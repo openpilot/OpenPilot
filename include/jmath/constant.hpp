@@ -5,6 +5,11 @@
 
 #include <cmath>
 
+#ifdef PI
+#undef PI
+#warning "preprocessor symbol PI undefined"
+#endif
+
 namespace jafar {
   namespace jmath {
 
@@ -17,7 +22,7 @@ namespace jafar {
       /// PI
       const double PI = M_PI;
 
-      /// 2 * PI
+      /// 2*PI
       const double TWO_PI = 2*M_PI;
 
       const double EPSILON = 1e-8;

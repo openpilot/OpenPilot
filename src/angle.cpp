@@ -7,12 +7,12 @@ namespace jafar {
   namespace jmath {
 
     double degToRad(double a_) {
-      return a_*constant::PI/180;
-    };
+      return a_*constant::PI/180.0;
+    }
 
     double radToDeg(double a_) {
-      return a_*180/constant::PI;
-    };
+      return a_*180.0/constant::PI;
+    }
 
     double toMinusPiPi(double a_) {
       double a = a_;
@@ -23,7 +23,7 @@ namespace jafar {
         a -= constant::TWO_PI;
       }
       return a;
-    };
+    }
 
     double toMinusTwoPiTwoPi(double a_) {
       double a = a_;
@@ -34,7 +34,7 @@ namespace jafar {
         a -= constant::TWO_PI;
       }
       return a;
-    };  
+    }
 
 } // namespace jmath
 } // namespace jafar

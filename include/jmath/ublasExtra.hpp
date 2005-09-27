@@ -8,6 +8,10 @@
 #include "kernel/jafarException.hpp"
 #include "kernel/jafarDebug.hpp"
 
+
+#include "jmath/jblas.hpp"
+#include "jmath/constant.hpp"
+
 // #include "jmath/lapack_bindings.hpp"
 
 namespace jafar {
@@ -25,118 +29,149 @@ namespace jafar {
       return s.str();
     };
 
-    /** This class provides some extra tools for ublas vector.
+    /** This namespace contains some extra tools for ublas vector and matrix.
      *
      * \ingroup jmath
      */
-    class VectorTools {
+    namespace ublasExtra {
 
-    protected:
+      /*
+       * Vector
+       */
 
-      /** implementation of setValue function.
+
+      /** normalize a vector.
        */
       template<class V>
-      static inline void _setValue(V& v, const double* val_) {
-        for (std::size_t i = 0 ; i < v.size() ; i++) {
-          v(i) = val_[i];
-        }
+      void normalize(V& v) {
+	double n = ublas::norm_2(v);
+	JFR_NUMERIC(n > jmath::constant::EPSILON,
+		    "VectorTools::normalize: vector too small");
+	v /= n;
       };
 
-    public:
-
-     template<class V>
-      static inline void setValue(V& v, const double* val_) {
-        VectorTools::_setValue(v, val_);
-      };
-
-      template<class V>
-      static inline void setValue(V& v, const double* val_, std::size_t size_) {
-        JFR_PRECOND(v.size()==size_,
-                    "VectorTools::setValue: size of v does not match");
-        VectorTools::_setValue(v, val_);
-      };
-      
-    }; // class VectorTools
-
-
-    /** This class provides some extra tools for ublas matrix.
-     *
-     * \ingroup jmath
-     */
-    class MatrixTools {
-
-    protected:
-
-      /** implementation of setValue function.
+      /** jacobian of normalize().
        */
-      template<class M>
-      static inline void _setValue(M& m, const double* val_) {
-        unsigned int k = 0;
-        for (std::size_t i = 0 ; i < m.size1() ; i++) {
-          for (std::size_t j = 0 ; j < m.size2() ; j++) {
-            m(i,j) = val_[k];
-            k++;
-          }
-        }
+      template<class V>
+      void normalizeJac(V& v, jblas::mat& J) {
+	JFR_PRECOND(J.size1() == v.size() && J.size2() == v.size(),
+		    "VectorTools::normalizeJac: size of J is invalid");
+	switch(v.size()) {
+	case 2:
+	  {
+	    double x = v(0);
+	    double y = v(1);
+	    /* begin maple copy/paste */
+	    double t1 = x * x;
+	    double t2 = y * y;
+	    double t3 = t1 + t2;
+	    double t4 = sqrt(t3);
+	    double t6 = 0.1e1 / t4 / t3;
+	    double t8 = 0.1e1 / t4;
+	    double t11 = t6 * x * y;
+	    J(0,0) = -t6 * t1 + t8;
+	    J(0,1) = -t11;
+	    J(1,0) = -t11;
+	    J(1,1) = -t6 * t2 + t8;
+	    /* end maple copy/paste */
+	  }
+	  return;
+	case 3:
+	  {
+	    double x = v(0);
+	    double y = v(1);
+	    double z = v(2);
+	    /* begin maple copy/paste */
+	    double t1 = x * x;
+	    double t2 = y * y;
+	    double t3 = z * z;
+	    double t4 = t1 + t2 + t3;
+	    double t5 = sqrt(t4);
+	    double t7 = 0.1e1 / t5 / t4;
+	    double t9 = 0.1e1 / t5;
+	    double t11 = t7 * x;
+	    double t12 = t11 * y;
+	    double t13 = t11 * z;
+	    double t17 = t7 * y * z;
+	    J(0,0) = -t7 * t1 + t9;
+	    J(0,1) = -t12;
+	    J(0,2) = -t13;
+	    J(1,0) = -t12;
+	    J(1,1) = -t7 * t2 + t9;
+	    J(1,2) = -t17;
+	    J(2,0) = -t13;
+	    J(2,1) = -t17;
+	    J(2,2) = -t7 * t3 + t9;
+	    /* end maple copy/paste */
+
+	  }
+	  return;
+	default:
+	  JFR_RUN_TIME("VectorTools::normalizeJac: not implemented yet");
+	}
       };
 
-      template<class M>
-      inline static double det2(const M& m_) {
-        return m_(0,0)*m_(1,1) - m_(1,0)*m_(0,1);
-      }
+      /** Compute the cross product of two vectors.
+       */
+      template<class Vec1, class Vec2, class VecRes>
+      void crossProd(Vec1 const& v1, Vec2 const& v2, VecRes& vRes) {
+	JFR_PRECOND(v1.size()==3 && v2.size()==3 && vRes.size()==3,
+		    "VectorTools::crossProd: 3D vector");
 
-      template<class M>
-      inline static double det3(const M& m_) {
-        return m_(0,0)*m_(1,1)*m_(2,2) 
-          + m_(0,1)*m_(1,2)*m_(2,0) 
-          + m_(0,2)*m_(1,0)*m_(2,1) 
-          - m_(2,0)*m_(1,1)*m_(0,2) 
-          - m_(2,1)*m_(1,2)*m_(0,0) 
-          - m_(2,2)*m_(1,0)*m_(0,1);
-      }
-
-      template<class M>
-      inline static void inv2(const M& m_, M& m_inv) {
-        m_inv(0,0) = m_(1,1);
-        m_inv(0,1) = -1.0*m_(0,1);
-        m_inv(1,0) = -1.0*m_(1,0);
-        m_inv(1,1) = m_(0,0);
-        m_inv /= det2(m_);
-      };
-
-      template<class M>
-      inline static void inv3(const M& m_, M& m_inv) {
-        m_inv(0,0) = m_(1,1)*m_(2,2)-m_(2,1)*m_(1,2);
-        m_inv(0,1) = m_(2,1)*m_(0,2)-m_(0,1)*m_(2,2);
-        m_inv(0,2) = m_(0,1)*m_(1,2)-m_(1,1)*m_(0,2);
-        m_inv(1,0) = m_(2,0)*m_(1,2)-m_(1,0)*m_(2,2);
-        m_inv(1,1) = m_(0,0)*m_(2,2)-m_(2,0)*m_(0,2);
-        m_inv(1,2) = m_(1,0)*m_(0,2)-m_(0,0)*m_(1,2);
-        m_inv(2,0) = m_(1,0)*m_(2,1)-m_(2,0)*m_(1,1);
-        m_inv(2,1) = m_(2,0)*m_(0,1)-m_(0,0)*m_(2,1);
-        m_inv(2,2) = m_(0,0)*m_(1,1)-m_(1,0)*m_(0,1);
-
-        m_inv /= det3(m_);
-
+	vRes(0) = v1(1) * v2(2) - v1(2) * v2(1);
+	vRes(1) = v1(2) * v2(0) - v1(0) * v2(2);
+	vRes(2) = v1(0) * v2(1) - v1(1) * v2(0);
       };
       
+      /*
+       * Matrix
+       */
 
-    public:
+      namespace detail {
+
+	template<class M>
+	double det2(const M& m_) {
+	  return m_(0,0)*m_(1,1) - m_(1,0)*m_(0,1);
+	}
+
+	template<class M>
+	double det3(const M& m_) {
+	  return m_(0,0)*m_(1,1)*m_(2,2) 
+	    + m_(0,1)*m_(1,2)*m_(2,0) 
+	    + m_(0,2)*m_(1,0)*m_(2,1) 
+	    - m_(2,0)*m_(1,1)*m_(0,2) 
+	    - m_(2,1)*m_(1,2)*m_(0,0) 
+	    - m_(2,2)*m_(0,2)*m_(0,1);
+	}
+
+	template<class M>
+	void inv2(const M& m_, M& m_inv) {
+	  m_inv(0,0) = m_(1,1);
+	  m_inv(0,1) = -1.0*m_(0,1);
+	  m_inv(1,0) = -1.0*m_(1,0);
+	  m_inv(1,1) = m_(0,0);
+	  m_inv /= det2(m_);
+	};
+
+	template<class M>
+	void inv3(const M& m_, M& m_inv) {
+	  m_inv(0,0) = m_(1,1)*m_(2,2)-m_(1,2)*m_(2,1);
+	  m_inv(0,1) = m_(2,1)*m_(0,2)-m_(2,2)*m_(0,1);
+	  m_inv(0,2) = m_(0,1)*m_(1,2)-m_(0,2)*m_(1,1);
+	  m_inv(1,0) = m_(2,0)*m_(1,2)-m_(1,0)*m_(2,2);
+	  m_inv(1,1) = m_(0,0)*m_(2,2)-m_(2,0)*m_(0,2);
+	  m_inv(1,2) = m_(1,0)*m_(0,2)-m_(0,0)*m_(1,2);
+	  m_inv(2,0) = m_(1,0)*m_(2,1)-m_(2,0)*m_(1,1);
+	  m_inv(2,1) = m_(2,0)*m_(1,0)-m_(0,0)*m_(2,1);
+	  m_inv(2,2) = m_(0,0)*m_(1,1)-m_(1,0)*m_(0,1);
+
+	  m_inv /= det3(m_);
+	};
+
+      } // namespace detail
 
       template<class M>
-      static inline void setValue(M& m, const double* val_) {
-        MatrixTools::_setValue(m, val_);
-      };
-
-      template<class M>
-      static inline void setValue(M& m, const double* val_, std::size_t size1_, std::size_t size2_) {
-        JFR_PRECOND(m.size1()==size1_ && m.size2()==size2_,
-                    "MatrixTools::setValue: size of m does not match");
-        MatrixTools::_setValue(m, val_);
-      };
-
-      template<class M>
-      static double max(const M& m_) {
+      double max(const M& m_) {
         double max = m_(0,0);
         for (std::size_t i=0 ; i < m_.size1() ; i++) {
           for (std::size_t j=0 ; j < m_.size2() ; j++) {
@@ -149,7 +184,7 @@ namespace jafar {
       };
 
       template<class M>
-      static double trace(const M& m_) {
+      double trace(const M& m_) {
         JFR_PRECOND(m_.size1() == m_.size2(),
                     "MatrixTools::trace: m_ must be square");
         double t=0;
@@ -160,23 +195,23 @@ namespace jafar {
       };
 
       template<class M>
-      static double det(const M& m_) {
+      double det(const M& m_) {
         JFR_PRECOND(m_.size1() == m_.size2(),
                     "MatrixTools::det: m_ must be a square matrix");
         switch(m_.size1()) {
         case 1:
           return m_(0,0);
         case 2:
-          return det2(m_);
+          return detail::det2(m_);
         case 3:
-          return det3(m_);
+          return detail::det3(m_);
         default:
           JFR_RUN_TIME("MatrixTools::det: not implemented yet");
         }  
       };
 
       template<class M>
-      static void inv(const M& m_, M& m_inv) {
+      void inv(const M& m_, M& m_inv) {
         JFR_PRECOND(m_.size1() == m_.size2(),
                     "MatrixTools::inv: m_ must be a square matrix");
         switch(m_.size1()) {
@@ -184,22 +219,21 @@ namespace jafar {
           m_inv(0,0) = 1/m_(0,0);
           break;
         case 2:
-          inv2(m_, m_inv);
+	  detail::inv2(m_, m_inv);
           break;
         case 3:
-          inv3(m_, m_inv);
+	  detail::inv3(m_, m_inv);
           break;
         default:
           JFR_RUN_TIME("MatrixTools::inv: not implemented yet");
         }
       };
 
-//       static int testLapack(jblas::mat& A, jblas::mat& B) {
-//         int err = lapack::gesv(A,B);
-//         return err;
-//       };
 
-    }; // class MatrixTools
+    } // namespace ublasExtra
+
+    namespace VectorTools=jafar::jmath::ublasExtra;
+    namespace MatrixTools=jafar::jmath::ublasExtra;
 
   } // namespace jmath
 } // namespace jafar

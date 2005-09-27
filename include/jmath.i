@@ -22,8 +22,9 @@
 #include "jmath/angle.hpp"
 #include "jmath/gaussianVector.hpp"
 
-  //#include "jmath/delaunay.hpp"
-
+#ifdef HAVE_TTL
+#include "jmath/delaunay.hpp"
+#endif
 %}
 
 %include "std_common.i"
@@ -45,17 +46,20 @@
 %include "jmathTools.i"
 %include "jmath/ublasExtra.hpp"
 
-// %template(create_vec) jafar::jmath::createVector<jblas::vec, double>; // deprecated
 %template(setSizeValue) jafar::jmath::setSizeValue<jblas::vec>;
 %template(setValue) jafar::jmath::setValueVec<jblas::vec>;
 %template(print) jafar::jmath::print<jblas::vec>;
 
 %template(print) jafar::jmath::print<jblas::vec_range>;
 
+%template(setValue) jafar::jmath::setValueVec<jblas::vec2>;
+%template(print) jafar::jmath::print<jblas::vec2>;
+
 %template(setValue) jafar::jmath::setValueVec<jblas::vec3>;
 %template(print) jafar::jmath::print<jblas::vec3>;
 
-//%template(create_mat) jafar::jmath::createMatrix<jblas::mat, double>; // deprecated
+%template(normalize) jafar::jmath::ublasExtra::normalize<jblas::vec>;
+
 %template(setSizeValue) jafar::jmath::setSizeValue<jblas::mat>;
 %template(setValue) jafar::jmath::setValueMat<jblas::mat>;
 %template(print) jafar::jmath::print<jblas::mat>;
@@ -66,32 +70,22 @@
 %template(print) jafar::jmath::print<jblas::mat44>;
 %template(prettyPrint) jafar::jmath::prettyFormat<jblas::mat44>;
 
-// %template(create_sym_mat) jafar::jmath::createMatrix<jblas::sym_mat, double>; // deprecated
-//%template(setSizeValue) jafar::jmath::setSizeValue<jblas::sym_mat>;
-//%template(setValue) jafar::jmath::setValueMat<jblas::sym_mat>;
+
+%template(setSizeValue) jafar::jmath::setSizeValue<jblas::sym_mat>;
+%template(setValue) jafar::jmath::setValueMat<jblas::sym_mat>;
 %template(print) jafar::jmath::print<jblas::sym_mat>;
 %template(prettyPrint) jafar::jmath::prettyFormat<jblas::sym_mat>;
 
 %template(print) jafar::jmath::print<jblas::sym_mat_range>;
 %template(prettyPrint) jafar::jmath::prettyFormat<jblas::sym_mat_range>;
 
-%template(max) jafar::jmath::MatrixTools::max<jblas::mat>;
-%template(max) jafar::jmath::MatrixTools::max<jblas::sym_mat>;
-%template(trace) jafar::jmath::MatrixTools::trace<jblas::mat>;
-%template(trace) jafar::jmath::MatrixTools::trace<jblas::sym_mat>;
-//%template(covToEllipsoid) jafar::jmath::MatrixTools::covToEllipsoid<jblas::sym_mat>;
-
-
-/* random */
+%template(max) jafar::jmath::ublasExtra::max<jblas::mat>;
+%template(max) jafar::jmath::ublasExtra::max<jblas::sym_mat>;
+%template(trace) jafar::jmath::ublasExtra::trace<jblas::mat>;
+%template(trace) jafar::jmath::ublasExtra::trace<jblas::sym_mat>;
 
 %include "jmath/random.hpp"
 
-// %template(EulerT3D_toFrame) jafar::jmath::EulerT3D::toFrame<jblas::vec, jblas::vec, jblas::vec>;
-// %template(EulerT3D_toFrameJac) jafar::jmath::EulerT3D::toFrameJac<jblas::vec, jblas::vec>;
-// %template(EulerT3D_fromFrame) jafar::jmath::EulerT3D::fromFrame<jblas::vec, jblas::vec, jblas::vec>;
-// %template(EulerT3D_fromFrameJac) jafar::jmath::EulerT3D::fromFrameJac<jblas::vec, jblas::vec>;
-// %template(EulerT3D_composeFrame) jafar::jmath::EulerT3D::composeFrame<jblas::vec, jblas::vec, jblas::vec>;
-// %template(EulerT3D_composeFrameJac) jafar::jmath::EulerT3D::composeFrameJac<jblas::vec, jblas::vec>;
 
 %include "jmath/constant.hpp"
 %include "jmath/angle.hpp"
@@ -100,4 +94,6 @@
 %template(print) jafar::jmath::print<jafar::jmath::GaussianVector>;
 %template(print) jafar::jmath::print<jafar::jmath::WeightedGaussianVector>;
 
-// %include "jmath/delaunay.hpp"
+#ifdef HAVE_TTL
+%include "jmath/delaunay.hpp"
+#endif

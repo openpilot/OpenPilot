@@ -41,10 +41,14 @@ double GaussianVector::probabilityDensity(const jblas::vec& v)
 
   sym_mat P_inv(size(), size());
   MatrixTools::inv(P, P_inv);
-  mat y(size(),1);
-  mat_column y_col(y, 0);
-  y_col.assign(v-x);
-  double num = exp(-0.5 * prod<mat>(trans(y), prod<mat>(P_inv, y))(0,0));
+//   mat y(size(),1);
+//   mat_column y_col(y, 0);
+//   y_col.assign(v-x);
+//   double num = exp(-0.5 * prod<mat>(trans(y), prod<mat>(P_inv, y))(0,0));
+
+  vec y = v-x;
+  double num = exp(-0.5 * inner_prod(y, prod(P_inv, y)));
+
   double den = pow(constant::TWO_PI,size()/2)*sqrt(MatrixTools::det(P));
   return num / den;
 }

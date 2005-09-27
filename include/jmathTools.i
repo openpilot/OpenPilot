@@ -12,6 +12,8 @@
 #include <sstream>
 #include <iostream>
 
+#include "boost/version.hpp"
+
 #include "kernel/jafarException.hpp"
 #include "jmath/jblas.hpp"
 
@@ -26,8 +28,6 @@ namespace jafar {
     void print(const U& u_) {
       std::cout << u_ << std::endl;
     };
-
-    typedef unsigned int size_type;
 
     /** Set the value (and the size) of a vector or a matrix using the operator>> in ublas.
      * @param t a vector or a matrix
@@ -66,69 +66,27 @@ namespace jafar {
       JFR_IO_STREAM(s >> mat, "reading matrix from string");
     };
 
-
-//     template<>
-//     void setValue<jblas::sym_mat>(jblas::sym_mat& mat, const std::string& value) {
-//       std::stringstream s;
-//       jblas::mat mat_tmp(mat.size1(), mat.size2());
-//       s << value;
-//       s >> mat_tmp;
-//       mat.assign(mat_tmp);
-//     };
-
-    /*
-     * vectors tools
-     */
-    /// @deprecated use setValue()
-    template<class V, class T>
-    V createVector(size_type size_, const std::string& values_="") {
-
-      V v(size_);
-
-      if (values_.size() > 0) {
-        std::istringstream ss(values_);
-        size_type index = 0;
-        T t;
-        
-        while(!ss.eof() && index<v.size()) {
-          ss >> t;
-          v(index) = t;
-          index++;
-        }
-      }
-
-      return v;
+#if BOOST_VERSION < 103300
+    
+    template<>
+    void setSizeValue<jblas::sym_mat>(T& t, const std::string& value) {
+      std::stringstream s;
+      jblas::mat mat_tmp(mat.size1(), mat.size2());
+      s << value;
+      JFR_IO_STREAM(s >> mat_tmp, "reading matrix or vector from string");
+      t.assign(mat_tmp);
     };
 
-
-    /*
-     * matrix tools
-     */
-    /// @deprecated use setValue()
-    template<class M, class T> // FIXME should not have T
-    M createMatrix(size_type size1_, size_type size2_, const std::string& values_="") {
-
-      M m(size1_, size2_);
-
-      if (values_.size() > 0) {
-        std::istringstream ss(values_);
-        size_type row = 0;
-        size_type col = 0;
-        T t;
-
-        while(!ss.eof() && row<m.size1()) {
-          ss >> t;
-          m(row,col) = t;
-          col ++;
-          if (col == m.size2()) {
-            col = 0;
-            row++;      
-          }
-        }
-      }
-
-      return m;
+    template<>
+    void setValueMat<jblas::sym_mat>(jblas::sym_mat& mat, const std::string& value) {
+      std::stringstream s;
+      jblas::mat mat_tmp(mat.size1(), mat.size2());
+      s << value;
+      s >> mat_tmp;
+      mat.assign(mat_tmp);
     };
+
+#endif
 
   }
 }

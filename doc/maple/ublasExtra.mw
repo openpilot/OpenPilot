@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Worksheet><Version major="6" minor="1"/><View-Properties><Zoom percentage="100"/></View-Properties><Styles><Layout alignment="left" bullet="none" firstindent="0.0" leftmargin="0.0" linebreak="space" linespacing="0.0" name="Normal" rightmargin="0.0" spaceabove="0.0" spacebelow="0.0"/><Layout alignment="centred" bullet="none" linespacing="0.5" name="Maple Output"/><Font background="[0,0,0]" bold="true" executable="true" family="Monospaced" foreground="[255,0,0]" name="Maple Input" opaque="false" size="12"/><Font background="[0,0,0]" family="Monospaced" foreground="[0,0,255]" name="Line Printed Output" opaque="false" readonly="true" size="12"/><Font background="[0,0,0]" family="Lucida Bright" foreground="[0,0,255]" name="2D Output" opaque="false" readonly="true" size="12"/></Styles><Group><Input><Text-field layout="Normal" prompt="&gt; " style="Maple Input">with(LinearAlgebra):with(CodeGeneration, C):with(VectorCalculus,Jacobian):</Text-field></Input></Group><Group><Input><Text-field layout="Normal" prompt="&gt; " style="Maple Input">normalize := proc (v::Vector())::Vector();</Text-field></Input><Input><Text-field prompt="&gt; " style="Maple Input">return v / VectorNorm(v,Euclidean,conjugate=false);</Text-field></Input><Input><Text-field prompt="&gt; " style="Maple Input">end proc;</Text-field></Input><Output><Text-field layout="Maple Output" style="2D Output"><Equation>NiM+SSpub3JtYWxpemVHNiJmKzYjJ0kidkdGJS1JJ1ZlY3RvckdGJUYlRiVGJUYlTyomOSQiIiItX0kuTGluZWFyQWxnZWJyYUc2JEkqcHJvdGVjdGVkR0Y0SShfc3lzbGliR0YlSStWZWN0b3JOb3JtR0YlNiVGLkkqRXVjbGlkZWFuR0YlL0kqY29uanVnYXRlR0Y0SSZmYWxzZUdGNCEiIkYlRiVGJUYq</Equation></Text-field></Output></Group><Group><Input><Text-field layout="Normal" prompt="&gt; " style="Maple Input">normalize(&lt;x,y,z&gt;);</Text-field></Input><Output><Text-field layout="Maple Output" style="2D Output"><Equation>NiMtSSdSVEFCTEVHNiI2JSIqNzVfbiItSSdNQVRSSVhHRiU2IzclNyMqJiwoKiRJInhHRiUiIiMiIiIqJEkieUdGJUYxRjIqJEkiekdGJUYxRjIjISIiRjFGMEYyNyMqJkYuRjdGNEYyNyMqJkYuRjdGNkYyJkknVmVjdG9yRzYkSSpwcm90ZWN0ZWRHRkBJKF9zeXNsaWJHRiU2I0knY29sdW1uR0Yl</Equation></Text-field></Output></Group><Group><Input><Text-field layout="Normal" prompt="&gt; " style="Maple Input">normalize2_jac := Jacobian(normalize(&lt;x,y&gt;), [x,y]);</Text-field></Input><Output><Text-field layout="Maple Output" style="2D Output"><Equation>NiM+SS9ub3JtYWxpemUyX2phY0c2Ii1JJ1JUQUJMRUdGJTYlIipvRXJuIi1JJ01BVFJJWEdGJTYjNyQ3JCwmKiYsJiokSSJ4R0YlIiIjIiIiKiRJInlHRiVGNEY1IyEiJEY0RjNGNCEiIiokRjEjRjpGNEY1LCQqKEYxRjhGM0Y1RjdGNUY6NyRGPSwmKiZGMUY4RjdGNEY6RjtGNUknTWF0cml4RzYkSSpwcm90ZWN0ZWRHRkRJKF9zeXNsaWJHRiU=</Equation></Text-field></Output></Group><Group><Input><Text-field layout="Normal" prompt="&gt; " style="Maple Input">C(normalize2_jac, optimize);</Text-field></Input><Output><Text-field layout="Normal" style="Line Printed Output">t1 = x * x;
+t2 = y * y;
+t3 = t1 + t2;
+t4 = sqrt(t3);
+t6 = 0.1e1 / t4 / t3;
+t8 = 0.1e1 / t4;
+t11 = t6 * x * y;
+cg[0][0] = -t6 * t1 + t8;
+cg[0][1] = -t11;
+cg[1][0] = -t11;
+cg[1][1] = -t6 * t2 + t8;</Text-field></Output></Group><Group><Input><Text-field layout="Normal" prompt="&gt; " style="Maple Input">normalize3_jac := Jacobian(normalize(&lt;x,y,z&gt;), [x,y,z]);</Text-field></Input><Output><Text-field layout="Maple Output" style="2D Output"><Equation>NiM+SS9ub3JtYWxpemUzX2phY0c2Ii1JJ1JUQUJMRUdGJTYlIipDa0duIi1JJ01BVFJJWEdGJTYjNyU3JSwmKiYsKCokSSJ4R0YlIiIjIiIiKiRJInlHRiVGNEY1KiRJInpHRiVGNEY1IyEiJEY0RjNGNCEiIiokRjEjRjxGNEY1LCQqKEYxRjpGM0Y1RjdGNUY8LCQqKEYxRjpGM0Y1RjlGNUY8NyVGPywmKiZGMUY6RjdGNEY8Rj1GNSwkKihGMUY6RjdGNUY5RjVGPDclRkFGRiwmKiZGMUY6RjlGNEY8Rj1GNUknTWF0cml4RzYkSSpwcm90ZWN0ZWRHRk1JKF9zeXNsaWJHRiU=</Equation></Text-field></Output></Group><Group><Input><Text-field layout="Normal" prompt="&gt; " style="Maple Input">C(normalize3_jac, optimize);</Text-field></Input><Output><Text-field layout="Normal" style="Line Printed Output">t1 = x * x;
+t2 = y * y;
+t3 = z * z;
+t4 = t1 + t2 + t3;
+t5 = sqrt(t4);
+t7 = 0.1e1 / t5 / t4;
+t9 = 0.1e1 / t5;
+t11 = t7 * x;
+t12 = t11 * y;
+t13 = t11 * z;
+t17 = t7 * y * z;
+cg0[0][0] = -t7 * t1 + t9;
+cg0[0][1] = -t12;
+cg0[0][2] = -t13;
+cg0[1][0] = -t12;
+cg0[1][1] = -t7 * t2 + t9;
+cg0[1][2] = -t17;
+cg0[2][0] = -t13;
+cg0[2][1] = -t17;
+cg0[2][2] = -t7 * t3 + t9;</Text-field></Output></Group><Group><Input><Text-field layout="Normal" prompt="&gt; " style="Maple Input"/></Input></Group><Text-field/><Text-field/><RTable handle="167521012" >TTdSMApJNlJUQUJMRV9TQVZFLzE2NzUyMTAxMlgqJSlhbnl0aGluZ0c2IjYiW2dsISMlISEhIiQiJComLCgqJCUieEciIiMiIiIqJCUieUdGK0YsCiokJSJ6R0YrRiwjISIiRitGKkYsKiZGKEYxRi5GLComRihGMUYwRixGJgo=</RTable><RTable handle="167712668" >TTdSMApJNlJUQUJMRV9TQVZFLzE2NzcxMjY2OFgsJSlhbnl0aGluZ0c2IjYiW2dsISIlISEhIyUiIyIjLCYqJiwmKiQlInhHIiIjIiIiKiQlInlHCkYsRi0jISIkRixGK0YsISIiKiRGKSNGMkYsRi0sJCooRilGMEYrRi1GL0YtRjJGNSwmKiZGKUYwRi9GLEYyRjNGLUYmCg==</RTable><RTable handle="167286424" >TTdSMApJNlJUQUJMRV9TQVZFLzE2NzI4NjQyNFgsJSlhbnl0aGluZ0c2IjYiW2dsISIlISEhIyoiJCIkLCYqJiwoKiQlInhHIiIjIiIiKiQlInlHCkYsRi0qJCUiekdGLEYtIyEiJEYsRitGLCEiIiokRikjRjRGLEYtLCQqKEYpRjJGK0YtRi9GLUY0LCQqKEYpRjJGK0YtRjFGLUY0RjcsJioKJkYpRjJGL0YsRjRGNUYtLCQqKEYpRjJGL0YtRjFGLUY0RjlGPSwmKiZGKUYyRjFGLEY0RjVGLUYmCg==</RTable></Worksheet>

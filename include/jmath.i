@@ -71,7 +71,7 @@
 %template(prettyPrint) jafar::jmath::prettyFormat<jblas::mat44>;
 
 
-%template(setSizeValue) jafar::jmath::setSizeValue<jblas::sym_mat>;
+//%template(setSizeValue) jafar::jmath::setSizeValue<jblas::sym_mat>;
 %template(setValue) jafar::jmath::setValueMat<jblas::sym_mat>;
 %template(print) jafar::jmath::print<jblas::sym_mat>;
 %template(prettyPrint) jafar::jmath::prettyFormat<jblas::sym_mat>;

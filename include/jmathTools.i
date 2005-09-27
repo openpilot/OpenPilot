@@ -69,21 +69,12 @@ namespace jafar {
 #if BOOST_VERSION < 103300
     
     template<>
-    void setSizeValue<jblas::sym_mat>(T& t, const std::string& value) {
-      std::stringstream s;
-      jblas::mat mat_tmp(mat.size1(), mat.size2());
-      s << value;
-      JFR_IO_STREAM(s >> mat_tmp, "reading matrix or vector from string");
-      t.assign(mat_tmp);
-    };
-
-    template<>
     void setValueMat<jblas::sym_mat>(jblas::sym_mat& mat, const std::string& value) {
       std::stringstream s;
-      jblas::mat mat_tmp(mat.size1(), mat.size2());
-      s << value;
-      s >> mat_tmp;
-      mat.assign(mat_tmp);
+      jblas::mat matTmp(mat.size1(), mat.size2());
+      s << "[" << mat.size1() << "," << mat.size2() << "]" << value;
+      JFR_IO_STREAM(s >> matTmp, "reading matrix from string");
+      mat.assign(matTmp);
     };
 
 #endif

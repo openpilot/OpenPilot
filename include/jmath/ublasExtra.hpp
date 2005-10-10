@@ -8,9 +8,7 @@
 #include "kernel/jafarException.hpp"
 #include "kernel/jafarDebug.hpp"
 
-
 #include "jmath/jblas.hpp"
-#include "jmath/constant.hpp"
 
 // #include "jmath/lapack_bindings.hpp"
 
@@ -35,6 +33,9 @@ namespace jafar {
      */
     namespace ublasExtra {
 
+      /// a small value
+      const double EPSILON = 1e-8;
+
       /*
        * Vector
        */
@@ -45,7 +46,7 @@ namespace jafar {
       template<class V>
       void normalize(V& v) {
 	double n = ublas::norm_2(v);
-	JFR_NUMERIC(n > jmath::constant::EPSILON,
+	JFR_NUMERIC(n > EPSILON,
 		    "VectorTools::normalize: vector too small");
 	v /= n;
       };
@@ -232,6 +233,7 @@ namespace jafar {
 
     } // namespace ublasExtra
 
+    // deprecated
     namespace VectorTools=jafar::jmath::ublasExtra;
     namespace MatrixTools=jafar::jmath::ublasExtra;
 

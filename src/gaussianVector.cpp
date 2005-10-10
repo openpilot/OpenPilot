@@ -5,7 +5,6 @@
 #include "kernel/jafarException.hpp"
 
 #include "jmath/gaussianVector.hpp"
-#include "jmath/constant.hpp"
 #include "jmath/ublasExtra.hpp"
 
 using namespace jblas;
@@ -49,7 +48,7 @@ double GaussianVector::probabilityDensity(const jblas::vec& v)
   vec y = v-x;
   double num = exp(-0.5 * inner_prod(y, prod(P_inv, y)));
 
-  double den = pow(constant::TWO_PI,size()/2)*sqrt(MatrixTools::det(P));
+  double den = pow(2*M_PI,size()/2)*sqrt(MatrixTools::det(P));
   return num / den;
 }
 

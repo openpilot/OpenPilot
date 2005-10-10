@@ -12,7 +12,7 @@ namespace jafar {
 
     double toMinusPiPi(double a_);
 
-    double toMinusTwoPiTwoPi(double a_);
+    double toMinus2Pi2Pi(double a_);
 
   } // namespace jmath
 } // namespace jafar

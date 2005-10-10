@@ -18,7 +18,6 @@
 #include "jmath/ublasExtra.hpp"
 
 #include "jmath/random.hpp"
-#include "jmath/constant.hpp"
 #include "jmath/angle.hpp"
 #include "jmath/gaussianVector.hpp"
 
@@ -86,8 +85,6 @@
 
 %include "jmath/random.hpp"
 
-
-%include "jmath/constant.hpp"
 %include "jmath/angle.hpp"
 
 %include "jmath/gaussianVector.hpp"

@@ -28,7 +28,9 @@ namespace jblas { /// special namespace to define blas datatype, shortcut to jbl
   /// standard vector type
   typedef boost::numeric::ublas::vector<double> vec;
   typedef boost::numeric::ublas::zero_vector<double> zero_vec;
-  
+
+  /// 1 dimension vector
+  typedef boost::numeric::ublas::bounded_vector<double,1> vec1;
   /// 2 dimension vector
   typedef boost::numeric::ublas::bounded_vector<double,2> vec2;
   /// 3 dimension vector

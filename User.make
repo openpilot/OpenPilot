@@ -13,18 +13,14 @@ USE_MODULES = kernel
 # concider also modifying .config/User.m4 to check for these libs at
 # configure time
 
-LDFLAGS += -L/home/thomas/usr/local/ttl/lib
-
 LIBS += -lkernel
 
-# to use ublas bindings to lapack
-#LIBS += -llapack
-
 CPPFLAGS += $(BOOST_CPPFLAGS) -DBOOST_UBLAS_USE_EXCEPTIONS
+
 # ttl library
 #CPPFLAGS += -I/home/thomas/usr/local/ttl/include -DHAVE_TTL
-#TTL_LIBS = -ldstrhe -lutils 
-#LIBS += TTL_LIBS
+#LIBS += -ldstrhe -lutils
+#LDFLAGS += -L/home/thomas/usr/local/ttl/lib
 
 #CPPFLAGS += -DNDEBUG
 

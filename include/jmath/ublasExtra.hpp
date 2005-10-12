@@ -15,12 +15,15 @@
 namespace jafar {
   namespace jmath {
 
+    /** Format a matrix output it to a string. Each matrix row
+     * corresponds to a line.
+     */
     template<class Mat>
     std::string prettyFormat(Mat const& m_) {
       std::stringstream s;
       for (std::size_t i = 0 ; i < m_.size1() ; ++i) {
 	for (std::size_t j = 0 ; j < m_.size2() ; ++j) {
-	   s << m_(i,j) << " ";
+	   s << m_(i,j) << "\t";
 	}
 	s << std::endl;
       }
@@ -55,6 +58,8 @@ namespace jafar {
        */
       template<class V>
       void normalizeJac(V& v, jblas::mat& J) {
+	JFR_NUMERIC(ublas::norm_2(v) > EPSILON,
+		    "VectorTools::normalizeJac: vector too small");
 	JFR_PRECOND(J.size1() == v.size() && J.size2() == v.size(),
 		    "VectorTools::normalizeJac: size of J is invalid");
 	switch(v.size()) {
@@ -112,6 +117,21 @@ namespace jafar {
 	}
       };
 
+      /** Compute the jacobian of an inner product.
+       */
+      template<std::size_t N, class Vec1, class Vec2>
+      void inner_prodJac(Vec1 const& u1, Vec2 const& u2, jblas::mat& J)
+      {
+	JFR_PRECOND(u1.size() == N && u2.size() == N,
+		    "ImageSegmentFeatureObserveModel::inner_prodJac: 3D vectors");
+	JFR_PRECOND(J.size1() == 1 && J.size2() == 2*N,
+		    "ImageSegmentFeatureObserveModel::inner_prodJac:");
+	for (std::size_t i = 0 ; i < N ; ++i) {
+	  J(0,i) = u2(i);
+	  J(0,N+i) = u1(i);
+	}
+      };
+
       /** Compute the cross product of two vectors.
        */
       template<class Vec1, class Vec2, class VecRes>
@@ -122,6 +142,13 @@ namespace jafar {
 	vRes(0) = v1(1) * v2(2) - v1(2) * v2(1);
 	vRes(1) = v1(2) * v2(0) - v1(0) * v2(2);
 	vRes(2) = v1(0) * v2(1) - v1(1) * v2(0);
+      };
+
+      template<class Vec1, class Vec2>
+      jblas::vec3 crossProd(Vec1 const& v1, Vec2 const& v2) {
+	jblas::vec3 vRes;
+	crossProd(v1,v2,vRes);
+	return vRes;
       };
       
       /*

@@ -142,11 +142,11 @@ namespace jafar {
 	JFR_PRECOND(J.size1() == 1 && J.size2() == N,
 		    "ublasExtra::norm_2Jac:");
 	double d=0;
-	for (int i = 0 ; i < N ; ++i) {
+	for (std::size_t i = 0 ; i < N ; ++i) {
 	  d+=pow(u(i),2);
 	}
 	d = sqrt(d);
-	for (int i = 0 ; i < N ; ++i) {
+	for (std::size_t i = 0 ; i < N ; ++i) {
 	  J(0,i) = u(i)/d;
 	}
       };

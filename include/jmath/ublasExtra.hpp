@@ -117,18 +117,37 @@ namespace jafar {
 	}
       };
 
-      /** Compute the jacobian of an inner product.
+      /** Compute the jacobian of inner product.
        */
-      template<std::size_t N, class Vec1, class Vec2>
-      void inner_prodJac(Vec1 const& u1, Vec2 const& u2, jblas::mat& J)
+      template<std::size_t N, class Vec1, class Vec2, class Mat>
+      void inner_prodJac(Vec1 const& u1, Vec2 const& u2, Mat& J)
       {
 	JFR_PRECOND(u1.size() == N && u2.size() == N,
-		    "ImageSegmentFeatureObserveModel::inner_prodJac: 3D vectors");
+		    "ublasExtra::inner_prodJac:" << N << "-vectors");
 	JFR_PRECOND(J.size1() == 1 && J.size2() == 2*N,
-		    "ImageSegmentFeatureObserveModel::inner_prodJac:");
+		    "ublasExtra::inner_prodJac:");
 	for (std::size_t i = 0 ; i < N ; ++i) {
 	  J(0,i) = u2(i);
 	  J(0,N+i) = u1(i);
+	}
+      };
+
+      /** Compute the jacobian of norm_2.
+       */
+      template<std::size_t N, class Vec, class Mat>
+      void norm_2Jac(Vec const& u, Mat& J)
+      {
+	JFR_PRECOND(u.size() == N,
+		    "ublasExtra::norm_2Jac:" << N << "-vectors");
+	JFR_PRECOND(J.size1() == 1 && J.size2() == N,
+		    "ublasExtra::norm_2Jac:");
+	double d=0;
+	for (int i = 0 ; i < N ; ++i) {
+	  d+=pow(u(i),2);
+	}
+	d = sqrt(d);
+	for (int i = 0 ; i < N ; ++i) {
+	  J(0,i) = u(i)/d;
 	}
       };
 

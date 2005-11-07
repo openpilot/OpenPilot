@@ -43,6 +43,15 @@ namespace jafar {
        * Vector
        */
 
+      template<class V>
+      void setVectorValue(V& v, const double* val_, std::size_t size_) {
+	JFR_PRECOND(v.size()==size_,
+                    "ublasExtra::setValue: size of v does not match");
+        for (std::size_t i = 0 ; i < v.size() ; i++) {
+          v(i) = val_[i];
+        }
+      };
+
 
       /** normalize a vector.
        */
@@ -173,6 +182,19 @@ namespace jafar {
       /*
        * Matrix
        */
+
+      template<class M>
+      void setMatrixValue(M& m, const double* val_, std::size_t size1_, std::size_t size2_) {
+        JFR_PRECOND(m.size1()==size1_ && m.size2()==size2_,
+                    "MatrixTools::setValue: size of m does not match");
+	unsigned int k = 0;
+        for (std::size_t i = 0 ; i < m.size1() ; i++) {
+          for (std::size_t j = 0 ; j < m.size2() ; j++) {
+            m(i,j) = val_[k];
+            k++;
+          }
+        }
+      };
 
       namespace detail {
 

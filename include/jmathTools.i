@@ -10,7 +10,6 @@
 
 #include <string>
 #include <sstream>
-#include <iostream>
 
 #include "boost/version.hpp"
 
@@ -24,9 +23,11 @@
 namespace jafar {
   namespace jmath {
 
-    template<class U>
-    void print(const U& u_) {
-      std::cout << u_ << std::endl;
+    template<class A>
+    std::string print(const A& a_) {
+      std::ostringstream os;
+      os << a_ << std::endl;
+      return os.str();
     };
 
     /** Set the value (and the size) of a vector or a matrix using the operator>> in ublas.

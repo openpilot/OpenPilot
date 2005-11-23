@@ -39,7 +39,7 @@ double GaussianVector::probabilityDensity(const jblas::vec& v)
               "GaussianVector::value: size of v must match size of gaussian");
 
   sym_mat P_inv(size(), size());
-  MatrixTools::inv(P, P_inv);
+  ublasExtra::inv(P, P_inv);
 //   mat y(size(),1);
 //   mat_column y_col(y, 0);
 //   y_col.assign(v-x);
@@ -48,7 +48,7 @@ double GaussianVector::probabilityDensity(const jblas::vec& v)
   vec y = v-x;
   double num = exp(-0.5 * inner_prod(y, prod(P_inv, y)));
 
-  double den = pow(2*M_PI,size()/2)*sqrt(MatrixTools::det(P));
+  double den = pow(2*M_PI,size()/2)*sqrt(ublasExtra::det(P));
   return num / den;
 }
 

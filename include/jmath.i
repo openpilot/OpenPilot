@@ -62,21 +62,22 @@
 %template(setSizeValue) jafar::jmath::setSizeValue<jblas::mat>;
 %template(setValue) jafar::jmath::setValueMat<jblas::mat>;
 %template(print) jafar::jmath::print<jblas::mat>;
-%template(prettyPrint) jafar::jmath::prettyFormat<jblas::mat>;
+%template(prettyPrint) jafar::jmath::ublasExtra::prettyFormat<jblas::mat>;
+%template(lu_invert) jafar::jmath::ublasExtra::lu_invert<jblas::mat, jblas::mat>;
 
 %template(setSizeValue) jafar::jmath::setSizeValue<jblas::mat44>;
 %template(setValue) jafar::jmath::setValueMat<jblas::mat44>;
 %template(print) jafar::jmath::print<jblas::mat44>;
-%template(prettyPrint) jafar::jmath::prettyFormat<jblas::mat44>;
+%template(prettyPrint) jafar::jmath::ublasExtra::prettyFormat<jblas::mat44>;
 
-
-//%template(setSizeValue) jafar::jmath::setSizeValue<jblas::sym_mat>;
+%template(setSizeValue) jafar::jmath::setSizeValue<jblas::sym_mat>;
 %template(setValue) jafar::jmath::setValueMat<jblas::sym_mat>;
 %template(print) jafar::jmath::print<jblas::sym_mat>;
-%template(prettyPrint) jafar::jmath::prettyFormat<jblas::sym_mat>;
+%template(prettyPrint) jafar::jmath::ublasExtra::prettyFormat<jblas::sym_mat>;
+%template(lu_invert) jafar::jmath::ublasExtra::lu_invert<jblas::sym_mat, jblas::sym_mat>;
 
 %template(print) jafar::jmath::print<jblas::sym_mat_range>;
-%template(prettyPrint) jafar::jmath::prettyFormat<jblas::sym_mat_range>;
+%template(prettyPrint) jafar::jmath::ublasExtra::prettyFormat<jblas::sym_mat_range>;
 
 %template(max) jafar::jmath::ublasExtra::max<jblas::mat>;
 %template(max) jafar::jmath::ublasExtra::max<jblas::sym_mat>;

@@ -5,40 +5,34 @@
 
 #include <cmath>
 
+// FIXME: missing includes in lu.hpp
+#include <boost/numeric/ublas/vector_proxy.hpp>
+#include <boost/numeric/ublas/matrix_proxy.hpp>
+#include <boost/numeric/ublas/triangular.hpp>
+// END FIXME
+#include <boost/numeric/ublas/lu.hpp>
+
 #include "kernel/jafarException.hpp"
 #include "kernel/jafarDebug.hpp"
 
 #include "jmath/jblas.hpp"
 
-// #include "jmath/lapack_bindings.hpp"
-
 namespace jafar {
   namespace jmath {
 
-    /** Format a matrix output it to a string. Each matrix row
-     * corresponds to a line.
-     */
-    template<class Mat>
-    std::string prettyFormat(Mat const& m_) {
-      std::stringstream s;
-      for (std::size_t i = 0 ; i < m_.size1() ; ++i) {
-	for (std::size_t j = 0 ; j < m_.size2() ; ++j) {
-	   s << m_(i,j) << "\t";
-	}
-	s << std::endl;
-      }
-      return s.str();
-    };
+    /** \ingroup jmath */
+    /*\@{*/
 
-    /** This namespace contains some extra tools for ublas vector and matrix.
-     *
-     * \ingroup jmath
+    /** This namespace contains some extra tools for ublas vector and
+     * matrix.
      */
     namespace ublasExtra {
 
-      /// a small value
+      namespace details {
+      // a small value
       const double EPSILON = 1e-8;
-
+      }
+      
       /*
        * Vector
        */
@@ -58,7 +52,7 @@ namespace jafar {
       template<class V>
       void normalize(V& v) {
 	double n = ublas::norm_2(v);
-	JFR_NUMERIC(n > EPSILON,
+	JFR_NUMERIC(n > details::EPSILON,
 		    "VectorTools::normalize: vector too small");
 	v /= n;
       };
@@ -67,7 +61,7 @@ namespace jafar {
        */
       template<class V>
       void normalizeJac(V& v, jblas::mat& J) {
-	JFR_NUMERIC(ublas::norm_2(v) > EPSILON,
+	JFR_NUMERIC(ublas::norm_2(v) > details::EPSILON,
 		    "VectorTools::normalizeJac: vector too small");
 	JFR_PRECOND(J.size1() == v.size() && J.size2() == v.size(),
 		    "VectorTools::normalizeJac: size of J is invalid");
@@ -160,7 +154,8 @@ namespace jafar {
 	}
       };
 
-      /** Compute the cross product of two vectors.
+      /** Compute the cross product of \a v1 and \a v2, results is
+       *  stored in \a vRes.
        */
       template<class Vec1, class Vec2, class VecRes>
       void crossProd(Vec1 const& v1, Vec2 const& v2, VecRes& vRes) {
@@ -172,6 +167,10 @@ namespace jafar {
 	vRes(2) = v1(0) * v2(1) - v1(1) * v2(0);
       };
 
+
+      /** Compute the cross product of \a v1 and \a v2, the result is
+       *  returned.
+       */
       template<class Vec1, class Vec2>
       jblas::vec3 crossProd(Vec1 const& v1, Vec2 const& v2) {
 	jblas::vec3 vRes;
@@ -182,6 +181,21 @@ namespace jafar {
       /*
        * Matrix
        */
+
+      /** Format a matrix output it to a string. Each matrix row
+       * corresponds to a line.
+       */
+      template<class Mat>
+      std::string prettyFormat(Mat const& m_) {
+	std::stringstream s;
+	for (std::size_t i = 0 ; i < m_.size1() ; ++i) {
+	  for (std::size_t j = 0 ; j < m_.size2() ; ++j) {
+	    s << m_(i,j) << "\t";
+	}
+	  s << std::endl;
+	}
+	return s.str();
+      };
 
       template<class M>
       void setMatrixValue(M& m, const double* val_, std::size_t size1_, std::size_t size2_) {
@@ -196,7 +210,7 @@ namespace jafar {
         }
       };
 
-      namespace detail {
+      namespace details {
 
 	template<class M>
 	double det2(const M& m_) {
@@ -237,8 +251,11 @@ namespace jafar {
 	  m_inv /= det3(m_);
 	};
 
-      } // namespace detail
+      } // namespace details
 
+      /** Find maximum value of a matrix.
+       * \warning it returns a double whatever matrix type...
+       */
       template<class M>
       double max(const M& m_) {
         double max = m_(0,0);
@@ -252,6 +269,10 @@ namespace jafar {
         return max;
       };
 
+      /** Computes the trace of a matrix.
+       *
+       * \warning it returns a double whatever matrix type...
+       */
       template<class M>
       double trace(const M& m_) {
         JFR_PRECOND(m_.size1() == m_.size2(),
@@ -271,9 +292,9 @@ namespace jafar {
         case 1:
           return m_(0,0);
         case 2:
-          return detail::det2(m_);
+          return details::det2(m_);
         case 3:
-          return detail::det3(m_);
+          return details::det3(m_);
         default:
           JFR_RUN_TIME("MatrixTools::det: not implemented yet");
         }  
@@ -288,22 +309,46 @@ namespace jafar {
           m_inv(0,0) = 1/m_(0,0);
           break;
         case 2:
-	  detail::inv2(m_, m_inv);
+	  details::inv2(m_, m_inv);
           break;
         case 3:
-	  detail::inv3(m_, m_inv);
+	  details::inv3(m_, m_inv);
           break;
         default:
           JFR_RUN_TIME("MatrixTools::inv: not implemented yet");
         }
       };
 
+      /** Matrix inversion routine.
+       *  Uses lu_factorize and lu_substitute in uBLAS to invert a matrix 
+       */
+      template<class M1, class M2>
+      void lu_invert (M1 const& input, M2& inverse) {
+	JFR_PRECOND(input.size1() == input.size2(),
+		    "ublasExtra::lu_invert(): input matrix must be squared");
+	JFR_PRECOND(inverse.size1() == input.size1() && inverse.size1() == inverse.size2(),
+		    "ublasExtra::lu_invert(): invalid size for inverse matrix");
+
+        using namespace boost::numeric::ublas;
+        // create a working copy of the input
+        M1 A(input);
+        // perform LU-factorization
+        lu_factorize(A);
+
+        // create identity matrix of "inverse"
+        inverse.clear();
+        for (unsigned int i = 0; i < A.size1(); i++)
+	  inverse(i,i) = 1;
+
+        // backsubstitute to get the inverse
+        lu_substitute<const M1, M2 >(A, inverse);
+      }
+
 
     } // namespace ublasExtra
 
-    // deprecated
-    namespace VectorTools=jafar::jmath::ublasExtra;
-    namespace MatrixTools=jafar::jmath::ublasExtra;
+    /*\@}*/
+
 
   } // namespace jmath
 } // namespace jafar

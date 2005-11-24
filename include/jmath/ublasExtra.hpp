@@ -5,11 +5,14 @@
 
 #include <cmath>
 
-// FIXME: missing includes in lu.hpp
+#if BOOST_VERSION < 103301 // missing includes in lu.hpp
+#include <boost/numeric/ublas/operation.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
+#include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/triangular.hpp>
-// END FIXME
+#endif
+
 #include <boost/numeric/ublas/lu.hpp>
 
 #include "kernel/jafarException.hpp"

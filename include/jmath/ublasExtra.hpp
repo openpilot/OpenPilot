@@ -5,15 +5,15 @@
 
 #include <cmath>
 
-#if BOOST_VERSION < 103301 // missing includes in lu.hpp
-#include <boost/numeric/ublas/operation.hpp>
-#include <boost/numeric/ublas/vector_proxy.hpp>
-#include <boost/numeric/ublas/matrix_proxy.hpp>
-#include <boost/numeric/ublas/vector.hpp>
-#include <boost/numeric/ublas/triangular.hpp>
-#endif
+// #if BOOST_VERSION < 103301 // missing includes in lu.hpp
+// #include <boost/numeric/ublas/operation.hpp>
+// #include <boost/numeric/ublas/vector_proxy.hpp>
+// #include <boost/numeric/ublas/matrix_proxy.hpp>
+// #include <boost/numeric/ublas/vector.hpp>
+// #include <boost/numeric/ublas/triangular.hpp>
+// #endif
 
-#include <boost/numeric/ublas/lu.hpp>
+// #include <boost/numeric/ublas/lu.hpp>
 
 #include "kernel/jafarException.hpp"
 #include "kernel/jafarDebug.hpp"
@@ -322,30 +322,30 @@ namespace jafar {
         }
       };
 
-      /** Matrix inversion routine.
-       *  Uses lu_factorize and lu_substitute in uBLAS to invert a matrix 
-       */
-      template<class M1, class M2>
-      void lu_invert (M1 const& input, M2& inverse) {
-	JFR_PRECOND(input.size1() == input.size2(),
-		    "ublasExtra::lu_invert(): input matrix must be squared");
-	JFR_PRECOND(inverse.size1() == input.size1() && inverse.size1() == inverse.size2(),
-		    "ublasExtra::lu_invert(): invalid size for inverse matrix");
+//       /** Matrix inversion routine.
+//        *  Uses lu_factorize and lu_substitute in uBLAS to invert a matrix 
+//        */
+//       template<class M1, class M2>
+//       void lu_invert (M1 const& input, M2& inverse) {
+// 	JFR_PRECOND(input.size1() == input.size2(),
+// 		    "ublasExtra::lu_invert(): input matrix must be squared");
+// 	JFR_PRECOND(inverse.size1() == input.size1() && inverse.size1() == inverse.size2(),
+// 		    "ublasExtra::lu_invert(): invalid size for inverse matrix");
 
-        using namespace boost::numeric::ublas;
-        // create a working copy of the input
-        M1 A(input);
-        // perform LU-factorization
-        lu_factorize(A);
+//         using namespace boost::numeric::ublas;
+//         // create a working copy of the input
+//         M1 A(input);
+//         // perform LU-factorization
+//         lu_factorize(A);
 
-        // create identity matrix of "inverse"
-        inverse.clear();
-        for (unsigned int i = 0; i < A.size1(); i++)
-	  inverse(i,i) = 1;
+//         // create identity matrix of "inverse"
+//         inverse.clear();
+//         for (unsigned int i = 0; i < A.size1(); i++)
+// 	  inverse(i,i) = 1;
 
-        // backsubstitute to get the inverse
-        lu_substitute<const M1, M2 >(A, inverse);
-      }
+//         // backsubstitute to get the inverse
+//         lu_substitute<const M1, M2 >(A, inverse);
+//       }
 
 
     } // namespace ublasExtra

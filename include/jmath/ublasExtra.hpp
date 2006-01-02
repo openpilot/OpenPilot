@@ -323,8 +323,8 @@ namespace jafar {
         }
       };
 
-      /** Matrix inversion routine.
-       *  Uses lu_factorize and lu_substitute in uBLAS to invert a matrix 
+      /** General matrix inversion routine.
+       *  It uses lu_factorize and lu_substitute in uBLAS to invert a matrix 
        */
       template<class M1, class M2>
       void lu_inv(M1 const& m, M2& inv) {
@@ -349,6 +349,9 @@ namespace jafar {
         lu_substitute<jblas::mat const, M2 >(mLu, inv);
       }
 
+      /** General matrix determinant. 
+       *  It uses lu_factorize in uBLAS.
+       */
       template<class M>
       double lu_det(M const& m) {
 	JFR_PRECOND(m.size1() == m.size2(),

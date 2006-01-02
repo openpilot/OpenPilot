@@ -7,6 +7,8 @@
 
 #include "boost/shared_ptr.hpp"
 
+#include "kernel/jafarDebug.hpp"
+
 #include "jmath/jblas.hpp"
 
 namespace jafar {
@@ -26,11 +28,19 @@ namespace jafar {
       /// covariance
       jblas::sym_mat P;
 
+      GaussianVector() {}
       GaussianVector(std::size_t size_);
       GaussianVector(const jblas::vec& x_, const jblas::sym_mat& P_);
       GaussianVector(const GaussianVector& v_);
 
       inline std::size_t size() const {return x.size();};
+
+      void resize(std::size_t s) {
+	if (size() != s) {
+	  x.resize(s);
+	  P.resize(s,s);
+	}
+      }
 
       double probabilityDensity(const jblas::vec& v);
 
@@ -52,8 +62,10 @@ namespace jafar {
       /// weight
       double w;
 
+      WeightedGaussianVector() : GaussianVector(), w(1.0) {}
       WeightedGaussianVector(std::size_t size_);
       WeightedGaussianVector(const jblas::vec& x_, const jblas::sym_mat& P_, double w_=1.0);
+      WeightedGaussianVector(const GaussianVector& gv_, double w_=1.0);
       WeightedGaussianVector(const WeightedGaussianVector& v_);
 
       friend std::ostream& operator <<(std::ostream& s, const WeightedGaussianVector& v_);

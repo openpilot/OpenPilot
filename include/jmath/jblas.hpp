@@ -43,6 +43,9 @@ namespace jblas { /// special namespace to define blas datatype, shortcut to jbl
   typedef boost::numeric::ublas::zero_matrix<double> zero_mat;
   typedef boost::numeric::ublas::identity_matrix<double> identity_mat;
 
+  /// 2x2 dimension matrix
+  typedef boost::numeric::ublas::bounded_matrix<double,2,2> mat22;
+
   /// 3x3 dimension matrix
   typedef boost::numeric::ublas::bounded_matrix<double,3,3> mat33;
   typedef boost::numeric::ublas::matrix_range<mat33> mat33_range;

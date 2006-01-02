@@ -62,10 +62,14 @@ std::ostream& jafar::jmath::operator <<(std::ostream& s, const GaussianVector& v
  */
 
 WeightedGaussianVector::WeightedGaussianVector(std::size_t size_) :
-  GaussianVector(size_), w(1) {}
+  GaussianVector(size_), w(1.0) {}
 
 WeightedGaussianVector::WeightedGaussianVector(const vec& x_, const sym_mat& P_, double w_) :
   GaussianVector(x_, P_),
+  w(w_) {}
+
+WeightedGaussianVector::WeightedGaussianVector(const GaussianVector& gv_, double w_) :
+  GaussianVector(gv_),
   w(w_) {}
 
 WeightedGaussianVector::WeightedGaussianVector(const WeightedGaussianVector& v_) :

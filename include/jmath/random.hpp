@@ -20,17 +20,17 @@ namespace jafar {
     class UniformDistribution {
     public:
 
-      UniformDistribution(double min_=0.0, double max_=1.0, long long unsigned int seed_ = 1);
+      UniformDistribution(double min_=0.0, double max_=1.0, unsigned int seed_ = 1);
       ~UniformDistribution();
 
       double get();
 
     private:
 
-      boost::rand48 rng;
-      boost::uniform_real<> uniform;
+      boost::mt19937 rng;
+      boost::uniform_real<double> uniform;
 
-      boost::variate_generator<boost::rand48, boost::uniform_real<> > vg;
+      boost::variate_generator<boost::mt19937, boost::uniform_real<double> > vg;
     };
 
     /** Multi dimensionnal uniform distribution generator using the
@@ -42,8 +42,8 @@ namespace jafar {
 
     public:
 
-      MultiDimUniformDistribution(std::size_t dim_, long long unsigned int seed_ = 1);
-      MultiDimUniformDistribution(const jblas::vec& min_, const jblas::vec& max_, long long unsigned int seed_ = 1);
+      MultiDimUniformDistribution(std::size_t dim_, unsigned int seed_ = 1);
+      MultiDimUniformDistribution(const jblas::vec& min_, const jblas::vec& max_, unsigned int seed_ = 1);
       ~MultiDimUniformDistribution();
 
       jblas::vec& get();
@@ -65,7 +65,7 @@ namespace jafar {
     class NormalDistribution {
     public:
 
-      NormalDistribution(double mean_ = 0, double sigma_ = 1, long long unsigned int seed_ = 1);
+      NormalDistribution(double mean_ = 0, double sigma_ = 1, unsigned int seed_ = 1);
 
       ~NormalDistribution();
 
@@ -73,10 +73,10 @@ namespace jafar {
 
     private:
       
-      boost::rand48 rng;
-      boost::normal_distribution<> normal;
+      boost::mt19937 rng;
+      boost::normal_distribution<double> normal;
 
-      boost::variate_generator<boost::rand48, boost::normal_distribution<> > vg;
+      boost::variate_generator<boost::mt19937, boost::normal_distribution<double> > vg;
 
     };
 
@@ -89,15 +89,13 @@ namespace jafar {
       
     public:
 
-      MultiDimNormalDistribution(std::size_t dim_, long long unsigned int seed_ = 1);
-      MultiDimNormalDistribution(const jblas::vec& mean_, const jblas::vec& cov_, long long unsigned int seed_ = 1);
+      MultiDimNormalDistribution(std::size_t dim_, unsigned int seed_ = 1);
+      MultiDimNormalDistribution(const jblas::vec& mean_, const jblas::vec& cov_, unsigned int seed_ = 1);
       ~MultiDimNormalDistribution();
 
-      jblas::vec& get();
+      jblas::vec get();
 
     private:
-
-      jblas::vec u;
 
       std::vector<NormalDistribution*> normalsVec;
 

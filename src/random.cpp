@@ -16,7 +16,7 @@ using namespace jafar::jmath;
  */
 
 UniformDistribution::UniformDistribution(double min_, double max_,
-                                         long long unsigned int seed_) :
+                                         unsigned int seed_) :
   rng(seed_),
   uniform(min_, max_),
   vg(rng, uniform) {}
@@ -31,7 +31,7 @@ double UniformDistribution::get() {
  * class MultiDimUniformDistribution
  */
 
-MultiDimUniformDistribution::MultiDimUniformDistribution(std::size_t size_, long long unsigned int seed_) :
+MultiDimUniformDistribution::MultiDimUniformDistribution(std::size_t size_, unsigned int seed_) :
     u(size_),
     uniformsVec(size_) 
 {
@@ -41,7 +41,7 @@ MultiDimUniformDistribution::MultiDimUniformDistribution(std::size_t size_, long
 }
 
 MultiDimUniformDistribution::MultiDimUniformDistribution(const vec& min_, const vec& max_, 
-                                                         long long unsigned int seed_) :
+							 unsigned int seed_) :
   u(min_.size()),
   uniformsVec(min_.size())
 {
@@ -71,7 +71,7 @@ vec& MultiDimUniformDistribution::get() {
  */
 
 NormalDistribution::NormalDistribution(double mean_, double sigma_, 
-                                       long long unsigned int seed_) :
+                                       unsigned int seed_) :
   rng(seed_),
   normal(mean_, sigma_),
   vg(rng, normal) 
@@ -82,17 +82,6 @@ NormalDistribution::NormalDistribution(double mean_, double sigma_,
 NormalDistribution::~NormalDistribution() {}
 
 double NormalDistribution::get() {
-//   double u = vg();
-//   if (u > normal.mean() + 3*normal.sigma() ) {
-//     JFR_DEBUG("u=" << u);
-//     u = normal.mean() + 3*normal.sigma();
-//   }
-//   if (u < normal.mean() - 3*normal.sigma() ) {
-//     JFR_DEBUG("u=" << u);
-//     u = normal.mean() - 3*normal.sigma();
-//   }
-  
-//   return u;
   return vg();
 }
 
@@ -100,8 +89,8 @@ double NormalDistribution::get() {
  * class MultiDimNormalDistribution
  */
 
-MultiDimNormalDistribution::MultiDimNormalDistribution(std::size_t size_, long long unsigned int seed_) :
-  u(size_), normalsVec(size_)
+MultiDimNormalDistribution::MultiDimNormalDistribution(std::size_t size_, unsigned int seed_) :
+  normalsVec(size_)
 {
   for (std::size_t i=0 ; i <size_ ; i++) {
     normalsVec[i] = new  NormalDistribution(seed_+i);
@@ -109,8 +98,7 @@ MultiDimNormalDistribution::MultiDimNormalDistribution(std::size_t size_, long l
 }
 
 MultiDimNormalDistribution::MultiDimNormalDistribution(const vec& mean_, const vec& cov_, 
-                                                       long long unsigned int seed_) :
-  u(mean_.size()),
+						       unsigned int seed_) :
   normalsVec(mean_.size())
 {
   JFR_PRECOND(cov_.size() == mean_.size(),
@@ -127,8 +115,9 @@ MultiDimNormalDistribution::~MultiDimNormalDistribution() {
 }
 
 
-vec& MultiDimNormalDistribution::get() {
-  for (std::size_t i =0 ; i <u.size() ; i++) {
+vec MultiDimNormalDistribution::get() {
+  vec u(normalsVec.size());
+  for (std::size_t i =0 ; i < normalsVec.size() ; i++) {
     u(i) = normalsVec[i]->get();
   }
   return u;

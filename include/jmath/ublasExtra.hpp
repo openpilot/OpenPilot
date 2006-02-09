@@ -14,7 +14,11 @@
 #include "boost/numeric/ublas/operation.hpp"
 #endif
 
-#include <boost/numeric/ublas/lu.hpp>
+#if BOOST_VERSION == 103301 // missing includes in lu.hpp
+#include "boost/numeric/ublas/triangular.hpp"
+#endif
+
+#include "boost/numeric/ublas/lu.hpp"
 
 #include "kernel/jafarException.hpp"
 #include "kernel/jafarDebug.hpp"
@@ -346,7 +350,9 @@ namespace jafar {
 	inv.assign(jblas::identity_mat(m.size1()));
 
         // backsubstitute to get the inverse
+	JFR_TRACE_BEGIN;
         lu_substitute<jblas::mat const, M2 >(mLu, inv);
+	JFR_TRACE_END("ublasExtra::lu_inv");
       }
 
       /** General matrix determinant. 

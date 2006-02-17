@@ -334,7 +334,7 @@ namespace jafar {
       void lu_inv(M1 const& m, M2& inv) {
 	JFR_PRECOND(m.size1() == m.size2(),
 		    "ublasExtra::lu_inv(): input matrix must be squared");
-	JFR_PRECOND(inv.size1() == m.size1() && inv.size1() == m.size2(),
+	JFR_PRECOND(inv.size1() == m.size1() && inv.size2() == m.size2(),
 		    "ublasExtra::lu_inv(): invalid size for inverse matrix");
 
         using namespace boost::numeric::ublas;
@@ -347,12 +347,13 @@ namespace jafar {
 	JFR_TRACE_END("ublasExtra::lu_inv");
 
         // create identity matrix of "inverse"
-	inv.assign(jblas::identity_mat(m.size1()));
+	jblas::mat mLuInv(jblas::identity_mat(m.size1()));
 
         // backsubstitute to get the inverse
 	JFR_TRACE_BEGIN;
-        lu_substitute<jblas::mat const, M2 >(mLu, inv);
+        lu_substitute<jblas::mat const, jblas::mat>(mLu, mLuInv);
 	JFR_TRACE_END("ublasExtra::lu_inv");
+	inv.assign(mLuInv);
       }
 
       /** General matrix determinant. 

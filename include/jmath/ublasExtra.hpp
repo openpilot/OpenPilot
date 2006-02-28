@@ -61,7 +61,7 @@ namespace jafar {
       void normalize(V& v) {
 	double n = ublas::norm_2(v);
 	JFR_NUMERIC(n > details::EPSILON,
-		    "VectorTools::normalize: vector too small");
+		    "ublasExtra::normalize: vector too small");
 	v /= n;
       };
 
@@ -70,9 +70,9 @@ namespace jafar {
       template<class V>
       void normalizeJac(V& v, jblas::mat& J) {
 	JFR_NUMERIC(ublas::norm_2(v) > details::EPSILON,
-		    "VectorTools::normalizeJac: vector too small");
+		    "ublasExtra::normalizeJac: vector too small");
 	JFR_PRECOND(J.size1() == v.size() && J.size2() == v.size(),
-		    "VectorTools::normalizeJac: size of J is invalid");
+		    "ublasExtra::normalizeJac: size of J is invalid");
 	switch(v.size()) {
 	case 2:
 	  {
@@ -124,7 +124,7 @@ namespace jafar {
 	  }
 	  return;
 	default:
-	  JFR_RUN_TIME("VectorTools::normalizeJac: not implemented yet");
+	  JFR_RUN_TIME("ublasExtra::normalizeJac: not implemented yet");
 	}
       };
 
@@ -168,7 +168,7 @@ namespace jafar {
       template<class Vec1, class Vec2, class VecRes>
       void crossProd(Vec1 const& v1, Vec2 const& v2, VecRes& vRes) {
 	JFR_PRECOND(v1.size()==3 && v2.size()==3 && vRes.size()==3,
-		    "VectorTools::crossProd: 3D vector");
+		    "ublasExtra::crossProd: 3D vector");
 
 	vRes(0) = v1(1) * v2(2) - v1(2) * v2(1);
 	vRes(1) = v1(2) * v2(0) - v1(0) * v2(2);
@@ -208,7 +208,7 @@ namespace jafar {
       template<class M>
       void setMatrixValue(M& m, const double* val_, std::size_t size1_, std::size_t size2_) {
         JFR_PRECOND(m.size1()==size1_ && m.size2()==size2_,
-                    "MatrixTools::setValue: size of m does not match");
+                    "ublasExtra::setValue: size of m does not match");
 	unsigned int k = 0;
         for (std::size_t i = 0 ; i < m.size1() ; i++) {
           for (std::size_t j = 0 ; j < m.size2() ; j++) {
@@ -284,7 +284,7 @@ namespace jafar {
       template<class M>
       double trace(const M& m_) {
         JFR_PRECOND(m_.size1() == m_.size2(),
-                    "MatrixTools::trace: m_ must be square");
+                    "ublasExtra::trace: m_ must be square");
         double t=0;
         for (std::size_t i =0 ; i <m_.size1() ; i++) {
           t+=m_(i,i);
@@ -295,7 +295,7 @@ namespace jafar {
       template<class M>
       double det(const M& m_) {
         JFR_PRECOND(m_.size1() == m_.size2(),
-                    "MatrixTools::det: m_ must be a square matrix");
+                    "ublasExtra::det: m_ must be a square matrix");
         switch(m_.size1()) {
         case 1:
           return m_(0,0);
@@ -304,14 +304,14 @@ namespace jafar {
         case 3:
           return details::det3(m_);
         default:
-          JFR_RUN_TIME("MatrixTools::det: not implemented yet");
+          JFR_RUN_TIME("ublasExtra::det: not implemented yet");
         }  
       };
 
       template<class M>
       void inv(const M& m_, M& m_inv) {
         JFR_PRECOND(m_.size1() == m_.size2(),
-                    "MatrixTools::inv: m_ must be a square matrix");
+                    "ublasExtra::inv: m_ must be a square matrix");
         switch(m_.size1()) {
         case 1:
           m_inv(0,0) = 1/m_(0,0);
@@ -323,7 +323,7 @@ namespace jafar {
 	  details::inv3(m_, m_inv);
           break;
         default:
-          JFR_RUN_TIME("MatrixTools::inv: not implemented yet");
+          JFR_RUN_TIME("ublasExtra::inv: not implemented yet");
         }
       };
 

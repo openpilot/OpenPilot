@@ -8,7 +8,7 @@ package require jmath
 
 set n 100
 
-set data [jmath::create_mat  $n 3]
+set data [jmath::new_mat  $n 3]
 
 for {set i 0} {$i < $n} {incr i} {
     set x [expr "$i/10.0"]

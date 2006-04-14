@@ -12,11 +12,7 @@ OPTIONAL_MODULES =
 
 # external libraries dependencies
 REQUIRED_EXTLIBS = 
-OPTIONAL_EXTLIBS = 
-
-# to add custom libraries 
-# concider also modifying .config/User.m4 to check for these libs at
-# configure time
+OPTIONAL_EXTLIBS = lapack boost_sandbox
 
 LIBS += -lkernel
 

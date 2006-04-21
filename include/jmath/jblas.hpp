@@ -53,6 +53,7 @@ namespace jblas { /// special namespace to define blas datatype, shortcut to jbl
   /// 4x4 dimension matrix
   typedef boost::numeric::ublas::bounded_matrix<double,4,4> mat44;
   typedef boost::numeric::ublas::matrix_range<mat44> mat44_range;
+  typedef boost::numeric::ublas::matrix_vector_range<mat44> mat44_vec_range;
 
   /// standard symmetric matrix type
   typedef boost::numeric::ublas::symmetric_matrix<double> sym_mat;

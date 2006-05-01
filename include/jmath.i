@@ -15,16 +15,21 @@
   // to control debug output from tcl
   // #include "kernel/jafarDebug.hpp"
 
+#include "jafarConfig.h"
+
 #include "jmath/ublasExtra.hpp"
 
 #include "jmath/random.hpp"
 #include "jmath/angle.hpp"
 #include "jmath/gaussianVector.hpp"
+#include "jmath/pca.hpp"
 
 #ifdef HAVE_TTL
 #include "jmath/delaunay.hpp"
 #endif
 %}
+
+%import "jafarConfig.h"
 
 %include "std_common.i"
 
@@ -97,3 +102,5 @@
 #ifdef HAVE_TTL
 %include "jmath/delaunay.hpp"
 #endif
+
+%include "jmath/pca.hpp"

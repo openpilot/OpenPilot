@@ -14,7 +14,12 @@
 namespace jafar {
   namespace jmath {
 
-    /*! Principal Component analysis (PCA) Tools Class
+    /*! Principal Component analysis (PCA) Tools Class.\n
+     *  Principal components are extracted by singular values decomposition on the covariance matrix
+     *  of the centered input data. Available data after pca computation are the mean of the input data,
+     *  the eigenvalues (in ascending order) and corresponding eigenvectors.\n
+     *  Other methods allow projection in the eigenspace, reconstruction from eigenspace and 
+     *  update of the eigenspace with a new data (according the thesis of Danijel Skocaj : "Robust subspace approach to visual learning and recognition").
      *
      * \ingroup jmath
      */
@@ -69,6 +74,8 @@ namespace jafar {
 
       /*! Increment the PCA basis with a new vector
        * @param I_ input vector 
+       *
+       * WARNING: NEED TESTS
        */
       void incrementPCA(const jblas::vec& I_);
 

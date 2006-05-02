@@ -62,11 +62,15 @@ void PCAtools::incrementPCA(const jblas::vec& I_) {
   jblas::vec y = ublas::prod(eigenvectors,a)+mean;
   jblas::vec r = I_ - y;
   double normR = ublas::norm_2(r);
-  jblas::mat Up(eigenvectors);
-  Up.resize(Up.size1(),Up.size2()+1);
+  jblas::mat Up(eigenvectors.size1(),eigenvectors.size2()+1);
+  Up.clear();
+  ublas::project(Up,ublas::range(0,eigenvectors.size1()),
+		 ublas::range(0,eigenvectors.size2())).assign(eigenvectors);
   ublas::column(Up,Up.size2()-1) = r/normR;
-  jblas::mat Ap(coefficients);
-  Ap.resize(Ap.size1()+1,Ap.size2()+1);
+  jblas::mat Ap(coefficients.size1()+1,coefficients.size2()+1);
+  Ap.clear();
+  ublas::project(Up,ublas::range(0,coefficients.size1()),
+		 ublas::range(0,coefficients.size2())).assign(coefficients);
   for(int i=0; i < a.size(); i++)
     Ap(i,(Ap.size2()-1)) = a(i);
   for(int i=0; i < (Ap.size2()-1); i++)

@@ -17,6 +17,7 @@
 
 #include "jafarConfig.h"
 
+#include "kernel/keyValueFile.hpp"
 #include "jmath/ublasExtra.hpp"
 
 #include "jmath/random.hpp"
@@ -40,6 +41,8 @@
 
 // to control debug output from tcl
 // %include "kernel/jafarDebug.hpp"
+
+%include "kernel/keyValueFile.hpp"
 
 %include "jmath/jblas.i"
 

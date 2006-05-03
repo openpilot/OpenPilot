@@ -108,5 +108,26 @@ jblas::vec PCAtools::reconstruct(const jblas::vec& P_) const {
 }
 
 
+void PCAtools::loadKeyValueFile(jafar::kernel::KeyValueFile const& keyValueFile) {
+  JFR_TRACE_BEGIN;
+  keyValueFile.getItem("mean", mean);
+  keyValueFile.getItem("eigenvalues", eigenvalues);
+  keyValueFile.getItem("eigenvectors", eigenvectors);
+  keyValueFile.getItem("coefficients", coefficients);
+  JFR_TRACE_END("PCAtools::load");
+  pca_performed = true;
+}
+
+
+void PCAtools::saveKeyValueFile(jafar::kernel::KeyValueFile & keyValueFile) {
+  JFR_PRECOND(pca_performed,"PCAtools::save: no data to save");
+  JFR_TRACE_BEGIN;
+  keyValueFile.setItem("mean", mean);
+  keyValueFile.setItem("eigenvalues", eigenvalues);
+  keyValueFile.setItem("eigenvectors", eigenvectors);
+  keyValueFile.setItem("coefficients", coefficients);
+  JFR_TRACE_END("PCAtools::save");
+}
+
 #endif
 #endif

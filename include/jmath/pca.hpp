@@ -9,6 +9,7 @@
 #ifdef HAVE_LAPACK
 
 #include "jmath/jblas.hpp"
+#include "kernel/keyValueFile.hpp"
 #include "kernel/jafarDebug.hpp"
 
 namespace jafar {
@@ -23,7 +24,7 @@ namespace jafar {
      *
      * \ingroup jmath
      */
-    class PCAtools {
+    class PCAtools : public jafar::kernel::KeyValueFileSaveLoad {
     public:
 
       typedef enum PCA_Method {
@@ -92,8 +93,21 @@ namespace jafar {
        */
       jblas::vec reconstruct(const jblas::vec& I_) const;
 
+    protected:
+
+      /*! Load pca data from file
+       * @param file_ path to data file
+       */
+      void loadKeyValueFile(jafar::kernel::KeyValueFile const& keyValueFile);
       
+
+      /*! Save pca data to file
+       * @param file_ path to data file
+       */
+      void saveKeyValueFile(jafar::kernel::KeyValueFile & keyValueFile);
+
     private:
+      
       bool pca_performed;
       jblas::mat eigenvectors,coefficients;
       jblas::vec mean, eigenvalues;

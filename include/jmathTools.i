@@ -44,17 +44,17 @@ namespace jafar {
       JFR_IO_STREAM(s >> t, "reading matrix or vector from string");
     };
 
-#if BOOST_VERSION < 103300
+// #if BOOST_VERSION < 103300
     
-    template<>
-    void setSizeValue<jblas::sym_mat>(jblas::sym_mat& mat, const std::string& value) {
-      std::stringstream s;
-      jblas::mat matTmp(mat.size1(), mat.size2());
-      JFR_IO_STREAM(s >> matTmp, "reading matrix from string");
-      mat.assign(matTmp);
-    };
+//     template<>
+//     void setSizeValue<jblas::sym_mat>(jblas::sym_mat& mat, const std::string& value) {
+//       std::stringstream s;
+//       jblas::mat matTmp(mat.size1(), mat.size2());
+//       JFR_IO_STREAM(s >> matTmp, "reading matrix from string");
+//       mat.assign(matTmp);
+//     };
 
-#endif
+// #endif
 
     /** Same as setSizeValue() for a vector except that size of \a vec
      * is used.
@@ -79,18 +79,18 @@ namespace jafar {
       JFR_IO_STREAM(s >> mat, "reading matrix from string");
     };
 
-#if BOOST_VERSION < 103300
+// #if BOOST_VERSION < 103300
     
-    template<>
-    void setValueMat<jblas::sym_mat>(jblas::sym_mat& mat, const std::string& value) {
-      std::stringstream s;
-      jblas::mat matTmp(mat.size1(), mat.size2());
-      s << "[" << mat.size1() << "," << mat.size2() << "]" << value;
-      JFR_IO_STREAM(s >> matTmp, "reading matrix from string");
-      mat.assign(matTmp);
-    };
+//     template<>
+//     void setValueMat<jblas::sym_mat>(jblas::sym_mat& mat, const std::string& value) {
+//       std::stringstream s;
+//       jblas::mat matTmp(mat.size1(), mat.size2());
+//       s << "[" << mat.size1() << "," << mat.size2() << "]" << value;
+//       JFR_IO_STREAM(s >> matTmp, "reading matrix from string");
+//       mat.assign(matTmp);
+//     };
 
-#endif
+// #endif
 
   }
 }

@@ -19,6 +19,8 @@
 #include "boost/numeric/ublas/matrix_proxy.hpp"
 #include "boost/numeric/ublas/vector_proxy.hpp"
 
+#include "jmath/ublasCompatibility.hpp"
+
 /// shortcut for ublas namespace
 namespace ublas = boost::numeric::ublas;
 

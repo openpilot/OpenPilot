@@ -15,6 +15,7 @@
 
 #include "kernel/jafarException.hpp"
 #include "jmath/jblas.hpp"
+#include "jmath/ublasCompatibility.hpp"
 
 %}
 
@@ -44,18 +45,6 @@ namespace jafar {
       JFR_IO_STREAM(s >> t, "reading matrix or vector from string");
     };
 
-// #if BOOST_VERSION < 103300
-    
-//     template<>
-//     void setSizeValue<jblas::sym_mat>(jblas::sym_mat& mat, const std::string& value) {
-//       std::stringstream s;
-//       jblas::mat matTmp(mat.size1(), mat.size2());
-//       JFR_IO_STREAM(s >> matTmp, "reading matrix from string");
-//       mat.assign(matTmp);
-//     };
-
-// #endif
-
     /** Same as setSizeValue() for a vector except that size of \a vec
      * is used.
      *  format: (v1,v2,...,vn)
@@ -78,19 +67,6 @@ namespace jafar {
       s << "[" << mat.size1() << "," << mat.size2() << "]" << value;
       JFR_IO_STREAM(s >> mat, "reading matrix from string");
     };
-
-// #if BOOST_VERSION < 103300
-    
-//     template<>
-//     void setValueMat<jblas::sym_mat>(jblas::sym_mat& mat, const std::string& value) {
-//       std::stringstream s;
-//       jblas::mat matTmp(mat.size1(), mat.size2());
-//       s << "[" << mat.size1() << "," << mat.size2() << "]" << value;
-//       JFR_IO_STREAM(s >> matTmp, "reading matrix from string");
-//       mat.assign(matTmp);
-//     };
-
-// #endif
 
   }
 }

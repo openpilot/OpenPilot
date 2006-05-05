@@ -25,9 +25,6 @@
 #include "jmath/gaussianVector.hpp"
 #include "jmath/pca.hpp"
 
-#ifdef HAVE_TTL
-#include "jmath/delaunay.hpp"
-#endif
 %}
 
 %import "jafarConfig.h"
@@ -102,8 +99,5 @@
 %template(print) jafar::jmath::print<jafar::jmath::GaussianVector>;
 %template(print) jafar::jmath::print<jafar::jmath::WeightedGaussianVector>;
 
-#ifdef HAVE_TTL
-%include "jmath/delaunay.hpp"
-#endif
-
 %include "jmath/pca.hpp"
+

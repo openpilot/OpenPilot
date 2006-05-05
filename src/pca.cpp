@@ -37,12 +37,16 @@ void PCAtools::batchPCA(const jblas::mat& X_) {
     A /= n;
     eigenvalues.resize(m);
     int ierr = lapack::syev('V','U',A,eigenvalues,lapack::optimal_workspace());	  
+    JFR_POSTCOND(ierr==0,
+		   "PCAtools::batchPCA: error in lapack::syev() function, ierr=" << ierr);
     eigenvectors = A;
   } else {
     ublas::matrix<double,ublas::column_major> A = ublas::prod(ublas::trans(centeredX),centeredX);
     A /= n;
     eigenvalues.resize(n);
     int ierr = lapack::syev('V','U',A,eigenvalues,lapack::optimal_workspace());
+    JFR_POSTCOND(ierr==0,
+		   "PCAtools::batchPCA: error in lapack::syev() function, ierr=" << ierr);
     eigenvectors = ublas::prod(centeredX,A);
     for(int j=0; j<n; j++) {
       jblas::mat_column Uc(eigenvectors,j);

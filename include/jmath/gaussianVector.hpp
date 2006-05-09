@@ -1,7 +1,7 @@
 /* $Id$ */
 
-#ifndef FILTER_GAUSSIAN_VECTOR_HPP
-#define FILTER_GAUSSIAN_VECTOR_HPP
+#ifndef JMATH_GAUSSIAN_VECTOR_HPP
+#define JMATH_GAUSSIAN_VECTOR_HPP
 
 #include <ostream>
 
@@ -77,4 +77,4 @@ namespace jafar {
  } // namespace jmath
 } // namespace jafar
 
-#endif // FILTER_GAUSSIAN_VECTOR_HPP
+#endif // JMATH_GAUSSIAN_VECTOR_HPP

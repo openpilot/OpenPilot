@@ -9,11 +9,7 @@
 
 %{
 
-  // to wrap std::string
 #include <string> 
-
-  // to control debug output from tcl
-  // #include "kernel/jafarDebug.hpp"
 
 #include "jafarConfig.h"
 
@@ -25,19 +21,17 @@
 #include "jmath/gaussianVector.hpp"
 #include "jmath/pca.hpp"
 
+#include "jmath/linearLeastSquares.hpp"
+
 %}
 
 %import "jafarConfig.h"
 
 %include "std_common.i"
 
-// to wrap std::string
 %include "std_string.i" 
 
 %include "jmathException.i"
-
-// to control debug output from tcl
-// %include "kernel/jafarDebug.hpp"
 
 %include "kernel/keyValueFile.hpp"
 
@@ -101,3 +95,4 @@
 
 %include "jmath/pca.hpp"
 
+%include "jmath/linearLeastSquares.hpp"

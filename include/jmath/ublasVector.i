@@ -7,8 +7,7 @@
 namespace boost { namespace numeric { namespace ublas {
 
   template<class T, class A = boost::numeric::ublas::unbounded_array<T> >
-  class vector:
-    public vector_expression<vector<T, A> > {
+  class vector {
 
   public:
 
@@ -41,8 +40,7 @@ namespace boost { namespace numeric { namespace ublas {
   };
 
   template<class V>
-  class vector_range:
-    public vector_expression<vector_range<V> > {
+  class vector_range {
   public:
 
     //     typedef typename V::size_type size_type; 
@@ -57,8 +55,9 @@ namespace boost { namespace numeric { namespace ublas {
     const_reference operator() (size_type i) const;
 
   };
+
   template<class T, std::size_t N>
-  class bounded_vector : public vector<T, bounded_array<T, N> > {
+  class bounded_vector {
   public:
     typedef unsigned int size_type;
     typedef const T &const_reference;

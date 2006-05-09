@@ -7,8 +7,7 @@ namespace boost { namespace numeric { namespace ublas {
   template<class T, 
 	   class F = boost::numeric::ublas::row_major, 
 	   class A = boost::numeric::ublas::unbounded_array<T> >
-  class matrix:
-    public matrix_expression<matrix<T, F, A> > {
+  class matrix {
 
   public:
 
@@ -41,8 +40,7 @@ namespace boost { namespace numeric { namespace ublas {
 	   class F1 = boost::numeric::ublas::lower, 
 	   class F2 = boost::numeric::ublas::row_major, 
 	   class A = boost::numeric::ublas::unbounded_array<T> >
-  class symmetric_matrix:
-    public matrix_expression<symmetric_matrix<T, F1, F2, A> > {
+  class symmetric_matrix {
 
   public:
 
@@ -76,8 +74,7 @@ namespace boost { namespace numeric { namespace ublas {
   };
 
   template<class M>
-  class matrix_range:
-    public matrix_expression<matrix_range<V> > {
+  class matrix_range {
   public:
 
     //     typedef typename M::size_type size_type;
@@ -93,8 +90,11 @@ namespace boost { namespace numeric { namespace ublas {
     const_reference operator() (size_type i, size_type j) const;
 
   };
-  template<class T, std::size_t M, std::size_t N, class F = boost::numeric::ublas::row_major>
-  class bounded_matrix : public matrix<T, F, bounded_array<T, M * N> > {
+
+  template<class T, std::size_t M, 
+	   std::size_t N, 
+	   class F = boost::numeric::ublas::row_major>
+  class bounded_matrix {
   public:
     typedef typename matrix_type::size_type size_type;
     bounded_matrix ();
@@ -102,8 +102,6 @@ namespace boost { namespace numeric { namespace ublas {
     bounded_matrix (const bounded_matrix &m);
     template<class A2>
     bounded_matrix (const matrix<T, A2, F> &m);
-    template<class AE>
-    bounded_matrix (const matrix_expression<AE> &ae);
   };
 
 }}}

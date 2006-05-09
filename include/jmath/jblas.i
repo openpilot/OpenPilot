@@ -42,6 +42,10 @@
 %rename(mat)  boost::numeric::ublas::matrix<double>;
 %template(mat) boost::numeric::ublas::matrix<double>;
 
+// column major matrix of double
+%rename(mat_column_major)  boost::numeric::ublas::matrix<double, boost::numeric::ublas::column_major>;
+%template(mat_column_major) boost::numeric::ublas::matrix<double, boost::numeric::ublas::column_major>;
+
 // symmetric matrix of double
 %rename(sym_mat)  boost::numeric::ublas::symmetric_matrix<double>;
 %template(sym_mat) boost::numeric::ublas::symmetric_matrix<double>;
@@ -49,7 +53,6 @@
 %nodefault boost::numeric::ublas::matrix_range<jblas::sym_mat>;
 %rename(sym_mat_range)  boost::numeric::ublas::matrix_range<jblas::sym_mat>;
 %template(sym_mat_range) boost::numeric::ublas::matrix_range<jblas::sym_mat>;
-
 
 %rename(mat44) boost::numeric::ublas::bounded_matrix<double,4,4>;
 %template(mat44) boost::numeric::ublas::bounded_matrix<double,4,4>;

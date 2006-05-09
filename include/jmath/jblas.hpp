@@ -24,8 +24,7 @@
 /// shortcut for ublas namespace
 namespace ublas = boost::numeric::ublas;
 
-//namespace jafar {
-namespace jblas { /// special namespace to define blas datatype, shortcut to jblas.
+namespace jblas { /// special namespace to typedef ublas datatype.
 
   /// standard vector type
   typedef boost::numeric::ublas::vector<double> vec;
@@ -44,6 +43,9 @@ namespace jblas { /// special namespace to define blas datatype, shortcut to jbl
   typedef boost::numeric::ublas::matrix<double> mat;
   typedef boost::numeric::ublas::zero_matrix<double> zero_mat;
   typedef boost::numeric::ublas::identity_matrix<double> identity_mat;
+
+  /// column major matrix
+  typedef boost::numeric::ublas::matrix<double, boost::numeric::ublas::column_major> mat_column_major;
 
   /// 2x2 dimension matrix
   typedef boost::numeric::ublas::bounded_matrix<double,2,2> mat22;
@@ -74,10 +76,6 @@ namespace jblas { /// special namespace to define blas datatype, shortcut to jbl
 
   typedef boost::numeric::ublas::matrix_column<mat> mat_column;
 
-} // namespace blas
-//} // namespace jafar
-
-/// shortcut
-  //namespace jblas = jafar::blas;
+} // namespace jblas
 
 #endif // JMATH_JBLAS_HPP

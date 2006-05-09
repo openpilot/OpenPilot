@@ -75,9 +75,9 @@ void PCAtools::incrementPCA(const jblas::vec& I_) {
   Ap.clear();
   ublas::project(Up,ublas::range(0,coefficients.size1()),
 		 ublas::range(0,coefficients.size2())).assign(coefficients);
-  for(int i=0; i < a.size(); i++)
+  for(std::size_t i=0; i < a.size(); i++)
     Ap(i,(Ap.size2()-1)) = a(i);
-  for(int i=0; i < (Ap.size2()-1); i++)
+  for(std::size_t i=0; i < (Ap.size2()-1); i++)
     Ap(Ap.size1()-1,i) = 0;
   Ap(Ap.size1()-1,Ap.size2()-1) = normR;
   PCAtools pca(Ap);

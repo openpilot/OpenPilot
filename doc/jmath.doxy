@@ -15,11 +15,6 @@ the Basic Linear Algebra System specification in a efficient way (it
 uses templates and operator expressions). It defines different vectors
 and matrix types (dense, symmetric, sparse, banded).
 
-Moreover \e bindings are provided beetween uBlas and others well known
-algebra libraries such that LAPACK or ATLAS which adds powerfull
-algebra routines to uBlas. Currently these bindings are not part of
-the official boost release but can be found on the boost-sandbox cvs.
-
 Links of interest concerning uBlas:
 
   - uBlas doc at http://boost.org/libs/numeric/ublas/doc/index.htm,
@@ -28,6 +23,7 @@ Effective uBlas</a>
   - <a href="http://www.crystalclearsoftware.com/cgi-bin/boost_wiki/wiki.pl?Linear_Algebra_With_UBLAS">
 Linear Algebra With uBlas</a>
   - <a href="http://www.crystalclearsoftware.com/cgi-bin/boost_wiki/wiki.pl?Frequently_Asked_Questions_Using_UBLAS"> FAQ using uBlas</a>
+
 \subsection subsecJmathJblas Standard jblas.hpp header 
 
 jblas.hpp is the standard jafar header to use ublas in your own
@@ -83,6 +79,20 @@ your module, you need to add the following to your module.i:
 \endcode
 
 For example, module filter uses this hint.
+
+\section secJmathNumericalTools Numerical tools
+
+Please, do not reinvent the wheel ! Many good, efficient, well
+documented and free libraries exist. Moreover \e bindings are provided
+for uBlas to other well known algebra libraries such that LAPACK or
+ATLAS. These bindings add powerfull algebra routines to
+uBlas. Currently they are not part of the official boost release but
+can be found on the boost-sandbox cvs.
+
+  - LAPACK: http://www.netlib.org/lapack/
+  - <a href="http://cvs.sourceforge.net/viewcvs.py/*checkout*/boost-sandbox/boost-sandbox/libs/numeric/bindings/doc/index.html">Boost.Numeric.Bindings</a>
+
+The use of Numerical Recipes code is not reocmmended since it is not published under a free licence. However, the books can help a lot, they are freely available at http://www.library.cornell.edu/nr.
 
 \section secJmathMacro Macro
 

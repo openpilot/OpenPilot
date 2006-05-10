@@ -13,10 +13,12 @@
 namespace jafar {
   namespace jmath {
 
-    /** Linear Least Squares solver. Find \f$x\f$ which minimizes:
+    /** (Weighted) Linear Least Squares solver. Find \f$x\f$ which minimizes:
      * \f[
      * \left\| A.x - b \right\|^2
      * \f]
+     *
+     * Each data can also be weighted (usualy by the inverse of its variance).
      *
      * The solution is computed using a Singular Value Decomposition,
      * the lapack::gesdd is used to do the real work.
@@ -60,6 +62,16 @@ namespace jafar {
 
       void setSize(std::size_t sizeModel, std::size_t sizeDataSet);
       void setDataSetSize(std::size_t sizeDataSet);
+
+      /** Safe function to add a data point. For more efficiency, one
+       * can directly modify the matrix A and the vector b.
+       */
+      void setData(std::size_t index, jblas::vec const& A_row, double b_val);
+
+      /** Safe function to add a weighted data point. For more
+       * efficiency, one can directly modify the matrix A and the vector b.
+       */
+      void setData(std::size_t index, jblas::vec const& A_row, double b_val, double weight);
 
       void solve();
 

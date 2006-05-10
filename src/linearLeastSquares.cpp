@@ -5,6 +5,8 @@
 #ifdef HAVE_BOOST_SANDBOX
 #ifdef HAVE_LAPACK
 
+#include <cmath>
+
 #include <iostream> // gesdd uses std::cerr but does not includes iostream
 #include "boost/numeric/bindings/lapack/gesdd.hpp"
 #include "boost/numeric/bindings/traits/ublas_matrix.hpp"
@@ -34,6 +36,24 @@ void LinearLeastSquares::setSize(std::size_t sizeModel, std::size_t sizeDataSet)
 void LinearLeastSquares::setDataSetSize(std::size_t sizeDataSet)
 {
   setSize(sizeModel(), sizeDataSet);
+}
+
+void LinearLeastSquares::setData(std::size_t index, jblas::vec const& A_row, double b_val)
+{
+  JFR_PRECOND(index < sizeDataSet(),
+	      "LinearLeastSquares::setData: invalid index: " << index);
+  JFR_PRECOND(A_row.size() == sizeModel(),
+	      "LinearLeastSquares::setData: invalid A_row size: " << A_row.size());
+  row(m_A, index).assign(A_row);
+  m_b(index) = b_val;
+}
+
+void LinearLeastSquares::setData(std::size_t index, jblas::vec const& A_row, double b_val, double weight)
+{
+  JFR_TRACE_BEGIN;
+  double sqrt_weight = sqrt(weight);
+  setData(index, sqrt_weight*A_row, sqrt_weight*b_val);
+  JFR_TRACE_END("LinearLeastSquares::setData");
 }
 
 void LinearLeastSquares::solve()

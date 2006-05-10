@@ -90,9 +90,9 @@ uBlas. Currently they are not part of the official boost release but
 can be found on the boost-sandbox cvs.
 
   - LAPACK: http://www.netlib.org/lapack/
-  - <a href="http://cvs.sourceforge.net/viewcvs.py/*checkout*/boost-sandbox/boost-sandbox/libs/numeric/bindings/doc/index.html">Boost.Numeric.Bindings</a>
+  - \link http://cvs.sourceforge.net/viewcvs.py/boost-sandbox/boost-sandbox/libs/numeric/bindings/doc/index.html Boost.Numeric.Bindings \endlink (click on \e download to browse the doc)
 
-The use of Numerical Recipes code is not reocmmended since it is not published under a free licence. However, the books can help a lot, they are freely available at http://www.library.cornell.edu/nr.
+The use of Numerical Recipes code is not recommended since it is not published under a free licence. However, the books can help a lot, they are freely available at http://www.library.cornell.edu/nr .
 
 \section secJmathMacro Macro
 

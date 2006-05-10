@@ -18,34 +18,42 @@ namespace jafar {
     /*! Principal Component analysis (PCA) Tools Class.\n
      *  Principal components are extracted by singular values decomposition on the covariance matrix
      *  of the centered input data. Available data after pca computation are the mean of the input data,
-     *  the eigenvalues (in ascending order) and corresponding eigenvectors.\n
+     *  the eigenvalues (in descending order) and corresponding eigenvectors.\n
      *  Other methods allow projection in the eigenspace, reconstruction from eigenspace and 
-     *  update of the eigenspace with a new data (according the thesis of Danijel Skocaj : "Robust subspace approach to visual learning and recognition").
+     *  update of the eigenspace with a new data (according Matej Artec, Matjaz Jogan and Ales Leonardis
+     *  : "Incremental PCA for On-line Visual Learning and Recognition").
      *
-     * \ingroup jmath
+     *  \ingroup jmath
      */
-    class PCAtools : public jafar::kernel::KeyValueFileSaveLoad {
+    class PCA : public jafar::kernel::KeyValueFileSaveLoad {
     public:
 
-      typedef enum PCA_Method {
-	batch,
-	EM
+      /*! Updating method flag
+       */
+      typedef enum UFlag {
+	/*! keep the new basis vector if possible */
+	increase, 
+	 /*! preserve subspace dimension */
+	preserve, 
+	/*! preserve subspace dimension if overall reconstruction error 
+	      is under a specified threshold */
+	ore 
       };
 
-      /// Default Constructor 
-      PCAtools() : pca_performed(false) {};
+
+      /*! Default Constructor
+       * @param basisOnly_ flag to compute only the PCA basis
+       */
+      PCA(bool basisOnly_=false) : pca_performed(false), basis_only(basisOnly_) {};
 
       /*! Constructor with direct computation
-       * @param X_ input matrix
+       * @param X_ input m*n matrix (ie n vectors of R(m))
+       * @param dim_ subspace dimension in [1,min(m,n)] (default: min(m;n))
+       * @param basisOnly_ flag to compute only the PCA basis
        */
-      PCAtools(const jblas::mat& X_, PCA_Method m_ = batch) {
-	switch (m_) {
-	case batch:
-	  batchPCA(X_);
-	  break;
-	default:
-	  JFR_RUN_TIME("jmath::PCA: forbidden case in constructor");
-	}
+      PCA(const jblas::mat& X_, int dim_=0, bool basisOnly_ = false) {
+	basis_only = basisOnly_;
+	batchPCA(X_,dim_);
       };
 
       //Accessors
@@ -69,23 +77,24 @@ namespace jafar {
 
 
       /*! Compute PCA using the batch algorithm
-       * @param X_ input matrix 
+       * @param X_ input m*n matrix (ie n vectors of R(m))
+       * @param dim_ subspace dimension in [1,min(m,n)] (default: min(m;n))
        */
-      void batchPCA(const jblas::mat& X_);
+      void batchPCA(const jblas::mat& X_, int dim_=0);
 
-      /*! Increment the PCA basis with a new vector
+
+      /*! update the PCA with a new vector
        * @param I_ input vector 
-       *
-       * WARNING: NEED TESTS
+       * @param f_ update flag 
+       * @param thd_ threshold used if UFlag = ore 
        */
-      void incrementPCA(const jblas::vec& I_);
+      void updatePCA(const jblas::vec& I_, UFlag f_=preserve, double thd_=0.25);
 
       /*! Project an Input vector on the eigenspace.
        * @param I_ input vector
-       * @param k_ eigenspace dimension
        * @return the image vector
        */
-      jblas::vec project(const jblas::vec& I_, int k_) const;
+      jblas::vec project(const jblas::vec& I_) const;
 
       /*! Reconstruct full vector from its projection
        * @param P_ projection vector
@@ -108,7 +117,7 @@ namespace jafar {
 
     private:
       
-      bool pca_performed;
+      bool pca_performed,basis_only;
       jblas::mat eigenvectors,coefficients;
       jblas::vec mean, eigenvalues;
 

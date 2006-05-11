@@ -25,9 +25,8 @@ JmathException::ExceptionId JmathException::getExceptionId() const throw() {
 
 string JmathException::exceptionIdToString(ExceptionId id_) throw() {
   switch(id_) {
-//   case MY_ERROR:
-//     return "MY_ERROR";
-
+  case LAPACK_ERROR:
+    return "LAPACK_ERROR";
   default:
     std::stringstream s;
     s << id_;

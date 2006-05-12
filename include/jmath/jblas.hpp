@@ -14,6 +14,7 @@
 #include "boost/numeric/ublas/vector.hpp"
 #include "boost/numeric/ublas/matrix.hpp"
 #include "boost/numeric/ublas/symmetric.hpp"
+#include "boost/numeric/ublas/banded.hpp"
 #include "boost/numeric/ublas/io.hpp"
 
 #include "boost/numeric/ublas/matrix_proxy.hpp"
@@ -46,6 +47,9 @@ namespace jblas { /// special namespace to typedef ublas datatype.
 
   /// column major matrix
   typedef boost::numeric::ublas::matrix<double, boost::numeric::ublas::column_major> mat_column_major;
+
+  /// diagonal matrix
+  typedef boost::numeric::ublas::diagonal_matrix<double> diag_mat;
 
   /// 2x2 dimension matrix
   typedef boost::numeric::ublas::bounded_matrix<double,2,2> mat22;

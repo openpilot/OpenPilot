@@ -14,6 +14,7 @@
 
 #include "kernel/jafarException.hpp"
 
+#include "jmath/jmathException.hpp"
 #include "jmath/linearLeastSquares.hpp"
 
 using namespace jafar::jmath;
@@ -67,8 +68,12 @@ void LinearLeastSquares::solve()
   mat_column_major VT(sizeModel(), sizeModel());
 
   int ierr = lapack::gesdd(m_A,s,U,VT);
-  JFR_POSTCOND(ierr==0,
-	       "LinearLeastSquares::solve: error in lapack::gesdd() function, ierr=" << ierr);
+  if (ierr!=0) {
+    throw(jmath::LapackException(ierr, 
+				 "LinearLeastSquares::solve: error in lapack::gesdd() routine",
+				 __FILE__,
+				 __LINE__));
+  }
 
   // fill x
   m_x.clear();

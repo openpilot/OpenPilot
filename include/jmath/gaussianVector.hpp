@@ -44,12 +44,14 @@ namespace jafar {
 
       double probabilityDensity(const jblas::vec& v);
 
+#ifndef SWIG
       friend std::ostream& operator <<(std::ostream& s, const GaussianVector& v_);
+#endif
     };
 
+#ifndef SWIG
     std::ostream& operator <<(std::ostream& s, const GaussianVector& v_);
-
-    typedef boost::shared_ptr<GaussianVector> GaussianVector_ptr;
+#endif
 
     /** A weighted gaussian vector, add a weight to a GaussianVector.
      *
@@ -68,11 +70,16 @@ namespace jafar {
       WeightedGaussianVector(const GaussianVector& gv_, double w_=1.0);
       WeightedGaussianVector(const WeightedGaussianVector& v_);
 
+
+#ifndef SWIG
       friend std::ostream& operator <<(std::ostream& s, const WeightedGaussianVector& v_);
+#endif
      };
 
+
+#ifndef SWIG
     std::ostream& operator <<(std::ostream& s, const WeightedGaussianVector& v_);
-    typedef boost::shared_ptr<WeightedGaussianVector> WeightedGaussianVector_ptr;
+#endif
 
  } // namespace jmath
 } // namespace jafar

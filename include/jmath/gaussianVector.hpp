@@ -42,6 +42,12 @@ namespace jafar {
 	}
       }
 
+      /// clear x and P
+      void clear() {
+	x.clear();
+	P.clear();
+      }
+
       double probabilityDensity(const jblas::vec& v);
 
 #ifndef SWIG

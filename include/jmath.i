@@ -65,6 +65,11 @@
 %template(lu_inv) jafar::jmath::ublasExtra::lu_inv<jblas::mat, jblas::mat>;
 %template(lu_det) jafar::jmath::ublasExtra::lu_det<jblas::mat>;
 
+%template(setSizeValue) jafar::jmath::setSizeValue<jblas::mat33>;
+%template(setValue) jafar::jmath::setValueMat<jblas::mat33>;
+%template(print) jafar::jmath::print<jblas::mat33>;
+%template(prettyPrint) jafar::jmath::ublasExtra::prettyFormat<jblas::mat33>;
+
 %template(setSizeValue) jafar::jmath::setSizeValue<jblas::mat44>;
 %template(setValue) jafar::jmath::setValueMat<jblas::mat44>;
 %template(print) jafar::jmath::print<jblas::mat44>;

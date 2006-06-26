@@ -99,7 +99,7 @@ void PCA::updatePCA(const jblas::vec& I_, UFlag f_, double thd_) {
   ublas::project(D,ublas::range(0,a.size()),
 		 ublas::range(0,a.size())) = ublas::outer_prod(a,a);
   D /= static_cast<double>(n)/static_cast<double>((n+1)*(n+1));
-  for(int i=0; i < a.size(); i++) {
+  for(std::size_t i=0; i < a.size(); i++) {
     D(i,i) += static_cast<double>(n)/static_cast<double>(n+1)*eigenvalues(i);
     D(D.size1()-1,i) = static_cast<double>(n)/static_cast<double>((n+1)*(n+1))*gamma*a(i);
     D(i,D.size2()-1) = static_cast<double>(n)/static_cast<double>((n+1)*(n+1))*gamma*a(i);
@@ -111,7 +111,7 @@ void PCA::updatePCA(const jblas::vec& I_, UFlag f_, double thd_) {
     JFR_RUN_TIME("PCA::updatePCA: error in lapack::syev() function, ierr=" << ierr);
   jblas::mat R(D.size1(),D.size2());
   eigenvalues.resize(eigenvalues.size()+1);
-  for(int i=0;i<eigenvalues.size();i++) {
+  for(std::size_t i=0;i<eigenvalues.size();i++) {
     eigenvalues(i) = alphap(eigenvalues.size()-i-1);
     ublas::column(R,i) = ublas::column(D,D.size2()-i-1);
   }
@@ -124,7 +124,7 @@ void PCA::updatePCA(const jblas::vec& I_, UFlag f_, double thd_) {
   if (!basis_only) {
     jblas::vec etha = ublas::prod(ublas::trans(Up),(mean-meanp));
     coefficients.resize(coefficients.size1()+1,coefficients.size2()+1);
-    for(int i=0; i<coefficients.size2()-1; i++) {
+    for(std::size_t i=0; i<coefficients.size2()-1; i++) {
       coefficients(coefficients.size1()-1,i) = 0;
       ublas::column(coefficients,i) = ublas::prod(ublas::trans(R),
 						  ublas::column(coefficients,i))+etha;

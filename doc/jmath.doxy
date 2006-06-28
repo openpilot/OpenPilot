@@ -90,7 +90,7 @@ uBlas. Currently they are not part of the official boost release but
 can be found on the boost-sandbox cvs.
 
   - LAPACK: http://www.netlib.org/lapack/
-  - <a href="http://boost.cvs.sourceforge.net/*checkout*/boost-sandbox/boost-sandbox/libs/numeric/bindings/doc/index.html">Boost.Numeric.Bindings</a> (click on \e download to browse the doc)
+  - <a href="http://boost.cvs.sourceforge.net/boost-sandbox/boost-sandbox/libs/numeric/bindings/doc/index.html">Boost.Numeric.Bindings</a> (click on \e download to browse the doc)
 
 The use of Numerical Recipes code is not recommended since it is not published under a free licence. However, the books can help a lot, they are freely available at http://www.library.cornell.edu/nr .
 

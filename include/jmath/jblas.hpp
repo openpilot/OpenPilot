@@ -42,8 +42,10 @@ namespace jblas { /// special namespace to typedef ublas datatype.
 
   /// standard matrix type
   typedef boost::numeric::ublas::matrix<double> mat;
+  typedef boost::numeric::ublas::matrix<bool> bool_mat;
   typedef boost::numeric::ublas::zero_matrix<double> zero_mat;
   typedef boost::numeric::ublas::identity_matrix<double> identity_mat;
+  
 
   /// column major matrix
   typedef boost::numeric::ublas::matrix<double, boost::numeric::ublas::column_major> mat_column_major;

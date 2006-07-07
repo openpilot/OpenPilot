@@ -90,6 +90,8 @@
 %template(trace) jafar::jmath::ublasExtra::trace<jblas::mat>;
 %template(trace) jafar::jmath::ublasExtra::trace<jblas::sym_mat>;
 
+
+
 %include "jmath/random.hpp"
 
 %include "jmath/angle.hpp"
@@ -101,3 +103,4 @@
 %include "jmath/pca.hpp"
 
 %include "jmath/linearLeastSquares.hpp"
+

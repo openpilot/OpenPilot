@@ -39,6 +39,8 @@ namespace jblas { /// special namespace to typedef ublas datatype.
   typedef boost::numeric::ublas::bounded_vector<double,3> vec3;
   /// 4 dimension vector
   typedef boost::numeric::ublas::bounded_vector<double,4> vec4;
+  /// 8 dimension vector
+  typedef boost::numeric::ublas::bounded_vector<double,8> vec8;
 
   /// standard matrix type
   typedef boost::numeric::ublas::matrix<double> mat;
@@ -63,6 +65,14 @@ namespace jblas { /// special namespace to typedef ublas datatype.
   /// 4x4 dimension matrix
   typedef boost::numeric::ublas::bounded_matrix<double,4,4> mat44;
   typedef boost::numeric::ublas::matrix_range<mat44> mat44_range;
+
+  /// 6x6 dimension matrix
+  typedef boost::numeric::ublas::bounded_matrix<double,6,6> mat66;
+  typedef boost::numeric::ublas::matrix_range<mat66> mat66_range;
+
+  /// 8x8 dimension matrix
+  typedef boost::numeric::ublas::bounded_matrix<double,8,8> mat88;
+  typedef boost::numeric::ublas::matrix_range<mat88> mat88_range;
 
   /// standard symmetric matrix type
   typedef boost::numeric::ublas::symmetric_matrix<double> sym_mat;

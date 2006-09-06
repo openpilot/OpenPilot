@@ -9,6 +9,9 @@
 
 %{
 
+/* ruby defines ALLOC which conflicts with boost */ 
+#undef ALLOC
+
 #include <string> 
 
 #include "jafarConfig.h"

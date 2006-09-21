@@ -5,6 +5,8 @@
 #ifdef HAVE_BOOST_SANDBOX
 #ifdef HAVE_LAPACK
 
+#include "assert.h"
+
 #include <cmath>
 
 #include <iostream> // gesdd uses std::cerr but does not includes iostream

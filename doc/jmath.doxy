@@ -94,6 +94,26 @@ can be found on the boost-sandbox cvs.
 
 The use of Numerical Recipes code is not recommended since it is not published under a free licence. However, the books can help a lot, they are freely available at http://www.library.cornell.edu/nr .
 
+\section secJmathFromMatlab From Matlab to jmath
+
+Here is a few example of a correspondance of functions between matlab and jafar:
+
+ - [U,S,V] = svd(M), singular value decomposition 
+\code
+#include <boost/numeric/bindings/lapack/gesvd.hpp>
+using namespace boost::numeric::bindings;
+
+jblas::vec s(3);
+jblas::mat_column_major M;
+jblas::mat_column_major U(3, 3);
+jblas::mat_column_major VT(3, 3);
+
+int ierr = lapack::gesvd(M,s,U,VT);
+
+\endcode
+
+Note that you can use gesdd to do the singular value decomposition using the divide and conquer method.
+
 \section secJmathMacro Macro
 
 - plot.tcl defines a front-end to gnuplot, a demo script is demoPlot.tcl

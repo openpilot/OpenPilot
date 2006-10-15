@@ -27,6 +27,10 @@ namespace ublas = boost::numeric::ublas;
 
 namespace jblas { /// special namespace to typedef ublas datatype.
 
+  /*
+   * scalar type double
+   */
+
   /// standard vector type
   typedef boost::numeric::ublas::vector<double> vec;
   typedef boost::numeric::ublas::zero_vector<double> zero_vec;
@@ -90,6 +94,13 @@ namespace jblas { /// special namespace to typedef ublas datatype.
   typedef boost::numeric::ublas::matrix_vector_slice<sym_mat> sym_mat_vec_slice;
 
   typedef boost::numeric::ublas::matrix_column<mat> mat_column;
+
+  /*
+   * scalar type int
+   */
+
+  /// 2 dimension vector
+  typedef boost::numeric::ublas::bounded_vector<int,2> veci2;
 
 } // namespace jblas
 

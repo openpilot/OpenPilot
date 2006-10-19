@@ -7,12 +7,9 @@
 namespace jafar {
 namespace qdisplay {
 
-ImageItem::ImageItem(jafar::qdisplay::Viewer* v, const jafar::image::Image& img)
+ImageItem::ImageItem(const jafar::image::Image& img)
 {
   setImage(img);
-  v->scene()->addItem(this);
-  QRect rect = boundingRect().toRect();
-  v->resize( rect.width() + 5, rect.height() + 5 );
 }
 
 void ImageItem::setImage(const jafar::image::Image& jfrimg)

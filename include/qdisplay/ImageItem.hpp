@@ -14,7 +14,7 @@ class ImageItem : public QGraphicsPixmapItem {
      * Create an ImageItem to use with a Viewer to display a jafar::image::Image in the Viewer.
      * @param img the jafar image to display
      */
-    ImageItem(jafar::qdisplay::Viewer* v, const jafar::image::Image& img);
+    ImageItem(const jafar::image::Image& img);
     /**
      * @param img a jafar image to display
      */

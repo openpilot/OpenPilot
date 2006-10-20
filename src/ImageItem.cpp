@@ -1,15 +1,27 @@
 #include "qdisplay/ImageItem.hpp"
 
+#include <QGraphicsPixmapItem>
 #include <QGraphicsScene>
 
-#include "qdisplay/Viewer.hpp"
+#include "qdisplay/ShapeItem.hpp"
 
 namespace jafar {
 namespace qdisplay {
 
-ImageItem::ImageItem(const jafar::image::Image& img)
+ImageItem::ImageItem(const jafar::image::Image& img) :
+    m_pixmapItem(new QGraphicsPixmapItem()),
+    m_currentZ(0.)
 {
   setImage(img);
+  m_pixmapItem->setZValue(m_currentZ++);
+  addToGroup(m_pixmapItem);
+}
+
+void ImageItem::addShapeItem(ShapeItem* si)
+{
+  addToGroup(si);
+  scene()->addItem(si);
+  si->setZValue(m_currentZ++);
 }
 
 void ImageItem::setImage(const jafar::image::Image& jfrimg)
@@ -40,9 +52,8 @@ void ImageItem::setImage(const jafar::image::Image& jfrimg)
       }
     }
   }
-  setPixmap(QPixmap::fromImage(img));
+  m_pixmapItem->setPixmap(QPixmap::fromImage(img));
 }
 
 }
 }
-

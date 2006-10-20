@@ -14,7 +14,7 @@ REQUIRED_MODULES = kernel image
 OPTIONAL_MODULES = 
 
 # external libraries dependencies
-REQUIRED_EXTLIBS = 
+REQUIRED_EXTLIBS = qt4
 OPTIONAL_EXTLIBS = 
 
 # LDFLAGS +=

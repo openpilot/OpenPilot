@@ -18,8 +18,8 @@
 
 #include "jafarConfig.h"
 #include "qdisplay/Viewer.hpp"
-#include "qdisplay/ImageItem.hpp"
-#include "qdisplay/ShapeItem.hpp"
+#include "qdisplay/ImageView.hpp"
+#include "qdisplay/Shape.hpp"
 // using namespace jafar::qdisplay;
 
 %}
@@ -32,8 +32,8 @@
 %include "jafar.i"
 %include "qdisplayException.i"
 %include "qdisplay/Viewer.hpp"
-%include "qdisplay/ImageItem.hpp"
-%include "qdisplay/ShapeItem.hpp"
+%include "qdisplay/ImageView.hpp"
+%include "qdisplay/Shape.hpp"
 
 #if defined(SWIGRUBY)
 %header %{

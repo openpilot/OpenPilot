@@ -1,4 +1,4 @@
-#include "qdisplay/ShapeItem.hpp"
+#include "qdisplay/Shape.hpp"
 
 #include <QPainter>
 #include <QStyleOption>
@@ -8,13 +8,13 @@
 namespace jafar {
 namespace qdisplay {
 
-ShapeItem::ShapeItem(ShapeType shapeType, double x, double y, double w, double h) :
+Shape::Shape(ShapeType shapeType, double x, double y, double w, double h) :
     m_shapeType(shapeType), m_boundingRect(-w * 0.5, -h * 0.5, w, h)
 {
   setPos(x,y);
 }
 
-void ShapeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+void Shape::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
   painter->setPen(m_color);
   switch(m_shapeType)

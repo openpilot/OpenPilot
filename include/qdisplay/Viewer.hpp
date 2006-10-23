@@ -8,11 +8,11 @@
 namespace jafar {
 namespace qdisplay {
 
-class ImageItem;
-class ShapeItem;
+class ImageView;
+class Shape;
 
 /**
- * This is the viewer, you can add ImageItem to display on it, or overlay using ShapeItem.
+ * This is the viewer, you can add ImageView to display on it, or overlay using Shape.
  */
 class Viewer : public QGraphicsView {
 
@@ -30,23 +30,23 @@ class Viewer : public QGraphicsView {
      * @param row row number
      * @param col column number
      */
-    ImageItem* imageItem(int row = 0, int col = 0)
+    ImageView* imageItem(int row = 0, int col = 0)
     {
       return m_imageMosaic[row][col];
     }
     /**
-     * @param ii an ImageItem to display on the scene.
+     * @param ii an ImageView to display on the scene.
      * @param row the number of the row in the mosaic
      * @param col the number of the column in the mosaic
      */
-    void setImageItem(ImageItem* ii, int row = 0, int col= 0);
+    void setImageView(ImageView* ii, int row = 0, int col= 0);
     /**
-     * @param si a ShapeItem to display on the scene.
+     * @param si a Shape to display on the scene.
      */
-    void addShapeItem(ShapeItem* si);
+    void addShape(qdisplay::Shape* si);
   private:
     QGraphicsScene* m_scene;
-    QHash< int, QHash< int, ImageItem* > > m_imageMosaic;
+    QHash< int, QHash< int, ImageView* > > m_imageMosaic;
     int m_mosaicWidth, m_mosaicHeight;
     double m_currentZ;
 };

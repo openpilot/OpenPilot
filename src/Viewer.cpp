@@ -4,8 +4,8 @@
 
 #include <kernel/jafarMacro.hpp>
 
-#include "qdisplay/ImageItem.hpp"
-#include "qdisplay/ShapeItem.hpp"
+#include "qdisplay/ImageView.hpp"
+#include "qdisplay/Shape.hpp"
 
 namespace jafar {
 namespace qdisplay {
@@ -16,12 +16,12 @@ Viewer::Viewer(int mosaicWidth, int mosaicHeight ) : m_scene(new QGraphicsScene(
   setScene(m_scene);
 }
 
-void Viewer::addShapeItem(ShapeItem* si) {
+void Viewer::addShape(qdisplay::Shape* si) {
   scene()->addItem(si);
   si->setZValue(m_currentZ++);
 }
 
-void Viewer::setImageItem(ImageItem* ii, int row, int col)
+void Viewer::setImageView(ImageView* ii, int row, int col)
 {
   JFR_DEBUG("Adding image item : " << ii);
   if(scene()->items().contains(ii)) return;

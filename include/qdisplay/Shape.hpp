@@ -3,17 +3,17 @@
 namespace jafar {
 namespace qdisplay {
 class Viewer;
-class ShapeItem : public QGraphicsPixmapItem {
+class Shape : public QGraphicsItem {
   public:
     enum ShapeType {
       ShapeRectangle,
       ShapeCross
     };
     /**
-      * Create an ShapeItem to use with a Viewer to display a basic shape.
+      * Create an Shape to use with a Viewer to display a basic shape.
       * @param shapeType the type of the shape to display
       */
-    ShapeItem(ShapeType shapeType, double x, double y, double w, double h);
+    Shape(ShapeType shapeType, double x, double y, double w, double h);
     virtual QRectF boundingRect () const { return m_boundingRect; } 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
     /**
@@ -28,7 +28,7 @@ class ShapeItem : public QGraphicsPixmapItem {
      * @param x
      * @param y
      */
-    inline void setPos(double x, double y) { QGraphicsPixmapItem::setPos(x,y); }
+    inline void setPos(double x, double y) { QGraphicsItem::setPos(x,y); }
   private:
     QRectF m_boundingRect;
     ShapeType m_shapeType;

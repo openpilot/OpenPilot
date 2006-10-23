@@ -1,14 +1,15 @@
-#include "qdisplay/ImageItem.hpp"
+#include "qdisplay/ImageView.hpp"
 
 #include <QGraphicsPixmapItem>
 #include <QGraphicsScene>
 
-#include "qdisplay/ShapeItem.hpp"
+#include <kernel/jafarMacro.hpp>
+#include "qdisplay/Shape.hpp"
 
 namespace jafar {
 namespace qdisplay {
 
-ImageItem::ImageItem(const jafar::image::Image& img) :
+ImageView::ImageView(const jafar::image::Image& img) :
     m_pixmapItem(new QGraphicsPixmapItem()),
     m_currentZ(0.)
 {
@@ -17,14 +18,16 @@ ImageItem::ImageItem(const jafar::image::Image& img) :
   addToGroup(m_pixmapItem);
 }
 
-void ImageItem::addShapeItem(ShapeItem* si)
+void ImageView::addShape(Shape* si)
 {
+  JFR_PRED_RUN_TIME(scene(), "You first need to add the ImageView to a scene");
   addToGroup(si);
   scene()->addItem(si);
   si->setZValue(m_currentZ++);
+  si->moveBy(pos().x(), pos().y());
 }
 
-void ImageItem::setImage(const jafar::image::Image& jfrimg)
+void ImageView::setImage(const jafar::image::Image& jfrimg)
 {
   int width = jfrimg.width();
   int height = jfrimg.height();

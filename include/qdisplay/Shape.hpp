@@ -3,7 +3,7 @@
 namespace jafar {
 namespace qdisplay {
 class Viewer;
-class Shape : public QGraphicsItem {
+class Shape : public QGraphicsItemGroup {
   public:
     enum ShapeType {
       ShapeRectangle,
@@ -29,10 +29,12 @@ class Shape : public QGraphicsItem {
      * @param y
      */
     inline void setPos(double x, double y) { QGraphicsItem::setPos(x,y); }
+    void setLabel(char * text);
   private:
     QRectF m_boundingRect;
     ShapeType m_shapeType;
     QColor m_color;
+    QGraphicsTextItem* m_label;
 };
 
 }

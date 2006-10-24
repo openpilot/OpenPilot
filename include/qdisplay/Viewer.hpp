@@ -44,6 +44,8 @@ class Viewer : public QGraphicsView {
      * @param si a Shape to display on the scene.
      */
     void addShape(qdisplay::Shape* si);
+    
+    bool isVisible() { return !QGraphicsView::isHidden(); }
   private:
     QGraphicsScene* m_scene;
     QHash< int, QHash< int, ImageView* > > m_imageMosaic;

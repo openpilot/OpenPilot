@@ -1,6 +1,7 @@
 #include "qdisplay/Viewer.hpp"
 
 #include <QGraphicsScene>
+// #include <QtOpenGL/QGLWidget>
 
 #include <kernel/jafarMacro.hpp>
 
@@ -14,6 +15,7 @@ Viewer::Viewer(int mosaicWidth, int mosaicHeight ) : m_scene(new QGraphicsScene(
 {
   show();
   setScene(m_scene);
+//   setViewport(new QGLWidget);
 }
 
 void Viewer::addShape(qdisplay::Shape* si) {
@@ -23,10 +25,8 @@ void Viewer::addShape(qdisplay::Shape* si) {
 
 void Viewer::setImageView(ImageView* ii, int row, int col)
 {
-  JFR_DEBUG("Adding image item : " << ii);
   if(scene()->items().contains(ii)) return;
   scene()->addItem(ii);
-//   ii->setParent(this);
   if(m_imageMosaic[row][col])
   {
     scene()->removeItem(m_imageMosaic[row][col]);

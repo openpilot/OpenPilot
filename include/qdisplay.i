@@ -35,6 +35,8 @@
 %include "qdisplay/ImageView.hpp"
 %include "qdisplay/Shape.hpp"
 
+
+
 #if defined(SWIGRUBY)
 %header %{
 
@@ -60,6 +62,11 @@ static void mark_QObject(void* ptr) {
 static void mark_Viewer(void* ptr) {
   mark_QObject(ptr);
   jafar::qdisplay::Viewer* obj = (jafar::qdisplay::Viewer*) ptr;
+  if(obj->isVisible())
+  {
+    VALUE robj = SWIG_RubyInstanceFor(ptr);
+    rb_gc_mark(robj);
+  }
 
 /* Loop over each object and tell the garbage collector
   that we are holding a reference to them. */

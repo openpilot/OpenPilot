@@ -49,8 +49,8 @@ void ImageView::setImage(const jafar::image::Image& jfrimg)
     {
       for(int y = 0; y < height; y++)
       {
-        const uchar* v = jfrimg.data( y) + x;
-        c.setRgb(v[0], v[1], v[2]);
+        const uchar* v = jfrimg.data( y) + 3*x;
+        c.setRgb(v[2], v[1], v[0]);
         img.setPixel(x, y, c.rgb());
       }
     }

@@ -17,7 +17,7 @@ and matrix types (dense, symmetric, sparse, banded).
 
 Links of interest concerning uBlas:
 
-  - uBlas doc at http://boost.org/libs/numeric/ublas/doc/index.htm,
+  - uBlas doc at http://boost.org/libs/numeric/ublas/doc/index.htm
   - <a href="http://www.crystalclearsoftware.com/cgi-bin/boost_wiki/wiki.pl?Effective_UBLAS">
 Effective uBlas</a>
   - <a href="http://www.crystalclearsoftware.com/cgi-bin/boost_wiki/wiki.pl?Linear_Algebra_With_UBLAS">

@@ -22,10 +22,14 @@
 
 #include "jmath/ublasCompatibility.hpp"
 
+/** \addtogroup jmath */
+/*@{*/
+
 /// shortcut for ublas namespace
 namespace ublas = boost::numeric::ublas;
 
-namespace jblas { /// special namespace to typedef ublas datatype.
+/// special namespace to typedef ublas datatype.
+namespace jblas {
 
   /*
    * scalar type double
@@ -48,10 +52,8 @@ namespace jblas { /// special namespace to typedef ublas datatype.
 
   /// standard matrix type
   typedef boost::numeric::ublas::matrix<double> mat;
-  typedef boost::numeric::ublas::matrix<bool> bool_mat;
   typedef boost::numeric::ublas::zero_matrix<double> zero_mat;
   typedef boost::numeric::ublas::identity_matrix<double> identity_mat;
-  
 
   /// column major matrix
   typedef boost::numeric::ublas::matrix<double, boost::numeric::ublas::column_major> mat_column_major;
@@ -102,6 +104,21 @@ namespace jblas { /// special namespace to typedef ublas datatype.
   /// 2 dimension vector
   typedef boost::numeric::ublas::bounded_vector<int,2> veci2;
 
+  /*
+   * scalar type bool
+   */
+  
+  /** bool matrix.
+   * @deprecated use jblas::matb instead (naming scheme)
+   */
+  typedef boost::numeric::ublas::matrix<bool> bool_mat;
+
+  /// bool matrix
+  typedef boost::numeric::ublas::matrix<bool> matb;
+
 } // namespace jblas
+
+/*@}*/
+/* End of Doxygen group */
 
 #endif // JMATH_JBLAS_HPP

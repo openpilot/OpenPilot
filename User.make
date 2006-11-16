@@ -11,7 +11,7 @@ MODULE_REVISION = 1
 
 # modules dependencies
 REQUIRED_MODULES = kernel image
-OPTIONAL_MODULES = 
+OPTIONAL_MODULES = datareader
 
 # external libraries dependencies
 REQUIRED_EXTLIBS = qt4

@@ -1,6 +1,9 @@
 #include "qdisplay/Viewer.hpp"
 
 #include <QGraphicsScene>
+#include <QKeyEvent>
+#include <QWheelEvent>
+
 // #include <QtOpenGL/QGLWidget>
 
 #include <kernel/jafarMacro.hpp>
@@ -17,6 +20,12 @@ Viewer::Viewer(int mosaicWidth, int mosaicHeight ) : m_scene(new QGraphicsScene(
   setScene(m_scene);
 //   setViewport(new QGLWidget);
 }
+
+Viewer::~Viewer()
+{
+  JFR_DEBUG("Deleting viewer " << this );
+}
+
 
 void Viewer::addShape(qdisplay::Shape* si) {
   scene()->addItem(si);
@@ -41,6 +50,33 @@ void Viewer::setImageView(ImageView* ii, int row, int col)
   }
   ii->setPos( row * m_mosaicWidth, col*m_mosaicHeight);
 }
+
+void Viewer::keyPressEvent ( QKeyEvent * event )
+{
+  switch (event->key()) {
+    case Qt::Key_Plus:
+      scaleView(1.2);
+      break;
+    case Qt::Key_Minus:
+      scaleView(1 / 1.2);
+      break;
+  }
+}
+
+void Viewer::wheelEvent(QWheelEvent *event)
+{
+  scaleView(pow((double)2, event->delta() / 240.0));
+}
+
+void Viewer::scaleView(qreal scaleFactor)
+{
+  qreal factor = matrix().scale(scaleFactor, scaleFactor).mapRect(QRectF(0, 0, 1, 1)).width();
+  if (factor < 0.07 || factor > 100)
+    return;
+
+  scale(scaleFactor, scaleFactor);
+}
+
 
 }
 }

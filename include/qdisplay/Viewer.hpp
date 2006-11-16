@@ -23,6 +23,8 @@ class Viewer : public QGraphicsView {
    * @param mosaicHeight the height of one cell of the mosaic
      */
     Viewer(int mosaicWidth = 0, int mosaicHeight = 0);
+    
+    ~Viewer();
 
     QGraphicsScene* scene() { return m_scene; }
     /**
@@ -46,6 +48,13 @@ class Viewer : public QGraphicsView {
     void addShape(qdisplay::Shape* si);
     
     bool isVisible() { return !QGraphicsView::isHidden(); }
+    /** Scale the view
+     * @param scaleFactor the scale factor to appply to the view
+     */
+    void scaleView(qreal scaleFactor);
+  protected:
+    virtual void keyPressEvent ( QKeyEvent * event );
+    virtual void wheelEvent(QWheelEvent *event);
   private:
     QGraphicsScene* m_scene;
     QHash< int, QHash< int, ImageView* > > m_imageMosaic;

@@ -60,13 +60,15 @@ static void mark_QObject(void* ptr) {
 #include <QGraphicsItem>
 
 static void mark_Viewer(void* ptr) {
-  mark_QObject(ptr);
   jafar::qdisplay::Viewer* obj = (jafar::qdisplay::Viewer*) ptr;
   if(obj->isVisible())
   {
     VALUE robj = SWIG_RubyInstanceFor(ptr);
+    JFR_DEBUG(robj<< " " << Qnil)
     rb_gc_mark(robj);
   }
+
+  mark_QObject(ptr);
 
 /* Loop over each object and tell the garbage collector
   that we are holding a reference to them. */

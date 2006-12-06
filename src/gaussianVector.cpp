@@ -33,7 +33,7 @@ GaussianVector::GaussianVector(const vec& x_, const sym_mat& P_) :
 GaussianVector::GaussianVector(const GaussianVector& v_) :
   x(v_.x), P(v_.P) {}
 
-double GaussianVector::probabilityDensity(const jblas::vec& v) 
+double GaussianVector::probabilityDensity(const jblas::vec& v) const
 {
   JFR_PRECOND(v.size() == size(),
               "GaussianVector::value: size of v must match size of gaussian");

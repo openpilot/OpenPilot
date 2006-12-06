@@ -48,7 +48,7 @@ namespace jafar {
 	P.clear();
       }
 
-      double probabilityDensity(const jblas::vec& v);
+      double probabilityDensity(const jblas::vec& v) const;
 
 #ifndef SWIG
       friend std::ostream& operator <<(std::ostream& s, const GaussianVector& v_);

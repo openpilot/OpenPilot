@@ -44,7 +44,7 @@ namespace jafar {
       /*! Default Constructor
        * @param basisOnly_ flag to compute only the PCA basis
        */
-      PCA(bool basisOnly_=false) : pca_performed(false), basis_only(basisOnly_) {};
+      PCA(bool basisOnly_=false) : basis_only(basisOnly_) {};
 
       /*! Constructor with direct computation
        * @param X_ input m*n matrix (ie n vectors of R(m))
@@ -56,24 +56,51 @@ namespace jafar {
 	batchPCA(X_,dim_);
       };
 
+      /*! Copy Constructor
+       * @param pca_ PCA object
+       */
+      PCA(PCA const & pca_) {
+	mean = pca_.mean;
+	eigenvalues = pca_.eigenvalues;
+	eigenvectors = pca_.eigenvectors;
+	coefficients = pca_.coefficients;
+      }
+
+      /*! assignment operator
+       * @param pca_ PCA object
+       */
+      PCA& operator= (PCA const & pca_) {
+	mean = pca_.mean;
+	eigenvalues = pca_.eigenvalues;
+	eigenvectors = pca_.eigenvectors;
+	coefficients = pca_.coefficients;
+	return *this;
+      };
+
       //Accessors
       /// Mean accessor
       jblas::vec& getMean() {
-	JFR_PRECOND(pca_performed, "PCA::getMean: no results available");
+	JFR_PRECOND(mean.size() != 0, "PCA::getMean: no results available");
 	return mean;
       };
 
       /// Eigen Vectors accessor
       jblas::mat& getEigenVectors() {
-	JFR_PRECOND(pca_performed, "PCA::getEigenVectors: no results available");
+	JFR_PRECOND(eigenvectors.size2() != 0, "PCA::getEigenVectors: no results available");
 	return eigenvectors;
       };
 
       /// Eigen Values accessor
       jblas::vec& getEigenValues() {
-	JFR_PRECOND(pca_performed, "PCA::getEigenValues: no results available");
+	JFR_PRECOND(eigenvalues.size() != 0, "PCA::getEigenValues: no results available");
 	return eigenvalues;
       }
+
+      /// Coefficients accessor
+      jblas::mat& getCoefficients() {
+	JFR_PRECOND(coefficients.size2() != 0, "PCA::getEigenValues: no results available");
+	return coefficients;
+      };
 
 
       /*! Compute PCA using the batch algorithm
@@ -117,7 +144,7 @@ namespace jafar {
 
     private:
       
-      bool pca_performed,basis_only;
+      bool basis_only;
       jblas::mat eigenvectors,coefficients;
       jblas::vec mean, eigenvalues;
 

@@ -74,12 +74,11 @@ void PCA::batchPCA(const jblas::mat& X_, int dim_) {
   }
   if (!basis_only)  
     coefficients = ublas::prod(ublas::trans(eigenvectors),centeredX); 
-  pca_performed = true;
 }
 
 
 void PCA::updatePCA(const jblas::vec& I_, UFlag f_, double thd_) {
-  JFR_PRECOND(pca_performed,
+  JFR_PRECOND(mean.size() != 0,
 	      "PCA::project: no eigenspace available");
   JFR_PRECOND(I_.size() == eigenvectors.size1(),
 	      "PCA::project: wrong size of the input vector. should be " << eigenvectors.size1());
@@ -155,7 +154,7 @@ void PCA::updatePCA(const jblas::vec& I_, UFlag f_, double thd_) {
 }
 
 jblas::vec PCA::project(const jblas::vec& I_) const {
-  JFR_PRECOND(pca_performed,
+  JFR_PRECOND(mean.size() != 0,
 	      "PCA::project: no eigenspace available");
   JFR_PRECOND(I_.size() == eigenvectors.size1(),
 	      "PCA::project: wrong size of the input vector. should be " << eigenvectors.size1());
@@ -163,7 +162,7 @@ jblas::vec PCA::project(const jblas::vec& I_) const {
 }
 
 jblas::vec PCA::reconstruct(const jblas::vec& P_) const {
-  JFR_PRECOND(pca_performed,
+  JFR_PRECOND(mean.size() != 0,
 	      "PCA::project: no eigenspace available");
   JFR_PRECOND(P_.size() <= eigenvectors.size2(),
 	      "PCA::project: wrong size of the input vector. should be in [1," << eigenvectors.size2() << "]");
@@ -178,12 +177,11 @@ void PCA::loadKeyValueFile(jafar::kernel::KeyValueFile const& keyValueFile) {
   keyValueFile.getItem("eigenvectors", eigenvectors);
   keyValueFile.getItem("coefficients", coefficients);
   JFR_TRACE_END("PCA::load");
-  pca_performed = true;
 }
 
 
 void PCA::saveKeyValueFile(jafar::kernel::KeyValueFile & keyValueFile) {
-  JFR_PRECOND(pca_performed,"PCA::save: no data to save");
+  JFR_PRECOND(mean.size() != 0,"PCA::save: no data to save");
   JFR_TRACE_BEGIN;
   keyValueFile.setItem("mean", mean);
   keyValueFile.setItem("eigenvalues", eigenvalues);

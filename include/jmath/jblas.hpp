@@ -52,11 +52,13 @@ namespace jblas {
 
   /// standard matrix type
   typedef boost::numeric::ublas::matrix<double> mat;
+  typedef boost::numeric::ublas::matrix_range<mat> mat_range;
   typedef boost::numeric::ublas::zero_matrix<double> zero_mat;
   typedef boost::numeric::ublas::identity_matrix<double> identity_mat;
 
   /// column major matrix
   typedef boost::numeric::ublas::matrix<double, boost::numeric::ublas::column_major> mat_column_major;
+  typedef boost::numeric::ublas::matrix_range<mat_column_major> mat_column_major_range;
 
   /// diagonal matrix
   typedef boost::numeric::ublas::diagonal_matrix<double> diag_mat;

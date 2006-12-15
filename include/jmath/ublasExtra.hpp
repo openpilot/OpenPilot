@@ -5,6 +5,8 @@
 
 #include <cmath>
 
+#include "jafarConfig.h"
+
 #if BOOST_VERSION < 103301 // missing includes in lu.hpp
 #include "boost/numeric/ublas/vector.hpp"
 #include "boost/numeric/ublas/vector_proxy.hpp"
@@ -18,12 +20,23 @@
 #include "boost/numeric/ublas/triangular.hpp"
 #endif
 
+#ifdef HAVE_BOOST_SANDBOX
+#ifdef HAVE_LAPACK
+#include "boost/numeric/bindings/lapack/gesdd.hpp"
+#include "boost/numeric/bindings/traits/ublas_matrix.hpp"
+#include "boost/numeric/bindings/traits/ublas_vector.hpp"
+#endif
+#endif
+
 #include "boost/numeric/ublas/lu.hpp"
 
 #include "kernel/jafarException.hpp"
 #include "kernel/jafarDebug.hpp"
 
 #include "jmath/jblas.hpp"
+#include "jmath/jmathException.hpp"
+
+
 
 namespace jafar {
   namespace jmath {
@@ -205,6 +218,28 @@ namespace jafar {
 	return s.str();
       };
 
+			/*!
+			 * Format a matrix output to a string in matlab syntax
+			 */
+			template<class Mat>
+			std::string matlabFormat(Mat const& m_) {
+				std::stringstream s;
+				s << "[";
+				for (std::size_t i = 0 ; i < m_.size1() ; ++i) {
+					for (std::size_t j = 0 ; j < m_.size2() ; ++j) {
+						if ( j != (m_.size2()-1) )
+							s << m_(i,j) << ",";
+						else
+							s << m_(i,j);
+					}
+					if ( i != (m_.size1()-1) )
+						s << ";";
+					else
+					 s << "]";
+				};
+				
+				return s.str();
+			};
       template<class M>
       void setMatrixValue(M& m, const double* val_, std::size_t size1_, std::size_t size2_) {
         JFR_PRECOND(m.size1()==size1_ && m.size2()==size2_,
@@ -304,7 +339,7 @@ namespace jafar {
         case 3:
           return details::det3(m_);
         default:
-          JFR_RUN_TIME("ublasExtra::det: not implemented yet");
+          lu_det(m_);
         }  
       };
 
@@ -323,7 +358,7 @@ namespace jafar {
 	  details::inv3(m_, m_inv);
           break;
         default:
-          JFR_RUN_TIME("ublasExtra::inv: not implemented yet");
+          lu_inv(m_,m_inv);
         }
       };
 
@@ -355,6 +390,41 @@ namespace jafar {
 	JFR_TRACE_END("ublasExtra::lu_inv");
 	inv.assign(mLuInv);
       }
+
+#ifdef HAVE_BOOST_SANDBOX
+#ifdef HAVE_LAPACK
+
+			/*!
+			 * General matrix inversion routine.
+			 * It use singular value decomposition to invert a matrix
+			 */
+			template<class M1, class M2>
+		void svd_inv(M1 const& m, M2& inv) {
+			JFR_PRECOND(m.size1() >= m.size2(),"ublasExtra::svd_inv: wrong matrix size");
+			JFR_PRECOND(inv.size1() == m.size1() && inv.size2() == m.size2(),
+				"ublasExtra::svd_inv(): invalid size for inverse matrix");
+			jblas::mat_column_major working_m(m);
+			jblas::vec s(m.size2());
+			jblas::mat_column_major U(m.size1(),m.size2());
+			jblas::mat_column_major VT(m.size1(),m.size2());  
+			int ierr = boost::numeric::bindings::lapack::gesdd(working_m,s,U,VT);
+			if (ierr!=0) {
+				throw(jmath::LapackException(ierr, 
+					"LinearLeastSquares::solve: error in lapack::gesdd() routine",
+					__FILE__,
+					__LINE__));
+			}
+			jblas::mat S(jblas::zero_mat(s.size(),s.size()));   
+			for(unsigned int i=0;i<s.size();i++) {       
+				JFR_ASSERT(s(i)!=0, "ublasExtra::svd_inv: singular matrix");        
+			  S(i,i)=1/s(i);                     
+			}               
+			inv = ublas::prod(S,ublas::trans(U));                      
+			inv = ublas::prod(ublas::trans(VT),inv);
+		};
+			
+#endif
+#endif 
 
       /** General matrix determinant. 
        *  It uses lu_factorize in uBLAS.

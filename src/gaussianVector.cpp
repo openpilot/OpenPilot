@@ -38,8 +38,9 @@ double GaussianVector::probabilityDensity(const jblas::vec& v) const
   JFR_PRECOND(v.size() == size(),
               "GaussianVector::value: size of v must match size of gaussian");
 
-  sym_mat P_inv(size(), size());
-  ublasExtra::inv(P, P_inv);
+	mat w_P(P);
+  mat P_inv(size(), size());
+  ublasExtra::inv(w_P, P_inv);
 //   mat y(size(),1);
 //   mat_column y_col(y, 0);
 //   y_col.assign(v-x);
@@ -48,7 +49,7 @@ double GaussianVector::probabilityDensity(const jblas::vec& v) const
   vec y = v-x;
   double num = exp(-0.5 * inner_prod(y, prod(P_inv, y)));
 
-  double den = pow(2*M_PI,size()/2)*sqrt(ublasExtra::det(P));
+  double den = pow(2*M_PI,size()/2)*sqrt(ublasExtra::det(w_P));
   return num / den;
 }
 

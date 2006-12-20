@@ -18,12 +18,10 @@ Viewer::Viewer(int mosaicWidth, int mosaicHeight ) : m_scene(new QGraphicsScene(
 {
   show();
   setScene(m_scene);
-//   setViewport(new QGLWidget);
 }
 
 Viewer::~Viewer()
 {
-  JFR_DEBUG("Deleting viewer " << this );
 }
 
 
@@ -49,6 +47,22 @@ void Viewer::setImageView(ImageView* ii, int row, int col)
     resize( m_mosaicWidth, m_mosaicHeight );
   }
   ii->setPos( row * m_mosaicWidth, col*m_mosaicHeight);
+}
+
+int Viewer::rows()
+{
+  int maxrows = 0;
+  for(QMap< int, QMap< int, ImageView* > >::iterator it = m_imageMosaic.begin(); it != m_imageMosaic.end(); it++)
+  {
+    int rows = (--it.value().end()).key();
+    if( rows > maxrows) maxrows = rows;
+  }
+  return maxrows + 1;
+}
+
+int Viewer::cols()
+{
+  return (--m_imageMosaic.end()).key() + 1;
 }
 
 void Viewer::keyPressEvent ( QKeyEvent * event )

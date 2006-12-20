@@ -3,7 +3,7 @@
 
 #include <QGraphicsView>
 
-#include <QHash>
+#include <QMap>
 
 namespace jafar {
 namespace qdisplay {
@@ -42,6 +42,8 @@ class Viewer : public QGraphicsView {
      * @param col the number of the column in the mosaic
      */
     void setImageView(ImageView* ii, int row = 0, int col= 0);
+    int rows();
+    int cols();
     /**
      * @param si a Shape to display on the scene.
      */
@@ -57,7 +59,7 @@ class Viewer : public QGraphicsView {
     virtual void wheelEvent(QWheelEvent *event);
   private:
     QGraphicsScene* m_scene;
-    QHash< int, QHash< int, ImageView* > > m_imageMosaic;
+    QMap< int, QMap< int, ImageView* > > m_imageMosaic;
     int m_mosaicWidth, m_mosaicHeight;
     double m_currentZ;
 };

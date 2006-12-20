@@ -64,7 +64,6 @@ static void mark_Viewer(void* ptr) {
   if(obj->isVisible())
   {
     VALUE robj = SWIG_RubyInstanceFor(ptr);
-    JFR_DEBUG(robj<< " " << Qnil)
     rb_gc_mark(robj);
   }
 
@@ -79,6 +78,16 @@ static void mark_Viewer(void* ptr) {
     VALUE object = SWIG_RubyInstanceFor(child);
     if (object != Qnil) {
       rb_gc_mark(object);
+    }
+  }
+  for(int i = 0; i < obj->rows(); i++)
+  {
+    for(int j = 0; j < obj->cols(); j++)
+    {
+      VALUE object = SWIG_RubyInstanceFor( obj->imageItem(i,j) );
+      if (object != Qnil) {
+        rb_gc_mark(object);
+      }
     }
   }
 }

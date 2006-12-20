@@ -38,10 +38,12 @@ class ImageView : public QObject, public QGraphicsItemGroup {
   public slots:
 #endif
     void lutRandomize();
+    void lutGrayscale();
+    void lutInvertGrayscale();
   protected:
     void contextMenuEvent ( QGraphicsSceneContextMenuEvent * event );
   private:
-    QAction *lutRandomizeAction;
+    QAction *lutRandomizeAction, *lutGrayscaleAction, *lutInvertGrayscaleAction;
     QImage m_image;
     QGraphicsPixmapItem* m_pixmapItem;
     double m_currentZ;

@@ -8,6 +8,7 @@
 
 #include <kernel/jafarMacro.hpp>
 #include "qdisplay/Shape.hpp"
+#include "qdisplay/AbstractEventHandler.hpp"
 
 namespace jafar {
 namespace qdisplay {
@@ -128,6 +129,15 @@ void ImageView::contextMenuEvent ( QGraphicsSceneContextMenuEvent * event )
     menu.addAction(lutInvertGrayscaleAction);
   }
   menu.exec(event->screenPos());
+}
+
+void ImageView::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
+{
+  if(m_eventHandler)
+  {
+    m_eventHandler->mouseReleaseEvent( event->button(), event->pos().x(), event->pos().y() );
+  }
+  QGraphicsItemGroup::mouseReleaseEvent(event);
 }
 
 }

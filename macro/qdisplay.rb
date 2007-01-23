@@ -16,6 +16,15 @@ def Qdisplay.showfile(filename)
 image = Jafar::Image::Image.loadImage(filename)
 return Qdisplay.showimage(image)
 end
-
+    
+class DisplayEventHandler < AbstractEventHandler
+  def initialize
+    super()
+  end
+  def mouseReleaseEvent(button, x, y)
+    puts "Button: #{button} Coordinate: (#{x}, #{y})"
+  end
+end
+    
 end
 end

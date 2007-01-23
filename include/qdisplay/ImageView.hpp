@@ -12,6 +12,7 @@ namespace jafar {
 namespace qdisplay {
 class Viewer;
 class Shape;
+class AbstractEventHandler;
 /**
  * This class manipulate the view of an image on a Viewer. You can add specific overlay to this image using
  * the command addShape
@@ -34,6 +35,13 @@ class ImageView : public QObject, public QGraphicsItemGroup {
      * @param si a Shape to display on the scene.
      */
     void addShape(Shape* si);
+    /**
+     * Define the event handler for this view
+     * @param eh the event handler
+     * Note: event handler can be shared between views, so it won't be deleted when
+     * this view is deleted
+     */
+    inline void setEventHandler(AbstractEventHandler* eh) { m_eventHandler = eh; }
 #ifndef SWIG
   public slots:
 #endif
@@ -42,11 +50,13 @@ class ImageView : public QObject, public QGraphicsItemGroup {
     void lutInvertGrayscale();
   protected:
     void contextMenuEvent ( QGraphicsSceneContextMenuEvent * event );
+    void mouseReleaseEvent ( QGraphicsSceneMouseEvent * event );
   private:
     QAction *lutRandomizeAction, *lutGrayscaleAction, *lutInvertGrayscaleAction;
     QImage m_image;
     QGraphicsPixmapItem* m_pixmapItem;
     double m_currentZ;
+    AbstractEventHandler* m_eventHandler;
 };
 
 }

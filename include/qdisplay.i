@@ -6,7 +6,7 @@
  * \ingroup qdisplay
  */      
 
-%module qdisplay
+%module(directors="1") qdisplay
 
 %{
 /* ruby defines ALLOC which conflicts with boost */ 
@@ -20,6 +20,7 @@
 #include "qdisplay/Viewer.hpp"
 #include "qdisplay/ImageView.hpp"
 #include "qdisplay/Shape.hpp"
+#include "qdisplay/AbstractEventHandler.hpp"
 // using namespace jafar::qdisplay;
 
 %}
@@ -34,6 +35,9 @@
 %include "qdisplay/Viewer.hpp"
 %include "qdisplay/ImageView.hpp"
 %include "qdisplay/Shape.hpp"
+
+%feature("director") jafar::qdisplay::AbstractEventHandler;
+%include "qdisplay/AbstractEventHandler.hpp"
 
 
 
@@ -104,5 +108,4 @@ static void mark_Viewer(void* ptr) {
 // instantiate some print functions
 // replace "Type" with appropriate class name
 // %template(print) jafar::qdisplay::print<jafar::qdisplay::Type>;
-
 

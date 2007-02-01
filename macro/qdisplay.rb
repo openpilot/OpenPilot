@@ -5,6 +5,10 @@ Jafar.register_module Jafar::Qdisplay
 module Jafar
 module Qdisplay
 
+if(not constants.include?("VManager"))
+  VManager = ViewerManager.new
+end
+
 def Qdisplay.showimage(image)
 viewer = Jafar::Qdisplay::Viewer.new
 imageview = Jafar::Qdisplay::ImageView.new(image)

@@ -21,6 +21,7 @@
 #include "qdisplay/ImageView.hpp"
 #include "qdisplay/Shape.hpp"
 #include "qdisplay/AbstractEventHandler.hpp"
+#include "qdisplay/ViewerManager.hpp"
 // using namespace jafar::qdisplay;
 
 %}
@@ -28,22 +29,46 @@
 #if defined(SWIGRUBY)
     %trackobjects;
     %markfunc jafar::qdisplay::Viewer "mark_Viewer";
+    %markfunc jafar::qdisplay::ViewerManager "mark_ViewerManager";
 #endif
 
 %include "jafar.i"
 %include "qdisplayException.i"
-%include "qdisplay/Viewer.hpp"
-%include "qdisplay/ImageView.hpp"
 %include "qdisplay/Shape.hpp"
+%include "qdisplay/ViewerManager.hpp"
 
 %feature("director") jafar::qdisplay::AbstractEventHandler;
 %include "qdisplay/AbstractEventHandler.hpp"
+
+%apply SWIGTYPE *DISOWN { jafar::qdisplay::Shape* si };
+%include "qdisplay/ImageView.hpp"
+
+%apply SWIGTYPE *DISOWN { jafar::qdisplay::ImageView* ii };
+%include "qdisplay/Viewer.hpp"
+
 
 
 
 #if defined(SWIGRUBY)
 %header %{
 
+static void mark_ViewerManager(void* ptr) {
+  jafar::qdisplay::ViewerManager* obj = (jafar::qdisplay::ViewerManager*) ptr;
+  QList<jafar::qdisplay::Viewer*> list = obj->viewers();
+  for(QList<jafar::qdisplay::Viewer*>::iterator it = list.begin(); it != list.end(); it++)
+  {
+    jafar::qdisplay::Viewer* v =*it;
+    if(v->isVisible())
+    {
+      VALUE object = SWIG_RubyInstanceFor(v);
+      if (object != Qnil) {
+        rb_gc_mark(object);
+      }
+    }
+  }
+}
+
+  
 static void mark_QObject(void* ptr) {
   QObject* obj = (QObject*) ptr;
 
@@ -65,11 +90,11 @@ static void mark_QObject(void* ptr) {
 
 static void mark_Viewer(void* ptr) {
   jafar::qdisplay::Viewer* obj = (jafar::qdisplay::Viewer*) ptr;
-  if(obj->isVisible())
+/*  if(obj->isVisible())
   {
     VALUE robj = SWIG_RubyInstanceFor(ptr);
     rb_gc_mark(robj);
-  }
+  }*/
 
   mark_QObject(ptr);
 

@@ -54,6 +54,10 @@ class Viewer : public QGraphicsView {
      * @param scaleFactor the scale factor to appply to the view
      */
     void scaleView(qreal scaleFactor);
+    /**
+     * Close the view
+     */
+    void close();
   protected:
     virtual void keyPressEvent ( QKeyEvent * event );
     virtual void wheelEvent(QWheelEvent *event);

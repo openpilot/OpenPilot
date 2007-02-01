@@ -15,7 +15,8 @@ namespace qdisplay {
 
 ImageView::ImageView(const jafar::image::Image& img) :
     m_pixmapItem(new QGraphicsPixmapItem()),
-    m_currentZ(0.)
+    m_currentZ(0.),
+    m_eventHandler(0)
 {
   setImage(img);
   m_pixmapItem->setZValue(m_currentZ++);

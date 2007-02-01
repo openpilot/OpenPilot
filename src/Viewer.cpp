@@ -10,6 +10,8 @@
 
 #include "qdisplay/ImageView.hpp"
 #include "qdisplay/Shape.hpp"
+#include "qdisplay/ViewerManager.hpp"
+
 
 namespace jafar {
 namespace qdisplay {
@@ -18,10 +20,12 @@ Viewer::Viewer(int mosaicWidth, int mosaicHeight ) : m_scene(new QGraphicsScene(
 {
   show();
   setScene(m_scene);
+  ViewerManager::registerViewer( this );
 }
 
 Viewer::~Viewer()
 {
+  ViewerManager::unregisterViewer( this );
 }
 
 
@@ -37,6 +41,7 @@ void Viewer::setImageView(ImageView* ii, int row, int col)
   if(m_imageMosaic[row][col])
   {
     scene()->removeItem(m_imageMosaic[row][col]);
+//     delete m_imageMosaic[row][col];
   }
   m_imageMosaic[row][col] = ii;
   if(m_mosaicWidth == 0 && m_mosaicHeight == 0)
@@ -91,7 +96,10 @@ void Viewer::scaleView(qreal scaleFactor)
   scale(scaleFactor, scaleFactor);
 }
 
+void Viewer::close()
+{
+  setVisible(false);
+}
 
 }
 }
-

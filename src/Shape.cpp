@@ -35,6 +35,7 @@ void Shape::setLabel(char * text)
   if(!m_label)
   {
     m_label = new QGraphicsTextItem(this, scene());
+    m_label->setFont(QFont( m_label->font().family(), 5));
     addToGroup(m_label);
     if(scene()) scene()->addItem(m_label);
   }

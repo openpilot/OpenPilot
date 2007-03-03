@@ -11,9 +11,15 @@
 #ifndef JMATH_JBLAS_HPP
 #define JMATH_JBLAS_HPP
 
+#ifdef USE_SERIALIZE_HEADERS
+#include "jmath/serialize_vector.hpp"
+#include "jmath/serialize_matrix.hpp"
+#include "jmath/serialize_symmetric.hpp"
+#else
 #include "boost/numeric/ublas/vector.hpp"
 #include "boost/numeric/ublas/matrix.hpp"
 #include "boost/numeric/ublas/symmetric.hpp"
+#endif
 #include "boost/numeric/ublas/banded.hpp"
 #include "boost/numeric/ublas/io.hpp"
 

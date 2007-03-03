@@ -20,6 +20,17 @@ namespace boost { namespace numeric { namespace ublas {
       }
     }
 
+		template<class Archive, class T, std::size_t M, std::size_t N>
+		inline void serialize
+		Archive & ar,
+		boost::numeric::ublas::bounded_matrix<T, M, N> &m,
+		const unsigned int file_version
+		) {
+			for(int i=0; i<M;i++)
+				for(int j=0; j<N;i++)
+					ar & m(i,j);
+		}
+
 #ifdef BOOST_NO_ARGUMENT_DEPENDENT_LOOKUP
 }; };
 #else

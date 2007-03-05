@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'ImageView.hpp'
 **
-** Created: Wed Dec 20 16:16:43 2006
+** Created: Tue Feb 27 17:27:31 2007
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.2.2)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -22,7 +22,7 @@ static const uint qt_meta_data_jafar__qdisplay__ImageView[] = {
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-       3,   10, // methods
+       4,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
 
@@ -30,6 +30,7 @@ static const uint qt_meta_data_jafar__qdisplay__ImageView[] = {
       28,   27,   27,   27, 0x0a,
       43,   27,   27,   27, 0x0a,
       58,   27,   27,   27, 0x0a,
+      79,   27,   27,   27, 0x0a,
 
        0        // eod
 };
@@ -37,6 +38,7 @@ static const uint qt_meta_data_jafar__qdisplay__ImageView[] = {
 static const char qt_meta_stringdata_jafar__qdisplay__ImageView[] = {
     "jafar::qdisplay::ImageView\0\0lutRandomize()\0"
     "lutGrayscale()\0lutInvertGrayscale()\0"
+    "exportView()\0"
 };
 
 const QMetaObject jafar::qdisplay::ImageView::staticMetaObject = {
@@ -69,8 +71,9 @@ int jafar::qdisplay::ImageView::qt_metacall(QMetaObject::Call _c, int _id, void 
         case 0: lutRandomize(); break;
         case 1: lutGrayscale(); break;
         case 2: lutInvertGrayscale(); break;
+        case 3: exportView(); break;
         }
-        _id -= 3;
+        _id -= 4;
     }
     return _id;
 }

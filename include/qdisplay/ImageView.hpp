@@ -10,9 +10,11 @@ class QAction;
 
 namespace jafar {
 namespace qdisplay {
-class Viewer;
-class Shape;
-class AbstractEventHandler;
+
+  class AbstractEventHandler;
+  class Line;
+  class Shape;
+  class Viewer;
 /**
  * This class manipulate the view of an image on a Viewer. You can add specific overlay to this image using
  * the command addShape
@@ -36,6 +38,10 @@ class ImageView : public QObject, public QGraphicsItemGroup {
      */
     void addShape(Shape* si);
     /**
+     * @param li a Line to display on the scene.
+     */
+    void addLine(Line* li);
+    /**
      * Define the event handler for this view
      * @param eh the event handler
      * Note: event handler can be shared between views, so it won't be deleted when
@@ -44,15 +50,18 @@ class ImageView : public QObject, public QGraphicsItemGroup {
     inline void setEventHandler(AbstractEventHandler* eh) { m_eventHandler = eh; }
 #ifndef SWIG
   public slots:
+#else
+  public:
 #endif
     void lutRandomize();
     void lutGrayscale();
     void lutInvertGrayscale();
+    void exportView();
   protected:
     void contextMenuEvent ( QGraphicsSceneContextMenuEvent * event );
     void mouseReleaseEvent ( QGraphicsSceneMouseEvent * event );
   private:
-    QAction *lutRandomizeAction, *lutGrayscaleAction, *lutInvertGrayscaleAction;
+    QAction *m_lutRandomizeAction, *m_lutGrayscaleAction, *m_lutInvertGrayscaleAction, *m_exportView;
     QImage m_image;
     QGraphicsPixmapItem* m_pixmapItem;
     double m_currentZ;

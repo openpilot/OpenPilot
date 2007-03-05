@@ -10,7 +10,7 @@ namespace qdisplay {
 
 class ImageView;
 class Shape;
-
+class Line;
 /**
  * This is the viewer, you can add ImageView to display on it, or overlay using Shape.
  */
@@ -19,8 +19,8 @@ class Viewer : public QGraphicsView {
   public:
     /**
      * Create a new viewer
-   * @param mosaicWidth the width of one cell of the mosaic
-   * @param mosaicHeight the height of one cell of the mosaic
+     * @param mosaicWidth the width of one cell of the mosaic
+     * @param mosaicHeight the height of one cell of the mosaic
      */
     Viewer(int mosaicWidth = 0, int mosaicHeight = 0);
     
@@ -49,6 +49,11 @@ class Viewer : public QGraphicsView {
      */
     void addShape(qdisplay::Shape* si);
     
+    /**
+     * @param si a Line to display on the scene.
+     */
+    void addLine(qdisplay::Line* li);
+
     bool isVisible() { return !QGraphicsView::isHidden(); }
     /** Scale the view
      * @param scaleFactor the scale factor to appply to the view

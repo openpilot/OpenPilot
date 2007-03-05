@@ -5,10 +5,17 @@
 #include <QGraphicsScene>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QMenu>
+#include <QMessageBox>
 
+#include <QPrinter>
+#include <QPainter>
+#include <QFileDialog>
+ 
 #include <kernel/jafarMacro.hpp>
-#include "qdisplay/Shape.hpp"
+
 #include "qdisplay/AbstractEventHandler.hpp"
+#include "qdisplay/Line.hpp"
+#include "qdisplay/Shape.hpp"
 
 namespace jafar {
 namespace qdisplay {
@@ -21,12 +28,14 @@ ImageView::ImageView(const jafar::image::Image& img) :
   setImage(img);
   m_pixmapItem->setZValue(m_currentZ++);
   addToGroup(m_pixmapItem);
-  lutRandomizeAction = new QAction("Randomize the lut", (QObject*)this);
-  this->connect(lutRandomizeAction, SIGNAL(triggered()), this, SLOT(lutRandomize()));
-  lutGrayscaleAction = new QAction("Use a grayscale lut", (QObject*)this);
-  this->connect(lutGrayscaleAction, SIGNAL(triggered()), this, SLOT(lutGrayscale()));
-  lutInvertGrayscaleAction = new QAction("Use an invert grayscale lut", (QObject*)this);
-  this->connect(lutInvertGrayscaleAction, SIGNAL(triggered()), this, SLOT(lutInvertGrayscale()));
+  m_lutRandomizeAction = new QAction("Randomize the lut", (QObject*)this);
+  this->connect(m_lutRandomizeAction, SIGNAL(triggered()), this, SLOT(lutRandomize()));
+  m_lutGrayscaleAction = new QAction("Use a grayscale lut", (QObject*)this);
+  this->connect(m_lutGrayscaleAction, SIGNAL(triggered()), this, SLOT(lutGrayscale()));
+  m_lutInvertGrayscaleAction = new QAction("Use an invert grayscale lut", (QObject*)this);
+  this->connect(m_lutInvertGrayscaleAction, SIGNAL(triggered()), this, SLOT(lutInvertGrayscale()));
+  m_exportView = new QAction("Export the view", (QObject*)this);
+  this->connect(m_exportView, SIGNAL(triggered()), this, SLOT(exportView()));
 }
 
 void ImageView::addShape(Shape* si)
@@ -36,6 +45,15 @@ void ImageView::addShape(Shape* si)
   scene()->addItem(si);
   si->setZValue(m_currentZ++);
   si->moveBy(pos().x(), pos().y());
+}
+
+void ImageView::addLine(Line* li)
+{
+  JFR_PRED_RUN_TIME(scene(), "You first need to add the ImageView to a scene");
+  addToGroup(li);
+  scene()->addItem(li);
+  li->setZValue(m_currentZ++);
+  li->moveBy(pos().x(), pos().y());
 }
 
 void ImageView::setImage(const jafar::image::Image& jfrimg)
@@ -81,7 +99,7 @@ void ImageView::lutRandomize()
   if(m_image.format() == QImage::Format_Indexed8)
   {
     QVector<QRgb> colorTable;
-    for(int i = 0; i < 255; i++)
+    for(int i = 0; i < 256; i++)
     {
       colorTable.push_back( qRgb(255 * rand(),255 * rand(),255 * rand()));
     }
@@ -96,7 +114,7 @@ void ImageView::lutGrayscale()
   if(m_image.format() == QImage::Format_Indexed8)
   {
     QVector<QRgb> colorTable;
-    for(int i = 0; i < 255; i++)
+    for(int i = 0; i < 256; i++)
     {
       colorTable.push_back( qRgb(i, i, i));
     }
@@ -107,11 +125,10 @@ void ImageView::lutGrayscale()
 
 void ImageView::lutInvertGrayscale()
 {
-  
   if(m_image.format() == QImage::Format_Indexed8)
   {
     QVector<QRgb> colorTable;
-    for(int i = 0; i < 255; i++)
+    for(int i = 0; i < 256; i++)
     {
       colorTable.push_back( qRgb(255 - i, 255 - i, 255 - i));
     }
@@ -120,15 +137,48 @@ void ImageView::lutInvertGrayscale()
   }
 }
 
+void ImageView::exportView()
+{
+  QString fileName = QFileDialog::getSaveFileName ( 0, "Export viewer content", "", "Supported format (*.pdf *.ps *.png *.tiff)" );
+  if(fileName == "") return;
+  QString extension = fileName.split(".").last().toLower();
+  if(extension == "pdf" or extension == "ps")
+  {
+    QPrinter printer;
+    printer.setOutputFileName(fileName);
+    QSizeF sF = scene()->sceneRect().size().toSize();
+    if(sF.height() < sF.width() ) printer.setOrientation(QPrinter::Landscape);
+    if(extension == "pdf") printer.setOutputFormat(QPrinter::PdfFormat);
+    else printer.setOutputFormat(QPrinter::PostScriptFormat);
+    QPainter painter(&printer);
+    this->scene()->render(&painter);
+  } else if ( extension == "png" or extension == "tiff" )
+  {
+    QImage img( scene()->sceneRect().size().toSize() , QImage::Format_RGB32);
+    QPainter painter(&img);
+    this->scene()->render(&painter);
+    if( extension == "png")
+    {
+        img.save(fileName, "PNG", 100);
+    }
+    else {
+        img.save(fileName, "TIFF", 100);
+    }
+  } else {
+    QMessageBox::critical(0, "Unsupported format", "This format " + extension + " is unsupported by the viewer export");
+  }
+}
+
 void ImageView::contextMenuEvent ( QGraphicsSceneContextMenuEvent * event )
 {
   QMenu menu;
   if(m_image.format() == QImage::Format_Indexed8)
   {
-    menu.addAction(lutRandomizeAction);
-    menu.addAction(lutGrayscaleAction);
-    menu.addAction(lutInvertGrayscaleAction);
+    menu.addAction(m_lutRandomizeAction);
+    menu.addAction(m_lutGrayscaleAction);
+    menu.addAction(m_lutInvertGrayscaleAction);
   }
+  menu.addAction(m_exportView);
   menu.exec(event->screenPos());
 }
 

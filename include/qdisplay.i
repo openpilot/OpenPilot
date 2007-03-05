@@ -20,6 +20,7 @@
 #include "qdisplay/Viewer.hpp"
 #include "qdisplay/ImageView.hpp"
 #include "qdisplay/Shape.hpp"
+#include "qdisplay/Line.hpp"
 #include "qdisplay/AbstractEventHandler.hpp"
 #include "qdisplay/ViewerManager.hpp"
 // using namespace jafar::qdisplay;
@@ -39,6 +40,8 @@
 
 %feature("director") jafar::qdisplay::AbstractEventHandler;
 %include "qdisplay/AbstractEventHandler.hpp"
+
+%include "qdisplay/Line.hpp"
 
 %apply SWIGTYPE *DISOWN { jafar::qdisplay::Shape* si };
 %include "qdisplay/ImageView.hpp"

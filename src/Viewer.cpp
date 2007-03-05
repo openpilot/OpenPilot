@@ -9,6 +9,7 @@
 #include <kernel/jafarMacro.hpp>
 
 #include "qdisplay/ImageView.hpp"
+#include "qdisplay/Line.hpp"
 #include "qdisplay/Shape.hpp"
 #include "qdisplay/ViewerManager.hpp"
 
@@ -32,6 +33,11 @@ Viewer::~Viewer()
 void Viewer::addShape(qdisplay::Shape* si) {
   scene()->addItem(si);
   si->setZValue(m_currentZ++);
+}
+
+void Viewer::addLine(qdisplay::Line* li) {
+  scene()->addItem(li);
+  li->setZValue(m_currentZ++);
 }
 
 void Viewer::setImageView(ImageView* ii, int row, int col)

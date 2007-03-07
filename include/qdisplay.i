@@ -43,10 +43,14 @@
 
 %include "qdisplay/Line.hpp"
 
-%apply SWIGTYPE *DISOWN { jafar::qdisplay::Shape* si };
+#if defined(SWIGRUBY)
+    %apply SWIGTYPE *DISOWN { jafar::qdisplay::Shape* si };
+#endif
 %include "qdisplay/ImageView.hpp"
 
-%apply SWIGTYPE *DISOWN { jafar::qdisplay::ImageView* ii };
+#if defined(SWIGRUBY)
+    %apply SWIGTYPE *DISOWN { jafar::qdisplay::ImageView* ii };
+#endif
 %include "qdisplay/Viewer.hpp"
 
 

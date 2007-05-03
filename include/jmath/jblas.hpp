@@ -11,7 +11,7 @@
 #ifndef JMATH_JBLAS_HPP
 #define JMATH_JBLAS_HPP
 
-#ifdef USE_SERIALIZE_HEADERS
+#ifdef USE_JMATH_SERIALIZATION
 #include "jmath/serialize_vector.hpp"
 #include "jmath/serialize_matrix.hpp"
 #include "jmath/serialize_symmetric.hpp"

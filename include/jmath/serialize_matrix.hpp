@@ -925,8 +925,9 @@ namespace boost { namespace numeric { namespace ublas {
 
         // Serialization
         template<class Archive>
-        void serialize(Archive & ar, const unsigned int /* file_version */){
-          ar & BOOST_SERIALIZATION_NVP(size1_) & BOOST_SERIALIZATION_NVP(size2_);
+        void serialize(Archive & ar, const unsigned int version){
+					ar & BOOST_SERIALIZATION_NVP(size1_);
+					ar & BOOST_SERIALIZATION_NVP(size2_);
           ar & BOOST_SERIALIZATION_NVP(data_);
         }
 
@@ -1935,8 +1936,9 @@ namespace boost { namespace numeric { namespace ublas {
 
         // Serialization
         template<class Archive>
-        void serialize(Archive & ar, const unsigned int /* file_version */){
-          ar & BOOST_SERIALIZATION_NVP(size1_) & BOOST_SERIALIZATION_NVP(size2_);
+        void serialize(Archive & ar, const unsigned int version){
+					ar & BOOST_SERIALIZATION_NVP(size1_); 
+					ar & BOOST_SERIALIZATION_NVP(size2_);
           ar & BOOST_SERIALIZATION_NVP(data_);
         }
 
@@ -3995,7 +3997,8 @@ namespace boost { namespace numeric { namespace ublas {
         // Serialization
         template<class Archive>
         void serialize(Archive & ar, const unsigned int /* file_version */){
-          ar & BOOST_SERIALIZATION_NVP(size1_) & BOOST_SERIALIZATION_NVP(size2_);
+					ar & BOOST_SERIALIZATION_NVP(size1_);
+					ar & BOOST_SERIALIZATION_NVP(size2_);
           for (size_type i=0; i<N; ++i) ar & BOOST_SERIALIZATION_NVP(data_[i]);
         }
 

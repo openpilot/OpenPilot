@@ -20,7 +20,7 @@ void PCA::batchPCA(const jblas::mat& X_, int dim_) {
   int m = X_.size1();
   int n = X_.size2();
 
-  JFR_PRECOND((0 <= dim_) && (dim_ <= min(m,n)),
+  JFR_PRECOND((0 < dim_) && (dim_ <= min(m,n)),
 	      "PCA::batchPCA: wrong dimension input. must be in [1," << min(m,n) << "]");
 
   jblas::mat centeredX(X_);
@@ -41,9 +41,10 @@ void PCA::batchPCA(const jblas::mat& X_, int dim_) {
     A /= n;
     jblas::vec alpha(m);
     int ierr = lapack::syev('V','U',A,alpha,lapack::optimal_workspace());	  
-    if (ierr==0)
+    if (ierr!=0)
       JFR_RUN_TIME("PCA::batchPCA: error in lapack::syev() function, ierr=" << ierr);
     eigenvectors.resize(m,m);
+		eigenvalues.resize(m);
     for(int i=0;i<m;i++) {
       eigenvalues(i) = alpha(m-i-1);
       ublas::column(eigenvectors,i) = ublas::column(A,m-i-1);
@@ -53,9 +54,10 @@ void PCA::batchPCA(const jblas::mat& X_, int dim_) {
     A /= n;
     jblas::vec alpha(n);
     int ierr = lapack::syev('V','U',A,alpha,lapack::optimal_workspace());
-    if (ierr==0)
+    if (ierr!=0)
       JFR_RUN_TIME("PCA::batchPCA: error in lapack::syev() function, ierr=" << ierr);
     eigenvectors.resize(m,n);
+		eigenvalues.resize(n);
     for(int i=0;i<n;i++) {
       eigenvalues(i) = alpha(n-i-1);
       ublas::column(eigenvectors,i) = ublas::column(A,n-i-1);
@@ -67,6 +69,7 @@ void PCA::batchPCA(const jblas::mat& X_, int dim_) {
     }
   }
   // reduce the subspace if needed
+	JFR_DEBUG("reduce subspace if needed");
   if ((0 < dim_) && (dim_ < min(m,n))) {
     eigenvalues = ublas::project(eigenvalues,ublas::range(min(m,n)-dim_,min(m,n)));
     eigenvectors = ublas::project(eigenvectors,ublas::range(0,m),
@@ -106,7 +109,7 @@ void PCA::updatePCA(const jblas::vec& I_, UFlag f_, double thd_) {
   }
   jblas::vec alphap(D.size1());
   int ierr = lapack::syev('V','U',D,alphap,lapack::optimal_workspace());	  
-  if (ierr==0)
+  if (ierr!=0)
     JFR_RUN_TIME("PCA::updatePCA: error in lapack::syev() function, ierr=" << ierr);
   jblas::mat R(D.size1(),D.size2());
   eigenvalues.resize(eigenvalues.size()+1);
@@ -167,27 +170,6 @@ jblas::vec PCA::reconstruct(const jblas::vec& P_) const {
   JFR_PRECOND(P_.size() <= eigenvectors.size2(),
 	      "PCA::project: wrong size of the input vector. should be in [1," << eigenvectors.size2() << "]");
   return (ublas::prod(eigenvectors,P_) + mean);
-}
-
-
-void PCA::loadKeyValueFile(jafar::kernel::KeyValueFile const& keyValueFile) {
-  JFR_TRACE_BEGIN;
-  keyValueFile.getItem("mean", mean);
-  keyValueFile.getItem("eigenvalues", eigenvalues);
-  keyValueFile.getItem("eigenvectors", eigenvectors);
-  keyValueFile.getItem("coefficients", coefficients);
-  JFR_TRACE_END("PCA::load");
-}
-
-
-void PCA::saveKeyValueFile(jafar::kernel::KeyValueFile & keyValueFile) {
-  JFR_PRECOND(mean.size() != 0,"PCA::save: no data to save");
-  JFR_TRACE_BEGIN;
-  keyValueFile.setItem("mean", mean);
-  keyValueFile.setItem("eigenvalues", eigenvalues);
-  keyValueFile.setItem("eigenvectors", eigenvectors);
-  keyValueFile.setItem("coefficients", coefficients);
-  JFR_TRACE_END("PCA::save");
 }
 
 #endif

@@ -358,7 +358,7 @@ namespace jafar {
 	  details::inv3(m_, m_inv);
           break;
         default:
-          svd_inv(m_,m_inv);
+          lu_inv(m_,m_inv);
         }
       };
 

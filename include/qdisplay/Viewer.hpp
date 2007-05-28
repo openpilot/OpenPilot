@@ -1,5 +1,5 @@
-#ifndef _IMAGE_VIEWER_H_
-#define _IMAGE_VIEWER_H_
+#ifndef _QDISPLAY_VIEWER_H_
+#define _QDISPLAY_VIEWER_H_
 
 #include <QGraphicsView>
 
@@ -22,7 +22,7 @@ class Viewer : public QGraphicsView {
      * @param mosaicWidth the width of one cell of the mosaic
      * @param mosaicHeight the height of one cell of the mosaic
      */
-    Viewer(int mosaicWidth = 0, int mosaicHeight = 0);
+    Viewer(int mosaicWidth = 0, int mosaicHeight = 0, QGraphicsScene* scene = 0);
     
     ~Viewer();
 
@@ -49,6 +49,9 @@ class Viewer : public QGraphicsView {
      */
     void addShape(qdisplay::Shape* si);
     
+    void splitVertical();
+    void splitHorizontal();
+
     /**
      * @param si a Line to display on the scene.
      */

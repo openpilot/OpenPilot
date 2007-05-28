@@ -2,6 +2,7 @@
 
 #include <QGraphicsScene>
 #include <QKeyEvent>
+#include <QSplitter>
 #include <QWheelEvent>
 
 // #include <QtOpenGL/QGLWidget>
@@ -13,12 +14,16 @@
 #include "qdisplay/Shape.hpp"
 #include "qdisplay/ViewerManager.hpp"
 
+#include <QSplitter>
 
 namespace jafar {
 namespace qdisplay {
   
-Viewer::Viewer(int mosaicWidth, int mosaicHeight ) : m_scene(new QGraphicsScene()), m_mosaicWidth(mosaicWidth), m_mosaicHeight(mosaicHeight), m_currentZ(0.)
+Viewer::Viewer(int mosaicWidth, int mosaicHeight, QGraphicsScene* scene ) : m_scene(scene), m_mosaicWidth(mosaicWidth), m_mosaicHeight(mosaicHeight), m_currentZ(0.)
 {
+  if(not m_scene) {
+    m_scene = new QGraphicsScene();
+  }
   show();
   setScene(m_scene);
   ViewerManager::registerViewer( this );
@@ -105,6 +110,36 @@ void Viewer::scaleView(qreal scaleFactor)
 void Viewer::close()
 {
   setVisible(false);
+}
+
+void Viewer::splitVertical()
+{
+  QSplitter* parentSplitter = dynamic_cast<QSplitter*>(parentWidget());
+  QSplitter* s = new QSplitter(Qt::Vertical, parentWidget());
+  if(parentSplitter)
+  {
+    parentSplitter->insertWidget(parentSplitter->indexOf(this), s);
+  }
+  Viewer* clone = new Viewer(0,0,scene());
+  s->addWidget(this);
+  s->addWidget(clone);
+  s->setVisible(true);
+}
+
+void Viewer::splitHorizontal()
+{
+  QSplitter* parentSplitter = dynamic_cast<QSplitter*>(parentWidget());
+  QSplitter* s = new QSplitter(Qt::Horizontal, parentWidget());
+  if(parentSplitter)
+  {
+    parentSplitter->insertWidget(parentSplitter->indexOf(this), s);
+  }
+  Viewer* clone = new Viewer(0,0,scene());
+  JFR_DEBUG(scene());
+  JFR_DEBUG(scene()->views().size());
+  s->addWidget(this);
+  s->addWidget(clone);
+  s->setVisible(true);
 }
 
 }

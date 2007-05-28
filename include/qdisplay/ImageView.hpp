@@ -57,15 +57,18 @@ class ImageView : public QObject, public QGraphicsItemGroup {
     void lutGrayscale();
     void lutInvertGrayscale();
     void exportView();
+    void splitVertical();
+    void splitHorizontal();
   protected:
     void contextMenuEvent ( QGraphicsSceneContextMenuEvent * event );
     void mouseReleaseEvent ( QGraphicsSceneMouseEvent * event );
   private:
-    QAction *m_lutRandomizeAction, *m_lutGrayscaleAction, *m_lutInvertGrayscaleAction, *m_exportView;
+    QAction *m_lutRandomizeAction, *m_lutGrayscaleAction, *m_lutInvertGrayscaleAction, *m_exportView, * m_splitVerticalAction,*m_splitHorizontalAction;
     QImage m_image;
     QGraphicsPixmapItem* m_pixmapItem;
     double m_currentZ;
     AbstractEventHandler* m_eventHandler;
+    Viewer* m_lastViewer;
 };
 
 }

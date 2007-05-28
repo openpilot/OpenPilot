@@ -16,6 +16,7 @@
 #include "qdisplay/AbstractEventHandler.hpp"
 #include "qdisplay/Line.hpp"
 #include "qdisplay/Shape.hpp"
+#include "qdisplay/Viewer.hpp"
 
 namespace jafar {
 namespace qdisplay {
@@ -29,13 +30,17 @@ ImageView::ImageView(const jafar::image::Image& img) :
   m_pixmapItem->setZValue(m_currentZ++);
   addToGroup(m_pixmapItem);
   m_lutRandomizeAction = new QAction("Randomize the lut", (QObject*)this);
-  this->connect(m_lutRandomizeAction, SIGNAL(triggered()), this, SLOT(lutRandomize()));
+  connect(m_lutRandomizeAction, SIGNAL(triggered()), this, SLOT(lutRandomize()));
   m_lutGrayscaleAction = new QAction("Use a grayscale lut", (QObject*)this);
-  this->connect(m_lutGrayscaleAction, SIGNAL(triggered()), this, SLOT(lutGrayscale()));
+  connect(m_lutGrayscaleAction, SIGNAL(triggered()), this, SLOT(lutGrayscale()));
   m_lutInvertGrayscaleAction = new QAction("Use an invert grayscale lut", (QObject*)this);
-  this->connect(m_lutInvertGrayscaleAction, SIGNAL(triggered()), this, SLOT(lutInvertGrayscale()));
+  connect(m_lutInvertGrayscaleAction, SIGNAL(triggered()), this, SLOT(lutInvertGrayscale()));
   m_exportView = new QAction("Export the view", (QObject*)this);
-  this->connect(m_exportView, SIGNAL(triggered()), this, SLOT(exportView()));
+  connect(m_exportView, SIGNAL(triggered()), this, SLOT(exportView()));
+  m_splitVerticalAction = new QAction("Split vertically", (QObject*)this);
+  connect(m_splitVerticalAction, SIGNAL(triggered()), this, SLOT(splitVertical()));
+  m_splitHorizontalAction = new QAction("Split horizontally", (QObject*)this);
+  connect(m_splitHorizontalAction, SIGNAL(triggered()), this, SLOT(splitHorizontal()));
 }
 
 void ImageView::addShape(Shape* si)
@@ -169,8 +174,34 @@ void ImageView::exportView()
   }
 }
 
+void ImageView::splitVertical()
+{
+  if(m_lastViewer)
+  {
+    m_lastViewer->splitVertical();
+  }
+}
+
+void ImageView::splitHorizontal()
+{
+  if(m_lastViewer)
+  {
+    m_lastViewer->splitHorizontal();
+  }
+}
+
 void ImageView::contextMenuEvent ( QGraphicsSceneContextMenuEvent * event )
 {
+  m_lastViewer = 0;
+  QGraphicsView* view;
+  foreach(view, scene()->views())
+  {
+    if(view->hasFocus())
+    {
+      m_lastViewer = dynamic_cast<Viewer*>(view);
+      break;
+    }
+  }
   QMenu menu;
   if(m_image.format() == QImage::Format_Indexed8)
   {
@@ -179,6 +210,11 @@ void ImageView::contextMenuEvent ( QGraphicsSceneContextMenuEvent * event )
     menu.addAction(m_lutInvertGrayscaleAction);
   }
   menu.addAction(m_exportView);
+  if(m_lastViewer)
+  {
+    menu.addAction(m_splitVerticalAction);
+    menu.addAction(m_splitHorizontalAction);
+  }
   menu.exec(event->screenPos());
 }
 

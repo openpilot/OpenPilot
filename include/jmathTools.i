@@ -30,6 +30,49 @@ namespace jafar {
       os << a_ << std::endl;
       return os.str();
     };
+    template<class T>
+    T add(const T& t1, const T& t2)
+    {
+      return t1 + t2;
+    }
+    template<class T>
+    T sub(const T& t1, const T& t2)
+    {
+      return t1 - t2;
+    }
+
+    template<class T, class T2>
+    T div(const T& t1, const T2& t2)
+    {
+      return t1 / t2;
+    }
+    template<class T, class T2>
+    T scalmul(const T& t1, const T2& t2)
+    {
+      return t1 * t2;
+    }
+    template<class T, class T2>
+    T2 vecmatmul(const T& t1, const T2& t2)
+    {
+      return ublas::prod(t1, t2);
+    }
+    jblas::mat mul(const jblas::vec& t1, const jblas::vec& t2)
+    {
+      jblas::mat M(t1.size(), t2.size());
+      for(int i = 0; i < t1.size(); i++)
+      {
+        for(int j = 0; j < t2.size(); j++)
+        {
+          M(i,j) = t1(i) * t2(j);
+        }
+      }
+      return M;
+    }
+    template<class T, class T2>
+    T matmatmul(const T& t1, const T2& t2)
+    {
+      return ublas::prod(t1, t2);
+    }
 
     /** Set the value (and the size) of a vector or a matrix using the operator>> in ublas.
      * @param t a vector or a matrix

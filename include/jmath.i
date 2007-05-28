@@ -94,6 +94,22 @@
 %template(trace) jafar::jmath::ublasExtra::trace<jblas::mat>;
 %template(trace) jafar::jmath::ublasExtra::trace<jblas::sym_mat>;
 
+/* wrap operation to be able to do operations on vector/matrix in jafar */
+%template(add) jafar::jmath::add<jblas::vec>;
+%template(sub) jafar::jmath::sub<jblas::vec>;
+%template(mul) jafar::jmath::scalmul<jblas::vec,int>;
+%template(mul) jafar::jmath::scalmul<jblas::vec,double>;
+%template(div) jafar::jmath::div<jblas::vec, double>;
+%template(div) jafar::jmath::div<jblas::vec, int>;
+/* matrix */
+%template(add) jafar::jmath::add<jblas::mat>;
+%template(sub) jafar::jmath::sub<jblas::mat>;
+%template(mul) jafar::jmath::scalmul<jblas::mat,int>;
+%template(mul) jafar::jmath::scalmul<jblas::mat,double>;
+%template(mul) jafar::jmath::vecmatmul<jblas::mat,jblas::vec>;
+%template(mul) jafar::jmath::matmatmul<jblas::mat,jblas::mat>;
+%template(div) jafar::jmath::div<jblas::mat, double>;
+%template(div) jafar::jmath::div<jblas::mat, int>;
 
 
 %include "jmath/random.hpp"

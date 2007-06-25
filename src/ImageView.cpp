@@ -17,6 +17,7 @@
 #include "qdisplay/Line.hpp"
 #include "qdisplay/Shape.hpp"
 #include "qdisplay/Viewer.hpp"
+#include "qdisplay/PolyLine.hpp"
 
 namespace jafar {
 namespace qdisplay {
@@ -45,20 +46,23 @@ ImageView::ImageView(const jafar::image::Image& img) :
 
 void ImageView::addShape(Shape* si)
 {
-  JFR_PRED_RUN_TIME(scene(), "You first need to add the ImageView to a scene");
   addToGroup(si);
-  scene()->addItem(si);
   si->setZValue(m_currentZ++);
   si->moveBy(pos().x(), pos().y());
 }
 
 void ImageView::addLine(Line* li)
 {
-  JFR_PRED_RUN_TIME(scene(), "You first need to add the ImageView to a scene");
   addToGroup(li);
-  scene()->addItem(li);
   li->setZValue(m_currentZ++);
   li->moveBy(pos().x(), pos().y());
+}
+
+void ImageView::addPolyLine(qdisplay::PolyLine* pl)
+{
+    addToGroup(pl);
+    pl->setZValue(m_currentZ++);
+    pl->moveBy(pos().x(), pos().y());
 }
 
 void ImageView::setImage(const jafar::image::Image& jfrimg)

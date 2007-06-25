@@ -15,6 +15,7 @@ namespace qdisplay {
   class Line;
   class Shape;
   class Viewer;
+  class PolyLine;
 /**
  * This class manipulate the view of an image on a Viewer. You can add specific overlay to this image using
  * the command addShape
@@ -41,6 +42,7 @@ class ImageView : public QObject, public QGraphicsItemGroup {
      * @param li a Line to display on the scene.
      */
     void addLine(Line* li);
+    void addPolyLine(qdisplay::PolyLine* pl);
     /**
      * Define the event handler for this view
      * @param eh the event handler

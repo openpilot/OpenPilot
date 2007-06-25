@@ -21,6 +21,7 @@
 #include "qdisplay/ImageView.hpp"
 #include "qdisplay/Shape.hpp"
 #include "qdisplay/Line.hpp"
+#include "qdisplay/PolyLine.hpp"
 #include "qdisplay/AbstractEventHandler.hpp"
 #include "qdisplay/ViewerManager.hpp"
 // using namespace jafar::qdisplay;
@@ -42,6 +43,7 @@
 %include "qdisplay/AbstractEventHandler.hpp"
 
 %include "qdisplay/Line.hpp"
+%include "qdisplay/PolyLine.hpp"
 
 #if defined(SWIGRUBY)
     %apply SWIGTYPE *DISOWN { jafar::qdisplay::Shape* si };

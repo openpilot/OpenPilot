@@ -1,8 +1,11 @@
+#ifndef _LINE_HPP_
+#define _LINE_HPP_
+
 #include <QGraphicsLineItem>
 
 namespace jafar {
 namespace qdisplay {
-class Viewer;
+
 class Line : public QGraphicsLineItem {
   public:
     /**
@@ -28,3 +31,4 @@ class Line : public QGraphicsLineItem {
 
 }
 
+#endif

@@ -11,6 +11,7 @@
 
 #include "qdisplay/ImageView.hpp"
 #include "qdisplay/Line.hpp"
+#include "qdisplay/PolyLine.hpp"
 #include "qdisplay/Shape.hpp"
 #include "qdisplay/ViewerManager.hpp"
 
@@ -45,6 +46,12 @@ void Viewer::addLine(qdisplay::Line* li) {
   li->setZValue(m_currentZ++);
 }
 
+void Viewer::addPolyLine(qdisplay::PolyLine* pl)
+{
+  scene()->addItem(pl);
+  pl->setZValue(m_currentZ++);
+}
+
 void Viewer::setImageView(ImageView* ii, int row, int col)
 {
   if(scene()->items().contains(ii)) return;
@@ -67,6 +74,8 @@ void Viewer::setImageView(ImageView* ii, int row, int col)
 
 int Viewer::rows()
 {
+  if( m_imageMosaic.size() == 0)
+    return 0;
   int maxrows = 0;
   for(QMap< int, QMap< int, ImageView* > >::iterator it = m_imageMosaic.begin(); it != m_imageMosaic.end(); it++)
   {
@@ -78,6 +87,8 @@ int Viewer::rows()
 
 int Viewer::cols()
 {
+  if( m_imageMosaic.size() == 0)
+    return 0;
   return (--m_imageMosaic.end()).key() + 1;
 }
 

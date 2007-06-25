@@ -29,6 +29,18 @@ class DisplayEventHandler < AbstractEventHandler
     puts "Button: #{button} Coordinate: (#{x}, #{y})"
   end
 end
+
+class RobotTrajectory < PolyLine
+  def initialize(scale = 10.0)
+    super(scale)
+    require 'jafar/geom'
+    require 'jafar/jmath'
+  end
+  def moveTo(robotPose)
+    arr = Jmath.vecToArray(robotPose.getX)
+    addPoint(arr[0] , arr[1] )
+  end
+end
     
 end
 end

@@ -11,6 +11,7 @@ namespace qdisplay {
 class ImageView;
 class Shape;
 class Line;
+class PolyLine;
 /**
  * This is the viewer, you can add ImageView to display on it, or overlay using Shape.
  */
@@ -57,6 +58,8 @@ class Viewer : public QGraphicsView {
      */
     void addLine(qdisplay::Line* li);
 
+    void addPolyLine(qdisplay::PolyLine* pl);
+    
     bool isVisible() { return !QGraphicsView::isHidden(); }
     /** Scale the view
      * @param scaleFactor the scale factor to appply to the view

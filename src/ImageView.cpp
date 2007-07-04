@@ -36,6 +36,8 @@ ImageView::ImageView(const jafar::image::Image& img) :
   connect(m_lutGrayscaleAction, SIGNAL(triggered()), this, SLOT(lutGrayscale()));
   m_lutInvertGrayscaleAction = new QAction("Use an invert grayscale lut", (QObject*)this);
   connect(m_lutInvertGrayscaleAction, SIGNAL(triggered()), this, SLOT(lutInvertGrayscale()));
+  m_lutRedHotAction = new QAction("Use a Red Hot lut", (QObject*)this);
+  connect(m_lutRedHotAction, SIGNAL(triggered()), this, SLOT(lutRedHot()));
   m_exportView = new QAction("Export the view", (QObject*)this);
   connect(m_exportView, SIGNAL(triggered()), this, SLOT(exportView()));
   m_splitVerticalAction = new QAction("Split vertically", (QObject*)this);
@@ -146,6 +148,29 @@ void ImageView::lutInvertGrayscale()
   }
 }
 
+void ImageView::lutRedHot()
+{
+  if(m_image.format() == QImage::Format_Indexed8)
+  {
+    QVector<QRgb> colorTable;
+    for(int i = 0; i < 256; i++)
+    {
+      // compute r component
+      int r=(255/80*i-255/10); 
+      if (r<0) r=0; if (r>255) r=255;
+      // compute g component
+      int g=(255/83*i-(255*85/83)); 
+      if (g<0) g=0; if (g>255) g=255;
+      // compute b component
+      int b=(255/84*i-(255*164/84)); 
+      if (b<0) b=0; if (b>255) b=255;
+      colorTable.push_back( qRgb(r,g,b));
+    }
+    m_image.setColorTable( colorTable );
+    m_pixmapItem->setPixmap(QPixmap::fromImage(m_image));
+  }
+}
+
 void ImageView::exportView()
 {
   QString fileName = QFileDialog::getSaveFileName ( 0, "Export viewer content", "", "Supported format (*.pdf *.ps *.png *.tiff)" );
@@ -212,6 +237,7 @@ void ImageView::contextMenuEvent ( QGraphicsSceneContextMenuEvent * event )
     menu.addAction(m_lutRandomizeAction);
     menu.addAction(m_lutGrayscaleAction);
     menu.addAction(m_lutInvertGrayscaleAction);
+    menu.addAction(m_lutRedHotAction);
   }
   menu.addAction(m_exportView);
   if(m_lastViewer)

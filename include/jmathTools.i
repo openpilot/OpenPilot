@@ -59,9 +59,9 @@ namespace jafar {
     jblas::mat mul(const jblas::vec& t1, const jblas::vec& t2)
     {
       jblas::mat M(t1.size(), t2.size());
-      for(int i = 0; i < t1.size(); i++)
+      for(unsigned int i = 0; i < t1.size(); i++)
       {
-        for(int j = 0; j < t2.size(); j++)
+        for(unsigned int j = 0; j < t2.size(); j++)
         {
           M(i,j) = t1(i) * t2(j);
         }
@@ -72,6 +72,11 @@ namespace jafar {
     T matmatmul(const T& t1, const T2& t2)
     {
       return ublas::prod(t1, t2);
+    }
+    
+    jblas::vec rangeToVec(const jblas::vec_range& r)
+    {
+      return r;
     }
 
     /** Set the value (and the size) of a vector or a matrix using the operator>> in ublas.

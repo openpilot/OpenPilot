@@ -16,7 +16,9 @@ class PolyLine;
  * This is the viewer, you can add ImageView to display on it, or overlay using Shape.
  */
 class Viewer : public QGraphicsView {
-
+#ifndef SWIG
+  Q_OBJECT
+#endif
   public:
     /**
      * Create a new viewer
@@ -69,7 +71,14 @@ class Viewer : public QGraphicsView {
      * Close the view
      */
     void close();
+#ifndef SWIG
+  public slots:
+#else
+  public:
+#endif
+    void exportView();
   protected:
+    virtual void contextMenuEvent ( QContextMenuEvent * event );
     virtual void keyPressEvent ( QKeyEvent * event );
     virtual void wheelEvent(QWheelEvent *event);
   private:
@@ -77,6 +86,7 @@ class Viewer : public QGraphicsView {
     QMap< int, QMap< int, ImageView* > > m_imageMosaic;
     int m_mosaicWidth, m_mosaicHeight;
     double m_currentZ;
+    QAction *m_exportView;
 };
 
 }

@@ -4,6 +4,14 @@
 #include <QKeyEvent>
 #include <QSplitter>
 #include <QWheelEvent>
+#include <QSvgGenerator>
+#include <QMenu>
+
+#include <QPrinter>
+#include <QPainter>
+#include <QFileDialog>
+#include <QMessageBox>
+
 
 // #include <QtOpenGL/QGLWidget>
 
@@ -28,6 +36,8 @@ Viewer::Viewer(int mosaicWidth, int mosaicHeight, QGraphicsScene* scene ) : m_sc
   show();
   setScene(m_scene);
   ViewerManager::registerViewer( this );
+  m_exportView = new QAction("Export the view", (QObject*)this);
+  connect(m_exportView, SIGNAL(triggered()), this, SLOT(exportView()));
 }
 
 Viewer::~Viewer()
@@ -153,5 +163,53 @@ void Viewer::splitHorizontal()
   s->setVisible(true);
 }
 
+void Viewer::contextMenuEvent ( QContextMenuEvent * event )
+{
+  QMenu menu;
+  menu.addAction(m_exportView);
+  menu.exec(event->globalPos());
+}
+
+void Viewer::exportView()
+{
+  QString fileName = QFileDialog::getSaveFileName ( 0, "Export viewer content", "", "Supported format (*.pdf *.ps *.png *.tiff *.svg)" );
+  if(fileName == "") return;
+  QString extension = fileName.split(".").last().toLower();
+  if(extension == "pdf" or extension == "ps")
+  {
+    QPrinter printer;
+    printer.setOutputFileName(fileName);
+    QSizeF sF = scene()->sceneRect().size().toSize();
+    if(sF.height() < sF.width() ) printer.setOrientation(QPrinter::Landscape);
+    if(extension == "pdf") printer.setOutputFormat(QPrinter::PdfFormat);
+    else printer.setOutputFormat(QPrinter::PostScriptFormat);
+    QPainter painter(&printer);
+    this->scene()->render(&painter);
+  } else if ( extension == "png" or extension == "tiff" )
+  {
+    QImage img( scene()->sceneRect().size().toSize() , QImage::Format_RGB32);
+    QPainter painter(&img);
+    this->scene()->render(&painter);
+    if( extension == "png")
+    {
+        img.save(fileName, "PNG", 100);
+    }
+    else {
+        img.save(fileName, "TIFF", 100);
+    }
+  } else if ( extension == "svg" )
+  {
+    QSvgGenerator generator;
+    generator.setFileName(fileName);
+    QPainter painter(&generator);
+    this->scene()->render(&painter);
+    painter.end();
+  } else {
+    QMessageBox::critical(0, "Unsupported format", "This format " + extension + " is unsupported by the viewer export");
+  }
+}
+
 }
 }
+
+#include "Viewer.moc"

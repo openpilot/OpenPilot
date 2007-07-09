@@ -6,6 +6,7 @@
 #include <QGraphicsSceneContextMenuEvent>
 #include <QMenu>
 #include <QMessageBox>
+#include <QSvgGenerator>
 
 #include <QPrinter>
 #include <QPainter>
@@ -173,7 +174,7 @@ void ImageView::lutRedHot()
 
 void ImageView::exportView()
 {
-  QString fileName = QFileDialog::getSaveFileName ( 0, "Export viewer content", "", "Supported format (*.pdf *.ps *.png *.tiff)" );
+  QString fileName = QFileDialog::getSaveFileName ( 0, "Export viewer content", "", "Supported format (*.pdf *.ps *.png *.tiff *.svg)" );
   if(fileName == "") return;
   QString extension = fileName.split(".").last().toLower();
   if(extension == "pdf" or extension == "ps")
@@ -198,6 +199,12 @@ void ImageView::exportView()
     else {
         img.save(fileName, "TIFF", 100);
     }
+  } else if ( extension == "svg" )
+  {
+    QSvgGenerator generator;
+    generator.setFileName(fileName);
+    QPainter painter(&generator);
+    this->scene()->render(&painter);
   } else {
     QMessageBox::critical(0, "Unsupported format", "This format " + extension + " is unsupported by the viewer export");
   }

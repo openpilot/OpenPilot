@@ -27,6 +27,9 @@ void Shape::paint(QPainter *painter, const QStyleOptionGraphicsItem * opt, QWidg
       painter->drawLine(m_boundingRect.left(), 0., m_boundingRect.right(), 0.);
       painter->drawLine(0., m_boundingRect.top(), 0., m_boundingRect.bottom());
       break;
+    case ShapeEllipse:
+    	painter->drawEllipse(m_boundingRect);
+    	break;
   }
   QGraphicsItemGroup::paint(painter, opt, wdg);
 }

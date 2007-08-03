@@ -7,7 +7,8 @@ class Shape : public QGraphicsItemGroup {
   public:
     enum ShapeType {
       ShapeRectangle,
-      ShapeCross
+      ShapeCross,
+      ShapeEllipse
     };
     /**
       * Create an Shape to use with a Viewer to display a basic shape.

@@ -22,8 +22,14 @@ namespace boost { namespace numeric { namespace ublas {
     size_type size2() const;
     void resize (size_type size1, size_type size2, bool preserve = true);
 
-    %rename(get) operator();
-    const_reference operator() (size_type i, size_type j) const;
+//    %rename(get) operator();
+//    const_reference operator() (size_type i, size_type j) const;
+
+		%addmethods {
+    const_reference get(size_type i,size_type j) const{
+      return (*self)(i,j);
+    }
+    }
 
 #if defined(BOOST_VERSION) && (BOOST_VERSION < 103300)
     %rename(set) insert;
@@ -58,8 +64,14 @@ namespace boost { namespace numeric { namespace ublas {
     
     void resize (size_type size, bool preserve = true);
 
-    %rename(get) operator();
-    const_reference operator() (size_type i, size_type j) const;
+//    %rename(get) operator();
+//    const_reference operator() (size_type i, size_type j) const;
+
+		%addmethods {
+    const_reference get(size_type i, size_type j) const{
+      return (*self)(i,j);
+    }
+    }
 
 #if defined(BOOST_VERSION) && (BOOST_VERSION < 103300)    
     %rename(set) insert;
@@ -86,8 +98,14 @@ namespace boost { namespace numeric { namespace ublas {
     size_type size1() const;
     size_type size2() const;
 
-    %rename(get) operator();
-    const_reference operator() (size_type i, size_type j) const;
+//    %rename(get) operator();
+//    const_reference operator() (size_type i, size_type j) const;
+
+		%addmethods {
+    const_reference get(size_type i,size_type j) const{
+      return (*self)(i,j);
+    }
+    }
 
   };
 

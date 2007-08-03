@@ -25,8 +25,14 @@ namespace boost { namespace numeric { namespace ublas {
 
     void resize(size_type size, bool preserve = true);
 
-    %rename(get) operator();
-    const_reference operator() (size_type i) const;
+//    %rename(get) operator();
+//    const_reference operator() (size_type i) const;
+
+		%addmethods {
+    const_reference get(size_type i) const{
+      return (*self)(i);
+    }
+    }
 
 #if defined(BOOST_VERSION) && (BOOST_VERSION < 103300)
     %rename(set) insert;
@@ -38,6 +44,7 @@ namespace boost { namespace numeric { namespace ublas {
 
     void clear ();
   };
+
 
   template<class V>
   class vector_range {
@@ -51,9 +58,14 @@ namespace boost { namespace numeric { namespace ublas {
 
     size_type size() const;
 
-    %rename(get) operator();
-    const_reference operator() (size_type i) const;
+//   %rename(get) operator();
+//    const_reference operator() (size_type i) const;
 
+		%addmethods {
+    	const_reference get(size_type i) const{
+      	return (*self)(i);
+    	}
+    }
   };
 
   template<class T, std::size_t N>
@@ -66,8 +78,15 @@ namespace boost { namespace numeric { namespace ublas {
     bounded_vector (size_type size);
     bounded_vector (const bounded_vector &v);
 
-    %rename(get) operator();
-    const_reference operator() (size_type i) const;
+//    %rename(get) operator();
+//    const_reference operator() (size_type i) const;
+	
+		%addmethods {
+    const_reference get(size_type i) const{
+      return (*self)(i);
+    }
+    }
+
 #if defined(BOOST_VERSION) && (BOOST_VERSION < 103300)
     %rename(set) insert;
     void insert (size_type i, const_reference t);

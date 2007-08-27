@@ -15,12 +15,13 @@
 #include "jmath/serialize_vector.hpp"
 #include "jmath/serialize_matrix.hpp"
 #include "jmath/serialize_symmetric.hpp"
+#include "jmath/serialize_banded.hpp"
 #else
 #include "boost/numeric/ublas/vector.hpp"
 #include "boost/numeric/ublas/matrix.hpp"
 #include "boost/numeric/ublas/symmetric.hpp"
-#endif
 #include "boost/numeric/ublas/banded.hpp"
+#endif
 #include "boost/numeric/ublas/io.hpp"
 
 #include "boost/numeric/ublas/matrix_proxy.hpp"

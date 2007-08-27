@@ -17,7 +17,7 @@
 #ifndef _BOOST_UBLAS_MATRIX_
 #define _BOOST_UBLAS_MATRIX_
 
-#include <boost/numeric/ublas/vector.hpp>
+#include "jmath/serialize_vector.hpp"
 #include <boost/numeric/ublas/matrix_expression.hpp>
 #include <boost/numeric/ublas/detail/matrix_assign.hpp>
 

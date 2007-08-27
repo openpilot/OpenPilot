@@ -21,7 +21,7 @@ namespace boost { namespace numeric { namespace ublas {
     }
 
 		template<class Archive, class T, std::size_t M, std::size_t N>
-		inline void serialize
+		inline void serialize(
 		Archive & ar,
 		boost::numeric::ublas::bounded_matrix<T, M, N> &m,
 		const unsigned int file_version

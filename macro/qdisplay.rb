@@ -35,10 +35,21 @@ class RobotTrajectory < PolyLine
     super(scale)
     require 'jafar/geom'
     require 'jafar/jmath'
+    @lastPose = nil
   end
   def moveTo(robotPose)
     arr = Jmath.vecToArray(robotPose.getX)
     addPoint(arr[0] , arr[1] )
+    @lastPose = robotPose
+  end
+  def moveOf(robotMvt)
+    if(@lastPose.nil?)
+      @lastPose = robotMvt
+    else
+      nextPose = Geom::T3DEuler.new
+      Geom::T3D.compose( @lastPose, robotMvt, nextPose)
+      moveTo(nextPose)
+    end
   end
 end
     

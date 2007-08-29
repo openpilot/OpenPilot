@@ -107,6 +107,7 @@
 %template(mul) jafar::jmath::scalmul<jblas::mat,int>;
 %template(mul) jafar::jmath::scalmul<jblas::mat,double>;
 %template(mul) jafar::jmath::vecmatmul<jblas::mat,jblas::vec>;
+%template(mul) jafar::jmath::vecmatmul<jblas::mat44,jblas::vec>;
 %template(mul) jafar::jmath::matmatmul<jblas::mat,jblas::mat>;
 %template(div) jafar::jmath::div<jblas::mat, double>;
 %template(div) jafar::jmath::div<jblas::mat, int>;

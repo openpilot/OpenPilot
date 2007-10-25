@@ -45,6 +45,7 @@ namespace jblas {
   /// standard vector type
   typedef boost::numeric::ublas::vector<double> vec;
   typedef boost::numeric::ublas::zero_vector<double> zero_vec;
+  typedef boost::numeric::ublas::unit_vector<double> unit_vec;
 
   /// 1 dimension vector
   typedef boost::numeric::ublas::bounded_vector<double,1> vec1;

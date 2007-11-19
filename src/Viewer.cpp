@@ -163,7 +163,7 @@ void Viewer::splitHorizontal()
   s->setVisible(true);
 }
 
-void Viewer::contextMenuEvent ( QContextMenuEvent * event )
+void Viewer::contextMenuEvent( QContextMenuEvent * event )
 {
   QMenu menu;
   menu.addAction(m_exportView);

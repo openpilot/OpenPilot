@@ -7,6 +7,10 @@
 namespace jafar {
 namespace qdisplay {
 
+/**
+ * Allows to display a poly line on a viewer overlay. For instance to display the
+ * path of a robot.
+ */
 class PolyLine : public QAbstractGraphicsShapeItem
 {
     public:
@@ -21,6 +25,9 @@ class PolyLine : public QAbstractGraphicsShapeItem
         */
         void setColor(int r, int g, int b);
         
+        /**
+         * Add a point at the end of the polyline
+         */
         void addPoint(double x, double y);
         
         QRectF boundingRect() const;
@@ -28,6 +35,10 @@ class PolyLine : public QAbstractGraphicsShapeItem
         
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
         
+        /**
+         * @return the scale applied to the point of the polyline
+         */
+        double scale() const;
     private:
         QVector<QPointF> m_points;
         mutable QRectF m_boundingRect;

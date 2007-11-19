@@ -84,3 +84,8 @@ void PolyLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->drawPath(path);
   }
 }
+
+double PolyLine::scale() const
+{
+  return m_scale;
+}

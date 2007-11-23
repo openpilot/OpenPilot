@@ -10,7 +10,7 @@ namespace jafar {
 namespace qdisplay {
 
 Shape::Shape(ShapeType shapeType, double x, double y, double w, double h) :
-    m_shapeType(shapeType), m_boundingRect(-w * 0.5, -h * 0.5, w, h), m_label(0)
+    m_shapeType(shapeType), m_boundingRect(-w * 0.5, -h * 0.5, w, h), m_label(0), m_fontSize(5)
 {
   setPos(x,y);
 }
@@ -38,7 +38,7 @@ void Shape::setLabel(char * text)
   if(!m_label)
   {
     m_label = new QGraphicsTextItem(this, scene());
-    m_label->setFont(QFont( m_label->font().family(), 5));
+    m_label->setFont(QFont( m_label->font().family(), m_fontSize));
     addToGroup(m_label);
   }
   m_label->setPlainText(text);

@@ -165,9 +165,14 @@ void Viewer::splitHorizontal()
 
 void Viewer::contextMenuEvent( QContextMenuEvent * event )
 {
-  QMenu menu;
-  menu.addAction(m_exportView);
-  menu.exec(event->globalPos());
+  if(itemAt(event->pos()) )
+  {
+    QGraphicsView::contextMenuEvent(event);
+  } else {
+    QMenu menu;
+    menu.addAction(m_exportView);
+    menu.exec(event->globalPos());
+  }
 }
 
 void Viewer::exportView()

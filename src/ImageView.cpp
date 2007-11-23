@@ -76,12 +76,7 @@ void ImageView::setImage(const jafar::image::Image& jfrimg)
   if(jfrimg.channels() == 1)
   {
     m_image = QImage(width, height, QImage::Format_Indexed8);
-    QVector<QRgb> colorTable;
-    for(int i = 0; i < 255; i++)
-    {
-      colorTable.push_back( qRgb(i,i,i));
-    }
-    m_image.setColorTable( colorTable );
+    lutGrayscale();
     for(int x = 0; x < width; x++)
     {
       for(int y = 0; y < height; y++)

@@ -31,11 +31,13 @@ class Shape : public QGraphicsItemGroup {
      */
     inline void setPos(double x, double y) { QGraphicsItem::setPos(x,y); }
     void setLabel(char * text);
+    void setFontSize(int s) { m_fontSize = s; }
   private:
     QRectF m_boundingRect;
     ShapeType m_shapeType;
     QColor m_color;
     QGraphicsTextItem* m_label;
+    int m_fontSize;
 };
 
 }

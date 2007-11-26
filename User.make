@@ -24,7 +24,4 @@ LIBS += -lkernel -limage  $(QT4_LIBS)
 CPPFLAGS += $(BOOST_CPPFLAGS) $(QT4_CPPFLAGS) $(OPENCV_CPPFLAGS)
 
 CXXFLAGS += -g -ggdb -Wall
-
-
-
-
+CPPFLAGS_MODULE = -Werror

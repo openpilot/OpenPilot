@@ -33,8 +33,8 @@ class Shape : public QGraphicsItemGroup {
     void setLabel(char * text);
     void setFontSize(int s) { m_fontSize = s; }
   private:
-    QRectF m_boundingRect;
     ShapeType m_shapeType;
+    QRectF m_boundingRect;
     QColor m_color;
     QGraphicsTextItem* m_label;
     int m_fontSize;

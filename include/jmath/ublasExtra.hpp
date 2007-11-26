@@ -65,7 +65,7 @@ namespace jafar {
         for (std::size_t i = 0 ; i < v.size() ; i++) {
           v(i) = val_[i];
         }
-      };
+      }
 
 
       /** normalize a vector.
@@ -76,7 +76,7 @@ namespace jafar {
 	JFR_NUMERIC(n > details::EPSILON,
 		    "ublasExtra::normalize: vector too small");
 	v /= n;
-      };
+      }
 
       /** jacobian of normalize().
        */
@@ -139,7 +139,7 @@ namespace jafar {
 	default:
 	  JFR_RUN_TIME("ublasExtra::normalizeJac: not implemented yet");
 	}
-      };
+      }
 
       /** Compute the jacobian of inner product.
        */
@@ -154,7 +154,7 @@ namespace jafar {
 	  J(0,i) = u2(i);
 	  J(0,N+i) = u1(i);
 	}
-      };
+      }
 
       /** Compute the jacobian of norm_2.
        */
@@ -173,7 +173,7 @@ namespace jafar {
 	for (std::size_t i = 0 ; i < N ; ++i) {
 	  J(0,i) = u(i)/d;
 	}
-      };
+      }
 
       /** Compute the cross product of \a v1 and \a v2, results is
        *  stored in \a vRes.
@@ -186,7 +186,7 @@ namespace jafar {
 	vRes(0) = v1(1) * v2(2) - v1(2) * v2(1);
 	vRes(1) = v1(2) * v2(0) - v1(0) * v2(2);
 	vRes(2) = v1(0) * v2(1) - v1(1) * v2(0);
-      };
+      }
 
 
       /** Compute the cross product of \a v1 and \a v2, the result is
@@ -197,7 +197,7 @@ namespace jafar {
 	jblas::vec3 vRes;
 	crossProd(v1,v2,vRes);
 	return vRes;
-      };
+      }
       
       /*
        * Matrix
@@ -216,7 +216,7 @@ namespace jafar {
 	  s << std::endl;
 	}
 	return s.str();
-      };
+      }
 
 			/*!
 			 * Format a matrix output to a string in matlab syntax
@@ -239,7 +239,7 @@ namespace jafar {
 				};
 				
 				return s.str();
-			};
+			}
       template<class M>
       void setMatrixValue(M& m, const double* val_, std::size_t size1_, std::size_t size2_) {
         JFR_PRECOND(m.size1()==size1_ && m.size2()==size2_,
@@ -251,7 +251,7 @@ namespace jafar {
             k++;
           }
         }
-      };
+      }
 
       namespace details {
 
@@ -277,7 +277,7 @@ namespace jafar {
 	  m_inv(1,0) = -1.0*m_(1,0);
 	  m_inv(1,1) = m_(0,0);
 	  m_inv /= det2(m_);
-	};
+	}
 
 	template<class M>
 	void inv3(const M& m_, M& m_inv) {
@@ -292,7 +292,7 @@ namespace jafar {
 	  m_inv(2,2) = m_(0,0)*m_(1,1)-m_(1,0)*m_(0,1);
 
 	  m_inv /= det3(m_);
-	};
+	}
 
       } // namespace details
 
@@ -310,7 +310,7 @@ namespace jafar {
           }
         }
         return max;
-      };
+      }
 
       /** Computes the trace of a matrix.
        *
@@ -325,7 +325,7 @@ namespace jafar {
           t+=m_(i,i);
         }
         return t;
-      };
+      }
 
       template<class M>
       double det(const M& m_) {
@@ -341,7 +341,7 @@ namespace jafar {
         default:
           lu_det(m_);
         }  
-      };
+      }
 
       template<class M>
       void inv(const M& m_, M& m_inv) {
@@ -360,7 +360,7 @@ namespace jafar {
         default:
           lu_inv(m_,m_inv);
         }
-      };
+      }
 
       /** General matrix inversion routine.
        *  It uses lu_factorize and lu_substitute in uBLAS to invert a matrix 
@@ -421,7 +421,7 @@ namespace jafar {
 			}               
 			inv = ublas::prod(S,ublas::trans(U));                      
 			inv = ublas::prod(ublas::trans(VT),inv);
-		};
+		}
 			
 #endif
 #endif 

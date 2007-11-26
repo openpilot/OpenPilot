@@ -16,7 +16,6 @@ BOOST_AUTO_TEST_CASE( dummy )
 {
 }
 
-
 /*
  * standard init_unit_test_suite function
  */

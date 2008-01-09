@@ -111,6 +111,8 @@
 %template(mul) jafar::jmath::matmatmul<jblas::mat,jblas::mat>;
 %template(div) jafar::jmath::div<jblas::mat, double>;
 %template(div) jafar::jmath::div<jblas::mat, int>;
+%template(inv) jafar::jmath::inv<jblas::mat44>;
+%template(inv) jafar::jmath::inv<jblas::mat>;
 
 
 %include "jmath/random.hpp"

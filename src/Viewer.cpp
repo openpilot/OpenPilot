@@ -69,7 +69,7 @@ void Viewer::setImageView(ImageView* ii, int row, int col)
   if(m_imageMosaic[row][col])
   {
     scene()->removeItem(m_imageMosaic[row][col]);
-//     delete m_imageMosaic[row][col];
+    delete m_imageMosaic[row][col];
   }
   m_imageMosaic[row][col] = ii;
   if(m_mosaicWidth == 0 && m_mosaicHeight == 0)

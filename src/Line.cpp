@@ -10,7 +10,7 @@
 namespace jafar {
 namespace qdisplay {
 
-Line::Line(double x, double y, double w, double h) : QGraphicsLineItem(x,y,w,h)
+Line::Line(double x1, double y1, double x2, double y2) : QGraphicsLineItem(x1,y1,x2,y2)
 {
 }
 void Line::setColor(int r, int g, int b)

@@ -11,7 +11,7 @@ class Line : public QGraphicsLineItem {
     /**
       * Create an Line to use with a Viewer to display a basic shape.
       */
-    Line(double x, double y, double w, double h);
+    Line(double x1, double y1, double x2, double y2);
     /**
      * Set the color of the line of the shape
      * @param r red [0 to 255]

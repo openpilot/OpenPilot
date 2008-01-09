@@ -47,6 +47,11 @@ ImageView::ImageView(const jafar::image::Image& img) :
   connect(m_splitHorizontalAction, SIGNAL(triggered()), this, SLOT(splitHorizontal()));
 }
 
+ImageView::~ImageView()
+{
+  delete m_pixmapItem;
+}
+
 void ImageView::addShape(Shape* si)
 {
   addToGroup(si);

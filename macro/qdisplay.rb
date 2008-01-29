@@ -31,6 +31,7 @@ class DisplayEventHandler < AbstractEventHandler
 end
 
 class RobotTrajectory < PolyLine
+  attr_reader :lastPose
   def initialize(scale = 10.0)
     super(scale)
     require 'jafar/geom'

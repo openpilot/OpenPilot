@@ -86,6 +86,11 @@ namespace jafar {
     {
       return r;
     }
+    jblas::vec_range* vecToRange( jblas::vec& v, int i1, int i2)
+    {
+      return new jblas::vec_range( v, ublas::range(i1,i2));
+    }
+
 
     /** Set the value (and the size) of a vector or a matrix using the operator>> in ublas.
      * @param t a vector or a matrix

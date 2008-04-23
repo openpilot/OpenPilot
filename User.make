@@ -29,5 +29,5 @@ CPPFLAGS += $(BOOST_CPPFLAGS) $(BOOST_SANDBOX_CPPFLAGS) \
 #CPPFLAGS += -DNDEBUG
 
 CXXFLAGS += -g -ggdb -Wall
-CPPFLAGS_MODULE = -pedantic -pedantic-errors -Werror 
+CPPFLAGS_MODULE = -pedantic -pedantic-errors
 

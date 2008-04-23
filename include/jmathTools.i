@@ -128,7 +128,17 @@ namespace jafar {
       s << "[" << mat.size1() << "," << mat.size2() << "]" << value;
       JFR_IO_STREAM(s >> mat, "reading matrix from string");
     };
-
+   
+    /** Dummy function that returns the ith element of a vec
+     * 
+     */
+    template<class V>
+    double getElementAt(const V& v, const unsigned int& rank) {
+      if(rank < v.size()) {
+        return v(rank);
+      }
+    };
+ 
   }
 }
 

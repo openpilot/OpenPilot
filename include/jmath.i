@@ -114,6 +114,8 @@
 %template(inv) jafar::jmath::inv<jblas::mat44>;
 %template(inv) jafar::jmath::inv<jblas::mat>;
 
+%template(getElementAt) jafar::jmath::getElementAt<jblas::vec2>;
+
 
 %include "jmath/random.hpp"
 

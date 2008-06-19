@@ -23,7 +23,7 @@
 #include "boost/numeric/ublas/banded.hpp"
 #endif
 #include "boost/numeric/ublas/io.hpp"
-
+#include <boost/numeric/ublas/triangular.hpp>
 #include "boost/numeric/ublas/matrix_proxy.hpp"
 #include "boost/numeric/ublas/vector_proxy.hpp"
 
@@ -108,10 +108,15 @@ namespace jblas {
 
   typedef boost::numeric::ublas::matrix_column<mat> mat_column;
 
+  /// standard triangular matrix type
+  typedef boost::numeric::ublas::triangular_matrix<double, boost::numeric::ublas::upper> up_tri_mat;
+  typedef boost::numeric::ublas::triangular_matrix<double, boost::numeric::ublas::lower> lo_tri_mat;
+
   /*
    * scalar type int
    */
-
+  /// unisized vector
+  typedef boost::numeric::ublas::vector<int> veci;
   /// 2 dimension vector
   typedef boost::numeric::ublas::bounded_vector<int,2> veci2;
 

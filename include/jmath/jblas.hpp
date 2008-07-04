@@ -93,6 +93,7 @@ namespace jblas {
 
   /// standard symmetric matrix type
   typedef boost::numeric::ublas::symmetric_matrix<double> sym_mat;
+  typedef boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::column_major> sym_mat_column_major;
 
   /// standard banded matrix type
   typedef boost::numeric::ublas::banded_matrix<double> banded_mat;

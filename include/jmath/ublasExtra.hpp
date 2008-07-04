@@ -340,7 +340,7 @@ namespace jafar {
         case 3:
           return details::det3(m_);
         default:
-          lu_det(m_);
+          return lu_det(m_);
         }  
       }
 

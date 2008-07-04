@@ -63,11 +63,13 @@ class ImageView : public QObject, public QGraphicsItemGroup {
     void exportView();
     void splitVertical();
     void splitHorizontal();
+    void addShape();
   protected:
     void contextMenuEvent ( QGraphicsSceneContextMenuEvent * event );
+  public:
     void mouseReleaseEvent ( QGraphicsSceneMouseEvent * event );
   private:
-    QAction *m_lutRandomizeAction, *m_lutGrayscaleAction, *m_lutInvertGrayscaleAction, *m_lutRedHotAction, *m_exportView, * m_splitVerticalAction,*m_splitHorizontalAction;
+    QAction *m_lutRandomizeAction, *m_lutGrayscaleAction, *m_lutInvertGrayscaleAction, *m_lutRedHotAction, *m_exportView, * m_splitVerticalAction,*m_splitHorizontalAction,*m_addShapeAction;
     QImage m_image;
     QGraphicsPixmapItem* m_pixmapItem;
     double m_currentZ;

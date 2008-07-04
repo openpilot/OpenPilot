@@ -20,8 +20,9 @@
 #include "qdisplay/Viewer.hpp"
 #include "qdisplay/PolyLine.hpp"
 
-namespace jafar {
-namespace qdisplay {
+#include "AddShapeDialog.h" // Regenerate it with "uic-qt4 AddShapeDialog.ui >! AddShapeDialog.h"
+
+using namespace jafar::qdisplay;
 
 ImageView::ImageView(const jafar::image::Image& img) :
     m_pixmapItem(new QGraphicsPixmapItem()),
@@ -45,6 +46,8 @@ ImageView::ImageView(const jafar::image::Image& img) :
   connect(m_splitVerticalAction, SIGNAL(triggered()), this, SLOT(splitVertical()));
   m_splitHorizontalAction = new QAction("Split horizontally", (QObject*)this);
   connect(m_splitHorizontalAction, SIGNAL(triggered()), this, SLOT(splitHorizontal()));
+  m_addShapeAction = new QAction("Add shape", (QObject*)this);
+  connect(m_addShapeAction, SIGNAL(triggered()), this, SLOT(addShape()));
 }
 
 ImageView::~ImageView()
@@ -226,6 +229,18 @@ void ImageView::splitHorizontal()
   }
 }
 
+void ImageView::addShape()
+{
+  QDialog dlg;
+  Ui_AddShapeDialog asd;
+  asd.setupUi( &dlg );
+  
+  if(dlg.exec() == QDialog::Accepted)
+  {
+    addShape( new Shape( (Shape::ShapeType)asd.shapeType->currentIndex(), asd.x->value(), asd.y->value(), asd.width->value(), asd.height->value() ) );
+  }
+}
+
 void ImageView::contextMenuEvent ( QGraphicsSceneContextMenuEvent * event )
 {
   m_lastViewer = 0;
@@ -241,31 +256,29 @@ void ImageView::contextMenuEvent ( QGraphicsSceneContextMenuEvent * event )
   QMenu menu;
   if(m_image.format() == QImage::Format_Indexed8)
   {
-    menu.addAction(m_lutRandomizeAction);
-    menu.addAction(m_lutGrayscaleAction);
-    menu.addAction(m_lutInvertGrayscaleAction);
-    menu.addAction(m_lutRedHotAction);
+    menu.addAction( m_lutRandomizeAction );
+    menu.addAction( m_lutGrayscaleAction );
+    menu.addAction( m_lutInvertGrayscaleAction );
+    menu.addAction( m_lutRedHotAction );
   }
-  menu.addAction(m_exportView);
+  menu.addAction( m_exportView );
   if(m_lastViewer)
   {
-    menu.addAction(m_splitVerticalAction);
-    menu.addAction(m_splitHorizontalAction);
+    menu.addAction( m_splitVerticalAction );
+    menu.addAction( m_splitHorizontalAction );
   }
+  menu.addAction( m_addShapeAction );
   menu.exec(event->screenPos());
 }
 
 void ImageView::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
 {
+//   JFR_DEBUG( event->pos().x() << " " << event->pos().y() );
   if(m_eventHandler)
   {
     m_eventHandler->mouseReleaseEvent( event->button(), event->pos().x(), event->pos().y() );
   }
   QGraphicsItemGroup::mouseReleaseEvent(event);
-}
-
-}
-
 }
 
 #include "ImageView.moc"

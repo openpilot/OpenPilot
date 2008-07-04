@@ -39,6 +39,7 @@ void Shape::setLabel(char * text)
   {
     m_label = new QGraphicsTextItem(this, scene());
     m_label->setFont(QFont( m_label->font().family(), m_fontSize));
+    m_label->setDefaultTextColor( m_fontColor );
     addToGroup(m_label);
   }
   m_label->setPlainText(text);

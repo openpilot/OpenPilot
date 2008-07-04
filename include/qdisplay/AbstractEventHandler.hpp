@@ -1,7 +1,6 @@
 #ifndef _ABSTRACT_EVENT_HANDLER_HPP_
 #define _ABSTRACT_EVENT_HANDLER_HPP_
 
-
 namespace jafar {
 namespace qdisplay {
 
@@ -12,8 +11,8 @@ namespace qdisplay {
    */
   class AbstractEventHandler {
     public:
-      virtual ~AbstractEventHandler() { }
-      virtual void mouseReleaseEvent(int button, double x, double y) { };
+      virtual ~AbstractEventHandler();
+      virtual void mouseReleaseEvent(int button, double x, double y);
   };
 }
 }

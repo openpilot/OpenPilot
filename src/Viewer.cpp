@@ -25,8 +25,7 @@
 
 #include <QSplitter>
 
-namespace jafar {
-namespace qdisplay {
+using namespace jafar::qdisplay;
   
 Viewer::Viewer(int mosaicWidth, int mosaicHeight, QGraphicsScene* scene ) : m_scene(scene), m_mosaicWidth(mosaicWidth), m_mosaicHeight(mosaicHeight), m_currentZ(0.)
 {
@@ -175,9 +174,40 @@ void Viewer::contextMenuEvent( QContextMenuEvent * event )
   }
 }
 
+// WORKAROUND Qt4.4 regression where mouseReleaseEvent are not forwarded to QGraphicsItem
+#include <QGraphicsSceneMouseEvent>
+#include <QApplication>
+
+void Viewer::mouseReleaseEvent( QMouseEvent* event )
+{
+  
+  if( QGraphicsItem* qgi = itemAt(event->pos() ) )
+  {
+    ImageView* iv = dynamic_cast<ImageView*>( qgi->group() );
+    if( iv )
+    {
+      QGraphicsSceneMouseEvent mouseEvent(QEvent::GraphicsSceneMouseRelease);
+      mouseEvent.setWidget(viewport());
+      QPointF mousePressScenePoint = mapToScene(event->pos());
+      mouseEvent.setButtonDownScenePos(event->button(), mousePressScenePoint);
+      mouseEvent.setButtonDownScreenPos(event->button(), event->globalPos());
+      mouseEvent.setScenePos(mapToScene(event->pos()));
+      mouseEvent.setScreenPos(event->globalPos());
+      mouseEvent.setButtons(event->buttons());
+      mouseEvent.setButton(event->button());
+      mouseEvent.setModifiers(event->modifiers());
+      mouseEvent.setAccepted(false);
+      mouseEvent.setPos( iv->mapFromScene( mouseEvent.scenePos() ) );
+      iv->mouseReleaseEvent( &mouseEvent );
+      return;
+    }
+  }
+  QGraphicsView::mouseReleaseEvent( event );
+}
+
 void Viewer::exportView()
 {
-  QString fileName = QFileDialog::getSaveFileName ( 0, "Export viewer content", "", "Supported format (*.pdf *.ps *.png *.tiff *.svg)" );
+  QString fileName = QFileDialog::getSaveFileName ( 0, "Export viewer content", "", "PDF Document (*.pdf);;Postscript (*.ps);;PNG Image (*.png);;Tiff Image (*.tiff);;Scalable Vector Graphics (*.svg)" );
   if(fileName == "") return;
   QString extension = fileName.split(".").last().toLower();
   if(extension == "pdf" or extension == "ps")
@@ -212,9 +242,6 @@ void Viewer::exportView()
   } else {
     QMessageBox::critical(0, "Unsupported format", "This format " + extension + " is unsupported by the viewer export");
   }
-}
-
-}
 }
 
 #include "Viewer.moc"

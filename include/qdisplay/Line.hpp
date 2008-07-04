@@ -25,6 +25,11 @@ class Line : public QGraphicsLineItem {
      * @param y
      */
     inline void setPos(double x, double y) { QGraphicsLineItem::setPos(x,y); }
+    void setLabel(char * text);
+    void setFontSize(int s) { m_fontSize = s; }
+  private:
+    QGraphicsTextItem* m_label;
+    int m_fontSize;
 };
 
 }

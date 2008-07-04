@@ -12,6 +12,8 @@ class Shape : public QGraphicsItemGroup {
     };
     /**
       * Create an Shape to use with a Viewer to display a basic shape.
+      * @param x x-coordinate of the center of the shape
+      * @param y y-coordinate of the center of the shape
       * @param shapeType the type of the shape to display
       */
     Shape(ShapeType shapeType, double x, double y, double w, double h);
@@ -32,10 +34,12 @@ class Shape : public QGraphicsItemGroup {
     inline void setPos(double x, double y) { QGraphicsItem::setPos(x,y); }
     void setLabel(char * text);
     void setFontSize(int s) { m_fontSize = s; }
+    void setFontColor( int r, int g, int b) { m_fontColor.setRgb(r,g,b); }
   private:
     ShapeType m_shapeType;
     QRectF m_boundingRect;
     QColor m_color;
+    QColor m_fontColor;
     QGraphicsTextItem* m_label;
     int m_fontSize;
 };

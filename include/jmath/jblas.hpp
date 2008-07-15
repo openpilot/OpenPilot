@@ -26,6 +26,7 @@
 #include <boost/numeric/ublas/triangular.hpp>
 #include "boost/numeric/ublas/matrix_proxy.hpp"
 #include "boost/numeric/ublas/vector_proxy.hpp"
+#include <boost/numeric/ublas/matrix_sparse.hpp>
 
 #include "jmath/ublasCompatibility.hpp"
 
@@ -93,7 +94,8 @@ namespace jblas {
 
   /// standard symmetric matrix type
   typedef boost::numeric::ublas::symmetric_matrix<double> sym_mat;
-  typedef boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::column_major> sym_mat_column_major;
+  typedef boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper> up_sym_mat;
+  typedef boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::lower> lo_sym_mat;
 
   /// standard banded matrix type
   typedef boost::numeric::ublas::banded_matrix<double> banded_mat;
@@ -109,10 +111,13 @@ namespace jblas {
 
   typedef boost::numeric::ublas::matrix_column<mat> mat_column;
 
-  /// standard triangular matrix type
+  /// standard double triangular matrix type
   typedef boost::numeric::ublas::triangular_matrix<double, boost::numeric::ublas::upper> up_tri_mat;
   typedef boost::numeric::ublas::triangular_matrix<double, boost::numeric::ublas::lower> lo_tri_mat;
 
+  ///standard double sparse matrix
+  typedef boost::numeric::ublas::compressed_matrix<double> sp_mat;
+  
   /*
    * scalar type int
    */
@@ -133,6 +138,11 @@ namespace jblas {
   /// bool matrix
   typedef boost::numeric::ublas::matrix<bool> matb;
 
+  /**
+   * boost orientation tags
+   */
+  typedef boost::numeric::ublas::upper upper;
+  typedef boost::numeric::ublas::lower lower;
 } // namespace jblas
 
 /*@}*/

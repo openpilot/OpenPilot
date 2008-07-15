@@ -34,26 +34,26 @@ namespace ublas = boost::numeric::ublas;
 /** \brief Do-nothing preconditioner
  */
 template < class MATRIX = int >
-class IdentityPreconditioner {
+  class IdentityPreconditioner {
   
-public:
+  public:
   IdentityPreconditioner(const MATRIX& A) { }
   
   template<class Vector>
-  void apply(const Vector& b, Vector& x) const
+    void apply(const Vector& b, Vector& x) const
   {
     x = b;
   }
-private:
+  private:
   IdentityPreconditioner() { }
 };
 
 /** \brief scales x with diagonal of a given matrix
  */
 template<class Matrix> 
-class DiagonalPreconditioner {
+  class DiagonalPreconditioner {
 
-public:
+  public:
   typedef typename Matrix::value_type value_type;
   typedef typename Matrix::size_type size_type;
 
@@ -70,12 +70,12 @@ public:
   }
   
   template<class Vector>
-  void apply(const Vector& b, Vector& x) const
+    void apply(const Vector& b, Vector& x) const
   {
     x = element_prod( diag, b );
   }
 
-private:
+  private:
   DiagonalPreconditioner() { };
   ublas::vector< value_type > diag;
   const double EPS;
@@ -83,8 +83,8 @@ private:
 };
 
 template <class Matrix>
-DiagonalPreconditioner<Matrix>
-make_DiagonalPreconditioner(const Matrix & A, const double eps = 1.0e-14)
+  DiagonalPreconditioner<Matrix>
+  make_DiagonalPreconditioner(const Matrix & A, const double eps = 1.0e-14)
 {
   return DiagonalPreconditioner<Matrix>(A, eps);
 }
@@ -96,28 +96,28 @@ make_DiagonalPreconditioner(const Matrix & A, const double eps = 1.0e-14)
  */
 template<class Matrix> class CholeskyPreconditioner {
 
-public:
+  public:
   CholeskyPreconditioner(const Matrix & A) : L(A) 
   { 
     cholesky_decompose(L);
   }
   
   template<class Vector>
-  void apply(const Vector& b, Vector& x) const
+    void apply(const Vector& b, Vector& x) const
   {
     x = b;
     cholesky_solve(L, x, ublas::lower());
   }
 
-private:
+  private:
   CholeskyPreconditioner() { }
   Matrix L;
 };
 
 
 template <class Matrix>
-CholeskyPreconditioner<Matrix>
-make_CholeskyPreconditioner(const Matrix & A)
+  CholeskyPreconditioner<Matrix>
+  make_CholeskyPreconditioner(const Matrix & A)
 {
   return CholeskyPreconditioner<Matrix>(A);
 }
@@ -132,28 +132,28 @@ make_CholeskyPreconditioner(const Matrix & A)
  */
 template<class Matrix> class IncompleteCholeskyPreconditioner {
 
-public:
+  public:
   IncompleteCholeskyPreconditioner(const Matrix & A) : L(A) 
   { 
     incomplete_cholesky_decompose(L);
   }
   
   template<class Vector>
-  void apply(const Vector& b, Vector& x) const
+    void apply(const Vector& b, Vector& x) const
   {
     x = b;
     cholesky_solve(L, x, ublas::lower());
   }
 
-private:
+  private:
   IncompleteCholeskyPreconditioner() { }
   Matrix L;
 };
 
 
 template <class Matrix>
-IncompleteCholeskyPreconditioner<Matrix>
-make_IncompleteCholeskyPreconditioner(const Matrix & A)
+  IncompleteCholeskyPreconditioner<Matrix>
+  make_IncompleteCholeskyPreconditioner(const Matrix & A)
 {
   return IncompleteCholeskyPreconditioner<Matrix>(A);
 }

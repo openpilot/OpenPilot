@@ -19,7 +19,9 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 */
-
+/** 
+ * preconditioned conjugate gradient solver 
+ */
 #ifndef _H_PCG_HPP_
 #define _H_PCG_HPP_
 

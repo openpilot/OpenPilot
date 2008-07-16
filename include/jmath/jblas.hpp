@@ -45,6 +45,7 @@ namespace jblas {
 
   /// standard vector type
   typedef boost::numeric::ublas::vector<double> vec;
+  typedef boost::numeric::ublas::vector_range<vec> vec_range; 
   typedef boost::numeric::ublas::zero_vector<double> zero_vec;
   typedef boost::numeric::ublas::unit_vector<double> unit_vec;
   typedef boost::numeric::ublas::scalar_vector<double> scalar_vec;
@@ -94,26 +95,19 @@ namespace jblas {
 
   /// standard symmetric matrix type
   typedef boost::numeric::ublas::symmetric_matrix<double> sym_mat;
+  typedef boost::numeric::ublas::matrix_range<sym_mat> sym_mat_range; 
   typedef boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper> up_sym_mat;
   typedef boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::lower> lo_sym_mat;
 
   /// standard banded matrix type
   typedef boost::numeric::ublas::banded_matrix<double> banded_mat;
 
-  /// standard range
-  typedef boost::numeric::ublas::vector_range<vec> vec_range; 
-  typedef boost::numeric::ublas::matrix_range<mat> mat_range; 
-  typedef boost::numeric::ublas::matrix_range<sym_mat> sym_mat_range; 
-
   /// standard slice
   typedef boost::numeric::ublas::matrix_vector_slice<mat> mat_vec_slice;
   typedef boost::numeric::ublas::matrix_vector_slice<sym_mat> sym_mat_vec_slice;
 
+  /// standard matrix column
   typedef boost::numeric::ublas::matrix_column<mat> mat_column;
-
-  /// standard double triangular matrix type
-  typedef boost::numeric::ublas::triangular_matrix<double, boost::numeric::ublas::upper> up_tri_mat;
-  typedef boost::numeric::ublas::triangular_matrix<double, boost::numeric::ublas::lower> lo_tri_mat;
 
   ///standard double sparse matrix
   typedef boost::numeric::ublas::compressed_matrix<double> sp_mat;

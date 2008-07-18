@@ -138,7 +138,7 @@ static void mark_Viewer(void* ptr) {
  * headers to be wrapped goes here
  */
 
-// %include "qdisplayTools.i"
+%include "qdisplayTools.i"
 // instantiate some print functions
 // replace "Type" with appropriate class name
 // %template(print) jafar::qdisplay::print<jafar::qdisplay::Type>;

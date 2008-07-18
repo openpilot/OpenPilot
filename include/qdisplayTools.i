@@ -9,6 +9,7 @@
 %{
 
 #include <sstream>
+#include <QApplication>
 
 %}
 
@@ -21,11 +22,14 @@ namespace jafar {
     /** Template print function which calls the output operator<< of A
      * and returns the resulting string.
      */
-    template<class A>
+/*    template<class A>
     std::string print(const A& a_) {
       std::ostringstream os;
       os << a_ << std::endl;
       return os.str();
+    };*/
+    void processEvents() {
+      QApplication::processEvents();
     };
 
   } // namespace qdisplay

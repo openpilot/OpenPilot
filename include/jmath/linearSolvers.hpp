@@ -9,8 +9,6 @@
 #ifdef HAVE_LAPACK
 
 #include "jmath/jblas.hpp"
-#include "boost/numeric/ublas/matrix_proxy.hpp"
-#include "boost/numeric/ublas/vector_proxy.hpp"
 
 namespace jafar {
   namespace jmath {
@@ -31,9 +29,11 @@ namespace jafar {
        * If A=Q R with Q orthogonal and R upper triangular, the linear system becomes
        * Q R x = b or R x = Q^T b.
        *
+       * WARNING solve_QR modifies A to return Q within
+       *
        * The function returns 0 in case of error, 1 if successfull
        */
-      int solve_QR(const jblas::mat& A, jblas::vec& b, jblas::vec& x);
+      int solve_QR(jblas::mat_column_major& A, const jblas::mat& B, jblas::mat& X);
 
       /**
        * This function returns the solution of Ax = b
@@ -46,7 +46,7 @@ namespace jafar {
        *
        * The function returns 0 in case of error, 1 if successfull
        */
-      int solve_QR_noQ(const jblas::mat& A, jblas::vec& b, jblas::vec& x);
+      int solve_QR_noQ(jblas::mat_column_major A, jblas::mat B, jblas::mat& X);
 
       /*
        * This function returns the solution of Ax=b
@@ -59,7 +59,7 @@ namespace jafar {
        *
        * The function returns 0 in case of error, 1 if successfull
        */
-      int solve_Cholesky(const jblas::mat& A, jblas::vec& b, jblas::vec& x);
+      int solve_Cholesky(jblas::mat_column_major A, jblas::mat_column_major B, jblas::mat& X);
 
       /**
        * This function returns the solution of Ax = b
@@ -71,7 +71,7 @@ namespace jafar {
        *
        * The function returns 0 in case of error, 1 if successfull
        */
-      int solve_LU(const jblas::mat& A, jblas::vec& b, jblas::vec& x);
+      int solve_LU(const jblas::mat& A, const jblas::vec& b, jblas::vec& x);
 
       /*
        * This function returns the solution of Ax = b
@@ -83,7 +83,7 @@ namespace jafar {
        *
        * The function returns 0 in case of error, 1 if successfull
        */
-      int solve_SVD(const jblas::mat& A, jblas::vec& b, jblas::vec& x);
+      int solve_SVD(const jblas::mat& A, const jblas::vec& b, jblas::vec& x);
 
       /*
        * This function returns the solution of Ax = b for a real symmetric matrix A
@@ -94,7 +94,7 @@ namespace jafar {
        *
        * The function returns 0 in case of error, 1 if successfull
        */
-      int solve_BK(const jblas::mat& A, jblas::vec& b, jblas::vec& x);
+      int solve_BK(const jblas::mat& A, const jblas::vec& b, jblas::vec& x);
     } // namespace LinearSolvers
   } // namespace jmath
 } // namespace jafar

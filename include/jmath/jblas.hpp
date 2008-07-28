@@ -66,6 +66,7 @@ namespace jblas {
   typedef boost::numeric::ublas::matrix_range<mat> mat_range;
   typedef boost::numeric::ublas::zero_matrix<double> zero_mat;
   typedef boost::numeric::ublas::identity_matrix<double> identity_mat;
+  typedef boost::numeric::ublas::matrix_vector_range<mat> mat_vec_range;
 
   /// column major matrix
   typedef boost::numeric::ublas::matrix<double, boost::numeric::ublas::column_major> mat_column_major;
@@ -97,8 +98,10 @@ namespace jblas {
   typedef boost::numeric::ublas::symmetric_matrix<double> sym_mat;
   typedef boost::numeric::ublas::matrix_range<sym_mat> sym_mat_range; 
   typedef boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper> up_sym_mat;
+  typedef boost::numeric::ublas::matrix_range<up_sym_mat> up_sym_mat_range;
   typedef boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::lower> lo_sym_mat;
 
+  typedef ublas::symmetric_matrix<double, ublas::column_major> sym_mat_column_major;
   /// standard banded matrix type
   typedef boost::numeric::ublas::banded_matrix<double> banded_mat;
 

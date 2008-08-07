@@ -25,7 +25,6 @@
 #include "jmath/pca.hpp"
 
 #include "jmath/linearLeastSquares.hpp"
-#include "jmath/testProxies.hpp"
 #include "jmath/linearSolvers.hpp"
 %}
 
@@ -132,4 +131,3 @@
 
 %include "jmath/linearSolvers.hpp"
 
-%include "jmath/testProxies.hpp"

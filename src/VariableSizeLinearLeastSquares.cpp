@@ -1,15 +1,16 @@
-/* $Id:$ */
+/* $Id$ */
 
 #include "jmath/VariableSizeLinearLeastSquares.hpp"
 
 #include "kernel/jafarMacro.hpp"
 
+#ifdef HAVE_BOOST_SANDBOX
+#ifdef HAVE_LAPACK
+
 #include "boost/numeric/bindings/lapack/gesv.hpp"
 #include "boost/numeric/bindings/traits/ublas_matrix.hpp"
 #include "boost/numeric/bindings/traits/ublas_vector.hpp"
 
-#ifdef HAVE_BOOST_SANDBOX
-#ifdef HAVE_LAPACK
 
 namespace lapack = boost::numeric::bindings::lapack;
 using namespace jafar::jmath;

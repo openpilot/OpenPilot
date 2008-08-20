@@ -46,6 +46,8 @@
 %include "qdisplay/PolyLine.hpp"
 
 #if defined(SWIGRUBY)
+    %apply SWIGTYPE *DISOWN { jafar::qdisplay::PolyLine* pl };
+    %apply SWIGTYPE *DISOWN { jafar::qdisplay::Line* li };
     %apply SWIGTYPE *DISOWN { jafar::qdisplay::Shape* si };
 #endif
 %include "qdisplay/ImageView.hpp"

@@ -67,7 +67,7 @@ namespace jblas {
   typedef boost::numeric::ublas::zero_matrix<double> zero_mat;
   typedef boost::numeric::ublas::identity_matrix<double> identity_mat;
   typedef boost::numeric::ublas::matrix_vector_range<mat> mat_vec_range;
-
+  typedef boost::numeric::ublas::scalar_matrix<double> scalar_mat;
   /// column major matrix
   typedef boost::numeric::ublas::matrix<double, boost::numeric::ublas::column_major> mat_column_major;
   typedef boost::numeric::ublas::matrix_range<mat_column_major> mat_column_major_range;

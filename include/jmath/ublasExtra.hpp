@@ -67,6 +67,25 @@ namespace jafar {
         }
       }
 
+      /** Fills vector with a certain value
+       */
+      template<class V>
+      void fillVector(V& v, const double& value=0.0) {
+        for (std::size_t i = 0 ; i < v.size() ; ++i)
+          v(i) = value;
+      }
+
+      template<class V>
+      bool isZeroVector(const V& v) {
+        bool isZero = true;
+        for (std::size_t i = 0 ; i < v.size() ; ++i){
+          if (v(i)!=0.0){
+            isZero = false;
+            break;
+          }
+        }
+        return isZero;
+      }
 
       /** normalize a vector.
        */
@@ -314,7 +333,6 @@ namespace jafar {
       }
 
       /** Computes the trace of a matrix.
-       *
        * \warning it returns a double whatever matrix type...
        */
       template<class M>
@@ -451,6 +469,15 @@ namespace jafar {
 	  det *= mLu(i,i);
 	}
 	return det;
+      }
+
+      /** Fills all matrix cells with the same value
+       */
+      template<class M>
+      void fillMatrix(M& m, const double& value=0.0) {
+        for (std::size_t i = 0 ; i < m.size1() ; ++i)
+          for (std::size_t j = 0 ; j < m.size2() ; ++j)
+            m(i)(j) = value;
       }
 
     } // namespace ublasExtra

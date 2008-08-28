@@ -226,30 +226,31 @@ void cholesky_solve(const TRIA& L, VEC& x, ublas::lower)
  * \param M input: square symmetric positive definite matrix
  * \param M output: inverted square symmetric positive definite matrix
  */
-template<class MATRIX>
+template< class MATRIX >
 void cholesky_invert (MATRIX &M)
 {
-    typedef typename M::size_type size_type;
-    typedef typename M::value_type value_type;
+  using namespace ublas; 
+  typedef typename M::size_type size_type;
+  typedef typename M::value_type value_type;
 
-    size_type size = m.size1();
+  size_type size = M.size1();
 
-    // determine the inverse of the lower traingular matrix
-    for (size_type i = 0; i < size; ++ i) {
-      m(i,i) = 1 / m(i,i);
+  // determine the inverse of the lower traingular matrix
+  for (size_type i = 0; i < size; ++ i) {
+    M(i,i) = 1 / M(i,i);
 
-      for (size_type j = i+1; j < size; ++ j) {
-        value_type elem(0);
+    for (size_type j = i+1; j < size; ++ j) {
+      value_type elem(0);
 
-        for (size_type k = i; k < j; ++ k) {
-          elem -= m(j,k)*m(k,i);
-        }
-        m(j,i) = elem / m(j,j);
+      for (size_type k = i; k < j; ++ k) {
+        elem -= M(j,k)*M(k,i);
       }
+      M(j,i) = elem / M(j,j);
     }
+  }
 
-    // multiply the upper and lower inverses together
-    m = prod(trans(triangular_adaptor<M,lower>(m)), triangular_adaptor<M,lower>(m));
-  } 
+  // multiply the upper and lower inverses together
+  M = prod(trans(triangular_adaptor<MATRIX,lower>(M)), triangular_adaptor<MATRIX,lower>(M));
+} 
 
 #endif

@@ -60,6 +60,7 @@ namespace jafar {
        * The function returns 0 in case of error, 1 if successfull
        */
       int solve_Cholesky(jblas::mat_column_major A, jblas::mat_column_major B, jblas::mat& X);
+      int solve_Cholesky(jblas::mat_column_major A, jblas::vec b, jblas::vec& x);
 
       /**
        * This function returns the solution of Ax = b

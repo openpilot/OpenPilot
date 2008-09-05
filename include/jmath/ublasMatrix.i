@@ -64,6 +64,9 @@ namespace boost { namespace numeric { namespace ublas {
     
     void resize (size_type size, bool preserve = true);
 
+    template<class AE>
+    symmetric_matrix &assign (const boost::numeric::ublas::matrix_expression<AE> &ae);
+    
 //    %rename(get) operator();
 //    const_reference operator() (size_type i, size_type j) const;
 

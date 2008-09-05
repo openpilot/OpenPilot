@@ -108,11 +108,16 @@
 %template(mul) jafar::jmath::scalmul<jblas::mat,double>;
 %template(mul) jafar::jmath::vecmatmul<jblas::mat,jblas::vec>;
 %template(mul) jafar::jmath::vecmatmul<jblas::mat44,jblas::vec>;
-%template(mul) jafar::jmath::matmatmul<jblas::mat,jblas::mat>;
+%template(mul) jafar::jmath::matmatmul<jblas::mat,jblas::mat,jblas::mat>;
+%template(mul) jafar::jmath::matmatmul<jblas::sym_mat,jblas::mat,jblas::mat>;
+%template(mul) jafar::jmath::matmatmul<jblas::sym_mat,jblas::sym_mat,jblas::sym_mat>;
+%template(mul) jafar::jmath::matmatmul<jblas::mat,jblas::sym_mat,jblas::mat>;
 %template(div) jafar::jmath::div<jblas::mat, double>;
 %template(div) jafar::jmath::div<jblas::mat, int>;
 %template(inv) jafar::jmath::inv<jblas::mat44>;
 %template(inv) jafar::jmath::inv<jblas::mat>;
+%template(trans) jafar::jmath::trans<jblas::mat>;
+%template(assignMat) jafar::jmath::assignMat<jblas::sym_mat,jblas::mat>;
 
 %template(getElementAt) jafar::jmath::getElementAt<jblas::vec2>;
 

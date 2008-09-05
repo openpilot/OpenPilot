@@ -68,10 +68,16 @@ namespace jafar {
       }
       return M;
     }
-    template<class T, class T2>
-    T matmatmul(const T& t1, const T2& t2)
+    template<class T, class T2, class T3>
+    T3 matmatmul(const T& t1, const T2& t2)
     {
       return ublas::prod(t1, t2);
+    }
+    
+    template<class T, class T2>
+    T& assignMat(T& t1, const T2& t2)
+    {
+      return t1.assign(t2);
     }
     
     template<class T>
@@ -80,6 +86,12 @@ namespace jafar {
       T invmat;
       jmath::ublasExtra::inv(mat, invmat);
       return invmat;
+    }
+    
+    template<class T>
+        T trans(const T& mat)
+    {
+      return ublas::trans(mat);
     }
     
     jblas::vec rangeToVec(const jblas::vec_range& r)

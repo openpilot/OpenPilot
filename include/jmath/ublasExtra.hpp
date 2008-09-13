@@ -332,6 +332,19 @@ namespace jafar {
         return max;
       }
 
+      /** Find maximum value of a matrix.
+       * \warning it returns a double whatever matrix type...
+       */
+      template<class V>
+      double maxV(const V& v_) {
+        double max = v_(0);
+        for (std::size_t i=1 ; i < v_.size() ; i++) {
+          if (v_(i) > max) {
+            max = v_(i);
+          }
+        }
+        return max;
+      }
       /** Computes the trace of a matrix.
        * \warning it returns a double whatever matrix type...
        */

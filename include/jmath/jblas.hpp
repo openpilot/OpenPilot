@@ -29,6 +29,7 @@
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 
 #include "jmath/ublasCompatibility.hpp"
+#include "jmath/boundedSymmetricMatrix.hpp"
 
 /** \addtogroup jmath */
 /*@{*/
@@ -102,6 +103,10 @@ namespace jblas {
   typedef boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::lower> lo_sym_mat;
 
   typedef ublas::symmetric_matrix<double, ublas::column_major> sym_mat_column_major;
+    
+  /// 2x2 symmetric matrix type
+  typedef bounded_symmetric_matrix<double, 2 > sym_mat22;
+  
   /// standard banded matrix type
   typedef boost::numeric::ublas::banded_matrix<double> banded_mat;
 

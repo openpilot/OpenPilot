@@ -4,6 +4,10 @@ Jafar.register_module Jafar::Jmath
 
 module Jafar
   module Jmath
+    def Jmath.vec2ToArray(v)
+      strs = print(v).split(/\(|\,|\)/)
+      return [strs[1].to_f, strs[2].to_f]
+    end
     def Jmath.vecToArray(v)
       strs = print(v).split(/\(|\,|\)/)
       a = []

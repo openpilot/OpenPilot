@@ -492,7 +492,19 @@ namespace jafar {
           for (std::size_t j = 0 ; j < m.size2() ; ++j)
             m(i)(j) = value;
       }
-
+      /**
+       * @return the eigen values of a 2x2 matrix
+       */
+      inline jblas::vec2 eigenValue( const jblas::mat22& m)
+      {
+        double tr = m(0,0) + m(1,1);
+        double diff = m(0,0) - m(1,1);
+        double sq = sqrt( 4 * m(0,1) * m(1,0) + diff * diff );
+        jblas::vec2 v;
+        v(0) = 0.5 * ( tr + sq );
+        v(1) = 0.5 * ( tr - sq );
+        return v;
+      }
     } // namespace ublasExtra
 
     /*\@}*/

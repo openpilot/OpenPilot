@@ -106,6 +106,10 @@ namespace jblas {
     
   /// 2x2 symmetric matrix type
   typedef bounded_symmetric_matrix<double, 2 > sym_mat22;
+  /// 3x3 symmetric matrix type
+  typedef bounded_symmetric_matrix<double, 3 > sym_mat33;
+  /// 4x4 symmetric matrix type
+  typedef bounded_symmetric_matrix<double, 4 > sym_mat44;
   
   /// standard banded matrix type
   typedef boost::numeric::ublas::banded_matrix<double> banded_mat;

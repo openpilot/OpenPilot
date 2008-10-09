@@ -32,6 +32,7 @@ Viewer::Viewer(int mosaicWidth, int mosaicHeight, QGraphicsScene* scene ) : m_sc
   if(not m_scene) {
     m_scene = new QGraphicsScene();
   }
+  m_scene->setBackgroundBrush( Qt::white );
   show();
   setScene(m_scene);
   ViewerManager::registerViewer( this );

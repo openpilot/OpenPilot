@@ -495,7 +495,7 @@ namespace jafar {
       /**
        * @return the eigen values of a 2x2 matrix
        */
-      inline jblas::vec2 eigenValue( const jblas::mat22& m)
+      inline jblas::vec2 eigenValues( const jblas::mat22& m)
       {
         double tr = m(0,0) + m(1,1);
         double diff = m(0,0) - m(1,1);

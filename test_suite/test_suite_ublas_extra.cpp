@@ -12,5 +12,5 @@ BOOST_AUTO_TEST_CASE( test_case_ublas_extra )
   jblas::vec2 v;
   v(0) = 3;
   v(1) = 1;
-  JFR_CHECK_VEC_EQUAL( jafar::jmath::ublasExtra::eigenValue( m ) ,v);
+  JFR_CHECK_VEC_EQUAL( jafar::jmath::ublasExtra::eigenValues( m ) ,v);
 }

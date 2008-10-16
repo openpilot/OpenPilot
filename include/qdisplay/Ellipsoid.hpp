@@ -9,7 +9,8 @@
 namespace jafar {
   namespace qdisplay {
     class Ellipsoid : public Shape {
-      Ellipsoid( const jblas::vec2& _x, const jblas::sym_mat22& _xCov );
+      public:
+        Ellipsoid( const jblas::vec2& _x, const jblas::sym_mat22& _xCov );
     };
   }
 }

@@ -36,6 +36,9 @@
 #endif
 
 %include "jafar.i"
+%import "jmath/jblas.i"
+
+
 %include "qdisplayException.i"
 %include "qdisplay/Shape.hpp"
 %include "qdisplay/ViewerManager.hpp"

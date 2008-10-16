@@ -1,8 +1,17 @@
+/* $Id:$ */
+#ifndef _QDISPLAY_SHAPE_HPP_
+#define _QDISPLAY_SHAPE_HPP_
+
 #include <QGraphicsItem>
 
 namespace jafar {
 namespace qdisplay {
 class Viewer;
+/**
+ * @ingroup qdisplay
+ * 
+ * Creates a shape (rectangle, cross or ellipse) to disaplay in a view.
+ */
 class Shape : public QGraphicsItemGroup {
   public:
     enum ShapeType {
@@ -10,6 +19,7 @@ class Shape : public QGraphicsItemGroup {
       ShapeCross,
       ShapeEllipse
     };
+    Shape(ShapeType shapeType);
     /**
       * Create an Shape to use with a Viewer to display a basic shape.
       * @param x x-coordinate of the center of the shape
@@ -35,6 +45,7 @@ class Shape : public QGraphicsItemGroup {
     void setLabel(char * text);
     void setFontSize(int s) { m_fontSize = s; }
     void setFontColor( int r, int g, int b) { m_fontColor.setRgb(r,g,b); }
+    void setBoundingBox( double x, double y, double w, double h);
   private:
     ShapeType m_shapeType;
     QRectF m_boundingRect;
@@ -48,3 +59,4 @@ class Shape : public QGraphicsItemGroup {
 
 }
 
+#endif

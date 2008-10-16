@@ -20,6 +20,7 @@
 #include "qdisplay/Viewer.hpp"
 #include "qdisplay/ImageView.hpp"
 #include "qdisplay/Shape.hpp"
+#include "qdisplay/Ellipsoid.hpp"
 #include "qdisplay/Line.hpp"
 #include "qdisplay/PolyLine.hpp"
 #include "qdisplay/AbstractEventHandler.hpp"
@@ -42,6 +43,7 @@
 %feature("director") jafar::qdisplay::AbstractEventHandler;
 %include "qdisplay/AbstractEventHandler.hpp"
 
+%include "qdisplay/Ellipsoid.hpp"
 %include "qdisplay/Line.hpp"
 %include "qdisplay/PolyLine.hpp"
 

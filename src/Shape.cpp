@@ -1,3 +1,5 @@
+/* $Id:$ */
+
 #include "qdisplay/Shape.hpp"
 
 #include <QPainter>
@@ -10,9 +12,9 @@ namespace jafar {
 namespace qdisplay {
 
 Shape::Shape(ShapeType shapeType, double x, double y, double w, double h) :
-    m_shapeType(shapeType), m_boundingRect(-w * 0.5, -h * 0.5, w, h), m_label(0), m_fontSize(5)
+    m_shapeType(shapeType), m_label(0), m_fontSize(5)
 {
-  setPos(x,y);
+  setBoundingBox(x, y, w, h );
 }
 
 void Shape::paint(QPainter *painter, const QStyleOptionGraphicsItem * opt, QWidget * wdg)
@@ -43,6 +45,12 @@ void Shape::setLabel(char * text)
     addToGroup(m_label);
   }
   m_label->setPlainText(text);
+}
+  
+void Shape::setBoundingBox( double x, double y, double w, double h)
+{
+  m_boundingRect = QRectF( -w * 0.5, -h * 0.5, w, h );
+  setPos(x,y);
 }
   
 }

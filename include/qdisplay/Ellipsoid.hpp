@@ -8,9 +8,18 @@
 
 namespace jafar {
   namespace qdisplay {
+    /**
+     * @ingroup qdisplay
+     * This class allow to display the uncertainty ellipsoid around a point.
+     */
     class Ellipsoid : public Shape {
       public:
-        Ellipsoid( const jblas::vec2& _x, const jblas::sym_mat22& _xCov );
+        /**
+         * @param _x center of the ellipsoid
+         * @param _xCov covariance matrix
+         * @param _scale scale of the ellipsoid
+         */
+        Ellipsoid( const jblas::vec2& _x, const jblas::sym_mat22& _xCov, double _scale = 3.0 );
     };
   }
 }

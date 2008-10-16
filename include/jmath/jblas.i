@@ -8,6 +8,7 @@
 %{
 
 #include "jmath/jblas.hpp"
+#include "jmath/boundedSymmetricMatrix.hpp"
 
 %}
 
@@ -18,6 +19,7 @@
 %include "jmath/ublasVector.i"
 %include "jmath/ublasMatrix.i"
 %include "jmath/jblas.hpp"
+%include "jmath/boundedSymmetricMatrix.i"
 
 /* wrap vector */
 
@@ -30,6 +32,8 @@
 
 %nodefault boost::numeric::ublas::vector_range<jblas::vec>;
 %template(vec_range) boost::numeric::ublas::vector_range<jblas::vec>;
+
+%template(sym_mat22) jblas::bounded_symmetric_matrix<double, 2>;
 
 
 /* wrap matrix */

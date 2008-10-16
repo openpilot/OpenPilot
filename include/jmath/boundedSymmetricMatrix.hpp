@@ -10,7 +10,7 @@ namespace jblas {
   template<class T, std::size_t M, class TRI = boost::numeric::ublas::lower, class L = boost::numeric::ublas::row_major>
   class bounded_symmetric_matrix:
       public boost::numeric::ublas::symmetric_matrix<T, TRI, L, boost::numeric::ublas::bounded_array<T, M * M> > {
-
+  public:
       typedef boost::numeric::ublas::symmetric_matrix<T, TRI, L, boost::numeric::ublas::bounded_array<T, M * M> > symmetric_matrix_type;
   public:
       typedef typename symmetric_matrix_type::size_type size_type;

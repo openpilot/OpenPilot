@@ -484,14 +484,6 @@ namespace jafar {
 	return det;
       }
 
-      /** Fills all matrix cells with the same value
-       */
-      template<class M>
-      void fillMatrix(M& m, const double& value=0.0) {
-        for (std::size_t i = 0 ; i < m.size1() ; ++i)
-          for (std::size_t j = 0 ; j < m.size2() ; ++j)
-            m(i)(j) = value;
-      }
       /**
        * @return the eigen values of a 2x2 matrix
        */
@@ -505,6 +497,7 @@ namespace jafar {
         v(1) = 0.5 * ( tr - sq );
         return v;
       }
+
     } // namespace ublasExtra
 
     /*\@}*/

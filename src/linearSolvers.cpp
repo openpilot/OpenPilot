@@ -102,9 +102,9 @@ namespace jafar {
 
         /* solve R^t y = A^t b */
         X = ublas::prod(ublas::trans(A), B);
-        ublas::blas_3::tsm(X, 1.0, ublas::trans(R), ublas::upper_tag());
+        X = ublas::blas_3::tsm(X, 1.0, ublas::trans(R), ublas::upper_tag());
         /* solve Rx = y (y was saved in A^t b) */
-        ublas::blas_3::tsm(X, 1.0, R, ublas::upper_tag());
+        X = ublas::blas_3::tsm(X, 1.0, R, ublas::upper_tag());
         return 1;
       }
   
@@ -122,11 +122,6 @@ namespace jafar {
                                        __LINE__));
           return 0;
         }
-        //   I don't know if it is better yo use potrs and oblige B to be column major or to use these
-        //   /* solve the linear system U^t y = b */
-        //   ublas::blas_3::tsm(B, 1.0, ublas::trans(A), ublas::upper_tag());
-        //   /* solve the linear system U x = y */
-        //   ublas::blas_3::tsm(B, 1.0, A, ublas::upper_tag());
         error = lapack::potrs('U', A, B);
         if (error != 0){
           throw(jmath::LapackException(error, 
@@ -151,17 +146,14 @@ namespace jafar {
         return result;
       }
 
-      int solve_LU(const jblas::mat& A, const jblas::vec& b, jblas::vec& x){
-        JFR_PRECOND(A.size1() == A.size2() == b.size(),
-                    "LinearSolver: invalid size. A is mxm and b is mx1");
+      int solve_LU(jblas::mat_column_major A, jblas::vec b, jblas::vec& x){
+        JFR_PRECOND( ((A.size1() == A.size2()) && (A.size1() == b.size()) && (A.size2() == x.size())),
+                    "LinearSolver: invalid size. A is "<<A.size1()<<"x"<<A.size2() << " and b is "<<b.size()<<"x1");
         size_t size = b.size();
         int error = 0;
         jblas::veci ipiv(size);
-        jblas::mat_column_major m_A(size, size);
-        m_A.assign(A);
-
         /* LU decomposition of A */
-        error = lapack::getrf(m_A, ipiv);
+        error = lapack::getrf(A, ipiv);
         if (error != 0){
           throw(jmath::LapackException(error, 
                                        "solve_LU: error in lapack::getrf() routine",
@@ -173,7 +165,7 @@ namespace jafar {
         /* solve with computed LU */
         jblas::mat_column_major B(size,1);		// getrs accepts two matrices
         column(B,0) = b;	// assign b to first column of B (need matrix_proxy.hpp)
-        error = lapack::getrs(m_A, ipiv, B);
+        error = lapack::getrs(A, ipiv, B);
         if (error != 0){
           throw(jmath::LapackException(error, 
                                        "solve_LU: error in lapack::getrs() routine",

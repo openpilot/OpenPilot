@@ -89,6 +89,9 @@
 %template(print) jafar::jmath::print<jblas::sym_mat_range>;
 %template(prettyPrint) jafar::jmath::ublasExtra::prettyFormat<jblas::sym_mat_range>;
 
+%template(print) jafar::jmath::print<jblas::sym_mat22>;
+
+
 %template(max) jafar::jmath::ublasExtra::max<jblas::mat>;
 %template(max) jafar::jmath::ublasExtra::max<jblas::sym_mat>;
 %template(trace) jafar::jmath::ublasExtra::trace<jblas::mat>;

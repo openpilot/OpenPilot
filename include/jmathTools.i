@@ -74,6 +74,13 @@ namespace jafar {
       return ublas::prod(t1, t2);
     }
     
+     template<class T, class T2>
+    T& assignVec3(T& t1, const T2& t2)
+    {
+      return t1.assign(t2);
+    }
+    
+
     template<class T, class T2>
     T& assignMat(T& t1, const T2& t2)
     {

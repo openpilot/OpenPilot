@@ -104,6 +104,7 @@
 %template(mul) jafar::jmath::scalmul<jblas::vec,double>;
 %template(div) jafar::jmath::div<jblas::vec, double>;
 %template(div) jafar::jmath::div<jblas::vec, int>;
+%template(assignVec3) jafar::jmath::assignVec3<jblas::vec,jblas::vec3>;
 /* matrix */
 %template(add) jafar::jmath::add<jblas::mat>;
 %template(sub) jafar::jmath::sub<jblas::mat>;

@@ -16,11 +16,26 @@ viewer.setImageView(imageview)
 return viewer
 end
 
+def Qdisplay.showimages(images)
+  viewer = Jafar::Qdisplay::Viewer.new
+  pos = 0
+  images.each() { |image|
+  imageview = Jafar::Qdisplay::ImageView.new(image)
+    viewer.setImageView(imageview, pos)
+    pos += 1
+  }
+  return viewer
+end
+
 def Qdisplay.showfile(filename)
 image = Jafar::Image::Image.loadImage(filename)
 return Qdisplay.showimage(image)
 end
     
+#
+# EventHandler that you can use with a display object to display
+# the X and Y coordinates where the display was clicked
+#
 class DisplayEventHandler < AbstractEventHandler
   def initialize
     super()
@@ -29,9 +44,17 @@ class DisplayEventHandler < AbstractEventHandler
     puts "Button: #{button} Coordinate: (#{x}, #{y})"
   end
 end
-
+#
+# This class allow to draw a RobotTrajectory on a display viewer.
+# It's basically a PolyLine with a few convenient function to
+# add robot pose or robot movement with a T3DEuler
+#
 class RobotTrajectory < PolyLine
   attr_reader :lastPose
+  #
+  # indexX the index of the T3D vector used for the X-coordinate
+  # indexY the index of the T3D vector used for the Y-coordinate 
+  #
   def initialize(scale = 10.0, indexX = 0, indexY = 1)
     super(scale)
     require 'jafar/geom'
@@ -56,6 +79,38 @@ class RobotTrajectory < PolyLine
   end
 end
 
+#
+# Always colorize shape with the same color
+#
+class ConstantColorizer
+  def initialize( color = [255, 0, 0] )
+    @color = color
+  end
+  def colorizeFor( id, shape )
+    shape.setColor( @color[0], @color[1], @color[2] )
+  end
+end
+
+#
+# Colorize shapes with a different color for each id
+#
+class OneColorPerIdColorizer
+  def initialize
+    @colors = []
+  end
+  def colorizeFor( id, shape )
+    c = @colors[id]
+    if( c.nil? )
+      c = [ (rand * 255).to_i, (rand * 255).to_i, (rand * 255).to_i ]
+      @colors[id] = c
+    end
+    shape.setColor( c[0], c[1], c[2] )
+  end
+end
+
+#
+# Show a list points on an image inside a viewer
+#
 def Qdisplay.showPoints( image, arrPoints, showCount = false, color = [255,0,0] )
   viewer = Qdisplay::Viewer.new
   view = Qdisplay::ImageView.new( image )

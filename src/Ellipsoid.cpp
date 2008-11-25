@@ -21,11 +21,11 @@ Ellipsoid::Ellipsoid( const jblas::vec2& _x, const jblas::sym_mat22& _xCov, doub
   if (!ierr==0) {
     JFR_WARNING("Ellipsoid::Ellipsoid: error in lapack::syev() function, ierr=" << ierr);
   } else {
+    JFR_DEBUG(_xCov << " " << lambda);
     if( lambda( 0 ) < 0 ) lambda( 0 ) = 0;
     if( lambda( 1 ) < 0 ) lambda( 1 ) = 0;
     setBoundingBox( _x(0), _x(1), _scale * sqrt(lambda(0)), _scale * sqrt(lambda( 1 ) ) );
     setTransform( QTransform( A(0,0), A(0,1), A(1,0), A(1, 1), 0, 0 ) );
-    
   }
 }
 

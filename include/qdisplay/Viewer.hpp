@@ -13,6 +13,7 @@ class Shape;
 class Line;
 class PolyLine;
 /**
+ * @ingroup qdisplay
  * This is the viewer, you can add ImageView to display on it, or overlay using Shape.
  */
 class Viewer : public QGraphicsView {
@@ -77,6 +78,11 @@ class Viewer : public QGraphicsView {
   public:
 #endif
     void exportView();
+  public:
+    /**
+     * Export the view to the given file name.
+     */
+    void exportView( const std::string& fileName );
   protected:
     virtual void contextMenuEvent ( QContextMenuEvent * event );
     virtual void mouseReleaseEvent ( QMouseEvent * event );

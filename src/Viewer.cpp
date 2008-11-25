@@ -210,6 +210,12 @@ void Viewer::exportView()
 {
   QString fileName = QFileDialog::getSaveFileName ( 0, "Export viewer content", "", "PDF Document (*.pdf);;Postscript (*.ps);;PNG Image (*.png);;Tiff Image (*.tiff);;Scalable Vector Graphics (*.svg)" );
   if(fileName == "") return;
+  exportView( fileName.toAscii().data() );
+}
+  
+void Viewer::exportView( const std::string& _fileName )
+{
+  QString fileName = _fileName.c_str();
   QString extension = fileName.split(".").last().toLower();
   if(extension == "pdf" or extension == "ps")
   {

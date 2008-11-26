@@ -15,7 +15,16 @@ Line::Line(double x1, double y1, double x2, double y2) : QGraphicsLineItem(x1,y1
 }
 void Line::setColor(int r, int g, int b)
 {
-  setPen(QPen(QColor(r,g,b)));
+  QPen p(pen());
+  p.setBrush(QColor(r,g,b));
+  setPen(p);
+}
+
+void Line::setWidth( double _width )
+{
+  QPen p(pen());
+  p.setWidth(_width);
+  setPen(p);
 }
 
 void Line::setLabel(char * text)

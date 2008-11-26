@@ -10,6 +10,7 @@ class Line : public QGraphicsLineItem {
   public:
     /**
       * Create an Line to use with a Viewer to display a basic shape.
+      * @ingroup qdisplay
       */
     Line(double x1, double y1, double x2, double y2);
     /**
@@ -19,6 +20,10 @@ class Line : public QGraphicsLineItem {
      * @param b blue [0 to 255]
      */
     void setColor(int r, int g, int b);
+    /**
+     * Set the width of the line.
+     */
+    void setWidth( double _width );
     /**
      * Set the position of the shape
      * @param x

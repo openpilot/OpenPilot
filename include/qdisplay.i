@@ -62,6 +62,12 @@
 #endif
 %include "qdisplay/Viewer.hpp"
 
+%extend jafar::qdisplay::Viewer {
+  void setUpdatesEnabled( bool enable )
+  {
+    self->setUpdatesEnabled( enable );
+  }
+}
 
 
 

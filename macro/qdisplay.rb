@@ -128,5 +128,36 @@ def Qdisplay.showPoints( image, arrPoints, showCount = false, color = [255,0,0] 
   }
 end
 
+#
+# Show the gradients of an image
+#
+
+def Qdisplay.showGradients( image )
+  # Compute Sobel
+  sobelX = Image::Image.new( image.width(), image.height(), Image::IPL_DEPTH_16S, Image::JfrImage_CS_GRAY )
+  Image::cvSobel( image, sobelX, 1,0,3)
+  sobelY = Image::Image.new( image.width(), image.height(), Image::IPL_DEPTH_16S, Image::JfrImage_CS_GRAY )
+  Image::cvSobel( image, sobelY, 0,1,3)
+  
+  # Display image
+  viewer = Qdisplay::Viewer.new
+  view = Qdisplay::ImageView.new( image )
+  viewer.setImageView( view )
+  viewer.setUpdatesEnabled( false )
+  # Draw lines
+  for y in 0...image.height
+    puts "#{y} / #{image.height}"
+    for x in 0...image.width
+      dy = sobelY.getPixelValueShort( x,y );
+      dx = sobelX.getPixelValueShort( x,y );
+      norm = Math.sqrt( dx * dx + dy * dy ) / 255
+      angle = Math.atan2( dy, dx )
+      l = Qdisplay::Line.new( x + 0.5, y + 0.5, x + 0.5 + norm * Math.cos(angle), y + 0.5 + norm * Math.sin( angle ) )
+      view.addLine( l )
+    end
+  end
+  viewer.setUpdatesEnabled( true )
+end
+
 end
 end

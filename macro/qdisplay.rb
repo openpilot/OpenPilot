@@ -89,6 +89,9 @@ class ConstantColorizer
   def colorizeFor( id, shape )
     shape.setColor( @color[0], @color[1], @color[2] )
   end
+  def color( id )
+    return @color
+  end
 end
 
 #
@@ -96,7 +99,7 @@ end
 #
 class OneColorPerIdColorizer
   def initialize
-    @colors = []
+    @colors = {}
   end
   def colorizeFor( id, shape )
     c = @colors[id]
@@ -105,6 +108,9 @@ class OneColorPerIdColorizer
       @colors[id] = c
     end
     shape.setColor( c[0], c[1], c[2] )
+  end
+  def color( id )
+    return @colors[id]
   end
 end
 

@@ -59,6 +59,9 @@
 %template(setValue) jafar::jmath::setValueVec<jblas::vec3>;
 %template(print) jafar::jmath::print<jblas::vec3>;
 
+%template(setValue) jafar::jmath::setValueVec<jblas::vec4>;
+%template(print) jafar::jmath::print<jblas::vec4>;
+
 %template(normalize) jafar::jmath::ublasExtra::normalize<jblas::vec>;
 
 %template(setSizeValue) jafar::jmath::setSizeValue<jblas::mat>;

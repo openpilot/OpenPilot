@@ -181,7 +181,7 @@ namespace jafar {
       }
 
       int solve_SVD(const jblas::mat& A, const jblas::vec& b, jblas::vec& x){
-        JFR_PRECOND(A.size1() == A.size2() == b.size(),
+        JFR_PRECOND( A.size1() == A.size2() and A.size1() == b.size(),
                     "LinearSolver: invalid size. A is mxm and b is mx1");
         size_t size = b.size();
         int error = 0;

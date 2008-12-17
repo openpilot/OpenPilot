@@ -59,6 +59,7 @@ namespace jblas {
   typedef boost::numeric::ublas::bounded_vector<double,3> vec3;
   /// 4 dimension vector
   typedef boost::numeric::ublas::bounded_vector<double,4> vec4;
+  typedef boost::numeric::ublas::vector_range<vec4> vec4_range; 
   /// 6 dimension vector
   typedef boost::numeric::ublas::bounded_vector<double,6> vec6;
   /// 8 dimension vector

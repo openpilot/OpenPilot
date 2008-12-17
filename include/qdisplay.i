@@ -38,6 +38,9 @@
 %include "jafar.i"
 %import "jmath/jblas.i"
 
+#define slots
+#define signals protected
+#define Q_OBJECT
 
 %include "qdisplayException.i"
 %include "qdisplay/Shape.hpp"
@@ -56,6 +59,12 @@
     %apply SWIGTYPE *DISOWN { jafar::qdisplay::Shape* si };
 #endif
 %include "qdisplay/ImageView.hpp"
+
+class QGraphicsView {
+    QGraphicsView();
+  public:
+    void hide();
+};
 
 #if defined(SWIGRUBY)
     %apply SWIGTYPE *DISOWN { jafar::qdisplay::ImageView* ii };

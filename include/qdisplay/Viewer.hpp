@@ -17,9 +17,7 @@ class PolyLine;
  * This is the viewer, you can add ImageView to display on it, or overlay using Shape.
  */
 class Viewer : public QGraphicsView {
-#ifndef SWIG
   Q_OBJECT
-#endif
   public:
     /**
      * Create a new viewer
@@ -72,11 +70,7 @@ class Viewer : public QGraphicsView {
      * Close the view
      */
     void close();
-#ifndef SWIG
   public slots:
-#else
-  public:
-#endif
     void exportView();
   public:
     /**

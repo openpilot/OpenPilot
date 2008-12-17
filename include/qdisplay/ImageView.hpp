@@ -21,9 +21,7 @@ namespace qdisplay {
  * the command addShape
  */
 class ImageView : public QObject, public QGraphicsItemGroup {
-#ifndef SWIG
   Q_OBJECT
-#endif
   public:
     /**
      * Create an ImageView to use with a Viewer to display a jafar::image::Image in the Viewer.
@@ -51,11 +49,7 @@ class ImageView : public QObject, public QGraphicsItemGroup {
      * this view is deleted
      */
     inline void setEventHandler(AbstractEventHandler* eh) { m_eventHandler = eh; }
-#ifndef SWIG
   public slots:
-#else
-  public:
-#endif
     void lutRandomize();
     void lutGrayscale();
     void lutInvertGrayscale();

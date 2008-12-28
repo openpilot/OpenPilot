@@ -97,7 +97,6 @@
 
 %template(print) jafar::jmath::print<jblas::sym_mat22>;
 
-
 %template(max) jafar::jmath::ublasExtra::max<jblas::mat>;
 %template(max) jafar::jmath::ublasExtra::max<jblas::sym_mat>;
 %template(trace) jafar::jmath::ublasExtra::trace<jblas::mat>;
@@ -130,7 +129,6 @@
 %template(assignMat) jafar::jmath::assignMat<jblas::sym_mat,jblas::mat>;
 
 %template(getElementAt) jafar::jmath::getElementAt<jblas::vec2>;
-
 
 %include "jmath/random.hpp"
 

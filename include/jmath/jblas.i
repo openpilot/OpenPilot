@@ -30,6 +30,8 @@
 
 %template(vec3) boost::numeric::ublas::bounded_vector<double,3>;
 
+%template(vec6) boost::numeric::ublas::bounded_vector<double,6>;
+
 %nodefault boost::numeric::ublas::vector_range<jblas::vec>;
 %template(vec_range) boost::numeric::ublas::vector_range<jblas::vec>;
 

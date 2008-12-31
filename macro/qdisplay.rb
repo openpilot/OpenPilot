@@ -102,15 +102,16 @@ class OneColorPerIdColorizer
     @colors = {}
   end
   def colorizeFor( id, shape )
+    c = color(id)
+    shape.setColor( c[0], c[1], c[2] )
+  end
+  def color( id )
     c = @colors[id]
     if( c.nil? )
       c = [ (rand * 255).to_i, (rand * 255).to_i, (rand * 255).to_i ]
       @colors[id] = c
     end
-    shape.setColor( c[0], c[1], c[2] )
-  end
-  def color( id )
-    return @colors[id]
+    return c
   end
 end
 

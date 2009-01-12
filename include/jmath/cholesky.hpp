@@ -230,8 +230,8 @@ template< class MATRIX >
 void cholesky_invert (MATRIX &M)
 {
   using namespace ublas; 
-  typedef typename M::size_type size_type;
-  typedef typename M::value_type value_type;
+  typedef typename MATRIX::size_type size_type;
+  typedef typename MATRIX::value_type value_type;
 
   size_type size = M.size1();
 

@@ -29,6 +29,8 @@ class ImageView : public QObject, public QGraphicsItemGroup {
      */
     ImageView(const jafar::image::Image& img);
     ~ImageView();
+    int imageWidth() const;
+    int imageHeight() const;
     /**
      * @param img a jafar image to display
      */

@@ -287,4 +287,14 @@ void ImageView::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
   QGraphicsItemGroup::mouseReleaseEvent(event);
 }
 
+int ImageView::imageWidth() const
+{
+  return m_image.width();
+}
+
+int ImageView::imageHeight() const
+{
+  return m_image.height();
+}
+
 #include "ImageView.moc"

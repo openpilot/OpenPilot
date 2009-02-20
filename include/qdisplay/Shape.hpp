@@ -19,7 +19,6 @@ class Shape : public QGraphicsItemGroup {
       ShapeCross,
       ShapeEllipse
     };
-    Shape(ShapeType shapeType);
     /**
       * Create an Shape to use with a Viewer to display a basic shape.
       * @param x x-coordinate of the center of the shape

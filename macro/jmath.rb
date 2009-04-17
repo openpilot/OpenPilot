@@ -8,6 +8,10 @@ module Jafar
       strs = print(v).split(/\(|\,|\)/)
       return [strs[1].to_f, strs[2].to_f]
     end
+    def Jmath.vec3ToArray(v)
+      strs = print(v).split(/\(|\,|\)/)
+      return [strs[1].to_f, strs[2].to_f, strs[3].to_f]
+    end
     def Jmath.vecToArray(v)
       strs = print(v).split(/\(|\,|\)/)
       a = []

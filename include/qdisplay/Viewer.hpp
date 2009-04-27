@@ -66,6 +66,12 @@ class Viewer : public QGraphicsView {
      * @param scaleFactor the scale factor to appply to the view
      */
     void scaleView(qreal scaleFactor);
+		/**
+		 * Set the window size parameters
+		 * @param width width of window
+		 * @param height height of window
+		 */
+		void setWindowSize( int width, int height );
     /**
      * Close the view
      */
@@ -86,6 +92,7 @@ class Viewer : public QGraphicsView {
     QGraphicsScene* m_scene;
     QMap< int, QMap< int, ImageView* > > m_imageMosaic;
     int m_mosaicWidth, m_mosaicHeight;
+		int m_windowWidth, m_windowHeight;			// added
     double m_currentZ;
     QAction *m_exportView;
 };

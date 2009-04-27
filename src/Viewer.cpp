@@ -29,10 +29,18 @@ using namespace jafar::qdisplay;
   
 Viewer::Viewer(int mosaicWidth, int mosaicHeight, QGraphicsScene* scene ) : m_scene(scene), m_mosaicWidth(mosaicWidth), m_mosaicHeight(mosaicHeight), m_currentZ(0.)
 {
+	m_windowWidth = -1;	// norman
+	m_windowHeight = -1;	// norman
+	
   if(not m_scene) {
     m_scene = new QGraphicsScene();
   }
   m_scene->setBackgroundBrush( Qt::white );
+	// added by norman
+	if ((m_windowHeight > 0) and (m_windowWidth > 0))
+	{
+		setGeometry(0,0,m_windowWidth,m_windowHeight);
+	}
   show();
   setScene(m_scene);
   ViewerManager::registerViewer( this );
@@ -45,6 +53,12 @@ Viewer::~Viewer()
   ViewerManager::unregisterViewer( this );
 }
 
+// added by norman
+void Viewer::setWindowSize( int width, int height )
+{
+	m_windowWidth = width;
+	m_windowHeight = height;
+}
 
 void Viewer::addShape(qdisplay::Shape* si) {
   scene()->addItem(si);
@@ -80,6 +94,12 @@ void Viewer::setImageView(ImageView* ii, int row, int col)
     resize( m_mosaicWidth, m_mosaicHeight );
   }
   ii->setPos( row * m_mosaicWidth, col*m_mosaicHeight);
+	
+	// added by norman
+	if ((m_windowHeight > 0) and (m_windowWidth > 0))
+	{
+		setGeometry(0,0,m_windowWidth,m_windowHeight);
+	}
 }
 
 int Viewer::rows()

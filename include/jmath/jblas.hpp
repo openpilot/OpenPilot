@@ -97,6 +97,10 @@ namespace jblas {
   /// 8x8 dimension matrix
   typedef boost::numeric::ublas::bounded_matrix<double,8,8> mat88;
   typedef boost::numeric::ublas::matrix_range<mat88> mat88_range;
+	
+	/// 9x9 dimension matrix
+	typedef boost::numeric::ublas::bounded_matrix<double,9,9> mat99;
+	typedef boost::numeric::ublas::matrix_range<mat99> mat99_range;
 
   /// standard symmetric matrix type
   typedef boost::numeric::ublas::symmetric_matrix<double> sym_mat;
@@ -134,7 +138,15 @@ namespace jblas {
   typedef boost::numeric::ublas::vector<int> veci;
   /// 2 dimension vector
   typedef boost::numeric::ublas::bounded_vector<int,2> veci2;
-
+  /// 3 dimension vector
+	typedef boost::numeric::ublas::bounded_vector<int,3> veci3;
+	/// 4 dimension vector
+	typedef boost::numeric::ublas::bounded_vector<int,4> veci4;
+	
+	typedef boost::numeric::ublas::zero_vector<int> zero_veci;
+	typedef boost::numeric::ublas::matrix<int> mati;
+	typedef boost::numeric::ublas::zero_matrix<int> zero_mati;
+	
   /*
    * scalar type bool
    */

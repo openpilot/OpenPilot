@@ -25,12 +25,12 @@
 
 // vector of double
 %template(vec) boost::numeric::ublas::vector<double>;
-
 %template(vec2) boost::numeric::ublas::bounded_vector<double,2>;
-
 %template(vec3) boost::numeric::ublas::bounded_vector<double,3>;
-
+%template(vec4) boost::numeric::ublas::bounded_vector<double,4>;
 %template(vec6) boost::numeric::ublas::bounded_vector<double,6>;
+%template(veci4) boost::numeric::ublas::bounded_vector<int,4>;
+
 
 %nodefault boost::numeric::ublas::vector_range<jblas::vec>;
 %template(vec_range) boost::numeric::ublas::vector_range<jblas::vec>;
@@ -42,6 +42,10 @@
 
 // matrix of double
 %template(mat) boost::numeric::ublas::matrix<double>;
+%template(mat22) boost::numeric::ublas::bounded_matrix<double,2,2>;
+%template(mat33) boost::numeric::ublas::bounded_matrix<double,3,3>;
+%template(mat44) boost::numeric::ublas::bounded_matrix<double,4,4>;
+%template(mat99) boost::numeric::ublas::bounded_matrix<double,9,9>;
 
 // column major matrix of double
 %template(mat_column_major) boost::numeric::ublas::matrix<double, boost::numeric::ublas::column_major>;
@@ -53,7 +57,9 @@
 };
 %template(sym_mat) boost::numeric::ublas::symmetric_matrix<double>;
 
+
 %nodefault boost::numeric::ublas::matrix_range<jblas::sym_mat>;
 %template(sym_mat_range) boost::numeric::ublas::matrix_range<jblas::sym_mat>;
 
 %template(mat44) boost::numeric::ublas::bounded_matrix<double,4,4>;
+/* %template(mat55) boost::numeric::ublas::bounded_matrix<double,5,5>; */

@@ -157,6 +157,16 @@ namespace jafar {
         return v(rank);
       }
     };
+		
+		/** Dummy function that returns the (i,j)th element of a mat
+		* 
+		*/
+		template<class Mat>
+				double getMatElementAt(const Mat& m, const unsigned int& i, const unsigned int& j) {
+			if( (i < m.size1() ) and (j < m.size2() )) {
+				return m(i,j);
+			}
+				};
  
   }
 }

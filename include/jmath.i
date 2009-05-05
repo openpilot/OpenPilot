@@ -65,6 +65,9 @@
 %template(setValue) jafar::jmath::setValueVec<jblas::vec6>;
 %template(print) jafar::jmath::print<jblas::vec6>;
 
+%template(setValue) jafar::jmath::setValueVec<jblas::veci4>;
+%template(print) jafar::jmath::print<jblas::veci4>;
+
 %template(normalize) jafar::jmath::ublasExtra::normalize<jblas::vec>;
 
 %template(setSizeValue) jafar::jmath::setSizeValue<jblas::mat>;
@@ -74,6 +77,11 @@
 %template(lu_inv) jafar::jmath::ublasExtra::lu_inv<jblas::mat, jblas::mat>;
 %template(lu_det) jafar::jmath::ublasExtra::lu_det<jblas::mat>;
 //%template(svd_inv) jafar::jmath::ublasExtra::svd_inv<jblas::mat,jblas::mat>;
+
+%template(setSizeValue) jafar::jmath::setSizeValue<jblas::mat22>;
+%template(setValue) jafar::jmath::setValueMat<jblas::mat22>;
+%template(print) jafar::jmath::print<jblas::mat22>;
+%template(prettyPrint) jafar::jmath::ublasExtra::prettyFormat<jblas::mat22>;
 
 %template(setSizeValue) jafar::jmath::setSizeValue<jblas::mat33>;
 %template(setValue) jafar::jmath::setValueMat<jblas::mat33>;
@@ -105,6 +113,9 @@
 /* wrap operation to be able to do operations on vector/matrix in jafar */
 %template(add) jafar::jmath::add<jblas::vec>;
 %template(sub) jafar::jmath::sub<jblas::vec>;
+%template(sub) jafar::jmath::sub<jblas::vec2>;
+%template(sub) jafar::jmath::sub<jblas::vec3>;
+%template(sub) jafar::jmath::sub<jblas::vec4>;
 %template(mul) jafar::jmath::scalmul<jblas::vec,int>;
 %template(mul) jafar::jmath::scalmul<jblas::vec,double>;
 %template(div) jafar::jmath::div<jblas::vec, double>;
@@ -113,22 +124,36 @@
 /* matrix */
 %template(add) jafar::jmath::add<jblas::mat>;
 %template(sub) jafar::jmath::sub<jblas::mat>;
+%template(sub) jafar::jmath::sub<jblas::mat33>;
 %template(mul) jafar::jmath::scalmul<jblas::mat,int>;
 %template(mul) jafar::jmath::scalmul<jblas::mat,double>;
 %template(mul) jafar::jmath::vecmatmul<jblas::mat,jblas::vec>;
+%template(mul) jafar::jmath::vecmatmul<jblas::mat33,jblas::vec3>;
+%template(mul) jafar::jmath::vecmatmul<jblas::mat33,jblas::vec>;
 %template(mul) jafar::jmath::vecmatmul<jblas::mat44,jblas::vec>;
+%template(mul) jafar::jmath::matmatmul<jblas::mat22,jblas::mat22,jblas::mat22>;
+%template(mul) jafar::jmath::matmatmul<jblas::mat33,jblas::mat33,jblas::mat33>;
 %template(mul) jafar::jmath::matmatmul<jblas::mat,jblas::mat,jblas::mat>;
 %template(mul) jafar::jmath::matmatmul<jblas::sym_mat,jblas::mat,jblas::mat>;
 %template(mul) jafar::jmath::matmatmul<jblas::sym_mat,jblas::sym_mat,jblas::sym_mat>;
 %template(mul) jafar::jmath::matmatmul<jblas::mat,jblas::sym_mat,jblas::mat>;
 %template(div) jafar::jmath::div<jblas::mat, double>;
+%template(div) jafar::jmath::div<jblas::mat, float>;
 %template(div) jafar::jmath::div<jblas::mat, int>;
+%template(div) jafar::jmath::div<jblas::mat33, double>;
+%template(div) jafar::jmath::div<jblas::mat33, float>;
 %template(inv) jafar::jmath::inv<jblas::mat44>;
 %template(inv) jafar::jmath::inv<jblas::mat>;
 %template(trans) jafar::jmath::trans<jblas::mat>;
+%template(trans) jafar::jmath::trans<jblas::mat22>;
 %template(assignMat) jafar::jmath::assignMat<jblas::sym_mat,jblas::mat>;
 
 %template(getElementAt) jafar::jmath::getElementAt<jblas::vec2>;
+%template(getElementAt) jafar::jmath::getElementAt<jblas::vec3>;
+%template(getElementAt) jafar::jmath::getElementAt<jblas::vec4>;
+%template(getElementAt) jafar::jmath::getMatElementAt<jblas::mat22>;
+%template(getElementAt) jafar::jmath::getMatElementAt<jblas::mat33>;
+%template(getElementAt) jafar::jmath::getMatElementAt<jblas::mat44>;
 
 %include "jmath/random.hpp"
 

@@ -320,11 +320,7 @@ namespace jafar {
        * \warning it returns a double whatever matrix type...
        */
       template<class M>
-#ifdef THALES_TAROT
-			double maxM(const M& m_) {
-#else
-			double max(const M& m_) {
-#endif
+      double max(const M& m_) {
         double max = m_(0,0);
         for (std::size_t i=0 ; i < m_.size1() ; i++) {
           for (std::size_t j=0 ; j < m_.size2() ; j++) {
@@ -336,8 +332,8 @@ namespace jafar {
         return max;
       }
 
-      /** Find maximum value of a vector.
-       * \warning it returns a double whatever vector type...
+      /** Find maximum value of a matrix.
+       * \warning it returns a double whatever matrix type...
        */
       template<class V>
       double maxV(const V& v_) {

@@ -1,5 +1,17 @@
 #!/bin/sh
 
-uic-qt4 AddShapeDialog.ui > AddShapeDialog.h
-moc-qt4 ../include/qdisplay/ImageView.hpp > ImageView.moc
-moc-qt4 ../include/qdisplay/Viewer.hpp > Viewer.moc
+if [ `which moc-qt4 2> /dev/null` ]; then
+	UIC_CMD=uic-qt4
+	MOC_CMD=moc-qt4
+else if [ `which moc 2> /dev/null` ]; then
+	UIC_CMD=uic
+	MOC_CMD=moc
+else
+	echo Missing moc and/or uic
+	exit
+fi
+fi
+
+$UIC_CMD AddShapeDialog.ui > AddShapeDialog.h
+$MOC_CMD ../include/qdisplay/ImageView.hpp > ImageView.moc
+$MOC_CMD ../include/qdisplay/Viewer.hpp > Viewer.moc

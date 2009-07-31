@@ -6,9 +6,9 @@
 \version 0.1
 
 \author 
-  toto@laas.fr
+  jafar@laas.fr
 
-  Short description of the module goes here...
+  This modules enables the display of objects jafar::image::JfrImage for Ruby scripts.
 
 \section secQdisplayHistory  History
 

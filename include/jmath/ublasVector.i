@@ -28,7 +28,7 @@ namespace boost { namespace numeric { namespace ublas {
 //    %rename(get) operator();
 //    const_reference operator() (size_type i) const;
 
-		%addmethods {
+		%extend {
     const_reference get(size_type i) const{
       return (*self)(i);
     }
@@ -61,7 +61,7 @@ namespace boost { namespace numeric { namespace ublas {
 //   %rename(get) operator();
 //    const_reference operator() (size_type i) const;
 
-		%addmethods {
+		%extend {
     	const_reference get(size_type i) const{
       	return (*self)(i);
     	}
@@ -81,7 +81,7 @@ namespace boost { namespace numeric { namespace ublas {
 //    %rename(get) operator();
 //    const_reference operator() (size_type i) const;
 	
-		%addmethods {
+		%extend {
     const_reference get(size_type i) const{
       return (*self)(i);
     }

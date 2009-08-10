@@ -98,10 +98,10 @@ namespace jblas {
   typedef boost::numeric::ublas::bounded_matrix<double,8,8> mat88;
   typedef boost::numeric::ublas::matrix_range<mat88> mat88_range;
 	
-	/// 9x9 dimension matrix
-	typedef boost::numeric::ublas::bounded_matrix<double,9,9> mat99;
-	typedef boost::numeric::ublas::matrix_range<mat99> mat99_range;
-
+  /// 9x9 dimension matrix
+  typedef boost::numeric::ublas::bounded_matrix<double,9,9> mat99;
+  typedef boost::numeric::ublas::matrix_range<mat99> mat99_range;
+  
   /// standard symmetric matrix type
   typedef boost::numeric::ublas::symmetric_matrix<double> sym_mat;
   typedef boost::numeric::ublas::matrix_range<sym_mat> sym_mat_range; 
@@ -132,6 +132,27 @@ namespace jblas {
   typedef boost::numeric::ublas::compressed_matrix<double> sp_mat;
   
   /*
+   * Scalar type float
+   */
+
+  /// standard vector type
+  typedef boost::numeric::ublas::vector<float> vecf;
+  typedef boost::numeric::ublas::scalar_vector<float> scalar_vecf;
+
+  /// 1 dimension vector
+  typedef boost::numeric::ublas::bounded_vector<float,1> vecf1;
+  /// 2 dimension vector
+  typedef boost::numeric::ublas::bounded_vector<float,2> vecf2;
+  /// 3 dimension vector
+  typedef boost::numeric::ublas::bounded_vector<float,3> vecf3;
+  /// 4 dimension vector
+  typedef boost::numeric::ublas::bounded_vector<float,4> vecf4;
+  /// 6 dimension vector
+  typedef boost::numeric::ublas::bounded_vector<float,6> vecf6;
+  /// 8 dimension vector
+  typedef boost::numeric::ublas::bounded_vector<float,8> vecf8;
+
+  /*
    * scalar type int
    */
   /// unisized vector
@@ -139,13 +160,13 @@ namespace jblas {
   /// 2 dimension vector
   typedef boost::numeric::ublas::bounded_vector<int,2> veci2;
   /// 3 dimension vector
-	typedef boost::numeric::ublas::bounded_vector<int,3> veci3;
-	/// 4 dimension vector
-	typedef boost::numeric::ublas::bounded_vector<int,4> veci4;
-	
-	typedef boost::numeric::ublas::zero_vector<int> zero_veci;
-	typedef boost::numeric::ublas::matrix<int> mati;
-	typedef boost::numeric::ublas::zero_matrix<int> zero_mati;
+  typedef boost::numeric::ublas::bounded_vector<int,3> veci3;
+  /// 4 dimension vector
+  typedef boost::numeric::ublas::bounded_vector<int,4> veci4;
+  
+  typedef boost::numeric::ublas::zero_vector<int> zero_veci;
+  typedef boost::numeric::ublas::matrix<int> mati;
+  typedef boost::numeric::ublas::zero_matrix<int> zero_mati;
 	
   /*
    * scalar type bool

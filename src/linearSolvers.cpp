@@ -37,7 +37,9 @@ namespace jafar {
       namespace ublas = boost::numeric::ublas;
 
       int solve_QR(jblas::mat_column_major& A, const jblas::mat& B, jblas::mat& X){
-        JFR_PRECOND( A.size1() == B.size1() == A.size2() == X.size1(),
+        JFR_PRECOND( ((A.size1() == B.size1()) && 
+                     (B.size1() == A.size2()) && 
+                     (A.size2() == X.size1())),
                      "LinearSolver: invalid size. A is nxn, B and X are nxq");
         JFR_PRECOND( X.size2() == B.size2(),
                      "LinearSolver: invalid size. X is nxq and B is nxq");
@@ -77,7 +79,9 @@ namespace jafar {
       }
 
       int solve_QR_noQ(jblas::mat_column_major A, jblas::mat B, jblas::mat& X){
-        JFR_PRECOND( A.size1() == B.size1() == A.size2() == X.size1(),
+          JFR_PRECOND( ((A.size1() == B.size1()) && 
+                        (B.size1() == A.size2()) && 
+                        (A.size2() == X.size1())),
                      "LinearSolver: invalid size. A is nxn, X and B are nxq");
         JFR_PRECOND( X.size2() == B.size2(),
                      "LinearSolver: invalid size. X is nxq and B is nxq");
@@ -206,7 +210,7 @@ namespace jafar {
       }
 
       int solve_BK(const jblas::mat& A, const jblas::vec& b, jblas::vec& x){
-        JFR_PRECOND(A.size1() == A.size2() == b.size(),
+        JFR_PRECOND(((A.size1() == A.size2()) && (A.size2() == b.size())),
                     "LinearSolver: invalid size. A is mxm and b is mx1");
         size_t size = b.size();
         int error = 0;

@@ -263,6 +263,7 @@ void Viewer::exportView( const std::string& _fileName )
   {
     QSvgGenerator generator;
     generator.setFileName(fileName);
+    generator.setSize(scene()->sceneRect().size().toSize());
     QPainter painter(&generator);
     this->scene()->render(&painter);
     painter.end();

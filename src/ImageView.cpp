@@ -212,6 +212,8 @@ void ImageView::exportView()
   {
     QSvgGenerator generator;
     generator.setFileName(fileName);
+    generator.setResolution(100);
+    generator.setSize(scene()->sceneRect().size().toSize());
     QPainter painter(&generator);
     this->scene()->render(&painter);
   } else {

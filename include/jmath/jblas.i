@@ -36,7 +36,8 @@
 %template(vec_range) boost::numeric::ublas::vector_range<jblas::vec>;
 
 %template(sym_mat22) jblas::bounded_symmetric_matrix<double, 2>;
-
+%template(sym_mat33) jblas::bounded_symmetric_matrix<double, 3>;
+%template(sym_mat44) jblas::bounded_symmetric_matrix<double, 4>;
 
 /* wrap matrix */
 

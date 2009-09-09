@@ -242,7 +242,6 @@ void Viewer::exportView( const std::string& _fileName )
     QPrinter printer;
     printer.setOutputFileName(fileName);
     QSizeF sF = scene()->sceneRect().size().toSize();
-    if(sF.height() < sF.width() ) printer.setOrientation(QPrinter::Landscape);
     printer.setPageSize(QPrinter::Custom);
     printer.setPaperSize(QSizeF(sF.width(), sF.height() ), QPrinter::DevicePixel);
     printer.setPageMargins(0,0,0,0, QPrinter::DevicePixel);

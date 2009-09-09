@@ -51,6 +51,7 @@ class ImageView : public QObject, public QGraphicsItemGroup {
      * this view is deleted
      */
     inline void setEventHandler(AbstractEventHandler* eh) { m_eventHandler = eh; }
+    void exportView( const std::string& _fileName );
   public slots:
     void lutRandomize();
     void lutGrayscale();

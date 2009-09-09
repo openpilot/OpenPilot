@@ -185,6 +185,12 @@ void ImageView::exportView()
 {
   QString fileName = QFileDialog::getSaveFileName ( 0, "Export viewer content", "", "Supported format (*.pdf *.ps *.png *.tiff *.svg)" );
   if(fileName == "") return;
+  exportView( fileName.toAscii().data() );
+}
+
+void ImageView::exportView( const std::string& _fileName )
+{
+  QString fileName = _fileName.c_str();
   QString extension = fileName.split(".").last().toLower();
   if(extension == "pdf" or extension == "ps")
   {
@@ -192,6 +198,8 @@ void ImageView::exportView()
     printer.setOutputFileName(fileName);
     QSizeF sF = scene()->sceneRect().size().toSize();
     if(sF.height() < sF.width() ) printer.setOrientation(QPrinter::Landscape);
+    printer.setPageSize(QPrinter::Custom);
+    printer.setPaperSize(QSizeF(sF.width(), sF.height() ), QPrinter::DevicePixel);
     if(extension == "pdf") printer.setOutputFormat(QPrinter::PdfFormat);
     else printer.setOutputFormat(QPrinter::PostScriptFormat);
     QPainter painter(&printer);

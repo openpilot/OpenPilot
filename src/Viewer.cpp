@@ -245,6 +245,7 @@ void Viewer::exportView( const std::string& _fileName )
     if(sF.height() < sF.width() ) printer.setOrientation(QPrinter::Landscape);
     printer.setPageSize(QPrinter::Custom);
     printer.setPaperSize(QSizeF(sF.width(), sF.height() ), QPrinter::DevicePixel);
+    printer.setPageMargins(0,0,0,0, QPrinter::DevicePixel);
     if(extension == "pdf") printer.setOutputFormat(QPrinter::PdfFormat);
     else printer.setOutputFormat(QPrinter::PostScriptFormat);
     QPainter painter(&printer);

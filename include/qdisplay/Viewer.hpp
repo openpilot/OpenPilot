@@ -76,6 +76,7 @@ class Viewer : public QGraphicsView {
      * Close the view
      */
     void close();
+    void setTitle(const std::string& _title );
   public slots:
     void exportView();
   public:

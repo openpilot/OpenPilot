@@ -57,8 +57,8 @@ namespace jafar {
           return 0;
         }
         /*store R (R is returned in the upper triangular of A)*/
-        for(uint i=0; i < lhs; ++i) {
-          for (uint j=i; j < lhs; ++j){
+        for(unsigned int i=0; i < lhs; ++i) {
+          for (unsigned int j=i; j < lhs; ++j){
             R(i,j) = A(i,j);
           }
         }
@@ -100,8 +100,8 @@ namespace jafar {
           return 0;
         }
         /* store R (R is returned in the upper triangular of A) */
-        for(uint i=0; i < lhs; ++i)
-          for (uint j=i; j < lhs;++j)
+        for(unsigned int i=0; i < lhs; ++i)
+          for (unsigned int j=i; j < lhs;++j)
             R(i,j) = A(i,j);
 
         /* solve R^t y = A^t b */
@@ -203,7 +203,7 @@ namespace jafar {
         }
         /* fill x */
         x.clear();
-        for (uint i = 0 ; i < size ; ++i) {
+        for (unsigned int i = 0 ; i < size ; ++i) {
           x.plus_assign( (inner_prod(column(U,i), b) / s(i)) * row(VT,i) );
         }
         return 1;

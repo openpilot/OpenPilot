@@ -219,7 +219,7 @@ namespace optimization {
     template<typename _TType_>
     double computeRemain(const ublas::vector<_TType_>& values) {
       _TType_ remain = 0.0;
-      for(uint j = 0; j < values.size(); j++)
+      for(unsigned-int j = 0; j < values.size(); j++)
       {
         _TType_ v = values[j];
         remain += v * v;
@@ -398,9 +398,9 @@ namespace optimization {
         M = M + M2; 
 //         std::cout << M2 << std::endl;
 /*        std::cout << std::endl << "[[";
-        for(uint m = 0; m < M2.size1(); m++)
+        for(unsigned-int m = 0; m < M2.size1(); m++)
         {
-          for(uint n = 0; n < M2.size2(); n++)
+          for(unsigned-int n = 0; n < M2.size2(); n++)
           {
             std::cout << M2(n,m) << " ";
           }

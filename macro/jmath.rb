@@ -4,31 +4,29 @@ Jafar.register_module Jafar::Jmath
 
 module Jafar
   module Jmath
-    def Jmath.vec2ToArray(v)
-      strs = print(v).split(/\(|\,|\)/)
-      return [strs[1].to_f, strs[2].to_f]
-    end
-    def Jmath.vec3ToArray(v)
-      strs = print(v).split(/\(|\,|\)/)
-      return [strs[1].to_f, strs[2].to_f, strs[3].to_f]
-    end
     def Jmath.vecToArray(v)
       strs = print(v).split(/\(|\,|\)/)
       a = []
-      for i in 0...v.size
-        a << strs[i+1].to_f
+      for i in 1...(strs.size-1)
+        a << strs[i].to_f
       end
       return a
     end
-    def Jmath.arrayToVec(a)
+    def Jmath.arrayToVec(a, type = Jmath::Vec)
       s = "("
       for i in 0...(a.size-1)
         s += "#{a[i]},"
       end
       s += "#{a[a.size-1]})"
-      v = Jmath::Vec.new(a.size)
+      v = type.new(a.size)
       setValue(v,s)
       return v
+    end
+    def Jmath.arrayToVec3(a)
+      return arrayToVec(a, Jmath::Vec3 )
+    end
+    def Jmath.arrayToVec2(a)
+      return arrayToVec(a, Jmath::Vec2 )
     end
     def Jmath.matToArray(m)
       a = []

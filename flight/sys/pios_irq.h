@@ -4,8 +4,8 @@
  *    
  * @author The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
  *  
- * @file pios_uart.h
- * UART functions header 
+ * @file pios_irq.h
+ * IRQ functions header 
  *  
  * @see The GNU Public License (GPL)
  */
@@ -25,8 +25,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_UART_H
-#define PIOS_UART_H
+#ifndef PIOS_IRQ_H
+#define PIOS_IRQ_H
 
 /* Function Prototypes */
 extern void UARTInit(void);
@@ -37,19 +37,7 @@ extern void UARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud);
 /*----------------------------------------------------------------------------------*/
 /* WORK IN PROGRESS BELOW */
 /*----------------------------------------------------------------------------------*/
-typedef enum {GPS = 0, TELEM = 1, AUX = 2} UARTNumTypeDef;
+extern int IRQDisable(void);
+extern int IRQEnable(void);
 
-extern int UARTRxBufferFree(UARTNumTypeDef uart);
-extern int UARTRxBufferUsed(UARTNumTypeDef uart);
-extern int UARTRxBufferGet(UARTNumTypeDef uart);
-extern int UARTRxBufferPeek(UARTNumTypeDef uart);
-extern int UARTRxBufferPut(UARTNumTypeDef uart, uint8_t b);
-
-extern int UARTTxBufferFree(UARTNumTypeDef uart);
-extern int UARTTxBufferGet(UARTNumTypeDef uart);
-extern int UARTTxBufferPutMore_NonBlocking(UARTNumTypeDef uart, uint8_t *buffer, uint16_t len);
-extern int UARTTxBufferPutMore(UARTNumTypeDef uart, uint8_t *buffer, uint16_t len);
-extern int UARTTxBufferPut_NonBlocking(uint8_t uart, uint8_t b);
-extern int UARTTxBufferPut(UARTNumTypeDef uart, uint8_t b);
-
-#endif /* PIOS_UART_H */
+#endif /* PIOS_IRQ_H */

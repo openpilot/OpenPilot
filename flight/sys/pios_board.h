@@ -112,7 +112,7 @@
 #define AUX_UART_GPIO_PORT			GPIOA
 #define AUX_UART_RX_PIN				GPIO_Pin_10
 #define AUX_UART_TX_PIN				GPIO_Pin_9
-#define GPS_REMAP_FUNC				{ }
+#define AUX_UART_REMAP_FUNC			{ }
 #define AUX_UART_IRQ_CHANNEL		USART1_IRQn
 #define AUX_UART_IRQHANDLER_FUNC	void USART1_IRQHandler(void)
 #define AUX_UART_CLK_FUNC			RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE)

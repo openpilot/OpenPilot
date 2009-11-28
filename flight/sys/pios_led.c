@@ -45,17 +45,17 @@ void LED_INIT(void)
 	}
 }
 
-void LED_ON(Led_TypeDef LEDNum)
+void LED_ON(LedTypeDef LEDNum)
 {
 	LED_GPIO_PORT[LEDNum]->BSRR = LED_GPIO_PIN[LEDNum];
 }
 
-void LED_OFF(Led_TypeDef LEDNum)
+void LED_OFF(LedTypeDef LEDNum)
 {
 	LED_GPIO_PORT[LEDNum]->BRR = LED_GPIO_PIN[LEDNum];
 }
 
-void LED_TOGGLE(Led_TypeDef LEDNum)
+void LED_TOGGLE(LedTypeDef LEDNum)
 {
 	LED_GPIO_PORT[LEDNum]->ODR ^= LED_GPIO_PIN[LEDNum];
 }

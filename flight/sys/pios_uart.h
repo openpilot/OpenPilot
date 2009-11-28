@@ -29,9 +29,9 @@
 #define PIOS_UART_H
 
 /* Function Prototypes */
-void UARTInit(void);
-void EnableAuxUART(void);
-void DisableAuxUART(void);
-void UARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud);
+extern void UARTInit(void);
+extern void EnableAuxUART(void);
+extern void DisableAuxUART(void);
+extern void UARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud);
 
 #endif /* PIOS_UART_H */

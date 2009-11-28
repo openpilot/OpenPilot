@@ -61,6 +61,6 @@ typedef struct {
 extern SettingsTypeDef Settings;
 
 /* Function Prototypes */
-void LoadSettings(void);
+extern void LoadSettings(void);
 
 #endif /* PIOS_SETTINGS_H */

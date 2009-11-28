@@ -28,23 +28,39 @@
 #ifndef PIOS_SETTINGS_H
 #define PIOS_SETTINGS_H
 
-/* Global Defines */
+/* Default Values */
+/* GPSUART Default Values */
+#define GPS_BAUDRATE		19200
+
+#define TELEM_BAUDRATE			19200
+
+#define AUXUART_ENABLED			1
+#define AUXUART_BAUDRATE		19200
 
 /* Global types */
 typedef struct {
+	uint32_t Baudrate;
+} GPSSettingsTypeDef;
+
+typedef struct {
+	uint32_t Baudrate;
+} TelemSettingsTypeDef;
+
+typedef struct {
 	bool Enabled;
-	uint32_t Baud;
+	uint32_t Baudrate;
 } UARTSettingsTypeDef;
 
 typedef struct {
-	UARTSettingsTypeDef GPSUART;
-	UARTSettingsTypeDef TELEMUART;
-	UARTSettingsTypeDef AUXUART;
+	GPSSettingsTypeDef GPS;
+	TelemSettingsTypeDef Telem;
+	UARTSettingsTypeDef AuxUART;
 } SettingsTypeDef;
 
 /*Global Veriables */
 extern SettingsTypeDef Settings;
 
 /* Function Prototypes */
+void LoadSettings(void);
 
 #endif /* PIOS_SETTINGS_H */

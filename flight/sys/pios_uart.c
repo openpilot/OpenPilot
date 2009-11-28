@@ -81,10 +81,10 @@ void UARTInit(void)
 	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
 	
-	USART_InitStructure.USART_BaudRate = GPS_BAUD;
+	USART_InitStructure.USART_BaudRate = Settings.GPS.Baudrate;
 	USART_Init(GPS_UART, &USART_InitStructure);
 	
-	USART_InitStructure.USART_BaudRate = TELEM_BAUD;
+	USART_InitStructure.USART_BaudRate = Settings.Telem.Baudrate;
 	USART_Init(TELEM_UART, &USART_InitStructure);
 	
 	/* Enable UART Receive and Transmit interrupts */

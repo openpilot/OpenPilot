@@ -28,24 +28,19 @@
 /* Project Includes */
 #include "pios.h"
 
-/*Global Variables */
-SettingsTypeDef Settings;
-
 /* Local Variables */
 FATFS Fatfs[_DRIVES];	// File system object for each logical drive */
 
 void SysInit(void)
 {
-	/* Setup STM32 system (clock, PLL and Flash configuration) - CMSIS Function */
+	/* Setup STM32 system (RCC, clock, PLL and Flash configuration) - CMSIS Function */
 	SystemInit();
-	
-	/* RRC Init??? */
-
-	/* Initialize LEDs */
-	LED_INIT();
 	
 	/* Initialize NVIC */
 	NVIC_Configuration();
+	
+	/* Initialize LEDs */
+	LED_INIT();
 	
 	/* Initialize FatFS disk */
 	if(f_mount(0, &Fatfs[0]) != FR_OK)
@@ -53,7 +48,7 @@ void SysInit(void)
 		//Failed to mount MicroSD filesystem, should we do something?
 	}
 	
-	//InitSettings(&Settings);
+	LoadSettings();
 	
 }
 

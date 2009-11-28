@@ -8,9 +8,6 @@
  * PiOS header. Central header for the project
  *
  * @see The GNU Public License (GPL) 
-
-*    
- * @see The GNU Public License (GPL)
  */
 /* 
  * This program is free software; you can redistribute it and/or modify 
@@ -44,6 +41,9 @@
 /* FatFS Functions */
 #include <ff.h>
 #include <diskio.h>
+
+/* minIni Functions */
+#include <minIni.h>
 
 /* Include Flyingfox Hardware Header Files */
 #include <pios_board.h>

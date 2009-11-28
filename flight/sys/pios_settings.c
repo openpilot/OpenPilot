@@ -29,4 +29,28 @@
 #include "pios.h"
 
 /* Local Variables */
+SettingsTypeDef Settings;
 
+/* Loads Settings from INI file 																			*/
+/* Value Reading:	ini_getl("Section", "Key", (DefaultValue), IniFile);									*/
+/* String Reading:	ini_gets("Section", "Key", "DefaultValue", StrBuffer, sizearray(StrBuffer), IniFile); 	*/
+void LoadSettings(void)
+{
+	char StrBuffer[100];
+	long Result;
+	
+	/* Section: GPS */
+	Settings.GPSUART.Baudrate = ini_getl("GPS", "Baudrate", GPS_BAUDRATE, SETTINGS_FILE);
+	
+	/* Section: Telemetry */
+	Settings.GPSUART.Baudrate = ini_getl("Telemetry", "Baudrate", TELEM_BAUDRATE, SETTINGS_FILE);
+	
+	/* Section: Auxillary_UART */
+	Settings.AuxUART.Enabled = ini_getl("Auxillary_UART", "Enabled", AUXUART_ENABLED, SETTINGS_FILE);
+	Settings.AuxUART.Baudrate = ini_getl("Auxillary_UART", "Baudrate", AUXUART_BAUDRATE, SETTINGS_FILE);
+}
+
+int foo(void)
+{
+	return 0;
+}

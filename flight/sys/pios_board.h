@@ -30,6 +30,11 @@
 #define PIOS_BOARD_H
 
 //------------------------
+// Default File Settings
+//------------------------
+#define SETTINGS_FILE			"Settings.ini"
+
+//------------------------
 // DMA Channels Used
 //------------------------
 /* Channel 1  - 					*/
@@ -199,7 +204,7 @@
 #define PERIPHERAL_CLOCK    (MASTER_CLOCK/2)
 
 //-------------------------
-// USB
+// Interrupt Priorities
 //-------------------------
 #define IRQ_PRIO_LOW		12			// lower than RTOS
 #define IRQ_PRIO_MID		8			// higher than RTOS

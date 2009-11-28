@@ -1,0 +1,5 @@
+Notes when upgrading MinINI to newer versions
+Gussy - 11/09
+
+-> Do not overwrite the following files, these files are platofrm depantant
+----> minGlue.h

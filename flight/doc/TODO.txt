@@ -1,0 +1,13 @@
+- Bootloader FW
+	DFU, IAP, or both.
+
+- FreeRTOS, Realtime stats
+	Very expensive :-( Only for debug mode
+
+- Configuration system - 
+	check MikroKopter source
+
+- USB Composite Device
+	HID and Mass Storage Device
+	Needs to be interrupt triggered
+	Will disable everything else except USB, no flying while plugged in

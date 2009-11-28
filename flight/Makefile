@@ -35,8 +35,6 @@ TCHAIN_PREFIX = arm-none-eabi-
 REMOVE_CMD=cs-rm
 
 FLASH_TOOL = OPENOCD
-#FLASH_TOOL = LPC21ISP
-#FLASH_TOOL = UVISION
 
 # YES enables -mthumb option to flags for source-files listed 
 # in SRC and CPPSRC
@@ -86,12 +84,13 @@ SRC += $(SYSDIR)/pios_sys.c
 SRC += $(SYSDIR)/pios_settings.c
 SRC += $(SYSDIR)/pios_led.c
 SRC += $(SYSDIR)/pios_uart.c
+SRC += $(SYSDIR)/pios_irq.c
 
 ## CMSIS for STM32
 SRC += $(CMSISDIR)/core_cm3.c
 SRC += $(CMSISDIR)/system_stm32f10x.c
 
-## used parts of the STM-Library
+## Used parts of the STM-Library
 SRC += $(STMSPDSRCDIR)/stm32f10x_adc.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_bkp.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_crc.c
@@ -110,10 +109,10 @@ SRC += $(STMSPDSRCDIR)/stm32f10x_usart.c
 SRC += $(STMSPDSRCDIR)/misc.c
 
 ## STM32 USB Library
-SRC += $(STMUSBSRCDIR)/usb_core.c
-SRC += $(STMUSBSRCDIR)/usb_int.c
-SRC += $(STMUSBSRCDIR)/usb_mem.c
-SRC += $(STMUSBSRCDIR)/usb_regs.c
+#SRC += $(STMUSBSRCDIR)/usb_core.c
+#SRC += $(STMUSBSRCDIR)/usb_int.c
+#SRC += $(STMUSBSRCDIR)/usb_mem.c
+#SRC += $(STMUSBSRCDIR)/usb_regs.c
 
 ## RTOS
 SRC += $(RTOSSRCDIR)/list.c 
@@ -200,7 +199,7 @@ endif
 
 # Output format. (can be ihex or binary or both)
 #  binary to create a load-image in raw-binary format i.e. for SAM-BA, 
-#  ihex to create a load-image in Intel hex format i.e. for lpc21isp
+#  ihex to create a load-image in Intel hex format
 #LOADFORMAT = ihex
 #LOADFORMAT = binary
 LOADFORMAT = both
@@ -352,7 +351,6 @@ MSG_ASSEMBLING = "**** Assembling:"
 MSG_ASSEMBLING_ARM = "****Assembling (ARM-only):"
 MSG_CLEANING = Cleaning project:
 MSG_FORMATERROR = Can not handle output-format
-MSG_LPC21_RESETREMINDER = You may have to bring the target in bootloader-mode now.
 MSG_ASMFROMC = "Creating asm-File from C-Source:"
 MSG_ASMFROMC_ARM = "Creating asm-File from C-Source (ARM-only):"
 
@@ -423,25 +421,11 @@ gccversion :
 #	@echo $(ALLOBJ)
 
 # Program the device.
-ifeq ($(FLASH_TOOL),UVISION)
-# Program the device with Keil's uVision (needs configured uVision-workspace). 
-program: $(OUTDIR)/$(TARGET).hex
-##	@echo
-	@echo "Programming with uVision"
-	C:\Keil\uv3\Uv3.exe -f uvisionflash.Uv2 -ouvisionflash.txt
-else
 ifeq ($(FLASH_TOOL),OPENOCD)
 # Program the device with Dominic Rath's OPENOCD in "batch-mode", needs cfg and "reset-script".
 program: $(OUTDIR)/$(TARGET).elf
 	@echo "Programming with OPENOCD"
 	$(OOCD_EXE) $(OOCD_CL)
-else
-# Program the device using lpc21isp (for NXP2k and ADuC UART bootloader)
-program: $(OUTDIR)/$(TARGET).hex
-##	@echo
-	@echo $(MSG_LPC21_RESETREMINDER)
-	-$(LPC21ISP) $(LPC21ISP_OPTIONS) $(LPC21ISP_FLASHFILE) $(LPC21ISP_PORT) $(LPC21ISP_BAUD) $(LPC21ISP_XTAL)
-endif
 endif
 
 # Create final output file (.hex) from ELF output file.

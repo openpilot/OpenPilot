@@ -3,6 +3,9 @@
  *    
  * @author The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
  *    
+ * @file pios_uart.c
+ * UART commands, Inits UARTS, controls & talks to UARTS
+ *
  * @see The GNU Public License (GPL)
  */
 /* 

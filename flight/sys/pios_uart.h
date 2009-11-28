@@ -3,7 +3,10 @@
  * Project: OpenPilot
  *    
  * @author The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
- *    
+ *  
+ * @file pios_uart.h
+ * UART functions header 
+ *  
  * @see The GNU Public License (GPL)
  */
 /* 

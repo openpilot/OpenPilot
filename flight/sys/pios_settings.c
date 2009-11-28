@@ -3,7 +3,10 @@
  * Project: OpenPilot
  *    
  * @author The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
- *    
+ * 
+ * @file pios_settings.c
+ * Gets and sets settings, normally from SDCard  
+ *
  * @see The GNU Public License (GPL)
  */
 /* 

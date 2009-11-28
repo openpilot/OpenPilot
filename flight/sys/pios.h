@@ -4,6 +4,12 @@
  *    
  * @author The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
  *    
+ * @file pios.h
+ * PiOS header. Central header for the project
+ *
+ * @see The GNU Public License (GPL) 
+
+*    
  * @see The GNU Public License (GPL)
  */
 /* 

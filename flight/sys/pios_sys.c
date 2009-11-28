@@ -4,6 +4,9 @@
  *    
  * @author The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
  *    
+ * @file pios_sys.c
+ * Sets up basic system hardware, functions are called from the Main function
+ *
  * @see The GNU Public License (GPL)
  */
 /* 

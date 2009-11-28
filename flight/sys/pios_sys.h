@@ -4,6 +4,9 @@
  *    
  * @author The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
  *    
+ * @file pios_sys.h
+ * System and hardware Init functions header 
+ *
  * @see The GNU Public License (GPL)
  */
 /* 

@@ -5,7 +5,8 @@
  * @author The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
  *    
  * @file pios.c
- * PiOS build, sets up main tasks, tickhook and calls hardware setup
+ * PiOS build, sets up main tasks, tickhook, and contains the Main function
+ * It all starts from here
  *
  * @see The GNU Public License (GPL)
  */

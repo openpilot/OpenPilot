@@ -30,11 +30,11 @@
 
 /* Default Values */
 /* GPSUART Default Values */
-#define GPS_BAUDRATE		19200
+#define GPS_BAUDRATE			19200
 
 #define TELEM_BAUDRATE			19200
 
-#define AUXUART_ENABLED			1
+#define AUXUART_ENABLED			0
 #define AUXUART_BAUDRATE		19200
 
 /* Global types */

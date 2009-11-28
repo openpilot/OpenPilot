@@ -43,9 +43,12 @@ void SysInit(void)
 	LED_INIT();
 	
 	/* Initialize FatFS disk */
-	if(f_mount(0, &Fatfs[0]) != FR_OK)
-	{
-		//Failed to mount MicroSD filesystem, should we do something?
+	if(f_mount(0, &Fatfs[0]) != FR_OK) {
+		/* Failed to mount MicroSD filesystem, flash LED1 forever */
+		while(1) {
+			for(int i = 0; i < 1000; i++);
+			LED_TOGGLE(LED1);
+		}
 	}
 	
 	LoadSettings();
@@ -61,6 +64,7 @@ void SysInit(void)
 *******************************************************************************/
 void GPIO_Configuration(void)
 {
+
 }
 
 /*******************************************************************************
@@ -70,7 +74,6 @@ void GPIO_Configuration(void)
 * Output         : None
 * Return         : None
 *******************************************************************************/
-
 void NVIC_Configuration(void)
 {
 	/* Set the Vector Table base address as specified in .ld file */
@@ -80,4 +83,3 @@ void NVIC_Configuration(void)
 	/* Configure HCLK clock as SysTick clock source. */
 	SysTick_CLKSourceConfig( SysTick_CLKSource_HCLK );
 }
-

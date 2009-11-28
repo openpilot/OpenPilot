@@ -34,16 +34,13 @@ const uint32_t LED_GPIO_CLK[NUM_LED] = {LED1_GPIO_CLK, LED2_GPIO_CLK};
 /* Initialises all the LED's */
 void LED_INIT(void)
 {
-	for(int LEDNum = 0; LEDNum < NUM_LED; LEDNum++)
-	{
-		GPIO_InitTypeDef GPIO_InitStructure;
-		
+	GPIO_InitTypeDef GPIO_InitStructure;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; 
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	
+	for(int LEDNum = 0; LEDNum < NUM_LED; LEDNum++) {
 		RCC_APB2PeriphClockCmd(LED_GPIO_CLK[LEDNum], ENABLE);
-		
 		GPIO_InitStructure.GPIO_Pin = LED_GPIO_PIN[LEDNum];
-		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; 
-		GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-		
 		GPIO_Init(LED_GPIO_PORT[LEDNum], &GPIO_InitStructure);
 	}
 }

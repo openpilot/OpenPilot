@@ -1,3 +1,4 @@
+
 /**
  * Project: OpenPilot
  *    
@@ -122,6 +123,10 @@ void UARTInit(void)
 	USART_Cmd(GPS_UART, ENABLE);
 	
 	USART_Cmd(TELEM_UART, ENABLE);
+	
+	if(Settings.AuxUART.Enabled == 1) {
+		EnableAuxUART();
+	}
 }
 
 void EnableAuxUART(void)
@@ -148,12 +153,9 @@ void UARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud)
 	RCC_ClocksTypeDef RCC_ClocksStatus;
 	
 	RCC_GetClocksFreq(&RCC_ClocksStatus);
-	if (usartxbase == USART1_BASE)
-	{
+	if (usartxbase == USART1_BASE) {
 		apbclock = RCC_ClocksStatus.PCLK2_Frequency;
-	}
-	else
-	{
+	} else {
 		apbclock = RCC_ClocksStatus.PCLK1_Frequency;
 	}
 	

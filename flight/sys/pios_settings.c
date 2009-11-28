@@ -40,10 +40,10 @@ void LoadSettings(void)
 	long Result;
 	
 	/* Section: GPS */
-	Settings.GPSUART.Baudrate = ini_getl("GPS", "Baudrate", GPS_BAUDRATE, SETTINGS_FILE);
+	Settings.GPS.Baudrate = ini_getl("GPS", "Baudrate", GPS_BAUDRATE, SETTINGS_FILE);
 	
 	/* Section: Telemetry */
-	Settings.GPSUART.Baudrate = ini_getl("Telemetry", "Baudrate", TELEM_BAUDRATE, SETTINGS_FILE);
+	Settings.Telem.Baudrate = ini_getl("Telemetry", "Baudrate", TELEM_BAUDRATE, SETTINGS_FILE);
 	
 	/* Section: Auxillary_UART */
 	Settings.AuxUART.Enabled = ini_getl("Auxillary_UART", "Enabled", AUXUART_ENABLED, SETTINGS_FILE);

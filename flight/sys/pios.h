@@ -1,14 +1,13 @@
-
 /**
- * Project: OpenPilot
- *    
- * @author The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
- *    
- * @file pios.h
- * PiOS header. Central header for the project
+ ******************************************************************************
  *
- * @see The GNU Public License (GPL) 
- */
+ * @file       pios.h  
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
+ * @brief      Main PiOS header. 
+ *                 - Central header for the project.
+ * @see        The GNU Public License (GPL) Version 3
+ *
+ *****************************************************************************/
 /* 
  * This program is free software; you can redistribute it and/or modify 
  * it under the terms of the GNU General Public License as published by 
@@ -46,15 +45,15 @@
 #include <minIni.h>
 
 /* PIOS Hardware Includes */
-#include <pios_board.h>
-#include <pios_sys.h>
-#include <pios_settings.h>
-#include <pios_led.h>
-#include <pios_uart.h>
-#include <pios_irq.h>
+#include "pios_board.h"
+#include "pios_sys.h"
+#include "pios_settings.h"
+#include "pios_led.h"
+#include "pios_uart.h"
+#include "pios_irq.h"
 
-//#include <pios_spi.h>
-//#include <pios_uart.h>
+//#include "pios_spi.h"
+//#include "pios_uart.h"
 
 /* More added here as they get written */
 

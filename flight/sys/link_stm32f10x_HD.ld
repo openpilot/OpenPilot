@@ -1,14 +1,12 @@
-
 /**
- * Project: OpenPilot
- *    
- * @author The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
- *    
- * @file link_stm32f10x_HD.ld
- * PiOS linker for the OpenPilot board
+ ******************************************************************************
  *
- * @see The GNU Public License (GPL)
- */
+ * @file       link_stm32f10x_HD.ld   
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
+ * @brief      PiOS linker for the OpenPilot board
+ * @see        The GNU Public License (GPL) Version 3
+ *
+ *****************************************************************************/
 /* 
  * This program is free software; you can redistribute it and/or modify 
  * it under the terms of the GNU General Public License as published by 

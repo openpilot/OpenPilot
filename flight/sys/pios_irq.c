@@ -1,14 +1,13 @@
-
 /**
- * Project: OpenPilot
- *    
- * @author The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
- *    
- * @file pios_irq.c
- * IRQ Enable/Disable routines
+ ******************************************************************************
  *
- * @see The GNU Public License (GPL)
- */
+ * @file       pios_irq.c  
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
+ * @brief      IRQ Enable/Disable routines
+ * @see        The GNU Public License (GPL) Version 3
+ * @defgroup   PIOS_IRQ
+ *
+ *****************************************************************************/
 /* 
  * This program is free software; you can redistribute it and/or modify 
  * it under the terms of the GNU General Public License as published by 

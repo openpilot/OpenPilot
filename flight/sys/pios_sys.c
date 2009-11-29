@@ -1,14 +1,13 @@
-
 /**
- * Project: OpenPilot
- *    
- * @author The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
- *    
- * @file pios_sys.c
- * Sets up basic system hardware, functions are called from the Main function
+ ******************************************************************************
  *
- * @see The GNU Public License (GPL)
- */
+ * @file       pios_sys.c  
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
+ * @brief      Sets up basic system hardware, functions are called from Main.
+ * @see        The GNU Public License (GPL) Version 3
+ * @defgroup   PIOS_SYS
+ *
+ *****************************************************************************/
 /* 
  * This program is free software; you can redistribute it and/or modify 
  * it under the terms of the GNU General Public License as published by 

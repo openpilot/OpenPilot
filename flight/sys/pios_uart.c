@@ -1,14 +1,13 @@
-
 /**
- * Project: OpenPilot
- *    
- * @author The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
- *    
- * @file pios_uart.c
- * UART commands. Inits USARTs, controls UARTs & Interupt handlers
+ ******************************************************************************
  *
- * @see The GNU Public License (GPL)
- */
+ * @file       pios_uart.c   
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
+ * @brief      UART commands. Inits UARTs, controls UARTs & Interupt handlers.
+ * @see        The GNU Public License (GPL) Version 3
+ * @defgroup   PIOS_UART
+ *
+ *****************************************************************************/
 /* 
  * This program is free software; you can redistribute it and/or modify 
  * it under the terms of the GNU General Public License as published by 

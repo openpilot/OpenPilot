@@ -1,15 +1,13 @@
-
 /**
- * Project: OpenPilot
- *    
- * @author The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
- *    
- * @file pios.c
- * PiOS build, sets up main tasks, tickhook, and contains the Main function
- * It all starts from here
+ ******************************************************************************
  *
- * @see The GNU Public License (GPL)
- */
+ * @file       pios.c 
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
+ * @brief      Sets up main tasks, tickhook, and contains the Main function.
+ *                 - It all starts from here!
+ * @see        The GNU Public License (GPL) Version 3
+ *
+ *****************************************************************************/
 /* 
  * This program is free software; you can redistribute it and/or modify 
  * it under the terms of the GNU General Public License as published by 

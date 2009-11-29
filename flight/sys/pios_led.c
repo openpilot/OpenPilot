@@ -1,14 +1,13 @@
-
 /**
- * Project: OpenPilot
- *    
- * @author The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
+ ******************************************************************************
  *
- * @file pios_led.c
- * LED functions, init, toggle, on & off 
- *    
- * @see The GNU Public License (GPL)
- */
+ * @file       pios_led.c   
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
+ * @brief      LED functions, init, toggle, on & off.
+ * @see        The GNU Public License (GPL) Version 3
+ * @defgroup   PIOS_LED
+ *
+ *****************************************************************************/
 /* 
  * This program is free software; you can redistribute it and/or modify 
  * it under the terms of the GNU General Public License as published by 

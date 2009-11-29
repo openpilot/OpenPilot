@@ -6,6 +6,7 @@
  * @brief      LED functions, init, toggle, on & off.
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   PIOS_LED
+ * @{
  *
  *****************************************************************************/
 /* 

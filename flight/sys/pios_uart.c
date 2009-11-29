@@ -6,6 +6,7 @@
  * @brief      UART commands. Inits UARTs, controls UARTs & Interupt handlers.
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   PIOS_UART
+ * @{
  *
  *****************************************************************************/
 /* 

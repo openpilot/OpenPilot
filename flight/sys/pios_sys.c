@@ -6,6 +6,7 @@
  * @brief      Sets up basic system hardware, functions are called from Main.
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   PIOS_SYS
+ * @{
  *
  *****************************************************************************/
 /* 

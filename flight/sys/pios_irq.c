@@ -6,7 +6,8 @@
  * @brief      IRQ Enable/Disable routines
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   PIOS_IRQ
- *
+ * @{
+ * 
  *****************************************************************************/
 /* 
  * This program is free software; you can redistribute it and/or modify 

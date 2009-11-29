@@ -6,6 +6,7 @@
  * @brief      Gets and sets PiOS settings, normally from SDCard. 
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   PIOS_SETTINGS
+ * @{
  *
  *****************************************************************************/
 /* 

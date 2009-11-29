@@ -6,7 +6,7 @@
  * @brief      Sets up main tasks, tickhook, and contains the Main function.
  *                 - It all starts from here!
  * @see        The GNU Public License (GPL) Version 3
- *
+ * 
  *****************************************************************************/
 /* 
  * This program is free software; you can redistribute it and/or modify 

@@ -45,11 +45,9 @@ static volatile u8 tx_buffer_size[UART_NUM];
 
 
 /**
-* Function Name  : UARTInit
-* Description    : Initialise the GPS and TELEM onboard UARTs
-* Input          : None
-* Output         : None
-* Return         : None
+* 
+* Initialise the GPS and TELEM onboard UARTs
+* 
 */
 void UARTInit(void)
 {
@@ -142,11 +140,9 @@ void UARTInit(void)
 
 
 /**
-* Function Name  : EnableAuxUART
-* Description    : Enables AUX UART at the expense of servo inputs
-* Input          : None
-* Output         : None
-* Return         : None
+*
+* Enables AUX UART at the expense of servo inputs
+*
 */
 void EnableAuxUART(void)
 {
@@ -155,11 +151,9 @@ void EnableAuxUART(void)
 
 
 /**
-* Function Name  : DisableAuxUART
-* Description    : Disables AUX UART reclaims two servo inputs
-* Input          : None
-* Output         : None
-* Return         : None
+*
+* Disables AUX UART reclaims two servo inputs
+*
 */
 void DisableAuxUART(void)
 {
@@ -168,12 +162,11 @@ void DisableAuxUART(void)
 
 
 /**
-* Function Name  : UARTInit
-* Description    : Changes the baud rate of the USART peripherial without
-*		 : re-initialising.
-* Input          : USART to change, new baud rate
-* Output         : None
-* Return         : None
+* 
+* Changes the baud rate of the USART peripherial without re-initialising.
+* @param[in] UART Number 
+* @param[in] Required baud rate         
+* 
 */
 void UARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud)
 {

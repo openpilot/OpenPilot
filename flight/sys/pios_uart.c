@@ -164,8 +164,8 @@ void DisableAuxUART(void)
 /**
 * 
 * Changes the baud rate of the USART peripherial without re-initialising.
-* @param[in] UART Number 
-* @param[in] Required baud rate         
+* \param[in] USARTx UART Number 
+* \param[in] Baud Requested baud rate         
 * 
 */
 void UARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud)

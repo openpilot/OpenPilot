@@ -42,13 +42,6 @@ static unsigned int prev_primask;
 
 
 /**
-* Function Name  : IRQDisable
-* Description    : 
-* Input          : None
-* Output         : None
-* Return         : Zero on no error
-*/
-/**
 * Disables all interrupts (nested)
 * \return < 0 On errors
 */

@@ -37,7 +37,7 @@
 #include <queue.h>
 
 
-/* FreeRTOS Tasks */
+/* FreeRTOS Prototypes */
 void PiosMainTask( void *pvParameters );
 void SensorTask( void *pvParameters );
 

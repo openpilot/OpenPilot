@@ -25,8 +25,18 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 /* Project Includes */
 #include "pios.h"
+
+
+/* Public Function Prototypes */
+int IRQDisable(void);
+int IRQEnable(void);
+
+
+/* Private Function Prototypes */
+
 
 /* Local Variables */
 /* The nesting counter ensures, that interrupts won't be enabled so long nested functions disable them */
@@ -35,7 +45,14 @@ static unsigned int nested_ctr;
 /* Stored priority level before IRQ has been disabled (important for co-existence with vPortEnterCritical) */
 static unsigned int prev_primask;
 
-/* Disables all interrupts (nested) */
+
+/*******************************************************************************
+* Function Name  : IRQDisable
+* Description    : Disables all interrupts (nested)
+* Input          : None
+* Output         : None
+* Return         : Zero on no error
+*******************************************************************************/
 int IRQDisable(void)
 {
 	/* Get current priority if nested level == 0 */
@@ -59,7 +76,14 @@ int IRQDisable(void)
 	return 0;
 }
 
-/* Enables all interrupts (nested) */
+
+/*******************************************************************************
+* Function Name  : IRQEnable
+* Description    : Enables all interrupts (nested)
+* Input          : None
+* Output         : None
+* Return         : Zero on no error, -1 on nesting error
+*******************************************************************************/
 int IRQEnable(void)
 {
 	/* Check for nesting error */

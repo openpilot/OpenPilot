@@ -25,12 +25,31 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 /* Project Includes */
 #include "pios.h"
+
+
+/* Public Function Prototypes */
+void SysInit(void);
+
+
+/* Private Function Prototypes */
+void NVIC_Configuration(void);
+
 
 /* Local Variables */
 FATFS Fatfs[_DRIVES];	// File system object for each logical drive */
 
+
+/*******************************************************************************
+* Function Name  : SysInit
+* Description    : Brings up the System and Initializes peripherals 
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+//TODO: Get these in the right order, settings need to be loaded ASAP
 void SysInit(void)
 {
 	/* Setup STM32 system (RCC, clock, PLL and Flash configuration) - CMSIS Function */
@@ -51,13 +70,15 @@ void SysInit(void)
 		}
 	}
 	
+	/* Call LoadSettings which populates System Vars */
 	LoadSettings();
 	
 }
 
+
 /*******************************************************************************
 * Function Name  : GPIO_Configuration
-* Description    : Configures the different GPIO ports.
+* Description    : Configures base level GPIO ports.
 * Input          : None
 * Output         : None
 * Return         : None
@@ -67,9 +88,10 @@ void GPIO_Configuration(void)
 
 }
 
+
 /*******************************************************************************
 * Function Name  : NVIC_Configuration
-* Description    : Configures Vector Table base location.
+* Description    : Configures Vector Table base location and SysTick
 * Input          : None
 * Output         : None
 * Return         : None
@@ -78,6 +100,8 @@ void NVIC_Configuration(void)
 {
 	/* Set the Vector Table base address as specified in .ld file */
 	NVIC_SetVectorTable(NVIC_VectTab_FLASH, 0x0);
+
+	/* 4 bits for Interupt priorities so no sub priorities */
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 
 	/* Configure HCLK clock as SysTick clock source. */

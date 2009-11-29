@@ -28,9 +28,7 @@
 #ifndef PIOS_SYS_H
 #define PIOS_SYS_H
 
-/* Exported Functions */
+/* Public Functions */
 extern void SysInit(void);
-extern void GPIO_Configuration(void);
-extern void NVIC_Configuration(void);
 
 #endif /* PIOS_SYS_H */

@@ -25,15 +25,35 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 /* Project Includes */
 #include "pios.h"
+
+
+/* Public Function Prototypes */
+void LoadSettings(void);
+
+
+/* Private Function Prototypes */
+
 
 /* Local Variables */
 SettingsTypeDef Settings;
 
-/* Loads Settings from INI file 																			*/
+
+/*******************************************************************************
+* Function Name  : LoadSettings
+* Description    : Populate System global Vars into Structs using MinIni, 
+* 		 : defaults are also set here. Only function in the file
+*		 : and where all our system data is handled. 
+*		 : Called from the end of SysInit()		   
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
 /* Value Reading:	ini_getl("Section", "Key", (DefaultValue), IniFile);									*/
 /* String Reading:	ini_gets("Section", "Key", "DefaultValue", StrBuffer, sizearray(StrBuffer), IniFile); 	*/
+
 void LoadSettings(void)
 {
 	char StrBuffer[100];

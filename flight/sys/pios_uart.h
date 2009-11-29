@@ -28,7 +28,7 @@
 #ifndef PIOS_UART_H
 #define PIOS_UART_H
 
-/* Function Prototypes */
+/* Public Functions */
 extern void UARTInit(void);
 extern void EnableAuxUART(void);
 extern void DisableAuxUART(void);

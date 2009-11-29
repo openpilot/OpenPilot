@@ -57,10 +57,10 @@ typedef struct {
 	UARTSettingsTypeDef AuxUART;
 } SettingsTypeDef;
 
-/*Global Veriables */
+/*Global Variables */
 extern SettingsTypeDef Settings;
 
-/* Function Prototypes */
+/* Public Functions */
 extern void LoadSettings(void);
 
 #endif /* PIOS_SETTINGS_H */

@@ -5,7 +5,7 @@
  * @author The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
  *    
  * @file pios_uart.c
- * UART commands, Inits UARTS, controls & talks to UARTS
+ * UART commands. Inits USARTs, controls UARTs & Interupt handlers
  *
  * @see The GNU Public License (GPL)
  */
@@ -25,8 +25,20 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 /* Project Includes */
 #include "pios.h"
+
+
+/* Public Function Prototypes */
+void UARTInit(void);
+void EnableAuxUART(void);
+void DisableAuxUART(void);
+void UARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud);
+
+
+/* Private Function Prototypes */
+
 
 /* Local Variables */
 static u8 rx_buffer[UART_NUM][UART_RX_BUFFER_SIZE];
@@ -39,7 +51,14 @@ static volatile u8 tx_buffer_tail[UART_NUM];
 static volatile u8 tx_buffer_head[UART_NUM];
 static volatile u8 tx_buffer_size[UART_NUM];
 
-/* Initialise the GPS and TELEM onboard UARTs */
+
+/*******************************************************************************
+* Function Name  : UARTInit
+* Description    : Initialise the GPS and TELEM onboard UARTs
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
 void UARTInit(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -129,17 +148,41 @@ void UARTInit(void)
 	}
 }
 
+
+/*******************************************************************************
+* Function Name  : EnableAuxUART
+* Description    : Enables AUX UART at the expense of servo inputs
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
 void EnableAuxUART(void)
 {
 	//Implement after servo inputs are implemented
 }
 
+
+/*******************************************************************************
+* Function Name  : DisableAuxUART
+* Description    : Disables AUX UART reclaims two servo inputs
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
 void DisableAuxUART(void)
 {
 	//Implement after servo inputs are implemented
 }
 
-/* Changes the baud rate of the USART peripherial without re-initialising */
+
+/*******************************************************************************
+* Function Name  : UARTInit
+* Description    : Changes the baud rate of the USART peripherial without
+*		 : re-initialising.
+* Input          : USART to change, new baud rate
+* Output         : None
+* Return         : None
+*******************************************************************************/
 void UARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud)
 {
 	/* USART BRR Configuration */
@@ -170,6 +213,7 @@ void UARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud)
 	/* Write to USART BRR */
 	USARTx->BRR = (uint16_t)tmpreg;
 }
+
 
 /*----------------------------------------------------------------------------------*/
 /* WORK IN PROGRESS BELOW */

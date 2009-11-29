@@ -31,7 +31,7 @@
 /* Type Definitions */
 typedef enum {LED1 = 0, LED2 = 1} LedTypeDef;
 
-/* Exported Functions */
+/* Public Functions */
 extern void LED_INIT(void);
 extern void LED_ON(LedTypeDef LEDNum);
 extern void LED_OFF(LedTypeDef LEDNum);

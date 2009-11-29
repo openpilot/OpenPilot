@@ -34,17 +34,13 @@
 
 
 /* Local Variables */
-GPIO_TypeDef* LED_GPIO_PORT[NUM_LED] = {LED1_GPIO_PORT, LED2_GPIO_PORT};
-const uint16_t LED_GPIO_PIN[NUM_LED] = {LED1_GPIO_PIN, LED2_GPIO_PIN};
-const uint32_t LED_GPIO_CLK[NUM_LED] = {LED1_GPIO_CLK, LED2_GPIO_CLK};
+static GPIO_TypeDef* LED_GPIO_PORT[NUM_LED] = {LED1_GPIO_PORT, LED2_GPIO_PORT};
+static const uint16_t LED_GPIO_PIN[NUM_LED] = {LED1_GPIO_PIN, LED2_GPIO_PIN};
+static const uint32_t LED_GPIO_CLK[NUM_LED] = {LED1_GPIO_CLK, LED2_GPIO_CLK};
 
 
 /**
-* Function Name  : LED_INIT
-* Description    : Initialises all the LED's
-* Input          : None
-* Output         : None
-* Return         : None
+* Initialises all the LED's
 */
 void LED_INIT(void)
 {
@@ -61,39 +57,30 @@ void LED_INIT(void)
 
 
 /**
-* Function Name  : LED_ON
-* Description    : Turn on LED
-* Input          : LED Number
-* Output         : None
-* Return         : None
+* Turn on LED
+* \param[in] LED LED Name (LED1, LED2)
 */
-void LED_ON(LedTypeDef LEDNum)
+void LED_ON(LedTypeDef LED)
 {
-	LED_GPIO_PORT[LEDNum]->BSRR = LED_GPIO_PIN[LEDNum];
+	LED_GPIO_PORT[LED]->BSRR = LED_GPIO_PIN[LED];
 }
 
 
 /**
-* Function Name  : LED_OFF
-* Description    : Turn off LED
-* Input          : LED Number
-* Output         : None
-* Return         : None
+* Turn off LED
+* \param[in] LED LED Name (LED1, LED2)
 */
-void LED_OFF(LedTypeDef LEDNum)
+void LED_OFF(LedTypeDef LED)
 {
-	LED_GPIO_PORT[LEDNum]->BRR = LED_GPIO_PIN[LEDNum];
+	LED_GPIO_PORT[LED]->BRR = LED_GPIO_PIN[LED];
 }
 
 
 /**
-* Function Name  : LED_TOGGLE
-* Description    : Turn on/off LED
-* Input          : LED Number
-* Output         : None
-* Return         : None
+* Toggle LED on/off
+* \param[in] LED LED Name (LED1, LED2)
 */
-void LED_TOGGLE(LedTypeDef LEDNum)
+void LED_TOGGLE(LedTypeDef LED)
 {
-	LED_GPIO_PORT[LEDNum]->ODR ^= LED_GPIO_PIN[LEDNum];
+	LED_GPIO_PORT[LED]->ODR ^= LED_GPIO_PIN[LED];
 }

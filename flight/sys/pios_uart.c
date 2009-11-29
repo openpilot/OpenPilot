@@ -46,9 +46,7 @@ static volatile u8 tx_buffer_size[UART_NUM];
 
 
 /**
-* 
 * Initialise the GPS and TELEM onboard UARTs
-* 
 */
 void UARTInit(void)
 {
@@ -141,9 +139,7 @@ void UARTInit(void)
 
 
 /**
-*
 * Enables AUX UART at the expense of servo inputs
-*
 */
 void EnableAuxUART(void)
 {
@@ -152,9 +148,7 @@ void EnableAuxUART(void)
 
 
 /**
-*
 * Disables AUX UART reclaims two servo inputs
-*
 */
 void DisableAuxUART(void)
 {
@@ -163,11 +157,9 @@ void DisableAuxUART(void)
 
 
 /**
-* 
 * Changes the baud rate of the USART peripherial without re-initialising.
-* \param[in] USARTx UART Number 
+* \param[in] USARTx UART name (GPS, TELEM, AUX)
 * \param[in] Baud Requested baud rate         
-* 
 */
 void UARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud)
 {
@@ -175,29 +167,29 @@ void UARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud)
 	/* Configure the USART Baud Rate */
 	/* Adapted from stm32f01x_usart.c */
 	
-	uint32_t tmpreg = 0x00, apbclock = 0x00;
-	uint32_t integerdivider = 0x00;
-	uint32_t fractionaldivider = 0x00;
-	uint32_t usartxbase = (uint32_t)USARTx;
+	uint32_t TmpReg = 0x00, ApbClock = 0x00;
+	uint32_t IntegerDivider = 0x00;
+	uint32_t FractionalDivider = 0x00;
+	uint32_t USARTxBase = (uint32_t)USARTx;
 	RCC_ClocksTypeDef RCC_ClocksStatus;
 	
 	RCC_GetClocksFreq(&RCC_ClocksStatus);
-	if (usartxbase == USART1_BASE) {
-		apbclock = RCC_ClocksStatus.PCLK2_Frequency;
+	if (USARTxBase == USART1_BASE) {
+		ApbClock = RCC_ClocksStatus.PCLK2_Frequency;
 	} else {
-		apbclock = RCC_ClocksStatus.PCLK1_Frequency;
+		ApbClock = RCC_ClocksStatus.PCLK1_Frequency;
 	}
 	
 	/* Determine the integer part */
-	integerdivider = ((0x19 * apbclock) / (0x04 * (Baud)));
-	tmpreg = (integerdivider / 0x64) << 0x04;
+	IntegerDivider = ((0x19 * ApbClock) / (0x04 * (Baud)));
+	TmpReg = (IntegerDivider / 0x64) << 0x04;
 	
 	/* Determine the fractional part */
-	fractionaldivider = integerdivider - (0x64 * (tmpreg >> 0x04));
-	tmpreg |= ((((fractionaldivider * 0x10) + 0x32) / 0x64)) & ((uint8_t)0x0F);
+	FractionalDivider = IntegerDivider - (0x64 * (TmpReg >> 0x04));
+	TmpReg |= ((((FractionalDivider * 0x10) + 0x32) / 0x64)) & ((uint8_t)0x0F);
 	
 	/* Write to USART BRR */
-	USARTx->BRR = (uint16_t)tmpreg;
+	USARTx->BRR = (uint16_t)TmpReg;
 }
 
 
@@ -205,13 +197,13 @@ void UARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud)
 /* WORK IN PROGRESS BELOW */
 /*----------------------------------------------------------------------------------*/
 
-/////////////////////////////////////////////////////////////////////////////
-//! returns number of free bytes in receive buffer
-//! \param[in] uart UART number (0..1)
-//! \return uart number of free bytes
-//! \return 1: uart available
-//! \return 0: uart not available
-/////////////////////////////////////////////////////////////////////////////
+/**
+* Returns number of free bytes in receive buffer
+* \param[in] uart UART name (GPS, TELEM, AUX)
+* \return uart number of free bytes
+* \return 1: uart available
+* \return 0: uart not available
+*/
 int UARTRxBufferFree(UARTNumTypeDef uart)
 {
 	if(uart >= UART_NUM) {
@@ -221,13 +213,13 @@ int UARTRxBufferFree(UARTNumTypeDef uart)
 	}
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//! returns number of used bytes in receive buffer
-//! \param[in] uart UART number (0..1)
-//! \return > 0: number of used bytes
-//! \return 0 if uart not available
-//! \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
-/////////////////////////////////////////////////////////////////////////////
+/**
+* Returns number of used bytes in receive buffer
+* \param[in] uart UART name (GPS, TELEM, AUX)
+* \return > 0: number of used bytes
+* \return 0 if uart not available
+* \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
+*/
 int UARTRxBufferUsed(UARTNumTypeDef uart)
 {
 	if(uart >= UART_NUM) {
@@ -237,17 +229,16 @@ int UARTRxBufferUsed(UARTNumTypeDef uart)
 	}
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//! gets a byte from the receive buffer
-//! \param[in] uart UART number (0..1)
-//! \return -1 if UART not available
-//! \return -2 if no new byte available
-//! \return >= 0: number of received bytes
-//! \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
-/////////////////////////////////////////////////////////////////////////////
+/**
+* Gets a byte from the receive buffer
+* \param[in] uart UART name (GPS, TELEM, AUX)
+* \return -1 if UART not available
+* \return -2 if no new byte available
+* \return >= 0: number of received bytes
+* \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
+*/
 int UARTRxBufferGet(UARTNumTypeDef uart)
 {
-
 	if(uart >= UART_NUM) {
 		/* UART not available */
 		return -1;
@@ -259,7 +250,7 @@ int UARTRxBufferGet(UARTNumTypeDef uart)
 	
 	/* get byte - this operation should be atomic! */
 	IRQDisable();
-	u8 b = rx_buffer[uart][rx_buffer_tail[uart]];
+	uint8_t b = rx_buffer[uart][rx_buffer_tail[uart]];
 	if(++rx_buffer_tail[uart] >= UART_RX_BUFFER_SIZE) {
 		rx_buffer_tail[uart] = 0;
 	}
@@ -270,14 +261,14 @@ int UARTRxBufferGet(UARTNumTypeDef uart)
 	return b;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//! returns the next byte of the receive buffer without taking it
-//! \param[in] uart UART number (0..1)
-//! \return -1 if UART not available
-//! \return -2 if no new byte available
-//! \return >= 0: number of received bytes
-//! \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
-/////////////////////////////////////////////////////////////////////////////
+/**
+* Returns the next byte of the receive buffer without taking it
+* \param[in] uart UART name (GPS, TELEM, AUX)
+* \return -1 if UART not available
+* \return -2 if no new byte available
+* \return >= 0: number of received bytes
+* \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
+*/
 int UARTRxBufferPeek(UARTNumTypeDef uart)
 {
 	if(uart >= UART_NUM) {
@@ -299,15 +290,15 @@ int UARTRxBufferPeek(UARTNumTypeDef uart)
 	return b;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//! puts a byte onto the receive buffer
-//! \param[in] uart UART number (0..1)
-//! \param[in] b byte which should be put into Rx buffer
-//! \return 0 if no error
-//! \return -1 if UART not available
-//! \return -2 if buffer full (retry)
-//! \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
-/////////////////////////////////////////////////////////////////////////////
+/**
+* puts a byte onto the receive buffer
+* \param[in] uart UART name (GPS, TELEM, AUX)
+* \param[in] b byte which should be put into Rx buffer
+* \return 0 if no error
+* \return -1 if UART not available
+* \return -2 if buffer full (retry)
+* \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
+*/
 int UARTRxBufferPut(UARTNumTypeDef uart, uint8_t b)
 {
 	if(uart >= UART_NUM) {
@@ -335,13 +326,13 @@ int UARTRxBufferPut(UARTNumTypeDef uart, uint8_t b)
 }
 
 
-/////////////////////////////////////////////////////////////////////////////
-//! returns number of free bytes in transmit buffer
-//! \param[in] uart UART number (0..1)
-//! \return number of free bytes
-//! \return 0 if uart not available
-//! \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
-/////////////////////////////////////////////////////////////////////////////
+/**
+* returns number of free bytes in transmit buffer
+* \param[in] uart UART name (GPS, TELEM, AUX)
+* \return number of free bytes
+* \return 0 if uart not available
+* \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
+*/
 int UARTTxBufferFree(UARTNumTypeDef uart)
 {
 	if(uart >= UART_NUM) {
@@ -351,13 +342,13 @@ int UARTTxBufferFree(UARTNumTypeDef uart)
 	}
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//! returns number of used bytes in transmit buffer
-//! \param[in] uart UART number (0..1)
-//! \return number of used bytes
-//! \return 0 if uart not available
-//! \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
-/////////////////////////////////////////////////////////////////////////////
+/**
+* returns number of used bytes in transmit buffer
+* \param[in] uart UART name (GPS, TELEM, AUX)
+* \return number of used bytes
+* \return 0 if uart not available
+* \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
+*/
 int UARTTxBufferUsed(UARTNumTypeDef uart)
 {
 	if(uart >= UART_NUM) {
@@ -367,14 +358,14 @@ int UARTTxBufferUsed(UARTNumTypeDef uart)
 	}
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//! gets a byte from the transmit buffer
-//! \param[in] uart UART number (0..1)
-//! \return -1 if UART not available
-//! \return -2 if no new byte available
-//! \return >= 0: transmitted byte
-//! \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
-/////////////////////////////////////////////////////////////////////////////
+/**
+* gets a byte from the transmit buffer
+* \param[in] uart UART name (GPS, TELEM, AUX)
+* \return -1 if UART not available
+* \return -2 if no new byte available
+* \return >= 0: transmitted byte
+* \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
+*/
 int UARTTxBufferGet(UARTNumTypeDef uart)
 {
 	if(uart >= UART_NUM) {
@@ -400,17 +391,17 @@ int UARTTxBufferGet(UARTNumTypeDef uart)
 	return b;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//! puts more than one byte onto the transmit buffer (used for atomic sends)
-//! \param[in] uart UART number (0..1)
-//! \param[in] *buffer pointer to buffer to be sent
-//! \param[in] len number of bytes to be sent
-//! \return 0 if no error
-//! \return -1 if UART not available
-//! \return -2 if buffer full or cannot get all requested bytes (retry)
-//! \return -3 if UART not supported by MIOS32_UART_TxBufferPut Routine
-//! \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
-/////////////////////////////////////////////////////////////////////////////
+/**
+* puts more than one byte onto the transmit buffer (used for atomic sends)
+* \param[in] uart UART name (GPS, TELEM, AUX)
+* \param[in] *buffer pointer to buffer to be sent
+* \param[in] len number of bytes to be sent
+* \return 0 if no error
+* \return -1 if UART not available
+* \return -2 if buffer full or cannot get all requested bytes (retry)
+* \return -3 if UART not supported by MIOS32_UART_TxBufferPut Routine
+* \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
+*/
 int UARTTxBufferPutMore_NonBlocking(UARTNumTypeDef uart, uint8_t *buffer, uint16_t len)
 {
 	if(uart >= UART_NUM) {
@@ -456,17 +447,17 @@ int UARTTxBufferPutMore_NonBlocking(UARTNumTypeDef uart, uint8_t *buffer, uint16
 	return 0;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//! puts more than one byte onto the transmit buffer (used for atomic sends)<BR>
-//! (blocking function)
-//! \param[in] uart UART number (0..1)
-//! \param[in] *buffer pointer to buffer to be sent
-//! \param[in] len number of bytes to be sent
-//! \return 0 if no error
-//! \return -1 if UART not available
-//! \return -3 if UART not supported by MIOS32_UART_TxBufferPut Routine
-//! \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
-/////////////////////////////////////////////////////////////////////////////
+/**
+* puts more than one byte onto the transmit buffer (used for atomic sends)<BR>
+* (blocking function)
+* \param[in] uart UART name (GPS, TELEM, AUX)
+* \param[in] *buffer pointer to buffer to be sent
+* \param[in] len number of bytes to be sent
+* \return 0 if no error
+* \return -1 if UART not available
+* \return -3 if UART not supported by MIOS32_UART_TxBufferPut Routine
+* \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
+*/
 int UARTTxBufferPutMore(UARTNumTypeDef uart, uint8_t *buffer, uint16_t len)
 {
 	int error;
@@ -476,33 +467,33 @@ int UARTTxBufferPutMore(UARTNumTypeDef uart, uint8_t *buffer, uint16_t len)
 	return error;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//! puts a byte onto the transmit buffer
-//! \param[in] uart UART number (0..1)
-//! \param[in] b byte which should be put into Tx buffer
-//! \return 0 if no error
-//! \return -1 if UART not available
-//! \return -2 if buffer full (retry)
-//! \return -3 if UART not supported by MIOS32_UART_TxBufferPut Routine
-//! \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
-/////////////////////////////////////////////////////////////////////////////
+/**
+* puts a byte onto the transmit buffer
+* \param[in] uart UART name (GPS, TELEM, AUX)
+* \param[in] b byte which should be put into Tx buffer
+* \return 0 if no error
+* \return -1 if UART not available
+* \return -2 if buffer full (retry)
+* \return -3 if UART not supported by MIOS32_UART_TxBufferPut Routine
+* \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
+*/
 int UARTTxBufferPut_NonBlocking(UARTNumTypeDef uart, uint8_t b)
 {
 	/* For more comfortable usage... */
-	/* -> Just forward to MIOS32_UART_TxBufferPutMore */
+	/* -> Just forward to UARTTxBufferPutMore */
 	return UARTTxBufferPutMore(uart, &b, 1);
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//! puts a byte onto the transmit buffer<BR>
-//! (blocking function)
-//! \param[in] uart UART number (0..1)
-//! \param[in] b byte which should be put into Tx buffer
-//! \return 0 if no error
-//! \return -1 if UART not available
-//! \return -3 if UART not supported by MIOS32_UART_TxBufferPut Routine
-//! \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
-/////////////////////////////////////////////////////////////////////////////
+/**
+* puts a byte onto the transmit buffer<BR>
+* (blocking function)
+* \param[in] uart UART name (GPS, TELEM, AUX)
+* \param[in] b byte which should be put into Tx buffer
+* \return 0 if no error
+* \return -1 if UART not available
+* \return -3 if UART not supported by MIOS32_UART_TxBufferPut Routine
+* \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
+*/
 int UARTTxBufferPut(UARTNumTypeDef uart, uint8_t b)
 {
 	int error;

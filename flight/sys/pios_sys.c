@@ -35,17 +35,13 @@ void NVIC_Configuration(void);
 
 
 /* Local Variables */
-FATFS Fatfs[_DRIVES];	// File system object for each logical drive */
+/* File system object for each logical drive */
+static FATFS Fatfs[_DRIVES];
 
 
 /**
-* Function Name  : SysInit
-* Description    : Brings up the System and Initializes peripherals 
-* Input          : None
-* Output         : None
-* Return         : None
+* Initializes all system peripherals
 */
-//TODO: Get these in the right order, settings need to be loaded ASAP
 void SysInit(void)
 {
 	/* Setup STM32 system (RCC, clock, PLL and Flash configuration) - CMSIS Function */
@@ -67,17 +63,14 @@ void SysInit(void)
 	}
 	
 	/* Call LoadSettings which populates System Vars */
+	/* Settings can not be loaded before this point */
 	LoadSettings();
 	
 }
 
 
 /**
-* Function Name  : GPIO_Configuration
-* Description    : Configures base level GPIO ports.
-* Input          : None
-* Output         : None
-* Return         : None
+* Configures base level GPIO ports.
 */
 void GPIO_Configuration(void)
 {
@@ -86,11 +79,7 @@ void GPIO_Configuration(void)
 
 
 /**
-* Function Name  : NVIC_Configuration
-* Description    : Configures Vector Table base location and SysTick
-* Input          : None
-* Output         : None
-* Return         : None
+* Configures Vector Table base location and SysTick
 */
 void NVIC_Configuration(void)
 {

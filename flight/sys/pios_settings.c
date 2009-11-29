@@ -38,30 +38,22 @@ SettingsTypeDef Settings;
 
 
 /**
-* Function Name  : LoadSettings
-* Description    : Populate System global Vars into Structs using MinIni, 
-* 		 : defaults are also set here. Only function in the file
-*		 : and where all our system data is handled. 
-*		 : Called from the end of SysInit()		   
-* Input          : None
-* Output         : None
-* Return         : None
+* Populate System global Settings into Structs using MinIni, defaults are also set here.
 */
-/* Value Reading:	ini_getl("Section", "Key", (DefaultValue), IniFile);									*/
+/* Value Reading:	ini_getl("Section", "Key", (DefaultValue), IniFile);					*/
 /* String Reading:	ini_gets("Section", "Key", "DefaultValue", StrBuffer, sizearray(StrBuffer), IniFile); 	*/
-
 void LoadSettings(void)
 {
 	char StrBuffer[100];
 	long Result;
 	
 	/* Section: GPS */
-	Settings.GPS.Baudrate = 		(uint32_t) 	ini_getl("GPS", "Baudrate", GPS_BAUDRATE, SETTINGS_FILE);
+	Settings.GPS.Baudrate = 	(uint32_t) 	ini_getl("GPS", "Baudrate", GPS_BAUDRATE, SETTINGS_FILE);
 	
 	/* Section: Telemetry */
-	Settings.Telem.Baudrate = 		(uint32_t) 	ini_getl("Telemetry", "Baudrate", TELEM_BAUDRATE, SETTINGS_FILE);
+	Settings.Telem.Baudrate = 	(uint32_t) 	ini_getl("Telemetry", "Baudrate", TELEM_BAUDRATE, SETTINGS_FILE);
 	
 	/* Section: Auxillary_UART */
-	Settings.AuxUART.Enabled = 		(bool) 		ini_getl("Auxillary_UART", "Enabled", AUXUART_ENABLED, SETTINGS_FILE);
+	Settings.AuxUART.Enabled = 	(bool) 		ini_getl("Auxillary_UART", "Enabled", AUXUART_ENABLED, SETTINGS_FILE);
 	Settings.AuxUART.Baudrate = 	(uint32_t) 	ini_getl("Auxillary_UART", "Baudrate", AUXUART_BAUDRATE, SETTINGS_FILE);
 }

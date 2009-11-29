@@ -43,10 +43,14 @@ static unsigned int prev_primask;
 
 /**
 * Function Name  : IRQDisable
-* Description    : Disables all interrupts (nested)
+* Description    : 
 * Input          : None
 * Output         : None
 * Return         : Zero on no error
+*/
+/**
+* Disables all interrupts (nested)
+* \return < 0 On errors
 */
 int IRQDisable(void)
 {
@@ -73,11 +77,9 @@ int IRQDisable(void)
 
 
 /**
-* Function Name  : IRQEnable
-* Description    : Enables all interrupts (nested)
-* Input          : None
-* Output         : None
-* Return         : Zero on no error, -1 on nesting error
+* Enables all interrupts (nested)
+* \return < 0 on errors
+* \return -1 on nesting errors (IRQDisable() hasn't been called before)
 */
 int IRQEnable(void)
 {

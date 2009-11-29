@@ -31,8 +31,8 @@ typedef enum {LED1 = 0, LED2 = 1} LedTypeDef;
 
 /* Public Functions */
 extern void LED_INIT(void);
-extern void LED_ON(LedTypeDef LEDNum);
-extern void LED_OFF(LedTypeDef LEDNum);
-extern void LED_TOGGLE(LedTypeDef LEDNum);
+extern void LED_ON(LedTypeDef LED);
+extern void LED_OFF(LedTypeDef LED);
+extern void LED_TOGGLE(LedTypeDef LED);
 
 #endif /* PIOS_LED_H */

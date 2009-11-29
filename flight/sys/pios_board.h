@@ -3,7 +3,7 @@
  *
  * @file       pios_board.h   
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
- * @brief      Defines board hardware for the OpenPilot hardware.
+ * @brief      Defines board hardware for the OpenPilot Version 0.1 hardware.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -35,19 +35,18 @@
 //------------------------
 // DMA Channels Used
 //------------------------
-/* Channel 1  - 					*/
+/* Channel 1  - 			*/
 /* Channel 2  - SPI1 (SPI_SD_RX)	*/
 /* Channel 3  - SPI1 (SPI_SD_TX)	*/
-/* Channel 4  - 					*/
-/* Channel 5  - 					*/
-/* Channel 6  - 					*/
-/* Channel 7  - 					*/
-/* Channel 8  - 					*/
-
-/* Channel 9  - 					*/
-/* Channel 10 - 					*/
-/* Channel 11 - 					*/
-/* Channel 12 - 					*/
+/* Channel 4  - 			*/
+/* Channel 5  - 			*/
+/* Channel 6  - 			*/
+/* Channel 7  - 			*/
+/* Channel 8  - 			*/
+/* Channel 9  - 			*/
+/* Channel 10 - 			*/
+/* Channel 11 - 			*/
+/* Channel 12 - 			*/
 
 //------------------------
 // Leds Definition   
@@ -152,7 +151,7 @@
 #define RECEIVER6_TIM_PORT		TIM1
 #define RECEIVER6_CH			TIM_Channel_2   // TIM1_CH2
 
-/* Not used in v1.2 HW
+/* Not used in v0.1 HW
 #define RECEIVER7_GPIO_PORT		GPIOB
 #define RECEIVER7_PIN			GPIO_Pin_4      // PB4
 #define RECEIVER7_TIM_PORT		TIM3

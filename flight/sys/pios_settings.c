@@ -30,10 +30,6 @@
 #include "pios.h"
 
 
-/* Public Function Prototypes */
-void LoadSettings(void);
-
-
 /* Private Function Prototypes */
 
 
@@ -41,7 +37,7 @@ void LoadSettings(void);
 SettingsTypeDef Settings;
 
 
-/*******************************************************************************
+/**
 * Function Name  : LoadSettings
 * Description    : Populate System global Vars into Structs using MinIni, 
 * 		 : defaults are also set here. Only function in the file
@@ -50,7 +46,7 @@ SettingsTypeDef Settings;
 * Input          : None
 * Output         : None
 * Return         : None
-*******************************************************************************/
+*/
 /* Value Reading:	ini_getl("Section", "Key", (DefaultValue), IniFile);									*/
 /* String Reading:	ini_gets("Section", "Key", "DefaultValue", StrBuffer, sizearray(StrBuffer), IniFile); 	*/
 

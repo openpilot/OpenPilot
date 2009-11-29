@@ -30,11 +30,6 @@
 #include "pios.h"
 
 
-/* Public Function Prototypes */
-int IRQDisable(void);
-int IRQEnable(void);
-
-
 /* Private Function Prototypes */
 
 
@@ -46,13 +41,13 @@ static unsigned int nested_ctr;
 static unsigned int prev_primask;
 
 
-/*******************************************************************************
+/**
 * Function Name  : IRQDisable
 * Description    : Disables all interrupts (nested)
 * Input          : None
 * Output         : None
 * Return         : Zero on no error
-*******************************************************************************/
+*/
 int IRQDisable(void)
 {
 	/* Get current priority if nested level == 0 */
@@ -77,13 +72,13 @@ int IRQDisable(void)
 }
 
 
-/*******************************************************************************
+/**
 * Function Name  : IRQEnable
 * Description    : Enables all interrupts (nested)
 * Input          : None
 * Output         : None
 * Return         : Zero on no error, -1 on nesting error
-*******************************************************************************/
+*/
 int IRQEnable(void)
 {
 	/* Check for nesting error */

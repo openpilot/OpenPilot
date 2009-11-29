@@ -30,13 +30,6 @@
 #include "pios.h"
 
 
-/* Public Function Prototypes */
-void LED_INIT(void);
-void LED_ON(LedTypeDef LEDNum);
-void LED_OFF(LedTypeDef LEDNum);
-void LED_TOGGLE(LedTypeDef LEDNum);
-
-
 /* Private Function Prototypes */
 
 
@@ -46,13 +39,13 @@ const uint16_t LED_GPIO_PIN[NUM_LED] = {LED1_GPIO_PIN, LED2_GPIO_PIN};
 const uint32_t LED_GPIO_CLK[NUM_LED] = {LED1_GPIO_CLK, LED2_GPIO_CLK};
 
 
-/*******************************************************************************
+/**
 * Function Name  : LED_INIT
 * Description    : Initialises all the LED's
 * Input          : None
 * Output         : None
 * Return         : None
-*******************************************************************************/
+*/
 void LED_INIT(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -67,39 +60,39 @@ void LED_INIT(void)
 }
 
 
-/*******************************************************************************
+/**
 * Function Name  : LED_ON
 * Description    : Turn on LED
 * Input          : LED Number
 * Output         : None
 * Return         : None
-*******************************************************************************/
+*/
 void LED_ON(LedTypeDef LEDNum)
 {
 	LED_GPIO_PORT[LEDNum]->BSRR = LED_GPIO_PIN[LEDNum];
 }
 
 
-/*******************************************************************************
+/**
 * Function Name  : LED_OFF
 * Description    : Turn off LED
 * Input          : LED Number
 * Output         : None
 * Return         : None
-*******************************************************************************/
+*/
 void LED_OFF(LedTypeDef LEDNum)
 {
 	LED_GPIO_PORT[LEDNum]->BRR = LED_GPIO_PIN[LEDNum];
 }
 
 
-/*******************************************************************************
+/**
 * Function Name  : LED_TOGGLE
 * Description    : Turn on/off LED
 * Input          : LED Number
 * Output         : None
 * Return         : None
-*******************************************************************************/
+*/
 void LED_TOGGLE(LedTypeDef LEDNum)
 {
 	LED_GPIO_PORT[LEDNum]->ODR ^= LED_GPIO_PIN[LEDNum];

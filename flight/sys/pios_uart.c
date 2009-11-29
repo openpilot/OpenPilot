@@ -30,13 +30,6 @@
 #include "pios.h"
 
 
-/* Public Function Prototypes */
-void UARTInit(void);
-void EnableAuxUART(void);
-void DisableAuxUART(void);
-void UARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud);
-
-
 /* Private Function Prototypes */
 
 
@@ -52,13 +45,13 @@ static volatile u8 tx_buffer_head[UART_NUM];
 static volatile u8 tx_buffer_size[UART_NUM];
 
 
-/*******************************************************************************
+/**
 * Function Name  : UARTInit
 * Description    : Initialise the GPS and TELEM onboard UARTs
 * Input          : None
 * Output         : None
 * Return         : None
-*******************************************************************************/
+*/
 void UARTInit(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -149,40 +142,40 @@ void UARTInit(void)
 }
 
 
-/*******************************************************************************
+/**
 * Function Name  : EnableAuxUART
 * Description    : Enables AUX UART at the expense of servo inputs
 * Input          : None
 * Output         : None
 * Return         : None
-*******************************************************************************/
+*/
 void EnableAuxUART(void)
 {
 	//Implement after servo inputs are implemented
 }
 
 
-/*******************************************************************************
+/**
 * Function Name  : DisableAuxUART
 * Description    : Disables AUX UART reclaims two servo inputs
 * Input          : None
 * Output         : None
 * Return         : None
-*******************************************************************************/
+*/
 void DisableAuxUART(void)
 {
 	//Implement after servo inputs are implemented
 }
 
 
-/*******************************************************************************
+/**
 * Function Name  : UARTInit
 * Description    : Changes the baud rate of the USART peripherial without
 *		 : re-initialising.
 * Input          : USART to change, new baud rate
 * Output         : None
 * Return         : None
-*******************************************************************************/
+*/
 void UARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud)
 {
 	/* USART BRR Configuration */

@@ -30,10 +30,6 @@
 #include "pios.h"
 
 
-/* Public Function Prototypes */
-void SysInit(void);
-
-
 /* Private Function Prototypes */
 void NVIC_Configuration(void);
 
@@ -42,13 +38,13 @@ void NVIC_Configuration(void);
 FATFS Fatfs[_DRIVES];	// File system object for each logical drive */
 
 
-/*******************************************************************************
+/**
 * Function Name  : SysInit
 * Description    : Brings up the System and Initializes peripherals 
 * Input          : None
 * Output         : None
 * Return         : None
-*******************************************************************************/
+*/
 //TODO: Get these in the right order, settings need to be loaded ASAP
 void SysInit(void)
 {
@@ -76,26 +72,26 @@ void SysInit(void)
 }
 
 
-/*******************************************************************************
+/**
 * Function Name  : GPIO_Configuration
 * Description    : Configures base level GPIO ports.
 * Input          : None
 * Output         : None
 * Return         : None
-*******************************************************************************/
+*/
 void GPIO_Configuration(void)
 {
 
 }
 
 
-/*******************************************************************************
+/**
 * Function Name  : NVIC_Configuration
 * Description    : Configures Vector Table base location and SysTick
 * Input          : None
 * Output         : None
 * Return         : None
-*******************************************************************************/
+*/
 void NVIC_Configuration(void)
 {
 	/* Set the Vector Table base address as specified in .ld file */

@@ -30,7 +30,7 @@
 #define PIOS_H
 
 
-/* C Header Files */
+/* C Lib Includes */
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -38,14 +38,14 @@
 #include <stm32f10x.h>
 #include <stm32f10x_conf.h>
 
-/* FatFS Functions */
+/* FatFS Includes */
 #include <ff.h>
 #include <diskio.h>
 
-/* minIni Functions */
+/* minIni Includes */
 #include <minIni.h>
 
-/* Include PIOS Hardware Header Files */
+/* PIOS Hardware Includes */
 #include <pios_board.h>
 #include <pios_sys.h>
 #include <pios_settings.h>

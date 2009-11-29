@@ -65,13 +65,13 @@ int main()
 }	            
 
 
-/*******************************************************************************
+/**
 * Function Name  : PiosMainTask
 * Description    : PIOS
 * Input          : None
 * Output         : None
 * Return         : None
-*******************************************************************************/
+*/
 void PiosMainTask( void *pvParameters )
 {
 
@@ -80,13 +80,13 @@ void PiosMainTask( void *pvParameters )
         }
 }
 
-/*******************************************************************************
+/**
 * Function Name  : SensorTask
 * Description    : PIOS
 * Input          : None
 * Output         : None
 * Return         : None
-*******************************************************************************/
+*/
 void SensorTask( void *pvParameters )
 {
 

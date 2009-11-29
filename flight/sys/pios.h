@@ -45,7 +45,7 @@
 /* minIni Functions */
 #include <minIni.h>
 
-/* Include Flyingfox Hardware Header Files */
+/* Include PIOS Hardware Header Files */
 #include <pios_board.h>
 #include <pios_sys.h>
 #include <pios_settings.h>

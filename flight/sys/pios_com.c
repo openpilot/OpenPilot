@@ -55,20 +55,6 @@ int32_t COMInit(void)
 	return -ret;
 }
 
-
-/**
-* This function checks the availability of a COM port
-* \param[in] port COM port (COM_GPS_UART, COM_TELEM_UART, COM_AUX_UART)
-* \return 1: port available
-* \return 0: port not available
-* \note Deprecated since our hardware is a constant
-*/
-int32_t COMCheckAvailable(COMPortTypeDef port)
-{
-	/* Deprecated since our hardware is a constant */
-}
-
-
 /**
 * Sends a package over given port
 * \param[in] port COM port (COM_GPS_UART, COM_TELEM_UART, COM_AUX_UART)
@@ -165,7 +151,7 @@ int32_t COMSendChar(COMPortTypeDef port, char c)
 *         caller should retry until buffer is free again
 * \return 0 on success
 */
-int32_t COMSendString_NonBlocking(COMPortTypeDef port, char *str)
+int32_t COMSendStringNonBlocking(COMPortTypeDef port, char *str)
 {
 	return COMSendBufferNonBlocking(port, (uint8_t *)str, (uint16_t)strlen(str));
 }
@@ -179,9 +165,9 @@ int32_t COMSendString_NonBlocking(COMPortTypeDef port, char *str)
 * \return -1 if port not available
 * \return 0 on success
 */
-int32_t MIOS32_COM_SendString(COMPortTypeDef port, char *str)
+int32_t COMSendString(COMPortTypeDef port, char *str)
 {
-	/* return COMSendBuffer(port, (uint8_t *)str, strlen(str)); */
+	return COMSendBuffer(port, (uint8_t *)str, strlen(str));
 }
 
 
@@ -195,16 +181,15 @@ int32_t MIOS32_COM_SendString(COMPortTypeDef port, char *str)
 *         caller should retry until buffer is free again
 * \return 0 on success
 */
-int32_t MIOS32_COM_SendFormattedStringNonBlocking(COMPortTypeDef port, char *format, ...)
+int32_t COMSendFormattedStringNonBlocking(COMPortTypeDef port, char *format, ...)
 {
 	uint8_t buffer[128]; // TODO: tmp!!! Provide a streamed COM method later!
-	/*
+
 	va_list args;
 
 	va_start(args, format);
 	vsprintf((char *)buffer, format, args);
 	return COMSendBufferNonBlocking(port, buffer, (uint16_t)strlen((char *)buffer));
-	*/
 }
 
 
@@ -217,16 +202,14 @@ int32_t MIOS32_COM_SendFormattedStringNonBlocking(COMPortTypeDef port, char *for
 * \return -1 if port not available
 * \return 0 on success
 */
-int32_t MIOS32_COM_SendFormattedString(COMPortTypeDef port, char *format, ...)
+int32_t COMSendFormattedString(COMPortTypeDef port, char *format, ...)
 {
 	uint8_t buffer[128]; // TODO: tmp!!! Provide a streamed COM method later!
-	/*
 	va_list args;
 
 	va_start(args, format);
 	vsprintf((char *)buffer, format, args);
 	return COMSendBuffer(port, buffer, (uint16_t)strlen((char *)buffer));
-	*/
 }
 
 

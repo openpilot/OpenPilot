@@ -505,9 +505,7 @@ GPS_IRQHANDLER_FUNC
 	if(GPS_UART->SR & (1 << 5)) {
 		uint8_t b = GPS_UART->DR;
 		
-		int status = 0;//MIOS32_MIDI_SendByteToRxCallback(UART0, b);
-		
-		if(status == 0 && UARTRxBufferPut(0, b) < 0) {
+		if(UARTRxBufferPut(0, b) < 0) {
 			/* Here we could add some error handling */
 		}
 	}
@@ -536,9 +534,7 @@ TELEM_IRQHANDLER_FUNC
 	if(TELEM_UART->SR & (1 << 5)) {
 		uint8_t b = TELEM_UART->DR;
 		
-		int status = 0;//MIOS32_MIDI_SendByteToRxCallback(UART1, b);
-		
-		if(status == 0 && UARTRxBufferPut(1, b) < 0) {
+		if(UARTRxBufferPut(1, b) < 0) {
 			/* Here we could add some error handling */
 		}
 	}
@@ -566,9 +562,7 @@ AUX_UART_IRQHANDLER_FUNC
 	if(AUX_UART_UART->SR & (1 << 5)) {
 		uint8_t b = AUX_UART_UART->DR;
 		
-		int status = 0;//MIOS32_MIDI_SendByteToRxCallback(UART1, b);
-		
-		if(status == 0 && UARTRxBufferPut(1, b) < 0) {
+		if(UARTRxBufferPut(1, b) < 0) {
 			/* Here we could add some error handling */
 		}
 	}

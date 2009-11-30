@@ -30,8 +30,10 @@
 
 
 /* C Lib Includes */
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
 
 /* STM32 Std Perf Lib */
 #include <stm32f10x.h>

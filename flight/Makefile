@@ -86,6 +86,7 @@ SRC += $(SYSDIR)/pios_led.c
 SRC += $(SYSDIR)/pios_uart.c
 SRC += $(SYSDIR)/pios_irq.c
 SRC += $(SYSDIR)/pios_com.c
+SRC += $(SYSDIR)/printf-stdarg.c
 
 ## CMSIS for STM32
 SRC += $(CMSISDIR)/core_cm3.c

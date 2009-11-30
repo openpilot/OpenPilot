@@ -1,6 +1,11 @@
 OpenPilot - List of tasks to complete
 Most to least important
 
+
+- Main
+	Start the FreeRTOS tasks and figure out how it all hangs together. PiOS.c should 
+	look 3/4 way there asap. More for my understanding than anything.
+
 - Modules
 	PIOS_SERVO
 	PIOS_PWM

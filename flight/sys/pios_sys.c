@@ -92,3 +92,31 @@ void NVIC_Configuration(void)
 	/* Configure HCLK clock as SysTick clock source. */
 	SysTick_CLKSourceConfig( SysTick_CLKSource_HCLK );
 }
+
+#ifdef  USE_FULL_ASSERT
+/**
+* Reports the name of the source file and the source line number
+*   where the assert_param error has occurred.
+* \param[in]  file pointer to the source file name
+* \param[in]  line assert_param error line source number
+* \retval None
+*/
+void assert_failed(uint8_t* file, uint32_t line)
+{
+	/* When serial debugging is implemented, use something like this. */
+	/* printf("Wrong parameters value: file %s on line %d\r\n", file, line); */
+
+	/* Setup the LEDs to Alternate */
+	LED_ON(LED1);
+	LED_OFF(LED2);
+
+	/* Infinite loop */
+	while (1)
+	{
+		for(int i = 0; i < 1000; i++);
+		LED_TOGGLE(LED1);
+		for(int i = 0; i < 1000; i++);
+		LED_TOGGLE(LED2);
+	}
+}
+#endif

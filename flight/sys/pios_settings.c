@@ -5,7 +5,7 @@
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
  * @brief      Gets and sets PiOS settings, normally from SDCard. 
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   PIOS_SETTINGS
+ * @defgroup   PIOS_SETTINGS Settings Functions
  * @{
  *
  *****************************************************************************/

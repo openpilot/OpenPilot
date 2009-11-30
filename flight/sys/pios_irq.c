@@ -5,7 +5,7 @@
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
  * @brief      IRQ Enable/Disable routines
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   PIOS_IRQ
+ * @defgroup   PIOS_IRQ IRQ Setup Functions
  * @{
  * 
  *****************************************************************************/

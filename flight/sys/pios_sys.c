@@ -5,7 +5,7 @@
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
  * @brief      Sets up basic system hardware, functions are called from Main.
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   PIOS_SYS
+ * @defgroup   PIOS_SYS System Functions
  * @{
  *
  *****************************************************************************/

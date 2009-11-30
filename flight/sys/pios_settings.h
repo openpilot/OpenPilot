@@ -60,5 +60,7 @@ extern SettingsTypeDef Settings;
 
 /* Public Functions */
 extern void LoadSettings(void);
+extern void DumpSettings(USART_TypeDef* USARTx);
+extern int CheckForSettingsFiles(void);
 
 #endif /* PIOS_SETTINGS_H */

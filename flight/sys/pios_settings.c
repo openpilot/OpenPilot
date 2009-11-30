@@ -57,3 +57,37 @@ void LoadSettings(void)
 	Settings.AuxUART.Enabled = 	(bool) 		ini_getl("Auxillary_UART", "Enabled", AUXUART_ENABLED, SETTINGS_FILE);
 	Settings.AuxUART.Baudrate = 	(uint32_t) 	ini_getl("Auxillary_UART", "Baudrate", AUXUART_BAUDRATE, SETTINGS_FILE);
 }
+
+/**
+* Dump Settings struct contents to UART
+* \param[in] USARTx UART name (GPS, TELEM, AUX)
+*/
+void DumpSettings(USART_TypeDef* USARTx)
+{
+	/* Implement once UART is fully implemented */
+}
+
+/**
+* Check if settings files exist on the drive
+* \return 0 All files found
+* \return >0 Number of files missing
+*/
+int CheckForSettingsFiles(void)
+{
+	FILINFO DummyVar;
+	int MissingCount = 0;
+	
+	/* Check for existence of SETTINGS_FILE */
+	if(f_stat(SETTINGS_FILE, &DummyVar) != FR_OK) {
+		MissingCount++;
+	}
+	
+	/* If one or more files are missing, return the number of missing files */
+	if(MissingCount > 0)
+	{
+		return MissingCount;
+	}
+	
+	/* All files found */
+	return 0;
+}

@@ -1,13 +1,22 @@
-- Bootloader FW
-	DFU, IAP, or both.
+OpenPilot - List of tasks to complete
+Most to least important
 
-- FreeRTOS, Realtime stats
-	Very expensive :-( Only for debug mode
-
-- Configuration system - 
-	check MikroKopter source
+- Modules
+	PIOS_SERVO
+	PIOS_PWM
+	PIOS_ADC
+	PIOS_I2C
+	PIOS_ALT
+	PIOS_PPM
+	PIOS_SPI
 
 - USB Composite Device
 	HID and Mass Storage Device
 	Needs to be interrupt triggered
 	Will disable everything else except USB, no flying while plugged in
+
+- Bootloader FW
+	DFU, IAP, or both.
+
+- FreeRTOS, Realtime stats
+	Very expensive :-( Only for debug mode

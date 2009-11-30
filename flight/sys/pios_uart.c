@@ -34,15 +34,15 @@
 
 
 /* Local Variables */
-static u8 rx_buffer[UART_NUM][UART_RX_BUFFER_SIZE];
-static volatile u8 rx_buffer_tail[UART_NUM];
-static volatile u8 rx_buffer_head[UART_NUM];
-static volatile u8 rx_buffer_size[UART_NUM];
+static uint8_t rx_buffer[UART_NUM][UART_RX_BUFFER_SIZE];
+static volatile uint8_t rx_buffer_tail[UART_NUM];
+static volatile uint8_t rx_buffer_head[UART_NUM];
+static volatile uint8_t rx_buffer_size[UART_NUM];
 
-static u8 tx_buffer[UART_NUM][UART_TX_BUFFER_SIZE];
-static volatile u8 tx_buffer_tail[UART_NUM];
-static volatile u8 tx_buffer_head[UART_NUM];
-static volatile u8 tx_buffer_size[UART_NUM];
+static uint8_t tx_buffer[UART_NUM][UART_TX_BUFFER_SIZE];
+static volatile uint8_t tx_buffer_tail[UART_NUM];
+static volatile uint8_t tx_buffer_head[UART_NUM];
+static volatile uint8_t tx_buffer_size[UART_NUM];
 
 
 /**
@@ -192,11 +192,6 @@ void UARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud)
 	USARTx->BRR = (uint16_t)TmpReg;
 }
 
-
-/*----------------------------------------------------------------------------------*/
-/* WORK IN PROGRESS BELOW */
-/*----------------------------------------------------------------------------------*/
-
 /**
 * Returns number of free bytes in receive buffer
 * \param[in] uart UART name (GPS, TELEM, AUX)
@@ -218,7 +213,7 @@ int UARTRxBufferFree(UARTNumTypeDef uart)
 * \param[in] uart UART name (GPS, TELEM, AUX)
 * \return > 0: number of used bytes
 * \return 0 if uart not available
-* \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
+* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
 int UARTRxBufferUsed(UARTNumTypeDef uart)
 {
@@ -235,7 +230,7 @@ int UARTRxBufferUsed(UARTNumTypeDef uart)
 * \return -1 if UART not available
 * \return -2 if no new byte available
 * \return >= 0: number of received bytes
-* \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
+* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
 int UARTRxBufferGet(UARTNumTypeDef uart)
 {
@@ -267,7 +262,7 @@ int UARTRxBufferGet(UARTNumTypeDef uart)
 * \return -1 if UART not available
 * \return -2 if no new byte available
 * \return >= 0: number of received bytes
-* \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
+* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
 int UARTRxBufferPeek(UARTNumTypeDef uart)
 {
@@ -297,7 +292,7 @@ int UARTRxBufferPeek(UARTNumTypeDef uart)
 * \return 0 if no error
 * \return -1 if UART not available
 * \return -2 if buffer full (retry)
-* \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
+* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
 int UARTRxBufferPut(UARTNumTypeDef uart, uint8_t b)
 {
@@ -331,7 +326,7 @@ int UARTRxBufferPut(UARTNumTypeDef uart, uint8_t b)
 * \param[in] uart UART name (GPS, TELEM, AUX)
 * \return number of free bytes
 * \return 0 if uart not available
-* \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
+* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
 int UARTTxBufferFree(UARTNumTypeDef uart)
 {
@@ -347,7 +342,7 @@ int UARTTxBufferFree(UARTNumTypeDef uart)
 * \param[in] uart UART name (GPS, TELEM, AUX)
 * \return number of used bytes
 * \return 0 if uart not available
-* \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
+* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
 int UARTTxBufferUsed(UARTNumTypeDef uart)
 {
@@ -364,7 +359,7 @@ int UARTTxBufferUsed(UARTNumTypeDef uart)
 * \return -1 if UART not available
 * \return -2 if no new byte available
 * \return >= 0: transmitted byte
-* \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
+* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
 int UARTTxBufferGet(UARTNumTypeDef uart)
 {
@@ -400,9 +395,9 @@ int UARTTxBufferGet(UARTNumTypeDef uart)
 * \return -1 if UART not available
 * \return -2 if buffer full or cannot get all requested bytes (retry)
 * \return -3 if UART not supported by MIOS32_UART_TxBufferPut Routine
-* \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
+* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int UARTTxBufferPutMore_NonBlocking(UARTNumTypeDef uart, uint8_t *buffer, uint16_t len)
+int UARTTxBufferPutMoreNonBlocking(UARTNumTypeDef uart, uint8_t *buffer, uint16_t len)
 {
 	if(uart >= UART_NUM) {
 		/* UART not available */
@@ -456,13 +451,13 @@ int UARTTxBufferPutMore_NonBlocking(UARTNumTypeDef uart, uint8_t *buffer, uint16
 * \return 0 if no error
 * \return -1 if UART not available
 * \return -3 if UART not supported by MIOS32_UART_TxBufferPut Routine
-* \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
+* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
 int UARTTxBufferPutMore(UARTNumTypeDef uart, uint8_t *buffer, uint16_t len)
 {
 	int error;
 
-	while((error = UARTTxBufferPutMore_NonBlocking(uart, buffer, len)) == -2);
+	while((error = UARTTxBufferPutMoreNonBlocking(uart, buffer, len)) == -2);
 
 	return error;
 }
@@ -475,7 +470,7 @@ int UARTTxBufferPutMore(UARTNumTypeDef uart, uint8_t *buffer, uint16_t len)
 * \return -1 if UART not available
 * \return -2 if buffer full (retry)
 * \return -3 if UART not supported by MIOS32_UART_TxBufferPut Routine
-* \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
+* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
 int UARTTxBufferPut_NonBlocking(UARTNumTypeDef uart, uint8_t b)
 {
@@ -492,7 +487,7 @@ int UARTTxBufferPut_NonBlocking(UARTNumTypeDef uart, uint8_t b)
 * \return 0 if no error
 * \return -1 if UART not available
 * \return -3 if UART not supported by MIOS32_UART_TxBufferPut Routine
-* \note Applications shouldn't call these functions directly, instead please use \ref MIOS32_COM or \ref MIOS32_MIDI layer functions
+* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
 int UARTTxBufferPut(UARTNumTypeDef uart, uint8_t b)
 {

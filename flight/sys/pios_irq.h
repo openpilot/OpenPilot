@@ -27,14 +27,6 @@
 #define PIOS_IRQ_H
 
 /* Public Functions */
-extern void UARTInit(void);
-extern void EnableAuxUART(void);
-extern void DisableAuxUART(void);
-extern void UARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud);
-
-/*----------------------------------------------------------------------------------*/
-/* WORK IN PROGRESS BELOW */
-/*----------------------------------------------------------------------------------*/
 extern int IRQDisable(void);
 extern int IRQEnable(void);
 

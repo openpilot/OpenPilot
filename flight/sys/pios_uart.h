@@ -26,16 +26,16 @@
 #ifndef PIOS_UART_H
 #define PIOS_UART_H
 
+
+/* Global Types */
+typedef enum {GPS = 0, TELEM = 1, AUX = 2} UARTNumTypeDef;
+
+
 /* Public Functions */
 extern void UARTInit(void);
 extern void EnableAuxUART(void);
 extern void DisableAuxUART(void);
 extern void UARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud);
-
-/*----------------------------------------------------------------------------------*/
-/* WORK IN PROGRESS BELOW */
-/*----------------------------------------------------------------------------------*/
-typedef enum {GPS = 0, TELEM = 1, AUX = 2} UARTNumTypeDef;
 
 extern int UARTRxBufferFree(UARTNumTypeDef uart);
 extern int UARTRxBufferUsed(UARTNumTypeDef uart);
@@ -45,9 +45,9 @@ extern int UARTRxBufferPut(UARTNumTypeDef uart, uint8_t b);
 
 extern int UARTTxBufferFree(UARTNumTypeDef uart);
 extern int UARTTxBufferGet(UARTNumTypeDef uart);
-extern int UARTTxBufferPutMore_NonBlocking(UARTNumTypeDef uart, uint8_t *buffer, uint16_t len);
+extern int UARTTxBufferPutMoreNonBlocking(UARTNumTypeDef uart, uint8_t *buffer, uint16_t len);
 extern int UARTTxBufferPutMore(UARTNumTypeDef uart, uint8_t *buffer, uint16_t len);
-extern int UARTTxBufferPut_NonBlocking(uint8_t uart, uint8_t b);
+extern int UARTTxBufferPutNonBlocking(uint8_t uart, uint8_t b);
 extern int UARTTxBufferPut(UARTNumTypeDef uart, uint8_t b);
 
 #endif /* PIOS_UART_H */

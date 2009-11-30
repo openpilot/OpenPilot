@@ -51,9 +51,7 @@
 #include "pios_led.h"
 #include "pios_uart.h"
 #include "pios_irq.h"
-
-//#include "pios_spi.h"
-//#include "pios_uart.h"
+#include "pios_com.h"
 
 /* More added here as they get written */
 

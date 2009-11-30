@@ -120,8 +120,9 @@
 // USART Serial Ports
 //-------------------------
 #define UART_NUM			3
-#define UART_RX_BUFFER_SIZE		128
-#define UART_TX_BUFFER_SIZE		128
+#define UART_RX_BUFFER_SIZE		1024
+#define UART_TX_BUFFER_SIZE		256
+#define COM_DEBUG_PORT			TELEM
 
 //-------------------------
 // Receiver PWM inputs   

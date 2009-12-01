@@ -32,4 +32,7 @@ Most to least important
 	Doc on the Wiki as we write code, more for my understanding and for new Devs.
 	Logo
 
+- Wiki
+	Mention the architeture PiOS / OPenPilot connection.
+
 

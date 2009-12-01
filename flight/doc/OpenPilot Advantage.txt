@@ -5,5 +5,10 @@ Does not need PPM convertor
 Does not need a recompile for a settings change
 SD Card logging
 NMEA GPS support, does not require special binary protocol
+Cross Platform Build
+
+
+
+Cross Platform Ground Station
  
  

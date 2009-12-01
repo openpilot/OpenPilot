@@ -1,10 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       pios.h  
+ * @file       pios_settings.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
- * @brief      Main PiOS header. 
- *                 - Central header for the project.
+ * @brief      Settings functions header 
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -24,39 +23,44 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#ifndef PIOS_SETTINGS_H
+#define PIOS_SETTINGS_H
 
-#ifndef PIOS_H
-#define PIOS_H
+/* Default Values */
+/* GPSUART Default Values */
+#define GPS_BAUDRATE			19200
 
-/* C Lib Includes */
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
+#define TELEM_BAUDRATE			19200
 
-/* STM32 Std Perf Lib */
-#include <stm32f10x.h>
-#include <stm32f10x_conf.h>
+#define AUXUART_ENABLED			0
+#define AUXUART_BAUDRATE		19200
 
-/* FatFS Includes */
-#include <ff.h>
-#include <diskio.h>
+/* Global types */
+typedef struct {
+	uint32_t Baudrate;
+} GPSSettingsTypeDef;
 
-/* minIni Includes */
-#include <minIni.h>
+typedef struct {
+	uint32_t Baudrate;
+} TelemSettingsTypeDef;
 
-/* PIOS Hardware Includes (STM32F10x) */
-#include "inc/pios_board.h"
-#include "inc/pios_sys.h"
-#include "inc/pios_settings.h"
-#include "inc/pios_led.h"
-#include "inc/pios_uart.h"
-#include "inc/pios_irq.h"
+typedef struct {
+	bool Enabled;
+	uint32_t Baudrate;
+} UARTSettingsTypeDef;
 
-/* PIOS Hardware Includes (Common) */
-#include "inc/pios_com.h"
+typedef struct {
+	GPSSettingsTypeDef GPS;
+	TelemSettingsTypeDef Telem;
+	UARTSettingsTypeDef AuxUART;
+} SettingsTypeDef;
 
-/* More added here as they get written */
+/*Global Variables */
+extern SettingsTypeDef Settings;
 
+/* Public Functions */
+extern void LoadSettings(void);
+extern void DumpSettings(USART_TypeDef* USARTx);
+extern int CheckForSettingsFiles(void);
 
-#endif /* PIOS_H */
+#endif /* PIOS_SETTINGS_H */

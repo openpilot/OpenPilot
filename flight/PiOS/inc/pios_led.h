@@ -1,10 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       pios.h  
+ * @file       pios_led.h   
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
- * @brief      Main PiOS header. 
- *                 - Central header for the project.
+ * @brief      LED functions header.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -24,39 +23,16 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#ifndef PIOS_LED_H
+#define PIOS_LED_H
 
-#ifndef PIOS_H
-#define PIOS_H
+/* Type Definitions */
+typedef enum {LED1 = 0, LED2 = 1} LedTypeDef;
 
-/* C Lib Includes */
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
+/* Public Functions */
+extern void LED_INIT(void);
+extern void LED_ON(LedTypeDef LED);
+extern void LED_OFF(LedTypeDef LED);
+extern void LED_TOGGLE(LedTypeDef LED);
 
-/* STM32 Std Perf Lib */
-#include <stm32f10x.h>
-#include <stm32f10x_conf.h>
-
-/* FatFS Includes */
-#include <ff.h>
-#include <diskio.h>
-
-/* minIni Includes */
-#include <minIni.h>
-
-/* PIOS Hardware Includes (STM32F10x) */
-#include "inc/pios_board.h"
-#include "inc/pios_sys.h"
-#include "inc/pios_settings.h"
-#include "inc/pios_led.h"
-#include "inc/pios_uart.h"
-#include "inc/pios_irq.h"
-
-/* PIOS Hardware Includes (Common) */
-#include "inc/pios_com.h"
-
-/* More added here as they get written */
-
-
-#endif /* PIOS_H */
+#endif /* PIOS_LED_H */

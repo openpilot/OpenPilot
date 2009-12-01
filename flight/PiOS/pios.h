@@ -50,7 +50,7 @@
 #include "inc/pios_sys.h"
 #include "inc/pios_settings.h"
 #include "inc/pios_led.h"
-#include "inc/pios_uart.h"
+#include "inc/pios_usart.h"
 #include "inc/pios_irq.h"
 
 /* PIOS Hardware Includes (Common) */

@@ -75,9 +75,9 @@
 #define HP03D_MCLK_GPIO_PIN		GPIO_Pin_1
 
 //-------------------------
-// GPS UART 
+// GPS USART 
 //-------------------------
-#define GPS_UART			USART2
+#define GPS_USART			USART2
 #define GPS_BAUD			57600
 #define GPS_GPIO_PORT			GPIOA
 #define GPS_RX_PIN			GPIO_Pin_3
@@ -89,9 +89,9 @@
 #define GPS_NVIC_PRIO			IRQ_PRIO_HIGHEST
 
 //-------------------------
-// Telemetry radio UART 
+// Telemetry radio USART 
 //-------------------------
-#define TELEM_UART        		USART3
+#define TELEM_USART        		USART3
 #define TELEM_BAUD         		115200
 #define TELEM_GPIO_PORT         	GPIOC
 #define TELEM_RX_PIN      		GPIO_Pin_11
@@ -105,23 +105,23 @@
 //-------------------------
 // AUXSER USART (available instead of RX5/RX6)
 //-------------------------
-#define AUX_UART_BAUD			19200
-#define AUX_UART_UART			USART1
-#define AUX_UART_GPIO_PORT		GPIOA
-#define AUX_UART_RX_PIN			GPIO_Pin_10
-#define AUX_UART_TX_PIN			GPIO_Pin_9
-#define AUX_UART_REMAP_FUNC		{ }
-#define AUX_UART_IRQ_CHANNEL		USART1_IRQn
-#define AUX_UART_IRQHANDLER_FUNC	void USART1_IRQHandler(void)
-#define AUX_UART_CLK_FUNC		RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE)
-#define AUX_UART_NVIC_PRIO		IRQ_PRIO_HIGH
+#define AUX_USART_BAUD			19200
+#define AUX_USART_USART			USART1
+#define AUX_USART_GPIO_PORT		GPIOA
+#define AUX_USART_RX_PIN			GPIO_Pin_10
+#define AUX_USART_TX_PIN			GPIO_Pin_9
+#define AUX_USART_REMAP_FUNC		{ }
+#define AUX_USART_IRQ_CHANNEL		USART1_IRQn
+#define AUX_USART_IRQHANDLER_FUNC	void USART1_IRQHandler(void)
+#define AUX_USART_CLK_FUNC		RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE)
+#define AUX_USART_NVIC_PRIO		IRQ_PRIO_HIGH
 
 //-------------------------
 // USART Serial Ports
 //-------------------------
-#define UART_NUM			3
-#define UART_RX_BUFFER_SIZE		1024
-#define UART_TX_BUFFER_SIZE		256
+#define USART_NUM			3
+#define USART_RX_BUFFER_SIZE		1024
+#define USART_TX_BUFFER_SIZE		256
 #define COM_DEBUG_PORT			TELEM
 
 //-------------------------
@@ -208,6 +208,6 @@
 #define IRQ_PRIO_LOW			12		// lower than RTOS
 #define IRQ_PRIO_MID			8		// higher than RTOS
 #define IRQ_PRIO_HIGH			5		// for like SPI, AIN, I2C etc...
-#define IRQ_PRIO_HIGHEST		4 		// for UART etc...
+#define IRQ_PRIO_HIGHEST		4 		// for USART etc...
 
 #endif /* PIOS_BOARD_H */

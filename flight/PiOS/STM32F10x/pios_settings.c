@@ -53,9 +53,9 @@ void LoadSettings(void)
 	/* Section: Telemetry */
 	Settings.Telem.Baudrate = 	(uint32_t) 	ini_getl("Telemetry", "Baudrate", TELEM_BAUDRATE, SETTINGS_FILE);
 	
-	/* Section: Auxillary_UART */
-	Settings.AuxUART.Enabled = 	(bool) 		ini_getl("Auxillary_UART", "Enabled", AUXUART_ENABLED, SETTINGS_FILE);
-	Settings.AuxUART.Baudrate = 	(uint32_t) 	ini_getl("Auxillary_UART", "Baudrate", AUXUART_BAUDRATE, SETTINGS_FILE);
+	/* Section: Auxillary_USART */
+	Settings.AuxUSART.Enabled = 	(bool) 		ini_getl("Auxillary_USART", "Enabled", AUXUART_ENABLED, SETTINGS_FILE);
+	Settings.AuxUSART.Baudrate = 	(uint32_t) 	ini_getl("Auxillary_USART", "Baudrate", AUXUART_BAUDRATE, SETTINGS_FILE);
 }
 
 /**

@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       pios_uart.h  
+ * @file       pios_usart.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
- * @brief      UART functions header.
+ * @brief      USART functions header.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -23,31 +23,31 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_UART_H
-#define PIOS_UART_H
+#ifndef PIOS_USART_H
+#define PIOS_USART_H
 
 
 /* Global Types */
-typedef enum {GPS = 0, TELEM = 1, AUX = 2} UARTNumTypeDef;
+typedef enum {GPS = 0, TELEM = 1, AUX = 2} USARTNumTypeDef;
 
 
 /* Public Functions */
-extern void UARTInit(void);
-extern void EnableAuxUART(void);
-extern void DisableAuxUART(void);
-extern void UARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud);
+extern void USARTInit(void);
+extern void USARTEnableAux(void);
+extern void USARTDisableAux(void);
+extern void USARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud);
 
-extern int UARTRxBufferFree(UARTNumTypeDef uart);
-extern int UARTRxBufferUsed(UARTNumTypeDef uart);
-extern int UARTRxBufferGet(UARTNumTypeDef uart);
-extern int UARTRxBufferPeek(UARTNumTypeDef uart);
-extern int UARTRxBufferPut(UARTNumTypeDef uart, uint8_t b);
+extern int USARTRxBufferFree(USARTNumTypeDef uart);
+extern int USARTRxBufferUsed(USARTNumTypeDef uart);
+extern int USARTRxBufferGet(USARTNumTypeDef uart);
+extern int USARTRxBufferPeek(USARTNumTypeDef uart);
+extern int USARTRxBufferPut(USARTNumTypeDef uart, uint8_t b);
 
-extern int UARTTxBufferFree(UARTNumTypeDef uart);
-extern int UARTTxBufferGet(UARTNumTypeDef uart);
-extern int UARTTxBufferPutMoreNonBlocking(UARTNumTypeDef uart, uint8_t *buffer, uint16_t len);
-extern int UARTTxBufferPutMore(UARTNumTypeDef uart, uint8_t *buffer, uint16_t len);
-extern int UARTTxBufferPutNonBlocking(uint8_t uart, uint8_t b);
-extern int UARTTxBufferPut(UARTNumTypeDef uart, uint8_t b);
+extern int USARTTxBufferFree(USARTNumTypeDef uart);
+extern int USARTTxBufferGet(USARTNumTypeDef uart);
+extern int USARTTxBufferPutMoreNonBlocking(USARTNumTypeDef uart, uint8_t *buffer, uint16_t len);
+extern int USARTTxBufferPutMore(USARTNumTypeDef uart, uint8_t *buffer, uint16_t len);
+extern int USARTTxBufferPutNonBlocking(uint8_t uart, uint8_t b);
+extern int USARTTxBufferPut(USARTNumTypeDef uart, uint8_t b);
 
-#endif /* PIOS_UART_H */
+#endif /* PIOS_USART_H */

@@ -47,12 +47,12 @@ typedef struct {
 typedef struct {
 	bool Enabled;
 	uint32_t Baudrate;
-} UARTSettingsTypeDef;
+} USARTSettingsTypeDef;
 
 typedef struct {
 	GPSSettingsTypeDef GPS;
 	TelemSettingsTypeDef Telem;
-	UARTSettingsTypeDef AuxUART;
+	USARTSettingsTypeDef AuxUSART;
 } SettingsTypeDef;
 
 /*Global Variables */

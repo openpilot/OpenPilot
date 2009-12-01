@@ -50,7 +50,7 @@ int32_t COMInit(void)
 	receive_callback_func = NULL;
 
 	/* If any COM assignment: */
-	UARTInit();
+	USARTInit();
 
 	return -ret;
 }
@@ -70,13 +70,13 @@ int32_t COMSendBufferNonBlocking(COMPortTypeDef port, uint8_t *buffer, uint16_t 
 	/* Branch depending on selected port */
 	switch(port) {
 		case 0:
-			return UARTTxBufferPutMoreNonBlocking(COM_DEBUG_PORT, buffer, len);
+			return USARTTxBufferPutMoreNonBlocking(COM_DEBUG_PORT, buffer, len);
 		case 1:
-			return UARTTxBufferPutMoreNonBlocking(GPS, buffer, len);
+			return USARTTxBufferPutMoreNonBlocking(GPS, buffer, len);
 		case 2:
-			return UARTTxBufferPutMoreNonBlocking(TELEM, buffer, len);
+			return USARTTxBufferPutMoreNonBlocking(TELEM, buffer, len);
 		case 3:
-			return UARTTxBufferPutMoreNonBlocking(AUX, buffer, len);
+			return USARTTxBufferPutMoreNonBlocking(AUX, buffer, len);
 		default:
 			/* Invalid port */
 			return -1;
@@ -99,13 +99,13 @@ int32_t COMSendBuffer(COMPortTypeDef port, uint8_t *buffer, uint16_t len)
 	/* Branch depending on selected port */
 	switch(port) {
 		case 0:
-			return UARTTxBufferPutMore(COM_DEBUG_PORT, buffer, len);
+			return USARTTxBufferPutMore(COM_DEBUG_PORT, buffer, len);
 		case 1:
-			return UARTTxBufferPutMore(GPS, buffer, len);
+			return USARTTxBufferPutMore(GPS, buffer, len);
 		case 2:
-			return UARTTxBufferPutMore(TELEM, buffer, len);
+			return USARTTxBufferPutMore(TELEM, buffer, len);
 		case 3:
-			return UARTTxBufferPutMore(AUX, buffer, len);
+			return USARTTxBufferPutMore(AUX, buffer, len);
 		default:
 			/* Invalid port */
 			return -1;
@@ -244,10 +244,10 @@ int32_t COMReceiveHandler(void)
 		// it would also improve this spagetthi code ;)
 		int32_t status = -1;
 		switch( intf++ ) {
-			case 0: status = UARTRxBufferGet(COM_DEBUG_PORT); port = COM_DEBUG_UART; break;
-			case 1: status = UARTRxBufferGet(GPS); port = COM_GPS_UART; break;
-			case 2: status = UARTRxBufferGet(TELEM); port = COM_TELEM_UART; break;
-			case 3: status = UARTRxBufferGet(AUX); port = COM_AUX_UART; break;
+			case 0: status = USARTRxBufferGet(COM_DEBUG_PORT); port = COM_DEBUG_UART; break;
+			case 1: status = USARTRxBufferGet(GPS); port = COM_GPS_UART; break;
+			case 2: status = USARTRxBufferGet(TELEM); port = COM_TELEM_UART; break;
+			case 3: status = USARTRxBufferGet(AUX); port = COM_AUX_UART; break;
 			default:
 				// allow 64 forwards maximum to yield some CPU time for other tasks
 				if(bytes_forwarded && total_bytes_forwarded < 64) {

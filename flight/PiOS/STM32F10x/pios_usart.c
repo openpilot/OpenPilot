@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       pios_uart.c   
+ * @file       pios_usart.c   
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
- * @brief      UART commands. Inits UARTs, controls UARTs & Interupt handlers.
+ * @brief      USART commands. Inits USARTs, controls USARTs & Interupt handlers.
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   PIOS_UART UART Functions
+ * @defgroup   PIOS_USART USART Functions
  * @{
  *
  *****************************************************************************/
@@ -34,41 +34,41 @@
 
 
 /* Local Variables */
-static uint8_t rx_buffer[UART_NUM][UART_RX_BUFFER_SIZE];
-static volatile uint8_t rx_buffer_tail[UART_NUM];
-static volatile uint8_t rx_buffer_head[UART_NUM];
-static volatile uint8_t rx_buffer_size[UART_NUM];
+static uint8_t rx_buffer[USART_NUM][USART_RX_BUFFER_SIZE];
+static volatile uint8_t rx_buffer_tail[USART_NUM];
+static volatile uint8_t rx_buffer_head[USART_NUM];
+static volatile uint8_t rx_buffer_size[USART_NUM];
 
-static uint8_t tx_buffer[UART_NUM][UART_TX_BUFFER_SIZE];
-static volatile uint8_t tx_buffer_tail[UART_NUM];
-static volatile uint8_t tx_buffer_head[UART_NUM];
-static volatile uint8_t tx_buffer_size[UART_NUM];
+static uint8_t tx_buffer[USART_NUM][USART_TX_BUFFER_SIZE];
+static volatile uint8_t tx_buffer_tail[USART_NUM];
+static volatile uint8_t tx_buffer_head[USART_NUM];
+static volatile uint8_t tx_buffer_size[USART_NUM];
 
 
 /**
-* Initialise the GPS and TELEM onboard UARTs
+* Initialise the GPS and TELEM onboard USARTs
 */
-void UARTInit(void)
+void USARTInit(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
 	
-	/* Enable the UART Pins Software Remapping */
+	/* Enable the USART Pins Software Remapping */
 	GPS_REMAP_FUNC;
 	TELEM_REMAP_FUNC;
 	
-	/* Configure UART Pins */
+	/* Configure USART Pins */
 	GPIO_StructInit(&GPIO_InitStructure);
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_OD;
 	
-	/* Configure and Init UART_GPS Tx as alternate function open-drain */
+	/* Configure and Init USART_GPS Tx as alternate function open-drain */
 	GPIO_InitStructure.GPIO_Pin = GPS_TX_PIN;
 	GPIO_Init(GPS_GPIO_PORT, &GPIO_InitStructure);
 	
 	GPIO_InitStructure.GPIO_Pin = TELEM_TX_PIN;
 	GPIO_Init(TELEM_GPIO_PORT, &GPIO_InitStructure);
 	
-	/* Configure and Init UART Rx input with internal pull-ups */
+	/* Configure and Init USART Rx input with internal pull-ups */
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
 	
 	GPIO_InitStructure.GPIO_Pin = GPS_RX_PIN;
@@ -77,11 +77,11 @@ void UARTInit(void)
 	GPIO_InitStructure.GPIO_Pin = TELEM_RX_PIN;
 	GPIO_Init(TELEM_GPIO_PORT, &GPIO_InitStructure);
 
-	/* Enable UART clocks */
+	/* Enable USART clocks */
 	GPS_CLK_FUNC;
 	TELEM_CLK_FUNC;
 
-	/* Configure and Init UARTs */
+	/* Configure and Init USARTs */
 	USART_InitTypeDef USART_InitStructure;
 	
 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
@@ -91,19 +91,19 @@ void UARTInit(void)
 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
 	
 	USART_InitStructure.USART_BaudRate = Settings.GPS.Baudrate;
-	USART_Init(GPS_UART, &USART_InitStructure);
+	USART_Init(GPS_USART, &USART_InitStructure);
 	
 	USART_InitStructure.USART_BaudRate = Settings.Telem.Baudrate;
-	USART_Init(TELEM_UART, &USART_InitStructure);
+	USART_Init(TELEM_USART, &USART_InitStructure);
 	
-	/* Enable UART Receive and Transmit interrupts */
-	USART_ITConfig(GPS_UART, USART_IT_RXNE, ENABLE);
-	USART_ITConfig(GPS_UART, USART_IT_TXE, ENABLE);
+	/* Enable USART Receive and Transmit interrupts */
+	USART_ITConfig(GPS_USART, USART_IT_RXNE, ENABLE);
+	USART_ITConfig(GPS_USART, USART_IT_TXE, ENABLE);
 	
-	USART_ITConfig(TELEM_UART, USART_IT_RXNE, ENABLE);
-	USART_ITConfig(TELEM_UART, USART_IT_TXE, ENABLE);
+	USART_ITConfig(TELEM_USART, USART_IT_RXNE, ENABLE);
+	USART_ITConfig(TELEM_USART, USART_IT_TXE, ENABLE);
 	
-	/* Configure the UART Interrupts */
+	/* Configure the USART Interrupts */
 	NVIC_InitTypeDef NVIC_InitStructure;
 	
 	NVIC_InitStructure.NVIC_IRQChannel = GPS_IRQ_CHANNEL;
@@ -111,46 +111,42 @@ void UARTInit(void)
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
-	USART_ITConfig(GPS_UART, USART_IT_RXNE, ENABLE);
+	USART_ITConfig(GPS_USART, USART_IT_RXNE, ENABLE);
 	
 	NVIC_InitStructure.NVIC_IRQChannel = TELEM_IRQ_CHANNEL;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = TELEM_NVIC_PRIO;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
-	USART_ITConfig(TELEM_UART, USART_IT_RXNE, ENABLE);
+	USART_ITConfig(TELEM_USART, USART_IT_RXNE, ENABLE);
 	
 	/* Clear buffer counters */
 	int i;
-	for(i=0; i<UART_NUM; ++i) {
+	for(i=0; i<USART_NUM; ++i) {
 		rx_buffer_tail[i] = rx_buffer_head[i] = rx_buffer_size[i] = 0;
 		tx_buffer_tail[i] = tx_buffer_head[i] = tx_buffer_size[i] = 0;
 	}
 	
 	/* Enable USARTs */
-	USART_Cmd(GPS_UART, ENABLE);
+	USART_Cmd(GPS_USART, ENABLE);
 	
-	USART_Cmd(TELEM_UART, ENABLE);
-	
-	if(Settings.AuxUART.Enabled == 1) {
-		EnableAuxUART();
-	}
+	USART_Cmd(TELEM_USART, ENABLE);
 }
 
 
 /**
-* Enables AUX UART at the expense of servo inputs
+* Enables AUX USART at the expense of servo inputs
 */
-void EnableAuxUART(void)
+void USARTEnableAux(void)
 {
 	//Implement after servo inputs are implemented
 }
 
 
 /**
-* Disables AUX UART reclaims two servo inputs
+* Disables AUX USART reclaims two servo inputs
 */
-void DisableAuxUART(void)
+void USARTDisableAux(void)
 {
 	//Implement after servo inputs are implemented
 }
@@ -158,10 +154,10 @@ void DisableAuxUART(void)
 
 /**
 * Changes the baud rate of the USART peripherial without re-initialising.
-* \param[in] USARTx UART name (GPS, TELEM, AUX)
+* \param[in] USARTx USART name (GPS, TELEM, AUX)
 * \param[in] Baud Requested baud rate         
 */
-void UARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud)
+void USARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud)
 {
 	/* USART BRR Configuration */
 	/* Configure the USART Baud Rate */
@@ -194,62 +190,62 @@ void UARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud)
 
 /**
 * Returns number of free bytes in receive buffer
-* \param[in] uart UART name (GPS, TELEM, AUX)
-* \return uart number of free bytes
-* \return 1: uart available
-* \return 0: uart not available
+* \param[in] USART USART name (GPS, TELEM, AUX)
+* \return USART number of free bytes
+* \return 1: USART available
+* \return 0: USART not available
 */
-int UARTRxBufferFree(UARTNumTypeDef uart)
+int USARTRxBufferFree(USARTNumTypeDef usart)
 {
-	if(uart >= UART_NUM) {
+	if(usart >= USART_NUM) {
 		return 0;
 	} else {
-		return UART_RX_BUFFER_SIZE - rx_buffer_size[uart];
+		return USART_RX_BUFFER_SIZE - rx_buffer_size[usart];
 	}
 }
 
 /**
 * Returns number of used bytes in receive buffer
-* \param[in] uart UART name (GPS, TELEM, AUX)
+* \param[in] USART USART name (GPS, TELEM, AUX)
 * \return > 0: number of used bytes
-* \return 0 if uart not available
+* \return 0 if USART not available
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int UARTRxBufferUsed(UARTNumTypeDef uart)
+int USARTRxBufferUsed(USARTNumTypeDef usart)
 {
-	if(uart >= UART_NUM) {
+	if(usart >= USART_NUM) {
 		return 0;
 	} else {
-		return rx_buffer_size[uart];
+		return rx_buffer_size[usart];
 	}
 }
 
 /**
 * Gets a byte from the receive buffer
-* \param[in] uart UART name (GPS, TELEM, AUX)
-* \return -1 if UART not available
+* \param[in] USART USART name (GPS, TELEM, AUX)
+* \return -1 if USART not available
 * \return -2 if no new byte available
 * \return >= 0: number of received bytes
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int UARTRxBufferGet(UARTNumTypeDef uart)
+int USARTRxBufferGet(USARTNumTypeDef usart)
 {
-	if(uart >= UART_NUM) {
-		/* UART not available */
+	if(usart >= USART_NUM) {
+		/* USART not available */
 		return -1;
 	}
-	if(!rx_buffer_size[uart]) {
+	if(!rx_buffer_size[usart]) {
 		/* nothing new in buffer */
 		return -2;
 	}
 	
 	/* get byte - this operation should be atomic! */
 	IRQDisable();
-	uint8_t b = rx_buffer[uart][rx_buffer_tail[uart]];
-	if(++rx_buffer_tail[uart] >= UART_RX_BUFFER_SIZE) {
-		rx_buffer_tail[uart] = 0;
+	uint8_t b = rx_buffer[usart][rx_buffer_tail[usart]];
+	if(++rx_buffer_tail[usart] >= USART_RX_BUFFER_SIZE) {
+		rx_buffer_tail[usart] = 0;
 	}
-	--rx_buffer_size[uart];
+	--rx_buffer_size[usart];
 	IRQEnable();
 	
 	/* Return received byte */
@@ -258,27 +254,27 @@ int UARTRxBufferGet(UARTNumTypeDef uart)
 
 /**
 * Returns the next byte of the receive buffer without taking it
-* \param[in] uart UART name (GPS, TELEM, AUX)
-* \return -1 if UART not available
+* \param[in] usart USART name (GPS, TELEM, AUX)
+* \return -1 if USART not available
 * \return -2 if no new byte available
 * \return >= 0: number of received bytes
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int UARTRxBufferPeek(UARTNumTypeDef uart)
+int USARTRxBufferPeek(USARTNumTypeDef usart)
 {
-	if(uart >= UART_NUM) {
-		/* UART not available */
+	if(usart >= USART_NUM) {
+		/* USART not available */
 		return -1;
 	}
 
-	if(!rx_buffer_size[uart]) {
+	if(!rx_buffer_size[usart]) {
 		/* Nothing new in buffer */
 		return -2;
 	}
 
 	/* Get byte - this operation should be atomic! */
 	IRQDisable();
-	uint8_t b = rx_buffer[uart][rx_buffer_tail[uart]];
+	uint8_t b = rx_buffer[usart][rx_buffer_tail[usart]];
 	IRQEnable();
 
 	/* Return received byte */
@@ -287,21 +283,21 @@ int UARTRxBufferPeek(UARTNumTypeDef uart)
 
 /**
 * puts a byte onto the receive buffer
-* \param[in] uart UART name (GPS, TELEM, AUX)
+* \param[in] USART USART name (GPS, TELEM, AUX)
 * \param[in] b byte which should be put into Rx buffer
 * \return 0 if no error
-* \return -1 if UART not available
+* \return -1 if USART not available
 * \return -2 if buffer full (retry)
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int UARTRxBufferPut(UARTNumTypeDef uart, uint8_t b)
+int USARTRxBufferPut(USARTNumTypeDef usart, uint8_t b)
 {
-	if(uart >= UART_NUM) {
-		/* UART not available */
+	if(usart >= USART_NUM) {
+		/* USART not available */
 		return -1;
 	}
 
-	if(rx_buffer_size[uart] >= UART_RX_BUFFER_SIZE) {
+	if(rx_buffer_size[usart] >= USART_RX_BUFFER_SIZE) {
 		/* Buffer full (retry) */
 		return -2;
 	}
@@ -309,11 +305,11 @@ int UARTRxBufferPut(UARTNumTypeDef uart, uint8_t b)
 	/* Copy received byte into receive buffer */
 	/* This operation should be atomic! */
 	IRQDisable();
-	rx_buffer[uart][rx_buffer_head[uart]] = b;
-	if(++rx_buffer_head[uart] >= UART_RX_BUFFER_SIZE) {
-		rx_buffer_head[uart] = 0;
+	rx_buffer[usart][rx_buffer_head[usart]] = b;
+	if(++rx_buffer_head[usart] >= USART_RX_BUFFER_SIZE) {
+		rx_buffer_head[usart] = 0;
 	}
-	++rx_buffer_size[uart];
+	++rx_buffer_size[usart];
 	IRQEnable();
 	
 	/* No error */
@@ -323,63 +319,63 @@ int UARTRxBufferPut(UARTNumTypeDef uart, uint8_t b)
 
 /**
 * returns number of free bytes in transmit buffer
-* \param[in] uart UART name (GPS, TELEM, AUX)
+* \param[in] USART USART name (GPS, TELEM, AUX)
 * \return number of free bytes
-* \return 0 if uart not available
+* \return 0 if USART not available
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int UARTTxBufferFree(UARTNumTypeDef uart)
+int USARTTxBufferFree(USARTNumTypeDef usart)
 {
-	if(uart >= UART_NUM) {
+	if(usart >= USART_NUM) {
 		return 0;
 	} else {
-		return UART_TX_BUFFER_SIZE - tx_buffer_size[uart];
+		return USART_TX_BUFFER_SIZE - tx_buffer_size[usart];
 	}
 }
 
 /**
 * returns number of used bytes in transmit buffer
-* \param[in] uart UART name (GPS, TELEM, AUX)
+* \param[in] USART USART name (GPS, TELEM, AUX)
 * \return number of used bytes
-* \return 0 if uart not available
+* \return 0 if USART not available
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int UARTTxBufferUsed(UARTNumTypeDef uart)
+int USARTTxBufferUsed(USARTNumTypeDef usart)
 {
-	if(uart >= UART_NUM) {
+	if(usart >= USART_NUM) {
 		return 0;
 	} else {
-		return tx_buffer_size[uart];
+		return tx_buffer_size[usart];
 	}
 }
 
 /**
 * gets a byte from the transmit buffer
-* \param[in] uart UART name (GPS, TELEM, AUX)
-* \return -1 if UART not available
+* \param[in] USART USART name (GPS, TELEM, AUX)
+* \return -1 if USART not available
 * \return -2 if no new byte available
 * \return >= 0: transmitted byte
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int UARTTxBufferGet(UARTNumTypeDef uart)
+int USARTTxBufferGet(USARTNumTypeDef usart)
 {
-	if(uart >= UART_NUM) {
-		/* UART not available */
+	if(usart >= USART_NUM) {
+		/* USART not available */
 		return -1;
 	}
 
-	if(!tx_buffer_size[uart]) {
+	if(!tx_buffer_size[usart]) {
 		/* Nothing new in buffer */
 		return -2;
 	}
 
 	/* Get byte - this operation should be atomic! */
 	IRQDisable();
-	uint8_t b = tx_buffer[uart][tx_buffer_tail[uart]];
-	if(++tx_buffer_tail[uart] >= UART_TX_BUFFER_SIZE) {
-		tx_buffer_tail[uart] = 0;
+	uint8_t b = tx_buffer[usart][tx_buffer_tail[usart]];
+	if(++tx_buffer_tail[usart] >= USART_TX_BUFFER_SIZE) {
+		tx_buffer_tail[usart] = 0;
 	}
-	--tx_buffer_size[uart];
+	--tx_buffer_size[usart];
 	IRQEnable();
 
 	/* Return transmitted byte */
@@ -388,23 +384,23 @@ int UARTTxBufferGet(UARTNumTypeDef uart)
 
 /**
 * puts more than one byte onto the transmit buffer (used for atomic sends)
-* \param[in] uart UART name (GPS, TELEM, AUX)
+* \param[in] USART USART name (GPS, TELEM, AUX)
 * \param[in] *buffer pointer to buffer to be sent
 * \param[in] len number of bytes to be sent
 * \return 0 if no error
-* \return -1 if UART not available
+* \return -1 if USART not available
 * \return -2 if buffer full or cannot get all requested bytes (retry)
-* \return -3 if UART not supported by MIOS32_UART_TxBufferPut Routine
+* \return -3 if USART not supported by USARTTxBufferPut Routine
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int UARTTxBufferPutMoreNonBlocking(UARTNumTypeDef uart, uint8_t *buffer, uint16_t len)
+int USARTTxBufferPutMoreNonBlocking(USARTNumTypeDef usart, uint8_t *buffer, uint16_t len)
 {
-	if(uart >= UART_NUM) {
-		/* UART not available */
+	if(usart >= USART_NUM) {
+		/* USART not available */
 		return -1;
 	}
 
-	if((tx_buffer_size[uart]+len) >= UART_TX_BUFFER_SIZE) {
+	if((tx_buffer_size[usart]+len) >= USART_TX_BUFFER_SIZE) {
 		/* Buffer full or cannot get all requested bytes (retry) */
 		return -2;
 	}
@@ -415,22 +411,22 @@ int UARTTxBufferPutMoreNonBlocking(UARTNumTypeDef uart, uint8_t *buffer, uint16_
 
 	uint16_t i;
 	for(i = 0; i < len; ++i) {
-		tx_buffer[uart][tx_buffer_head[uart]] = *buffer++;
+		tx_buffer[usart][tx_buffer_head[usart]] = *buffer++;
 		
-		if(++tx_buffer_head[uart] >= UART_TX_BUFFER_SIZE) {
-			tx_buffer_head[uart] = 0;
+		if(++tx_buffer_head[usart] >= USART_TX_BUFFER_SIZE) {
+			tx_buffer_head[usart] = 0;
 		}
 		
 		/* Enable Tx interrupt if buffer was empty */
-		if(++tx_buffer_size[uart] == 1) {
-			switch(uart) {
+		if(++tx_buffer_size[usart] == 1) {
+			switch(usart) {
 				/* Enable TXE interrupt (TXEIE=1) */
-				case 0: GPS_UART->CR1 |= (1 << 7); break;
+				case 0: GPS_USART->CR1 |= (1 << 7); break;
 				/* Enable TXE interrupt (TXEIE=1) */
-				case 1: TELEM_UART->CR1 |= (1 << 7); break;
+				case 1: TELEM_USART->CR1 |= (1 << 7); break;
 				/* Enable TXE interrupt (TXEIE=1) */
-				case 2: AUX_UART_UART->CR1 |= (1 << 7); break;
-				/* Uart not supported by routine (yet) */
+				case 2: AUX_USART_USART->CR1 |= (1 << 7); break;
+				/* USART not supported by routine (yet) */
 				default: IRQEnable(); return -3;
 			}
 		}
@@ -445,140 +441,140 @@ int UARTTxBufferPutMoreNonBlocking(UARTNumTypeDef uart, uint8_t *buffer, uint16_
 /**
 * puts more than one byte onto the transmit buffer (used for atomic sends)<BR>
 * (blocking function)
-* \param[in] uart UART name (GPS, TELEM, AUX)
+* \param[in] USART USART name (GPS, TELEM, AUX)
 * \param[in] *buffer pointer to buffer to be sent
 * \param[in] len number of bytes to be sent
 * \return 0 if no error
-* \return -1 if UART not available
-* \return -3 if UART not supported by MIOS32_UART_TxBufferPut Routine
+* \return -1 if USART not available
+* \return -3 if USART not supported by USARTTxBufferPut Routine
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int UARTTxBufferPutMore(UARTNumTypeDef uart, uint8_t *buffer, uint16_t len)
+int USARTTxBufferPutMore(USARTNumTypeDef usart, uint8_t *buffer, uint16_t len)
 {
 	int error;
 
-	while((error = UARTTxBufferPutMoreNonBlocking(uart, buffer, len)) == -2);
+	while((error = USARTTxBufferPutMoreNonBlocking(usart, buffer, len)) == -2);
 
 	return error;
 }
 
 /**
 * puts a byte onto the transmit buffer
-* \param[in] uart UART name (GPS, TELEM, AUX)
+* \param[in] USART USART name (GPS, TELEM, AUX)
 * \param[in] b byte which should be put into Tx buffer
 * \return 0 if no error
-* \return -1 if UART not available
+* \return -1 if USART not available
 * \return -2 if buffer full (retry)
-* \return -3 if UART not supported by MIOS32_UART_TxBufferPut Routine
+* \return -3 if USART not supported by USARTTxBufferPut Routine
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int UARTTxBufferPut_NonBlocking(UARTNumTypeDef uart, uint8_t b)
+int USARTTxBufferPut_NonBlocking(USARTNumTypeDef usart, uint8_t b)
 {
 	/* For more comfortable usage... */
-	/* -> Just forward to UARTTxBufferPutMore */
-	return UARTTxBufferPutMore(uart, &b, 1);
+	/* -> Just forward to USARTTxBufferPutMore */
+	return USARTTxBufferPutMore(usart, &b, 1);
 }
 
 /**
 * puts a byte onto the transmit buffer<BR>
 * (blocking function)
-* \param[in] uart UART name (GPS, TELEM, AUX)
+* \param[in] usart USART name (GPS, TELEM, AUX)
 * \param[in] b byte which should be put into Tx buffer
 * \return 0 if no error
-* \return -1 if UART not available
-* \return -3 if UART not supported by MIOS32_UART_TxBufferPut Routine
+* \return -1 if USART not available
+* \return -3 if USART not supported by USARTTxBufferPut Routine
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int UARTTxBufferPut(UARTNumTypeDef uart, uint8_t b)
+int USARTTxBufferPut(USARTNumTypeDef usart, uint8_t b)
 {
 	int error;
 
-	while((error = UARTTxBufferPutMore(uart, &b, 1)) == -2);
+	while((error = USARTTxBufferPutMore(usart, &b, 1)) == -2);
 
 	return error;
 }
 
-/* Interrupt handler for GPS UART */
+/* Interrupt handler for GPS USART */
 GPS_IRQHANDLER_FUNC
 {
 	/* Check if RXNE flag is set */
-	if(GPS_UART->SR & (1 << 5)) {
-		uint8_t b = GPS_UART->DR;
+	if(GPS_USART->SR & (1 << 5)) {
+		uint8_t b = GPS_USART->DR;
 		
-		if(UARTRxBufferPut(0, b) < 0) {
+		if(USARTRxBufferPut(0, b) < 0) {
 			/* Here we could add some error handling */
 		}
 	}
 
 	/* Check if TXE flag is set */
-	if(GPS_UART->SR & (1 << 7)) {
-		if(UARTTxBufferUsed(0) > 0) {
-			int b = UARTTxBufferGet(0);
+	if(GPS_USART->SR & (1 << 7)) {
+		if(USARTTxBufferUsed(0) > 0) {
+			int b = USARTTxBufferGet(0);
 			if( b < 0 ) {
 				/* Here we could add some error handling */
-				GPS_UART->DR = 0xff;
+				GPS_USART->DR = 0xff;
 			} else {
-				GPS_UART->DR = b;
+				GPS_USART->DR = b;
 			}
 		} else {
 			/* Disable TXE interrupt (TXEIE=0) */
-			GPS_UART->CR1 &= ~(1 << 7);
+			GPS_USART->CR1 &= ~(1 << 7);
 		}
 	}
 }
 
-/* Interrupt handler for TELEM UART */
+/* Interrupt handler for TELEM USART */
 TELEM_IRQHANDLER_FUNC
 {
 	/* check if RXNE flag is set */
-	if(TELEM_UART->SR & (1 << 5)) {
-		uint8_t b = TELEM_UART->DR;
+	if(TELEM_USART->SR & (1 << 5)) {
+		uint8_t b = TELEM_USART->DR;
 		
-		if(UARTRxBufferPut(1, b) < 0) {
+		if(USARTRxBufferPut(1, b) < 0) {
 			/* Here we could add some error handling */
 		}
 	}
 
-	if(TELEM_UART->SR & (1 << 7)) { // check if TXE flag is set
-		if(UARTTxBufferUsed(1) > 0) {
-			int b = UARTTxBufferGet(1);
+	if(TELEM_USART->SR & (1 << 7)) { // check if TXE flag is set
+		if(USARTTxBufferUsed(1) > 0) {
+			int b = USARTTxBufferGet(1);
 			if(b < 0) {
 				/* Here we could add some error handling */
-				TELEM_UART->DR = 0xff;
+				TELEM_USART->DR = 0xff;
 			} else {
-				TELEM_UART->DR = b;
+				TELEM_USART->DR = b;
 			}
 		} else {
 			/* Disable TXE interrupt (TXEIE=0) */
-			TELEM_UART->CR1 &= ~(1 << 7);
+			TELEM_USART->CR1 &= ~(1 << 7);
 		}
 	}
 }
 
-/* Interrupt handler for AUX UART */
-AUX_UART_IRQHANDLER_FUNC
+/* Interrupt handler for AUX USART */
+AUX_USART_IRQHANDLER_FUNC
 {
 	/* check if RXNE flag is set */
-	if(AUX_UART_UART->SR & (1 << 5)) {
-		uint8_t b = AUX_UART_UART->DR;
+	if(AUX_USART_USART->SR & (1 << 5)) {
+		uint8_t b = AUX_USART_USART->DR;
 		
-		if(UARTRxBufferPut(1, b) < 0) {
+		if(USARTRxBufferPut(1, b) < 0) {
 			/* Here we could add some error handling */
 		}
 	}
 
-	if(AUX_UART_UART->SR & (1 << 7)) { // check if TXE flag is set
-		if(UARTTxBufferUsed(1) > 0) {
-			int b = UARTTxBufferGet(1);
+	if(AUX_USART_USART->SR & (1 << 7)) { // check if TXE flag is set
+		if(USARTTxBufferUsed(1) > 0) {
+			int b = USARTTxBufferGet(1);
 			if(b < 0) {
 				/* Here we could add some error handling */
-				AUX_UART_UART->DR = 0xff;
+				AUX_USART_USART->DR = 0xff;
 			} else {
-				AUX_UART_UART->DR = b;
+				AUX_USART_USART->DR = b;
 			}
 		} else {
 			/* Disable TXE interrupt (TXEIE=0) */
-			AUX_UART_UART->CR1 &= ~(1 << 7);
+			AUX_USART_USART->CR1 &= ~(1 << 7);
 		}
 	}
 }

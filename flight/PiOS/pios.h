@@ -28,7 +28,6 @@
 #ifndef PIOS_H
 #define PIOS_H
 
-
 /* C Lib Includes */
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,7 +36,7 @@
 
 /* STM32 Std Perf Lib */
 #include <stm32f10x.h>
-#include <stm32f10x_conf.h>
+#include "STM32F10x/inc/stm32f10x_conf.h"
 
 /* FatFS Includes */
 #include <ff.h>
@@ -46,14 +45,16 @@
 /* minIni Includes */
 #include <minIni.h>
 
-/* PIOS Hardware Includes */
-#include "pios_board.h"
-#include "pios_sys.h"
-#include "pios_settings.h"
-#include "pios_led.h"
-#include "pios_uart.h"
-#include "pios_irq.h"
-#include "pios_com.h"
+/* PIOS Hardware Includes (STM32F10x) */
+#include "STM32F10x/inc/pios_board.h"
+#include "STM32F10x/inc/pios_sys.h"
+#include "STM32F10x/inc/pios_settings.h"
+#include "STM32F10x/inc/pios_led.h"
+#include "STM32F10x/inc/pios_uart.h"
+#include "STM32F10x/inc/pios_irq.h"
+
+/* PIOS Hardware Includes (Common) */
+#include "Common/inc/pios_com.h"
 
 /* More added here as they get written */
 

@@ -53,10 +53,12 @@ BOARD    = STM3210E_OP
 OUTDIR = Build
 
 # Target file name (without extension).
-TARGET = openpilot
+TARGET = OpenPilot
 
 # Paths
-SYSDIR = sys
+PIOS = PiOS
+PIOSSTM32F10X = PiOS/STM32F10x
+PIOSCOMMON = PiOS/Common
 APPLIBDIR = libraries
 STMLIBDIR = $(APPLIBDIR)
 STMSPDDIR = $(STMLIBDIR)/STM32F10x_StdPeriph_Driver
@@ -77,16 +79,18 @@ RTOSINCDIR = $(RTOSSRCDIR)/include
 # use file-extension c for "c-only"-files
 
 ## PIOS:
-SRC = $(SYSDIR)/pios.c 
+SRC = $(PIOS)/pios.c 
 
-## PIOS Hardware
-SRC += $(SYSDIR)/pios_sys.c
-SRC += $(SYSDIR)/pios_settings.c
-SRC += $(SYSDIR)/pios_led.c
-SRC += $(SYSDIR)/pios_uart.c
-SRC += $(SYSDIR)/pios_irq.c
-SRC += $(SYSDIR)/pios_com.c
-SRC += $(SYSDIR)/printf-stdarg.c
+## PIOS Hardware (STM32F10x)
+SRC += $(PIOSSTM32F10X)/pios_sys.c
+SRC += $(PIOSSTM32F10X)/pios_settings.c
+SRC += $(PIOSSTM32F10X)/pios_led.c
+SRC += $(PIOSSTM32F10X)/pios_uart.c
+SRC += $(PIOSSTM32F10X)/pios_irq.c
+
+## PIOS Hardware (Common)
+SRC += $(PIOSCOMMON)/pios_com.c
+SRC += $(PIOSCOMMON)/printf-stdarg.c
 
 ## CMSIS for STM32
 SRC += $(CMSISDIR)/core_cm3.c
@@ -155,14 +159,15 @@ CPPSRCARM =
 # Even though the DOS/Win* filesystem matches both .s and .S the same,
 # it will preserve the spelling of the filenames, and gcc itself does
 # care about how the name is spelled on its command-line.
-ASRC = $(SYSDIR)/startup_stm32f10x_$(MODEL).S
+ASRC = $(PIOSSTM32F10X)/startup_stm32f10x_$(MODEL).S
 
 # List Assembler source files here which must be assembled in ARM-Mode..
 ASRCARM = 
 
 # List any extra directories to look for include files here.
 #    Each directory must be seperated by a space.
-EXTRAINCDIRS  = $(SYSDIR)
+EXTRAINCDIRS  =  $(PIOSSTM32F10X)
+EXTRAINCDIRS  += $(PIOSCOMMON)
 EXTRAINCDIRS  += $(STMSPDINCDIR)
 EXTRAINCDIRS  += $(CMSISDIR)
 EXTRAINCDIRS  += $(FATSDDIR)
@@ -187,7 +192,7 @@ EXTRA_LIBDIRS =
 EXTRA_LIBS =
 
 # Path to Linker-Scripts
-LINKERSCRIPTPATH = $(SYSDIR)
+LINKERSCRIPTPATH = $(PIOSSTM32F10X)
 
 # Optimization level, can be [0, 1, 2, 3, s]. 
 # 0 = turn off optimization. s = optimize for size.

@@ -43,6 +43,7 @@
 /* Channel 6  - 			*/
 /* Channel 7  - 			*/
 /* Channel 8  - 			*/
+
 /* Channel 9  - 			*/
 /* Channel 10 - 			*/
 /* Channel 11 - 			*/
@@ -108,8 +109,8 @@
 #define AUX_USART_BAUD			19200
 #define AUX_USART_USART			USART1
 #define AUX_USART_GPIO_PORT		GPIOA
-#define AUX_USART_RX_PIN			GPIO_Pin_10
-#define AUX_USART_TX_PIN			GPIO_Pin_9
+#define AUX_USART_RX_PIN		GPIO_Pin_10
+#define AUX_USART_TX_PIN		GPIO_Pin_9
 #define AUX_USART_REMAP_FUNC		{ }
 #define AUX_USART_IRQ_CHANNEL		USART1_IRQn
 #define AUX_USART_IRQHANDLER_FUNC	void USART1_IRQHandler(void)
@@ -207,7 +208,7 @@
 //-------------------------
 #define IRQ_PRIO_LOW			12		// lower than RTOS
 #define IRQ_PRIO_MID			8		// higher than RTOS
-#define IRQ_PRIO_HIGH			5		// for like SPI, AIN, I2C etc...
+#define IRQ_PRIO_HIGH			5		// for SPI, AIN, I2C etc...
 #define IRQ_PRIO_HIGHEST		4 		// for USART etc...
 
 #endif /* PIOS_BOARD_H */

@@ -57,8 +57,9 @@ TARGET = OpenPilot
 
 # Paths
 PIOS = PiOS
-PIOSSTM32F10X = PiOS/STM32F10x
-PIOSCOMMON = PiOS/Common
+PIOSINC = $(PIOS)/inc
+PIOSSTM32F10X = $(PIOS)/STM32F10x
+PIOSCOMMON = $(PIOS)/Common
 APPLIBDIR = libraries
 STMLIBDIR = $(APPLIBDIR)
 STMSPDDIR = $(STMLIBDIR)/STM32F10x_StdPeriph_Driver
@@ -166,7 +167,9 @@ ASRCARM =
 
 # List any extra directories to look for include files here.
 #    Each directory must be seperated by a space.
-EXTRAINCDIRS  =  $(PIOSSTM32F10X)
+EXTRAINCDIRS  =  $(PIOS)
+EXTRAINCDIRS  += $(PIOSINC)
+EXTRAINCDIRS  += $(PIOSSTM32F10X)
 EXTRAINCDIRS  += $(PIOSCOMMON)
 EXTRAINCDIRS  += $(STMSPDINCDIR)
 EXTRAINCDIRS  += $(CMSISDIR)

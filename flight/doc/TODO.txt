@@ -4,7 +4,7 @@ Most to least important
 
 - Main
 	Start the FreeRTOS tasks and figure out how it all hangs together. PiOS.c should 
-	look 3/4 way there asap. More for my understanding than anything.
+	be got to 3/4 way there asap. More for my understanding than anything.
 
 - Modules
 	PIOS_SERVO
@@ -25,3 +25,11 @@ Most to least important
 
 - FreeRTOS, Realtime stats
 	Very expensive :-( Only for debug mode
+
+
+- Web
+	Wikipedia entry for the project - before revealing to the world.
+	Doc on the Wiki as we write code, more for my understanding and for new Devs.
+	Logo
+
+

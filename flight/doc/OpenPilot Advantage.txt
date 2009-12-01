@@ -1,0 +1,9 @@
+Real time OS
+Open Source
+Custom powerful Hardware using High Denisty SMT32
+Does not need PPM convertor
+Does not need a recompile for a settings change
+SD Card logging
+NMEA GPS support, does not require special binary protocol
+ 
+ 

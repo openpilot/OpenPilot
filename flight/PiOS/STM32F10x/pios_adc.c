@@ -192,7 +192,7 @@ int32_t ADCHandler(void *_callback)
 		/* Call application hook */
 		/* Note that due to dual conversion approach, we have to convert the pin number */
 		/* If an uneven number of channels selected */
-		callback(pin, pin_value);	
+		callback(pin, pin_value);
 	}
 
 	/* Start next scan */

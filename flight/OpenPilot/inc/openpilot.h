@@ -43,5 +43,7 @@
 extern void OpenPilotInit(void);
 extern void vApplicationIdleHook(void);
 
+/* Hooks */
+extern void ADCNotifyChange(uint32_t pin, uint32_t pin_value);
 
 #endif /* OPENPILOT_H */

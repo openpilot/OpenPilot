@@ -34,6 +34,10 @@
 /* Task Priorities */
 #define PRIORITY_TASK_HOOKS             ( tskIDLE_PRIORITY + 3 )
 
+/* Local Variables */
+static uint32_t ulIdleCycleCount = 0;
+static uint32_t IdleTimePercent = 0;
+
 /* Function Prototypes */
 static void HooksTask(void *pvParameters);
 
@@ -45,7 +49,9 @@ int main()
 {
 	/* Setup Hardware */
 	SysInit();
-
+	COMInit();
+	ADCInit();
+	
 	/* Initialise OpenPilot */
 	OpenPilotInit();
 	
@@ -77,8 +83,29 @@ static void HooksTask(void *pvParameters)
 			xLastExecutionTime = xCurrentTickCount;
 		}		
 		
+		/* Check for ADC pin changes, call ADCNotifyChange on each pin change */
+		ADCHandler(ADCNotifyChange);
 		
 		/* Check for incoming COM messages */
 		COMReceiveHandler();
 	}
+}
+
+
+/**
+* Idle hook function
+*/
+void vApplicationIdleHook(void)
+{
+	/* Called when the scheduler has no tasks to run */
+	/* In here we could implement full stats for FreeRTOS
+	Although this would need us to enable stats in FreeRTOS
+	which is *very* costly. With the function below we can
+	either print it out or just watch the variable using JTAG */
+	
+	/* This can give a basic indication of how much time the system spends in idle */
+	/* IdleTimePercent is the percentage of time spent in idle since the scheduler started */
+	/* For example a value of 75 would mean we are spending 75% of FreeRTOS Cycles in idle */
+	ulIdleCycleCount++;
+	IdleTimePercent = ((ulIdleCycleCount / xTaskGetTickCount()) * 100);
 }

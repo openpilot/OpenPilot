@@ -29,8 +29,7 @@
 
 
 /* Local Variables */
-static uint32_t ulIdleCycleCount = 0;
-static uint32_t IdleTimePercent = 0;
+static uint16_t adc_pin_values[4];
 
 /* Local Functions */
 static void ServosTask(void *pvParameters);
@@ -67,23 +66,11 @@ static void ServosTask(void *pvParameters)
 	}
 }
 
-
-
 /**
-* Idle hook function
+* This hook is called every time the 
 */
-void vApplicationIdleHook(void)
+void ADCNotifyChange(uint32_t pin, uint32_t pin_value)
 {
-	/* Called when the scheduler has no tasks to run */
-	/* In here we could implement full stats for FreeRTOS
-	Although this would need us to enable stats in FreeRTOS
-	which is *very* costly. With the function below we can
-	either print it out or just watch the variable using JTAG */
-	
-	/* This can give a basic indication of how much time the system spends in idle */
-	/* IdleTimePercent is the percentage of time spent in idle since the scheduler started */
-	/* For example a value of 75 would mean we are spending 75% of FreeRTOS Cycles in idle */
-	ulIdleCycleCount++;
-	IdleTimePercent = ((ulIdleCycleCount / xTaskGetTickCount()) * 100);
+	/* All we really need to do here is store the values in a local array. */
+	adc_pin_values[pin] = (uint16_t) pin_value;
 }
-

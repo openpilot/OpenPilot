@@ -29,7 +29,8 @@
 
 
 /* Local Variables */
-static unsigned long ulIdleCycleCount = 0UL;
+static uint32_t ulIdleCycleCount = 0;
+static uint32_t IdleTimePercent = 0;
 
 /* Local Functions */
 static void ServosTask(void *pvParameters);
@@ -73,13 +74,15 @@ static void ServosTask(void *pvParameters)
 */
 void vApplicationIdleHook(void)
 {
-	uint32_t IdleTimePercent = 0;
-	
 	/* Called when the scheduler has no tasks to run */
-	/* In here we could implement stats for FreeRTOS */
+	/* In here we could implement full stats for FreeRTOS
+	Although this would need us to enable stats in FreeRTOS
+	which is *very* costly. With the function below we can
+	either print it out or just watch the variable using JTAG */
 	
 	/* This can give a basic indication of how much time the system spends in idle */
 	/* IdleTimePercent is the percentage of time spent in idle since the scheduler started */
+	/* For example a value of 75 would mean we are spending 75% of FreeRTOS Cycles in idle */
 	ulIdleCycleCount++;
 	IdleTimePercent = ((ulIdleCycleCount / xTaskGetTickCount()) * 100);
 }

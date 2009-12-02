@@ -34,43 +34,41 @@
 #include <task.h>
 #include <queue.h>
 
+/* Local Variables */
+static unsigned long ulIdleCycleCount = 0UL;
 
-/* FreeRTOS Prototypes */
-void PiosMainTask( void *pvParameters );
-void SensorTask( void *pvParameters );
+/* Function Prototypes */
+void PiosMainTask(void *pvParameters);
+void SensorTask(void *pvParameters);
+void ServosTask(void *pvParameters);
+void vApplicationIdleHook(void);
 
-
+/**
+* Main function
+*/
 int main()
 {
+	/* Setup Hardware */
+	SysInit();
 
-  /* Setup Hardware */
-  SysInit();
+	/* Start Main tasks. */
+	xTaskCreate(PiosMainTask, (signed portCHAR *) "PiosMain", configMINIMAL_STACK_SIZE, NULL, 2, NULL);
+	xTaskCreate(SensorTask, (signed portCHAR *) "Sensor", configMINIMAL_STACK_SIZE, NULL, 2, NULL);
+	xTaskCreate(ServosTask, (signed portCHAR *) "Servos", configMINIMAL_STACK_SIZE, NULL, 2, NULL);
 
-  /* Start Main tasks. */
-  xTaskCreate( PiosMainTask, ( signed portCHAR * ) "PiosMain", configMINIMAL_STACK_SIZE, NULL, 2, NULL );
-  xTaskCreate( SensorTask, ( signed portCHAR * ) "Sensor", configMINIMAL_STACK_SIZE, NULL, 2, NULL );
+	/* Start the scheduler. */
+	vTaskStartScheduler();
 
-
-  /* Start the scheduler. */
-  vTaskStartScheduler();
-
-
-  /* If all is well we will never reach here as the scheduler will now be
-  running. */ 
-
-  return 0;
-	  			
-}	            
+	/* If all is well we will never reach here as the scheduler will now be running. */
+	/* If we do get here, it will most likley be because we ran out of heap space. */
+	return 0;
+}
 
 
 /**
-* Function Name  : PiosMainTask
-* Description    : PIOS
-* Input          : None
-* Output         : None
-* Return         : None
+* PiosMainTask
 */
-void PiosMainTask( void *pvParameters )
+void PiosMainTask(void *pvParameters)
 {
 
     while(1)
@@ -79,18 +77,49 @@ void PiosMainTask( void *pvParameters )
 }
 
 /**
-* Function Name  : SensorTask
-* Description    : PIOS
-* Input          : None
-* Output         : None
-* Return         : None
+* SensorTask
 */
-void SensorTask( void *pvParameters )
+void SensorTask(void *pvParameters)
 {
-
     while(1)
         {
         }
 }
 
+/**
+* Task to update servo positions at 50Hz
+*/
+void ServosTask(void *pvParameters)
+{
+	portTickType xLastWakeTime;
+	
+	/* The xLastWakeTime variable needs to be initialized with the current tick count. */
+	xLastWakeTime = xTaskGetTickCount();
+	
+	for(;;)
+	{
+		/* Update Servo positions */
+		
+		
+		/* This task should execute exactly every 20 milliseconds or 50Hz
+		There is no need to update the servos any faster than this */
+		vTaskDelayUntil(&xLastWakeTime, (20 / portTICK_RATE_MS));
+	}
+}
+
+/**
+* Idle hook function
+*/
+void vApplicationIdleHook(void)
+{
+	uint32_t IdleTimePercent = 0;
+	
+	/* Called when the scheduler has no tasks to run */
+	/* In here we could implement stats for FreeRTOS */
+	
+	/* This can give a basic indication of how much time the system spends in idle */
+	/* IdleTimePercent is the percentage of time spent in idle since the scheduler started */
+	ulIdleCycleCount++;
+	IdleTimePercent = ((ulIdleCycleCount / xTaskGetTickCount()) * 100);
+}
 

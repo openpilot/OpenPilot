@@ -60,7 +60,7 @@ void LoadSettings(void)
 
 /**
 * Dump Settings struct contents to UART
-* \param[in] USARTx UART name (GPS, TELEM, AUX)
+* \param[in] USARTx USART name (GPS, TELEM, AUX)
 */
 void DumpSettings(USART_TypeDef* USARTx)
 {

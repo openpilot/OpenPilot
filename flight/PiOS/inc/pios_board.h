@@ -183,12 +183,17 @@
 #define NUM_SERVO_OUTPUTS		8
 
 //-------------------------
-// Leveler (analog inputs)
+// ADC
 //-------------------------
-#define LEVELER_GPIO_PORT		GPIOC  
-#define LEVELER_Z_PIN			GPIO_Pin_0	// ADC123_IN10
-#define LEVELER_A_PIN			GPIO_Pin_1	// ADC123_IN11
-#define LEVELER_B_PIN			GPIO_Pin_2	// ADC123_IN12
+#define ADC_GPIO_PORT			GPIOC  
+#define ADC_Z_PIN			GPIO_Pin_0	// ADC123_IN10
+#define ADC_A_PIN			GPIO_Pin_1	// ADC123_IN11
+#define ADC_B_PIN			GPIO_Pin_2	// ADC123_IN12
+#define ADC_Z_CHANNEL			ADC_Channel_10
+#define ADC_A_CHANNEL			ADC_Channel_11
+#define ADC_B_CHANNEL			ADC_Channel_12
+#define NUM_ADC_PINS			4		// 3 but actually 4 because of temp sensor
+#define ADC_IRQ_PRIO			IRQ_PRIO_HIGH
 
 //-------------------------  
 // USB
@@ -208,7 +213,7 @@
 //-------------------------
 #define IRQ_PRIO_LOW			12		// lower than RTOS
 #define IRQ_PRIO_MID			8		// higher than RTOS
-#define IRQ_PRIO_HIGH			5		// for SPI, AIN, I2C etc...
+#define IRQ_PRIO_HIGH			5		// for SPI, ADC, I2C etc...
 #define IRQ_PRIO_HIGHEST		4 		// for USART etc...
 
 #endif /* PIOS_BOARD_H */

@@ -1,10 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       pios.h  
+ * @file       pios_adc.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
- * @brief      Main PiOS header. 
- *                 - Central header for the project.
+ * @brief      ADC functions header.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -24,44 +23,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#ifndef PIOS_ADC_H
+#define PIOS_ADC_H
 
-#ifndef PIOS_H
-#define PIOS_H
+/* Public Functions */
+extern void ADCInit(void);
+extern int32_t ADCPinGet(uint32_t pin);
+extern int32_t ADCHandler(void *_callback);
 
-
-/* PIOS Compile Time Configuration */
-#include "pios_config.h"
-
-/* C Lib Includes */
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
-
-/* STM32 Std Perf Lib */
-#include <stm32f10x.h>
-#include <stm32f10x_conf.h>
-
-/* FatFS Includes */
-#include <ff.h>
-#include <diskio.h>
-
-/* minIni Includes */
-#include <minIni.h>
-
-/* PIOS Hardware Includes (STM32F10x) */
-#include "pios_board.h"
-#include "pios_sys.h"
-#include "pios_led.h"
-#include "pios_usart.h"
-#include "pios_irq.h"
-#include "pios_adc.h"
-
-/* PIOS Hardware Includes (Common) */
-#include "pios_settings.h"
-#include "pios_com.h"
-
-/* More added here as they get written */
-
-
-#endif /* PIOS_H */
+#endif /* PIOS_ADC_H */

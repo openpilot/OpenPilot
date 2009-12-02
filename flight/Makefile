@@ -2,7 +2,7 @@
  # Project: OpenPilot
  #    
  # @file Makefile 
- # Makefile for OpenPilot project build PiOS and the AP.
+ # @brief Makefile for OpenPilot project build PiOS and the AP.
  #
  # @author The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
  #    

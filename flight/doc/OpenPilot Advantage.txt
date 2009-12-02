@@ -4,8 +4,12 @@ Custom powerful Hardware using High Denisty SMT32
 Does not need PPM convertor
 Does not need a recompile for a settings change
 SD Card logging
+	- OpenPilot has logging directly onboard, this is extremely helpful for tuning and trouble
+	shooting.  
+
 NMEA GPS support, does not require special binary protocol
 Fully complete (no soldering to do)
+Standard servo headers so you don't have to butcher your servos. 
 comes with software loaded
 Cross Platform Build, entire dev development is easy to setup
 

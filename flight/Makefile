@@ -56,6 +56,8 @@ OUTDIR = Build
 TARGET = OpenPilot
 
 # Paths
+OPENPILOT = OpenPilot
+OPENPILOTINC = $(OPENPILOT)/inc
 PIOS = PiOS
 PIOSINC = $(PIOS)/inc
 PIOSSTM32F10X = $(PIOS)/STM32F10x
@@ -79,17 +81,20 @@ RTOSINCDIR = $(RTOSSRCDIR)/include
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
 
+## OPENPILOT:
+SRC = $(OPENPILOT)/openpilot.c 
+
 ## PIOS:
-SRC = $(PIOS)/pios.c 
+SRC += $(PIOS)/pios.c 
 
 ## PIOS Hardware (STM32F10x)
 SRC += $(PIOSSTM32F10X)/pios_sys.c
-SRC += $(PIOSSTM32F10X)/pios_settings.c
 SRC += $(PIOSSTM32F10X)/pios_led.c
 SRC += $(PIOSSTM32F10X)/pios_usart.c
 SRC += $(PIOSSTM32F10X)/pios_irq.c
 
 ## PIOS Hardware (Common)
+SRC += $(PIOSCOMMON)/pios_settings.c
 SRC += $(PIOSCOMMON)/pios_com.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 
@@ -167,7 +172,9 @@ ASRCARM =
 
 # List any extra directories to look for include files here.
 #    Each directory must be seperated by a space.
-EXTRAINCDIRS  =  $(PIOS)
+EXTRAINCDIRS  =  $(OPENPILOT)
+EXTRAINCDIRS  += $(OPENPILOTINC)
+EXTRAINCDIRS  += $(PIOS)
 EXTRAINCDIRS  += $(PIOSINC)
 EXTRAINCDIRS  += $(PIOSSTM32F10X)
 EXTRAINCDIRS  += $(PIOSCOMMON)

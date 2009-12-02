@@ -28,20 +28,15 @@
 /* Project Includes */
 #include "pios.h"
 
+/* OpenPilot Includes */
+#include "openpilot.h"
 
-/* FreeRTOS Includes */
-#include <FreeRTOS.h>
-#include <task.h>
-#include <queue.h>
-
-/* Local Variables */
-static unsigned long ulIdleCycleCount = 0UL;
+/* Task Priorities */
+#define PRIORITY_TASK_HOOKS             ( tskIDLE_PRIORITY + 3 )
 
 /* Function Prototypes */
-void PiosMainTask(void *pvParameters);
-void SensorTask(void *pvParameters);
-void ServosTask(void *pvParameters);
-void vApplicationIdleHook(void);
+static void HooksTask(void *pvParameters);
+
 
 /**
 * Main function
@@ -51,12 +46,13 @@ int main()
 	/* Setup Hardware */
 	SysInit();
 
-	/* Start Main tasks. */
-	xTaskCreate(PiosMainTask, (signed portCHAR *) "PiosMain", configMINIMAL_STACK_SIZE, NULL, 2, NULL);
-	xTaskCreate(SensorTask, (signed portCHAR *) "Sensor", configMINIMAL_STACK_SIZE, NULL, 2, NULL);
-	xTaskCreate(ServosTask, (signed portCHAR *) "Servos", configMINIMAL_STACK_SIZE, NULL, 2, NULL);
+	/* Initialise OpenPilot */
+	OpenPilotInit();
+	
+	/* *tart the task which calls the application hooks */
+	xTaskCreate(HooksTask, (signed portCHAR *)"Hooks", configMINIMAL_STACK_SIZE, NULL, PRIORITY_TASK_HOOKS, NULL);
 
-	/* Start the scheduler. */
+	/* Start the scheduler */
 	vTaskStartScheduler();
 
 	/* If all is well we will never reach here as the scheduler will now be running. */
@@ -64,62 +60,25 @@ int main()
 	return 0;
 }
 
-
-/**
-* PiosMainTask
-*/
-void PiosMainTask(void *pvParameters)
+static void HooksTask(void *pvParameters)
 {
+	portTickType xLastExecutionTime;
 
-    while(1)
-        {
-        }
-}
+	// Initialise the xLastExecutionTime variable on task entry
+	xLastExecutionTime = xTaskGetTickCount();
 
-/**
-* SensorTask
-*/
-void SensorTask(void *pvParameters)
-{
-    while(1)
-        {
-        }
-}
-
-/**
-* Task to update servo positions at 50Hz
-*/
-void ServosTask(void *pvParameters)
-{
-	portTickType xLastWakeTime;
-	
-	/* The xLastWakeTime variable needs to be initialized with the current tick count. */
-	xLastWakeTime = xTaskGetTickCount();
-	
-	for(;;)
-	{
-		/* Update Servo positions */
+	while(1) {
+		vTaskDelayUntil(&xLastExecutionTime, 1 / portTICK_RATE_MS);
+		
+		/* Skip delay gap if we had to wait for more than 5 ticks to avoid  */
+		/* unnecessary repeats until xLastExecutionTime reached xTaskGetTickCount() again */
+		portTickType xCurrentTickCount = xTaskGetTickCount();
+		if(xLastExecutionTime < (xCurrentTickCount - 5)) {
+			xLastExecutionTime = xCurrentTickCount;
+		}		
 		
 		
-		/* This task should execute exactly every 20 milliseconds or 50Hz
-		There is no need to update the servos any faster than this */
-		vTaskDelayUntil(&xLastWakeTime, (20 / portTICK_RATE_MS));
+		/* Check for incoming COM messages */
+		COMReceiveHandler();
 	}
 }
-
-/**
-* Idle hook function
-*/
-void vApplicationIdleHook(void)
-{
-	uint32_t IdleTimePercent = 0;
-	
-	/* Called when the scheduler has no tasks to run */
-	/* In here we could implement stats for FreeRTOS */
-	
-	/* This can give a basic indication of how much time the system spends in idle */
-	/* IdleTimePercent is the percentage of time spent in idle since the scheduler started */
-	ulIdleCycleCount++;
-	IdleTimePercent = ((ulIdleCycleCount / xTaskGetTickCount()) * 100);
-}
-

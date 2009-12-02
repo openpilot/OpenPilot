@@ -5,10 +5,17 @@ Does not need PPM convertor
 Does not need a recompile for a settings change
 SD Card logging
 NMEA GPS support, does not require special binary protocol
-Cross Platform Build
+Fully complete (no soldering to do)
+comes with software loaded
+Cross Platform Build, entire dev development is easy to setup
+
+There is a clear distinction in the codebase, PiOS handles the hardware and hides
+the intricities of micro controller developement. OpenPilot sits on top of PiOS and
+is written in clear portable C. The autopilot code of OpenPilot is there for easy to develop
+on without the hassle of direct hardware access.   
 
 
+Cross Platform Ground Station written in c++
 
-Cross Platform Ground Station
  
  

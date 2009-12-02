@@ -275,11 +275,9 @@ CONLYFLAGS += $(CSTANDARD)
 # Assembler flags.
 #  -Wa,...:    tell GCC to pass this to the assembler.
 #  -ahlns:     create listing
-#  -g$(DEBUG): have the assembler create line number information
 ASFLAGS  = -mcpu=$(MCU) -mthumb -I. -x assembler-with-cpp
 ASFLAGS += $(ADEFS)
 ASFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))
-ASFLAGS += -Wa,-g$(DEBUG)
 ASFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))
 
 MATH_LIB = -lm

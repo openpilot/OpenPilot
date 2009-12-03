@@ -45,7 +45,7 @@ static void printchar(char **str, int c)
                 ++(*str);
         }
 
-        else COMSendChar(1, c); // (void)putchar(c);
+        else COMSendChar(COM_DEBUG_UART, c); // (void)putchar(c);
 
 }
 

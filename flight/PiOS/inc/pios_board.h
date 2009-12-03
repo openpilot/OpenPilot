@@ -169,17 +169,16 @@
 //-------------------------
 // Servo outputs   
 //-------------------------
-#define SERVO1_4_PORT			GPIOB
+#define SERVO1TO4_PORT			GPIOB
 #define SERVO1_PIN			GPIO_Pin_6
 #define SERVO2_PIN			GPIO_Pin_7
 #define SERVO3_PIN			GPIO_Pin_8
 #define SERVO4_PIN			GPIO_Pin_9
-#define SERVO5_8_PORT			GPIOC
+#define SERVO5TO8_PORT			GPIOC
 #define SERVO5_PIN			GPIO_Pin_6
 #define SERVO6_PIN			GPIO_Pin_7
 #define SERVO7_PIN			GPIO_Pin_8
 #define SERVO8_PIN			GPIO_Pin_9
-
 #define NUM_SERVO_OUTPUTS		8
 
 //-------------------------

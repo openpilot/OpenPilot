@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       pios_settings.h
+ * @file       pios_servo.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
- * @brief      Settings functions header 
+ * @brief      RC Servo functions header.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -23,52 +23,15 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_SETTINGS_H
-#define PIOS_SETTINGS_H
+#ifndef PIOS_SERVO_H
+#define PIOS_SERVO_H
 
-/* Default Values */
-#define GPS_BAUDRATE			19200
-
-#define TELEM_BAUDRATE			19200
-
-#define AUXUART_ENABLED			0
-#define AUXUART_BAUDRATE		19200
-
-#define SERVOS_POSITION_MIN		800
-#define SERVOS_POSITION_MAX		2200
-
-/* Global types */
-typedef struct {
-	uint32_t Baudrate;
-} GPSSettingsTypeDef;
-
-typedef struct {
-	uint32_t Baudrate;
-} TelemSettingsTypeDef;
-
-typedef struct {
-	bool Enabled;
-	uint32_t Baudrate;
-} USARTSettingsTypeDef;
-
-typedef struct {
-	uint16_t PositionMax;
-	uint16_t PositionMin;
-} ServosSettingsTypeDef;
-
-typedef struct {
-	GPSSettingsTypeDef GPS;
-	TelemSettingsTypeDef Telem;
-	USARTSettingsTypeDef AuxUSART;
-	ServosSettingsTypeDef Servos;
-} SettingsTypeDef;
-
-/*Global Variables */
-extern SettingsTypeDef Settings;
+/* Local Defines */
+#define SERVO_NUM_TIMER_SLOTS		8
+#define SERVOS_POSITION_INITIAL		1500
 
 /* Public Functions */
-extern void LoadSettings(void);
-extern void DumpSettings(USART_TypeDef* USARTx);
-extern int CheckForSettingsFiles(void);
+extern void PIOS_Servo_Init(void);
+extern void PIOS_Servo_Set(uint8_t Servo, uint16_t Position);
 
-#endif /* PIOS_SETTINGS_H */
+#endif /* PIOS_SERVO_H */

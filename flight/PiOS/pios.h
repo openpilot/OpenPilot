@@ -56,6 +56,7 @@
 #include "pios_usart.h"
 #include "pios_irq.h"
 #include "pios_adc.h"
+#include "pios_servo.h"
 
 /* PIOS Hardware Includes (Common) */
 #include "pios_settings.h"

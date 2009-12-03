@@ -44,8 +44,10 @@ SettingsTypeDef Settings;
 /* String Reading:	ini_gets("Section", "Key", "DefaultValue", StrBuffer, sizearray(StrBuffer), IniFile); 	*/
 void LoadSettings(void)
 {
+	/* Unused yet, until we load strings
 	char StrBuffer[100];
 	long Result;
+	*/
 	
 	/* Section: GPS */
 	Settings.GPS.Baudrate = 	(uint32_t) 	ini_getl("GPS", "Baudrate", GPS_BAUDRATE, SETTINGS_FILE);
@@ -56,6 +58,11 @@ void LoadSettings(void)
 	/* Section: Auxillary_USART */
 	Settings.AuxUSART.Enabled = 	(bool) 		ini_getl("Auxillary_USART", "Enabled", AUXUART_ENABLED, SETTINGS_FILE);
 	Settings.AuxUSART.Baudrate = 	(uint32_t) 	ini_getl("Auxillary_USART", "Baudrate", AUXUART_BAUDRATE, SETTINGS_FILE);
+	
+	/* Section: Servos */
+	Settings.Servos.PositionMin =	(uint16_t)	ini_getl("Servos", "PositionMin", SERVOS_POSITION_MIN, SETTINGS_FILE);
+	Settings.Servos.PositionMin =	(uint16_t)	ini_getl("Servos", "PositionMin", SERVOS_POSITION_MIN, SETTINGS_FILE);
+	Settings.Servos.PositionMax =	(uint16_t)	ini_getl("Servos", "PositionMax", SERVOS_POSITION_MAX, SETTINGS_FILE);
 }
 
 /**

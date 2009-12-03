@@ -7,9 +7,7 @@ Most to least important
 	be got to 3/4 way there asap. More for my understanding than anything.
 
 - Modules
-	PIOS_SERVO
 	PIOS_PWM
-	PIOS_ADC
 	PIOS_I2C
 	PIOS_ALT
 	PIOS_PPM

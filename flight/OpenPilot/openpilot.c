@@ -29,7 +29,7 @@
 
 
 /* Local Variables */
-//static uint16_t adc_pin_values[4];
+
 
 /* Local Functions */
 static void ServosTask(void *pvParameters);
@@ -44,40 +44,21 @@ void OpenPilotInit(void)
 	OP_Logging_Init();
 	
 	
-	xTaskCreate(ServosTask, (signed portCHAR *) "Servos", configMINIMAL_STACK_SIZE, NULL, 2, NULL);
-
-
-}
-
-/**
-* Task to update servo positions at 50Hz
-*/
-static void ServosTask(void *pvParameters)
-{
-	portTickType xLastWakeTime;
-	
-	/* The xLastWakeTime variable needs to be initialized with the current tick count. */
-	xLastWakeTime = xTaskGetTickCount();
-	
-	for(;;)
-	{
-		/* Update Servo positions */
+	/* Possible task setup:
+		-> Supervisor: Monitors mainly which state the system should be in, starts/stops Manual/ARC/HARC tasks
+			-> Manual: Simply passes servo inputs to servo outputs, maybe some logging too
+			-> ARC: Assisted RC, fancy name for stabilisation only (aka. Auto1)
+			-> HARC: Higly Assisted RC, fancy name for full autonomous (aka. Auto2)
+		-> GPS: Simply parses incomming GPS data and puts it into the GPS struct, also set states of FIX/NOFIX etc.
+		-> Gatekeepers: Tasks which use queue's to access shared resources
+			-> MicroSD: Simply logs data to the MicroSD card
+			-> Telemetry: Sends (and receives?) telemetry usig a que
 		
-		
-		/* This task should execute exactly every 20 milliseconds or 50Hz
-		There is no need to update the servos any faster than this */
-		vTaskDelayUntil(&xLastWakeTime, (20 / portTICK_RATE_MS));
-	}
-}
+		- Supervisor should have highest possibly priority (Idle + 14?)
+		- Sub tasks of the supervisor should have a priority just lower than the supervisor (Idle + 12?)
+		- Sub tasks of the supervisor shoud ONLY be pre-empted by interrupts such as the GPS tasks
+		- Gatekeepers should sit in a blocked state while there is nothing on the que, with a low priority
+		- With the low priority of gatekeepers, the should only be running while the supervisor tasks are not working
+	*/
 
-
-/**
-* This hook is called every time the 
-*/
-/* Do we really need to use this callback stuff for analog changes?? We should just use PIOS_ADC_PinGet()
-void ADCNotifyChange(uint32_t pin, uint32_t pin_value)
-{
-	// All we really need to do here is store the values in a local array.
-	adc_pin_values[pin] = (uint16_t) pin_value;
 }
-*/

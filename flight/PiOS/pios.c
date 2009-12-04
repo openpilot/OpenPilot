@@ -38,6 +38,10 @@
 static uint32_t ulIdleCycleCount = 0;
 static uint32_t IdleTimePercent = 0;
 
+/* Global Functions */
+void vApplicationIdleHook(void);
+
+
 /* Function Prototypes */
 static void HooksTask(void *pvParameters);
 
@@ -84,7 +88,7 @@ static void HooksTask(void *pvParameters)
 		}		
 		
 		/* Check for ADC pin changes, call ADCNotifyChange on each pin change */
-		ADCHandler(ADCNotifyChange);
+		//ADCHandler(ADCNotifyChange);
 		
 		/* Check for incoming COM messages */
 		COMReceiveHandler();

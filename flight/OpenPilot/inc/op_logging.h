@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       openpilot.h
+ * @file       op_logging.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.
- * @brief      Main OpenPilot header.
+ * @brief      OpenPilot Logging Functions header.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -24,22 +24,22 @@
  */
 
 
-#ifndef OPENPILOT_H
-#define OPENPILOT_H
+#ifndef OP_LOGGING_H
+#define OP_LOGGING_H
+
+/* Defines */
+#define OP_LOGGING_TASK_PRI	( tskIDLE_PRIORITY + 5 )
+
+/* Type Definitions */
+typedef enum {FLIGHT_LOG, RC_LOG} LogTypeTypeDef;
+typedef struct {
+	LogTypeTypeDef Type;
+	char *Message;
+} LogTypeDef;
 
 
-/* PIOS Includes */
-#include "pios.h"
+/* Function Prototypes */
+extern void OP_Logging_Init(void);
 
-/* OpenPilot Includes */
-#include "op_logging.h"
 
-/* FreeRTOS Includes */
-#include <FreeRTOS.h>
-#include <task.h>
-#include <queue.h>
-
-/* Global Functions */
-extern void OpenPilotInit(void);
-
-#endif /* OPENPILOT_H */
+#endif /* OP_LOGGING_H */

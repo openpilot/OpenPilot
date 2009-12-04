@@ -82,7 +82,8 @@ RTOSINCDIR = $(RTOSSRCDIR)/include
 # use file-extension c for "c-only"-files
 
 ## OPENPILOT:
-SRC = $(OPENPILOT)/openpilot.c 
+SRC =  $(OPENPILOT)/openpilot.c
+SRC += $(OPENPILOT)/op_logging.c
 
 ## PIOS:
 SRC += $(PIOS)/pios.c 

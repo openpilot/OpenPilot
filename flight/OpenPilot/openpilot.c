@@ -29,7 +29,7 @@
 
 
 /* Local Variables */
-static uint16_t adc_pin_values[4];
+//static uint16_t adc_pin_values[4];
 
 /* Local Functions */
 static void ServosTask(void *pvParameters);
@@ -40,6 +40,10 @@ static void ServosTask(void *pvParameters);
 */
 void OpenPilotInit(void)
 {
+	/* Initialise Logging */
+	OP_Logging_Init();
+	
+	
 	xTaskCreate(ServosTask, (signed portCHAR *) "Servos", configMINIMAL_STACK_SIZE, NULL, 2, NULL);
 
 
@@ -66,11 +70,14 @@ static void ServosTask(void *pvParameters)
 	}
 }
 
+
 /**
 * This hook is called every time the 
 */
+/* Do we really need to use this callback stuff for analog changes?? We should just use PIOS_ADC_PinGet()
 void ADCNotifyChange(uint32_t pin, uint32_t pin_value)
 {
-	/* All we really need to do here is store the values in a local array. */
+	// All we really need to do here is store the values in a local array.
 	adc_pin_values[pin] = (uint16_t) pin_value;
 }
+*/

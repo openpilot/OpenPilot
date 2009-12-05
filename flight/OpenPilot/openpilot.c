@@ -32,7 +32,6 @@
 
 
 /* Local Functions */
-static void ServosTask(void *pvParameters);
 
 
 /**
@@ -52,13 +51,17 @@ void OpenPilotInit(void)
 		-> GPS: Simply parses incomming GPS data and puts it into the GPS struct, also set states of FIX/NOFIX etc.
 		-> Gatekeepers: Tasks which use queue's to access shared resources
 			-> MicroSD: Simply logs data to the MicroSD card
-			-> Telemetry: Sends (and receives?) telemetry usig a que
+			-> Telemetry: Sends telemetry using a queue
 		
 		- Supervisor should have highest possibly priority (Idle + 14?)
+		- Supervisor should also act as the warnings system, low batter etc)
+		- Supervisor should handle all telemetry inputs (not outputs), and act accordingly
 		- Sub tasks of the supervisor should have a priority just lower than the supervisor (Idle + 12?)
-		- Sub tasks of the supervisor shoud ONLY be pre-empted by interrupts such as the GPS tasks
+		- Sub tasks of the supervisor shoud ONLY be pre-empted by system interrupts such as UART, I2C etc
 		- Gatekeepers should sit in a blocked state while there is nothing on the que, with a low priority
-		- With the low priority of gatekeepers, the should only be running while the supervisor tasks are not working
+		- With the low priority of gatekeepers, they should only be running while the supervisor tasks are not working
+		
+		- I2C module sending and receiving needs to be included in here somwhere. Inputs would be interrupt triggered.
 	*/
 
 }

@@ -47,6 +47,9 @@ void OP_Logging_Init(void)
 	uint16_t FileCount;
 	FILINFO DummyFileInfo;
 	
+	/* Create the logging queue */
+	xLoggingQueue = xQueueCreate(15, sizeof(LogTypeDef));
+	
 	/* This is a crude way to file the next avaiable number avaiable */
 	/* The proper way would be to use folders with dates, we will get to that later */
 	for(FileCount = 0; FileCount < 65536; FileCount++) {

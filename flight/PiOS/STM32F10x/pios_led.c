@@ -42,7 +42,7 @@ static const uint32_t LED_GPIO_CLK[NUM_LED] = {LED1_GPIO_CLK, LED2_GPIO_CLK};
 /**
 * Initialises all the LED's
 */
-void LED_INIT(void)
+void PIOS_LED_Init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; 
@@ -60,7 +60,7 @@ void LED_INIT(void)
 * Turn on LED
 * \param[in] LED LED Name (LED1, LED2)
 */
-void LED_ON(LedTypeDef LED)
+void PIOS_LED_On(LedTypeDef LED)
 {
 	LED_GPIO_PORT[LED]->BSRR = LED_GPIO_PIN[LED];
 }
@@ -70,7 +70,7 @@ void LED_ON(LedTypeDef LED)
 * Turn off LED
 * \param[in] LED LED Name (LED1, LED2)
 */
-void LED_OFF(LedTypeDef LED)
+void PIOS_LED_Off(LedTypeDef LED)
 {
 	LED_GPIO_PORT[LED]->BRR = LED_GPIO_PIN[LED];
 }
@@ -80,7 +80,7 @@ void LED_OFF(LedTypeDef LED)
 * Toggle LED on/off
 * \param[in] LED LED Name (LED1, LED2)
 */
-void LED_TOGGLE(LedTypeDef LED)
+void PIOS_LED_Toggle(LedTypeDef LED)
 {
 	LED_GPIO_PORT[LED]->ODR ^= LED_GPIO_PIN[LED];
 }

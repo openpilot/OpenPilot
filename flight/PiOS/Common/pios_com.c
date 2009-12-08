@@ -42,7 +42,7 @@ static int32_t (*receive_callback_func)(COMPortTypeDef port, char c);
 * \param[in] mode currently only mode 0 supported
 * \return < 0 if initialisation failed
 */
-int32_t COMInit(void)
+int32_t PIOS_COM_Init(void)
 {
 	int32_t ret = 0;
 
@@ -50,7 +50,7 @@ int32_t COMInit(void)
 	receive_callback_func = NULL;
 
 	/* If any COM assignment: */
-	USARTInit();
+	PIOS_USART_Init();
 
 	return -ret;
 }
@@ -65,18 +65,18 @@ int32_t COMInit(void)
 *            caller should retry until buffer is free again
 * \return 0 on success
 */
-int32_t COMSendBufferNonBlocking(COMPortTypeDef port, uint8_t *buffer, uint16_t len)
+int32_t PIOS_COM_SendBufferNonBlocking(COMPortTypeDef port, uint8_t *buffer, uint16_t len)
 {
 	/* Branch depending on selected port */
 	switch(port) {
 		case 0:
-			return USARTTxBufferPutMoreNonBlocking(COM_DEBUG_PORT, buffer, len);
+			return PIOS_USART_TxBufferPutMoreNonBlocking(COM_DEBUG_PORT, buffer, len);
 		case 1:
-			return USARTTxBufferPutMoreNonBlocking(GPS, buffer, len);
+			return PIOS_USART_TxBufferPutMoreNonBlocking(GPS, buffer, len);
 		case 2:
-			return USARTTxBufferPutMoreNonBlocking(TELEM, buffer, len);
+			return PIOS_USART_TxBufferPutMoreNonBlocking(TELEM, buffer, len);
 		case 3:
-			return USARTTxBufferPutMoreNonBlocking(AUX, buffer, len);
+			return PIOS_USART_TxBufferPutMoreNonBlocking(AUX, buffer, len);
 		default:
 			/* Invalid port */
 			return -1;
@@ -94,18 +94,18 @@ int32_t COMSendBufferNonBlocking(COMPortTypeDef port, uint8_t *buffer, uint16_t 
 * \return -1 if port not available
 * \return 0 on success
 */
-int32_t COMSendBuffer(COMPortTypeDef port, uint8_t *buffer, uint16_t len)
+int32_t PIOS_COM_SendBuffer(COMPortTypeDef port, uint8_t *buffer, uint16_t len)
 {
 	/* Branch depending on selected port */
 	switch(port) {
 		case 0:
-			return USARTTxBufferPutMore(COM_DEBUG_PORT, buffer, len);
+			return PIOS_USART_TxBufferPutMore(COM_DEBUG_PORT, buffer, len);
 		case 1:
-			return USARTTxBufferPutMore(GPS, buffer, len);
+			return PIOS_USART_TxBufferPutMore(GPS, buffer, len);
 		case 2:
-			return USARTTxBufferPutMore(TELEM, buffer, len);
+			return PIOS_USART_TxBufferPutMore(TELEM, buffer, len);
 		case 3:
-			return USARTTxBufferPutMore(AUX, buffer, len);
+			return PIOS_USART_TxBufferPutMore(AUX, buffer, len);
 		default:
 			/* Invalid port */
 			return -1;
@@ -122,9 +122,9 @@ int32_t COMSendBuffer(COMPortTypeDef port, uint8_t *buffer, uint16_t len)
 *            caller should retry until buffer is free again
 * \return 0 on success
 */
-int32_t COMSendCharNonBlocking(COMPortTypeDef port, char c)
+int32_t PIOS_COM_SendCharNonBlocking(COMPortTypeDef port, char c)
 {
-	return COMSendBufferNonBlocking(port, (uint8_t *)&c, 1);
+	return PIOS_COM_SendBufferNonBlocking(port, (uint8_t *)&c, 1);
 }
 
 
@@ -136,9 +136,9 @@ int32_t COMSendCharNonBlocking(COMPortTypeDef port, char c)
 * \return -1 if port not available
 * \return 0 on success
 */
-int32_t COMSendChar(COMPortTypeDef port, char c)
+int32_t PIOS_COM_SendChar(COMPortTypeDef port, char c)
 {
-	return COMSendBuffer(port, (uint8_t *)&c, 1);
+	return PIOS_COM_SendBuffer(port, (uint8_t *)&c, 1);
 }
 
 
@@ -151,9 +151,9 @@ int32_t COMSendChar(COMPortTypeDef port, char c)
 *         caller should retry until buffer is free again
 * \return 0 on success
 */
-int32_t COMSendStringNonBlocking(COMPortTypeDef port, char *str)
+int32_t PIOS_COM_SendStringNonBlocking(COMPortTypeDef port, char *str)
 {
-	return COMSendBufferNonBlocking(port, (uint8_t *)str, (uint16_t)strlen(str));
+	return PIOS_COM_SendBufferNonBlocking(port, (uint8_t *)str, (uint16_t)strlen(str));
 }
 
 
@@ -165,9 +165,9 @@ int32_t COMSendStringNonBlocking(COMPortTypeDef port, char *str)
 * \return -1 if port not available
 * \return 0 on success
 */
-int32_t COMSendString(COMPortTypeDef port, char *str)
+int32_t PIOS_COM_SendString(COMPortTypeDef port, char *str)
 {
-	return COMSendBuffer(port, (uint8_t *)str, strlen(str));
+	return PIOS_COM_SendBuffer(port, (uint8_t *)str, strlen(str));
 }
 
 
@@ -181,7 +181,7 @@ int32_t COMSendString(COMPortTypeDef port, char *str)
 *         caller should retry until buffer is free again
 * \return 0 on success
 */
-int32_t COMSendFormattedStringNonBlocking(COMPortTypeDef port, char *format, ...)
+int32_t PIOS_COM_SendFormattedStringNonBlocking(COMPortTypeDef port, char *format, ...)
 {
 	uint8_t buffer[128]; // TODO: tmp!!! Provide a streamed COM method later!
 
@@ -189,7 +189,7 @@ int32_t COMSendFormattedStringNonBlocking(COMPortTypeDef port, char *format, ...
 
 	va_start(args, format);
 	vsprintf((char *)buffer, format, args);
-	return COMSendBufferNonBlocking(port, buffer, (uint16_t)strlen((char *)buffer));
+	return PIOS_COM_SendBufferNonBlocking(port, buffer, (uint16_t)strlen((char *)buffer));
 }
 
 
@@ -202,14 +202,14 @@ int32_t COMSendFormattedStringNonBlocking(COMPortTypeDef port, char *format, ...
 * \return -1 if port not available
 * \return 0 on success
 */
-int32_t COMSendFormattedString(COMPortTypeDef port, char *format, ...)
+int32_t PIOS_COM_SendFormattedString(COMPortTypeDef port, char *format, ...)
 {
 	uint8_t buffer[128]; // TODO: tmp!!! Provide a streamed COM method later!
 	va_list args;
 
 	va_start(args, format);
 	vsprintf((char *)buffer, format, args);
-	return COMSendBuffer(port, buffer, (uint16_t)strlen((char *)buffer));
+	return PIOS_COM_SendBuffer(port, buffer, (uint16_t)strlen((char *)buffer));
 }
 
 
@@ -223,7 +223,7 @@ int32_t COMSendFormattedString(COMPortTypeDef port, char *format, ...)
 * 
 * \return < 0 on errors
 */
-int32_t COMReceiveHandler(void)
+int32_t PIOS_COM_ReceiveHandler(void)
 {
 	uint8_t port;
 
@@ -244,10 +244,10 @@ int32_t COMReceiveHandler(void)
 		// it would also improve this spagetthi code ;)
 		int32_t status = -1;
 		switch( intf++ ) {
-			case 0: status = USARTRxBufferGet(COM_DEBUG_PORT); port = COM_DEBUG_UART; break;
-			case 1: status = USARTRxBufferGet(GPS); port = COM_GPS_UART; break;
-			case 2: status = USARTRxBufferGet(TELEM); port = COM_TELEM_UART; break;
-			case 3: status = USARTRxBufferGet(AUX); port = COM_AUX_UART; break;
+			case 0: status = PIOS_USART_RxBufferGet(COM_DEBUG_PORT); port = COM_DEBUG_UART; break;
+			case 1: status = PIOS_USART_RxBufferGet(GPS); port = COM_GPS_UART; break;
+			case 2: status = PIOS_USART_RxBufferGet(TELEM); port = COM_TELEM_UART; break;
+			case 3: status = PIOS_USART_RxBufferGet(AUX); port = COM_AUX_UART; break;
 			default:
 				// allow 64 forwards maximum to yield some CPU time for other tasks
 				if(bytes_forwarded && total_bytes_forwarded < 64) {
@@ -291,12 +291,12 @@ int32_t COMReceiveHandler(void)
 *
 * The callback function has been installed in an Init() function with:
 * \code
-*   COMReceiveCallbackInit(CONSOLE_Parse);
+*   PIOS_COM_ReceiveCallbackInit(CONSOLE_Parse);
 * \endcode
 * \param[in] callback_debug_command the callback function (NULL disables the callback)
 * \return < 0 on errors
 */
-int32_t COMReceiveCallbackInit(void *callback_receive)
+int32_t PIOS_COM_ReceiveCallbackInit(void *callback_receive)
 {
 	receive_callback_func = callback_receive;
 

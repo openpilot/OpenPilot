@@ -52,9 +52,9 @@ static void HooksTask(void *pvParameters);
 int main()
 {
 	/* Setup Hardware */
-	SysInit();
-	COMInit();
-	ADCInit();
+	PIOS_SYS_Init();
+	PIOS_COM_Init();
+	PIOS_ADC_Init();
 	
 	/* Initialise OpenPilot */
 	OpenPilotInit();
@@ -91,7 +91,7 @@ static void HooksTask(void *pvParameters)
 		//ADCHandler(ADCNotifyChange);
 		
 		/* Check for incoming COM messages */
-		COMReceiveHandler();
+		PIOS_COM_ReceiveHandler();
 	}
 }
 

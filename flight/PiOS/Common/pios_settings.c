@@ -42,7 +42,7 @@ SettingsTypeDef Settings;
 */
 /* Value Reading:	ini_getl("Section", "Key", (DefaultValue), IniFile);					*/
 /* String Reading:	ini_gets("Section", "Key", "DefaultValue", StrBuffer, sizearray(StrBuffer), IniFile); 	*/
-void LoadSettings(void)
+void PIOS_Settings_Load(void)
 {
 	/* Unused yet, until we load strings
 	char StrBuffer[100];
@@ -69,7 +69,7 @@ void LoadSettings(void)
 * Dump Settings struct contents to UART
 * \param[in] USARTx USART name (GPS, TELEM, AUX)
 */
-void DumpSettings(USART_TypeDef* USARTx)
+void PIOS_Settings_Dump(USART_TypeDef* USARTx)
 {
 	/* Implement once UART is fully implemented */
 }
@@ -79,7 +79,7 @@ void DumpSettings(USART_TypeDef* USARTx)
 * \return 0 All files found
 * \return >0 Number of files missing
 */
-int CheckForSettingsFiles(void)
+int PIOS_Settings_CheckForFiles(void)
 {
 	FILINFO DummyVar;
 	int MissingCount = 0;

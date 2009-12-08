@@ -41,7 +41,7 @@ static uint16_t adc_pin_values[NUM_ADC_PINS];
 /**
 * Initialise the ADC Peripheral
 */
-void ADCInit(void)
+void PIOS_ADC_Init(void)
 {
 	int32_t i;
 
@@ -153,7 +153,7 @@ void ADCInit(void)
 * \return ADC pin value - resolution depends on the selected oversampling rate Set in Settings.ini
 * \return -1 if pin doesn't exist
 */
-int32_t ADCPinGet(uint32_t pin)
+int32_t PIOS_ADC_PinGet(uint32_t pin)
 {
 	/* Check if pin exists */
 	if(pin >= NUM_ADC_PINS) {
@@ -173,7 +173,7 @@ int32_t ADCPinGet(uint32_t pin)
 * \param[in] _callback pointer to callback function
 * \return < 0 on errors
 */
-int32_t ADCHandler(void *_callback)
+int32_t PIOS_ADC_Handler(void *_callback)
 {
 	/* No callback function? */
 	if(_callback == NULL) {
@@ -185,9 +185,9 @@ int32_t ADCHandler(void *_callback)
 
 	/* Check for changed ADC conversion values */
 	for(pin = 0; pin < NUM_ADC_PINS; pin++) {		
-		IRQDisable();
+		PIOS_IRQ_Disable();
 		uint32_t pin_value = adc_pin_values[pin];
-		IRQEnable();
+		PIOS_IRQ_Enable();
 		
 		/* Call application hook */
 		/* Note that due to dual conversion approach, we have to convert the pin number */

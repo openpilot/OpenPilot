@@ -45,22 +45,22 @@ static unsigned int prev_primask;
 * Disables all interrupts (nested)
 * \return < 0 On errors
 */
-int IRQDisable(void)
+int PIOS_IRQ_Disable(void)
 {
 	/* Get current priority if nested level == 0 */
 	if(!nested_ctr) {
-		__asm volatile (						\
-						"   mrs %0, primask\n"	\
-						: "=r" (prev_primask)	\
-						);
+		__asm volatile (			\
+				"   mrs %0, primask\n"	\
+				: "=r" (prev_primask)	\
+				);
 	}
 
 	/* disable interrupts */
-	__asm volatile (							\
-					"     mov r0, #1     \n"	\
-					"     msr primask, r0\n"	\
-					:::"r0"						\
-					);
+	__asm volatile (				\
+			"     mov r0, #1     \n"	\
+			"     msr primask, r0\n"	\
+			:::"r0"				\
+			);
 
 	++nested_ctr;
 
@@ -72,9 +72,9 @@ int IRQDisable(void)
 /**
 * Enables all interrupts (nested)
 * \return < 0 on errors
-* \return -1 on nesting errors (IRQDisable() hasn't been called before)
+* \return -1 on nesting errors (PIOS_IRQ_Disable() hasn't been called before)
 */
-int IRQEnable(void)
+int PIOS_IRQ_Enable(void)
 {
 	/* Check for nesting error */
 	if(nested_ctr == 0) {

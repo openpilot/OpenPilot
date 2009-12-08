@@ -67,8 +67,8 @@ typedef struct {
 extern SettingsTypeDef Settings;
 
 /* Public Functions */
-extern void LoadSettings(void);
-extern void DumpSettings(USART_TypeDef* USARTx);
-extern int CheckForSettingsFiles(void);
+extern void PIOS_Settings_Load(void);
+extern void PIOS_Settings_Dump(USART_TypeDef* USARTx);
+extern int PIOS_Settings_CheckForFiles(void);
 
 #endif /* PIOS_SETTINGS_H */

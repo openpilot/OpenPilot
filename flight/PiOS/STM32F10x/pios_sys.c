@@ -42,7 +42,7 @@ static FATFS Fatfs[_DRIVES];
 /**
 * Initializes all system peripherals
 */
-void SysInit(void)
+void PIOS_SYS_Init(void)
 {
 	/* Setup STM32 system (RCC, clock, PLL and Flash configuration) - CMSIS Function */
 	SystemInit();
@@ -51,20 +51,20 @@ void SysInit(void)
 	NVIC_Configuration();
 	
 	/* Initialize LEDs */
-	LED_INIT();
+	PIOS_LED_Init();
 	
 	/* Initialize FatFS disk */
 	if(f_mount(0, &Fatfs[0]) != FR_OK) {
 		/* Failed to mount MicroSD filesystem, flash LED1 forever */
 		while(1) {
 			for(int i = 0; i < 1000; i++);
-			LED_TOGGLE(LED1);
+			PIOS_LED_Toggle(LED1);
 		}
 	}
 	
 	/* Call LoadSettings which populates System Vars */
 	/* Settings can not be loaded before this point */
-	LoadSettings();
+	PIOS_Settings_Load();
 	
 }
 
@@ -107,16 +107,16 @@ void assert_failed(uint8_t* file, uint32_t line)
 	/* printf("Wrong parameters value: file %s on line %d\r\n", file, line); */
 
 	/* Setup the LEDs to Alternate */
-	LED_ON(LED1);
-	LED_OFF(LED2);
+	PIOS_LED_On(LED1);
+	PIOS_LED_Off(LED2);
 
 	/* Infinite loop */
 	while (1)
 	{
 		for(int i = 0; i < 1000; i++);
-		LED_TOGGLE(LED1);
+		PIOS_LED_Toggle(LED1);
 		for(int i = 0; i < 1000; i++);
-		LED_TOGGLE(LED2);
+		PIOS_LED_Toggle(LED2);
 	}
 }
 #endif

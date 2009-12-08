@@ -56,6 +56,7 @@ void OpenPilotInit(void)
 		- Supervisor should have highest possibly priority (Idle + 14?)
 		- Supervisor should also act as the warnings system, low batter etc)
 		- Supervisor should handle all telemetry inputs (not outputs), and act accordingly
+		- ARC and HARC tasks should be split into two parts, gathering sensor data and acting on sensor data.
 		- Sub tasks of the supervisor should have a priority just lower than the supervisor (Idle + 12?)
 		- Sub tasks of the supervisor shoud ONLY be pre-empted by system interrupts such as UART, I2C etc
 		- Gatekeepers should sit in a blocked state while there is nothing on the que, with a low priority

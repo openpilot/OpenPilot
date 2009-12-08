@@ -27,6 +27,6 @@
 #define PIOS_SYS_H
 
 /* Public Functions */
-extern void SysInit(void);
+extern void PIOS_SYS_Init(void);
 
 #endif /* PIOS_SYS_H */

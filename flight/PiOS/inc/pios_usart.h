@@ -32,22 +32,22 @@ typedef enum {GPS = 0, TELEM = 1, AUX = 2} USARTNumTypeDef;
 
 
 /* Public Functions */
-extern void USARTInit(void);
-extern void USARTEnableAux(void);
-extern void USARTDisableAux(void);
-extern void USARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud);
+extern void PIOS_USART_Init(void);
+extern void PIOS_USART_EnableAux(void);
+extern void PIOS_USART_DisableAux(void);
+extern void PIOS_USART_ChangeBaud(USART_TypeDef* USARTx, uint32_t Baud);
 
-extern int USARTRxBufferFree(USARTNumTypeDef uart);
-extern int USARTRxBufferUsed(USARTNumTypeDef uart);
-extern int USARTRxBufferGet(USARTNumTypeDef uart);
-extern int USARTRxBufferPeek(USARTNumTypeDef uart);
-extern int USARTRxBufferPut(USARTNumTypeDef uart, uint8_t b);
+extern int PIOS_USART_RxBufferFree(USARTNumTypeDef uart);
+extern int PIOS_USART_RxBufferUsed(USARTNumTypeDef uart);
+extern int PIOS_USART_RxBufferGet(USARTNumTypeDef uart);
+extern int PIOS_USART_RxBufferPeek(USARTNumTypeDef uart);
+extern int PIOS_USART_RxBufferPut(USARTNumTypeDef uart, uint8_t b);
 
-extern int USARTTxBufferFree(USARTNumTypeDef uart);
-extern int USARTTxBufferGet(USARTNumTypeDef uart);
-extern int USARTTxBufferPutMoreNonBlocking(USARTNumTypeDef uart, uint8_t *buffer, uint16_t len);
-extern int USARTTxBufferPutMore(USARTNumTypeDef uart, uint8_t *buffer, uint16_t len);
-extern int USARTTxBufferPutNonBlocking(uint8_t uart, uint8_t b);
-extern int USARTTxBufferPut(USARTNumTypeDef uart, uint8_t b);
+extern int PIOS_USART_TxBufferFree(USARTNumTypeDef uart);
+extern int PIOS_USART_TxBufferGet(USARTNumTypeDef uart);
+extern int PIOS_USART_TxBufferPutMoreNonBlocking(USARTNumTypeDef uart, uint8_t *buffer, uint16_t len);
+extern int PIOS_USART_TxBufferPutMore(USARTNumTypeDef uart, uint8_t *buffer, uint16_t len);
+extern int PIOS_USART_TxBufferPutNonBlocking(uint8_t uart, uint8_t b);
+extern int PIOS_USART_TxBufferPut(USARTNumTypeDef uart, uint8_t b);
 
 #endif /* PIOS_USART_H */

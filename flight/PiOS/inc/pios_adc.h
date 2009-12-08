@@ -27,8 +27,8 @@
 #define PIOS_ADC_H
 
 /* Public Functions */
-extern void ADCInit(void);
-extern int32_t ADCPinGet(uint32_t pin);
-extern int32_t ADCHandler(void *_callback);
+extern void PIOS_ADC_Init(void);
+extern int32_t PIOS_ADC_PinGet(uint32_t pin);
+extern int32_t PIOS_ADC_Handler(void *_callback);
 
 #endif /* PIOS_ADC_H */

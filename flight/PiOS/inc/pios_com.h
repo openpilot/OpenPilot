@@ -35,18 +35,18 @@ typedef enum {
 } COMPortTypeDef;
 
 /* Public Functions */
-extern int32_t COMInit(void);
+extern int32_t PIOS_COM_Init(void);
 
-extern int32_t COMSendCharNonBlocking(COMPortTypeDef port, char c);
-extern int32_t COMSendChar(COMPortTypeDef port, char c);
-extern int32_t COMSendBufferNonBlocking(COMPortTypeDef port, uint8_t *buffer, uint16_t len);
-extern int32_t COMSendBuffer(COMPortTypeDef port, uint8_t *buffer, uint16_t len);
-extern int32_t COMSendStringNonBlocking(COMPortTypeDef port, char *str);
-extern int32_t COMSendString(COMPortTypeDef port, char *str);
-extern int32_t COMSendFormattedStringNonBlocking(COMPortTypeDef port, char *format, ...);
-extern int32_t COMSendFormattedString(COMPortTypeDef port, char *format, ...);
+extern int32_t PIOS_COM_SendCharNonBlocking(COMPortTypeDef port, char c);
+extern int32_t PIOS_COM_SendChar(COMPortTypeDef port, char c);
+extern int32_t PIOS_COM_SendBufferNonBlocking(COMPortTypeDef port, uint8_t *buffer, uint16_t len);
+extern int32_t PIOS_COM_SendBuffer(COMPortTypeDef port, uint8_t *buffer, uint16_t len);
+extern int32_t PIOS_COM_SendStringNonBlocking(COMPortTypeDef port, char *str);
+extern int32_t PIOS_COM_SendString(COMPortTypeDef port, char *str);
+extern int32_t PIOS_COM_SendFormattedStringNonBlocking(COMPortTypeDef port, char *format, ...);
+extern int32_t PIOS_COM_SendFormattedString(COMPortTypeDef port, char *format, ...);
 
-extern int32_t COMReceiveHandler(void);
-extern int32_t COMReceiveCallbackInit(void *callback_receive);
+extern int32_t PIOS_COM_ReceiveHandler(void);
+extern int32_t PIOS_COM_ReceiveCallbackInit(void *callback_receive);
 
 #endif /* PIOS_COM_H */

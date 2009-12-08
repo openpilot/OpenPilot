@@ -48,7 +48,7 @@ static volatile uint8_t tx_buffer_size[USART_NUM];
 /**
 * Initialise the GPS and TELEM onboard USARTs
 */
-void USARTInit(void)
+void PIOS_USART_Init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
 	
@@ -137,7 +137,7 @@ void USARTInit(void)
 /**
 * Enables AUX USART at the expense of servo inputs
 */
-void USARTEnableAux(void)
+void PIOS_USART_EnableAux(void)
 {
 	//Implement after servo inputs are implemented
 }
@@ -146,7 +146,7 @@ void USARTEnableAux(void)
 /**
 * Disables AUX USART reclaims two servo inputs
 */
-void USARTDisableAux(void)
+void PIOS_USART_DisableAux(void)
 {
 	//Implement after servo inputs are implemented
 }
@@ -157,7 +157,7 @@ void USARTDisableAux(void)
 * \param[in] USARTx USART name (GPS, TELEM, AUX)
 * \param[in] Baud Requested baud rate         
 */
-void USARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud)
+void PIOS_USART_ChangeBaud(USART_TypeDef* USARTx, uint32_t Baud)
 {
 	/* USART BRR Configuration */
 	/* Configure the USART Baud Rate */
@@ -195,7 +195,7 @@ void USARTChangeBaud(USART_TypeDef* USARTx, uint32_t Baud)
 * \return 1: USART available
 * \return 0: USART not available
 */
-int USARTRxBufferFree(USARTNumTypeDef usart)
+int PIOS_USART_RxBufferFree(USARTNumTypeDef usart)
 {
 	if(usart >= USART_NUM) {
 		return 0;
@@ -211,7 +211,7 @@ int USARTRxBufferFree(USARTNumTypeDef usart)
 * \return 0 if USART not available
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int USARTRxBufferUsed(USARTNumTypeDef usart)
+int PIOS_USART_RxBufferUsed(USARTNumTypeDef usart)
 {
 	if(usart >= USART_NUM) {
 		return 0;
@@ -228,7 +228,7 @@ int USARTRxBufferUsed(USARTNumTypeDef usart)
 * \return >= 0: number of received bytes
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int USARTRxBufferGet(USARTNumTypeDef usart)
+int PIOS_USART_RxBufferGet(USARTNumTypeDef usart)
 {
 	if(usart >= USART_NUM) {
 		/* USART not available */
@@ -240,13 +240,13 @@ int USARTRxBufferGet(USARTNumTypeDef usart)
 	}
 	
 	/* get byte - this operation should be atomic! */
-	IRQDisable();
+	PIOS_IRQ_Disable();
 	uint8_t b = rx_buffer[usart][rx_buffer_tail[usart]];
 	if(++rx_buffer_tail[usart] >= USART_RX_BUFFER_SIZE) {
 		rx_buffer_tail[usart] = 0;
 	}
 	--rx_buffer_size[usart];
-	IRQEnable();
+	PIOS_IRQ_Enable();
 	
 	/* Return received byte */
 	return b;
@@ -260,7 +260,7 @@ int USARTRxBufferGet(USARTNumTypeDef usart)
 * \return >= 0: number of received bytes
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int USARTRxBufferPeek(USARTNumTypeDef usart)
+int PIOS_USART_RxBufferPeek(USARTNumTypeDef usart)
 {
 	if(usart >= USART_NUM) {
 		/* USART not available */
@@ -273,9 +273,9 @@ int USARTRxBufferPeek(USARTNumTypeDef usart)
 	}
 
 	/* Get byte - this operation should be atomic! */
-	IRQDisable();
+	PIOS_IRQ_Disable();
 	uint8_t b = rx_buffer[usart][rx_buffer_tail[usart]];
-	IRQEnable();
+	PIOS_IRQ_Enable();
 
 	/* Return received byte */
 	return b;
@@ -290,7 +290,7 @@ int USARTRxBufferPeek(USARTNumTypeDef usart)
 * \return -2 if buffer full (retry)
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int USARTRxBufferPut(USARTNumTypeDef usart, uint8_t b)
+int PIOS_USART_RxBufferPut(USARTNumTypeDef usart, uint8_t b)
 {
 	if(usart >= USART_NUM) {
 		/* USART not available */
@@ -304,13 +304,13 @@ int USARTRxBufferPut(USARTNumTypeDef usart, uint8_t b)
 
 	/* Copy received byte into receive buffer */
 	/* This operation should be atomic! */
-	IRQDisable();
+	PIOS_IRQ_Disable();
 	rx_buffer[usart][rx_buffer_head[usart]] = b;
 	if(++rx_buffer_head[usart] >= USART_RX_BUFFER_SIZE) {
 		rx_buffer_head[usart] = 0;
 	}
 	++rx_buffer_size[usart];
-	IRQEnable();
+	PIOS_IRQ_Enable();
 	
 	/* No error */
 	return 0;
@@ -324,7 +324,7 @@ int USARTRxBufferPut(USARTNumTypeDef usart, uint8_t b)
 * \return 0 if USART not available
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int USARTTxBufferFree(USARTNumTypeDef usart)
+int PIOS_USART_TxBufferFree(USARTNumTypeDef usart)
 {
 	if(usart >= USART_NUM) {
 		return 0;
@@ -340,7 +340,7 @@ int USARTTxBufferFree(USARTNumTypeDef usart)
 * \return 0 if USART not available
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int USARTTxBufferUsed(USARTNumTypeDef usart)
+int PIOS_USART_TxBufferUsed(USARTNumTypeDef usart)
 {
 	if(usart >= USART_NUM) {
 		return 0;
@@ -357,7 +357,7 @@ int USARTTxBufferUsed(USARTNumTypeDef usart)
 * \return >= 0: transmitted byte
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int USARTTxBufferGet(USARTNumTypeDef usart)
+int PIOS_USART_TxBufferGet(USARTNumTypeDef usart)
 {
 	if(usart >= USART_NUM) {
 		/* USART not available */
@@ -370,13 +370,13 @@ int USARTTxBufferGet(USARTNumTypeDef usart)
 	}
 
 	/* Get byte - this operation should be atomic! */
-	IRQDisable();
+	PIOS_IRQ_Disable();
 	uint8_t b = tx_buffer[usart][tx_buffer_tail[usart]];
 	if(++tx_buffer_tail[usart] >= USART_TX_BUFFER_SIZE) {
 		tx_buffer_tail[usart] = 0;
 	}
 	--tx_buffer_size[usart];
-	IRQEnable();
+	PIOS_IRQ_Enable();
 
 	/* Return transmitted byte */
 	return b;
@@ -393,7 +393,7 @@ int USARTTxBufferGet(USARTNumTypeDef usart)
 * \return -3 if USART not supported by USARTTxBufferPut Routine
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int USARTTxBufferPutMoreNonBlocking(USARTNumTypeDef usart, uint8_t *buffer, uint16_t len)
+int PIOS_USART_TxBufferPutMoreNonBlocking(USARTNumTypeDef usart, uint8_t *buffer, uint16_t len)
 {
 	if(usart >= USART_NUM) {
 		/* USART not available */
@@ -407,7 +407,7 @@ int USARTTxBufferPutMoreNonBlocking(USARTNumTypeDef usart, uint8_t *buffer, uint
 
 	/* Copy bytes to be transmitted into transmit buffer */
 	/* This operation should be atomic! */
-	IRQDisable();
+	PIOS_IRQ_Disable();
 
 	uint16_t i;
 	for(i = 0; i < len; ++i) {
@@ -427,12 +427,12 @@ int USARTTxBufferPutMoreNonBlocking(USARTNumTypeDef usart, uint8_t *buffer, uint
 				/* Enable TXE interrupt (TXEIE=1) */
 				case 2: AUX_USART_USART->CR1 |= (1 << 7); break;
 				/* USART not supported by routine (yet) */
-				default: IRQEnable(); return -3;
+				default: PIOS_IRQ_Enable(); return -3;
 			}
 		}
 	}
 
-	IRQEnable();
+	PIOS_IRQ_Enable();
 
 	/* No error */
 	return 0;
@@ -449,11 +449,11 @@ int USARTTxBufferPutMoreNonBlocking(USARTNumTypeDef usart, uint8_t *buffer, uint
 * \return -3 if USART not supported by USARTTxBufferPut Routine
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int USARTTxBufferPutMore(USARTNumTypeDef usart, uint8_t *buffer, uint16_t len)
+int PIOS_USART_TxBufferPutMore(USARTNumTypeDef usart, uint8_t *buffer, uint16_t len)
 {
 	int error;
 
-	while((error = USARTTxBufferPutMoreNonBlocking(usart, buffer, len)) == -2);
+	while((error = PIOS_USART_TxBufferPutMoreNonBlocking(usart, buffer, len)) == -2);
 
 	return error;
 }
@@ -468,11 +468,11 @@ int USARTTxBufferPutMore(USARTNumTypeDef usart, uint8_t *buffer, uint16_t len)
 * \return -3 if USART not supported by USARTTxBufferPut Routine
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int USARTTxBufferPut_NonBlocking(USARTNumTypeDef usart, uint8_t b)
+int PIOS_USART_TxBufferPut_NonBlocking(USARTNumTypeDef usart, uint8_t b)
 {
 	/* For more comfortable usage... */
 	/* -> Just forward to USARTTxBufferPutMore */
-	return USARTTxBufferPutMore(usart, &b, 1);
+	return PIOS_USART_TxBufferPutMore(usart, &b, 1);
 }
 
 /**
@@ -485,11 +485,11 @@ int USARTTxBufferPut_NonBlocking(USARTNumTypeDef usart, uint8_t b)
 * \return -3 if USART not supported by USARTTxBufferPut Routine
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int USARTTxBufferPut(USARTNumTypeDef usart, uint8_t b)
+int PIOS_USART_TxBufferPut(USARTNumTypeDef usart, uint8_t b)
 {
 	int error;
 
-	while((error = USARTTxBufferPutMore(usart, &b, 1)) == -2);
+	while((error = PIOS_USART_TxBufferPutMore(usart, &b, 1)) == -2);
 
 	return error;
 }
@@ -501,15 +501,15 @@ GPS_IRQHANDLER_FUNC
 	if(GPS_USART->SR & (1 << 5)) {
 		uint8_t b = GPS_USART->DR;
 		
-		if(USARTRxBufferPut(0, b) < 0) {
+		if(PIOS_USART_RxBufferPut(GPS, b) < 0) {
 			/* Here we could add some error handling */
 		}
 	}
 
 	/* Check if TXE flag is set */
 	if(GPS_USART->SR & (1 << 7)) {
-		if(USARTTxBufferUsed(0) > 0) {
-			int b = USARTTxBufferGet(0);
+		if(PIOS_USART_TxBufferUsed(GPS) > 0) {
+			int b = PIOS_USART_TxBufferGet(GPS);
 			if( b < 0 ) {
 				/* Here we could add some error handling */
 				GPS_USART->DR = 0xff;
@@ -530,14 +530,15 @@ TELEM_IRQHANDLER_FUNC
 	if(TELEM_USART->SR & (1 << 5)) {
 		uint8_t b = TELEM_USART->DR;
 		
-		if(USARTRxBufferPut(1, b) < 0) {
+		if(PIOS_USART_RxBufferPut(TELEM, b) < 0) {
 			/* Here we could add some error handling */
 		}
 	}
-
-	if(TELEM_USART->SR & (1 << 7)) { // check if TXE flag is set
-		if(USARTTxBufferUsed(1) > 0) {
-			int b = USARTTxBufferGet(1);
+	
+	/* Check if TXE flag is set */
+	if(TELEM_USART->SR & (1 << 7)) {
+		if(PIOS_USART_TxBufferUsed(TELEM) > 0) {
+			int b = PIOS_USART_TxBufferGet(TELEM);
 			if(b < 0) {
 				/* Here we could add some error handling */
 				TELEM_USART->DR = 0xff;
@@ -558,14 +559,14 @@ AUX_USART_IRQHANDLER_FUNC
 	if(AUX_USART_USART->SR & (1 << 5)) {
 		uint8_t b = AUX_USART_USART->DR;
 		
-		if(USARTRxBufferPut(1, b) < 0) {
+		if(PIOS_USART_RxBufferPut(AUX, b) < 0) {
 			/* Here we could add some error handling */
 		}
 	}
 
 	if(AUX_USART_USART->SR & (1 << 7)) { // check if TXE flag is set
-		if(USARTTxBufferUsed(1) > 0) {
-			int b = USARTTxBufferGet(1);
+		if(PIOS_USART_TxBufferUsed(AUX) > 0) {
+			int b = PIOS_USART_TxBufferGet(AUX);
 			if(b < 0) {
 				/* Here we could add some error handling */
 				AUX_USART_USART->DR = 0xff;

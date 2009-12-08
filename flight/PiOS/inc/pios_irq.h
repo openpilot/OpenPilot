@@ -27,7 +27,7 @@
 #define PIOS_IRQ_H
 
 /* Public Functions */
-extern int IRQDisable(void);
-extern int IRQEnable(void);
+extern int PIOS_IRQ_Disable(void);
+extern int PIOS_IRQ_Enable(void);
 
 #endif /* PIOS_IRQ_H */

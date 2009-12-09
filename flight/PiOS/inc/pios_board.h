@@ -66,6 +66,11 @@
 #define I2C_GPIO_PORT			GPIOB
 #define I2C_SDA_PIN			GPIO_Pin_11
 #define I2C_SCL_PIN			GPIO_Pin_10
+#define I2C_DUTY_CYCLE			I2C_DutyCycle_2
+#define I2C_BUS_FREQUENCY		400000
+#define I2C_TIMEOUT_VALUE		5000
+#define IRQ_I2C_EV_PRIORITY		2
+#define IRQ_I2C_ER_PRIORITY		2
 
 //------------------------
 // Onboard Pressure sensor   

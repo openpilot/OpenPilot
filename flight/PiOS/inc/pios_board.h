@@ -75,10 +75,18 @@
 //------------------------
 // Onboard Pressure sensor   
 //------------------------
-#define HP03D_XCLR_GPIO_PORT		GPIOC
-#define HP03D_XCLR_GPIO_PIN		GPIO_Pin_15
-#define HP03D_MCLK_GPIO_PORT		GPIOA
-#define HP03D_MCLK_GPIO_PIN		GPIO_Pin_1
+#define BMP085_EOC_GPIO_PORT		GPIOC
+#define BMP085_EOC_GPIO_PIN		GPIO_Pin_15
+#define BMP085_EOC_PORT_SOURCE		GPIO_PortSourceGPIOG
+#define BMP085_EOC_PIN_SOURCE		GPIO_PinSource8
+#define BMP085_EOC_CLK			RCC_APB2Periph_GPIOC
+#define BMP085_EOC_EXTI_LINE		EXTI_Line15
+#define BMP085_EOC_IRQn			EXTI15_10_IRQn
+
+/* Unused, repurpose PA1 as another ADC input?
+#define BMP085_XCLR_GPIO_PORT		GPIOA
+#define BMP085_XCLR_GPIO_PIN		GPIO_Pin_1
+*/
 
 //-------------------------
 // GPS USART 

@@ -24,7 +24,20 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
+/*
+Example of how to use this module:
+	PIOS_BMP085_Init();
+	
+	PIOS_BMP085_StartADC(Temperature);
+		(Interrupt reads the ADC)
+	
+	Somwhere inbetween these 2 calls we need to wait for the first one to finish
+	
+	PIOS_BMP085_StartADC(Pressure);
+		(Interrupt reads the ADC)
+	
+	PIOS_BMP085_GetValues(&Pressure, &Altitude, &Temperature);
+*/
 
 /* Project Includes */
 #include "pios.h"
@@ -43,6 +56,33 @@ static uint16_t RawTemperature;
 */
 void PIOS_BMP085_Init(void)
 {
+	GPIO_InitTypeDef GPIO_InitStructure;
+	EXTI_InitTypeDef EXTI_InitStructure;
+	NVIC_InitTypeDef NVIC_InitStructure;
+	
+	/* Enable EOC GPIO clock */
+	RCC_APB2PeriphClockCmd(BMP085_EOC_CLK | RCC_APB2Periph_AFIO, ENABLE);
+
+	/* Configure EOC pin as input floating */
+	GPIO_InitStructure.GPIO_Pin = BMP085_EOC_GPIO_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	GPIO_Init(BMP085_EOC_GPIO_PORT, &GPIO_InitStructure);
+	
+	/* Configure the End Of Conversion (EOC) interrup */
+	GPIO_EXTILineConfig(BMP085_EOC_PORT_SOURCE, BMP085_EOC_PIN_SOURCE);
+	EXTI_InitStructure.EXTI_Line = BMP085_EOC_EXTI_LINE;
+	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
+	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+	EXTI_Init(&EXTI_InitStructure);
+	
+	/* Enable and set EOC EXTI Interrupt to the lowest priority */
+	NVIC_InitStructure.NVIC_IRQChannel = BMP085_EOC_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 15;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 15;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
+	
 	/* Read the calibration data on the BMP085 sensor */
 	PIOS_BMP085_Read(BMP085_CALIB_ADDR, (uint8_t *) &CalibData.AC1, 2);
 	PIOS_BMP085_Read(BMP085_CALIB_ADDR + 2, (uint8_t *) &CalibData.AC2, 2);
@@ -137,6 +177,7 @@ void PIOS_BMP085_GetValues(uint16_t *Pressure, uint16_t *Altitude, uint16_t *Tem
 	*Altitude = (uint16_t) 44330 * (1 - (pow((*Pressure/BMP085_P0), (1/5.255))));
 }
 
+
 /**
 * Reads one or more bytes into a buffer
 * \param[in] address BMP085 register address (depends on size)
@@ -216,18 +257,23 @@ int32_t PIOS_BMP085_Write(uint16_t address, uint8_t *buffer, uint8_t len)
 	return error < 0 ? -1 : 0;
 }
 
-/*
-Example of how to use this module:
-	PIOS_BMP085_Init();
-	
-	(We could possibly use an interrupt on EOC to read the ADC and start a new conversion?)
-	PIOS_BMP085_StartADC(Temperature);
-		(Once conversion is done)
-	PIOS_BMP085_ReadADC();
-	
-	PIOS_BMP085_StartADC(Pressure);
-		(Once conversion is done)
-	PIOS_BMP085_ReadADC();
-	
-	PIOS_BMP085_GetValues(&Pressure, &Altitude, &Temperature);
+
+/**
+* This function handles External lines 15 to 10 interrupt request
 */
+void EXTI15_10_IRQHandler(void)
+{
+	if(EXTI_GetITStatus(BMP085_EOC_EXTI_LINE) != RESET) {
+		/* Disable interrupts */
+		PIOS_IRQ_Disable();
+		
+		/* Read the ADC Value */
+		PIOS_BMP085_ReadADC();
+		
+		/* Clear the EOC EXTI line pending bit */
+		EXTI_ClearITPendingBit(BMP085_EOC_EXTI_LINE);
+		
+		/* Enable interrupts */
+		PIOS_IRQ_Enable();
+	}
+}

@@ -100,6 +100,7 @@ SRC += $(PIOSSTM32F10X)/pios_i2c.c
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_settings.c
 SRC += $(PIOSCOMMON)/pios_com.c
+SRC += $(PIOSCOMMON)/pios_bmp085.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 
 ## CMSIS for STM32

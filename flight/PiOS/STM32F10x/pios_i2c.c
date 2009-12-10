@@ -5,7 +5,7 @@
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
  * @brief      I2C Enable/Disable routines
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   PIOS_I2C I2C Communication Functions
+ * @defgroup   PIOS_I2C I2C Functions
  * @{
  * 
  *****************************************************************************/
@@ -145,7 +145,6 @@ static void PIOS_I2C_InitPeripheral(void)
 	/* Clear transfer state and error value */
 	i2cx->transfer_state.ALL = 0;
 	i2cx->transfer_error = 0;
-
 
 	/* Configure I2C peripheral */
 	I2C_Init(i2cx->base, &I2C_InitStructure);

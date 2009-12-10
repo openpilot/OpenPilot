@@ -37,6 +37,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <math.h>
 
 /* STM32 Std Perf Lib */
 #include <stm32f10x.h>

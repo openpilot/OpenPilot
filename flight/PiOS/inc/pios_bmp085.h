@@ -36,6 +36,7 @@
 #define BMP085_TEMP_ADDR	0x2E
 #define BMP085_ADC_MSB		0xF6
 #define BMP085_ADC_LSB		0xF7
+#define BMP085_P0		101325
 
 /* Local Types */
 typedef struct {
@@ -52,9 +53,16 @@ typedef struct {
 	uint16_t MD;
 } BMP085CalibDataTypeDef;
 
+typedef enum {
+	Pressure,
+	Temperature
+} ConversionTypeTypeDef;
+
 /* Public Functions */
 void PIOS_BMP085_Init(void);
-void PIOS_BMP085_StartADC(uint16_t *PresOrTemp);
+void PIOS_BMP085_StartADC(ConversionTypeTypeDef Type);
+void PIOS_BMP085_ReadADC(void);
+void PIOS_BMP085_GetValues(uint16_t *Pressure, uint16_t *Altitude, uint16_t *Temperature);
 int32_t PIOS_BMP085_Read(u16 address, uint8_t *buffer, uint8_t len);
 int32_t PIOS_BMP085_Write(uint16_t address, uint8_t *buffer, uint8_t len);
 

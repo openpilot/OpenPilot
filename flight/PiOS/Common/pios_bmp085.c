@@ -5,7 +5,7 @@
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
  * @brief      IRQ Enable/Disable routines
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   PIOS_BMP085 Bosch BMP085 Barometric Pressure Sensor Functions
+ * @defgroup   PIOS_BMP085 BMP085 Functions
  * @{
  * 
  *****************************************************************************/
@@ -29,9 +29,14 @@
 /* Project Includes */
 #include "pios.h"
 
+/* Glocal Variables */
+ConversionTypeTypeDef CurrentRead;
 
 /* Local Variables */
 static BMP085CalibDataTypeDef CalibData;
+static uint16_t RawPressure;
+static uint16_t RawTemperature;
+
 
 /**
 * Initialise the BMP085 sensor
@@ -52,15 +57,84 @@ void PIOS_BMP085_Init(void)
 	PIOS_BMP085_Read(BMP085_CALIB_ADDR + 20, (uint8_t *) &CalibData.MD, 2);
 }
 
+
 /**
 * Start the ADC conversion
 * \param[in] PresOrTemp BMP085_PRES_ADDR or BMP085_TEMP_ADDR
 * \return Raw ADC value
 */
-void PIOS_BMP085_StartADC(uint16_t *PresOrTemp)
+void PIOS_BMP085_StartADC(ConversionTypeTypeDef Type)
 {
 	/* Start the conversion */
-	PIOS_BMP085_Write(BMP085_CTRL_ADDR, (uint8_t *)PresOrTemp, 2);
+	if(Type == Temperature) {
+		PIOS_BMP085_Write(BMP085_CTRL_ADDR, (uint8_t *)BMP085_TEMP_ADDR, 2);
+	} else if(Type == Pressure) {
+		PIOS_BMP085_Write(BMP085_CTRL_ADDR, (uint8_t *)BMP085_PRES_ADDR, 2);
+	}
+	
+	CurrentRead = Type;
+}
+
+
+/**
+* Read the ADC conversion value (once ADC converion has completed)
+* \param[in] PresOrTemp BMP085_PRES_ADDR or BMP085_TEMP_ADDR
+* \return Raw ADC value
+*/
+void PIOS_BMP085_ReadADC(void)
+{
+	uint8_t LSB, MSB;
+	
+	/* Read the conversion */
+	PIOS_BMP085_Read(BMP085_TEMP_ADDR, &LSB, 2);
+	PIOS_BMP085_Read(BMP085_TEMP_ADDR, &MSB, 2);
+	
+	/* Store the 16bit result */
+	if(CurrentRead == Temperature) {
+		RawTemperature = ((MSB << 8) + LSB);
+	} else {
+		RawPressure = ((MSB << 8) + LSB);
+	}
+}
+
+
+/**
+* Get the converted raw values
+* \param[out] Pressure Pointer to the pressure variable
+* \param[out] Altitude Pointer to the altitude variable
+* \param[out] Temperature Pointer to the temperature variable
+*/
+void PIOS_BMP085_GetValues(uint16_t *Pressure, uint16_t *Altitude, uint16_t *Temperature)
+{
+	/* Straight from the datasheet */
+	int32_t X1, X2, X3, B3, B5, B6, P;
+	uint32_t B4, B7;
+
+	/* Convert Temperatre */
+	X1 = (RawTemperature - CalibData.AC6) * CalibData.AC5 >> 15;
+	X2 = ((int32_t) CalibData.MC << 11) / (X1 + CalibData.MD);
+	B5 = X1 + X2;
+	*Temperature = (B5 + 8) >> 4;
+
+	/* Calculate Pressure */
+	B6 = B5 - 4000;
+	X1 = (CalibData.B2 * (B6 * B6 >> 12)) >> 11;
+	X2 = CalibData.AC2 * B6 >> 11;
+	X3 = X1 + X2;
+	B3 = ((int32_t) CalibData.AC1 * 4 + X3 + 2) >> 2;
+	X1 = CalibData.AC3 * B6 >> 13;
+	X2 = (CalibData.B1 * (B6 * B6 >> 12)) >> 16;
+	X3 = ((X1 + X2) + 2) >> 2;
+	B4 = (CalibData.AC4 * (uint32_t) (X3 + 32768)) >> 15;
+	B7 = ((uint32_t) RawPressure - B3) * 50000;
+	P = B7 < 0x80000000 ? (B7 * 2) / B4 : (B7 / B4) * 2;
+	X1 = (P >> 8) * (P >> 8);
+	X1 = (X1 * 3038) >> 16;
+	X2 = (-7357 * P) >> 16;
+	*Pressure = P + ((X1 + X2 + 3791) >> 4);
+	
+	/* Calculate Altitude */
+	*Altitude = (uint16_t) 44330 * (1 - (pow((*Pressure/BMP085_P0), (1/5.255))));
 }
 
 /**
@@ -142,10 +216,18 @@ int32_t PIOS_BMP085_Write(uint16_t address, uint8_t *buffer, uint8_t len)
 	return error < 0 ? -1 : 0;
 }
 
-
-/* Read the values from the sensor
-* \param[out] Pressure Pointer to the pressure variable
-* \param[out] Altitude Pointer to the altitude variable
-* \param[out] Temperature Pointer to the temperature variable
-
-void PIOS_BMP085_ReadADC(uint16_t *Pressure, uint16_t *Altitude, uint16_t *Temperature)*/
+/*
+Example of how to use this module:
+	PIOS_BMP085_Init();
+	
+	(We could possibly use an interrupt on EOC to read the ADC and start a new conversion?)
+	PIOS_BMP085_StartADC(Temperature);
+		(Once conversion is done)
+	PIOS_BMP085_ReadADC();
+	
+	PIOS_BMP085_StartADC(Pressure);
+		(Once conversion is done)
+	PIOS_BMP085_ReadADC();
+	
+	PIOS_BMP085_GetValues(&Pressure, &Altitude, &Temperature);
+*/

@@ -42,13 +42,15 @@ Example of how to use this module:
 /* Project Includes */
 #include "pios.h"
 
+
 /* Glocal Variables */
 ConversionTypeTypeDef CurrentRead;
+
 
 /* Local Variables */
 static BMP085CalibDataTypeDef CalibData;
 static uint16_t RawPressure;
-static uint16_t RawTemperature;
+static uint32_t RawTemperature;
 
 
 /**
@@ -83,18 +85,26 @@ void PIOS_BMP085_Init(void)
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 	
-	/* Read the calibration data on the BMP085 sensor */
-	PIOS_BMP085_Read(BMP085_CALIB_ADDR, (uint8_t *) &CalibData.AC1, 2);
-	PIOS_BMP085_Read(BMP085_CALIB_ADDR + 2, (uint8_t *) &CalibData.AC2, 2);
-	PIOS_BMP085_Read(BMP085_CALIB_ADDR + 4, (uint8_t *) &CalibData.AC3, 2);
-	PIOS_BMP085_Read(BMP085_CALIB_ADDR + 6, (uint8_t *) &CalibData.AC4, 2);
-	PIOS_BMP085_Read(BMP085_CALIB_ADDR + 8, (uint8_t *) &CalibData.AC5, 2);
-	PIOS_BMP085_Read(BMP085_CALIB_ADDR + 10, (uint8_t *) &CalibData.AC6, 2);
-	PIOS_BMP085_Read(BMP085_CALIB_ADDR + 12, (uint8_t *) &CalibData.B1, 2);
-	PIOS_BMP085_Read(BMP085_CALIB_ADDR + 14, (uint8_t *) &CalibData.B2, 2);
-	PIOS_BMP085_Read(BMP085_CALIB_ADDR + 16, (uint8_t *) &CalibData.MB, 2);
-	PIOS_BMP085_Read(BMP085_CALIB_ADDR + 18, (uint8_t *) &CalibData.MC, 2);
-	PIOS_BMP085_Read(BMP085_CALIB_ADDR + 20, (uint8_t *) &CalibData.MD, 2);
+	/* Read all 22 bytes of calibration data in one transfer, this is a very optimised way of doing things */
+	uint8_t Data[22];
+	PIOS_BMP085_Read(BMP085_CALIB_ADDR, Data, BMP085_CALIB_LEN);
+	
+	/* Parameters AC1-AC6 */
+	CalibData.AC1 = (Data[0] << 8) | Data[1];
+	CalibData.AC2 = (Data[2] << 8) | Data[3];
+	CalibData.AC3 = (Data[4] << 8) | Data[5];
+	CalibData.AC4 = (Data[6] << 8) | Data[7];
+	CalibData.AC5 = (Data[8] << 8) | Data[9];
+	CalibData.AC6 = (Data[10] << 8) | Data[11];
+
+	/* Parameters B1, B2 */
+	CalibData.B1 =  (Data[12] << 8) | Data[13];
+	CalibData.B2 =  (Data[14] << 8) | Data[15];
+
+	/* Parameters MB, MC, MD */
+	CalibData.MB =  (Data[16] << 8) | Data[17];
+	CalibData.MC =  (Data[18] << 8) | Data[19];
+	CalibData.MD =  (Data[20] << 8) | Data[21];
 }
 
 
@@ -107,9 +117,9 @@ void PIOS_BMP085_StartADC(ConversionTypeTypeDef Type)
 {
 	/* Start the conversion */
 	if(Type == Temperature) {
-		PIOS_BMP085_Write(BMP085_CTRL_ADDR, (uint8_t *)BMP085_TEMP_ADDR, 2);
+		PIOS_BMP085_Write(BMP085_CTRL_ADDR, (uint8_t *)BMP085_TEMP_ADDR, 1);
 	} else if(Type == Pressure) {
-		PIOS_BMP085_Write(BMP085_CTRL_ADDR, (uint8_t *)BMP085_PRES_ADDR, 2);
+		PIOS_BMP085_Write(BMP085_CTRL_ADDR, (uint8_t *)BMP085_PRES_ADDR, 1);
 	}
 	
 	CurrentRead = Type;
@@ -123,17 +133,17 @@ void PIOS_BMP085_StartADC(ConversionTypeTypeDef Type)
 */
 void PIOS_BMP085_ReadADC(void)
 {
-	uint8_t LSB, MSB;
+	uint8_t Data[3];
 	
-	/* Read the conversion */
-	PIOS_BMP085_Read(BMP085_TEMP_ADDR, &LSB, 2);
-	PIOS_BMP085_Read(BMP085_TEMP_ADDR, &MSB, 2);
-	
-	/* Store the 16bit result */
+	/* Read and store the 16bit result */
 	if(CurrentRead == Temperature) {
-		RawTemperature = ((MSB << 8) + LSB);
+		/* Read the temperature conversion */
+		PIOS_BMP085_Read(BMP085_ADC_MSB, Data, 2);
+		RawTemperature = ((Data[0] << 8) | Data[1]);
 	} else {
-		RawPressure = ((MSB << 8) + LSB);
+		/* Read the pressure conversion */
+		PIOS_BMP085_Read(BMP085_ADC_MSB, Data, 3);
+		RawPressure = ((Data[0] << 16) | (Data[1] << 8) | Data[2]) >> (8 - BMP085_OVERSAMPLING);
 	}
 }
 
@@ -199,7 +209,7 @@ int32_t PIOS_BMP085_Read(uint16_t address, uint8_t *buffer, uint8_t len)
 	/* Send I2C address and EEPROM address */
 	/* To avoid issues with litte/big endian: copy address into temporary buffer */
 	uint8_t addr_buffer[2] = {(uint8_t)(address>>8), (uint8_t)address};
-	int32_t error = PIOS_I2C_Transfer(I2C_Write_WithoutStop, BMP085_ADDR_WRITE, addr_buffer, 2);
+	int32_t error = PIOS_I2C_Transfer(I2C_Write_WithoutStop, BMP085_I2C_ADDR, addr_buffer, 2);
 
 	if(!error) {
 		error = PIOS_I2C_TransferWait();
@@ -207,7 +217,7 @@ int32_t PIOS_BMP085_Read(uint16_t address, uint8_t *buffer, uint8_t len)
 
 	/* Now receive byte(s) */
 	if(!error) {
-		error = PIOS_I2C_Transfer(I2C_Read, BMP085_ADDR_READ, buffer, len);
+		error = PIOS_I2C_Transfer(I2C_Read, BMP085_I2C_ADDR, buffer, len);
 	}
 	if(!error) {
 		error = PIOS_I2C_TransferWait();
@@ -229,7 +239,6 @@ int32_t PIOS_BMP085_Read(uint16_t address, uint8_t *buffer, uint8_t len)
 * \return 0 if operation was successful
 * \return -1 if error during IIC transfer
 * \return -2 if BankStick blocked by another task (retry it!)
-* \return -4 if invalid length
 * \note Use \ref PIOS_I2C_BS_CheckWriteFinished to check when the write operation
 * has been finished - this can take up to 5 mS!
 */
@@ -241,11 +250,18 @@ int32_t PIOS_BMP085_Write(uint16_t address, uint8_t *buffer, uint8_t len)
 		return -2;
 	}
 
-	/* Send I2C address and EEPROM address */
-	/* To avoid issues with litte/big endian: copy address into temporary buffer */
-	uint8_t addr_buffer[2] = {(uint8_t)(address>>8), (uint8_t)address};
-	int32_t error = PIOS_I2C_Transfer(I2C_Write_WithoutStop, BMP085_ADDR_WRITE, addr_buffer, 2);
+	/* Send I2C address and data */
+	uint8_t WriteBuffer[64+2];
+	WriteBuffer[0] = (uint8_t) (address >> 8);
+	WriteBuffer[1] = (uint8_t) address;
 
+	uint8_t i;
+	for(i = 0; i < len; i++) {
+		WriteBuffer[i+2] = buffer[i];
+	}
+	
+	int32_t error = PIOS_I2C_Transfer(I2C_Write, BMP085_I2C_ADDR, WriteBuffer, len+2);
+	
 	if(!error) {
 		error = PIOS_I2C_TransferWait();
 	}

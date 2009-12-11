@@ -1,13 +1,11 @@
  #####
  # Project: OpenPilot
  #    
- # @file Makefile 
- # @brief Makefile for OpenPilot project build PiOS and the AP.
+ #  
+ # Makefile for OpenPilot project build PiOS and the AP.
  #
- # @author The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
+ # The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
  #    
- # @see The GNU Public License (GPL)
- #
  # 
  # This program is free software; you can redistribute it and/or modify 
  # it under the terms of the GNU General Public License as published by 

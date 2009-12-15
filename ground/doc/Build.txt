@@ -1,2 +1,6 @@
 The simply way to build this is to use QT Creator, this can be downloaded from  http://qt.nokia.com/
 
+Serial port classes:
+
+http://code.google.com/p/qextserialport/
+

@@ -47,7 +47,7 @@ void PIOS_SYS_Init(void)
 	/* Setup STM32 system (RCC, clock, PLL and Flash configuration) - CMSIS Function */
 	SystemInit();
 	
-	/* Initialize NVIC */
+	/* Initialize Basic NVIC */
 	NVIC_Configuration();
 	
 	/* Initialize LEDs */
@@ -66,15 +66,6 @@ void PIOS_SYS_Init(void)
 	/* Settings can not be loaded before this point */
 	PIOS_Settings_Load();
 	
-}
-
-
-/**
-* Configures base level GPIO ports.
-*/
-void GPIO_Configuration(void)
-{
-
 }
 
 

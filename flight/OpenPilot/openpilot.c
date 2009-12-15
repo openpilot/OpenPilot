@@ -35,7 +35,7 @@
 
 
 /**
-* Main function
+* OpenPilot Main function
 */
 void OpenPilotInit(void)
 {
@@ -53,7 +53,7 @@ void OpenPilotInit(void)
 			-> MicroSD: Simply logs data to the MicroSD card
 			-> Telemetry: Sends telemetry using a queue
 		
-		- Supervisor should have highest possibly priority (Idle + 14?)
+		- Supervisor should have highest possibly priority (Idle + 14) We only have 5 task levels, as long as it yeilds that is fine. 
 		- Supervisor should also act as the warnings system, low batter etc)
 		- Supervisor should handle all telemetry inputs (not outputs), and act accordingly
 		- ARC and HARC tasks should be split into two parts, gathering sensor data and acting on sensor data.

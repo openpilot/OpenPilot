@@ -3,8 +3,8 @@
  *
  * @file       pios_config.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
- * @brief      Main configuration header. 
- *                 - Compile time configuration the project.
+ * @brief      PiOS configuration header. 
+ *                 - Central compile time config for the project.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/

@@ -59,7 +59,7 @@ int main()
 	/* Initialise OpenPilot */
 	OpenPilotInit();
 	
-	/* *tart the task which calls the application hooks */
+	/* Start the task which calls the application hooks */
 	xTaskCreate(HooksTask, (signed portCHAR *)"Hooks", configMINIMAL_STACK_SIZE, NULL, PRIORITY_TASK_HOOKS, NULL);
 
 	/* Start the scheduler */
@@ -102,6 +102,7 @@ static void HooksTask(void *pvParameters)
 void vApplicationIdleHook(void)
 {
 	/* Called when the scheduler has no tasks to run */
+
 	/* In here we could implement full stats for FreeRTOS
 	Although this would need us to enable stats in FreeRTOS
 	which is *very* costly. With the function below we can
@@ -113,3 +114,4 @@ void vApplicationIdleHook(void)
 	ulIdleCycleCount++;
 	IdleTimePercent = ((ulIdleCycleCount / xTaskGetTickCount()) * 100);
 }
+

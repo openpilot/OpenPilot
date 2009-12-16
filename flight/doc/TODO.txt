@@ -7,7 +7,16 @@ Most to least important
 	be got to 3/4 way there asap. More for my understanding than anything.
 
 - Modules
-	PIOS_PWM
+	PIOS_PWM 
+
+there is a trick in the PPZ code in thre stm32 branch to limit the risk of EMI issues. 
+
+Also 
+
+http://www.midibox.org/mios32/manual/group___m_i_o_s32___a_i_n.html
+
+has a special timer for such cases.
+ 
 	PIOS_I2C
 	PIOS_ALT
 	PIOS_PPM
@@ -28,7 +37,6 @@ Most to least important
 - Web
 	Wikipedia entry for the project - before revealing to the world.
 	Doc on the Wiki as we write code, more for my understanding and for new Devs.
-	Logo
 
 - Wiki
 	Mention the architeture PiOS / OPenPilot connection.

@@ -65,6 +65,8 @@ void OpenPilotInit(void)
 		- I2C module sending and receiving needs to be included in here somwhere. Inputs would be interrupt triggered.
 
 		- Task to check inbuilt preasure sensor every second and update GCS
+		- Task to write to a .klm for google earth to the SDCard every interval (interval is config parameter as is turning on this this logging feature. Check to see if SDCard is ok before writing, i.e. check it has not fallen out, check it is not full as well. 
+
 	*/
 
 }

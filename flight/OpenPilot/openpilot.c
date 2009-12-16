@@ -63,6 +63,8 @@ void OpenPilotInit(void)
 		- With the low priority of gatekeepers, they should only be running while the supervisor tasks are not working
 		
 		- I2C module sending and receiving needs to be included in here somwhere. Inputs would be interrupt triggered.
+
+		- Task to check inbuilt preasure sensor every second and update GCS
 	*/
 
 }

@@ -62,7 +62,7 @@ void PIOS_LED_Init(void)
 */
 void PIOS_LED_On(LedTypeDef LED)
 {
-	LED_GPIO_PORT[LED]->BSRR = LED_GPIO_PIN[LED];
+	LED_GPIO_PORT[LED]->BRR = LED_GPIO_PIN[LED];
 }
 
 
@@ -72,7 +72,7 @@ void PIOS_LED_On(LedTypeDef LED)
 */
 void PIOS_LED_Off(LedTypeDef LED)
 {
-	LED_GPIO_PORT[LED]->BRR = LED_GPIO_PIN[LED];
+	LED_GPIO_PORT[LED]->BSRR = LED_GPIO_PIN[LED];
 }
 
 

@@ -49,6 +49,8 @@ void PIOS_SYS_Init(void)
 	
 	/* Initialize Basic NVIC */
 	NVIC_Configuration();
+
+//TODo: Setup system time
 	
 	/* Initialize LEDs */
 	PIOS_LED_Init();

@@ -326,8 +326,8 @@ OOCD_CL+=-c "fast enable"
 OOCD_CL+=-c targets
 # commands to prepare flash-write
 OOCD_CL+= -c "reset halt"
-# increase JTAG frequency a little bit - can be disabled for tests
-#OOCD_CL+= -c "jtag_khz 1200"
+# Try to enable rclk for adaptive speed, fallback to 1Mhz
+# OOCD_CL+= -c "jtag_rclk 1000"
 # flash-write and -verify
 OOCD_CL+=-c "flash write_image erase $(OOCD_LOADFILE)" -c "verify_image $(OOCD_LOADFILE)"
 # reset target

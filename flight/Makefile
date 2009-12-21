@@ -315,21 +315,22 @@ OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).elf
 OOCD_EXE=openocd
 # debug level
 OOCD_CL=-d0
-#OOCD_CL=-d3
 # interface and board/target settings (using the OOCD target-library here)
-OOCD_CL+=-f interface/olimex-arm-usb-ocd.cfg -f target/stm32.cfg
+OOCD_CL+=-f project/OpenOCD/olimex-arm-usb-ocd.cfg -f project/OpenOCD/stm32.cfg
 # initialize
 OOCD_CL+=-c init
-# enable "fast mode" - can be disabled for tests
-OOCD_CL+=-c "fast enable"
 # show the targets
 OOCD_CL+=-c targets
 # commands to prepare flash-write
 OOCD_CL+= -c "reset halt"
 # Try to enable rclk for adaptive speed, fallback to 1Mhz
-# OOCD_CL+= -c "jtag_rclk 1000"
-# flash-write and -verify
-OOCD_CL+=-c "flash write_image erase $(OOCD_LOADFILE)" -c "verify_image $(OOCD_LOADFILE)"
+OOCD_CL+= -c "jtag_rclk 1200"
+# flash erase 
+OOCD_CL+=-c "stm32x mass_erase 0"
+# flash-write
+OOCD_CL+=-c "flash write_image $(OOCD_LOADFILE)" 
+# Verify
+OOCD_CL+=-c "verify_image $(OOCD_LOADFILE)"
 # reset target
 OOCD_CL+=-c "reset run"
 # terminate OOCD after programming

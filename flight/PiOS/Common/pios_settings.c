@@ -38,7 +38,7 @@ SettingsTypeDef Settings;
 
 
 /**
-* Populate System global Settings into Structs using MinIni, defaults are also set here.
+* Populate System global Settings into Structs using MinIni, defaults are also set here via macros from pios_config.h
 */
 /* Value Reading:	ini_getl("Section", "Key", (DefaultValue), IniFile);					*/
 /* String Reading:	ini_gets("Section", "Key", "DefaultValue", StrBuffer, sizearray(StrBuffer), IniFile); 	*/

@@ -1,9 +1,10 @@
 /**
  ******************************************************************************
  *
- * @file       op_logging.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.
- * @brief      OpenPilot Logging Functions header.
+ * @file       op_config.h  
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
+ * @brief      OpenPilot configuration header. 
+ *                 - Compile time config for OpenPilot Application
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -24,22 +25,13 @@
  */
 
 
-#ifndef OP_LOGGING_H
-#define OP_LOGGING_H
+#ifndef OP_CONFIG_H
+#define OP_CONFIG_H
 
-/* Defines */
-#define OP_LOGGING_TASK_PRI	( tskIDLE_PRIORITY + 4 )
-
-/* Type Definitions */
-typedef enum {FLIGHT_LOG, RC_LOG} LogTypeTypeDef;
-typedef struct {
-	LogTypeTypeDef Type;
-	char *Message;
-} LogTypeDef;
+/* Compile Time Macros */ 
 
 
-/* Function Prototypes */
-extern void OP_Logging_Init(void);
+/* Defaults for MinIni */
 
 
-#endif /* OP_LOGGING_H */
+#endif /* OP_CONFIG_H */

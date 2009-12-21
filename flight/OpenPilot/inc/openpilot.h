@@ -29,10 +29,12 @@
 
 
 /* PIOS Includes */
-#include "pios.h"
+#include <pios.h>
 
 /* OpenPilot Includes */
-#include "op_logging.h"
+#include <op_config.h>
+#include <op_logging.h>
+
 
 /* FreeRTOS Includes */
 #include <FreeRTOS.h>

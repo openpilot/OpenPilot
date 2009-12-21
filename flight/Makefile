@@ -60,7 +60,7 @@ PIOS = PiOS
 PIOSINC = $(PIOS)/inc
 PIOSSTM32F10X = $(PIOS)/STM32F10x
 PIOSCOMMON = $(PIOS)/Common
-APPLIBDIR = libraries
+APPLIBDIR = Libraries
 STMLIBDIR = $(APPLIBDIR)
 STMSPDDIR = $(STMLIBDIR)/STM32F10x_StdPeriph_Driver
 STMUSBDIR = $(STMLIBDIR)/STM32_USB-FS-Device_Driver
@@ -196,7 +196,7 @@ EXTRAINCDIRS  += $(STMUSBINCDIR)
 #     Each directory must be seperated by a space.
 EXTRA_LIBDIRS = 
 
-# Extra libraries
+# Extra Libraries
 #    Each library-name must be seperated by a space.
 #    i.e. to link with libxyz.a, libabc.a and libefsl.a: 
 #    EXTRA_LIBS = xyz abc efsl

@@ -62,12 +62,7 @@ void PIOS_SYS_Init(void)
 			for(int i = 0; i < 1000; i++);
 			PIOS_LED_Toggle(LED1);
 		}
-	}
-	
-	/* Call LoadSettings which populates System Vars */
-	/* Settings can not be loaded before this point */
-	PIOS_Settings_Load();
-	
+	}		
 }
 
 

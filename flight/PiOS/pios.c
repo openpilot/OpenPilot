@@ -53,10 +53,13 @@ int main()
 {
 	
 	/* Brings up System using CMSIS functions,
-	   enables the LEDs and mounts the SDCard,
-	   loads global systems settings.	 */
+	   enables the LEDs and mounts the SDCard. */
 	PIOS_SYS_Init();
 	
+	/* Call LoadSettings which populates System Vars 
+	   so the rest of the hardware can be configured. */
+	PIOS_Settings_Load();
+
 	/* Com ports init */
 	PIOS_COM_Init();
 	

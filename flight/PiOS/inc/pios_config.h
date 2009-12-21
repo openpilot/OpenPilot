@@ -28,7 +28,20 @@
 #ifndef PIOS_CONFIG_H
 #define PIOS_CONFIG_H
 
+/* Compile Time Macros */ 
 
+
+/* Defaults for MinIni */
+
+/* COM Module */
+#define GPS_BAUDRATE			19200
+#define TELEM_BAUDRATE			19200
+#define AUXUART_ENABLED			0
+#define AUXUART_BAUDRATE		19200
+
+/* Servos */
+#define SERVOS_POSITION_MIN		800
+#define SERVOS_POSITION_MAX		2200
 
 
 #endif /* PIOS_CONFIG_H */

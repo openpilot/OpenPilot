@@ -26,16 +26,6 @@
 #ifndef PIOS_SETTINGS_H
 #define PIOS_SETTINGS_H
 
-/* Default Values */
-#define GPS_BAUDRATE			19200
-
-#define TELEM_BAUDRATE			19200
-
-#define AUXUART_ENABLED			0
-#define AUXUART_BAUDRATE		19200
-
-#define SERVOS_POSITION_MIN		800
-#define SERVOS_POSITION_MAX		2200
 
 /* Global types */
 typedef struct {

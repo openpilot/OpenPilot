@@ -51,18 +51,25 @@ static void HooksTask(void *pvParameters);
 */
 int main()
 {
-	/* Setup Hardware */
+	
+	/* Brings up System using CMSIS functions,
+	   enables the LEDs and mounts the SDCard,
+	   loads global systems settings.	 */
 	PIOS_SYS_Init();
+	
+	/* Com ports init */
 	PIOS_COM_Init();
+	
+	/* Analog to digi init */
 	PIOS_ADC_Init();
 	
-	/* Initialise OpenPilot */
+	/* Initialise OpenPilot application */
 	OpenPilotInit();
 	
 	/* Start the task which calls the application hooks */
 	xTaskCreate(HooksTask, (signed portCHAR *)"Hooks", configMINIMAL_STACK_SIZE, NULL, PRIORITY_TASK_HOOKS, NULL);
 
-	/* Start the scheduler */
+	/* Start the FreeRTOS scheduler */
 	vTaskStartScheduler();
 
 	/* If all is well we will never reach here as the scheduler will now be running. */

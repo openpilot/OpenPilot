@@ -32,14 +32,16 @@
 /* Private Function Prototypes */
 void NVIC_Configuration(void);
 
-/* File system object for each logical drive */
-static FATFS Fatfs[_DRIVES];
+
 
 /**
 * Initializes all system peripherals
 */
 void PIOS_SYS_Init(void)
 {
+	/* File system object for each logical drive */
+	FATFS Fatfs[_DRIVES];
+
 	/* Setup STM32 system (RCC, clock, PLL and Flash configuration) - CMSIS Function */
 	SystemInit();
 	

@@ -39,8 +39,6 @@ void NVIC_Configuration(void);
 */
 void PIOS_SYS_Init(void)
 {
-	/* File system object for each logical drive */
-	FATFS Fatfs[_DRIVES];
 
 	/* Setup STM32 system (RCC, clock, PLL and Flash configuration) - CMSIS Function */
 	SystemInit();
@@ -51,14 +49,6 @@ void PIOS_SYS_Init(void)
 	/* Initialize LEDs */
 	PIOS_LED_Init();
 	
-	/* Initialize FatFS disk */
-	if(f_mount(0, &Fatfs[0]) != FR_OK) {
-		/* Failed to mount MicroSD filesystem, flash LED1 forever */
-		while(1) {
-			for(int i = 0; i < 100000; i++);
-			PIOS_LED_Toggle(LED1);
-		}
-	}		
 }
 
 

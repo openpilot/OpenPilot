@@ -1,11 +1,12 @@
 /**
  ******************************************************************************
  *
- * @file       pios.h  
+ * @file       pios_sdcard.c  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
- * @brief      Main PiOS header. 
- *                 - Central header for the project.
+ * @brief      Sets up basic system hardware, functions are called from Main.
  * @see        The GNU Public License (GPL) Version 3
+ * @defgroup   PIOS_SDCARD SDCard Functions
+ * @{
  *
  *****************************************************************************/
 /* 
@@ -25,48 +26,26 @@
  */
 
 
-#ifndef PIOS_H
-#define PIOS_H
+/* Project Includes */
+#include "pios.h"
+
+/* Private Function Prototypes */
 
 
-/* PIOS Compile Time Configuration */
-#include "pios_config.h"
-
-/* C Lib Includes */
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
-#include <math.h>
-
-/* STM32 Std Perf Lib */
-#include <stm32f10x.h>
-#include <stm32f10x_conf.h>
-
-/* FatFS Includes */
-#include <ff.h>
-#include <diskio.h>
-
-/* minIni Includes */
-#include <minIni.h>
-
-/* PIOS Hardware Includes (STM32F10x) */
-#include <pios_board.h>
-#include <pios_sys.h>
-#include <pios_led.h>
-#include <pios_sdcard.h>
-#include <pios_usart.h>
-#include <pios_irq.h>
-#include <pios_adc.h>
-#include <pios_servo.h>
-#include <pios_i2c.h>
-
-/* PIOS Hardware Includes (Common) */
-#include <pios_settings.h>
-#include <pios_com.h>
-#include <pios_bmp085.h>
-
-/* More added here as they get written */
-
-
-#endif /* PIOS_H */
+/**
+* Initializes all system peripherals
+*/
+void PIOS_SDCARD_Init(void)
+{
+	/* File system object for each logical drive */
+	static FATFS Fatfs[_DRIVES];
+	
+	/* Initialize FatFS disk */
+	if(f_mount(0, &Fatfs[0]) != FR_OK) {
+		/* Failed to mount MicroSD filesystem, flash LED1 forever */
+		while(1) {
+			for(int i = 0; i < 100000; i++);
+			PIOS_LED_Toggle(LED1);
+		}
+	}		
+}

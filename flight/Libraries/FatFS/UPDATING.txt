@@ -1,7 +1,7 @@
 Notes when upgrading FatFS to newer versions
 Gussy - 11/09
 
--> Do not overwrite the following files, these files are platofrm depantant
+-> Do not overwrite the following files, these files are platform depantant
 ----> diskio.c
 ----> diskio.h
 ----> integer.c

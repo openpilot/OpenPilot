@@ -1,0 +1,3 @@
+For now, old ARM-USB-OCD is renamed to tiny-h.cfg to save messing with Eclipse once tiny-hs arrive.
+
+Once we have them, delete the tiny-h.cfg and rename the .new in it's place.

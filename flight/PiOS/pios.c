@@ -55,7 +55,7 @@ int main()
 	PIOS_SYS_Init();
 
 	/* Enables the SDCard */
-	PIOS_SDCARD_Init(void);
+	PIOS_SDCARD_Init();
 	
 	/* Call LoadSettings which populates System Vars 
 	   so the rest of the hardware can be configured. */

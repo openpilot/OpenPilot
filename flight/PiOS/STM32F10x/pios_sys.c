@@ -29,15 +29,11 @@
 /* Project Includes */
 #include "pios.h"
 
-
 /* Private Function Prototypes */
 void NVIC_Configuration(void);
 
-
-/* Local Variables */
 /* File system object for each logical drive */
 static FATFS Fatfs[_DRIVES];
-
 
 /**
 * Initializes all system peripherals
@@ -49,8 +45,6 @@ void PIOS_SYS_Init(void)
 	
 	/* Initialize Basic NVIC */
 	NVIC_Configuration();
-
-//TODo: Setup system time
 	
 	/* Initialize LEDs */
 	PIOS_LED_Init();
@@ -59,7 +53,7 @@ void PIOS_SYS_Init(void)
 	if(f_mount(0, &Fatfs[0]) != FR_OK) {
 		/* Failed to mount MicroSD filesystem, flash LED1 forever */
 		while(1) {
-			for(int i = 0; i < 1000; i++);
+			for(int i = 0; i < 100000; i++);
 			PIOS_LED_Toggle(LED1);
 		}
 	}		

@@ -41,10 +41,8 @@ static uint32_t IdleTimePercent = 0;
 /* Global Functions */
 void vApplicationIdleHook(void);
 
-
 /* Function Prototypes */
 static void HooksTask(void *pvParameters);
-
 
 /**
 * Main function
@@ -58,16 +56,16 @@ int main()
 	
 	/* Call LoadSettings which populates System Vars 
 	   so the rest of the hardware can be configured. */
-	PIOS_Settings_Load();
+//	PIOS_Settings_Load();
 
 	/* Com ports init */
-	PIOS_COM_Init();
+//	PIOS_COM_Init();
 	
 	/* Analog to digi init */
-	PIOS_ADC_Init();
+//	PIOS_ADC_Init();
 	
 	/* Initialise OpenPilot application */
-	OpenPilotInit();
+//	OpenPilotInit();
 	
 	/* Start the task which calls the application hooks */
 	xTaskCreate(HooksTask, (signed portCHAR *)"Hooks", configMINIMAL_STACK_SIZE, NULL, PRIORITY_TASK_HOOKS, NULL);

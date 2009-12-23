@@ -36,11 +36,8 @@ DRESULT disk_write (BYTE, const BYTE*, DWORD, BYTE);
 #endif
 DRESULT disk_ioctl (BYTE, BYTE, void*);
 
-// mthomas:
-#ifndef RAMFUNC
-#define RAMFUNC
-#endif
-RAMFUNC void    disk_timerproc (void);
+
+void    disk_timerproc (void);
 
 
 /* Disk Status Bits (DSTATUS) */

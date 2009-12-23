@@ -924,7 +924,7 @@ DRESULT disk_ioctl (
 /*-----------------------------------------------------------------------*/
 /* This function must be called in period of 10ms                        */
 
-RAMFUNC void disk_timerproc (void)
+void disk_timerproc (void)
 {
 	static socket_state_t pv;
 	socket_state_t ns;

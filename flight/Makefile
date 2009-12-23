@@ -89,7 +89,6 @@ SRC += $(PIOS)/pios.c
 ## PIOS Hardware (STM32F10x)
 SRC += $(PIOSSTM32F10X)/pios_sys.c
 SRC += $(PIOSSTM32F10X)/pios_led.c
-SRC += $(PIOSSTM32F10X)/pios_sdcard.c
 SRC += $(PIOSSTM32F10X)/pios_usart.c
 SRC += $(PIOSSTM32F10X)/pios_irq.c
 SRC += $(PIOSSTM32F10X)/pios_adc.c
@@ -97,6 +96,7 @@ SRC += $(PIOSSTM32F10X)/pios_servo.c
 SRC += $(PIOSSTM32F10X)/pios_i2c.c
 
 ## PIOS Hardware (Common)
+SRC += $(PIOSCOMMON)/pios_sdcard.c
 SRC += $(PIOSCOMMON)/pios_settings.c
 SRC += $(PIOSCOMMON)/pios_com.c
 SRC += $(PIOSCOMMON)/pios_bmp085.c
@@ -317,7 +317,7 @@ OOCD_EXE=openocd
 # debug level
 OOCD_CL=-d0
 # interface and board/target settings (using the OOCD target-library here)
-OOCD_CL+=-f project/OpenOCD/olimex-arm-usb-ocd.cfg -f project/OpenOCD/stm32.cfg
+OOCD_CL+=-f project/OpenOCD/olimex-arm-usb-tiny-h.cfg -f project/OpenOCD/stm32.cfg
 # initialize
 OOCD_CL+=-c init
 # show the targets

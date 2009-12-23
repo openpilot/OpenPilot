@@ -42,6 +42,7 @@ void vApplicationIdleHook(void);
 
 /* Function Prototypes */
 void TestTask( void *pvParameters );
+
 /**
 * Main function
 */
@@ -68,7 +69,7 @@ int main()
 	/* Initialise OpenPilot application */
 //	OpenPilotInit();
 
-	xTaskCreate( TestTask, ( signed portCHAR * ) "Test", configMINIMAL_STACK_SIZE, NULL, 2, NULL );
+	xTaskCreate( TestTask, ( signed portCHAR * ) "Test", 128 , NULL, 2, NULL );
 
 	/* Start the FreeRTOS scheduler */
 	vTaskStartScheduler();

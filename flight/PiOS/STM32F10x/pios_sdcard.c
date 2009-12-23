@@ -29,23 +29,38 @@
 /* Project Includes */
 #include "pios.h"
 
-/* Private Function Prototypes */
+/* File system object for each logical drive */
+FATFS Fatfs[_DRIVES];
 
+/* Create struct for logfile */
+FIL logfile;
 
 /**
-* Initializes all system peripherals
+* Initialises SDCard
 */
 void PIOS_SDCARD_Init(void)
 {
-	/* File system object for each logical drive */
-	static FATFS Fatfs[_DRIVES];
+	int result;
 	
-	/* Initialize FatFS disk */
+	/* Initialise FatFS disk */
 	if(f_mount(0, &Fatfs[0]) != FR_OK) {
-		/* Failed to mount MicroSD filesystem, flash LED1 forever */
+		/* Failed to setup MicroSD memory structure, flash LED1 forever */
 		while(1) {
 			for(int i = 0; i < 100000; i++);
 			PIOS_LED_Toggle(LED1);
 		}
-	}		
+	} else {
+		/* Try to Open Logging file */
+		if ( f_open(&logfile, LOG_FILENAME, FA_CREATE_ALWAYS | FA_WRITE ) != FR_OK ) {
+			/* Failed to mount MicroSD or create file, flash LED1 forever */
+			while(1) {
+				for(int i = 0; i < 100000; i++);
+				PIOS_LED_Toggle(LED1);
+			}
+		} else {
+			result = f_puts("Hello\n", &logfile );
+			if ( result != EOF ) { result = f_puts("pios rocks!\n", &logfile ); }
+			f_close( &logfile );
+		}
+	}
 }

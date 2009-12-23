@@ -28,10 +28,16 @@
 #ifndef PIOS_CONFIG_H
 #define PIOS_CONFIG_H
 
+
 /* Compile Time Macros */ 
+
+/* Defaults for Logging */
+#define LOG_FILENAME 			"pios.log"
 
 
 /* Defaults for MinIni */
+
+#define SYS_INI_FILE 			system.ini
 
 /* COM Module */
 #define GPS_BAUDRATE			19200

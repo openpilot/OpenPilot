@@ -36,8 +36,7 @@
 
 
 /* Defaults for MinIni */
-
-#define SYS_INI_FILE 			system.ini
+#define SETTINGS_FILE			"Settings.ini"
 
 /* COM Module */
 #define GPS_BAUDRATE			19200

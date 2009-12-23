@@ -27,10 +27,6 @@
 #ifndef PIOS_BOARD_H
 #define PIOS_BOARD_H
 
-//------------------------
-// Default File Settings
-//------------------------
-#define SETTINGS_FILE			"Settings.ini"
 
 //------------------------
 // DMA Channels Used

@@ -32,7 +32,6 @@
 #include <openpilot.h>
 
 /* Task Priorities */
-#define PRIORITY_TASK_HOOKS             ( tskIDLE_PRIORITY + 3 )
 
 /* Local Variables */
 static uint32_t ulIdleCycleCount = 0;
@@ -42,8 +41,7 @@ static uint32_t IdleTimePercent = 0;
 void vApplicationIdleHook(void);
 
 /* Function Prototypes */
-static void HooksTask(void *pvParameters);
-
+void TestTask( void *pvParameters );
 /**
 * Main function
 */
@@ -55,7 +53,7 @@ int main()
 	PIOS_SYS_Init();
 
 	/* Enables the SDCard */
-	PIOS_SDCARD_Init();
+//	PIOS_SDCARD_Init();
 	
 	/* Call LoadSettings which populates System Vars 
 	   so the rest of the hardware can be configured. */
@@ -69,9 +67,8 @@ int main()
 	
 	/* Initialise OpenPilot application */
 //	OpenPilotInit();
-	
-	/* Start the task which calls the application hooks */
-	xTaskCreate(HooksTask, (signed portCHAR *)"Hooks", configMINIMAL_STACK_SIZE, NULL, PRIORITY_TASK_HOOKS, NULL);
+
+	xTaskCreate( TestTask, ( signed portCHAR * ) "Test", configMINIMAL_STACK_SIZE, NULL, 2, NULL );
 
 	/* Start the FreeRTOS scheduler */
 	vTaskStartScheduler();
@@ -81,29 +78,15 @@ int main()
 	return 0;
 }
 
-static void HooksTask(void *pvParameters)
+void TestTask( void *pvParameters )
 {
-	portTickType xLastExecutionTime;
+const portTickType xDelay = 500 / portTICK_RATE_MS;
 
-	// Initialise the xLastExecutionTime variable on task entry
-	xLastExecutionTime = xTaskGetTickCount();
-
-	while(1) {
-		vTaskDelayUntil(&xLastExecutionTime, 1 / portTICK_RATE_MS);
-		
-		/* Skip delay gap if we had to wait for more than 5 ticks to avoid  */
-		/* unnecessary repeats until xLastExecutionTime reached xTaskGetTickCount() again */
-		portTickType xCurrentTickCount = xTaskGetTickCount();
-		if(xLastExecutionTime < (xCurrentTickCount - 5)) {
-			xLastExecutionTime = xCurrentTickCount;
-		}		
-		
-		/* Check for ADC pin changes, call ADCNotifyChange on each pin change */
-		//ADCHandler(ADCNotifyChange);
-		
-		/* Check for incoming COM messages */
-		PIOS_COM_ReceiveHandler();
-	}
+    while(1)
+        {
+    	PIOS_LED_Toggle(LED1);
+        vTaskDelay(xDelay);
+        }
 }
 
 

@@ -5,6 +5,6 @@ Gussy - 11/09
 ----> diskio.c
 ----> diskio.h
 ----> integer.c
-----> ffconf.c
+----> ffconf.h
 -> The above files should be diff'd with the new files to see if there is any changes that need to be made.
 -> Everything else can be overwritten

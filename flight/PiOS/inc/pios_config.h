@@ -35,11 +35,6 @@
 #define LOG_FILENAME 			"pios.log"
 
 
-/* Timer to use for Delay Functions */
-#define PIOS_DELAY_TIMER TIM8
-#define PIOS_DELAY_TIMER_RCC RCC_APB2Periph_TIM8
-
-
 /* Defaults for MinIni */
 #define SETTINGS_FILE			"Settings.ini"
 

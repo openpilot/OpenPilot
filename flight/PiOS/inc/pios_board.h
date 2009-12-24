@@ -211,6 +211,12 @@
 #define USB_PULLUP_PIN			GPIO_Pin_14
 
 //-------------------------
+// Delay Timer    
+//-------------------------
+#define PIOS_DELAY_TIMER TIM7
+#define PIOS_DELAY_TIMER_RCC RCC_APB1Periph_TIM7
+
+//-------------------------
 // Master Clock   
 //-------------------------
 #define MASTER_CLOCK			72000000

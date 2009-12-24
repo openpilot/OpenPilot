@@ -42,7 +42,6 @@ void vApplicationIdleHook(void);
 
 /* Function Prototypes */
 void TestTask( void *pvParameters );
-void DiskTask( void *pvParameters );
 
 /**
 * Main function
@@ -54,8 +53,8 @@ int main()
 	   enables the LEDs. */
 	PIOS_SYS_Init();
 
-	xTaskCreate( TestTask, ( signed portCHAR * ) "Test", configMINIMAL_STACK_SIZE , NULL, 2, NULL );
-	xTaskCreate( DiskTask, ( signed portCHAR * ) "Disk", configMINIMAL_STACK_SIZE , NULL, 4, NULL );
+	/* Delay system */
+	PIOS_DELAY_Init();
 
 	/* Enables the SDCard */
 //	PIOS_SDCARD_Init();
@@ -73,6 +72,10 @@ int main()
 	/* Initialise OpenPilot application */
 //	OpenPilotInit();
 
+
+	/* Create a FreeRTOS task */
+	xTaskCreate( TestTask, ( signed portCHAR * ) "Test", configMINIMAL_STACK_SIZE , NULL, 2, NULL );
+
 	/* Start the FreeRTOS scheduler */
 	vTaskStartScheduler();
 
@@ -80,6 +83,8 @@ int main()
 	/* If we do get here, it will most likley be because we ran out of heap space. */
 	return 0;
 }
+
+
 
 void TestTask( void *pvParameters )
 {
@@ -92,17 +97,6 @@ const portTickType xDelay = 500 / portTICK_RATE_MS;
         }
 }
 
-
-void DiskTask( void *pvParameters )
-{
-const portTickType xDelay = 10 / portTICK_RATE_MS;
-
-    while(1)
-        {
-    	disk_timerproc();
-        vTaskDelay(xDelay);
-        }
-}
 
 
 /**

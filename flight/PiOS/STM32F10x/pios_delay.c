@@ -36,9 +36,9 @@
 * This is called from pios.c as part of the main() function
 * at system start up.
 *
-* We use TIM8 for this on Hardware V1. Can be changed
+* We use TIM7 for this on Hardware V1. Can be changed
 * with PIOS_DELAY_TIMER and PIOS_DELAY_TIMER_RCC the 
-* pios_config.h file.
+* board_config.h file.
 * 
 * \return < 0 if initialisation failed
 */

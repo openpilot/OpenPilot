@@ -59,6 +59,6 @@ extern SettingsTypeDef Settings;
 /* Public Functions */
 extern void PIOS_Settings_Load(void);
 extern void PIOS_Settings_Dump(USART_TypeDef* USARTx);
-extern int PIOS_Settings_CheckForFiles(void);
+extern int32_t PIOS_Settings_CheckForFiles(void);
 
 #endif /* PIOS_SETTINGS_H */

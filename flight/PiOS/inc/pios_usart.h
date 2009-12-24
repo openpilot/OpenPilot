@@ -37,17 +37,17 @@ extern void PIOS_USART_EnableAux(void);
 extern void PIOS_USART_DisableAux(void);
 extern void PIOS_USART_ChangeBaud(USART_TypeDef* USARTx, uint32_t Baud);
 
-extern int PIOS_USART_RxBufferFree(USARTNumTypeDef uart);
-extern int PIOS_USART_RxBufferUsed(USARTNumTypeDef uart);
-extern int PIOS_USART_RxBufferGet(USARTNumTypeDef uart);
-extern int PIOS_USART_RxBufferPeek(USARTNumTypeDef uart);
-extern int PIOS_USART_RxBufferPut(USARTNumTypeDef uart, uint8_t b);
+extern int32_t PIOS_USART_RxBufferFree(USARTNumTypeDef uart);
+extern int32_t PIOS_USART_RxBufferUsed(USARTNumTypeDef uart);
+extern int32_t PIOS_USART_RxBufferGet(USARTNumTypeDef uart);
+extern int32_t PIOS_USART_RxBufferPeek(USARTNumTypeDef uart);
+extern int32_t PIOS_USART_RxBufferPut(USARTNumTypeDef uart, uint8_t b);
 
-extern int PIOS_USART_TxBufferFree(USARTNumTypeDef uart);
-extern int PIOS_USART_TxBufferGet(USARTNumTypeDef uart);
-extern int PIOS_USART_TxBufferPutMoreNonBlocking(USARTNumTypeDef uart, uint8_t *buffer, uint16_t len);
-extern int PIOS_USART_TxBufferPutMore(USARTNumTypeDef uart, uint8_t *buffer, uint16_t len);
-extern int PIOS_USART_TxBufferPutNonBlocking(uint8_t uart, uint8_t b);
-extern int PIOS_USART_TxBufferPut(USARTNumTypeDef uart, uint8_t b);
+extern int32_t PIOS_USART_TxBufferFree(USARTNumTypeDef uart);
+extern int32_t PIOS_USART_TxBufferGet(USARTNumTypeDef uart);
+extern int32_t PIOS_USART_TxBufferPutMoreNonBlocking(USARTNumTypeDef uart, uint8_t *buffer, uint16_t len);
+extern int32_t PIOS_USART_TxBufferPutMore(USARTNumTypeDef uart, uint8_t *buffer, uint16_t len);
+extern int32_t PIOS_USART_TxBufferPutNonBlocking(uint8_t uart, uint8_t b);
+extern int32_t PIOS_USART_TxBufferPut(USARTNumTypeDef uart, uint8_t b);
 
 #endif /* PIOS_USART_H */

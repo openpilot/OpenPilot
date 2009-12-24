@@ -79,7 +79,7 @@ void PIOS_Settings_Dump(USART_TypeDef* USARTx)
 * \return 0 All files found
 * \return >0 Number of files missing
 */
-int PIOS_Settings_CheckForFiles(void)
+int32_t PIOS_Settings_CheckForFiles(void)
 {
 	FILINFO DummyVar;
 	int MissingCount = 0;

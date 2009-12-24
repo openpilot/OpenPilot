@@ -195,7 +195,7 @@ void PIOS_USART_ChangeBaud(USART_TypeDef* USARTx, uint32_t Baud)
 * \return 1: USART available
 * \return 0: USART not available
 */
-int PIOS_USART_RxBufferFree(USARTNumTypeDef usart)
+int32_t PIOS_USART_RxBufferFree(USARTNumTypeDef usart)
 {
 	if(usart >= USART_NUM) {
 		return 0;
@@ -211,7 +211,7 @@ int PIOS_USART_RxBufferFree(USARTNumTypeDef usart)
 * \return 0 if USART not available
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int PIOS_USART_RxBufferUsed(USARTNumTypeDef usart)
+int32_t PIOS_USART_RxBufferUsed(USARTNumTypeDef usart)
 {
 	if(usart >= USART_NUM) {
 		return 0;
@@ -228,7 +228,7 @@ int PIOS_USART_RxBufferUsed(USARTNumTypeDef usart)
 * \return >= 0: number of received bytes
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int PIOS_USART_RxBufferGet(USARTNumTypeDef usart)
+int32_t PIOS_USART_RxBufferGet(USARTNumTypeDef usart)
 {
 	if(usart >= USART_NUM) {
 		/* USART not available */
@@ -260,7 +260,7 @@ int PIOS_USART_RxBufferGet(USARTNumTypeDef usart)
 * \return >= 0: number of received bytes
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int PIOS_USART_RxBufferPeek(USARTNumTypeDef usart)
+int32_t PIOS_USART_RxBufferPeek(USARTNumTypeDef usart)
 {
 	if(usart >= USART_NUM) {
 		/* USART not available */
@@ -290,7 +290,7 @@ int PIOS_USART_RxBufferPeek(USARTNumTypeDef usart)
 * \return -2 if buffer full (retry)
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int PIOS_USART_RxBufferPut(USARTNumTypeDef usart, uint8_t b)
+int32_t PIOS_USART_RxBufferPut(USARTNumTypeDef usart, uint8_t b)
 {
 	if(usart >= USART_NUM) {
 		/* USART not available */
@@ -324,7 +324,7 @@ int PIOS_USART_RxBufferPut(USARTNumTypeDef usart, uint8_t b)
 * \return 0 if USART not available
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int PIOS_USART_TxBufferFree(USARTNumTypeDef usart)
+int32_t PIOS_USART_TxBufferFree(USARTNumTypeDef usart)
 {
 	if(usart >= USART_NUM) {
 		return 0;
@@ -340,7 +340,7 @@ int PIOS_USART_TxBufferFree(USARTNumTypeDef usart)
 * \return 0 if USART not available
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int PIOS_USART_TxBufferUsed(USARTNumTypeDef usart)
+int32_t PIOS_USART_TxBufferUsed(USARTNumTypeDef usart)
 {
 	if(usart >= USART_NUM) {
 		return 0;
@@ -357,7 +357,7 @@ int PIOS_USART_TxBufferUsed(USARTNumTypeDef usart)
 * \return >= 0: transmitted byte
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int PIOS_USART_TxBufferGet(USARTNumTypeDef usart)
+int32_t PIOS_USART_TxBufferGet(USARTNumTypeDef usart)
 {
 	if(usart >= USART_NUM) {
 		/* USART not available */
@@ -393,7 +393,7 @@ int PIOS_USART_TxBufferGet(USARTNumTypeDef usart)
 * \return -3 if USART not supported by USARTTxBufferPut Routine
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int PIOS_USART_TxBufferPutMoreNonBlocking(USARTNumTypeDef usart, uint8_t *buffer, uint16_t len)
+int32_t PIOS_USART_TxBufferPutMoreNonBlocking(USARTNumTypeDef usart, uint8_t *buffer, uint16_t len)
 {
 	if(usart >= USART_NUM) {
 		/* USART not available */
@@ -449,7 +449,7 @@ int PIOS_USART_TxBufferPutMoreNonBlocking(USARTNumTypeDef usart, uint8_t *buffer
 * \return -3 if USART not supported by USARTTxBufferPut Routine
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int PIOS_USART_TxBufferPutMore(USARTNumTypeDef usart, uint8_t *buffer, uint16_t len)
+int32_t PIOS_USART_TxBufferPutMore(USARTNumTypeDef usart, uint8_t *buffer, uint16_t len)
 {
 	int error;
 
@@ -468,7 +468,7 @@ int PIOS_USART_TxBufferPutMore(USARTNumTypeDef usart, uint8_t *buffer, uint16_t 
 * \return -3 if USART not supported by USARTTxBufferPut Routine
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int PIOS_USART_TxBufferPut_NonBlocking(USARTNumTypeDef usart, uint8_t b)
+int32_t PIOS_USART_TxBufferPut_NonBlocking(USARTNumTypeDef usart, uint8_t b)
 {
 	/* For more comfortable usage... */
 	/* -> Just forward to USARTTxBufferPutMore */
@@ -485,7 +485,7 @@ int PIOS_USART_TxBufferPut_NonBlocking(USARTNumTypeDef usart, uint8_t b)
 * \return -3 if USART not supported by USARTTxBufferPut Routine
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int PIOS_USART_TxBufferPut(USARTNumTypeDef usart, uint8_t b)
+int32_t PIOS_USART_TxBufferPut(USARTNumTypeDef usart, uint8_t b)
 {
 	int error;
 

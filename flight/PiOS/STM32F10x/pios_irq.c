@@ -35,17 +35,17 @@
 
 /* Local Variables */
 /* The nesting counter ensures, that interrupts won't be enabled so long nested functions disable them */
-static unsigned int nested_ctr;
+static uint32_t nested_ctr;
 
 /* Stored priority level before IRQ has been disabled (important for co-existence with vPortEnterCritical) */
-static unsigned int prev_primask;
+static uint32_t prev_primask;
 
 
 /**
 * Disables all interrupts (nested)
 * \return < 0 On errors
 */
-int PIOS_IRQ_Disable(void)
+int32_t PIOS_IRQ_Disable(void)
 {
 	/* Get current priority if nested level == 0 */
 	if(!nested_ctr) {
@@ -74,7 +74,7 @@ int PIOS_IRQ_Disable(void)
 * \return < 0 on errors
 * \return -1 on nesting errors (PIOS_IRQ_Disable() hasn't been called before)
 */
-int PIOS_IRQ_Enable(void)
+int32_t PIOS_IRQ_Enable(void)
 {
 	/* Check for nesting error */
 	if(nested_ctr == 0) {

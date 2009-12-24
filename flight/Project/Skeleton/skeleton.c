@@ -1,11 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       <name of file.c> 
+ * @file       name of file.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
  * @brief      Description of file 
- *                 - Slighlty longer description, describe what fiel provides.
+ *                 - Slighlty longer description, describe what file provides.
  * @see        The GNU Public License (GPL) Version 3
+ * @defgroup   Module name here & two or three word description of module
+ * @{
  * 
  *****************************************************************************/
 /* 
@@ -39,5 +41,6 @@
 
 
 /**
-* functions
+* function doxygen comments
 */
+

@@ -63,7 +63,7 @@ void PIOS_BMP085_Init(void);
 void PIOS_BMP085_StartADC(ConversionTypeTypeDef Type);
 void PIOS_BMP085_ReadADC(void);
 void PIOS_BMP085_GetValues(uint16_t *Pressure, uint16_t *Altitude, uint16_t *Temperature);
-int32_t PIOS_BMP085_Read(u16 address, uint8_t *buffer, uint8_t len);
+int32_t PIOS_BMP085_Read(uint16_t address, uint8_t *buffer, uint8_t len);
 int32_t PIOS_BMP085_Write(uint16_t address, uint8_t *buffer, uint8_t len);
 
 #endif /* PIOS_BMP085_H */

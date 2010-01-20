@@ -32,45 +32,43 @@
 
 
 /**
-* Initializes the Timer used by PIOS_DELAY functions<BR>
+* Initialises the Timer used by PIOS_DELAY functions<BR>
 * This is called from pios.c as part of the main() function
 * at system start up.
-*
-* We use TIM7 for this on Hardware V1. Can be changed
-* with PIOS_DELAY_TIMER and PIOS_DELAY_TIMER_RCC the 
-* board_config.h file.
-* 
 * \return < 0 if initialisation failed
 */
 
 
 int32_t PIOS_DELAY_Init(void)
 {
-  // enable timer clock
-  if( PIOS_DELAY_TIMER_RCC == RCC_APB2Periph_TIM1 || PIOS_DELAY_TIMER_RCC == RCC_APB2Periph_TIM8 )
-    RCC_APB2PeriphClockCmd(PIOS_DELAY_TIMER_RCC, ENABLE);
-  else
-    RCC_APB1PeriphClockCmd(PIOS_DELAY_TIMER_RCC, ENABLE);
+	/* Enable timer clock */
+	if(PIOS_DELAY_TIMER_RCC == RCC_APB2Periph_TIM1 || PIOS_DELAY_TIMER_RCC == RCC_APB2Periph_TIM8) {
+	    RCC_APB2PeriphClockCmd(PIOS_DELAY_TIMER_RCC, ENABLE);
+	} else {
+		RCC_APB1PeriphClockCmd(PIOS_DELAY_TIMER_RCC, ENABLE);
+	}
 
-  // time base configuration
-  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-  TIM_TimeBaseStructure.TIM_Period = 65535; // maximum value
-  TIM_TimeBaseStructure.TIM_Prescaler = 72-1; // for 1 uS accuracy fixed to 72Mhz
-  TIM_TimeBaseStructure.TIM_ClockDivision = 0;
-  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-  TIM_TimeBaseInit(PIOS_DELAY_TIMER, &TIM_TimeBaseStructure);
+	/* Time base configuration */
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
+	TIM_TimeBaseStructure.TIM_Period = 65535; // maximum value
+	TIM_TimeBaseStructure.TIM_Prescaler = 72-1; // for 1 uS accuracy fixed to 72Mhz
+	TIM_TimeBaseStructure.TIM_ClockDivision = 0;
+	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+	TIM_TimeBaseInit(PIOS_DELAY_TIMER, &TIM_TimeBaseStructure);
 
-  // enable counter
-  TIM_Cmd(PIOS_DELAY_TIMER, ENABLE);
+	/* Enable counter */
+	TIM_Cmd(PIOS_DELAY_TIMER, ENABLE);
 
-  return 0; // no error
+	/* No error */
+	return 0;
 }
 
 /**
 * Waits for a specific number of uS<BR>
 * Example:<BR>
 * \code
-*   // wait for 500 uS
+*   // Wait for 500 uS
 *   PIOS_DELAY_Wait_uS(500);
 * \endcode
 * \param[in] uS delay (1..65535 microseconds)
@@ -78,10 +76,11 @@ int32_t PIOS_DELAY_Init(void)
 */
 int32_t PIOS_DELAY_Wait_uS(uint16_t uS)
 {
-  uint16_t start = PIOS_DELAY_TIMER->CNT;
+	uint16_t start = PIOS_DELAY_TIMER->CNT;
 
-  // note that this event works on 16bit counter wrap-arounds
-  while( (uint16_t)(PIOS_DELAY_TIMER->CNT - start) <= uS );
+	/* Note that this event works on 16bit counter wrap-arounds */
+	while((uint16_t)(PIOS_DELAY_TIMER->CNT - start) <= uS);
 
-  return 0; // no error
+	/* No error */
+	return 0;
 }

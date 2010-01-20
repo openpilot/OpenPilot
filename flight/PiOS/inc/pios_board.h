@@ -213,8 +213,8 @@
 //-------------------------
 // Delay Timer    
 //-------------------------
-#define PIOS_DELAY_TIMER TIM7
-#define PIOS_DELAY_TIMER_RCC RCC_APB1Periph_TIM7
+#define PIOS_DELAY_TIMER		TIM2
+#define PIOS_DELAY_TIMER_RCC	RCC_APB1Periph_TIM2
 
 //-------------------------
 // Master Clock   

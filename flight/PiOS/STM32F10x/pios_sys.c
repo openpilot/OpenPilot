@@ -33,7 +33,6 @@
 void NVIC_Configuration(void);
 
 
-
 /**
 * Initializes all system peripherals
 */

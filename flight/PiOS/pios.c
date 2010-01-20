@@ -41,7 +41,8 @@ static uint32_t IdleTimePercent = 0;
 void vApplicationIdleHook(void);
 
 /* Function Prototypes */
-void TestTask( void *pvParameters );
+void TestTask(void *pvParameters);
+void Flashy(void);
 
 /**
 * Main function
@@ -55,6 +56,8 @@ int main()
 
 	/* Delay system */
 	PIOS_DELAY_Init();
+
+	Flashy();
 
 	/* Enables the SDCard */
 //	PIOS_SDCARD_Init();
@@ -80,11 +83,27 @@ int main()
 	vTaskStartScheduler();
 
 	/* If all is well we will never reach here as the scheduler will now be running. */
-	/* If we do get here, it will most likley be because we ran out of heap space. */
+	/* If we do get here, it will most likely be because we ran out of heap space. */
 	return 0;
 }
 
+void Flashy(void)
+{
+	for(;;)
+	{
+		/* Setup the LEDs to Alternate */
+		PIOS_LED_On(LED1);
+		PIOS_LED_Off(LED2);
 
+		/* Infinite loop */
+		while (1)
+		{
+			PIOS_LED_Toggle(LED1);
+			PIOS_LED_Toggle(LED2);
+			for(int i = 0; i < 1000000; i++);
+		}
+	}
+}
 
 void TestTask( void *pvParameters )
 {

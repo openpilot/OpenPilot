@@ -41,26 +41,32 @@ FIL logfile;
 void PIOS_SDCARD_Init(void)
 {
 	int result;
-	
+
 	/* Initialise FatFS disk */
 	if(f_mount(0, &Fatfs[0]) != FR_OK) {
 		/* Failed to setup MicroSD memory structure, flash LED1 forever */
 		while(1) {
-			for(int i = 0; i < 100000; i++);
+			for(int i = 0; i < 1000000; i++);
 			PIOS_LED_Toggle(LED1);
 		}
 	} else {
-		/* Try to Open Logging file */
-		if ( f_open(&logfile, LOG_FILENAME, FA_CREATE_ALWAYS | FA_WRITE ) != FR_OK ) {
+		FRESULT foresult = f_open(&logfile, LOG_FILENAME, FA_CREATE_ALWAYS | FA_WRITE);
+		if (foresult != FR_OK) {
 			/* Failed to mount MicroSD or create file, flash LED1 forever */
+			PIOS_LED_Off(LED1);
+			PIOS_LED_Off(LED2);
 			while(1) {
-				for(int i = 0; i < 100000; i++);
+				for(int i = 0; i < 1000000; i++);
 				PIOS_LED_Toggle(LED1);
+				PIOS_LED_Toggle(LED2);
 			}
 		} else {
-			result = f_puts("Hello\n", &logfile );
-			if ( result != EOF ) { result = f_puts("pios rocks!\n", &logfile ); }
-			f_close( &logfile );
+			result = f_puts("Hello\n", &logfile);
+			if (result != EOF ) {
+				result = f_puts("pios rocks!\n", &logfile );
+			}
+			f_close(&logfile);
 		}
 	}
 }
+

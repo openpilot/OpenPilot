@@ -41,8 +41,9 @@ static uint32_t IdleTimePercent = 0;
 void vApplicationIdleHook(void);
 
 /* Function Prototypes */
-void TestTask(void *pvParameters);
+void TickTask(void *pvParameters);
 void Flashy(void);
+void SysTick_Handler(void);
 
 /**
 * Main function
@@ -57,14 +58,16 @@ int main()
 	/* Delay system */
 	PIOS_DELAY_Init();
 
-	Flashy();
-
 	/* Enables the SDCard */
-//	PIOS_SDCARD_Init();
-	
-	/* Call LoadSettings which populates System Vars 
+	PIOS_SDCARD_Init();
+
+	/* Call LoadSettings which populates System Vars
 	   so the rest of the hardware can be configured. */
-//	PIOS_Settings_Load();
+	//PIOS_Settings_Load();
+
+	for(;;) {
+
+	}
 
 	/* Com ports init */
 //	PIOS_COM_Init();
@@ -77,7 +80,7 @@ int main()
 
 
 	/* Create a FreeRTOS task */
-	xTaskCreate( TestTask, ( signed portCHAR * ) "Test", configMINIMAL_STACK_SIZE , NULL, 2, NULL );
+	xTaskCreate(TickTask, (signed portCHAR *) "Test", configMINIMAL_STACK_SIZE , NULL, 2, NULL);
 
 	/* Start the FreeRTOS scheduler */
 	vTaskStartScheduler();
@@ -105,17 +108,16 @@ void Flashy(void)
 	}
 }
 
-void TestTask( void *pvParameters )
+void TickTask(void *pvParameters)
 {
-const portTickType xDelay = 500 / portTICK_RATE_MS;
+	const portTickType xDelay = 10 / portTICK_RATE_MS;
 
-    while(1)
-        {
-    	PIOS_LED_Toggle(LED1);
-        vTaskDelay(xDelay);
-        }
+	for(;;)
+	{
+		PIOS_LED_Toggle(LED2);
+		vTaskDelay(xDelay);
+	}
 }
-
 
 
 /**

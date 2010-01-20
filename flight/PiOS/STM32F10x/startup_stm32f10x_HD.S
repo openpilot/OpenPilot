@@ -155,7 +155,8 @@ g_pfnVectors:
   .word  DebugMon_Handler
   .word  0
   .word  xPortPendSVHandler
-  .word  xPortSysTickHandler
+  //.word  xPortSysTickHandler
+  .word  SysTick_Handler
   .word  WWDG_IRQHandler
   .word  PVD_IRQHandler
   .word  TAMPER_IRQHandler

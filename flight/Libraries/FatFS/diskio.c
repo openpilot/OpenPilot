@@ -41,15 +41,15 @@
 //Using DMA
 #define STM32_USE_DMA
 
-//Setup for SPI1 on v1.2 hardware (CD is on GPIO_Pin_4)
+//Setup for SPI1 on v1 hardware (CD is on GPIO_Pin_4)
 #define CARD_SUPPLY_SWITCHABLE   0
 #define SOCKET_WP_CP_CONNECTED   0
 #define SPI_SD                   SPI1
 
-//CS is on PC5
-#define GPIO_CS                  GPIOC
-#define RCC_APB2Periph_GPIO_CS   RCC_APB2Periph_GPIOC
-#define GPIO_Pin_CS              GPIO_Pin_5
+//CS is on PA4
+#define GPIO_CS                  GPIOA
+#define RCC_APB2Periph_GPIO_CS   RCC_APB2Periph_GPIOA
+#define GPIO_Pin_CS              GPIO_Pin_4
 
 #define GPIO_SPI_SD              GPIOA
 #define GPIO_Pin_SPI_SD_SCK      GPIO_Pin_5

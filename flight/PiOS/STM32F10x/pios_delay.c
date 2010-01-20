@@ -84,3 +84,24 @@ int32_t PIOS_DELAY_Wait_uS(uint16_t uS)
 	/* No error */
 	return 0;
 }
+
+/**
+* Waits for a specific number of mS<BR>
+* Example:<BR>
+* \code
+*   // Wait for 500 mS
+*   PIOS_DELAY_Wait_mS(500);
+* \endcode
+* \param[in] mS delay (1..65535 milliseconds)
+* \return < 0 on errors
+*/
+int32_t PIOS_DELAY_Wait_mS(uint16_t mS)
+{
+	uint16_t start = PIOS_DELAY_TIMER->CNT;
+
+	/* Note that this event works on 16bit counter wrap-arounds */
+	while((uint16_t)(PIOS_DELAY_TIMER->CNT - start) <= (mS * 1000));
+
+	/* No error */
+	return 0;
+}

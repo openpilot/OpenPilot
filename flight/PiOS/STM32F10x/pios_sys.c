@@ -31,14 +31,13 @@
 
 /* Private Function Prototypes */
 void NVIC_Configuration(void);
-
+void SysTick_Handler(void);
 
 /**
 * Initializes all system peripherals
 */
 void PIOS_SYS_Init(void)
 {
-
 	/* Setup STM32 system (RCC, clock, PLL and Flash configuration) - CMSIS Function */
 	SystemInit();
 	
@@ -47,7 +46,6 @@ void PIOS_SYS_Init(void)
 	
 	/* Initialize LEDs */
 	PIOS_LED_Init();
-	
 }
 
 
@@ -63,7 +61,19 @@ void NVIC_Configuration(void)
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 
 	/* Configure HCLK clock as SysTick clock source. */
-	SysTick_CLKSourceConfig( SysTick_CLKSource_HCLK );
+	//SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK);
+
+	/* Set SysTick to 10mS tick */
+	if(SysTick_Config(SystemFrequency / 100))
+	{
+		/* Capture error */
+		while (1);
+	}
+}
+
+void SysTick_Handler(void)
+{
+	disk_timerproc();
 }
 
 #ifdef  USE_FULL_ASSERT
@@ -86,10 +96,9 @@ void assert_failed(uint8_t* file, uint32_t line)
 	/* Infinite loop */
 	while (1)
 	{
-		for(int i = 0; i < 1000; i++);
 		PIOS_LED_Toggle(LED1);
-		for(int i = 0; i < 1000; i++);
 		PIOS_LED_Toggle(LED2);
+		for(int i = 0; i < 1000000; i++);
 	}
 }
 #endif

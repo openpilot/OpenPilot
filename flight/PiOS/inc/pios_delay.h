@@ -30,6 +30,7 @@
 /* Public Functions */
 extern int32_t PIOS_DELAY_Init(void);
 extern int32_t PIOS_DELAY_Wait_uS(uint16_t uS);
+extern int32_t PIOS_DELAY_Wait_mS(uint16_t mS);
 
 
 #endif /* PIOS_DELAY_H */

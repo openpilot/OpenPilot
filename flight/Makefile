@@ -324,8 +324,6 @@ OOCD_CL+=-c init
 OOCD_CL+=-c targets
 # commands to prepare flash-write
 OOCD_CL+= -c "reset halt"
-# Try to enable rclk for adaptive speed, fallback to 1Mhz
-OOCD_CL+= -c "jtag_rclk 1200"
 # flash erase 
 OOCD_CL+=-c "stm32x mass_erase 0"
 # flash-write

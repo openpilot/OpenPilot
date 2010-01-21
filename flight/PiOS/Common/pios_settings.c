@@ -50,17 +50,16 @@ void PIOS_Settings_Load(void)
 	*/
 	
 	/* Section: GPS */
-	Settings.GPS.Baudrate = 	(uint32_t) 	ini_getl("GPS", "Baudrate", GPS_BAUDRATE, SETTINGS_FILE);
+	Settings.GPS.Baudrate = 		(uint32_t) 	ini_getl("GPS", "Baudrate", GPS_BAUDRATE, SETTINGS_FILE);
 	
 	/* Section: Telemetry */
-	Settings.Telem.Baudrate = 	(uint32_t) 	ini_getl("Telemetry", "Baudrate", TELEM_BAUDRATE, SETTINGS_FILE);
+	Settings.Telem.Baudrate = 		(uint32_t) 	ini_getl("Telemetry", "Baudrate", TELEM_BAUDRATE, SETTINGS_FILE);
 	
 	/* Section: Auxillary_USART */
 	Settings.AuxUSART.Enabled = 	(bool) 		ini_getl("Auxillary_USART", "Enabled", AUXUART_ENABLED, SETTINGS_FILE);
 	Settings.AuxUSART.Baudrate = 	(uint32_t) 	ini_getl("Auxillary_USART", "Baudrate", AUXUART_BAUDRATE, SETTINGS_FILE);
 	
 	/* Section: Servos */
-	Settings.Servos.PositionMin =	(uint16_t)	ini_getl("Servos", "PositionMin", SERVOS_POSITION_MIN, SETTINGS_FILE);
 	Settings.Servos.PositionMin =	(uint16_t)	ini_getl("Servos", "PositionMin", SERVOS_POSITION_MIN, SETTINGS_FILE);
 	Settings.Servos.PositionMax =	(uint16_t)	ini_getl("Servos", "PositionMax", SERVOS_POSITION_MAX, SETTINGS_FILE);
 }

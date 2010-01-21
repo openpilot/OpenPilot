@@ -30,10 +30,10 @@
 #include "pios.h"
 
 /* File system object for each logical drive */
-FATFS Fatfs[_DRIVES];
+static FATFS Fatfs[_DRIVES];
 
 /* Create struct for logfile */
-FIL logfile;
+static FIL logfile;
 
 /**
 * Initialises SDCard
@@ -61,12 +61,24 @@ void PIOS_SDCARD_Init(void)
 				PIOS_LED_Toggle(LED2);
 			}
 		} else {
-			result = f_puts("Hello\n", &logfile);
-			if (result != EOF ) {
-				result = f_puts("pios rocks!\n", &logfile );
+			result = f_puts("PiOS Startup Log\n\n", &logfile);
+			if (result != EOF) {
+
+
+				/* Print out diagnostic information */
+				FATFS *fs;
+				DWORD free;
+				f_getfree("/", &free, &fs);
+
+				f_puts("Log file creation completed.\n\n", &logfile);
+
+				f_puts("------------------------------\n", &logfile);
+				f_puts("SD Card Information\n", &logfile);
+				f_puts("------------------------------\n", &logfile);
+				f_printf(&logfile, "Free Space: %lu MB\n", ((free * (Fatfs[0].csize / 2)) / 1024));
+				f_printf(&logfile, "Total Space: %lu MB\n", (((Fatfs[0].max_clust - 2) * (Fatfs[0].csize / 2)) / 1024));
 			}
 			f_close(&logfile);
 		}
 	}
 }
-

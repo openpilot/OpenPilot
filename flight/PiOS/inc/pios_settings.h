@@ -42,8 +42,8 @@ typedef struct {
 } USARTSettingsTypeDef;
 
 typedef struct {
-	uint16_t PositionMax;
 	uint16_t PositionMin;
+	uint16_t PositionMax;
 } ServosSettingsTypeDef;
 
 typedef struct {

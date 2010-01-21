@@ -63,11 +63,9 @@ int main()
 
 	/* Call LoadSettings which populates System Vars
 	   so the rest of the hardware can be configured. */
-	//PIOS_Settings_Load();
+	PIOS_Settings_Load();
 
-	for(;;) {
-
-	}
+	Flashy();
 
 	/* Com ports init */
 //	PIOS_COM_Init();

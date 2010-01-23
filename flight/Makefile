@@ -69,7 +69,7 @@ STMSPDINCDIR = $(STMSPDDIR)/inc
 STMUSBSRCDIR = $(STMUSBDIR)/src
 STMUSBINCDIR = $(STMUSBDIR)/inc
 CMSISDIR  = $(STMLIBDIR)/CMSIS/Core/CM3
-FATSDDIR  = $(APPLIBDIR)/FatFS
+DOSFSDIR  = $(APPLIBDIR)/dosfs
 MININIDIR = $(APPLIBDIR)/minIni
 RTOSDIR = $(APPLIBDIR)/FreeRTOS
 RTOSSRCDIR = $(RTOSDIR)/Source
@@ -95,6 +95,7 @@ SRC += $(PIOSSTM32F10X)/pios_irq.c
 SRC += $(PIOSSTM32F10X)/pios_adc.c
 SRC += $(PIOSSTM32F10X)/pios_servo.c
 SRC += $(PIOSSTM32F10X)/pios_i2c.c
+SRC += $(PIOSSTM32F10X)/pios_spi.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_sdcard.c
@@ -140,14 +141,13 @@ SRC += $(RTOSSRCDIR)/tasks.c
 SRC += $(RTOSSRCDIR)/portable/GCC/ARM_CM3/port.c
 SRC += $(RTOSSRCDIR)/portable/MemMang/heap_2.c
 
-## Chan's fat and low-level drivers
-SRC += $(FATSDDIR)/ff.c 
-SRC += $(FATSDDIR)/fattime.c 
-SRC += $(FATSDDIR)/diskio.c 
-SRC += $(FATSDDIR)/option/ccsbcs.c
+## Dosfs file system
+SRC += $(DOSFSDIR)/dosfs.c
+SRC += $(DOSFSDIR)/dfs_sdcard.c
 
 ## ITB CompuPhase's minIni
 SRC += $(MININIDIR)/minIni.c
+SRC += $(MININIDIR)/minGlue.c
 
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
 # use file-extension c for "c-only"-files
@@ -185,7 +185,7 @@ EXTRAINCDIRS  += $(PIOSSTM32F10X)
 EXTRAINCDIRS  += $(PIOSCOMMON)
 EXTRAINCDIRS  += $(STMSPDINCDIR)
 EXTRAINCDIRS  += $(CMSISDIR)
-EXTRAINCDIRS  += $(FATSDDIR)
+EXTRAINCDIRS  += $(DOSFSDIR)
 EXTRAINCDIRS  += $(MININIDIR)
 EXTRAINCDIRS  += $(RTOSINCDIR)
 EXTRAINCDIRS  += $(RTOSSRCDIR)/portable/GCC/ARM_CM3

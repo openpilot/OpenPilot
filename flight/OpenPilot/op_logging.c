@@ -44,24 +44,24 @@ static void OP_Logging_MicroSDGateKeeperTask(void *pvParameters);
 */
 void OP_Logging_Init(void)
 {
-	uint16_t FileCount;
-	FILINFO DummyFileInfo;
-	
-	/* Create the logging queue */
-	xLoggingQueue = xQueueCreate(15, sizeof(LogTypeDef));
-	
-	/* This is a crude way to file the next avaiable number avaiable */
-	/* The proper way would be to use folders with dates, we will get to that later */
-	for(FileCount = 0; FileCount < 65536; FileCount++) {
-		sprintf((char *)FlightLogFilename, "Flight_Log_%d.txt", FileCount);
-		if(f_stat((char *)FlightLogFilename, &DummyFileInfo) != FR_OK) {
-			/* We have come to a file that doesn't extist */
-			break;
-		}
-	}
-	
-	/* Start the gatekeeper task */
-	xTaskCreate(OP_Logging_MicroSDGateKeeperTask, (signed portCHAR *) "Logging_MicroSDGateKeeperTask", configMINIMAL_STACK_SIZE, NULL, OP_LOGGING_TASK_PRI, NULL);
+//	uint16_t FileCount;
+//	FILINFO DummyFileInfo;
+//
+//	/* Create the logging queue */
+//	xLoggingQueue = xQueueCreate(15, sizeof(LogTypeDef));
+//
+//	/* This is a crude way to file the next avaiable number avaiable */
+//	/* The proper way would be to use folders with dates, we will get to that later */
+//	for(FileCount = 0; FileCount < 65536; FileCount++) {
+//		sprintf((char *)FlightLogFilename, "Flight_Log_%d.txt", FileCount);
+//		if(f_stat((char *)FlightLogFilename, &DummyFileInfo) != FR_OK) {
+//			/* We have come to a file that doesn't extist */
+//			break;
+//		}
+//	}
+//
+//	/* Start the gatekeeper task */
+//	xTaskCreate(OP_Logging_MicroSDGateKeeperTask, (signed portCHAR *) "Logging_MicroSDGateKeeperTask", configMINIMAL_STACK_SIZE, NULL, OP_LOGGING_TASK_PRI, NULL);
 }
 
 /**
@@ -69,35 +69,35 @@ void OP_Logging_Init(void)
 */
 void OP_Logging_MicroSDGateKeeperTask(void *pvParameters)
 {
-	FIL File;
-	LogTypeDef pcMessageToLog;
-	
-	for(;;) {
-		xQueueReceive(xLoggingQueue, &pcMessageToLog, portMAX_DELAY);
-		
-		/* We don't want this take to get pre-empted, so enter critical state */
-		/* If we do get pre-empted we face corrupting the MicroSD filesystem */
-		taskENTER_CRITICAL();
-		
-		/* Open the correct log file */
-		switch(pcMessageToLog.Type) {
-			case FLIGHT_LOG:
-				f_open(&File, (char *)FlightLogFilename, FA_OPEN_EXISTING);
-				break;
-			case RC_LOG:
-				break;
-		}
-		
-		/* Write the stuff */
-		f_puts(pcMessageToLog.Message, &File);
-		
-		/* Sync the MicroSD Card */
-		f_sync(&File);
-		
-		/* Close the file */
-		f_close(&File);
-		
-		/* Exit the critical stage */
-		taskEXIT_CRITICAL();
-	}
+//	FIL File;
+//	LogTypeDef pcMessageToLog;
+//
+//	for(;;) {
+//		xQueueReceive(xLoggingQueue, &pcMessageToLog, portMAX_DELAY);
+//
+//		/* We don't want this take to get pre-empted, so enter critical state */
+//		/* If we do get pre-empted we face corrupting the MicroSD filesystem */
+//		taskENTER_CRITICAL();
+//
+//		/* Open the correct log file */
+//		switch(pcMessageToLog.Type) {
+//			case FLIGHT_LOG:
+//				f_open(&File, (char *)FlightLogFilename, FA_OPEN_EXISTING);
+//				break;
+//			case RC_LOG:
+//				break;
+//		}
+//
+//		/* Write the stuff */
+//		f_puts(pcMessageToLog.Message, &File);
+//
+//		/* Sync the MicroSD Card */
+//		f_sync(&File);
+//
+//		/* Close the file */
+//		f_close(&File);
+//
+//		/* Exit the critical stage */
+//		taskEXIT_CRITICAL();
+//	}
 }

@@ -41,6 +41,29 @@ void PIOS_SYS_Init(void)
 	/* Setup STM32 system (RCC, clock, PLL and Flash configuration) - CMSIS Function */
 	SystemInit();
 	
+	/* Enable GPIOA, GPIOB, GPIOC, GPIOD, GPIOE and AFIO clocks */
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC
+							| RCC_APB2Periph_GPIOD | RCC_APB2Periph_GPIOE | RCC_APB2Periph_AFIO, ENABLE);
+
+	/* Activate pull-ups on all pins by default */
+	GPIO_InitTypeDef GPIO_InitStructure;
+	GPIO_StructInit(&GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+	GPIO_InitStructure.GPIO_Pin = 0xffff & ~GPIO_Pin_11 & ~GPIO_Pin_12; /* Exclude USB pins */
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+	GPIO_InitStructure.GPIO_Pin = 0xffff;
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+	GPIO_Init(GPIOD, &GPIO_InitStructure);
+
+	/* Ensure that pull-down is active on USB detach pin */
+	GPIO_InitStructure.GPIO_Pin = 0xffff & ~USB_PULLUP_PIN;
+	GPIO_Init(GPIOC, &GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = USB_PULLUP_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
+	GPIO_Init(GPIOC, &GPIO_InitStructure);
+	GPIO_Init(GPIOC, &GPIO_InitStructure);
+
 	/* Initialize Basic NVIC */
 	NVIC_Configuration();
 	
@@ -61,19 +84,7 @@ void NVIC_Configuration(void)
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 
 	/* Configure HCLK clock as SysTick clock source. */
-	//SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK);
-
-	/* Set SysTick to 10mS tick */
-	if(SysTick_Config(SystemFrequency / 100))
-	{
-		/* Capture error */
-		while (1);
-	}
-}
-
-void SysTick_Handler(void)
-{
-	disk_timerproc();
+	SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK);
 }
 
 #ifdef  USE_FULL_ASSERT

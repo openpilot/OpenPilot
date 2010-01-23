@@ -51,31 +51,34 @@ void SysTick_Handler(void);
 int main()
 {
 	
-	/* Brings up System using CMSIS functions,
-	   enables the LEDs. */
+	/* Brings up System using CMSIS functions, enables the LEDs. */
 	PIOS_SYS_Init();
 
 	/* Delay system */
 	PIOS_DELAY_Init();
 
+	/* SPI Init */
+	PIOS_SPI_Init();
+
 	/* Enables the SDCard */
 	PIOS_SDCARD_Init();
 
-	/* Call LoadSettings which populates System Vars
-	   so the rest of the hardware can be configured. */
+	PIOS_SDCARD_StartupLog();
+
+	/* Call LoadSettings which populates System Vars so the rest of the hardware can be configured. */
 	PIOS_Settings_Load();
 
 	Flashy();
 
 	/* Com ports init */
 //	PIOS_COM_Init();
+
 	
 	/* Analog to digi init */
 //	PIOS_ADC_Init();
 	
 	/* Initialise OpenPilot application */
 //	OpenPilotInit();
-
 
 	/* Create a FreeRTOS task */
 	xTaskCreate(TickTask, (signed portCHAR *) "Test", configMINIMAL_STACK_SIZE , NULL, 2, NULL);
@@ -97,11 +100,12 @@ void Flashy(void)
 		PIOS_LED_Off(LED2);
 
 		/* Infinite loop */
-		while (1)
+		while(1)
 		{
 			PIOS_LED_Toggle(LED1);
 			PIOS_LED_Toggle(LED2);
-			for(int i = 0; i < 1000000; i++);
+			//for(int i = 0; i < 1000000; i++);
+			PIOS_DELAY_Wait_mS(250);
 		}
 	}
 }

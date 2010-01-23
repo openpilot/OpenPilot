@@ -43,9 +43,8 @@
 #include <stm32f10x.h>
 #include <stm32f10x_conf.h>
 
-/* FatFS Includes */
-#include <ff.h>
-#include <diskio.h>
+/* Dosfs Includes */
+#include <dosfs.h>
 
 /* minIni Includes */
 #include <minIni.h>
@@ -61,9 +60,11 @@
 #include <pios_adc.h>
 #include <pios_servo.h>
 #include <pios_i2c.h>
+#include <pios_spi.h>
 
 /* PIOS Hardware Includes (Common) */
 #include <pios_settings.h>
+#include <pios_sdcard.h>
 #include <pios_com.h>
 #include <pios_bmp085.h>
 

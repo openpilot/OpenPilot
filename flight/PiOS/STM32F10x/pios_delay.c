@@ -85,6 +85,7 @@ int32_t PIOS_DELAY_Wait_uS(uint16_t uS)
 	return 0;
 }
 
+
 /**
 * Waits for a specific number of mS<BR>
 * Example:<BR>
@@ -97,10 +98,9 @@ int32_t PIOS_DELAY_Wait_uS(uint16_t uS)
 */
 int32_t PIOS_DELAY_Wait_mS(uint16_t mS)
 {
-	uint16_t start = PIOS_DELAY_TIMER->CNT;
-
-	/* Note that this event works on 16bit counter wrap-arounds */
-	while((uint16_t)(PIOS_DELAY_TIMER->CNT - start) <= (mS * 1000));
+	for(int i = 0; i < mS; i++) {
+		PIOS_DELAY_Wait_uS(1000);
+	}
 
 	/* No error */
 	return 0;

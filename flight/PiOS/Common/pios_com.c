@@ -52,7 +52,7 @@ int32_t PIOS_COM_Init(void)
 	/* If any COM assignment: */
 	PIOS_USART_Init();
 
-	return -ret;
+	return ret;
 }
 
 /**

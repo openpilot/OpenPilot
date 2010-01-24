@@ -80,6 +80,11 @@ typedef struct {
   uint8_t  Reserved2;				/* always 1*/
 } SDCARDCidTypeDef;
 
+/* Global Variables */
+extern VOLINFO VolInfo;
+extern uint32_t pstart, psize;
+extern uint8_t  pactive, ptype;
+extern uint8_t Sector[SECTOR_SIZE];
 
 /* Prototypes */
 extern int32_t PIOS_SDCARD_Init(void);
@@ -92,5 +97,7 @@ extern int32_t PIOS_SDCARD_SectorWrite(uint32_t sector, uint8_t *buffer);
 extern int32_t PIOS_SDCARD_CIDRead(SDCARDCidTypeDef *cid);
 extern int32_t PIOS_SDCARD_CSDRead(SDCARDCsdTypeDef *csd);
 extern int32_t PIOS_SDCARD_StartupLog(void);
+extern int32_t PIOS_SDCARD_MountFS(uint32_t StartupLog);
+extern int32_t PIOS_SDCARD_GetFree(void);
 
 #endif /* PIOS_SDCARD_H */

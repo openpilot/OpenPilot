@@ -29,6 +29,11 @@
 /* Project Includes */
 #include "pios.h"
 
+/* Global Variables */
+VOLINFO VolInfo;
+uint32_t pstart, psize;
+uint8_t  pactive, ptype;
+uint8_t Sector[SECTOR_SIZE];
 
 /* Local Definitions */
 #if !defined(SDCARD_MUTEX_TAKE)
@@ -753,87 +758,116 @@ int32_t PIOS_SDCARD_CSDRead(SDCARDCsdTypeDef *csd)
 
 /**
 * Attempts to write a startup log to the SDCard
-* return 0 Successful
-* return -1 Cannot find first partition
-* return -2 No volume information
-* return -3 Error opening file
+* return 0 No errors
+* return -1 Error deleting file
+* return -2 Error opening file
+* return -3 Error writing file
 */
 int32_t PIOS_SDCARD_StartupLog(void)
 {
-	PIOS_SDCARD_Init();
+	FILEINFO File;
+	char Buffer[1024];
+	uint32_t Cache;
 
-	static uint8_t sdcard_available = 0;
+	/* Delete the file if it exists */
+	if(DFS_UnlinkFile(&VolInfo, (uint8_t *)LOG_FILENAME, Sector)) {
+		/* Error deleting file */
+		return -1;
+	}
 
+	if(DFS_OpenFile(&VolInfo, (uint8_t *)LOG_FILENAME, DFS_WRITE, Sector, &File)) {
+		/* Error opening file */
+		return -2;
+	}
+
+	sprintf(Buffer, "PiOS Startup Log\r\n\r\nLog file creation completed.\r\n");
+	if(DFS_WriteFile(&File, Sector, (uint8_t *)Buffer, &Cache, strlen(Buffer))) {
+		/* Error writing to file */
+		return -3;
+	}
+
+	sprintf(Buffer, "------------------------------\r\nSD Card Information\r\n------------------------------\r\n");
+	if(DFS_WriteFile(&File, Sector, (uint8_t *)Buffer, &Cache, strlen(Buffer))) {
+		/* Error writing to file */
+		return -2;
+	}
+
+	/* Disabled because it takes ca. 7 seconds with my 2GB card */
+	/* sprintf(Buffer, "Total Space: %u MB\r\nFree Space: %u MB\r\n", (uint16_t)((VolInfo.numclusters * (VolInfo.secperclus / 2)) / 1024), (uint16_t)(PIOS_SDCARD_GetFree() / 1048576)); */
+
+	sprintf(Buffer, "Total Space: %u MB\r\n\r\n", (uint16_t)((VolInfo.numclusters * (VolInfo.secperclus / 2)) / 1024));
+	if(DFS_WriteFile(&File, Sector, (uint8_t *)Buffer, &Cache, strlen(Buffer))) {
+		/* Error writing to file */
+		return -2;
+	}
+
+	/* No errors */
+	return 0;
+}
+
+
+/**
+* Mounts the file system
+* param[in] CreateStartupLog 1 = True, 0 = False
+* return 0 No errors
+* return -1 SDCard not available
+* return -2 Cannot find first partition
+* return -3 No volume information
+* return -4 Error writing startup log file
+*/
+int32_t PIOS_SDCARD_MountFS(uint32_t CreateStartupLog)
+{
+	uint8_t sdcard_available = 0;
 	sdcard_available = PIOS_SDCARD_CheckAvailable(0);
 
-	if(sdcard_available) {
-		/* Connected */
-		/*
-		SDCARDCidTypeDef cid;
-		PIOS_SDCARD_CIDRead(&cid);
+	if(!sdcard_available) {
+		/* Disconnected */
+		return -1;
+	}
 
-		SDCARDCsdTypeDef csd;
-		PIOS_SDCARD_CSDRead(&csd);
-		*/
+	/* Connected */
 
-		/* Try to mount file system */
-		uint32_t pstart, psize;
-		uint8_t  pactive, ptype;
+	pstart = DFS_GetPtnStart(0, Sector, 0, &pactive, &ptype, &psize);
+	if (pstart == 0xffffffff) {
+		/* Cannot find first partition */
+		return -2;
+	}
 
-		static uint8_t Buffer1[SECTOR_SIZE], Buffer2[1024];
+	if(DFS_GetVolInfo(0, Sector, pstart, &VolInfo) != DFS_OK) {
+		/* No volume information */
+		return -3;
+	}
 
-		pstart = DFS_GetPtnStart(0, Buffer1, 0, &pactive, &ptype, &psize);
-		if (pstart == 0xffffffff) {
-			/* Cannot find first partition */
-			return -1;
-		}
-
-		VOLINFO vi;
-		if(DFS_GetVolInfo(0, Buffer1, pstart, &vi) != DFS_OK) {
-			/* No volume information */
-			return -2;
-		}
-
-		FILEINFO fi;
-		uint32_t cache;
-
-		/* Delete the file if it exists */
-		DFS_UnlinkFile(&vi, LOG_FILENAME, Buffer1);
-
-		if(DFS_OpenFile(&vi, LOG_FILENAME, DFS_WRITE, Buffer1, &fi)) {
-			/* Error opening file */
-			return -3;
-		}
-		sprintf(Buffer2, "PiOS Startup Log\r\n\r\nLog file creation completed.\r\n");
-		DFS_WriteFile(&fi, Buffer1, Buffer2, &cache, strlen(Buffer2));
-
-		sprintf(Buffer2, "------------------------------\r\nSD Card Information\r\n------------------------------\r\n");
-		DFS_WriteFile(&fi, Buffer1, Buffer2, &cache, strlen(Buffer2));
-
-		sprintf(Buffer2, "Total Space: %d MB\r\n\r\n", ((vi.numclusters * (vi.secperclus / 2)) / 1024));
-		DFS_WriteFile(&fi, Buffer1, Buffer2, &cache, strlen(Buffer2));
-
-
-
-		uint32_t successcount;
-		uint8_t buff[80];
-
-		DFS_OpenFile(&vi, LOG_FILENAME, DFS_READ, Buffer1, &fi);
-		//result = DFS_ReadFile(file, Sector, (uint8_t *)buffer, &successcount, size); /* file->filelen */
-		DFS_ReadFile(&fi, Buffer1, buff, &successcount, 80);
-
-
-
-		return 0;
-	} else if(!sdcard_available) {
-		/* Disconnected - lock up and flash LEDs */
-		PIOS_LED_On(LED1);
-		PIOS_LED_On(LED2);
-		for(;;) {
-			PIOS_LED_Toggle(LED2);
-			PIOS_DELAY_Wait_mS(100);
+	if(CreateStartupLog == 1) {
+		if(PIOS_SDCARD_StartupLog()) {
+			/* Error writing startup log file */
+			return -4;
 		}
 	}
 
-	return -4;
+	/* No errors */
+	return 0;
 }
+
+/**
+* Mounts the file system
+* return Amount of free bytes
+*/
+int32_t PIOS_SDCARD_GetFree(void)
+{
+	uint32_t VolFreeBytes = 0xffffffff;
+	uint32_t ScratchCache = 0;
+
+	/* This takes very long, since it scans ALL clusters */
+	/* It takes ca. 7 seconds to determine free clusters out of ~47000 (2Gb) */
+
+	/* Scan all the clusters */
+	for(uint32_t i = 2; i < VolInfo.numclusters; ++i) {
+		if(!DFS_GetFAT(&VolInfo, Sector, &ScratchCache, i)) {
+			VolFreeBytes += VolInfo.secperclus * SECTOR_SIZE;
+		}
+	}
+
+	return VolFreeBytes;
+}
+

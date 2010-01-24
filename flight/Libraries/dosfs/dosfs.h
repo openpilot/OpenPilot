@@ -366,6 +366,15 @@ void DFS_Seek(PFILEINFO fileinfo, uint32_t offset, uint8_t *scratch);
 */
 uint32_t DFS_UnlinkFile(PVOLINFO volinfo, uint8_t *path, uint8_t *scratch);
 
+/*
+        Fetch FAT entry for specified cluster number
+        You must provide a scratch buffer for one sector (SECTOR_SIZE) and a populated VOLINFO
+        Returns a FAT32 BAD_CLUSTER value for any error, otherwise the contents of the desired
+        FAT entry.
+        scratchcache should point to a UINT32. This variable caches the physical sector number
+        last read into the scratch buffer for performance enhancement reasons.
+*/
+uint32_t DFS_GetFAT(PVOLINFO volinfo, uint8_t *scratch, uint32_t *scratchcache, uint32_t cluster);
 
 /*
 // TK: added 2009-02-12

@@ -33,6 +33,7 @@
 
 /* Defaults for Logging */
 #define LOG_FILENAME 			"pios.log"
+#define STARTUP_LOG_ENABLED		1
 
 
 /* Defaults for MinIni */

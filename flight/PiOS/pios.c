@@ -63,9 +63,25 @@ int main()
 	/* Enables the SDCard */
 	PIOS_SDCARD_Init();
 
-	PIOS_SDCARD_StartupLog();
+	/* Wait for SD card for ever */
+	for(;;)
+	{
+		/* Check if we have an SD Card */
+		if(!PIOS_SDCARD_MountFS(STARTUP_LOG_ENABLED)) {
+			/* Found one without errors */
+			break;
+		}
 
-	/* Call LoadSettings which populates System Vars so the rest of the hardware can be configured. */
+		/* SD Card not found, flash for 1 second */
+		PIOS_LED_On(LED1);
+		PIOS_LED_On(LED2);
+		for(uint32_t i = 0; i < 10; i++) {
+			PIOS_LED_Toggle(LED2);
+			PIOS_DELAY_Wait_mS(100);
+		}
+	}
+
+	/* Call LoadSettings which populates global variables so the rest of the hardware can be configured. */
 	PIOS_Settings_Load();
 
 	Flashy();
@@ -103,8 +119,7 @@ void Flashy(void)
 		while(1)
 		{
 			PIOS_LED_Toggle(LED1);
-			PIOS_LED_Toggle(LED2);
-			//for(int i = 0; i < 1000000; i++);
+			//PIOS_LED_Toggle(LED2);
 			PIOS_DELAY_Wait_mS(250);
 		}
 	}

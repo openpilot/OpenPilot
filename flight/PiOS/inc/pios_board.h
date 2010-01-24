@@ -87,7 +87,6 @@
 // GPS USART 
 //-------------------------
 #define GPS_USART					USART2
-#define GPS_BAUD					57600
 #define GPS_GPIO_PORT				GPIOA
 #define GPS_RX_PIN					GPIO_Pin_3
 #define GPS_TX_PIN					GPIO_Pin_2
@@ -101,7 +100,6 @@
 // Telemetry radio USART 
 //-------------------------
 #define TELEM_USART        			USART3
-#define TELEM_BAUD         			115200
 #define TELEM_GPIO_PORT				GPIOC
 #define TELEM_RX_PIN      			GPIO_Pin_11
 #define TELEM_TX_PIN      			GPIO_Pin_10
@@ -114,7 +112,6 @@
 //-------------------------
 // AUXSER USART (available instead of RX5/RX6)
 //-------------------------
-#define AUX_USART_BAUD				19200
 #define AUX_USART_USART				USART1
 #define AUX_USART_GPIO_PORT			GPIOA
 #define AUX_USART_RX_PIN			GPIO_Pin_10
@@ -131,7 +128,7 @@
 #define USART_NUM					3
 #define USART_RX_BUFFER_SIZE		1024
 #define USART_TX_BUFFER_SIZE		256
-#define COM_DEBUG_PORT				TELEM
+#define COM_DEBUG_PORT				GPS
 
 //-------------------------
 // SPI

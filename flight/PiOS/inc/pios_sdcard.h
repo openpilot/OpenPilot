@@ -96,8 +96,14 @@ extern int32_t PIOS_SDCARD_SectorRead(uint32_t sector, uint8_t *buffer);
 extern int32_t PIOS_SDCARD_SectorWrite(uint32_t sector, uint8_t *buffer);
 extern int32_t PIOS_SDCARD_CIDRead(SDCARDCidTypeDef *cid);
 extern int32_t PIOS_SDCARD_CSDRead(SDCARDCsdTypeDef *csd);
+
 extern int32_t PIOS_SDCARD_StartupLog(void);
 extern int32_t PIOS_SDCARD_MountFS(uint32_t StartupLog);
 extern int32_t PIOS_SDCARD_GetFree(void);
+
+extern int32_t PIOS_SDCARD_ReadBuffer(PFILEINFO fileinfo, uint8_t *buffer, uint32_t len);
+extern int32_t PIOS_SDCARD_ReadLine(PFILEINFO fileinfo, uint8_t *buffer, uint32_t max_len);
+extern int32_t PIOS_SDCARD_FileCopy(char *Source, char *Destination);
+extern int32_t PIOS_SDCARD_FileDelete(char *Filename);
 
 #endif /* PIOS_SDCARD_H */

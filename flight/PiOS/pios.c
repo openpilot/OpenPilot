@@ -84,11 +84,40 @@ int main()
 	/* Call LoadSettings which populates global variables so the rest of the hardware can be configured. */
 	PIOS_Settings_Load();
 
-	Flashy();
-
 	/* Com ports init */
-//	PIOS_COM_Init();
+	PIOS_COM_Init();
 
+	/* Initialise servo outputs */
+	PIOS_Servo_Init();
+
+	/* Used to test servos, cycles all servos from one side to the other
+	for(;;) {
+		for(int i = 1000; i < 2000; i++) {
+			PIOS_Servo_Set(0, i);
+			PIOS_Servo_Set(1, i);
+			PIOS_Servo_Set(2, i);
+			PIOS_Servo_Set(3, i);
+			PIOS_Servo_Set(4, i);
+			PIOS_Servo_Set(5, i);
+			PIOS_Servo_Set(6, i);
+			PIOS_Servo_Set(7, i);
+			PIOS_DELAY_Wait_uS(500);
+		}
+		for(int i = 2000; i > 1000; i--) {
+			PIOS_Servo_Set(0, i);
+			PIOS_Servo_Set(1, i);
+			PIOS_Servo_Set(2, i);
+			PIOS_Servo_Set(3, i);
+			PIOS_Servo_Set(4, i);
+			PIOS_Servo_Set(5, i);
+			PIOS_Servo_Set(6, i);
+			PIOS_Servo_Set(7, i);
+			PIOS_DELAY_Wait_uS(500);
+		}
+	}
+	*/
+
+	Flashy();
 	
 	/* Analog to digi init */
 //	PIOS_ADC_Init();
@@ -116,7 +145,7 @@ void Flashy(void)
 		PIOS_LED_Off(LED2);
 
 		/* Infinite loop */
-		while(1)
+		for(;;)
 		{
 			PIOS_LED_Toggle(LED1);
 			//PIOS_LED_Toggle(LED2);

@@ -769,11 +769,8 @@ int32_t PIOS_SDCARD_StartupLog(void)
 	char Buffer[1024];
 	uint32_t Cache;
 
-	/* Delete the file if it exists */
-	if(DFS_UnlinkFile(&VolInfo, (uint8_t *)LOG_FILENAME, Sector)) {
-		/* Error deleting file */
-		return -1;
-	}
+	/* Delete the file if it exists - ignore errors */
+	DFS_UnlinkFile(&VolInfo, (uint8_t *)LOG_FILENAME, Sector);
 
 	if(DFS_OpenFile(&VolInfo, (uint8_t *)LOG_FILENAME, DFS_WRITE, Sector, &File)) {
 		/* Error opening file */
@@ -805,7 +802,6 @@ int32_t PIOS_SDCARD_StartupLog(void)
 	return 0;
 }
 
-
 /**
 * Mounts the file system
 * param[in] CreateStartupLog 1 = True, 0 = False
@@ -824,8 +820,6 @@ int32_t PIOS_SDCARD_MountFS(uint32_t CreateStartupLog)
 		/* Disconnected */
 		return -1;
 	}
-
-	/* Connected */
 
 	pstart = DFS_GetPtnStart(0, Sector, 0, &pactive, &ptype, &psize);
 	if (pstart == 0xffffffff) {
@@ -869,5 +863,127 @@ int32_t PIOS_SDCARD_GetFree(void)
 	}
 
 	return VolFreeBytes;
+}
+
+/**
+* Read from file
+* return 0 No error
+* return -1 DFS_ReadFile failed
+* return -2 Less bytes read than expected
+*/
+int32_t PIOS_SDCARD_ReadBuffer(PFILEINFO fileinfo, uint8_t *buffer, uint32_t len)
+{
+	uint32_t SuccessCount;
+
+	if(DFS_ReadFile(fileinfo, Sector, buffer, &SuccessCount, len)) {
+		/* DFS_ReadFile failed */
+		return -1;
+	}
+	if(SuccessCount != len) {
+		/* Less bytes read than expected */
+		return -2;
+	}
+
+	/* No error */
+	return 0;
+}
+
+/**
+* Read a line from file
+* returns Number of bytes read
+*/
+int32_t PIOS_SDCARD_ReadLine(PFILEINFO fileinfo, uint8_t *buffer, uint32_t max_len)
+{
+	int32_t status;
+	uint32_t num_read = 0;
+
+	while(fileinfo->pointer < fileinfo->filelen) {
+		status = PIOS_SDCARD_ReadBuffer(fileinfo, buffer, 1);
+
+		if(status < 0) {
+			return status;
+		}
+
+		++num_read;
+
+		if(*buffer == '\n' || *buffer == '\r') {
+			break;
+		}
+
+		if(num_read < max_len) {
+			++buffer;
+		}
+	}
+
+	/* Replace newline by terminator */
+	*buffer = 0;
+
+	return num_read;
+}
+
+/**
+* Copy a file
+* WARNING: This will overwrite the destination file even if it exists
+* param[in] *Source Path to file to copy
+* param[in] *Destination Path to destination file
+* return 0 No errors
+* return -1 Source file doesn't exist
+* return -2 Failed to create destination file
+* return -3 DFS_ReadFile failed
+* return -4 DFS_WriteFile failed
+*/
+int32_t PIOS_SDCARD_FileCopy(char *Source, char *Destination)
+{
+	FILEINFO SourceFile, DestFile;
+
+	/* Disable caching to avoid file inconsistencies while using different sector buffers! */
+	DFS_CachingEnabledSet(0);
+
+	if(DFS_OpenFile(&VolInfo, (uint8_t *)Source, DFS_READ, Sector, &SourceFile)) {
+		/* Source file doesn't exist */
+		return -1;
+	} else {
+		/* Delete destination file if it already exists - ignore errors */
+		DFS_UnlinkFile(&VolInfo, (uint8_t *)Destination, Sector);
+
+		if(DFS_OpenFile(&VolInfo, (uint8_t *)Destination, DFS_WRITE, Sector, &DestFile)) {
+			/* Failed to create destination file */
+			return -2;
+		}
+	}
+
+	/* Copy operation */
+	uint8_t WriteBuffer[SECTOR_SIZE];
+	uint32_t SuccessCountRead;
+	uint32_t SuccessCountWrite;
+	do {
+		if(DFS_ReadFile(&SourceFile, Sector, WriteBuffer, &SuccessCountRead, SECTOR_SIZE)) {
+			/* DFS_ReadFile failed */
+			return -3;
+		} else if(DFS_WriteFile(&DestFile, Sector, WriteBuffer, &SuccessCountWrite, SuccessCountRead)) {
+			/* DFS_WriteFile failed */
+			return -4;
+		}
+	} while(SuccessCountRead > 0);
+
+	/* No errors */
+	return 0;
+}
+
+/**
+* Delete a file
+* param[in] *Filename File to delete
+* return 0 No errors
+* return -1 Error deleting file
+*/
+int32_t PIOS_SDCARD_FileDelete(char *Filename)
+{
+	if(DFS_UnlinkFile(&VolInfo, (uint8_t *)Filename, Sector)) {
+		/* Error deleting file */
+		return -1;
+	}
+
+	/* No errors */
+	return 0;
 }
 

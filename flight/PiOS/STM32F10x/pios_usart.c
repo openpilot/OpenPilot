@@ -30,8 +30,8 @@
 #include "pios.h"
 
 
-/* Private Function Prototypes */
-
+/* Global Variables */
+extern SettingsTypeDef Settings;
 
 /* Local Variables */
 static uint8_t rx_buffer[USART_NUM][USART_RX_BUFFER_SIZE];

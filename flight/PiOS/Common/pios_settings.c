@@ -48,7 +48,7 @@ void PIOS_Settings_Load(void)
 	char StrBuffer[100];
 	long Result;
 	*/
-	
+
 	/* Section: GPS */
 	Settings.GPS.Baudrate = 		(uint32_t) 	ini_getl("GPS", "Baudrate", GPS_BAUDRATE, SETTINGS_FILE);
 
@@ -80,20 +80,33 @@ void PIOS_Settings_Dump(USART_TypeDef* USARTx)
 */
 int32_t PIOS_Settings_CheckForFiles(void)
 {
-//	FILINFO DummyVar;
-//	int MissingCount = 0;
-//
-//	/* Check for existence of SETTINGS_FILE */
-//	if(f_stat(SETTINGS_FILE, &DummyVar) != FR_OK) {
-//		MissingCount++;
-//	}
-//
-//	/* If one or more files are missing, return the number of missing files */
-//	if(MissingCount > 0)
-//	{
-//		return MissingCount;
-//	}
-//
+	DIRINFO di;
+	DIRENT de;
+	int FoundCount = 0;
+
+	di.scratch = PIOS_SDCARD_Sector;
+
+	/* Open the root directory */
+	DFS_OpenDir(&PIOS_SDCARD_VolInfo, (uint8_t *)"", &di);
+
+	/* Scan the directory for all files */
+	while(!DFS_GetNext(&PIOS_SDCARD_VolInfo, &di, &de)) {
+		if(de.name[0]) {
+			uint8_t file_name[13];
+			DFS_DirToCanonical((char *)file_name, (char *)de.name);
+
+			if(strcmp((char *)file_name, SETTINGS_FILE) == 0) {
+				FoundCount++;
+			}
+		}
+	}
+
+	/* If one or more files are missing, return the number of missing files */
+	if(FoundCount != 1)
+	{
+		return FoundCount;
+	}
+
 	/* All files found */
 	return 0;
 }

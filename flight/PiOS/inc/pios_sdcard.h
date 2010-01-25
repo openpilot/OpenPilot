@@ -81,10 +81,8 @@ typedef struct {
 } SDCARDCidTypeDef;
 
 /* Global Variables */
-extern VOLINFO VolInfo;
-extern uint32_t pstart, psize;
-extern uint8_t  pactive, ptype;
-extern uint8_t Sector[SECTOR_SIZE];
+extern VOLINFO PIOS_SDCARD_VolInfo;
+extern uint8_t PIOS_SDCARD_Sector[SECTOR_SIZE];
 
 /* Prototypes */
 extern int32_t PIOS_SDCARD_Init(void);

@@ -3,15 +3,15 @@
 #include "minGlue.h"
 
 /* Global Variables */
-extern uint8_t Sector[SECTOR_SIZE];
-extern VOLINFO VolInfo;
+extern uint8_t PIOS_SDCARD_Sector[SECTOR_SIZE];
+extern VOLINFO PIOS_SDCARD_VolInfo;
 
 /* Local Variables */
 static uint32_t SuccessCount;
 
 int dosfs_ini_openread(const char *filename, PFILEINFO file)
 {
-	if(DFS_OpenFile(&VolInfo, (uint8_t *)filename, DFS_READ, Sector, file)) {
+	if(DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *)filename, DFS_READ, PIOS_SDCARD_Sector, file)) {
 		/* Error opening file */
 		return 0;
 	}
@@ -23,7 +23,7 @@ int dosfs_ini_openread(const char *filename, PFILEINFO file)
 int dosfs_ini_openwrite(const char *filename, PFILEINFO file)
 {
 	/* TODO: Check this works */
-	if(DFS_OpenFile(&VolInfo, (uint8_t *)filename, DFS_WRITE, Sector, file)) {
+	if(DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *)filename, DFS_WRITE, PIOS_SDCARD_Sector, file)) {
 		/* Error opening file */
 		return 0;
 	}
@@ -56,7 +56,7 @@ int dosfs_ini_read(char *buffer, int size, PFILEINFO file)
 int dosfs_ini_write(char *buffer, PFILEINFO file)
 {
 	/* TODO: Check this works */
-	DFS_WriteFile(file, Sector, (uint8_t *)buffer, &SuccessCount, sizeof(buffer));
+	DFS_WriteFile(file, PIOS_SDCARD_Sector, (uint8_t *)buffer, &SuccessCount, sizeof(buffer));
 
 	/* No errors */
 	return 1;
@@ -88,7 +88,7 @@ int dosfs_ini_remove(const char *filename)
 int dosfs_ini_rewind(PFILEINFO file)
 {
 	/* TODO: Check this works */
-	DFS_Seek(file, 0, Sector);
+	DFS_Seek(file, 0, PIOS_SDCARD_Sector);
 	/* No errors */
 	return 1;
 }

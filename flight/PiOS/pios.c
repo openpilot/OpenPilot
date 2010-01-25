@@ -68,8 +68,8 @@ int main()
 	/* Wait for SD card for ever */
 	for(;;)
 	{
-		/* Check if we have an SD Card */
-		if(!PIOS_SDCARD_MountFS(STARTUP_LOG_ENABLED)) {
+		/* Check if we have an SD Card with the correct settings files on it */
+		if(!PIOS_SDCARD_MountFS(STARTUP_LOG_ENABLED) && !PIOS_Settings_CheckForFiles()) {
 			/* Found one without errors */
 			break;
 		}

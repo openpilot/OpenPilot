@@ -172,7 +172,7 @@
 // Receiver PWM inputs   
 //-------------------------
 #define RECEIVER1_GPIO_PORT			GPIOB
-#define RECEIVER1_PIN				GPIO_Pin_2      // PB2
+#define RECEIVER1_PIN				GPIO_Pin_0      // PB0
 #define RECEIVER1_TIM_PORT			TIM3
 #define RECEIVER1_CH				TIM_Channel_3   // TIM3_CH3
 #define RECEIVER2_GPIO_PORT			GPIOB

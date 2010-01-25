@@ -231,7 +231,7 @@ int32_t PIOS_SDCARD_PowerOff(void)
 * // If multiple tasks are accessing the SD card, add a semaphore/mutex
 * //  to avoid IO access collisions with other tasks!
 * u8 sdcard_available;
-* int32_t SEQ_FILE_CheckSDCard(void)
+* int32_t CheckSDCard(void)
 * {
 *   // check if SD card is available
 *   // High speed access if the card was previously available

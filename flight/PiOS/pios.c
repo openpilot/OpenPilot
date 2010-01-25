@@ -32,18 +32,20 @@
 #include <openpilot.h>
 
 /* Task Priorities */
+#define PRIORITY_TASK_HOOKS             (tskIDLE_PRIORITY + 3)
+
+/* Global Variables */
 
 /* Local Variables */
-static uint32_t ulIdleCycleCount = 0;
-static uint32_t IdleTimePercent = 0;
-
-/* Global Functions */
-void vApplicationIdleHook(void);
+#define STRING_MAX 1024
+static uint8_t line_buffer[STRING_MAX];
+static uint16_t line_ix;
 
 /* Function Prototypes */
-void TickTask(void *pvParameters);
-void Flashy(void);
-void SysTick_Handler(void);
+static void TaskTick(void *pvParameters);
+static void TaskHooks(void *pvParameters);
+int32_t CONSOLE_Parse(COMPortTypeDef port, char c);
+void OP_ADC_NotifyChange(uint32_t pin, uint32_t pin_value);
 
 /**
 * Main function
@@ -90,7 +92,79 @@ int main()
 	/* Initialise servo outputs */
 	PIOS_Servo_Init();
 
-	/* Used to test servos, cycles all servos from one side to the other
+	/* Analog to digital converter initialise */
+	PIOS_ADC_Init();
+
+	//PIOS_PWM_Init();
+
+	PIOS_COM_ReceiveCallbackInit(CONSOLE_Parse);
+
+	/* Initialise OpenPilot application */
+//	OpenPilotInit();
+
+	/* Create a FreeRTOS task */
+	xTaskCreate(TaskTick, (signed portCHAR *)"Test", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
+	xTaskCreate(TaskHooks, (signed portCHAR *)"Hooks", configMINIMAL_STACK_SIZE, NULL, PRIORITY_TASK_HOOKS, NULL);
+
+	/* Start the FreeRTOS scheduler */
+	vTaskStartScheduler();
+
+	/* If all is well we will never reach here as the scheduler will now be running. */
+	/* If we do get here, it will most likely be because we ran out of heap space. */
+	return 0;
+}
+
+int32_t CONSOLE_Parse(COMPortTypeDef port, char c)
+{
+	if(c == '\r') {
+		/* Ignore */
+	} else if(c == '\n') {
+		PIOS_COM_SendFormattedString(GPS, "String: %s\n", line_buffer);
+		line_ix = 0;
+	} else if(line_ix < (STRING_MAX - 1)) {
+		line_buffer[line_ix++] = c;
+		line_buffer[line_ix] = 0;
+	}
+
+	/* No error */
+	return 0;
+}
+
+void OP_ADC_NotifyChange(uint32_t pin, uint32_t pin_value)
+{
+	/* HW v1.0 GPS/IR Connector
+	0000000
+	|||||||-- 5V
+	||||||--- TX (RXD on FDTI)
+	|||||---- RX (TXD on FDTI)
+	||||----- ADC PIN 3 (PC0)
+	|||------ ADC PIN 0 (PC1)
+	||------- ADC PIN 1 (PC2)
+	|-------- GND
+	*/
+
+}
+
+void TaskTick(void *pvParameters)
+{
+	const portTickType xDelay = 500 / portTICK_RATE_MS;
+
+	/* Setup the LEDs to Alternate */
+	PIOS_LED_On(LED1);
+	PIOS_LED_Off(LED2);
+
+	for(;;)
+	{
+		PIOS_LED_Toggle(LED1);
+		//PIOS_LED_Toggle(LED2);
+		//PIOS_DELAY_Wait_mS(250);
+		vTaskDelay(xDelay);
+	}
+
+	/*
+	const portTickType xDelay = 1 / portTICK_RATE_MS;
+
+	Used to test servos, cycles all servos from one side to the other
 	for(;;) {
 		for(int i = 1000; i < 2000; i++) {
 			PIOS_Servo_Set(0, i);
@@ -101,7 +175,7 @@ int main()
 			PIOS_Servo_Set(5, i);
 			PIOS_Servo_Set(6, i);
 			PIOS_Servo_Set(7, i);
-			PIOS_DELAY_Wait_uS(500);
+			vTaskDelay(xDelay);
 		}
 		for(int i = 2000; i > 1000; i--) {
 			PIOS_Servo_Set(0, i);
@@ -112,59 +186,35 @@ int main()
 			PIOS_Servo_Set(5, i);
 			PIOS_Servo_Set(6, i);
 			PIOS_Servo_Set(7, i);
-			PIOS_DELAY_Wait_uS(500);
+			vTaskDelay(xDelay);
 		}
 	}
 	*/
-
-	Flashy();
-	
-	/* Analog to digi init */
-//	PIOS_ADC_Init();
-	
-	/* Initialise OpenPilot application */
-//	OpenPilotInit();
-
-	/* Create a FreeRTOS task */
-	xTaskCreate(TickTask, (signed portCHAR *) "Test", configMINIMAL_STACK_SIZE , NULL, 2, NULL);
-
-	/* Start the FreeRTOS scheduler */
-	vTaskStartScheduler();
-
-	/* If all is well we will never reach here as the scheduler will now be running. */
-	/* If we do get here, it will most likely be because we ran out of heap space. */
-	return 0;
 }
 
-void Flashy(void)
+static void TaskHooks(void *pvParameters)
 {
-	for(;;)
-	{
-		/* Setup the LEDs to Alternate */
-		PIOS_LED_On(LED1);
-		PIOS_LED_Off(LED2);
+	portTickType xLastExecutionTime;
 
-		/* Infinite loop */
-		for(;;)
-		{
-			PIOS_LED_Toggle(LED1);
-			//PIOS_LED_Toggle(LED2);
-			PIOS_DELAY_Wait_mS(250);
-		}
+	// Initialise the xLastExecutionTime variable on task entry
+	xLastExecutionTime = xTaskGetTickCount();
+
+	for(;;) {
+		vTaskDelayUntil(&xLastExecutionTime, 1 / portTICK_RATE_MS);
+
+		/* Skip delay gap if we had to wait for more than 5 ticks to avoid */
+		/* unnecessary repeats until xLastExecutionTime reached xTaskGetTickCount() again */
+		portTickType xCurrentTickCount = xTaskGetTickCount();
+		if(xLastExecutionTime < (xCurrentTickCount - 5))
+		xLastExecutionTime = xCurrentTickCount;
+
+		/* Check for incoming COM messages */
+		PIOS_COM_ReceiveHandler();
+
+		/* Check for incoming ADC notifications */
+		PIOS_ADC_Handler(OP_ADC_NotifyChange);
 	}
 }
-
-void TickTask(void *pvParameters)
-{
-	const portTickType xDelay = 10 / portTICK_RATE_MS;
-
-	for(;;)
-	{
-		PIOS_LED_Toggle(LED2);
-		vTaskDelay(xDelay);
-	}
-}
-
 
 /**
 * Idle hook function
@@ -173,15 +223,6 @@ void vApplicationIdleHook(void)
 {
 	/* Called when the scheduler has no tasks to run */
 
-	/* In here we could implement full stats for FreeRTOS
-	Although this would need us to enable stats in FreeRTOS
-	which is *very* costly. With the function below we can
-	either print it out or just watch the variable using JTAG */
 	
-	/* This can give a basic indication of how much time the system spends in idle */
-	/* IdleTimePercent is the percentage of time spent in idle since the scheduler started */
-	/* For example a value of 75 would mean we are spending 75% of FreeRTOS Cycles in idle */
-	ulIdleCycleCount++;
-	IdleTimePercent = ((ulIdleCycleCount / xTaskGetTickCount()) * 100);
 }
 

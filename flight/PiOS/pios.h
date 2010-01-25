@@ -61,6 +61,7 @@
 #include <pios_servo.h>
 #include <pios_i2c.h>
 #include <pios_spi.h>
+#include <pios_pwm.h>
 
 /* PIOS Hardware Includes (Common) */
 #include <pios_settings.h>

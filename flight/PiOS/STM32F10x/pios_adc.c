@@ -36,6 +36,7 @@ static uint16_t adc_conversion_values[NUM_ADC_PINS] __attribute__((aligned(4)));
 static uint16_t adc_conversion_values_sum[NUM_ADC_PINS] __attribute__((aligned(4)));
 
 static uint16_t adc_pin_values[NUM_ADC_PINS];
+static uint32_t adc_pin_changed[NUM_ADC_PINS];
 
 
 /**
@@ -53,6 +54,9 @@ void PIOS_ADC_Init(void)
 	for(i=0; i < NUM_ADC_PINS; ++i) {
 		adc_pin_values[i] = 0;
 	}
+	for(i=0; i < NUM_ADC_PINS; ++i) {
+		adc_pin_changed[i] = 1;
+	}
 
 	/* Setup analog pins */
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -64,16 +68,16 @@ void PIOS_ADC_Init(void)
 	GPIO_Init(GPIOC, &GPIO_InitStructure);
 
 	/* Enable ADC1/2 clock */
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 | RCC_APB2Periph_ADC2 | RCC_APB2Periph_GPIOC, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 | RCC_APB2Periph_ADC2, ENABLE);
 
 	/* Map channels to conversion slots depending on the channel selection mask */
 	/* Distribute this over the three ADCs, so that channels can be converted in parallel */
 	/* Sample time: */
 	/* With an ADCCLK = 14 MHz and a sampling time of 293.5 cycles: */
 	/* Tconv = 239.5 + 12.5 = 252 cycles = 18µs */
-	/* To be pedantic, we take A and B simulataneously, and Z and Temp simulataneously */
+	/* To be pedantic, we take A and B simultaneously, and Z and Temp simultaneously */
 	ADC_RegularChannelConfig(ADC1, ADC_A_CHANNEL, 1, ADC_SampleTime_239Cycles5);
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_14, 2, ADC_SampleTime_239Cycles5);	
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_14, 2, ADC_SampleTime_239Cycles5);
 	ADC_RegularChannelConfig(ADC2, ADC_B_CHANNEL, 1, ADC_SampleTime_239Cycles5);
 	ADC_RegularChannelConfig(ADC2, ADC_Z_CHANNEL, 2, ADC_SampleTime_239Cycles5);
 	
@@ -110,17 +114,17 @@ void PIOS_ADC_Init(void)
 	ADC_StartCalibration(ADC2);
 	while(ADC_GetCalibrationStatus(ADC2));
 
-	// enable DMA1 clock
+	/* Enable DMA1 clock */
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
 
-	// configure DMA1 channel 1 to fetch data from ADC result register
+	/* Configure DMA1 channel 1 to fetch data from ADC result register */
 	DMA_InitTypeDef DMA_InitStructure;
 	DMA_StructInit(&DMA_InitStructure);
 	DMA_DeInit(DMA1_Channel1);
 	DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&ADC1->DR;
 	DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)&adc_conversion_values;
 	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;
-	DMA_InitStructure.DMA_BufferSize = 2; /* number of conversions depends on number of used channels */
+	DMA_InitStructure.DMA_BufferSize = 2; /* Number of conversions depends on number of used channels */
 	DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
 	DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
 	DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word;
@@ -131,7 +135,7 @@ void PIOS_ADC_Init(void)
 	DMA_Init(DMA1_Channel1, &DMA_InitStructure);
 	DMA_Cmd(DMA1_Channel1, ENABLE);
 
-	/* trigger interrupt when all conversion values have been fetched */
+	/* Trigger interrupt when all conversion values have been fetched */
 	DMA_ITConfig(DMA1_Channel1, DMA_IT_TC, ENABLE);
 
 	/* Configure and enable DMA interrupt */
@@ -150,7 +154,7 @@ void PIOS_ADC_Init(void)
 /**
 * Returns value of an ADC Pin
 * \param[in] pin number
-* \return ADC pin value - resolution depends on the selected oversampling rate Set in Settings.ini
+* \return ADC pin value - resolution depends on the selected oversampling rate
 * \return -1 if pin doesn't exist
 */
 int32_t PIOS_ADC_PinGet(uint32_t pin)
@@ -192,7 +196,9 @@ int32_t PIOS_ADC_Handler(void *_callback)
 		/* Call application hook */
 		/* Note that due to dual conversion approach, we have to convert the pin number */
 		/* If an uneven number of channels selected */
-		callback(pin, pin_value);
+		if(adc_pin_changed[pin] == 1) {
+			callback(pin, pin_value);
+		}
 	}
 
 	/* Start next scan */
@@ -210,21 +216,42 @@ int32_t PIOS_ADC_Handler(void *_callback)
 void DMA1_Channel1_IRQHandler(void)
 {
 	int32_t i;
-	uint16_t *src_ptr, *dst_ptr;
+	uint16_t *src_ptr, *dst_ptr, *changed_ptr;
 
 	/* Clear the pending flag(s) */
 	DMA_ClearFlag(DMA1_FLAG_TC1 | DMA1_FLAG_TE1 | DMA1_FLAG_HT1 | DMA1_FLAG_GL1);
 
 	/* Copy conversion values to adc_pin_values */
-	src_ptr = (uint16_t *)adc_conversion_values;
-	dst_ptr = (uint16_t *)&adc_pin_values[NUM_ADC_PINS];
+//	src_ptr = (uint16_t *)adc_conversion_values;
+//	dst_ptr = (uint16_t *)&adc_pin_values[NUM_ADC_PINS];
+//	changed_ptr = (uint16_t *)&adc_pin_changed[NUM_ADC_PINS];
+//
+//	for(i = 0; i < NUM_ADC_PINS; ++i) {
+//		/* Takeover new value */
+//		if(*dst_ptr != *src_ptr) {
+//			*dst_ptr = *src_ptr;
+//			*changed_ptr = 1;
+//		} else {
+//			*changed_ptr = 0;
+//		}
+//
+//		/* Switch to next results */
+//		++dst_ptr;
+//		++src_ptr;
+//		++changed_ptr;
+//	}
 	
-	for(i=0; i < NUM_ADC_PINS; ++i) {
+	src_ptr = (uint16_t *)adc_conversion_values;
+
+	for(i = 0; i < NUM_ADC_PINS; ++i) {
 		/* Takeover new value */
-		*dst_ptr = *src_ptr;
-		
-		/* Switch to next results */
-		++dst_ptr;
+		if(adc_pin_values[i] != *src_ptr) {
+			adc_pin_values[i] = *src_ptr;
+			adc_pin_changed[i] = 1;
+		} else {
+			adc_pin_changed[i] = 0;
+		}
+
 		++src_ptr;
 	}
 

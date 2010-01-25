@@ -216,7 +216,7 @@ int32_t PIOS_COM_SendFormattedString(COMPortTypeDef port, char *format, ...)
 
 /**
 * Checks for incoming COM messages, calls the callback function which has
-* been installed via COMReceiveCallbackInit()
+* been installed via PIOS_COM_ReceiveCallbackInit()
 * 
 * Not for use in an application - this function is called by
 * by a task in the programming model!

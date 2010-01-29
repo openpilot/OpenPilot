@@ -273,7 +273,7 @@ CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
 
 CFLAGS += -mapcs-frame 
 CFLAGS += -fomit-frame-pointer
-CFLAGS += -fpromote-loop-indices
+#CFLAGS += -fpromote-loop-indices       # it is a Sourcery G++ Lite specific option
 
 CFLAGS += -Wall
 CFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))

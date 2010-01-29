@@ -26,11 +26,17 @@
 # Set developer code and compile options
 # Set to YES for debugging
 DEBUG = YES
+# Set to YES when using Code Sourcery toolchain
+CODE_SOURCERY=NO
 
 # Toolchain prefix (i.e arm-elf- -> arm-elf-gcc.exe)
 TCHAIN_PREFIX = arm-none-eabi-
-#REMOVE_CMD=rm
+
+ifeq ($(CODE_SOURCERY), YES)
 REMOVE_CMD=cs-rm
+else
+REMOVE_CMD=rm
+endif
 
 FLASH_TOOL = OPENOCD
 
@@ -273,7 +279,9 @@ CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
 
 CFLAGS += -mapcs-frame 
 CFLAGS += -fomit-frame-pointer
-#CFLAGS += -fpromote-loop-indices       # it is a Sourcery G++ Lite specific option
+ifeq ($(CODE_SOURCERY), YES)
+CFLAGS += -fpromote-loop-indices
+endif
 
 CFLAGS += -Wall
 CFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))

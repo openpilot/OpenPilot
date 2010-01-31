@@ -33,6 +33,9 @@
 void NVIC_Configuration(void);
 void SysTick_Handler(void);
 
+/* Local Macros */
+#define MEM8(addr)  (*((volatile uint8_t  *)(addr)))
+
 /**
 * Initializes all system peripherals
 */
@@ -75,6 +78,30 @@ void PIOS_SYS_Init(void)
 	PIOS_LED_Init();
 }
 
+/**
+* Returns the serial number as a string
+* param[out] str pointer to a string which can store at least 32 digits + zero terminator!
+* (24 digits returned for STM32)
+* return < 0 if feature not supported
+*/
+int32_t PIOS_SYS_SerialNumberGet(char *str)
+{
+	int i;
+
+	/* Stored in the so called "electronic signature" */
+	for(i=0; i<24; ++i) {
+		uint8_t b = MEM8(0x1ffff7e8 + (i/2));
+		if( !(i & 1) )
+		b >>= 4;
+		b &= 0x0f;
+
+		str[i] = ((b > 9) ? ('A'-10) : '0') + b;
+	}
+	str[i] = 0;
+
+	/* No error */
+	return 0;
+}
 
 /**
 * Configures Vector Table base location and SysTick

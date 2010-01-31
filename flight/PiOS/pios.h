@@ -49,6 +49,9 @@
 /* minIni Includes */
 #include <minIni.h>
 
+/* Mass Storage Device Includes */
+#include <msd.h>
+
 /* PIOS Hardware Includes (STM32F10x) */
 #include <pios_board.h>
 #include <pios_sys.h>
@@ -62,6 +65,7 @@
 #include <pios_i2c.h>
 #include <pios_spi.h>
 #include <pios_pwm.h>
+#include <pios_usb.h>
 
 /* PIOS Hardware Includes (Common) */
 #include <pios_settings.h>

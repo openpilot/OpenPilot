@@ -28,5 +28,6 @@
 
 /* Public Functions */
 extern void PIOS_SYS_Init(void);
+extern int32_t PIOS_SYS_SerialNumberGet(char *str);
 
 #endif /* PIOS_SYS_H */

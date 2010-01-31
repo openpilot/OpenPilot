@@ -40,19 +40,20 @@
 #define STRING_MAX 1024
 static uint8_t line_buffer[STRING_MAX];
 static uint16_t line_ix;
+static uint8_t sdcard_available;
 
 /* Function Prototypes */
 static void TaskTick(void *pvParameters);
 static void TaskHooks(void *pvParameters);
 int32_t CONSOLE_Parse(COMPortTypeDef port, char c);
 void OP_ADC_NotifyChange(uint32_t pin, uint32_t pin_value);
+static void TaskSDCard(void *pvParameters);
 
 /**
 * Main function
 */
 int main()
 {
-	
 	/* Brings up System using CMSIS functions, enables the LEDs. */
 	PIOS_SYS_Init();
 
@@ -79,7 +80,7 @@ int main()
 		PIOS_LED_On(LED2);
 		for(uint32_t i = 0; i < 10; i++) {
 			PIOS_LED_Toggle(LED2);
-			PIOS_DELAY_Wait_mS(100);
+			PIOS_DELAY_WaitmS(100);
 		}
 	}
 
@@ -93,9 +94,11 @@ int main()
 	PIOS_Servo_Init();
 
 	/* Analog to digital converter initialise */
-	PIOS_ADC_Init();
+	//PIOS_ADC_Init();
 
 	//PIOS_PWM_Init();
+
+	PIOS_USB_Init(0);
 
 	PIOS_COM_ReceiveCallbackInit(CONSOLE_Parse);
 
@@ -103,8 +106,9 @@ int main()
 //	OpenPilotInit();
 
 	/* Create a FreeRTOS task */
-	xTaskCreate(TaskTick, (signed portCHAR *)"Test", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
-	xTaskCreate(TaskHooks, (signed portCHAR *)"Hooks", configMINIMAL_STACK_SIZE, NULL, PRIORITY_TASK_HOOKS, NULL);
+	//xTaskCreate(TaskTick, (signed portCHAR *)"Test", configMINIMAL_STACK_SIZE , NULL, 1, NULL);
+	//xTaskCreate(TaskHooks, (signed portCHAR *)"Hooks", configMINIMAL_STACK_SIZE, NULL, PRIORITY_TASK_HOOKS, NULL);
+	xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
 
 	/* Start the FreeRTOS scheduler */
 	vTaskStartScheduler();
@@ -147,7 +151,7 @@ void OP_ADC_NotifyChange(uint32_t pin, uint32_t pin_value)
 
 void TaskTick(void *pvParameters)
 {
-	const portTickType xDelay = 500 / portTICK_RATE_MS;
+	portTickType xLastExecutionTime;
 
 	/* Setup the LEDs to Alternate */
 	PIOS_LED_On(LED1);
@@ -156,12 +160,11 @@ void TaskTick(void *pvParameters)
 	for(;;)
 	{
 		PIOS_LED_Toggle(LED1);
-		//PIOS_LED_Toggle(LED2);
-		//PIOS_DELAY_Wait_mS(250);
-		vTaskDelay(xDelay);
+		vTaskDelayUntil(&xLastExecutionTime, 500 / portTICK_RATE_MS);
 	}
 
-	/*
+#if 0
+	/* For testing servo outputs */
 	const portTickType xDelay = 1 / portTICK_RATE_MS;
 
 	Used to test servos, cycles all servos from one side to the other
@@ -189,7 +192,7 @@ void TaskTick(void *pvParameters)
 			vTaskDelay(xDelay);
 		}
 	}
-	*/
+#endif
 }
 
 static void TaskHooks(void *pvParameters)
@@ -213,6 +216,46 @@ static void TaskHooks(void *pvParameters)
 
 		/* Check for incoming ADC notifications */
 		PIOS_ADC_Handler(OP_ADC_NotifyChange);
+	}
+}
+
+static void TaskSDCard(void *pvParameters)
+{
+	uint16_t second_delay_ctr = 0;
+	portTickType xLastExecutionTime;
+
+	/* Initialise the xLastExecutionTime variable on task entry */
+	xLastExecutionTime = xTaskGetTickCount();
+
+	for(;;) {
+		vTaskDelayUntil(&xLastExecutionTime, 1 / portTICK_RATE_MS);
+
+		/* Each second: */
+		/* Check if SD card is available */
+		/* High-speed access if SD card was previously available */
+		if(++second_delay_ctr >= 1000) {
+			second_delay_ctr = 0;
+
+			uint8_t prev_sdcard_available = sdcard_available;
+			sdcard_available = PIOS_SDCARD_CheckAvailable(prev_sdcard_available);
+
+			if(sdcard_available && !prev_sdcard_available) {
+				/* SD Card has been connected! */
+				/* Switch to mass storage device */
+				MSD_Init(0);
+			} else if(!sdcard_available && prev_sdcard_available) {
+				/* Re-init USB for MIDI */
+				PIOS_USB_Init(1);
+				/* SD Card disconnected! */
+
+			}
+		}
+
+		/* Each millisecond: */
+		/* Handle USB access if device is available */
+		if(sdcard_available) {
+			MSD_Periodic_mS();
+		}
 	}
 }
 

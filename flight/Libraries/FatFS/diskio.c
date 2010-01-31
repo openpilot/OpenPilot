@@ -165,7 +165,7 @@ int32_t SDCARD_PowerOn(void)
 	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0); /* spi, pin_value */
 
 	/* wait for 1 mS */
-	PIOS_DELAY_Wait_uS(1000);
+	PIOS_DELAY_WaituS(1000);
 
 	/* Send CMD0 to reset the media */
 	if((status = SDCARD_SendSDCCmd(SDCMD_GO_IDLE_STATE, 0, SDCMD_GO_IDLE_STATE_CRC)) < 0) {

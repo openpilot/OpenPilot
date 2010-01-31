@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       pios_com.c  
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.
  * @brief      COM layer functions
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   PIOS_COM COM layer functions

@@ -33,9 +33,9 @@ CODE_SOURCERY=NO
 TCHAIN_PREFIX = arm-none-eabi-
 
 ifeq ($(CODE_SOURCERY), YES)
-REMOVE_CMD=cs-rm
+REMOVE_CMD = cs-rm
 else
-REMOVE_CMD=rm
+REMOVE_CMD = rm
 endif
 
 FLASH_TOOL = OPENOCD
@@ -76,6 +76,7 @@ STMUSBSRCDIR = $(STMUSBDIR)/src
 STMUSBINCDIR = $(STMUSBDIR)/inc
 CMSISDIR  = $(STMLIBDIR)/CMSIS/Core/CM3
 DOSFSDIR  = $(APPLIBDIR)/dosfs
+MSDDIR  = $(APPLIBDIR)/msd
 MININIDIR = $(APPLIBDIR)/minIni
 RTOSDIR = $(APPLIBDIR)/FreeRTOS
 RTOSSRCDIR = $(RTOSDIR)/Source
@@ -103,6 +104,7 @@ SRC += $(PIOSSTM32F10X)/pios_servo.c
 SRC += $(PIOSSTM32F10X)/pios_i2c.c
 SRC += $(PIOSSTM32F10X)/pios_spi.c
 SRC += $(PIOSSTM32F10X)/pios_pwm.c
+SRC += $(PIOSSTM32F10X)/pios_usb.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_sdcard.c
@@ -134,10 +136,11 @@ SRC += $(STMSPDSRCDIR)/stm32f10x_usart.c
 SRC += $(STMSPDSRCDIR)/misc.c
 
 ## STM32 USB Library
-#SRC += $(STMUSBSRCDIR)/usb_core.c
-#SRC += $(STMUSBSRCDIR)/usb_int.c
-#SRC += $(STMUSBSRCDIR)/usb_mem.c
-#SRC += $(STMUSBSRCDIR)/usb_regs.c
+SRC += $(STMUSBSRCDIR)/usb_core.c
+SRC += $(STMUSBSRCDIR)/usb_init.c
+SRC += $(STMUSBSRCDIR)/usb_int.c
+SRC += $(STMUSBSRCDIR)/usb_mem.c
+SRC += $(STMUSBSRCDIR)/usb_regs.c
 
 ## RTOS
 SRC += $(RTOSSRCDIR)/list.c 
@@ -155,6 +158,14 @@ SRC += $(DOSFSDIR)/dfs_sdcard.c
 ## ITB CompuPhase's minIni
 SRC += $(MININIDIR)/minIni.c
 SRC += $(MININIDIR)/minGlue.c
+
+## Mass Storage Device
+SRC += $(MSDDIR)/msd.c
+SRC += $(MSDDIR)/msd_bot.c
+SRC += $(MSDDIR)/msd_desc.c
+SRC += $(MSDDIR)/msd_memory.c
+SRC += $(MSDDIR)/msd_scsi.c
+SRC += $(MSDDIR)/msd_scsi_data.c
 
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
 # use file-extension c for "c-only"-files
@@ -191,12 +202,13 @@ EXTRAINCDIRS  += $(PIOSINC)
 EXTRAINCDIRS  += $(PIOSSTM32F10X)
 EXTRAINCDIRS  += $(PIOSCOMMON)
 EXTRAINCDIRS  += $(STMSPDINCDIR)
+EXTRAINCDIRS  += $(STMUSBINCDIR)
 EXTRAINCDIRS  += $(CMSISDIR)
 EXTRAINCDIRS  += $(DOSFSDIR)
+EXTRAINCDIRS  += $(MSDDIR)
 EXTRAINCDIRS  += $(MININIDIR)
 EXTRAINCDIRS  += $(RTOSINCDIR)
 EXTRAINCDIRS  += $(RTOSSRCDIR)/portable/GCC/ARM_CM3
-EXTRAINCDIRS  += $(STMUSBINCDIR)
 
 
 # List any extra directories to look for library files here.
@@ -241,7 +253,6 @@ DEBUGF = dwarf-2
 CDEFS = -DSTM32F10X_$(MODEL)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)
-CDEFS += -DSTM32_SD_USE_DMA
 
 # Place project-specific -D and/or -U options for 
 # Assembler with preprocessor here.

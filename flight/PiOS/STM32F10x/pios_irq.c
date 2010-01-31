@@ -55,7 +55,7 @@ int32_t PIOS_IRQ_Disable(void)
 				);
 	}
 
-	/* disable interrupts */
+	/* Disable interrupts */
 	__asm volatile (				\
 			"     mov r0, #1     \n"	\
 			"     msr primask, r0\n"	\

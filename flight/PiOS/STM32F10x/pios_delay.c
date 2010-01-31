@@ -74,7 +74,7 @@ int32_t PIOS_DELAY_Init(void)
 * \param[in] uS delay (1..65535 microseconds)
 * \return < 0 on errors
 */
-int32_t PIOS_DELAY_Wait_uS(uint16_t uS)
+int32_t PIOS_DELAY_WaituS(uint16_t uS)
 {
 	uint16_t start = PIOS_DELAY_TIMER->CNT;
 
@@ -96,10 +96,10 @@ int32_t PIOS_DELAY_Wait_uS(uint16_t uS)
 * \param[in] mS delay (1..65535 milliseconds)
 * \return < 0 on errors
 */
-int32_t PIOS_DELAY_Wait_mS(uint16_t mS)
+int32_t PIOS_DELAY_WaitmS(uint16_t mS)
 {
 	for(int i = 0; i < mS; i++) {
-		PIOS_DELAY_Wait_uS(1000);
+		PIOS_DELAY_WaituS(1000);
 	}
 
 	/* No error */

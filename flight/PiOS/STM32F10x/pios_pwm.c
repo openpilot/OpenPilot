@@ -102,15 +102,17 @@ void TIM3_IRQHandler(void)
 	/* Get the Input Capture value */
 	IC3Value = TIM_GetCapture3(TIM3);
 
-//	if (IC3Value != 0)
-//	{
-//		/* Duty cycle computation */
-//		DutyCycle = (TIM_GetCapture1(TIM3) * 100) / IC3Value;
-//
-//		/* Frequency computation */
-//		Frequency = 72000000 / IC3Value;
-//	} else {
-//		DutyCycle = 0;
-//		Frequency = 0;
-//	}
+#if 0
+	if (IC3Value != 0)
+	{
+		/* Duty cycle computation */
+		DutyCycle = (TIM_GetCapture1(TIM3) * 100) / IC3Value;
+
+		/* Frequency computation */
+		Frequency = 72000000 / IC3Value;
+	} else {
+		DutyCycle = 0;
+		Frequency = 0;
+	}
+#endif
 }

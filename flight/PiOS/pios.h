@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       pios.h  
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Main PiOS header. 
  *                 - Central header for the project.
  * @see        The GNU Public License (GPL) Version 3

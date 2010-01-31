@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       op_logging.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      OpenPilot Logging Functions header.
  * @see        The GNU Public License (GPL) Version 3
  *

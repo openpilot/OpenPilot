@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       pios.c 
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Sets up main tasks, tickhook, and contains the Main function.
  *                 - It all starts from here!
  * @see        The GNU Public License (GPL) Version 3
@@ -244,10 +244,9 @@ static void TaskSDCard(void *pvParameters)
 				/* Switch to mass storage device */
 				MSD_Init(0);
 			} else if(!sdcard_available && prev_sdcard_available) {
-				/* Re-init USB for MIDI */
+				/* Re-init USB for HID */
 				PIOS_USB_Init(1);
 				/* SD Card disconnected! */
-
 			}
 		}
 

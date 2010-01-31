@@ -2,8 +2,8 @@
  ******************************************************************************
  *
  * @file       msd.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.
- * 	        Parts by Thorsten Klose (tk@midibox.org)
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
  * @brief      USB Mass Storage Device Driver
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   MSD MSD Functions
@@ -160,7 +160,7 @@ int32_t MSD_Periodic_mS(void)
 }
 
 /**
-* This function returns the connection status of the USB MIDI interface
+* This function returns the connection status of the USB HID interface
 * \return 1: interface available
 * \return 0: interface not available
 */
@@ -177,7 +177,7 @@ int32_t MSD_CheckAvailable(void)
 * SD Card would be removed.
 *
 * When this happens, the application can either call PIOS_USB_Init(1)
-* again, e.g. to switch to USB MIDI, or it can make the LUN available
+* again, e.g. to switch to USB HID, or it can make the LUN available
 * again by calling MSD_LUN_AvailableSet(0, 1)
 * \param[in] lun Logical Unit number (0)
 * \param[in] available 0 or 1

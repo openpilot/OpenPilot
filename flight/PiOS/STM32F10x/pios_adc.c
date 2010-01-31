@@ -2,7 +2,8 @@
  ******************************************************************************
  *
  * @file       pios_adc.c  
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
  * @brief      Analog to Digital converstion routines
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   PIOS_ADC ADC Functions

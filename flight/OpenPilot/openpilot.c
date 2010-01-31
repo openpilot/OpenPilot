@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       openpilot.c 
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Sets up ans runs main OpenPilot tasks.
  * @see        The GNU Public License (GPL) Version 3
  * 

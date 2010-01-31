@@ -2,7 +2,8 @@
  ******************************************************************************
  *
  * @file       pios_i2c.c  
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
  * @brief      I2C Enable/Disable routines
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   PIOS_I2C I2C Functions
@@ -198,7 +199,7 @@ int32_t PIOS_I2C_TransferFinished(void)
 * Will be cleared when a new transfer has been started successfully
 * \return last error status
 */
-int32_t MIOS32_IIC_LastErrorGet(void)
+int32_t PIOS_IIC_LastErrorGet(void)
 {
 	return I2CRec.last_transfer_error;
 }
@@ -224,7 +225,7 @@ int32_t PIOS_I2C_TransferCheck(void)
 	/* Error during transfer? */
 	/* (must be done *after* BUSY check to avoid race conditon!) */
 	if(i2cx->transfer_error) {
-		/* Store error status for MIOS32_IIC_LastErrorGet() function */
+		/* Store error status for PIOS_IIC_LastErrorGet() function */
 		i2cx->last_transfer_error = i2cx->transfer_error;
 		/* Clear current error status */
 		i2cx->transfer_error = 0;

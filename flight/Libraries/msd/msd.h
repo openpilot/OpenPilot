@@ -2,8 +2,8 @@
  ******************************************************************************
  *
  * @file       msd.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.
- * 	        Parts by Thorsten Klose (tk@midibox.org)
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
  * @brief      MSD functions header.
  * @see        The GNU Public License (GPL) Version 3
  *

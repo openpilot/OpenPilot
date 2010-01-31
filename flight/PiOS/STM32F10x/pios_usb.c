@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       pios_usb.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * 		Parts by Thorsten Klose (tk@midibox.org)
  * @brief      USB functions
  * @see        The GNU Public License (GPL) Version 3
@@ -28,8 +28,6 @@
 
 /* Project Includes */
 #include "pios.h"
-#define PIOS_DONT_USE_USB_MIDI
-#define PIOS_USE_USB_COM
 
 /* Private Function Prototypes */
 
@@ -157,7 +155,7 @@ static __IO uint32_t bDeviceState = UNCONNECTED;
 *     <LI>if 1, USB peripheral re-initialisation will be forced
 *     <LI>if 2, USB peripheral re-initialisation will be forced, STM32 driver hooks won't be overwritten.<BR>
 *         This mode can be used for a local USB driver which installs it's own hooks during runtime.<BR>
-*         The application can switch back to MIOS32 drivers (e.g. PIOS_USB_MIDI) by calling PIOS_USB_Init(1)
+*         The application can switch back to PIOS drivers by calling PIOS_USB_Init(1)
 *   </UL>
 * \return < 0 if initialisation failed
 * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
@@ -318,7 +316,7 @@ int32_t PIOS_USB_IsInitialized(void)
 */
 static void PIOS_USB_CB_Reset(void)
 {
-	/* Set MIOS32 Device as not configured */
+	/* Set PIOS Device as not configured */
 	pInformation->Current_Configuration = 0;
 
 	/* Current Feature initialization */

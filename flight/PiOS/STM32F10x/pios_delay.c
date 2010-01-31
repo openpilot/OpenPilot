@@ -2,7 +2,8 @@
  ******************************************************************************
  *
  * @file       pios_delay.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
  * @brief      Delay Functions 
  *                 - Provides a micro-second granular delay using a TIM 
  * @see        The GNU Public License (GPL) Version 3

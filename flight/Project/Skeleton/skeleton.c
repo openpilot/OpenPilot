@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       name of file.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Description of file 
  *                 - Slighlty longer description, describe what file provides.
  * @see        The GNU Public License (GPL) Version 3

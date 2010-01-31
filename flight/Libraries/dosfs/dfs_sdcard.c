@@ -2,7 +2,8 @@
  ******************************************************************************
  *
  * @file       pios.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
  * @brief      Access layer between DOSFS and PIOS
  * @see        The GNU Public License (GPL) Version 3
  *

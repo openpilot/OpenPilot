@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       pios_servo.c  
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      RC Servo routines
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   PIOS_SERVO RC Servo Functions

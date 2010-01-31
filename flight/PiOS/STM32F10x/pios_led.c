@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       pios_led.c   
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      LED functions, init, toggle, on & off.
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   PIOS_LED LED Functions

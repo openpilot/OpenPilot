@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       pios_board.h   
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Defines board hardware for the OpenPilot Version 0.1 hardware.
  * @see        The GNU Public License (GPL) Version 3
  *

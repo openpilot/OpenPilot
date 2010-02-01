@@ -5,5 +5,5 @@ SUBDIRS   = \
     qtconcurrent \
     aggregation \
     extensionsystem \
-    utils \
-    utils/process_stub.pro 
+    utils
+

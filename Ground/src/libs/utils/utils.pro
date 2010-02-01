@@ -3,7 +3,7 @@ TARGET = Utils
 QT += gui \
     network
 DEFINES += QTCREATOR_UTILS_LIB
-include(../../qtcreatorlibrary.pri)
+include(../../openpilotgcslibrary.pri)
 SOURCES += reloadpromptutils.cpp \
     settingsutils.cpp \
     filesearch.cpp \

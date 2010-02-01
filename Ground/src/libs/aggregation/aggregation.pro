@@ -1,7 +1,7 @@
 TEMPLATE = lib
 TARGET = Aggregation
 
-include(../../qtcreatorlibrary.pri)
+include(../../openpilotgcslibrary.pri)
 
 DEFINES += AGGREGATION_LIBRARY
 

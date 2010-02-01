@@ -1,7 +1,7 @@
 TEMPLATE = lib
 TARGET = ExtensionSystem
 DEFINES += EXTENSIONSYSTEM_LIBRARY
-include(../../qtcreatorlibrary.pri)
+include(../../openpilotgcslibrary.pri)
 include(extensionsystem_dependencies.pri)
 
 unix:!macx:!freebsd*:LIBS += -ldl

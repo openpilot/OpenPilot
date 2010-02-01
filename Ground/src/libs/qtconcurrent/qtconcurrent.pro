@@ -2,7 +2,7 @@ TEMPLATE = lib
 TARGET = QtConcurrent
 DEFINES += BUILD_QTCONCURRENT
 
-include(../../qtcreatorlibrary.pri)
+include(../../openpilotgcslibrary.pri)
 
 HEADERS += \
     qtconcurrent_global.h \

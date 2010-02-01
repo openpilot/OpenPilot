@@ -1,7 +1,7 @@
 TEMPLATE = lib
 TARGET = Welcome
 QT += network
-include(../../qtcreatorplugin.pri)
+include(../../openpilotgcsplugin.pri)
 include(welcome_dependencies.pri)
 HEADERS += welcomeplugin.h \
     welcomemode.h \

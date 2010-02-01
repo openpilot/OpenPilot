@@ -13,3 +13,5 @@ set QMAKESPEC=win32-g++
 qmake C:\Users\David\Documents\Code\OpenPilot\ground\openpilotgcs.pro
 
 mingw32-make.exe
+
+pause

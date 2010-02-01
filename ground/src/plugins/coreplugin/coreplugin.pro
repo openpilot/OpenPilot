@@ -6,7 +6,7 @@ QT += xml \
     script \
     svg \
     sql
-include(../../qtcreatorplugin.pri)
+include(../../openpilotgcsplugin.pri)
 include(../../libs/utils/utils.pri)
 include(../../shared/scriptwrapper/scriptwrapper.pri)
 include(coreplugin_dependencies.pri)

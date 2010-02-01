@@ -108,6 +108,3 @@ linux-g++-* {
     QMAKE_LFLAGS += -Wl,--allow-shlib-undefined -Wl,--no-undefined
 }
 
-# Handle S60 support: Conditionally built
-win32:SUPPORT_QT_S60= $$(QTCREATOR_WITH_S60)
-else:SUPPORT_QT_S60 = $$(QTCREATOR_WITH_S60)

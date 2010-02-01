@@ -81,6 +81,7 @@ MININIDIR = $(APPLIBDIR)/minIni
 RTOSDIR = $(APPLIBDIR)/FreeRTOS
 RTOSSRCDIR = $(RTOSDIR)/Source
 RTOSINCDIR = $(RTOSSRCDIR)/include
+DOXYGENDIR = Doc/Doxygen
 
 
 # List C source files here. (C dependencies are automatically generated.)
@@ -570,6 +571,10 @@ $(SRCARM:.c=.s) : %.s : %.c
 	@echo $(MSG_ASMFROMC_ARM) $< to $@
 	$(CC) -S $(CFLAGS) $(CONLYFLAGS) $< -o $@
 
+# Generate Doxygen documents
+docs:
+	doxygen  $(DOXYGENDIR)/doxygen.cfg
+	
 # Target: clean project.
 clean: begin clean_list finished end
 

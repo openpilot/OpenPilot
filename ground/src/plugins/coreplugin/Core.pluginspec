@@ -9,6 +9,6 @@ General Public License version 2.1 as published by the Free Software
 Foundation.  Please review the following information to
 ensure the GNU Lesser General Public License version 2.1 requirements
 will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.</license>
-    <description>The core plugin OpenPilot GCS</description>
+    <description>The core plugin for the OpenPilot GCS</description>
     <url>http://www.openpilot.org</url>
 </plugin>

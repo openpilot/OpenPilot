@@ -53,7 +53,7 @@ CommunityWelcomePageWidget::CommunityWelcomePageWidget(QWidget *parent) :
     connect(m_rssFetcher, SIGNAL(newsItemReady(QString, QString, QString)),
         ui->newsTreeWidget, SLOT(slotAddNewsItem(QString, QString, QString)));
     //: Add localized feed here only if one exists
-    m_rssFetcher->fetch(QUrl(tr("http://labs.trolltech.com/blogs/feed")));
+    m_rssFetcher->fetch(QUrl(tr("http://forums.openpilot.org/blog/rss/4-openpilot-development-blog")));
 
     QList<QPair<QString, QString> > sites;
     sites << qMakePair(tr("OpenPilot Home"), QString(QLatin1String("http://www.openpilot.org")));

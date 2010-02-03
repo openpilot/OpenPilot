@@ -19,12 +19,12 @@ MIME_TR_H = $$IDE_DATA_PATH/translations/mime_tr.h
 contains(QT_VERSION, ^4\.[0-5]\..*) {
     ts.commands = @echo This Qt version is too old for the ts target. Need Qt 4.6+.
 } else {
-    for(dir, $$list($$files($$IDE_SOURCE_TREE/src/plugins/*))):MIMETYPES_FILES += $$files($$dir/*.mimetypes.xml)
+    for(dir, $$list($$files($$GCS_SOURCE_TREE/src/plugins/*))):MIMETYPES_FILES += $$files($$dir/*.mimetypes.xml)
     MIMETYPES_FILES = \"$$join(MIMETYPES_FILES, \", \")\"
     QMAKE_SUBSTITUTES += extract-mimetypes.xq.in
     ts.commands += \
         $$XMLPATTERNS -output $$MIME_TR_H $$PWD/extract-mimetypes.xq && \
-        (cd $$IDE_SOURCE_TREE && $$LUPDATE src $$MIME_TR_H -ts $$TRANSLATIONS) && \
+        (cd $$GCS_SOURCE_TREE && $$LUPDATE src $$MIME_TR_H -ts $$TRANSLATIONS) && \
         $$QMAKE_DEL_FILE $$MIME_TR_H
 }
 QMAKE_EXTRA_TARGETS += ts

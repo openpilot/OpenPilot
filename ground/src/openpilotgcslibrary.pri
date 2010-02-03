@@ -17,7 +17,7 @@ contains(QT_CONFIG, reduce_exports):CONFIG += hide_symbols
         target.path = /bin
         target.files = $$DESTDIR/$${TARGET}.dll
     } else {
-        target.path = /$$IDE_LIBRARY_BASENAME/qtcreator
+        target.path = /$$GCS_LIBRARY_BASENAME/openpilotgcs
     }
     INSTALLS += target
 }

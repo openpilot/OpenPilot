@@ -34,25 +34,25 @@ isEmpty(TEST):CONFIG(debug, debug|release) {
     }
 }
 
-isEmpty(IDE_LIBRARY_BASENAME) {
-    IDE_LIBRARY_BASENAME = lib
+isEmpty(GCS_LIBRARY_BASENAME) {
+    GCS_LIBRARY_BASENAME = lib
 }
 
-DEFINES += IDE_LIBRARY_BASENAME=\\\"$$IDE_LIBRARY_BASENAME\\\"
+DEFINES += GCS_LIBRARY_BASENAME=\\\"$$GCS_LIBRARY_BASENAME\\\"
 
 equals(TEST, 1) {
     QT +=testlib
     DEFINES += WITH_TESTS
 }
 
-IDE_SOURCE_TREE = $$PWD
-isEmpty(IDE_BUILD_TREE) {
+GCS_SOURCE_TREE = $$PWD
+isEmpty(GCS_BUILD_TREE) {
     sub_dir = $$_PRO_FILE_PWD_
     sub_dir ~= s,^$$re_escape($$PWD),,
-    IDE_BUILD_TREE = $$cleanPath($$OUT_PWD)
-    IDE_BUILD_TREE ~= s,$$re_escape($$sub_dir)$,,
+    GCS_BUILD_TREE = $$cleanPath($$OUT_PWD)
+    GCS_BUILD_TREE ~= s,$$re_escape($$sub_dir)$,,
 }
-IDE_APP_PATH = $$IDE_BUILD_TREE/bin
+IDE_APP_PATH = $$GCS_BUILD_TREE/bin
 macx {
     IDE_APP_TARGET   = "OpenPilot GCS"
     IDE_LIBRARY_PATH = $$IDE_APP_PATH/$${IDE_APP_TARGET}.app/Contents/PlugIns
@@ -70,19 +70,19 @@ macx {
         IDE_APP_WRAPPER  = openpilotgcs
         IDE_APP_TARGET   = openpilotgcs.bin
     }
-    IDE_LIBRARY_PATH = $$IDE_BUILD_TREE/$$IDE_LIBRARY_BASENAME/openpilotgcs
+    IDE_LIBRARY_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/openpilotgcs
     IDE_PLUGIN_PATH  = $$IDE_LIBRARY_PATH/plugins
     IDE_LIBEXEC_PATH = $$IDE_APP_PATH # FIXME
-    IDE_DATA_PATH    = $$IDE_BUILD_TREE/share/openpilotgcs
-    IDE_DOC_PATH     = $$IDE_BUILD_TREE/share/doc/openpilotgcs
-    !isEqual(IDE_SOURCE_TREE, $$IDE_BUILD_TREE):copydata = 1
+    IDE_DATA_PATH    = $$GCS_BUILD_TREE/share/openpilotgcs
+    IDE_DOC_PATH     = $$GCS_BUILD_TREE/share/doc/openpilotgcs
+    !isEqual(GCS_SOURCE_TREE, $$GCS_BUILD_TREE):copydata = 1
 }
 
 INCLUDEPATH += \
-    $$IDE_SOURCE_TREE/src/libs
+    $$GCS_SOURCE_TREE/src/libs
 
 DEPENDPATH += \
-    $$IDE_SOURCE_TREE/src/libs
+    $$GCS_SOURCE_TREE/src/libs
 
 LIBS += -L$$IDE_LIBRARY_PATH
 

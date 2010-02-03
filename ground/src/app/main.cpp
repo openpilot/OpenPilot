@@ -178,7 +178,7 @@ static inline QStringList getPluginPaths()
     // 1) "plugins" (Win/Linux)
     QString pluginPath = rootDirPath;
     pluginPath += QLatin1Char('/');
-    pluginPath += QLatin1String(IDE_LIBRARY_BASENAME);
+    pluginPath += QLatin1String(GCS_LIBRARY_BASENAME);
     pluginPath += QLatin1Char('/');
     pluginPath += QLatin1String("openpilotgcs");
     pluginPath += QLatin1Char('/');

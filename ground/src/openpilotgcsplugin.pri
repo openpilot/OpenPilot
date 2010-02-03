@@ -6,8 +6,8 @@ isEmpty(PROVIDER) {
 
 DESTDIR = $$IDE_PLUGIN_PATH/$$PROVIDER
 LIBS += -L$$DESTDIR
-INCLUDEPATH += $$IDE_SOURCE_TREE/src/plugins
-DEPENDPATH += $$IDE_SOURCE_TREE/src/plugins
+INCLUDEPATH += $$GCS_SOURCE_TREE/src/plugins
+DEPENDPATH += $$GCS_SOURCE_TREE/src/plugins
 
 # copy the plugin spec
 isEmpty(TARGET) {
@@ -43,8 +43,8 @@ contains(QT_CONFIG, reduce_exports):CONFIG += hide_symbols
 CONFIG += plugin plugin_with_soname
 
 !macx {
-    target.path = /$$IDE_LIBRARY_BASENAME/opnepilotgcs/plugins/$$PROVIDER
+    target.path = /$$GCS_LIBRARY_BASENAME/opnepilotgcs/plugins/$$PROVIDER
     pluginspec.files += $${TARGET}.pluginspec
-    pluginspec.path = /$$IDE_LIBRARY_BASENAME/openpilotgcs/plugins/$$PROVIDER
+    pluginspec.path = /$$GCS_LIBRARY_BASENAME/openpilotgcs/plugins/$$PROVIDER
     INSTALLS += target pluginspec
 }

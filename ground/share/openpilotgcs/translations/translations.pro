@@ -14,7 +14,7 @@ LRELEASE = $$targetPath($$[QT_INSTALL_BINS]/lrelease)
 
 TRANSLATIONS = $$prependAll(LANGUAGES, $$PWD/openpilotgcs_,.ts)
 
-MIME_TR_H = $$IDE_DATA_PATH/translations/mime_tr.h
+MIME_TR_H = $$GCS_DATA_PATH/translations/mime_tr.h
 
 contains(QT_VERSION, ^4\.[0-5]\..*) {
     ts.commands = @echo This Qt version is too old for the ts target. Need Qt 4.6+.
@@ -36,7 +36,7 @@ QT =
 LIBS =
 
 updateqm.input = TRANSLATIONS
-updateqm.output = $$IDE_DATA_PATH/translations/${QMAKE_FILE_BASE}.qm
+updateqm.output = $$GCS_DATA_PATH/translations/${QMAKE_FILE_BASE}.qm
 isEmpty(vcproj):updateqm.variable_out = PRE_TARGETDEPS
 updateqm.commands = $$LRELEASE ${QMAKE_FILE_IN} -qm ${QMAKE_FILE_OUT}
 updateqm.name = LRELEASE ${QMAKE_FILE_IN}

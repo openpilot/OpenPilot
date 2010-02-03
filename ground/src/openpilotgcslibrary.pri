@@ -1,10 +1,10 @@
 include(../openpilotgcs.pri)
 
 win32 {
-    DLLDESTDIR = $$IDE_APP_PATH
+    DLLDESTDIR = $$GCS_APP_PATH
 }
 
-DESTDIR = $$IDE_LIBRARY_PATH
+DESTDIR = $$GCS_LIBRARY_PATH
 
 include(rpath.pri)
 

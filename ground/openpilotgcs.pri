@@ -52,28 +52,28 @@ isEmpty(GCS_BUILD_TREE) {
     GCS_BUILD_TREE = $$cleanPath($$OUT_PWD)
     GCS_BUILD_TREE ~= s,$$re_escape($$sub_dir)$,,
 }
-IDE_APP_PATH = $$GCS_BUILD_TREE/bin
+GCS_APP_PATH = $$GCS_BUILD_TREE/bin
 macx {
-    IDE_APP_TARGET   = "OpenPilot GCS"
-    IDE_LIBRARY_PATH = $$IDE_APP_PATH/$${IDE_APP_TARGET}.app/Contents/PlugIns
-    IDE_PLUGIN_PATH  = $$IDE_LIBRARY_PATH
-    IDE_LIBEXEC_PATH = $$IDE_APP_PATH/$${IDE_APP_TARGET}.app/Contents/Resources
-    IDE_DATA_PATH    = $$IDE_APP_PATH/$${IDE_APP_TARGET}.app/Contents/Resources
-    IDE_DOC_PATH     = $$IDE_DATA_PATH/doc
+    GCS_APP_TARGET   = "OpenPilot GCS"
+    GCS_LIBRARY_PATH = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/PlugIns
+    GCS_PLUGIN_PATH  = $$GCS_LIBRARY_PATH
+    GCS_LIBEXEC_PATH = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/Resources
+    GCS_DATA_PATH    = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/Resources
+    IDE_DOC_PATH     = $$GCS_DATA_PATH/doc
     contains(QT_CONFIG, ppc):CONFIG += ppc x86
     copydata = 1
 } else {
     win32 {
         contains(TEMPLATE, vc.*)|contains(TEMPLATE_PREFIX, vc):vcproj = 1
-        IDE_APP_TARGET   = openpilotgcs
+        GCS_APP_TARGET   = openpilotgcs
     } else {
         IDE_APP_WRAPPER  = openpilotgcs
-        IDE_APP_TARGET   = openpilotgcs.bin
+        GCS_APP_TARGET   = openpilotgcs.bin
     }
-    IDE_LIBRARY_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/openpilotgcs
-    IDE_PLUGIN_PATH  = $$IDE_LIBRARY_PATH/plugins
-    IDE_LIBEXEC_PATH = $$IDE_APP_PATH # FIXME
-    IDE_DATA_PATH    = $$GCS_BUILD_TREE/share/openpilotgcs
+    GCS_LIBRARY_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/openpilotgcs
+    GCS_PLUGIN_PATH  = $$GCS_LIBRARY_PATH/plugins
+    GCS_LIBEXEC_PATH = $$GCS_APP_PATH # FIXME
+    GCS_DATA_PATH    = $$GCS_BUILD_TREE/share/openpilotgcs
     IDE_DOC_PATH     = $$GCS_BUILD_TREE/share/doc/openpilotgcs
     !isEqual(GCS_SOURCE_TREE, $$GCS_BUILD_TREE):copydata = 1
 }
@@ -84,7 +84,7 @@ INCLUDEPATH += \
 DEPENDPATH += \
     $$GCS_SOURCE_TREE/src/libs
 
-LIBS += -L$$IDE_LIBRARY_PATH
+LIBS += -L$$GCS_LIBRARY_PATH
 
 # DEFINES += QT_NO_CAST_FROM_ASCII
 DEFINES += QT_NO_CAST_TO_ASCII

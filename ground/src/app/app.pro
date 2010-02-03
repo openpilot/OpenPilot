@@ -2,8 +2,8 @@ include(../../openpilotgcs.pri)
 include(../shared/qtsingleapplication/qtsingleapplication.pri)
 
 TEMPLATE = app
-TARGET = $$IDE_APP_TARGET
-DESTDIR = $$IDE_APP_PATH
+TARGET = $$GCS_APP_TARGET
+DESTDIR = $$GCS_APP_PATH
 
 SOURCES += main.cpp
 

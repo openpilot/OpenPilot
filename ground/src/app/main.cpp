@@ -147,7 +147,7 @@ static inline QString prepareRemoteArgument(const QString &a)
     return a;
 }
 
-// Send the arguments to an already running instance of Qt Creator
+// Send the arguments to an already running instance of OpenPilot GCS
 static bool sendArguments(SharedTools::QtSingleApplication &app, const QStringList &arguments)
 {
     if (!arguments.empty()) {
@@ -201,7 +201,7 @@ static inline QStringList getPluginPaths()
 int main(int argc, char **argv)
 {
 #ifdef Q_OS_MAC
-    // increase the number of file that can be opened in Qt Creator.
+    // increase the number of file that can be opened in OpenPilot GCS
     struct rlimit rl;
     getrlimit(RLIMIT_NOFILE, &rl);
     rl.rlim_cur = rl.rlim_max;
@@ -215,7 +215,7 @@ int main(int argc, char **argv)
     QString locale = QLocale::system().name();
     const QString &creatorTrPath = QCoreApplication::applicationDirPath()
                         + QLatin1String(SHARE_PATH "/translations");
-    if (translator.load(QLatin1String("qtcreator_") + locale, creatorTrPath)) {
+    if (translator.load(QLatin1String("openpilotgcs_") + locale, creatorTrPath)) {
         const QString &qtTrPath = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
         const QString &qtTrFile = QLatin1String("qt_") + locale;
         // Binary installer puts Qt tr files into creatorTrPath

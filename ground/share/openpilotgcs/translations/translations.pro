@@ -1,6 +1,6 @@
 include(../../../openpilotgcs.pri)
 
-LANGUAGES = de es fr it ja pl ru sl
+LANGUAGES = de es fr
 
 # var, prepend, append
 defineReplace(prependAll) {
@@ -60,6 +60,6 @@ isEmpty(vcproj) {
 }
 
 qmfiles.files = $$prependAll(LANGUAGES, $$OUT_PWD/qtcreator_,.qm)
-qmfiles.path = /share/qtcreator/translations
+qmfiles.path = /share/openpilotgcs/translations
 qmfiles.CONFIG += no_check_exist
 INSTALLS += qmfiles

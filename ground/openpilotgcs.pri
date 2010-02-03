@@ -59,7 +59,7 @@ macx {
     GCS_PLUGIN_PATH  = $$GCS_LIBRARY_PATH
     GCS_LIBEXEC_PATH = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/Resources
     GCS_DATA_PATH    = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/Resources
-    IDE_DOC_PATH     = $$GCS_DATA_PATH/doc
+    GCS_DOC_PATH     = $$GCS_DATA_PATH/doc
     contains(QT_CONFIG, ppc):CONFIG += ppc x86
     copydata = 1
 } else {
@@ -67,14 +67,14 @@ macx {
         contains(TEMPLATE, vc.*)|contains(TEMPLATE_PREFIX, vc):vcproj = 1
         GCS_APP_TARGET   = openpilotgcs
     } else {
-        IDE_APP_WRAPPER  = openpilotgcs
+        GCS_APP_WRAPPER  = openpilotgcs
         GCS_APP_TARGET   = openpilotgcs.bin
     }
     GCS_LIBRARY_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/openpilotgcs
     GCS_PLUGIN_PATH  = $$GCS_LIBRARY_PATH/plugins
     GCS_LIBEXEC_PATH = $$GCS_APP_PATH # FIXME
     GCS_DATA_PATH    = $$GCS_BUILD_TREE/share/openpilotgcs
-    IDE_DOC_PATH     = $$GCS_BUILD_TREE/share/doc/openpilotgcs
+    GCS_DOC_PATH     = $$GCS_BUILD_TREE/share/doc/openpilotgcs
     !isEqual(GCS_SOURCE_TREE, $$GCS_BUILD_TREE):copydata = 1
 }
 

@@ -159,7 +159,7 @@ MainWindow::MainWindow() :
     qApp->setWindowIcon(QIcon(":/core/images/qtcreator_logo_128.png"));
 #endif
     QCoreApplication::setApplicationName(QLatin1String("OpenPilotGCS"));
-    QCoreApplication::setApplicationVersion(QLatin1String(Core::Constants::IDE_VERSION_LONG));
+    QCoreApplication::setApplicationVersion(QLatin1String(Core::Constants::GCS_VERSION_LONG));
     QCoreApplication::setOrganizationName(QLatin1String("OpenPilot"));
     QSettings::setDefaultFormat(QSettings::IniFormat);
     QString baseName = qApp->style()->objectName();

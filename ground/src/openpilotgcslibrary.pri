@@ -10,7 +10,7 @@ include(rpath.pri)
 
 TARGET = $$qtLibraryTarget($$TARGET)
 
-contains(QT_CONFIG, reduce_exports):CONFIG += hide_symbols
+contains(QT_CONFIG, reduce_exports):CONFIG += hGCS_symbols
 
 !macx {
     win32 {

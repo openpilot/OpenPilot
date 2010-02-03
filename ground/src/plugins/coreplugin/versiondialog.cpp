@@ -60,13 +60,13 @@ VersionDialog::VersionDialog(QWidget *parent)
     QGridLayout *layout = new QGridLayout(this);
     layout->setSizeConstraint(QLayout::SetFixedSize);
 
-    QString version = QLatin1String(IDE_VERSION_LONG);
+    QString version = QLatin1String(GCS_VERSION_LONG);
     version += QDate(2007, 25, 10).toString(Qt::SystemLocaleDate);
 
     QString ideRev;
-#ifdef IDE_REVISION
+#ifdef GCS_REVISION
      //: This gets conditionally inserted as argument %8 into the description string.
-     ideRev = tr("From revision %1<br/>").arg(QString::fromLatin1(IDE_REVISION_STR).left(10));
+     ideRev = tr("From revision %1<br/>").arg(QString::fromLatin1(GCS_REVISION_STR).left(10));
 #endif
 
      const QString description = tr(
@@ -83,8 +83,8 @@ VersionDialog::VersionDialog(QWidget *parent)
         "INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A "
         "PARTICULAR PURPOSE.<br/>")
         .arg(version, QLatin1String(QT_VERSION_STR), QString::number(QSysInfo::WordSize), 
-             QLatin1String(__DATE__), QLatin1String(__TIME__), QLatin1String(IDE_YEAR), 
-             (QLatin1String(IDE_AUTHOR)), ideRev);
+             QLatin1String(__DATE__), QLatin1String(__TIME__), QLatin1String(GCS_YEAR), 
+             (QLatin1String(GCS_AUTHOR)), ideRev);
 
     QLabel *copyRightLabel = new QLabel(description);
     copyRightLabel->setWordWrap(true);

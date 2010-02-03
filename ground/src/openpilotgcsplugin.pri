@@ -32,13 +32,13 @@ macx {
     QMAKE_RPATHDIR += \$\$ORIGIN
     QMAKE_RPATHDIR += \$\$ORIGIN/..
     QMAKE_RPATHDIR += \$\$ORIGIN/../..
-    IDE_PLUGIN_RPATH = $$join(QMAKE_RPATHDIR, ":")
-    QMAKE_LFLAGS += -Wl,-z,origin \'-Wl,-rpath,$${IDE_PLUGIN_RPATH}\'
+    GCS_PLUGIN_RPATH = $$join(QMAKE_RPATHDIR, ":")
+    QMAKE_LFLAGS += -Wl,-z,origin \'-Wl,-rpath,$${GCS_PLUGIN_RPATH}\'
     QMAKE_RPATHDIR =
 }
 
 
-contains(QT_CONFIG, reduce_exports):CONFIG += hide_symbols
+contains(QT_CONFIG, reduce_exports):CONFIG += hGCS_symbols
 
 CONFIG += plugin plugin_with_soname
 

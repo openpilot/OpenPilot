@@ -338,7 +338,7 @@ EditorManager::EditorManager(ICore *core, QWidget *parent) :
     connect(m_d->m_splitAction, SIGNAL(triggered()), this, SLOT(split()));
 
     m_d->m_splitSideBySideAction = new QAction(tr("Split Side by Side"), this);
-    cmd = am->registerAction(m_d->m_splitSideBySideAction, Constants::SPLIT_SIDE_BY_SIDE, editManagerContext);
+    cmd = am->registerAction(m_d->m_splitSideBySideAction, Constants::SPLIT_SGCS_BY_SIDE, editManagerContext);
     cmd->setDefaultKeySequence(QKeySequence(tr("%1,3").arg(prefix)));
     mwindow->addAction(cmd, Constants::G_WINDOW_SPLIT);
     connect(m_d->m_splitSideBySideAction, SIGNAL(triggered()), this, SLOT(splitSideBySide()));

@@ -33,28 +33,28 @@
 namespace Core {
 namespace Constants {
 
-#define IDE_VERSION_MAJOR 1
-#define IDE_VERSION_MINOR 3
-#define IDE_VERSION_RELEASE 1
+#define GCS_VERSION_MAJOR 1
+#define GCS_VERSION_MINOR 3
+#define GCS_VERSION_RELEASE 1
 
 #define STRINGIFY_INTERNAL(x) #x
 #define STRINGIFY(x) STRINGIFY_INTERNAL(x)
 
-#define IDE_VERSION STRINGIFY(IDE_VERSION_MAJOR) \
-    "." STRINGIFY(IDE_VERSION_MINOR) \
-    "." STRINGIFY(IDE_VERSION_RELEASE)
+#define GCS_VERSION STRINGIFY(GCS_VERSION_MAJOR) \
+    "." STRINGIFY(GCS_VERSION_MINOR) \
+    "." STRINGIFY(GCS_VERSION_RELEASE)
 
-const char * const IDE_VERSION_LONG      = IDE_VERSION;
-const char * const IDE_AUTHOR            = "Nokia Corporation";
-const char * const IDE_YEAR              = "2009";
+const char * const GCS_VERSION_LONG      = GCS_VERSION;
+const char * const GCS_AUTHOR            = "Nokia Corporation";
+const char * const GCS_YEAR              = "2009";
 
-#ifdef IDE_REVISION
-const char * const IDE_REVISION_STR      = STRINGIFY(IDE_REVISION);
+#ifdef GCS_REVISION
+const char * const GCS_REVISION_STR      = STRINGIFY(GCS_REVISION);
 #else
-const char * const IDE_REVISION_STR      = "";
+const char * const GCS_REVISION_STR      = "";
 #endif
 
-#undef IDE_VERSION
+#undef GCS_VERSION
 #undef STRINGIFY
 #undef STRINGIFY_INTERNAL
 
@@ -122,7 +122,7 @@ const char * const MINIMIZE_WINDOW       = "QtCreator.MinimizeWindow";
 const char * const ZOOM_WINDOW           = "QtCreator.ZoomWindow";
 
 const char * const SPLIT                 = "QtCreator.Split";
-const char * const SPLIT_SIDE_BY_SIDE    = "QtCreator.SplitSideBySide";
+const char * const SPLIT_SGCS_BY_SIDE    = "QtCreator.SplitSideBySide";
 const char * const REMOVE_CURRENT_SPLIT  = "QtCreator.RemoveCurrentSplit";
 const char * const REMOVE_ALL_SPLITS     = "QtCreator.RemoveAllSplits";
 const char * const GOTO_OTHER_SPLIT      = "QtCreator.GotoOtherSplit";

@@ -156,7 +156,7 @@ MainWindow::MainWindow() :
 
     setWindowTitle(tr("OpenPilot GCS"));
 #ifndef Q_WS_MAC
-    qApp->setWindowIcon(QIcon(":/core/images/qtcreator_logo_128.png"));
+    qApp->setWindowIcon(QIcon(":/core/images/openpilot_logo_128.png"));
 #endif
     QCoreApplication::setApplicationName(QLatin1String("OpenPilotGCS"));
     QCoreApplication::setApplicationVersion(QLatin1String(Core::Constants::GCS_VERSION_LONG));
@@ -733,9 +733,9 @@ void MainWindow::registerDefaultActions()
 
     // About IDE Action
 #ifdef Q_WS_MAC
-    tmpaction = new QAction(tr("About &Qt Creator"), this); // it's convention not to add dots to the about menu
+    tmpaction = new QAction(tr("About &OpenPilot GCS"), this); // it's convention not to add dots to the about menu
 #else
-    tmpaction = new QAction(tr("About &Qt Creator..."), this);
+    tmpaction = new QAction(tr("About &OpenPilot GCS..."), this);
 #endif
     cmd = am->registerAction(tmpaction, Constants::ABOUT_QTCREATOR, m_globalContext);
     mhelp->addAction(cmd, Constants::G_HELP_ABOUT);

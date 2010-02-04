@@ -1,5 +1,8 @@
 <RCC>
     <qresource prefix="/core" >
+        <file>images/openpilot_logo_256.png</file>
+        <file>images/openpilot_logo_128.png</file>
+        <file>images/openpilot_logo_64.png</file>
         <file>images/clean_pane_small.png</file>
         <file>images/clear.png</file>
         <file>images/closebutton.png</file>
@@ -13,7 +16,7 @@
         <file>images/filesave.png</file>
         <file>images/find.png</file>
         <file>images/findnext.png</file>
-        <file>images/qtcreator_logo_128.png</file>
+	   <file>images/qtcreator_logo_128.png</file>
         <file>images/qtcreator_logo_32.png</file>
         <file>images/inputfield.png</file>
         <file>images/inputfield_disabled.png</file>

@@ -122,7 +122,7 @@ const char * const MINIMIZE_WINDOW       = "QtCreator.MinimizeWindow";
 const char * const ZOOM_WINDOW           = "QtCreator.ZoomWindow";
 
 const char * const SPLIT                 = "QtCreator.Split";
-const char * const SPLIT_SGCS_BY_SIDE    = "QtCreator.SplitSideBySide";
+const char * const SPLIT_SIDE_BY_SIDE    = "QtCreator.SplitSideBySide";
 const char * const REMOVE_CURRENT_SPLIT  = "QtCreator.RemoveCurrentSplit";
 const char * const REMOVE_ALL_SPLITS     = "QtCreator.RemoveAllSplits";
 const char * const GOTO_OTHER_SPLIT      = "QtCreator.GotoOtherSplit";

@@ -679,7 +679,7 @@ void SplitterOrView::paintEvent(QPaintEvent *)
     if (hasFocus()) {
 #ifdef Q_WS_MAC
         // With QMacStyle, we have to draw our own focus rect, since I didn't find
-        // a way to draw the nice mac focus rect _insGCS_ this widget
+        // a way to draw the nice mac focus rect _inside_ this widget
         if (qobject_cast<QMacStyle *>(style())) {
             painter.setPen(Qt::DotLine);
             painter.setBrush(Qt::NoBrush);

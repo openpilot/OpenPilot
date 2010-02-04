@@ -45,8 +45,8 @@ namespace Constants {
     "." STRINGIFY(GCS_VERSION_RELEASE)
 
 const char * const GCS_VERSION_LONG      = GCS_VERSION;
-const char * const GCS_AUTHOR            = "Nokia Corporation";
-const char * const GCS_YEAR              = "2009";
+const char * const GCS_AUTHOR            = "OpenPilot Project";
+const char * const GCS_YEAR              = "2010";
 
 #ifdef GCS_REVISION
 const char * const GCS_REVISION_STR      = STRINGIFY(GCS_REVISION);

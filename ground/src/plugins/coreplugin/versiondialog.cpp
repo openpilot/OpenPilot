@@ -53,9 +53,9 @@ VersionDialog::VersionDialog(QWidget *parent)
 {
     // We need to set the window icon explicitly here since for some reason the
     // application icon isn't used when the size of the dialog is fixed (at least not on X11/GNOME)
-    setWindowIcon(QIcon(":/core/images/qtcreator_logo_128.png"));
+    setWindowIcon(QIcon(":/core/images/openpilot_logo_128.png"));
 
-    setWindowTitle(tr("About Qt Creator"));
+    setWindowTitle(tr("About OpenPilot GCS"));
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     QGridLayout *layout = new QGridLayout(this);
     layout->setSizeConstraint(QLayout::SetFixedSize);
@@ -70,7 +70,7 @@ VersionDialog::VersionDialog(QWidget *parent)
 #endif
 
      const QString description = tr(
-        "<h3>Qt Creator %1</h3>"
+        "<h3>OpenPilot GCS %1</h3>"
         "Based on Qt %2 (%3 bit)<br/>"
         "<br/>"
         "Built on %4 at %5<br />"

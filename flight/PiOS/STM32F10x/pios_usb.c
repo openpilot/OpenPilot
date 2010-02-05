@@ -160,7 +160,7 @@ static const uint8_t PIOS_USB_ConfigDescriptor[PIOS_USB_SIZ_CONFIG_DESC] = {
 
 		0x81, /* bEndpointAddress: Endpoint Address (IN) */
 		0x03, /* bmAttributes: Interrupt endpoint */
-		0x02, /* wMaxPacketSize: 2 Bytes max */
+		64,//0x02, /* wMaxPacketSize: 2 Bytes max */
 		0x00, 0x20, /* bInterval: Polling Interval (32 ms) */
 		/* 34 */
 
@@ -170,7 +170,7 @@ static const uint8_t PIOS_USB_ConfigDescriptor[PIOS_USB_SIZ_CONFIG_DESC] = {
 		0x01, /* bEndpointAddress: */
 		/*	Endpoint Address (OUT) */
 		0x03, /* bmAttributes: Interrupt endpoint */
-		0x02, /* wMaxPacketSize: 2 Bytes max  */
+		64,//0x02, /* wMaxPacketSize: 2 Bytes max  */
 		0x00, 0x20, /* bInterval: Polling Interval (20 ms) */
 		/* 41 */
 	};
@@ -347,6 +347,8 @@ int32_t PIOS_USB_Init(uint32_t mode)
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
+
+	pInformation->Ctrl_Info.Usb_wLength = 64;
 
 	/* No error */
 	return 0;

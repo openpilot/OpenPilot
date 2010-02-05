@@ -52,7 +52,7 @@ const uint8_t PIOS_USB_HID_ReportDescriptor[PIOS_USB_HID_SIZ_REPORT_DESC] = {
 		0x09, 0x01, /* USAGE (Demo Kit)               */
 		0xa1, 0x01, /* COLLECTION (Application)       */
 		/* 6 */
-
+#if 0
 		/* Led 1 */
 		0x85, 0x01, /*     REPORT_ID (1)		     */
 		0x09, 0x01, /*     USAGE (LED 1)	             */
@@ -81,34 +81,6 @@ const uint8_t PIOS_USB_HID_ReportDescriptor[PIOS_USB_HID_SIZ_REPORT_DESC] = {
 		0x91, 0x82, /*     OUTPUT (Data,Var,Abs,Vol)  */
 		/* 46 */
 
-		/* Led 3 */
-		0x85, 0x03, /*     REPORT_ID (3)		     */
-		0x09, 0x03, /*     USAGE (LED 3)	             */
-		0x15, 0x00, /*     LOGICAL_MINIMUM (0)        */
-		0x25, 0x01, /*     LOGICAL_MAXIMUM (1)        */
-		0x75, 0x08, /*     REPORT_SIZE (8)            */
-		0x95, 0x01, /*     REPORT_COUNT (1)           */
-		0xB1, 0x82, /*    FEATURE (Data,Var,Abs,Vol) */
-
-		0x85, 0x03, /*     REPORT_ID (3)              */
-		0x09, 0x03, /*     USAGE (LED 3)              */
-		0x91, 0x82, /*     OUTPUT (Data,Var,Abs,Vol)  */
-		/* 66 */
-
-		/* Led 4 */
-		0x85, 0x04, /*     REPORT_ID 4)		     */
-		0x09, 0x04, /*     USAGE (LED 4)	             */
-		0x15, 0x00, /*     LOGICAL_MINIMUM (0)        */
-		0x25, 0x01, /*     LOGICAL_MAXIMUM (1)        */
-		0x75, 0x08, /*     REPORT_SIZE (8)            */
-		0x95, 0x01, /*     REPORT_COUNT (1)           */
-		0xB1, 0x82, /*     FEATURE (Data,Var,Abs,Vol) */
-
-		0x85, 0x04, /*     REPORT_ID (4)              */
-		0x09, 0x04, /*     USAGE (LED 4)              */
-		0x91, 0x82, /*     OUTPUT (Data,Var,Abs,Vol)  */
-		/* 86 */
-
 		/* key Push Button */
 		0x85, 0x05, /*     REPORT_ID (5)              */
 		0x09, 0x05, /*     USAGE (Push Button)        */
@@ -127,7 +99,7 @@ const uint8_t PIOS_USB_HID_ReportDescriptor[PIOS_USB_HID_SIZ_REPORT_DESC] = {
 
 		0x75, 0x07, /*     REPORT_SIZE (7)            */
 		0xb1, 0x83, /*     FEATURE (Cnst,Var,Abs,Vol) */
-		/* 114 */
+		/* 74 */
 
 		/* Tamper Push Button */
 		0x85, 0x06, /*     REPORT_ID (6)              */
@@ -147,7 +119,7 @@ const uint8_t PIOS_USB_HID_ReportDescriptor[PIOS_USB_HID_SIZ_REPORT_DESC] = {
 
 		0x75, 0x07, /*     REPORT_SIZE (7)            */
 		0xb1, 0x83, /*     FEATURE (Cnst,Var,Abs,Vol) */
-		/* 142 */
+		/* 102 */
 
 		/* ADC IN */
 		0x85, 0x07, /*     REPORT_ID (7)              */
@@ -156,12 +128,55 @@ const uint8_t PIOS_USB_HID_ReportDescriptor[PIOS_USB_HID_SIZ_REPORT_DESC] = {
 		0x26, 0xff, 0x00, /*     LOGICAL_MAXIMUM (255)      */
 		0x75, 0x08, /*     REPORT_SIZE (8)            */
 		0x81, 0x82, /*     INPUT (Data,Var,Abs,Vol)   */
+
 		0x85, 0x07, /*     REPORT_ID (7)              */
 		0x09, 0x07, /*     USAGE (ADC in)             */
 		0xb1, 0x82, /*     FEATURE (Data,Var,Abs,Vol) */
-		/* 161 */
+		/* 121 */
+#endif
 
-		0xc0 /*     END_COLLECTION	             */
+		/* In Control */
+		0x85, 0x06, // Report ID (6)
+		0x95, 0x02, // REPORT_COUNT (2)
+		0x75, 0x08, // REPORT_SIZE (8)
+		0x26, 0xff, 0x00, // LOGICAL_MAXIMUM (255)
+		0x15, 0x00, // LOGICAL_MINIMUM (0)
+		0x09, 0x01, // USAGE (Vendor Usage 1)
+		0x81, 0x02, // INPUT (Data,Var,Abs)
+		/*21*/
+
+		/* Out Control */
+		0x85, 0x07, // Report ID (7)
+		0x95, 0x02, // REPORT_COUNT (2)
+		0x75, 0x08, // REPORT_SIZE (8)
+		0x26, 0xff, 0x00, // LOGICAL_MAXIMUM (255)
+		0x15, 0x00, // LOGICAL_MINIMUM (0)
+		0x09, 0x01, // USAGE (Vendor Usage 1)
+		0x91, 0x02, // OUTPUT (Data,Var,Abs)
+		/*36*/
+
+		/* In Data */
+		0x85, 0x01, // Report ID (1)
+		0x95, 0x40, // REPORT_COUNT (64)
+		0x75, 0x08, // REPORT_SIZE (8)
+		0x26, 0xff, 0x00, // LOGICAL_MAXIMUM (255)
+		0x15, 0x00, // LOGICAL_MINIMUM (0)
+		0x09, 0x01, // USAGE (Vendor Usage 1)
+		0x81, 0x02, // INPUT (Data,Var,Abs)
+		/*51*/
+
+		/* Out Data */
+		0x85, 0x02, // Report ID (2)
+		0x95, 0x40, // REPORT_COUNT (64)
+		0x75, 0x08, // REPORT_SIZE (8)
+		0x26, 0xff, 0x00, // LOGICAL_MAXIMUM (255)
+		0x15, 0x00, // LOGICAL_MINIMUM (0)
+		0x09, 0x01, // USAGE (Vendor Usage 1)
+		0x91, 0x02, // OUTPUT (Data,Var,Abs)
+		/*66*/
+
+		0xc0 /* END_COLLECTION */
+		/*67*/
 		};
 ONE_DESCRIPTOR PIOS_USB_HID_Report_Descriptor = {(uint8_t *) PIOS_USB_HID_ReportDescriptor, PIOS_USB_HID_SIZ_REPORT_DESC};
 ONE_DESCRIPTOR PIOS_USB_HID_Hid_Descriptor = {(uint8_t*) PIOS_USB_HID_ReportDescriptor + PIOS_USB_HID_OFF_HID_DESC, PIOS_USB_HID_SIZ_HID_DESC};
@@ -267,38 +282,18 @@ static uint8_t *PIOS_USB_HID_GetProtocolValue(uint16_t Length)
 void PIOS_USB_HID_EP1_OUT_Callback(void)
 {
 	uint8_t Receive_Buffer[2];
-	BitAction Led_State;
+	uint32_t DataLength = 0;
 
 	/* Read received data (2 bytes) */
-	USB_SIL_Read(0x01, Receive_Buffer);
+	//USB_SIL_Read(ENDP1, Receive_Buffer);
 
-	if(Receive_Buffer[1] == 0) {
-		Led_State = Bit_RESET;
-	} else {
-		Led_State = Bit_SET;
-	}
+	/* Get the number of received data on the selected Endpoint */
+	DataLength = GetEPRxCount(ENDP1 & 0x7F);
 
-	switch(Receive_Buffer[0]) {
-		case 1: /* Led 1 */
-			if(Led_State != Bit_RESET) {
-				PIOS_LED_On(LED1);
-			} else {
-				PIOS_LED_Off(LED1);
-			}
-			break;
-		case 2: /* Led 2 */
-			if(Led_State != Bit_RESET) {
-				PIOS_LED_On(LED2);
-			} else {
-				PIOS_LED_Off(LED2);
-			}
-			break;
-		default:
+	/* Use the memory interface function to write to the selected endpoint */
+	PMAToUserBufferCopy((uint8_t *) Receive_Buffer, GetEPRxAddr(ENDP1 & 0x7F), DataLength);
 
-			PIOS_LED_Off(LED1);
-			PIOS_LED_Off(LED2);
-			break;
-	}
+	/* Do stuff here */
 
 	SetEPRxStatus(ENDP1, EP_RX_VALID);
 }

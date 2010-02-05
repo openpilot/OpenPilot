@@ -174,26 +174,23 @@ static void TaskHIDTest(void *pvParameters)
 {
 	portTickType xDelay = 250 / portTICK_RATE_MS;;
 
-	__IO uint8_t Send_Buffer[2];
-	uint8_t count = 0;
+	__IO uint8_t Send_Buffer[64];
 
 	for(;;)
 	{
-		/* Report ID */
-		Send_Buffer[0] = 0x07;
-
-		/* Report Data */
-		Send_Buffer[1] = count;
+		Send_Buffer[0] = 0x01;
+		Send_Buffer[1] = 't';
+		Send_Buffer[2] = 'e';
+		Send_Buffer[3] = 's';
+		Send_Buffer[4] = 't';
+		Send_Buffer[5] = '!';
+		Send_Buffer[6] = '!';
 
 		/* Write the data to the pipe */
-		USB_SIL_Write(EP1_IN, (uint8_t*) Send_Buffer, 2);
-		SetEPTxValid(ENDP1);
+		UserToPMABufferCopy((uint8_t*) Send_Buffer, GetEPTxAddr(EP1_IN & 0x7F), 64);
+		SetEPTxCount(ENDP1, 64);
 
-		if(count >= 255) {
-			count = 0;
-		} else {
-			count++;
-		}
+		SetEPTxValid(ENDP1);
 
 		vTaskDelay(xDelay);
 	}

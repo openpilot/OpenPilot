@@ -17,6 +17,7 @@ class Shape : public QGraphicsItemGroup {
     enum ShapeType {
       ShapeRectangle,
       ShapeCross,
+      ShapeCrossX,
       ShapeEllipse
     };
     /**
@@ -41,7 +42,7 @@ class Shape : public QGraphicsItemGroup {
      * @param y
      */
     inline void setPos(double x, double y) { QGraphicsItem::setPos(x,y); }
-    void setLabel(char * text);
+    void setLabel(char * text, double relX = 0, double relY = 0);
     void setFontSize(int s) { m_fontSize = s; }
     void setFontColor( int r, int g, int b) { m_fontColor.setRgb(r,g,b); }
     void setBoundingBox( double x, double y, double w, double h);

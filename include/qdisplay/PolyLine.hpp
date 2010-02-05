@@ -8,6 +8,7 @@ namespace jafar {
 namespace qdisplay {
 
 /**
+ * @ingroup qdisplay
  * Allows to display a poly line on a viewer overlay. For instance to display the
  * path of a robot.
  */

@@ -9,6 +9,7 @@ namespace qdisplay {
 class Viewer;
 
 /**
+ * @ingroup qdisplay
  * ViewerManager gives access to all active Viewer.
  * Usefull for memory management and for closing all visible Viewer.
  */

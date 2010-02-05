@@ -36,6 +36,8 @@ Viewer::Viewer(int mosaicWidth, int mosaicHeight, QGraphicsScene* scene ) : m_sc
     m_scene = new QGraphicsScene();
   }
   m_scene->setBackgroundBrush( Qt::white );
+	setDragMode(QGraphicsView::ScrollHandDrag);
+	setTransformationAnchor(QGraphicsView::AnchorUnderMouse); 
 	// added by norman
 	if ((m_windowHeight > 0) and (m_windowWidth > 0))
 	{
@@ -78,6 +80,17 @@ void Viewer::addPolyLine(qdisplay::PolyLine* pl)
 
 void Viewer::setImageView(ImageView* ii, int row, int col)
 {
+	if (ii == NULL)
+	{
+		if (m_imageMosaic[row][col])
+		{
+			scene()->removeItem(m_imageMosaic[row][col]);
+			delete m_imageMosaic[row][col];
+			m_imageMosaic[row][col] = NULL;
+		}
+		return;
+	}
+	
   if(scene()->items().contains(ii)) return;
   scene()->addItem(ii);
   if(m_imageMosaic[row][col])

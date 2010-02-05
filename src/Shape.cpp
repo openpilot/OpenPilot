@@ -29,19 +29,25 @@ void Shape::paint(QPainter *painter, const QStyleOptionGraphicsItem * opt, QWidg
       painter->drawLine(QPointF(m_boundingRect.left(), 0.), QPointF( m_boundingRect.right(), 0.));
       painter->drawLine(QPointF(0., m_boundingRect.top()), QPointF(0., m_boundingRect.bottom()));
       break;
+    case ShapeCrossX:
+      painter->drawLine(QPointF(m_boundingRect.left(), m_boundingRect.top()), QPointF( m_boundingRect.right(), m_boundingRect.bottom()));
+      painter->drawLine(QPointF(m_boundingRect.right(), m_boundingRect.top()), QPointF(m_boundingRect.left(), m_boundingRect.bottom()));
+      break;
     case ShapeEllipse:
     	painter->drawEllipse(m_boundingRect);
     	break;
   }
   QGraphicsItemGroup::paint(painter, opt, wdg);
 }
-void Shape::setLabel(char * text)
+
+void Shape::setLabel(char * text, double relX, double relY)
 {
   if(!m_label)
   {
     m_label = new QGraphicsTextItem(this, scene());
     m_label->setFont(QFont( m_label->font().family(), m_fontSize));
     m_label->setDefaultTextColor( m_fontColor );
+    m_label->translate(relX,relY);
     addToGroup(m_label);
   }
   m_label->setPlainText(text);

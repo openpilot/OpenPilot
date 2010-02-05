@@ -17,6 +17,7 @@ namespace qdisplay {
   class Viewer;
   class PolyLine;
 /**
+ * @ingroup qdisplay
  * This class manipulate the view of an image on a Viewer. You can add specific overlay to this image using
  * the command addShape
  */

@@ -72,13 +72,25 @@ static const DEVICE_PROP My_Device_Property = {
 		MSD_MASS_Reset, MSD_MASS_Status_In, MSD_MASS_Status_Out, MSD_MASS_Data_Setup, MSD_MASS_NoData_Setup, MSD_MASS_Get_Interface_Setting,
 		MSD_MASS_GetDeviceDescriptor, MSD_MASS_GetConfigDescriptor, MSD_MASS_GetStringDescriptor, 0, 0x40 /*MAX PACKET SIZE*/
 };
-static const USER_STANDARD_REQUESTS My_User_Standard_Requests = {NOP_Process, MSD_Mass_Storage_SetConfiguration, NOP_Process, NOP_Process, NOP_Process,
-		MSD_Mass_Storage_ClearFeature, NOP_Process, NOP_Process, MSD_Mass_Storage_SetDeviceAddress};
+static const USER_STANDARD_REQUESTS My_User_Standard_Requests = {
+		NOP_Process,
+		MSD_Mass_Storage_SetConfiguration,
+		NOP_Process,
+		NOP_Process,
+		NOP_Process,
+		MSD_Mass_Storage_ClearFeature,
+		NOP_Process, NOP_Process,
+		MSD_Mass_Storage_SetDeviceAddress
+};
 static ONE_DESCRIPTOR Device_Descriptor = {(uint8_t *) MSD_MASS_DeviceDescriptor, MSD_MASS_SIZ_DEVICE_DESC};
 static ONE_DESCRIPTOR Config_Descriptor = {(uint8_t *) MSD_MASS_ConfigDescriptor, MSD_MASS_SIZ_CONFIG_DESC};
-static ONE_DESCRIPTOR String_Descriptor[5] = { {(uint8_t *) MSD_MASS_StringLangID, MSD_MASS_SIZ_STRING_LANGID}, {(uint8_t *) MSD_MASS_StringVendor,
-		MSD_MASS_SIZ_STRING_VENDOR}, {(uint8_t *) MSD_MASS_StringProduct, MSD_MASS_SIZ_STRING_PRODUCT}, {(uint8_t *) MSD_MASS_StringSerial,
-		MSD_MASS_SIZ_STRING_SERIAL}, {(uint8_t *) MSD_MASS_StringInterface, MSD_MASS_SIZ_STRING_INTERFACE}, };
+static ONE_DESCRIPTOR String_Descriptor[5] = {
+		{(uint8_t *) MSD_MASS_StringLangID, MSD_MASS_SIZ_STRING_LANGID},
+		{(uint8_t *) MSD_MASS_StringVendor, MSD_MASS_SIZ_STRING_VENDOR},
+		{(uint8_t *) MSD_MASS_StringProduct, MSD_MASS_SIZ_STRING_PRODUCT},
+		{(uint8_t *) MSD_MASS_StringSerial, MSD_MASS_SIZ_STRING_SERIAL},
+		{(uint8_t *) MSD_MASS_StringInterface, MSD_MASS_SIZ_STRING_INTERFACE},
+};
 static uint8_t lun_available;
 
 /**

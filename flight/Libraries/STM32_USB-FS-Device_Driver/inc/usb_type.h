@@ -1,8 +1,8 @@
 /******************** (C) COPYRIGHT 2009 STMicroelectronics ********************
 * File Name          : usb_type.h
 * Author             : MCD Application Team
-* Version            : V3.0.1
-* Date               : 04/27/2009
+* Version            : V3.1.0
+* Date               : 10/30/2009
 * Description        : Type definitions used by the USB Library
 ********************************************************************************
 * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
@@ -18,8 +18,7 @@
 #define __USB_TYPE_H
 
 /* Includes ------------------------------------------------------------------*/
-// TK: disabled, as not required for integration of STM32 drivers!
-// #include "usb_conf.h"
+//#include "usb_conf.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/

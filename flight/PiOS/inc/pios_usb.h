@@ -30,43 +30,38 @@
 /* Local defines */
 /* Following settings allow to customise the USB device descriptor */
 #ifndef PIOS_USB_VENDOR_ID
-#define PIOS_USB_VENDOR_ID    0x16c0        // sponsored by voti.nl! see http://www.voti.nl/pids
+#define PIOS_USB_VENDOR_ID		0x0483
 #endif
 
 #ifndef PIOS_USB_VENDOR_STR
-#define PIOS_USB_VENDOR_STR   "openpilot.org" // you will see this in the USB device description
+#define PIOS_USB_VENDOR_STR		"openpilot.org"
 #endif
 
 #ifndef PIOS_USB_PRODUCT_STR
-#define PIOS_USB_PRODUCT_STR  "OpenPilot"      /* You will see this in the USB device list */
+#define PIOS_USB_PRODUCT_STR		"OpenPilot"
 #endif
 
 #ifndef PIOS_USB_PRODUCT_ID
-#define PIOS_USB_PRODUCT_ID   0x03ff        /* ==1023; 1020-1029 reserved for T.Klose, 1000 - 1009 free for lab use */
+#define PIOS_USB_PRODUCT_ID		0x5750
 #endif
 
 #ifndef PIOS_USB_VERSION_ID
-#define PIOS_USB_VERSION_ID   0x0100        /* v1.00 */
+#define PIOS_USB_VERSION_ID		0x0200        /* v2.00 */
 #endif
 
 /* Internal defines which are used by PIOS USB HID (don't touch) */
-#define PIOS_USB_EP_NUM   5
+#define PIOS_USB_EP_NUM			2
 
 /* Buffer table base address */
-#define PIOS_USB_BTABLE_ADDRESS      0x000
+#define PIOS_USB_BTABLE_ADDRESS		0x000
 
 /* EP0 rx/tx buffer base address */
-#define PIOS_USB_ENDP0_RXADDR        0x040
-#define PIOS_USB_ENDP0_TXADDR        0x080
+#define PIOS_USB_ENDP0_RXADDR		0x040
+#define PIOS_USB_ENDP0_TXADDR		0x080
 
 /* EP1 Rx/Tx buffer base address for HID driver */
-#define PIOS_USB_ENDP1_TXADDR        0x0c0
-#define PIOS_USB_ENDP1_RXADDR        0x100
-
-/* EP2/3/4 buffer base addresses for COM driver */
-#define PIOS_USB_ENDP2_TXADDR        0x140
-#define PIOS_USB_ENDP3_RXADDR        0x180
-#define PIOS_USB_ENDP4_TXADDR        0x1c0
+#define PIOS_USB_ENDP1_TXADDR		0x0C0
+#define PIOS_USB_ENDP1_RXADDR		0x100
 
 
 /* Global Variables */

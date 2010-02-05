@@ -28,13 +28,8 @@
 
 /* Project Includes */
 #include "pios.h"
-
-/* Private Function Prototypes */
-
-/* Local Variables */
-
-#include <usb_lib.h>
 #include <string.h>
+
 
 /* Local definitions */
 #define DSCR_DEVICE     1       /* Descriptor type: Device */
@@ -44,13 +39,19 @@
 #define DSCR_ENDPNT     5       /* Descriptor type: Endpoint */
 #define CS_INTERFACE    0x24    /* Class-specific type: Interface */
 #define CS_ENDPOINT     0x25    /* Class-specific type: Endpoint */
+
 /* ISTR events */
 /* mask defining which events has to be handled by the device application software */
-#define IMR_MSK (CNTR_CTRM | CNTR_RESETM)
+#define IMR_MSK (CNTR_CTRM  | CNTR_WKUPM | CNTR_SUSPM | CNTR_ERRM  | CNTR_SOFM | CNTR_ESOFM | CNTR_RESETM)
 
 /* Local types */
 typedef enum _DEVICE_STATE {
-	UNCONNECTED, ATTACHED, POWERED, SUSPENDED, ADDRESSED, CONFIGURED
+	UNCONNECTED,
+	ATTACHED,
+	POWERED,
+	SUSPENDED,
+	ADDRESSED,
+	CONFIGURED
 } DEVICE_STATE;
 
 /* Global Variables used by STM32 USB Driver */
@@ -63,23 +64,42 @@ DEVICE_PROP *pProperty;
 USER_STANDARD_REQUESTS *pUser_Standard_Requests;
 
 /* Stored in RAM, vectors can be changed on-the-fly */
-void (*pEpInt_IN[7])(void) = {NOP_Process, NOP_Process, NOP_Process, NOP_Process, NOP_Process, NOP_Process, NOP_Process};
-void (*pEpInt_OUT[7])(void) = {NOP_Process, NOP_Process, NOP_Process, NOP_Process, NOP_Process, NOP_Process, NOP_Process};
+void (*pEpInt_IN[7])(void) = {
+		NOP_Process,
+		NOP_Process,
+		NOP_Process,
+		NOP_Process,
+		NOP_Process,
+		NOP_Process,
+		NOP_Process
+		};
+void (*pEpInt_OUT[7])(void) = {
+		NOP_Process,
+		NOP_Process,
+		NOP_Process,
+		NOP_Process,
+		NOP_Process,
+		NOP_Process,
+		NOP_Process
+		};
 
-#define PIOS_USB_NUM_INTERFACES              (0)
-#define PIOS_USB_SIZ_CONFIG_DESC             (9 + 0)
+#define USB_ENDPOINT_DESCRIPTOR_TYPE		0x05
+
+#define PIOS_USB_HID_NUM_INTERFACES		1
+#define PIOS_USB_HID_SIZ_CLASS_DESC		18
+#define PIOS_USB_HID_SIZ_CONFIG_DESC		32
+
+#define PIOS_USB_NUM_INTERFACES			(PIOS_USB_HID_NUM_INTERFACES)
+#define PIOS_USB_SIZ_CONFIG_DESC		(9 + PIOS_USB_HID_SIZ_CONFIG_DESC)
 
 /* USB Standard Device Descriptor */
 #define PIOS_USB_SIZ_DEVICE_DESC 18
-static const uint8_t PIOS_USB_DeviceDescriptor[PIOS_USB_SIZ_DEVICE_DESC] = {(uint8_t)(PIOS_USB_SIZ_DEVICE_DESC & 0xff), /* Device Descriptor length */
+static const uint8_t PIOS_USB_DeviceDescriptor[PIOS_USB_SIZ_DEVICE_DESC] = {
+		(uint8_t)(PIOS_USB_SIZ_DEVICE_DESC & 0xff), /* Device Descriptor length */
 		DSCR_DEVICE, /* Descriptor type */
 		(uint8_t)(0x0200 & 0xff), /* Specification Version (BCD, LSB) */
 		(uint8_t)(0x0200 >> 8), /* Specification Version (BCD, MSB) */
-#if 1
-		0x02, /* Device class "Communication"   -- required for MacOS to find the COM device. Audio Device works fine in parallel to this */
-#else
-		0x00, /* Device class "Composite" */
-#endif
+		0x00, /* Device class "Communication" */
 		0x00, /* Device sub-class */
 		0x00, /* Device sub-sub-class */
 		0x40, /* Maximum packet size */
@@ -95,7 +115,7 @@ static const uint8_t PIOS_USB_DeviceDescriptor[PIOS_USB_SIZ_DEVICE_DESC] = {(uin
 		0x01 /* Number of configurations */
 		};
 
-/* USB Config Descriptor */
+/* USB Configuration Descriptor */
 static const uint8_t PIOS_USB_ConfigDescriptor[PIOS_USB_SIZ_CONFIG_DESC] = {
 		/* Configuration Descriptor */
 		9, /* Descriptor length */
@@ -108,9 +128,51 @@ static const uint8_t PIOS_USB_ConfigDescriptor[PIOS_USB_SIZ_CONFIG_DESC] = {
 		0x80, /* Attributes (b7 - buspwr, b6 - selfpwr, b5 - rwu) */
 		0x32, /* Power requirement (div 2 ma) */
 
-		/* TODO:HID */
+		/* HID */
+		/************** Descriptor of Custom HID interface ****************/
+		/* 09 */
+		0x09, /* bLength: Interface Descriptor size */
+		0x04,/* bDescriptorType: Interface descriptor type */
+		0x00, /* bInterfaceNumber: Number of Interface */
+		0x00, /* bAlternateSetting: Alternate setting */
+		0x02, /* bNumEndpoints */
+		0x03, /* bInterfaceClass: HID */
+		0x00, /* bInterfaceSubClass : 1=BOOT, 0=no boot */
+		0x00, /* nInterfaceProtocol : 0=none, 1=keyboard, 2=mouse */
+		0, /* iInterface: Index of string descriptor */
 
-		};
+		/******************** Descriptor of Custom HID HID ********************/
+		/* 18 */
+		0x09, /* bLength: HID Descriptor size */
+		0x21, /* bDescriptorType: HID */
+		0x10, /* bcdHID: HID Class Spec release number */
+		0x01, 0x00, /* bCountryCode: Hardware target country */
+		0x01, /* bNumDescriptors: Number of HID class descriptors to follow */
+		0x22, /* bDescriptorType */
+		PIOS_USB_HID_SIZ_REPORT_DESC,/* wItemLength: Total length of Report descriptor */
+		0x00,
+
+		/******************** Descriptor of Custom HID endpoints ******************/
+		/* 27 */
+		0x07, /* bLength: Endpoint Descriptor size */
+		USB_ENDPOINT_DESCRIPTOR_TYPE, /* bDescriptorType: */
+
+		0x81, /* bEndpointAddress: Endpoint Address (IN) */
+		0x03, /* bmAttributes: Interrupt endpoint */
+		0x02, /* wMaxPacketSize: 2 Bytes max */
+		0x00, 0x20, /* bInterval: Polling Interval (32 ms) */
+		/* 34 */
+
+		0x07, /* bLength: Endpoint Descriptor size */
+		USB_ENDPOINT_DESCRIPTOR_TYPE, /* bDescriptorType: */
+		/*	Endpoint descriptor type */
+		0x01, /* bEndpointAddress: */
+		/*	Endpoint Address (OUT) */
+		0x03, /* bmAttributes: Interrupt endpoint */
+		0x02, /* wMaxPacketSize: 2 Bytes max  */
+		0x00, 0x20, /* bInterval: Polling Interval (20 ms) */
+		/* 41 */
+	};
 
 /* Local prototypes */
 static void PIOS_USB_CB_Reset(void);
@@ -125,15 +187,27 @@ static uint8_t *PIOS_USB_CB_GetConfigDescriptor(uint16_t Length);
 static uint8_t *PIOS_USB_CB_GetStringDescriptor(uint16_t Length);
 static RESULT PIOS_USB_CB_Get_Interface_Setting(uint8_t Interface, uint8_t AlternateSetting);
 
+
 /* USB callback vectors */
 static const DEVICE My_Device_Table = {PIOS_USB_EP_NUM, 1};
 static const DEVICE_PROP My_Device_Property = {
 		0, /* PIOS_USB_CB_Init, */
-		PIOS_USB_CB_Reset, PIOS_USB_CB_Status_In, PIOS_USB_CB_Status_Out, PIOS_USB_CB_Data_Setup, PIOS_USB_CB_NoData_Setup,
-		PIOS_USB_CB_Get_Interface_Setting, PIOS_USB_CB_GetDeviceDescriptor, PIOS_USB_CB_GetConfigDescriptor, PIOS_USB_CB_GetStringDescriptor, 0, 0x40 /*MAX PACKET SIZE*/
+		PIOS_USB_CB_Reset,
+		PIOS_USB_CB_Status_In,
+		PIOS_USB_CB_Status_Out,
+		PIOS_USB_CB_Data_Setup,
+		PIOS_USB_CB_NoData_Setup,
+		PIOS_USB_CB_Get_Interface_Setting,
+		PIOS_USB_CB_GetDeviceDescriptor,
+		PIOS_USB_CB_GetConfigDescriptor,
+		PIOS_USB_CB_GetStringDescriptor,
+		0,
+		0x40 /*MAX PACKET SIZE*/
 };
-static const USER_STANDARD_REQUESTS My_User_Standard_Requests = {NOP_Process, /* PIOS_USB_CB_GetConfiguration, */
-		PIOS_USB_CB_SetConfiguration, NOP_Process, /* PIOS_USB_CB_GetInterface, */
+static const USER_STANDARD_REQUESTS My_User_Standard_Requests = {
+		NOP_Process, /* PIOS_USB_CB_GetConfiguration, */
+		PIOS_USB_CB_SetConfiguration,
+		NOP_Process, /* PIOS_USB_CB_GetInterface, */
 		NOP_Process, /* PIOS_USB_CB_SetInterface, */
 		NOP_Process, /* PIOS_USB_CB_GetStatus, */
 		NOP_Process, /* PIOS_USB_CB_ClearFeature, */
@@ -145,7 +219,7 @@ static const USER_STANDARD_REQUESTS My_User_Standard_Requests = {NOP_Process, /*
 /* USB Device informations */
 static DEVICE_INFO My_Device_Info;
 /* USB device status */
-static __IO uint32_t bDeviceState = UNCONNECTED;
+static volatile uint32_t bDeviceState = UNCONNECTED;
 
 /**
 * Initialises USB interface
@@ -170,34 +244,41 @@ int32_t PIOS_USB_Init(uint32_t mode)
 
 	/* Clear all USB interrupt requests */
 	PIOS_IRQ_Disable();
-	_SetCNTR(0); /* Interrupt Mask */
+	/* Interrupt Mask */
+	_SetCNTR(0);
 	PIOS_IRQ_Enable();
 
-	/* if mode != 2: install PIOS hooks */
-	/* a local driver can install it's own hooks and call PIOS_USB_Init(2) to force re-enumeration */
+	/* If mode != 2: install PIOS hooks */
+	/* A local driver can install it's own hooks and call PIOS_USB_Init(2) to force re-enumeration */
 	if(mode != 2) {
-		pInformation = &My_Device_Info; /* Note: usually no need to duplicate this for external drivers */
+		/* Note: usually no need to duplicate this for external drivers */
+		pInformation = &My_Device_Info;
 
 		/* Following hooks/pointers should be replaced by external drivers */
 		memcpy(&Device_Table, (DEVICE *) &My_Device_Table, sizeof(Device_Table));
 		pProperty = (DEVICE_PROP *) &My_Device_Property;
 		pUser_Standard_Requests = (USER_STANDARD_REQUESTS *) &My_User_Standard_Requests;
+
+		#ifndef DISABLE_HID
+		pEpInt_OUT[0] = PIOS_USB_HID_EP1_OUT_Callback;
+		#endif
 	}
+
+	PIOS_USB_HID_ChangeConnectionState(0);
 
 	pInformation->ControlState = 2;
 	pInformation->Current_Configuration = 0;
 
-	/* if mode == 0: don't initialise USB if not required (important for BSL) */
+	/* If mode == 0: don't initialise USB if not required (important for BSL) */
 	if(mode == 0 && PIOS_USB_IsInitialized()) {
 		pInformation->Current_Feature = PIOS_USB_ConfigDescriptor[7];
 		pInformation->Current_Configuration = 1;
 		pUser_Standard_Requests->User_SetConfiguration();
-
 	} else {
 		/* Force USB reset and power-down (this will also release the USB pins for direct GPIO control) */
 		_SetCNTR(CNTR_FRES | CNTR_PDWN);
 
-#if 0
+		#if 0
 		/* Disabled because it doesn't work, hardware needs to be looked into */
 		/* Configure USB disconnect pin */
 		/* first we hold it low for ca. 50 mS to force a re-enumeration */
@@ -213,7 +294,7 @@ int32_t PIOS_USB_Init(uint32_t mode)
 
 		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
 		GPIO_Init(USB_ACC_GPIO_PORT, &GPIO_InitStructure);
-#endif
+		#endif
 
 		/* Using a "dirty" method to force a re-enumeration: */
 		/* Force DPM (Pin PA12) low for ca. 10 mS before USB Tranceiver will be enabled */
@@ -231,7 +312,6 @@ int32_t PIOS_USB_Init(uint32_t mode)
 
 		/* Release power-down, still hold reset */
 		_SetCNTR(CNTR_PDWN);
-
 		PIOS_DELAY_WaituS(5);
 
 		/* CNTR_FRES = 0 */
@@ -253,12 +333,12 @@ int32_t PIOS_USB_Init(uint32_t mode)
 		_SetISTR(0);
 
 		/* Set interrupts mask */
-		_SetCNTR(IMR_MSK); /* Interrupt mask */
+		_SetCNTR(IMR_MSK);
 	}
 
 	bDeviceState = UNCONNECTED;
 
-	/* Enable USB interrupts (unfortunately shared with CAN Rx0, as either CAN or USB can be used, but not at the same time) */
+	/* Enable USB interrupts */
 	NVIC_InitTypeDef NVIC_InitStructure;
 	NVIC_InitStructure.NVIC_IRQChannel = USB_LP_CAN1_RX0_IRQn;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_USB_PRIORITY;
@@ -311,6 +391,7 @@ int32_t PIOS_USB_IsInitialized(void)
 * Hooks of STM32 USB library
 * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
 */
+
 /**
 * Reset Routine
 */
@@ -319,14 +400,14 @@ static void PIOS_USB_CB_Reset(void)
 	/* Set PIOS Device as not configured */
 	pInformation->Current_Configuration = 0;
 
-	/* Current Feature initialization */
+	/* Current Feature initialisation */
 	pInformation->Current_Feature = PIOS_USB_ConfigDescriptor[7];
 
 	/* Set PIOS Device with the default Interface */
 	pInformation->Current_Interface = 0;
 	SetBTABLE(PIOS_USB_BTABLE_ADDRESS);
 
-	/* Initialize Endpoint 0 */
+	/* Initialise Endpoint 0 */
 	SetEPType(ENDP0, EP_CONTROL);
 	SetEPTxStatus(ENDP0, EP_TX_STALL);
 	SetEPRxAddr(ENDP0, PIOS_USB_ENDP0_RXADDR);
@@ -334,6 +415,20 @@ static void PIOS_USB_CB_Reset(void)
 	Clear_Status_Out(ENDP0);
 	SetEPRxCount(ENDP0, pProperty->MaxPacketSize);
 	SetEPRxValid(ENDP0);
+
+	#ifndef DISABLE_HID
+	/* Initialise Endpoint 1 */
+	SetEPType(ENDP1, EP_INTERRUPT);
+	SetEPTxAddr(ENDP1, PIOS_USB_ENDP1_TXADDR);
+	SetEPRxAddr(ENDP1, PIOS_USB_ENDP1_RXADDR);
+	SetEPTxCount(ENDP1, 2);
+	SetEPRxCount(ENDP1, 2);
+	SetEPTxStatus(ENDP1, EP_TX_NAK);
+	SetEPRxStatus(ENDP1, EP_RX_VALID);
+
+	/* Propagate connection state to USB HID driver */
+	PIOS_USB_HID_ChangeConnectionState(0);
+	#endif
 
 	/* Set this device to response on default address */
 	SetDeviceAddress(0);
@@ -347,7 +442,10 @@ static void PIOS_USB_CB_Reset(void)
 static void PIOS_USB_CB_SetConfiguration(void)
 {
 	if(pInformation->Current_Configuration != 0) {
+		/* Propagate connection state to USB HID driver */
+		PIOS_USB_HID_ChangeConnectionState(1); /* Connected */
 		bDeviceState = CONFIGURED;
+
 	}
 }
 
@@ -380,6 +478,11 @@ static void PIOS_USB_CB_Status_Out(void)
 */
 static RESULT PIOS_USB_CB_Data_Setup(uint8_t RequestNo)
 {
+	RESULT Result;
+	if((Result = PIOS_USB_HID_CB_Data_Setup(RequestNo)) != USB_UNSUPPORT) {
+		return Result;
+	}
+
 	return USB_UNSUPPORT;
 }
 
@@ -388,6 +491,11 @@ static RESULT PIOS_USB_CB_Data_Setup(uint8_t RequestNo)
 */
 static RESULT PIOS_USB_CB_NoData_Setup(uint8_t RequestNo)
 {
+	RESULT res;
+	if((res = PIOS_USB_HID_CB_NoData_Setup(RequestNo)) != USB_UNSUPPORT) {
+		return res;
+	}
+
 	return USB_UNSUPPORT;
 }
 
@@ -423,14 +531,14 @@ static uint8_t *PIOS_USB_CB_GetStringDescriptor(uint16_t Length)
 
 	switch(pInformation->USBwValue0) {
 		case 0: /* Language */
-			/* buffer[0] and [1] initialized below */
+			/* buffer[0] and [1] initialised below */
 			buffer[2] = 0x09; // CharSet
 			buffer[3] = 0x04; // U.S.
 			len = 4;
 			break;
 
 		case 1: /* Vendor */
-			/* buffer[0] and [1] initialized below */
+			/* buffer[0] and [1] initialised below */
 			for(i = 0, len = 2; vendor_str[i] != '\0' && len < 200; ++i) {
 				buffer[len++] = vendor_str[i];
 				buffer[len++] = 0;
@@ -438,7 +546,7 @@ static uint8_t *PIOS_USB_CB_GetStringDescriptor(uint16_t Length)
 			break;
 
 		case 2: /* Product */
-			/* buffer[0] and [1] initialized below */
+			/* buffer[0] and [1] initialised below */
 			for(i = 0, len = 2; product_str[i] != '\0' && len < 200; ++i) {
 				buffer[len++] = product_str[i];
 				buffer[len++] = 0;

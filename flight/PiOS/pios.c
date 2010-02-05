@@ -44,10 +44,11 @@ static uint8_t sdcard_available;
 
 /* Function Prototypes */
 static void TaskTick(void *pvParameters);
+static void TaskServos(void *pvParameters);
 static void TaskHooks(void *pvParameters);
+static void TaskSDCard(void *pvParameters);
 int32_t CONSOLE_Parse(COMPortTypeDef port, char c);
 void OP_ADC_NotifyChange(uint32_t pin, uint32_t pin_value);
-static void TaskSDCard(void *pvParameters);
 
 /**
 * Main function
@@ -100,15 +101,37 @@ int main()
 
 	PIOS_USB_Init(0);
 
-	PIOS_COM_ReceiveCallbackInit(CONSOLE_Parse);
+	__IO uint8_t Send_Buffer[2];
+	uint8_t count = 0;
+
+	for(;;)
+	{
+		/* Report ID */
+		Send_Buffer[0] = 0x07;
+
+		/* Report Data */
+		Send_Buffer[1] = count;
+		USB_SIL_Write(EP1_IN, (uint8_t*) Send_Buffer, 2);
+
+		if(count >= 255) {
+			count = 0;
+		} else {
+			count++;
+		}
+
+		PIOS_DELAY_WaitmS(50);
+	}
+
+	//PIOS_COM_ReceiveCallbackInit(CONSOLE_Parse);
 
 	/* Initialise OpenPilot application */
 //	OpenPilotInit();
 
 	/* Create a FreeRTOS task */
-	//xTaskCreate(TaskTick, (signed portCHAR *)"Test", configMINIMAL_STACK_SIZE , NULL, 1, NULL);
+	xTaskCreate(TaskTick, (signed portCHAR *)"Test", configMINIMAL_STACK_SIZE , NULL, 1, NULL);
+	//xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
 	//xTaskCreate(TaskHooks, (signed portCHAR *)"Hooks", configMINIMAL_STACK_SIZE, NULL, PRIORITY_TASK_HOOKS, NULL);
-	xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
+	//xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
 
 	/* Start the FreeRTOS scheduler */
 	vTaskStartScheduler();
@@ -149,7 +172,7 @@ void OP_ADC_NotifyChange(uint32_t pin, uint32_t pin_value)
 
 }
 
-void TaskTick(void *pvParameters)
+static void TaskTick(void *pvParameters)
 {
 	portTickType xLastExecutionTime;
 
@@ -162,13 +185,51 @@ void TaskTick(void *pvParameters)
 		PIOS_LED_Toggle(LED1);
 		vTaskDelayUntil(&xLastExecutionTime, 500 / portTICK_RATE_MS);
 	}
+}
 
-#if 0
+static void TaskServos(void *pvParameters)
+{
 	/* For testing servo outputs */
-	const portTickType xDelay = 1 / portTICK_RATE_MS;
+	portTickType xDelay;
 
-	Used to test servos, cycles all servos from one side to the other
+	/* Used to test servos, cycles all servos from one side to the other */
 	for(;;) {
+		xDelay = 250 / portTICK_RATE_MS;
+		PIOS_Servo_Set(0, 2000);
+		vTaskDelay(xDelay);
+		PIOS_Servo_Set(1, 2000);
+		vTaskDelay(xDelay);
+		PIOS_Servo_Set(2, 2000);
+		vTaskDelay(xDelay);
+		PIOS_Servo_Set(3, 2000);
+		vTaskDelay(xDelay);
+		PIOS_Servo_Set(4, 2000);
+		vTaskDelay(xDelay);
+		PIOS_Servo_Set(5, 2000);
+		vTaskDelay(xDelay);
+		PIOS_Servo_Set(6, 2000);
+		vTaskDelay(xDelay);
+		PIOS_Servo_Set(7, 2000);
+		vTaskDelay(xDelay);
+
+		PIOS_Servo_Set(7, 1000);
+		vTaskDelay(xDelay);
+		PIOS_Servo_Set(6, 1000);
+		vTaskDelay(xDelay);
+		PIOS_Servo_Set(5, 1000);
+		vTaskDelay(xDelay);
+		PIOS_Servo_Set(4, 1000);
+		vTaskDelay(xDelay);
+		PIOS_Servo_Set(3, 1000);
+		vTaskDelay(xDelay);
+		PIOS_Servo_Set(2, 1000);
+		vTaskDelay(xDelay);
+		PIOS_Servo_Set(1, 1000);
+		vTaskDelay(xDelay);
+		PIOS_Servo_Set(0, 1000);
+		vTaskDelay(xDelay);
+
+		xDelay = 1 / portTICK_RATE_MS;
 		for(int i = 1000; i < 2000; i++) {
 			PIOS_Servo_Set(0, i);
 			PIOS_Servo_Set(1, i);
@@ -192,7 +253,6 @@ void TaskTick(void *pvParameters)
 			vTaskDelay(xDelay);
 		}
 	}
-#endif
 }
 
 static void TaskHooks(void *pvParameters)

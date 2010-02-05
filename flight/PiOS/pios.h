@@ -66,6 +66,7 @@
 #include <pios_spi.h>
 #include <pios_pwm.h>
 #include <pios_usb.h>
+#include <pios_usb_hid.h>
 
 /* PIOS Hardware Includes (Common) */
 #include <pios_settings.h>
@@ -75,5 +76,7 @@
 
 /* More added here as they get written */
 
+/* USB Libs */
+#include <usb_lib.h>
 
 #endif /* PIOS_H */

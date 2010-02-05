@@ -1,8 +1,8 @@
 /******************** (C) COPYRIGHT 2009 STMicroelectronics ********************
 * File Name          : usb_core.c
 * Author             : MCD Application Team
-* Version            : V3.0.1
-* Date               : 04/27/2009
+* Version            : V3.1.0
+* Date               : 10/30/2009
 * Description        : Standard protocol processing (USB v2.0)
 ********************************************************************************
 * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
@@ -15,19 +15,19 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usb_lib.h"
-//DEVICE_INFO *pInformation;
-//DEVICE Device_Table;
-//DEVICE_PROP *pProperty;
-//USER_STANDARD_REQUESTS *pUser_Standard_Requests;
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 #define ValBit(VAR,Place)    (VAR & (1 << Place))
 #define SetBit(VAR,Place)    (VAR |= (1 << Place))
 #define ClrBit(VAR,Place)    (VAR &= ((1 << Place) ^ 255))
 
+#ifdef STM32F10X_CL
+ #define Send0LengthData()  {OTGD_FS_PCD_EP_Write (0, 0, 0) ; vSetEPTxStatus(EP_TX_VALID);}
+#else
 #define Send0LengthData() { _SetEPTxCount(ENDP0, 0); \
     vSetEPTxStatus(EP_TX_VALID); \
   }
+#endif /* STM32F10X_CL */
 
 #define vSetEPRxStatus(st) (SaveRState = st)
 #define vSetEPTxStatus(st) (SaveTState = st)
@@ -41,6 +41,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 uint16_t_uint8_t StatusInfo;
+
 bool Data_Mul_MaxPacketSize = FALSE;
 /* Private function prototypes -----------------------------------------------*/
 static void DataStageOut(void);
@@ -167,8 +168,8 @@ uint8_t *Standard_GetStatus(uint16_t Length)
     return 0;
   }
 
-  StatusInfo.w = 0;
   /* Reset Status Information */
+  StatusInfo.w = 0;
 
   if (Type_Recipient == (STANDARD_REQUEST | DEVICE_RECIPIENT))
   {
@@ -180,15 +181,19 @@ uint8_t *Standard_GetStatus(uint16_t Length)
     {
       SetBit(StatusInfo0, 1);
     }
+    else
+    {
+      ClrBit(StatusInfo0, 1);
+    }      
 
     /* Bus-powered */
     if (ValBit(Feature, 6))
     {
-      ClrBit(StatusInfo0, 0);
+      SetBit(StatusInfo0, 0);
     }
     else /* Self-powered */
     {
-      SetBit(StatusInfo0, 0);
+      ClrBit(StatusInfo0, 0);
     }
   }
   /*Interface Status*/
@@ -289,7 +294,9 @@ RESULT Standard_ClearFeature(void)
       /* IN endpoint */
       if (_GetTxStallStatus(Related_Endpoint ))
       {
+      #ifndef STM32F10X_CL
         ClearDTOG_TX(Related_Endpoint);
+      #endif /* STM32F10X_CL */
         SetEPTxStatus(Related_Endpoint, EP_TX_VALID);
       }
     }
@@ -301,14 +308,15 @@ RESULT Standard_ClearFeature(void)
         if (Related_Endpoint == ENDP0)
         {
           /* After clear the STALL, enable the default endpoint receiver */
-//          SetEPRxCount(Related_Endpoint, Device_Property.MaxPacketSize);
-// TK: we should reference MaxPacketSize() via pointer!
+          //SetEPRxCount(Related_Endpoint, Device_Property.MaxPacketSize);
           SetEPRxCount(Related_Endpoint, pProperty->MaxPacketSize);
           _SetEPRxStatus(Related_Endpoint, EP_RX_VALID);
         }
         else
         {
+        #ifndef STM32F10X_CL
           ClearDTOG_RX(Related_Endpoint);
+        #endif /* STM32F10X_CL */
           _SetEPRxStatus(Related_Endpoint, EP_RX_VALID);
         }
       }
@@ -333,7 +341,7 @@ RESULT Standard_SetEndPointFeature(void)
   uint32_t    wIndex0;
   uint32_t    Related_Endpoint;
   uint32_t    rEP;
-  uint32_t   Status;
+  uint32_t    Status;
 
   wIndex0 = pInformation->USBwIndex0;
   rEP = wIndex0 & ~0x80;
@@ -451,7 +459,11 @@ void DataStageOut(void)
     pEPinfo->Usb_rLength -= Length;
     pEPinfo->Usb_rOffset += Length;
 
+  #ifdef STM32F10X_CL  
+    OTGD_FS_PCD_EP_Read(ENDP0, Buffer, Length); 
+  #else  
     PMAToUserBufferCopy(Buffer, GetEPRxAddr(ENDP0), Length);
+  #endif  /* STM32F10X_CL */
   }
 
   if (pEPinfo->Usb_rLength != 0)
@@ -508,7 +520,14 @@ void DataStageIn(void)
     {
       /* No more data to send so STALL the TX Status*/
       ControlState = WAIT_STATUS_OUT;
+
+    #ifdef STM32F10X_CL      
+      OTGD_FS_PCD_EP_Read (ENDP0, 0, 0);
+    #endif  /* STM32F10X_CL */ 
+    
+    #ifndef STM32F10X_CL 
       vSetEPTxStatus(EP_TX_STALL);
+    #endif  /* STM32F10X_CL */ 
     }
     
     goto Expect_Status_Out;
@@ -524,7 +543,11 @@ void DataStageIn(void)
 
   DataBuffer = (*pEPinfo->CopyData)(Length);
 
+#ifdef STM32F10X_CL
+  OTGD_FS_PCD_EP_Write (ENDP0, DataBuffer, Length);
+#else   
   UserToPMABufferCopy(DataBuffer, GetEPTxAddr(ENDP0), Length);
+#endif /* STM32F10X_CL */ 
 
   SetEPTxCount(ENDP0, Length);
 
@@ -574,6 +597,10 @@ void NoData_Setup0(void)
       else
       {
         Result = USB_SUCCESS;
+
+      #ifdef STM32F10X_CL
+         SetDeviceAddress(pInformation->USBwValue0);
+      #endif  /* STM32F10X_CL */
       }
     }
     /*SET FEATURE for Device*/
@@ -683,6 +710,7 @@ void Data_Setup0(void)
   CopyRoutine = NULL;
   wOffset = 0;
 
+  /*GET DESCRIPTOR*/
   if (Request_No == GET_DESCRIPTOR)
   {
     if (Type_Recipient == (STANDARD_REQUEST | DEVICE_RECIPIENT))
@@ -810,7 +838,7 @@ void Data_Setup0(void)
     /* Device ==> Host */
     __IO uint32_t wLength = pInformation->USBwLength;
      
-    /* Restrict the data length to be the one host asks */
+    /* Restrict the data length to be the one host asks for */
     if (pInformation->Ctrl_Info.Usb_wLength > wLength)
     {
       pInformation->Ctrl_Info.Usb_wLength = wLength;
@@ -856,17 +884,29 @@ uint8_t Setup0_Process(void)
     uint16_t* w;
   } pBuf;
 
+#ifdef STM32F10X_CL
+  USB_OTG_EP *ep;
+  uint16_t offset = 0;
+ 
+  ep = OTGD_FS_PCD_GetOutEP(ENDP0);
+  pBuf.b = ep->xfer_buff;
+  
+  OTGD_FS_EP0StartXfer(ep);
+#else  
+  uint16_t offset = 1;
+  
   pBuf.b = PMAAddr + (uint8_t *)(_GetEPRxAddr(ENDP0) * 2); /* *2 for 32 bits addr */
+#endif /* STM32F10X_CL */
 
   if (pInformation->ControlState != PAUSE)
   {
     pInformation->USBbmRequestType = *pBuf.b++; /* bmRequestType */
     pInformation->USBbRequest = *pBuf.b++; /* bRequest */
-    pBuf.w++;  /* word not accessed because of 32 bits addressing */
+    pBuf.w += offset;  /* word not accessed because of 32 bits addressing */
     pInformation->USBwValue = ByteSwap(*pBuf.w++); /* wValue */
-    pBuf.w++;  /* word not accessed because of 32 bits addressing */
+    pBuf.w += offset;  /* word not accessed because of 32 bits addressing */
     pInformation->USBwIndex  = ByteSwap(*pBuf.w++); /* wIndex */
-    pBuf.w++;  /* word not accessed because of 32 bits addressing */
+    pBuf.w += offset;  /* word not accessed because of 32 bits addressing */
     pInformation->USBwLength = *pBuf.w; /* wLength */
   }
 
@@ -935,7 +975,12 @@ uint8_t Out0_Process(void)
 {
   uint32_t ControlState = pInformation->ControlState;
 
-  if ((ControlState == OUT_DATA) || (ControlState == LAST_OUT_DATA))
+  if ((ControlState == IN_DATA) || (ControlState == LAST_IN_DATA))
+  {
+    /* host aborts the transfer before finish */
+    ControlState = STALLED;
+  }
+  else if ((ControlState == OUT_DATA) || (ControlState == LAST_OUT_DATA))
   {
     DataStageOut();
     ControlState = pInformation->ControlState; /* may be changed outside the function */
@@ -944,14 +989,11 @@ uint8_t Out0_Process(void)
   else if (ControlState == WAIT_STATUS_OUT)
   {
     (*pProperty->Process_Status_OUT)();
+  #ifndef STM32F10X_CL
     ControlState = STALLED;
+  #endif /* STM32F10X_CL */
   }
 
-  else if ((ControlState == IN_DATA) || (ControlState == LAST_IN_DATA))
-  {
-    /* host aborts the transfer before finish */
-    ControlState = STALLED;
-  }
 
   /* Unexpect state, STALL the endpoint */
   else
@@ -974,8 +1016,11 @@ uint8_t Out0_Process(void)
 *******************************************************************************/
 uint8_t Post0_Process(void)
 {
-  //  SetEPRxCount(ENDP0, Device_Property.MaxPacketSize);
-// TK: we should reference to MaxPacketSize() via pointer!
+#ifdef STM32F10X_CL  
+  USB_OTG_EP *ep;
+#endif /* STM32F10X_CL */
+      
+  //SetEPRxCount(ENDP0, Device_Property.MaxPacketSize);
   SetEPRxCount(ENDP0, pProperty->MaxPacketSize);
 
   if (pInformation->ControlState == STALLED)
@@ -983,6 +1028,26 @@ uint8_t Post0_Process(void)
     vSetEPRxStatus(EP_RX_STALL);
     vSetEPTxStatus(EP_TX_STALL);
   }
+
+#ifdef STM32F10X_CL
+  else if ((pInformation->ControlState == OUT_DATA) ||
+      (pInformation->ControlState == WAIT_STATUS_OUT))
+  {
+    ep = OTGD_FS_PCD_GetInEP(0);
+    ep->is_in = 0;
+    OTGD_FS_EP0StartXfer(ep);
+    
+    vSetEPTxStatus(EP_TX_VALID);
+  }
+  
+  else if ((pInformation->ControlState == IN_DATA) || 
+      (pInformation->ControlState == WAIT_STATUS_IN))
+  {
+    ep = OTGD_FS_PCD_GetInEP(0);
+    ep->is_in = 1;
+    OTGD_FS_EP0StartXfer(ep);    
+  }  
+#endif /* STM32F10X_CL */
 
   return (pInformation->ControlState == PAUSE);
 }
@@ -996,6 +1061,9 @@ uint8_t Post0_Process(void)
 *******************************************************************************/
 void SetDeviceAddress(uint8_t Val)
 {
+#ifdef STM32F10X_CL 
+  OTGD_FS_PCD_EP_SetAddress ((uint8_t)Val);
+#else 
   uint32_t i;
   uint32_t nEP = Device_Table.Total_Endpoint;
 
@@ -1005,6 +1073,7 @@ void SetDeviceAddress(uint8_t Val)
     _SetEPAddress((uint8_t)i, (uint8_t)i);
   } /* for */
   _SetDADDR(Val | DADDR_EF); /* set device address and enable function */
+#endif  /* STM32F10X_CL */  
 }
 
 /*******************************************************************************

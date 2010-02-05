@@ -44,6 +44,7 @@ static uint8_t sdcard_available;
 
 /* Function Prototypes */
 static void TaskTick(void *pvParameters);
+static void TaskHIDTest(void *pvParameters);
 static void TaskServos(void *pvParameters);
 static void TaskHooks(void *pvParameters);
 static void TaskSDCard(void *pvParameters);
@@ -60,6 +61,8 @@ int main()
 
 	/* Delay system */
 	PIOS_DELAY_Init();
+
+
 
 	/* SPI Init */
 	PIOS_SPI_Init();
@@ -101,34 +104,14 @@ int main()
 
 	PIOS_USB_Init(0);
 
-	__IO uint8_t Send_Buffer[2];
-	uint8_t count = 0;
-
-	for(;;)
-	{
-		/* Report ID */
-		Send_Buffer[0] = 0x07;
-
-		/* Report Data */
-		Send_Buffer[1] = count;
-		USB_SIL_Write(EP1_IN, (uint8_t*) Send_Buffer, 2);
-
-		if(count >= 255) {
-			count = 0;
-		} else {
-			count++;
-		}
-
-		PIOS_DELAY_WaitmS(50);
-	}
-
-	//PIOS_COM_ReceiveCallbackInit(CONSOLE_Parse);
+	PIOS_COM_ReceiveCallbackInit(CONSOLE_Parse);
 
 	/* Initialise OpenPilot application */
 //	OpenPilotInit();
 
 	/* Create a FreeRTOS task */
 	xTaskCreate(TaskTick, (signed portCHAR *)"Test", configMINIMAL_STACK_SIZE , NULL, 1, NULL);
+	xTaskCreate(TaskHIDTest, (signed portCHAR *)"HIDTest", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
 	//xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
 	//xTaskCreate(TaskHooks, (signed portCHAR *)"Hooks", configMINIMAL_STACK_SIZE, NULL, PRIORITY_TASK_HOOKS, NULL);
 	//xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
@@ -184,6 +167,35 @@ static void TaskTick(void *pvParameters)
 	{
 		PIOS_LED_Toggle(LED1);
 		vTaskDelayUntil(&xLastExecutionTime, 500 / portTICK_RATE_MS);
+	}
+}
+
+static void TaskHIDTest(void *pvParameters)
+{
+	portTickType xDelay = 250 / portTICK_RATE_MS;;
+
+	__IO uint8_t Send_Buffer[2];
+	uint8_t count = 0;
+
+	for(;;)
+	{
+		/* Report ID */
+		Send_Buffer[0] = 0x07;
+
+		/* Report Data */
+		Send_Buffer[1] = count;
+
+		/* Write the data to the pipe */
+		USB_SIL_Write(EP1_IN, (uint8_t*) Send_Buffer, 2);
+		SetEPTxValid(ENDP1);
+
+		if(count >= 255) {
+			count = 0;
+		} else {
+			count++;
+		}
+
+		vTaskDelay(xDelay);
 	}
 }
 

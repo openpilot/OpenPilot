@@ -42,7 +42,8 @@
 
 /* ISTR events */
 /* mask defining which events has to be handled by the device application software */
-#define IMR_MSK (CNTR_CTRM  | CNTR_WKUPM | CNTR_SUSPM | CNTR_ERRM  | CNTR_SOFM | CNTR_ESOFM | CNTR_RESETM)
+/* Unused; #define IMR_MSK (CNTR_CTRM  | CNTR_WKUPM | CNTR_SUSPM | CNTR_ERRM  | CNTR_SOFM | CNTR_ESOFM | CNTR_RESETM) */
+#define IMR_MSK (CNTR_RESETM | CNTR_SOFM | CNTR_CTRM)
 
 /* Local types */
 typedef enum _DEVICE_STATE {
@@ -220,6 +221,7 @@ static const USER_STANDARD_REQUESTS My_User_Standard_Requests = {
 static DEVICE_INFO My_Device_Info;
 /* USB device status */
 static volatile uint32_t bDeviceState = UNCONNECTED;
+__IO uint8_t bIntPackSOF = 0;
 
 /**
 * Initialises USB interface

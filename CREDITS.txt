@@ -14,27 +14,32 @@ Description of work (D)
 
 
 N: David Ankers
-E: david (at) openpilot dot org
+E: david (at) openpilot (dot) org
 D: Co-founder 
 D: GCS infrastruture, adaptation of plugin system for the GCS 
 D: Random embedded hacker
+
+N: Frederic Goddeeris
+E: fredericgoddeeris (at) hotmail (dot) com
+D: I2C work and FreeRTOS work. 
 
 N: Thorsten Klose
 E: thorsten.klose (at) dmx.de
 D: Embedded STM32 infrastructure  
 
 N: Angus Peart
-E: gussy (at) openpilot dot org
+E: gussy (at) openpilot (dot) org
 D: Co-founder 
 D: Hardware design of OpenPilot, AHRS, GPS and other hardware
 D: Core developer embedded code
 
 N: Vassilis Varveropoulos
-E: vassilis (at) openpilot dot org
+E: vassilis (at) openpilot (dot) org
 D: Co-founder
 D: Architeture and UAVTalk Implimentation
 
 N: Zik Saleeba
-E: zik (at) zikzak.net
+E: zik (at) zikzak (dot) net
 D: Initial schematic based on Zik's Flying Fox schematic     
 
+ 

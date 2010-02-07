@@ -47,7 +47,7 @@ static uint8_t *PIOS_USB_HID_GetHIDDescriptor(uint16_t Length);
 static uint8_t *PIOS_USB_HID_GetReportDescriptor(uint16_t Length);
 static uint8_t *PIOS_USB_HID_GetProtocolValue(uint16_t Length);
 
-const uint8_t PIOS_USB_HID_ReportDescriptor[PIOS_USB_HID_SIZ_REPORT_DESC] = {
+static const uint8_t PIOS_USB_HID_ReportDescriptor[PIOS_USB_HID_SIZ_REPORT_DESC] = {
 		0x05, 0x8c, /* USAGE_PAGE (ST Page)           */
 		0x09, 0x01, /* USAGE (Demo Kit)               */
 		0xa1, 0x01, /* COLLECTION (Application)       */
@@ -178,8 +178,8 @@ const uint8_t PIOS_USB_HID_ReportDescriptor[PIOS_USB_HID_SIZ_REPORT_DESC] = {
 		0xc0 /* END_COLLECTION */
 		/*67*/
 		};
-ONE_DESCRIPTOR PIOS_USB_HID_Report_Descriptor = {(uint8_t *) PIOS_USB_HID_ReportDescriptor, PIOS_USB_HID_SIZ_REPORT_DESC};
-ONE_DESCRIPTOR PIOS_USB_HID_Hid_Descriptor = {(uint8_t*) PIOS_USB_HID_ReportDescriptor + PIOS_USB_HID_OFF_HID_DESC, PIOS_USB_HID_SIZ_HID_DESC};
+static ONE_DESCRIPTOR PIOS_USB_HID_Report_Descriptor = {(uint8_t *) PIOS_USB_HID_ReportDescriptor, PIOS_USB_HID_SIZ_REPORT_DESC};
+static ONE_DESCRIPTOR PIOS_USB_HID_Hid_Descriptor = {(uint8_t*) PIOS_USB_HID_ReportDescriptor + PIOS_USB_HID_OFF_HID_DESC, PIOS_USB_HID_SIZ_HID_DESC};
 
 /**
 * This function is called by the USB driver on cable connection/disconnection

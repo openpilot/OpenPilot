@@ -15,7 +15,7 @@ Description of work (D)
 
 N: David Ankers
 E: david (at) openpilot (dot) org
-D: Co-founder 
+D: Co-founder, Principal ground software architect.  
 D: GCS infrastruture, adaptation of plugin system for the GCS 
 D: Random embedded hacker
 
@@ -29,13 +29,13 @@ D: Embedded STM32 infrastructure
 
 N: Angus Peart
 E: gussy (at) openpilot (dot) org
-D: Co-founder 
+D: Co-founder, Principal hardware architect.  
 D: Hardware design of OpenPilot, AHRS, GPS and other hardware
 D: Core developer embedded code
 
 N: Vassilis Varveropoulos
 E: vassilis (at) openpilot (dot) org
-D: Co-founder
+D: Co-founder, Principal embedded software architect. 
 D: Architeture and UAVTalk Implimentation
 
 N: Zik Saleeba

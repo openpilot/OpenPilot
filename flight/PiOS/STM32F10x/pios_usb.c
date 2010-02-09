@@ -161,7 +161,7 @@ static const uint8_t PIOS_USB_ConfigDescriptor[PIOS_USB_SIZ_CONFIG_DESC] = {
 		0x81, /* bEndpointAddress: Endpoint Address (IN) */
 		0x03, /* bmAttributes: Interrupt endpoint */
 		64,//0x02, /* wMaxPacketSize: 2 Bytes max */
-		0x00, 0x20, /* bInterval: Polling Interval (32 ms) */
+		0x00, 2,//0x20, /* bInterval: Polling Interval (2 ms) */
 		/* 34 */
 
 		0x07, /* bLength: Endpoint Descriptor size */
@@ -171,7 +171,7 @@ static const uint8_t PIOS_USB_ConfigDescriptor[PIOS_USB_SIZ_CONFIG_DESC] = {
 		/*	Endpoint Address (OUT) */
 		0x03, /* bmAttributes: Interrupt endpoint */
 		64,//0x02, /* wMaxPacketSize: 2 Bytes max  */
-		0x00, 0x20, /* bInterval: Polling Interval (20 ms) */
+		0x00, 8,//0x20, /* bInterval: Polling Interval (8 ms) */
 		/* 41 */
 	};
 
@@ -255,15 +255,14 @@ int32_t PIOS_USB_Init(uint32_t mode)
 	if(mode != 2) {
 		/* Note: usually no need to duplicate this for external drivers */
 		pInformation = &My_Device_Info;
+		pInformation->Ctrl_Info.Usb_wLength = 64; /* TODO: Is this required? */
 
 		/* Following hooks/pointers should be replaced by external drivers */
 		memcpy(&Device_Table, (DEVICE *) &My_Device_Table, sizeof(Device_Table));
 		pProperty = (DEVICE_PROP *) &My_Device_Property;
 		pUser_Standard_Requests = (USER_STANDARD_REQUESTS *) &My_User_Standard_Requests;
 
-		#ifndef DISABLE_HID
 		pEpInt_OUT[0] = PIOS_USB_HID_EP1_OUT_Callback;
-		#endif
 	}
 
 	PIOS_USB_HID_ChangeConnectionState(0);
@@ -347,8 +346,6 @@ int32_t PIOS_USB_Init(uint32_t mode)
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
-
-	pInformation->Ctrl_Info.Usb_wLength = 64;
 
 	/* No error */
 	return 0;

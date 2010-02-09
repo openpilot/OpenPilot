@@ -7,6 +7,8 @@
  * @brief      USB HID functions
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   PIOS_USB_HID USB HID Functions
+ * @notes      This implements a very simple HID device with a simple data in
+ * and data out endpoints.
  * @{
  *
  *****************************************************************************/
@@ -48,10 +50,12 @@ static uint8_t *PIOS_USB_HID_GetReportDescriptor(uint16_t Length);
 static uint8_t *PIOS_USB_HID_GetProtocolValue(uint16_t Length);
 
 static const uint8_t PIOS_USB_HID_ReportDescriptor[PIOS_USB_HID_SIZ_REPORT_DESC] = {
+#if 0
 		0x05, 0x8c, /* USAGE_PAGE (ST Page)           */
 		0x09, 0x01, /* USAGE (Demo Kit)               */
 		0xa1, 0x01, /* COLLECTION (Application)       */
 		/* 6 */
+#endif
 #if 0
 		/* Led 1 */
 		0x85, 0x01, /*     REPORT_ID (1)		     */
@@ -134,7 +138,7 @@ static const uint8_t PIOS_USB_HID_ReportDescriptor[PIOS_USB_HID_SIZ_REPORT_DESC]
 		0xb1, 0x82, /*     FEATURE (Data,Var,Abs,Vol) */
 		/* 121 */
 #endif
-
+#if 0
 		/* In Control */
 		0x85, 0x06, // Report ID (6)
 		0x95, 0x02, // REPORT_COUNT (2)
@@ -171,12 +175,47 @@ static const uint8_t PIOS_USB_HID_ReportDescriptor[PIOS_USB_HID_SIZ_REPORT_DESC]
 		0x75, 0x08, // REPORT_SIZE (8)
 		0x26, 0xff, 0x00, // LOGICAL_MAXIMUM (255)
 		0x15, 0x00, // LOGICAL_MINIMUM (0)
-		0x09, 0x01, // USAGE (Vendor Usage 1)
+		0x09, 0x02, // USAGE (Vendor Usage 1)
 		0x91, 0x02, // OUTPUT (Data,Var,Abs)
 		/*66*/
+#endif
+#if 0
+		0x75, 0x08, // report size = 8 bits
+		0x15, 0x00, // logical minimum = 0
+		0x26, 0xff, 0x00, // logical maximum = 255
 
-		0xc0 /* END_COLLECTION */
-		/*67*/
+		/* In Data */
+		0x95, 64, // report count (64 bytes)
+		0x09, 0x01, // usage
+		0x81, 0x02, // Input (array)
+
+		/* Out Data */
+		0x95, 64, // report count (64 bytes)
+		0x09, 0x02, // usage
+		0x91, 0x02, // Output (array)
+		/*25*/
+#endif
+
+		0x06, 0x9c, 0xff,     /* Usage Page (Vendor Defined)                     */
+		0x09, 0x01,           /* Usage (Vendor Defined)                          */
+		0xa1, 0x01,           /* Collection (Vendor Defined)                     */
+#if 1
+		0x09, 0x02,           /*   Usage (Vendor Defined)                        */
+		0x75, 0x08,           /*   Report Size (8)                               */
+		0x95, 8,              /*   Report Count (64)                             */
+		0x15, 0x00,           /*   Logical Minimum (0)                           */
+		0x25, 0xff,           /*   Logical Maximum (255)                         */
+		0x81, 0x02,           /*   Input (Data, Variable, Absolute)              */
+
+		0x09, 0x03,           /*   Usage (Vendor Defined)                        */
+		0x75, 0x08,           /*   Report Size (8)                               */
+		0x95, 8,              /*   Report Count (64)                             */
+		0x15, 0x00,           /*   Logical Minimum (0)                           */
+		0x25, 0xff,           /*   Logical Maximum (255)                         */
+		0x91, 0x02,           /*   Output (Data, Variable, Absolute)             */
+		0x81, 0x02,           /*   Input (Data, Variable, Absolute)              */
+#endif
+		0xc0                  /* End Collection                                  */
 		};
 static ONE_DESCRIPTOR PIOS_USB_HID_Report_Descriptor = {(uint8_t *) PIOS_USB_HID_ReportDescriptor, PIOS_USB_HID_SIZ_REPORT_DESC};
 static ONE_DESCRIPTOR PIOS_USB_HID_Hid_Descriptor = {(uint8_t*) PIOS_USB_HID_ReportDescriptor + PIOS_USB_HID_OFF_HID_DESC, PIOS_USB_HID_SIZ_HID_DESC};
@@ -281,19 +320,23 @@ static uint8_t *PIOS_USB_HID_GetProtocolValue(uint16_t Length)
 */
 void PIOS_USB_HID_EP1_OUT_Callback(void)
 {
-	uint8_t Receive_Buffer[2];
-	uint32_t DataLength = 0;
+	const char *buff = "\rACK\r";
+	PIOS_COM_SendBuffer(GPS, (uint8_t *)buff, sizeof(buff));
 
-	/* Read received data (2 bytes) */
-	//USB_SIL_Read(ENDP1, Receive_Buffer);
+	uint8_t Receive_Buffer[64];
+	//uint32_t DataLength = 0;
+
+	/* Read received data (64 bytes) */
+	//USB_SIL_Read(EP1_OUT, Receive_Buffer);
 
 	/* Get the number of received data on the selected Endpoint */
-	DataLength = GetEPRxCount(ENDP1 & 0x7F);
+	//DataLength = GetEPRxCount(ENDP1 & 0x7F);
 
 	/* Use the memory interface function to write to the selected endpoint */
-	PMAToUserBufferCopy((uint8_t *) Receive_Buffer, GetEPRxAddr(ENDP1 & 0x7F), DataLength);
+	//PMAToUserBufferCopy((uint8_t *) Receive_Buffer, GetEPRxAddr(ENDP1 & 0x7F), DataLength);
 
 	/* Do stuff here */
+	//PIOS_COM_SendBuffer(GPS, Receive_Buffer, sizeof(Receive_Buffer));
 
 	SetEPRxStatus(ENDP1, EP_RX_VALID);
 }

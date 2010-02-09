@@ -62,8 +62,6 @@ int main()
 	/* Delay system */
 	PIOS_DELAY_Init();
 
-
-
 	/* SPI Init */
 	PIOS_SPI_Init();
 
@@ -179,12 +177,18 @@ static void TaskHIDTest(void *pvParameters)
 	for(;;)
 	{
 		Send_Buffer[0] = 0x01;
-		Send_Buffer[1] = 't';
-		Send_Buffer[2] = 'e';
-		Send_Buffer[3] = 's';
-		Send_Buffer[4] = 't';
-		Send_Buffer[5] = '!';
-		Send_Buffer[6] = '!';
+		Send_Buffer[1] = 'e';
+		Send_Buffer[2] = 'l';
+		Send_Buffer[3] = 'l';
+		Send_Buffer[4] = 'o';
+		Send_Buffer[5] = ' ';
+		Send_Buffer[6] = 'W';
+		Send_Buffer[7] = 'o';
+		Send_Buffer[8] = 'r';
+		Send_Buffer[9] = 'l';
+		Send_Buffer[10] = 'd';
+		Send_Buffer[11] = '!';
+		Send_Buffer[12] = 0;
 
 		/* Write the data to the pipe */
 		UserToPMABufferCopy((uint8_t*) Send_Buffer, GetEPTxAddr(EP1_IN & 0x7F), 64);

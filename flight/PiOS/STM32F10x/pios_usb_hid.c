@@ -199,22 +199,21 @@ static const uint8_t PIOS_USB_HID_ReportDescriptor[PIOS_USB_HID_SIZ_REPORT_DESC]
 		0x06, 0x9c, 0xff,     /* Usage Page (Vendor Defined)                     */
 		0x09, 0x01,           /* Usage (Vendor Defined)                          */
 		0xa1, 0x01,           /* Collection (Vendor Defined)                     */
-#if 1
+
 		0x09, 0x02,           /*   Usage (Vendor Defined)                        */
 		0x75, 0x08,           /*   Report Size (8)                               */
-		0x95, 8,              /*   Report Count (64)                             */
+		0x95, 64,             /*   Report Count (64)                             */
 		0x15, 0x00,           /*   Logical Minimum (0)                           */
 		0x25, 0xff,           /*   Logical Maximum (255)                         */
 		0x81, 0x02,           /*   Input (Data, Variable, Absolute)              */
 
 		0x09, 0x03,           /*   Usage (Vendor Defined)                        */
 		0x75, 0x08,           /*   Report Size (8)                               */
-		0x95, 8,              /*   Report Count (64)                             */
+		0x95, 64,             /*   Report Count (64)                             */
 		0x15, 0x00,           /*   Logical Minimum (0)                           */
 		0x25, 0xff,           /*   Logical Maximum (255)                         */
 		0x91, 0x02,           /*   Output (Data, Variable, Absolute)             */
-		0x81, 0x02,           /*   Input (Data, Variable, Absolute)              */
-#endif
+
 		0xc0                  /* End Collection                                  */
 		};
 static ONE_DESCRIPTOR PIOS_USB_HID_Report_Descriptor = {(uint8_t *) PIOS_USB_HID_ReportDescriptor, PIOS_USB_HID_SIZ_REPORT_DESC};

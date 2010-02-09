@@ -176,7 +176,7 @@ static void TaskHIDTest(void *pvParameters)
 
 	for(;;)
 	{
-		Send_Buffer[0] = 0x01;
+		Send_Buffer[0] = 'H';
 		Send_Buffer[1] = 'e';
 		Send_Buffer[2] = 'l';
 		Send_Buffer[3] = 'l';

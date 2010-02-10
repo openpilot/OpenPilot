@@ -143,7 +143,6 @@ SRC += $(STMUSBSRCDIR)/usb_init.c
 SRC += $(STMUSBSRCDIR)/usb_int.c
 SRC += $(STMUSBSRCDIR)/usb_mem.c
 SRC += $(STMUSBSRCDIR)/usb_regs.c
-SRC += $(STMUSBSRCDIR)/usb_sil.c
 
 ## RTOS
 SRC += $(RTOSSRCDIR)/list.c 

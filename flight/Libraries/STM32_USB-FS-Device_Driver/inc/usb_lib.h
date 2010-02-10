@@ -29,8 +29,6 @@
  #include "usb_int.h"
 #endif /* STM32F10X_CL */
 
-#include "usb_sil.h"
-
 #ifdef STM32F10X_CL
  #include "otgd_fs_cal.h"
  #include "otgd_fs_pcd.h"

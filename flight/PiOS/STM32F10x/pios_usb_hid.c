@@ -42,7 +42,7 @@ typedef enum _HID_REQUESTS {
 } HID_REQUESTS;
 
 /* Local Variables */
-uint32_t ProtocolValue;
+static uint32_t ProtocolValue;
 
 /* Local Functions */
 static uint8_t *PIOS_USB_HID_GetHIDDescriptor(uint16_t Length);
@@ -50,174 +50,52 @@ static uint8_t *PIOS_USB_HID_GetReportDescriptor(uint16_t Length);
 static uint8_t *PIOS_USB_HID_GetProtocolValue(uint16_t Length);
 
 static const uint8_t PIOS_USB_HID_ReportDescriptor[PIOS_USB_HID_SIZ_REPORT_DESC] = {
-#if 0
-		0x05, 0x8c, /* USAGE_PAGE (ST Page)           */
-		0x09, 0x01, /* USAGE (Demo Kit)               */
-		0xa1, 0x01, /* COLLECTION (Application)       */
-		/* 6 */
-#endif
-#if 0
-		/* Led 1 */
-		0x85, 0x01, /*     REPORT_ID (1)		     */
-		0x09, 0x01, /*     USAGE (LED 1)	             */
-		0x15, 0x00, /*     LOGICAL_MINIMUM (0)        */
-		0x25, 0x01, /*     LOGICAL_MAXIMUM (1)        */
-		0x75, 0x08, /*     REPORT_SIZE (8)            */
-		0x95, 0x01, /*     REPORT_COUNT (1)           */
-		0xB1, 0x82, /*    FEATURE (Data,Var,Abs,Vol) */
+		0x06, 0x9c, 0xff,			/* Usage Page (Vendor Defined)                     */
+		0x09, 0x01,				/* Usage (Vendor Defined)                          */
+		0xa1, 0x01,				/* Collection (Vendor Defined)                     */
 
-		0x85, 0x01, /*     REPORT_ID (1)              */
-		0x09, 0x01, /*     USAGE (LED 1)              */
-		0x91, 0x82, /*     OUTPUT (Data,Var,Abs,Vol)  */
-		/* 26 */
+		0x09, 0x02,				/*   Usage (Vendor Defined)                        */
+		0x75, 0x08,				/*   Report Size (8)                               */
+		0x95, (PIOS_USB_HID_DATA_LENGTH),	/*   Report Count (64)                             */
+		0x15, 0x00,				/*   Logical Minimum (0)                           */
+		0x25, 0xff,				/*   Logical Maximum (255)                         */
+		0x81, 0x02,				/*   Input (Data, Variable, Absolute)              */
 
-		/* Led 2 */
-		0x85, 0x02, /*     REPORT_ID 2		     */
-		0x09, 0x02, /*     USAGE (LED 2)	             */
-		0x15, 0x00, /*     LOGICAL_MINIMUM (0)        */
-		0x25, 0x01, /*     LOGICAL_MAXIMUM (1)        */
-		0x75, 0x08, /*     REPORT_SIZE (8)            */
-		0x95, 0x01, /*     REPORT_COUNT (1)           */
-		0xB1, 0x82, /*    FEATURE (Data,Var,Abs,Vol) */
+		0x09, 0x03,				/*   Usage (Vendor Defined)                        */
+		0x75, 0x08,				/*   Report Size (8)                               */
+		0x95, (PIOS_USB_HID_DATA_LENGTH),	/*   Report Count (64)                             */
+		0x15, 0x00,				/*   Logical Minimum (0)                           */
+		0x25, 0xff,				/*   Logical Maximum (255)                         */
+		0x91, 0x02,				/*   Output (Data, Variable, Absolute)             */
 
-		0x85, 0x02, /*     REPORT_ID (2)              */
-		0x09, 0x02, /*     USAGE (LED 2)              */
-		0x91, 0x82, /*     OUTPUT (Data,Var,Abs,Vol)  */
-		/* 46 */
-
-		/* key Push Button */
-		0x85, 0x05, /*     REPORT_ID (5)              */
-		0x09, 0x05, /*     USAGE (Push Button)        */
-		0x15, 0x00, /*     LOGICAL_MINIMUM (0)        */
-		0x25, 0x01, /*     LOGICAL_MAXIMUM (1)        */
-		0x75, 0x01, /*     REPORT_SIZE (1)            */
-		0x81, 0x82, /*     INPUT (Data,Var,Abs,Vol)   */
-
-		0x09, 0x05, /*     USAGE (Push Button)        */
-		0x75, 0x01, /*     REPORT_SIZE (1)            */
-		0xb1, 0x82, /*     FEATURE (Data,Var,Abs,Vol) */
-
-		0x75, 0x07, /*     REPORT_SIZE (7)            */
-		0x81, 0x83, /*     INPUT (Cnst,Var,Abs,Vol)   */
-		0x85, 0x05, /*     REPORT_ID (2)              */
-
-		0x75, 0x07, /*     REPORT_SIZE (7)            */
-		0xb1, 0x83, /*     FEATURE (Cnst,Var,Abs,Vol) */
-		/* 74 */
-
-		/* Tamper Push Button */
-		0x85, 0x06, /*     REPORT_ID (6)              */
-		0x09, 0x06, /*     USAGE (Tamper Push Button) */
-		0x15, 0x00, /*     LOGICAL_MINIMUM (0)        */
-		0x25, 0x01, /*     LOGICAL_MAXIMUM (1)        */
-		0x75, 0x01, /*     REPORT_SIZE (1)            */
-		0x81, 0x82, /*     INPUT (Data,Var,Abs,Vol)   */
-
-		0x09, 0x06, /*     USAGE (Tamper Push Button) */
-		0x75, 0x01, /*     REPORT_SIZE (1)            */
-		0xb1, 0x82, /*     FEATURE (Data,Var,Abs,Vol) */
-
-		0x75, 0x07, /*     REPORT_SIZE (7)            */
-		0x81, 0x83, /*     INPUT (Cnst,Var,Abs,Vol)   */
-		0x85, 0x06, /*     REPORT_ID (6)              */
-
-		0x75, 0x07, /*     REPORT_SIZE (7)            */
-		0xb1, 0x83, /*     FEATURE (Cnst,Var,Abs,Vol) */
-		/* 102 */
-
-		/* ADC IN */
-		0x85, 0x07, /*     REPORT_ID (7)              */
-		0x09, 0x07, /*     USAGE (ADC IN)             */
-		0x15, 0x00, /*     LOGICAL_MINIMUM (0)        */
-		0x26, 0xff, 0x00, /*     LOGICAL_MAXIMUM (255)      */
-		0x75, 0x08, /*     REPORT_SIZE (8)            */
-		0x81, 0x82, /*     INPUT (Data,Var,Abs,Vol)   */
-
-		0x85, 0x07, /*     REPORT_ID (7)              */
-		0x09, 0x07, /*     USAGE (ADC in)             */
-		0xb1, 0x82, /*     FEATURE (Data,Var,Abs,Vol) */
-		/* 121 */
-#endif
-#if 0
-		/* In Control */
-		0x85, 0x06, // Report ID (6)
-		0x95, 0x02, // REPORT_COUNT (2)
-		0x75, 0x08, // REPORT_SIZE (8)
-		0x26, 0xff, 0x00, // LOGICAL_MAXIMUM (255)
-		0x15, 0x00, // LOGICAL_MINIMUM (0)
-		0x09, 0x01, // USAGE (Vendor Usage 1)
-		0x81, 0x02, // INPUT (Data,Var,Abs)
-		/*21*/
-
-		/* Out Control */
-		0x85, 0x07, // Report ID (7)
-		0x95, 0x02, // REPORT_COUNT (2)
-		0x75, 0x08, // REPORT_SIZE (8)
-		0x26, 0xff, 0x00, // LOGICAL_MAXIMUM (255)
-		0x15, 0x00, // LOGICAL_MINIMUM (0)
-		0x09, 0x01, // USAGE (Vendor Usage 1)
-		0x91, 0x02, // OUTPUT (Data,Var,Abs)
-		/*36*/
-
-		/* In Data */
-		0x85, 0x01, // Report ID (1)
-		0x95, 0x40, // REPORT_COUNT (64)
-		0x75, 0x08, // REPORT_SIZE (8)
-		0x26, 0xff, 0x00, // LOGICAL_MAXIMUM (255)
-		0x15, 0x00, // LOGICAL_MINIMUM (0)
-		0x09, 0x01, // USAGE (Vendor Usage 1)
-		0x81, 0x02, // INPUT (Data,Var,Abs)
-		/*51*/
-
-		/* Out Data */
-		0x85, 0x02, // Report ID (2)
-		0x95, 0x40, // REPORT_COUNT (64)
-		0x75, 0x08, // REPORT_SIZE (8)
-		0x26, 0xff, 0x00, // LOGICAL_MAXIMUM (255)
-		0x15, 0x00, // LOGICAL_MINIMUM (0)
-		0x09, 0x02, // USAGE (Vendor Usage 1)
-		0x91, 0x02, // OUTPUT (Data,Var,Abs)
-		/*66*/
-#endif
-#if 0
-		0x75, 0x08, // report size = 8 bits
-		0x15, 0x00, // logical minimum = 0
-		0x26, 0xff, 0x00, // logical maximum = 255
-
-		/* In Data */
-		0x95, 64, // report count (64 bytes)
-		0x09, 0x01, // usage
-		0x81, 0x02, // Input (array)
-
-		/* Out Data */
-		0x95, 64, // report count (64 bytes)
-		0x09, 0x02, // usage
-		0x91, 0x02, // Output (array)
-		/*25*/
-#endif
-
-		0x06, 0x9c, 0xff,     /* Usage Page (Vendor Defined)                     */
-		0x09, 0x01,           /* Usage (Vendor Defined)                          */
-		0xa1, 0x01,           /* Collection (Vendor Defined)                     */
-
-		0x09, 0x02,           /*   Usage (Vendor Defined)                        */
-		0x75, 0x08,           /*   Report Size (8)                               */
-		0x95, 64,             /*   Report Count (64)                             */
-		0x15, 0x00,           /*   Logical Minimum (0)                           */
-		0x25, 0xff,           /*   Logical Maximum (255)                         */
-		0x81, 0x02,           /*   Input (Data, Variable, Absolute)              */
-
-		0x09, 0x03,           /*   Usage (Vendor Defined)                        */
-		0x75, 0x08,           /*   Report Size (8)                               */
-		0x95, 64,             /*   Report Count (64)                             */
-		0x15, 0x00,           /*   Logical Minimum (0)                           */
-		0x25, 0xff,           /*   Logical Maximum (255)                         */
-		0x91, 0x02,           /*   Output (Data, Variable, Absolute)             */
-
-		0xc0                  /* End Collection                                  */
+		0xc0					/* End Collection                                  */
 		};
 static ONE_DESCRIPTOR PIOS_USB_HID_Report_Descriptor = {(uint8_t *) PIOS_USB_HID_ReportDescriptor, PIOS_USB_HID_SIZ_REPORT_DESC};
 static ONE_DESCRIPTOR PIOS_USB_HID_Hid_Descriptor = {(uint8_t*) PIOS_USB_HID_ReportDescriptor + PIOS_USB_HID_OFF_HID_DESC, PIOS_USB_HID_SIZ_HID_DESC};
+
+/* Rx/Tx status */
+static volatile uint8_t rx_buffer_new_data_ctr = 0;
+static volatile uint8_t rx_buffer_ix;
+static uint8_t transfer_possible = 0;
+
+static uint8_t rx_buffer[PIOS_USB_HID_DATA_LENGTH];
+
+/**
+* Initialises USB COM layer
+* \param[in] mode currently only mode 0 supported
+* \return < 0 if initialisation failed
+* \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
+*/
+int32_t PIOS_USB_HID_Init(uint32_t mode)
+{
+	/* Currently only mode 0 supported */
+	if(mode != 0) {
+		/* Unsupported mode */
+		return -1;
+	}
+
+	return 0; /* No error */
+}
 
 /**
 * This function is called by the USB driver on cable connection/disconnection
@@ -225,9 +103,119 @@ static ONE_DESCRIPTOR PIOS_USB_HID_Hid_Descriptor = {(uint8_t*) PIOS_USB_HID_Rep
 * \return < 0 on errors
 * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
 */
-uint32_t PIOS_USB_HID_ChangeConnectionState(uint32_t Connected)
+int32_t PIOS_USB_HID_ChangeConnectionState(uint32_t Connected)
 {
+	/* In all cases: re-initialise USB HID driver */
+	if(Connected) {
+		transfer_possible = 1;
+		//TODO: Check SetEPRxValid(ENDP1);
+	} else {
+		/* Cable disconnected: disable transfers */
+		transfer_possible = 0;
+	}
 	return 0;
+}
+
+/**
+* This function returns the connection status of the USB COM interface
+* \return 1: interface available
+* \return 0: interface not available
+* \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
+*/
+int32_t PIOS_USB_HID_CheckAvailable(void)
+{
+  return transfer_possible ? 1 : 0;
+}
+
+/**
+* Puts more than one byte onto the transmit buffer (used for atomic sends)
+* \param[in] *buffer pointer to buffer which should be transmitted
+* \param[in] len number of bytes which should be transmitted
+* \return 0 if no error
+* \return -1 if too many bytes to be send
+* \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
+*/
+int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t *buffer, uint16_t len)
+{
+	if(len > PIOS_USB_HID_DATA_LENGTH) {
+		/* Cannot get all requested bytes */
+		return -1;
+	}
+
+	/* Copy bytes to be transmitted into transmit buffer */
+	UserToPMABufferCopy((uint8_t*) buffer, GetEPTxAddr(EP1_IN & 0x7F), (PIOS_USB_HID_DATA_LENGTH + 1));
+	SetEPTxCount(ENDP1, (PIOS_USB_HID_DATA_LENGTH + 1));
+
+	/* Send Buffer */
+	SetEPTxValid(ENDP1);
+
+	/* No error */
+	return 0;
+}
+
+/**
+* Puts more than one byte onto the transmit buffer (used for atomic sends)<br>
+* (Blocking Function)
+* \param[in] *buffer pointer to buffer which should be transmitted
+* \param[in] len number of bytes which should be transmitted
+* \return 0 if no error
+* \return -1 if too many bytes to be send
+* \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
+*/
+int32_t PIOS_USB_HID_TxBufferPutMore(uint8_t *buffer, uint16_t len)
+{
+  int32_t error;
+
+  while((error = PIOS_USB_HID_TxBufferPutMoreNonBlocking(buffer, len)) == -2);
+
+  return error;
+}
+
+/**
+* Gets a byte from the receive buffer
+* \param[in] usb_com USB_COM number (not supported yet, should always be 0)
+* \return -1 if no new byte available
+* \return >= 0: received byte
+* \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
+*/
+int32_t PIOS_USB_HID_RxBufferGet(void)
+{
+	if(!rx_buffer_new_data_ctr) {
+		/* Nothing new in buffer */
+		return -1;
+	}
+
+	/* Get byte - this operation should be atomic! */
+	//PIOS_IRQ_Disable();
+	// TODO: Access buffer directly, so that we don't need to copy into temporary buffer
+	//uint8_t buffer_out[PIOS_USB_HID_DATA_LENGTH];
+	//PMAToUserBufferCopy(buffer_out, GetEPRxAddr(ENDP1 & 0x7F), GetEPRxCount(ENDP1));
+
+	/* This stops returning bytes after the first ocurance of '\0' */
+	/* We don't need to do this but it does optimize things quite a bit */
+	if(rx_buffer[rx_buffer_ix] == 0) {
+		/* TODO: Evaluate if this is really needed */
+		/* Clean the buffer */
+		for(uint8_t i = 0; i < PIOS_USB_HID_DATA_LENGTH; i++) {
+			rx_buffer[i] = 0;
+		}
+
+		rx_buffer_new_data_ctr = 0;
+		rx_buffer_ix = 0;
+		SetEPRxStatus(ENDP1, EP_RX_VALID);
+		return -1;
+	}
+
+	/* There is still data in the buffer */
+	uint8_t b = rx_buffer[rx_buffer_ix++];
+	if(!--rx_buffer_new_data_ctr) {
+		rx_buffer_ix = 0;
+		SetEPRxStatus(ENDP1, EP_RX_VALID);
+	}
+	//PIOS_IRQ_Enable();
+
+	/* Return received byte */
+	return b;
 }
 
 int32_t PIOS_USB_HID_CB_Data_Setup(uint8_t RequestNo)
@@ -236,6 +224,7 @@ int32_t PIOS_USB_HID_CB_Data_Setup(uint8_t RequestNo)
 
 	CopyRoutine = NULL;
 
+	/* GET_DESCRIPTOR */
 	if((RequestNo == GET_DESCRIPTOR) && (Type_Recipient == (STANDARD_REQUEST | INTERFACE_RECIPIENT)) && (pInformation->USBwIndex0 == 0)) {
 
 		if(pInformation->USBwValue1 == PIOS_USB_HID_REPORT_DESCRIPTOR) {
@@ -245,7 +234,6 @@ int32_t PIOS_USB_HID_CB_Data_Setup(uint8_t RequestNo)
 		}
 
 	}
-	/* End of GET_DESCRIPTOR */
 
 	/* GET_PROTOCOL */
 	else if((Type_Recipient == (CLASS_REQUEST | INTERFACE_RECIPIENT)) && RequestNo == GET_PROTOCOL) {
@@ -274,9 +262,6 @@ int32_t PIOS_USB_HID_CB_NoData_Setup(uint8_t RequestNo)
 	else {
 		return USB_UNSUPPORT;
 	}
-
-	// TODO:Unsure
-	return USB_UNSUPPORT;
 }
 
 /**
@@ -319,14 +304,26 @@ static uint8_t *PIOS_USB_HID_GetProtocolValue(uint16_t Length)
 */
 void PIOS_USB_HID_EP1_OUT_Callback(void)
 {
-	const char *buff = "\rACK\r";
-	PIOS_COM_SendBuffer(GPS, (uint8_t *)buff, sizeof(buff));
+#if 1
+	uint32_t DataLength = 0;
 
-	uint8_t Receive_Buffer[64];
+	/* Get the number of received data on the selected Endpoint */
+	DataLength = GetEPRxCount(ENDP1 & 0x7F);
+
+	/* Use the memory interface function to write to the selected endpoint */
+	PMAToUserBufferCopy((uint8_t *) rx_buffer, GetEPRxAddr(ENDP1 & 0x7F), DataLength);
+
+	/* We now have data waiting */
+	rx_buffer_new_data_ctr = PIOS_USB_HID_DATA_LENGTH;
+
+#else
+	// FOR DEBUGGING USE ONLY
+
+	uint8_t Receive_Buffer[PIOS_USB_HID_DATA_LENGTH];
 	//uint32_t DataLength = 0;
 
-	/* Read received data (64 bytes) */
-	//USB_SIL_Read(EP1_OUT, Receive_Buffer);
+	/* Read received data (63 bytes) */
+	USB_SIL_Read(EP1_OUT, Receive_Buffer);
 
 	/* Get the number of received data on the selected Endpoint */
 	//DataLength = GetEPRxCount(ENDP1 & 0x7F);
@@ -334,9 +331,11 @@ void PIOS_USB_HID_EP1_OUT_Callback(void)
 	/* Use the memory interface function to write to the selected endpoint */
 	//PMAToUserBufferCopy((uint8_t *) Receive_Buffer, GetEPRxAddr(ENDP1 & 0x7F), DataLength);
 
-	/* Do stuff here */
-	//PIOS_COM_SendBuffer(GPS, Receive_Buffer, sizeof(Receive_Buffer));
+	/* Send it back */
+	PIOS_COM_SendBuffer(GPS, Receive_Buffer, sizeof(Receive_Buffer));
+	PIOS_COM_SendBuffer(GPS, "\r", 1);
 
 	SetEPRxStatus(ENDP1, EP_RX_VALID);
+#endif
 }
 

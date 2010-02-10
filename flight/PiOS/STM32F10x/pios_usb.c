@@ -28,7 +28,7 @@
 
 /* Project Includes */
 #include "pios.h"
-#include <string.h>
+//#include <string.h>
 
 
 /* Local definitions */
@@ -42,7 +42,6 @@
 
 /* ISTR events */
 /* mask defining which events has to be handled by the device application software */
-/* Unused; #define IMR_MSK (CNTR_CTRM  | CNTR_WKUPM | CNTR_SUSPM | CNTR_ERRM  | CNTR_SOFM | CNTR_ESOFM | CNTR_RESETM) */
 #define IMR_MSK (CNTR_RESETM | CNTR_SOFM | CNTR_CTRM)
 
 /* Local types */
@@ -160,7 +159,7 @@ static const uint8_t PIOS_USB_ConfigDescriptor[PIOS_USB_SIZ_CONFIG_DESC] = {
 
 		0x81, /* bEndpointAddress: Endpoint Address (IN) */
 		0x03, /* bmAttributes: Interrupt endpoint */
-		64,//0x02, /* wMaxPacketSize: 2 Bytes max */
+		(PIOS_USB_HID_DATA_LENGTH + 1), /* wMaxPacketSize: 2 Bytes max */
 		0x00, 2,//0x20, /* bInterval: Polling Interval (2 ms) */
 		/* 34 */
 
@@ -170,7 +169,7 @@ static const uint8_t PIOS_USB_ConfigDescriptor[PIOS_USB_SIZ_CONFIG_DESC] = {
 		0x01, /* bEndpointAddress: */
 		/*	Endpoint Address (OUT) */
 		0x03, /* bmAttributes: Interrupt endpoint */
-		64,//0x02, /* wMaxPacketSize: 2 Bytes max  */
+		(PIOS_USB_HID_DATA_LENGTH + 1), /* wMaxPacketSize: 2 Bytes max  */
 		0x00, 8,//0x20, /* bInterval: Polling Interval (8 ms) */
 		/* 41 */
 	};
@@ -255,7 +254,7 @@ int32_t PIOS_USB_Init(uint32_t mode)
 	if(mode != 2) {
 		/* Note: usually no need to duplicate this for external drivers */
 		pInformation = &My_Device_Info;
-		pInformation->Ctrl_Info.Usb_wLength = 64; /* TODO: Is this required? */
+		pInformation->Ctrl_Info.Usb_wLength = (PIOS_USB_HID_DATA_LENGTH + 1); /* TODO: Is this required? */
 
 		/* Following hooks/pointers should be replaced by external drivers */
 		memcpy(&Device_Table, (DEVICE *) &My_Device_Table, sizeof(Device_Table));
@@ -417,19 +416,17 @@ static void PIOS_USB_CB_Reset(void)
 	SetEPRxCount(ENDP0, pProperty->MaxPacketSize);
 	SetEPRxValid(ENDP0);
 
-	#ifndef DISABLE_HID
 	/* Initialise Endpoint 1 */
 	SetEPType(ENDP1, EP_INTERRUPT);
 	SetEPTxAddr(ENDP1, PIOS_USB_ENDP1_TXADDR);
 	SetEPRxAddr(ENDP1, PIOS_USB_ENDP1_RXADDR);
-	SetEPTxCount(ENDP1, 2);
-	SetEPRxCount(ENDP1, 2);
+	SetEPTxCount(ENDP1, (PIOS_USB_HID_DATA_LENGTH + 1));
+	SetEPRxCount(ENDP1, (PIOS_USB_HID_DATA_LENGTH + 1));
 	SetEPTxStatus(ENDP1, EP_TX_NAK);
 	SetEPRxStatus(ENDP1, EP_RX_VALID);
 
 	/* Propagate connection state to USB HID driver */
 	PIOS_USB_HID_ChangeConnectionState(0);
-	#endif
 
 	/* Set this device to response on default address */
 	SetDeviceAddress(0);

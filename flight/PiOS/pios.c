@@ -109,9 +109,9 @@ int main()
 
 	/* Create a FreeRTOS task */
 	xTaskCreate(TaskTick, (signed portCHAR *)"Test", configMINIMAL_STACK_SIZE , NULL, 1, NULL);
-	xTaskCreate(TaskHIDTest, (signed portCHAR *)"HIDTest", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
+	//xTaskCreate(TaskHIDTest, (signed portCHAR *)"HIDTest", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
 	//xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
-	//xTaskCreate(TaskHooks, (signed portCHAR *)"Hooks", configMINIMAL_STACK_SIZE, NULL, PRIORITY_TASK_HOOKS, NULL);
+	xTaskCreate(TaskHooks, (signed portCHAR *)"Hooks", configMINIMAL_STACK_SIZE, NULL, PRIORITY_TASK_HOOKS, NULL);
 	//xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
 
 	/* Start the FreeRTOS scheduler */
@@ -124,10 +124,16 @@ int main()
 
 int32_t CONSOLE_Parse(COMPortTypeDef port, char c)
 {
+	if(port == COM_USB_HID) {
+		PIOS_COM_SendChar(COM_DEBUG_UART, c);
+
+		return 0;
+	}
+
 	if(c == '\r') {
 		/* Ignore */
 	} else if(c == '\n') {
-		PIOS_COM_SendFormattedString(GPS, "String: %s\n", line_buffer);
+		PIOS_COM_SendFormattedString(COM_DEBUG_UART, "String: %s\n", line_buffer);
 		line_ix = 0;
 	} else if(line_ix < (STRING_MAX - 1)) {
 		line_buffer[line_ix++] = c;
@@ -170,12 +176,13 @@ static void TaskTick(void *pvParameters)
 
 static void TaskHIDTest(void *pvParameters)
 {
-	portTickType xDelay = 250 / portTICK_RATE_MS;;
+	portTickType xDelay = 1000 / portTICK_RATE_MS;;
 
-	__IO uint8_t Send_Buffer[64];
+	__IO uint8_t Send_Buffer[63];
 
 	for(;;)
 	{
+
 		Send_Buffer[0] = 'H';
 		Send_Buffer[1] = 'e';
 		Send_Buffer[2] = 'l';
@@ -191,10 +198,12 @@ static void TaskHIDTest(void *pvParameters)
 		Send_Buffer[12] = 0;
 
 		/* Write the data to the pipe */
-		UserToPMABufferCopy((uint8_t*) Send_Buffer, GetEPTxAddr(EP1_IN & 0x7F), 64);
-		SetEPTxCount(ENDP1, 64);
+		//UserToPMABufferCopy((uint8_t*) Send_Buffer, GetEPTxAddr(EP1_IN & 0x7F), 64);
+		//SetEPTxCount(ENDP1, 64);
 
-		SetEPTxValid(ENDP1);
+		//SetEPTxValid(ENDP1);
+
+		PIOS_COM_SendBufferNonBlocking(COM_USB_HID, Send_Buffer, 63);
 
 		vTaskDelay(xDelay);
 	}

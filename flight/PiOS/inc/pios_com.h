@@ -27,12 +27,13 @@
 #ifndef PIOS_COM_H
 #define PIOS_COM_H
 
-/* GLobal Types */
+/* Global Types */
 typedef enum {
 	COM_DEBUG_UART = 0,
 	COM_GPS_UART = 1,
 	COM_TELEM_UART = 2,
-	COM_AUX_UART = 3
+	COM_AUX_UART = 3,
+	COM_USB_HID = 4
 } COMPortTypeDef;
 
 /* Public Functions */

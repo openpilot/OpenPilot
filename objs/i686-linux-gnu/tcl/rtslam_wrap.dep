@@ -1,0 +1,4 @@
+/home/jsola/jafar/modules/rtslam/src/tcl/rtslam_wrap.cpp: \
+ /home/jsola/jafar/modules/rtslam/include/rtslam.i \
+ /home/jsola/jafar/swig/jafar.i \
+ /home/jsola/jafar/modules/rtslam/include/rtslamException.i 

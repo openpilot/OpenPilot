@@ -1,0 +1,7 @@
+/home/jsola/jafar/modules/rtslam/src/ruby/rtslam_wrap.cpp: \
+ /home/jsola/jafar/modules/rtslam/include/rtslam.i \
+ /home/jsola/jafar/swig/jafar.i \
+ /home/jsola/jafar/swig/jafarRuby.i \
+ /home/jsola/jafar/modules/rtslam/include/rtslamException.i \
+ /home/jsola/jafar/include/kernel/jafarException.hpp \
+ /home/jsola/jafar/modules/rtslam/include/rtslam/rtslamException.hpp 

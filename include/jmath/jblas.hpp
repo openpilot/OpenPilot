@@ -185,6 +185,8 @@ namespace jblas {
    */
   typedef boost::numeric::ublas::upper upper;
   typedef boost::numeric::ublas::lower lower;
+	
+	typedef boost::numeric::ublas::symmetric_adaptor<const jblas::mat> sym_adapt;
 } // namespace jblas
 
 /*@}*/

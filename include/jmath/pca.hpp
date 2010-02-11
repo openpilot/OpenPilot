@@ -29,7 +29,7 @@ namespace jafar {
 
       /*! Updating method flag
        */
-      typedef enum UFlag {
+      enum UFlag {
 	/*! keep the new basis vector if possible */
         increase, 
 	/*! preserve subspace dimension */

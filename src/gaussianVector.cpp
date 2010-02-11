@@ -49,7 +49,7 @@ double GaussianVector::probabilityDensity(const jblas::vec& v) const
   vec y = v-x;
   double num = exp(-0.5 * inner_prod(y, prod(P_inv, y)));
 
-  double den = pow(2*M_PI,size()/2)*sqrt(ublasExtra::lu_det(w_P));
+  double den = pow(2*M_PI,(double)(size()/2))*sqrt(ublasExtra::lu_det(w_P));
   return num / den;
 }
 

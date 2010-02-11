@@ -7,6 +7,7 @@
 
 #include "jafarConfig.h"
 
+
 #if BOOST_VERSION < 103301 // missing includes in lu.hpp
 #include "boost/numeric/ublas/vector.hpp"
 #include "boost/numeric/ublas/vector_proxy.hpp"
@@ -96,6 +97,14 @@ namespace jafar {
 		    "ublasExtra::normalize: vector too small");
 	v /= n;
       }
+
+		/**
+		Covariance transformation using jacobians (J*P*Jt)
+		*/
+		jblas::sym_mat prod_JPJt(jblas::sym_mat P, jblas::mat J)
+		{
+			return ublas::prod<jblas::sym_mat>(J, ublas::prod<mat>(P, ublas::trans(J)));
+		}
 
       /** jacobian of normalize().
        */
@@ -315,6 +324,10 @@ namespace jafar {
 	}
 
       } // namespace details
+
+		#ifdef THALES_TAROT
+		#undef max
+		#endif
 
       /** Find maximum value of a matrix.
        * \warning it returns a double whatever matrix type...

@@ -1,6 +1,0 @@
- \
- /home/jsola/jafar/modules/rtslam/test_suite/i686-linux-gnu/test_suite_rtslam.lo:  \
- /home/jsola/jafar/modules/rtslam/test_suite/test_suite_rtslam.cpp \
-  /home/jsola/jafar/include/kernel/jafarDebug.hpp \
-  /home/jsola/jafar/include/kernel/jafarMacro.hpp \
-  /home/jsola/jafar/include/kernel/jafarException.hpp

@@ -101,9 +101,9 @@ namespace jafar {
 		/**
 		Covariance transformation using jacobians (J*P*Jt)
 		*/
-		jblas::sym_mat prod_JPJt(jblas::sym_mat P, jblas::mat J)
+		inline jblas::sym_mat prod_JPJt(jblas::sym_mat P, jblas::mat J)
 		{
-			return ublas::prod<jblas::sym_mat>(J, ublas::prod<mat>(P, ublas::trans(J)));
+			return ublas::prod<jblas::sym_mat>(J, ublas::prod<jblas::mat>(P, ublas::trans(J)));
 		}
 
       /** jacobian of normalize().

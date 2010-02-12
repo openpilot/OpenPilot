@@ -71,5 +71,6 @@ extern void (*pEpInt_OUT[7])(void);
 /* Public Functions */
 extern int32_t PIOS_USB_Init(uint32_t mode);
 extern int32_t PIOS_USB_IsInitialized(void);
+extern int32_t PIOS_USB_CableConnected(void);
 
 #endif /* PIOS_USB_H */

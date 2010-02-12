@@ -60,16 +60,9 @@ void PIOS_SYS_Init(void)
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 	GPIO_Init(GPIOD, &GPIO_InitStructure);
 
-	/* Ensure that pull-down is active on USB detach pin */
-	GPIO_InitStructure.GPIO_Pin = 0xffff & ~USB_PULLUP_PIN;
-	GPIO_Init(USB_ACC_GPIO_PORT, &GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
-	GPIO_InitStructure.GPIO_Pin = USB_PULLUP_PIN;
-	GPIO_Init(USB_ACC_GPIO_PORT, &GPIO_InitStructure);
-
-	/* And pull-up for detect pin */
+	/*  Ensure that pull-up is active on detect pin */
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-	GPIO_InitStructure.GPIO_Pin = USB_PULLUP_PIN;
+	GPIO_InitStructure.GPIO_Pin = USB_DETECT_PIN;
 	GPIO_Init(USB_ACC_GPIO_PORT, &GPIO_InitStructure);
 
 	/* Initialize Basic NVIC */

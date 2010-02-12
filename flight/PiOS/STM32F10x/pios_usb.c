@@ -278,24 +278,6 @@ int32_t PIOS_USB_Init(uint32_t mode)
 		/* Force USB reset and power-down (this will also release the USB pins for direct GPIO control) */
 		_SetCNTR(CNTR_FRES | CNTR_PDWN);
 
-		#if 0
-		/* Disabled because it doesn't work, hardware needs to be looked into */
-		/* Configure USB disconnect pin */
-		/* first we hold it low for ca. 50 mS to force a re-enumeration */
-		GPIO_InitTypeDef GPIO_InitStructure;
-		GPIO_StructInit(&GPIO_InitStructure);
-		GPIO_InitStructure.GPIO_Pin = USB_PULLUP_PIN;
-		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-		GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-		GPIO_Init(USB_ACC_GPIO_PORT, &GPIO_InitStructure);
-
-		GPIO_SetBits(USB_ACC_GPIO_PORT, USB_PULLUP_PIN);
-		PIOS_DELAY_WaitmS(50);
-
-		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
-		GPIO_Init(USB_ACC_GPIO_PORT, &GPIO_InitStructure);
-		#endif
-
 		/* Using a "dirty" method to force a re-enumeration: */
 		/* Force DPM (Pin PA12) low for ca. 10 mS before USB Tranceiver will be enabled */
 		/* This overrules the external Pull-Up at PA12, and at least Windows & MacOS will enumerate again */
@@ -305,8 +287,6 @@ int32_t PIOS_USB_Init(uint32_t mode)
 		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 		GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 		GPIO_Init(GPIOA, &GPIO_InitStructure);
-
-		GPIO_ResetBits(USB_ACC_GPIO_PORT, USB_PULLUP_PIN);
 
 		PIOS_DELAY_WaitmS(50);
 
@@ -384,6 +364,16 @@ int32_t PIOS_USB_IsInitialized(void)
 {
 	/* We assume that initialisation has been done when endpoint 0 contains a value */
 	return GetEPType(ENDP0) ? 1 : 0;
+}
+
+/**
+* Reads the USB detect pin to determine if a USB cable is connected
+* \return 0 if cable not connected
+* \return 1 if cable is connected
+*/
+int32_t PIOS_USB_CableConnected(void)
+{
+	return GPIO_ReadInputDataBit(USB_ACC_GPIO_PORT, USB_DETECT_PIN);
 }
 
 

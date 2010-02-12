@@ -71,13 +71,13 @@ int32_t PIOS_COM_SendBufferNonBlocking(COMPortTypeDef port, uint8_t *buffer, uin
 {
 	/* Branch depending on selected port */
 	switch(port) {
-		case COM_DEBUG_UART:
+		case COM_DEBUG_USART:
 			return PIOS_USART_TxBufferPutMoreNonBlocking(COM_DEBUG_PORT, buffer, len);
-		case COM_GPS_UART:
+		case COM_GPS_USART:
 			return PIOS_USART_TxBufferPutMoreNonBlocking(GPS, buffer, len);
-		case COM_TELEM_UART:
+		case COM_TELEM_USART:
 			return PIOS_USART_TxBufferPutMoreNonBlocking(TELEM, buffer, len);
-		case COM_AUX_UART:
+		case COM_AUX_USART:
 			return PIOS_USART_TxBufferPutMoreNonBlocking(AUX, buffer, len);
 		case COM_USB_HID:
 			return PIOS_USB_HID_TxBufferPutMoreNonBlocking(buffer, len);
@@ -100,13 +100,13 @@ int32_t PIOS_COM_SendBuffer(COMPortTypeDef port, uint8_t *buffer, uint16_t len)
 {
 	/* Branch depending on selected port */
 	switch(port) {
-		case COM_DEBUG_UART:
+		case COM_DEBUG_USART:
 			return PIOS_USART_TxBufferPutMore(COM_DEBUG_PORT, buffer, len);
-		case COM_GPS_UART:
+		case COM_GPS_USART:
 			return PIOS_USART_TxBufferPutMore(GPS, buffer, len);
-		case COM_TELEM_UART:
+		case COM_TELEM_USART:
 			return PIOS_USART_TxBufferPutMore(TELEM, buffer, len);
-		case COM_AUX_UART:
+		case COM_AUX_USART:
 			return PIOS_USART_TxBufferPutMore(AUX, buffer, len);
 		case COM_USB_HID:
 			return PIOS_USB_HID_TxBufferPutMore(buffer, len);
@@ -240,21 +240,21 @@ int32_t PIOS_COM_ReceiveHandler(void)
 		/* it would also improve this spagetthi code ;) */
 		int32_t status = -1;
 		switch(intf++) {
-			case COM_DEBUG_UART:
+			case COM_DEBUG_USART:
 				status = PIOS_USART_RxBufferGet(COM_DEBUG_PORT);
-				port = COM_DEBUG_UART;
+				port = COM_DEBUG_USART;
 				break;
-			case COM_GPS_UART:
+			case COM_GPS_USART:
 				status = PIOS_USART_RxBufferGet(GPS);
-				port = COM_GPS_UART;
+				port = COM_GPS_USART;
 				break;
-			case COM_TELEM_UART:
+			case COM_TELEM_USART:
 				status = PIOS_USART_RxBufferGet(TELEM);
-				port = COM_TELEM_UART;
+				port = COM_TELEM_USART;
 				break;
-			case COM_AUX_UART:
+			case COM_AUX_USART:
 				status = PIOS_USART_RxBufferGet(AUX);
-				port = COM_AUX_UART;
+				port = COM_AUX_USART;
 				break;
 			case COM_USB_HID:
 				status = PIOS_USB_HID_RxBufferGet();

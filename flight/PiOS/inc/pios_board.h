@@ -242,7 +242,6 @@
 //-------------------------
 #define USB_ACC_GPIO_PORT			GPIOC
 #define USB_DETECT_PIN				GPIO_Pin_4
-#define USB_PULLUP_PIN				GPIO_Pin_14
 #define PIOS_IRQ_USB_PRIORITY			IRQ_PRIO_MID
 
 //-------------------------

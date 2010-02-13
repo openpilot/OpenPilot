@@ -1,4 +1,0 @@
-Linux kernel with exceptions
-
-Eclipse setup
-

@@ -60,8 +60,8 @@ OUTDIR = Build
 TARGET = OpenPilot
 
 # Paths
-OPENPILOT = OpenPilot
-OPENPILOTINC = $(OPENPILOT)/inc
+OPENPILOTSYS = OpenPilot/System
+OPENPILOTSYSINC = $(OPENPILOTSYS)/inc
 PIOS = PiOS
 PIOSINC = $(PIOS)/inc
 PIOSSTM32F10X = $(PIOS)/STM32F10x
@@ -88,8 +88,8 @@ DOXYGENDIR = Doc/Doxygen
 # use file-extension c for "c-only"-files
 
 ## OPENPILOT:
-SRC =  $(OPENPILOT)/openpilot.c
-SRC += $(OPENPILOT)/op_logging.c
+SRC =  $(OPENPILOTSYS)/openpilot.c
+SRC += $(OPENPILOTSYS)/op_logging.c
 
 ## PIOS:
 SRC += $(PIOS)/pios.c 
@@ -197,8 +197,8 @@ ASRCARM =
 
 # List any extra directories to look for include files here.
 #    Each directory must be seperated by a space.
-EXTRAINCDIRS  =  $(OPENPILOT)
-EXTRAINCDIRS  += $(OPENPILOTINC)
+EXTRAINCDIRS  =  $(OPENPILOTSYS)
+EXTRAINCDIRS  += $(OPENPILOTSYSINC)
 EXTRAINCDIRS  += $(PIOS)
 EXTRAINCDIRS  += $(PIOSINC)
 EXTRAINCDIRS  += $(PIOSSTM32F10X)

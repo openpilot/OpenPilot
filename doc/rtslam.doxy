@@ -59,7 +59,6 @@
   - \c \b Sensor: \t A sensing device, with a pose specified in robot frame, and some intrinsic parameters. 
   	- It has children \c \b Observations. 
   	- It knows its parent \c \b Robot.
-  	- It knows how to detect new features and match them to landmarks.
   - \c \b Landmark: \t A geometric entity in outer space, with some parameters in the stochastic map, 
   	and some out of it. 
   	- Its children are the \c \b Observations \t that have potentially seen it.
@@ -67,13 +66,14 @@
   	- It knows how to transform itself to or from other frames. 
   	- It knows how to reparametrize itself into another representation. 
   - \c \b Observation: \t All the information related to the fact that a landmark is observable from a sensor. 
-  	- It exists if the landmark is potentially observable by the sensor. 
+  	- It exists if the landmark is potentially observable by the sensor.  		
   		An actual, successful observation is called a \e measurement.
   	- It does not have children.
   	- It knows its parent \c \b Sensor (mother). 
   	- It knows to which \c \b Landmark \t it points to (father).
-  	- It knows how to project existing landmarks to the measurement space.
-  	- It knows how to back-project features from teh measurement space into new landmarks in the state space.
+  	- It knows how to detect new features and match them to landmarks.
+  	- It knows how to project existing landmarks.
+  	- It knows how to back-project features into new landmarks.
 
   See the jafar::rtslam::MapAbstract class reference for a full dependence diagram. 
   Observe that pretty much everybody derives from a class jafar::rtslam::Gaussian (solid arrows).
@@ -95,7 +95,7 @@
 	
 	We make use of Boost and OpenCV, which are warped into Jafar modules \ref jmath and \ref image.
 	
-	The graphics part is relegated to \ref qdisplay and GDHE. 
+	The graphics part is relegated to \ref qdisplay (2D) and GDHE (3D). 
 	However, \ref rtslam creates libraries that are independent of the graphics output.
 	
 	\subsection secQuaternions Quaternions

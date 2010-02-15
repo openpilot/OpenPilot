@@ -27,7 +27,7 @@ namespace jafar
 		typedef enum
 		{
 			LOCAL, REMOTE
-		} storage_type;
+		} storage_t;
 
 		/**
 		 * Class for indirect Gaussians
@@ -36,7 +36,7 @@ namespace jafar
 		class Gaussian
 		{
 			protected:
-				storage_type storage;
+				storage_t storage;
 				std::size_t size;
 				jblas::vec x_;
 				jblas::sym_mat P_;
@@ -79,18 +79,20 @@ namespace jafar
 				/**
 				 * Accessors
 				 */
-				void set_storage_type(const storage_type _s);
+				void set_storage_type(const storage_t _s);
 				void set_r(const jblas::ind_array& _r);
 				void set_size(const std::size_t _size);
 				void set_x(const jblas::vec& _x);
 				void set_P(const jblas::vec& _std);
 				void set_P(const jblas::sym_mat& _P);
+				void set_P(const jblas::sym_mat& _P, jblas::ind_array _r);
+				void set_P(const jblas::mat& _P, jblas::ind_array _r1, jblas::ind_array _r2);
 				void set(const jblas::vec& _x, const jblas::vec& _std);
 				void set(const jblas::vec& _x, const jblas::sym_mat& _P);
 				void set(const Gaussian& G, const jblas::ind_array& _r, const jblas::vec& _x, const jblas::vec& _std);
 				void set(const Gaussian& G, const jblas::ind_array& _r, const jblas::vec& _x, const jblas::sym_mat& _P);
 
-//				std::ostream& jafar::jmath::operator <<(std::ostream& s, const Gaussian& g_);
+				//				std::ostream& jafar::jmath::operator <<(std::ostream& s, const Gaussian& g_);
 		};
 
 		/*
@@ -105,19 +107,54 @@ namespace jafar
 			}
 		}
 
+		/**
+		 * Set covariance from a covariances matrix
+		 */
+		void Gaussian::set_P(const jblas::sym_mat& _P)
+		{
+			JFR_PRECOND(_P.size1() == size, "gaussian::set_P: sizes of _P and Gaussian do not match");
+			for (std::size_t i = 0; i < size; i++)
+			{
+				for (std::size_t j = 0; j <= i; j++)
+				{
+					P(i, j) = _P(i, j);
+				}
+			}
+		}
+
+		/**
+		 * Set covariances block-diagonal
+		 */
+		void Gaussian::set_P(const jblas::mat& _P, jblas::ind_array _r1, jblas::ind_array _r2)
+		{
+			JFR_PRECOND((_r1.size() == _P.size1()) && (_r2.size() == _P.size2()),
+			    "gaussian::set_P: sizes of _P , _r1 and _r2 do not match");
+			JFR_PRECOND((_r1.size() <= size) && (_r2.size() <= size),
+			    "gaussian::set_P: size of _P too big for local Gaussian.");
+			for (std::size_t i = 0; i < r1.size(); i++)
+			{
+				for (std::size_t j = 0; j < r2.size(); j++)
+				{
+					P_(_r(i), _r(j)) = _P(i, j);
+				}
+			}
+		}
+
+		/**
+		 * Set covariance block - any block
+		 */
+		void Gaussian::set_P()
+
 		/*
 		 * Local constructor
 		 */
 		Gaussian::Gaussian(const jblas::vec& _x) :
-			storage(LOCAL),
-			size(_x.size()),
-			x_(_x),
-			r(size)
+			storage(LOCAL), size(_x.size()), x_(_x), r(size)
 		{
 			r.all_;
 			P_.resize(size, size);
 			P_.clear();
-			x(x_, r);    // affect to local data
+			x(x_, r); // affect to local data
 			P(P_, r, r); // affect to local data
 		}
 
@@ -127,8 +164,7 @@ namespace jafar
 		Gaussian::Gaussian(const jblas::vec& _x, const jblas::vec& _std) :
 			storage(LOCAL), size(_x.size()), x_(_x), r(0, size)
 		{
-			JFR_PRECOND(_x.size() == _std.size(),
-									"gaussian::Gaussian: sizes of _x and _std do not match");
+			JFR_PRECOND(_x.size() == _std.size(), "gaussian::Gaussian: sizes of _x and _std do not match");
 			P_.resize(size, size);
 			for (size_t i = 0; i < size; i++)
 			{

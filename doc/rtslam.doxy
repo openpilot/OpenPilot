@@ -40,7 +40,7 @@
 	\image html familyTree.png "The family tree hierarchical organization"
 	
 	Each Observation creates a loop of links. 
-	All of such loops are visible in the figure. For example, the leftmost one: M1 -> R1 -> S11 -> O111 <- L1 <- M1.
+	All of such loops are visible in the figure. For example, the leftmost one is highlighted in red: M1 -> R1 -> S11 -> O111 <- L1 <- M1.
   
 	To account for these relationships, the \ref rtslam uses <b> lists of pointers to children</b>, and a single <b>pointer to a parent</b>. 
 	Yes, each link in the graph is stored twice. This allows systematic forward and backward referencing between objects.

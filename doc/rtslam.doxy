@@ -13,6 +13,7 @@
  - \ref secPhilosophy
  - \ref secImplementation
  - \ref secGuidelines
+ - \ref secReference
  
   This module implements real-time EKF-SLAM based on an active-search architecture.
   
@@ -45,11 +46,18 @@
 	
 	\image html familyTree.png "The family tree hierarchical organization"
 	
-	Each Observation creates a loop of links. 
+	Each Observation creates a loop of links.
 	All of such loops are visible in the figure. For example, the leftmost one is highlighted in red: M1->R1->S11->O111<-L1<-M1.
   
 	To account for these relationships, the \ref rtslam uses <b> lists of pointers to children</b>, and a single <b>pointer to a parent</b>. 
 	Yes, each link in the graph is stored twice. This allows systematic forward and backward referencing between objects.
+	This figure shows the general implementation of such bi-directional links
+	
+	\image html parentalLinks.png "Bi-directional parental links. A parent has a list of pointers to children. A child has a pointer to his parent."
+	
+	You will discover these triangular loops in the collaboration diagrams of this documentation. Check this one jafar::rtslam::MapAbstract for an example.
+
+	NOTE: The drawback or danger of this bidirectional linkage is that it allows access to any object of the system from any other object. Be careful.
 
   Here is an overview of how these objects are treated in this software.
   
@@ -82,12 +90,14 @@
   	- It knows how to back-project features into new landmarks.
 
   See the jafar::rtslam::MapAbstract class reference for a full dependence diagram. 
-  Observe that pretty much everybody derives from a class jafar::rtslam::Gaussian (solid arrows).
-  The dashed arrows indicate ownship. 
+  Observe that many bricks of data derive from a class jafar::rtslam::Gaussian (solid arrows).
+  The dashed arrows indicate ownship. This should not be surprising as we are dealing with EKF.
   See the section \ref secGaussians below for further details.
   
   The classes specifying the structure and operation of these objects are defined as Abstract. 
   They must be derived for each new instance that wants to be incorporated.
+  
+  ## This is the end of the Philosophy section. Now, meditate.
 
 \section secImplementation Implementation
 
@@ -137,6 +147,8 @@
 	in the big Gaussian residing in the \c \b Map.
 	A nice feature of this class is that the indirect array of pointers to the Map is explicitly available.
 	This makes the manipulation of banded matrices and cross-variances easy, intuitive, light-weight, readable.
+	
+	## This is the end of the Implementation section.
   
 \section secGuidelines  Development guidelines
 
@@ -236,6 +248,8 @@ not relevant)
     - rtslam.i defines the wrapped classes and functions,
     - rtslamException.i defines the \c try { } \c catch block
 for this module.
+
+\section secReference Reference manual
 
 */
 

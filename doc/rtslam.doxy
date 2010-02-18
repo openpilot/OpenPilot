@@ -81,8 +81,10 @@
   	- It knows how to transform itself to or from other frames. 
   	- It knows how to reparametrize itself into another representation. 
   - \c \b Observation: \t All the information related to the fact that a landmark is observable from a sensor. 
+  	- This is the biggest class in the project.
   	- It exists if the landmark is potentially observable by the sensor.  		
   		An actual, successful observation is called a \e measurement.
+  	- It stores everything related to the bynome sensor-landmark, including expectations, measurements, innovations and all related Jacobians.
   	- It does not have children.
   	- It knows its parent \c \b Sensor (mother). 
   	- It knows to which \c \b Landmark \t it points to (father).

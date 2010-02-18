@@ -13,6 +13,7 @@
  - \ref secPhilosophy
  - \ref secImplementation
  - \ref secGuidelines
+ - \ref secRtslamHistory, \ref secRtslamRequirements, \ref secRtslamMacro and \ref secRtslamInterface
  - \ref secReference
  
   This module implements real-time EKF-SLAM based on an active-search architecture.
@@ -80,8 +81,10 @@
   	- It knows how to transform itself to or from other frames. 
   	- It knows how to reparametrize itself into another representation. 
   - \c \b Observation: \t All the information related to the fact that a landmark is observable from a sensor. 
+  	- This is the biggest class in the project.
   	- It exists if the landmark is potentially observable by the sensor.  		
   		An actual, successful observation is called a \e measurement.
+  	- It stores everything related to the bynome sensor-landmark, including expectations, measurements, innovations and all related Jacobians.
   	- It does not have children.
   	- It knows its parent \c \b Sensor (mother). 
   	- It knows to which \c \b Landmark \t it points to (father).
@@ -90,9 +93,9 @@
   	- It knows how to back-project features into new landmarks.
 
   See the jafar::rtslam::MapAbstract class reference for a full dependence diagram. 
-  Observe that many bricks of data derive from a class jafar::rtslam::Gaussian (solid arrows).
-  The dashed arrows indicate ownship. This should not be surprising as we are dealing with EKF.
-  See the section \ref secGaussians below for further details.
+  Observe that many bricks of data derive from a class jafar::rtslam::Gaussian (solid arrows;
+ 	the dashed arrows indicate ownship). This should not be surprising as we are dealing with EKF.
+	See the section \ref secGaussians below for further details.
   
   The classes specifying the structure and operation of these objects are defined as Abstract. 
   They must be derived for each new instance that wants to be incorporated.
@@ -105,7 +108,7 @@
 
 	This software aims at being sufficiently general. 
 	However, some things are fixed in advance and should not be the subject of future modification.
-	Imortant details on these hard-coded decisions follow.
+	Important details on these hard-coded decisions follow.
 	
 	\subsection secExternalLibraries External libraries
 	

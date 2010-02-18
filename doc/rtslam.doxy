@@ -155,28 +155,33 @@
   
 \section secGuidelines  Development guidelines
 
-	(NOTE: This section, as the work advances, should gradually move up to the previous section and become a stable documentation.)
+	(NOTE: This section, as the work advances, should gradually move up to the previous section 
+	and become a stable documentation.)
   
   \subsection secInitialDevelopment Initial development
   
   Initially, and to make it simple to develop, each abstract contains only one derived class, as follows:
   
   	- jafar::rtslam::MapAbstract
-  		- jafar::rtslam::MapEKF : classical local map with fixed origin (robot moves away from origin, all landmarks are referenced to the fixed origin).
+  		- jafar::rtslam::MapEKF : classical local map with fixed origin (robot moves away from origin, 
+  		  all landmarks are referenced to the fixed origin).
 
   	- jafar::rtslam::RobotAbstract
   		- jafar::rtslam::Robot3DConstantVelocity : a 3D constant velocity model.
   
   	- jafar::rtslam::SensorAbstract
-  		- jafar::rtslam::SensorPinHole : A pin-hole perspective camera, with radial distorsion and correction models.
+  		- jafar::rtslam::SensorPinHole : A pin-hole perspective camera, with radial distorsion 
+  		  and correction models.
   
   	- jafar::rtslam::LandmarkAbstract
   		- jafar::rtslam::Landmark3DAnchoredHomogeneousPoint : Anchored homogeneous 3D points AHP3 (x_0,y_0,z_0,x,y,z,w).
   
-  	- jafar::rtslam::ObservationAbstract : Please note that Observations depend always on two types of objects: sensor type and landmark type.
+  	- jafar::rtslam::ObservationAbstract : Please note that Observations depend always on 
+  	  two types of objects: sensor type and landmark type.
   		- jafar::rtslam::ObservationPinHole3DAnchoredHomogeneous : observe AHP3 from a pin-hole sensor.
   
-This sets the initially indispensable classes to start working with vision sensors and Anchored homogeneous point landmarks that allow undelayed initialization.
+	This sets the initially indispensable classes to start working with vision sensors 
+	and Anchored homogeneous point landmarks that allow undelayed initialization.
 
 	\subsection secNextDevelopment Next important developments
 	A second set of derivations should perform some additional and useful things such as a few new motion, sensor and landmark models. 

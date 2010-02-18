@@ -41,27 +41,14 @@
 	The parents may have none, one or more children. 
 	The children have a backwards link to their parent. 
 	
-	The Observations link Sensors to Landmarks and are the only objects to have both mother 
-	(\e eg. the Sensor) and father (\e eg. the Landmark). 
-	
-	\b 
-	REMARK: The existence of the class Observation permits the correct segmentation of data and methods into
-	comprehensive units. An observation stores everything related with the bynome sensor-landmark.
-	Its type is determined by both the sensor type and the landmark type. 
-	Therefore, its methods and data depend on both the type of sensor and the type of landmark,
-	and cannot be stored, owned or contained in any other place. 
-	An Observation has a full existence in its own right, as any other object in SLAM. 
-	Finally, an Observation exists every time there exist a sensor and a landmark, 
-	regardless of the sensor having actually observed the landmark or not.
-	
-	The figure below illustrates the family-tree organization for the case of a map 
-	with 2 robots and 2 landmarks, one robot with one sensor and the other one with 2 sensors.
+	The Observations link Sensors to Landmarks and are the only objects to have both mother (\e eg. the Sensor) 
+	and father (\e eg. the Landmark). 
+	The figure below illustrates the family-tree organization for the case of a map with 2 robots and 2 landmarks, one robot with one sensor and the other one with 2 sensors.
 	
 	\image html familyTree.png "The family tree hierarchical organization"
 	
 	Each Observation creates a loop of links.
-	All of such loops are visible in the figure. 
-	For example, the leftmost one is highlighted in red: M1->R1->S11->O111<-L1<-M1.
+	All of such loops are visible in the figure. For example, the leftmost one is highlighted in red: M1->R1->S11->O111<-L1<-M1.
   
 	To account for these relationships, the \ref rtslam uses <b> lists of pointers to children</b>, and a single <b>pointer to a parent</b>. 
 	Yes, each link in the graph is stored twice. This allows systematic forward and backward referencing between objects.
@@ -71,7 +58,7 @@
 	
 	You will discover these triangular loops in the collaboration diagrams of this documentation. Check this one jafar::rtslam::MapAbstract for an example.
 
-	\b NOTE: The drawback or danger of this bidirectional linkage is that it allows access to any object of the system from any other object. Be careful.
+	NOTE: The drawback or danger of this bidirectional linkage is that it allows access to any object of the system from any other object. Be careful.
 
   Here is an overview of how these objects are treated in this software.
   
@@ -168,8 +155,8 @@
   
 \section secGuidelines  Development guidelines
 
-	\b NOTE: This section, as the work advances, should gradually move up to the previous section 
-	and become a stable documentation.
+	(NOTE: This section, as the work advances, should gradually move up to the previous section 
+	and become a stable documentation.)
   
   \subsection secInitialDevelopment Initial development
   

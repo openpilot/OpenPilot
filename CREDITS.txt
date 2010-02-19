@@ -33,6 +33,10 @@ D: Co-founder, Principal hardware architect.
 D: Hardware design of OpenPilot, AHRS, GPS and other hardware
 D: Core developer embedded code
 
+N: Pete Stapley
+E: pete (at) stapleylabs (dot) com
+D: PPM inputs
+
 N: Vassilis Varveropoulos
 E: vassilis (at) openpilot (dot) org
 D: Co-founder, Principal embedded software architect. 
@@ -42,4 +46,4 @@ N: Zik Saleeba
 E: zik (at) zikzak (dot) net
 D: Initial schematic based on Zik's Flying Fox schematic     
 
- 
+

@@ -1,6 +1,6 @@
 This is a credits file of people that have contributed to the OpenPilot project. Without the work of the people in this file OpenPilot would not be what it is today. 
 
-It is sorted by alphabetically by name and formatted so that it allows for easy grepping and beautification by scripts.  
+It is sorted alphabetically by name and formatted so that it allows for easy grepping and beautification by scripts.  
 
 The fields are: 
 

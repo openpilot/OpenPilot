@@ -46,13 +46,15 @@
 	
 	\b 
 	REMARK: The existence of the class Observation permits the correct segmentation of data and methods into
-	comprehensive units. An observation stores everything related with the bynome sensor-landmark.
+	comprehensive units. 
+	An Observation exists every time there exist a sensor and a landmark, 
+	regardless of the sensor having actually observed the landmark or not.
+	An actual, successful observation is merely a \e measurement, which is itself one of the members of the Observation.
+	An observation stores everything related with the bynome sensor-landmark.
 	Its type is determined by both the sensor type and the landmark type. 
 	Therefore, its methods and data depend on both the type of sensor and the type of landmark,
 	and cannot be stored, owned or contained in any other place. 
 	An Observation has a full existence in its own right, as any other object in SLAM. 
-	Finally, an Observation exists every time there exist a sensor and a landmark, 
-	regardless of the sensor having actually observed the landmark or not.
 	
 	The figure below illustrates the family-tree organization for the case of a map 
 	with 2 robots and 2 landmarks, one robot with one sensor and the other one with 2 sensors.

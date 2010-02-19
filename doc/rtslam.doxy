@@ -44,8 +44,7 @@
 	The Observations link Sensors to Landmarks and are the only objects to have both mother 
 	(\e eg. the Sensor) and father (\e eg. the Landmark). 
 	
-	\b 
-	REMARK: The existence of the class Observation permits the correct segmentation of data and methods into
+	\b REMARK: The existence of the class Observation permits the correct segmentation of data and methods into
 	comprehensive units. 
 	An Observation exists every time there exist a sensor and a landmark, 
 	regardless of the sensor having actually observed the landmark or not.

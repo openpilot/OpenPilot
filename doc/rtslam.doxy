@@ -87,9 +87,9 @@
 
 				Control control;                         // Control input.
 
-				list<SensorAbstract*> sensorsList;       // List of sensors.
+				list<SensorAbstract*> sensorsList;       // List of pointers to sensors.
 
-				MapAbstract * map;                       // Father Map.
+				MapAbstract * map;                       // Pointer to father Map.
 
 				State state;                             // State vector, pointing to the SLAM map.
 

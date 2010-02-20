@@ -115,25 +115,12 @@ namespace jafar
 				/**
 				 * Acquire control structure
 				 */
-				virtual void acquire(const Control & control_);
+				virtual void set_control(const Control & control_);
 
 				/**
 				 * Move the robot.
 				 */
 				virtual void move(void) = 0;
-
-				/**
-				 * Accesssors
-				 */
-				virtual void setPose(jblas::vec& pose_);
-				virtual void setPoseCov(jblas::sym_mat& poseCov_);
-				virtual void setPoseCov(jblas::vec& poseStd_);
-				virtual jblas::vec getPose();
-				virtual jblas::sym_mat getPoseCov();
-				virtual void setState(jblas::vec& state_);
-				virtual void setStateCov(jblas::sym_mat& stateCov_);
-				virtual jblas::vec getState();
-				virtual jblas::sym_mat getStateCov();
 
 		};
 

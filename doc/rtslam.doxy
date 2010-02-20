@@ -74,6 +74,32 @@
 
 	\b NOTE: The drawback or danger of this bidirectional linkage is that it allows access to any object of the system from any other object. Be careful.
 
+	Here is an example of the Robot class. Observe the list of links to sensors and the link to the father map:
+	
+	\code
+		class RobotAbstract
+		{
+			public:
+
+				string name;                             // Name of robot.
+
+				string type;                             // Type of robot.
+
+				Control control;                         // Control input.
+
+				list<SensorAbstract*> sensorsList;       // List of sensors.
+
+				MapAbstract * map;                       // Father Map.
+
+				State state;                             // State vector, pointing to the SLAM map.
+
+				virtual void set_control(const Control & control_); // Set control input.
+
+				virtual void move(void) = 0;             // Move the robot.
+
+		};
+	\endcode
+
   Here is an overview of how these objects are treated in this software.
   
   - \c \b Map: \t A playground base with robots and landmarks, and a stochastic map and filtering engine. 

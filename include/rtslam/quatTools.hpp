@@ -176,13 +176,189 @@ namespace jafar {
 		 */
 		template<class VecQ, class Vec, class VecO, class MatVO_q, class MatVO_v>
 		void RofQtimesV(const VecQ & q, const Vec & v, VecO & vo, MatVO_q & VO_q, MatVO_v VO_v) {
-				vo = RofQtimesV(q,v);
-				dRofQtimesV_by_dq(q, v, VO_q);
-				dRofQtimesV_by_dv(q, VO_v);
+			vo = RofQtimesV(q, v);
+			dRofQtimesV_by_dq(q, v, VO_q);
+			dRofQtimesV_by_dv(q, VO_v);
 		}
 
-		//todo delete this line
+		/**
+		 * Rotate inversely a vector from given quaternion.
+		 * \param q the quaternion;
+		 * \param v the vector
+		 * \return the rotated vector
+		 */
+		template<class VecQ, class Vec>
+		vec3 RTofQtimesV(const VecQ & q, const Vec & v) {
+			using namespace ublas;
+			return prod(q2Rt(q), v);
+		}
 
+		/**
+		 * Jacobian of inverse vector rotation from quaternion, wrt quaternion
+		 * \param q the quaternion
+		 * \param v the vector
+		 * \param VO_q the Jacobian of R(q)'*v wrt q
+		 */
+		template<class VecQ, class Vec, class MatVO_q>
+		void dRTofQtimesV_by_dq(const VecQ & q, const Vec & v, MatVO_q & VO_q) {
+			// split q and v
+			double qw = q(0);
+			double qx = q(1);
+			double qy = q(2);
+			double qz = q(3);
+			double x = v(0);
+			double y = v(1);
+			double z = v(2);
+
+			// temporary
+			double s1 = 2 * (qw * x + qz * y - qy * z);
+			double s2 = 2 * (qx * x + qy * y + qz * z);
+			double s3 = 2 * (qy * x - qx * y + qw * z);
+			double s4 = 2 * (qz * x - qw * y - qx * z);
+
+			// Jacobian
+			VO_q(0, 0) = s1;
+			VO_q(0, 1) = s2;
+			VO_q(0, 2) = -s3;
+			VO_q(0, 3) = -s4;
+			VO_q(1, 0) = -s4;
+			VO_q(1, 1) = s3;
+			VO_q(1, 2) = s2;
+			VO_q(1, 3) = -s1;
+			VO_q(2, 0) = s3;
+			VO_q(2, 1) = s4;
+			VO_q(2, 2) = s1;
+			VO_q(2, 3) = s2;
+		}
+
+		/**
+		 * Jacobian of vector inverse rotation from quaternion, wrt vector
+		 * \param q the quaternion
+		 * \param VO_v = R(q) the Jacobian of R(q)'*v wrt v
+		 */
+		template<class VecQ, class MatVO_v>
+		void dRTofQtimesV_by_dv(const VecQ & q, MatVO_v & VO_v) {
+			VO_v = q2Rt(q);
+		}
+
+		/**
+		 * Rotate inversely a vector from given quaternion, with all Jacobians.
+		 * \param q the quaternion;
+		 * \param v the vector
+		 * \param vo the rotated vector
+		 * \param VO_q the Jacobian wrt q
+		 * \param VO_v the Jacobians wrt v
+		 */
+		template<class VecQ, class Vec, class VecO, class MatVO_q, class MatVO_v>
+		void RTofQtimesV(const VecQ & q, const Vec & v, VecO & vo, MatVO_q & VO_q, MatVO_v VO_v) {
+			VO_v = q2Rt(q); // this is Rt !
+			vo = prod(VO_v, v);
+			dRTofQtimesV_by_dq(q, v, VO_q);
+		}
+
+		/**
+		 * Quaternion product
+		 */
+		template<class VecQ1, class VecQ2>
+		vec4 qProd(const VecQ1 q1, const VecQ2 q2) {
+			// split quaternions
+			double q1w = q1(0);
+			double q1x = q1(1);
+			double q1y = q1(2);
+			double q1z = q1(3);
+			double q2w = q2(0);
+			double q2x = q2(1);
+			double q2y = q2(2);
+			double q2z = q2(3);
+
+			vec4 q;
+			q(0) = q1w * q2w - q1x * q2x - q1y * q2y - q1z * q2z;
+			q(1) = q1w * q2x + q1x * q2w + q1y * q2z - q1z * q2y;
+			q(2) = q1w * q2y - q1x * q2z + q1y * q2w + q1z * q2x;
+			q(3) = q1w * q2z + q1x * q2y - q1y * q2x + q1z * q2w;
+			return q;
+		}
+
+		/**
+		 * Jacobian of quaternion product wrt first quaternion, d(q1*q2)/dq1
+		 * This Jacobian only depends on q2
+		 * \param q2 the second quaternion of the product
+		 * \return the Jacobian
+		 */
+		template<class VecQ2, class MatQ_q1>
+		void dQProd_by_dq1(const VecQ2 q2, MatQ_q1 Q_q1) {
+
+			// split quaternion
+			double q2w = q2(0);
+			double q2x = q2(1);
+			double q2y = q2(2);
+			double q2z = q2(3);
+
+			Q_q1(0, 0) = q2w;
+			Q_q1(0, 1) = -q2x;
+			Q_q1(0, 2) = -q2y;
+			Q_q1(0, 3) = -q2z;
+			Q_q1(1, 0) = q2x;
+			Q_q1(1, 1) = q2w;
+			Q_q1(1, 2) = q2z;
+			Q_q1(1, 3) = -q2y;
+			Q_q1(2, 0) = q2y;
+			Q_q1(2, 1) = -q2z;
+			Q_q1(2, 2) = q2w;
+			Q_q1(2, 3) = q2x;
+			Q_q1(3, 0) = q2z;
+			Q_q1(3, 1) = q2y;
+			Q_q1(3, 2) = -q2x;
+			Q_q1(3, 3) = q2w;
+		}
+
+		/**
+		 * Jacobian of quaternion product wrt second quaternion, d(q1*q2)/dq2
+		 * This Jacobian only depends on q1
+		 * \param q1 the first quaternion of the product
+		 * \return the Jacobian
+		 */
+		template<class VecQ1, class MatQ_q2>
+		void dQProd_by_dq2(const VecQ1 q1, MatQ_q2 Q_q2) {
+
+			// split quaternion
+			double q1w = q1(0);
+			double q1x = q1(1);
+			double q1y = q1(2);
+			double q1z = q1(3);
+
+			Q_q2(0, 0) = q1w;
+			Q_q2(0, 1) = -q1x;
+			Q_q2(0, 2) = -q1y;
+			Q_q2(0, 3) = -q1z;
+			Q_q2(1, 0) = q1x;
+			Q_q2(1, 1) = q1w;
+			Q_q2(1, 2) = -q1z;
+			Q_q2(1, 3) = q1y;
+			Q_q2(2, 0) = q1y;
+			Q_q2(2, 1) = q1z;
+			Q_q2(2, 2) = q1w;
+			Q_q2(2, 3) = -q1x;
+			Q_q2(3, 0) = q1z;
+			Q_q2(3, 1) = -q1y;
+			Q_q2(3, 2) = q1x;
+			Q_q2(3, 3) = q1w;
+		}
+
+		/**
+		 * Quaternion product, with Jacobians
+		 * \param q1 the first quaternion
+		 * \param q2 the second quaternion
+		 * \param q the output q = q1*q2
+		 * \param Q_q1 the Jacobian of qo wrt q1
+		 * \param Q_q2 the Jacobian of qo wrt q2
+		 */
+		template<class VecQ1, class VecQ2, class VecQ, class MatQ_q1, class MatQ_q2>
+		void qProd(const VecQ1 q1, const VecQ2 q2, VecQ q, MatQ_q1 Q_q1, MatQ_q2 Q_q2) {
+			q = qProd(q1, q2);
+			dQProd_by_dq1(q2, Q_q1);
+			dQProd_by_dq2(q1, Q_q2);
+		}
 	}
 }
 

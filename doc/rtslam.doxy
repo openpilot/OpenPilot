@@ -10,13 +10,22 @@
   
 \section Contents
 
+ - \ref secPresentation
  - \ref secPhilosophy
  - \ref secImplementation
- - \ref secGuidelines
+ - \ref secPlan
  - \ref secRtslamHistory, \ref secRtslamRequirements, \ref secRtslamMacro and \ref secRtslamInterface
  - \ref secReference
  
-  This module implements real-time EKF-SLAM based on an active-search architecture.
+\section secPresentation Presentation 
+  This module implements real-time single-map EKF-SLAM based on an active-search architecture. 
+  
+  It supports the coexistence of multiple robots, multiple sensors, and multiple landmark types.
+  
+  It is initially conceived for vision sensors (cameras), although this is not a constraint.
+  
+  - In single-camera mode, it aims at achieveing a minimum of 30fps operation with 640x480 B+W images.
+  - In multi-camera mode this target framerate is to be divided by the number of sensors.
   
   If you are a developer, jump to \ref secImplementation. Otherwise keep reading.
   
@@ -48,12 +57,15 @@
 	comprehensive units. 
 	An Observation exists every time there exist a sensor and a landmark, 
 	regardless of the sensor having actually observed the landmark or not.
-	An actual, successful observation is merely a \e measurement, which is itself one of the members of the Observation.
 	An observation stores everything related with the bynome sensor-landmark.
 	Its type is determined by both the sensor type and the landmark type. 
 	Therefore, its methods and data depend on both the type of sensor and the type of landmark,
 	and cannot be stored, owned or contained in any other place. 
 	An Observation has a full existence in its own right, as any other object in SLAM. 
+	- An actual, successful observation is merely a \e measurement. 
+	- A \e measurement is a member of Observation.
+	- Other members are the \e expectation and the \e innovation.
+	
 	
 	The figure below illustrates the family-tree organization for the case of a map 
 	with 2 robots and 2 landmarks, one robot with one sensor and the other one with 2 sensors.
@@ -100,6 +112,39 @@
 		};
 	\endcode
 
+	Here is an example of the class Observation:
+	\code
+	class ObservationAbstract
+		{
+			public:
+
+				SensorAbstract * sensor;               // Pointer to mother sensor.
+
+				LandmarkAbstract * landmark;           // Pointer to father landmark.
+
+				Expectation expectation;               // Expectation. This is a Gaussian.
+
+				Measurement measurement;               // Measurement. This is a Gaussian.
+
+				Innovation innovation;                 // Innovation. This is a Gaussian.
+
+				struct counter                         // Event counters for map management.
+
+				struct event                           // Event flags for active-search flow control.
+
+				virtual bool project(void) = 0;        // Project landmark into sensor.
+
+				virtual bool isVisible(void) = 0;      // True if landmark is visible.
+
+				virtual bool match(void);              // Try to match and get measurement.
+
+				virtual bool isIndividuallyConsistent(void); // Consistency test.
+
+				virtual void back_project(void) = 0;   // Back-project feature into landmark for initialization.
+
+		};
+	\endcode
+	
   Here is an overview of how these objects are treated in this software.
   
   - \c \b Map: \t A playground base with robots and landmarks, and a stochastic map and filtering engine. 
@@ -144,7 +189,7 @@
 
 \section secImplementation Implementation
 
-	If you are not a new developer, jump to the \ref secGuidelines. If you are new you MUST keep reading here.
+	If you are not a new developer, jump to the \ref secPlan. If you are new you MUST keep reading here.
 
 	This software aims at being sufficiently general. 
 	However, some things are fixed in advance and should not be the subject of future modification.
@@ -156,15 +201,6 @@
 	
 	The graphics part is relegated to \ref qdisplay (2D) and GDHE (3D). 
 	However, \ref rtslam creates libraries that are independent of the graphics output.
-	
-	\subsection secQuaternions Quaternions
-	
-	All orientation-related magnitudes are stored as quaternions. 
-	These are internally converted to rotation matrices when necessary.
-	Our quaternion is defined as a regular boost bounded_vector of dimension 4.
-	(More exactly, it is a typedef boost::numeric::ublas::bounded_vector<double,4> vec4.)
-	The real part comes first, then the three imaginary parts.
-	All the quaternion algebra is coded inside the module.
 	
 	\subsection secObjectCreation Objects creation policy
 	
@@ -182,6 +218,26 @@
 	However, it is possible that some particular classes could be used as bricks for these alternative systems. 
 	This is to be evaluated in the future, and no efforts are made here to facilitate such a transition.
 	
+	\subsection secFunctions Functions with Jacobians
+	
+	Nearly all functions involved in EKF-SLAM are required to return Jacobian matrices. 
+	We use systematicallly the chain rule to create Jacobians of composed functions.
+	
+	Here is an example of a composed function and the chain rule:
+	
+	\code
+	f(const vec3 x, vec2 y, mat Y_x);    // This is y = f(x), Y_x = dy/dx = df(x)/dx.
+	g(const vec2 x, vec2 y, mat Y_x);    // This is y = g(x), Y_x = dy/dx = dg(x)/dx.
+	h(const vec3 x, vec2 z, mat Z_x){    // This will perform g(f(x)) and return Jacobians.
+		vec2 y;
+		mat23 Y_x;
+		f(x, y, Y_x);                      // This computes y and     -------->  Y_x = dy/dx = df(x)/dx.
+		mat22 Z_y;
+		g(y, z, Z_y);                      // This is z = g(y) = g(f(x)) and ->  Z_y = dz/dy = dg(y)/dy.
+		Z_x = Z_y * Y_x;                   // This is the chain rule doing   ->  Z_x = dz/dx = dz/dy * dy/dx.
+	}
+	\endcode
+	
 	\subsection secGaussians Gaussians
 	
 	We designed and built the jafar::rtslam::Gaussian class for storing Gaussian variables. 
@@ -191,9 +247,18 @@
 	A nice feature of this class is that the indirect array of pointers to the Map is explicitly available.
 	This makes the manipulation of banded matrices and cross-variances easy, intuitive, light-weight, readable.
 	
+	\subsection secQuaternions Quaternions
+	
+	All orientation-related magnitudes are stored as quaternions. 
+	These are internally converted to rotation matrices when necessary.
+	Our quaternion is defined as a regular boost bounded_vector of dimension 4.
+	(More exactly, it is a typedef boost::numeric::ublas::bounded_vector<double,4> vec4.)
+	The real part comes first, then the three imaginary parts.
+	All the quaternion algebra is coded inside the module.
+	
 	## This is the end of the Implementation section.
   
-\section secGuidelines  Development guidelines
+\section secPlan  Development plan
 
 	\b NOTE: This section, as the work advances, should gradually move up to the previous section 
 	and become a stable documentation.

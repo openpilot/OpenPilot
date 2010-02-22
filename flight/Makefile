@@ -60,8 +60,16 @@ OUTDIR = Build
 TARGET = OpenPilot
 
 # Paths
-OPENPILOTSYS = OpenPilot/System
-OPENPILOTSYSINC = $(OPENPILOTSYS)/inc
+OPSYSTEM = OpenPilot/System
+OPSYSTEMINC = $(OPSYSTEM)/inc
+OPUAVTALK = OpenPilot/UAVTalk
+OPUAVTALKINC = $(OPUAVTALK)/inc
+OPUAVOBJ = OpenPilot/UAVObjects
+OPUAVOBJINC = $(OPUAVOBJ)/inc
+OPSETTINGS = OpenPilot/Settings
+OPSETTINGSINC = $(OPSETTINGS)/inc
+MODTELEMETRY = Modules/Telemetry
+MODTELEMETRYINC = $(MODTELEMETRY)/inc
 PIOS = PiOS
 PIOSINC = $(PIOS)/inc
 PIOSSTM32F10X = $(PIOS)/STM32F10x
@@ -87,9 +95,18 @@ DOXYGENDIR = Doc/Doxygen
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
 
+## MODULES
+SRC =  $(MODTELEMETRY)/telemetry.c
+
 ## OPENPILOT:
-SRC =  $(OPENPILOTSYS)/openpilot.c
-SRC += $(OPENPILOTSYS)/op_logging.c
+SRC +=  $(OPSYSTEM)/openpilot.c
+SRC += $(OPSYSTEM)/op_logging.c
+SRC += $(OPUAVTALK)/uavtalk.c
+SRC += $(OPUAVOBJ)/uavobjectutils.c
+SRC += $(OPUAVOBJ)/uavobjectlist.c
+SRC += $(OPUAVOBJ)/uavobjectsinit.c
+
+## UAVOBJECTS
 
 ## PIOS:
 SRC += $(PIOS)/pios.c 
@@ -197,8 +214,16 @@ ASRCARM =
 
 # List any extra directories to look for include files here.
 #    Each directory must be seperated by a space.
-EXTRAINCDIRS  =  $(OPENPILOTSYS)
-EXTRAINCDIRS  += $(OPENPILOTSYSINC)
+EXTRAINCDIRS  =  $(OPSYSTEM)
+EXTRAINCDIRS  += $(OPSYSTEMINC)
+EXTRAINCDIRS  += $(OPUAVTALK)
+EXTRAINCDIRS  += $(OPUAVTALKINC)
+EXTRAINCDIRS  += $(OPUAVOBJ)
+EXTRAINCDIRS  += $(OPUAVOBJINC)
+EXTRAINCDIRS  += $(OPSETTINGS)
+EXTRAINCDIRS  += $(OPSETTINGSINC)
+EXTRAINCDIRS  += $(MODTELEMETRY)
+EXTRAINCDIRS  += $(MODTELEMETRYINC)
 EXTRAINCDIRS  += $(PIOS)
 EXTRAINCDIRS  += $(PIOSINC)
 EXTRAINCDIRS  += $(PIOSSTM32F10X)
@@ -210,6 +235,7 @@ EXTRAINCDIRS  += $(DOSFSDIR)
 EXTRAINCDIRS  += $(MSDDIR)
 EXTRAINCDIRS  += $(MININIDIR)
 EXTRAINCDIRS  += $(RTOSINCDIR)
+EXTRAINCDIRS  += $(APPLIBDIR)
 EXTRAINCDIRS  += $(RTOSSRCDIR)/portable/GCC/ARM_CM3
 
 

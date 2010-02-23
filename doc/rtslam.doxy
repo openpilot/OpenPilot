@@ -226,9 +226,9 @@
 	Here is an example of a composed function and the chain rule:
 	
 	\code
-	f(const vec3 x, vec2 y, mat Y_x);    // This is y = f(x), Y_x = dy/dx = df(x)/dx.
-	g(const vec2 x, vec2 y, mat Y_x);    // This is y = g(x), Y_x = dy/dx = dg(x)/dx.
-	h(const vec3 x, vec2 z, mat Z_x){    // This will perform g(f(x)) and return Jacobians.
+	void f(const vec3 x, vec2 y, mat Y_x);    // This is y = f(x), Y_x = dy/dx = df(x)/dx.
+	void g(const vec2 x, vec2 y, mat Y_x);    // This is y = g(x), Y_x = dy/dx = dg(x)/dx.
+	void h(const vec3 x, vec2 z, mat Z_x){    // This will perform g(f(x)) and return Jacobians.
 		vec2 y;
 		mat23 Y_x;
 		f(x, y, Y_x);                      // This computes y and     -------->  Y_x = dy/dx = df(x)/dx.
@@ -238,6 +238,28 @@
 	}
 	\endcode
 	
+	As a general rule, a function should be implemented several times:
+	- Once with only the nominal output, provided as a returned value:
+	\code
+	vec2 f(const vec2 & a, const vec2 & b) { return b-a; }
+	\endcode
+	- Once with only the Jacobian being computed. One implementation per input variable. 
+	  The name is appended with "_by_d{VARNAME}" to indicate which Jacobian is being computed. 
+	  The function is \e void and the result must be passed as a non-const parameter.
+	\code
+	void f_by_da(const vec2 & a, const vec2 & b, mat22 C_a) { C_a = -identity_mat(2); }
+	void f_by_db(const vec2 & a, const vec2 & b, mat22 C_b) { C_b = identity_mat(2); }
+	\endcode
+	- Once with nominal value and Jacobians. 
+	  The name is the same as the original one (overloaded method). 
+	  The function is \e void, all results are in the parameter list.
+	\code
+	void f(const vec2 & a, const vec2 & b, vec2 & c, mat22 & C_a, mat22 & C_b)	{ 
+		c   = b-a; 
+		C_a = -identity_mat(2); 
+		C_b = -C_a;
+	}
+	\endcode	
 	\subsection secGaussians Gaussians
 	
 	We designed and built the jafar::rtslam::Gaussian class for storing Gaussian variables. 
@@ -254,7 +276,7 @@
 	Our quaternion is defined as a regular boost bounded_vector of dimension 4.
 	(More exactly, it is a typedef boost::numeric::ublas::bounded_vector<double,4> vec4.)
 	The real part comes first, then the three imaginary parts.
-	All the quaternion algebra is coded inside the module.
+	All the quaternion algebra is coded inside the module in the file quatTools.hpp.
 	
 	## This is the end of the Implementation section.
   

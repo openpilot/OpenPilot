@@ -599,6 +599,128 @@ namespace jafar {
 			row(E_q, 2) = de3dx3 * dx3dq + de3dy3 * dy3dq;
 		}
 
+		/**
+		 * To-frame transformation for Euclidean points
+		 * \param F frame
+		 * \param p point in global frame
+		 * \return the point in frame F
+		 */
+		template<class VecF, class Pnt>
+		vec3 eucToFrame(const VecF & F, const Pnt & p) {
+			vec4 q = project(F, range(3, 7));
+			vec3 t = project(F, range(0, 3));
+			vec3 v = p - t;
+			vec3 pf;
+			pf = RTofQtimesV(q, v);
+			return pf;
+		}
+
+		/**
+		 * To-frame transformation for Euclidean points, with Jacobians
+		 * \param F frame
+		 * \param p point in global frame
+		 * \param pf the point in frame F
+		 * \param PF_f the Jacobian wrt F
+		 * \param PF_p the Jacobian wrt p
+		 */
+		template<class VecF, class Pnt, class PntF, class MatPF_f, class MatPF_p>
+		void eucToFrame(const VecF & F, const Pnt & p, PntF & pf, MatPF_f & PF_f, MatPF_p & PF_p) {
+			vec4 q = project(F, range(3, 7));
+			vec3 t = project(F, range(0, 3));
+			vec3 v = p - t;
+			mat_range PF_q(PF_f, range(0, 3), range(3, 7));
+			RTofQtimesV(q, v, pf, PF_q, PF_p);
+			project(PF_f, range(0, 3), range(0, 3)) = -PF_p;
+		}
+
+		/**
+		 * To-frame transformation for vectors
+		 * \param F frame
+		 * \param v vector in global frame
+		 * \return the vector in frame F
+		 */
+		template<class VecF, class Vec>
+		vec3 vecToFrame(const VecF & F, const Vec & v) {
+			return RTofQtimesV(subrange(F, 3, 7), v);
+		}
+
+		/**
+		 * To-frame transformation for vectors, with Jacobians
+		 * \param F frame
+		 * \param v vector in global frame
+		 * \param vf the point in frame F
+		 * \param VF_f the Jacobian wrt F
+		 * \param VF_v the Jacobian wrt v
+		 */
+		template<class VecF, class Vec, class Vecf, class MatVF_f, class MatVF_v>
+		void vecToFrame(const VecF & F, const Vec & v, Vecf & vf, MatVF_f & VF_f, MatVF_v & VF_v) {
+			vec4 q = project(F, range(3, 7));
+			mat_range VF_q(VF_f, range(0, 3), range(3, 7));
+			RTofQtimesV(q, v, vf, VF_q, VF_v);
+			project(VF_f, range(0, 3), range(0, 3)) = zero_mat(3, 3);
+		}
+
+
+
+
+		/**
+		 * From-frame transformation for Euclidean points
+		 * \param F frame
+		 * \param pf point in frame F
+		 * \return the point in global frame
+		 */
+		template<class VecF, class Pnt>
+		vec3 eucFromFrame(const VecF & F, const Pnt & pf) {
+			return RofQtimesV(project(F, range(3,7)),pf) + project(F, range(0,3));
+		}
+
+		/**
+		 * From-frame transformation for Euclidean points, with Jacobians
+		 * \param F frame
+		 * \param pf point in frame F
+		 * \param p the point in global frame
+		 * \param P_f the Jacobian wrt F
+		 * \param P_pf the Jacobian wrt pf
+		 */
+		template<class VecF, class PntF, class Pnt, class MatP_f, class MatP_pf>
+		void eucFromFrame(const VecF & F, const PntF & pf, Pnt & p, MatP_f & P_f, MatP_pf & P_pf) {
+			vec4 q = project(F, range(3, 7));
+			vec3 t = project(F, range(0, 3));
+			mat_range P_q(P_f, range(0, 3), range(3, 7));
+			RofQtimesV(q, pf, p, P_q, P_pf);
+			p += t;
+			project(P_f, range(0, 3), range(0, 3)) = identity_mat(3); // dp/dt = I
+		}
+
+		/**
+		 * From-frame transformation for vectors
+		 * \param F frame
+		 * \param vf vector in frame F
+		 * \return the vector in global frame
+		 */
+		template<class VecF, class Vec>
+		vec3 vecFromFrame(const VecF & F, const Vec & vf) {
+			return RofQtimesV(subrange(F, 3, 7), vf);
+		}
+
+		/**
+		 * From-frame transformation for vectors, with Jacobians
+		 * \param F frame
+		 * \param vf vector in frame F
+		 * \param v the point in global frame
+		 * \param V_f the Jacobian wrt F
+		 * \param V_vf the Jacobian wrt vf
+		 */
+		template<class VecF, class Vecf, class Vec, class MatV_f, class MatV_vf>
+		void vecFromFrame(const VecF & F, const Vecf & vf, Vec & v, MatV_f & V_f, MatV_vf & V_vf) {
+			vec4 q = project(F, range(3, 7));
+			project(V_f, range(0, 3), range(0, 3)) = zero_mat(3, 3); // dv/dt = 0
+			mat_range V_q(V_f, range(0, 3), range(3, 7));
+			RofQtimesV(q, vf, v, V_q, V_vf);
+		}
+
+
+
 	}
 }
 

@@ -92,23 +92,14 @@
 		class RobotAbstract
 		{
 			public:
-
-				string name;                             // Name of robot.
-
-				string type;                             // Type of robot.
-
-				Control control;                         // Control input.
-
-				list<SensorAbstract*> sensorsList;       // List of pointers to sensors.
-
-				MapAbstract * map;                       // Pointer to father Map.
-
-				State state;                             // State vector, pointing to the SLAM map.
-
-				virtual void set_control(const Control & control_); // Set control input.
-
-				virtual void move(void) = 0;             // Move the robot.
-
+				string                name;           // Name of robot.
+				string                type;           // Type of robot.
+				Control               control;        // Control input.
+				list<SensorAbstract*> sensorsList;    // List of pointers to sensors.
+				MapAbstract           * map;          // Pointer to father Map.
+				State                 state;          // State vector, pointing to the SLAM map.
+				virtual void          set_control();  // Set control input.
+				virtual void          move() = 0;     // Move the robot.
 		};
 	\endcode
 
@@ -117,31 +108,18 @@
 	class ObservationAbstract
 		{
 			public:
-
-				SensorAbstract * sensor;               // Pointer to mother sensor.
-
-				LandmarkAbstract * landmark;           // Pointer to father landmark.
-
-				Expectation expectation;               // Expectation. This is a Gaussian.
-
-				Measurement measurement;               // Measurement. This is a Gaussian.
-
-				Innovation innovation;                 // Innovation. This is a Gaussian.
-
-				struct counters;                       // Event counters for map management.
-
-				struct events;                         // Event flags for active-search flow control.
-
-				virtual bool project(void) = 0;        // Project landmark into sensor.
-
-				virtual bool isVisible(void) = 0;      // True if landmark is visible.
-
-				virtual bool match(void);              // Try to match and get measurement.
-
-				virtual bool isIndividuallyConsistent(void); // Consistency test.
-
-				virtual void back_project(void) = 0;   // Back-project feature into landmark for initialization.
-
+				SensorAbstract   * sensor;                   // Pointer to mother sensor.
+				LandmarkAbstract * landmark;                 // Pointer to father landmark.
+				Expectation      expectation;                // Expectation. This is a Gaussian.
+				Measurement      measurement;                // Measurement. This is a Gaussian.
+				Innovation       innovation;                 // Innovation. This is a Gaussian.
+				struct           counters;                   // Event counters for map management.
+				struct           events;                     // Event flags for active-search flow control.
+				virtual bool     project() = 0;              // Project landmark into sensor.
+				virtual bool     isVisible() = 0;            // True if landmark is visible.
+				virtual bool     match();                    // Try to match and get measurement.
+				virtual bool     isIndividuallyConsistent(); // Consistency test.
+				virtual void     back_project() = 0;         // Back-project feature into landmark for initialization.
 		};
 	\endcode
 	

@@ -546,7 +546,7 @@ void I2C_ITConfig(I2C_TypeDef* I2Cx, uint16_t I2C_IT, FunctionalState NewState)
   /* Check the parameters */
   assert_param(IS_I2C_ALL_PERIPH(I2Cx));
   assert_param(IS_FUNCTIONAL_STATE(NewState));
-  assert_param(IS_I2C_CONFIG_IT(I2C_IT));
+ // assert_param(IS_I2C_CONFIG_IT(I2C_IT));  // TODO: Why?
   
   if (NewState != DISABLE)
   {

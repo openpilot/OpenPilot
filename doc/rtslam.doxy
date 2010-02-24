@@ -245,14 +245,14 @@
 	\endcode
 	- Once with only the Jacobian being computed. One implementation per input variable. 
 	  The name is appended with "_by_d{VARNAME}" to indicate which Jacobian is being computed. 
-	  The function is \e void and the result must be passed as a non-const parameter.
+	  The function is \c void and the result must be passed as a non-const parameter.
 	\code
 	void f_by_da(const vec2 & a, const vec2 & b, mat22 C_a) { C_a = -identity_mat(2); }
 	void f_by_db(const vec2 & a, const vec2 & b, mat22 C_b) { C_b = identity_mat(2); }
 	\endcode
 	- Once with nominal value and Jacobians. 
 	  The name is the same as the original one (overloaded method). 
-	  The function is \e void, all results are in the parameter list.
+	  The function is \c void, all results are in the parameter list.
 	\code
 	void f(const vec2 & a, const vec2 & b, vec2 & c, mat22 & C_a, mat22 & C_b)	{ 
 		c   = b-a; 

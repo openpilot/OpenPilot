@@ -66,10 +66,10 @@ namespace jafar
 				AppearanceAbstract * appearance;
 				jblas::mat EXP_rob, EXP_sen, EXP_lmk; // Jacobians of the expectation wrt robot state, sensor state, lmk state.
 				jblas::vec nonObs; // expected value of the non-observable part.
-				bool visible; // landmark is visible.
+				bool visible; // landmark is visible (in Field Of View).
 				double infoGain; // expected "information gain" of performing an update with this observation.
 
-				void isVisible(void) = 0;
+				void computeVisibility(void) = 0;
 				void estimateInfoGain(void);
 		};
 
@@ -81,6 +81,7 @@ namespace jafar
 		{
 			public:
 				AppearanceAbstract * appearance;
+				double score;  ///< matching quality score
 		};
 
 		/** Base class for all Gaussian innovations defined in the module rtslam.
@@ -94,12 +95,6 @@ namespace jafar
 		class Innovation: public Gaussian
 		{
 			protected:
-				///  the expectation size.
-				std::size_t size_exp;
-				/// the measurement size.
-				std::size_t size_meas;
-				/// the innovation size.
-				std::size_t size_inn;
 				/// The inverse of the innovation covariances matrix.
 				jblas::sym_mat iP;
 				/// The Mahalanobis distance from the measurement to the expectation.
@@ -113,7 +108,7 @@ namespace jafar
 				/**
 				 * the inverse of the innovation covariance.
 				 */
-				void invCov(void)
+				void invertCov(void)
 				{
 					ublas::lu_inv(P, iP);
 				}
@@ -121,7 +116,7 @@ namespace jafar
 				/**
 				 * The Mahalanobis distance.
 				 */
-				void Mahalanobis(void)
+				void mahalanobis(void)
 				{
 					iP = invCov(P);
 					mahalanobis = ublas::inner_prod(x, (jblas::vec) ublas::prod(iP, x));
@@ -206,23 +201,23 @@ namespace jafar
 				/**
 				 * Counters
 				 */
-				struct counter
+				struct
 				{
 						int nSearch; ///< Number of searches
 						int nMatch;  ///< number of matches
 						int nInlier; ///< Number of times declared inlier
-				};
+				} counters;
 
 				/**
 				 * Events
 				 */
-				struct event
+				struct
 				{
 						bool visible;  ///< Landmark is visible
 						bool measured; ///< Feature is measured
 						bool matched;  ///< Feature is matched
 						bool updated;  ///< Landmark is updated
-				};
+				} events;
 
 				/**
 				 * Project
@@ -234,7 +229,7 @@ namespace jafar
 				 * Is visible
 				 * \return true if inside FOV
 				 */
-				virtual bool isVisible(void) = 0;
+				virtual bool isVisible(void){return events.visible;};
 
 				/**
 				 * match

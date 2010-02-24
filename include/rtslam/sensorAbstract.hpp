@@ -25,22 +25,30 @@
 #include "robotAbstract.hpp"
 #include "observationAbstract.hpp"
 
-namespace jafar
-{
-	namespace rtslam
-	{
+namespace jafar {
+	namespace rtslam {
 
-		/* --------------------------------------------------------------------- */
-		/* --- CLASS ----------------------------------------------------------- */
-		/* --------------------------------------------------------------------- */
 
-		/** Base class for all sensors defined in the module
-		 * rtslam.
+		/**
+		 * Base class for all raw data in module rtslam.
+		 */
+		class RawAbstract {
+				/**
+				 * Mandatory virtual destructor.
+				 */
+				virtual ~RawAbstract(void);
+				/**
+				 * Acquire raw data
+				 */
+				virtual void acquire() = 0;
+
+		};
+
+		/** Base class for all sensors defined in the module rtslam.
 		 *
 		 * @ingroup rtslam
 		 */
-		class SensorAbstract
-		{
+		class SensorAbstract {
 			public:
 
 				/**
@@ -59,14 +67,14 @@ namespace jafar
 				std::string type;
 
 				/**
-				 * Flag for including pose in map for calibration
-				 */
-				storage_type poseInMap;
-
-				/**
 				 * Father robot
 				 */
 				RobotAbstract* robot;
+
+				/**
+				 * Flag for including pose in map for calibration
+				 */
+				storage_type pose_storage_type;
 
 				/**
 				 * pose (local or remote in Map)
@@ -76,9 +84,12 @@ namespace jafar
 				/**
 				 * parameters
 				 */
-				struct parameters
-				{
-				};
+				ParametersAbstract parameters;
+
+				/**
+				 * Raw data
+				 */
+				RawAbstract raw;
 
 				/**
 				 * Observations list
@@ -86,21 +97,9 @@ namespace jafar
 				std::list<ObservationAbstract*> observationsList;
 
 				/**
-				 * Accessors
-				 */
-				virtual void setPose(jblas::vec& pose_);
-				virtual void setPoseCov(jblas::sym_mat& poseCov_);
-				virtual vec getPose();
-				virtual sym_mat getPoseCov();
-				virtual void setState(jblas::vec& state_);
-				virtual void setStateCov(jblas::sym_mat& stateCov_);
-				virtual vec getState();
-				virtual sym_mat getStateCov();
-
-				/**
 				 * Acquire raw data
 				 */
-				virtual void acquire();
+				virtual void acquireRaw(){raw.acquire();};
 
 				/**
 				 * Project all landmarks
@@ -115,7 +114,7 @@ namespace jafar
 				/**
 				 * Try to match landmarks
 				 */
-				virtual std::list<size_t> match(std::list<size_t> ) = 0;
+				virtual std::list<size_t> match(std::list<size_t>) = 0;
 
 				/**
 				 *

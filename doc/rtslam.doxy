@@ -89,38 +89,38 @@
 	Here is an example of the Robot class. Observe the list of links to sensors and the link to the father map:
 	
 	\code
-		class RobotAbstract
-		{
-			public:
-				string                name;           // Name of robot.
-				string                type;           // Type of robot.
-				Control               control;        // Control input.
-				list<SensorAbstract*> sensorsList;    // List of pointers to sensors.
-				MapAbstract           * map;          // Pointer to father Map.
-				State                 state;          // State vector, pointing to the SLAM map.
-				virtual void          set_control();  // Set control input.
-				virtual void          move() = 0;     // Move the robot.
-		};
+	class RobotAbstract
+	{
+		public:
+			string                name;           // Name of robot.
+			string                type;           // Type of robot.
+			Control               control;        // Control input.
+			list<SensorAbstract*> sensorsList;    // List of pointers to sensors.
+			MapAbstract           * map;          // Pointer to father Map.
+			State                 state;          // State vector, pointing to the SLAM map.
+			virtual void          set_control();  // Set control input.
+			virtual void          move() = 0;     // Move the robot.
+	};
 	\endcode
 
 	Here is an example of the class Observation:
 	\code
 	class ObservationAbstract
-		{
-			public:
-				SensorAbstract   * sensor;                   // Pointer to mother sensor.
-				LandmarkAbstract * landmark;                 // Pointer to father landmark.
-				Expectation      expectation;                // Expectation. This is a Gaussian.
-				Measurement      measurement;                // Measurement. This is a Gaussian.
-				Innovation       innovation;                 // Innovation. This is a Gaussian.
-				struct           counters;                   // Event counters for map management.
-				struct           events;                     // Event flags for active-search flow control.
-				virtual bool     project() = 0;              // Project landmark into sensor.
-				virtual bool     isVisible() = 0;            // True if landmark is visible.
-				virtual bool     match();                    // Try to match and get measurement.
-				virtual bool     isIndividuallyConsistent(); // Consistency test.
-				virtual void     back_project() = 0;         // Back-project feature into landmark for initialization.
-		};
+	{
+		public:
+			SensorAbstract   * sensor;                   // Pointer to mother sensor.
+			LandmarkAbstract * landmark;                 // Pointer to father landmark.
+			Expectation      expectation;                // Expectation. This is a Gaussian.
+			Measurement      measurement;                // Measurement. This is a Gaussian.
+			Innovation       innovation;                 // Innovation. This is a Gaussian.
+			struct           counters;                   // Event counters for map management.
+			struct           events;                     // Event flags for active-search flow control.
+			virtual bool     project() = 0;              // Project landmark into sensor.
+			virtual bool     isVisible() = 0;            // True if landmark is visible.
+			virtual bool     match();                    // Try to match and get measurement.
+			virtual bool     isIndividuallyConsistent(); // Consistency test.
+			virtual void     back_project() = 0;         // Back-project feature into landmark for initialization.
+	};
 	\endcode
 	
   Here is an overview of how these objects are treated in this software.
@@ -209,10 +209,10 @@
 	void h(const vec3 x, vec2 z, mat Z_x){    // This will perform g(f(x)) and return Jacobians.
 		vec2 y;
 		mat23 Y_x;
-		f(x, y, Y_x);                      // This computes y and     -------->  Y_x = dy/dx = df(x)/dx.
+		f(x, y, Y_x);                         // This computes y and     -------->  Y_x = dy/dx = df(x)/dx.
 		mat22 Z_y;
-		g(y, z, Z_y);                      // This is z = g(y) = g(f(x)) and ->  Z_y = dz/dy = dg(y)/dy.
-		Z_x = Z_y * Y_x;                   // This is the chain rule doing   ->  Z_x = dz/dx = dz/dy * dy/dx.
+		g(y, z, Z_y);                         // This is z = g(y) = g(f(x)) and ->  Z_y = dz/dy = dg(y)/dy.
+		Z_x = Z_y * Y_x;                      // This is the chain rule doing   ->  Z_x = dz/dx = dz/dy * dy/dx.
 	}
 	\endcode
 	

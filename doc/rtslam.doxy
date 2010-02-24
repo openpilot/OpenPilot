@@ -8,7 +8,7 @@
 \author 
   Joan Sola, jsola@laas.fr
   
-\section Contents
+\section secContents Contents
 
  - \ref secPresentation
  - \ref secPhilosophy
@@ -76,7 +76,7 @@
 	All of such loops are visible in the figure. 
 	For example, the leftmost one is highlighted in red: M1->R1->S11->O111<-L1<-M1.
   
-	To account for these relationships, the \ref rtslam uses <b> lists of pointers to children</b>, and a single <b>pointer to a parent</b>. 
+	To account for these relationships, the \b rtslam uses <b> lists of pointers to children</b>, and a single <b>pointer to a parent</b>. 
 	Yes, each link in the graph is stored twice. This allows systematic forward and backward referencing between objects.
 	This figure shows the general implementation of such bi-directional links
 	
@@ -128,9 +128,9 @@
 
 				Innovation innovation;                 // Innovation. This is a Gaussian.
 
-				struct counter                         // Event counters for map management.
+				struct counters;                       // Event counters for map management.
 
-				struct event                           // Event flags for active-search flow control.
+				struct events;                         // Event flags for active-search flow control.
 
 				virtual bool project(void) = 0;        // Project landmark into sensor.
 

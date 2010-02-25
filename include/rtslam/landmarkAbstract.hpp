@@ -2,7 +2,7 @@
  * Copyright RIA-LAAS/CNRS, 2010
  *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
- * File:      LandmarkAbstract.h
+ * File:      landmarkAbstract.h
  * Project:   RT-Slam
  * Author:    Joan Sola
  *

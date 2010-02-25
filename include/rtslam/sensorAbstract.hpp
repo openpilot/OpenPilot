@@ -1,5 +1,5 @@
 /*
- * SensorAbstract.h
+ * sensorAbstract.h
  *
  *  Created on: Jan 28, 2010
  *      Author: jsola
@@ -41,8 +41,8 @@ namespace jafar {
 				 * Acquire raw data
 				 */
 				virtual void acquire() = 0;
-
 		};
+
 
 		/** Base class for all sensors defined in the module rtslam.
 		 *

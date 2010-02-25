@@ -46,13 +46,22 @@
 	
 	The hierarchical organization of all these objects is defined family-tree-like. 
 	The family-tree differs from a regular tree in that an object can have more than one parent 
-	(\e ie. \t a father and a mother, please keep reading). 
+	(\e ie. a father and a mother, please keep reading). 
 	The parents may have none, one or more children. 
 	The children have a backwards link to their parent. 
 	
 	The Observations link Sensors to Landmarks and are the only objects to have both mother 
 	(\e eg. the Sensor) and father (\e eg. the Landmark). 
+		
+	The figure below illustrates the family-tree organization for the case of a map 
+	with 2 robots and 2 landmarks, one robot with one sensor and the other one with 2 sensors.
 	
+	\image html familyTree.png "The family tree hierarchical organization"
+	
+	Each Observation creates a loop of links.
+	All of such loops are visible in the figure. 
+	For example, the leftmost one is highlighted in red: M1->R1->S11->O111<-L1<-M1.
+  
 	\b REMARK: The existence of the class Observation permits the correct segmentation of data and methods into
 	comprehensive units. 
 	An Observation exists every time there exist a sensor and a landmark, 
@@ -66,16 +75,6 @@
 	- A \e measurement is a member of Observation.
 	- Other members are the \e expectation and the \e innovation.
 	
-	
-	The figure below illustrates the family-tree organization for the case of a map 
-	with 2 robots and 2 landmarks, one robot with one sensor and the other one with 2 sensors.
-	
-	\image html familyTree.png "The family tree hierarchical organization"
-	
-	Each Observation creates a loop of links.
-	All of such loops are visible in the figure. 
-	For example, the leftmost one is highlighted in red: M1->R1->S11->O111<-L1<-M1.
-  
 	To account for these relationships, the \b rtslam uses <b> lists of pointers to children</b>, and a single <b>pointer to a parent</b>. 
 	Yes, each link in the graph is stored twice. This allows systematic forward and backward referencing between objects.
 	This figure shows the general implementation of such bi-directional links
@@ -125,32 +124,32 @@
 	
   Here is an overview of how these objects are treated in this software.
   
-  - \c \b Map: \t A playground base with robots and landmarks, and a stochastic map and filtering engine. 
-  	- It has children \c \b Robots \t and \c \b Landmarks.
+  - \b Map: A playground base with robots and landmarks, and a stochastic map and filtering engine. 
+  	- It has children \b Robots  and \b Landmarks.
   	- Its parent would be a higher structure managing multi-map setups. 
-  		This is not yet supported here, but an object \c \b MultiMap \t could just do.
+  		This is not yet supported here, but an object \b MultiMap  could just do.
   	- It knows how to keep all its children up to date in the stochastic map (EKF predictions and corrections).
-  - \c \b Robot: \t A frame carrying sensors.
-  	- It has children \c \b Sensors. 
-  	- It knows its parent \c \b Map.
+  - \b Robot: A frame carrying sensors.
+  	- It has children \b Sensors. 
+  	- It knows its parent \b Map.
   	- It knows how to move. 
-  - \c \b Sensor: \t A sensing device, with a pose specified in robot frame, and some intrinsic parameters. 
-  	- It has children \c \b Observations. 
-  	- It knows its parent \c \b Robot.
-  - \c \b Landmark: \t A geometric entity in outer space, with some parameters in the stochastic map, 
+  - \b Sensor:  A sensing device, with a pose specified in robot frame, and some intrinsic parameters. 
+  	- It has children \b Observations. 
+  	- It knows its parent \b Robot.
+  - \b Landmark:  A geometric entity in outer space, with some parameters in the stochastic map, 
   	and some out of it. 
-  	- Its children are the \c \b Observations \t that have potentially seen it.
-  	- It knows its parent \c \b Map. 
+  	- Its children are the \b Observations  that have potentially seen it.
+  	- It knows its parent \b Map. 
   	- It knows how to transform itself to or from other frames. 
   	- It knows how to reparametrize itself into another representation. 
-  - \c \b Observation: \t All the information related to the fact that a landmark is observable from a sensor. 
+  - \b Observation:  All the information related to the fact that a landmark is observable from a sensor. 
   	- This is the biggest class in the project.
   	- It exists if the landmark is potentially observable by the sensor.  		
   		An actual, successful observation is called a \e measurement.
   	- It stores everything related to the bynome sensor-landmark, including expectations, measurements, innovations and all related Jacobians.
   	- It does not have children.
-  	- It knows its parent \c \b Sensor (mother). 
-  	- It knows to which \c \b Landmark \t it points to (father).
+  	- It knows its parent \b Sensor (mother). 
+  	- It knows to which \b Landmark  it points to (father).
   	- It knows how to detect new features and match them to landmarks.
   	- It knows how to project existing landmarks.
   	- It knows how to back-project features into new landmarks.
@@ -209,10 +208,10 @@
 	void h(const vec3 x, vec2 z, mat Z_x){    // This will perform g(f(x)) and return Jacobians.
 		vec2 y;
 		mat23 Y_x;
-		f(x, y, Y_x);                         // This computes y and     -------->  Y_x = dy/dx = df(x)/dx.
+		f(x, y, Y_x);                           // This computes y and     -------->  Y_x = dy/dx = df(x)/dx.
 		mat22 Z_y;
-		g(y, z, Z_y);                         // This is z = g(y) = g(f(x)) and ->  Z_y = dz/dy = dg(y)/dy.
-		Z_x = Z_y * Y_x;                      // This is the chain rule doing   ->  Z_x = dz/dx = dz/dy * dy/dx.
+		g(y, z, Z_y);                           // This is z = g(y) = g(f(x)) and ->  Z_y = dz/dy = dg(y)/dy.
+		Z_x = Z_y * Y_x;                        // This is the chain rule doing   ->  Z_x = dz/dx = dz/dy * dy/dx.
 	}
 	\endcode
 	
@@ -243,7 +242,7 @@
 	We designed and built the jafar::rtslam::Gaussian class for storing Gaussian variables. 
 	This class is interesting because it admits both local and remote storage, 
 	and thus we can make it point to its own internal data or to data stored 
-	in the big Gaussian residing in the \c \b Map.
+	in the big Gaussian residing in the \b Map.
 	A nice feature of this class is that the indirect array of pointers to the Map is explicitly available.
 	This makes the manipulation of banded matrices and cross-variances easy, intuitive, light-weight, readable.
 	

@@ -2,7 +2,7 @@
  * Copyright RIA-LAAS/CNRS, 2010
  *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
- * File:      ObservationAbstract.h
+ * File:      observationAbstract.h
  * Project:   RT-Slam
  * Author:    Joan Sola
  *

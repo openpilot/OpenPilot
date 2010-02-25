@@ -2,7 +2,7 @@
  * Copyright RIA-LAAS/CNRS, 2010
  *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
- * File:      RobotAbstract.h
+ * File:      robotAbstract.h
  * Project:   RT-Slam
  * Author:    Joan Sola
  *

@@ -22,23 +22,21 @@
 #include "robotAbstract.hpp"
 #include "landmarkAbstract.hpp"
 
-namespace jafar
-{
+namespace jafar {
 
 	/**
 	 * Namespace rtslam for real-time slam module.
 	 * \ingroup rtslam
 	 */
-	namespace rtslam
-	{
+	namespace rtslam {
 
 		/** Base class for all map types defined in the module
 		 * rtslam.
 		 *
 		 * @ingroup rtslam
 		 */
-		class MapAbstract: public Gaussian
-		{
+		class MapAbstract: public Gaussian {
+
 				/**
 				 * Mandatory virtual destructor
 				 */

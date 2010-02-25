@@ -43,25 +43,14 @@ namespace jafar {
 				/**
 				 * Copy constructor.
 				 */
-				Gaussian( Gaussian& G);
+				Gaussian(const Gaussian& G);
 
 				/**
 				 * Local constructors.
 				 * These constructors store the input information in the local storage x_ and P_.
 				 * The range is set to occupy the full data size.
 				 */
-				Gaussian( jblas::vec& _x);
-				Gaussian( jblas::vec& _x,  jblas::vec& _std);
-				Gaussian( jblas::vec& _x,  jblas::sym_mat& _P);
-				//				:
-				//					storage(LOCAL),
-				//					size(_x.size())
-				//					x_(_x),
-				//					P_(_P)
-				//					{
-				//					x(x_, r.all());
-				//					P(P_, r.all(), r.all());
-				//				}
+				Gaussian(const jblas::vec& _x, const jblas::sym_mat& _P);
 
 				/**
 				 * Remote constructors.
@@ -70,159 +59,122 @@ namespace jafar {
 				 * If mean and covariance are provided, these affect the remote Gaussian.
 				 * The local storage is kept at null size for economy.
 				 */
-				Gaussian( Gaussian& G,  jblas::ind_array& _r);
-				Gaussian( Gaussian& G,  jblas::ind_array& _r,  jblas::vec& _x);
-				Gaussian( Gaussian& G,  jblas::ind_array& _r,  jblas::vec& _x,  jblas::vec& _std);
-				Gaussian( Gaussian& G,  jblas::ind_array& _r,  jblas::vec& _x,  jblas::sym_mat& _P);
+				Gaussian(Gaussian& G, const jblas::ind_array& _r);
 
 				/**
-				 * Clear all data, keep sizes and ranges
+				 * Clear data, keep sizes and ranges
 				 */
 				void clear(void);
 
 				/**
+				 * Clear local data, keep sizes and ranges
+				 */
+				void clear_local(void);
+
+				/**
 				 * Accessors
 				 */
-				void set_storage_type( storage_t _s);
-				void set_r( jblas::ind_array& _r);
-				void set_size( std::size_t _size);
-				void set_x( jblas::vec& _x);
-				void set_P( jblas::vec& _std);
-				void set_P( jblas::sym_mat& _P);
-				void set_P( jblas::sym_mat& _P, jblas::ind_array _r);
-				void set_P( jblas::mat& _P, jblas::ind_array _r1, jblas::ind_array _r2);
-				void set( jblas::vec& _x,  jblas::vec& _std);
-				void set( jblas::vec& _x,  jblas::sym_mat& _P);
-				void set( Gaussian& G,  jblas::ind_array& _r,  jblas::vec& _x,  jblas::vec& _std);
-				void set( Gaussian& G,  jblas::ind_array& _r,  jblas::vec& _x,  jblas::sym_mat& _P);
+				void set_storage_type(const storage_t _s);
+				void set_r(const jblas::ind_array& _r);
+				void set_size(const std::size_t _size);
+				void set_x(const jblas::vec& _x);
+				void set_P(const jblas::vec& _std);
+				void set_P(const jblas::sym_mat& _P);
+				void set_P(const jblas::sym_mat& _P, const jblas::ind_array _r);
+				void set_P(const jblas::mat& _P, const jblas::ind_array _r1, const jblas::ind_array _r2);
+				void set(const jblas::vec& _x, const jblas::vec& _std);
+				void set(const jblas::vec& _x, const jblas::sym_mat& _P);
+				void set(jblas::vec _x, jblas::sym_mat _P, const jblas::ind_array& _r);
+				void set(Gaussian& G, const jblas::ind_array& _r);
 
-				//				std::ostream& jafar::jmath::operator <<(std::ostream& s,  Gaussian& g_);
+				//				std::ostream& jafar::rtslam::operator <<(std::ostream& s,  Gaussian& g_);
 		};
+
+		/**
+		 * Set mean
+		 */
+		void Gaussian::set_x(const jblas::vec & _x)
+		{
+			JFR_ASSERT(_x.size() == size,"gaussian.hpp: set_x: size mismatch.");
+			x.assign(_x);
+		}
+
+		/**
+		 * Set covariance
+		 */
+		void Gaussian::set_P(const jblas::sym_mat & _P)
+		{
+			JFR_ASSERT(_P.size1() == size,"gaussian.hpp: set_P: size mismatch.");
+			P.assign(_P);
+		}
 
 		/*
 		 * Set cov from std
 		 */
-		//		void Gaussian::set_P( jblas::vec& _std)
-		//		{
-		//			P.assign(jblas::zero_mat(size));
-		//			for (std::size_t i = 0; i < size; i++)
-		//			{
-		//				P(i, i) = _std(i) * _std(i);
-		//			}
-		//		}
+		void Gaussian::set_P(const jblas::vec& _std) {
+			JFR_ASSERT(_std.size() == P.size1(),"gaussian.hpp: set_P: size mismatch.");
+			P.assign(jblas::zero_mat(size));
+			for (std::size_t i = 0; i < size; i++) {
+				P(i, i) = _std(i) * _std(i);
+			}
+		}
+
 
 		/**
-		 * Set covariance from a covariances matrix
+		 * Copy constructor
 		 */
-		//		void Gaussian::set_P( jblas::sym_mat& _P)
-		//		{
-		//			JFR_PRECOND(_P.size1() == size, "gaussian::set_P: sizes of _P and Gaussian do not match");
-		//			for (std::size_t i = 0; i < size; i++)
-		//			{
-		//				for (std::size_t j = 0; j <= i; j++)
-		//				{
-		//					P(i, j) = _P(i, j);
-		//				}
-		//			}
-		//		}
-
-		/**
-		 * Set covariances block-diagonal
-		 */
-		//		void Gaussian::set_P( jblas::mat& _P, jblas::ind_array _r1, jblas::ind_array _r2)
-		//		{
-		//			JFR_PRECOND((_r1.size() == _P.size1()) && (_r2.size() == _P.size2()),
-		//			    "gaussian::set_P: sizes of _P , _r1 and _r2 do not match");
-		//			JFR_PRECOND((_r1.size() <= size) && (_r2.size() <= size),
-		//			    "gaussian::set_P: size of _P too big for local Gaussian.");
-		//			for (std::size_t i = 0; i < _r1.size(); i++)
-		//			{
-		//				for (std::size_t j = 0; j < _r2.size(); j++)
-		//				{
-		//					P_(r(i), r(j)) = _P(i, j);
-		//				}
-		//			}
-		//		}
-
-		/**
-		 * Set covariance block - any block
-		 */
-		//		void Gaussian::set_P(){}
+		Gaussian::Gaussian(const Gaussian & G) :
+			storage(G.storage), size(G.size), x_(G.x_), P_(G.P_), r(G.r), x(G.x), P(G.P) {
+		}
 
 		/*
 		 * Local constructor
 		 */
-		//		Gaussian::Gaussian( jblas::vec& _x) :
-		//			storage(LOCAL), size(_x.size()), x_(_x), r(size)
-		//		{
-		//			r.all_;
-		//			P_.resize(size, size);
-		//			P_.clear();
-		//			x(x_, r); // affect to local data
-		//			P(P_, r, r); // affect to local data
-		//		}
-
-		/*
-		 * Local constructor
-		 */
-		//		Gaussian::Gaussian( jblas::vec& _x,  jblas::vec& _std) :
-		//			storage(LOCAL), size(_x.size()), x_(_x), r(0, size)
-		//		{
-		//			JFR_PRECOND(_x.size() == _std.size(), "gaussian::Gaussian: sizes of _x and _std do not match");
-		//			P_.resize(size, size);
-		//			for (size_t i = 0; i < size; i++)
-		//			{
-		//				P_(i, i) = _std(i);
-		//			}
-		//			x(x_, r); // direct to local data
-		//			P(P_, r, r); // direct to local data
-		//		}
-
-		/*
-		 * Local constructor
-		 */
-		Gaussian::Gaussian( jblas::vec& _x,  jblas::sym_mat& _P) :
+		Gaussian::Gaussian(const jblas::vec& _x, const jblas::sym_mat& _P) :
 			storage(LOCAL), size(_x.size()), x_(_x), P_(_P), r(size), x(x_, r.all()), P(P_, r.all(), r.all()) {
 		}
 
 		/*
 		 * Remote constructor
 		 */
-		Gaussian::Gaussian( Gaussian & G,  jblas::ind_array & _r) :
-			storage(REMOTE), size(_r.size()), x_(0), P_(0), r(size), x(G.x_, r), P(G.P_, r, r) {
-			r = _r;
-			//			x(G.x_, r);
-			//			P(G.P_, r, r);
+		Gaussian::Gaussian(Gaussian & G, const jblas::ind_array & _r) :
+			storage(REMOTE), size(_r.size()), x_(0), P_(0), r(_r), x(G.x_, r), P(G.P_, r, r) {
 		}
 
-		/*
-		 * Remote constructor
+		/**
+		 * Clear data, keep sizes and ranges
 		 */
-		//		Gaussian::Gaussian( Gaussian G,  jblas::ind_array& _r,  jblas::vec& _x) :
-		//			storage(REMOTE), r(_r), size(_r.size()), x(G, r), P(G, r, r)
-		//		{
-		//			x.assign(_x);
-		//			P.assign(jblas::zero_mat(size));
-		//		}
+		void Gaussian::clear(void){
+			x.assign(jblas::zero_vec(size));
+			P.assign(jblas::zero_mat(size,size));
+		}
 
-		/*
-		 * Remote constructor
+
+
+		/**
+		 * Clear
 		 */
-		//		Gaussian::Gaussian( Gaussian G,  jblas::ind_array& _r,  jblas::vec& _x,  jblas::sym_mat& _P) :
-		//			storage(REMOTE), r(_r), size(_r.size()), x(G, r), P(G, r, r)
-		//		{
-		//			x.assign(_x);
-		//			P.assign(_P);
-		//		}
+		void Gaussian::clear_local(void){
+			x_.clear();
+			P_.clear();
+		}
 
 		/*
 		 * Operators
 		 */
-//		std::ostream& jafar::jmath::operator <<(std::ostream& s,  Gaussian& g_) {
-//			s << g_.x << " - " << g_.P;
-//			return s;
-//		}
+		std::ostream& operator <<(std::ostream & s, jafar::rtslam::Gaussian & g_) {
+			if (g_.storage == LOCAL)
+				s << "Gaussian with local storage:\n";
+			else
+				s << "Gaussian with remote storage:\n .r: TODO: gaussian.hpp: operator << for indirect_array<> type." << "\n";
+			//			s << "Gaussian with remote storage\n .r: " << g_.r << "\n";
+			s << " .x: " << g_.x << "\n .P: " << g_.P;
+			return s;
+		}
 	}
 }
+
+
+
 
 #endif /* GAUSSIAN_HPP_ */

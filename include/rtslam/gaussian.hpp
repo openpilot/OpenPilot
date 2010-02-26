@@ -174,13 +174,21 @@ namespace jafar {
 		}
 
 		/**
-		 * Operator << for class Gaussian
+		 * Operator << for class Gaussian.
+		 * It shows different information depending on the Gaussian having local or remote storage.
+		 * For local storage, the mean and covariance data is shown.
+		 * For remote storage, the size of the remote Gaussian is also shown, and the indirect array too.
 		 */
 		std::ostream& operator <<(std::ostream & s, jafar::rtslam::Gaussian & g_) {
 			if (g_.storage == LOCAL)
 				s << "Gaussian with local storage: \n";
-			else
-				s << "Gaussian with remote storage: \n .ia: " << g_.ia << "\n";
+			else {
+				size_t sz = g_.x.data().size();
+				s << "Gaussian with remote storage: \n";
+				s << "->x_: [" << sz << "](...data not shown...)\n";
+				s << "->P_: [" << sz << "," << sz << "](...data not shown...)\n";
+				s << " .ia: " << g_.ia << "\n";
+			}
 			s << " .x : " << g_.x << "\n .P : " << g_.P;
 			return s;
 		}

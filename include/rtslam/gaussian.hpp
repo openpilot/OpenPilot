@@ -35,6 +35,7 @@ namespace jafar {
 				storage_t storage;
 				std::size_t size;
 				jblas::vec x_;
+				//				boost::numeric::ublas::symmetric_adaptor<jblas::sym_mat> P_;
 				jblas::sym_mat P_;
 				jblas::ind_array ia;
 				jblas::vec_indirect x;
@@ -153,7 +154,7 @@ namespace jafar {
 		}
 
 		/**
-		 * Clear
+		 * Clear local data, keep sizes and ranges
 		 */
 		void Gaussian::clear_local(void) {
 			x_.clear();
@@ -161,7 +162,7 @@ namespace jafar {
 		}
 
 		/**
-		 * Operator << class for ind_array
+		 * Operator << for class for ind_array
 		 * TODO: see where to put this operator!
 		 */
 		std::ostream& operator <<(std::ostream & s, jblas::ind_array & ia_) {

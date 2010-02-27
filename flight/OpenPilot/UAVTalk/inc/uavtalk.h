@@ -23,29 +23,24 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef UAVTALK_C_H
-#define UAVTALK_C_H
+#ifndef UAVTALK_H
+#define UAVTALK_H
 
 #include <stdint.h>
+#include "uavobjectmanager.h"
 
 // Public constants
 #define UAVTALK_WAITFOREVER -1
 #define UAVTALK_NOWAIT 0
 
 // Public types
-typedef int32_t (*UAVTalkUnpackCb)(uint32_t objId, uint8_t* data, int32_t length);
-typedef int32_t (*UAVTalkPackCb)(uint32_t objId, uint8_t* data, int32_t maxLength);
 typedef int32_t (*UAVTalkOutputStream)(uint8_t* data, int32_t length);
 
 // Public functions
 int32_t UAVTalkInitialize(UAVTalkOutputStream outputStream);
-int32_t UAVTalkConnectObject(uint32_t objectId, UAVTalkPackCb packCb, UAVTalkUnpackCb unpackCb, int32_t updatePeriodMs);
-int32_t UAVTalkSetUpdatePeriod(uint32_t objectId, int32_t updatePeriodMs);
 int32_t UAVTalkSetOutputStream(UAVTalkOutputStream outputStream);
-int32_t UAVTalkSendObject(uint32_t objectId, uint8_t acked, int32_t timeoutMs);
-int32_t UAVTalkSendObjectRequest(uint32_t objectId, int32_t timeoutMs);
+int32_t UAVTalkSendObject(UAVObjHandle obj, uint16_t instId, uint8_t acked, int32_t timeoutMs);
+int32_t UAVTalkSendObjectRequest(UAVObjHandle obj, uint16_t instId, int32_t timeoutMs);
 int32_t UAVTalkProcessInputStream(uint8_t rxbyte);
-int32_t UAVTalkProcessPeriodicUpdates(void);
 
-
-#endif // UAVTALK_C_H
+#endif // UAVTALK_H

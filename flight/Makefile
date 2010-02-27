@@ -102,8 +102,7 @@ SRC =  $(MODTELEMETRY)/telemetry.c
 SRC +=  $(OPSYSTEM)/openpilot.c
 SRC += $(OPSYSTEM)/op_logging.c
 SRC += $(OPUAVTALK)/uavtalk.c
-SRC += $(OPUAVOBJ)/uavobjectutils.c
-SRC += $(OPUAVOBJ)/uavobjectlist.c
+SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/uavobjectsinit.c
 
 ## UAVOBJECTS

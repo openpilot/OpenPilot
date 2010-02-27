@@ -25,19 +25,17 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <stdlib.h> // for malloc
 #include "uavtalk.h"
-#include "utlist.h"
 #include "FreeRTOS.h"
 #include "semphr.h"
 
 // Private constants
 #define TYPE_MASK 0xFC
-#define TYPE_BASE 0x50
-#define TYPE_OBJ (TYPE_BASE | 0x00)
-#define TYPE_OBJ_REQ (TYPE_BASE | 0x01)
-#define TYPE_OBJ_ACK (TYPE_BASE | 0x02)
-#define TYPE_ACK (TYPE_BASE | 0x03)
+#define TYPE_VER 0x10
+#define TYPE_OBJ (TYPE_VER | 0x00)
+#define TYPE_OBJ_REQ (TYPE_VER | 0x01)
+#define TYPE_OBJ_ACK (TYPE_VER | 0x02)
+#define TYPE_ACK (TYPE_VER | 0x03)
 
 #define HEADER_LENGTH 6 // type (1), object ID (4), length (1)
 #define CHECKSUM_LENGTH 2
@@ -47,33 +45,23 @@
 #define MIN_UPDATE_PERIOD_MS 1
 
 // Private types
-struct ObjectHandleStruct {
-    uint32_t objectId;
-    UAVTalkUnpackCb packCb;
-    UAVTalkUnpackCb unpackCb;
-    xSemaphoreHandle sema;
-    uint32_t waitingResp;
-    int32_t updatePeriodMs;
-    int32_t timeToNextUpdateMs;
-    struct ObjectHandleStruct* next;
-};
-typedef struct ObjectHandleStruct ObjectHandle;
-typedef enum {STATE_SYNC, STATE_OBJID, STATE_LENGTH, STATE_DATA, STATE_CS} RxState;
+typedef enum {STATE_SYNC, STATE_OBJID, STATE_INSTID, STATE_DATA, STATE_CS} RxState;
 
 // Private variables
 UAVTalkOutputStream outStream;
-ObjectHandle* objects;
-int32_t timeToNextUpdateMs;
-xSemaphoreHandle mutex;
+xSemaphoreHandle lock;
+xSemaphoreHandle respSema;
+UAVObjHandle respObj;
+uint16_t respInstId;
 uint8_t rxBuffer[MAX_PACKET_LENGTH];
 uint8_t txBuffer[MAX_PACKET_LENGTH];
 
 // Private functions
 uint16_t updateChecksum(uint16_t cs, uint8_t* data, int32_t length);
-ObjectHandle* findObject(uint32_t objId);
-int32_t objectTransaction(uint32_t objectId, uint8_t type, int32_t timeout);
-int32_t sendObject(ObjectHandle* obj, uint8_t type);
-int32_t receiveObject(uint8_t type, ObjectHandle* obj, uint8_t* data, int32_t length);
+int32_t objectTransaction(uint32_t objectId, uint16_t instId, uint8_t type, int32_t timeout);
+int32_t sendObject(UAVObjHandle obj, uint16_t instId, uint8_t type);
+int32_t sendSingleObject(UAVObjHandle obj, uint16_t instId, uint8_t type);
+int32_t receiveObject(uint8_t type, UAVObjHandle obj, uint16_t instId, uint8_t* data, int32_t length);
 
 /**
  * Initialize the UAVTalk library
@@ -81,110 +69,50 @@ int32_t receiveObject(uint8_t type, ObjectHandle* obj, uint8_t* data, int32_t le
  * \return 0 Success
  * \return -1 Failure
  */
-int32_t UAVTalkInitialize(UAVTalkOutputStream outputStream) {
+int32_t UAVTalkInitialize(UAVTalkOutputStream outputStream)
+{
     outStream = outputStream;
-    mutex = xSemaphoreCreateRecursiveMutex();
-    timeToNextUpdateMs = 0;
-    objects = NULL;
-
+    lock = xSemaphoreCreateRecursiveMutex();
+    vSemaphoreCreateBinary(respSema);
     return 0;
-}
-
-/**
- * Connect an object to the UAVTalk library. All objects needs to be registered, this is needed
- * so that the library knows how to call the pack and unpack functions of the object.
- * \param[in] objectId ID of the object
- * \param[in] packCb Callback function that is used to pack the object, called each time the object needs to be sent.
- * \param[in] unpackCb Callback function that is used to unpack the object, called each time the object is received.
- * \return 0 Success
- * \return -1 Failure
- */
-int32_t UAVTalkConnectObject(uint32_t objectId, UAVTalkPackCb packCb, UAVTalkUnpackCb unpackCb, int32_t updatePeriodMs) {
-    ObjectHandle* obj;
-    // Lock
-    xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-	// Check that the object is not already connected
-	LL_FOREACH(objects, obj)
-	{
-		if (obj->objectId == objectId)
-		{
-			// Already registered, ignore
-			xSemaphoreGiveRecursive(mutex);
-			return -1;
-		}
-	}
-    // Create handle
-    obj = (ObjectHandle*)malloc(sizeof(ObjectHandle));
-    obj->objectId = objectId;
-    obj->packCb = packCb;
-    obj->unpackCb = unpackCb;
-    vSemaphoreCreateBinary(obj->sema);
-    obj->waitingResp = 0;
-    obj->updatePeriodMs = updatePeriodMs;
-    obj->timeToNextUpdateMs = 0;
-    // Add to list
-    LL_APPEND(objects, obj);
-    // Done
-    xSemaphoreGiveRecursive(mutex);
-    return 0;
-}
-
-/**
- * Setup object for periodic updates.
- * \param[in] objectId ID of the object to update
- * \param[in] updatePeriodMs The update period in ms, if zero then periodic updates are disabled
- * \return 0 Success
- * \return -1 Failure
- */
-int32_t UAVTalkSetUpdatePeriod(uint32_t objectId, int32_t updatePeriodMs) {
-    ObjectHandle* obj;
-    // Lock
-    xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-    // Get and update object
-    obj = findObject(objectId);
-    if (obj != 0) {
-        obj->updatePeriodMs = updatePeriodMs;
-        obj->timeToNextUpdateMs = 0;
-        xSemaphoreGiveRecursive(mutex);
-        return 0;
-    }
-    else {
-    	xSemaphoreGiveRecursive(mutex);
-        return -1;
-    }
 }
 
 /**
  * Request an update for the specified object, on success the object data would have been
  * updated by the GCS.
- * \param[in] objectId ID of the object to update
+ * \param[in] obj Object to update
+ * \param[in] instId The instance ID of UAVOBJ_ALL_INSTANCES for all instances.
  * \param[in] timeout Time to wait for the response, when zero it will return immediately
  * \return 0 Success
  * \return -1 Failure
  */
-int32_t UAVTalkSendObjectRequest(uint32_t objectId, int32_t timeout) {
-    return objectTransaction(objectId, TYPE_OBJ_REQ, timeout);
+int32_t UAVTalkSendObjectRequest(UAVObjHandle obj, uint16_t instId, int32_t timeout)
+{
+    return objectTransaction(obj, instId, TYPE_OBJ_REQ, timeout);
 }
 
 /**
  * Send the specified object through the telemetry link.
- * \param[in] objectId ID of the object to send
+ * \param[in] obj Object to send
+ * \param[in] instId The instance ID of UAVOBJ_ALL_INSTANCES for all instances.
  * \param[in] acked Selects if an ack is required (1:ack required, 0: ack not required)
  * \param[in] timeoutMs Time to wait for the ack, when zero it will return immediately
  * \return 0 Success
  * \return -1 Failure
  */
-int32_t UAVTalkSendObject(uint32_t objectId, uint8_t acked, int32_t timeoutMs) {
+int32_t UAVTalkSendObject(UAVObjHandle obj, uint16_t instId, uint8_t acked, int32_t timeoutMs)
+{
     if (acked == 1) {
-        return objectTransaction(objectId, TYPE_OBJ_ACK, timeoutMs);
+        return objectTransaction(obj, instId, TYPE_OBJ_ACK, timeoutMs);
     } else {
-        return objectTransaction(objectId, TYPE_OBJ, timeoutMs);
+        return objectTransaction(obj, instId, TYPE_OBJ, timeoutMs);
     }
 }
 
 /**
  * Execute the requested transaction on an object.
- * \param[in] objectId ID of object
+ * \param[in] obj Object
+ * \param[in] instId The instance ID of UAVOBJ_ALL_INSTANCES for all instances.
  * \param[in] type Transaction type
  * 			  TYPE_OBJ: send object,
  * 			  TYPE_OBJ_REQ: request object update
@@ -192,87 +120,43 @@ int32_t UAVTalkSendObject(uint32_t objectId, uint8_t acked, int32_t timeoutMs) {
  * \return 0 Success
  * \return -1 Failure
  */
-int32_t objectTransaction(uint32_t objectId, uint8_t type, int32_t timeoutMs) {
-    ObjectHandle* obj;
+int32_t objectTransaction(UAVObjHandle obj, uint16_t instId, uint8_t type, int32_t timeoutMs)
+{
+	int32_t respReceived;
 
-    // Lock
-    xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-
-    // Find object
-    obj = findObject(objectId);
-    if (obj == 0) {
-    	xSemaphoreGiveRecursive(mutex);
-        return -1;
-    }
+	// Lock
+    xSemaphoreTakeRecursive(lock, portMAX_DELAY);
 
     // Send object depending on if a response is needed
-    if (type == TYPE_OBJ_ACK || type == TYPE_OBJ_REQ) {
-        sendObject(obj, type);
-        xSemaphoreGiveRecursive(mutex); // need to release lock since the next call will block until a response is received
-        xSemaphoreTake(obj->sema, 0); // the semaphore needs to block on the next call, here we make sure the value is zero (binary sema)
-        xSemaphoreTake(obj->sema, timeoutMs/portTICK_RATE_MS); // lock on object until a response is received (or timeout)
-        xSemaphoreTakeRecursive(mutex, portMAX_DELAY); // complete transaction
-        // Check if a response was received
-        if (obj->waitingResp == 1) {
-            obj->waitingResp = 0;
-            xSemaphoreGiveRecursive(mutex);
-            return -1;
-        } else {
-        	xSemaphoreGiveRecursive(mutex);
-            return 0;
-        }
-    } else if (type == TYPE_OBJ) {
-        sendObject(obj, TYPE_OBJ);
-        xSemaphoreGiveRecursive(mutex);
+    if (type == TYPE_OBJ_ACK || type == TYPE_OBJ_REQ)
+    {
+        sendObject(obj, instId, type);
+        respObj = obj;
+        respInstId = instId;
+        xSemaphoreGiveRecursive(lock); // need to release lock since the next call will block until a response is received
+    	xSemaphoreTake(respSema, 0); // the semaphore needs to block on the next call, here we make sure the value is zero (binary sema)
+    	respReceived = xSemaphoreTake(respSema, timeoutMs/portTICK_RATE_MS); // lock on object until a response is received (or timeout)
+    	// Check if a response was received
+    	if (respReceived == pdFALSE)
+    	{
+    		return -1;
+    	}
+    	else
+    	{
+    		return 0;
+    	}
+    }
+    else if (type == TYPE_OBJ)
+    {
+        sendObject(obj, instId, TYPE_OBJ);
+        xSemaphoreGiveRecursive(lock);
         return 0;
-    } else {
-    	xSemaphoreGiveRecursive(mutex);
+    }
+    else
+    {
+    	xSemaphoreGiveRecursive(lock);
         return -1;
     }
-}
-
-/**
- * Handle periodic updates for all objects.
- * \return The time to wait until the next update (in ms)
- * \return 0 Success
- * \return -1 Failure
- */
-int32_t UAVTalkProcessPeriodicUpdates(void) {
-    ObjectHandle* obj;
-    int32_t minDelay = MAX_UPDATE_PERIOD_MS;
-
-    // Lock
-    xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-
-    // Iterate through each object and update its timer, if zero then transmit object.
-    // Also calculate smallest delay to next update (will be used for setting timeToNextUpdateMs)
-    LL_FOREACH(objects, obj) {
-        // If object is configured for periodic updates
-        if (obj->updatePeriodMs > 0) {
-            obj->timeToNextUpdateMs -= timeToNextUpdateMs;
-            // Check if time for the next update
-            if (obj->timeToNextUpdateMs <= 0) {
-                // Reset timer
-                obj->timeToNextUpdateMs = obj->updatePeriodMs;
-                // Send object
-                sendObject(obj, TYPE_OBJ);
-            }
-            // Update minimum delay
-            if (obj->timeToNextUpdateMs < minDelay) {
-                minDelay = obj->timeToNextUpdateMs;
-            }
-        }
-    }
-
-    // Check if delay for the next update is too short
-    if (minDelay < MIN_UPDATE_PERIOD_MS) {
-        minDelay = MIN_UPDATE_PERIOD_MS;
-    }
-
-    // Done
-    timeToNextUpdateMs = minDelay;
-    xSemaphoreGiveRecursive(mutex);
-    return timeToNextUpdateMs;
 }
 
 /**
@@ -281,12 +165,14 @@ int32_t UAVTalkProcessPeriodicUpdates(void) {
  * \return 0 Success
  * \return -1 Failure
  */
-int32_t UAVTalkProcessInputStream(uint8_t rxbyte) {
+int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
+{
     static uint8_t tmpBuffer[4];
-    static ObjectHandle* obj;
+    static UAVObjHandle obj;
     static uint8_t type;
     static uint32_t objId;
-    static uint8_t length;
+    static uint16_t instId;
+    static uint32_t length;
     static uint16_t cs, csRx;
     static int32_t rxCount;
     static RxState state = STATE_SYNC;
@@ -294,7 +180,8 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte) {
     // Receive state machine
     switch (state) {
     case STATE_SYNC:
-        if ((rxbyte & TYPE_MASK) == TYPE_BASE ) {
+        if ((rxbyte & TYPE_MASK) == TYPE_VER )
+        {
             cs = rxbyte;
             type = rxbyte;
             state = STATE_OBJID;
@@ -303,39 +190,81 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte) {
         break;
     case STATE_OBJID:
         tmpBuffer[rxCount++] = rxbyte;
-        if (rxCount == 4) {
+        if (rxCount == 4)
+        {
             // Search for object, if not found reset state machine
             objId = (tmpBuffer[3] << 24) | (tmpBuffer[2] << 16) | (tmpBuffer[1] << 8) | (tmpBuffer[0]);
-            xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-            obj = findObject(objId);
-            xSemaphoreGiveRecursive(mutex);
-            if (obj == 0) {
+            obj = UAVObjGetByID(objId);
+            if (obj == 0)
+            {
                 state = STATE_SYNC;
-            } else {
+            }
+            else
+            {
+            	// Update checksum
                 cs = updateChecksum(cs, tmpBuffer, 4);
-                state = STATE_LENGTH;
-                rxCount = 0;
+                // Determine data length
+                if (type == TYPE_OBJ_REQ || type == TYPE_ACK)
+                {
+                	length = 0;
+                }
+                else
+                {
+					length = UAVObjGetNumBytes(obj);
+                }
+                // Check length and determine next state
+				if (length >= MAX_PAYLOAD_LENGTH)
+				{
+					state = STATE_SYNC;
+				}
+				else
+				{
+					// Check if this is a single instance object (i.e. if the instance ID field is coming next)
+					if ( UAVObjIsSingleInstance(obj) )
+					{
+						// If there is a payload get it, otherwise receive checksum
+			        	if (length > 0)
+			        	{
+			        		state = STATE_DATA;
+			        	}
+			        	else
+			        	{
+			        		state = STATE_CS;
+			        	}
+						instId = 0;
+						rxCount = 0;
+					}
+					else
+					{
+						state = STATE_INSTID;
+						rxCount = 0;
+					}
+				}
             }
         }
         break;
-    case STATE_LENGTH:
-        length = (int32_t)rxbyte;
-        if (length > MAX_PAYLOAD_LENGTH ||
-            ((type == TYPE_OBJ_REQ || type == TYPE_ACK) && length != 0)) {
-            state = STATE_SYNC;
-        } else {
-            cs = updateChecksum(cs, &length, 1);
-            rxCount = 0;
-            if (length > 0) {
-                state = STATE_DATA;
-            } else {
-                state = STATE_CS;
-            }
+    case STATE_INSTID:
+        tmpBuffer[rxCount++] = rxbyte;
+        if (rxCount == 2)
+        {
+        	instId = (tmpBuffer[1] << 8) | (tmpBuffer[0]);
+        	cs = updateChecksum(cs, tmpBuffer, 2);
+        	rxCount = 0;
+        	// If there is a payload get it, otherwise receive checksum
+        	if (length > 0)
+        	{
+        		state = STATE_DATA;
+        	}
+        	else
+        	{
+        		state = STATE_CS;
+        	}
         }
         break;
     case STATE_DATA:
         rxBuffer[rxCount++] = rxbyte;
-        if (rxCount == length) {
+        if (rxCount == length)
+        {
             cs = updateChecksum(cs, rxBuffer, length);
             state = STATE_CS;
             rxCount = 0;
@@ -343,12 +272,14 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte) {
         break;
     case STATE_CS:
         tmpBuffer[rxCount++] = rxbyte;
-        if (rxCount == 2) {
+        if (rxCount == 2)
+        {
             csRx = (tmpBuffer[1] << 8) | (tmpBuffer[0]);
-            if (csRx == cs) {
-                xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-                receiveObject(type, obj, rxBuffer, length);
-                xSemaphoreGiveRecursive(mutex);
+            if (csRx == cs)
+            {
+                xSemaphoreTakeRecursive(lock, portMAX_DELAY);
+                receiveObject(type, obj, instId, rxBuffer, length);
+                xSemaphoreGiveRecursive(lock);
             }
             state = STATE_SYNC;
         }
@@ -365,33 +296,39 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte) {
  * Receive an object. This function process objects received through the telemetry stream.
  * \param[in] type Type of received message (TYPE_OBJ, TYPE_OBJ_REQ, TYPE_OBJ_ACK, TYPE_ACK)
  * \param[in] obj Handle of the received object
+ * \param[in] instId The instance ID of UAVOBJ_ALL_INSTANCES for all instances.
  * \param[in] data Data buffer
  * \param[in] length Buffer length
  * \return 0 Success
  * \return -1 Failure
  */
-int32_t receiveObject(uint8_t type, ObjectHandle* obj, uint8_t* data, int32_t length) {
+int32_t receiveObject(uint8_t type, UAVObjHandle obj, uint16_t instId, uint8_t* data, int32_t length)
+{
     // Unpack object if the message is of type OBJ or OBJ_ACK
-    if (type == TYPE_OBJ || type == TYPE_OBJ_ACK) {
-       (obj->unpackCb)(obj->objectId, data, length);
+    if (type == TYPE_OBJ || type == TYPE_OBJ_ACK)
+    {
+    	UAVObjUnpack(obj, instId, data);
     }
 
     // Send requested object if message is of type OBJ_REQ
-    if (type == TYPE_OBJ_REQ) {
-       sendObject(obj, TYPE_OBJ);
+    if (type == TYPE_OBJ_REQ)
+    {
+    	sendObject(obj, instId, TYPE_OBJ);
     }
 
     // Send ACK if message is of type OBJ_ACK
-    if (type == TYPE_OBJ_ACK) {
-       sendObject(obj, TYPE_ACK);
+    if (type == TYPE_OBJ_ACK)
+    {
+    	sendObject(obj, instId, TYPE_ACK);
     }
 
     // If a response was pending on the object, unblock any waiting tasks
-    if (type == TYPE_ACK || type == TYPE_OBJ) {
-        if (obj->waitingResp == 1) {
-            obj->waitingResp = 0;
-            xSemaphoreGive(obj->sema);
-        }
+    if (type == TYPE_ACK || type == TYPE_OBJ)
+    {
+    	if (respObj == obj && (respInstId = instId || respInstId == UAVOBJ_ALL_INSTANCES))
+    	{
+    		xSemaphoreGive(respSema);
+    	}
     }
 
     // Done
@@ -401,52 +338,116 @@ int32_t receiveObject(uint8_t type, ObjectHandle* obj, uint8_t* data, int32_t le
 /**
  * Send an object through the telemetry link.
  * \param[in] obj Object handle to send
+ * \param[in] instId The instance ID or UAVOBJ_ALL_INSTANCES for all instances
  * \param[in] type Transaction type
  * \return 0 Success
  * \return -1 Failure
  */
-int32_t sendObject(ObjectHandle* obj, uint8_t type) {
+int32_t sendObject(UAVObjHandle obj, uint16_t instId, uint8_t type)
+{
+	uint32_t numInst;
+	uint32_t n;
+
+	// Check if this operation is for a single instance or all
+	if (instId == UAVOBJ_ALL_INSTANCES && !UAVObjIsSingleInstance(obj))
+	{
+		if (type == TYPE_OBJ || type == TYPE_OBJ_ACK)
+		{
+			// Get number of instances
+			numInst = UAVObjGetNumInstances(obj);
+			// Send all instances
+			for (n = 0; n < numInst; ++n)
+			{
+				sendSingleObject(obj, n, type);
+			}
+			return 0;
+		}
+		else
+		{
+			return -1;
+		}
+	}
+	else
+	{
+		return sendSingleObject(obj, instId, type);
+	}
+}
+
+
+/**
+ * Send an object through the telemetry link.
+ * \param[in] obj Object handle to send
+ * \param[in] instId The instance ID (can NOT be UAVOBJ_ALL_INSTANCES, use sendObject() instead)
+ * \param[in] type Transaction type
+ * \return 0 Success
+ * \return -1 Failure
+ */
+int32_t sendSingleObject(UAVObjHandle obj, uint16_t instId, uint8_t type)
+{
     int32_t length;
+    int32_t dataOffset;
     uint16_t cs = 0;
+    uint32_t objId;
 
     // Check for valid packet type
-    if (type != TYPE_OBJ && type != TYPE_OBJ_ACK && type != TYPE_OBJ_REQ && type != TYPE_ACK) {
+    if (type != TYPE_OBJ && type != TYPE_OBJ_ACK && type != TYPE_OBJ_REQ && type != TYPE_ACK)
+    {
         return -1;
     }
 
-    // If a response is expected, set the flag
-    if (type == TYPE_OBJ_ACK || type == TYPE_OBJ_REQ) {
-        obj->waitingResp = 1;
-    }
-
     // Setup type and object id fields
+    objId = UAVObjGetID(obj);
     txBuffer[0] = type;
-    txBuffer[1] = (uint8_t)(obj->objectId & 0xFF);
-    txBuffer[2] = (uint8_t)((obj->objectId >> 8) & 0xFF);
-    txBuffer[3] = (uint8_t)((obj->objectId >> 16) & 0xFF);
-    txBuffer[4] = (uint8_t)((obj->objectId >> 24) & 0xFF);
+    txBuffer[1] = (uint8_t)(objId & 0xFF);
+    txBuffer[2] = (uint8_t)((objId >> 8) & 0xFF);
+    txBuffer[3] = (uint8_t)((objId >> 16) & 0xFF);
+    txBuffer[4] = (uint8_t)((objId >> 24) & 0xFF);
 
-    // Setup length and data field (if one)
-    if (type == TYPE_ACK || type == TYPE_OBJ_REQ) {
-        length = 0;
-    } else {
-        // Pack object
-        length = (obj->packCb)(obj->objectId, &txBuffer[HEADER_LENGTH], MAX_PAYLOAD_LENGTH);
-        // Check length
-        if (length > MAX_PAYLOAD_LENGTH || length <= 0) {
-            return -1;
-        }
+    // Setup instance ID if one is required
+    if (UAVObjIsSingleInstance(obj))
+    {
+    	dataOffset = 5;
     }
-    txBuffer[5] = (uint8_t)length;
+    else
+    {
+    	txBuffer[5] = (uint8_t)(instId & 0xFF);
+    	txBuffer[6] = (uint8_t)((instId >> 8) & 0xFF);
+    	dataOffset = 7;
+    }
+
+    // Determine data length
+    if (type == TYPE_OBJ_REQ || type == TYPE_ACK)
+    {
+    	length = 0;
+    }
+    else
+    {
+		length = UAVObjGetNumBytes(obj);
+    }
+
+    // Check length
+    if (length >= MAX_PAYLOAD_LENGTH)
+    {
+    	return -1;
+    }
+
+    // Copy data (if any)
+    if (length > 0)
+    {
+    	if ( UAVObjPack(obj, instId, &txBuffer[dataOffset]) < 0 )
+    	{
+    		return -1;
+    	}
+    }
 
     // Calculate checksum
     cs = 0;
-    cs = updateChecksum(cs, txBuffer, HEADER_LENGTH+length);
-    txBuffer[HEADER_LENGTH+length] = (uint8_t)(cs & 0xFF);
-    txBuffer[HEADER_LENGTH+length+1] = (uint8_t)((cs >> 8) & 0xFF);
+    cs = updateChecksum(cs, txBuffer, dataOffset+length);
+    txBuffer[dataOffset+length] = (uint8_t)(cs & 0xFF);
+    txBuffer[dataOffset+length+1] = (uint8_t)((cs >> 8) & 0xFF);
 
     // Send buffer
-    if (outStream!=NULL) (*outStream)(txBuffer, HEADER_LENGTH+length+CHECKSUM_LENGTH);
+    if (outStream!=NULL) (*outStream)(txBuffer, dataOffset+length+CHECKSUM_LENGTH);
 
     // Done
     return 0;
@@ -459,26 +460,19 @@ int32_t sendObject(ObjectHandle* obj, uint8_t type) {
  * \param[in] length Length of buffer
  * \return Updated checksum
  */
-uint16_t updateChecksum(uint16_t cs, uint8_t* data, int32_t length) {
+uint16_t updateChecksum(uint16_t cs, uint8_t* data, int32_t length)
+{
     int32_t n;
-    for (n = 0; n < length; ++n) {
+    for (n = 0; n < length; ++n)
+    {
         cs += (uint16_t)data[n];
     }
     return cs;
 }
 
-/**
- * Find an object handle given the object ID
- * \param[in] objId Object ID
- * \return The object handle or NULL if not found
- */
-ObjectHandle* findObject(uint32_t objId) {
-    ObjectHandle* obj;
-    LL_FOREACH(objects, obj) {
-        if (obj->objectId == objId) {
-            return obj;
-        }
-    }
-    return NULL;
-}
+
+
+
+
+
 

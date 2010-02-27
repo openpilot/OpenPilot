@@ -32,9 +32,17 @@
 #define $(NAMEUC)_H
 
 #include <stdint.h>
-#include "uavobject.h"
-#include "FreeRTOS.h"
-#include "queue.h"
+#include "uavobjectmanager.h"
+
+// Object constants
+#define $(NAMEUC)_OBJID $(OBJID)
+#define $(NAMEUC)_NAME "$(NAME)"
+#define $(NAMEUC)_SINGLEINST $(SINGLEINST)
+#define $(NAMEUC)_NUMBYTES sizeof($(NAME)Data)
+
+// Data access macros
+#define $(NAMEUC)_GET(dataOut) UAVObjGetData($(NAME)GetHandle(), dataOut)
+#define $(NAMEUC)_SET(dataIn) UAVObjGetData($(NAME)GetHandle(), dataIn)
 
 // Object data
 typedef struct {
@@ -43,8 +51,6 @@ typedef struct {
 
 // Generic interface functions
 int32_t $(NAME)Initialize();
-UAVObject* $(NAME)Get();
-void $(NAME)GetData(TestObjectData* dataOut);
-void $(NAME)SetData(const TestObjectData* dataIn);
+UAVObjHandle $(NAME)GetHandle();
 
 #endif // $(NAME)_H

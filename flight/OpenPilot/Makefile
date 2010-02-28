@@ -60,21 +60,21 @@ OUTDIR = Build
 TARGET = OpenPilot
 
 # Paths
-OPSYSTEM = OpenPilot/System
+OPSYSTEM = ./System
 OPSYSTEMINC = $(OPSYSTEM)/inc
-OPUAVTALK = OpenPilot/UAVTalk
+OPUAVTALK = ./UAVTalk
 OPUAVTALKINC = $(OPUAVTALK)/inc
-OPUAVOBJ = OpenPilot/UAVObjects
+OPUAVOBJ = ./UAVObjects
 OPUAVOBJINC = $(OPUAVOBJ)/inc
-OPSETTINGS = OpenPilot/Settings
+OPSETTINGS = ./Settings
 OPSETTINGSINC = $(OPSETTINGS)/inc
-MODTELEMETRY = Modules/Telemetry
+MODTELEMETRY = ../Modules/Telemetry
 MODTELEMETRYINC = $(MODTELEMETRY)/inc
-PIOS = PiOS
+PIOS = ../PiOS
 PIOSINC = $(PIOS)/inc
 PIOSSTM32F10X = $(PIOS)/STM32F10x
 PIOSCOMMON = $(PIOS)/Common
-APPLIBDIR = Libraries
+APPLIBDIR = ../Libraries
 STMLIBDIR = $(APPLIBDIR)
 STMSPDDIR = $(STMLIBDIR)/STM32F10x_StdPeriph_Driver
 STMUSBDIR = $(STMLIBDIR)/STM32_USB-FS-Device_Driver
@@ -89,7 +89,7 @@ MININIDIR = $(APPLIBDIR)/minIni
 RTOSDIR = $(APPLIBDIR)/FreeRTOS
 RTOSSRCDIR = $(RTOSDIR)/Source
 RTOSINCDIR = $(RTOSSRCDIR)/include
-DOXYGENDIR = Doc/Doxygen
+DOXYGENDIR = ../Doc/Doxygen
 
 
 # List C source files here. (C dependencies are automatically generated.)
@@ -99,7 +99,7 @@ DOXYGENDIR = Doc/Doxygen
 SRC =  $(MODTELEMETRY)/telemetry.c
 
 ## OPENPILOT:
-SRC +=  $(OPSYSTEM)/openpilot.c
+SRC += $(OPSYSTEM)/openpilot.c
 SRC += $(OPSYSTEM)/op_logging.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c

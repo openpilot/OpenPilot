@@ -44,6 +44,7 @@
 #include <stm32f10x.h>
 #include <stm32f10x_conf.h>
 
+#if !defined(PIOS_DONT_USE_SDCARD)
 /* Dosfs Includes */
 #include <dosfs.h>
 
@@ -52,6 +53,7 @@
 
 /* Mass Storage Device Includes */
 #include <msd.h>
+#endif
 
 /* PIOS Hardware Includes (STM32F10x) */
 #include <pios_sys.h>
@@ -76,7 +78,9 @@
 
 /* More added here as they get written */
 
+#if !defined(PIOS_DONT_USE_USB)
 /* USB Libs */
 #include <usb_lib.h>
+#endif
 
 #endif /* PIOS_H */

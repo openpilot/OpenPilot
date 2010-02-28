@@ -79,7 +79,7 @@ void PIOS_USART_Init(void)
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 
-#ifdef PIOS_USART1_ENABLED
+#if (PIOS_USART1_ENABLED)
 	/* Enable the USART Pins Software Remapping */
 	PIOS_USART1_REMAP_FUNC;
 
@@ -111,7 +111,7 @@ void PIOS_USART_Init(void)
 	USART_Cmd(PIOS_USART1_USART, ENABLE);
 #endif
 
-#ifdef PIOS_USART2_ENABLED
+#if (PIOS_USART2_ENABLED)
 	/* Enable the USART Pins Software Remapping */
 	PIOS_USART2_REMAP_FUNC;
 
@@ -143,7 +143,7 @@ void PIOS_USART_Init(void)
 	USART_Cmd(PIOS_USART2_USART, ENABLE);
 #endif
 
-#ifdef PIOS_USART3_ENABLED
+#if (PIOS_USART3_ENABLED)
 	/* Enable the USART Pins Software Remapping */
 	PIOS_USART3_REMAP_FUNC;
 

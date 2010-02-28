@@ -43,7 +43,7 @@
 
 
 /* Local variables */
-static void (*spi_callback[2])(void);
+static void (*spi_callback[PIOS_SPI_NUM])(void);
 static uint8_t tx_dummy_byte;
 static uint8_t rx_dummy_byte;
 
@@ -59,6 +59,7 @@ int32_t PIOS_SPI_Init(void)
 	DMA_StructInit(&DMA_InitStructure);
 	NVIC_InitTypeDef NVIC_InitStructure;
 
+#if (PIOS_SPI0_ENABLED)
 	/* SPI0 */
 	/* Disable callback function */
 	spi_callback[0] = NULL;
@@ -110,11 +111,13 @@ int32_t PIOS_SPI_Init(void)
 
 	/* Configure DMA interrupt */
 	NVIC_InitStructure.NVIC_IRQChannel = PIOS_SPI0_DMA_IRQ_CHANNEL;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_SPI_DMA_PRIORITY;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_SPI_IRQ_DMA_PRIORITY;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
+#endif
 
+#if (PIOS_SPI1_ENABLED)
 	/* SPI1 */
 	/* Disable callback function */
 	spi_callback[1] = NULL;
@@ -166,10 +169,11 @@ int32_t PIOS_SPI_Init(void)
 
 	/* Configure DMA interrupt */
 	NVIC_InitStructure.NVIC_IRQChannel = PIOS_SPI1_DMA_IRQ_CHANNEL;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_SPI_DMA_PRIORITY; /* defined in PIOS_irq.h */
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_SPI_IRQ_DMA_PRIORITY; /* defined in PIOS_irq.h */
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
+#endif
 
 	/* No error */
 	return 0;

@@ -84,7 +84,7 @@
 //-------------------------
 // PIOS_USART1 (TELEM)
 //-------------------------
-#define PIOS_USART1_ENABLED
+#define PIOS_USART1_ENABLED				1
 #define PIOS_USART1_USART				USART2
 #define PIOS_USART1_GPIO_PORT			GPIOA
 #define PIOS_USART1_RX_PIN				GPIO_Pin_3
@@ -99,7 +99,7 @@
 //-------------------------
 // PIOS_USART2 (GPS)
 //-------------------------
-#define PIOS_USART2_ENABLED
+#define PIOS_USART2_ENABLED				1
 #define PIOS_USART2_USART       		USART3
 #define PIOS_USART2_GPIO_PORT			GPIOC
 #define PIOS_USART2_RX_PIN      		GPIO_Pin_11
@@ -114,7 +114,7 @@
 //-------------------------
 //  PIOS_USART3 (AUX) (RX5/RX6)
 //-------------------------
-//#define PIOS_USART3_ENABLED
+#define PIOS_USART3_ENABLED				0
 #define PIOS_USART3_USART				USART1
 #define PIOS_USART3_GPIO_PORT			GPIOA
 #define PIOS_USART3_RX_PIN				GPIO_Pin_10
@@ -137,7 +137,9 @@
 //-------------------------
 // SPI
 //-------------------------
-#define PIOS_IRQ_SPI_DMA_PRIORITY		IRQ_PRIO_HIGH
+#define PIOS_SPI_IRQ_DMA_PRIORITY		IRQ_PRIO_HIGH
+#define PIOS_SPI_NUM					2
+#define PIOS_SPI0_ENABLED				1
 #define PIOS_SPI0_PTR					SPI1
 #define PIOS_SPI0_DMA_RX_PTR			DMA1_Channel2
 #define PIOS_SPI0_DMA_TX_PTR			DMA1_Channel3
@@ -152,6 +154,7 @@
 #define PIOS_SPI0_MISO_PIN				GPIO_Pin_6
 #define PIOS_SPI0_MOSI_PORT				GPIOA
 #define PIOS_SPI0_MOSI_PIN				GPIO_Pin_7
+#define PIOS_SPI1_ENABLED				1
 #define PIOS_SPI1_PTR					SPI2
 #define PIOS_SPI1_DMA_RX_PTR			DMA1_Channel4
 #define PIOS_SPI1_DMA_TX_PTR			DMA1_Channel5
@@ -168,7 +171,7 @@
 #define PIOS_SPI1_MOSI_PIN				GPIO_Pin_15
 
 //-------------------------
-// SDCard
+// PIOS_SDCARD
 //-------------------------
 #define PIOS_SDCARD_SPI					0
 

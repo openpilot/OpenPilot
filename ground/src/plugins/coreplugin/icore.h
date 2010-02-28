@@ -43,19 +43,14 @@ QT_END_NAMESPACE
 namespace Core {
 
 class ActionManager;
-class EditorManager;
-class FileManager;
 class IContext;
 class IWizard;
 class MessageManager;
 class MimeDatabase;
 class ModeManager;
-class ProgressManager;
-class ScriptManager;
 class SettingsDatabase;
 class UniqueIDManager;
 class VariableManager;
-class VCSManager;
 
 class CORE_EXPORT ICore : public QObject
 {
@@ -82,14 +77,9 @@ public:
                                        QWidget *parent = 0) = 0;
 
     virtual ActionManager *actionManager() const = 0;
-    virtual FileManager *fileManager() const = 0;
     virtual UniqueIDManager *uniqueIDManager() const = 0;
     virtual MessageManager *messageManager() const = 0;
-    virtual EditorManager *editorManager() const = 0;
-    virtual ProgressManager *progressManager() const = 0;
-    virtual ScriptManager *scriptManager() const = 0;
     virtual VariableManager *variableManager() const = 0;
-    virtual VCSManager *vcsManager() const = 0;
     virtual ModeManager *modeManager() const = 0;
     virtual MimeDatabase *mimeDatabase() const = 0;
 

@@ -140,7 +140,7 @@ void ModeManager::objectAdded(QObject *obj)
 
     // Register mode shortcut
     ActionManager *am = m_mainWindow->actionManager();
-    const QString shortcutId = QLatin1String("QtCreator.Mode.") + mode->uniqueModeName();
+    const QString shortcutId = QLatin1String("GCS.Mode.") + mode->uniqueModeName();
     QShortcut *shortcut = new QShortcut(m_mainWindow);
     shortcut->setWhatsThis(tr("Switch to %1 mode").arg(mode->name()));
     Command *cmd = am->registerShortcut(shortcut, shortcutId, QList<int>() << Constants::C_GLOBAL_ID);

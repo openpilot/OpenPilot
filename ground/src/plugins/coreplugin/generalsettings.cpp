@@ -32,7 +32,6 @@
 #include <utils/stylehelper.h>
 #include <utils/qtcolorbutton.h>
 #include <utils/consoleprocess.h>
-#include <coreplugin/editormanager/editormanager.h>
 #include <coreplugin/icore.h>
 #include <QtGui/QMessageBox>
 
@@ -73,8 +72,6 @@ QWidget *GeneralSettings::createPage(QWidget *parent)
     m_page->setupUi(w);
 
     m_page->colorButton->setColor(StyleHelper::baseColor());
-    m_page->externalEditorEdit->setText(EditorManager::instance()->externalEditor());
-    m_page->reloadBehavior->setCurrentIndex(EditorManager::instance()->reloadBehavior());
 #ifdef Q_OS_UNIX
     m_page->terminalEdit->setText(ConsoleProcess::terminalEmulator(Core::ICore::instance()->settings()));
 #else
@@ -101,8 +98,6 @@ void GeneralSettings::apply()
 {
     // Apply the new base color if accepted
     StyleHelper::setBaseColor(m_page->colorButton->color());
-    EditorManager::instance()->setExternalEditor(m_page->externalEditorEdit->text());
-    EditorManager::instance()->setReloadBehavior(IFile::ReloadBehavior(m_page->reloadBehavior->currentIndex()));
 #ifdef Q_OS_UNIX
 	ConsoleProcess::setTerminalEmulator(Core::ICore::instance()->settings(),
                                         m_page->terminalEdit->text());
@@ -121,7 +116,6 @@ void GeneralSettings::resetInterfaceColor()
 
 void GeneralSettings::resetExternalEditor()
 {
-    m_page->externalEditorEdit->setText(EditorManager::instance()->defaultExternalEditor());
 }
 
 #ifdef Q_OS_UNIX
@@ -139,6 +133,7 @@ void GeneralSettings::showHelpForExternalEditor()
         m_dialog->activateWindow();
         return;
     }
+#if 0
     QMessageBox *mb = new QMessageBox(QMessageBox::Information,
                                   tr("Variables"),
                                   EditorManager::instance()->externalEditorHelpText(),
@@ -147,4 +142,5 @@ void GeneralSettings::showHelpForExternalEditor()
     mb->setWindowModality(Qt::NonModal);
     m_dialog = mb;
     mb->show();
+#endif
 }

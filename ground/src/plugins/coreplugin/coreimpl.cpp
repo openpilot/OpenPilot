@@ -85,11 +85,6 @@ ActionManager *CoreImpl::actionManager() const
     return m_mainwindow->actionManager();
 }
 
-FileManager *CoreImpl::fileManager() const
-{
-    return m_mainwindow->fileManager();
-}
-
 UniqueIDManager *CoreImpl::uniqueIDManager() const
 {
     return m_mainwindow->uniqueIDManager();
@@ -100,29 +95,9 @@ MessageManager *CoreImpl::messageManager() const
     return m_mainwindow->messageManager();
 }
 
-EditorManager *CoreImpl::editorManager() const
-{
-    return m_mainwindow->editorManager();
-}
-
-ProgressManager *CoreImpl::progressManager() const
-{
-    return m_mainwindow->progressManager();
-}
-
-ScriptManager *CoreImpl::scriptManager() const
-{
-    return m_mainwindow->scriptManager();
-}
-
 VariableManager *CoreImpl::variableManager() const
 {
     return m_mainwindow->variableManager();
-}
-
-VCSManager *CoreImpl::vcsManager() const
-{
-    return m_mainwindow->vcsManager();
 }
 
 ModeManager *CoreImpl::modeManager() const

@@ -84,6 +84,7 @@ void VariableManager::removeFileInfo(const QString &tag)
     }
 }
 
+#if 0
 void VariableManager::updateCurrentDocument(Core::IEditor *editor)
 {
     const QString currentDocumentTag = QLatin1String("CURRENT_DOCUMENT");
@@ -96,6 +97,7 @@ void VariableManager::updateCurrentDocument(Core::IEditor *editor)
         }
     }
 }
+#endif
 
 QString VariableManager::value(const QString &variable) const
 {

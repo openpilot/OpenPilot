@@ -57,14 +57,9 @@ public:
                                 QWidget *parent = 0);
 
     ActionManager *actionManager() const;
-    FileManager *fileManager() const ;
     UniqueIDManager *uniqueIDManager() const;
     MessageManager *messageManager() const;
-    EditorManager *editorManager() const;
-    ProgressManager *progressManager() const;
-    ScriptManager *scriptManager() const;
     VariableManager *variableManager() const;
-    VCSManager *vcsManager() const;
     ModeManager *modeManager() const;
     MimeDatabase *mimeDatabase() const;
 

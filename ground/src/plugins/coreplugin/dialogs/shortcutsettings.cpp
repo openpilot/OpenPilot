@@ -34,7 +34,6 @@
 #include "command_p.h"
 #include "commandsfile.h"
 #include "coreconstants.h"
-#include "filemanager.h"
 #include "icore.h"
 #include "uniqueidmanager.h"
 #include <utils/treewidgetcolumnstretcher.h>
@@ -267,6 +266,7 @@ void ShortcutSettings::defaultAction()
 
 void ShortcutSettings::exportAction()
 {
+#if 0
     QString fileName = ICore::instance()->fileManager()->getSaveFileNameWithExtension(
         tr("Export Keyboard Mapping Scheme"),
         ICore::instance()->resourcePath() + "/schemes/",
@@ -276,6 +276,7 @@ void ShortcutSettings::exportAction()
         CommandsFile cf(fileName);
         cf.exportCommands(m_scitems);
     }
+#endif
 }
 
 void ShortcutSettings::initialize()

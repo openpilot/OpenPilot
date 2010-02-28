@@ -28,11 +28,8 @@
 **************************************************************************/
 
 #include "coreplugin.h"
-#include "editmode.h"
-#include "editormanager.h"
 #include "mainwindow.h"
 #include "modemanager.h"
-#include "fileiconprovider.h"
 
 #include <extensionsystem/pluginmanager.h>
 
@@ -41,19 +38,12 @@
 using namespace Core::Internal;
 
 CorePlugin::CorePlugin() :
-    m_mainWindow(new MainWindow), m_editMode(0)
+    m_mainWindow(new MainWindow)
 {
 }
 
 CorePlugin::~CorePlugin()
 {
-    if (m_editMode) {
-        removeObject(m_editMode);
-        delete m_editMode;
-    }
-
-    // delete FileIconProvider singleton
-    delete FileIconProvider::instance();
 
     delete m_mainWindow;
 }
@@ -62,11 +52,7 @@ bool CorePlugin::initialize(const QStringList &arguments, QString *errorMessage)
 {
     Q_UNUSED(arguments)
     const bool success = m_mainWindow->init(errorMessage);
-    if (success) {
-        EditorManager *editorManager = m_mainWindow->editorManager();
-        m_editMode = new EditMode(editorManager);
-        addObject(m_editMode);
-    }
+
     return success;
 }
 

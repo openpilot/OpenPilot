@@ -31,7 +31,6 @@
 #define VARIABLEMANAGER_H
 
 #include "core_global.h"
-#include <coreplugin/editormanager/ieditor.h>
 
 #include <QtCore/QObject>
 #include <QtCore/QMap>
@@ -61,8 +60,6 @@ public:
     bool remove(const QString &variable);
     QString resolve(const QString &stringWithVariables) const;
 
-private slots:
-    void updateCurrentDocument(Core::IEditor *editor);
 
 private:
     QMap<QString, QString> m_map;

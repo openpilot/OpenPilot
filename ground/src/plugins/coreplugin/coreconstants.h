@@ -33,8 +33,8 @@
 namespace Core {
 namespace Constants {
 
-#define GCS_VERSION_MAJOR 1
-#define GCS_VERSION_MINOR 3
+#define GCS_VERSION_MAJOR 0
+#define GCS_VERSION_MINOR 0
 #define GCS_VERSION_RELEASE 1
 
 #define STRINGIFY_INTERNAL(x) #x
@@ -60,33 +60,27 @@ const char * const GCS_REVISION_STR      = "";
 
 //modes
 const char * const MODE_WELCOME          = "Welcome";
-const char * const MODE_EDIT             = "Edit";
-const char * const MODE_OUTPUT           = "Output";
 const int          P_MODE_WELCOME        = 100;
-const int          P_MODE_EDIT           = 90;
-const int          P_MODE_OUTPUT         = 10;
 
 //menubar
-const char * const MENU_BAR              = "QtCreator.MenuBar";
+const char * const MENU_BAR              = "GCS.MenuBar";
 
 //menus
-const char * const M_FILE                = "QtCreator.Menu.File";
-const char * const M_FILE_OPEN           = "QtCreator.Menu.File.Open";
-const char * const M_FILE_NEW            = "QtCreator.Menu.File.New";
-const char * const M_FILE_RECENTFILES    = "QtCreator.Menu.File.RecentFiles";
-const char * const M_EDIT                = "QtCreator.Menu.Edit";
-const char * const M_EDIT_ADVANCED       = "QtCreator.Menu.Edit.Advanced";
-const char * const M_TOOLS               = "QtCreator.Menu.Tools";
-const char * const M_WINDOW              = "QtCreator.Menu.Window";
-const char * const M_WINDOW_PANES        = "QtCreator.Menu.Window.Panes";
-const char * const M_HELP                = "QtCreator.Menu.Help";
+const char * const M_FILE                = "GCS.Menu.File";
+const char * const M_FILE_OPEN           = "GCS.Menu.File.Open";
+const char * const M_FILE_NEW            = "GCS.Menu.File.New";
+const char * const M_FILE_RECENTFILES    = "GCS.Menu.File.RecentFiles";
+const char * const M_EDIT                = "GCS.Menu.Edit";
+const char * const M_EDIT_ADVANCED       = "GCS.Menu.Edit.Advanced";
+const char * const M_TOOLS               = "GCS.Menu.Tools";
+const char * const M_WINDOW              = "GCS.Menu.Window";
+const char * const M_WINDOW_PANES        = "GCS.Menu.Window.Panes";
+const char * const M_HELP                = "GCS.Menu.Help";
 
 //contexts
 const char * const C_GLOBAL              = "Global Context";
 const int          C_GLOBAL_ID           = 0;
 const char * const C_WELCOME_MODE        = "Core.WelcomeMode";
-const char * const C_EDIT_MODE           = "Core.EditMode";
-const char * const C_EDITORMANAGER       = "Core.EditorManager";
 const char * const C_NAVIGATION_PANE     = "Core.NavigationPane";
 const char * const C_PROBLEM_PANE        = "Core.ProblemPane";
 
@@ -95,106 +89,102 @@ const char * const K_DEFAULT_TEXT_EDITOR = QT_TRANSLATE_NOOP("OpenWith::Editors"
 const char * const K_DEFAULT_BINARY_EDITOR = QT_TRANSLATE_NOOP("OpenWith::Editors", "Binary Editor");
 
 //actions
-const char * const UNDO                  = "QtCreator.Undo";
-const char * const REDO                  = "QtCreator.Redo";
-const char * const COPY                  = "QtCreator.Copy";
-const char * const PASTE                 = "QtCreator.Paste";
-const char * const CUT                   = "QtCreator.Cut";
-const char * const SELECTALL             = "QtCreator.SelectAll";
+const char * const UNDO                  = "GCS.Undo";
+const char * const REDO                  = "GCS.Redo";
+const char * const COPY                  = "GCS.Copy";
+const char * const PASTE                 = "GCS.Paste";
+const char * const CUT                   = "GCS.Cut";
+const char * const SELECTALL             = "GCS.SelectAll";
 
-const char * const GOTO                  = "QtCreator.Goto";
+const char * const NEW                   = "GCS.New";
+const char * const OPEN                  = "GCS.Open";
+const char * const OPEN_WITH             = "GCS.OpenWith";
+const char * const REVERTTOSAVED         = "GCS.RevertToSaved";
+const char * const SAVE                  = "GCS.Save";
+const char * const SAVEAS                = "GCS.SaveAs";
+const char * const SAVEALL               = "GCS.SaveAll";
+const char * const EXIT                  = "GCS.Exit";
 
-const char * const NEW                   = "QtCreator.New";
-const char * const OPEN                  = "QtCreator.Open";
-const char * const OPEN_WITH             = "QtCreator.OpenWith";
-const char * const REVERTTOSAVED         = "QtCreator.RevertToSaved";
-const char * const SAVE                  = "QtCreator.Save";
-const char * const SAVEAS                = "QtCreator.SaveAs";
-const char * const SAVEALL               = "QtCreator.SaveAll";
-const char * const PRINT                 = "QtCreator.Print";
-const char * const EXIT                  = "QtCreator.Exit";
+const char * const OPTIONS               = "GCS.Options";
+const char * const TOGGLE_SIDEBAR        = "GCS.ToggleSidebar";
+const char * const TOGGLE_FULLSCREEN     = "GCS.ToggleFullScreen";
 
-const char * const OPTIONS               = "QtCreator.Options";
-const char * const TOGGLE_SIDEBAR        = "QtCreator.ToggleSidebar";
-const char * const TOGGLE_FULLSCREEN     = "QtCreator.ToggleFullScreen";
+const char * const MINIMIZE_WINDOW       = "GCS.MinimizeWindow";
+const char * const ZOOM_WINDOW           = "GCS.ZoomWindow";
 
-const char * const MINIMIZE_WINDOW       = "QtCreator.MinimizeWindow";
-const char * const ZOOM_WINDOW           = "QtCreator.ZoomWindow";
-
-const char * const SPLIT                 = "QtCreator.Split";
-const char * const SPLIT_SIDE_BY_SIDE    = "QtCreator.SplitSideBySide";
-const char * const REMOVE_CURRENT_SPLIT  = "QtCreator.RemoveCurrentSplit";
-const char * const REMOVE_ALL_SPLITS     = "QtCreator.RemoveAllSplits";
-const char * const GOTO_OTHER_SPLIT      = "QtCreator.GotoOtherSplit";
-const char * const SAVEASDEFAULT         = "QtCreator.SaveAsDefaultLayout";
-const char * const RESTOREDEFAULT        = "QtCreator.RestoreDefaultLayout";
-const char * const CLOSE                 = "QtCreator.Close";
-const char * const CLOSEALL              = "QtCreator.CloseAll";
-const char * const CLOSEOTHERS           = "QtCreator.CloseOthers";
-const char * const GOTONEXT              = "QtCreator.GotoNext";
-const char * const GOTOPREV              = "QtCreator.GotoPrevious";
-const char * const GOTONEXTINHISTORY     = "QtCreator.GotoNextInHistory";
-const char * const GOTOPREVINHISTORY     = "QtCreator.GotoPreviousInHistory";
-const char * const GO_BACK               = "QtCreator.GoBack";
-const char * const GO_FORWARD            = "QtCreator.GoForward";
-const char * const GOTOPREVIOUSGROUP     = "QtCreator.GotoPreviousTabGroup";
-const char * const GOTONEXTGROUP         = "QtCreator.GotoNextTabGroup";
-const char * const WINDOWSLIST           = "QtCreator.WindowsList";
-const char * const ABOUT_QTCREATOR       = "QtCreator.AboutQtCreator";
-const char * const ABOUT_PLUGINS         = "QtCreator.AboutPlugins";
-const char * const ABOUT_QT              = "QtCreator.AboutQt";
-const char * const S_RETURNTOEDITOR      = "QtCreator.ReturnToEditor";
-const char * const OPEN_IN_EXTERNAL_EDITOR = "QtCreator.OpenInExternalEditor";
+const char * const SPLIT                 = "GCS.Split";
+const char * const SPLIT_SIDE_BY_SIDE    = "GCS.SplitSideBySide";
+const char * const REMOVE_CURRENT_SPLIT  = "GCS.RemoveCurrentSplit";
+const char * const REMOVE_ALL_SPLITS     = "GCS.RemoveAllSplits";
+const char * const GOTO_OTHER_SPLIT      = "GCS.GotoOtherSplit";
+const char * const SAVEASDEFAULT         = "GCS.SaveAsDefaultLayout";
+const char * const RESTOREDEFAULT        = "GCS.RestoreDefaultLayout";
+const char * const CLOSE                 = "GCS.Close";
+const char * const CLOSEALL              = "GCS.CloseAll";
+const char * const CLOSEOTHERS           = "GCS.CloseOthers";
+const char * const GOTONEXT              = "GCS.GotoNext";
+const char * const GOTOPREV              = "GCS.GotoPrevious";
+const char * const GOTONEXTINHISTORY     = "GCS.GotoNextInHistory";
+const char * const GOTOPREVINHISTORY     = "GCS.GotoPreviousInHistory";
+const char * const GO_BACK               = "GCS.GoBack";
+const char * const GO_FORWARD            = "GCS.GoForward";
+const char * const GOTOPREVIOUSGROUP     = "GCS.GotoPreviousTabGroup";
+const char * const GOTONEXTGROUP         = "GCS.GotoNextTabGroup";
+const char * const WINDOWSLIST           = "GCS.WindowsList";
+const char * const ABOUT_OPENPILOTGCS    = "GCS.AboutOpenPilotGCS";
+const char * const ABOUT_PLUGINS         = "GCS.AboutPlugins";
+const char * const ABOUT_QT              = "GCS.AboutQt";
+const char * const S_RETURNTOEDITOR      = "GCS.ReturnToEditor";
+const char * const OPEN_IN_EXTERNAL_EDITOR = "GCS.OpenInExternalEditor";
 
 // default groups
-const char * const G_DEFAULT_ONE         = "QtCreator.Group.Default.One";
-const char * const G_DEFAULT_TWO         = "QtCreator.Group.Default.Two";
-const char * const G_DEFAULT_THREE       = "QtCreator.Group.Default.Three";
+const char * const G_DEFAULT_ONE         = "GCS.Group.Default.One";
+const char * const G_DEFAULT_TWO         = "GCS.Group.Default.Two";
+const char * const G_DEFAULT_THREE       = "GCS.Group.Default.Three";
 
 // main menu bar groups
-const char * const G_FILE                = "QtCreator.Group.File";
-const char * const G_EDIT                = "QtCreator.Group.Edit";
-const char * const G_VIEW                = "QtCreator.Group.View";
-const char * const G_TOOLS               = "QtCreator.Group.Tools";
-const char * const G_WINDOW              = "QtCreator.Group.Window";
-const char * const G_HELP                = "QtCreator.Group.Help";
+const char * const G_FILE                = "GCS.Group.File";
+const char * const G_EDIT                = "GCS.Group.Edit";
+const char * const G_VIEW                = "GCS.Group.View";
+const char * const G_TOOLS               = "GCS.Group.Tools";
+const char * const G_WINDOW              = "GCS.Group.Window";
+const char * const G_HELP                = "GCS.Group.Help";
 
 // file menu groups
-const char * const G_FILE_NEW            = "QtCreator.Group.File.New";
-const char * const G_FILE_OPEN           = "QtCreator.Group.File.Open";
-const char * const G_FILE_PROJECT        = "QtCreator.Group.File.Project";
-const char * const G_FILE_SAVE           = "QtCreator.Group.File.Save";
-const char * const G_FILE_CLOSE          = "QtCreator.Group.File.Close";
-const char * const G_FILE_PRINT          = "QtCreator.Group.File.Print";
-const char * const G_FILE_OTHER          = "QtCreator.Group.File.Other";
+const char * const G_FILE_NEW            = "GCS.Group.File.New";
+const char * const G_FILE_OPEN           = "GCS.Group.File.Open";
+const char * const G_FILE_PROJECT        = "GCS.Group.File.Project";
+const char * const G_FILE_SAVE           = "GCS.Group.File.Save";
+const char * const G_FILE_CLOSE          = "GCS.Group.File.Close";
+const char * const G_FILE_OTHER          = "GCS.Group.File.Other";
 
 // edit menu groups
-const char * const G_EDIT_UNDOREDO       = "QtCreator.Group.Edit.UndoRedo";
-const char * const G_EDIT_COPYPASTE      = "QtCreator.Group.Edit.CopyPaste";
-const char * const G_EDIT_SELECTALL      = "QtCreator.Group.Edit.SelectAll";
-const char * const G_EDIT_ADVANCED       = "QtCreator.Group.Edit.Advanced";
+const char * const G_EDIT_UNDOREDO       = "GCS.Group.Edit.UndoRedo";
+const char * const G_EDIT_COPYPASTE      = "GCS.Group.Edit.CopyPaste";
+const char * const G_EDIT_SELECTALL      = "GCS.Group.Edit.SelectAll";
+const char * const G_EDIT_ADVANCED       = "GCS.Group.Edit.Advanced";
 
-const char * const G_EDIT_FIND           = "QtCreator.Group.Edit.Find";
-const char * const G_EDIT_OTHER          = "QtCreator.Group.Edit.Other";
+const char * const G_EDIT_FIND           = "GCS.Group.Edit.Find";
+const char * const G_EDIT_OTHER          = "GCS.Group.Edit.Other";
 
 // advanced edit menu groups
 
-const char * const G_EDIT_FORMAT         = "QtCreator.Group.Edit.Format";
-const char * const G_EDIT_COLLAPSING     = "QtCreator.Group.Edit.Collapsing";
-const char * const G_EDIT_BLOCKS         = "QtCreator.Group.Edit.Blocks";
-const char * const G_EDIT_FONT           = "QtCreator.Group.Edit.Font";
-const char * const G_EDIT_EDITOR         = "QtCreator.Group.Edit.Editor";
+const char * const G_EDIT_FORMAT         = "GCS.Group.Edit.Format";
+const char * const G_EDIT_COLLAPSING     = "GCS.Group.Edit.Collapsing";
+const char * const G_EDIT_BLOCKS         = "GCS.Group.Edit.Blocks";
+const char * const G_EDIT_FONT           = "GCS.Group.Edit.Font";
+const char * const G_EDIT_EDITOR         = "GCS.Group.Edit.Editor";
 
 // window menu groups
-const char * const G_WINDOW_SIZE         = "QtCreator.Group.Window.Size";
-const char * const G_WINDOW_PANES        = "QtCreator.Group.Window.Panes";
-const char * const G_WINDOW_SPLIT        = "QtCreator.Group.Window.Split";
-const char * const G_WINDOW_NAVIGATE     = "QtCreator.Group.Window.Navigate";
-const char * const G_WINDOW_OTHER        = "QtCreator.Group.Window.Other";
+const char * const G_WINDOW_SIZE         = "GCS.Group.Window.Size";
+const char * const G_WINDOW_PANES        = "GCS.Group.Window.Panes";
+const char * const G_WINDOW_SPLIT        = "GCS.Group.Window.Split";
+const char * const G_WINDOW_NAVIGATE     = "GCS.Group.Window.Navigate";
+const char * const G_WINDOW_OTHER        = "GCS.Group.Window.Other";
 
 // help groups (global)
-const char * const G_HELP_HELP           = "QtCreator.Group.Help.Help";
-const char * const G_HELP_ABOUT          = "QtCreator.Group.Help.About";
+const char * const G_HELP_HELP           = "GCS.Group.Help.Help";
+const char * const G_HELP_ABOUT          = "GCS.Group.Help.About";
 
 const char * const ICON_MINUS            = ":/core/images/minus.png";
 const char * const ICON_PLUS             = ":/core/images/plus.png";
@@ -219,8 +209,8 @@ const char * const ICON_MAGNIFIER        = ":/core/images/magnifier.png";
 const char * const ICON_TOGGLE_SIDEBAR   = ":/core/images/sidebaricon.png";
 
 // wizard kind
-const char * const WIZARD_TYPE_FILE      = "QtCreator::WizardType::File";
-const char * const WIZARD_TYPE_CLASS     = "QtCreator::WizardType::Class";
+const char * const WIZARD_TYPE_FILE      = "GCS::WizardType::File";
+const char * const WIZARD_TYPE_CLASS     = "GCS::WizardType::Class";
 
 } // namespace Constants
 } // namespace Core

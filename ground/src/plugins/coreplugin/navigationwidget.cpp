@@ -227,9 +227,9 @@ void NavigationWidget::closeSubWidget()
 void NavigationWidget::saveSettings(QSettings *settings)
 {
     QStringList views;
-    for (int i=0; i<m_subWidgets.count(); ++i) {
-        views.append(m_subWidgets.at(i)->factory()->displayName());
-    }
+    //for (int i=0; i<m_subWidgets.count(); ++i) {
+    //    views.append(m_subWidgets.at(i)->factory()->displayName());
+    //}
     settings->setValue("Navigation/Views", views);
     settings->setValue("Navigation/Visible", isShown());
     settings->setValue("Navigation/VerticalPosition", saveState());
@@ -496,12 +496,12 @@ INavigationWidgetFactory *NavigationSubWidget::factory()
 
 void NavigationSubWidget::saveSettings(int position)
 {
-    factory()->saveSettings(position, m_navigationWidget);
+    //factory()->saveSettings(position, m_navigationWidget);
 }
 
 void NavigationSubWidget::restoreSettings(int position)
 {
-    factory()->restoreSettings(position, m_navigationWidget);
+    //factory()->restoreSettings(position, m_navigationWidget);
 }
 
 Core::Command *NavigationSubWidget::command(const QString &title) const

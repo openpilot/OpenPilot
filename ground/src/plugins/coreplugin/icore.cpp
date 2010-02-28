@@ -137,18 +137,7 @@
     active document.
 */
 
-/*!
-    \fn ProgressManager *ICore::progressManager() const
-    \brief Returns the application's progress manager.
 
-    Use the progress manager to register a concurrent task to
-    show a progress bar the way Qt Creator does it.
-*/
-
-/*!
-    \fn ScriptManager *ICore::scriptManager() const
-    \internal
-*/
 
 /*!
     \fn VariableManager *ICore::variableManager() const
@@ -157,17 +146,6 @@
     The variable manager is used to register application wide string variables
     like \c MY_PROJECT_DIR such that strings like \c{somecommand ${MY_PROJECT_DIR}/sub}
     can be resolved/expanded from anywhere in the application.
-*/
-
-/*!
-    \fn VCSManager *ICore::vcsManager() const
-    \brief Returns the application's vcs manager.
-
-    The vcs manager can be used to e.g. retrieve information about
-    the version control system used for a directory on hard disk.
-    The actual functionality for a specific version control system
-    must be implemented in a IVersionControl object and registered in
-    the plugin manager's object pool.
 */
 
 /*!

@@ -48,20 +48,15 @@ namespace Core {
 class ActionManager;
 class BaseMode;
 class BaseView;
-class EditorManager;
-class FileManager;
 class IContext;
 class IWizard;
 class MessageManager;
 class MimeDatabase;
 class ModeManager;
-class ProgressManager;
 class RightPaneWidget;
-class ScriptManager;
 class SettingsDatabase;
 class UniqueIDManager;
 class VariableManager;
-class VCSManager;
 class ViewManagerInterface;
 class IMode;
 
@@ -71,8 +66,6 @@ class ActionManagerPrivate;
 class CoreImpl;
 class FancyTabWidget;
 class GeneralSettings;
-class NavigationWidget;
-class ProgressManagerPrivate;
 class ShortcutSettings;
 class ViewManager;
 class VersionDialog;
@@ -97,17 +90,12 @@ public:
     void openFiles(const QStringList &fileNames);
 
     Core::ActionManager *actionManager() const;
-    Core::FileManager *fileManager() const;
     Core::UniqueIDManager *uniqueIDManager() const;
     Core::MessageManager *messageManager() const;
-    Core::EditorManager *editorManager() const;
-    Core::ProgressManager *progressManager() const;
-    Core::ScriptManager *scriptManager() const;
     Core::VariableManager *variableManager() const;
     Core::ModeManager *modeManager() const;
     Core::MimeDatabase *mimeDatabase() const;
 
-    VCSManager *vcsManager() const;
     inline QSettings *settings() const { return m_settings; }
     inline SettingsDatabase *settingsDatabase() const { return m_settingsDatabase; }
     virtual QPrinter *printer() const;
@@ -156,10 +144,9 @@ private slots:
     void openRecentFile();
     void setFocusToEditor();
     void saveAll();
-    void aboutQtCreator();
+    void aboutOpenPilogGCS();
     void aboutPlugins();
     void updateFocusWidget(QWidget *old, QWidget *now);
-    void setSidebarVisible(bool visible);
     void destroyVersionDialog();
     void modeChanged(Core::IMode *mode);
 
@@ -179,18 +166,12 @@ private:
     SettingsDatabase *m_settingsDatabase;
     mutable QPrinter *m_printer;
     ActionManagerPrivate *m_actionManager;
-    EditorManager *m_editorManager;
-    FileManager *m_fileManager;
     MessageManager *m_messageManager;
-    ProgressManagerPrivate *m_progressManager;
-    ScriptManager *m_scriptManager;
     VariableManager *m_variableManager;
-    VCSManager *m_vcsManager;
     ViewManager *m_viewManager;
     ModeManager *m_modeManager;
     MimeDatabase *m_mimeDatabase;
     FancyTabWidget *m_modeStack;
-    NavigationWidget *m_navigationWidget;
     RightPaneWidget *m_rightPaneWidget;
     Core::BaseView *m_outputView;
     VersionDialog *m_versionDialog;
@@ -211,14 +192,12 @@ private:
     QAction *m_saveAllAction;
     QAction *m_exitAction;
     QAction *m_optionsAction;
-    QAction *m_toggleSideBarAction;
     QAction *m_toggleFullScreenAction;
 #ifdef Q_WS_MAC
     QAction *m_minimizeAction;
     QAction *m_zoomAction;
 #endif
 
-    QToolButton *m_toggleSideBarButton;
 };
 
 } // namespace Internal

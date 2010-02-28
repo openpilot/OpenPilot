@@ -42,7 +42,6 @@ QT_END_NAMESPACE
 namespace Core {
 
 class IFile;
-class EditorManager;
 
 namespace Internal {
 

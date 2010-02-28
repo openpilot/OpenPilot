@@ -55,7 +55,6 @@ public slots:
 
 private:
     MainWindow *m_mainWindow;
-    EditMode *m_editMode;
 };
 
 } // namespace Internal

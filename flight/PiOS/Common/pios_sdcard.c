@@ -30,6 +30,9 @@
 /* Project Includes */
 #include "pios.h"
 
+#if !defined(PIOS_DONT_USE_SDCARD)
+
+
 /* Global Variables */
 VOLINFO PIOS_SDCARD_VolInfo;
 uint8_t PIOS_SDCARD_Sector[SECTOR_SIZE];
@@ -989,3 +992,4 @@ int32_t PIOS_SDCARD_FileDelete(char *Filename)
 	return 0;
 }
 
+#endif

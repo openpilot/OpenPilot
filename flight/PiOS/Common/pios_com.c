@@ -30,6 +30,7 @@
 /* Project Includes */
 #include "pios.h"
 
+#if !defined(PIOS_DONT_USE_COM)
 
 /* Private Function Prototypes */
 
@@ -314,3 +315,5 @@ int32_t PIOS_COM_ReceiveCallbackInit(void *callback_receive)
 	/* No error */
 	return 0;
 }
+
+#endif

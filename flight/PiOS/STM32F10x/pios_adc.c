@@ -30,6 +30,7 @@
 /* Project Includes */
 #include "pios.h"
 
+#if !defined(PIOS_DONT_USE_ADC)
 
 /* Local Variables */
 /* following two arrays are word aligned, so that DMA can transfer two hwords at once */
@@ -259,3 +260,5 @@ void DMA1_Channel1_IRQHandler(void)
 	/* Request next conversion */
 	ADC_SoftwareStartConvCmd(ADC1, ENABLE);
 }
+
+#endif

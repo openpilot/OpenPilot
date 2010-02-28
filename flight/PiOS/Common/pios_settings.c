@@ -29,6 +29,8 @@
 /* Project Includes */
 #include "pios.h"
 
+#if !defined(PIOS_DONT_USE_SETTINGS)
+
 
 /* Private Function Prototypes */
 
@@ -110,3 +112,5 @@ int32_t PIOS_Settings_CheckForFiles(void)
 	/* All files found */
 	return 0;
 }
+
+#endif

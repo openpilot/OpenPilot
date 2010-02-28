@@ -31,6 +31,7 @@
 /* Project Includes */
 #include "pios.h"
 
+#if !defined(PIOS_DONT_USE_DELAY)
 
 /**
 * Initialises the Timer used by PIOS_DELAY functions<BR>
@@ -106,3 +107,5 @@ int32_t PIOS_DELAY_WaitmS(uint16_t mS)
 	/* No error */
 	return 0;
 }
+
+#endif

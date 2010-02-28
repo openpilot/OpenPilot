@@ -42,6 +42,8 @@ Example of how to use this module:
 /* Project Includes */
 #include "pios.h"
 
+#if !defined(PIOS_DONT_USE_BMP085)
+
 
 /* Glocal Variables */
 ConversionTypeTypeDef CurrentRead;
@@ -293,3 +295,5 @@ void EXTI15_10_IRQHandler(void)
 		PIOS_IRQ_Enable();
 	}
 }
+
+#endif

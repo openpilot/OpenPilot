@@ -39,6 +39,8 @@
 
 #include <pios.h>
 
+#if !defined(PIOS_DONT_USE_SPI)
+
 
 /* Local variables */
 static void (*spi_callback[2])(void);
@@ -593,3 +595,4 @@ PIOS_SPI1_DMA_IRQHANDLER_FUNC
 	}
 }
 
+#endif

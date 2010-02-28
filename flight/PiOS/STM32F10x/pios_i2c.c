@@ -30,6 +30,8 @@
 /* Project Includes */
 #include "pios.h"
 
+#if !defined(PIOS_DONT_USE_I2C)
+
 /* Global Variables */
 volatile uint32_t PIOS_I2C_UnexpectedEvent;
 
@@ -572,3 +574,5 @@ void I2C2_ER_IRQHandler(void)
 {
   ER_IRQHandler((I2CRecTypeDef *)&I2CRec);
 }
+
+#endif

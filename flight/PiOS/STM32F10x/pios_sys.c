@@ -30,6 +30,9 @@
 /* Project Includes */
 #include "pios.h"
 
+#if !defined(PIOS_DONT_USE_SYS)
+
+
 /* Private Function Prototypes */
 void NVIC_Configuration(void);
 void SysTick_Handler(void);
@@ -137,4 +140,6 @@ void assert_failed(uint8_t* file, uint32_t line)
 		for(int i = 0; i < 1000000; i++);
 	}
 }
+#endif
+
 #endif

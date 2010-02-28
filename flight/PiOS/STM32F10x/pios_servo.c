@@ -29,6 +29,8 @@
 /* Project Includes */
 #include "pios.h"
 
+#if !defined(PIOS_DONT_USE_SERVO)
+
 
 /* Private Function Prototypes */
 
@@ -161,3 +163,4 @@ void PIOS_Servo_Set(uint8_t Servo, uint16_t Position)
     }
 }
 
+#endif

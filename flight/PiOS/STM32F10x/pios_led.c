@@ -29,6 +29,7 @@
 /* Project Includes */
 #include "pios.h"
 
+#if !defined(PIOS_DONT_USE_LED)
 
 /* Private Function Prototypes */
 
@@ -84,3 +85,5 @@ void PIOS_LED_Toggle(LedTypeDef LED)
 {
 	LED_GPIO_PORT[LED]->ODR ^= LED_GPIO_PIN[LED];
 }
+
+#endif

@@ -31,6 +31,9 @@
 /* Project Includes */
 #include "pios.h"
 
+#if !defined(PIOS_DONT_USE_HID)
+
+
 /* Local types */
 typedef enum _HID_REQUESTS {
 	GET_REPORT = 1,
@@ -339,3 +342,4 @@ void PIOS_USB_HID_EP1_OUT_Callback(void)
 #endif
 }
 
+#endif

@@ -29,6 +29,7 @@
 /* Project Includes */
 #include "pios.h"
 
+#if !defined(PIOS_DONT_USE_PWM)
 
 /* Local Variables */
 volatile uint16_t IC3Value = 0;
@@ -116,3 +117,5 @@ void TIM3_IRQHandler(void)
 	}
 #endif
 }
+
+#endif

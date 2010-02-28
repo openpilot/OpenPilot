@@ -30,6 +30,8 @@
 /* Project Includes */
 #include "pios.h"
 
+#if !defined(PIOS_DONT_USE_IRQ)
+
 
 /* Private Function Prototypes */
 
@@ -97,3 +99,5 @@ int32_t PIOS_IRQ_Enable(void)
 	/* No error */
 	return 0;
 }
+
+#endif

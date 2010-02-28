@@ -28,7 +28,8 @@
 
 /* Project Includes */
 #include "pios.h"
-//#include <string.h>
+
+#if !defined(PIOS_DONT_USE_USB)
 
 
 /* Local definitions */
@@ -576,3 +577,4 @@ static RESULT PIOS_USB_CB_Get_Interface_Setting(uint8_t Interface, uint8_t Alter
 	return USB_SUCCESS;
 }
 
+#endif

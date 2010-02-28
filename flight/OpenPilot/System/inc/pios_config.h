@@ -29,7 +29,25 @@
 #define PIOS_CONFIG_H
 
 
-/* Compile Time Macros */ 
+/* Enable/Disable PiOS Modules */
+//#define PIOS_DONT_USE_ADC
+//#define PIOS_DONT_USE_DELAY
+//#define PIOS_DONT_USE_I2C
+//#define PIOS_DONT_USE_IRQ
+//#define PIOS_DONT_USE_LED
+//#define PIOS_DONT_USE_PWM
+//#define PIOS_DONT_USE_SERVO
+//#define PIOS_DONT_USE_SPI
+//#define PIOS_DONT_USE_SYS
+//#define PIOS_DONT_USE_USART
+#define PIOS_DONT_USE_USB_COM
+//#define PIOS_DONT_USE_USB_HID
+//#define PIOS_DONT_USE_USB
+//#define PIOS_DONT_USE_BMP085
+//#define PIOS_DONT_USE_COM
+//#define PIOS_DONT_USE_SDCARD
+//#define PIOS_DONT_USE_SETTINGS
+
 
 /* Defaults for Logging */
 #define LOG_FILENAME 			"PIOS.LOG"

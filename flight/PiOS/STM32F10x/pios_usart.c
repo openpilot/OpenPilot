@@ -30,6 +30,8 @@
 /* Project Includes */
 #include "pios.h"
 
+#if !defined(PIOS_DONT_USE_USART)
+
 
 /* Global Variables */
 extern SettingsTypeDef Settings;
@@ -580,3 +582,5 @@ AUX_USART_IRQHANDLER_FUNC
 		}
 	}
 }
+
+#endif

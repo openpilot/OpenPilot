@@ -86,11 +86,11 @@ int32_t PIOS_I2C_Init(void)
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_OD;
 
-	GPIO_InitStructure.GPIO_Pin = I2C_SCL_PIN;
-	GPIO_Init(I2C_GPIO_PORT, &GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = PIOS_I2C_SCL_PIN;
+	GPIO_Init(PIOS_I2C_GPIO_PORT, &GPIO_InitStructure);
 	
-	GPIO_InitStructure.GPIO_Pin = I2C_SDA_PIN;
-	GPIO_Init(I2C_GPIO_PORT, &GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = PIOS_I2C_SDA_PIN;
+	GPIO_Init(PIOS_I2C_GPIO_PORT, &GPIO_InitStructure);
 
 	PIOS_I2C_InitPeripheral();
 
@@ -101,13 +101,13 @@ int32_t PIOS_I2C_Init(void)
 	/* Configure and enable I2C2 interrupts */
 	NVIC_InitTypeDef NVIC_InitStructure;
 	NVIC_InitStructure.NVIC_IRQChannel = I2C2_EV_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = IRQ_I2C_EV_PRIORITY;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_I2C_IRQ_EV_PRIORITY;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 
 	NVIC_InitStructure.NVIC_IRQChannel = I2C2_ER_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = IRQ_I2C_ER_PRIORITY;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_I2C_IRQ_ER_PRIORITY;
 	NVIC_Init(&NVIC_InitStructure);
 
 	/* No error */
@@ -139,8 +139,8 @@ static void PIOS_I2C_InitPeripheral(void)
 	/* Set I2C clock bus clock params */
 	/* Note that the STM32 driver handles value <= 100kHz differently! (duty cycle always 1:1) */
 	/* Important: bus frequencies > 400kHz don't work stable */
-	I2C_InitStructure.I2C_DutyCycle = I2C_DUTY_CYCLE;
-	I2C_InitStructure.I2C_ClockSpeed = I2C_BUS_FREQUENCY;
+	I2C_InitStructure.I2C_DutyCycle = PIOS_I2C_DUTY_CYCLE;
+	I2C_InitStructure.I2C_ClockSpeed = PIOS_I2C_BUS_FREQ;
 
 	/* Trigger software reset via I2C_DeInit */
 	I2C_DeInit(i2cx->base);
@@ -253,13 +253,13 @@ int32_t PIOS_I2C_TransferWait(void)
 {
 	I2CRecTypeDef *i2cx = &I2CRec;
 	
-	uint32_t repeat_ctr = I2C_TIMEOUT_VALUE;
+	uint32_t repeat_ctr = PIOS_I2C_TIMEOUT_VALUE;
 	uint16_t last_buffer_ix = i2cx->buffer_ix;
 
 	while(--repeat_ctr > 0) {
 		/* Check if buffer index has changed - if so, reload repeat counter */
 		if(i2cx->buffer_ix != last_buffer_ix) {
-			repeat_ctr = I2C_TIMEOUT_VALUE;
+			repeat_ctr = PIOS_I2C_TIMEOUT_VALUE;
 			last_buffer_ix = i2cx->buffer_ix;
 		}
 		

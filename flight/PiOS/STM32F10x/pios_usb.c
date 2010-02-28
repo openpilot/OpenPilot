@@ -374,7 +374,7 @@ int32_t PIOS_USB_IsInitialized(void)
 */
 int32_t PIOS_USB_CableConnected(void)
 {
-	return GPIO_ReadInputDataBit(USB_ACC_GPIO_PORT, USB_DETECT_PIN);
+	return GPIO_ReadInputDataBit(PIOS_USB_DETECT_GPIO_PORT, PIOS_USB_DETECT_GPIO_PIN);
 }
 
 

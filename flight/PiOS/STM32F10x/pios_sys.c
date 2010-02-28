@@ -41,7 +41,7 @@ void SysTick_Handler(void);
 #define MEM8(addr)  (*((volatile uint8_t  *)(addr)))
 
 /**
-* Initializes all system peripherals
+* Initialises all system peripherals
 */
 void PIOS_SYS_Init(void)
 {
@@ -49,29 +49,31 @@ void PIOS_SYS_Init(void)
 	SystemInit();
 	
 	/* Enable GPIOA, GPIOB, GPIOC, GPIOD, GPIOE and AFIO clocks */
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC
-							| RCC_APB2Periph_GPIOD | RCC_APB2Periph_GPIOE | RCC_APB2Periph_AFIO, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD | RCC_APB2Periph_GPIOE | RCC_APB2Periph_AFIO, ENABLE);
 
 	/* Activate pull-ups on all pins by default */
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_StructInit(&GPIO_InitStructure);
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-	GPIO_InitStructure.GPIO_Pin = 0xffff & ~GPIO_Pin_11 & ~GPIO_Pin_12; /* Exclude USB pins */
-	GPIO_Init(GPIOA, &GPIO_InitStructure);
-
 	GPIO_InitStructure.GPIO_Pin = 0xffff;
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 	GPIO_Init(GPIOD, &GPIO_InitStructure);
+#if (PIOS_USB_ENABLED)
+	GPIO_InitStructure.GPIO_Pin = 0xffff & ~GPIO_Pin_11 & ~GPIO_Pin_12; /* Exclude USB pins */
+#endif
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
 
+#if (PIOS_USB_ENABLED)
 	/*  Ensure that pull-up is active on detect pin */
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-	GPIO_InitStructure.GPIO_Pin = USB_DETECT_PIN;
-	GPIO_Init(USB_ACC_GPIO_PORT, &GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = PIOS_USB_DETECT_GPIO_PIN;
+	GPIO_Init(PIOS_USB_DETECT_GPIO_PORT, &GPIO_InitStructure);
+#endif
 
-	/* Initialize Basic NVIC */
+	/* Initialise Basic NVIC */
 	NVIC_Configuration();
 	
-	/* Initialize LEDs */
+	/* Initialise LEDs */
 	PIOS_LED_Init();
 }
 
@@ -108,14 +110,14 @@ void NVIC_Configuration(void)
 	/* Set the Vector Table base address as specified in .ld file */
 	NVIC_SetVectorTable(NVIC_VectTab_FLASH, 0x0);
 
-	/* 4 bits for Interupt priorities so no sub priorities */
+	/* 4 bits for Interrupt priorities so no sub priorities */
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 
 	/* Configure HCLK clock as SysTick clock source. */
 	SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK);
 }
 
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
 * Reports the name of the source file and the source line number
 *   where the assert_param error has occurred.

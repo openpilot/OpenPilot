@@ -93,7 +93,7 @@
 #define PIOS_USART1_IRQ_CHANNEL			USART2_IRQn
 #define PIOS_USART1_IRQHANDLER_FUNC		void USART2_IRQHandler(void)
 #define PIOS_USART1_CLK_FUNC			RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE)
-#define PIOS_USART1_NVIC_PRIO			IRQ_PRIO_HIGHEST
+#define PIOS_USART1_NVIC_PRIO			PIOS_IRQ_PRIO_HIGHEST
 #define PIOS_USART1_BAUDRATE			57600
 
 //-------------------------
@@ -108,7 +108,7 @@
 #define PIOS_USART2_IRQ_CHANNEL			USART3_IRQn
 #define PIOS_USART2_IRQHANDLER_FUNC		void USART3_IRQHandler(void)
 #define PIOS_USART2_CLK_FUNC			RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE)
-#define PIOS_USART2_NVIC_PRIO			IRQ_PRIO_HIGHEST
+#define PIOS_USART2_NVIC_PRIO			PIOS_IRQ_PRIO_HIGHEST
 #define PIOS_USART2_BAUDRATE			57600
 
 //-------------------------
@@ -123,7 +123,7 @@
 #define PIOS_USART3_IRQ_CHANNEL			USART1_IRQn
 #define PIOS_USART3_IRQHANDLER_FUNC		void USART1_IRQHandler(void)
 #define PIOS_USART3_CLK_FUNC			RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE)
-#define PIOS_USART3_NVIC_PRIO			IRQ_PRIO_HIGH
+#define PIOS_USART3_NVIC_PRIO			PIOS_IRQ_PRIO_HIGH
 #define PIOS_USART3_BAUDRATE			57600
 
 //-------------------------
@@ -137,7 +137,7 @@
 //-------------------------
 // SPI
 //-------------------------
-#define PIOS_SPI_IRQ_DMA_PRIORITY		IRQ_PRIO_HIGH
+#define PIOS_SPI_IRQ_DMA_PRIORITY		PIOS_IRQ_PRIO_HIGH
 #define PIOS_SPI_NUM					2
 #define PIOS_SPI0_ENABLED				1
 #define PIOS_SPI0_PTR					SPI1
@@ -176,6 +176,26 @@
 #define PIOS_SDCARD_SPI					0
 
 //-------------------------
+// Delay Timer
+//-------------------------
+#define PIOS_DELAY_TIMER				TIM2
+#define PIOS_DELAY_TIMER_RCC			RCC_APB1Periph_TIM2
+
+//-------------------------
+// Master Clock
+//-------------------------
+#define PIOS_MASTER_CLOCK				72000000
+#define PIOS_PERIPHERAL_CLOCK			(PIOS_MASTER_CLOCK / 2)
+
+//-------------------------
+// Interrupt Priorities
+//-------------------------
+#define PIOS_IRQ_PRIO_LOW				12		// lower than RTOS
+#define PIOS_IRQ_PRIO_MID				8		// higher than RTOS
+#define PIOS_IRQ_PRIO_HIGH				5		// for SPI, ADC, I2C etc...
+#define PIOS_IRQ_PRIO_HIGHEST			4 		// for USART etc...
+
+//-------------------------
 // Receiver PWM inputs   
 //-------------------------
 #define RECEIVER1_GPIO_PORT				GPIOB
@@ -210,7 +230,6 @@
 #define RECEIVER8_PIN					GPIO_Pin_5      // PB5
 #define RECEIVER8_TIM_PORT				TIM3
 #define RECEIVER8_CH					TIM_Channel_2   // TIM3_CH2
-
 #define NUM_RECEIVER_INPUTS				6
 
 //-------------------------
@@ -239,33 +258,14 @@
 #define ADC_A_CHANNEL					ADC_Channel_11
 #define ADC_B_CHANNEL					ADC_Channel_12
 #define NUM_ADC_PINS					4		// 3 but actually 4 because of temp sensor
-#define ADC_IRQ_PRIO					IRQ_PRIO_HIGH
+#define ADC_IRQ_PRIO					PIOS_IRQ_PRIO_HIGH
 
 //-------------------------  
 // USB
 //-------------------------
-#define USB_ACC_GPIO_PORT				GPIOC
-#define USB_DETECT_PIN					GPIO_Pin_4
-#define PIOS_IRQ_USB_PRIORITY			IRQ_PRIO_MID
-
-//-------------------------
-// Delay Timer    
-//-------------------------
-#define PIOS_DELAY_TIMER				TIM2
-#define PIOS_DELAY_TIMER_RCC			RCC_APB1Periph_TIM2
-
-//-------------------------
-// Master Clock   
-//-------------------------
-#define MASTER_CLOCK					72000000
-#define PERIPHERAL_CLOCK				(MASTER_CLOCK/2)
-
-//-------------------------
-// Interrupt Priorities
-//-------------------------
-#define IRQ_PRIO_LOW					12		// lower than RTOS
-#define IRQ_PRIO_MID					8		// higher than RTOS
-#define IRQ_PRIO_HIGH					5		// for SPI, ADC, I2C etc...
-#define IRQ_PRIO_HIGHEST				4 		// for USART etc...
+#define PIOS_USB_ENABLED				1
+#define PIOS_USB_DETECT_GPIO_PORT		GPIOC
+#define PIOS_USB_DETECT_GPIO_PIN		GPIO_Pin_4
+#define PIOS_IRQ_USB_PRIORITY			PIOS_IRQ_PRIO_MID
 
 #endif /* PIOS_BOARD_H */

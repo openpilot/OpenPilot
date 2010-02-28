@@ -73,7 +73,7 @@ int32_t PIOS_COM_SendBufferNonBlocking(COMPortTypeDef port, uint8_t *buffer, uin
 	/* Branch depending on selected port */
 	switch(port) {
 		case COM_DEBUG_USART:
-			return PIOS_USART_TxBufferPutMoreNonBlocking(COM_DEBUG_PORT, buffer, len);
+			return PIOS_USART_TxBufferPutMoreNonBlocking(PIOS_COM_DEBUG_PORT, buffer, len);
 		case COM_GPS_USART:
 			return PIOS_USART_TxBufferPutMoreNonBlocking(GPS, buffer, len);
 		case COM_TELEM_USART:
@@ -102,7 +102,7 @@ int32_t PIOS_COM_SendBuffer(COMPortTypeDef port, uint8_t *buffer, uint16_t len)
 	/* Branch depending on selected port */
 	switch(port) {
 		case COM_DEBUG_USART:
-			return PIOS_USART_TxBufferPutMore(COM_DEBUG_PORT, buffer, len);
+			return PIOS_USART_TxBufferPutMore(PIOS_COM_DEBUG_PORT, buffer, len);
 		case COM_GPS_USART:
 			return PIOS_USART_TxBufferPutMore(GPS, buffer, len);
 		case COM_TELEM_USART:
@@ -242,7 +242,7 @@ int32_t PIOS_COM_ReceiveHandler(void)
 		int32_t status = -1;
 		switch(intf++) {
 			case COM_DEBUG_USART:
-				status = PIOS_USART_RxBufferGet(COM_DEBUG_PORT);
+				status = PIOS_USART_RxBufferGet(PIOS_COM_DEBUG_PORT);
 				port = COM_DEBUG_USART;
 				break;
 			case COM_GPS_USART:

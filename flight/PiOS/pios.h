@@ -31,6 +31,7 @@
 
 /* PIOS Compile Time Configuration */
 #include "pios_config.h"
+#include "pios_board.h"
 
 /* C Lib Includes */
 #include <stdio.h>
@@ -53,7 +54,6 @@
 #include <msd.h>
 
 /* PIOS Hardware Includes (STM32F10x) */
-#include <pios_board.h>
 #include <pios_sys.h>
 #include <pios_delay.h>
 #include <pios_led.h>

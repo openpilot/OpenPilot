@@ -29,13 +29,11 @@
 
 
 /* Global Types */
-typedef enum {GPS = 0, TELEM = 1, AUX = 2} USARTNumTypeDef;
+typedef enum {GPS = 0, TELEM = 1, AUX = 2} USARTNumTypeDef; //TODO: Make this non-application specific
 
 
 /* Public Functions */
 extern void PIOS_USART_Init(void);
-extern void PIOS_USART_EnableAux(void);
-extern void PIOS_USART_DisableAux(void);
 extern void PIOS_USART_ChangeBaud(USART_TypeDef* USARTx, uint32_t Baud);
 
 extern int32_t PIOS_USART_RxBufferFree(USARTNumTypeDef uart);

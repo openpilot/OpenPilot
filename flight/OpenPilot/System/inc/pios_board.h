@@ -82,51 +82,57 @@
 #define PIOS_BMP085_EOC_IRQn			EXTI15_10_IRQn
 
 //-------------------------
-// GPS USART 
+// PIOS_USART1 (TELEM)
 //-------------------------
-#define GPS_USART						USART2
-#define GPS_GPIO_PORT					GPIOA
-#define GPS_RX_PIN						GPIO_Pin_3
-#define GPS_TX_PIN						GPIO_Pin_2
-#define GPS_REMAP_FUNC					{ }
-#define GPS_IRQ_CHANNEL					USART2_IRQn
-#define GPS_IRQHANDLER_FUNC				void USART2_IRQHandler(void)
-#define GPS_CLK_FUNC					RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE)
-#define GPS_NVIC_PRIO					IRQ_PRIO_HIGHEST
+#define PIOS_USART1_ENABLED
+#define PIOS_USART1_USART				USART2
+#define PIOS_USART1_GPIO_PORT			GPIOA
+#define PIOS_USART1_RX_PIN				GPIO_Pin_3
+#define PIOS_USART1_TX_PIN				GPIO_Pin_2
+#define PIOS_USART1_REMAP_FUNC			{ }
+#define PIOS_USART1_IRQ_CHANNEL			USART2_IRQn
+#define PIOS_USART1_IRQHANDLER_FUNC		void USART2_IRQHandler(void)
+#define PIOS_USART1_CLK_FUNC			RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE)
+#define PIOS_USART1_NVIC_PRIO			IRQ_PRIO_HIGHEST
+#define PIOS_USART1_BAUDRATE			57600
 
 //-------------------------
-// Telemetry radio USART 
+// PIOS_USART2 (GPS)
 //-------------------------
-#define TELEM_USART        				USART3
-#define TELEM_GPIO_PORT					GPIOC
-#define TELEM_RX_PIN      				GPIO_Pin_11
-#define TELEM_TX_PIN      				GPIO_Pin_10
-#define TELEM_REMAP_FUNC				{ GPIO_PinRemapConfig(GPIO_PartialRemap_USART3, ENABLE); }
-#define TELEM_IRQ_CHANNEL				USART3_IRQn
-#define TELEM_IRQHANDLER_FUNC			void USART3_IRQHandler(void)
-#define TELEM_CLK_FUNC					RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE)
-#define TELEM_NVIC_PRIO					IRQ_PRIO_HIGHEST
+#define PIOS_USART2_ENABLED
+#define PIOS_USART2_USART       		USART3
+#define PIOS_USART2_GPIO_PORT			GPIOC
+#define PIOS_USART2_RX_PIN      		GPIO_Pin_11
+#define PIOS_USART2_TX_PIN      		GPIO_Pin_10
+#define PIOS_USART2_REMAP_FUNC			{ GPIO_PinRemapConfig(GPIO_PartialRemap_USART3, ENABLE); }
+#define PIOS_USART2_IRQ_CHANNEL			USART3_IRQn
+#define PIOS_USART2_IRQHANDLER_FUNC		void USART3_IRQHandler(void)
+#define PIOS_USART2_CLK_FUNC			RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE)
+#define PIOS_USART2_NVIC_PRIO			IRQ_PRIO_HIGHEST
+#define PIOS_USART2_BAUDRATE			57600
 
 //-------------------------
-// AUXSER USART (available instead of RX5/RX6)
+//  PIOS_USART3 (AUX) (RX5/RX6)
 //-------------------------
-#define AUX_USART_USART					USART1
-#define AUX_USART_GPIO_PORT				GPIOA
-#define AUX_USART_RX_PIN				GPIO_Pin_10
-#define AUX_USART_TX_PIN				GPIO_Pin_9
-#define AUX_USART_REMAP_FUNC			{ }
-#define AUX_USART_IRQ_CHANNEL			USART1_IRQn
-#define AUX_USART_IRQHANDLER_FUNC		void USART1_IRQHandler(void)
-#define AUX_USART_CLK_FUNC				RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE)
-#define AUX_USART_NVIC_PRIO				IRQ_PRIO_HIGH
+//#define PIOS_USART3_ENABLED
+#define PIOS_USART3_USART				USART1
+#define PIOS_USART3_GPIO_PORT			GPIOA
+#define PIOS_USART3_RX_PIN				GPIO_Pin_10
+#define PIOS_USART3_TX_PIN				GPIO_Pin_9
+#define PIOS_USART3_REMAP_FUNC			{ }
+#define PIOS_USART3_IRQ_CHANNEL			USART1_IRQn
+#define PIOS_USART3_IRQHANDLER_FUNC		void USART1_IRQHandler(void)
+#define PIOS_USART3_CLK_FUNC			RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE)
+#define PIOS_USART3_NVIC_PRIO			IRQ_PRIO_HIGH
+#define PIOS_USART3_BAUDRATE			57600
 
 //-------------------------
-// USART Serial Ports
+// PIOS_USART
 //-------------------------
-#define USART_NUM						3
-#define USART_RX_BUFFER_SIZE			1024
-#define USART_TX_BUFFER_SIZE			256
-#define COM_DEBUG_PORT					GPS
+#define PIOS_USART_NUM					3
+#define PIOS_USART_RX_BUFFER_SIZE		1024
+#define PIOS_USART_TX_BUFFER_SIZE		256
+#define PIOS_COM_DEBUG_PORT				GPS
 
 //-------------------------
 // SPI

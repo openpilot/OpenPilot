@@ -34,7 +34,6 @@
 #include "coreimpl.h"
 #include "coreconstants.h"
 #include "fancytabwidget.h"
-#include "filemanager.h"
 #include "generalsettings.h"
 #include "ifilefactory.h"
 #include "messagemanager.h"

@@ -61,7 +61,6 @@ void PIOS_Servo_Init(void)
 	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
 	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
 	TIM_TimeBaseStructure.TIM_Prescaler = (MASTER_CLOCK / 1000000) - 1;
-	TIM_TimeBaseStructure.TIM_Period = (20000 - 1);
 	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
 	
@@ -69,7 +68,9 @@ void PIOS_Servo_Init(void)
 	TIM_OCInitTypeDef TIM_OCInitStructure;
 
 	/* TIM4 */
+	TIM_TimeBaseStructure.TIM_Period = (20000 - 1);
 	TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
+
 	TIM_OCStructInit(&TIM_OCInitStructure);
 	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
@@ -88,7 +89,9 @@ void PIOS_Servo_Init(void)
 	TIM_Cmd(TIM4, ENABLE);
 	
 	/* TIM8 */
+	TIM_TimeBaseStructure.TIM_Period = (20000 - 1);
 	TIM_TimeBaseInit(TIM8, &TIM_TimeBaseStructure);
+
 	TIM_OCStructInit(&TIM_OCInitStructure);
 	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;

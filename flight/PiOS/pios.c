@@ -100,7 +100,11 @@ int main()
 
 	//PIOS_PWM_Init();
 
+	PIOS_USB_Init(0);
+
 	PIOS_COM_ReceiveCallbackInit(CONSOLE_Parse);
+
+	//PIOS_BMP085_Init();
 
 	/* Initialise OpenPilot application */
 //	OpenPilotInit();

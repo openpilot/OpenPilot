@@ -76,14 +76,14 @@ void PIOS_BMP085_Init(void)
 	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
 	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	EXTI_Init(&EXTI_InitStructure);
+	//EXTI_Init(&EXTI_InitStructure);
 	
 	/* Enable and set EOC EXTI Interrupt to the lowest priority */
 	NVIC_InitStructure.NVIC_IRQChannel = BMP085_EOC_IRQn;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 15;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 15;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
+	//NVIC_Init(&NVIC_InitStructure);
 	
 	/* Read all 22 bytes of calibration data in one transfer, this is a very optimised way of doing things */
 	uint8_t Data[22];
@@ -160,7 +160,7 @@ void PIOS_BMP085_GetValues(uint16_t *Pressure, uint16_t *Altitude, uint16_t *Tem
 	int32_t X1, X2, X3, B3, B5, B6, P;
 	uint32_t B4, B7;
 
-	/* Convert Temperatre */
+	/* Convert Temperature */
 	X1 = (RawTemperature - CalibData.AC6) * CalibData.AC5 >> 15;
 	X2 = ((int32_t) CalibData.MC << 11) / (X1 + CalibData.MD);
 	B5 = X1 + X2;

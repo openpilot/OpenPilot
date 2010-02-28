@@ -31,21 +31,21 @@
 //------------------------
 // DMA Channels Used
 //------------------------
-/* Channel 1  - 					*/
+/* Channel 1  - 						*/
 /* Channel 2  - SPI1 RX					*/
 /* Channel 3  - SPI1 TX					*/
 /* Channel 4  - SPI2 RX					*/
 /* Channel 5  - SPI2 TX					*/
-/* Channel 6  - 					*/
-/* Channel 7  - 					*/
-/* Channel 8  - 					*/
-/* Channel 9  - 					*/
-/* Channel 10 - 					*/
-/* Channel 11 - 					*/
-/* Channel 12 - 					*/
+/* Channel 6  - 						*/
+/* Channel 7  - 						*/
+/* Channel 8  - 						*/
+/* Channel 9  - 						*/
+/* Channel 10 - 						*/
+/* Channel 11 - 						*/
+/* Channel 12 - 						*/
 
 //------------------------
-// Leds Definition   
+// PIOS_LED
 //------------------------
 #define PIOS_LED_LED1_GPIO_PORT			GPIOC
 #define PIOS_LED_LED1_GPIO_PIN			GPIO_Pin_12
@@ -59,7 +59,7 @@
 #define PIOS_LED_CLKS					{ PIOS_LED_LED1_GPIO_CLK, PIOS_LED_LED2_GPIO_CLK }
 
 //------------------------
-// I2C   
+// PIOS_I2C
 //------------------------
 #define PIOS_I2C_GPIO_PORT				GPIOB
 #define PIOS_I2C_SDA_PIN				GPIO_Pin_11
@@ -71,15 +71,15 @@
 #define PIOS_I2C_IRQ_ER_PRIORITY		2
 
 //------------------------
-// Onboard Pressure sensor   
+// PIOS_BMP085
 //------------------------
-#define BMP085_EOC_GPIO_PORT			GPIOC
-#define BMP085_EOC_GPIO_PIN				GPIO_Pin_15
-#define BMP085_EOC_PORT_SOURCE			GPIO_PortSourceGPIOG
-#define BMP085_EOC_PIN_SOURCE			GPIO_PinSource8
-#define BMP085_EOC_CLK					RCC_APB2Periph_GPIOC
-#define BMP085_EOC_EXTI_LINE			EXTI_Line15
-#define BMP085_EOC_IRQn					EXTI15_10_IRQn
+#define PIOS_BMP085_EOC_GPIO_PORT		GPIOC
+#define PIOS_BMP085_EOC_GPIO_PIN		GPIO_Pin_15
+#define PIOS_BMP085_EOC_PORT_SOURCE		GPIO_PortSourceGPIOG
+#define PIOS_BMP085_EOC_PIN_SOURCE		GPIO_PinSource8
+#define PIOS_BMP085_EOC_CLK				RCC_APB2Periph_GPIOC
+#define PIOS_BMP085_EOC_EXTI_LINE		EXTI_Line15
+#define PIOS_BMP085_EOC_IRQn			EXTI15_10_IRQn
 
 //-------------------------
 // GPS USART 

@@ -31,7 +31,7 @@ Example of how to use this module:
 	PIOS_BMP085_StartADC(Temperature);
 		(Interrupt reads the ADC)
 	
-	Somwhere inbetween these 2 calls we need to wait for the first one to finish
+	Somewhere in between these 2 calls we need to wait for the first one to finish
 	
 	PIOS_BMP085_StartADC(Pressure);
 		(Interrupt reads the ADC)
@@ -65,23 +65,23 @@ void PIOS_BMP085_Init(void)
 	NVIC_InitTypeDef NVIC_InitStructure;
 	
 	/* Enable EOC GPIO clock */
-	RCC_APB2PeriphClockCmd(BMP085_EOC_CLK | RCC_APB2Periph_AFIO, ENABLE);
+	RCC_APB2PeriphClockCmd(PIOS_BMP085_EOC_CLK | RCC_APB2Periph_AFIO, ENABLE);
 
 	/* Configure EOC pin as input floating */
-	GPIO_InitStructure.GPIO_Pin = BMP085_EOC_GPIO_PIN;
+	GPIO_InitStructure.GPIO_Pin = PIOS_BMP085_EOC_GPIO_PIN;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-	GPIO_Init(BMP085_EOC_GPIO_PORT, &GPIO_InitStructure);
+	GPIO_Init(PIOS_BMP085_EOC_GPIO_PORT, &GPIO_InitStructure);
 	
-	/* Configure the End Of Conversion (EOC) interrup */
-	GPIO_EXTILineConfig(BMP085_EOC_PORT_SOURCE, BMP085_EOC_PIN_SOURCE);
-	EXTI_InitStructure.EXTI_Line = BMP085_EOC_EXTI_LINE;
+	/* Configure the End Of Conversion (EOC) interrupt */
+	GPIO_EXTILineConfig(PIOS_BMP085_EOC_PORT_SOURCE, PIOS_BMP085_EOC_PIN_SOURCE);
+	EXTI_InitStructure.EXTI_Line = PIOS_BMP085_EOC_EXTI_LINE;
 	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
 	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 	//EXTI_Init(&EXTI_InitStructure);
 	
 	/* Enable and set EOC EXTI Interrupt to the lowest priority */
-	NVIC_InitStructure.NVIC_IRQChannel = BMP085_EOC_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannel = PIOS_BMP085_EOC_IRQn;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 15;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 15;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
@@ -281,7 +281,7 @@ int32_t PIOS_BMP085_Write(uint16_t address, uint8_t *buffer, uint8_t len)
 */
 void EXTI15_10_IRQHandler(void)
 {
-	if(EXTI_GetITStatus(BMP085_EOC_EXTI_LINE) != RESET) {
+	if(EXTI_GetITStatus(PIOS_BMP085_EOC_EXTI_LINE) != RESET) {
 		/* Disable interrupts */
 		PIOS_IRQ_Disable();
 		
@@ -289,7 +289,7 @@ void EXTI15_10_IRQHandler(void)
 		PIOS_BMP085_ReadADC();
 		
 		/* Clear the EOC EXTI line pending bit */
-		EXTI_ClearITPendingBit(BMP085_EOC_EXTI_LINE);
+		EXTI_ClearITPendingBit(PIOS_BMP085_EOC_EXTI_LINE);
 		
 		/* Enable interrupts */
 		PIOS_IRQ_Enable();

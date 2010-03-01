@@ -33,9 +33,22 @@ D: Co-founder, Principal hardware architect.
 D: Hardware design of OpenPilot, AHRS, GPS and other hardware
 D: Core developer embedded code
 
+N: Julien Rouviere
+E: julien.rouviere (at) gmail (dot) com
+D: GCS Core developer
+D: GCS Framework and Plugins for the GCS
+
+N: Juan soler
+E: jsoler (at) optusnet (dot) com (dot) au
+D: Project managment, documentation, issue tracker
+
 N: Pete Stapley
 E: pete (at) stapleylabs (dot) com
 D: PPM inputs
+
+N: Rowan Taubitz
+E: rowan (at) zantek (dot) com (dot) au
+D: Hardware debugging and testing
 
 N: Vassilis Varveropoulos
 E: vassilis (at) openpilot (dot) org

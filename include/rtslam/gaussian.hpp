@@ -23,7 +23,7 @@ namespace jafar {
 		 * Storage type of Gaussians: LOCAL, REMOTE.
 		 */
 		typedef enum {
-			LOCAL, REMOTE
+			GAUSSIAN_LOCAL, GAUSSIAN_REMOTE
 		} storage_t;
 
 		/**
@@ -107,10 +107,14 @@ namespace jafar {
 				 * \param the vector of standard deviations.
 				 */
 				void set_P(const jblas::vec & _std);
+				/**
+				 * Set covariances matrix from a covariances matrix.
+				 * \param P the covariances matrix.
+				 */
 				void set_P(const jblas::sym_mat & _P);
 
 				/**
-				 * Set off-diagonal block.
+				 * Set off-diagonal block in the covariances matrix.
 				 * Only tested for local Gaussians.
 				 * \param M the off-diagonal block.
 				 * \param ia1 the indirect array for rows.
@@ -163,7 +167,7 @@ namespace jafar {
 		 * Empty constructor
 		 */
 		Gaussian::Gaussian() :
-			storage_(LOCAL), x_(0), P_(0), ia(0), x(x_, 0), P(P_, 0, 0) {
+			storage_(GAUSSIAN_LOCAL), x_(0), P_(0), ia(0), x(x_, 0), P(P_, 0, 0) {
 		}
 
 		/**
@@ -177,21 +181,21 @@ namespace jafar {
 		 * Local constructor from size
 		 */
 		Gaussian::Gaussian(const size_t _size) :
-			storage_(LOCAL), size_(_size), x_(size_), P_(size_, size_), ia(size_), x(x_, ia.all()), P(P_, ia.all(), ia.all()) {
+			storage_(GAUSSIAN_LOCAL), size_(_size), x_(size_), P_(size_, size_), ia(size_), x(x_, ia.all()), P(P_, ia.all(), ia.all()) {
 		}
 
 		/*
 		 * Local constructor from data
 		 */
 		Gaussian::Gaussian(const jblas::vec& _x, const jblas::sym_mat& _P) :
-			storage_(LOCAL), size_(_x.size()), x_(_x), P_(_P), ia(size_), x(x_, ia.all()), P(P_, ia.all(), ia.all()) {
+			storage_(GAUSSIAN_LOCAL), size_(_x.size()), x_(_x), P_(_P), ia(size_), x(x_, ia.all()), P(P_, ia.all(), ia.all()) {
 		}
 
 		/*
 		 * Remote constructor
 		 */
 		Gaussian::Gaussian(Gaussian & G, const jblas::ind_array & _ia) :
-			storage_(REMOTE), size_(_ia.size()), x_(0), P_(0), ia(_ia), x(G.x_, ia), P(G.P_, ia, ia) {
+			storage_(GAUSSIAN_REMOTE), size_(_ia.size()), x_(0), P_(0), ia(_ia), x(G.x_, ia), P(G.P_, ia, ia) {
 		}
 
 		/**
@@ -229,7 +233,7 @@ namespace jafar {
 		 * For remote storage, the size of the remote Gaussian is also shown, and the indirect array too.
 		 */
 		std::ostream& operator <<(std::ostream & s, jafar::rtslam::Gaussian & g_) {
-			if (g_.storage() == LOCAL)
+			if (g_.storage() == GAUSSIAN_LOCAL)
 				s << "Gaussian with local storage: \n";
 			else {
 				size_t sz = g_.x.data().size();

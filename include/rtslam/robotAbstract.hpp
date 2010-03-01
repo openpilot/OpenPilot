@@ -34,42 +34,34 @@
 
 #include <jmath/jblas.hpp>
 #include "blocks.hpp"
+#include "gaussian.hpp"
+#include "sensorAbstract.hpp"
 #include "mapAbstract.hpp"
 
-namespace jafar
-{
-	namespace rtslam
-	{
+namespace jafar {
 
-		/* --------------------------------------------------------------------- */
-		/* --- CLASS ----------------------------------------------------------- */
-		/* --------------------------------------------------------------------- */
+	namespace rtslam {
+
 
 		/** Base class for all Gaussian control vectors defined in the module rtslam.
 		 *
 		 * @ingroup rtslam
 		 */
-		class Control: public Gaussian
-		{
+		class Control: public Gaussian {
 				double dt;
 			public:
-				void set_dt(double dt_)
-				{
+				void set_dt(double dt_) {
 					dt(dt_);
 				}
 		};
 
-		/* --------------------------------------------------------------------- */
-		/* --- CLASS ----------------------------------------------------------- */
-		/* --------------------------------------------------------------------- */
 
 		/** Base class for all robots defined in the module
 		 * rtslam.
 		 *
 		 * @ingroup rtslam
 		 */
-		class RobotAbstract
-		{
+		class RobotAbstract {
 			public:
 
 				/**
@@ -115,12 +107,22 @@ namespace jafar
 				/**
 				 * Acquire control structure
 				 */
-				virtual void set_control(const Control & control_);
+				virtual void set_control(const Control & _control) {
+					control(_control);
+				}
 
 				/**
 				 * Move the robot.
 				 */
 				virtual void move(void) = 0;
+				void move(const Control & _control) {
+					set_control(_control);
+					move();
+				}
+				void move(const jblas::vec & _u) {
+					JFR_ASSERT(_u.size() == control.size(), "robotAbstract.hpp: move: size mismatch.");
+					control.set_x(_u);
+				}
 
 		};
 

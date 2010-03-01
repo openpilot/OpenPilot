@@ -173,9 +173,9 @@ static void TaskTick(void *pvParameters)
 
 		// I2C Test: communicate with external PCF8570 ram chip
 		{
-			char buf[20];
-			PIOS_I2C_Transfer(I2C_Write, 0x50<<1, "\x0\x10\x11\x12", 4);
-			PIOS_I2C_Transfer(I2C_Write_WithoutStop, 0x50<<1, "\x0", 1);
+			uint8_t buf[20];
+			PIOS_I2C_Transfer(I2C_Write, 0x50<<1, (uint8_t*)"\x0\x10\x11\x12", 4);
+			PIOS_I2C_Transfer(I2C_Write_WithoutStop, 0x50<<1, (uint8_t*)"\x0", 1);
 			PIOS_I2C_Transfer(I2C_Read, 0x50<<1, buf, 3);
 		}
 

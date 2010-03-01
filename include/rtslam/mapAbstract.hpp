@@ -35,7 +35,27 @@ namespace jafar {
 		 *
 		 * @ingroup rtslam
 		 */
-		class MapAbstract: public Gaussian {
+		class MapAbstract {
+
+			public:
+
+				/**
+				 * Size things and map usage management
+				 */
+				size_t max_size;
+				size_t current_size;
+				vector<bool> used_states;
+				jblas::ind_array * ia;
+
+				/**
+				 * Constructor
+				 */
+				MapAbstract(size_t max_size);
+
+				/**
+				 * Gaussian map
+				 */
+				Gaussian gaussian;
 
 				/**
 				 * Mandatory virtual destructor
@@ -58,18 +78,26 @@ namespace jafar {
 				 * \param freeSpace_ the resulting free space
 				 * \return \a true if enough space was found.
 				 */
-				bool getFreeSpace(const size_t size_, jblas::vec& freeSpace_);
+				jblas::ind_array getFreeSpace(const size_t size_);
 
 				/**
 				 * Robot and landmark addition and removal
 				 */
-				void addRobot(RobotAbstract& robot_);
-				void removeRobot(RobotAbstract& robot_);
-				void addLandmark(LandmarkAbstract& landmark_);
-				void removeLandmark(LandmarkAbstract& landmark_);
+				void addRobot(RobotAbstract& _rob);
+				void removeRobot(RobotAbstract& _rob);
+				void addLandmark(LandmarkAbstract& _lmk);
+				void removeLandmark(LandmarkAbstract& _lmk);
 
-				std::vector<size_t> used; // TODO: see how to implement this "used" feature.
-
+				/**
+				 * Full map operations
+				 */
+				void predictMotion(RobotAbstract & _rob);
+				void stackOneLmkCorrection(LandmarkAbstract & _lmk, ObservationAbstract & _obs);
+				void correctStackedLmks();
+				void correctOneLmk(LandmarkAbstract & _lmk, ObservationAbstract & _obs);
+				void reparametrizeLmk(LandmarkAbstract & _lmk);
+				void initializeLmk(ObservationAbstract & _obs);
+				void deleteLmk(LandmarkAbstract & _lmk);
 		};
 
 	}

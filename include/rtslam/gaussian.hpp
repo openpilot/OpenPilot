@@ -79,6 +79,19 @@ namespace jafar {
 				Gaussian(Gaussian& G, const jblas::ind_array& _ia);
 
 				/**
+				 * Remote constructor.
+				 * This constructor uses indirect indexing onto a remote pair {x, P} provided to the constructor.
+				 * The indirect array where this new Gaussian points to in {x, P} is also given as input.
+				 * For practical use, the result is such that the new Gaussian Gnew has <i> this.x = x(ia) </i> and <i> this.P = P(ia,ia).</i>
+				 * The local storage \a x_ and \a P_ is kept at null size for economy.
+				 * \param x the remote mean vector.
+				 * \param P the remote covariances matrix.
+				 * \param _ia the indirect array of indices pointing to x and P,
+				 * such that <i> this.x = x(ia) </i> and <i> this.P = P(ia,ia).</i>
+				 */
+				Gaussian(jblas::vec & _x, jblas::sym_mat & _P, const jblas::ind_array& _ia);
+
+				/**
 				 * Clear data, keep sizes and ranges.
 				 * Clears the data of \a x and \a P.
 				 */
@@ -181,7 +194,8 @@ namespace jafar {
 		 * Local constructor from size
 		 */
 		Gaussian::Gaussian(const size_t _size) :
-			storage_(GAUSSIAN_LOCAL), size_(_size), x_(size_), P_(size_, size_), ia(size_), x(x_, ia.all()), P(P_, ia.all(), ia.all()) {
+			storage_(GAUSSIAN_LOCAL), size_(_size), x_(size_), P_(size_, size_), ia(size_), x(x_, ia.all()), P(P_, ia.all(),
+			    ia.all()) {
 		}
 
 		/*
@@ -196,6 +210,14 @@ namespace jafar {
 		 */
 		Gaussian::Gaussian(Gaussian & G, const jblas::ind_array & _ia) :
 			storage_(GAUSSIAN_REMOTE), size_(_ia.size()), x_(0), P_(0), ia(_ia), x(G.x_, ia), P(G.P_, ia, ia) {
+		}
+
+		/*
+		 * Remote constructor
+		 */
+		Gaussian::Gaussian(jblas::vec & _x, jblas::sym_mat & _P, const jblas::ind_array& _ia) :
+			storage_(GAUSSIAN_REMOTE), size_(_ia.size()), x_(0), P_(0), ia(_ia), x(_x, ia), P(_P, ia, ia) {
+			//			JFR_ASSERT((_x.size() == _ia.size()) && (_x.size() == -P.size1()), "gaussian.hpp: Gaussian(): sizes mismatch.");
 		}
 
 		/**

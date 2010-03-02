@@ -69,6 +69,7 @@
 #include <pios_pwm.h>
 #include <pios_usb.h>
 #include <pios_usb_hid.h>
+#include <pios_debug.h>
 
 /* PIOS Hardware Includes (Common) */
 #include <pios_settings.h>

@@ -34,7 +34,7 @@
 /* Function Prototypes */
 
 /**
-* OpenPilot Main function
+* AHRS Main function
 */
 int main()
 {
@@ -53,7 +53,6 @@ int main()
 		PIOS_DELAY_WaitmS(100);
 	}
 
-	/* If all is well we will never reach here as the scheduler will now be running. */
-	/* If we do get here, it will most likely be because we ran out of heap space. */
+
 	return 0;
 }

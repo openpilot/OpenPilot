@@ -74,11 +74,16 @@ namespace jafar {
 
 				/**
 				 * Obtain free Map space of a given size.
-				 * \param size_ the requested free space size
-				 * \param freeSpace_ the resulting free space
-				 * \return \a true if enough space was found.
+				 * \param _size the requested free space size.
+				 * \return the resulting free space.
 				 */
-				jblas::ind_array getFreeSpace(const size_t size_);
+				jblas::ind_array getFreeSpace(const size_t _size);
+
+				/**
+				 * Liberate the space indicated.
+				 * \param _ia the space to liberate.
+				 */
+				void liberateSpace(const jblas::ind_array & _ia);
 
 				/**
 				 * Robot and landmark addition and removal

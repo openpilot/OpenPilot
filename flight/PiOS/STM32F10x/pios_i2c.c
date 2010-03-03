@@ -175,7 +175,7 @@ static void PIOS_I2C_InitPeripheral(void)
 * \return Non_Blocking: returns -1 to request a retry
 * \return 0 if IIC interface free
 */
-int32_t PIOS_I2C_TransferBegin(I2CSemaphoreTypeDef semaphore_type)
+int32_t PIOS_I2C_LockDevice(I2CSemaphoreTypeDef semaphore_type)
 {
 	volatile I2CRecTypeDef *i2cx = &I2CRec;
 	int32_t status = -1;
@@ -201,7 +201,7 @@ int32_t PIOS_I2C_TransferBegin(I2CSemaphoreTypeDef semaphore_type)
 * Semaphore handling: releases the IIC interface for other tasks
 * \return < 0 on errors
 */
-int32_t PIOS_I2C_TransferFinished(void)
+int32_t PIOS_I2C_UnlockDevice(void)
 {
 	I2CRec.i2c_semaphore = 0;
 

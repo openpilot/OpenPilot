@@ -53,8 +53,8 @@ typedef enum {
 
 /* Public Functions */
 extern int32_t PIOS_I2C_Init(void);
-extern int32_t PIOS_I2C_TransferBegin(I2CSemaphoreTypeDef semaphore_type);
-extern int32_t PIOS_I2C_TransferFinished(void);
+extern int32_t PIOS_I2C_LockDevice(I2CSemaphoreTypeDef semaphore_type);
+extern int32_t PIOS_I2C_UnlockDevice(void);
 extern int32_t PIOS_I2C_LastErrorGet(void);
 extern int32_t PIOS_I2C_TransferCheck(void);
 extern int32_t PIOS_I2C_TransferWait(void);

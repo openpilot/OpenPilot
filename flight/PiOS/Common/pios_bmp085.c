@@ -203,7 +203,7 @@ void PIOS_BMP085_GetValues(uint16_t *Pressure, uint16_t *Altitude, uint16_t *Tem
 int32_t PIOS_BMP085_Read(uint16_t address, uint8_t *buffer, uint8_t len)
 {
 	/* Try to get the IIC peripheral */
-	if(PIOS_I2C_TransferBegin(I2C_Non_Blocking) < 0) {
+	if(PIOS_I2C_LockDevice(I2C_Non_Blocking) < 0) {
 		/* Request a retry */
 		return -2;
 	}
@@ -226,7 +226,7 @@ int32_t PIOS_BMP085_Read(uint16_t address, uint8_t *buffer, uint8_t len)
 	}
 
 	/* Release I2C peripheral */
-	PIOS_I2C_TransferFinished();
+	PIOS_I2C_UnlockDevice();
 	
 	/* Return error status */
 	return error < 0 ? -1 : 0;
@@ -247,7 +247,7 @@ int32_t PIOS_BMP085_Read(uint16_t address, uint8_t *buffer, uint8_t len)
 int32_t PIOS_BMP085_Write(uint16_t address, uint8_t *buffer, uint8_t len)
 {
 	/* Try to get the IIC peripheral */
-	if(PIOS_I2C_TransferBegin(I2C_Non_Blocking) < 0) {
+	if(PIOS_I2C_LockDevice(I2C_Non_Blocking) < 0) {
 		/* Request a retry */
 		return -2;
 	}
@@ -269,7 +269,7 @@ int32_t PIOS_BMP085_Write(uint16_t address, uint8_t *buffer, uint8_t len)
 	}
 
 	/* Release I2C peripheral */
-	PIOS_I2C_TransferFinished();
+	PIOS_I2C_UnlockDevice();
 	
 	/* Return error status */
 	return error < 0 ? -1 : 0;

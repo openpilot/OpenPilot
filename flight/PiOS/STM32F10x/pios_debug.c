@@ -37,6 +37,7 @@
 */
 void PIOS_DEBUG_Init(void)
 {
+#ifdef PIOS_ENABLE_DEBUG_PINS
 	/* Initialise Servo pins as standard output pins */
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_StructInit(&GPIO_InitStructure);
@@ -46,6 +47,7 @@ void PIOS_DEBUG_Init(void)
 	GPIO_Init(PIOS_SERVO_GPIO_PORT_1TO4, &GPIO_InitStructure);
 	GPIO_InitStructure.GPIO_Pin = PIOS_SERVO_GPIO_PIN_5 | PIOS_SERVO_GPIO_PIN_6 | PIOS_SERVO_GPIO_PIN_7 | PIOS_SERVO_GPIO_PIN_8;
 	GPIO_Init(PIOS_SERVO_GPIO_PORT_5TO8, &GPIO_InitStructure);
+#endif // PIOS_ENABLE_DEBUG_PINS
 }
 
 /**
@@ -53,12 +55,14 @@ void PIOS_DEBUG_Init(void)
 * \param pin 0 for S1 output
 */
 void PIOS_DEBUG_PinHigh(uint8_t Pin)
- {
+{
+#ifdef PIOS_ENABLE_DEBUG_PINS
 	if(Pin < 4) {
 		PIOS_SERVO_GPIO_PORT_1TO4->BSRR = (PIOS_SERVO_GPIO_PIN_1 << Pin);
 	} else if (Pin <= 7) {
 		PIOS_SERVO_GPIO_PORT_5TO8->BSRR = (PIOS_SERVO_GPIO_PIN_5 << (Pin - 4));
 	}
+#endif // PIOS_ENABLE_DEBUG_PINS
 }
 
 /**
@@ -67,11 +71,13 @@ void PIOS_DEBUG_PinHigh(uint8_t Pin)
 */
 void PIOS_DEBUG_PinLow(uint8_t Pin)
 {
+#ifdef PIOS_ENABLE_DEBUG_PINS
 	if(Pin < 4) {
 		PIOS_SERVO_GPIO_PORT_1TO4->BRR = (PIOS_SERVO_GPIO_PIN_1 << Pin);
 	} else if(Pin <= 7) {
 		PIOS_SERVO_GPIO_PORT_5TO8->BRR = (PIOS_SERVO_GPIO_PIN_5 << (Pin - 4));
 	}
+#endif // PIOS_ENABLE_DEBUG_PINS
 }
 
 

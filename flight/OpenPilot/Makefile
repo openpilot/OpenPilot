@@ -26,6 +26,8 @@
 # Set developer code and compile options
 # Set to YES for debugging
 DEBUG = YES
+ENABLE_DEBUG_PINS = NO
+
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY = YES
 
@@ -279,6 +281,11 @@ DEBUGF = dwarf-2
 CDEFS = -DSTM32F10X_$(MODEL)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)
+
+ifeq ($(ENABLE_DEBUG_PINS),YES)
+CDEFS += -DPIOS_ENABLE_DEBUG_PINS
+endif
+
 
 # Place project-specific -D and/or -U options for 
 # Assembler with preprocessor here.

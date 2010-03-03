@@ -235,17 +235,20 @@
 //-------------------------
 // Servo outputs   
 //-------------------------
-#define SERVO1TO4_PORT					GPIOB
-#define SERVO1_PIN						GPIO_Pin_6
-#define SERVO2_PIN						GPIO_Pin_7
-#define SERVO3_PIN						GPIO_Pin_8
-#define SERVO4_PIN						GPIO_Pin_9
-#define SERVO5TO8_PORT					GPIOC
-#define SERVO5_PIN						GPIO_Pin_6
-#define SERVO6_PIN						GPIO_Pin_7
-#define SERVO7_PIN						GPIO_Pin_8
-#define SERVO8_PIN						GPIO_Pin_9
-#define NUM_SERVO_OUTPUTS				8
+#define PIOS_SERVO_GPIO_PORT_1TO4		GPIOB
+#define PIOS_SERVO_GPIO_PIN_1			GPIO_Pin_6
+#define PIOS_SERVO_GPIO_PIN_2			GPIO_Pin_7
+#define PIOS_SERVO_GPIO_PIN_3			GPIO_Pin_8
+#define PIOS_SERVO_GPIO_PIN_4			GPIO_Pin_9
+#define PIOS_SERVO_GPIO_PORT_5TO8		GPIOC
+#define PIOS_SERVO_GPIO_PIN_5			GPIO_Pin_6
+#define PIOS_SERVO_GPIO_PIN_6			GPIO_Pin_7
+#define PIOS_SERVO_GPIO_PIN_7			GPIO_Pin_8
+#define PIOS_SERVO_GPIO_PIN_8			GPIO_Pin_9
+#define PIOS_SERVO_NUM_OUTPUTS			8
+#define PIOS_SERVO_NUM_TIMERS			PIOS_SERVO_NUM_OUTPUTS
+#define PIOS_SERVO_UPDATE_HZ			50
+#define PIOS_SERVOS_INITIAL_POSITION	1500
 
 //-------------------------
 // ADC

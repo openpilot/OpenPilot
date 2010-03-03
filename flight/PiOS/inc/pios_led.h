@@ -27,7 +27,12 @@
 #define PIOS_LED_H
 
 /* Type Definitions */
+
+#if (PIOS_LED_NUM == 1)
+typedef enum {LED1 = 0} LedTypeDef;
+#elif (PIOS_LED_NUM == 2)
 typedef enum {LED1 = 0, LED2 = 1} LedTypeDef;
+#endif
 
 /* Public Functions */
 extern void PIOS_LED_Init(void);

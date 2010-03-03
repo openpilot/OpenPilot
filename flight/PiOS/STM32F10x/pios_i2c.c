@@ -221,6 +221,23 @@ int32_t PIOS_IIC_LastErrorGet(void)
 	return I2CRec.last_transfer_error;
 }
 
+/**
+ * Internal function called at the start of a transfer
+ */
+static void TransferStart(I2CRecTypeDef *i2cx)
+{
+	DebugPinHigh(DEBUG_PIN_BUSY);
+	i2cx->transfer_state.BUSY = 1;
+}
+
+/**
+ * Internal function called at the end of a transfer
+ */
+static void TransferEnd(I2CRecTypeDef *i2cx)
+{
+	DebugPinLow(DEBUG_PIN_BUSY);
+	i2cx->transfer_state.BUSY = 0;
+}
 
 /**
 * Checks if transfer is finished
@@ -339,8 +356,6 @@ int32_t PIOS_I2C_Transfer(I2CTransferTypeDef transfer, uint8_t address, uint8_t 
 		return error + I2C_ERROR_PREV_OFFSET;
 	}
 
-	DebugPinLow(DEBUG_PIN_BUSY);
-	i2cx->transfer_state.BUSY = 0;
 
 	/* Disable interrupts */
 	I2C_ITConfig(i2cx->base, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, DISABLE);
@@ -383,8 +398,7 @@ int32_t PIOS_I2C_Transfer(I2CTransferTypeDef transfer, uint8_t address, uint8_t 
 	i2cx->last_transfer_error = 0;
 
 	/* Notify that transfer has started */
-	DebugPinHigh(DEBUG_PIN_BUSY);
-	i2cx->transfer_state.BUSY = 1;
+	TransferStart(i2cx);
 
 	/* Send start condition */
 	I2C_GenerateSTART(i2cx->base, ENABLE);
@@ -429,9 +443,7 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 		
 		/* Last byte received, disable interrupts and return. */
 		if(i2cx->transfer_state.STOP_REQUESTED) {
-			/* Transfer finished */
-			DebugPinLow(DEBUG_PIN_BUSY);
-			i2cx->transfer_state.BUSY = 0;
+			TransferEnd(i2cx);
 			/* Disable all interrupts */
 			I2C_ITConfig(i2cx->base, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, DISABLE);
 			DebugPinLow(DEBUG_PIN_ISR);
@@ -473,9 +485,7 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 	if(event & I2C_FLAG_TXE) {
 		/* Last byte already sent, disable interrupts and return. */
 		if(i2cx->transfer_state.STOP_REQUESTED) {
-			/* Transfer finished */
-			DebugPinLow(DEBUG_PIN_BUSY);
-			i2cx->transfer_state.BUSY = 0;
+			TransferEnd(i2cx);
 			/* Disable all interrupts */
 			I2C_ITConfig(i2cx->base, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, DISABLE);
 			DebugPinLow(DEBUG_PIN_ISR);
@@ -502,9 +512,7 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 		}
 		
 		if(i2cx->buffer_len == 0) {
-			/* Transfer finished */
-			i2cx->transfer_state.BUSY = 0;
-			DebugPinLow(DEBUG_PIN_BUSY);
+			TransferEnd(i2cx);
 			/* Disable all interrupts */
 			I2C_ITConfig(i2cx->base, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, DISABLE);
 		} else {
@@ -522,9 +530,7 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 		/* Don't send address if stop was requested (WRITE_WITHOUT_STOP - mode, start condition was sent) */
 		/* We have to wait for the application to start the next transfer */
 		if(i2cx->transfer_state.STOP_REQUESTED) {
-			/* Transfer finished */
-			i2cx->transfer_state.BUSY = 0;
-			DebugPinLow(DEBUG_PIN_BUSY);
+			TransferEnd(i2cx);
 			/* Disable all interrupts */
 			I2C_ITConfig(i2cx->base, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, DISABLE);
 			DebugPinLow(DEBUG_PIN_ISR);
@@ -548,9 +554,9 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 	/* Notify error */
 	PIOS_I2C_UnexpectedEvent = event;
 	i2cx->transfer_error = I2C_ERROR_UNEXPECTED_EVENT;
-	i2cx->transfer_state.BUSY = 0;
-	DebugPinLow(DEBUG_PIN_BUSY);
 	
+	TransferEnd(i2cx);
+
 	/* Do dummy read to send NAK + STOP condition */
 	I2C_AcknowledgeConfig(i2cx->base, DISABLE);
 	b = I2C_ReceiveData(i2cx->base);
@@ -596,8 +602,7 @@ static void ER_IRQHandler(I2CRecTypeDef *i2cx)
 	I2C_ITConfig(i2cx->base, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, DISABLE);
 
 	/* Notify that transfer has finished (due to the error) */
-	i2cx->transfer_state.BUSY = 0;
-	DebugPinLow(DEBUG_PIN_BUSY);
+	TransferEnd(i2cx);
 }
 
 

@@ -122,6 +122,7 @@ void PIOS_Servo_SetHz(uint16_t onetofour, uint16_t fivetoeight)
 	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
 
+	#if 0
 	/* Clipping */
 	if(onetofour > 500) {
 		onetofour = 500;
@@ -129,6 +130,7 @@ void PIOS_Servo_SetHz(uint16_t onetofour, uint16_t fivetoeight)
 	if(fivetoeight > 500) {
 		fivetoeight = 500;
 	}
+	#endif
 
 	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;
 	TIM_TimeBaseStructure.TIM_Period = ((1000000 / onetofour) - 1);
@@ -141,53 +143,53 @@ void PIOS_Servo_SetHz(uint16_t onetofour, uint16_t fivetoeight)
 
 /**
 * Set servo position
-* \param[in] Servo Servo number (0-7)
+* \param[in] Servo Servo number (1-8)
 * \param[in] Position Servo position in milliseconds
 */
 void PIOS_Servo_Set(uint8_t Servo, uint16_t Position)
 {
-    /* Make sure servo exists */
-    if (Servo < PIOS_SERVO_NUM_OUTPUTS && Servo >= 0)
-    {
-        /* Clip servo position */
-        if(Position < Settings.Servos.PositionMin) {
-            Position = Settings.Servos.PositionMin;
-        }
-        if(Position > Settings.Servos.PositionMax) {
-            Position = Settings.Servos.PositionMax;
-        }
-        
-        /* Update the position */
-        ServoPosition[Servo] = Position;
-	
-        switch(Servo)
-        {
-			case 0:
+	/* Make sure servo exists */
+	if (Servo < PIOS_SERVO_NUM_OUTPUTS && Servo >= 0)
+	{
+		/* Clip servo position */
+		if(Position < Settings.Servos.PositionMin) {
+			Position = Settings.Servos.PositionMin;
+		}
+		if(Position > Settings.Servos.PositionMax) {
+			Position = Settings.Servos.PositionMax;
+		}
+
+		/* Update the position */
+		ServoPosition[Servo] = Position;
+
+		switch(Servo)
+		{
+			case 1:
 				TIM_SetCompare1(TIM4, Position);
 				break;
-			case 1:
+			case 2:
 				TIM_SetCompare2(TIM4, Position);
 				break;
-			case 2:
+			case 3:
 				TIM_SetCompare3(TIM4, Position);
 				break;
-			case 3:
+			case 4:
 				TIM_SetCompare4(TIM4, Position);
 				break;
-			case 4:
+			case 5:
 				TIM_SetCompare1(TIM8, Position);
 				break;
-			case 5:
+			case 6:
 				TIM_SetCompare2(TIM8, Position);
 				break;
-			case 6:
+			case 7:
 				TIM_SetCompare3(TIM8, Position);
 				break;
-			case 7:
+			case 8:
 				TIM_SetCompare4(TIM8, Position);
 				break;
-        }
-    }
+		}
+	}
 }
 
 #endif

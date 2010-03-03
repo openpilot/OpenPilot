@@ -36,7 +36,7 @@
 
 
 /* Local Variables */
-static volatile uint16_t ServoPosition[SERVO_NUM_TIMER_SLOTS];
+static volatile uint16_t ServoPosition[PIOS_SERVO_NUM_TIMERS];
 
 
 /**
@@ -49,10 +49,10 @@ void PIOS_Servo_Init(void)
 	GPIO_StructInit(&GPIO_InitStructure);
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	GPIO_InitStructure.GPIO_Pin = SERVO1_PIN | SERVO2_PIN | SERVO3_PIN | SERVO4_PIN;
-	GPIO_Init(SERVO1TO4_PORT, &GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Pin = SERVO5_PIN | SERVO6_PIN | SERVO7_PIN | SERVO8_PIN;
-	GPIO_Init(SERVO5TO8_PORT, &GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = PIOS_SERVO_GPIO_PIN_1 | PIOS_SERVO_GPIO_PIN_2 | PIOS_SERVO_GPIO_PIN_3 | PIOS_SERVO_GPIO_PIN_4;
+	GPIO_Init(PIOS_SERVO_GPIO_PORT_1TO4, &GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = PIOS_SERVO_GPIO_PIN_5 | PIOS_SERVO_GPIO_PIN_6 | PIOS_SERVO_GPIO_PIN_7 | PIOS_SERVO_GPIO_PIN_8;
+	GPIO_Init(PIOS_SERVO_GPIO_PORT_5TO8, &GPIO_InitStructure);
 	
 	/* Initialise RCC Clocks (TIM4 and TIM8) */
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
@@ -65,19 +65,19 @@ void PIOS_Servo_Init(void)
 	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;
 	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	
+	TIM_TimeBaseStructure.TIM_Period = ((1000000 / PIOS_SERVO_UPDATE_HZ) - 1);
+	TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
+	TIM_TimeBaseInit(TIM8, &TIM_TimeBaseStructure);
+
 	/* Setup each timer separately */
 	TIM_OCInitTypeDef TIM_OCInitStructure;
 
 	/* TIM4 */
-	TIM_TimeBaseStructure.TIM_Period = (20000 - 1);
-	TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
-
 	TIM_OCStructInit(&TIM_OCInitStructure);
 	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
 	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
-	TIM_OCInitStructure.TIM_Pulse = SERVOS_POSITION_INITIAL;
+	TIM_OCInitStructure.TIM_Pulse = PIOS_SERVOS_INITIAL_POSITION;
 	TIM_OC1Init(TIM4, &TIM_OCInitStructure);
 	TIM_OC1PreloadConfig(TIM4, TIM_OCPreload_Enable);
 	TIM_OC2Init(TIM4, &TIM_OCInitStructure);
@@ -91,14 +91,11 @@ void PIOS_Servo_Init(void)
 	TIM_Cmd(TIM4, ENABLE);
 	
 	/* TIM8 */
-	TIM_TimeBaseStructure.TIM_Period = (20000 - 1);
-	TIM_TimeBaseInit(TIM8, &TIM_TimeBaseStructure);
-
 	TIM_OCStructInit(&TIM_OCInitStructure);
 	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
 	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
-	TIM_OCInitStructure.TIM_Pulse = SERVOS_POSITION_INITIAL;
+	TIM_OCInitStructure.TIM_Pulse = PIOS_SERVOS_INITIAL_POSITION;
 	TIM_OC1Init(TIM8, &TIM_OCInitStructure);
 	TIM_OC1PreloadConfig(TIM8, TIM_OCPreload_Enable);
 	TIM_OC2Init(TIM8, &TIM_OCInitStructure);
@@ -113,6 +110,36 @@ void PIOS_Servo_Init(void)
 }
 
 /**
+* Set the servo update rate (Max 500Hz)
+* \param[in] onetofour Rate for outputs 1 to 4 (Hz)
+* \param[in] fivetoeight Rate for outputs 5 to 8 (Hz)
+*/
+void PIOS_Servo_SetHz(uint16_t onetofour, uint16_t fivetoeight)
+{
+	/* (Re)-Initialise Timers TIM4 and TIM8 */
+	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
+	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
+	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
+	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+
+	/* Clipping */
+	if(onetofour > 500) {
+		onetofour = 500;
+	}
+	if(fivetoeight > 500) {
+		fivetoeight = 500;
+	}
+
+	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;
+	TIM_TimeBaseStructure.TIM_Period = ((1000000 / onetofour) - 1);
+	TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
+
+	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;
+	TIM_TimeBaseStructure.TIM_Period = ((1000000 / fivetoeight) - 1);
+	TIM_TimeBaseInit(TIM8, &TIM_TimeBaseStructure);
+}
+
+/**
 * Set servo position
 * \param[in] Servo Servo number (0-7)
 * \param[in] Position Servo position in milliseconds
@@ -120,7 +147,7 @@ void PIOS_Servo_Init(void)
 void PIOS_Servo_Set(uint8_t Servo, uint16_t Position)
 {
     /* Make sure servo exists */
-    if (Servo < NUM_SERVO_OUTPUTS && Servo >= 0)
+    if (Servo < PIOS_SERVO_NUM_OUTPUTS && Servo >= 0)
     {
         /* Clip servo position */
         if(Position < Settings.Servos.PositionMin) {

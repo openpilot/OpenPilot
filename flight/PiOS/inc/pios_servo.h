@@ -26,12 +26,9 @@
 #ifndef PIOS_SERVO_H
 #define PIOS_SERVO_H
 
-/* Local Defines */
-#define SERVO_NUM_TIMER_SLOTS		8
-#define SERVOS_POSITION_INITIAL		1500
-
 /* Public Functions */
 extern void PIOS_Servo_Init(void);
+extern void PIOS_Servo_SetHz(uint16_t onetofour, uint16_t fivetoeight);
 extern void PIOS_Servo_Set(uint8_t Servo, uint16_t Position);
 
 #endif /* PIOS_SERVO_H */

@@ -3,9 +3,9 @@
  *
  * @file       pios_debug.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      RC Servo routines
+ * @brief      Debugging Functions
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   PIOS_SERVO RC Servo Functions
+ * @defgroup   PIOS_DEBUG Debugging Functions
  * @{
  * 
  *****************************************************************************/
@@ -37,48 +37,40 @@
 */
 void PIOS_DEBUG_Init(void)
 {
-	// Initialise Servo pins as standard output pins
+	/* Initialise Servo pins as standard output pins */
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_StructInit(&GPIO_InitStructure);
-
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_Pin = SERVO1_PIN | SERVO2_PIN | SERVO3_PIN | SERVO4_PIN;
-	GPIO_Init(SERVO1TO4_PORT, &GPIO_InitStructure);
-
-	GPIO_InitStructure.GPIO_Pin = SERVO5_PIN | SERVO6_PIN | SERVO7_PIN | SERVO8_PIN;
-	GPIO_Init(SERVO5TO8_PORT, &GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = PIOS_SERVO_GPIO_PIN_1 | PIOS_SERVO_GPIO_PIN_2 | PIOS_SERVO_GPIO_PIN_3 | PIOS_SERVO_GPIO_PIN_4;
+	GPIO_Init(PIOS_SERVO_GPIO_PORT_1TO4, &GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = PIOS_SERVO_GPIO_PIN_5 | PIOS_SERVO_GPIO_PIN_6 | PIOS_SERVO_GPIO_PIN_7 | PIOS_SERVO_GPIO_PIN_8;
+	GPIO_Init(PIOS_SERVO_GPIO_PORT_5TO8, &GPIO_InitStructure);
 }
 
 /**
 * Set debug-pin high
-* \param pin	0 for S1 output
+* \param pin 0 for S1 output
 */
-void PIOS_DEBUG_PinHigh(uint8_t pin)
-{
-	if (pin < 4)
-	{
-		SERVO1TO4_PORT->BSRR = (SERVO1_PIN<<pin);
-	}
-	else if (pin <= 7)
-	{
-		SERVO5TO8_PORT->BSRR = (SERVO5_PIN<<(pin-4));
+void PIOS_DEBUG_PinHigh(uint8_t Pin)
+ {
+	if(Pin < 4) {
+		PIOS_SERVO_GPIO_PORT_1TO4->BSRR = (PIOS_SERVO_GPIO_PIN_1 << Pin);
+	} else if (Pin <= 7) {
+		PIOS_SERVO_GPIO_PORT_5TO8->BSRR = (PIOS_SERVO_GPIO_PIN_5 << (Pin - 4));
 	}
 }
 
 /**
 * Set debug-pin low
-* \param pin	0 for S1 output
+* \param pin 0 for S1 output
 */
-void PIOS_DEBUG_PinLow(uint8_t pin)
+void PIOS_DEBUG_PinLow(uint8_t Pin)
 {
-	if (pin < 4)
-	{
-		SERVO1TO4_PORT->BRR = (SERVO1_PIN<<pin);
-	}
-	else if (pin <= 7)
-	{
-		SERVO5TO8_PORT->BRR = (SERVO5_PIN<<(pin-4));
+	if(Pin < 4) {
+		PIOS_SERVO_GPIO_PORT_1TO4->BRR = (PIOS_SERVO_GPIO_PIN_1 << Pin);
+	} else if(Pin <= 7) {
+		PIOS_SERVO_GPIO_PORT_5TO8->BRR = (PIOS_SERVO_GPIO_PIN_5 << (Pin - 4));
 	}
 }
 

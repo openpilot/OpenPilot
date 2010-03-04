@@ -1,3 +1,4 @@
+
 /* $Id$ */
 
 /** \file jblas.hpp
@@ -28,6 +29,8 @@
 #include "boost/numeric/ublas/vector_proxy.hpp"
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 
+#include "boost/math/quaternion.hpp"
+
 #include "jmath/ublasCompatibility.hpp"
 #include "jmath/boundedSymmetricMatrix.hpp"
 
@@ -47,6 +50,8 @@ namespace jblas {
   /// standard vector type
   typedef boost::numeric::ublas::vector<double> vec;
   typedef boost::numeric::ublas::vector_range<vec> vec_range; 
+  typedef boost::numeric::ublas::vector_indirect<vec> vec_indirect;
+  typedef boost::numeric::ublas::vector_range<const vec> cvec_range; 
   typedef boost::numeric::ublas::zero_vector<double> zero_vec;
   typedef boost::numeric::ublas::unit_vector<double> unit_vec;
   typedef boost::numeric::ublas::scalar_vector<double> scalar_vec;
@@ -67,13 +72,17 @@ namespace jblas {
 
   /// standard matrix type
   typedef boost::numeric::ublas::matrix<double> mat;
+  
   typedef boost::numeric::ublas::matrix_range<mat> mat_range;
+  typedef boost::numeric::ublas::matrix_indirect<mat> mat_indirect;
+  typedef boost::numeric::ublas::matrix_range<const mat> cmat_range;
   typedef boost::numeric::ublas::zero_matrix<double> zero_mat;
   typedef boost::numeric::ublas::identity_matrix<double> identity_mat;
   typedef boost::numeric::ublas::matrix_vector_range<mat> mat_vec_range;
   typedef boost::numeric::ublas::scalar_matrix<double> scalar_mat;
   /// column major matrix
   typedef boost::numeric::ublas::matrix<double, boost::numeric::ublas::column_major> mat_column_major;
+  typedef boost::numeric::ublas::matrix_range<const mat_column_major> cmat_column_major_range;
   typedef boost::numeric::ublas::matrix_range<mat_column_major> mat_column_major_range;
 
   /// diagonal matrix
@@ -105,6 +114,7 @@ namespace jblas {
   /// standard symmetric matrix type
   typedef boost::numeric::ublas::symmetric_matrix<double> sym_mat;
   typedef boost::numeric::ublas::matrix_range<sym_mat> sym_mat_range; 
+  typedef boost::numeric::ublas::matrix_indirect<sym_mat> sym_mat_indirect;
   typedef boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper> up_sym_mat;
   typedef boost::numeric::ublas::matrix_range<up_sym_mat> up_sym_mat_range;
   typedef boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::lower> lo_sym_mat;
@@ -131,6 +141,12 @@ namespace jblas {
   ///standard double sparse matrix
   typedef boost::numeric::ublas::compressed_matrix<double> sp_mat;
   
+  ///indirect array
+  typedef boost::numeric::ublas::indirect_array<> ind_array;
+
+  /// Quaternions
+  typedef boost::math::quaternion<double> quat;
+
   /*
    * Scalar type float
    */

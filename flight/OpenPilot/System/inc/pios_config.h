@@ -47,6 +47,7 @@
 //#define PIOS_DONT_USE_COM
 //#define PIOS_DONT_USE_SDCARD
 //#define PIOS_DONT_USE_SETTINGS
+//#define PIOS_DONT_USE_ESC_I2C
 
 
 /* Defaults for Logging */

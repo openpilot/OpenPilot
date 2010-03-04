@@ -15,6 +15,7 @@
 #define GAUSSIAN_HPP_
 
 #include <jmath/jblas.hpp>
+#include "jmath/ublasExtra.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -236,17 +237,19 @@ namespace jafar {
 			P_.clear();
 		}
 
-		/**
-		 * Operator << for class for ind_array
-		 * TODO: see where to put this operator!
-		 */
-		std::ostream& operator <<(std::ostream & s, jblas::ind_array & ia_) {
-			s << "[" << ia_.size() << "]{";
-			for (size_t i = 0; i < ia_.size() - 1; i++)
-				s << ia_(i) << ",";
-			s << ia_(ia_.size() - 1) << "}";
-			return s;
-		}
+		//		/**
+		//		 * Operator << for class for ind_array
+		//		 * TODO: see where to put this operator!
+		//		 */
+		//		template <class A>
+		//		std::ostream& operator <<(std::ostream & s, boost::numeric::ublas::indirect_array<A> & ia_) {
+		//			s << "[" << ia_.size() << "]{";
+		//			for (size_t i = 0; i < ia_.size() - 1; i++)
+		//				s << ia_(i) << ",";
+		//			s << ia_(ia_.size() - 1) << "}";
+		//			return s;
+		//		}
+
 
 		/**
 		 * Operator << for class Gaussian.
@@ -255,6 +258,10 @@ namespace jafar {
 		 * For remote storage, the size of the remote Gaussian is also shown, and the indirect array too.
 		 */
 		std::ostream& operator <<(std::ostream & s, jafar::rtslam::Gaussian & g_) {
+
+			using namespace jafar::jmath;
+			using namespace boost::numeric::ublas;
+
 			if (g_.storage() == GAUSSIAN_LOCAL)
 				s << "Gaussian with local storage: \n";
 			else {
@@ -264,7 +271,8 @@ namespace jafar {
 				s << "->P_: [" << sz << "," << sz << "](...data not shown...)\n";
 				s << " .ia: " << g_.ia << "\n";
 			}
-			s << " .x : " << g_.x << "\n .P : " << g_.P;
+			s << " .x : " << g_.x;
+			s << "\n .P : " << g_.P;
 			return s;
 		}
 

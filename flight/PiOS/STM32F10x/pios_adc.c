@@ -33,12 +33,18 @@
 #if !defined(PIOS_DONT_USE_ADC)
 
 /* Local Variables */
-/* following two arrays are word aligned, so that DMA can transfer two hwords at once */
-static uint16_t adc_conversion_values[NUM_ADC_PINS] __attribute__((aligned(4)));
-static uint16_t adc_conversion_values_sum[NUM_ADC_PINS] __attribute__((aligned(4)));
+static GPIO_TypeDef* ADC_GPIO_PORT[PIOS_ADC_NUM_PINS] = PIOS_ADC_PORTS;
+static const uint32_t ADC_GPIO_PIN[PIOS_ADC_NUM_PINS] = PIOS_ADC_PINS;
+static const uint32_t ADC_CHANNEL[PIOS_ADC_NUM_PINS] = PIOS_ADC_CHANNELS;
 
-static uint16_t adc_pin_values[NUM_ADC_PINS];
-static uint32_t adc_pin_changed[NUM_ADC_PINS];
+static ADC_TypeDef* ADC_MAPPING[PIOS_ADC_NUM_PINS] = PIOS_ADC_MAPPING;
+static const uint32_t ADC_CHANNEL_MAPPING[PIOS_ADC_NUM_PINS] = PIOS_ADC_CHANNEL_MAPPING;
+
+/* The following two arrays are word aligned, so that DMA can transfer two hwords at once */
+static uint16_t adc_conversion_values[PIOS_ADC_NUM_CHANNELS] __attribute__((aligned(4)));
+static uint16_t adc_conversion_values_sum[PIOS_ADC_NUM_CHANNELS] __attribute__((aligned(4)));
+
+static uint16_t adc_pin_values[PIOS_ADC_NUM_CHANNELS];
 
 
 /**
@@ -49,15 +55,12 @@ void PIOS_ADC_Init(void)
 	int32_t i;
 
 	/* Clear arrays and variables */
-	for(i=0; i < NUM_ADC_PINS; ++i) {
+	for(i = 0; i < PIOS_ADC_NUM_CHANNELS; ++i) {
 		adc_conversion_values[i] = 0;
 		adc_conversion_values_sum[i] = 0;
 	}
-	for(i=0; i < NUM_ADC_PINS; ++i) {
+	for(i = 0; i < PIOS_ADC_NUM_CHANNELS; ++i) {
 		adc_pin_values[i] = 0;
-	}
-	for(i=0; i < NUM_ADC_PINS; ++i) {
-		adc_pin_changed[i] = 1;
 	}
 
 	/* Setup analog pins */
@@ -66,23 +69,24 @@ void PIOS_ADC_Init(void)
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
 	GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AIN;
 
-	GPIO_InitStructure.GPIO_Pin = ADC_Z_PIN | ADC_A_PIN | ADC_B_PIN;
-	GPIO_Init(GPIOC, &GPIO_InitStructure);
+	/* Enable each ADC pin in the array */
+	for(i = 0; i < PIOS_ADC_NUM_PINS; i++) {
+		GPIO_InitStructure.GPIO_Pin = ADC_GPIO_PIN[i];
+		GPIO_Init(ADC_GPIO_PORT[i], &GPIO_InitStructure);
+	}
 
-	/* Enable ADC1/2 clock */
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 | RCC_APB2Periph_ADC2, ENABLE);
+	/* Enable ADC clocks */
+	PIOS_ADC_CLOCK_FUNCTION;
 
 	/* Map channels to conversion slots depending on the channel selection mask */
-	/* Distribute this over the three ADCs, so that channels can be converted in parallel */
-	/* Sample time: */
-	/* With an ADCCLK = 14 MHz and a sampling time of 293.5 cycles: */
-	/* Tconv = 239.5 + 12.5 = 252 cycles = 18µs */
-	/* To be pedantic, we take A and B simultaneously, and Z and Temp simultaneously */
-	ADC_RegularChannelConfig(ADC1, ADC_A_CHANNEL, 1, ADC_SampleTime_239Cycles5);
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_14, 2, ADC_SampleTime_239Cycles5);
-	ADC_RegularChannelConfig(ADC2, ADC_B_CHANNEL, 1, ADC_SampleTime_239Cycles5);
-	ADC_RegularChannelConfig(ADC2, ADC_Z_CHANNEL, 2, ADC_SampleTime_239Cycles5);
-	
+	for(i = 0; i < PIOS_ADC_NUM_PINS; i++) {
+		ADC_RegularChannelConfig(ADC_MAPPING[i], ADC_CHANNEL[i], ADC_CHANNEL_MAPPING[i], PIOS_ADC_SAMPLE_TIME);
+	}
+
+	#if (PIOS_ADC_USE_TEMP_SENSOR)
+	ADC_TempSensorVrefintCmd(ENABLE);
+	ADC_RegularChannelConfig(PIOS_ADC_TEMP_SENSOR_ADC, ADC_Channel_14, PIOS_ADC_TEMP_SENSOR_ADC_CHANNEL, PIOS_ADC_SAMPLE_TIME);
+	#endif
 
 	/* Configure ADCs */
 	ADC_InitTypeDef ADC_InitStructure;
@@ -92,12 +96,15 @@ void PIOS_ADC_Init(void)
 	ADC_InitStructure.ADC_ContinuousConvMode = DISABLE;
 	ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None;
 	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
-	ADC_InitStructure.ADC_NbrOfChannel = 2;
+	ADC_InitStructure.ADC_NbrOfChannel = PIOS_ADC_NUM_ADC_CHANNELS;
 	ADC_Init(ADC1, &ADC_InitStructure);
+
+	#if (PIOS_ADC_USE_ADC2)
 	ADC_Init(ADC2, &ADC_InitStructure);
 
 	/* Enable ADC2 external trigger conversion (to synch with ADC1) */
 	ADC_ExternalTrigConvCmd(ADC2, ENABLE);
+	#endif
 
 	/* Enable ADC1->DMA request */
 	ADC_DMACmd(ADC1, ENABLE);
@@ -109,12 +116,14 @@ void PIOS_ADC_Init(void)
 	ADC_StartCalibration(ADC1);
 	while(ADC_GetCalibrationStatus(ADC1));
 
+	#if (PIOS_ADC_USE_ADC2)
 	/* ADC2 calibration */
 	ADC_Cmd(ADC2, ENABLE);
 	ADC_ResetCalibration(ADC2);
 	while(ADC_GetResetCalibrationStatus(ADC2));
 	ADC_StartCalibration(ADC2);
 	while(ADC_GetCalibrationStatus(ADC2));
+	#endif
 
 	/* Enable DMA1 clock */
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
@@ -126,7 +135,7 @@ void PIOS_ADC_Init(void)
 	DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&ADC1->DR;
 	DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)&adc_conversion_values;
 	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;
-	DMA_InitStructure.DMA_BufferSize = 2; /* Number of conversions depends on number of used channels */
+	DMA_InitStructure.DMA_BufferSize = PIOS_ADC_NUM_ADC_CHANNELS; /* Number of conversions depends on number of used channels */
 	DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
 	DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
 	DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word;
@@ -143,7 +152,7 @@ void PIOS_ADC_Init(void)
 	/* Configure and enable DMA interrupt */
 	NVIC_InitTypeDef NVIC_InitStructure;
 	NVIC_InitStructure.NVIC_IRQChannel = DMA1_Channel1_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = ADC_IRQ_PRIO;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_ADC_IRQ_PRIO;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
@@ -162,54 +171,13 @@ void PIOS_ADC_Init(void)
 int32_t PIOS_ADC_PinGet(uint32_t pin)
 {
 	/* Check if pin exists */
-	if(pin >= NUM_ADC_PINS) {
+	if(pin >= PIOS_ADC_NUM_CHANNELS) {
 		return -1;
 	}
 
 	/* Return last conversion result */
 	return adc_pin_values[pin];
 }
-
-
-/**
-* Checks for pin changes, and calls given callback function with following parameters on pin changes:
-* \code
-*   void ADCNotifyChanged(uint32_t pin, uint16_t value)
-* \endcode
-* \param[in] _callback pointer to callback function
-* \return < 0 on errors
-*/
-int32_t PIOS_ADC_Handler(void *_callback)
-{
-	/* No callback function? */
-	if(_callback == NULL) {
-		return -1;
-	}
-
-	int pin;
-	void (*callback)(int32_t pin, uint32_t value) = _callback;
-
-	/* Check for changed ADC conversion values */
-	for(pin = 0; pin < NUM_ADC_PINS; pin++) {		
-		PIOS_IRQ_Disable();
-		uint32_t pin_value = adc_pin_values[pin];
-		PIOS_IRQ_Enable();
-		
-		/* Call application hook */
-		/* Note that due to dual conversion approach, we have to convert the pin number */
-		/* If an uneven number of channels selected */
-		if(adc_pin_changed[pin] == 1) {
-			callback(pin, pin_value);
-		}
-	}
-
-	/* Start next scan */
-	ADC_SoftwareStartConvCmd(ADC1, ENABLE);
-
-	/* No error */
-	return 0;
-}
-
 
 /**
 * DMA channel interrupt is triggered when all ADC channels have been converted
@@ -218,41 +186,17 @@ int32_t PIOS_ADC_Handler(void *_callback)
 void DMA1_Channel1_IRQHandler(void)
 {
 	int32_t i;
-	uint16_t *src_ptr, *dst_ptr, *changed_ptr;
+	uint16_t *src_ptr;
 
 	/* Clear the pending flag(s) */
 	DMA_ClearFlag(DMA1_FLAG_TC1 | DMA1_FLAG_TE1 | DMA1_FLAG_HT1 | DMA1_FLAG_GL1);
 
-	/* Copy conversion values to adc_pin_values */
-//	src_ptr = (uint16_t *)adc_conversion_values;
-//	dst_ptr = (uint16_t *)&adc_pin_values[NUM_ADC_PINS];
-//	changed_ptr = (uint16_t *)&adc_pin_changed[NUM_ADC_PINS];
-//
-//	for(i = 0; i < NUM_ADC_PINS; ++i) {
-//		/* Takeover new value */
-//		if(*dst_ptr != *src_ptr) {
-//			*dst_ptr = *src_ptr;
-//			*changed_ptr = 1;
-//		} else {
-//			*changed_ptr = 0;
-//		}
-//
-//		/* Switch to next results */
-//		++dst_ptr;
-//		++src_ptr;
-//		++changed_ptr;
-//	}
-	
 	src_ptr = (uint16_t *)adc_conversion_values;
 
-	for(i = 0; i < NUM_ADC_PINS; ++i) {
+	/* Copy conversion values to adc_pin_values */
+	for(i = 0; i < PIOS_ADC_NUM_CHANNELS; ++i) {
 		/* Takeover new value */
-		if(adc_pin_values[i] != *src_ptr) {
-			adc_pin_values[i] = *src_ptr;
-			adc_pin_changed[i] = 1;
-		} else {
-			adc_pin_changed[i] = 0;
-		}
+		adc_pin_values[i] = *src_ptr;
 
 		++src_ptr;
 	}

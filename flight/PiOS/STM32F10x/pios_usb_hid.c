@@ -120,7 +120,7 @@ int32_t PIOS_USB_HID_ChangeConnectionState(uint32_t Connected)
 }
 
 /**
-* This function returns the connection status of the USB COM interface
+* This function returns the connection status of the USB HID interface
 * \return 1: interface available
 * \return 0: interface not available
 * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions

@@ -99,7 +99,8 @@
 //-------------------------
 // PIOS_USART2 (GPS)
 //-------------------------
-#define PIOS_USART2_ENABLED				1
+#define PIOS_USART1_NAME			GPS
+#define PIOS_USART2_ENABLED			1
 #define PIOS_USART2_USART       		USART3
 #define PIOS_USART2_GPIO_PORT			GPIOC
 #define PIOS_USART2_RX_PIN      		GPIO_Pin_11
@@ -132,7 +133,7 @@
 #define PIOS_USART_NUM				3
 #define PIOS_USART_RX_BUFFER_SIZE		1024
 #define PIOS_USART_TX_BUFFER_SIZE		256
-#define PIOS_COM_DEBUG_PORT			GPS
+#define PIOS_COM_DEBUG_PORT			USART_1
 
 //-------------------------
 // SPI

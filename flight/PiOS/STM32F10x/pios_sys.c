@@ -72,9 +72,11 @@ void PIOS_SYS_Init(void)
 
 	/* Initialise Basic NVIC */
 	NVIC_Configuration();
-	
+
+#if !defined(PIOS_DONT_USE_LED)
 	/* Initialise LEDs */
 	PIOS_LED_Init();
+#endif
 }
 
 /**

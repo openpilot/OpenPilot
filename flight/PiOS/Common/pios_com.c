@@ -74,12 +74,12 @@ int32_t PIOS_COM_SendBufferNonBlocking(COMPortTypeDef port, uint8_t *buffer, uin
 	switch(port) {
 		case COM_DEBUG_USART:
 			return PIOS_USART_TxBufferPutMoreNonBlocking(PIOS_COM_DEBUG_PORT, buffer, len);
-		case COM_GPS_USART:
-			return PIOS_USART_TxBufferPutMoreNonBlocking(GPS, buffer, len);
-		case COM_TELEM_USART:
-			return PIOS_USART_TxBufferPutMoreNonBlocking(TELEM, buffer, len);
-		case COM_AUX_USART:
-			return PIOS_USART_TxBufferPutMoreNonBlocking(AUX, buffer, len);
+		case COM_USART1:
+			return PIOS_USART_TxBufferPutMoreNonBlocking(USART_1, buffer, len);
+		case COM_USART2:
+			return PIOS_USART_TxBufferPutMoreNonBlocking(USART_2, buffer, len);
+		case COM_USART3:
+			return PIOS_USART_TxBufferPutMoreNonBlocking(USART_3, buffer, len);
 		case COM_USB_HID:
 			return PIOS_USB_HID_TxBufferPutMoreNonBlocking(buffer, len);
 		default:
@@ -103,12 +103,12 @@ int32_t PIOS_COM_SendBuffer(COMPortTypeDef port, uint8_t *buffer, uint16_t len)
 	switch(port) {
 		case COM_DEBUG_USART:
 			return PIOS_USART_TxBufferPutMore(PIOS_COM_DEBUG_PORT, buffer, len);
-		case COM_GPS_USART:
-			return PIOS_USART_TxBufferPutMore(GPS, buffer, len);
-		case COM_TELEM_USART:
-			return PIOS_USART_TxBufferPutMore(TELEM, buffer, len);
-		case COM_AUX_USART:
-			return PIOS_USART_TxBufferPutMore(AUX, buffer, len);
+		case COM_USART1:
+			return PIOS_USART_TxBufferPutMore(USART_1, buffer, len);
+		case COM_USART2:
+			return PIOS_USART_TxBufferPutMore(USART_2, buffer, len);
+		case COM_USART3:
+			return PIOS_USART_TxBufferPutMore(USART_3, buffer, len);
 		case COM_USB_HID:
 			return PIOS_USB_HID_TxBufferPutMore(buffer, len);
 		default:
@@ -245,17 +245,17 @@ int32_t PIOS_COM_ReceiveHandler(void)
 				status = PIOS_USART_RxBufferGet(PIOS_COM_DEBUG_PORT);
 				port = COM_DEBUG_USART;
 				break;
-			case COM_GPS_USART:
-				status = PIOS_USART_RxBufferGet(GPS);
-				port = COM_GPS_USART;
+			case COM_USART1:
+				status = PIOS_USART_RxBufferGet(USART_1);
+				port = COM_USART1;
 				break;
-			case COM_TELEM_USART:
-				status = PIOS_USART_RxBufferGet(TELEM);
-				port = COM_TELEM_USART;
+			case COM_USART2:
+				status = PIOS_USART_RxBufferGet(USART_2);
+				port = COM_USART2;
 				break;
-			case COM_AUX_USART:
-				status = PIOS_USART_RxBufferGet(AUX);
-				port = COM_AUX_USART;
+			case COM_USART3:
+				status = PIOS_USART_RxBufferGet(USART_3);
+				port = COM_USART3;
 				break;
 			case COM_USB_HID:
 				status = PIOS_USB_HID_RxBufferGet();

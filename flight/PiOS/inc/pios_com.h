@@ -30,9 +30,9 @@
 /* Global Types */
 typedef enum {
 	COM_DEBUG_USART = 0,
-	COM_GPS_USART = 1,
-	COM_TELEM_USART = 2,
-	COM_AUX_USART = 3,
+	COM_USART1 = 1,
+	COM_USART2 = 2,
+	COM_USART3 = 3,
 	COM_USB_HID = 4
 } COMPortTypeDef;
 

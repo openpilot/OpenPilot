@@ -29,7 +29,7 @@
 
 
 /* Global Types */
-typedef enum {GPS = 0, TELEM = 1, AUX = 2} USARTNumTypeDef; //TODO: Make this non-application specific
+typedef enum {USART_1 = 0, USART_2 = 1, USART_3 = 2} USARTNumTypeDef; //TODO: Make this non-application specific
 
 
 /* Public Functions */

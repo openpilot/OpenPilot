@@ -525,15 +525,15 @@ PIOS_USART1_IRQHANDLER_FUNC
 	if(PIOS_USART1_USART->SR & (1 << 5)) {
 		uint8_t b = PIOS_USART1_USART->DR;
 		
-		if(PIOS_USART_RxBufferPut(GPS, b) < 0) {
+		if(PIOS_USART_RxBufferPut(USART_1, b) < 0) {
 			/* Here we could add some error handling */
 		}
 	}
 
 	/* Check if TXE flag is set */
 	if(PIOS_USART1_USART->SR & (1 << 7)) {
-		if(PIOS_USART_TxBufferUsed(GPS) > 0) {
-			int b = PIOS_USART_TxBufferGet(GPS);
+		if(PIOS_USART_TxBufferUsed(USART_1) > 0) {
+			int b = PIOS_USART_TxBufferGet(USART_1);
 			if( b < 0 ) {
 				/* Here we could add some error handling */
 				PIOS_USART1_USART->DR = 0xff;
@@ -554,15 +554,15 @@ PIOS_USART2_IRQHANDLER_FUNC
 	if(PIOS_USART2_USART->SR & (1 << 5)) {
 		uint8_t b = PIOS_USART2_USART->DR;
 		
-		if(PIOS_USART_RxBufferPut(TELEM, b) < 0) {
+		if(PIOS_USART_RxBufferPut(USART_2, b) < 0) {
 			/* Here we could add some error handling */
 		}
 	}
 	
 	/* Check if TXE flag is set */
 	if(PIOS_USART2_USART->SR & (1 << 7)) {
-		if(PIOS_USART_TxBufferUsed(TELEM) > 0) {
-			int b = PIOS_USART_TxBufferGet(TELEM);
+		if(PIOS_USART_TxBufferUsed(USART_2) > 0) {
+			int b = PIOS_USART_TxBufferGet(USART_2);
 			if(b < 0) {
 				/* Here we could add some error handling */
 				PIOS_USART2_USART->DR = 0xff;
@@ -583,14 +583,14 @@ PIOS_USART3_IRQHANDLER_FUNC
 	if(PIOS_USART3_USART->SR & (1 << 5)) {
 		uint8_t b = PIOS_USART3_USART->DR;
 		
-		if(PIOS_USART_RxBufferPut(AUX, b) < 0) {
+		if(PIOS_USART_RxBufferPut(USART_3, b) < 0) {
 			/* Here we could add some error handling */
 		}
 	}
 
 	if(PIOS_USART3_USART->SR & (1 << 7)) { // check if TXE flag is set
-		if(PIOS_USART_TxBufferUsed(AUX) > 0) {
-			int b = PIOS_USART_TxBufferGet(AUX);
+		if(PIOS_USART_TxBufferUsed(USART_3) > 0) {
+			int b = PIOS_USART_TxBufferGet(USART_3);
 			if(b < 0) {
 				/* Here we could add some error handling */
 				PIOS_USART3_USART->DR = 0xff;

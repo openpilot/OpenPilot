@@ -27,7 +27,7 @@
 #include "telemetry.h"
 #include "uavtalk.h"
 #include "uavobjectmanager.h"
-#include "utlist.h"
+#include "eventdispatcher.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
@@ -39,36 +39,22 @@
 #define TASK_PRIORITY 100
 #define REQ_TIMEOUT_MS 500
 #define MAX_RETRIES 2
-#define MAX_UPDATE_PERIOD_MS 1000
-#define MIN_UPDATE_PERIOD_MS 1
 
 // Private types
-
-/**
- * List of object properties that are needed for the periodic updates.
- */
-struct ObjectListStruct {
-	UAVObjHandle obj; /** Object handle */
-    int32_t updatePeriodMs; /** Update period in ms or 0 if no periodic updates are needed */
-    int32_t timeToNextUpdateMs; /** Time delay to the next update */
-    struct ObjectListStruct* next; /** Needed by linked list library (utlist.h) */
-};
-typedef struct ObjectListStruct ObjectList;
 
 // Private variables
 xQueueHandle queue;
 xTaskHandle telemetryTaskHandle;
-ObjectList* objList;
 
 // Private functions
 void telemetryTask();
 void receiveTask();
+void periodicEventHandler(UAVObjEvent* ev);
 int32_t transmitData(uint8_t* data, int32_t length);
 void registerObject(UAVObjHandle obj);
 void updateObject(UAVObjHandle obj);
 int32_t addObject(UAVObjHandle obj);
 int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs);
-int32_t processPeriodicUpdates();
 
 /**
 * Initialize the telemetry module
@@ -77,11 +63,8 @@ int32_t processPeriodicUpdates();
 */
 int32_t TelemetryInitialize()
 {
-	// Initialize object list
-	objList = NULL;
-
 	// Create object queue
-	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjQMsg));
+	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 
 	// TODO: Get telemetry settings object
 
@@ -93,9 +76,8 @@ int32_t TelemetryInitialize()
 	// Process all registered objects and connect queue for updates
 	UAVObjIterate(&registerObject);
 
-	// Start tasks
+	// Start telemetry task
 	xTaskCreate( telemetryTask, (signed char*)"Telemetry", STACK_SIZE, NULL, TASK_PRIORITY, &telemetryTaskHandle );
-	// TODO: Start receive task
 
 	return 0;
 }
@@ -107,7 +89,7 @@ int32_t TelemetryInitialize()
 */
 void registerObject(UAVObjHandle obj)
 {
-	// Add object to list
+	// Setup object for periodic updates
 	addObject(obj);
 
 	// Setup object for telemetry updates
@@ -132,43 +114,43 @@ void updateObject(UAVObjHandle obj)
 		// Set update period
 		setUpdatePeriod(obj, metadata.telemetryUpdatePeriod);
 		// Connect queue
-		eventMask = QMSG_UPDATED_MANUAL|QMSG_UPDATE_REQ;
+		eventMask = EV_UPDATED_MANUAL|EV_UPDATE_REQ;
 		if (UAVObjIsMetaobject(obj))
 		{
-			eventMask |= QMSG_UNPACKED; // we also need to act on remote updates (unpack events)
+			eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
 		}
-		UAVObjConnect(obj, queue, eventMask);
+		UAVObjConnectQueue(obj, queue, eventMask);
 	}
 	else if (metadata.telemetryUpdateMode == UPDATEMODE_ONCHANGE)
 	{
 		// Set update period
 		setUpdatePeriod(obj, 0);
 		// Connect queue
-		eventMask = QMSG_UPDATED|QMSG_UPDATED_MANUAL|QMSG_UPDATE_REQ;
+		eventMask = EV_UPDATED|EV_UPDATED_MANUAL|EV_UPDATE_REQ;
 		if (UAVObjIsMetaobject(obj))
 		{
-			eventMask |= QMSG_UNPACKED; // we also need to act on remote updates (unpack events)
+			eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
 		}
-		UAVObjConnect(obj, queue, eventMask);
+		UAVObjConnectQueue(obj, queue, eventMask);
 	}
 	else if (metadata.telemetryUpdateMode == UPDATEMODE_MANUAL)
 	{
 		// Set update period
 		setUpdatePeriod(obj, 0);
 		// Connect queue
-		eventMask = QMSG_UPDATED_MANUAL|QMSG_UPDATE_REQ;
+		eventMask = EV_UPDATED_MANUAL|EV_UPDATE_REQ;
 		if (UAVObjIsMetaobject(obj))
 		{
-			eventMask |= QMSG_UNPACKED; // we also need to act on remote updates (unpack events)
+			eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
 		}
-		UAVObjConnect(obj, queue, eventMask);
+		UAVObjConnectQueue(obj, queue, eventMask);
 	}
 	else if (metadata.telemetryUpdateMode == UPDATEMODE_NEVER)
 	{
 		// Set update period
 		setUpdatePeriod(obj, 0);
 		// Disconnect queue
-		UAVObjDisconnect(obj, queue);
+		UAVObjDisconnectQueue(obj, queue);
 	}
 }
 
@@ -177,77 +159,50 @@ void updateObject(UAVObjHandle obj)
  */
 void telemetryTask()
 {
-	int32_t timeToNextUpdateMs;
-	int32_t delayMs;
-	UAVObjQMsg msg;
+	UAVObjEvent ev;
 	UAVObjMetadata metadata;
 	int32_t retries;
 	int32_t success;
 
-	// Initialize time
-	timeToNextUpdateMs = xTaskGetTickCount()*portTICK_RATE_MS;
 
 	// Loop forever
 	while (1)
 	{
-		// Calculate delay time
-		delayMs = timeToNextUpdateMs-(xTaskGetTickCount()*portTICK_RATE_MS);
-		if (delayMs < 0)
-		{
-			delayMs = 0;
-		}
-
 		// Wait for queue message
-		if ( xQueueReceive(queue, &msg, delayMs/portTICK_RATE_MS) == pdTRUE )
+		if ( xQueueReceive(queue, &ev, portMAX_DELAY) == pdTRUE )
 		{
 			// Get object metadata
-			UAVObjGetMetadata(msg.obj, &metadata);
+			UAVObjGetMetadata(ev.obj, &metadata);
 			// Act on event
-			if (msg.event == QMSG_UPDATED || msg.event == QMSG_UPDATED_MANUAL)
+			if (ev.event == EV_UPDATED || ev.event == EV_UPDATED_MANUAL)
 			{
 				// Send update to GCS (with retries)
 				retries = 0;
 				while (retries < MAX_RETRIES && success == -1)
 				{
-					success = UAVTalkSendObject(msg.obj, msg.instId, metadata.ackRequired, REQ_TIMEOUT_MS); // call blocks until ack is received or timeout
+					success = UAVTalkSendObject(ev.obj, ev.instId, metadata.ackRequired, REQ_TIMEOUT_MS); // call blocks until ack is received or timeout
 					++retries;
 				}
 			}
-			else if (msg.event == QMSG_UPDATE_REQ)
+			else if (ev.event == EV_UPDATE_REQ)
 			{
 				// Request object update from GCS (with retries)
 				retries = 0;
 				while (retries < MAX_RETRIES && success == -1)
 				{
-					success = UAVTalkSendObjectRequest(msg.obj, msg.instId, REQ_TIMEOUT_MS); // call blocks until update is received or timeout
+					success = UAVTalkSendObjectRequest(ev.obj, ev.instId, REQ_TIMEOUT_MS); // call blocks until update is received or timeout
 					++retries;
 				}
 			}
 			// If this is a metadata object then make necessary telemetry updates
-			if (UAVObjIsMetaobject(msg.obj))
+			if (UAVObjIsMetaobject(ev.obj))
 			{
-				updateObject(UAVObjGetLinkedObj(msg.obj)); // linked object will be the actual object the metadata are for
+				updateObject(UAVObjGetLinkedObj(ev.obj)); // linked object will be the actual object the metadata are for
 			}
 		}
 
-		// Process periodic updates
-		if ((xTaskGetTickCount()*portTICK_RATE_MS) >= timeToNextUpdateMs )
-		{
-			timeToNextUpdateMs = processPeriodicUpdates();
-		}
-	}
-}
-
-/**
- * Receive task. Processes received bytes (from the modem or USB) and passes them to
- * UAVTalk for decoding. Does not return.
- */
-void receiveTask()
-{
-	// Main thread
-	while (1)
-	{
-		// TODO: Wait for bytes and pass to UAVTalk for processing
+		// TODO: Check for received data (from the modem or USB) and pass them to UAVTalk for decoding
+		// UAVTalkProcessInputStream(data);
 	}
 }
 
@@ -263,7 +218,33 @@ int32_t transmitData(uint8_t* data, int32_t length)
 }
 
 /**
+ * Event handler for periodic object updates (called by the event dispatcher)
+ */
+void periodicEventHandler(UAVObjEvent* ev)
+{
+	// Push event to the telemetry queue
+	xQueueSend(queue, ev, 0); // do not wait if queue is full
+}
+
+/**
  * Setup object for periodic updates.
+ * \param[in] obj The object to update
+ * \return 0 Success
+ * \return -1 Failure
+ */
+int32_t addObject(UAVObjHandle obj)
+{
+	UAVObjEvent ev;
+
+	// Add object for periodic updates
+	ev.obj = obj;
+	ev.instId = UAVOBJ_ALL_INSTANCES;
+	ev.event = EV_UPDATED_MANUAL;
+	return EventPeriodicCreate(&ev, &periodicEventHandler, 0);
+}
+
+/**
+ * Set update period of object (it must be already setup for periodic updates)
  * \param[in] obj The object to update
  * \param[in] updatePeriodMs The update period in ms, if zero then periodic updates are disabled
  * \return 0 Success
@@ -271,97 +252,12 @@ int32_t transmitData(uint8_t* data, int32_t length)
  */
 int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs)
 {
-	ObjectList* objEntry;
-	// Check that the object is not already connected
-	LL_FOREACH(objList, objEntry)
-	{
-		if (objEntry->obj == obj)
-		{
-			objEntry->updatePeriodMs = updatePeriodMs;
-			objEntry->timeToNextUpdateMs = 0;
-			return 0;
-		}
-	}
-	// If this point is reached then the object was not found
-	return -1;
+	UAVObjEvent ev;
+
+	// Add object for periodic updates
+	ev.obj = obj;
+	ev.instId = UAVOBJ_ALL_INSTANCES;
+	ev.event = EV_UPDATED_MANUAL;
+	return EventPeriodicUpdate(&ev, &periodicEventHandler, updatePeriodMs);
 }
-
-/**
- * Handle periodic updates for all objects.
- * \return The system time until the next update (in ms) or -1 if failed
- */
-int32_t processPeriodicUpdates()
-{
-	static int32_t timeOfLastUpdate = 0;
-	ObjectList* objEntry;
-	int32_t delaySinceLastUpdateMs;
-    int32_t minDelay = MAX_UPDATE_PERIOD_MS;
-
-    // Iterate through each object and update its timer, if zero then transmit object.
-    // Also calculate smallest delay to next update.
-    delaySinceLastUpdateMs = xTaskGetTickCount()*portTICK_RATE_MS - timeOfLastUpdate;
-    LL_FOREACH(objList, objEntry)
-    {
-        // If object is configured for periodic updates
-        if (objEntry->updatePeriodMs > 0)
-        {
-        	objEntry->timeToNextUpdateMs -= delaySinceLastUpdateMs;
-            // Check if time for the next update
-            if (objEntry->timeToNextUpdateMs <= 0)
-            {
-                // Reset timer
-            	objEntry->timeToNextUpdateMs = objEntry->updatePeriodMs;
-                // Send object (trigger update)
-            	UAVObjUpdated(objEntry->obj);
-            }
-            // Update minimum delay
-            if (objEntry->timeToNextUpdateMs < minDelay)
-            {
-                minDelay = objEntry->timeToNextUpdateMs;
-            }
-        }
-    }
-
-    // Check if delay for the next update is too short
-    if (minDelay < MIN_UPDATE_PERIOD_MS)
-    {
-        minDelay = MIN_UPDATE_PERIOD_MS;
-    }
-
-    // Done
-    timeOfLastUpdate = xTaskGetTickCount()*portTICK_RATE_MS;
-    return timeOfLastUpdate + minDelay;
-}
-
-/**
- * Add a new object to the object list
- */
-int32_t addObject(UAVObjHandle obj)
-{
-	ObjectList* objEntry;
-	// Check that the object is not already connected
-	LL_FOREACH(objList, objEntry)
-	{
-		if (objEntry->obj == obj)
-		{
-			// Already registered, ignore
-			return -1;
-		}
-	}
-    // Create handle
-	objEntry = (ObjectList*)malloc(sizeof(ObjectList));
-	if (objEntry == NULL) return -1;
-	objEntry->obj = obj;
-    objEntry->updatePeriodMs = 0;
-    objEntry->timeToNextUpdateMs = 0;
-    // Add to list
-    LL_APPEND(objList, objEntry);
-    return 0;
-}
-
-
-
-
-
-
 

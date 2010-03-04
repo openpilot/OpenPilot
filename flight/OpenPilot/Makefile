@@ -106,6 +106,7 @@ SRC += $(OPSYSTEM)/op_logging.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/uavobjectsinit.c
+SRC += $(OPUAVOBJ)/eventdispatcher.c
 
 ## UAVOBJECTS
 

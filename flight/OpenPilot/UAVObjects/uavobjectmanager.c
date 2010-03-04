@@ -25,8 +25,9 @@
  */
 
 #include <stdlib.h> // for malloc
-#include "string.h" // for strcmp
+#include <string.h> // for strcmp
 #include "uavobjectmanager.h"
+#include "eventdispatcher.h"
 #include "utlist.h"
 #include "FreeRTOS.h"
 #include "queue.h"
@@ -41,6 +42,7 @@
  */
 struct ObjectQueueListStruct {
 	xQueueHandle queue;
+	UAVObjEventCallback cb;
 	int32_t eventMask;
     struct ObjectQueueListStruct* next;
 };
@@ -51,7 +53,7 @@ typedef struct ObjectQueueListStruct ObjectQueueList;
  */
 struct ObjectInstListStruct {
 	void* data;
-	uint32_t instId;
+	uint16_t instId;
     struct ObjectInstListStruct* next;
 };
 typedef struct ObjectInstListStruct ObjectInstList;
@@ -62,10 +64,10 @@ typedef struct ObjectInstListStruct ObjectInstList;
 struct ObjectListStruct {
 	uint32_t id; /** The object ID */
 	const char* name; /** The object name */
-	int32_t isMetaobject; /** Set to 1 if this is a metaobject */
-	int32_t isSingleInstance; /** Set to 1 if this object has a single instance */
-	uint32_t numBytes; /** Number of data bytes contained in the object (for a single instance) */
-	uint32_t numInstances; /** Number of instances */
+	int8_t isMetaobject; /** Set to 1 if this is a metaobject */
+	int8_t isSingleInstance; /** Set to 1 if this object has a single instance */
+	uint16_t numBytes; /** Number of data bytes contained in the object (for a single instance) */
+	uint16_t numInstances; /** Number of instances */
 	struct ObjectListStruct* linkedObj; /** Linked object, for regular objects this is the metaobject and for metaobjects it is the parent object */
 	union
 	{
@@ -78,11 +80,13 @@ struct ObjectListStruct {
 typedef struct ObjectListStruct ObjectList;
 
 // Private functions
-int32_t setInstanceData(ObjectList* obj, uint32_t instId, const void* dataIn);
-int32_t getInstanceData(ObjectList* obj, uint32_t instId, void* dataOut);
-int32_t sendEvent(ObjectList* obj, uint32_t instId, UAVObjQMsgEvent event);
-int32_t createInstance(ObjectList* obj, uint32_t instId);
-int32_t hasInstance(ObjectList* obj, uint32_t instId);
+int32_t setInstanceData(ObjectList* obj, uint16_t instId, const void* dataIn);
+int32_t getInstanceData(ObjectList* obj, uint16_t instId, void* dataOut);
+int32_t sendEvent(ObjectList* obj, uint16_t instId, UAVObjEventType event);
+int32_t createInstance(ObjectList* obj, uint16_t instId);
+int32_t hasInstance(ObjectList* obj, uint16_t instId);
+int32_t connectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb, int32_t eventMask);
+int32_t disconnectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb);
 
 // Private variables
 ObjectList* objList;
@@ -155,8 +159,8 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char* name, int32_t isMetaobject,
 	}
 	objEntry->id = id;
 	objEntry->name = name;
-	objEntry->isMetaobject = isMetaobject;
-	objEntry->isSingleInstance = isSingleInstance;
+	objEntry->isMetaobject = (int8_t)isMetaobject;
+	objEntry->isSingleInstance = (int8_t)isSingleInstance;
 	objEntry->numBytes = numBytes;
 	objEntry->queues = NULL;
 	if (!isSingleInstance)
@@ -370,7 +374,7 @@ int32_t UAVObjInitData(UAVObjHandle obj, const char* init)
  * \param[in] dataIn The byte array
  * \return 0 if success or -1 if failure
  */
-int32_t UAVObjUnpack(UAVObjHandle obj, uint32_t instId, const uint8_t* dataIn)
+int32_t UAVObjUnpack(UAVObjHandle obj, uint16_t instId, const uint8_t* dataIn)
 {
 	ObjectList* objEntry;
 
@@ -400,7 +404,7 @@ int32_t UAVObjUnpack(UAVObjHandle obj, uint32_t instId, const uint8_t* dataIn)
 	}
 
 	// Fire event
-	sendEvent(objEntry, instId, QMSG_UNPACKED);
+	sendEvent(objEntry, instId, EV_UNPACKED);
 
 	// Unlock
 	xSemaphoreGiveRecursive(mutex);
@@ -414,7 +418,7 @@ int32_t UAVObjUnpack(UAVObjHandle obj, uint32_t instId, const uint8_t* dataIn)
  * \param[out] dataOut The byte array
  * \return 0 if success or -1 if failure
  */
-int32_t UAVObjPack(UAVObjHandle obj, uint32_t instId, uint8_t* dataOut)
+int32_t UAVObjPack(UAVObjHandle obj, uint16_t instId, uint8_t* dataOut)
 {
 	ObjectList* objEntry;
 
@@ -473,7 +477,7 @@ int32_t UAVObjGetData(UAVObjHandle obj, void* dataOut)
  * \param[in] dataIn The object's data structure
  * \return 0 if success or -1 if failure
  */
-int32_t UAVObjSetInstanceData(UAVObjHandle obj, uint32_t instId, const void* dataIn)
+int32_t UAVObjSetInstanceData(UAVObjHandle obj, uint16_t instId, const void* dataIn)
 {
 	ObjectList* objEntry;
 
@@ -497,7 +501,7 @@ int32_t UAVObjSetInstanceData(UAVObjHandle obj, uint32_t instId, const void* dat
 	}
 
 	// Fire event
-	sendEvent(objEntry, instId, QMSG_UPDATED);
+	sendEvent(objEntry, instId, EV_UPDATED);
 
 	// Unlock
 	xSemaphoreGiveRecursive(mutex);
@@ -511,7 +515,7 @@ int32_t UAVObjSetInstanceData(UAVObjHandle obj, uint32_t instId, const void* dat
  * \param[out] dataOut The object's data structure
  * \return 0 if success or -1 if failure
  */
-int32_t UAVObjGetInstanceData(UAVObjHandle obj, uint32_t instId, void* dataOut)
+int32_t UAVObjGetInstanceData(UAVObjHandle obj, uint16_t instId, void* dataOut)
 {
 	ObjectList* objEntry;
 
@@ -598,82 +602,72 @@ int32_t UAVObjGetMetadata(UAVObjHandle obj, UAVObjMetadata* dataOut)
 }
 
 /**
- * Connect an event queue to the object
+ * Connect an event queue to the object, if the queue is already connected then the event mask is only updated.
+ * All events matching the event mask will be pushed to the event queue.
  * \param[in] obj The object handle
  * \param[in] queue The event queue
- * \param[in] eventMask The event mask, if 0 then all events are enabled (e.g. QMSG_UPDATED | QMSG_UPDATED_MANUAL)
+ * \param[in] eventMask The event mask, if EV_MASK_ALL then all events are enabled (e.g. EV_UPDATED | EV_UPDATED_MANUAL)
  * \return 0 if success or -1 if failure
  */
-int32_t UAVObjConnect(UAVObjHandle obj, xQueueHandle queue, int32_t eventMask)
+int32_t UAVObjConnectQueue(UAVObjHandle obj, xQueueHandle queue, int32_t eventMask)
 {
-	ObjectQueueList* queueEntry;
-	ObjectList* objEntry;
-
-	// Lock
+	int32_t res;
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-
-	// Check that the queue is not already connected, if it is simply update event mask
-	objEntry = (ObjectList*)obj;
-	LL_FOREACH(objEntry->queues, queueEntry)
-	{
-		if (queueEntry->queue == queue)
-		{
-			// Already connected, update event mask and return
-			queueEntry->eventMask = eventMask;
-			xSemaphoreGiveRecursive(mutex);
-			return 0;
-		}
-	}
-
-	// Add queue to list
-	queueEntry = (ObjectQueueList*)malloc(sizeof(ObjectQueueList));
-	if (queueEntry == NULL)
-	{
-		xSemaphoreGiveRecursive(mutex);
-		return -1;
-	}
-	queueEntry->queue = queue;
-	queueEntry->eventMask = eventMask;
-	LL_APPEND(objEntry->queues, queueEntry);
-
-	// Done
+	res = connectObj(obj, queue, 0, eventMask);
 	xSemaphoreGiveRecursive(mutex);
-	return 0;
+	return res;
 }
 
 /**
- * Disconnect an event queue from the object
+ * Disconnect an event queue from the object.
  * \param[in] obj The object handle
  * \param[in] queue The event queue
  * \return 0 if success or -1 if failure
  */
-int32_t UAVObjDisconnect(UAVObjHandle obj, xQueueHandle queue)
+int32_t UAVObjDisconnectQueue(UAVObjHandle obj, xQueueHandle queue)
 {
-	ObjectQueueList* queueEntry;
-	ObjectList* objEntry;
-
-	// Lock
+	int32_t res;
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-
-	// Find queue and remove it
-	objEntry = (ObjectList*)obj;
-	LL_FOREACH(objEntry->queues, queueEntry)
-	{
-		if (queueEntry->queue == queue)
-		{
-			LL_DELETE(objEntry->queues, queueEntry);
-			xSemaphoreGiveRecursive(mutex);
-			return 0;
-		}
-	}
-
-	// If this point is reached the queue was not found
+	res = disconnectObj(obj, queue, 0);
 	xSemaphoreGiveRecursive(mutex);
-	return -1;
+	return res;
 }
 
 /**
- * Request an update of the object's data from the GCS. The call will not wait for the response, a QMSG_UPDATED event
+ * Connect an event callback to the object, if the callback is already connected then the event mask is only updated.
+ * The supplied callback will be invoked on all events matching the event mask.
+ * \param[in] obj The object handle
+ * \param[in] cb The event callback
+ * \param[in] eventMask The event mask, if EV_MASK_ALL then all events are enabled (e.g. EV_UPDATED | EV_UPDATED_MANUAL)
+ * \return 0 if success or -1 if failure
+ */
+int32_t UAVObjConnectCallback(UAVObjHandle obj, UAVObjEventCallback cb, int32_t eventMask)
+{
+	int32_t res;
+	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	res = connectObj(obj, 0, cb, eventMask);
+	xSemaphoreGiveRecursive(mutex);
+	return res;
+}
+
+/**
+ * Disconnect an event callback from the object.
+ * \param[in] obj The object handle
+ * \param[in] cb The event callback
+ * \return 0 if success or -1 if failure
+ */
+int32_t UAVObjDisconnectCallback(UAVObjHandle obj, UAVObjEventCallback cb)
+{
+	int32_t res;
+	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	res = disconnectObj(obj, 0, cb);
+	xSemaphoreGiveRecursive(mutex);
+	return res;
+}
+
+
+/**
+ * Request an update of the object's data from the GCS. The call will not wait for the response, a EV_UPDATED event
  * will be generated as soon as the object is updated.
  * \param[in] obj The object handle
  */
@@ -683,20 +677,20 @@ void UAVObjRequestUpdate(UAVObjHandle obj)
 }
 
 /**
- * Request an update of the object's data from the GCS. The call will not wait for the response, a QMSG_UPDATED event
+ * Request an update of the object's data from the GCS. The call will not wait for the response, a EV_UPDATED event
  * will be generated as soon as the object is updated.
  * \param[in] obj The object handle
  * \param[in] instId Object instance ID to update
  */
-void UAVObjRequestInstanceUpdate(UAVObjHandle obj, uint32_t instId)
+void UAVObjRequestInstanceUpdate(UAVObjHandle obj, uint16_t instId)
 {
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-	sendEvent((ObjectList*)obj, instId, QMSG_UPDATE_REQ);
+	sendEvent((ObjectList*)obj, instId, EV_UPDATE_REQ);
 	xSemaphoreGiveRecursive(mutex);
 }
 
 /**
- * Send the object's data to the GCS (triggers a QMSG_UPDATED_MANUAL event on this object).
+ * Send the object's data to the GCS (triggers a EV_UPDATED_MANUAL event on this object).
  * \param[in] obj The object handle
  */
 void UAVObjUpdated(UAVObjHandle obj)
@@ -705,14 +699,14 @@ void UAVObjUpdated(UAVObjHandle obj)
 }
 
 /**
- * Send the object's data to the GCS (triggers a QMSG_UPDATED_MANUAL event on this object).
+ * Send the object's data to the GCS (triggers a EV_UPDATED_MANUAL event on this object).
  * \param[in] obj The object handle
  * \param[in] instId The object instance ID
  */
-void UAVObjInstanceUpdated(UAVObjHandle obj, uint32_t instId)
+void UAVObjInstanceUpdated(UAVObjHandle obj, uint16_t instId)
 {
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-	sendEvent((ObjectList*)obj, instId, QMSG_UPDATED);
+	sendEvent((ObjectList*)obj, instId, EV_UPDATED);
 	xSemaphoreGiveRecursive(mutex);
 }
 
@@ -741,7 +735,7 @@ void UAVObjIterate(void (*iterator)(UAVObjHandle obj))
 /**
  * Set the data of a specific object instance.
  */
-int32_t setInstanceData(ObjectList* obj, uint32_t instId, const void* dataIn)
+int32_t setInstanceData(ObjectList* obj, uint16_t instId, const void* dataIn)
 {
 	ObjectInstList* elemEntry;
 
@@ -770,7 +764,7 @@ int32_t setInstanceData(ObjectList* obj, uint32_t instId, const void* dataIn)
 /**
  * Get the data of a specific object instance.
  */
-int32_t getInstanceData(ObjectList* obj, uint32_t instId, void* dataOut)
+int32_t getInstanceData(ObjectList* obj, uint16_t instId, void* dataOut)
 {
 	ObjectInstList* elemEntry;
 
@@ -799,10 +793,10 @@ int32_t getInstanceData(ObjectList* obj, uint32_t instId, void* dataOut)
 /**
  * Send an event to all event queues registered on the object.
  */
-int32_t sendEvent(ObjectList* obj, uint32_t instId, UAVObjQMsgEvent event)
+int32_t sendEvent(ObjectList* obj, uint16_t instId, UAVObjEventType event)
 {
 	ObjectQueueList* queueEntry;
-	UAVObjQMsg msg;
+	UAVObjEvent msg;
 
 	// Setup event
 	msg.obj = (UAVObjHandle)obj;
@@ -814,7 +808,16 @@ int32_t sendEvent(ObjectList* obj, uint32_t instId, UAVObjQMsgEvent event)
 	{
     	if ( queueEntry->eventMask == 0 || (queueEntry->eventMask & event) != 0 )
     	{
-    		xQueueSend(queueEntry->queue, &msg, 0); // do not wait if queue is full
+    		// Send to queue if a valid queue is registered
+    		if (queueEntry->queue != 0)
+    		{
+    			xQueueSend(queueEntry->queue, &msg, 0); // do not wait if queue is full
+    		}
+    		// Invoke callback (from event task) if a valid one is registered
+    		if (queueEntry->cb != 0)
+    		{
+    			EventDispatch(&msg, queueEntry->cb); // invoke callback from the event task
+    		}
     	}
     }
 
@@ -825,7 +828,7 @@ int32_t sendEvent(ObjectList* obj, uint32_t instId, UAVObjQMsgEvent event)
 /**
  * Create a new object instance
  */
-int32_t createInstance(ObjectList* obj, uint32_t instId)
+int32_t createInstance(ObjectList* obj, uint16_t instId)
 {
 	ObjectInstList* elemEntry;
 
@@ -851,7 +854,7 @@ int32_t createInstance(ObjectList* obj, uint32_t instId)
 /**
  * Check if the object has the instance ID specified.
  */
-int32_t hasInstance(ObjectList* obj, uint32_t instId)
+int32_t hasInstance(ObjectList* obj, uint16_t instId)
 {
 	ObjectInstList* elemEntry;
 
@@ -873,6 +876,74 @@ int32_t hasInstance(ObjectList* obj, uint32_t instId)
 	{
 		return -1;
 	}
+}
+
+/**
+ * Connect an event queue to the object, if the queue is already connected then the event mask is only updated.
+ * \param[in] obj The object handle
+ * \param[in] queue The event queue
+ * \param[in] cb The event callback
+ * \param[in] eventMask The event mask, if EV_MASK_ALL then all events are enabled (e.g. EV_UPDATED | EV_UPDATED_MANUAL)
+ * \return 0 if success or -1 if failure
+ */
+int32_t connectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb, int32_t eventMask)
+{
+	ObjectQueueList* queueEntry;
+	ObjectList* objEntry;
+
+	// Check that the queue is not already connected, if it is simply update event mask
+	objEntry = (ObjectList*)obj;
+	LL_FOREACH(objEntry->queues, queueEntry)
+	{
+		if ( queueEntry->queue == queue && queueEntry->cb == cb )
+		{
+			// Already connected, update event mask and return
+			queueEntry->eventMask = eventMask;
+			return 0;
+		}
+	}
+
+	// Add queue to list
+	queueEntry = (ObjectQueueList*)malloc(sizeof(ObjectQueueList));
+	if (queueEntry == NULL)
+	{
+		return -1;
+	}
+	queueEntry->queue = queue;
+	queueEntry->cb = cb;
+	queueEntry->eventMask = eventMask;
+	LL_APPEND(objEntry->queues, queueEntry);
+
+	// Done
+	return 0;
+}
+
+/**
+ * Disconnect an event queue from the object
+ * \param[in] obj The object handle
+ * \param[in] queue The event queue
+ * \param[in] cb The event callback
+ * \return 0 if success or -1 if failure
+ */
+int32_t disconnectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb)
+{
+	ObjectQueueList* queueEntry;
+	ObjectList* objEntry;
+
+	// Find queue and remove it
+	objEntry = (ObjectList*)obj;
+	LL_FOREACH(objEntry->queues, queueEntry)
+	{
+		if ( ( queueEntry->queue == queue && queueEntry->cb == cb ) )
+		{
+			LL_DELETE(objEntry->queues, queueEntry);
+			free(queueEntry);
+			return 0;
+		}
+	}
+
+	// If this point is reached the queue was not found
+	return -1;
 }
 
 

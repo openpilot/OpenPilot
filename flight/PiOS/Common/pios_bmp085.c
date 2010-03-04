@@ -202,7 +202,7 @@ void PIOS_BMP085_GetValues(uint16_t *Pressure, uint16_t *Altitude, uint16_t *Tem
 */
 int32_t PIOS_BMP085_Read(uint16_t address, uint8_t *buffer, uint8_t len)
 {
-	/* Try to get the IIC peripheral */
+	/* Try to get the I2C peripheral */
 	if(PIOS_I2C_LockDevice(I2C_Non_Blocking) < 0) {
 		/* Request a retry */
 		return -2;
@@ -210,16 +210,15 @@ int32_t PIOS_BMP085_Read(uint16_t address, uint8_t *buffer, uint8_t len)
 
 	/* Send I2C address and EEPROM address */
 	/* To avoid issues with litte/big endian: copy address into temporary buffer */
-	uint8_t addr_buffer[2] = {(uint8_t)(address>>8), (uint8_t)address};
+	uint8_t addr_buffer[2] = {(uint8_t)(address >> 8), (uint8_t)address};
 	int32_t error = PIOS_I2C_Transfer(I2C_Write_WithoutStop, BMP085_I2C_ADDR, addr_buffer, 2);
-
 	if(!error) {
 		error = PIOS_I2C_TransferWait();
 	}
 
 	/* Now receive byte(s) */
 	if(!error) {
-		error = PIOS_I2C_Transfer(I2C_Read, BMP085_I2C_ADDR, buffer, len);
+		error = PIOS_I2C_Transfer(I2C_Read, (BMP085_I2C_ADDR + 1), buffer, len);
 	}
 	if(!error) {
 		error = PIOS_I2C_TransferWait();
@@ -262,7 +261,7 @@ int32_t PIOS_BMP085_Write(uint16_t address, uint8_t *buffer, uint8_t len)
 		WriteBuffer[i+2] = buffer[i];
 	}
 	
-	int32_t error = PIOS_I2C_Transfer(I2C_Write, BMP085_I2C_ADDR, WriteBuffer, len+2);
+	int32_t error = PIOS_I2C_Transfer(I2C_Write, BMP085_I2C_ADDR, WriteBuffer, len + 2);
 	
 	if(!error) {
 		error = PIOS_I2C_TransferWait();

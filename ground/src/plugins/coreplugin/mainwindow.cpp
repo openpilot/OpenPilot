@@ -120,7 +120,6 @@ MainWindow::MainWindow() :
     m_rightPaneWidget(0),
     m_versionDialog(0),
     m_activeContext(0),
-    m_outputMode(0),
     m_generalSettings(new GeneralSettings),
     m_shortcutSettings(new ShortcutSettings),
     m_focusToEditor(0),
@@ -205,10 +204,6 @@ MainWindow::~MainWindow()
     m_printer = 0;
     delete m_uniqueIDManager;
     m_uniqueIDManager = 0;
-
-    pm->removeObject(m_outputMode);
-    delete m_outputMode;
-    m_outputMode = 0;
 
     delete m_viewManager;
     m_viewManager = 0;

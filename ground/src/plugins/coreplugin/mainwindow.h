@@ -180,7 +180,6 @@ private:
 
     QMap<QWidget *, IContext *> m_contextWidgets;
 
-    BaseMode *m_outputMode;
     GeneralSettings *m_generalSettings;
     ShortcutSettings *m_shortcutSettings;
 

@@ -441,8 +441,7 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 		/* Last byte received, disable interrupts and return. */
 		if(i2cx->transfer_state.STOP_REQUESTED) {
 			TransferEnd(i2cx);
-			DebugPinLow(DEBUG_PIN_ISR);
-			return;
+			goto isr_return;
 		}
 		
 		/* Request NAK and stop condition before receiving last data */
@@ -453,8 +452,7 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 			I2C_GenerateSTOP(i2cx->base, ENABLE);
 			i2cx->transfer_state.STOP_REQUESTED = 1;
 		}
-		DebugPinLow(DEBUG_PIN_ISR);
-		return;
+		goto isr_return;
 	}
 
 	/* ADDR set, TRA flag not set (indicates transmitter/receiver mode). */
@@ -469,8 +467,7 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 			I2C_GenerateSTOP(i2cx->base, ENABLE);
 			i2cx->transfer_state.STOP_REQUESTED = 1;
 		}
-		DebugPinLow(DEBUG_PIN_ISR);
-		return;
+		goto isr_return;
 	}
 
 	/* TxE set, will be cleared by writing DR, or after START or STOP was generated */
@@ -481,15 +478,13 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 		/* Last byte already sent, disable interrupts and return. */
 		if(i2cx->transfer_state.STOP_REQUESTED) {
 			TransferEnd(i2cx);
-			DebugPinLow(DEBUG_PIN_ISR);
-			return;
+			goto isr_return;
 		}
 		
 		if(i2cx->buffer_ix < i2cx->buffer_len) {
 			/* Checking tx_buffer_ptr for NULL is a failsafe measure. */
 			I2C_SendData(i2cx->base, (i2cx->tx_buffer_ptr == NULL) ? 0 : i2cx->tx_buffer_ptr[i2cx->buffer_ix++]);
-			DebugPinLow(DEBUG_PIN_ISR);
-			return;
+			goto isr_return;
 		} 
 		
 		/* Peripheral is transfering last byte, request stop condition / */
@@ -511,8 +506,7 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 			/* If this is not done, BUSY will be cleared before the transfer is finished */
 			I2C_ITConfig(i2cx->base, I2C_IT_BUF, DISABLE);
 		}
-		DebugPinLow(DEBUG_PIN_ISR);
-		return;
+		goto isr_return;
 	}
 
 	/* SB set, cleared by reading SR1 (done by I2C_GetLastEvent) followed by writing DR register */
@@ -530,8 +524,7 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 		(i2cx->i2c_address & 1)
 		? I2C_Direction_Receiver
 		: I2C_Direction_Transmitter);
-		DebugPinLow(DEBUG_PIN_ISR);
-		return;
+		goto isr_return;
 	}
 
 	/* This code is only reached if something got wrong, e.g. interrupt handler is called too late, */
@@ -549,6 +542,7 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 	b = I2C_ReceiveData(i2cx->base);
 	I2C_GenerateSTOP(i2cx->base, ENABLE);
 
+isr_return:
 	DebugPinLow(DEBUG_PIN_ISR);
 }
 

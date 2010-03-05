@@ -60,6 +60,7 @@ CommunityWelcomePageWidget::CommunityWelcomePageWidget(QWidget *parent) :
     sites << qMakePair(tr("OpenPilot Wiki"), QString(QLatin1String("http://wiki.openpilot.org")));
     sites << qMakePair(tr("OpenPilot Store"), QString(QLatin1String("http://www.openpilot.org/store")));
     sites << qMakePair(tr("OpenPilot Forums"), QString(QLatin1String("http://forums.openpilot.org")));
+    sites << qMakePair(tr("OpenPilot Bug Tracker"), QString(QLatin1String("http://bugs.openpilot.org")));
     
     QListIterator<QPair<QString, QString> > it(sites);
     while (it.hasNext()) {

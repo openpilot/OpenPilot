@@ -40,17 +40,17 @@
 
 /* Local Types */
 typedef struct {
-	uint16_t AC1;
-	uint16_t AC2;
-	uint16_t AC3;
+	int16_t AC1;
+	int16_t AC2;
+	int16_t AC3;
 	uint16_t AC4;
 	uint16_t AC5;
 	uint16_t AC6;
-	uint16_t B1;
-	uint16_t B2;
-	uint16_t MB;
-	uint16_t MC;
-	uint16_t MD;
+	int16_t B1;
+	int16_t B2;
+	int16_t MB;
+	int16_t MC;
+	int16_t MD;
 } BMP085CalibDataTypeDef;
 
 typedef enum {
@@ -63,7 +63,7 @@ void PIOS_BMP085_Init(void);
 void PIOS_BMP085_StartADC(ConversionTypeTypeDef Type);
 void PIOS_BMP085_ReadADC(void);
 void PIOS_BMP085_GetValues(uint16_t *Pressure, uint16_t *Altitude, uint16_t *Temperature);
-int32_t PIOS_BMP085_Read(uint16_t address, uint8_t *buffer, uint8_t len);
-int32_t PIOS_BMP085_Write(uint16_t address, uint8_t *buffer, uint8_t len);
+int32_t PIOS_BMP085_Read(uint8_t address, uint8_t *buffer, uint8_t len);
+int32_t PIOS_BMP085_Write(uint8_t address, uint8_t buffer);
 
 #endif /* PIOS_BMP085_H */

@@ -30,10 +30,14 @@
 /* Project Includes */
 #include "pios.h"
 
+// FIXME: temp assert
+#define assert(exp) {if (!(exp)) while(1);}
+
+
 #if !defined(PIOS_DONT_USE_I2C)
 
 /* Options */
-//#define USE_DEBUG_PINS
+#define USE_DEBUG_PINS
 
 /* Global Variables */
 volatile uint32_t PIOS_I2C_UnexpectedEvent;
@@ -228,6 +232,9 @@ static void TransferStart(I2CRecTypeDef *i2cx)
 {
 	DebugPinHigh(DEBUG_PIN_BUSY);
 	i2cx->transfer_state.BUSY = 1;
+
+	// Enable Interrupts: I2V2 event, buffer and error interrupt
+	I2C_ITConfig(i2cx->base, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, ENABLE);
 }
 
 /**
@@ -235,6 +242,9 @@ static void TransferStart(I2CRecTypeDef *i2cx)
  */
 static void TransferEnd(I2CRecTypeDef *i2cx)
 {
+	// Disable all interrupts
+	I2C_ITConfig(i2cx->base, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, DISABLE);
+
 	DebugPinLow(DEBUG_PIN_BUSY);
 	i2cx->transfer_state.BUSY = 0;
 }
@@ -356,9 +366,9 @@ int32_t PIOS_I2C_Transfer(I2CTransferTypeDef transfer, uint8_t address, uint8_t 
 		return error + I2C_ERROR_PREV_OFFSET;
 	}
 
+	// Should not be busy at this point, interrupts disabled
+	assert(i2cx->transfer_state.BUSY == 0);
 
-	/* Disable interrupts */
-	I2C_ITConfig(i2cx->base, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, DISABLE);
 
 	/* Clear transfer state and error value */
 	i2cx->transfer_state.ALL = 0;
@@ -391,24 +401,11 @@ int32_t PIOS_I2C_Transfer(I2CTransferTypeDef transfer, uint8_t address, uint8_t 
 		return (i2cx->last_transfer_error=I2C_ERROR_UNSUPPORTED_TRANSFER_TYPE);
 	}
 
-	/* Start with ACK */
-	I2C_AcknowledgeConfig(i2cx->base, ENABLE);
-
-	/* Clear last error status */
-	i2cx->last_transfer_error = 0;
-
-	/* Notify that transfer has started */
+	// Start the transfer
 	TransferStart(i2cx);
-
-	/* Send start condition */
 	I2C_GenerateSTART(i2cx->base, ENABLE);
 
-	/* Enable I2V2 event, buffer and error interrupt */
-	/* This must be done *after* GenerateStart, for the case last transfer was WRITE_WITHOUT_STOP. */
-	/* In this case, start was already generated at the end of the last communication! */
-	I2C_ITConfig(i2cx->base, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, ENABLE);
-
-	/* No error */
+	// All is fine
 	return 0;
 }
 
@@ -444,8 +441,6 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 		/* Last byte received, disable interrupts and return. */
 		if(i2cx->transfer_state.STOP_REQUESTED) {
 			TransferEnd(i2cx);
-			/* Disable all interrupts */
-			I2C_ITConfig(i2cx->base, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, DISABLE);
 			DebugPinLow(DEBUG_PIN_ISR);
 			return;
 		}
@@ -486,8 +481,6 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 		/* Last byte already sent, disable interrupts and return. */
 		if(i2cx->transfer_state.STOP_REQUESTED) {
 			TransferEnd(i2cx);
-			/* Disable all interrupts */
-			I2C_ITConfig(i2cx->base, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, DISABLE);
 			DebugPinLow(DEBUG_PIN_ISR);
 			return;
 		}
@@ -507,17 +500,11 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 			i2cx->transfer_state.STOP_REQUESTED = 1;
 			DebugPinLow(2);
 		} else {
-			//I2C_GenerateSTART(i2cx->base, ENABLE);
-			//i2cx->transfer_state.STOP_REQUESTED = 1;
 			TransferEnd(i2cx);
-			/* Disable all interrupts */
-			I2C_ITConfig(i2cx->base, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, DISABLE);
 		}
 		
 		if(i2cx->buffer_len == 0) {
 			TransferEnd(i2cx);
-			/* Disable all interrupts */
-			I2C_ITConfig(i2cx->base, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, DISABLE);
 		} else {
 			/* Disable the I2C_IT_BUF interrupt after sending the last buffer data  */
 			/* (last EV8) to not allow a new interrupt just with TxE - only BTF will generate it */
@@ -534,8 +521,6 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 		/* We have to wait for the application to start the next transfer */
 		if(i2cx->transfer_state.STOP_REQUESTED) {
 			TransferEnd(i2cx);
-			/* Disable all interrupts */
-			I2C_ITConfig(i2cx->base, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, DISABLE);
 			DebugPinLow(DEBUG_PIN_ISR);
 			return;
 		}
@@ -552,7 +537,6 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 	/* This code is only reached if something got wrong, e.g. interrupt handler is called too late, */
 	/* The device reset itself (while testing, it was always event 0x00000000). we have to stop the transfer, */
 	/* Else read/write of corrupt data may be the result. */
-	I2C_ITConfig(i2cx->base, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, DISABLE);
 	
 	/* Notify error */
 	PIOS_I2C_UnexpectedEvent = event;
@@ -600,9 +584,6 @@ static void ER_IRQHandler(I2CRecTypeDef *i2cx)
 		/* Send stop condition to release bus */
 		I2C_GenerateSTOP(i2cx->base, ENABLE);
 	}
-
-	/* Disable interrupts */
-	I2C_ITConfig(i2cx->base, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, DISABLE);
 
 	/* Notify that transfer has finished (due to the error) */
 	TransferEnd(i2cx);

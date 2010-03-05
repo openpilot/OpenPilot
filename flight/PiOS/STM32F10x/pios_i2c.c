@@ -507,8 +507,11 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 			i2cx->transfer_state.STOP_REQUESTED = 1;
 			DebugPinLow(2);
 		} else {
-			I2C_GenerateSTART(i2cx->base, ENABLE);
-			i2cx->transfer_state.STOP_REQUESTED = 1;
+			//I2C_GenerateSTART(i2cx->base, ENABLE);
+			//i2cx->transfer_state.STOP_REQUESTED = 1;
+			TransferEnd(i2cx);
+			/* Disable all interrupts */
+			I2C_ITConfig(i2cx->base, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, DISABLE);
 		}
 		
 		if(i2cx->buffer_len == 0) {

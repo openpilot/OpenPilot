@@ -386,6 +386,8 @@ int32_t PIOS_I2C_Transfer(I2CTransferTypeDef transfer, uint8_t address, uint8_t 
 		/* Ensure that previous TX buffer won't be accessed */
 		i2cx->tx_buffer_ptr = NULL;
 		i2cx->rx_buffer_ptr = buffer;
+		// Ack the bytes we will be getting
+		I2C_AcknowledgeConfig(i2cx->base, ENABLE);
 	} else if(transfer == I2C_Write || transfer == I2C_Write_WithoutStop) {
 		/* Take new address/buffer/len */
 		/* Clear bit 0 for write operation */

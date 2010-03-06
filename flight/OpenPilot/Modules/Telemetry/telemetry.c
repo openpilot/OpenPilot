@@ -187,7 +187,7 @@ static void telemetryTask(void)
 			UAVTalkProcessInputStream(PIOS_COM_ReceiveBuffer(TelemetryPort));
 		} else if(PIOS_COM_ReceiveBufferUsed(COM_USB_HID) > 0)
 		{
-			UAVTalkProcessInputStream(PIOS_COM_ReceiveBuffer(TelemetryPort));
+			UAVTalkProcessInputStream(PIOS_COM_ReceiveBuffer(COM_USB_HID));
 		}
 	}
 }

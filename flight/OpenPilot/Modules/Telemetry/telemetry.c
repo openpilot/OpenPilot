@@ -23,15 +23,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "pios.h"
-#include "telemetry.h"
-#include "uavtalk.h"
-#include "uavobjectmanager.h"
-#include "eventdispatcher.h"
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
+#include "openpilot.h"
 
 // Private constants
 #define MAX_QUEUE_SIZE 20
@@ -43,12 +35,12 @@
 // Private types
 
 // Private variables
-xQueueHandle queue;
-xTaskHandle telemetryTaskHandle;
+static COMPortTypeDef TelemetryPort;
+static xQueueHandle queue;
+static xTaskHandle telemetryTaskHandle;
 
 // Private functions
-static void telemetryTask();
-static void receiveTask();
+static void telemetryTask(void);
 static void periodicEventHandler(UAVObjEvent* ev);
 static int32_t transmitData(uint8_t* data, int32_t length);
 static void registerObject(UAVObjHandle obj);
@@ -57,20 +49,21 @@ static int32_t addObject(UAVObjHandle obj);
 static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs);
 
 /**
- * Initialize the telemetry module
- * \return -1 if initialization failed
+ * Initialise the telemetry module
+ * \return -1 if initialisation failed
  * \return 0 on success
  */
-int32_t TelemetryInitialize()
+int32_t TelemetryInitialize(void)
 {
 	// Create object queue
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 
 	// TODO: Get telemetry settings object
+	TelemetryPort = COM_USART1;
 
-	// TODO: Initialize communication ports
+	// TODO: Re-Initialise communication ports
 
-	// Initialize UAVTalk
+	// Initialise UAVTalk
 	UAVTalkInitialize(&transmitData);
 
 	// Process all registered objects and connect queue for updates
@@ -147,7 +140,7 @@ void updateObject(UAVObjHandle obj)
 /**
  * Telemetry task. Processes queue events and periodic updates. It does not return.
  */
-static void telemetryTask()
+static void telemetryTask(void)
 {
 	UAVObjEvent ev;
 	UAVObjMetadata metadata;
@@ -172,7 +165,7 @@ static void telemetryTask()
 				// Request object update from GCS (with retries)
 				retries = 0;
 				while(retries < MAX_RETRIES && success == -1) {
-					success = UAVTalkSendObjectRequest( ev.obj, ev.instId, REQ_TIMEOUT_MS); // call blocks until update is received or timeout
+					success = UAVTalkSendObjectRequest(ev.obj, ev.instId, REQ_TIMEOUT_MS); // call blocks until update is received or timeout
 					++retries;
 				}
 			}
@@ -182,8 +175,20 @@ static void telemetryTask()
 			}
 		}
 
-		// TODO: Check for received data (from the modem or USB) and pass them to UAVTalk for decoding
-		// UAVTalkProcessInputStream(data);
+		/* This blocks the task until there is something on the buffer */
+		/* TODO: This needs to check the USB semaphore as well, somehow */
+		/* This isn't really going to work
+		xSemaphoreTake(PIOS_USART1_Buffer, portMAX_DELAY);
+		UAVTalkProcessInputStream(PIOS_COM_ReceiveBuffer(TelemetryPort));
+		*/
+
+		if(PIOS_COM_ReceiveBufferUsed(TelemetryPort) > 0)
+		{
+			UAVTalkProcessInputStream(PIOS_COM_ReceiveBuffer(TelemetryPort));
+		} else if(PIOS_COM_ReceiveBufferUsed(COM_USB_HID) > 0)
+		{
+			UAVTalkProcessInputStream(PIOS_COM_ReceiveBuffer(TelemetryPort));
+		}
 	}
 }
 

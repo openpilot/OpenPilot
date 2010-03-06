@@ -29,8 +29,12 @@
 
 
 /* Global Types */
-typedef enum {USART_1 = 0, USART_2 = 1, USART_3 = 2} USARTNumTypeDef; //TODO: Make this non-application specific
+typedef enum {USART_1 = 0, USART_2 = 1, USART_3 = 2} USARTNumTypeDef;
 
+/* Global Variables */
+extern xSemaphoreHandle PIOS_USART1_Buffer;
+extern xSemaphoreHandle PIOS_USART2_Buffer;
+extern xSemaphoreHandle PIOS_USART3_Buffer;
 
 /* Public Functions */
 extern void PIOS_USART_Init(void);

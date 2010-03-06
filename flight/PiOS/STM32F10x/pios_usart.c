@@ -35,6 +35,9 @@
 
 /* Global Variables */
 extern SettingsTypeDef Settings;
+xSemaphoreHandle PIOS_USART1_Buffer;
+xSemaphoreHandle PIOS_USART2_Buffer;
+xSemaphoreHandle PIOS_USART3_Buffer;
 
 /* Local Variables */
 static uint8_t rx_buffer[PIOS_USART_NUM][PIOS_USART_RX_BUFFER_SIZE];
@@ -46,6 +49,8 @@ static uint8_t tx_buffer[PIOS_USART_NUM][PIOS_USART_TX_BUFFER_SIZE];
 static volatile uint8_t tx_buffer_tail[PIOS_USART_NUM];
 static volatile uint8_t tx_buffer_head[PIOS_USART_NUM];
 static volatile uint8_t tx_buffer_size[PIOS_USART_NUM];
+
+static portBASE_TYPE xHigherPriorityTaskWoken;
 
 
 /**
@@ -174,6 +179,10 @@ void PIOS_USART_Init(void)
 	/* Enable USART */
 	USART_Cmd(PIOS_USART3_USART, ENABLE);
 #endif
+
+	vSemaphoreCreateBinary(PIOS_USART1_Buffer);
+	vSemaphoreCreateBinary(PIOS_USART2_Buffer);
+	vSemaphoreCreateBinary(PIOS_USART3_Buffer);
 }
 
 /**
@@ -335,11 +344,23 @@ int32_t PIOS_USART_RxBufferPut(USARTNumTypeDef usart, uint8_t b)
 	}
 	++rx_buffer_size[usart];
 	PIOS_IRQ_Enable();
-	
+
+
+	switch(usart) {
+		case USART_1:
+			xSemaphoreGiveFromISR(PIOS_USART1_Buffer, &xHigherPriorityTaskWoken);
+			break;
+		case USART_2:
+			xSemaphoreGiveFromISR(PIOS_USART2_Buffer, &xHigherPriorityTaskWoken);
+			break;
+		case USART_3:
+			xSemaphoreGiveFromISR(PIOS_USART3_Buffer, &xHigherPriorityTaskWoken);
+			break;
+	}
+
 	/* No error */
 	return 0;
 }
-
 
 /**
 * returns number of free bytes in transmit buffer

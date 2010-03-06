@@ -44,8 +44,12 @@ typedef enum _HID_REQUESTS {
 	SET_PROTOCOL
 } HID_REQUESTS;
 
+/* Global Variables */
+xSemaphoreHandle PIOS_HID_Buffer;
+
 /* Local Variables */
 static uint32_t ProtocolValue;
+static portBASE_TYPE xHigherPriorityTaskWoken;
 
 /* Local Functions */
 static uint8_t *PIOS_USB_HID_GetHIDDescriptor(uint16_t Length);
@@ -176,7 +180,6 @@ int32_t PIOS_USB_HID_TxBufferPutMore(uint8_t *buffer, uint16_t len)
 
 /**
 * Gets a byte from the receive buffer
-* \param[in] usb_com USB_COM number (not supported yet, should always be 0)
 * \return -1 if no new byte available
 * \return >= 0: received byte
 * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
@@ -188,14 +191,8 @@ int32_t PIOS_USB_HID_RxBufferGet(void)
 		return -1;
 	}
 
-	/* Get byte - this operation should be atomic! */
-	//PIOS_IRQ_Disable();
-	// TODO: Access buffer directly, so that we don't need to copy into temporary buffer
-	//uint8_t buffer_out[PIOS_USB_HID_DATA_LENGTH];
-	//PMAToUserBufferCopy(buffer_out, GetEPRxAddr(ENDP1 & 0x7F), GetEPRxCount(ENDP1));
-
-	/* This stops returning bytes after the first ocurance of '\0' */
-	/* We don't need to do this but it does optimize things quite a bit */
+	/* This stops returning bytes after the first occurrence of '\0' */
+	/* We don't need to do this but it does optimise things quite a bit */
 	if(rx_buffer[rx_buffer_ix] == 0) {
 		/* TODO: Evaluate if this is really needed */
 		/* Clean the buffer */
@@ -215,7 +212,6 @@ int32_t PIOS_USB_HID_RxBufferGet(void)
 		rx_buffer_ix = 0;
 		SetEPRxStatus(ENDP1, EP_RX_VALID);
 	}
-	//PIOS_IRQ_Enable();
 
 	/* Return received byte */
 	return b;
@@ -290,7 +286,7 @@ static uint8_t *PIOS_USB_HID_GetReportDescriptor(uint16_t Length)
 /**
 * Gets the protocol value
 * \param[in] Length
-* \return address of the protcol value.
+* \return address of the protocol value.
 */
 static uint8_t *PIOS_USB_HID_GetProtocolValue(uint16_t Length)
 {
@@ -318,6 +314,7 @@ void PIOS_USB_HID_EP1_OUT_Callback(void)
 
 	/* We now have data waiting */
 	rx_buffer_new_data_ctr = PIOS_USB_HID_DATA_LENGTH;
+	xSemaphoreGiveFromISR(PIOS_HID_Buffer, &xHigherPriorityTaskWoken);
 
 #else
 	// FOR DEBUGGING USE ONLY

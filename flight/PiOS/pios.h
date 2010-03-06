@@ -33,6 +33,12 @@
 #include "pios_config.h"
 #include "pios_board.h"
 
+/* FreeRTOS Includes */
+#include <FreeRTOS.h>
+#include <task.h>
+#include <queue.h>
+#include <semphr.h>
+
 /* C Lib Includes */
 #include <stdio.h>
 #include <stdlib.h>
@@ -76,8 +82,6 @@
 #include <pios_sdcard.h>
 #include <pios_com.h>
 #include <pios_bmp085.h>
-
-/* More added here as they get written */
 
 #if !defined(PIOS_DONT_USE_USB)
 /* USB Libs */

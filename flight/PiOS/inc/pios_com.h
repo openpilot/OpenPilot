@@ -47,8 +47,9 @@ extern int32_t PIOS_COM_SendStringNonBlocking(COMPortTypeDef port, char *str);
 extern int32_t PIOS_COM_SendString(COMPortTypeDef port, char *str);
 extern int32_t PIOS_COM_SendFormattedStringNonBlocking(COMPortTypeDef port, char *format, ...);
 extern int32_t PIOS_COM_SendFormattedString(COMPortTypeDef port, char *format, ...);
+extern uint8_t PIOS_COM_ReceiveBuffer(COMPortTypeDef port);
+extern int32_t PIOS_COM_ReceiveBufferUsed(COMPortTypeDef port);
 
 extern int32_t PIOS_COM_ReceiveHandler(void);
-extern int32_t PIOS_COM_ReceiveCallbackInit(void *callback_receive);
 
 #endif /* PIOS_COM_H */

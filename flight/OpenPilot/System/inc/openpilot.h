@@ -35,11 +35,11 @@
 #include <op_config.h>
 #include <op_logging.h>
 
-
 /* FreeRTOS Includes */
 #include <FreeRTOS.h>
 #include <task.h>
 #include <queue.h>
+#include <semphr.h>
 
 /* Global Functions */
 extern void OpenPilotInit(void);

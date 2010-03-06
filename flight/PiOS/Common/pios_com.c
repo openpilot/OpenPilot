@@ -32,15 +32,16 @@
 
 #if !defined(PIOS_DONT_USE_COM)
 
-/* Private Function Prototypes */
 
+/* Global Variables */
+xSemaphoreHandle PIOS_HID_Buffer;
 
 /* Local Variables */
 static int32_t (*receive_callback_func)(COMPortTypeDef port, char c);
 
 
 /**
-* Initializes COM layer
+* Initialises COM layer
 * \param[in] mode currently only mode 0 supported
 * \return < 0 if initialisation failed
 */
@@ -60,7 +61,7 @@ int32_t PIOS_COM_Init(void)
 
 /**
 * Sends a package over given port
-* \param[in] port COM port (COM_DEBUG_UART, COM_GPS_UART, COM_TELEM_UART, COM_AUX_UART, COM_USB_HID)
+* \param[in] port COM port
 * \param[in] buffer character buffer
 * \param[in] len buffer length
 * \return -1 if port not available
@@ -91,7 +92,7 @@ int32_t PIOS_COM_SendBufferNonBlocking(COMPortTypeDef port, uint8_t *buffer, uin
 /**
 * Sends a package over given port
 * (blocking function)
-* \param[in] port COM port (COM_DEBUG_UART, COM_GPS_UART, COM_TELEM_UART, COM_AUX_UART, COM_USB_HID)
+* \param[in] port COM port
 * \param[in] buffer character buffer
 * \param[in] len buffer length
 * \return -1 if port not available
@@ -119,7 +120,7 @@ int32_t PIOS_COM_SendBuffer(COMPortTypeDef port, uint8_t *buffer, uint16_t len)
 
 /**
 * Sends a single character over given port
-* \param[in] port COM port (COM_DEBUG_UART, COM_GPS_UART, COM_TELEM_UART, COM_AUX_UART, COM_USB_HID)
+* \param[in] port COM port
 * \param[in] c character
 * \return -1 if port not available
 * \return -2 buffer is full
@@ -134,7 +135,7 @@ int32_t PIOS_COM_SendCharNonBlocking(COMPortTypeDef port, char c)
 /**
 * Sends a single character over given port
 * (blocking function)
-* \param[in] port COM port (COM_DEBUG_UART, COM_GPS_UART, COM_TELEM_UART, COM_AUX_UART, COM_USB_HID)
+* \param[in] port COM port
 * \param[in] c character
 * \return -1 if port not available
 * \return 0 on success
@@ -146,7 +147,7 @@ int32_t PIOS_COM_SendChar(COMPortTypeDef port, char c)
 
 /**
 * Sends a string over given port
-* \param[in] port COM port (COM_DEBUG_UART, COM_GPS_UART, COM_TELEM_UART, COM_AUX_UART, COM_USB_HID)
+* \param[in] port COM port
 * \param[in] str zero-terminated string
 * \return -1 if port not available
 * \return -2 buffer is full
@@ -161,7 +162,7 @@ int32_t PIOS_COM_SendStringNonBlocking(COMPortTypeDef port, char *str)
 /**
 * Sends a string over given port
 * (blocking function)
-* \param[in] port COM port (COM_DEBUG_UART, COM_GPS_UART, COM_TELEM_UART, COM_AUX_UART, COM_USB_HID)
+* \param[in] port COM port
 * \param[in] str zero-terminated string
 * \return -1 if port not available
 * \return 0 on success
@@ -173,7 +174,7 @@ int32_t PIOS_COM_SendString(COMPortTypeDef port, char *str)
 
 /**
 * Sends a formatted string (-> printf) over given port
-* \param[in] port COM port (COM_DEBUG_UART, COM_GPS_UART, COM_TELEM_UART, COM_AUX_UART, COM_USB_HID)
+* \param[in] port COM port
 * \param[in] *format zero-terminated format string - 128 characters supported maximum!
 * \param[in] ... optional arguments,
 *        128 characters supported maximum!
@@ -195,7 +196,7 @@ int32_t PIOS_COM_SendFormattedStringNonBlocking(COMPortTypeDef port, char *forma
 /**
 * Sends a formatted string (-> printf) over given port
 * (blocking function)
-* \param[in] port COM port (COM_DEBUG_UART, COM_GPS_UART, COM_TELEM_UART, COM_AUX_UART, COM_USB_HID)
+* \param[in] port COM port
 * \param[in] *format zero-terminated format string - 128 characters supported maximum!
 * \param[in] ... optional arguments,
 * \return -1 if port not available
@@ -212,108 +213,47 @@ int32_t PIOS_COM_SendFormattedString(COMPortTypeDef port, char *format, ...)
 }
 
 /**
-* Checks for incoming COM messages, calls the callback function which has
-* been installed via PIOS_COM_ReceiveCallbackInit()
-* 
-* Not for use in an application - this function is called by
-* by a task in the programming model!
-* 
-* \return < 0 on errors
+* Transfer bytes from port buffers into another buffer
+* \param[in] port COM port
+* \returns Byte from buffer
 */
-int32_t PIOS_COM_ReceiveHandler(void)
+uint8_t PIOS_COM_ReceiveBuffer(COMPortTypeDef port)
 {
-	uint8_t port;
-
-	/* Interface to be checked */
-	uint8_t intf = 0;
-	
-	/* Number of forwards - stop after 10 forwards to yield some CPU time for other tasks */
-	uint8_t total_bytes_forwarded = 0;
-	
-	uint8_t bytes_forwarded = 0;
-	uint8_t again = 1;
-	
-	do {
-		/* Round Robin */
-		/* TODO: maybe a list based approach would be better */
-		/* it would allow to add/remove interfaces dynamically */
-		/* this would also allow to give certain ports a higher priority (to add them multiple times to the list) */
-		/* it would also improve this spagetthi code ;) */
-		int32_t status = -1;
-		switch(intf++) {
-			case COM_DEBUG_USART:
-				status = PIOS_USART_RxBufferGet(PIOS_COM_DEBUG_PORT);
-				port = COM_DEBUG_USART;
-				break;
-			case COM_USART1:
-				status = PIOS_USART_RxBufferGet(USART_1);
-				port = COM_USART1;
-				break;
-			case COM_USART2:
-				status = PIOS_USART_RxBufferGet(USART_2);
-				port = COM_USART2;
-				break;
-			case COM_USART3:
-				status = PIOS_USART_RxBufferGet(USART_3);
-				port = COM_USART3;
-				break;
-			case COM_USB_HID:
-				status = PIOS_USB_HID_RxBufferGet();
-				port = COM_USB_HID;
-				break;
-			default:
-				/* Allow 64 forwards maximum to yield some CPU time for other tasks */
-				if(bytes_forwarded && total_bytes_forwarded < 64) {
-					intf = 0; /* Restart at start */
-					bytes_forwarded = 0; /* Ror checking, if bytes still have been forwarded in next round */
-				} else {
-					again = 0; /* No more interfaces to be processed */
-				}
-				status = -1; /* Empty round - no message */
-		}
-
-		/* Message received? */
-		if(status >= 0) {
-		/* Notify that a package has been forwarded */
-		++bytes_forwarded;
-		++total_bytes_forwarded;
-		
-		/* Call function */
-		if(receive_callback_func != NULL)
-			receive_callback_func(port, (uint8_t)status);
-		}
-	} while(again);
-
-	return 0;
+	switch(port) {
+		case COM_USART1:
+			return PIOS_USART_RxBufferGet(USART_1);
+		case COM_USART2:
+			return PIOS_USART_RxBufferGet(USART_2);
+		case COM_USART3:
+			return PIOS_USART_RxBufferGet(USART_3);
+		case COM_USB_HID:
+			return PIOS_USB_HID_RxBufferGet();
+		/* To suppress warnings */
+		default:
+			return 0;
+	}
 }
 
 /**
-* Installs the callback function which is executed on incoming characters
-* from a COM interface.
-*
-* Example:
-* \code
-* int32_t CONSOLE_Parse(COMPortTypeDef port, char c)
-* {
-* 	// Do Parsing here
-*
-* 	return 0; // no error
-* }
-* \endcode
-*
-* The callback function has been installed in an Init() function with:
-* \code
-*   PIOS_COM_ReceiveCallbackInit(CONSOLE_Parse);
-* \endcode
-* \param[in] callback_debug_command the callback function (NULL disables the callback)
-* \return < 0 on errors
+* Get the number of bytes waiting in the buffer
+* \param[in] port COM port
+* \return Number of bytes used in buffer
 */
-int32_t PIOS_COM_ReceiveCallbackInit(void *callback_receive)
+int32_t PIOS_COM_ReceiveBufferUsed(COMPortTypeDef port)
 {
-	receive_callback_func = callback_receive;
-
-	/* No error */
-	return 0;
+	switch(port) {
+		case COM_USART1:
+			return PIOS_USART_RxBufferUsed(USART_1);
+		case COM_USART2:
+			return PIOS_USART_RxBufferUsed(USART_2);
+		case COM_USART3:
+			return PIOS_USART_RxBufferUsed(USART_3);
+		case COM_USB_HID:
+			return PIOS_USB_HID_DATA_LENGTH;
+		/* To suppress warnings */
+		default:
+			return 0;
+	}
 }
 
 #endif

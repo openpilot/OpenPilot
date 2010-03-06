@@ -37,6 +37,7 @@
 #define PIOS_USB_HID_DATA_LENGTH		63
 
 /* Global Variables */
+extern xSemaphoreHandle PIOS_HID_Buffer;
 
 /* Global functions */
 extern int32_t PIOS_USB_HID_Init(uint32_t mode);

@@ -28,16 +28,15 @@
 #ifndef PIOS_H
 #define PIOS_H
 
-
 /* PIOS Compile Time Configuration */
 #include "pios_config.h"
 #include "pios_board.h"
 
 /* FreeRTOS Includes */
-#include <FreeRTOS.h>
-#include <task.h>
-#include <queue.h>
-#include <semphr.h>
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
 
 /* C Lib Includes */
 #include <stdio.h>

@@ -26,9 +26,6 @@
 #ifndef UAVTALK_H
 #define UAVTALK_H
 
-#include <stdint.h>
-#include "uavobjectmanager.h"
-
 // Public constants
 #define UAVTALK_WAITFOREVER -1
 #define UAVTALK_NOWAIT 0

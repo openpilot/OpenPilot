@@ -29,8 +29,6 @@
 #ifndef TELEMETRY_H
 #define TELEMETRY_H
 
-#include <stdint.h>
-
-int32_t TelemetryInitialize();
+int32_t TelemetryInitialize(void);
 
 #endif // TELEMETRY_H

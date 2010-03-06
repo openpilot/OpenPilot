@@ -24,14 +24,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <stdlib.h> // for malloc
-#include <string.h> // for strcmp
-#include "uavobjectmanager.h"
-#include "eventdispatcher.h"
-#include "utlist.h"
-#include "FreeRTOS.h"
-#include "queue.h"
-#include "semphr.h"
+#include "openpilot.h"
 
 // Constants
 

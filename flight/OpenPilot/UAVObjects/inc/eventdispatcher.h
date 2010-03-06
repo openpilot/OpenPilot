@@ -26,9 +26,6 @@
 #ifndef EVENTDISPATCHER_H
 #define EVENTDISPATCHER_H
 
-#include <stdint.h>
-#include "uavobjectmanager.h"
-
 // Public types
 
 // Public functions

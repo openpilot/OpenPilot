@@ -31,9 +31,6 @@
 #ifndef $(NAMEUC)_H
 #define $(NAMEUC)_H
 
-#include <stdint.h>
-#include "uavobjectmanager.h"
-
 // Object constants
 #define $(NAMEUC)_OBJID $(OBJID)
 #define $(NAMEUC)_NAME "$(NAME)"

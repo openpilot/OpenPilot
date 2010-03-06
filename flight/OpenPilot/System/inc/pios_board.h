@@ -197,7 +197,7 @@
 #define PIOS_IRQ_PRIO_HIGHEST			4 		// for USART etc...
 
 //-------------------------
-// Receiver PWM inputs   
+// Receiver PWM inputs
 //-------------------------
 #define RECEIVER1_GPIO_PORT			GPIOB
 #define RECEIVER1_PIN				GPIO_Pin_0      // PB0

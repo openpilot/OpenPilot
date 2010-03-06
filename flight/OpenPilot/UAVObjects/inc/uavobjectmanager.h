@@ -26,10 +26,6 @@
 #ifndef UAVOBJECTMANAGER_H
 #define UAVOBJECTMANAGER_H
 
-#include <stdint.h>
-#include "FreeRTOS.h"
-#include "queue.h"
-
 #define UAVOBJ_ALL_INSTANCES 0xFFFF
 
 typedef uint32_t UAVObjHandle;

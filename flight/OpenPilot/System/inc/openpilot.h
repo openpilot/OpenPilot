@@ -31,15 +31,20 @@
 /* PIOS Includes */
 #include <pios.h>
 
+/* OpenPilot Modules */
+#include "telemetry.h"
+
 /* OpenPilot Includes */
 #include <op_config.h>
 #include <op_logging.h>
 
-/* FreeRTOS Includes */
-#include <FreeRTOS.h>
-#include <task.h>
-#include <queue.h>
-#include <semphr.h>
+/* UAVObjects */
+#include "uavobjectmanager.h"
+#include "eventdispatcher.h"
+#include "utlist.h"
+
+/* UAVTalk */
+#include "uavtalk.h"
 
 /* Global Functions */
 extern void OpenPilotInit(void);

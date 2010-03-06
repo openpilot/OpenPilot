@@ -30,9 +30,8 @@
 
 #define $(METAOBJECT)
 
-#include <string.h> // for memcpy
+#include "openpilot.h"
 #include "$(NAMELC).h"
-#include "uavobjectmanager.h"
 
 
 

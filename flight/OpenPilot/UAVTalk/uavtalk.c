@@ -25,9 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "uavtalk.h"
-#include "FreeRTOS.h"
-#include "semphr.h"
+#include "openpilot.h"
 
 // Private constants
 #define TYPE_MASK 0xFC

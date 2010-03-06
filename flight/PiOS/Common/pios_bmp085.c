@@ -47,12 +47,19 @@ Example of how to use this module:
 
 /* Glocal Variables */
 ConversionTypeTypeDef CurrentRead;
-
+xSemaphoreHandle PIOS_BMP085_EOC;
 
 /* Local Variables */
 static BMP085CalibDataTypeDef CalibData;
-static volatile uint32_t RawPressure;
-static volatile uint32_t RawTemperature;
+static portBASE_TYPE xHigherPriorityTaskWoken;
+/* Straight from the datasheet */
+static int32_t X1, X2, X3, B3, B5, B6, P;
+static uint32_t B4, B7;
+static uint16_t RawTemperature;
+static uint32_t RawPressure;
+static uint32_t Pressure;
+static uint16_t Temperature;
+static uint32_t Altitude;
 
 
 /**
@@ -82,8 +89,8 @@ void PIOS_BMP085_Init(void)
 	
 	/* Enable and set EOC EXTI Interrupt to the lowest priority */
 	NVIC_InitStructure.NVIC_IRQChannel = PIOS_BMP085_EOC_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 15;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 15;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_BMP085_EOC_PRIO;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 	
@@ -121,6 +128,8 @@ void PIOS_BMP085_Init(void)
 	PIOS_COM_SendFormattedString(COM_DEBUG_USART, "MB = %d\r", CalibData.MB);
 	PIOS_COM_SendFormattedString(COM_DEBUG_USART, "MC = %d\r", CalibData.MC);
 	PIOS_COM_SendFormattedString(COM_DEBUG_USART, "MD = %d\r", CalibData.MD);
+
+	vSemaphoreCreateBinary(PIOS_BMP085_EOC);
 }
 
 
@@ -132,9 +141,9 @@ void PIOS_BMP085_Init(void)
 void PIOS_BMP085_StartADC(ConversionTypeTypeDef Type)
 {
 	/* Start the conversion */
-	if(Type == Temperature) {
+	if(Type == TemperatureConv) {
 		PIOS_BMP085_Write(BMP085_CTRL_ADDR, BMP085_TEMP_ADDR);
-	} else if(Type == Pressure) {
+	} else if(Type == PressureConv) {
 		PIOS_BMP085_Write(BMP085_CTRL_ADDR, BMP085_PRES_ADDR);
 	}
 	
@@ -143,7 +152,7 @@ void PIOS_BMP085_StartADC(ConversionTypeTypeDef Type)
 
 
 /**
-* Read the ADC conversion value (once ADC converion has completed)
+* Read the ADC conversion value (once ADC conversion has completed)
 * \param[in] PresOrTemp BMP085_PRES_ADDR or BMP085_TEMP_ADDR
 * \return Raw ADC value
 */
@@ -152,68 +161,55 @@ void PIOS_BMP085_ReadADC(void)
 	uint8_t Data[3];
 	
 	/* Read and store the 16bit result */
-	if(CurrentRead == Temperature) {
+	if(CurrentRead == TemperatureConv) {
 		/* Read the temperature conversion */
 		PIOS_BMP085_Read(BMP085_ADC_MSB, Data, 2);
 		RawTemperature = ((Data[0] << 8) | Data[1]);
+
+		X1 = (RawTemperature - CalibData.AC6) * (CalibData.AC5 / pow(2, 15));
+		X2 = ((int32_t)CalibData.MC * pow(2, 11)) / (X1 + CalibData.MD);
+		B5 = X1 + X2;
+		Temperature = (B5 + 8) >> 4;
 	} else {
 		/* Read the pressure conversion */
 		PIOS_BMP085_Read(BMP085_ADC_MSB, Data, 3);
 		RawPressure = ((Data[0] << 16) | (Data[1] << 8) | Data[2]) >> (8 - BMP085_OVERSAMPLING);
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "UP = %d\r", RawPressure);
+
+		B6 = B5 - 4000;
+		X1 = (CalibData.B2 * (B6 * (B6 / pow(2, 12)))) / pow(2, 11);
+		X2 = CalibData.AC2 * (B6 / pow(2, 11));
+		X3 = X1 + X2;
+		B3 = (((int32_t)CalibData.AC1 * 4 + X3) << (BMP085_OVERSAMPLING + 2)) / 2;
+		X1 = (CalibData.AC3 * B6) / pow(2, 13);
+		X2 = (CalibData.B1 * (B6 * (B6 / pow(2, 12)))) / pow(2, 16);
+		X3 = ((X1 + X2) + 2) / 4;
+		B4 = (CalibData.AC4 * (uint32_t)(X3 + 32768)) / pow(2, 15);
+		B7 = (RawPressure - B3) * 50000;
+		P = B7 < 0x80000000 ? (B7 * 2) / B4 : (B7 / B4) * 2;
+		//PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "P = %d\r", P);
+		X1 = (P / pow(2, 8)) * (P / pow(2, 8));
+		//PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "X1 = %d\r", X1);
+		X1 = (X1 * 3038) / pow(2, 16);
+		//PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "X1 = %d\r", X1);
+		X2 = (-7357 * P) / pow(2, 16);
+		//PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "X2 = %d\r", X2);
+		Pressure = P + ((X1 + X2 + 3791) / pow(2, 4));
+
+		//Altitude = 44330 * (1 - (pow((101300/BMP085_P0), (1/5.255))));
+		//PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "Altitude = %u\r", Altitude);
 	}
 }
 
-
-/**
-* Get the converted raw values
-* \param[out] Pressure Pointer to the pressure variable
-* \param[out] Altitude Pointer to the altitude variable
-* \param[out] Temperature Pointer to the temperature variable
-*/
-void PIOS_BMP085_GetValues(uint16_t *Pressure, uint16_t *Altitude, uint16_t *Temperature)
+int16_t PIOS_BMP085_GetTemperature(void)
 {
-	uint16_t Pre = 0;
-	uint16_t Alt = 0;
-	uint16_t Temp = 0;
-
-	/* Straight from the datasheet */
-	int32_t X1, X2, X3, B3, B5, B6, P;
-	uint32_t B4, B7;
-
-	/* Convert Temperature */
-	X1 = (RawTemperature - CalibData.AC6) * (CalibData.AC5 >> 15);
-	X2 = ((int32_t) CalibData.MC << 11) / (X1 + CalibData.MD);
-	B5 = X1 + X2;
-	//Temperature = (B5 + 8) >> 4;
-	Temp = (B5 + 8) >> 4;
-	PIOS_COM_SendFormattedString(COM_DEBUG_USART, "UT = %u\r", RawTemperature);
-	PIOS_COM_SendFormattedString(COM_DEBUG_USART, "X1 = %u\r", X1);
-	PIOS_COM_SendFormattedString(COM_DEBUG_USART, "X2 = %u\r", X2);
-
-	/* Calculate Pressure */
-	B6 = B5 - 4000;
-	X1 = (CalibData.B2 * (B6 * B6 >> 12)) >> 11;
-	X2 = CalibData.AC2 * B6 >> 11;
-	X3 = X1 + X2;
-	B3 = ((int32_t) CalibData.AC1 * 4 + X3 + 2) >> 2;
-	X1 = CalibData.AC3 * B6 >> 13;
-	X2 = (CalibData.B1 * (B6 * B6 >> 12)) >> 16;
-	X3 = ((X1 + X2) + 2) >> 2;
-	B4 = (CalibData.AC4 * (uint32_t) (X3 + 32768)) >> 15;
-	B7 = (RawPressure - B3) * 50000;
-	P = B7 < 0x80000000 ? (B7 * 2) / B4 : (B7 / B4) * 2;
-	X1 = (P >> 8) * (P >> 8);
-	X1 = (X1 * 3038) >> 16;
-	X2 = (-7357 * P) >> 16;
-	//Pressure = P + ((X1 + X2 + 3791) >> 4);
-	Pre = P + ((X1 + X2 + 3791) >> 4);
-	
-	/* Calculate Altitude */
-	//Altitude = (uint16_t) 44330 * (1 - (pow((*Pressure/BMP085_P0), (1/5.255))));
-
-	PIOS_COM_SendFormattedString(COM_DEBUG_USART, "T = %u P = %u A = %u\r", Temp, Pre, Alt);
+	return Temperature;
 }
 
+int32_t PIOS_BMP085_GetPressure(void)
+{
+	return Pressure;
+}
 
 /**
 * Reads one or more bytes into a buffer
@@ -299,7 +295,8 @@ void EXTI15_10_IRQHandler(void)
 {
 	if(EXTI_GetITStatus(PIOS_BMP085_EOC_EXTI_LINE) != RESET) {
 		/* Read the ADC Value */
-		PIOS_BMP085_ReadADC();
+		//PIOS_BMP085_ReadADC();
+		xSemaphoreGiveFromISR(PIOS_BMP085_EOC, &xHigherPriorityTaskWoken);
 		
 		/* Clear the EOC EXTI line pending bit */
 		EXTI_ClearITPendingBit(PIOS_BMP085_EOC_EXTI_LINE);

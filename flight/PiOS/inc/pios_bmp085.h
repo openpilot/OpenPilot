@@ -31,11 +31,10 @@
 #define BMP085_CALIB_ADDR		0xAA
 #define BMP085_CALIB_LEN		22
 #define BMP085_CTRL_ADDR		0xF4
-#define BMP085_OVERSAMPLING		0
+#define BMP085_OVERSAMPLING		2
 #define BMP085_PRES_ADDR		(0x34 + (BMP085_OVERSAMPLING << 6))
 #define BMP085_TEMP_ADDR		0x2E
 #define BMP085_ADC_MSB			0xF6
-#define BMP085_ADC_LSB			0xF7
 #define BMP085_P0			101325
 
 /* Local Types */
@@ -54,16 +53,20 @@ typedef struct {
 } BMP085CalibDataTypeDef;
 
 typedef enum {
-	Pressure,
-	Temperature
+	PressureConv,
+	TemperatureConv
 } ConversionTypeTypeDef;
 
+/* Global Variables */
+extern xSemaphoreHandle PIOS_BMP085_EOC;
+
 /* Public Functions */
-void PIOS_BMP085_Init(void);
-void PIOS_BMP085_StartADC(ConversionTypeTypeDef Type);
-void PIOS_BMP085_ReadADC(void);
-void PIOS_BMP085_GetValues(uint16_t *Pressure, uint16_t *Altitude, uint16_t *Temperature);
-int32_t PIOS_BMP085_Read(uint8_t address, uint8_t *buffer, uint8_t len);
-int32_t PIOS_BMP085_Write(uint8_t address, uint8_t buffer);
+extern void PIOS_BMP085_Init(void);
+extern void PIOS_BMP085_StartADC(ConversionTypeTypeDef Type);
+extern void PIOS_BMP085_ReadADC(void);
+extern int16_t PIOS_BMP085_GetTemperature(void);
+extern int32_t PIOS_BMP085_GetPressure(void);
+extern int32_t PIOS_BMP085_Read(uint8_t address, uint8_t *buffer, uint8_t len);
+extern int32_t PIOS_BMP085_Write(uint8_t address, uint8_t buffer);
 
 #endif /* PIOS_BMP085_H */

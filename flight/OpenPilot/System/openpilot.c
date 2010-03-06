@@ -33,9 +33,6 @@
 /* Global Variables */
 
 /* Local Variables */
-#define STRING_MAX 1024
-static uint8_t line_buffer[STRING_MAX];
-static uint16_t line_ix;
 static uint8_t sdcard_available;
 
 /* Function Prototypes */
@@ -105,7 +102,7 @@ int main()
 
 	/* Create a FreeRTOS task */
 	xTaskCreate(TaskTick, (signed portCHAR *)"Test", configMINIMAL_STACK_SIZE , NULL, 1, NULL);
-	xTaskCreate(TaskTesting, (signed portCHAR *)"TaskTesting", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
+	xTaskCreate(TaskTesting, (signed portCHAR *)"TaskTesting", configMINIMAL_STACK_SIZE , NULL, 1, NULL);
 	//xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
 	//xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
 
@@ -143,16 +140,29 @@ static void TaskTick(void *pvParameters)
 static void TaskTesting(void *pvParameters)
 {
 	portTickType xDelay = 1000 / portTICK_RATE_MS;
-	portTickType xTimeout = 1 / portTICK_RATE_MS;
+	portTickType xTimeout = 10 / portTICK_RATE_MS;
 
 	for(;;)
 	{
+		/* This blocks the task until the BMP085 EOC */
+		PIOS_BMP085_StartADC(TemperatureConv);
+		xSemaphoreTake(PIOS_BMP085_EOC, xTimeout);
+		PIOS_BMP085_ReadADC();
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "Temp: %u\r", PIOS_BMP085_GetTemperature());
+
+		PIOS_BMP085_StartADC(PressureConv);
+		xSemaphoreTake(PIOS_BMP085_EOC, xTimeout);
+		PIOS_BMP085_ReadADC();
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "Pressure: %u\r", PIOS_BMP085_GetPressure());
+
+		vTaskDelay(xDelay);
+
 		/* This blocks the task until there is something on the buffer */
-		xSemaphoreTake(PIOS_USART1_Buffer, portMAX_DELAY);
+		/*xSemaphoreTake(PIOS_USART1_Buffer, portMAX_DELAY);
 		int32_t len = PIOS_COM_ReceiveBufferUsed(COM_USART1);
 		for(int32_t i = 0; i < len; i++) {
 			PIOS_COM_SendFormattedString(COM_DEBUG_USART, ">%c\r", PIOS_COM_ReceiveBuffer(COM_USART1));
-		}
+		}*/
 
 		//int32_t state = PIOS_USB_CableConnected();
 		//PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "State: %d\r", state);

@@ -101,6 +101,8 @@ int32_t PIOS_USB_HID_Init(uint32_t mode)
 		return -1;
 	}
 
+	vSemaphoreCreateBinary(PIOS_HID_Buffer);
+
 	return 0; /* No error */
 }
 

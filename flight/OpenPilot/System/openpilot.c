@@ -142,7 +142,7 @@ static void TaskTick(void *pvParameters)
 
 static void TaskTesting(void *pvParameters)
 {
-	portTickType xDelay = 1000 / portTICK_RATE_MS;
+	portTickType xDelay = 500 / portTICK_RATE_MS;
 	portTickType xTimeout = 10 / portTICK_RATE_MS;
 
 	for(;;)

@@ -55,11 +55,10 @@ static portBASE_TYPE xHigherPriorityTaskWoken;
 /* Straight from the datasheet */
 static int32_t X1, X2, X3, B3, B5, B6, P;
 static uint32_t B4, B7;
-static uint16_t RawTemperature;
-static uint32_t RawPressure;
-static uint32_t Pressure;
-static uint16_t Temperature;
-static uint32_t Altitude;
+static volatile uint16_t RawTemperature;
+static volatile uint32_t RawPressure;
+static volatile uint32_t Pressure;
+static volatile uint16_t Temperature;
 
 
 /**
@@ -114,20 +113,6 @@ void PIOS_BMP085_Init(void)
 	CalibData.MB =  (Data[16] << 8) | Data[17];
 	CalibData.MC =  (Data[18] << 8) | Data[19];
 	CalibData.MD =  (Data[20] << 8) | Data[21];
-
-	PIOS_COM_SendFormattedString(COM_DEBUG_USART, "AC1 = %d\r", CalibData.AC1);
-	PIOS_COM_SendFormattedString(COM_DEBUG_USART, "AC2 = %d\r", CalibData.AC2);
-	PIOS_COM_SendFormattedString(COM_DEBUG_USART, "AC3 = %d\r", CalibData.AC3);
-	PIOS_COM_SendFormattedString(COM_DEBUG_USART, "AC4 = %d\r", CalibData.AC4);
-	PIOS_COM_SendFormattedString(COM_DEBUG_USART, "AC5 = %d\r", CalibData.AC5);
-	PIOS_COM_SendFormattedString(COM_DEBUG_USART, "AC6 = %d\r", CalibData.AC6);
-
-	PIOS_COM_SendFormattedString(COM_DEBUG_USART, "B1 = %d\r", CalibData.B1);
-	PIOS_COM_SendFormattedString(COM_DEBUG_USART, "B2 = %d\r", CalibData.B2);
-
-	PIOS_COM_SendFormattedString(COM_DEBUG_USART, "MB = %d\r", CalibData.MB);
-	PIOS_COM_SendFormattedString(COM_DEBUG_USART, "MC = %d\r", CalibData.MC);
-	PIOS_COM_SendFormattedString(COM_DEBUG_USART, "MD = %d\r", CalibData.MD);
 
 	vSemaphoreCreateBinary(PIOS_BMP085_EOC);
 }
@@ -194,9 +179,6 @@ void PIOS_BMP085_ReadADC(void)
 		X1 = (X1 * 3038) >> 16;
 		X2 = (-7357 * P) >> 16;
 		Pressure = P + ((X1 + X2 + 3791) >> 4);
-
-		//Altitude = 44330 * (1 - (pow((Pressure/BMP085_P0), (1/5.255))));
-		//PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "Altitude = %u\r", Altitude);
 	}
 }
 

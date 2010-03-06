@@ -51,8 +51,8 @@ ConversionTypeTypeDef CurrentRead;
 
 /* Local Variables */
 static BMP085CalibDataTypeDef CalibData;
-static uint16_t RawPressure;
-static uint32_t RawTemperature;
+static volatile uint32_t RawPressure;
+static volatile uint32_t RawTemperature;
 
 
 /**
@@ -78,14 +78,14 @@ void PIOS_BMP085_Init(void)
 	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
 	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	//EXTI_Init(&EXTI_InitStructure);
+	EXTI_Init(&EXTI_InitStructure);
 	
 	/* Enable and set EOC EXTI Interrupt to the lowest priority */
 	NVIC_InitStructure.NVIC_IRQChannel = PIOS_BMP085_EOC_IRQn;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 15;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 15;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	//NVIC_Init(&NVIC_InitStructure);
+	NVIC_Init(&NVIC_InitStructure);
 	
 	/* Read all 22 bytes of calibration data in one transfer, this is a very optimised way of doing things */
 	uint8_t Data[BMP085_CALIB_LEN];
@@ -172,15 +172,23 @@ void PIOS_BMP085_ReadADC(void)
 */
 void PIOS_BMP085_GetValues(uint16_t *Pressure, uint16_t *Altitude, uint16_t *Temperature)
 {
+	uint16_t Pre = 0;
+	uint16_t Alt = 0;
+	uint16_t Temp = 0;
+
 	/* Straight from the datasheet */
 	int32_t X1, X2, X3, B3, B5, B6, P;
 	uint32_t B4, B7;
 
 	/* Convert Temperature */
-	X1 = (RawTemperature - CalibData.AC6) * CalibData.AC5 >> 15;
+	X1 = (RawTemperature - CalibData.AC6) * (CalibData.AC5 >> 15);
 	X2 = ((int32_t) CalibData.MC << 11) / (X1 + CalibData.MD);
 	B5 = X1 + X2;
-	*Temperature = (B5 + 8) >> 4;
+	//Temperature = (B5 + 8) >> 4;
+	Temp = (B5 + 8) >> 4;
+	PIOS_COM_SendFormattedString(COM_DEBUG_USART, "UT = %u\r", RawTemperature);
+	PIOS_COM_SendFormattedString(COM_DEBUG_USART, "X1 = %u\r", X1);
+	PIOS_COM_SendFormattedString(COM_DEBUG_USART, "X2 = %u\r", X2);
 
 	/* Calculate Pressure */
 	B6 = B5 - 4000;
@@ -192,15 +200,18 @@ void PIOS_BMP085_GetValues(uint16_t *Pressure, uint16_t *Altitude, uint16_t *Tem
 	X2 = (CalibData.B1 * (B6 * B6 >> 12)) >> 16;
 	X3 = ((X1 + X2) + 2) >> 2;
 	B4 = (CalibData.AC4 * (uint32_t) (X3 + 32768)) >> 15;
-	B7 = ((uint32_t) RawPressure - B3) * 50000;
+	B7 = (RawPressure - B3) * 50000;
 	P = B7 < 0x80000000 ? (B7 * 2) / B4 : (B7 / B4) * 2;
 	X1 = (P >> 8) * (P >> 8);
 	X1 = (X1 * 3038) >> 16;
 	X2 = (-7357 * P) >> 16;
-	*Pressure = P + ((X1 + X2 + 3791) >> 4);
+	//Pressure = P + ((X1 + X2 + 3791) >> 4);
+	Pre = P + ((X1 + X2 + 3791) >> 4);
 	
 	/* Calculate Altitude */
-	*Altitude = (uint16_t) 44330 * (1 - (pow((*Pressure/BMP085_P0), (1/5.255))));
+	//Altitude = (uint16_t) 44330 * (1 - (pow((*Pressure/BMP085_P0), (1/5.255))));
+
+	PIOS_COM_SendFormattedString(COM_DEBUG_USART, "T = %u P = %u A = %u\r", Temp, Pre, Alt);
 }
 
 
@@ -287,17 +298,11 @@ int32_t PIOS_BMP085_Write(uint8_t address, uint8_t buffer)
 void EXTI15_10_IRQHandler(void)
 {
 	if(EXTI_GetITStatus(PIOS_BMP085_EOC_EXTI_LINE) != RESET) {
-		/* Disable interrupts */
-		PIOS_IRQ_Disable();
-		
 		/* Read the ADC Value */
 		PIOS_BMP085_ReadADC();
 		
 		/* Clear the EOC EXTI line pending bit */
 		EXTI_ClearITPendingBit(PIOS_BMP085_EOC_EXTI_LINE);
-		
-		/* Enable interrupts */
-		PIOS_IRQ_Enable();
 	}
 }
 

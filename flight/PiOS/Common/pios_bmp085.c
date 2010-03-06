@@ -159,6 +159,9 @@ void PIOS_BMP085_StartADC(ConversionTypeTypeDef Type)
 void PIOS_BMP085_ReadADC(void)
 {
 	uint8_t Data[3];
+	Data[0] = 0;
+	Data[1] = 0;
+	Data[2] = 0;
 	
 	/* Read and store the 16bit result */
 	if(CurrentRead == TemperatureConv) {
@@ -166,37 +169,33 @@ void PIOS_BMP085_ReadADC(void)
 		PIOS_BMP085_Read(BMP085_ADC_MSB, Data, 2);
 		RawTemperature = ((Data[0] << 8) | Data[1]);
 
-		X1 = (RawTemperature - CalibData.AC6) * (CalibData.AC5 / pow(2, 15));
-		X2 = ((int32_t)CalibData.MC * pow(2, 11)) / (X1 + CalibData.MD);
+		X1 = (RawTemperature - CalibData.AC6) * CalibData.AC5 >> 15;
+		X2 = ((int32_t)CalibData.MC << 11) / (X1 + CalibData.MD);
 		B5 = X1 + X2;
 		Temperature = (B5 + 8) >> 4;
 	} else {
 		/* Read the pressure conversion */
 		PIOS_BMP085_Read(BMP085_ADC_MSB, Data, 3);
 		RawPressure = ((Data[0] << 16) | (Data[1] << 8) | Data[2]) >> (8 - BMP085_OVERSAMPLING);
-		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "UP = %d\r", RawPressure);
 
 		B6 = B5 - 4000;
-		X1 = (CalibData.B2 * (B6 * (B6 / pow(2, 12)))) / pow(2, 11);
-		X2 = CalibData.AC2 * (B6 / pow(2, 11));
+		X1 = (CalibData.B2 * (B6 * B6 >> 12)) >> 11;
+		X2 = CalibData.AC2 * B6 >> 11;
 		X3 = X1 + X2;
-		B3 = (((int32_t)CalibData.AC1 * 4 + X3) << (BMP085_OVERSAMPLING + 2)) / 2;
-		X1 = (CalibData.AC3 * B6) / pow(2, 13);
-		X2 = (CalibData.B1 * (B6 * (B6 / pow(2, 12)))) / pow(2, 16);
-		X3 = ((X1 + X2) + 2) / 4;
-		B4 = (CalibData.AC4 * (uint32_t)(X3 + 32768)) / pow(2, 15);
-		B7 = (RawPressure - B3) * 50000;
+		B3 = ((((int32_t) CalibData.AC1 * 4 + X3) << BMP085_OVERSAMPLING) + 2) >> 2;
+		X1 = CalibData.AC3 * B6 >> 13;
+		X2 = (CalibData.B1 * (B6 * B6 >> 12)) >> 16;
+		X3 = ((X1 + X2) + 2) >> 2;
+		B4 = (CalibData.AC4 * (uint32_t) (X3 + 32768)) >> 15;
+		B7 = ((uint32_t) RawPressure - B3) * (50000 >> BMP085_OVERSAMPLING);
 		P = B7 < 0x80000000 ? (B7 * 2) / B4 : (B7 / B4) * 2;
-		//PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "P = %d\r", P);
-		X1 = (P / pow(2, 8)) * (P / pow(2, 8));
-		//PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "X1 = %d\r", X1);
-		X1 = (X1 * 3038) / pow(2, 16);
-		//PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "X1 = %d\r", X1);
-		X2 = (-7357 * P) / pow(2, 16);
-		//PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "X2 = %d\r", X2);
-		Pressure = P + ((X1 + X2 + 3791) / pow(2, 4));
 
-		//Altitude = 44330 * (1 - (pow((101300/BMP085_P0), (1/5.255))));
+		X1 = (P >> 8) * (P >> 8);
+		X1 = (X1 * 3038) >> 16;
+		X2 = (-7357 * P) >> 16;
+		Pressure = P + ((X1 + X2 + 3791) >> 4);
+
+		//Altitude = 44330 * (1 - (pow((Pressure/BMP085_P0), (1/5.255))));
 		//PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "Altitude = %u\r", Altitude);
 	}
 }

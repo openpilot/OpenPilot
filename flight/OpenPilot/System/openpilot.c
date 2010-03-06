@@ -34,6 +34,9 @@
 
 /* Local Variables */
 static uint8_t sdcard_available;
+FILEINFO File;
+char Buffer[1024];
+uint32_t Cache;
 
 /* Function Prototypes */
 static void TaskTick(void *pvParameters);
@@ -102,7 +105,7 @@ int main()
 
 	/* Create a FreeRTOS task */
 	xTaskCreate(TaskTick, (signed portCHAR *)"Test", configMINIMAL_STACK_SIZE , NULL, 1, NULL);
-	xTaskCreate(TaskTesting, (signed portCHAR *)"TaskTesting", configMINIMAL_STACK_SIZE , NULL, 1, NULL);
+	xTaskCreate(TaskTesting, (signed portCHAR *)"TaskTesting", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
 	//xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
 	//xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
 
@@ -148,12 +151,12 @@ static void TaskTesting(void *pvParameters)
 		PIOS_BMP085_StartADC(TemperatureConv);
 		xSemaphoreTake(PIOS_BMP085_EOC, xTimeout);
 		PIOS_BMP085_ReadADC();
-		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "Temp: %u\r", PIOS_BMP085_GetTemperature());
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u\r", PIOS_BMP085_GetTemperature());
 
 		PIOS_BMP085_StartADC(PressureConv);
 		xSemaphoreTake(PIOS_BMP085_EOC, xTimeout);
 		PIOS_BMP085_ReadADC();
-		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "Pressure: %u\r", PIOS_BMP085_GetPressure());
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u\r", PIOS_BMP085_GetPressure());
 
 		vTaskDelay(xDelay);
 

@@ -3,7 +3,7 @@
  *
  * @file       openpilot.c 
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Sets up ans runs main OpenPilot tasks.
+ * @brief      Sets up and runs main OpenPilot tasks.
  * @see        The GNU Public License (GPL) Version 3
  * 
  *****************************************************************************/
@@ -42,7 +42,6 @@ static uint8_t sdcard_available;
 static void TaskTick(void *pvParameters);
 static void TaskTesting(void *pvParameters);
 static void TaskServos(void *pvParameters);
-static void TaskHooks(void *pvParameters);
 static void TaskSDCard(void *pvParameters);
 int32_t CONSOLE_Parse(COMPortTypeDef port, char c);
 void OP_ADC_NotifyChange(uint32_t pin, uint32_t pin_value);
@@ -98,20 +97,16 @@ int main()
 
 	PIOS_USB_Init(0);
 
-	PIOS_COM_ReceiveCallbackInit(CONSOLE_Parse);
-
-	//PIOS_BMP085_Init();
-
-	/* Initialise OpenPilot application */
-//	OpenPilotInit();
-
 	PIOS_I2C_Init();
+
+	PIOS_BMP085_Init();
+
+	//PIOS_Servo_SetHz(50, 500);
 
 	/* Create a FreeRTOS task */
 	xTaskCreate(TaskTick, (signed portCHAR *)"Test", configMINIMAL_STACK_SIZE , NULL, 1, NULL);
 	xTaskCreate(TaskTesting, (signed portCHAR *)"TaskTesting", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
 	//xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
-	xTaskCreate(TaskHooks, (signed portCHAR *)"Hooks", configMINIMAL_STACK_SIZE, NULL, PRIORITY_TASK_HOOKS, NULL);
 	//xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
 
 	/* Start the FreeRTOS scheduler */
@@ -119,44 +114,15 @@ int main()
 
 	/* If all is well we will never reach here as the scheduler will now be running. */
 	/* If we do get here, it will most likely be because we ran out of heap space. */
-	return 0;
-}
-
-int32_t CONSOLE_Parse(COMPortTypeDef port, char c)
-{
-	if(port == COM_USB_HID) {
-		PIOS_COM_SendChar(COM_DEBUG_USART, c);
-
-		return 0;
+	PIOS_LED_Off(LED1);
+	PIOS_LED_Off(LED2);
+	for(;;) {
+		PIOS_LED_Toggle(LED1);
+		PIOS_LED_Toggle(LED2);
+		PIOS_DELAY_WaitmS(100);
 	}
 
-	if(c == '\r') {
-		/* Ignore */
-	} else if(c == '\n') {
-		PIOS_COM_SendFormattedString(COM_DEBUG_USART, "String: %s\n", line_buffer);
-		line_ix = 0;
-	} else if(line_ix < (STRING_MAX - 1)) {
-		line_buffer[line_ix++] = c;
-		line_buffer[line_ix] = 0;
-	}
-
-	/* No error */
 	return 0;
-}
-
-void OP_ADC_NotifyChange(uint32_t pin, uint32_t pin_value)
-{
-	/* HW v1.0 GPS/IR Connector
-	0000000
-	|||||||-- 5V
-	||||||--- TX (RXD on FDTI)
-	|||||---- RX (TXD on FDTI)
-	||||----- ADC PIN 3 (PC0)
-	|||------ ADC PIN 0 (PC1)
-	||------- ADC PIN 1 (PC2)
-	|-------- GND
-	*/
-
 }
 
 static void TaskTick(void *pvParameters)
@@ -170,32 +136,58 @@ static void TaskTick(void *pvParameters)
 	for(;;)
 	{
 		PIOS_LED_Toggle(LED1);
-
-		// I2C Test: communicate with external PCF8570 ram chip
-		{
-			uint8_t buf[20];
-			PIOS_I2C_Transfer(I2C_Write, 0x50<<1, (uint8_t*)"\x0\x10\x11\x12", 4);
-			PIOS_I2C_Transfer(I2C_Write_WithoutStop, 0x50<<1, (uint8_t*)"\x0", 1);
-			PIOS_I2C_Transfer(I2C_Read, 0x50<<1, buf, 3);
-		}
-
-
-		vTaskDelayUntil(&xLastExecutionTime, 100 / portTICK_RATE_MS);
+		vTaskDelayUntil(&xLastExecutionTime, 1000 / portTICK_RATE_MS);
 	}
 }
 
 static void TaskTesting(void *pvParameters)
 {
-	portTickType xDelay = 1000 / portTICK_RATE_MS;;
-
-
+	portTickType xDelay = 1000 / portTICK_RATE_MS;
+	portTickType xTimeout = 1 / portTICK_RATE_MS;
 
 	for(;;)
 	{
-		int32_t state = PIOS_USB_CableConnected();
-		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "State: %d\r", state);
+		/* This blocks the task until there is something on the buffer */
+		xSemaphoreTake(PIOS_USART1_Buffer, portMAX_DELAY);
+		int32_t len = PIOS_COM_ReceiveBufferUsed(COM_USART1);
+		for(int32_t i = 0; i < len; i++) {
+			PIOS_COM_SendFormattedString(COM_DEBUG_USART, ">%c\r", PIOS_COM_ReceiveBuffer(COM_USART1));
+		}
 
-		vTaskDelay(xDelay);
+		//int32_t state = PIOS_USB_CableConnected();
+		//PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "State: %d\r", state);
+
+		//PIOS_I2C_Transfer(I2C_Write_WithoutStop, 0x57, (uint8_t *)50, 1);
+
+		/*uint8_t buffer[2];
+		int32_t err1 = PIOS_BMP085_Write(0xF4, 0x2E);
+		PIOS_DELAY_WaitmS(5);
+		int32_t err2 = PIOS_BMP085_Read(0xF6, buffer, 2);
+
+		PIOS_COM_SendFormattedString(COM_DEBUG_USART, "err1 = %d err2 = %d\r", err1, err2);
+		PIOS_COM_SendFormattedString(COM_DEBUG_USART, "0xF6 = %u 0xF7 = %u\r", buffer[0], buffer[1]);
+
+		PIOS_BMP085_StartADC(Temperature);
+		//PIOS_DELAY_WaitmS(50);
+		//PIOS_BMP085_StartADC(Pressure);
+		//PIOS_DELAY_WaitmS(50);
+
+		PIOS_DELAY_WaitmS(50);
+
+		uint16_t P;
+		uint16_t A;
+		uint16_t T;
+		PIOS_BMP085_GetValues(P, A, T);*/
+
+
+		/* Test ADC pins */
+		//temp = ((1.43 - ((Vsense / 4096) * 3.3)) / 4.3) + 25;
+		//uint32_t vsense = PIOS_ADC_PinGet(0);
+		//uint32_t Temp = (1.42 -  vsense * 3.3 / 4096) * 1000 / 4.35 + 25;
+		//PIOS_COM_SendFormattedString(COM_DEBUG_USART, "Temp: %d, CS_I: %d, CS_V: %d, 5v: %d\r", PIOS_ADC_PinGet(0), PIOS_ADC_PinGet(1), PIOS_ADC_PinGet(2), PIOS_ADC_PinGet(3));
+		//PIOS_COM_SendFormattedString(COM_DEBUG_USART, "AUX1?: %d, AUX2?: %d, AUX3?: %d\r", PIOS_ADC_PinGet(4), PIOS_ADC_PinGet(5), PIOS_ADC_PinGet(6));
+
+		//vTaskDelay(xDelay);
 	}
 }
 
@@ -207,8 +199,6 @@ static void TaskServos(void *pvParameters)
 	/* Used to test servos, cycles all servos from one side to the other */
 	for(;;) {
 		xDelay = 250 / portTICK_RATE_MS;
-		PIOS_Servo_Set(0, 2000);
-		vTaskDelay(xDelay);
 		PIOS_Servo_Set(1, 2000);
 		vTaskDelay(xDelay);
 		PIOS_Servo_Set(2, 2000);
@@ -223,7 +213,11 @@ static void TaskServos(void *pvParameters)
 		vTaskDelay(xDelay);
 		PIOS_Servo_Set(7, 2000);
 		vTaskDelay(xDelay);
+		PIOS_Servo_Set(8, 2000);
+		vTaskDelay(xDelay);
 
+		PIOS_Servo_Set(8, 1000);
+		vTaskDelay(xDelay);
 		PIOS_Servo_Set(7, 1000);
 		vTaskDelay(xDelay);
 		PIOS_Servo_Set(6, 1000);
@@ -238,12 +232,9 @@ static void TaskServos(void *pvParameters)
 		vTaskDelay(xDelay);
 		PIOS_Servo_Set(1, 1000);
 		vTaskDelay(xDelay);
-		PIOS_Servo_Set(0, 1000);
-		vTaskDelay(xDelay);
 
 		xDelay = 1 / portTICK_RATE_MS;
 		for(int i = 1000; i < 2000; i++) {
-			PIOS_Servo_Set(0, i);
 			PIOS_Servo_Set(1, i);
 			PIOS_Servo_Set(2, i);
 			PIOS_Servo_Set(3, i);
@@ -251,10 +242,10 @@ static void TaskServos(void *pvParameters)
 			PIOS_Servo_Set(5, i);
 			PIOS_Servo_Set(6, i);
 			PIOS_Servo_Set(7, i);
+			PIOS_Servo_Set(8, i);
 			vTaskDelay(xDelay);
 		}
 		for(int i = 2000; i > 1000; i--) {
-			PIOS_Servo_Set(0, i);
 			PIOS_Servo_Set(1, i);
 			PIOS_Servo_Set(2, i);
 			PIOS_Servo_Set(3, i);
@@ -262,32 +253,9 @@ static void TaskServos(void *pvParameters)
 			PIOS_Servo_Set(5, i);
 			PIOS_Servo_Set(6, i);
 			PIOS_Servo_Set(7, i);
+			PIOS_Servo_Set(8, i);
 			vTaskDelay(xDelay);
 		}
-	}
-}
-
-static void TaskHooks(void *pvParameters)
-{
-	portTickType xLastExecutionTime;
-
-	// Initialise the xLastExecutionTime variable on task entry
-	xLastExecutionTime = xTaskGetTickCount();
-
-	for(;;) {
-		vTaskDelayUntil(&xLastExecutionTime, 1 / portTICK_RATE_MS);
-
-		/* Skip delay gap if we had to wait for more than 5 ticks to avoid */
-		/* unnecessary repeats until xLastExecutionTime reached xTaskGetTickCount() again */
-		portTickType xCurrentTickCount = xTaskGetTickCount();
-		if(xLastExecutionTime < (xCurrentTickCount - 5))
-		xLastExecutionTime = xCurrentTickCount;
-
-		/* Check for incoming COM messages */
-		PIOS_COM_ReceiveHandler();
-
-		/* Check for incoming ADC notifications */
-		PIOS_ADC_Handler(OP_ADC_NotifyChange);
 	}
 }
 

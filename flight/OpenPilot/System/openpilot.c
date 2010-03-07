@@ -93,7 +93,7 @@ int main()
 	/* Analog to digital converter initialise */
 	//PIOS_ADC_Init();
 
-	//PIOS_PWM_Init();
+	PIOS_PWM_Init();
 
 	PIOS_USB_Init(0);
 
@@ -148,6 +148,7 @@ static void TaskTesting(void *pvParameters)
 	for(;;)
 	{
 		/* This blocks the task until the BMP085 EOC */
+		/*
 		PIOS_BMP085_StartADC(TemperatureConv);
 		xSemaphoreTake(PIOS_BMP085_EOC, xTimeout);
 		PIOS_BMP085_ReadADC();
@@ -157,8 +158,9 @@ static void TaskTesting(void *pvParameters)
 		xSemaphoreTake(PIOS_BMP085_EOC, xTimeout);
 		PIOS_BMP085_ReadADC();
 		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u\r", PIOS_BMP085_GetPressure());
+		*/
 
-		vTaskDelay(xDelay);
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u uS\r", PIOS_PWM_Get());
 
 		/* This blocks the task until there is something on the buffer */
 		/*xSemaphoreTake(PIOS_USART1_Buffer, portMAX_DELAY);
@@ -200,7 +202,7 @@ static void TaskTesting(void *pvParameters)
 		//PIOS_COM_SendFormattedString(COM_DEBUG_USART, "Temp: %d, CS_I: %d, CS_V: %d, 5v: %d\r", PIOS_ADC_PinGet(0), PIOS_ADC_PinGet(1), PIOS_ADC_PinGet(2), PIOS_ADC_PinGet(3));
 		//PIOS_COM_SendFormattedString(COM_DEBUG_USART, "AUX1?: %d, AUX2?: %d, AUX3?: %d\r", PIOS_ADC_PinGet(4), PIOS_ADC_PinGet(5), PIOS_ADC_PinGet(6));
 
-		//vTaskDelay(xDelay);
+		vTaskDelay(xDelay);
 	}
 }
 

@@ -32,16 +32,16 @@
 #if !defined(PIOS_DONT_USE_PWM)
 
 /* Local Variables */
-volatile uint16_t IC3Value = 0;
-volatile uint16_t DutyCycle = 0;
-volatile uint32_t Frequency = 0;
+static volatile uint16_t ic3_readvalue1 = 0, ic3_readvalue2 = 0;
+static volatile uint16_t capture_number = 0;
+static volatile uint32_t CAPTURE = 0;
+static volatile uint32_t TIM3_FREQ = 0;
 
 /**
 * Initialises all the LED's
 */
 void PIOS_PWM_Init(void)
 {
-
 	/* Setup RCC */
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
 
@@ -53,43 +53,39 @@ void PIOS_PWM_Init(void)
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 
+	GPIO_PinRemapConfig(GPIO_PartialRemap_TIM3, ENABLE);
 
-	/* TIM3 channel 2 pin (PA.01) configuration */
 	GPIO_InitTypeDef GPIO_InitStructure;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;//GPIO_Mode_AF_OD
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
 
-	GPIO_InitStructure.GPIO_Pin = RECEIVER1_PIN;
-	GPIO_Init(RECEIVER1_GPIO_PORT, &GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = RECEIVER8_PIN;
+	GPIO_Init(RECEIVER8_GPIO_PORT, &GPIO_InitStructure);
 
-	/* TIM3 configuration: PWM Input mode ------------------------
-	The Rising edge is used as active edge,
-	The TIM3 CCR2 is used to compute the frequency value
-	The TIM3 CCR1 is used to compute the duty cycle value
-	------------------------------------------------------------ */
-	TIM_ICInitTypeDef  TIM_ICInitStructure;
-	TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Falling;
+	TIM_ICInitTypeDef TIM_ICInitStructure;
+	TIM_ICInitStructure.TIM_Channel = RECEIVER8_CH;
+	TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
 	TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
 	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
 	TIM_ICInitStructure.TIM_ICFilter = 0x0;
 
-	TIM_ICInitStructure.TIM_Channel = RECEIVER1_CH;
-	TIM_PWMIConfig(TIM3, &TIM_ICInitStructure);
+	TIM_ICInitStructure.TIM_Channel = RECEIVER8_CH;
+	TIM_ICInit(RECEIVER8_TIM_PORT, &TIM_ICInitStructure);
 
-	/* Select the TIM3 Input Trigger: TI2FP2 */
-	TIM_SelectInputTrigger(TIM3, TIM_TS_TI2FP2);
-
-	/* Select the slave Mode: Reset Mode */
-	TIM_SelectSlaveMode(TIM3, TIM_SlaveMode_Reset);
-
-	/* Enable the Master/Slave Mode */
-	TIM_SelectMasterSlaveMode(TIM3, TIM_MasterSlaveMode_Enable);
+	TIM_InternalClockConfig(RECEIVER8_TIM_PORT);
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
+	TIM_TimeBaseStructure.TIM_Period = 0xFFFF;
+	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;//17; // fCK_PSC / (17 + 1) 1ms = 4000
+	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
+	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+	TIM_TimeBaseInit(RECEIVER8_TIM_PORT, &TIM_TimeBaseStructure);
 
 	/* TIM enable counter */
-	TIM_Cmd(TIM3, ENABLE);
+	TIM_Cmd(RECEIVER8_TIM_PORT, ENABLE);
 
-	/* Enable the CC3 Interrupt Request */
-	TIM_ITConfig(TIM3, TIM_IT_CC3, ENABLE);
+	/* Enable the CC2 Interrupt Request */
+	TIM_ITConfig(RECEIVER8_TIM_PORT, TIM_IT_CC2, ENABLE);
 }
 
 /**
@@ -97,25 +93,53 @@ void PIOS_PWM_Init(void)
 */
 void TIM3_IRQHandler(void)
 {
-	/* Clear TIM3 Capture compare interrupt pending bit */
-	TIM_ClearITPendingBit(TIM3, TIM_IT_CC3);
+	if(TIM_GetITStatus(RECEIVER8_TIM_PORT, TIM_IT_CC2) == SET) {
+		/* Clear TIM3 Capture compare interrupt pending bit */
+		TIM_ClearITPendingBit(RECEIVER8_TIM_PORT, TIM_IT_CC2);
 
-	/* Get the Input Capture value */
-	IC3Value = TIM_GetCapture3(TIM3);
+		if(capture_number == 0) {
+			/* Get the Input Capture value */
+			ic3_readvalue1 = TIM_GetCapture2(RECEIVER8_TIM_PORT);
+			capture_number = 1;
 
-#if 0
-	if (IC3Value != 0)
-	{
-		/* Duty cycle computation */
-		DutyCycle = (TIM_GetCapture1(TIM3) * 100) / IC3Value;
+			TIM_ICInitTypeDef TIM_ICInitStructure;
+			TIM_ICInitStructure.TIM_Channel = RECEIVER8_CH;
+			TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Falling;
+			TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
+			TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
+			TIM_ICInitStructure.TIM_ICFilter = 0x0;
+			TIM_ICInitStructure.TIM_Channel = RECEIVER8_CH;
+			TIM_ICInit(RECEIVER8_TIM_PORT, &TIM_ICInitStructure);
 
-		/* Frequency computation */
-		Frequency = 72000000 / IC3Value;
-	} else {
-		DutyCycle = 0;
-		Frequency = 0;
+		} else if(capture_number == 1) {
+			/* Get the Input Capture value */
+			ic3_readvalue2 = TIM_GetCapture2(RECEIVER8_TIM_PORT);
+
+			TIM_ICInitTypeDef TIM_ICInitStructure;
+			TIM_ICInitStructure.TIM_Channel = RECEIVER8_CH;
+			TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
+			TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
+			TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
+			TIM_ICInitStructure.TIM_ICFilter = 0x0;
+			TIM_ICInitStructure.TIM_Channel = RECEIVER8_CH;
+			TIM_ICInit(RECEIVER8_TIM_PORT, &TIM_ICInitStructure);
+
+			/* Capture computation */
+			if (ic3_readvalue2 > ic3_readvalue1) {
+				CAPTURE = (ic3_readvalue2 - ic3_readvalue1);
+			} else {
+				CAPTURE = ((0xFFFF - ic3_readvalue1) + ic3_readvalue2);
+			}
+
+			capture_number = 0;
+
+		}
 	}
-#endif
+}
+
+uint32_t PIOS_PWM_Get(void)
+{
+	return CAPTURE;
 }
 
 #endif

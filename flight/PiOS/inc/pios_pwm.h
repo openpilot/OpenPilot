@@ -26,12 +26,8 @@
 #ifndef PIOS_PWM_H
 #define PIOS_PWM_H
 
-/* Global variables */
-extern volatile uint16_t IC3Value;
-extern volatile uint16_t DutyCycle;
-extern volatile uint32_t Frequency;
-
 /* Public Functions */
 extern void PIOS_PWM_Init(void);
+extern uint32_t PIOS_PWM_Get(void);
 
 #endif /* PIOS_PWM_H */

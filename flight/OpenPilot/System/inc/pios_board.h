@@ -29,6 +29,23 @@
 
 
 //------------------------
+// Timers and Channels Used
+//------------------------
+/*
+Timer | Channel 1 | Channel 2 | Channel 3 | Channel 4
+------+-----------+-----------+-----------+----------
+TIM1  | RC In 3   | RC In 6   | RC In 5   |
+TIM2  | --------------- PIOS_DELAY -----------------
+TIM3  | RC In 7   | RC In 8   | RC In 1   | RC In 2
+TIM4  | Servo 1   | Servo 2   | Servo 3   | Servo 4
+TIM5  | RC In 4   |           |           |
+TIM6  | ----------- PIOS_PWM (Supervisor) ----------
+TIM7  |           |           |           |
+TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
+------+-----------+-----------+-----------+----------
+*/
+
+//------------------------
 // DMA Channels Used
 //------------------------
 /* Channel 1  - ADC				*/
@@ -181,7 +198,7 @@
 // Delay Timer
 //-------------------------
 #define PIOS_DELAY_TIMER			TIM2
-#define PIOS_DELAY_TIMER_RCC			RCC_APB1Periph_TIM2
+#define PIOS_DELAY_TIMER_RCC_FUNC		RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE)
 
 //-------------------------
 // Master Clock
@@ -232,7 +249,13 @@
 #define RECEIVER8_PIN				GPIO_Pin_5      // PB5
 #define RECEIVER8_TIM_PORT			TIM3
 #define RECEIVER8_CH				TIM_Channel_2   // TIM3_CH2
-#define NUM_RECEIVER_INPUTS			8
+#define PIOS_PWM_NUM_INPUTS			1
+#define PIOS_PWM_SUPV_ENABLED			1
+#define PIOS_PWM_SUPV_TIMER			TIM6
+#define PIOS_PWM_SUPV_TIMER_RCC_FUNC		RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE)
+#define PIOS_PWM_SUPV_HZ			25
+#define PIOS_PWM_SUPV_IRQ_CHANNEL		TIM6_IRQn
+#define PIOS_PWM_SUPV_IRQ_FUNC			void TIM6_IRQHandler(void)
 
 //-------------------------
 // Servo outputs   

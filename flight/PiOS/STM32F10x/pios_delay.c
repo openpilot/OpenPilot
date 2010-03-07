@@ -44,11 +44,7 @@
 int32_t PIOS_DELAY_Init(void)
 {
 	/* Enable timer clock */
-	if(PIOS_DELAY_TIMER_RCC == RCC_APB2Periph_TIM1 || PIOS_DELAY_TIMER_RCC == RCC_APB2Periph_TIM8) {
-	    RCC_APB2PeriphClockCmd(PIOS_DELAY_TIMER_RCC, ENABLE);
-	} else {
-		RCC_APB1PeriphClockCmd(PIOS_DELAY_TIMER_RCC, ENABLE);
-	}
+	PIOS_DELAY_TIMER_RCC_FUNC;
 
 	/* Time base configuration */
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;

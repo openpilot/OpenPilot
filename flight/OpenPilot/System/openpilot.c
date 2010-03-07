@@ -106,7 +106,7 @@ int main()
 	/* Create a FreeRTOS task */
 	xTaskCreate(TaskTick, (signed portCHAR *)"Test", configMINIMAL_STACK_SIZE , NULL, 1, NULL);
 	xTaskCreate(TaskTesting, (signed portCHAR *)"TaskTesting", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
-	//xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
+	xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
 	//xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
 
 	/* Start the FreeRTOS scheduler */
@@ -142,7 +142,7 @@ static void TaskTick(void *pvParameters)
 
 static void TaskTesting(void *pvParameters)
 {
-	portTickType xDelay = 500 / portTICK_RATE_MS;
+	portTickType xDelay = 1000 / portTICK_RATE_MS;
 	portTickType xTimeout = 10 / portTICK_RATE_MS;
 
 	for(;;)
@@ -160,7 +160,7 @@ static void TaskTesting(void *pvParameters)
 		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u\r", PIOS_BMP085_GetPressure());
 		*/
 
-		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u uS\r", PIOS_PWM_Get());
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u uS\r", PIOS_PWM_Get(0));
 
 		/* This blocks the task until there is something on the buffer */
 		/*xSemaphoreTake(PIOS_USART1_Buffer, portMAX_DELAY);

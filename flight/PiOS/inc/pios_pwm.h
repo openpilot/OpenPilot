@@ -28,6 +28,6 @@
 
 /* Public Functions */
 extern void PIOS_PWM_Init(void);
-extern uint32_t PIOS_PWM_Get(void);
+extern int32_t PIOS_PWM_Get(int8_t Channel);
 
 #endif /* PIOS_PWM_H */

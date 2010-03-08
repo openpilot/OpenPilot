@@ -101,12 +101,12 @@ int main()
 
 	PIOS_BMP085_Init();
 
-	//PIOS_Servo_SetHz(50, 500);
+	PIOS_Servo_SetHz(50, 450);
 
 	/* Create a FreeRTOS task */
 	xTaskCreate(TaskTick, (signed portCHAR *)"Test", configMINIMAL_STACK_SIZE , NULL, 1, NULL);
 	xTaskCreate(TaskTesting, (signed portCHAR *)"TaskTesting", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
-	xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
+	//xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
 	//xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
 
 	/* Start the FreeRTOS scheduler */
@@ -142,7 +142,7 @@ static void TaskTick(void *pvParameters)
 
 static void TaskTesting(void *pvParameters)
 {
-	portTickType xDelay = 1000 / portTICK_RATE_MS;
+	portTickType xDelay = 250 / portTICK_RATE_MS;
 	portTickType xTimeout = 10 / portTICK_RATE_MS;
 
 	for(;;)
@@ -160,7 +160,7 @@ static void TaskTesting(void *pvParameters)
 		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u\r", PIOS_BMP085_GetPressure());
 		*/
 
-		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u uS\r", PIOS_PWM_Get(0));
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u,%u,%u,%u,%u,%u,%u,%u uS\r", PIOS_PWM_Get(0), PIOS_PWM_Get(1), PIOS_PWM_Get(2), PIOS_PWM_Get(3), PIOS_PWM_Get(4), PIOS_PWM_Get(5), PIOS_PWM_Get(6), PIOS_PWM_Get(7));
 
 		/* This blocks the task until there is something on the buffer */
 		/*xSemaphoreTake(PIOS_USART1_Buffer, portMAX_DELAY);
@@ -213,7 +213,7 @@ static void TaskServos(void *pvParameters)
 
 	/* Used to test servos, cycles all servos from one side to the other */
 	for(;;) {
-		xDelay = 250 / portTICK_RATE_MS;
+		/*xDelay = 250 / portTICK_RATE_MS;
 		PIOS_Servo_Set(1, 2000);
 		vTaskDelay(xDelay);
 		PIOS_Servo_Set(2, 2000);
@@ -246,7 +246,7 @@ static void TaskServos(void *pvParameters)
 		PIOS_Servo_Set(2, 1000);
 		vTaskDelay(xDelay);
 		PIOS_Servo_Set(1, 1000);
-		vTaskDelay(xDelay);
+		vTaskDelay(xDelay);*/
 
 		xDelay = 1 / portTICK_RATE_MS;
 		for(int i = 1000; i < 2000; i++) {

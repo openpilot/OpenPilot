@@ -32,6 +32,15 @@
 #if !defined(PIOS_DONT_USE_PWM)
 
 /* Local Variables */
+static GPIO_TypeDef* PIOS_PWM_GPIO_PORT[PIOS_PWM_NUM_INPUTS] = PIOS_PWM_GPIO_PORTS;
+static const uint32_t PIOS_PWM_GPIO_PIN[PIOS_PWM_NUM_INPUTS] = PIOS_PWM_GPIO_PINS;
+static TIM_TypeDef* PIOS_PWM_TIM_PORT[PIOS_PWM_NUM_INPUTS] = PIOS_PWM_TIM_PORTS;
+static const uint32_t PIOS_PWM_TIM_CHANNEL[PIOS_PWM_NUM_INPUTS] = PIOS_PWM_TIM_CHANNELS;
+static const uint32_t PIOS_PWM_TIM_CCR[PIOS_PWM_NUM_INPUTS] = PIOS_PWM_TIM_CCRS;
+static TIM_TypeDef* PIOS_PWM_TIM[PIOS_PWM_NUM_TIMS] = PIOS_PWM_TIMS;
+static const uint32_t PIOS_PWM_TIM_IRQ[PIOS_PWM_NUM_TIMS] = PIOS_PWM_TIM_IRQS;
+
+static TIM_ICInitTypeDef TIM_ICInitStructure;
 static uint8_t CaptureState[PIOS_PWM_NUM_INPUTS];
 static uint16_t RiseValue[PIOS_PWM_NUM_INPUTS];
 static uint16_t FallValue[PIOS_PWM_NUM_INPUTS];
@@ -63,53 +72,61 @@ void PIOS_PWM_Init(void)
 	}
 
 	/* Setup RCC */
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5, ENABLE);
 
 	/* Enable timer interrupts */
 	NVIC_InitTypeDef NVIC_InitStructure;
-	NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
+	for(i = 0; i < PIOS_PWM_NUM_TIMS; i++) {
+		NVIC_InitStructure.NVIC_IRQChannel = PIOS_PWM_TIM_IRQ[i];
+		NVIC_Init(&NVIC_InitStructure);
+	}
 
-	/* Partial pin remap for PB5 */
+	/* Partial pin remap for TIM3 (PB5) */
 	GPIO_PinRemapConfig(GPIO_PartialRemap_TIM3, ENABLE);
 
 	/* Configure input pins */
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-
-	GPIO_InitStructure.GPIO_Pin = RECEIVER8_PIN;
-	GPIO_Init(RECEIVER8_GPIO_PORT, &GPIO_InitStructure);
+	for(i = 0; i < PIOS_PWM_NUM_INPUTS; i++) {
+		GPIO_InitStructure.GPIO_Pin = PIOS_PWM_GPIO_PIN[i];
+		GPIO_Init(PIOS_PWM_GPIO_PORT[i], &GPIO_InitStructure);
+	}
 
 	/* Configure timer for input capture */
-	TIM_ICInitTypeDef TIM_ICInitStructure;
 	TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
 	TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
 	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
 	TIM_ICInitStructure.TIM_ICFilter = 0x0;
-
-	TIM_ICInitStructure.TIM_Channel = RECEIVER8_CH;
-	TIM_ICInit(RECEIVER8_TIM_PORT, &TIM_ICInitStructure);
+	for(i = 0; i < PIOS_PWM_NUM_INPUTS; i++) {
+		TIM_ICInitStructure.TIM_Channel = PIOS_PWM_TIM_CHANNEL[i];
+		TIM_ICInit(PIOS_PWM_TIM_PORT[i], &TIM_ICInitStructure);
+	}
 
 	/* Configure timer clocks */
-	TIM_InternalClockConfig(RECEIVER8_TIM_PORT);
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
 	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
 	TIM_TimeBaseStructure.TIM_Period = 0xFFFF;
 	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;
 	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	TIM_TimeBaseInit(RECEIVER8_TIM_PORT, &TIM_TimeBaseStructure);
+	for(i = 0; i < PIOS_PWM_NUM_INPUTS; i++) {
+		TIM_InternalClockConfig(PIOS_PWM_TIM_PORT[i]);
+		TIM_TimeBaseInit(PIOS_PWM_TIM_PORT[i], &TIM_TimeBaseStructure);
 
-	/* Enable the CC2 Interrupt Request */
-	TIM_ITConfig(RECEIVER8_TIM_PORT, TIM_IT_CC2, ENABLE);
+		/* Enable the Capture Compare Interrupt Request */
+		TIM_ITConfig(PIOS_PWM_TIM_PORT[i], PIOS_PWM_TIM_CCR[i], ENABLE);
+	}
 
 	/* Enable timers */
-	TIM_Cmd(RECEIVER8_TIM_PORT, ENABLE);
-
+	for(i = 0; i < PIOS_PWM_NUM_TIMS; i++) {
+		TIM_Cmd(PIOS_PWM_TIM[i], ENABLE);
+	}
 
 	/* Supervisor Setup */
 #if (PIOS_PWM_SUPV_ENABLED)
@@ -148,6 +165,12 @@ void PIOS_PWM_Init(void)
 	/* Enable counter */
 	TIM_Cmd(PIOS_PWM_SUPV_TIMER, ENABLE);
 #endif
+
+	/* Setup local variable which stays in this scope */
+	/* Doing this here and using a local variable saves doing it in the ISR */
+	TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
+	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
+	TIM_ICInitStructure.TIM_ICFilter = 0x0;
 }
 
 /**
@@ -166,58 +189,226 @@ int32_t PIOS_PWM_Get(int8_t Channel)
 }
 
 /**
-* This function handles TIM3 global interrupt request.
+* Handle TIM3 global interrupt request
 */
 void TIM3_IRQHandler(void)
 {
-	if(TIM_GetITStatus(RECEIVER8_TIM_PORT, TIM_IT_CC2) == SET) {
+	int32_t i;
+
+	/* For now we skip the generic non-application  stuff for speed reasons */
+	//for(i = 0; i < PIOS_PWM_NUM_INPUTS; i++) {
+	//	if(TIM_GetITStatus(PIOS_PWM_TIM_PORT[i], PIOS_PWM_TIM_CCR[i]) == SET) {
+	//		/* This identifies which interrupt we are processing */
+	//		break;
+	//	}
+	//}
+
+	/* Do this as it's more efficient */
+	if(TIM_GetITStatus(PIOS_PWM_TIM_PORT[4], PIOS_PWM_TIM_CCR[4]) == SET) {
+		i = 4;
+		if(CaptureState[i] == 0) {
+			RiseValue[i] = TIM_GetCapture4(PIOS_PWM_TIM_PORT[i]);
+		} else {
+			FallValue[i] = TIM_GetCapture4(PIOS_PWM_TIM_PORT[i]);
+		}
+	} else if(TIM_GetITStatus(PIOS_PWM_TIM_PORT[5], PIOS_PWM_TIM_CCR[5]) == SET) {
+		i = 5;
+		if(CaptureState[i] == 0) {
+			RiseValue[i] = TIM_GetCapture3(PIOS_PWM_TIM_PORT[i]);
+		} else {
+			FallValue[i] = TIM_GetCapture3(PIOS_PWM_TIM_PORT[i]);
+		}
+	} else if(TIM_GetITStatus(PIOS_PWM_TIM_PORT[6], PIOS_PWM_TIM_CCR[6]) == SET) {
+		i = 6;
+		if(CaptureState[i] == 0) {
+			RiseValue[i] = TIM_GetCapture1(PIOS_PWM_TIM_PORT[i]);
+		} else {
+			FallValue[i] = TIM_GetCapture1(PIOS_PWM_TIM_PORT[i]);
+		}
+	} else if(TIM_GetITStatus(PIOS_PWM_TIM_PORT[7], PIOS_PWM_TIM_CCR[7]) == SET) {
+		i = 7;
+		if(CaptureState[i] == 0) {
+			RiseValue[i] = TIM_GetCapture2(PIOS_PWM_TIM_PORT[i]);
+		} else {
+			FallValue[i] = TIM_GetCapture2(PIOS_PWM_TIM_PORT[i]);
+		}
+	}
+
+	/* Clear TIM3 Capture compare interrupt pending bit */
+	TIM_ClearITPendingBit(PIOS_PWM_TIM_PORT[i], PIOS_PWM_TIM_CCR[i]);
+
+	/* Simple rise or fall state machine */
+	if(CaptureState[i] == 0) {
+		/* Get the Input Capture value */
+		//switch(PIOS_PWM_TIM_CHANNEL[i]) {
+		//	case TIM_Channel_1:
+		//		RiseValue[i] = TIM_GetCapture1(PIOS_PWM_TIM_PORT[i]);
+		//		break;
+		//	case TIM_Channel_2:
+		//		RiseValue[i] = TIM_GetCapture2(PIOS_PWM_TIM_PORT[i]);
+		//		break;
+		//	case TIM_Channel_3:
+		//		RiseValue[i] = TIM_GetCapture3(PIOS_PWM_TIM_PORT[i]);
+		//		break;
+		//	case TIM_Channel_4:
+		//		RiseValue[i] = TIM_GetCapture4(PIOS_PWM_TIM_PORT[i]);
+		//		break;
+		//}
+
+		/* Switch states */
+		CaptureState[i] = 1;
+
+		/* Switch polarity of input capture */
+		TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Falling;
+		TIM_ICInitStructure.TIM_Channel = PIOS_PWM_TIM_CHANNEL[i];
+		TIM_ICInit(PIOS_PWM_TIM_PORT[i], &TIM_ICInitStructure);
+
+	} else {
+		/* Get the Input Capture value */
+		//switch(PIOS_PWM_TIM_CHANNEL[i]) {
+		//	case TIM_Channel_1:
+		//		FallValue[i] = TIM_GetCapture1(PIOS_PWM_TIM_PORT[i]);
+		//		break;
+		//	case TIM_Channel_2:
+		//		FallValue[i] = TIM_GetCapture2(PIOS_PWM_TIM_PORT[i]);
+		//		break;
+		//	case TIM_Channel_3:
+		//		FallValue[i] = TIM_GetCapture3(PIOS_PWM_TIM_PORT[i]);
+		//		break;
+		//	case TIM_Channel_4:
+		//		FallValue[i] = TIM_GetCapture4(PIOS_PWM_TIM_PORT[i]);
+		//		break;
+		//}
+
+		/* Capture computation */
+		if (FallValue[i] > RiseValue[i]) {
+			CaptureValue[i] = (FallValue[i] - RiseValue[i]);
+		} else {
+			CaptureValue[i] = ((0xFFFF - RiseValue[i]) + FallValue[i]);
+		}
+
+		/* Switch states */
+		CaptureState[i] = 0;
+
+		/* Increase supervisor counter */
+		CapCounter[i]++;
+
+		/* Switch polarity of input capture */
+		TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
+		TIM_ICInitStructure.TIM_Channel = PIOS_PWM_TIM_CHANNEL[i];
+		TIM_ICInit(PIOS_PWM_TIM_PORT[i], &TIM_ICInitStructure);
+	}
+}
+
+/**
+* Handle TIM1 global interrupt request
+*/
+void TIM1_CC_IRQHandler(void)
+{
+	int32_t i;
+
+	/* Do this as it's more efficient */
+	if(TIM_GetITStatus(PIOS_PWM_TIM_PORT[0], PIOS_PWM_TIM_CCR[0]) == SET) {
+		i = 0;
+		if(CaptureState[i] == 0) {
+			RiseValue[i] = TIM_GetCapture2(PIOS_PWM_TIM_PORT[i]);
+		} else {
+			FallValue[i] = TIM_GetCapture2(PIOS_PWM_TIM_PORT[i]);
+		}
+	} else if(TIM_GetITStatus(PIOS_PWM_TIM_PORT[1], PIOS_PWM_TIM_CCR[1]) == SET) {
+		i = 1;
+		if(CaptureState[i] == 0) {
+			RiseValue[i] = TIM_GetCapture3(PIOS_PWM_TIM_PORT[i]);
+		} else {
+			FallValue[i] = TIM_GetCapture3(PIOS_PWM_TIM_PORT[i]);
+		}
+	} else if(TIM_GetITStatus(PIOS_PWM_TIM_PORT[3], PIOS_PWM_TIM_CCR[3]) == SET) {
+		i = 3;
+		if(CaptureState[i] == 0) {
+			RiseValue[i] = TIM_GetCapture1(PIOS_PWM_TIM_PORT[i]);
+		} else {
+			FallValue[i] = TIM_GetCapture1(PIOS_PWM_TIM_PORT[i]);
+		}
+	}
+
+	/* Clear TIM3 Capture compare interrupt pending bit */
+	TIM_ClearITPendingBit(PIOS_PWM_TIM_PORT[i], PIOS_PWM_TIM_CCR[i]);
+
+	/* Simple rise or fall state machine */
+	if(CaptureState[i] == 0) {
+		/* Switch states */
+		CaptureState[i] = 1;
+
+		/* Switch polarity of input capture */
+		TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Falling;
+		TIM_ICInitStructure.TIM_Channel = PIOS_PWM_TIM_CHANNEL[i];
+		TIM_ICInit(PIOS_PWM_TIM_PORT[i], &TIM_ICInitStructure);
+
+	} else {
+		/* Capture computation */
+		if (FallValue[i] > RiseValue[i]) {
+			CaptureValue[i] = (FallValue[i] - RiseValue[i]);
+		} else {
+			CaptureValue[i] = ((0xFFFF - RiseValue[i]) + FallValue[i]);
+		}
+
+		/* Switch states */
+		CaptureState[i] = 0;
+
+		/* Increase supervisor counter */
+		CapCounter[i]++;
+
+		/* Switch polarity of input capture */
+		TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
+		TIM_ICInitStructure.TIM_Channel = PIOS_PWM_TIM_CHANNEL[i];
+		TIM_ICInit(PIOS_PWM_TIM_PORT[i], &TIM_ICInitStructure);
+	}
+}
+
+/**
+* Handle TIM5 global interrupt request
+*/
+void TIM5_IRQHandler(void)
+{
+	/* Do this as it's more efficient */
+	if(TIM_GetITStatus(PIOS_PWM_TIM_PORT[2], PIOS_PWM_TIM_CCR[2]) == SET) {
+		if(CaptureState[2] == 0) {
+			RiseValue[2] = TIM_GetCapture1(PIOS_PWM_TIM_PORT[2]);
+		} else {
+			FallValue[2] = TIM_GetCapture1(PIOS_PWM_TIM_PORT[2]);
+		}
+
 		/* Clear TIM3 Capture compare interrupt pending bit */
-		TIM_ClearITPendingBit(RECEIVER8_TIM_PORT, TIM_IT_CC2);
+		TIM_ClearITPendingBit(PIOS_PWM_TIM_PORT[2], PIOS_PWM_TIM_CCR[2]);
 
 		/* Simple rise or fall state machine */
-		if(CaptureState[0] == 0) {
-			/* Get the Input Capture value */
-			RiseValue[0] = TIM_GetCapture2(RECEIVER8_TIM_PORT);
-
+		if(CaptureState[2] == 0) {
 			/* Switch states */
-			CaptureState[0] = 1;
+			CaptureState[2] = 1;
 
 			/* Switch polarity of input capture */
-			TIM_ICInitTypeDef TIM_ICInitStructure;
-			TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
-			TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
-			TIM_ICInitStructure.TIM_ICFilter = 0x0;
-
 			TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Falling;
-			TIM_ICInitStructure.TIM_Channel = RECEIVER8_CH;
-			TIM_ICInit(RECEIVER8_TIM_PORT, &TIM_ICInitStructure);
+			TIM_ICInitStructure.TIM_Channel = PIOS_PWM_TIM_CHANNEL[2];
+			TIM_ICInit(PIOS_PWM_TIM_PORT[2], &TIM_ICInitStructure);
 
 		} else {
-			/* Get the Input Capture value */
-			FallValue[0] = TIM_GetCapture2(RECEIVER8_TIM_PORT);
-
 			/* Capture computation */
-			if (FallValue[0] > RiseValue[0]) {
-				CaptureValue[0] = (FallValue[0] - RiseValue[0]);
+			if (FallValue[2] > RiseValue[2]) {
+				CaptureValue[2] = (FallValue[2] - RiseValue[2]);
 			} else {
-				CaptureValue[0] = ((0xFFFF - RiseValue[0]) + FallValue[0]);
+				CaptureValue[2] = ((0xFFFF - RiseValue[2]) + FallValue[2]);
 			}
 
 			/* Switch states */
-			CaptureState[0] = 0;
+			CaptureState[2] = 0;
 
 			/* Increase supervisor counter */
-			CapCounter[0]++;
+			CapCounter[2]++;
 
 			/* Switch polarity of input capture */
-			TIM_ICInitTypeDef TIM_ICInitStructure;
-			TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
-			TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
-			TIM_ICInitStructure.TIM_ICFilter = 0x0;
-
 			TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
-			TIM_ICInitStructure.TIM_Channel = RECEIVER8_CH;
-			TIM_ICInit(RECEIVER8_TIM_PORT, &TIM_ICInitStructure);
+			TIM_ICInitStructure.TIM_Channel = PIOS_PWM_TIM_CHANNEL[2];
+			TIM_ICInit(PIOS_PWM_TIM_PORT[2], &TIM_ICInitStructure);
 		}
 	}
 }

@@ -195,14 +195,6 @@ void TIM3_IRQHandler(void)
 {
 	int32_t i;
 
-	/* For now we skip the generic non-application  stuff for speed reasons */
-	//for(i = 0; i < PIOS_PWM_NUM_INPUTS; i++) {
-	//	if(TIM_GetITStatus(PIOS_PWM_TIM_PORT[i], PIOS_PWM_TIM_CCR[i]) == SET) {
-	//		/* This identifies which interrupt we are processing */
-	//		break;
-	//	}
-	//}
-
 	/* Do this as it's more efficient */
 	if(TIM_GetITStatus(PIOS_PWM_TIM_PORT[4], PIOS_PWM_TIM_CCR[4]) == SET) {
 		i = 4;
@@ -239,22 +231,6 @@ void TIM3_IRQHandler(void)
 
 	/* Simple rise or fall state machine */
 	if(CaptureState[i] == 0) {
-		/* Get the Input Capture value */
-		//switch(PIOS_PWM_TIM_CHANNEL[i]) {
-		//	case TIM_Channel_1:
-		//		RiseValue[i] = TIM_GetCapture1(PIOS_PWM_TIM_PORT[i]);
-		//		break;
-		//	case TIM_Channel_2:
-		//		RiseValue[i] = TIM_GetCapture2(PIOS_PWM_TIM_PORT[i]);
-		//		break;
-		//	case TIM_Channel_3:
-		//		RiseValue[i] = TIM_GetCapture3(PIOS_PWM_TIM_PORT[i]);
-		//		break;
-		//	case TIM_Channel_4:
-		//		RiseValue[i] = TIM_GetCapture4(PIOS_PWM_TIM_PORT[i]);
-		//		break;
-		//}
-
 		/* Switch states */
 		CaptureState[i] = 1;
 
@@ -264,22 +240,6 @@ void TIM3_IRQHandler(void)
 		TIM_ICInit(PIOS_PWM_TIM_PORT[i], &TIM_ICInitStructure);
 
 	} else {
-		/* Get the Input Capture value */
-		//switch(PIOS_PWM_TIM_CHANNEL[i]) {
-		//	case TIM_Channel_1:
-		//		FallValue[i] = TIM_GetCapture1(PIOS_PWM_TIM_PORT[i]);
-		//		break;
-		//	case TIM_Channel_2:
-		//		FallValue[i] = TIM_GetCapture2(PIOS_PWM_TIM_PORT[i]);
-		//		break;
-		//	case TIM_Channel_3:
-		//		FallValue[i] = TIM_GetCapture3(PIOS_PWM_TIM_PORT[i]);
-		//		break;
-		//	case TIM_Channel_4:
-		//		FallValue[i] = TIM_GetCapture4(PIOS_PWM_TIM_PORT[i]);
-		//		break;
-		//}
-
 		/* Capture computation */
 		if (FallValue[i] > RiseValue[i]) {
 			CaptureValue[i] = (FallValue[i] - RiseValue[i]);

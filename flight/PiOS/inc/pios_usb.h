@@ -30,7 +30,7 @@
 /* Local defines */
 /* Following settings allow to customise the USB device descriptor */
 #ifndef PIOS_USB_VENDOR_ID
-#define PIOS_USB_VENDOR_ID		0x0483
+#define PIOS_USB_VENDOR_ID		0x20A0
 #endif
 
 #ifndef PIOS_USB_VENDOR_STR
@@ -42,7 +42,7 @@
 #endif
 
 #ifndef PIOS_USB_PRODUCT_ID
-#define PIOS_USB_PRODUCT_ID		0x5750
+#define PIOS_USB_PRODUCT_ID		0x4117
 #endif
 
 #ifndef PIOS_USB_VERSION_ID

@@ -195,6 +195,7 @@ namespace jblas {
 
   /// bool matrix
   typedef boost::numeric::ublas::matrix<bool> matb;
+  typedef boost::numeric::ublas::vector<bool> vecb;
 
   /**
    * boost orientation tags

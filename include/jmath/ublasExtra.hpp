@@ -37,20 +37,6 @@
 #include "jmath/jblas.hpp"
 #include "jmath/jmathException.hpp"
 
-namespace std {
-	/**
-	 * Operator << for class for ind_array
-	 * FIXME: This operator has been defined in namespace STD. This is not necessarily beautiful but we cannot put it under jafar::jmath.
-	 */
-	template<class A>
-	std::ostream& operator <<(std::ostream & s, boost::numeric::ublas::indirect_array<A> & ia_) {
-		s << "[" << ia_.size() << "]{";
-		for (size_t i = 0; i < ia_.size() - 1; i++)
-			s << ia_(i) << ",";
-		s << ia_(ia_.size() - 1) << "}";
-		return s;
-	}
-}
 
 namespace jafar {
 	namespace jmath {
@@ -239,7 +225,7 @@ namespace jafar {
 				}
 			}
 
-			/** Compute the cross product of \a v1 and \a v2, results is
+			/** Compute the cross product of \a v1 and \a v2, result is
 			 *  stored in \a vRes.
 			 */
 			template<class Vec1, class Vec2, class VecRes>

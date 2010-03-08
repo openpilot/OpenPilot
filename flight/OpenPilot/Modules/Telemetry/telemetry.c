@@ -61,8 +61,6 @@ int32_t TelemetryInitialize(void)
 	// TODO: Get telemetry settings object
 	TelemetryPort = COM_USART1;
 
-	// TODO: Re-Initialise communication ports
-
 	// Initialise UAVTalk
 	UAVTalkInitialize(&transmitData);
 
@@ -70,7 +68,7 @@ int32_t TelemetryInitialize(void)
 	UAVObjIterate(&registerObject);
 
 	// Start telemetry task
-	xTaskCreate( telemetryTask, (signed char*)"Telemetry", STACK_SIZE, NULL, TASK_PRIORITY, &telemetryTaskHandle );
+	xTaskCreate(telemetryTask, (signed char*)"Telemetry", STACK_SIZE, NULL, TASK_PRIORITY, &telemetryTaskHandle);
 
 	return 0;
 }
@@ -176,12 +174,6 @@ static void telemetryTask(void)
 		}
 
 		/* This blocks the task until there is something on the buffer */
-		/* TODO: This needs to check the USB semaphore as well, somehow */
-		/* This isn't really going to work
-		xSemaphoreTake(PIOS_USART1_Buffer, portMAX_DELAY);
-		UAVTalkProcessInputStream(PIOS_COM_ReceiveBuffer(TelemetryPort));
-		*/
-
 		if(PIOS_COM_ReceiveBufferUsed(TelemetryPort) > 0)
 		{
 			UAVTalkProcessInputStream(PIOS_COM_ReceiveBuffer(TelemetryPort));

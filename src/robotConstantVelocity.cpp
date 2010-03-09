@@ -26,6 +26,7 @@ namespace jafar {
 		void Robot3DConstantVelocity::move(void) {
 
 			using namespace jblas;
+			using namespace ublas;
 
 			/*
 			 * This motion model is defined by
@@ -71,7 +72,7 @@ namespace jafar {
 			p += v * dt;
 			P_v = I_3 * dt;
 			vec4 q_old(q);
-			qProd(q_old, w * dt, q, Q_q, Q_wdt);
+			quaternion::qProd(q_old, w * dt, q, Q_q, Q_wdt);
 			// v and w are constant velocity ---> do not predict!
 
 			// Compose state

@@ -12,6 +12,7 @@
 #define LANDMARKANCHOREDHOMOGENEOUSPOINT_HPP_
 
 #include "rtslam/landmarkAbstract.hpp"
+#include "rtslam/quatTools.hpp"
 #include "iostream"
 
 /**
@@ -65,8 +66,8 @@ namespace jafar {
 				// transformed landmark in global frame
 				jblas::vec ahp(7);
 
-				ublas::subrange(ahp, 0, 3) = eucFromFrame(F, p0f);
-				ublas::subrange(ahp, 3, 6) = vecFromFrame(F, mf);
+				ublas::subrange(ahp, 0, 3) = quaternion::eucFromFrame(F, p0f);
+				ublas::subrange(ahp, 3, 6) = quaternion::vecFromFrame(F, mf);
 				ahp(6) = ahpf(6);
 
 				return ahp;
@@ -88,12 +89,12 @@ namespace jafar {
 				AHP_ahpf.clear();
 
 				// transform p0
-				eucFromFrame(F, p0f, p0, JAC_37, JAC_33);
+				quaternion::eucFromFrame(F, p0f, p0, JAC_37, JAC_33);
 				ublas::subrange(ahp, 0, 3) = p0;
 				subrange(AHP_f, 0, 3, 0, 7) = JAC_37;
 				subrange(AHP_ahpf, 0, 3, 0, 3) = JAC_33;
 				// transform m
-				vecFromFrame(F, mf, m, JAC_37, JAC_33);
+				quaternion::vecFromFrame(F, mf, m, JAC_37, JAC_33);
 				subrange(ahp, 3, 6) = m;
 				subrange(AHP_f, 3, 6, 0, 7) = JAC_37;
 				subrange(AHP_ahpf, 3, 6, 3, 6) = JAC_33;
@@ -112,8 +113,8 @@ namespace jafar {
 				// transformed landmark in frame F
 				jblas::vec ahpf(7);
 
-				ublas::subrange(ahpf, 0, 3) = eucToFrame(F, p0);
-				ublas::subrange(ahpf, 3, 6) = vecToFrame(F, m);
+				ublas::subrange(ahpf, 0, 3) = quaternion::eucToFrame(F, p0);
+				ublas::subrange(ahpf, 3, 6) = quaternion::vecToFrame(F, m);
 				ahpf(6) = ahp(6);
 
 				return ahpf;
@@ -136,12 +137,12 @@ namespace jafar {
 				AHPF_ahp.clear();
 
 				// transform p0
-				eucToFrame(F, p0, p0f, JAC_37, JAC_33);
+				quaternion::eucToFrame(F, p0, p0f, JAC_37, JAC_33);
 				ublas::subrange(ahpf, 0, 3) = p0f;
 				subrange(AHPF_f, 0, 3, 0, 7) = JAC_37;
 				subrange(AHPF_ahp, 0, 3, 0, 3) = JAC_33;
 				// transform m
-				vecToFrame(F, m, mf, JAC_37, JAC_33);
+				quaternion::vecToFrame(F, m, mf, JAC_37, JAC_33);
 				subrange(ahpf, 3, 6) = mf;
 				subrange(AHPF_f, 3, 6, 0, 7) = JAC_37;
 				subrange(AHPF_ahp, 3, 6, 3, 6) = JAC_33;

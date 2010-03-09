@@ -84,8 +84,8 @@ namespace jafar {
 				}
 
 				/**
-				 * Local pose constructor - full Gaussian
-				 * Creates a sensor with its own pose information
+				 * Local pose constructor - full Gaussian.
+				 * Creates a sensor with its own pose information.
 				 * \param _pose a Gaussian pose
 				 */
 				SensorAbstract(const Gaussian & _pose) :
@@ -93,8 +93,8 @@ namespace jafar {
 				}
 
 				/**
-				 * Remote pose constructor
-				 * Creates a sensor with the pose indexed in a Gaussian map
+				 * Remote pose constructor.
+				 * Creates a sensor with the pose indexed in a Gaussian map.
 				 * \param map the map
 				 * \param ias the indirect array of indices to the map
 				 */

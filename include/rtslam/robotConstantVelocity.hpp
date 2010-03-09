@@ -74,10 +74,10 @@ namespace jafar {
 				 */
 				template<class Vp, class Vq, class Vv, class Vw>
 				inline void splitState(Vp & p, Vq & q, Vv & v, Vw & w) {
-					p = ublas::subrange(state.x, 0, 3);
-					q = ublas::subrange(state.x, 3, 7);
-					v = ublas::subrange(state.x, 7, 10);
-					w = ublas::subrange(state.x, 10, 13);
+					p = ublas::subrange(state.x(), 0, 3);
+					q = ublas::subrange(state.x(), 3, 7);
+					v = ublas::subrange(state.x(), 7, 10);
+					w = ublas::subrange(state.x(), 10, 13);
 				}
 
 				/**
@@ -91,10 +91,10 @@ namespace jafar {
 				 */
 				template<class Vp, class Vq, class Vv, class Vw>
 				inline void composeState(const Vp & p, const Vq & q, const Vv & v, const Vw & w) {
-					ublas::subrange(state.x, 0, 3) = p;
-					ublas::subrange(state.x, 3, 7) = q;
-					ublas::subrange(state.x, 7, 10) = v;
-					ublas::subrange(state.x, 10, 13) = w;
+					ublas::subrange(state.x(), 0, 3) = p;
+					ublas::subrange(state.x(), 3, 7) = q;
+					ublas::subrange(state.x(), 7, 10) = v;
+					ublas::subrange(state.x(), 10, 13) = w;
 				}
 
 			private:

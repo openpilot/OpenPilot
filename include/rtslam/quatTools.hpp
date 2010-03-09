@@ -724,16 +724,24 @@ namespace jafar {
 			 * \return the composed frame GoF
 			 */
 			template<class VecG, class VecF>
-			jblas::vec composeFrames(VecG & G, VecF & F) {
+			jblas::vec7 composeFrames(VecG & G, VecF & F) {
 				vec4 q1 = subrange(G, 3, 7);
 				vec3 t2 = subrange(F, 0, 3);
 				vec4 q2 = subrange(F, 3, 7);
 				vec3 t = eucFromFrame(G, t2);
 				vec4 q = qProd(q1, q2);
-				vec H(7);
+				vec7 H;
 				subrange(H, 0, 3) = t;
 				subrange(H, 3, 7) = q;
 				return H;
+			}
+
+			/**
+			 * Compose frames, give Jacobians
+			 */
+			template<class VecG, class VecL, class VecC, class MatC_g, class MatC_l>
+			void composeFrames(const VecG & G, const VecL & L, VecC & C, MatC_g & C_g, MatC_l & C_l) {
+				//TODO: implement this
 			}
 
 		}

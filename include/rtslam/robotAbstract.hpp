@@ -139,7 +139,7 @@ namespace jafar {
 
 				void move(const jblas::vec & _u) {
 					JFR_ASSERT(_u.size() == control.size(), "robotAbstract.hpp: move: wrong control size.");
-					control.set_x(_u);
+					control.x(_u);
 					move();
 				}
 

@@ -34,6 +34,13 @@ namespace jafar {
 				 */
 				Landmark3DAnchoredHomogeneousPoint(MapAbstract & map, const jblas::ind_array & ial) :
 					LandmarkAbstract(map, ial) {
+					// TODO see this. Add this functionality to class Gaussian.
+					//					using namespace jafar::jmath::ublasExtra;
+					//					jblas::ind_array ia2(ial.size());
+					//					ia2 = ia_range(0,ial.size());
+					//					state.ia = ia2;
+					//					state.x = jblas::vec_indirect(map.filter.x,ia2);
+					//					state.P = jblas::mat_indirect(map.filter.P,ia2,ia2);
 				}
 
 				/**

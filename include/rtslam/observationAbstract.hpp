@@ -108,7 +108,7 @@ namespace jafar {
 				 * the inverse of the innovation covariance.
 				 */
 				void invertCov(void) {
-					jafar::jmath::ublasExtra::lu_inv(P, iP);
+					jafar::jmath::ublasExtra::lu_inv(P(), iP);
 				}
 
 				/**
@@ -116,7 +116,7 @@ namespace jafar {
 				 */
 				double mahalanobis(void) {
 					invertCov();
-					mahalanobis_ = ublas::inner_prod(x, (jblas::vec) ublas::prod(iP, x));
+					mahalanobis_ = ublas::inner_prod(x(), (jblas::vec) ublas::prod(iP, x()));
 					return mahalanobis_;
 				}
 
@@ -126,7 +126,7 @@ namespace jafar {
 				 */
 				template<class V1, class V2>
 				void func(V1& exp_mean, V2& meas_mean) {
-					x = meas_mean - exp_mean;
+					x() = meas_mean - exp_mean;
 				}
 
 				/**
@@ -147,8 +147,8 @@ namespace jafar {
 				void compute(Expectation& exp /// The expected Gaussian.
 				    , Measurement& meas /// The measured Gaussian.
 				) {
-					func(exp.x, meas.x); // We do not request trivial Jacobians here. Jacobians are the identity.
-					P = meas.P + exp.P; // Derived classes: P = Inn_meas*meas.P*Inn_meas.transpose() + Inn_exp*exp.P*Inn_exp.transpose();
+					func(exp.x(), meas.x()); // We do not request trivial Jacobians here. Jacobians are the identity.
+					P() = meas.P() + exp.P(); // Derived classes: P = Inn_meas*meas.P*Inn_meas.transpose() + Inn_exp*exp.P*Inn_exp.transpose();
 				}
 		};
 

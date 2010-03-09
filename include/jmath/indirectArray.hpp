@@ -57,13 +57,25 @@ namespace jafar {
 			jblas::ind_array ia_union(const jblas::ind_array & ia1, const jblas::ind_array & ia2);
 
 			/**
-			 * Return the N first indices of an indirect array
+			 * Return the N first indices of an indirect array.
 			 * \param ia the indirect array
 			 * \param N the number of indices to return
 			 * \return the N first indices in \a ia
 			 */
 			jblas::ind_array ia_head(const jblas::ind_array & ia, const size_t N);
 
+			/**
+			 * Create array from a boolean vector.
+			 * The size of the returned indirect array is the number of true entries in the boolean vector.
+			 * The indices in the array are the positions of the true values in the boolean vector.
+			 * \param vb a boolean vector
+			 * \return the indirect array
+			 */
+			jblas::ind_array ia_bool(jblas::vecb & vb);
+
+			//TODO ia_bool_head()
+
+			//TODO ia_range()
 
 		}
 	}

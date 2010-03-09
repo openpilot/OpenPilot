@@ -102,6 +102,31 @@ namespace jafar {
 				return res;
 			}
 
+			/**
+			 * Create array from a boolean vector
+			 */
+			jblas::ind_array ia_bool(jblas::vecb & vb) {
+
+				int nb = 0;
+				for (size_t i = 0; i < vb.size(); i++) {
+					if (vb(i))
+						nb += 1;
+				}
+
+				jblas::ind_array ia(nb);
+
+				int j = 0;
+
+				for (size_t i = 0; i < vb.size(); i++) {
+					if (vb(i)) {
+						ia(j) = i;
+						j += 1;
+					}
+				}
+
+				return ia;
+			}
+
 		}
 	}
 }

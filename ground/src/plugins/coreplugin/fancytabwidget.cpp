@@ -56,7 +56,7 @@ FancyTabBar::FancyTabBar(QWidget *parent)
 {
     m_hoverIndex = -1;
     m_currentIndex = 0;
-    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     setStyle(new QWindowsStyle);
     setMinimumWidth(qMax(2 * m_rounding, 40));
     setAttribute(Qt::WA_Hover, true);
@@ -166,23 +166,23 @@ void FancyTabBar::leaveEvent(QEvent *e)
 QSize FancyTabBar::sizeHint() const
 {
     QSize sh = tabSizeHint();
-    return QSize(sh.width(), sh.height() * m_tabs.count());
+    return QSize(sh.width() * m_tabs.count(), sh.height());
 }
 
 QSize FancyTabBar::minimumSizeHint() const
 {
     QSize sh = tabSizeHint(true);
-    return QSize(sh.width(), sh.height() * m_tabs.count());
+    return QSize(sh.width() * m_tabs.count(), sh.height());
 }
 
 QRect FancyTabBar::tabRect(int index) const
 {
     QSize sh = tabSizeHint();
 
-    if (sh.height() * m_tabs.count() > height())
-        sh.setHeight(height() / m_tabs.count());
+    if(sh.width() * m_tabs.count() > width())
+        sh.setWidth(width() / m_tabs.count());
 
-    return QRect(0, index * sh.height(), sh.width(), sh.height());
+    return QRect(index * sh.width(), 0, sh.width(), sh.height());
 
 }
 
@@ -221,24 +221,24 @@ void FancyTabBar::paintTab(QPainter *painter, int tabIndex) const
     QColor dark = QColor(0, 0, 0, 60);
 
     if (selected) {
-        QLinearGradient selectedGradient(rect.topLeft(), QPoint(rect.center().x(), rect.bottom()));
+        QLinearGradient selectedGradient(rect.bottomRight(), QPoint(rect.center().x(), rect.top()));
         selectedGradient.setColorAt(0, Qt::white);
         selectedGradient.setColorAt(0.3, Qt::white);
-        selectedGradient.setColorAt(0.7, QColor(230, 230, 230));
+        selectedGradient.setColorAt(0.7, QColor(210, 210, 220)); //give a blue-ish color
 
         painter->fillRect(rect, selectedGradient);
         painter->setPen(QColor(200, 200, 200));
-        painter->drawLine(rect.topLeft(), rect.topRight());
+        painter->drawLine(rect.topLeft(), rect.bottomLeft());
         painter->setPen(QColor(150, 160, 200));
-        painter->drawLine(rect.bottomLeft(), rect.bottomRight());
+        painter->drawLine(rect.topRight(), rect.bottomRight());
     } else {
         painter->fillRect(rect, background);
         if (hover)
             painter->fillRect(rect, hoverColor);
         painter->setPen(QPen(light, 0));
-        painter->drawLine(rect.topLeft(), rect.topRight());
+        painter->drawLine(rect.topLeft(), rect.bottomLeft());
         painter->setPen(QPen(dark, 0));
-        painter->drawLine(rect.bottomLeft(), rect.bottomRight());
+        painter->drawLine(rect.topRight(), rect.bottomRight());
     }
 
     QString tabText(this->tabText(tabIndex));
@@ -301,7 +301,7 @@ FancyTabWidget::FancyTabWidget(QWidget *parent)
     m_tabBar = new FancyTabBar(this);
 
     m_selectionWidget = new QWidget(this);
-    QVBoxLayout *selectionLayout = new QVBoxLayout;
+    QHBoxLayout *selectionLayout = new QHBoxLayout;
     selectionLayout->setSpacing(0);
     selectionLayout->setMargin(0);
 
@@ -310,14 +310,14 @@ FancyTabWidget::FancyTabWidget(QWidget *parent)
     layout->setMargin(0);
     layout->setSpacing(0);
     layout->addWidget(new FancyColorButton(this));
-    selectionLayout->addWidget(bar);
+    //selectionLayout->addWidget(bar);
 
     selectionLayout->addWidget(m_tabBar, 1);
     m_selectionWidget->setLayout(selectionLayout);
-    m_selectionWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+    m_selectionWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
     m_cornerWidgetContainer = new QWidget(this);
-    m_cornerWidgetContainer->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+    m_cornerWidgetContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
     m_cornerWidgetContainer->setAutoFillBackground(false);
 
     QVBoxLayout *cornerWidgetLayout = new QVBoxLayout;
@@ -326,7 +326,7 @@ FancyTabWidget::FancyTabWidget(QWidget *parent)
     cornerWidgetLayout->addStretch();
     m_cornerWidgetContainer->setLayout(cornerWidgetLayout);
 
-    selectionLayout->addWidget(m_cornerWidgetContainer, 0);
+    //selectionLayout->addWidget(m_cornerWidgetContainer, 0);
 
     m_modesStack = new QStackedLayout;
     m_statusBar = new QStatusBar;
@@ -336,12 +336,12 @@ FancyTabWidget::FancyTabWidget(QWidget *parent)
     vlayout->setMargin(0);
     vlayout->setSpacing(0);
     vlayout->addLayout(m_modesStack);
-    vlayout->addWidget(m_statusBar);
+    vlayout->addWidget(m_selectionWidget);
+    //vlayout->addWidget(m_statusBar);  //status bar is not used for now
 
     QHBoxLayout *mainLayout = new QHBoxLayout;
     mainLayout->setMargin(0);
     mainLayout->setSpacing(1);
-    mainLayout->addWidget(m_selectionWidget);
     mainLayout->addLayout(vlayout);
     setLayout(mainLayout);
 
@@ -375,11 +375,11 @@ void FancyTabWidget::paintEvent(QPaintEvent *event)
     Q_UNUSED(event)
     QPainter p(this);
 
-    QRect rect = m_selectionWidget->rect().adjusted(0, 0, 1, 0);
+    QRect rect = m_selectionWidget->geometry().adjusted(0, 0, 1, 0);
     rect = style()->visualRect(layoutDirection(), geometry(), rect);
     Utils::StyleHelper::verticalGradient(&p, rect, rect);
     p.setPen(Utils::StyleHelper::borderColor());
-    p.drawLine(rect.topRight(), rect.bottomRight());
+    p.drawLine(rect.topLeft(), rect.topRight());
 }
 
 void FancyTabWidget::insertCornerWidget(int pos, QWidget *widget)

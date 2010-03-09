@@ -18,9 +18,10 @@
 #include <list>
 
 #include "jmath/jblas.hpp"
-#include "gaussian.hpp"
-#include "robotAbstract.hpp"
-#include "landmarkAbstract.hpp"
+#include "rtslam/gaussian.hpp"
+#include "rtslam/robotAbstract.hpp"
+#include "rtslam/landmarkAbstract.hpp"
+#include "rtslam/kalmanFilter.hpp"
 
 namespace jafar {
 
@@ -29,6 +30,12 @@ namespace jafar {
 	 * \ingroup rtslam
 	 */
 	namespace rtslam {
+
+		// some forward declarations.
+		// TODO: check if this is OK
+		class RobotAbstract;
+		class LandmarkAbstract;
+		class ObservationAbstract;
 
 		/** Base class for all map types defined in the module
 		 * rtslam.
@@ -44,23 +51,18 @@ namespace jafar {
 				 */
 				size_t max_size;
 				size_t current_size;
-				vector<bool> used_states;
-				jblas::ind_array * ia;
+				jblas::vecb used_states;
+				jblas::ind_array * iax;
 
 				/**
-				 * Constructor
+				 * EKF engine
 				 */
-				MapAbstract(size_t max_size);
+				ExtendedKalmanFilterIndirect filter;
 
 				/**
-				 * Gaussian map
+				 * Mandatory virtual destructor - Map is used as non-abstract by now
 				 */
-				Gaussian gaussian;
-
-				/**
-				 * Mandatory virtual destructor
-				 */
-				virtual ~MapAbstract(void);
+				// virtual ~MapAbstract(void);
 
 				/**
 				 * A list of robots
@@ -71,6 +73,14 @@ namespace jafar {
 				 * A list of landmarks
 				 */
 				std::list<LandmarkAbstract*> landmarksList;
+
+				/**
+				 * Constructor
+				 */
+				MapAbstract(size_t max_size) :
+					used_states(max_size), filter(max_size) {
+					used_states.clear();
+				}
 
 				/**
 				 * Obtain free Map space of a given size.

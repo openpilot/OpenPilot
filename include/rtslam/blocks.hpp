@@ -18,7 +18,8 @@
 
 #include "jmath/jblas.hpp"
 #include "jmath/ublasExtra.hpp"
-#include "gaussian.hpp"
+//#include "boost/numeric/ublas/storage.hpp"
+#include "rtslam/gaussian.hpp"
 
 // Shortcut for namespace ublas
 namespace ublas = boost::numeric::ublas;
@@ -28,43 +29,18 @@ namespace jafar {
 
 		/**
 		 * Base class for all parameter sets in module rtslam.
+		 * \ingroup rtslam
 		 */
 		class ParametersAbstract {
+			public:
 				/**
 				 * Mandatory virtual destructor.
 				 */
-				virtual ~ParametersAbstract(void);
+				inline virtual ~ParametersAbstract(void) {
+				}
+
 		};
 
-		/** Base class for all Gaussian state vectors defined in the module rtslam.
-		 *
-		 * @ingroup rtslam
-		 */
-		class State: public Gaussian {
-		};
-
-		/**
-		 * Class for Gaussian poses with selectable Direct or Indirect access (with local or remote storage)
-		 * \ingroup rtslam
-		 */
-		class Pose: public Gaussian {
-			public:
-				/**
-				 * Position
-				 */
-				jblas::vec3 position(void) {
-					jblas::vec3 res;
-					res.assign(subvector(x, 0, 3));
-					return res;
-				}
-				/**
-				 * Orientation quaternion
-				 */
-				jblas::vec4 quaternion(void) {
-					jblas::vec4 res;
-					res.assign(subvector(x, 3, 7));
-				}
-		};
 
 	}
 }

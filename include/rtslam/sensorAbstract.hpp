@@ -21,104 +21,119 @@
 #include <list>
 
 #include "jmath/jblas.hpp"
-#include "blocks.hpp"
-#include "robotAbstract.hpp"
-#include "observationAbstract.hpp"
+#include "rtslam/blocks.hpp"
+#include "rtslam/robotAbstract.hpp"
+#include "rtslam/observationAbstract.hpp"
+#include "rtslam/mapAbstract.hpp"
 
 namespace jafar {
 	namespace rtslam {
 
+		// Forward declarations
+		// TODO: check if this is OK.
+		class RobotAbstract;
+		class ObservationAbstract;
 
 		/**
 		 * Base class for all raw data in module rtslam.
+		 * \ingroup rtslam
 		 */
 		class RawAbstract {
+			public:
 				/**
 				 * Mandatory virtual destructor.
 				 */
-				virtual ~RawAbstract(void);
+				inline virtual ~RawAbstract(void) {
+				}
 				/**
 				 * Acquire raw data
 				 */
-				virtual void acquire() = 0;
+				inline virtual void acquire(void) {
+				}
 		};
 
-
-		/** Base class for all sensors defined in the module rtslam.
-		 *
-		 * @ingroup rtslam
+		/**
+		 * Base class for all sensors defined in the module rtslam.
+		 * \ingroup rtslam
 		 */
 		class SensorAbstract {
+
 			public:
 
-				/**
-				 * Mandatory virtual destructor.
-				 */
-				virtual ~SensorAbstract(void);
+				// Mandatory virtual destructor.
+				inline virtual ~SensorAbstract(void) {
+				}
 
-				/**
-				 * Sensor name
-				 */
+				size_t id;
 				std::string name;
-
-				/**
-				 * Sensor type
-				 */
 				std::string type;
 
-				/**
-				 * Father robot
-				 */
 				RobotAbstract* robot;
-
-				/**
-				 * Flag for including pose in map for calibration
-				 */
-				storage_type pose_storage_type;
-
-				/**
-				 * pose (local or remote in Map)
-				 */
-				Pose pose;
-
-				/**
-				 * parameters
-				 */
-				ParametersAbstract parameters;
-
-				/**
-				 * Raw data
-				 */
-				RawAbstract raw;
-
-				/**
-				 * Observations list
-				 */
 				std::list<ObservationAbstract*> observationsList;
 
+				Gaussian pose;
+
 				/**
+				 * Local pose constructor - only mean
+				 * Creates a sensor with its own pose information
+				 * \param _pose a pose vector
+				 */
+				//				template<class V>
+				SensorAbstract(const jblas::vec & _pose) :
+					pose(_pose) {
+				}
+
+				/**
+				 * Local pose constructor - full Gaussian
+				 * Creates a sensor with its own pose information
+				 * \param _pose a Gaussian pose
+				 */
+				SensorAbstract(const Gaussian & _pose) :
+					pose(_pose) {
+				}
+
+				/**
+				 * Remote pose constructor
+				 * Creates a sensor with the pose indexed in a Gaussian map
+				 * \param map the map
+				 * \param ias the indirect array of indices to the map
+				 */
+				SensorAbstract(MapAbstract & map, const jblas::ind_array & ias) :
+					pose(map.filter.x, map.filter.P, ias) {
+				}
+
+				/*
 				 * Acquire raw data
 				 */
-				virtual void acquireRaw(){raw.acquire();};
+				virtual void acquireRaw() {
+					// raw.acquire();
+				}
+
+				//				/*
+				//				 * Project all landmarks
+				//				 */
+				//				void projectAllLandmarks(void);
+				//
+				//				/*
+				//				 * Select most informative observations to update
+				//				 */
+				//				std::list<size_t> selectMostInformative(size_t numOfLmks);
+				//
+				//				/*
+				//				 * Try to match landmarks
+				//				 */
+				//				virtual std::list<size_t> match(std::list<size_t>) = 0;
 
 				/**
-				 * Project all landmarks
+				 * Operator << for class SensorAbstract.
+				 * It shows information of the sensor.
 				 */
-				void projectAllLandmarks(void);
+				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::SensorAbstract & sen) {
+					s << "SENSOR " << sen.id << ": " << sen.name << " of type " << sen.type << endl;
+					s << ".pose:  " << sen.pose << endl;
+					return s;
+				}
 
-				/**
-				 * Select most informative observations to update
-				 */
-				std::list<size_t> selectMostInformative(size_t numOfLmks);
-
-				/**
-				 * Try to match landmarks
-				 */
-				virtual std::list<size_t> match(std::list<size_t>) = 0;
-
-				/**
-				 *
-				 */
 		};
 
 	}

@@ -12,7 +12,7 @@
 #ifndef OBSERVATIONPINHOLEANCHOREDHOMOGENEOUS_HPP_
 #define OBSERVATIONPINHOLEANCHOREDHOMOGENEOUS_HPP_
 
-#include "observationAbstract.hpp"
+#include "rtslam/observationAbstract.hpp"
 
 namespace jafar
 {

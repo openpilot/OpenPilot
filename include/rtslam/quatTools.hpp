@@ -660,9 +660,6 @@ namespace jafar {
 			project(VF_f, range(0, 3), range(0, 3)) = zero_mat(3, 3);
 		}
 
-
-
-
 		/**
 		 * From-frame transformation for Euclidean points
 		 * \param F frame
@@ -671,7 +668,7 @@ namespace jafar {
 		 */
 		template<class VecF, class Pnt>
 		vec3 eucFromFrame(const VecF & F, const Pnt & pf) {
-			return RofQtimesV(project(F, range(3,7)),pf) + project(F, range(0,3));
+			return RofQtimesV(project(F, range(3, 7)), pf) + project(F, range(0, 3));
 		}
 
 		/**
@@ -719,7 +716,24 @@ namespace jafar {
 			RofQtimesV(q, vf, v, V_q, V_vf);
 		}
 
-
+		/**
+		 * Compose frames
+		 * \param G the global frame
+		 * \param F the local frame (expressed in G)
+		 * \return the composed frame GoF
+		 */
+		template<class VecG, class VecF>
+		jblas::vec composeFrames(VecG & G, VecF & F) {
+			vec4 q1 = subrange(G, 3, 7);
+			vec3 t2 = subrange(F, 0, 3);
+			vec4 q2 = subrange(F, 3, 7);
+			vec3 t = eucFromFrame(G, t2);
+			vec4 q = qProd(q1, q2);
+			vec H(7);
+			subrange(H, 0, 3) = t;
+			subrange(H, 3, 7) = q;
+			return H;
+		}
 
 	}
 }

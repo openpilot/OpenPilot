@@ -1,5 +1,7 @@
 *.graffle
 lib/
 objs/
+macro/
+test_suite/
 *.old
 *.*~

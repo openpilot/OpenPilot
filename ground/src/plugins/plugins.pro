@@ -4,8 +4,7 @@
 TEMPLATE  = subdirs
 
 SUBDIRS   = plugin_coreplugin \
-            plugin_welcome \
-            plugin_tutorial
+            plugin_welcome
 
 # Blank Template Plugin, not compiled by default
 #SUBDIRS += plugin_donothing
@@ -19,6 +18,4 @@ plugin_coreplugin.subdir = coreplugin
 plugin_welcome.subdir = welcome
 plugin_welcome.depends = plugin_coreplugin
 
-plugin_tutorial.subdir = tutorial
-plugin_tutorial.depends = plugin_coreplugin
 

@@ -28,11 +28,8 @@ SOURCES += mainwindow.cpp \
     actionmanager/command.cpp \
     actionmanager/actioncontainer.cpp \
     actionmanager/commandsfile.cpp \
-    dialogs/saveitemsdialog.cpp \
-    dialogs/newdialog.cpp \
     dialogs/settingsdialog.cpp \
     dialogs/shortcutsettings.cpp \
-    dialogs/openwithdialog.cpp \
     basemode.cpp \
     baseview.cpp \
     coreplugin.cpp \
@@ -68,11 +65,8 @@ HEADERS += mainwindow.h \
     actionmanager/command_p.h \
     actionmanager/actioncontainer_p.h \
     actionmanager/commandsfile.h \
-    dialogs/saveitemsdialog.h \
-    dialogs/newdialog.h \
     dialogs/settingsdialog.h \
     dialogs/shortcutsettings.h \
-    dialogs/openwithdialog.h \
     dialogs/iwizard.h \
     dialogs/ioptionspage.h \
     icontext.h \
@@ -104,11 +98,8 @@ HEADERS += mainwindow.h \
     mimedatabase.h \
     settingsdatabase.h \
     eventfilteringmainwindow.h
-FORMS += dialogs/newdialog.ui \
-    dialogs/settingsdialog.ui \
+FORMS += dialogs/settingsdialog.ui \
     dialogs/shortcutsettings.ui \
-    dialogs/saveitemsdialog.ui \
-    dialogs/openwithdialog.ui \
     generalsettings.ui
 RESOURCES += core.qrc \
     fancyactionbar.qrc

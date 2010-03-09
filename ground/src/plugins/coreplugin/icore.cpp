@@ -187,14 +187,6 @@
 */
 
 /*!
-    \fn QPrinter *ICore::printer() const
-    \brief Returns the application's printer object.
-
-    Always use this printer object for printing, so the different parts of the
-    application re-use its settings.
-*/
-
-/*!
     \fn QString ICore::resourcePath() const
     \brief Returns the absolute path that is used for resources like
     project templates and the debugger macros.

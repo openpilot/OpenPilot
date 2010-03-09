@@ -84,21 +84,6 @@ void VariableManager::removeFileInfo(const QString &tag)
     }
 }
 
-#if 0
-void VariableManager::updateCurrentDocument(Core::IEditor *editor)
-{
-    const QString currentDocumentTag = QLatin1String("CURRENT_DOCUMENT");
-    removeFileInfo(currentDocumentTag);
-    if (editor) {
-        if (const Core::IFile *file = editor->file()) {
-            const QString fileName = file->fileName();
-            if (!fileName.isEmpty())
-                insertFileInfo(currentDocumentTag, fileName);
-        }
-    }
-}
-#endif
-
 QString VariableManager::value(const QString &variable) const
 {
     return m_map.value(variable);

@@ -34,7 +34,6 @@
 #include <QtCore/QObject>
 
 namespace Core {
-class IEditor;
 /*!
   \class Core::ICoreListener
 
@@ -66,7 +65,6 @@ public:
     ICoreListener(QObject *parent = 0) : QObject(parent) {}
     virtual ~ICoreListener() {}
 
-    virtual bool editorAboutToClose(IEditor * /*editor*/) { return true; }
     virtual bool coreAboutToClose() { return true; }
 };
 

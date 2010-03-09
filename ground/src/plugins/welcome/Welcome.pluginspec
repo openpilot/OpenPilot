@@ -1,4 +1,4 @@
-<plugin name="Welcome" version="1.3.1" compatVersion="1.3.1">
+<plugin name="Welcome" version="1.0.0" compatVersion="1.0.0">
 <vendor>The OpenPilot Project</vendor>
     <copyright>(C) 2010 OpenPilot Project</copyright>
     <license>
@@ -12,6 +12,6 @@ will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.</license>
         <description>Default Welcome Screen Plugin</description>
     <url>http://www.openpilot.org</url>
 <dependencyList>
-        <dependency name="Core" version="1.3.1"/>
+        <dependency name="Core" version="1.0.0"/>
     </dependencyList>
 </plugin>    

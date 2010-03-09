@@ -35,7 +35,6 @@
 
 QT_BEGIN_NAMESPACE
 class QMainWindow;
-class QPrinter;
 class QSettings;
 template <class T> class QList;
 QT_END_NAMESPACE
@@ -62,10 +61,6 @@ public:
 
     static ICore *instance();
 
-    virtual QStringList showNewItemDialog(const QString &title,
-                                          const QList<IWizard *> &wizards,
-                                          const QString &defaultLocation = QString()) = 0;
-
     virtual bool showOptionsDialog(const QString &group = QString(),
                                    const QString &page = QString(),
                                    QWidget *parent = 0) = 0;
@@ -85,7 +80,6 @@ public:
 
     virtual QSettings *settings() const = 0;
     virtual SettingsDatabase *settingsDatabase() const = 0;
-    virtual QPrinter *printer() const = 0;
 
     virtual QString resourcePath() const = 0;
 

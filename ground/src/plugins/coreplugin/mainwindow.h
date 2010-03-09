@@ -39,7 +39,6 @@
 QT_BEGIN_NAMESPACE
 class QSettings;
 class QShortcut;
-class QPrinter;
 class QToolButton;
 QT_END_NAMESPACE
 
@@ -98,7 +97,6 @@ public:
 
     inline QSettings *settings() const { return m_settings; }
     inline SettingsDatabase *settingsDatabase() const { return m_settingsDatabase; }
-    virtual QPrinter *printer() const;
     IContext * currentContextObject() const;
     QStatusBar *statusBar() const;
     void addAdditionalContext(int context);
@@ -117,10 +115,6 @@ public slots:
     void openFileWith();
     void exit();
     void setFullScreen(bool on);
-
-    QStringList showNewItemDialog(const QString &title,
-                                  const QList<IWizard *> &wizards,
-                                  const QString &defaultLocation = QString());
 
     bool showOptionsDialog(const QString &category = QString(),
                            const QString &page = QString(),
@@ -164,7 +158,6 @@ private:
     QList<int> m_additionalContexts;
     QSettings *m_settings;
     SettingsDatabase *m_settingsDatabase;
-    mutable QPrinter *m_printer;
     ActionManagerPrivate *m_actionManager;
     MessageManager *m_messageManager;
     VariableManager *m_variableManager;

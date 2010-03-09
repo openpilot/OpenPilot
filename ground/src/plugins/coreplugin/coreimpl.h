@@ -44,9 +44,6 @@ public:
     CoreImpl(MainWindow *mainwindow);
     ~CoreImpl() {}
 
-    QStringList showNewItemDialog(const QString &title,
-                                  const QList<IWizard *> &wizards,
-                                  const QString &defaultLocation = QString());
     bool showOptionsDialog(const QString &group = QString(),
                            const QString &page = QString(),
                            QWidget *parent = 0);
@@ -65,7 +62,6 @@ public:
 
     QSettings *settings() const;
     SettingsDatabase *settingsDatabase() const;
-    QPrinter *printer() const;
 
     QString resourcePath() const;
 

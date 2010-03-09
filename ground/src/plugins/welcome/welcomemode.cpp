@@ -34,7 +34,6 @@
 #include <coreplugin/coreconstants.h>
 #include <coreplugin/uniqueidmanager.h>
 #include <coreplugin/modemanager.h>
-#include <coreplugin/dialogs/newdialog.h>
 
 #include <utils/styledbar.h>
 #include <utils/welcomemodetreewidget.h>

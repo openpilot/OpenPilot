@@ -46,7 +46,6 @@ QT_END_NAMESPACE
 
 namespace Core {
 
-class IEditor;
 class IFileWizardExtension;
 
 class BaseFileWizardParameterData;

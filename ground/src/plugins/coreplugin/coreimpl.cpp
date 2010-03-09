@@ -57,13 +57,6 @@ CoreImpl::CoreImpl(MainWindow *mainwindow)
     m_mainwindow = mainwindow;
 }
 
-QStringList CoreImpl::showNewItemDialog(const QString &title,
-                                        const QList<IWizard *> &wizards,
-                                        const QString &defaultLocation)
-{
-    return m_mainwindow->showNewItemDialog(title, wizards, defaultLocation);
-}
-
 bool CoreImpl::showOptionsDialog(const QString &group, const QString &page, QWidget *parent)
 {
     return m_mainwindow->showOptionsDialog(group, page, parent);
@@ -118,11 +111,6 @@ QSettings *CoreImpl::settings() const
 SettingsDatabase *CoreImpl::settingsDatabase() const
 {
     return m_mainwindow->settingsDatabase();
-}
-
-QPrinter *CoreImpl::printer() const
-{
-    return m_mainwindow->printer();
 }
 
 #ifdef Q_OS_MAC

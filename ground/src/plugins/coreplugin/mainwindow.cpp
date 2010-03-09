@@ -39,7 +39,6 @@
 #include "messagemanager.h"
 #include "modemanager.h"
 #include "mimedatabase.h"
-#include "newdialog.h"
 #include "outputpane.h"
 #include "plugindialog.h"
 #include "shortcutsettings.h"
@@ -73,11 +72,9 @@
 #include <QtGui/QCloseEvent>
 #include <QtGui/QMenu>
 #include <QtGui/QPixmap>
-#include <QtGui/QPrinter>
 #include <QtGui/QShortcut>
 #include <QtGui/QStatusBar>
 #include <QtGui/QWizard>
-#include <QtGui/QPrinter>
 #include <QtGui/QToolButton>
 #include <QtGui/QMessageBox>
 
@@ -111,7 +108,6 @@ MainWindow::MainWindow() :
     m_settingsDatabase(new SettingsDatabase(QFileInfo(m_settings->fileName()).path(),
                                             QLatin1String("OpenPilotGCS"),
                                             this)),
-    m_printer(0),
     m_actionManager(new ActionManagerPrivate(this)),
     m_variableManager(new VariableManager(this)),
     m_viewManager(0),
@@ -200,8 +196,6 @@ MainWindow::~MainWindow()
     m_generalSettings = 0;
     delete m_settings;
     m_settings = 0;
-    delete m_printer;
-    m_printer = 0;
     delete m_uniqueIDManager;
     m_uniqueIDManager = 0;
 
@@ -628,7 +622,6 @@ void MainWindow::registerDefaultActions()
 
 void MainWindow::newFile()
 {
-    showNewItemDialog(tr("New...", "Title of dialog"), IWizard::allWizards());
 }
 
 void MainWindow::openFile()
@@ -637,15 +630,6 @@ void MainWindow::openFile()
 
 static QList<IFileFactory*> getNonEditorFileFactories()
 {
-#if 0
-    const QList<IFileFactory*> allFileFactories =
-        ExtensionSystem::PluginManager::instance()->getObjects<IFileFactory>();
-    QList<IFileFactory*> nonEditorFileFactories;
-    foreach (IFileFactory *factory, allFileFactories) {
-        if (!qobject_cast<IEditorFactory *>(factory))
-            nonEditorFileFactories.append(factory);
-    }
-#endif
     QList<IFileFactory*> tmp;
     return tmp;
 }
@@ -683,39 +667,6 @@ void MainWindow::openFiles(const QStringList &fileNames)
 void MainWindow::setFocusToEditor()
 {
 
-}
-
-QStringList MainWindow::showNewItemDialog(const QString &title,
-                                          const QList<IWizard *> &wizards,
-                                          const QString &defaultLocation)
-{
-
-    QString defaultDir = defaultLocation;
-
-    if (defaultDir.isEmpty())
-        defaultDir = Utils::PathChooser::homePath();
-
-    // Scan for wizards matching the filter and pick one. Don't show
-    // dialog if there is only one.
-    IWizard *wizard = 0;
-    switch (wizards.size()) {
-    case 0:
-        break;
-    case 1:
-        wizard = wizards.front();
-        break;
-    default: {
-        NewDialog dlg(this);
-        dlg.setWizards(wizards);
-        dlg.setWindowTitle(title);
-        wizard = dlg.showDialog();
-    }
-        break;
-    }
-
-    if (!wizard)
-        return QStringList();
-    return wizard->runWizard(defaultDir, this);
 }
 
 bool MainWindow::showOptionsDialog(const QString &category,
@@ -1018,13 +969,6 @@ void MainWindow::aboutPlugins()
 {
     PluginDialog dialog(this);
     dialog.exec();
-}
-
-QPrinter *MainWindow::printer() const
-{
-    if (!m_printer)
-        m_printer = new QPrinter(QPrinter::HighResolution);
-    return m_printer;
 }
 
 void MainWindow::setFullScreen(bool on)

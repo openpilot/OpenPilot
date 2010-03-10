@@ -33,18 +33,19 @@
 #include <list>
 #include <jmath/jblas.hpp>
 
-#include "rtslam/observationAbstract.hpp"
 #include "rtslam/blocks.hpp"
+// include parents
 #include "rtslam/mapAbstract.hpp"
 
 namespace jafar {
 
 	namespace rtslam {
 
-		// Forward declarations
-		// TODO: check if this is OK.
+		using namespace std;
+
+
+		// Forward declarations of children
 		class ObservationAbstract;
-		class MapAbstract;
 
 		/** Base class for all landmark descriptors defined in the module
 		 * rtslam.
@@ -73,14 +74,14 @@ namespace jafar {
 			public:
 
 				size_t size;
-				std::size_t id;
+				size_t id;
 				std::string type;
 
 				Gaussian state;
 				DescriptorAbstract descriptor;
 
 				MapAbstract * map;
-				std::list<ObservationAbstract*> observationsList;
+				list<ObservationAbstract*> observationsList;
 
 				/**
 				 * Mandatory virtual destructor.
@@ -88,9 +89,10 @@ namespace jafar {
 				virtual ~LandmarkAbstract(void) {
 				}
 
-				LandmarkAbstract(MapAbstract & _map, const jblas::ind_array & _ial) :
-					size(_ial.size()), type("AHP"), state(_map.filter.x, _map.filter.P, _ial), map(&_map) {
-				}
+				/**
+				 * constructor
+				 */
+				LandmarkAbstract(MapAbstract & _map, const jblas::ind_array & _ial);
 
 				/**
 				 * Reparametrize the landmark.
@@ -124,9 +126,9 @@ namespace jafar {
 				 * Operator << for class LandmarkAbstract.
 				 * It shows different information of the landmark.
 				 */
-				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::LandmarkAbstract & lmk) {
-					s << "LANDMARK " << lmk.id << " of type " << lmk.type << endl;
-					s << ".state:  " << lmk.state << endl;
+				friend ostream& operator <<(ostream & s, jafar::rtslam::LandmarkAbstract & lmk) {
+					s << "LANDMARK " << lmk.id << " of type " << lmk.type << std::endl;
+					s << ".state:  " << lmk.state << std::endl;
 					return s;
 				}
 

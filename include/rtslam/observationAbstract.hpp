@@ -34,6 +34,7 @@
 
 #include "rtslam/blocks.hpp"
 #include "rtslam/gaussian.hpp"
+// include parents
 #include "rtslam/sensorAbstract.hpp"
 #include "rtslam/landmarkAbstract.hpp"
 
@@ -41,10 +42,7 @@ namespace jafar {
 
 	namespace rtslam {
 
-		// Forward declarations
-		// TODO: check if this is OK.
-		class SensorAbstract;
-		class LandmarkAbstract;
+		using namespace std;
 
 		/** Base class for all landmark appearances defined in the module
 		 * rtslam.
@@ -70,7 +68,17 @@ namespace jafar {
 				bool visible; // landmark is visible (in Field Of View).
 				double infoGain; // expected "information gain" of performing an update with this observation.
 
-				virtual void computeVisibility(void);
+				/**
+				 * size constructor
+				 */
+				Expectation(const size_t _size);
+
+				/**
+				 * sizes constructor
+				 */
+				Expectation(const size_t _size, const size_t _size_nonobs);
+
+				void computeVisibility(void);
 				void estimateInfoGain(void);
 		};
 
@@ -85,17 +93,17 @@ namespace jafar {
 		};
 
 		/** Base class for all Gaussian innovations defined in the module rtslam.
-		 *
-		 * It implements the trivial innovation model inn = meas - exp. It also returns the Jacobian matrices.
-		 *
-		 * Derive this class if you need other non-trivial innovation models (useful for line lendmarks).
+		 * It implements the trivial innovation model inn = meas - exp.
+		 * It also returns the Jacobian matrices.
+		 * Derive this class if you need other non-trivial innovation
+		 * models (useful for line lendmarks).
 		 *
 		 * @ingroup rtslam
 		 */
 		class Innovation: public Gaussian {
 			protected:
 				/// The inverse of the innovation covariances matrix.
-				jblas::sym_mat iP;
+				jblas::sym_mat iP_;
 				/// The Mahalanobis distance from the measurement to the expectation.
 				double mahalanobis_;
 				/// The Jacobian of the innovation wrt the measurement.
@@ -105,10 +113,24 @@ namespace jafar {
 			public:
 
 				/**
+				 * Size construction.
+				 * \param _size the innovation size
+				 */
+				Innovation(const size_t _size);
+
+				/**
+				 * Sizes construction.
+				 * \param _size the innovation size
+				 * \param _size_meas the measurement size
+				 * \param _size_exp the expectation size
+				 */
+				Innovation(const size_t _size, const size_t _size_meas, const size_t _size_exp);
+
+				/**
 				 * the inverse of the innovation covariance.
 				 */
 				void invertCov(void) {
-					jafar::jmath::ublasExtra::lu_inv(P(), iP);
+					jafar::jmath::ublasExtra::lu_inv(P(), iP_);
 				}
 
 				/**
@@ -116,38 +138,43 @@ namespace jafar {
 				 */
 				double mahalanobis(void) {
 					invertCov();
-					mahalanobis_ = ublas::inner_prod(x(), (jblas::vec) ublas::prod(iP, x()));
+					mahalanobis_ = ublas::inner_prod(x(), (jblas::vec) ublas::prod(iP_, x()));
 					return mahalanobis_;
 				}
 
 				/**
-				 * The trivial innovation function  inn = meas - exp .
+				 * The trivial innovation function  inn = meas - exp.
 				 * Derive the class and overload this method to use other, non-trivial innovation functions.
+				 * \param exp_mean the expectation mean
+				 * \param meas_mean the measurement mean
 				 */
 				template<class V1, class V2>
-				void func(V1& exp_mean, V2& meas_mean) {
+				void compute(V1& exp_mean, V2& meas_mean) {
 					x() = meas_mean - exp_mean;
 				}
 
 				/**
-				 * The trivial innovation function inn = meas - exp. It updates the Jacobian matrices.
+				 * The trivial innovation function inn = meas - exp.
+				 * It updates the Jacobian matrices.
 				 * Derive the class and overload this method to use other, non-trivial innovation functions.
+				 * \param exp_mean the expectation mean
+				 * \param meas_mean the measurement mean
 				 */
 				template<class V1, class V2>
-				void func_with_Jacobians(V1& exp_mean, V2& meas_mean) {
+				void compute_with_Jacobians(V1& exp_mean, V2& meas_mean) {
 					func(exp_mean, meas_mean);
 					INN_meas = jblas::identity_mat(exp_mean.size());
 					INN_exp = -1.0 * jblas::identity_mat(exp_mean.size());
 				}
 
 				/**
-				 * Compute full innovation
+				 * Compute full innovation, with covariances matrix.
 				 * Derive the class and overload this method to use other, non-trivial innovation functions.
+				 * \param exp_mean the expectation
+				 * \param meas_mean the measurement
 				 */
-				void compute(Expectation& exp /// The expected Gaussian.
-				    , Measurement& meas /// The measured Gaussian.
-				) {
-					func(exp.x(), meas.x()); // We do not request trivial Jacobians here. Jacobians are the identity.
+				void compute(Expectation& exp, Measurement& meas) {
+					compute(exp.x(), meas.x()); // We do not request trivial Jacobians here. Jacobians are the identity.
 					P() = meas.P() + exp.P(); // Derived classes: P = Inn_meas*meas.P*Inn_meas.transpose() + Inn_exp*exp.P*Inn_exp.transpose();
 				}
 		};
@@ -164,6 +191,16 @@ namespace jafar {
 				 * Mandatory virtual destructor.
 				 */
 				virtual ~ObservationAbstract(void);
+
+				/**
+				 * Sizes constructor
+				 */
+				ObservationAbstract(size_t _size_meas, size_t _size_exp, size_t _size_inn);
+
+				/**
+				 * Sensor and landmark constructor
+				 */
+				ObservationAbstract(SensorAbstract & _sen, LandmarkAbstract & _lmk);
 
 				/**
 				 *  Mother Sensor where it was acquired from
@@ -246,8 +283,8 @@ namespace jafar {
 				 * It shows different information of the observation.
 				 */
 				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObservationAbstract & obs) {
-//					s << "OBSERVATION of " << obs.landmark->type << " from " << obs.sensor->type << endl;
-//					s << "Sensor: " << obs.sensor->id << ", landmark: "	<< obs.landmark->id << endl;
+					//					s << "OBSERVATION of " << obs.landmark->type << " from " << obs.sensor->type << endl;
+					//					s << "Sensor: " << obs.sensor->id << ", landmark: "	<< obs.landmark->id << endl;
 					s << ".expectation:  " << obs.expectation << endl;
 					s << ".measurement:  " << obs.measurement << endl;
 					s << ".innovation:   " << obs.innovation << endl;

@@ -22,16 +22,16 @@
 
 #include "jmath/jblas.hpp"
 #include "rtslam/blocks.hpp"
+//include parents
 #include "rtslam/robotAbstract.hpp"
-#include "rtslam/observationAbstract.hpp"
-#include "rtslam/mapAbstract.hpp"
+//#include "rtslam/mapAbstract.hpp"
 
 namespace jafar {
 	namespace rtslam {
 
-		// Forward declarations
-		// TODO: check if this is OK.
-		class RobotAbstract;
+		using namespace std;
+
+		// Forward declarations of children
 		class ObservationAbstract;
 
 		/**
@@ -79,28 +79,30 @@ namespace jafar {
 				 * \param _pose a pose vector
 				 */
 				//				template<class V>
-				SensorAbstract(const jblas::vec & _pose) :
-					pose(_pose) {
-				}
+				SensorAbstract(const jblas::vec & _pose);
 
 				/**
 				 * Local pose constructor - full Gaussian.
 				 * Creates a sensor with its own pose information.
 				 * \param _pose a Gaussian pose
 				 */
-				SensorAbstract(const Gaussian & _pose) :
-					pose(_pose) {
-				}
+				SensorAbstract(const Gaussian & _pose);
 
 				/**
 				 * Remote pose constructor.
-				 * Creates a sensor with the pose indexed in a Gaussian map.
+				 * Creates a sensor with the pose indexed in a map.
 				 * \param map the map
 				 * \param ias the indirect array of indices to the map
 				 */
-				SensorAbstract(MapAbstract & map, const jblas::ind_array & ias) :
-					pose(map.filter.x, map.filter.P, ias) {
-				}
+				SensorAbstract(MapAbstract & map, const jblas::ind_array & ias);
+
+
+				/**
+				 * Install sensor in robot
+				 * \param sen the sensor
+				 */
+				void installToRobot(RobotAbstract & rob);
+
 
 				/*
 				 * Acquire raw data

@@ -19,8 +19,8 @@
 
 #include "jmath/jblas.hpp"
 #include "rtslam/gaussian.hpp"
-#include "rtslam/robotAbstract.hpp"
-#include "rtslam/landmarkAbstract.hpp"
+//#include "rtslam/robotAbstract.hpp"
+//#include "rtslam/landmarkAbstract.hpp"
 #include "rtslam/kalmanFilter.hpp"
 
 namespace jafar {
@@ -32,7 +32,6 @@ namespace jafar {
 	namespace rtslam {
 
 		// some forward declarations.
-		// TODO: check if this is OK
 		class RobotAbstract;
 		class LandmarkAbstract;
 		class ObservationAbstract;
@@ -77,13 +76,12 @@ namespace jafar {
 				/**
 				 * Constructor
 				 */
-				MapAbstract(size_t max_size) :
-					used_states(max_size), filter(max_size) {
-					used_states.clear();
-				}
+				MapAbstract(size_t _max_size) ;
 
 				/**
 				 * Obtain free Map space of a given size.
+				 * The free space in \a used and the current size \a current_size are modified accordingly.
+				 * Ig not enough space is available, the returned indirect array is of null size.
 				 * \param _size the requested free space size.
 				 * \return the resulting free space.
 				 */
@@ -91,6 +89,7 @@ namespace jafar {
 
 				/**
 				 * Liberate the space indicated.
+				 * The free space in \a used and the current size \a current_size are modified accordingly.
 				 * \param _ia the space to liberate.
 				 */
 				void liberateSpace(const jblas::ind_array & _ia);

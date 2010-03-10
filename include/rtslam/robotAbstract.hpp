@@ -35,17 +35,17 @@
 #include <jmath/jblas.hpp>
 #include "rtslam/blocks.hpp"
 #include "rtslam/gaussian.hpp"
-#include "rtslam/sensorAbstract.hpp"
+// include parents
+//#include "rtslam/sensorAbstract.hpp"
 #include "rtslam/mapAbstract.hpp"
 
 namespace jafar {
 
 	namespace rtslam {
 
-		// Forward declarations
-		// TODO: check if this is OK.
+		//  Forward declarations of children
 		class SensorAbstract;
-		class MapAbstract;
+		//		class MapAbstract;
 
 		/** Base class for all Gaussian control vectors defined in the module rtslam.
 		 *
@@ -96,10 +96,7 @@ namespace jafar {
 				 * \param size_state the state size
 				 * \param size_control the control vector size
 				 */
-				RobotAbstract(size_t size_state, size_t size_control) :
-					//					state(size_state), control(size_control), F_r(size_state, size_state), F_u(size_state, size_control) {
-					    control(size_control), F_r(size_state, size_state), F_u(size_state, size_control) {
-				}
+				RobotAbstract(size_t size_state, size_t size_control);
 
 				/**
 				 * Remote constructor from remote map and size of control vector
@@ -107,16 +104,12 @@ namespace jafar {
 				 * \param _iar the indirect array pointing to the remote storage
 				 * \param _size_control the size of the control vector
 				 */
-				RobotAbstract(MapAbstract & _map, jblas::ind_array & _iar, size_t _size_control) :
-					state(_map.filter.x, _map.filter.P, _iar), pose(_map.filter.x, _map.filter.P,
-					    jafar::jmath::ublasExtra::ia_head(_iar, 7)), control(_size_control), F_r(_iar.size(), _iar.size()), F_u(
-					    _iar.size(), _size_control) {
-				}
+				RobotAbstract(MapAbstract & _map, jblas::ind_array & _iar, size_t _size_control);
 
-				inline void set_type(string _type) {
+				inline void set_type(std::string _type) {
 					type = _type;
 				}
-				inline void set_name(string _name) {
+				inline void set_name(std::string _name) {
 					name = _name;
 				}
 
@@ -143,12 +136,6 @@ namespace jafar {
 					move();
 				}
 
-				/**
-				 * Install sensor in robot
-				 * \param rob the robot
-				 * \param sen the sensor
-				 */
-				void installSensor(SensorAbstract & sen);
 
 				size_t getNextId(void);
 
@@ -157,9 +144,9 @@ namespace jafar {
 				 * It shows information of the robot.
 				 */
 				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::RobotAbstract & rob) {
-					s << "ROBOT " << rob.id << ": " << rob.name << " of type " << rob.type << endl;
-					s << ".pose: " << rob.pose << endl;
-					s << ".state:" << rob.state << endl;
+					s << "ROBOT " << rob.id << ": " << rob.name << " of type " << rob.type << std::endl;
+					s << ".pose: " << rob.pose << std::endl;
+					s << ".state:" << rob.state << std::endl;
 					return s;
 				}
 

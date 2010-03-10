@@ -27,7 +27,10 @@ namespace jafar {
 		 * - v += vi \n
 		 * - w += wi
 		 *
-		 * where \a vi and \a wi are linear and angular velocity random impulses.
+		 * where \a vi and \a wi are linear and angular velocity random impulses,
+		 * and ** is the quaternion product.
+		 *
+		 * See robotConstantVelocity.cpp comments for full algebric details.
 		 *
 		 * \ingroup rtslam
 		 */
@@ -40,16 +43,10 @@ namespace jafar {
 				 * \param _iar the indirect array pointing to the remote storage
 				 * \param _size_control the size of the control vector
 				 */
-				Robot3DConstantVelocity(MapAbstract & _map, jblas::ind_array & _iar, size_t _size_control) :
-					RobotAbstract(_map, _iar, _size_control) {
-					// Build constant perturbation Jacobian
-					jblas::identity_mat I(3);
-					ublas::subrange(F_u, 7, 10, 0, 3) = I;
-					ublas::subrange(F_u, 10, 13, 3, 6) = I;
-					set_type("Constant-Velocity");
-				}
+				Robot3DConstantVelocity(MapAbstract & _map, jblas::ind_array & _iar, size_t _size_control);
 
-				~Robot3DConstantVelocity(void){}
+				~Robot3DConstantVelocity(void) {
+				}
 
 				/**
 				 * Move one step ahead.

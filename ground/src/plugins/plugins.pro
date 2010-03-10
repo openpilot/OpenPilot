@@ -4,7 +4,7 @@
 TEMPLATE  = subdirs
 
 SUBDIRS   = plugin_coreplugin \
-            plugin_welcome
+            plugin_welcome \
 
 # Blank Template Plugin, not compiled by default
 #SUBDIRS += plugin_donothing
@@ -17,5 +17,16 @@ plugin_coreplugin.subdir = coreplugin
 # Welcome Plugin
 plugin_welcome.subdir = welcome
 plugin_welcome.depends = plugin_coreplugin
+
+# UAVObjects plug-in
+#SUBDIRS += plugin_uavobjects
+#plugin_uavobjects.subdir = uavobjects
+#plugin_uavobjects.depends = plugin_coreplugin
+
+# UAVTalk plug-in
+#SUBDIRS += plugin_uavtalk
+#plugin_uavtalk.subdir = uavtalk
+#plugin_uavtalk.depends = plugin_uavobjects
+#plugin_uavtalk.depends += plugin_coreplugin
 
 

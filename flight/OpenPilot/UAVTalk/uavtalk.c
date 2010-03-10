@@ -4,8 +4,8 @@
  * @file       uavtalk.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      UAVTalk library, implements to telemetry protocol. See the wiki for more details.
- * 			   This library should not be called directly by the application, it is only used by the
- * 		       Telemetry module.
+ * 	       This library should not be called directly by the application, it is only used by the
+ * 	       Telemetry module.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/

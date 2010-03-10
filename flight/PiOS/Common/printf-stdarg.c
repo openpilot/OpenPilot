@@ -3,7 +3,7 @@
  *
  * @file       printf-stdarg.c   
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
+ * 	       Parts by Thorsten Klose (tk@midibox.org)
  * @brief      Formatted print functions
  * @see        The GNU Public License (GPL) Version 3
  *

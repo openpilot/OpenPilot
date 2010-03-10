@@ -4,7 +4,7 @@
  * @file       op_config.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      OpenPilot configuration header. 
- *                 - Compile time config for OpenPilot Application
+ *             Compile time config for OpenPilot Application
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/

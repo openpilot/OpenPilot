@@ -4,7 +4,7 @@
  * @file       uavobjectmanager.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Object manager library. This library holds a collection of all objects.
- * 			   It can be used by all modules/libraries to find an object reference.
+ *             It can be used by all modules/libraries to find an object reference.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/

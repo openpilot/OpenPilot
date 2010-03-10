@@ -3,7 +3,7 @@
  *
  * @file       pios_sdcard.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
+ * 	       Parts by Thorsten Klose (tk@midibox.org)
  * @brief      System and hardware Init functions header.
  * @see        The GNU Public License (GPL) Version 3
  *

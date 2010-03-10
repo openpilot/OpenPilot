@@ -3,7 +3,7 @@
  *
  * @file       pios_settings.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
+ * 	       Parts by Thorsten Klose (tk@midibox.org)
  * @brief      Settings functions header 
  * @see        The GNU Public License (GPL) Version 3
  *

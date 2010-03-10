@@ -4,9 +4,9 @@
  * @file       uavobjecttemplate.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Template file for all objects. This file will not compile, it is used
- * 			   by the parser as a template to generate all other objects. All $(x) fields
- * 			   will be replaced by the parser with the actual object information.
- * 			   Each object has a meta object associated with it. The meta object
+ * 	       by the parser as a template to generate all other objects. All $(x) fields
+ * 	       will be replaced by the parser with the actual object information.
+ * 	       Each object has a meta object associated with it. The meta object
  *             contains information such as the telemetry and logging properties.
  *
  * @see        The GNU Public License (GPL) Version 3

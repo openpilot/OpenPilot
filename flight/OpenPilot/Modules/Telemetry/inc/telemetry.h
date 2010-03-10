@@ -4,8 +4,8 @@
  * @file       telemetry.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Include file of the telemetry module.
- * 			   As with all modules only the initialize function is exposed all other
- * 			   interactions with the module take place through the event queue and
+ * 	       As with all modules only the initialize function is exposed all other
+ * 	       interactions with the module take place through the event queue and
  *             objects.
  * @see        The GNU Public License (GPL) Version 3
  *

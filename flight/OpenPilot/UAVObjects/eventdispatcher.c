@@ -3,8 +3,8 @@
  *
  * @file       eventdispatcher.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief	   Event dispatcher, distributes object events as callbacks. Alternative
- * 			   to using tasks and queues. All callbacks are invoked from the event task.
+ * @brief      Event dispatcher, distributes object events as callbacks. Alternative
+ * 	       to using tasks and queues. All callbacks are invoked from the event task.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/

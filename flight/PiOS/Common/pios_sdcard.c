@@ -3,7 +3,7 @@
  *
  * @file       pios_sdcard.c  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
+ * 	       Parts by Thorsten Klose (tk@midibox.org)
  * @brief      Sets up basic system hardware, functions are called from Main.
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   PIOS_SDCARD SDCard Functions

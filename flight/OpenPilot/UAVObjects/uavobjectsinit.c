@@ -4,7 +4,7 @@
  * @file       uavobjectsinit.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Initialize all objects.
- * 			   This file is automatically updated by the parser.
+ * 	       This file is automatically updated by the parser.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/

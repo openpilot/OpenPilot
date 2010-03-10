@@ -30,14 +30,12 @@
 /* Project Includes */
 #include "pios.h"
 
-// FIXME: temp assert
-#define assert(exp) {if (!(exp)) while(1);}
 
 
 #if !defined(PIOS_DONT_USE_I2C)
 
 /* Options */
-#define USE_DEBUG_PINS
+// #define USE_DEBUG_PINS
 
 /* Global Variables */
 volatile uint32_t PIOS_I2C_UnexpectedEvent;
@@ -84,12 +82,17 @@ static I2CRecTypeDef I2CRec;
 #ifdef USE_DEBUG_PINS
 	#define	DEBUG_PIN_ISR	0
 	#define DEBUG_PIN_BUSY	1
+	#define DEBUG_PIN_ASSERT	7
 	#define DebugPinHigh(x) PIOS_DEBUG_PinHigh(x)
 	#define DebugPinLow(x)	PIOS_DEBUG_PinLow(x)
 #else
 	#define DebugPinHigh(x)
 	#define DebugPinLow(x)
 #endif
+
+// FIXME: temp assert
+#define assert(exp) {if (!(exp)) while(1){DebugPinHigh(DEBUG_PIN_ASSERT);DebugPinLow(DEBUG_PIN_ASSERT);};};
+
 
 /**
 * Initializes IIC driver
@@ -127,6 +130,8 @@ int32_t PIOS_I2C_Init(void)
 	NVIC_InitStructure.NVIC_IRQChannel = I2C2_ER_IRQn;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_I2C_IRQ_ER_PRIORITY;
 	NVIC_Init(&NVIC_InitStructure);
+
+	DebugPinLow(2);
 
 	/* No error */
 	return 0;
@@ -298,6 +303,9 @@ int32_t PIOS_I2C_TransferWait(void)
 	uint32_t repeat_ctr = PIOS_I2C_TIMEOUT_VALUE;
 	uint16_t last_buffer_ix = i2cx->buffer_ix;
 
+	DebugPinHigh(3);
+	//while(i2cx->transfer_state.BUSY);
+
 	while(--repeat_ctr > 0) {
 		/* Check if buffer index has changed - if so, reload repeat counter */
 		if(i2cx->buffer_ix != last_buffer_ix) {
@@ -314,6 +322,7 @@ int32_t PIOS_I2C_TransferWait(void)
 				/* Release semaphore for easier programming at user level */
 				i2cx->i2c_semaphore = 0;
 			}
+			DebugPinLow(3);
 			return check_state;
 		}
 	}
@@ -328,6 +337,8 @@ int32_t PIOS_I2C_TransferWait(void)
 
 	/* Release semaphore (!) */
 	i2cx->i2c_semaphore = 0;
+
+	DebugPinLow(3);
 
 	return (i2cx->last_transfer_error = I2C_ERROR_TIMEOUT);
 }
@@ -357,6 +368,7 @@ int32_t PIOS_I2C_Transfer(I2CTransferTypeDef transfer, uint8_t address, uint8_t 
 	I2CRecTypeDef *i2cx = &I2CRec;
 	int32_t error;
 
+
 	/* Wait until previous transfer finished */
 	if((error = PIOS_I2C_TransferWait())) {
 		/* Transmission error during previous transfer */
@@ -373,6 +385,7 @@ int32_t PIOS_I2C_Transfer(I2CTransferTypeDef transfer, uint8_t address, uint8_t 
 	/* Clear transfer state and error value */
 	i2cx->transfer_state.ALL = 0;
 	i2cx->transfer_error = 0;
+
 
 	/* Set buffer length and start index */
 	i2cx->buffer_len = len;
@@ -404,8 +417,10 @@ int32_t PIOS_I2C_Transfer(I2CTransferTypeDef transfer, uint8_t address, uint8_t 
 	}
 
 	// Start the transfer
-	TransferStart(i2cx);
 	I2C_GenerateSTART(i2cx->base, ENABLE);
+	TransferStart(i2cx);
+
+
 
 	// All is fine
 	return 0;
@@ -419,6 +434,7 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 	uint8_t b;
 
 	DebugPinHigh(DEBUG_PIN_ISR);
+
 
 	/* Read SR1 and SR2 at the beginning (if not done so, flags may get lost) */
 	uint32_t event = I2C_GetLastEvent(i2cx->base);
@@ -440,6 +456,7 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 			i2cx->rx_buffer_ptr[i2cx->buffer_ix++] = b;
 		}
 		
+
 		/* Last byte received, disable interrupts and return. */
 		if(i2cx->transfer_state.STOP_REQUESTED) {
 			TransferEnd(i2cx);
@@ -491,13 +508,14 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 		
 		/* Peripheral is transfering last byte, request stop condition / */
 		/* On write-without-stop transfer-type, request start condition instead */
-		if(!i2cx->transfer_state.WRITE_WITHOUT_STOP) {
-			DebugPinHigh(2);
+		i2cx->transfer_state.STOP_REQUESTED = 1;
+		if(!i2cx->transfer_state.WRITE_WITHOUT_STOP)
+		{
 			I2C_GenerateSTOP(i2cx->base, ENABLE);
-			i2cx->transfer_state.STOP_REQUESTED = 1;
-			DebugPinLow(2);
-		} else {
-			TransferEnd(i2cx);
+		}
+		else
+		{
+			DebugPinHigh(2);
 		}
 		
 		if(i2cx->buffer_len == 0) {
@@ -511,6 +529,7 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 		goto isr_return;
 	}
 
+	// Send address
 	/* SB set, cleared by reading SR1 (done by I2C_GetLastEvent) followed by writing DR register */
 	if(event & I2C_FLAG_SB) {
 		/* Don't send address if stop was requested (WRITE_WITHOUT_STOP - mode, start condition was sent) */
@@ -528,21 +547,31 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 		: I2C_Direction_Transmitter);
 		goto isr_return;
 	}
-
-	/* This code is only reached if something got wrong, e.g. interrupt handler is called too late, */
-	/* The device reset itself (while testing, it was always event 0x00000000). we have to stop the transfer, */
-	/* Else read/write of corrupt data may be the result. */
 	
-	/* Notify error */
-	PIOS_I2C_UnexpectedEvent = event;
-	i2cx->transfer_error = I2C_ERROR_UNEXPECTED_EVENT;
-	
-	TransferEnd(i2cx);
+	DebugPinHigh(DEBUG_PIN_ASSERT);DebugPinLow(DEBUG_PIN_ASSERT);
 
-	/* Do dummy read to send NAK + STOP condition */
-	I2C_AcknowledgeConfig(i2cx->base, DISABLE);
-	b = I2C_ReceiveData(i2cx->base);
-	I2C_GenerateSTOP(i2cx->base, ENABLE);
+	//
+	// FredericG: Despite the comments below, it seems to me that this situation can happen and can
+	// be ignored without ill effects...
+	// For now this condition does not stop the transfer, but further investigation in needed
+	//
+
+//	assert(0);
+//
+//	/* This code is only reached if something got wrong, e.g. interrupt handler is called too late, */
+//	/* The device reset itself (while testing, it was always event 0x00000000). we have to stop the transfer, */
+//	/* Else read/write of corrupt data may be the result. */
+//
+//	/* Notify error */
+//	PIOS_I2C_UnexpectedEvent = event;
+//	i2cx->transfer_error = I2C_ERROR_UNEXPECTED_EVENT;
+//
+//	TransferEnd(i2cx);
+//
+//	/* Do dummy read to send NAK + STOP condition */
+//	I2C_AcknowledgeConfig(i2cx->base, DISABLE);
+//	b = I2C_ReceiveData(i2cx->base);
+//	I2C_GenerateSTOP(i2cx->base, ENABLE);
 
 isr_return:
 	DebugPinLow(DEBUG_PIN_ISR);

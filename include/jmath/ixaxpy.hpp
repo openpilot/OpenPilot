@@ -15,17 +15,13 @@
 #define IXAXPY_HPP_
 
 #include "jmath/jblas.hpp"
-//#include "boost/numeric/ublas/operation.hpp"
-//#include "boost/numeric/ublas/io.hpp"
-//#include <iostream>
 #include "jmath/indirectArray.hpp"
-
-using namespace std;
 
 namespace jafar {
 	namespace jmath {
 		namespace ublasExtra {
 
+			using namespace std;
 			using namespace boost::numeric::ublas;
 
 			//			template<class bubMatrix>

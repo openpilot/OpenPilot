@@ -45,7 +45,6 @@ namespace jafar {
 						j++;
 					}
 				}
-				cout << endl;
 				return icomp;
 			}
 
@@ -105,28 +104,85 @@ namespace jafar {
 			/**
 			 * Create array from a boolean vector
 			 */
-			jblas::ind_array ia_bool(jblas::vecb & vb) {
-
+			jblas::ind_array ia_set(const jblas::vecb & vb) {
 				int nb = 0;
-				for (size_t i = 0; i < vb.size(); i++) {
+				for (size_t i = 0; i < vb.size(); i++)
 					if (vb(i))
-						nb += 1;
-				}
-
+						nb++;
 				jblas::ind_array ia(nb);
-
 				int j = 0;
-
-				for (size_t i = 0; i < vb.size(); i++) {
+				for (size_t i = 0; i < vb.size(); i++)
 					if (vb(i)) {
 						ia(j) = i;
-						j += 1;
+						j++;
 					}
-				}
-
 				return ia;
 			}
 
-		}
-	}
-}
+			/**
+			 * Create indirect array from boolean vector and take the head N elements
+			 */
+			jblas::ind_array ia_head(const jblas::vecb & vb, const size_t N) {
+				JFR_PRECOND( (vb.size() >= N), "Boolean vector smaller than requested elements.");
+				jblas::ind_array res(N);
+				size_t i = 0;
+				size_t j = 0;
+				for (i = 0; i < vb.size(); i++) {
+					if (vb(i)) {
+						res(j) = i;
+						j++;
+						if (j >= N)
+							break;
+					}
+				}
+				JFR_POSTCOND( (j == N), "Boolean vector with insufficient true entries.");
+				return res;
+			}
+
+			/**
+			 * Create indirect array from boolean vector and take the head N elements, and clear these N elements form the boolean.
+			 */
+			jblas::ind_array ia_popfront(jblas::vecb & vb, const size_t N) {
+				JFR_PRECOND( (vb.size() >= N), "Boolean vector smaller than requested elements.");
+				jblas::ind_array res(N);
+				size_t i = 0;
+				size_t j = 0;
+				for (i = 0; i < vb.size(); i++) {
+					if (vb(i)) {
+						res(j) = i;
+						j++;
+						if (j >= N)
+							break;
+					}
+				}
+				JFR_POSTCOND( (j == N), "Boolean vector with insufficient true entries.");
+				jblas::vecb z(N);
+				z.clear();
+				ublas::project(vb, res) = z;
+				return res;
+			}
+
+			/**
+			 * Create indirect array from range.
+			 */
+			jblas::ind_array ia_range(const ublas::range & r) {
+				jblas::ind_array res(r.size());
+				for (size_t i = 0; i < res.size(); i++)
+					res(i) = r.start() + i;
+				return res;
+			}
+
+			/**
+			 * Create indirect array from start and end indices.
+			 */
+			jblas::ind_array ia_range(size_t begin, size_t end) {
+				JFR_PRECOND((begin < end), "Index begin is bigger than end.");
+				jblas::ind_array res(end - begin);
+				for (size_t i = 0; i < res.size(); i++)
+					res(i) = begin + i;
+				return res;
+			}
+
+		} // namespace ublasExtra
+	} // namespace jmath
+} // namespace jafar

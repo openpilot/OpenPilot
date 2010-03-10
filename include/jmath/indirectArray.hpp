@@ -71,11 +71,43 @@ namespace jafar {
 			 * \param vb a boolean vector
 			 * \return the indirect array
 			 */
-			jblas::ind_array ia_bool(jblas::vecb & vb);
+			jblas::ind_array ia_set(const jblas::vecb & vb);
 
-			//TODO ia_bool_head()
+			/**
+			 * Create indirect array from boolean vector and take the head N elements
+			 * The size of the returned array is the number of requested elements.
+			 * It is an error if not enough elements are present in the input boolean vector.
+			 * \param vb the boolean vector.
+			 * \param N the number of elements to be returned.
+			 * \return the indirect array.
+			 */
+			jblas::ind_array ia_head(const jblas::vecb & vb, const size_t N);
 
-			//TODO ia_range()
+			/**
+			 * Create indirect array from boolean vector and take the head N elements, and clear these N elements form the boolean.
+			 * The size of the returned array is the number of requested elements.
+			 * It is an error if not enough elements are present in the input boolean vector.
+			 * \param vb the boolean vector.
+			 * \param N the number of elements to be returned.
+			 * \return the indirect array.
+			 */
+			jblas::ind_array ia_popfront(jblas::vecb & vb, const size_t N);
+
+			/**
+			 * Create indirect array from range.
+			 * \param r a range.
+			 * \return the indirect array.
+			 */
+			jblas::ind_array ia_range(const ublas::range & r);
+
+			/**
+			 * Create indirect array from start and end indices.
+			 * The indirect array goes from \a begin to \(end-1).
+			 * \param begin the first index
+			 * \param end the last index plus one.
+			 * \return the indirect array.
+			 */
+			jblas::ind_array ia_range(size_t begin, size_t end);
 
 		}
 	}

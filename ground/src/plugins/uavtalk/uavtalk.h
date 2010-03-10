@@ -5,7 +5,7 @@
 #include <QMutex>
 #include <QMutexLocker>
 #include <QSemaphore>
-#include "uavobjects\uavobjectmanager.h"
+#include "uavobjects/uavobjectmanager.h"
 
 class UAVTalk: public QObject
 {

@@ -1,4 +1,4 @@
-#include "UAVMetaObject.h"
+#include "uavmetaobject.h"
 
 UAVMetaObject::UAVMetaObject(quint32 objID, QString& name, Metadata& mdata, UAVObject* parent):
         UAVObject(objID, 0, true, name, sizeof(Metadata))

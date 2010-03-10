@@ -1,7 +1,7 @@
 #ifndef UAVMETAOBJECT_H
 #define UAVMETAOBJECT_H
 
-#include "UAVObject.h"
+#include "uavobject.h"
 
 class UAVMetaObject: public UAVObject
 {

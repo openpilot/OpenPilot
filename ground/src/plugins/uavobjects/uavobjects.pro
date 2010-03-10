@@ -1,7 +1,9 @@
 TEMPLATE = lib
 TARGET = UAVObjects
+
 include(../../openpilotgcsplugin.pri)
-include(../../plugins/coreplugin/coreplugin.pri)
+include(uavobjects_dependencies.pri)
+
 HEADERS += uavobject.h \
     uavmetaobject.h \
     uavobjectmanager.h \
@@ -9,6 +11,7 @@ HEADERS += uavobject.h \
     uavobjectfield.h \
     uavobjectsinit.h \
     uavobjectsplugin.h
+
 SOURCES += uavobject.cpp \
     uavmetaobject.cpp \
     uavobjectmanager.cpp \
@@ -16,4 +19,5 @@ SOURCES += uavobject.cpp \
     uavobjectfield.cpp \
     uavobjectsinit.cpp \
     uavobjectsplugin.cpp
-OTHER_FILES += uavobjects.pluginspec
+
+OTHER_FILES += UAVObjects.pluginspec

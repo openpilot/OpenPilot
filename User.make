@@ -18,7 +18,7 @@ REQUIRED_EXTLIBS = boost_sandbox
 OPTIONAL_EXTLIBS = 
 
 # LDFLAGS +=
-LIBS += -lkernel 
+LIBS += -lkernel -ljmath
 
 # CPPFLAGS += -DJFR_NDEBUG
 CPPFLAGS += $(BOOST_CPPFLAGS) $(BOOST_SANDBOX_CPPFLAGS)

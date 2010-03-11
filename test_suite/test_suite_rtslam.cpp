@@ -12,16 +12,6 @@ using boost::unit_test_framework::test_case;
 
 // include here your defined test suite
 
-BOOST_AUTO_TEST_CASE( dummy )
-{
-
-}
-BOOST_AUTO_TEST_CASE( dummy )
-{
-
-}
-
-
 /**
  * standard init_unit_test_suite functione
  */

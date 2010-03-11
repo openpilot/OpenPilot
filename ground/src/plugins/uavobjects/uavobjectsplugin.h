@@ -32,8 +32,11 @@
 #include <QtPlugin>
 #include "uavobjectmanager.h"
 
-class UAVObjectsPlugin: public ExtensionSystem::IPlugin
+class UAVObjectsPlugin:
+        public ExtensionSystem::IPlugin
 {
+    Q_OBJECT
+
 public:
     UAVObjectsPlugin();
     ~UAVObjectsPlugin();

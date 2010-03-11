@@ -19,14 +19,14 @@ plugin_welcome.subdir = welcome
 plugin_welcome.depends = plugin_coreplugin
 
 # UAVObjects plug-in
-#SUBDIRS += plugin_uavobjects
-#plugin_uavobjects.subdir = uavobjects
-#plugin_uavobjects.depends = plugin_coreplugin
+SUBDIRS += plugin_uavobjects
+plugin_uavobjects.subdir = uavobjects
+plugin_uavobjects.depends = plugin_coreplugin
 
 # UAVTalk plug-in
-#SUBDIRS += plugin_uavtalk
-#plugin_uavtalk.subdir = uavtalk
-#plugin_uavtalk.depends = plugin_uavobjects
-#plugin_uavtalk.depends += plugin_coreplugin
+SUBDIRS += plugin_uavtalk
+plugin_uavtalk.subdir = uavtalk
+plugin_uavtalk.depends = plugin_uavobjects
+plugin_uavtalk.depends += plugin_coreplugin
 
 

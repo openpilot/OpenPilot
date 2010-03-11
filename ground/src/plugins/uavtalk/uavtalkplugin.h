@@ -28,10 +28,22 @@
 #ifndef UAVTALKPLUGIN_H
 #define UAVTALKPLUGIN_H
 
-class UAVTalkPlugin
+
+#include <extensionsystem/iplugin.h>
+#include <QtPlugin>
+
+class UAVTalkPlugin:
+        public ExtensionSystem::IPlugin
 {
+    Q_OBJECT
+
 public:
     UAVTalkPlugin();
+    ~UAVTalkPlugin();
+
+    void extensionsInitialized();
+    bool initialize(const QStringList & arguments, QString * errorString);
+    void shutdown();
 };
 
 #endif // UAVTALKPLUGIN_H

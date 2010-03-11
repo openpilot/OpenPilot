@@ -25,8 +25,35 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
 #include "uavtalkplugin.h"
 
 UAVTalkPlugin::UAVTalkPlugin()
 {
+
 }
+
+UAVTalkPlugin::~UAVTalkPlugin()
+{
+
+}
+
+void UAVTalkPlugin::extensionsInitialized()
+{
+
+}
+
+bool UAVTalkPlugin::initialize(const QStringList & arguments, QString * errorString)
+{
+    Q_UNUSED(arguments);
+    Q_UNUSED(errorString);
+
+    return true;
+}
+
+void UAVTalkPlugin::shutdown()
+{
+
+}
+
+Q_EXPORT_PLUGIN(UAVTalkPlugin)

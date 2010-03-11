@@ -30,7 +30,7 @@
 /* Project Includes */
 #include "pios.h"
 
-#if !defined(PIOS_DONT_USE_IRQ)
+#if defined(PIOS_INCLUDE_IRQ)
 
 
 /* Private Function Prototypes */

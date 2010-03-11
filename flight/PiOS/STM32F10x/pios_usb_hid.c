@@ -31,7 +31,7 @@
 /* Project Includes */
 #include "pios.h"
 
-#if !defined(PIOS_DONT_USE_HID)
+#if defined(PIOS_INCLUDE_USB_HID)
 
 
 /* Local types */

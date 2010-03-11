@@ -29,7 +29,7 @@
 /* Project Includes */
 #include "pios.h"
 
-#if !defined(PIOS_DONT_USE_PWM)
+#if defined(PIOS_INCLUDE_PWM)
 
 /* Local Variables */
 static GPIO_TypeDef* PIOS_PWM_GPIO_PORT[PIOS_PWM_NUM_INPUTS] = PIOS_PWM_GPIO_PORTS;

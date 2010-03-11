@@ -30,7 +30,7 @@
 /* Project Includes */
 #include "pios.h"
 
-#if !defined(PIOS_DONT_USE_ADC)
+#if defined(PIOS_INCLUDE_ADC)
 
 /* Local Variables */
 static GPIO_TypeDef* ADC_GPIO_PORT[PIOS_ADC_NUM_PINS] = PIOS_ADC_PORTS;

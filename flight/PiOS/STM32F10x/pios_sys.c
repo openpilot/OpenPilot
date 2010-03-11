@@ -30,7 +30,7 @@
 /* Project Includes */
 #include "pios.h"
 
-#if !defined(PIOS_DONT_USE_SYS)
+#if defined(PIOS_INCLUDE_SYS)
 
 
 /* Private Function Prototypes */
@@ -73,7 +73,7 @@ void PIOS_SYS_Init(void)
 	/* Initialise Basic NVIC */
 	NVIC_Configuration();
 
-#if !defined(PIOS_DONT_USE_LED)
+#if defined(PIOS_INCLUDE_LED)
 	/* Initialise LEDs */
 	PIOS_LED_Init();
 #endif

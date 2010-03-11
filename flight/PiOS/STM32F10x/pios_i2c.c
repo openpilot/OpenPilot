@@ -32,7 +32,7 @@
 
 
 
-#if !defined(PIOS_DONT_USE_I2C)
+#if defined(PIOS_INCLUDE_I2C)
 
 /* Options */
 // #define USE_DEBUG_PINS

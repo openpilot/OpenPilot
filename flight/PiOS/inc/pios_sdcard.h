@@ -27,7 +27,7 @@
 #ifndef PIOS_SDCARD_H
 #define PIOS_SDCARD_H
 
-#if !defined(PIOS_DONT_USE_SDCARD)
+#if defined(PIOS_INCLUDE_SDCARD)
 
 /* Public Functions */
 typedef struct {

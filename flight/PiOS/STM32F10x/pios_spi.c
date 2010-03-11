@@ -39,7 +39,7 @@
 
 #include <pios.h>
 
-#if !defined(PIOS_DONT_USE_SPI)
+#if defined(PIOS_INCLUDE_SPI)
 
 
 /* Local variables */

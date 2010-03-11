@@ -29,7 +29,7 @@
 /* Project Includes */
 #include "pios.h"
 
-#if !defined(PIOS_DONT_USE_SERVO)
+#if defined(PIOS_INCLUDE_SERVO)
 
 #ifdef PIOS_ENABLE_DEBUG_PINS
 #warning "*** PIOS_ENABLE_DEBUG_PINS defined => Servo outputs will not function ***"

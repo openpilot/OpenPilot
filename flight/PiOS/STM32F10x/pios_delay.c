@@ -31,7 +31,7 @@
 /* Project Includes */
 #include "pios.h"
 
-#if !defined(PIOS_DONT_USE_DELAY)
+#if defined(PIOS_INCLUDE_DELAY)
 
 /**
 * Initialises the Timer used by PIOS_DELAY functions<BR>

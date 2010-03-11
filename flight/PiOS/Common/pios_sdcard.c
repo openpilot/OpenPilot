@@ -30,7 +30,7 @@
 /* Project Includes */
 #include "pios.h"
 
-#if !defined(PIOS_DONT_USE_SDCARD)
+#if defined(PIOS_INCLUDE_SDCARD)
 
 
 /* Global Variables */

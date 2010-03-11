@@ -49,7 +49,7 @@
 #include <stm32f10x.h>
 #include <stm32f10x_conf.h>
 
-#if !defined(PIOS_DONT_USE_SDCARD)
+#if defined(PIOS_INCLUDE_SDCARD)
 /* Dosfs Includes */
 #include <dosfs.h>
 
@@ -82,7 +82,7 @@
 #include <pios_com.h>
 #include <pios_bmp085.h>
 
-#if !defined(PIOS_DONT_USE_USB)
+#if defined(PIOS_INCLUDE_USB)
 /* USB Libs */
 #include <usb_lib.h>
 #endif

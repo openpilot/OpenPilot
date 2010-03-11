@@ -42,7 +42,7 @@ Example of how to use this module:
 /* Project Includes */
 #include "pios.h"
 
-#if !defined(PIOS_DONT_USE_BMP085)
+#if defined(PIOS_INCLUDE_BMP085)
 
 
 /* Glocal Variables */

@@ -29,7 +29,7 @@
 /* Project Includes */
 #include "pios.h"
 
-#if !defined(PIOS_DONT_USE_LED)
+#if defined(PIOS_INCLUDE_LED)
 
 /* Private Function Prototypes */
 

@@ -30,7 +30,7 @@
 /* Project Includes */
 #include "pios.h"
 
-#if !defined(PIOS_DONT_USE_USART)
+#if defined(PIOS_INCLUDE_USART)
 
 
 /* Global Variables */

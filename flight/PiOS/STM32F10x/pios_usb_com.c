@@ -30,7 +30,7 @@
 #include "pios.h"
 #include <usb_lib.h>
 
-#if !defined(PIOS_DONT_USE_USB_COM)
+#if defined(PIOS_INCLUDE_USB_COM)
 
 
 /////////////////////////////////////////////////////////////////////////////

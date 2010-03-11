@@ -29,7 +29,7 @@
 /* Project Includes */
 #include "pios.h"
 
-#if !defined(PIOS_DONT_USE_USB)
+#if defined(PIOS_INCLUDE_USB)
 
 
 /* Local definitions */

@@ -37,7 +37,6 @@
 #include "jmath/jblas.hpp"
 #include "jmath/jmathException.hpp"
 
-
 namespace jafar {
 	namespace jmath {
 

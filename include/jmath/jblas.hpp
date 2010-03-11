@@ -50,6 +50,7 @@ namespace jblas {
   /// standard vector type
   typedef boost::numeric::ublas::vector<double> vec;
   typedef boost::numeric::ublas::vector_range<vec> vec_range; 
+  typedef boost::numeric::ublas::vector_slice<vec> vec_slice;
   typedef boost::numeric::ublas::vector_indirect<vec> vec_indirect;
   typedef boost::numeric::ublas::vector_range<const vec> cvec_range; 
   typedef boost::numeric::ublas::zero_vector<double> zero_vec;
@@ -72,10 +73,12 @@ namespace jblas {
   /// 8 dimension vector
   typedef boost::numeric::ublas::bounded_vector<double,8> vec8;
 
+
   /// standard matrix type
   typedef boost::numeric::ublas::matrix<double> mat;
   
   typedef boost::numeric::ublas::matrix_range<mat> mat_range;
+  typedef boost::numeric::ublas::matrix_slice<mat> mat_slice;
   typedef boost::numeric::ublas::matrix_indirect<mat> mat_indirect;
   typedef boost::numeric::ublas::matrix_range<const mat> cmat_range;
   typedef boost::numeric::ublas::zero_matrix<double> zero_mat;

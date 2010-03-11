@@ -18,6 +18,7 @@
 
 #include "boost/numeric/ublas/operation.hpp"
 #include "boost/numeric/ublas/io.hpp"
+
 #include "jmath/jblas.hpp"
 
 namespace std {
@@ -99,6 +100,13 @@ namespace jafar {
 			 * \return the indirect array.
 			 */
 			jblas::ind_array ia_range(const ublas::range & r);
+
+			/**
+			 * Create indirect array from slice.
+			 * \param s a slice.
+			 * \return the indirect array.
+			 */
+			jblas::ind_array ia_slice(const ublas::slice & s);
 
 			/**
 			 * Create indirect array from start and end indices.

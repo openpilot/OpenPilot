@@ -5,9 +5,11 @@
 
 #include <vector>
 
+#include "boost/random.hpp"
+#include <boost/numeric/ublas/blas.hpp>
+
 #include "jmath/jblas.hpp"
 
-#include "boost/random.hpp"
 
 namespace jafar {
   namespace jmath {
@@ -100,6 +102,39 @@ namespace jafar {
       std::vector<NormalDistribution*> normalsVec;
 
     };
+
+
+
+
+
+
+		template<typename bubTemplateMatrix>
+		void randMatrix(bubTemplateMatrix& M) {
+			for (size_t i = 0; i < M.size1(); ++i)
+				for (size_t j = 0; j < M.size2(); ++j) {
+					M(i, j) = ((rand() + 0.0) / RAND_MAX * 2) - 1.;
+				}
+		}
+
+		template<typename bubTemplateMatrix>
+		void randMatrix(bubTemplateMatrix& M, const size_t row, const size_t col) {
+			M.resize(row, col);
+			randMatrix(M);
+		}
+
+		template<typename bubTemplateVector>
+		void randVector(bubTemplateVector& V) {
+			for (size_t i = 0; i < V.size(); ++i) {
+				V(i) = ((rand() + 0.0) / RAND_MAX * 2) - 1.;
+			}
+		}
+
+		template<typename bubTemplateVector>
+		void randVector(bubTemplateVector& V, const size_t size) {
+			V.resize(size);
+			randVector(V);
+		}
+
 
   } // namespace jmath
 } // namespace jafar

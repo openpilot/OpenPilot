@@ -12,10 +12,6 @@ using boost::unit_test_framework::test_case;
 
 //using namespace jafar::jmath;
 
-BOOST_AUTO_TEST_CASE( dummy )
-{
-}
-
 /*
  * standard init_unit_test_suite function
  */

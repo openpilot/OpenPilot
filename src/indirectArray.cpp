@@ -173,6 +173,16 @@ namespace jafar {
 			}
 
 			/**
+			 * Create indirect array from slice.
+			 */
+			jblas::ind_array ia_slice(const ublas::slice & s) {
+				jblas::ind_array res(s.size());
+				for (size_t i = 0; i < res.size(); i++)
+					res(i) = s.start() + s.stride() * i;
+				return res;
+			}
+
+			/**
 			 * Create indirect array from start and end indices.
 			 */
 			jblas::ind_array ia_range(size_t begin, size_t end) {

@@ -55,8 +55,8 @@ int32_t $(NAME)Initialize()
 	metadata.ackRequired = $(ACK);
 	metadata.gcsTelemetryUpdateMode = $(GCSTELEM_UPDATEMODE);
 	metadata.gcsTelemetryUpdatePeriod = $(GCSTELEM_UPDATEPERIOD);
-	metadata.telemetryUpdateMode = $(TELEM_UPDATEMODE);
-	metadata.telemetryUpdatePeriod = $(TELEM_UPDATEPERIOD);
+	metadata.telemetryUpdateMode = $(FLIGHTTELEM_UPDATEMODE);
+	metadata.telemetryUpdatePeriod = $(FLIGHTTELEM_UPDATEPERIOD);
 	metadata.loggingUpdateMode = $(LOGGING_UPDATEMODE);
 	metadata.loggingUpdatePeriod = $(LOGGING_UPDATEPERIOD);
 	UAVObjSetMetadata(handle, &metadata);

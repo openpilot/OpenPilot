@@ -35,12 +35,10 @@
 #define TYPE_OBJ_ACK (TYPE_VER | 0x02)
 #define TYPE_ACK (TYPE_VER | 0x03)
 
-#define HEADER_LENGTH 6 // type (1), object ID (4), length (1)
+#define HEADER_LENGTH 7 // type (1), object ID (4), instance ID (2, not used in single objects)
 #define CHECKSUM_LENGTH 2
 #define MAX_PAYLOAD_LENGTH 256
 #define MAX_PACKET_LENGTH (HEADER_LENGTH+MAX_PAYLOAD_LENGTH+CHECKSUM_LENGTH)
-#define MAX_UPDATE_PERIOD_MS 1000
-#define MIN_UPDATE_PERIOD_MS 1
 
 // Private types
 typedef enum {STATE_SYNC, STATE_OBJID, STATE_INSTID, STATE_DATA, STATE_CS} RxState;
@@ -60,6 +58,7 @@ int32_t objectTransaction(uint32_t objectId, uint16_t instId, uint8_t type, int3
 int32_t sendObject(UAVObjHandle obj, uint16_t instId, uint8_t type);
 int32_t sendSingleObject(UAVObjHandle obj, uint16_t instId, uint8_t type);
 int32_t receiveObject(uint8_t type, UAVObjHandle obj, uint16_t instId, uint8_t* data, int32_t length);
+void updateAck(UAVObjHandle obj, uint16_t instId);
 
 /**
  * Initialize the UAVTalk library
@@ -92,7 +91,7 @@ int32_t UAVTalkSendObjectRequest(UAVObjHandle obj, uint16_t instId, int32_t time
 /**
  * Send the specified object through the telemetry link.
  * \param[in] obj Object to send
- * \param[in] instId The instance ID of UAVOBJ_ALL_INSTANCES for all instances.
+ * \param[in] instId The instance ID
  * \param[in] acked Selects if an ack is required (1:ack required, 0: ack not required)
  * \param[in] timeoutMs Time to wait for the ack, when zero it will return immediately
  * \return 0 Success
@@ -100,9 +99,18 @@ int32_t UAVTalkSendObjectRequest(UAVObjHandle obj, uint16_t instId, int32_t time
  */
 int32_t UAVTalkSendObject(UAVObjHandle obj, uint16_t instId, uint8_t acked, int32_t timeoutMs)
 {
-    if (acked == 1) {
+	// Make sure a valid instance id is requested
+	if (instId == UAVOBJ_ALL_INSTANCES)
+	{
+		return -1;
+	}
+	// Send object
+    if (acked == 1)
+    {
         return objectTransaction(obj, instId, TYPE_OBJ_ACK, timeoutMs);
-    } else {
+    }
+    else
+    {
         return objectTransaction(obj, instId, TYPE_OBJ, timeoutMs);
     }
 }
@@ -302,35 +310,77 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
  */
 int32_t receiveObject(uint8_t type, UAVObjHandle obj, uint16_t instId, uint8_t* data, int32_t length)
 {
-    // Unpack object if the message is of type OBJ or OBJ_ACK
-    if (type == TYPE_OBJ || type == TYPE_OBJ_ACK)
-    {
-    	UAVObjUnpack(obj, instId, data);
-    }
+    int32_t ret = 0;
 
-    // Send requested object if message is of type OBJ_REQ
-    if (type == TYPE_OBJ_REQ)
-    {
+    // Process message type
+    switch (type) {
+    case TYPE_OBJ:
+        // All instances, not allowed for OBJ messages
+        if (instId != UAVOBJ_ALL_INSTANCES)
+        {
+            // Unpack object, if the instance does not exist it will be created!
+        	UAVObjUnpack(obj, instId, data);
+            // Check if an ack is pending
+            updateAck(obj, instId);
+        }
+        else
+        {
+            ret = -1;
+        }
+        break;
+    case TYPE_OBJ_ACK:
+        // All instances, not allowed for OBJ_ACK messages
+        if (instId != UAVOBJ_ALL_INSTANCES)
+        {
+            // Unpack object, if the instance does not exist it will be created!
+        	if ( UAVObjUnpack(obj, instId, data) == 0 )
+        	{
+        		// Transmit ACK
+        		sendObject(obj, instId, TYPE_ACK);
+        	}
+        	else
+        	{
+        		ret = -1;
+        	}
+        }
+        else
+        {
+        	ret = -1;
+        }
+        break;
+    case TYPE_OBJ_REQ:
+        // Send requested object if message is of type OBJ_REQ
     	sendObject(obj, instId, TYPE_OBJ);
+        break;
+    case TYPE_ACK:
+        // All instances, not allowed for ACK messages
+        if (instId != UAVOBJ_ALL_INSTANCES)
+        {
+            // Check if an ack is pending
+            updateAck(obj, instId);
+        }
+        else
+        {
+        	ret = -1;
+        }
+        break;
+    default:
+        ret = -1;
     }
-
-    // Send ACK if message is of type OBJ_ACK
-    if (type == TYPE_OBJ_ACK)
-    {
-    	sendObject(obj, instId, TYPE_ACK);
-    }
-
-    // If a response was pending on the object, unblock any waiting tasks
-    if (type == TYPE_ACK || type == TYPE_OBJ)
-    {
-    	if (respObj == obj && (respInstId = instId || respInstId == UAVOBJ_ALL_INSTANCES))
-    	{
-    		xSemaphoreGive(respSema);
-    	}
-    }
-
     // Done
-    return 0;
+    return ret;
+}
+
+/**
+ * Check if an ack is pending on an object and give response semaphore
+ */
+void updateAck(UAVObjHandle obj, uint16_t instId)
+{
+    if (respObj == obj && (respInstId == instId || respInstId == UAVOBJ_ALL_INSTANCES))
+    {
+    	xSemaphoreGive(respSema);
+        respObj = 0;
+    }
 }
 
 /**
@@ -346,11 +396,17 @@ int32_t sendObject(UAVObjHandle obj, uint16_t instId, uint8_t type)
 	uint32_t numInst;
 	uint32_t n;
 
-	// Check if this operation is for a single instance or all
-	if (instId == UAVOBJ_ALL_INSTANCES && !UAVObjIsSingleInstance(obj))
+	// If all instances are requested on a single instance object it is an error
+	if ( instId == UAVOBJ_ALL_INSTANCES && UAVObjIsSingleInstance(obj) )
 	{
-		if (type == TYPE_OBJ || type == TYPE_OBJ_ACK)
-		{
+		return -1;
+	}
+
+    // Process message type
+    if ( type == TYPE_OBJ || type == TYPE_OBJ_ACK )
+    {
+    	if (instId == UAVOBJ_ALL_INSTANCES)
+    	{
 			// Get number of instances
 			numInst = UAVObjGetNumInstances(obj);
 			// Send all instances
@@ -359,18 +415,32 @@ int32_t sendObject(UAVObjHandle obj, uint16_t instId, uint8_t type)
 				sendSingleObject(obj, n, type);
 			}
 			return 0;
-		}
-		else
-		{
-			return -1;
-		}
-	}
-	else
-	{
-		return sendSingleObject(obj, instId, type);
-	}
+    	}
+    	else
+    	{
+    		return sendSingleObject(obj, instId, type);
+    	}
+    }
+    else if (type == TYPE_OBJ_REQ)
+    {
+        return sendSingleObject(obj, instId, TYPE_OBJ_REQ);
+    }
+    else if (type == TYPE_ACK)
+    {
+        if ( instId != UAVOBJ_ALL_INSTANCES )
+        {
+            return sendSingleObject(obj, instId, TYPE_ACK);
+        }
+        else
+        {
+            return -1;
+        }
+    }
+    else
+    {
+        return -1;
+    }
 }
-
 
 /**
  * Send an object through the telemetry link.
@@ -386,12 +456,6 @@ int32_t sendSingleObject(UAVObjHandle obj, uint16_t instId, uint8_t type)
     int32_t dataOffset;
     uint16_t cs = 0;
     uint32_t objId;
-
-    // Check for valid packet type
-    if (type != TYPE_OBJ && type != TYPE_OBJ_ACK && type != TYPE_OBJ_REQ && type != TYPE_ACK)
-    {
-        return -1;
-    }
 
     // Setup type and object id fields
     objId = UAVObjGetID(obj);

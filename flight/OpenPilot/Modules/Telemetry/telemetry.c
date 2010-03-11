@@ -40,7 +40,7 @@ static xQueueHandle queue;
 static xTaskHandle telemetryTaskHandle;
 
 // Private functions
-static void telemetryTask(void);
+static void telemetryTask(void* parameters);
 static void periodicEventHandler(UAVObjEvent* ev);
 static int32_t transmitData(uint8_t* data, int32_t length);
 static void registerObject(UAVObjHandle obj);
@@ -138,7 +138,7 @@ void updateObject(UAVObjHandle obj)
 /**
  * Telemetry task. Processes queue events and periodic updates. It does not return.
  */
-static void telemetryTask(void)
+static void telemetryTask(void* parameters)
 {
 	UAVObjEvent ev;
 	UAVObjMetadata metadata;

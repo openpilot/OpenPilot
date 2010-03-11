@@ -422,9 +422,7 @@ int32_t UAVObjPack(UAVObjHandle obj, uint16_t instId, uint8_t* dataOut)
 	objEntry = (ObjectList*)obj;
 	if (!objEntry->isSingleInstance)
 	{
-		dataOut[0] = (uint8_t)(instId && 0xFF);
-		dataOut[1] = (uint8_t)((instId >> 8) && 0xFF);
-		if (getInstanceData(objEntry, instId, &dataOut[2]) < 0)
+		if (getInstanceData(objEntry, instId, dataOut) < 0)
 		{
 			// Error, unlock and return
 			xSemaphoreGiveRecursive(mutex);
@@ -836,6 +834,7 @@ int32_t createInstance(ObjectList* obj, uint16_t instId)
 		elemEntry->instId = instId;
 		LL_APPEND(obj->data.instances, elemEntry);
 		++obj->numInstances;
+		UAVObjInstanceUpdated((UAVObjHandle)obj, instId);
 		return instId;
 	}
 	else

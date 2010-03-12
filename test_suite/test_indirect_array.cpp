@@ -17,7 +17,6 @@
 // jafar debug include
 #include "kernel/jafarDebug.hpp"
 
-
 #include <iostream>
 #include <boost/numeric/ublas/symmetric.hpp>
 #include <boost/numeric/ublas/blas.hpp>
@@ -30,123 +29,125 @@
 #include "jmath/random.hpp"
 
 using namespace std;
-namespace ublas = boost::numeric::ublas;
-namespace ublasExtra = jafar::jmath::ublasExtra;
+using namespace jafar::jmath;
 
 // TEST INDIRECT ARRAY OPERATION
 void test_indirect_array01(void) {
-//		size_t N = 7;
-//		ublas::matrix<int> M(N, N);
-//		ublas::symmetric_matrix<int> S(N);
-//		ublas::vector<int> V(N);
-//
-//		// initialize M and V
-//		cout << "M=" << endl;
-//		for (size_t i = 0; i < M.size1(); ++i) {
-//			V(i) = 111 * i;
-//			for (size_t j = 0; j < M.size2(); ++j) {
-//				M(i, j) = 10 * i + j;
-//				cout.width(2);
-//				cout.fill('0');
-//				cout << M(i, j) << "  ";
-//
-//				S(i, j) = 10 * i + j;
-//			}
-//			cout << endl;
-//		}
-//		cout << "V=\n" << V << endl;
-//
-//		//define an indirect_array
-//		const size_t n = 3;
-//		jblas::ind_array ia(n);
-//		ia(0) = 1;
-//		ia(1) = 2;
-//		ia(2) = 3;
-//
-//		// operator <<
-//		cout << "ia : " << ia << endl;
-//		cout << "ia = " << (MATLAB) ia << endl;
-//
-//		jblas::ind_array ib(n);
-//		ib(0) = 2;
-//		ib(1) = 3;
-//		ib(2) = 4;
-//
-//		ublas::matrix<int> m(n, n);
-//		m(0, 0) = 100;
-//		m(0, 1) = 101;
-//		m(0, 2) = 102;
-//		m(1, 0) = 110;
-//		m(1, 1) = 111;
-//		m(1, 2) = 112;
-//		m(2, 0) = 120;
-//		m(2, 1) = 221;
-//		m(2, 2) = 322;
-//
-//		ublas::symmetric_matrix<int> s(n, n);
-//		s(0, 0) = 100;
-//		s(1, 0) = 110;
-//		s(1, 1) = 111;
-//		s(2, 0) = 120;
-//		s(2, 1) = 221;
-//		s(2, 2) = 322;
-//
-//		//hint: use jblas::ind_array::all() to access all indices
-//		jblas::ind_array a(N);
-//
-//		// display array's data <--- does not work !
-//		//		cout << "ia=\n" << ia.data() << endl;
-//		//		cout << "a=\n" << a.all().data() << endl;
-//
-//		cout << "\n% OPERATIONS ON REGULAR MATRICES" << endl;
-//		ublas::matrix_indirect<ublas::matrix<int> > Mall(M, a.all(), a.all());
-//		cout << "Mat, all=\n" << Mall << endl;
-//
-//		// use ia to extract some indices
-//		ublas::matrix_indirect<ublas::matrix<int> > Mindirect(M, ia, ia);
-//		cout << "Mat, ind=\n" << Mindirect << endl;
-//
-//		// or use ublas::project
-//		cout << "Mat, proj=\n" << ublas::project(M, ia, ia) << endl;
-//
-//		// Project on a matrix
-//		project(M, ia, ib) = m;
-//		cout << "mat, projected to Mat=" << m << endl;
-//		cout << "Mat, updated" << M << endl;
-//
-//		// Access to all the matrix
-//		cout << "\n% OPERATIONS ON SYMMETRIC MATRICES" << endl;
-//		ublas::matrix_indirect<ublas::symmetric_matrix<int> > Sall(S, ia.all(), a.all());
-//		cout << "Sym Mat, all=\n" << Sall << endl;
-//
-//		ublas::matrix_indirect<ublas::symmetric_matrix<int> > Sind(S, ia, ia);
-//		cout << "Sym Mat, sym ind=\n" << Sind << endl;
-//
-//		ublas::matrix_indirect<ublas::symmetric_matrix<int> > NSind(S, ia, ib);
-//		cout << "Sym Mat, non sym ind=\n" << NSind << endl;
-//
-//		ublas::matrix<double> A(5, 5);
-//		for (size_t i = 0; i < 5; ++i)
-//			for (size_t j = 0; j < 5; ++j)
-//				A(i, j) = 0;
-//		//cout << "A = " << (MATLAB)A << endl;
-//
-//		ublas::symmetric_adaptor<ublas::matrix<double> > Asym(A);
-//		//cout << "Asym = " << (MATLAB)Asym << endl;
-//		Asym(1, 0) = 1;
-//		//cout << "Asym = " << (MATLAB)Asym << endl;
-//		//cout << "A = " << (MATLAB)A << endl;
-//		Asym(0, 0) = -12;
-//		cout << "Asym = " << (MATLAB) Asym << endl;
-//		cout << "A = " << (MATLAB) A << endl;
-//
-//		ublas::matrix<double> H(3, 5);
-//		randMatrix(H, 3, 5);
-//		cout << "H = " << (MATLAB) H << endl;
-//		for (size_t i = 0; i < 5; ++i)
-//			for (size_t j = 0; j < 5; ++j)
-//				Asym(i, j) = (rand() + 0.0) / RAND_MAX * 2 - 1;
-//		cout << "Asym = " << (MATLAB) Asym << endl;
+	size_t N = 7;
+	ublas::matrix<int> M(N, N);
+	ublas::symmetric_matrix<int> S(N);
+	ublas::vector<int> V(N);
+
+	// initialize M and V
+	cout << "M=" << endl;
+	for (size_t i = 0; i < M.size1(); ++i) {
+		V(i) = 111 * i;
+		for (size_t j = 0; j < M.size2(); ++j) {
+			M(i, j) = 10 * i + j;
+			cout.width(2);
+			cout.fill('0');
+			cout << M(i, j) << "  ";
+
+			S(i, j) = 10 * i + j;
+		}
+		cout << endl;
+	}
+	cout << "V=\n" << V << endl;
+
+	//define an indirect_array
+	const size_t n = 3;
+	jblas::ind_array ia(n);
+	ia(0) = 1;
+	ia(1) = 2;
+	ia(2) = 3;
+
+	// operator <<
+	cout << "ia : " << ia << endl;
+	cout << "ia = " << (MATLAB) ia << endl;
+
+	jblas::ind_array ib(n);
+	ib(0) = 2;
+	ib(1) = 3;
+	ib(2) = 4;
+
+	ublas::matrix<int> m(n, n);
+	m(0, 0) = 100;
+	m(0, 1) = 101;
+	m(0, 2) = 102;
+	m(1, 0) = 110;
+	m(1, 1) = 111;
+	m(1, 2) = 112;
+	m(2, 0) = 120;
+	m(2, 1) = 221;
+	m(2, 2) = 322;
+
+	ublas::symmetric_matrix<int> s(n, n);
+	s(0, 0) = 100;
+	s(1, 0) = 110;
+	s(1, 1) = 111;
+	s(2, 0) = 120;
+	s(2, 1) = 221;
+	s(2, 2) = 322;
+
+	//hint: use jblas::ind_array::all() to access all indices
+	jblas::ind_array a(N);
+
+	// display array's data <--- does not work !
+	//		cout << "ia=\n" << ia.data() << endl;
+	//		cout << "a=\n" << a.all().data() << endl;
+
+	cout << "\n% OPERATIONS ON REGULAR MATRICES" << endl;
+	ublas::matrix_indirect<ublas::matrix<int> > Mall(M, a.all(), a.all());
+	cout << "Mat, all=\n" << Mall << endl;
+
+	// use ia to extract some indices
+	ublas::matrix_indirect<ublas::matrix<int> > Mindirect(M, ia, ia);
+	cout << "Mat, ind=\n" << Mindirect << endl;
+
+	// or use ublas::project
+	cout << "Mat, proj=\n" << ublas::project(M, ia, ia) << endl;
+
+	// Project on a matrix
+	project(M, ia, ib) = m;
+	cout << "mat, projected to Mat=" << m << endl;
+	cout << "Mat, updated" << M << endl;
+
+	// Access to all the matrix
+	cout << "\n% OPERATIONS ON SYMMETRIC MATRICES" << endl;
+	ublas::matrix_indirect<ublas::symmetric_matrix<int> > Sall(S, ia.all(), a.all());
+	cout << "Sym Mat, all=\n" << Sall << endl;
+
+	ublas::matrix_indirect<ublas::symmetric_matrix<int> > Sind(S, ia, ia);
+	cout << "Sym Mat, sym ind=\n" << Sind << endl;
+
+	ublas::matrix_indirect<ublas::symmetric_matrix<int> > NSind(S, ia, ib);
+	cout << "Sym Mat, non sym ind=\n" << NSind << endl;
+
+	ublas::matrix<double> A(5, 5);
+	for (size_t i = 0; i < 5; ++i)
+		for (size_t j = 0; j < 5; ++j)
+			A(i, j) = 0;
+	//cout << "A = " << (MATLAB)A << endl;
+
+	ublas::symmetric_adaptor<ublas::matrix<double> > Asym(A);
+	//cout << "Asym = " << (MATLAB)Asym << endl;
+	Asym(1, 0) = 1;
+	//cout << "Asym = " << (MATLAB)Asym << endl;
+	//cout << "A = " << (MATLAB)A << endl;
+	Asym(0, 0) = -12;
+	cout << "Asym = " << (MATLAB) Asym << endl;
+	cout << "A = " << (MATLAB) A << endl;
+
+	ublas::matrix<double> H(3, 5);
+	randMatrix(H, 3, 5);
+	cout << "H = " << (MATLAB) H << endl;
+	for (size_t i = 0; i < 5; ++i)
+		for (size_t j = 0; j < 5; ++j)
+			Asym(i, j) = (rand() + 0.0) / RAND_MAX * 2 - 1;
+	cout << "Asym = " << (MATLAB) Asym << endl;
+}
+
+void test_indirect_array02(void) {
 
 	cout << "\n% INDIRECT ARRAY MANIPULATION\n%===============" << endl;
 	jblas::ind_array ilong(5);
@@ -193,9 +194,9 @@ void test_indirect_array01(void) {
 
 }
 
-
 BOOST_AUTO_TEST_CASE( test_indirect_array )
 {
-	test_indirect_array01();
+	//	test_indirect_array01();
+	test_indirect_array02();
 }
 

@@ -17,40 +17,41 @@
 #include "kernel/jafarDebug.hpp"
 
 #include <iostream>
+#include "jmath/jblas.hpp"
 #include "jmath/matlab.hpp"
 #include "jmath/random.hpp"
 #include "jmath/ixaxpy.hpp"
 
-namespace ublas = boost::numeric::ublas;
-
 using namespace std;
 using namespace jafar::jmath;
+using namespace ublas;
 
 void test_ixaxpy01(void) { // TEST FOR XAXPY_PROD()
-
-	using namespace ublas;
 
 	size_t n;
 	matrix<double> M;
 
-	if (false) {
-		cout << "\n% TEST FOR SYMMETRIC PROJECTION\n% ===========" << endl;
-		// define an indirect_array
-		n = 3;
-		jblas::ind_array ia(n);
-		ia(0) = 1;
-		ia(1) = 2;
-		ia(2) = 3;
+	cout << "\n% TEST FOR SYMMETRIC MATRICES\n% ===========" << endl;
+	// define an indirect_array
+	n = 3;
+	jblas::ind_array ia(n);
+	ia(0) = 1;
+	ia(1) = 2;
+	ia(2) = 3;
 
-		matrix<double> m(3, 3);
-		randMatrix(m, 3, 3);
-		symmetric_adaptor<matrix<double> > s(m);
+	matrix<double> m(3, 3);
+	randMatrix(m, 3, 3);
+	symmetric_adaptor<matrix<double> > s(m);
 
-		M(10, 10);
-		randMatrix(M, 10, 10);
-		symmetric_adaptor<matrix<double> > P(M);
+	M(10, 10);
+	randMatrix(M, 10, 10);
+	symmetric_adaptor<matrix<double> > P(M);
 
-	}
+}
+
+void test_ixaxpy02(void) {
+	size_t n;
+	matrix<double> M;
 
 	cout << "\n% TEST FOR IXAXPY\n% ===========" << endl;
 	size_t N = 4;
@@ -90,7 +91,7 @@ void test_ixaxpy01(void) { // TEST FOR XAXPY_PROD()
 	// the full, non-sym matrix M, adapted MS, symmetric S, adapted SS
 	randMatrix(M, N, N);
 	symmetric_adaptor<matrix<double> > MS(M);
-//	symmetric_matrix<double> S(MS);
+	//	symmetric_matrix<double> S(MS);
 	jblas::sym_mat S(MS);
 	symmetric_matrix<double> S2(S); // copy of S
 	symmetric_adaptor<symmetric_matrix<double> > SS(S2);
@@ -136,7 +137,6 @@ void test_ixaxpy01(void) { // TEST FOR XAXPY_PROD()
 
 BOOST_AUTO_TEST_CASE( test_ixaxpy )
 {
-	test_ixaxpy01();
+	test_ixaxpy02();
 }
-
 

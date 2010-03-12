@@ -36,8 +36,19 @@
 /* OpenPilot Includes */
 #include "openpilot.h"
 
+#define USE_DEBUG_PINS
+
 /* Task Priorities */
 #define PRIORITY_TASK_HOOKS             (tskIDLE_PRIORITY + 3)
+
+#ifdef USE_DEBUG_PINS
+	#define	DEBUG_PIN_IDLE	5
+	#define DebugPinHigh(x) PIOS_DEBUG_PinHigh(x)
+	#define DebugPinLow(x)	PIOS_DEBUG_PinLow(x)
+#else
+	#define DebugPinHigh(x)
+	#define DebugPinLow(x)
+#endif
 
 /* Global Variables */
 
@@ -122,7 +133,7 @@ static void TestTask(void *pvParameters)
 
 		}
 
-		//vTaskDelayUntil(&xLastExecutionTime, 10 / portTICK_RATE_MS);
+		vTaskDelayUntil(&xLastExecutionTime, 10 / portTICK_RATE_MS);
 	}
 }
 
@@ -133,6 +144,6 @@ static void TestTask(void *pvParameters)
 void vApplicationIdleHook(void)
 {
 	/* Called when the scheduler has no tasks to run */
-
-
+	DebugPinHigh(DEBUG_PIN_IDLE);
+	DebugPinLow(DEBUG_PIN_IDLE);
 }

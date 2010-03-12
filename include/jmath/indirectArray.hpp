@@ -85,14 +85,24 @@ namespace jafar {
 			jblas::ind_array ia_head(const jblas::vecb & vb, const size_t N);
 
 			/**
-			 * Create indirect array from boolean vector and take the head N elements, and clear these N elements form the boolean.
+			 * Create indirect array from boolean vector with the head N true-elements, and clear these N elements form the boolean.
 			 * The size of the returned array is the number of requested elements.
-			 * It is an error if not enough elements are present in the input boolean vector.
+			 * It is an error if not enough true elements are present in the input boolean vector.
 			 * \param vb the boolean vector.
 			 * \param N the number of elements to be returned.
 			 * \return the indirect array.
 			 */
 			jblas::ind_array ia_popfront(jblas::vecb & vb, const size_t N);
+
+			/**
+			 * Create indirect array from boolean vector with the head N false-elements, and set these N elements to the boolean.
+			 * The size of the returned array is the number of requested elements.
+			 * It is an error if not enough false elements are present in the input boolean vector.
+			 * \param vb the boolean vector.
+			 * \param N the number of elements to be returned.
+			 * \return the indirect array.
+			 */
+			jblas::ind_array ia_pushfront(jblas::vecb & vb, const size_t N);
 
 			/**
 			 * Create indirect array from range.

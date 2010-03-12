@@ -64,9 +64,6 @@ namespace jafar {
 				inline virtual ~SensorAbstract(void) {
 				}
 
-				size_t id;
-				std::string name;
-				std::string type;
 
 				RobotAbstract* robot;
 				std::list<ObservationAbstract*> observationsList;
@@ -95,6 +92,31 @@ namespace jafar {
 				 * \param ias the indirect array of indices to the map
 				 */
 				SensorAbstract(MapAbstract & map, const jblas::ind_array & ias);
+
+				inline void setup(size_t _id, std::string & _name, std::string & _type) {
+					id_ = _id;
+					name_ = _name;
+					type_ = _type;
+				}
+
+				inline void id(size_t _id) {
+					id_ = _id;
+				}
+				inline void type(std::string _type) {
+					type_ = _type;
+				}
+				inline void name(std::string _name) {
+					name_ = _name;
+				}
+				inline size_t id(void) {
+					return id_;
+				}
+				inline std::string type(void) {
+					return type_;
+				}
+				inline std::string name(void) {
+					return name_;
+				}
 
 
 				/**
@@ -131,10 +153,16 @@ namespace jafar {
 				 * It shows information of the sensor.
 				 */
 				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::SensorAbstract & sen) {
-					s << "SENSOR " << sen.id << ": " << sen.name << " of type " << sen.type << endl;
+					s << "SENSOR " << sen.id() << ": " << sen.name() << " of type " << sen.type() << endl;
 					s << ".pose:  " << sen.pose << endl;
 					return s;
 				}
+
+			private:
+				std::size_t id_;
+				std::string name_;
+				std::string type_;
+
 
 		};
 

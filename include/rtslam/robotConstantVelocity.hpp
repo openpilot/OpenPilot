@@ -59,6 +59,10 @@ namespace jafar {
 				 */
 				void move(void);
 
+				static size_t size(void) {
+					return 13;
+				}
+
 			protected:
 				/**
 				 * Split state vector.

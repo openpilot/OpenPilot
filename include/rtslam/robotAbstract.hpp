@@ -72,9 +72,6 @@ namespace jafar {
 				virtual ~RobotAbstract(void) {
 				}
 
-				std::size_t id;
-				std::string name;
-				std::string type;
 
 				std::list<SensorAbstract*> sensorsList;
 				MapAbstract * map;
@@ -106,11 +103,29 @@ namespace jafar {
 				 */
 				RobotAbstract(MapAbstract & _map, jblas::ind_array & _iar, size_t _size_control);
 
-				inline void set_type(std::string _type) {
-					type = _type;
+				inline void setup(size_t _id, std::string & _name, std::string & _type) {
+					id_ = _id;
+					name_ = _name;
+					type_ = _type;
 				}
-				inline void set_name(std::string _name) {
-					name = _name;
+
+				inline void id(size_t _id) {
+					id_ = _id;
+				}
+				inline void type(std::string _type) {
+					type_ = _type;
+				}
+				inline void name(std::string _name) {
+					name_ = _name;
+				}
+				inline size_t id(void) {
+					return id_;
+				}
+				inline std::string type(void) {
+					return type_;
+				}
+				inline std::string name(void) {
+					return name_;
 				}
 
 				/**
@@ -136,19 +151,26 @@ namespace jafar {
 					move();
 				}
 
-
-				size_t getNextId(void);
+				static size_t size(void) {
+					return 0;
+				}
 
 				/**
 				 * Operator << for class RobotAbstract.
 				 * It shows information of the robot.
 				 */
 				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::RobotAbstract & rob) {
-					s << "ROBOT " << rob.id << ": " << rob.name << " of type " << rob.type << std::endl;
+					s << "ROBOT " << rob.id_ << ": " << rob.name_ << " of type " << rob.type_ << std::endl;
 					s << ".pose: " << rob.pose << std::endl;
 					s << ".state:" << rob.state << std::endl;
 					return s;
 				}
+
+			private:
+				std::size_t id_;
+				std::string name_;
+				std::string type_;
+
 
 		};
 

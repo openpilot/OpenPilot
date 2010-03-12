@@ -23,7 +23,7 @@ namespace jafar {
 		SensorPinHole::SensorPinHole(Gaussian & _pose, const jblas::vec4 & k, const jblas::vec & d, const jblas::vec & c,
 		    const size_t hsize, const size_t vsize) :
 			SensorAbstract(_pose), parameters(k, d, c), image(hsize, vsize) {
-			type = "Pin-hole-camera";
+			type("Pin-hole-camera");
 		}
 
 		/*
@@ -32,7 +32,7 @@ namespace jafar {
 		SensorPinHole::SensorPinHole(const jblas::vec & _pose, const jblas::vec4 & k, const jblas::vec & d,
 		    const jblas::vec & c, const size_t hsize, const size_t vsize) :
 			SensorAbstract(_pose), parameters(k, d, c), image(hsize, vsize) {
-			type = "Pin-hole-camera";
+			type("Pin-hole-camera");
 		}
 
 		/*
@@ -41,7 +41,7 @@ namespace jafar {
 		SensorPinHole::SensorPinHole(MapAbstract & map, const jblas::ind_array & ias, const jblas::vec4 & k,
 		    const jblas::vec & d, const jblas::vec & c, const size_t hsize, const size_t vsize) :
 			SensorAbstract(map, ias), parameters(k, d, c), image(hsize, vsize) {
-			type = "Pin-hole-camera";
+			type("Pin-hole-camera");
 		}
 
 	}

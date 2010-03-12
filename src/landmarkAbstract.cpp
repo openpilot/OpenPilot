@@ -22,14 +22,9 @@ namespace jafar {
 		 * constructor.
 		 */
 		LandmarkAbstract::LandmarkAbstract(MapAbstract & _map, const jblas::ind_array & _ial) :
-			size(_ial.size()),
-			type("AHP"),
-			state(_map.filter.x, _map.filter.P, _ial),
-			map(& _map) {
+			state(_map.filter.x, _map.filter.P, _ial), map(&_map) {
+			type("AHP");
 		}
-
-
-
 
 	}
 }

@@ -100,6 +100,10 @@ namespace jafar {
 				SensorPinHole(MapAbstract & map, const jblas::ind_array & ias, const jblas::vec4 & k, const jblas::vec & d,
 				    const jblas::vec & c, const size_t hsize, const size_t vsize);
 
+				static size_t size(void) {
+					return 7;
+				}
+
 			private:
 		};
 

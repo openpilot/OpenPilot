@@ -28,15 +28,8 @@ namespace jafar {
 		 * Remote constructor from remote map and size of control vector
 		 */
 		RobotAbstract::RobotAbstract(MapAbstract & _map, jblas::ind_array & _iar, size_t _size_control) :
-			state(_map.filter.x, _map.filter.P, _iar), pose(_map.filter.x, _map.filter.P,
-			    jafar::jmath::ublasExtra::ia_head(_iar, 7)), control(_size_control), F_r(_iar.size(), _iar.size()), F_u(
-			    _iar.size(), _size_control) {
-		}
-
-
-		size_t RobotAbstract::getNextId(void) {
-			static size_t ID;
-			return ++ID;
+			state(_map.filter.x, _map.filter.P, _iar), pose(_map.filter.x, _map.filter.P, jafar::jmath::ublasExtra::ia_head(
+			    _iar, 7)), control(_size_control), F_r(_iar.size(), _iar.size()), F_u(_iar.size(), _size_control) {
 		}
 
 	}

@@ -43,6 +43,11 @@ namespace jafar {
 					//					state.P = jblas::mat_indirect(map.filter.P,ia2,ia2);
 				}
 
+				static size_t size(void) {
+					return 7;
+				}
+
+
 				/**
 				 * Frame transformations
 				 */

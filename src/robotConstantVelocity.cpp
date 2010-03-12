@@ -34,7 +34,7 @@ namespace jafar {
 			jblas::identity_mat I(3);
 			ublas::subrange(F_u, 7, 10, 0, 3) = I;
 			ublas::subrange(F_u, 10, 13, 3, 6) = I;
-			set_type("Constant-Velocity");
+			type("Constant-Velocity");
 		}
 
 		void Robot3DConstantVelocity::move(void) {

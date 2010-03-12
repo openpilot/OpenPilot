@@ -29,6 +29,7 @@
 #include "rtslam/robotConstantVelocity.hpp"
 #include "rtslam/sensorPinHole.hpp"
 #include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
+#include "kernel/IdFactory.hpp"
 
 using namespace jafar::rtslam;
 using namespace jblas;
@@ -37,23 +38,21 @@ using namespace jafar::jmath::ublasExtra;
 
 void test_rtslam01(void) {
 
-	size_t size_storage = 30;
-	size_t size_state = 13;
+	size_t size_map = 30;
 	size_t size_pert = 6;
 
-	MapAbstract map(size_storage);
+	MapAbstract map(size_map);
 	randVector(map.filter.x);
 	randMatrix(map.filter.P);
 
 	cout << "\n% ROBOT CREATION AND PRINT \n%===========" << endl;
-	jblas::ind_array iar = ia_range(0, size_state);
+	jblas::ind_array iar = ia_pushfront(map.used_states, Robot3DConstantVelocity::size());
 	Robot3DConstantVelocity robot(map, iar, size_pert);
-	robot.set_name("Dala");
+	robot.name("Dala");
 	robot.state.clear();
+	jafar::kernel::IdFactory IdFac;
+	robot.id(IdFac.getId());
 	cout << "robot: " << robot << endl;
-	size_t id = robot.getNextId();
-	cout << "Robot ids: " << id << " " << robot.getNextId() << " " << robot.getNextId() << " " << robot.getNextId()
-	    << " " << robot.getNextId() << " " << robot.getNextId() << endl;
 
 	cout << "\n% CAMERA CREATION AND PRINT \n%===========" << endl;
 	Gaussian sensorPose(7);
@@ -65,30 +64,36 @@ void test_rtslam01(void) {
 	size_t vsize = 480;
 
 	SensorPinHole camera1(sensorPose, k, dist, corr, hsize, vsize);
+	camera1.id(IdFac.getId());
+	camera1.name("Flea");
 	cout << "camera1: " << camera1 << endl;
-	camera1.name = "Flea2";
 
-	jblas::ind_array ias = ia_range(13,20);
+	jblas::ind_array ias = ia_pushfront(map.used_states, SensorPinHole::size());
 	SensorPinHole camera2(map, ias, k, dist, corr, hsize, vsize);
+	camera2.id(IdFac.getId());
+	camera1.name("Flea2");
 	cout << "camera2: " << camera2 << endl;
 
 	jblas::vec posevec = sensorPose.x();
 	SensorPinHole camera3(posevec, k, dist, corr, hsize, vsize);
+	camera3.id(IdFac.getId());
+	camera1.name("Marlin");
 	cout << "camera3: " << camera3 << endl;
 
 	camera1.installToRobot(robot);
 
+
 	cout << "\n% PARENTAL ACCESS \n%===========" << endl;
-	cout << "Robot " << robot.name << " has sensor " << robot.sensorsList.front()->name << " of type "
-	    << robot.sensorsList.front()->type << endl;
-	cout << "Sensor " << camera1.name << " is on robot " << camera1.robot->name << endl;
+	cout << "Robot " << robot.name() << " has sensor " << robot.sensorsList.front()->name() << " of type "
+	    << robot.sensorsList.front()->type() << endl;
+	cout << "Sensor " << camera1.name() << " is on robot " << camera1.robot->name() << endl;
 
 	cout << "\n% LANDMARK CREATION AND PRINT \n%===========" << endl;
-	jblas::ind_array ial(7);
-	for (size_t i = 0; i < 7; i++)
-		ial(i) = i + 20;
+	jblas::ind_array ial = ia_pushfront(map.used_states, Landmark3DAnchoredHomogeneousPoint::size());
 	Landmark3DAnchoredHomogeneousPoint ahp1(map, ial);
+	ahp1.id(IdFac.getId());
 	cout << "lmk1: " << ahp1 << endl;
+
 
 	jblas::vec7 F;
 	jblas::vec3 T;

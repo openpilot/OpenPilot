@@ -5,5 +5,7 @@ SUBDIRS   = \
     qtconcurrent \
     aggregation \
     extensionsystem \
+    qmapcontrol \
+    qwt \
     utils
 

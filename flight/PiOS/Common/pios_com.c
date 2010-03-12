@@ -34,7 +34,6 @@
 
 
 /* Global Variables */
-xSemaphoreHandle PIOS_HID_Buffer;
 
 /* Local Variables */
 static int32_t (*receive_callback_func)(COMPortTypeDef port, char c);

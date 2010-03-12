@@ -3,7 +3,7 @@
  *
  * @file       pios_board.h   
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Defines board hardware for the OpenPilot Version 0.1 hardware.
+ * @brief      Defines board hardware for the OpenPilot Version 1.1 hardware.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -117,7 +117,6 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 //-------------------------
 // PIOS_USART2 (GPS)
 //-------------------------
-#define PIOS_USART1_NAME			GPS
 #define PIOS_USART2_ENABLED			1
 #define PIOS_USART2_USART       		USART3
 #define PIOS_USART2_GPIO_PORT			GPIOC

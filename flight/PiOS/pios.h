@@ -32,11 +32,13 @@
 #include "pios_config.h"
 #include "pios_board.h"
 
+#if defined(PIOS_INCLUDE_FREERTOS)
 /* FreeRTOS Includes */
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
+#endif
 
 /* C Lib Includes */
 #include <stdio.h>
@@ -80,7 +82,9 @@
 #include <pios_settings.h>
 #include <pios_sdcard.h>
 #include <pios_com.h>
+#if defined(PIOS_INCLUDE_BMP085)
 #include <pios_bmp085.h>
+#endif
 
 #if defined(PIOS_INCLUDE_USB)
 /* USB Libs */

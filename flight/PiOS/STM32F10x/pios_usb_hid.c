@@ -46,10 +46,11 @@ typedef enum _HID_REQUESTS {
 
 /* Global Variables */
 xSemaphoreHandle PIOS_HID_Buffer;
+static portBASE_TYPE xHigherPriorityTaskWoken;
 
 /* Local Variables */
 static uint32_t ProtocolValue;
-static portBASE_TYPE xHigherPriorityTaskWoken;
+
 
 /* Local Functions */
 static uint8_t *PIOS_USB_HID_GetHIDDescriptor(uint16_t Length);

@@ -38,6 +38,7 @@ extern SettingsTypeDef Settings;
 xSemaphoreHandle PIOS_USART1_Buffer;
 xSemaphoreHandle PIOS_USART2_Buffer;
 xSemaphoreHandle PIOS_USART3_Buffer;
+static portBASE_TYPE xHigherPriorityTaskWoken;
 
 /* Local Variables */
 static uint8_t rx_buffer[PIOS_USART_NUM][PIOS_USART_RX_BUFFER_SIZE];
@@ -49,8 +50,6 @@ static uint8_t tx_buffer[PIOS_USART_NUM][PIOS_USART_TX_BUFFER_SIZE];
 static volatile uint8_t tx_buffer_tail[PIOS_USART_NUM];
 static volatile uint8_t tx_buffer_head[PIOS_USART_NUM];
 static volatile uint8_t tx_buffer_size[PIOS_USART_NUM];
-
-static portBASE_TYPE xHigherPriorityTaskWoken;
 
 
 /**
@@ -539,7 +538,8 @@ int32_t PIOS_USART_TxBufferPut(USARTNumTypeDef usart, uint8_t b)
 	return error;
 }
 
-/* Interrupt handler for GPS USART */
+#if (PIOS_USART1_ENABLED)
+/* Interrupt handler for USART1 */
 PIOS_USART1_IRQHANDLER_FUNC
 {
 	/* Check if RXNE flag is set */
@@ -567,8 +567,10 @@ PIOS_USART1_IRQHANDLER_FUNC
 		}
 	}
 }
+#endif
 
-/* Interrupt handler for TELEM USART */
+#if (PIOS_USART1_ENABLED)
+/* Interrupt handler for USART2 */
 PIOS_USART2_IRQHANDLER_FUNC
 {
 	/* check if RXNE flag is set */
@@ -596,8 +598,10 @@ PIOS_USART2_IRQHANDLER_FUNC
 		}
 	}
 }
+#endif
 
-/* Interrupt handler for AUX USART */
+#if (PIOS_USART1_ENABLED)
+/* Interrupt handler for USART3 */
 PIOS_USART3_IRQHANDLER_FUNC
 {
 	/* check if RXNE flag is set */
@@ -624,5 +628,6 @@ PIOS_USART3_IRQHANDLER_FUNC
 		}
 	}
 }
+#endif
 
 #endif

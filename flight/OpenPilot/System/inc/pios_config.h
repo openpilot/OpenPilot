@@ -47,6 +47,7 @@
 #define PIOS_INCLUDE_COM
 #define PIOS_INCLUDE_SDCARD
 #define PIOS_INCLUDE_SETTINGS
+#define PIOS_INCLUDE_FREERTOS
 
 
 /* Defaults for Logging */

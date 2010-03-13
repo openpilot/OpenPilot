@@ -52,8 +52,13 @@ int32_t PIOS_COM_Init(void)
 	receive_callback_func = NULL;
 
 	/* If any COM assignment: */
+#if defined(PIOS_INCLUDE_USART)
 	PIOS_USART_Init();
+#endif
+
+#if defined(PIOS_INCLUDE_USB_HID)
 	PIOS_USB_HID_Init(0);
+#endif
 
 	return ret;
 }

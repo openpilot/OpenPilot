@@ -34,8 +34,15 @@
 
 #if defined(PIOS_INCLUDE_I2C)
 
+
+
 /* Options */
-// #define USE_DEBUG_PINS
+#define USE_DEBUG_PINS
+
+#ifdef PIOS_INCLUDE_FREERTOS
+	#define USE_FREERTOS
+#endif
+
 
 /* Global Variables */
 volatile uint32_t PIOS_I2C_UnexpectedEvent;
@@ -50,6 +57,7 @@ typedef union {
 		unsigned STOP_REQUESTED:1;
 		unsigned ABORT_IF_FIRST_BYTE_0:1;
 		unsigned WRITE_WITHOUT_STOP:1;
+		unsigned INIRQ:1;
 	};
 } TransferStateTypeDef;
 
@@ -66,6 +74,11 @@ typedef struct {
 	volatile TransferStateTypeDef transfer_state;
 	volatile int32_t transfer_error;
 
+#ifdef USE_FREERTOS
+	xSemaphoreHandle sem_readySignal;
+	portBASE_TYPE xHigherPriorityTaskWoken;
+#endif
+
 	volatile uint8_t i2c_semaphore;
 } I2CRecTypeDef;
 
@@ -76,6 +89,10 @@ static void ER_IRQHandler(I2CRecTypeDef *i2cx);
 
 /* Local Variables */
 static I2CRecTypeDef I2CRec;
+
+/* Local Functions */
+static void TransferStart(I2CRecTypeDef *i2cx);
+static void TransferEnd(I2CRecTypeDef *i2cx);
 
 /* Macros */
 #ifdef USE_DEBUG_PINS
@@ -117,6 +134,11 @@ int32_t PIOS_I2C_Init(void)
 
 	/* Now accessible for other tasks */
 	I2CRec.i2c_semaphore = 0;
+#ifdef USE_FREERTOS
+	vSemaphoreCreateBinary(I2CRec.sem_readySignal);
+#endif
+
+	TransferEnd(&I2CRec);
 
 	/* Configure and enable I2C2 interrupts */
 	NVIC_InitTypeDef NVIC_InitStructure;
@@ -221,6 +243,8 @@ int32_t PIOS_I2C_UnlockDevice(void)
  */
 static void TransferStart(I2CRecTypeDef *i2cx)
 {
+	assert(i2cx->transfer_state.BUSY == 0);
+
 	DebugPinHigh(DEBUG_PIN_BUSY);
 	i2cx->transfer_state.BUSY = 1;
 
@@ -238,6 +262,17 @@ static void TransferEnd(I2CRecTypeDef *i2cx)
 
 	DebugPinLow(DEBUG_PIN_BUSY);
 	i2cx->transfer_state.BUSY = 0;
+
+#ifdef USE_FREERTOS
+	if (i2cx->transfer_state.INIRQ)
+	{
+		xSemaphoreGiveFromISR(i2cx->sem_readySignal, &i2cx->xHigherPriorityTaskWoken);
+	}
+	else
+	{
+		xSemaphoreGive(i2cx->sem_readySignal);
+	}
+#endif
 }
 
 /**
@@ -281,10 +316,27 @@ int32_t PIOS_I2C_TransferWait(void)
 {
 	I2CRecTypeDef *i2cx = &I2CRec;
 	
+	DebugPinHigh(DEBUG_PIN_WAIT);
+
+#ifdef USE_FREERTOS
+
+	if (i2cx->transfer_state.BUSY)
+	{
+		// Wait until we see the ready signal
+		if (xSemaphoreTake(i2cx->sem_readySignal, PIOS_I2C_TIMEOUT_VALUE/portTICK_RATE_MS) == pdTRUE)
+		{
+			// OK, got the semaphore, release it again
+			assert(i2cx->transfer_state.BUSY == 0);
+		}
+		else
+		{
+			PIOS_I2C_TerminateTransfer(I2C_ERROR_TIMEOUT);
+		}
+	}
+
+#else
 	uint32_t repeat_ctr = PIOS_I2C_TIMEOUT_VALUE;
 	uint16_t last_buffer_ix = i2cx->buffer_ix;
-
-	DebugPinHigh(DEBUG_PIN_WAIT);
 
 	if (i2cx->transfer_state.BUSY)
 	{
@@ -310,8 +362,9 @@ int32_t PIOS_I2C_TransferWait(void)
 		/* Timeout error - something is stalling... */
 		PIOS_I2C_TerminateTransfer(I2C_ERROR_TIMEOUT);
 	}
+#endif
 
-	DebugPinHigh(DEBUG_PIN_WAIT);
+	DebugPinLow(DEBUG_PIN_WAIT);
 
 	return i2cx->transfer_error;
 }
@@ -354,6 +407,12 @@ void PIOS_I2C_StartTransfer(I2CTransferTypeDef transfer, uint8_t address, uint8_
 		assert(0);
 		return;
 	}
+
+#ifdef USE_FREERTOS
+	// Consume Ready semaphore in case it would be there for some reason
+	xSemaphoreTake(i2cx->sem_readySignal, 0);
+	assert(xSemaphoreTake(i2cx->sem_readySignal, 0) == pdFALSE);
+#endif
 
 	// Clear state
 	i2cx->transfer_state.ALL = 0;
@@ -402,12 +461,18 @@ void PIOS_I2C_StartTransfer(I2CTransferTypeDef transfer, uint8_t address, uint8_
 static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 {
 	uint8_t b;
+	uint32_t event;
 
 	DebugPinHigh(DEBUG_PIN_ISR);
 
+	// Update state
+	i2cx->transfer_state.INIRQ = 1;
+#ifdef USE_FREERTOS
+	i2cx->xHigherPriorityTaskWoken = pdFALSE;
+#endif
 
 	/* Read SR1 and SR2 at the beginning (if not done so, flags may get lost) */
-	uint32_t event = I2C_GetLastEvent(i2cx->base);
+	event = I2C_GetLastEvent(i2cx->base);
 
 	/* The order of the handling blocks is chosen by test results @ 1MHZ */
 	/* Don't change this order */
@@ -544,6 +609,13 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 //	I2C_GenerateSTOP(i2cx->base, ENABLE);
 
 isr_return:
+	// Cause task-switch when needed
+#ifdef USE_FREERTOS
+	portEND_SWITCHING_ISR(i2cx->xHigherPriorityTaskWoken);
+#endif
+
+	// Update state
+	i2cx->transfer_state.INIRQ = 0;
 	DebugPinLow(DEBUG_PIN_ISR);
 }
 

@@ -37,7 +37,8 @@
 #define I2C_ERROR_SLAVE_NOT_CONNECTED			-7
 #define I2C_ERROR_UNEXPECTED_EVENT			-8
 #define I2C_ERROR_RX_BUFFER_OVERRUN			-9
-#define I2C_ERROR_PREV_OFFSET				-128
+#define I2C_ERROR_BUSY						-10
+
 
 /* Global Types */
 typedef enum {
@@ -55,9 +56,9 @@ typedef enum {
 extern int32_t PIOS_I2C_Init(void);
 extern int32_t PIOS_I2C_LockDevice(I2CSemaphoreTypeDef semaphore_type);
 extern int32_t PIOS_I2C_UnlockDevice(void);
-extern int32_t PIOS_I2C_LastErrorGet(void);
 extern int32_t PIOS_I2C_TransferCheck(void);
 extern int32_t PIOS_I2C_TransferWait(void);
 extern int32_t PIOS_I2C_Transfer(I2CTransferTypeDef transfer, uint8_t address, uint8_t *buffer, uint16_t len);
+extern void PIOS_I2C_StartTransfer(I2CTransferTypeDef transfer, uint8_t address, uint8_t *buffer, uint16_t len);
 
 #endif /* PIOS_I2C_H */

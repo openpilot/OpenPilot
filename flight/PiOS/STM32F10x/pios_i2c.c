@@ -65,7 +65,6 @@ typedef struct {
 
 	volatile TransferStateTypeDef transfer_state;
 	volatile int32_t transfer_error;
-	volatile int32_t last_transfer_error;
 
 	volatile uint8_t i2c_semaphore;
 } I2CRecTypeDef;
@@ -82,6 +81,7 @@ static I2CRecTypeDef I2CRec;
 #ifdef USE_DEBUG_PINS
 	#define	DEBUG_PIN_ISR	0
 	#define DEBUG_PIN_BUSY	1
+	#define DEBUG_PIN_WAIT	2
 	#define DEBUG_PIN_ASSERT	7
 	#define DebugPinHigh(x) PIOS_DEBUG_PinHigh(x)
 	#define DebugPinLow(x)	PIOS_DEBUG_PinLow(x)
@@ -117,7 +117,6 @@ int32_t PIOS_I2C_Init(void)
 
 	/* Now accessible for other tasks */
 	I2CRec.i2c_semaphore = 0;
-	I2CRec.last_transfer_error = 0;
 
 	/* Configure and enable I2C2 interrupts */
 	NVIC_InitTypeDef NVIC_InitStructure;
@@ -170,7 +169,6 @@ static void PIOS_I2C_InitPeripheral(void)
 
 	/* Clear transfer state and error value */
 	i2cx->transfer_state.ALL = 0;
-	PIOS_DEBUG_PinLow(0);
 	i2cx->transfer_error = 0;
 
 	/* Configure I2C peripheral */
@@ -199,7 +197,6 @@ int32_t PIOS_I2C_LockDevice(I2CSemaphoreTypeDef semaphore_type)
 	} while(semaphore_type == I2C_Blocking && status != 0);
 
 	/* Clear transfer errors of last transmission */
-	i2cx->last_transfer_error = 0;
 	i2cx->transfer_error = 0;
 
 	return status;
@@ -218,17 +215,6 @@ int32_t PIOS_I2C_UnlockDevice(void)
 	return 0;
 }
 
-/**
-* Returns the last transfer error<BR>
-* Will be updated by PIOS_I2C_TransferCheck(), so that the error status
-* doesn't get lost (the check function will return 0 when called again)<BR>
-* Will be cleared when a new transfer has been started successfully
-* \return last error status
-*/
-int32_t PIOS_IIC_LastErrorGet(void)
-{
-	return I2CRec.last_transfer_error;
-}
 
 /**
  * Internal function called at the start of a transfer
@@ -256,45 +242,40 @@ static void TransferEnd(I2CRecTypeDef *i2cx)
 
 /**
 * Checks if transfer is finished
-* \return 0 if no ongoing transfer
 * \return 1 if ongoing transfer
-* \return < 0 if error during transfer
-* \note Note that the semaphore will be released automatically after an error
+* \return <=0 no transfer is busy; return value indicates error value of last transfer
 * (PIOS_I2C_TransferBegin() has to be called again)
 */
 int32_t PIOS_I2C_TransferCheck(void)
 {
 	I2CRecTypeDef *i2cx = &I2CRec;
 
-	/* Ongoing transfer? */
-	if(i2cx->transfer_state.BUSY) {
+	if(i2cx->transfer_state.BUSY)
 		return 1;
-	}
 
-	/* Error during transfer? */
-	/* (must be done *after* BUSY check to avoid race conditon!) */
-	if(i2cx->transfer_error) {
-		/* Store error status for PIOS_IIC_LastErrorGet() function */
-		i2cx->last_transfer_error = i2cx->transfer_error;
-		/* Clear current error status */
-		i2cx->transfer_error = 0;
-		/* Release semaphore for easier programming at user level */
-		i2cx->i2c_semaphore = 0;
-		/* And exit */
-		return i2cx->last_transfer_error;
-	}
-
-	/* No transfer */
-	return 0;
+	return i2cx->transfer_error;
 }
 
+/**
+ * Stop the current transfer
+ * \param error the error that must be reported
+ */
+void PIOS_I2C_TerminateTransfer(uint32_t error)
+{
+	I2CRecTypeDef *i2cx = &I2CRec;
+
+	/* Send stop condition */
+	I2C_GenerateSTOP(i2cx->base, ENABLE);
+
+	/* Re-initialize peripheral */
+	PIOS_I2C_InitPeripheral();
+
+	i2cx->transfer_error = error;
+}
 
 /**
-* Waits until transfer is finished
-* \return 0 if no ongoing transfer
-* \return < 0 if error during transfer
-* \note Note that the semaphore will be released automatically after an error
-* (PIOS_I2C_TransferBegin() has to be called again)
+* Waits until transfer is finished.
+* \return error value of the transfer
 */
 int32_t PIOS_I2C_TransferWait(void)
 {
@@ -303,50 +284,56 @@ int32_t PIOS_I2C_TransferWait(void)
 	uint32_t repeat_ctr = PIOS_I2C_TIMEOUT_VALUE;
 	uint16_t last_buffer_ix = i2cx->buffer_ix;
 
-	DebugPinHigh(3);
-	//while(i2cx->transfer_state.BUSY);
+	DebugPinHigh(DEBUG_PIN_WAIT);
 
-	while(--repeat_ctr > 0) {
-		/* Check if buffer index has changed - if so, reload repeat counter */
-		if(i2cx->buffer_ix != last_buffer_ix) {
-			repeat_ctr = PIOS_I2C_TIMEOUT_VALUE;
-			last_buffer_ix = i2cx->buffer_ix;
-		}
-		
-		/* Get transfer state */
-		int32_t check_state = PIOS_I2C_TransferCheck();
-		
-		/* Exit if transfer finished or error detected */
-		if(check_state <= 0) {
-			if(check_state < 0) {
-				/* Release semaphore for easier programming at user level */
-				i2cx->i2c_semaphore = 0;
+	if (i2cx->transfer_state.BUSY)
+	{
+		while(--repeat_ctr > 0)
+		{
+			/* Check if buffer index has changed - if so, reload repeat counter */
+			if(i2cx->buffer_ix != last_buffer_ix) {
+				repeat_ctr = PIOS_I2C_TIMEOUT_VALUE;
+				last_buffer_ix = i2cx->buffer_ix;
 			}
-			DebugPinLow(3);
-			return check_state;
+
+			/* Get transfer state */
+			int32_t check_state = PIOS_I2C_TransferCheck();
+
+			/* Exit if transfer finished */
+			if(check_state <= 0)
+			{
+				DebugPinLow(DEBUG_PIN_WAIT);
+				return check_state;
+			}
 		}
+
+		/* Timeout error - something is stalling... */
+		PIOS_I2C_TerminateTransfer(I2C_ERROR_TIMEOUT);
 	}
 
-	/* Timeout error - something is stalling... */
+	DebugPinHigh(DEBUG_PIN_WAIT);
 
-	/* Send stop condition */
-	I2C_GenerateSTOP(i2cx->base, ENABLE);
-
-	/* Re-initialize peripheral */
-	PIOS_I2C_InitPeripheral();
-
-	/* Release semaphore (!) */
-	i2cx->i2c_semaphore = 0;
-
-	DebugPinLow(3);
-
-	return (i2cx->last_transfer_error = I2C_ERROR_TIMEOUT);
+	return i2cx->transfer_error;
 }
 
+/**
+* Perform a transfer. No previous transfer should be ongoing when this function is called.
+* When the function returns, the transfer is finished.
+* See PIOS_I2C_StartTransfer() for details on the parameters.
+* \return 0 no error
+* \return < 0 on errors
+*
+*/
+int32_t PIOS_I2C_Transfer(I2CTransferTypeDef transfer, uint8_t address, uint8_t *buffer, uint16_t len)
+{
+	PIOS_I2C_StartTransfer(transfer, address, buffer, len);
+	return PIOS_I2C_TransferWait();
+}
 
 /**
-* Starts a new transfer. If this function is called during an ongoing
-* transfer, we wait until it has been finished and setup the new transfer
+* Starts a new transfer. No previous transfer should be ongoing when this function is called.
+* When this function returns, the new transfer is ongoing. PIOS_I2C_TransferWait() should be called
+* to wait for the transfer to finish and to retrieve the result code.
 * \param[in] transfer type:<BR>
 * <UL>
 *   <LI>I2C_Read: a common Read transfer
@@ -356,43 +343,28 @@ int32_t PIOS_I2C_TransferWait(void)
 * \param[in] address of I2C device (bit 0 always cleared)
 * \param[in] *buffer pointer to transmit/receive buffer
 * \param[in] len number of bytes which should be transmitted/received
-* \return 0 no error
-* \return < 0 on errors, if PIOS_I2C_ERROR_PREV_OFFSET is added, the previous
-*      transfer got an error (the previous task didn't use \ref PIOS_I2C_TransferWait
-*      to poll the transfer state)
-* \note Note that the semaphore will be released automatically after an error
-* (PIOS_I2C_TransferBegin() has to be called again)
 */
-int32_t PIOS_I2C_Transfer(I2CTransferTypeDef transfer, uint8_t address, uint8_t *buffer, uint16_t len)
+void PIOS_I2C_StartTransfer(I2CTransferTypeDef transfer, uint8_t address, uint8_t *buffer, uint16_t len)
 {
 	I2CRecTypeDef *i2cx = &I2CRec;
-	int32_t error;
 
-
-	/* Wait until previous transfer finished */
-	if((error = PIOS_I2C_TransferWait())) {
-		/* Transmission error during previous transfer */
-		
-		/* Release semaphore for easier programming at user level */
-		i2cx->i2c_semaphore = 0;
-		return error + I2C_ERROR_PREV_OFFSET;
+	// Should not be busy
+	if (i2cx->transfer_state.BUSY)
+	{
+		assert(0);
+		return;
 	}
 
-	// Should not be busy at this point, interrupts disabled
-	assert(i2cx->transfer_state.BUSY == 0);
-
-
-	/* Clear transfer state and error value */
+	// Clear state
 	i2cx->transfer_state.ALL = 0;
 	i2cx->transfer_error = 0;
 
-
-	/* Set buffer length and start index */
+	// Set buffer length and start index
 	i2cx->buffer_len = len;
 	i2cx->buffer_ix = 0;
 
-	/* Branch depending on read/write */
-	if(transfer == I2C_Read) {
+	if(transfer == I2C_Read)
+	{
 		/* Take new address/buffer/len */
 		/* Set bit 0 for read operation */
 		i2cx->i2c_address = address | 1;
@@ -401,7 +373,9 @@ int32_t PIOS_I2C_Transfer(I2CTransferTypeDef transfer, uint8_t address, uint8_t 
 		i2cx->rx_buffer_ptr = buffer;
 		// Ack the bytes we will be getting
 		I2C_AcknowledgeConfig(i2cx->base, ENABLE);
-	} else if(transfer == I2C_Write || transfer == I2C_Write_WithoutStop) {
+	}
+	else if(transfer == I2C_Write || transfer == I2C_Write_WithoutStop)
+	{
 		/* Take new address/buffer/len */
 		/* Clear bit 0 for write operation */
 		i2cx->i2c_address = address & 0xfe;
@@ -410,20 +384,16 @@ int32_t PIOS_I2C_Transfer(I2CTransferTypeDef transfer, uint8_t address, uint8_t 
 		i2cx->rx_buffer_ptr = NULL;
 		/* Option to skip stop-condition generation after successful write */
 		i2cx->transfer_state.WRITE_WITHOUT_STOP = transfer == I2C_Write_WithoutStop ? 1 : 0;
-	} else {
-		/* Release semaphore for easier programming at user level */
-		i2cx->i2c_semaphore = 0;
-		return (i2cx->last_transfer_error=I2C_ERROR_UNSUPPORTED_TRANSFER_TYPE);
+	}
+	else
+	{
+		i2cx->transfer_error = I2C_ERROR_UNSUPPORTED_TRANSFER_TYPE;
+		return;
 	}
 
 	// Start the transfer
 	I2C_GenerateSTART(i2cx->base, ENABLE);
 	TransferStart(i2cx);
-
-
-
-	// All is fine
-	return 0;
 }
 
 /**

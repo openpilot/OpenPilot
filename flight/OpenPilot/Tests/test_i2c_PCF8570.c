@@ -109,7 +109,7 @@ static void TestTask(void *pvParameters)
 	for(;;)
 	{
 		i++;
-		if (i==100)
+		if (i==10)
 		{
 			PIOS_LED_Toggle(LED1);
 			i = 0;
@@ -117,17 +117,24 @@ static void TestTask(void *pvParameters)
 
 		{
 			uint8_t buf[20];
-			PIOS_I2C_Transfer(I2C_Write, 0x50<<1, (uint8_t*)"\x10\xA0\xA1\xA2", 4);
+			if (PIOS_I2C_Transfer(I2C_Write, 0x50<<1, (uint8_t*)"\x10\xA0\xA1\xA2", 4) != 0)
+				OnError();
 
-			PIOS_I2C_Transfer(I2C_Write_WithoutStop, 0x50<<1, (uint8_t*)"\x20", 1);
-			PIOS_I2C_Transfer(I2C_Read, 0x50<<1, buf, 3);
-			PIOS_I2C_TransferWait();
+			if (PIOS_I2C_Transfer(I2C_Write_WithoutStop, 0x50<<1, (uint8_t*)"\x20", 1) != 0)
+				OnError();
+
+			if (PIOS_I2C_Transfer(I2C_Read, 0x50<<1, buf, 3) != 0)
+				OnError();
+
 			if (memcmp(buf, "\xB0\xB1\xB2",3) != 0)
 				OnError();
 
-			PIOS_I2C_Transfer(I2C_Write_WithoutStop, 0x50<<1, (uint8_t*)"\x10", 1);
-			PIOS_I2C_Transfer(I2C_Read, 0x50<<1, buf, 3);
-			PIOS_I2C_TransferWait();
+			if (PIOS_I2C_Transfer(I2C_Write_WithoutStop, 0x50<<1, (uint8_t*)"\x10", 1) != 0)
+				OnError();
+
+			if (PIOS_I2C_Transfer(I2C_Read, 0x50<<1, buf, 3) != 0)
+				OnError();
+
 			if (memcmp(buf, "\xA0\xA1\xA2",3) != 0)
 				OnError();
 

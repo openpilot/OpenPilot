@@ -214,17 +214,13 @@ int32_t PIOS_BMP085_Read(uint8_t address, uint8_t *buffer, uint8_t len)
 	/* To avoid issues copy address into temporary buffer */
 	uint8_t addr_buffer[1] = {(uint8_t)address};
 	int32_t error = PIOS_I2C_Transfer(I2C_Write_WithoutStop, BMP085_I2C_ADDR, addr_buffer, 1);
-	if(!error) {
-		error = PIOS_I2C_TransferWait();
-	}
+
 
 	/* Now receive byte(s) */
 	if(!error) {
 		error = PIOS_I2C_Transfer(I2C_Read, BMP085_I2C_ADDR, buffer, len);
 	}
-	if(!error) {
-		error = PIOS_I2C_TransferWait();
-	}
+
 
 	/* Release I2C peripheral */
 	PIOS_I2C_UnlockDevice();
@@ -257,10 +253,6 @@ int32_t PIOS_BMP085_Write(uint8_t address, uint8_t buffer)
 	
 	int32_t error = PIOS_I2C_Transfer(I2C_Write, BMP085_I2C_ADDR, WriteBuffer, 2);
 	
-	if(!error) {
-		error = PIOS_I2C_TransferWait();
-	}
-
 	/* Release I2C peripheral */
 	PIOS_I2C_UnlockDevice();
 	

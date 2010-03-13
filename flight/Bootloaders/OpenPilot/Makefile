@@ -203,11 +203,6 @@ CDEFS = -DSTM32F10X_$(MODEL)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)
 
-ifeq ($(ENABLE_DEBUG_PINS),YES)
-CDEFS += -DPIOS_ENABLE_DEBUG_PINS
-endif
-
-
 # Place project-specific -D and/or -U options for 
 # Assembler with preprocessor here.
 #ADEFS = -DUSE_IRQ_ASM_WRAPPER

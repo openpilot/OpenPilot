@@ -31,9 +31,6 @@
 static pFunction Jump_To_Application;
 static uint32_t JumpAddress;
 
-/* Local Variables */
-
-/* Function Prototypes */
 
 /**
 * OpenPilot Bootloader Main function
@@ -43,24 +40,22 @@ int main()
 	/* Brings up System using CMSIS functions, enables the LEDs. */
 	PIOS_SYS_Init();
 
+	/* Initialise LED's */
+	PIOS_LED_Off(LED1);
+	PIOS_LED_Off(LED2);
+
 	/* Only go into bootloader when the USB cable is connected */
 	if(PIOS_USB_CableConnected()) {
 		/* Delay system */
 		PIOS_DELAY_Init();
 
-		/* Initialise the USB system */
-		PIOS_USB_Init(0);
+		if(PIOS_USB_IsInitialized()) {
+			/* Initialise the USB system */
+			PIOS_USB_Init(0);
+		}
 
 		/* Initialise COM Ports */
 		PIOS_COM_Init();
-
-		/* Initialise LED's */
-		PIOS_LED_Init();
-		PIOS_LED_Off(LED1);
-		PIOS_LED_Off(LED2);
-
-		/* Flash unlock */
-		FLASH_Unlock();
 
 		/* Execute the IAP driver in order to re-program the Flash */
 		StartBootloader();

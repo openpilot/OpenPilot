@@ -31,7 +31,7 @@ typedef  void (*pFunction)(void);
 
 /* Global Defines */
 #define CMD_STRING_SIZE			128
-#define ApplicationAddress		0x8008000
+#define ApplicationAddress		(0x8008000)
 #define PAGE_SIZE			(0x800)
 #define FLASH_SIZE			(0x80000)	/* 512K */
 

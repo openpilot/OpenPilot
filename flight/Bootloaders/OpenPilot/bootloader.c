@@ -79,6 +79,9 @@ void StartBootloader(void)
 			if(PIOS_COM_ReceiveBufferUsed(OPBL_COM_PORT) > 0) {
 				key = PIOS_COM_ReceiveBuffer(OPBL_COM_PORT);
 				if(key == 0x31) {
+					/* Flash unlock */
+					FLASH_Unlock();
+
 					/* Download user application in the Flash */
 					SerialDownload();
 					return;

@@ -27,7 +27,7 @@
 #ifndef OPENPILOT_BL_H
 #define OPENPILOT_BL_H
 
-#define OPBL_MAGIC_TIMEOUT		2000
+#define OPBL_MAGIC_TIMEOUT		200
 #define OPBL_COM_PORT			COM_DEBUG_USART
 
 /* PIOS Includes */

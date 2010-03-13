@@ -27,6 +27,7 @@
 #ifndef PIOS_BOARD_H
 #define PIOS_BOARD_H
 
+
 //------------------------
 // PIOS_LED
 //------------------------
@@ -54,7 +55,7 @@
 #define PIOS_USART1_IRQHANDLER_FUNC		void USART2_IRQHandler(void)
 #define PIOS_USART1_CLK_FUNC			RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE)
 #define PIOS_USART1_NVIC_PRIO			PIOS_IRQ_PRIO_HIGHEST
-#define PIOS_USART1_BAUDRATE			57600
+#define PIOS_USART1_BAUDRATE			115200
 
 //-------------------------
 // PIOS_USART2 (GPS)
@@ -90,8 +91,8 @@
 // PIOS_USART
 //-------------------------
 #define PIOS_USART_NUM				1
-#define PIOS_USART_RX_BUFFER_SIZE		1024
-#define PIOS_USART_TX_BUFFER_SIZE		256
+#define PIOS_USART_RX_BUFFER_SIZE		128
+#define PIOS_USART_TX_BUFFER_SIZE		128
 #define PIOS_COM_DEBUG_PORT			USART_1
 
 //-------------------------
@@ -101,10 +102,11 @@
 #define PIOS_DELAY_TIMER_RCC_FUNC		RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE)
 
 //-------------------------
-// Master Clock
+// System Settings
 //-------------------------
 #define PIOS_MASTER_CLOCK			72000000
 #define PIOS_PERIPHERAL_CLOCK			(PIOS_MASTER_CLOCK / 2)
+#define PIOS_NVIC_VECTTAB_FLASH			((uint32_t)0x08000000)
 
 //-------------------------
 // Interrupt Priorities

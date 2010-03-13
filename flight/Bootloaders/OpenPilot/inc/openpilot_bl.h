@@ -27,8 +27,12 @@
 #ifndef OPENPILOT_BL_H
 #define OPENPILOT_BL_H
 
+#define OPBL_MAGIC_TIMEOUT		2000
+#define OPBL_COM_PORT			COM_DEBUG_USART
 
 /* PIOS Includes */
 #include <pios.h>
+#include "bootloader.h"
+#include "ymodem.h"
 
 #endif /* OPENPILOT_BL_H */

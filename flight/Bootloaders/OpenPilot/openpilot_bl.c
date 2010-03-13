@@ -28,6 +28,8 @@
 #include "openpilot_bl.h"
 
 /* Global Variables */
+static pFunction Jump_To_Application;
+static uint32_t JumpAddress;
 
 /* Local Variables */
 
@@ -41,19 +43,47 @@ int main()
 	/* Brings up System using CMSIS functions, enables the LEDs. */
 	PIOS_SYS_Init();
 
-	/* Delay system */
-	PIOS_DELAY_Init();
+	/* Only go into bootloader when the USB cable is connected */
+	if(PIOS_USB_CableConnected()) {
+		/* Delay system */
+		PIOS_DELAY_Init();
 
-	/* Initialise LED's */
-	PIOS_LED_Init();
+		/* Initialise the USB system */
+		PIOS_USB_Init(0);
 
-	/* Loop for ever */
+		/* Initialise COM Ports */
+		PIOS_COM_Init();
+
+		/* Initialise LED's */
+		PIOS_LED_Init();
+		PIOS_LED_Off(LED1);
+		PIOS_LED_Off(LED2);
+
+		/* Flash unlock */
+		FLASH_Unlock();
+
+		/* Execute the IAP driver in order to re-program the Flash */
+		StartBootloader();
+	}
+
+	/* Test if user code is programmed starting from address "ApplicationAddress" */
+	if(((*(volatile uint32_t*) ApplicationAddress) & 0x2FFE0000) == 0x20000000) {
+		/* Jump to user application */
+		JumpAddress = *(volatile uint32_t*) (ApplicationAddress + 4);
+		Jump_To_Application = (pFunction) JumpAddress;
+
+		/* Initialise user application's Stack Pointer */
+		__set_MSP(*(volatile uint32_t*) ApplicationAddress);
+		Jump_To_Application();
+	}
+
+	/* Loop for ever if no application code is not programmed */
 	PIOS_LED_Off(LED1);
 	PIOS_LED_Off(LED2);
 	for(;;) {
 		PIOS_LED_Toggle(LED1);
 		PIOS_LED_Toggle(LED2);
-		PIOS_DELAY_WaitmS(200);
+		PIOS_DELAY_WaitmS(50);
 	}
 
 	return 0;

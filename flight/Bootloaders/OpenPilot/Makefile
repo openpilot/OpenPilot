@@ -51,7 +51,7 @@ USE_THUMB_MODE = YES
 # - BOARD just passed as define (optional)
 MCU      = cortex-m3
 CHIP     = STM32F103RET
-MODEL    = HD_BL
+MODEL    = HD
 BOARD    = STM3210E_OP
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
@@ -83,7 +83,9 @@ DOXYGENDIR = .../Doc/Doxygen
 # use file-extension c for "c-only"-files
 
 ## OPENPILOT Bootloader:
-SRC = $(OPBLSYSTEM)/openpilot_bl.c
+SRC =  $(OPBLSYSTEM)/openpilot_bl.c
+SRC += $(OPBLSYSTEM)/bootloader.c
+SRC += $(OPBLSYSTEM)/ymodem.c
 
 ## PIOS Hardware (STM32F10x)
 SRC += $(PIOSSTM32F10X)/pios_sys.c
@@ -91,8 +93,8 @@ SRC += $(PIOSSTM32F10X)/pios_led.c
 SRC += $(PIOSSTM32F10X)/pios_usart.c
 SRC += $(PIOSSTM32F10X)/pios_delay.c
 SRC += $(PIOSSTM32F10X)/pios_irq.c
-#SRC += $(PIOSSTM32F10X)/pios_usb.c
-#SRC += $(PIOSSTM32F10X)/pios_usb_hid.c
+SRC += $(PIOSSTM32F10X)/pios_usb.c
+SRC += $(PIOSSTM32F10X)/pios_usb_hid.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_com.c
@@ -105,16 +107,18 @@ SRC += $(CMSISDIR)/system_stm32f10x.c
 ## Used parts of the STM-Library
 SRC += $(STMSPDSRCDIR)/stm32f10x_gpio.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_rcc.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_wwdg.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_tim.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_flash.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_usart.c
 SRC += $(STMSPDSRCDIR)/misc.c
 
 ## STM32 USB Library
-#SRC += $(STMUSBSRCDIR)/usb_core.c
-#SRC += $(STMUSBSRCDIR)/usb_init.c
-#SRC += $(STMUSBSRCDIR)/usb_int.c
-#SRC += $(STMUSBSRCDIR)/usb_mem.c
-3SRC += $(STMUSBSRCDIR)/usb_regs.c
+SRC += $(STMUSBSRCDIR)/usb_core.c
+SRC += $(STMUSBSRCDIR)/usb_init.c
+SRC += $(STMUSBSRCDIR)/usb_int.c
+SRC += $(STMUSBSRCDIR)/usb_mem.c
+SRC += $(STMUSBSRCDIR)/usb_regs.c
 
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
 # use file-extension c for "c-only"-files

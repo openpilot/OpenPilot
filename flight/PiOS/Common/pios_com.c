@@ -224,6 +224,8 @@ int32_t PIOS_COM_SendFormattedString(COMPortTypeDef port, char *format, ...)
 uint8_t PIOS_COM_ReceiveBuffer(COMPortTypeDef port)
 {
 	switch(port) {
+		case COM_DEBUG_USART:
+			return PIOS_USART_RxBufferGet(PIOS_COM_DEBUG_PORT);
 		case COM_USART1:
 			return PIOS_USART_RxBufferGet(USART_1);
 		case COM_USART2:
@@ -246,6 +248,8 @@ uint8_t PIOS_COM_ReceiveBuffer(COMPortTypeDef port)
 int32_t PIOS_COM_ReceiveBufferUsed(COMPortTypeDef port)
 {
 	switch(port) {
+		case COM_DEBUG_USART:
+			return PIOS_USART_RxBufferUsed(PIOS_COM_DEBUG_PORT);
 		case COM_USART1:
 			return PIOS_USART_RxBufferUsed(USART_1);
 		case COM_USART2:

@@ -38,7 +38,7 @@
 void PIOS_DEBUG_Init(void)
 {
 #ifdef PIOS_ENABLE_DEBUG_PINS
-	/* Initialise Servo pins as standard output pins */
+	// Initialise Servo pins as standard output pins
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_StructInit(&GPIO_InitStructure);
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
@@ -47,6 +47,10 @@ void PIOS_DEBUG_Init(void)
 	GPIO_Init(PIOS_SERVO_GPIO_PORT_1TO4, &GPIO_InitStructure);
 	GPIO_InitStructure.GPIO_Pin = PIOS_SERVO_GPIO_PIN_5 | PIOS_SERVO_GPIO_PIN_6 | PIOS_SERVO_GPIO_PIN_7 | PIOS_SERVO_GPIO_PIN_8;
 	GPIO_Init(PIOS_SERVO_GPIO_PORT_5TO8, &GPIO_InitStructure);
+
+	// Drive all pins low
+	PIOS_SERVO_GPIO_PORT_1TO4->BRR = PIOS_SERVO_GPIO_PIN_1 | PIOS_SERVO_GPIO_PIN_2 | PIOS_SERVO_GPIO_PIN_3 | PIOS_SERVO_GPIO_PIN_4;
+	PIOS_SERVO_GPIO_PORT_5TO8->BRR = PIOS_SERVO_GPIO_PIN_5 | PIOS_SERVO_GPIO_PIN_6 | PIOS_SERVO_GPIO_PIN_7 | PIOS_SERVO_GPIO_PIN_8;
 #endif // PIOS_ENABLE_DEBUG_PINS
 }
 

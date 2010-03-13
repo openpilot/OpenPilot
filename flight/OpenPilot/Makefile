@@ -27,6 +27,7 @@
 # Set to YES for debugging
 DEBUG = YES
 ENABLE_DEBUG_PINS = NO
+USE_BOOTLOADER = NO
 
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY = YES
@@ -52,8 +53,13 @@ USE_THUMB_MODE = YES
 # - BOARD just passed as define (optional)
 MCU      = cortex-m3
 CHIP     = STM32F103RET
-MODEL    = HD
 BOARD    = STM3210E_OP
+ifeq ($(USE_BOOTLOADER), YES)
+MODEL    = HD_BL
+
+else
+MODEL    = HD_NB
+endif
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
 OUTDIR = Build
@@ -283,9 +289,11 @@ DEBUGF = dwarf-2
 CDEFS = -DSTM32F10X_$(MODEL)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)
-
-ifeq ($(ENABLE_DEBUG_PINS),YES)
+ifeq ($(ENABLE_DEBUG_PINS), YES)
 CDEFS += -DPIOS_ENABLE_DEBUG_PINS
+endif
+ifeq ($(USE_BOOTLOADER), YES)
+CDEFS += -DUSE_BOOTLOADER
 endif
 
 

@@ -110,7 +110,7 @@ int32_t PIOS_SYS_SerialNumberGet(char *str)
 void NVIC_Configuration(void)
 {
 	/* Set the Vector Table base address as specified in .ld file */
-	NVIC_SetVectorTable(NVIC_VectTab_FLASH, 0x0);
+	NVIC_SetVectorTable(PIOS_NVIC_VECTTAB_FLASH, 0x0);
 
 	/* 4 bits for Interrupt priorities so no sub priorities */
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);

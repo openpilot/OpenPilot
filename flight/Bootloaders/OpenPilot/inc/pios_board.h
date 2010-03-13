@@ -91,8 +91,8 @@
 // PIOS_USART
 //-------------------------
 #define PIOS_USART_NUM				1
-#define PIOS_USART_RX_BUFFER_SIZE		128
-#define PIOS_USART_TX_BUFFER_SIZE		128
+#define PIOS_USART_RX_BUFFER_SIZE		64
+#define PIOS_USART_TX_BUFFER_SIZE		64
 #define PIOS_COM_DEBUG_PORT			USART_1
 
 //-------------------------

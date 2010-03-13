@@ -36,9 +36,9 @@ extern uint32_t FlashDestination;
 extern uint8_t file_name[FILE_NAME_LENGTH];
 
 /* Local variables */
-uint32_t BlockNbr = 0, UserMemoryMask = 0;
-bool FlashProtection = FALSE;
-uint8_t tab_1024[1024] = { 0 };
+static uint32_t BlockNbr = 0, UserMemoryMask = 0;
+static bool FlashProtection = FALSE;
+static uint8_t tab_1024[1024] = { 0 };
 
 /**
  * Main bootloader function
@@ -60,13 +60,13 @@ void StartBootloader(void)
 	/* Test if any page of Flash memory where program user will be loaded is write protected */
 	if((FLASH_GetWriteProtectionOptionByte() & UserMemoryMask) != UserMemoryMask) {
 		FlashProtection = TRUE;
-		SerialPutString("  Download Image To the STM32F10x Internal Flash ------- 1\r\n");
-		SerialPutString("  Execute The New Program ------------------------------ 2\r\n");
-		SerialPutString("  Disable the write protection ------------------------- 3\r\n");
+		SerialPutString("Download Image To the STM32F10x Internal Flash ------- 1\r\n");
+		SerialPutString("Execute The New Program ------------------------------ 2\r\n");
+		SerialPutString("Disable the write protection ------------------------- 3\r\n");
 	} else {
 		FlashProtection = FALSE;
-		SerialPutString("  Download Image To the STM32F10x Internal Flash ------- 1\r\n");
-		SerialPutString("  Execute The New Program ------------------------------ 2\r\n");
+		SerialPutString("Download Image To the STM32F10x Internal Flash ------- 1\r\n");
+		SerialPutString("Execute The New Program ------------------------------ 2\r\n");
 	}
 
 	/* Loop through 1mS check for specified time */

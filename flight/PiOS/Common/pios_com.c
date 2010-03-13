@@ -77,6 +77,7 @@ int32_t PIOS_COM_SendBufferNonBlocking(COMPortTypeDef port, uint8_t *buffer, uin
 {
 	/* Branch depending on selected port */
 	switch(port) {
+#if defined(PIOS_INCLUDE_USART)
 		case COM_DEBUG_USART:
 			return PIOS_USART_TxBufferPutMoreNonBlocking(PIOS_COM_DEBUG_PORT, buffer, len);
 		case COM_USART1:
@@ -85,6 +86,7 @@ int32_t PIOS_COM_SendBufferNonBlocking(COMPortTypeDef port, uint8_t *buffer, uin
 			return PIOS_USART_TxBufferPutMoreNonBlocking(USART_2, buffer, len);
 		case COM_USART3:
 			return PIOS_USART_TxBufferPutMoreNonBlocking(USART_3, buffer, len);
+#endif
 		case COM_USB_HID:
 			return PIOS_USB_HID_TxBufferPutMoreNonBlocking(buffer, len);
 		default:
@@ -106,6 +108,7 @@ int32_t PIOS_COM_SendBuffer(COMPortTypeDef port, uint8_t *buffer, uint16_t len)
 {
 	/* Branch depending on selected port */
 	switch(port) {
+#if defined(PIOS_INCLUDE_USART)
 		case COM_DEBUG_USART:
 			return PIOS_USART_TxBufferPutMore(PIOS_COM_DEBUG_PORT, buffer, len);
 		case COM_USART1:
@@ -114,6 +117,7 @@ int32_t PIOS_COM_SendBuffer(COMPortTypeDef port, uint8_t *buffer, uint16_t len)
 			return PIOS_USART_TxBufferPutMore(USART_2, buffer, len);
 		case COM_USART3:
 			return PIOS_USART_TxBufferPutMore(USART_3, buffer, len);
+#endif
 		case COM_USB_HID:
 			return PIOS_USB_HID_TxBufferPutMore(buffer, len);
 		default:
@@ -224,6 +228,7 @@ int32_t PIOS_COM_SendFormattedString(COMPortTypeDef port, char *format, ...)
 uint8_t PIOS_COM_ReceiveBuffer(COMPortTypeDef port)
 {
 	switch(port) {
+#if defined(PIOS_INCLUDE_USART)
 		case COM_DEBUG_USART:
 			return PIOS_USART_RxBufferGet(PIOS_COM_DEBUG_PORT);
 		case COM_USART1:
@@ -232,6 +237,7 @@ uint8_t PIOS_COM_ReceiveBuffer(COMPortTypeDef port)
 			return PIOS_USART_RxBufferGet(USART_2);
 		case COM_USART3:
 			return PIOS_USART_RxBufferGet(USART_3);
+#endif
 		case COM_USB_HID:
 			return PIOS_USB_HID_RxBufferGet();
 		/* To suppress warnings */
@@ -248,6 +254,7 @@ uint8_t PIOS_COM_ReceiveBuffer(COMPortTypeDef port)
 int32_t PIOS_COM_ReceiveBufferUsed(COMPortTypeDef port)
 {
 	switch(port) {
+#if defined(PIOS_INCLUDE_USART)
 		case COM_DEBUG_USART:
 			return PIOS_USART_RxBufferUsed(PIOS_COM_DEBUG_PORT);
 		case COM_USART1:
@@ -256,6 +263,7 @@ int32_t PIOS_COM_ReceiveBufferUsed(COMPortTypeDef port)
 			return PIOS_USART_RxBufferUsed(USART_2);
 		case COM_USART3:
 			return PIOS_USART_RxBufferUsed(USART_3);
+#endif
 		case COM_USB_HID:
 			return PIOS_USB_HID_DATA_LENGTH;
 		/* To suppress warnings */

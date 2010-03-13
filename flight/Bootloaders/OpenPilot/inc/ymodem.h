@@ -64,9 +64,6 @@
 #define CONVERTHEX_alpha(c)  (IS_AF(c) ? (c - 'A'+10) : (c - 'a'+10))
 #define CONVERTHEX(c)   (IS_09(c) ? (c - '0') : CONVERTHEX_alpha(c))
 
-/* Global Variables */
-extern uint8_t tab_1024[1024];
-
 /* Public Functions */
 extern int32_t Ymodem_Receive(uint8_t *buf);
 

@@ -27,7 +27,7 @@
 # Set to YES for debugging
 DEBUG = YES
 ENABLE_DEBUG_PINS = NO
-USE_BOOTLOADER = NO
+USE_BOOTLOADER = YES
 
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY = YES

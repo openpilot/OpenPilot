@@ -34,7 +34,6 @@ static uint32_t Str2Int(uint8_t *inputstr, int32_t *intnum);
 
 /* Global variables */
 uint32_t FlashDestination = ApplicationAddress; /* Flash user program offset */
-uint8_t tab_1024[1024];
 
 /* Local variables */
 static uint8_t file_name[FILE_NAME_LENGTH];

@@ -206,7 +206,7 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define PIOS_MASTER_CLOCK			72000000
 #define PIOS_PERIPHERAL_CLOCK			(PIOS_MASTER_CLOCK / 2)
 #if defined(USE_BOOTLOADER)
-#define PIOS_NVIC_VECTTAB_FLASH			((uint32_t)0x08008000)
+#define PIOS_NVIC_VECTTAB_FLASH			((uint32_t)0x08006000)
 #else
 #define PIOS_NVIC_VECTTAB_FLASH			((uint32_t)0x08000000)
 #endif

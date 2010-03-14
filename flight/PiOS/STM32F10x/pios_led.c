@@ -53,6 +53,9 @@ void PIOS_LED_Init(void)
 		RCC_APB2PeriphClockCmd(LED_GPIO_CLK[LEDNum], ENABLE);
 		GPIO_InitStructure.GPIO_Pin = LED_GPIO_PIN[LEDNum];
 		GPIO_Init(LED_GPIO_PORT[LEDNum], &GPIO_InitStructure);
+
+		/* LED's Off */
+		LED_GPIO_PORT[LEDNum]->BSRR = LED_GPIO_PIN[LEDNum];
 	}
 }
 

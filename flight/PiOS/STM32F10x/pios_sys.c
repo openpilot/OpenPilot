@@ -80,6 +80,45 @@ void PIOS_SYS_Init(void)
 }
 
 /**
+* Shutdown PIOS and reset the microcontroller:<BR>
+* <UL>
+*   <LI>Disable all RTOS tasks
+*   <LI>Disable all interrupts
+*   <LI>Turn off all board LEDs
+*   <LI>Reset STM32
+* </UL>
+* \return < 0 if reset failed
+*/
+int32_t PIOS_SYS_Reset(void)
+{
+	/* Disable all RTOS tasks */
+#if defined(PIOS_INCLUDE_FREERTOS)
+	/* port specific FreeRTOS function to disable tasks (nested) */
+	portENTER_CRITICAL();
+#endif
+
+	// disable all interrupts
+	PIOS_IRQ_Disable();
+
+	// turn off all board LEDs
+	PIOS_LED_Off(LED1);
+	PIOS_LED_Off(LED2);
+
+	/* Reset STM32 */
+	//RCC_APB2PeriphResetCmd(0xfffffff8, ENABLE); /* MBHP_CORE_STM32: don't reset GPIOA/AF due to USB pins */
+	//RCC_APB1PeriphResetCmd(0xff7fffff, ENABLE); /* don't reset USB, so that the connection can survive! */
+
+	RCC_APB2PeriphResetCmd(0xffffffff, DISABLE);
+	RCC_APB1PeriphResetCmd(0xffffffff, DISABLE);
+	SCB->AIRCR = NVIC_AIRCR_VECTKEY | (1 << NVIC_VECTRESET);
+
+	while(1);
+
+	/* We will never reach this point */
+	return -1;
+}
+
+/**
 * Returns the serial number as a string
 * param[out] str pointer to a string which can store at least 32 digits + zero terminator!
 * (24 digits returned for STM32)

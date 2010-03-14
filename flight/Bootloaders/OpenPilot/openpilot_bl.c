@@ -40,10 +40,6 @@ int main()
 	/* Brings up System using CMSIS functions, enables the LEDs. */
 	PIOS_SYS_Init();
 
-	/* Initialise LED's */
-	PIOS_LED_Off(LED1);
-	PIOS_LED_Off(LED2);
-
 	/* Only go into bootloader when the USB cable is connected */
 	if(PIOS_USB_CableConnected()) {
 		/* Delay system */

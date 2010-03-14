@@ -77,6 +77,7 @@
 #include <pios_usb.h>
 #include <pios_usb_hid.h>
 #include <pios_debug.h>
+#include <pios_gpio.h>
 
 /* PIOS Hardware Includes (Common) */
 #include <pios_settings.h>

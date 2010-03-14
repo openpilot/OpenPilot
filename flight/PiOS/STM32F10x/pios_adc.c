@@ -42,7 +42,7 @@ static const uint32_t ADC_CHANNEL_MAPPING[PIOS_ADC_NUM_PINS] = PIOS_ADC_CHANNEL_
 
 /* The following two arrays are word aligned, so that DMA can transfer two hwords at once */
 static uint16_t adc_conversion_values[PIOS_ADC_NUM_CHANNELS] __attribute__((aligned(4)));
-static uint16_t adc_conversion_values_sum[PIOS_ADC_NUM_CHANNELS] __attribute__((aligned(4)));
+//static uint16_t adc_conversion_values_sum[PIOS_ADC_NUM_CHANNELS]; __attribute__((aligned(4)));
 
 static uint16_t adc_pin_values[PIOS_ADC_NUM_CHANNELS];
 
@@ -56,8 +56,8 @@ void PIOS_ADC_Init(void)
 
 	/* Clear arrays and variables */
 	for(i = 0; i < PIOS_ADC_NUM_CHANNELS; ++i) {
-		adc_conversion_values[i] = 0;
-		adc_conversion_values_sum[i] = 0;
+		adc_conversion_values[i] = 55;
+		//adc_conversion_values_sum[i] = 0;
 	}
 	for(i = 0; i < PIOS_ADC_NUM_CHANNELS; ++i) {
 		adc_pin_values[i] = 0;
@@ -96,7 +96,7 @@ void PIOS_ADC_Init(void)
 	ADC_InitStructure.ADC_ContinuousConvMode = DISABLE;
 	ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None;
 	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
-	ADC_InitStructure.ADC_NbrOfChannel = PIOS_ADC_NUM_ADC_CHANNELS;
+	ADC_InitStructure.ADC_NbrOfChannel = ((PIOS_ADC_NUM_CHANNELS + 1) >> 1);
 	ADC_Init(ADC1, &ADC_InitStructure);
 
 	#if (PIOS_ADC_USE_ADC2)
@@ -135,7 +135,7 @@ void PIOS_ADC_Init(void)
 	DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&ADC1->DR;
 	DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)&adc_conversion_values;
 	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;
-	DMA_InitStructure.DMA_BufferSize = PIOS_ADC_NUM_ADC_CHANNELS; /* Number of conversions depends on number of used channels */
+	DMA_InitStructure.DMA_BufferSize = ((PIOS_ADC_NUM_CHANNELS + 1) >> 1); /* Number of conversions depends on number of used channels */
 	DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
 	DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
 	DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word;
@@ -197,7 +197,6 @@ void DMA1_Channel1_IRQHandler(void)
 	for(i = 0; i < PIOS_ADC_NUM_CHANNELS; ++i) {
 		/* Takeover new value */
 		adc_pin_values[i] = *src_ptr;
-
 		++src_ptr;
 	}
 

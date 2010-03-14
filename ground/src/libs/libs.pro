@@ -7,5 +7,6 @@ SUBDIRS   = \
     extensionsystem \
     qmapcontrol \
     qwt \
+    qextserialport \
     utils
 

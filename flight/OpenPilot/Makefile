@@ -73,6 +73,7 @@ OPUAVOBJ = ./UAVObjects
 OPUAVOBJINC = $(OPUAVOBJ)/inc
 OPSETTINGS = ./Settings
 OPSETTINGSINC = $(OPSETTINGS)/inc
+OPTESTS  = ./Tests
 OPMODULEDIR = ./Modules
 MODTELEMETRY = $(OPMODULEDIR)/Telemetry
 MODTELEMETRYINC = $(MODTELEMETRY)/inc
@@ -111,6 +112,10 @@ SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/uavobjectsinit.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
+
+## OPENPILOT Testcode
+#SRC += $(OPTESTS)/test_I2c_PCF8570.c
+
 
 ## UAVOBJECTS
 
@@ -320,7 +325,7 @@ CSTANDARD = -std=gnu99
 # Flags for C and C++ (arm-elf-gcc/arm-elf-g++)
 
 ifeq ($(DEBUG),YES)
-CFLAGS = -g$(DEBUGF)
+CFLAGS = -g$(DEBUGF) -DDEBUG
 endif
 
 CFLAGS += -O$(OPT)

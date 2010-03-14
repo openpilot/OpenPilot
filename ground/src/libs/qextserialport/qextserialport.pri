@@ -1,0 +1,2 @@
+LIBS += -l$$qtLibraryTarget(QExtSerialPort)
+

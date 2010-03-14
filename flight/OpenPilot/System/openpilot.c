@@ -99,8 +99,6 @@ int main()
 
 	PIOS_I2C_Init();
 
-	PIOS_BMP085_Init();
-
 	PIOS_Servo_SetHz(50, 450);
 
 	/* Create a FreeRTOS task */
@@ -145,8 +143,11 @@ static void TaskTesting(void *pvParameters)
 	portTickType xDelay = 250 / portTICK_RATE_MS;
 	portTickType xTimeout = 10 / portTICK_RATE_MS;
 
+	PIOS_BMP085_Init();
+
 	for(;;)
 	{
+
 		/* This blocks the task until the BMP085 EOC */
 		/*
 		PIOS_BMP085_StartADC(TemperatureConv);

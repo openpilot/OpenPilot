@@ -29,6 +29,8 @@
 /* Project Includes */
 #include "pios.h"
 
+// Global variables
+const uint8_t* PIOS_DEBUG_AssertMsg = (uint8_t*)"ASSERT FAILED";
 
 /* Private Function Prototypes */
 
@@ -84,4 +86,16 @@ void PIOS_DEBUG_PinLow(uint8_t Pin)
 #endif // PIOS_ENABLE_DEBUG_PINS
 }
 
+/**
+ * Report a serious error and halt
+ */
+void PIOS_DEBUG_Panic(const uint8_t* msg)
+{
+	register int *lr asm ("lr");	// Link-register holds the PC of the caller
+
+	PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "\r%s @0x%x\r", msg, lr);
+
+	// Stay put
+	while(1);
+}
 

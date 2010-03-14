@@ -26,8 +26,17 @@
 #ifndef PIOS_DEBUG_H
 #define PIOS_DEBUG_H
 
+extern const uint8_t* PIOS_DEBUG_AssertMsg;
+
 void PIOS_DEBUG_Init(void);
 void PIOS_DEBUG_PinHigh(uint8_t pin);
 void PIOS_DEBUG_PinLow(uint8_t pin);
+void PIOS_DEBUG_Panic(const uint8_t* msg);
+
+#ifdef DEBUG
+	#define PIOS_DEBUG_Assert(test) if (!(test)) PIOS_DEBUG_Panic(PIOS_DEBUG_AssertMsg);
+#else
+	#define PIOS_DEBUG_Assert(test)
+#endif
 
 #endif /* PIOS_DEBUG_H */

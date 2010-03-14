@@ -29,8 +29,33 @@ namespace jafar {
 		 * This class defines a multi-dimensional Gaussian variable.
 		 * It allows mean and covariances data to be stored locally or remotelly, depending on the constructor.
 		 * Remote Gaussians are indexed with indirect arrays.
-		 * Mean and covariances are accessed through \a x() and \a P().
-		 * The indirect array is part of the Gaussian class, and is accessible through \a ia().
+		 *
+		 * - Mean and covariances are accessed through \a x() and \a P().\n
+		 * - The indirect array is part of the Gaussian class, and is accessible through \a ia().\n
+		 * - Having two Gaussian instances \a G1 and \a G2 pointing to the same remote pair {\a x , \a P }
+		 * allows recovering their cross-variances matrix. Consider this code as example:
+		 * \code
+		 *	jblas::vec x(300);                                     // The remote mean vector.
+		 *	jblas::sym_mat P(300);                                 // The remote covariances matrix.
+		 *	P(1,102) = 99;                                         // We put here a value to test later
+		 *	Gaussian G1(x, P, ublasExtra::ia_range(0, 3));         // G1 points to positions {0, 1, 2}.
+		 *	Gaussian G2(x, P, ublasExtra::ia_range(100, 104));     // G2 points to positions {100, 101, 102, 103}.
+		 *	jblas::mat c(3, 4);                                    //
+		 *	c = ublas::project(P, G1.ia(), G2.ia());               // Cross-variance (hard copy)
+		 *	jblas::sym_mat_indirect ic(P, G1.ia(), G2.ia());       // Cross-variance (indirectly indexed)
+		 *	cout << " c-value (sould be 99): " << c(1,2) << endl;  // We recover here the values
+		 *	cout << "ic-value (sould be 99): " << ic(1,2) << endl; //
+		 *	P(1,102) = 0;                                          // We change the P-value to test ic
+		 *	cout << " c-value (sould be 99): " << c(1,2) << endl;  // We recover here the values
+		 *	cout << "ic-value (sould be 0 ): " << ic(1,2) << endl; //
+		 * \endcode
+		 * which renders the output:
+		 * \code
+		 * >>  c-value (sould be 99): 99
+		 * >> ic-value (sould be 99): 99
+		 * >>  c-value (sould be 99): 99
+		 * >> ic-value (sould be 0 ): 0
+		 * \endcode
 		 *
 		 * \ingroup rtslam
 		 */
@@ -40,7 +65,9 @@ namespace jafar {
 				 * Storage type of Gaussians: LOCAL, REMOTE.
 				 */
 				typedef enum {
-					LOCAL, REMOTE
+					LOCAL, ///< Mean and covariances are stored in \a x_local and \a P_local.
+					REMOTE
+				///< Mean and covariances point to an external pair {x,P}.
 				} storage_t;
 
 				storage_t storage_; ///< select local or remote storage
@@ -61,8 +88,8 @@ namespace jafar {
 				}
 
 				inline bool hasNullCov() {
-						return hasNullCov_;
-					}
+					return hasNullCov_;
+				}
 
 				inline size_t size() {
 					return size_;
@@ -89,7 +116,7 @@ namespace jafar {
 						hasNullCov_ = false;
 				}
 
-					inline void hasNullCov(bool _hasNullCov) {
+				inline void hasNullCov(bool _hasNullCov) {
 					hasNullCov_ = _hasNullCov;
 				}
 
@@ -163,8 +190,8 @@ namespace jafar {
 				 * \param _size the size of the Gaussian.
 				 */
 				inline Gaussian(const size_t _size) :
-					storage_(LOCAL), hasNullCov_(false), size_(_size), x_local(size_), P_local(size_, size_),
-					    ia_(size_), x_(x_local, ia_.all()), P_(P_local, ia_.all(), ia_.all()) {
+					storage_(LOCAL), hasNullCov_(false), size_(_size), x_local(size_), P_local(size_, size_), ia_(size_), x_(
+					    x_local, ia_.all()), P_(P_local, ia_.all(), ia_.all()) {
 					clear();
 				}
 
@@ -174,8 +201,8 @@ namespace jafar {
 				 * \param G the Gaussian to copy.
 				 */
 				inline Gaussian(const Gaussian & G) :
-					storage_(LOCAL), hasNullCov_(G.hasNullCov_), size_(G.size_), x_local(G.x_), P_local(G.P_),
-					    ia_(size_), x_(x_local, ia_.all()), P_(P_local, ia_.all(), ia_.all()) {
+					storage_(LOCAL), hasNullCov_(G.hasNullCov_), size_(G.size_), x_local(G.x_), P_local(G.P_), ia_(size_), x_(
+					    x_local, ia_.all()), P_(P_local, ia_.all(), ia_.all()) {
 					for (size_t i = 0; i < size_; i++)
 						ia_(i) = i;
 				}
@@ -187,8 +214,8 @@ namespace jafar {
 				 * \param _x the Gaussian mean.
 				 */
 				inline Gaussian(const jblas::vec & _x) :
-					storage_(LOCAL), hasNullCov_(true), size_(_x.size()), x_local(_x), P_local(size_, size_),
-					    ia_(size_), x_(x_local, ia_.all()), P_(P_local, ia_.all(), ia_.all()) {
+					storage_(LOCAL), hasNullCov_(true), size_(_x.size()), x_local(_x), P_local(size_, size_), ia_(size_), x_(
+					    x_local, ia_.all()), P_(P_local, ia_.all(), ia_.all()) {
 				}
 
 				/**
@@ -199,8 +226,8 @@ namespace jafar {
 				 * \param _P the Gaussian covariances matrix.
 				 */
 				inline Gaussian(const jblas::vec& _x, const jblas::sym_mat& _P) :
-					storage_(LOCAL), hasNullCov_(false), size_(_x.size()), x_local(_x), P_local(_P), ia_(size_), x_(
-					    x_local, ia_.all()), P_(P_local, ia_.all(), ia_.all()) {
+					storage_(LOCAL), hasNullCov_(false), size_(_x.size()), x_local(_x), P_local(_P), ia_(size_), x_(x_local,
+					    ia_.all()), P_(P_local, ia_.all(), ia_.all()) {
 				}
 
 				/**
@@ -215,8 +242,8 @@ namespace jafar {
 				 * \param _ia the indirect array.
 				 */
 				inline Gaussian(Gaussian & G, const jblas::ind_array & _ia) :
-					storage_(REMOTE), hasNullCov_(false), size_(_ia.size()), x_local(0), P_local(0), ia_(_ia), x_(
-					    G.x_local, ia_), P_(G.P_local, ia_, ia_) {
+					storage_(REMOTE), hasNullCov_(false), size_(_ia.size()), x_local(0), P_local(0), ia_(_ia),
+					    x_(G.x_local, ia_), P_(G.P_local, ia_, ia_) {
 				}
 
 				/**
@@ -230,8 +257,8 @@ namespace jafar {
 				 * \param _ia the indirect array.
 				 */
 				inline Gaussian(jblas::vec & _x, jblas::sym_mat & _P, const jblas::ind_array& _ia) :
-					storage_(REMOTE), hasNullCov_(false), size_(_ia.size()), x_local(0), P_local(0), ia_(_ia), x_(_x,
-					    ia_), P_(_P, ia_, ia_) {
+					storage_(REMOTE), hasNullCov_(false), size_(_ia.size()), x_local(0), P_local(0), ia_(_ia), x_(_x, ia_), P_(
+					    _P, ia_, ia_) {
 					//			JFR_ASSERT((_x.size() == _ia.size()) && (_x.size() == _P.size1()), "gaussian.hpp: Gaussian(): sizes mismatch.");
 				}
 

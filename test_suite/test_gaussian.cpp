@@ -221,8 +221,27 @@ void test_gaussian01(void) { // TESTS FOR THE GAUSSIAN CLASS
 
 }
 
+
+void test_gaussian02(void) {
+	jblas::vec x(300);                                  // The remote mean vector.
+	jblas::sym_mat P(300);                              // The remote covariances matrix.
+	P(1,102) = 99;                                      // We put here a value to test later
+	Gaussian G1(x, P, ublasExtra::ia_range(0, 3));      // G1 points to positions {0, 1, 2}.
+	Gaussian G2(x, P, ublasExtra::ia_range(100, 104));  // G2 points to positions {100, 101, 102, 103}.
+	jblas::mat c(3, 4);                                    //
+	c = ublas::project(P, G1.ia(), G2.ia());               // Cross-variance (hard copy)
+	jblas::sym_mat_indirect ic(P, G1.ia(), G2.ia());       // Cross-variance (indirectly indexed)
+	cout << "c-value  (sould be 99): " << c(1,2) << endl;  // We recover here the values
+	cout << "ic-value (sould be 99): " << ic(1,2) << endl; //
+	P(1,102) = 0;                                          // We change the P-value to test ic
+	cout << "ic-value (sould be 0): " << ic(1,2) << endl;  // We recover here the value
+}
+
+
+
 BOOST_AUTO_TEST_CASE( test_gaussian )
 {
-	test_gaussian01();
+//	test_gaussian01();
+	test_gaussian02();
 }
 

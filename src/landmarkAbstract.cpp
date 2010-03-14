@@ -22,8 +22,8 @@ namespace jafar {
 		 * constructor.
 		 */
 		LandmarkAbstract::LandmarkAbstract(MapAbstract & _map, const jblas::ind_array & _ial) :
-			state(_map.filter.x, _map.filter.P, _ial), map(&_map) {
-			type("AHP");
+			MapObject(_map, _ial), map(&_map) {
+			categoryName("LANDMARK");
 		}
 
 	}

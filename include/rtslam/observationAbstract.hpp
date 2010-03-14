@@ -90,6 +90,7 @@ namespace jafar {
 			public:
 				AppearanceAbstract * appearance;
 				double score; ///< matching quality score
+				Measurement(size_t _size);
 		};
 
 		/** Base class for all Gaussian innovations defined in the module rtslam.
@@ -179,10 +180,10 @@ namespace jafar {
 				}
 		};
 
-		/** Base class for all observations defined in the module
-		 * rtslam.
-		 *
-		 * @ingroup rtslam
+		/**
+		 * Base class for all observations defined in the module rtslam.
+		 * \author jsola
+		 * \ingroup rtslam
 		 */
 		class ObservationAbstract {
 			public:
@@ -193,14 +194,19 @@ namespace jafar {
 				virtual ~ObservationAbstract(void);
 
 				/**
+				 * Size constructor
+				 */
+				ObservationAbstract(size_t _size);
+
+				/**
 				 * Sizes constructor
 				 */
 				ObservationAbstract(size_t _size_meas, size_t _size_exp, size_t _size_inn);
 
-				/**
-				 * Sensor and landmark constructor
-				 */
-				ObservationAbstract(SensorAbstract & _sen, LandmarkAbstract & _lmk);
+				//				/**
+				//				 * Sensor and landmark constructor
+				//				 */
+				//				ObservationAbstract(SensorAbstract & _sen, LandmarkAbstract & _lmk);
 
 				/**
 				 *  Mother Sensor where it was acquired from
@@ -247,44 +253,48 @@ namespace jafar {
 				} events;
 
 				/**
-				 * Project
-				 * \return true if valid projection
+				 * Associate to sensor and landmark.
+				 * This sets several parameters such as identifiers and pointers to sensor and landmark ancestors.
+				 * \param sen the sensor
+				 * \param lmk the landmark
 				 */
-				virtual bool project(void) = 0;
+				inline void associate(SensorAbstract & sen, LandmarkAbstract & lmk);
+
+				/**
+				 * Project and get Jacobians
+				 */
+//				virtual void project(void) = 0;
 
 				/**
 				 * Is visible
-				 * \return true if inside FOV
+				 * \return true if visible
 				 */
 				virtual bool isVisible(void) {
 					return events.visible;
 				}
-				;
 
 				/**
 				 * match
-				 * \return true if matched
 				 */
-				virtual bool match(void);
+//				virtual void match(void);
 
 				/**
 				 * Individual consistency check
-				 * \return true if consistent
 				 */
-				virtual bool isIndividuallyConsistent(void);
+//				virtual void isIndividuallyConsistent(void);
 
 				/**
 				 * Back-project
 				 */
-				virtual void back_project(void) = 0;
+//				virtual void back_project(void) = 0;
 
 				/**
 				 * Operator << for class ObservationAbstract.
 				 * It shows different information of the observation.
 				 */
 				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObservationAbstract & obs) {
-					//					s << "OBSERVATION of " << obs.landmark->type << " from " << obs.sensor->type << endl;
-					//					s << "Sensor: " << obs.sensor->id << ", landmark: "	<< obs.landmark->id << endl;
+					s << "OBSERVATION of " << obs.landmark->type() << " from " << obs.sensor->type() << endl;
+					s << "Sensor: " << obs.sensor->id() << ", landmark: " << obs.landmark->id() << endl;
 					s << ".expectation:  " << obs.expectation << endl;
 					s << ".measurement:  " << obs.measurement << endl;
 					s << ".innovation:   " << obs.innovation << endl;

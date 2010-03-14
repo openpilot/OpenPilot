@@ -16,24 +16,19 @@
 // jafar debug include
 #include "kernel/jafarDebug.hpp"
 
-
 #include <iostream>
 #include "jmath/jblas.hpp"
-//#include "jmath/ublasExtra.hpp"
 #include "rtslam/quatTools.hpp"
-//#include <boost/numeric/ublas/blas.hpp>
 #include "jmath/matlab.hpp"
 #include "jmath/random.hpp"
 
-namespace ublas = boost::numeric::ublas;
 
-using namespace jafar::jmath;
-using namespace std;
 
 void test_quaternion01(void) { // TESTS FOR QUATTOOLS.HPP IN RTSLAM
 
-	using namespace ublas;
+	using namespace std;
 	using namespace jblas;
+	using namespace jafar::jmath;
 	using namespace jafar::rtslam::quaternion;
 
 	// Initialization
@@ -68,15 +63,15 @@ void test_quaternion01(void) { // TESTS FOR QUATTOOLS.HPP IN RTSLAM
 	vec3 vo;
 	vo = prod(R, v);
 	cout << "vo1 = " << (MATLAB) vo << endl;
-	vo = RofQtimesV(q, v);
+	vo = qRot(q, v);
 	cout << "vo2 = " << (MATLAB) vo << endl;
 	mat VO_q(3, 4);
 	mat VO_v(3, 3);
-	RofQtimesV_by_dq(q, v, VO_q);
-	RofQtimesV_by_dv(q, VO_v);
+	qRot_by_dq(q, v, VO_q);
+	qRot_by_dv(q, VO_v);
 	cout << "VO_q = " << (MATLAB) (mat) VO_q << endl;
 	cout << "VO_v = " << (MATLAB) (mat) VO_v << endl;
-	RofQtimesV(q, v, vo, VO_q, VO_v);
+	qRot(q, v, vo, VO_q, VO_v);
 	cout << "vo = " << (MATLAB) vo << endl;
 	cout << "VO_q = " << (MATLAB) (mat) VO_q << endl;
 	cout << "VO_v = " << (MATLAB) (mat) VO_v << endl;
@@ -89,13 +84,13 @@ void test_quaternion01(void) { // TESTS FOR QUATTOOLS.HPP IN RTSLAM
 	cout << "\n% INVERSE ROTATIONS\n% ================" << endl;
 	cout << "q = " << (MATLAB) q << endl;
 	cout << "v = " << (MATLAB) v << endl;
-	vo = RTofQtimesV(q, v);
+	vo = qcRot(q, v);
 	cout << "vo = " << (MATLAB) vo << endl;
-	RTofQtimesV_by_dq(q, v, VO_q);
-	RTofQtimesV_by_dv(q, VO_v);
+	qcRot_by_dq(q, v, VO_q);
+	qcRot_by_dv(q, VO_v);
 	cout << "VO_q = " << (MATLAB) (mat) VO_q << endl;
 	cout << "VO_v = " << (MATLAB) (mat) VO_v << endl;
-	RTofQtimesV(q, v, vo, VO_q, VO_v);
+	qcRot(q, v, vo, VO_q, VO_v);
 	cout << "vo = " << (MATLAB) vo << endl;
 	cout << "VO_q = " << (MATLAB) (mat) VO_q << endl;
 	cout << "VO_v = " << (MATLAB) (mat) VO_v << endl;
@@ -244,11 +239,29 @@ void test_quaternion01(void) { // TESTS FOR QUATTOOLS.HPP IN RTSLAM
 	cout << "G.x = " << (MATLAB) G << endl;
 	jblas::vec7 H; // the composed frame
 	H = composeFrames(G, F);
+	mat H_g(7,7), H_f(7,7);
+	composeFrames(G, F, H, H_g, H_f);
 	cout << "H.x = " << (MATLAB) H << endl;
 	cout << "F=updateFrame(F); G=updateFrame(G); H=updateFrame(H);" << endl;
-	cout << "H_mat = composeFrames(G,F);" << endl;
+	cout << "[H_mat,H_g_mat, H_f_mat] = composeFrames(G,F);" << endl;
+	cout << "H_g = " << (MATLAB) H_g << endl;
+	cout << "H_f = " << (MATLAB) H_f << endl;
 	cout << "H_err = norm(H.x-H_mat.x)" << endl;
+	cout << "H_g_err = norm(H_g-H_g_mat)" << endl;
+	cout << "H_f_err = norm(H_f-H_f_mat)" << endl;
 
+
+	cout << "\n% FRAME INVERSION \n% ===========" << endl;
+	cout << "F.x = " << (MATLAB) F << endl;
+	G = invertFrame(F);
+	cout << "G.x = " << (MATLAB) G << endl;
+	H = composeFrames(F,G);
+	cout << "H.x = " << (MATLAB) H << "   % <--- Should be ~ [0 0 0 1 0 0 0]" << endl;
+	jblas::mat G_f(7,7);
+	invertFrame(F, G, G_f);
+	cout << "G_f = " << (MATLAB) G_f << endl;
+	cout << "[G_mat, G_f_mat] = invertFrame(F);" << endl;
+	cout << "G_err = norm(G_f - G_f_mat)" << endl;
 }
 
 

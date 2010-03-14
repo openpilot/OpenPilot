@@ -35,6 +35,7 @@
 #include <jmath/jblas.hpp>
 #include "rtslam/blocks.hpp"
 #include "rtslam/gaussian.hpp"
+#include "rtslam/mapObject.hpp"
 // include parents
 //#include "rtslam/sensorAbstract.hpp"
 #include "rtslam/mapAbstract.hpp"
@@ -65,7 +66,7 @@ namespace jafar {
 		 *
 		 * \ingroup rtslam
 		 */
-		class RobotAbstract {
+		class RobotAbstract : public MapObject {
 			public:
 
 				// Mandatory virtual destructor.
@@ -74,9 +75,9 @@ namespace jafar {
 
 
 				std::list<SensorAbstract*> sensorsList;
-				MapAbstract * map;
+//				MapAbstract * map;
 
-				Gaussian state;
+//				Gaussian state;
 				Gaussian pose;
 				Control control;
 
@@ -88,12 +89,6 @@ namespace jafar {
 				jblas::mat F_r;
 				jblas::mat F_u;
 
-				/**
-				 * Sizes constructor
-				 * \param size_state the state size
-				 * \param size_control the control vector size
-				 */
-				RobotAbstract(size_t size_state, size_t size_control);
 
 				/**
 				 * Remote constructor from remote map and size of control vector
@@ -103,30 +98,6 @@ namespace jafar {
 				 */
 				RobotAbstract(MapAbstract & _map, jblas::ind_array & _iar, size_t _size_control);
 
-				inline void setup(size_t _id, std::string & _name, std::string & _type) {
-					id_ = _id;
-					name_ = _name;
-					type_ = _type;
-				}
-
-				inline void id(size_t _id) {
-					id_ = _id;
-				}
-				inline void type(std::string _type) {
-					type_ = _type;
-				}
-				inline void name(std::string _name) {
-					name_ = _name;
-				}
-				inline size_t id(void) {
-					return id_;
-				}
-				inline std::string type(void) {
-					return type_;
-				}
-				inline std::string name(void) {
-					return name_;
-				}
 
 				/**
 				 * Acquire control structure
@@ -151,25 +122,22 @@ namespace jafar {
 					move();
 				}
 
-				static size_t size(void) {
+
+				static size_t size_control(void) {
 					return 0;
 				}
 
+
 				/**
 				 * Operator << for class RobotAbstract.
-				 * It shows information of the robot.
+				 * It shows different information of the robot.
 				 */
 				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::RobotAbstract & rob) {
-					s << "ROBOT " << rob.id_ << ": " << rob.name_ << " of type " << rob.type_ << std::endl;
-					s << ".pose: " << rob.pose << std::endl;
-					s << ".state:" << rob.state << std::endl;
+					s << rob.categoryName() << " " << rob.id() << " of type " << rob.type() << std::endl;
+					s << ".state:  " << rob.state << std::endl;
+					s << ".pose :  " << rob.pose << std::endl;
 					return s;
 				}
-
-			private:
-				std::size_t id_;
-				std::string name_;
-				std::string type_;
 
 
 		};

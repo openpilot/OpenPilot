@@ -37,13 +37,18 @@ namespace jafar {
 		class Robot3DConstantVelocity: public RobotAbstract {
 			public:
 
+//				/**
+//				 * Local constructor
+//				 */
+//				Robot3DConstantVelocity(void);
+
 				/**
-				 * Remote constructor from remote map and size of control vector
+				 * Remote constructor from remote map.
 				 * \param _map the remote map
 				 * \param _iar the indirect array pointing to the remote storage
 				 * \param _size_control the size of the control vector
 				 */
-				Robot3DConstantVelocity(MapAbstract & _map, jblas::ind_array & _iar, size_t _size_control);
+				Robot3DConstantVelocity(MapAbstract & _map, jblas::ind_array & _iar);
 
 				~Robot3DConstantVelocity(void) {
 				}
@@ -61,6 +66,10 @@ namespace jafar {
 
 				static size_t size(void) {
 					return 13;
+				}
+
+				static size_t size_control(void) {
+					return 6;
 				}
 
 			protected:

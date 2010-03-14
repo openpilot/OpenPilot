@@ -32,31 +32,12 @@ namespace jafar {
 				/**
 				 * Constructor from map and indirect array
 				 */
-				Landmark3DAnchoredHomogeneousPoint(MapAbstract & map, const jblas::ind_array & ial) :
-					LandmarkAbstract(map, ial) {
-					// TODO see this. Add this functionality to class Gaussian.
-					//					using namespace jafar::jmath::ublasExtra;
-					//					jblas::ind_array ia2(ial.size());
-					//					ia2 = ia_range(0,ial.size());
-					//					state.ia = ia2;
-					//					state.x = jblas::vec_indirect(map.filter.x,ia2);
-					//					state.P = jblas::mat_indirect(map.filter.P,ia2,ia2);
-				}
+				Landmark3DAnchoredHomogeneousPoint(MapAbstract & map, const jblas::ind_array & ial);
 
 				static size_t size(void) {
 					return 7;
 				}
 
-
-				/**
-				 * Frame transformations
-				 */
-
-				//				static jblas::vec fromFrame(const jblas::vec & F);
-				//				static void Landmark3DAnchoredHomogeneousPoint::fromFrame(const jblas::vec & F, const jblas::vec & ahpf,
-				//				    jblas::vec & ahp, jblas::mat & AHP_f, jblas::mat & AHP_ahpf);
-				//				static jblas::vec toFrame(const jblas::vec & F);
-				//				static void toFrame(const jblas::vec & F, jblas::vec & ahpf, jblas::mat & AHPF_f, jblas::mat & AHPF_ahp);
 
 			private:
 
@@ -164,9 +145,9 @@ namespace jafar {
 			}
 
 			/**
-			 * Reparametrize to Euclidean
-			 * \param ahp the anchored homogeneous point to be reparametrized
-			 * \return the Euclidean point
+			 * Reparametrize to Euclidean.
+			 * \param ahp the anchored homogeneous point to be reparametrized.
+			 * \return the Euclidean point.
 			 */
 			template<class VA>
 			jblas::vec3 ahp2euc(const VA & ahp) {
@@ -174,10 +155,10 @@ namespace jafar {
 			}
 
 			/**
-			 * Reparametrize to Euclidean
-			 * \param ahp the anchored homogeneous point to be reparametrized
-			 * \param euc the returned Euclidean point
-			 * \param EUC_ahp the Jacobian of the conversion
+			 * Reparametrize to Euclidean, with Jacobians.
+			 * \param ahp the anchored homogeneous point to be reparametrized.
+			 * \param euc the returned Euclidean point.
+			 * \param EUC_ahp the Jacobian of the conversion.
 			 */
 			template<class VA, class VE, class ME_a>
 			void ahp2euc(const VA & ahp, VE & euc, ME_a & EUC_ahp) {

@@ -38,10 +38,10 @@ void test_gaussian01(void) { // TESTS FOR THE GAUSSIAN CLASS
 	randVector(x, N);
 	randMatrix(P, N, N);
 
-	cout << "\n% EMPTY CONSTRUCTOR\n% ===========" << endl;
-	cout << "% Gaussian G0;" << endl;
-	Gaussian G0;
-	cout << G0 << endl;
+//	cout << "\n% EMPTY CONSTRUCTOR\n% ===========" << endl;
+//	cout << "% Gaussian G0;" << endl;
+//	Gaussian G0;
+//	cout << G0 << endl;
 
 	cout << "\n% SIZE CONSTRUCTOR\n% ===========" << endl;
 	cout << "% Gaussian GS(n);" << endl;

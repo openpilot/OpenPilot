@@ -35,6 +35,9 @@ namespace jafar {
 					intrinsic(_k) {
 				}
 
+				inline ParametersPinHole(void) {
+				}
+
 				inline ~ParametersPinHole(void) {
 				}
 		};
@@ -83,26 +86,40 @@ namespace jafar {
 				Image image;
 
 				/**
-				 * Constructor from Gaussian pose and params
+				 * Constructor from Gaussian pose.
+				 * \param _pose the Gaussian pose.
 				 */
-				SensorPinHole(Gaussian & _pose, const jblas::vec4 & k, const jblas::vec & d, const jblas::vec & c,
-				    const size_t hsize, const size_t vsize);
+				SensorPinHole(Gaussian & _pose);
 
 				/**
-				 * Constructor from mean pose and params
+				 * Constructor from mean pose.
+				 * \param _pose the pose 7-vector.
 				 */
-				SensorPinHole(const jblas::vec & _pose, const jblas::vec4 & k, const jblas::vec & d, const jblas::vec & c,
-				    const size_t hsize, const size_t vsize);
+				SensorPinHole(const jblas::vec & _pose);
 
 				/**
-				 * Construction from map, indirect array and params
+				 * Construction from map and indirect array.
+				 * \param map the map.
+				 * \param ias the indirect array pointing to the map states.
 				 */
-				SensorPinHole(MapAbstract & map, const jblas::ind_array & ias, const jblas::vec4 & k, const jblas::vec & d,
-				    const jblas::vec & c, const size_t hsize, const size_t vsize);
+				SensorPinHole(MapAbstract & map, const jblas::ind_array & ias);
+
+				/**
+				 * Pin-hole sensor setup.
+				 * \param k the vector of intrinsic parameters <c>k = [u_0, v_0, a_u, a_v]</c>.
+				 * \param d the radial distortion parameters vector <c>d = [d_2, d_4, ...] </c>.
+				 * \param c the radial distortion correction parameters vector <c>c = [c_2, c_4, ...] </c>.
+				 * \param hsize the horizontal image size.
+				 * \param vsize the vertical image size.
+				 */
+				void set_parameters(const jblas::vec4 & k, const jblas::vec & d, const jblas::vec & c, const size_t hsize,
+				    const size_t vsize);
 
 				static size_t size(void) {
 					return 7;
 				}
+
+
 
 			private:
 		};

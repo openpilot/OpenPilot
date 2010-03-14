@@ -56,14 +56,13 @@ namespace jafar {
 		 * Base class for all sensors defined in the module rtslam.
 		 * \ingroup rtslam
 		 */
-		class SensorAbstract {
+		class SensorAbstract: public MapObject {
 
 			public:
 
 				// Mandatory virtual destructor.
 				inline virtual ~SensorAbstract(void) {
 				}
-
 
 				RobotAbstract* robot;
 				std::list<ObservationAbstract*> observationsList;
@@ -91,40 +90,13 @@ namespace jafar {
 				 * \param map the map
 				 * \param ias the indirect array of indices to the map
 				 */
-				SensorAbstract(MapAbstract & map, const jblas::ind_array & ias);
-
-				inline void setup(size_t _id, std::string & _name, std::string & _type) {
-					id_ = _id;
-					name_ = _name;
-					type_ = _type;
-				}
-
-				inline void id(size_t _id) {
-					id_ = _id;
-				}
-				inline void type(std::string _type) {
-					type_ = _type;
-				}
-				inline void name(std::string _name) {
-					name_ = _name;
-				}
-				inline size_t id(void) {
-					return id_;
-				}
-				inline std::string type(void) {
-					return type_;
-				}
-				inline std::string name(void) {
-					return name_;
-				}
-
+				SensorAbstract(MapAbstract & _map, const jblas::ind_array & _ias);
 
 				/**
-				 * Install sensor in robot
-				 * \param sen the sensor
+				 * Install sensor in robot.
+				 * \param rob the robot.
 				 */
 				void installToRobot(RobotAbstract & rob);
-
 
 				/*
 				 * Acquire raw data
@@ -133,36 +105,45 @@ namespace jafar {
 					// raw.acquire();
 				}
 
-				//				/*
-				//				 * Project all landmarks
-				//				 */
-				//				void projectAllLandmarks(void);
-				//
-				//				/*
-				//				 * Select most informative observations to update
-				//				 */
-				//				std::list<size_t> selectMostInformative(size_t numOfLmks);
-				//
-				//				/*
-				//				 * Try to match landmarks
-				//				 */
-				//				virtual std::list<size_t> match(std::list<size_t>) = 0;
+				/**
+				 * Get sensor pose in global frame.
+				 * This function composes robot pose with sensor pose to obtain the global sensor pose.
+				 * It renders the Jacobians of the composition.
+				 * \param poseG the global pose
+				 * \param PG_r the Jacobian wrt the robot pose
+				 * \param PG_s the Jacobian wrt the sensor local pose
+				 */
+				void poseGlobal(jblas::vec7 & poseG, jblas::mat & PG_r, jblas::mat & PG_s);
+
+				/**
+				 * Get sensor pose in global frame, for sensor poses with LOCAL storage (see class Gaussian for doc on storage options).
+				 * This function composes robot pose with sensor pose to obtain the global sensor pose.
+				 * It renders the Jacobian of the composition only wrt the robot pose.
+				 * \param poseG the global pose
+				 * \param PG_r the Jacobian wrt the robot pose
+				 */
+				void poseGlobal(jblas::vec7 & poseG, jblas::mat & PG_r);
+
+				/**
+				 * Get sensor pose in global frame.
+				 * This function composes robot pose with sensor pose to obtain the global sensor pose.
+				 * It renders the Jacobians of the composed frame wrt all variables that are in the map (either robot only, or robot and sensor),
+				 * depending on the sensor pose storage being LOCAL or REMOTE (see class Gaussian for doc on storage options).
+				 * \param poseG the global pose
+				 * \param PG_m the Jacobian wrt the mapped states
+				 * \return an indirect array with indices to the variables in the map concerned by the Jacobian \a PG_m.
+				 */
+				jblas::ind_array poseGlobal(jblas::vec7 & poseG, jblas::mat PG_m);
 
 				/**
 				 * Operator << for class SensorAbstract.
-				 * It shows information of the sensor.
+				 * It shows different information of the sensor.
 				 */
 				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::SensorAbstract & sen) {
-					s << "SENSOR " << sen.id() << ": " << sen.name() << " of type " << sen.type() << endl;
-					s << ".pose:  " << sen.pose << endl;
+					s << sen.categoryName() << " " << sen.id() << " of type " << sen.type() << std::endl;
+					s << ".pose :  " << sen.pose << std::endl;
 					return s;
 				}
-
-			private:
-				std::size_t id_;
-				std::string name_;
-				std::string type_;
-
 
 		};
 

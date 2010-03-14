@@ -12,7 +12,8 @@
 #ifndef OBSERVATIONPINHOLEANCHOREDHOMOGENEOUS_HPP_
 #define OBSERVATIONPINHOLEANCHOREDHOMOGENEOUS_HPP_
 
-#include "rtslam/observationAbstract.hpp"
+#include "rtslam/observationPinHolePoint.hpp"
+#include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
 
 namespace jafar
 {
@@ -20,15 +21,20 @@ namespace jafar
 	{
 
 		/**
-		 * Class for Pin-Hole observations of Anchored Homogeneous 3D points
+		 * Class for Pin-Hole observations of Anchored Homogeneous 3D points.
+		 * \author jsola
 		 * \ingroup rtslam
 		 */
-		class ObservationPinHole3DAnchoredHomogeneous {
+		class ObservationPinHoleAnchoredHomogeneousPoint : public ObservationPinHolePoint{
 		public:
 
+				ObservationPinHoleAnchoredHomogeneousPoint();
 
-		private:
+
+
+
 		};
+
 
 	}
 }

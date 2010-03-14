@@ -44,8 +44,13 @@ namespace jafar {
 		 * Gaussian GLc(GRa);
 		 * \endcode
 		 *
-		 * see that the third constructor takes a remote Gaussian (see below).
+		 * see that the last constructor takes a remote Gaussian (see below).
 		 * The result is a local Gaussian (the data is copied to the local storage).
+		 *
+		 * You can create Gaussians with no covariance by providing just the mean vector. This is only possible for local Gaussians:
+		 * \code
+		 * Gaussian GLx(x)
+		 * \endcode
 		 *
 		 * <b> Defining a remote Gaussian </b>
 		 *
@@ -64,7 +69,7 @@ namespace jafar {
 		 * Having two remote Gaussian instances \a G1 and \a G2 pointing to the same data (Gaussian \a G or pair {\a x , \a P })
 		 * allows recovering their cross-variances matrix.
 		 *
-		 * This is a graphical representation of the situation:
+		 * This is a graphical representation of the situation, where we want to access the blocks of data \c ic and \c ic' (in purple):
 		 * 	\image html Gaussian.png "Two remote Gaussians G1 and G2 pointing to {\a x, \a P } via indirect arrays. The cross-variances \a ic and \a ic' are shown."
 		 *
 		 * Bear in mind that indirect arrays are not correlative: they contain sparse indices. Thus this is a more accurate representation of the situation:

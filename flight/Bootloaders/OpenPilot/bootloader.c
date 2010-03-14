@@ -36,9 +36,7 @@ extern uint32_t FlashDestination;
 extern uint8_t file_name[FILE_NAME_LENGTH];
 
 /* Local variables */
-static uint32_t BlockNbr = 0, UserMemoryMask = 0;
-static bool FlashProtection = FALSE;
-static uint8_t tab_1024[1024] = { 0 };
+static uint32_t UserMemoryMask = 0;
 
 /**
  * Main bootloader function
@@ -46,6 +44,8 @@ static uint8_t tab_1024[1024] = { 0 };
 void StartBootloader(void)
 {
 	uint8_t key = 0;
+	uint32_t BlockNbr = 0;
+	bool FlashProtection = FALSE;
 
 	/* Get the number of block (4 or 2 pages) from where the user program will be loaded */
 	BlockNbr = (FlashDestination - 0x08000000) >> 12;
@@ -190,12 +190,13 @@ static void FLASH_DisableWriteProtectionPages(void)
  */
 static void SerialDownload(void)
 {
+	uint8_t tab_1024[1024] = { 0 };
 	int32_t Size = 0;
 
 	SerialPutString("Waiting for the file to be sent ... (press 'a' to abort)\n\r");
 	Size = Ymodem_Receive(&tab_1024[0]);
 	if(Size > 0) {
-		SerialPutString("\n\n\r Programming Completed Successfully!\n\r--------------------------------\r\n Name: ");
+		SerialPutString("\n\n\rProgramming Completed Successfully!\n\r");
 	} else if(Size == -1) {
 		SerialPutString("\n\n\rThe image size is higher than the allowed space memory!\n\r");
 	} else if(Size == -2) {

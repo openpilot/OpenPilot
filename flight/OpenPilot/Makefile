@@ -25,21 +25,18 @@
 
 # Set developer code and compile options
 # Set to YES for debugging
-DEBUG = YES
-ENABLE_DEBUG_PINS = NO
-USE_BOOTLOADER = NO
+DEBUG ?= YES
+ENABLE_DEBUG_PINS ?= NO
+USE_BOOTLOADER ?= NO
 
 # Set to YES when using Code Sourcery toolchain
-CODE_SOURCERY = YES
+CODE_SOURCERY ?= YES
 
 # Toolchain prefix (i.e arm-elf- -> arm-elf-gcc.exe)
-TCHAIN_PREFIX = arm-none-eabi-
+TCHAIN_PREFIX ?= arm-none-eabi-
 
-ifeq ($(CODE_SOURCERY), YES)
-REMOVE_CMD = cs-rm
-else
-REMOVE_CMD = rm
-endif
+# Remove command is different for Code Sourcery on Windows
+REMOVE_CMD ?= cs-rm
 
 FLASH_TOOL = OPENOCD
 
@@ -380,7 +377,7 @@ OOCD_EXE=openocd
 # debug level
 OOCD_CL=-d0
 # interface and board/target settings (using the OOCD target-library here)
-OOCD_CL+=-f ../project/OpenOCD/floss-jtag.cfg -f ../project/OpenOCD/stm32.cfg
+OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.cfg -f ../Project/OpenOCD/stm32.cfg
 # initialize
 OOCD_CL+=-c init
 # show the targets

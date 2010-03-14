@@ -37,7 +37,7 @@
 
 
 /* Options */
-#define USE_DEBUG_PINS
+//#define USE_DEBUG_PINS
 
 #ifdef PIOS_INCLUDE_FREERTOS
 	#define USE_FREERTOS
@@ -107,8 +107,7 @@ static void TransferEnd(I2CRecTypeDef *i2cx);
 	#define DebugPinLow(x)
 #endif
 
-// FIXME: temp assert
-#define assert(exp) {if (!(exp)) while(1){DebugPinHigh(DEBUG_PIN_ASSERT);DebugPinLow(DEBUG_PIN_ASSERT);};};
+#define assert(exp) PIOS_DEBUG_Assert(exp)
 
 
 /**

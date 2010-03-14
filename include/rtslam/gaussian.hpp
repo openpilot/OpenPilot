@@ -23,29 +23,54 @@ namespace jafar {
 	namespace rtslam {
 
 		/**
-		 * Class for Gaussians having construction-time selectable LOCAL or REMOTE storage.
+		 * Class for Gaussians having LOCAL or REMOTE storage.
 		 * \author jsola
 		 *
 		 * This class defines a multi-dimensional Gaussian variable.
 		 * It allows mean and covariances data to be stored locally or remotelly, depending on the constructor.
+		 * The storage modality is selectable only at construction time.
 		 * Remote Gaussians are indexed with indirect arrays.
 		 *
 		 * - Mean and covariances are accessed through \a x() and \a P().\n
 		 * - The indirect array is part of the Gaussian class, and is accessible through \a ia().\n
 		 *
+		 * <b> Defining a local Gaussian </b>
+		 *
+		 * You just give a size, a pair {\a x , \a P } or another Gaussian:
+		 * \code
+		 * Gaussian GLs(7);
+		 * Gaussian GLa(x, P);
+		 * Gaussian GLb(GLa);
+		 * Gaussian GLc(GRa);
+		 * \endcode
+		 *
+		 * see that the third constructor takes a remote Gaussian (see below).
+		 * The result is a local Gaussian (the data is copied to the local storage).
+		 *
+		 * <b> Defining a remote Gaussian </b>
+		 *
+		 * You add an indirect array to the constructor:
+		 * \code
+		 * Gaussian GRa(x, P, ia);
+		 * Gaussian GRb(GLa, ia);
+		 * \endcode
+		 *
+		 * See that the remote constructor wants a local Gaussian \a GLa to point to. Do NEVER provide a remote Gaussian to such constructor.
+		 *
+		 * For information about indirect arrays, see the documentation of ia_range(), ia_head() and similar functions in namespace ublasExtra.
+		 *
 		 * <b> Managing cross-variances through indirect indexing</b>
 		 *
-		 * Having two Gaussian instances \a G1 and \a G2 pointing to the same remote pair {\a x , \a P }
+		 * Having two remote Gaussian instances \a G1 and \a G2 pointing to the same data (Gaussian \a G or pair {\a x , \a P })
 		 * allows recovering their cross-variances matrix.
 		 *
-		 * The following example is borrowed from \c test_gaussian02() in file \c rtslam/test_suite/test_gaussian.cpp.
-		 * Run this test yourself :
-		 * - edit \c rtslam/test_suite/test_gaussian.cpp\n
-		 * - go to the bottom of the file, locate the macro function <c> BOOST_AUTO_TEST_CASE( test_gaussian )</c>\n
-		 * - in this macro, comment all but \c test_gaussian02(). Save the file.\n
-		 * - \c cd to directory \c $JAFAR_DIR/modules/rtslam/
-		 * - type  <c> make test_gaussian </c>\n
-		 * - Once you are done, recover the file to its original state.
+		 * This is a graphical representation of the situation:
+		 * 	\image html Gaussian.png "Two remote Gaussians G1 and G2 pointing to {\a x, \a P } via indirect arrays. The cross-variances \a ic and \a ic' are shown."
+		 *
+		 * Bear in mind that indirect arrays are not correlative: they contain sparse indices. Thus this is a more accurate representation of the situation:
+		 * 	\image html GaussianSparse.png "Two remote Gaussians G1 and G2 pointing to {\a x, \a P } via indirect arrays. The cross-variances \a ic and \a ic' are shown."
+		 *
+		 * The following example is borrowed from \c test_gaussian02() in file \c rtslam/test_suite/test_gaussian.cpp:
 		 *
 		 * \code
 		 *	jblas::vec x(300);                                      // The remote mean vector.
@@ -68,6 +93,14 @@ namespace jafar {
 		 * >>  c-value (should be 99): 99
 		 * >> ic-value (should be 0 ): 0
 		 * \endcode
+		 *
+		 * Run this test yourself. Follow these steps :
+		 * - edit \c rtslam/test_suite/test_gaussian.cpp\n
+		 * - go to the bottom of the file, locate the macro function <c> BOOST_AUTO_TEST_CASE( test_gaussian )</c>\n
+		 * - in this macro, comment all but \c test_gaussian02(). Save the file.\n
+		 * - \c cd to directory \c $JAFAR_DIR/modules/rtslam/
+		 * - type  <c> make test_gaussian </c>\n
+		 * - Once you are done, recover the file to its original state.
 		 *
 		 * \ingroup rtslam
 		 */

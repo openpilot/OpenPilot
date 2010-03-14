@@ -64,7 +64,7 @@ void test_rtslam01(void) {
 
 	SensorPinHole camera1(sensorPose);
 	camera1.id(IdFac.getId());
-	camera1.name("Flea");
+//	camera1.name("");
 	camera1.set_parameters(k, dist, corr, hsize, vsize);
 	cout << "camera1: " << camera1 << endl;
 
@@ -83,11 +83,11 @@ void test_rtslam01(void) {
 
 	cout << "\n% PARENTAL ACCESS \n%===========" << endl;
 
-	camera1.installToRobot(robot);
+	camera2.installToRobot(robot);
 
 	cout << "Robot " << robot.name() << " has sensor " << robot.sensorsList.front()->name() << " of type "
 	    << robot.sensorsList.front()->type() << endl;
-	cout << "Sensor " << camera1.name() << " is on robot " << camera1.robot->name() << endl;
+	cout << "Sensor " << camera2.name() << " is on robot " << camera2.robot->name() << endl;
 
 	cout << "\n% LANDMARK CREATION AND PRINT \n%===========" << endl;
 	jblas::ind_array ial = ia_pushfront(map.used_states, Landmark3DAnchoredHomogeneousPoint::size());

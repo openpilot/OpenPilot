@@ -140,7 +140,10 @@ namespace jafar {
 				 * It shows different information of the sensor.
 				 */
 				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::SensorAbstract & sen) {
-					s << sen.categoryName() << " " << sen.id() << " of type " << sen.type() << std::endl;
+					s << sen.categoryName() << " " << sen.id() << ": ";
+					if (sen.name().size() > 0)
+						s << sen.name() << ", ";
+					s << "of type " << sen.type() << std::endl;
 					s << ".pose :  " << sen.pose << std::endl;
 					return s;
 				}

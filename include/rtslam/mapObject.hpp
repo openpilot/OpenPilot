@@ -50,12 +50,6 @@ namespace jafar {
 				 */
 				MapObject(MapAbstract & _map, const jblas::ind_array & _iar);
 
-				inline void setup(size_t _id, std::string & _name, std::string & _type) {
-					id_ = _id;
-					name_ = _name;
-					type_ = _type;
-				}
-
 				inline void id(std::size_t _id) {
 					id_ = _id;
 				}
@@ -71,13 +65,13 @@ namespace jafar {
 				inline std::size_t id(void) {
 					return id_;
 				}
-				inline std::string type(void) {
+				inline std::string & type(void) {
 					return type_;
 				}
-				inline std::string name(void) {
+				inline std::string & name(void) {
 					return name_;
 				}
-				inline std::string categoryName(void) {
+				inline std::string & categoryName(void) {
 					return categoryName_;
 				}
 
@@ -85,12 +79,21 @@ namespace jafar {
 					return 0;
 				}
 
+				inline void setup(size_t _id, std::string & _type, std::string & _name) {
+					id(_id);
+					type(_type);
+					name(_name);
+				}
+
 				/**
 				 * Operator << for class MapObject.
 				 * It shows different information of the object.
 				 */
 				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::MapObject & obj) {
-					s << obj.categoryName() << " " << obj.id() << " of type " << obj.type() << std::endl;
+					s << obj.categoryName() << " " << obj.id() << ": ";
+					if (obj.name().size() > 0)
+						s << obj.name() << ", ";
+					s << "of type " << obj.type() << std::endl;
 					s << ".state:  " << obj.state << std::endl;
 					return s;
 				}

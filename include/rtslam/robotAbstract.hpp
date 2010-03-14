@@ -133,7 +133,10 @@ namespace jafar {
 				 * It shows different information of the robot.
 				 */
 				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::RobotAbstract & rob) {
-					s << rob.categoryName() << " " << rob.id() << " of type " << rob.type() << std::endl;
+					s << rob.categoryName() << " " << rob.id() << ": ";
+					if (rob.name().size() > 0)
+						s << rob.name() << ", ";
+					s << "of type " << rob.type() << std::endl;
 					s << ".state:  " << rob.state << std::endl;
 					s << ".pose :  " << rob.pose << std::endl;
 					return s;

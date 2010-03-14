@@ -91,7 +91,9 @@ int main()
 	PIOS_Servo_Init();
 
 	/* Analog to digital converter initialise */
-	//PIOS_ADC_Init();
+	PIOS_ADC_Init();
+
+	PIOS_GPIO_Init();
 
 	PIOS_PWM_Init();
 
@@ -175,33 +177,12 @@ static void TaskTesting(void *pvParameters)
 
 		//PIOS_I2C_Transfer(I2C_Write_WithoutStop, 0x57, (uint8_t *)50, 1);
 
-		/*uint8_t buffer[2];
-		int32_t err1 = PIOS_BMP085_Write(0xF4, 0x2E);
-		PIOS_DELAY_WaitmS(5);
-		int32_t err2 = PIOS_BMP085_Read(0xF6, buffer, 2);
-
-		PIOS_COM_SendFormattedString(COM_DEBUG_USART, "err1 = %d err2 = %d\r", err1, err2);
-		PIOS_COM_SendFormattedString(COM_DEBUG_USART, "0xF6 = %u 0xF7 = %u\r", buffer[0], buffer[1]);
-
-		PIOS_BMP085_StartADC(Temperature);
-		//PIOS_DELAY_WaitmS(50);
-		//PIOS_BMP085_StartADC(Pressure);
-		//PIOS_DELAY_WaitmS(50);
-
-		PIOS_DELAY_WaitmS(50);
-
-		uint16_t P;
-		uint16_t A;
-		uint16_t T;
-		PIOS_BMP085_GetValues(P, A, T);*/
-
-
 		/* Test ADC pins */
 		//temp = ((1.43 - ((Vsense / 4096) * 3.3)) / 4.3) + 25;
 		//uint32_t vsense = PIOS_ADC_PinGet(0);
 		//uint32_t Temp = (1.42 -  vsense * 3.3 / 4096) * 1000 / 4.35 + 25;
-		//PIOS_COM_SendFormattedString(COM_DEBUG_USART, "Temp: %d, CS_I: %d, CS_V: %d, 5v: %d\r", PIOS_ADC_PinGet(0), PIOS_ADC_PinGet(1), PIOS_ADC_PinGet(2), PIOS_ADC_PinGet(3));
-		//PIOS_COM_SendFormattedString(COM_DEBUG_USART, "AUX1?: %d, AUX2?: %d, AUX3?: %d\r", PIOS_ADC_PinGet(4), PIOS_ADC_PinGet(5), PIOS_ADC_PinGet(6));
+		PIOS_COM_SendFormattedString(COM_DEBUG_USART, "Temp: %d, CS_I: %d, CS_V: %d, 5v: %d\r", PIOS_ADC_PinGet(0), PIOS_ADC_PinGet(1), PIOS_ADC_PinGet(2), PIOS_ADC_PinGet(3));
+		PIOS_COM_SendFormattedString(COM_DEBUG_USART, "AUX1: %d, AUX2: %d, AUX3: %d\r", PIOS_ADC_PinGet(4), PIOS_ADC_PinGet(5), PIOS_ADC_PinGet(6));
 
 		vTaskDelay(xDelay);
 	}

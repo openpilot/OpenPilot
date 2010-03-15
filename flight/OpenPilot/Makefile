@@ -114,7 +114,11 @@ SRC += $(OPUAVOBJ)/uavobjectsinit.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
 
 ## OPENPILOT Testcode
+##
+## This is only a temp solution. When activating one of lines below, openpilot.c must be commented
+##    
 #SRC += $(OPTESTS)/test_I2c_PCF8570.c
+#SRC += $(OPTESTS)/test_BMP085.c
 
 
 ## UAVOBJECTS

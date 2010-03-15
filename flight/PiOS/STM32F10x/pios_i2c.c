@@ -107,7 +107,7 @@ static void TransferEnd(I2CRecTypeDef *i2cx);
 	#define DebugPinLow(x)
 #endif
 
-#define assert(exp) PIOS_DEBUG_Assert(exp)
+#define Assert(exp) PIOS_DEBUG_Assert(exp)
 
 
 /**
@@ -242,7 +242,7 @@ int32_t PIOS_I2C_UnlockDevice(void)
  */
 static void TransferStart(I2CRecTypeDef *i2cx)
 {
-	assert(i2cx->transfer_state.BUSY == 0);
+	Assert(i2cx->transfer_state.BUSY == 0);
 
 	DebugPinHigh(DEBUG_PIN_BUSY);
 	i2cx->transfer_state.BUSY = 1;
@@ -325,7 +325,7 @@ int32_t PIOS_I2C_TransferWait(void)
 		if (xSemaphoreTake(i2cx->sem_readySignal, PIOS_I2C_TIMEOUT_VALUE/portTICK_RATE_MS) == pdTRUE)
 		{
 			// OK, got the semaphore, release it again
-			assert(i2cx->transfer_state.BUSY == 0);
+			Assert(i2cx->transfer_state.BUSY == 0);
 		}
 		else
 		{
@@ -403,14 +403,14 @@ void PIOS_I2C_StartTransfer(I2CTransferTypeDef transfer, uint8_t address, uint8_
 	// Should not be busy
 	if (i2cx->transfer_state.BUSY)
 	{
-		assert(0);
+		Assert(0);
 		return;
 	}
 
 #ifdef USE_FREERTOS
 	// Consume Ready semaphore in case it would be there for some reason
 	xSemaphoreTake(i2cx->sem_readySignal, 0);
-	assert(xSemaphoreTake(i2cx->sem_readySignal, 0) == pdFALSE);
+	Assert(xSemaphoreTake(i2cx->sem_readySignal, 0) == pdFALSE);
 #endif
 
 	// Clear state
@@ -590,7 +590,7 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 	// For now this condition does not stop the transfer, but further investigation in needed
 	//
 
-//	assert(0);
+//	Assert(0);
 //
 //	/* This code is only reached if something got wrong, e.g. interrupt handler is called too late, */
 //	/* The device reset itself (while testing, it was always event 0x00000000). we have to stop the transfer, */

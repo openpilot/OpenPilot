@@ -370,30 +370,42 @@ int32_t UAVObjInitData(UAVObjHandle obj, const char* init)
 int32_t UAVObjUnpack(UAVObjHandle obj, uint16_t instId, const uint8_t* dataIn)
 {
 	ObjectList* objEntry;
+	uint16_t n;
 
 	// Lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// Unpack
+	// Cast handle to object
 	objEntry = (ObjectList*)obj;
-	if (!objEntry->isSingleInstance)
+
+	// If instance does not exist, create it and any other instances before it
+	if (!objEntry->isSingleInstance && !hasInstance(objEntry, instId))
 	{
-		// If instance does not exist, create it
-		if (!hasInstance(objEntry, instId))
+		// Create any missing instances (all instance IDs must be sequential)
+		for (n = objEntry->numInstances; n < instId; ++n)
 		{
-			createInstance(objEntry, instId);
+			if ( createInstance(objEntry, n) < 0 )
+			{
+				// Error, unlock and return
+				xSemaphoreGiveRecursive(mutex);
+				return -1;
+			}
 		}
-		// Set data
-		if (setInstanceData(objEntry, instId, dataIn) < 0)
+		// Create the actual instance
+		if ( createInstance(objEntry, instId) < 0 )
 		{
 			// Error, unlock and return
 			xSemaphoreGiveRecursive(mutex);
 			return -1;
 		}
 	}
-	else
+
+	// Set data
+	if (setInstanceData(objEntry, instId, dataIn) < 0)
 	{
-		memcpy(objEntry->data.instance, dataIn, objEntry->numBytes);
+		// Error, unlock and return
+		xSemaphoreGiveRecursive(mutex);
+		return -1;
 	}
 
 	// Fire event
@@ -824,7 +836,7 @@ int32_t createInstance(ObjectList* obj, uint16_t instId)
 	ObjectInstList* elemEntry;
 
 	// Create new instance
-	if (!obj->isSingleInstance)
+	if (!obj->isSingleInstance && instId < UAVOBJ_MAX_INSTANCES)
 	{
 		elemEntry = (ObjectInstList*)malloc(sizeof(ObjectInstList));
 		if (elemEntry == NULL) return -1;

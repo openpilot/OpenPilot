@@ -78,7 +78,7 @@ int32_t UAVTalkInitialize(UAVTalkOutputStream outputStream)
  * Request an update for the specified object, on success the object data would have been
  * updated by the GCS.
  * \param[in] obj Object to update
- * \param[in] instId The instance ID of UAVOBJ_ALL_INSTANCES for all instances.
+ * \param[in] instId The instance ID or UAVOBJ_ALL_INSTANCES for all instances.
  * \param[in] timeout Time to wait for the response, when zero it will return immediately
  * \return 0 Success
  * \return -1 Failure
@@ -91,7 +91,7 @@ int32_t UAVTalkSendObjectRequest(UAVObjHandle obj, uint16_t instId, int32_t time
 /**
  * Send the specified object through the telemetry link.
  * \param[in] obj Object to send
- * \param[in] instId The instance ID
+ * \param[in] instId The instance ID or UAVOBJ_ALL_INSTANCES for all instances.
  * \param[in] acked Selects if an ack is required (1:ack required, 0: ack not required)
  * \param[in] timeoutMs Time to wait for the ack, when zero it will return immediately
  * \return 0 Success
@@ -99,11 +99,6 @@ int32_t UAVTalkSendObjectRequest(UAVObjHandle obj, uint16_t instId, int32_t time
  */
 int32_t UAVTalkSendObject(UAVObjHandle obj, uint16_t instId, uint8_t acked, int32_t timeoutMs)
 {
-	// Make sure a valid instance id is requested
-	if (instId == UAVOBJ_ALL_INSTANCES)
-	{
-		return -1;
-	}
 	// Send object
     if (acked == 1)
     {

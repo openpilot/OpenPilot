@@ -27,6 +27,7 @@
 #define UAVOBJECTMANAGER_H
 
 #define UAVOBJ_ALL_INSTANCES 0xFFFF
+#define UAVOBJ_MAX_INSTANCES 1000
 
 typedef uint32_t UAVObjHandle;
 
@@ -35,9 +36,9 @@ typedef uint32_t UAVObjHandle;
  */
 typedef enum {
 	UPDATEMODE_PERIODIC = 0, /** Automatically update object at periodic intervals */
-	UPDATEMODE_ONCHANGE, /** Only update object when its data changes */
-	UPDATEMODE_MANUAL,  /** Manually update object, by calling the updated() function */
-	UPDATEMODE_NEVER /** Object is never updated */
+	UPDATEMODE_ONCHANGE = 1, /** Only update object when its data changes */
+	UPDATEMODE_MANUAL = 2,  /** Manually update object, by calling the updated() function */
+	UPDATEMODE_NEVER = 3 /** Object is never updated */
 } UAVObjUpdateMode;
 
 /**
@@ -46,11 +47,11 @@ typedef enum {
  */
 typedef struct {
 	int8_t ackRequired; /** Defines if an ack is required for the transactions of this object (1:acked, 0:not acked) */
-	UAVObjUpdateMode telemetryUpdateMode; /** Update mode used by the telemetry module */
+	int8_t telemetryUpdateMode; /** Update mode used by the telemetry module (UAVObjUpdateMode) */
 	int32_t telemetryUpdatePeriod; /** Update period used by the telemetry module (only if telemetry mode is PERIODIC) */
-	UAVObjUpdateMode gcsTelemetryUpdateMode; /** Update mode used by the GCS */
+	int8_t gcsTelemetryUpdateMode; /** Update mode used by the GCS (UAVObjUpdateMode) */
 	int32_t gcsTelemetryUpdatePeriod; /** Update period used by the GCS (only if telemetry mode is PERIODIC) */
-	UAVObjUpdateMode loggingUpdateMode; /** Update mode used by the logging module */
+	int8_t loggingUpdateMode; /** Update mode used by the logging module (UAVObjUpdateMode) */
 	int32_t loggingUpdatePeriod; /** Update period used by the logging module (only if logging mode is PERIODIC) */
 } __attribute__((packed)) UAVObjMetadata;
 

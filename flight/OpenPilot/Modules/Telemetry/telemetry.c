@@ -28,14 +28,14 @@
 // Private constants
 #define MAX_QUEUE_SIZE 20
 #define STACK_SIZE 100
-#define TASK_PRIORITY 100
+#define TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define REQ_TIMEOUT_MS 500
-#define MAX_RETRIES 2
+#define MAX_RETRIES 3
 
 // Private types
 
 // Private variables
-static COMPortTypeDef TelemetryPort;
+static COMPortTypeDef telemetryPort;
 static xQueueHandle queue;
 static xTaskHandle telemetryTaskHandle;
 
@@ -59,7 +59,7 @@ int32_t TelemetryInitialize(void)
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 
 	// TODO: Get telemetry settings object
-	TelemetryPort = COM_USART1;
+	telemetryPort = COM_USART1;
 
 	// Initialise UAVTalk
 	UAVTalkInitialize(&transmitData);
@@ -100,34 +100,44 @@ void updateObject(UAVObjHandle obj)
 	UAVObjGetMetadata(obj, &metadata);
 
 	// Setup object depending on update mode
-	if(metadata.telemetryUpdateMode == UPDATEMODE_PERIODIC) {
+	if(metadata.telemetryUpdateMode == UPDATEMODE_PERIODIC)
+	{
 		// Set update period
 		setUpdatePeriod(obj, metadata.telemetryUpdatePeriod);
 		// Connect queue
 		eventMask = EV_UPDATED_MANUAL | EV_UPDATE_REQ;
-		if(UAVObjIsMetaobject(obj)) {
+		if(UAVObjIsMetaobject(obj))
+		{
 			eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
 		}
 		UAVObjConnectQueue(obj, queue, eventMask);
-	} else if(metadata.telemetryUpdateMode == UPDATEMODE_ONCHANGE) {
+	}
+	else if(metadata.telemetryUpdateMode == UPDATEMODE_ONCHANGE)
+	{
 		// Set update period
 		setUpdatePeriod(obj, 0);
 		// Connect queue
 		eventMask = EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
-		if(UAVObjIsMetaobject(obj)) {
+		if(UAVObjIsMetaobject(obj))
+		{
 			eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
 		}
 		UAVObjConnectQueue(obj, queue, eventMask);
-	} else if(metadata.telemetryUpdateMode == UPDATEMODE_MANUAL) {
+	}
+	else if(metadata.telemetryUpdateMode == UPDATEMODE_MANUAL)
+	{
 		// Set update period
 		setUpdatePeriod(obj, 0);
 		// Connect queue
 		eventMask = EV_UPDATED_MANUAL | EV_UPDATE_REQ;
-		if(UAVObjIsMetaobject(obj)) {
+		if(UAVObjIsMetaobject(obj))
+		{
 			eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
 		}
 		UAVObjConnectQueue(obj, queue, eventMask);
-	} else if(metadata.telemetryUpdateMode == UPDATEMODE_NEVER) {
+	}
+	else if(metadata.telemetryUpdateMode == UPDATEMODE_NEVER)
+	{
 		// Set update period
 		setUpdatePeriod(obj, 0);
 		// Disconnect queue
@@ -146,38 +156,47 @@ static void telemetryTask(void* parameters)
 	int32_t success;
 
 	// Loop forever
-	while(1) {
+	while(1)
+	{
 		// Wait for queue message
-		if(xQueueReceive(queue, &ev, portMAX_DELAY) == pdTRUE) {
+		if(xQueueReceive(queue, &ev, portMAX_DELAY) == pdTRUE)
+		{
 			// Get object metadata
 			UAVObjGetMetadata(ev.obj, &metadata);
 			// Act on event
-			if(ev.event == EV_UPDATED || ev.event == EV_UPDATED_MANUAL) {
+			if(ev.event == EV_UPDATED || ev.event == EV_UPDATED_MANUAL)
+			{
 				// Send update to GCS (with retries)
 				retries = 0;
-				while(retries < MAX_RETRIES && success == -1) {
+				while(retries < MAX_RETRIES && success == -1)
+				{
 					success = UAVTalkSendObject(ev.obj, ev.instId, metadata.ackRequired, REQ_TIMEOUT_MS); // call blocks until ack is received or timeout
 					++retries;
 				}
-			} else if(ev.event == EV_UPDATE_REQ) {
+			}
+			else if(ev.event == EV_UPDATE_REQ)
+			{
 				// Request object update from GCS (with retries)
 				retries = 0;
-				while(retries < MAX_RETRIES && success == -1) {
+				while(retries < MAX_RETRIES && success == -1)
+				{
 					success = UAVTalkSendObjectRequest(ev.obj, ev.instId, REQ_TIMEOUT_MS); // call blocks until update is received or timeout
 					++retries;
 				}
 			}
-			// If this is a metadata object then make necessary telemetry updates
-			if(UAVObjIsMetaobject(ev.obj)) {
+			// If this is a metaobject then make necessary telemetry updates
+			if(UAVObjIsMetaobject(ev.obj))
+			{
 				updateObject(UAVObjGetLinkedObj(ev.obj)); // linked object will be the actual object the metadata are for
 			}
 		}
 
 		/* This blocks the task until there is something on the buffer */
-		if(PIOS_COM_ReceiveBufferUsed(TelemetryPort) > 0)
+		if(PIOS_COM_ReceiveBufferUsed(telemetryPort) > 0)
 		{
-			UAVTalkProcessInputStream(PIOS_COM_ReceiveBuffer(TelemetryPort));
-		} else if(PIOS_COM_ReceiveBufferUsed(COM_USB_HID) > 0)
+			UAVTalkProcessInputStream(PIOS_COM_ReceiveBuffer(telemetryPort));
+		}
+		else if(PIOS_COM_ReceiveBufferUsed(COM_USB_HID) > 0)
 		{
 			UAVTalkProcessInputStream(PIOS_COM_ReceiveBuffer(COM_USB_HID));
 		}
@@ -195,9 +214,12 @@ static int32_t transmitData(uint8_t* data, int32_t length)
 	COMPortTypeDef OutputPort;
 
 	/* If USB HID transfer is possible */
-	if(!PIOS_USB_HID_CheckAvailable()) {
+	if(!PIOS_USB_HID_CheckAvailable())
+	{
 		OutputPort = COM_USART1;
-	} else {
+	}
+	else
+	{
 		OutputPort = COM_USB_HID;
 	}
 

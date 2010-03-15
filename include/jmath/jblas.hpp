@@ -118,7 +118,9 @@ namespace jblas {
   
   /// standard symmetric matrix type
   typedef boost::numeric::ublas::symmetric_matrix<double> sym_mat;
+  /// matrix range
   typedef boost::numeric::ublas::matrix_range<sym_mat> sym_mat_range; 
+  /// indirect access to a symmetric matrix
   typedef boost::numeric::ublas::matrix_indirect<sym_mat> sym_mat_indirect;
   typedef boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper> up_sym_mat;
   typedef boost::numeric::ublas::matrix_range<up_sym_mat> up_sym_mat_range;

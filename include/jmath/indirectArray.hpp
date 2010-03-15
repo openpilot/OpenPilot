@@ -25,7 +25,6 @@ namespace std {
 	/**
 	 * Operator << for class for ind_array
 	 * FIXME: This operator has been defined in namespace STD.
-	 * FIXME: This is not necessarily beautiful but we cannot put it under jafar::jmath.
 	 */
 	template<class A>
 	ostream& operator <<(ostream & s, boost::numeric::ublas::indirect_array<A> & ia_) {
@@ -120,7 +119,7 @@ namespace jafar {
 
 			/**
 			 * Create indirect array from start and end indices.
-			 * The indirect array goes from \a begin to \(end-1).
+			 * The indirect array goes from \a begin to (\a end -1).
 			 * \param begin the first index
 			 * \param end the last index plus one.
 			 * \return the indirect array.

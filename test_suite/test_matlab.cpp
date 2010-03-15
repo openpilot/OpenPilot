@@ -42,7 +42,7 @@ void test_matlab01(void) {
 	jblas::vec_slice vs(v, s);
 	jblas::vec_indirect vi(v, i);
 
-	cout << "%\n Indirect arrays, ranges and slices \n%=================================" << endl;
+	cout << "\n% Indirect arrays, ranges and slices \n%====================================" << endl;
 	cout << "i   = " << (MATLAB) i << endl;
 	cout << "r   = " << (MATLAB) r << endl;
 	cout << "s   = " << (MATLAB) s << endl;
@@ -109,10 +109,14 @@ void test_matlab03(void) {
 
 }
 
+void test_matlab04(void) {
+
+}
+
 BOOST_AUTO_TEST_CASE( test_matlab )
 {
-//	test_matlab01();
+	test_matlab01();
 //	test_matlab02();
-	test_matlab03();
+//	test_matlab03();
 }
 

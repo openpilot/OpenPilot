@@ -21,7 +21,9 @@
 namespace jafar {
 	namespace rtslam {
 
-
+		/////////////////////////
+		//    CLASS Gaussian
+		/////////////////////////
 		/**
 		 * Class for Gaussians having LOCAL or REMOTE storage.
 		 * \author jsola
@@ -119,7 +121,7 @@ namespace jafar {
 		 * \ingroup rtslam
 		 */
 		class Gaussian {
-			private:
+			public:
 				/**
 				 * Storage type of Gaussians: LOCAL, REMOTE.
 				 */
@@ -129,6 +131,8 @@ namespace jafar {
 				///< Mean and covariances point to an external pair {x,P}.
 				} storage_t;
 
+
+			private:
 				storage_t storage_; ///< select local or remote storage
 				bool hasNullCov_; ///< true if covariance is exactly null
 				std::size_t size_; ///< size of data

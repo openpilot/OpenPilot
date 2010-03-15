@@ -52,10 +52,10 @@ namespace jafar {
 				MapObject(MapAbstract & _map, const jblas::ind_array & _iar);
 
 				/**
-				 * Virtual destructor
+				 * Mandatory virtual destructor
 				 */
-				//				inline virtual ~Mapobject(void) {
-				//				}
+				virtual ~MapObject() {
+				}
 
 				inline void id(std::size_t _id) {
 					id_ = _id;
@@ -69,16 +69,16 @@ namespace jafar {
 				inline void categoryName(std::string _categoryName) {
 					categoryName_ = _categoryName;
 				}
-				inline std::size_t & id(void) {
+				inline std::size_t & id() {
 					return id_;
 				}
-				inline std::string & type(void) {
+				inline std::string & type() {
 					return type_;
 				}
-				inline std::string & name(void) {
+				inline std::string & name() {
 					return name_;
 				}
-				inline std::string & categoryName(void) {
+				inline std::string & categoryName() {
 					return categoryName_;
 				}
 

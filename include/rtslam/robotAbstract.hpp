@@ -84,7 +84,14 @@ namespace jafar {
 				virtual ~RobotAbstract(void) {
 				}
 
+				/**
+				 * A set of sensors
+				 */
 				std::map<size_t, SensorAbstract*> sensors;
+
+				/**
+				 * Parent map
+				 */
 				MapAbstract * map;
 
 				//				Gaussian state;

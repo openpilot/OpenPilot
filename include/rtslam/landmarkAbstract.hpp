@@ -70,9 +70,15 @@ namespace jafar {
 
 				DescriptorAbstract descriptor;
 
+				/**
+				 * Parent map
+				 */
 				MapAbstract * map;
 
-				list<ObservationAbstract*> observationsList;
+				/**
+				 * A set of observations (one per sensor)
+				 */
+				std::map<size_t, ObservationAbstract*> observations;
 
 				/**
 				 * Mandatory virtual destructor.
@@ -95,10 +101,7 @@ namespace jafar {
 					descriptor = _desc;
 				}
 
-				inline void addObservation(ObservationAbstract & _obs) {
-					observationsList.push_front(&_obs);
-				}
-
+//				inline void addObservation(ObservationAbstract & _obs) ;
 
 		};
 

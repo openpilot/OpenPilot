@@ -64,9 +64,19 @@ namespace jafar {
 			public:
 
 
+				/**
+				 * Parent robot
+				 */
 				RobotAbstract* robot;
+
+				/**
+				 * A set of observations (one per landmark)
+				 */
 				std::map<size_t, ObservationAbstract*> observationsList;
 
+				/**
+				 * Sensor pose in robot
+				 */
 				Gaussian pose;
 
 				/**
@@ -94,8 +104,9 @@ namespace jafar {
 				/**
 				 * Mandatory virtual destructor.
 				 */
-				inline virtual ~SensorAbstract(void) {
+				virtual ~SensorAbstract(void) {
 				}
+
 
 				/**
 				 * Install sensor in robot.
@@ -119,7 +130,7 @@ namespace jafar {
 				 * \param PG_r the Jacobian wrt the robot pose
 				 * \param PG_s the Jacobian wrt the sensor local pose
 				 */
-				void poseGlobal(jblas::vec7 & poseG, jblas::mat & PG_r, jblas::mat & PG_s) const;
+				void globalPose(jblas::vec7 & poseG, jblas::mat & PG_r, jblas::mat & PG_s) ;
 
 				/**
 				 * Get sensor pose in global frame, for sensor poses with LOCAL storage (see class Gaussian for doc on storage options).
@@ -128,7 +139,7 @@ namespace jafar {
 				 * \param poseG the global pose
 				 * \param PG_r the Jacobian wrt the robot pose
 				 */
-				void poseGlobal(jblas::vec7 & poseG, jblas::mat & PG_r) const ;
+				void globalPose(jblas::vec7 & poseG, jblas::mat & PG_r) ;
 
 				/**
 				 * Get sensor pose in global frame.
@@ -139,7 +150,7 @@ namespace jafar {
 				 * \param PG_m the Jacobian wrt the mapped states
 				 * \return an indirect array with indices to the variables in the map concerned by the Jacobian \a PG_m.
 				 */
-				jblas::ind_array poseGlobal(jblas::vec7 & poseG, jblas::mat PG_m) const ;
+				jblas::ind_array globalPoseInMap(jblas::vec7 & poseG, jblas::mat & PG_m) ;
 
 				/**
 				 * Operator << for class SensorAbstract.

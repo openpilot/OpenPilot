@@ -50,9 +50,6 @@ namespace jafar {
 				kernel::IdFactory sensorIds;
 				kernel::IdFactory landmarkIds;
 
-			public:
-
-
 				/**
 				 * Size things and map usage management
 				 */
@@ -66,7 +63,7 @@ namespace jafar {
 				MapAbstract(size_t _max_size);
 
 				/**
-				 * Mandatory virtual destructor - Map is used as non-abstract by now
+				 * Mandatory virtual destructor - Map is used as-is, non-abstract by now
 				 */
 				// inline virtual ~MapAbstract(void);
 
@@ -95,7 +92,7 @@ namespace jafar {
 				/**
 				 * A set of landmarks
 				 */
-				std::list<LandmarkAbstract*> landmarks;
+				std::map<size_t, LandmarkAbstract*> landmarks;
 
 				/**
 				 * Query about available free space.

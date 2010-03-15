@@ -12,11 +12,13 @@
  */
 
 #include "rtslam/mapAbstract.hpp"
+#include "jmath/indirectArray.hpp"
 
 using namespace std;
 
 namespace jafar {
 	namespace rtslam {
+
 
 		/**
 		 * Constructor
@@ -26,10 +28,15 @@ namespace jafar {
 			used_states.clear();
 		}
 
-		jblas::ind_array MapAbstract::getFreeSpace(size_t N) {
-			size_t available_space = max_size - current_size;
-			if (N <= available_space) {
-				jblas::ind_array res = jmath::ublasExtra::ia_popfront(used_states, N);
+//		/**
+//		 * Robot and landmark addition and removal
+//		 */
+//		void MapAbstract::addRobot(RobotAbstract * _robPtr) {
+//		}
+
+		jblas::ind_array MapAbstract::reserveStates(const std::size_t N) {
+			if (unusedStates(N)) {
+				jblas::ind_array res = jmath::ublasExtra::ia_pushfront(used_states, N);
 				current_size += N;
 				return res;
 			}
@@ -39,15 +46,19 @@ namespace jafar {
 			}
 		}
 
+
 		/**
 		 * Liberate the space indicated.
 		 * \param _ia the space to liberate.
 		 */
-		void MapAbstract::liberateSpace(const jblas::ind_array & _ia) {
+		void MapAbstract::liberateStates(const jblas::ind_array & _ia) {
 			for (size_t i = 0; _ia.size(); i++)
-				used_states(_ia(i)) = false;
-			current_size += _ia.size();
+				if (used_states(_ia(i)) == true) {
+					used_states(_ia(i)) = false;
+					current_size += 1;
+				}
 		}
+
 
 	}
 }

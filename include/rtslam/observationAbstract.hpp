@@ -297,7 +297,7 @@ namespace jafar {
 					s << "Sensor: " << obs.sensor->id() << ", landmark: " << obs.landmark->id() << endl;
 					s << ".expectation:  " << obs.expectation << endl;
 					s << ".measurement:  " << obs.measurement << endl;
-					s << ".innovation:   " << obs.innovation << endl;
+					s << ".innovation:   " << obs.innovation;
 					return s;
 				}
 

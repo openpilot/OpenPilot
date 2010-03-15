@@ -21,6 +21,7 @@
 namespace jafar {
 	namespace rtslam {
 
+
 		/**
 		 * Class for generic mappable objects.
 		 * \author jsola
@@ -50,6 +51,12 @@ namespace jafar {
 				 */
 				MapObject(MapAbstract & _map, const jblas::ind_array & _iar);
 
+				/**
+				 * Virtual destructor
+				 */
+				//				inline virtual ~Mapobject(void) {
+				//				}
+
 				inline void id(std::size_t _id) {
 					id_ = _id;
 				}
@@ -62,7 +69,7 @@ namespace jafar {
 				inline void categoryName(std::string _categoryName) {
 					categoryName_ = _categoryName;
 				}
-				inline std::size_t id(void) {
+				inline std::size_t & id(void) {
 					return id_;
 				}
 				inline std::string & type(void) {
@@ -85,6 +92,7 @@ namespace jafar {
 					name(_name);
 				}
 
+
 				/**
 				 * Operator << for class MapObject.
 				 * It shows different information of the object.
@@ -94,7 +102,7 @@ namespace jafar {
 					if (obj.name().size() > 0)
 						s << obj.name() << ", ";
 					s << "of type " << obj.type() << std::endl;
-					s << ".state:  " << obj.state << std::endl;
+					s << ".state:  " << obj.state;
 					return s;
 				}
 

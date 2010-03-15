@@ -548,7 +548,6 @@ namespace jafar {
 			 * \param q the quaternion
 			 * \param e the Euler angles
 			 * \param E_q the Jacobian
-			 * TODO fix all this
 			 */
 			template<class VecQ, class VecE, class MatE_q>
 			void q2e(const VecQ & q, VecE & e, MatE_q & E_q) {

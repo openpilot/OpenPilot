@@ -20,7 +20,7 @@ namespace jafar {
 		/*
 		 * Constructor from Gaussian pose
 		 */
-		SensorPinHole::SensorPinHole(Gaussian & _pose) :
+		SensorPinHole::SensorPinHole(const Gaussian & _pose) :
 			SensorAbstract(_pose) {
 			type("Pin-hole-camera");
 		}
@@ -28,7 +28,7 @@ namespace jafar {
 		/*
 		 * Constructor from mean pose
 		 */
-		SensorPinHole::SensorPinHole(const jblas::vec & _pose) :
+		SensorPinHole::SensorPinHole(const jblas::vec7 & _pose) :
 			SensorAbstract(_pose) {
 			type("Pin-hole-camera");
 		}

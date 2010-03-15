@@ -1,5 +1,5 @@
 /**
- * observationPinHoleAnchoredHomogeneous.hpp
+ * \file observationPinHoleAnchoredHomogeneous.hpp
  *
  *  Created on: 14/02/2010
  *      Author: jsola

@@ -115,7 +115,6 @@ namespace jafar {
 
 			template<class VF, class Vahp, class Vahpf, class MAHPF_f, class MAHPF_ahp>
 			void toFrame(const VF & F, const Vahp & ahp, Vahpf & ahpf, MAHPF_f & AHPF_f, MAHPF_ahp & AHPF_ahp) {
-				//TODO: implement this
 				// split non-trivial chunks of landmark state
 				jblas::vec3 p0(ublas::subrange(ahp, 0, 3));
 				jblas::vec3 m(subrange(ahp, 3, 6));

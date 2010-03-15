@@ -250,7 +250,7 @@ void test_gaussian02(void) {
 
 BOOST_AUTO_TEST_CASE( test_gaussian )
 {
-//	test_gaussian01();
+	test_gaussian01();
 	test_gaussian02();
 }
 

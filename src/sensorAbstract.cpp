@@ -21,7 +21,7 @@ namespace jafar {
 		 * Local pose constructor - only mean
 		 */
 		//				template<class V>
-		SensorAbstract::SensorAbstract(const jblas::vec & _pose) :
+		SensorAbstract::SensorAbstract(const jblas::vec7 & _pose) :
 			MapObject(0),
 			pose(_pose) {
 			categoryName("SENSOR");
@@ -45,7 +45,8 @@ namespace jafar {
 		}
 
 		void SensorAbstract::installToRobot(RobotAbstract & rob) {
-			rob.sensorsList.push_back(this);
+
+//			rob.sensorsList.push_back(this);
 			robot = &rob;
 		}
 

@@ -16,18 +16,22 @@
 namespace jafar {
 	namespace rtslam {
 
+		using namespace std;
+
 
 		/**
 		 * Remote constructor from remote map and size of control vector
 		 */
-		RobotAbstract::RobotAbstract(MapAbstract & _map, jblas::ind_array & _iar, size_t _size_control) :
-			MapObject(_map, _iar),
-			//			state(_map.filter.x, _map.filter.P, _iar),
-			pose(_map.filter.x, _map.filter.P, jafar::jmath::ublasExtra::ia_head(_iar, 7)),
-			control(_size_control),
-			F_r(_iar.size(), _iar.size()),
-			F_u(_iar.size(), _size_control) {
-			categoryName("ROBOT");
+		RobotAbstract::RobotAbstract(MapAbstract & _map, const jblas::ind_array & _iar, const size_t _size_control) :
+			MapObject(_map, _iar), pose(_map.filter.x, _map.filter.P, jafar::jmath::ublasExtra::ia_head(_iar, 7)), control(
+			    _size_control), F_r(_iar.size(), _iar.size()), F_u(_iar.size(), _size_control) {
+			// Set robot properties and identifiers
+			categoryName("ROBOT"); // robot is categorized
+			id(_map.robotIds.getId()); // robot has ID
+
+			// Link robot to map
+			_map.robots[id()] = this; // map has robot
+			map = &_map; // robot is in map
 		}
 
 	}

@@ -30,7 +30,7 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#include <list>
+#include <map>
 
 #include <jmath/jblas.hpp>
 #include "rtslam/blocks.hpp"
@@ -44,6 +44,7 @@ namespace jafar {
 
 	namespace rtslam {
 
+
 		//  Forward declarations of children
 		class SensorAbstract;
 		//		class MapAbstract;
@@ -55,29 +56,38 @@ namespace jafar {
 		class Control: public Gaussian {
 			public:
 				double dt;
-				Control(size_t _size) :
+				Control(const size_t _size) :
 					Gaussian(_size) {
 					dt = 1.0;
 				}
 		};
+
 
 		/** Base class for all robots defined in the module
 		 * rtslam.
 		 *
 		 * \ingroup rtslam
 		 */
-		class RobotAbstract : public MapObject {
+		class RobotAbstract: public MapObject {
 			public:
+
+
+				/**
+				 * Remote constructor from remote map and size of control vector.
+				 * \param _map the remote map
+				 * \param _iar the indirect array pointing to the remote storage
+				 * \param _size_control the size of the control vector
+				 */
+				RobotAbstract(MapAbstract & _map, const jblas::ind_array & _iar, const size_t _size_control);
 
 				// Mandatory virtual destructor.
 				virtual ~RobotAbstract(void) {
 				}
 
+				std::map<size_t, SensorAbstract*> sensors;
+				MapAbstract * map;
 
-				std::list<SensorAbstract*> sensorsList;
-//				MapAbstract * map;
-
-//				Gaussian state;
+				//				Gaussian state;
 				Gaussian pose;
 				Control control;
 
@@ -89,22 +99,13 @@ namespace jafar {
 				jblas::mat F_r;
 				jblas::mat F_u;
 
-
-				/**
-				 * Remote constructor from remote map and size of control vector
-				 * \param _map the remote map
-				 * \param _iar the indirect array pointing to the remote storage
-				 * \param _size_control the size of the control vector
-				 */
-				RobotAbstract(MapAbstract & _map, jblas::ind_array & _iar, size_t _size_control);
-
-
 				/**
 				 * Acquire control structure
 				 */
 				virtual void set_control(const Control & _control) {
 					control = _control;
 				}
+
 
 				/**
 				 * Move the robot.
@@ -122,7 +123,6 @@ namespace jafar {
 					move();
 				}
 
-
 				static size_t size_control(void) {
 					return 0;
 				}
@@ -138,10 +138,9 @@ namespace jafar {
 						s << rob.name() << ", ";
 					s << "of type " << rob.type() << std::endl;
 					s << ".state:  " << rob.state << std::endl;
-					s << ".pose :  " << rob.pose << std::endl;
+					s << ".pose :  " << rob.pose;
 					return s;
 				}
-
 
 		};
 

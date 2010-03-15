@@ -1,5 +1,5 @@
 /**
- * sensorPinHole.hpp
+ * \file sensorPinHole.hpp
  *
  *  Created on: 14/02/2010
  *      Author: jsola
@@ -89,13 +89,13 @@ namespace jafar {
 				 * Constructor from Gaussian pose.
 				 * \param _pose the Gaussian pose.
 				 */
-				SensorPinHole(Gaussian & _pose);
+				SensorPinHole(const Gaussian & _pose);
 
 				/**
 				 * Constructor from mean pose.
 				 * \param _pose the pose 7-vector.
 				 */
-				SensorPinHole(const jblas::vec & _pose);
+				SensorPinHole(const jblas::vec7 & _pose);
 
 				/**
 				 * Construction from map and indirect array.

@@ -21,6 +21,7 @@
 namespace jafar {
 	namespace rtslam {
 
+		using namespace std;
 
 //		/**
 //		 * Local constructor.

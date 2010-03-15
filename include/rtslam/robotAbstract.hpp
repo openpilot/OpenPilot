@@ -80,6 +80,11 @@ namespace jafar {
 				 */
 				RobotAbstract(MapAbstract & _map, const jblas::ind_array & _iar, const size_t _size_control);
 
+				/**
+				 * Remote constructor from remote map and size of control vector.
+				 */
+				RobotAbstract(MapAbstract & _map, const size_t _size_state, const size_t _size_control);
+
 				// Mandatory virtual destructor.
 				virtual ~RobotAbstract(void) {
 				}

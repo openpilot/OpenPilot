@@ -102,6 +102,20 @@ namespace jafar {
 				SensorAbstract(MapAbstract & _map, const jblas::ind_array & _ias);
 
 				/**
+				 * Remote pose constructor.
+				 * Creates a sensor with the pose indexed in a map.
+				 * \param map the map
+				 */
+				SensorAbstract(MapAbstract & _map);
+
+				/**
+				 * Selectable LOCAL or REMOTE pose constructor.
+				 * Creates a sensor with the pose indexed in a map.
+				 * \param map the map
+				 */
+				SensorAbstract(RobotAbstract & _rob, bool inFilter);
+
+				/**
 				 * Mandatory virtual destructor.
 				 */
 				virtual ~SensorAbstract(void) {

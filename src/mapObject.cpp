@@ -12,9 +12,11 @@
  */
 
 #include "rtslam/mapObject.hpp"
+#include "jmath/indirectArray.hpp"
 
 namespace jafar {
 	namespace rtslam {
+
 
 		/**
 		 * Local constructor from size
@@ -23,13 +25,21 @@ namespace jafar {
 			state(_size) {
 		}
 
+
 		/**
 		 * Remote constructor from remote map and indirect array
-		 * \param _map the remote map
-		 * \param _iar the indirect array pointing to the remote storage
 		 */
 		MapObject::MapObject(MapAbstract & _map, const jblas::ind_array & _iar) :
 			map(&_map), state(_map.filter.x, _map.filter.P, _iar) {
+			categoryName_ = "OBJECT";
+		}
+
+
+		/**
+		 * Remote constructor from remote map and indirect array
+		 */
+		MapObject::MapObject(MapAbstract & _map, size_t _size) :
+			map(&_map), state(_map.filter.x, _map.filter.P, _map.reserveStates(_size)) {
 			categoryName_ = "OBJECT";
 		}
 

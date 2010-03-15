@@ -12,6 +12,7 @@
  */
 
 #include "rtslam/mapAbstract.hpp"
+#include "rtslam/robotAbstract.hpp"
 #include "jmath/indirectArray.hpp"
 
 using namespace std;
@@ -28,11 +29,13 @@ namespace jafar {
 			used_states.clear();
 		}
 
-//		/**
-//		 * Robot and landmark addition and removal
-//		 */
-//		void MapAbstract::addRobot(RobotAbstract * _robPtr) {
-//		}
+
+		/**
+		 * Robot and landmark addition and removal
+		 */
+		void MapAbstract::addRobot(RobotAbstract * _robPtr) {
+			robots[_robPtr->id()] = _robPtr;
+		}
 
 		jblas::ind_array MapAbstract::reserveStates(const std::size_t N) {
 			if (unusedStates(N)) {
@@ -58,7 +61,6 @@ namespace jafar {
 					current_size += 1;
 				}
 		}
-
 
 	}
 }

@@ -42,13 +42,18 @@ namespace jafar {
 //				 */
 //				Robot3DConstantVelocity(void);
 
-				/**
-				 * Remote constructor from remote map.
-				 * \param _map the remote map
-				 * \param _iar the indirect array pointing to the remote storage
-				 * \param _size_control the size of the control vector
-				 */
-				Robot3DConstantVelocity(MapAbstract & _map, jblas::ind_array & _iar);
+			/**
+			 * Remote constructor from remote map.
+			 * \param _map the remote map
+			 * \param _iar the indirect array pointing to the remote storage
+			 */
+			Robot3DConstantVelocity(MapAbstract & _map, jblas::ind_array & _iar);
+
+			/**
+			 * Remote constructor from remote map.
+			 * \param _map the remote map
+			 */
+			Robot3DConstantVelocity(MapAbstract & _map);
 
 				~Robot3DConstantVelocity(void) {
 				}

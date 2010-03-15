@@ -46,6 +46,24 @@ namespace jafar {
 			categoryName("SENSOR");
 		}
 
+		/*
+		 * Remote pose constructor.
+		 */
+		SensorAbstract::SensorAbstract(MapAbstract & _map) :
+			MapObject(_map, 7), pose(_map.filter.x, _map.filter.P, state.ia()) {
+			categoryName("SENSOR");
+		}
+
+		/*
+		 * Selectable LOCAL or REMOTE pose constructor.
+		 */
+		SensorAbstract::SensorAbstract(RobotAbstract & _rob, bool inFilter) :
+			MapObject(*_rob.map, 7),
+			pose(inFilter ? Gaussian((*_rob.map).filter.x, (*_rob.map).filter.P, state.ia()) : Gaussian(7))
+		{
+			categoryName("SENSOR");
+		}
+
 		void SensorAbstract::installToRobot(RobotAbstract & rob) {
 
 
@@ -75,22 +93,24 @@ namespace jafar {
 		}
 
 
-	/*
-	 * Get sensor pose in global frame.
-	 */
-			jblas::ind_array SensorAbstract::globalPoseInMap(jblas::vec7 & poseG, jblas::mat & PG_m) {
-				jblas::vec7 robotPose = robot->pose.x();
-				jblas::vec7 sensorPose = pose.x();
-				if (pose.storage() == pose.LOCAL){
-					// Sensor is no in the map. Jacobians and indices only wrt robot.
+		/*
+		 * Get sensor pose in global frame.
+		 */
+		jblas::ind_array SensorAbstract::globalPoseInMap(jblas::vec7 & poseG, jblas::mat & PG_m) {
+			jblas::vec7 robotPose = robot->pose.x();
+			jblas::vec7 sensorPose = pose.x();
+			if (pose.storage() == pose.LOCAL) {
+				// Sensor is no in the map. Jacobians and indices only wrt robot.
+				jblas::ind_array ia(robot->pose.ia());
 
-				}else{
-					// Sensor is in the map. Give composed Jacobian and indices.
-
-				}
-
+				return ia;
 			}
-
+			else {
+				// Sensor is in the map. Give composed Jacobian and indices.
+				jblas::ind_array ia(14);
+				return ia;
+			}
+		}
 
 	}
 }

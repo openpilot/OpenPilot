@@ -829,7 +829,6 @@ namespace jafar {
 				vec4 qg = subrange(G, 3, 7);
 				vec3 tl = subrange(L, 0, 3);
 				vec4 ql = subrange(L, 3, 7);
-				;
 				mat T_qg(3,4);
 				mat Q_qg(4,4);
 				C_g.clear();

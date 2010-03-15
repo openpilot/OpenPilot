@@ -52,6 +52,15 @@ namespace jafar {
 				MapObject(MapAbstract & _map, const jblas::ind_array & _iar);
 
 				/**
+				 * Remote constructor from remote map and indirect array
+				 * \param _map the remote map
+				 * \param _begin the first index pointing to the remote storage
+				 */
+				MapObject(MapAbstract & _map, size_t _size);
+
+
+
+				/**
 				 * Mandatory virtual destructor
 				 */
 				virtual ~MapObject() {

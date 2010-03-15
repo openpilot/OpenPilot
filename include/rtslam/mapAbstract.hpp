@@ -112,10 +112,11 @@ namespace jafar {
 				}
 
 
-//				/**
-//				 * Robot and landmark addition and removal
-//				 */
-//				void addRobot(RobotAbstract * _robPtr);
+				/**
+				 * Robot and landmark addition and removal
+				 */
+				void addRobot(RobotAbstract * _robPtr);
+
 
 				/**
 				 * Obtain free Map space of a given size.

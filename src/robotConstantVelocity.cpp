@@ -23,17 +23,18 @@ namespace jafar {
 
 		using namespace std;
 
-//		/**
-//		 * Local constructor.
-//		 */
-//		Robot3DConstantVelocity::Robot3DConstantVelocity(void) :
-//			RobotAbstract(Robot3DConstantVelocity::size(), Robot3DConstantVelocity::size_control()) {
-//			// Build constant perturbation Jacobian
-//			jblas::identity_mat I(3);
-//			ublas::subrange(F_u, 7, 10, 0, 3) = I;
-//			ublas::subrange(F_u, 10, 13, 3, 6) = I;
-//			type("Constant-Velocity");
-//		}
+
+		//		/**
+		//		 * Local constructor.
+		//		 */
+		//		Robot3DConstantVelocity::Robot3DConstantVelocity(void) :
+		//			RobotAbstract(Robot3DConstantVelocity::size(), Robot3DConstantVelocity::size_control()) {
+		//			// Build constant perturbation Jacobian
+		//			jblas::identity_mat I(3);
+		//			ublas::subrange(F_u, 7, 10, 0, 3) = I;
+		//			ublas::subrange(F_u, 10, 13, 3, 6) = I;
+		//			type("Constant-Velocity");
+		//		}
 
 		/**
 		 * Remote constructor from remote map and size of control vector
@@ -50,10 +51,26 @@ namespace jafar {
 			type("Constant-Velocity");
 		}
 
+
+		/**
+		 * Remote constructor from remote map.
+		 * \param _map the remote map
+		 */
+		Robot3DConstantVelocity::Robot3DConstantVelocity(MapAbstract & _map) :
+			RobotAbstract(_map, Robot3DConstantVelocity::size(), Robot3DConstantVelocity::size_control()) {
+			// Build constant perturbation Jacobian
+			jblas::identity_mat I(3);
+			F_u.clear();
+			ublas::subrange(F_u, 7, 10, 0, 3) = I;
+			ublas::subrange(F_u, 10, 13, 3, 6) = I;
+			type("Constant-Velocity");
+		}
+
 		void Robot3DConstantVelocity::move(void) {
 
 			using namespace jblas;
 			using namespace ublas;
+
 
 			/*
 			 * This motion model is defined by
@@ -89,11 +106,13 @@ namespace jafar {
 			splitState(p, q, v, w);
 			double dt = control.dt;
 
+
 			// Non-trivial Jacobian blocks
 			mat P_v(3, 3);
 			mat Q_wdt(4, 3);
 			mat Q_q(4, 4);
 			identity_mat I_3(3);
+
 
 			// predict each part of the state, give or build non-trivial Jacobians
 			p += v * dt;
@@ -105,11 +124,13 @@ namespace jafar {
 			// Compose state
 			composeState(p, q, v, w);
 
+
 			// Build transition Jacobian matrix F_r
 			F_r.assign(identity_mat(state.size()));
 			project(F_r, range(0, 3), range(7, 10)) = P_v;
 			project(F_r, range(3, 7), range(3, 7)) = Q_q;
 			project(F_r, range(3, 7), range(10, 13)) = Q_wdt * dt;
+
 
 			// Build control Jacobian matrix F_u
 			// NOTE: F_u is constant and it has been build in the constructor.

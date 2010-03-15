@@ -16,6 +16,7 @@
 
 // jafar debug include
 #include "kernel/jafarDebug.hpp"
+#include "kernel/jafarTestMacro.hpp"
 
 #include <iostream>
 #include "jmath/matlab.hpp"
@@ -23,6 +24,7 @@
 
 #include "jmath/jblas.hpp"
 #include "jmath/indirectArray.hpp"
+#include "jmath/misc.hpp"
 
 #include "rtslam/quatTools.hpp"
 
@@ -164,9 +166,46 @@ void test_rtslam02(void) {
 
 }
 
+void test_rtslam03(void) {
+
+	size_t size_map = 300;
+
+	MapAbstract map(size_map);
+	cout << "Current map size: " << map.current_size << endl;
+
+	cout << "\n MAP OBJECT \n%==========" << endl;
+	MapObject O(map, 3);
+	O.id(1);
+	cout << O << endl;
+	cout << "Current map size: " << map.current_size << endl;
+
+	cout << "\n ROBOTS \n%==========" << endl;
+	// Add 2 robots
+	std::size_t N = Robot3DConstantVelocity::size();
+	for (size_t i = 0; i < 2; i++) {
+		//		jblas::ind_array ia = map.reserveStates(N);
+		if (map.unusedStates(N)) {
+			Robot3DConstantVelocity * robPtr = new Robot3DConstantVelocity(map);
+			std::stringstream name;
+			robPtr->name("PLANE " + jafar::jmath::intToStr(i + 1));
+		}
+		cout << "Current map size: " << map.current_size << endl;
+	}
+
+
+	// Print all robots
+	// TODO: find the way of using iterators !
+	for (size_t i = 1; i <= map.robots.size(); i++) {
+		cout << "\nAbout to print robot # " << i << endl;
+		cout << *map.robots[i] << endl << endl;
+	}
+
+}
+
 BOOST_AUTO_TEST_CASE( test_rtslam )
 {
 	//	test_rtslam01();
-	test_rtslam02();
+	//	test_rtslam02();
+	test_rtslam03();
 }
 

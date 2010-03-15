@@ -37,6 +37,14 @@ static inline T min(const T a, const T b, const T c) { return min(min(a,b),c); }
 template <typename T>
 static inline T sign(const T x) { return (x < 0 ? -1 : +1); }
 
+std::string intToStr(int i) {
+	std::ostringstream name;
+	name << "" << i;
+	return name.str();
+}
+
+
+
 }
 }
 

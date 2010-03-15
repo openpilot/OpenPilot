@@ -6,7 +6,7 @@
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
  * @brief      
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup   uavobjects_plugin
  * @{
  * 
  *****************************************************************************/

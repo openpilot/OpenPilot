@@ -18,6 +18,11 @@ plugin_coreplugin.subdir = coreplugin
 plugin_welcome.subdir = welcome
 plugin_welcome.depends = plugin_coreplugin
 
+# RawHID plug-in
+SUBDIRS += plugin_rawhid
+plugin_rawhid.subdir = rawhid
+plugin_rawhid.depends = plugin_coreplugin
+
 # UAVObjects plug-in
 SUBDIRS += plugin_uavobjects
 plugin_uavobjects.subdir = uavobjects

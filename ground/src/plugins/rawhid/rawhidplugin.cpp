@@ -1,12 +1,12 @@
 /**
  ******************************************************************************
  *
- * @file       uavdataobject.h
+ * @file       rawhidplugin.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
  * @brief      
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   uavobjects_plugin
+ * @defgroup   welcomeplugin
  * @{
  * 
  *****************************************************************************/
@@ -25,31 +25,35 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef UAVDATAOBJECT_H
-#define UAVDATAOBJECT_H
 
-#include "uavobjects_global.h"
-#include "uavobject.h"
-#include "uavobjectfield.h"
-#include "uavmetaobject.h"
-#include <QList>
+#include "rawhidplugin.h"
 
-class UAVOBJECTS_EXPORT UAVDataObject: public UAVObject
+#include <extensionsystem/pluginmanager.h>
+
+#include <QtCore/QtPlugin>
+
+RawHIDPlugin::RawHIDPlugin()
 {
-    Q_OBJECT
 
-public:
-    UAVDataObject(quint32 objID, bool isSingleInst, const QString& name);
-    void initialize(quint32 instID, UAVMetaObject* mobj);
-    void initialize(UAVMetaObject* mobj);
-    void setMetadata(const Metadata& mdata);
-    Metadata getMetadata();
-    UAVMetaObject* getMetaObject();
-    virtual UAVDataObject* clone(quint32 instID = 0) = 0;
+}
 
-private:
-    UAVMetaObject* mobj;
+RawHIDPlugin::~RawHIDPlugin()
+{
 
-};
+}
 
-#endif // UAVDATAOBJECT_H
+void RawHIDPlugin::extensionsInitialized()
+{
+
+}
+
+bool RawHIDPlugin::initialize(const QStringList & arguments, QString * errorString)
+{
+    Q_UNUSED(arguments);
+    Q_UNUSED(errorString);
+
+    return true;
+}
+
+
+Q_EXPORT_PLUGIN(RawHIDPlugin)

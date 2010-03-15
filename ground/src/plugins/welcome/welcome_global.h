@@ -37,4 +37,4 @@
 #  define WELCOME_EXPORT Q_DECL_IMPORT
 #endif
 
-#endif // CPPEDITOR_GLOBAL_H
+#endif // WELCOME_GLOBAL_H

@@ -6,7 +6,7 @@
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
  * @brief      
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup   uavobjects_plugin
  * @{
  * 
  *****************************************************************************/
@@ -28,6 +28,7 @@
 #ifndef UAVOBJECTMANAGER_H
 #define UAVOBJECTMANAGER_H
 
+#include "uavobjects_global.h"
 #include "uavobject.h"
 #include "uavdataobject.h"
 #include "uavmetaobject.h"
@@ -35,7 +36,7 @@
 #include <QMutex>
 #include <QMutexLocker>
 
-class UAVObjectManager: public QObject
+class UAVOBJECTS_EXPORT UAVObjectManager: public QObject
 {
     Q_OBJECT
 

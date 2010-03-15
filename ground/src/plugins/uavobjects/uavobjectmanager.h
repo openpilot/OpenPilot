@@ -33,6 +33,7 @@
 #include "uavmetaobject.h"
 #include <QList>
 #include <QMutex>
+#include <QMutexLocker>
 
 class UAVObjectManager: public QObject
 {
@@ -41,9 +42,7 @@ class UAVObjectManager: public QObject
 public:
     UAVObjectManager();
 
-    bool registerObject(UAVObject* obj);
-    UAVDataObject* newObjectInstance(QString& name, quint32 instId = 0);
-    UAVDataObject* newObjectInstance(quint32 objId, quint32 instId = 0);
+    bool registerObject(UAVDataObject* obj);
     QList< QList<UAVObject*> > getObjects();
     QList< QList<UAVDataObject*> > getDataObjects();
     QList< QList<UAVMetaObject*> > getMetaObjects();
@@ -56,12 +55,15 @@ public:
 
 signals:
     void newObject(UAVObject* obj);
+    void newInstance(UAVObject* obj);
 
 private:
+    static const quint32 MAX_INSTANCES = 1000;
+
     QList< QList<UAVObject*> > objects;
     QMutex* mutex;
 
-    UAVDataObject* newObjectInstance(QString* name, quint32 objId, quint32 instId);
+    void addObject(UAVObject* obj);
     UAVObject* getObject(QString* name, quint32 objId, quint32 instId);
     QList<UAVObject*> getObjectInstances(QString* name, quint32 objId);
     qint32 getNumInstances(QString* name, quint32 objId);

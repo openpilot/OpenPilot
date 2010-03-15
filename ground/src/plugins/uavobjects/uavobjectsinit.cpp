@@ -27,6 +27,10 @@
  */
 #include "uavobjectsinit.h"
 
+/**
+ * Static function used to initialize the first instance of each object.
+ * For each object class an entry should be made here.
+ */
 void UAVObjectsInitialize(UAVObjectManager* objMngr)
 {
     //objMngr->registerObject( new TestObject() );

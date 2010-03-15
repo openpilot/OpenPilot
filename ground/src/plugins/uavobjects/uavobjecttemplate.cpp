@@ -25,36 +25,52 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include "uavobjecttemplate.h"
+#include "$(NAMELC).h"
 
-$(NAME)::$(NAME)(): UAVDataObject(OBJID, 0, SINGLEINST, NAME, NUMBYTES)
+const QString $(NAME)::NAME = QString("$(NAME)");
+
+$(NAME)::$(NAME)(): UAVDataObject(OBJID, SINGLEINST, NAME)
 {
     // Create fields
     QList<UAVObjectField*> fields;
 
     $(FIELDS)
-    // fields.append(new UAVObjectField($(FIELD_NAME), $(FIELD_UNITS), $(FIELD_TYPE), $(FIELD_NUMELEM));
-
-    // Create metadata
-    UAVObject::Metadata metadata;
-    metadata.ackRequired = $(ACK);
-    metadata.gcsTelemetryUpdateMode = $(GCSTELEM_UPDATEMODE);
-    metadata.gcsTelemetryUpdatePeriod = $(GCSTELEM_UPDATEPERIOD);
-    metadata.flightTelemetryUpdateMode = $(FLIGHTTELEM_UPDATEMODE);
-    metadata.flightTelemetryUpdatePeriod = $(FLIGHTTELEM_UPDATEPERIOD);
-    metadata.loggingUpdateMode = $(LOGGING_UPDATEMODE);
-    metadata.loggingUpdatePeriod = $(LOGGING_UPDATEPERIOD);
+    // fields.append(new UAVObjectField(QString("$(FIELD_NAME)"), QString("$(FIELD_UNITS)", UAVObjectField::$(FIELD_TYPE), $(FIELD_NUMELEM));
 
     // Initialize object
-    initialize(fields, metadata);
+    initializeFields(fields, (quint8*)&data, NUMBYTES);
 }
 
-$(NAME)Data $(NAME)::getData()
+UAVObject::Metadata $(NAME)::getDefaultMetadata()
 {
+    UAVObject::Metadata metadata;
+    metadata.ackRequired = $(ACK);
+    metadata.gcsTelemetryUpdateMode = UAVObject::$(GCSTELEM_UPDATEMODE);
+    metadata.gcsTelemetryUpdatePeriod = $(GCSTELEM_UPDATEPERIOD);
+    metadata.flightTelemetryUpdateMode = UAVObject::$(FLIGHTTELEM_UPDATEMODE);
+    metadata.flightTelemetryUpdatePeriod = $(FLIGHTTELEM_UPDATEPERIOD);
+    metadata.loggingUpdateMode = UAVObject::$(LOGGING_UPDATEMODE);
+    metadata.loggingUpdatePeriod = $(LOGGING_UPDATEPERIOD);
+	return metadata;
+}
+
+$(NAME)::DataFields $(NAME)::getData()
+{
+	QMutexLocker locker(mutex);
     return data;
 }
 
-void $(NAME)::setData($(NAME)Data& data)
+void $(NAME)::setData(DataFields& data)
 {
+	QMutexLocker locker(mutex);
     this->data = data;
+    emit objectUpdatedAuto(this); // trigger object updated event
+    emit objectUpdated(this);
+}
+
+UAVDataObject* $(NAME)::clone(quint32 instID)
+{
+    $(NAME)* obj = new $(NAME)();
+    obj->initialize(instID, this->getMetaObject());
+    return obj;
 }

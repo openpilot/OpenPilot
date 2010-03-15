@@ -28,7 +28,7 @@
 #include "uavobjectfield.h"
 #include <QtEndian>
 
-UAVObjectField::UAVObjectField(QString& name, QString& units, FieldType type, quint32 numElements)
+UAVObjectField::UAVObjectField(const QString& name, const QString& units, FieldType type, quint32 numElements)
 {
     // Copy params
     this->name = name;
@@ -101,6 +101,65 @@ quint32 UAVObjectField::getNumElements()
     return numElements;
 }
 
+qint32 UAVObjectField::pack(quint8* dataOut)
+{
+    QMutexLocker locker(obj->getMutex());
+    // Pack each element in output buffer
+    for (quint32 index = 0; index < numElements; ++index)
+    {
+        switch (type) {
+        case FIELDTYPE_CHAR:
+        case FIELDTYPE_INT8:
+            dataOut[numBytesPerElement*index] = data[offset + numBytesPerElement*index];
+            break;
+        case FIELDTYPE_INT16:
+            qint16 value16;
+            memcpy(&value16, &data[offset + numBytesPerElement*index], 2);
+            qToBigEndian<qint16>(value16, &dataOut[numBytesPerElement*index]);
+            break;
+        case FIELDTYPE_INT32:
+        case FIELDTYPE_FLOAT32:
+            qint32 value32;
+            memcpy(&value32, &data[offset + numBytesPerElement*index], 4);
+            qToBigEndian<qint32>(value32, &dataOut[numBytesPerElement*index]);
+            break;
+        default:
+            return 0;
+        }
+    }
+    // Done
+    return getNumBytes();
+}
+
+qint32 UAVObjectField::unpack(const quint8* dataIn)
+{
+    QMutexLocker locker(obj->getMutex());
+    // Pack each element in output buffer
+    for (quint32 index = 0; index < numElements; ++index)
+    {
+        switch (type) {
+        case FIELDTYPE_CHAR:
+        case FIELDTYPE_INT8:
+            data[offset + numBytesPerElement*index] = dataIn[numBytesPerElement*index];
+            break;
+        case FIELDTYPE_INT16:
+            qint16 value16;
+            value16 = qFromBigEndian<qint16>(&dataIn[numBytesPerElement*index]);
+            memcpy(&data[offset + numBytesPerElement*index], &value16, 2);
+            break;
+        case FIELDTYPE_INT32:
+        case FIELDTYPE_FLOAT32:
+            qint32 value32;
+            value32 = qFromBigEndian<qint32>(&dataIn[numBytesPerElement*index]);
+            memcpy(&data[offset + numBytesPerElement*index], &value32, 4);
+            break;
+        default:
+            return 0;
+        }
+    }
+    // Done
+    return getNumBytes();
+}
 
 double UAVObjectField::getValue(quint32 index)
 {
@@ -120,19 +179,17 @@ double UAVObjectField::getValue(quint32 index)
             break;
         case FIELDTYPE_INT16:
             qint16 value16;
-            value16 = (qint16)qFromBigEndian<qint16>(&data[offset + numBytesPerElement*index]);
+            memcpy(&value16, &data[offset + numBytesPerElement*index], 2);
             ret = (double)value16;
             break;
         case FIELDTYPE_INT32:
             qint32 value32;
-            value32 = (qint32)qFromBigEndian<qint32>(&data[offset + numBytesPerElement*index]);
+            memcpy(&value32, &data[offset + numBytesPerElement*index], 4);
             ret = (double)value32;
             break;
         case FIELDTYPE_FLOAT32:
-            qint32 tmp;
             float valuef;
-            tmp = (qint32)qFromBigEndian<qint32>(&data[offset + numBytesPerElement*index]);
-            memcpy(&valuef, &tmp, 4);
+            memcpy(&valuef, &data[offset + numBytesPerElement*index], 4);
             ret = (double)valuef;
             break;
         default:
@@ -155,15 +212,19 @@ void UAVObjectField::setValue(double value, quint32 index)
             data[offset + numBytesPerElement*index] = (qint8)value;
             break;
         case FIELDTYPE_INT16:
-            qToBigEndian<qint16>((qint16)value, &data[offset + numBytesPerElement*index]);
+            qint16 value16;
+            value16 = (qint16)value;
+            memcpy(&data[offset + numBytesPerElement*index], &value16, 2);
             break;
         case FIELDTYPE_INT32:
-            qToBigEndian<qint32>((qint32)value, &data[offset + numBytesPerElement*index]);
+            qint32 value32;
+            value32 = (qint32)value;
+            memcpy(&data[offset + numBytesPerElement*index], &value32, 4);
             break;
         case FIELDTYPE_FLOAT32:
-            qint32 tmp;
-            memcpy(&tmp, &value, 4);
-            qToBigEndian<qint32>((qint32)tmp, &data[offset + numBytesPerElement*index]);
+            float valuef;
+            valuef = (float)value;
+            memcpy(&data[offset + numBytesPerElement*index], &valuef, 4);
             break;            
         }
     }
@@ -226,5 +287,18 @@ quint32 UAVObjectField::getNumBytesElement()
 {
     return numBytesPerElement;
 }
+
+QString UAVObjectField::toString()
+{
+    QString sout;
+    sout.append ( QString("%1: [ ").arg(name) );
+    for (unsigned int n = 0; n < numElements; ++n)
+    {
+        sout.append( QString("%1 ").arg(getValue(n)) );
+    }
+    sout.append( QString("] %1\n").arg(units) );
+    return sout;
+}
+
 
 

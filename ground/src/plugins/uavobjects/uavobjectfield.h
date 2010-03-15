@@ -30,6 +30,8 @@
 
 #include "uavobject.h"
 
+class UAVObject;
+
 class UAVObjectField: public QObject
 {
     Q_OBJECT
@@ -46,13 +48,15 @@ public:
             FIELDTYPE_CHAR
     } FieldType;
 
-    UAVObjectField(QString& name, QString& units, FieldType type, quint32 numElements);
+    UAVObjectField(const QString& name, const QString& units, FieldType type, quint32 numElements);
     void initialize(quint8* data, quint32 dataOffset, UAVObject* obj);
     UAVObject* getObject();
     QString getName();
     QString getUnits();
     FieldType getType();
     quint32 getNumElements();
+    qint32 pack(quint8* dataOut);
+    qint32 unpack(const quint8* dataIn);
     double getValue();
     void setValue(double value);
     double getValue(quint32 index);
@@ -62,6 +66,7 @@ public:
     quint32 getDataOffset();
     quint32 getNumBytes();
     quint32 getNumBytesElement();
+    QString toString();
 
 signals:
     void fieldUpdated(UAVObjectField* field);

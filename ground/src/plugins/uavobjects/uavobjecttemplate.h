@@ -30,25 +30,27 @@
 
 #include "uavdataobject.h"
 
-class $(NAME): UAVDataObject
+class $(NAME): public UAVDataObject
 {
-public:     
-    static const quint32 OBJID = $(OBJID);
-    static const QString NAME = QString($(NAME));
-    static const bool SINGLEINST = $(SINGLEINST);
-    static const quint32 NUMBYTES = sizeof($(NAME)Data);
-
+public:   
     typedef struct {
             $(DATAFIELDS)
-    } __attribute__((packed)) $(NAME)Data;
+    } __attribute__((packed)) DataFields;
+  
+    static const quint32 OBJID = $(OBJID);
+    static const QString NAME;
+    static const bool SINGLEINST = $(SINGLEINST);
+    static const quint32 NUMBYTES = sizeof(DataFields);
 
     $(NAME)();
 
-    $(NAME)Data getData();
-    void setData($(NAME)Data& data);
-
+    DataFields getData();
+    void setData(DataFields& data);
+    Metadata getDefaultMetadata();
+    UAVDataObject* clone(quint32 instID);
+	
 private:
-    $(NAME)Data data;
+    DataFields data;
 
 };
 

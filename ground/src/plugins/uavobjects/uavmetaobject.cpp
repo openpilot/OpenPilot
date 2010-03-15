@@ -27,11 +27,14 @@
  */
 #include "uavmetaobject.h"
 
-UAVMetaObject::UAVMetaObject(quint32 objID, QString& name, Metadata& mdata, UAVObject* parent):
-        UAVObject(objID, 0, true, name, sizeof(Metadata))
+/**
+ * Constructor
+ */
+UAVMetaObject::UAVMetaObject(quint32 objID, const QString& name, UAVObject* parent):
+        UAVObject(objID, true, name)
 {
-    this->parentMetadata = mdata;
     this->parent = parent;
+    // Setup default metadata of metaobject (can not be changed)
     ownMetadata.ackRequired = 1;
     ownMetadata.flightTelemetryUpdateMode = UPDATEMODE_ONCHANGE;
     ownMetadata.flightTelemetryUpdatePeriod = 0;
@@ -39,47 +42,73 @@ UAVMetaObject::UAVMetaObject(quint32 objID, QString& name, Metadata& mdata, UAVO
     ownMetadata.gcsTelemetryUpdatePeriod = 0;
     ownMetadata.loggingUpdateMode = UPDATEMODE_ONCHANGE;
     ownMetadata.loggingUpdatePeriod = 0;
+    // Setup fields
+    QList<UAVObjectField*> fields;
+    fields.append(new UAVObjectField(QString("AckRequired"), QString(""), UAVObjectField::FIELDTYPE_INT8, 1));
+    fields.append(new UAVObjectField(QString("FlightTelemetryUpdateMode"), QString(""), UAVObjectField::FIELDTYPE_INT8, 1));
+    fields.append(new UAVObjectField(QString("FlightTelemetryUpdatePeriod"), QString("ms"), UAVObjectField::FIELDTYPE_INT32, 1));
+    fields.append(new UAVObjectField(QString("GCSTelemetryUpdateMode"), QString(""), UAVObjectField::FIELDTYPE_INT8, 1));
+    fields.append(new UAVObjectField(QString("GCSTelemetryUpdatePeriod"), QString("ms"), UAVObjectField::FIELDTYPE_INT32, 1));
+    fields.append(new UAVObjectField(QString("LoggingUpdateMode"), QString(""), UAVObjectField::FIELDTYPE_INT8, 1));
+    fields.append(new UAVObjectField(QString("LoggingUpdatePeriod"), QString("ms"), UAVObjectField::FIELDTYPE_INT32, 1));
+    // Initialize parent
+    UAVObject::initialize(0);
+    UAVObject::initializeFields(fields, (quint8*)&parentMetadata, sizeof(Metadata));
+    // Setup metadata of parent
+    parentMetadata = parent->getDefaultMetadata();
 }
 
+/**
+ * Get the parent object
+ */
 UAVObject* UAVMetaObject::getParentObject()
 {
     return parent;
 }
 
-qint32 UAVMetaObject::pack(quint8* dataOut)
-{
-    QMutexLocker locker(mutex);
-    memcpy(dataOut, &parentMetadata, sizeof(Metadata));
-    return sizeof(Metadata);
-}
-
-qint32 UAVMetaObject::unpack(const quint8* dataIn)
-{
-    QMutexLocker locker(mutex);
-    memcpy(&parentMetadata, dataIn, sizeof(Metadata));
-    emit objectUpdated(this, true); // trigger object updated event
-    return sizeof(Metadata);
-}
-
+/**
+ * Set the metadata of the metaobject, this function will
+ * do nothing since metaobjects have read-only metadata.
+ */
 void UAVMetaObject::setMetadata(const Metadata& mdata)
 {
     return; // can not update metaobject's metadata
 }
 
+/**
+ * Get the metadata of the metaobject
+ */
 UAVObject::Metadata UAVMetaObject::getMetadata()
 {
     return ownMetadata;
 }
 
+/**
+ * Get the default metadata
+ */
+UAVObject::Metadata UAVMetaObject::getDefaultMetadata()
+{
+    return ownMetadata;
+}
+
+/**
+ * Set the metadata held by the metaobject
+ */
 void UAVMetaObject::setData(const Metadata& mdata)
 {
     QMutexLocker locker(mutex);
     parentMetadata = mdata;
-    emit objectUpdated(this, false); // trigger object updated event
+    emit objectUpdatedAuto(this); // trigger object updated event
+    emit objectUpdated(this);
 }
 
+/**
+ * Get the metadata held by the metaobject
+ */
 UAVObject::Metadata UAVMetaObject::getData()
 {
     QMutexLocker locker(mutex);
     return parentMetadata;
 }
+
+

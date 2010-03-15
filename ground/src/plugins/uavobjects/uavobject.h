@@ -33,6 +33,10 @@
 #include <QMutex>
 #include <QMutexLocker>
 #include <QString>
+#include <QList>
+#include "uavobjectfield.h"
+
+class UAVObjectField;
 
 class UAVObject: public QObject
 {
@@ -45,9 +49,9 @@ public:
      */
     typedef enum {
             UPDATEMODE_PERIODIC = 0, /** Automatically update object at periodic intervals */
-            UPDATEMODE_ONCHANGE, /** Only update object when its data changes */
-            UPDATEMODE_MANUAL,  /** Manually update object, by calling the updated() function */
-            UPDATEMODE_NEVER /** Object is never updated */
+            UPDATEMODE_ONCHANGE = 1, /** Only update object when its data changes */
+            UPDATEMODE_MANUAL = 2,  /** Manually update object, by calling the updated() function */
+            UPDATEMODE_NEVER = 3 /** Object is never updated */
     } UpdateMode;
 
     /**
@@ -56,35 +60,49 @@ public:
      */
     typedef struct {
             quint8 ackRequired; /** Defines if an ack is required for the transactions of this object (1:acked, 0:not acked) */
-            UpdateMode flightTelemetryUpdateMode; /** Update mode used by the autopilot */
+            quint8 flightTelemetryUpdateMode; /** Update mode used by the autopilot (UpdateMode) */
             qint32 flightTelemetryUpdatePeriod; /** Update period used by the autopilot (only if telemetry mode is PERIODIC) */
-            UpdateMode gcsTelemetryUpdateMode; /** Update mode used by the GCS */
+            quint8 gcsTelemetryUpdateMode; /** Update mode used by the GCS (UpdateMode) */
             qint32 gcsTelemetryUpdatePeriod; /** Update period used by the GCS (only if telemetry mode is PERIODIC) */
-            UpdateMode loggingUpdateMode; /** Update mode used by the logging module */
+            quint8 loggingUpdateMode; /** Update mode used by the logging module (UpdateMode) */
             qint32 loggingUpdatePeriod; /** Update period used by the logging module (only if logging mode is PERIODIC) */
-    } Metadata;
+    } __attribute__((packed)) Metadata;
 
 
-    UAVObject(quint32 objID, quint32 instID, bool isSingleInst, QString& name, quint32 numBytes);
+    UAVObject(quint32 objID, bool isSingleInst, const QString& name);
+    void initialize(quint32 instID);
     quint32 getObjID();
     quint32 getInstID();
     bool isSingleInstance();
     QString getName();
     quint32 getNumBytes(); 
-    virtual qint32 pack(quint8* dataOut) = 0;
-    virtual qint32 unpack(const quint8* dataIn) = 0;
+    virtual qint32 pack(quint8* dataOut);
+    virtual qint32 unpack(const quint8* dataIn);
     virtual void setMetadata(const Metadata& mdata) = 0;
     virtual Metadata getMetadata() = 0;
+    virtual Metadata getDefaultMetadata() = 0;
     void requestUpdate();
     void updated();
     void lock();
     void lock(int timeoutMs);
     void unlock();
     QMutex* getMutex();
+    qint32 getNumFields();
+    QList<UAVObjectField*> getFields();
+    UAVObjectField* getField(QString& name);
+    QString toString();
+    QString toStringBrief();
+    QString toStringData();
 
 signals:
-    void objectUpdated(UAVObject* obj, bool unpacked);
+    void objectUpdated(UAVObject* obj);
+    void objectUpdatedAuto(UAVObject* obj);
+    void objectUpdatedManual(UAVObject* obj);
+    void objectUnpacked(UAVObject* obj);
     void updateRequested(UAVObject* obj);
+
+private slots:
+    void fieldUpdated(UAVObjectField* field);
 
 protected:
     quint32 objID;
@@ -93,7 +111,10 @@ protected:
     QString name;
     quint32 numBytes;
     QMutex* mutex;
+    quint8* data;
+    QList<UAVObjectField*> fields;
 
+    void initializeFields(QList<UAVObjectField*>& fields, quint8* data, quint32 numBytes);
 };
 
 #endif // UAVOBJECT_H

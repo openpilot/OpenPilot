@@ -38,29 +38,16 @@ class UAVDataObject: public UAVObject
     Q_OBJECT
 
 public:
-    UAVDataObject(quint32 objID, quint32 instID, bool isSingleInst, QString& name, quint32 numBytes);
-    void initialize(QList<UAVObjectField*> fields, Metadata& mdata);
-    void initialize(QList<UAVObjectField*> fields, UAVMetaObject* mobj);
-
-    qint32 getNumFields();
-    QList<UAVObjectField*> getFields();
-    UAVObjectField* getField(QString& name);
-    qint32 pack(quint8* dataOut);
-    qint32 unpack(const quint8* dataIn);
+    UAVDataObject(quint32 objID, bool isSingleInst, const QString& name);
+    void initialize(quint32 instID, UAVMetaObject* mobj);
+    void initialize(UAVMetaObject* mobj);
     void setMetadata(const Metadata& mdata);
     Metadata getMetadata();
     UAVMetaObject* getMetaObject();
-
-private slots:
-    void fieldUpdated(UAVObjectField* field);
+    virtual UAVDataObject* clone(quint32 instID = 0) = 0;
 
 private:
-    quint8* data;
-    QList<UAVObjectField*> fields;
     UAVMetaObject* mobj;
-
-    void initialize(QList<UAVObjectField*> fields);
-
 
 };
 

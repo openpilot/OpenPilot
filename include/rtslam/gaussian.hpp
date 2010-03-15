@@ -15,20 +15,20 @@
 #define GAUSSIAN_HPP_
 
 #include <jmath/jblas.hpp>
-//#include "jmath/ublasExtra.hpp"
 #include "jmath/indirectArray.hpp"
 #include "rtslam/rtslamException.hpp"
 
 namespace jafar {
 	namespace rtslam {
 
+
 		/**
 		 * Class for Gaussians having LOCAL or REMOTE storage.
 		 * \author jsola
 		 *
 		 * This class defines a multi-dimensional Gaussian variable.
-		 * It allows mean and covariances data to be stored locally or remotelly, depending on the constructor.
-		 * The storage modality is selectable only at construction time.
+		 * It allows mean and covariances data to be stored locally or remotelly, depending on the constructor
+		 * (the storage modality is selectable only at construction time).
 		 * Remote Gaussians are indexed with indirect arrays.
 		 *
 		 * - Mean and covariances are accessed through \a x() and \a P().\n
@@ -68,6 +68,15 @@ namespace jafar {
 		 *
 		 * Having two remote Gaussian instances \a G1 and \a G2 pointing to the same data (Gaussian \a G or pair {\a x , \a P })
 		 * allows recovering their cross-variances matrix.
+		 *
+		 * You can recover a hard copy of the cross-variance block with
+		 * \code
+		 * mat c = project(P, G1.ia(), G2.ia());
+		 * \endcode
+		 * You can have an indirect access to the cross-variance block with
+		 * \code
+		 * sym_mat_indirect ic(P, G1.ia(), G2.ia());
+		 * \endcode
 		 *
 		 * This is a graphical representation of the situation, where we want to access the blocks of data \c ic and \c ic' (in purple):
 		 * 	\image html Gaussian.png "Two remote Gaussians G1 and G2 pointing to {\a x, \a P } via indirect arrays. The cross-variances \a ic and \a ic' are shown."
@@ -131,6 +140,7 @@ namespace jafar {
 
 			public:
 
+
 				// Getters
 
 				inline storage_t storage() {
@@ -141,7 +151,7 @@ namespace jafar {
 					return hasNullCov_;
 				}
 
-				inline size_t size() {
+				inline size_t size() const {
 					return size_;
 				}
 
@@ -157,6 +167,7 @@ namespace jafar {
 					return P_;
 				}
 
+
 				/*
 				 * Setters
 				 */
@@ -170,16 +181,11 @@ namespace jafar {
 					hasNullCov_ = _hasNullCov;
 				}
 
-				inline void size(const std::size_t & _size) {
-					size_ = _size;
-				}
-
-				inline void ia(const jblas::ind_array & _ia);
-
 				inline void x(const jblas::vec & _x) {
 					JFR_ASSERT(_x.size() == size_, "gaussian.hpp: set_x: size mismatch.");
 					x_.assign(_x);
 				}
+
 
 				/**
 				 * Set covariances matrix from standard deviations vector.
@@ -194,6 +200,7 @@ namespace jafar {
 					}
 				}
 
+
 				/**
 				 * Set covariances matrix from a covariances matrix.
 				 * \param _P the covariances matrix.
@@ -204,9 +211,10 @@ namespace jafar {
 					P_.assign(_P);
 				}
 
+
 				/**
 				 * Set off-diagonal block in the covariances matrix.
-				 * Only tested for local Gaussians.
+				 * Only works for local Gaussians.
 				 * \param M the off-diagonal block.
 				 * \param ia1 the indirect array for rows.
 				 * \param ia2 the indirect array for columns.
@@ -215,6 +223,7 @@ namespace jafar {
 					hasNullCov_ = false;
 					project(P_local, ia1, ia2) = M;
 				}
+
 
 				/**
 				 * Clear data, keep sizes and ranges.
@@ -225,14 +234,7 @@ namespace jafar {
 					P_.assign(jblas::zero_mat(size_, size_));
 				}
 
-				/*
-				 * Empty constructor.
-				 * TODO: Need to solve dynamic resize and re-indexing of indirect stuff (arrays, vectors and matrices), otherwise this constructor is useless.
-				 */
-				//				inline Gaussian() :
-				//					storage_(LOCAL), hasNullCov_(true), size_(0), x_local(0), P_local(0), ia_(0), x_(x_local, 0), P_(
-				//					    P_local, 0, 0) {
-				//				}
+
 
 				/**
 				 * Local constructor from size.
@@ -240,10 +242,11 @@ namespace jafar {
 				 * \param _size the size of the Gaussian.
 				 */
 				inline Gaussian(const size_t _size) :
-					storage_(LOCAL), hasNullCov_(false), size_(_size), x_local(size_), P_local(size_, size_), ia_(size_), x_(
-					    x_local, ia_.all()), P_(P_local, ia_.all(), ia_.all()) {
+					storage_(LOCAL), hasNullCov_(false), size_(_size), x_local(size_), P_local(size_, size_), ia_(size_),
+					    x_(x_local, ia_.all()), P_(P_local, ia_.all(), ia_.all()) {
 					clear();
 				}
+
 
 				/**
 				 * Smart copy constructor.
@@ -251,11 +254,12 @@ namespace jafar {
 				 * \param G the Gaussian to copy.
 				 */
 				inline Gaussian(const Gaussian & G) :
-					storage_(LOCAL), hasNullCov_(G.hasNullCov_), size_(G.size_), x_local(G.x_), P_local(G.P_), ia_(size_), x_(
-					    x_local, ia_.all()), P_(P_local, ia_.all(), ia_.all()) {
+					storage_(LOCAL), hasNullCov_(G.hasNullCov_), size_(G.size_), x_local(G.x_), P_local(G.P_), ia_(size_),
+					    x_(x_local, ia_.all()), P_(P_local, ia_.all(), ia_.all()) {
 					for (size_t i = 0; i < size_; i++)
 						ia_(i) = i;
 				}
+
 
 				/**
 				 * Local constructor from mean data, no covariance.
@@ -264,9 +268,10 @@ namespace jafar {
 				 * \param _x the Gaussian mean.
 				 */
 				inline Gaussian(const jblas::vec & _x) :
-					storage_(LOCAL), hasNullCov_(true), size_(_x.size()), x_local(_x), P_local(size_, size_), ia_(size_), x_(
-					    x_local, ia_.all()), P_(P_local, ia_.all(), ia_.all()) {
+					storage_(LOCAL), hasNullCov_(true), size_(_x.size()), x_local(_x), P_local(size_, size_), ia_(size_),
+					    x_(x_local, ia_.all()), P_(P_local, ia_.all(), ia_.all()) {
 				}
+
 
 				/**
 				 * Local constructor from full data.
@@ -277,8 +282,10 @@ namespace jafar {
 				 */
 				inline Gaussian(const jblas::vec& _x, const jblas::sym_mat& _P) :
 					storage_(LOCAL), hasNullCov_(false), size_(_x.size()), x_local(_x), P_local(_P), ia_(size_), x_(x_local,
-					    ia_.all()), P_(P_local, ia_.all(), ia_.all()) {
+					                                                                                                ia_.all()),
+					    P_(P_local, ia_.all(), ia_.all()) {
 				}
+
 
 				/**
 				 * Remote constructor from LOCAL Gaussian.
@@ -296,6 +303,7 @@ namespace jafar {
 					    x_(G.x_local, ia_), P_(G.P_local, ia_, ia_) {
 				}
 
+
 				/**
 				 * Remote constructor from data.
 				 * This constructor uses indirect indexing onto a remote pair {_x, _P} provided to the constructor.
@@ -307,10 +315,17 @@ namespace jafar {
 				 * \param _ia the indirect array.
 				 */
 				inline Gaussian(jblas::vec & _x, jblas::sym_mat & _P, const jblas::ind_array& _ia) :
-					storage_(REMOTE), hasNullCov_(false), size_(_ia.size()), x_local(0), P_local(0), ia_(_ia), x_(_x, ia_), P_(
-					    _P, ia_, ia_) {
+					storage_(REMOTE), hasNullCov_(false), size_(_ia.size()), x_local(0), P_local(0), ia_(_ia), x_(_x, ia_),
+					    P_(_P, ia_, ia_) {
 					//			JFR_ASSERT((_x.size() == _ia.size()) && (_x.size() == _P.size1()), "gaussian.hpp: Gaussian(): sizes mismatch.");
 				}
+
+
+				/**
+				 * Probability density.
+				 * \param v the evaluation point
+				 */
+				double probabilityDensity(const jblas::vec& v) const;
 
 				/**
 				 * Operator << for class Gaussian.
@@ -322,19 +337,15 @@ namespace jafar {
 
 					if (g_.storage() == LOCAL) {
 						if (g_.hasNullCov()) {
-							s << "Gaussian with local storage and null covariance: \n";
-							s << " .x : " << g_.x_ << "\n";
+							s << "\n .x : " << g_.x_ << "\n";
 						}
-						else { // No covariance
-							s << "Gaussian with local storage: \n";
-							s << " .x : " << g_.x_ << "\n";
+						else { // Null covariance
+							s << "\n .x : " << g_.x_ << "\n";
 							s << " .P : " << g_.P_;
 						}
 					}
-					else {
-						size_t sz = g_.x_.data().size();
-						s << "Gaussian with remote storage: \n";
-						s << " .rm->[" << sz << "](...data not shown...)\n";
+					else { // REMOTE
+						s << "\n REM->[" << g_.x_.data().size() << "](...)\n";
 						s << " .ia: " << g_.ia_ << "\n";
 						s << " .x : " << g_.x_ << "\n";
 						s << " .P : " << g_.P_;
@@ -342,6 +353,23 @@ namespace jafar {
 					return s;
 				}
 
+				// THIS MATERIAL ELIMINATED:
+				//				/*
+				//				 * Empty constructor.
+				//				 * TODO: Need to solve dynamic resize and re-indexing of indirect stuff (arrays, vectors and matrices), otherwise this constructor is useless.
+				//				 */
+				//				inline Gaussian() :
+				//					storage_(LOCAL), hasNullCov_(true), size_(0), x_local(0), P_local(0), ia_(0), x_(x_local, 0), P_(
+				//					    P_local, 0, 0) {
+				//				}
+
+				//        // TODO: Need to solve resizing and redirection of indirect stuff
+				//				inline void size(const std::size_t & _size) {
+				//					size_ = _size;
+				//				}
+
+				//        // TODO: Need to solve resizing and redirection of indirect stuff
+				//				inline void ia(const jblas::ind_array & _ia);
 		};
 
 	}

@@ -28,15 +28,15 @@
 #ifndef UAVTALKPLUGIN_H
 #define UAVTALKPLUGIN_H
 
-
 #include <extensionsystem/iplugin.h>
+#include <extensionsystem/pluginmanager.h>
 #include <QtPlugin>
+#include "telemetry.h"
+#include "uavtalk.h"
+#include "uavobjects/uavobjectmanager.h"
 
-class UAVTalkPlugin:
-        public ExtensionSystem::IPlugin
+class UAVTalkPlugin: public ExtensionSystem::IPlugin
 {
-    Q_OBJECT
-
 public:
     UAVTalkPlugin();
     ~UAVTalkPlugin();
@@ -44,6 +44,11 @@ public:
     void extensionsInitialized();
     bool initialize(const QStringList & arguments, QString * errorString);
     void shutdown();
+
+private:
+    UAVObjectManager* objMngr;
+    UAVTalk* utalk;
+    Telemetry* telemetry;
 };
 
 #endif // UAVTALKPLUGIN_H

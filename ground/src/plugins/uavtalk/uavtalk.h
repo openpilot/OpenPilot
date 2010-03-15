@@ -41,8 +41,8 @@ class UAVTalk: public QObject
 public:
     UAVTalk(QIODevice* iodev, UAVObjectManager* objMngr);
 
-    qint32 sendObject(UAVObject* obj, bool acked, qint32 timeoutMs);
-    qint32 sendObjectRequest(UAVObject* obj, qint32 timeout, bool allInstances);
+    bool sendObject(UAVObject* obj, bool acked, qint32 timeoutMs, bool allInstances);
+    bool sendObjectRequest(UAVObject* obj, qint32 timeout, bool allInstances);
 
 signals:
     void transactionCompleted(UAVObject* obj);

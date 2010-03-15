@@ -25,7 +25,6 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 #include "uavtalkplugin.h"
 
 UAVTalkPlugin::UAVTalkPlugin()
@@ -40,14 +39,24 @@ UAVTalkPlugin::~UAVTalkPlugin()
 
 void UAVTalkPlugin::extensionsInitialized()
 {
+    // Get UAVObjectManager instance
+    ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
+    objMngr = pm->getObject<UAVObjectManager>();
 
+    // TODO: Initialize serial port and USB libraries, get QIODevice from each
+
+    // TODO: Initialize UAVTalk object
+    //utalk = new UAVTalk(io, objMngr);
+
+    // TODO: Initialize telemetry object
+    //telemetry = new Telemetry(utalk, objMngr);
 }
 
 bool UAVTalkPlugin::initialize(const QStringList & arguments, QString * errorString)
 {
+    // Done
     Q_UNUSED(arguments);
     Q_UNUSED(errorString);
-
     return true;
 }
 

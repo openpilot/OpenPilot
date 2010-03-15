@@ -28,6 +28,9 @@
 #include "uavtalk.h"
 #include <QtEndian>
 
+/**
+ * Constructor
+ */
 UAVTalk::UAVTalk(QIODevice* iodev, UAVObjectManager* objMngr)
 {
     io = iodev;
@@ -39,6 +42,9 @@ UAVTalk::UAVTalk(QIODevice* iodev, UAVObjectManager* objMngr)
     connect(io, SIGNAL(readyRead()), this, SLOT(processInputStream()));
 }
 
+/**
+ * Called each time there are data in the input buffer
+ */
 void UAVTalk::processInputStream()
 {
     quint8 tmp;
@@ -56,9 +62,9 @@ void UAVTalk::processInputStream()
  * \param[in] obj Object to update
  * \param[in] timeout Time to wait for the response, when zero it will return immediately
  * \param[in] allInstances If set true then all instances will be updated
- * \return Success (0), Failure (-1)
+ * \return Success (true), Failure (false)
  */
-qint32 UAVTalk::sendObjectRequest(UAVObject* obj, qint32 timeout, bool allInstances)
+bool UAVTalk::sendObjectRequest(UAVObject* obj, qint32 timeout, bool allInstances)
 {
     return objectTransaction(obj, TYPE_OBJ_REQ, timeout, allInstances);
 }
@@ -69,18 +75,17 @@ qint32 UAVTalk::sendObjectRequest(UAVObject* obj, qint32 timeout, bool allInstan
  * \param[in] acked Selects if an ack is required
  * \param[in] timeoutMs Time to wait for the ack, when zero it will return immediately
  * \param[in] allInstances If set true then all instances will be updated
- * \return 0 Success
- * \return -1 Failure
+ * \return Success (true), Failure (false)
  */
-qint32 UAVTalk::sendObject(UAVObject* obj, bool acked, qint32 timeoutMs)
+bool UAVTalk::sendObject(UAVObject* obj, bool acked, qint32 timeoutMs, bool allInstances)
 {
     if (acked)
     {
-        return objectTransaction(obj, TYPE_OBJ_ACK, timeoutMs, false);
+        return objectTransaction(obj, TYPE_OBJ_ACK, timeoutMs, allInstances);
     }
     else
     {
-        return objectTransaction(obj, TYPE_OBJ, timeoutMs, false);
+        return objectTransaction(obj, TYPE_OBJ, timeoutMs, allInstances);
     }
 }
 
@@ -278,7 +283,14 @@ bool UAVTalk::receiveObject(quint8 type, quint32 objId, quint16 instId, quint8* 
             // Get object and update its data
             obj = updateObject(objId, instId, data);
             // Check if an ack is pending
-            updateAck(obj);
+            if ( obj != NULL )
+            {
+                updateAck(obj);
+            }
+            else
+            {
+                error = true;
+            }
         }
         else
         {
@@ -292,7 +304,14 @@ bool UAVTalk::receiveObject(quint8 type, quint32 objId, quint16 instId, quint8* 
             // Get object and update its data
             obj = updateObject(objId, instId, data);
             // Transmit ACK
-            transmitObject(obj, TYPE_ACK, false);
+            if ( obj != NULL )
+            {
+               transmitObject(obj, TYPE_ACK, false);
+            }
+            else
+            {
+                error = true;
+            }
         }
         else
         {
@@ -343,7 +362,11 @@ bool UAVTalk::receiveObject(quint8 type, quint32 objId, quint16 instId, quint8* 
     return !error;
 }
 
-
+/**
+ * Update the data of an object from a byte array (unpack).
+ * If the object instance could not be found in the list, then a
+ * new one is created.
+ */
 UAVObject* UAVTalk::updateObject(quint32 objId, quint16 instId, quint8* data)
 {
     // Get object
@@ -351,13 +374,38 @@ UAVObject* UAVTalk::updateObject(quint32 objId, quint16 instId, quint8* data)
     // If the instance does not exist create it
     if (obj == NULL)
     {
-        obj = objMngr->newObjectInstance(objId, instId);
+        // Get the object type
+        UAVObject* tobj = objMngr->getObject(objId);
+        if (tobj == NULL)
+        {
+            return NULL;
+        }
+        // Make sure this is a data object
+        UAVDataObject* dobj = dynamic_cast<UAVDataObject*>(tobj);
+        if (dobj == NULL)
+        {
+            return NULL;
+        }
+        // Create a new instance, unpack and register
+        UAVDataObject* instobj = dobj->clone(instId);
+        if ( !objMngr->registerObject(instobj) )
+        {
+            return NULL;
+        }
+        instobj->unpack(data);
+        return instobj;
     }
-    // Unpack data into object instance
-    obj->unpack(data);
-    return obj;
+    else
+    {
+        // Unpack data into object instance
+        obj->unpack(data);
+        return obj;
+    }
 }
 
+/**
+ * Check if a transaction is pending and if yes complete it.
+ */
 void UAVTalk::updateAck(UAVObject* obj)
 {
     if (respObj != NULL && respObj->getObjID() == obj->getObjID() && (respObj->getInstID() == obj->getInstID() || respAllInstances))
@@ -405,13 +453,13 @@ bool UAVTalk::transmitObject(UAVObject* obj, quint8 type, bool allInstances)
     }
     else if (type == TYPE_OBJ_REQ)
     {
-        return transmitSingleObject(obj, type, allInstances);
+        return transmitSingleObject(obj, TYPE_OBJ_REQ, allInstances);
     }
     else if (type == TYPE_ACK)
     {
         if (!allInstances)
         {
-            return transmitSingleObject(obj, type, false);
+            return transmitSingleObject(obj, TYPE_ACK, false);
         }
         else
         {

@@ -25,11 +25,14 @@ namespace jafar {
 	namespace jmath {
 
 
+		/////////////////////
+		//   CLASS MATLAB
+		/////////////////////
 		/**
 		 * Class for serializing boost arrays into Matlab format.
 		 * \author nmansard, jsola
 		 *
-		 * This class is used to pretty-print boost arrays in Matlab format using the \c << serialized operator.
+		 * This class is used to pretty-print boost arrays in Matlab format using the \c << serializer operator.
 		 * It can be used in two equivalent ways:\n
 		 * - <c> cout << "M = " << MATLAB (M) << endl;  // <== this is a regular call to the constructor.</c>\n
 		 * - <c> cout << "M = " << (MATLAB) M << endl; // <== this is a cast which also calls to the constructor if it exists.</c>\n

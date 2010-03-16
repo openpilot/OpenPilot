@@ -41,10 +41,11 @@ void test_gaussian01(void) { // TESTS FOR THE GAUSSIAN CLASS
 	randVector(x, N);
 	randMatrix(P, N, N);
 
-//	cout << "\n% EMPTY CONSTRUCTOR\n% ===========" << endl;
-//	cout << "% Gaussian G0;" << endl;
-//	Gaussian G0;
-//	cout << G0 << endl;
+
+	//	cout << "\n% EMPTY CONSTRUCTOR\n% ===========" << endl;
+	//	cout << "% Gaussian G0;" << endl;
+	//	Gaussian G0;
+	//	cout << G0 << endl;
 
 	cout << "\n% SIZE CONSTRUCTOR\n% ===========" << endl;
 	cout << "% Gaussian GS(n);" << endl;
@@ -94,6 +95,7 @@ void test_gaussian01(void) { // TESTS FOR THE GAUSSIAN CLASS
 	cout << "Gr.ia = " << (MATLAB) Gr.ia() << endl;
 	cout << "Gr.x = " << (MATLAB) (vec) Gr.x() << endl;
 	cout << "Gr.P = " << (MATLAB) Gr.P() << endl;
+
 
 	// Remote Gaussian, referred to {x, P}
 	cout << "\n% REMOTE CONSTRUCTOR, {x, P} \n% ===========" << endl;
@@ -227,6 +229,7 @@ void test_gaussian01(void) { // TESTS FOR THE GAUSSIAN CLASS
 	Gl.P(M, ia1, ia2);
 	cout << "Gl.P = " << (MATLAB) (mat) Gl.P() << endl;
 
+
 	//	cout << "\n% SET OFF-DIAGONAL P TO BE NOT-OFF-DIAG (THIS MUST NOT WORK!)\n%=============" << endl;
 	//	cout << "M = " << (MATLAB) (mat) M << endl;
 	//	ia1(0) = 0;
@@ -238,23 +241,22 @@ void test_gaussian01(void) { // TESTS FOR THE GAUSSIAN CLASS
 
 }
 
-
 void test_gaussian02(void) {
-	jblas::vec x(300);                                        // The remote mean vector.
-	jblas::sym_mat P(300);                                    // The remote covariances matrix.
-	P(1,102) = 99;                                            // We put here a value to test later
-	Gaussian G1(x, P, ublasExtra::ia_range(0, 3));            // G1 points to positions {0, 1, 2}.
-	Gaussian G2(x, P, ublasExtra::ia_range(100, 104));        // G2 points to positions {100, 101, 102, 103}.
-	jblas::mat c = ublas::project(P, G1.ia(), G2.ia());       // Cross-variance (hard copy)
-	jblas::sym_mat_indirect ic(P, G1.ia(), G2.ia());          // Cross-variance (indirectly indexed)
-	cout << " c-value (should be 99): " << c(1,2) << endl;    // We recover here the values
-	cout << "ic-value (should be 99): " << ic(1,2) << endl;   //
+	jblas::vec x(300); // The remote mean vector.
+	jblas::sym_mat P(300); // The remote covariances matrix.
+	P(1, 102) = 99; // We put here a value to test later
+	Gaussian G1(x, P, ublasExtra::ia_range(0, 3)); // G1 points to positions {0, 1, 2}.
+	Gaussian G2(x, P, ublasExtra::ia_range(100, 104)); // G2 points to positions {100, 101, 102, 103}.
+	jblas::mat c = ublas::project(P, G1.ia(), G2.ia()); // Cross-variance (hard copy)
+	jblas::sym_mat_indirect ic(P, G1.ia(), G2.ia()); // Cross-variance (indirectly indexed)
+	cout << " c-value (should be 99): " << c(1, 2) << endl; // We recover here the values
+	cout << "ic-value (should be 99): " << ic(1, 2) << endl; //
 	JFR_CHECK_EQUAL(c(1,2), 99);
 	JFR_CHECK_EQUAL(ic(1,2), 99);
 
-	P(1,102) = 0;                                             // We change the P-value to test ic
-	cout << " c-value (should be 99): " << c(1,2) << endl;    // We recover here the value
-	cout << "ic-value (should be 0 ): " << ic(1,2) << endl;   // We recover here the value
+	P(1, 102) = 0; // We change the P-value to test ic
+	cout << " c-value (should be 99): " << c(1, 2) << endl; // We recover here the value
+	cout << "ic-value (should be 0 ): " << ic(1, 2) << endl; // We recover here the value
 
 	JFR_CHECK_EQUAL(c(1,2), 99);
 	JFR_CHECK_EQUAL(ic(1,2), 0);
@@ -262,35 +264,6 @@ void test_gaussian02(void) {
 }
 
 void test_gaussian03() {
-	jblas::ind_array ia = ublasExtra::ia_range(2,5);
-	jblas::vec V(10);
-	randVector(V);
-
-	jblas::vec_indirect v(V,ia);
-	cout << "V         = " << V << endl;
-	cout << "ia        = " << ia << endl;
-	cout << "v         = " << v << endl;
-	cout << "&V        = " << &V << endl;
-	cout << "&v.data() = " << &v.data() << endl;
-	cout << "v.data()[2] = " << v.data()[2] << endl;
-	cout << "v.data().size() = " << v.data().size() << endl;
-
-	jblas::vec_indirect w(v);
-	cout << "w         = " << w << endl;
-	cout << "&w.data() = " << &w.data() << endl;
-	cout << "w.data()[2] = " << w.data()[2] << endl;
-	cout << "w.data().size() = " << w.data().size() << endl;
-
-	V(2) = 0;
-	cout << "v.data()[2] = " << v.data()[2] << endl;
-	cout << "w.data()[2] = " << w.data()[2] << endl;
-
-	jblas::ind_array ia2(ia);
-	cout << "ia2   = " << ia2 << endl;
-
-}
-
-void test_gaussian04(){
 
 	size_t N = 3;
 	vec x;
@@ -298,16 +271,20 @@ void test_gaussian04(){
 	randVector(x, N);
 	randMatrix(P, N, N);
 
-//	cout << "\n% EMPTY CONSTRUCTOR\n% ===========" << endl;
-//	cout << "% Gaussian G0;" << endl;
-//	Gaussian G0;
-//	cout << G0 << endl;
+
+	//	cout << "\n% EMPTY CONSTRUCTOR\n% ===========" << endl;
+	//	cout << "% Gaussian G0;" << endl;
+	//	Gaussian G0;
+	//	cout << G0 << endl;
+	cout << "\n% MOTHER GAUSSIAN, LOCAL FROM {x,P}, AND REMOTE POINTING TO IT." << endl;
 	cout << "x = " << x << endl;
 	cout << "P = " << P << endl;
 	cout << "% Gaussian Gl(x, P);" << endl;
 	Gaussian Gl(x, P);
-	Gaussian Gr(x, P, jafar::jmath::ublasExtra::ia_range(0,2));
-
+	cout << "Gl  : " << Gl << endl;
+	cout << "% Gaussian Gr(x, P, jafar::jmath::ublasExtra::ia_range(0,2));" << endl;
+	Gaussian Gr(x, P, jafar::jmath::ublasExtra::ia_range(0, 2));
+	cout << "Gr  : " << Gr << endl;
 
 	cout << "\n% LOCAL->LOCAL COPY CONSTRUCTOR \n% ===========" << endl;
 	cout << "% Gaussian Gl1(Gl);" << endl;
@@ -317,7 +294,7 @@ void test_gaussian04(){
 	cout << "Gl  : " << Gl << endl;
 	cout << "Gl1 : " << Gl1 << endl;
 	Gl.x()(1) = 1;
-	Gl.P()(0,1) = 1;
+	Gl.P()(0, 1) = 1;
 	JFR_CHECK_VEC_NOT_EQUAL(Gl.x(),Gl1.x())
 	JFR_CHECK_MAT_NOT_EQUAL(Gl.P(),Gl1.P())
 	cout << "Gl  : " << Gl << endl;
@@ -325,13 +302,13 @@ void test_gaussian04(){
 
 	cout << "\n% FORCE LOCAL->LOCAL COPY CONSTRUCTOR \n% ===========" << endl;
 	cout << "% Gaussian Gl2(Gl,Gl.LOCAL);" << endl;
-	Gaussian Gl2(Gl,Gl.LOCAL);
+	Gaussian Gl2(Gl, Gl.LOCAL);
 	JFR_CHECK_VEC_EQUAL(Gl.x(),Gl2.x());
 	JFR_CHECK_MAT_EQUAL(Gl.P(),Gl2.P());
 	cout << "Gl  : " << Gl << endl;
 	cout << "Gl2 : " << Gl2 << endl;
 	Gl.x()(1) = 2;
-	Gl.P()(0,1) = 2;
+	Gl.P()(0, 1) = 2;
 	JFR_CHECK_VEC_NOT_EQUAL(Gl.x(),Gl2.x())
 	JFR_CHECK_MAT_NOT_EQUAL(Gl.P(),Gl2.P())
 	cout << "Gl  : " << Gl << endl;
@@ -345,7 +322,7 @@ void test_gaussian04(){
 	cout << "Gr  : " << Gr << endl;
 	cout << "Gr1 : " << Gr1 << endl;
 	Gr.x()(1) = 3;
-	Gr.P()(0,1) = 3;
+	Gr.P()(0, 1) = 3;
 	JFR_CHECK_VEC_EQUAL(Gr.x(),Gr1.x())
 	JFR_CHECK_MAT_EQUAL(Gr.P(),Gr1.P())
 	cout << "Gr  : " << Gr << endl;
@@ -353,13 +330,13 @@ void test_gaussian04(){
 
 	cout << "\n% FORCE REMOTE->REMOTE COPY CONSTRUCTOR \n% ===========" << endl;
 	cout << "% Gaussian Gr2(Gr,Gr.REMOTE);" << endl;
-	Gaussian Gr2(Gr,Gr.REMOTE);
+	Gaussian Gr2(Gr, Gr.REMOTE);
 	JFR_CHECK_VEC_EQUAL(Gr.x(),Gr2.x())
 	JFR_CHECK_MAT_EQUAL(Gr.P(),Gr2.P())
 	cout << "Gr  : " << Gr << endl;
 	cout << "Gr2 : " << Gr2 << endl;
 	Gr.x()(1) = 4;
-	Gr.P()(0,1) = 4;
+	Gr.P()(0, 1) = 4;
 	JFR_CHECK_VEC_EQUAL(Gr.x(),Gr2.x())
 	JFR_CHECK_MAT_EQUAL(Gr.P(),Gr2.P())
 	cout << "Gr  : " << Gr << endl;
@@ -367,13 +344,13 @@ void test_gaussian04(){
 
 	cout << "\n% LOCAL->REMOTE COPY CONSTRUCTOR \n% ===========" << endl;
 	cout << "% Gaussian Gr3(Gl,Gl.REMOTE);" << endl;
-	Gaussian Gr3(Gl,Gl.REMOTE);
+	Gaussian Gr3(Gl, Gl.REMOTE);
 	JFR_CHECK_VEC_EQUAL(Gl.x(),Gr3.x())
 	JFR_CHECK_MAT_EQUAL(Gl.P(),Gr3.P())
 	cout << "Gl  : " << Gl << endl;
 	cout << "Gr3 : " << Gr3 << endl;
 	Gl.x()(1) = 5;
-	Gl.P()(0,1) = 5;
+	Gl.P()(0, 1) = 5;
 	JFR_CHECK_VEC_EQUAL(Gl.x(),Gr3.x())
 	JFR_CHECK_MAT_EQUAL(Gl.P(),Gr3.P())
 	cout << "Gl  : " << Gl << endl;
@@ -381,26 +358,61 @@ void test_gaussian04(){
 
 	cout << "\n% REMOTE->LOCAL COPY CONSTRUCTOR \n% ===========" << endl;
 	cout << "% Gaussian Gl3(Gr,Gr.LOCAL);" << endl;
-	Gaussian Gl3(Gr,Gr.LOCAL);
+	Gaussian Gl3(Gr, Gr.LOCAL);
 	JFR_CHECK_VEC_EQUAL(Gr.x(),Gl3.x())
 	JFR_CHECK_MAT_EQUAL(Gr.P(),Gl3.P())
 	cout << "Gr  : " << Gr << endl;
 	cout << "Gl3 : " << Gl3 << endl;
 	Gr.x()(1) = 6;
-	Gr.P()(0,1) = 6;
+	Gr.P()(0, 1) = 6;
 	JFR_CHECK_VEC_NOT_EQUAL(Gr.x(),Gl3.x())
 	JFR_CHECK_MAT_NOT_EQUAL(Gr.P(),Gl3.P())
 	cout << "Gr  : " << Gr << endl;
 	cout << "Gl3 : " << Gl3 << endl;
 
+}
+
+void test_gaussian04() {
+
+	size_t N = 4;
+	vec x;
+	sym_mat P;
+	randVector(x, N);
+	randMatrix(P, N, N);
+
+
+	//	cout << "\n% EMPTY CONSTRUCTOR\n% ===========" << endl;
+	//	cout << "% Gaussian G0;" << endl;
+	//	Gaussian G0;
+	//	cout << G0 << endl;
+	cout << "\n% MOTHER GAUSSIAN, LOCAL FROM {x,P}, AND REMOTE POINTING TO IT." << endl;
+	//	cout << "x = " << x << endl;
+	//	cout << "P = " << P << endl;
+	cout << "% Gaussian Gl(x, P);" << endl;
+	Gaussian Gl(x, P);
+	cout << "Gl  : " << Gl << endl;
+	cout << "% Gaussian Gr(x, P, jafar::jmath::ublasExtra::ia_range(0,2));" << endl;
+	Gaussian Gr(x, P, jafar::jmath::ublasExtra::ia_range(1, N));
+	cout << "Gr  : " << Gr << endl;
+
+	cout << "\n% REMOTE CONSTRUCTOR FROM LOCAL GAUSSIAN\n%================================" << endl;
+	jblas::ind_array iaPtr = ublasExtra::ia_range(1, 3);
+	cout << "% Gaussian Gr1(Gl, iaPtr, true);" << endl;
+	Gaussian Gr1(Gl, iaPtr);
+	cout << "Gr1  : " << Gr1 << endl;
+
+	cout << "\n% REMOTE CONSTRUCTOR FROM REMOTE GAUSSIAN\n%================================" << endl;
+	cout << "% Gaussian Gr2(Gr, iaPtr);" << endl;
+	Gaussian Gr2(Gr, iaPtr);
+	cout << "Gr2  : " << Gr2 << endl;
 
 }
 
 BOOST_AUTO_TEST_CASE( test_gaussian )
 {
-//	test_gaussian01();
-//	test_gaussian02();
-//	test_gaussian03();
+	test_gaussian01();
+	test_gaussian02();
+	test_gaussian03();
 	test_gaussian04();
 }
 

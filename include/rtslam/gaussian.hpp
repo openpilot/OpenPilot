@@ -30,27 +30,33 @@ namespace jafar {
 		 * \author jsola@laas.fr & croussil@laas.fr
 		 *
 		 * This class defines a multi-dimensional Gaussian variable.
-		 * It allows mean and covariances data to be stored locally or remotelly, depending on the constructor
+		 * It allows mean and covariances data to be stored locally or remotelly,
+		 * depending on the constructor
 		 * (the storage modality is selectable only at construction time).
 		 * Remote Gaussians are indexed with indirect arrays.
 		 *
 		 * - Mean and covariances are accessed through \a x() and \a P().\n
 		 * - The indirect array is part of the Gaussian class, and is accessible through \a ia().\n
 		 *
+		 * <i><b> HELP:</b></i> For information about indirect arrays, see the documentation
+		 * of ia_range(), ia_head() and similar functions in namespace jafar::jmath::ublasExtra.
+		 *
 		 * <b> Defining a local Gaussian </b>
 		 *
 		 * You just give a size, a pair {\a x , \a P } or another Gaussian:
 		 * \code
-		 * Gaussian GLs(7);                // Construct from size
-		 * Gaussian GLa(x, P);             // Construct from given vector and matrix. these are copied to the local storage.
-		 * Gaussian GLb(GLa);              // Copy-construct from local Gaussian.
-		 * Gaussian GLc(GRa, GRa.LOCAL);   // Copy-construct from remote Gaussian but force local storage.
+		 * Gaussian GLa(7);               // Construct from size
+		 * Gaussian GLb(x, P);            // Construct from given vector and matrix..
+		 * Gaussian GLc(GL);              // Copy-construct from local Gaussian.
+		 * Gaussian GLd(GR, GR.LOCAL);    // Copy-construct from remote, force local storage.
 		 * \endcode
 		 *
-		 * see that the last constructor takes a remote Gaussian (see below). The directive \a GRa.LOCAL tells the constructor to force local storage.
+		 * see that the last constructor takes a remote Gaussian (see below).
+		 * The directive \a GRa.LOCAL tells the constructor to force local storage.
 		 * The result is a local Gaussian (the data is copied to the local storage).
 		 *
-		 * You can create Gaussians with no covariance by providing just the mean vector. This is only possible for local Gaussians:
+		 * You can create Gaussians with no covariance by providing just the mean vector.
+		 * This is only possible for local Gaussians:
 		 * \code
 		 * Gaussian GLx(x)
 		 * \endcode
@@ -61,19 +67,24 @@ namespace jafar {
 		 * \code
 		 * Gaussian GRa(GR);              // Copy a remote Gaussian
 		 * Gaussian GRb(GL, GL.REMOTE);   // Point to a whole local Gaussian
-		 * Gaussian GRc(GL, ia);          // Point to a part of a given local Gaussian
-		 * Gaussian GRd(x, P, ia);        // Point to a part of given vector and covariances matrix.
+		 * Gaussian GRc(x, P, ia);        // Point to a part of given x and P.
+		 * Gaussian GRd(GL, ia);          // Point to a part of a given local Gaussian
+		 * Gaussian GRe(GR, ia);          // Point to a part of a given remote Gaussian
 		 * \endcode
 		 *
-		 * To specify the set of indices the remote Gaussian points to, you add an indirect array to the constructor:
+		 * In the last three constructor modes, specify the set of indices
+		 * to the provided data with an indirect array <c> jblas::ind_array </c>.
 		 *
-		 * See that the remote constructor \a GRc wants a local Gaussian \a GL to point to. Do NEVER provide a remote Gaussian to such constructor.
-		 *
-		 * For information about indirect arrays, see the documentation of ia_range(), ia_head() and similar functions in namespace ublasExtra.
+		 * <i><b> REMEMBER: remote Gaussians always point to local Gaussians.</b></i>
+		 * See that the remote constructor \a GRe accepts a remote Gaussian \a GR to point to.
+		 * In this case, the created Gaussian \a GRe is set to point to the local Gaussian \a GR was pointing to,
+		 * say \a GL, and its indirect array is composed accordingly.
+		 * The reference to \a GR is therefore lost.
 		 *
 		 * <b> Managing cross-variances through indirect indexing</b>
 		 *
-		 * Having two remote Gaussian instances \a G1 and \a G2 pointing to the same data (Gaussian \a G or pair {\a x , \a P })
+		 * Having two remote Gaussian instances \a G1 and \a G2
+		 * pointing to the same data (Gaussian \a G or pair {\a x , \a P })
 		 * allows recovering their cross-variances matrix.
 		 *
 		 * You can recover a hard copy of the cross-variance block with
@@ -85,13 +96,16 @@ namespace jafar {
 		 * sym_mat_indirect ic(P, G1.ia(), G2.ia());
 		 * \endcode
 		 *
-		 * This is a graphical representation of the situation, where we want to access the blocks of data \c ic and \c ic' (in purple):
+		 * This is a graphical representation of the situation,
+		 * where we want to access the blocks of data \c ic and \c ic' (in purple):
 		 * 	\image html Gaussian.png "Two remote Gaussians G1 and G2 pointing to {\a x, \a P } via indirect arrays. The cross-variances \a ic and \a ic' are shown."
 		 *
-		 * Bear in mind that indirect arrays are not correlative: they contain sparse indices. Thus this is a more accurate representation of the situation:
+		 * Bear in mind that indirect arrays are not correlative: they contain sparse indices.
+		 * Thus this is a more accurate representation of the situation:
 		 * 	\image html GaussianSparse.png "Two remote Gaussians G1 and G2 pointing to {\a x, \a P } via indirect arrays. The cross-variances \a ic and \a ic' are shown."
 		 *
-		 * The following example is borrowed from \c test_gaussian02() in file \c rtslam/test_suite/test_gaussian.cpp:
+		 * The following example shows the recovery and manipulation of the cross-variance.
+		 * It is borrowed from \c test_gaussian02() in file \c rtslam/test_suite/test_gaussian.cpp:
 		 *
 		 * \code
 		 *	jblas::vec x(300);                                      // The remote mean vector.
@@ -312,33 +326,39 @@ namespace jafar {
 				inline Gaussian(const Gaussian & G, storage_t _storage = UNCHANGED) :
 					hasNullCov_(G.hasNullCov_),
 					size_  (G.size_),
-					storage_(_storage == UNCHANGED ? G.storage_                                              : _storage),
-					x_local (_storage == LOCAL     ? G.x_                                                    : G.x_local),
-					P_local (_storage == LOCAL     ? G.P_                                                    : G.P_local),
-					ia_     (_storage == LOCAL     ? jafar::jmath::ublasExtra::ia_range(0, size_)            : G.ia_),
-					x_      (storage_ == LOCAL     ? jblas::vec_indirect     (x_local, ia_.all())            : G.x_),
-					P_      (storage_ == LOCAL     ? jblas::sym_mat_indirect (P_local, ia_.all(), ia_.all()) : G.P_)
+					storage_(_storage == UNCHANGED  ?  G.storage_                                              : _storage),
+					x_local (_storage == LOCAL      ?  G.x_                                                    : G.x_local),
+					P_local (_storage == LOCAL      ?  G.P_                                                    : G.P_local),
+					ia_     (_storage == LOCAL      ?  jafar::jmath::ublasExtra::ia_range(0, size_)            : G.ia_),
+					x_      (storage_ == LOCAL      ?  jblas::vec_indirect     (x_local, ia_.all())            : G.x_),
+					P_      (storage_ == LOCAL      ?  jblas::sym_mat_indirect (P_local, ia_.all(), ia_.all()) : G.P_)
 				{
 				}
 
 
 				/**
-				 * Remote constructor from LOCAL Gaussian.
-				 * <b>WARNING ! : G must be local.</b> Failure to guarantee so will result in a BOOST exception error.
-				 *
-				 * This constructor uses indirect indexing onto a local Gaussian provided to the constructor.
+				 * Remote constructor from Gaussian.
+				 * This constructor uses indirect indexing onto Gaussian provided to the constructor.
 				 * The indirect array where this new Gaussian points to in the old one is also given as input.
-				 * For practical use, the result is such that the new Gaussian Gnew has <i> x_ = G.x_local(ia_) </i> and <i> P_ = G.P_local(ia_,ia_).</i>
+				 *
+				 * In case the input Gaussian is REMOTE, a composition of indirect arrays is performed,
+				 * and the resulting Gaussian points to the Gaussian where the remote Gaussian points to.
+				 *
 				 * The local storage \a x_local and \a P_local are kept at null size for economy.
 				 * \param G the local Gaussian.
 				 * \param _ia the indirect array.
 				 */
 				inline Gaussian(Gaussian & G, const jblas::ind_array & _ia) :
-					hasNullCov_(false), size_(_ia.size()),
+					hasNullCov_(false),
+					size_(_ia.size()),
 					storage_(REMOTE),
-					x_local(0), P_local(0),
-					ia_(_ia),
-					x_(G.x_local, ia_), P_(G.P_local, ia_, ia_) {
+					x_local(0),
+					P_local(0),
+					//     # check storage   ?                   # is local                   :             # is remote
+					ia_(G.storage_ == LOCAL  ?  _ia                                           : G.ia_.compose(_ia)),
+					x_ (G.storage_ == LOCAL  ?  jblas::vec_indirect     (G.x_local, ia_)      : jblas::vec_indirect     (G.x_.data(), ia_, 1)     ),
+					P_ (G.storage_ == LOCAL  ?  jblas::sym_mat_indirect (G.P_local, ia_, ia_) : jblas::sym_mat_indirect (G.P_.data(), ia_, ia_, 1))
+				{
 				}
 
 

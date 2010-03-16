@@ -21,6 +21,7 @@
 #include "jmath/jblas.hpp"
 #include "rtslam/gaussian.hpp"
 #include "rtslam/kalmanFilter.hpp"
+//#include "rtslam/landmarkAbstract.hpp"
 
 namespace jafar {
 
@@ -87,12 +88,14 @@ namespace jafar {
 				/**
 				 * A set of robots
 				 */
-				std::map<size_t, RobotAbstract*> robots;
+				typedef std::map<size_t, RobotAbstract*> robots_t;
+				robots_t robots;
 
 				/**
 				 * A set of landmarks
 				 */
-				std::map<size_t, LandmarkAbstract*> landmarks;
+				typedef std::map<size_t, LandmarkAbstract*> landmarks_t;
+				landmarks_t landmarks;
 
 				/**
 				 * Query about available free space.
@@ -117,6 +120,8 @@ namespace jafar {
 				 */
 				void addRobot(RobotAbstract * _robPtr);
 
+				void addLandmark(LandmarkAbstract * _lmk);
+
 
 				/**
 				 * Obtain free Map space of a given size.
@@ -136,7 +141,6 @@ namespace jafar {
 
 
 				//				void removeRobot(RobotAbstract& _rob);
-				//				void addLandmark(LandmarkAbstract& _lmk);
 				//				void removeLandmark(LandmarkAbstract& _lmk);
 
 				//				/**

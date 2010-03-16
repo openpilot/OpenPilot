@@ -176,9 +176,9 @@ namespace jafar {
 
 
 				/**
-				 * Constructor from map and indirect array
+				 * Constructor from map
 				 */
-				Landmark3DAnchoredHomogeneousPoint(MapAbstract & map, const jblas::ind_array & ial);
+				Landmark3DAnchoredHomogeneousPoint(MapAbstract & map);
 
 
 				static size_t size(void) {

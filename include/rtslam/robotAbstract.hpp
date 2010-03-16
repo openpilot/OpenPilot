@@ -33,11 +33,10 @@
 #include <map>
 
 #include <jmath/jblas.hpp>
-#include "rtslam/blocks.hpp"
 #include "rtslam/gaussian.hpp"
 #include "rtslam/mapObject.hpp"
 // include parents
-//#include "rtslam/sensorAbstract.hpp"
+#include "rtslam/sensorAbstract.hpp"
 #include "rtslam/mapAbstract.hpp"
 
 namespace jafar {
@@ -73,15 +72,10 @@ namespace jafar {
 
 
 				/**
-				 * Remote constructor from remote map and size of control vector.
-				 * \param _map the remote map
-				 * \param _iar the indirect array pointing to the remote storage
+				 * Remote constructor from remote map and size of state and control vectors.
+				 * \param _map the map.
+				 * \param _size_state the size of the robot state vector
 				 * \param _size_control the size of the control vector
-				 */
-				RobotAbstract(MapAbstract & _map, const jblas::ind_array & _iar, const size_t _size_control);
-
-				/**
-				 * Remote constructor from remote map and size of control vector.
 				 */
 				RobotAbstract(MapAbstract & _map, const size_t _size_state, const size_t _size_control);
 
@@ -90,18 +84,23 @@ namespace jafar {
 				}
 
 				/**
+				 * Add a sensor to this robot
+				 */
+				void addSensor(SensorAbstract * _senPtr);
+
+				/**
 				 * A set of sensors
 				 */
-				std::map<size_t, SensorAbstract*> sensors;
+				typedef std::map<size_t, SensorAbstract*> sensors_t;
+				sensors_t sensors;
 
 				/**
 				 * Parent map
 				 */
 				MapAbstract * map;
 
-				//				Gaussian state;
-				Gaussian pose;
-				Control control;
+				Gaussian pose; ///< Robot pose
+				Control control; ///< Control vector
 
 				/*
 				 * Jacobians
@@ -150,7 +149,12 @@ namespace jafar {
 						s << rob.name() << ", ";
 					s << "of type " << rob.type() << std::endl;
 					s << ".state:  " << rob.state << std::endl;
-					s << ".pose :  " << rob.pose;
+					s << ".pose :  " << rob.pose << std::endl;
+					s << ".sens << [";
+					sensors_t::iterator senIter;
+					for (senIter = rob.sensors.begin(); senIter != rob.sensors.end(); senIter++)
+						s << senIter->first << " ";
+					s << "]" << std::endl;
 					return s;
 				}
 

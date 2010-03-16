@@ -40,23 +40,17 @@ namespace jafar {
 
 				/**
 				 * Local constructor from size.
+				 * With this constructor the object is not linked to any map. Use it for sensors.
 				 * \param _size the state size.
 				 */
-				MapObject(std::size_t _size);
-
-				/**
-				 * Remote constructor from remote map and indirect array
-				 * \param _map the remote map
-				 * \param _iar the indirect array pointing to the remote storage
-				 */
-				MapObject(MapAbstract & _map, const jblas::ind_array & _iar);
+				MapObject(const std::size_t _size);
 
 				/**
 				 * Remote constructor from remote map and indirect array
 				 * \param _map the remote map
 				 * \param _begin the first index pointing to the remote storage
 				 */
-				MapObject(MapAbstract & _map, size_t _size);
+				MapObject(MapAbstract & _map, const size_t _size);
 
 
 

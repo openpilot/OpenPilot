@@ -98,11 +98,15 @@ namespace jafar {
 				SensorPinHole(const jblas::vec7 & _pose);
 
 				/**
-				 * Construction from map and indirect array.
-				 * \param map the map.
-				 * \param ias the indirect array pointing to the map states.
+				 * Construction from map.
+				 * \param _map the map.
 				 */
-				SensorPinHole(MapAbstract & map, const jblas::ind_array & ias);
+				SensorPinHole(MapAbstract & _map);
+
+				/**
+				 * Constructor for selectable LOCAL or REMOTE pose, from robot.
+				 */
+				SensorPinHole(RobotAbstract & _rob, bool inFilter = false);
 
 				/**
 				 * Pin-hole sensor setup.

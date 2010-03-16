@@ -11,9 +11,11 @@
  * \ingroup rtslam
  */
 
+#include "jmath/indirectArray.hpp"
+
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/robotAbstract.hpp"
-#include "jmath/indirectArray.hpp"
+#include "rtslam/landmarkAbstract.hpp"
 
 using namespace std;
 
@@ -31,10 +33,17 @@ namespace jafar {
 
 
 		/**
-		 * Robot and landmark addition and removal
+		 * Robot addition
 		 */
 		void MapAbstract::addRobot(RobotAbstract * _robPtr) {
 			robots[_robPtr->id()] = _robPtr;
+		}
+
+		/**
+		 * Landmark addition
+		 */
+		void MapAbstract::addLandmark(LandmarkAbstract * _lmkPtr) {
+			landmarks[_lmkPtr->id()] = _lmkPtr;
 		}
 
 		jblas::ind_array MapAbstract::reserveStates(const std::size_t N) {

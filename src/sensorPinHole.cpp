@@ -36,10 +36,19 @@ namespace jafar {
 		/*
 		 * Construction from map and indirect array
 		 */
-		SensorPinHole::SensorPinHole(MapAbstract & _map, const jblas::ind_array & _ias) :
-			SensorAbstract(_map, _ias) {
+		SensorPinHole::SensorPinHole(MapAbstract & _map) :
+			SensorAbstract(_map) {
 			type("Pin-hole-camera");
 		}
+
+		/**
+		 * Selectable LOCAL or REMOTE pose constructor.
+		 */
+		SensorPinHole::SensorPinHole(RobotAbstract & _rob, bool inFilter) :
+			SensorAbstract(_rob, inFilter){
+			type("Pin-hole-camera");
+		}
+
 
 		/**
 		 * Pin-hole sensor parameters setup.

@@ -18,6 +18,7 @@
 namespace jafar {
 	namespace rtslam {
 
+
 		/**
 		 * Constant velocity model robot class.
 		 *
@@ -37,26 +38,16 @@ namespace jafar {
 		class Robot3DConstantVelocity: public RobotAbstract {
 			public:
 
-//				/**
-//				 * Local constructor
-//				 */
-//				Robot3DConstantVelocity(void);
 
-			/**
-			 * Remote constructor from remote map.
-			 * \param _map the remote map
-			 * \param _iar the indirect array pointing to the remote storage
-			 */
-			Robot3DConstantVelocity(MapAbstract & _map, jblas::ind_array & _iar);
-
-			/**
-			 * Remote constructor from remote map.
-			 * \param _map the remote map
-			 */
-			Robot3DConstantVelocity(MapAbstract & _map);
+				/**
+				 * Remote constructor from remote map.
+				 * \param _map the remote map
+				 */
+				Robot3DConstantVelocity(MapAbstract & _map);
 
 				~Robot3DConstantVelocity(void) {
 				}
+
 
 				/**
 				 * Move one step ahead.
@@ -94,6 +85,7 @@ namespace jafar {
 					v = ublas::subrange(state.x(), 7, 10);
 					w = ublas::subrange(state.x(), 10, 13);
 				}
+
 
 				/**
 				 * Compose state vector.

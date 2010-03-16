@@ -72,7 +72,8 @@ namespace jafar {
 				/**
 				 * A set of observations (one per landmark)
 				 */
-				std::map<size_t, ObservationAbstract*> observationsList;
+				typedef std::map<size_t, ObservationAbstract*> observations_t;
+				observations_t observationsList;
 
 				/**
 				 * Sensor pose in robot
@@ -97,21 +98,23 @@ namespace jafar {
 				 * Remote pose constructor.
 				 * Creates a sensor with the pose indexed in a map.
 				 * \param map the map
-				 * \param ias the indirect array of indices to the map
-				 */
-				SensorAbstract(MapAbstract & _map, const jblas::ind_array & _ias);
-
-				/**
-				 * Remote pose constructor.
-				 * Creates a sensor with the pose indexed in a map.
-				 * \param map the map
 				 */
 				SensorAbstract(MapAbstract & _map);
 
 				/**
+				 * Remote pose constructor, with sensor association.
+				 * Creates a sensor with the pose indexed in a map,
+				 * and installed on a robot.
+				 * \param _map the map
+				 * \param _rob the robot
+				 */
+				SensorAbstract(MapAbstract & _map, RobotAbstract & _rob);
+
+				/**
 				 * Selectable LOCAL or REMOTE pose constructor.
 				 * Creates a sensor with the pose indexed in a map.
-				 * \param map the map
+				 * \param _rob the robot
+				 * \param inFilter flag indicating if the sensor state is part of the filter (REMOTE).
 				 */
 				SensorAbstract(RobotAbstract & _rob, bool inFilter);
 
@@ -122,11 +125,11 @@ namespace jafar {
 				}
 
 
-				/**
-				 * Install sensor in robot.
-				 * \param rob the robot.
-				 */
-				void installToRobot(RobotAbstract & rob);
+//				/**
+//				 * Install sensor in robot.
+//				 * \param rob the robot.
+//				 */
+//				void installToRobot(RobotAbstract & rob);
 
 				/*
 				 * Acquire raw data

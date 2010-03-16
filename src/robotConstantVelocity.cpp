@@ -36,21 +36,6 @@ namespace jafar {
 		//			type("Constant-Velocity");
 		//		}
 
-		/**
-		 * Remote constructor from remote map and size of control vector
-		 * \param _map the remote map
-		 * \param _iar the indirect array pointing to the remote storage
-		 * \param _size_control the size of the control vector
-		 */
-		Robot3DConstantVelocity::Robot3DConstantVelocity(MapAbstract & _map, jblas::ind_array & _iar) :
-			RobotAbstract(_map, _iar, Robot3DConstantVelocity::size_control()) {
-			// Build constant perturbation Jacobian
-			jblas::identity_mat I(3);
-			ublas::subrange(F_u, 7, 10, 0, 3) = I;
-			ublas::subrange(F_u, 10, 13, 3, 6) = I;
-			type("Constant-Velocity");
-		}
-
 
 		/**
 		 * Remote constructor from remote map.

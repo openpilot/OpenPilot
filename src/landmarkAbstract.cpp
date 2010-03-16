@@ -21,9 +21,13 @@ namespace jafar {
 		/**
 		 * constructor.
 		 */
-		LandmarkAbstract::LandmarkAbstract(MapAbstract & _map, const jblas::ind_array & _ial) :
-			MapObject(_map, _ial), map(&_map) {
+		LandmarkAbstract::LandmarkAbstract(MapAbstract & _map, const size_t _size) :
+			MapObject(_map, _size) {
 			categoryName("LANDMARK");
+			id(_map.landmarkIds.getId());
+			// Link map and lmk
+			map = &_map;
+			_map.addLandmark(this);
 		}
 
 	}

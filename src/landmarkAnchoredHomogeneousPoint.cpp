@@ -16,17 +16,14 @@
 namespace jafar {
 	namespace rtslam {
 
+
 		/**
 		 * Constructor from map and indirect array
 		 */
-		Landmark3DAnchoredHomogeneousPoint::Landmark3DAnchoredHomogeneousPoint(MapAbstract & map,
-		    const jblas::ind_array & ial) :
-			LandmarkAbstract(map, ial) {
+		Landmark3DAnchoredHomogeneousPoint::Landmark3DAnchoredHomogeneousPoint(MapAbstract & map) :
+			LandmarkAbstract(map, 7) {
 			type("AHP");
 		}
 
-		namespace landmarkAHP {
-
-		} // namespace ahp
 	} // namespace rtslam
 } // namespace jafar

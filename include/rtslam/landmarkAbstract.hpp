@@ -30,7 +30,6 @@
 #include <list>
 #include <jmath/jblas.hpp>
 
-#include "rtslam/blocks.hpp"
 // include parents
 #include "rtslam/mapObject.hpp"
 #include "rtslam/mapAbstract.hpp"
@@ -44,12 +43,13 @@ namespace jafar {
 		// Forward declarations of children
 		class ObservationAbstract;
 
-		/** Base class for all landmark descriptors defined in the module
-		 * rtslam.
+		/** Base class for all landmark descriptors defined in the module rtslam.
 		 *
-		 * @ingroup rtslam
+		 * \author jsola@laas.fr
+		 * \ingroup rtslam
 		 */
 		class DescriptorAbstract {
+
 			public:
 				/**
 				 * Mandatory virtual destructor
@@ -68,6 +68,17 @@ namespace jafar {
 
 			public:
 
+				/**
+				 * constructor
+				 */
+				LandmarkAbstract(MapAbstract & _map, const size_t _size);
+
+				/**
+				 * Mandatory virtual destructor.
+				 */
+				virtual ~LandmarkAbstract(void) {
+				}
+
 				DescriptorAbstract descriptor;
 
 				/**
@@ -78,28 +89,17 @@ namespace jafar {
 				/**
 				 * A set of observations (one per sensor)
 				 */
-				std::map<size_t, ObservationAbstract*> observations;
-
-				/**
-				 * Mandatory virtual destructor.
-				 */
-				virtual ~LandmarkAbstract(void) {
-				}
-
-				/**
-				 * constructor
-				 */
-				LandmarkAbstract(MapAbstract & _map, const jblas::ind_array & _ial);
-
+				typedef std::map<size_t, ObservationAbstract*> observations_t;
+				observations_t observations;
 
 				/**
 				 * Reparametrize the landmark.
 				 */
 				//				virtual void reparametrize(LandmarkAbstract & landmark) = 0;
 
-				inline void setDescriptor(DescriptorAbstract _desc) {
-					descriptor = _desc;
-				}
+//				inline void setDescriptor(DescriptorAbstract _desc) {
+//					descriptor = _desc;
+//				}
 
 //				inline void addObservation(ObservationAbstract & _obs) ;
 

@@ -59,7 +59,9 @@ const char * const GCS_REVISION_STR      = "";
 
 //modes
 const char * const MODE_WELCOME          = "Welcome";
+const char * const MODE_UAVGADGET        = "Mode 1";
 const int          P_MODE_WELCOME        = 100;
+const int          P_MODE_UAVGADGET      = 90;
 
 //menubar
 const char * const MENU_BAR              = "GCS.MenuBar";
@@ -80,6 +82,8 @@ const char * const M_HELP                = "GCS.Menu.Help";
 const char * const C_GLOBAL              = "Global Context";
 const int          C_GLOBAL_ID           = 0;
 const char * const C_WELCOME_MODE        = "Core.WelcomeMode";
+const char * const C_UAVGADGET_MODE      = "Core.UAVGadgetMode";
+const char * const C_UAVGADGETMANAGER    = "Core.UAVGadgetManager";
 const char * const C_NAVIGATION_PANE     = "Core.NavigationPane";
 const char * const C_PROBLEM_PANE        = "Core.ProblemPane";
 
@@ -118,6 +122,7 @@ const char * const REMOVE_ALL_SPLITS     = "GCS.RemoveAllSplits";
 const char * const GOTO_OTHER_SPLIT      = "GCS.GotoOtherSplit";
 const char * const SAVEASDEFAULT         = "GCS.SaveAsDefaultLayout";
 const char * const RESTOREDEFAULT        = "GCS.RestoreDefaultLayout";
+const char * const HIDE_TOOLBARS         = "GCS.HideToolbars";
 const char * const CLOSE                 = "GCS.Close";
 const char * const CLOSEALL              = "GCS.CloseAll";
 const char * const CLOSEOTHERS           = "GCS.CloseOthers";
@@ -180,6 +185,7 @@ const char * const G_WINDOW_PANES        = "GCS.Group.Window.Panes";
 const char * const G_WINDOW_SPLIT        = "GCS.Group.Window.Split";
 const char * const G_WINDOW_NAVIGATE     = "GCS.Group.Window.Navigate";
 const char * const G_WINDOW_OTHER        = "GCS.Group.Window.Other";
+const char * const G_WINDOW_HIDE_TOOLBAR = "GCS.Group.Window.Hide";
 
 // help groups (global)
 const char * const G_HELP_HELP           = "GCS.Group.Help.Help";

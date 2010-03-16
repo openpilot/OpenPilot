@@ -11,8 +11,10 @@ include(../../libs/utils/utils.pri)
 include(../../shared/scriptwrapper/scriptwrapper.pri)
 include(coreplugin_dependencies.pri)
 INCLUDEPATH += dialogs \
+    uavgadgetmanager \
     actionmanager
 DEPENDPATH += dialogs \
+    uavgadgetmanager \
     actionmanager
 SOURCES += mainwindow.cpp \
     tabpositionindicator.cpp \
@@ -24,6 +26,10 @@ SOURCES += mainwindow.cpp \
     messageoutputwindow.cpp \
     viewmanager.cpp \
     versiondialog.cpp \
+    iuavgadget.cpp \
+    uavgadgetmode.cpp \
+    uavgadgetmanager/uavgadgetmanager.cpp \
+    uavgadgetmanager/uavgadgetview.cpp \
     actionmanager/actionmanager.cpp \
     actionmanager/command.cpp \
     actionmanager/actioncontainer.cpp \
@@ -58,6 +64,11 @@ HEADERS += mainwindow.h \
     messagemanager.h \
     messageoutputwindow.h \
     viewmanager.h \
+    iuavgadget.h \
+    uavgadgetmode.h \
+    iuavgadgetfactory.h \
+    uavgadgetmanager/uavgadgetmanager.h \
+    uavgadgetmanager/uavgadgetview.h \
     actionmanager/actioncontainer.h \
     actionmanager/actionmanager.h \
     actionmanager/command.h \

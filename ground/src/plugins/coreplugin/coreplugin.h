@@ -34,7 +34,7 @@
 namespace Core {
 namespace Internal {
 
-class EditMode;
+class UAVGadgetMode;
 class MainWindow;
 
 class CorePlugin : public ExtensionSystem::IPlugin
@@ -54,6 +54,7 @@ public slots:
 
 private:
     MainWindow *m_mainWindow;
+    UAVGadgetMode *m_uavGadgetMode;
 };
 
 } // namespace Internal

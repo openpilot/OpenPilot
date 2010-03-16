@@ -41,6 +41,7 @@
 #include "outputpane.h"
 #include "plugindialog.h"
 #include "shortcutsettings.h"
+#include "uavgadgetmanager.h"
 
 #include "settingsdialog.h"
 #include "variablemanager.h"
@@ -111,6 +112,7 @@ MainWindow::MainWindow() :
     m_variableManager(new VariableManager(this)),
     m_viewManager(0),
     m_modeManager(0),
+    m_uavGadgetManager(0),
     m_mimeDatabase(new MimeDatabase),
     m_rightPaneWidget(0),
     m_versionDialog(0),
@@ -137,6 +139,7 @@ MainWindow::MainWindow() :
     QCoreApplication::setApplicationName(QLatin1String("OpenPilotGCS"));
     QCoreApplication::setApplicationVersion(QLatin1String(Core::Constants::GCS_VERSION_LONG));
     QCoreApplication::setOrganizationName(QLatin1String("OpenPilot"));
+    QCoreApplication::setOrganizationDomain(QLatin1String("openpilot.org"));
     QSettings::setDefaultFormat(QSettings::IniFormat);
     QString baseName = qApp->style()->objectName();
 #ifdef Q_WS_X11
@@ -167,7 +170,10 @@ MainWindow::MainWindow() :
     //m_modeManager->addWidget(m_progressManager->progressView());
     m_viewManager = new ViewManager(this);
     m_messageManager = new MessageManager;
+    m_uavGadgetManager = new UAVGadgetManager(m_coreImpl, this);
+    m_uavGadgetManager->hide();
     setCentralWidget(m_modeStack);
+
 
     connect(QApplication::instance(), SIGNAL(focusChanged(QWidget*,QWidget*)),
             this, SLOT(updateFocusWidget(QWidget*,QWidget*)));
@@ -717,6 +723,11 @@ MessageManager *MainWindow::messageManager() const
 VariableManager *MainWindow::variableManager() const
 {
      return m_variableManager;
+}
+
+UAVGadgetManager *MainWindow::uavGadgetManager() const
+{
+    return m_uavGadgetManager;
 }
 
 ModeManager *MainWindow::modeManager() const

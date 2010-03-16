@@ -49,6 +49,7 @@ class ModeManager;
 class SettingsDatabase;
 class UniqueIDManager;
 class VariableManager;
+class UAVGadgetManager;
 
 class CORE_EXPORT ICore : public QObject
 {
@@ -75,6 +76,7 @@ public:
     virtual MessageManager *messageManager() const = 0;
     virtual VariableManager *variableManager() const = 0;
     virtual ModeManager *modeManager() const = 0;
+    virtual UAVGadgetManager *uavGadgetManager() const = 0;
     virtual MimeDatabase *mimeDatabase() const = 0;
 
     virtual QSettings *settings() const = 0;

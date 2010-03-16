@@ -29,6 +29,8 @@
 #include "coreplugin.h"
 #include "mainwindow.h"
 #include "modemanager.h"
+#include "uavgadgetmode.h"
+#include "uavgadgetmanager.h"
 
 #include <extensionsystem/pluginmanager.h>
 
@@ -37,13 +39,17 @@
 using namespace Core::Internal;
 
 CorePlugin::CorePlugin() :
-    m_mainWindow(new MainWindow)
+    m_mainWindow(new MainWindow),
+    m_uavGadgetMode(0)
 {
 }
 
 CorePlugin::~CorePlugin()
 {
-
+    if (m_uavGadgetMode) {
+        removeObject(m_uavGadgetMode);
+        delete m_uavGadgetMode;
+    }
     delete m_mainWindow;
 }
 
@@ -51,7 +57,11 @@ bool CorePlugin::initialize(const QStringList &arguments, QString *errorMessage)
 {
     Q_UNUSED(arguments)
     const bool success = m_mainWindow->init(errorMessage);
-
+    if (success) {
+        UAVGadgetManager *uavGadgetManager = m_mainWindow->uavGadgetManager();
+        m_uavGadgetMode = new UAVGadgetMode(uavGadgetManager);
+        addObject(m_uavGadgetMode);
+    }
     return success;
 }
 

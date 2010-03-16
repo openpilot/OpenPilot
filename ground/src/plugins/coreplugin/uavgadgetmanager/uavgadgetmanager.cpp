@@ -87,7 +87,8 @@ UAVGadgetManagerPlaceHolder::UAVGadgetManagerPlaceHolder(Core::IMode *mode, QWid
     connect(Core::ModeManager::instance(), SIGNAL(currentModeChanged(Core::IMode *)),
             this, SLOT(currentModeChanged(Core::IMode *)));
 
-    currentModeChanged(Core::ModeManager::instance()->currentMode());
+    //Julien: this line is crashing (I guess when no mode are added yet)
+    //currentModeChanged(Core::ModeManager::instance()->currentMode());
 }
 
 UAVGadgetManagerPlaceHolder::~UAVGadgetManagerPlaceHolder()
@@ -564,7 +565,7 @@ UAVGadgetManager::UAVGadgetFactoryList
 {
   //qDebug() << Q_FUNC_INFO;
     UAVGadgetFactoryList rc = pluginManager()->getObjects<IUAVGadgetFactory>();
-    if (debugUAVGadgetManager)
+    //if (debugUAVGadgetManager)
       //qDebug() << Q_FUNC_INFO << rc;
     return rc;
 }

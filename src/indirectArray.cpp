@@ -139,6 +139,7 @@ namespace jafar {
 				return res;
 			}
 
+
 			/*
 			 * Create indirect array from boolean vector and take the head N elements, and clear these N elements form the boolean.
 			 */

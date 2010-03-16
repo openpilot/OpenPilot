@@ -16,6 +16,7 @@
 
 // jafar debug include
 #include "kernel/jafarDebug.hpp"
+#include "kernel/jafarTestMacro.hpp"
 
 #include <iostream>
 #include <boost/numeric/ublas/symmetric.hpp>
@@ -38,6 +39,7 @@ void test_indirect_array01(void) {
 	ublas::symmetric_matrix<int> S(N);
 	ublas::vector<int> V(N);
 
+
 	// initialize M and V
 	cout << "M=" << endl;
 	for (size_t i = 0; i < M.size1(); ++i) {
@@ -54,12 +56,14 @@ void test_indirect_array01(void) {
 	}
 	cout << "V=\n" << V << endl;
 
+
 	//define an indirect_array
 	const size_t n = 3;
 	jblas::ind_array ia(n);
 	ia(0) = 1;
 	ia(1) = 2;
 	ia(2) = 3;
+
 
 	// operator <<
 	cout << "ia : " << ia << endl;
@@ -89,8 +93,10 @@ void test_indirect_array01(void) {
 	s(2, 1) = 221;
 	s(2, 2) = 322;
 
+
 	//hint: use jblas::ind_array::all() to access all indices
 	jblas::ind_array a(N);
+
 
 	// display array's data <--- does not work !
 	//		cout << "ia=\n" << ia.data() << endl;
@@ -100,17 +106,21 @@ void test_indirect_array01(void) {
 	ublas::matrix_indirect<ublas::matrix<int> > Mall(M, a.all(), a.all());
 	cout << "Mat, all=\n" << Mall << endl;
 
+
 	// use ia to extract some indices
 	ublas::matrix_indirect<ublas::matrix<int> > Mindirect(M, ia, ia);
 	cout << "Mat, ind=\n" << Mindirect << endl;
 
+
 	// or use ublas::project
 	cout << "Mat, proj=\n" << ublas::project(M, ia, ia) << endl;
+
 
 	// Project on a matrix
 	project(M, ia, ib) = m;
 	cout << "mat, projected to Mat=" << m << endl;
 	cout << "Mat, updated" << M << endl;
+
 
 	// Access to all the matrix
 	cout << "\n% OPERATIONS ON SYMMETRIC MATRICES" << endl;
@@ -194,9 +204,55 @@ void test_indirect_array02(void) {
 
 }
 
+void test_indirect_array03() {
+	jblas::ind_array ia = ublasExtra::ia_range(2, 5);
+	jblas::vec V(10);
+	randVector(V);
+
+	jblas::vec_indirect v(V, ia);
+	cout << "V         = " << V << endl;
+	cout << "ia        = " << ia << endl;
+	cout << "v         = " << v << endl;
+	cout << "&V        = " << &V << endl;
+	cout << "&v.data() = " << &v.data() << endl;
+	cout << "v.data()[2] = " << v.data()[2] << endl;
+	cout << "v.data().size() = " << v.data().size() << endl;
+
+	jblas::vec_indirect w(v);
+	cout << "w         = " << w << endl;
+	cout << "&w.data() = " << &w.data() << endl;
+	cout << "w.data()[2] = " << w.data()[2] << endl;
+	cout << "w.data().size() = " << w.data().size() << endl;
+
+	V(2) = 0;
+	cout << "v.data()[2] = " << v.data()[2] << endl;
+	cout << "w.data()[2] = " << w.data()[2] << endl;
+
+	jblas::ind_array ia2(ia);
+	cout << "ia2   = " << ia2 << endl;
+
+}
+
+void test_indirect_array04() {
+	cout << "\n BOOST IND_ARRAY COMPOSITION\n%========================" << endl;
+	jblas::ind_array ia_base = ublasExtra::ia_range(4, 8);
+	jblas::ind_array ia_ptr = ublasExtra::ia_range(1, 3);
+	cout << "ia_base = " << ia_base << endl;
+	cout << "ia_ptr = " << ia_ptr << endl;
+	// try one among these 2:
+	cout << "% ia_comp  = ia_base.compose(ia_equal);" << endl;
+	jblas::ind_array ia_comp = ia_base.compose(ia_ptr);
+	//	jblas::ind_array ia_comp  = ia_ptr.compose(ia_base);
+	cout << "ia_comp = " << ia_comp << endl;
+	cout << "We got ==> ia_comp(i) = ia_base(ia_ptr(i)) " << endl;
+	JFR_CHECK_EQUAL( ia_comp(1) , ia_base(ia_ptr(1)) );
+}
+
 BOOST_AUTO_TEST_CASE( test_indirect_array )
 {
 	//	test_indirect_array01();
-	test_indirect_array02();
+	//	test_indirect_array02();
+	//	test_indirect_array03();
+	test_indirect_array04();
 }
 

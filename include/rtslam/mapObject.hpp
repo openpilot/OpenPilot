@@ -18,8 +18,10 @@
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/gaussian.hpp"
 
+
 namespace jafar {
 	namespace rtslam {
+		using namespace std;
 
 
 		/**
@@ -46,7 +48,7 @@ namespace jafar {
 				MapObject(const std::size_t _size);
 
 				/**
-				 * Remote constructor from remote map and indirect array
+				 * Remote constructor from remote map and size
 				 * \param _map the remote map
 				 * \param _begin the first index pointing to the remote storage
 				 */

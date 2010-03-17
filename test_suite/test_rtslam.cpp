@@ -28,10 +28,10 @@
 
 //#include <map>
 
-using namespace jafar::rtslam;
 using namespace jblas;
 using namespace jafar::jmath;
 using namespace jafar::jmath::ublasExtra;
+using namespace jafar::rtslam;
 
 void fillMapSeq(MapAbstract & map) {
 	size_t size_map = map.max_size;
@@ -63,33 +63,33 @@ void test_rtslam01(void) {
 
 	fillMapIdent(slamMap);
 
-	cout << endl << "\n ROBOTS AND SENSORS \n%====================" << endl;
+	cout << endl << "\n% ROBOTS AND SENSORS \n%====================" << endl;
 
 
 	// Add 2 robots
 	std::size_t sizerob = Robot3DConstantVelocity::size();
 	std::size_t sizesen = SensorPinHole::size();
 	if (slamMap.unusedStates(sizerob)) {
-		Robot3DConstantVelocity * robPtr1 = new Robot3DConstantVelocity(slamMap);
-		robPtr1->name("SUBMARINE");
+		Robot3DConstantVelocity * robPtr = new Robot3DConstantVelocity(slamMap);
+		robPtr->name("SUBMARINE");
 
 		if (slamMap.unusedStates(sizesen)) {
-			SensorPinHole * senPtr1 = new SensorPinHole(*robPtr1);
-			senPtr1->name("FLEA");
+			SensorPinHole * senPtr = new SensorPinHole(*robPtr);
+			senPtr->name("FLEA");
 		}
 
 		if (slamMap.unusedStates(sizesen)) {
-			SensorPinHole * senPtr2 = new SensorPinHole(*robPtr1, true);
-			senPtr2->name("MARLIN");
+			SensorPinHole * senPtr = new SensorPinHole(*robPtr, true);
+			senPtr->name("MARLIN");
 		}
 	}
 	if (slamMap.unusedStates(sizerob)) {
-		Robot3DConstantVelocity * robPtr2 = new Robot3DConstantVelocity(slamMap);
-		robPtr2->name("AEROPLANE");
+		Robot3DConstantVelocity * robPtr = new Robot3DConstantVelocity(slamMap);
+		robPtr->name("AEROPLANE");
 
 		if (slamMap.unusedStates(sizesen)) {
-			SensorPinHole * senPtr3 = new SensorPinHole(*robPtr2);
-			senPtr3->name("VIDERE");
+			SensorPinHole * senPtr = new SensorPinHole(*robPtr);
+			senPtr->name("VIDERE");
 		}
 	}
 
@@ -101,28 +101,26 @@ void test_rtslam01(void) {
 
 	for (robIter = slamMap.robots.begin(); robIter != slamMap.robots.end(); robIter++) {
 
-		size_t rid = robIter->first;
 		RobotAbstract * robPtr = robIter->second;
-
 		cout << *robPtr << endl;
 
 		for (senIter = robPtr->sensors.begin(); senIter != robPtr->sensors.end(); senIter++) {
-			size_t sid = senIter->first;
+
 			SensorAbstract * senPtr = senIter->second;
 			cout << *senPtr << endl;
 
 		}
 	}
 
-	cout << "\n LANDMARKS \n%==========" << endl;
+	cout << "\n% LANDMARKS \n%==========" << endl;
 
 
 	// Add 2 lmks
 	for (size_t i = 0; i < 2; i++) {
 		std::size_t sizelmk = Landmark3DAnchoredHomogeneousPoint::size();
 		if (slamMap.unusedStates(sizelmk)) {
-			Landmark3DAnchoredHomogeneousPoint * lmkPtr1 = new Landmark3DAnchoredHomogeneousPoint(slamMap);
-			lmkPtr1->name("");
+			Landmark3DAnchoredHomogeneousPoint * lmkPtr = new Landmark3DAnchoredHomogeneousPoint(slamMap);
+			lmkPtr->name("");
 		}
 	}
 

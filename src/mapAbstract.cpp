@@ -17,10 +17,10 @@
 #include "rtslam/robotAbstract.hpp"
 #include "rtslam/landmarkAbstract.hpp"
 
-using namespace std;
-
 namespace jafar {
 	namespace rtslam {
+		using namespace std;
+
 
 
 		/**

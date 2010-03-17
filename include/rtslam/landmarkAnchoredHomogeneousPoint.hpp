@@ -14,7 +14,6 @@
 
 #include "rtslam/landmarkAbstract.hpp"
 #include "rtslam/quatTools.hpp"
-#include "iostream"
 
 /**
  * General namespace for Jafar environment.

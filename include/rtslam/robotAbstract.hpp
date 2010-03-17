@@ -36,14 +36,11 @@
 #include "rtslam/gaussian.hpp"
 #include "rtslam/mapObject.hpp"
 // include parents
-#include "rtslam/sensorAbstract.hpp"
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/mapObject.hpp"
 
 namespace jafar {
-
 	namespace rtslam {
-
 		using namespace std;
 
 		//  Forward declarations of children
@@ -140,10 +137,10 @@ namespace jafar {
 					s << "of type " << rob.type() << endl;
 					s << ".state:  " << rob.state << endl;
 					s << ".pose :  " << rob.pose << endl;
-					s << ".sens : [ ";
+					s << ".sens : [";
 					sensors_t::iterator senIter;
 					for (senIter = rob.sensors.begin(); senIter != rob.sensors.end(); senIter++)
-						s << senIter->first << " ";
+						s << " " << senIter->first << " ";
 					s << "]";
 					return s;
 				}

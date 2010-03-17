@@ -14,12 +14,14 @@
 #ifndef KALMANFILTER_HPP_
 #define KALMANFILTER_HPP_
 
-//#include "rtslam/gaussian.hpp"
 #include "jmath/ixaxpy.hpp"
 #include "jmath/ublasExtra.hpp"
 
 namespace jafar {
 	namespace rtslam {
+		using namespace std;
+		using namespace jblas;
+
 
 		/**
 		 * Base class for Kalman filters
@@ -31,17 +33,18 @@ namespace jafar {
 				size_t measurementSize;
 				size_t expectationSize;
 				size_t innovationSize;
-				jblas::vec x;
-				jblas::sym_mat P;
+				vec x;
+				sym_mat P;
 				//				boost::posix_time::time_duration curTime;
-				jblas::mat K;
-				jblas::mat PHt_tmp;
+				mat K;
+				mat PHt_tmp;
 
 				ExtendedKalmanFilterIndirect(size_t _size) :
 					size(_size), x(size), P(size) {
 					x.clear();
 					P.clear();
 				}
+
 
 				// TODO: define API for all these functions.
 				/**
@@ -57,8 +60,7 @@ namespace jafar {
 				 * \param F_u the Jacobian of the process model wrt the perturbation.
 				 * \param U the covariances matrix of the perturbation.
 				 */
-				inline void predict(jblas::ind_array & iax, jblas::mat & F_v, jblas::ind_array & iav, jblas::mat & F_u,
-				    jblas::sym_mat & U) {
+				inline void predict(ind_array & iax, mat & F_v, ind_array & iav, mat & F_u, sym_mat & U) {
 					jafar::jmath::ublasExtra::ixaxpy_prod(P, iax, F_v, iav);
 					ublas::project(P, iav, iav) += jafar::jmath::ublasExtra::prod_JPJt(U, F_u);
 				}

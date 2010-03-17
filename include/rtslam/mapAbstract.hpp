@@ -21,22 +21,19 @@
 #include "jmath/jblas.hpp"
 #include "rtslam/gaussian.hpp"
 #include "rtslam/kalmanFilter.hpp"
-//#include "rtslam/landmarkAbstract.hpp"
+
 
 namespace jafar {
-
-
 	/**
 	 * Namespace rtslam for real-time slam module.
 	 * \ingroup rtslam
 	 */
 	namespace rtslam {
-
+		using namespace std;
 
 		// some forward declarations.
 		class RobotAbstract;
 		class LandmarkAbstract;
-		class ObservationAbstract;
 
 
 		/** Base class for all map types defined in the module rtslam.

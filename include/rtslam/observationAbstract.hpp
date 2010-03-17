@@ -32,16 +32,13 @@
 
 #include <jmath/jblas.hpp>
 
-#include "rtslam/blocks.hpp"
 #include "rtslam/gaussian.hpp"
 // include parents
 #include "rtslam/sensorAbstract.hpp"
 #include "rtslam/landmarkAbstract.hpp"
 
 namespace jafar {
-
 	namespace rtslam {
-
 		using namespace std;
 
 		/** Base class for all landmark appearances defined in the module

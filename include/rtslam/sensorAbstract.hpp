@@ -21,21 +21,34 @@
 #include <map>
 
 #include "jmath/jblas.hpp"
-#include "rtslam/blocks.hpp"
 //include parents
-//#include "rtslam/robotAbstract.hpp"
-#include "rtslam/mapObject.hpp"
 #include "rtslam/mapAbstract.hpp"
+#include "rtslam/mapObject.hpp"
+#include "rtslam/robotAbstract.hpp"
 
 namespace jafar {
 	namespace rtslam {
-
 		using namespace std;
 
 
 		// Forward declarations of children
 		class ObservationAbstract;
-//		class RobotAbstract;
+
+		/**
+		 * Base class for all parameter sets in module rtslam.
+		 * \ingroup rtslam
+		 */
+		class ParametersAbstract {
+			public:
+				/**
+				 * Mandatory virtual destructor.
+				 */
+				inline virtual ~ParametersAbstract(void) {
+				}
+
+		};
+
+
 
 		/**
 		 * Base class for all raw data in module rtslam.
@@ -174,7 +187,8 @@ namespace jafar {
 					if (sen.name().size() > 0)
 						s << sen.name() << ", ";
 					s << "of type " << sen.type() << std::endl;
-					s << ".pose :  " << sen.pose;
+					s << ".pose :  " << sen.pose << endl;
+					s << ".robot: [ " << sen.robot->id() << " ]";
 					return s;
 				}
 

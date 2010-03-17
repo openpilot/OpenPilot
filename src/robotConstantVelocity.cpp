@@ -20,21 +20,7 @@
 
 namespace jafar {
 	namespace rtslam {
-
 		using namespace std;
-
-
-		//		/**
-		//		 * Local constructor.
-		//		 */
-		//		Robot3DConstantVelocity::Robot3DConstantVelocity(void) :
-		//			RobotAbstract(Robot3DConstantVelocity::size(), Robot3DConstantVelocity::size_control()) {
-		//			// Build constant perturbation Jacobian
-		//			jblas::identity_mat I(3);
-		//			ublas::subrange(F_u, 7, 10, 0, 3) = I;
-		//			ublas::subrange(F_u, 10, 13, 3, 6) = I;
-		//			type("Constant-Velocity");
-		//		}
 
 
 		/**

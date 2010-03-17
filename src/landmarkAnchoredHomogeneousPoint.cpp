@@ -18,7 +18,7 @@ namespace jafar {
 
 
 		/**
-		 * Constructor from map and indirect array
+		 * Constructor from map
 		 */
 		Landmark3DAnchoredHomogeneousPoint::Landmark3DAnchoredHomogeneousPoint(MapAbstract & map) :
 			LandmarkAbstract(map, 7) {

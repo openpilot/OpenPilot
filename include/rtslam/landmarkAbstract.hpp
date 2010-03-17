@@ -27,17 +27,12 @@
 #define __LandmarkAbstract_H__
 
 
-#include <list>
-#include <jmath/jblas.hpp>
-
 // include parents
-#include "rtslam/mapObject.hpp"
 #include "rtslam/mapAbstract.hpp"
+#include "rtslam/mapObject.hpp"
 
 namespace jafar {
-
 	namespace rtslam {
-
 		using namespace std;
 
 		// Forward declarations of children
@@ -69,7 +64,7 @@ namespace jafar {
 			public:
 
 				/**
-				 * constructor
+				 * constructor from map and size
 				 */
 				LandmarkAbstract(MapAbstract & _map, const size_t _size);
 

@@ -12,10 +12,10 @@
  */
 
 #include "rtslam/robotAbstract.hpp"
+#include "rtslam/sensorAbstract.hpp"
 
 namespace jafar {
 	namespace rtslam {
-
 		using namespace std;
 
 

@@ -326,6 +326,7 @@ namespace jafar {
 				inline Gaussian(const Gaussian & G, storage_t _storage = UNCHANGED) :
 					hasNullCov_(G.hasNullCov_),
 					size_  (G.size_),
+					//        # check storage       ?              # is local                                  : # is remote
 					storage_(_storage == UNCHANGED  ?  G.storage_                                              : _storage),
 					x_local (_storage == LOCAL      ?  G.x_                                                    : G.x_local),
 					P_local (_storage == LOCAL      ?  G.P_                                                    : G.P_local),

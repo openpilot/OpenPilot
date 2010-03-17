@@ -6,7 +6,6 @@
 #include "kernel/jafarException.hpp"
 
 namespace jafar {
-
 	namespace rtslam {
 
 		/** Base class for all exceptions defined in the module

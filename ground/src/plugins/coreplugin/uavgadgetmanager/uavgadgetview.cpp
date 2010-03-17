@@ -63,8 +63,9 @@ using namespace Core::Internal;
 
 // ================UAVGadgetView====================
 
-UAVGadgetView::UAVGadgetView(IUAVGadget *uavGadget, QWidget *parent) :
+UAVGadgetView::UAVGadgetView(UAVGadgetManager *uavGadgetManager, IUAVGadget *uavGadget, QWidget *parent) :
         QWidget(parent),
+        m_uavGadgetManager(uavGadgetManager),
         m_uavGadget(uavGadget),
         m_toolBar(new QWidget),
         m_defaultToolBar(new QWidget(this)),
@@ -116,8 +117,8 @@ UAVGadgetView::UAVGadgetView(IUAVGadget *uavGadget, QWidget *parent) :
     //  //qDebug() << Q_FUNC_INFO << uavGadget;
     ActionManager *am = ICore::instance()->actionManager();
     //  //qDebug() << Q_FUNC_INFO << uavGadget << am;
-    connect(am->command(Constants::CLOSE), SIGNAL(keySequenceChanged()),
-            this, SLOT(updateActionShortcuts()));
+//    connect(am->command(Constants::CLOSE), SIGNAL(keySequenceChanged()),
+//            this, SLOT(updateActionShortcuts()));
 
     updateActionShortcuts();
     //    updateActions();
@@ -140,8 +141,7 @@ void UAVGadgetView::hideToolbar(bool hide)
 void UAVGadgetView::closeView()
 {
 //    m_top->hide();
-    UAVGadgetManager *gm = CoreImpl::instance()->uavGadgetManager();
-    gm->closeView(this);
+    m_uavGadgetManager->closeView(this);
   //qDebug() << Q_FUNC_INFO;
 /*    removeUAVGadget();
     if (m_uavGadget)
@@ -228,17 +228,18 @@ void UAVGadgetView::listSelectionActivated(int index)
 void UAVGadgetView::updateActionShortcuts()
 {
   //qDebug() << Q_FUNC_INFO;
-    ActionManager *am = ICore::instance()->actionManager();
-    m_closeButton->setToolTip(am->command(Constants::CLOSE)->stringWithAppendedShortcut(UAVGadgetManager::tr("Close")));
+//    ActionManager *am = ICore::instance()->actionManager();
+//    m_closeButton->setToolTip(am->command(Constants::CLOSE)->stringWithAppendedShortcut(UAVGadgetManager::tr("Close")));
 }
 
 
-SplitterOrView::SplitterOrView(Core::IUAVGadget *uavGadget, bool isRoot)
+SplitterOrView::SplitterOrView(UAVGadgetManager *uavGadgetManager, Core::IUAVGadget *uavGadget, bool isRoot) :
+        m_uavGadgetManager(uavGadgetManager),
+        m_isRoot(isRoot)
 {    
   //qDebug() << Q_FUNC_INFO << uavGadget << isRoot;
-    m_isRoot = isRoot;
     //  //qDebug() << Q_FUNC_INFO << uavGadget << isRoot;
-    m_view = new UAVGadgetView(uavGadget);
+    m_view = new UAVGadgetView(m_uavGadgetManager, uavGadget);
     m_layout = new QStackedLayout(this);
     m_splitter = 0;
     m_layout->addWidget(m_view);
@@ -258,13 +259,13 @@ void SplitterOrView::mousePressEvent(QMouseEvent *e)
     if (e->button() != Qt::LeftButton)
         return;
     setFocus(Qt::MouseFocusReason);
-    CoreImpl::instance()->uavGadgetManager()->setCurrentView(this);
+    m_uavGadgetManager->setCurrentView(this);
 }
 
 void SplitterOrView::paintEvent(QPaintEvent *)
 {
     //  //qDebug() << Q_FUNC_INFO;
-    if (CoreImpl::instance()->uavGadgetManager()->currentSplitterOrView() != this)
+    if (m_uavGadgetManager->currentSplitterOrView() != this)
         return;
 
     if (!m_view || hasUAVGadgets())
@@ -464,18 +465,17 @@ void SplitterOrView::split(Qt::Orientation orientation)
     m_splitter = new MiniSplitter(this);
     m_splitter->setOrientation(orientation);
     m_layout->addWidget(m_splitter);
-    UAVGadgetManager *gm = CoreImpl::instance()->uavGadgetManager();
     Core::IUAVGadget *e = m_view->currentUAVGadget();
 
     SplitterOrView *view = 0;
     SplitterOrView *otherView = 0;
     if (e) {
         m_view->removeUAVGadget();
-        m_splitter->addWidget((view = new SplitterOrView(e)));
-        m_splitter->addWidget((otherView = new SplitterOrView()));
+        m_splitter->addWidget((view = new SplitterOrView(m_uavGadgetManager, e)));
+        m_splitter->addWidget((otherView = new SplitterOrView(m_uavGadgetManager)));
     } else {
-        m_splitter->addWidget((otherView = new SplitterOrView()));
-        m_splitter->addWidget((view = new SplitterOrView()));
+        m_splitter->addWidget((otherView = new SplitterOrView(m_uavGadgetManager)));
+        m_splitter->addWidget((view = new SplitterOrView(m_uavGadgetManager)));
     }
 
     //    QWidget *w = m_layout->currentWidget();
@@ -483,12 +483,12 @@ void SplitterOrView::split(Qt::Orientation orientation)
     //    m_layout->removeWidget(w);
 
     if (m_view && !m_isRoot) {
-        gm->emptyView(m_view);
+        m_uavGadgetManager->emptyView(m_view);
         delete m_view;
         m_view = 0;
     }
 
-    gm->setCurrentView(view);
+    m_uavGadgetManager->setCurrentView(view);
 }
 
 void SplitterOrView::unsplitAll()
@@ -505,7 +505,7 @@ void SplitterOrView::unsplitAll_helper()
 {
   //qDebug() << Q_FUNC_INFO;
     if (!m_isRoot && m_view)
-        CoreImpl::instance()->uavGadgetManager()->emptyView(m_view);
+        m_uavGadgetManager->emptyView(m_view);
     if (m_splitter) {
         for (int i = 0; i < m_splitter->count(); ++i) {
             if (SplitterOrView *splitterOrView = qobject_cast<SplitterOrView*>(m_splitter->widget(i))) {
@@ -522,7 +522,6 @@ void SplitterOrView::unsplit()
         return;
 
     Q_ASSERT(m_splitter->count() == 1);
-    UAVGadgetManager *em = CoreImpl::instance()->uavGadgetManager();
     SplitterOrView *childSplitterOrView = qobject_cast<SplitterOrView*>(m_splitter->widget(0));
     QSplitter *oldSplitter = m_splitter;
     m_splitter = 0;
@@ -540,7 +539,7 @@ void SplitterOrView::unsplit()
                 childView->removeUAVGadget();
                 m_view->setCurrentUAVGadget(e);
             }
-            em->emptyView(childView);
+            m_uavGadgetManager->emptyView(childView);
         } else {
             m_view = childSplitterOrView->takeView();
             m_layout->addWidget(m_view);
@@ -548,71 +547,71 @@ void SplitterOrView::unsplit()
         m_layout->setCurrentWidget(m_view);
     }
     delete oldSplitter;
-    em->setCurrentView(findFirstView());
+    m_uavGadgetManager->setCurrentView(findFirstView());
 }
 
 
 QByteArray SplitterOrView::saveState() const
 {
     QByteArray bytes;
-    /*    QDataStream stream(&bytes, QIODevice::WriteOnly);
-
-    if (m_splitter) {
-        stream << QByteArray("splitter")
-                << (qint32)m_splitter->orientation()
-                << m_splitter->saveState()
-                << static_cast<SplitterOrView*>(m_splitter->widget(0))->saveState()
-                << static_cast<SplitterOrView*>(m_splitter->widget(1))->saveState();
-    } else {
-        IUAVGadget* e = uavGadget();
-        UAVGadgetManager *em = CoreImpl::instance()->uavGadgetManager();
-
-        if (e && e == em->currentUAVGadget()) {
-            stream << QByteArray("currentuavGadget")
-                    << e->file()->fileName() << e->kind() << e->saveState();
-        } else if (e) {
-            stream << QByteArray("uavGadget")
-                    << e->file()->fileName() << e->kind() << e->saveState();
-        } else {
-            stream << QByteArray("empty");
-        }
-    }*/
+//    QDataStream stream(&bytes, QIODevice::WriteOnly);
+//
+//    if (m_splitter) {
+//        stream << QByteArray("splitter")
+//                << (qint32)m_splitter->orientation()
+//                << m_splitter->saveState()
+//                << static_cast<SplitterOrView*>(m_splitter->widget(0))->saveState()
+//                << static_cast<SplitterOrView*>(m_splitter->widget(1))->saveState();
+//    } else {
+//        IUAVGadget* e = uavGadget();
+//        UAVGadgetManager *em = CoreImpl::instance()->uavGadgetManager();
+//
+//        if (e && e == em->currentUAVGadget()) {
+//            stream << QByteArray("currentuavGadget")
+//                    << e->file()->fileName() << e->kind() << e->saveState();
+//        } else if (e) {
+//            stream << QByteArray("uavGadget")
+//                    << e->file()->fileName() << e->kind() << e->saveState();
+//        } else {
+//            stream << QByteArray("empty");
+//        }
+//    }
     return bytes;
 }
 
 void SplitterOrView::restoreState(const QByteArray &state)
 {
-    /*    QDataStream stream(state);
-    QByteArray mode;
-    stream >> mode;
-    if (mode == "splitter") {
-        qint32 orientation;
-        QByteArray splitter, first, second;
-        stream >> orientation >> splitter >> first >> second;
-        split((Qt::Orientation)orientation);
-        m_splitter->restoreState(splitter);
-        static_cast<SplitterOrView*>(m_splitter->widget(0))->restoreState(first);
-        static_cast<SplitterOrView*>(m_splitter->widget(1))->restoreState(second);
-    } else if (mode == "uavGadget" || mode == "currentuavGadget") {
-        UAVGadgetManager *em = CoreImpl::instance()->uavGadgetManager();
-        QString fileName;
-        QByteArray kind;
-        QByteArray uavGadgetState;
-        stream >> fileName >> kind >> uavGadgetState;
-        IUAVGadget *e = em->openUAVGadget(view(), fileName, kind, Core::UAVGadgetManager::IgnoreNavigationHistory
-                                    | Core::UAVGadgetManager::NoActivate);
-
-        if (!e) {
-            QModelIndex idx = em->openedUAVGadgetsModel()->firstRestoredUAVGadget();
-            if (idx.isValid())
-                em->activateUAVGadget(idx, view(), Core::UAVGadgetManager::IgnoreNavigationHistory
-                                    | Core::UAVGadgetManager::NoActivate);
-        }
-
-        if (e) {
-            e->restoreState(uavGadgetState);
-            if (mode == "currentuavGadget")
-                em->setCurrentUAVGadget(e);
-        }
-    }*/
+//    QDataStream stream(state);
+//    QByteArray mode;
+//    stream >> mode;
+//    if (mode == "splitter") {
+//        qint32 orientation;
+//        QByteArray splitter, first, second;
+//        stream >> orientation >> splitter >> first >> second;
+//        split((Qt::Orientation)orientation);
+//        m_splitter->restoreState(splitter);
+//        static_cast<SplitterOrView*>(m_splitter->widget(0))->restoreState(first);
+//        static_cast<SplitterOrView*>(m_splitter->widget(1))->restoreState(second);
+//    } else if (mode == "uavGadget" || mode == "currentuavGadget") {
+//        UAVGadgetManager *em = CoreImpl::instance()->uavGadgetManager();
+//        QString fileName;
+//        QByteArray kind;
+//        QByteArray uavGadgetState;
+//        stream >> fileName >> kind >> uavGadgetState;
+//        IUAVGadget *e = em->openUAVGadget(view(), fileName, kind, Core::UAVGadgetManager::IgnoreNavigationHistory
+//                                    | Core::UAVGadgetManager::NoActivate);
+//
+//        if (!e) {
+//            QModelIndex idx = em->openedUAVGadgetsModel()->firstRestoredUAVGadget();
+//            if (idx.isValid())
+//                em->activateUAVGadget(idx, view(), Core::UAVGadgetManager::IgnoreNavigationHistory
+//                                    | Core::UAVGadgetManager::NoActivate);
+//        }
+//
+//        if (e) {
+//            e->restoreState(uavGadgetState);
+//            if (mode == "currentuavGadget")
+//                em->setCurrentUAVGadget(e);
+//        }
+//    }
 }

@@ -37,7 +37,6 @@
 #include "iuavgadget.h"
 
 #include <QtCore/QLatin1String>
-#include <QtGui/QIcon>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QWidget>
 #include <QtGui/QSplitter>
@@ -45,8 +44,11 @@
 using namespace Core;
 using namespace Core::Internal;
 
-UAVGadgetMode::UAVGadgetMode(UAVGadgetManager *uavGadgetManager) :
+UAVGadgetMode::UAVGadgetMode(UAVGadgetManager *uavGadgetManager, QString name, QIcon icon, int priority, QString uniqueName) :
     m_uavGadgetManager(uavGadgetManager),
+    m_name(name),
+    m_icon(icon),
+    m_priority(0),
     m_widget(new QWidget),
     m_layout(new QVBoxLayout)
 {
@@ -54,26 +56,18 @@ UAVGadgetMode::UAVGadgetMode(UAVGadgetManager *uavGadgetManager) :
     m_layout->setMargin(0);
     m_widget->setLayout(m_layout);
     m_layout->insertWidget(0, new Core::UAVGadgetManagerPlaceHolder(this));
-
-//    MiniSplitter *rightPaneSplitter = new MiniSplitter;
-//    rightPaneSplitter->insertWidget(0, rightSplitWidget);
-//    rightPaneSplitter->insertWidget(1, new RightPanePlaceHolder(this));
-//    rightPaneSplitter->setStretchFactor(0, 1);
-//    rightPaneSplitter->setStretchFactor(1, 0);
-//
-//    MiniSplitter *splitter = new MiniSplitter;
-//    splitter->setOrientation(Qt::Vertical);
-//    splitter->insertWidget(0, rightPaneSplitter);
-//    splitter->insertWidget(1, new Core::OutputPanePlaceHolder(this));
-//    splitter->setStretchFactor(0, 3);
-//    splitter->setStretchFactor(1, 0);
-//
-//    m_splitter->insertWidget(0, new NavigationWidgetPlaceHolder(this));
-//    m_splitter->insertWidget(1, splitter);
-//    m_splitter->setStretchFactor(0, 0);
-//    m_splitter->setStretchFactor(1, 1);
+    if (0 <= priority && priority <= 100)
+        m_priority = priority;
 
     ModeManager *modeManager = ModeManager::instance();
+    // checking that the mode name is unique gives harmless
+    // warnings on the console output
+    if (!modeManager->mode(uniqueName)) {
+        m_uniqueName = uniqueName;
+    } else {
+        // this shouldn't happen
+        m_uniqueName = uniqueName + QString::number(quint64(this));
+    }
     connect(modeManager, SIGNAL(currentModeChanged(Core::IMode*)),
             this, SLOT(grabUAVGadgetManager(Core::IMode*)));
     m_widget->setFocusProxy(m_uavGadgetManager);
@@ -81,6 +75,7 @@ UAVGadgetMode::UAVGadgetMode(UAVGadgetManager *uavGadgetManager) :
 
 UAVGadgetMode::~UAVGadgetMode()
 {
+    // TODO: see if this leftover from Qt Creator still applies
     // Make sure the uavGadget manager does not get deleted
     m_uavGadgetManager->setParent(0);
     delete m_widget;
@@ -88,17 +83,17 @@ UAVGadgetMode::~UAVGadgetMode()
 
 QString UAVGadgetMode::name() const
 {
-    return tr("UavGadget");
+    return m_name;
 }
 
 QIcon UAVGadgetMode::icon() const
 {
-    return QIcon(QLatin1String(":/core/images/openpilot_logo_64.png"));
+    return m_icon;
 }
 
 int UAVGadgetMode::priority() const
 {
-    return Constants::P_MODE_UAVGADGET;
+    return m_priority;
 }
 
 QWidget* UAVGadgetMode::widget()
@@ -108,7 +103,7 @@ QWidget* UAVGadgetMode::widget()
 
 const char* UAVGadgetMode::uniqueModeName() const
 {
-    return Constants::MODE_UAVGADGET;
+    return m_uniqueName.toAscii().data();
 }
 
 QList<int> UAVGadgetMode::context() const

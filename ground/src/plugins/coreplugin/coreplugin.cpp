@@ -27,6 +27,7 @@
  */
 
 #include "coreplugin.h"
+#include "coreimpl.h"
 #include "mainwindow.h"
 #include "modemanager.h"
 #include "uavgadgetmode.h"
@@ -39,16 +40,19 @@
 using namespace Core::Internal;
 
 CorePlugin::CorePlugin() :
-    m_mainWindow(new MainWindow),
-    m_uavGadgetMode(0)
+    m_mainWindow(new MainWindow)
+//    m_uavGadgetMode(0)
 {
 }
 
 CorePlugin::~CorePlugin()
 {
-    if (m_uavGadgetMode) {
-        removeObject(m_uavGadgetMode);
-        delete m_uavGadgetMode;
+    if (m_uavGadgetModes.count() > 0) {
+        foreach (UAVGadgetMode *mode, m_uavGadgetModes)
+        {
+            removeObject(mode);
+            delete mode;
+        }
     }
     delete m_mainWindow;
 }
@@ -58,9 +62,21 @@ bool CorePlugin::initialize(const QStringList &arguments, QString *errorMessage)
     Q_UNUSED(arguments)
     const bool success = m_mainWindow->init(errorMessage);
     if (success) {
-        UAVGadgetManager *uavGadgetManager = m_mainWindow->uavGadgetManager();
-        m_uavGadgetMode = new UAVGadgetMode(uavGadgetManager);
-        addObject(m_uavGadgetMode);
+        UAVGadgetMode *uavGadgetMode;
+        UAVGadgetManager *m_uavGadgetManager = new UAVGadgetManager(CoreImpl::instance(), m_mainWindow);
+        m_uavGadgetManager->hide();
+        uavGadgetMode = new UAVGadgetMode(m_uavGadgetManager, QString("Mode 1"),
+                                            QIcon(":/core/images/openpilot_logo_64.png"), 80, QString("Mode1"));
+        m_uavGadgetManager->setUAVGadgetMode(uavGadgetMode);
+        m_uavGadgetModes.append(uavGadgetMode);
+        addObject(uavGadgetMode);
+        m_uavGadgetManager = new UAVGadgetManager(CoreImpl::instance(), m_mainWindow);
+        m_uavGadgetManager->hide();
+        uavGadgetMode = new UAVGadgetMode(m_uavGadgetManager, QString("Mode 2"),
+                                            QIcon(":/core/images/plus.png"), 60, QString("Mode2"));
+        m_uavGadgetManager->setUAVGadgetMode(uavGadgetMode);
+        m_uavGadgetModes.append(uavGadgetMode);
+        addObject(uavGadgetMode);
     }
     return success;
 }

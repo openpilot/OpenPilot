@@ -55,7 +55,7 @@ public:
     ActionManager *actionManager() const;
     UniqueIDManager *uniqueIDManager() const;
     MessageManager *messageManager() const;
-    UAVGadgetManager *uavGadgetManager() const;
+//    UAVGadgetManager *uavGadgetManager() const;
     VariableManager *variableManager() const;
     ModeManager *modeManager() const;
     MimeDatabase *mimeDatabase() const;

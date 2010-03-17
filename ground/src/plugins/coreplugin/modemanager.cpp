@@ -67,7 +67,7 @@ ModeManager::ModeManager(Internal::MainWindow *mainWindow, FancyTabWidget *modeS
     m_instance = this;
 
     m_actionBar = new FancyActionBar(modeStack);
-    m_modeStack->addCornerWidget(m_actionBar);
+//    m_modeStack->addCornerWidget(m_actionBar);
 
     connect(m_modeStack, SIGNAL(currentAboutToShow(int)), SLOT(currentTabAboutToChange(int)));
     connect(m_modeStack, SIGNAL(currentChanged(int)), SLOT(currentTabChanged(int)));
@@ -92,7 +92,9 @@ void ModeManager::addWidget(QWidget *widget)
 
 IMode *ModeManager::currentMode() const
 {
-    return m_modes.at(m_modeStack->currentIndex());
+    if (m_modes.count() > 0)
+        return m_modes.at(m_modeStack->currentIndex());
+    return 0;
 }
 
 int ModeManager::indexOf(const QString &id) const

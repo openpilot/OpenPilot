@@ -54,6 +54,7 @@ class StyledBar;
 namespace Core {
 
 class IUAVGadget;
+class UAVGadgetManager;
 
 namespace Internal {
 
@@ -62,7 +63,7 @@ class UAVGadgetView : public QWidget
     Q_OBJECT
 
 public:
-    UAVGadgetView(IUAVGadget *uavGadget = 0, QWidget *parent = 0);
+    UAVGadgetView(UAVGadgetManager *uavGadgetManager, IUAVGadget *uavGadget = 0, QWidget *parent = 0);
     virtual ~UAVGadgetView();
 
     void removeUAVGadget();
@@ -81,6 +82,7 @@ private slots:
 private:
     void updateToolBar();
 
+    UAVGadgetManager *m_uavGadgetManager;
     IUAVGadget *m_uavGadget;
     QWidget *m_toolBar;
     QWidget *m_defaultToolBar;
@@ -96,7 +98,7 @@ class SplitterOrView  : public QWidget
 {
     Q_OBJECT
 public:
-    SplitterOrView(Core::IUAVGadget *uavGadget = 0, bool root = false);
+    SplitterOrView(UAVGadgetManager *uavGadgetManager, Core::IUAVGadget *uavGadget = 0, bool root = false);
     ~SplitterOrView();
 
     void split(Qt::Orientation orientation);
@@ -135,13 +137,11 @@ protected:
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *e);
 
-
 private:
     void unsplitAll_helper();
     SplitterOrView *findNextView_helper(SplitterOrView *view, bool *found);
-public:
+    UAVGadgetManager *m_uavGadgetManager;
     bool m_isRoot;
-private:
     QStackedLayout *m_layout;
     UAVGadgetView *m_view;
     QSplitter *m_splitter;

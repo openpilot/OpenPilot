@@ -54,7 +54,7 @@ public slots:
 
 private:
     MainWindow *m_mainWindow;
-    UAVGadgetMode *m_uavGadgetMode;
+    QList<UAVGadgetMode*> m_uavGadgetModes;
 };
 
 } // namespace Internal

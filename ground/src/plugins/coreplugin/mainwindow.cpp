@@ -110,11 +110,11 @@ MainWindow::MainWindow() :
                                             this)),
     m_actionManager(new ActionManagerPrivate(this)),
     m_variableManager(new VariableManager(this)),
-    m_viewManager(0),
+//    m_viewManager(0),
     m_modeManager(0),
     m_uavGadgetManager(0),
     m_mimeDatabase(new MimeDatabase),
-    m_rightPaneWidget(0),
+//    m_rightPaneWidget(0),
     m_versionDialog(0),
     m_activeContext(0),
     m_generalSettings(new GeneralSettings),
@@ -163,17 +163,16 @@ MainWindow::MainWindow() :
     registerDefaultContainers();
     registerDefaultActions();
 
-    m_rightPaneWidget = new RightPaneWidget();
+//    m_rightPaneWidget = new RightPaneWidget();
 
     m_modeStack = new FancyTabWidget(this);
     m_modeManager = new ModeManager(this, m_modeStack);
     //m_modeManager->addWidget(m_progressManager->progressView());
-    m_viewManager = new ViewManager(this);
+//    m_viewManager = new ViewManager(this);
     m_messageManager = new MessageManager;
-    m_uavGadgetManager = new UAVGadgetManager(m_coreImpl, this);
-    m_uavGadgetManager->hide();
+//    m_uavGadgetManager = new UAVGadgetManager(m_coreImpl, this);
+//    m_uavGadgetManager->hide();
     setCentralWidget(m_modeStack);
-
 
     connect(QApplication::instance(), SIGNAL(focusChanged(QWidget*,QWidget*)),
             this, SLOT(updateFocusWidget(QWidget*,QWidget*)));
@@ -204,15 +203,15 @@ MainWindow::~MainWindow()
     delete m_uniqueIDManager;
     m_uniqueIDManager = 0;
 
-    delete m_viewManager;
-    m_viewManager = 0;
+//    delete m_viewManager;
+//    m_viewManager = 0;
 
     pm->removeObject(m_coreImpl);
     delete m_coreImpl;
     m_coreImpl = 0;
 
-    delete m_rightPaneWidget;
-    m_rightPaneWidget = 0;
+//    delete m_rightPaneWidget;
+//    m_rightPaneWidget = 0;
 
     delete m_modeManager;
     m_modeManager = 0;
@@ -226,7 +225,7 @@ bool MainWindow::init(QString *errorMessage)
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     pm->addObject(m_coreImpl);
-    m_viewManager->init();
+//    m_viewManager->init();
     m_modeManager->init();
 
     pm->addObject(m_generalSettings);
@@ -242,7 +241,7 @@ void MainWindow::modeChanged(Core::IMode */*mode*/)
 
 void MainWindow::extensionsInitialized()
 {
-    m_viewManager->extensionsInitalized();
+//    m_viewManager->extensionsInitalized();
 
     m_messageManager->init();
 
@@ -382,6 +381,7 @@ void MainWindow::registerDefaultContainers()
     menubar->addMenu(mwindow, Constants::G_WINDOW);
     mwindow->menu()->setTitle(tr("&Window"));
     mwindow->appendGroup(Constants::G_WINDOW_SIZE);
+    mwindow->appendGroup(Constants::G_WINDOW_HIDE_TOOLBAR);
     mwindow->appendGroup(Constants::G_WINDOW_PANES);
     mwindow->appendGroup(Constants::G_WINDOW_SPLIT);
     mwindow->appendGroup(Constants::G_WINDOW_NAVIGATE);
@@ -869,7 +869,7 @@ void MainWindow::readSettings()
 
     m_settings->endGroup();
 
-    m_rightPaneWidget->readSettings(m_settings);
+//    m_rightPaneWidget->readSettings(m_settings);
 }
 
 void MainWindow::writeSettings()
@@ -889,7 +889,7 @@ void MainWindow::writeSettings()
 
     m_settings->endGroup();
 
-    m_viewManager->saveSettings(m_settings);
+//    m_viewManager->saveSettings(m_settings);
     m_actionManager->saveSettings(m_settings);
 }
 

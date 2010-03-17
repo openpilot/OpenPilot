@@ -32,10 +32,12 @@
 #include <coreplugin/imode.h>
 
 #include <QtCore/QObject>
+#include <QtGui/QIcon>
 
 QT_BEGIN_NAMESPACE
 class QSplitter;
 class QWidget;
+class QIcon;
 class QVBoxLayout;
 QT_END_NAMESPACE
 
@@ -50,7 +52,7 @@ class UAVGadgetMode : public Core::IMode
     Q_OBJECT
 
 public:
-    UAVGadgetMode(UAVGadgetManager *uavGadgetManager);
+    UAVGadgetMode(UAVGadgetManager *uavGadgetManager, QString name, QIcon icon, int priority, QString uniqueName);
     ~UAVGadgetMode();
 
     // IMode
@@ -60,6 +62,7 @@ public:
     QWidget* widget();
     const char* uniqueModeName() const;
     QList<int> context() const;
+    UAVGadgetManager* uavGadgetManager() const { return m_uavGadgetManager; }
 
 private slots:
     void grabUAVGadgetManager(Core::IMode *mode);
@@ -68,6 +71,10 @@ private:
     UAVGadgetManager *m_uavGadgetManager;
     QWidget *m_widget;
     QVBoxLayout *m_layout;
+    QString m_name;
+    QIcon m_icon;
+    QString m_uniqueName;
+    int m_priority;
 };
 
 } // namespace Internal

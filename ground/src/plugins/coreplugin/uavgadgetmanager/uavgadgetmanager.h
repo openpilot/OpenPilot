@@ -54,6 +54,7 @@ struct UAVGadgetManagerPrivate;
 
 namespace Internal {
 
+class UAVGadgetMode;
 class UAVGadgetView;
 class SplitterOrView;
 
@@ -66,14 +67,15 @@ class CORE_EXPORT UAVGadgetManagerPlaceHolder : public QWidget
 {
     Q_OBJECT
 public:
-    UAVGadgetManagerPlaceHolder(Core::IMode *mode, QWidget *parent = 0);
+    UAVGadgetManagerPlaceHolder(Core::Internal::UAVGadgetMode *mode, QWidget *parent = 0);
     ~UAVGadgetManagerPlaceHolder();
-    static UAVGadgetManagerPlaceHolder* current();
+//    static UAVGadgetManagerPlaceHolder* current();
 private slots:
     void currentModeChanged(Core::IMode *);
 private:
     Core::IMode *m_mode;
-    static UAVGadgetManagerPlaceHolder* m_current;
+    Core::Internal::UAVGadgetMode *m_uavGadgetMode;
+    UAVGadgetManagerPlaceHolder* m_current;
 };
 
 class CORE_EXPORT UAVGadgetManager : public QWidget
@@ -86,7 +88,9 @@ public:
     explicit UAVGadgetManager(ICore *core, QWidget *parent);
     virtual ~UAVGadgetManager();
     void init();
-    static UAVGadgetManager *instance() { return m_instance; }
+    // setUAVGadgetMode should be called exactly once
+    // right after the mode has been created, and never thereafter
+    void setUAVGadgetMode(Core::Internal::UAVGadgetMode *mode) { m_uavGadgetMode = mode; }
 
     void ensureUAVGadgetManagerVisible();
 
@@ -100,6 +104,7 @@ public:
 
     void saveSettings();
     void readSettings();
+    bool toolbarsHidden() { return m_hidden; }
 
     UAVGadgetFactoryList uavGadgetFactories() const;
 
@@ -141,8 +146,9 @@ private:
     Core::Internal::UAVGadgetView *currentUAVGadgetView() const;
     IUAVGadget *pickUnusedUAVGadget() const;
 
-    static UAVGadgetManager *m_instance;
     UAVGadgetManagerPrivate *m_d;
+    Core::Internal::UAVGadgetMode *m_uavGadgetMode;
+    bool m_hidden;
 
     friend class Core::Internal::SplitterOrView;
     friend class Core::Internal::UAVGadgetView;

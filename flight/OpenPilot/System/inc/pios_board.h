@@ -287,6 +287,25 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define PIOS_PWM_SUPV_IRQ_FUNC			void TIM6_IRQHandler(void)
 
 //-------------------------
+// Receiver PPM input
+//-------------------------
+#define PIOS_PPM_GPIO_PORT			RECEIVER1_GPIO_PORT
+#define PIOS_PPM_GPIO_PIN			RECEIVER1_PIN
+#define PIOS_PPM_TIM_PORT			RECEIVER1_TIM_PORT
+#define PIOS_PPM_TIM_CHANNEL		RECEIVER1_CH
+#define PIOS_PPM_TIM_CCR			RECEIVER1_CCR
+#define PIOS_PPM_TIM				TIM1
+#define PIOS_PPM_TIM_IRQ			TIM1_CC_IRQn
+#define PIOS_PPM_NUM_INPUTS			8  //Could be more if needed
+#define PIOS_PPM_SUPV_ENABLED			0
+#define PIOS_PPM_SUPV_TIMER			TIM6
+#define PIOS_PPM_SUPV_TIMER_RCC_FUNC		RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE)
+#define PIOS_PPM_SUPV_HZ			25
+#define PIOS_PPM_SUPV_IRQ_CHANNEL		TIM6_IRQn
+#define PIOS_PPM_SUPV_IRQ_FUNC			void TIM6_IRQHandler(void)
+
+
+//-------------------------
 // Servo outputs   
 //-------------------------
 #define PIOS_SERVO_GPIO_PORT_1TO4		GPIOB
@@ -360,7 +379,7 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define PIOS_ADC_CLOCK_FUNCTION			RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 | RCC_APB2Periph_ADC2, ENABLE)
 #define PIOS_ADC_SAMPLE_TIME			ADC_SampleTime_239Cycles5 /* Sample time: */
 										/* With an ADCCLK = 14 MHz and a sampling time of 293.5 cycles: */
-										/* Tconv = 239.5 + 12.5 = 252 cycles = 18µs */
+										/* Tconv = 239.5 + 12.5 = 252 cycles = 18ï¿½s */
 #define PIOS_ADC_IRQ_PRIO			PIOS_IRQ_PRIO_HIGH
 
 //-------------------------  

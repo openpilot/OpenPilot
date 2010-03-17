@@ -110,7 +110,7 @@ MainWindow::MainWindow() :
                                             this)),
     m_actionManager(new ActionManagerPrivate(this)),
     m_variableManager(new VariableManager(this)),
-//    m_viewManager(0),
+    m_viewManager(0),
     m_modeManager(0),
     m_uavGadgetManager(0),
     m_mimeDatabase(new MimeDatabase),
@@ -168,7 +168,7 @@ MainWindow::MainWindow() :
     m_modeStack = new FancyTabWidget(this);
     m_modeManager = new ModeManager(this, m_modeStack);
     //m_modeManager->addWidget(m_progressManager->progressView());
-//    m_viewManager = new ViewManager(this);
+    m_viewManager = new ViewManager(this);
     m_messageManager = new MessageManager;
 //    m_uavGadgetManager = new UAVGadgetManager(m_coreImpl, this);
 //    m_uavGadgetManager->hide();
@@ -203,8 +203,8 @@ MainWindow::~MainWindow()
     delete m_uniqueIDManager;
     m_uniqueIDManager = 0;
 
-//    delete m_viewManager;
-//    m_viewManager = 0;
+    delete m_viewManager;
+    m_viewManager = 0;
 
     pm->removeObject(m_coreImpl);
     delete m_coreImpl;
@@ -225,7 +225,7 @@ bool MainWindow::init(QString *errorMessage)
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     pm->addObject(m_coreImpl);
-//    m_viewManager->init();
+    m_viewManager->init();
     m_modeManager->init();
 
     pm->addObject(m_generalSettings);
@@ -241,7 +241,7 @@ void MainWindow::modeChanged(Core::IMode */*mode*/)
 
 void MainWindow::extensionsInitialized()
 {
-//    m_viewManager->extensionsInitalized();
+    m_viewManager->extensionsInitalized();
 
     m_messageManager->init();
 
@@ -889,7 +889,7 @@ void MainWindow::writeSettings()
 
     m_settings->endGroup();
 
-//    m_viewManager->saveSettings(m_settings);
+    m_viewManager->saveSettings(m_settings);
     m_actionManager->saveSettings(m_settings);
 }
 

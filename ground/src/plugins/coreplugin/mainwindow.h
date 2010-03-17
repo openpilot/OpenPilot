@@ -162,7 +162,7 @@ private:
     ActionManagerPrivate *m_actionManager;
     MessageManager *m_messageManager;
     VariableManager *m_variableManager;
-//    ViewManager *m_viewManager;
+    ViewManager *m_viewManager;
     ModeManager *m_modeManager;
     UAVGadgetManager *m_uavGadgetManager;
     MimeDatabase *m_mimeDatabase;

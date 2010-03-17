@@ -170,14 +170,14 @@ namespace jafar {
 		 * Class for anchored homogeneous 3D points
 		 * \ingroup rtslam
 		 */
-		class Landmark3DAnchoredHomogeneousPoint: public LandmarkAbstract {
+		class LandmarkAnchoredHomogeneousPoint: public LandmarkAbstract {
 			public:
 
 
 				/**
 				 * Constructor from map
 				 */
-				Landmark3DAnchoredHomogeneousPoint(MapAbstract & map);
+				LandmarkAnchoredHomogeneousPoint(MapAbstract & map);
 
 
 				static size_t size(void) {
@@ -260,7 +260,7 @@ namespace jafar {
 				}
 
 
-		}; // class Landmark3DAnchoredHomogeneousPoint
+		}; // class LandmarkAnchoredHomogeneousPoint
 
 
 	} // namespace rtslam

@@ -22,8 +22,9 @@ namespace jafar {
 		 * Local constructor from size
 		 */
 		MapObject::MapObject(const std::size_t _size) :
+			ObjectAbstract(),
 			state(_size) {
-			categoryName_ = "OBJECT";
+			categoryName("MAP OBJECT");
 		}
 
 
@@ -31,9 +32,10 @@ namespace jafar {
 		 * Remote constructor from remote map and indirect array
 		 */
 		MapObject::MapObject(MapAbstract & _map, const size_t _size) :
+			ObjectAbstract(),
 			slamMap(&_map),
-			state(_map.filter.x, _map.filter.P, _map.reserveStates(_size)) {
-			categoryName_ = "OBJECT";
+			state(_map.x(), _map.P(), _map.reserveStates(_size)) {
+			categoryName("MAP OBJECT");
 		}
 
 	}

@@ -33,16 +33,31 @@ namespace jafar {
 				size_t measurementSize;
 				size_t expectationSize;
 				size_t innovationSize;
-				vec x;
-				sym_mat P;
+			private:
+				vec x_;
+				sym_mat P_;
+			public:
 				//				boost::posix_time::time_duration curTime;
 				mat K;
 				mat PHt_tmp;
 
 				ExtendedKalmanFilterIndirect(size_t _size) :
-					size(_size), x(size), P(size) {
-					x.clear();
-					P.clear();
+					size(_size), x_(size), P_(size) {
+					x_.clear();
+					P_.clear();
+				}
+
+				jblas::vec & x() {
+					return x_;
+				}
+				jblas::sym_mat & P() {
+					return P_;
+				}
+				double & x(size_t i) {
+					return x_(i);
+				}
+				double & P(size_t i, size_t j) {
+					return P_(i, j);
 				}
 
 
@@ -61,8 +76,8 @@ namespace jafar {
 				 * \param U the covariances matrix of the perturbation.
 				 */
 				inline void predict(ind_array & iax, mat & F_v, ind_array & iav, mat & F_u, sym_mat & U) {
-					jafar::jmath::ublasExtra::ixaxpy_prod(P, iax, F_v, iav);
-					ublas::project(P, iav, iav) += jafar::jmath::ublasExtra::prod_JPJt(U, F_u);
+					jafar::jmath::ublasExtra::ixaxpy_prod(P_, iax, F_v, iav);
+					ublas::project(P_, iav, iav) += jafar::jmath::ublasExtra::prod_JPJt(U, F_u);
 				}
 				inline void correct();
 				inline void computeInnovation();

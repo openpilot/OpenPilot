@@ -42,16 +42,16 @@ void test_landmark01(void) {
 	size_t size_map = 300;
 
 	MapAbstract map(size_map);
-	randVector(map.filter.x);
-	randMatrix(map.filter.P);
+	randVector(map.x());
+	randMatrix(map.P());
 
 	ublas::vector<LandmarkAbstract *> Lmks(5);
 
 	cout << "\n% LANDMARK CREATION AND PRINT \n%===========" << endl;
 
 	for (size_t lmk = 0; lmk < 3; lmk++) {
-		jblas::ind_array ial = ia_pushfront(map.used_states, Landmark3DAnchoredHomogeneousPoint::size());
-		Lmks.insert_element(lmk, new Landmark3DAnchoredHomogeneousPoint(map));
+		jblas::ind_array ial = ia_pushfront(map.used_states, LandmarkAnchoredHomogeneousPoint::size());
+		Lmks.insert_element(lmk, new LandmarkAnchoredHomogeneousPoint(map));
 		Lmks(lmk)->id(lmk);
 	}
 	for (size_t lmk = 0; lmk < 3; lmk++) {
@@ -66,7 +66,7 @@ void test_landmark01(void) {
 		E(i) = 0.1 * (i + 1);
 		T(i) = i + 1;
 	}
-	Landmark3DAnchoredHomogeneousPoint ahp1(map);
+	LandmarkAnchoredHomogeneousPoint ahp1(map);
 	subrange(F, 0, 3) = T;
 	subrange(F, 3, 7) = quaternion::e2q(E);
 	cout << "F = " << F << endl;
@@ -78,9 +78,9 @@ void test_landmark01(void) {
 	ahpf = ahp1.state.x();
 	ahp = landmarkAHP::fromFrame(F, ahpf);
 	cout << "ahp_namespace : " << ahp << endl;
-	ahp = Landmark3DAnchoredHomogeneousPoint::fromFrame(F, ahpf);
+	ahp = LandmarkAnchoredHomogeneousPoint::fromFrame(F, ahpf);
 	cout << "ahp_static : " << ahp << endl;
-	Landmark3DAnchoredHomogeneousPoint::fromFrame(F, ahpf, ahp, AHP_f, AHP_ahpf);
+	LandmarkAnchoredHomogeneousPoint::fromFrame(F, ahpf, ahp, AHP_f, AHP_ahpf);
 
 	cout << "F.x = " << MATLAB(F) << endl;
 	cout << "F = updateFrame(F);" << endl;
@@ -95,8 +95,8 @@ void test_landmark01(void) {
 
 	cout << "\n% TO FRAME \n%==================" << endl;
 	jblas::mat AHPF_f(7, 7), AHPF_ahp(7, 7);
-	Landmark3DAnchoredHomogeneousPoint::toFrame(F, ahp, ahpf, AHPF_f, AHPF_ahp);
-	//	ahpf = Landmark3DAnchoredHomogeneousPoint::toFrame(F, ahp);
+	LandmarkAnchoredHomogeneousPoint::toFrame(F, ahp, ahpf, AHPF_f, AHPF_ahp);
+	//	ahpf = LandmarkAnchoredHomogeneousPoint::toFrame(F, ahp);
 	cout << "ahp = " << (MATLAB) ahp << endl;
 	cout << "ahpf = " << (MATLAB) (vec) ahpf << endl;
 	cout << "AHPF_f = " << (MATLAB) AHPF_f << endl;
@@ -110,8 +110,8 @@ void test_landmark01(void) {
 	cout << "ahp = " << (MATLAB) ahp << endl;
 	jblas::vec3 euc;
 	jblas::mat EUC_ahp(3, 7);
-	//	euc = Landmark3DAnchoredHomogeneousPoint::ahp2euc(ahp);
-	Landmark3DAnchoredHomogeneousPoint::ahp2euc(ahp, euc, EUC_ahp);
+	//	euc = LandmarkAnchoredHomogeneousPoint::ahp2euc(ahp);
+	LandmarkAnchoredHomogeneousPoint::ahp2euc(ahp, euc, EUC_ahp);
 	cout << "euc = " << (MATLAB) euc << endl;
 	cout << "EUC_ahp = " << (MATLAB) EUC_ahp << endl;
 	cout << "[euc_m, EUC_ahp_m] = ahm2euc(ahp);" << endl;

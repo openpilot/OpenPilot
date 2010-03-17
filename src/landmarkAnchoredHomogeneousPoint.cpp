@@ -20,7 +20,7 @@ namespace jafar {
 		/**
 		 * Constructor from map
 		 */
-		Landmark3DAnchoredHomogeneousPoint::Landmark3DAnchoredHomogeneousPoint(MapAbstract & map) :
+		LandmarkAnchoredHomogeneousPoint::LandmarkAnchoredHomogeneousPoint(MapAbstract & map) :
 			LandmarkAbstract(map, 7) {
 			type("AHP");
 		}

@@ -21,6 +21,7 @@ namespace jafar {
 
 		ObservationPinHoleAnchoredHomogeneousPoint::ObservationPinHoleAnchoredHomogeneousPoint() :
 			ObservationPinHolePoint(){
+			categoryName("PINHOLE-AHP OBS");
 		}
 
 	}

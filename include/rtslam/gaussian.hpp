@@ -41,27 +41,27 @@ namespace jafar {
 		 * <i><b> HELP:</b></i> For information about indirect arrays, see the documentation
 		 * of ia_range(), ia_head() and similar functions in namespace jafar::jmath::ublasExtra.
 		 *
-		 * <b> Defining a local Gaussian </b>
+		 * <b> To construct a local Gaussian </b>
 		 *
 		 * You just give a size, a pair {\a x , \a P } or another Gaussian:
 		 * \code
-		 * Gaussian GLa(7);               // Construct from size
-		 * Gaussian GLb(x, P);            // Construct from given vector and matrix..
-		 * Gaussian GLc(GL);              // Copy-construct from local Gaussian.
-		 * Gaussian GLd(GR, GR.LOCAL);    // Copy-construct from remote, force local storage.
+		 * Gaussian GLa(7);               // Construct from size.
+		 * Gaussian GLb(x);               // Construct from vector.
+		 * Gaussian GLc(x, P);            // Construct from given vector and matrix.
+		 * Gaussian GLd(GL);              // Copy-construct from local Gaussian.
+		 * Gaussian GLe(GR, GR.LOCAL);    // Copy-construct from remote, force local storage.
 		 * \endcode
-		 *
-		 * see that the last constructor takes a remote Gaussian (see below).
-		 * The directive \a GRa.LOCAL tells the constructor to force local storage.
-		 * The result is a local Gaussian (the data is copied to the local storage).
 		 *
 		 * You can create Gaussians with no covariance by providing just the mean vector.
-		 * This is only possible for local Gaussians:
-		 * \code
-		 * Gaussian GLx(x)
-		 * \endcode
+		 * This is only possible for local Gaussians. The Gaussian \a GLb above is an example.
 		 *
-		 * <b> Defining a remote Gaussian </b>
+		 * See that the last constructor \a GLe takes a remote Gaussian (see below).
+		 * The directive \a GR.LOCAL tells the constructor to force local storage.
+		 * The result is a local Gaussian (the data is copied to the local storage).
+		 *
+		 * <b> To construct a remote Gaussian </b>
+		 *
+		 * Remote Gaussians always point to local Gaussians (or to explicit {x,P} data).
 		 *
 		 * There are four methods to create a remote Gaussian:
 		 * \code
@@ -72,8 +72,13 @@ namespace jafar {
 		 * Gaussian GRe(GR, ia);          // Point to a part of a given remote Gaussian
 		 * \endcode
 		 *
-		 * In the last three constructor modes, specify the set of indices
-		 * to the provided data with an indirect array <c> jblas::ind_array </c>.
+		 * In the first case, \a GRa points to the same Gaussian as \a GR.
+		 *
+		 * In the second case, the directive \a GL.REMOTE tells the constructor not to copy \a GL (as in \a GLd above)
+		 * but to create a remote Gaussian that points to \a GL.
+		 *
+		 * In the last three constructor modes, the produced Gaussian points to just a sub-set of the provided data.
+		 * Specify the set of indices to the provided data with an indirect array <c> jblas::ind_array </c>.
 		 *
 		 * <i><b> REMEMBER: remote Gaussians always point to local Gaussians.</b></i>
 		 * See that the remote constructor \a GRe accepts a remote Gaussian \a GR to point to.
@@ -187,6 +192,14 @@ namespace jafar {
 
 				inline jblas::sym_mat_indirect & P() {
 					return P_;
+				}
+
+				double & x(size_t i) {
+					return x_(i);
+				}
+
+				double & P(size_t i, size_t j) {
+					return P_(i, j);
 				}
 
 
@@ -339,15 +352,15 @@ namespace jafar {
 
 				/**
 				 * Remote constructor from Gaussian.
-				 * This constructor uses indirect indexing onto Gaussian provided to the constructor.
+				 * This constructor uses indirect indexing onto the Gaussian provided to the constructor.
 				 * The indirect array where this new Gaussian points to in the old one is also given as input.
 				 *
 				 * In case the input Gaussian is REMOTE, a composition of indirect arrays is performed,
 				 * and the resulting Gaussian points to the Gaussian where the remote Gaussian points to.
 				 *
-				 * The local storage \a x_local and \a P_local are kept at null size for economy.
-				 * \param G the local Gaussian.
-				 * \param _ia the indirect array.
+				 * The local storage \a x_local and \a P_local in the constructed Gaussian are kept at null size for economy.
+				 * \param G a Gaussian.
+				 * \param _ia an indirect array of indices pointing to \a G.
 				 */
 				inline Gaussian(Gaussian & G, const jblas::ind_array & _ia) :
 					hasNullCov_(false),

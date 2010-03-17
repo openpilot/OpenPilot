@@ -41,7 +41,7 @@ namespace jafar {
 		 * Remote pose constructor.
 		 */
 		SensorAbstract::SensorAbstract(MapAbstract & _map) :
-			MapObject(_map, 7), pose(_map.filter.x, _map.filter.P, state.ia()) {
+			MapObject(_map, 7), pose(_map.x(), _map.P(), state.ia()) {
 			categoryName("SENSOR");
 			id(_map.sensorIds.getId());
 			cout << "Sensor id: " << id() << endl;
@@ -52,7 +52,7 @@ namespace jafar {
 		 */
 		SensorAbstract::SensorAbstract(MapAbstract & _map, RobotAbstract & _rob) :
 			MapObject(_map, 7),
-			pose(_map.filter.x, _map.filter.P, state.ia()) {
+			pose(_map.x(), _map.P(), state.ia()) {
 			categoryName("SENSOR");
 			id(_map.sensorIds.getId());
 			cout << "Sensor id: " << id() << endl;
@@ -67,7 +67,7 @@ namespace jafar {
 		SensorAbstract::SensorAbstract(RobotAbstract & _rob, bool inFilter = false) :
 			//          #check           # sensor in filter                                         # not in filter
 			MapObject (inFilter ? MapObject(*_rob.slamMap, 7)                                          : 0            ),
-			pose      (inFilter ? Gaussian((*_rob.slamMap).filter.x, (*_rob.slamMap).filter.P, state.ia()) : Gaussian(7)  )
+			pose      (inFilter ? Gaussian((*_rob.slamMap).x(), (*_rob.slamMap).P(), state.ia()) : Gaussian(7)  )
 		{
 			categoryName("SENSOR");
 			id(_rob.slamMap->sensorIds.getId());

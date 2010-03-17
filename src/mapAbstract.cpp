@@ -22,13 +22,25 @@ namespace jafar {
 		using namespace std;
 
 
-
 		/**
 		 * Constructor
 		 */
 		MapAbstract::MapAbstract(size_t _max_size) :
 			max_size(_max_size), current_size(0), used_states(max_size), filter(max_size) {
 			used_states.clear();
+		}
+
+		jblas::vec & MapAbstract::x() {
+			return filter.x();
+		}
+		jblas::sym_mat & MapAbstract::P() {
+			return filter.P();
+		}
+		double & MapAbstract::x(size_t i) {
+			return filter.x(i);
+		}
+		double & MapAbstract::P(size_t i, size_t j) {
+			return filter.P(i, j);
 		}
 
 
@@ -38,6 +50,7 @@ namespace jafar {
 		void MapAbstract::addRobot(RobotAbstract * _robPtr) {
 			robots[_robPtr->id()] = _robPtr;
 		}
+
 
 		/**
 		 * Landmark addition

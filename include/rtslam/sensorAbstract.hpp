@@ -22,6 +22,7 @@
 
 #include "jmath/jblas.hpp"
 //include parents
+//#include "rtslam/rtslam.hpp"
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/mapObject.hpp"
 #include "rtslam/robotAbstract.hpp"
@@ -77,13 +78,13 @@ namespace jafar {
 
 			public:
 
+				typedef std::map<size_t, ObservationAbstract*> observations_t;
 
 				/**
 				 * Parent robot
 				 */
 				RobotAbstract* robot;
 
-				typedef std::map<size_t, ObservationAbstract*> observations_t;
 				/**
 				 * A set of observations (one per landmark)
 				 */

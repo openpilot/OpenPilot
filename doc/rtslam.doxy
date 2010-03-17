@@ -75,30 +75,31 @@
 	- A \e measurement is a member of Observation.
 	- Other members are the \e expectation and the \e innovation.
 	
-	To account for these relationships, the \b rtslam uses <b> lists of pointers to children</b>, and a single <b>pointer to a parent</b>. 
+	To account for these relationships, the \b rtslam uses <b> maps of pointers to children</b>, 
+	indexed by their unique ID number, and a single <b>pointer to a parent</b>. 
 	Yes, each link in the graph is stored twice. This allows systematic forward and backward referencing between objects.
 	This figure shows the general implementation of such bi-directional links
 	
-	\image html parentalLinks.png "Bi-directional parental links. A parent has a list of pointers to children. A child has a pointer to his parent."
+	\image html parentalLinks.png "Bi-directional parental links. A parent has a map of pointers to children. A child has a pointer to his parent."
 	
 	You will discover these triangular loops in the collaboration diagrams of this documentation. Check this one jafar::rtslam::MapAbstract for an example.
 
 	\b NOTE: The drawback or danger of this bidirectional linkage is that it allows access to any object of the system from any other object. Be careful.
 
-	Here is an example of the Robot class. Observe the list of links to sensors and the link to the father map:
+	Here is an example of the Robot class. Observe the maps of links to sensors and the link to the father map:
 	
 	\code
 	class RobotAbstract
 	{
 		public:
-			string                name;           // Name of robot.
-			string                type;           // Type of robot.
-			Control               control;        // Control input.
-			list<SensorAbstract*> sensorsList;    // List of pointers to sensors.
-			MapAbstract           * map;          // Pointer to father Map.
-			State                 state;          // State vector, pointing to the SLAM map.
-			virtual void          set_control();  // Set control input.
-			virtual void          move() = 0;     // Move the robot.
+			string                        name;           // Name of robot.
+			string                        type;           // Type of robot.
+			Control                       control;        // Control input.
+			map<size_t, SensorAbstract*>  sensors;        // List of pointers to sensors.
+			MapAbstract                   * map;          // Pointer to father Map.
+			State                         state;          // State vector, pointing to the SLAM map.
+			virtual void                  set_control();  // Set control input.
+			virtual void                  move() = 0;     // Move the robot.
 	};
 	\endcode
 
@@ -107,18 +108,18 @@
 	class ObservationAbstract
 	{
 		public:
-			SensorAbstract   * sensor;                   // Pointer to mother sensor.
-			LandmarkAbstract * landmark;                 // Pointer to father landmark.
-			Expectation      expectation;                // Expectation. This is a Gaussian.
-			Measurement      measurement;                // Measurement. This is a Gaussian.
-			Innovation       innovation;                 // Innovation. This is a Gaussian.
-			struct           counters;                   // Event counters for map management.
-			struct           events;                     // Event flags for active-search flow control.
-			virtual bool     project() = 0;              // Project landmark into sensor.
-			virtual bool     isVisible() = 0;            // True if landmark is visible.
-			virtual bool     match();                    // Try to match and get measurement.
-			virtual bool     isIndividuallyConsistent(); // Consistency test.
-			virtual void     back_project() = 0;         // Back-project feature into landmark for initialization.
+			SensorAbstract   * sensor;                    // Pointer to mother sensor.
+			LandmarkAbstract * landmark;                  // Pointer to father landmark.
+			Expectation      expectation;                 // Expectation. This is a Gaussian.
+			Measurement      measurement;                 // Measurement. This is a Gaussian.
+			Innovation       innovation;                  // Innovation. This is a Gaussian.
+			struct           counters;                    // Event counters for map management.
+			struct           events;                      // Event flags for active-search flow control.
+			virtual bool     project() = 0;               // Project landmark into sensor.
+			virtual bool     isVisible() = 0;             // True if landmark is visible.
+			virtual bool     match();                     // Try to match and get measurement.
+			virtual bool     isIndividuallyConsistent();  // Consistency test.
+			virtual void     back_project() = 0;          // Back-project feature into landmark for initialization.
 	};
 	\endcode
 	
@@ -278,11 +279,11 @@
   		  and correction models.
   
   	- jafar::rtslam::LandmarkAbstract
-  		- jafar::rtslam::Landmark3DAnchoredHomogeneousPoint : Anchored homogeneous 3D points AHP3 (x_0,y_0,z_0,x,y,z,w).
+  		- jafar::rtslam::LandmarkAnchoredHomogeneousPoint : Anchored homogeneous 3D points \b AHP (x_0,y_0,z_0,x,y,z,w).
   
   	- jafar::rtslam::ObservationAbstract : Please note that Observations depend always on 
   	  two types of objects: sensor type and landmark type.
-  		- jafar::rtslam::ObservationPinHole3DAnchoredHomogeneous : observe AHP3 from a pin-hole sensor.
+  		- jafar::rtslam::ObservationPinHoleAnchoredHomogeneousPoint : observe \b AHP from a pin-hole sensor.
   
 	This sets the initially indispensable classes to start working with vision sensors 
 	and Anchored homogeneous point landmarks that allow undelayed initialization.
@@ -304,16 +305,16 @@
   		- jafar::rtslam::SensorBarreto : A Barreto-modeled camera, preferably with distorsion and correction models.
   
   	- jafar::rtslam::LandmarkAbstract
-  		- jafar::rtslam::Landmark3DEuclideanPoint : Euclidean 3D points EP3, (x,y,z).
-  		- jafar::rtslam::Landmark3DAnchoredHomogeneousLine : 
+  		- jafar::rtslam::LandmarkEuclideanPoint : Euclidean 3D points \b EP, (x,y,z).
+  		- jafar::rtslam::landmarkAnchoredHomogeneousLine : 
   			Anchored homogeneous 3D lines AHL3, (x_0,y_0,z_0,x_1,y_1,z_1,w_1,x_2,y_2,z_2,w_2).
   
   	- jafar::rtslam::ObservationAbstract : 
   		Please note that Observations depend always on two types of objects: sensor type and landmark type.
-  		- jafar::rtslam::ObservationPinHole3DEuclideanPoint : observe EP3 point from a pin-hole sensor.
-  		- jafar::rtslam::ObservationPinHole3DAnchoredHomogeneousLine : observe AHL point from a pin-hole sensor.
-  		- jafar::rtslam::ObservationBarreto3DAnchoredHomogeneousPoint : observe AHP3 point from a Barreto sensor.
-  		- jafar::rtslam::ObservationBarreto3DEuclideanPoint : observe EP3 point from a Barreto sensor.
+  		- jafar::rtslam::ObservationPinHoleEuclideanPoint : observe \b EP point from a pin-hole sensor.
+  		- jafar::rtslam::ObservationPinHoleAnchoredHomogeneousPointLine : observe \b AHL point from a pin-hole sensor.
+  		- jafar::rtslam::ObservationBarretoAnchoredHomogeneousPoint : observe \b AHP point from a Barreto sensor.
+  		- jafar::rtslam::ObservationBarretoEuclideanPoint : observe \b EP point from a Barreto sensor.
   
   \subsection secFutureDevelopments Future developments
 	Further developments could consider building straight line landmark models. 
@@ -321,16 +322,16 @@
 	The list below is not exhaustive, nor it tries to impose the order for future development.
 
  	- jafar::rtslam::LandmarkAbstract
-  		- jafar::rtslam::Landmark3DAnchoredModifiedPolarPoint : Anchored modified-polar 3D points AMPP3 (x_0,y_0,z_0,x,y,z,w). 
+  		- jafar::rtslam::landmarkAnchoredModifiedPolarPoint : Anchored modified-polar 3D points AMPP3 (x_0,y_0,z_0,x,y,z,w). 
   			This is the same as IDP landmarks.
-  		- jafar::rtslam::Landmark3DHomogeneousLine : Homogeneous 3D lines HL3 (x_1,y_1,z_1,w_1,x_2,y_2,z_2,w_2).
+  		- jafar::rtslam::landmarkHomogeneousLine : Homogeneous 3D lines HL3 (x_1,y_1,z_1,w_1,x_2,y_2,z_2,w_2).
   
   	- jafar::rtslam::ObservationAbstract : Please note that Observations depend always on two types of objects: sensor type and landmark type.
-  		- jafar::rtslam::ObservationPinHole3DHomogeneousLine : observe HL from a pin-hole sensor.
-  		- jafar::rtslam::ObservationPinHole3DAnchoredModifiedPolarPoint : observe AHP3 from a pin-hole sensor.
-  		- jafar::rtslam::ObservationBarreto3DAnchoredHomogeneousLine : observe AHL point from a Barreto sensor.
-  		- jafar::rtslam::ObservationBarreto3DHomogeneousLine : observe HL from a Barreto sensor.
-  		- jafar::rtslam::ObservationBarreto3DAnchoredModifiedPolarPoint : observe AHP3 from a Barreto sensor.
+  		- jafar::rtslam::ObservationPinHoleHomogeneousLine : observe \b HL from a pin-hole sensor.
+  		- jafar::rtslam::ObservationPinHoleAnchoredModifiedPolarPoint : observe \b AHP from a pin-hole sensor.
+  		- jafar::rtslam::ObservationBarretoAnchoredHomogeneousLine : observe \b AHL line from a Barreto sensor.
+  		- jafar::rtslam::ObservationBarretoHomogeneousLine : observe \b HL from a Barreto sensor.
+  		- jafar::rtslam::ObservationBarretoAnchoredModifiedPolarPoint : observe \b AHP from a Barreto sensor.
 
   
   		

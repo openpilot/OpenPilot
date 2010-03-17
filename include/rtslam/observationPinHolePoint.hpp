@@ -35,8 +35,8 @@ namespace jafar {
 				}
 
 				/**
-				 * Project an Euclidean point.
-				 * \param p a 3D point
+				 * Project a director vector.
+				 * \param p a 3D director vector.
 				 * \param U_r the Jacobian wrt the robot pose
 				 * \param U_s the Jacobian wrt the sensor pose
 				 * \param U_p the Jacobian wrt the point

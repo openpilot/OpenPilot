@@ -28,6 +28,7 @@
 
 
 // include parents
+//#include "rtslam/rtslam.hpp"
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/mapObject.hpp"
 
@@ -63,6 +64,8 @@ namespace jafar {
 
 			public:
 
+				typedef std::map<size_t, ObservationAbstract*> observations_t;
+
 				/**
 				 * constructor from map and size
 				 */
@@ -81,7 +84,6 @@ namespace jafar {
 				 */
 				MapAbstract * slamMap;
 
-				typedef std::map<size_t, ObservationAbstract*> observations_t;
 				/**
 				 * A set of observations (one per sensor)
 				 */
@@ -94,9 +96,9 @@ namespace jafar {
 				 */
 				//				virtual void reparametrize(LandmarkAbstract & landmark) = 0;
 
-//				inline void setDescriptor(DescriptorAbstract _desc) {
-//					descriptor = _desc;
-//				}
+				//				inline void setDescriptor(DescriptorAbstract _desc) {
+				//					descriptor = _desc;
+				//				}
 
 
 		};

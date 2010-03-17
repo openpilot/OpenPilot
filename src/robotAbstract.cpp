@@ -24,7 +24,7 @@ namespace jafar {
 		 */
 		RobotAbstract::RobotAbstract(MapAbstract & _map, const size_t _size_state, const size_t _size_control) :
 			MapObject(_map, _size_state),
-			pose(_map.filter.x, _map.filter.P, jafar::jmath::ublasExtra::ia_head(state.ia(), 7)),
+			pose(_map.x(), _map.P(), jafar::jmath::ublasExtra::ia_head(state.ia(), 7)),
 			control(_size_control),
 			F_r(_size_state, _size_state),
 			F_u(_size_state, _size_control) {

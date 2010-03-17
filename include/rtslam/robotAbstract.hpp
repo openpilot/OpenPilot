@@ -34,6 +34,7 @@
 
 #include <jmath/jblas.hpp>
 #include "rtslam/gaussian.hpp"
+//#include "rtslam/rtslam.hpp"
 #include "rtslam/mapObject.hpp"
 // include parents
 #include "rtslam/mapAbstract.hpp"
@@ -69,6 +70,8 @@ namespace jafar {
 
 			public:
 
+				typedef map<size_t, SensorAbstract*> sensors_t;
+
 				/**
 				 * Remote constructor from remote map and size of state and control vectors.
 				 * \param _map the map.
@@ -81,8 +84,6 @@ namespace jafar {
 				virtual ~RobotAbstract() {}
 
 				MapAbstract * slamMap; ///< Parent map
-
-				typedef map<size_t, SensorAbstract*> sensors_t;
 
 				sensors_t sensors; ///<	A set of sensors
 

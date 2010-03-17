@@ -20,6 +20,7 @@
 #include "kernel/IdFactory.hpp"
 #include "jmath/jblas.hpp"
 #include "rtslam/gaussian.hpp"
+//#include "rtslam/rtslam.hpp"
 #include "rtslam/kalmanFilter.hpp"
 
 
@@ -47,6 +48,9 @@ namespace jafar {
 				kernel::IdFactory robotIds;
 				kernel::IdFactory sensorIds;
 				kernel::IdFactory landmarkIds;
+
+				typedef std::map<size_t, RobotAbstract*> robots_t;
+				typedef std::map<size_t, LandmarkAbstract*> landmarks_t;
 
 				/**
 				 * Size things and map usage management
@@ -85,14 +89,17 @@ namespace jafar {
 				/**
 				 * A set of robots
 				 */
-				typedef std::map<size_t, RobotAbstract*> robots_t;
 				robots_t robots;
 
 				/**
 				 * A set of landmarks
 				 */
-				typedef std::map<size_t, LandmarkAbstract*> landmarks_t;
 				landmarks_t landmarks;
+
+				jblas::vec & x();
+				jblas::sym_mat & P();
+				double & x(size_t i);
+				double & P(size_t i, size_t j);
 
 				/**
 				 * Query about available free space.

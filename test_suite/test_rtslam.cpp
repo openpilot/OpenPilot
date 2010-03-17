@@ -36,23 +36,23 @@ using namespace jafar::rtslam;
 void fillMapSeq(MapAbstract & map) {
 	size_t size_map = map.max_size;
 	for (size_t i = 0; i < size_map; i++) {
-		map.filter.x(i) = i;
+		map.x(i) = i;
 		for (size_t j = 0; j < size_map; j++)
-			map.filter.P(i, j) = i + 100 * j;
+			map.P(i, j) = i + 100 * j;
 	}
 }
 
 void fillMapIdent(MapAbstract & map) {
 	size_t size_map = map.max_size;
 	for (size_t i = 0; i < size_map; i++) {
-		map.filter.x(i) = i;
+		map.x(i) = i;
 	}
-	map.filter.P = jblas::identity_mat(size_map);
+	map.P() = jblas::identity_mat(size_map);
 }
 
 void fillMapRndm(MapAbstract & map) {
-	randVector(map.filter.x);
-	randMatrix(map.filter.P);
+	randVector(map.x());
+	randMatrix(map.P());
 }
 
 void test_rtslam01(void) {
@@ -67,27 +67,27 @@ void test_rtslam01(void) {
 
 
 	// Add 2 robots
-	std::size_t sizerob = Robot3DConstantVelocity::size();
-	std::size_t sizesen = SensorPinHole::size();
-	if (slamMap.unusedStates(sizerob)) {
+	std::size_t sizerobCV = Robot3DConstantVelocity::size();
+	std::size_t sizesenPH = SensorPinHole::size();
+	if (slamMap.unusedStates(sizerobCV)) {
 		Robot3DConstantVelocity * robPtr = new Robot3DConstantVelocity(slamMap);
 		robPtr->name("SUBMARINE");
 
-		if (slamMap.unusedStates(sizesen)) {
+		if (slamMap.unusedStates(sizesenPH)) {
 			SensorPinHole * senPtr = new SensorPinHole(*robPtr);
 			senPtr->name("FLEA");
 		}
 
-		if (slamMap.unusedStates(sizesen)) {
+		if (slamMap.unusedStates(sizesenPH)) {
 			SensorPinHole * senPtr = new SensorPinHole(*robPtr, true);
 			senPtr->name("MARLIN");
 		}
 	}
-	if (slamMap.unusedStates(sizerob)) {
+	if (slamMap.unusedStates(sizerobCV)) {
 		Robot3DConstantVelocity * robPtr = new Robot3DConstantVelocity(slamMap);
 		robPtr->name("AEROPLANE");
 
-		if (slamMap.unusedStates(sizesen)) {
+		if (slamMap.unusedStates(sizesenPH)) {
 			SensorPinHole * senPtr = new SensorPinHole(*robPtr);
 			senPtr->name("VIDERE");
 		}
@@ -117,9 +117,9 @@ void test_rtslam01(void) {
 
 	// Add 2 lmks
 	for (size_t i = 0; i < 2; i++) {
-		std::size_t sizelmk = Landmark3DAnchoredHomogeneousPoint::size();
-		if (slamMap.unusedStates(sizelmk)) {
-			Landmark3DAnchoredHomogeneousPoint * lmkPtr = new Landmark3DAnchoredHomogeneousPoint(slamMap);
+		std::size_t sizelmkAHP = LandmarkAnchoredHomogeneousPoint::size();
+		if (slamMap.unusedStates(sizelmkAHP)) {
+			LandmarkAnchoredHomogeneousPoint * lmkPtr = new LandmarkAnchoredHomogeneousPoint(slamMap);
 			lmkPtr->name("");
 		}
 	}

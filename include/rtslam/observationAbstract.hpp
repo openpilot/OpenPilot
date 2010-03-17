@@ -32,8 +32,12 @@
 
 #include <jmath/jblas.hpp>
 
+#include <boost/shared_ptr.hpp>
+
 #include "rtslam/gaussian.hpp"
 // include parents
+//#include "rtslam/rtslam.hpp"
+#include "rtslam/objectAbstract.hpp"
 #include "rtslam/sensorAbstract.hpp"
 #include "rtslam/landmarkAbstract.hpp"
 
@@ -41,24 +45,31 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
+
 		/** Base class for all landmark appearances defined in the module
 		 * rtslam.
 		 *
 		 * @ingroup rtslam
 		 */
 		class AppearanceAbstract {
+			public:
 				/**
 				 * Mandatory virtual destructor
 				 */
-				virtual ~AppearanceAbstract();
+				virtual ~AppearanceAbstract() {
+				}
 		};
+
 
 		/** Base class for all Gaussian expectations defined in the module rtslam.
 		 *
 		 * @ingroup rtslam
 		 */
 		class Expectation: public Gaussian {
+
 			public:
+
+				typedef boost::shared_ptr<AppearanceAbstract> appearance_t;
 
 				/**
 				 * size constructor
@@ -70,20 +81,26 @@ namespace jafar {
 				 */
 				Expectation(const size_t _size, const size_t _size_nonobs);
 
-				AppearanceAbstract * appearance;
-
 				jblas::mat EXP_rob, EXP_sen, EXP_lmk; // Jacobians of the expectation wrt robot state, sensor state, lmk state.
 
 				jblas::vec nonObs; // expected value of the non-observable part.
 
-				bool visible; // landmark is visible (in Field Of View).
-
-				double infoGain; // expected "information gain" of performing an update with this observation.
-
 				void computeVisibility();
 
 				void estimateInfoGain();
+
+				inline bool isVisible(); // landmark is visible (in Field Of View).
+
+				inline double infoGain(); // expected "information gain" of performing an update with this observation.
+
+				inline void appearance(appearance_t _appearance);
+
+			private:
+				bool visible_;
+				bool infoGain_;
+				appearance_t appearance_;
 		};
+
 
 		/** Base class for all Gaussian measurements defined in the module rtslam.
 		 *
@@ -91,10 +108,21 @@ namespace jafar {
 		 */
 		class Measurement: public Gaussian {
 			public:
-				AppearanceAbstract * appearance;
-				double score; ///< matching quality score
+
+				typedef boost::shared_ptr<AppearanceAbstract> appearance_t;
+
+
+				inline void appearance(appearance_t _appearance);
+				inline appearance_t appearance();
 				Measurement(size_t _size);
+
+				double score; ///< matching quality score
+
+			private:
+				appearance_t appearance_;
+
 		};
+
 
 		/** Base class for all Gaussian innovations defined in the module rtslam.
 		 * It implements the trivial innovation model inn = meas - exp.
@@ -117,6 +145,7 @@ namespace jafar {
 
 			public:
 
+
 				/**
 				 * Size construction.
 				 * \param _size the innovation size
@@ -138,6 +167,7 @@ namespace jafar {
 					jafar::jmath::ublasExtra::lu_inv(P(), iP_);
 				}
 
+
 				/**
 				 * The Mahalanobis distance.
 				 */
@@ -146,6 +176,7 @@ namespace jafar {
 					mahalanobis_ = ublas::inner_prod(x(), (jblas::vec) ublas::prod(iP_, x()));
 					return mahalanobis_;
 				}
+
 
 				/**
 				 * The trivial innovation function  inn = meas - exp.
@@ -157,6 +188,7 @@ namespace jafar {
 				void compute(V1& exp_mean, V2& meas_mean) {
 					x() = meas_mean - exp_mean;
 				}
+
 
 				/**
 				 * The trivial innovation function inn = meas - exp.
@@ -172,6 +204,7 @@ namespace jafar {
 					INN_exp = -1.0 * jblas::identity_mat(exp_mean.size());
 				}
 
+
 				/**
 				 * Compute full innovation, with covariances matrix.
 				 * Derive the class and overload this method to use other, non-trivial innovation functions.
@@ -184,17 +217,15 @@ namespace jafar {
 				}
 		};
 
+
 		/**
 		 * Base class for all observations defined in the module rtslam.
 		 * \author jsola
 		 * \ingroup rtslam
 		 */
-		class ObservationAbstract {
-			private:
-				std::size_t id_;
-				std::string type_;
-				std::string categoryName_;
+		class ObservationAbstract: public ObjectAbstract {
 			public:
+
 
 				/**
 				 * Mandatory virtual destructor.
@@ -271,7 +302,7 @@ namespace jafar {
 				/**
 				 * Project and get Jacobians
 				 */
-//				virtual void project() = 0;
+				//				virtual void project() = 0;
 
 				/**
 				 * Is visible
@@ -281,47 +312,27 @@ namespace jafar {
 					return events.visible;
 				}
 
-				inline void id(std::size_t _id) {
-					id_ = _id;
-				}
-				inline void type(std::string _type) {
-					type_ = _type;
-				}
-				inline void categoryName(std::string _categoryName) {
-					categoryName_ = _categoryName;
-				}
-				inline std::size_t & id() {
-					return id_;
-				}
-				inline std::string & type() {
-					return type_;
-				}
-				inline std::string & categoryName() {
-					return categoryName_;
-				}
-
 
 				/**
 				 * match
 				 */
-//				virtual void match();
+				//				virtual void match();
 
 				/**
 				 * Individual consistency check
 				 */
-//				virtual void isIndividuallyConsistent();
+				//				virtual void isIndividuallyConsistent();
 
 				/**
 				 * Back-project
 				 */
-//				virtual void back_project() = 0;
+				//				virtual void back_project() = 0;
 
 				/**
 				 * Operator << for class ObservationAbstract.
 				 * It shows different information of the observation.
 				 */
-				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObservationAbstract & obs)
-				{
+				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObservationAbstract & obs) {
 					s << "OBSERVATION of " << obs.landmark->type() << " from " << obs.sensor->type() << endl;
 					s << "Sensor: " << obs.sensor->id() << ", landmark: " << obs.landmark->id() << endl;
 					s << ".expectation:  " << obs.expectation << endl;

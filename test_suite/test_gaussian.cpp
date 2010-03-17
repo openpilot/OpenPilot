@@ -68,8 +68,8 @@ void test_gaussian01(void) { // TESTS FOR THE GAUSSIAN CLASS
 	Gaussian Gl2(Gl);
 	cout << "Gl: " << Gl << endl;
 	cout << "Gl2: " << Gl2 << endl;
-	Gl.x()(0) = 99;
-	cout << "Gl.x()(0) = 99; " << endl;
+	Gl.x(0) = 99;
+	cout << "Gl.x(0) = 99; " << endl;
 	cout << "Gl: " << Gl << endl;
 	cout << "Gl2: " << Gl2 << endl;
 	cout << "% Gaussian Gl5(Gl,true);" << endl;
@@ -113,8 +113,8 @@ void test_gaussian01(void) { // TESTS FOR THE GAUSSIAN CLASS
 	Gaussian Gr3(Gr);
 	cout << "Gr: " << Gr << endl;
 	cout << "Gr3: " << Gr3 << endl;
-	Gr.P()(0, 1) = 55;
-	cout << "Gr.P()(0,1) = 55;" << endl;
+	Gr.P(0, 1) = 55;
+	cout << "Gr.P(0,1) = 55;" << endl;
 	cout << "Gr: " << Gr << endl;
 	cout << "Gr3: " << Gr3 << endl;
 
@@ -122,8 +122,8 @@ void test_gaussian01(void) { // TESTS FOR THE GAUSSIAN CLASS
 	Gaussian Gl4(Gr);
 	cout << "Gr: " << Gr << endl;
 	cout << "Gl4: " << Gl4 << endl;
-	Gr.P()(0, 1) = -99;
-	cout << "Gr.P()(0,1) = -99;" << endl;
+	Gr.P(0, 1) = -99;
+	cout << "Gr.P(0,1) = -99;" << endl;
 	cout << "Gr: " << Gr << endl;
 	cout << "Gl4: " << Gl4 << endl;
 
@@ -133,15 +133,15 @@ void test_gaussian01(void) { // TESTS FOR THE GAUSSIAN CLASS
 	cout << "Gxp:" << Gxp << endl;
 
 	cout << "\n% CHANGE LOCAL STORAGE, CHECK REMOTE GAUSSIAN \n% ===========" << endl;
-	Gl.x()(2) = 103.0;
+	Gl.x(2) = 103.0;
 	cout << "ia = " << (MATLAB) ia << endl;
 	cout << "Gl.x(3) = 103.0;" << endl;
 	cout << "Gr.x = " << (MATLAB) (vec) Gr.x() << endl;
 
 	cout << "\n% CHANGE REMOTE STORAGE, CHECK REMOTE AND LOCAL GAUSSIANS \n% ===========" << endl;
-	Gr.x()(1) = 2.0;
-	Gr.P()(0, 1) = 12.0;
-	Gr.P()(0, 0) = 11.0;
+	Gr.x(1) = 2.0;
+	Gr.P(0, 1) = 12.0;
+	Gr.P(0, 0) = 11.0;
 	cout << "ia = " << (MATLAB) ia << endl;
 	cout << "Gr.x(2) = 2.0;" << endl;
 	cout << "Gr.P(1,1) = 11.0;" << endl;
@@ -286,85 +286,85 @@ void test_gaussian03() {
 	Gaussian Gr(x, P, jafar::jmath::ublasExtra::ia_range(0, 2));
 	cout << "Gr  : " << Gr << endl;
 
-	cout << "\n% LOCAL->LOCAL COPY CONSTRUCTOR \n% ===========" << endl;
+	cout << "\n% LOCAL<-LOCAL COPY CONSTRUCTOR \n% ===========" << endl;
 	cout << "% Gaussian Gl1(Gl);" << endl;
 	Gaussian Gl1(Gl);
 	JFR_CHECK_VEC_EQUAL(Gl.x(),Gl1.x());
 	JFR_CHECK_MAT_EQUAL(Gl.P(),Gl1.P());
 	cout << "Gl  : " << Gl << endl;
 	cout << "Gl1 : " << Gl1 << endl;
-	Gl.x()(1) = 1;
-	Gl.P()(0, 1) = 1;
+	Gl.x(1) = 1;
+	Gl.P(0, 1) = 1;
 	JFR_CHECK_VEC_NOT_EQUAL(Gl.x(),Gl1.x())
 	JFR_CHECK_MAT_NOT_EQUAL(Gl.P(),Gl1.P())
 	cout << "Gl  : " << Gl << endl;
 	cout << "Gl1 : " << Gl1 << endl;
 
-	cout << "\n% FORCE LOCAL->LOCAL COPY CONSTRUCTOR \n% ===========" << endl;
+	cout << "\n% FORCE LOCAL<-LOCAL COPY CONSTRUCTOR \n% ===========" << endl;
 	cout << "% Gaussian Gl2(Gl,Gl.LOCAL);" << endl;
 	Gaussian Gl2(Gl, Gl.LOCAL);
 	JFR_CHECK_VEC_EQUAL(Gl.x(),Gl2.x());
 	JFR_CHECK_MAT_EQUAL(Gl.P(),Gl2.P());
 	cout << "Gl  : " << Gl << endl;
 	cout << "Gl2 : " << Gl2 << endl;
-	Gl.x()(1) = 2;
-	Gl.P()(0, 1) = 2;
+	Gl.x(1) = 2;
+	Gl.P(0, 1) = 2;
 	JFR_CHECK_VEC_NOT_EQUAL(Gl.x(),Gl2.x())
 	JFR_CHECK_MAT_NOT_EQUAL(Gl.P(),Gl2.P())
 	cout << "Gl  : " << Gl << endl;
 	cout << "Gl2 : " << Gl2 << endl;
 
-	cout << "\n% REMOTE->REMOTE COPY CONSTRUCTOR \n% ===========" << endl;
+	cout << "\n% REMOTE<-REMOTE COPY CONSTRUCTOR \n% ===========" << endl;
 	cout << "% Gaussian Gr1(Gr);" << endl;
 	Gaussian Gr1(Gr);
 	JFR_CHECK_VEC_EQUAL(Gr.x(),Gr1.x())
 	JFR_CHECK_MAT_EQUAL(Gr.P(),Gr1.P())
 	cout << "Gr  : " << Gr << endl;
 	cout << "Gr1 : " << Gr1 << endl;
-	Gr.x()(1) = 3;
-	Gr.P()(0, 1) = 3;
+	Gr.x(1) = 3;
+	Gr.P(0, 1) = 3;
 	JFR_CHECK_VEC_EQUAL(Gr.x(),Gr1.x())
 	JFR_CHECK_MAT_EQUAL(Gr.P(),Gr1.P())
 	cout << "Gr  : " << Gr << endl;
 	cout << "Gr1 : " << Gr1 << endl;
 
-	cout << "\n% FORCE REMOTE->REMOTE COPY CONSTRUCTOR \n% ===========" << endl;
+	cout << "\n% FORCE REMOTE<-REMOTE COPY CONSTRUCTOR \n% ===========" << endl;
 	cout << "% Gaussian Gr2(Gr,Gr.REMOTE);" << endl;
 	Gaussian Gr2(Gr, Gr.REMOTE);
 	JFR_CHECK_VEC_EQUAL(Gr.x(),Gr2.x())
 	JFR_CHECK_MAT_EQUAL(Gr.P(),Gr2.P())
 	cout << "Gr  : " << Gr << endl;
 	cout << "Gr2 : " << Gr2 << endl;
-	Gr.x()(1) = 4;
-	Gr.P()(0, 1) = 4;
+	Gr.x(1) = 4;
+	Gr.P(0, 1) = 4;
 	JFR_CHECK_VEC_EQUAL(Gr.x(),Gr2.x())
 	JFR_CHECK_MAT_EQUAL(Gr.P(),Gr2.P())
 	cout << "Gr  : " << Gr << endl;
 	cout << "Gr2 : " << Gr2 << endl;
 
-	cout << "\n% LOCAL->REMOTE COPY CONSTRUCTOR \n% ===========" << endl;
+	cout << "\n% FORCE REMOTE<-LOCAL COPY CONSTRUCTOR \n% ===========" << endl;
 	cout << "% Gaussian Gr3(Gl,Gl.REMOTE);" << endl;
 	Gaussian Gr3(Gl, Gl.REMOTE);
 	JFR_CHECK_VEC_EQUAL(Gl.x(),Gr3.x())
 	JFR_CHECK_MAT_EQUAL(Gl.P(),Gr3.P())
 	cout << "Gl  : " << Gl << endl;
 	cout << "Gr3 : " << Gr3 << endl;
-	Gl.x()(1) = 5;
-	Gl.P()(0, 1) = 5;
+	Gl.x(1) = 5;
+	Gl.P(0, 1) = 5;
 	JFR_CHECK_VEC_EQUAL(Gl.x(),Gr3.x())
 	JFR_CHECK_MAT_EQUAL(Gl.P(),Gr3.P())
 	cout << "Gl  : " << Gl << endl;
 	cout << "Gr3 : " << Gr3 << endl;
 
-	cout << "\n% REMOTE->LOCAL COPY CONSTRUCTOR \n% ===========" << endl;
+	cout << "\n% FORCE LOCAL<-REMOTE COPY CONSTRUCTOR \n% ===========" << endl;
 	cout << "% Gaussian Gl3(Gr,Gr.LOCAL);" << endl;
 	Gaussian Gl3(Gr, Gr.LOCAL);
 	JFR_CHECK_VEC_EQUAL(Gr.x(),Gl3.x())
 	JFR_CHECK_MAT_EQUAL(Gr.P(),Gl3.P())
 	cout << "Gr  : " << Gr << endl;
 	cout << "Gl3 : " << Gl3 << endl;
-	Gr.x()(1) = 6;
-	Gr.P()(0, 1) = 6;
+	Gr.x(1) = 6;
+	Gr.P(0, 1) = 6;
 	JFR_CHECK_VEC_NOT_EQUAL(Gr.x(),Gl3.x())
 	JFR_CHECK_MAT_NOT_EQUAL(Gr.P(),Gl3.P())
 	cout << "Gr  : " << Gr << endl;
@@ -396,14 +396,15 @@ void test_gaussian04() {
 	cout << "Gr  : " << Gr << endl;
 
 	cout << "\n% REMOTE CONSTRUCTOR FROM LOCAL GAUSSIAN\n%================================" << endl;
-	jblas::ind_array iaPtr = ublasExtra::ia_range(1, 3);
-	cout << "% Gaussian Gr1(Gl, iaPtr, true);" << endl;
-	Gaussian Gr1(Gl, iaPtr);
+	jblas::ind_array ia = ublasExtra::ia_range(1, 3);
+	cout << "ia : " << ia << endl;
+	cout << "% Gaussian Gr1(Gl, ia);" << endl;
+	Gaussian Gr1(Gl, ia);
 	cout << "Gr1  : " << Gr1 << endl;
 
 	cout << "\n% REMOTE CONSTRUCTOR FROM REMOTE GAUSSIAN\n%================================" << endl;
-	cout << "% Gaussian Gr2(Gr, iaPtr);" << endl;
-	Gaussian Gr2(Gr, iaPtr);
+	cout << "% Gaussian Gr2(Gr, ia);" << endl;
+	Gaussian Gr2(Gr, ia);
 	cout << "Gr2  : " << Gr2 << endl;
 
 }

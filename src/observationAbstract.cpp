@@ -36,6 +36,19 @@ namespace jafar {
 			Gaussian(_size), nonObs(_size_nonobs) {
 		}
 
+		bool Expectation::isVisible() {
+			return visible_;
+		} // landmark is visible (in Field Of View).
+
+		double Expectation::infoGain() {
+			return infoGain_;
+		}	 // expected "information gain" of performing an update with this observation.
+
+		void Expectation::appearance(appearance_t _appearance) {
+			appearance_ = _appearance;
+		}
+
+
 		///////////////////////////
 		// INNOVATION
 		///////////////////////////
@@ -44,7 +57,7 @@ namespace jafar {
 		 * Size constructor
 		 */
 		Innovation::Innovation(const size_t _size) :
-			Gaussian(_size), iP_(_size) {
+			Gaussian(_size), iP_(_size), INN_meas(_size, _size), INN_exp(_size, _size) {
 		}
 
 		/*
@@ -62,8 +75,15 @@ namespace jafar {
 		 * Size constructor
 		 */
 		Measurement::Measurement(size_t _size) :
-			Gaussian(_size) {
+			Gaussian(_size), score(0) {
 		}
+
+		void Measurement::appearance(appearance_t _appearance) {
+			appearance_ = _appearance;
+		}
+
+//		Measurement::appearance_t Measurement::appearance();
+
 
 		//////////////////////////
 		// OBSERVATION ABSTRACT
@@ -73,6 +93,7 @@ namespace jafar {
 		 * Destructor
 		 */
 		ObservationAbstract::~ObservationAbstract() {
+			categoryName("OBSERVATION");
 		}
 
 		/*
@@ -80,6 +101,7 @@ namespace jafar {
 		 */
 		ObservationAbstract::ObservationAbstract(size_t _size) :
 			expectation(_size), measurement(_size), innovation(_size) {
+			categoryName("OBSERVATION");
 		}
 
 		/*
@@ -87,6 +109,7 @@ namespace jafar {
 		 */
 		ObservationAbstract::ObservationAbstract(size_t _size_meas, size_t _size_exp, size_t _size_inn) :
 			expectation(_size_exp), measurement(_size_meas), innovation(_size_inn) {
+			categoryName("OBSERVATION");
 		}
 
 		/*

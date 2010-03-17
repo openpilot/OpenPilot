@@ -53,7 +53,7 @@ namespace jafar {
 				/**
 				 * Mandatory virtual destructor
 				 */
-				virtual ~AppearanceAbstract(void);
+				virtual ~AppearanceAbstract();
 		};
 
 		/** Base class for all Gaussian expectations defined in the module rtslam.
@@ -62,11 +62,6 @@ namespace jafar {
 		 */
 		class Expectation: public Gaussian {
 			public:
-				AppearanceAbstract * appearance;
-				jblas::mat EXP_rob, EXP_sen, EXP_lmk; // Jacobians of the expectation wrt robot state, sensor state, lmk state.
-				jblas::vec nonObs; // expected value of the non-observable part.
-				bool visible; // landmark is visible (in Field Of View).
-				double infoGain; // expected "information gain" of performing an update with this observation.
 
 				/**
 				 * size constructor
@@ -78,8 +73,19 @@ namespace jafar {
 				 */
 				Expectation(const size_t _size, const size_t _size_nonobs);
 
-				void computeVisibility(void);
-				void estimateInfoGain(void);
+				AppearanceAbstract * appearance;
+
+				jblas::mat EXP_rob, EXP_sen, EXP_lmk; // Jacobians of the expectation wrt robot state, sensor state, lmk state.
+
+				jblas::vec nonObs; // expected value of the non-observable part.
+
+				bool visible; // landmark is visible (in Field Of View).
+
+				double infoGain; // expected "information gain" of performing an update with this observation.
+
+				void computeVisibility();
+
+				void estimateInfoGain();
 		};
 
 		/** Base class for all Gaussian measurements defined in the module rtslam.
@@ -111,6 +117,7 @@ namespace jafar {
 				jblas::mat INN_meas;
 				/// The Jacobian of the innovation wrt the expectation.
 				jblas::mat INN_exp;
+
 			public:
 
 				/**
@@ -130,14 +137,14 @@ namespace jafar {
 				/**
 				 * the inverse of the innovation covariance.
 				 */
-				void invertCov(void) {
+				void invertCov() {
 					jafar::jmath::ublasExtra::lu_inv(P(), iP_);
 				}
 
 				/**
 				 * The Mahalanobis distance.
 				 */
-				double mahalanobis(void) {
+				double mahalanobis() {
 					invertCov();
 					mahalanobis_ = ublas::inner_prod(x(), (jblas::vec) ublas::prod(iP_, x()));
 					return mahalanobis_;
@@ -186,12 +193,16 @@ namespace jafar {
 		 * \ingroup rtslam
 		 */
 		class ObservationAbstract {
+			private:
+				std::size_t id_;
+				std::string type_;
+				std::string categoryName_;
 			public:
 
 				/**
 				 * Mandatory virtual destructor.
 				 */
-				virtual ~ObservationAbstract(void);
+				virtual ~ObservationAbstract();
 
 				/**
 				 * Size constructor
@@ -263,36 +274,57 @@ namespace jafar {
 				/**
 				 * Project and get Jacobians
 				 */
-//				virtual void project(void) = 0;
+//				virtual void project() = 0;
 
 				/**
 				 * Is visible
 				 * \return true if visible
 				 */
-				virtual bool isVisible(void) {
+				virtual bool isVisible() {
 					return events.visible;
 				}
+
+				inline void id(std::size_t _id) {
+					id_ = _id;
+				}
+				inline void type(std::string _type) {
+					type_ = _type;
+				}
+				inline void categoryName(std::string _categoryName) {
+					categoryName_ = _categoryName;
+				}
+				inline std::size_t & id() {
+					return id_;
+				}
+				inline std::string & type() {
+					return type_;
+				}
+				inline std::string & categoryName() {
+					return categoryName_;
+				}
+
 
 				/**
 				 * match
 				 */
-//				virtual void match(void);
+//				virtual void match();
 
 				/**
 				 * Individual consistency check
 				 */
-//				virtual void isIndividuallyConsistent(void);
+//				virtual void isIndividuallyConsistent();
 
 				/**
 				 * Back-project
 				 */
-//				virtual void back_project(void) = 0;
+//				virtual void back_project() = 0;
 
 				/**
 				 * Operator << for class ObservationAbstract.
 				 * It shows different information of the observation.
 				 */
-				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObservationAbstract & obs) {
+				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObservationAbstract & obs)
+				{
 					s << "OBSERVATION of " << obs.landmark->type() << " from " << obs.sensor->type() << endl;
 					s << "Sensor: " << obs.sensor->id() << ", landmark: " << obs.landmark->id() << endl;
 					s << ".expectation:  " << obs.expectation << endl;

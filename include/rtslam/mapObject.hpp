@@ -35,7 +35,7 @@ namespace jafar {
 				std::string categoryName_;
 
 			public:
-				MapAbstract * map;
+				MapAbstract * slamMap;
 				Gaussian state;
 
 				/**

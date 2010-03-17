@@ -23,8 +23,9 @@
 #include "jmath/jblas.hpp"
 #include "rtslam/blocks.hpp"
 //include parents
-#include "rtslam/robotAbstract.hpp"
-//#include "rtslam/mapAbstract.hpp"
+//#include "rtslam/robotAbstract.hpp"
+#include "rtslam/mapObject.hpp"
+#include "rtslam/mapAbstract.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -34,7 +35,7 @@ namespace jafar {
 
 		// Forward declarations of children
 		class ObservationAbstract;
-
+//		class RobotAbstract;
 
 		/**
 		 * Base class for all raw data in module rtslam.
@@ -45,12 +46,12 @@ namespace jafar {
 				/**
 				 * Mandatory virtual destructor.
 				 */
-				inline virtual ~RawAbstract(void) {
+				inline virtual ~RawAbstract() {
 				}
 				/**
 				 * Acquire raw data
 				 */
-				inline virtual void acquire(void) {
+				inline virtual void acquire() {
 				}
 		};
 
@@ -69,10 +70,10 @@ namespace jafar {
 				 */
 				RobotAbstract* robot;
 
+				typedef std::map<size_t, ObservationAbstract*> observations_t;
 				/**
 				 * A set of observations (one per landmark)
 				 */
-				typedef std::map<size_t, ObservationAbstract*> observations_t;
 				observations_t observationsList;
 
 				/**
@@ -97,7 +98,7 @@ namespace jafar {
 				/**
 				 * Remote pose constructor.
 				 * Creates a sensor with the pose indexed in a map.
-				 * \param map the map
+				 * \param _map the slam map
 				 */
 				SensorAbstract(MapAbstract & _map);
 
@@ -121,15 +122,9 @@ namespace jafar {
 				/**
 				 * Mandatory virtual destructor.
 				 */
-				virtual ~SensorAbstract(void) {
+				virtual ~SensorAbstract() {
 				}
 
-
-//				/**
-//				 * Install sensor in robot.
-//				 * \param rob the robot.
-//				 */
-//				void installToRobot(RobotAbstract & rob);
 
 				/*
 				 * Acquire raw data
@@ -173,7 +168,8 @@ namespace jafar {
 				 * Operator << for class SensorAbstract.
 				 * It shows different information of the sensor.
 				 */
-				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::SensorAbstract & sen) {
+				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::SensorAbstract & sen)
+				{
 					s << sen.categoryName() << " " << sen.id() << ": ";
 					if (sen.name().size() > 0)
 						s << sen.name() << ", ";

@@ -12,6 +12,7 @@
  */
 
 #include "rtslam/landmarkAbstract.hpp"
+#include "rtslam/observationAbstract.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -26,9 +27,14 @@ namespace jafar {
 			categoryName("LANDMARK");
 			id(_map.landmarkIds.getId());
 			// Link map and lmk
-			map = &_map;
+			slamMap = &_map;
 			_map.addLandmark(this);
 		}
+
+		inline void LandmarkAbstract::addObservation(ObservationAbstract * _obsPtr) {
+			observations[_obsPtr->id()] = _obsPtr;
+		}
+
 
 	}
 }

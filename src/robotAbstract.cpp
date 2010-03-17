@@ -35,7 +35,7 @@ namespace jafar {
 
 			// Link robot to map
 			_map.addRobot(this); // map has robot
-			map = &_map; // robot is in map
+			slamMap = &_map; // robot is in map
 		}
 
 

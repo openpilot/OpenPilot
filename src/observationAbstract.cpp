@@ -12,6 +12,7 @@
  */
 
 #include "rtslam/observationAbstract.hpp"
+#include "rtslam/sensorAbstract.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -71,7 +72,7 @@ namespace jafar {
 		/*
 		 * Destructor
 		 */
-		ObservationAbstract::~ObservationAbstract(void) {
+		ObservationAbstract::~ObservationAbstract() {
 		}
 
 		/*
@@ -98,12 +99,6 @@ namespace jafar {
 			sensor = &sen;
 			landmark = &lmk;
 		}
-
-	//		/*
-	//		 * Sensor and landmark constructor
-	//		 */
-	//		ObservationAbstract::ObservationAbstract(SensorAbstract & _sen, LandmarkAbstract & _lmk):
-	//			expectation(){}
 
 	} // namespace rtslam
 } // namespace jafar

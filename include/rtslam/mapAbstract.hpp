@@ -66,14 +66,14 @@ namespace jafar {
 				/**
 				 * Mandatory virtual destructor - Map is used as-is, non-abstract by now
 				 */
-				// inline virtual ~MapAbstract(void);
+				 inline virtual ~MapAbstract(){}
 
 				/**
 				 * Map's indirect array is a function by now.
 				 * \return the indirect array of all used states in the map.
 				 * TODO: see how to avoid constructing this each time
 				 */
-				inline jblas::ind_array ia_used_states(void) {
+				inline jblas::ind_array ia_used_states() {
 					jblas::ind_array res;
 					res = jmath::ublasExtra::ia_set(used_states);
 					return res;
@@ -101,7 +101,7 @@ namespace jafar {
 				 * Query about available free space.
 				 * \return the number of unused states
 				 */
-				inline std::size_t unusedStates(void) const {
+				inline std::size_t unusedStates() const {
 					return max_size - current_size;
 				}
 

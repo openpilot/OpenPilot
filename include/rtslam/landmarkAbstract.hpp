@@ -54,7 +54,7 @@ namespace jafar {
 				/**
 				 * Mandatory virtual destructor
 				 */
-				virtual ~DescriptorAbstract(void) {
+				virtual ~DescriptorAbstract() {
 				}
 		};
 
@@ -76,7 +76,7 @@ namespace jafar {
 				/**
 				 * Mandatory virtual destructor.
 				 */
-				virtual ~LandmarkAbstract(void) {
+				virtual ~LandmarkAbstract() {
 				}
 
 				DescriptorAbstract descriptor;
@@ -84,13 +84,15 @@ namespace jafar {
 				/**
 				 * Parent map
 				 */
-				MapAbstract * map;
+				MapAbstract * slamMap;
 
+				typedef std::map<size_t, ObservationAbstract*> observations_t;
 				/**
 				 * A set of observations (one per sensor)
 				 */
-				typedef std::map<size_t, ObservationAbstract*> observations_t;
 				observations_t observations;
+
+				inline void addObservation(ObservationAbstract * _obsPtr) ;
 
 				/**
 				 * Reparametrize the landmark.
@@ -101,7 +103,6 @@ namespace jafar {
 //					descriptor = _desc;
 //				}
 
-//				inline void addObservation(ObservationAbstract & _obs) ;
 
 		};
 

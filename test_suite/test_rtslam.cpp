@@ -17,6 +17,7 @@
 // jafar debug include
 #include "kernel/jafarDebug.hpp"
 #include "kernel/jafarTestMacro.hpp"
+#include "jmath/random.hpp"
 
 #include <iostream>
 
@@ -32,20 +33,37 @@ using namespace jblas;
 using namespace jafar::jmath;
 using namespace jafar::jmath::ublasExtra;
 
+void fillMapSeq(MapAbstract & map) {
+	size_t size_map = map.max_size;
+	for (size_t i = 0; i < size_map; i++) {
+		map.filter.x(i) = i;
+		for (size_t j = 0; j < size_map; j++)
+			map.filter.P(i, j) = i + 100 * j;
+	}
+}
+
+void fillMapIdent(MapAbstract & map) {
+	size_t size_map = map.max_size;
+	for (size_t i = 0; i < size_map; i++) {
+		map.filter.x(i) = i;
+	}
+	map.filter.P = jblas::identity_mat(size_map);
+}
+
+void fillMapRndm(MapAbstract & map) {
+	randVector(map.filter.x);
+	randMatrix(map.filter.P);
+}
+
 void test_rtslam01(void) {
 
 	size_t size_map = 100;
 
 	MapAbstract slamMap(size_map);
 
-	for (size_t i = 0; i < size_map; i++) {
-		slamMap.filter.x(i) = i;
-		for (size_t j = 0; j < size_map; j++)
-			slamMap.filter.P(i, j) = i + 100*j;
-	}
-	slamMap.filter.P = jblas::identity_mat(size_map);
+	fillMapIdent(slamMap);
 
-	cout << "\n ROBOTS AND SENSORS \n%==========" << endl;
+	cout << endl << "\n ROBOTS AND SENSORS \n%====================" << endl;
 
 
 	// Add 2 robots
@@ -86,12 +104,12 @@ void test_rtslam01(void) {
 		size_t rid = robIter->first;
 		RobotAbstract * robPtr = robIter->second;
 
-		cout << "Robot " << rid << ": " << *robPtr << endl;
+		cout << *robPtr << endl;
 
 		for (senIter = robPtr->sensors.begin(); senIter != robPtr->sensors.end(); senIter++) {
 			size_t sid = senIter->first;
 			SensorAbstract * senPtr = senIter->second;
-			cout << "==> with sensor " << sid << ": " << *senPtr << endl;
+			cout << *senPtr << endl;
 
 		}
 	}

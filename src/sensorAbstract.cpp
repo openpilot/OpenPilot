@@ -12,6 +12,7 @@
  */
 
 #include "rtslam/sensorAbstract.hpp"
+#include "rtslam/robotAbstract.hpp"
 #include "rtslam/quatTools.hpp"
 
 namespace jafar {
@@ -65,11 +66,11 @@ namespace jafar {
 		 */
 		SensorAbstract::SensorAbstract(RobotAbstract & _rob, bool inFilter = false) :
 			//          #check           # sensor in filter                                         # not in filter
-			MapObject (inFilter ? MapObject(*_rob.map, 7)                                          : 0            ),
-			pose      (inFilter ? Gaussian((*_rob.map).filter.x, (*_rob.map).filter.P, state.ia()) : Gaussian(7)  )
+			MapObject (inFilter ? MapObject(*_rob.slamMap, 7)                                          : 0            ),
+			pose      (inFilter ? Gaussian((*_rob.slamMap).filter.x, (*_rob.slamMap).filter.P, state.ia()) : Gaussian(7)  )
 		{
 			categoryName("SENSOR");
-			id(_rob.map->sensorIds.getId());
+			id(_rob.slamMap->sensorIds.getId());
 			// link robot and sensor together:
 			robot = &_rob;
 			_rob.addSensor(this);

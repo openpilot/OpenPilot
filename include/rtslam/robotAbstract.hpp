@@ -38,15 +38,16 @@
 // include parents
 #include "rtslam/sensorAbstract.hpp"
 #include "rtslam/mapAbstract.hpp"
+#include "rtslam/mapObject.hpp"
 
 namespace jafar {
 
 	namespace rtslam {
 
+		using namespace std;
 
 		//  Forward declarations of children
 		class SensorAbstract;
-		//		class MapAbstract;
 
 		/** Base class for all Gaussian control vectors defined in the module rtslam.
 		 *
@@ -68,8 +69,8 @@ namespace jafar {
 		 * \ingroup rtslam
 		 */
 		class RobotAbstract: public MapObject {
-			public:
 
+			public:
 
 				/**
 				 * Remote constructor from remote map and size of state and control vectors.
@@ -80,7 +81,24 @@ namespace jafar {
 				RobotAbstract(MapAbstract & _map, const size_t _size_state, const size_t _size_control);
 
 				// Mandatory virtual destructor.
-				virtual ~RobotAbstract(void) {
+				virtual ~RobotAbstract() {}
+
+				MapAbstract * slamMap; ///< Parent map
+
+				typedef map<size_t, SensorAbstract*> sensors_t;
+
+				sensors_t sensors; ///<	A set of sensors
+
+				Gaussian pose; ///< Robot pose
+
+				Control control; ///< Control vector
+
+				jblas::mat F_r; ///< Jacobian wrt state
+
+				jblas::mat F_u; ///< Jacobian wrt control
+
+				static size_t size_control() {
+					return 0;
 				}
 
 				/**
@@ -89,39 +107,16 @@ namespace jafar {
 				void addSensor(SensorAbstract * _senPtr);
 
 				/**
-				 * A set of sensors
-				 */
-				typedef std::map<size_t, SensorAbstract*> sensors_t;
-				sensors_t sensors;
-
-				/**
-				 * Parent map
-				 */
-				MapAbstract * map;
-
-				Gaussian pose; ///< Robot pose
-				Control control; ///< Control vector
-
-				/*
-				 * Jacobians
-				 * F_r: wrt state
-				 * F_u: wrt control
-				 */
-				jblas::mat F_r;
-				jblas::mat F_u;
-
-				/**
 				 * Acquire control structure
 				 */
 				virtual void set_control(const Control & _control) {
 					control = _control;
 				}
 
-
 				/**
 				 * Move the robot.
 				 */
-				virtual void move(void) = 0;
+				virtual void move() = 0;
 
 				void move(const Control & _control) {
 					set_control(_control);
@@ -134,27 +129,22 @@ namespace jafar {
 					move();
 				}
 
-				static size_t size_control(void) {
-					return 0;
-				}
-
-
 				/**
 				 * Operator << for class RobotAbstract.
 				 * It shows different information of the robot.
 				 */
-				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::RobotAbstract & rob) {
+				friend ostream& operator <<(ostream & s, jafar::rtslam::RobotAbstract & rob) {
 					s << rob.categoryName() << " " << rob.id() << ": ";
 					if (rob.name().size() > 0)
 						s << rob.name() << ", ";
-					s << "of type " << rob.type() << std::endl;
-					s << ".state:  " << rob.state << std::endl;
-					s << ".pose :  " << rob.pose << std::endl;
-					s << ".sens << [";
+					s << "of type " << rob.type() << endl;
+					s << ".state:  " << rob.state << endl;
+					s << ".pose :  " << rob.pose << endl;
+					s << ".sens : [ ";
 					sensors_t::iterator senIter;
 					for (senIter = rob.sensors.begin(); senIter != rob.sensors.end(); senIter++)
 						s << senIter->first << " ";
-					s << "]" << std::endl;
+					s << "]";
 					return s;
 				}
 

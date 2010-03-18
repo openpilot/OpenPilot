@@ -1,0 +1,57 @@
+RTSLAM 9 MARS 2010
+
+Joan Sola
+
+1. Structure repertoires travail JAFAR.
+	jafar
+		include
+			moduleName
+				*.hpp
+		lib
+			platformName
+				*.la
+				*.so … etc
+		modules
+			moduleName
+				include
+					moduleName
+						*.hpp
+				src
+					*.cpp
+	Test
+		include
+			*.hpp
+		src
+			*.cpp
+
+2. Projets et depots
+	2a. jafar: depot SVN. 
+		racourcis dans jafar/bin. 
+		Exception: module rtslam.
+	2b. jafar/modules/rtslam: 
+		module rtslam, depot GIT.
+	2c. Test
+		projet pour tests et debug. Depot GIT. 
+
+3. Namespaces du projet RTSLAM et voisins.
+	jafar
+		jmath
+			jblas		- typedefs for vectors and matrices
+			ublasExtra	- extension to ublas operations. ind_array, ixaxpy
+		rtslam
+			quaternion	- quatTools.hpp
+			landmarkAHP	- AHP landmark manipulation toolbox
+
+4. Fichiers RTSLAM
+	4a. rtslam/gaussian.hpp, gaussian.cpp
+	4b. rtslam/quatTools.hpp
+	4c. jmath/indirectArray.hpp, .cpp
+	4d. jmath/ixaxpy.hpp, .cpp
+	4e. Abstract classes for map, robot, sensor, landmark, observation
+	4f. Derived classes for CV, PH, AHP
+
+5. Fichiers Test
+
+	5a. Test.hpp, Test.cpp
+	5b. test_*.cpp
+

@@ -52,7 +52,7 @@ D: PPM inputs
 
 N: Rowan Taubitz
 E: rowan (at) zantek (dot) com (dot) au
-D: Hardware debugging and testing
+D: Hardware debugging and testing, creation of 2-layer Floss-JTAG board
 
 N: Vassilis Varveropoulos
 E: vassilis (at) openpilot (dot) org

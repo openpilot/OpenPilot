@@ -83,7 +83,9 @@ namespace jafar {
 		 * <i><b> REMEMBER: remote Gaussians always point to local Gaussians.</b></i>
 		 * See that the remote constructor \a GRe accepts a remote Gaussian \a GR to point to.
 		 * In this case, the created Gaussian \a GRe is set to point to the local Gaussian \a GR was pointing to,
-		 * say \a GL, and its indirect array is composed accordingly.
+		 * say \a GL, and its indirect array is composed accordingly
+		 * (composed means that after creation we have <i>GRe.ia(i) = GR.ia(ia(i))</i>, that is,
+		 * the resulting \a GR.ia is different from the provided one \a ia).
 		 * The reference to \a GR is therefore lost.
 		 *
 		 * <b> Managing cross-variances through indirect indexing</b>
@@ -276,13 +278,15 @@ namespace jafar {
 				 * \param _size the size of the Gaussian.
 				 */
 				inline Gaussian(const size_t _size) :
-					hasNullCov_(false), size_(_size),
-					storage_(LOCAL),
-					x_local(size_),
-					P_local(size_, size_),
-					ia_(size_),
-					x_(x_local, ia_.all()),
-					P_(P_local, ia_.all(), ia_.all()) {
+					hasNullCov_ (false),
+					size_       (_size),
+					storage_    (LOCAL),
+					x_local     (size_),
+					P_local     (size_, size_),
+					ia_         (size_),
+					x_          (x_local, ia_.all()),
+					P_          (P_local, ia_.all(), ia_.all())
+				{
 					clear();
 					for (size_t i = 0; i < size_; i++)
 						ia_(i) = i;
@@ -296,12 +300,15 @@ namespace jafar {
 				 * \param _x the Gaussian mean.
 				 */
 				inline Gaussian(const jblas::vec & _x) :
-					hasNullCov_(true), size_(_x.size()),
-					storage_(LOCAL),
-					x_local(_x),
-					P_local(size_, size_),
-					ia_(size_), x_(x_local, ia_.all()),
-					P_(P_local, ia_.all(), ia_.all()) {
+					hasNullCov_ (true),
+					size_       (_x.size()),
+					storage_    (LOCAL),
+					x_local     (_x),
+					P_local     (size_, size_),
+					ia_         (size_),
+					x_          (x_local, ia_.all()),
+					P_          (P_local, ia_.all(), ia_.all())
+				{
 					for (size_t i = 0; i < size_; i++)
 						ia_(i) = i;
 				}
@@ -315,12 +322,15 @@ namespace jafar {
 				 * \param _P the Gaussian covariances matrix.
 				 */
 				inline Gaussian(const jblas::vec& _x, const jblas::sym_mat& _P) :
-					hasNullCov_(false), size_(_x.size()),
-					storage_(LOCAL),
-					x_local(_x), P_local(_P),
-					ia_(size_),
-					x_(x_local, ia_.all()),
-					P_(P_local, ia_.all(), ia_.all()) {
+					hasNullCov_ (false),
+					size_       (_x.size()),
+					storage_    (LOCAL),
+					x_local     (_x),
+					P_local     (_P),
+					ia_         (size_),
+					x_          (x_local, ia_.all()),
+					P_          (P_local, ia_.all(), ia_.all())
+				{
 					for (size_t i = 0; i < size_; i++)
 						ia_(i) = i;
 				}
@@ -337,8 +347,8 @@ namespace jafar {
 				 * \param _storage the directive to force local or remote storage.
 				 */
 				inline Gaussian(const Gaussian & G, storage_t _storage = UNCHANGED) :
-					hasNullCov_(G.hasNullCov_),
-					size_  (G.size_),
+					hasNullCov_ (G.hasNullCov_),
+					size_       (G.size_),
 					//        # check storage       ?              # is local                                  : # is remote
 					storage_(_storage == UNCHANGED  ?  G.storage_                                              : _storage),
 					x_local (_storage == LOCAL      ?  G.x_                                                    : G.x_local),
@@ -363,11 +373,11 @@ namespace jafar {
 				 * \param _ia an indirect array of indices pointing to \a G.
 				 */
 				inline Gaussian(Gaussian & G, const jblas::ind_array & _ia) :
-					hasNullCov_(false),
-					size_(_ia.size()),
-					storage_(REMOTE),
-					x_local(0),
-					P_local(0),
+					hasNullCov_ (false),
+					size_       (_ia.size()),
+					storage_    (REMOTE),
+					x_local     (0),
+					P_local     (0),
 					//     # check storage   ?                   # is local                   :             # is remote
 					ia_(G.storage_ == LOCAL  ?  _ia                                           : G.ia_.compose(_ia)),
 					x_ (G.storage_ == LOCAL  ?  jblas::vec_indirect     (G.x_local, ia_)      : jblas::vec_indirect     (G.x_.data(), ia_, 1)     ),
@@ -387,12 +397,14 @@ namespace jafar {
 				 * \param _ia the indirect array.
 				 */
 				inline Gaussian(jblas::vec & _x, jblas::sym_mat & _P, const jblas::ind_array& _ia) :
-					hasNullCov_(false), size_(_ia.size()),
-					storage_(REMOTE),
-					x_local(0), P_local(0),
-					ia_(_ia), x_(_x, ia_),
-					P_(_P, ia_, ia_) {
-					//			JFR_ASSERT((_x.size() == _ia.size()) && (_x.size() == _P.size1()), "gaussian.hpp: Gaussian(): sizes mismatch.");
+					hasNullCov_ (false),
+					size_       (_ia.size()),
+					storage_    (REMOTE),
+					x_local     (0),
+					P_local     (0),
+					ia_         (_ia),
+					x_          (_x, ia_),
+					P_          (_P, ia_, ia_) {
 				}
 
 

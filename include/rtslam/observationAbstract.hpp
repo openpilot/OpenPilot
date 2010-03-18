@@ -111,7 +111,6 @@ namespace jafar {
 
 				typedef boost::shared_ptr<AppearanceAbstract> appearance_t;
 
-
 				inline void appearance(appearance_t _appearance);
 				inline appearance_t appearance();
 				Measurement(size_t _size);
@@ -224,6 +223,9 @@ namespace jafar {
 		 * \ingroup rtslam
 		 */
 		class ObservationAbstract: public ObjectAbstract {
+
+				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObservationAbstract & obs);
+
 			public:
 
 
@@ -327,19 +329,6 @@ namespace jafar {
 				 * Back-project
 				 */
 				//				virtual void back_project() = 0;
-
-				/**
-				 * Operator << for class ObservationAbstract.
-				 * It shows different information of the observation.
-				 */
-				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObservationAbstract & obs) {
-					s << "OBSERVATION of " << obs.landmark->type() << " from " << obs.sensor->type() << endl;
-					s << "Sensor: " << obs.sensor->id() << ", landmark: " << obs.landmark->id() << endl;
-					s << ".expectation:  " << obs.expectation << endl;
-					s << ".measurement:  " << obs.measurement << endl;
-					s << ".innovation:   " << obs.innovation;
-					return s;
-				}
 
 		};
 

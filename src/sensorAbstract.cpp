@@ -21,6 +21,21 @@ namespace jafar {
 
 
 		/*
+		 * Operator << for class SensorAbstract.
+		 * It shows different information of the sensor.
+		 */
+		std::ostream& operator <<(std::ostream & s, jafar::rtslam::SensorAbstract & sen) {
+			s << sen.categoryName() << " " << sen.id() << ": ";
+			if (sen.name().size() > 0)
+				s << sen.name() << ", ";
+			s << "of type " << sen.type() << std::endl;
+			s << ".pose :  " << sen.pose << endl;
+			s << ".robot: [ " << sen.robot->id() << " ]";
+			return s;
+		}
+
+
+		/*
 		 * Local pose constructor - only mean
 		 */
 		//				template<class V>
@@ -29,6 +44,7 @@ namespace jafar {
 			categoryName("SENSOR");
 		}
 
+
 		/*
 		 * Local pose constructor - full Gaussian.
 		 */
@@ -36,6 +52,7 @@ namespace jafar {
 			MapObject(0), pose(_pose) {
 			categoryName("SENSOR");
 		}
+
 
 		/*
 		 * Remote pose constructor.
@@ -47,12 +64,12 @@ namespace jafar {
 			cout << "Sensor id: " << id() << endl;
 		}
 
+
 		/*
 		 * Remote pose constructor, with robot association.
 		 */
 		SensorAbstract::SensorAbstract(MapAbstract & _map, RobotAbstract & _rob) :
-			MapObject(_map, 7),
-			pose(_map.x(), _map.P(), state.ia()) {
+			MapObject(_map, 7), pose(_map.x(), _map.P(), state.ia()) {
 			categoryName("SENSOR");
 			id(_map.sensorIds.getId());
 			cout << "Sensor id: " << id() << endl;
@@ -61,14 +78,14 @@ namespace jafar {
 			_rob.addSensor(this);
 		}
 
+
 		/*
 		 * Selectable LOCAL or REMOTE pose constructor.
 		 */
 		SensorAbstract::SensorAbstract(RobotAbstract & _rob, bool inFilter = false) :
 			//          #check           # sensor in filter                                         # not in filter
-			MapObject (inFilter ? MapObject(*_rob.slamMap, 7)                                          : 0            ),
-			pose      (inFilter ? Gaussian((*_rob.slamMap).x(), (*_rob.slamMap).P(), state.ia()) : Gaussian(7)  )
-		{
+			    MapObject(inFilter ? MapObject(*_rob.slamMap, 7) : 0), pose(inFilter ? Gaussian((*_rob.slamMap).x(),
+			        (*_rob.slamMap).P(), state.ia()) : Gaussian(7)) {
 			categoryName("SENSOR");
 			id(_rob.slamMap->sensorIds.getId());
 			// link robot and sensor together:

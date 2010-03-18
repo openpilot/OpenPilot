@@ -170,108 +170,6 @@ namespace jafar {
 			public:
 
 
-				// Getters
-
-				inline storage_t storage() const {
-					return storage_;
-				}
-
-				inline bool hasNullCov() {
-					return hasNullCov_;
-				}
-
-				inline size_t size() const {
-					return size_;
-				}
-
-				inline jblas::ind_array & ia() {
-					return ia_;
-				}
-
-				inline jblas::vec_indirect & x() {
-					return x_;
-				}
-
-				inline jblas::sym_mat_indirect & P() {
-					return P_;
-				}
-
-				double & x(size_t i) {
-					return x_(i);
-				}
-
-				double & P(size_t i, size_t j) {
-					return P_(i, j);
-				}
-
-
-				/*
-				 * Setters
-				 */
-				inline void storage(const storage_t & _s) {
-					storage_ = _s;
-					if (_s == REMOTE)
-						hasNullCov_ = false;
-				}
-
-				inline void hasNullCov(bool _hasNullCov) {
-					hasNullCov_ = _hasNullCov;
-				}
-
-				inline void x(const jblas::vec & _x) {
-					JFR_ASSERT(_x.size() == size_, "gaussian.hpp: set_x: size mismatch.");
-					x_.assign(_x);
-				}
-
-
-				/**
-				 * Set covariances matrix from standard deviations vector.
-				 * \param std the vector of standard deviations.
-				 */
-				inline void std(const jblas::vec& _std) {
-					JFR_ASSERT(_std.size() == P_.size1(), "gaussian.hpp: set_P: size mismatch.");
-					hasNullCov_ = false;
-					P_.assign(jblas::zero_mat(size_));
-					for (std::size_t i = 0; i < size_; i++) {
-						P_(i, i) = _std(i) * _std(i);
-					}
-				}
-
-
-				/**
-				 * Set covariances matrix from a covariances matrix.
-				 * \param _P the covariances matrix.
-				 */
-				inline void P(const jblas::sym_mat & _P) {
-					JFR_ASSERT(_P.size1() == size_, "gaussian.hpp: set_P: size mismatch.");
-					hasNullCov_ = false;
-					P_.assign(_P);
-				}
-
-
-				/**
-				 * Set off-diagonal block in the covariances matrix.
-				 * Only works for local Gaussians.
-				 * \param M the off-diagonal block.
-				 * \param ia1 the indirect array for rows.
-				 * \param ia2 the indirect array for columns.
-				 */
-				inline void P(const jblas::mat & M, const jblas::ind_array & ia1, const jblas::ind_array & ia2) {
-					hasNullCov_ = false;
-					project(P_local, ia1, ia2) = M;
-				}
-
-
-				/**
-				 * Clear data, keep sizes and ranges.
-				 * Clears the data of \a x_ and \a P_.
-				 */
-				inline void clear(void) {
-					x_.assign(jblas::zero_vec(size_));
-					P_.assign(jblas::zero_mat(size_, size_));
-				}
-
-
 				/**
 				 * Local constructor from size.
 				 * This constructor defines a local-storage Gaussian of size \a _size. Data is cleared automatically.
@@ -331,6 +229,7 @@ namespace jafar {
 					x_          (x_local, ia_.all()),
 					P_          (P_local, ia_.all(), ia_.all())
 				{
+					JFR_ASSERT(_x.size() == _P.size1(), "gaussian::Gaussian():: x and P sizes do not match.");
 					for (size_t i = 0; i < size_; i++)
 						ia_(i) = i;
 				}
@@ -346,6 +245,7 @@ namespace jafar {
 				 * \param G the Gaussian to copy.
 				 * \param _storage the directive to force local or remote storage.
 				 */
+				// Thanks to C. Roussillon for this constructor.
 				inline Gaussian(const Gaussian & G, storage_t _storage = UNCHANGED) :
 					hasNullCov_ (G.hasNullCov_),
 					size_       (G.size_),
@@ -404,7 +304,73 @@ namespace jafar {
 					P_local     (0),
 					ia_         (_ia),
 					x_          (_x, ia_),
-					P_          (_P, ia_, ia_) {
+					P_          (_P, ia_, ia_)
+				{
+					JFR_ASSERT(_x.size() == _P.size1(), "gaussian::Gaussian():: x and P sizes do not match.");
+				}
+
+
+				// Getters
+				inline bool                      hasNullCov()          { return hasNullCov_; }
+				inline storage_t                 storage() const       { return storage_;    }
+				inline size_t                    size() const          { return size_;       }
+				inline jblas::ind_array        & ia()                  { return ia_;         }
+				inline jblas::vec_indirect     & x()                   { return x_;          }
+				inline jblas::sym_mat_indirect & P()                   { return P_;          }
+				inline double                  & x(size_t i)           { return x_(i);       }
+				inline double                  & P(size_t i, size_t j) { return P_(i, j);    }
+
+				 // Setters
+				inline void  storage(const storage_t & _s) {
+					storage_ = _s;
+					if (_s == REMOTE)
+						hasNullCov_ = false;
+				}
+				inline void  hasNullCov(bool _hasNullCov) {
+					hasNullCov_ = _hasNullCov;
+				}
+				inline void  x(const jblas::vec & _x) {
+					JFR_ASSERT(_x.size() == size_, "gaussian.hpp: set_x: size mismatch.");
+					x_.assign(_x);
+				}
+				inline void  P(const jblas::sym_mat & _P) {
+					JFR_ASSERT(_P.size1() == size_, "gaussian.hpp: set_P: size mismatch.");
+					hasNullCov_ = false;
+					P_.assign(_P);
+				}
+
+				/**
+				 * Set covariances matrix from standard deviations vector.
+				 * \param std the vector of standard deviations.
+				 */
+				inline void std(const jblas::vec& _std) {
+					JFR_ASSERT(_std.size() == P_.size1(), "gaussian.hpp: set_P: size mismatch.");
+					hasNullCov_ = false;
+					P_.assign(jblas::zero_mat(size_));
+					for (std::size_t i = 0; i < size_; i++) {
+						P_(i, i) = _std(i) * _std(i);
+					}
+				}
+
+				/**
+				 * Set off-diagonal block in the covariances matrix.
+				 * Only works for local Gaussians.
+				 * \param M the off-diagonal block.
+				 * \param ia1 the indirect array for rows.
+				 * \param ia2 the indirect array for columns.
+				 */
+				inline void P(const jblas::mat & M, const jblas::ind_array & ia1, const jblas::ind_array & ia2) {
+					hasNullCov_ = false;
+					project(P_local, ia1, ia2) = M;
+				}
+
+				/**
+				 * Clear data, keep sizes and ranges.
+				 * Clears the data of \a x_ and \a P_.
+				 */
+				inline void clear(void) {
+					x_.assign(jblas::zero_vec(size_));
+					P_.assign(jblas::zero_mat(size_, size_));
 				}
 
 

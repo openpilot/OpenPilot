@@ -15,6 +15,8 @@
 #define MAPOBJECT_HPP_
 
 #include "jmath/jblas.hpp"
+
+#include "rtslam/rtslam.hpp"
 #include "rtslam/objectAbstract.hpp"
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/gaussian.hpp"
@@ -31,14 +33,17 @@ namespace jafar {
 		 */
 		class MapObject: public ObjectAbstract {
 
+				friend ostream& operator <<(ostream & s, jafar::rtslam::MapObject & obj);
+
 			public:
-				MapAbstract * slamMap;
+
+				MapAbstract * slamMap; ///< parent map
 
 				Gaussian state;
 
 				/**
 				 * Local constructor from size.
-				 * With this constructor the object is not linked to any map. Use it for sensors.
+				 * With this constructor the object is not linked to any map. Use it for eg. sensors.
 				 * \param _size the state size.
 				 */
 				MapObject(const size_t _size);
@@ -58,19 +63,6 @@ namespace jafar {
 
 				inline static size_t size() {
 					return 0;
-				}
-
-				/**
-				 * Operator << for class MapObject.
-				 * It shows different information of the object.
-				 */
-				friend ostream& operator <<(ostream & s, jafar::rtslam::MapObject & obj) {
-					s << obj.categoryName() << " " << obj.id() << ": ";
-					if (obj.name().size() > 0)
-						s << obj.name() << ", ";
-					s << "of type " << obj.type() << endl;
-					s << ".state:  " << obj.state;
-					return s;
 				}
 
 		};

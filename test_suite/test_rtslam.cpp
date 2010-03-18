@@ -63,7 +63,14 @@ void test_rtslam01(void) {
 
 	fillMapIdent(slamMap);
 
-	cout << endl << "\n% ROBOTS AND SENSORS \n%====================" << endl;
+	cout << endl;
+
+	cout << "\n% OBJECT ABSTRACT \n%====================" << endl;
+	ObjectAbstract O;
+	O.id(0);
+	cout << O << endl;
+
+	cout << "\n% ROBOTS AND SENSORS \n%====================" << endl;
 
 
 	// Add 2 robots

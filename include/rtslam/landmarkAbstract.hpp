@@ -82,7 +82,7 @@ namespace jafar {
 				/**
 				 * Parent map
 				 */
-				MapAbstract * slamMap;
+//				MapAbstract * slamMap;
 
 				/**
 				 * A set of observations (one per sensor)

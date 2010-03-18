@@ -18,7 +18,8 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
-		/**
+
+		/*
 		 * constructor.
 		 */
 		LandmarkAbstract::LandmarkAbstract(MapAbstract & _map, const size_t _size) :
@@ -33,7 +34,6 @@ namespace jafar {
 		inline void LandmarkAbstract::addObservation(ObservationAbstract * _obsPtr) {
 			observations[_obsPtr->id()] = _obsPtr;
 		}
-
 
 	}
 }

@@ -68,6 +68,8 @@ namespace jafar {
 		 */
 		class RobotAbstract: public MapObject {
 
+				friend ostream& operator <<(ostream & s, jafar::rtslam::RobotAbstract & rob) ;
+
 			public:
 
 				typedef map<size_t, SensorAbstract*> sensors_t;
@@ -83,7 +85,7 @@ namespace jafar {
 				// Mandatory virtual destructor.
 				virtual ~RobotAbstract() {}
 
-				MapAbstract * slamMap; ///< Parent map
+//				MapAbstract * slamMap; ///< Parent map
 
 				sensors_t sensors; ///<	A set of sensors
 
@@ -125,25 +127,6 @@ namespace jafar {
 					JFR_ASSERT(_u.size() == control.size(), "robotAbstract.hpp: move: wrong control size.");
 					control.x(_u);
 					move();
-				}
-
-				/**
-				 * Operator << for class RobotAbstract.
-				 * It shows different information of the robot.
-				 */
-				friend ostream& operator <<(ostream & s, jafar::rtslam::RobotAbstract & rob) {
-					s << rob.categoryName() << " " << rob.id() << ": ";
-					if (rob.name().size() > 0)
-						s << rob.name() << ", ";
-					s << "of type " << rob.type() << endl;
-					s << ".state:  " << rob.state << endl;
-					s << ".pose :  " << rob.pose << endl;
-					s << ".sens : [";
-					sensors_t::iterator senIter;
-					for (senIter = rob.sensors.begin(); senIter != rob.sensors.end(); senIter++)
-						s << " " << senIter->first << " ";
-					s << "]";
-					return s;
 				}
 
 		};

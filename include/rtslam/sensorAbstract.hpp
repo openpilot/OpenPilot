@@ -76,6 +76,8 @@ namespace jafar {
 		 */
 		class SensorAbstract: public MapObject {
 
+				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::SensorAbstract & sen);
+
 			public:
 
 				typedef std::map<size_t, ObservationAbstract*> observations_t;
@@ -177,21 +179,6 @@ namespace jafar {
 				 * \return an indirect array with indices to the variables in the map concerned by the Jacobian \a PG_m.
 				 */
 				jblas::ind_array globalPoseInMap(jblas::vec7 & poseG, jblas::mat & PG_m) ;
-
-				/**
-				 * Operator << for class SensorAbstract.
-				 * It shows different information of the sensor.
-				 */
-				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::SensorAbstract & sen)
-				{
-					s << sen.categoryName() << " " << sen.id() << ": ";
-					if (sen.name().size() > 0)
-						s << sen.name() << ", ";
-					s << "of type " << sen.type() << std::endl;
-					s << ".pose :  " << sen.pose << endl;
-					s << ".robot: [ " << sen.robot->id() << " ]";
-					return s;
-				}
 
 		};
 

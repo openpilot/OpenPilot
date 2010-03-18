@@ -18,6 +18,7 @@
 namespace jafar {
 	namespace rtslam {
 
+
 		/**
 		 * Class for generic objects in rtslam.
 		 * This class defines standard members:
@@ -28,6 +29,9 @@ namespace jafar {
 		 * \ingroup rtslam
 		 */
 		class ObjectAbstract {
+
+				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObjectAbstract & obj);
+
 			private:
 				std::size_t id_;
 				std::string categoryName_;
@@ -35,7 +39,9 @@ namespace jafar {
 				std::string name_;
 
 			public:
-				virtual ~ObjectAbstract(){}
+				ObjectAbstract();
+				virtual ~ObjectAbstract() {
+				}
 				inline void id(std::size_t _id) {
 					id_ = _id;
 				}
@@ -66,19 +72,6 @@ namespace jafar {
 					type(_type);
 					name(_name);
 				}
-				/**
-				 * Operator << for class ObjectAbstract.
-				 * It shows different information of the object.
-				 */
-				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObjectAbstract & obj) {
-					s << obj.categoryName() << " " << obj.id() << ": ";
-					if (obj.name().size() > 0)
-						s << obj.name() << ", ";
-					s << "of type " << obj.type();
-					return s;
-				}
-
-
 
 		};
 

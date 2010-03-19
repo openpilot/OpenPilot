@@ -47,7 +47,7 @@ bool UAVObjectsPlugin::initialize(const QStringList & arguments, QString * error
 {
     // Create object manager and expose object
     UAVObjectManager* objMngr = new UAVObjectManager();
-    addObject(objMngr);
+    addAutoReleasedObject(objMngr);
     // Initialize UAVObjects
     UAVObjectsInitialize(objMngr);
     // Done

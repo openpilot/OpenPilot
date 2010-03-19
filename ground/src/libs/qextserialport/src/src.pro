@@ -1,11 +1,9 @@
 TEMPLATE = lib
 TARGET = QExtSerialPort
-
+DEFINES += QEXTSERIALPORT_LIBRARY
 include(../../../openpilotgcslibrary.pri)
 
-DEFINES += QEXTSERIALPORT_LIBRARY
-
-VERSION                 = 1.2.0
+#VERSION                 = 1.2.0
 
 # event driven device enumeration on windows requires the gui module
 !win32:QT               -= gui

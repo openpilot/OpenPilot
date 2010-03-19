@@ -75,6 +75,7 @@ private:
     int m_priority;
     QVBoxLayout *m_layout;
     QString m_uniqueName;
+    const char *m_uniqueNameC;
 };
 
 } // namespace Internal

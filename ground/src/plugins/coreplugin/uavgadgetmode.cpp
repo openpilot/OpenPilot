@@ -66,6 +66,8 @@ UAVGadgetMode::UAVGadgetMode(UAVGadgetManager *uavGadgetManager, QString name, Q
         // this shouldn't happen
         m_uniqueName = uniqueName + QString::number(quint64(this));
     }
+    QByteArray ba = m_uniqueName.toLatin1();
+    m_uniqueNameC = ba.data();
     connect(modeManager, SIGNAL(currentModeChanged(Core::IMode*)),
             this, SLOT(grabUAVGadgetManager(Core::IMode*)));
     m_widget->setFocusProxy(m_uavGadgetManager);
@@ -101,7 +103,7 @@ QWidget* UAVGadgetMode::widget()
 
 const char* UAVGadgetMode::uniqueModeName() const
 {
-    return m_uniqueName.toAscii().data();
+    return m_uniqueNameC;
 }
 
 QList<int> UAVGadgetMode::context() const

@@ -48,8 +48,8 @@ UAVGadgetMode::UAVGadgetMode(UAVGadgetManager *uavGadgetManager, QString name, Q
     m_uavGadgetManager(uavGadgetManager),
     m_name(name),
     m_icon(icon),
-    m_priority(0),
     m_widget(new QWidget),
+    m_priority(0),
     m_layout(new QVBoxLayout)
 {
     m_layout->setSpacing(0);

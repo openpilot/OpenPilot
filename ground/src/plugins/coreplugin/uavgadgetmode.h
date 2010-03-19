@@ -69,12 +69,12 @@ private slots:
 
 private:
     UAVGadgetManager *m_uavGadgetManager;
-    QWidget *m_widget;
-    QVBoxLayout *m_layout;
     QString m_name;
     QIcon m_icon;
-    QString m_uniqueName;
+    QWidget *m_widget;
     int m_priority;
+    QVBoxLayout *m_layout;
+    QString m_uniqueName;
 };
 
 } // namespace Internal

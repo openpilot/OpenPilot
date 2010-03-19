@@ -40,13 +40,13 @@ plugin_emptygadget.depends = plugin_coreplugin
 SUBDIRS += plugin_emptygadget
 
 # Map UAVGadget
-plugin_map.subdir = map
-plugin_map.depends = plugin_coreplugin
-SUBDIRS += plugin_map
+#plugin_map.subdir = map
+#plugin_map.depends = plugin_coreplugin
+#SUBDIRS += plugin_map
 
 # Scope UAVGadget
-plugin_scope.subdir = scope
-plugin_scope.depends = plugin_coreplugin
-SUBDIRS += plugin_scope
+#plugin_scope.subdir = scope
+#plugin_scope.depends = plugin_coreplugin
+#SUBDIRS += plugin_scope
 
 

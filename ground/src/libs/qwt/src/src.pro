@@ -1,56 +1,11 @@
-# -*- mode: sh -*- ###########################
-# Qwt Widget Library
-# Copyright (C) 1997   Josef Wilgen
-# Copyright (C) 2002   Uwe Rathmann
-#
-# This library is free software; you can redistribute it and/or
-# modify it under the terms of the Qwt License, Version 1.0
-##############################################
-
-# qmake project file for building the qwt libraries
-
-include(../../../openpilotgcslibrary.pri)
-include( ../qwtconfig.pri )
-
 TEMPLATE = lib
 TARGET = Qwt
 DEFINES += QWT_LIBRARY
+include(../../../openpilotgcslibrary.pri)
+include( ../qwtconfig.pri )
 
-SUFFIX_STR =
-VVERSION = $$[QT_VERSION]
-isEmpty(VVERSION) {
+#VVERSION = $$[QT_VERSION]
 
-    # Qt 3
-    debug {
-        SUFFIX_STR = $${DEBUG_SUFFIX}
-    }
-    else {
-        SUFFIX_STR = $${RELEASE_SUFFIX} 
-    }
-}
-else {
-    CONFIG(debug, debug|release) {
-        SUFFIX_STR = $${DEBUG_SUFFIX}
-    }
-    else {
-        SUFFIX_STR = $${RELEASE_SUFFIX}
-    }
-}
-
-MOC_DIR           = moc
-OBJECTS_DIR       = obj$${SUFFIX_STR}
-#DESTDIR           = $${QWT_ROOT}/lib
-
-contains(CONFIG, QwtDll ) {
-    CONFIG += dll
-} 
-else {
-    CONFIG += staticlib
-}
-
-win32:QwtDll {
-    DEFINES    += QT_DLL QWT_DLL QWT_MAKEDLL
-}
 
 HEADERS += \
     qwt.h \

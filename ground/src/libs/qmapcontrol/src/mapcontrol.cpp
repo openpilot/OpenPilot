@@ -192,7 +192,7 @@ namespace qmapcontrol
         // painter.drawLine(screen_middle.x()-cross_x+0, screen_middle.y()-cross_y+cross_y,
         //   screen_middle.x()-cross_x+256, screen_middle.y()-cross_y+cross_y); // -
 
-        painter.drawRect(0,0, size.width(), size.height());
+//        painter.drawRect(0,0, size.width(), size.height());
         /*
         // rotating
           painter.setMatrix(painter.matrix().inverted());

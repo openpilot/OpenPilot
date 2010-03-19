@@ -53,6 +53,10 @@ public:
 //    virtual void loadConfiguration(QString ) = 0;
 //    virtual QStringList getConfigurationNames() = 0;
     virtual QWidget *toolBar() = 0;
+    virtual void setIndex(int index) { m_index = index; }
+    virtual int index() { return m_index; }
+private:
+    int m_index;
 };
 
 } // namespace Core

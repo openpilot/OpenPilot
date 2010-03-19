@@ -62,27 +62,29 @@ bool CorePlugin::initialize(const QStringList &arguments, QString *errorMessage)
     Q_UNUSED(arguments)
     const bool success = m_mainWindow->init(errorMessage);
     if (success) {
-        UAVGadgetMode *uavGadgetMode;
-        UAVGadgetManager *m_uavGadgetManager = new UAVGadgetManager(CoreImpl::instance(), m_mainWindow);
-        m_uavGadgetManager->hide();
-        uavGadgetMode = new UAVGadgetMode(m_uavGadgetManager, QString("Mode 1"),
-                                            QIcon(":/core/images/openpilot_logo_64.png"), 80, QString("Mode1"));
-        m_uavGadgetManager->setUAVGadgetMode(uavGadgetMode);
-        m_uavGadgetModes.append(uavGadgetMode);
-        addObject(uavGadgetMode);
-        m_uavGadgetManager = new UAVGadgetManager(CoreImpl::instance(), m_mainWindow);
-        m_uavGadgetManager->hide();
-        uavGadgetMode = new UAVGadgetMode(m_uavGadgetManager, QString("Mode 2"),
-                                            QIcon(":/core/images/plus.png"), 60, QString("Mode2"));
-        m_uavGadgetManager->setUAVGadgetMode(uavGadgetMode);
-        m_uavGadgetModes.append(uavGadgetMode);
-        addObject(uavGadgetMode);
+        // nothing right now
     }
     return success;
 }
 
 void CorePlugin::extensionsInitialized()
 {
+    UAVGadgetMode *uavGadgetMode;
+    UAVGadgetManager *m_uavGadgetManager = new UAVGadgetManager(CoreImpl::instance(), m_mainWindow);
+    m_uavGadgetManager->hide();
+    uavGadgetMode = new UAVGadgetMode(m_uavGadgetManager, QString("Mode 1"),
+                                      QIcon(":/core/images/openpilot_logo_64.png"), 90, QString("Mode1"));
+    m_uavGadgetManager->setUAVGadgetMode(uavGadgetMode);
+    m_uavGadgetModes.append(uavGadgetMode);
+    addObject(uavGadgetMode);
+    m_uavGadgetManager = new UAVGadgetManager(CoreImpl::instance(), m_mainWindow);
+    m_uavGadgetManager->hide();
+    uavGadgetMode = new UAVGadgetMode(m_uavGadgetManager, QString("Mode 2"),
+                                      QIcon(":/core/images/plus.png"), 60, QString("Mode2"));
+    m_uavGadgetManager->setUAVGadgetMode(uavGadgetMode);
+    m_uavGadgetModes.append(uavGadgetMode);
+    addObject(uavGadgetMode);
+
     m_mainWindow->extensionsInitialized();
 }
 

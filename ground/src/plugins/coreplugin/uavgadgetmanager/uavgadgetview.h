@@ -67,13 +67,12 @@ public:
     virtual ~UAVGadgetView();
 
     void removeUAVGadget();
-    IUAVGadget *currentUAVGadget() const;
-    void setCurrentUAVGadget(IUAVGadget *uavGadget);
+    IUAVGadget *uavGadget() const;
+    void setUAVGadget(IUAVGadget *uavGadget);
     bool hasUAVGadget(IUAVGadget *uavGadget) const;
     void hideToolbar(bool hide);
 
 public slots:
-    void updateActionShortcuts();
     void closeView();
 
 private slots:
@@ -92,6 +91,7 @@ private:
     QToolButton *m_closeButton;
     Utils::StyledBar *m_top;
     QVBoxLayout *tl; // top layout
+    int m_defaultIndex;
 };
 
 class SplitterOrView  : public QWidget
@@ -108,9 +108,9 @@ public:
     inline bool isRoot() const { return m_isRoot; }
     
     inline bool isSplitter() const { return m_splitter != 0; }
-    inline Core::IUAVGadget *uavGadget() const { return m_view ? m_view->currentUAVGadget() : 0; }
+    inline Core::IUAVGadget *uavGadget() const { return m_view ? m_view->uavGadget() : 0; }
     inline bool hasUAVGadget(Core::IUAVGadget *uavGadget) const { return m_view && m_view->hasUAVGadget(uavGadget); }
-    inline bool hasUAVGadgets() const { return m_view && (m_view->currentUAVGadget() != 0); }
+    inline bool hasUAVGadget() const { return m_view && (m_view->uavGadget() != 0); }
     inline UAVGadgetView *view() const { return m_view; }
     inline QSplitter *splitter() const { return m_splitter; }
     QSplitter *takeSplitter();
@@ -122,7 +122,6 @@ public:
     SplitterOrView *findView(Core::IUAVGadget *uavGadget);
     SplitterOrView *findView(UAVGadgetView *view);
     SplitterOrView *findFirstView();
-    SplitterOrView *findEmptyView();
     SplitterOrView *findSplitter(Core::IUAVGadget *uavGadget);
     SplitterOrView *findSplitter(SplitterOrView *child);
 

@@ -78,12 +78,14 @@ private:
     UAVGadgetManagerPlaceHolder* m_current;
 };
 
+typedef QList<IUAVGadgetFactory*> UAVGadgetFactoryList;
+
+
 class CORE_EXPORT UAVGadgetManager : public QWidget
 {
     Q_OBJECT
 
 public:
-    typedef QList<IUAVGadgetFactory*> UAVGadgetFactoryList;
 
     explicit UAVGadgetManager(ICore *core, QWidget *parent);
     virtual ~UAVGadgetManager();
@@ -95,9 +97,6 @@ public:
     void ensureUAVGadgetManagerVisible();
 
     IUAVGadget *currentUAVGadget() const;
-    IUAVGadget *activateUAVGadget(IUAVGadget *gadget);
-
-    bool closeUAVGadgets(const QList<IUAVGadget *> uavGadgetsToClose);
 
     QByteArray saveState() const;
     bool restoreState(const QByteArray &state);
@@ -109,11 +108,6 @@ public:
     UAVGadgetFactoryList uavGadgetFactories() const;
 
 signals:
-
-public slots:
-    bool closeAllUAVGadgets();
-
-    void closeUAVGadget();
 
 private slots:
     void handleContextChange(Core::IContext *context);
@@ -130,25 +124,15 @@ public slots:
 
 private:
     void addUAVGadget(IUAVGadget *gadget);
-    IUAVGadget *createUAVGadget(const QString &uavGadgetKind = QString());
     void removeUAVGadget(IUAVGadget *gadget);
-
-    IUAVGadget *placeUAVGadget(Core::Internal::UAVGadgetView *view, Core::IUAVGadget *gadget);
     void setCurrentUAVGadget(IUAVGadget *gadget);
-    void setCurrentView(Core::Internal::SplitterOrView *view);
-    IUAVGadget *activateUAVGadget(Core::Internal::UAVGadgetView *view, Core::IUAVGadget *gadget);
-
-    Core::Internal::SplitterOrView *currentSplitterOrView() const;
-
-    void closeUAVGadget(Core::IUAVGadget *gadget);
     void closeView(Core::Internal::UAVGadgetView *view);
     void emptyView(Core::Internal::UAVGadgetView *view);
-    Core::Internal::UAVGadgetView *currentUAVGadgetView() const;
-    IUAVGadget *pickUnusedUAVGadget() const;
+    Core::Internal::SplitterOrView *currentSplitterOrView() const;
 
+    bool m_hidden;
     UAVGadgetManagerPrivate *m_d;
     Core::Internal::UAVGadgetMode *m_uavGadgetMode;
-    bool m_hidden;
 
     friend class Core::Internal::SplitterOrView;
     friend class Core::Internal::UAVGadgetView;

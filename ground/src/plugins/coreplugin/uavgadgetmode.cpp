@@ -49,15 +49,13 @@ UAVGadgetMode::UAVGadgetMode(UAVGadgetManager *uavGadgetManager, QString name, Q
     m_name(name),
     m_icon(icon),
     m_widget(new QWidget),
-    m_priority(0),
+    m_priority(priority),
     m_layout(new QVBoxLayout)
 {
     m_layout->setSpacing(0);
     m_layout->setMargin(0);
     m_widget->setLayout(m_layout);
     m_layout->insertWidget(0, new Core::UAVGadgetManagerPlaceHolder(this));
-    if (0 <= priority && priority <= 100)
-        m_priority = priority;
 
     ModeManager *modeManager = ModeManager::instance();
     // checking that the mode name is unique gives harmless

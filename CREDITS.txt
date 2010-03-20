@@ -1,4 +1,4 @@
-This is a credits file of people that have contributed to the OpenPilot project. Without the work of the people in this file OpenPilot would not be what it is today. 
+This is a credits file of people that have been / are key contributors to the OpenPilot project. Without the work of the people in this file OpenPilot would not be what it is today. 
 
 It is sorted alphabetically by name and formatted so that it allows for easy grepping and beautification by scripts.  
 
@@ -41,10 +41,6 @@ N: Julien Rouviere
 E: julien.rouviere (at) gmail (dot) com
 D: GCS Core developer
 D: GCS Framework and Plugins for the GCS
-
-N: Juan soler
-E: jsoler (at) optusnet (dot) com (dot) au
-D: Project managment, documentation, issue tracker
 
 N: Pete Stapley
 E: pete (at) stapleylabs (dot) com

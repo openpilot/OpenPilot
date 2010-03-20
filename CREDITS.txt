@@ -23,6 +23,10 @@ N: Frederic Goddeeris
 E: fredericgoddeeris (at) hotmail (dot) com
 D: I2C work and FreeRTOS work. 
 
+N: Peter Gunnarsson
+E: peter (at) pyne (dot) se
+D: Multiple GCS plugins, Gadget foundations and GCS core work
+
 N: Thorsten Klose
 E: thorsten.klose (at) dmx.de
 D: Embedded STM32 infrastructure  
@@ -42,6 +46,10 @@ E: julien.rouviere (at) gmail (dot) com
 D: GCS Core developer
 D: GCS Framework and Plugins for the GCS
 
+N: Zik Saleeba
+E: zik (at) zikzak (dot) net
+D: Initial schematic based on Zik's Flying Fox schematic     
+
 N: Pete Stapley
 E: pete (at) stapleylabs (dot) com
 D: PPM inputs
@@ -54,8 +62,4 @@ N: Vassilis Varveropoulos
 E: vassilis (at) openpilot (dot) org
 D: Co-founder, Principal embedded software architect. 
 D: Architeture and UAVTalk Implimentation
-
-N: Zik Saleeba
-E: zik (at) zikzak (dot) net
-D: Initial schematic based on Zik's Flying Fox schematic     
 

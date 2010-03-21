@@ -34,6 +34,8 @@
 #include <boost/shared_ptr.hpp>
 
 #include <jmath/jblas.hpp>
+
+#include "rtslam/rtSlam.hpp"
 #include "rtslam/gaussian.hpp"
 #include "rtslam/mapObject.hpp"
 // include parents
@@ -72,11 +74,6 @@ namespace jafar {
 
 			public:
 
-				typedef boost::shared_ptr<MapAbstract> map_t;
-				typedef boost::shared_ptr<SensorAbstract> sensor_t;
-				typedef map<size_t, sensor_t > sensorsSet_t;
-//				typedef map<size_t, SensorAbstract*> sensors_t;
-
 				/**
 				 * Remote constructor from remote map and size of state and control vectors.
 				 * \param _map the map.
@@ -88,10 +85,9 @@ namespace jafar {
 				// Mandatory virtual destructor.
 				virtual ~RobotAbstract() {}
 
-//				MapAbstract * slamMap; ///< Parent map
-				map_t slamMap; ///< parent map
+				map_ptr_t slamMap; ///< parent map
 
-				sensorsSet_t sensors; ///<	A set of sensors
+				sensors_ptr_set_t sensors; ///<	A set of sensors
 
 				Gaussian pose; ///< Robot pose
 
@@ -108,7 +104,7 @@ namespace jafar {
 				/**
 				 * Add a sensor to this robot
 				 */
-				void addSensor(sensor_t _senPtr);
+				void addSensor(sensor_ptr_t _senPtr);
 
 				/**
 				 * Acquire control structure

@@ -34,11 +34,13 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "rtslam/gaussian.hpp"
+#include "rtslam/rtSlam.hpp"
 // include parents
 #include "rtslam/objectAbstract.hpp"
 #include "rtslam/sensorAbstract.hpp"
 #include "rtslam/landmarkAbstract.hpp"
+
+#include "rtslam/gaussian.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -68,7 +70,7 @@ namespace jafar {
 
 			public:
 
-				typedef boost::shared_ptr<AppearanceAbstract> appearance_t;
+				typedef boost::shared_ptr<AppearanceAbstract> appearance_ptr_t;
 
 				/**
 				 * size constructor
@@ -92,12 +94,12 @@ namespace jafar {
 
 				inline double infoGain(); // expected "information gain" of performing an update with this observation.
 
-				inline void appearance(appearance_t _appearance);
+				inline void appearance(appearance_ptr_t _appearance);
 
 			private:
 				bool visible_;
 				bool infoGain_;
-				appearance_t appearance_;
+				appearance_ptr_t appearance_;
 		};
 
 
@@ -108,16 +110,16 @@ namespace jafar {
 		class Measurement: public Gaussian {
 			public:
 
-				typedef boost::shared_ptr<AppearanceAbstract> appearance_t;
+				typedef boost::shared_ptr<AppearanceAbstract> appearance_ptr_t;
 
-				inline void appearance(appearance_t _appearance);
-				inline appearance_t appearance();
+				inline void appearance(appearance_ptr_t _appearance);
+				inline appearance_ptr_t appearance();
 				Measurement(size_t _size);
 
 				double score; ///< matching quality score
 
 			private:
-				appearance_t appearance_;
+				appearance_ptr_t appearance_;
 
 		};
 
@@ -227,13 +229,7 @@ namespace jafar {
 
 			public:
 
-				typedef boost::shared_ptr<SensorAbstract> sensor_t;
-				typedef boost::shared_ptr<LandmarkAbstract> landmark_t;
-
-				/**
-				 * Mandatory virtual destructor.
-				 */
-				virtual ~ObservationAbstract();
+				virtual ~ObservationAbstract(){}
 
 				/**
 				 * Size constructor
@@ -253,26 +249,17 @@ namespace jafar {
 				/**
 				 *  Mother Sensor where it was acquired from
 				 */
-				sensor_t sensor;
+				sensor_ptr_t sensor;
 
 				/**
 				 * Father Landmark where it points to
 				 */
-				landmark_t landmark;
+				landmark_ptr_t landmark;
 
-				/**
-				 * Expectation
-				 */
 				Expectation expectation;
 
-				/**
-				 * Measurement
-				 */
 				Measurement measurement;
 
-				/**
-				 * Innovation
-				 */
 				Innovation innovation;
 
 				/**
@@ -300,7 +287,7 @@ namespace jafar {
 				 * \param sen the sensor
 				 * \param lmk the landmark
 				 */
-				inline void associate(sensor_t senPtr, landmark_t lmkPtr);
+				inline void associate(sensor_ptr_t senPtr, landmark_ptr_t lmkPtr);
 
 				/**
 				 * Project and get Jacobians

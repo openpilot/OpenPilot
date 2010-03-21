@@ -20,6 +20,8 @@
 
 #include "kernel/IdFactory.hpp"
 #include "jmath/jblas.hpp"
+#include "rtslam/rtSlam.hpp"
+
 #include "rtslam/gaussian.hpp"
 #include "rtslam/kalmanFilter.hpp"
 
@@ -48,15 +50,6 @@ namespace jafar {
 				kernel::IdFactory robotIds;
 				kernel::IdFactory sensorIds;
 				kernel::IdFactory landmarkIds;
-
-				typedef boost::shared_ptr<RobotAbstract> robot_t;
-				typedef boost::shared_ptr<LandmarkAbstract> landmark_t;
-				typedef std::map<size_t, robot_t > robotsSet_t;
-				typedef std::map<size_t, landmark_t > landmarksSet_t;
-//				typedef RobotAbstract * robot_t;
-//				typedef LandmarkAbstract * landmark_t;
-//				typedef std::map<size_t, robot_t> robots_t;
-//				typedef std::map<size_t, landmark_t> landmarks_t;
 
 				/**
 				 * Size things and map usage management
@@ -95,12 +88,12 @@ namespace jafar {
 				/**
 				 * A set of robots
 				 */
-				robotsSet_t robots;
+				jafar::rtslam::robots_ptr_set_t robots;
 
 				/**
 				 * A set of landmarks
 				 */
-				landmarksSet_t landmarks;
+				landmarks_ptr_set_t landmarks;
 
 				jblas::vec & x();
 				jblas::sym_mat & P();
@@ -128,11 +121,11 @@ namespace jafar {
 				/*
 				 * Robot and landmark addition and removal
 				 */
-				void addRobot(robot_t _robPtr);
-				void deleteRobot(robot_t _robPtr);
+				void addRobot(robot_ptr_t _robPtr);
+				void deleteRobot(robot_ptr_t _robPtr);
 
-				void addLandmark(landmark_t _lmkPtr);
-				void deleteLandmark(landmark_t _lmkPtr);
+				void addLandmark(landmark_ptr_t _lmkPtr);
+				void deleteLandmark(landmark_ptr_t _lmkPtr);
 
 				/**
 				 * Obtain free Map space of a given size.

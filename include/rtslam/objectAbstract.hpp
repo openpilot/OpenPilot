@@ -14,6 +14,7 @@
 #define OBJECTABSTRACT_HPP_
 
 #include <iostream>
+#include "rtslam/rtSlam.hpp"
 
 namespace jafar {
 	namespace rtslam {

@@ -22,6 +22,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "jmath/jblas.hpp"
+#include "rtslam/rtSlam.hpp"
 //include parents
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/mapObject.hpp"
@@ -80,20 +81,16 @@ namespace jafar {
 
 			public:
 
-				typedef boost::shared_ptr<RobotAbstract> robot_t;
-				typedef boost::shared_ptr<ObservationAbstract> observation_t;
-				typedef std::map<size_t, observation_t> observationsSet_t;
-//				typedef std::map<size_t, ObservationAbstract*> observations_t;
 
 				/**
 				 * Parent robot
 				 */
-				robot_t robot;
+				robot_ptr_t robot;
 
 				/**
 				 * A set of observations (one per landmark)
 				 */
-				observationsSet_t observationsSet;
+				observations_ptr_set_t observationsSet;
 
 				/**
 				 * Sensor pose in robot
@@ -149,7 +146,6 @@ namespace jafar {
 				 */
 				virtual ~SensorAbstract() {
 				}
-
 
 				/*
 				 * Acquire raw data

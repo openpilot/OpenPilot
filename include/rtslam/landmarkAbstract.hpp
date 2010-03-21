@@ -27,6 +27,7 @@
 #define __LandmarkAbstract_H__
 
 #include <boost/shared_ptr.hpp>
+#include "rtslam/rtSlam.hpp"
 
 // include parents
 #include "rtslam/mapAbstract.hpp"
@@ -64,11 +65,6 @@ namespace jafar {
 
 			public:
 
-				typedef boost::shared_ptr<MapAbstract> map_t;
-				typedef boost::shared_ptr<ObservationAbstract> observation_t;
-				typedef std::map<size_t, observation_t> observationsSet_t;
-//				typedef std::map<size_t, ObservationAbstract*> observations_t;
-
 				/**
 				 * constructor from map and size
 				 */
@@ -85,14 +81,14 @@ namespace jafar {
 				/**
 				 * Parent map
 				 */
-				map_t slamMap;
+				map_ptr_t slamMap;
 
 				/**
 				 * A set of observations (one per sensor)
 				 */
-				observationsSet_t observations;
+				observations_ptr_set_t observations;
 
-				inline void addObservation(observation_t _obsPtr);
+				inline void addObservation(observation_ptr_t _obsPtr);
 
 				/**
 				 * Reparametrize the landmark.

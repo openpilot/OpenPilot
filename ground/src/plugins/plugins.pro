@@ -3,8 +3,7 @@
 
 TEMPLATE  = subdirs
 
-SUBDIRS   = plugin_coreplugin \
-            plugin_welcome \
+SUBDIRS   = plugin_coreplugin
 
 # Blank Template Plugin, not compiled by default
 #SUBDIRS += plugin_donothing
@@ -17,6 +16,7 @@ plugin_coreplugin.subdir = coreplugin
 # Welcome Plugin
 plugin_welcome.subdir = welcome
 plugin_welcome.depends = plugin_coreplugin
+SUBDIRS += plugin_welcome
 
 # RawHID plug-in
 SUBDIRS += plugin_rawhid
@@ -40,13 +40,13 @@ plugin_emptygadget.depends = plugin_coreplugin
 SUBDIRS += plugin_emptygadget
 
 # Map UAVGadget
-#plugin_map.subdir = map
-#plugin_map.depends = plugin_coreplugin
-#SUBDIRS += plugin_map
+plugin_map.subdir = map
+plugin_map.depends = plugin_coreplugin
+SUBDIRS += plugin_map
 
 # Scope UAVGadget
-#plugin_scope.subdir = scope
-#plugin_scope.depends = plugin_coreplugin
-#SUBDIRS += plugin_scope
+plugin_scope.subdir = scope
+plugin_scope.depends = plugin_coreplugin
+SUBDIRS += plugin_scope
 
 

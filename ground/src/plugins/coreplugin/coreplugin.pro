@@ -54,7 +54,9 @@ SOURCES += mainwindow.cpp \
     dialogs/ioptionspage.cpp \
     dialogs/iwizard.cpp \
     settingsdatabase.cpp \
-    eventfilteringmainwindow.cpp
+    eventfilteringmainwindow.cpp \
+    connectionmanager.cpp \
+    iconnection.cpp
 HEADERS += mainwindow.h \
     tabpositionindicator.h \
     fancyactionbar.h \
@@ -108,7 +110,9 @@ HEADERS += mainwindow.h \
     sidebar.h \
     mimedatabase.h \
     settingsdatabase.h \
-    eventfilteringmainwindow.h
+    eventfilteringmainwindow.h \
+    connectionmanager.h \
+    iconnection.h
 FORMS += dialogs/settingsdialog.ui \
     dialogs/shortcutsettings.ui \
     generalsettings.ui

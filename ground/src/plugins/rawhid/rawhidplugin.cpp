@@ -3,10 +3,9 @@
  *
  * @file       rawhidplugin.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief      Register connection object for the core connection manager
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   welcomeplugin
+ * @defgroup   rawhid_plugin
  * @{
  * 
  *****************************************************************************/
@@ -27,14 +26,119 @@
  */
 
 #include "rawhidplugin.h"
-
+#include "rawhid.h"
 #include <extensionsystem/pluginmanager.h>
 
 #include <QtCore/QtPlugin>
+#include <QtCore/QMutexLocker>
+
+#include "pjrc_rawhid.h"
+
+#include "rawhid_const.h"
+
+
+
+RawHIDEnumerationThread::RawHIDEnumerationThread(RawHIDConnection *rawhid)
+    : m_rawhid(rawhid),
+    m_running(true)
+{
+}
+
+RawHIDEnumerationThread::~RawHIDEnumerationThread()
+{
+    m_running = false;
+    //wait for the thread to terminate
+    if(wait(1000) == false)
+        qDebug() << "Cannot terminate rawhid thread";
+}
+
+void RawHIDEnumerationThread::run()
+{
+    QStringList devices = m_rawhid->availableDevices();
+
+    while(m_running)
+    {
+        if(!m_rawhid->deviceOpened())
+        {
+            QStringList newDev = m_rawhid->availableDevices();
+            if(devices != newDev)
+            {
+                devices = newDev;
+                emit enumerationChanged();
+            }
+        }
+
+        msleep(500); //update available devices twice per second
+    }
+}
+
+
+RawHIDConnection::RawHIDConnection()
+    : m_enumerateThread(this)
+{
+    QObject::connect(&m_enumerateThread, SIGNAL(enumerationChanged()),
+                     this, SLOT(onEnumerationChanged()));
+    m_enumerateThread.start();
+}
+
+RawHIDConnection::~RawHIDConnection()
+{}
+
+void RawHIDConnection::onEnumerationChanged()
+{
+    emit availableDevChanged(this);
+}
+
+QStringList RawHIDConnection::availableDevices()
+{
+    QMutexLocker locker(&m_enumMutex);
+
+    QStringList devices;
+    pjrc_rawhid dev;
+
+    //open all device we can
+    int opened = dev.open(MAX_DEVICES, VID, PID, USAGE_PAGE, USAGE);
+
+    //for each devices found, get serial number and close it back
+    for(int i=0; i<opened; i++)
+    {
+        char serial[256];
+        dev.getserial(i, serial);
+        devices.append(QString::fromAscii(serial, DEV_SERIAL_LEN));
+        dev.close(i);
+    }
+
+    return devices;
+}
+
+QIODevice *RawHIDConnection::openDevice(const QString &deviceName)
+{
+    m_deviceOpened = true;
+    return new RawHID(deviceName);
+}
+
+void RawHIDConnection::closeDevice(const QString &deviceName)
+{
+    m_deviceOpened = false;
+}
+
+
+QString RawHIDConnection::connectionName()
+{
+    return QString("Raw HID USB");
+}
+
+QString RawHIDConnection::shortName()
+{
+    return QString("USB");
+}
+
+
+
+
 
 RawHIDPlugin::RawHIDPlugin()
 {
-
 }
 
 RawHIDPlugin::~RawHIDPlugin()
@@ -44,7 +148,7 @@ RawHIDPlugin::~RawHIDPlugin()
 
 void RawHIDPlugin::extensionsInitialized()
 {
-
+    addAutoReleasedObject(new RawHIDConnection);
 }
 
 bool RawHIDPlugin::initialize(const QStringList & arguments, QString * errorString)

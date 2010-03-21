@@ -3,10 +3,9 @@
  *
  * @file       rawhid.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
  * @brief      
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   welcomeplugin
+ * @defgroup   rawhid_plugin
  * @{
  * 
  *****************************************************************************/
@@ -29,11 +28,62 @@
 #ifndef RAWHIDPLUGIN_H
 #define RAWHIDPLUGIN_H
 
+#include "rawhid_global.h"
+
+#include "coreplugin/iconnection.h"
 #include <extensionsystem/iplugin.h>
 
+#include <QtCore/QMutex>
+#include <QtCore/QThread>
 
-class RawHIDPlugin
-  : public ExtensionSystem::IPlugin
+class IConnection;
+class RawHIDConnection;
+
+class RAWHID_EXPORT RawHIDEnumerationThread : public QThread
+{
+    Q_OBJECT
+public:
+    RawHIDEnumerationThread(RawHIDConnection *rawhid);
+    virtual ~RawHIDEnumerationThread();
+
+    virtual void run();
+
+signals:
+    void enumerationChanged();
+
+protected:
+    RawHIDConnection *m_rawhid;
+    bool m_running;
+};
+
+class RAWHID_EXPORT RawHIDConnection
+    : public Core::IConnection
+{
+    Q_OBJECT
+public:
+    RawHIDConnection();
+    virtual ~RawHIDConnection();
+
+    virtual QStringList availableDevices();
+    virtual QIODevice *openDevice(const QString &deviceName);
+    virtual void closeDevice(const QString &deviceName);
+
+    virtual QString connectionName();
+    virtual QString shortName();
+
+    bool deviceOpened() {return m_deviceOpened;}
+
+protected slots:
+    void onEnumerationChanged();
+
+protected:
+    QMutex m_enumMutex;
+    RawHIDEnumerationThread m_enumerateThread;
+    bool m_deviceOpened;
+};
+
+class RAWHID_EXPORT RawHIDPlugin
+    : public ExtensionSystem::IPlugin
 {
     Q_OBJECT
 
@@ -41,9 +91,8 @@ public:
     RawHIDPlugin();
     ~RawHIDPlugin();
 
-    bool initialize(const QStringList &arguments, QString *error_message);
-
-    void extensionsInitialized();
+    virtual bool initialize(const QStringList &arguments, QString *error_message);
+    virtual void extensionsInitialized();
 };
 
 

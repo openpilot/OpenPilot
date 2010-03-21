@@ -42,6 +42,7 @@
 #include "plugindialog.h"
 #include "shortcutsettings.h"
 #include "uavgadgetmanager.h"
+#include "connectionmanager.h"
 
 #include "settingsdialog.h"
 #include "variablemanager.h"
@@ -113,6 +114,7 @@ MainWindow::MainWindow() :
     m_viewManager(0),
     m_modeManager(0),
     m_uavGadgetManager(0),
+    m_connectionManager(0),
     m_mimeDatabase(new MimeDatabase),
 //    m_rightPaneWidget(0),
     m_versionDialog(0),
@@ -163,11 +165,11 @@ MainWindow::MainWindow() :
     registerDefaultContainers();
     registerDefaultActions();
 
-//    m_rightPaneWidget = new RightPaneWidget();
-
     m_modeStack = new FancyTabWidget(this);
     m_modeManager = new ModeManager(this, m_modeStack);
-    //m_modeManager->addWidget(m_progressManager->progressView());
+
+    m_connectionManager = new ConnectionManager(this, m_modeStack);
+
     m_viewManager = new ViewManager(this);
     m_messageManager = new MessageManager;
 //    m_uavGadgetManager = new UAVGadgetManager(m_coreImpl, this);
@@ -227,6 +229,7 @@ bool MainWindow::init(QString *errorMessage)
     pm->addObject(m_coreImpl);
     m_viewManager->init();
     m_modeManager->init();
+    m_connectionManager->init();
 
     pm->addObject(m_generalSettings);
     pm->addObject(m_shortcutSettings);
@@ -723,6 +726,12 @@ MessageManager *MainWindow::messageManager() const
 VariableManager *MainWindow::variableManager() const
 {
      return m_variableManager;
+}
+
+
+ConnectionManager *MainWindow::connectionManager() const
+{
+    return m_connectionManager;
 }
 
 UAVGadgetManager *MainWindow::uavGadgetManager() const

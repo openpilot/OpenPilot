@@ -305,11 +305,11 @@ FancyTabWidget::FancyTabWidget(QWidget *parent)
     selectionLayout->setMargin(0);
 
     Utils::StyledBar *bar = new Utils::StyledBar;
-    QHBoxLayout *layout = new QHBoxLayout(bar);
+    QVBoxLayout *layout = new QVBoxLayout(bar);
     layout->setMargin(0);
     layout->setSpacing(0);
     layout->addWidget(new FancyColorButton(this));
-    //selectionLayout->addWidget(bar);
+    selectionLayout->addWidget(bar);
 
     selectionLayout->addWidget(m_tabBar, 1);
     m_selectionWidget->setLayout(selectionLayout);
@@ -319,13 +319,13 @@ FancyTabWidget::FancyTabWidget(QWidget *parent)
     m_cornerWidgetContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
     m_cornerWidgetContainer->setAutoFillBackground(false);
 
-    QVBoxLayout *cornerWidgetLayout = new QVBoxLayout;
+    QHBoxLayout *cornerWidgetLayout = new QHBoxLayout;
     cornerWidgetLayout->setSpacing(0);
     cornerWidgetLayout->setMargin(0);
     cornerWidgetLayout->addStretch();
     m_cornerWidgetContainer->setLayout(cornerWidgetLayout);
 
-    //selectionLayout->addWidget(m_cornerWidgetContainer, 0);
+    selectionLayout->addWidget(m_cornerWidgetContainer, 0);
 
     m_modesStack = new QStackedLayout;
     m_statusBar = new QStatusBar;
@@ -383,7 +383,7 @@ void FancyTabWidget::paintEvent(QPaintEvent *event)
 
 void FancyTabWidget::insertCornerWidget(int pos, QWidget *widget)
 {
-    QVBoxLayout *layout = static_cast<QVBoxLayout *>(m_cornerWidgetContainer->layout());
+    QHBoxLayout *layout = static_cast<QHBoxLayout *>(m_cornerWidgetContainer->layout());
     layout->insertWidget(pos, widget);
 }
 

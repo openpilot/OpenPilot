@@ -47,7 +47,9 @@ class ActionManager;
 class BaseMode;
 class BaseView;
 class IContext;
+class IMode;
 class IWizard;
+class ConnectionManager;
 class MessageManager;
 class MimeDatabase;
 class ModeManager;
@@ -56,7 +58,6 @@ class SettingsDatabase;
 class UniqueIDManager;
 class VariableManager;
 class ViewManagerInterface;
-class IMode;
 class UAVGadgetManager;
 
 namespace Internal {
@@ -92,6 +93,7 @@ public:
     Core::UniqueIDManager *uniqueIDManager() const;
     Core::MessageManager *messageManager() const;
     Core::UAVGadgetManager *uavGadgetManager() const;
+    Core::ConnectionManager *connectionManager() const;
     Core::VariableManager *variableManager() const;
     Core::ModeManager *modeManager() const;
     Core::MimeDatabase *mimeDatabase() const;
@@ -165,6 +167,7 @@ private:
     ViewManager *m_viewManager;
     ModeManager *m_modeManager;
     UAVGadgetManager *m_uavGadgetManager;
+    ConnectionManager *m_connectionManager;
     MimeDatabase *m_mimeDatabase;
     FancyTabWidget *m_modeStack;
 //    RightPaneWidget *m_rightPaneWidget;

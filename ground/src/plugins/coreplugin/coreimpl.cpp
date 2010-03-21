@@ -87,6 +87,11 @@ MessageManager *CoreImpl::messageManager() const
     return m_mainwindow->messageManager();
 }
 
+ConnectionManager *CoreImpl::connectionManager() const
+{
+    return m_mainwindow->connectionManager();
+}
+
 //UAVGadgetManager *CoreImpl::uavGadgetManager() const
 //{
 //    return m_mainwindow->uavGadgetManager();

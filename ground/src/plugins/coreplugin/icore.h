@@ -43,6 +43,7 @@ namespace Core {
 class ActionManager;
 class IContext;
 class IWizard;
+class ConnectionManager;
 class MessageManager;
 class MimeDatabase;
 class ModeManager;
@@ -76,6 +77,7 @@ public:
     virtual MessageManager *messageManager() const = 0;
     virtual VariableManager *variableManager() const = 0;
     virtual ModeManager *modeManager() const = 0;
+    virtual ConnectionManager *connectionManager() const = 0;
 //    virtual UAVGadgetManager *uavGadgetManager() const = 0;
     virtual MimeDatabase *mimeDatabase() const = 0;
 

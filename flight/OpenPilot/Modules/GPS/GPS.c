@@ -30,6 +30,8 @@
 
 // constants/macros/typdefs
 #define NMEA_BUFFERSIZE		110
+#define MAXTOKENS 20 //token slots for nmea parser
+
 
 // Message Codes
 #define NMEA_NODATA		0	// No data. Packet not available, bad, or not decoded
@@ -43,20 +45,13 @@
 
 // Debugging
 
-//#define GPSDEBUG
+#define GPSDEBUG
 
 #ifdef GPSDEBUG
 	#define NMEA_DEBUG_PKT	///< define to enable debug of all NMEA messages
 	#define NMEA_DEBUG_GGA	///< define to enable debug of GGA messages
 	#define NMEA_DEBUG_VTG	///< define to enable debug of VTG messages
 #endif
-
-// functions
-void nmeaInit(void);
-uint8_t* nmeaGetPacketBuffer(void);
-uint8_t nmeaProcess(cBuffer* rxBuffer);
-void nmeaProcessGPGGA(uint8_t* packet);
-void nmeaProcessGPVTG(uint8_t* packet);
 
 // Private functions
 static void gpsTask(void* parameters);
@@ -65,6 +60,13 @@ static void registerObject(UAVObjHandle obj);
 static void updateObject(UAVObjHandle obj);
 static int32_t addObject(UAVObjHandle obj);
 static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs);
+
+// functions
+void nmeaInit(void);
+uint8_t* nmeaGetPacketBuffer(void);
+uint8_t nmeaProcess(cBuffer* rxBuffer);
+void nmeaProcessGPGGA(uint8_t* packet);
+void nmeaProcessGPVTG(uint8_t* packet);
 
 cBuffer gpsRxBuffer;
 static char gpsRxData[512];
@@ -103,7 +105,7 @@ int32_t GpsInitialize(void)
 	bufferInit(&gpsRxBuffer, (unsigned char *)gpsRxData, 512);
 
 	// Process all registered objects and connect queue for updates
-	UAVObjIterate(&registerObject);
+	//UAVObjIterate(&registerObject);
 
 	// Start gps task
 	xTaskCreate(gpsTask, (signed char*)"GPS", STACK_SIZE, NULL, TASK_PRIORITY, &gpsTaskHandle);
@@ -131,7 +133,7 @@ void registerObject(UAVObjHandle obj)
  */
 void updateObject(UAVObjHandle obj)
 {
-	UAVObjMetadata metadata;
+/*	UAVObjMetadata metadata;
 	int32_t eventMask;
 
 	// Get metadata
@@ -180,7 +182,7 @@ void updateObject(UAVObjHandle obj)
 		setUpdatePeriod(obj, 0);
 		// Disconnect queue
 		UAVObjDisconnectQueue(obj, queue);
-	}
+	}*/
 }
 
 /**
@@ -231,7 +233,7 @@ static int32_t addObject(UAVObjHandle obj)
 	ev.obj = obj;
 	ev.instId = UAVOBJ_ALL_INSTANCES;
 	ev.event = EV_UPDATED_MANUAL;
-	return EventPeriodicCreate(&ev, &periodicEventHandler, 0);
+	/*return EventPeriodicCreate(&ev, &periodicEventHandler, 0);*/
 }
 
 /**
@@ -248,8 +250,8 @@ static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs)
 	// Add object for periodic updates
 	ev.obj = obj;
 	ev.instId = UAVOBJ_ALL_INSTANCES;
-	ev.event = EV_UPDATED_MANUAL;
-	return EventPeriodicUpdate(&ev, &periodicEventHandler, updatePeriodMs);
+	ev.event = EV_UPDATED_MANUAL;/*
+	return EventPeriodicUpdate(&ev, &periodicEventHandler, updatePeriodMs);*/
 }
 
 uint8_t* nmeaGetPacketBuffer(void)
@@ -359,16 +361,16 @@ uint8_t nmeaProcess(cBuffer* rxBuffer)
 	return foundpacket;
 }
 
-//#define CHAR_GPS
-
 /**
  * Prosesses NMEA GPGGA sentences
  * \param[in] Buffer for parsed nmea GPGGA sentence
  */
 void nmeaProcessGPGGA(uint8_t* packet)
 {
-	uint8_t i,j=0;
-	char* endptr;
+	char *p, *tokens[MAXTOKENS];
+    char *last;
+
+    uint8_t i=0;
 	double degrees, minutesfrac;
 
 	#ifdef NMEA_DEBUG_GGA
@@ -376,74 +378,74 @@ void nmeaProcessGPGGA(uint8_t* packet)
 	#endif
 
 	// start parsing just after "GPGGA,"
-	i = 6;
 	// attempt to reject empty packets right away
-	if(packet[i]==',' && packet[i+1]==',')
+	if(packet[6]==',' && packet[7]==',')
 		return;
 
-	// get UTC time [hhmmss.sss]
-	GpsInfo.PosLLA.TimeOfFix.f = strtod((char *)&packet[i], &endptr);
-	while(packet[i++] != ',');				// next field: latitude
+	// tokenizer for nmea sentence
+    for ((p = strtok_r(packet, ",", &last)); p;
+        (p = strtok_r(NULL, ",", &last)), i++) {
+            if (i < MAXTOKENS - 1)
+                    tokens[i] = p;
+    }
 
-	// get latitude [ddmm.mmmmm]
-	GpsInfo.PosLLA.lat.f = strtod((char *)&packet[i], &endptr);
+	// get UTC time [hhmmss.sss]
+    strcpy(GpsInfo.PosLLA.TimeOfFix.c,tokens[1]);
+
+    // next field: latitude
+    // get latitude [ddmm.mmmmm]
+    strcpy(GpsInfo.PosLLA.lat.c,tokens[2]);
 	// convert to pure degrees [dd.dddd] format
+	/*
 	minutesfrac = modf(GpsInfo.PosLLA.lat.f/100, &degrees);
 	GpsInfo.PosLLA.lat.f = degrees + (minutesfrac*100)/60;
 	// convert to radians
 	GpsInfo.PosLLA.lat.f *= (M_PI/180);
-#ifdef CHAR_GPS
-	while(packet[i++] != ',')
-		GpsInfo.PosLLA.lat.c[j++]=packet[i-1];				// next field: N/S indicator
-	GpsInfo.PosLLA.lat.c[j]=0;
-#else
-	while(packet[i++] != ',');				// next field: N/S indicator
-#endif
-	// correct latitute for N/S
-	if(packet[i] == 'S') GpsInfo.PosLLA.lat.f = -GpsInfo.PosLLA.lat.f;
-	while(packet[i++] != ',');				// next field: longitude
 
+    // next field: N/S indicator
+	// correct latitute for N/S
+	if(tokens[3] == 'S') GpsInfo.PosLLA.lat.f = -GpsInfo.PosLLA.lat.f;
+	*/
+
+    // next field: longitude
 	// get longitude [ddmm.mmmmm]
-	GpsInfo.PosLLA.lon.f = strtod((char *)&packet[i], &endptr);
+    strcpy(GpsInfo.PosLLA.lon.c,tokens[4]);
+    /*
 	// convert to pure degrees [dd.dddd] format
 	minutesfrac = modf(GpsInfo.PosLLA.lon.f/100, &degrees);
 	GpsInfo.PosLLA.lon.f = degrees + (minutesfrac*100)/60;
 	// convert to radians
 	GpsInfo.PosLLA.lon.f *= (M_PI/180);
-#ifdef CHAR_GPS
-	j=0;
-	while(packet[i++] != ',')
-		GpsInfo.PosLLA.lon.c[j++]=packet[i-1];				// next field: E/W indicator
-	GpsInfo.PosLLA.lon.c[j]=0;
-#else
-	while(packet[i++] != ',');				// next field: E/W indicator
-#endif
 
+    // next field: E/W indicator
 	// correct latitute for E/W
-	if(packet[i] == 'W') GpsInfo.PosLLA.lon.f = -GpsInfo.PosLLA.lon.f;
-	while(packet[i++] != ',');				// next field: position fix status
+	if(tokens[5] == 'W') GpsInfo.PosLLA.lon.f = -GpsInfo.PosLLA.lon.f;
+	*/
 
+    // next field: position fix status
 	// position fix status
 	// 0 = Invalid, 1 = Valid SPS, 2 = Valid DGPS, 3 = Valid PPS
 	// check for good position fix
-	if( (packet[i] != '0') && (packet[i] != ',') )
-		GpsInfo.PosLLA.updates++;
-	while(packet[i++] != ',');				// next field: satellites used
+    //if(&tokens[6] != '0' || &tokens[6] != 0)
+	//	GpsInfo.PosLLA.updates++;
 
-	// get number of satellites used in GPS solution
-	GpsInfo.numSVs = atoi((char *)&packet[i]);
-	while(packet[i++] != ',');				// next field: HDOP (horizontal dilution of precision)
-	while(packet[i++] != ',');				// next field: altitude
 
+    // next field: satellites used
+    // get number of satellites used in GPS solution
+	GpsInfo.numSVs = atoi(tokens[7]);
+
+	// next field: HDOP (horizontal dilution of precision)
+
+	// next field: altitude
 	// get altitude (in meters)
-	GpsInfo.PosLLA.alt.f = strtod((char *)&packet[i], &endptr);
+	strcpy(GpsInfo.PosLLA.alt.c,tokens[9]);
 
-	while(packet[i++] != ',');				// next field: altitude units, always 'M'
-	while(packet[i++] != ',');				// next field: geoid seperation
-	while(packet[i++] != ',');				// next field: seperation units
-	while(packet[i++] != ',');				// next field: DGPS age
-	while(packet[i++] != ',');				// next field: DGPS station ID
-	while(packet[i++] != '*');				// next field: checksum
+	// next field: altitude units, always 'M'
+	// next field: geoid seperation
+	// next field: seperation units
+	// next field: DGPS age
+	// next field: DGPS station ID
+	// next field: checksum
 }
 
 /**
@@ -452,38 +454,46 @@ void nmeaProcessGPGGA(uint8_t* packet)
  */
 void nmeaProcessGPVTG(uint8_t* packet)
 {
-	uint8_t i;
-	char* endptr;
+	char *p, *tokens[MAXTOKENS];
+    char *last;
+
+	uint8_t i=0;
 
 	#ifdef NMEA_DEBUG_VTG
 	printf("NMEA: %s\r\n",packet);
 	#endif
 
 	// start parsing just after "GPVTG,"
-	i = 6;
 	// attempt to reject empty packets right away
-	if(packet[i]==',' && packet[i+1]==',')
+	if(packet[6]==',' && packet[7]==',')
 		return;
 
+	// tokenizer for nmea sentence
+    for ((p = strtok_r(packet, ",", &last)); p;
+        (p = strtok_r(NULL, ",", &last)), i++) {
+            if (i < MAXTOKENS - 1)
+                    tokens[i] = p;
+    }
+
 	// get course (true north ref) in degrees [ddd.dd]
-	GpsInfo.VelHS.heading.f = strtod((char *)&packet[i], &endptr);
-	while(packet[i++] != ',');				// next field: 'T'
-	while(packet[i++] != ',');				// next field: course (magnetic north)
+    strcpy(GpsInfo.VelHS.heading.c,tokens[1]);
+    // next field: 'T'
 
-	// get course (magnetic north ref) in degrees [ddd.dd]
-	//GpsInfo.VelHS.heading.f = strtod(&packet[i], &endptr);
-	while(packet[i++] != ',');				// next field: 'M'
-	while(packet[i++] != ',');				// next field: speed (knots)
+    // next field: course (magnetic north)
+ 	// get course (magnetic north ref) in degrees [ddd.dd]
+    //strcpy(GpsInfo.VelHS.heading.c,tokens[1]);
+	// next field: 'M'
 
+	// next field: speed (knots)
 	// get speed in knots
-	//GpsInfo.VelHS.speed.f = strtod(&packet[i], &endptr);
-	while(packet[i++] != ',');				// next field: 'N'
-	while(packet[i++] != ',');				// next field: speed (km/h)
+    //strcpy(GpsInfo.VelHS.speed.f,tokens[5]);
+	// next field: 'N'
 
+	// next field: speed (km/h)
 	// get speed in km/h
-	GpsInfo.VelHS.speed.f = strtod((char *)&packet[i], &endptr);
-	while(packet[i++] != ',');				// next field: 'K'
-	while(packet[i++] != '*');				// next field: checksum
+	strcpy(GpsInfo.VelHS.speed.c,tokens[7]);
+	// next field: 'K'
+	// next field: checksum
 
 	GpsInfo.VelHS.updates++;
 }

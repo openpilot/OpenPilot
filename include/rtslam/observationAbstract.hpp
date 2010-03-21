@@ -46,10 +46,6 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
-//		typedef boost::shared_ptr<SensorAbstract> sensor_ptr_t;
-//		typedef boost::shared_ptr<LandmarkAbstract> landmark_ptr_t;
-
-
 		/** Base class for all landmark appearances defined in the module
 		 * rtslam.
 		 *

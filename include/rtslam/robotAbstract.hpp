@@ -49,10 +49,6 @@ namespace jafar {
 		//  Forward declarations of children
 		class SensorAbstract;
 
-//		typedef boost::shared_ptr<SensorAbstract> sensor_ptr_t;
-//		typedef std::map<size_t, sensor_ptr_t> sensors_ptr_set_t;
-//		typedef boost::shared_ptr<MapAbstract> map_ptr_t;
-
 		/** Base class for all Gaussian control vectors defined in the module rtslam.
 		 *
 		 * @ingroup rtslam

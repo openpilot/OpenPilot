@@ -46,6 +46,9 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
+//		typedef boost::shared_ptr<SensorAbstract> sensor_ptr_t;
+//		typedef boost::shared_ptr<LandmarkAbstract> landmark_ptr_t;
+
 
 		/** Base class for all landmark appearances defined in the module
 		 * rtslam.
@@ -288,6 +291,17 @@ namespace jafar {
 				 * \param lmk the landmark
 				 */
 				inline void associate(sensor_ptr_t senPtr, landmark_ptr_t lmkPtr);
+
+				/**
+				 * Link to sensor.
+				 */
+				void linkToSensor(sensor_ptr_t _sensorPtr);
+
+				/**
+				 * Link to landmark
+				 */
+				void linkToLandmark(landmark_ptr_t _lmkPtr);
+
 
 				/**
 				 * Project and get Jacobians

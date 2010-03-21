@@ -41,6 +41,7 @@ namespace jafar {
 
 		// Pointer sets
 		typedef std::map<size_t, object_ptr_t> objects_ptr_set_t;
+		typedef std::map<size_t, map_ptr_t> map_ptr_set_t;
 		typedef std::map<size_t, robot_ptr_t> robots_ptr_set_t;
 		typedef std::map<size_t, sensor_ptr_t> sensors_ptr_set_t;
 		typedef std::map<size_t, landmark_ptr_t> landmarks_ptr_set_t;

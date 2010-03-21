@@ -38,6 +38,11 @@ namespace jafar {
 		class RobotAbstract;
 		class LandmarkAbstract;
 
+//		typedef boost::shared_ptr<RobotAbstract> robot_ptr_t;
+//		typedef boost::shared_ptr<LandmarkAbstract> landmark_ptr_t;
+//		typedef std::map<size_t, robot_ptr_t> robots_ptr_set_t;
+//		typedef std::map<size_t, landmark_ptr_t> landmarks_ptr_set_t;
+
 
 		/** Base class for all map types defined in the module rtslam.
 		 *

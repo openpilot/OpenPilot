@@ -40,6 +40,10 @@ namespace jafar {
 		// Forward declarations of children
 		class ObservationAbstract;
 
+//		typedef boost::shared_ptr<ObservationAbstract> observation_ptr_t;
+//		typedef std::map<size_t, observation_ptr_t> observations_ptr_set_t;
+//		typedef boost::shared_ptr<MapAbstract> map_ptr_t;
+
 		/** Base class for all landmark descriptors defined in the module rtslam.
 		 *
 		 * \author jsola@laas.fr
@@ -89,6 +93,11 @@ namespace jafar {
 				observations_ptr_set_t observations;
 
 				inline void addObservation(observation_ptr_t _obsPtr);
+
+				/**
+				 * Link To Map
+				 */
+				void linkToMap(map_ptr_t _mapPtr);
 
 				/**
 				 * Reparametrize the landmark.

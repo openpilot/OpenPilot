@@ -32,7 +32,7 @@ namespace jafar {
 			s << ".state:  " << rob.state << endl;
 			s << ".pose :  " << rob.pose << endl;
 			s << ".sens : [";
-			RobotAbstract::sensorsSet_t::iterator senIter;
+			sensors_ptr_set_t::iterator senIter;
 			for (senIter = rob.sensors.begin(); senIter != rob.sensors.end(); senIter++)
 				s << " " << senIter->first << " ";
 			s << "]";
@@ -57,9 +57,14 @@ namespace jafar {
 		/*
 		 * Add a sensor to this robot
 		 */
-		void RobotAbstract::addSensor(sensor_t _senPtr) {
+		void RobotAbstract::addSensor(sensor_ptr_t _senPtr) {
 			sensors[_senPtr->id()] = _senPtr;
 		}
+
+		void RobotAbstract::linkToMap(map_ptr_t _mapPtr){
+			slamMap = _mapPtr;
+		}
+
 
 
 	}

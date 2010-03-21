@@ -96,6 +96,15 @@ namespace jafar {
 			categoryName("SENSOR");
 		}
 
+		void SensorAbstract::addObservation(observation_ptr_t _obsPtr){
+//			observationsSet[_obsPtr->id()] = _obsPtr;
+		}
+
+		void SensorAbstract::linkToRobot(robot_ptr_t _robPtr){
+			robot = _robPtr;
+		}
+
+
 
 		/*
 		 * Get sensor pose in global frame.

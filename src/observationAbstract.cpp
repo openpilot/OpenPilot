@@ -44,9 +44,10 @@ namespace jafar {
 			return infoGain_;
 		}	 // expected "information gain" of performing an update with this observation.
 
-		void Expectation::appearance(appearance_t _appearance) {
+		inline void Expectation::appearance(appearance_ptr_t _appearance){
 			appearance_ = _appearance;
 		}
+
 
 
 		///////////////////////////
@@ -78,7 +79,7 @@ namespace jafar {
 			Gaussian(_size), score(0) {
 		}
 
-		void Measurement::appearance(appearance_t _appearance) {
+		void Measurement::appearance(appearance_ptr_t _appearance) {
 			appearance_ = _appearance;
 		}
 
@@ -103,14 +104,6 @@ namespace jafar {
 		}
 
 
-
-		/*
-		 * Destructor
-		 */
-		ObservationAbstract::~ObservationAbstract() {
-			categoryName("OBSERVATION");
-		}
-
 		/*
 		 * Size constructor
 		 */
@@ -133,10 +126,19 @@ namespace jafar {
 		 * \param sen the sensor
 		 * \param lmk the landmark
 		 */
-		inline void ObservationAbstract::associate(sensor_t senPtr, landmark_t lmkPtr) {
+		inline void ObservationAbstract::associate(sensor_ptr_t senPtr, landmark_ptr_t lmkPtr) {
 			sensor = senPtr;
 			landmark = lmkPtr;
 		}
+
+		void ObservationAbstract::linkToSensor(sensor_ptr_t _sensorPtr){
+			sensor = _sensorPtr;
+		}
+
+		void ObservationAbstract::linkToLandmark(landmark_ptr_t _lmkPtr){
+			landmark = _lmkPtr;
+		}
+
 
 	} // namespace rtslam
 } // namespace jafar

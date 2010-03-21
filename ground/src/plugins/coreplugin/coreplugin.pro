@@ -42,7 +42,6 @@ SOURCES += mainwindow.cpp \
     variablemanager.cpp \
     modemanager.cpp \
     coreimpl.cpp \
-    basefilewizard.cpp \
     plugindialog.cpp \
     manhattanstyle.cpp \
     minisplitter.cpp \
@@ -84,14 +83,11 @@ HEADERS += mainwindow.h \
     dialogs/ioptionspage.h \
     icontext.h \
     icore.h \
-    ifile.h \
-    ifilefactory.h \
     imode.h \
     ioutputpane.h \
     coreconstants.h \
     iversioncontrol.h \
     iview.h \
-    ifilewizardextension.h \
     icorelistener.h \
     versiondialog.h \
     core_global.h \
@@ -101,7 +97,6 @@ HEADERS += mainwindow.h \
     variablemanager.h \
     modemanager.h \
     coreimpl.h \
-    basefilewizard.h \
     plugindialog.h \
     manhattanstyle.h \
     minisplitter.h \

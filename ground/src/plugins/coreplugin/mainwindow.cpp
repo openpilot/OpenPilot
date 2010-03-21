@@ -315,7 +315,7 @@ void MainWindow::dropEvent(QDropEvent *event)
     QStringList files;
     if (isDesktopFileManagerDrop(event->mimeData(), &files)) {
         event->accept();
-        openFiles(files);
+        //openFiles(files);
     } else {
         event->ignore();
     }
@@ -633,7 +633,7 @@ void MainWindow::openFile()
 {
 }
 
-static QList<IFileFactory*> getNonEditorFileFactories()
+/*static QList<IFileFactory*> getNonEditorFileFactories()
 {
     QList<IFileFactory*> tmp;
     return tmp;
@@ -667,7 +667,7 @@ void MainWindow::openFiles(const QStringList &fileNames)
 
         }
     }
-}
+}*/
 
 void MainWindow::setFocusToEditor()
 {

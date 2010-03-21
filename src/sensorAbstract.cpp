@@ -13,6 +13,7 @@
 
 #include "rtslam/sensorAbstract.hpp"
 #include "rtslam/robotAbstract.hpp"
+#include "rtslam/observationAbstract.hpp"
 #include "rtslam/quatTools.hpp"
 
 namespace jafar {
@@ -97,7 +98,7 @@ namespace jafar {
 		}
 
 		void SensorAbstract::addObservation(observation_ptr_t _obsPtr){
-//			observationsSet[_obsPtr->id()] = _obsPtr;
+			observations[_obsPtr->id()] = _obsPtr;
 		}
 
 		void SensorAbstract::linkToRobot(robot_ptr_t _robPtr){

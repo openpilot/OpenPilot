@@ -13,6 +13,7 @@
 
 #include "rtslam/robotAbstract.hpp"
 #include "rtslam/sensorAbstract.hpp"
+#include "rtslam/mapAbstract.hpp"
 
 #include <boost/shared_ptr.hpp>
 

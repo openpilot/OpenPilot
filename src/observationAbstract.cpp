@@ -13,6 +13,7 @@
 
 #include "rtslam/observationAbstract.hpp"
 #include "rtslam/sensorAbstract.hpp"
+#include "rtslam/landmarkAbstract.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -95,7 +96,7 @@ namespace jafar {
 		 * It shows different information of the observation.
 		 */
 		std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObservationAbstract & obs) {
-			s << "OBSERVATION of " << obs.landmark->type() << " from " << obs.sensor->type() << endl;
+			s << "OBSERVATION " << obs.id() << ": of " << obs.landmark->type() << " from " << obs.sensor->type() << endl;
 			s << "Sensor: " << obs.sensor->id() << ", landmark: " << obs.landmark->id() << endl;
 			s << ".expectation:  " << obs.expectation << endl;
 			s << ".measurement:  " << obs.measurement << endl;

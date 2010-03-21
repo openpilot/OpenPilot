@@ -13,6 +13,7 @@
 
 #include "rtslam/landmarkAbstract.hpp"
 #include "rtslam/observationAbstract.hpp"
+#include "rtslam/mapAbstract.hpp"
 
 namespace jafar {
 	namespace rtslam {

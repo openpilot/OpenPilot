@@ -37,19 +37,41 @@
 
 namespace Core {
 
+/**
+*   An IConnection object define a "type of connection",
+*   for instance USB, Serial, Network, ...
+*/
 class CORE_EXPORT IConnection : public QObject
 {
     Q_OBJECT
 
 public:
+    /**
+    *   Return the list of devices found on the system
+    */
     virtual QStringList availableDevices() = 0;
+
+    /**
+    *   Open a device, and return a QIODevice interface from it
+    */
     virtual QIODevice *openDevice(const QString &deviceName) = 0;
+
     virtual void closeDevice(const QString &deviceName) {};
 
+    /**
+    *   Connection type name "USB HID"
+    */
     virtual QString connectionName() = 0;
+
+    /**
+    *   Short name to display in a combo box
+    */
     virtual QString shortName() {return connectionName();}
 
 signals:
+    /**
+    *   Available devices list has changed, signal it to connection manager (and whoever wants to know)
+    */
     void availableDevChanged(IConnection *);
 };
 

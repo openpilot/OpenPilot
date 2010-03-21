@@ -39,6 +39,12 @@
 class IConnection;
 class RawHIDConnection;
 
+
+/**
+*   Helper thread to check on device connection/disconnection
+*   Underlying HID library is not really easy to use,
+*   so we have to poll for device modification in a separate thread
+*/
 class RAWHID_EXPORT RawHIDEnumerationThread : public QThread
 {
     Q_OBJECT
@@ -56,6 +62,12 @@ protected:
     bool m_running;
 };
 
+
+/**
+*   Define a connection via the IConnection interface
+*   Plugin will add a instance of this class to the pool,
+*   so the connection manager can use it.
+*/
 class RAWHID_EXPORT RawHIDConnection
     : public Core::IConnection
 {

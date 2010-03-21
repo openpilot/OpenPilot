@@ -97,6 +97,9 @@ void ConnectionManager::init()
                      this, SLOT(aboutToRemoveObject(QObject*)));
 }
 
+/**
+*   Slot called when a plugin added an object to the core pool
+*/
 void ConnectionManager::objectAdded(QObject *obj)
 {
     //Check if a plugin added a connection object to the pool
@@ -118,6 +121,9 @@ void ConnectionManager::aboutToRemoveObject(QObject *obj)
 {
 }
 
+/**
+*   Slot called when the user pressed the connect/disconnect button
+*/
 void ConnectionManager::onConnectPressed()
 {
     if(!m_deviceConnected)
@@ -157,6 +163,9 @@ void ConnectionManager::onConnectPressed()
     emit deviceDisconnected();
 }
 
+/**
+*   Find a device by its displayed (visible on screen) name
+*/
 devListItem ConnectionManager::findDevice(const QString &displayedName)
 {
     foreach(devListItem d, m_devList)
@@ -172,6 +181,10 @@ devListItem ConnectionManager::findDevice(const QString &displayedName)
     return d;
 }
 
+/**
+*   Unregister all devices from one connection plugin
+*   \param[in] connection Connection type that you want to forget about :)
+*/
 void ConnectionManager::unregisterAll(IConnection *connection)
 {
     for(QLinkedList<devListItem>::iterator iter = m_devList.begin();
@@ -184,6 +197,9 @@ void ConnectionManager::unregisterAll(IConnection *connection)
     }
 }
 
+/**
+*   Register a device from one connection plugin
+*/
 void ConnectionManager::registerDevice(IConnection *conn, const QString &devN, const QString &disp)
 {
     devListItem d;
@@ -194,6 +210,11 @@ void ConnectionManager::registerDevice(IConnection *conn, const QString &devN, c
     m_devList.append(d);
 }
 
+/**
+*   A device plugin notified us that its device list has changed
+*   (eg: user plug/unplug a usb device)
+*   \param[in] connection Connection type which signaled the update
+*/
 void ConnectionManager::devChanged(IConnection *connection)
 {
     //remove all registered devices

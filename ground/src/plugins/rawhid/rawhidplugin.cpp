@@ -37,7 +37,6 @@
 #include "rawhid_const.h"
 
 
-
 RawHIDEnumerationThread::RawHIDEnumerationThread(RawHIDConnection *rawhid)
     : m_rawhid(rawhid),
     m_running(true)

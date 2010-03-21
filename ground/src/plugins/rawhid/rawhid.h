@@ -33,6 +33,10 @@
 
 #include "pjrc_rawhid.h"
 
+/**
+*   The actual IO device that will be used to communicate
+*   with the board.
+*/
 class RAWHID_EXPORT RawHID : public QIODevice
 {
 public:

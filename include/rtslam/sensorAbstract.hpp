@@ -94,7 +94,7 @@ namespace jafar {
 				/**
 				 * A set of observations (one per landmark)
 				 */
-				observations_ptr_set_t observationsSet;
+				observations_ptr_set_t observations;
 
 				/**
 				 * Sensor pose in robot

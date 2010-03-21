@@ -29,6 +29,37 @@ namespace jafar {
 		 */
 		namespace landmarkAHP {
 
+			/**
+			 * Split AHP
+			 * \param p0 the output anchor.
+			 * \param m the output director vector
+			 * \param rho the homogeneous parameter (inverse-distance)
+			 */
+			template<class AHP, class P0, class M>
+			void split(const AHP & ahp, P0 & p0, M & m, double rho){
+					p0  = project(ahp, ublas::range(0, 3));
+					m   = project(ahp, ublas::range(3, 7));
+					rho = ahp(7);
+			}
+
+			/**
+			 * Compose AHP
+			 * This is the opposite as split()
+			 * \param p0 the output anchor.
+			 * \param m the output director vector
+			 * \param rho the homogeneous parameter (inverse-distance)
+			 */
+			template<class P0, class M>
+			jblas::vec7 compose(const P0 & p0, const M & m, const double rho){
+					jblas::vec7 ahp;
+					project(ahp, ublas::range(0, 3)) = p0;
+					project(ahp, ublas::range(3, 7)) = m;
+					ahp(7) = rho;
+					return ahp;
+			}
+
+
+
 			template<class VF, class Vlf>
 			jblas::vec fromFrame(const VF & F, const Vlf & ahpf) {
 
@@ -258,7 +289,6 @@ namespace jafar {
 				static void ahp2euc(const VA & ahp, VE & euc, ME_a & EUC_ahp) {
 					landmarkAHP::ahp2euc(ahp, euc, EUC_ahp);
 				}
-
 
 		}; // class LandmarkAnchoredHomogeneousPoint
 

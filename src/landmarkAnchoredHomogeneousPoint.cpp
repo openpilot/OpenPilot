@@ -25,5 +25,6 @@ namespace jafar {
 			type("AHP");
 		}
 
+
 	} // namespace rtslam
 } // namespace jafar

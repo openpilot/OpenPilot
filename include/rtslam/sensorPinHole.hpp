@@ -86,6 +86,11 @@ namespace jafar {
 				Image image;
 
 				/**
+				 * Empty constructor
+				 */
+				SensorPinHole();
+
+				/**
 				 * Constructor from Gaussian pose.
 				 * \param _pose the Gaussian pose.
 				 */

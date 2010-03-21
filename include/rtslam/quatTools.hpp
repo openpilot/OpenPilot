@@ -33,7 +33,7 @@ namespace jafar {
 
 			/**
 			 * Conjugate of quaternion.
-			 * \param q The imput quaternion.
+			 * \param q The input quaternion [qw, qx, qy, qz].
 			 * \return the conjugated quaternion.
 			 */
 			template<class VecQ>
@@ -51,7 +51,7 @@ namespace jafar {
 			 * Jacobian of conjugated quaternion wrt input quaternion.
 			 *
 			 * Jac = QC_q = dqc/dq.
-			 * \param q the input quaternion
+			 * \param q the input quaternion [qw, qx, qy, qz]
 			 * \param QC_q the Jacobian.
 			 */
 			template<class VecQ, class MatQC_q>
@@ -111,7 +111,7 @@ namespace jafar {
 
 			/**
 			 * The transposed rotation matrix from a quaternion.
-			 * \param q the quaternion.
+			 * \param q the quaternion [qw, qx, qy, qz].
 			 * \return the transposed rotation matrix.
 			 */
 			template<class VecQ>
@@ -122,12 +122,12 @@ namespace jafar {
 
 			/**
 			 * Rotate a vector from given quaternion.
-			 * \param q the quaternion.
+			 * \param q the quaternion [qw, qx, qy, qz].
 			 * \param v the vector.
 			 * \return the rotated vector.
 			 */
 			template<class VecQ, class Vec>
-			vec3 qRot(const VecQ & q, const Vec & v) {
+			vec3 rotate(const VecQ & q, const Vec & v) {
 				using namespace ublas;
 				return prod(q2R(q), v);
 			}
@@ -135,12 +135,12 @@ namespace jafar {
 
 			/**
 			 * Jacobian of vector rotation from quaternion, wrt quaternion.
-			 * \param q the quaternion
+			 * \param q the quaternion [qw, qx, qy, qz]
 			 * \param v the vector
 			 * \param VO_q the Jacobian of R(q)*v wrt q
 			 */
 			template<class VecQ, class Vec, class MatVO_q>
-			void qRot_by_dq(const VecQ & q, const Vec & v, MatVO_q & VO_q) {
+			void rotate_by_dq(const VecQ & q, const Vec & v, MatVO_q & VO_q) {
 				// split q and v
 				double qw = q(0);
 				double qx = q(1);
@@ -176,39 +176,39 @@ namespace jafar {
 
 			/**
 			 * Jacobian of vector rotation from quaternion, wrt vector.
-			 * \param q the quaternion
+			 * \param q the quaternion [qw, qx, qy, qz]
 			 * \param VO_v = R(q) the Jacobian of R(q)*v wrt v
 			 */
 			template<class VecQ, class MatVO_v>
-			void qRot_by_dv(const VecQ & q, MatVO_v & VO_v) {
+			void rotate_by_dv(const VecQ & q, MatVO_v & VO_v) {
 				VO_v = q2R(q);
 			}
 
 
 			/**
 			 * Rotate a vector from given quaternion, with all Jacobians.
-			 * \param q the quaternion;
+			 * \param q the quaternion [qw, qx, qy, qz];
 			 * \param v the vector
 			 * \param vo the rotated vector
 			 * \param VO_q the Jacobian wrt q
-			 * \param VO_v the Jacobians wrt v
+			 * \param VO_v the Jacobian wrt v
 			 */
 			template<class VecQ, class Vec, class VecO, class MatVO_q, class MatVO_v>
-			void qRot(const VecQ & q, const Vec & v, VecO & vo, MatVO_q & VO_q, MatVO_v & VO_v) {
-				vo = qRot(q, v);
-				qRot_by_dq(q, v, VO_q);
-				qRot_by_dv(q, VO_v);
+			void rotate(const VecQ & q, const Vec & v, VecO & vo, MatVO_q & VO_q, MatVO_v & VO_v) {
+				vo = rotate(q, v);
+				rotate_by_dq(q, v, VO_q);
+				rotate_by_dv(q, VO_v);
 			}
 
 
 			/**
 			 * Rotate inversely a vector from given quaternion.
-			 * \param q the quaternion;
+			 * \param q the quaternion [qw, qx, qy, qz];
 			 * \param v the vector
 			 * \return the rotated vector
 			 */
 			template<class VecQ, class Vec>
-			vec3 qcRot(const VecQ & q, const Vec & v) {
+			vec3 rotateInv(const VecQ & q, const Vec & v) {
 				using namespace ublas;
 				return prod(q2Rt(q), v);
 			}
@@ -216,12 +216,12 @@ namespace jafar {
 
 			/**
 			 * Jacobian of inverse vector rotation from quaternion, wrt quaternion.
-			 * \param q the quaternion
+			 * \param q the quaternion [qw, qx, qy, qz]
 			 * \param v the vector
 			 * \param VO_q the Jacobian of R(q)'*v wrt q
 			 */
 			template<class VecQ, class Vec, class MatVO_q>
-			void qcRot_by_dq(const VecQ & q, const Vec & v, MatVO_q & VO_q) {
+			void rotateInv_by_dq(const VecQ & q, const Vec & v, MatVO_q & VO_q) {
 				// split q and v
 				double qw = q(0);
 				double qx = q(1);
@@ -257,34 +257,34 @@ namespace jafar {
 
 			/**
 			 * Jacobian of vector inverse rotation from quaternion, wrt vector.
-			 * \param q the quaternion
+			 * \param q the quaternion [qw, qx, qy, qz]
 			 * \param VO_v = R(q) the Jacobian of R(q)'*v wrt v
 			 */
 			template<class VecQ, class MatVO_v>
-			void qcRot_by_dv(const VecQ & q, MatVO_v & VO_v) {
+			void rotateInv_by_dv(const VecQ & q, MatVO_v & VO_v) {
 				VO_v = q2Rt(q);
 			}
 
 
 			/**
 			 * Rotate inversely a vector from given quaternion, with all Jacobians.
-			 * \param q the quaternion;
+			 * \param q the quaternion [qw, qx, qy, qz];
 			 * \param v the vector
 			 * \param vo the rotated vector
 			 * \param VO_q the Jacobian wrt q
-			 * \param VO_v the Jacobians wrt v
+			 * \param VO_v the Jacobian wrt v
 			 */
 			template<class VecQ, class Vec, class VecO, class MatVO_q, class MatVO_v>
-			void qcRot(const VecQ & q, const Vec & v, VecO & vo, MatVO_q & VO_q, MatVO_v & VO_v) {
+			void rotateInv(const VecQ & q, const Vec & v, VecO & vo, MatVO_q & VO_q, MatVO_v & VO_v) {
 				VO_v = q2Rt(q); // this is Rt !
 				vo = prod(VO_v, v);
-				qcRot_by_dq(q, v, VO_q);
+				rotateInv_by_dq(q, v, VO_q);
 			}
 
 
 			/**
 			 * Quaternion product.
-			 * \param q1 the first quaternion
+			 * \param q1 the first quaternion [qw, qx, qy, qz]
 			 * \param q2 the second quaternion
 			 * \return the product q1**q2, where ** means quaternion product
 			 */
@@ -313,7 +313,7 @@ namespace jafar {
 			 * Jacobian of quaternion product wrt first quaternion, d(q1**q2)/dq1.
 			 *
 			 * This Jacobian only depends on q2.
-			 * \param q2 the second quaternion of the product
+			 * \param q2 the second quaternion [qw, qx, qy, qz] of the product
 			 * \param Q_q1 the output Jacobian
 			 */
 			template<class VecQ2, class MatQ_q1>
@@ -350,7 +350,7 @@ namespace jafar {
 			 * Jacobian of quaternion product wrt second quaternion, d(q1**q2)/dq2.
 			 *
 			 * This Jacobian only depends on q1.
-			 * \param q1 the first quaternion of the product
+			 * \param q1 the first quaternion [qw, qx, qy, qz] of the product
 			 * \param Q_q2 the output Jacobian
 			 */
 			template<class VecQ1, class MatQ_q2>
@@ -384,11 +384,11 @@ namespace jafar {
 
 			/**
 			 * Quaternion product, with Jacobians.
-			 * \param q1 the first quaternion
+			 * \param q1 the first quaternion [qw, qx, qy, qz]
 			 * \param q2 the second quaternion
 			 * \param q the output q = q1**q2
-			 * \param Q_q1 the Jacobian of qo wrt q1
-			 * \param Q_q2 the Jacobian of qo wrt q2
+			 * \param Q_q1 the Jacobian of q wrt q1
+			 * \param Q_q2 the Jacobian of q wrt q2
 			 */
 			template<class VecQ1, class VecQ2, class VecQ, class MatQ_q1, class MatQ_q2>
 			void qProd(const VecQ1 & q1, const VecQ2 & q2, VecQ & q, MatQ_q1 & Q_q1, MatQ_q2 & Q_q2) {
@@ -401,7 +401,7 @@ namespace jafar {
 			/**
 			 * Quaternion from rotation vector.
 			 * \param v the rotation vector
-			 * \return the quaternion
+			 * \return the quaternion [qw, qx, qy, qz]
 			 */
 			template<class Vec>
 			vec4 v2q(const Vec & v) {
@@ -480,7 +480,7 @@ namespace jafar {
 
 			/** Rotation vector to quaternion conversion, with Jacobian.
 			 * \param v the rotation vector
-			 * \param q the output quaternion
+			 * \param q the output quaternion [qw, qx, qy, qz]
 			 * \param Q_v the Jacobian
 			 */
 			template<class Vec, class VecQ, class MatQ_v>
@@ -493,7 +493,7 @@ namespace jafar {
 			/**
 			 * Quaternion from Euler angles.
 			 * \param e the Euler angles [roll, pitch, yaw]
-			 * \return the quaternion
+			 * \return the quaternion [qw, qx, qy, qz]
 			 */
 			template<class Vec>
 			vec4 e2q(const Vec & e) {
@@ -518,7 +518,7 @@ namespace jafar {
 
 			/**
 			 * Jacobian of quaternion wrt Euler angles.
-			 * \param e the Euler angles
+			 * \param e the Euler angles [roll, pitch, yaw]
 			 * \param Q_e the output Jacobian
 			 */
 			template<class Vec, class MatQ_e>
@@ -547,8 +547,8 @@ namespace jafar {
 
 
 			/** Euler angles to quaternion conversion, with Jacobian.
-			 * \param e the Euler angles
-			 * \param q the output quaternion
+			 * \param e the Euler angles [roll, pitch, yaw]
+			 * \param q the output quaternion [qw, qx, qy, qz]
 			 * \param Q_e the Jacobian
 			 */
 			template<class Vec, class VecQ, class MatQ_e>
@@ -560,8 +560,8 @@ namespace jafar {
 
 			/**
 			 * Quaternion to Euler angles conversion.
-			 * \param q the quaternion
-			 * \return the Euler angles
+			 * \param q the quaternion [qw, qx, qy, qz]
+			 * \return the Euler angles [roll, pitch, yaw]
 			 */
 			template<class VecQ>
 			vec3 q2e(const VecQ & q) {
@@ -581,8 +581,8 @@ namespace jafar {
 
 			/**
 			 * Quaternion-to-Euler conversion, with Jacobian.
-			 * \param q the quaternion
-			 * \param e the Euler angles
+			 * \param q the quaternion [qw, qx, qy, qz]
+			 * \param e the Euler angles [roll, pitch, yaw]
 			 * \param E_q the Jacobian
 			 */
 			template<class VecQ, class VecE, class MatE_q>
@@ -665,7 +665,7 @@ namespace jafar {
 				vec3 t = project(F, range(0, 3));
 				vec3 v = p - t;
 				vec3 pf;
-				pf = qcRot(q, v);
+				pf = rotateInv(q, v);
 				return pf;
 			}
 
@@ -687,7 +687,7 @@ namespace jafar {
 				vec3 t = project(F, range(0, 3));
 				vec3 v = p - t;
 				mat_range PF_q(PF_f, range(0, 3), range(3, 7));
-				qcRot(q, v, pf, PF_q, PF_p);
+				rotateInv(q, v, pf, PF_q, PF_p);
 				project(PF_f, range(0, 3), range(0, 3)) = -PF_p;
 			}
 
@@ -700,7 +700,7 @@ namespace jafar {
 			 */
 			template<class VecF, class Vec>
 			vec3 vecToFrame(const VecF & F, const Vec & v) {
-				return qcRot(subrange(F, 3, 7), v);
+				return rotateInv(subrange(F, 3, 7), v);
 			}
 
 
@@ -719,7 +719,7 @@ namespace jafar {
 
 				vec4 q = project(F, range(3, 7));
 				mat_range VF_q(VF_f, range(0, 3), range(3, 7));
-				qcRot(q, v, vf, VF_q, VF_v);
+				rotateInv(q, v, vf, VF_q, VF_v);
 				project(VF_f, range(0, 3), range(0, 3)) = zero_mat(3, 3);
 			}
 
@@ -735,7 +735,7 @@ namespace jafar {
 
 				using namespace ublas;
 
-				return qRot(project(F, range(3, 7)), pf) + project(F, range(0, 3));
+				return rotate(project(F, range(3, 7)), pf) + project(F, range(0, 3));
 			}
 
 
@@ -755,7 +755,7 @@ namespace jafar {
 				vec4 q = project(F, range(3, 7));
 				vec3 t = project(F, range(0, 3));
 				mat_range P_q(P_f, range(0, 3), range(3, 7));
-				qRot(q, pf, p, P_q, P_pf);
+				rotate(q, pf, p, P_q, P_pf);
 				p += t;
 				project(P_f, range(0, 3), range(0, 3)) = identity_mat(3); // dp/dt = I
 			}
@@ -772,7 +772,7 @@ namespace jafar {
 
 				using namespace ublas;
 
-				return qRot(subrange(F, 3, 7), vf);
+				return rotate(subrange(F, 3, 7), vf);
 			}
 
 
@@ -790,7 +790,7 @@ namespace jafar {
 				vec4 q = project(F, range(3, 7));
 				project(V_f, range(0, 3), range(0, 3)) = zero_mat(3, 3); // dv/dt = 0
 				mat_range V_q(V_f, range(0, 3), range(3, 7));
-				qRot(q, vf, v, V_q, V_vf);
+				rotate(q, vf, v, V_q, V_vf);
 			}
 
 
@@ -823,7 +823,7 @@ namespace jafar {
 			template<class VecG, class VecL, class MatC_g>
 			void composeFrames_by_dglobal(const VecG & G, const VecL & L, MatC_g & C_g) {
 					/*
-					 * C_g = [ I_3   qRot_by_dq   ]
+					 * C_g = [ I_3   rotate_by_dq ]
 					 *       [  0    qProd_by_dq1 ]
 					 */
 				vec4 qg = subrange(G, 3, 7);
@@ -833,7 +833,7 @@ namespace jafar {
 				mat Q_qg(4,4);
 				C_g.clear();
 				ublas::subrange(C_g, 0, 3, 0, 3) = jblas::identity_mat(3);
-				qRot_by_dq(qg, tl, T_qg);
+				rotate_by_dq(qg, tl, T_qg);
 				ublas::subrange(C_g, 0, 3, 3, 7) = T_qg;
 				qProd_by_dq1(ql, Q_qg);
 				ublas::subrange(C_g, 3, 7, 3, 7) = Q_qg;
@@ -849,14 +849,14 @@ namespace jafar {
 			template<class VecG, class VecL, class MatC_l>
 			void composeFrames_by_dlocal(const VecG & G, const VecL & L, MatC_l & C_l) {
 					/*
-					 * C_l = [ qRot_by_dv       0      ]
-					 *       [      0     qProd_by_dq2 ]
+					 * C_l = [ rotate_by_dv       0      ]
+					 *       [      0       qProd_by_dq2 ]
 					 */
 				vec4 qg = subrange(G, 3, 7);
 				mat_range T_tl(C_l, 0, 3, 0, 3);
 				mat_range Q_ql(C_l, 4, 7, 4, 7);
 				C_l.clear();
-				qRot_by_dv(qg, T_tl);
+				rotate_by_dv(qg, T_tl);
 				qProd_by_dq2(qg, Q_ql);
 			}
 
@@ -901,7 +901,7 @@ namespace jafar {
 				vec3 t = subrange(F, 0, 3);
 				vec4 q = subrange(F, 3, 7);
 				vec7 res;
-				subrange(res, 0, 3) = -qcRot(q, t);
+				subrange(res, 0, 3) = -rotateInv(q, t);
 				subrange(res, 3, 7) = q2qc(q);
 				return res;
 			}
@@ -924,7 +924,7 @@ namespace jafar {
 				jblas::mat NT_t(3, 3);
 				jblas::mat Q_q(4, 4);
 
-				qcRot(Fq, Ft, nt, NT_q, NT_t);
+				rotateInv(Fq, Ft, nt, NT_q, NT_t);
 				q2qc(Fq, q, Q_q);
 				I_f.clear();
 				subrange(I_f, 0, 3, 0, 3) = -NT_t;

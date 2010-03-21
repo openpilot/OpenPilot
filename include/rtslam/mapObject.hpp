@@ -16,7 +16,6 @@
 
 #include "jmath/jblas.hpp"
 
-#include "rtslam/rtslam.hpp"
 #include "rtslam/objectAbstract.hpp"
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/gaussian.hpp"

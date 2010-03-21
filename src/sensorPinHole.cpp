@@ -18,6 +18,15 @@ namespace jafar {
 		using namespace std;
 
 		/*
+		 * Empty constructor
+		 */
+		SensorPinHole::SensorPinHole() :
+			SensorAbstract() {
+			type("Pin-hole-camera");
+		}
+
+
+		/*
 		 * Constructor from Gaussian pose
 		 */
 		SensorPinHole::SensorPinHole(const Gaussian & _pose) :

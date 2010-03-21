@@ -27,6 +27,10 @@ namespace jafar {
 
 				ObservationPinHoleAnchoredHomogeneousPoint();
 
+				void convertToDir();
+				void project();
+				void splitAHP(vec3 & p0, vec3 & m, double rho);
+
 		};
 
 	}

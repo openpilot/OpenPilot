@@ -22,11 +22,13 @@
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 
+#include "rtslam/rtSlam.hpp"
 #include "rtslam/objectAbstract.hpp"
 #include "rtslam/robotAbstract.hpp"
 #include "rtslam/robotConstantVelocity.hpp"
 #include "rtslam/sensorPinHole.hpp"
 #include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
+#include "rtslam/observationPinHoleAnchoredHomogeneous.hpp"
 
 //#include <map>
 
@@ -146,23 +148,47 @@ void test_rtslam01(void) {
 		}
 	}
 
-	// Print all data
-	MapAbstract::robotsSet_t::iterator robIter;
-	RobotAbstract::sensorsSet_t::iterator senIter;
-	MapAbstract::landmarksSet_t::iterator lmkIter;
+	// Add observations
+	robots_ptr_set_t::iterator robIter;
+	sensors_ptr_set_t::iterator senIter;
+	landmarks_ptr_set_t::iterator lmkIter;
 
-	cout << "\n% ROBOTS AND SENSORS \n%====================" << endl;
 	for (robIter = slamMapPtr->robots.begin(); robIter != slamMapPtr->robots.end(); robIter++) {
-		MapAbstract::robot_t robPtr = robIter->second;
+		robot_ptr_t robPtr = robIter->second;
+		for (senIter = robPtr->sensors.begin(); senIter != robPtr->sensors.end(); senIter++) {
+			sensor_ptr_t senPtr = senIter->second;
+			for(lmkIter = slamMapPtr->landmarks.begin(); lmkIter != slamMapPtr->landmarks.end(); lmkIter++){
+				landmark_ptr_t lmkPtr = lmkIter->second;
+				shared_ptr<ObservationPinHoleAnchoredHomogeneousPoint> obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint());
+				size_t id = 1000*senPtr->id() + lmkPtr->id();
+				obsPtr->id() = id;
+				obsPtr->sensor = senPtr;
+				obsPtr->landmark = lmkPtr;
+				senPtr->observations[id] = obsPtr;
+				lmkPtr->observations[id] = obsPtr;
+			}
+		}
+	}
+
+
+	// Print all data
+	cout << "\n% ROBOTS, SENSORS AND OBSERVATIONS \n%==================================" << endl;
+	for (robIter = slamMapPtr->robots.begin(); robIter != slamMapPtr->robots.end(); robIter++) {
+		robot_ptr_t robPtr = robIter->second;
 		cout << *robPtr << endl;
 		for (senIter = robPtr->sensors.begin(); senIter != robPtr->sensors.end(); senIter++) {
-			RobotAbstract::sensor_t senPtr = senIter->second;
+			sensor_ptr_t senPtr = senIter->second;
 			cout << *senPtr << endl;
+			for(lmkIter = slamMapPtr->landmarks.begin(); lmkIter != slamMapPtr->landmarks.end(); lmkIter++){
+				landmark_ptr_t lmkPtr = lmkIter->second;
+				size_t id = 1000*senPtr->id() + lmkPtr->id();
+				cout << *senPtr->observations[id] << endl;
+			}
 		}
 	}
 	cout << "\n% LANDMARKS \n%==========" << endl;
 	for (lmkIter = slamMapPtr->landmarks.begin(); lmkIter != slamMapPtr->landmarks.end(); lmkIter++) {
-		MapAbstract::landmark_t lmkPtr = lmkIter->second;
+		landmark_ptr_t lmkPtr = lmkIter->second;
 		cout << *lmkPtr << endl;
 	}
 
@@ -179,6 +205,8 @@ void test_rtslam01(void) {
 	cout << slamMapPtr->robots[2]->sensors[3] << " <= slamMapPtr->robots[2]->sensors[3]" << endl;
 	cout << slamMapPtr->landmarks[1] << " <= slamMapPtr->landmarks[1]" << endl;
 	cout << slamMapPtr->landmarks[2] << " <= slamMapPtr->landmarks[2]" << endl;
+	cout << slamMapPtr->robots[1]->sensors[1]->observations[1001] << " <= slamMapPtr->robots[1]->sensors[1]->observations[1001]" << endl;
+	cout << slamMapPtr->landmarks[1]->observations[1001] << " <= slamMapPtr->landmarks[2]->observations[1001]" << endl;
 
 	cout << "\nTHAT'S ALL, WHAT'S WRONG?" << endl;
 }

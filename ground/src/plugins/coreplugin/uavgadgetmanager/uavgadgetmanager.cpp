@@ -445,7 +445,6 @@ bool UAVGadgetManager::restoreState(const QByteArray &state)
     removeAllSplits();
     emptyView(m_d->m_splitterOrView->view());
     QDataStream stream(state);
-    qDebug() << Q_FUNC_INFO;
 
     QByteArray version;
     stream >> version;

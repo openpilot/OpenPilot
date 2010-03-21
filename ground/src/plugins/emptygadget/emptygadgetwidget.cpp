@@ -20,7 +20,7 @@ EmptyGadgetWidget::EmptyGadgetWidget(QWidget *parent) : QLabel(parent)
     this->
     setText(tr("Choose a gadget to display in this view.\n") +
             tr("You can also split this view in two.\n\n") +
-            tr("Once you are done, choose Hide Toolbars in the Window menu."));
+            tr("Maybe you first have to choose Show Toolbars in the Window menu."));
 }
 
 EmptyGadgetWidget::~EmptyGadgetWidget()

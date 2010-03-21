@@ -1,0 +1,55 @@
+/*! \page pageJacobians Function Jacobians 
+
+We use strict rules for manipulating and naming Jacobians:
+
+	- Jacobians are named with \e BIG_small, 
+		where \e BIG is the name of the differentiated variable and \e small is the differentiator.
+		For example, the Jacobian of \e y=f(x) is \e Y_x=dy/dx.
+	- Elementary functions compute their own Jacobians from scratch.
+	- Composed functions use the chain rule to compute their Jacobians, 
+		using the return of the elementary functions called.
+	- Multivariate functions return one Jacobian per input variable. 
+		For example, \e z=f(x,y) must return \e Z_x=dz/dx and \e Z_y=dz/dy.
+
+	Here is an example of a composed function and the chain rule (a real example is the whole file quatTools.hpp.).
+	- We have two functions <i> f(x), g(x) </i> and we need their composition <i> h(x) = g(f(x)) </i>
+	- Both \e f() and \e g() are able to return their own Jacobians. 
+	- We want \e g() to return the Jacobian too.
+	
+	\code
+	void f(const vec3 x, vec2 y, mat Y_x);    // This is y = f(x), Y_x = dy/dx = df(x)/dx.
+	void g(const vec2 x, vec2 y, mat Y_x);    // This is y = g(x), Y_x = dy/dx = dg(x)/dx.
+	void h(const vec3 x, vec2 z, mat Z_x){    // This will perform g(f(x)) and return Jacobians.
+		vec2 y;
+		mat23 Y_x;
+		f(x, y, Y_x);                           // This computes y and     -------->  Y_x = dy/dx = df(x)/dx.
+		mat22 Z_y;
+		g(y, z, Z_y);                           // This is z = g(y) = g(f(x)) and ->  Z_y = dz/dy = dg(y)/dy.
+		Z_x = Z_y * Y_x;                        // This is the chain rule doing   ->  Z_x = dz/dx = dz/dy * dy/dx.
+	}
+	\endcode
+	
+	As a general rule (but always depending on usability requirements) a function should be implemented several times:
+	- Once with only the nominal output, provided as a returned value:
+	\code
+	vec2 f(const vec2 & a, const vec2 & b) { return b-a; }
+	\endcode
+	- Once with only the Jacobian being computed. One implementation per input variable. 
+	  The name is appended with "_by_d{VARNAME}" to indicate which Jacobian is being computed. 
+	  The function is \c void and the result must be passed as a non-const parameter.
+	\code
+	void f_by_da(const vec2 & a, const vec2 & b, mat22 C_a) { C_a = -identity_mat(2); }
+	void f_by_db(const vec2 & a, const vec2 & b, mat22 C_b) { C_b = identity_mat(2); }
+	\endcode
+	- Once with nominal value and Jacobians. 
+	  The name is the same as the original one (overloaded method). 
+	  The function is \c void, all results are in the parameter list.
+	\code
+	void f(const vec2 & a, const vec2 & b, vec2 & c, mat22 & C_a, mat22 & C_b)	{ 
+		c   = b-a; 
+		C_a = -identity_mat(2); 
+		C_b = -C_a;
+	}
+	\endcode	
+
+*/

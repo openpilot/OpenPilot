@@ -44,23 +44,14 @@
 		
 	\image html slam.png "The main objects in rtslam"
 	
-	The hierarchical organization of all these objects is defined family-tree-like. 
-	The family-tree differs from a regular tree in that an object can have more than one parent 
-	(\e ie. a father and a mother, please keep reading). 
-	The parents may have none, one or more children. 
-	The children have a backwards link to their parent. 
-	
-	The Observations link Sensors to Landmarks and are the only objects to have both mother 
-	(\e eg. the Sensor) and father (\e eg. the Landmark). 
-		
-	The figure below illustrates the family-tree organization for the case of a map 
-	with 2 robots and 2 landmarks, one robot with one sensor and the other one with 2 sensors.
+	The hierarchical organization of all these objects is defined family-tree-like, as shown here: 
 	
 	\image html familyTree.png "The family tree hierarchical organization"
 	
-	Each Observation creates a loop of links.
-	All of such loops are visible in the figure. 
-	For example, the leftmost one is highlighted in red: M1->R1->S11->O111<-L1<-M1.
+	The family-tree differs from a regular tree in that an object can have more than one parent 
+	(\e ie. a father and a mother). 
+		
+	See the \ref pageLinks page for more information about the parental links.
   
 	\b REMARK: The existence of the class Observation permits the correct segmentation of data and methods into
 	comprehensive units. 
@@ -75,34 +66,6 @@
 	- A \e measurement is a member of Observation.
 	- Other members are the \e expectation and the \e innovation.
 	
-	To account for these relationships, the \b rtslam uses <b> maps of pointers to children</b>, 
-	indexed by their unique ID number, and a single <b>pointer to a parent</b>. 
-	Yes, each link in the graph is stored twice. This allows systematic forward and backward referencing between objects.
-	This figure shows the general implementation of such bi-directional links
-	
-	\image html parentalLinks.png "Bi-directional parental links. A parent has a map of pointers to children. A child has a pointer to his parent."
-	
-	You will discover these triangular loops in the collaboration diagrams of this documentation. Check this one jafar::rtslam::MapAbstract for an example.
-
-	\b NOTE: The drawback or danger of this bidirectional linkage is that it allows access to any object of the system from any other object. Be careful.
-
-	Here is an example of the Robot class. Observe the maps of links to sensors and the link to the father map:
-	
-	\code
-	class RobotAbstract
-	{
-		public:
-			string                        name;           // Name of robot.
-			string                        type;           // Type of robot.
-			Control                       control;        // Control input.
-			map<size_t, SensorAbstract*>  sensors;        // List of pointers to sensors.
-			MapAbstract                   * map;          // Pointer to father Map.
-			State                         state;          // State vector, pointing to the SLAM map.
-			virtual void                  set_control();  // Set control input.
-			virtual void                  move() = 0;     // Move the robot.
-	};
-	\endcode
-
 	Here is an example of the class Observation:
 	\code
 	class ObservationAbstract
@@ -177,7 +140,7 @@
 	
 	We make use of Boost and OpenCV, which are warped into Jafar modules \ref jmath and \ref image.
 	
-	The graphics part is relegated to \ref qdisplay (2D) and GDHE (3D). 
+	The graphics part is relegated to \ref qdisplay (2D) and \ref GDHE (3D). 
 	However, \ref rtslam creates libraries that are independent of the graphics output.
 	
 	\subsection secObjectCreation Objects creation policy
@@ -199,45 +162,11 @@
 	\subsection secFunctions Functions with Jacobians
 	
 	Nearly all functions involved in EKF-SLAM are required to return Jacobian matrices. 
-	We use systematicallly the chain rule to create Jacobians of composed functions.
+	We systematicallly use a fixed terminology for naming Jacobian matrices, and the chain rule to create Jacobians of composed functions.
 	
-	Here is an example of a composed function and the chain rule:
+	See the \ref pageJacobians page for more information.
 	
-	\code
-	void f(const vec3 x, vec2 y, mat Y_x);    // This is y = f(x), Y_x = dy/dx = df(x)/dx.
-	void g(const vec2 x, vec2 y, mat Y_x);    // This is y = g(x), Y_x = dy/dx = dg(x)/dx.
-	void h(const vec3 x, vec2 z, mat Z_x){    // This will perform g(f(x)) and return Jacobians.
-		vec2 y;
-		mat23 Y_x;
-		f(x, y, Y_x);                           // This computes y and     -------->  Y_x = dy/dx = df(x)/dx.
-		mat22 Z_y;
-		g(y, z, Z_y);                           // This is z = g(y) = g(f(x)) and ->  Z_y = dz/dy = dg(y)/dy.
-		Z_x = Z_y * Y_x;                        // This is the chain rule doing   ->  Z_x = dz/dx = dz/dy * dy/dx.
-	}
-	\endcode
-	
-	As a general rule, a function should be implemented several times:
-	- Once with only the nominal output, provided as a returned value:
-	\code
-	vec2 f(const vec2 & a, const vec2 & b) { return b-a; }
-	\endcode
-	- Once with only the Jacobian being computed. One implementation per input variable. 
-	  The name is appended with "_by_d{VARNAME}" to indicate which Jacobian is being computed. 
-	  The function is \c void and the result must be passed as a non-const parameter.
-	\code
-	void f_by_da(const vec2 & a, const vec2 & b, mat22 C_a) { C_a = -identity_mat(2); }
-	void f_by_db(const vec2 & a, const vec2 & b, mat22 C_b) { C_b = identity_mat(2); }
-	\endcode
-	- Once with nominal value and Jacobians. 
-	  The name is the same as the original one (overloaded method). 
-	  The function is \c void, all results are in the parameter list.
-	\code
-	void f(const vec2 & a, const vec2 & b, vec2 & c, mat22 & C_a, mat22 & C_b)	{ 
-		c   = b-a; 
-		C_a = -identity_mat(2); 
-		C_b = -C_a;
-	}
-	\endcode	
+
 	\subsection secGaussians Gaussians
 	
 	We designed and built the jafar::rtslam::Gaussian class for storing Gaussian variables. 
@@ -255,6 +184,8 @@
 	(More exactly, it is a typedef boost::numeric::ublas::bounded_vector<double,4> vec4.)
 	The real part comes first, then the three imaginary parts.
 	All the quaternion algebra is coded inside the module in the file quatTools.hpp.
+	
+	See the \ref pageQuaternion page and quatTools.hpp for more information about quaternions.
 	
 	## This is the end of the Implementation section.
   

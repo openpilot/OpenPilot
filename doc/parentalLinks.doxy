@@ -1,0 +1,64 @@
+/** \page pageLinks Parental links
+
+	The hierarchical organization of objects in RTSLAM is defined family-tree-like. 
+	The family-tree differs from a regular tree in that an object can have more than one parent 
+	(\e ie. a father and a mother, please keep reading). 
+	- The parents may have none, one or more children. 
+	- The children have a backwards link to their parent. 
+	- The Observations link Sensors to Landmarks and are the only objects to have both mother 
+	(\e eg. the Sensor) and father (\e eg. the Landmark). 
+		
+	The figure below illustrates the family-tree organization for the case of a map 
+	with 2 robots and 2 landmarks, one robot with one sensor and the other one with 2 sensors.
+	
+	\image html familyTree.png "The family tree hierarchical organization"
+	
+	Each Observation creates a loop of links.
+	All of such loops are visible in the figure. 
+	For example, the loop highlighted in red: M1->R2->S2->O4->L2->M1. 
+	
+	To account for these relationships, the \b rtslam uses <b> maps of pointers to children</b>, 
+	indexed by their unique ID number, and a single <b>pointer to a parent</b>. 
+	Yes, each link in the graph is stored twice. This allows systematic forward and backward referencing between objects.
+	This figure shows the general implementation of such bi-directional links
+	
+	\image html parentalLinks.png "Bi-directional parental links. A parent has a map of pointers to children. A child has a pointer to his parent."
+	
+	You will discover these triangular loops in the collaboration diagrams of this documentation. Check this one jafar::rtslam::MapAbstract for an example.
+
+	In our implementation, if we have a pointer \a mapPtr to the map at the base level, 
+	loops can be traversed clockwise or counter-clockwise. We exemplify here the red loop:
+	\code
+	mapPtr->landmarks[2]->observations[4]->sensor->robot->slamMap       // clockwise
+	mapPtr->robots[2]->sensors[2]->observations[4]->landmark->slamMap   // counter-clockwise
+	\endcode
+	
+	Taking arbitrary fractions of such loops allow us to access information at any part of the parental hierarchy. 
+	For example, from a pointer to observation 4, we can know which robot was observing which landmark:
+	\code
+	obs4ptr->sensor->robot->id()     // This is the ID of the landmark: 2 in this case (see figure)
+	obs4Ptr->landmark->id()          // This is the ID of the robot   : 2 in this case
+	\endcode
+
+	\b NOTE: The drawback or danger of this bidirectional linkage is that it allows access to any object of the system from any other object. Be careful.
+
+	Here is an example of the Robot class. Observe the maps of links to sensors and the link to the father map:
+	
+	\code
+	class RobotAbstract
+	{
+		public:
+			string                        name;           // Name of robot.
+			string                        type;           // Type of robot.
+			Control                       control;        // Control input.
+			map<size_t, SensorAbstract*>  sensors;        // List of pointers to sensors.
+			MapAbstract                   * map;          // Pointer to father Map.
+			State                         state;          // State vector, pointing to the SLAM map.
+			virtual void                  set_control();  // Set control input.
+			virtual void                  move() = 0;     // Move the robot.
+	};
+	\endcode
+
+	
+	
+	*/

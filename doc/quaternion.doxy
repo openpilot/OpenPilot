@@ -1,0 +1,65 @@
+ /** \page pageQuaternion Quaternions in RTSLAM
+ 
+   
+   We specify a quaternion with a unit, column 4-vector
+
+       - q = [a b c d]' , norm(q) = 1.
+
+   with [a] the real part and [b c d]' the imaginary parts. This is
+   equivalent to writing the true quaternion in quaternion space
+
+       - q = a + bi + cj + dk, 
+
+   with
+
+       - i^2 = j^2 = k^2 = -1, ij = k, ji = -k.
+
+   \b NOTE: The products performed in quaternion space are indicated with
+   a double asterisk as in (q1**q2). Matrix products are standard (A*v). 
+
+   Quaternions are used for encoding rotations and orientations with the
+   following convention:
+
+       1. Consider a world or global frame W and a local frame F.
+
+       2. q is used to encode the orientation of frame F wrt frame W. It
+       may be written as q_WF.
+
+       3. Consider now a vector v = vx.i + vy.j + vz.k in quaternion
+       space.
+
+       4. We name v_F and v_W the coordinates of v in frames W and F.
+
+       5. Then, if q_FW = (q_WF)' = a - bi - cj - dk is the conjugate of
+       q_WF, we have
+          -  v_W = q_WF . v_F . q_FW
+          -  v_F = q_FW . v_W . q_WF
+
+       6. This is equivalent to the linear, rotation matrix forms 
+          - V_W = R_WF * V_F
+          - V_F = R_FW * V_W , 
+       		
+       			with 
+           	- V_W, V_F         : the same vectors in Euclidean 3d-space
+           	- R_WF = q2R(q_WF) : the rotation matrix
+           	- R_FW = R_WF'.    : the transposed rotation matrix.
+
+   Some interesting functions involving quaternions are:
+
+       - q2qc()    conjugate quaternion,      q' = q2qc(q).
+       - qProd()   product of quaternions, q1**q2 = qProd(q1,q2)
+       - q2R()     rotation matrix. We name R(q) = q2R(q), with the properties:
+           - R(q1**q2) = R(q1) * R(q2)
+           - R(q')     = R(q)'
+           - R(-q)     = R(q)
+       - e2q()     Euler angles to quaternion conversion.
+       - v2q()     Rotation vector to quaternion conversion.
+
+   These functions are equipped with Jacobian computation for
+   their use in algorithms requiring linearization, such as EKF.
+   
+   See the documentation of quatTools.hpp for a full list of functions. 
+   
+   See the \ref pageJacobians page for information about Jacobian manipulation in RTSLAM.
+
+*/

@@ -36,6 +36,7 @@
 #include "rightpane.h"
 #include "iuavgadget.h"
 
+#include <QDebug>
 #include <QtCore/QLatin1String>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QWidget>
@@ -66,8 +67,8 @@ UAVGadgetMode::UAVGadgetMode(UAVGadgetManager *uavGadgetManager, QString name, Q
         // this shouldn't happen
         m_uniqueName = uniqueName + QString::number(quint64(this));
     }
-    QByteArray ba = m_uniqueName.toLatin1();
-    m_uniqueNameC = ba.data();
+    m_uniqueNameBA = m_uniqueName.toLatin1();
+    m_uniqueNameC = m_uniqueNameBA.data();
     connect(modeManager, SIGNAL(currentModeChanged(Core::IMode*)),
             this, SLOT(grabUAVGadgetManager(Core::IMode*)));
     m_widget->setFocusProxy(m_uavGadgetManager);

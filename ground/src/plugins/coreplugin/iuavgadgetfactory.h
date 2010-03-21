@@ -48,7 +48,11 @@ public:
     virtual ~IUAVGadgetFactory() {}
 
     virtual IUAVGadget *createUAVGadget(QWidget *parent) = 0;
-    virtual QString name() = 0;
+    virtual QString gadgetKind() const { return m_gadgetKind; }
+    virtual QString name() const { return m_name; }
+protected:
+    QString m_name;
+    QString m_gadgetKind;
 };
 
 } // namespace Core

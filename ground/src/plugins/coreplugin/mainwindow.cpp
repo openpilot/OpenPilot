@@ -113,7 +113,6 @@ MainWindow::MainWindow() :
     m_variableManager(new VariableManager(this)),
     m_viewManager(0),
     m_modeManager(0),
-    m_uavGadgetManager(0),
     m_connectionManager(0),
     m_mimeDatabase(new MimeDatabase),
 //    m_rightPaneWidget(0),
@@ -172,8 +171,6 @@ MainWindow::MainWindow() :
 
     m_viewManager = new ViewManager(this);
     m_messageManager = new MessageManager;
-//    m_uavGadgetManager = new UAVGadgetManager(m_coreImpl, this);
-//    m_uavGadgetManager->hide();
     setCentralWidget(m_modeStack);
 
     connect(QApplication::instance(), SIGNAL(focusChanged(QWidget*,QWidget*)),
@@ -728,15 +725,20 @@ VariableManager *MainWindow::variableManager() const
      return m_variableManager;
 }
 
-
 ConnectionManager *MainWindow::connectionManager() const
 {
     return m_connectionManager;
 }
 
-UAVGadgetManager *MainWindow::uavGadgetManager() const
+void MainWindow::addUAVGadgetManager(UAVGadgetManager *manager)
 {
-    return m_uavGadgetManager;
+    if (!m_uavGadgetManagers.contains(manager))
+        m_uavGadgetManagers.append(manager);
+}
+
+QList<UAVGadgetManager*> MainWindow::uavGadgetManagers() const
+{
+    return m_uavGadgetManagers;
 }
 
 ModeManager *MainWindow::modeManager() const
@@ -870,7 +872,7 @@ void MainWindow::readSettings()
     if (geom.isValid()) {
         setGeometry(geom.toRect());
     } else {
-        resize(1024, 700);
+        resize(750, 400);
     }
     if (m_settings->value(QLatin1String(maxKey), false).toBool())
         setWindowState(Qt::WindowMaximized);
@@ -878,7 +880,10 @@ void MainWindow::readSettings()
 
     m_settings->endGroup();
 
-//    m_rightPaneWidget->readSettings(m_settings);
+    foreach (UAVGadgetManager *manager, m_uavGadgetManagers) {
+        manager->readSettings();
+    }
+    //    m_rightPaneWidget->readSettings(m_settings);
 }
 
 void MainWindow::writeSettings()
@@ -900,6 +905,9 @@ void MainWindow::writeSettings()
 
     m_viewManager->saveSettings(m_settings);
     m_actionManager->saveSettings(m_settings);
+    foreach (UAVGadgetManager *manager, m_uavGadgetManagers) {
+        manager->saveSettings();
+    }
 }
 
 void MainWindow::addAdditionalContext(int context)

@@ -92,7 +92,8 @@ public:
     Core::ActionManager *actionManager() const;
     Core::UniqueIDManager *uniqueIDManager() const;
     Core::MessageManager *messageManager() const;
-    Core::UAVGadgetManager *uavGadgetManager() const;
+    void addUAVGadgetManager(Core::UAVGadgetManager *manager);
+    QList<Core::UAVGadgetManager*> uavGadgetManagers() const;
     Core::ConnectionManager *connectionManager() const;
     Core::VariableManager *variableManager() const;
     Core::ModeManager *modeManager() const;
@@ -166,7 +167,7 @@ private:
     VariableManager *m_variableManager;
     ViewManager *m_viewManager;
     ModeManager *m_modeManager;
-    UAVGadgetManager *m_uavGadgetManager;
+    QList<UAVGadgetManager*> m_uavGadgetManagers;
     ConnectionManager *m_connectionManager;
     MimeDatabase *m_mimeDatabase;
     FancyTabWidget *m_modeStack;

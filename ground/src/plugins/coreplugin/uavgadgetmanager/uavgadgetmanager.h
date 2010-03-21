@@ -103,7 +103,7 @@ public:
 
     void saveSettings();
     void readSettings();
-    bool toolbarsHidden() { return m_hidden; }
+    bool toolbarsShown() { return m_showToolbars; }
 
     UAVGadgetFactoryList uavGadgetFactories() const;
 
@@ -120,7 +120,7 @@ public slots:
     void removeCurrentSplit();
     void removeAllSplits();
     void gotoOtherSplit();
-    void hideToolbars(bool hide);
+    void showToolbars(bool show);
 
 private:
     void addUAVGadget(IUAVGadget *gadget);
@@ -130,7 +130,7 @@ private:
     void emptyView(Core::Internal::UAVGadgetView *view);
     Core::Internal::SplitterOrView *currentSplitterOrView() const;
 
-    bool m_hidden;
+    bool m_showToolbars;
     UAVGadgetManagerPrivate *m_d;
     Core::Internal::UAVGadgetMode *m_uavGadgetMode;
 

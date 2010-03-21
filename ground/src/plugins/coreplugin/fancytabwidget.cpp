@@ -79,9 +79,9 @@ QSize FancyTabBar::tabSizeHint(bool minimum) const
     boldFont.setBold(true);
     QFontMetrics fm(boldFont);
     int spacing = 6;
-    int width = 60 + spacing + 2;
+    int width = 90 + spacing + 2;
 
-    int iconHeight = minimum ? 0 : 32;
+    int iconHeight = minimum ? 0 : 16;
     return QSize(width, iconHeight + spacing + fm.height());
 }
 
@@ -336,7 +336,7 @@ FancyTabWidget::FancyTabWidget(QWidget *parent)
     vlayout->setSpacing(0);
     vlayout->addLayout(m_modesStack);
     vlayout->addWidget(m_selectionWidget);
-    //vlayout->addWidget(m_statusBar);  //status bar is not used for now
+//    vlayout->addWidget(m_statusBar);  //status bar is not used for now
 
     QHBoxLayout *mainLayout = new QHBoxLayout;
     mainLayout->setMargin(0);

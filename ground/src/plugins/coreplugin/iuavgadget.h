@@ -48,15 +48,16 @@ public:
     virtual QList<int> context() const = 0;
     virtual QWidget *widget() = 0;
     virtual QString contextHelpId() const { return QString(); }
+    virtual QString gadgetKind() { return m_gadgetKind; }
 
 //    virtual void saveConfiguration() = 0;
 //    virtual void loadConfiguration(QString ) = 0;
 //    virtual QStringList getConfigurationNames() = 0;
     virtual QWidget *toolBar() = 0;
-    virtual void setIndex(int index) { m_index = index; }
-    virtual int index() { return m_index; }
-private:
-    int m_index;
+    virtual QByteArray saveState() { return 0; }
+    virtual void restoreState(QByteArray state) { }
+protected:
+    QString m_gadgetKind;
 };
 
 } // namespace Core

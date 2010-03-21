@@ -70,12 +70,11 @@ public:
     IUAVGadget *uavGadget() const;
     void setUAVGadget(IUAVGadget *uavGadget);
     bool hasUAVGadget(IUAVGadget *uavGadget) const;
-    void hideToolbar(bool hide);
+    int indexOfGadgetKind(QString gadgetKind);
+    void showToolbar(bool show);
 
 public slots:
     void closeView();
-
-private slots:
     void listSelectionActivated(int index);
 
 private:

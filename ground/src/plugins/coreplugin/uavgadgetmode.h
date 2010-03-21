@@ -75,6 +75,7 @@ private:
     int m_priority;
     QVBoxLayout *m_layout;
     QString m_uniqueName;
+    QByteArray m_uniqueNameBA;
     const char *m_uniqueNameC;
 };
 

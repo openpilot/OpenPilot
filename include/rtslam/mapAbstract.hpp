@@ -16,11 +16,11 @@
 #define MAPABSTRACT_HPP_
 
 #include <map>
+#include <boost/shared_ptr.hpp>
 
 #include "kernel/IdFactory.hpp"
 #include "jmath/jblas.hpp"
 #include "rtslam/gaussian.hpp"
-//#include "rtslam/rtslam.hpp"
 #include "rtslam/kalmanFilter.hpp"
 
 
@@ -49,8 +49,14 @@ namespace jafar {
 				kernel::IdFactory sensorIds;
 				kernel::IdFactory landmarkIds;
 
-				typedef std::map<size_t, RobotAbstract*> robots_t;
-				typedef std::map<size_t, LandmarkAbstract*> landmarks_t;
+				typedef boost::shared_ptr<RobotAbstract> robot_t;
+				typedef boost::shared_ptr<LandmarkAbstract> landmark_t;
+				typedef std::map<size_t, robot_t > robotsSet_t;
+				typedef std::map<size_t, landmark_t > landmarksSet_t;
+//				typedef RobotAbstract * robot_t;
+//				typedef LandmarkAbstract * landmark_t;
+//				typedef std::map<size_t, robot_t> robots_t;
+//				typedef std::map<size_t, landmark_t> landmarks_t;
 
 				/**
 				 * Size things and map usage management
@@ -76,7 +82,7 @@ namespace jafar {
 				 */
 				inline jblas::ind_array ia_used_states() {
 					jblas::ind_array res;
-					res = jmath::ublasExtra::ia_set(used_states);
+					res = jmath::ublasExtra::ia_bool(used_states);
 					return res;
 				}
 
@@ -89,12 +95,12 @@ namespace jafar {
 				/**
 				 * A set of robots
 				 */
-				robots_t robots;
+				robotsSet_t robots;
 
 				/**
 				 * A set of landmarks
 				 */
-				landmarks_t landmarks;
+				landmarksSet_t landmarks;
 
 				jblas::vec & x();
 				jblas::sym_mat & P();
@@ -119,13 +125,14 @@ namespace jafar {
 				}
 
 
-				/**
+				/*
 				 * Robot and landmark addition and removal
 				 */
-				void addRobot(RobotAbstract * _robPtr);
+				void addRobot(robot_t _robPtr);
+				void deleteRobot(robot_t _robPtr);
 
-				void addLandmark(LandmarkAbstract * _lmk);
-
+				void addLandmark(landmark_t _lmkPtr);
+				void deleteLandmark(landmark_t _lmkPtr);
 
 				/**
 				 * Obtain free Map space of a given size.
@@ -156,7 +163,6 @@ namespace jafar {
 				//				void correctOneLmk(LandmarkAbstract & _lmk, ObservationAbstract & _obs);
 				//				void reparametrizeLmk(LandmarkAbstract & _lmk);
 				//				void initializeLmk(ObservationAbstract & _obs);
-				//				void deleteLmk(LandmarkAbstract & _lmk);
 		};
 
 	}

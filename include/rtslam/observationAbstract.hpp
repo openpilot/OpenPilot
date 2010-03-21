@@ -36,7 +36,6 @@
 
 #include "rtslam/gaussian.hpp"
 // include parents
-//#include "rtslam/rtslam.hpp"
 #include "rtslam/objectAbstract.hpp"
 #include "rtslam/sensorAbstract.hpp"
 #include "rtslam/landmarkAbstract.hpp"
@@ -228,6 +227,8 @@ namespace jafar {
 
 			public:
 
+				typedef boost::shared_ptr<SensorAbstract> sensor_t;
+				typedef boost::shared_ptr<LandmarkAbstract> landmark_t;
 
 				/**
 				 * Mandatory virtual destructor.
@@ -252,12 +253,12 @@ namespace jafar {
 				/**
 				 *  Mother Sensor where it was acquired from
 				 */
-				SensorAbstract * sensor;
+				sensor_t sensor;
 
 				/**
 				 * Father Landmark where it points to
 				 */
-				LandmarkAbstract * landmark;
+				landmark_t landmark;
 
 				/**
 				 * Expectation
@@ -299,7 +300,7 @@ namespace jafar {
 				 * \param sen the sensor
 				 * \param lmk the landmark
 				 */
-				inline void associate(SensorAbstract & sen, LandmarkAbstract & lmk);
+				inline void associate(sensor_t senPtr, landmark_t lmkPtr);
 
 				/**
 				 * Project and get Jacobians

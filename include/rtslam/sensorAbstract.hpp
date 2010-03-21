@@ -19,10 +19,10 @@
 /* --------------------------------------------------------------------- */
 
 #include <map>
+#include <boost/shared_ptr.hpp>
 
 #include "jmath/jblas.hpp"
 //include parents
-//#include "rtslam/rtslam.hpp"
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/mapObject.hpp"
 #include "rtslam/robotAbstract.hpp"
@@ -80,22 +80,31 @@ namespace jafar {
 
 			public:
 
-				typedef std::map<size_t, ObservationAbstract*> observations_t;
+				typedef boost::shared_ptr<RobotAbstract> robot_t;
+				typedef boost::shared_ptr<ObservationAbstract> observation_t;
+				typedef std::map<size_t, observation_t> observationsSet_t;
+//				typedef std::map<size_t, ObservationAbstract*> observations_t;
 
 				/**
 				 * Parent robot
 				 */
-				RobotAbstract* robot;
+				robot_t robot;
 
 				/**
 				 * A set of observations (one per landmark)
 				 */
-				observations_t observationsList;
+				observationsSet_t observationsSet;
 
 				/**
 				 * Sensor pose in robot
 				 */
 				Gaussian pose;
+
+				/**
+				 * Empty constructor.
+				 * This just defines a pose of size 7.
+				 */
+				SensorAbstract();
 
 				/**
 				 * Local pose constructor - only mean

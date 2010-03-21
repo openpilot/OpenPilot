@@ -35,6 +35,15 @@ namespace jafar {
 		}
 
 
+		/**
+		 * Empty constructor.
+		 * This just defines a pose of size 7.
+		 */
+		SensorAbstract::SensorAbstract() :
+			MapObject(0), pose(7) {
+			categoryName("SENSOR");
+		}
+
 		/*
 		 * Local pose constructor - only mean
 		 */
@@ -58,39 +67,33 @@ namespace jafar {
 		 * Remote pose constructor.
 		 */
 		SensorAbstract::SensorAbstract(MapAbstract & _map) :
-			MapObject(_map, 7), pose(_map.x(), _map.P(), state.ia()) {
+			MapObject(_map, 7),
+			pose(state, jmath::ublasExtra::ia_range(0,7))
+		{
 			categoryName("SENSOR");
-			id(_map.sensorIds.getId());
-			cout << "Sensor id: " << id() << endl;
 		}
 
 
-		/*
-		 * Remote pose constructor, with robot association.
-		 */
-		SensorAbstract::SensorAbstract(MapAbstract & _map, RobotAbstract & _rob) :
-			MapObject(_map, 7), pose(_map.x(), _map.P(), state.ia()) {
-			categoryName("SENSOR");
-			id(_map.sensorIds.getId());
-			cout << "Sensor id: " << id() << endl;
-			// link robot and sensor together:
-			robot = &_rob;
-			_rob.addSensor(this);
-		}
+//		/*
+//		 * Remote pose constructor, with robot association.
+//		 */
+//		SensorAbstract::SensorAbstract(MapAbstract & _map, RobotAbstract & _rob) :
+//			MapObject(_map, 7),
+//			pose(state, jmath::ublasExtra::ia_range(0,7))
+//		{
+//			categoryName("SENSOR");
+//		}
 
 
 		/*
 		 * Selectable LOCAL or REMOTE pose constructor.
 		 */
 		SensorAbstract::SensorAbstract(RobotAbstract & _rob, bool inFilter = false) :
-			//          #check           # sensor in filter                                         # not in filter
-			    MapObject(inFilter ? MapObject(*_rob.slamMap, 7) : 0), pose(inFilter ? Gaussian((*_rob.slamMap).x(),
-			        (*_rob.slamMap).P(), state.ia()) : Gaussian(7)) {
+			//          #check        # sensor in filter                           : # not in filter
+			MapObject(inFilter ? MapObject(*_rob.slamMap, 7)                       : 0),
+			pose     (inFilter ? Gaussian(state, jmath::ublasExtra::ia_range(0,7)) : Gaussian(7))
+		{
 			categoryName("SENSOR");
-			id(_rob.slamMap->sensorIds.getId());
-			// link robot and sensor together:
-			robot = &_rob;
-			_rob.addSensor(this);
 		}
 
 

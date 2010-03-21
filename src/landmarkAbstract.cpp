@@ -25,13 +25,9 @@ namespace jafar {
 		LandmarkAbstract::LandmarkAbstract(MapAbstract & _map, const size_t _size) :
 			MapObject(_map, _size) {
 			categoryName("LANDMARK");
-			id(_map.landmarkIds.getId());
-			// Link map and lmk
-			slamMap = &_map;
-			_map.addLandmark(this);
 		}
 
-		inline void LandmarkAbstract::addObservation(ObservationAbstract * _obsPtr) {
+		inline void LandmarkAbstract::addObservation(observation_t _obsPtr) {
 			observations[_obsPtr->id()] = _obsPtr;
 		}
 

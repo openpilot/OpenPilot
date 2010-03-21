@@ -133,9 +133,9 @@ namespace jafar {
 		 * \param sen the sensor
 		 * \param lmk the landmark
 		 */
-		inline void ObservationAbstract::associate(SensorAbstract & sen, LandmarkAbstract & lmk) {
-			sensor = &sen;
-			landmark = &lmk;
+		inline void ObservationAbstract::associate(sensor_t senPtr, landmark_t lmkPtr) {
+			sensor = senPtr;
+			landmark = lmkPtr;
 		}
 
 	} // namespace rtslam

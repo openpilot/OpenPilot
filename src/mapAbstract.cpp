@@ -47,7 +47,7 @@ namespace jafar {
 		/**
 		 * Robot addition
 		 */
-		void MapAbstract::addRobot(RobotAbstract * _robPtr) {
+		void MapAbstract::addRobot(robot_t _robPtr) {
 			robots[_robPtr->id()] = _robPtr;
 		}
 
@@ -55,7 +55,7 @@ namespace jafar {
 		/**
 		 * Landmark addition
 		 */
-		void MapAbstract::addLandmark(LandmarkAbstract * _lmkPtr) {
+		void MapAbstract::addLandmark(landmark_t _lmkPtr) {
 			landmarks[_lmkPtr->id()] = _lmkPtr;
 		}
 

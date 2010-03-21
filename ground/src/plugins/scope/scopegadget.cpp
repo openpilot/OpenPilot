@@ -13,6 +13,7 @@ ScopeGadget::ScopeGadget(ScopeGadgetWidget *widget) :
         m_widget(widget),
         m_toolbar(new QToolBar())
 {
+    m_gadgetKind = QString("ScopeGadget");
 }
 
 ScopeGadget::~ScopeGadget()

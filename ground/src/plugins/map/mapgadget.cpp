@@ -13,6 +13,7 @@ MapGadget::MapGadget(MapGadgetWidget *widget) :
         m_widget(widget),
         m_toolbar(new QToolBar())
 {
+    m_gadgetKind = QString("MapGadget");
 }
 
 MapGadget::~MapGadget()

@@ -28,7 +28,6 @@ bool ScopePlugin::initialize(const QStringList& args, QString *errMsg)
    Q_UNUSED(errMsg);
    mf = new ScopeGadgetFactory(this);
    addAutoReleasedObject(mf);
-   qDebug() << "ScopePlugin::initialize()";
 
    return true;
 }

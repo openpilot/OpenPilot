@@ -28,7 +28,6 @@ bool MapPlugin::initialize(const QStringList& args, QString *errMsg)
    Q_UNUSED(errMsg);
    mf = new MapGadgetFactory(this);
    addAutoReleasedObject(mf);
-   qDebug() << "MapPlugin::initialize()";
 
    return true;
 }

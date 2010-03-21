@@ -17,8 +17,10 @@ EmptyGadgetWidget::EmptyGadgetWidget(QWidget *parent) : QLabel(parent)
 {
     setMinimumSize(64,64);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-    setText(QString("Empty gadget"));
-
+    this->
+    setText(tr("Choose a gadget to display in this view.\n") +
+            tr("You can also split this view in two.\n\n") +
+            tr("Once you are done, choose Hide Toolbars in the Window menu."));
 }
 
 EmptyGadgetWidget::~EmptyGadgetWidget()

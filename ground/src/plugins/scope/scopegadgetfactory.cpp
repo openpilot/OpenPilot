@@ -11,6 +11,8 @@
 
 ScopeGadgetFactory::ScopeGadgetFactory(QObject *parent) : IUAVGadgetFactory(parent)
 {
+    m_name = tr("Scope Gadget");
+    m_gadgetKind = QString("ScopeGadget");
 }
 
 ScopeGadgetFactory::~ScopeGadgetFactory()
@@ -21,8 +23,4 @@ ScopeGadgetFactory::~ScopeGadgetFactory()
 Core::IUAVGadget* ScopeGadgetFactory::createUAVGadget(QWidget *parent) {
         ScopeGadgetWidget* gadgetWidget = new ScopeGadgetWidget(parent);
         return new ScopeGadget(gadgetWidget);
-}
-
-QString ScopeGadgetFactory::name() {
-        return QString("ScopeGadget");
 }

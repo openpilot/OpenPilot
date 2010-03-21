@@ -22,7 +22,6 @@ public:
     ~ScopeGadgetFactory();
 
     Core::IUAVGadget *createUAVGadget(QWidget *parent);
-    QString name();
 };
 
 #endif // SCOPEGADGETFACTORY_H_

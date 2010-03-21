@@ -11,6 +11,8 @@
 
 MapGadgetFactory::MapGadgetFactory(QObject *parent) : IUAVGadgetFactory(parent)
 {
+    m_name = tr("Map Gadget");
+    m_gadgetKind = QString("MapGadget");
 }
 
 MapGadgetFactory::~MapGadgetFactory()
@@ -21,8 +23,4 @@ MapGadgetFactory::~MapGadgetFactory()
 Core::IUAVGadget* MapGadgetFactory::createUAVGadget(QWidget *parent) {
 	MapGadgetWidget* gadgetWidget = new MapGadgetWidget(parent);
 	return new MapGadget(gadgetWidget);
-}
-
-QString MapGadgetFactory::name() {
-	return QString("MapGadget");
 }

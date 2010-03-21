@@ -28,7 +28,6 @@ bool EmptyPlugin::initialize(const QStringList& args, QString *errMsg)
    Q_UNUSED(errMsg);
    mf = new EmptyGadgetFactory(this);
    addAutoReleasedObject(mf);
-   qDebug() << "EmptyPlugin::initialize()";
 
    return true;
 }

@@ -13,6 +13,7 @@ EmptyGadget::EmptyGadget(EmptyGadgetWidget *widget) :
         m_widget(widget),
         m_toolbar(new QToolBar())
 {
+    m_gadgetKind = QString("EmptyGadget");
 }
 
 EmptyGadget::~EmptyGadget()

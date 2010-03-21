@@ -22,7 +22,6 @@ public:
     ~EmptyGadgetFactory();
 
     Core::IUAVGadget *createUAVGadget(QWidget *parent);
-    QString name();
 };
 
 #endif // EMPTYGADGETFACTORY_H_

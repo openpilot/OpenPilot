@@ -22,7 +22,6 @@ public:
     ~MapGadgetFactory();
 
     Core::IUAVGadget *createUAVGadget(QWidget *parent);
-    QString name();
 };
 
 #endif // MAPGADGETFACTORY_H_

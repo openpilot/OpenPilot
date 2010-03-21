@@ -11,6 +11,8 @@
 
 EmptyGadgetFactory::EmptyGadgetFactory(QObject *parent) : IUAVGadgetFactory(parent)
 {
+    m_name = tr("Choose gadget...");
+    m_gadgetKind = QString("EmptyGadget");
 }
 
 EmptyGadgetFactory::~EmptyGadgetFactory()
@@ -21,8 +23,4 @@ EmptyGadgetFactory::~EmptyGadgetFactory()
 Core::IUAVGadget* EmptyGadgetFactory::createUAVGadget(QWidget *parent) {
         EmptyGadgetWidget* gadgetWidget = new EmptyGadgetWidget(parent);
         return new EmptyGadget(gadgetWidget);
-}
-
-QString EmptyGadgetFactory::name() {
-        return QString("EmptyGadget");
 }

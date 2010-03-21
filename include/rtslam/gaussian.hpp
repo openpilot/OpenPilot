@@ -94,13 +94,15 @@ namespace jafar {
 		 * pointing to the same data (Gaussian \a G or pair {\a x , \a P })
 		 * allows recovering their cross-variances matrix.
 		 *
-		 * You can recover a hard copy of the cross-variance block with
+		 * You can recover a hard copy of the cross-variance block with one of these:
 		 * \code
-		 * mat c = project(P, G1.ia(), G2.ia());
+		 * mat c = project(  P  , G1.ia(), G2.ia());
+		 * mat c = project(G.P(), G1.ia(), G2.ia());
 		 * \endcode
-		 * You can have an indirect access to the cross-variance block with
+		 * You can have an indirect access to the cross-variance block with one of these:
 		 * \code
-		 * sym_mat_indirect ic(P, G1.ia(), G2.ia());
+		 * sym_mat_indirect ic(  P  , G1.ia(), G2.ia());
+		 * sym_mat_indirect ic(G.P(), G1.ia(), G2.ia());
 		 * \endcode
 		 *
 		 * This is a graphical representation of the situation,

@@ -37,6 +37,8 @@
 
 class UAVTalkPlugin: public ExtensionSystem::IPlugin
 {
+    Q_OBJECT
+
 public:
     UAVTalkPlugin();
     ~UAVTalkPlugin();
@@ -44,6 +46,10 @@ public:
     void extensionsInitialized();
     bool initialize(const QStringList & arguments, QString * errorString);
     void shutdown();
+
+protected slots:
+    void onDeviceConnect(QIODevice *dev);
+    void onDeviceDisconnect();
 
 private:
     UAVObjectManager* objMngr;

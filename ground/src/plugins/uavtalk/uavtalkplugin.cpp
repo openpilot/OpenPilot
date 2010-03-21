@@ -27,6 +27,9 @@
  */
 #include "uavtalkplugin.h"
 
+#include <coreplugin/icore.h>
+#include <coreplugin/connectionmanager.h>
+
 UAVTalkPlugin::UAVTalkPlugin()
 {
 
@@ -44,12 +47,15 @@ void UAVTalkPlugin::extensionsInitialized()
     objMngr = pm->getObject<UAVObjectManager>();
 
     // TODO: Initialize serial port and USB libraries, get QIODevice from each
+    // ---Julien: Actually I changed a little bit from the initial plan,
+    // now you have to connect to signal emited by the connection manager
+    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
+    QObject::connect(cm, SIGNAL(deviceConnected(QIODevice *)),
+                     this, SLOT(onDeviceConnect(QIODevice *)));
+    QObject::connect(cm, SIGNAL(deviceDisconnected()),
+                     this, SLOT(onDeviceDisconnect()));
 
-    // TODO: Initialize UAVTalk object
-    //utalk = new UAVTalk(io, objMngr);
 
-    // TODO: Initialize telemetry object
-    //telemetry = new Telemetry(utalk, objMngr);
 }
 
 bool UAVTalkPlugin::initialize(const QStringList & arguments, QString * errorString)
@@ -63,6 +69,17 @@ bool UAVTalkPlugin::initialize(const QStringList & arguments, QString * errorStr
 void UAVTalkPlugin::shutdown()
 {
 
+}
+
+void UAVTalkPlugin::onDeviceConnect(QIODevice *dev)
+{
+    utalk = new UAVTalk(dev, objMngr);
+    telemetry = new Telemetry(utalk, objMngr);
+}
+void UAVTalkPlugin::onDeviceDisconnect()
+{
+    delete telemetry;
+    delete utalk;
 }
 
 Q_EXPORT_PLUGIN(UAVTalkPlugin)

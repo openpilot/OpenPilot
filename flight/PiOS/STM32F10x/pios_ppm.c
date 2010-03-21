@@ -172,16 +172,16 @@ int32_t PIOS_PPM_Get(int8_t Channel)
 void TIM1_CC_IRQHandler(void)
 {
 	/* Do this as it's more efficient */
-	if(TIM_GetITStatus(RECEIVER1_TIM_PORT, RECEIVER1_CCR) == SET) {
+	if(TIM_GetITStatus(PIOS_PWM_CH1_TIM_PORT, RECEIVER1_CCR) == SET) {
 		if(CaptureState == 0) {
-			RiseValue = TIM_GetCapture2(RECEIVER1_TIM_PORT);
+			RiseValue = TIM_GetCapture2(PIOS_PWM_CH1_TIM_PORT);
 		} else {
-			FallValue = TIM_GetCapture2(RECEIVER1_TIM_PORT);
+			FallValue = TIM_GetCapture2(PIOS_PWM_CH1_TIM_PORT);
 		}
 	}
 
 	/* Clear TIM3 Capture compare interrupt pending bit */
-	TIM_ClearITPendingBit(RECEIVER1_TIM_PORT, RECEIVER1_CCR);
+	TIM_ClearITPendingBit(PIOS_PWM_CH1_TIM_PORT, RECEIVER1_CCR);
 
 	/* Simple rise or fall state machine */
 	if(CaptureState == 0) {
@@ -191,7 +191,7 @@ void TIM1_CC_IRQHandler(void)
 		/* Switch polarity of input capture */
 		TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Falling;
 		TIM_ICInitStructure.TIM_Channel = RECEIVER1_CH;
-		TIM_ICInit(RECEIVER1_TIM_PORT, &TIM_ICInitStructure);
+		TIM_ICInit(PIOS_PWM_CH1_TIM_PORT, &TIM_ICInitStructure);
 
 	} else {
 		/* Capture computation */
@@ -212,7 +212,7 @@ void TIM1_CC_IRQHandler(void)
 		/* Switch polarity of input capture */
 		TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
 		TIM_ICInitStructure.TIM_Channel = RECEIVER1_CH;
-		TIM_ICInit(RECEIVER1_TIM_PORT, &TIM_ICInitStructure);
+		TIM_ICInit(PIOS_PWM_CH1_TIM_PORT, &TIM_ICInitStructure);
 	}
 }
 

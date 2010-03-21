@@ -49,7 +49,7 @@ void PIOS_GPIO_Init(void)
 }
 
 /**
-* Turn on Pin
+* Enable a GPIO Pin
 * \param[in] Pin Pin Number
 */
 void PIOS_GPIO_Enable(uint8_t Pin)

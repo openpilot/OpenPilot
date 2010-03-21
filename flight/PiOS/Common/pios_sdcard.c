@@ -281,7 +281,7 @@ int32_t PIOS_SDCARD_CheckAvailable(uint8_t was_available)
 		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1); /* spi, pin_value */
 		/* send 80 clock cycles to start up */
 		uint8_t i;
-		for(i=0; i<10; ++i) {
+		for(i = 0; i < 10; ++i) {
 			PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
 		}
 
@@ -293,11 +293,11 @@ int32_t PIOS_SDCARD_CheckAvailable(uint8_t was_available)
 			goto not_available;
 		}
 
-		//* Deactivate chip select */
+		/* Deactivate chip select */
 		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1); /* spi, pin_value */
 
 		SDCARD_MUTEX_GIVE;
-		/* run power-on sequence (negative return = not available) */
+		/* Run power-on sequence (negative return = not available) */
 		ret = PIOS_SDCARD_PowerOn();
 	}
 

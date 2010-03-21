@@ -106,6 +106,8 @@ void PIOS_ADC_Init(void)
 	ADC_ExternalTrigConvCmd(ADC2, ENABLE);
 	#endif
 
+	//RCC_ADCCLKConfig(PIOS_ADC_ADCCLK);
+
 	/* Enable ADC1->DMA request */
 	ADC_DMACmd(ADC1, ENABLE);
 

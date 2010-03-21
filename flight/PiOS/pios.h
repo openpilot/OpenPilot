@@ -78,6 +78,9 @@
 #include <pios_usb_hid.h>
 #include <pios_debug.h>
 #include <pios_gpio.h>
+#if defined(PIOS_INCLUDE_EXTI)
+#include <pios_exti.h>
+#endif
 
 /* PIOS Hardware Includes (Common) */
 #include <pios_settings.h>

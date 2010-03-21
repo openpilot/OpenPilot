@@ -50,6 +50,7 @@
 #define PIOS_INCLUDE_SETTINGS
 #define PIOS_INCLUDE_FREERTOS
 #define PIOS_INCLUDE_GPIO
+#define PIOS_INCLUDE_EXTI
 
 
 /* Defaults for Logging */

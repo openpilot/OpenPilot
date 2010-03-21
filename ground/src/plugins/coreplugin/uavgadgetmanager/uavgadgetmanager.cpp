@@ -322,6 +322,7 @@ void UAVGadgetManager::setCurrentUAVGadget(IUAVGadget *uavGadget)
             view->update();
     }
     uavGadget->widget()->setFocus();
+    emit currentUAVGadgetChanged(uavGadget);
     updateActions();
 //    emit currentUAVGadgetChanged(uavGadget);
 }

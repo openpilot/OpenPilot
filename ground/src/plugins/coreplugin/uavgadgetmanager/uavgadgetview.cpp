@@ -71,7 +71,8 @@ UAVGadgetView::UAVGadgetView(UAVGadgetManager *uavGadgetManager, IUAVGadget *uav
         m_defaultToolBar(new QWidget(this)),
         m_uavGadgetList(new QComboBox),
         m_closeButton(new QToolButton),
-        m_defaultIndex(0)
+        m_defaultIndex(0),
+        m_activeLabel(new QLabel(tr("<font color=red><b>Active</b></font>")))
 {
 
     tl = new QVBoxLayout(this);
@@ -102,6 +103,8 @@ UAVGadgetView::UAVGadgetView(UAVGadgetManager *uavGadgetManager, IUAVGadget *uav
         m_toolBar->setLayout(toolBarLayout);
         m_toolBar->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
+        m_activeLabel->setTextFormat(Qt::RichText);
+
         m_closeButton->setAutoRaise(true);
         m_closeButton->setIcon(QIcon(":/core/images/closebutton.png"));
 
@@ -110,6 +113,7 @@ UAVGadgetView::UAVGadgetView(UAVGadgetManager *uavGadgetManager, IUAVGadget *uav
         toplayout->setMargin(0);
         toplayout->addWidget(m_uavGadgetList);
         toplayout->addWidget(m_toolBar, 1); // Custom toolbar stretches
+        toplayout->addWidget(m_activeLabel);
         toplayout->addWidget(m_closeButton);
 
         m_top = new Utils::StyledBar;
@@ -118,6 +122,7 @@ UAVGadgetView::UAVGadgetView(UAVGadgetManager *uavGadgetManager, IUAVGadget *uav
 
         connect(m_uavGadgetList, SIGNAL(activated(int)), this, SLOT(listSelectionActivated(int)));
         connect(m_closeButton, SIGNAL(clicked()), this, SLOT(closeView()), Qt::QueuedConnection);
+        connect(m_uavGadgetManager, SIGNAL(currentUAVGadgetChanged(IUAVGadget*)), this, SLOT(currentUAVGadgetChanged(IUAVGadget*)));
     }
     if (m_uavGadget) {
         setUAVGadget(m_uavGadget);
@@ -218,6 +223,11 @@ int UAVGadgetView::indexOfGadgetKind(QString gadgetKind)
     return m_uavGadgetList->findData(gadgetKind);
 }
 
+void UAVGadgetView::currentUAVGadgetChanged(IUAVGadget *gadget)
+{
+    (m_uavGadget == gadget) ? m_activeLabel->show() : m_activeLabel->hide();
+
+}
 
 SplitterOrView::SplitterOrView(UAVGadgetManager *uavGadgetManager, Core::IUAVGadget *uavGadget, bool isRoot) :
         m_uavGadgetManager(uavGadgetManager),

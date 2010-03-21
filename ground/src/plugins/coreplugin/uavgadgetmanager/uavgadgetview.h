@@ -77,6 +77,9 @@ public slots:
     void closeView();
     void listSelectionActivated(int index);
 
+private slots:
+    void currentUAVGadgetChanged(IUAVGadget *gadget);
+
 private:
     void updateToolBar();
 
@@ -91,6 +94,7 @@ private:
     Utils::StyledBar *m_top;
     QVBoxLayout *tl; // top layout
     int m_defaultIndex;
+    QLabel *m_activeLabel;
 };
 
 class SplitterOrView  : public QWidget

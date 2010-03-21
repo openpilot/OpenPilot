@@ -108,6 +108,7 @@ public:
     UAVGadgetFactoryList uavGadgetFactories() const;
 
 signals:
+    void currentUAVGadgetChanged(IUAVGadget *gadget);
 
 private slots:
     void handleContextChange(Core::IContext *context);

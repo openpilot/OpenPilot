@@ -103,7 +103,7 @@ int ModeManager::indexOf(const QString &id) const
         if (m_modes.at(i)->uniqueModeName() == id)
             return i;
     }
-    qDebug() << "Warning, no such mode:" << id;
+//    qDebug() << "Warning, no such mode:" << id;
     return -1;
 }
 

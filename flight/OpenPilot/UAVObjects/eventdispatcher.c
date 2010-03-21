@@ -129,7 +129,7 @@ int32_t EventPeriodicCreate(UAVObjEvent* ev, UAVObjEventCallback cb, int32_t per
 		}
 	}
     // Create handle
-	objEntry = (PeriodicObjectList*)malloc(sizeof(PeriodicObjectList));
+	objEntry = (PeriodicObjectList*)pvPortMalloc(sizeof(PeriodicObjectList));
 	if (objEntry == NULL) return -1;
 	memcpy(&objEntry->evInfo.ev, ev, sizeof(UAVObjEvent));
     objEntry->updatePeriodMs = periodMs;
@@ -189,7 +189,7 @@ int32_t EventPeriodicDelete(UAVObjEvent* ev, UAVObjEventCallback cb)
 		{
 			// Object found, remove from list
 			LL_DELETE(objList, objEntry);
-			free(objEntry);
+			vPortFree(objEntry);
 			xSemaphoreGiveRecursive(mutex);
 			return 0;
 		}

@@ -144,7 +144,7 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char* name, int32_t isMetaobject,
 	}
 
 	// Create and append entry
-	objEntry = (ObjectList*)malloc(sizeof(ObjectList));
+	objEntry = (ObjectList*)pvPortMalloc(sizeof(ObjectList));
 	if (objEntry == NULL)
 	{
 		xSemaphoreGiveRecursive(mutex);
@@ -164,7 +164,7 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char* name, int32_t isMetaobject,
 	else
 	{
 		objEntry->numInstances = 1;
-		objEntry->data.instance = malloc(numBytes);
+		objEntry->data.instance = pvPortMalloc(numBytes);
 		if (objEntry->data.instance == NULL)
 		{
 			xSemaphoreGiveRecursive(mutex);
@@ -838,9 +838,9 @@ int32_t createInstance(ObjectList* obj, uint16_t instId)
 	// Create new instance
 	if (!obj->isSingleInstance && instId < UAVOBJ_MAX_INSTANCES)
 	{
-		elemEntry = (ObjectInstList*)malloc(sizeof(ObjectInstList));
+		elemEntry = (ObjectInstList*)pvPortMalloc(sizeof(ObjectInstList));
 		if (elemEntry == NULL) return -1;
-		elemEntry->data = malloc(obj->numBytes);
+		elemEntry->data = pvPortMalloc(obj->numBytes);
 		if (elemEntry->data == NULL) return -1;
 		memset(elemEntry->data, 0, obj->numBytes);
 		elemEntry->instId = instId;
@@ -908,7 +908,7 @@ int32_t connectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb,
 	}
 
 	// Add queue to list
-	queueEntry = (ObjectQueueList*)malloc(sizeof(ObjectQueueList));
+	queueEntry = (ObjectQueueList*)pvPortMalloc(sizeof(ObjectQueueList));
 	if (queueEntry == NULL)
 	{
 		return -1;
@@ -941,7 +941,7 @@ int32_t disconnectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback 
 		if ( ( queueEntry->queue == queue && queueEntry->cb == cb ) )
 		{
 			LL_DELETE(objEntry->queues, queueEntry);
-			free(queueEntry);
+			vPortFree(queueEntry);
 			return 0;
 		}
 	}

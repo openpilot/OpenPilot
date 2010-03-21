@@ -38,8 +38,8 @@
 #define $(NAMEUC)_NUMBYTES sizeof($(NAME)Data)
 
 // Data access macros
-#define $(NAMEUC)_GET(dataOut) UAVObjGetData($(NAME)GetHandle(), dataOut)
-#define $(NAMEUC)_SET(dataIn) UAVObjGetData($(NAME)GetHandle(), dataIn)
+#define $(NAME)Get(dataOut) UAVObjGetData($(NAME)GetHandle(), dataOut)
+#define $(NAME)Set(dataIn) UAVObjSetData($(NAME)GetHandle(), dataIn)
 
 // Object data
 typedef struct {

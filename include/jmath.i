@@ -26,6 +26,7 @@
 
 #include "jmath/linearLeastSquares.hpp"
 #include "jmath/linearSolvers.hpp"
+#include "jmath/misc.hpp"
 %}
 
 %import "jafarConfig.h"
@@ -46,6 +47,7 @@
 
 %include "jmathTools.i"
 %include "jmath/ublasExtra.hpp"
+%include "jmath/misc.hpp"
 
 %template(setSizeValue) jafar::jmath::setSizeValue<jblas::vec>;
 %template(setValue) jafar::jmath::setValueVec<jblas::vec>;

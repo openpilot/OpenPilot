@@ -10,7 +10,6 @@ using boost::unit_test_framework::test_case;
 // jafar debug include
 #include "kernel/jafarDebug.hpp"
 
-//using namespace jafar::jmath;
 
 /*
  * standard init_unit_test_suite function

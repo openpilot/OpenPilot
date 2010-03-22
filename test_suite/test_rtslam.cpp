@@ -93,28 +93,28 @@ void test_rtslam01(void) {
 		size_t rid = slamMapPtr->robotIds.getId();
 		shared_ptr<Robot3DConstantVelocity> robPtr(new Robot3DConstantVelocity(*slamMapPtr));
 
-		slamMapPtr->robots[rid] = robPtr; // robot is now in map
-		robPtr->slamMap = slamMapPtr; // robot points now to map too
 		robPtr->id(rid);
 		robPtr->name("SUBMARINE");
+		slamMapPtr->addRobot(robPtr);
+		robPtr->linkToMap(slamMapPtr);
 
 		if (slamMapPtr->unusedStates(size_senPH)) {
 			size_t sid = slamMapPtr->sensorIds.getId();
 			shared_ptr<SensorPinHole> senPtr(new SensorPinHole(*robPtr));
 
-			robPtr->sensors[sid] = senPtr;
-			senPtr->robot = robPtr;
 			senPtr->id(sid);
 			senPtr->name("FLEA");
+			robPtr->addSensor(senPtr);
+			senPtr->linkToRobot(robPtr);
 		}
 		if (slamMapPtr->unusedStates(size_senPH)) {
 			size_t sid = slamMapPtr->sensorIds.getId();
 			shared_ptr<SensorPinHole> senPtr(new SensorPinHole(*robPtr, true));
 
-			robPtr->sensors[sid] = senPtr;
-			senPtr->robot = robPtr;
 			senPtr->id(sid);
 			senPtr->name("MARLIN");
+			robPtr->addSensor(senPtr);
+			senPtr->linkToRobot(robPtr);
 		}
 	}
 
@@ -122,19 +122,19 @@ void test_rtslam01(void) {
 		size_t rid = slamMapPtr->robotIds.getId();
 		shared_ptr<Robot3DConstantVelocity> robPtr(new Robot3DConstantVelocity(*slamMapPtr));
 
-		slamMapPtr->robots[rid] = robPtr;
-		robPtr->slamMap = slamMapPtr;
 		robPtr->id(rid);
 		robPtr->name("AEROPLANE");
+		slamMapPtr->addRobot(robPtr);
+		robPtr->linkToMap(slamMapPtr);
 
 		if (slamMapPtr->unusedStates(size_senPH)) {
 			size_t sid = slamMapPtr->sensorIds.getId();
 			shared_ptr<SensorPinHole> senPtr(new SensorPinHole(*robPtr));
 
-			robPtr->sensors[sid] = senPtr;
-			senPtr->robot = robPtr;
 			senPtr->id(sid);
 			senPtr->name("VIDERE");
+			robPtr->addSensor(senPtr);
+			senPtr->linkToRobot(robPtr);
 		}
 	}
 
@@ -144,10 +144,11 @@ void test_rtslam01(void) {
 			size_t lid = slamMapPtr->landmarkIds.getId();
 			shared_ptr<LandmarkAnchoredHomogeneousPoint> lmkPtr(new LandmarkAnchoredHomogeneousPoint(*slamMapPtr));
 
-			slamMapPtr->landmarks[lid] = lmkPtr;
-			lmkPtr->slamMap = slamMapPtr;
 			lmkPtr->id(lid);
 			lmkPtr->name("");
+
+			slamMapPtr->addLandmark(lmkPtr);
+			lmkPtr->linkToMap(slamMapPtr);
 		}
 	}
 
@@ -165,10 +166,10 @@ void test_rtslam01(void) {
 				shared_ptr<ObservationPinHoleAnchoredHomogeneousPoint> obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint());
 				size_t id = 1000*senPtr->id() + lmkPtr->id();
 				obsPtr->id() = id;
-				obsPtr->sensor = senPtr;
-				obsPtr->landmark = lmkPtr;
-				senPtr->observations[id] = obsPtr;
-				lmkPtr->observations[id] = obsPtr;
+				obsPtr->linkToSensor(senPtr);
+				obsPtr->linkToLandmark(lmkPtr);
+				senPtr->addObservation(obsPtr);
+				lmkPtr->addObservation(obsPtr);
 			}
 		}
 	}

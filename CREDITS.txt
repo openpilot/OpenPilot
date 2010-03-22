@@ -28,8 +28,12 @@ E: peter (at) pyne (dot) se
 D: Multiple GCS plugins, Gadget foundations and GCS core work
 
 N: Thorsten Klose
-E: thorsten.klose (at) dmx.de
+E: thorsten.klose (at) dmx (dot) de
 D: Embedded STM32 infrastructure  
+
+N: Ken Northup
+E: helos360 (at) bellsouth (dot) net
+D: 3D Modelling for the GCS  
 
 N: Angus Peart
 E: gussy (at) openpilot (dot) org
@@ -43,7 +47,7 @@ D: Graphic Design, OpenPilot Logo
 
 N: Julien Rouviere
 E: julien.rouviere (at) gmail (dot) com
-D: GCS Core developer
+D: GCS Core developer & Team Leader
 D: GCS Framework and Plugins for the GCS
 
 N: Zik Saleeba

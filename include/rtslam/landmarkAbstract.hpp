@@ -19,6 +19,7 @@
 
 /**
  * \file landmarkAbstract.hpp
+ * \author jsola@laas.fr
  * File defining the abstract landmark class
  * \ingroup rtslam
  */

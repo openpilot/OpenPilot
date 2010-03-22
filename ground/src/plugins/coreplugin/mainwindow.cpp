@@ -34,7 +34,6 @@
 #include "coreconstants.h"
 #include "fancytabwidget.h"
 #include "generalsettings.h"
-#include "ifilefactory.h"
 #include "messagemanager.h"
 #include "modemanager.h"
 #include "mimedatabase.h"
@@ -53,7 +52,6 @@
 #include "dialogs/iwizard.h"
 #include "rightpane.h"
 #include "baseview.h"
-#include "basefilewizard.h"
 #include "ioutputpane.h"
 #include "icorelistener.h"
 

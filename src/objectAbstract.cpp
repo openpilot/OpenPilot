@@ -10,6 +10,8 @@
  * \ingroup rtslam
  */
 
+#include <iostream>
+
 #include "rtslam/objectAbstract.hpp"
 
 namespace jafar {

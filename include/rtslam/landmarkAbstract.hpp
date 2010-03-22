@@ -27,7 +27,6 @@
 #ifndef __LandmarkAbstract_H__
 #define __LandmarkAbstract_H__
 
-#include <boost/shared_ptr.hpp>
 #include "rtslam/rtSlam.hpp"
 
 // include parents

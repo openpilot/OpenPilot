@@ -33,8 +33,6 @@
 
 #include <jmath/jblas.hpp>
 
-#include <boost/shared_ptr.hpp>
-
 #include "rtslam/rtSlam.hpp"
 // include parents
 #include "rtslam/objectAbstract.hpp"

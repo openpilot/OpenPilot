@@ -9,15 +9,13 @@
  * \ingroup rtslam
  */
 
+
 #ifndef SENSORABSTRACT_H_
 #define SENSORABSTRACT_H_
 
 /* --------------------------------------------------------------------- */
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
-
-#include <map>
-#include <boost/shared_ptr.hpp>
 
 #include "jmath/jblas.hpp"
 #include "rtslam/rtSlam.hpp"

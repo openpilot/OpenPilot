@@ -13,7 +13,8 @@
 #ifndef OBJECTABSTRACT_HPP_
 #define OBJECTABSTRACT_HPP_
 
-#include <iostream>
+#include <string>
+
 #include "rtslam/rtSlam.hpp"
 
 namespace jafar {

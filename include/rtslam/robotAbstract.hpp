@@ -33,9 +33,6 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#include <map>
-#include <boost/shared_ptr.hpp>
-
 #include <jmath/jblas.hpp>
 
 #include "rtslam/rtSlam.hpp"

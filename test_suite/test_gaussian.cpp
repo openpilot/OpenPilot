@@ -409,11 +409,24 @@ void test_gaussian04() {
 
 }
 
+void test_gaussian05(){
+	Gaussian G(3);
+	randVector(G.x());
+	randMatrix(G.P());
+	cout << "x = " << (MATLAB) G.x() << endl;
+	cout << "P = " << (MATLAB) G.P() << endl;
+	cout << "NEES_mat = x'*P^-1*x" << endl;
+	double NEES = jmath::ublasExtra::prod_xt_P_x(G.P(),G.x());
+	cout << "NEES = " << NEES << endl;
+	cout << "NEES_err = NEES - NEES_mat" << endl;
+}
+
 BOOST_AUTO_TEST_CASE( test_gaussian )
 {
 	test_gaussian01();
 	test_gaussian02();
 	test_gaussian03();
 	test_gaussian04();
+	test_gaussian05();
 }
 

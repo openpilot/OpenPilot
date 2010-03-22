@@ -178,7 +178,7 @@ void test_indirect_array02(void) {
 	ssv << "[10](0,1,0,1,0,0,1,1,0,1)";
 	ssv >> ba;
 	cout << "ba    : " << ba << endl;
-	jblas::ind_array iset = jafar::jmath::ublasExtra::ia_set(ba);
+	jblas::ind_array iset = jafar::jmath::ublasExtra::ia_bool(ba);
 	cout << "iset  = " << iset << endl;
 	jblas::ind_array irng = ublasExtra::ia_range(0, 4);
 	cout << "irng  = " << irng << endl;

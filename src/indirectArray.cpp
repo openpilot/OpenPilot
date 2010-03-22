@@ -104,7 +104,7 @@ namespace jafar {
 			/**
 			 * Create array from a boolean vector
 			 */
-			jblas::ind_array ia_set(const jblas::vecb & vb) {
+			jblas::ind_array ia_bool(const jblas::vecb & vb) {
 				int nb = 0;
 				for (size_t i = 0; i < vb.size(); i++)
 					if (vb(i))

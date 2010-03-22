@@ -71,7 +71,7 @@ namespace jafar {
 			 * \param vb a boolean vector
 			 * \return the indirect array
 			 */
-			jblas::ind_array ia_set(const jblas::vecb & vb);
+			jblas::ind_array ia_bool(const jblas::vecb & vb);
 
 			/**
 			 * Create indirect array from boolean vector and take the head N elements

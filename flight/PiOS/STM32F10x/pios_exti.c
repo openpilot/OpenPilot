@@ -42,11 +42,11 @@ void EXTI15_10_IRQHandler(void)
 {
 #if defined(PIOS_INCLUDE_BMP085)
 	if(EXTI_GetITStatus(PIOS_BMP085_EOC_EXTI_LINE) != RESET) {
-		/* Read the ADC Value */
-		xSemaphoreGiveFromISR(PIOS_BMP085_EOC, &xHigherPriorityTaskWoken);
-
 		/* Clear the EXTI line pending bit */
 		EXTI_ClearITPendingBit(PIOS_BMP085_EOC_EXTI_LINE);
+
+		/* Read the ADC Value */
+		xSemaphoreGiveFromISR(PIOS_BMP085_EOC, &xHigherPriorityTaskWoken);
 	}
 #endif
 }
@@ -59,8 +59,6 @@ void EXTI15_10_IRQHandler(void)
 void EXTI4_IRQHandler(void)
 {
 	if(EXTI_GetITStatus(PIOS_USB_DETECT_EXTI_LINE) != RESET) {
-
-
 		/* Clear the EXTI line pending bit */
 		EXTI_ClearITPendingBit(PIOS_USB_DETECT_EXTI_LINE);
 	}

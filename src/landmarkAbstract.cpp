@@ -28,7 +28,7 @@ namespace jafar {
 			categoryName("LANDMARK");
 		}
 
-		void LandmarkAbstract::addObservation(observation_ptr_t _obsPtr) {
+		void LandmarkAbstract::linkToObservation(observation_ptr_t _obsPtr) {
 			observations[_obsPtr->id()] = _obsPtr;
 		}
 

@@ -95,7 +95,7 @@ void test_rtslam01(void) {
 
 		robPtr->id(rid);
 		robPtr->name("SUBMARINE");
-		slamMapPtr->addRobot(robPtr);
+		slamMapPtr->linkToRobot(robPtr);
 		robPtr->linkToMap(slamMapPtr);
 
 		if (slamMapPtr->unusedStates(size_senPH)) {
@@ -104,7 +104,7 @@ void test_rtslam01(void) {
 
 			senPtr->id(sid);
 			senPtr->name("FLEA");
-			robPtr->addSensor(senPtr);
+			robPtr->linkToSensor(senPtr);
 			senPtr->linkToRobot(robPtr);
 		}
 		if (slamMapPtr->unusedStates(size_senPH)) {
@@ -113,7 +113,7 @@ void test_rtslam01(void) {
 
 			senPtr->id(sid);
 			senPtr->name("MARLIN");
-			robPtr->addSensor(senPtr);
+			robPtr->linkToSensor(senPtr);
 			senPtr->linkToRobot(robPtr);
 		}
 	}
@@ -124,7 +124,7 @@ void test_rtslam01(void) {
 
 		robPtr->id(rid);
 		robPtr->name("AEROPLANE");
-		slamMapPtr->addRobot(robPtr);
+		slamMapPtr->linkToRobot(robPtr);
 		robPtr->linkToMap(slamMapPtr);
 
 		if (slamMapPtr->unusedStates(size_senPH)) {
@@ -133,7 +133,7 @@ void test_rtslam01(void) {
 
 			senPtr->id(sid);
 			senPtr->name("VIDERE");
-			robPtr->addSensor(senPtr);
+			robPtr->linkToSensor(senPtr);
 			senPtr->linkToRobot(robPtr);
 		}
 	}
@@ -147,7 +147,7 @@ void test_rtslam01(void) {
 			lmkPtr->id(lid);
 			lmkPtr->name("");
 
-			slamMapPtr->addLandmark(lmkPtr);
+			slamMapPtr->linkToLandmark(lmkPtr);
 			lmkPtr->linkToMap(slamMapPtr);
 		}
 	}
@@ -168,8 +168,8 @@ void test_rtslam01(void) {
 				obsPtr->id() = id;
 				obsPtr->linkToSensor(senPtr);
 				obsPtr->linkToLandmark(lmkPtr);
-				senPtr->addObservation(obsPtr);
-				lmkPtr->addObservation(obsPtr);
+				senPtr->linkToObservation(obsPtr);
+				lmkPtr->linkToObservation(obsPtr);
 			}
 		}
 	}

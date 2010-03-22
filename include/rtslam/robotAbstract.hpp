@@ -104,7 +104,7 @@ namespace jafar {
 				/**
 				 * Add a sensor to this robot
 				 */
-				void addSensor(sensor_ptr_t _senPtr);
+				void linkToSensor(sensor_ptr_t _senPtr);
 
 				/**
 				 * Link To Map

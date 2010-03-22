@@ -146,7 +146,7 @@ namespace jafar {
 				/**
 				 * Add an observation
 				 */
-				void addObservation(observation_ptr_t _obsPtr);
+				void linkToObservation(observation_ptr_t _obsPtr);
 
 				/**
 				 * Link to robot

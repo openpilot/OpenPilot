@@ -58,7 +58,7 @@ namespace jafar {
 		/*
 		 * Add a sensor to this robot
 		 */
-		void RobotAbstract::addSensor(sensor_ptr_t _senPtr) {
+		void RobotAbstract::linkToSensor(sensor_ptr_t _senPtr) {
 			sensors[_senPtr->id()] = _senPtr;
 		}
 

@@ -97,7 +97,7 @@ namespace jafar {
 			categoryName("SENSOR");
 		}
 
-		void SensorAbstract::addObservation(observation_ptr_t _obsPtr){
+		void SensorAbstract::linkToObservation(observation_ptr_t _obsPtr){
 			observations[_obsPtr->id()] = _obsPtr;
 		}
 

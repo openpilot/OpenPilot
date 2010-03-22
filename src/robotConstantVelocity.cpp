@@ -31,9 +31,10 @@ namespace jafar {
 			RobotAbstract(_map, Robot3DConstantVelocity::size(), Robot3DConstantVelocity::size_control()) {
 			// Build constant perturbation Jacobian
 			jblas::identity_mat I(3);
-			F_u.clear();
-			ublas::subrange(F_u, 7, 10, 0, 3) = I;
-			ublas::subrange(F_u, 10, 13, 3, 6) = I;
+			dx_by_dcontrol.clear();
+			ublas::subrange(dx_by_dcontrol, 7, 10, 0, 3) = I;
+			ublas::subrange(dx_by_dcontrol, 10, 13, 3, 6) = I;
+			RobotAbstract::computeStatePerturbation();
 			type("Constant-Velocity");
 		}
 
@@ -97,10 +98,10 @@ namespace jafar {
 
 
 			// Build transition Jacobian matrix F_r
-			F_r.assign(identity_mat(state.size()));
-			project(F_r, range(0, 3), range(7, 10)) = P_v;
-			project(F_r, range(3, 7), range(3, 7)) = Q_q;
-			project(F_r, range(3, 7), range(10, 13)) = Q_wdt * dt;
+			dx_by_dstate.assign(identity_mat(state.size()));
+			project(dx_by_dstate, range(0, 3), range(7, 10)) = P_v;
+			project(dx_by_dstate, range(3, 7), range(3, 7)) = Q_q;
+			project(dx_by_dstate, range(3, 7), range(10, 13)) = Q_wdt * dt;
 
 
 			// Build control Jacobian matrix F_u
@@ -111,6 +112,14 @@ namespace jafar {
 			// project(F_u, range(10,13), range(3,6)) = I_3;
 
 		}
+
+		/**
+		 * Retro-project perturbation to robot state.
+		 * The member matrix \a Q is constant and computed at construction time.
+		 * This function therefore cancels the Jacobian product defined in RobotAbstract::computeStatePerturbation().
+		 */
+		void computeStatePerturbation(){}
+
 
 	}
 }

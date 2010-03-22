@@ -91,13 +91,19 @@ namespace jafar {
 
 				Gaussian pose; ///< Robot pose
 
-				Control control; ///< Control vector
+				Control control; ///< Control Gaussian vector
 
-				jblas::mat F_r; ///< Jacobian wrt state
+				jblas::sym_mat Q; ///< Perturbation matrix in state space, Q = dx_by_dcontrol * control.P * trans(dx_by_dcontrol);
 
-				jblas::mat F_u; ///< Jacobian wrt control
+				jblas::mat dx_by_dstate; ///< Jacobian wrt state
+
+				jblas::mat dx_by_dcontrol; ///< Jacobian wrt control
 
 				static size_t size_control() {
+					return 0;
+				}
+
+				static size_t size_pert() {
 					return 0;
 				}
 
@@ -132,6 +138,13 @@ namespace jafar {
 					JFR_ASSERT(_u.size() == control.size(), "robotAbstract.hpp: move: wrong control size.");
 					control.x(_u);
 					move();
+				}
+
+				/**
+				 * Retro-project perturbation to robot state
+				 */
+				void computeStatePerturbation(){
+					Q = jmath::ublasExtra::prod_JPJt(control.P(),dx_by_dcontrol);
 				}
 
 		};

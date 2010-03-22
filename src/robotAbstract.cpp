@@ -48,8 +48,8 @@ namespace jafar {
 			MapObject(_map, _size_state),
 			pose(state, jmath::ublasExtra::ia_range(0,7)),
 			control(_size_control),
-			F_r(_size_state, _size_state),
-			F_u(_size_state, _size_control)
+			dx_by_dstate(_size_state, _size_state),
+			dx_by_dcontrol(_size_state, _size_control)
 		{
 			categoryName("ROBOT"); // robot is categorized
 		}

@@ -89,7 +89,7 @@ namespace jafar {
 				 */
 				observations_ptr_set_t observations;
 
-				inline void addObservation(observation_ptr_t _obsPtr);
+				void addObservation(observation_ptr_t _obsPtr);
 
 				/**
 				 * Link To Map

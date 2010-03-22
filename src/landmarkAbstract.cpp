@@ -28,16 +28,13 @@ namespace jafar {
 			categoryName("LANDMARK");
 		}
 
-		inline void LandmarkAbstract::addObservation(observation_ptr_t _obsPtr) {
+		void LandmarkAbstract::addObservation(observation_ptr_t _obsPtr) {
 			observations[_obsPtr->id()] = _obsPtr;
 		}
 
-		void LandmarkAbstract::linkToMap(map_ptr_t _mapPtr){
+		void LandmarkAbstract::linkToMap(map_ptr_t _mapPtr) {
 			slamMap = _mapPtr;
 		}
-
-
-
 
 	}
 }

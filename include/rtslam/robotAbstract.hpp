@@ -19,7 +19,10 @@
 
 /**
  * \file robotAbstract.hpp
+ * \author: jsola@laas.fr
+ *
  * File defining the abstract robot class
+ *
  * \ingroup rtslam
  */
 

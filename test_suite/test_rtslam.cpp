@@ -6,7 +6,10 @@
  *
  *  \file test_rtslam.cpp
  *
- *  ## Add a description here ##
+ *  This test file acts as a main() program for the rtslam project.
+ *
+ *  Achievements (newest to oldest):
+ *  - 2010/03/22: jsola: Created 1 map, 2 robots, 3 sensors, 2 landmarks, 6 observations, with parental links and print.
  *
  * \ingroup rtslam
  */

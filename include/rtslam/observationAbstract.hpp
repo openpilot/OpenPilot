@@ -20,6 +20,7 @@
 /**
  * \file observationAbstract.hpp
  * File defining the abstract observation class
+ * \author jsola@laas.fr
  * \ingroup rtslam
  */
 

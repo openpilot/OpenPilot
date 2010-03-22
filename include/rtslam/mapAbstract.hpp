@@ -1,14 +1,11 @@
 /*
- * mapAbstract.hpp
- *
- *     Project: jafar
- *  Created on: Feb 9, 2010
- *      Author: jsola
- */
-
-/**
  * \file mapAbstract.hpp
- * File defining the abstract map class
+ *
+ *  Created on: Feb 9, 2010
+ *     \author jsola@laas.fr
+ *
+ * Header file for abstract maps
+ *
  * \ingroup rtslam
  */
 

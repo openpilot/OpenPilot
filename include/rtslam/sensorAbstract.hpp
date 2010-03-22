@@ -1,13 +1,11 @@
 /*
- * sensorAbstract.h
+ * \file sensorAbstract.h
+ *
+ * Header file for the abstract sensor.
  *
  *  Created on: Jan 28, 2010
- *      Author: jsola
- */
-
-/**
- * \file sensorAbstract.hpp
- * File defining the abstract sensor class
+ *     \author: jsola
+ *
  * \ingroup rtslam
  */
 

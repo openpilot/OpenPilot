@@ -1,12 +1,10 @@
 /**
- * kalmanFilter.hpp
- *
- *  Created on: 04/03/2010
- *      Author: jsola
- *
  *  \file kalmanFilter.hpp
  *
- *  ## Add a description here ##
+ * Header file for the kalman filter
+ *
+ *  Created on: 04/03/2010
+ *     \author jsola
  *
  * \ingroup rtslam
  */

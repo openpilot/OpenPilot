@@ -1,12 +1,10 @@
 /**
- * mapObject.hpp
- *
- *  Created on: 13/03/2010
- *      Author: jsola
- *
  *  \file mapObject.hpp
  *
- *  ## Add a description here ##
+ *  Created on: 13/03/2010
+ *     \author: jsola
+ *
+ *  Header file for mappable objects
  *
  * \ingroup rtslam
  */

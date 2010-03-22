@@ -1,12 +1,11 @@
 /*
- * robotConstantVelocity.hpp
+ * \file robotConstantVelocity.hpp
+ *
+ * Header file for the robot with constant velocity motion model.
  *
  *  Created on: 14/02/2010
- *      Author: jsola
- */
-
-/**
- * \file robotConstantVelocity.hpp
+ *     \author: jsola
+ *
  * \ingroup rtslam
  */
 

@@ -1,8 +1,10 @@
 /**
  * \file sensorPinHole.hpp
  *
+ * Header file for pin-hole sensor.
+ *
  *  Created on: 14/02/2010
- *      Author: jsola
+ *      \author: jsola
  *
  * \ingroup rtslam
  */

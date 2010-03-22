@@ -1,11 +1,11 @@
 /**
  * \file rtSlam.hpp
  *
+ *  This file defines general typedefs and material for the whole rtslam project.
+ *
  *  Created on: 21/03/2010
  *     \author: jsola@laas.fr
  *
- *
- *  This file defines general typedefs and material for the whole rtslam project.
  *
  * \ingroup rtslam
  */

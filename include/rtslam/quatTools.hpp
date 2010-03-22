@@ -1,14 +1,13 @@
 /**
- * quatTools.hpp
- *
- *  Created on: 20/02/2010
- *      Author: jsola
  *
  * \file quatTools.hpp
  * \author jsola
  * File defining geometric operations with quaternions.
+ *
  * Quaternions operate on vectors and other quaternions.
  * Functions for Jacobian computations are also provided.
+ *
+ *  Created on: 20/02/2010
  *
  * \ingroup rtslam
  */

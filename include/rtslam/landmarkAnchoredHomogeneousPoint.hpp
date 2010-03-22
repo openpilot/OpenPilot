@@ -1,11 +1,9 @@
 /**
- * landmarkAnchoredHomogeneousPoint.hpp
- *
- *  Created on: 14/02/2010
- *      Author: jsola
- *
  * \file landmarkAnchoredHomogeneousPoint.hpp
  * \author jsola
+ *  Created on: 14/02/2010
+ *
+ * Header file for anchored homogeneous point
  * \ingroup rtslam
  */
 

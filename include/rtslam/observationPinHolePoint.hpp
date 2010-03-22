@@ -1,12 +1,11 @@
 /**
- * observationPinHolePoint.hpp
- *
- *  Created on: 14/03/2010
- *      Author: jsola
  *
  *  \file observationPinHolePoint.hpp
  *
- *  ## Add a description here ##
+ *  Header file for observations of points from pin-hole camera sensors.
+ *
+ *  Created on: 14/03/2010
+ *     \author: jsola@laas.fr
  *
  * \ingroup rtslam
  */

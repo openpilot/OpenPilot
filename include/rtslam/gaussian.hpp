@@ -7,6 +7,7 @@
 
 /**
  * \file gaussian.hpp
+ * \author jsola@laas.fr, croussil@laas.fr
  * File defining the gaussian classes
  * \ingroup rtslam
  */

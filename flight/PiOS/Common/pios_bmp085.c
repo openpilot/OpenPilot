@@ -24,20 +24,6 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-/*
-Example of how to use this module:
-	PIOS_BMP085_Init();
-	
-	PIOS_BMP085_StartADC(Temperature);
-		(Interrupt reads the ADC)
-	
-	Somewhere in between these 2 calls we need to wait for the first one to finish
-	
-	PIOS_BMP085_StartADC(Pressure);
-		(Interrupt reads the ADC)
-	
-	PIOS_BMP085_GetValues(&Pressure, &Altitude, &Temperature);
-*/
 
 /* Project Includes */
 #include "pios.h"
@@ -165,20 +151,22 @@ void PIOS_BMP085_ReadADC(void)
 
 		B6 = B5 - 4000;
 		X1 = (CalibData.B2 * (B6 * B6 >> 12)) >> 11;
+		Pressure = X1;
+		/*
 		X2 = CalibData.AC2 * B6 >> 11;
 		X3 = X1 + X2;
-		B3 = ((((int32_t) CalibData.AC1 * 4 + X3) << BMP085_OVERSAMPLING) + 2) >> 2;
+		B3 = ((((int32_t)CalibData.AC1 * 4 + X3) << BMP085_OVERSAMPLING) + 2) >> 2;
 		X1 = CalibData.AC3 * B6 >> 13;
 		X2 = (CalibData.B1 * (B6 * B6 >> 12)) >> 16;
 		X3 = ((X1 + X2) + 2) >> 2;
 		B4 = (CalibData.AC4 * (uint32_t) (X3 + 32768)) >> 15;
-		B7 = ((uint32_t) RawPressure - B3) * (50000 >> BMP085_OVERSAMPLING);
+		B7 = ((uint32_t)RawPressure - B3) * (50000 >> BMP085_OVERSAMPLING);
 		P = B7 < 0x80000000 ? (B7 * 2) / B4 : (B7 / B4) * 2;
 
 		X1 = (P >> 8) * (P >> 8);
 		X1 = (X1 * 3038) >> 16;
 		X2 = (-7357 * P) >> 16;
-		Pressure = P + ((X1 + X2 + 3791) >> 4);
+		Pressure = P + ((X1 + X2 + 3791) >> 4);*/
 	}
 }
 
@@ -258,22 +246,6 @@ int32_t PIOS_BMP085_Write(uint8_t address, uint8_t buffer)
 	
 	/* Return error status */
 	return error < 0 ? -1 : 0;
-}
-
-
-/**
-* This function handles External lines 15 to 10 interrupt request
-*/
-void EXTI15_10_IRQHandler(void)
-{
-	if(EXTI_GetITStatus(PIOS_BMP085_EOC_EXTI_LINE) != RESET) {
-		/* Read the ADC Value */
-		//PIOS_BMP085_ReadADC();
-		xSemaphoreGiveFromISR(PIOS_BMP085_EOC, &xHigherPriorityTaskWoken);
-		
-		/* Clear the EOC EXTI line pending bit */
-		EXTI_ClearITPendingBit(PIOS_BMP085_EOC_EXTI_LINE);
-	}
 }
 
 #endif

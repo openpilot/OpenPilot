@@ -29,7 +29,9 @@
 #include "pios.h"
 
 #if defined(PIOS_INCLUDE_BMP085)
-
+#if !defined(PIOS_INCLUDE_EXTI)
+#error PIOS_EXTI Must be included in the project!
+#endif
 
 /* Glocal Variables */
 ConversionTypeTypeDef CurrentRead;
@@ -151,8 +153,6 @@ void PIOS_BMP085_ReadADC(void)
 
 		B6 = B5 - 4000;
 		X1 = (CalibData.B2 * (B6 * B6 >> 12)) >> 11;
-		Pressure = X1;
-		/*
 		X2 = CalibData.AC2 * B6 >> 11;
 		X3 = X1 + X2;
 		B3 = ((((int32_t)CalibData.AC1 * 4 + X3) << BMP085_OVERSAMPLING) + 2) >> 2;
@@ -166,7 +166,7 @@ void PIOS_BMP085_ReadADC(void)
 		X1 = (P >> 8) * (P >> 8);
 		X1 = (X1 * 3038) >> 16;
 		X2 = (-7357 * P) >> 16;
-		Pressure = P + ((X1 + X2 + 3791) >> 4);*/
+		Pressure = P + ((X1 + X2 + 3791) >> 4);
 	}
 }
 
@@ -203,12 +203,10 @@ int32_t PIOS_BMP085_Read(uint8_t address, uint8_t *buffer, uint8_t len)
 	uint8_t addr_buffer[1] = {(uint8_t)address};
 	int32_t error = PIOS_I2C_Transfer(I2C_Write_WithoutStop, BMP085_I2C_ADDR, addr_buffer, 1);
 
-
 	/* Now receive byte(s) */
 	if(!error) {
 		error = PIOS_I2C_Transfer(I2C_Read, BMP085_I2C_ADDR, buffer, len);
 	}
-
 
 	/* Release I2C peripheral */
 	PIOS_I2C_UnlockDevice();

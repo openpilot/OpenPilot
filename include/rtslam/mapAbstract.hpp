@@ -81,7 +81,7 @@ namespace jafar {
 				/**
 				 * A set of robots
 				 */
-				jafar::rtslam::robots_ptr_set_t robots;
+				robots_ptr_set_t robots;
 
 				/**
 				 * A set of landmarks

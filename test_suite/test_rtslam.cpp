@@ -199,8 +199,7 @@ void test_rtslam01(void) {
 	cout << "\n% POINTERS \n%=============" << endl;
 	cout << slamMapPtr << " <= slamMapPtr" << endl;
 	cout << slamMapPtr->robots[1]->slamMap << " <= slamMapPtr->robots[1]->slamMap" << endl;
-	cout << slamMapPtr->robots[1]->sensors[1]->robot->slamMap << " <= slamMapPtr->robots[1]->sensors[1]->robot->slamMap"
-	    << endl;
+	cout << slamMapPtr->robots[1]->sensors[1]->robot->slamMap << " <= slamMapPtr->robots[1]->sensors[1]->robot->slamMap" << endl;
 	cout << slamMapPtr->landmarks[1]->slamMap << " <= slamMapPtr->landmarks[1]->slamMap" << endl;
 	cout << slamMapPtr->robots[1] << " <= slamMapPtr->robots[1]" << endl;
 	cout << slamMapPtr->robots[1]->sensors[1] << " <= slamMapPtr->robots[1]->sensors[1]" << endl;

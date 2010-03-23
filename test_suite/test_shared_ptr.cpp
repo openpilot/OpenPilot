@@ -29,8 +29,7 @@ using namespace std;
 class Linked;
 typedef shared_ptr<Linked> link_t;
 typedef boost::numeric::ublas::vector<link_t> linksVec_t;
-typedef std::list<link_t> linksList_t;
-typedef std::map<size_t,link_t> linksMap_t;
+typedef weak_ptr<Linked> wklink_t;
 
 class Linked {
 	public:

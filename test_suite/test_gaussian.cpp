@@ -406,7 +406,6 @@ void test_gaussian04() {
 	cout << "% Gaussian Gr2(Gr, ia);" << endl;
 	Gaussian Gr2(Gr, ia);
 	cout << "Gr2  : " << Gr2 << endl;
-
 }
 
 void test_gaussian05(){
@@ -417,7 +416,7 @@ void test_gaussian05(){
 	cout << "P = " << (MATLAB) G.P() << endl;
 	cout << "NEES_mat = x'*P^-1*x" << endl;
 	double NEES = jmath::ublasExtra::prod_xt_P_x(G.P(),G.x());
-	cout << "NEES = " << NEES << endl;
+	cout << "NEES = " << NEES << ";" << endl;
 	cout << "NEES_err = NEES - NEES_mat" << endl;
 }
 

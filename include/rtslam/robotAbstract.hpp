@@ -141,7 +141,7 @@ namespace jafar {
 				}
 
 				/**
-				 * Retro-project perturbation to robot state
+				 * Retro-project perturbation to robot state.
 				 */
 				void computeStatePerturbation(){
 					Q = jmath::ublasExtra::prod_JPJt(control.P(),dx_by_dcontrol);

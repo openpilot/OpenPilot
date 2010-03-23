@@ -67,20 +67,23 @@ static void TaskTesting(void *pvParameters)
 
 	for(;;)
 	{
-		uint16_t temp;
-		uint16_t pressure;
+		PIOS_LED_Toggle(LED2);
+
+		int16_t temp;
+		int32_t pressure;
 
 		PIOS_BMP085_StartADC(TemperatureConv);
 		xSemaphoreTake(PIOS_BMP085_EOC, xTimeout);
 		PIOS_BMP085_ReadADC();
-		temp = PIOS_BMP085_GetTemperature();
 
 		PIOS_BMP085_StartADC(PressureConv);
 		xSemaphoreTake(PIOS_BMP085_EOC, xTimeout);
 		PIOS_BMP085_ReadADC();
+
+		temp = PIOS_BMP085_GetTemperature();
 		pressure = PIOS_BMP085_GetPressure();
 
-		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "temp=%3u pressure=%4u\r", temp, pressure);
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%3u,%4u\r", temp, pressure);
 
 		vTaskDelay(xDelay);
 	}

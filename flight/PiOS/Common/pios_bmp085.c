@@ -102,7 +102,10 @@ void PIOS_BMP085_Init(void)
 	CalibData.MC =  (Data[18] << 8) | Data[19];
 	CalibData.MD =  (Data[20] << 8) | Data[21];
 
+	/* Semaphore used by ISR to signal End-Of-Conversion */
 	vSemaphoreCreateBinary(PIOS_BMP085_EOC);
+	/* Must start off empty so that first transfer waits for EOC */
+	xSemaphoreTake(PIOS_BMP085_EOC, portMAX_DELAY);
 }
 
 

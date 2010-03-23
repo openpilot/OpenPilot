@@ -8,7 +8,7 @@
 /**
  * \file gaussian.hpp
  * \author jsola@laas.fr, croussil@laas.fr
- * File defining the gaussian classes
+ * File defining the gaussian class.
  * \ingroup rtslam
  */
 
@@ -157,7 +157,7 @@ namespace jafar {
 				typedef enum {
 					REMOTE, ///< Mean and covariances point to an external pair {x,P}.
 					LOCAL, ///< Mean and covariances are stored in \a x_local and \a P_local.
-					UNCHANGED ///< Used only as the default flag for the copy constructor.
+					UNCHANGED ///< Used **only** as the default flag for the copy constructor.
 				} storage_t;
 
 			private:

@@ -17,6 +17,7 @@
 #include "boost/numeric/ublas/matrix_proxy.hpp"
 #include "boost/numeric/ublas/vector_proxy.hpp"
 #include "rtslam/quatTools.hpp"
+#include "rtslam/robotAbstract.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -45,31 +46,40 @@ namespace jafar {
 
 
 			/*
-			 * This motion model is defined by
+			 * This motion model is defined by:
+			 * The state vector, x = [p q v w] = [x y z, qw qx qy qz, vx vy vz, wx wy wz], of size 13.
+			 * The transition equation x+ = move(x,i), with i = [vi wi] the control impulse, decomposed as:
 			 * - p = p + v*dt
 			 * - q = q**(w*dt)    <-- ** : quaternion product
-			 * - v = v + vi       <-- vi : impulse in linear velocity
-			 * - w = w + wi       <-- wi : impulse in angular velocity
-			 * -----------------------------------------
+			 * - v = v + vi       <-- vi : impulse in linear velocity  - vi = [vix viy viz]
+			 * - w = w + wi       <-- wi : impulse in angular velocity - wi = [wix wiy wiz]
+			 * -----------------------------------------------------------------------------
 			 *
-			 * The Jacobian F_r is built with
-			 *          p    q     v     w    |
-			 *       -------------------------+---
-			 * F_r = [ I_3        P_v       ] | p
-			 *       [      Q_q         Q_w ] | q
-			 *       [            I_3       ] | v
-			 *       [                  I_3 ] | w
-			 * -----------------------------------------
+			 * The Jacobian dx_by_dstate is built with
+			 *				           p    q     v     w    |
+			 *				           0    3     7     10   |
+			 *      				---------------------------+------
+			 * dx_by_dstate = [ I_3        P_v       ] | 0  p
+			 *       					[      Q_q         Q_w ] | 3  q
+			 *       					[            I_3       ] | 7  v
+			 *       					[                  I_3 ] | 10 w
+			 * -----------------------------------------------------------------------------
 			 *
-			 * The Jacobian F_u is built with
-			 *          vi     wi   |
-			 *       ---------------+---
-			 * F_u = [            ] | p
-			 *       [            ] | q
-			 *       [ I_3        ] | v
-			 *       [        I_3 ] | w
+			 * The Jacobian dx_by_dcontrol is built with
+			 *          					 vi     wi   |
+			 *                     0      3    |
+			 *       					-----------------+------
+			 * dx_by_dcontrol = [            ] | 0  p
+			 *                  [            ] | 3  q
+			 *       						[ I_3        ] | 7  v
+			 *       						[        I_3 ] | 10 w
 			 * this Jacobian is however constant and is computed once at Construction time.
-			 * -----------------------------------------
+			 *
+			 * NOTE: The also constant perturbation matrix:
+			 *    Q = dx_by_dcontrol * control.P * trans(dx_by_dcontrol)
+			 * could be built also once after construction with initStatePerturbation().
+			 * This is up to the user -- if nothing is done, Q will be computed at each iteration.
+			 * -----------------------------------------------------------------------------
 			 */
 
 			// split robot state vector
@@ -77,6 +87,11 @@ namespace jafar {
 			vec4 q;
 			splitState(p, q, v, w);
 			double dt = control.dt;
+
+
+			// split control vector
+			vec3 vi, wi;
+			splitControl(vi, wi);
 
 
 			// Non-trivial Jacobian blocks
@@ -91,35 +106,33 @@ namespace jafar {
 			P_v = I_3 * dt;
 			vec4 q_old(q);
 			quaternion::qProd(q_old, w * dt, q, Q_q, Q_wdt);
-			// v and w are constant velocity ---> do not predict!
+			v += vi;
+			w += wi;
 
-			// Compose state
+
+			// Compose state - this is the output state.
 			composeState(p, q, v, w);
 
 
-			// Build transition Jacobian matrix F_r
+			// Build transition Jacobian matrix dx_by_dstate
 			dx_by_dstate.assign(identity_mat(state.size()));
 			project(dx_by_dstate, range(0, 3), range(7, 10)) = P_v;
 			project(dx_by_dstate, range(3, 7), range(3, 7)) = Q_q;
 			project(dx_by_dstate, range(3, 7), range(10, 13)) = Q_wdt * dt;
 
 
-			// Build control Jacobian matrix F_u
-			// NOTE: F_u is constant and it has been build in the constructor.
+			// Build control Jacobian matrix dx_by_dcontrol
+			// NOTE: dx_by_dcontrol is constant and it has been build in the constructor.
 			// NOTE: These lines below just for reference:
-			// F_u.clear();
-			// project(F_u, range(7,10), range(0,3)) = I_3;
-			// project(F_u, range(10,13), range(3,6)) = I_3;
+			// dx_by_dcontrol.clear();
+			// project(dx_by_dcontrol, range(7,10), range(0,3)) = I_3;
+			// project(dx_by_dcontrol, range(10,13), range(3,6)) = I_3;
 
 		}
 
-		/**
-		 * Retro-project perturbation to robot state.
-		 * The member matrix \a Q is constant and computed at construction time.
-		 * This function therefore cancels the Jacobian product defined in RobotAbstract::computeStatePerturbation().
-		 */
-		void computeStatePerturbation(){}
-
+		void Robot3DConstantVelocity::initStatePerturbation() {
+			RobotAbstract::computeStatePerturbation();
+		}
 
 	}
 }

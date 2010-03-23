@@ -59,6 +59,21 @@ namespace jafar {
 				 */
 				void move(void);
 
+				/**
+				 * Retro-project perturbation to robot state.
+				 * The member matrix \a Q is constant and computed once with initStatePerturbation().
+				 * This function cancels the Jacobian product defined in RobotAbstract::computeStatePerturbation().
+				 */
+				inline void computeStatePerturbation() {
+				}
+
+
+				/**
+				 * Initialize state perturbation.
+				 * This is used for constant perturbations therefore avoiding the Jacobian product at each iteration.
+				 */
+				void initStatePerturbation();
+
 				static size_t size(void) {
 					return 13;
 				}
@@ -101,6 +116,19 @@ namespace jafar {
 					ublas::subrange(state.x(), 3, 7) = q;
 					ublas::subrange(state.x(), 7, 10) = v;
 					ublas::subrange(state.x(), 10, 13) = w;
+				}
+
+				/**
+				 * Split control vector.
+				 *
+				 * Extracts impulses \a vi and \a wi from the control vector.
+				 * \param vi the linear impulse.
+				 * \param wi the angular impulse.
+				 */
+				template<class V>
+				inline void splitControl(V & vi, V & wi) {
+					vi = project(control.x(), ublas::range(0, 3));
+					wi = project(control.x(), ublas::range(0, 3));
 				}
 
 			private:

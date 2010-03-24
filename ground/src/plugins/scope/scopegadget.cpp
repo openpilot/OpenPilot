@@ -6,14 +6,11 @@
  */
 #include "scopegadget.h"
 #include "scopegadgetwidget.h"
-#include <QtGui/QToolBar>
 
-ScopeGadget::ScopeGadget(ScopeGadgetWidget *widget) :
-        IUAVGadget(widget),
-        m_widget(widget),
-        m_toolbar(new QToolBar())
+ScopeGadget::ScopeGadget(QString classId, QList<IUAVGadgetConfiguration*> *configurations, ScopeGadgetWidget *widget) :
+        IUAVGadget(classId, configurations, widget),
+        m_widget(widget)
 {
-    m_gadgetKind = QString("ScopeGadget");
 }
 
 ScopeGadget::~ScopeGadget()

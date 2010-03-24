@@ -9,10 +9,11 @@
 #include "scopegadget.h"
 #include <coreplugin/iuavgadget.h>
 
-ScopeGadgetFactory::ScopeGadgetFactory(QObject *parent) : IUAVGadgetFactory(parent)
+ScopeGadgetFactory::ScopeGadgetFactory(QObject *parent) :
+        IUAVGadgetFactory(QString("ScopeGadget"),
+                          tr("Scope Gadget"),
+                          parent)
 {
-    m_name = tr("Scope Gadget");
-    m_gadgetKind = QString("ScopeGadget");
 }
 
 ScopeGadgetFactory::~ScopeGadgetFactory()
@@ -20,7 +21,7 @@ ScopeGadgetFactory::~ScopeGadgetFactory()
 
 }
 
-Core::IUAVGadget* ScopeGadgetFactory::createUAVGadget(QWidget *parent) {
+Core::IUAVGadget* ScopeGadgetFactory::createUAVGadget(QList<IUAVGadgetConfiguration*> *configurations, QWidget *parent) {
         ScopeGadgetWidget* gadgetWidget = new ScopeGadgetWidget(parent);
-        return new ScopeGadget(gadgetWidget);
+        return new ScopeGadget(QString("ScopeGadget"), configurations, gadgetWidget);
 }

@@ -6,14 +6,11 @@
  */
 #include "mapgadget.h"
 #include "mapgadgetwidget.h"
-#include <QtGui/QToolBar>
 
-MapGadget::MapGadget(MapGadgetWidget *widget) :
-        IUAVGadget(widget),
-        m_widget(widget),
-        m_toolbar(new QToolBar())
+MapGadget::MapGadget(QString classId, QList<IUAVGadgetConfiguration*> *configurations, MapGadgetWidget *widget) :
+        IUAVGadget(classId, configurations, widget),
+        m_widget(widget)
 {
-    m_gadgetKind = QString("MapGadget");
 }
 
 MapGadget::~MapGadget()

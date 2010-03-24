@@ -7,12 +7,15 @@
 #include "mapgadgetfactory.h"
 #include "mapgadgetwidget.h"
 #include "mapgadget.h"
+#include "mapgadgetconfiguration.h"
+#include "mapgadgetoptionspage.h"
 #include <coreplugin/iuavgadget.h>
 
-MapGadgetFactory::MapGadgetFactory(QObject *parent) : IUAVGadgetFactory(parent)
+MapGadgetFactory::MapGadgetFactory(QObject *parent) :
+        IUAVGadgetFactory(QString("MapGadget"),
+                          tr("Map Gadget"),
+                          parent)
 {
-    m_name = tr("Map Gadget");
-    m_gadgetKind = QString("MapGadget");
 }
 
 MapGadgetFactory::~MapGadgetFactory()
@@ -20,7 +23,20 @@ MapGadgetFactory::~MapGadgetFactory()
 
 }
 
-Core::IUAVGadget* MapGadgetFactory::createUAVGadget(QWidget *parent) {
+Core::IUAVGadget* MapGadgetFactory::createUAVGadget(QList<IUAVGadgetConfiguration*> *configurations, QWidget *parent) {
 	MapGadgetWidget* gadgetWidget = new MapGadgetWidget(parent);
-	return new MapGadget(gadgetWidget);
+        return new MapGadget(QString("MapGadget"), configurations, gadgetWidget);
 }
+
+IUAVGadgetConfiguration *MapGadgetFactory::createUAVGadgetConfiguration(bool locked,
+                                                      const QString configName,
+                                                      const QByteArray &state)
+{
+    return new MapGadgetConfiguration(locked, QString("MapGadget"), configName, state);
+}
+
+UAVGadgetOptionsPage *MapGadgetFactory::createUAVGadgetOptionsPage(IUAVGadgetConfiguration *config)
+{
+    return new MapGadgetOptionsPage(config);
+}
+

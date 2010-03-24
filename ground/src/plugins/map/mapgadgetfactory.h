@@ -10,9 +10,12 @@
 
 #include <coreplugin/iuavgadgetfactory.h>
 
-using namespace Core;
+namespace Core {
 class IUAVGadget;
 class IUAVGadgetFactory;
+}
+
+using namespace Core;
 
 class MapGadgetFactory : public Core::IUAVGadgetFactory
 {
@@ -21,7 +24,11 @@ public:
     MapGadgetFactory(QObject *parent = 0);
     ~MapGadgetFactory();
 
-    Core::IUAVGadget *createUAVGadget(QWidget *parent);
+    Core::IUAVGadget *createUAVGadget(QList<IUAVGadgetConfiguration*> *configurations, QWidget *parent);
+    IUAVGadgetConfiguration *createUAVGadgetConfiguration(bool locked,
+                                                          const QString configName,
+                                                          const QByteArray &state);
+    UAVGadgetOptionsPage *createUAVGadgetOptionsPage(IUAVGadgetConfiguration *config);
 };
 
 #endif // MAPGADGETFACTORY_H_

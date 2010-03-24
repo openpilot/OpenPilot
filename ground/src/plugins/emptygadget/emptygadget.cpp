@@ -1,19 +1,36 @@
-/*
- * emptygadget.cpp
+/**
+ ******************************************************************************
  *
- *  Created on: Mar 11, 2010
- *      Author: peter
+ * @file       emptygadget.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @brief
+ * @see        The GNU Public License (GPL) Version 3
+ * @defgroup   emptygadget
+ * @{
+ *
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "emptygadget.h"
 #include "emptygadgetwidget.h"
-#include <QtGui/QToolBar>
 
-EmptyGadget::EmptyGadget(EmptyGadgetWidget *widget) :
-        IUAVGadget(widget),
-        m_widget(widget),
-        m_toolbar(new QToolBar())
+EmptyGadget::EmptyGadget(QString classId, QList<IUAVGadgetConfiguration*> *configurations, EmptyGadgetWidget *widget) :
+        IUAVGadget(classId, configurations, widget),
+        m_widget(widget)
 {
-    m_gadgetKind = QString("EmptyGadget");
 }
 
 EmptyGadget::~EmptyGadget()

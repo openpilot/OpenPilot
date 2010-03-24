@@ -92,12 +92,12 @@ namespace jafar {
 				map_ptr_t slamMap; ///< parent map
 				sensors_ptr_set_t sensors; ///<	A set of sensors
 
-				Gaussian pose; ///< Robot pose
+				Gaussian pose; ///< Robot Gaussian pose
 				Control control; ///< Control Gaussian vector
 
-				jblas::sym_mat Q; ///< Perturbation matrix in state space, Q = dx_by_dcontrol * control.P * trans(dx_by_dcontrol);
-				jblas::mat dx_by_dstate; ///< Jacobian wrt state
-				jblas::mat dx_by_dcontrol; ///< Jacobian wrt control
+				jblas::mat dxnew_by_dx; ///< Jacobian wrt state
+				jblas::mat dxnew_by_dcontrol; ///< Jacobian wrt control
+				jblas::sym_mat Q; ///< Perturbation matrix in state space, Q = dxnew_by_dcontrol * control.P * trans(dxnew_by_dcontrol);
 
 				static size_t size_control() {
 					return 0;
@@ -143,11 +143,26 @@ namespace jafar {
 
 
 				/**
-				 * Retro-project perturbation to robot state.
+				 * Compute robot process noise \a Q in state space.
+				 * This function is called at each iteration.
+				 * Overload it to an empty inline function if you know \a Q is constant,
+				 * and use initStatePerturbation() just once after contruction.
 				 */
 				void computeStatePerturbation() {
-					Q = jmath::ublasExtra::prod_JPJt(control.P(), dx_by_dcontrol);
+					Q = jmath::ublasExtra::prod_JPJt(control.P(), dxnew_by_dcontrol);
 				}
+
+				/**
+				 * Compute robot process noise \a Q in state space.
+				 * This function is only called once.
+				 * Use it just once after robot construction if you know \a Q is constant,
+				 * and overload computeStatePerturbation() to an empty inline.
+				 */
+				void initStatePerturbation() {
+					RobotAbstract::computeStatePerturbation();
+				}
+
+
 
 		};
 

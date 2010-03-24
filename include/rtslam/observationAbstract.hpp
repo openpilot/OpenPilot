@@ -45,6 +45,7 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
+
 		/** Base class for all landmark appearances defined in the module
 		 * rtslam.
 		 *
@@ -70,7 +71,6 @@ namespace jafar {
 
 			public:
 
-				typedef boost::shared_ptr<AppearanceAbstract> appearance_ptr_t;
 
 				/**
 				 * size constructor
@@ -227,7 +227,9 @@ namespace jafar {
 
 			public:
 
-				virtual ~ObservationAbstract(){}
+				virtual ~ObservationAbstract() {
+				}
+
 
 				/**
 				 * Size constructor
@@ -272,7 +274,7 @@ namespace jafar {
 				/**
 				 * Events
 				 */
-				struct {
+				struct events {
 						bool visible; ///< Landmark is visible
 						bool measured; ///< Feature is measured
 						bool matched; ///< Feature is matched
@@ -296,7 +298,6 @@ namespace jafar {
 				 * Link to landmark
 				 */
 				void linkToLandmark(landmark_ptr_t _lmkPtr);
-
 
 				/**
 				 * Project and get Jacobians

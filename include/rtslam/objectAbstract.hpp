@@ -34,8 +34,6 @@ namespace jafar {
 
 				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObjectAbstract & obj);
 
-			public:
-
 			private:
 				std::size_t id_;
 				std::string categoryName_;
@@ -80,9 +78,7 @@ namespace jafar {
 					id(_id);
 					name(_name);
 				}
-
 		};
-
 	}
 }
 

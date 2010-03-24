@@ -59,6 +59,8 @@ namespace jafar {
 				}
 		};
 
+		typedef boost::shared_ptr<AppearanceAbstract> appearance_ptr_t;
+
 
 		/** Base class for all Gaussian expectations defined in the module rtslam.
 		 *
@@ -107,8 +109,6 @@ namespace jafar {
 		 */
 		class Measurement: public Gaussian {
 			public:
-
-				typedef boost::shared_ptr<AppearanceAbstract> appearance_ptr_t;
 
 				inline void appearance(appearance_ptr_t _appearance);
 				inline appearance_ptr_t appearance();
@@ -263,7 +263,7 @@ namespace jafar {
 				/**
 				 * Counters
 				 */
-				struct {
+				struct counters {
 						int nSearch; ///< Number of searches
 						int nMatch; ///< number of matches
 						int nInlier; ///< Number of times declared inlier

@@ -31,33 +31,44 @@
 
 #include <coreplugin/icontext.h>
 #include <coreplugin/core_global.h>
+#include <QtGui/QComboBox>
 
 QT_BEGIN_NAMESPACE
 class QWidget;
+class QComboBox;
 QT_END_NAMESPACE
 
 namespace Core {
+
+class IUAVGadgetConfiguration;
 
 class CORE_EXPORT IUAVGadget : public IContext
 {
     Q_OBJECT
 public:
-    IUAVGadget(QObject *parent = 0) : IContext(parent) {}
+    IUAVGadget(QString classId, QList<IUAVGadgetConfiguration*> *configurations, QObject *parent = 0);
     virtual ~IUAVGadget() {}
 
     virtual QList<int> context() const = 0;
     virtual QWidget *widget() = 0;
     virtual QString contextHelpId() const { return QString(); }
-    virtual QString gadgetKind() { return m_gadgetKind; }
+    QString classId() const { return m_classId; }
 
-//    virtual void saveConfiguration() = 0;
-//    virtual void loadConfiguration(QString ) = 0;
-//    virtual QStringList getConfigurationNames() = 0;
-    virtual QWidget *toolBar() = 0;
-    virtual QByteArray saveState() { return 0; }
-    virtual void restoreState(QByteArray state) { }
-protected:
-    QString m_gadgetKind;
+    virtual void loadConfiguration(IUAVGadgetConfiguration* /*config*/) {}
+    QComboBox *toolBar() { return m_toolbar; }
+    virtual QByteArray saveState();
+    virtual void restoreState(QByteArray state);
+public slots:
+    void configurationChanged(IUAVGadgetConfiguration* config);
+    void configurationNameChanged(QString oldName, QString newName);
+private slots:
+    void loadConfiguration(int index);
+private:
+    QString m_classId;
+    QComboBox *m_toolbar;
+
+    IUAVGadgetConfiguration *m_activeConfiguration;
+    QList<IUAVGadgetConfiguration*> *m_configurations;
 };
 
 } // namespace Core

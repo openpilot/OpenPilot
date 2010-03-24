@@ -29,9 +29,6 @@
 #include "coreplugin.h"
 #include "coreimpl.h"
 #include "mainwindow.h"
-#include "modemanager.h"
-#include "uavgadgetmode.h"
-#include "uavgadgetmanager.h"
 
 #include <extensionsystem/pluginmanager.h>
 
@@ -46,13 +43,6 @@ CorePlugin::CorePlugin() :
 
 CorePlugin::~CorePlugin()
 {
-    if (m_uavGadgetModes.count() > 0) {
-        foreach (UAVGadgetMode *mode, m_uavGadgetModes)
-        {
-            removeObject(mode);
-            delete mode;
-        }
-    }
     delete m_mainWindow;
 }
 
@@ -68,28 +58,6 @@ bool CorePlugin::initialize(const QStringList &arguments, QString *errorMessage)
 
 void CorePlugin::extensionsInitialized()
 {
-    // Workspace 1
-    UAVGadgetMode *uavGadgetMode;
-    UAVGadgetManager *m_uavGadgetManager;
-    m_uavGadgetManager = new UAVGadgetManager(CoreImpl::instance(), m_mainWindow);
-    m_uavGadgetManager->hide();
-    uavGadgetMode = new UAVGadgetMode(m_uavGadgetManager, QString(tr("Workspace 1")),
-                                      QIcon(":/core/images/openpilot_logo_64.png"), 90, QString("Mode1"));
-    m_uavGadgetManager->setUAVGadgetMode(uavGadgetMode);
-    m_uavGadgetModes.append(uavGadgetMode);
-    addObject(uavGadgetMode);
-    m_mainWindow->addUAVGadgetManager(m_uavGadgetManager);
-
-    // Workspace 2
-    m_uavGadgetManager = new UAVGadgetManager(CoreImpl::instance(), m_mainWindow);
-    m_uavGadgetManager->hide();
-    uavGadgetMode = new UAVGadgetMode(m_uavGadgetManager, QString(tr("Workspace 2")),
-                                      QIcon(":/core/images/plus.png"), 60, QString("Mode2"));
-    m_uavGadgetManager->setUAVGadgetMode(uavGadgetMode);
-    m_uavGadgetModes.append(uavGadgetMode);
-    addObject(uavGadgetMode);
-    m_mainWindow->addUAVGadgetManager(m_uavGadgetManager);
-
     m_mainWindow->extensionsInitialized();
 }
 

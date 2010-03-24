@@ -419,14 +419,6 @@ void UAVGadgetManager::updateActions()
     m_d->m_gotoOtherSplitAction->setEnabled(shown && hasSplitter);
 }
 
-UAVGadgetFactoryList UAVGadgetManager::uavGadgetFactories() const
-{
-    UAVGadgetFactoryList rc = pluginManager()->getObjects<Core::IUAVGadgetFactory>();
-    //if (debugUAVGadgetManager)
-        //qDebug() << Q_FUNC_INFO << rc;
-    return rc;
-}
-
 QByteArray UAVGadgetManager::saveState() const
 {
     QByteArray bytes;
@@ -474,10 +466,10 @@ void UAVGadgetManager::saveSettings()
 
     QSettings *qs = m_d->m_core->settings();
     // The idea is to have a default setting that is only written once
-    if (!qs->contains(defaultUAVGadgetManagerKey.toLatin1()))
-        qs->setValue(defaultUAVGadgetManagerKey.toLatin1(), saveState().toBase64());
+    if (!qs->contains(defaultUAVGadgetManagerKey))
+        qs->setValue(defaultUAVGadgetManagerKey, saveState().toBase64());
     else
-        qs->setValue(uavGadgetManagerKey.toLatin1(), saveState().toBase64());
+        qs->setValue(uavGadgetManagerKey, saveState().toBase64());
 }
 
 void UAVGadgetManager::readSettings()
@@ -487,10 +479,10 @@ void UAVGadgetManager::readSettings()
 
     QSettings *qs = m_d->m_core->settings();
     QString key("");
-    if (qs->contains(uavGadgetManagerKey.toLatin1()))
-        key = uavGadgetManagerKey.toLatin1();
-    else if (qs->contains(defaultUAVGadgetManagerKey.toLatin1()))
-        key = defaultUAVGadgetManagerKey.toLatin1();
+    if (qs->contains(uavGadgetManagerKey))
+        key = uavGadgetManagerKey;
+    else if (qs->contains(defaultUAVGadgetManagerKey))
+        key = defaultUAVGadgetManagerKey;
     else
         return;
     const QVariant &managerSettings = qs->value(key);

@@ -47,7 +47,6 @@ namespace Core {
 class IContext;
 class ICore;
 class IUAVGadget;
-class IUAVGadgetFactory;
 class IMode;
 
 struct UAVGadgetManagerPrivate;
@@ -78,8 +77,6 @@ private:
     UAVGadgetManagerPlaceHolder* m_current;
 };
 
-typedef QList<IUAVGadgetFactory*> UAVGadgetFactoryList;
-
 
 class CORE_EXPORT UAVGadgetManager : public QWidget
 {
@@ -104,8 +101,6 @@ public:
     void saveSettings();
     void readSettings();
     bool toolbarsShown() { return m_showToolbars; }
-
-    UAVGadgetFactoryList uavGadgetFactories() const;
 
 signals:
     void currentUAVGadgetChanged(IUAVGadget *gadget);

@@ -55,7 +55,10 @@ SOURCES += mainwindow.cpp \
     settingsdatabase.cpp \
     eventfilteringmainwindow.cpp \
     connectionmanager.cpp \
-    iconnection.cpp
+    iconnection.cpp \
+    uavgadgetoptionspage.cpp \
+    iuavgadgetconfiguration.cpp \
+    uavgadgetinstancemanager.cpp
 HEADERS += mainwindow.h \
     tabpositionindicator.h \
     fancyactionbar.h \
@@ -107,10 +110,14 @@ HEADERS += mainwindow.h \
     settingsdatabase.h \
     eventfilteringmainwindow.h \
     connectionmanager.h \
-    iconnection.h
+    iconnection.h \
+    uavgadgetoptionspage.h \
+    iuavgadgetconfiguration.h \
+    uavgadgetinstancemanager.h
 FORMS += dialogs/settingsdialog.ui \
     dialogs/shortcutsettings.ui \
-    generalsettings.ui
+    generalsettings.ui \
+    uavgadgetoptionspage.ui
 RESOURCES += core.qrc \
     fancyactionbar.qrc
 unix:!macx { 

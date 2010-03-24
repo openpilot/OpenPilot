@@ -1,10 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       coreplugin.h
+ * @file       uavgadgetoptionspage.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   coreplugin
  * @{
@@ -26,36 +25,46 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef COREPLUGIN_H
-#define COREPLUGIN_H
+#ifndef UAVGADGETOPTIONSPAGE_H
+#define UAVGADGETOPTIONSPAGE_H
+#include "iuavgadgetconfiguration.h"
+#include <coreplugin/dialogs/ioptionspage.h>
 
-#include <extensionsystem/iplugin.h>
+class Ui_TopOptionsPage;
 
 namespace Core {
-namespace Internal {
 
-class MainWindow;
+class IUAVGadgetConfiguration;
 
-class CorePlugin : public ExtensionSystem::IPlugin
+class UAVGadgetOptionsPage : public Core::IOptionsPage
 {
-    Q_OBJECT
-
+Q_OBJECT
 public:
-    CorePlugin();
-    ~CorePlugin();
+    explicit UAVGadgetOptionsPage(IUAVGadgetConfiguration *config, QObject *parent = 0);
 
-    virtual bool initialize(const QStringList &arguments, QString *errorMessage = 0);
-    virtual void extensionsInitialized();
-    virtual void shutdown();
+    QString id() const { return m_id; }
+    QString trName() const { return m_id; }
+    QString category() const { return m_category; }
+    QString trCategory() const { return m_categoryTr; }
+
+    /*final*/ QWidget *createPage(QWidget *parent); // do not override this function in subclasses
+    virtual QWidget *widget() = 0;                  // implement this instead
+    virtual void apply() = 0;
+    virtual void finish() = 0;
+
+signals:
 
 public slots:
-    void remoteArgument(const QString&);
 
 private:
-    MainWindow *m_mainWindow;
+    IUAVGadgetConfiguration *m_config;
+    QString m_id;
+    QString m_category;
+    QString m_categoryTr;
+
+    Ui_TopOptionsPage *m_page;
 };
 
-} // namespace Internal
 } // namespace Core
 
-#endif // COREPLUGIN_H
+#endif // UAVGADGETOPTIONSPAGE_H

@@ -59,6 +59,8 @@ class UniqueIDManager;
 class VariableManager;
 class ViewManagerInterface;
 class UAVGadgetManager;
+class UAVGadgetInstanceManager;
+
 
 namespace Internal {
 
@@ -69,6 +71,7 @@ class GeneralSettings;
 class ShortcutSettings;
 class ViewManager;
 class VersionDialog;
+class UAVGadgetMode;
 
 class CORE_EXPORT MainWindow : public EventFilteringMainWindow
 {
@@ -92,8 +95,8 @@ public:
     Core::ActionManager *actionManager() const;
     Core::UniqueIDManager *uniqueIDManager() const;
     Core::MessageManager *messageManager() const;
-    void addUAVGadgetManager(Core::UAVGadgetManager *manager);
-    QList<Core::UAVGadgetManager*> uavGadgetManagers() const;
+    QList<UAVGadgetManager*> uavGadgetManagers() const;
+    UAVGadgetInstanceManager *uavGadgetInstanceManager() const;
     Core::ConnectionManager *connectionManager() const;
     Core::VariableManager *variableManager() const;
     Core::ModeManager *modeManager() const;
@@ -149,6 +152,7 @@ private slots:
     void modeChanged(Core::IMode *mode);
 
 private:
+    void addUAVGadgetManager(Core::UAVGadgetManager *manager);
     void updateContextObject(IContext *context);
     void registerDefaultContainers();
     void registerDefaultActions();
@@ -168,6 +172,8 @@ private:
     ViewManager *m_viewManager;
     ModeManager *m_modeManager;
     QList<UAVGadgetManager*> m_uavGadgetManagers;
+    QList<UAVGadgetMode*> m_uavGadgetModes;
+    UAVGadgetInstanceManager *m_uavGadgetInstanceManager;
     ConnectionManager *m_connectionManager;
     MimeDatabase *m_mimeDatabase;
     FancyTabWidget *m_modeStack;

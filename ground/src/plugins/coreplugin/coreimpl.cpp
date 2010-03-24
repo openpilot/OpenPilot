@@ -92,10 +92,10 @@ ConnectionManager *CoreImpl::connectionManager() const
     return m_mainwindow->connectionManager();
 }
 
-//UAVGadgetManager *CoreImpl::uavGadgetManager() const
-//{
-//    return m_mainwindow->uavGadgetManager();
-//}
+UAVGadgetInstanceManager *CoreImpl::uavGadgetInstanceManager() const
+{
+    return m_mainwindow->uavGadgetInstanceManager();
+}
 
 VariableManager *CoreImpl::variableManager() const
 {

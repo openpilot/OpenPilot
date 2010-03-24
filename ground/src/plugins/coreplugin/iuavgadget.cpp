@@ -27,18 +27,57 @@
  */
 
 #include "iuavgadget.h"
+#include "iuavgadgetconfiguration.h"
 
-/*!
-  \class Core::IUAVGadget
-  \brief The IUAVGadget is an interface for uav gadgets.
+using namespace Core;
 
-  Classes that implement this interface are for example .
+IUAVGadget::IUAVGadget(QString classId, QList<IUAVGadgetConfiguration*> *configurations, QObject *parent) :
+        IContext(parent),
+        m_classId(classId),
+        m_toolbar(new QComboBox),
+        m_configurations(configurations)
+{
+    foreach (IUAVGadgetConfiguration *config, *configurations)
+        m_toolbar->addItem(config->name());
+    connect(m_toolbar, SIGNAL(activated(int)), this, SLOT(loadConfiguration(int)));
+}
 
-  Guidelines for implementing:
-  \list
-  \o to be filled in...
-  \endlist
+void IUAVGadget::loadConfiguration(int index) {
+    IUAVGadgetConfiguration* config = m_configurations->at(index);
+    loadConfiguration(config);
+}
 
-  \sa Core::IUAVGadgetFactory Core::IContext
 
-*/
+void IUAVGadget::configurationChanged(IUAVGadgetConfiguration* config)
+{
+    if (config == m_activeConfiguration)
+        loadConfiguration(config);
+}
+
+void IUAVGadget::configurationNameChanged(QString oldName, QString newName)
+{
+    for (int i = 0; i < m_toolbar->count(); ++i) {
+        if (m_toolbar->itemText(i) == oldName)
+            m_toolbar->setItemText(i, newName);
+    }
+}
+
+QByteArray IUAVGadget::saveState()
+{
+    QByteArray bytes;
+    QDataStream stream(&bytes, QIODevice::WriteOnly);
+//    if (m_activeConfiguration)
+//        stream << m_activeConfiguration->name().toLatin1();
+    return bytes;
+}
+
+void IUAVGadget::restoreState(QByteArray state)
+{
+    QDataStream stream(state);
+    QByteArray configName;
+    stream >> configName;
+    foreach (IUAVGadgetConfiguration *config, *m_configurations) {
+        if (config->name() == configName)
+            loadConfiguration(config);
+    }
+}

@@ -58,6 +58,7 @@ class UAVGadgetManager;
 
 namespace Internal {
 
+
 class UAVGadgetView : public QWidget
 {
     Q_OBJECT
@@ -70,7 +71,7 @@ public:
     IUAVGadget *uavGadget() const;
     void setUAVGadget(IUAVGadget *uavGadget);
     bool hasUAVGadget(IUAVGadget *uavGadget) const;
-    int indexOfGadgetKind(QString gadgetKind);
+    int indexOfClassId(QString classId);
     void showToolbar(bool show);
 
 public slots:
@@ -86,7 +87,7 @@ private:
     UAVGadgetManager *m_uavGadgetManager;
     IUAVGadget *m_uavGadget;
     QWidget *m_toolBar;
-    QWidget *m_defaultToolBar;
+    QComboBox *m_defaultToolBar;
     QWidget *m_currentToolBar;
     QWidget *m_activeToolBar;
     QComboBox *m_uavGadgetList;

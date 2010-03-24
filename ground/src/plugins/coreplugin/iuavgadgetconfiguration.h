@@ -1,10 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       coreplugin.h
+ * @file       iuavgadgetconfiguration.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   coreplugin
  * @{
@@ -26,36 +25,36 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef COREPLUGIN_H
-#define COREPLUGIN_H
+#ifndef IUAVGADGETCONFIGURATION_H
+#define IUAVGADGETCONFIGURATION_H
 
-#include <extensionsystem/iplugin.h>
+#include <QObject>
 
 namespace Core {
-namespace Internal {
 
-class MainWindow;
-
-class CorePlugin : public ExtensionSystem::IPlugin
+class IUAVGadgetConfiguration : public QObject
 {
-    Q_OBJECT
-
+Q_OBJECT
 public:
-    CorePlugin();
-    ~CorePlugin();
+    explicit IUAVGadgetConfiguration(bool locked, QString classId, QString name, QObject *parent = 0);
+    virtual QByteArray saveState() const = 0;
+    QString classId() { return m_classId; }
+    QString name() { return m_name; }
+    void setName(QString name) { m_name = name; }
+    bool locked() const { return m_locked; }
+    virtual IUAVGadgetConfiguration *clone() = 0;
 
-    virtual bool initialize(const QStringList &arguments, QString *errorMessage = 0);
-    virtual void extensionsInitialized();
-    virtual void shutdown();
+signals:
 
 public slots:
-    void remoteArgument(const QString&);
 
 private:
-    MainWindow *m_mainWindow;
+    bool m_locked;
+    QString m_classId;
+    QString m_name;
+
 };
 
-} // namespace Internal
 } // namespace Core
 
-#endif // COREPLUGIN_H
+#endif // IUAVGADGETCONFIGURATION_H

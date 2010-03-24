@@ -39,20 +39,29 @@ QT_END_NAMESPACE
 namespace Core {
 
 class IUAVGadget;
+class IUAVGadgetConfiguration;
+class UAVGadgetOptionsPage;
 
 class CORE_EXPORT IUAVGadgetFactory : public QObject
 {
     Q_OBJECT
 public:
-    IUAVGadgetFactory(QObject *parent = 0) : QObject(parent) {}
+    IUAVGadgetFactory(QString classId, QString name, QObject *parent = 0) :
+            QObject(parent),
+            m_classId(classId),
+            m_name(name) {}
     virtual ~IUAVGadgetFactory() {}
 
-    virtual IUAVGadget *createUAVGadget(QWidget *parent) = 0;
-    virtual QString gadgetKind() const { return m_gadgetKind; }
-    virtual QString name() const { return m_name; }
-protected:
+    virtual IUAVGadget *createUAVGadget(QList<IUAVGadgetConfiguration*> *configurations, QWidget *parent) = 0;
+    virtual IUAVGadgetConfiguration *createUAVGadgetConfiguration(bool /*locked*/,
+                                                                  const QString /*configName*/,
+                                                                  const QByteArray &/*state*/) { return 0; }
+    virtual UAVGadgetOptionsPage *createUAVGadgetOptionsPage(IUAVGadgetConfiguration */*config*/) { return 0; }
+    QString classId() const { return m_classId; }
+    QString name() const { return m_name; }
+private:
+    QString m_classId;
     QString m_name;
-    QString m_gadgetKind;
 };
 
 } // namespace Core

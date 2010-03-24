@@ -28,7 +28,7 @@
 
 #include "uavgadgetview.h"
 #include "uavgadgetmanager.h"
-#include "iuavgadgetfactory.h"
+#include "uavgadgetinstancemanager.h"
 #include "iuavgadget.h"
 #include "coreimpl.h"
 #include "minisplitter.h"
@@ -63,12 +63,12 @@ using namespace Core::Internal;
 
 // ================UAVGadgetView====================
 
-UAVGadgetView::UAVGadgetView(UAVGadgetManager *uavGadgetManager, IUAVGadget *uavGadget, QWidget *parent) :
+UAVGadgetView::UAVGadgetView(Core::UAVGadgetManager *uavGadgetManager, IUAVGadget *uavGadget, QWidget *parent) :
         QWidget(parent),
         m_uavGadgetManager(uavGadgetManager),
         m_uavGadget(uavGadget),
         m_toolBar(new QWidget),
-        m_defaultToolBar(new QWidget(this)),
+        m_defaultToolBar(new QComboBox(this)),
         m_uavGadgetList(new QComboBox),
         m_closeButton(new QToolButton),
         m_defaultIndex(0),
@@ -80,15 +80,16 @@ UAVGadgetView::UAVGadgetView(UAVGadgetManager *uavGadgetManager, IUAVGadget *uav
     tl->setMargin(0);
     {
         m_uavGadgetList->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        m_uavGadgetList->setMinimumContentsLength(20);
+        m_uavGadgetList->setMinimumContentsLength(15);
         m_uavGadgetList->setMaxVisibleItems(40);
         m_uavGadgetList->setContextMenuPolicy(Qt::CustomContextMenu);
-        UAVGadgetFactoryList fl = m_uavGadgetManager->uavGadgetFactories();
+        UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
+        QStringList sl = im->uavGadgetClassIds();
         int index = 0;
-        foreach(Core::IUAVGadgetFactory *factory, fl)
+        foreach(QString classId, sl)
         {
-            m_uavGadgetList->addItem(factory->name(), factory->gadgetKind());
-            if (factory->gadgetKind() == QString("EmptyGadget"))
+            m_uavGadgetList->addItem(im->uavGadgetName(classId), classId);
+            if (classId == QString("EmptyGadget"))
                 m_defaultIndex = index;
             ++index;
         }
@@ -101,7 +102,10 @@ UAVGadgetView::UAVGadgetView(UAVGadgetManager *uavGadgetManager, IUAVGadget *uav
         toolBarLayout->setSpacing(0);
         toolBarLayout->addWidget(m_defaultToolBar);
         m_toolBar->setLayout(toolBarLayout);
-        m_toolBar->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+        m_toolBar->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::MinimumExpanding);
+
+        QWidget *spacerWidget = new QWidget;
+        spacerWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
         m_activeLabel->setTextFormat(Qt::RichText);
 
@@ -112,7 +116,8 @@ UAVGadgetView::UAVGadgetView(UAVGadgetManager *uavGadgetManager, IUAVGadget *uav
         toplayout->setSpacing(0);
         toplayout->setMargin(0);
         toplayout->addWidget(m_uavGadgetList);
-        toplayout->addWidget(m_toolBar, 1); // Custom toolbar stretches
+        toplayout->addWidget(m_toolBar); // Custom toolbar stretches
+        toplayout->addWidget(spacerWidget);
         toplayout->addWidget(m_activeLabel);
         toplayout->addWidget(m_closeButton);
 
@@ -185,42 +190,45 @@ void UAVGadgetView::setUAVGadget(IUAVGadget *uavGadget)
     tl->addWidget(m_uavGadget->widget());
     m_uavGadget->widget()->setParent(this);
     m_uavGadget->widget()->show();
-    int index = indexOfGadgetKind(m_uavGadget->gadgetKind());
+    int index = indexOfClassId(m_uavGadget->classId());
     Q_ASSERT(index >= 0);
     m_uavGadgetList->setCurrentIndex(index);
 
-//    updateToolBar();
+    updateToolBar();
 }
 
 void UAVGadgetView::updateToolBar()
 {
     if (!m_uavGadget)
         return;
-    QWidget *toolBar = m_uavGadget->toolBar();
+    QComboBox *toolBar = m_uavGadget->toolBar();
     if (!toolBar)
         toolBar = m_defaultToolBar;
     if (m_activeToolBar == toolBar)
         return;
-    toolBar->setVisible(true);
+    toolBar->setVisible(toolBar->count() > 0);
+    toolBar->setEnabled(toolBar->count() > 1);
+    m_toolBar->layout()->addWidget(toolBar);
     m_activeToolBar->setVisible(false);
     m_activeToolBar = toolBar;
 }
 
 void UAVGadgetView::listSelectionActivated(int index)
 {
-    if (index < 0 || m_uavGadgetManager->uavGadgetFactories().count() == 0)
+    if (index < 0) // this could happen when called from SplitterOrView::restoreState()
+        index = m_defaultIndex;
+    UAVGadgetInstanceManager *fm = ICore::instance()->uavGadgetInstanceManager();
+    QString classId = m_uavGadgetList->itemData(index).toString();
+    if (m_uavGadget && (m_uavGadget->classId() == classId))
         return;
-    IUAVGadgetFactory *factory = m_uavGadgetManager->uavGadgetFactories().at(index);
-    if (m_uavGadget && m_uavGadget->gadgetKind() == factory->gadgetKind())
-        return;
-    IUAVGadget *gadget = factory->createUAVGadget(this);
+    IUAVGadget *gadget = fm->createUAVGadget(classId, this);
     setUAVGadget(gadget);
     m_uavGadgetManager->setCurrentUAVGadget(gadget);
 }
 
-int UAVGadgetView::indexOfGadgetKind(QString gadgetKind)
+int UAVGadgetView::indexOfClassId(QString classId)
 {
-    return m_uavGadgetList->findData(gadgetKind);
+    return m_uavGadgetList->findData(classId);
 }
 
 void UAVGadgetView::currentUAVGadgetChanged(IUAVGadget *gadget)
@@ -229,7 +237,7 @@ void UAVGadgetView::currentUAVGadgetChanged(IUAVGadget *gadget)
 
 }
 
-SplitterOrView::SplitterOrView(UAVGadgetManager *uavGadgetManager, Core::IUAVGadget *uavGadget, bool isRoot) :
+SplitterOrView::SplitterOrView(Core::UAVGadgetManager *uavGadgetManager, Core::IUAVGadget *uavGadget, bool isRoot) :
         m_uavGadgetManager(uavGadgetManager),
         m_isRoot(isRoot)
 {
@@ -265,8 +273,8 @@ void SplitterOrView::paintEvent(QPaintEvent *event)
     if (!m_view)
         return;
 
-//    if (hasUAVGadget())
-//        return;
+    if (hasUAVGadget())
+        return;
 
     if (m_uavGadgetManager->toolbarsShown())
         return;
@@ -550,7 +558,7 @@ QByteArray SplitterOrView::saveState() const
                 << static_cast<SplitterOrView*>(m_splitter->widget(1))->saveState();
     } else {
         if (uavGadget())
-            stream << QByteArray("uavGadget") << uavGadget()->gadgetKind() << uavGadget()->saveState();
+            stream << QByteArray("uavGadget") << uavGadget()->classId() << uavGadget()->saveState();
     }
     return bytes;
 }
@@ -569,11 +577,11 @@ void SplitterOrView::restoreState(const QByteArray &state)
         static_cast<SplitterOrView*>(m_splitter->widget(0))->restoreState(first);
         static_cast<SplitterOrView*>(m_splitter->widget(1))->restoreState(second);
     } else if (mode == "uavGadget") {
-        QString gadgetKind;
+        QString classId;
         QByteArray uavGadgetState;
-        stream >> gadgetKind >> uavGadgetState;
+        stream >> classId >> uavGadgetState;
         m_view = new UAVGadgetView(m_uavGadgetManager, 0);
-        int index = m_view->indexOfGadgetKind(gadgetKind);
+        int index = m_view->indexOfClassId(classId);
         m_view->listSelectionActivated(index);
         m_layout->addWidget(m_view);
         m_layout->setCurrentWidget(m_view);

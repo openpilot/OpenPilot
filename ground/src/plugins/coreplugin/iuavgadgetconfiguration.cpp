@@ -1,10 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       coreplugin.h
+ * @file       iuavgadgetconfiguration.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   coreplugin
  * @{
@@ -26,36 +25,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef COREPLUGIN_H
-#define COREPLUGIN_H
+#include "iuavgadgetconfiguration.h"
 
-#include <extensionsystem/iplugin.h>
+using namespace Core;
 
-namespace Core {
-namespace Internal {
-
-class MainWindow;
-
-class CorePlugin : public ExtensionSystem::IPlugin
+IUAVGadgetConfiguration::IUAVGadgetConfiguration(bool locked, QString classId, QString name, QObject *parent) :
+    QObject(parent),
+    m_locked(locked),
+    m_classId(classId),
+    m_name(name)
 {
-    Q_OBJECT
-
-public:
-    CorePlugin();
-    ~CorePlugin();
-
-    virtual bool initialize(const QStringList &arguments, QString *errorMessage = 0);
-    virtual void extensionsInitialized();
-    virtual void shutdown();
-
-public slots:
-    void remoteArgument(const QString&);
-
-private:
-    MainWindow *m_mainWindow;
-};
-
-} // namespace Internal
-} // namespace Core
-
-#endif // COREPLUGIN_H
+}

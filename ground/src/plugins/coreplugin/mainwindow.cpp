@@ -40,7 +40,10 @@
 #include "outputpane.h"
 #include "plugindialog.h"
 #include "shortcutsettings.h"
+#include "modemanager.h"
+#include "uavgadgetmode.h"
 #include "uavgadgetmanager.h"
+#include "uavgadgetinstancemanager.h"
 #include "connectionmanager.h"
 
 #include "settingsdialog.h"
@@ -187,6 +190,13 @@ MainWindow::~MainWindow()
 {
     hide();
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    if (m_uavGadgetModes.count() > 0) {
+        foreach (UAVGadgetMode *mode, m_uavGadgetModes)
+        {
+            pm->removeObject(mode);
+            delete mode;
+        }
+    }
     pm->removeObject(m_shortcutSettings);
     pm->removeObject(m_generalSettings);
     delete m_messageManager;
@@ -239,6 +249,33 @@ void MainWindow::modeChanged(Core::IMode */*mode*/)
 
 void MainWindow::extensionsInitialized()
 {
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+
+    m_uavGadgetInstanceManager = new UAVGadgetInstanceManager(this);
+    m_uavGadgetInstanceManager->readUAVGadgetConfigurations();
+
+    // Workspace 1
+    UAVGadgetMode *uavGadgetMode;
+    Core::UAVGadgetManager *m_uavGadgetManager;
+    m_uavGadgetManager = new Core::UAVGadgetManager(CoreImpl::instance(), this);
+    m_uavGadgetManager->hide();
+    uavGadgetMode = new UAVGadgetMode(m_uavGadgetManager, QString(tr("Workspace 1")),
+                                      QIcon(":/core/images/openpilot_logo_64.png"), 90, QString("Mode1"));
+    m_uavGadgetManager->setUAVGadgetMode(uavGadgetMode);
+    m_uavGadgetModes.append(uavGadgetMode);
+    pm->addObject(uavGadgetMode);
+    addUAVGadgetManager(m_uavGadgetManager);
+
+    // Workspace 2
+    m_uavGadgetManager = new Core::UAVGadgetManager(CoreImpl::instance(), this);
+    m_uavGadgetManager->hide();
+    uavGadgetMode = new UAVGadgetMode(m_uavGadgetManager, QString(tr("Workspace 2")),
+                                      QIcon(":/core/images/plus.png"), 60, QString("Mode2"));
+    m_uavGadgetManager->setUAVGadgetMode(uavGadgetMode);
+    m_uavGadgetModes.append(uavGadgetMode);
+    pm->addObject(uavGadgetMode);
+    addUAVGadgetManager(m_uavGadgetManager);
+
     m_viewManager->extensionsInitalized();
 
     m_messageManager->init();
@@ -739,6 +776,12 @@ QList<UAVGadgetManager*> MainWindow::uavGadgetManagers() const
     return m_uavGadgetManagers;
 }
 
+UAVGadgetInstanceManager *MainWindow::uavGadgetInstanceManager() const
+{
+    return m_uavGadgetInstanceManager;
+}
+
+
 ModeManager *MainWindow::modeManager() const
 {
     return m_modeManager;
@@ -903,6 +946,9 @@ void MainWindow::writeSettings()
 
     m_viewManager->saveSettings(m_settings);
     m_actionManager->saveSettings(m_settings);
+
+    m_uavGadgetInstanceManager->writeUAVGadgetConfigurations();
+
     foreach (UAVGadgetManager *manager, m_uavGadgetManagers) {
         manager->saveSettings();
     }

@@ -133,9 +133,8 @@ namespace jafar {
 
 		}
 
-		void Robot3DConstantVelocity::initStatePerturbation() {
-			RobotAbstract::computeStatePerturbation();
-		}
+
+
 
 	}
 }

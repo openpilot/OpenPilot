@@ -68,11 +68,6 @@ namespace jafar {
 				}
 
 
-				/**
-				 * Initialize state perturbation.
-				 * This is used for constant perturbations therefore avoiding the Jacobian product at each iteration.
-				 */
-				void initStatePerturbation();
 
 				static size_t size() {
 					return 13;
@@ -117,6 +112,7 @@ namespace jafar {
 					ublas::subrange(state.x(), 7, 10) = v;
 					ublas::subrange(state.x(), 10, 13) = w;
 				}
+
 
 				/**
 				 * Split control vector.

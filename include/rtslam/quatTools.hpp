@@ -31,6 +31,13 @@ namespace jafar {
 
 
 			/**
+			 * Null rotation quaternion
+			 * \return the identity quaternion q = [1, 0, 0, 0]
+			 */
+			vec4 identQ();
+
+
+			/**
 			 * Conjugate of quaternion.
 			 * \param q The input quaternion [qw, qx, qy, qz].
 			 * \return the conjugated quaternion.
@@ -405,6 +412,9 @@ namespace jafar {
 			template<class Vec>
 			vec4 v2q(const Vec & v) {
 				double a = boost::numeric::ublas::norm_2(v);
+				if (a < 1e-6)
+					return identQ();
+
 				double san = sin(a / 2) / a;
 				vec4 q;
 				q(0) = cos(a / 2);
@@ -650,6 +660,13 @@ namespace jafar {
 
 
 			/**
+			 * Origin frame
+			 * \return a pose at the origin, F = [0 0 0 1 0 0 0]
+			 */
+			vec7 originFrame();
+
+
+			/**
 			 * To-frame transformation for Euclidean points.
 			 * \param F frame
 			 * \param p point in global frame
@@ -821,15 +838,15 @@ namespace jafar {
 			 */
 			template<class VecG, class VecL, class MatC_g>
 			void composeFrames_by_dglobal(const VecG & G, const VecL & L, MatC_g & C_g) {
-					/*
-					 * C_g = [ I_3   rotate_by_dq ]
-					 *       [  0    qProd_by_dq1 ]
-					 */
+				/*
+				 * C_g = [ I_3   rotate_by_dq ]
+				 *       [  0    qProd_by_dq1 ]
+				 */
 				vec4 qg = subrange(G, 3, 7);
 				vec3 tl = subrange(L, 0, 3);
 				vec4 ql = subrange(L, 3, 7);
-				mat T_qg(3,4);
-				mat Q_qg(4,4);
+				mat T_qg(3, 4);
+				mat Q_qg(4, 4);
 				C_g.clear();
 				ublas::subrange(C_g, 0, 3, 0, 3) = jblas::identity_mat(3);
 				rotate_by_dq(qg, tl, T_qg);
@@ -847,10 +864,10 @@ namespace jafar {
 			 */
 			template<class VecG, class VecL, class MatC_l>
 			void composeFrames_by_dlocal(const VecG & G, const VecL & L, MatC_l & C_l) {
-					/*
-					 * C_l = [ rotate_by_dv       0      ]
-					 *       [      0       qProd_by_dq2 ]
-					 */
+				/*
+				 * C_l = [ rotate_by_dv       0      ]
+				 *       [      0       qProd_by_dq2 ]
+				 */
 				vec4 qg = subrange(G, 3, 7);
 				mat_range T_tl(C_l, 0, 3, 0, 3);
 				mat_range Q_ql(C_l, 4, 7, 4, 7);

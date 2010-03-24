@@ -57,7 +57,7 @@ namespace jafar {
 				 * All parameters exist in the class and hence the funciton is void.
 				 * \sa See other prototypes of move() with additional input parameters in the RobotAbstract class.
 				 */
-				void move(void);
+				void move();
 
 				/**
 				 * Retro-project perturbation to robot state.
@@ -74,11 +74,11 @@ namespace jafar {
 				 */
 				void initStatePerturbation();
 
-				static size_t size(void) {
+				static size_t size() {
 					return 13;
 				}
 
-				static size_t size_control(void) {
+				static size_t size_control() {
 					return 6;
 				}
 
@@ -128,7 +128,7 @@ namespace jafar {
 				template<class V>
 				inline void splitControl(V & vi, V & wi) {
 					vi = project(control.x(), ublas::range(0, 3));
-					wi = project(control.x(), ublas::range(0, 3));
+					wi = project(control.x(), ublas::range(3, 6));
 				}
 
 			private:

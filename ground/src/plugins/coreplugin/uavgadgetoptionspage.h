@@ -28,6 +28,7 @@
 #ifndef UAVGADGETOPTIONSPAGE_H
 #define UAVGADGETOPTIONSPAGE_H
 #include "iuavgadgetconfiguration.h"
+#include <coreplugin/core_global.h>
 #include <coreplugin/dialogs/ioptionspage.h>
 
 class Ui_TopOptionsPage;
@@ -36,7 +37,7 @@ namespace Core {
 
 class IUAVGadgetConfiguration;
 
-class UAVGadgetOptionsPage : public Core::IOptionsPage
+class CORE_EXPORT UAVGadgetOptionsPage : public Core::IOptionsPage
 {
 Q_OBJECT
 public:

@@ -28,11 +28,12 @@
 #ifndef IUAVGADGETCONFIGURATION_H
 #define IUAVGADGETCONFIGURATION_H
 
+#include <coreplugin/core_global.h>
 #include <QObject>
 
 namespace Core {
 
-class IUAVGadgetConfiguration : public QObject
+class CORE_EXPORT IUAVGadgetConfiguration : public QObject
 {
 Q_OBJECT
 public:

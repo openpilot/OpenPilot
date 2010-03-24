@@ -19,6 +19,7 @@
 #include "kernel/jafarDebug.hpp"
 #include "kernel/jafarTestMacro.hpp"
 #include "jmath/random.hpp"
+#include "jmath/matlab.hpp"
 
 #include <iostream>
 #include <boost/shared_ptr.hpp>
@@ -183,6 +184,8 @@ map_ptr_t initSlam(size_t size_map) {
 
 	using namespace boost;
 
+
+	// create a map
 	shared_ptr<MapAbstract> slamMapPtr(new MapAbstract(size_map));
 
 
@@ -191,7 +194,7 @@ map_ptr_t initSlam(size_t size_map) {
 	std::size_t size_senPH = SensorPinHole::size();
 
 
-	// Add 2 robots, 3 sensors
+	// Add 1 robots, 2 sensors
 	if (slamMapPtr->unusedStates(size_robCV)) {
 		robot_ptr_t robPtr = newRobot(slamMapPtr, "SUBMARINE");
 		robPtr->pose.x(quaternion::originFrame());
@@ -232,50 +235,114 @@ void initSomeLmks(map_ptr_t slamMapPtr, size_t N) {
 	}
 }
 
+/**
+ * robot setup.
+ * Sets basic date for a robot: initial pose, perturbation levels.
+ * \param x0 initial x-coordinate. Same for \a y0, \a z0.
+ * \param roll0 initial roll angle. Same for \a pitch0, \a yaw0
+ * \param sigma_vi std. dev. of linear velocity impulse.
+ * \param sigma_wi std. dev. of angular velocity impulse.
+ */
+void motionSetup(robot_ptr_t robPtr, const double x0, const double y0, const double z0, const double roll0,
+    const double pitch0, const double yaw0, const double sigma_pos, const double sigma_ori, const double sigma_vi,
+    const double sigma_wi) {
+
+
+	// clear state and pose
+	robPtr->state.clear();
+
+
+	// initial pose
+	vec7 p0; // pose
+	sym_mat P0(7); // pose covariance
+	vec3 e; // euler angles
+	vec4 q; // quaternion
+	mat Q_e(4, 3);
+	sym_mat Q(4); // quat cov. mat.
+
+	p0(0) = x0;
+	p0(1) = y0;
+	p0(2) = z0;
+
+	e(0) = roll0;
+	e(1) = pitch0;
+	e(2) = yaw0;
+	quaternion::e2q(e, q, Q_e);
+	subrange(p0, 3, 7) = q;
+	Q = ublasExtra::prod_JPJt(ublasExtra::scalar_diag_mat(3, sigma_ori * sigma_ori), Q_e);
+
+	P0.clear();
+	subrange(P0, 0, 3, 0, 3) = ublasExtra::scalar_diag_mat(3, sigma_pos * sigma_pos);
+	subrange(P0, 3, 7, 3, 7) = Q;
+
+	robPtr->pose.x(p0);
+	robPtr->pose.P(P0);
+
+
+	// Perturbation
+	vec6 std_pert;
+	subrange(std_pert, 0, 3) = scalar_vec(3, sigma_vi);
+	subrange(std_pert, 3, 6) = scalar_vec(3, sigma_wi);
+	robPtr->control.clear();
+	robPtr->control.std(std_pert);
+
+	robPtr->initStatePerturbation();
+
+}
+
 void test_main01() {
 
 	cout << "\n\n\n% ######    WELCOME TO RTSLAM    ######\n" << endl;
 
 	using namespace boost;
 
-	map_ptr_t slamMapPtr = initSlam(300);
-//	initSomeLmks(slamMapPtr, 2);
-
-//	printSlam(slamMapPtr);
-
-	// Get some slam parts for easy access
-	ExtendedKalmanFilterIndirect filter = slamMapPtr->filter;
-	robots_ptr_set_t robots = slamMapPtr->robots;
-	landmarks_ptr_set_t landmarks = slamMapPtr->landmarks;
+	map_ptr_t slamMapPtr = initSlam(50);
+	//	initSomeLmks(slamMapPtr, 2);
+	double dt = 1;
+	double t_end = 4;
 
 
-	// start SLAM loop
-
-	// first loop robots
-	for (robots_ptr_set_t::iterator robIter = robots.begin(); robIter != robots.end(); robIter++) {
+	// setup
+	for (robots_ptr_set_t::iterator robIter = slamMapPtr->robots.begin(); robIter != slamMapPtr->robots.end(); robIter++) {
 		robot_ptr_t robPtr = robIter->second;
 
+		motionSetup(robPtr, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1);
 		// set robot control to some easy value
+		robPtr->control.dt = dt;
 		vec6 control;
 		control.clear();
 		control(0) = 1.0; // forward 1m.
 		control(5) = 0.1; // left 0.1 rad = 6deg.
-
-		cout << "x  = " << robPtr->state.x() << endl;
-		robPtr->move(control);
-		cout << "x  = " << robPtr->state.x() << endl;
-		filter.predict(slamMapPtr->ia_used_states(), robPtr->dx_by_dstate, robPtr->state.ia(), robPtr->Q);
-
-
-		// now loop for sensors on this particular robot
-		sensors_ptr_set_t sensors = robPtr->sensors;
-		for (sensors_ptr_set_t::iterator senIter = sensors.begin(); senIter != sensors.end(); senIter++) {
-			sensor_ptr_t senPtr = senIter->second;
-		}
+		robPtr->control.x(control);
 	}
 
-//	printSlam(slamMapPtr);
+	cout << "comenca el loop" << endl;
 
+	// start SLAM loop
+	for (double t = 0; t < t_end; t += dt) {
+
+
+		// first loop robots
+		for (robots_ptr_set_t::iterator robIter = slamMapPtr->robots.begin(); robIter != slamMapPtr->robots.end(); robIter++) {
+
+			robot_ptr_t robPtr = robIter->second;
+
+			robPtr->move();
+			robPtr->computeStatePerturbation();
+			slamMapPtr->filter.predict(slamMapPtr->ia_used_states(), robPtr->dxnew_by_dx, robPtr->state.ia(), robPtr->Q);
+
+			// now loop for sensors on this particular robot
+			sensors_ptr_set_t sensors = robPtr->sensors;
+			for (sensors_ptr_set_t::iterator senIter = sensors.begin(); senIter != sensors.end(); senIter++) {
+
+				sensor_ptr_t senPtr = senIter->second;
+
+			}
+		}
+
+
+		//	printSlam(slamMapPtr);
+	}
 	cout << "\nTHAT'S ALL, WHAT'S WRONG?" << endl;
 }
 

@@ -39,7 +39,7 @@ namespace jafar {
 			type("Constant-Velocity");
 		}
 
-		void Robot3DConstantVelocity::move(void) {
+		void Robot3DConstantVelocity::move() {
 
 			using namespace jblas;
 			using namespace ublas;
@@ -96,18 +96,31 @@ namespace jafar {
 
 			// Non-trivial Jacobian blocks
 			mat P_v(3, 3);
+			vec4 qwdt;
+			mat QWDT_wdt(4, 3);
+			mat Q_qwdt(4, 4);
 			mat Q_wdt(4, 3);
 			mat Q_q(4, 4);
 			identity_mat I_3(3);
 
 
 			// predict each part of the state, give or build non-trivial Jacobians
+			cout << "x  = " << state.x() << endl;
+
 			p += v * dt;
 			P_v = I_3 * dt;
 			vec4 q_old(q);
-			quaternion::qProd(q_old, w * dt, q, Q_q, Q_wdt);
+			cout << "q  = " << q << endl;
+			cout << "w  = " << w << endl;
+			cout << "dt = " << dt << endl;
+			quaternion::v2q(w * dt, qwdt, QWDT_wdt);
+			cout << "qwdt=" << qwdt << endl;
+			quaternion::qProd(q_old, qwdt, q, Q_q, Q_qwdt);
+			cout << "q  = " << q << endl;
+			Q_wdt = ublas::prod(Q_qwdt, QWDT_wdt);
 			v += vi;
 			w += wi;
+			cout << "x  = " << state.x() << endl;
 
 
 			// Compose state - this is the output state.

@@ -134,9 +134,12 @@ namespace jafar {
 					move();
 				}
 
-				void move(const jblas::vec & _u) {
+				template<class V>
+				void move(V & _u) {
 					JFR_ASSERT(_u.size() == control.size(), "robotAbstract.hpp: move: wrong control size.");
 					control.x(_u);
+					cout << control.x() << endl;
+
 					move();
 				}
 

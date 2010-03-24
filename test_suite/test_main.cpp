@@ -30,6 +30,7 @@
 #include "rtslam/sensorPinHole.hpp"
 #include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
 #include "rtslam/observationPinHoleAnchoredHomogeneous.hpp"
+#include "rtslam/kalmanFilter.hpp"
 
 //#include <map>
 
@@ -135,14 +136,13 @@ sensor_ptr_t newSensor(robot_ptr_t robPtr, string name, bool isInMap = false) {
 }
 
 /**
- * Add new observation.
+ * Add a new observation.
  * \param senPtr pointer to the sensor observing the landmark.
  * \param lmkPtr poitner to the observed landmark
  */
 observation_ptr_t newObservation(sensor_ptr_t senPtr, landmark_ptr_t lmkPtr) {
 	shared_ptr<ObservationPinHoleAnchoredHomogeneousPoint> obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint());
-	size_t id = 10000 * senPtr->id() + lmkPtr->id();
-	obsPtr->id() = id;
+	obsPtr->id() = 0;
 	obsPtr->linkToSensor(senPtr);
 	obsPtr->linkToLandmark(lmkPtr);
 	senPtr->linkToObservation(obsPtr);
@@ -155,9 +155,7 @@ observation_ptr_t newObservation(sensor_ptr_t senPtr, landmark_ptr_t lmkPtr) {
  * Add a new landmark
  * \param senPtr the sensor that discovered it.
  */
-landmark_ptr_t newLandmark(sensor_ptr_t senPtr) {
-
-	map_ptr_t slamMapPtr = senPtr->robot->slamMap;
+landmark_ptr_t newLandmark(map_ptr_t slamMapPtr) {
 
 	size_t lid = slamMapPtr->landmarkIds.getId();
 	shared_ptr<LandmarkAnchoredHomogeneousPoint> lmkPtr(new LandmarkAnchoredHomogeneousPoint(*slamMapPtr));
@@ -167,6 +165,7 @@ landmark_ptr_t newLandmark(sensor_ptr_t senPtr) {
 
 	slamMapPtr->linkToLandmark(lmkPtr);
 	lmkPtr->linkToMap(slamMapPtr);
+
 
 	// Add observations for each sensor
 	for (robots_ptr_set_t::iterator robIter = slamMapPtr->robots.begin(); robIter != slamMapPtr->robots.end(); robIter++) {
@@ -187,63 +186,96 @@ map_ptr_t initSlam(size_t size_map) {
 	shared_ptr<MapAbstract> slamMapPtr(new MapAbstract(size_map));
 
 
-
 	// Map object sizes;
 	std::size_t size_robCV = Robot3DConstantVelocity::size();
 	std::size_t size_senPH = SensorPinHole::size();
-	std::size_t size_lmkAHP = LandmarkAnchoredHomogeneousPoint::size();
 
 
 	// Add 2 robots, 3 sensors
 	if (slamMapPtr->unusedStates(size_robCV)) {
 		robot_ptr_t robPtr = newRobot(slamMapPtr, "SUBMARINE");
+		robPtr->pose.x(quaternion::originFrame());
 
 		if (slamMapPtr->unusedStates(size_senPH)) {
 			sensor_ptr_t senPtr = newSensor(robPtr, "FLEA", false);
+			senPtr->pose.x(quaternion::originFrame());
 		}
 		if (slamMapPtr->unusedStates(size_senPH)) {
 			sensor_ptr_t senPtr = newSensor(robPtr, "MARLIN", true);
+			senPtr->pose.x(quaternion::originFrame());
 		}
 	}
 
-//	if (slamMapPtr->unusedStates(size_robCV)) {
-//		robot_ptr_t robPtr = newRobot(slamMapPtr, "AEROPLANE");
-//		if (slamMapPtr->unusedStates(size_senPH)) {
-//			sensor_ptr_t senPtr = newSensor(robPtr, "FLEA2", false);
-//		}
-//	}
 
-	// Add 3 lmks
-	if (slamMapPtr->unusedStates(size_lmkAHP)) {
-		sensor_ptr_t senPtr = slamMapPtr->robots[1]->sensors[1]; // discovered by sensor 1
-		landmark_ptr_t lmkPtr = newLandmark(senPtr);
-	}
-//	if (slamMapPtr->unusedStates(size_lmkAHP)) {
-//		sensor_ptr_t senPtr = slamMapPtr->robots[1]->sensors[2]; // discovered by sensor 2
-//		landmark_ptr_t lmkPtr = newLandmark(senPtr);
-//	}
-//	if (slamMapPtr->unusedStates(size_lmkAHP)) {
-//		sensor_ptr_t senPtr = slamMapPtr->robots[2]->sensors[3]; // discovered by sensor 3
-//		landmark_ptr_t lmkPtr = newLandmark(senPtr);
-//	}
+	//	if (slamMapPtr->unusedStates(size_robCV)) {
+	//		robot_ptr_t robPtr = newRobot(slamMapPtr, "AEROPLANE");
+	//		if (slamMapPtr->unusedStates(size_senPH)) {
+	//			sensor_ptr_t senPtr = newSensor(robPtr, "FLEA2", false);
+	//		}
+	//	}
 
 	return slamMapPtr;
-
 }
 
-void test_main01(){
+/**
+ * Add some landmarks to the map.
+ * \param slamMapPtr pointer to the slam map.
+ * \param N the number of landmarks to initialize.
+ */
+void initSomeLmks(map_ptr_t slamMapPtr, size_t N) {
+	std::size_t size_lmkAHP = LandmarkAnchoredHomogeneousPoint::size();
+	for (size_t i = 0; i < N; i++) {
+		if (slamMapPtr->unusedStates(size_lmkAHP)) {
+			sensor_ptr_t senPtr = slamMapPtr->robots[1]->sensors[1]; // discovered by sensor 1
+			landmark_ptr_t lmkPtr = newLandmark(slamMapPtr);
+		}
+	}
+}
 
-	cout << "\n\n\n% ######    WELCOME TO RTSLAM    ######" << endl;
+void test_main01() {
+
+	cout << "\n\n\n% ######    WELCOME TO RTSLAM    ######\n" << endl;
 
 	using namespace boost;
 
 	map_ptr_t slamMapPtr = initSlam(300);
+//	initSomeLmks(slamMapPtr, 2);
 
-	printSlam(slamMapPtr);
+//	printSlam(slamMapPtr);
 
-	fillMapDiag(*slamMapPtr);
+	// Get some slam parts for easy access
+	ExtendedKalmanFilterIndirect filter = slamMapPtr->filter;
+	robots_ptr_set_t robots = slamMapPtr->robots;
+	landmarks_ptr_set_t landmarks = slamMapPtr->landmarks;
 
-	printSlam(slamMapPtr);
+
+	// start SLAM loop
+
+	// first loop robots
+	for (robots_ptr_set_t::iterator robIter = robots.begin(); robIter != robots.end(); robIter++) {
+		robot_ptr_t robPtr = robIter->second;
+
+		// set robot control to some easy value
+		vec6 control;
+		control.clear();
+		control(0) = 1.0; // forward 1m.
+		control(5) = 0.1; // left 0.1 rad = 6deg.
+
+		cout << "x  = " << robPtr->state.x() << endl;
+		robPtr->move(control);
+		cout << "x  = " << robPtr->state.x() << endl;
+		filter.predict(slamMapPtr->ia_used_states(), robPtr->dx_by_dstate, robPtr->state.ia(), robPtr->Q);
+		cout << "x  = " << robPtr->state.x() << endl;
+
+
+		// now loop for sensors on this particular robot
+		sensors_ptr_set_t sensors = robPtr->sensors;
+		for (sensors_ptr_set_t::iterator senIter = sensors.begin(); senIter != sensors.end(); senIter++) {
+			sensor_ptr_t senPtr = senIter->second;
+		}
+	}
+
+//	printSlam(slamMapPtr);
 
 	cout << "\nTHAT'S ALL, WHAT'S WRONG?" << endl;
 }

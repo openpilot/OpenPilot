@@ -22,10 +22,11 @@ namespace jafar {
 		namespace ublasExtra {
 
 			using namespace std;
+			using namespace jblas;
 			using namespace boost::numeric::ublas;
 
 			//			template<class bubMatrix>
-			//			symmetric_adaptor<matrix_indirect<bubMatrix> > projectSym(bubMatrix & M, const jblas::ind_array & ia) {
+			//			symmetric_adaptor<matrix_indirect<bubMatrix> > projectSym(bubMatrix & M, const ind_array & ia) {
 			//				matrix_indirect<bubMatrix> Mrr(M, ia, ia);
 			//				symmetric_adaptor<matrix_indirect<bubMatrix> > Srr(Mrr);
 			//				return Srr;
@@ -34,18 +35,18 @@ namespace jafar {
 			//////////////////////////
 			// HERE WITH SYMMETRIC ADAPTORS
 			template<class bubMatrix1, class bubMatrix2>
-			void ixaxpy_offdiag_subprod(symmetric_adaptor<bubMatrix1> S, const jblas::ind_array & iax, const bubMatrix2 & Hr,
-			    const jblas::ind_array & iar) {
+			void ixaxpy_offdiag_subprod(symmetric_adaptor<bubMatrix1> S, const ind_array & iax, const bubMatrix2 & Hr,
+			    const ind_array & iar) {
 				size_t sr = iar.size();
 				size_t ss = iax.size();
 				size_t sm = ss - sr;
-				jblas::ind_array iac(sm);
+				ind_array iac(sm);
 				iac = ia_complement(iax, iar);
 				project(S, iar, iac) = prod(Hr, project(S, iar, iac));
 			}
 
 			template<class bubMatrix1, class bubMatrix2>
-			void ixaxpy_diag_subprod(symmetric_adaptor<bubMatrix1> S, const bubMatrix2 & Hr, const jblas::ind_array & iar) {
+			void ixaxpy_diag_subprod(symmetric_adaptor<bubMatrix1> S, const bubMatrix2 & Hr, const ind_array & iar) {
 				matrix<double> HrSrr = prod(Hr, project(S, iar, iar));
 				project(S, iar, iar) = prod(HrSrr, trans(Hr));
 			}
@@ -55,8 +56,8 @@ namespace jafar {
 			 * See documentation in overloaded function
 			 */
 			template<class bubMatrix1, class bubMatrix2>
-			void ixaxpy_prod(symmetric_adaptor<bubMatrix1> S, const jblas::ind_array & iax, const bubMatrix2 & Hr,
-			    const jblas::ind_array & iar) {
+			void ixaxpy_prod(symmetric_adaptor<bubMatrix1> S, const ind_array & iax, const bubMatrix2 & Hr,
+			    const ind_array & iar) {
 				ixaxpy_offdiag_subprod(S, iax, Hr, iar);
 				ixaxpy_diag_subprod(S, Hr, iar);
 			}
@@ -64,20 +65,15 @@ namespace jafar {
 			///////////////////////
 			// HERE WITH ALL SYMMETRIC - EVEN THE SUBPRODS
 			template<class bubMatrix>
-			void ixaxpy_offdiag_subprod(jblas::sym_mat & S, const jblas::ind_array & iax, const bubMatrix & Hr,
-			    const jblas::ind_array & iar) {
-				size_t sr = iar.size();
-				size_t ss = iax.size();
-				size_t sm = ss - sr;
-				jblas::ind_array iac(sm);
-				iac = ia_complement(iax, iar);
+			void ixaxpy_offdiag_subprod(sym_mat & S, const ind_array & iax, const bubMatrix & Hr, const ind_array & iar) {
+				ind_array iac = ia_complement(iax, iar);
 				project(S, iar, iac) = prod(Hr, project(S, iar, iac));
 			}
 
 			template<class bubMatrix>
-			void ixaxpy_diag_subprod(jblas::sym_mat & S, const bubMatrix & Hr, const jblas::ind_array & iar) {
+			void ixaxpy_diag_subprod(sym_mat & S, const bubMatrix & Hr, const ind_array & iar) {
 				matrix<double> HrSrr = prod(Hr, project(S, iar, iar));
-				project(S, iar, iar) = prod<jblas::sym_mat> (HrSrr, trans(Hr));
+				project(S, iar, iar) = prod<sym_mat> (HrSrr, trans(Hr));
 			}
 
 			/**
@@ -116,10 +112,44 @@ namespace jafar {
 			 * \param iar the indices in S that are to be affected by Hr.
 			 */
 			template<class bubMatrix>
-			void ixaxpy_prod(jblas::sym_mat & S, const jblas::ind_array & iax, const bubMatrix & Hr,
-			    const jblas::ind_array & iar) {
+			void ixaxpy_prod(sym_mat & S, const ind_array & iax, const bubMatrix & Hr,
+			    const ind_array & iar) {
 				ixaxpy_offdiag_subprod(S, iax, Hr, iar);
 				ixaxpy_diag_subprod(S, Hr, iar);
+			}
+
+
+			///////////////////////
+			// HERE WITH ALL SYMMETRIC - DIFFERENT IN AND OUT INDICES - AND ADDED COVARIANCE
+			template<class bubMatrix>
+			void ixaxpy_offdiag_subprod(sym_mat & S, const ind_array & ia_x, const bubMatrix & J_oi, const ind_array & ia_in, const ind_array & ia_out){
+					ind_array iac = ia_complement(ia_x, ia_out);
+					project(S, ia_out, iac) = prod(J_oi, project(S, ia_in, iac));
+			}
+
+			template<class bubMatrix, class bubMatrixY>
+			void ixaxpy_diag_subprod(sym_mat & S, const bubMatrix & J, const ind_array & ia_in, const ind_array & ia_out, const bubMatrixY Y) {
+					matrix<double> JSii = prod(J, project(S, ia_in, ia_in));
+					project(S, ia_out, ia_out) = prod<sym_mat> (JSii, trans(J));
+					project(S, ia_out, ia_out) += Y;
+			}
+
+			template<class bubMatrix>
+			void ixaxpy_diag_subprod(sym_mat & S, const bubMatrix & J, const ind_array & ia_in, const ind_array & ia_out) {
+					matrix<double> JSii = prod(J, project(S, ia_in, ia_in));
+					project(S, ia_out, ia_out) = prod<sym_mat> (JSii, trans(J));
+			}
+
+			template<class bubMatrixJ, class bubMatrixY>
+			void ixaxpy_prod(sym_mat & S, const ind_array & ia_x, const bubMatrixJ & J, const ind_array & ia_in, const ind_array & ia_out, const bubMatrixY Y){
+					ixaxpy_offdiag_subprod(S, ia_x, J, ia_in, ia_out);
+					ixaxpy_diag_subprod(S, J, ia_in, ia_out, Y);
+			}
+
+			template<class bubMatrixJ>
+			void ixaxpy_prod(sym_mat & S, const ind_array & ia_x, const bubMatrixJ & J, const ind_array & ia_in, const ind_array & ia_out){
+					ixaxpy_offdiag_subprod(S, ia_x, J, ia_in, ia_out);
+					ixaxpy_diag_subprod(S, J, ia_in, ia_out);
 			}
 
 		}

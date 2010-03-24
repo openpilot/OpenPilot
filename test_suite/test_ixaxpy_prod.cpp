@@ -57,6 +57,7 @@ void test_ixaxpy02(void) {
 	size_t N = 4;
 	n = 2;
 
+
 	// first test for complementing and concatenating indirect arrays
 	////////////////////////////////
 	jblas::ind_array iax(N);
@@ -85,6 +86,7 @@ void test_ixaxpy02(void) {
 	iacat = ublasExtra::ia_union(itest0, iar);
 	cout << "iacat_itest0_iar = " << (MATLAB) iacat << endl;
 
+
 	// now test for ixaxpy_prod()
 	///////////////////////////
 
@@ -96,22 +98,25 @@ void test_ixaxpy02(void) {
 	symmetric_matrix<double> S2(S); // copy of S
 	symmetric_adaptor<symmetric_matrix<double> > SS(S2);
 
+
 	// the jacobian
-	jblas::mat Hr;
-	randMatrix(Hr, n, n);
-	cout << "Hr = " << (MATLAB) Hr << endl;
+	jblas::mat J;
+	randMatrix(J, n, n);
+	cout << "J = " << (MATLAB) J << endl;
+
 
 	// Here we print the Matlab operations for generating the full Jacobian
-	cout << "H = eye(" << N << "); H(iar,iar) = Hr" << endl;
+	cout << "H = eye(" << N << "); H(iar,iar) = J" << endl;
 
-	// Here we perform P = [Hr 0 ; 0 I] * P * [Hr 0 ; 0 I]'
-	// in the optimized fashion: P = [Hr*Srr*Hr' Hr*Srm ; XXXXX Smm]
+
+	// Here we perform P = [J 0 ; 0 I] * P * [J 0 ; 0 I]'
+	// in the optimized fashion: P = [J*Srr*J' J*Srm ; XXXXX Smm]
 	// where XXXX is not computed because P is symmetrical,
 	// and Smm neither because it's a copy of the original.
 
 	cout << "% With MS = symmetric_adaptor<matrix>" << endl;
 	cout << "MS = " << (MATLAB) MS << endl;
-	ublasExtra::ixaxpy_prod(MS, iax, Hr, iar);
+	ublasExtra::ixaxpy_prod(MS, iax, J, iar);
 	cout << "MS_cpp = " << (MATLAB) MS << endl;
 	cout << "MS_mat = H * MS * H';" << endl;
 	cout << "MS_err = MS_cpp - MS_mat;" << endl;
@@ -119,7 +124,7 @@ void test_ixaxpy02(void) {
 
 	cout << "% With S = symmetric_matrix " << endl;
 	cout << "S = " << (MATLAB) S << endl;
-	ublasExtra::ixaxpy_prod(S, iax, Hr, iar);
+	ublasExtra::ixaxpy_prod(S, iax, J, iar);
 	cout << "S_cpp = " << (MATLAB) S << endl;
 	cout << "S_mat = H * S * H';" << endl;
 	cout << "S_err = S_cpp - S_mat;" << endl;
@@ -127,7 +132,7 @@ void test_ixaxpy02(void) {
 
 	cout << "% With SS = symmetric_adaptor<symmetric_matrix> " << endl;
 	cout << "SS = " << (MATLAB) SS << endl;
-	ublasExtra::ixaxpy_prod(SS, iax, Hr, iar);
+	ublasExtra::ixaxpy_prod(SS, iax, J, iar);
 	cout << "SS_cpp = " << (MATLAB) SS << endl;
 	cout << "SS_mat = H * SS * H';" << endl;
 	cout << "SS_err = SS_cpp - SS_mat;" << endl;
@@ -135,8 +140,92 @@ void test_ixaxpy02(void) {
 
 }
 
+void test_ixaxpy03(void) {
+
+	cout << "\n% TEST FOR IXAXPY\n% ===========" << endl;
+	size_t s = 6; // size of S(s,s)
+	size_t N = 5; // size of P(N,N)
+	size_t n = 2; // size of OUT_in(m,n)
+	size_t m = 1; // size of OUT_in(m,n)
+
+	//	symmetric_matrix<double> S(s,s);
+	jblas::sym_mat S(s, s);
+	randMatrix(S);
+
+	jblas::ind_array ia_x(N);
+	for (size_t i = 0; i < N; i++)
+		ia_x(i) = i;
+	cout << "ia_x = " << (MATLAB) ia_x << endl;
+
+	jblas::ind_array ia_in(n);
+	ia_in(0) = 2;
+	ia_in(1) = 0;
+	cout << "ia_in = " << (MATLAB) ia_in << endl;
+
+	cout << "% With S = symmetric_matrix." << endl;
+	cout << "% With output not in the original map range." << endl;
+
+	jblas::ind_array ia_out(m);
+	//	ia_out(0) = 3; // this one inside P
+	ia_out(0) = 5; // this one outside P
+	cout << "ia_out = " << (MATLAB) ia_out << endl;
+
+
+	// the jacobian
+	jblas::mat OUT_in;
+	randMatrix(OUT_in, m, n);
+	cout << "OUT_in = " << (MATLAB) OUT_in << endl;
+
+
+	// Here we print the Matlab operations for generating the full Jacobian
+	cout << "J = zeros(" << s << "); J(ia_x,ia_x) = eye(" << N << "); J(ia_out,ia_out) = 0; J(ia_out,ia_in) = OUT_in" << endl;
+
+	// Here we perform P = [OUT_in 0 ; 0 I] * P * [OUT_in 0 ; 0 I]'
+	// in the optimized fashion: P = [OUT_in*Srr*OUT_in' OUT_in*Srm ; XXXXX Smm]
+	// where XXXX is not computed because P is symmetrical,
+	// and Smm neither because it's a copy of the original.
+
+	cout << "% Without added covariance." << endl;
+	cout << "S = " << (MATLAB) S << endl;
+	ublasExtra::ixaxpy_prod(S, ia_x, OUT_in, ia_in, ia_out);
+	cout << "S_cpp = " << (MATLAB) S << endl;
+	cout << "S_mat = J * S * J';" << endl;
+	cout << "ia_res = " << (MATLAB) ublasExtra::ia_union(ia_x, ia_out) << endl;
+	cout << "S_err = S_cpp(ia_res,ia_res) - S_mat(ia_res,ia_res);" << endl;
+	cout << "norm_S_err = norm(S_err)" << endl;
+
+
+	cout << "% With output not in the original map range." << endl;
+	cout << "% With output not in the input range." << endl;
+	ia_out(0) = 4;
+	cout << "S = " << (MATLAB) S << endl;
+	cout << "ia_out = " << (MATLAB) ia_out << endl;
+	cout << "J = zeros(" << s << "); J(ia_x,ia_x) = eye(" << N << "); J(ia_out,ia_out) = 0; J(ia_out,ia_in) = OUT_in" << endl;
+	ublasExtra::ixaxpy_prod(S, ia_x, OUT_in, ia_in, ia_out);
+	cout << "S_cpp = " << (MATLAB) S << endl;
+	cout << "S_mat = J * S * J';" << endl;
+	cout << "ia_res = " << (MATLAB) ublasExtra::ia_union(ia_x, ia_out) << endl;
+	cout << "S_err = S_cpp(ia_res,ia_res) - S_mat(ia_res,ia_res);" << endl;
+	cout << "norm_S_err = norm(S_err)" << endl;
+
+	cout << "% With output not in the original map range." << endl;
+	cout << "% With output in the input range." << endl;
+	ia_out(0) = 2;
+	cout << "S = " << (MATLAB) S << endl;
+	cout << "ia_out = " << (MATLAB) ia_out << endl;
+	cout << "J = zeros(" << s << "); J(ia_x,ia_x) = eye(" << N << "); J(ia_out,ia_out) = 0; J(ia_out,ia_in) = OUT_in" << endl;
+	ublasExtra::ixaxpy_prod(S, ia_x, OUT_in, ia_in, ia_out);
+	cout << "S_cpp = " << (MATLAB) S << endl;
+	cout << "S_mat = J * S * J';" << endl;
+	cout << "ia_res = " << (MATLAB) ublasExtra::ia_union(ia_x, ia_out) << endl;
+	cout << "S_err = S_cpp(ia_res,ia_res) - S_mat(ia_res,ia_res)" << endl;
+	cout << "norm_S_err = norm(S_err)" << endl;
+
+}
+
 BOOST_AUTO_TEST_CASE( test_ixaxpy )
 {
-	test_ixaxpy02();
+//	test_ixaxpy02();
+	test_ixaxpy03();
 }
 

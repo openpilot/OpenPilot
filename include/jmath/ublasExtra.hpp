@@ -120,7 +120,7 @@ namespace jafar {
 							"ublasExtra::prod_xt_P_x: size mismatch.");
 					jblas::sym_mat iP(P.size1());
 					lu_inv(P, iP);
-					return ublas::inner_prod<double>(x, ublas::prod<jblas::vec>(iP, x));
+					return ublas::inner_prod(x, ublas::prod<jblas::vec>(iP, x));
 			}
 
 			/**
@@ -133,10 +133,11 @@ namespace jafar {
 			double prod_xt_iP_x(SymMat & iP, V & x) {
 					JFR_PRECOND(x.size()==iP.size1(),
 							"ublasExtra::prod_xt_iP_x: size mismatch.");
-					return ublas::inner_prod<double>(x, ublas::prod(iP, x));
+					return ublas::inner_prod(x, ublas::prod(iP, x));
 			}
 
-			/** jacobian of normalize().
+			/**
+			 * Jacobian of normalize().
 			 */
 			template<class V>
 			void normalizeJac(V& v, jblas::mat& J) {

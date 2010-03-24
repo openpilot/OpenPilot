@@ -21,37 +21,45 @@ namespace jafar {
 	namespace jmath {
 		namespace ublasExtra {
 
+
 			/**
 			 * Complement of ind. array
 			 */
 			jblas::ind_array ia_complement(const jblas::ind_array & ifull, const jblas::ind_array & ipartial) {
 
-				size_t ifull_max = 0;
+				size_t i_max = 0;
 				for (size_t i = 0; i < ifull.size(); i++)
-					if (ifull(i) > ifull_max)
-						ifull_max = ifull(i);
+					if (ifull(i) > i_max)
+						i_max = ifull(i);
+				for (size_t i = 0; i < ipartial.size(); i++)
+					if (ipartial(i) > i_max)
+						i_max = ipartial(i);
 
-				jblas::vecb is_in_partial(ifull_max + 1);
+				jblas::vecb is_in_full(i_max + 1);
+				is_in_full.clear();
+				for (size_t i = 0; i < ifull.size(); i++)
+					is_in_full(ifull(i)) = true;
 
+				jblas::vecb is_in_partial(i_max + 1);
 				is_in_partial.clear();
 				for (size_t i = 0; i < ipartial.size(); i++)
 					is_in_partial(ipartial(i)) = true;
 
-				jblas::ind_array icomp(ifull.size() - ipartial.size());
-				size_t j = 0;
-				for (size_t i = 0; i < ifull.size(); i++) {
-					if (!is_in_partial(ifull(i))) {
-						icomp(j) = ifull(i);
-						j++;
-					}
-				}
+				jblas::vecb is_in_comp(i_max + 1);
+				for (size_t i = 0; i <= i_max; i++)
+					is_in_comp(i) = (is_in_full(i) && !is_in_partial(i));
+
+				jblas::ind_array icomp = ia_bool(is_in_comp);
+
 				return icomp;
 			}
+
 
 			/**
 			 * Union of ind. arrays
 			 */
 			jblas::ind_array ia_union(const jblas::ind_array & ia1, const jblas::ind_array & ia2) {
+
 
 				// get max index
 				size_t max_index = 0;
@@ -62,6 +70,7 @@ namespace jafar {
 				for (size_t i = 0; i < ia2.size(); i++)
 					if (ia2(i) > max_index)
 						max_index = ia2(i);
+
 
 				// explore inputs
 				size_t repetitions = 0;
@@ -90,6 +99,7 @@ namespace jafar {
 				return icat;
 			}
 
+
 			/**
 			 * Return the N first indices of an indirect array
 			 */
@@ -100,6 +110,7 @@ namespace jafar {
 					res(i) = ia(i);
 				return res;
 			}
+
 
 			/**
 			 * Create array from a boolean vector
@@ -118,6 +129,7 @@ namespace jafar {
 					}
 				return ia;
 			}
+
 
 			/**
 			 * Create indirect array from boolean vector and take the head N elements
@@ -163,6 +175,7 @@ namespace jafar {
 				return res;
 			}
 
+
 			/*
 			 * Create indirect array from boolean vector with the head N false-elements, and set these N elements to the boolean.
 			 */
@@ -184,6 +197,7 @@ namespace jafar {
 				return res;
 			}
 
+
 			/*
 			 * Create indirect array from range.
 			 */
@@ -194,6 +208,7 @@ namespace jafar {
 				return res;
 			}
 
+
 			/**
 			 * Create indirect array from slice.
 			 */
@@ -203,6 +218,7 @@ namespace jafar {
 					res(i) = s.start() + s.stride() * i;
 				return res;
 			}
+
 
 			/**
 			 * Create indirect array from start and end indices.

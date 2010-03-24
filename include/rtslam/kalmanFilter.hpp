@@ -73,9 +73,13 @@ namespace jafar {
 				 * \param F_u the Jacobian of the process model wrt the perturbation.
 				 * \param U the covariances matrix of the perturbation.
 				 */
-				inline void predict(ind_array & iax, mat & F_v, ind_array & iav, mat & F_u, sym_mat & U) {
+				inline void predict(const ind_array & iax, const  mat & F_v, const ind_array & iav, const mat & F_u, const sym_mat & U) {
 					jafar::jmath::ublasExtra::ixaxpy_prod(P_, iax, F_v, iav);
 					ublas::project(P_, iav, iav) += jafar::jmath::ublasExtra::prod_JPJt(U, F_u);
+				}
+				inline void predict(const ind_array & iax, const mat & F_v, const ind_array & iav, const sym_mat & Q) {
+					jafar::jmath::ublasExtra::ixaxpy_prod(P_, iax, F_v, iav);
+					ublas::project(P_, iav, iav) += Q;
 				}
 				inline void correct();
 				inline void computeInnovation();

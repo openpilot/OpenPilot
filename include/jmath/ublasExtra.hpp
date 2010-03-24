@@ -102,7 +102,7 @@ namespace jafar {
 			 * \return the transformed covariances matrix
 			 */
 			template<class SymMat>
-			jblas::sym_mat prod_JPJt(SymMat & P, jblas::mat & J) {
+			jblas::sym_mat prod_JPJt(const SymMat & P, const jblas::mat & J) {
 				JFR_PRECOND((J.size2()==P.size1()) && (P.size2()==P.size1()),
 						"ublasExtra::prod_JPJt: size mismatch.");
 				return ublas::prod<jblas::sym_mat>(J, ublas::prod<jblas::mat>(P, ublas::trans(J)));
@@ -115,7 +115,7 @@ namespace jafar {
 			 * \return the NEES = x' * P^-1 * x
 			 */
 			template<class SymMat, class V>
-			double prod_xt_P_x(SymMat & P, V & x) {
+			double prod_xt_P_x(const SymMat & P, const V & x) {
 					JFR_PRECOND(x.size() == P.size1(),
 							"ublasExtra::prod_xt_P_x: size mismatch.");
 					jblas::sym_mat iP(P.size1());

@@ -265,7 +265,6 @@ void test_main01() {
 		robPtr->move(control);
 		cout << "x  = " << robPtr->state.x() << endl;
 		filter.predict(slamMapPtr->ia_used_states(), robPtr->dx_by_dstate, robPtr->state.ia(), robPtr->Q);
-		cout << "x  = " << robPtr->state.x() << endl;
 
 
 		// now loop for sensors on this particular robot

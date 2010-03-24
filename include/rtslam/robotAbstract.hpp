@@ -46,8 +46,10 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
+
 		//  Forward declarations of children
 		class SensorAbstract;
+
 
 		/** Base class for all Gaussian control vectors defined in the module rtslam.
 		 *
@@ -70,9 +72,10 @@ namespace jafar {
 		 */
 		class RobotAbstract: public MapObject {
 
-				friend ostream& operator <<(ostream & s, jafar::rtslam::RobotAbstract & rob) ;
+				friend ostream& operator <<(ostream & s, jafar::rtslam::RobotAbstract & rob);
 
 			public:
+
 
 				/**
 				 * Remote constructor from remote map and size of state and control vectors.
@@ -83,26 +86,22 @@ namespace jafar {
 				RobotAbstract(MapAbstract & _map, const size_t _size_state, const size_t _size_control);
 
 				// Mandatory virtual destructor.
-				virtual ~RobotAbstract() {}
+				virtual ~RobotAbstract() {
+				}
 
 				map_ptr_t slamMap; ///< parent map
-
 				sensors_ptr_set_t sensors; ///<	A set of sensors
 
 				Gaussian pose; ///< Robot pose
-
 				Control control; ///< Control Gaussian vector
 
 				jblas::sym_mat Q; ///< Perturbation matrix in state space, Q = dx_by_dcontrol * control.P * trans(dx_by_dcontrol);
-
 				jblas::mat dx_by_dstate; ///< Jacobian wrt state
-
 				jblas::mat dx_by_dcontrol; ///< Jacobian wrt control
 
 				static size_t size_control() {
 					return 0;
 				}
-
 				static size_t size_pert() {
 					return 0;
 				}
@@ -124,6 +123,7 @@ namespace jafar {
 					control = _control;
 				}
 
+
 				/**
 				 * Move the robot.
 				 */
@@ -138,16 +138,15 @@ namespace jafar {
 				void move(V & _u) {
 					JFR_ASSERT(_u.size() == control.size(), "robotAbstract.hpp: move: wrong control size.");
 					control.x(_u);
-					cout << control.x() << endl;
-
 					move();
 				}
+
 
 				/**
 				 * Retro-project perturbation to robot state.
 				 */
-				void computeStatePerturbation(){
-					Q = jmath::ublasExtra::prod_JPJt(control.P(),dx_by_dcontrol);
+				void computeStatePerturbation() {
+					Q = jmath::ublasExtra::prod_JPJt(control.P(), dx_by_dcontrol);
 				}
 
 		};

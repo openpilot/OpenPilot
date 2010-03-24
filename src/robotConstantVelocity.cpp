@@ -105,27 +105,17 @@ namespace jafar {
 
 
 			// predict each part of the state, give or build non-trivial Jacobians
-			cout << "x  = " << state.x() << endl;
-
 			p += v * dt;
 			P_v = I_3 * dt;
 			vec4 q_old(q);
-			cout << "q  = " << q << endl;
-			cout << "w  = " << w << endl;
-			cout << "dt = " << dt << endl;
 			quaternion::v2q(w * dt, qwdt, QWDT_wdt);
-			cout << "qwdt=" << qwdt << endl;
 			quaternion::qProd(q_old, qwdt, q, Q_q, Q_qwdt);
-			cout << "q  = " << q << endl;
 			Q_wdt = ublas::prod(Q_qwdt, QWDT_wdt);
 			v += vi;
 			w += wi;
-			cout << "x  = " << state.x() << endl;
-
 
 			// Compose state - this is the output state.
 			composeState(p, q, v, w);
-
 
 			// Build transition Jacobian matrix dx_by_dstate
 			dx_by_dstate.assign(identity_mat(state.size()));

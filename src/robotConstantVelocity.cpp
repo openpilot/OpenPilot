@@ -11,17 +11,21 @@
  * \ingroup rtslam
  */
 
-#include "rtslam/robotConstantVelocity.hpp"
 #include "jmath/jblas.hpp"
+#include "jmath/ublasExtra.hpp"
 #include "boost/numeric/ublas/operation.hpp"
 #include "boost/numeric/ublas/matrix_proxy.hpp"
 #include "boost/numeric/ublas/vector_proxy.hpp"
 #include "rtslam/quatTools.hpp"
+
 #include "rtslam/robotAbstract.hpp"
+#include "rtslam/robotConstantVelocity.hpp"
+
 
 namespace jafar {
 	namespace rtslam {
 		using namespace std;
+		using namespace jmath;
 
 
 		/**

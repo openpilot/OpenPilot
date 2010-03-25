@@ -30,7 +30,10 @@
 
 #include <extensionsystem/pluginmanager.h>
 #include "icore.h"
+#include "coreplugin/uavgadgetinstancemanager.h"
+//#include "coreimpl.h"
 
+#include <QtCore/QDebug>
 #include <QtCore/QSettings>
 #include <QtGui/QHeaderView>
 #include <QtGui/QPushButton>
@@ -68,6 +71,11 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId,
     buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
 
     connect(buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(apply()));
+   
+    m_instanceManager = Core::ICore::instance()->uavGadgetInstanceManager();
+    
+    connect(this, SIGNAL(settingsDialogShown(Core::Internal::SettingsDialog*)), m_instanceManager, SLOT(settingsDialogShown(Core::Internal::SettingsDialog*)));
+    connect(this, SIGNAL(settingsDialogRemoved()), m_instanceManager, SLOT(settingsDialogRemoved()));
 
     splitter->setCollapsible(1, false);
     pageTree->header()->setVisible(false);
@@ -152,11 +160,66 @@ void SettingsDialog::pageSelected()
     stackedPages->setCurrentIndex(index);
 }
 
+void SettingsDialog::deletePage()
+{
+    QTreeWidgetItem *item = pageTree->currentItem();
+    item->parent()->removeChild(item);
+    PageData data = item->data(0, Qt::UserRole).value<PageData>();
+    int index = data.index;
+    m_deletedPageIndices.append(index);
+    pageSelected();
+}
+
+void SettingsDialog::insertPage(IOptionsPage* page)
+{
+    PageData pageData;
+    pageData.index = m_pages.count();
+    pageData.category = page->category();
+    pageData.id = page->id();
+
+    QTreeWidgetItem *categoryItem = 0;
+    for (int i = 0; i < pageTree->topLevelItemCount(); ++i) {
+        QTreeWidgetItem *tw = pageTree->topLevelItem(i);
+        PageData data = tw->data(0, Qt::UserRole).value<PageData>();
+        if (data.category == page->category()) {
+            categoryItem = tw;
+            break;
+        }
+    }
+    if (!categoryItem)
+        return;
+
+    QTreeWidgetItem *item = new QTreeWidgetItem;
+    item->setText(0, page->trName());
+    item->setData(0, Qt::UserRole, qVariantFromValue(pageData));
+
+    categoryItem->addChild(item);
+
+    m_pages.append(page);
+    stackedPages->addWidget(page->createPage(stackedPages));
+
+    stackedPages->setCurrentIndex(stackedPages->count());
+    pageTree->setCurrentItem(item);
+}
+
+void SettingsDialog::updateText(QString text)
+{
+    QTreeWidgetItem *item = pageTree->currentItem();
+    item->setText(0, text);
+}
+
+void SettingsDialog::disableApplyOk(bool disable)
+{
+    buttonBox->button(QDialogButtonBox::Apply)->setDisabled(disable);
+    buttonBox->button(QDialogButtonBox::Ok)->setDisabled(disable);
+}
+
 void SettingsDialog::accept()
 {
     m_applied = true;
     foreach (IOptionsPage *page, m_pages) {
-        page->apply();
+        if (!m_deletedPageIndices.contains(m_pages.indexOf(page)))
+            page->apply();
         page->finish();
     }
     done(QDialog::Accepted);
@@ -171,15 +234,19 @@ void SettingsDialog::reject()
 
 void SettingsDialog::apply()
 {
-    foreach (IOptionsPage *page, m_pages)
-        page->apply();
+    foreach (IOptionsPage *page, m_pages) {
+        if (!m_deletedPageIndices.contains(m_pages.indexOf(page)))
+            page->apply();
+    }
     m_applied = true;
 }
 
 bool SettingsDialog::execDialog()
 {
     m_applied = false;
+    emit settingsDialogShown(this);
     exec();
+    emit settingsDialogRemoved();
     return m_applied;
 }
 

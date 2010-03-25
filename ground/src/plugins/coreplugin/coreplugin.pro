@@ -56,9 +56,9 @@ SOURCES += mainwindow.cpp \
     eventfilteringmainwindow.cpp \
     connectionmanager.cpp \
     iconnection.cpp \
-    uavgadgetoptionspage.cpp \
     iuavgadgetconfiguration.cpp \
-    uavgadgetinstancemanager.cpp
+    uavgadgetinstancemanager.cpp \
+    uavgadgetoptionspagedecorator.cpp
 HEADERS += mainwindow.h \
     tabpositionindicator.h \
     fancyactionbar.h \
@@ -111,9 +111,9 @@ HEADERS += mainwindow.h \
     eventfilteringmainwindow.h \
     connectionmanager.h \
     iconnection.h \
-    uavgadgetoptionspage.h \
     iuavgadgetconfiguration.h \
-    uavgadgetinstancemanager.h
+    uavgadgetinstancemanager.h \
+    uavgadgetoptionspagedecorator.h
 FORMS += dialogs/settingsdialog.ui \
     dialogs/shortcutsettings.ui \
     generalsettings.ui \

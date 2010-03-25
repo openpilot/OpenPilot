@@ -55,11 +55,14 @@ public:
     QString classId() const { return m_classId; }
 
     virtual void loadConfiguration(IUAVGadgetConfiguration* /*config*/) {}
+    IUAVGadgetConfiguration *activeConfiguration() { return m_activeConfiguration; }
     QComboBox *toolBar() { return m_toolbar; }
     virtual QByteArray saveState();
     virtual void restoreState(QByteArray state);
 public slots:
     void configurationChanged(IUAVGadgetConfiguration* config);
+    void configurationAdded(IUAVGadgetConfiguration* config);
+    void configurationToBeDeleted(IUAVGadgetConfiguration* config);
     void configurationNameChanged(QString oldName, QString newName);
 private slots:
     void loadConfiguration(int index);

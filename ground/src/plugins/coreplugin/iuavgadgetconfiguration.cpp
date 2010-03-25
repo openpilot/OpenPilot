@@ -33,6 +33,7 @@ IUAVGadgetConfiguration::IUAVGadgetConfiguration(bool locked, QString classId, Q
     QObject(parent),
     m_locked(locked),
     m_classId(classId),
-    m_name(name)
+    m_name(name),
+    m_provisionalName(name)
 {
 }

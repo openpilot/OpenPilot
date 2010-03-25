@@ -40,7 +40,7 @@ namespace Core {
 
 class IUAVGadget;
 class IUAVGadgetConfiguration;
-class UAVGadgetOptionsPage;
+class IOptionsPage;
 
 class CORE_EXPORT IUAVGadgetFactory : public QObject
 {
@@ -52,11 +52,11 @@ public:
             m_name(name) {}
     virtual ~IUAVGadgetFactory() {}
 
-    virtual IUAVGadget *createUAVGadget(QList<IUAVGadgetConfiguration*> *configurations, QWidget *parent) = 0;
-    virtual IUAVGadgetConfiguration *createUAVGadgetConfiguration(bool /*locked*/,
+    virtual IUAVGadget *createGadget(QList<IUAVGadgetConfiguration*> *configurations, QWidget *parent) = 0;
+    virtual IUAVGadgetConfiguration *createConfiguration(bool /*locked*/,
                                                                   const QString /*configName*/,
                                                                   const QByteArray &/*state*/) { return 0; }
-    virtual UAVGadgetOptionsPage *createUAVGadgetOptionsPage(IUAVGadgetConfiguration */*config*/) { return 0; }
+    virtual IOptionsPage *createOptionsPage(IUAVGadgetConfiguration */*config*/) { return 0; }
     QString classId() const { return m_classId; }
     QString name() const { return m_name; }
 private:

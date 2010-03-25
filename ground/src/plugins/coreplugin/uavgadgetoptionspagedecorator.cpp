@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       uavgadgetoptionspage.cpp
+ * @file       uavgadgetoptionspagedecorator.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief
+ * @brief      
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   coreplugin
  * @{
@@ -25,27 +25,27 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "uavgadgetoptionspage.h"
+#include "uavgadgetoptionspagedecorator.h"
 #include "ui_uavgadgetoptionspage.h"
 #include "uavgadgetinstancemanager.h"
 #include "coreimpl.h"
 
 #include <QtCore/QDebug>
 
-
 using namespace Core;
 
-UAVGadgetOptionsPage::UAVGadgetOptionsPage(IUAVGadgetConfiguration *config, QObject *parent) :
+UAVGadgetOptionsPageDecorator::UAVGadgetOptionsPageDecorator(IOptionsPage *page, IUAVGadgetConfiguration *config, QObject *parent) :
     Core::IOptionsPage(parent),
+    m_optionsPage(page),
     m_config(config),
     m_id(config->name()),
     m_category(config->classId())
 {
-    UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
-    m_categoryTr = im->uavGadgetName(m_category);
+    m_instanceManager = ICore::instance()->uavGadgetInstanceManager();
+    m_categoryTr = m_instanceManager->gadgetName(m_category);
 }
 
-QWidget *UAVGadgetOptionsPage::createPage(QWidget *parent)
+QWidget *UAVGadgetOptionsPageDecorator::createPage(QWidget *parent)
 {
     m_page = new Ui_TopOptionsPage();
     QWidget *w = new QWidget(parent);
@@ -55,14 +55,44 @@ QWidget *UAVGadgetOptionsPage::createPage(QWidget *parent)
         m_page->lockCheckBox->hide();
         m_page->nameLineEdit->setDisabled(true);
     }
+    if (!m_instanceManager->canDeleteConfiguration(m_config))
+        m_page->deleteButton->setDisabled(true);
     m_page->lockCheckBox->hide(); //
     m_page->nameLineEdit->setText(m_id);
-    QWidget *wi = widget();
+
+    QWidget *wi = m_optionsPage->createPage(w);
     m_page->verticalLayout_4->addWidget(wi);
 
-    w->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    connect(m_page->cloneButton, SIGNAL(clicked()), this, SLOT(cloneConfiguration()));
+    connect(m_page->deleteButton, SIGNAL(clicked()), this, SLOT(deleteConfiguration()));
+    connect(m_page->nameLineEdit, SIGNAL(textEdited(QString)), this, SLOT(textEdited(QString)));
 
     return w;
 }
 
+void UAVGadgetOptionsPageDecorator::apply()
+{
+    m_optionsPage->apply();
+}
+
+void UAVGadgetOptionsPageDecorator::finish()
+{
+    m_optionsPage->finish();
+}
+
+void UAVGadgetOptionsPageDecorator::cloneConfiguration()
+{
+    m_instanceManager->cloneConfiguration(m_config);
+}
+
+void UAVGadgetOptionsPageDecorator::deleteConfiguration()
+{
+    m_instanceManager->deleteConfiguration(m_config);
+}
+
+void UAVGadgetOptionsPageDecorator::textEdited(QString name)
+{
+    m_config->setProvisionalName(name);
+    m_instanceManager->configNameEdited(name);
+}
 

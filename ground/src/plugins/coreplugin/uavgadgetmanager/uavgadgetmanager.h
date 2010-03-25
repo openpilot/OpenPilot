@@ -93,7 +93,7 @@ public:
 
     void ensureUAVGadgetManagerVisible();
 
-    IUAVGadget *currentUAVGadget() const;
+    IUAVGadget *currentGadget() const;
 
     QByteArray saveState() const;
     bool restoreState(const QByteArray &state);
@@ -103,7 +103,7 @@ public:
     bool toolbarsShown() { return m_showToolbars; }
 
 signals:
-    void currentUAVGadgetChanged(IUAVGadget *gadget);
+    void currentGadgetChanged(IUAVGadget *gadget);
 
 private slots:
     void handleContextChange(Core::IContext *context);
@@ -119,9 +119,9 @@ public slots:
     void showToolbars(bool show);
 
 private:
-    void addUAVGadget(IUAVGadget *gadget);
-    void removeUAVGadget(IUAVGadget *gadget);
-    void setCurrentUAVGadget(IUAVGadget *gadget);
+    void addGadgetToContext(IUAVGadget *gadget);
+    void removeGadget(IUAVGadget *gadget);
+    void setCurrentGadget(IUAVGadget *gadget);
     void closeView(Core::Internal::UAVGadgetView *view);
     void emptyView(Core::Internal::UAVGadgetView *view);
     Core::Internal::SplitterOrView *currentSplitterOrView() const;

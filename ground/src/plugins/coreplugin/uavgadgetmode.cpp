@@ -120,6 +120,6 @@ void UAVGadgetMode::grabUAVGadgetManager(Core::IMode *mode)
     if (mode != this)
         return;
 
-    if (m_uavGadgetManager->currentUAVGadget())
-        m_uavGadgetManager->currentUAVGadget()->widget()->setFocus();
+    if (m_uavGadgetManager->currentGadget())
+        m_uavGadgetManager->currentGadget()->widget()->setFocus();
 }

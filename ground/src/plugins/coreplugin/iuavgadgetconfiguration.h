@@ -42,8 +42,10 @@ public:
     QString classId() { return m_classId; }
     QString name() { return m_name; }
     void setName(QString name) { m_name = name; }
+    QString provisionalName() { return m_provisionalName; }
+    void setProvisionalName(QString name) { m_provisionalName = name; }
     bool locked() const { return m_locked; }
-    virtual IUAVGadgetConfiguration *clone() = 0;
+    virtual IUAVGadgetConfiguration *clone(QString name) = 0;
 
 signals:
 
@@ -53,6 +55,7 @@ private:
     bool m_locked;
     QString m_classId;
     QString m_name;
+    QString m_provisionalName;
 
 };
 

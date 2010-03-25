@@ -72,7 +72,7 @@ UAVGadgetView::UAVGadgetView(Core::UAVGadgetManager *uavGadgetManager, IUAVGadge
         m_uavGadgetList(new QComboBox),
         m_closeButton(new QToolButton),
         m_defaultIndex(0),
-        m_activeLabel(new QLabel(tr("<font color=red><b>Active</b></font>")))
+        m_activeLabel(new QLabel)
 {
 
     tl = new QVBoxLayout(this);
@@ -84,11 +84,11 @@ UAVGadgetView::UAVGadgetView(Core::UAVGadgetManager *uavGadgetManager, IUAVGadge
         m_uavGadgetList->setMaxVisibleItems(40);
         m_uavGadgetList->setContextMenuPolicy(Qt::CustomContextMenu);
         UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
-        QStringList sl = im->uavGadgetClassIds();
+        QStringList sl = im->classIds();
         int index = 0;
         foreach(QString classId, sl)
         {
-            m_uavGadgetList->addItem(im->uavGadgetName(classId), classId);
+            m_uavGadgetList->addItem(im->gadgetName(classId), classId);
             if (classId == QString("EmptyGadget"))
                 m_defaultIndex = index;
             ++index;
@@ -108,6 +108,7 @@ UAVGadgetView::UAVGadgetView(Core::UAVGadgetManager *uavGadgetManager, IUAVGadge
         spacerWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
         m_activeLabel->setTextFormat(Qt::RichText);
+        m_activeLabel->setText("<font color=red><b>" + tr("Active") + "</b></font>");
 
         m_closeButton->setAutoRaise(true);
         m_closeButton->setIcon(QIcon(":/core/images/closebutton.png"));
@@ -127,10 +128,10 @@ UAVGadgetView::UAVGadgetView(Core::UAVGadgetManager *uavGadgetManager, IUAVGadge
 
         connect(m_uavGadgetList, SIGNAL(activated(int)), this, SLOT(listSelectionActivated(int)));
         connect(m_closeButton, SIGNAL(clicked()), this, SLOT(closeView()), Qt::QueuedConnection);
-        connect(m_uavGadgetManager, SIGNAL(currentUAVGadgetChanged(IUAVGadget*)), this, SLOT(currentUAVGadgetChanged(IUAVGadget*)));
+        connect(m_uavGadgetManager, SIGNAL(currentGadgetChanged(IUAVGadget*)), this, SLOT(currentGadgetChanged(IUAVGadget*)));
     }
     if (m_uavGadget) {
-        setUAVGadget(m_uavGadget);
+        setGadget(m_uavGadget);
     } else {
         listSelectionActivated(m_defaultIndex);
     }
@@ -140,7 +141,7 @@ UAVGadgetView::~UAVGadgetView()
 {
 }
 
-bool UAVGadgetView::hasUAVGadget(IUAVGadget *uavGadget) const
+bool UAVGadgetView::hasGadget(IUAVGadget *uavGadget) const
 {
     return (m_uavGadget == uavGadget);
 }
@@ -155,7 +156,7 @@ void UAVGadgetView::closeView()
     m_uavGadgetManager->closeView(this);
 }
 
-void UAVGadgetView::removeUAVGadget()
+void UAVGadgetView::removeGadget()
 {
     if (!m_uavGadget)
         return;
@@ -175,17 +176,17 @@ void UAVGadgetView::removeUAVGadget()
     m_uavGadget = 0;
 }
 
-IUAVGadget *UAVGadgetView::uavGadget() const
+IUAVGadget *UAVGadgetView::gadget() const
 {
     return m_uavGadget;
 }
 
-void UAVGadgetView::setUAVGadget(IUAVGadget *uavGadget)
+void UAVGadgetView::setGadget(IUAVGadget *uavGadget)
 {
     if (!uavGadget) {
         return;
     }
-    removeUAVGadget();
+    removeGadget();
     m_uavGadget = uavGadget;
     tl->addWidget(m_uavGadget->widget());
     m_uavGadget->widget()->setParent(this);
@@ -221,9 +222,9 @@ void UAVGadgetView::listSelectionActivated(int index)
     QString classId = m_uavGadgetList->itemData(index).toString();
     if (m_uavGadget && (m_uavGadget->classId() == classId))
         return;
-    IUAVGadget *gadget = fm->createUAVGadget(classId, this);
-    setUAVGadget(gadget);
-    m_uavGadgetManager->setCurrentUAVGadget(gadget);
+    IUAVGadget *gadget = fm->createGadget(classId, this);
+    setGadget(gadget);
+    m_uavGadgetManager->setCurrentGadget(gadget);
 }
 
 int UAVGadgetView::indexOfClassId(QString classId)
@@ -231,10 +232,9 @@ int UAVGadgetView::indexOfClassId(QString classId)
     return m_uavGadgetList->findData(classId);
 }
 
-void UAVGadgetView::currentUAVGadgetChanged(IUAVGadget *gadget)
+void UAVGadgetView::currentGadgetChanged(IUAVGadget *gadget)
 {
-    (m_uavGadget == gadget) ? m_activeLabel->show() : m_activeLabel->hide();
-
+    m_activeLabel->setVisible(m_uavGadget == gadget);
 }
 
 SplitterOrView::SplitterOrView(Core::UAVGadgetManager *uavGadgetManager, Core::IUAVGadget *uavGadget, bool isRoot) :
@@ -259,9 +259,9 @@ void SplitterOrView::mousePressEvent(QMouseEvent *e)
 {
     if (e->button() != Qt::LeftButton)
         return;
-    if (uavGadget()) {
+    if (gadget()) {
         setFocus(Qt::MouseFocusReason);
-        m_uavGadgetManager->setCurrentUAVGadget(this->uavGadget());
+        m_uavGadgetManager->setCurrentGadget(this->gadget());
     }
 }
 
@@ -273,7 +273,7 @@ void SplitterOrView::paintEvent(QPaintEvent *event)
     if (!m_view)
         return;
 
-    if (hasUAVGadget())
+    if (hasGadget())
         return;
 
     if (m_uavGadgetManager->toolbarsShown())
@@ -337,7 +337,7 @@ SplitterOrView *SplitterOrView::findFirstView()
  */
 SplitterOrView *SplitterOrView::findView(Core::IUAVGadget *uavGadget)
 {
-    if (!uavGadget || hasUAVGadget(uavGadget))
+    if (!uavGadget || hasGadget(uavGadget))
         return this;
     if (m_splitter) {
         for (int i = 0; i < m_splitter->count(); ++i) {
@@ -375,7 +375,7 @@ SplitterOrView *SplitterOrView::findSplitter(Core::IUAVGadget *uavGadget)
     if (m_splitter) {
         for (int i = 0; i < m_splitter->count(); ++i) {
             if (SplitterOrView *splitterOrView = qobject_cast<SplitterOrView*>(m_splitter->widget(i))) {
-                if (splitterOrView->hasUAVGadget(uavGadget))
+                if (splitterOrView->hasGadget(uavGadget))
                     return this;
                 if (SplitterOrView *result = splitterOrView->findSplitter(uavGadget))
                     return result;
@@ -467,12 +467,12 @@ void SplitterOrView::split(Qt::Orientation orientation)
     m_splitter = new MiniSplitter(this);
     m_splitter->setOrientation(orientation);
     m_layout->addWidget(m_splitter);
-    Core::IUAVGadget *e = m_view->uavGadget();
+    Core::IUAVGadget *e = m_view->gadget();
 
     SplitterOrView *view = 0;
     SplitterOrView *otherView = 0;
     if (e) {
-        m_view->removeUAVGadget();
+        m_view->removeGadget();
         m_splitter->addWidget((view = new SplitterOrView(m_uavGadgetManager, e)));
         m_splitter->addWidget((otherView = new SplitterOrView(m_uavGadgetManager)));
     } else {
@@ -529,9 +529,9 @@ void SplitterOrView::unsplit()
         UAVGadgetView *childView = childSplitterOrView->view();
         Q_ASSERT(childView);
         if (m_view) {
-            if (IUAVGadget *e = childView->uavGadget()) {
-                childView->removeUAVGadget();
-                m_view->setUAVGadget(e);
+            if (IUAVGadget *e = childView->gadget()) {
+                childView->removeGadget();
+                m_view->setGadget(e);
             }
             m_uavGadgetManager->emptyView(childView);
         } else {
@@ -541,7 +541,7 @@ void SplitterOrView::unsplit()
         m_layout->setCurrentWidget(m_view);
     }
     delete oldSplitter;
-    m_uavGadgetManager->setCurrentUAVGadget(findFirstView()->uavGadget());
+    m_uavGadgetManager->setCurrentGadget(findFirstView()->gadget());
 }
 
 
@@ -557,8 +557,8 @@ QByteArray SplitterOrView::saveState() const
                 << static_cast<SplitterOrView*>(m_splitter->widget(0))->saveState()
                 << static_cast<SplitterOrView*>(m_splitter->widget(1))->saveState();
     } else {
-        if (uavGadget())
-            stream << QByteArray("uavGadget") << uavGadget()->classId() << uavGadget()->saveState();
+        if (gadget())
+            stream << QByteArray("uavGadget") << gadget()->classId() << gadget()->saveState();
     }
     return bytes;
 }
@@ -585,6 +585,6 @@ void SplitterOrView::restoreState(const QByteArray &state)
         m_view->listSelectionActivated(index);
         m_layout->addWidget(m_view);
         m_layout->setCurrentWidget(m_view);
-        uavGadget()->restoreState(uavGadgetState);
+        gadget()->restoreState(uavGadgetState);
     }
 }

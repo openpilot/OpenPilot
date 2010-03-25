@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       uavgadgetoptionspage.h
+ * @file       uavgadgetoptionspagedecorator.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief
+ * @brief      
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   coreplugin
  * @{
@@ -25,8 +25,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef UAVGADGETOPTIONSPAGE_H
-#define UAVGADGETOPTIONSPAGE_H
+#ifndef UAVGADGETOPTIONSPAGEDECORATOR_H
+#define UAVGADGETOPTIONSPAGEDECORATOR_H
+
 #include "iuavgadgetconfiguration.h"
 #include <coreplugin/core_global.h>
 #include <coreplugin/dialogs/ioptionspage.h>
@@ -36,29 +37,36 @@ class Ui_TopOptionsPage;
 namespace Core {
 
 class IUAVGadgetConfiguration;
+class UAVGadgetInstanceManager;
 
-class CORE_EXPORT UAVGadgetOptionsPage : public Core::IOptionsPage
+class CORE_EXPORT UAVGadgetOptionsPageDecorator : public Core::IOptionsPage
 {
 Q_OBJECT
 public:
-    explicit UAVGadgetOptionsPage(IUAVGadgetConfiguration *config, QObject *parent = 0);
+    explicit UAVGadgetOptionsPageDecorator(IOptionsPage *page, IUAVGadgetConfiguration *config, QObject *parent = 0);
 
     QString id() const { return m_id; }
     QString trName() const { return m_id; }
     QString category() const { return m_category; }
     QString trCategory() const { return m_categoryTr; }
 
-    /*final*/ QWidget *createPage(QWidget *parent); // do not override this function in subclasses
-    virtual QWidget *widget() = 0;                  // implement this instead
-    virtual void apply() = 0;
-    virtual void finish() = 0;
+    QWidget *createPage(QWidget *parent);
+    void apply();
+    void finish();
 
 signals:
 
 public slots:
 
+private slots:
+    void cloneConfiguration();
+    void deleteConfiguration();
+    void textEdited(QString);
+
 private:
+    IOptionsPage *m_optionsPage;
     IUAVGadgetConfiguration *m_config;
+    UAVGadgetInstanceManager *m_instanceManager;
     QString m_id;
     QString m_category;
     QString m_categoryTr;
@@ -68,4 +76,4 @@ private:
 
 } // namespace Core
 
-#endif // UAVGADGETOPTIONSPAGE_H
+#endif // UAVGADGETOPTIONSPAGEDECORATOR_H

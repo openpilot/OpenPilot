@@ -35,9 +35,13 @@
 namespace Core
 {
 
+namespace Internal {
+class SettingsDialog;
+}
+
 class IUAVGadget;
 class IUAVGadgetConfiguration;
-class UAVGadgetOptionsPage;
+class IOptionsPage;
 class IUAVGadgetFactory;
 
 class UAVGadgetInstanceManager : public QObject
@@ -45,27 +49,37 @@ class UAVGadgetInstanceManager : public QObject
 Q_OBJECT
 public:
     explicit UAVGadgetInstanceManager(QObject *parent = 0);
-    void readUAVGadgetConfigurations();
-    void writeUAVGadgetConfigurations();
-    IUAVGadget *createUAVGadget(QString classId, QWidget *parent);
-    bool deleteUAVGadgetConfiguration(QString classId, QString configName);
-    QStringList uavGadgetClassIds() const { return m_uavGadgetClassIds.keys(); }
-    QStringList uavGadgetConfigurationNames(QString classId) const;
-    QString uavGadgetName(QString classId) const;
+    void readConfigurations();
+    void writeConfigurations();
+    IUAVGadget *createGadget(QString classId, QWidget *parent);
+    bool canDeleteConfiguration(IUAVGadgetConfiguration *config);
+    void deleteConfiguration(IUAVGadgetConfiguration *config);
+    void cloneConfiguration(IUAVGadgetConfiguration *config);
+    QStringList classIds() const { return m_classIds.keys(); }
+    QStringList configurationNames(QString classId) const;
+    QString gadgetName(QString classId) const;
+    void configNameEdited(QString text, bool hasText = true);
 
 signals:
 
 public slots:
+    void settingsDialogShown(Core::Internal::SettingsDialog* settingsDialog);
+    void settingsDialogRemoved();
 
 private:
-    IUAVGadgetFactory *uavGadgetFactory(QString classId) const;
-    void createUAVGadgetOptionPages();
-    QList<IUAVGadgetConfiguration*> *uavGadgetConfigurations(QString classId) const;
-//    UAVGadgetOptionsPage *createUAVGadgetOptionsPage(QString classId);
-    QList<IUAVGadget*> m_uavGadgetInstances;
-    QList<IUAVGadgetFactory*> m_uavGadgetFactories;
-    QList<IUAVGadgetConfiguration*> m_uavGadgetConfigurations;
-    QMap<QString, QString> m_uavGadgetClassIds;
+    IUAVGadgetFactory *factory(QString classId) const;
+    void createOptionsPages();
+    QList<IUAVGadgetConfiguration*> *configurations(QString classId) const;
+    QString suggestName(QString classId, QString name);
+    QList<IUAVGadget*> m_gadgetInstances;
+    QList<IUAVGadgetFactory*> m_factories;
+    QList<IUAVGadgetConfiguration*> m_configurations;
+    QList<IOptionsPage*> m_optionsPages;
+    QMap<QString, QString> m_classIds;
+    QMap<QString, QStringList> m_takenNames;
+    QList<IUAVGadgetConfiguration*> m_provisionalConfigs;
+    QList<IOptionsPage*> m_provisionalOptionsPages;
+    Core::Internal::SettingsDialog *m_settingsDialog;
 
 };
 

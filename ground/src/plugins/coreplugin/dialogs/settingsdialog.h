@@ -36,6 +36,9 @@
 #include "coreplugin/dialogs/ioptionspage.h"
 
 namespace Core {
+
+class UAVGadgetInstanceManager;
+
 namespace Internal {
 
 class SettingsDialog : public QDialog, public ::Ui::SettingsDialog
@@ -51,6 +54,14 @@ public:
     // Run the dialog and return true if 'Ok' was choosen or 'Apply' was invoked
     // at least once
     bool execDialog();
+    void insertPage(IOptionsPage* page);
+    void deletePage();
+    void updateText(QString text);
+    void disableApplyOk(bool disable);
+
+signals:
+    void settingsDialogShown(Core::Internal::SettingsDialog*);
+    void settingsDialogRemoved();
 
 public slots:
     void done(int);
@@ -63,9 +74,11 @@ private slots:
 
 private:
     QList<Core::IOptionsPage*> m_pages;
+    UAVGadgetInstanceManager *m_instanceManager;
     bool m_applied;
     QString m_currentCategory;
     QString m_currentPage;
+    QList<int> m_deletedPageIndices;
 };
 
 } // namespace Internal

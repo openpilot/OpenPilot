@@ -37,13 +37,17 @@ IUAVGadget::IUAVGadget(QString classId, QList<IUAVGadgetConfiguration*> *configu
         m_toolbar(new QComboBox),
         m_configurations(configurations)
 {
-    foreach (IUAVGadgetConfiguration *config, *configurations)
+    m_toolbar->setMinimumContentsLength(15);
+    foreach (IUAVGadgetConfiguration *config, *m_configurations)
         m_toolbar->addItem(config->name());
     connect(m_toolbar, SIGNAL(activated(int)), this, SLOT(loadConfiguration(int)));
+    if (m_configurations->count() > 0)
+        loadConfiguration(0);
 }
 
 void IUAVGadget::loadConfiguration(int index) {
     IUAVGadgetConfiguration* config = m_configurations->at(index);
+    m_activeConfiguration = config;
     loadConfiguration(config);
 }
 
@@ -52,6 +56,21 @@ void IUAVGadget::configurationChanged(IUAVGadgetConfiguration* config)
 {
     if (config == m_activeConfiguration)
         loadConfiguration(config);
+}
+
+void IUAVGadget::configurationAdded(IUAVGadgetConfiguration* config)
+{
+    m_configurations->append(config);
+    m_toolbar->addItem(config->name());
+}
+
+void IUAVGadget::configurationToBeDeleted(IUAVGadgetConfiguration* config)
+{
+    int index = m_configurations->indexOf(config);
+    if (index >= 0) {
+        m_toolbar->removeItem(index);
+        m_configurations->removeAt(index);
+    }
 }
 
 void IUAVGadget::configurationNameChanged(QString oldName, QString newName)
@@ -77,7 +96,9 @@ void IUAVGadget::restoreState(QByteArray state)
     QByteArray configName;
     stream >> configName;
     foreach (IUAVGadgetConfiguration *config, *m_configurations) {
-        if (config->name() == configName)
+        if (config->name() == configName) {
+            m_activeConfiguration = config;
             loadConfiguration(config);
+        }
     }
 }

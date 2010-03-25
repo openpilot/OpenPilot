@@ -252,7 +252,7 @@ void MainWindow::extensionsInitialized()
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 
     m_uavGadgetInstanceManager = new UAVGadgetInstanceManager(this);
-    m_uavGadgetInstanceManager->readUAVGadgetConfigurations();
+    m_uavGadgetInstanceManager->readConfigurations();
 
     // Workspace 1
     UAVGadgetMode *uavGadgetMode;
@@ -947,7 +947,7 @@ void MainWindow::writeSettings()
     m_viewManager->saveSettings(m_settings);
     m_actionManager->saveSettings(m_settings);
 
-    m_uavGadgetInstanceManager->writeUAVGadgetConfigurations();
+    m_uavGadgetInstanceManager->writeConfigurations();
 
     foreach (UAVGadgetManager *manager, m_uavGadgetManagers) {
         manager->saveSettings();

@@ -26,15 +26,18 @@
  */
 
 #include "uavgadgetinstancemanager.h"
+#include "iuavgadget.h"
 #include "iuavgadgetfactory.h"
 #include "iuavgadgetconfiguration.h"
-#include "uavgadgetoptionspage.h"
+#include "coreplugin/dialogs/ioptionspage.h"
+#include "coreplugin/dialogs/settingsdialog.h"
 #include "icore.h"
 
 #include <extensionsystem/pluginmanager.h>
 #include <QtCore/QStringList>
 #include <QtCore/QSettings>
 #include <QtCore/QDebug>
+#include <QtGui/QMessageBox>
 
 
 using namespace Core;
@@ -45,22 +48,22 @@ UAVGadgetInstanceManager::UAVGadgetInstanceManager(QObject *parent) :
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     QList<IUAVGadgetFactory*> factories = pm->getObjects<IUAVGadgetFactory>();
     foreach (IUAVGadgetFactory *f, factories) {
-        if (!m_uavGadgetFactories.contains(f)) {
-            m_uavGadgetFactories.append(f);
+        if (!m_factories.contains(f)) {
+            m_factories.append(f);
             QString classId = f->classId();
             QString name = f->name();
-            m_uavGadgetClassIds.insert(classId, name);
+            m_classIds.insert(classId, name);
         }
     }
 }
 
-void UAVGadgetInstanceManager::readUAVGadgetConfigurations()
+void UAVGadgetInstanceManager::readConfigurations()
 {
     QSettings *qs = Core::ICore::instance()->settings();
     qs->beginGroup("UAVGadgetConfigurations");
-    foreach (QString classId, m_uavGadgetClassIds.keys())
+    foreach (QString classId, m_classIds.keys())
     {
-        IUAVGadgetFactory *f = uavGadgetFactory(classId);
+        IUAVGadgetFactory *f = factory(classId);
         qs->beginGroup(classId);
         QStringList configs = qs->childKeys();
 
@@ -71,29 +74,30 @@ void UAVGadgetInstanceManager::readUAVGadgetConfigurations()
             stream >> locked;
             QByteArray state;
             stream >> state;
-            IUAVGadgetConfiguration *config = f->createUAVGadgetConfiguration(locked, configName, state);
-            m_uavGadgetConfigurations.append(config);
+            IUAVGadgetConfiguration *config = f->createConfiguration(locked, configName, state);
+            if (config)
+                m_configurations.append(config);
         }
 
         if (configs.count() == 0) {
-            IUAVGadgetConfiguration *config = f->createUAVGadgetConfiguration(false, tr("default"), 0);
+            IUAVGadgetConfiguration *config = f->createConfiguration(false, tr("default"), 0);
             // it is not mandatory for uavgadgets to have any configurations (settings)
             // and therefore we have to check for that
             if (config)
-                m_uavGadgetConfigurations.append(config);
+                m_configurations.append(config);
         }
         qs->endGroup();
     }
     qs->endGroup();
-    createUAVGadgetOptionPages();
+    createOptionsPages();
 }
 
-void UAVGadgetInstanceManager::writeUAVGadgetConfigurations()
+void UAVGadgetInstanceManager::writeConfigurations()
 {
     QSettings *qs = Core::ICore::instance()->settings();
     qs->beginGroup("UAVGadgetConfigurations");
     qs->allKeys().clear(); // Remove existing configurations
-    foreach (IUAVGadgetConfiguration *config, m_uavGadgetConfigurations)
+    foreach (IUAVGadgetConfiguration *config, m_configurations)
     {
         qs->beginGroup(config->classId());
         QByteArray ba;
@@ -106,65 +110,173 @@ void UAVGadgetInstanceManager::writeUAVGadgetConfigurations()
     qs->endGroup();
 }
 
-void UAVGadgetInstanceManager::createUAVGadgetOptionPages()
+void UAVGadgetInstanceManager::createOptionsPages()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    foreach (IUAVGadgetConfiguration *config, m_uavGadgetConfigurations)
+    foreach (IUAVGadgetConfiguration *config, m_configurations)
     {
-        IUAVGadgetFactory *f = uavGadgetFactory(config->classId());
-        UAVGadgetOptionsPage *page = f->createUAVGadgetOptionsPage(config);
+        IUAVGadgetFactory *f = factory(config->classId());
+        IOptionsPage *page = f->createOptionsPage(config);
+        m_optionsPages.append(page);
         pm->addObject(page);
     }
 }
 
 
-IUAVGadget *UAVGadgetInstanceManager::createUAVGadget(QString classId, QWidget *parent)
+IUAVGadget *UAVGadgetInstanceManager::createGadget(QString classId, QWidget *parent)
 {
-    IUAVGadgetFactory *f = uavGadgetFactory(classId);
+    IUAVGadgetFactory *f = factory(classId);
     if (f) {
-        QList<IUAVGadgetConfiguration*> *configs = uavGadgetConfigurations(classId);
-        IUAVGadget *gadget = f->createUAVGadget(configs, parent);
-        m_uavGadgetInstances.append(gadget);
+        QList<IUAVGadgetConfiguration*> *configs = configurations(classId);
+        IUAVGadget *gadget = f->createGadget(configs, parent);
+        m_gadgetInstances.append(gadget);
         return gadget;
     }
     return 0;
 }
 
-//IUAVGadgetConfiguration *UAVGadgetInstanceManager::createUAVGadgetConfiguration(QString classId,
-//                                                      QString configName)
-//{
-//    return 0;
-//}
+bool UAVGadgetInstanceManager::canDeleteConfiguration(IUAVGadgetConfiguration *config)
+{
+    // to be able to delete a configuration, no instance must be using it
+    foreach (IUAVGadget *gadget, m_gadgetInstances) {
+        if (gadget->activeConfiguration() == config) {
+          return false;
+        }
+    }
+    // and it cannot be the only configuration
+    foreach (IUAVGadgetConfiguration *c, m_configurations) {
+        if (c != config && c->classId() == config->classId())
+            return true;
+    }
+    return false;
+}
 
-//UAVGadgetOptionsPage *UAVGadgetInstanceManager::createUAVGadgetOptionsPage(QString classId)
-//{
-//    return 0;
-//}
+void  UAVGadgetInstanceManager::deleteConfiguration(IUAVGadgetConfiguration *config)
+{
+    if (m_provisionalConfigs.contains(config)) {
+        int i = m_provisionalConfigs.indexOf(config);
+        m_provisionalConfigs.removeAt(i);
+        m_provisionalOptionsPages.removeAt(i);
+        int j = m_takenNames[config->classId()].indexOf(config->name());
+        m_takenNames[config->classId()].removeAt(j);
+        m_settingsDialog->deletePage();
+    } else if (m_configurations.contains(config)) {
+        int i = m_configurations.indexOf(config);
+        m_provisionalConfigs.removeAt(i);
+        m_optionsPages.removeAt(i);
+        m_settingsDialog->deletePage();
+    }
+    configNameEdited("", false);
+}
 
-QStringList UAVGadgetInstanceManager::uavGadgetConfigurationNames(QString classId) const
+void  UAVGadgetInstanceManager::cloneConfiguration(IUAVGadgetConfiguration *configToClone)
+{
+    QString name = suggestName(configToClone->classId(), configToClone->name());
+
+    IUAVGadgetConfiguration *config = configToClone->clone(name);
+    IUAVGadgetFactory *f = factory(config->classId());
+    IOptionsPage *page = f->createOptionsPage(config);
+    m_provisionalConfigs.append(config);
+    m_provisionalOptionsPages.append(page);
+    m_settingsDialog->insertPage(page);
+}
+
+// "name" => "name 1", "Name 3" => "Name 4", "Name1" => "Name1 1"
+QString UAVGadgetInstanceManager::suggestName(QString classId, QString name)
+{
+    QString suggestedName;
+
+    QString last = name.split(" ").last();
+    bool ok;
+    int num = last.toInt(&ok);
+    int i = 1;
+    if (ok) {
+        QStringList n = name.split(" ");
+        n.removeLast();
+        name = n.join(" ");
+        i = num+1;
+    }
+    do {
+        suggestedName = name + " " + QString::number(i);
+        ++i;
+    } while (m_takenNames[classId].contains(suggestedName));
+
+    m_takenNames[classId].append(suggestedName);
+    return suggestedName;
+}
+
+void UAVGadgetInstanceManager::configNameEdited(QString text, bool hasText)
+{
+    bool disable = false;
+    foreach (IUAVGadgetConfiguration *c, m_configurations) {
+        foreach (IUAVGadgetConfiguration *d, m_configurations) {
+            if (c != d && c->provisionalName() == d->provisionalName())
+                disable = true;
+        }
+        foreach (IUAVGadgetConfiguration *d, m_provisionalConfigs) {
+            if (c != d && c->provisionalName() == d->provisionalName())
+                disable = true;
+        }
+    }
+    foreach (IUAVGadgetConfiguration *c, m_provisionalConfigs) {
+        foreach (IUAVGadgetConfiguration *d, m_provisionalConfigs) {
+            if (c != d && c->provisionalName() == d->provisionalName())
+                disable = true;
+        }
+    }
+    if (hasText && text == "")
+        disable = true;
+    m_settingsDialog->disableApplyOk(disable);
+    if (hasText)
+        m_settingsDialog->updateText(text);
+}
+
+void UAVGadgetInstanceManager::settingsDialogShown(Core::Internal::SettingsDialog* settingsDialog)
+{
+    foreach (QString classId, classIds())
+        m_takenNames.insert(classId, configurationNames(classId));
+    m_settingsDialog = settingsDialog;
+}
+
+void UAVGadgetInstanceManager::settingsDialogRemoved()
+{
+    m_takenNames.clear();
+    m_provisionalConfigs.clear();
+    m_provisionalOptionsPages.clear();
+    foreach (IUAVGadgetConfiguration *config, m_configurations)
+        config->setProvisionalName(config->name());
+    m_settingsDialog = 0;
+}
+
+
+QStringList UAVGadgetInstanceManager::configurationNames(QString classId) const
 {
     QStringList names;
+    foreach (IUAVGadgetConfiguration *config, m_configurations) {
+        if (config->classId() == classId)
+            names.append(config->name());
+    }
     return names;
 }
 
-QString UAVGadgetInstanceManager::uavGadgetName(QString classId) const
+QString UAVGadgetInstanceManager::gadgetName(QString classId) const
 {
-    return m_uavGadgetClassIds.value(classId);
+    return m_classIds.value(classId);
 }
 
-IUAVGadgetFactory *UAVGadgetInstanceManager::uavGadgetFactory(QString classId) const
+IUAVGadgetFactory *UAVGadgetInstanceManager::factory(QString classId) const
 {
-    foreach (IUAVGadgetFactory *f, m_uavGadgetFactories) {
+    foreach (IUAVGadgetFactory *f, m_factories) {
         if (f->classId() == classId)
             return f;
     }
     return 0;
 }
 
-QList<IUAVGadgetConfiguration*> *UAVGadgetInstanceManager::uavGadgetConfigurations(QString classId) const
+QList<IUAVGadgetConfiguration*> *UAVGadgetInstanceManager::configurations(QString classId) const
 {
     QList<IUAVGadgetConfiguration*> *configs = new QList<IUAVGadgetConfiguration*>;
-    foreach (IUAVGadgetConfiguration *config, m_uavGadgetConfigurations) {
+    foreach (IUAVGadgetConfiguration *config, m_configurations) {
         if (config->classId() == classId)
             configs->append(config);
     }

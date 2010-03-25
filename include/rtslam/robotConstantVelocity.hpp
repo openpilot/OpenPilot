@@ -21,16 +21,27 @@ namespace jafar {
 		/**
 		 * Constant velocity model robot class.
 		 *
+		 * \author jsola@laas.fr
+		 *
 		 * This class implements a rigid frame in 3D moving with a constant velocity motion model. This model is the following:\n
-		 * - p += v*dt \n
-		 * - q = q**(w*dt)\n
-		 * - v += vi \n
-		 * - w += wi
+		 * - p += v*dt <-- position\n
+		 * - q = q**(w*dt) <-- orientation quaternion\n
+		 * - v += vi <-- linear velocity\n
+		 * - w += wi <-- angular velocity
 		 *
 		 * where \a vi and \a wi are linear and angular velocity random impulses,
 		 * and ** is the quaternion product.
 		 *
-		 * See robotConstantVelocity.cpp comments for full algebric details.
+		 * This model is embedded into the system variables as follows:
+		 * - the prediction function is x+ = f(x,u), implemented with method move().
+		 * - the state vector is x = state.x = [p q v w]
+		 * - the state covariance is in the map, P = state.P = (map.filter).P(state.ia, state.ia)
+		 * - the control vector is u = control.x = [vi wi]
+		 * - the control covariances matrix is U = control.P
+		 * - the Jacobians of f(x,u) provided by move() are F_x = dxnew_by_dx and F_u = dxnew_by_dcontrol.
+		 * - the perturbation covariance is obtained with Q = F_u*U*F_u' with method computeStatePerturbation().
+		 *
+		 * \sa Explore the comments in file robotConstantVelocity.cpp for full algebric details.
 		 *
 		 * \ingroup rtslam
 		 */

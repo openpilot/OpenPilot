@@ -33,8 +33,8 @@ using namespace Core;
 
 IUAVGadget::IUAVGadget(QString classId, QList<IUAVGadgetConfiguration*> *configurations, QObject *parent) :
         IContext(parent),
-        m_classId(classId),
         m_toolbar(new QComboBox),
+        m_classId(classId),
         m_configurations(configurations)
 {
     m_toolbar->setMinimumContentsLength(15);
@@ -85,8 +85,8 @@ QByteArray IUAVGadget::saveState()
 {
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::WriteOnly);
-//    if (m_activeConfiguration)
-//        stream << m_activeConfiguration->name().toLatin1();
+    if (m_activeConfiguration)
+        stream << m_activeConfiguration->name().toLatin1();
     return bytes;
 }
 

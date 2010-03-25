@@ -61,6 +61,7 @@ QWidget *UAVGadgetOptionsPageDecorator::createPage(QWidget *parent)
     m_page->nameLineEdit->setText(m_id);
 
     QWidget *wi = m_optionsPage->createPage(w);
+    wi->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     m_page->verticalLayout_4->addWidget(wi);
 
     connect(m_page->cloneButton, SIGNAL(clicked()), this, SLOT(cloneConfiguration()));
@@ -72,6 +73,8 @@ QWidget *UAVGadgetOptionsPageDecorator::createPage(QWidget *parent)
 
 void UAVGadgetOptionsPageDecorator::apply()
 {
+    m_id = m_config->provisionalName();
+    m_instanceManager->applyChanges(m_config);
     m_optionsPage->apply();
 }
 
@@ -93,6 +96,6 @@ void UAVGadgetOptionsPageDecorator::deleteConfiguration()
 void UAVGadgetOptionsPageDecorator::textEdited(QString name)
 {
     m_config->setProvisionalName(name);
-    m_instanceManager->configNameEdited(name);
+    m_instanceManager->configurationNameEdited(name);
 }
 

@@ -54,7 +54,7 @@ public:
     virtual QString contextHelpId() const { return QString(); }
     QString classId() const { return m_classId; }
 
-    virtual void loadConfiguration(IUAVGadgetConfiguration* /*config*/) {}
+    virtual void loadConfiguration(IUAVGadgetConfiguration* /*config*/) { }
     IUAVGadgetConfiguration *activeConfiguration() { return m_activeConfiguration; }
     QComboBox *toolBar() { return m_toolbar; }
     virtual QByteArray saveState();
@@ -66,10 +66,10 @@ public slots:
     void configurationNameChanged(QString oldName, QString newName);
 private slots:
     void loadConfiguration(int index);
+protected:
+    QComboBox *m_toolbar;
 private:
     QString m_classId;
-    QComboBox *m_toolbar;
-
     IUAVGadgetConfiguration *m_activeConfiguration;
     QList<IUAVGadgetConfiguration*> *m_configurations;
 };

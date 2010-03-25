@@ -32,6 +32,10 @@
 #include <QtCore/QMap>
 #include <QtCore/QStringList>
 
+namespace ExtensionSystem {
+    class PluginManager;
+}
+
 namespace Core
 {
 
@@ -49,18 +53,24 @@ class UAVGadgetInstanceManager : public QObject
 Q_OBJECT
 public:
     explicit UAVGadgetInstanceManager(QObject *parent = 0);
+    ~UAVGadgetInstanceManager();
     void readConfigurations();
     void writeConfigurations();
     IUAVGadget *createGadget(QString classId, QWidget *parent);
     bool canDeleteConfiguration(IUAVGadgetConfiguration *config);
     void deleteConfiguration(IUAVGadgetConfiguration *config);
     void cloneConfiguration(IUAVGadgetConfiguration *config);
+    void applyChanges(IUAVGadgetConfiguration *config);
+    void configurationNameEdited(QString text, bool hasText = true);
     QStringList classIds() const { return m_classIds.keys(); }
     QStringList configurationNames(QString classId) const;
     QString gadgetName(QString classId) const;
-    void configNameEdited(QString text, bool hasText = true);
 
 signals:
+    void configurationChanged(IUAVGadgetConfiguration* config);
+    void configurationAdded(IUAVGadgetConfiguration* config);
+    void configurationToBeDeleted(IUAVGadgetConfiguration* config);
+    void configurationNameChanged(QString oldName, QString newName);
 
 public slots:
     void settingsDialogShown(Core::Internal::SettingsDialog* settingsDialog);
@@ -80,6 +90,7 @@ private:
     QList<IUAVGadgetConfiguration*> m_provisionalConfigs;
     QList<IOptionsPage*> m_provisionalOptionsPages;
     Core::Internal::SettingsDialog *m_settingsDialog;
+    ExtensionSystem::PluginManager *m_pm;
 
 };
 

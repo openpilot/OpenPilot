@@ -76,13 +76,13 @@ namespace jafar {
 					dt = 1.0;
 				}
 				template<class SymMat>
-				void set_P_continuous(SymMat & _P_ct){
+				void set_P_continuous(SymMat & _P_ct) {
 					JFR_ASSERT(_P_ct.size1() == size(), "Matrix sizes mismatch.");
-					P_ct.resize(size(),size());
+					P_ct.resize(size(), size());
 					P_ct = _P_ct;
 				}
 				template<class V>
-				void set_x_continuous(V & _x_ct){
+				void set_x_continuous(V & _x_ct) {
 					JFR_ASSERT(_x_ct.size() == size(), "Vector sizes mismatch.");
 					x_ct.resize(size());
 					x_ct = _x_ct;
@@ -95,7 +95,7 @@ namespace jafar {
 				 * This function takes covariances from the internal variables of the class (which is often constant).
 				 * \param _dt the time interval to integrate.
 				 */
-				void convert_P_from_continuous(double _dt){
+				void convert_P_from_continuous(double _dt) {
 					JFR_ASSERT(P_ct.size1() == size(), "Continuous-time covariance not yet initialized.");
 					P(P_ct * _dt); // perturbation is random => variance is linear with time
 				}
@@ -107,7 +107,7 @@ namespace jafar {
 				 * \param _P_ct continuous-time perturbation covariances matrix.
 				 * \param _dt the time interval to integrate.
 				 */
-				void convert_P_from_continuous(sym_mat & _P_ct, double _dt){
+				void convert_P_from_continuous(sym_mat & _P_ct, double _dt) {
 					JFR_ASSERT(_P_ct.size1() == size(), "Matrix sizes mismatch.");
 					set_P_continuous(_P_ct);
 					P(P_ct * _dt); // perturbation is random => variance is linear with time
@@ -122,12 +122,13 @@ namespace jafar {
 				 * This function takes mean and covariances from the internal variables of the class (which are often constant).
 				 * \param _dt the time interval to integrate.
 				 */
-				void convert_from_continuous(double _dt){
+				void convert_from_continuous(double _dt) {
 					JFR_ASSERT(x_ct.size() == size(), "Continuous-time values not yet initialized.");
 					x(x_ct * _dt); // control is deterministic => mean is linear with time
 					P(P_ct * _dt); // perturbation is random => variance is linear with time
 					dt = _dt;
 				}
+
 
 				/**
 				 * Discrete control and perturbation from continuous specifications.
@@ -139,7 +140,7 @@ namespace jafar {
 				 * \param Ct a continuous-time Gaussian holding deterministic mean and the covariances matrix of the random part.
 				 * \param _dt the time interval to integrate.
 				 */
-				void convert_from_continuous(Gaussian & Ct, double _dt){
+				void convert_from_continuous(Gaussian & Ct, double _dt) {
 					JFR_ASSERT(Ct.size() == size(), "Sizes mismatch");
 					set_P_continuous(Ct.P());
 					set_x_continuous(Ct.x());
@@ -189,6 +190,7 @@ namespace jafar {
 					return 0;
 				}
 
+
 				/**
 				 * Add a sensor to this robot
 				 */
@@ -205,7 +207,6 @@ namespace jafar {
 				virtual void set_control(const Control & _control) {
 					control = _control;
 				}
-
 
 			protected:
 				/**
@@ -229,7 +230,6 @@ namespace jafar {
 					move_func();
 				}
 
-
 			public:
 				/**
 				 * Move one step ahead, affect SLAM filter.
@@ -237,16 +237,19 @@ namespace jafar {
 				 */
 				void move();
 
-
 				/**
 				 * Compute robot process noise \a Q in state space.
 				 * This function is called at each iteration.
 				 * Overload it to an empty inline function if you know \a Q is constant,
 				 * and use initStatePerturbation() just once after contruction.
 				 */
-				void computeStatePerturbation() {
-					Q = jmath::ublasExtra::prod_JPJt(control.P(), XNEW_control);
-				}
+				void computeStatePerturbation();
+
+				/**
+				 * Explore all sensors.
+				 * This function iterates all the sensors in the robot and calls the main sensor operations.
+				 */
+				void exploreSensors();
 
 		};
 

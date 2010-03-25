@@ -21,6 +21,7 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
+
 		/*
 		 * Operator << for class RobotAbstract.
 		 * It shows different information of the robot.
@@ -45,13 +46,8 @@ namespace jafar {
 		 * Remote constructor from remote map and size of control vector.
 		 */
 		RobotAbstract::RobotAbstract(MapAbstract & _map, const size_t _size_state, const size_t _size_control) :
-			MapObject(_map, _size_state),
-			pose(state, jmath::ublasExtra::ia_range(0,7)),
-			control(_size_control),
-			XNEW_x(_size_state, _size_state),
-			XNEW_control(_size_state, _size_control),
-			Q(_size_state, _size_state)
-		{
+			MapObject(_map, _size_state), pose(state, jmath::ublasExtra::ia_range(0, 7)), control(_size_control), XNEW_x(
+			    _size_state, _size_state), XNEW_control(_size_state, _size_control), Q(_size_state, _size_state) {
 			categoryName("ROBOT"); // robot is categorized
 		}
 
@@ -63,14 +59,29 @@ namespace jafar {
 			sensors[_senPtr->id()] = _senPtr;
 		}
 
-		void RobotAbstract::linkToMap(map_ptr_t _mapPtr){
+		void RobotAbstract::linkToMap(map_ptr_t _mapPtr) {
 			slamMap = _mapPtr;
 		}
 
-		void RobotAbstract::move(){
+		void RobotAbstract::move() {
 			move_func(); // x = F(x, u); Update Jacobians dxnew/dx and dxnew/du
 			computeStatePerturbation();
-			slamMap->filter.predict(slamMap->ia_used_states(), XNEW_x, state.ia(), Q);  // P = F*P*F' + Q
+			slamMap->filter.predict(slamMap->ia_used_states(), XNEW_x, state.ia(), Q); // P = F*P*F' + Q
+		}
+
+		void RobotAbstract::computeStatePerturbation() {
+			Q = jmath::ublasExtra::prod_JPJt(control.P(), XNEW_control);
+		}
+
+		void RobotAbstract::exploreSensors() {
+			for (sensors_ptr_set_t::iterator senIter = sensors.begin(); senIter != sensors.end(); senIter++) {
+				sensor_ptr_t senPtr = senIter->second;
+				cout << "exploring sensor: " << senPtr->id() << endl;
+
+				senPtr->acquireRaw();
+				senPtr->processRaw();
+
+			}
 		}
 
 	}

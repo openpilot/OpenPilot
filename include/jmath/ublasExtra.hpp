@@ -85,6 +85,43 @@ namespace jafar {
 				return isZero;
 			}
 
+			/**
+			 * create diagonal matrix from scalar.
+			 * The matrix is:
+			 * - \a M(i,i) = \a val <-- diagonal
+			 * - \a M(i,j) = 0  <-- off-diagonal
+			 *
+			 * \param size the size of the (square) matrix
+			 * \param val the value to set to the diagonal elements
+			 */
+			template<typename T>
+			ublas::diagonal_matrix<T> scalar_diag_mat(const size_t size, const T val) {
+				jblas::diag_mat D(size, size);
+				D.clear();
+				for (size_t i = 0; i < size; i++)
+					D(i, i) = val;
+				return D;
+			}
+
+			/**
+			 * Create diagonal matrix from vector.
+			 * The matrix is:
+			 * - \a M(i,i) = \a v(i) <-- diagonal
+			 * - \a M(i,j) = 0  <-- off-diagonal
+			 *
+			 * \param v the vector with the values to set to the diagonal
+			 */
+			template<class V>
+			jblas::diag_mat vec_diag_mat(const V & v) {
+				jblas::diag_mat D(v.size(), v.size());
+				D.clear();
+				for (size_t i = 0; i < v.size(); i++)
+					D(i, i) = v(i);
+				return D;
+			}
+
+
+
 			/** normalize a vector.
 			 */
 			template<class V>

@@ -12,10 +12,15 @@
  */
 
 #include "jmath/indirectArray.hpp"
+#include <boost/shared_ptr.hpp>
 
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/robotAbstract.hpp"
 #include "rtslam/landmarkAbstract.hpp"
+
+// TODO this needs to go out of here - when we'll have factories
+#include "rtslam/observationPinHoleAnchoredHomogeneous.hpp"
+
 
 namespace jafar {
 	namespace rtslam {
@@ -82,6 +87,28 @@ namespace jafar {
 					used_states(_ia(i)) = false;
 					current_size += 1;
 				}
+		}
+
+		void MapAbstract::addObservations(landmark_ptr_t lmkPtr) {
+			for (robots_ptr_set_t::iterator robIter = robots.begin(); robIter != robots.end(); robIter++) {
+				robot_ptr_t robPtr = robIter->second;
+				for (sensors_ptr_set_t::iterator senIter = robPtr->sensors.begin(); senIter != robPtr->sensors.end(); senIter++) {
+					sensor_ptr_t senPtr = senIter->second;
+					observation_ptr_t obsPtr = newObservation(senPtr, lmkPtr);
+				}
+			}
+		}
+
+		observation_ptr_t MapAbstract::newObservation(sensor_ptr_t senPtr, landmark_ptr_t lmkPtr){
+			boost::shared_ptr<ObservationPinHoleAnchoredHomogeneousPoint> obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint());
+			//	obsPtr->id() = 0;
+			obsPtr->id() = 1000 * senPtr->id() + lmkPtr->id();
+			obsPtr->linkToSensor(senPtr);
+			obsPtr->linkToLandmark(lmkPtr);
+			senPtr->linkToObservation(obsPtr);
+			lmkPtr->linkToObservation(obsPtr);
+
+			return obsPtr;
 		}
 
 	}

@@ -136,6 +136,21 @@ namespace jafar {
 				 */
 				void liberateStates(const jblas::ind_array & _ia);
 
+				/**
+				 * Add all necessary observations for a given landmark.
+				 * \param lmkPtr pointser to the new landmark.
+				 */
+				void addObservations(landmark_ptr_t lmkPtr);
+
+			protected:
+
+				/**
+				 * Create new observation.
+				 * Creates a new observation from a sensor and a landmark.
+				 * TODO see if this can go to class Observation, possibly with a dedicated constructor.
+				 */
+				observation_ptr_t newObservation(sensor_ptr_t senPtr, landmark_ptr_t lmkPtr);
+
 
 				//				void removeRobot(RobotAbstract& _rob);
 				//				void removeLandmark(LandmarkAbstract& _lmk);

@@ -286,7 +286,7 @@ void motionSetup(robot_ptr_t robPtr, const double x0, const double y0, const dou
 	robPtr->control.clear();
 	robPtr->control.std(std_pert);
 
-	robPtr->initStatePerturbation();
+	robPtr->computeStatePerturbation();
 
 }
 
@@ -311,8 +311,8 @@ void test_main01() {
 		robPtr->control.dt = dt;
 		vec6 control;
 		control.clear();
-		control(0) = 1.0; // forward 1m.
-		control(5) = 0.1; // left 0.1 rad = 6deg.
+		control(0) = 0.1; // increase X m/s forward.
+		control(5) = 0.1; // increase X rad/s = 60X deg/s left.
 		robPtr->control.x(control);
 	}
 
@@ -328,14 +328,20 @@ void test_main01() {
 			robot_ptr_t robPtr = robIter->second;
 
 			robPtr->move();
-			robPtr->computeStatePerturbation();
-			slamMapPtr->filter.predict(slamMapPtr->ia_used_states(), robPtr->dxnew_by_dx, robPtr->state.ia(), robPtr->Q);
+//			robPtr->computeStatePerturbation();
+//			slamMapPtr->filter.predict(slamMapPtr->ia_used_states(), robPtr->XNEW_x, robPtr->state.ia(), robPtr->Q);
+
+			cout << "robot.pose.x = " << (MATLAB) robPtr->pose.x() << endl;
+			cout << "robot.pose.P = " << (MATLAB) robPtr->pose.P() << endl;
 
 			// now loop for sensors on this particular robot
 			sensors_ptr_set_t sensors = robPtr->sensors;
 			for (sensors_ptr_set_t::iterator senIter = sensors.begin(); senIter != sensors.end(); senIter++) {
 
 				sensor_ptr_t senPtr = senIter->second;
+
+				senPtr->acquireRaw();
+//				senPtr->process();
 
 			}
 		}

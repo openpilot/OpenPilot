@@ -32,10 +32,9 @@
 // constants/macros/typdefs
 typedef union union_float_u32
 {
-	float f;
 	unsigned long i;
 	unsigned char b[4];
-	unsigned char c[20];
+	char c[12];
 } float_u32;
 
 typedef union union_double_u64

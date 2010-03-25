@@ -37,6 +37,7 @@ static uint8_t sdcard_available;
 FILEINFO File;
 char Buffer[1024];
 uint32_t Cache;
+GpsInfoType GpsInfo;
 
 /* Function Prototypes */
 static void TaskTick(void *pvParameters);
@@ -108,6 +109,7 @@ int main()
 	xTaskCreate(TaskTesting, (signed portCHAR *)"TaskTesting", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
 	//xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
 	//xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
+	//GpsInitialize();
 
 	/* Start the FreeRTOS scheduler */
 	vTaskStartScheduler();
@@ -135,6 +137,11 @@ static void TaskTick(void *pvParameters)
 
 	for(;;)
 	{
+		/*PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"utc: %s alt:%u\r\n",GpsInfo.PosLLA.TimeOfFix.c,GpsInfo.PosLLA.alt.i);
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"lat: %u lon:%u\r\n",GpsInfo.PosLLA.lat.i,GpsInfo.PosLLA.lon.i);
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"SV: %u\r\n",GpsInfo.numSVs);
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"Heading: %s Speed: %s\r\n",GpsInfo.VelHS.heading.c,GpsInfo.VelHS.speed.c);
+		*/
 		PIOS_LED_Toggle(LED1);
 		vTaskDelayUntil(&xLastExecutionTime, 1000 / portTICK_RATE_MS);
 	}

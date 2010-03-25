@@ -14,6 +14,7 @@
 
 #include "jmath/ixaxpy.hpp"
 #include "jmath/ublasExtra.hpp"
+#include "rtslam/innovation.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -39,11 +40,7 @@ namespace jafar {
 				mat K;
 				mat PHt_tmp;
 
-				ExtendedKalmanFilterIndirect(size_t _size) :
-					size(_size), x_(size), P_(size) {
-					x_.clear();
-					P_.clear();
-				}
+				ExtendedKalmanFilterIndirect(size_t _size);
 
 				jblas::vec & x() {
 					return x_;
@@ -77,6 +74,7 @@ namespace jafar {
 				 * \param U the covariances matrix of the perturbation in control-space.
 				 */
 				void predict(const ind_array & iax, const mat & F_v, const ind_array & iav, const mat & F_u, const sym_mat & U);
+
 				/**
 				 * Predict covariances matrix.
 				 *
@@ -93,7 +91,25 @@ namespace jafar {
 				 * \param Q the covariances matrix of the perturbation in state-space.
 				 */
 				void predict(const ind_array & iax, const mat & F_v, const ind_array & iav, const sym_mat & Q);
-				void correct();
+
+				/**
+				 * EKF correction.
+				 * This function uses the Innovation class to extract all useful chunks necessary for EKF correction.
+				 * In partucular, the following info is recovered from Innovation:
+				 * - INN_x: the Jacobian wrt the states that contributed to the innovation
+				 * - ia: the indices to these states
+				 * - {z, Z} = {inn.x, inn.P}, mean and conv. matrices.
+				 *
+				 * the EKF update is then the following:
+				 * - K = -P * trans(INN_x) * inv(Z)
+				 * - x = x + K * z
+				 * - P = P - K * INN_x * P
+				 *
+				 * \param iax the indirect array of used indices in the map.
+				 * \param inn the Innovation.
+				 */
+				void correct(const ind_array & iax, Innovation & inn);
+
 				void computeInnovation();
 				void computeK();
 				void updateP();

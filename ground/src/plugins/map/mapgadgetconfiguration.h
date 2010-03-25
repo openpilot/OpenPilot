@@ -38,6 +38,11 @@ Q_OBJECT
 public:
     explicit MapGadgetConfiguration(bool locked, QString classId, QString name, const QByteArray &state = 0, QObject *parent = 0);
     int zoom() { return m_defaultZoom; }
+    void setZoom(int zoom) { m_defaultZoom = zoom; }
+    double latitude() { return m_defaultLatitude; }
+    void setLatitude(double lat) { m_defaultLatitude = lat; }
+    double longitude() { return m_defaultLongitude; }
+    void setLongitude(double lon) { m_defaultLongitude = lon; }
     QByteArray saveState() const;
     IUAVGadgetConfiguration *clone(QString name);
 signals:

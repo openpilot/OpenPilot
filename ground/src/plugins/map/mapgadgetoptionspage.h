@@ -34,6 +34,8 @@ namespace Core {
 class IUAVGadgetConfiguration;
 }
 class MapGadgetConfiguration;
+class QSpinBox;
+class QDoubleSpinBox;
 
 using namespace Core;
 
@@ -56,6 +58,9 @@ signals:
 public slots:
 private:
     MapGadgetConfiguration *m_config;
+    QSpinBox *m_zoomSpin;
+    QDoubleSpinBox *m_latSpin;
+    QDoubleSpinBox *m_longSpin;
 
 };
 

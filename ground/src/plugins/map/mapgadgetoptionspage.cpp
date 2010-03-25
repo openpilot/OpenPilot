@@ -28,6 +28,11 @@
 #include "mapgadgetoptionspage.h"
 #include "mapgadgetconfiguration.h"
 #include <QtGui/QLabel>
+#include <QtGui/QSpinBox>
+#include <QtGui/QDoubleSpinBox>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QVBoxLayout>
+
 
 MapGadgetOptionsPage::MapGadgetOptionsPage(IUAVGadgetConfiguration *config, QObject *parent) :
     IOptionsPage(parent),
@@ -37,14 +42,59 @@ MapGadgetOptionsPage::MapGadgetOptionsPage(IUAVGadgetConfiguration *config, QObj
 
 QWidget *MapGadgetOptionsPage::createPage(QWidget *parent)
 {
-    QWidget *label = new QLabel("Settings will be here.", parent);
-//    QLabel *label = new QLabel(QString(m_config->zoom()));
-    label->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-    return label;
+    QWidget *widget = new QWidget;
+    QVBoxLayout *vl = new QVBoxLayout();
+    widget->setLayout(vl);
+
+    QHBoxLayout *zoomLayout = new QHBoxLayout();
+    QWidget *x = new QWidget;
+    x->setLayout(zoomLayout);
+    QWidget *label = new QLabel("Default zoom:");
+    m_zoomSpin = new QSpinBox();
+    m_zoomSpin->setMaximum(18);
+    zoomLayout->addWidget(label);
+    zoomLayout->addWidget(m_zoomSpin);
+
+    QHBoxLayout *latLayout = new QHBoxLayout();
+    QWidget *y = new QWidget;
+    y->setLayout(latLayout);
+    label = new QLabel("Default latitude:");
+    m_latSpin = new QDoubleSpinBox();
+    m_latSpin->setDecimals(8);
+    m_latSpin->setMinimum(-90);
+    m_latSpin->setMaximum(90);
+    latLayout->addWidget(label);
+    latLayout->addWidget(m_latSpin);
+
+
+    QHBoxLayout *longLayout = new QHBoxLayout();
+    QWidget *z = new QWidget;
+    z->setLayout(longLayout);
+    label = new QLabel("Default longitude:");
+    m_longSpin = new QDoubleSpinBox();
+    m_longSpin->setDecimals(8);
+    m_longSpin->setMinimum(-180);
+    m_longSpin->setMaximum(180);
+    longLayout->addWidget(label);
+    longLayout->addWidget(m_longSpin);
+    QSpacerItem *item = new QSpacerItem(100, 100, QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    vl->addWidget(x);
+    vl->addWidget(y);
+    vl->addWidget(z);
+
+    m_zoomSpin->setValue(m_config->zoom());
+    m_latSpin->setValue(m_config->latitude());
+    m_longSpin->setValue(m_config->longitude());
+
+    return widget;
 }
 
 void MapGadgetOptionsPage::apply()
 {
+    m_config->setZoom(m_zoomSpin->value());
+    m_config->setLatitude(m_latSpin->value());
+    m_config->setLongitude(m_longSpin->value());
 
 }
 

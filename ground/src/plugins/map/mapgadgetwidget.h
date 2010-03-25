@@ -11,6 +11,7 @@
 #include "qmapcontrol/qmapcontrol.h"
 #include <QtGui/QWidget>
 
+
 using namespace qmapcontrol;
 
 class MapGadgetWidget : public QWidget
@@ -20,6 +21,8 @@ class MapGadgetWidget : public QWidget
 public:
     MapGadgetWidget(QWidget *parent = 0);
    ~MapGadgetWidget();
+   void setZoom(int value);
+   void setPosition(QPointF pos);
 
 protected:
    void resizeEvent(QResizeEvent *event);

@@ -36,6 +36,18 @@ MapGadgetWidget::~MapGadgetWidget()
 {
    // Do nothing
 }
+void MapGadgetWidget::setZoom(int value)
+{
+    mc->setZoom(value);
+    mc->updateRequestNew();
+}
+
+void MapGadgetWidget::setPosition(QPointF pos)
+{
+    mc->setView(pos);
+    mc->updateRequestNew();
+}
+
 
 void MapGadgetWidget::resizeEvent(QResizeEvent *event)
 {

@@ -35,14 +35,25 @@ MapGadgetConfiguration::MapGadgetConfiguration(bool locked, QString classId, QSt
     if (state.count() > 0) {
         QDataStream stream(state);
         int zoom;
+        double latitude;
+        double longitude;
         stream >> zoom;
+        stream >> latitude;
+        stream >> longitude;
         m_defaultZoom = zoom;
+        m_defaultLatitude = latitude;
+        m_defaultLongitude = longitude;
+
     }
 }
 
 IUAVGadgetConfiguration *MapGadgetConfiguration::clone(QString name)
 {
-    return new MapGadgetConfiguration(this->locked(), this->classId(), name);
+    MapGadgetConfiguration *m = new MapGadgetConfiguration(this->locked(), this->classId(), name);
+    m->m_defaultZoom = m_defaultZoom;
+    m->m_defaultLatitude = m_defaultLatitude;
+    m->m_defaultLongitude = m_defaultLongitude;
+    return m;
 }
 
 QByteArray MapGadgetConfiguration::saveState() const
@@ -50,6 +61,8 @@ QByteArray MapGadgetConfiguration::saveState() const
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::WriteOnly);
     stream << m_defaultZoom;
+    stream << m_defaultLatitude;
+    stream << m_defaultLongitude;
     return bytes;
 }
 

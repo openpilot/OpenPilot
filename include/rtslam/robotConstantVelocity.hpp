@@ -38,8 +38,10 @@ namespace jafar {
 		 * - the state covariance is in the map, P = state.P = (map.filter).P(state.ia, state.ia)
 		 * - the control vector is u = control.x = [vi wi]
 		 * - the control covariances matrix is U = control.P
-		 * - the Jacobians of f(x,u) provided by move() are F_x = dxnew_by_dx and F_u = dxnew_by_dcontrol.
-		 * - the perturbation covariance is obtained with Q = F_u*U*F_u' with method computeStatePerturbation().
+		 * - the Jacobians of f(x,u) provided by move() are XNEW_x and XNEW_control.
+		 * - the perturbation covariance is obtained with the method computeStatePerturbation(), as follows:
+		 * 		- Q = XNEW_control * control.P * XNEW_control'\n
+		 * .
 		 *
 		 * \sa Explore the comments in file robotConstantVelocity.cpp for full algebric details.
 		 *
@@ -63,20 +65,26 @@ namespace jafar {
 				 * Move one step ahead.
 				 *
 				 * This function predicts the robot state one step of length \a dt ahead in time,
-				 * according to the control input \a control.
-				 * In this case \a control only contains the covariances matrix of the impulses.
-				 * All parameters exist in the class and hence the funciton is void.
-				 * \sa See other prototypes of move() with additional input parameters in the RobotAbstract class.
+				 * according to the control input \a control.x and the time interval \a control.dt.
+				 * It updates the state and computes the convenient Jacobian matrices.
+				 */
+				void move_func();
+
+				/**
+				 * Move one step ahead and update the map.
+				 * This version of move() considers Q constant.
+				 * We do not need to compute Q = XNEW_control * ccontrol.P * XNEW_control '
 				 */
 				void move();
+
 
 				/**
 				 * Retro-project perturbation to robot state.
 				 * The member matrix \a Q is constant and computed once with initStatePerturbation().
 				 * This function cancels the Jacobian product defined in RobotAbstract::computeStatePerturbation().
 				 */
-				inline void computeStatePerturbation() {
-				}
+//				inline void computeStatePerturbation() {
+//				}
 
 
 

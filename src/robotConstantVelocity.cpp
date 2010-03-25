@@ -36,14 +36,14 @@ namespace jafar {
 			RobotAbstract(_map, RobotConstantVelocity::size(), RobotConstantVelocity::size_control()) {
 			// Build constant perturbation Jacobian
 			jblas::identity_mat I(3);
-			dxnew_by_dcontrol.clear();
-			ublas::subrange(dxnew_by_dcontrol, 7, 10, 0, 3) = I;
-			ublas::subrange(dxnew_by_dcontrol, 10, 13, 3, 6) = I;
+			XNEW_control.clear();
+			ublas::subrange(XNEW_control, 7, 10, 0, 3) = I;
+			ublas::subrange(XNEW_control, 10, 13, 3, 6) = I;
 			RobotAbstract::computeStatePerturbation();
 			type("Constant-Velocity");
 		}
 
-		void RobotConstantVelocity::move() {
+		void RobotConstantVelocity::move_func() {
 
 			using namespace jblas;
 			using namespace ublas;
@@ -122,10 +122,10 @@ namespace jafar {
 			composeState(p, q, v, w);
 
 			// Build transition Jacobian matrix dx_by_dstate
-			dxnew_by_dx.assign(identity_mat(state.size()));
-			project(dxnew_by_dx, range(0, 3), range(7, 10)) = P_v;
-			project(dxnew_by_dx, range(3, 7), range(3, 7)) = Q_q;
-			project(dxnew_by_dx, range(3, 7), range(10, 13)) = Q_wdt * dt;
+			XNEW_x.assign(identity_mat(state.size()));
+			project(XNEW_x, range(0, 3), range(7, 10)) = P_v;
+			project(XNEW_x, range(3, 7), range(3, 7)) = Q_q;
+			project(XNEW_x, range(3, 7), range(10, 13)) = Q_wdt * dt;
 
 
 			// Build control Jacobian matrix dx_by_dcontrol
@@ -136,6 +136,14 @@ namespace jafar {
 			// project(dx_by_dcontrol, range(10,13), range(3,6)) = I_3;
 
 		}
+
+
+		// We overload move() because Q is constant
+		void RobotConstantVelocity::move(){
+			move_func();
+			slamMap->filter.predict(slamMap->ia_used_states(), XNEW_x, state.ia(), Q);
+		}
+
 
 
 

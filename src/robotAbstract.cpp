@@ -48,8 +48,8 @@ namespace jafar {
 			MapObject(_map, _size_state),
 			pose(state, jmath::ublasExtra::ia_range(0,7)),
 			control(_size_control),
-			dxnew_by_dx(_size_state, _size_state),
-			dxnew_by_dcontrol(_size_state, _size_control),
+			XNEW_x(_size_state, _size_state),
+			XNEW_control(_size_state, _size_control),
 			Q(_size_state, _size_state)
 		{
 			categoryName("ROBOT"); // robot is categorized
@@ -67,7 +67,11 @@ namespace jafar {
 			slamMap = _mapPtr;
 		}
 
-
+		void RobotAbstract::move(){
+			move_func(); // x = F(x, u); Update Jacobians dxnew/dx and dxnew/du
+			computeStatePerturbation();
+			slamMap->filter.predict(slamMap->ia_used_states(), XNEW_x, state.ia(), Q);  // P = F*P*F' + Q
+		}
 
 	}
 }

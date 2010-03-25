@@ -178,9 +178,9 @@ namespace jafar {
 				Gaussian pose; ///< Robot Gaussian pose
 				Control control; ///< Control Gaussian vector
 
-				jblas::mat dxnew_by_dx; ///< Jacobian wrt state
-				jblas::mat dxnew_by_dcontrol; ///< Jacobian wrt control
-				jblas::sym_mat Q; ///< Perturbation matrix in state space, Q = dxnew_by_dcontrol * control.P * trans(dxnew_by_dcontrol);
+				jblas::mat XNEW_x; ///< Jacobian wrt state
+				jblas::mat XNEW_control; ///< Jacobian wrt control
+				jblas::sym_mat Q; ///< Perturbation matrix in state space, Q = XNEW_control * control.P * trans(XNEW_control);
 
 				static size_t size_control() {
 					return 0;
@@ -207,22 +207,35 @@ namespace jafar {
 				}
 
 
+			protected:
 				/**
-				 * Move the robot.
+				 * Move one step ahead.
+				 *
+				 * This function predicts the robot state one step of length \a dt ahead in time,
+				 * according to the control input \a control.x and the time interval \a control.dt.
+				 * It updates the state and computes the convenient Jacobian matrices.
 				 */
-				virtual void move() = 0;
+				virtual void move_func() = 0;
 
-				void move(const Control & _control) {
+				void move_func(const Control & _control) {
 					set_control(_control);
-					move();
+					move_func();
 				}
 
 				template<class V>
-				void move(V & _u) {
+				void move_func(V & _u) {
 					JFR_ASSERT(_u.size() == control.size(), "robotAbstract.hpp: move: wrong control size.");
 					control.x(_u);
-					move();
+					move_func();
 				}
+
+
+			public:
+				/**
+				 * Move one step ahead, affect SLAM filter.
+				 * This function updates the full state and covariances matrix of the robot plus the cross-variances with all other map objects.
+				 */
+				void move();
 
 
 				/**
@@ -232,20 +245,8 @@ namespace jafar {
 				 * and use initStatePerturbation() just once after contruction.
 				 */
 				void computeStatePerturbation() {
-					Q = jmath::ublasExtra::prod_JPJt(control.P(), dxnew_by_dcontrol);
+					Q = jmath::ublasExtra::prod_JPJt(control.P(), XNEW_control);
 				}
-
-				/**
-				 * Compute robot process noise \a Q in state space.
-				 * This function is only called once.
-				 * Use it just once after robot construction if you know \a Q is constant,
-				 * and overload computeStatePerturbation() to an empty inline.
-				 */
-				void initStatePerturbation() {
-					RobotAbstract::computeStatePerturbation();
-				}
-
-
 
 		};
 

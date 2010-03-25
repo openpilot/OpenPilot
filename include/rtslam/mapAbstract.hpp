@@ -137,10 +137,13 @@ namespace jafar {
 				void liberateStates(const jblas::ind_array & _ia);
 
 				/**
-				 * Add all necessary observations for a given landmark.
-				 * \param lmkPtr pointser to the new landmark.
+				 * Add observations to landmark.
+				 * This requires traversing all the map tree and this is why this function goes here.
+				 * \param lmkPtr the pointer to the landmark to associate observations to.
 				 */
 				void addObservations(landmark_ptr_t lmkPtr);
+
+
 
 			protected:
 

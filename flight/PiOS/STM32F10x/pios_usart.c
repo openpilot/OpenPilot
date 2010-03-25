@@ -121,6 +121,7 @@ void PIOS_USART_Init(void)
 
 	/* Configure and Init USART Tx as alternate function open-drain */
 	GPIO_InitStructure.GPIO_Pin = PIOS_USART2_TX_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_OD;
 	GPIO_Init(PIOS_USART2_GPIO_PORT, &GPIO_InitStructure);
 
 	/* Configure and Init USART Rx input with internal pull-ups */
@@ -153,6 +154,7 @@ void PIOS_USART_Init(void)
 
 	/* Configure and Init USART Tx as alternate function open-drain */
 	GPIO_InitStructure.GPIO_Pin = PIOS_USART3_TX_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_OD;
 	GPIO_Init(PIOS_USART3_GPIO_PORT, &GPIO_InitStructure);
 
 	/* Configure and Init USART Rx input with internal pull-ups */

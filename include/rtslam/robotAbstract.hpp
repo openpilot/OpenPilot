@@ -52,15 +52,98 @@ namespace jafar {
 
 
 		/** Base class for all Gaussian control vectors defined in the module rtslam.
+		 * \author jsola@laas.fr
+		 *
+		 * This class is mainly a Gaussian with a time interval value. It represents discrete-time control vectors.
+		 * Mean and covariances are interpreted as follows:
+		 * - The mean is considered the deterministic part of the control.
+		 * - The covariances matrix encodes the random character of the perturbation.
+		 *
+		 * In case the control and perturbation values want to be specified in continuous-time,
+		 * this class incorporates private members for storing the continuous values
+		 * and methods for the conversion.
 		 *
 		 * @ingroup rtslam
 		 */
 		class Control: public Gaussian {
+			private:
+				vec x_ct; ///< continuous-time control vector
+				sym_mat P_ct; ///< continuous-time covariances matrix
 			public:
 				double dt;
 				Control(const size_t _size) :
 					Gaussian(_size) {
 					dt = 1.0;
+				}
+				template<class SymMat>
+				void set_P_continuous(SymMat & _P_ct){
+					JFR_ASSERT(_P_ct.size1() == size(), "Matrix sizes mismatch.");
+					P_ct.resize(size(),size());
+					P_ct = _P_ct;
+				}
+				template<class V>
+				void set_x_continuous(V & _x_ct){
+					JFR_ASSERT(_x_ct.size() == size(), "Vector sizes mismatch.");
+					x_ct.resize(size());
+					x_ct = _x_ct;
+				}
+				/**
+				 * Discrete perturbation from continuous specification.
+				 * - The white, Gaussian random values integrate with the square root of dt. Their variance integrates linearly with dt:
+				 *		- P = _P_ct * _dt
+				 *
+				 * This function takes covariances from the internal variables of the class (which is often constant).
+				 * \param _dt the time interval to integrate.
+				 */
+				void convert_P_from_continuous(double _dt){
+					JFR_ASSERT(P_ct.size1() == size(), "Continuous-time covariance not yet initialized.");
+					P(P_ct * _dt); // perturbation is random => variance is linear with time
+				}
+				/**
+				 * Discrete perturbation from continuous specification.
+				 * - The white, Gaussian random values integrate with the square root of dt. Their variance integrates linearly with dt:
+				 *		- P = _P_ct * _dt
+				 *
+				 * \param _P_ct continuous-time perturbation covariances matrix.
+				 * \param _dt the time interval to integrate.
+				 */
+				void convert_P_from_continuous(sym_mat & _P_ct, double _dt){
+					JFR_ASSERT(_P_ct.size1() == size(), "Matrix sizes mismatch.");
+					set_P_continuous(_P_ct);
+					P(P_ct * _dt); // perturbation is random => variance is linear with time
+				}
+				/**
+				 * Discrete control and perturbation from continuous specifications.
+				 * - The deterministic values integrate with time normally, linearly with dt:
+				 * 		- x = _x_ct * _dt
+				 * - The white, Gaussian random values integrate with the square root of dt. Their variance integrates linearly with dt:
+				 *		- P = _P_ct * _dt
+				 *
+				 * This function takes mean and covariances from the internal variables of the class (which are often constant).
+				 * \param _dt the time interval to integrate.
+				 */
+				void convert_from_continuous(double _dt){
+					JFR_ASSERT(x_ct.size() == size(), "Continuous-time values not yet initialized.");
+					x(x_ct * _dt); // control is deterministic => mean is linear with time
+					P(P_ct * _dt); // perturbation is random => variance is linear with time
+					dt = _dt;
+				}
+
+				/**
+				 * Discrete control and perturbation from continuous specifications.
+				 * - The deterministic values integrate with time normally, linearly with dt:
+				 * 		- x = Ct.x * _dt
+				 * - The white, Gaussian random values integrate with the square root of dt. Their variance integrates linearly with dt:
+				 *		- P = Ct.P * _dt
+				 *
+				 * \param Ct a continuous-time Gaussian holding deterministic mean and the covariances matrix of the random part.
+				 * \param _dt the time interval to integrate.
+				 */
+				void convert_from_continuous(Gaussian & Ct, double _dt){
+					JFR_ASSERT(Ct.size() == size(), "Sizes mismatch");
+					set_P_continuous(Ct.P());
+					set_x_continuous(Ct.x());
+					convert_from_continuous(_dt);
 				}
 		};
 

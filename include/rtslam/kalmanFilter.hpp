@@ -67,25 +67,38 @@ namespace jafar {
 				 * It uses a Jacobian \a F_v indexed by an indirect array \a iav into the state vector.
 				 * The covariances matrix is also indexed by an indirect array \a iax containing the used states of the filter.
 				 * It incorporates the process noise \a U via a second Jacobian \a F_u, mapping it to the state space via \a iav (the same as F_v).
-				 * \param iax the ind_array of used states.
+				 * The formula is:
+				 * - [Pvv, Pvm; Pmv, Pmm] = [F_v*Pvv*F_v'+F_u*U*F_u' ,  F_v*Pvm ; Pmv*F_v' ,  Pmm]
+				 *
+				 * \param iax the ind_array of all used states in the map.
 				 * \param F_v the Jacobian of the process model.
 				 * \param iav the ind_array of the process model states.
 				 * \param F_u the Jacobian of the process model wrt the perturbation.
-				 * \param U the covariances matrix of the perturbation.
+				 * \param U the covariances matrix of the perturbation in control-space.
 				 */
-				inline void predict(const ind_array & iax, const  mat & F_v, const ind_array & iav, const mat & F_u, const sym_mat & U) {
-					jafar::jmath::ublasExtra::ixaxpy_prod(P_, iax, F_v, iav);
-					ublas::project(P_, iav, iav) += jafar::jmath::ublasExtra::prod_JPJt(U, F_u);
-				}
-				inline void predict(const ind_array & iax, const mat & F_v, const ind_array & iav, const sym_mat & Q) {
-					jafar::jmath::ublasExtra::ixaxpy_prod(P_, iax, F_v, iav, iav, Q);
-				}
-				inline void correct();
-				inline void computeInnovation();
-				inline void computeK();
-				inline void updateP();
-				inline void stackCorrection();
-				inline void correctAllStacked();
+				void predict(const ind_array & iax, const mat & F_v, const ind_array & iav, const mat & F_u, const sym_mat & U);
+				/**
+				 * Predict covariances matrix.
+				 *
+				 * This function predicts the future state of the covariances matrix.
+				 * It uses a Jacobian \a F_v indexed by an indirect array \a iav into the state vector.
+				 * The covariances matrix is also indexed by an indirect array \a iax containing the used states of the filter.
+				 * It incorporates the process noise \a Q, already mapped to the state space.
+				 * The formula is:
+				 * - [Pvv, Pvm; Pmv, Pmm] = [F_v*Pvv*F_v'+Q ,  F_v*Pvm ; Pmv*F_v' ,  Pmm]
+				 *
+				 * \param iax the ind_array of all used states in the map.
+				 * \param F_v the Jacobian of the process model.
+				 * \param iav the ind_array of the process model states.
+				 * \param Q the covariances matrix of the perturbation in state-space.
+				 */
+				void predict(const ind_array & iax, const mat & F_v, const ind_array & iav, const sym_mat & Q);
+				void correct();
+				void computeInnovation();
+				void computeK();
+				void updateP();
+				void stackCorrection();
+				void correctAllStacked();
 
 		};
 

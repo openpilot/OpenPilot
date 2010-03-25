@@ -39,7 +39,7 @@ public:
     explicit MapGadgetConfiguration(bool locked, QString classId, QString name, const QByteArray &state = 0, QObject *parent = 0);
     int zoom() { return m_defaultZoom; }
     QByteArray saveState() const;
-    IUAVGadgetConfiguration *clone() { return 0; }
+    IUAVGadgetConfiguration *clone(QString name);
 signals:
 
 public slots:

@@ -30,14 +30,14 @@
 #include <QtGui/QLabel>
 
 MapGadgetOptionsPage::MapGadgetOptionsPage(IUAVGadgetConfiguration *config, QObject *parent) :
-    UAVGadgetOptionsPage(config, parent)
+    IOptionsPage(parent),
+    m_config(qobject_cast<MapGadgetConfiguration*>(config))
 {
-    m_config = qobject_cast<MapGadgetConfiguration*>(config);
 }
 
-QWidget *MapGadgetOptionsPage::widget()
+QWidget *MapGadgetOptionsPage::createPage(QWidget *parent)
 {
-    QWidget *label = new QLabel("Settings will be here.");
+    QWidget *label = new QLabel("Settings will be here.", parent);
 //    QLabel *label = new QLabel(QString(m_config->zoom()));
     label->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     return label;

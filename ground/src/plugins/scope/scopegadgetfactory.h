@@ -21,7 +21,7 @@ public:
     ScopeGadgetFactory(QObject *parent = 0);
     ~ScopeGadgetFactory();
 
-    Core::IUAVGadget *createUAVGadget(QList<IUAVGadgetConfiguration*> *configurations, QWidget *parent);
+    Core::IUAVGadget *createGadget(QList<IUAVGadgetConfiguration*> *configurations, QWidget *parent);
 };
 
 #endif // SCOPEGADGETFACTORY_H_

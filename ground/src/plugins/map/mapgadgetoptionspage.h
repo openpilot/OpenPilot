@@ -28,18 +28,26 @@
 #ifndef MAPGADGETOPTIONSPAGE_H
 #define MAPGADGETOPTIONSPAGE_H
 
-#include "coreplugin/uavgadgetoptionspage.h"
+#include "coreplugin/dialogs/ioptionspage.h"
 
+namespace Core {
+class IUAVGadgetConfiguration;
+}
 class MapGadgetConfiguration;
 
 using namespace Core;
 
-class MapGadgetOptionsPage : public UAVGadgetOptionsPage
+class MapGadgetOptionsPage : public IOptionsPage
 {
 Q_OBJECT
 public:
     explicit MapGadgetOptionsPage(IUAVGadgetConfiguration *config, QObject *parent = 0);
-    QWidget *widget();
+    QString id() const { return ""; }
+    QString trName() const { return ""; }
+    QString category() const { return ""; }
+    QString trCategory() const { return ""; }
+
+    QWidget *createPage(QWidget *parent);
     void apply();
     void finish();
 
@@ -48,7 +56,6 @@ signals:
 public slots:
 private:
     MapGadgetConfiguration *m_config;
-
 
 };
 

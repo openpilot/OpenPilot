@@ -21,7 +21,7 @@ ScopeGadgetFactory::~ScopeGadgetFactory()
 
 }
 
-Core::IUAVGadget* ScopeGadgetFactory::createUAVGadget(QList<IUAVGadgetConfiguration*> *configurations, QWidget *parent) {
+Core::IUAVGadget* ScopeGadgetFactory::createGadget(QList<IUAVGadgetConfiguration*> *configurations, QWidget *parent) {
         ScopeGadgetWidget* gadgetWidget = new ScopeGadgetWidget(parent);
         return new ScopeGadget(QString("ScopeGadget"), configurations, gadgetWidget);
 }

@@ -9,6 +9,7 @@
 #include "mapgadget.h"
 #include "mapgadgetconfiguration.h"
 #include "mapgadgetoptionspage.h"
+#include <coreplugin/uavgadgetoptionspagedecorator.h>
 #include <coreplugin/iuavgadget.h>
 
 MapGadgetFactory::MapGadgetFactory(QObject *parent) :
@@ -20,23 +21,23 @@ MapGadgetFactory::MapGadgetFactory(QObject *parent) :
 
 MapGadgetFactory::~MapGadgetFactory()
 {
-
 }
 
-Core::IUAVGadget* MapGadgetFactory::createUAVGadget(QList<IUAVGadgetConfiguration*> *configurations, QWidget *parent) {
+Core::IUAVGadget* MapGadgetFactory::createGadget(QList<IUAVGadgetConfiguration*> *configurations, QWidget *parent) {
 	MapGadgetWidget* gadgetWidget = new MapGadgetWidget(parent);
         return new MapGadget(QString("MapGadget"), configurations, gadgetWidget);
 }
 
-IUAVGadgetConfiguration *MapGadgetFactory::createUAVGadgetConfiguration(bool locked,
-                                                      const QString configName,
-                                                      const QByteArray &state)
+IUAVGadgetConfiguration *MapGadgetFactory::createConfiguration(bool locked,
+                                                               const QString configName,
+                                                               const QByteArray &state)
 {
     return new MapGadgetConfiguration(locked, QString("MapGadget"), configName, state);
 }
 
-UAVGadgetOptionsPage *MapGadgetFactory::createUAVGadgetOptionsPage(IUAVGadgetConfiguration *config)
+IOptionsPage *MapGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
-    return new MapGadgetOptionsPage(config);
+    MapGadgetOptionsPage *page = new MapGadgetOptionsPage(config);
+    return new UAVGadgetOptionsPageDecorator(page, config);
 }
 

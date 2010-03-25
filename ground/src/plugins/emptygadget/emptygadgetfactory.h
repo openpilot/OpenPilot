@@ -41,7 +41,7 @@ public:
     EmptyGadgetFactory(QObject *parent = 0);
     ~EmptyGadgetFactory();
 
-    Core::IUAVGadget *createUAVGadget(QList<IUAVGadgetConfiguration*> *configurations, QWidget *parent);
+    Core::IUAVGadget *createGadget(QList<IUAVGadgetConfiguration*> *configurations, QWidget *parent);
 };
 
 #endif // EMPTYGADGETFACTORY_H_

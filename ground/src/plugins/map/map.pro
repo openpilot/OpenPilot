@@ -4,15 +4,15 @@ include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
 include(../../libs/qmapcontrol/qmapcontrol.pri)
 HEADERS += mapplugin.h \
-    mapgadgetconfiguration.h
-HEADERS += mapgadget.h
-HEADERS += mapgadgetwidget.h
-HEADERS += mapgadgetfactory.h
-HEADERS += mapgadgetoptionspage.h
+    mapgadgetconfiguration.h \
+    mapgadget.h \
+    mapgadgetwidget.h \
+    mapgadgetfactory.h \
+    mapgadgetoptionspage.h
 SOURCES += mapplugin.cpp \
-    mapgadgetconfiguration.cpp
-SOURCES += mapgadget.cpp
-SOURCES += mapgadgetfactory.cpp
-SOURCES += mapgadgetwidget.cpp
-SOURCES += mapgadgetoptionspage.cpp
+    mapgadgetconfiguration.cpp \
+    mapgadget.cpp \
+    mapgadgetfactory.cpp \
+    mapgadgetwidget.cpp \
+    mapgadgetoptionspage.cpp
 OTHER_FILES += MapGadget.pluginspec

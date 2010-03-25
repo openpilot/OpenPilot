@@ -24,11 +24,11 @@ public:
     MapGadgetFactory(QObject *parent = 0);
     ~MapGadgetFactory();
 
-    Core::IUAVGadget *createUAVGadget(QList<IUAVGadgetConfiguration*> *configurations, QWidget *parent);
-    IUAVGadgetConfiguration *createUAVGadgetConfiguration(bool locked,
-                                                          const QString configName,
-                                                          const QByteArray &state);
-    UAVGadgetOptionsPage *createUAVGadgetOptionsPage(IUAVGadgetConfiguration *config);
+    Core::IUAVGadget *createGadget(QList<IUAVGadgetConfiguration*> *configurations, QWidget *parent);
+    IUAVGadgetConfiguration *createConfiguration(bool locked,
+                                                 const QString configName,
+                                                 const QByteArray &state);
+    IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
 };
 
 #endif // MAPGADGETFACTORY_H_

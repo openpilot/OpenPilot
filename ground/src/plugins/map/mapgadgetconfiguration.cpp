@@ -40,6 +40,11 @@ MapGadgetConfiguration::MapGadgetConfiguration(bool locked, QString classId, QSt
     }
 }
 
+IUAVGadgetConfiguration *MapGadgetConfiguration::clone(QString name)
+{
+    return new MapGadgetConfiguration(this->locked(), this->classId(), name);
+}
+
 QByteArray MapGadgetConfiguration::saveState() const
 {
     QByteArray bytes;

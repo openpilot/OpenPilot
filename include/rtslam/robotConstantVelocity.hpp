@@ -34,7 +34,7 @@ namespace jafar {
 		 *
 		 * \ingroup rtslam
 		 */
-		class Robot3DConstantVelocity: public RobotAbstract {
+		class RobotConstantVelocity: public RobotAbstract {
 			public:
 
 
@@ -42,9 +42,9 @@ namespace jafar {
 				 * Remote constructor from remote map.
 				 * \param _map the remote map
 				 */
-				Robot3DConstantVelocity(MapAbstract & _map);
+				RobotConstantVelocity(MapAbstract & _map);
 
-				~Robot3DConstantVelocity(void) {
+				~RobotConstantVelocity(void) {
 				}
 
 

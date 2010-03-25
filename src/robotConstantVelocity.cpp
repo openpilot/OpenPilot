@@ -32,8 +32,8 @@ namespace jafar {
 		 * Remote constructor from remote map.
 		 * \param _map the remote map
 		 */
-		Robot3DConstantVelocity::Robot3DConstantVelocity(MapAbstract & _map) :
-			RobotAbstract(_map, Robot3DConstantVelocity::size(), Robot3DConstantVelocity::size_control()) {
+		RobotConstantVelocity::RobotConstantVelocity(MapAbstract & _map) :
+			RobotAbstract(_map, RobotConstantVelocity::size(), RobotConstantVelocity::size_control()) {
 			// Build constant perturbation Jacobian
 			jblas::identity_mat I(3);
 			dxnew_by_dcontrol.clear();
@@ -43,7 +43,7 @@ namespace jafar {
 			type("Constant-Velocity");
 		}
 
-		void Robot3DConstantVelocity::move() {
+		void RobotConstantVelocity::move() {
 
 			using namespace jblas;
 			using namespace ublas;

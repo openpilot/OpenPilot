@@ -203,7 +203,7 @@
   		  all landmarks are referenced to the fixed origin).
 
   	- jafar::rtslam::RobotAbstract
-  		- jafar::rtslam::Robot3DConstantVelocity : a 3D constant velocity model.
+  		- jafar::rtslam::RobotConstantVelocity : a 3D constant velocity model.
   
   	- jafar::rtslam::SensorAbstract
   		- jafar::rtslam::SensorPinHole : A pin-hole perspective camera, with radial distorsion 
@@ -229,8 +229,8 @@
   		This may require the extension of all robot classes with the appropriate re-frame functions.
 
   	- jafar::rtslam::RobotAbstract
-  		- jafar::rtslam::Robot3DWith2DOdometry : a 3D odometry model with odometry inputs specified in the robot's local 2D plane.
-  		- jafar::rtslam::Robot3DInertial : a 3D motion model reading IMU measurements.
+  		- jafar::rtslam::RobotWith2DOdometry : a 3D odometry model with odometry inputs specified in the robot's local 2D plane.
+  		- jafar::rtslam::RobotInertial : a 3D motion model reading IMU measurements.
   
   	- jafar::rtslam::SensorAbstract
   		- jafar::rtslam::SensorBarreto : A Barreto-modeled camera, preferably with distorsion and correction models.

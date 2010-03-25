@@ -82,7 +82,7 @@ void test_rtslam01(void) {
 
 
 	// Robot and sensor sizes;
-	std::size_t size_robCV = Robot3DConstantVelocity::size();
+	std::size_t size_robCV = RobotConstantVelocity::size();
 	std::size_t size_senPH = SensorPinHole::size();
 	std::size_t size_lmkAHP = LandmarkAnchoredHomogeneousPoint::size();
 
@@ -91,7 +91,7 @@ void test_rtslam01(void) {
 	if (slamMapPtr->unusedStates(size_robCV)) {
 
 		size_t rid = slamMapPtr->robotIds.getId();
-		shared_ptr<Robot3DConstantVelocity> robPtr(new Robot3DConstantVelocity(*slamMapPtr));
+		shared_ptr<RobotConstantVelocity> robPtr(new RobotConstantVelocity(*slamMapPtr));
 
 		robPtr->id(rid);
 		robPtr->name("SUBMARINE");
@@ -120,7 +120,7 @@ void test_rtslam01(void) {
 
 	if (slamMapPtr->unusedStates(size_robCV)) {
 		size_t rid = slamMapPtr->robotIds.getId();
-		shared_ptr<Robot3DConstantVelocity> robPtr(new Robot3DConstantVelocity(*slamMapPtr));
+		shared_ptr<RobotConstantVelocity> robPtr(new RobotConstantVelocity(*slamMapPtr));
 
 		robPtr->id(rid);
 		robPtr->name("AEROPLANE");

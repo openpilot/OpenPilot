@@ -109,7 +109,7 @@ void printSlam(map_ptr_t slamMapPtr) {
 robot_ptr_t newRobot(map_ptr_t slamMapPtr, string name) {
 
 	size_t rid = slamMapPtr->robotIds.getId();
-	shared_ptr<Robot3DConstantVelocity> robPtr(new Robot3DConstantVelocity(*slamMapPtr));
+	shared_ptr<RobotConstantVelocity> robPtr(new RobotConstantVelocity(*slamMapPtr));
 
 	robPtr->id(rid);
 	robPtr->name(name);
@@ -190,7 +190,7 @@ map_ptr_t initSlam(size_t size_map) {
 
 
 	// Map object sizes;
-	std::size_t size_robCV = Robot3DConstantVelocity::size();
+	std::size_t size_robCV = RobotConstantVelocity::size();
 	std::size_t size_senPH = SensorPinHole::size();
 
 

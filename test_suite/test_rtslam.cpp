@@ -40,27 +40,6 @@ using namespace jafar::jmath;
 using namespace jafar::jmath::ublasExtra;
 using namespace jafar::rtslam;
 
-void fillMapSeq(MapAbstract & map) {
-	size_t size_map = map.max_size;
-	for (size_t i = 0; i < size_map; i++) {
-		map.x(i) = i;
-		for (size_t j = 0; j < size_map; j++)
-			map.P(i, j) = i + 100 * j;
-	}
-}
-
-void fillMapDiag(MapAbstract & map) {
-	size_t size_map = map.max_size;
-	for (size_t i = 0; i < size_map; i++) {
-		map.x(i) = i;
-		map.P(i, i) = i;
-	}
-}
-
-void fillMapRndm(MapAbstract & map) {
-	randVector(map.x());
-	randMatrix(map.P());
-}
 
 
 void test_rtslam01(void) {
@@ -71,7 +50,7 @@ void test_rtslam01(void) {
 
 	shared_ptr<MapAbstract> slamMapPtr(new MapAbstract(size_map));
 
-	fillMapDiag(*slamMapPtr);
+	slamMapPtr->fillDiag();
 
 	cout << endl;
 

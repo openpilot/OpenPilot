@@ -76,7 +76,7 @@ namespace jafar {
 		void RobotAbstract::exploreSensors() {
 			for (sensors_ptr_set_t::iterator senIter = sensors.begin(); senIter != sensors.end(); senIter++) {
 				sensor_ptr_t senPtr = senIter->second;
-				cout << "exploring sensor: " << senPtr->id() << endl;
+				cout << "exploring sen: " << senPtr->id() << endl;
 
 				senPtr->acquireRaw();
 				senPtr->processRaw();

@@ -155,6 +155,12 @@ namespace jafar {
 				void addObservations(landmark_ptr_t lmkPtr);
 
 
+				void fillSeq() ;
+
+				void fillDiag() ;
+
+				void fillRndm() ;
+
 			protected:
 
 				/**

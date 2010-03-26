@@ -111,7 +111,9 @@ namespace jafar {
 				SensorPinHole(MapAbstract & _map);
 
 				/**
-				 * Constructor for selectable LOCAL or REMOTE pose, from robot.
+				 * Constructor for selectable LOCAL or REMOTE pose, from robot and selector flag.
+				 * \param _rob the robot to install to.
+				 * \param inFilter flag indicating in the sensor pose is filtered or not.
 				 */
 				SensorPinHole(RobotAbstract & _rob, bool inFilter = false);
 

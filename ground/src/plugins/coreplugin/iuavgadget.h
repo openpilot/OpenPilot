@@ -46,32 +46,34 @@ class CORE_EXPORT IUAVGadget : public IContext
 {
     Q_OBJECT
 public:
-    IUAVGadget(QString classId, QObject *parent = 0) :
-            IContext(parent),
-            m_classId(classId) { }
-
+    IUAVGadget(QString classId, QList<IUAVGadgetConfiguration*> *configurations, QObject *parent = 0);
     virtual ~IUAVGadget() {}
 
-    QList<int> context() const { return m_context; }
-    void setContext(QList<int> context) { m_context = context; }
+    virtual QList<int> context() const = 0;
     virtual QWidget *widget() = 0;
-    virtual QComboBox *toolBar() { return 0; }
     virtual QString contextHelpId() const { return QString(); }
     QString classId() const { return m_classId; }
 
-    virtual IUAVGadgetConfiguration *activeConfiguration() { return 0; }
-    virtual void loadConfiguration(IUAVGadgetConfiguration*) { }
-    virtual QByteArray saveState() { return QByteArray(); }
-    virtual void restoreState(QByteArray) { }
+    virtual void loadConfiguration(IUAVGadgetConfiguration* /*config*/) { }
+    IUAVGadgetConfiguration *activeConfiguration() { return m_activeConfiguration; }
+    void setActiveConfiguration(IUAVGadgetConfiguration *config);
+    QComboBox *toolBar() { return m_toolbar; }
+    virtual QByteArray saveState();
+    virtual void restoreState(QByteArray state);
 public slots:
-    virtual void configurationChanged(IUAVGadgetConfiguration* ) { }
-    virtual void configurationAdded(IUAVGadgetConfiguration*) { }
-    virtual void configurationToBeDeleted(IUAVGadgetConfiguration*) { }
-    virtual void configurationNameChanged(QString, QString) { }
+    void configurationChanged(IUAVGadgetConfiguration* config);
+    void configurationAdded(IUAVGadgetConfiguration* config);
+    void configurationToBeDeleted(IUAVGadgetConfiguration* config);
+    void configurationNameChanged(QString oldName, QString newName);
 private slots:
+    void loadConfiguration(int index);
+protected:
+    QComboBox *m_toolbar;
 private:
+    void updateToolbar();
     QString m_classId;
-    QList<int> m_context;
+    IUAVGadgetConfiguration *m_activeConfiguration;
+    QList<IUAVGadgetConfiguration*> *m_configurations;
 };
 
 } // namespace Core

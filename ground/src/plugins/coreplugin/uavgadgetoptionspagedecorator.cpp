@@ -74,8 +74,8 @@ QWidget *UAVGadgetOptionsPageDecorator::createPage(QWidget *parent)
 void UAVGadgetOptionsPageDecorator::apply()
 {
     m_id = m_config->provisionalName();
-    m_optionsPage->apply();
     m_instanceManager->applyChanges(m_config);
+    m_optionsPage->apply();
 }
 
 void UAVGadgetOptionsPageDecorator::finish()

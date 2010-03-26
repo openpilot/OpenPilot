@@ -10,21 +10,18 @@
 
 #include <coreplugin/iuavgadgetfactory.h>
 
-namespace Core {
+using namespace Core;
 class IUAVGadget;
 class IUAVGadgetFactory;
-}
 
-using namespace Core;
-
-class ScopeGadgetFactory : public IUAVGadgetFactory
+class ScopeGadgetFactory : public Core::IUAVGadgetFactory
 {
     Q_OBJECT
 public:
     ScopeGadgetFactory(QObject *parent = 0);
     ~ScopeGadgetFactory();
 
-    IUAVGadget *createGadget(QWidget *parent);
+    Core::IUAVGadget *createGadget(QList<IUAVGadgetConfiguration*> *configurations, QWidget *parent);
 };
 
 #endif // SCOPEGADGETFACTORY_H_

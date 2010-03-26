@@ -1,8 +1,28 @@
-/*
- * mapgadget.cpp
+/**
+ ******************************************************************************
  *
- *  Created on: Mar 11, 2010
- *      Author: peter
+ * @file       mapgadget.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @brief
+ * @see        The GNU Public License (GPL) Version 3
+ * @defgroup   map
+ * @{
+ *
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "mapgadget.h"
 #include "mapgadgetwidget.h"
@@ -21,10 +41,10 @@ MapGadget::~MapGadget()
 
 void MapGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 {
+    setActiveConfiguration(config);
+
     MapGadgetConfiguration *m = qobject_cast<MapGadgetConfiguration*>(config);
     m_widget->setZoom(m->zoom());
     m_widget->setPosition(QPointF(m->longitude(), m->latitude()));
-    int index = m_toolbar->findText(config->name());
-    m_toolbar->setCurrentIndex(index);
 }
 

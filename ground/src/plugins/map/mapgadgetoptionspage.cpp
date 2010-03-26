@@ -77,11 +77,12 @@ QWidget *MapGadgetOptionsPage::createPage(QWidget *parent)
     m_longSpin->setMaximum(180);
     longLayout->addWidget(label);
     longLayout->addWidget(m_longSpin);
-    QSpacerItem *item = new QSpacerItem(100, 100, QSizePolicy::Expanding, QSizePolicy::Expanding);
+    QSpacerItem *spacer = new QSpacerItem(100, 100, QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     vl->addWidget(x);
     vl->addWidget(y);
     vl->addWidget(z);
+    vl->addSpacerItem(spacer);
 
     m_zoomSpin->setValue(m_config->zoom());
     m_latSpin->setValue(m_config->latitude());

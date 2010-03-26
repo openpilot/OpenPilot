@@ -30,18 +30,21 @@
 
 #include <coreplugin/iuavgadgetfactory.h>
 
-using namespace Core;
+namespace Core {
 class IUAVGadget;
 class IUAVGadgetFactory;
+}
 
-class EmptyGadgetFactory : public Core::IUAVGadgetFactory
+using namespace Core;
+
+class EmptyGadgetFactory : public IUAVGadgetFactory
 {
     Q_OBJECT
 public:
     EmptyGadgetFactory(QObject *parent = 0);
     ~EmptyGadgetFactory();
 
-    Core::IUAVGadget *createGadget(QList<IUAVGadgetConfiguration*> *configurations, QWidget *parent);
+    IUAVGadget *createGadget(QWidget *parent);
 };
 
 #endif // EMPTYGADGETFACTORY_H_

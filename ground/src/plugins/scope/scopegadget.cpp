@@ -7,8 +7,8 @@
 #include "scopegadget.h"
 #include "scopegadgetwidget.h"
 
-ScopeGadget::ScopeGadget(QString classId, QList<IUAVGadgetConfiguration*> *configurations, ScopeGadgetWidget *widget) :
-        IUAVGadget(classId, configurations, widget),
+ScopeGadget::ScopeGadget(QString classId, ScopeGadgetWidget *widget, QWidget *parent) :
+        IUAVGadget(classId, parent),
         m_widget(widget)
 {
 }

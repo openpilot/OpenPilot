@@ -28,8 +28,8 @@
 #include "mapgadgetwidget.h"
 #include "mapgadgetconfiguration.h"
 
-MapGadget::MapGadget(QString classId, QList<IUAVGadgetConfiguration*> *configurations, MapGadgetWidget *widget) :
-        IUAVGadget(classId, configurations, widget),
+MapGadget::MapGadget(QString classId, MapGadgetWidget *widget, QWidget *parent) :
+        IUAVGadget(classId, parent),
         m_widget(widget)
 {
 }
@@ -41,8 +41,6 @@ MapGadget::~MapGadget()
 
 void MapGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 {
-    setActiveConfiguration(config);
-
     MapGadgetConfiguration *m = qobject_cast<MapGadgetConfiguration*>(config);
     m_widget->setZoom(m->zoom());
     m_widget->setPosition(QPointF(m->longitude(), m->latitude()));

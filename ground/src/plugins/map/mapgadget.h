@@ -43,17 +43,14 @@ class MapGadget : public Core::IUAVGadget
 {
     Q_OBJECT
 public:
-    MapGadget(QString classId, QList<IUAVGadgetConfiguration*> *configurations, MapGadgetWidget *widget = 0);
+    MapGadget(QString classId, MapGadgetWidget *widget, QWidget *parent = 0);
     ~MapGadget();
 
-    QList<int> context() const { return m_context; }
     QWidget *widget() { return m_widget; }
-    QString contextHelpId() const { return QString(); }
     void loadConfiguration(IUAVGadgetConfiguration* config);
 
 private:
-        MapGadgetWidget *m_widget;
-	QList<int> m_context;
+    MapGadgetWidget *m_widget;
 };
 
 

@@ -185,6 +185,7 @@ void test_main01() {
 	}
 
 	for (double t = 0; t < t_end; t += dt) { // start SLAM time loop
+		cout << "         time: " << t << endl;
 		for (robots_ptr_set_t::iterator robIter = slamMapPtr->robots.begin(); robIter != slamMapPtr->robots.end(); robIter++) { // loop robots
 
 			robot_ptr_t robPtr = robIter->second;

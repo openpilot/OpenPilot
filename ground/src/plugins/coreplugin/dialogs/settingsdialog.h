@@ -78,7 +78,6 @@ private:
     bool m_applied;
     QString m_currentCategory;
     QString m_currentPage;
-    QList<int> m_deletedPageIndices;
 };
 
 } // namespace Internal

@@ -88,6 +88,7 @@ private:
     QMap<QString, QString> m_classIds;
     QMap<QString, QStringList> m_takenNames;
     QList<IUAVGadgetConfiguration*> m_provisionalConfigs;
+    QList<IUAVGadgetConfiguration*> m_provisionalDeletes;
     QList<IOptionsPage*> m_provisionalOptionsPages;
     Core::Internal::SettingsDialog *m_settingsDialog;
     ExtensionSystem::PluginManager *m_pm;

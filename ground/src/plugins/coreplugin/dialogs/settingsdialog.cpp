@@ -164,9 +164,6 @@ void SettingsDialog::deletePage()
 {
     QTreeWidgetItem *item = pageTree->currentItem();
     item->parent()->removeChild(item);
-    PageData data = item->data(0, Qt::UserRole).value<PageData>();
-    int index = data.index;
-    m_deletedPageIndices.append(index);
     pageSelected();
 }
 
@@ -218,7 +215,6 @@ void SettingsDialog::accept()
 {
     m_applied = true;
     foreach (IOptionsPage *page, m_pages) {
-        if (!m_deletedPageIndices.contains(m_pages.indexOf(page)))
             page->apply();
         page->finish();
     }
@@ -235,7 +231,6 @@ void SettingsDialog::reject()
 void SettingsDialog::apply()
 {
     foreach (IOptionsPage *page, m_pages) {
-        if (!m_deletedPageIndices.contains(m_pages.indexOf(page)))
             page->apply();
     }
     m_applied = true;

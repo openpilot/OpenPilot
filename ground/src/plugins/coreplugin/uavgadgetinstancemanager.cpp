@@ -163,6 +163,7 @@ bool UAVGadgetInstanceManager::canDeleteConfiguration(IUAVGadgetConfiguration *c
 
 void  UAVGadgetInstanceManager::deleteConfiguration(IUAVGadgetConfiguration *config)
 {
+    m_provisionalDeletes.append(config);
     if (m_provisionalConfigs.contains(config)) {
         int i = m_provisionalConfigs.indexOf(config);
         m_provisionalConfigs.removeAt(i);
@@ -171,13 +172,7 @@ void  UAVGadgetInstanceManager::deleteConfiguration(IUAVGadgetConfiguration *con
         m_takenNames[config->classId()].removeAt(j);
         m_settingsDialog->deletePage();
     } else if (m_configurations.contains(config)) {
-        emit configurationToBeDeleted(config);
-        int i = m_configurations.indexOf(config);
-        m_provisionalConfigs.removeAt(i);
-        m_pm->removeObject(m_optionsPages.at(i));
-        m_optionsPages.removeAt(i);//TODO delete
         m_settingsDialog->deletePage();
-        m_configurations.removeAt(i);
     }
     configurationNameEdited("", false);
 }
@@ -220,6 +215,19 @@ QString UAVGadgetInstanceManager::suggestName(QString classId, QString name)
 
 void UAVGadgetInstanceManager::applyChanges(IUAVGadgetConfiguration *config)
 {
+    if (m_provisionalDeletes.contains(config)) {
+        m_provisionalDeletes.removeAt(m_provisionalDeletes.indexOf(config));
+        int i = m_configurations.indexOf(config);
+        if (i >= 0) {
+            emit configurationToBeDeleted(config);
+            int j = m_takenNames[config->classId()].indexOf(config->name());
+            m_takenNames[config->classId()].removeAt(j);
+            m_pm->removeObject(m_optionsPages.at(i));
+            m_configurations.removeAt(i);
+            m_optionsPages.removeAt(i);//TODO delete
+        }
+        return;
+    }
     if (config->provisionalName() != config->name()) {
         emit configurationNameChanged(config->name(), config->provisionalName());
         config->setName(config->provisionalName());
@@ -228,10 +236,12 @@ void UAVGadgetInstanceManager::applyChanges(IUAVGadgetConfiguration *config)
         emit configurationChanged(config);
     } else if (m_provisionalConfigs.contains(config)) {
         emit configurationAdded(config);
+        int i = m_provisionalConfigs.indexOf(config);
+        IOptionsPage *page = m_provisionalOptionsPages.at(i);
         m_configurations.append(config);
-        IUAVGadgetFactory *f = factory(config->classId());
-        IOptionsPage *page = f->createOptionsPage(config);
         m_optionsPages.append(page);
+        m_provisionalConfigs.removeAt(i);
+        m_provisionalOptionsPages.removeAt(i);
         m_pm->addObject(page);
     }
 }
@@ -273,12 +283,12 @@ void UAVGadgetInstanceManager::settingsDialogRemoved()
 {
     m_takenNames.clear();
     m_provisionalConfigs.clear();
+    m_provisionalDeletes.clear();
     m_provisionalOptionsPages.clear(); //TODO delete
     foreach (IUAVGadgetConfiguration *config, m_configurations)
         config->setProvisionalName(config->name());
     m_settingsDialog = 0;
 }
-
 
 QStringList UAVGadgetInstanceManager::configurationNames(QString classId) const
 {

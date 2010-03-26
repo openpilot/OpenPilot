@@ -63,7 +63,6 @@ void fillMapRndm(MapAbstract & map) {
 	randMatrix(map.P());
 }
 
-
 /**
  * Add a new robot to map
  * \param slamMapPtr a pointer to the SLAM map.
@@ -99,8 +98,6 @@ sensor_ptr_t newSensor(robot_ptr_t robPtr, string name, bool isInMap = false) {
 	return senPtr;
 }
 
-
-
 map_ptr_t initSlam(size_t size_map) {
 
 	using namespace boost;
@@ -131,7 +128,6 @@ map_ptr_t initSlam(size_t size_map) {
 	}
 	return slamMapPtr;
 }
-
 
 /**
  * robot setup.
@@ -189,12 +185,12 @@ void test_main01() {
 	using namespace boost;
 
 	map_ptr_t slamMapPtr = initSlam(100);
-//	initSomeLmks(slamMapPtr, 2);
+	//	initSomeLmks(slamMapPtr, 2);
 	double dt = 1;
 	double t_end = 3;
 
 
-	// setup
+	// setup: add a robot with 2 sensors
 	for (robots_ptr_set_t::iterator robIter = slamMapPtr->robots.begin(); robIter != slamMapPtr->robots.end(); robIter++) {
 		robot_ptr_t robPtr = robIter->second;
 
@@ -208,19 +204,17 @@ void test_main01() {
 		robPtr->control.x(control);
 	}
 
-	for (double t = 0; t < t_end; t += dt) {// start SLAM loop
-
-		for (robots_ptr_set_t::iterator robIter = slamMapPtr->robots.begin(); robIter != slamMapPtr->robots.end(); robIter++) {		// loop robots
+	for (double t = 0; t < t_end; t += dt) { // start SLAM time loop
+		for (robots_ptr_set_t::iterator robIter = slamMapPtr->robots.begin(); robIter != slamMapPtr->robots.end(); robIter++) { // loop robots
 
 			robot_ptr_t robPtr = robIter->second;
 			robPtr->move();
 			robPtr->exploreSensors();
+
 		} // end of robots loop
-
-
 	} // end of time loop
 
-	cout << *slamMapPtr << endl;
+//	cout << *slamMapPtr << endl;
 
 	cout << "\n THAT'S ALL, WHAT'S WRONG? " << endl;
 

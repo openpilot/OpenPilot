@@ -176,6 +176,8 @@ namespace jafar {
 
 				/**
 				 * Add one landmark to the map.
+				 * TODO: see if we move this to MapAbstract -> lmkPtr = slamMapPtr->newLandmark(senPtr)
+				 * TODO: need to solve first the pointer-from-this issue of shared_ptr.
 				 * \param slamMapPtr pointer to the slam map.
 				 */
 				landmark_ptr_t newLandmark(map_ptr_t slamMapPtr);

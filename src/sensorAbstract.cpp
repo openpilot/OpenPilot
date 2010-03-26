@@ -119,7 +119,7 @@ namespace jafar {
 		void SensorAbstract::observeKnownLmks() {
 			for (observations_ptr_set_t::iterator obsIter = observations.begin(); obsIter != observations.end(); obsIter++) {
 				observation_ptr_t obsPtr = obsIter->second;
-				cout << "exploring observation: " << obsPtr->id() << endl;
+				cout << "exploring obs: " << obsPtr->id() << endl;
 			}
 
 		}
@@ -129,6 +129,7 @@ namespace jafar {
 			std::size_t size_lmkAHP = LandmarkAnchoredHomogeneousPoint::size();
 			if (slamMapPtr->unusedStates(size_lmkAHP)) {
 				landmark_ptr_t lmkPtr = newLandmark(slamMapPtr);
+				cout << "    added lmk: " << lmkPtr->id() << endl;
 				slamMapPtr->addObservations(lmkPtr);
 			}
 		}
@@ -180,13 +181,13 @@ namespace jafar {
 			jblas::vec7 robotPose = robot->pose.x();
 			jblas::vec7 sensorPose = pose.x();
 			if (pose.storage() == pose.LOCAL) {
-				// Sensor is no in the map. Jacobians and indices only wrt robot.
+				// Sensor is not in the map. Jacobians and indices only wrt robot.
 				jblas::ind_array ia(robot->pose.ia());
 
 				return ia;
 			}
 			else {
-				// Sensor is in the map. Give composed Jacobian and indices.
+				// TODO Sensor is in the map. Give composed Jacobian and indices.
 				jblas::ind_array ia(14);
 				return ia;
 			}

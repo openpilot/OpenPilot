@@ -72,11 +72,11 @@ robot_ptr_t newRobot(map_ptr_t slamMapPtr, string name) {
 
 	size_t rid = slamMapPtr->robotIds.getId();
 	shared_ptr<RobotConstantVelocity> robPtr(new RobotConstantVelocity(*slamMapPtr));
-
 	robPtr->id(rid);
 	robPtr->name(name);
 	slamMapPtr->linkToRobot(robPtr);
 	robPtr->linkToMap(slamMapPtr);
+	cout << "    added rob: " << robPtr->id() << endl;
 	return robPtr;
 }
 
@@ -95,6 +95,7 @@ sensor_ptr_t newSensor(robot_ptr_t robPtr, string name, bool isInMap = false) {
 	senPtr->name(name);
 	robPtr->linkToSensor(senPtr);
 	senPtr->linkToRobot(robPtr);
+	cout << "    added sen: " << senPtr->id() << endl;
 	return senPtr;
 }
 
@@ -208,6 +209,7 @@ void test_main01() {
 		for (robots_ptr_set_t::iterator robIter = slamMapPtr->robots.begin(); robIter != slamMapPtr->robots.end(); robIter++) { // loop robots
 
 			robot_ptr_t robPtr = robIter->second;
+			cout << "exploring rob: " << robPtr->id() << endl;
 			robPtr->move();
 			robPtr->exploreSensors();
 

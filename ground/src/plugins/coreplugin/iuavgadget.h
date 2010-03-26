@@ -56,6 +56,7 @@ public:
 
     virtual void loadConfiguration(IUAVGadgetConfiguration* /*config*/) { }
     IUAVGadgetConfiguration *activeConfiguration() { return m_activeConfiguration; }
+    void setActiveConfiguration(IUAVGadgetConfiguration *config);
     QComboBox *toolBar() { return m_toolbar; }
     virtual QByteArray saveState();
     virtual void restoreState(QByteArray state);

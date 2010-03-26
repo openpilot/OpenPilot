@@ -51,6 +51,13 @@ void IUAVGadget::loadConfiguration(int index) {
     loadConfiguration(config);
 }
 
+void IUAVGadget::setActiveConfiguration(IUAVGadgetConfiguration *config)
+{
+    m_activeConfiguration = config;
+    int index = m_toolbar->findText(config->name());
+    m_toolbar->setCurrentIndex(index);
+
+}
 
 void IUAVGadget::configurationChanged(IUAVGadgetConfiguration* config)
 {

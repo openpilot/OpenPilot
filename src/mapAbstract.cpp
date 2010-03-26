@@ -26,6 +26,8 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
+		// Serializer function very long: and defined at the end of file
+		// std::ostream& operator <<(std::ostream & s, jafar::rtslam::MapAbstract & map) {
 
 		/**
 		 * Constructor
@@ -49,17 +51,10 @@ namespace jafar {
 		}
 
 
-		/**
-		 * Robot addition
-		 */
 		void MapAbstract::linkToRobot(robot_ptr_t _robPtr) {
 			robots[_robPtr->id()] = _robPtr;
 		}
 
-
-		/**
-		 * Landmark addition
-		 */
 		void MapAbstract::linkToLandmark(landmark_ptr_t _lmkPtr) {
 			landmarks[_lmkPtr->id()] = _lmkPtr;
 		}
@@ -76,11 +71,6 @@ namespace jafar {
 			}
 		}
 
-
-		/**
-		 * Liberate the space indicated.
-		 * \param _ia the space to liberate.
-		 */
 		void MapAbstract::liberateStates(const jblas::ind_array & _ia) {
 			for (size_t i = 0; _ia.size(); i++)
 				if (used_states(_ia(i)) == true) {
@@ -95,6 +85,7 @@ namespace jafar {
 				for (sensors_ptr_set_t::iterator senIter = robPtr->sensors.begin(); senIter != robPtr->sensors.end(); senIter++) {
 					sensor_ptr_t senPtr = senIter->second;
 					observation_ptr_t obsPtr = newObservation(senPtr, lmkPtr);
+					cout << "    added obs: " << obsPtr->id() << endl;
 				}
 			}
 		}
@@ -110,6 +101,46 @@ namespace jafar {
 
 			return obsPtr;
 		}
+
+
+		/**
+		 * Serializer. Print all MAP data.
+		 *
+		 * It traverses the map tree in the following way:
+		 * - robots
+		 *   - sensors in robot
+		 * - landmarks
+		 *   - observations of landmark from each sensor
+		 */
+		std::ostream& operator <<(std::ostream & s, jafar::rtslam::MapAbstract & map) {
+
+			robots_ptr_set_t::iterator robIter;
+			sensors_ptr_set_t::iterator senIter;
+			landmarks_ptr_set_t::iterator lmkIter;
+			observations_ptr_set_t::iterator obsIter;
+
+			s << "\n% ROBOTS AND SENSORS \n%=========================" << endl;
+			for (robIter = map.robots.begin(); robIter != map.robots.end(); robIter++) {
+				robot_ptr_t robPtr = robIter->second;
+				s << *robPtr << endl;
+				for (senIter = robPtr->sensors.begin(); senIter != robPtr->sensors.end(); senIter++) {
+					sensor_ptr_t senPtr = senIter->second;
+					s << *senPtr << endl;
+				}
+			}
+			s << "\n% LANDMARKS AND OBSERVATIONS \n%==========================" << endl;
+			for (lmkIter = map.landmarks.begin(); lmkIter != map.landmarks.end(); lmkIter++) {
+				landmark_ptr_t lmkPtr = lmkIter->second;
+				s << *lmkPtr << endl;
+				for (obsIter = lmkPtr->observations.begin(); obsIter != lmkPtr->observations.end(); obsIter++) {
+					observation_ptr_t obsPtr = obsIter->second;
+					s << *obsPtr << endl;
+				}
+			}
+			return s;
+		}
+
+
 
 	}
 }

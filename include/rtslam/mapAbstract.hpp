@@ -39,6 +39,17 @@ namespace jafar {
 		 */
 		class MapAbstract {
 
+				/**
+				 * Print all MAP data.
+				 *
+				 * It traverses the map tree in the following way:
+				 * - robots
+				 *   - sensors in robot
+				 * - landmarks
+				 *   - observations of landmark from each sensor
+				 */
+				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::MapAbstract & map);
+
 			public:
 				kernel::IdFactory robotIds;
 				kernel::IdFactory sensorIds;
@@ -144,7 +155,6 @@ namespace jafar {
 				void addObservations(landmark_ptr_t lmkPtr);
 
 
-
 			protected:
 
 				/**
@@ -153,6 +163,8 @@ namespace jafar {
 				 * TODO see if this can go to class Observation, possibly with a dedicated constructor.
 				 */
 				observation_ptr_t newObservation(sensor_ptr_t senPtr, landmark_ptr_t lmkPtr);
+
+
 
 
 				//				void removeRobot(RobotAbstract& _rob);

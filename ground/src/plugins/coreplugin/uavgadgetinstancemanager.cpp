@@ -27,8 +27,10 @@
 
 #include "uavgadgetinstancemanager.h"
 #include "iuavgadget.h"
+#include "uavgadgetdecorator.h"
 #include "iuavgadgetfactory.h"
 #include "iuavgadgetconfiguration.h"
+#include "uavgadgetoptionspagedecorator.h"
 #include "coreplugin/dialogs/ioptionspage.h"
 #include "coreplugin/dialogs/settingsdialog.h"
 #include "icore.h"
@@ -122,7 +124,8 @@ void UAVGadgetInstanceManager::createOptionsPages()
     foreach (IUAVGadgetConfiguration *config, m_configurations)
     {
         IUAVGadgetFactory *f = factory(config->classId());
-        IOptionsPage *page = f->createOptionsPage(config);
+        IOptionsPage *p = f->createOptionsPage(config);
+        IOptionsPage *page = new UAVGadgetOptionsPageDecorator(p, config);
         m_optionsPages.append(page);
         m_pm->addObject(page);
     }
@@ -134,7 +137,8 @@ IUAVGadget *UAVGadgetInstanceManager::createGadget(QString classId, QWidget *par
     IUAVGadgetFactory *f = factory(classId);
     if (f) {
         QList<IUAVGadgetConfiguration*> *configs = configurations(classId);
-        IUAVGadget *gadget = f->createGadget(configs, parent);
+        IUAVGadget *g = f->createGadget(parent);
+        IUAVGadget *gadget = new UAVGadgetDecorator(g, configs);
         m_gadgetInstances.append(gadget);
         connect(this, SIGNAL(configurationAdded(IUAVGadgetConfiguration*)), gadget, SLOT(configurationAdded(IUAVGadgetConfiguration*)));
         connect(this, SIGNAL(configurationChanged(IUAVGadgetConfiguration*)), gadget, SLOT(configurationChanged(IUAVGadgetConfiguration*)));
@@ -183,7 +187,8 @@ void  UAVGadgetInstanceManager::cloneConfiguration(IUAVGadgetConfiguration *conf
 
     IUAVGadgetConfiguration *config = configToClone->clone(name);
     IUAVGadgetFactory *f = factory(config->classId());
-    IOptionsPage *page = f->createOptionsPage(config);
+    IOptionsPage *p = f->createOptionsPage(config);
+    IOptionsPage *page = new UAVGadgetOptionsPageDecorator(p, config);
     m_provisionalConfigs.append(config);
     m_provisionalOptionsPages.append(page);
     m_settingsDialog->insertPage(page);

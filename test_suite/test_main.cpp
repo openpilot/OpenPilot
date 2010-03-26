@@ -63,43 +63,6 @@ void fillMapRndm(MapAbstract & map) {
 	randMatrix(map.P());
 }
 
-/**
- * Print all MAP data.
- *
- * It traverses the map tree in the following way:
- * - robots
- *   - sensors in robot
- * - landmarks
- *   - observations of landmark from each sensor
- *
- * \param slamMapPtr pointer to the SLAM map.
- */
-void printSlam(map_ptr_t slamMapPtr) {
-	// Add observations
-	robots_ptr_set_t::iterator robIter;
-	sensors_ptr_set_t::iterator senIter;
-	landmarks_ptr_set_t::iterator lmkIter;
-	observations_ptr_set_t::iterator obsIter;
-
-	cout << "\n% ROBOTS AND SENSORS \n%=========================" << endl;
-	for (robIter = slamMapPtr->robots.begin(); robIter != slamMapPtr->robots.end(); robIter++) {
-		robot_ptr_t robPtr = robIter->second;
-		cout << *robPtr << endl;
-		for (senIter = robPtr->sensors.begin(); senIter != robPtr->sensors.end(); senIter++) {
-			sensor_ptr_t senPtr = senIter->second;
-			cout << *senPtr << endl;
-		}
-	}
-	cout << "\n% LANDMARKS AND OBSERVATIONS \n%==========================" << endl;
-	for (lmkIter = slamMapPtr->landmarks.begin(); lmkIter != slamMapPtr->landmarks.end(); lmkIter++) {
-		landmark_ptr_t lmkPtr = lmkIter->second;
-		cout << *lmkPtr << endl;
-		for (obsIter = lmkPtr->observations.begin(); obsIter != lmkPtr->observations.end(); obsIter++) {
-			observation_ptr_t obsPtr = obsIter->second;
-			cout << *obsPtr << endl;
-		}
-	}
-}
 
 /**
  * Add a new robot to map
@@ -136,49 +99,7 @@ sensor_ptr_t newSensor(robot_ptr_t robPtr, string name, bool isInMap = false) {
 	return senPtr;
 }
 
-/**
- * Add a new observation.
- * \param senPtr pointer to the sensor observing the landmark.
- * \param lmkPtr poitner to the observed landmark
- */
-observation_ptr_t newObservation(sensor_ptr_t senPtr, landmark_ptr_t lmkPtr) {
-	shared_ptr<ObservationPinHoleAnchoredHomogeneousPoint> obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint());
-	obsPtr->id() = 0;
-	obsPtr->linkToSensor(senPtr);
-	obsPtr->linkToLandmark(lmkPtr);
-	senPtr->linkToObservation(obsPtr);
-	lmkPtr->linkToObservation(obsPtr);
 
-	return obsPtr;
-}
-
-/**
- * Add a new landmark
- * \param senPtr the sensor that discovered it.
- */
-landmark_ptr_t newLandmark(map_ptr_t slamMapPtr) {
-
-	size_t lid = slamMapPtr->landmarkIds.getId();
-	shared_ptr<LandmarkAnchoredHomogeneousPoint> lmkPtr(new LandmarkAnchoredHomogeneousPoint(*slamMapPtr));
-
-	lmkPtr->id(lid);
-	lmkPtr->name("");
-
-	slamMapPtr->linkToLandmark(lmkPtr);
-	lmkPtr->linkToMap(slamMapPtr);
-
-
-	// Add observations for each sensor
-	for (robots_ptr_set_t::iterator robIter = slamMapPtr->robots.begin(); robIter != slamMapPtr->robots.end(); robIter++) {
-		robot_ptr_t robPtr = robIter->second;
-		for (sensors_ptr_set_t::iterator senIter = robPtr->sensors.begin(); senIter != robPtr->sensors.end(); senIter++) {
-			sensor_ptr_t senPtr = senIter->second;
-			observation_ptr_t obsPtr = newObservation(senPtr, lmkPtr);
-		}
-	}
-
-	return lmkPtr;
-}
 
 map_ptr_t initSlam(size_t size_map) {
 
@@ -208,32 +129,9 @@ map_ptr_t initSlam(size_t size_map) {
 			senPtr->pose.x(quaternion::originFrame());
 		}
 	}
-
-
-	//	if (slamMapPtr->unusedStates(size_robCV)) {
-	//		robot_ptr_t robPtr = newRobot(slamMapPtr, "AEROPLANE");
-	//		if (slamMapPtr->unusedStates(size_senPH)) {
-	//			sensor_ptr_t senPtr = newSensor(robPtr, "FLEA2", false);
-	//		}
-	//	}
-
 	return slamMapPtr;
 }
 
-/**
- * Add some landmarks to the map.
- * \param slamMapPtr pointer to the slam map.
- * \param N the number of landmarks to initialize.
- */
-void initSomeLmks(map_ptr_t slamMapPtr, size_t N) {
-	std::size_t size_lmkAHP = LandmarkAnchoredHomogeneousPoint::size();
-	for (size_t i = 0; i < N; i++) {
-		if (slamMapPtr->unusedStates(size_lmkAHP)) {
-			sensor_ptr_t senPtr = slamMapPtr->robots[1]->sensors[1]; // discovered by sensor 1
-			landmark_ptr_t lmkPtr = newLandmark(slamMapPtr);
-		}
-	}
-}
 
 /**
  * robot setup.
@@ -247,18 +145,14 @@ void motionSetup(robot_ptr_t robPtr, const double x0, const double y0, const dou
     const double pitch0, const double yaw0, const double sigma_pos, const double sigma_ori, const double sigma_vi,
     const double sigma_wi) {
 
+	robPtr->state.clear(); // clear state and pose
 
-	// clear state and pose
-	robPtr->state.clear();
-
-
-	// initial pose
-	vec7 p0; // pose
-	sym_mat P0(7); // pose covariance
-	vec3 e; // euler angles
-	vec4 q; // quaternion
+	vec7 p0; //         initial pose
+	sym_mat P0(7); //   pose covariance
+	vec3 e; //          euler angles
+	vec4 q; //          quaternion
 	mat Q_e(4, 3);
-	sym_mat Q(4); // quat cov. mat.
+	sym_mat Q(4); //    quat cov. mat.
 
 	p0(0) = x0;
 	p0(1) = y0;
@@ -278,9 +172,7 @@ void motionSetup(robot_ptr_t robPtr, const double x0, const double y0, const dou
 	robPtr->pose.x(p0);
 	robPtr->pose.P(P0);
 
-
-	// Perturbation
-	vec6 std_pert;
+	vec6 std_pert; // Perturbation
 	subrange(std_pert, 0, 3) = scalar_vec(3, sigma_vi);
 	subrange(std_pert, 3, 6) = scalar_vec(3, sigma_wi);
 	robPtr->control.clear();
@@ -296,10 +188,10 @@ void test_main01() {
 
 	using namespace boost;
 
-	map_ptr_t slamMapPtr = initSlam(50);
-	//	initSomeLmks(slamMapPtr, 2);
+	map_ptr_t slamMapPtr = initSlam(100);
+//	initSomeLmks(slamMapPtr, 2);
 	double dt = 1;
-	double t_end = 4;
+	double t_end = 3;
 
 
 	// setup
@@ -316,40 +208,22 @@ void test_main01() {
 		robPtr->control.x(control);
 	}
 
-	cout << "comenca el loop" << endl;
+	for (double t = 0; t < t_end; t += dt) {// start SLAM loop
 
-	// start SLAM loop
-	for (double t = 0; t < t_end; t += dt) {
-
-
-		// first loop robots
-		for (robots_ptr_set_t::iterator robIter = slamMapPtr->robots.begin(); robIter != slamMapPtr->robots.end(); robIter++) {
+		for (robots_ptr_set_t::iterator robIter = slamMapPtr->robots.begin(); robIter != slamMapPtr->robots.end(); robIter++) {		// loop robots
 
 			robot_ptr_t robPtr = robIter->second;
-
 			robPtr->move();
-//			robPtr->computeStatePerturbation();
-//			slamMapPtr->filter.predict(slamMapPtr->ia_used_states(), robPtr->XNEW_x, robPtr->state.ia(), robPtr->Q);
-
-			cout << "robot.pose.x = " << (MATLAB) robPtr->pose.x() << endl;
-			cout << "robot.pose.P = " << (MATLAB) robPtr->pose.P() << endl;
-
-			// now loop for sensors on this particular robot
-			sensors_ptr_set_t sensors = robPtr->sensors;
-			for (sensors_ptr_set_t::iterator senIter = sensors.begin(); senIter != sensors.end(); senIter++) {
-
-				sensor_ptr_t senPtr = senIter->second;
-
-				senPtr->acquireRaw();
-//				senPtr->process();
-
-			}
-		}
+			robPtr->exploreSensors();
+		} // end of robots loop
 
 
-		//	printSlam(slamMapPtr);
-	}
-	cout << "\nTHAT'S ALL, WHAT'S WRONG?" << endl;
+	} // end of time loop
+
+	cout << *slamMapPtr << endl;
+
+	cout << "\n THAT'S ALL, WHAT'S WRONG? " << endl;
+
 }
 
 BOOST_AUTO_TEST_CASE( test_rtslam )

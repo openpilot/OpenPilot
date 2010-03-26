@@ -47,13 +47,22 @@ namespace jafar {
 
 				/**
 				 * Project a director vector.
-				 * \param p a 3D director vector.
-				 * \param U_r the Jacobian wrt the robot pose
-				 * \param U_s the Jacobian wrt the sensor pose
-				 * \param U_p the Jacobian wrt the point
+				 * \param k the intrinsic parameters vector.
+				 * \param d the radial distortion parameters vector.
+				 * \param v the vector to project, in sensor frame.
+				 * \return the projected pixel.
 				 */
-				void projectDir(const jblas::vec3 & p, jblas::mat & U_r, jblas::mat & U_s, jblas::mat & U_p);
-				vec2 projectDir(const vec4 & k, const vec & d, const vec3 v);
+				vec2 project(const vec4 & k, const vec & d, const vec3 v);
+
+				/**
+				 * Project a director vector, return Jacobians.
+				 * \param k the intrinsic parameters vector.
+				 * \param d the radial distortion parameters vector.
+				 * \param v the vector to project, in sensor frame.
+				 * \param u the projected pixel.
+				 * \param U_v the Jacobian of \a u wrt \a v.
+				 */
+				void project(const vec4 & k, const vec & d, const vec3 v, vec2 & u, mat & U_v);
 
 			private:
 				/**
@@ -64,16 +73,37 @@ namespace jafar {
 				jblas::vec2 project0(const jblas::vec3 & p);
 
 				/**
+				 * Pin hole normalized projection for 3D points, with Jacobian.
+				 * \param v the point to project
+				 * \param up the projected point in the normalized image plane (at focal distance \e f = 1).
+				 * \param UP_v the Jacobian of \a up wrt \a v.
+				 */
+				void project0(const jblas::vec3 & v, vec2 & up, mat & UP_v);
+
+				/**
 				 * Radial distortion.
 				 * This follows the model
 				 * - ud = (1 + d_0 * r^2 + d_1 * r^4 + d_2 * r^6 + etc) * u
 				 *
 				 * with r = norm(u)^2.
 				 * \param d the radial distortion parameters d = [d_0, d_1, ...]
-				 * \param u the undistorted pixel
+				 * \param up the undistorted pixel
 				 * \return the distorted pixel
 				 */
-				jblas::vec2 distort(const jblas::vec & d, const jblas::vec & u);
+				jblas::vec2 distort(const jblas::vec & d, const jblas::vec2 & up);
+
+				/**
+				 * Radial distortion.
+				 * This follows the model
+				 * - ud = (1 + d_0 * r^2 + d_1 * r^4 + d_2 * r^6 + etc) * u
+				 *
+				 * with r = norm(u)^2.
+				 * \param d the radial distortion parameters d = [d_0, d_1, ...]
+				 * \param up the undistorted pixel
+				 * \param ud the distorted pixel
+				 * \param UD_up the Jacobian of \a ud wrt \a up
+				 */
+				void distort(const jblas::vec & d, const jblas::vec2 & up, vec2 & ud, mat & UD_up);
 
 				/**
 				 * Rectangular pixellization.
@@ -82,10 +112,17 @@ namespace jafar {
 				 * \param ud the projected point
 				 * \return the pixel value
 				 */
-				jblas::vec2 pixellize(const jblas::vec4 & k, const jblas::vec4 & ud);
-				void project0(const jblas::vec3 & v, jblas::vec2 & u, jblas::mat & U_v);
-				void distort(const jblas::vec & d, const jblas::vec & u, jblas::vec2 & ud, jblas::mat & UD_u);
-				void pixellize(const jblas::vec4 & k, const jblas::vec4 & ud, jblas::vec2 & u, jblas::mat & U_ud);
+				jblas::vec2 pixellize(const jblas::vec4 & k, const jblas::vec2 & ud);
+
+				/**
+				 * Rectangular pixellization.
+				 * Transforms a projected point in metric coordinates into a pixel value
+				 * \param k the intrinsic parameters vector, \a k = [u_0, v_0, a_u, a_v]
+				 * \param ud the projected point
+				 * \param u the pixel value
+				 * \param U_ud the Jacobian of \a u wrt \a ud
+				 */
+				void pixellize(const jblas::vec4 & k, const jblas::vec2 & ud, jblas::vec2 & u, jblas::mat & U_ud);
 
 		};
 

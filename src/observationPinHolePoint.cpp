@@ -29,7 +29,7 @@ namespace jafar {
 
 
 		// Radial distortion: ud = (1 + d_0 * r^2 + d_1 * r^4 + d_2 * r^6 + ...) * u
-		jblas::vec2 ObservationPinHolePoint::distort(const jblas::vec & d, const jblas::vec & u) {
+		jblas::vec2 ObservationPinHolePoint::distort(const jblas::vec & d, const jblas::vec2 & u) {
 			size_t n = d.size();
 			if (n == 0)
 				return u;
@@ -47,7 +47,7 @@ namespace jafar {
 
 
 		// Pixellization from k = [u_0, v_0, a_u, a_v]
-		jblas::vec2 ObservationPinHolePoint::pixellize(const jblas::vec4 & k, const jblas::vec4 & ud) {
+		jblas::vec2 ObservationPinHolePoint::pixellize(const jblas::vec4 & k, const jblas::vec2 & ud) {
 			double u_0 = k(0);
 			double v_0 = k(1);
 			double a_u = k(2);
@@ -58,7 +58,7 @@ namespace jafar {
 			return u;
 		}
 
-		vec2 ObservationPinHolePoint::projectDir(const vec4 & k, const vec & d, const vec3 v) {
+		vec2 ObservationPinHolePoint::project(const vec4 & k, const vec & d, const vec3 v) {
 			return pixellize(k, distort(d, project0(v)));
 		}
 

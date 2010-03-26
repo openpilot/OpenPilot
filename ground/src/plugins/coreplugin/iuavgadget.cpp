@@ -35,6 +35,7 @@ IUAVGadget::IUAVGadget(QString classId, QList<IUAVGadgetConfiguration*> *configu
         IContext(parent),
         m_toolbar(new QComboBox),
         m_classId(classId),
+        m_activeConfiguration(0),
         m_configurations(configurations)
 {
     m_toolbar->setMinimumContentsLength(15);
@@ -43,6 +44,7 @@ IUAVGadget::IUAVGadget(QString classId, QList<IUAVGadgetConfiguration*> *configu
     connect(m_toolbar, SIGNAL(activated(int)), this, SLOT(loadConfiguration(int)));
     if (m_configurations->count() > 0)
         loadConfiguration(0);
+    updateToolbar();
 }
 
 void IUAVGadget::loadConfiguration(int index) {
@@ -69,6 +71,7 @@ void IUAVGadget::configurationAdded(IUAVGadgetConfiguration* config)
 {
     m_configurations->append(config);
     m_toolbar->addItem(config->name());
+    updateToolbar();
 }
 
 void IUAVGadget::configurationToBeDeleted(IUAVGadgetConfiguration* config)
@@ -78,6 +81,7 @@ void IUAVGadget::configurationToBeDeleted(IUAVGadgetConfiguration* config)
         m_toolbar->removeItem(index);
         m_configurations->removeAt(index);
     }
+    updateToolbar();
 }
 
 void IUAVGadget::configurationNameChanged(QString oldName, QString newName)
@@ -86,6 +90,11 @@ void IUAVGadget::configurationNameChanged(QString oldName, QString newName)
         if (m_toolbar->itemText(i) == oldName)
             m_toolbar->setItemText(i, newName);
     }
+}
+
+void IUAVGadget::updateToolbar()
+{
+    m_toolbar->setEnabled(m_toolbar->count() > 1);
 }
 
 QByteArray IUAVGadget::saveState()

@@ -70,6 +70,7 @@ private slots:
 protected:
     QComboBox *m_toolbar;
 private:
+    void updateToolbar();
     QString m_classId;
     IUAVGadgetConfiguration *m_activeConfiguration;
     QList<IUAVGadgetConfiguration*> *m_configurations;

@@ -208,7 +208,6 @@ void UAVGadgetView::updateToolBar()
     if (m_activeToolBar == toolBar)
         return;
     toolBar->setVisible(toolBar->count() > 0);
-    toolBar->setEnabled(toolBar->count() > 1);
     m_toolBar->layout()->addWidget(toolBar);
     m_activeToolBar->setVisible(false);
     m_activeToolBar = toolBar;

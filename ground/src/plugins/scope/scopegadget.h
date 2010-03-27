@@ -22,7 +22,7 @@ class ScopeGadget : public Core::IUAVGadget
 {
     Q_OBJECT
 public:
-    ScopeGadget(QString classId, QList<IUAVGadgetConfiguration*> *configurations, ScopeGadgetWidget *widget = 0);
+    ScopeGadget(QString classId, ScopeGadgetWidget *widget, QWidget *parent = 0);
     ~ScopeGadget();
 
     QList<int> context() const { return m_context; }

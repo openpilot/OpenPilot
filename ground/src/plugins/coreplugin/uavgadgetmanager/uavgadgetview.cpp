@@ -217,11 +217,12 @@ void UAVGadgetView::listSelectionActivated(int index)
 {
     if (index < 0) // this could happen when called from SplitterOrView::restoreState()
         index = m_defaultIndex;
-    UAVGadgetInstanceManager *fm = ICore::instance()->uavGadgetInstanceManager();
     QString classId = m_uavGadgetList->itemData(index).toString();
     if (m_uavGadget && (m_uavGadget->classId() == classId))
         return;
-    IUAVGadget *gadget = fm->createGadget(classId, this);
+    UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
+    im->removeGadget(m_uavGadget);
+    IUAVGadget *gadget = im->createGadget(classId, this);
     setGadget(gadget);
     m_uavGadgetManager->setCurrentGadget(gadget);
 }
@@ -460,6 +461,22 @@ UAVGadgetView *SplitterOrView::takeView()
     return oldView;
 }
 
+QList<IUAVGadget*> SplitterOrView::gadgets()
+{
+    QList<IUAVGadget*> g;
+    if (hasGadget())
+        g.append(gadget());
+    if (m_splitter) {
+        for (int i = 0; i < m_splitter->count(); ++i) {
+            if (SplitterOrView *splitterOrView = qobject_cast<SplitterOrView*>(m_splitter->widget(i))) {
+                QList<IUAVGadget*> result = splitterOrView->gadgets();
+                g.append(result);
+            }
+        }
+    }
+    return g;
+}
+
 void SplitterOrView::split(Qt::Orientation orientation)
 {
     Q_ASSERT(m_view && (m_splitter == 0));
@@ -579,11 +596,8 @@ void SplitterOrView::restoreState(const QByteArray &state)
         QString classId;
         QByteArray uavGadgetState;
         stream >> classId >> uavGadgetState;
-        m_view = new UAVGadgetView(m_uavGadgetManager, 0);
         int index = m_view->indexOfClassId(classId);
         m_view->listSelectionActivated(index);
-        m_layout->addWidget(m_view);
-        m_layout->setCurrentWidget(m_view);
         gadget()->restoreState(uavGadgetState);
     }
 }

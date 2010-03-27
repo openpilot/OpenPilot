@@ -30,9 +30,11 @@
 
 #include <coreplugin/iuavgadget.h>
 
+namespace Core {
 class IUAVGadget;
-class QWidget;
-class QString;
+}
+//class QWidget;
+//class QString;
 class EmptyGadgetWidget;
 
 using namespace Core;
@@ -41,7 +43,7 @@ class EmptyGadget : public Core::IUAVGadget
 {
     Q_OBJECT
 public:
-    EmptyGadget(QString classId, QList<IUAVGadgetConfiguration*> *configurations, EmptyGadgetWidget *widget = 0);
+    EmptyGadget(QString classId, EmptyGadgetWidget *widget, QWidget *parent = 0);
     ~EmptyGadget();
 
     QList<int> context() const { return m_context; }

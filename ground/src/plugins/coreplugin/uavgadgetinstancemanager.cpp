@@ -27,8 +27,10 @@
 
 #include "uavgadgetinstancemanager.h"
 #include "iuavgadget.h"
+#include "uavgadgetdecorator.h"
 #include "iuavgadgetfactory.h"
 #include "iuavgadgetconfiguration.h"
+#include "uavgadgetoptionspagedecorator.h"
 #include "coreplugin/dialogs/ioptionspage.h"
 #include "coreplugin/dialogs/settingsdialog.h"
 #include "icore.h"
@@ -122,7 +124,8 @@ void UAVGadgetInstanceManager::createOptionsPages()
     foreach (IUAVGadgetConfiguration *config, m_configurations)
     {
         IUAVGadgetFactory *f = factory(config->classId());
-        IOptionsPage *page = f->createOptionsPage(config);
+        IOptionsPage *p = f->createOptionsPage(config);
+        IOptionsPage *page = new UAVGadgetOptionsPageDecorator(p, config);
         m_optionsPages.append(page);
         m_pm->addObject(page);
     }
@@ -134,15 +137,23 @@ IUAVGadget *UAVGadgetInstanceManager::createGadget(QString classId, QWidget *par
     IUAVGadgetFactory *f = factory(classId);
     if (f) {
         QList<IUAVGadgetConfiguration*> *configs = configurations(classId);
-        IUAVGadget *gadget = f->createGadget(configs, parent);
+        IUAVGadget *g = f->createGadget(0);
+        IUAVGadget *gadget = new UAVGadgetDecorator(g, configs);
         m_gadgetInstances.append(gadget);
         connect(this, SIGNAL(configurationAdded(IUAVGadgetConfiguration*)), gadget, SLOT(configurationAdded(IUAVGadgetConfiguration*)));
         connect(this, SIGNAL(configurationChanged(IUAVGadgetConfiguration*)), gadget, SLOT(configurationChanged(IUAVGadgetConfiguration*)));
-        connect(this, SIGNAL(configurationNameChanged(QString,QString)), gadget, SLOT(configurationNameChanged(QString,QString)));
+        connect(this, SIGNAL(configurationNameChanged(IUAVGadgetConfiguration*, QString,QString)), gadget, SLOT(configurationNameChanged(IUAVGadgetConfiguration*, QString,QString)));
         connect(this, SIGNAL(configurationToBeDeleted(IUAVGadgetConfiguration*)), gadget, SLOT(configurationToBeDeleted(IUAVGadgetConfiguration*)));
         return gadget;
     }
     return 0;
+}
+
+void UAVGadgetInstanceManager::removeGadget(IUAVGadget *gadget)
+{
+    if (m_gadgetInstances.contains(gadget)) {
+        m_gadgetInstances.removeOne(gadget);
+    }
 }
 
 bool UAVGadgetInstanceManager::canDeleteConfiguration(IUAVGadgetConfiguration *config)
@@ -183,7 +194,8 @@ void  UAVGadgetInstanceManager::cloneConfiguration(IUAVGadgetConfiguration *conf
 
     IUAVGadgetConfiguration *config = configToClone->clone(name);
     IUAVGadgetFactory *f = factory(config->classId());
-    IOptionsPage *page = f->createOptionsPage(config);
+    IOptionsPage *p = f->createOptionsPage(config);
+    IOptionsPage *page = new UAVGadgetOptionsPageDecorator(p, config);
     m_provisionalConfigs.append(config);
     m_provisionalOptionsPages.append(page);
     m_settingsDialog->insertPage(page);
@@ -229,7 +241,7 @@ void UAVGadgetInstanceManager::applyChanges(IUAVGadgetConfiguration *config)
         return;
     }
     if (config->provisionalName() != config->name()) {
-        emit configurationNameChanged(config->name(), config->provisionalName());
+        emit configurationNameChanged(config, config->name(), config->provisionalName());
         config->setName(config->provisionalName());
     }
     if (m_configurations.contains(config)) {
@@ -251,17 +263,17 @@ void UAVGadgetInstanceManager::configurationNameEdited(QString text, bool hasTex
     bool disable = false;
     foreach (IUAVGadgetConfiguration *c, m_configurations) {
         foreach (IUAVGadgetConfiguration *d, m_configurations) {
-            if (c != d && c->provisionalName() == d->provisionalName())
+            if (c != d && c->classId() == d->classId() && c->provisionalName() == d->provisionalName())
                 disable = true;
         }
         foreach (IUAVGadgetConfiguration *d, m_provisionalConfigs) {
-            if (c != d && c->provisionalName() == d->provisionalName())
+            if (c != d && c->classId() == d->classId() && c->provisionalName() == d->provisionalName())
                 disable = true;
         }
     }
     foreach (IUAVGadgetConfiguration *c, m_provisionalConfigs) {
         foreach (IUAVGadgetConfiguration *d, m_provisionalConfigs) {
-            if (c != d && c->provisionalName() == d->provisionalName())
+            if (c != d && c->classId() == d->classId() && c->provisionalName() == d->provisionalName())
                 disable = true;
         }
     }

@@ -27,8 +27,8 @@
 #include "emptygadget.h"
 #include "emptygadgetwidget.h"
 
-EmptyGadget::EmptyGadget(QString classId, QList<IUAVGadgetConfiguration*> *configurations, EmptyGadgetWidget *widget) :
-        IUAVGadget(classId, configurations, widget),
+EmptyGadget::EmptyGadget(QString classId, EmptyGadgetWidget *widget, QWidget *parent) :
+        IUAVGadget(classId, parent),
         m_widget(widget)
 {
 }

@@ -49,7 +49,7 @@ public slots:
     void configurationChanged(IUAVGadgetConfiguration* config);
     void configurationAdded(IUAVGadgetConfiguration* config);
     void configurationToBeDeleted(IUAVGadgetConfiguration* config);
-    void configurationNameChanged(QString oldName, QString newName);
+    void configurationNameChanged(IUAVGadgetConfiguration* config, QString oldName, QString newName);
 private slots:
     void loadConfiguration(int index);
 private:

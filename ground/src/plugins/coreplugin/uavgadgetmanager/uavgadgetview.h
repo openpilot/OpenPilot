@@ -117,6 +117,7 @@ public:
     inline bool hasGadget() const { return m_view && (m_view->gadget() != 0); }
     inline UAVGadgetView *view() const { return m_view; }
     inline QSplitter *splitter() const { return m_splitter; }
+    QList<Core::IUAVGadget*> gadgets();
     QSplitter *takeSplitter();
     UAVGadgetView *takeView();
 

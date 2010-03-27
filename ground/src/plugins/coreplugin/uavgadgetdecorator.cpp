@@ -29,6 +29,7 @@
 #include "iuavgadgetconfiguration.h"
 #include <QtGui/QComboBox>
 #include <QtCore/QByteArray>
+#include <QtCore/QDebug>
 
 using namespace Core;
 
@@ -70,6 +71,8 @@ void UAVGadgetDecorator::configurationChanged(IUAVGadgetConfiguration* config)
 
 void UAVGadgetDecorator::configurationAdded(IUAVGadgetConfiguration* config)
 {
+    if (config->classId() != classId())
+        return;
     m_configurations->append(config);
     m_toolbar->addItem(config->name());
     updateToolbar();
@@ -77,6 +80,8 @@ void UAVGadgetDecorator::configurationAdded(IUAVGadgetConfiguration* config)
 
 void UAVGadgetDecorator::configurationToBeDeleted(IUAVGadgetConfiguration* config)
 {
+    if (config->classId() != classId())
+        return;
     int index = m_configurations->indexOf(config);
     if (index >= 0) {
         m_toolbar->removeItem(index);
@@ -85,8 +90,10 @@ void UAVGadgetDecorator::configurationToBeDeleted(IUAVGadgetConfiguration* confi
     updateToolbar();
 }
 
-void UAVGadgetDecorator::configurationNameChanged(QString oldName, QString newName)
+void UAVGadgetDecorator::configurationNameChanged(IUAVGadgetConfiguration* config, QString oldName, QString newName)
 {
+    if (config->classId() != classId())
+        return;
     for (int i = 0; i < m_toolbar->count(); ++i) {
         if (m_toolbar->itemText(i) == oldName)
             m_toolbar->setItemText(i, newName);

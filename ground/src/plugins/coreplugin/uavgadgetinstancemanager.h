@@ -57,6 +57,7 @@ public:
     void readConfigurations();
     void writeConfigurations();
     IUAVGadget *createGadget(QString classId, QWidget *parent);
+    void removeGadget(IUAVGadget *gadget);
     bool canDeleteConfiguration(IUAVGadgetConfiguration *config);
     void deleteConfiguration(IUAVGadgetConfiguration *config);
     void cloneConfiguration(IUAVGadgetConfiguration *config);
@@ -70,7 +71,7 @@ signals:
     void configurationChanged(IUAVGadgetConfiguration* config);
     void configurationAdded(IUAVGadgetConfiguration* config);
     void configurationToBeDeleted(IUAVGadgetConfiguration* config);
-    void configurationNameChanged(QString oldName, QString newName);
+    void configurationNameChanged(IUAVGadgetConfiguration* config, QString oldName, QString newName);
 
 public slots:
     void settingsDialogShown(Core::Internal::SettingsDialog* settingsDialog);

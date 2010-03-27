@@ -41,7 +41,7 @@ EmptyGadgetFactory::~EmptyGadgetFactory()
 
 }
 
-Core::IUAVGadget* EmptyGadgetFactory::createGadget(QList<IUAVGadgetConfiguration*> *configurations, QWidget *parent) {
-        EmptyGadgetWidget* gadgetWidget = new EmptyGadgetWidget(parent);
-        return new EmptyGadget(QString("EmptyGadget"), configurations, gadgetWidget);
+IUAVGadget* EmptyGadgetFactory::createGadget(QWidget *parent) {
+    EmptyGadgetWidget* gadgetWidget = new EmptyGadgetWidget(parent);
+    return new EmptyGadget(QString("EmptyGadget"), gadgetWidget, parent);
 }

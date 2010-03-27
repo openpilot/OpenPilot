@@ -29,6 +29,7 @@
 #include "uavgadgetmanager.h"
 #include "uavgadgetview.h"
 #include "uavgadgetmode.h"
+#include "uavgadgetinstancemanager.h"
 #include "iuavgadgetfactory.h"
 #include "iuavgadget.h"
 #include "icore.h"
@@ -300,11 +301,9 @@ void UAVGadgetManager::handleContextChange(Core::IContext *context)
 //    if (debugUAVGadgetManager)
 //        qDebug() << Q_FUNC_INFO << context;
     IUAVGadget *uavGadget = context ? qobject_cast<IUAVGadget*>(context) : 0;
-    if (uavGadget) {
+    if (uavGadget)
         setCurrentGadget(uavGadget);
-    } else {
-        updateActions();
-    }
+    updateActions();
 }
 
 void UAVGadgetManager::setCurrentGadget(IUAVGadget *uavGadget)
@@ -368,6 +367,10 @@ void UAVGadgetManager::closeView(Core::Internal::UAVGadgetView *view)
     if (splitterOrView == m_d->m_splitterOrView)
         return;
 
+    IUAVGadget *gadget = view->gadget();
+    UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
+    im->removeGadget(gadget);
+
     emptyView(view);
 
     SplitterOrView *splitter = m_d->m_splitterOrView->findSplitter(splitterOrView);
@@ -382,23 +385,22 @@ void UAVGadgetManager::closeView(Core::Internal::UAVGadgetView *view)
     Q_ASSERT(newCurrent);
     if (newCurrent)
         setCurrentGadget(newCurrent->gadget());
-    updateActions();
 }
 
-void UAVGadgetManager::addGadgetToContext(IUAVGadget *uavGadget)
+void UAVGadgetManager::addGadgetToContext(IUAVGadget *gadget)
 {
-    if (!uavGadget)
+    if (!gadget)
         return;
-    m_d->m_core->addContextObject(uavGadget);
+    m_d->m_core->addContextObject(gadget);
 
 //   emit uavGadgetOpened(uavGadget);
 }
 
-void UAVGadgetManager::removeGadget(IUAVGadget *uavGadget)
+void UAVGadgetManager::removeGadget(IUAVGadget *gadget)
 {
-    if (!uavGadget)
+    if (!gadget)
         return;
-    m_d->m_core->removeContextObject(qobject_cast<IContext*>(uavGadget));
+    m_d->m_core->removeContextObject(qobject_cast<IContext*>(gadget));
 }
 
 void UAVGadgetManager::ensureUAVGadgetManagerVisible()
@@ -409,6 +411,8 @@ void UAVGadgetManager::ensureUAVGadgetManagerVisible()
 
 void UAVGadgetManager::updateActions()
 {
+    if (m_d->m_core->modeManager()->currentMode() != m_uavGadgetMode)
+        return;
     if (!m_d->m_splitterOrView) // this is only for startup
         return;
     // Splitting is only possible when the toolbars are shown
@@ -436,6 +440,9 @@ QByteArray UAVGadgetManager::saveState() const
 bool UAVGadgetManager::restoreState(const QByteArray &state)
 {
     removeAllSplits();
+
+    UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
+    im->removeGadget(m_d->m_splitterOrView->view()->gadget());
     emptyView(m_d->m_splitterOrView->view());
     QDataStream stream(state);
 
@@ -454,7 +461,6 @@ bool UAVGadgetManager::restoreState(const QByteArray &state)
     m_d->m_splitterOrView->restoreState(splitterstates);
 
     QApplication::restoreOverrideCursor();
-
     return true;
 }
 
@@ -505,7 +511,6 @@ void UAVGadgetManager::split(Qt::Orientation orientation)
     SplitterOrView *sor = m_d->m_splitterOrView->findView(uavGadget);
     SplitterOrView *next = m_d->m_splitterOrView->findNextView(sor);
     setCurrentGadget(next->gadget());
-    updateActions();
 }
 
 void UAVGadgetManager::split()
@@ -527,7 +532,6 @@ void UAVGadgetManager::removeCurrentSplit()
     if (viewToClose == m_d->m_splitterOrView)
         return;
     closeView(viewToClose->view());
-    updateActions();
 }
 
 void UAVGadgetManager::removeAllSplits()
@@ -538,6 +542,13 @@ void UAVGadgetManager::removeAllSplits()
     if (!m_d->m_splitterOrView->isSplitter())
         return;
     IUAVGadget *uavGadget = m_d->m_currentGadget;
+    QList<IUAVGadget*> gadgets = m_d->m_splitterOrView->gadgets();
+    gadgets.removeOne(uavGadget);
+    UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
+    foreach (IUAVGadget *g, gadgets) {
+        im->removeGadget(g);
+    }
+
     m_d->m_currentGadget = 0; // trigger update below
     m_d->m_splitterOrView->unsplitAll();
     m_d->m_splitterOrView->view()->setGadget(uavGadget);

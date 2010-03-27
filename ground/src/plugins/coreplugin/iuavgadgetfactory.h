@@ -52,10 +52,10 @@ public:
             m_name(name) {}
     virtual ~IUAVGadgetFactory() {}
 
-    virtual IUAVGadget *createGadget(QList<IUAVGadgetConfiguration*> *configurations, QWidget *parent) = 0;
+    virtual IUAVGadget *createGadget(QWidget *parent) = 0;
     virtual IUAVGadgetConfiguration *createConfiguration(bool /*locked*/,
-                                                                  const QString /*configName*/,
-                                                                  const QByteArray &/*state*/) { return 0; }
+                                                         const QString /*configName*/,
+                                                         const QByteArray &/*state*/) { return 0; }
     virtual IOptionsPage *createOptionsPage(IUAVGadgetConfiguration */*config*/) { return 0; }
     QString classId() const { return m_classId; }
     QString name() const { return m_name; }

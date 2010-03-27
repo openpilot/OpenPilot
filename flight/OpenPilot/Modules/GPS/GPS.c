@@ -61,8 +61,8 @@ static int32_t addObject(UAVObjHandle obj);
 static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs);
 
 // functions
-void nmeaInit(void);
 char* nmeaGetPacketBuffer(void);
+char nmeaChecksum(char* gps_buffer);
 uint8_t nmeaProcess(cBuffer* rxBuffer);
 void nmeaProcessGPGGA(char* packet);
 void nmeaProcessGPVTG(char* packet);
@@ -215,6 +215,38 @@ char* nmeaGetPacketBuffer(void)
 	return NmeaPacket;
 }
 
+/**
+ * Prosesses NMEA sentence checksum
+ * \param[in] Buffer for parsed nmea sentence
+ * \return 0 checksum not valid
+ * \return 1 checksum valid
+ */
+char nmeaChecksum(char* gps_buffer)
+{
+	char checksum=0;
+	char checksum_received=0;
+
+	for(int x=0; x<NMEA_BUFFERSIZE; x++)
+	{
+		if(gps_buffer[x]=='*')
+		{
+			//Parsing received checksum...
+			checksum_received = strtol(&gps_buffer[x+1],NULL,16);
+			break;
+		}
+		else
+		{
+			//XOR the received data...
+			checksum^=gps_buffer[x];
+		}
+	}
+	//PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"$%d=%d\r\n",checksum_received,checksum);
+	if(checksum == checksum_received)
+		return 1;
+	else
+		return 0;
+
+}
 
 /**
  * Prosesses NMEA sentences
@@ -342,6 +374,12 @@ void nmeaProcessGPGGA(char* packet)
 	if(packet[6]==',' && packet[7]==',')
 		return;
 
+	if(!nmeaChecksum(packet))
+	{
+		// checksum not valid
+		//PIOS_LED_Toggle(LED2);
+		return;
+	}
 	// tokenizer for nmea sentence
     /*for ((p = strtok_r(packet, ",", &last)); p;
         (p = strtok_r(NULL, ",", &last)), i++) {
@@ -466,6 +504,12 @@ void nmeaProcessGPVTG(char* packet)
 	if(packet[6]==',' && packet[7]==',')
 		return;
 
+	if(!nmeaChecksum(packet))
+	{
+		// checksum not valid
+		//PIOS_LED_Toggle(LED2);
+		return;
+	}
 	// tokenizer for nmea sentence
     /*for ((p = strtok_r(packet, ",", &last)); p;
         (p = strtok_r(NULL, ",", &last)), i++) {

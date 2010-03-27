@@ -102,9 +102,10 @@ int32_t UAVObjInitialize()
 		return -1;
 
 	// Initialize default metadata structure (metadata of metaobjects)
-	defMetadata.ackRequired = 1;
+	defMetadata.telemetryAcked = 1;
 	defMetadata.telemetryUpdateMode = UPDATEMODE_ONCHANGE;
 	defMetadata.telemetryUpdatePeriod = 0;
+	defMetadata.gcsTelemetryAcked = 1;
 	defMetadata.gcsTelemetryUpdateMode = UPDATEMODE_ONCHANGE;
 	defMetadata.gcsTelemetryUpdatePeriod = 0;
 	defMetadata.loggingUpdateMode = UPDATEMODE_ONCHANGE;

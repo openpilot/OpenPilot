@@ -170,7 +170,7 @@ static void telemetryTask(void* parameters)
 				retries = 0;
 				while(retries < MAX_RETRIES && success == -1)
 				{
-					success = UAVTalkSendObject(ev.obj, ev.instId, metadata.ackRequired, REQ_TIMEOUT_MS); // call blocks until ack is received or timeout
+					success = UAVTalkSendObject(ev.obj, ev.instId, metadata.telemetryAcked, REQ_TIMEOUT_MS); // call blocks until ack is received or timeout
 					++retries;
 				}
 			}

@@ -26,11 +26,9 @@
  */
 #include "mapplugin.h"
 #include "mapgadgetfactory.h"
-#include <QDebug>
 #include <QtPlugin>
 #include <QStringList>
 #include <extensionsystem/pluginmanager.h>
-
 
 MapPlugin::MapPlugin()
 {

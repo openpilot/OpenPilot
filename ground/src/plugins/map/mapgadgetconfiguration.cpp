@@ -28,8 +28,8 @@
 #include "mapgadgetconfiguration.h"
 #include <QtCore/QDataStream>
 
-MapGadgetConfiguration::MapGadgetConfiguration(bool locked, QString classId, QString name, const QByteArray &state, QObject *parent) :
-    IUAVGadgetConfiguration(locked, classId, name, parent),
+MapGadgetConfiguration::MapGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
+    IUAVGadgetConfiguration(classId, parent),
     m_defaultZoom(10)
 {
     if (state.count() > 0) {
@@ -49,7 +49,9 @@ MapGadgetConfiguration::MapGadgetConfiguration(bool locked, QString classId, QSt
 
 IUAVGadgetConfiguration *MapGadgetConfiguration::clone(QString name)
 {
-    MapGadgetConfiguration *m = new MapGadgetConfiguration(this->locked(), this->classId(), name);
+    MapGadgetConfiguration *m = new MapGadgetConfiguration(this->classId());
+    m->setName(name);
+    m->setProvisionalName(name);
     m->m_defaultZoom = m_defaultZoom;
     m->m_defaultLatitude = m_defaultLatitude;
     m->m_defaultLongitude = m_defaultLongitude;

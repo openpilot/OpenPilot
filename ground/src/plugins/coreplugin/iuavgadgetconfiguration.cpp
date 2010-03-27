@@ -29,11 +29,11 @@
 
 using namespace Core;
 
-IUAVGadgetConfiguration::IUAVGadgetConfiguration(bool locked, QString classId, QString name, QObject *parent) :
+IUAVGadgetConfiguration::IUAVGadgetConfiguration(QString classId, QObject *parent) :
     QObject(parent),
-    m_locked(locked),
+    m_locked(false),
     m_classId(classId),
-    m_name(name),
-    m_provisionalName(name)
+    m_name(tr("default")),
+    m_provisionalName(tr("default"))
 {
 }

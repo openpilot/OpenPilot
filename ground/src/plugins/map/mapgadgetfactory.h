@@ -45,9 +45,7 @@ public:
     ~MapGadgetFactory();
 
     Core::IUAVGadget *createGadget(QWidget *parent);
-    IUAVGadgetConfiguration *createConfiguration(bool locked,
-                                                 const QString configName,
-                                                 const QByteArray &state);
+    IUAVGadgetConfiguration *createConfiguration(const QByteArray &state);
     IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
 };
 

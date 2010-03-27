@@ -46,11 +46,9 @@ Core::IUAVGadget* MapGadgetFactory::createGadget(QWidget *parent)
     return new MapGadget(QString("MapGadget"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *MapGadgetFactory::createConfiguration(bool locked,
-                                                               const QString configName,
-                                                               const QByteArray &state)
+IUAVGadgetConfiguration *MapGadgetFactory::createConfiguration(const QByteArray &state)
 {
-    return new MapGadgetConfiguration(locked, QString("MapGadget"), configName, state);
+    return new MapGadgetConfiguration(QString("MapGadget"), state);
 }
 
 IOptionsPage *MapGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)

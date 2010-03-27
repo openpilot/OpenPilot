@@ -37,14 +37,16 @@ class CORE_EXPORT IUAVGadgetConfiguration : public QObject
 {
 Q_OBJECT
 public:
-    explicit IUAVGadgetConfiguration(bool locked, QString classId, QString name, QObject *parent = 0);
-    virtual QByteArray saveState() const = 0;
+    explicit IUAVGadgetConfiguration(QString classId, QObject *parent = 0);
     QString classId() { return m_classId; }
     QString name() { return m_name; }
     void setName(QString name) { m_name = name; }
     QString provisionalName() { return m_provisionalName; }
     void setProvisionalName(QString name) { m_provisionalName = name; }
     bool locked() const { return m_locked; }
+    void setLocked(bool locked) { m_locked = locked; }
+
+    virtual QByteArray saveState() const = 0;
     virtual IUAVGadgetConfiguration *clone(QString name) = 0;
 
 signals:

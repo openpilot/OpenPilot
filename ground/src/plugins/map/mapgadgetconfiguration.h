@@ -36,7 +36,7 @@ class MapGadgetConfiguration : public IUAVGadgetConfiguration
 {
 Q_OBJECT
 public:
-    explicit MapGadgetConfiguration(bool locked, QString classId, QString name, const QByteArray &state = 0, QObject *parent = 0);
+    explicit MapGadgetConfiguration(QString classId, const QByteArray &state = 0, QObject *parent = 0);
     int zoom() { return m_defaultZoom; }
     void setZoom(int zoom) { m_defaultZoom = zoom; }
     double latitude() { return m_defaultLatitude; }

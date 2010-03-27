@@ -83,17 +83,23 @@ void UAVGadgetInstanceManager::readConfigurations()
             stream >> locked;
             QByteArray state;
             stream >> state;
-            IUAVGadgetConfiguration *config = f->createConfiguration(locked, configName, state);
+            IUAVGadgetConfiguration *config = f->createConfiguration(state);
+            config->setName(configName);
+            config->setProvisionalName(configName);
+            config->setLocked(locked);
             if (config)
                 m_configurations.append(config);
         }
 
         if (configs.count() == 0) {
-            IUAVGadgetConfiguration *config = f->createConfiguration(false, tr("default"), 0);
+            IUAVGadgetConfiguration *config = f->createConfiguration(0);
             // it is not mandatory for uavgadgets to have any configurations (settings)
             // and therefore we have to check for that
-            if (config)
+            if (config) {
+                config->setName(tr("default"));
+                config->setProvisionalName(tr("default"));
                 m_configurations.append(config);
+            }
         }
         qs->endGroup();
     }

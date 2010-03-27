@@ -53,15 +53,13 @@ public:
     virtual ~IUAVGadgetFactory() {}
 
     virtual IUAVGadget *createGadget(QWidget *parent) = 0;
-    virtual IUAVGadgetConfiguration *createConfiguration(bool /*locked*/,
-                                                         const QString /*configName*/,
-                                                         const QByteArray &/*state*/) { return 0; }
+    virtual IUAVGadgetConfiguration *createConfiguration(const QByteArray &/*state*/) { return 0; }
     virtual IOptionsPage *createOptionsPage(IUAVGadgetConfiguration */*config*/) { return 0; }
     QString classId() const { return m_classId; }
     QString name() const { return m_name; }
 private:
-    QString m_classId;
-    QString m_name;
+    QString m_classId; // unique class id
+    QString m_name; // display name, should also be unique
 };
 
 } // namespace Core

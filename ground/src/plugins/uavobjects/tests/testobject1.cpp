@@ -19,9 +19,10 @@ UAVObject::Metadata TestObject1::getDefaultMetadata()
 {
     // Create metadata
     UAVObject::Metadata metadata;
-    metadata.ackRequired = true;
+    metadata.gcsTelemetryAcked = true;
     metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
     metadata.gcsTelemetryUpdatePeriod = 200;
+    metadata.flightTelemetryAcked = true;
     metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_NEVER;
     metadata.flightTelemetryUpdatePeriod = 0;
     metadata.loggingUpdateMode = UAVObject::UPDATEMODE_NEVER;

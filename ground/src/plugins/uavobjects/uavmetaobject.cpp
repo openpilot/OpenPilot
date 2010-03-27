@@ -35,18 +35,20 @@ UAVMetaObject::UAVMetaObject(quint32 objID, const QString& name, UAVObject* pare
 {
     this->parent = parent;
     // Setup default metadata of metaobject (can not be changed)
-    ownMetadata.ackRequired = 1;
+    ownMetadata.flightTelemetryAcked = 1;
     ownMetadata.flightTelemetryUpdateMode = UPDATEMODE_ONCHANGE;
     ownMetadata.flightTelemetryUpdatePeriod = 0;
+    ownMetadata.gcsTelemetryAcked = 1;
     ownMetadata.gcsTelemetryUpdateMode = UPDATEMODE_ONCHANGE;
     ownMetadata.gcsTelemetryUpdatePeriod = 0;
     ownMetadata.loggingUpdateMode = UPDATEMODE_ONCHANGE;
     ownMetadata.loggingUpdatePeriod = 0;
     // Setup fields
     QList<UAVObjectField*> fields;
-    fields.append(new UAVObjectField(QString("AckRequired"), QString(""), UAVObjectField::FIELDTYPE_INT8, 1));
+    fields.append(new UAVObjectField(QString("FlightTelemetryAcked"), QString(""), UAVObjectField::FIELDTYPE_INT8, 1));
     fields.append(new UAVObjectField(QString("FlightTelemetryUpdateMode"), QString(""), UAVObjectField::FIELDTYPE_INT8, 1));
     fields.append(new UAVObjectField(QString("FlightTelemetryUpdatePeriod"), QString("ms"), UAVObjectField::FIELDTYPE_INT32, 1));
+    fields.append(new UAVObjectField(QString("GCSTelemetryAcked"), QString(""), UAVObjectField::FIELDTYPE_INT8, 1));
     fields.append(new UAVObjectField(QString("GCSTelemetryUpdateMode"), QString(""), UAVObjectField::FIELDTYPE_INT8, 1));
     fields.append(new UAVObjectField(QString("GCSTelemetryUpdatePeriod"), QString("ms"), UAVObjectField::FIELDTYPE_INT32, 1));
     fields.append(new UAVObjectField(QString("LoggingUpdateMode"), QString(""), UAVObjectField::FIELDTYPE_INT8, 1));

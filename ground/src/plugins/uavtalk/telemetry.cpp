@@ -216,7 +216,7 @@ void Telemetry::processObjectUpdates(UAVObject* obj, EventMask event, bool allIn
         retries = 0;
         while(retries < MAX_RETRIES && !success)
         {
-            success = utalk->sendObject(obj, metadata.ackRequired, REQ_TIMEOUT_MS, allInstances); // call blocks until ack is received or timeout
+            success = utalk->sendObject(obj, metadata.gcsTelemetryAcked, REQ_TIMEOUT_MS, allInstances); // call blocks until ack is received or timeout
             ++retries;
         }
     }

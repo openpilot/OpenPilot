@@ -60,9 +60,10 @@ public:
      * properties for each object and can be used by multiple modules (e.g. telemetry and logger)
      */
     typedef struct {
-            quint8 ackRequired; /** Defines if an ack is required for the transactions of this object (1:acked, 0:not acked) */
+            quint8 flightTelemetryAcked; /** Defines if an ack is required for the transactions of this object (1:acked, 0:not acked) */
             quint8 flightTelemetryUpdateMode; /** Update mode used by the autopilot (UpdateMode) */
             qint32 flightTelemetryUpdatePeriod; /** Update period used by the autopilot (only if telemetry mode is PERIODIC) */
+            quint8 gcsTelemetryAcked; /** Defines if an ack is required for the transactions of this object (1:acked, 0:not acked) */
             quint8 gcsTelemetryUpdateMode; /** Update mode used by the GCS (UpdateMode) */
             qint32 gcsTelemetryUpdatePeriod; /** Update period used by the GCS (only if telemetry mode is PERIODIC) */
             quint8 loggingUpdateMode; /** Update mode used by the logging module (UpdateMode) */

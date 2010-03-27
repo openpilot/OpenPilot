@@ -1,0 +1,11 @@
+<xml>
+	<object name="ExampleObject" singleinstance="false" type="data">
+		<field name="field1" units="unit1" type="int8" elements="1"/>
+		<field name="field2" units="unit2" type="int16" elements="1"/>
+		<field name="field3" units="unit3" type="float" elements="4"/>
+		<field name="field4" units="unit4" type="int32" elements="1"/>
+		<telemetrygcs acked="true" updatemode="periodic" period="100"/>
+		<telemetryflight acked="true" updatemode="onchange" period="0"/>
+		<logging updatemode="never" period="0"/>
+	</object>
+</xml>

@@ -30,8 +30,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "uavobjectsinit.h"
-#include "exampleobject.h"
-
+$(OBJINC)
 
 /**
  * Function used to initialize the first instance of each object.
@@ -39,5 +38,5 @@
  */
 void UAVObjectsInitialize(UAVObjectManager* objMngr)
 {
-    objMngr->registerObject( new ExampleObject() );
+$(OBJINIT)
 }

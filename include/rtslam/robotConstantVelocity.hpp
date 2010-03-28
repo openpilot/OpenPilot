@@ -43,7 +43,7 @@ namespace jafar {
 		 * 		- Q = XNEW_control * control.P * XNEW_control'\n
 		 * .
 		 *
-		 * \sa Explore the comments in file robotConstantVelocity.cpp for full algebric details.
+		 * \sa Explore the comments in file robotConstantVelocity.cpp for full algebraic details.
 		 *
 		 * \ingroup rtslam
 		 */
@@ -70,22 +70,7 @@ namespace jafar {
 				 */
 				void move_func();
 
-				/**
-				 * Move one step ahead and update the map.
-				 * This version of move() considers Q constant.
-				 * We do not need to compute Q = XNEW_control * ccontrol.P * XNEW_control '
-				 */
-				void move();
-
-
-				/**
-				 * Retro-project perturbation to robot state.
-				 * The member matrix \a Q is constant and computed once with initStatePerturbation().
-				 * This function cancels the Jacobian product defined in RobotAbstract::computeStatePerturbation().
-				 */
-//				inline void computeStatePerturbation() {
-//				}
-
+				void computeControlJacobian();
 
 
 				static size_t size() {
@@ -125,7 +110,7 @@ namespace jafar {
 				 * \param w the angular velocity
 				 */
 				template<class Vp, class Vq, class Vv, class Vw>
-				inline void composeState(const Vp & p, const Vq & q, const Vv & v, const Vw & w) {
+				inline void unsplitState(const Vp & p, const Vq & q, const Vv & v, const Vw & w) {
 					ublas::subrange(state.x(), 0, 3) = p;
 					ublas::subrange(state.x(), 3, 7) = q;
 					ublas::subrange(state.x(), 7, 10) = v;

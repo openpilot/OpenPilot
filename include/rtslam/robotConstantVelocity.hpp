@@ -132,6 +132,12 @@ namespace jafar {
 				}
 
 			private:
+				// temporary matrices to speed up Jacobian computation
+				mat33 PNEW_v; ///<      Temporary Jacobian matrix
+				mat43 QWDT_wdt; ///< Temporary Jacobian matrix
+				mat44 QNEW_qwdt; ///<   Temporary Jacobian matrix
+				mat43 QNEW_wdt; ///<    Temporary Jacobian matrix
+				mat44 QNEW_q; ///<      Temporary Jacobian matrix
 
 		};
 	}

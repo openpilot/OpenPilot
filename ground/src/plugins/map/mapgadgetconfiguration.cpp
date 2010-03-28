@@ -30,7 +30,9 @@
 
 MapGadgetConfiguration::MapGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),
-    m_defaultZoom(10)
+    m_defaultZoom(10),
+    m_defaultLatitude(0),
+    m_defaultLongitude(0)
 {
     if (state.count() > 0) {
         QDataStream stream(state);

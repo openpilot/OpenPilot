@@ -53,6 +53,6 @@ IUAVGadgetConfiguration *MapGadgetFactory::createConfiguration(const QByteArray 
 
 IOptionsPage *MapGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
-    return new MapGadgetOptionsPage(config);
+    return new MapGadgetOptionsPage(qobject_cast<MapGadgetConfiguration*>(config));
 }
 

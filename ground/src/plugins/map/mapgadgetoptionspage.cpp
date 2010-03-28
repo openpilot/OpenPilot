@@ -34,9 +34,9 @@
 #include <QtGui/QVBoxLayout>
 
 
-MapGadgetOptionsPage::MapGadgetOptionsPage(IUAVGadgetConfiguration *config, QObject *parent) :
+MapGadgetOptionsPage::MapGadgetOptionsPage(MapGadgetConfiguration *config, QObject *parent) :
     IOptionsPage(parent),
-    m_config(qobject_cast<MapGadgetConfiguration*>(config))
+    m_config(config)
 {
 }
 

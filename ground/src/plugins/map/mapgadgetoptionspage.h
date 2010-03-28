@@ -43,7 +43,7 @@ class MapGadgetOptionsPage : public IOptionsPage
 {
 Q_OBJECT
 public:
-    explicit MapGadgetOptionsPage(IUAVGadgetConfiguration *config, QObject *parent = 0);
+    explicit MapGadgetOptionsPage(MapGadgetConfiguration *config, QObject *parent = 0);
     QString id() const { return ""; }
     QString trName() const { return ""; }
     QString category() const { return ""; }

@@ -54,14 +54,14 @@ namespace jafar {
 		/** Base class for all Gaussian control vectors defined in the module rtslam.
 		 * \author jsola@laas.fr
 		 *
-		 * This class is mainly a Gaussian with a time interval value. It represents discrete-time control vectors.
+		 * The Control class is mainly a Gaussian with a time interval value. It represents discrete-time control vectors.
 		 * Mean and covariances are interpreted as follows:
 		 * - The mean is considered the deterministic part of the control.
 		 * - The covariances matrix encodes the random character of the perturbation.
 		 *
 		 * In case the control and perturbation values want to be specified in continuous-time,
-		 * this class incorporates private members for storing the continuous values
-		 * and methods for the conversion.
+		 * this class incorporates private members for storing the continuous values,
+		 * and also methods for the conversion to discrete-time.
 		 *
 		 * @ingroup rtslam
 		 */
@@ -136,8 +136,6 @@ namespace jafar {
 					P(P_ct * _dt); // perturbation is random => variance is linear with time
 					dt = _dt;
 				}
-
-
 				/**
 				 * Discrete control and perturbation from continuous specifications.
 				 * - The deterministic values integrate with time normally, linearly with dt:
@@ -180,6 +178,19 @@ namespace jafar {
 				// Mandatory virtual destructor.
 				virtual ~RobotAbstract() {
 				}
+
+				/**
+				 * Constant perturbation flag.
+				 * Flag for indicating that the state perturbation Q is constant and should not be computed at each iteration.
+				 *
+				 * In case this flag wants to be set to \c true , the user must consider computing the constant \a Q immediately after construction time.
+				 * This can be done in two ways:
+				 * - use a function member \b setup(..args..) in the derived class to compute the Jacobian XNEW_control,
+				 *   and enter the appropriate control.P() value.
+				 * 	 Then call computeStatePerturbation().
+				 * - use a function member \b setup(..args..) in the derived class to enter the matrix Q directly.
+				 */
+				bool constantPerturbation;
 
 				map_ptr_t slamMap; ///< parent map
 				sensors_ptr_set_t sensors; ///<	A set of sensors
@@ -236,9 +247,11 @@ namespace jafar {
 
 				/**
 				 * Compute robot process noise \a Q in state space.
-				 * This function is called at each iteration.
-				 * Overload it to an empty inline function if you know \a Q is constant,
-				 * and use initStatePerturbation() just once after contruction.
+				 * This function is called by move() at each iteration if constantPerturbation is \b false.
+				 * It performs the operation:
+				 * - Q = XNEW_control * control.P() * XNEW_control',
+				 *
+				 * where XNEW_control and control.P() must have been already computed.
 				 */
 				void computeStatePerturbation();
 

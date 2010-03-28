@@ -31,6 +31,7 @@
  */
 #include "uavobjectsinit.h"
 #include "exampleobject.h"
+#include "examplesettings.h"
 
 
 /**
@@ -40,4 +41,6 @@
 void UAVObjectsInitialize(UAVObjectManager* objMngr)
 {
     objMngr->registerObject( new ExampleObject() );
+    objMngr->registerObject( new ExampleSettings() );
+
 }

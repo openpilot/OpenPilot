@@ -35,6 +35,7 @@
 #include <QMutexLocker>
 #include <QString>
 #include <QList>
+#include <QFile>
 #include "uavobjectfield.h"
 
 class UAVObjectField;
@@ -78,8 +79,12 @@ public:
     bool isSingleInstance();
     QString getName();
     quint32 getNumBytes(); 
-    virtual qint32 pack(quint8* dataOut);
-    virtual qint32 unpack(const quint8* dataIn);
+    qint32 pack(quint8* dataOut);
+    qint32 unpack(const quint8* dataIn);
+    bool save();
+    bool save(QFile& file);
+    bool load();
+    bool load(QFile& file);
     virtual void setMetadata(const Metadata& mdata) = 0;
     virtual Metadata getMetadata() = 0;
     virtual Metadata getDefaultMetadata() = 0;

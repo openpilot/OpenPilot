@@ -26,6 +26,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "uavobject.h"
+#include <QtEndian>
 
 /**
  * Constructor
@@ -240,6 +241,151 @@ qint32 UAVObject::unpack(const quint8* dataIn)
     emit objectUnpacked(this); // trigger object updated event
     emit objectUpdated(this);
     return numBytes;
+}
+
+/**
+ * Save the object data to the file.
+ * The file will be created in the current directory
+ * and its name will be the same as the object with
+ * the .uavobj extension.
+ * @returns True on success, false on failure
+ */
+bool UAVObject::save()
+{
+    QMutexLocker locker(mutex);
+
+    // Open file
+    QFile file(name + ".uavobj");
+    if (!file.open(QFile::WriteOnly))
+    {
+        return false;
+    }
+
+    // Write object
+    if ( !save(file) )
+    {
+        return false;
+    }
+
+    // Close file
+    file.close();
+    return true;
+}
+
+/**
+ * Save the object data to the file.
+ * The file is expected to be already open for writting.
+ * The data will be appended and the file will not be closed.
+ * @returns True on success, false on failure
+ */
+bool UAVObject::save(QFile& file)
+{
+    QMutexLocker locker(mutex);
+    quint8 buffer[numBytes];
+    quint8 tmpId[4];
+
+    // Write the object ID
+    qToBigEndian<quint32>(objID, tmpId);
+    if ( file.write((const char*)tmpId, 4) == -1 )
+    {
+        return false;
+    }
+
+    // Write the instance ID
+    if (!isSingleInst)
+    {
+        qToBigEndian<quint16>(instID, tmpId);
+        if ( file.write((const char*)tmpId, 2) == -1 )
+        {
+            return false;
+        }
+    }
+
+    // Write the data
+    pack(buffer);
+    if ( file.write((const char*)buffer, numBytes) == -1 )
+    {
+        return false;
+    }
+
+    // Done
+    return true;
+}
+
+/**
+ * Load the object data from a file.
+ * The file will be openned in the current directory
+ * and its name will be the same as the object with
+ * the .uavobj extension.
+ * @returns True on success, false on failure
+ */
+bool UAVObject::load()
+{
+    QMutexLocker locker(mutex);
+
+    // Open file
+    QFile file(name + ".uavobj");
+    if (!file.open(QFile::ReadOnly))
+    {
+        return false;
+    }
+
+    // Load object
+    if ( !load(file) )
+    {
+        return false;
+    }
+
+    // Close file
+    file.close();
+    return true;
+}
+
+/**
+ * Load the object data from file.
+ * The file is expected to be already open for reading.
+ * The data will be read and the file will not be closed.
+ * @returns True on success, false on failure
+ */
+bool UAVObject::load(QFile& file)
+{
+    QMutexLocker locker(mutex);
+    quint8 buffer[numBytes];
+    quint8 tmpId[4];
+
+    // Read the object ID
+    if ( file.read((char*)tmpId, 4) != 4 )
+    {
+        return false;
+    }
+
+    // Check that the IDs match
+    if (qFromBigEndian<quint32>(tmpId) != objID)
+    {
+        return false;
+    }
+
+    // Read the instance ID
+    if ( file.read((char*)tmpId, 2) != 2 )
+    {
+        return false;
+    }
+
+    // Check that the IDs match
+    if (qFromBigEndian<quint16>(tmpId) != instID)
+    {
+        return false;
+    }
+
+    // Read and unpack the data
+    if ( file.read((char*)buffer, numBytes) != numBytes )
+    {
+        return false;
+    }
+    unpack(buffer);
+
+    // Done
+    return true;
 }
 
 /**

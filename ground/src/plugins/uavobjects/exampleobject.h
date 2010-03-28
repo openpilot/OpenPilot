@@ -46,7 +46,8 @@ public:
   
     static const quint32 OBJID = 3048370380U;
     static const QString NAME;
-    static const bool SINGLEINST = 0;
+    static const bool ISSINGLEINST = 0;
+	static const bool ISSETTINGS = 0;
     static const quint32 NUMBYTES = sizeof(DataFields);
 
     ExampleObject();

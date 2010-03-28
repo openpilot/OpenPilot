@@ -32,7 +32,7 @@
 
 const QString ExampleObject::NAME = QString("ExampleObject");
 
-ExampleObject::ExampleObject(): UAVDataObject(OBJID, SINGLEINST, NAME)
+ExampleObject::ExampleObject(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
 {
     // Create fields
     QList<UAVObjectField*> fields;

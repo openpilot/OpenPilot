@@ -12,7 +12,6 @@ SOURCES += main.cpp \
     ../uavobject.cpp \
     ../uavmetaobject.cpp \
     ../uavdataobject.cpp \
-    testobject1.cpp \
     uavobjectstest.cpp \
     ../exampleobject.cpp
 HEADERS += ../uavobjectmanager.h \
@@ -20,6 +19,5 @@ HEADERS += ../uavobjectmanager.h \
     ../uavobject.h \
     ../uavmetaobject.h \
     ../uavdataobject.h \
-    testobject1.h \
     uavobjectstest.h \
     ../exampleobject.h

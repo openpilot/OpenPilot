@@ -30,10 +30,11 @@
 /**
  * Constructor
  */
-UAVDataObject::UAVDataObject(quint32 objID, bool isSingleInst, const QString& name):
+UAVDataObject::UAVDataObject(quint32 objID, bool isSingleInst, bool isSet,const QString& name):
         UAVObject(objID, isSingleInst, name)
 {
     mobj = NULL;
+    this->isSet = isSet;
 }
 
 /**
@@ -53,6 +54,14 @@ void UAVDataObject::initialize(UAVMetaObject* mobj)
 {
     QMutexLocker locker(mutex);
     this->mobj = mobj;
+}
+
+/**
+ * Returns true if this is a data object holding module settings
+ */
+bool UAVDataObject::isSettings()
+{
+    return isSet;
 }
 
 /**

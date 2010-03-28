@@ -160,7 +160,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
         if (rxCount == 4)
         {
             // Search for object, if not found reset state machine
-            rxObjId = (qint32)qFromBigEndian<qint32>(rxTmpBuffer);
+            rxObjId = (qint32)qFromBigEndian<quint32>(rxTmpBuffer);
             UAVObject* rxObj = objMngr->getObject(rxObjId);
             if (rxObj == NULL)
             {
@@ -214,7 +214,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
         rxTmpBuffer[rxCount++] = rxbyte;
         if (rxCount == 2)
         {
-            rxInstId = (qint16)qFromBigEndian<qint16>(rxTmpBuffer);
+            rxInstId = (qint16)qFromBigEndian<quint16>(rxTmpBuffer);
             rxCS = updateChecksum(rxCS, rxTmpBuffer, 2);
             rxCount = 0;
             // If there is a payload get it, otherwise receive checksum
@@ -241,7 +241,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
         rxTmpBuffer[rxCount++] = rxbyte;
         if (rxCount == 2)
         {
-            rxCSPacket = (qint16)qFromBigEndian<qint16>(rxTmpBuffer);
+            rxCSPacket = (qint16)qFromBigEndian<quint16>(rxTmpBuffer);
             if (rxCS == rxCSPacket)
             {
                 mutex->lock();
@@ -491,7 +491,7 @@ bool UAVTalk::transmitSingleObject(UAVObject* obj, quint8 type, bool allInstance
     // Setup type and object id fields
     objId = obj->getObjID();
     txBuffer[0] = type;
-    qToBigEndian<qint32>(objId, &txBuffer[1]);
+    qToBigEndian<quint32>(objId, &txBuffer[1]);
 
     // Setup instance ID if one is required
     if ( obj->isSingleInstance() )
@@ -503,12 +503,12 @@ bool UAVTalk::transmitSingleObject(UAVObject* obj, quint8 type, bool allInstance
         // Check if all instances are requested
         if (allInstances)
         {
-            qToBigEndian<qint16>(allInstId, &txBuffer[5]);
+            qToBigEndian<quint16>(allInstId, &txBuffer[5]);
         }
         else
         {
             instId = obj->getInstID();
-            qToBigEndian<qint16>(instId, &txBuffer[5]);
+            qToBigEndian<quint16>(instId, &txBuffer[5]);
         }
         dataOffset = 7;
     }
@@ -541,7 +541,7 @@ bool UAVTalk::transmitSingleObject(UAVObject* obj, quint8 type, bool allInstance
     // Calculate checksum
     cs = 0;
     cs = updateChecksum(cs, txBuffer, dataOffset+length);
-    qToBigEndian<qint16>(cs, &txBuffer[dataOffset+length]);
+    qToBigEndian<quint16>(cs, &txBuffer[dataOffset+length]);
 
     // Send buffer
     io->write((const char*)txBuffer, dataOffset+length+CHECKSUM_LENGTH);

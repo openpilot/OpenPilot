@@ -47,11 +47,9 @@ MapGadgetConfiguration::MapGadgetConfiguration(QString classId, const QByteArray
     }
 }
 
-IUAVGadgetConfiguration *MapGadgetConfiguration::clone(QString name)
+IUAVGadgetConfiguration *MapGadgetConfiguration::clone()
 {
     MapGadgetConfiguration *m = new MapGadgetConfiguration(this->classId());
-    m->setName(name);
-    m->setProvisionalName(name);
     m->m_defaultZoom = m_defaultZoom;
     m->m_defaultLatitude = m_defaultLatitude;
     m->m_defaultLongitude = m_defaultLongitude;

@@ -44,7 +44,7 @@ public:
     double longitude() { return m_defaultLongitude; }
     void setLongitude(double lon) { m_defaultLongitude = lon; }
     QByteArray saveState() const;
-    IUAVGadgetConfiguration *clone(QString name);
+    IUAVGadgetConfiguration *clone();
 signals:
 
 public slots:

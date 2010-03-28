@@ -198,7 +198,9 @@ void  UAVGadgetInstanceManager::cloneConfiguration(IUAVGadgetConfiguration *conf
 {
     QString name = suggestName(configToClone->classId(), configToClone->name());
 
-    IUAVGadgetConfiguration *config = configToClone->clone(name);
+    IUAVGadgetConfiguration *config = configToClone->clone();
+    config->setName(name);
+    config->setProvisionalName(name);
     IUAVGadgetFactory *f = factory(config->classId());
     IOptionsPage *p = f->createOptionsPage(config);
     IOptionsPage *page = new UAVGadgetOptionsPageDecorator(p, config);

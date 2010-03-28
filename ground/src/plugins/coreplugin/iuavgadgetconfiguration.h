@@ -47,7 +47,7 @@ public:
     void setLocked(bool locked) { m_locked = locked; }
 
     virtual QByteArray saveState() const = 0;
-    virtual IUAVGadgetConfiguration *clone(QString name) = 0;
+    virtual IUAVGadgetConfiguration *clone() = 0;
 
 signals:
 

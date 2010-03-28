@@ -73,29 +73,23 @@ namespace jafar {
 		 *   g   16 |  0     0     0     0
 		 * -----------------------------------------------------------------------------
 		 */
-		void RobotInertial::move_func() {
-
-
-			//			JFR_DEBUG("RobotInertial::move_func(): start.")
+		void RobotInertial::move_func(const vec & x, const vec & u, const double dt, vec & xnew, mat & _XNEW_x,
+		    mat & _XNEW_control) {
 
 
 			// Separate things out to make it clearer
 			vec3 p, v, ab, wb, g;
 			vec4 q;
-			splitState(p, q, v, ab, wb, g); // split state vector
-			//			JFR_DEBUG("RobotInertial::move_func(): 1.")
+			splitState(x, p, q, v, ab, wb, g); // split state vector
 
 			// Split control vector into sensed acceleration and sensed angular rate
 			vec3 am, wm, ar, wr; // measurements and random walks
-			splitControl(am, wm, ar, wr);
-			double dt = control.dt;
-			//			JFR_DEBUG("RobotInertial::move_func(): 2.")
+			splitControl(u, am, wm, ar, wr);
 
 
 			// It is useful to start obtaining a nice rotation matrix and the product R*dt
 			Rold = q2R(q);
 			Rdt = Rold * dt;
-			//			JFR_DEBUG("RobotInertial::move_func(): 3.")
 
 
 			// Invert sensor functions. Get true acc. and ang. rates
@@ -104,7 +98,6 @@ namespace jafar {
 			vec3 atrue, wtrue;
 			atrue = prod(Rold, (am - ab)) + g;
 			wtrue = wm - wb;
-			//			JFR_DEBUG("RobotInertial::move_func(): 4.")
 
 
 			// Get new state vector
@@ -120,12 +113,10 @@ namespace jafar {
 			abnew = ab + ar; //          acc bias
 			wbnew = wb + wr; //          gyro bias
 			gnew = g; //                 gravity does not change
-			//			JFR_DEBUG("RobotInertial::move_func(): 5.")
 
 
 			// Put it all together - this is the output state
-			unsplitState(pnew, qnew, vnew, abnew, wbnew, gnew);
-			//			JFR_DEBUG("RobotInertial::move_func(): 6.")
+			unsplitState(pnew, qnew, vnew, abnew, wbnew, gnew, xnew);
 
 
 			// Now on to the Jacobian...
@@ -140,23 +131,20 @@ namespace jafar {
 			// wb  13 |  0       0       0       0       I       0
 			// g   16 |  0       0       0       0       0       I
 
-			XNEW_x.assign(identity_mat(state.size()));
-			//			JFR_DEBUG("RobotInertial::move_func(): 7.")
+			_XNEW_x.assign(identity_mat(state.size()));
 
 
 			// Fill in XNEW_v: VNEW_g and PNEW_v = I * dt
 			identity_mat I(3);
 			Idt = I * dt;
-			subrange(XNEW_x, 0, 3, 7, 10) = Idt;
-			subrange(XNEW_x, 7, 10, 16, 19) = Idt;
-			//			JFR_DEBUG("RobotInertial::move_func(): 8.")
+			subrange(_XNEW_x, 0, 3, 7, 10) = Idt;
+			subrange(_XNEW_x, 7, 10, 16, 19) = Idt;
 
 
 			// Fill in QNEW_q
 			// qnew = qold ** qwdt  ( qnew = q1 ** q2 = qProd(q1, q2) in rtslam/quatTools.hpp )
 			qProd_by_dq1(qwdt, QNEW_q);
-			subrange(XNEW_x, 3, 7, 3, 7) = QNEW_q;
-			//			JFR_DEBUG("RobotInertial::move_func(): 9.")
+			subrange(_XNEW_x, 3, 7, 3, 7) = QNEW_q;
 
 
 			// Fill in QNEW_wb
@@ -167,20 +155,17 @@ namespace jafar {
 			// Here we get the derivative of qwdt wrt wtrue, so we consider dt = 1 and call for the derivative of v2q() with v = w*dt
 			v2q_by_dv(wtrue, QWDT_w);
 			QNEW_w = prod<mat> (QNEW_qwdt, QWDT_w);
-			subrange(XNEW_x, 3, 7, 13, 16) = -QNEW_w;
-			//			JFR_DEBUG("RobotInertial::move_func(): 10.")
+			subrange(_XNEW_x, 3, 7, 13, 16) = -QNEW_w;
 
 
 			// Fill VNEW_q
 			// VNEW_q = d(R(q)*v) / dq
 			rotate_by_dq(q, v, VNEW_q);
-			subrange(XNEW_x, 7, 10, 3, 7) = VNEW_q;
-			//			JFR_DEBUG("RobotInertial::move_func(): 11.")
+			subrange(_XNEW_x, 7, 10, 3, 7) = VNEW_q;
 
 
 			// Fill in VNEW_ab
-			subrange(XNEW_x, 7, 10, 10, 13) = -Rdt;
-			//			JFR_DEBUG("RobotInertial::move_func(): 12.")
+			subrange(_XNEW_x, 7, 10, 10, 13) = -Rdt;
 
 
 			// Now on to the control Jacobian XNEW_control
@@ -197,18 +182,17 @@ namespace jafar {
 			// wb  13 |  0     0     0     I
 			// g   16 |  0     0     0     0
 
-			XNEW_control.clear();
-			//			JFR_DEBUG("RobotInertial::move_func(): 13.")
-
 			// Fill in the easy bits first
-			ublas::subrange(XNEW_control, 7, 10, 0, 3) = I;
-			ublas::subrange(XNEW_control, 10, 13, 6, 9) = I;
-			ublas::subrange(XNEW_control, 13, 16, 9, 12) = I;
-			//			JFR_DEBUG("RobotInertial::move_func(): 14.")
+			_XNEW_control.clear();
+			ublas::subrange(_XNEW_control, 7, 10, 0, 3) = I;
+			ublas::subrange(_XNEW_control, 10, 13, 6, 9) = I;
+			ublas::subrange(_XNEW_control, 13, 16, 9, 12) = I;
+
 
 			// Tricky bit is QNEW_w = d(qnew)/d(wi)
 			// Here, wi is the integral of the perturbation, wi = integral_tau=0^dt (wn(t) * dtau),
 			// with: wn: the angular rate measurement noise
+			//       dt: the integration period
 			//       wi: the resulting angular impulse
 			// We have: QNEW_wi = QNEW_qwdt * QWDT_wi
 			//                  = QNEW_qwdt * QWDT_wdt // Hey! wdt is the integral when w is deterministic. The jacobians *_wdt and *_wi are the same!!!
@@ -220,8 +204,7 @@ namespace jafar {
 			//	with: U_continuous_time expressed in ( rad / s / sqrt(s) )^2 = rad^2 / s^3 <-- yeah, it is confusing, but true.
 			//   (Use control.convert_P_from_continuous() helper if necessary.)
 			//
-			subrange(XNEW_control, 3, 7, 3, 6) = QNEW_w * (1 / dt);
-			//			JFR_DEBUG("RobotInertial::move_func(): 15.")
+			subrange(_XNEW_control, 3, 7, 3, 6) = QNEW_w * (1 / dt);
 
 		}
 

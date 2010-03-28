@@ -39,7 +39,7 @@ namespace jafar {
 			type("Constant-Velocity");
 		}
 
-		void RobotConstantVelocity::move_func() {
+		void RobotConstantVelocity::move_func(const vec & _x, const vec & _u, const double _dt, vec & _xnew, mat & _XNEW_x, mat & _XNEW_u) {
 
 			using namespace jblas;
 			using namespace ublas;
@@ -85,13 +85,13 @@ namespace jafar {
 			// split robot state vector
 			vec3 p, v, w;
 			vec4 q;
-			splitState(p, q, v, w);
+			splitState(_x, p, q, v, w);
 			double dt = control.dt;
 
 
 			// split control vector
 			vec3 vi, wi;
-			splitControl(vi, wi);
+			splitControl(_u, vi, wi);
 
 
 			// Non-trivial Jacobian blocks
@@ -112,14 +112,14 @@ namespace jafar {
 
 
 			// Compose state - this is the output state.
-			unsplitState(pnew, qnew, vnew, wnew);
+			unsplitState(pnew, qnew, vnew, wnew, _xnew);
 
 
 			// Build transition Jacobian matrix XNEW_x
-			XNEW_x.assign(identity_mat(state.size()));
-			project(XNEW_x, range(0, 3), range(7, 10)) = PNEW_v;
-			project(XNEW_x, range(3, 7), range(3, 7)) = QNEW_q;
-			project(XNEW_x, range(3, 7), range(10, 13)) = QNEW_wdt * dt;
+			_XNEW_x.assign(identity_mat(state.size()));
+			project(_XNEW_x, range(0, 3), range(7, 10)) = PNEW_v;
+			project(_XNEW_x, range(3, 7), range(3, 7)) = QNEW_q;
+			project(_XNEW_x, range(3, 7), range(10, 13)) = QNEW_wdt * dt;
 
 
 			/*
@@ -151,13 +151,6 @@ namespace jafar {
 			subrange(XNEW_control, 7, 10, 0, 3) = I;
 			subrange(XNEW_control, 10, 13, 3, 6) = I;
 		}
-
-
-	//		// We overload move() because Q is constant
-	//		void RobotConstantVelocity::move(){
-	//			move_func();
-	//			slamMap->filter.predict(slamMap->ia_used_states(), XNEW_x, state.ia(), Q);
-	//		}
 
 
 	}

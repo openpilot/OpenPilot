@@ -73,7 +73,6 @@ namespace jafar {
 
 		void RobotAbstract::computeStatePerturbation() {
 			Q = jmath::ublasExtra::prod_JPJt(control.P(), XNEW_control);
-			//			cout << "computed Q" << endl; // TODO: remove this if enough time since 2010/03/28 has passed.
 		}
 
 		void RobotAbstract::exploreSensors() {

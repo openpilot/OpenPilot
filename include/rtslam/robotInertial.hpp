@@ -61,7 +61,6 @@ namespace jafar {
 				~RobotInertial() {
 				}
 
-
 				/**
 				 * Move one step ahead.
 				 *
@@ -83,7 +82,7 @@ namespace jafar {
 				 *
 				 * \sa See the extense comments on move_func() in file robotInertial.cpp for algebraic details.
 				 */
-				void move_func();
+				void move_func(const vec & _x, const vec & _u, const double _dt, vec & _xnew, mat & _XNEW_x, mat & _XNEW_u);
 
 				static size_t size() {
 					return 19;
@@ -105,14 +104,14 @@ namespace jafar {
 				 * \param wb the gyrometer bias
 				 * \param g the gravity vector
 				 */
-				template<class Vp, class Vq, class Vv, class Vab, class Vwb, class Vg>
-				inline void splitState(Vp & p, Vq & q, Vv & v, Vab & ab, Vwb & wb, Vg & g) {
-					p = ublas::subrange(state.x(), 0, 3);
-					q = ublas::subrange(state.x(), 3, 7);
-					v = ublas::subrange(state.x(), 7, 10);
-					ab = ublas::subrange(state.x(), 10, 13);
-					wb = ublas::subrange(state.x(), 13, 16);
-					g = ublas::subrange(state.x(), 16, 19);
+				template<class Vx, class Vp, class Vq, class Vv, class Vab, class Vwb, class Vg>
+				inline void splitState(const Vx & x, Vp & p, Vq & q, Vv & v, Vab & ab, Vwb & wb, Vg & g) {
+					p = ublas::subrange(x, 0, 3);
+					q = ublas::subrange(x, 3, 7);
+					v = ublas::subrange(x, 7, 10);
+					ab = ublas::subrange(x, 10, 13);
+					wb = ublas::subrange(x, 13, 16);
+					g = ublas::subrange(x, 16, 19);
 				}
 
 
@@ -127,14 +126,14 @@ namespace jafar {
 				 * \param wb the gyrometer bias
 				 * \param g the gravity vector
 				 */
-				template<class Vp, class Vq, class Vv, class Vab, class Vwb, class Vg>
-				inline void unsplitState(const Vp & p, const Vq & q, const Vv & v, const Vab & ab, const Vwb & wb, const Vg & g) {
-					ublas::subrange(state.x(), 0, 3) = p;
-					ublas::subrange(state.x(), 3, 7) = q;
-					ublas::subrange(state.x(), 7, 10) = v;
-					ublas::subrange(state.x(), 10, 13) = ab;
-					ublas::subrange(state.x(), 13, 16) = wb;
-					ublas::subrange(state.x(), 16, 19) = g;
+				template<class Vp, class Vq, class Vv, class Vab, class Vwb, class Vg, class Vx>
+				inline void unsplitState(const Vp & p, const Vq & q, const Vv & v, const Vab & ab, const Vwb & wb, const Vg & g, Vx & x) {
+					ublas::subrange(x, 0, 3) = p;
+					ublas::subrange(x, 3, 7) = q;
+					ublas::subrange(x, 7, 10) = v;
+					ublas::subrange(x, 10, 13) = ab;
+					ublas::subrange(x, 13, 16) = wb;
+					ublas::subrange(x, 16, 19) = g;
 				}
 
 
@@ -147,12 +146,12 @@ namespace jafar {
 				 * \param ar the accelerometer bias random walk noise
 				 * \param wr the gyrometer bias random walk noise
 				 */
-				template<class V>
-				inline void splitControl(V & am, V & wm, V & ar, V & wr) {
-					am = project(control.x(), ublas::range(0, 3));
-					wm = project(control.x(), ublas::range(3, 6));
-					ar = project(control.x(), ublas::range(6, 9));
-					wr = project(control.x(), ublas::range(9, 12));
+				template<class Vu, class V>
+				inline void splitControl(const Vu & u, V & am, V & wm, V & ar, V & wr) {
+					am = project(u, ublas::range(0, 3));
+					wm = project(u, ublas::range(3, 6));
+					ar = project(u, ublas::range(6, 9));
+					wr = project(u, ublas::range(9, 12));
 				}
 
 			private:

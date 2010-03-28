@@ -44,7 +44,7 @@ int32_t ExampleObjectInitialize()
 	UAVObjMetadata metadata;
 
 	// Register object with the object manager
-	handle = UAVObjRegister(EXAMPLEOBJECT_OBJID, EXAMPLEOBJECT_NAME, 0, EXAMPLEOBJECT_SINGLEINST, EXAMPLEOBJECT_NUMBYTES);
+	handle = UAVObjRegister(EXAMPLEOBJECT_OBJID, EXAMPLEOBJECT_NAME, 0, EXAMPLEOBJECT_ISSINGLEINST, EXAMPLEOBJECT_ISSETTINGS, EXAMPLEOBJECT_NUMBYTES);
 	if (handle == 0) return -1;
 
 	// Initialize metadata

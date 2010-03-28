@@ -29,6 +29,7 @@
 
 #include "openpilot.h"
 #include "exampleobject.h"
+#include "examplesettings.h"
 
 
 /**
@@ -38,5 +39,6 @@
 void UAVObjectsInitializeAll()
 {
     ExampleObjectInitialize();
+    ExampleSettingsInitialize();
 
 }

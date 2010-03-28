@@ -44,7 +44,7 @@ int32_t $(NAME)Initialize()
 	UAVObjMetadata metadata;
 
 	// Register object with the object manager
-	handle = UAVObjRegister($(NAMEUC)_OBJID, $(NAMEUC)_NAME, 0, $(NAMEUC)_SINGLEINST, $(NAMEUC)_NUMBYTES);
+	handle = UAVObjRegister($(NAMEUC)_OBJID, $(NAMEUC)_NAME, 0, $(NAMEUC)_ISSINGLEINST, $(NAMEUC)_ISSETTINGS, $(NAMEUC)_NUMBYTES);
 	if (handle == 0) return -1;
 
 	// Initialize metadata

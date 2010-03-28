@@ -27,6 +27,23 @@ namespace jafar {
 
 		/** Base class for all Gaussian expectations defined in the module rtslam.
 		 *
+		 * The expectation is defined as the projection of the state into the measurement space:
+		 * - this->x() = exp = h(x)
+		 *
+		 * where the function h(x) belongs to some observation model.
+		 *
+		 * Its covariances matrix is computed via Gaussian uncertainty propagation using the Jacobians of h():
+		 * - this->P() = EXP = EXP_x * P * EXP_x'
+		 *
+		 * with EXP_x = dexp/dx = dh(x)/dx, also a member of the class, computed also by the observation model.
+		 *
+		 * In this class, the Jacobian is sparse. The states in \a x that contribute to the expectation are available through an indirect array
+		 * - this->ia_exp_x
+		 *
+		 * so that we have:
+		 * - exp = h( project(x, ia_exp_x) )
+		 * - EXP = EXP_x * project(P, ia_exp_x, ia_exp_x) * EXP_x'
+		 *
 		 * @ingroup rtslam
 		 */
 		class Expectation: public Gaussian {
@@ -53,7 +70,7 @@ namespace jafar {
 				jblas::vec nonObs; ///< expected value of the non-observable part.
 
 				jblas::mat EXP_x; ///< Jacobian wrt the state.
-				jblas::ind_array ia; ///< ind. array of indices to the map
+				jblas::ind_array ia_exp_x; ///< ind. array of indices to the map
 
 				void computeVisibility();
 				void estimateInfoGain();

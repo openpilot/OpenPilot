@@ -69,11 +69,19 @@ namespace jafar {
 			private:
 				vec x_ct; ///< continuous-time control vector
 				sym_mat P_ct; ///< continuous-time covariances matrix
+
 			public:
 				double dt;
 				Control(const size_t _size) :
 					Gaussian(_size) {
 					dt = 1.0;
+				}
+				Control(const Gaussian & c) :
+					Gaussian(c) {
+					dt = 1.0;
+				}
+				Control(const Gaussian & c, const double _dt) :
+					Gaussian(c), dt(_dt) {
 				}
 				template<class SymMat>
 				void set_P_continuous(SymMat & _P_ct) {

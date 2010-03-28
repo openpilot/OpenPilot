@@ -142,16 +142,8 @@ namespace jafar {
 				virtual ~SensorAbstract() {
 				}
 
-
-				/**
-				 * Add an observation.
-				 */
-				void linkToObservation(observation_ptr_t _obsPtr);
-
-				/**
-				 * Link to robot.
-				 */
-				void linkToRobot(robot_ptr_t _robPtr);
+				void linkToObservation(observation_ptr_t _obsPtr); ///< Link to observation
+				void linkToRobot(robot_ptr_t _robPtr); ///<             Link to robot
 
 				/*
 				 * Acquire raw data.

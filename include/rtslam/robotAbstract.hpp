@@ -186,20 +186,9 @@ namespace jafar {
 				static size_t size_control() {
 					return 0;
 				}
-				static size_t size_pert() {
-					return 0;
-				}
 
-
-				/**
-				 * Add a sensor to this robot
-				 */
-				void linkToSensor(sensor_ptr_t _senPtr);
-
-				/**
-				 * Link To Map
-				 */
-				void linkToMap(map_ptr_t _mapPtr);
+				void linkToSensor(sensor_ptr_t _senPtr); ///< Link to sensor
+				void linkToMap(map_ptr_t _mapPtr); ///<       Link to map
 
 				/**
 				 * Acquire control structure

@@ -122,13 +122,10 @@ namespace jafar {
 				}
 
 
-				/*
-				 * Robot and landmark addition and removal
-				 */
-				void linkToRobot(robot_ptr_t _robPtr);
+				void linkToRobot(robot_ptr_t _robPtr); ///< Link to robot
 				void deleteRobot(robot_ptr_t _robPtr);
 
-				void linkToLandmark(landmark_ptr_t _lmkPtr);
+				void linkToLandmark(landmark_ptr_t _lmkPtr); ///< Link to landmark
 				void deleteLandmark(landmark_ptr_t _lmkPtr);
 
 				/**

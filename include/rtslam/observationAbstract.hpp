@@ -142,15 +142,8 @@ namespace jafar {
 				 */
 				inline void associate(sensor_ptr_t senPtr, landmark_ptr_t lmkPtr);
 
-				/**
-				 * Link to sensor.
-				 */
-				void linkToSensor(sensor_ptr_t _sensorPtr);
-
-				/**
-				 * Link to landmark
-				 */
-				void linkToLandmark(landmark_ptr_t _lmkPtr);
+				void linkToSensor(sensor_ptr_t _sensorPtr); ///<  Link to sensor
+				void linkToLandmark(landmark_ptr_t _lmkPtr); ///< Link to landmark
 
 				/**
 				 * Project and get Jacobians

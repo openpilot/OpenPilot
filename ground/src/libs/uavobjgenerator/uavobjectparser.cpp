@@ -188,7 +188,7 @@ void UAVObjectParser::calculateID(ObjectInfo* info)
     // Hash object name
     quint32 hash = updateHash(info->name, 0);
     // Hash object attributes
-    hash = updateHash(info->type, hash);
+    hash = updateHash(info->isSettings, hash);
     hash = updateHash(info->isSingleInst, hash);
     // Hash field information
     for (int n = 0; n < info->fields.length(); ++n)
@@ -413,26 +413,31 @@ QString UAVObjectParser::processObjectAttributes(QDomNode& node, ObjectInfo* inf
             return QString("Object:singleinstance attribute value is invalid");
         }
     }
-    // Get type attribute
-    attr = attributes.namedItem("type");
+    // Get settings attribute
+    attr = attributes.namedItem("settings");
     if ( attr.isNull() )
     {
-        return QString("Object:type attribute is missing");
+        return QString("Object:settings attribute is missing");
     }
     else
     {
-        if ( attr.nodeValue().compare(QString("data")) == 0 )
+        if ( attr.nodeValue().compare(QString("true")) == 0 )
         {
-            info->type = OBJTYPE_DATA;
+            info->isSettings = true;
         }
-        else if ( attr.nodeValue().compare(QString("settings")) == 0 )
+        else if ( attr.nodeValue().compare(QString("false")) == 0 )
         {
-            info->type = OBJTYPE_SETTINGS;
+            info->isSettings = false;
         }
         else
         {
-            return QString("Object:type attribute value is invalid");
+            return QString("Object:settings attribute value is invalid");
         }
+    }
+    // Settings objects can only have a single instance
+    if ( info->isSettings && !info->isSingleInst )
+    {
+        return QString("Object: Settings objects can not have multiple instances");
     }
     // Done
     return QString();
@@ -455,9 +460,12 @@ void UAVObjectParser::replaceCommonTags(QString& out, ObjectInfo* info)
     out.replace(QString("$(NAMEUC)"), info->name.toUpper());
     // Replace $(OBJID) tag
     out.replace(QString("$(OBJID)"), QString().setNum(info->id));
-    // Replace $(SINGLEINST) tag
+    // Replace $(ISSINGLEINST) tag
     value = boolToString( info->isSingleInst );
-    out.replace(QString("$(SINGLEINST)"), value);
+    out.replace(QString("$(ISSINGLEINST)"), value);
+    // Replace $(ISSETTINGS) tag
+    value = boolToString( info->isSettings );
+    out.replace(QString("$(ISSETTINGS)"), value);
     // Replace $(FLIGHTTELEM_ACKED) tag
     value = boolToString( info->flightTelemetryAcked );
     out.replace(QString("$(FLIGHTTELEM_ACKED)"), value);

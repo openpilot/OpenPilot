@@ -38,11 +38,6 @@ class UAVObjectParser
 public:
     // Types
     typedef enum {
-        OBJTYPE_DATA = 0,
-        OBJTYPE_SETTINGS
-    } ObjectType;
-
-    typedef enum {
         FIELDTYPE_INT8 = 0,
         FIELDTYPE_INT16,
         FIELDTYPE_INT32,
@@ -70,8 +65,8 @@ public:
     typedef struct {
         QString name;
         quint32 id;
-        ObjectType type;
         bool isSingleInst;
+        bool isSettings;
         bool flightTelemetryAcked;
         UpdateMode flightTelemetryUpdateMode; /** Update mode used by the autopilot (UpdateMode) */
         int flightTelemetryUpdatePeriod; /** Update period used by the autopilot (only if telemetry mode is PERIODIC) */

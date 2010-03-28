@@ -173,7 +173,7 @@ bool UAVObjectGenerator::processAll()
             // Update strings for the object initialization
             objInc.append("#include \"" + namelc + ".h\"\n");
             flightObjInit.append("    " + name + "Initialize();\n");
-            gcsObjInit.append("    objMngr->registerObject( new " + name + "() );");
+            gcsObjInit.append("    objMngr->registerObject( new " + name + "() );\n");
         }
     }
 

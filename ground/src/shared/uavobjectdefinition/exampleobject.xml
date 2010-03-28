@@ -1,5 +1,5 @@
 <xml>
-	<object name="ExampleObject" singleinstance="false" type="data">
+	<object name="ExampleObject" singleinstance="false" settings="false">
 		<field name="field1" units="unit1" type="int8" elements="1"/>
 		<field name="field2" units="unit2" type="int16" elements="1"/>
 		<field name="field3" units="unit3" type="float" elements="4"/>

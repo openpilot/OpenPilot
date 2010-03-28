@@ -55,17 +55,6 @@ namespace jafar {
 			categoryName("OBSERVATION");
 		}
 
-		/*
-		 * Associate to sensor and landmark.
-		 * This sets several parameters such as identifiers and pointers to sensor and landmark ancestors.
-		 * \param sen the sensor
-		 * \param lmk the landmark
-		 */
-		inline void ObservationAbstract::associate(sensor_ptr_t senPtr, landmark_ptr_t lmkPtr) {
-			sensor = senPtr;
-			landmark = lmkPtr;
-		}
-
 		void ObservationAbstract::linkToSensor(sensor_ptr_t _sensorPtr){
 			sensor = _sensorPtr;
 		}

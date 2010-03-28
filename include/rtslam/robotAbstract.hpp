@@ -212,38 +212,35 @@ namespace jafar {
 				/**
 				 * Acquire control structure
 				 */
-				virtual void set_control(const Control & _control) {
+				void set_control(const Control & _control) {
 					control = _control;
 				}
 
-			protected:
-				/**
-				 * Move one step ahead.
-				 *
-				 * This function predicts the robot state one step of length \a dt ahead in time,
-				 * according to the control input \a control.x and the time interval \a control.dt.
-				 * It updates the state and computes the convenient Jacobian matrices.
-				 */
-				virtual void move_func() = 0;
-
-				void move_func(const Control & _control) {
-					set_control(_control);
-					move_func();
-				}
-
-				template<class V>
-				void move_func(V & _u) {
-					JFR_ASSERT(_u.size() == control.size(), "robotAbstract.hpp: move: wrong control size.");
-					control.x(_u);
-					move_func();
-				}
-
-			public:
 				/**
 				 * Move one step ahead, affect SLAM filter.
 				 * This function updates the full state and covariances matrix of the robot plus the cross-variances with all other map objects.
 				 */
-				void move();
+				virtual void move();
+
+				/**
+				 * Move one step ahead, affect SLAM filter.
+				 * This function updates the full state and covariances matrix of the robot plus the cross-variances with all other map objects.
+				 */
+				inline void move(const Control & _control) {
+					set_control(_control);
+					move();
+				}
+
+				/**
+				 * Move one step ahead, affect SLAM filter.
+				 * This function updates the full state and covariances matrix of the robot plus the cross-variances with all other map objects.
+				 */
+				template<class V>
+				inline void move(V & _u) {
+					JFR_ASSERT(_u.size() == control.size(), "robotAbstract.hpp: move: wrong control size.");
+					control.x(_u);
+					move();
+				}
 
 				/**
 				 * Compute robot process noise \a Q in state space.
@@ -260,6 +257,35 @@ namespace jafar {
 				 * This function iterates all the sensors in the robot and calls the main sensor operations.
 				 */
 				void exploreSensors();
+
+			protected:
+
+				/**
+				 * Move one step ahead.
+				 *
+				 * Implement this function in every derived class.
+				 *
+				 * This function predicts the robot state one step of length \a _dt ahead in time,
+				 * according to the current state _x, the control input \a _u and the time interval \a _dt.
+				 * It computes the new state and the convenient Jacobian matrices.
+				 *
+				 * \param _x the current state vector
+				 * \param _u the control vector
+				 * \param _dt the time interval
+				 * \param _xnew the new state
+				 * \param _XNEW_x the Jacobian of \a _xnew wrt \a _x
+				 * \param _XNEW_u the Jacobian of \a _xnew wrt \a _u
+				 */
+				virtual void move_func(const vec & _x, const vec & _u, const double _dt, vec & _xnew, mat & _XNEW_x, mat & _XNEW_u) = 0;
+
+				/**
+				 * Move one step ahead, use object members as data.
+				 */
+				inline void move_func() {
+					vec x = state.x();
+					vec u = control.x();
+					move_func(x, u, control.dt, x, XNEW_x, XNEW_control);
+				}
 
 		};
 

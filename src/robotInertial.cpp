@@ -80,9 +80,9 @@ namespace jafar {
 
 
 			// Separate things out to make it clearer
-			vec3 pold, vold, abold, wbold, gold;
-			vec4 qold;
-			splitState(pold, qold, vold, abold, wbold, gold); // split state vector
+			vec3 p, v, ab, wb, g;
+			vec4 q;
+			splitState(p, q, v, ab, wb, g); // split state vector
 			//			JFR_DEBUG("RobotInertial::move_func(): 1.")
 
 			// Split control vector into sensed acceleration and sensed angular rate
@@ -93,7 +93,7 @@ namespace jafar {
 
 
 			// It is useful to start obtaining a nice rotation matrix and the product R*dt
-			Rold = q2R(qold);
+			Rold = q2R(q);
 			Rdt = Rold * dt;
 			//			JFR_DEBUG("RobotInertial::move_func(): 3.")
 
@@ -102,8 +102,8 @@ namespace jafar {
 			// a = R(q)(asens - ab) + g     true acceleration
 			// w = wsens - wb               true angular rate
 			vec3 atrue, wtrue;
-			atrue = prod(Rold, (am - abold)) + gold;
-			wtrue = wm - wbold;
+			atrue = prod(Rold, (am - ab)) + g;
+			wtrue = wm - wb;
 			//			JFR_DEBUG("RobotInertial::move_func(): 4.")
 
 
@@ -111,15 +111,15 @@ namespace jafar {
 			vec3 pnew, vnew, abnew, wbnew, gnew;
 			vec4 qnew;
 
-			pnew = pold + vold * dt; //     position
+			pnew = p + v * dt; //     position
 			// qnew = q x q(w * dt)
 			// Keep qwt ( = q(w * dt)) for later use
 			vec4 qwdt = v2q(wtrue * dt);
-			qnew = qProd(qold, qwdt); //    orientation
-			vnew = vold + atrue * dt; //    velocity
-			abnew = abold + ar; //          acc bias
-			wbnew = wbold + wr; //          gyro bias
-			gnew = gold; //                 gravity does not change
+			qnew = qProd(q, qwdt); //    orientation
+			vnew = v + atrue * dt; //    velocity
+			abnew = ab + ar; //          acc bias
+			wbnew = wb + wr; //          gyro bias
+			gnew = g; //                 gravity does not change
 			//			JFR_DEBUG("RobotInertial::move_func(): 5.")
 
 
@@ -163,7 +163,7 @@ namespace jafar {
 			// QNEW_wb = QNEW_qwdt * QWDT_wdt * WDT_w * W_wb
 			//         = QNEW_qwdt * QWDT_w * W_wb
 			//         = QNEW_qwdt * QWDT_w * (-1)
-			qProd_by_dq2(qold, QNEW_qwdt);
+			qProd_by_dq2(q, QNEW_qwdt);
 			// Here we get the derivative of qwdt wrt wtrue, so we consider dt = 1 and call for the derivative of v2q() with v = w*dt
 			v2q_by_dv(wtrue, QWDT_w);
 			QNEW_w = prod<mat> (QNEW_qwdt, QWDT_w);
@@ -173,7 +173,7 @@ namespace jafar {
 
 			// Fill VNEW_q
 			// VNEW_q = d(R(q)*v) / dq
-			rotate_by_dq(qold, vold, VNEW_q);
+			rotate_by_dq(q, v, VNEW_q);
 			subrange(XNEW_x, 7, 10, 3, 7) = VNEW_q;
 			//			JFR_DEBUG("RobotInertial::move_func(): 11.")
 

@@ -157,13 +157,13 @@ namespace jafar {
 
 			private:
 				// Temporary members to accelerate Jacobian computation
-				mat33 Idt;
-				mat33 Rold, Rdt;
-				mat44 QNEW_q;
-				mat44 QNEW_qwdt;
-				mat43 QWDT_w;
-				mat43 QNEW_w;
-				mat34 VNEW_q;
+				mat33 Idt; ///<       Temporary I*dt matrix
+				mat33 Rold, Rdt; ///< Temporary rotation matrices
+				mat44 QNEW_q; ///<    Temporary Jacobian matrix
+				mat44 QNEW_qwdt; ///< Temporary Jacobian matrix
+				mat43 QWDT_w; ///<    Temporary Jacobian matrix
+				mat43 QNEW_w; ///<    Temporary Jacobian matrix
+				mat34 VNEW_q; ///<    Temporary Jacobian matrix
 
 		};
 

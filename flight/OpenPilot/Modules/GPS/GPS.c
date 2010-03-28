@@ -392,23 +392,22 @@ void nmeaProcessGPGGA(char* packet)
 
 	// get UTC time [hhmmss.sss]
 	tokens = strtok_r(NULL, delimiter, &last);
-	strcpy(GpsInfo.PosLLA.TimeOfFix.c,tokens);
+	strcpy(GpsInfo.TimeOfFix,tokens);
 
 	// next field: latitude
     // get latitude [ddmm.mmmmm]
 	tokens = strtok_r(NULL, delimiter, &last);
-	//strcpy(GpsInfo.PosLLA.lat.c,token);
 	if(1) // 5 desimal output
 	{
 		deg=strtol (tokens,&pEnd,10);
 		desim=strtol (pEnd+1,NULL,10);
-		GpsInfo.PosLLA.lat.i=deg*100000+desim;
+		GpsInfo.lat=deg*100000+desim;
 	}
 	else // 4 desimal output
 	{
 		deg=strtol (tokens,&pEnd,10);
 		desim=strtol (pEnd+1,NULL,10);
-		GpsInfo.PosLLA.lat.i=deg*10000+desim;
+		GpsInfo.lat=deg*10000+desim;
 	}
 	// convert to pure degrees [dd.dddd] format
     /*	minutesfrac = modf(GpsInfo.PosLLA.lat.f/100, &degrees);
@@ -424,18 +423,17 @@ void nmeaProcessGPGGA(char* packet)
 	// next field: longitude
 	// get longitude [ddmm.mmmmm]
 	tokens = strtok_r(NULL, delimiter, &last);
-	//strcpy(GpsInfo.PosLLA.lon.c,token);
 	if(1) // 5 desimal output
 	{
 		deg=strtol (tokens,&pEnd,10);
 		desim=strtol (pEnd+1,NULL,10);
-		GpsInfo.PosLLA.lon.i=deg*100000+desim;
+		GpsInfo.lon=deg*100000+desim;
 	}
 	else // 4 desimal output
 	{
 		deg=strtol (tokens,&pEnd,10);
 		desim=strtol (pEnd+1,NULL,10);
-		GpsInfo.PosLLA.lon.i=deg*10000+desim;
+		GpsInfo.lon=deg*10000+desim;
 	}
 
 	// convert to pure degrees [dd.dddd] format
@@ -468,11 +466,10 @@ void nmeaProcessGPGGA(char* packet)
 	// next field: altitude
 	// get altitude (in meters mm.m)
 	tokens = strtok_r(NULL, delimiter, &last);
-	//strcpy(GpsInfo.PosLLA.alt.c,tokens);
 	//reuse variables for alt
 	deg=strtol (tokens,&pEnd,10);
 	desim=strtol (pEnd+1,NULL,10);
-	GpsInfo.PosLLA.alt.i=deg*10+desim;
+	GpsInfo.alt=deg*10+desim;
 
 	// next field: altitude units, always 'M'
 	// next field: geoid seperation
@@ -522,7 +519,7 @@ void nmeaProcessGPVTG(char* packet)
 
 	// get course (true north ref) in degrees [ddd.dd]
 	tokens = strtok_r(NULL, delimiter, &last);
-    strcpy(GpsInfo.VelHS.heading.c,tokens);
+    strcpy(GpsInfo.heading,tokens);
     // next field: 'T'
 	tokens = strtok_r(NULL, delimiter, &last);
 
@@ -543,10 +540,10 @@ void nmeaProcessGPVTG(char* packet)
 	// next field: speed (km/h)
 	// get speed in km/h
 	tokens = strtok_r(NULL, delimiter, &last);
-	strcpy(GpsInfo.VelHS.speed.c,tokens);
+	strcpy(GpsInfo.speed,tokens);
 	// next field: 'K'
 	// next field: checksum
 
-	GpsInfo.VelHS.updates++;
+	GpsInfo.updates++;
 }
 

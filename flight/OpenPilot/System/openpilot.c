@@ -137,10 +137,10 @@ static void TaskTick(void *pvParameters)
 
 	for(;;)
 	{
-		/*PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"utc: %s alt:%u\r\n",GpsInfo.PosLLA.TimeOfFix.c,GpsInfo.PosLLA.alt.i);
-		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"lat: %u lon:%u\r\n",GpsInfo.PosLLA.lat.i,GpsInfo.PosLLA.lon.i);
+		/*PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"utc: %s alt:%u\r\n",GpsInfo.TimeOfFix,GpsInfo.alt);
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"lat: %u lon:%u\r\n",GpsInfo.lat,GpsInfo.lon);
 		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"SV: %u\r\n",GpsInfo.numSVs);
-		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"Heading: %s Speed: %s\r\n",GpsInfo.VelHS.heading.c,GpsInfo.VelHS.speed.c);
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"Heading: %s Speed: %s\r\n",GpsInfo.heading,GpsInfo.speed);
 		*/
 		PIOS_LED_Toggle(LED1);
 		vTaskDelayUntil(&xLastExecutionTime, 1000 / portTICK_RATE_MS);

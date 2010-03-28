@@ -30,89 +30,20 @@
 #define GPSINFO_H
 
 // constants/macros/typdefs
-typedef union union_float_u32
-{
-	unsigned long i;
-	unsigned char b[4];
-	char c[12];
-} float_u32;
-
-typedef union union_double_u64
-{
-	double f;
-	unsigned long long i;
-	unsigned char b[8];
-} double_u64;
-
-struct PositionLLA
-{
-	float_u32 lat;
-	float_u32 lon;
-	float_u32 alt;
-	float_u32 TimeOfFix;
-	uint16_t updates;
-};
-
-struct VelocityENU
-{
-	float_u32 east;
-	float_u32 north;
-	float_u32 up;
-	float_u32 TimeOfFix;
-	uint16_t updates;
-};
-
-struct VelocityHS
-{
-	float_u32 heading;
-	float_u32 speed;
-	float_u32 TimeOfFix;
-	uint16_t updates;
-};
-
-struct PositionECEF
-{
-	float_u32 x;
-	float_u32 y;
-	float_u32 z;
-	float_u32 TimeOfFix;
-	uint16_t updates;
-};
-
-struct VelocityECEF
-{
-	float_u32 x;
-	float_u32 y;
-	float_u32 z;
-	float_u32 TimeOfFix;
-	uint16_t updates;
-};
-
-struct UTCtime
-{
-	uint16_t year;
-	uint8_t month;
-	uint8_t day;
-	uint8_t hour;
-	uint8_t min;
-	uint8_t sec;
-	uint8_t offset;
-};
-
 typedef struct struct_GpsInfo
 {
-	float_u32 TimeOfWeek;
-	uint16_t WeekNum;
-	float_u32 UtcOffset;
 	uint8_t numSVs;
 
+	signed long lat;
+	signed long lon;
+	signed int alt;
+	char TimeOfFix[12];
 
-	struct PositionLLA PosLLA;
-	struct PositionECEF PosECEF;
-	struct VelocityECEF VelECEF;
-	struct VelocityENU VelENU;
-	struct VelocityHS VelHS;
-	struct UTCtime UTC;
+	// make these to values
+	char heading[12];
+	char speed[12];
+	uint16_t updates;
+
 
 } GpsInfoType;
 

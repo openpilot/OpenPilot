@@ -89,7 +89,8 @@ typedef struct {
 typedef void (*UAVObjEventCallback)(UAVObjEvent* ev);
 
 int32_t UAVObjInitialize();
-UAVObjHandle UAVObjRegister(uint32_t id, const char* name, int32_t isMetaobject, int32_t isSingleInstance, uint32_t numBytes);
+UAVObjHandle UAVObjRegister(uint32_t id, const char* name, int32_t isMetaobject, int32_t isSingleInstance,
+		int32_t isSettings, uint32_t numBytes);
 UAVObjHandle UAVObjGetByID(uint32_t id);
 UAVObjHandle UAVObjGetByName(char* name);
 uint32_t UAVObjGetID(UAVObjHandle obj);
@@ -100,9 +101,14 @@ UAVObjHandle UAVObjGetLinkedObj(UAVObjHandle obj);
 int32_t UAVObjCreateInstance(UAVObjHandle obj);
 int32_t UAVObjIsSingleInstance(UAVObjHandle obj);
 int32_t UAVObjIsMetaobject(UAVObjHandle obj);
+int32_t UAVObjIsSettings(UAVObjHandle obj);
 int32_t UAVObjInitData(UAVObjHandle obj, const char* init);
 int32_t UAVObjUnpack(UAVObjHandle obj, uint16_t instId, const uint8_t* dataIn);
 int32_t UAVObjPack(UAVObjHandle obj, uint16_t instId, uint8_t* dataOut);
+int32_t UAVObjSave(UAVObjHandle obj, uint16_t instId);
+int32_t UAVObjLoad(UAVObjHandle obj, uint16_t instId);
+int32_t UAVObjSaveToFile(UAVObjHandle obj, uint16_t instId, FILEINFO* file);
+UAVObjHandle UAVObjLoadFromFile(FILEINFO* file);
 int32_t UAVObjSetData(UAVObjHandle obj, const void* dataIn);
 int32_t UAVObjGetData(UAVObjHandle obj, void* dataOut);
 int32_t UAVObjSetInstanceData(UAVObjHandle obj, uint16_t instId, const void* dataIn);

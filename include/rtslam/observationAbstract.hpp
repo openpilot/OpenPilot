@@ -64,11 +64,6 @@ namespace jafar {
 		typedef boost::shared_ptr<AppearanceAbstract> appearance_ptr_t;
 
 
-
-
-
-
-
 		/**
 		 * Base class for all observations defined in the module rtslam.
 		 * \author jsola
@@ -94,25 +89,11 @@ namespace jafar {
 				 */
 				ObservationAbstract(size_t _size_meas, size_t _size_exp, size_t _size_inn);
 
-				//				/**
-				//				 * Sensor and landmark constructor
-				//				 */
-				//				ObservationAbstract(SensorAbstract & _sen, LandmarkAbstract & _lmk);
-
-				/**
-				 *  Mother Sensor where it was acquired from
-				 */
-				sensor_ptr_t sensor;
-
-				/**
-				 * Father Landmark where it points to
-				 */
-				landmark_ptr_t landmark;
+				sensor_ptr_t sensor; ///<			   Mother Sensor where it was acquired from
+				landmark_ptr_t landmark; ///< 	 Father Landmark where it points to
 
 				Expectation expectation;
-
 				Measurement measurement;
-
 				Innovation innovation;
 
 				/**
@@ -134,21 +115,30 @@ namespace jafar {
 						bool updated; ///< Landmark is updated
 				} events;
 
-				/**
-				 * Associate to sensor and landmark.
-				 * This sets several parameters such as identifiers and pointers to sensor and landmark ancestors.
-				 * \param sen the sensor
-				 * \param lmk the landmark
-				 */
-				inline void associate(sensor_ptr_t senPtr, landmark_ptr_t lmkPtr);
-
 				void linkToSensor(sensor_ptr_t _sensorPtr); ///<  Link to sensor
 				void linkToLandmark(landmark_ptr_t _lmkPtr); ///< Link to landmark
 
 				/**
-				 * Project and get Jacobians
+				 * Project and get Jacobians.
+				 *
+				 * All variables are part of the class, or are accessible by the class.
+				 *
+				 * This projects the landmark into the sensor space, and gives the Jacobians of this projection
+				 * wrt the states that contributed to the projection (those of the robot, eventually the sensor, and the landmark).
+				 * These states are also available through the indirect_array \a ia_exp_x, updated by this function.
 				 */
-				//				virtual void project() = 0;
+				virtual void project_func();
+
+				/**
+				 * Project and get expectation covariances
+				 */
+				void project() {
+					project_func();
+					expectation.P() = ublasExtra::prod_JPJt(
+							ublas::project(landmark->slamMap->filter.P(), expectation.ia_exp_x, expectation.ia_exp_x),
+							expectation.EXP_x);
+				}
+
 
 				/**
 				 * Is visible
@@ -159,19 +149,9 @@ namespace jafar {
 				}
 
 
-				/**
-				 * match
-				 */
-				//				virtual void match();
-
-				/**
-				 * Individual consistency check
-				 */
-				//				virtual void isIndividuallyConsistent();
-
-				/**
-				 * Back-project
-				 */
+				//				/**
+				//				 * Back-project
+				//				 */
 				//				virtual void back_project() = 0;
 
 		};

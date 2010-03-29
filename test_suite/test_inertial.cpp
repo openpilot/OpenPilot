@@ -52,9 +52,8 @@ void test_inertial01() {
 	vec u(6);
 	randVector(u);
 	u *= 0.1;
-	Gaussian n(scalar_vector<double>(12, 0.1), sym_mat(scalar_diag_mat(12, 1.0)));
-	Perturbation pert(n);
-	cout << n << endl;
+//	Gaussian n(scalar_vector<double>(12, 0.1), sym_mat(scalar_diag_mat(12, 1.0)));
+	Perturbation pert(scalar_vector<double>(12, 0.1), sym_mat(scalar_diag_mat(12, 1.0)));
 
 	robPtr->dt = 0.5;
 	robPtr->control = u;
@@ -62,7 +61,7 @@ void test_inertial01() {
 	cout << robPtr->state.x() << endl;
 
 	cout << "P(:,1) = " << (MATLAB) robPtr->state.x() << endl;
-	for (size_t t = 2; t <= 15; t++){
+	for (size_t t = 2; t <= 12; t++){
 	robPtr->move();
 	cout << "P(:," << t << ") = " << (MATLAB) robPtr->state.x() << endl;
 	}

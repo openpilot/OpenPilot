@@ -89,6 +89,10 @@ namespace jafar {
 				}
 
 				static size_t size_control() {
+					return 6;
+				}
+
+				static size_t size_perturbation() {
 					return 12;
 				}
 

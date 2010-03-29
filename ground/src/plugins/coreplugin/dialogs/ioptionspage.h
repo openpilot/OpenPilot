@@ -46,10 +46,13 @@ public:
     IOptionsPage(QObject *parent = 0) : QObject(parent) {}
     virtual ~IOptionsPage() {}
 
-    virtual QString id() const = 0;
-    virtual QString trName() const = 0;
-    virtual QString category() const = 0;
-    virtual QString trCategory() const = 0;
+    /*  gadget options pages can leave these 4 functions as is,
+        since they are decorated by UAVGadgetOptionsPageDecorator,
+        all other options pages must override these */
+    virtual QString id() const { return ""; };
+    virtual QString trName() const { return ""; };
+    virtual QString category() const { return "DefaultCategory"; };
+    virtual QString trCategory() const { return "DefaultCategory"; };
 
     virtual QWidget *createPage(QWidget *parent) = 0;
     virtual void apply() = 0;

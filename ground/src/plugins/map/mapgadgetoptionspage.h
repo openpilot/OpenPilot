@@ -44,10 +44,6 @@ class MapGadgetOptionsPage : public IOptionsPage
 Q_OBJECT
 public:
     explicit MapGadgetOptionsPage(MapGadgetConfiguration *config, QObject *parent = 0);
-    QString id() const { return ""; }
-    QString trName() const { return ""; }
-    QString category() const { return ""; }
-    QString trCategory() const { return ""; }
 
     QWidget *createPage(QWidget *parent);
     void apply();

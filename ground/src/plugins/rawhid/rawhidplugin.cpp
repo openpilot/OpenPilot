@@ -48,7 +48,7 @@ RawHIDEnumerationThread::~RawHIDEnumerationThread()
     m_running = false;
     //wait for the thread to terminate
     if(wait(1000) == false)
-        qDebug() << "Cannot terminate rawhid thread";
+        qDebug() << "Cannot terminate RawHIDEnumerationThread";
 }
 
 void RawHIDEnumerationThread::run()
@@ -67,7 +67,7 @@ void RawHIDEnumerationThread::run()
             }
         }
 
-        msleep(500); //update available devices twice per second
+        msleep(500); //update available devices twice per second (doesn't need more)
     }
 }
 
@@ -135,6 +135,43 @@ QString RawHIDConnection::shortName()
 
 
 
+//usb hid test thread
+//temporary...
+RawHIDTestThread::RawHIDTestThread()
+{
+    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
+    QObject::connect(cm, SIGNAL(deviceConnected(QIODevice *)),
+                     this, SLOT(onDeviceConnect(QIODevice *)));
+    QObject::connect(cm, SIGNAL(deviceDisconnected()),
+                     this, SLOT(onDeviceDisconnect()));
+}
+
+void RawHIDTestThread::onDeviceConnect(QIODevice *dev)
+{
+    this->dev = dev;
+    dev->open(QIODevice::ReadWrite);
+    QObject::connect(dev, SIGNAL(readyRead()),
+                     this, SLOT(onReadyRead()));
+
+    QObject::connect(dev, SIGNAL(bytesWritten(qint64)),
+                     this, SLOT(onBytesWritten(qint64)));
+    dev->write("Hello raw hid device\n");
+}
+
+void RawHIDTestThread::onDeviceDisconnect()
+{
+    dev->close();
+}
+
+void RawHIDTestThread::onReadyRead()
+{
+    qDebug() << "Rx:" << dev->readLine(32);
+}
+
+void RawHIDTestThread::onBytesWritten(qint64 sz)
+{
+    qDebug() << "Sent " << sz << " bytes";
+}
 
 RawHIDPlugin::RawHIDPlugin()
 {
@@ -148,6 +185,9 @@ RawHIDPlugin::~RawHIDPlugin()
 void RawHIDPlugin::extensionsInitialized()
 {
     addAutoReleasedObject(new RawHIDConnection);
+
+    //temp for test
+    //addAutoReleasedObject(new RawHIDTestThread);
 }
 
 bool RawHIDPlugin::initialize(const QStringList & arguments, QString * errorString)

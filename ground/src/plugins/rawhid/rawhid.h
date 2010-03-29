@@ -29,9 +29,17 @@
 #define RAWHID_H
 
 #include "rawhid_global.h"
+
+#include <QThread>
 #include <QIODevice>
+#include <QMutex>
+#include <QByteArray>
 
 #include "pjrc_rawhid.h"
+
+//helper classes
+class RawHIDReadThread;
+class RawHIDWriteThread;
 
 /**
 *   The actual IO device that will be used to communicate
@@ -39,6 +47,9 @@
 */
 class RAWHID_EXPORT RawHID : public QIODevice
 {
+    friend class RawHIDReadThread;
+    friend class RawHIDWriteThread;
+
 public:
     RawHID();
     RawHID(const QString &deviceName);
@@ -51,10 +62,16 @@ public:
 protected:
     virtual qint64 readData(char *data, qint64 maxSize);
     virtual qint64 writeData(const char *data, qint64 maxSize);
+    virtual qint64 bytesAvailable() const;
+    virtual qint64 bytesToWrite() const;
 
     QString serialNumber;
+
     int m_deviceNo;
     pjrc_rawhid dev;
+
+    RawHIDReadThread *m_readThread;
+    RawHIDWriteThread *m_writeThread;
 };
 
 #endif // RAWHID_H

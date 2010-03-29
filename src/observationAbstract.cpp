@@ -32,9 +32,9 @@ namespace jafar {
 		std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObservationAbstract & obs) {
 			s << "OBSERVATION " << obs.id() << ": of " << obs.landmark->type() << " from " << obs.sensor->type() << endl;
 			s << "Sensor: " << obs.sensor->id() << ", landmark: " << obs.landmark->id() << endl;
-			s << ".expectation:  " << obs.expectation << endl;
-			s << ".measurement:  " << obs.measurement << endl;
-			s << ".innovation:   " << obs.innovation;
+			s << " .expectation:  " << obs.expectation << endl;
+			s << " .measurement:  " << obs.measurement << endl;
+			s << " .innovation:   " << obs.innovation;
 			return s;
 		}
 
@@ -42,7 +42,7 @@ namespace jafar {
 		/*
 		 * Size constructor
 		 */
-		ObservationAbstract::ObservationAbstract(size_t _size) :
+		ObservationAbstract::ObservationAbstract(const size_t _size) :
 			expectation(_size), measurement(_size), innovation(_size) {
 			categoryName("OBSERVATION");
 		}
@@ -50,7 +50,7 @@ namespace jafar {
 		/*
 		 * Sizes constructor
 		 */
-		ObservationAbstract::ObservationAbstract(size_t _size_meas, size_t _size_exp, size_t _size_inn) :
+		ObservationAbstract::ObservationAbstract(const size_t _size_meas, const size_t _size_exp, const size_t _size_inn) :
 			expectation(_size_exp), measurement(_size_meas), innovation(_size_inn) {
 			categoryName("OBSERVATION");
 		}

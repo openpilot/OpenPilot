@@ -182,6 +182,7 @@ namespace jafar {
 			jblas::ind_array ia_pushfront(jblas::vecb & vb, const size_t N) {
 				JFR_PRECOND( (vb.size() >= N), "Boolean vector smaller than requested elements.");
 				jblas::ind_array res(N);
+				if (N==0) return res;
 				size_t j = 0;
 				for (size_t i = 0; i < vb.size(); i++) {
 					if (!vb(i)) {

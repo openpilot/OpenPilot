@@ -100,6 +100,14 @@ namespace jblas {
   typedef boost::numeric::ublas::bounded_matrix<double,3,3> mat33;
   typedef boost::numeric::ublas::matrix_range<mat33> mat33_range;
   
+  /// 3x4 dimension matrix
+  typedef boost::numeric::ublas::bounded_matrix<double,3,4> mat34;
+  typedef boost::numeric::ublas::matrix_range<mat34> mat34_range;
+
+  /// 4x3 dimension matrix
+  typedef boost::numeric::ublas::bounded_matrix<double,4,3> mat43;
+  typedef boost::numeric::ublas::matrix_range<mat43> mat43_range;
+
   /// 4x4 dimension matrix
   typedef boost::numeric::ublas::bounded_matrix<double,4,4> mat44;
   typedef boost::numeric::ublas::matrix_range<mat44> mat44_range;

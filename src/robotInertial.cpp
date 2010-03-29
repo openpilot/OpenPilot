@@ -30,8 +30,7 @@ namespace jafar {
 		 * \param _map the remote map
 		 */
 		RobotInertial::RobotInertial(MapAbstract & _map) :
-			RobotAbstract(_map, RobotInertial::size(), RobotInertial::size_control()) {
-			// Build constant perturbation Jacobian
+			RobotAbstract(_map, RobotInertial::size(), RobotInertial::size_control(), RobotInertial::size_perturbation()) {
 			constantPerturbation = false;
 			type("Inertial");
 		}
@@ -40,7 +39,14 @@ namespace jafar {
 		/*
 		 * This motion model is driven by IMU measurements and random perturbations, and defined by:
 		 * The state vector, x = [p q v ab wb g] , of size 19.
-		 * The transition equation x+ = move(x,u), with u = [am, wm, ar, wr] the control impulse, decomposed as:
+		 *
+		 * The transition equation is
+		 * - x+ = move(x,u,n),
+		 *
+		 * with u = [am, wm] the IMU measurements (the control input)
+		 *  and n = [an, wn, ar, wr] the perturbation impulse.
+		 *
+		 * the transition equation f() is decomposed as:
 		 * - p+  = p + v*dt
 		 * - v+  = v + R(q)*(am - ab) + g     <-- am and wm: IMU measurements
 		 * - q+  = q**((wm - wb)*dt)          <-- ** : quaternion product
@@ -61,7 +67,7 @@ namespace jafar {
 		 *   g   16 |  0       0       0       0       0       I
 		 * -----------------------------------------------------------------------------
 		 *
-		 * The Jacobian XNEW_control is built with
+		 * The Jacobian XNEW_pert is built with
 		 *   var    |  an    wn    ar    wr
 		 *      pos |  0     3     6     9
 		 *   -------+----------------------
@@ -73,8 +79,8 @@ namespace jafar {
 		 *   g   16 |  0     0     0     0
 		 * -----------------------------------------------------------------------------
 		 */
-		void RobotInertial::move_func(const vec & x, const vec & u, const double dt, vec & xnew, mat & _XNEW_x,
-		    mat & _XNEW_control) {
+		void RobotInertial::move_func(const vec & x, const vec & u, const vec & n, const double dt, vec & xnew, mat & _XNEW_x,
+		    mat & _XNEW_pert) {
 
 
 			// Separate things out to make it clearer
@@ -82,9 +88,12 @@ namespace jafar {
 			vec4 q;
 			splitState(x, p, q, v, ab, wb, g); // split state vector
 
-			// Split control vector into sensed acceleration and sensed angular rate
-			vec3 am, wm, ar, wr; // measurements and random walks
-			splitControl(u, am, wm, ar, wr);
+			// Split control and perturbation vectors into
+			// sensed acceleration and sensed angular rate
+			// and noises
+			vec3 am, wm, an, wn, ar, wr; // measurements and random walks
+			splitControl(u, am, wm);
+			splitPert(n, an, wn, ar, wr);
 
 
 			// It is useful to start obtaining a nice rotation matrix and the product R*dt
@@ -96,8 +105,8 @@ namespace jafar {
 			// a = R(q)(asens - ab) + g     true acceleration
 			// w = wsens - wb               true angular rate
 			vec3 atrue, wtrue;
-			atrue = prod(Rold, (am - ab)) + g;
-			wtrue = wm - wb;
+			atrue = prod(Rold, (am - ab + an)) + g;
+			wtrue = wm - wb + wn;
 
 
 			// Get new state vector
@@ -168,9 +177,9 @@ namespace jafar {
 			subrange(_XNEW_x, 7, 10, 10, 13) = -Rdt;
 
 
-			// Now on to the control Jacobian XNEW_control
+			// Now on to the perturbation Jacobian XNEW_pert
 
-			// Form of Jacobian XNEW_control
+			// Form of Jacobian XNEW_pert
 			// It is like this:
 			// var    |  an    wn    ar    wr
 			//    pos |  0     3     6     9
@@ -183,10 +192,10 @@ namespace jafar {
 			// g   16 |  0     0     0     0
 
 			// Fill in the easy bits first
-			_XNEW_control.clear();
-			ublas::subrange(_XNEW_control, 7, 10, 0, 3) = I;
-			ublas::subrange(_XNEW_control, 10, 13, 6, 9) = I;
-			ublas::subrange(_XNEW_control, 13, 16, 9, 12) = I;
+			_XNEW_pert.clear();
+			ublas::subrange(_XNEW_pert, 7, 10, 0, 3) = I;
+			ublas::subrange(_XNEW_pert, 10, 13, 6, 9) = I;
+			ublas::subrange(_XNEW_pert, 13, 16, 9, 12) = I;
 
 
 			// Tricky bit is QNEW_w = d(qnew)/d(wi)
@@ -199,12 +208,12 @@ namespace jafar {
 			//                  = QNEW_w * W_wdt
 			//                  = QNEW_w / dt,
 			//    with: QNEW_w computed before.
-			// The time dependence needs to be included in control.P(), proportional to control.dt:
-			//   U = control.P() = U_continuous_time * dt
+			// The time dependence needs to be included in perturbation.P(), proportional to perturbation.dt:
+			//   U = perturbation.P() = U_continuous_time * dt
 			//	with: U_continuous_time expressed in ( rad / s / sqrt(s) )^2 = rad^2 / s^3 <-- yeah, it is confusing, but true.
-			//   (Use control.convert_P_from_continuous() helper if necessary.)
+			//   (Use perturbation.set_P_from_continuous() helper if necessary.)
 			//
-			subrange(_XNEW_control, 3, 7, 3, 6) = QNEW_w * (1 / dt);
+			subrange(_XNEW_pert, 3, 7, 3, 6) = QNEW_w * (1 / dt);
 
 		}
 

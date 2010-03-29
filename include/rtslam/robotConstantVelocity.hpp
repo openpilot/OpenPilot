@@ -66,10 +66,17 @@ namespace jafar {
 				 *
 				 * This function predicts the robot state one step of length \a dt ahead in time,
 				 * according to the control input \a control.x and the time interval \a control.dt.
+				 *
+				 * \param _x the current state vecto
+				 * \param _p the perturbation vector
+				 * \param _dt the sampling time
+				 * \param _xnew the new state vector
+				 * \param _XNEW_x the Jacobian of xnew wrt x
+				 * \param _XNEW_pert the Jacobian of xnew wrt p
 				 */
-				void move_func(const vec & _x, const vec & _u, const double _dt, vec & _xnew, mat & _XNEW_x, mat & _XNEW_u);
+				void move_func(const vec & _x, const vec & _u, const vec & _n, const double _dt, vec & _xnew, mat & _XNEW_x, mat & _XNEW_pert);
 
-				void computeControlJacobian();
+				void computePertJacobian();
 
 
 				static size_t size() {
@@ -77,6 +84,10 @@ namespace jafar {
 				}
 
 				static size_t size_control() {
+					return 0;
+				}
+
+				static size_t size_perturbation() {
 					return 6;
 				}
 

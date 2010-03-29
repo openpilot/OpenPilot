@@ -32,14 +32,14 @@ namespace jafar {
 		 * \param _map the remote map
 		 */
 		RobotConstantVelocity::RobotConstantVelocity(MapAbstract & _map) :
-			RobotAbstract(_map, RobotConstantVelocity::size(), RobotConstantVelocity::size_control()) {
+			RobotAbstract(_map, RobotConstantVelocity::size(), RobotConstantVelocity::size_control(), RobotConstantVelocity::size_perturbation()) {
 			// Build constant perturbation Jacobian
 			constantPerturbation = true;
-			computeControlJacobian();
+			computePertJacobian();
 			type("Constant-Velocity");
 		}
 
-		void RobotConstantVelocity::move_func(const vec & _x, const vec & _u, const double _dt, vec & _xnew, mat & _XNEW_x, mat & _XNEW_u) {
+		void RobotConstantVelocity::move_func(const vec & _x, const vec & _u, const vec & _n, const double _dt, vec & _xnew, mat & _XNEW_x, mat & _XNEW_u) {
 
 			using namespace jblas;
 			using namespace ublas;
@@ -65,18 +65,18 @@ namespace jafar {
 			 *       		[                      I_3  ] | 10 w
 			 * -----------------------------------------------------------------------------
 			 *
-			 * The Jacobian XNEW_control is built with
-			 *          				 vi     wi   |
-			 *                   0      3    |
-			 *       				-----------------+------
-			 * XNEW_control = [            ] | 0  p
-			 * 								[            ] | 3  q
-			 * 								[ I_3        ] | 7  v
-			 * 								[        I_3 ] | 10 w
+			 * The Jacobian XNEW_pert is built with
+			 *          			 vi     wi   |
+			 *                 0      3    |
+			 *       			-----------------+------
+			 * XNEW_pert = 	[            ] | 0  p
+			 * 					   	[            ] | 3  q
+			 * 							[ I_3        ] | 7  v
+			 * 							[        I_3 ] | 10 w
 			 * this Jacobian is however constant and is computed once at Construction time.
 			 *
 			 * NOTE: The also constant perturbation matrix:
-			 *    Q = XNEW_control * control.P * trans(XNEW_control)
+			 *    Q = XNEW_pert * perturbation.P * trans(XNEW_pert)
 			 * could be built also once after construction with computeStatePerturbation().
 			 * This is up to the user -- if nothing is done, Q will be computed at each iteration.
 			 * -----------------------------------------------------------------------------
@@ -86,12 +86,11 @@ namespace jafar {
 			vec3 p, v, w;
 			vec4 q;
 			splitState(_x, p, q, v, w);
-			double dt = control.dt;
 
 
-			// split control vector
+			// split perturbation vector
 			vec3 vi, wi;
-			splitControl(_u, vi, wi);
+			splitControl(_n, vi, wi);
 
 
 			// Non-trivial Jacobian blocks
@@ -101,8 +100,8 @@ namespace jafar {
 			vec4 qnew;
 
 			// predict each part of the state, give or build non-trivial Jacobians
-			pnew = p + v * dt;
-			PNEW_v = I_3 * dt;
+			pnew = p + v * _dt;
+			PNEW_v = I_3 * _dt;
 			vec4 qwdt;
 			quaternion::v2q(w * dt, qwdt, QWDT_wdt);
 			quaternion::qProd(q, qwdt, qnew, QNEW_q, QNEW_qwdt);
@@ -119,37 +118,38 @@ namespace jafar {
 			_XNEW_x.assign(identity_mat(state.size()));
 			project(_XNEW_x, range(0, 3), range(7, 10)) = PNEW_v;
 			project(_XNEW_x, range(3, 7), range(3, 7)) = QNEW_q;
-			project(_XNEW_x, range(3, 7), range(10, 13)) = QNEW_wdt * dt;
+			project(_XNEW_x, range(3, 7), range(10, 13)) = QNEW_wdt * _dt;
 
 
 			/*
-			 * Build control Jacobian matrix XNEW_control.
-			 * NOTE: XNEW_control is constant and it has been build in the constructor.
+			 * We are normally supposed here to build the perturbation Jacobian matrix XNEW_pert.
+			 * NOTE: XNEW_pert is constant and it has been build in the constructor.
 			 *
-			 * The control Jacobian is
-			 *
-			 * var    |  vi  wi
-			 *    pos |  0   3
-			 * -------+--------
-			 *  p  0  |  0   0
-			 *  q  3  |  0   0
-			 *  v  7  |  I   0
-			 *  w  10 |  0   I
-			 *
-			 * NOTE: These lines below just for reference:
-			 *
-			 * XNEW_control.clear();
-			 * project(XNEW_control, range(7,10), range(0,3)) = I_3;
-			 * project(XNEW_control, range(10,13), range(3,6)) = I_3;
+			 * \sa See computePertJacobian() for more info.
 			 */
 
 		}
 
-		void RobotConstantVelocity::computeControlJacobian() {
+		/*
+		 * Build perturbation Jacobian matrix XNEW_pert.
+		 *
+		 * The perturbation Jacobian is
+		 *
+		 * var    |  vi  wi
+		 *    pos |  0   3
+		 * -------+--------
+		 *  p  0  |  0   0
+		 *  q  3  |  0   0
+		 *  v  7  |  I   0
+		 *  w  10 |  0   I
+		 *
+		 * NOTE: These lines below just for reference:
+		 */
+		void RobotConstantVelocity::computePertJacobian() {
 			identity_mat I(3);
-			XNEW_control.clear();
-			subrange(XNEW_control, 7, 10, 0, 3) = I;
-			subrange(XNEW_control, 10, 13, 3, 6) = I;
+			XNEW_pert.clear();
+			subrange(XNEW_pert, 7, 10, 0, 3) = I;
+			subrange(XNEW_pert, 10, 13, 3, 6) = I;
 		}
 
 

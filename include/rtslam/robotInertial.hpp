@@ -82,7 +82,7 @@ namespace jafar {
 				 *
 				 * \sa See the extense comments on move_func() in file robotInertial.cpp for algebraic details.
 				 */
-				void move_func(const vec & _x, const vec & _u, const double _dt, vec & _xnew, mat & _XNEW_x, mat & _XNEW_u);
+				void move_func(const vec & _x, const vec & _u, const vec & _n, const double _dt, vec & _xnew, mat & _XNEW_x, mat & _XNEW_pert);
 
 				static size_t size() {
 					return 19;
@@ -147,11 +147,26 @@ namespace jafar {
 				 * \param wr the gyrometer bias random walk noise
 				 */
 				template<class Vu, class V>
-				inline void splitControl(const Vu & u, V & am, V & wm, V & ar, V & wr) {
+				inline void splitControl(const Vu & u, V & am, V & wm) {
 					am = project(u, ublas::range(0, 3));
 					wm = project(u, ublas::range(3, 6));
-					ar = project(u, ublas::range(6, 9));
-					wr = project(u, ublas::range(9, 12));
+				}
+
+				/**
+				 * Split perturbation vector.
+				 *
+				 * Extracts noisy measurements \a am and \a wm, and perturbationa \a ar and \a wr, from the control vector.
+				 * \param am the acceleration measurements, with noise
+				 * \param wm the gyrometer measurements, with noise
+				 * \param ar the accelerometer bias random walk noise
+				 * \param wr the gyrometer bias random walk noise
+				 */
+				template<class Vn, class V>
+				inline void splitPert(const Vn & n, V & an, V & wn, V & ar, V & wr) {
+					an = project(n, ublas::range(0, 3));
+					wn = project(n, ublas::range(3, 6));
+					ar = project(n, ublas::range(6, 9));
+					wr = project(n, ublas::range(9, 12));
 				}
 
 			private:

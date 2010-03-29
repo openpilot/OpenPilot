@@ -44,6 +44,9 @@ namespace jafar {
 					ObservationAbstract(2) {
 				}
 
+				// TODO implement this
+				void project_func(){
+				}
 
 				/**
 				 * Project a director vector.
@@ -52,7 +55,7 @@ namespace jafar {
 				 * \param v the vector to project, in sensor frame.
 				 * \return the projected pixel.
 				 */
-				vec2 project(const vec4 & k, const vec & d, const vec3 v);
+				vec2 project_func(const vec4 & k, const vec & d, const vec3 v);
 
 				/**
 				 * Project a director vector, return Jacobians.
@@ -62,7 +65,7 @@ namespace jafar {
 				 * \param u the projected pixel.
 				 * \param U_v the Jacobian of \a u wrt \a v.
 				 */
-				void project(const vec4 & k, const vec & d, const vec3 v, vec2 & u, mat & U_v);
+				void project_func(const vec4 & k, const vec & d, const vec3 v, vec2 & u, mat & U_v);
 
 			private:
 				/**

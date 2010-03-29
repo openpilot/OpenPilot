@@ -18,6 +18,7 @@ namespace jafar {
 		using namespace std;
 		using namespace jblas;
 
+
 		// Pin-hole canonical projection
 		vec2 ObservationPinHolePoint::project0(const jblas::vec3 & v) {
 			vec2 up;
@@ -130,12 +131,12 @@ namespace jafar {
 
 		}
 
-		vec2 ObservationPinHolePoint::project(const vec4 & k, const vec & d,
+		vec2 ObservationPinHolePoint::project_func(const vec4 & k, const vec & d,
 		    const vec3 v) {
 			return pixellize(k, distort(d, project0(v)));
 		}
 
-		void ObservationPinHolePoint::project(const vec4 & k, const vec & d,
+		void ObservationPinHolePoint::project_func(const vec4 & k, const vec & d,
 		    const vec3 v, vec2 & u, mat & U_v) {
 
 			vec2 up;

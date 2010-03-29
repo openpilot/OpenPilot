@@ -45,18 +45,20 @@ void test_inertial01() {
 	mapPtr->linkToRobot(robPtr);
 	robPtr->linkToMap(mapPtr);
 
-	mapPtr->fillSeq();
+	mapPtr->fillRndm();
 
 	robPtr->pose.x(quaternion::originFrame());
 
-	Gaussian c(scalar_vector<double>(12, 0.1), sym_mat(scalar_diag_mat(12, 1.0)));
-//	Gaussian c(zero_vector<double> (12), sym_mat(scalar_diag_mat(12, 1.0)));
-	double dt = 0.5;
+	vec u(6);
+	randVector(u);
+	u *= 0.1;
+	Gaussian n(scalar_vector<double>(12, 0.1), sym_mat(scalar_diag_mat(12, 1.0)));
+	Perturbation pert(n);
+	cout << n << endl;
 
-	Control ctrl(c, dt);
-	cout << ctrl << endl;
-
-	robPtr->set_control(ctrl);
+	robPtr->dt = 0.5;
+	robPtr->control = u;
+	robPtr->set_perturbation(pert);
 	cout << robPtr->state.x() << endl;
 
 	cout << "P(:,1) = " << (MATLAB) robPtr->state.x() << endl;

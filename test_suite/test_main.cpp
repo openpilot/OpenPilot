@@ -161,8 +161,8 @@ void motionSetup(robot_ptr_t robPtr, const double x0, const double y0, const dou
 	vec6 std_pert; // Perturbation
 	subrange(std_pert, 0, 3) = scalar_vec(3, sigma_vi);
 	subrange(std_pert, 3, 6) = scalar_vec(3, sigma_wi);
-	robPtr->control.clear();
-	robPtr->control.std(std_pert);
+	robPtr->perturbation.clear();
+	robPtr->perturbation.std(std_pert);
 
 	robPtr->computeStatePerturbation();
 
@@ -186,12 +186,12 @@ void test_main01() {
 
 		motionSetup(robPtr, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1);
 		// set robot control to some easy value
-		robPtr->control.dt = dt;
-		vec6 control;
-		control.clear();
-		control(0) = 0.1; // increase X m/s forward.
-		control(5) = 0.1; // increase X rad/s = 60X deg/s left.
-		robPtr->control.x(control);
+		robPtr->dt = dt;
+		vec6 pert;
+		pert.clear();
+		pert(0) = 0.1; // increase X m/s forward.
+		pert(5) = 0.1; // increase X rad/s = 60X deg/s left.
+		robPtr->perturbation.x(pert);
 	}
 
 	for (double t = 0; t < t_end; t += dt) { // start SLAM time loop

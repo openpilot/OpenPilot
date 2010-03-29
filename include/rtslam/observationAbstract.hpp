@@ -81,13 +81,14 @@ namespace jafar {
 
 				/**
 				 * Size constructor
+				 * \param _size size of measurement space (used for measurement, expectation and innovation).
 				 */
-				ObservationAbstract(size_t _size);
+				ObservationAbstract(const size_t _size);
 
 				/**
 				 * Sizes constructor
 				 */
-				ObservationAbstract(size_t _size_meas, size_t _size_exp, size_t _size_inn);
+				ObservationAbstract(const size_t _size_meas, const size_t _size_exp, const size_t _size_inn);
 
 				sensor_ptr_t sensor; ///<			   Mother Sensor where it was acquired from
 				landmark_ptr_t landmark; ///< 	 Father Landmark where it points to
@@ -127,7 +128,7 @@ namespace jafar {
 				 * wrt the states that contributed to the projection (those of the robot, eventually the sensor, and the landmark).
 				 * These states are also available through the indirect_array \a ia_exp_x, updated by this function.
 				 */
-				virtual void project_func();
+				virtual void project_func(){}
 
 				/**
 				 * Project and get expectation covariances

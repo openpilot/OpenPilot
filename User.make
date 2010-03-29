@@ -14,13 +14,13 @@ REQUIRED_MODULES = kernel jmath
 OPTIONAL_MODULES = 
 
 # external libraries dependencies
-REQUIRED_EXTLIBS = boost_sandbox
+REQUIRED_EXTLIBS = boost_sandbox 
 OPTIONAL_EXTLIBS = 
 
 # LDFLAGS +=
-LIBS += -lkernel -ljmath
+LIBS += -lkernel -ljmath 
 
 # CPPFLAGS += -DJFR_NDEBUG
-CPPFLAGS += $(BOOST_CPPFLAGS) $(BOOST_SANDBOX_CPPFLAGS)
+CPPFLAGS += $(BOOST_CPPFLAGS) $(BOOST_SANDBOX_CPPFLAGS) 
 
 CXXFLAGS += -g -ggdb -Wall

@@ -13,6 +13,7 @@
 
 #include "jmath/indirectArray.hpp"
 #include <boost/shared_ptr.hpp>
+#include "jmath/random.hpp"
 
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/robotAbstract.hpp"
@@ -88,6 +89,27 @@ namespace jafar {
 					cout << "    added obs: " << obsPtr->id() << endl;
 				}
 			}
+		}
+
+
+		void MapAbstract::fillSeq() {
+			for (size_t i = 0; i < max_size; i++) {
+				x(i) = i;
+				for (size_t j = 0; j < max_size; j++)
+					P(i, j) = i + 100 * j;
+			}
+		}
+
+		void MapAbstract::fillDiag() {
+			for (size_t i = 0; i < max_size; i++) {
+				x(i) = i;
+				P(i, i) = i;
+			}
+		}
+
+		void MapAbstract::fillRndm() {
+			randVector(x());
+			randMatrix(P());
 		}
 
 		observation_ptr_t MapAbstract::newObservation(sensor_ptr_t senPtr, landmark_ptr_t lmkPtr){

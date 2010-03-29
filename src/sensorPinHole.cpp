@@ -42,17 +42,13 @@ namespace jafar {
 			type("Pin-hole-camera");
 		}
 
-
 		void SensorPinHole::set_parameters(const jblas::vec4 & k, const jblas::vec & d, const jblas::vec & c,
 		    const size_t hsize, const size_t vsize) {
-			parameters.intrinsic = k;
-			parameters.distortion.resize(d.size());
-			parameters.distortion = d;
-			parameters.correction.resize(c.size());
-			parameters.correction = c;
-			image.pixels.resize(hsize,vsize);
-			image.H_size = hsize;
-			image.V_size = vsize;
+			intrinsic = k;
+			distortion.resize(d.size());
+			distortion = d;
+			correction.resize(c.size());
+			correction = c;
 		}
 
 	}

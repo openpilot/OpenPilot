@@ -12,6 +12,8 @@
 #ifndef SENSORPINHOLE_HPP_
 #define SENSORPINHOLE_HPP_
 
+//#include "image/Image.hpp"
+
 #include "rtslam/sensorAbstract.hpp"
 #include "rtslam/gaussian.hpp"
 #include "iostream"
@@ -19,63 +21,6 @@
 namespace jafar {
 	namespace rtslam {
 
-		/**
-		 * Class for pin hole parameters
-		 * \ingroup rtslam
-		 */
-		class ParametersPinHole: public ParametersAbstract {
-			public:
-				jblas::vec4 intrinsic;
-				jblas::vec distortion;
-				jblas::vec correction;
-
-				inline ParametersPinHole(const jblas::vec4 & _k, const jblas::vec & _d, const jblas::vec & _c) :
-					intrinsic(_k), distortion(_d), correction(_c) {
-				}
-
-				inline ParametersPinHole(const jblas::vec4 & _k) :
-					intrinsic(_k) {
-				}
-
-				inline ParametersPinHole(void) {
-				}
-
-				inline ~ParametersPinHole(void) {
-				}
-		};
-
-		/**
-		 * Class for rectangular pixels image
-		 * \ingroup rtslam
-		 */
-		class Image: public RawAbstract {
-			public:
-				jblas::mati pixels;
-				size_t H_size;
-				size_t V_size;
-
-				inline Image(void) {
-				}
-
-				inline Image(size_t H, size_t V) :
-					pixels(H, V), H_size(H), V_size(V) {
-				}
-
-				inline ~Image(void) {
-				}
-
-				inline size_t size1(void) {
-					return pixels.size1();
-				}
-
-				inline size_t size2(void) {
-					return pixels.size2();
-				}
-
-				inline void acquire(void) {
-				}
-
-		};
 
 		/**
 		 * Class for pin-hole cameras.
@@ -83,9 +28,9 @@ namespace jafar {
 		 * \ingroup rtslam
 		 */
 		class SensorPinHole: public SensorAbstract {
+
 			public:
-				ParametersPinHole parameters;
-				Image image;
+				//				boost::shared_ptr<image::Image> image;
 
 				/**
 				 * Empty constructor
@@ -111,7 +56,9 @@ namespace jafar {
 				SensorPinHole(MapAbstract & _map);
 
 				/**
-				 * Constructor for selectable LOCAL or REMOTE pose, from robot.
+				 * Constructor for selectable LOCAL or REMOTE pose, from robot and selector flag.
+				 * \param _rob the robot to install to.
+				 * \param inFilter flag indicating in the sensor pose is filtered or not.
 				 */
 				SensorPinHole(RobotAbstract & _rob, bool inFilter = false);
 
@@ -130,9 +77,10 @@ namespace jafar {
 					return 7;
 				}
 
-
-
 			private:
+				jblas::vec4 intrinsic;
+				jblas::vec distortion;
+				jblas::vec correction;
 		};
 
 	}

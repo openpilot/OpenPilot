@@ -41,27 +41,6 @@ using namespace jafar::jmath::ublasExtra;
 using namespace jafar::rtslam;
 using namespace boost;
 
-void fillMapSeq(MapAbstract & map) {
-	size_t size_map = map.max_size;
-	for (size_t i = 0; i < size_map; i++) {
-		map.x(i) = i;
-		for (size_t j = 0; j < size_map; j++)
-			map.P(i, j) = i + 100 * j;
-	}
-}
-
-void fillMapDiag(MapAbstract & map) {
-	size_t size_map = map.max_size;
-	for (size_t i = 0; i < size_map; i++) {
-		map.x(i) = i;
-		map.P(i, i) = i;
-	}
-}
-
-void fillMapRndm(MapAbstract & map) {
-	randVector(map.x());
-	randMatrix(map.P());
-}
 
 /**
  * Add a new robot to map
@@ -206,6 +185,7 @@ void test_main01() {
 	}
 
 	for (double t = 0; t < t_end; t += dt) { // start SLAM time loop
+		cout << "         time: " << t << endl;
 		for (robots_ptr_set_t::iterator robIter = slamMapPtr->robots.begin(); robIter != slamMapPtr->robots.end(); robIter++) { // loop robots
 
 			robot_ptr_t robPtr = robIter->second;
@@ -222,7 +202,7 @@ void test_main01() {
 
 }
 
-BOOST_AUTO_TEST_CASE( test_rtslam )
+BOOST_AUTO_TEST_CASE( test_main )
 {
 	test_main01();
 }

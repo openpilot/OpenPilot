@@ -72,6 +72,9 @@ namespace jafar {
 				Perturbation(const size_t _size) :
 					Gaussian(_size), x_ct(0), P_ct(0) {
 				}
+				Perturbation(const vec & p, const sym_mat & P) :
+					Gaussian(p, P), x_ct(0), P_ct(0) {
+				}
 				Perturbation(const Gaussian & p) :
 					Gaussian(p), x_ct(0), P_ct(0) {
 				}

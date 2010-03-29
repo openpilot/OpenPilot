@@ -57,6 +57,10 @@ namespace jafar {
 				 */
 				RobotConstantVelocity(MapAbstract & _map);
 
+				// TODO implement a constructor with all useful data as scalars for easy interface.
+				RobotConstantVelocity(MapAbstract & _map, const double _dt, const double sigma_v,
+				    const double sigma_w);
+
 				~RobotConstantVelocity(void) {
 				}
 
@@ -74,10 +78,10 @@ namespace jafar {
 				 * \param _XNEW_x the Jacobian of xnew wrt x
 				 * \param _XNEW_pert the Jacobian of xnew wrt p
 				 */
-				void move_func(const vec & _x, const vec & _u, const vec & _n, const double _dt, vec & _xnew, mat & _XNEW_x, mat & _XNEW_pert);
+				void move_func(const vec & _x, const vec & _u, const vec & _n, const double _dt, vec & _xnew, mat & _XNEW_x,
+				    mat & _XNEW_pert);
 
 				void computePertJacobian();
-
 
 				static size_t size() {
 					return 13;

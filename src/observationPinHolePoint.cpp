@@ -51,11 +51,11 @@ namespace jafar {
 				double r2 = up(0) * up(0) + up(1) * up(1); // this is the norm squared: r2 = ||u||^2
 				double s = 1.0;
 				double r2i = 1.0;
-				for (size_t i = 0; i < n; i++) { //.. here we are doing:
-					r2i = r2i * r2; //................. r2i = r^(2*(i+1))
-					s += d(i) * r2i; //................ s = 1 + d_0 * r^2 + d_1 * r^4 + d_2 * r^6 + ...
+				for (size_t i = 0; i < n; i++) { //   here we are doing:
+					r2i = r2i * r2; //                    r2i = r^(2*(i+1))
+					s += d(i) * r2i; //                   s = 1 + d_0 * r^2 + d_1 * r^4 + d_2 * r^6 + ...
 				}
-				return s * up; // finally ud = (1 + d_0 * r^2 + d_1 * r^4 + d_2 * r^6 + ...) * u;
+				return s * up; //                     finally: ud = (1 + d_0 * r^2 + d_1 * r^4 + d_2 * r^6 + ...) * u;
 			}
 		}
 

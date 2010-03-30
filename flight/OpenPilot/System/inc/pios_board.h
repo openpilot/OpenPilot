@@ -290,7 +290,7 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define PIOS_PPM_TIM				TIM1
 #define PIOS_PPM_TIM_IRQ			TIM1_CC_IRQn
 #define PIOS_PPM_NUM_INPUTS			8  //Could be more if needed
-#define PIOS_PPM_SUPV_ENABLED			0
+#define PIOS_PPM_SUPV_ENABLED			1
 #define PIOS_PPM_SUPV_TIMER			TIM6
 #define PIOS_PPM_SUPV_TIMER_RCC_FUNC		RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE)
 #define PIOS_PPM_SUPV_HZ			25
@@ -378,8 +378,8 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define PIOS_ADC_SAMPLE_TIME			ADC_SampleTime_239Cycles5
 						/* Sample time: */
 						/* With an ADCCLK = 14 MHz and a sampling time of 293.5 cycles: */
-						/* Tconv = 239.5 + 12.5 = 252 cycles = 18µs */
-						/* (1 / (ADCCLK / CYCLES)) = Sample Time (µS) */
+						/* Tconv = 239.5 + 12.5 = 252 cycles = 18ï¿½s */
+						/* (1 / (ADCCLK / CYCLES)) = Sample Time (ï¿½S) */
 #define PIOS_ADC_IRQ_PRIO			PIOS_IRQ_PRIO_HIGH
 
 //-------------------------  

@@ -138,6 +138,7 @@ SRC += $(PIOSSTM32F10X)/pios_adc.c
 SRC += $(PIOSSTM32F10X)/pios_servo.c
 SRC += $(PIOSSTM32F10X)/pios_i2c.c
 SRC += $(PIOSSTM32F10X)/pios_spi.c
+SRC += $(PIOSSTM32F10X)/pios_ppm.c
 SRC += $(PIOSSTM32F10X)/pios_pwm.c
 SRC += $(PIOSSTM32F10X)/pios_usb.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid.c

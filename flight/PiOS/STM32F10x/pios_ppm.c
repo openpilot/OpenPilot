@@ -35,9 +35,9 @@
 
 static TIM_ICInitTypeDef TIM_ICInitStructure;
 static uint8_t PulseIndex;
-static uint8_t CaptureState;
-static uint16_t RiseValue;
-static uint16_t FallValue;
+static uint32_t PreviousValue;
+static uint32_t CurrentValue;
+static uint32_t CapturedValue;
 static uint32_t CaptureValue[PIOS_PPM_NUM_INPUTS];
 
 static uint8_t SupervisorState = 0;
@@ -54,9 +54,9 @@ void PIOS_PPM_Init(void)
 	int32_t i;
 
 	PulseIndex = 0;
-	CaptureState = 0;
-	RiseValue = 0;
-	FallValue = 0;
+	PreviousValue = 0;
+	CurrentValue = 0;
+	CapturedValue = 0;
 
 	for(i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
 		CaptureValue[i] = 0;
@@ -172,47 +172,31 @@ int32_t PIOS_PPM_Get(int8_t Channel)
 void TIM1_CC_IRQHandler(void)
 {
 	/* Do this as it's more efficient */
-	if(TIM_GetITStatus(PIOS_PWM_CH1_TIM_PORT, RECEIVER1_CCR) == SET) {
-		if(CaptureState == 0) {
-			RiseValue = TIM_GetCapture2(PIOS_PWM_CH1_TIM_PORT);
-		} else {
-			FallValue = TIM_GetCapture2(PIOS_PWM_CH1_TIM_PORT);
-		}
+	if(TIM_GetITStatus(PIOS_PPM_TIM_PORT, PIOS_PPM_TIM_CCR) == SET) {
+		PreviousValue = CurrentValue;
+		CurrentValue = TIM_GetCapture2(PIOS_PPM_TIM_PORT);
 	}
 
 	/* Clear TIM3 Capture compare interrupt pending bit */
-	TIM_ClearITPendingBit(PIOS_PWM_CH1_TIM_PORT, RECEIVER1_CCR);
+	TIM_ClearITPendingBit(PIOS_PPM_TIM_PORT, PIOS_PPM_TIM_CCR);
 
-	/* Simple rise or fall state machine */
-	if(CaptureState == 0) {
-		/* Switch states */
-		CaptureState = 1;
-
-		/* Switch polarity of input capture */
-		TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Falling;
-		TIM_ICInitStructure.TIM_Channel = RECEIVER1_CH;
-		TIM_ICInit(PIOS_PWM_CH1_TIM_PORT, &TIM_ICInitStructure);
-
+	/* Capture computation */
+	if (CurrentValue > PreviousValue) {
+		CapturedValue = (CurrentValue - PreviousValue);
 	} else {
-		/* Capture computation */
-		if (FallValue > RiseValue) {
-			//need to change
-			CaptureValue[0] = (FallValue - RiseValue);
-		} else {
-			//need to change
-			CaptureValue[0] = ((0xFFFF - RiseValue) + FallValue);
+		CapturedValue = ((0xFFFF - PreviousValue) + CurrentValue);
+	}
+
+	/* sync pulse */
+	if(CapturedValue > 8000) {
+		PulseIndex = 0;
+	/* trying to detect bad pulses, not sure this is working correctly yet. I need a scope :P */
+	} else if(CapturedValue > 750 && CapturedValue < 2500) {
+		if(PulseIndex < PIOS_PPM_NUM_INPUTS) {
+			CaptureValue[PulseIndex] = CapturedValue;
+			CapCounter[PulseIndex]++;
+			PulseIndex++;
 		}
-
-		/* Switch states */
-		CaptureState = 0;
-
-		/* Increase supervisor counter */
-		CapCounter[0]++;
-
-		/* Switch polarity of input capture */
-		TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
-		TIM_ICInitStructure.TIM_Channel = RECEIVER1_CH;
-		TIM_ICInit(PIOS_PWM_CH1_TIM_PORT, &TIM_ICInitStructure);
 	}
 }
 

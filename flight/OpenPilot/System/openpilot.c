@@ -96,6 +96,8 @@ int main()
 
 	PIOS_GPIO_Init();
 
+	//PIOS_PPM_Init();
+
 	PIOS_PWM_Init();
 
 	PIOS_USB_Init(0);
@@ -171,6 +173,7 @@ static void TaskTesting(void *pvParameters)
 		*/
 
 		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u,%u,%u,%u,%u,%u,%u,%u uS\r", PIOS_PWM_Get(0), PIOS_PWM_Get(1), PIOS_PWM_Get(2), PIOS_PWM_Get(3), PIOS_PWM_Get(4), PIOS_PWM_Get(5), PIOS_PWM_Get(6), PIOS_PWM_Get(7));
+		//PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u,%u,%u,%u,%u,%u,%u,%u uS\r", PIOS_PPM_Get(0), PIOS_PPM_Get(1), PIOS_PPM_Get(2), PIOS_PPM_Get(3), PIOS_PPM_Get(4), PIOS_PPM_Get(5), PIOS_PPM_Get(6), PIOS_PPM_Get(7));
 
 		/* This blocks the task until there is something on the buffer */
 		/*xSemaphoreTake(PIOS_USART1_Buffer, portMAX_DELAY);

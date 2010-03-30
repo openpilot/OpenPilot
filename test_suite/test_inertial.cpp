@@ -52,7 +52,6 @@ void test_inertial01() {
 	vec u(6);
 	randVector(u);
 	u *= 0.1;
-//	Gaussian n(scalar_vector<double>(12, 0.1), sym_mat(scalar_diag_mat(12, 1.0)));
 	Perturbation pert(scalar_vector<double>(12, 0.1), sym_mat(scalar_diag_mat(12, 1.0)));
 
 	robPtr->dt = 0.5;

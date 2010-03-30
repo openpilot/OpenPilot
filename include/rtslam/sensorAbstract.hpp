@@ -92,6 +92,15 @@ namespace jafar {
 				 */
 				Gaussian pose;
 
+			protected:
+				/**
+				 * Sensor parameters.
+				 * Derive this class for real sensors,
+				 * and use dynamic down-cast in the associated observation classes to access the derived parameters.
+				 */
+				ParametersAbstract* paramsAbs;
+
+			public:
 				/**
 				 * Empty constructor.
 				 * This just defines a pose of size 7.

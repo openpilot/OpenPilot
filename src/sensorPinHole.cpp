@@ -17,6 +17,19 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
+		////////////////////////////////////////
+		// Class for pin-hole parameters.
+		////////////////////////////////////////
+		ParamsPinHole::ParamsPinHole(const vec4 & k, const vec & d, const vec & c) :
+				intrinsic(k),
+				distortion(d),
+				correction(c) {
+		}
+
+
+		///////////////////////////////////////
+		// Class sensor pin hole
+		///////////////////////////////////////
 		SensorPinHole::SensorPinHole() :
 			SensorAbstract() {
 			type("Pin-hole-camera");

@@ -51,8 +51,8 @@ void test_obsPH01(void) {
 	k(3) = 100;
 	randVector(d);
 
-	u = obsph.project(k,d,v);
-	obsph.project(k,d,v,u,U_v);
+	u = obsph.project_func(k,d,v);
+	obsph.project_func(k,d,v,u,U_v);
 	cout<<"u = "<< (MATLAB)u << endl;
 	cout<<"v = "<< (MATLAB)v << endl;
 	cout<<"k = "<< (MATLAB)k << endl;

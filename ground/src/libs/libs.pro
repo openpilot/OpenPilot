@@ -8,5 +8,6 @@ SUBDIRS   = \
     qmapcontrol \
     qwt \
     qextserialport \
-    utils
+    utils \
+    glc_lib
 

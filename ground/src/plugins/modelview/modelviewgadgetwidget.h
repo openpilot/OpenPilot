@@ -48,6 +48,7 @@ public:
    ~ModelViewGadgetWidget();
    void setAcFilename(QString acf) { acFilename = acf; }
    void setBgFilename(QString bgf) { bgFilename = bgf; }
+   void reloadScene();
    void updateAttitude(int value);
 
 protected:

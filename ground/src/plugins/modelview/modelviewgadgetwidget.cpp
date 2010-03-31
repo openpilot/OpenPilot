@@ -25,6 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "modelviewgadgetwidget.h"
+#include <iostream>
 
 ModelViewGadgetWidget::ModelViewGadgetWidget(QWidget *parent) 
 : QGLWidget(parent)
@@ -46,8 +47,8 @@ ModelViewGadgetWidget::ModelViewGadgetWidget(QWidget *parent)
     repColor.setRgbF(1.0, 0.11372, 0.11372, 0.0);
     m_MoverController= m_pFactory->createDefaultMoverController(repColor, &m_GlView);
 
-    m_GlView.cameraHandle()->setDefaultUpVector(glc::Z_AXIS);
-    m_GlView.cameraHandle()->setIsoView();
+    m_GlView.cameraHandle()->setDefaultUpVector(glc::Y_AXIS);
+    //m_GlView.cameraHandle()->setIsoView();
 
     // Create objects to display
     CreateScene();
@@ -59,6 +60,13 @@ ModelViewGadgetWidget::~ModelViewGadgetWidget()
     delete m_pFactory;
 }
 
+//// Public funcitons ////
+void ModelViewGadgetWidget::reloadScene()
+{
+    CreateScene();
+}
+
+//// Private functions ////
 void ModelViewGadgetWidget::initializeGL()
 {
     // OpenGL initialization
@@ -110,14 +118,23 @@ void ModelViewGadgetWidget::resizeGL(int width, int height)
 void ModelViewGadgetWidget::CreateScene()
 {
     // TODO: Replace with files from configuration page
-    m_GlView.loadBackGroundImage("../artwork/3D\ Model/default_background.png");
-    QFile aircraft("../artwork/3D\ Model/quad.dae");
+    if (QFile::exists(bgFilename))
+    {
+        m_GlView.loadBackGroundImage(bgFilename);
+    }
+    //else { std::cout << "File doesn't exist" << bgFilename.toStdString() << std::endl; }
 
-    GLC_World* pWorld= m_pFactory->createWorld(aircraft);
-    m_World= *pWorld;
-    delete pWorld;
+    if (QFile::exists(acFilename))
+    {
+        QFile aircraft(acFilename);
 
-    m_ModelBoundingBox= m_World.boundingBox();
+        GLC_World* pWorld= m_pFactory->createWorld(aircraft);
+        m_World= *pWorld;
+        delete pWorld;
+
+        m_ModelBoundingBox= m_World.boundingBox();
+    }
+    //else { std::cout << "File doesn't exist" << acFilename.toStdString() << std::endl; }
 }
 
 void ModelViewGadgetWidget::mousePressEvent(QMouseEvent *e)
@@ -158,7 +175,7 @@ void ModelViewGadgetWidget::mouseReleaseEvent(QMouseEvent*)
 // Rotate the view
 void ModelViewGadgetWidget::rotateView()
 {
-        m_GlView.cameraHandle()->rotateAroundTarget(glc::Z_AXIS, 2.0 * glc::PI / static_cast<double>(200));
+        m_GlView.cameraHandle()->rotateAroundTarget(glc::Y_AXIS, 2.0 * glc::PI / static_cast<double>(200));
         updateGL();
 }
 

@@ -30,11 +30,18 @@
 #ifndef RAWABSTRACT_HPP_
 #define RAWABSTRACT_HPP_
 
+/* --------------------------------------------------------------------- */
+/* --- INCLUDE --------------------------------------------------------- */
+/* --------------------------------------------------------------------- */
+
+#include "rtslam/objectAbstract.hpp"
+
 namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
-		class rawAbstract {
+		class rawAbstract: public ObjectAbstract {
+			private:
 			public:
 				rawAbstract();
 				virtual ~rawAbstract();
@@ -42,3 +49,6 @@ namespace jafar {
 	}
 }
 #endif /* RAWABSTRACT_HPP_ */
+
+
+

@@ -79,26 +79,26 @@ namespace jafar {
 		 *   g   16 |  0     0     0     0
 		 * -----------------------------------------------------------------------------
 		 */
-		void RobotInertial::move_func(const vec & x, const vec & u, const vec & n, const double dt, vec & xnew, mat & _XNEW_x,
+		void RobotInertial::move_func(const vec & _x, const vec & _u, const vec & _n, const double _dt, vec & _xnew, mat & _XNEW_x,
 		    mat & _XNEW_pert) {
 
 
 			// Separate things out to make it clearer
 			vec3 p, v, ab, wb, g;
 			vec4 q;
-			splitState(x, p, q, v, ab, wb, g); // split state vector
+			splitState(_x, p, q, v, ab, wb, g); // split state vector
 
 			// Split control and perturbation vectors into
 			// sensed acceleration and sensed angular rate
 			// and noises
 			vec3 am, wm, an, wn, ar, wr; // measurements and random walks
-			splitControl(u, am, wm);
-			splitPert(n, an, wn, ar, wr);
+			splitControl(_u, am, wm);
+			splitPert(_n, an, wn, ar, wr);
 
 
 			// It is useful to start obtaining a nice rotation matrix and the product R*dt
 			Rold = q2R(q);
-			Rdt = Rold * dt;
+			Rdt = Rold * _dt;
 
 
 			// Invert sensor functions. Get true acc. and ang. rates
@@ -113,19 +113,19 @@ namespace jafar {
 			vec3 pnew, vnew, abnew, wbnew, gnew;
 			vec4 qnew;
 
-			pnew = p + v * dt; //     position
+			pnew = p + v * _dt; //     position
 			// qnew = q x q(w * dt)
 			// Keep qwt ( = q(w * dt)) for later use
-			vec4 qwdt = v2q(wtrue * dt);
+			vec4 qwdt = v2q(wtrue * _dt);
 			qnew = qProd(q, qwdt); //    orientation
-			vnew = v + atrue * dt; //    velocity
+			vnew = v + atrue * _dt; //    velocity
 			abnew = ab + ar; //          acc bias
 			wbnew = wb + wr; //          gyro bias
 			gnew = g; //                 gravity does not change
 
 
 			// Put it all together - this is the output state
-			unsplitState(pnew, qnew, vnew, abnew, wbnew, gnew, xnew);
+			unsplitState(pnew, qnew, vnew, abnew, wbnew, gnew, _xnew);
 
 
 			// Now on to the Jacobian...
@@ -145,7 +145,7 @@ namespace jafar {
 
 			// Fill in XNEW_v: VNEW_g and PNEW_v = I * dt
 			identity_mat I(3);
-			Idt = I * dt;
+			Idt = I * _dt;
 			subrange(_XNEW_x, 0, 3, 7, 10) = Idt;
 			subrange(_XNEW_x, 7, 10, 16, 19) = Idt;
 
@@ -213,7 +213,7 @@ namespace jafar {
 			//	with: U_continuous_time expressed in ( rad / s / sqrt(s) )^2 = rad^2 / s^3 <-- yeah, it is confusing, but true.
 			//   (Use perturbation.set_P_from_continuous() helper if necessary.)
 			//
-			subrange(_XNEW_pert, 3, 7, 3, 6) = QNEW_w * (1 / dt);
+			subrange(_XNEW_pert, 3, 7, 3, 6) = QNEW_w * (1 / _dt);
 
 		}
 

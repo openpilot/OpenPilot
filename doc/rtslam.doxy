@@ -214,7 +214,8 @@
   
   	- jafar::rtslam::ObservationAbstract : Please note that Observations depend always on 
   	  two types of objects: sensor type and landmark type.
-  		- jafar::rtslam::ObservationPinHoleAnchoredHomogeneousPoint : observe \b AHP from a pin-hole sensor.
+  	  - jafar::rtslam::ObservationPinHolePoint : observe a point from a pin-hole sensor. Derive this class still once more to specify which kind of point.
+  			- jafar::rtslam::ObservationPinHoleAnchoredHomogeneousPoint : observe \b AHP from a pin-hole sensor.
   
 	This sets the initially indispensable classes to start working with vision sensors 
 	and Anchored homogeneous point landmarks that allow undelayed initialization.
@@ -242,10 +243,12 @@
   
   	- jafar::rtslam::ObservationAbstract : 
   		Please note that Observations depend always on two types of objects: sensor type and landmark type.
-  		- jafar::rtslam::ObservationPinHoleEuclideanPoint : observe \b EP point from a pin-hole sensor.
-  		- jafar::rtslam::ObservationPinHoleAnchoredHomogeneousPointLine : observe \b AHL point from a pin-hole sensor.
-  		- jafar::rtslam::ObservationBarretoAnchoredHomogeneousPoint : observe \b AHP point from a Barreto sensor.
-  		- jafar::rtslam::ObservationBarretoEuclideanPoint : observe \b EP point from a Barreto sensor.
+  	  - jafar::rtslam::ObservationPinHolePoint : observe a point from a pin-hole sensor. Derive this class still once more to specify which kind of point.
+	  		- jafar::rtslam::ObservationPinHoleEuclideanPoint : observe \b EP point from a pin-hole sensor.
+	  		- jafar::rtslam::ObservationBarretoAnchoredHomogeneousPoint : observe \b AHP point from a Barreto sensor.
+  			- jafar::rtslam::ObservationBarretoEuclideanPoint : observe \b EP point from a Barreto sensor.
+  	  - jafar::rtslam::ObservationPinHoleLine : observe a line from a pin-hole sensor. Derive this class still once more to specify which kind of line.
+	  		- jafar::rtslam::ObservationPinHoleAnchoredHomogeneousPointLine : observe \b AHL point from a pin-hole sensor.
   
   \subsection secFutureDevelopments Future developments
 	Further developments could consider building straight line landmark models. 
@@ -258,11 +261,13 @@
   		- jafar::rtslam::landmarkHomogeneousLine : Homogeneous 3D lines HL3 (x_1,y_1,z_1,w_1,x_2,y_2,z_2,w_2).
   
   	- jafar::rtslam::ObservationAbstract : Please note that Observations depend always on two types of objects: sensor type and landmark type.
-  		- jafar::rtslam::ObservationPinHoleHomogeneousLine : observe \b HL from a pin-hole sensor.
-  		- jafar::rtslam::ObservationPinHoleAnchoredModifiedPolarPoint : observe \b AHP from a pin-hole sensor.
-  		- jafar::rtslam::ObservationBarretoAnchoredHomogeneousLine : observe \b AHL line from a Barreto sensor.
-  		- jafar::rtslam::ObservationBarretoHomogeneousLine : observe \b HL from a Barreto sensor.
-  		- jafar::rtslam::ObservationBarretoAnchoredModifiedPolarPoint : observe \b AHP from a Barreto sensor.
+  	  - jafar::rtslam::ObservationPinHolePoint : observe a point from a pin-hole sensor. Derive this class still once more to specify which kind of point.
+	  		- jafar::rtslam::ObservationPinHoleHomogeneousLine : observe \b HL from a pin-hole sensor.
+	  		- jafar::rtslam::ObservationPinHoleAnchoredModifiedPolarPoint : observe \b AMPP from a pin-hole sensor.
+	  		- jafar::rtslam::ObservationBarretoAnchoredModifiedPolarPoint : observe \b AMPP from a Barreto sensor.
+  	  - jafar::rtslam::ObservationPinHoleLine : observe a line from a pin-hole sensor. Derive this class still once more to specify which kind of line.
+	  		- jafar::rtslam::ObservationBarretoAnchoredHomogeneousLine : observe \b AHL line from a Barreto sensor.
+	  		- jafar::rtslam::ObservationBarretoHomogeneousLine : observe \b HL from a Barreto sensor.
 
   
   		

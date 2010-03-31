@@ -1,0 +1,5 @@
+
+The Sketchup files (.skp) are Copyright Philippe Mijon and used under permission with a cc-by-nc-sa license. 
+
+The files in collada format (.dae) are Copyright Ken Northup and were created for OpenPilot, these models are freely distributed.
+

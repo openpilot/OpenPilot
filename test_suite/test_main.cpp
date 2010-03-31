@@ -186,7 +186,7 @@ void test_main01() {
 
 		motionSetup(robPtr, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1);
 		// set robot control to some easy value
-		robPtr->dt = dt;
+		robPtr->dt_or_dx = dt;
 		vec6 pert;
 		pert.clear();
 		pert(0) = 0.1; // increase X m/s forward.

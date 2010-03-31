@@ -54,7 +54,7 @@ void test_inertial01() {
 	u *= 0.1;
 	Perturbation pert(scalar_vector<double>(12, 0.1), sym_mat(scalar_diag_mat(12, 1.0)));
 
-	robPtr->dt = 0.5;
+	robPtr->dt_or_dx = 0.5;
 	robPtr->control = u;
 	robPtr->set_perturbation(pert);
 	cout << robPtr->state.x() << endl;

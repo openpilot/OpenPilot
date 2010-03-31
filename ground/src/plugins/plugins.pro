@@ -49,4 +49,9 @@ plugin_scope.subdir = scope
 plugin_scope.depends = plugin_coreplugin
 SUBDIRS += plugin_scope
 
+# ModelView UAVGadget
+plugin_modelview.subdir = modelview
+plugin_scope.depends = plugin_coreplugin
+SUBDIRS += plugin_modelview
+
 

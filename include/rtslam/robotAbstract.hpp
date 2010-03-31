@@ -174,23 +174,27 @@ namespace jafar {
 				virtual ~RobotAbstract() {
 				}
 
-				map_ptr_t slamMap; ///<         parent map
+				map_ptr_t slamMap; ///<         Parent map
 				sensors_ptr_set_t sensors; ///<	A set of sensors
 
 				Gaussian pose; ///<             Robot Gaussian pose
 				vec control; ///<               Control vector
-				double dt; ///<                 Sampling time
+				double dt_or_dx; ///<           Sampling time or any other relevant increment (e.g. odometry is not time-driven but distance-driven)
 				Perturbation perturbation; ///< Perturbation Gaussian vector
 				/**
 				 * Constant perturbation flag.
 				 * Flag for indicating that the state perturbation Q is constant and should not be computed at each iteration.
 				 *
 				 * In case this flag wants to be set to \c true , the user must consider computing the constant \a Q immediately after construction time.
-				 * This can be done in two ways:
-				 * - use a function member \b setup(..args..) in the derived class to compute the Jacobian XNEW_pert,
+				 * This can be done in three ways:
+				 * - define a function member \b setup(..args..) in the derived class to compute the Jacobian XNEW_pert,
 				 *   and enter the appropriate perturbation.P() value.
-				 * 	 Then call computeStatePerturbation().
-				 * - use a function member \b setup(..args..) in the derived class to enter the matrix Q directly.
+				 * 	 Then call \b computeStatePerturbation(), which will compute \a Q from \a P() and \a XNEW_pert.
+				 * - define a function member \b setup(..args..) in the derived class to enter the matrix Q directly.
+				 *
+				 * In any of the above cases, call your \b setup() function immediately after the constructor.
+				 * - Define a constructor that accepts a number of parameters relevant to your perturbation levels,
+				 *   and perform all the above operations to obtain Q inside the constructor body.
 				 */
 				bool constantPerturbation;
 
@@ -206,11 +210,6 @@ namespace jafar {
 				}
 				void linkToSensor(sensor_ptr_t _senPtr); ///< Link to sensor
 				void linkToMap(map_ptr_t _mapPtr); ///<       Link to map
-				void set_control(const vec & c, double _dt){
-					JFR_ASSERT(c.size() == size_control(), "RobotAbstract::set_control(vec&, double): Sizes mismatch");
-					control = c;
-					dt = _dt;
-				}
 				void set_control(const vec & c){
 					JFR_ASSERT(c.size() == size_control(), "RobotAbstract::set_control(vec&, double): Sizes mismatch");
 					control = c;
@@ -278,7 +277,7 @@ namespace jafar {
 				inline void move_func() {
 					vec x = state.x();
 					vec n = perturbation.x();
-					move_func(x, control, n, dt, x, XNEW_x, XNEW_pert);
+					move_func(x, control, n, dt_or_dx, x, XNEW_x, XNEW_pert);
 				}
 
 		};

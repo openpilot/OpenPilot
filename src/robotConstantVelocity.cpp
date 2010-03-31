@@ -103,7 +103,7 @@ namespace jafar {
 			pnew = p + v * _dt;
 			PNEW_v = I_3 * _dt;
 			vec4 qwdt;
-			quaternion::v2q(w * dt, qwdt, QWDT_wdt);
+			quaternion::v2q(w * _dt, qwdt, QWDT_wdt);
 			quaternion::qProd(q, qwdt, qnew, QNEW_q, QNEW_qwdt);
 			QNEW_wdt = prod(QNEW_qwdt, QWDT_wdt);
 			vnew = v + vi;

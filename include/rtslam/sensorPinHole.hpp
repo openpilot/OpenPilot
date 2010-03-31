@@ -41,7 +41,6 @@ namespace jafar {
 		class SensorPinHole: public SensorAbstract {
 
 			public:
-				//				boost::shared_ptr<image::Image> image;
 
 				/**
 				 * Empty constructor

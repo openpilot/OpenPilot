@@ -116,7 +116,7 @@ namespace jafar {
 					P(P_ct * _dt); // perturbation is random => variance is linear with time
 				}
 				/**
-				 * Discrete perturbation and perturbation from continuous specifications.
+				 * Discrete perturbation from continuous specifications.
 				 * - The deterministic values integrate with time normally, linearly with dt:
 				 * 		- x = _x_ct * _dt
 				 * - The white, Gaussian random values integrate with the square root of dt. Their variance integrates linearly with dt:
@@ -134,10 +134,10 @@ namespace jafar {
 				 * Discrete perturbation from continuous specifications.
 				 * - The variance integrates linearly with dt:
 				 *		- P = Pct.P * _dt
-				 * - Therefore, the deterministic values integrate with time linearly with the square root of dt:
+				 * - Therefore, the mean values integrate with time linearly with the square root of dt:
 				 * 		- x = Pct.x * sqrt(_dt)
 				 *
-				 * \param Pct a continuous-time Gaussian holding mean and the covariances matrix of the random part.
+				 * \param Pct a continuous-time Gaussian process noise.
 				 * \param _dt the time interval to integrate.
 				 */
 				void set_from_continuous(Gaussian & Pct, double _dt) {

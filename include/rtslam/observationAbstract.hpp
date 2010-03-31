@@ -126,7 +126,7 @@ namespace jafar {
 				 *
 				 * This projects the landmark into the sensor space, and gives the Jacobians of this projection
 				 * wrt the states that contributed to the projection (those of the robot, eventually the sensor, and the landmark).
-				 * These states are also available through the indirect_array \a ia_exp_x, updated by this function.
+				 * These states are also available through the indirect_array \a ia_rsl, updated by this function.
 				 */
 				virtual void project_func(){}
 
@@ -136,8 +136,8 @@ namespace jafar {
 				void project() {
 					project_func();
 					expectation.P() = ublasExtra::prod_JPJt(
-							ublas::project(landmark->slamMap->filter.P(), expectation.ia_exp_x, expectation.ia_exp_x),
-							expectation.EXP_x);
+							ublas::project(landmark->slamMap->filter.P(), expectation.ia_rsl, expectation.ia_rsl),
+							expectation.EXP_rsl);
 				}
 
 

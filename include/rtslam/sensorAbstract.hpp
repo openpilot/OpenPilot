@@ -47,24 +47,6 @@ namespace jafar {
 		};
 
 
-//		/**
-//		 * Base class for all raw data in module rtslam.
-//		 * \ingroup rtslam
-//		 */
-//		class RawAbstract {
-//			public:
-//				/**
-//				 * Mandatory virtual destructor.
-//				 */
-//				inline virtual ~RawAbstract() {
-//				}
-//				/**
-//				 * Acquire raw data
-//				 */
-//				inline virtual void acquire() {
-//				}
-//		};
-
 
 		/**
 		 * Base class for all sensors defined in the module rtslam.

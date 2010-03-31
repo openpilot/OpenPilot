@@ -33,16 +33,16 @@ namespace jafar {
 		 * where the function h(x) belongs to some observation model.
 		 *
 		 * Its covariances matrix is computed via Gaussian uncertainty propagation using the Jacobians of h():
-		 * - this->P() = EXP = EXP_x * P * EXP_x'
+		 * - this->P() = EXP = EXP_rsl * P * EXP_rsl'
 		 *
-		 * with EXP_x = dexp/dx = dh(x)/dx, also a member of the class, computed also by the observation model.
+		 * with EXP_rsl = dexp/dx = dh(x)/dx, also a member of the class, computed also by the observation model.
 		 *
 		 * In this class, the Jacobian is sparse. The states in \a x that contribute to the expectation are available through an indirect array
-		 * - this->ia_exp_x
+		 * - this->ia_rsl
 		 *
 		 * so that we have:
-		 * - exp = h( project(x, ia_exp_x) )
-		 * - EXP = EXP_x * project(P, ia_exp_x, ia_exp_x) * EXP_x'
+		 * - exp = h( project(x, ia_rsl) )
+		 * - EXP = EXP_rsl * project(P, ia_rsl, ia_rsl) * EXP_rsl'
 		 *
 		 * @ingroup rtslam
 		 */
@@ -69,8 +69,8 @@ namespace jafar {
 
 				jblas::vec nonObs; ///< expected value of the non-observable part.
 
-				jblas::mat EXP_x; ///< Jacobian wrt the state.
-				jblas::ind_array ia_exp_x; ///< ind. array of indices to the map
+				jblas::mat EXP_rsl; ///< Jacobian wrt the state.
+				jblas::ind_array ia_rsl; ///< ind. array of indices to the map
 
 				void computeVisibility();
 				void estimateInfoGain();

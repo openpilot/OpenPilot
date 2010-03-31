@@ -185,9 +185,9 @@ namespace jafar {
 			if (pose.storage() == pose.LOCAL) {
 				// Sensor is not in the map. Jacobians and indices only wrt robot.
 				globalPose(poseG, PG_rs);
-				jblas::ind_array ia(robot->pose.ia());
+				jblas::ind_array ia_rs(robot->pose.ia());
 
-				return ia;
+				return ia_rs;
 			}
 			else {
 				// Sensor is in the map. Give composed Jacobian and indices.
@@ -195,8 +195,8 @@ namespace jafar {
 				globalPose(poseG, PG_r, PG_s);
 				project(PG_rs, range(0, 7), range(0, 7)) = PG_r;
 				project(PG_rs, range(0, 7), range(7, 14)) = PG_s;
-				jblas::ind_array ia(ia_union(robot->pose.ia(), this->pose.ia()));
-				return ia;
+				jblas::ind_array ia_rs(ia_union(robot->pose.ia(), this->pose.ia()));
+				return ia_rs;
 			}
 		}
 

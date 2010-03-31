@@ -49,8 +49,8 @@ namespace jafar {
 				double mahalanobis_; ///<       The Mahalanobis distance from the measurement to the expectation.
 				jblas::mat INN_meas; ///<       The Jacobian of the innovation wrt the measurement.
 				jblas::mat INN_exp; ///<        The Jacobian of the innovation wrt the expectation.
-				jblas::mat INN_x; ///<          The Jacobian of the innovation wrt the state vector.
-				jblas::ind_array ia_inn_x; ///< The indirect array of states that contributed to the innovation
+				jblas::mat INN_rsl; ///<        The Jacobian of the innovation wrt the state vector.
+				jblas::ind_array ia_rsl; ///<   The indirect array of states that contributed to the innovation.
 
 
 				/**

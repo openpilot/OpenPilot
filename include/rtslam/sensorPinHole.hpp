@@ -21,6 +21,17 @@
 namespace jafar {
 	namespace rtslam {
 
+		/**
+		 * Class for pin-hole parameters.
+		 */
+		class ParamsPinHole : public ParametersAbstract {
+			public:
+			vec4 intrinsic; ///< intrinsic vector [u0, v0, au, av]
+			vec distortion; ///< radial distortion [d2, d4, ...] (model: ud = (1 + d2 r^2 + d2 r^4 + ...) * up)
+			vec correction; ///< radial correction [c2, c4, ...] (See Joan Sola's thesis for correction model and calibration)
+			ParamsPinHole(const vec4 & k, const vec & d, const vec & c);
+		};
+
 
 		/**
 		 * Class for pin-hole cameras.
@@ -30,7 +41,6 @@ namespace jafar {
 		class SensorPinHole: public SensorAbstract {
 
 			public:
-				//				boost::shared_ptr<image::Image> image;
 
 				/**
 				 * Empty constructor
@@ -77,6 +87,7 @@ namespace jafar {
 					return 7;
 				}
 
+				ParamsPinHole* params;
 			private:
 				jblas::vec4 intrinsic;
 				jblas::vec distortion;

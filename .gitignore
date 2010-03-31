@@ -3,3 +3,6 @@ lib/
 objs/
 *.old
 *.*~
+*.o
+*.lo
+*.dep

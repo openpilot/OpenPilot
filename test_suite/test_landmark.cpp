@@ -120,7 +120,7 @@ void test_landmark01(void) {
 
 }
 
-BOOST_AUTO_TEST_CASE( test_robotConstVel )
+BOOST_AUTO_TEST_CASE( test_landmark )
 {
 	test_landmark01();
 }

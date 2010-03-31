@@ -47,24 +47,6 @@ namespace jafar {
 		};
 
 
-//		/**
-//		 * Base class for all raw data in module rtslam.
-//		 * \ingroup rtslam
-//		 */
-//		class RawAbstract {
-//			public:
-//				/**
-//				 * Mandatory virtual destructor.
-//				 */
-//				inline virtual ~RawAbstract() {
-//				}
-//				/**
-//				 * Acquire raw data
-//				 */
-//				inline virtual void acquire() {
-//				}
-//		};
-
 
 		/**
 		 * Base class for all sensors defined in the module rtslam.
@@ -92,6 +74,15 @@ namespace jafar {
 				 */
 				Gaussian pose;
 
+			protected:
+				/**
+				 * Sensor parameters.
+				 * Derive this class for real sensors,
+				 * and use dynamic down-cast in the associated observation classes to access the derived parameters.
+				 */
+				ParametersAbstract* paramsAbs;
+
+			public:
 				/**
 				 * Empty constructor.
 				 * This just defines a pose of size 7.
@@ -142,16 +133,8 @@ namespace jafar {
 				virtual ~SensorAbstract() {
 				}
 
-
-				/**
-				 * Add an observation.
-				 */
-				void linkToObservation(observation_ptr_t _obsPtr);
-
-				/**
-				 * Link to robot.
-				 */
-				void linkToRobot(robot_ptr_t _robPtr);
+				void linkToObservation(observation_ptr_t _obsPtr); ///< Link to observation
+				void linkToRobot(robot_ptr_t _robPtr); ///<             Link to robot
 
 				/*
 				 * Acquire raw data.

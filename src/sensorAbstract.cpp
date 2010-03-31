@@ -11,6 +11,7 @@
  * \ingroup rtslam
  */
 #include "boost/shared_ptr.hpp"
+#include "jmath/indirectArray.hpp"
 #include "rtslam/sensorAbstract.hpp"
 #include "rtslam/robotAbstract.hpp"
 #include "rtslam/observationAbstract.hpp"
@@ -23,6 +24,7 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 		using namespace boost;
+		using namespace ublasExtra;
 
 
 		/*
@@ -158,7 +160,7 @@ namespace jafar {
 		 */
 		void SensorAbstract::globalPose(jblas::vec7 & poseG, jblas::mat & PG_r, jblas::mat & PG_s) {
 			jblas::vec7 robotPose = robot->pose.x();
-			jblas::vec7 sensorPose = pose.x();
+			jblas::vec7 sensorPose = this->pose.x();
 			quaternion::composeFrames(robotPose, sensorPose, poseG, PG_r, PG_s);
 		}
 
@@ -168,7 +170,7 @@ namespace jafar {
 		 */
 		void SensorAbstract::globalPose(jblas::vec7 & poseG, jblas::mat & PG_r) {
 			jblas::vec7 robotPose = robot->pose.x();
-			jblas::vec7 sensorPose = pose.x();
+			jblas::vec7 sensorPose = this->pose.x();
 			poseG = quaternion::composeFrames(robotPose, sensorPose);
 			quaternion::composeFrames_by_dglobal(robotPose, sensorPose, PG_r);
 		}
@@ -177,19 +179,24 @@ namespace jafar {
 		/*
 		 * Get sensor pose in global frame.
 		 */
-		jblas::ind_array SensorAbstract::globalPoseInMap(jblas::vec7 & poseG, jblas::mat & PG_m) {
+		jblas::ind_array SensorAbstract::globalPoseInMap(jblas::vec7 & poseG, jblas::mat & PG_rs) {
 			jblas::vec7 robotPose = robot->pose.x();
 			jblas::vec7 sensorPose = pose.x();
 			if (pose.storage() == pose.LOCAL) {
 				// Sensor is not in the map. Jacobians and indices only wrt robot.
-				jblas::ind_array ia(robot->pose.ia());
+				globalPose(poseG, PG_rs);
+				jblas::ind_array ia_rs(robot->pose.ia());
 
-				return ia;
+				return ia_rs;
 			}
 			else {
-				// TODO Sensor is in the map. Give composed Jacobian and indices.
-				jblas::ind_array ia(14);
-				return ia;
+				// Sensor is in the map. Give composed Jacobian and indices.
+				jblas::mat PG_r(7, 7), PG_s(7, 7);
+				globalPose(poseG, PG_r, PG_s);
+				project(PG_rs, range(0, 7), range(0, 7)) = PG_r;
+				project(PG_rs, range(0, 7), range(7, 14)) = PG_s;
+				jblas::ind_array ia_rs(ia_union(robot->pose.ia(), this->pose.ia()));
+				return ia_rs;
 			}
 		}
 

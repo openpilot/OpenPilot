@@ -76,34 +76,13 @@ namespace jafar {
 				virtual ~LandmarkAbstract() {
 				}
 
-				DescriptorAbstract descriptor;
+				DescriptorAbstract descriptor; //<                        Landmark descriptor
 
-				/**
-				 * Parent map
-				 */
-				map_ptr_t slamMap;
+				map_ptr_t slamMap; ///<                                   Parent map
+				observations_ptr_set_t observations; ///<                 A set of observations (one per sensor)
 
-				/**
-				 * A set of observations (one per sensor)
-				 */
-				observations_ptr_set_t observations;
-
-				void linkToObservation(observation_ptr_t _obsPtr);
-
-				/**
-				 * Link To Map
-				 */
-				void linkToMap(map_ptr_t _mapPtr);
-
-				/**
-				 * Reparametrize the landmark.
-				 */
-				//				virtual void reparametrize(LandmarkAbstract & landmark) = 0;
-
-				//				inline void setDescriptor(DescriptorAbstract _desc) {
-				//					descriptor = _desc;
-				//				}
-
+				void linkToObservation(observation_ptr_t _obsPtr); ///<   Link to observation
+				void linkToMap(map_ptr_t _mapPtr); ///<                   Link to map
 
 		};
 

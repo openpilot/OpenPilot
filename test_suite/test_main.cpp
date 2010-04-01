@@ -206,7 +206,20 @@ void test_main01() {
 		} // end of robots loop
 	} // end of time loop
 
-	//	cout << *slamMapPtr << endl;
+//		cout << *slamMapPtr << endl;
+
+	cout << "% GLOBAL SENSOR POSE \n%====================	" << endl;
+	vec7 sg_local, sg_remote;
+	mat SG_rs_local(7,7);
+	mat SG_rs_remote(7,14);
+
+	slamMapPtr->robots[1]->sensors[1]->globalPose(sg_local, SG_rs_local);
+	slamMapPtr->robots[1]->sensors[2]->globalPose(sg_remote, SG_rs_remote);
+
+	cout << "sg_local  = " << sg_local << endl;
+	cout << "sg_remote = " << sg_remote << endl;
+	cout << "SG_rs_local  = " << SG_rs_local << endl;
+	cout << "SG_rs_remote = " << SG_rs_remote << endl;
 
 	cout << "\n THAT'S ALL, WHAT'S WRONG? " << endl;
 

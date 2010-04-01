@@ -74,6 +74,11 @@ namespace jafar {
 				 */
 				Gaussian pose;
 
+				/**
+				 * Indices of sensor's global pose in map (this is either the \a ia of the robot, \a rob.ia to make it short, or the \b ia_union() of \a rob.ia and \a sen.ia)
+				 */
+				ind_array ia_globalPose;
+
 			protected:
 				/**
 				 * Sensor parameters.
@@ -172,32 +177,15 @@ namespace jafar {
 				/**
 				 * Get sensor pose in global frame.
 				 * This function composes robot pose with sensor pose to obtain the global sensor pose.
-				 * It renders the Jacobians of the composition.
-				 * \param poseG the global pose
-				 * \param PG_r the Jacobian wrt the robot pose
-				 * \param PG_s the Jacobian wrt the sensor local pose
-				 */
-				void globalPose(jblas::vec7 & poseG, jblas::mat & PG_r, jblas::mat & PG_s);
-
-				/**
-				 * Get sensor pose in global frame, for sensor poses with LOCAL storage (see class Gaussian for doc on storage options).
-				 * This function composes robot pose with sensor pose to obtain the global sensor pose.
-				 * It renders the Jacobian of the composition only wrt the robot pose.
-				 * \param poseG the global pose
-				 * \param PG_r the Jacobian wrt the robot pose
-				 */
-				void globalPose(jblas::vec7 & poseG, jblas::mat & PG_r);
-
-				/**
-				 * Get sensor pose in global frame.
-				 * This function composes robot pose with sensor pose to obtain the global sensor pose.
 				 * It renders the Jacobians of the composed frame wrt all variables that are in the map (either robot only, or robot and sensor),
 				 * depending on the sensor pose storage being LOCAL or REMOTE (see class Gaussian for doc on storage options).
-				 * \param poseG the global pose
-				 * \param PG_m the Jacobian wrt the mapped states
-				 * \return an indirect array with indices to the variables in the map concerned by the Jacobian \a PG_m.
+				 * Therefore, this Jacobian is either 7-by-7 (LOCAL sensor pose) or 7-by-14 (REMOTE sensor pose).
+				 *
+				 * The concerned states are available as an indirect array \a ia_rs, member of the class and defined at construction time.
+				 * \param poseG the global pose.
+				 * \param PG_rs the Jacobian wrt the mapped states of robot and sensor.
 				 */
-				jblas::ind_array globalPoseInMap(jblas::vec7 & poseG, jblas::mat & PG_m);
+				void globalPose(jblas::vec7 & senGlobalPose, jblas::mat & SG_rs);
 
 		};
 

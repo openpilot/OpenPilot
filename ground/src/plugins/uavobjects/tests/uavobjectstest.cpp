@@ -68,11 +68,11 @@ void UAVObjectsTest::runTest()
         // Set data
         ExampleObject::DataFields data = obj1->getData();
         data.field1 = 1;
-        data.field3[0] = 2.1;
-        data.field3[1] = 2.2;
-        data.field3[2] = 2.3;
-        data.field2 = 3;
-        data.field4 = 4;
+        data.field2 = 2;
+        data.field3 = 3;
+        data.field4[0] = 4.1;
+        data.field4[1] = 4.2;
+        data.field4[2] = 4.3;
         obj1->setData(data);
 
         // Set metadata
@@ -93,22 +93,22 @@ void UAVObjectsTest::runTest()
         quint8* buf = new quint8[obj1->getNumBytes()];
         obj1->pack(buf);
         data.field1 = 10;
-        data.field3[0] = 20.1;
-        data.field3[1] = 20.2;
-        data.field3[2] = 20.3;
-        data.field2 = 30;
-        data.field4 = 40;
+        data.field2 = 20;
+        data.field3 = 30;
+        data.field4[0] = 40.1;
+        data.field4[1] = 40.2;
+        data.field4[2] = 40.3;
         obj1->setData(data);
         obj1->unpack(buf);
 
         // Save, load testing
         obj1->save();
         data.field1 = 10;
-        data.field3[0] = 20.1;
-        data.field3[1] = 20.2;
-        data.field3[2] = 20.3;
-        data.field2 = 30;
-        data.field4 = 40;
+        data.field2 = 20;
+        data.field3 = 30;
+        data.field4[0] = 40.1;
+        data.field4[1] = 40.2;
+        data.field4[2] = 40.3;
         obj1->setData(data);
         obj1->load();
 

@@ -36,10 +36,10 @@ ExampleSettings::ExampleSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTING
 {
     // Create fields
     QList<UAVObjectField*> fields;
-    fields.append(new UAVObjectField(QString("setting1"), QString("unit1"), UAVObjectField::FIELDTYPE_INT8, 1));
-    fields.append(new UAVObjectField(QString("setting2"), QString("unit2"), UAVObjectField::FIELDTYPE_INT16, 1));
-    fields.append(new UAVObjectField(QString("setting3"), QString("unit3"), UAVObjectField::FIELDTYPE_INT8, 1));
-    fields.append(new UAVObjectField(QString("setting4"), QString("unit4"), UAVObjectField::FIELDTYPE_INT32, 1));
+    fields.append(new UAVObjectFieldPrimitives<qint8>(QString("setting1"), QString("unit1"), 1));
+    fields.append(new UAVObjectFieldPrimitives<qint16>(QString("setting2"), QString("unit2"), 1));
+    fields.append(new UAVObjectFieldPrimitives<qint8>(QString("setting3"), QString("unit3"), 1));
+    fields.append(new UAVObjectFieldPrimitives<qint32>(QString("setting4"), QString("unit4"), 1));
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
@@ -61,7 +61,7 @@ UAVObject::Metadata ExampleSettings::getDefaultMetadata()
 
 ExampleSettings::DataFields ExampleSettings::getData()
 {
-	QMutexLocker locker(mutex);
+    QMutexLocker locker(mutex);
     return data;
 }
 

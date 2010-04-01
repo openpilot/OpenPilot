@@ -38,46 +38,29 @@ class UAVOBJECTS_EXPORT UAVObjectField: public QObject
     Q_OBJECT
 
 public:
-    /**
-     * Recognized field types
-     */
-    typedef enum {
-            FIELDTYPE_INT8 = 0,
-            FIELDTYPE_INT16,
-            FIELDTYPE_INT32,
-            FIELDTYPE_FLOAT32,
-            FIELDTYPE_CHAR
-    } FieldType;
-
-    UAVObjectField(const QString& name, const QString& units, FieldType type, quint32 numElements);
+    UAVObjectField(const QString& name, const QString& units, quint32 numElements);
     void initialize(quint8* data, quint32 dataOffset, UAVObject* obj);
+    virtual void initializeValues() = 0;
     UAVObject* getObject();
     QString getName();
     QString getUnits();
-    FieldType getType();
     quint32 getNumElements();
-    qint32 pack(quint8* dataOut);
-    qint32 unpack(const quint8* dataIn);
-    double getValue();
-    void setValue(double value);
-    double getValue(quint32 index);
-    void setValue(double value, quint32 index);
-    QString getString();
-    void setString(QString& str);
+    virtual qint32 pack(quint8* dataOut) = 0;
+    virtual qint32 unpack(const quint8* dataIn) = 0;
+    virtual double getDouble(quint32 index = 0) = 0;
+    virtual void setDouble(double value, quint32 index = 0) = 0;
     quint32 getDataOffset();
     quint32 getNumBytes();
-    quint32 getNumBytesElement();
+    virtual quint32 getNumBytesElement() = 0;
     QString toString();
 
 signals:
     void fieldUpdated(UAVObjectField* field);
 
-private:
+protected:
     QString name;
     QString units;
-    FieldType type;
     quint32 numElements;
-    quint32 numBytesPerElement;
     quint32 offset;
     quint8* data;
     UAVObject* obj;

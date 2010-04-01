@@ -13,11 +13,17 @@ SOURCES += main.cpp \
     ../uavmetaobject.cpp \
     ../uavdataobject.cpp \
     uavobjectstest.cpp \
-    ../exampleobject.cpp
+    ../exampleobject.cpp \
+    ../uavobjectfieldprimitives.cpp \
+    ../uavobjectfieldenum.cpp \
+    ../uavobjectfieldstring.cpp
 HEADERS += ../uavobjectmanager.h \
     ../uavobjectfield.h \
     ../uavobject.h \
     ../uavmetaobject.h \
     ../uavdataobject.h \
     uavobjectstest.h \
-    ../exampleobject.h
+    ../exampleobject.h \
+    ../uavobjectfieldprimitives.h \
+    ../uavobjectfieldenum.h \
+    ../uavobjectfieldstring.h

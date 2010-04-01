@@ -26,6 +26,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "uavmetaobject.h"
+#include "uavobjectfieldprimitives.h"
 
 /**
  * Constructor
@@ -45,14 +46,14 @@ UAVMetaObject::UAVMetaObject(quint32 objID, const QString& name, UAVObject* pare
     ownMetadata.loggingUpdatePeriod = 0;
     // Setup fields
     QList<UAVObjectField*> fields;
-    fields.append(new UAVObjectField(QString("FlightTelemetryAcked"), QString(""), UAVObjectField::FIELDTYPE_INT8, 1));
-    fields.append(new UAVObjectField(QString("FlightTelemetryUpdateMode"), QString(""), UAVObjectField::FIELDTYPE_INT8, 1));
-    fields.append(new UAVObjectField(QString("FlightTelemetryUpdatePeriod"), QString("ms"), UAVObjectField::FIELDTYPE_INT32, 1));
-    fields.append(new UAVObjectField(QString("GCSTelemetryAcked"), QString(""), UAVObjectField::FIELDTYPE_INT8, 1));
-    fields.append(new UAVObjectField(QString("GCSTelemetryUpdateMode"), QString(""), UAVObjectField::FIELDTYPE_INT8, 1));
-    fields.append(new UAVObjectField(QString("GCSTelemetryUpdatePeriod"), QString("ms"), UAVObjectField::FIELDTYPE_INT32, 1));
-    fields.append(new UAVObjectField(QString("LoggingUpdateMode"), QString(""), UAVObjectField::FIELDTYPE_INT8, 1));
-    fields.append(new UAVObjectField(QString("LoggingUpdatePeriod"), QString("ms"), UAVObjectField::FIELDTYPE_INT32, 1));
+    fields.append(new UAVObjectFieldPrimitives<qint8>(QString("FlightTelemetryAcked"), QString(""), 1));
+    fields.append(new UAVObjectFieldPrimitives<qint8>(QString("FlightTelemetryUpdateMode"), QString(""), 1));
+    fields.append(new UAVObjectFieldPrimitives<qint32>(QString("FlightTelemetryUpdatePeriod"), QString("ms"), 1));
+    fields.append(new UAVObjectFieldPrimitives<qint8>(QString("GCSTelemetryAcked"), QString(""), 1));
+    fields.append(new UAVObjectFieldPrimitives<qint8>(QString("GCSTelemetryUpdateMode"), QString(""), 1));
+    fields.append(new UAVObjectFieldPrimitives<qint32>(QString("GCSTelemetryUpdatePeriod"), QString("ms"), 1));
+    fields.append(new UAVObjectFieldPrimitives<qint8>(QString("LoggingUpdateMode"), QString(""), 1));
+    fields.append(new UAVObjectFieldPrimitives<qint32>(QString("LoggingUpdatePeriod"), QString("ms"), 1));
     // Initialize parent
     UAVObject::initialize(0);
     UAVObject::initializeFields(fields, (quint8*)&parentMetadata, sizeof(Metadata));

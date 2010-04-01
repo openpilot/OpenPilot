@@ -36,10 +36,14 @@ ExampleObject::ExampleObject(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, N
 {
     // Create fields
     QList<UAVObjectField*> fields;
-    fields.append(new UAVObjectField(QString("field1"), QString("unit1"), UAVObjectField::FIELDTYPE_INT8, 1));
-    fields.append(new UAVObjectField(QString("field2"), QString("unit2"), UAVObjectField::FIELDTYPE_INT16, 1));
-    fields.append(new UAVObjectField(QString("field3"), QString("unit3"), UAVObjectField::FIELDTYPE_FLOAT32, 4));
-    fields.append(new UAVObjectField(QString("field4"), QString("unit4"), UAVObjectField::FIELDTYPE_INT32, 1));
+    fields.append(new UAVObjectFieldPrimitives<qint8>(QString("field1"), QString("unit1"), 1));
+    fields.append(new UAVObjectFieldPrimitives<qint16>(QString("field2"), QString("unit2"), 1));
+    fields.append(new UAVObjectFieldPrimitives<qint32>(QString("field3"), QString("unit3"), 1));
+    fields.append(new UAVObjectFieldPrimitives<float>(QString("field4"), QString("unit4"), 4));
+    fields.append(new UAVObjectFieldPrimitives<quint8>(QString("field5"), QString("unit5"), 1));
+    fields.append(new UAVObjectFieldPrimitives<quint16>(QString("field6"), QString("unit6"), 1));
+    fields.append(new UAVObjectFieldPrimitives<quint32>(QString("field7"), QString("unit7"), 1));
+    fields.append(new UAVObjectFieldPrimitives<quint8>(QString("field8"), QString("unit8"), 1));
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
@@ -49,11 +53,11 @@ UAVObject::Metadata ExampleObject::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
     metadata.gcsTelemetryAcked = 1;
-    metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
-    metadata.gcsTelemetryUpdatePeriod = 100;
+    metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
+    metadata.gcsTelemetryUpdatePeriod = 0;
     metadata.flightTelemetryAcked = 1;
     metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
-    metadata.flightTelemetryUpdatePeriod = 0;
+    metadata.flightTelemetryUpdatePeriod = 100;
     metadata.loggingUpdateMode = UAVObject::UPDATEMODE_NEVER;
     metadata.loggingUpdatePeriod = 0;
     return metadata;
@@ -61,7 +65,7 @@ UAVObject::Metadata ExampleObject::getDefaultMetadata()
 
 ExampleObject::DataFields ExampleObject::getData()
 {
-	QMutexLocker locker(mutex);
+    QMutexLocker locker(mutex);
     return data;
 }
 

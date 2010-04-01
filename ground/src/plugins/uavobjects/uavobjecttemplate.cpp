@@ -57,7 +57,7 @@ UAVObject::Metadata $(NAME)::getDefaultMetadata()
 
 $(NAME)::DataFields $(NAME)::getData()
 {
-	QMutexLocker locker(mutex);
+    QMutexLocker locker(mutex);
     return data;
 }
 

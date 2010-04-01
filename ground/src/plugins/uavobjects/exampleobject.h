@@ -32,24 +32,36 @@
 #define EXAMPLEOBJECT_H
 
 #include "uavdataobject.h"
+#include "uavobjectfieldprimitives.h"
 
 class ExampleObject: public UAVDataObject
 {
-public:   
+public:
+    // Field structure
     typedef struct {
         qint8 field1;
         qint16 field2;
-        float field3[4];
-        qint32 field4;
+        qint32 field3;
+        float field4[4];
+        quint8 field5;
+        quint16 field6;
+        quint32 field7;
+        quint8 field8;
 
     } __attribute__((packed)) DataFields;
+
+    // Enumeration types
+    typedef enum { FIELD8_OPTION1=0, FIELD8_OPTION2=1,  } FIELD8Enum;
+
   
-    static const quint32 OBJID = 3048370380U;
+    // Constants
+    static const quint32 OBJID = 1785231914U;
     static const QString NAME;
     static const bool ISSINGLEINST = 0;
-	static const bool ISSETTINGS = 0;
+    static const bool ISSETTINGS = 0;
     static const quint32 NUMBYTES = sizeof(DataFields);
 
+    // Functions
     ExampleObject();
 
     DataFields getData();

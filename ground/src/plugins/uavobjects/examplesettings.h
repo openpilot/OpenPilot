@@ -32,10 +32,12 @@
 #define EXAMPLESETTINGS_H
 
 #include "uavdataobject.h"
+#include "uavobjectfieldprimitives.h"
 
 class ExampleSettings: public UAVDataObject
 {
-public:   
+public:
+    // Field structure
     typedef struct {
         qint8 setting1;
         qint16 setting2;
@@ -43,13 +45,18 @@ public:
         qint32 setting4;
 
     } __attribute__((packed)) DataFields;
+
+    // Enumeration types
+
   
+    // Constants
     static const quint32 OBJID = 3555345034U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
-	static const bool ISSETTINGS = 1;
+    static const bool ISSETTINGS = 1;
     static const quint32 NUMBYTES = sizeof(DataFields);
 
+    // Functions
     ExampleSettings();
 
     DataFields getData();

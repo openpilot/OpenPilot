@@ -32,20 +32,27 @@
 #define $(NAMEUC)_H
 
 #include "uavdataobject.h"
+#include "uavobjectfieldprimitives.h"
 
 class $(NAME): public UAVDataObject
 {
-public:   
+public:
+    // Field structure
     typedef struct {
 $(DATAFIELDS)
     } __attribute__((packed)) DataFields;
+
+    // Enumeration types
+$(DATAENUM)
   
+    // Constants
     static const quint32 OBJID = $(OBJID)U;
     static const QString NAME;
     static const bool ISSINGLEINST = $(ISSINGLEINST);
-	static const bool ISSETTINGS = $(ISSETTINGS);
+    static const bool ISSETTINGS = $(ISSETTINGS);
     static const quint32 NUMBYTES = sizeof(DataFields);
 
+    // Functions
     $(NAME)();
 
     DataFields getData();

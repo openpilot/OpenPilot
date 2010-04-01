@@ -27,17 +27,29 @@
 #include "uavobjectparser.h"
 #include <QByteArray>
 
-const char* UAVObjectParser::FieldTypeStr[] = {"FIELDTYPE_INT8", "FIELDTYPE_INT16", "FIELDTYPE_INT32", "FIELDTYPE_FLOAT32", "FIELDTYPE_CHAR"};
-const char* UAVObjectParser::FieldTypeStrC[] = {"int8_t", "int16_t", "int32_t", "float", "char"};
-const char* UAVObjectParser::FieldTypeStrCPP[] = {"qint8", "qint16", "qint32", "float", "char"};
-const char* UAVObjectParser::UpdateModeStr[] = {"UPDATEMODE_PERIODIC", "UPDATEMODE_ONCHANGE", "UPDATEMODE_MANUAL", "UPDATEMODE_NEVER"};
 
 /**
  * Constructor
  */
 UAVObjectParser::UAVObjectParser()
 {
+    fieldTypeStrC << QString("int8_t") << QString("int16_t") << QString("int32_t") <<
+                     QString("uint8_t") << QString("uint16_t") << QString("uint32_t") <<
+                     QString("float") << QString("uint8_t");
 
+    fieldTypeStrCPP << QString("qint8") << QString("qint16") << QString("qint32") <<
+                       QString( "quint8") << QString("quint16") << QString("quint32") <<
+                       QString("float") << QString("quint8");
+
+    fieldTypeStrXML << QString("int8") << QString("int16") << QString("int32") <<
+                       QString("uint8") << QString("uint16") << QString("uint32") <<
+                       QString("float") << QString("enum");
+
+    updateModeStr << QString("UPDATEMODE_PERIODIC") << QString("UPDATEMODE_ONCHANGE") <<
+                     QString("UPDATEMODE_MANUAL") << QString("UPDATEMODE_NEVER");
+
+    updateModeStrXML << QString("periodic") << QString("onchange") <<
+                        QString("manual") << QString("never");
 }
 
 /**
@@ -240,21 +252,10 @@ QString UAVObjectParser::processObjectMetadata(QDomNode& childNode, UpdateMode* 
     }
     else
     {
-        if ( elemAttr.nodeValue().compare(QString("periodic")) == 0 )
+        int index = updateModeStrXML.indexOf( elemAttr.nodeValue() );
+        if (index >= 0)
         {
-            *mode = UPDATEMODE_PERIODIC;
-        }
-        else if ( elemAttr.nodeValue().compare(QString("onchange")) == 0 )
-        {
-            *mode = UPDATEMODE_ONCHANGE;
-        }
-        else if ( elemAttr.nodeValue().compare(QString("manual")) == 0 )
-        {
-            *mode = UPDATEMODE_MANUAL;
-        }
-        else if ( elemAttr.nodeValue().compare(QString("never")) == 0 )
-        {
-            *mode = UPDATEMODE_NEVER;
+            *mode = (UpdateMode)index;
         }
         else
         {
@@ -335,25 +336,10 @@ QString UAVObjectParser::processObjectFields(QDomNode& childNode, ObjectInfo* in
     }
     else
     {
-        if ( elemAttr.nodeValue().compare(QString("int8")) == 0 )
+        int index = fieldTypeStrXML.indexOf(elemAttr.nodeValue());
+        if (index >= 0)
         {
-            field->type = FIELDTYPE_INT8;
-        }
-        else if ( elemAttr.nodeValue().compare(QString("int16")) == 0 )
-        {
-            field->type = FIELDTYPE_INT16;
-        }
-        else if ( elemAttr.nodeValue().compare(QString("int32")) == 0 )
-        {
-            field->type = FIELDTYPE_INT32;
-        }
-        else if ( elemAttr.nodeValue().compare(QString("float")) == 0 )
-        {
-            field->type = FIELDTYPE_FLOAT32;
-        }
-        else if ( elemAttr.nodeValue().compare(QString("char")) == 0 )
-        {
-            field->type = FIELDTYPE_CHAR;
+            field->type = (FieldType)index;
         }
         else
         {
@@ -369,6 +355,25 @@ QString UAVObjectParser::processObjectFields(QDomNode& childNode, ObjectInfo* in
     else
     {
         field->numElements = elemAttr.nodeValue().toInt();
+    }
+    // Get options attribute (only if an enum type)
+    if (field->type == FIELDTYPE_ENUM)
+    {
+        // Get options attribute
+        elemAttr = elemAttributes.namedItem("options");
+        if ( elemAttr.isNull() )
+        {
+            return QString("Object:field:options attribute is missing");
+        }
+        else
+        {
+            QStringList options = elemAttr.nodeValue().split(",", QString::SkipEmptyParts);
+            for (int n = 0; n < options.length(); ++n)
+            {
+                options[n] = options[n].trimmed();
+            }
+            field->options = options;
+        }
     }
     // Add field to object
     info->fields.append(field);
@@ -470,7 +475,7 @@ void UAVObjectParser::replaceCommonTags(QString& out, ObjectInfo* info)
     value = boolToString( info->flightTelemetryAcked );
     out.replace(QString("$(FLIGHTTELEM_ACKED)"), value);
     // Replace $(FLIGHTTELEM_UPDATEMODE) tag
-    value = UpdateModeStr[info->flightTelemetryUpdateMode];
+    value = updateModeStr[info->flightTelemetryUpdateMode];
     out.replace(QString("$(FLIGHTTELEM_UPDATEMODE)"), value);
     // Replace $(FLIGHTTELEM_UPDATEPERIOD) tag
     out.replace(QString("$(FLIGHTTELEM_UPDATEPERIOD)"), QString().setNum(info->flightTelemetryUpdatePeriod));
@@ -478,12 +483,12 @@ void UAVObjectParser::replaceCommonTags(QString& out, ObjectInfo* info)
     value = boolToString( info->gcsTelemetryAcked );
     out.replace(QString("$(GCSTELEM_ACKED)"), value);
     // Replace $(GCSTELEM_UPDATEMODE) tag
-    value = UpdateModeStr[info->gcsTelemetryUpdateMode];
+    value = updateModeStr[info->gcsTelemetryUpdateMode];
     out.replace(QString("$(GCSTELEM_UPDATEMODE)"), value);
     // Replace $(GCSTELEM_UPDATEPERIOD) tag
     out.replace(QString("$(GCSTELEM_UPDATEPERIOD)"), QString().setNum(info->gcsTelemetryUpdatePeriod));
     // Replace $(LOGGING_UPDATEMODE) tag
-    value = UpdateModeStr[info->loggingUpdateMode];
+    value = updateModeStr[info->loggingUpdateMode];
     out.replace(QString("$(LOGGING_UPDATEMODE)"), value);
     // Replace $(LOGGING_UPDATEPERIOD) tag
     out.replace(QString("$(LOGGING_UPDATEPERIOD)"), QString().setNum(info->loggingUpdatePeriod));
@@ -528,7 +533,7 @@ bool UAVObjectParser::generateFlightObject(int objIndex, const QString& template
     for (int n = 0; n < info->fields.length(); ++n)
     {
         // Determine type
-        type = FieldTypeStrC[info->fields[n]->type];
+        type = fieldTypeStrC[info->fields[n]->type];
         // Append field
         if ( info->fields[n]->numElements > 1 )
         {
@@ -541,6 +546,33 @@ bool UAVObjectParser::generateFlightObject(int objIndex, const QString& template
         }
     }
     outInclude.replace(QString("$(DATAFIELDS)"), fields);
+
+    // Replace the $(DATAENUM) tag
+    QString name;
+    QString enums;
+    for (int n = 0; n < info->fields.length(); ++n)
+    {
+        // Only for enum types
+        if (info->fields[n]->type == FIELDTYPE_ENUM)
+        {
+            enums.append("typedef enum { ");
+            // Go through each option
+            QStringList options = info->fields[n]->options;
+            for (int m = 0; m < options.length(); ++m)
+            {
+                enums.append( QString("%1_%2_%3=%4, ")
+                                .arg( info->name.toUpper() )
+                                .arg( info->fields[n]->name.toUpper() )
+                                .arg( options[m].toUpper() )
+                                .arg(m) );
+
+            }
+            enums.append( QString(" } %1%2Enum;\n")
+                          .arg( info->name.toUpper() )
+                          .arg( info->fields[n]->name.toUpper() ) );
+        }
+    }
+    outInclude.replace(QString("$(DATAENUM)"), enums);
 
     // Done
     return true;
@@ -570,7 +602,7 @@ bool UAVObjectParser::generateGCSObject(int objIndex, const QString& templateInc
     for (int n = 0; n < info->fields.length(); ++n)
     {
         // Determine type
-        type = FieldTypeStrCPP[info->fields[n]->type];
+        type = fieldTypeStrCPP[info->fields[n]->type];
         // Append field
         if ( info->fields[n]->numElements > 1 )
         {
@@ -588,13 +620,38 @@ bool UAVObjectParser::generateGCSObject(int objIndex, const QString& templateInc
     QString finit;
     for (int n = 0; n < info->fields.length(); ++n)
     {
-        finit.append( QString("    fields.append(new UAVObjectField(QString(\"%1\"), QString(\"%2\"), UAVObjectField::%3, %4));\n")
+        finit.append( QString("    fields.append(new UAVObjectFieldPrimitives<%1>(QString(\"%2\"), QString(\"%3\"), %4));\n")
+                      .arg(fieldTypeStrCPP[info->fields[n]->type])
                       .arg(info->fields[n]->name)
                       .arg(info->fields[n]->units)
-                      .arg(FieldTypeStr[info->fields[n]->type])
                       .arg(info->fields[n]->numElements) );
     }
     outCode.replace(QString("$(FIELDSINIT)"), finit);
+
+    // Replace the $(DATAENUM) tag
+    QString name;
+    QString enums;
+    for (int n = 0; n < info->fields.length(); ++n)
+    {
+        // Only for enum types
+        if (info->fields[n]->type == FIELDTYPE_ENUM)
+        {
+            enums.append("    typedef enum { ");
+            // Go through each option
+            QStringList options = info->fields[n]->options;
+            for (int m = 0; m < options.length(); ++m)
+            {
+                enums.append( QString("%1_%2=%3, ")
+                                .arg( info->fields[n]->name.toUpper() )
+                                .arg( options[m].toUpper() )
+                                .arg(m) );
+
+            }
+            enums.append( QString(" } %1Enum;\n")
+                          .arg( info->fields[n]->name.toUpper() ) );
+        }
+    }
+    outInclude.replace(QString("$(DATAENUM)"), enums);
 
     // Done
     return true;

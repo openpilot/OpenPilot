@@ -28,6 +28,7 @@
 #define UAVOBJECTPARSER_H
 
 #include <QString>
+#include <QStringList>
 #include <QList>
 #include <QDomDocument>
 #include <QDomElement>
@@ -41,8 +42,11 @@ public:
         FIELDTYPE_INT8 = 0,
         FIELDTYPE_INT16,
         FIELDTYPE_INT32,
+        FIELDTYPE_UINT8,
+        FIELDTYPE_UINT16,
+        FIELDTYPE_UINT32,
         FIELDTYPE_FLOAT32,
-        FIELDTYPE_CHAR
+        FIELDTYPE_ENUM
     } FieldType;
 
     /**
@@ -60,6 +64,7 @@ public:
         QString units;
         FieldType type;
         int numElements;
+        QStringList options; // for enums only
     } FieldInfo;
 
     typedef struct {
@@ -78,12 +83,6 @@ public:
         QList<FieldInfo*> fields;
     } ObjectInfo;
 
-    // Constants
-    static const char* FieldTypeStr[];
-    static const char* FieldTypeStrC[];
-    static const char* FieldTypeStrCPP[];
-    static const char* UpdateModeStr[];
-
     // Functions
     UAVObjectParser();
     QString parseXML(QString& xml, QString& filename);
@@ -99,6 +98,11 @@ public:
 private:
     QList<ObjectInfo*> objInfo;
     QString filename;
+    QStringList fieldTypeStrC;
+    QStringList fieldTypeStrCPP;
+    QStringList fieldTypeStrXML;
+    QStringList updateModeStr;
+    QStringList updateModeStrXML;
 
     QString processObjectAttributes(QDomNode& node, ObjectInfo* info);
     QString processObjectFields(QDomNode& childNode, ObjectInfo* info);

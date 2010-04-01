@@ -76,7 +76,7 @@ namespace jafar {
 				virtual ~LandmarkAbstract() {
 				}
 
-				DescriptorAbstract descriptor; //<                        Landmark descriptor
+				DescriptorAbstract descriptor; ///<                       Landmark descriptor
 
 				map_ptr_t slamMap; ///<                                   Parent map
 				observations_ptr_set_t observations; ///<                 A set of observations (one per sensor)

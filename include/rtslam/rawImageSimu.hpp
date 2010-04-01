@@ -14,6 +14,7 @@
 #define RAWIMAGESIMU_HPP_
 
 #include "rtslam/rawAbstract.hpp"
+#include "rtslam/featureAbstract.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -35,6 +36,11 @@ namespace jafar {
 				RawImageSimu() :
 					rawAbstract() {
 				}
+
+				/**
+				 * Add a point-typed feature on a pixel.
+				 */
+				 void addFeature(const FeatureAbstract);
 
 			private:
 

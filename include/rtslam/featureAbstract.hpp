@@ -2,7 +2,7 @@
  * Copyright RIA-LAAS/CNRS, 2010
  *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
- * File:      rawAbstract.hpp
+ * File:      featureAbstract.h
  * Project:   RT-Slam
  * Author:    Jean-Marie CODOL
  *
@@ -14,48 +14,52 @@
  * Description
  * ============
  *
- *	The Raws are used to store informations from sensors (exemple: image from camera,
- *	    gps pseudo-distances from GPS sensor, ...).
- *
  *
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 /**
- * \file rawAbstract.hpp
- * File defining the abstract raw-datas class
+ * \file featureAbstract.hpp
+ * File defining the abstract feature.
  * \author jmcodol@laas.fr
  * \ingroup rtslam
  */
 
-#ifndef RAWABSTRACT_HPP_
-#define RAWABSTRACT_HPP_
+#ifndef __FeatureAbstract_H__
+#define __FeatureAbstract_H__
 
 /* --------------------------------------------------------------------- */
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#include "rtslam/objectAbstract.hpp"
-
-#include <iostream>
 
 namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
-		class rawAbstract: public ObjectAbstract {
-			private:
+
+		/** Base class for all landmark appearances defined in the module
+		 * rtslam.
+		 *
+		 * @ingroup rtslam
+		 */
+		class FeatureAbstract {
 			public:
-				rawAbstract();
-				virtual ~rawAbstract();
-				/*
-				 * Operator << for class rawAbstract.
-				 * It shows some informations
-				 */
-				friend ostream& operator <<(ostream & s, jafar::rtslam::rawAbstract & rawA);
+				FeatureAbstract() {
+				}
+				virtual ~FeatureAbstract() {
+				}
 		};
+
 	}
+
 }
-#endif /* RAWABSTRACT_HPP_ */
 
-
-
+#endif // #ifndef __FeatureAbstract_H__
+/*
+ * Local variables:
+ * mode: c++
+ * indent-tabs-mode: t
+ * tab-width: 2
+ * c-basic-offset: 2
+ * End:
+ */

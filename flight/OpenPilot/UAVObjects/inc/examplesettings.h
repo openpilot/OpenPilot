@@ -54,6 +54,9 @@ typedef struct {
 
 } __attribute__((packed)) ExampleSettingsData;
 
+// Enumeration types
+
+
 // Generic interface functions
 int32_t ExampleSettingsInitialize();
 UAVObjHandle ExampleSettingsGetHandle();

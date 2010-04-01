@@ -50,10 +50,10 @@ int32_t ExampleObjectInitialize()
 	// Initialize metadata
 	metadata.telemetryAcked = 1;
 	metadata.telemetryUpdateMode = UPDATEMODE_ONCHANGE;
-	metadata.telemetryUpdatePeriod = 0;
+	metadata.telemetryUpdatePeriod = 100;
 	metadata.gcsTelemetryAcked = 1;
-	metadata.gcsTelemetryUpdateMode = UPDATEMODE_PERIODIC;
-	metadata.gcsTelemetryUpdatePeriod = 100;
+	metadata.gcsTelemetryUpdateMode = UPDATEMODE_ONCHANGE;
+	metadata.gcsTelemetryUpdatePeriod = 0;
 	metadata.loggingUpdateMode = UPDATEMODE_NEVER;
 	metadata.loggingUpdatePeriod = 0;
 	UAVObjSetMetadata(handle, &metadata);

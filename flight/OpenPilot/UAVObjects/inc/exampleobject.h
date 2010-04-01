@@ -35,7 +35,7 @@
 #include "openpilot.h"
 
 // Object constants
-#define EXAMPLEOBJECT_OBJID 3048370380U
+#define EXAMPLEOBJECT_OBJID 1785231914U
 #define EXAMPLEOBJECT_NAME "ExampleObject"
 #define EXAMPLEOBJECT_ISSINGLEINST 0
 #define EXAMPLEOBJECT_ISSETTINGS 0
@@ -49,10 +49,18 @@
 typedef struct {
     int8_t field1;
     int16_t field2;
-    float field3[4];
-    int32_t field4;
+    int32_t field3;
+    float field4[4];
+    uint8_t field5;
+    uint16_t field6;
+    uint32_t field7;
+    uint8_t field8;
 
 } __attribute__((packed)) ExampleObjectData;
+
+// Enumeration types
+typedef enum { EXAMPLEOBJECT_FIELD8_OPTION1=0, EXAMPLEOBJECT_FIELD8_OPTION2=1,  } EXAMPLEOBJECTFIELD8Enum;
+
 
 // Generic interface functions
 int32_t ExampleObjectInitialize();

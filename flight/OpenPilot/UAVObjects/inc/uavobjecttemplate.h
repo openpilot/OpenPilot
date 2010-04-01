@@ -50,6 +50,9 @@ typedef struct {
 $(DATAFIELDS)
 } __attribute__((packed)) $(NAME)Data;
 
+// Enumeration types
+$(DATAENUM)
+
 // Generic interface functions
 int32_t $(NAME)Initialize();
 UAVObjHandle $(NAME)GetHandle();

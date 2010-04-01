@@ -21,6 +21,20 @@ namespace jafar {
 		// RAW IMAGE SIMULATED
 		//////////////////////////
 
+		/**
+		 * Add a Feature on the image simulated.
+		 */
+		 void RawImageSimu::addFeature(const FeatureAbstract) {
+			 return ;
+		 }
+			/*
+			 * Operator << for class rawAbstract.
+			 * It shows some informations
+			 */
+			std::ostream& operator <<(std::ostream & s, jafar::rtslam::RawImageSimu & rawIS) {
+				s << " I am a raw-data image simu" << endl;
+				return s;
+			}
 
 	} // namespace rtslam
 } // namespace jafar

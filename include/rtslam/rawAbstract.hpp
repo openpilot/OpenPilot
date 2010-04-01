@@ -36,6 +36,8 @@
 
 #include "rtslam/objectAbstract.hpp"
 
+#include <iostream>
+
 namespace jafar {
 	namespace rtslam {
 		using namespace std;
@@ -45,6 +47,11 @@ namespace jafar {
 			public:
 				rawAbstract();
 				virtual ~rawAbstract();
+				/*
+				 * Operator << for class rawAbstract.
+				 * It shows some informations
+				 */
+				friend ostream& operator <<(ostream & s, jafar::rtslam::rawAbstract & rawA);
 		};
 	}
 }

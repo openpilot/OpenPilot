@@ -17,6 +17,7 @@
 #include "kernel/jafarDebug.hpp"
 
 #include "rtslam/rawImageSimu.hpp"
+#include "rtslam/FeaturePoint.hpp"
 
 #include <iostream>
 
@@ -25,7 +26,10 @@ using namespace std;
 
 void test_raw01(void) {
 	cout << "\n% TEST OF RAW STRUCTURE\n% ==============" << endl;
-	RawImageSimu img ;
+	RawImageSimu    imgSimu  ;
+	cout << imgSimu << endl ;
+	FeaturePoint fp1   ;
+	imgSimu.addFeature( fp1 ) ;
 
 }
 

@@ -41,6 +41,7 @@ namespace jafar {
 				 * Add a point-typed feature on a pixel.
 				 */
 				 void addFeature(const FeatureAbstract);
+				 friend ostream& operator <<(ostream & s, jafar::rtslam::RawImageSimu& rawA);
 
 			private:
 

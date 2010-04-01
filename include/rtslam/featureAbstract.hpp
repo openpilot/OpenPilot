@@ -46,7 +46,7 @@ namespace jafar {
 			public:
 				FeatureAbstract() {
 				}
-				~FeatureAbstract() {
+				virtual ~FeatureAbstract() {
 				}
 		};
 

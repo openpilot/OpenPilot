@@ -262,12 +262,16 @@ namespace jafar {
 				 * according to the current state _x, the control input \a _u and the time interval \a _dt.
 				 * It computes the new state and the convenient Jacobian matrices.
 				 *
+				 * In clase the flag \b constantPerturbation is set to \c true, the matrix _XNEW_pert is not computed.
+				 *
+				 * \sa Documentation of the constantPerturbation flag.
+				 *
 				 * \param _x the current state vector
 				 * \param _u the control vector
 				 * \param _dt the time interval
 				 * \param _xnew the new state
 				 * \param _XNEW_x the Jacobian of \a _xnew wrt \a _x
-				 * \param _XNEW_u the Jacobian of \a _xnew wrt \a _u
+				 * \param _XNEW_pert the Jacobian of \a _xnew wrt \a _n
 				 */
 				virtual void move_func(const vec & _x, const vec & _u, const vec& _n, const double _dt, vec & _xnew, mat & _XNEW_x, mat & _XNEW_pert) = 0;
 

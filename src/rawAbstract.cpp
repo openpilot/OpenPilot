@@ -19,12 +19,9 @@ namespace jafar {
 		using namespace std;
 
 		rawAbstract::rawAbstract() {
-			// TODO Auto-generated constructor stub
-
 		}
 
 		rawAbstract::~rawAbstract() {
-			// TODO Auto-generated destructor stub
 		}
 
 	}

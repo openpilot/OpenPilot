@@ -1,0 +1,45 @@
+/**
+ *
+ *  \file rawImageSimu.hpp
+ *
+ *  Header file for simulated image
+ *
+ *  Created on: 14/03/2010
+ *     \author: jmcodol@laas.fr
+ *
+ * \ingroup rtslam
+ */
+
+#ifndef RAWIMAGESIMU_HPP_
+#define RAWIMAGESIMU_HPP_
+
+#include "rtslam/rawAbstract.hpp"
+
+namespace jafar {
+	namespace rtslam {
+		using namespace std;
+
+
+		/**
+		 * Class of simulated image
+		 * \author jmcodol
+		 * \ingroup rtslam
+		 */
+		class RawImageSimu: public rawAbstract {
+
+			public:
+
+				/**
+				 * Constructor
+				 */
+				RawImageSimu() :
+					rawAbstract() {
+				}
+
+			private:
+
+		};
+	}
+}
+
+#endif /* RAWIMAGESIMU_HPP_ */

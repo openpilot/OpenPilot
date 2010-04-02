@@ -73,8 +73,7 @@ namespace jafar {
 			}
 
 			template<class VF, class Vahpf, class Vahp, class MAHP_f, class MAHP_ahpf>
-			void fromFrame(const VF & F, const Vahpf & ahpf, Vahp & ahp,
-			    MAHP_f & AHP_f, MAHP_ahpf & AHP_ahpf) {
+			void fromFrame(const VF & F, const Vahpf & ahpf, Vahp & ahp, MAHP_f & AHP_f, MAHP_ahpf & AHP_ahpf) {
 				// split non-trivial chunks of landmark state
 				jblas::vec3 p0f(ublas::subrange(ahpf, 0, 3));
 				jblas::vec3 mf(subrange(ahpf, 3, 6));
@@ -120,10 +119,8 @@ namespace jafar {
 				return ahpf;
 			}
 
-			template<class VF, class Vahp, class Vahpf, class MAHPF_f,
-			    class MAHPF_ahp>
-			void toFrame(const VF & F, const Vahp & ahp, Vahpf & ahpf,
-			    MAHPF_f & AHPF_f, MAHPF_ahp & AHPF_ahp) {
+			template<class VF, class Vahp, class Vahpf, class MAHPF_f, class MAHPF_ahp>
+			void toFrame(const VF & F, const Vahp & ahp, Vahpf & ahpf, MAHPF_f & AHPF_f, MAHPF_ahp & AHPF_ahp) {
 				// split non-trivial chunks of landmark state
 				jblas::vec3 p0(ublas::subrange(ahp, 0, 3));
 				jblas::vec3 m(subrange(ahp, 3, 6));
@@ -283,12 +280,11 @@ namespace jafar {
 				 * \param AHP_f the Jacobian of \a ahp wrt \a F
 				 * \param AHP_ahpf the Jacobians of \a ahp wrt \a ahpf
 				 */
-				template<class VF, class Vahpf, class Vahp, class MAHP_f,
-				    class MAHP_ahpf>
-				static void fromFrame(const VF & F, const Vahpf & ahpf, Vahp & ahp,
-				    MAHP_f & AHP_f, MAHP_ahpf & AHP_ahpf) {
+				template<class VF, class Vahpf, class Vahp, class MAHP_f, class MAHP_ahpf>
+				static void fromFrame(const VF & F, const Vahpf & ahpf, Vahp & ahp, MAHP_f & AHP_f, MAHP_ahpf & AHP_ahpf) {
 					landmarkAHP::fromFrame(F, ahpf, ahp, AHP_f, AHP_ahpf);
 				}
+
 
 				/**
 				 * To-frame transform.
@@ -309,12 +305,11 @@ namespace jafar {
 				 * \param AHPF_f the Jacobian of \a ahpf wrt \a F
 				 * \param AHPF_ahp the Jacobians of \a ahpf wrt \a ahp
 				 */
-				template<class VF, class Vahp, class Vahpf, class MAHPF_f,
-				    class MAHPF_ahp>
-				static void toFrame(const VF & F, const Vahp & ahp, Vahpf & ahpf,
-				    MAHPF_f & AHPF_f, MAHPF_ahp & AHPF_ahp) {
+				template<class VF, class Vahp, class Vahpf, class MAHPF_f, class MAHPF_ahp>
+				static void toFrame(const VF & F, const Vahp & ahp, Vahpf & ahpf, MAHPF_f & AHPF_f, MAHPF_ahp & AHPF_ahp) {
 					landmarkAHP::toFrame(F, ahp, ahpf, AHPF_f, AHPF_ahp);
 				}
+
 
 				/**
 				 * Reparametrize to Euclidean.

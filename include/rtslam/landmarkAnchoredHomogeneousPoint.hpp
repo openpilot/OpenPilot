@@ -37,7 +37,7 @@ namespace jafar {
 			 * \param rho the homogeneous parameter (inverse-distance)
 			 */
 			template<class AHP, class P0, class M>
-			void split(const AHP & ahp, P0 & p0, M & m, double rho) {
+			void split(const AHP & ahp, P0 & p0, M & m, double & rho) {
 				p0 = project(ahp, ublas::range(0, 3));
 				m = project(ahp, ublas::range(3, 6));
 				rho = ahp(6);
@@ -219,7 +219,7 @@ namespace jafar {
 				vec3 t = subrange(s, 0, 3);
 				vec4 q = subrange(s, 3, 7);
 				vec3 d = m - (t - p0) * rho;
-				return rotateInv(q, d);
+				return rotateInv(q, d); // OK JS April 1 2010
 			}
 
 
@@ -257,13 +257,20 @@ namespace jafar {
 
 
 				// Jacobians
+				mat33 V_p0;
+				V_p0 = V_d * rho;
+				//				mat V_rho(3,1); // This comments only for Jacobian reference...
+				//				V_m = V_d;
+				//				V_rho = prod(V_d, (p0 - t));
+				//				V_t = - V_d * rho;
+
 				V_s.clear();
 				V_ahp.clear();
-				ublas::subrange(V_s, 0, 3, 0, 3) = -rho * V_d; // dv / dt
+				ublas::subrange(V_s, 0, 3, 0, 3) = - V_p0; //      dv / dt
 				ublas::subrange(V_s, 0, 3, 3, 7) = V_q; //         dv / dq
-				ublas::subrange(V_ahp, 0, 3, 0, 3) = rho * V_d; // dv / dp0
+				ublas::subrange(V_ahp, 0, 3, 0, 3) = V_p0; //      dv / dp0
 				ublas::subrange(V_ahp, 0, 3, 3, 6) = V_d; //       dv / dm
-				ublas::column(V_ahp, 6) = prod(V_d, (t - p0)); //  dv / drho
+				ublas::column(V_ahp, 6) = prod(V_d, (p0 - t)); //  dv / drho   // OK JS April 1 2010
 			}
 
 
@@ -289,7 +296,7 @@ namespace jafar {
 				ublas::subrange(ahp, 0, 3) = t;
 				ublas::subrange(ahp, 3, 6) = rotate(q, v);
 				ahp(6) = _rho * norm_2(v);
-				return ahp;
+				return ahp; // OK JS April 1 2010
 			}
 
 
@@ -337,7 +344,7 @@ namespace jafar {
 				subrange(AHP_v, 3, 6, 0, 3) = M_v; //            dm / dv
 				subrange(AHP_v, 6, 7, 0, 3) = _rho * NV_v; //  drho / dv
 				AHP_rho(6, 0) = nv; //                         drho / drho
-			}
+			}  // OK JS April 1 2010
 
 		} // namespace landmarkAHP
 

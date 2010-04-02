@@ -153,14 +153,13 @@ namespace jafar {
 
 				template<typename bubTemplateMatrix>
 				void initFromBubMatrix(const bubTemplateMatrix& m1) {
-//					fullPrec = false;
+					fullPrec = false;
 					std::ostringstream os;
 					os << "...\n[ ";
 					std::ostringstream ostmp;
 					ostmp.precision(prec);
 					ostmp.setf(std::ios::fixed,std::ios::floatfield);
 					for (size_t i = 0; i < m1.size1(); ++i) {
-//						ostmp << "\t";
 						for (size_t j = 0; j < m1.size2(); ++j) {
 							if (m1(i, j) < 0)
 								ostmp << "-";
@@ -169,14 +168,13 @@ namespace jafar {
 							if (fullPrec || fabs(m1(i, j)) > 1e-6)
 								ostmp << fabs(m1(i, j));
 							else {
-								ostmp << 0.0;
+								ostmp << "0";
 							}
 							if (m1.size2() != j + 1) {
 								ostmp << ",";
 								const int size = ostmp.str().length();
 								for (size_t i = size; i < prec+7; ++i)
 									ostmp << " ";
-//								ostmp << "\t";
 							}
 							os << ostmp.str();
 							ostmp.str("");

@@ -35,30 +35,32 @@
 #include "openpilot.h"
 
 // Object constants
-#define EXAMPLESETTINGS_OBJID 3555345034U
+#define EXAMPLESETTINGS_OBJID 1640607828U
 #define EXAMPLESETTINGS_NAME "ExampleSettings"
 #define EXAMPLESETTINGS_ISSINGLEINST 1
 #define EXAMPLESETTINGS_ISSETTINGS 1
 #define EXAMPLESETTINGS_NUMBYTES sizeof(ExampleSettingsData)
 
 // Data access macros
-#define ExampleSettingsGet(dataOut) UAVObjGetData(ExampleSettingsGetHandle(), dataOut)
-#define ExampleSettingsSet(dataIn) UAVObjSetData(ExampleSettingsGetHandle(), dataIn)
+#define ExampleSettingsGet(dataOut) UAVObjGetData(ExampleSettingsHandle(), dataOut)
+#define ExampleSettingsSet(dataIn) UAVObjSetData(ExampleSettingsHandle(), dataIn)
+#define ExampleSettingsConnectQueue(queue) UAVObjConnectQueue(ExampleSettingsHandle(), queue, EV_MASK_ALL_UPDATES)
+#define ExampleSettingsConnectCallback(cb) UAVObjConnectCallback(ExampleSettingsHandle(), cb, EV_MASK_ALL_UPDATES)
 
 // Object data
 typedef struct {
-    int8_t setting1;
-    int16_t setting2;
-    int8_t setting3;
-    int32_t setting4;
+    int32_t UpdatePeriod;
+    int32_t StepSize;
+    uint8_t StepDirection;
 
 } __attribute__((packed)) ExampleSettingsData;
 
 // Enumeration types
+typedef enum { EXAMPLESETTINGS_STEPDIRECTION_UP=0, EXAMPLESETTINGS_STEPDIRECTION_DOWN=1,  } EXAMPLESETTINGSSTEPDIRECTIONEnum;
 
 
 // Generic interface functions
 int32_t ExampleSettingsInitialize();
-UAVObjHandle ExampleSettingsGetHandle();
+UAVObjHandle ExampleSettingsHandle();
 
 #endif // EXAMPLESETTINGS_H

@@ -65,7 +65,7 @@ int32_t ExampleSettingsInitialize()
 /**
  * Get object handle
  */
-UAVObjHandle ExampleSettingsGetHandle()
+UAVObjHandle ExampleSettingsHandle()
 {
 	return handle;
 }

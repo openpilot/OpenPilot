@@ -75,6 +75,8 @@ OPSETTINGS = ./Settings
 OPSETTINGSINC = $(OPSETTINGS)/inc
 OPTESTS  = ./Tests
 OPMODULEDIR = ./Modules
+MODEXAMPLE = $(OPMODULEDIR)/Example
+MODEXAMPLEINC = $(MODEXAMPLE)/inc
 MODTELEMETRY = $(OPMODULEDIR)/Telemetry
 MODTELEMETRYINC = $(MODTELEMETRY)/inc
 MODGPS = $(OPMODULEDIR)/GPS
@@ -105,7 +107,8 @@ DOXYGENDIR = ../Doc/Doxygen
 # use file-extension c for "c-only"-files
 
 ## MODULES
-SRC =  $(MODTELEMETRY)/telemetry.c
+SRC = $(MODEXAMPLE)/examplemodevent.c $(MODEXAMPLE)/examplemodperiodic.c $(MODEXAMPLE)/examplemodthread.c
+SRC +=  $(MODTELEMETRY)/telemetry.c
 SRC += $(MODGPS)/GPS.c $(MODGPS)/buffer.c
 
 ## OPENPILOT:
@@ -125,7 +128,8 @@ SRC += $(OPUAVOBJ)/eventdispatcher.c
 
 
 ## UAVOBJECTS
-SRC += $(OPUAVOBJ)/exampleobject.c
+SRC += $(OPUAVOBJ)/exampleobject1.c
+SRC += $(OPUAVOBJ)/exampleobject2.c
 SRC += $(OPUAVOBJ)/examplesettings.c
 
 ## PIOS Hardware (STM32F10x)
@@ -243,6 +247,8 @@ EXTRAINCDIRS  += $(OPUAVOBJ)
 EXTRAINCDIRS  += $(OPUAVOBJINC)
 EXTRAINCDIRS  += $(OPSETTINGS)
 EXTRAINCDIRS  += $(OPSETTINGSINC)
+EXTRAINCDIRS  += $(MODEXAMPLE)
+EXTRAINCDIRS  += $(MODEXAMPLEINC)
 EXTRAINCDIRS  += $(MODTELEMETRY)
 EXTRAINCDIRS  += $(MODTELEMETRYINC)
 EXTRAINCDIRS  += $(MODGPS)

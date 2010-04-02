@@ -65,7 +65,7 @@ int32_t $(NAME)Initialize()
 /**
  * Get object handle
  */
-UAVObjHandle $(NAME)GetHandle()
+UAVObjHandle $(NAME)Handle()
 {
 	return handle;
 }

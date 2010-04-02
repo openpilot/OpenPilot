@@ -22,58 +22,60 @@ namespace jafar {
 
 
 		/**
-		 * Namespace for operations on Anchored Homogeneous Points
+		 * Namespace for operations on Anchored Homogeneous Points.
 		 * \ingroup rtslam
 		 */
 		namespace landmarkAHP {
 			using namespace ublas;
+			using namespace jblas;
 			using namespace quaternion;
 
 
 			/**
-			 * Split AHP
+			 * Split AHP.
 			 * \param p0 the output anchor.
 			 * \param m the output director vector
 			 * \param rho the homogeneous parameter (inverse-distance)
 			 */
 			template<class AHP, class P0, class M>
 			void split(const AHP & ahp, P0 & p0, M & m, double & rho) {
-				p0 = project(ahp, ublas::range(0, 3));
-				m = project(ahp, ublas::range(3, 6));
+				p0 = project(ahp, range(0, 3));
+				m = project(ahp, range(3, 6));
 				rho = ahp(6);
 			}
 
 
 			/**
-			 * Compose AHP
+			 * Compose AHP.
+			 *
 			 * This is the opposite as split()
 			 * \param p0 the output anchor.
 			 * \param m the output director vector
 			 * \param rho the homogeneous parameter (inverse-distance)
 			 */
 			template<class P0, class M>
-			jblas::vec7 compose(const P0 & p0, const M & m, const double rho) {
-				jblas::vec7 ahp;
-				project(ahp, ublas::range(0, 3)) = p0;
-				project(ahp, ublas::range(3, 6)) = m;
+			vec7 compose(const P0 & p0, const M & m, const double rho) {
+				vec7 ahp;
+				project(ahp, range(0, 3)) = p0;
+				project(ahp, range(3, 6)) = m;
 				ahp(6) = rho;
 				return ahp;
 			}
 
 			template<class VF, class Vlf>
-			jblas::vec fromFrame(const VF & F, const Vlf & ahpf) {
+			vec fromFrame(const VF & F, const Vlf & ahpf) {
 
 
 				// split non-trivial chunks of landmark state
-				jblas::vec3 p0f(ublas::subrange(ahpf, 0, 3));
-				jblas::vec3 mf(ublas::subrange(ahpf, 3, 6));
+				vec3 p0f(subrange(ahpf, 0, 3));
+				vec3 mf(subrange(ahpf, 3, 6));
 
 
 				// transformed landmark in global frame
-				jblas::vec ahp(7);
+				vec ahp(7);
 
-				ublas::subrange(ahp, 0, 3) = eucFromFrame(F, p0f);
-				ublas::subrange(ahp, 3, 6) = vecFromFrame(F, mf);
+				subrange(ahp, 0, 3) = eucFromFrame(F, p0f);
+				subrange(ahp, 3, 6) = vecFromFrame(F, mf);
 				ahp(6) = ahpf(6);
 
 				return ahp;
@@ -82,24 +84,18 @@ namespace jafar {
 			template<class VF, class Vahpf, class Vahp, class MAHP_f, class MAHP_ahpf>
 			void fromFrame(const VF & F, const Vahpf & ahpf, Vahp & ahp, MAHP_f & AHP_f, MAHP_ahpf & AHP_ahpf) {
 				// split non-trivial chunks of landmark state
-				jblas::vec3 p0f(ublas::subrange(ahpf, 0, 3));
-				jblas::vec3 mf(subrange(ahpf, 3, 6));
-
-
+				vec3 p0f(subrange(ahpf, 0, 3));
+				vec3 mf(subrange(ahpf, 3, 6));
 				// destination chunks
-				jblas::vec3 p0;
-				jblas::vec3 m;
-				jblas::mat JAC_33(3, 3), JAC_37(3, 7);
-
-
+				vec3 p0;
+				vec3 m;
+				mat JAC_33(3, 3), JAC_37(3, 7);
 				// Jacobians
 				AHP_f.clear();
 				AHP_ahpf.clear();
-
-
 				// transform p0
 				eucFromFrame(F, p0f, p0, JAC_37, JAC_33);
-				ublas::subrange(ahp, 0, 3) = p0;
+				subrange(ahp, 0, 3) = p0;
 				subrange(AHP_f, 0, 3, 0, 7) = JAC_37;
 				subrange(AHP_ahpf, 0, 3, 0, 3) = JAC_33;
 				// transform m
@@ -113,19 +109,14 @@ namespace jafar {
 			}
 
 			template<class VF, class Vahp>
-			jblas::vec toFrame(const VF & F, const Vahp & ahp) {
-
-
+			vec toFrame(const VF & F, const Vahp & ahp) {
 				// split non-trivial chunks of landmark state
-				jblas::vec3 p0(ublas::subrange(ahp, 0, 3));
-				jblas::vec3 m(subrange(ahp, 3, 6));
-
-
+				vec3 p0(subrange(ahp, 0, 3));
+				vec3 m(subrange(ahp, 3, 6));
 				// transformed landmark in frame F
-				jblas::vec ahpf(7);
-
-				ublas::subrange(ahpf, 0, 3) = eucToFrame(F, p0);
-				ublas::subrange(ahpf, 3, 6) = vecToFrame(F, m);
+				vec ahpf(7);
+				subrange(ahpf, 0, 3) = eucToFrame(F, p0);
+				subrange(ahpf, 3, 6) = vecToFrame(F, m);
 				ahpf(6) = ahp(6);
 
 				return ahpf;
@@ -134,24 +125,18 @@ namespace jafar {
 			template<class VF, class Vahp, class Vahpf, class MAHPF_f, class MAHPF_ahp>
 			void toFrame(const VF & F, const Vahp & ahp, Vahpf & ahpf, MAHPF_f & AHPF_f, MAHPF_ahp & AHPF_ahp) {
 				// split non-trivial chunks of landmark state
-				jblas::vec3 p0(ublas::subrange(ahp, 0, 3));
-				jblas::vec3 m(subrange(ahp, 3, 6));
-
-
+				vec3 p0(subrange(ahp, 0, 3));
+				vec3 m(subrange(ahp, 3, 6));
 				// destination chunks
-				jblas::vec3 p0f;
-				jblas::vec3 mf;
-				jblas::mat JAC_33(3, 3), JAC_37(3, 7);
-
-
+				vec3 p0f;
+				vec3 mf;
+				mat JAC_33(3, 3), JAC_37(3, 7);
 				// Jacobians
 				AHPF_f.clear();
 				AHPF_ahp.clear();
-
-
 				// transform p0
 				eucToFrame(F, p0, p0f, JAC_37, JAC_33);
-				ublas::subrange(ahpf, 0, 3) = p0f;
+				subrange(ahpf, 0, 3) = p0f;
 				subrange(AHPF_f, 0, 3, 0, 7) = JAC_37;
 				subrange(AHPF_ahp, 0, 3, 0, 3) = JAC_33;
 				// transform m
@@ -171,8 +156,8 @@ namespace jafar {
 			 * \return the Euclidean point.
 			 */
 			template<class VA>
-			jblas::vec3 ahp2euc(const VA & ahp) {
-				return ublas::subrange(ahp, 0, 3) + ublas::subrange(ahp, 3, 6) / ahp(6);
+			vec3 ahp2euc(const VA & ahp) {
+				return subrange(ahp, 0, 3) + subrange(ahp, 3, 6) / ahp(6);
 			}
 
 
@@ -186,12 +171,12 @@ namespace jafar {
 			void ahp2euc(const VA & ahp, VE & euc, ME_a & EUC_ahp) {
 				euc.assign(ahp2euc(ahp));
 				// split non-trivial chunks of landmark state
-				jblas::vec3 m(subrange(ahp, 3, 6));
+				vec3 m(subrange(ahp, 3, 6));
 				double rho = ahp(6);
-				jblas::identity_mat I(3);
-				ublas::subrange(EUC_ahp, 0, 3, 0, 3) = I;
-				ublas::subrange(EUC_ahp, 0, 3, 3, 6) = I / rho;
-				ublas::column(EUC_ahp, 6) = -m / rho / rho;
+				identity_mat I(3);
+				subrange(EUC_ahp, 0, 3, 0, 3) = I;
+				subrange(EUC_ahp, 0, 3, 3, 6) = I / rho;
+				column(EUC_ahp, 6) = -m / rho / rho;
 			}
 
 
@@ -205,7 +190,7 @@ namespace jafar {
 			 * this function computes the chain (See Sola \e etal. PAMI 2010):
 			 * - R'(q) * ( m - (t - p0) * rho )
 			 *
-			 * which is a vector in sensor frame in the direction of the landmark. the range information is lost.
+			 * which is a vector in sensor frame in the direction of the landmark. The range information is lost.
 			 *
 			 * \param s the sensor frame
 			 * \param ahp the AHP landmark
@@ -224,7 +209,39 @@ namespace jafar {
 
 
 			/**
-			 * Bring landmark to bearing-only sensor frame (without range information).
+			 * Bring landmark to bearing-only sensor frame (give inverse-distance information).
+			 *
+			 * For a landmark and sensor frame
+			 * - ahp = [p0 m rho]
+			 * - s = [t q],
+			 *
+			 * this function computes the chain (See Sola \e etal. PAMI 2010):
+			 * - v = R'(q) * ( m - (t - p0) * rho )
+			 *
+			 * which is a vector in sensor frame in the direction of the landmark.
+			 *
+			 * The range information is recuperated in \a invDist as the inverse of the distance from sensor to landmark.
+			 *
+			 * \param s the sensor frame
+			 * \param ahp the AHP landmark
+			 * \param v the bearing-only landmark in sensor frame
+			 * \param invDist the inverse of the non-observable distance
+			 */
+			template<class VS, class VA, class VV>
+			void toBearingOnlyFrame(const VS & s, const VA & ahp, VV & v, double & invDist) {
+				vec3 p0, m;
+				double rho;
+				split(ahp, p0, m, rho);
+				vec3 t = subrange(s, 0, 3);
+				vec4 q = subrange(s, 3, 7);
+				vec3 d = m - (t - p0) * rho;
+				v = rotateInv(q, d); // OK JS April 1 2010
+				invDist = rho / norm_2(v);
+			}
+
+
+			/**
+			 * Bring landmark to bearing-only sensor frame (give inverse-distance information).
 			 *
 			 * For a landmark and sensor frame
 			 * - ahp = [p0 m rho]
@@ -233,7 +250,9 @@ namespace jafar {
 			 * this function computes the chain (See Sola \e etal. PAMI 2010):
 			 * - R'(q) * ( m - (t - p0) * rho )
 			 *
-			 * which is a vector in sensor frame in the direction of the landmark. the range information is lost.
+			 * which is a vector in sensor frame in the direction of the landmark.
+			 *
+			 * The range information is recuperated in \a invDist as the inverse of the distance from sensor to landmark.
 			 *
 			 * and returns the Jacobians wrt s and ahp.
 			 * \param s the sensor frame
@@ -243,19 +262,18 @@ namespace jafar {
 			 * \param V_ahp the Jacobian of \a v wrt \a ahp
 			 */
 			template<class VS, class VA, class VV, class MV_s, class MV_a>
-			void toBearingOnlyFrame(const VS & s, const VA & ahp, VV & v, MV_s & V_s, MV_a & V_ahp) {
+			void toBearingOnlyFrame(const VS & s, const VA & ahp, VV & v, double & invDist, MV_s & V_s, MV_a & V_ahp) {
 				vec3 p0, m;
 				double rho;
 				mat34 V_q;
 				mat33 V_d;
-
+				// value
 				split(ahp, p0, m, rho);
 				vec3 t = subrange(s, 0, 3);
 				vec4 q = subrange(s, 3, 7);
-				vec3 d = m - (t - p0) * rho; // before rotation
-				rotateInv(q, d, v, V_q, V_d);
-
-
+				vec3 d = m - (t - p0) * rho; //    before rotation
+				rotateInv(q, d, v, V_q, V_d); //   obtain v
+				invDist = rho / norm_2(v); //      obtain invDist
 				// Jacobians
 				mat33 V_p0;
 				V_p0 = V_d * rho;
@@ -263,14 +281,13 @@ namespace jafar {
 				//				V_m = V_d;
 				//				V_rho = prod(V_d, (p0 - t));
 				//				V_t = - V_d * rho;
-
 				V_s.clear();
 				V_ahp.clear();
-				ublas::subrange(V_s, 0, 3, 0, 3) = - V_p0; //      dv / dt
-				ublas::subrange(V_s, 0, 3, 3, 7) = V_q; //         dv / dq
-				ublas::subrange(V_ahp, 0, 3, 0, 3) = V_p0; //      dv / dp0
-				ublas::subrange(V_ahp, 0, 3, 3, 6) = V_d; //       dv / dm
-				ublas::column(V_ahp, 6) = prod(V_d, (p0 - t)); //  dv / drho   // OK JS April 1 2010
+				subrange(V_s, 0, 3, 0, 3) = -V_p0; //      dv / dt
+				subrange(V_s, 0, 3, 3, 7) = V_q; //         dv / dq
+				subrange(V_ahp, 0, 3, 0, 3) = V_p0; //      dv / dp0
+				subrange(V_ahp, 0, 3, 3, 6) = V_d; //       dv / dm
+				column(V_ahp, 6) = prod(V_d, (p0 - t)); //  dv / drho   // OK JS April 1 2010
 			}
 
 
@@ -293,8 +310,8 @@ namespace jafar {
 				vec4 q = subrange(s, 3, 7);
 				vec7 ahp;
 
-				ublas::subrange(ahp, 0, 3) = t;
-				ublas::subrange(ahp, 3, 6) = rotate(q, v);
+				subrange(ahp, 0, 3) = t;
+				subrange(ahp, 3, 6) = rotate(q, v);
 				ahp(6) = _rho * norm_2(v);
 				return ahp; // OK JS April 1 2010
 			}
@@ -329,8 +346,8 @@ namespace jafar {
 				rotate(q, v, m, M_q, M_v);
 				double nv = norm_2(v);
 
-				ublas::subrange(ahp, 0, 3) = t; // p0  = t
-				ublas::subrange(ahp, 3, 6) = m; // m   = R(q) * v
+				subrange(ahp, 0, 3) = t; // p0  = t
+				subrange(ahp, 3, 6) = m; // m   = R(q) * v
 				ahp(6) = _rho * nv; //              rho = ||v|| * _rho
 				ublasExtra::norm_2Jac<3>(v, NV_v); // drho / dv = d||v||/dv * _rho
 
@@ -344,7 +361,7 @@ namespace jafar {
 				subrange(AHP_v, 3, 6, 0, 3) = M_v; //            dm / dv
 				subrange(AHP_v, 6, 7, 0, 3) = _rho * NV_v; //  drho / dv
 				AHP_rho(6, 0) = nv; //                         drho / drho
-			}  // OK JS April 1 2010
+			} // OK JS April 1 2010
 
 		} // namespace landmarkAHP
 
@@ -374,7 +391,7 @@ namespace jafar {
 				 * \return the AHP point in global frame
 				 */
 				template<class VF, class Vlf>
-				static jblas::vec fromFrame(const VF & F, const Vlf & ahpf) {
+				static vec fromFrame(const VF & F, const Vlf & ahpf) {
 					return landmarkAHP::fromFrame(F, ahpf);
 				}
 
@@ -400,7 +417,7 @@ namespace jafar {
 				 * \return the AHP point in F-frame
 				 */
 				template<class VF, class Vahp>
-				static jblas::vec toFrame(const VF & F, const Vahp & ahp) {
+				static vec toFrame(const VF & F, const Vahp & ahp) {
 					return landmarkAHP::toFrame(F, ahp);
 				}
 
@@ -425,7 +442,7 @@ namespace jafar {
 				 * \return the Euclidean point.
 				 */
 				template<class VA>
-				static jblas::vec3 ahp2euc(const VA & ahp) {
+				static vec3 ahp2euc(const VA & ahp) {
 					return landmarkAHP::ahp2euc(ahp);
 				}
 

@@ -20,12 +20,16 @@
 namespace jafar {
 	namespace rtslam {
 
+
 		/**
 		 * Namespace for operations on Anchored Homogeneous Points
 		 * \ingroup rtslam
 		 */
 		namespace landmarkAHP {
 			using namespace ublas;
+			using namespace quaternion;
+
+
 			/**
 			 * Split AHP
 			 * \param p0 the output anchor.
@@ -35,9 +39,10 @@ namespace jafar {
 			template<class AHP, class P0, class M>
 			void split(const AHP & ahp, P0 & p0, M & m, double rho) {
 				p0 = project(ahp, ublas::range(0, 3));
-				m = project(ahp, ublas::range(3, 7));
-				rho = ahp(7);
+				m = project(ahp, ublas::range(3, 6));
+				rho = ahp(6);
 			}
+
 
 			/**
 			 * Compose AHP
@@ -50,23 +55,25 @@ namespace jafar {
 			jblas::vec7 compose(const P0 & p0, const M & m, const double rho) {
 				jblas::vec7 ahp;
 				project(ahp, ublas::range(0, 3)) = p0;
-				project(ahp, ublas::range(3, 7)) = m;
-				ahp(7) = rho;
+				project(ahp, ublas::range(3, 6)) = m;
+				ahp(6) = rho;
 				return ahp;
 			}
 
 			template<class VF, class Vlf>
 			jblas::vec fromFrame(const VF & F, const Vlf & ahpf) {
 
+
 				// split non-trivial chunks of landmark state
 				jblas::vec3 p0f(ublas::subrange(ahpf, 0, 3));
 				jblas::vec3 mf(ublas::subrange(ahpf, 3, 6));
 
+
 				// transformed landmark in global frame
 				jblas::vec ahp(7);
 
-				ublas::subrange(ahp, 0, 3) = quaternion::eucFromFrame(F, p0f);
-				ublas::subrange(ahp, 3, 6) = quaternion::vecFromFrame(F, mf);
+				ublas::subrange(ahp, 0, 3) = eucFromFrame(F, p0f);
+				ublas::subrange(ahp, 3, 6) = vecFromFrame(F, mf);
 				ahp(6) = ahpf(6);
 
 				return ahp;
@@ -78,22 +85,25 @@ namespace jafar {
 				jblas::vec3 p0f(ublas::subrange(ahpf, 0, 3));
 				jblas::vec3 mf(subrange(ahpf, 3, 6));
 
+
 				// destination chunks
 				jblas::vec3 p0;
 				jblas::vec3 m;
 				jblas::mat JAC_33(3, 3), JAC_37(3, 7);
 
+
 				// Jacobians
 				AHP_f.clear();
 				AHP_ahpf.clear();
 
+
 				// transform p0
-				quaternion::eucFromFrame(F, p0f, p0, JAC_37, JAC_33);
+				eucFromFrame(F, p0f, p0, JAC_37, JAC_33);
 				ublas::subrange(ahp, 0, 3) = p0;
 				subrange(AHP_f, 0, 3, 0, 7) = JAC_37;
 				subrange(AHP_ahpf, 0, 3, 0, 3) = JAC_33;
 				// transform m
-				quaternion::vecFromFrame(F, mf, m, JAC_37, JAC_33);
+				vecFromFrame(F, mf, m, JAC_37, JAC_33);
 				subrange(ahp, 3, 6) = m;
 				subrange(AHP_f, 3, 6, 0, 7) = JAC_37;
 				subrange(AHP_ahpf, 3, 6, 3, 6) = JAC_33;
@@ -105,15 +115,17 @@ namespace jafar {
 			template<class VF, class Vahp>
 			jblas::vec toFrame(const VF & F, const Vahp & ahp) {
 
+
 				// split non-trivial chunks of landmark state
 				jblas::vec3 p0(ublas::subrange(ahp, 0, 3));
 				jblas::vec3 m(subrange(ahp, 3, 6));
 
+
 				// transformed landmark in frame F
 				jblas::vec ahpf(7);
 
-				ublas::subrange(ahpf, 0, 3) = quaternion::eucToFrame(F, p0);
-				ublas::subrange(ahpf, 3, 6) = quaternion::vecToFrame(F, m);
+				ublas::subrange(ahpf, 0, 3) = eucToFrame(F, p0);
+				ublas::subrange(ahpf, 3, 6) = vecToFrame(F, m);
 				ahpf(6) = ahp(6);
 
 				return ahpf;
@@ -125,22 +137,25 @@ namespace jafar {
 				jblas::vec3 p0(ublas::subrange(ahp, 0, 3));
 				jblas::vec3 m(subrange(ahp, 3, 6));
 
+
 				// destination chunks
 				jblas::vec3 p0f;
 				jblas::vec3 mf;
 				jblas::mat JAC_33(3, 3), JAC_37(3, 7);
 
+
 				// Jacobians
 				AHPF_f.clear();
 				AHPF_ahp.clear();
 
+
 				// transform p0
-				quaternion::eucToFrame(F, p0, p0f, JAC_37, JAC_33);
+				eucToFrame(F, p0, p0f, JAC_37, JAC_33);
 				ublas::subrange(ahpf, 0, 3) = p0f;
 				subrange(AHPF_f, 0, 3, 0, 7) = JAC_37;
 				subrange(AHPF_ahp, 0, 3, 0, 3) = JAC_33;
 				// transform m
-				quaternion::vecToFrame(F, m, mf, JAC_37, JAC_33);
+				vecToFrame(F, m, mf, JAC_37, JAC_33);
 				subrange(ahpf, 3, 6) = mf;
 				subrange(AHPF_f, 3, 6, 0, 7) = JAC_37;
 				subrange(AHPF_ahp, 3, 6, 3, 6) = JAC_33;
@@ -148,6 +163,7 @@ namespace jafar {
 				ahpf(6) = ahp(6);
 				AHPF_ahp(6, 6) = 1;
 			}
+
 
 			/**
 			 * Reparametrize to Euclidean.
@@ -158,6 +174,7 @@ namespace jafar {
 			jblas::vec3 ahp2euc(const VA & ahp) {
 				return ublas::subrange(ahp, 0, 3) + ublas::subrange(ahp, 3, 6) / ahp(6);
 			}
+
 
 			/**
 			 * Reparametrize to Euclidean, with Jacobians.
@@ -177,6 +194,7 @@ namespace jafar {
 				ublas::column(EUC_ahp, 6) = -m / rho / rho;
 			}
 
+
 			/**
 			 * Bring landmark to bearing-only sensor frame (without range information).
 			 *
@@ -184,7 +202,7 @@ namespace jafar {
 			 * - ahp = [p0 m rho]
 			 * - s = [t q],
 			 *
-			 * this function computes the chain:
+			 * this function computes the chain (See Sola \e etal. PAMI 2010):
 			 * - R'(q) * ( m - (t - p0) * rho )
 			 *
 			 * which is a vector in sensor frame in the direction of the landmark. the range information is lost.
@@ -194,15 +212,16 @@ namespace jafar {
 			 * \return the bearing-only landmark in sensor frame
 			 */
 			template<class VS, class VA>
-			vec3 toBearingOnlyFrame(VS & s, VA & ahp) {
+			vec3 toBearingOnlyFrame(const VS & s, const VA & ahp) {
 				vec3 p0, m;
 				double rho;
 				split(ahp, p0, m, rho);
-				vec3 t = project(s, range(0, 3));
-				vec4 q = project(s, range(3, 7));
-				vec3 tmp = m - (t - p0) * rho;
-				return quaternion::rotateInv(q, tmp);
+				vec3 t = subrange(s, 0, 3);
+				vec4 q = subrange(s, 3, 7);
+				vec3 d = m - (t - p0) * rho;
+				return rotateInv(q, d);
 			}
+
 
 			/**
 			 * Bring landmark to bearing-only sensor frame (without range information).
@@ -211,7 +230,7 @@ namespace jafar {
 			 * - ahp = [p0 m rho]
 			 * - s = [t q],
 			 *
-			 * this function computes the chain:
+			 * this function computes the chain (See Sola \e etal. PAMI 2010):
 			 * - R'(q) * ( m - (t - p0) * rho )
 			 *
 			 * which is a vector in sensor frame in the direction of the landmark. the range information is lost.
@@ -219,27 +238,105 @@ namespace jafar {
 			 * and returns the Jacobians wrt s and ahp.
 			 * \param s the sensor frame
 			 * \param ahp the AHP landmark
-			 * \param ls the bearing-only landmark in sensor frame
-			 * \param LS_s the Jacobian of \a ls wrt \a s
-			 * \param LS_ahp the Jacobian of \a ls wrt \a ahp
+			 * \param v the bearing-only landmark in sensor frame
+			 * \param V_s the Jacobian of \a v wrt \a s
+			 * \param V_ahp the Jacobian of \a v wrt \a ahp
 			 */
-			template<class VS, class VA, class VLS, class MLS_s, class MLS_a>
-			void toBearingOnlyFrame(VS & s, VA & ahp, VLS & ls, MLS_s & LS_s,
-			    MLS_a & LS_ahp) {
-				ls = toBearingOnlyFrame(s, ahp);
+			template<class VS, class VA, class VV, class MV_s, class MV_a>
+			void toBearingOnlyFrame(const VS & s, const VA & ahp, VV & v, MV_s & V_s, MV_a & V_ahp) {
 				vec3 p0, m;
 				double rho;
-				vec3 t = project(s, range(0, 3));
-				vec4 q = project(s, range(3, 7));
-				vec3 v = m - (t - p0) * rho; // before rotation
-				mat34 LS_q;
-				mat33 LS_v;
-				quaternion::rotateInv(q, v, ls, LS_q, LS_v);
-				ublas::subrange(LS_s, 0, 7, 0, 3) = rho * LS_v;
-				ublas::subrange(LS_s, 0, 7, 4, 7) = LS_q;
-				ublas::subrange(LS_ahp, 0, 3, 0, 3) = rho * LS_v; // dls / dp0
-				ublas::subrange(LS_ahp, 0, 3, 3, 6) = LS_v; //       dls / dm
-				ublas::column(LS_ahp, 7) = prod(LS_v, (t - p0)); //  dls / drho
+				mat34 V_q;
+				mat33 V_d;
+
+				split(ahp, p0, m, rho);
+				vec3 t = subrange(s, 0, 3);
+				vec4 q = subrange(s, 3, 7);
+				vec3 d = m - (t - p0) * rho; // before rotation
+				rotateInv(q, d, v, V_q, V_d);
+
+
+				// Jacobians
+				V_s.clear();
+				V_ahp.clear();
+				ublas::subrange(V_s, 0, 3, 0, 3) = -rho * V_d; // dv / dt
+				ublas::subrange(V_s, 0, 3, 3, 7) = V_q; //         dv / dq
+				ublas::subrange(V_ahp, 0, 3, 0, 3) = rho * V_d; // dv / dp0
+				ublas::subrange(V_ahp, 0, 3, 3, 6) = V_d; //       dv / dm
+				ublas::column(V_ahp, 6) = prod(V_d, (t - p0)); //  dv / drho
+			}
+
+
+			/**
+			 * AHP landmark from bearing-only retro-projection.
+			 * This function is the inverse of toBearingOnlyFrame(). It builds the Anchored Homogeneous Point (AHP) landmark from a
+			 * sensor frame \a s, a retro-projected director vector \a v, and a inverse-distance proportional prior \a rho.
+			 *
+			 * It uses the formula (See Sola \e etal. PAMI 2010):
+			 * - AHP = [ t ;  R(q) * v ; rho * norm(v) ]
+			 *
+			 * \param s the sensor frame
+			 * \param v the retro-projected director vector in sensor frame
+			 * \param rho the prior, proportional to inverse-distance
+			 * \return the AHP landmark.
+			 */
+			template<class VS, class VLS>
+			vec7 fromBearingOnlyFrame(const VS & s, const VLS & v, const double _rho) {
+				vec3 t = subrange(s, 0, 3);
+				vec4 q = subrange(s, 3, 7);
+				vec7 ahp;
+
+				ublas::subrange(ahp, 0, 3) = t;
+				ublas::subrange(ahp, 3, 6) = rotate(q, v);
+				ahp(6) = _rho * norm_2(v);
+				return ahp;
+			}
+
+
+			/**
+			 * AHP landmark from bearing-only retro-projection, with Jacobians.
+			 * This function is the inverse of toBearingOnlyFrame(). It builds the Anchored Homogeneous Point (AHP) landmark from a
+			 * sensor frame \a s, a retro-projected director vector \a v, and a inverse-distance proportional prior \a rho.
+			 *
+			 * It uses the formula (See Sola \e etal. PAMI 2010):
+			 * - AHP = [ t ;  R(q) * v ; rho * norm(v) ]
+			 *
+			 * \param s the sensor frame
+			 * \param v the retro-projected director vector in sensor frame
+			 * \param rho the prior, proportional to inverse-distance
+			 * \param ahp the AHP landmark.
+			 * \param AHP_s the Jacobian wrt \a s
+			 * \param AHP_v the Jacobian wrt \a v
+			 * \param AHP_rho the Jacobian wrt \a rho
+			 */
+			template<class VS, class VLS, class VA, class MA_s, class MA_v, class MA_rho>
+			void fromBearingOnlyFrame(const VS & s, const VLS & v, const double _rho, VA & ahp, MA_s & AHP_s, MA_v & AHP_v,
+			    MA_rho & AHP_rho) {
+				vec3 t = subrange(s, 0, 3);
+				vec4 q = subrange(s, 3, 7);
+				vec3 m;
+				mat34 M_q;
+				mat33 M_v;
+				mat NV_v(1, 3);
+
+				rotate(q, v, m, M_q, M_v);
+				double nv = norm_2(v);
+
+				ublas::subrange(ahp, 0, 3) = t; // p0  = t
+				ublas::subrange(ahp, 3, 6) = m; // m   = R(q) * v
+				ahp(6) = _rho * nv; //              rho = ||v|| * _rho
+				ublasExtra::norm_2Jac<3>(v, NV_v); // drho / dv = d||v||/dv * _rho
+
+				// Jacobians
+				identity_mat I(3);
+				AHP_s.clear();
+				AHP_v.clear();
+				AHP_rho.clear();
+				subrange(AHP_s, 0, 3, 0, 3) = I; //             dp0 / dt
+				subrange(AHP_s, 3, 6, 3, 7) = M_q; //            dm / dq
+				subrange(AHP_v, 3, 6, 0, 3) = M_v; //            dm / dv
+				subrange(AHP_v, 6, 7, 0, 3) = _rho * NV_v; //  drho / dv
+				AHP_rho(6, 0) = nv; //                         drho / drho
 			}
 
 		} // namespace landmarkAHP
@@ -252,6 +349,7 @@ namespace jafar {
 		class LandmarkAnchoredHomogeneousPoint: public LandmarkAbstract {
 			public:
 
+
 				/**
 				 * Constructor from map
 				 */
@@ -260,6 +358,7 @@ namespace jafar {
 				static size_t size(void) {
 					return 7;
 				}
+
 
 				/**
 				 * From-frame transform.
@@ -271,6 +370,7 @@ namespace jafar {
 				static jblas::vec fromFrame(const VF & F, const Vlf & ahpf) {
 					return landmarkAHP::fromFrame(F, ahpf);
 				}
+
 
 				/**
 				 * From-frame transform, with Jacobians.
@@ -297,6 +397,7 @@ namespace jafar {
 					return landmarkAHP::toFrame(F, ahp);
 				}
 
+
 				/**
 				 * To-frame transform, with Jacobians.
 				 * \param F a frame to transform to
@@ -320,6 +421,7 @@ namespace jafar {
 				static jblas::vec3 ahp2euc(const VA & ahp) {
 					return landmarkAHP::ahp2euc(ahp);
 				}
+
 
 				/**
 				 * Reparametrize to Euclidean, with Jacobians.

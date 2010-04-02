@@ -11,10 +11,11 @@ HEADERS += uavobjects_global.h \
     uavobjectsinit.h \
     uavobjectsplugin.h \
     examplesettings.h \
-    exampleobject.h \
     uavobjectfieldprimitives.h \
     uavobjectfieldenum.h \
-    uavobjectfieldstring.h
+    uavobjectfieldstring.h \
+    exampleobject2.h \
+    exampleobject1.h
 SOURCES += uavobject.cpp \
     uavmetaobject.cpp \
     uavobjectmanager.cpp \
@@ -23,9 +24,10 @@ SOURCES += uavobject.cpp \
     uavobjectsinit.cpp \
     uavobjectsplugin.cpp \
     examplesettings.cpp \
-    exampleobject.cpp \
     uavobjectfieldprimitives.cpp \
     uavobjectfieldenum.cpp \
-    uavobjectfieldstring.cpp
+    uavobjectfieldstring.cpp \
+    exampleobject2.cpp \
+    exampleobject1.cpp
 DEFINES += UAVOBJECTS_LIBRARY
 OTHER_FILES += UAVObjects.pluginspec

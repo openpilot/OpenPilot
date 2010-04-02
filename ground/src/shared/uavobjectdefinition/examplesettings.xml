@@ -1,9 +1,8 @@
 <xml>
 	<object name="ExampleSettings" singleinstance="true" settings="true">
-		<field name="setting1" units="unit1" type="int8" elements="1"/>
-		<field name="setting2" units="unit2" type="int16" elements="1"/>
-		<field name="setting3" units="unit3" type="int8" elements="1"/>
-		<field name="setting4" units="unit4" type="int32" elements="1"/>
+		<field name="UpdatePeriod" units="ms" type="int32" elements="1"/>
+		<field name="StepSize" units="" type="int32" elements="1"/>
+		<field name="StepDirection" units="" type="enum" elements="1" options="up,down"/>
 		<telemetrygcs acked="true" updatemode="onchange" period="0"/>
 		<telemetryflight acked="true" updatemode="onchange" period="0"/>
 		<logging updatemode="never" period="0"/>

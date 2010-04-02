@@ -2,7 +2,7 @@
 #define UAVOBJECTSTEST_H
 
 #include "..\uavobjectmanager.h"
-#include "..\exampleobject.h"
+#include "..\exampleobject1.h"
 #include <QTimer>
 #include <QTextStream>
 
@@ -26,7 +26,7 @@ private slots:
 
 private:
     UAVObjectManager* objMngr;
-    ExampleObject* obj1;
+    ExampleObject1* obj1;
     QTimer* timer;
     QTextStream sout;
     bool done;

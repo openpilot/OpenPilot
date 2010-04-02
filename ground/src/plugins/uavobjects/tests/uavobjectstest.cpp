@@ -8,7 +8,7 @@ UAVObjectsTest::UAVObjectsTest(): sout(stdout), done(false)
     connect(objMngr, SIGNAL(newInstance(UAVObject*)), this, SLOT(newInstance(UAVObject*)));
 
     // Create test objects
-    obj1 = new ExampleObject();
+    obj1 = new ExampleObject1();
     connect(obj1, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(objectUpdated(UAVObject*)));
     connect(obj1, SIGNAL(objectUpdatedAuto(UAVObject*)), this, SLOT(objectUpdatedAuto(UAVObject*)));
     connect(obj1, SIGNAL(objectUpdatedManual(UAVObject*)), this, SLOT(objectUpdatedManual(UAVObject*)));
@@ -62,17 +62,17 @@ void UAVObjectsTest::runTest()
     if (!done)
     {
         // Create a new instance
-        ExampleObject* obj2 = new ExampleObject();
+        ExampleObject1* obj2 = new ExampleObject1();
         objMngr->registerObject(obj2);    
 
         // Set data
-        ExampleObject::DataFields data = obj1->getData();
-        data.field1 = 1;
-        data.field2 = 2;
-        data.field3 = 3;
-        data.field4[0] = 4.1;
-        data.field4[1] = 4.2;
-        data.field4[2] = 4.3;
+        ExampleObject1::DataFields data = obj1->getData();
+        data.Field1 = 1;
+        data.Field2 = 2;
+        data.Field3 = 3;
+        data.Field4[0] = 4.1;
+        data.Field4[1] = 4.2;
+        data.Field4[2] = 4.3;
         obj1->setData(data);
 
         // Set metadata
@@ -92,28 +92,28 @@ void UAVObjectsTest::runTest()
         // Pack, unpack testing
         quint8* buf = new quint8[obj1->getNumBytes()];
         obj1->pack(buf);
-        data.field1 = 10;
-        data.field2 = 20;
-        data.field3 = 30;
-        data.field4[0] = 40.1;
-        data.field4[1] = 40.2;
-        data.field4[2] = 40.3;
+        data.Field1 = 10;
+        data.Field2 = 20;
+        data.Field3 = 30;
+        data.Field4[0] = 40.1;
+        data.Field4[1] = 40.2;
+        data.Field4[2] = 40.3;
         obj1->setData(data);
         obj1->unpack(buf);
 
         // Save, load testing
         obj1->save();
-        data.field1 = 10;
-        data.field2 = 20;
-        data.field3 = 30;
-        data.field4[0] = 40.1;
-        data.field4[1] = 40.2;
-        data.field4[2] = 40.3;
+        data.Field1 = 10;
+        data.Field2 = 20;
+        data.Field3 = 30;
+        data.Field4[0] = 40.1;
+        data.Field4[1] = 40.2;
+        data.Field4[2] = 40.3;
         obj1->setData(data);
         obj1->load();
 
         // Get all instances
-        QList<UAVObject*> objs = objMngr->getObjectInstances(ExampleObject::OBJID);
+        QList<UAVObject*> objs = objMngr->getObjectInstances(ExampleObject1::OBJID);
         for (int n = 0; n < objs.length(); ++n)
         {
             sout << "[Printing object instances]\n";

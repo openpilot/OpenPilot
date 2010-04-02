@@ -30,7 +30,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "uavobjectsinit.h"
-#include "exampleobject.h"
+#include "exampleobject1.h"
+#include "exampleobject2.h"
 #include "examplesettings.h"
 
 
@@ -40,7 +41,8 @@
  */
 void UAVObjectsInitialize(UAVObjectManager* objMngr)
 {
-    objMngr->registerObject( new ExampleObject() );
+    objMngr->registerObject( new ExampleObject1() );
+    objMngr->registerObject( new ExampleObject2() );
     objMngr->registerObject( new ExampleSettings() );
 
 }

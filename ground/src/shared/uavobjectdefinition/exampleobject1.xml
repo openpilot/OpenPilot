@@ -1,0 +1,15 @@
+<xml>
+	<object name="ExampleObject1" singleinstance="false" settings="false">
+		<field name="Field1" units="unit1" type="int8" elements="1"/>
+		<field name="Field2" units="unit2" type="int16" elements="1"/>
+        <field name="Field3" units="unit3" type="int32" elements="1"/>
+        <field name="Field4" units="unit4" type="float" elements="4"/>
+        <field name="Field5" units="unit5" type="uint8" elements="1"/>
+        <field name="Field6" units="unit6" type="uint16" elements="1"/>
+        <field name="Field7" units="unit7" type="uint32" elements="1"/>
+        <field name="Field8" units="unit8" type="enum" elements="1" options="Option1, Option2"/>
+        <telemetrygcs acked="true" updatemode="periodic" period="200"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+		<logging updatemode="never" period="0"/>
+	</object>
+</xml>

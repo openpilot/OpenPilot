@@ -57,9 +57,9 @@ void test_ahp01(void) {
 	cout << "F.x = " << (MATLAB) senFrame << endl;
 	cout << "v = " << (MATLAB) v1 << endl;
 	cout << "r = " << r << endl;
-	ahp = fromBearingOnlyFrame(senFrame, v1, r);
+	ahp = LandmarkAnchoredHomogeneousPoint::fromBearingOnlyFrame(senFrame, v1, r);
 	cout << "ahp1 = " << (MATLAB) ahp << endl;
-	fromBearingOnlyFrame(senFrame, v1, r, ahp, AHP_s, AHP_v, AHP_r);
+	LandmarkAnchoredHomogeneousPoint::fromBearingOnlyFrame(senFrame, v1, r, ahp, AHP_s, AHP_v, AHP_r);
 	cout << "ahp2 = " << (MATLAB) ahp << endl;
 	cout << "AHP_s = " << (MATLAB) AHP_s << endl;
 	cout << "AHP_v = " << (MATLAB) AHP_v << endl;
@@ -79,18 +79,18 @@ void test_ahp01(void) {
 	cout << "\n% TO B-O FRAME \n%============" << endl;
 	cout << "F.x = " << (MATLAB) senFrame << endl;
 	cout << "ahp = " << (MATLAB) ahp << endl;
-	v2 = toBearingOnlyFrame(senFrame, ahp);
+	v2 = LandmarkAnchoredHomogeneousPoint::toBearingOnlyFrame(senFrame, ahp);
 	JFR_CHECK_VEC_EQUAL(v2, v1);
-	toBearingOnlyFrame(senFrame, ahp, v2, id);
+	LandmarkAnchoredHomogeneousPoint::toBearingOnlyFrame(senFrame, ahp, v2, id);
 	JFR_CHECK_VEC_EQUAL(v2, v1);
 	JFR_CHECK_EQUAL(id, r);
-	toBearingOnlyFrame(senFrame, ahp, v2, id, V_s, V_ahp);
+	LandmarkAnchoredHomogeneousPoint::toBearingOnlyFrame(senFrame, ahp, v2, id, V_s, V_ahp);
 	cout << "v2 = " << (MATLAB) v2 << endl;
 	cout << "id = " << id << endl;
 	cout << "V_s = " << (MATLAB) V_s << endl;
 	cout << "V_ahp = " << (MATLAB) V_ahp << endl;
 	cout << "[v_mat, V_s_mat, V_ahp_mat] = toBearingOnlyFrameAHM(F, ahp)" << endl;
-	cout << "v_err = norm(v1 - v_mat)" << endl;
+	cout << "v_err = norm(v2 - v_mat)" << endl;
 	cout << "V_s_err = norm(V_s - V_s_mat)" << endl;
 	cout << "V_ahp_err = norm(V_ahp - V_ahp_mat)" << endl;
 	JFR_CHECK_VEC_EQUAL(v2, v1);
@@ -104,9 +104,11 @@ void test_ahp01(void) {
 	AHP_ahp = ublas::prod(AHP_v, V_ahp);
 	identity_mat I3(3);
 	cout << "V_v = " << (MATLAB) V_v << endl;
-	cout << "AHP_ahp = " << (MATLAB) AHP_ahp << endl;
+	//	cout << "AHP_ahp = " << (MATLAB) AHP_ahp << endl;
+	//	cout << "V_ahp*AHP_s + V_s = " << (MATLAB) (prod(V_ahp, AHP_s) + V_s) << endl;
+	//	cout << "V_ahp*AHP_s = " << (MATLAB) (prod(V_ahp, AHP_s)) << endl;
+	//	cout << "V_s = " << (MATLAB) ( V_s) << endl;
 	JFR_CHECK_MAT_EQUAL(V_v, I3);
-	JFR_CHECK_EQUAL(V_v(1,1), 1.0); // M3 = V_ahp * AHP_v must be a identity matrix
 
 }
 

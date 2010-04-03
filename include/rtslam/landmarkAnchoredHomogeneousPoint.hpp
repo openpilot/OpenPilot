@@ -458,6 +458,121 @@ namespace jafar {
 					landmarkAHP::ahp2euc(ahp, euc, EUC_ahp);
 				}
 
+				/**
+				 * Bring landmark to bearing-only sensor frame (without range information).
+				 *
+				 * For a landmark and sensor frame
+				 * - ahp = [p0 m rho]
+				 * - s = [t q],
+				 *
+				 * this function computes the chain (See Sola \e etal. PAMI 2010):
+				 * - R'(q) * ( m - (t - p0) * rho )
+				 *
+				 * which is a vector in sensor frame in the direction of the landmark. The range information is lost.
+				 *
+				 * \param s the sensor frame
+				 * \param ahp the AHP landmark
+				 * \return the bearing-only landmark in sensor frame
+				 */
+				template<class VS, class VA>
+				static vec3 toBearingOnlyFrame(const VS & s, const VA & ahp) {
+						return landmarkAHP::toBearingOnlyFrame(s, ahp);
+				}
+
+				/**
+				 * Bring landmark to bearing-only sensor frame (give inverse-distance information).
+				 *
+				 * For a landmark and sensor frame
+				 * - ahp = [p0 m rho]
+				 * - s = [t q],
+				 *
+				 * this function computes the chain (See Sola \e etal. PAMI 2010):
+				 * - v = R'(q) * ( m - (t - p0) * rho )
+				 *
+				 * which is a vector in sensor frame in the direction of the landmark.
+				 *
+				 * The range information is recuperated in \a invDist as the inverse of the distance from sensor to landmark.
+				 *
+				 * \param s the sensor frame
+				 * \param ahp the AHP landmark
+				 * \param v the bearing-only landmark in sensor frame
+				 * \param invDist the inverse of the non-observable distance
+				 */
+				template<class VS, class VA, class VV>
+				static void toBearingOnlyFrame(const VS & s, const VA & ahp, VV & v, double & invDist) {
+						landmarkAHP::toBearingOnlyFrame(s, ahp, v, invDist);
+				}
+
+				/**
+				 * Bring landmark to bearing-only sensor frame (give inverse-distance information).
+				 *
+				 * For a landmark and sensor frame
+				 * - ahp = [p0 m rho]
+				 * - s = [t q],
+				 *
+				 * this function computes the chain (See Sola \e etal. PAMI 2010):
+				 * - R'(q) * ( m - (t - p0) * rho )
+				 *
+				 * which is a vector in sensor frame in the direction of the landmark.
+				 *
+				 * The range information is recuperated in \a invDist as the inverse of the distance from sensor to landmark.
+				 *
+				 * and returns the Jacobians wrt s and ahp.
+				 * \param s the sensor frame
+				 * \param ahp the AHP landmark
+				 * \param v the bearing-only landmark in sensor frame
+				 * \param V_s the Jacobian of \a v wrt \a s
+				 * \param V_ahp the Jacobian of \a v wrt \a ahp
+				 */
+				template<class VS, class VA, class VV, class MV_s, class MV_a>
+				static void toBearingOnlyFrame(const VS & s, const VA & ahp, VV & v, double & invDist, MV_s & V_s, MV_a & V_ahp) {
+						landmarkAHP::toBearingOnlyFrame(s, ahp, v, invDist, V_s, V_ahp);
+				}
+
+				/**
+				 * AHP landmark from bearing-only retro-projection.
+				 * This function is the inverse of toBearingOnlyFrame(). It builds the Anchored Homogeneous Point (AHP) landmark from a
+				 * sensor frame \a s, a retro-projected director vector \a v, and a inverse-distance proportional prior \a rho.
+				 *
+				 * It uses the formula (See Sola \e etal. PAMI 2010):
+				 * - AHP = [ t ;  R(q) * v ; rho * norm(v) ]
+				 *
+				 * so that \a rho can be specified as being exactly inverse-distance.
+				 *
+				 * \param s the sensor frame
+				 * \param v the retro-projected director vector in sensor frame
+				 * \param rho the prior, proportional to inverse-distance
+				 * \return the AHP landmark.
+				 */
+				template<class VS, class VLS>
+				static vec7 fromBearingOnlyFrame(const VS & s, const VLS & v, const double _rho) {
+						return landmarkAHP::fromBearingOnlyFrame(s, v, _rho);
+				}
+
+				/**
+				 * AHP landmark from bearing-only retro-projection, with Jacobians.
+				 * This function is the inverse of toBearingOnlyFrame(). It builds the Anchored Homogeneous Point (AHP) landmark from a
+				 * sensor frame \a s, a retro-projected director vector \a v, and a inverse-distance proportional prior \a rho.
+				 *
+				 * It uses the formula (See Sola \e etal. PAMI 2010):
+				 * - AHP = [ t ;  R(q) * v ; rho * norm(v) ]
+				 *
+				 * so that \a rho can be specified as being exactly inverse-distance.
+				 *
+				 * \param s the sensor frame
+				 * \param v the retro-projected director vector in sensor frame
+				 * \param rho the prior, proportional to inverse-distance
+				 * \param ahp the AHP landmark.
+				 * \param AHP_s the Jacobian wrt \a s
+				 * \param AHP_v the Jacobian wrt \a v
+				 * \param AHP_rho the Jacobian wrt \a rho
+				 */
+				template<class VS, class VLS, class VA, class MA_s, class MA_v, class MA_rho>
+				static void fromBearingOnlyFrame(const VS & s, const VLS & v, const double _rho, VA & ahp, MA_s & AHP_s, MA_v & AHP_v, MA_rho & AHP_rho) {
+						landmarkAHP::fromBearingOnlyFrame(s, v, _rho, ahp, AHP_s, AHP_v, AHP_rho);
+				}
+
+
 		}; // class LandmarkAnchoredHomogeneousPoint
 
 

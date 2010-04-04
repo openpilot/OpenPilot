@@ -110,7 +110,7 @@ void UAVObjectsTest::runTest()
         data.Field4[1] = 40.2;
         data.Field4[2] = 40.3;
         obj1->setData(data);
-        obj1->load();
+        obj1->load();      
 
         // Get all instances
         QList<UAVObject*> objs = objMngr->getObjectInstances(ExampleObject1::OBJID);
@@ -118,6 +118,28 @@ void UAVObjectsTest::runTest()
         {
             sout << "[Printing object instances]\n";
             sout << objs[n]->toString();
+        }
+
+        // Get object fields
+        QString objname("ExampleObject1");
+        UAVObject* obj = objMngr->getObject(objname);
+        QList<UAVObjectField*> fields = obj->getFields();
+        // qint8
+        UAVObjectFieldPrimitives<qint8>* fieldint8 = dynamic_cast< UAVObjectFieldPrimitives<qint8>* >(fields[0]);
+        if (fieldint8 != NULL)
+        {
+            fieldint8->setValue(10);
+            qint8 value = fieldint8->getValue();
+            sout << value;
+        }
+        // enum
+        UAVObjectFieldEnum* fieldenum = dynamic_cast< UAVObjectFieldEnum* >(fields[7]);
+        if (fieldenum != NULL)
+        {
+            QStringList options = fieldenum->getOptions();
+            fieldenum->setSelected(options[1]);
+            QString selected = fieldenum->getSelected();
+            sout << selected;
         }
 
         // Done

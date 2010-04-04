@@ -620,11 +620,32 @@ bool UAVObjectParser::generateGCSObject(int objIndex, const QString& templateInc
     QString finit;
     for (int n = 0; n < info->fields.length(); ++n)
     {
-        finit.append( QString("    fields.append(new UAVObjectFieldPrimitives<%1>(QString(\"%2\"), QString(\"%3\"), %4));\n")
-                      .arg(fieldTypeStrCPP[info->fields[n]->type])
-                      .arg(info->fields[n]->name)
-                      .arg(info->fields[n]->units)
-                      .arg(info->fields[n]->numElements) );
+        // Only for enum types
+        if (info->fields[n]->type == FIELDTYPE_ENUM)
+        {
+            QString optionName = info->fields[n]->name + "EnumOptions";
+            finit.append( QString("    QStringList %1;\n").arg(optionName) );
+            QStringList options = info->fields[n]->options;
+            for (int m = 0; m < options.length(); ++m)
+            {
+                finit.append( QString("    %1.append(\"%2\");\n")
+                              .arg(optionName)
+                              .arg(options[m]) );
+            }
+            finit.append( QString("    fields.append(new UAVObjectFieldEnum(QString(\"%1\"), QString(\"%2\"), %3, %4));\n")
+                          .arg(info->fields[n]->name)
+                          .arg(info->fields[n]->units)
+                          .arg(info->fields[n]->numElements)
+                          .arg(optionName) );
+        }
+        else
+        {
+            finit.append( QString("    fields.append(new UAVObjectFieldPrimitives<%1>(QString(\"%2\"), QString(\"%3\"), %4));\n")
+                          .arg(fieldTypeStrCPP[info->fields[n]->type])
+                          .arg(info->fields[n]->name)
+                          .arg(info->fields[n]->units)
+                          .arg(info->fields[n]->numElements) );
+        }
     }
     outCode.replace(QString("$(FIELDSINIT)"), finit);
 

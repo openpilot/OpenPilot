@@ -43,7 +43,10 @@ ExampleObject1::ExampleObject1(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS,
     fields.append(new UAVObjectFieldPrimitives<quint8>(QString("Field5"), QString("unit5"), 1));
     fields.append(new UAVObjectFieldPrimitives<quint16>(QString("Field6"), QString("unit6"), 1));
     fields.append(new UAVObjectFieldPrimitives<quint32>(QString("Field7"), QString("unit7"), 1));
-    fields.append(new UAVObjectFieldPrimitives<quint8>(QString("Field8"), QString("unit8"), 1));
+    QStringList Field8EnumOptions;
+    Field8EnumOptions.append("Option1");
+    Field8EnumOptions.append("Option2");
+    fields.append(new UAVObjectFieldEnum(QString("Field8"), QString("unit8"), 1, Field8EnumOptions));
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

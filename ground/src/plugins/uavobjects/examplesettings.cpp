@@ -38,7 +38,10 @@ ExampleSettings::ExampleSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTING
     QList<UAVObjectField*> fields;
     fields.append(new UAVObjectFieldPrimitives<qint32>(QString("UpdatePeriod"), QString("ms"), 1));
     fields.append(new UAVObjectFieldPrimitives<qint32>(QString("StepSize"), QString(""), 1));
-    fields.append(new UAVObjectFieldPrimitives<quint8>(QString("StepDirection"), QString(""), 1));
+    QStringList StepDirectionEnumOptions;
+    StepDirectionEnumOptions.append("up");
+    StepDirectionEnumOptions.append("down");
+    fields.append(new UAVObjectFieldEnum(QString("StepDirection"), QString(""), 1, StepDirectionEnumOptions));
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

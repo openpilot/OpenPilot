@@ -33,6 +33,7 @@
 
 #include "uavdataobject.h"
 #include "uavobjectfieldprimitives.h"
+#include "uavobjectfieldenum.h"
 
 class ExampleObject2: public UAVDataObject
 {

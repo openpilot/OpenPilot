@@ -28,7 +28,7 @@
 // Private constants
 #define MAX_QUEUE_SIZE 20
 #define STACK_SIZE 100
-#define TASK_PRIORITY (tskIDLE_PRIORITY + 2)
+#define TASK_PRIORITY (tskIDLE_PRIORITY + 1)
 #define REQ_TIMEOUT_MS 500
 #define MAX_RETRIES 3
 
@@ -78,7 +78,7 @@ int32_t TelemetryInitialize(void)
  * telemetry settings.
  * \param[in] obj Object to connect
  */
-void registerObject(UAVObjHandle obj)
+static void registerObject(UAVObjHandle obj)
 {
 	// Setup object for periodic updates
 	addObject(obj);
@@ -91,7 +91,7 @@ void registerObject(UAVObjHandle obj)
  * Update object's queue connections and timer, depending on object's settings
  * \param[in] obj Object to updates
  */
-void updateObject(UAVObjHandle obj)
+static void updateObject(UAVObjHandle obj)
 {
 	UAVObjMetadata metadata;
 	int32_t eventMask;

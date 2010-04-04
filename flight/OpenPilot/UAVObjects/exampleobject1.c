@@ -32,7 +32,7 @@
 #include "exampleobject1.h"
 
 // Private variables
-UAVObjHandle handle;
+static UAVObjHandle handle;
 
 /**
  * Initialize object.

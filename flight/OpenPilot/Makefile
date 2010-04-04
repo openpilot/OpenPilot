@@ -125,6 +125,7 @@ SRC += $(OPUAVOBJ)/eventdispatcher.c
 ##    
 #SRC += $(OPTESTS)/test_I2c_PCF8570.c
 #SRC += $(OPTESTS)/test_BMP085.c
+#SRC += $(OPTESTS)/test_uavobjects.c
 
 
 ## UAVOBJECTS

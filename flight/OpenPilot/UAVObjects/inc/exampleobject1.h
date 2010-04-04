@@ -41,11 +41,20 @@
 #define EXAMPLEOBJECT1_ISSETTINGS 0
 #define EXAMPLEOBJECT1_NUMBYTES sizeof(ExampleObject1Data)
 
-// Data access macros
+// Object access macros
 #define ExampleObject1Get(dataOut) UAVObjGetData(ExampleObject1Handle(), dataOut)
 #define ExampleObject1Set(dataIn) UAVObjSetData(ExampleObject1Handle(), dataIn)
+#define ExampleObject1InstGet(instId, dataOut) UAVObjGetInstanceData(ExampleObject1Handle(), instId, dataOut)
+#define ExampleObject1InstSet(instId, dataIn) UAVObjSetInstanceData(ExampleObject1Handle(), instId, dataIn)
 #define ExampleObject1ConnectQueue(queue) UAVObjConnectQueue(ExampleObject1Handle(), queue, EV_MASK_ALL_UPDATES)
 #define ExampleObject1ConnectCallback(cb) UAVObjConnectCallback(ExampleObject1Handle(), cb, EV_MASK_ALL_UPDATES)
+#define ExampleObject1CreateInstance() UAVObjCreateInstance(ExampleObject1Handle())
+#define ExampleObject1RequestUpdate() UAVObjRequestUpdate(ExampleObject1Handle())
+#define ExampleObject1RequestInstUpdate(instId) UAVObjRequestInstanceUpdate(ExampleObject1Handle(), instId)
+#define ExampleObject1Updated() UAVObjUpdated(ExampleObject1Handle())
+#define ExampleObject1InstUpdated(instId) UAVObjUpdated(ExampleObject1Handle(), instId)
+#define ExampleObject1GetMetadata(dataOut) UAVObjGetMetadata(ExampleObject1Handle(), dataOut)
+#define ExampleObject1SetMetadata(dataIn) UAVObjSetMetadata(ExampleObject1Handle(), dataIn)
 
 // Object data
 typedef struct {

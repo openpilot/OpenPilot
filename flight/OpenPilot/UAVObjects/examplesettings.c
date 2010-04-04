@@ -32,7 +32,7 @@
 #include "examplesettings.h"
 
 // Private variables
-UAVObjHandle handle;
+static UAVObjHandle handle;
 
 /**
  * Initialize object.

@@ -50,7 +50,7 @@
 
 // Private constants
 #define STACK_SIZE 200
-#define TASK_PRIORITY (tskIDLE_PRIORITY)
+#define TASK_PRIORITY (tskIDLE_PRIORITY+1)
 
 // Private types
 
@@ -75,7 +75,7 @@ int32_t ExampleModPeriodicInitialize(void)
 /**
  * Module thread, should not return.
  */
-void exampleTask(void* parameters)
+static void exampleTask(void* parameters)
 {
 	ExampleSettingsData settings;
 	ExampleObject1Data data;

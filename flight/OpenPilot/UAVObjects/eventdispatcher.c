@@ -27,11 +27,10 @@
 #include "openpilot.h"
 
 // Private constants
-#define MAX_QUEUE_SIZE 10
-#define STACK_SIZE 100
-#define TASK_PRIORITY 100
+#define MAX_QUEUE_SIZE 20
+#define STACK_SIZE configMINIMAL_STACK_SIZE
+#define TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define MAX_UPDATE_PERIOD_MS 1000
-#define MIN_UPDATE_PERIOD_MS 1
 
 // Private types
 
@@ -56,14 +55,14 @@ struct PeriodicObjectListStruct {
 typedef struct PeriodicObjectListStruct PeriodicObjectList;
 
 // Private variables
-PeriodicObjectList* objList;
-xQueueHandle queue;
-xTaskHandle eventTaskHandle;
-xSemaphoreHandle mutex;
+static PeriodicObjectList* objList;
+static xQueueHandle queue;
+static xTaskHandle eventTaskHandle;
+static xSemaphoreHandle mutex;
 
 // Private functions
-int32_t processPeriodicUpdates();
-void eventTask();
+static int32_t processPeriodicUpdates();
+static void eventTask();
 
 /**
  * Initialize the dispatcher
@@ -80,7 +79,7 @@ int32_t EventDispatcherInitialize()
 		return -1;
 
 	// Create event queue
-	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
+	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(EventCallbackInfo));
 
 	// Create task
 	xTaskCreate( eventTask, (signed char*)"Event", STACK_SIZE, NULL, TASK_PRIORITY, &eventTaskHandle );
@@ -132,6 +131,7 @@ int32_t EventPeriodicCreate(UAVObjEvent* ev, UAVObjEventCallback cb, int32_t per
 	objEntry = (PeriodicObjectList*)pvPortMalloc(sizeof(PeriodicObjectList));
 	if (objEntry == NULL) return -1;
 	memcpy(&objEntry->evInfo.ev, ev, sizeof(UAVObjEvent));
+	objEntry->evInfo.cb = cb;
     objEntry->updatePeriodMs = periodMs;
     objEntry->timeToNextUpdateMs = 0;
     // Add to list
@@ -202,7 +202,7 @@ int32_t EventPeriodicDelete(UAVObjEvent* ev, UAVObjEventCallback cb)
 /**
  * Event task, responsible of invoking callbacks.
  */
-void eventTask()
+static void eventTask()
 {
 	int32_t timeToNextUpdateMs;
 	int32_t delayMs;
@@ -240,50 +240,42 @@ void eventTask()
  * Handle periodic updates for all objects.
  * \return The system time until the next update (in ms) or -1 if failed
  */
-int32_t processPeriodicUpdates()
+static int32_t processPeriodicUpdates()
 {
-	static int32_t timeOfLastUpdate = 0;
 	PeriodicObjectList* objEntry;
-	int32_t delaySinceLastUpdateMs;
-    int32_t minDelay = MAX_UPDATE_PERIOD_MS;
+	int32_t timeNow;
+    int32_t timeToNextUpdate;
 
 	// Get lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
     // Iterate through each object and update its timer, if zero then transmit object.
     // Also calculate smallest delay to next update.
-    delaySinceLastUpdateMs = xTaskGetTickCount()*portTICK_RATE_MS - timeOfLastUpdate;
+    timeToNextUpdate = xTaskGetTickCount()*portTICK_RATE_MS + MAX_UPDATE_PERIOD_MS;
     LL_FOREACH(objList, objEntry)
     {
         // If object is configured for periodic updates
         if (objEntry->updatePeriodMs > 0)
         {
-        	objEntry->timeToNextUpdateMs -= delaySinceLastUpdateMs;
             // Check if time for the next update
-            if (objEntry->timeToNextUpdateMs <= 0)
+        	timeNow = xTaskGetTickCount()*portTICK_RATE_MS;
+            if (objEntry->timeToNextUpdateMs <= timeNow)
             {
                 // Reset timer
-            	objEntry->timeToNextUpdateMs = objEntry->updatePeriodMs;
+            	objEntry->timeToNextUpdateMs = timeNow + objEntry->updatePeriodMs;
                 // Invoke callback
             	objEntry->evInfo.cb(&objEntry->evInfo.ev); // the function is expected to copy the event information
             }
             // Update minimum delay
-            if (objEntry->timeToNextUpdateMs < minDelay)
+            if (objEntry->timeToNextUpdateMs < timeToNextUpdate)
             {
-                minDelay = objEntry->timeToNextUpdateMs;
+            	timeToNextUpdate = objEntry->timeToNextUpdateMs;
             }
         }
     }
 
-    // Check if delay for the next update is too short
-    if (minDelay < MIN_UPDATE_PERIOD_MS)
-    {
-        minDelay = MIN_UPDATE_PERIOD_MS;
-    }
-
     // Done
-    timeOfLastUpdate = xTaskGetTickCount()*portTICK_RATE_MS;
     xSemaphoreGiveRecursive(mutex);
-    return timeOfLastUpdate + minDelay;
+    return timeToNextUpdate;
 }
 

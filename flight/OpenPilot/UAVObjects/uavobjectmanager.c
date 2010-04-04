@@ -70,16 +70,16 @@ struct ObjectListStruct {
 typedef struct ObjectListStruct ObjectList;
 
 // Private functions
-int32_t sendEvent(ObjectList* obj, uint16_t instId, UAVObjEventType event);
-ObjectInstList* createInstance(ObjectList* obj, uint16_t instId);
-ObjectInstList* getInstance(ObjectList* obj, uint16_t instId);
-int32_t connectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb, int32_t eventMask);
-int32_t disconnectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb);
+static int32_t sendEvent(ObjectList* obj, uint16_t instId, UAVObjEventType event);
+static ObjectInstList* createInstance(ObjectList* obj, uint16_t instId);
+static ObjectInstList* getInstance(ObjectList* obj, uint16_t instId);
+static int32_t connectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb, int32_t eventMask);
+static int32_t disconnectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb);
 
 // Private variables
-ObjectList* objList;
-xSemaphoreHandle mutex;
-UAVObjMetadata defMetadata;
+static ObjectList* objList;
+static xSemaphoreHandle mutex;
+static UAVObjMetadata defMetadata;
 
 /**
  * Initialize the object manager
@@ -299,7 +299,7 @@ UAVObjHandle UAVObjGetLinkedObj(UAVObjHandle obj)
  * \param[in] obj The object handle
  * \return The number of instances
  */
-uint32_t UAVObjGetNumInstances(UAVObjHandle obj)
+uint16_t UAVObjGetNumInstances(UAVObjHandle obj)
 {
 	uint32_t numInstances;
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
@@ -311,9 +311,9 @@ uint32_t UAVObjGetNumInstances(UAVObjHandle obj)
 /**
  * Create a new instance in the object.
  * \param[in] obj The object handle
- * \return The instance ID or -1 if an error
+ * \return The instance ID or 0 if an error
  */
-int32_t UAVObjCreateInstance(UAVObjHandle obj)
+uint16_t UAVObjCreateInstance(UAVObjHandle obj)
 {
 	ObjectList* objEntry;
 	ObjectInstList* instEntry;
@@ -363,18 +363,6 @@ int32_t UAVObjIsMetaobject(UAVObjHandle obj)
 int32_t UAVObjIsSettings(UAVObjHandle obj)
 {
 	return ((ObjectList*)obj)->isSettings;
-}
-
-/**
- * Initialize object data from a string (usually stored as a settings file)
- * \param[in] obj The object handle
- * \param[in] init Text with initialization information (settings file)
- * \return 0 if success or -1 if failure
- */
-int32_t UAVObjInitData(UAVObjHandle obj, const char* init)
-{
-	// TODO: Implement object data initialization from string (settings)
-	return -1;
 }
 
 /**
@@ -784,15 +772,15 @@ int32_t UAVObjSetMetadata(UAVObjHandle obj, const UAVObjMetadata* dataIn)
 	// Lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// Set metadata
+	// Set metadata (metadata of metaobjects can not be modified)
 	objEntry = (ObjectList*)obj;
-	if (objEntry->isMetaobject)
+	if (!objEntry->isMetaobject)
 	{
-		memcpy(&defMetadata, dataIn, sizeof(UAVObjMetadata));
+		UAVObjSetData((UAVObjHandle)objEntry->linkedObj, dataIn);
 	}
 	else
 	{
-		UAVObjSetData((UAVObjHandle)objEntry->linkedObj, dataIn);
+		return -1;
 	}
 
 	// Unlock
@@ -963,7 +951,7 @@ void UAVObjIterate(void (*iterator)(UAVObjHandle obj))
 /**
  * Send an event to all event queues registered on the object.
  */
-int32_t sendEvent(ObjectList* obj, uint16_t instId, UAVObjEventType event)
+static int32_t sendEvent(ObjectList* obj, uint16_t instId, UAVObjEventType event)
 {
 	ObjectQueueList* queueEntry;
 	UAVObjEvent msg;
@@ -998,7 +986,7 @@ int32_t sendEvent(ObjectList* obj, uint16_t instId, UAVObjEventType event)
 /**
  * Create a new object instance, return the instance info or NULL if failure.
  */
-ObjectInstList* createInstance(ObjectList* obj, uint16_t instId)
+static ObjectInstList* createInstance(ObjectList* obj, uint16_t instId)
 {
 	ObjectInstList* instEntry;
 	int32_t n;
@@ -1050,7 +1038,7 @@ ObjectInstList* createInstance(ObjectList* obj, uint16_t instId)
 /**
  * Get the instance information or NULL if the instance does not exist
  */
-ObjectInstList* getInstance(ObjectList* obj, uint16_t instId)
+static ObjectInstList* getInstance(ObjectList* obj, uint16_t instId)
 {
 	ObjectInstList* instEntry;
 
@@ -1074,7 +1062,7 @@ ObjectInstList* getInstance(ObjectList* obj, uint16_t instId)
  * \param[in] eventMask The event mask, if EV_MASK_ALL then all events are enabled (e.g. EV_UPDATED | EV_UPDATED_MANUAL)
  * \return 0 if success or -1 if failure
  */
-int32_t connectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb, int32_t eventMask)
+static int32_t connectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb, int32_t eventMask)
 {
 	ObjectQueueList* queueEntry;
 	ObjectList* objEntry;
@@ -1113,7 +1101,7 @@ int32_t connectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb,
  * \param[in] cb The event callback
  * \return 0 if success or -1 if failure
  */
-int32_t disconnectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb)
+static int32_t disconnectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb)
 {
 	ObjectQueueList* queueEntry;
 	ObjectList* objEntry;

@@ -41,11 +41,20 @@
 #define $(NAMEUC)_ISSETTINGS $(ISSETTINGS)
 #define $(NAMEUC)_NUMBYTES sizeof($(NAME)Data)
 
-// Data access macros
+// Object access macros
 #define $(NAME)Get(dataOut) UAVObjGetData($(NAME)Handle(), dataOut)
 #define $(NAME)Set(dataIn) UAVObjSetData($(NAME)Handle(), dataIn)
+#define $(NAME)InstGet(instId, dataOut) UAVObjGetInstanceData($(NAME)Handle(), instId, dataOut)
+#define $(NAME)InstSet(instId, dataIn) UAVObjSetInstanceData($(NAME)Handle(), instId, dataIn)
 #define $(NAME)ConnectQueue(queue) UAVObjConnectQueue($(NAME)Handle(), queue, EV_MASK_ALL_UPDATES)
 #define $(NAME)ConnectCallback(cb) UAVObjConnectCallback($(NAME)Handle(), cb, EV_MASK_ALL_UPDATES)
+#define $(NAME)CreateInstance() UAVObjCreateInstance($(NAME)Handle())
+#define $(NAME)RequestUpdate() UAVObjRequestUpdate($(NAME)Handle())
+#define $(NAME)RequestInstUpdate(instId) UAVObjRequestInstanceUpdate($(NAME)Handle(), instId)
+#define $(NAME)Updated() UAVObjUpdated($(NAME)Handle())
+#define $(NAME)InstUpdated(instId) UAVObjUpdated($(NAME)Handle(), instId)
+#define $(NAME)GetMetadata(dataOut) UAVObjGetMetadata($(NAME)Handle(), dataOut)
+#define $(NAME)SetMetadata(dataIn) UAVObjSetMetadata($(NAME)Handle(), dataIn)
 
 // Object data
 typedef struct {

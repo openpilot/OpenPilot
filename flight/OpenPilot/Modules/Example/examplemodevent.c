@@ -56,7 +56,7 @@
 // Private variables
 
 // Private functions
-void ObjectUpdatedCb(UAVObjEvent* ev);
+static void ObjectUpdatedCb(UAVObjEvent* ev);
 
 /**
  * Initialise the module, called on startup.
@@ -80,7 +80,7 @@ int32_t ExampleModEventInitialize(void)
  * important since all callbacks are executed from the same thread, so other
  * queued events can not be executed until the currently active callback returns.
  */
-void ObjectUpdatedCb(UAVObjEvent* ev)
+static void ObjectUpdatedCb(UAVObjEvent* ev)
 {
 	ExampleSettingsData settings;
 	ExampleObject1Data data1;

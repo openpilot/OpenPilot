@@ -26,6 +26,7 @@
 
 /* OpenPilot Includes */
 #include "openpilot.h"
+#include "uavobjectsinit.h"
 
 /* Task Priorities */
 #define PRIORITY_TASK_HOOKS             (tskIDLE_PRIORITY + 3)
@@ -81,6 +82,11 @@ int main()
 			PIOS_DELAY_WaitmS(100);
 		}
 	}
+
+	/* Initialize UAVObject libraries */
+	EventDispatcherInitialize();
+	UAVObjInitialize();
+	UAVObjectsInitializeAll();
 
 	/* Call LoadSettings which populates global variables so the rest of the hardware can be configured. */
 	PIOS_Settings_Load();

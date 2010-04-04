@@ -44,21 +44,21 @@
 typedef enum {STATE_SYNC, STATE_OBJID, STATE_INSTID, STATE_DATA, STATE_CS} RxState;
 
 // Private variables
-UAVTalkOutputStream outStream;
-xSemaphoreHandle lock;
-xSemaphoreHandle respSema;
-UAVObjHandle respObj;
-uint16_t respInstId;
-uint8_t rxBuffer[MAX_PACKET_LENGTH];
-uint8_t txBuffer[MAX_PACKET_LENGTH];
+static UAVTalkOutputStream outStream;
+static xSemaphoreHandle lock;
+static xSemaphoreHandle respSema;
+static UAVObjHandle respObj;
+static uint16_t respInstId;
+static uint8_t rxBuffer[MAX_PACKET_LENGTH];
+static uint8_t txBuffer[MAX_PACKET_LENGTH];
 
 // Private functions
-uint16_t updateChecksum(uint16_t cs, uint8_t* data, int32_t length);
-int32_t objectTransaction(uint32_t objectId, uint16_t instId, uint8_t type, int32_t timeout);
-int32_t sendObject(UAVObjHandle obj, uint16_t instId, uint8_t type);
-int32_t sendSingleObject(UAVObjHandle obj, uint16_t instId, uint8_t type);
-int32_t receiveObject(uint8_t type, UAVObjHandle obj, uint16_t instId, uint8_t* data, int32_t length);
-void updateAck(UAVObjHandle obj, uint16_t instId);
+static uint16_t updateChecksum(uint16_t cs, uint8_t* data, int32_t length);
+static int32_t objectTransaction(uint32_t objectId, uint16_t instId, uint8_t type, int32_t timeout);
+static int32_t sendObject(UAVObjHandle obj, uint16_t instId, uint8_t type);
+static int32_t sendSingleObject(UAVObjHandle obj, uint16_t instId, uint8_t type);
+static int32_t receiveObject(uint8_t type, UAVObjHandle obj, uint16_t instId, uint8_t* data, int32_t length);
+static void updateAck(UAVObjHandle obj, uint16_t instId);
 
 /**
  * Initialize the UAVTalk library
@@ -121,7 +121,7 @@ int32_t UAVTalkSendObject(UAVObjHandle obj, uint16_t instId, uint8_t acked, int3
  * \return 0 Success
  * \return -1 Failure
  */
-int32_t objectTransaction(UAVObjHandle obj, uint16_t instId, uint8_t type, int32_t timeoutMs)
+static int32_t objectTransaction(UAVObjHandle obj, uint16_t instId, uint8_t type, int32_t timeoutMs)
 {
 	int32_t respReceived;
 
@@ -303,7 +303,7 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
  * \return 0 Success
  * \return -1 Failure
  */
-int32_t receiveObject(uint8_t type, UAVObjHandle obj, uint16_t instId, uint8_t* data, int32_t length)
+static int32_t receiveObject(uint8_t type, UAVObjHandle obj, uint16_t instId, uint8_t* data, int32_t length)
 {
     int32_t ret = 0;
 
@@ -369,7 +369,7 @@ int32_t receiveObject(uint8_t type, UAVObjHandle obj, uint16_t instId, uint8_t* 
 /**
  * Check if an ack is pending on an object and give response semaphore
  */
-void updateAck(UAVObjHandle obj, uint16_t instId)
+static void updateAck(UAVObjHandle obj, uint16_t instId)
 {
     if (respObj == obj && (respInstId == instId || respInstId == UAVOBJ_ALL_INSTANCES))
     {
@@ -386,7 +386,7 @@ void updateAck(UAVObjHandle obj, uint16_t instId)
  * \return 0 Success
  * \return -1 Failure
  */
-int32_t sendObject(UAVObjHandle obj, uint16_t instId, uint8_t type)
+static int32_t sendObject(UAVObjHandle obj, uint16_t instId, uint8_t type)
 {
 	uint32_t numInst;
 	uint32_t n;
@@ -445,7 +445,7 @@ int32_t sendObject(UAVObjHandle obj, uint16_t instId, uint8_t type)
  * \return 0 Success
  * \return -1 Failure
  */
-int32_t sendSingleObject(UAVObjHandle obj, uint16_t instId, uint8_t type)
+static int32_t sendSingleObject(UAVObjHandle obj, uint16_t instId, uint8_t type)
 {
     int32_t length;
     int32_t dataOffset;
@@ -517,7 +517,7 @@ int32_t sendSingleObject(UAVObjHandle obj, uint16_t instId, uint8_t type)
  * \param[in] length Length of buffer
  * \return Updated checksum
  */
-uint16_t updateChecksum(uint16_t cs, uint8_t* data, int32_t length)
+static uint16_t updateChecksum(uint16_t cs, uint8_t* data, int32_t length)
 {
     int32_t n;
     for (n = 0; n < length; ++n)

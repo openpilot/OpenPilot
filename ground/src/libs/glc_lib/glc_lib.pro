@@ -8,11 +8,12 @@ TEMPLATE = lib
 QT += opengl \
     core
 
-CONFIG+= x86
-CONFIG += exceptions \
-    release \
-    warn_on
-VERSION = 1.2.0
+#CONFIG+= x86
+#CONFIG += exceptions \
+#    release \
+#    debug \
+#    warn_on
+#VERSION = 1.2.0
 
 unix:OBJECTS_DIR = .
 unix:MOC_DIR = .
@@ -366,10 +367,10 @@ include_glc_viewport.files = $${HEADERS_GLC_VIEWPORT}
 target.path = $${LIB_DIR}
    
 # "make install" configuration options
-INSTALLS += include_lib3ds include_glext include_quazip include_glc_maths include_glc_io
-INSTALLS += include_glc_scengraph include_glc_geometry include_glc_shading include_glc_viewport
-INSTALLS += include_pqp
+#INSTALLS += include_lib3ds include_glext include_quazip include_glc_maths include_glc_io
+#INSTALLS += include_glc_scengraph include_glc_geometry include_glc_shading include_glc_viewport
+#INSTALLS += include_pqp
 
-INSTALLS += target
-INSTALLS +=include
+#INSTALLS += target
+#INSTALLS +=include
 

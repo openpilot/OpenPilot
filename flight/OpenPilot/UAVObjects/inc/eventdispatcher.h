@@ -30,9 +30,10 @@
 
 // Public functions
 int32_t EventDispatcherInitialize();
-int32_t EventDispatch(UAVObjEvent* ev, UAVObjEventCallback cb);
-int32_t EventPeriodicCreate(UAVObjEvent* ev, UAVObjEventCallback cb, int32_t periodMs);
-int32_t EventPeriodicUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, int32_t periodMs);
-int32_t EventPeriodicDelete(UAVObjEvent* ev, UAVObjEventCallback cb);
+int32_t EventCallbackDispatch(UAVObjEvent* ev, UAVObjEventCallback cb);
+int32_t EventPeriodicCallbackCreate(UAVObjEvent* ev, UAVObjEventCallback cb, int32_t periodMs);
+int32_t EventPeriodicCallbackUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, int32_t periodMs);
+int32_t EventPeriodicQueueCreate(UAVObjEvent* ev, xQueueHandle queue, int32_t periodMs);
+int32_t EventPeriodicQueueUpdate(UAVObjEvent* ev, xQueueHandle queue, int32_t periodMs);
 
 #endif // EVENTDISPATCHER_H

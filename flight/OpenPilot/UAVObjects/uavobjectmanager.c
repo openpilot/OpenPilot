@@ -33,13 +33,13 @@
 /**
  * List of event queues and the eventmask associated with the queue.
  */
-struct ObjectQueueListStruct {
+struct ObjectEventListStruct {
 	xQueueHandle queue;
 	UAVObjEventCallback cb;
 	int32_t eventMask;
-    struct ObjectQueueListStruct* next;
+    struct ObjectEventListStruct* next;
 };
-typedef struct ObjectQueueListStruct ObjectQueueList;
+typedef struct ObjectEventListStruct ObjectEventList;
 
 /**
  * List of object instances, holds the actual data structure and instance ID
@@ -64,7 +64,7 @@ struct ObjectListStruct {
 	uint16_t numInstances; /** Number of instances */
 	struct ObjectListStruct* linkedObj; /** Linked object, for regular objects this is the metaobject and for metaobjects it is the parent object */
 	ObjectInstList* instances; /** List of object instances, instance 0 always exists */
-	ObjectQueueList* queues; /** Event queues registered on the object */
+	ObjectEventList* events; /** Event queues registered on the object */
     struct ObjectListStruct* next; /** Needed by linked list library (utlist.h) */
 };
 typedef struct ObjectListStruct ObjectList;
@@ -155,7 +155,7 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char* name, int32_t isMetaobject,
 	objEntry->isSingleInstance = (int8_t)isSingleInstance;
 	objEntry->isSettings = (int8_t)isSettings;
 	objEntry->numBytes = numBytes;
-	objEntry->queues = NULL;
+	objEntry->events = NULL;
 	objEntry->numInstances = 0;
 	objEntry->instances = NULL;
 	objEntry->linkedObj = NULL; // will be set later
@@ -953,7 +953,7 @@ void UAVObjIterate(void (*iterator)(UAVObjHandle obj))
  */
 static int32_t sendEvent(ObjectList* obj, uint16_t instId, UAVObjEventType event)
 {
-	ObjectQueueList* queueEntry;
+	ObjectEventList* eventEntry;
 	UAVObjEvent msg;
 
 	// Setup event
@@ -962,19 +962,19 @@ static int32_t sendEvent(ObjectList* obj, uint16_t instId, UAVObjEventType event
 	msg.instId = instId;
 
 	// Go through each object and push the event message in the queue (if event is activated for the queue)
-    LL_FOREACH(obj->queues, queueEntry)
+    LL_FOREACH(obj->events, eventEntry)
 	{
-    	if ( queueEntry->eventMask == 0 || (queueEntry->eventMask & event) != 0 )
+    	if ( eventEntry->eventMask == 0 || (eventEntry->eventMask & event) != 0 )
     	{
     		// Send to queue if a valid queue is registered
-    		if (queueEntry->queue != 0)
+    		if (eventEntry->queue != 0)
     		{
-    			xQueueSend(queueEntry->queue, &msg, 0); // do not wait if queue is full
+    			xQueueSend(eventEntry->queue, &msg, 0); // do not wait if queue is full
     		}
     		// Invoke callback (from event task) if a valid one is registered
-    		if (queueEntry->cb != 0)
+    		if (eventEntry->cb != 0)
     		{
-    			EventDispatch(&msg, queueEntry->cb); // invoke callback from the event task
+    			EventCallbackDispatch(&msg, eventEntry->cb); // invoke callback from the event task
     		}
     	}
     }
@@ -1064,31 +1064,31 @@ static ObjectInstList* getInstance(ObjectList* obj, uint16_t instId)
  */
 static int32_t connectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb, int32_t eventMask)
 {
-	ObjectQueueList* queueEntry;
+	ObjectEventList* eventEntry;
 	ObjectList* objEntry;
 
 	// Check that the queue is not already connected, if it is simply update event mask
 	objEntry = (ObjectList*)obj;
-	LL_FOREACH(objEntry->queues, queueEntry)
+	LL_FOREACH(objEntry->events, eventEntry)
 	{
-		if ( queueEntry->queue == queue && queueEntry->cb == cb )
+		if ( eventEntry->queue == queue && eventEntry->cb == cb )
 		{
 			// Already connected, update event mask and return
-			queueEntry->eventMask = eventMask;
+			eventEntry->eventMask = eventMask;
 			return 0;
 		}
 	}
 
 	// Add queue to list
-	queueEntry = (ObjectQueueList*)pvPortMalloc(sizeof(ObjectQueueList));
-	if (queueEntry == NULL)
+	eventEntry = (ObjectEventList*)pvPortMalloc(sizeof(ObjectEventList));
+	if (eventEntry == NULL)
 	{
 		return -1;
 	}
-	queueEntry->queue = queue;
-	queueEntry->cb = cb;
-	queueEntry->eventMask = eventMask;
-	LL_APPEND(objEntry->queues, queueEntry);
+	eventEntry->queue = queue;
+	eventEntry->cb = cb;
+	eventEntry->eventMask = eventMask;
+	LL_APPEND(objEntry->events, eventEntry);
 
 	// Done
 	return 0;
@@ -1103,17 +1103,17 @@ static int32_t connectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallb
  */
 static int32_t disconnectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb)
 {
-	ObjectQueueList* queueEntry;
+	ObjectEventList* eventEntry;
 	ObjectList* objEntry;
 
 	// Find queue and remove it
 	objEntry = (ObjectList*)obj;
-	LL_FOREACH(objEntry->queues, queueEntry)
+	LL_FOREACH(objEntry->events, eventEntry)
 	{
-		if ( ( queueEntry->queue == queue && queueEntry->cb == cb ) )
+		if ( ( eventEntry->queue == queue && eventEntry->cb == cb ) )
 		{
-			LL_DELETE(objEntry->queues, queueEntry);
-			vPortFree(queueEntry);
+			LL_DELETE(objEntry->events, eventEntry);
+			vPortFree(eventEntry);
 			return 0;
 		}
 	}

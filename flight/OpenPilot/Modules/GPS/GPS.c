@@ -54,11 +54,6 @@
 
 // Private functions
 static void gpsTask(void* parameters);
-static void periodicEventHandler(UAVObjEvent* ev);
-static void registerObject(UAVObjHandle obj);
-static void updateObject(UAVObjHandle obj);
-static int32_t addObject(UAVObjHandle obj);
-static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs);
 
 // functions
 char* nmeaGetPacketBuffer(void);
@@ -84,7 +79,6 @@ char NmeaPacket[NMEA_BUFFERSIZE];
 
 // Private variables
 static COMPortTypeDef gpsPort;
-static xQueueHandle queue;
 static xTaskHandle gpsTaskHandle;
 
 /**
@@ -94,17 +88,11 @@ static xTaskHandle gpsTaskHandle;
  */
 int32_t GpsInitialize(void)
 {
-	// Create object queue
-	//queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
-
 	// TODO: Get gps settings object
 	gpsPort = COM_USART2;
 
 	// Init input buffer size 512
 	bufferInit(&gpsRxBuffer, (unsigned char *)gpsRxData, 1024);
-
-	// Process all registered objects and connect queue for updates
-	//UAVObjIterate(&registerObject);
 
 	// Start gps task
 	xTaskCreate(gpsTask, (signed char*)"GPS", configMINIMAL_STACK_SIZE, NULL, TASK_PRIORITY, &gpsTaskHandle);
@@ -112,28 +100,6 @@ int32_t GpsInitialize(void)
 	return 0;
 }
 
-/**
- * Register a new object, adds object to local list and connects the queue depending on the object's
- * telemetry settings.
- * \param[in] obj Object to connect
- */
-void registerObject(UAVObjHandle obj)
-{
-	// Setup object for periodic updates
-	addObject(obj);
-
-	// Setup object for telemetry updates
-	updateObject(obj);
-}
-
-/**
- * Update object's queue connections and timer, depending on object's settings
- * \param[in] obj Object to updates
- */
-void updateObject(UAVObjHandle obj)
-{
-
-}
 
 /**
  * gps task. Processes input buffer. It does not return.
@@ -164,50 +130,6 @@ static void gpsTask(void* parameters)
 		nmeaProcess(&gpsRxBuffer);
 		vTaskDelay(xDelay);
 	}
-}
-
-/**
- * Event handler for periodic object updates (called by the event dispatcher)
- */
-static void periodicEventHandler(UAVObjEvent* ev)
-{
-	// Push event to the telemetry queue
-	xQueueSend(queue, ev, 0); // do not wait if queue is full
-}
-
-/**
- * Setup object for periodic updates.
- * \param[in] obj The object to update
- * \return 0 Success
- * \return -1 Failure
- */
-static int32_t addObject(UAVObjHandle obj)
-{
-	UAVObjEvent ev;
-
-	// Add object for periodic updates
-	ev.obj = obj;
-	ev.instId = UAVOBJ_ALL_INSTANCES;
-	ev.event = EV_UPDATED_MANUAL;
-	return EventPeriodicCreate(&ev, &periodicEventHandler, 0);
-}
-
-/**
- * Set update period of object (it must be already setup for periodic updates)
- * \param[in] obj The object to update
- * \param[in] updatePeriodMs The update period in ms, if zero then periodic updates are disabled
- * \return 0 Success
- * \return -1 Failure
- */
-static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs)
-{
-	UAVObjEvent ev;
-
-	// Add object for periodic updates
-	ev.obj = obj;
-	ev.instId = UAVOBJ_ALL_INSTANCES;
-	ev.event = EV_UPDATED_MANUAL;
-	return EventPeriodicUpdate(&ev, &periodicEventHandler, updatePeriodMs);
 }
 
 char* nmeaGetPacketBuffer(void)

@@ -40,7 +40,8 @@
  */
 typedef struct {
 	UAVObjEvent ev; /** The actual event */
-	UAVObjEventCallback cb; /** The callback function */
+	UAVObjEventCallback cb; /** The callback function, or zero if none */
+	xQueueHandle queue; /** The queue or zero if none */
 } EventCallbackInfo;
 
 /**
@@ -63,6 +64,9 @@ static xSemaphoreHandle mutex;
 // Private functions
 static int32_t processPeriodicUpdates();
 static void eventTask();
+static int32_t eventPeriodicCreate(UAVObjEvent* ev, UAVObjEventCallback cb, xQueueHandle queue, int32_t periodMs);
+static int32_t eventPeriodicUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, xQueueHandle queue, int32_t periodMs);
+
 
 /**
  * Initialize the dispatcher
@@ -95,24 +99,74 @@ int32_t EventDispatcherInitialize()
  * \param[in] cb The callback function
  * \return Success (0), failure (-1)
  */
-int32_t EventDispatch(UAVObjEvent* ev, UAVObjEventCallback cb)
+int32_t EventCallbackDispatch(UAVObjEvent* ev, UAVObjEventCallback cb)
 {
 	EventCallbackInfo evInfo;
 	// Initialize event callback information
 	memcpy(&evInfo.ev, ev, sizeof(UAVObjEvent));
 	evInfo.cb = cb;
+	evInfo.queue = 0;
 	// Push to queue
 	return xQueueSend(queue, &evInfo, 0); // will not block if queue is full
 }
 
 /**
- * Dispatch an event through a callback at periodic intervals.
+ * Dispatch an event at periodic intervals.
  * \param[in] ev The event to be dispatched
  * \param[in] cb The callback to be invoked
  * \param[in] periodMs The period the event is generated
  * \return Success (0), failure (-1)
  */
-int32_t EventPeriodicCreate(UAVObjEvent* ev, UAVObjEventCallback cb, int32_t periodMs)
+int32_t EventPeriodicCallbackCreate(UAVObjEvent* ev, UAVObjEventCallback cb, int32_t periodMs)
+{
+	return eventPeriodicCreate(ev, cb, 0, periodMs);
+}
+
+/**
+ * Update the period of a periodic event.
+ * \param[in] ev The event to be dispatched
+ * \param[in] cb The callback to be invoked
+ * \param[in] periodMs The period the event is generated
+ * \return Success (0), failure (-1)
+ */
+int32_t EventPeriodicCallbackUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, int32_t periodMs)
+{
+	return eventPeriodicUpdate(ev, cb, 0, periodMs);
+}
+
+/**
+ * Dispatch an event at periodic intervals.
+ * \param[in] ev The event to be dispatched
+ * \param[in] queue The queue that the event will be pushed in
+ * \param[in] periodMs The period the event is generated
+ * \return Success (0), failure (-1)
+ */
+int32_t EventPeriodicQueueCreate(UAVObjEvent* ev, xQueueHandle queue, int32_t periodMs)
+{
+	return eventPeriodicCreate(ev, 0, queue, periodMs);
+}
+
+/**
+ * Update the period of a periodic event.
+ * \param[in] ev The event to be dispatched
+ * \param[in] queue The queue
+ * \param[in] periodMs The period the event is generated
+ * \return Success (0), failure (-1)
+ */
+int32_t EventPeriodicQueueUpdate(UAVObjEvent* ev, xQueueHandle queue, int32_t periodMs)
+{
+	return eventPeriodicUpdate(ev, 0, queue, periodMs);
+}
+
+/**
+ * Dispatch an event through a callback at periodic intervals.
+ * \param[in] ev The event to be dispatched
+ * \param[in] cb The callback to be invoked or zero if none
+ * \param[in] queue The queue or zero if none
+ * \param[in] periodMs The period the event is generated
+ * \return Success (0), failure (-1)
+ */
+static int32_t eventPeriodicCreate(UAVObjEvent* ev, UAVObjEventCallback cb, xQueueHandle queue, int32_t periodMs)
 {
 	PeriodicObjectList* objEntry;
 	// Get lock
@@ -120,7 +174,9 @@ int32_t EventPeriodicCreate(UAVObjEvent* ev, UAVObjEventCallback cb, int32_t per
 	// Check that the object is not already connected
 	LL_FOREACH(objList, objEntry)
 	{
-		if (objEntry->evInfo.cb == cb && memcmp(&objEntry->evInfo.ev, ev, sizeof(UAVObjEvent)) == 0)
+		if (objEntry->evInfo.cb == cb &&
+			objEntry->evInfo.queue == queue &&
+			memcmp(&objEntry->evInfo.ev, ev, sizeof(UAVObjEvent)) == 0)
 		{
 			// Already registered, do nothing
 			xSemaphoreGiveRecursive(mutex);
@@ -132,6 +188,7 @@ int32_t EventPeriodicCreate(UAVObjEvent* ev, UAVObjEventCallback cb, int32_t per
 	if (objEntry == NULL) return -1;
 	memcpy(&objEntry->evInfo.ev, ev, sizeof(UAVObjEvent));
 	objEntry->evInfo.cb = cb;
+	objEntry->evInfo.queue = queue;
     objEntry->updatePeriodMs = periodMs;
     objEntry->timeToNextUpdateMs = 0;
     // Add to list
@@ -144,11 +201,12 @@ int32_t EventPeriodicCreate(UAVObjEvent* ev, UAVObjEventCallback cb, int32_t per
 /**
  * Update the period of a periodic event.
  * \param[in] ev The event to be dispatched
- * \param[in] cb The callback to be invoked
+ * \param[in] cb The callback to be invoked or zero if none
+ * \param[in] queue The queue or zero if none
  * \param[in] periodMs The period the event is generated
  * \return Success (0), failure (-1)
  */
-int32_t EventPeriodicUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, int32_t periodMs)
+static int32_t eventPeriodicUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, xQueueHandle queue, int32_t periodMs)
 {
 	PeriodicObjectList* objEntry;
 	// Get lock
@@ -156,40 +214,14 @@ int32_t EventPeriodicUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, int32_t per
 	// Find object
 	LL_FOREACH(objList, objEntry)
 	{
-		if (objEntry->evInfo.cb == cb && memcmp(&objEntry->evInfo.ev, ev, sizeof(UAVObjEvent)) == 0)
+		if (objEntry->evInfo.cb == cb &&
+			objEntry->evInfo.queue == queue &&
+			memcmp(&objEntry->evInfo.ev, ev, sizeof(UAVObjEvent)) == 0)
 		{
 			// Object found, update period
 			objEntry->updatePeriodMs = periodMs;
 			objEntry->timeToNextUpdateMs = 0;
 			// Release lock
-			xSemaphoreGiveRecursive(mutex);
-			return 0;
-		}
-	}
-    // If this point is reached the object was not found
-	xSemaphoreGiveRecursive(mutex);
-    return -1;
-}
-
-/**
- * Delete periodic event.
- * \param[in] ev The event to be dispatched
- * \param[in] cb The callback to be invoked
- * \return Success (0), failure (-1)
- */
-int32_t EventPeriodicDelete(UAVObjEvent* ev, UAVObjEventCallback cb)
-{
-	PeriodicObjectList* objEntry;
-	// Get lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-	// Find object
-	LL_FOREACH(objList, objEntry)
-	{
-		if (objEntry->evInfo.cb == cb && memcmp(&objEntry->evInfo.ev, ev, sizeof(UAVObjEvent)) == 0)
-		{
-			// Object found, remove from list
-			LL_DELETE(objList, objEntry);
-			vPortFree(objEntry);
 			xSemaphoreGiveRecursive(mutex);
 			return 0;
 		}
@@ -224,8 +256,11 @@ static void eventTask()
 		// Wait for queue message
 		if ( xQueueReceive(queue, &evInfo, delayMs/portTICK_RATE_MS) == pdTRUE )
 		{
-			// Invoke callback
-			evInfo.cb(&evInfo.ev); // the function is expected to copy the event information
+			// Invoke callback, if one
+			if ( evInfo.cb != 0)
+			{
+				evInfo.cb(&evInfo.ev); // the function is expected to copy the event information
+			}
 		}
 
 		// Process periodic updates
@@ -263,8 +298,16 @@ static int32_t processPeriodicUpdates()
             {
                 // Reset timer
             	objEntry->timeToNextUpdateMs = timeNow + objEntry->updatePeriodMs;
-                // Invoke callback
-            	objEntry->evInfo.cb(&objEntry->evInfo.ev); // the function is expected to copy the event information
+    			// Invoke callback, if one
+    			if ( objEntry->evInfo.cb != 0)
+    			{
+    				objEntry->evInfo.cb(&objEntry->evInfo.ev); // the function is expected to copy the event information
+    			}
+    			// Push event to queue, if one
+    			if ( objEntry->evInfo.queue != 0)
+    			{
+    				xQueueSend(objEntry->evInfo.queue, &objEntry->evInfo.ev, 0); // do not block if queue is full
+    			}
             }
             // Update minimum delay
             if (objEntry->timeToNextUpdateMs < timeToNextUpdate)

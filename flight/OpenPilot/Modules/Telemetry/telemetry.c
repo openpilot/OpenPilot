@@ -41,7 +41,6 @@ static xTaskHandle telemetryTaskHandle;
 
 // Private functions
 static void telemetryTask(void* parameters);
-static void periodicEventHandler(UAVObjEvent* ev);
 static int32_t transmitData(uint8_t* data, int32_t length);
 static void registerObject(UAVObjHandle obj);
 static void updateObject(UAVObjHandle obj);
@@ -227,15 +226,6 @@ static int32_t transmitData(uint8_t* data, int32_t length)
 }
 
 /**
- * Event handler for periodic object updates (called by the event dispatcher)
- */
-static void periodicEventHandler(UAVObjEvent* ev)
-{
-	// Push event to the telemetry queue
-	xQueueSend(queue, ev, 0); // do not wait if queue is full
-}
-
-/**
  * Setup object for periodic updates.
  * \param[in] obj The object to update
  * \return 0 Success
@@ -249,7 +239,7 @@ static int32_t addObject(UAVObjHandle obj)
 	ev.obj = obj;
 	ev.instId = UAVOBJ_ALL_INSTANCES;
 	ev.event = EV_UPDATED_MANUAL;
-	return EventPeriodicCreate(&ev, &periodicEventHandler, 0);
+	return EventPeriodicQueueCreate(&ev, queue, 0);
 }
 
 /**
@@ -267,6 +257,6 @@ static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs)
 	ev.obj = obj;
 	ev.instId = UAVOBJ_ALL_INSTANCES;
 	ev.event = EV_UPDATED_MANUAL;
-	return EventPeriodicUpdate(&ev, &periodicEventHandler, updatePeriodMs);
+	return EventPeriodicQueueUpdate(&ev, queue, updatePeriodMs);
 }
 

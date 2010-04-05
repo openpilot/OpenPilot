@@ -128,17 +128,18 @@ static void testTask(void *pvParameters)
 	ExampleObject1ConnectCallback(eventCallback);
 	ExampleObject1Set(&data);
 
-	// Test periodic callback
-	UAVObjEvent ev;
-	ev.event = 0;
-	ev.instId = 0;
-	ev.obj = ExampleObject1Handle();
-	EventPeriodicCreate(&ev, eventCallbackPeriodic, 500);
-
 	// Test queue events
 	xQueueHandle queue;
 	queue = xQueueCreate(10, sizeof(UAVObjEvent));
 	ExampleObject1ConnectQueue(queue);
+
+	// Test periodic events
+	UAVObjEvent ev;
+	ev.event = 0;
+	ev.instId = 0;
+	ev.obj = ExampleObject1Handle();
+	EventPeriodicCallbackCreate(&ev, eventCallbackPeriodic, 500);
+	EventPeriodicQueueCreate(&ev, queue, 250);
 
 	// Done testing
 	while (1)
@@ -164,7 +165,7 @@ static void eventCallbackPeriodic(UAVObjEvent* ev)
 	lastUpdate = xTaskGetTickCount();
 	const char* name = UAVObjGetName(ev->obj);
 	PIOS_LED_Toggle(LED1);
-	ExampleObject1Updated();
+	//ExampleObject1Updated();
 }
 
 void vApplicationIdleHook(void)

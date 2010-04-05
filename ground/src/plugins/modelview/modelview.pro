@@ -16,4 +16,4 @@ SOURCES += modelviewplugin.cpp \
     modelviewgadgetfactory.cpp \
     modelviewgadgetwidget.cpp \
     modelviewgadgetoptionspage.cpp
-OTHER_FILES += ModelView.pluginspec
+OTHER_FILES += ModelViewGadget.pluginspec

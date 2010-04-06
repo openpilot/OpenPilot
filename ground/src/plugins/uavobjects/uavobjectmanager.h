@@ -42,6 +42,7 @@ class UAVOBJECTS_EXPORT UAVObjectManager: public QObject
 
 public:
     UAVObjectManager();
+    ~UAVObjectManager();
 
     bool registerObject(UAVDataObject* obj);
     QList< QList<UAVObject*> > getObjects();

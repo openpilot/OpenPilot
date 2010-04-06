@@ -63,6 +63,7 @@ UAVGadgetInstanceManager::~UAVGadgetInstanceManager()
 {
     foreach (IOptionsPage *page, m_optionsPages) {
         m_pm->removeObject(page);
+        delete page;
     }
 }
 
@@ -143,7 +144,7 @@ IUAVGadget *UAVGadgetInstanceManager::createGadget(QString classId, QWidget *par
     IUAVGadgetFactory *f = factory(classId);
     if (f) {
         QList<IUAVGadgetConfiguration*> *configs = configurations(classId);
-        IUAVGadget *g = f->createGadget(0);
+        IUAVGadget *g = f->createGadget(parent);
         IUAVGadget *gadget = new UAVGadgetDecorator(g, configs);
         m_gadgetInstances.append(gadget);
         connect(this, SIGNAL(configurationAdded(IUAVGadgetConfiguration*)), gadget, SLOT(configurationAdded(IUAVGadgetConfiguration*)));
@@ -159,6 +160,8 @@ void UAVGadgetInstanceManager::removeGadget(IUAVGadget *gadget)
 {
     if (m_gadgetInstances.contains(gadget)) {
         m_gadgetInstances.removeOne(gadget);
+        delete gadget;
+        gadget = 0;
     }
 }
 

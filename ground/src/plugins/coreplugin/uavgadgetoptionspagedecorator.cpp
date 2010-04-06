@@ -41,6 +41,7 @@ UAVGadgetOptionsPageDecorator::UAVGadgetOptionsPageDecorator(IOptionsPage *page,
     m_id(config->name()),
     m_category(config->classId())
 {
+    m_optionsPage->setParent(this);
     m_instanceManager = ICore::instance()->uavGadgetInstanceManager();
     m_categoryTr = m_instanceManager->gadgetName(m_category);
 }

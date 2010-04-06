@@ -40,6 +40,7 @@ UAVGadgetDecorator::UAVGadgetDecorator(IUAVGadget *gadget, QList<IUAVGadgetConfi
         m_activeConfiguration(0),
         m_configurations(configurations)
 {
+    m_gadget->setParent(this);
     m_toolbar->setMinimumContentsLength(15);
     foreach (IUAVGadgetConfiguration *config, *m_configurations)
         m_toolbar->addItem(config->name());
@@ -47,6 +48,12 @@ UAVGadgetDecorator::UAVGadgetDecorator(IUAVGadget *gadget, QList<IUAVGadgetConfi
     if (m_configurations->count() > 0)
         loadConfiguration(0);
     updateToolbar();
+}
+
+UAVGadgetDecorator::~UAVGadgetDecorator()
+{
+    delete m_configurations;
+    delete m_toolbar;
 }
 
 void UAVGadgetDecorator::loadConfiguration(int index) {

@@ -35,6 +35,11 @@ UAVObjectManager::UAVObjectManager()
     mutex = new QMutex(QMutex::Recursive);
 }
 
+UAVObjectManager::~UAVObjectManager()
+{
+    delete mutex;
+}
+
 /**
  * Register an object with the manager. This function must be called for all newly created instances.
  * A new instance can be created directly by instantiating a new object or by calling clone() of

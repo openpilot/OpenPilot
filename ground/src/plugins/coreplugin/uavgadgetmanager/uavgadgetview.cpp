@@ -67,10 +67,10 @@ UAVGadgetView::UAVGadgetView(Core::UAVGadgetManager *uavGadgetManager, IUAVGadge
         QWidget(parent),
         m_uavGadgetManager(uavGadgetManager),
         m_uavGadget(uavGadget),
-        m_toolBar(new QWidget),
+        m_toolBar(new QWidget(this)),
         m_defaultToolBar(new QComboBox(this)),
-        m_uavGadgetList(new QComboBox),
-        m_closeButton(new QToolButton),
+        m_uavGadgetList(new QComboBox(this)),
+        m_closeButton(new QToolButton(this)),
         m_defaultIndex(0),
         m_activeLabel(new QLabel)
 {
@@ -97,14 +97,14 @@ UAVGadgetView::UAVGadgetView(Core::UAVGadgetManager *uavGadgetManager, IUAVGadge
         m_defaultToolBar->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
         m_activeToolBar = m_defaultToolBar;
 
-        QHBoxLayout *toolBarLayout = new QHBoxLayout;
+        QHBoxLayout *toolBarLayout = new QHBoxLayout(m_toolBar);
         toolBarLayout->setMargin(0);
         toolBarLayout->setSpacing(0);
         toolBarLayout->addWidget(m_defaultToolBar);
         m_toolBar->setLayout(toolBarLayout);
         m_toolBar->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::MinimumExpanding);
 
-        QWidget *spacerWidget = new QWidget;
+        QWidget *spacerWidget = new QWidget(this);
         spacerWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
         m_activeLabel->setTextFormat(Qt::RichText);
@@ -113,7 +113,8 @@ UAVGadgetView::UAVGadgetView(Core::UAVGadgetManager *uavGadgetManager, IUAVGadge
         m_closeButton->setAutoRaise(true);
         m_closeButton->setIcon(QIcon(":/core/images/closebutton.png"));
 
-        QHBoxLayout *toplayout = new QHBoxLayout;
+        m_top = new Utils::StyledBar(this);
+        QHBoxLayout *toplayout = new QHBoxLayout(m_top);
         toplayout->setSpacing(0);
         toplayout->setMargin(0);
         toplayout->addWidget(m_uavGadgetList);
@@ -122,7 +123,6 @@ UAVGadgetView::UAVGadgetView(Core::UAVGadgetManager *uavGadgetManager, IUAVGadge
         toplayout->addWidget(m_activeLabel);
         toplayout->addWidget(m_closeButton);
 
-        m_top = new Utils::StyledBar;
         m_top->setLayout(toplayout);
         tl->addWidget(m_top);
 
@@ -162,6 +162,7 @@ void UAVGadgetView::removeGadget()
         return;
     tl->removeWidget(m_uavGadget->widget());
 
+    m_uavGadget->setParent(0);
     m_uavGadget->widget()->setParent(0);
     QWidget *toolBar = m_uavGadget->toolBar();
     if (toolBar != 0) {
@@ -221,10 +222,11 @@ void UAVGadgetView::listSelectionActivated(int index)
     if (m_uavGadget && (m_uavGadget->classId() == classId))
         return;
     UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
-    im->removeGadget(m_uavGadget);
+    IUAVGadget *gadgetToRemove = m_uavGadget;
     IUAVGadget *gadget = im->createGadget(classId, this);
     setGadget(gadget);
     m_uavGadgetManager->setCurrentGadget(gadget);
+    im->removeGadget(gadgetToRemove);
 }
 
 int UAVGadgetView::indexOfClassId(QString classId)
@@ -241,7 +243,7 @@ SplitterOrView::SplitterOrView(Core::UAVGadgetManager *uavGadgetManager, Core::I
         m_uavGadgetManager(uavGadgetManager),
         m_isRoot(isRoot)
 {
-    m_view = new UAVGadgetView(m_uavGadgetManager, uavGadget);
+    m_view = new UAVGadgetView(m_uavGadgetManager, uavGadget, this);
     m_layout = new QStackedLayout(this);
     m_splitter = 0;
     m_layout->addWidget(m_view);

@@ -167,7 +167,8 @@ UAVGadgetManagerPrivate::~UAVGadgetManagerPrivate()
 UAVGadgetManager::UAVGadgetManager(ICore *core, QWidget *parent) :
     QWidget(parent),
     m_showToolbars(false),
-    m_d(new UAVGadgetManagerPrivate(core, parent))
+    m_d(new UAVGadgetManagerPrivate(core, parent)),
+    m_uavGadgetMode(0)
 {
 
     connect(m_d->m_core, SIGNAL(contextAboutToChange(Core::IContext *)),
@@ -368,10 +369,9 @@ void UAVGadgetManager::closeView(Core::Internal::UAVGadgetView *view)
         return;
 
     IUAVGadget *gadget = view->gadget();
+    emptyView(view);
     UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
     im->removeGadget(gadget);
-
-    emptyView(view);
 
     SplitterOrView *splitter = m_d->m_splitterOrView->findSplitter(splitterOrView);
     Q_ASSERT(splitterOrView->hasGadget() == false);
@@ -442,8 +442,9 @@ bool UAVGadgetManager::restoreState(const QByteArray &state)
     removeAllSplits();
 
     UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
-    im->removeGadget(m_d->m_splitterOrView->view()->gadget());
+    IUAVGadget *gadget = m_d->m_splitterOrView->view()->gadget();
     emptyView(m_d->m_splitterOrView->view());
+    im->removeGadget(gadget);
     QDataStream stream(state);
 
     QByteArray version;
@@ -544,15 +545,15 @@ void UAVGadgetManager::removeAllSplits()
     IUAVGadget *uavGadget = m_d->m_currentGadget;
     QList<IUAVGadget*> gadgets = m_d->m_splitterOrView->gadgets();
     gadgets.removeOne(uavGadget);
-    UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
-    foreach (IUAVGadget *g, gadgets) {
-        im->removeGadget(g);
-    }
 
     m_d->m_currentGadget = 0; // trigger update below
     m_d->m_splitterOrView->unsplitAll();
     m_d->m_splitterOrView->view()->setGadget(uavGadget);
     setCurrentGadget(uavGadget);
+    UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
+    foreach (IUAVGadget *g, gadgets) {
+        im->removeGadget(g);
+    }
 }
 
 void UAVGadgetManager::gotoOtherSplit()

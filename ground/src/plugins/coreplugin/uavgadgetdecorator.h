@@ -38,6 +38,7 @@ class UAVGadgetDecorator : public IUAVGadget
 Q_OBJECT
 public:
     explicit UAVGadgetDecorator(IUAVGadget *gadget, QList<IUAVGadgetConfiguration*> *configurations);
+    ~UAVGadgetDecorator();
 
     QWidget *widget() { return m_gadget->widget(); }
     QComboBox *toolBar() { return m_toolbar; }

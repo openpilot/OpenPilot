@@ -16,6 +16,6 @@
 namespace jafar{
 	namespace jmath{
 		bool MATLAB::fullPrec = true;
-		const size_t MATLAB::prec = 7;
+		const size_t MATLAB::prec = 6;
 	}
 }

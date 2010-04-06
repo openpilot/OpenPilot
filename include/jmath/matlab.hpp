@@ -135,7 +135,8 @@ namespace jafar {
 				void initFromBubVector(const bubTemplateVector& v1) {
 					std::ostringstream os;
 					os.precision(prec);
-					os.setf(std::ios::fixed,std::ios::floatfield);
+					//					os.setf(std::ios::fixed,std::ios::floatfield);
+					os.setf(std::ios::fixed,std::ios::adjustfield);
 					os << "[ ";
 					for (size_t i = 0; i < v1.size(); ++i) {
 						{
@@ -158,7 +159,8 @@ namespace jafar {
 					os << "...\n[ ";
 					std::ostringstream ostmp;
 					ostmp.precision(prec);
-					ostmp.setf(std::ios::fixed,std::ios::floatfield);
+//					ostmp.setf(std::ios::fixed,std::ios::floatfield);
+					ostmp.setf(std::ios::fixed,std::ios::adjustfield);
 					for (size_t i = 0; i < m1.size1(); ++i) {
 						for (size_t j = 0; j < m1.size2(); ++j) {
 							if (m1(i, j) < 0)
@@ -173,7 +175,7 @@ namespace jafar {
 							if (m1.size2() != j + 1) {
 								ostmp << ",";
 								const int size = ostmp.str().length();
-								for (size_t i = size; i < prec+7; ++i)
+								for (size_t i = size; i < prec+5; ++i)
 									ostmp << " ";
 							}
 							os << ostmp.str();
@@ -192,12 +194,10 @@ namespace jafar {
 				template<typename bubTemplateIndex>
 				void initFromBubIndex(const bubTemplateIndex & i1) {
 					std::ostringstream os;
-					os.precision(prec);
-					os.setf(std::ios::fixed,std::ios::floatfield);
 					os << "[ ";
 					for (size_t i = 0; i < i1.size(); ++i) {
 						os << (i1(i) + 1);
-						if (i1.size() != i + 1) {
+						if (i1.size() != i + 1) { // Matlab indexes from 1 to size()
 							os << ", ";
 						}
 					}

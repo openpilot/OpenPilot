@@ -93,36 +93,24 @@ namespace jblas {
   /// diagonal matrix
   typedef boost::numeric::ublas::diagonal_matrix<double> diag_mat;
 
-  /// 2x2 dimension matrix
-  typedef boost::numeric::ublas::bounded_matrix<double,2,2> mat22;
-
-  /// 3x3 dimension matrix
-  typedef boost::numeric::ublas::bounded_matrix<double,3,3> mat33;
-  typedef boost::numeric::ublas::matrix_range<mat33> mat33_range;
-  
-  /// 3x4 dimension matrix
-  typedef boost::numeric::ublas::bounded_matrix<double,3,4> mat34;
-  typedef boost::numeric::ublas::matrix_range<mat34> mat34_range;
-
-  /// 4x3 dimension matrix
-  typedef boost::numeric::ublas::bounded_matrix<double,4,3> mat43;
-  typedef boost::numeric::ublas::matrix_range<mat43> mat43_range;
-
-  /// 4x4 dimension matrix
-  typedef boost::numeric::ublas::bounded_matrix<double,4,4> mat44;
-  typedef boost::numeric::ublas::matrix_range<mat44> mat44_range;
-
-  /// 6x6 dimension matrix
-  typedef boost::numeric::ublas::bounded_matrix<double,6,6> mat66;
-  typedef boost::numeric::ublas::matrix_range<mat66> mat66_range;
-
-  /// 8x8 dimension matrix
-  typedef boost::numeric::ublas::bounded_matrix<double,8,8> mat88;
-  typedef boost::numeric::ublas::matrix_range<mat88> mat88_range;
-	
-  /// 9x9 dimension matrix
-  typedef boost::numeric::ublas::bounded_matrix<double,9,9> mat99;
-  typedef boost::numeric::ublas::matrix_range<mat99> mat99_range;
+  /// Fixed dimension matrices and matrix ranges
+  typedef boost::numeric::ublas::bounded_matrix<double,2,2> mat22; // 2x2
+  typedef boost::numeric::ublas::bounded_matrix<double,2,3> mat23; // 2x3
+  typedef boost::numeric::ublas::bounded_matrix<double,3,2> mat32; // 3x2
+  typedef boost::numeric::ublas::bounded_matrix<double,3,3> mat33; // 3x3
+  typedef boost::numeric::ublas::matrix_range<mat33> mat33_range; //  3x3
+  typedef boost::numeric::ublas::bounded_matrix<double,3,4> mat34; // 3x4
+  typedef boost::numeric::ublas::matrix_range<mat34> mat34_range; //  3x4
+  typedef boost::numeric::ublas::bounded_matrix<double,4,3> mat43; // 4x3
+  typedef boost::numeric::ublas::matrix_range<mat43> mat43_range; //  4x3
+  typedef boost::numeric::ublas::bounded_matrix<double,4,4> mat44; // 4x4
+  typedef boost::numeric::ublas::matrix_range<mat44> mat44_range; //  4x4
+  typedef boost::numeric::ublas::bounded_matrix<double,6,6> mat66; // 6x6
+  typedef boost::numeric::ublas::matrix_range<mat66> mat66_range; //  6x6
+  typedef boost::numeric::ublas::bounded_matrix<double,8,8> mat88; // 8x8
+  typedef boost::numeric::ublas::matrix_range<mat88> mat88_range; //  8x8
+  typedef boost::numeric::ublas::bounded_matrix<double,9,9> mat99; // 9x9
+  typedef boost::numeric::ublas::matrix_range<mat99> mat99_range; //  9x9
   
   /// standard symmetric matrix type
   typedef boost::numeric::ublas::symmetric_matrix<double> sym_mat;

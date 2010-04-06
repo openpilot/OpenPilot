@@ -196,7 +196,7 @@ UAVGadgetManager::UAVGadgetManager(ICore *core, QWidget *parent) :
         cmd = am->registerAction(tmpaction, QLatin1String("OpenPilot.Window.Sep.Split"), uavGadgetManagerContext);
         mwindow->addAction(cmd, Constants::G_WINDOW_HIDE_TOOLBAR);
 
-        m_d->m_showToolbarsAction = new QAction(tr("Show toolbars"), this);
+        m_d->m_showToolbarsAction = new QAction(tr("Edit Gadgets Mode"), this);
         m_d->m_showToolbarsAction->setCheckable(true);
         cmd = am->registerAction(m_d->m_showToolbarsAction, Constants::HIDE_TOOLBARS, uavGadgetManagerContext);
         cmd->setDefaultKeySequence(QKeySequence(tr("Ctrl+Shift+F10")));

@@ -138,7 +138,7 @@ public:
     void unsplitAll();
 
 protected:
-    void paintEvent(QPaintEvent *);
+//    void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *e);
 
 private:

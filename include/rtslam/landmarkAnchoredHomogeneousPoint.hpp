@@ -10,6 +10,7 @@
 #ifndef LANDMARKANCHOREDHOMOGENEOUSPOINT_HPP_
 #define LANDMARKANCHOREDHOMOGENEOUSPOINT_HPP_
 
+#include "boost/shared_ptr.hpp"
 #include "rtslam/landmarkAbstract.hpp"
 #include "rtslam/quatTools.hpp"
 
@@ -19,6 +20,9 @@
  */
 namespace jafar {
 	namespace rtslam {
+
+		class LandmarkAnchoredHomogeneousPoint;
+		typedef boost::shared_ptr<LandmarkAnchoredHomogeneousPoint> ahp_ptr_t;
 
 
 		/**
@@ -377,7 +381,7 @@ namespace jafar {
 				/**
 				 * Constructor from map
 				 */
-				LandmarkAnchoredHomogeneousPoint(MapAbstract & map);
+				LandmarkAnchoredHomogeneousPoint(const map_ptr_t mapPtr);
 
 				static size_t size(void) {
 					return 7;

@@ -41,17 +41,17 @@ void test_landmark01(void) {
 
 	size_t size_map = 300;
 
-	MapAbstract map(size_map);
-	randVector(map.x());
-	randMatrix(map.P());
+	map_ptr_t mapPtr(new MapAbstract(size_map));
+	randVector(mapPtr->x());
+	randMatrix(mapPtr->P());
 
 	ublas::vector<LandmarkAbstract *> Lmks(5);
 
 	cout << "\n% LANDMARK CREATION AND PRINT \n%===========" << endl;
 
 	for (size_t lmk = 0; lmk < 3; lmk++) {
-		jblas::ind_array ial = ia_pushfront(map.used_states, LandmarkAnchoredHomogeneousPoint::size());
-		Lmks.insert_element(lmk, new LandmarkAnchoredHomogeneousPoint(map));
+		jblas::ind_array ial = ia_pushfront(mapPtr->used_states, LandmarkAnchoredHomogeneousPoint::size());
+		Lmks.insert_element(lmk, new LandmarkAnchoredHomogeneousPoint(mapPtr));
 		Lmks(lmk)->id(lmk);
 	}
 	for (size_t lmk = 0; lmk < 3; lmk++) {
@@ -66,7 +66,7 @@ void test_landmark01(void) {
 		E(i) = 0.1 * (i + 1);
 		T(i) = i + 1;
 	}
-	LandmarkAnchoredHomogeneousPoint ahp1(map);
+	LandmarkAnchoredHomogeneousPoint ahp1(mapPtr);
 	subrange(F, 0, 3) = T;
 	subrange(F, 3, 7) = quaternion::e2q(E);
 	cout << "F = " << F << endl;

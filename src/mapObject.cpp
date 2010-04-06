@@ -45,8 +45,8 @@ namespace jafar {
 		/*
 		 * Remote constructor from remote map and indirect array
 		 */
-		MapObject::MapObject(MapAbstract & _map, const size_t _size) :
-			ObjectAbstract(), slamMap(&_map), state(_map.x(), _map.P(), _map.reserveStates(_size)) {
+		MapObject::MapObject(const map_ptr_t _mapPtr, const size_t _size) :
+			ObjectAbstract(), state(_mapPtr->x(), _mapPtr->P(), _mapPtr->reserveStates(_size)) {
 			categoryName("MAP OBJECT");
 		}
 

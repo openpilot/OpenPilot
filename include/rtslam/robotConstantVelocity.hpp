@@ -17,6 +17,9 @@
 namespace jafar {
 	namespace rtslam {
 
+		class RobotConstantVelocity;
+		typedef boost::shared_ptr<RobotConstantVelocity> constvel_ptr_t;
+
 
 		/**
 		 * Constant velocity model robot class.
@@ -55,11 +58,7 @@ namespace jafar {
 				 * Remote constructor from remote map.
 				 * \param _map the remote map
 				 */
-				RobotConstantVelocity(MapAbstract & _map);
-
-				// TODO implement a constructor with all useful data as scalars for easy interface.
-				RobotConstantVelocity(MapAbstract & _map, const double _dt, const double sigma_v,
-				    const double sigma_w);
+				RobotConstantVelocity(const map_ptr_t _mapPtr);
 
 				~RobotConstantVelocity(void) {
 				}

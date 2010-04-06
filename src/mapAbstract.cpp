@@ -22,10 +22,10 @@
 // TODO this needs to go out of here - when we'll have factories
 #include "rtslam/observationPinHoleAnchoredHomogeneous.hpp"
 
-
 namespace jafar {
 	namespace rtslam {
 		using namespace std;
+
 
 		// Serializer function very long: and defined at the end of file
 		// std::ostream& operator <<(std::ostream & s, jafar::rtslam::MapAbstract & map) {
@@ -51,13 +51,12 @@ namespace jafar {
 			return filter.P(i, j);
 		}
 
-
 		void MapAbstract::linkToRobot(robot_ptr_t _robPtr) {
-			robots[_robPtr->id()] = _robPtr;
+			robotsPtrSet[_robPtr->id()] = _robPtr;
 		}
 
 		void MapAbstract::linkToLandmark(landmark_ptr_t _lmkPtr) {
-			landmarks[_lmkPtr->id()] = _lmkPtr;
+			landmarksPtrSet[_lmkPtr->id()] = _lmkPtr;
 		}
 
 		jblas::ind_array MapAbstract::reserveStates(const std::size_t N) {
@@ -81,16 +80,15 @@ namespace jafar {
 		}
 
 		void MapAbstract::addObservations(landmark_ptr_t lmkPtr) {
-			for (robots_ptr_set_t::iterator robIter = robots.begin(); robIter != robots.end(); robIter++) {
+			for (robots_ptr_set_t::iterator robIter = robotsPtrSet.begin(); robIter != robotsPtrSet.end(); robIter++) {
 				robot_ptr_t robPtr = robIter->second;
-				for (sensors_ptr_set_t::iterator senIter = robPtr->sensors.begin(); senIter != robPtr->sensors.end(); senIter++) {
+				for (sensors_ptr_set_t::iterator senIter = robPtr->sensorsPtrSet.begin(); senIter != robPtr->sensorsPtrSet.end(); senIter++) {
 					sensor_ptr_t senPtr = senIter->second;
 					observation_ptr_t obsPtr = newObservation(senPtr, lmkPtr);
 					cout << "    added obs: " << obsPtr->id() << endl;
 				}
 			}
 		}
-
 
 		void MapAbstract::fillSeq() {
 			for (size_t i = 0; i < max_size; i++) {
@@ -112,12 +110,13 @@ namespace jafar {
 			randMatrix(P());
 		}
 
-		observation_ptr_t MapAbstract::newObservation(sensor_ptr_t senPtr, landmark_ptr_t lmkPtr){
-			boost::shared_ptr<ObservationPinHoleAnchoredHomogeneousPoint> obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint());
+		observation_ptr_t MapAbstract::newObservation(sensor_ptr_t senPtr, landmark_ptr_t lmkPtr) {
+			boost::shared_ptr<ObservationPinHoleAnchoredHomogeneousPoint> obsPtr(
+//			    new ObservationPinHoleAnchoredHomogeneousPoint(senPtr->isInFilter));
+	    new ObservationPinHoleAnchoredHomogeneousPoint(senPtr, lmkPtr));
 			//	obsPtr->id() = 0;
 			obsPtr->id() = 1000 * senPtr->id() + lmkPtr->id();
-			obsPtr->linkToSensor(senPtr);
-			obsPtr->linkToLandmark(lmkPtr);
+			obsPtr->link(senPtr, lmkPtr);
 			senPtr->linkToObservation(obsPtr);
 			lmkPtr->linkToObservation(obsPtr);
 
@@ -142,27 +141,25 @@ namespace jafar {
 			observations_ptr_set_t::iterator obsIter;
 
 			s << "\n% ROBOTS AND SENSORS \n%=========================" << endl;
-			for (robIter = map.robots.begin(); robIter != map.robots.end(); robIter++) {
+			for (robIter = map.robotsPtrSet.begin(); robIter != map.robotsPtrSet.end(); robIter++) {
 				robot_ptr_t robPtr = robIter->second;
 				s << *robPtr << endl;
-				for (senIter = robPtr->sensors.begin(); senIter != robPtr->sensors.end(); senIter++) {
+				for (senIter = robPtr->sensorsPtrSet.begin(); senIter != robPtr->sensorsPtrSet.end(); senIter++) {
 					sensor_ptr_t senPtr = senIter->second;
 					s << *senPtr << endl;
 				}
 			}
 			s << "\n% LANDMARKS AND OBSERVATIONS \n%==========================" << endl;
-			for (lmkIter = map.landmarks.begin(); lmkIter != map.landmarks.end(); lmkIter++) {
+			for (lmkIter = map.landmarksPtrSet.begin(); lmkIter != map.landmarksPtrSet.end(); lmkIter++) {
 				landmark_ptr_t lmkPtr = lmkIter->second;
 				s << *lmkPtr << endl;
-				for (obsIter = lmkPtr->observations.begin(); obsIter != lmkPtr->observations.end(); obsIter++) {
+				for (obsIter = lmkPtr->observationsPtrSet.begin(); obsIter != lmkPtr->observationsPtrSet.end(); obsIter++) {
 					observation_ptr_t obsPtr = obsIter->second;
 					s << *obsPtr << endl;
 				}
 			}
 			return s;
 		}
-
-
 
 	}
 }

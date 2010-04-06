@@ -31,8 +31,8 @@ namespace jafar {
 		 * Remote constructor from remote map.
 		 * \param _map the remote map
 		 */
-		RobotConstantVelocity::RobotConstantVelocity(MapAbstract & _map) :
-			RobotAbstract(_map, RobotConstantVelocity::size(), RobotConstantVelocity::size_control(), RobotConstantVelocity::size_perturbation()) {
+		RobotConstantVelocity::RobotConstantVelocity(const map_ptr_t _mapPtr) :
+			RobotAbstract(_mapPtr, RobotConstantVelocity::size(), RobotConstantVelocity::size_control(), RobotConstantVelocity::size_perturbation()) {
 			// Build constant perturbation Jacobian
 			constantPerturbation = true;
 			computePertJacobian();

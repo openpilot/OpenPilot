@@ -67,6 +67,14 @@ namespace jafar {
 		/**
 		 * Base class for all observations defined in the module rtslam.
 		 * \author jsola
+		 *
+		 * In this class, the Jacobians are sparse. The states that contribute to the observation are available through an indirect array
+		 * - this->ia_rsl
+		 *
+		 * so that we have, for example:
+		 * - expectation.x() = h( project(x, ia_rsl) )
+		 * - expectation.P() = EXP_rsl * project(P, ia_rsl, ia_rsl) * EXP_rsl'
+		 *
 		 * \ingroup rtslam
 		 */
 		class ObservationAbstract: public ObjectAbstract {
@@ -75,27 +83,39 @@ namespace jafar {
 
 			public:
 
-				virtual ~ObservationAbstract() {
-				}
 
 
 				/**
 				 * Size constructor
 				 * \param _size size of measurement space (used for measurement, expectation and innovation).
 				 */
-				ObservationAbstract(const size_t _size);
+				ObservationAbstract(const sensor_ptr_t _senPtr, const landmark_ptr_t _lmkPtr, const size_t _size, const size_t size_nonobs = 0);
 
 				/**
 				 * Sizes constructor
 				 */
-				ObservationAbstract(const size_t _size_meas, const size_t _size_exp, const size_t _size_inn);
+				ObservationAbstract(sensor_ptr_t _senPtr, landmark_ptr_t _lmkPtr, const size_t _size_meas, const size_t _size_exp, const size_t _size_inn,
+				    const size_t _size_nonobs = 0);
 
-				sensor_ptr_t sensor; ///<			   Mother Sensor where it was acquired from
-				landmark_ptr_t landmark; ///< 	 Father Landmark where it points to
+				virtual ~ObservationAbstract() {
+				}
 
+				// Links
+				sensor_ptr_t sensorPtr; ///<       Mother Sensor where it was acquired from
+				landmark_ptr_t landmarkPtr; ///<   Father Landmark where it points to
+
+				// Data
 				Expectation expectation;
 				Measurement measurement;
 				Innovation innovation;
+
+				ind_array ia_rsl; ///<          Ind. array of indices to the map
+				jblas::mat EXP_rsl; ///<        Jacobian of the expectation wrt the states of robot, sensor and landmark.
+				jblas::mat INN_meas; ///<       The Jacobian of the innovation wrt the measurement.
+				jblas::mat INN_exp; ///<        The Jacobian of the innovation wrt the expectation.
+				jblas::mat INN_rsl; ///<        The Jacobian of the innovation wrt the states of robot, sensor and landmark.
+				jblas::vec nonObs; ///<         Expected value of the non-observable part.
+
 
 				/**
 				 * Counters
@@ -116,8 +136,7 @@ namespace jafar {
 						bool updated; ///< Landmark is updated
 				} events;
 
-				void linkToSensor(sensor_ptr_t _sensorPtr); ///<  Link to sensor
-				void linkToLandmark(landmark_ptr_t _lmkPtr); ///< Link to landmark
+				void link(sensor_ptr_t _senPtr, landmark_ptr_t _lmkPtr); ///< Link to sensor and landmark
 
 				/**
 				 * Project and get Jacobians.
@@ -128,18 +147,12 @@ namespace jafar {
 				 * wrt the states that contributed to the projection (those of the robot, eventually the sensor, and the landmark).
 				 * These states are also available through the indirect_array \a ia_rsl, updated by this function.
 				 */
-				virtual void project_func(){}
+				virtual void project_func() = 0;
 
 				/**
 				 * Project and get expectation covariances
 				 */
-				void project() {
-					project_func();
-					expectation.P() = ublasExtra::prod_JPJt(
-							ublas::project(landmark->slamMap->filter.P(), expectation.ia_rsl, expectation.ia_rsl),
-							expectation.EXP_rsl);
-				}
-
+				void project();
 
 				/**
 				 * Is visible
@@ -150,10 +163,10 @@ namespace jafar {
 				}
 
 
-				//				/**
-				//				 * Back-project
-				//				 */
-				//				virtual void back_project() = 0;
+				/**
+				 * Back-project
+				 */
+				virtual void backProject_func() = 0;
 
 		};
 

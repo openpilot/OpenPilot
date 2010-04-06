@@ -35,7 +35,7 @@ namespace jafar {
 			s << ".pose :  " << rob.pose << endl;
 			s << ".sens : [";
 			sensors_ptr_set_t::iterator senIter;
-			for (senIter = rob.sensors.begin(); senIter != rob.sensors.end(); senIter++)
+			for (senIter = rob.sensorsPtrSet.begin(); senIter != rob.sensorsPtrSet.end(); senIter++)
 				s << " " << senIter->first << " ";
 			s << "]";
 			return s;
@@ -45,8 +45,9 @@ namespace jafar {
 		/*
 		 * Remote constructor from remote map and size of control vector.
 		 */
-		RobotAbstract::RobotAbstract(MapAbstract & _map, const size_t _size_state, const size_t _size_control, const size_t _size_pert) :
-			MapObject(_map, _size_state),
+		RobotAbstract::RobotAbstract(const map_ptr_t _mapPtr, const size_t _size_state, const size_t _size_control, const size_t _size_pert) :
+			MapObject(_mapPtr, _size_state),
+			mapPtr(_mapPtr),
 			pose(state, jmath::ublasExtra::ia_range(0, 7)),
 			control(_size_control),
 			perturbation(_size_pert),
@@ -63,18 +64,18 @@ namespace jafar {
 		 * Add a sensor to this robot
 		 */
 		void RobotAbstract::linkToSensor(sensor_ptr_t _senPtr) {
-			sensors[_senPtr->id()] = _senPtr;
+			sensorsPtrSet[_senPtr->id()] = _senPtr;
 		}
 
 		void RobotAbstract::linkToMap(map_ptr_t _mapPtr) {
-			slamMap = _mapPtr;
+			mapPtr = _mapPtr;
 		}
 
 		void RobotAbstract::move() {
 			move_func(); // x = F(x, u); Update Jacobians dxnew/dx and dxnew/du
 			if (!constantPerturbation)
 				computeStatePerturbation();
-			slamMap->filter.predict(slamMap->ia_used_states(), XNEW_x, state.ia(), Q); // P = F*P*F' + Q
+			mapPtr->filter.predict(mapPtr->ia_used_states(), XNEW_x, state.ia(), Q); // P = F*P*F' + Q
 		}
 
 		void RobotAbstract::computeStatePerturbation() {
@@ -82,7 +83,7 @@ namespace jafar {
 		}
 
 		void RobotAbstract::exploreSensors() {
-			for (sensors_ptr_set_t::iterator senIter = sensors.begin(); senIter != sensors.end(); senIter++) {
+			for (sensors_ptr_set_t::iterator senIter = sensorsPtrSet.begin(); senIter != sensorsPtrSet.end(); senIter++) {
 				sensor_ptr_t senPtr = senIter->second;
 				cout << "exploring sen: " << senPtr->id() << endl;
 

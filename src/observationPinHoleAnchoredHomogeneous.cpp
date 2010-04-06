@@ -11,6 +11,8 @@
  * \ingroup rtslam
  */
 
+#include "boost/shared_ptr.hpp"
+
 #include "rtslam/observationPinHoleAnchoredHomogeneous.hpp"
 
 namespace jafar {
@@ -18,24 +20,55 @@ namespace jafar {
 
 		using namespace std;
 		using namespace jblas;
+		using namespace ublas;
 
-		ObservationPinHoleAnchoredHomogeneousPoint::ObservationPinHoleAnchoredHomogeneousPoint() :
-			ObservationPinHolePoint() {
+
+		ObservationPinHoleAnchoredHomogeneousPoint::ObservationPinHoleAnchoredHomogeneousPoint(const sensor_ptr_t pinholePtr,
+				const landmark_ptr_t ahpPtr) :
+
+			ObservationAbstract(pinholePtr, ahpPtr, 2, pinholePtr->robotPtr->pose.size() + pinholePtr->state.size(), 1) {
 			categoryName("PINHOLE-AHP OBS");
+			link(pinholePtr, ahpPtr);
 		}
 
-		void ObservationPinHoleAnchoredHomogeneousPoint::convertToDir() {
-			jblas::vec7 ahp = landmark->state.x();
-			vec3 p0;
-			vec3 m;
-			double rho;
-			landmarkAHP::split(ahp, p0, m, rho);
-			vec7 S; // sensor global pose
-			S = quaternion::composeFrames(sensor->robot->pose.x(), sensor->pose.x());
-			vec3 T = ublas::project(S, ublas::range(0, 3));
-			vec4 Q = ublas::project(S, ublas::range(3, 7));
-			jblas::mat33 Rt = quaternion::q2Rt(Q);
-			dirVec = ublas::prod(Rt, (m - (T - p0) * rho)); // See Sola, ICRA 2010.
+		void ObservationPinHoleAnchoredHomogeneousPoint::link(sensor_ptr_t _senPtr, landmark_ptr_t _lmkPtr) { ///< Link to sensor and landmark
+			ObservationAbstract::link(_senPtr, _lmkPtr);
+			// Use this pointer below to access the pin-hole specific parameters.
+			pinHolePtr = boost::dynamic_pointer_cast<SensorPinHole>(sensorPtr);
+		}
+
+		void ObservationPinHoleAnchoredHomogeneousPoint::project_func() {
+			vec7 sg; // Some temps of known size
+			vec3 v;
+			vec2 u;
+			double invDist;
+			mat V_sg(3, 7);
+			mat V_ahp(3, 7);
+			mat23 U_v;
+
+			size_t size_rsl = ia_rsl.size(); //       Sizes of Jacobians depend on the sensor being LOCAL or REMOTE.
+			size_t size_l = landmarkPtr->size(); //   But this is already known since we have ia_rsl with the same size.
+			size_t size_rs = size_rsl - size_l;
+
+			mat SG_rs(sensorPtr->pose.size(), size_rs); // This temp was of variable size
+
+			sensorPtr->globalPose(sg, SG_rs); //      Pose of sensor wrt the map
+			LandmarkAnchoredHomogeneousPoint::toBearingOnlyFrame(sg, landmarkPtr->state.x(), v, invDist, V_sg, V_ahp); // lmk in sensor frame
+			// This function below uses the down-casted pointer because it needs to know the sensor parameters.
+			pinHolePtr->projectPoint(v, u, U_v); //   Project lmk, get expected pixel u and Jacobians
+
+			mat V_rs = prod(V_sg, SG_rs); //          The chain rule !
+			mat U_rs = prod(U_v, V_rs);
+			mat U_ahp = prod(U_v, V_ahp);
+
+			expectation.x(u); //                      Output: assign expectation mean and Jacobians
+			ublas::subrange(EXP_rsl, 0, 2, 0, size_rs) = U_rs;
+			ublas::subrange(EXP_rsl, 0, 2, size_rs, size_rsl) = U_ahp;
+			nonObs(0) = invDist; //                   Assign non-observable part (inverse-distance)
+		}
+
+		void ObservationPinHoleAnchoredHomogeneousPoint::backProject_func() {
+			// TODO implement back-projection
 		}
 
 	}

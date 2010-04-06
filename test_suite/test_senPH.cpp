@@ -1,15 +1,10 @@
 /**
- * test_rtslam.cpp
+ * test_senPH.cpp
  *
  *  Created on: 12/03/2010
  *      Author: jsola
  *
- *  \file test_rtslam.cpp
- *
- *  This test file acts as a main() program for the rtslam project.
- *
- *  Achievements (newest to oldest):
- *  - 2010/03/22: jsola: Created 1 map, 2 robots, 3 sensors, 2 landmarks, 6 observations, with parental links and print.
+ *  \file test_senPH.cpp
  *
  * \ingroup rtslam
  */
@@ -25,70 +20,56 @@
 
 #include <iostream>
 
-#include "rtslam/observationPinHolePoint.hpp"
-
-//#include <map>
+#include "rtslam/robotConstantVelocity.hpp"
+#include "rtslam/sensorPinHole.hpp"
 
 using namespace jblas;
 using namespace jafar::jmath;
 using namespace jafar::jmath::ublasExtra;
 using namespace jafar::rtslam;
 
-void test_obsPH01(void) {
+void test_senPH01(void) {
 
-	ObservationPinHolePoint obsph;
+	map_ptr_t mapPtr(new MapAbstract(100));
+	constvel_ptr_t robPtr(new RobotConstantVelocity(mapPtr));
+	pinhole_ptr_t senPtr(new SensorPinHole(robPtr, true));
 
 	vec3 v;
 	vec2 u;
-	mat U_v(2,3);
+	mat23 U_v;
 	vec4 k;
-	vec d(2);
+	vec d(2), c(2);
 
-	randVector(v);
 	k(0) = 100;
 	k(1) = 100;
 	k(2) = 100;
 	k(3) = 100;
+	randVector(v);
 	randVector(d);
-
-	u = obsph.project_func(k,d,v);
-	obsph.project_func(k,d,v,u,U_v);
-	cout<<"u = "<< (MATLAB)u << endl;
-	cout<<"v = "<< (MATLAB)v << endl;
-	cout<<"k = "<< (MATLAB)k << endl;
-	cout<<"d = "<< (MATLAB)d << endl;
-	cout<<"U_v = "<< (MATLAB)U_v << endl;
-	cout<<"[u_mat,smat,Umat_v] = pinHole(v, k, d)"<<endl;
-	cout<<"u_err = norm(u - u_mat)"<<endl;
-	cout<<"U_v_err = norm(U_v - Umat_v)"<<endl;
+	d *= 0.1;
+	senPtr->set_parameters(k, d, c);
 
 
-//	vec2 v2;
-//	randVector(v2);
-//
-//		obsph.distort(d,v2,u,U_v);
-//		cout<<"d = "<< (MATLAB)d << endl;
-//		cout<<"v2 = "<< (MATLAB)v2 << endl;
-//		cout<<"u = "<< (MATLAB)u << endl;
-//		cout<<"U_v = "<< (MATLAB)U_v << endl;
-//		cout<<"[u_mat,Umat_v] = distort(v2,d)"<<endl;
-//		cout<<"u_err = norm(u - u_mat)"<<endl;
-//		cout<<"U_verr = norm(U_v - Umat_v)"<<endl;
+	//	u = senPH.projectPoint(k,d,v);
+	u = senPtr->projectPoint(v);
+	cout << "k = " << (MATLAB) k << endl;
+	cout << "d = " << (MATLAB) d << endl;
+	cout << "v = " << (MATLAB) v << endl;
+	cout << "u = " << (MATLAB) u << endl;
+	//	senPtr->projectPoint(k,d,v,u,U_v);
+	senPtr->projectPoint(v, u, U_v);
+	cout << "u = " << (MATLAB) u << endl;
+	cout << "U_v = " << (MATLAB) U_v << endl;
+	cout << "[u_mat,smat,Umat_v] = pinHole(v, k, d)" << endl;
+	cout << "u_err = norm(u - u_mat)" << endl;
+	cout << "U_v_err = norm(U_v - Umat_v)" << endl;
 
-//		obsph.project0(v,u,U_v);
-//		cout<<"v = "<< (MATLAB)v << endl;
-//		cout<<"u = "<< (MATLAB)u << endl;
-//		cout<<"U_v = "<< (MATLAB)U_v << endl;
-//		cout<<"[u_mat,Umat_v] = project(v)"<<endl;
-//		cout<<"u_err = norm(u - u_mat)"<<endl;
-//		cout<<"U_v_err = norm(U_v - Umat_v)"<<endl;
-
-cout << "End" <<endl;
+	cout << "End" << endl;
 
 }
 
-BOOST_AUTO_TEST_CASE( test_obsPH )
+BOOST_AUTO_TEST_CASE( test_senPH )
 {
-	test_obsPH01();
+	test_senPH01();
 }
 

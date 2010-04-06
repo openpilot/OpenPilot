@@ -14,11 +14,15 @@
 #define ROBOTINERTIAL_HPP_
 
 #include "jmath/jblas.hpp"
+#include "boost/shared_ptr.hpp"
 #include "rtslam/robotAbstract.hpp"
 
 namespace jafar {
 	namespace rtslam {
 		using namespace std;
+
+		class RobotInertial;
+		typedef boost::shared_ptr<RobotInertial> inertial_ptr_t;
 
 
 		/**
@@ -56,7 +60,8 @@ namespace jafar {
 		class RobotInertial: public RobotAbstract {
 
 			public:
-				RobotInertial(MapAbstract & _map);
+//				RobotInertial(MapAbstract & _map);
+				RobotInertial(const map_ptr_t _mapPtr);
 
 				~RobotInertial() {
 				}

@@ -163,19 +163,19 @@ namespace jafar {
 
 				/**
 				 * Remote constructor from remote map and size of state and control vectors.
-				 * \param _map the map.
+				 * \param _mapPtr a pointer to the map.
 				 * \param _size_state the size of the robot state vector
 				 * \param _size_control the size of the control vector
 				 * \param _size_pert the size of the perturbation vector
 				 */
-				RobotAbstract(MapAbstract & _map, const size_t _size_state, const size_t _size_control, const size_t _size_pert);
+				RobotAbstract(const map_ptr_t _mapPtr, const size_t _size_state, const size_t _size_control, const size_t _size_pert);
 
 				// Mandatory virtual destructor.
 				virtual ~RobotAbstract() {
 				}
 
-				map_ptr_t slamMap; ///<         Parent map
-				sensors_ptr_set_t sensors; ///<	A set of sensors
+				map_ptr_t mapPtr; ///<              Parent map
+				sensors_ptr_set_t sensorsPtrSet; ///<	  A set of sensors
 
 				Gaussian pose; ///<             Robot Gaussian pose
 				vec control; ///<               Control vector

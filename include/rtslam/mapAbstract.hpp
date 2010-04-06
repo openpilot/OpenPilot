@@ -51,6 +51,17 @@ namespace jafar {
 				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::MapAbstract & map);
 
 			public:
+
+				/**
+				 * A set of robots
+				 */
+				robots_ptr_set_t robotsPtrSet;
+
+				/**
+				 * A set of landmarks
+				 */
+				landmarks_ptr_set_t landmarksPtrSet;
+
 				kernel::IdFactory robotIds;
 				kernel::IdFactory sensorIds;
 				kernel::IdFactory landmarkIds;
@@ -88,16 +99,6 @@ namespace jafar {
 				 * EKF engine
 				 */
 				ExtendedKalmanFilterIndirect filter;
-
-				/**
-				 * A set of robots
-				 */
-				robots_ptr_set_t robots;
-
-				/**
-				 * A set of landmarks
-				 */
-				landmarks_ptr_set_t landmarks;
 
 				jblas::vec & x();
 				jblas::sym_mat & P();

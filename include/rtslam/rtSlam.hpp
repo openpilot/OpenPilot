@@ -37,6 +37,7 @@ namespace jafar {
 		//		typedef LandmarkAbstract* landmark_ptr_t;
 		//		typedef ObservationAbstract* observation_ptr_t;
 
+
 		// Pointers with boost::shared_ptr:
 		typedef boost::shared_ptr<MapAbstract> map_ptr_t;
 		typedef boost::shared_ptr<RobotAbstract> robot_ptr_t;

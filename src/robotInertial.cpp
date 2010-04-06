@@ -29,8 +29,8 @@ namespace jafar {
 		 * Remote constructor from remote map.
 		 * \param _map the remote map
 		 */
-		RobotInertial::RobotInertial(MapAbstract & _map) :
-			RobotAbstract(_map, RobotInertial::size(), RobotInertial::size_control(), RobotInertial::size_perturbation()) {
+		RobotInertial::RobotInertial(const map_ptr_t _mapPtr) :
+			RobotAbstract(_mapPtr, RobotInertial::size(), RobotInertial::size_control(), RobotInertial::size_perturbation()) {
 			constantPerturbation = false;
 			type("Inertial");
 		}

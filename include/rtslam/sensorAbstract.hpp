@@ -62,12 +62,12 @@ namespace jafar {
 				/**
 				 * Parent robot
 				 */
-				robot_ptr_t robot;
+				robot_ptr_t robotPtr;
 
 				/**
 				 * A set of observations (one per landmark)
 				 */
-				observations_ptr_set_t observations;
+				observations_ptr_set_t observationsPtrSet;
 
 				/**
 				 * Sensor pose in robot
@@ -78,6 +78,10 @@ namespace jafar {
 				 * Indices of sensor's global pose in map (this is either the \a ia of the robot, \a rob.ia to make it short, or the \b ia_union() of \a rob.ia and \a sen.ia)
 				 */
 				ind_array ia_globalPose;
+				/**
+				 * Flag indicating if the sensor pose is being filtered
+				 */
+				bool isInFilter;
 
 			protected:
 				/**
@@ -88,41 +92,7 @@ namespace jafar {
 				ParametersAbstract* paramsAbs;
 
 			public:
-				/**
-				 * Empty constructor.
-				 * This just defines a pose of size 7.
-				 */
-				SensorAbstract();
 
-				/**
-				 * Local pose constructor - only mean
-				 * Creates a sensor with its own pose information
-				 * \param _pose a pose vector
-				 */
-				SensorAbstract(const jblas::vec7 & _pose);
-
-				/**
-				 * Local pose constructor - full Gaussian.
-				 * Creates a sensor with its own pose information.
-				 * \param _pose a Gaussian pose
-				 */
-				SensorAbstract(const Gaussian & _pose);
-
-				/**
-				 * Remote pose constructor.
-				 * Creates a sensor with the pose indexed in a map.
-				 * \param _map the slam map
-				 */
-				SensorAbstract(MapAbstract & _map);
-
-				/**
-				 * Remote pose constructor, with sensor association.
-				 * Creates a sensor with the pose indexed in a map,
-				 * and installed on a robot.
-				 * \param _map the map
-				 * \param _rob the robot
-				 */
-				SensorAbstract(MapAbstract & _map, RobotAbstract & _rob);
 
 				/**
 				 * Selectable LOCAL or REMOTE pose constructor.
@@ -130,7 +100,7 @@ namespace jafar {
 				 * \param _rob the robot
 				 * \param inFilter flag indicating if the sensor state is part of the filter (REMOTE).
 				 */
-				SensorAbstract(RobotAbstract & _rob, bool inFilter);
+				SensorAbstract(const robot_ptr_t _robPtr, const bool inFilter);
 
 				/**
 				 * Mandatory virtual destructor.
@@ -164,11 +134,11 @@ namespace jafar {
 
 				/**
 				 * Add one landmark to the map.
-				 * TODO: see if we move this to MapAbstract -> lmkPtr = slamMapPtr->newLandmark(senPtr)
+				 * TODO: see if we move this to MapAbstract -> lmkPtr = mapPtr->newLandmark(senPtr)
 				 * TODO: need to solve first the pointer-from-this issue of shared_ptr.
-				 * \param slamMapPtr pointer to the slam map.
+				 * \param mapPtr pointer to the slam map.
 				 */
-				landmark_ptr_t newLandmark(map_ptr_t slamMapPtr);
+				landmark_ptr_t newLandmark(map_ptr_t mapPtr);
 
 
 			public:

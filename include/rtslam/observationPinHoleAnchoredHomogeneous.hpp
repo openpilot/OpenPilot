@@ -12,11 +12,17 @@
 #ifndef OBSERVATIONPINHOLEANCHOREDHOMOGENEOUS_HPP_
 #define OBSERVATIONPINHOLEANCHOREDHOMOGENEOUS_HPP_
 
-#include "rtslam/observationPinHolePoint.hpp"
+#include "rtslam/observationAbstract.hpp"
+#include "rtslam/sensorPinHole.hpp"
 #include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
+
+#include "boost/shared_ptr.hpp"
 
 namespace jafar {
 	namespace rtslam {
+
+		class ObservationPinHoleAnchoredHomogeneousPoint;
+		typedef boost::shared_ptr<ObservationPinHoleAnchoredHomogeneousPoint> obs_ph_ahp_ptr_t;
 
 
 		/**
@@ -24,14 +30,24 @@ namespace jafar {
 		 * \author jsola
 		 * \ingroup rtslam
 		 */
-		class ObservationPinHoleAnchoredHomogeneousPoint: public ObservationPinHolePoint {
+		class ObservationPinHoleAnchoredHomogeneousPoint: public ObservationAbstract {
 			public:
 
-				ObservationPinHoleAnchoredHomogeneousPoint();
+				pinhole_ptr_t pinHolePtr; ///<  Use this pointer to downcast the SensorAbstract into SensorPinHole type.
+				ahp_ptr_t ahpPtr; ///<          Use this pointer to downcast the LandmarkAbstract into LandmarkAnchoredHomogeneousPoint type.
 
-				void convertToDir();
-				void project();
-				void splitAHP(vec3 & p0, vec3 & m, double rho);
+				ObservationPinHoleAnchoredHomogeneousPoint(const sensor_ptr_t pinholePtr, const landmark_ptr_t ahpPtr);
+				void link(sensor_ptr_t _senPtr, landmark_ptr_t _lmkPtr); ///< Link to sensor and landmark
+
+				/**
+				 * Projection function, with Jacobians and non-observable part.
+				 */
+				void project_func();
+				/**
+				 * Retro-projection function, with Jacobians
+				 */
+				void backProject_func();
+
 
 		};
 

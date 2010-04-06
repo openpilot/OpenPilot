@@ -45,17 +45,17 @@ using namespace boost;
 
 /**
  * Add a new robot to map
- * \param slamMapPtr a pointer to the SLAM map.
+ * \param mapPtr a pointer to the SLAM map.
  * \param name the name of the robot.
  */
-robot_ptr_t newRobot(map_ptr_t slamMapPtr, string name) {
+robot_ptr_t newRobot(map_ptr_t mapPtr, string name) {
 
-	size_t rid = slamMapPtr->robotIds.getId();
-	shared_ptr<RobotConstantVelocity> robPtr(new RobotConstantVelocity(*slamMapPtr));
+	size_t rid = mapPtr->robotIds.getId();
+	constvel_ptr_t robPtr(new RobotConstantVelocity(mapPtr));
 	robPtr->id(rid);
 	robPtr->name(name);
-	slamMapPtr->linkToRobot(robPtr);
-	robPtr->linkToMap(slamMapPtr);
+	mapPtr->linkToRobot(robPtr);
+	robPtr->linkToMap(mapPtr);
 	cout << "    added rob: " << robPtr->id() << endl;
 	return robPtr;
 }
@@ -66,10 +66,10 @@ robot_ptr_t newRobot(map_ptr_t slamMapPtr, string name) {
  * \param inInMap flag to estimate robot pose within the SLAM EKF.
  */
 sensor_ptr_t newSensor(robot_ptr_t robPtr, string name, bool isInMap = false) {
-	map_ptr_t slamMapPtr = robPtr->slamMap;
+	map_ptr_t mapPtr = robPtr->mapPtr;
 
-	size_t sid = slamMapPtr->sensorIds.getId();
-	shared_ptr<SensorPinHole> senPtr(new SensorPinHole(*robPtr, isInMap));
+	size_t sid = mapPtr->sensorIds.getId();
+	pinhole_ptr_t senPtr(new SensorPinHole(robPtr, isInMap));
 
 	senPtr->id(sid);
 	senPtr->name(name);
@@ -85,7 +85,7 @@ map_ptr_t initSlam(size_t size_map) {
 
 
 	// create a map
-	shared_ptr<MapAbstract> slamMapPtr(new MapAbstract(size_map));
+	shared_ptr<MapAbstract> mapPtr(new MapAbstract(size_map));
 
 
 	// Map object sizes;
@@ -94,29 +94,29 @@ map_ptr_t initSlam(size_t size_map) {
 
 
 	// Add 1 robots, 2 sensors
-	if (slamMapPtr->unusedStates(size_robCV)) {
-		robot_ptr_t robPtr = newRobot(slamMapPtr, "SUBMARINE");
+	if (mapPtr->unusedStates(size_robCV)) {
+		robot_ptr_t robPtr = newRobot(mapPtr, "SUBMARINE");
 		robPtr->pose.x(quaternion::originFrame());
 
-		if (slamMapPtr->unusedStates(size_senPH)) {
+		if (mapPtr->unusedStates(size_senPH)) {
 			sensor_ptr_t senPtr = newSensor(robPtr, "FLEA", false);
 			senPtr->pose.x(quaternion::originFrame());
 		}
-		if (slamMapPtr->unusedStates(size_senPH)) {
+		if (mapPtr->unusedStates(size_senPH)) {
 			sensor_ptr_t senPtr = newSensor(robPtr, "MARLIN", true);
 			senPtr->pose.x(quaternion::originFrame());
 		}
 	}
-	if (slamMapPtr->unusedStates(size_robCV)) {
-		robot_ptr_t robPtr = newRobot(slamMapPtr, "AEROPLANE");
+	if (mapPtr->unusedStates(size_robCV)) {
+		robot_ptr_t robPtr = newRobot(mapPtr, "AEROPLANE");
 		robPtr->pose.x(quaternion::originFrame());
 
-		if (slamMapPtr->unusedStates(size_senPH)) {
+		if (mapPtr->unusedStates(size_senPH)) {
 			sensor_ptr_t senPtr = newSensor(robPtr, "DRAGONFLY", false);
 			senPtr->pose.x(quaternion::originFrame());
 		}
 	}
-	return slamMapPtr;
+	return mapPtr;
 }
 
 /**
@@ -174,14 +174,14 @@ void test_main01() {
 
 	using namespace boost;
 
-	map_ptr_t slamMapPtr = initSlam(70);
-	//	initSomeLmks(slamMapPtr, 2);
+	map_ptr_t mapPtr = initSlam(70);
+	//	initSomeLmks(mapPtr, 2);
 	double dt = 1;
 	double t_end = 3;
 
 
 	// setup: add a robot with 2 sensors
-	for (robots_ptr_set_t::iterator robIter = slamMapPtr->robots.begin(); robIter != slamMapPtr->robots.end(); robIter++) {
+	for (robots_ptr_set_t::iterator robIter = mapPtr->robotsPtrSet.begin(); robIter != mapPtr->robotsPtrSet.end(); robIter++) {
 		robot_ptr_t robPtr = robIter->second;
 
 		motionSetup(robPtr, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1);
@@ -196,7 +196,7 @@ void test_main01() {
 
 	for (double t = 0; t < t_end; t += dt) { // start SLAM time loop
 		cout << " o-----> Time: " << t << endl;
-		for (robots_ptr_set_t::iterator robIter = slamMapPtr->robots.begin(); robIter != slamMapPtr->robots.end(); robIter++) { // loop robots
+		for (robots_ptr_set_t::iterator robIter = mapPtr->robotsPtrSet.begin(); robIter != mapPtr->robotsPtrSet.end(); robIter++) { // loop robots
 
 			robot_ptr_t robPtr = robIter->second;
 			cout << "exploring rob: " << robPtr->id() << endl;
@@ -206,15 +206,13 @@ void test_main01() {
 		} // end of robots loop
 	} // end of time loop
 
-//		cout << *slamMapPtr << endl;
-
 	cout << "% GLOBAL SENSOR POSE \n%====================	" << endl;
 	vec7 sg_local, sg_remote;
 	mat SG_rs_local(7,7);
 	mat SG_rs_remote(7,14);
 
-	slamMapPtr->robots[1]->sensors[1]->globalPose(sg_local, SG_rs_local);
-	slamMapPtr->robots[1]->sensors[2]->globalPose(sg_remote, SG_rs_remote);
+	mapPtr->robotsPtrSet[1]->sensorsPtrSet[1]->globalPose(sg_local, SG_rs_local);
+	mapPtr->robotsPtrSet[1]->sensorsPtrSet[2]->globalPose(sg_remote, SG_rs_remote);
 
 	cout << "sg_local  = " << sg_local << endl;
 	cout << "sg_remote = " << sg_remote << endl;

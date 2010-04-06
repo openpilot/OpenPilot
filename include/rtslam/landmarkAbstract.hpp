@@ -68,7 +68,7 @@ namespace jafar {
 				/**
 				 * constructor from map and size
 				 */
-				LandmarkAbstract(MapAbstract & _map, const size_t _size);
+				LandmarkAbstract(const map_ptr_t _mapPtr, const size_t _size);
 
 				/**
 				 * Mandatory virtual destructor.
@@ -76,10 +76,10 @@ namespace jafar {
 				virtual ~LandmarkAbstract() {
 				}
 
-				DescriptorAbstract descriptor; ///<                       Landmark descriptor
+				map_ptr_t mapPtr; ///<                                   Parent map
+				observations_ptr_set_t observationsPtrSet; ///<                 A set of observations (one per sensor)
 
-				map_ptr_t slamMap; ///<                                   Parent map
-				observations_ptr_set_t observations; ///<                 A set of observations (one per sensor)
+				DescriptorAbstract descriptor; ///<                       Landmark descriptor
 
 				void linkToObservation(observation_ptr_t _obsPtr); ///<   Link to observation
 				void linkToMap(map_ptr_t _mapPtr); ///<                   Link to map

@@ -108,7 +108,7 @@ namespace jafar {
 				 * \param iax the indirect array of used indices in the map.
 				 * \param inn the Innovation.
 				 */
-				void correct(const ind_array & iax, Innovation & inn);
+				void correct(const ind_array & iax, Innovation & inn, const mat & INN_rsl, const ind_array & ia_rsl);
 
 				void computeInnovation();
 				void computeK();

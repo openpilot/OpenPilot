@@ -37,7 +37,7 @@ namespace jafar {
 			return s;
 		}
 
-		ObservationAbstract::ObservationAbstract(const sensor_ptr_t _senPtr, const landmark_ptr_t _lmkPtr, const size_t _size_meas, const size_t _size_exp, const size_t _size_inn,
+		ObservationAbstract::ObservationAbstract(const sensor_ptr_t & _senPtr, const landmark_ptr_t & _lmkPtr, const size_t _size_meas, const size_t _size_exp, const size_t _size_inn,
 		    const size_t _size_nonobs) :
 		  sensorPtr(_senPtr),
 		  landmarkPtr(_lmkPtr),
@@ -55,7 +55,7 @@ namespace jafar {
 		}
 
 
-		void ObservationAbstract::link(sensor_ptr_t _senPtr, landmark_ptr_t _lmkPtr) {
+		void ObservationAbstract::link(const sensor_ptr_t & _senPtr, const landmark_ptr_t & _lmkPtr) {
 			sensorPtr = _senPtr;
 			landmarkPtr = _lmkPtr;
 			ia_rsl = ublasExtra::ia_union(sensorPtr->ia_globalPose, landmarkPtr->state.ia());

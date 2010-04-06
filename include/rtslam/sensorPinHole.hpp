@@ -41,7 +41,7 @@ namespace jafar {
 				 * \param _rob the robot to install to.
 				 * \param inFilter flag indicating in the sensor pose is filtered or not.
 				 */
-				SensorPinHole(const robot_ptr_t _robPtr, bool inFilter = false);
+				SensorPinHole(const robot_ptr_t & _robPtr, bool inFilter = false);
 
 				/**
 				 * Pin-hole sensor setup.

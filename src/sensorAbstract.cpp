@@ -44,7 +44,7 @@ namespace jafar {
 		}
 
 
-		SensorAbstract::SensorAbstract(const robot_ptr_t _robPtr, const bool inFilter = false) :
+		SensorAbstract::SensorAbstract(const robot_ptr_t & _robPtr, const bool inFilter = false) :
 			//          #check       ? # sensor in filter                                 : # not in filter
 			MapObject(inFilter       ? MapObject(_robPtr->mapPtr, 7)                  : 0),
 			robotPtr(_robPtr),
@@ -92,7 +92,7 @@ namespace jafar {
 			}
 		}
 
-		landmark_ptr_t SensorAbstract::newLandmark(map_ptr_t mapPtr) {
+		landmark_ptr_t SensorAbstract::newLandmark(map_ptr_t & mapPtr) {
 			shared_ptr<LandmarkAnchoredHomogeneousPoint> lmkPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr));
 			size_t lid = mapPtr->landmarkIds.getId();
 			lmkPtr->id(lid);
@@ -102,11 +102,11 @@ namespace jafar {
 			return lmkPtr;
 		}
 
-		void SensorAbstract::linkToObservation(observation_ptr_t _obsPtr) {
+		void SensorAbstract::linkToObservation(const observation_ptr_t & _obsPtr) {
 			observationsPtrSet[_obsPtr->id()] = _obsPtr;
 		}
 
-		void SensorAbstract::linkToRobot(robot_ptr_t _robPtr) {
+		void SensorAbstract::linkToRobot(const robot_ptr_t & _robPtr) {
 			robotPtr = _robPtr;
 		}
 

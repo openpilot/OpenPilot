@@ -22,7 +22,7 @@ namespace jafar {
 		// Class sensor pin hole
 		///////////////////////////////////////
 
-		SensorPinHole::SensorPinHole(const robot_ptr_t _robPtr, bool inFilter) :
+		SensorPinHole::SensorPinHole(const robot_ptr_t & _robPtr, bool inFilter) :
 			SensorAbstract(_robPtr, inFilter){
 			type("Pin-hole-camera");
 		}

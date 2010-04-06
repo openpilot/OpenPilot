@@ -61,7 +61,7 @@ namespace jafar {
 
 			public:
 //				RobotInertial(MapAbstract & _map);
-				RobotInertial(const map_ptr_t _mapPtr);
+				RobotInertial(const map_ptr_t & _mapPtr);
 
 				~RobotInertial() {
 				}

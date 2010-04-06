@@ -381,7 +381,7 @@ namespace jafar {
 				/**
 				 * Constructor from map
 				 */
-				LandmarkAnchoredHomogeneousPoint(const map_ptr_t mapPtr);
+				LandmarkAnchoredHomogeneousPoint(const map_ptr_t & mapPtr);
 
 				static size_t size(void) {
 					return 7;

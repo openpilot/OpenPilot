@@ -45,7 +45,7 @@ namespace jafar {
 		/*
 		 * Remote constructor from remote map and size of control vector.
 		 */
-		RobotAbstract::RobotAbstract(const map_ptr_t _mapPtr, const size_t _size_state, const size_t _size_control, const size_t _size_pert) :
+		RobotAbstract::RobotAbstract(const map_ptr_t & _mapPtr, const size_t _size_state, const size_t _size_control, const size_t _size_pert) :
 			MapObject(_mapPtr, _size_state),
 			mapPtr(_mapPtr),
 			pose(state, jmath::ublasExtra::ia_range(0, 7)),
@@ -63,11 +63,11 @@ namespace jafar {
 		/*
 		 * Add a sensor to this robot
 		 */
-		void RobotAbstract::linkToSensor(sensor_ptr_t _senPtr) {
+		void RobotAbstract::linkToSensor(const sensor_ptr_t & _senPtr) {
 			sensorsPtrSet[_senPtr->id()] = _senPtr;
 		}
 
-		void RobotAbstract::linkToMap(map_ptr_t _mapPtr) {
+		void RobotAbstract::linkToMap(const map_ptr_t & _mapPtr) {
 			mapPtr = _mapPtr;
 		}
 

@@ -100,7 +100,7 @@ namespace jafar {
 				 * \param _rob the robot
 				 * \param inFilter flag indicating if the sensor state is part of the filter (REMOTE).
 				 */
-				SensorAbstract(const robot_ptr_t _robPtr, const bool inFilter);
+				SensorAbstract(const robot_ptr_t & _robPtr, const bool inFilter);
 
 				/**
 				 * Mandatory virtual destructor.
@@ -108,8 +108,8 @@ namespace jafar {
 				virtual ~SensorAbstract() {
 				}
 
-				void linkToObservation(observation_ptr_t _obsPtr); ///< Link to observation
-				void linkToRobot(robot_ptr_t _robPtr); ///<             Link to robot
+				void linkToObservation(const observation_ptr_t & _obsPtr); ///< Link to observation
+				void linkToRobot(const robot_ptr_t & _robPtr); ///<             Link to robot
 
 				/*
 				 * Acquire raw data.
@@ -138,7 +138,7 @@ namespace jafar {
 				 * TODO: need to solve first the pointer-from-this issue of shared_ptr.
 				 * \param mapPtr pointer to the slam map.
 				 */
-				landmark_ptr_t newLandmark(map_ptr_t mapPtr);
+				landmark_ptr_t newLandmark(map_ptr_t & mapPtr);
 
 
 			public:

@@ -23,15 +23,15 @@ namespace jafar {
 		using namespace ublas;
 
 
-		ObservationPinHoleAnchoredHomogeneousPoint::ObservationPinHoleAnchoredHomogeneousPoint(const sensor_ptr_t pinholePtr,
-				const landmark_ptr_t ahpPtr) :
+		ObservationPinHoleAnchoredHomogeneousPoint::ObservationPinHoleAnchoredHomogeneousPoint(const sensor_ptr_t & pinholePtr,
+				const landmark_ptr_t & ahpPtr) :
 
 			ObservationAbstract(pinholePtr, ahpPtr, 2, pinholePtr->robotPtr->pose.size() + pinholePtr->state.size(), 1) {
 			categoryName("PINHOLE-AHP OBS");
 			link(pinholePtr, ahpPtr);
 		}
 
-		void ObservationPinHoleAnchoredHomogeneousPoint::link(sensor_ptr_t _senPtr, landmark_ptr_t _lmkPtr) { ///< Link to sensor and landmark
+		void ObservationPinHoleAnchoredHomogeneousPoint::link(const sensor_ptr_t & _senPtr, const landmark_ptr_t & _lmkPtr) { ///< Link to sensor and landmark
 			ObservationAbstract::link(_senPtr, _lmkPtr);
 			// Use this pointer below to access the pin-hole specific parameters.
 			pinHolePtr = boost::dynamic_pointer_cast<SensorPinHole>(sensorPtr);

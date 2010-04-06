@@ -48,7 +48,7 @@ namespace jafar {
 				 * \param _map the remote map
 				 * \param _begin the first index pointing to the remote storage
 				 */
-				MapObject(const map_ptr_t _mapPtr, const size_t _size);
+				MapObject(const map_ptr_t & _mapPtr, const size_t _size);
 
 				/**
 				 * Mandatory virtual destructor

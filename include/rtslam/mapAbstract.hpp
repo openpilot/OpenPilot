@@ -123,11 +123,11 @@ namespace jafar {
 				}
 
 
-				void linkToRobot(robot_ptr_t _robPtr); ///< Link to robot
-				void deleteRobot(robot_ptr_t _robPtr);
+				void linkToRobot(const robot_ptr_t & _robPtr); ///< Link to robot
+				void deleteRobot(const robot_ptr_t & _robPtr);
 
-				void linkToLandmark(landmark_ptr_t _lmkPtr); ///< Link to landmark
-				void deleteLandmark(landmark_ptr_t _lmkPtr);
+				void linkToLandmark(const landmark_ptr_t & _lmkPtr); ///< Link to landmark
+				void deleteLandmark(const landmark_ptr_t & _lmkPtr);
 
 				/**
 				 * Obtain free Map space of a given size.
@@ -150,7 +150,7 @@ namespace jafar {
 				 * This requires traversing all the map tree and this is why this function goes here.
 				 * \param lmkPtr the pointer to the landmark to associate observations to.
 				 */
-				void addObservations(landmark_ptr_t lmkPtr);
+				void addObservations(landmark_ptr_t & lmkPtr);
 
 
 				void fillSeq() ;
@@ -166,7 +166,7 @@ namespace jafar {
 				 * Creates a new observation from a sensor and a landmark.
 				 * TODO see if this can go to class Observation, possibly with a dedicated constructor.
 				 */
-				observation_ptr_t newObservation(sensor_ptr_t senPtr, landmark_ptr_t lmkPtr);
+				observation_ptr_t newObservation(sensor_ptr_t & senPtr, landmark_ptr_t & lmkPtr);
 
 
 

@@ -171,7 +171,6 @@ void UAVGadgetView::removeGadget()
             m_activeToolBar->setVisible(true);
         }
         m_toolBar->layout()->removeWidget(toolBar);
-        toolBar->setVisible(false);
         toolBar->setParent(0);
     }
     m_uavGadget = 0;

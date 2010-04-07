@@ -215,9 +215,11 @@ void test_main01() {
 	mapPtr->robotsPtrSet[1]->sensorsPtrSet[2]->globalPose(sg_remote, SG_rs_remote);
 
 	cout << "sg_local  = " << sg_local << endl;
-	cout << "sg_remote = " << sg_remote << endl;
 	cout << "SG_rs_local  = " << SG_rs_local << endl;
+	cout << "sg_local.ia_rsl = " << mapPtr->robotsPtrSet[1]->sensorsPtrSet[1]->ia_globalPose << endl;
+	cout << "sg_remote = " << sg_remote << endl;
 	cout << "SG_rs_remote = " << SG_rs_remote << endl;
+	cout << "sg_local.ia_rsl = " << mapPtr->robotsPtrSet[1]->sensorsPtrSet[2]->ia_globalPose << endl;
 
 	cout << "\n THAT'S ALL, WHAT'S WRONG? " << endl;
 

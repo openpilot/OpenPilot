@@ -284,7 +284,7 @@ void nmeaProcessGPGGA(char* packet)
     char *pEnd;
 
     uint8_t i=0;
-    long deg,desim;
+    long deg,min,desim;
 	double degrees, minutesfrac;
 
 	#ifdef NMEA_DEBUG_GGA
@@ -319,17 +319,21 @@ void nmeaProcessGPGGA(char* packet)
 	// next field: latitude
     // get latitude [ddmm.mmmmm]
 	tokens = strtok_r(NULL, delimiter, &last);
-	if(1) // 5 desimal output
+	if(strlen(tokens)==10)// 5 desimal output
 	{
 		deg=strtol (tokens,&pEnd,10);
+		min=deg%100;
+		deg=deg/100;
 		desim=strtol (pEnd+1,NULL,10);
-		GpsInfo.lat=deg*100000+desim;
+		GpsInfo.lat=deg+(min+desim/100000.0)/60.0; // to desimal degrees
 	}
-	else // 4 desimal output
+	else if(strlen(tokens)==9) // 4 desimal output
 	{
 		deg=strtol (tokens,&pEnd,10);
+		min=deg%100;
+		deg=deg/100;
 		desim=strtol (pEnd+1,NULL,10);
-		GpsInfo.lat=deg*10000+desim;
+		GpsInfo.lat=deg+(min+desim/10000.0)/60.0; // to desimal degrees
 	}
 	// convert to pure degrees [dd.dddd] format
     /*	minutesfrac = modf(GpsInfo.PosLLA.lat.f/100, &degrees);
@@ -340,22 +344,26 @@ void nmeaProcessGPGGA(char* packet)
     // next field: N/S indicator
 	// correct latitute for N/S
 	tokens = strtok_r(NULL, delimiter, &last);
-	//if(*tokens[3] == 'S') GpsInfo.PosLLA.lat.f = -GpsInfo.PosLLA.lat.f;
+	if(tokens[0] == 'S') GpsInfo.lat = -GpsInfo.lat;
 
 	// next field: longitude
-	// get longitude [ddmm.mmmmm]
+	// get longitude [dddmm.mmmmm]
 	tokens = strtok_r(NULL, delimiter, &last);
-	if(1) // 5 desimal output
+	if(strlen(tokens)==11)// 5 desimal output
 	{
 		deg=strtol (tokens,&pEnd,10);
+		min=deg%100;
+		deg=deg/100;
 		desim=strtol (pEnd+1,NULL,10);
-		GpsInfo.lon=deg*100000+desim;
+		GpsInfo.lon=deg+(min+desim/100000.0)/60.0; // to desimal degrees
 	}
-	else // 4 desimal output
+	else if(strlen(tokens)==10) // 4 desimal output
 	{
 		deg=strtol (tokens,&pEnd,10);
+		min=deg%100;
+		deg=deg/100;
 		desim=strtol (pEnd+1,NULL,10);
-		GpsInfo.lon=deg*10000+desim;
+		GpsInfo.lon=deg+(min+desim/10000.0)/60.0; // to desimal degrees
 	}
 
 	// convert to pure degrees [dd.dddd] format
@@ -367,15 +375,15 @@ void nmeaProcessGPGGA(char* packet)
     // next field: E/W indicator
 	// correct latitute for E/W
 	tokens = strtok_r(NULL, delimiter, &last);
-	//if(*tokens[5] == 'W') GpsInfo.PosLLA.lon.f = -GpsInfo.PosLLA.lon.f;
+	if(tokens[0] == 'W') GpsInfo.lon = -GpsInfo.lon;
 
     // next field: position fix status
 	// position fix status
 	// 0 = Invalid, 1 = Valid SPS, 2 = Valid DGPS, 3 = Valid PPS
 	// check for good position fix
 	tokens = strtok_r(NULL, delimiter, &last);
-    //if(&tokens[6] != '0' || &tokens[6] != 0)
-	//	GpsInfo.PosLLA.updates++;
+    if((tokens[0] != '0') || (tokens[0] != 0))
+		GpsInfo.updates++;
 
     // next field: satellites used
     // get number of satellites used in GPS solution
@@ -389,9 +397,9 @@ void nmeaProcessGPGGA(char* packet)
 	// get altitude (in meters mm.m)
 	tokens = strtok_r(NULL, delimiter, &last);
 	//reuse variables for alt
-	deg=strtol (tokens,&pEnd,10);
+	deg=strtol (tokens,&pEnd,10); // always 0.1m resolution?
 	desim=strtol (pEnd+1,NULL,10);
-	GpsInfo.alt=deg*10+desim;
+	GpsInfo.alt=deg+desim/10.0;
 
 	// next field: altitude units, always 'M'
 	// next field: geoid seperation

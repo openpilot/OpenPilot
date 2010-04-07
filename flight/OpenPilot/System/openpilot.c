@@ -145,9 +145,10 @@ static void TaskTick(void *pvParameters)
 
 	for(;;)
 	{
-		/*PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"utc: %s alt:%u\r\n",GpsInfo.TimeOfFix,GpsInfo.alt);
-		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"lat: %u lon:%u\r\n",GpsInfo.lat,GpsInfo.lon);
-		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"SV: %u\r\n",GpsInfo.numSVs);
+		/*
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"utc: %s alt:%d\r\n",GpsInfo.TimeOfFix,(int)GpsInfo.alt);
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"lat: %d lon: %d\r\n",(long)(GpsInfo.lat*10000),(long)(GpsInfo.lon*10000));
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"SV: %d\r\n",GpsInfo.numSVs);
 		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"Heading: %s Speed: %s\r\n",GpsInfo.heading,GpsInfo.speed);
 		*/
 		PIOS_LED_Toggle(LED1);

@@ -34,9 +34,9 @@ typedef struct struct_GpsInfo
 {
 	uint8_t numSVs;
 
-	signed long lat;
-	signed long lon;
-	signed int alt;
+	float lat;
+	float lon;
+	float alt;
 	char TimeOfFix[12];
 
 	// make these to values
@@ -45,6 +45,6 @@ typedef struct struct_GpsInfo
 	uint16_t updates;
 
 
-} GpsInfoType;
+} __attribute__((packed)) GpsInfoType;
 
 #endif // GPSINFO_H

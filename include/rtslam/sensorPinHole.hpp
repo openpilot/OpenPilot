@@ -121,7 +121,7 @@ namespace jafar {
 				 */
 				static void pixellizePoint(const jblas::vec4 & k, const jblas::vec2 & ud, jblas::vec2 & u, jblas::mat22 & U_ud);
 
-			private:
+//			private:
 				jblas::vec4 intrinsic;
 				jblas::vec distortion;
 				jblas::vec correction;

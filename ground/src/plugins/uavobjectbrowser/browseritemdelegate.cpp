@@ -30,6 +30,7 @@
 #include <QtGui/QSpinBox>
 #include <QtGui/QDoubleSpinBox>
 #include <QtGui/QComboBox>
+#include <limits>
 
 BrowserItemDelegate::BrowserItemDelegate(QObject *parent) :
         QStyledItemDelegate(parent)
@@ -53,8 +54,15 @@ QWidget *BrowserItemDelegate::createEditor(QWidget *parent,
         foreach (QString option, enumItem->enumOptions)
             editor->addItem(option);
         return editor;
+    } else if (item->isFloatType()) {
+        FloatFieldTreeItem *floatItem = static_cast<FloatFieldTreeItem*>(item);
+        QDoubleSpinBox *editor = new QDoubleSpinBox(parent);
+        editor->setDecimals(6);
+        editor->setMinimum(-std::numeric_limits<float>::max());
+        return editor;
+    } else {
+        return QStyledItemDelegate::createEditor(parent, option, index);
     }
-    return QStyledItemDelegate::createEditor(parent, option, index);
 }
 
 
@@ -70,6 +78,10 @@ void BrowserItemDelegate::setEditorData(QWidget *editor,
         int value = index.model()->data(index, Qt::EditRole).toInt();
         QComboBox *comboBox = static_cast<QComboBox*>(editor);
         comboBox->setCurrentIndex(value);
+    } else if (item->isFloatType()) {
+        float value = index.model()->data(index, Qt::EditRole).toDouble();
+        QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
+        spinBox->setValue(value);
     } else {
         QStyledItemDelegate::setEditorData(editor, index);
     }
@@ -88,6 +100,11 @@ void BrowserItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *mode
         QComboBox *comboBox = static_cast<QComboBox*>(editor);
         int value = comboBox->currentIndex();
         model->setData(index, value, Qt::EditRole);
+    } else if (item->isFloatType()) {
+        QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
+        spinBox->interpretText();
+        float value = spinBox->value();
+        model->setData(index, value, Qt::EditRole);
     } else {
         QStyledItemDelegate::setModelData(editor, model, index);
     }
@@ -101,5 +118,5 @@ void BrowserItemDelegate::updateEditorGeometry(QWidget *editor,
 
 QSize BrowserItemDelegate::sizeHint(const QStyleOptionViewItem & option, const QModelIndex &index) const
 {
-       return QSpinBox().sizeHint();
+    return QSpinBox().sizeHint();
 }

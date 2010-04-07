@@ -118,6 +118,7 @@ public:
     bool isEditable() { return true; }
     virtual bool isIntType() { return false; }
     virtual bool isEnum() { return false; }
+    virtual bool isFloatType() { return false; }
 private:
     int m_index;
 };
@@ -152,7 +153,7 @@ public:
             FieldTreeItem(index, data, parent) { }
     FloatFieldTreeItem(int index, const QVariant &data, TreeItem *parent = 0) :
             FieldTreeItem(index, data, parent) { }
-    virtual bool isIntType() { return false; }
+    bool isFloatType() { return true; }
 };
 
 

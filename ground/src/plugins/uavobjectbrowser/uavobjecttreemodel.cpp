@@ -41,18 +41,18 @@
 #include "extensionsystem/pluginmanager.h"
 #include <QtGui/QColor>
 #include <QtCore/QDebug>
+#include <limits>
 
-#define QINT8MIN -128
-#define QINT8MAX 127
-#define QUINTMIN 0
-#define QUINT8MAX 255
-#define QINT16MIN -32768
-#define QINT16MAX 32767
-#define QUINT16MAX 65535
-#define QINT32MIN -2147483648
-#define QINT32MAX 2147483647
-#define QUINT32MAX 2147483647
-
+#define QINT8MIN std::numeric_limits<qint8>::min()
+#define QINT8MAX std::numeric_limits<qint8>::max()
+#define QUINTMIN std::numeric_limits<quint8>::min()
+#define QUINT8MAX std::numeric_limits<quint8>::max()
+#define QINT16MIN std::numeric_limits<qint16>::min()
+#define QINT16MAX std::numeric_limits<qint16>::max()
+#define QUINT16MAX std::numeric_limits<quint16>::max()
+#define QINT32MIN std::numeric_limits<qint32>::min()
+#define QINT32MAX std::numeric_limits<qint32>::max()
+#define QUINT32MAX std::numeric_limits<qint32>::max()
 
 
 UAVObjectTreeModel::UAVObjectTreeModel(QObject *parent) :

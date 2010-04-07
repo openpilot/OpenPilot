@@ -54,4 +54,10 @@ plugin_modelview.subdir = modelview
 plugin_scope.depends = plugin_coreplugin
 SUBDIRS += plugin_modelview
 
+# UAVObject Browser Gadget
+plugin_uavobjectbrowser.subdir = uavobjectbrowser
+plugin_uavobjectbrowser.depends = plugin_coreplugin
+plugin_uavobjectbrowser.depends = plugin_uavobjects
+SUBDIRS += plugin_uavobjectbrowser
+
 

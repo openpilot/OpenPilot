@@ -98,3 +98,8 @@ void BrowserItemDelegate::updateEditorGeometry(QWidget *editor,
 {
     editor->setGeometry(option.rect);
 }
+
+QSize BrowserItemDelegate::sizeHint(const QStyleOptionViewItem & option, const QModelIndex &index) const
+{
+       return QSpinBox().sizeHint();
+}

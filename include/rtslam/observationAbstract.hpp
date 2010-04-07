@@ -89,12 +89,12 @@ namespace jafar {
 				 * Size constructor
 				 * \param _size size of measurement space (used for measurement, expectation and innovation).
 				 */
-				ObservationAbstract(const sensor_ptr_t _senPtr, const landmark_ptr_t _lmkPtr, const size_t _size, const size_t size_nonobs = 0);
+				ObservationAbstract(const sensor_ptr_t & _senPtr, const landmark_ptr_t & _lmkPtr, const size_t _size, const size_t size_nonobs = 0);
 
 				/**
 				 * Sizes constructor
 				 */
-				ObservationAbstract(sensor_ptr_t _senPtr, landmark_ptr_t _lmkPtr, const size_t _size_meas, const size_t _size_exp, const size_t _size_inn,
+				ObservationAbstract(const sensor_ptr_t & _senPtr, const landmark_ptr_t & _lmkPtr, const size_t _size_meas, const size_t _size_exp, const size_t _size_inn,
 				    const size_t _size_nonobs = 0);
 
 				virtual ~ObservationAbstract() {
@@ -136,7 +136,7 @@ namespace jafar {
 						bool updated; ///< Landmark is updated
 				} events;
 
-				void link(sensor_ptr_t _senPtr, landmark_ptr_t _lmkPtr); ///< Link to sensor and landmark
+				void link(const sensor_ptr_t & _senPtr, const landmark_ptr_t & _lmkPtr); ///< Link to sensor and landmark
 
 				/**
 				 * Project and get Jacobians.

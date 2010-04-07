@@ -48,7 +48,7 @@ using namespace boost;
  * \param mapPtr a pointer to the SLAM map.
  * \param name the name of the robot.
  */
-robot_ptr_t newRobot(map_ptr_t mapPtr, string name) {
+robot_ptr_t newRobot(map_ptr_t & mapPtr, string name) {
 
 	size_t rid = mapPtr->robotIds.getId();
 	constvel_ptr_t robPtr(new RobotConstantVelocity(mapPtr));
@@ -65,7 +65,7 @@ robot_ptr_t newRobot(map_ptr_t mapPtr, string name) {
  * \param robPtr a pointer to the robot owning the sensor.
  * \param inInMap flag to estimate robot pose within the SLAM EKF.
  */
-sensor_ptr_t newSensor(robot_ptr_t robPtr, string name, bool isInMap = false) {
+sensor_ptr_t newSensor(robot_ptr_t & robPtr, string name, bool isInMap = false) {
 	map_ptr_t mapPtr = robPtr->mapPtr;
 
 	size_t sid = mapPtr->sensorIds.getId();
@@ -127,7 +127,7 @@ map_ptr_t initSlam(size_t size_map) {
  * \param sigma_vi std. dev. of linear velocity impulse.
  * \param sigma_wi std. dev. of angular velocity impulse.
  */
-void motionSetup(robot_ptr_t robPtr, const double x0, const double y0, const double z0, const double roll0,
+void motionSetup(robot_ptr_t & robPtr, const double x0, const double y0, const double z0, const double roll0,
     const double pitch0, const double yaw0, const double sigma_pos, const double sigma_ori, const double sigma_vi,
     const double sigma_wi) {
 

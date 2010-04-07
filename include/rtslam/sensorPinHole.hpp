@@ -41,7 +41,7 @@ namespace jafar {
 				 * \param _rob the robot to install to.
 				 * \param inFilter flag indicating in the sensor pose is filtered or not.
 				 */
-				SensorPinHole(const robot_ptr_t _robPtr, bool inFilter = false);
+				SensorPinHole(const robot_ptr_t & _robPtr, bool inFilter = false);
 
 				/**
 				 * Pin-hole sensor setup.
@@ -121,7 +121,7 @@ namespace jafar {
 				 */
 				static void pixellizePoint(const jblas::vec4 & k, const jblas::vec2 & ud, jblas::vec2 & u, jblas::mat22 & U_ud);
 
-			private:
+//			private:
 				jblas::vec4 intrinsic;
 				jblas::vec distortion;
 				jblas::vec correction;

@@ -168,7 +168,7 @@ namespace jafar {
 				 * \param _size_control the size of the control vector
 				 * \param _size_pert the size of the perturbation vector
 				 */
-				RobotAbstract(const map_ptr_t _mapPtr, const size_t _size_state, const size_t _size_control, const size_t _size_pert);
+				RobotAbstract(const map_ptr_t & _mapPtr, const size_t _size_state, const size_t _size_control, const size_t _size_pert);
 
 				// Mandatory virtual destructor.
 				virtual ~RobotAbstract() {
@@ -208,8 +208,8 @@ namespace jafar {
 				static size_t size_perturbation() {
 					return 0;
 				}
-				void linkToSensor(sensor_ptr_t _senPtr); ///< Link to sensor
-				void linkToMap(map_ptr_t _mapPtr); ///<       Link to map
+				void linkToSensor(const sensor_ptr_t & _senPtr); ///< Link to sensor
+				void linkToMap(const map_ptr_t & _mapPtr); ///<       Link to map
 				void set_control(const vec & c){
 					JFR_ASSERT(c.size() == size_control(), "RobotAbstract::set_control(vec&, double): Sizes mismatch");
 					control = c;

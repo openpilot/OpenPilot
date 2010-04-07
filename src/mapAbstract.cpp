@@ -51,11 +51,11 @@ namespace jafar {
 			return filter.P(i, j);
 		}
 
-		void MapAbstract::linkToRobot(robot_ptr_t _robPtr) {
+		void MapAbstract::linkToRobot(const robot_ptr_t & _robPtr) {
 			robotsPtrSet[_robPtr->id()] = _robPtr;
 		}
 
-		void MapAbstract::linkToLandmark(landmark_ptr_t _lmkPtr) {
+		void MapAbstract::linkToLandmark(const landmark_ptr_t & _lmkPtr) {
 			landmarksPtrSet[_lmkPtr->id()] = _lmkPtr;
 		}
 
@@ -79,10 +79,11 @@ namespace jafar {
 				}
 		}
 
-		void MapAbstract::addObservations(landmark_ptr_t lmkPtr) {
+		void MapAbstract::addObservations(landmark_ptr_t & lmkPtr) {
 			for (robots_ptr_set_t::iterator robIter = robotsPtrSet.begin(); robIter != robotsPtrSet.end(); robIter++) {
 				robot_ptr_t robPtr = robIter->second;
-				for (sensors_ptr_set_t::iterator senIter = robPtr->sensorsPtrSet.begin(); senIter != robPtr->sensorsPtrSet.end(); senIter++) {
+				for (sensors_ptr_set_t::iterator senIter = robPtr->sensorsPtrSet.begin(); senIter
+				    != robPtr->sensorsPtrSet.end(); senIter++) {
 					sensor_ptr_t senPtr = senIter->second;
 					observation_ptr_t obsPtr = newObservation(senPtr, lmkPtr);
 					cout << "    added obs: " << obsPtr->id() << endl;
@@ -110,10 +111,9 @@ namespace jafar {
 			randMatrix(P());
 		}
 
-		observation_ptr_t MapAbstract::newObservation(sensor_ptr_t senPtr, landmark_ptr_t lmkPtr) {
+		observation_ptr_t MapAbstract::newObservation(sensor_ptr_t & senPtr, landmark_ptr_t & lmkPtr) {
 			boost::shared_ptr<ObservationPinHoleAnchoredHomogeneousPoint> obsPtr(
-//			    new ObservationPinHoleAnchoredHomogeneousPoint(senPtr->isInFilter));
-	    new ObservationPinHoleAnchoredHomogeneousPoint(senPtr, lmkPtr));
+			    new ObservationPinHoleAnchoredHomogeneousPoint(senPtr, lmkPtr));
 			//	obsPtr->id() = 0;
 			obsPtr->id() = 1000 * senPtr->id() + lmkPtr->id();
 			obsPtr->link(senPtr, lmkPtr);

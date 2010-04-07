@@ -20,13 +20,14 @@
 
 #include <iostream>
 
+#include "rtslam/pinhole.hpp"
 #include "rtslam/robotConstantVelocity.hpp"
 #include "rtslam/sensorPinHole.hpp"
 
+using namespace std;
 using namespace jblas;
-using namespace jafar::jmath;
-using namespace jafar::jmath::ublasExtra;
 using namespace jafar::rtslam;
+using namespace jafar::jmath;
 
 void test_senPH01(void) {
 
@@ -47,17 +48,17 @@ void test_senPH01(void) {
 	randVector(v);
 	randVector(d);
 	d *= 0.1;
+	c = d;
 	senPtr->set_parameters(k, d, c);
 
 
 	//	u = senPH.projectPoint(k,d,v);
-	u = senPtr->projectPoint(v);
+	u = pinhole::projectPoint(senPtr->intrinsic, senPtr->distortion, v);
 	cout << "k = " << (MATLAB) k << endl;
 	cout << "d = " << (MATLAB) d << endl;
 	cout << "v = " << (MATLAB) v << endl;
 	cout << "u = " << (MATLAB) u << endl;
-	//	senPtr->projectPoint(k,d,v,u,U_v);
-	senPtr->projectPoint(v, u, U_v);
+	pinhole::projectPoint(senPtr->intrinsic, senPtr->distortion, v, u, U_v);
 	cout << "u = " << (MATLAB) u << endl;
 	cout << "U_v = " << (MATLAB) U_v << endl;
 	cout << "[u_mat,smat,Umat_v] = pinHole(v, k, d)" << endl;

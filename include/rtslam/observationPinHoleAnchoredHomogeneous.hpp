@@ -36,8 +36,8 @@ namespace jafar {
 				pinhole_ptr_t pinHolePtr; ///<  Use this pointer to downcast the SensorAbstract into SensorPinHole type.
 				ahp_ptr_t ahpPtr; ///<          Use this pointer to downcast the LandmarkAbstract into LandmarkAnchoredHomogeneousPoint type.
 
-				ObservationPinHoleAnchoredHomogeneousPoint(const sensor_ptr_t pinholePtr, const landmark_ptr_t ahpPtr);
-				void link(sensor_ptr_t _senPtr, landmark_ptr_t _lmkPtr); ///< Link to sensor and landmark
+				ObservationPinHoleAnchoredHomogeneousPoint(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & ahpPtr);
+				void link(const sensor_ptr_t & _senPtr, const landmark_ptr_t & _lmkPtr); ///< Link to sensor and landmark
 
 				/**
 				 * Projection function, with Jacobians and non-observable part.

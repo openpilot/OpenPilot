@@ -58,7 +58,7 @@ namespace jafar {
 				 * Remote constructor from remote map.
 				 * \param _map the remote map
 				 */
-				RobotConstantVelocity(const map_ptr_t _mapPtr);
+				RobotConstantVelocity(const map_ptr_t & _mapPtr);
 
 				~RobotConstantVelocity(void) {
 				}

@@ -1,5 +1,9 @@
 /** \page pageLinks Parental links
 
+\authors jsola@laas.fr, nmansard@laas.fr
+
+\section secIntro Introduction and philosophy
+
 	The hierarchical organization of objects in RTSLAM is defined family-tree-like. 
 	The family-tree differs from a regular tree in that an object can have more than one parent 
 	(\e ie. a father and a mother, please keep reading). 
@@ -29,8 +33,8 @@
 	In our implementation, if we have a pointer \a mapPtr to the map at the base level, 
 	loops can be traversed clockwise or counter-clockwise. We exemplify here the red loop:
 	\code
-	mapPtr->landmarks[2]->observations[4]->sensor->robot->slamMap       // clockwise
-	mapPtr->robots[2]->sensors[2]->observations[4]->landmark->slamMap   // counter-clockwise
+	mapPtr->landmarksPtrSet[2]->observationsPtrSet[4]->sensorPtr()->robotPtr()->mapPtr       // clockwise
+	mapPtr->robotsPtrSet[2]->sensorsPtrSet[2]->observationsPtrSet[4]->landmarkPtr()->mapPtr     // counter-clockwise
 	\endcode
 	
 	Taking arbitrary fractions of such loops allow us to access information at any part of the parental hierarchy. 
@@ -59,6 +63,77 @@
 	};
 	\endcode
 
+	\section secParentalImplementation Implementation using boost smart pointers
+
+	We use \c boost:: smart pointers to implement suck links. 
+	- Links from father to child use \c shared_ptr. The sets of links are implemented with \c map as stated. Therefore we find \c map<type_t,shared_ptr<CHILD>>. 
+	- Links from child to parent use \c weak_ptr.
+	- At the Observation level, we use downcasting to convert pointers of abstract types into specific type pointers. 
+	
+	Check out this figure:
+
+	\image html smartPtr.png "Types of pointers used in the rtslam hierarchy"
+  
+  \subsection secDownwards Traversing downwards: links PARENT -> CHILD.
+  
+  Traversing downwards is straightforward:
+  \code
+  robotPtr->sensorsPtrSet[1]->pose.x()
+  \endcode
+  is the pose of sensor 1, accessed from the robot that owns it. 
+  In this case, we used the sensor ID to access the element in the \a sensorsPtrSet \c map.
+  Usually, we will iterate all sensors. The code would look then more like this:
+  \code
+  typedef boost::shared_ptr<SensorAbstract> sensor_ptr_t;
+  typedef map<size_t, sensor_ptr_t> sensors_ptr_set_t;
+  sensors_ptr_set_t sensorsPtrSet;
+  /* ... */
+  for (sensors_ptr_set_t::iterator senIter = sensorsPtrSet.begin(); senIter != sensorsPtrSet.end(); senIter++) { // loop sensors
+    sensor_ptr_t senPtr = senIter->second;
+    cout << "exploring sensor: " << senPtr->id() << endl;
+    senPtr->doSomething();
+  }
+  \endcode
+  
+  \subsection secUpwards Traversing upwards: links CHILD -> PARENT.
+    
+  Traversing upwards is a bit more tricky because \c weak_ptr needs to lock the operation of \c shared_ptr before accessing the object.
+  We encapsulated the necessary code into a convenient function with the name of the pointer, 
+  such that the only difference you see is the aparition of a couple of empty brackets. For example:
+  \code
+  senPtr->robotPtr()->state.x()
+  \endcode
+  is the state of the robot owning a particular sensor, accessed from that sensor.
+  
+  \subsection secDownCasting Downcasting to access derived class parameters. Links DERIVED_OBS -> DERIVED_PARENT.
+  
+  The observation class needs to access information in Sensor and Landmark that only exist in the derived versions. 
+  For example, observing an AHP point from a Pin-hole camera requires knowledge about the sensor's intrinsic parameters. 
+  But these parameters do not exist at the Abstract level.
+  
+  We add a couple of pointers to each derived observation class, especially dedicated to each particular parent. 
+  These pointers are a downcast of the ones at the abstract level.
+  
+  The downcast is done at construction time of the object \c ObservationPinHoleAnchoredHomogeneousPoint, with something like this:
+  \code
+  // Some type definitions
+  typedef weak_ptr<SensorPinHole> pinhole_ptr_t;
+  typedef weak_ptr<LandmarkAnchoredHomogeneousPoint> ahp_ptr_t;
+  // Members of the derived observation class 
+  pinhole_ptr_t pinholePtr;
+  ahp_ptr_t ahpPtr;
+  // At construction time of the derived observation object 
+  pinholePtr = dynamic_pointer_cast<SensorPinHole> (sensorPtr);
+  ahpPtr = dynamic_pointer_cast<LandmarkAnchoredHomogeneousPoint> (landmarkPtr);
+	\endcode
+	
+	With this downcast, we can now access the parameters of the sensor. For example, this ficticious function:
+	\code
+	vec3 p = ahpPtr->convertToEuclidean();
+	vec2 u = ObsAHP.project(pinholePtr->intrinsic, p);
+	\endcode
+	converts the AHP into an Euclidean point, and projects it into the pin-hole sensor. 
+	
 	
 	
 	*/

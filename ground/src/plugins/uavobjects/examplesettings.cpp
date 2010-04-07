@@ -29,6 +29,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "examplesettings.h"
+#include "uavobjectfields.h"
 
 const QString ExampleSettings::NAME = QString("ExampleSettings");
 
@@ -36,8 +37,8 @@ ExampleSettings::ExampleSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTING
 {
     // Create fields
     QList<UAVObjectField*> fields;
-    fields.append(new UAVObjectFieldPrimitives<qint32>(QString("UpdatePeriod"), QString("ms"), 1));
-    fields.append(new UAVObjectFieldPrimitives<qint32>(QString("StepSize"), QString(""), 1));
+    fields.append(new UAVObjectFieldInt32(QString("UpdatePeriod"), QString("ms"), 1));
+    fields.append(new UAVObjectFieldInt32(QString("StepSize"), QString(""), 1));
     QStringList StepDirectionEnumOptions;
     StepDirectionEnumOptions.append("up");
     StepDirectionEnumOptions.append("down");

@@ -32,8 +32,6 @@
 #define $(NAMEUC)_H
 
 #include "uavdataobject.h"
-#include "uavobjectfieldprimitives.h"
-#include "uavobjectfieldenum.h"
 
 class $(NAME): public UAVDataObject
 {

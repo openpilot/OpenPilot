@@ -32,8 +32,6 @@
 #define EXAMPLEOBJECT2_H
 
 #include "uavdataobject.h"
-#include "uavobjectfieldprimitives.h"
-#include "uavobjectfieldenum.h"
 
 class ExampleObject2: public UAVDataObject
 {

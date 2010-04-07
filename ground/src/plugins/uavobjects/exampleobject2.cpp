@@ -29,6 +29,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "exampleobject2.h"
+#include "uavobjectfields.h"
 
 const QString ExampleObject2::NAME = QString("ExampleObject2");
 
@@ -36,10 +37,10 @@ ExampleObject2::ExampleObject2(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS,
 {
     // Create fields
     QList<UAVObjectField*> fields;
-    fields.append(new UAVObjectFieldPrimitives<qint8>(QString("Field1"), QString("unit1"), 1));
-    fields.append(new UAVObjectFieldPrimitives<qint16>(QString("Field2"), QString("unit2"), 1));
-    fields.append(new UAVObjectFieldPrimitives<qint32>(QString("Field3"), QString("unit3"), 1));
-    fields.append(new UAVObjectFieldPrimitives<float>(QString("Field4"), QString("unit4"), 4));
+    fields.append(new UAVObjectFieldInt8(QString("Field1"), QString("unit1"), 1));
+    fields.append(new UAVObjectFieldInt16(QString("Field2"), QString("unit2"), 1));
+    fields.append(new UAVObjectFieldInt32(QString("Field3"), QString("unit3"), 1));
+    fields.append(new UAVObjectFieldFloat(QString("Field4"), QString("unit4"), 4));
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

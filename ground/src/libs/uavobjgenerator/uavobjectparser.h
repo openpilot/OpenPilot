@@ -100,6 +100,7 @@ private:
     QString filename;
     QStringList fieldTypeStrC;
     QStringList fieldTypeStrCPP;
+    QStringList fieldTypeStrCPPClass;
     QStringList fieldTypeStrXML;
     QStringList updateModeStr;
     QStringList updateModeStrXML;

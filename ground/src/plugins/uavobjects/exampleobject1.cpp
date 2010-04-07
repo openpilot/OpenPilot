@@ -29,6 +29,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "exampleobject1.h"
+#include "uavobjectfields.h"
 
 const QString ExampleObject1::NAME = QString("ExampleObject1");
 
@@ -36,13 +37,13 @@ ExampleObject1::ExampleObject1(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS,
 {
     // Create fields
     QList<UAVObjectField*> fields;
-    fields.append(new UAVObjectFieldPrimitives<qint8>(QString("Field1"), QString("unit1"), 1));
-    fields.append(new UAVObjectFieldPrimitives<qint16>(QString("Field2"), QString("unit2"), 1));
-    fields.append(new UAVObjectFieldPrimitives<qint32>(QString("Field3"), QString("unit3"), 1));
-    fields.append(new UAVObjectFieldPrimitives<float>(QString("Field4"), QString("unit4"), 4));
-    fields.append(new UAVObjectFieldPrimitives<quint8>(QString("Field5"), QString("unit5"), 1));
-    fields.append(new UAVObjectFieldPrimitives<quint16>(QString("Field6"), QString("unit6"), 1));
-    fields.append(new UAVObjectFieldPrimitives<quint32>(QString("Field7"), QString("unit7"), 1));
+    fields.append(new UAVObjectFieldInt8(QString("Field1"), QString("unit1"), 1));
+    fields.append(new UAVObjectFieldInt16(QString("Field2"), QString("unit2"), 1));
+    fields.append(new UAVObjectFieldInt32(QString("Field3"), QString("unit3"), 1));
+    fields.append(new UAVObjectFieldFloat(QString("Field4"), QString("unit4"), 4));
+    fields.append(new UAVObjectFieldUInt8(QString("Field5"), QString("unit5"), 1));
+    fields.append(new UAVObjectFieldUInt16(QString("Field6"), QString("unit6"), 1));
+    fields.append(new UAVObjectFieldUInt32(QString("Field7"), QString("unit7"), 1));
     QStringList Field8EnumOptions;
     Field8EnumOptions.append("Option1");
     Field8EnumOptions.append("Option2");

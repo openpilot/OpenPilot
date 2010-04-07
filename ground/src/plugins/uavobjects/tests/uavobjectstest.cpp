@@ -125,7 +125,7 @@ void UAVObjectsTest::runTest()
         UAVObject* obj = objMngr->getObject(objname);
         QList<UAVObjectField*> fields = obj->getFields();
         // qint8
-        UAVObjectFieldPrimitives<qint8>* fieldint8 = dynamic_cast< UAVObjectFieldPrimitives<qint8>* >(fields[0]);
+        UAVObjectFieldInt8* fieldint8 = dynamic_cast< UAVObjectFieldInt8* >(fields[0]);
         if (fieldint8 != NULL)
         {
             fieldint8->setValue(10);

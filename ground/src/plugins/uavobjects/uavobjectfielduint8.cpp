@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       uavobjectfield.cpp
+ * @file       uavobjectfielduint8.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
  * @brief
@@ -25,20 +25,21 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include "uavobjectfieldprimitives.h"
+#include "uavobjectfielduint8.h"
 
 /**
  * Constructor
  */
-template <typename FType>
-UAVObjectFieldPrimitives<FType>::UAVObjectFieldPrimitives(const QString& name, const QString& units, quint32 numElements):
+UAVObjectFieldUInt8::UAVObjectFieldUInt8(const QString& name, const QString& units, quint32 numElements):
         UAVObjectField(name, units, numElements)
 {
-    numBytesPerElement = sizeof(FType);
+    numBytesPerElement = sizeof(quint8);
 }
 
-template <typename FType>
-void UAVObjectFieldPrimitives<FType>::initializeValues()
+/**
+ * Initialize all values
+ */
+void UAVObjectFieldUInt8::initializeValues()
 {
     for (quint32 n = 0; n < numElements; ++n)
     {
@@ -49,16 +50,13 @@ void UAVObjectFieldPrimitives<FType>::initializeValues()
 /**
  * Pack the field in to an array of bytes.
  */
-template <typename FType>
-qint32 UAVObjectFieldPrimitives<FType>::pack(quint8* dataOut)
+qint32 UAVObjectFieldUInt8::pack(quint8* dataOut)
 {
     QMutexLocker locker(obj->getMutex());
     // Pack each element in output buffer
     for (quint32 index = 0; index < numElements; ++index)
     {
-        FType value;
-        memcpy(&value, &data[offset + numBytesPerElement*index], numBytesPerElement);
-        qToBigEndian<FType>(value, &dataOut[numBytesPerElement*index]);
+        dataOut[numBytesPerElement*index] = data[offset + numBytesPerElement*index];
     }
     // Done
     return getNumBytes();
@@ -67,16 +65,13 @@ qint32 UAVObjectFieldPrimitives<FType>::pack(quint8* dataOut)
 /**
  * Unpack the field from an array of bytes.
  */
-template <typename FType>
-qint32 UAVObjectFieldPrimitives<FType>::unpack(const quint8* dataIn)
+qint32 UAVObjectFieldUInt8::unpack(const quint8* dataIn)
 {
     QMutexLocker locker(obj->getMutex());
     // Pack each element in output buffer
     for (quint32 index = 0; index < numElements; ++index)
     {
-        FType value;
-        value = qFromBigEndian<FType>(&dataIn[numBytesPerElement*index]);
-        memcpy(&data[offset + numBytesPerElement*index], &value, numBytesPerElement);
+        data[offset + numBytesPerElement*index] = dataIn[numBytesPerElement*index];
     }
     // Done
     return getNumBytes();
@@ -85,15 +80,14 @@ qint32 UAVObjectFieldPrimitives<FType>::unpack(const quint8* dataIn)
 /**
  * Get the field value as a double.
  */
-template <typename FType>
-double UAVObjectFieldPrimitives<FType>::getDouble(quint32 index)
+double UAVObjectFieldUInt8::getDouble(quint32 index)
 {
     QMutexLocker locker(obj->getMutex());
     double ret = 0.0;
     // Check if index is out of bounds or no data available
     if (index < numElements && data != NULL)
     {
-        FType value;
+        quint8 value;
         memcpy(&value, &data[offset + numBytesPerElement*index], numBytesPerElement);
         ret = (double)value;
     }
@@ -104,15 +98,14 @@ double UAVObjectFieldPrimitives<FType>::getDouble(quint32 index)
 /**
  * Set the field value from a double.
  */
-template <typename FType>
-void UAVObjectFieldPrimitives<FType>::setDouble(double value, quint32 index)
+void UAVObjectFieldUInt8::setDouble(double value, quint32 index)
 {
     QMutexLocker locker(obj->getMutex());
     // Check if index is out of bounds or no data available
     if (index < numElements && data != NULL)
     {
-        FType tmpValue;
-        tmpValue = (FType)value;
+        quint8 tmpValue;
+        tmpValue = (quint8)value;
         memcpy(&data[offset + numBytesPerElement*index], &tmpValue, numBytesPerElement);
     }
 
@@ -123,8 +116,7 @@ void UAVObjectFieldPrimitives<FType>::setDouble(double value, quint32 index)
 /**
  * Get the number of bytes per field element.
  */
-template <typename FType>
-quint32 UAVObjectFieldPrimitives<FType>::getNumBytesElement()
+quint32 UAVObjectFieldUInt8::getNumBytesElement()
 {
     return numBytesPerElement;
 }
@@ -132,14 +124,13 @@ quint32 UAVObjectFieldPrimitives<FType>::getNumBytesElement()
 /**
  * Get the field value.
  */
-template <typename FType>
-FType UAVObjectFieldPrimitives<FType>::getValue(quint32 index)
+quint8 UAVObjectFieldUInt8::getValue(quint32 index)
 {
     QMutexLocker locker(obj->getMutex());
     // Check if index is out of bounds or no data available
     if (index < numElements && data != NULL)
     {
-        FType value;
+        quint8 value;
         memcpy(&value, &data[offset + numBytesPerElement*index], numBytesPerElement);
         return value;
     }
@@ -152,8 +143,7 @@ FType UAVObjectFieldPrimitives<FType>::getValue(quint32 index)
 /**
  * Set the field value.
  */
-template <typename FType>
-void UAVObjectFieldPrimitives<FType>::setValue(FType value, quint32 index)
+void UAVObjectFieldUInt8::setValue(quint8 value, quint32 index)
 {
     QMutexLocker locker(obj->getMutex());
     // Check if index is out of bounds or no data available
@@ -166,16 +156,6 @@ void UAVObjectFieldPrimitives<FType>::setValue(FType value, quint32 index)
     emit fieldUpdated(this);
 }
 
-/**
- * Pre-define valid templates
- */
-template class UAVObjectFieldPrimitives<qint8>;
-template class UAVObjectFieldPrimitives<qint16>;
-template class UAVObjectFieldPrimitives<qint32>;
-template class UAVObjectFieldPrimitives<quint8>;
-template class UAVObjectFieldPrimitives<quint16>;
-template class UAVObjectFieldPrimitives<quint32>;
-template class UAVObjectFieldPrimitives<float>;
 
 
 

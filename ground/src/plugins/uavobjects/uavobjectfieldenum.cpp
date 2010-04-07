@@ -27,10 +27,12 @@
  */
 
 #include "uavobjectfieldenum.h"
+#include <QtEndian>
 
 UAVObjectFieldEnum::UAVObjectFieldEnum(const QString& name, const QString& units, quint32 numElements, QStringList& options):
-        UAVObjectFieldPrimitives<quint8>(name, units, numElements)
+        UAVObjectField(name, units, numElements)
 {
+    numBytesPerElement = sizeof(quint8);
     this->options = options;
 }
 
@@ -67,3 +69,124 @@ void UAVObjectFieldEnum::setSelectedIndex(quint8 index)
         setValue(index);
     }
 }
+
+/**
+ * Initialize all values
+ */
+void UAVObjectFieldEnum::initializeValues()
+{
+    for (quint32 n = 0; n < numElements; ++n)
+    {
+        setValue(0, n);
+    }
+}
+
+/**
+ * Pack the field in to an array of bytes.
+ */
+qint32 UAVObjectFieldEnum::pack(quint8* dataOut)
+{
+    QMutexLocker locker(obj->getMutex());
+    // Pack each element in output buffer
+    for (quint32 index = 0; index < numElements; ++index)
+    {
+        dataOut[numBytesPerElement*index] = data[offset + numBytesPerElement*index];
+    }
+    // Done
+    return getNumBytes();
+}
+
+/**
+ * Unpack the field from an array of bytes.
+ */
+qint32 UAVObjectFieldEnum::unpack(const quint8* dataIn)
+{
+    QMutexLocker locker(obj->getMutex());
+    // Pack each element in output buffer
+    for (quint32 index = 0; index < numElements; ++index)
+    {
+        data[offset + numBytesPerElement*index] = dataIn[numBytesPerElement*index];
+    }
+    // Done
+    return getNumBytes();
+}
+
+/**
+ * Get the field value as a double.
+ */
+double UAVObjectFieldEnum::getDouble(quint32 index)
+{
+    QMutexLocker locker(obj->getMutex());
+    double ret = 0.0;
+    // Check if index is out of bounds or no data available
+    if (index < numElements && data != NULL)
+    {
+        quint8 value;
+        memcpy(&value, &data[offset + numBytesPerElement*index], numBytesPerElement);
+        ret = (double)value;
+    }
+    // Done
+    return ret;
+}
+
+/**
+ * Set the field value from a double.
+ */
+void UAVObjectFieldEnum::setDouble(double value, quint32 index)
+{
+    QMutexLocker locker(obj->getMutex());
+    // Check if index is out of bounds or no data available
+    if (index < numElements && data != NULL)
+    {
+        quint8 tmpValue;
+        tmpValue = (quint8)value;
+        memcpy(&data[offset + numBytesPerElement*index], &tmpValue, numBytesPerElement);
+    }
+
+    // Emit updated event
+    emit fieldUpdated(this);
+}
+
+/**
+ * Get the number of bytes per field element.
+ */
+quint32 UAVObjectFieldEnum::getNumBytesElement()
+{
+    return numBytesPerElement;
+}
+
+/**
+ * Get the field value.
+ */
+quint8 UAVObjectFieldEnum::getValue(quint32 index)
+{
+    QMutexLocker locker(obj->getMutex());
+    // Check if index is out of bounds or no data available
+    if (index < numElements && data != NULL)
+    {
+        quint8 value;
+        memcpy(&value, &data[offset + numBytesPerElement*index], numBytesPerElement);
+        return value;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+/**
+ * Set the field value.
+ */
+void UAVObjectFieldEnum::setValue(quint8 value, quint32 index)
+{
+    QMutexLocker locker(obj->getMutex());
+    // Check if index is out of bounds or no data available
+    if (index < numElements && data != NULL)
+    {
+        memcpy(&data[offset + numBytesPerElement*index], &value, numBytesPerElement);
+    }
+
+    // Emit updated event
+    emit fieldUpdated(this);
+}
+

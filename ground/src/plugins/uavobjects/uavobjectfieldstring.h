@@ -29,16 +29,31 @@
 #define UAVOBJECTFIELDSTRING_H
 
 #include "uavobjects_global.h"
-#include "uavobjectfieldprimitives.h"
+#include "uavobjectfield.h"
 #include <QStringList>
 
-class UAVOBJECTS_EXPORT UAVObjectFieldString: public UAVObjectFieldPrimitives<quint8>
+// Note: This class could be implemented as a template but due to limitations of the Qt
+// plugins it not possible.
+
+class UAVOBJECTS_EXPORT UAVObjectFieldString: public UAVObjectField
 {
+    Q_OBJECT
+
 public:
     UAVObjectFieldString(const QString& name, quint32 maxSize);
     QString getString();
     void setString(QString& str);
+    void initializeValues();
+    qint32 pack(quint8* dataOut);
+    qint32 unpack(const quint8* dataIn);
+    double getDouble(quint32 index = 0);
+    void setDouble(double value, quint32 index = 0);
+    quint32 getNumBytesElement();
 private:
+    quint32 numBytesPerElement;
+
+    quint8 getValue(quint32 index = 0);
+    void setValue(quint8 value, quint32 index = 0);
 };
 
 #endif // UAVOBJECTFIELDSTRING_H

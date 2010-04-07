@@ -41,6 +41,10 @@ UAVObjectParser::UAVObjectParser()
                        QString( "quint8") << QString("quint16") << QString("quint32") <<
                        QString("float") << QString("quint8");
 
+    fieldTypeStrCPPClass << QString("Int8") << QString("Int16") << QString("Int32") <<
+                            QString( "UInt8") << QString("UInt16") << QString("UInt32") <<
+                            QString("Float") << QString("Enum");
+
     fieldTypeStrXML << QString("int8") << QString("int16") << QString("int32") <<
                        QString("uint8") << QString("uint16") << QString("uint32") <<
                        QString("float") << QString("enum");
@@ -640,8 +644,8 @@ bool UAVObjectParser::generateGCSObject(int objIndex, const QString& templateInc
         }
         else
         {
-            finit.append( QString("    fields.append(new UAVObjectFieldPrimitives<%1>(QString(\"%2\"), QString(\"%3\"), %4));\n")
-                          .arg(fieldTypeStrCPP[info->fields[n]->type])
+            finit.append( QString("    fields.append(new UAVObjectField%1(QString(\"%2\"), QString(\"%3\"), %4));\n")
+                          .arg(fieldTypeStrCPPClass[info->fields[n]->type])
                           .arg(info->fields[n]->name)
                           .arg(info->fields[n]->units)
                           .arg(info->fields[n]->numElements) );

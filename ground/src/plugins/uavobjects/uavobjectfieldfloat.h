@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       uavobjectfieldenum.h
+ * @file       uavobjectfieldfloat.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
  * @brief
@@ -25,40 +25,33 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef UAVOBJECTFIELDENUM_H
-#define UAVOBJECTFIELDENUM_H
+#ifndef UAVOBJECTFIELDFLOAT_H
+#define UAVOBJECTFIELDFLOAT_H
 
 #include "uavobjects_global.h"
 #include "uavobjectfield.h"
-#include <QStringList>
+#include <QtEndian>
 
 // Note: This class could be implemented as a template but due to limitations of the Qt
 // plugins it not possible.
 
-class UAVOBJECTS_EXPORT UAVObjectFieldEnum: public UAVObjectField
+class UAVOBJECTS_EXPORT UAVObjectFieldFloat: public UAVObjectField
 {
     Q_OBJECT
 
 public:
-    UAVObjectFieldEnum(const QString& name, const QString& units, quint32 numElements, QStringList& options);
-    QStringList getOptions();
-    QString getSelected();
-    void setSelected(QString& val);
-    quint8 getSelectedIndex();
-    void setSelectedIndex(quint8 index);
+    UAVObjectFieldFloat(const QString& name, const QString& units, quint32 numElements);
     void initializeValues();
     qint32 pack(quint8* dataOut);
     qint32 unpack(const quint8* dataIn);
     double getDouble(quint32 index = 0);
     void setDouble(double value, quint32 index = 0);
     quint32 getNumBytesElement();
+    float getValue(quint32 index = 0);
+    void setValue(float value, quint32 index = 0);
 
 private:
     quint32 numBytesPerElement;
-    QStringList options;
-
-    quint8 getValue(quint32 index = 0);
-    void setValue(quint8 value, quint32 index = 0);
 };
 
-#endif // UAVOBJECTFIELDENUM_H
+#endif // UAVOBJECTFIELDFLOAT_H

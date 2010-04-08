@@ -140,7 +140,7 @@ void Telemetry::connectToObjectInstances(UAVObject* obj, quint32 eventMask)
         }
         if ( (eventMask&EV_UPDATE_REQ) != 0)
         {
-            connect(objs[n], SIGNAL(objectUpdateRequested(UAVObject*)), this, SLOT(objectUpdateRequested(UAVObject*)), Qt::QueuedConnection);
+            connect(objs[n], SIGNAL(updateRequested(UAVObject*)), this, SLOT(updateRequested(UAVObject*)), Qt::QueuedConnection);
         }
     }
 }

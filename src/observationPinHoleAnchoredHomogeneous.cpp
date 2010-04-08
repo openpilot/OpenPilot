@@ -35,6 +35,7 @@ namespace jafar {
 			ObservationAbstract::link(_senPtr, _lmkPtr);
 			// Use this pointer below to access the pin-hole specific parameters.
 			pinHolePtr = boost::dynamic_pointer_cast<SensorPinHole>(sensorPtr);
+			ahpPtr = boost::dynamic_pointer_cast<LandmarkAnchoredHomogeneousPoint>(landmarkPtr);
 		}
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::project_func() {

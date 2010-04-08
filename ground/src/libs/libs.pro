@@ -9,5 +9,6 @@ SUBDIRS   = \
     qwt \
     qextserialport \
     utils \
-    glc_lib
+    glc_lib\
+    qymodem
 

@@ -1,17 +1,18 @@
 TEMPLATE = lib
-TARGET = QYModem
+TARGET = QYmodem
 DEFINES += QYMODEM_LIBRARY
-
 include(../../../openpilotgcslibrary.pri)
-include(../../../libs/qextserialport/qextserialport.pri)
 
 # CONFIG                 += staticlib
 SOURCES += qymodem.cpp \
-    qymodem_TX.cpp \
+    qymodem_tx.cpp \
     qymodemsend.cpp
-HEADERS += qymodem_TX.h \
+HEADERS += qymodem_tx.h \
     qymodem.h \
     qymodemsend.h
 
-win32:LIBS += -lsetupapi
+LIBS += -l$$qtLibraryTarget(QExtSerialPort)
 
+#CONFIG(debug, debug|release):LIBS += -lqextserialportd
+#else:LIBS += -lqextserialport
+win32:LIBS += -lsetupapi

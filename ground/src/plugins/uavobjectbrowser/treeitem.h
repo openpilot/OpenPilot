@@ -28,6 +28,17 @@
 #ifndef TREEITEM_H
 #define TREEITEM_H
 
+#include "uavobjects/uavobject.h"
+#include "uavobjects/uavmetaobject.h"
+#include "uavobjects/uavobjectfieldenum.h"
+#include "uavobjects/uavobjectfieldint8.h"
+#include "uavobjects/uavobjectfieldint16.h"
+#include "uavobjects/uavobjectfieldint32.h"
+#include "uavobjects/uavobjectfielduint8.h"
+#include "uavobjects/uavobjectfielduint16.h"
+#include "uavobjects/uavobjectfielduint32.h"
+#include "uavobjects/uavobjectfieldfloat.h"
+#include "uavobjects/uavobjectfieldenum.h"
 #include <QtCore/QList>
 #include <QtCore/QVariant>
 #include <QtCore/QStringList>
@@ -47,7 +58,7 @@ class TreeItem
      int childCount() const;
      int columnCount() const;
      QVariant data(int column) const;
-     void setData(int column, QVariant value);
+     virtual void setData(int column, QVariant value);
      int row() const;
      TreeItem *parent() { return m_parent; }
      void setParent(TreeItem *parent) { m_parent = parent; }
@@ -55,6 +66,7 @@ class TreeItem
 
  private:
      QList<TreeItem*> m_children;
+     // m_data contains: [0] property name, [1] value, and [2] unit
      QList<QVariant> m_data;
      TreeItem *m_parent;
  };
@@ -115,6 +127,7 @@ public:
             TreeItem(data, parent), m_index(index) { }
     FieldTreeItem(int index, const QVariant &data, TreeItem *parent = 0) :
             TreeItem(data, parent), m_index(index) { }
+    inline int index() { return m_index; }
     bool isEditable() { return true; }
     virtual bool isIntType() { return false; }
     virtual bool isEnum() { return false; }
@@ -126,12 +139,55 @@ private:
 class EnumFieldTreeItem : public FieldTreeItem
 {
 public:
-    EnumFieldTreeItem(int index, const QList<QVariant> &data, QStringList enumOptions, TreeItem *parent = 0) :
-            FieldTreeItem(index, data, parent), enumOptions(enumOptions) { }
-    EnumFieldTreeItem(int index, const QVariant &data, QStringList enumOptions, TreeItem *parent = 0) :
-            FieldTreeItem(index, data, parent), enumOptions(enumOptions) { }
+    EnumFieldTreeItem(UAVMetaObject *mobj, int index, const QList<QVariant> &data,
+                      QStringList enumOptions, TreeItem *parent = 0) :
+            FieldTreeItem(index, data, parent), enumOptions(enumOptions), m_mobj(mobj), m_field(0) { }
+    EnumFieldTreeItem(UAVObjectFieldEnum *field, int index, const QList<QVariant> &data,
+                      QStringList enumOptions, TreeItem *parent = 0) :
+            FieldTreeItem(index, data, parent), enumOptions(enumOptions), m_field(field), m_mobj(0) { }
+    EnumFieldTreeItem(UAVObjectFieldEnum *field, int index, const QVariant &data,
+                      QStringList enumOptions, TreeItem *parent = 0) :
+            FieldTreeItem(index, data, parent), enumOptions(enumOptions), m_field(field), m_mobj(0) { }
+    void setData(int column, QVariant value) {
+        TreeItem::setData(column, value);
+        if (m_field) {
+            m_field->setSelectedIndex(value.toInt(), index());
+        } else {
+            UAVObject::Metadata md = m_mobj->getData();
+            switch(index()) {
+            case 0:
+                md.flightTelemetryAcked = value.toInt();
+                break;
+            case 1:
+                md.flightTelemetryUpdateMode = value.toInt();
+                break;
+            case 2:
+                md.flightTelemetryUpdatePeriod = value.toInt();
+                break;
+            case 3:
+                md.gcsTelemetryAcked = value.toInt();
+                break;
+            case 4:
+                md.gcsTelemetryUpdateMode = value.toInt();
+                break;
+            case 5:
+                md.gcsTelemetryUpdatePeriod = value.toInt();
+                break;
+            case 6:
+                md.loggingUpdateMode = value.toInt();
+                break;
+            case 7:
+                md.loggingUpdatePeriod = value.toInt();
+                break;
+            }
+            m_mobj->setData(md);
+        }
+    }
     bool isEnum() { return true; }
     QStringList enumOptions;
+private:
+    UAVObjectFieldEnum *m_field;
+    UAVMetaObject *m_mobj;
 };
 
 class IntFieldTreeItem : public FieldTreeItem
@@ -146,14 +202,145 @@ public:
     int MAX;
 };
 
+class Int8FieldTreeItem : public IntFieldTreeItem
+{
+public:
+    Int8FieldTreeItem(UAVObjectFieldInt8 *field, int index, const QList<QVariant> &data, int min, int max, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, min, max, parent), m_field(field) { }
+    Int8FieldTreeItem(UAVObjectFieldInt8 *field, int index, const QVariant &data, int min, int max, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, min, max, parent), m_field(field) { }
+    void setData(int column, QVariant value) {
+        TreeItem::setData(column, value);
+        m_field->setValue(value.toInt());
+    }
+private:
+    UAVObjectFieldInt8 *m_field;
+};
+
+class Int16FieldTreeItem : public IntFieldTreeItem
+{
+public:
+    Int16FieldTreeItem(UAVObjectFieldInt16 *field, int index, const QList<QVariant> &data, int min, int max, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, min, max, parent), m_field(field) { }
+    Int16FieldTreeItem(UAVObjectFieldInt16 *field, int index, const QVariant &data, int min, int max, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, min, max, parent), m_field(field) { }
+    void setData(int column, QVariant value) {
+        TreeItem::setData(column, value);
+        m_field->setValue(value.toInt());
+    }
+private:
+    UAVObjectFieldInt16 *m_field;
+};
+
+class Int32FieldTreeItem : public IntFieldTreeItem
+{
+public:
+    Int32FieldTreeItem(UAVMetaObject *mobj, int index, const QList<QVariant> &data, int min, int max, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, min, max, parent), m_mobj(mobj), m_field(0) { }
+    Int32FieldTreeItem(UAVObjectFieldInt32 *field, int index, const QList<QVariant> &data, int min, int max, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, min, max, parent), m_field(field), m_mobj(0) { }
+    Int32FieldTreeItem(UAVObjectFieldInt32 *field, int index, const QVariant &data, int min, int max, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, min, max, parent), m_field(field), m_mobj(0) { }
+    void setData(int column, QVariant value) {
+        TreeItem::setData(column, value);
+        if (m_field) {
+            m_field->setValue(value.toInt());
+        } else {
+            UAVObject::Metadata md = m_mobj->getData();
+            switch(index()) {
+            case 0:
+                md.flightTelemetryAcked = value.toInt();
+                break;
+            case 1:
+                md.flightTelemetryUpdateMode = value.toInt();
+                break;
+            case 2:
+                md.flightTelemetryUpdatePeriod = value.toInt();
+                break;
+            case 3:
+                md.gcsTelemetryAcked = value.toInt();
+                break;
+            case 4:
+                md.gcsTelemetryUpdateMode = value.toInt();
+                break;
+            case 5:
+                md.gcsTelemetryUpdatePeriod = value.toInt();
+                break;
+            case 6:
+                md.loggingUpdateMode = value.toInt();
+                break;
+            case 7:
+                md.loggingUpdatePeriod = value.toInt();
+                break;
+            }
+            m_mobj->setData(md);
+        }
+    }
+private:
+    UAVObjectFieldInt32 *m_field;
+    UAVMetaObject *m_mobj;
+};
+
+class UInt8FieldTreeItem : public IntFieldTreeItem
+{
+public:
+    UInt8FieldTreeItem(UAVObjectFieldUInt8 *field, int index, const QList<QVariant> &data, int min, int max, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, min, max, parent), m_field(field) { }
+    UInt8FieldTreeItem(UAVObjectFieldUInt8 *field, int index, const QVariant &data, int min, int max, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, min, max, parent), m_field(field) { }
+    void setData(int column, QVariant value) {
+        TreeItem::setData(column, value);
+        m_field->setValue(value.toInt());
+    }
+private:
+    UAVObjectFieldUInt8 *m_field;
+};
+
+class UInt16FieldTreeItem : public IntFieldTreeItem
+{
+public:
+    UInt16FieldTreeItem(UAVObjectFieldUInt16 *field, int index, const QList<QVariant> &data, int min, int max, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, min, max, parent), m_field(field) { }
+    UInt16FieldTreeItem(UAVObjectFieldUInt16 *field, int index, const QVariant &data, int min, int max, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, min, max, parent), m_field(field) { }
+    void setData(int column, QVariant value) {
+        TreeItem::setData(column, value);
+        m_field->setValue(value.toInt());
+    }
+private:
+    UAVObjectFieldUInt16 *m_field;
+};
+
+class UInt32FieldTreeItem : public IntFieldTreeItem
+{
+public:
+    UInt32FieldTreeItem(UAVObjectFieldUInt32 *field, int index, const QList<QVariant> &data, int min, int max, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, min, max, parent), m_field(field) { }
+    UInt32FieldTreeItem(UAVObjectFieldUInt32 *field, int index, const QVariant &data, int min, int max, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, min, max, parent), m_field(field) { }
+    void setData(int column, QVariant value) {
+        TreeItem::setData(column, value);
+        m_field->setValue(value.toInt());
+    }
+private:
+    UAVObjectFieldUInt32 *m_field;
+};
+
+
 class FloatFieldTreeItem : public FieldTreeItem
 {
 public:
-    FloatFieldTreeItem(int index, const QList<QVariant> &data, TreeItem *parent = 0) :
-            FieldTreeItem(index, data, parent) { }
-    FloatFieldTreeItem(int index, const QVariant &data, TreeItem *parent = 0) :
-            FieldTreeItem(index, data, parent) { }
+    FloatFieldTreeItem(UAVObjectFieldFloat *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
+            FieldTreeItem(index, data, parent), m_field(field) { }
+    FloatFieldTreeItem(UAVObjectFieldFloat *field, int index, const QVariant &data, TreeItem *parent = 0) :
+            FieldTreeItem(index, data, parent), m_field(field) { }
     bool isFloatType() { return true; }
+    void setData(int column, QVariant value) {
+        TreeItem::setData(column, value);
+        m_field->setValue(value.toDouble());
+    }
+private:
+    UAVObjectFieldFloat *m_field;
 };
 
 

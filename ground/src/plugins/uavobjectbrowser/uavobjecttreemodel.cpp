@@ -122,28 +122,28 @@ void UAVObjectTreeModel::addMetaObject(UAVMetaObject *obj, TreeItem *parent)
     QList<QVariant> data;
     QString msUnit = tr("ms");
     data << tr("Flight Telemetry Acked") << md.flightTelemetryAcked;
-    meta->appendChild(new EnumFieldTreeItem(0, data, boolList));
+    meta->appendChild(new EnumFieldTreeItem(obj, 0, data, boolList));
     data.clear();
     data << tr("Flight Telemetry Update Mode") << md.flightTelemetryUpdateMode;
-    meta->appendChild(new EnumFieldTreeItem(0, data, updateModeList));
+    meta->appendChild(new EnumFieldTreeItem(obj, 1, data, updateModeList));
     data.clear();
     data << tr("Flight Telemetry Update Period") << md.flightTelemetryUpdatePeriod << msUnit;
-    meta->appendChild(new IntFieldTreeItem(0, data, QINT32MIN, QINT32MAX));
+    meta->appendChild(new Int32FieldTreeItem(obj, 2, data, QINT32MIN, QINT32MAX));
     data.clear();
     data << tr("GCS Telemetry Acked") << md.gcsTelemetryAcked;
-    meta->appendChild(new EnumFieldTreeItem(0, data, boolList));
+    meta->appendChild(new EnumFieldTreeItem(obj, 3, data, boolList));
     data.clear();
     data << tr("GCS Telemetry Update Mode") << md.gcsTelemetryUpdateMode;
-    meta->appendChild(new EnumFieldTreeItem(0, data, updateModeList));
+    meta->appendChild(new EnumFieldTreeItem(obj, 4, data, updateModeList));
     data.clear();
     data << tr("GCS Telemetry Update Period") << md.gcsTelemetryUpdatePeriod << msUnit;
-    meta->appendChild(new IntFieldTreeItem(0, data, QINT32MIN, QINT32MAX));
+    meta->appendChild(new Int32FieldTreeItem(obj, 5, data, QINT32MIN, QINT32MAX));
     data.clear();
     data << tr("Logging Update Mode") << md.loggingUpdateMode;
-    meta->appendChild(new EnumFieldTreeItem(0, data, updateModeList));
+    meta->appendChild(new EnumFieldTreeItem(obj, 6, data, updateModeList));
     data.clear();
     data << tr("Logging Update Period") << md.loggingUpdatePeriod << msUnit;
-    meta->appendChild(new IntFieldTreeItem(0, data, QINT32MIN, QINT32MAX));
+    meta->appendChild(new Int32FieldTreeItem(obj, 7, data, QINT32MIN, QINT32MAX));
     parent->appendChild(meta);
 }
 
@@ -196,37 +196,37 @@ void UAVObjectTreeModel::addSingleField(int index, UAVObjectField *field, TreeIt
 
     FieldTreeItem *item;
     if (enumField) {
-        data.append(enumField->getSelectedIndex());
+        data.append(enumField->getSelectedIndex(index));
         data.append(field->getUnits());
-        item = new EnumFieldTreeItem(index, data, enumField->getOptions());
+        item = new EnumFieldTreeItem(enumField, index, data, enumField->getOptions());
     } else if (int8Field) {
         data.append(int8Field->getValue());
         data.append(field->getUnits());
-        item = new IntFieldTreeItem(index, data, QINT8MIN, QINT8MAX);
+        item = new Int8FieldTreeItem(int8Field, index, data, QINT8MIN, QINT8MAX);
     } else if (int16Field) {
         data.append(int16Field->getValue());
         data.append(field->getUnits());
-        item = new IntFieldTreeItem(index, data, QINT16MIN, QINT16MAX);
+        item = new Int16FieldTreeItem(int16Field, index, data, QINT16MIN, QINT16MAX);
     } else if (int32Field) {
         data.append(int32Field->getValue());
         data.append(field->getUnits());
-        item = new IntFieldTreeItem(index, data, QINT32MIN, QINT32MAX);
+        item = new Int32FieldTreeItem(int32Field, index, data, QINT32MIN, QINT32MAX);
     } else if (uInt8Field) {
         data.append(uInt8Field->getValue());
         data.append(field->getUnits());
-        item = new IntFieldTreeItem(index, data, QUINTMIN, QUINT8MAX);
+        item = new UInt8FieldTreeItem(uInt8Field, index, data, QUINTMIN, QUINT8MAX);
     } else if (uInt16Field) {
         data.append(uInt16Field->getValue());
         data.append(field->getUnits());
-        item = new IntFieldTreeItem(index, data, QUINTMIN, QUINT16MAX);
+        item = new UInt16FieldTreeItem(uInt16Field, index, data, QUINTMIN, QUINT16MAX);
     } else if (uInt32Field) {
         data.append(uInt32Field->getValue());
         data.append(field->getUnits());
-        item = new IntFieldTreeItem(index, data, QUINTMIN, QUINT32MAX);
+        item = new UInt32FieldTreeItem(uInt32Field, index, data, QUINTMIN, QUINT32MAX);
     } else if (floatField) {
         data.append(floatField->getValue());
         data.append(field->getUnits());
-        item = new FloatFieldTreeItem(index, data);
+        item = new FloatFieldTreeItem(floatField, index, data);
     } else {
         data.append("Data Error");
         data.append(field->getUnits());

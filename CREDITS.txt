@@ -16,8 +16,15 @@ Description of work (D)
 N: David Ankers
 E: david (at) openpilot (dot) org
 D: Co-founder, Project Coordination     
-D: GCS infrastruture 
-D: Random embedded hacker
+D: Minor GCS infrastruture 
+
+N: Pedro Assuncao
+E: pedro (dot) agda (at) gmail (dot) com
+D: GCS Settings Widget & Plugin
+
+N: Jose Barros
+E: josembarros (at) hotmail (dot) com
+D: GCS Y-Modem Plugin  
 
 N: Frederic Goddeeris
 E: fredericgoddeeris (at) hotmail (dot) com
@@ -25,11 +32,16 @@ D: I2C work and FreeRTOS work.
 
 N: Peter Gunnarsson
 E: peter (at) pyne (dot) se
-D: Multiple GCS plugins, Gadget foundations and GCS core work
+D: GCS Core Developer
+D: Multiple GCS plugins, Gadget foundations
 
 N: Thorsten Klose
 E: thorsten.klose (at) dmx (dot) de
 D: Embedded STM32 infrastructure  
+
+N: Edouard Lafargue 
+E: edouard (at) lafargue (dot) name
+D: Artwork including Display Dials
 
 N: Ken Northup
 E: helos360 (at) bellsouth (dot) net
@@ -47,7 +59,7 @@ D: Graphic Design, OpenPilot Logo
 
 N: Julien Rouviere
 E: julien.rouviere (at) gmail (dot) com
-D: GCS Core developer & Team Leader
+D: GCS Core Developer
 D: GCS Framework and Plugins for the GCS
 
 N: Zik Saleeba
@@ -65,5 +77,5 @@ D: Hardware debugging and testing, creation of 2-layer Floss-JTAG board
 N: Vassilis Varveropoulos
 E: vassilis (at) openpilot (dot) org
 D: Co-founder, Principal embedded software architect. 
-D: Architeture and UAVTalk Implimentation
+D: Module architecture and UAVTalk Implimentation.
 

@@ -107,7 +107,7 @@ void UAVObjectTreeModel::addDataObject(UAVDataObject *obj)
 void UAVObjectTreeModel::addMetaObject(UAVMetaObject *obj, TreeItem *parent)
 {
     MetaObjectTreeItem *meta = new MetaObjectTreeItem(tr("Meta Data"));
-    UAVObject::Metadata md = obj->getMetadata();
+    UAVObject::Metadata md = obj->getData();
     QStringList boolList;
     boolList << tr("False") << tr("True");
     QStringList updateModeList;

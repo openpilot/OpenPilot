@@ -301,15 +301,23 @@ QVariant UAVObjectTreeModel::data(const QModelIndex &index, int role) const
         return item->data(index.column());
     }
 
-    //XXX
-//    if (index.column() == 1 && role == Qt::ForegroundRole)
-//        return QVariant( QColor( Qt::red ) );
+    TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
 
+    //
+//    if (index.column() == 1 && role == Qt::ForegroundRole) {
+//        FieldTreeItem *fieldItem = dynamic_cast<FieldTreeItem*>(item);
+//        if (fieldItem && fieldItem->isChanged())
+//            return QVariant(QColor(Qt::darkBlue));
+//    }
+    if (index.column() == 1 && role == Qt::BackgroundRole) {
+        FieldTreeItem *fieldItem = dynamic_cast<FieldTreeItem*>(item);
+        if (fieldItem && fieldItem->isChanged())
+            return QVariant(QColor(230, 230, 255));
+    }
 
     if (role != Qt::DisplayRole)
         return QVariant();
 
-    TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
     if (index.column() == 1) {
         EnumFieldTreeItem *fieldItem = dynamic_cast<EnumFieldTreeItem*>(item);
         if (fieldItem) {

@@ -41,7 +41,7 @@ protected:
 
         @return Sum of bytes in data, modulo 256.
         */
-    uint8_t Checksum(const char* data, size_t size);
+    quint8 Checksum(const char* data, size_t size);
 
     /**
         Calculate CRC for a block of data.
@@ -51,7 +51,7 @@ protected:
 
         @return CRC of data.
         */
-    uint16_t CRC16(const char* data, size_t size);
+    quint16 CRC16(const char* data, size_t size);
 
     /**
         Update CRC value by accumulating another byte of data.
@@ -61,7 +61,7 @@ protected:
 
         @return Updated CRC value.
         */
-    uint16_t UpdateCRC16(uint16_t crcIn, uint8_t byte);
+    quint16 UpdateCRC16(quint16 crcIn, quint8 byte);
 
     /**
         Receive a single character.

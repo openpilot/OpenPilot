@@ -21,10 +21,10 @@
 
 #include "qymodem.h"
 
-uint16_t QymodemBase::UpdateCRC16(uint16_t crcIn, uint8_t byte)
+quint16 QymodemBase::UpdateCRC16(quint16 crcIn, quint8 byte)
         {
-        uint32_t crc = crcIn;
-        uint32_t in = byte|0x100;
+        quint32 crc = crcIn;
+        quint32 in = byte|0x100;
         do
                 {
                 crc <<= 1;
@@ -39,9 +39,9 @@ uint16_t QymodemBase::UpdateCRC16(uint16_t crcIn, uint8_t byte)
         }
 
 
-uint16_t QymodemBase::CRC16(const char* data, size_t size)
+quint16 QymodemBase::CRC16(const char* data, size_t size)
         {
-        uint32_t crc = 0;
+        quint32 crc = 0;
         const char* dataEnd = data+size;
         while(data<dataEnd)
                 crc = UpdateCRC16(crc,*data++);
@@ -51,7 +51,7 @@ uint16_t QymodemBase::CRC16(const char* data, size_t size)
         }
 
 
-uint8_t QymodemBase::Checksum(const char* data, size_t size)
+quint8 QymodemBase::Checksum(const char* data, size_t size)
         {
         int sum = 0;
         const char* dataEnd = data+size;

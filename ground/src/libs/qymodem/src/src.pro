@@ -1,8 +1,10 @@
-include(../../../openpilotgcslibrary.pri)
-PROJECT = qymodem
 TEMPLATE = lib
+TARGET = QYModem
 DEFINES += QYMODEM_LIBRARY
-TARGET = Qymodem
+
+include(../../../openpilotgcslibrary.pri)
+include(../../../libs/qextserialport/qextserialport.pri)
+
 # CONFIG                 += staticlib
 SOURCES += qymodem.cpp \
     qymodem_TX.cpp \
@@ -11,9 +13,5 @@ HEADERS += qymodem_TX.h \
     qymodem.h \
     qymodemsend.h
 
-
-
-CONFIG(debug, debug|release):LIBS += -lqextserialportd
-else:LIBS += -lqextserialport
 win32:LIBS += -lsetupapi
 

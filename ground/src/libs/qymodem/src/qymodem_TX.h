@@ -115,7 +115,7 @@ private:
         bool SendCRC;
         bool WaitForBlockACK;
         bool Use1KBlocks;
-        uint8_t ModeChar;
+        quint8 ModeChar;
         int CancelCount;    
         };
 

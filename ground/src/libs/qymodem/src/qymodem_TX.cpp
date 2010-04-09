@@ -155,14 +155,14 @@ change_mode:
                 // append checksum/crc...
                 if(SendCRC)
                         {
-                        uint16_t crc = CRC16(block+3,blockSize);
+                        quint16 crc = CRC16(block+3,blockSize);
                         blockSize += 3;
-                        block[blockSize++] = (uint8_t)(crc>>8);
-                        block[blockSize++] = (uint8_t)crc;
+                        block[blockSize++] = (quint8)(crc>>8);
+                        block[blockSize++] = (quint8)crc;
                         }
                 else
                         {
-                        uint8_t sum = Checksum(block+3,blockSize);
+                        quint8 sum = Checksum(block+3,blockSize);
                         blockSize += 3;
                         block[blockSize++] = sum;
                         }

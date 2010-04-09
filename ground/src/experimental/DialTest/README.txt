@@ -1,3 +1,4 @@
 Widget experiments. Compile and run test application
-to see widget.
+to see widget. Change bg.svg file to load different
+background.
 

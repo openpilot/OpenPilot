@@ -30,14 +30,7 @@
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/uavdataobject.h"
 #include "uavobjects/uavmetaobject.h"
-#include "uavobjects/uavobjectfieldenum.h"
-#include "uavobjects/uavobjectfielduint8.h"
-#include "uavobjects/uavobjectfielduint16.h"
-#include "uavobjects/uavobjectfielduint32.h"
-#include "uavobjects/uavobjectfieldint8.h"
-#include "uavobjects/uavobjectfieldint16.h"
-#include "uavobjects/uavobjectfieldint32.h"
-#include "uavobjects/uavobjectfieldfloat.h"
+#include "uavobjects/uavobjectfields.h"
 #include "extensionsystem/pluginmanager.h"
 #include <QtGui/QColor>
 #include <QtCore/QDebug>

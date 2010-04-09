@@ -132,9 +132,11 @@ void UAVGadgetInstanceManager::createOptionsPages()
     {
         IUAVGadgetFactory *f = factory(config->classId());
         IOptionsPage *p = f->createOptionsPage(config);
-        IOptionsPage *page = new UAVGadgetOptionsPageDecorator(p, config);
-        m_optionsPages.append(page);
-        m_pm->addObject(page);
+        if (p) {
+            IOptionsPage *page = new UAVGadgetOptionsPageDecorator(p, config);
+            m_optionsPages.append(page);
+            m_pm->addObject(page);
+        }
     }
 }
 

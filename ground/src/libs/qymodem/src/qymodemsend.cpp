@@ -97,7 +97,7 @@ public:
         */
     int In(char* data, size_t size, int * percent)
     {
-        *percent = TotalSize ? ((quint64)TransferredSize*(qint64)100)/(quint64)TotalSize : 0;
+        *percent = TotalSize ? ((quint64)TransferredSize*(quint64)100)/(quint64)TotalSize : 0;
         fflush(stdout);
         size=fread(data,sizeof(quint8),size,File);
         if(size)

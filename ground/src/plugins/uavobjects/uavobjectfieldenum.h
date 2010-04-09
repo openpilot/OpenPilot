@@ -42,10 +42,10 @@ class UAVOBJECTS_EXPORT UAVObjectFieldEnum: public UAVObjectField
 public:
     UAVObjectFieldEnum(const QString& name, const QString& units, quint32 numElements, QStringList& options);
     QStringList getOptions();
-    QString getSelected();
-    void setSelected(QString& val);
-    quint8 getSelectedIndex();
-    void setSelectedIndex(quint8 index);
+    QString getSelected(quint32 arrayIndex);
+    void setSelected(QString& val, quint32 arrayIndex);
+    quint8 getSelectedIndex(quint32 arrayIndex);
+    void setSelectedIndex(quint8 index, quint32 arrayIndex);
     void initializeValues();
     qint32 pack(quint8* dataOut);
     qint32 unpack(const quint8* dataIn);

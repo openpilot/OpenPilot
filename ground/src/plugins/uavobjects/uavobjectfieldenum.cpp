@@ -41,32 +41,32 @@ QStringList UAVObjectFieldEnum::getOptions()
     return options;
 }
 
-QString UAVObjectFieldEnum::getSelected()
+QString UAVObjectFieldEnum::getSelected(quint32 arrayIndex)
 {
-    return options[getValue()];
+    return options[getValue(arrayIndex)];
 }
 
-void UAVObjectFieldEnum::setSelected(QString& val)
+void UAVObjectFieldEnum::setSelected(QString& val, quint32 arrayIndex)
 {
     // Find index of selected value
     int index = options.indexOf(val);
     if (index >= 0)
     {
-        setValue(index);
+        setValue(index, arrayIndex);
     }
 }
 
-quint8 UAVObjectFieldEnum::getSelectedIndex()
+quint8 UAVObjectFieldEnum::getSelectedIndex(quint32 arrayIndex)
 {
-    return getValue();
+    return getValue(arrayIndex);
 }
 
-void UAVObjectFieldEnum::setSelectedIndex(quint8 index)
+void UAVObjectFieldEnum::setSelectedIndex(quint8 index, quint32 arrayIndex)
 {
     // Check that the index is valid
     if (index < options.length())
     {
-        setValue(index);
+        setValue(index, arrayIndex);
     }
 }
 

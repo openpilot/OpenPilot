@@ -3,6 +3,7 @@
 
 #include <QtGui/QMainWindow>
 #include <QDebug>
+#include <QFileDialog>
 
 #include "basicdial.h"
 
@@ -24,7 +25,9 @@ private:
     BasicDial      *dial;
 
 private slots:
-    void on_buttonTest_clicked();
+    void on_buttonFile_clicked();
+    void on_sliderValue_valueChanged(int value);
+    void on_buttonUpdate_clicked();
     void on_buttonQuit_clicked();
 };
 

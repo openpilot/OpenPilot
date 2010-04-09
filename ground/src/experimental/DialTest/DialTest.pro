@@ -10,3 +10,4 @@ SOURCES += main.cpp \
 HEADERS += mainwindow.h \
     basicdial.h
 FORMS += mainwindow.ui
+RESOURCES += 

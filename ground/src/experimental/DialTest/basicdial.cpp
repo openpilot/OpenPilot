@@ -27,18 +27,22 @@ void BasicDial::paintEvent(QPaintEvent *event) {
 
 void BasicDial::renderBackground(void) {
     int side = qMin(width(), height());
-    if( bg.size() == QSize(side, side) ) {
+    if( bg.size() == size() ) {
         qDebug() << "BasicDial::renderBackground(): Size not changed! Abort rerendering stuff";
         return;
     }
-    QPixmap pixmap(QSize(side, side));
+    /* Create buffer pixmap and make it transparent */
+    QPixmap pixmap(size());
     pixmap.fill(Qt::transparent);
+
+    /* Configure painter */
     QPainter painter(&pixmap);
     painter.setRenderHint(QPainter::Antialiasing);
-    QRectF frame( QPoint(0, 0), QPoint(side-1, side-1));
-    renderer->load(backgroundFile);
-    renderer->render(&painter, frame);
-    bg = pixmap;
+
+    renderer->load(backgroundFile);          /* load file; needed to calculate frame         */
+    QRectF frame = calculateCenteredFrame(); /* viewport from renderer (based on loaded file */
+    renderer->render(&painter, frame);       /* dump bg on pixmap                            */
+    bg = pixmap;                             /* save it                                      */
 }
 
 void BasicDial::renderNeedle(qreal angle) {
@@ -92,4 +96,18 @@ void BasicDial::setBackgroundFile(QString file) {
 void BasicDial::setPen(QPen p) {
     pen = p;
     pen.setWidth(2);
+}
+
+QRectF BasicDial::calculateCenteredFrame(void) {
+    QRectF vb = renderer->viewBoxF();                                   /* get SVG viewport                      */
+    qreal scale = qMax( (vb.height()/height()), (vb.width()/width()));  /* calc scale to fit SVG into widget     */
+    vb.setWidth( vb.width()/scale );                                    /* scale viewport so SVG fit widget size */
+    vb.setHeight( vb.height()/scale );
+
+    QRectF frame;                             /* let's prepare render frame for bg */
+    frame.setX( (width()-vb.width())/2.0 );   /* frame is centered on widget       */
+    frame.setY( (height()-vb.height())/2.0 );
+    frame.setWidth(  vb.width() );            /* derive size from scaled viewport  */
+    frame.setHeight( vb.height() );
+    return frame;
 }

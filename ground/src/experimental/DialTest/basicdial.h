@@ -29,6 +29,8 @@ private:
     void  renderNeedle(qreal angle);
     qreal value2angle(qreal value);
 
+    QRectF calculateCenteredFrame(void);
+
     QSvgRenderer *renderer;
     QPixmap       bg;
     qreal         angle;

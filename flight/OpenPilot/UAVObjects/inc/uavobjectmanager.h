@@ -46,14 +46,14 @@ typedef enum {
  * properties for each object and can be used by multiple modules (e.g. telemetry and logger)
  */
 typedef struct {
-	int8_t telemetryAcked; /** Defines if an ack is required for the transactions of this object (1:acked, 0:not acked) */
-	int8_t telemetryUpdateMode; /** Update mode used by the telemetry module (UAVObjUpdateMode) */
+	uint8_t telemetryAcked; /** Defines if an ack is required for the transactions of this object (1:acked, 0:not acked) */
+	uint8_t telemetryUpdateMode; /** Update mode used by the telemetry module (UAVObjUpdateMode) */
 	int32_t telemetryUpdatePeriod; /** Update period used by the telemetry module (only if telemetry mode is PERIODIC) */
-	int8_t gcsTelemetryAcked; /** Defines if an ack is required for the transactions of this object (1:acked, 0:not acked) */
-	int8_t gcsTelemetryUpdateMode; /** Update mode used by the GCS (UAVObjUpdateMode) */
+	uint8_t gcsTelemetryAcked; /** Defines if an ack is required for the transactions of this object (1:acked, 0:not acked) */
+	uint8_t gcsTelemetryUpdateMode; /** Update mode used by the GCS (UAVObjUpdateMode) */
 	int32_t gcsTelemetryUpdatePeriod; /** Update period used by the GCS (only if telemetry mode is PERIODIC) */
-	int8_t loggingUpdateMode; /** Update mode used by the logging module (UAVObjUpdateMode) */
-	int32_t loggingUpdatePeriod; /** Update period used by the logging module (only if logging mode is PERIODIC) */
+	uint8_t loggingUpdateMode; /** Update mode used by the logging module (UAVObjUpdateMode) */
+	uint32_t loggingUpdatePeriod; /** Update period used by the logging module (only if logging mode is PERIODIC) */
 } __attribute__((packed)) UAVObjMetadata;
 
 /**

@@ -60,4 +60,7 @@ plugin_uavobjectbrowser.depends = plugin_coreplugin
 plugin_uavobjectbrowser.depends = plugin_uavobjects
 SUBDIRS += plugin_uavobjectbrowser
 
-
+#Uploader Gadget
+plugin_uploader.subdir = uploader
+plugin_uploader.depends = plugin_coreplugin
+SUBDIRS += plugin_uploader

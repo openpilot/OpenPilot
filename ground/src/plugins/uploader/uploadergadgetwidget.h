@@ -42,7 +42,6 @@
 #include <QtGui/QPushButton>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QTimer>
 //using namespace qmapcontrol;
 
 
@@ -68,14 +67,12 @@ private:
      QymodemSend * Ymodem;
      QProgressBar *progressBar;
      QTimer *timer;
-     int percent;
 
 private slots:
     void setOpenFileName();
     void send();
     void error(QString errorString,int errorNumber);
     void info(QString infoString,int infoNumber);
-    void updatePerc();
     void updatePercSlot(int);
 };
 

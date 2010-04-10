@@ -2,6 +2,8 @@ TEMPLATE = lib
 TARGET = Uploader
 include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
+include(../../libs/qextserialport/qextserialport.pri)
+include(../../libs/qymodem/qymodem.pri)
 HEADERS += uploadergadget.h \
     uploadergadgetconfiguration.h \
     uploadergadgetfactory.h \
@@ -15,11 +17,5 @@ SOURCES += uploadergadget.cpp \
     uploadergadgetwidget.cpp \
     uploaderplugin.cpp
 OTHER_FILES += uploader.pluginspec
-
-LIBS += -l$$qtLibraryTarget(QExtSerialPort)
-LIBS += -l$$qtLibraryTarget(QYmodem)
-
-#CONFIG(debug, debug|release):LIBS += -lqextserialportd
-#else:LIBS += -lqextserialport
-#CONFIG(debug, debug|release):LIBS += -lqymodemd
-#else:LIBS += -lqymodem
+#LIBS += -l$$qtLibraryTarget(QExtSerialPort)
+#LIBS += -l$$qtLibraryTarget(QYmodem)

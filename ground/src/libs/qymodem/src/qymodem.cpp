@@ -39,10 +39,10 @@ quint16 QymodemBase::UpdateCRC16(quint16 crcIn, quint8 byte)
         }
 
 
-quint16 QymodemBase::CRC16(const char* data, size_t size)
+quint16 QymodemBase::CRC16(const quint8* data, size_t size)
         {
         quint32 crc = 0;
-        const char* dataEnd = data+size;
+        const quint8* dataEnd = data+size;
         while(data<dataEnd)
                 crc = UpdateCRC16(crc,*data++);
         crc = UpdateCRC16(crc,0);
@@ -51,10 +51,10 @@ quint16 QymodemBase::CRC16(const char* data, size_t size)
         }
 
 
-quint8 QymodemBase::Checksum(const char* data, size_t size)
+quint8 QymodemBase::Checksum(const quint8* data, size_t size)
         {
         int sum = 0;
-        const char* dataEnd = data+size;
+        const quint8* dataEnd = data+size;
         while(data<dataEnd)
                 sum += *data++;
         return sum&0xffu;
@@ -63,9 +63,11 @@ quint8 QymodemBase::Checksum(const char* data, size_t size)
 
 int QymodemBase::InChar(long timeout)
         {
-        char c;
+        quint8 c;
+        char cc;
         Port.setTimeout(timeout);
-        int result =(int)Port.read(&c,1);
+        int result =(int)Port.read(&cc,1);
+        c=(quint8)cc;
         if(result==1)
                 return c;
         if(result==0)
@@ -76,8 +78,8 @@ int QymodemBase::InChar(long timeout)
 
 void QymodemBase::Cancel()
         {
-        const char CancelString[] = { CAN,CAN,CAN,CAN,CAN };
+        const quint8 CancelString[] = { CAN,CAN,CAN,CAN,CAN };
         Port.setTimeout(1000);
-        Port.write(CancelString,sizeof(CancelString));
+        Port.write((char*)CancelString,sizeof(CancelString));
          }
 

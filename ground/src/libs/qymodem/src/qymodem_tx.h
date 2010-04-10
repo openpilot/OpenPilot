@@ -44,6 +44,7 @@ public:
         class InStream
                 {
         public:
+             int percent;
                 /**
                 Read data from the stream.
 
@@ -52,7 +53,7 @@ public:
 
                 @return Number of bytes successfully read, or a negative error value if failed.
                 */
-                virtual int In(char* data, size_t size, int * percent) =0;
+                virtual int In(quint8* data, size_t size) =0;
 
                 /**
                 Empty destructor to avoid compiler warnings.
@@ -105,10 +106,10 @@ public:
 
 private:
         int SendInitialise(unsigned timeout);
-        int SendBlock(const char* data, size_t size);
-        int SendData(const char* data, size_t size);
+        int SendBlock(const quint8* data, size_t size);
+        int SendData(const quint8* data, size_t size);
         int SendAll(InStream& in);
-        int MakeBlock0(char* buffer, const char* fileName, size_t fileSize);
+        int MakeBlock0(quint8* buffer, const char* fileName, size_t fileSize);
         int ProcessResponse(int c);
 private:
         size_t BlockNumber;

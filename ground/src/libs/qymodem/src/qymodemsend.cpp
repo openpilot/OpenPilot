@@ -20,12 +20,8 @@
 QymodemSend::QymodemSend(QextSerialPort& port)
     : QymodemTx(port)
     {
-        percent=0;
+
     }
-int QymodemSend::PercentSend()
-{
-    return percent;
-}
 
 /**
 Class for presenting a file as a input stream.
@@ -44,6 +40,8 @@ public:
 
         @return Zero if successful, or a negative error value if failed.
         */
+
+
     int Open(const char* fileName)
     {
         File = fopen(fileName,"rb");
@@ -95,9 +93,11 @@ public:
 
         @return Zero if successful, or a negative error value if failed.
         */
-    int In(char* data, size_t size, int * percent)
+    int In(quint8* data, size_t size)
     {
-        *percent = TotalSize ? ((quint64)TransferredSize*(quint64)100)/(quint64)TotalSize : 0;
+       // mutex.lock();
+        percent = TotalSize ? ((quint64)TransferredSize*(quint64)100)/(quint64)TotalSize : 0;
+        //mutex.unlock();
         fflush(stdout);
         size=fread(data,sizeof(quint8),size,File);
         if(size)
@@ -110,9 +110,11 @@ public:
         return 0;
     }
 private:
+  //  QMutex mutex;
     FILE* File;
     size_t TotalSize;
     size_t TransferredSize;
+
 };
 
 
@@ -140,10 +142,11 @@ void QymodemSend::Send()
     error = SendY(FileName,source.Size(),source,Timeout);
     if(error)
     {
-        emit Error("Error during file transfer, error "+QString(error),error);
+        emit Error("Error during file transfer, error "+QString::number(error),error);
     }
     else
     {
+
         emit Information("Sent OK",QymodemSend::InfoSent);
     }
     source.Close();
@@ -157,7 +160,7 @@ int QymodemSend::SendFile(QString filename)
         emit Error("File not found",QymodemSend::ErrorFileNotFound);
         return QymodemSend::ErrorFileNotFound;
     }
-    if(!Port.open(QIODevice::ReadWrite| QIODevice::Unbuffered))
+    if(!Port.open(QIODevice::ReadWrite))
     {
         emit Error("Could not open port",QymodemSend::ErrorCoulNotOpenPort);
         return QymodemSend::ErrorCoulNotOpenPort;
@@ -191,7 +194,7 @@ void QymodemSend::run()
         emit Error("File not found",QymodemSend::ErrorFileNotFound);
         return;
     }
-    if(!Port.open(QIODevice::ReadWrite| QIODevice::Unbuffered))
+    if(!Port.open(QIODevice::ReadWrite))
     {
         emit Error("Could not open port",QymodemSend::ErrorCoulNotOpenPort);
         return;

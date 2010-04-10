@@ -28,7 +28,6 @@ public:
     QymodemSend(QextSerialPort& port);
     int SendFile(QString filename);
     int SendFileT(QString filename);
-    int PercentSend();
 
 private:
     void run();

@@ -79,7 +79,7 @@ int QymodemTx::SendInitialise(unsigned timeout)
         int c;
         for(;;)
                 {
-                const unsigned timeoutStep = 10;
+                const unsigned timeoutStep = 1000;
                 c = InChar(timeoutStep);
                 if(c=='G')
                         {
@@ -123,9 +123,9 @@ A zero sized block terminates the transfer.
 
 @pre SendInitialise() must have been successful.
 */
-int   QymodemTx::SendBlock(const char* data, size_t size)
+int   QymodemTx::SendBlock(const quint8* data, size_t size)
         {
-        char block[1+2+1024+2];	// buffer to hold data in the block
+        quint8 block[1+2+1024+2];	// buffer to hold data in the block
         int retryCount = 10;		// number of attempts to send the block
         bool waitForBlockACK = WaitForBlockACK;
 
@@ -173,13 +173,13 @@ do_retry:
         if(!retryCount--)
                 return ErrorBlockRetriesExceded;
 
-        char* out = block;
+        quint8* out = block;
         size_t outSize = blockSize;
         for(;;)
                 {
                 // send some data...
                 Port.setTimeout(1000);;
-                int result = (int)Port.write(out,outSize);
+                int result = (int)Port.write((char*)out,outSize);
                 if(result<0)
                         return result; // return error
                 if(result==0)
@@ -259,7 +259,7 @@ A zero sized block terminates the transfer.
 
 @pre SendInitialise() must have been successful.
 */
-int QymodemTx::SendData(const char* data, size_t size)
+int QymodemTx::SendData(const quint8* data, size_t size)
         {
         do
                 {
@@ -290,8 +290,9 @@ int QymodemTx::SendAll(InStream& in)
         do
                 {
                 // get data from input stream...
-                char data[1024];
-                int result = in.In(data,sizeof(data),&percent);
+                quint8 data[1024];
+                int result = in.In(data,sizeof(data));
+                emit Percent(in.percent);
                 if(result<0)
                         return ErrorInputStreamError;
 
@@ -316,11 +317,11 @@ Construct the data for the first block of a Y-Modem transfer.
 
 @return Zero if successful, or a negative error value if failed.
 */
-int QymodemTx::MakeBlock0(char* buffer, const char* fileName, size_t fileSize)
+int QymodemTx::MakeBlock0(quint8* buffer, const char* fileName, size_t fileSize)
         {
         // setup buffer for block 0...
-        char* out = buffer;
-        char* outEnd = buffer+128-1;
+        quint8* out = buffer;
+        quint8* outEnd = buffer+128-1;
         memset(buffer,0,128);
 
         // copy file name to block data...
@@ -378,7 +379,7 @@ int QymodemTx::SendX(InStream& in, unsigned timeout, bool kMode)
 int QymodemTx::SendY(const char* fileName, size_t size, InStream& in, unsigned timeout)
         {
         Use1KBlocks = true;
-        char buffer[128];
+        quint8 buffer[128];
         int result = MakeBlock0(buffer,fileName,size);
         if(result<0)
                 return result;
@@ -413,7 +414,7 @@ int QymodemTx::SendY(const char* fileName, size_t size, InStream& in, unsigned t
         result = SendBlock(buffer,sizeof(buffer));
         if(result<0)
                 return result;
-
+        emit Percent(100);
         return 0;
         }
 

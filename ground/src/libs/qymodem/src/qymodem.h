@@ -26,6 +26,8 @@ class QymodemBase: public QThread
 signals:
     void Error(QString,int);
     void Information(QString,int);
+    ///
+    void Percent(int);
 
 protected:
 
@@ -41,7 +43,7 @@ protected:
 
         @return Sum of bytes in data, modulo 256.
         */
-    quint8 Checksum(const char* data, size_t size);
+    quint8 Checksum(const quint8* data, size_t size);
 
     /**
         Calculate CRC for a block of data.
@@ -51,7 +53,7 @@ protected:
 
         @return CRC of data.
         */
-    quint16 CRC16(const char* data, size_t size);
+    quint16 CRC16(const quint8* data, size_t size);
 
     /**
         Update CRC value by accumulating another byte of data.
@@ -107,7 +109,6 @@ protected:
         */
 
     QextSerialPort& Port;
-    int percent;
 };
 
 

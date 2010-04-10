@@ -60,6 +60,20 @@ namespace jafar {
 
 
 				/**
+				 * Selectable LOCAL or REMOTE pose constructor.
+				 * Creates a sensor with the pose indexed in a map.
+				 * \param _rob the robot
+				 * \param inFilter flag indicating if the sensor state is part of the filter (REMOTE).
+				 */
+				SensorAbstract(const robot_ptr_t & _robPtr, const bool inFilter);
+
+				/**
+				 * Mandatory virtual destructor.
+				 */
+				virtual ~SensorAbstract() {
+				}
+
+				/**
 				 * Parent robot
 				 */
 				robot_ptr_t robotPtr;
@@ -93,20 +107,6 @@ namespace jafar {
 
 			public:
 
-
-				/**
-				 * Selectable LOCAL or REMOTE pose constructor.
-				 * Creates a sensor with the pose indexed in a map.
-				 * \param _rob the robot
-				 * \param inFilter flag indicating if the sensor state is part of the filter (REMOTE).
-				 */
-				SensorAbstract(const robot_ptr_t & _robPtr, const bool inFilter);
-
-				/**
-				 * Mandatory virtual destructor.
-				 */
-				virtual ~SensorAbstract() {
-				}
 
 				void linkToObservation(const observation_ptr_t & _obsPtr); ///< Link to observation
 				void linkToRobot(const robot_ptr_t & _robPtr); ///<             Link to robot

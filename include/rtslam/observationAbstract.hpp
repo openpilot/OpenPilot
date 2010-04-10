@@ -168,6 +168,14 @@ namespace jafar {
 				 */
 				virtual void backProject_func() = 0;
 
+				/**
+				 * Compute innovation from measurement and expectation.
+				 *
+				 * This is the trivial innovation function  inn = meas - exp.
+				 * Derive the class and overload this method to use other, non-trivial innovation functions.
+				 */
+				void computeInnovation();
+
 		};
 
 	}

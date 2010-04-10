@@ -79,6 +79,7 @@ namespace jafar {
 				map_ptr_t mapPtr; ///<                                   Parent map
 				observations_ptr_set_t observationsPtrSet; ///<                 A set of observations (one per sensor)
 
+				// TODO use a smart pointer here.
 				DescriptorAbstract descriptor; ///<                       Landmark descriptor
 
 				void linkToObservation(const observation_ptr_t & _obsPtr); ///<   Link to observation

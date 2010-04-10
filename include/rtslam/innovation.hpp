@@ -60,55 +60,13 @@ namespace jafar {
 				/**
 				 * the inverse of the innovation covariance.
 				 */
-				void invertCov() {
-					jafar::jmath::ublasExtra::lu_inv(P(), iP_);
-				}
+				void invertCov();
 
 
 				/**
 				 * The Mahalanobis distance.
 				 */
-				double mahalanobis() {
-					invertCov();
-					mahalanobis_ = ublas::inner_prod(x(), (jblas::vec) ublas::prod(iP_, x()));
-					return mahalanobis_;
-				}
-
-
-				/**
-				 * The trivial innovation function  inn = meas - exp.
-				 * Derive the class and overload this method to use other, non-trivial innovation functions.
-				 * \param exp_mean the expectation mean
-				 * \param meas_mean the measurement mean
-				 */
-				template<class V1, class V2>
-				void compute(V1& exp_mean, V2& meas_mean) {
-					x() = meas_mean - exp_mean;
-				}
-
-
-				/**
-				 * The trivial innovation function inn = meas - exp.
-				 * It updates the Jacobian matrices.
-				 * Derive the class and overload this method to use other, non-trivial innovation functions.
-				 * \param exp_mean the expectation mean
-				 * \param meas_mean the measurement mean
-				 */
-				template<class V1, class V2, class MI_m, class MI_e>
-				void compute(V1& exp_mean, V2& meas_mean, MI_m & INN_meas, MI_e & INN_exp) {
-					compute(exp_mean, meas_mean);
-					INN_meas = jblas::identity_mat(exp_mean.size());
-					INN_exp = -1.0 * jblas::identity_mat(exp_mean.size());
-				}
-
-
-				/**
-				 * Compute full innovation, with covariances matrix.
-				 * Derive the class and overload this method to use other, non-trivial innovation functions.
-				 * \param exp the expectation object
-				 * \param meas the measurement object
-				 */
-				void compute(Expectation& exp, Measurement& meas);
+				double mahalanobis();
 
 		};
 

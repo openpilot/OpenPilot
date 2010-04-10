@@ -67,5 +67,11 @@ namespace jafar {
 			    ia_rsl), EXP_rsl);
 		}
 
+		void ObservationAbstract::computeInnovation(){
+			innovation.x() = measurement.x() - expectation.x();
+			innovation.P() = measurement.P() + expectation.P();
+		}
+
+
 	} // namespace rtslam
 } // namespace jafar

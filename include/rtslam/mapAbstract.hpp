@@ -53,6 +53,16 @@ namespace jafar {
 			public:
 
 				/**
+				 * Constructor
+				 */
+				MapAbstract(size_t _max_size);
+
+				/**
+				 * Mandatory virtual destructor - Map is used as-is, non-abstract by now
+				 */
+				 inline virtual ~MapAbstract(){}
+
+				/**
 				 * A set of robots
 				 */
 				robots_ptr_set_t robotsPtrSet;
@@ -72,16 +82,6 @@ namespace jafar {
 				size_t max_size;
 				size_t current_size;
 				jblas::vecb used_states;
-
-				/**
-				 * Constructor
-				 */
-				MapAbstract(size_t _max_size);
-
-				/**
-				 * Mandatory virtual destructor - Map is used as-is, non-abstract by now
-				 */
-				 inline virtual ~MapAbstract(){}
 
 				/**
 				 * Map's indirect array is a function by now.

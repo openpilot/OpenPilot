@@ -96,11 +96,13 @@ namespace jafar {
 				 * EKF correction.
 				 * This function uses the Innovation class to extract all useful chunks necessary for EKF correction.
 				 * In partucular, the following info is recovered from Innovation:
-				 * - INN_rsl: the Jacobian wrt the states that contributed to the innovation
-				 * - ia: the indices to these states
 				 * - {z, Z} = {inn.x, inn.P}, mean and conv. matrices.
 				 *
-				 * the EKF update is then the following:
+				 * Also, the Jacobian and indirect-array associated to the innovation:
+				 * - INN_rsl: the Jacobian wrt the states that contributed to the innovation
+				 * - ia: the indices to these states
+				 *
+				 * The EKF update is then the following:
 				 * - K = -P * trans(INN_rsl) * inv(Z)
 				 * - x = x + K * z
 				 * - P = P - K * INN_rsl * P

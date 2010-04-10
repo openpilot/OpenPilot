@@ -54,7 +54,7 @@
      </column>
      <column>
       <property name="text">
-       <string>Vendor</string>
+       <string>Developer</string>
       </property>
      </column>
      <column>

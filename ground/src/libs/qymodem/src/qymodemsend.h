@@ -20,6 +20,11 @@
 #include <QString>
 #include <QFile>
 
+#ifdef Q_OS_WIN
+#define _DEVICE_SET_ QIODevice::ReadWrite|QIODevice::Unbuffered
+#else
+#define _DEVICE_SET_ QIODevice::ReadWrite
+#endif
 
 class QymodemSend:public QymodemTx
 {

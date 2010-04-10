@@ -160,7 +160,7 @@ int QymodemSend::SendFile(QString filename)
         emit Error("File not found",QymodemSend::ErrorFileNotFound);
         return QymodemSend::ErrorFileNotFound;
     }
-    if(!Port.open(QIODevice::ReadWrite))
+    if(!Port.open(_DEVICE_SET_))
     {
         emit Error("Could not open port",QymodemSend::ErrorCoulNotOpenPort);
         return QymodemSend::ErrorCoulNotOpenPort;
@@ -194,7 +194,7 @@ void QymodemSend::run()
         emit Error("File not found",QymodemSend::ErrorFileNotFound);
         return;
     }
-    if(!Port.open(QIODevice::ReadWrite))
+    if(!Port.open(_DEVICE_SET_))
     {
         emit Error("Could not open port",QymodemSend::ErrorCoulNotOpenPort);
         return;

@@ -79,7 +79,7 @@ int QymodemTx::SendInitialise(unsigned timeout)
         int c;
         for(;;)
                 {
-                const unsigned timeoutStep = 1000;
+                const unsigned timeoutStep = 100;
                 c = InChar(timeoutStep);
                 if(c=='G')
                         {

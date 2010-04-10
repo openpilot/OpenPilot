@@ -10,8 +10,8 @@ SOURCES += main.cpp
 include(../rpath.pri)
 
 win32 {
-    CONFIG(debug, debug|release):LIBS *= -lExtensionSystemd -lAggregationd
-    else:LIBS *= -lExtensionSystem -lAggregation
+    CONFIG(debug, debug|release):LIBS *= -lExtensionSystemd -lAggregationd  -lQExtSerialPortd
+    else:LIBS *= -lExtensionSystem -lAggregation -lQExtSerialPort
 
     RC_FILE = openpilotgcs.rc
     target.path = /bin

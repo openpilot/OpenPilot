@@ -36,7 +36,7 @@
 #include <ddk/hidsdi.h>
 #include <ddk/hidclass.h>
 
-#define printf //qDebug
+#define printf qDebug
 
 typedef struct hid_struct hid_t;
 struct hid_struct {
@@ -167,7 +167,7 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
 int pjrc_rawhid::receive(int num, void *buf, int len, int timeout)
 {
         hid_t *hid;
-        unsigned char tmpbuf[516];
+        unsigned char tmpbuf[516]={0};
         OVERLAPPED ov;
         DWORD n, r;
 
@@ -213,11 +213,11 @@ return_error:
 int pjrc_rawhid::send(int num, void *buf, int len, int timeout)
 {
         hid_t *hid;
-        unsigned char tmpbuf[516];
+        unsigned char tmpbuf[64]={0};
         OVERLAPPED ov;
         DWORD n, r;
 
-        if (sizeof(tmpbuf) < len + 1) return -1;
+        if (sizeof(tmpbuf) < (len + 1)) return -1;
         hid = get_hid(num);
         if (!hid || !hid->open) return -1;
         EnterCriticalSection(&tx_mutex);
@@ -226,7 +226,7 @@ int pjrc_rawhid::send(int num, void *buf, int len, int timeout)
         ov.hEvent = tx_event;
         tmpbuf[0] = 0;
         memcpy(tmpbuf + 1, buf, len);
-        if (!WriteFile(hid->handle, tmpbuf, len + 1, NULL, &ov)) {
+        if (!WriteFile(hid->handle, tmpbuf, 64, NULL, &ov)) {
                 if (GetLastError() != ERROR_IO_PENDING) goto return_error;
                 r = WaitForSingleObject(tx_event, timeout);
                 if (r == WAIT_TIMEOUT) goto return_timeout;
@@ -343,9 +343,12 @@ static void hid_close(hid_t *hid)
 static void print_win32_err(void)
 {
         char buf[256];
+        char temp[256];
         DWORD err;
 
         err = GetLastError();
-        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, (WCHAR*)buf, sizeof(buf), NULL);
-        printf("err %ld: %s\n", err, buf);
+        //FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, (WCHAR*)buf, sizeof(buf), NULL);
+        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, MAKELANGID(LANG_ENGLISH, SUBLANG_DEFAULT), (WCHAR*)buf, sizeof(buf), NULL);
+        WideCharToMultiByte( CP_ACP, 0, (WCHAR*)buf, sizeof(buf), temp, sizeof(temp), NULL, NULL );
+        printf("err %ld: %s\n", err, temp);
 }

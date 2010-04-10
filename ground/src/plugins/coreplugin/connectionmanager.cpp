@@ -37,6 +37,8 @@
 #include "fancytabwidget.h"
 #include "fancyactionbar.h"
 #include "mainwindow.h"
+#include "qextserialport/src/qextserialenumerator.h"
+#include "qextserialport/src/qextserialport.h"
 
 #include <QDebug>
 #include <QLabel>
@@ -137,7 +139,23 @@ void ConnectionManager::onConnectPressed()
         if(m_connectionDevice.connection)
         {
             QIODevice *ioDev = m_connectionDevice.connection->openDevice(m_connectionDevice.devName);
-
+            /*QextSerialPort *ioDev = new QextSerialPort("COM5");
+            ioDev->setBaudRate(BAUD57600);
+            ioDev->setFlowControl(FLOW_OFF);*/
+            ioDev->open(QIODevice::ReadWrite);
+            /*if(ioDev->isOpen())
+                ioDev->putChar('M');*/
+            QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
+            qDebug() << "List of ports:";
+            for (int i = 0; i < ports.size(); i++) {
+                qDebug() << "port name:" << ports.at(i).portName;
+                qDebug() << "friendly name:" << ports.at(i).friendName;
+                qDebug() << "physical name:" << ports.at(i).physName;
+                qDebug() << "enumerator name:" << ports.at(i).enumName;
+                qDebug() << "vendor ID:" << QString::number(ports.at(i).vendorID, 16);
+                qDebug() << "product ID:" << QString::number(ports.at(i).productID, 16);
+                qDebug() << "===================================";
+            }
             if(ioDev)
             {
                 emit deviceConnected(ioDev);

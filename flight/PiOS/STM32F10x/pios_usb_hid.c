@@ -86,7 +86,7 @@ static volatile uint8_t rx_buffer_new_data_ctr = 0;
 static volatile uint8_t rx_buffer_ix;
 static uint8_t transfer_possible = 0;
 
-static uint8_t rx_buffer[PIOS_USB_HID_DATA_LENGTH];
+static uint8_t rx_buffer[PIOS_USB_HID_DATA_LENGTH] = {0};
 
 /**
 * Initialises USB COM layer
@@ -196,10 +196,10 @@ int32_t PIOS_USB_HID_RxBufferGet(void)
 
 	/* This stops returning bytes after the first occurrence of '\0' */
 	/* We don't need to do this but it does optimise things quite a bit */
-	if(rx_buffer[rx_buffer_ix] == 0) {
+	//if(rx_buffer[rx_buffer_ix] == 0) {
 		/* TODO: Evaluate if this is really needed */
 		/* Clean the buffer */
-		for(uint8_t i = 0; i < PIOS_USB_HID_DATA_LENGTH; i++) {
+		/*for(uint8_t i = 0; i < PIOS_USB_HID_DATA_LENGTH; i++) {
 			rx_buffer[i] = 0;
 		}
 
@@ -207,7 +207,7 @@ int32_t PIOS_USB_HID_RxBufferGet(void)
 		rx_buffer_ix = 0;
 		SetEPRxStatus(ENDP1, EP_RX_VALID);
 		return -1;
-	}
+	}*/
 
 	/* There is still data in the buffer */
 	uint8_t b = rx_buffer[rx_buffer_ix++];

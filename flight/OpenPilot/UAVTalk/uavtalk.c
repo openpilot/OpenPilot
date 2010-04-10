@@ -194,7 +194,8 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
         if (rxCount == 4)
         {
             // Search for object, if not found reset state machine
-            objId = (tmpBuffer[3] << 24) | (tmpBuffer[2] << 16) | (tmpBuffer[1] << 8) | (tmpBuffer[0]);
+            //objId = (tmpBuffer[3] << 24) | (tmpBuffer[2] << 16) | (tmpBuffer[1] << 8) | (tmpBuffer[0]);
+            objId = (tmpBuffer[0] << 24) | (tmpBuffer[1] << 16) | (tmpBuffer[2] << 8) | (tmpBuffer[3]);
             obj = UAVObjGetByID(objId);
             if (obj == 0)
             {
@@ -275,7 +276,7 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
         tmpBuffer[rxCount++] = rxbyte;
         if (rxCount == 2)
         {
-            csRx = (tmpBuffer[1] << 8) | (tmpBuffer[0]);
+            csRx = (tmpBuffer[0] << 8) | (tmpBuffer[1]);
             if (csRx == cs)
             {
                 xSemaphoreTakeRecursive(lock, portMAX_DELAY);
@@ -288,7 +289,6 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
     default:
         state = STATE_SYNC;
     }
-
     // Done
     return 0;
 }
@@ -504,7 +504,8 @@ static int32_t sendSingleObject(UAVObjHandle obj, uint16_t instId, uint8_t type)
     txBuffer[dataOffset+length+1] = (uint8_t)((cs >> 8) & 0xFF);
 
     // Send buffer
-    if (outStream!=NULL) (*outStream)(txBuffer, dataOffset+length+CHECKSUM_LENGTH);
+    if (outStream!=NULL)
+    	(*outStream)(txBuffer, dataOffset+length+CHECKSUM_LENGTH);
 
     // Done
     return 0;

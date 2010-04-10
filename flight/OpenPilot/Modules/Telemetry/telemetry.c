@@ -153,12 +153,14 @@ static void telemetryTask(void* parameters)
 	UAVObjMetadata metadata;
 	int32_t retries;
 	int32_t success;
+	PIOS_COM_SendFormattedStringNonBlocking(telemetryPort, "sendtest");
 
 	// Loop forever
 	while(1)
 	{
+//		PIOS_LED_Toggle(LED2);
 		// Wait for queue message
-		if(xQueueReceive(queue, &ev, portMAX_DELAY) == pdTRUE)
+		if(xQueueReceive(queue, &ev, 0) == pdTRUE)
 		{
 			// Get object metadata
 			UAVObjGetMetadata(ev.obj, &metadata);
@@ -191,14 +193,26 @@ static void telemetryTask(void* parameters)
 		}
 
 		/* This blocks the task until there is something on the buffer */
-		if(PIOS_COM_ReceiveBufferUsed(telemetryPort) > 0)
+		uint8_t bytes = PIOS_COM_ReceiveBufferUsed(telemetryPort);
+		if(bytes > 0)
 		{
-			UAVTalkProcessInputStream(PIOS_COM_ReceiveBuffer(telemetryPort));
+			PIOS_LED_Toggle(LED2);
+			uint8_t c=PIOS_COM_ReceiveBuffer(telemetryPort);
+			UAVTalkProcessInputStream(c);
+			//PIOS_COM_SendFormattedStringNonBlocking(COM_USART1, "%c", c);
 		}
 		else if(PIOS_COM_ReceiveBufferUsed(COM_USB_HID) > 0)
 		{
-			UAVTalkProcessInputStream(PIOS_COM_ReceiveBuffer(COM_USB_HID));
+			PIOS_LED_Toggle(LED2);
+			//UAVTalkProcessInputStream(PIOS_COM_ReceiveBuffer(COM_USB_HID));
+			uint8_t c=PIOS_COM_ReceiveBuffer(COM_USB_HID);
+			if(c!=255)
+			{
+				PIOS_COM_SendCharNonBlocking(COM_USART1, c);
+				UAVTalkProcessInputStream(c);
+			}
 		}
+		//vTaskDelay(200 / portTICK_RATE_MS);
 	}
 }
 

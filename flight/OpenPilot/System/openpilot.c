@@ -111,10 +111,11 @@ int main()
 
 	/* Create a FreeRTOS task */
 	xTaskCreate(TaskTick, (signed portCHAR *)"Test", configMINIMAL_STACK_SIZE , NULL, 1, NULL);
-	xTaskCreate(TaskTesting, (signed portCHAR *)"TaskTesting", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
+	//xTaskCreate(TaskTesting, (signed portCHAR *)"TaskTesting", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
 	//xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
 	//xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
 	//GpsInitialize();
+	TelemetryInitialize();
 
 	/* Start the FreeRTOS scheduler */
 	vTaskStartScheduler();
@@ -142,12 +143,12 @@ static void TaskTick(void *pvParameters)
 
 	for(;;)
 	{
-		/*
-		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"utc: %s alt:%d\r\n",GpsInfo.TimeOfFix,(int)GpsInfo.alt);
+
+		/*PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"utc: %s alt:%d\r\n",GpsInfo.TimeOfFix,(int)GpsInfo.alt);
 		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"lat: %d lon: %d\r\n",(long)(GpsInfo.lat*10000),(long)(GpsInfo.lon*10000));
-		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"SV: %d\r\n",GpsInfo.numSVs);
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"SV: %d Updates: %d\r\n",GpsInfo.numSVs,GpsInfo.updates);
 		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"Heading: %s Speed: %s\r\n",GpsInfo.heading,GpsInfo.speed);
-		*/
+*/
 		PIOS_LED_Toggle(LED1);
 		vTaskDelayUntil(&xLastExecutionTime, 1000 / portTICK_RATE_MS);
 	}

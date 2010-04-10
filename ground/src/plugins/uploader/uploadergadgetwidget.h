@@ -68,6 +68,7 @@ private:
      QymodemSend * Ymodem;
      QProgressBar *progressBar;
      QTimer *timer;
+     int percent;
 
 private slots:
     void setOpenFileName();
@@ -75,6 +76,7 @@ private slots:
     void error(QString errorString,int errorNumber);
     void info(QString infoString,int infoNumber);
     void updatePerc();
+    void updatePercSlot(int);
 };
 
 #endif // UPLOADERGADGETWIDGET_H

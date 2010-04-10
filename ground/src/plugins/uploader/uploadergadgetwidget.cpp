@@ -78,18 +78,17 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
 
 void UploaderGadgetWidget::updatePerc()
 {
-    if(Ymodem->isRunning())
+    if(!Ymodem->isRunning())
     {
-        progressBar->setValue(Ymodem->PercentSend());
+         timer->stop();
     }
-    else
-        timer->stop();
+    progressBar->setValue(percent);
 }
 
 void UploaderGadgetWidget::send()
 {
     Ymodem->SendFileT(openFileNameLE->text());
-    timer->start();
+    timer->start(500);
 }
 
 UploaderGadgetWidget::~UploaderGadgetWidget()
@@ -106,8 +105,14 @@ void UploaderGadgetWidget::setPort(QextSerialPort* port)
             ,this,SLOT(error(QString,int)));
     connect(Ymodem,SIGNAL(Information(QString,int)),
             this,SLOT(info(QString,int)));
+    connect(Ymodem,SIGNAL(Percent(int)),
+            this,SLOT(updatePercSlot(int)));
 }
 
+void UploaderGadgetWidget::updatePercSlot(int i)
+{
+    percent=i;
+}
 
 void UploaderGadgetWidget::setOpenFileName()
 {

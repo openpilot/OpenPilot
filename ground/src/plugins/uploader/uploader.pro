@@ -8,7 +8,7 @@ HEADERS += uploadergadget.h \
     uploadergadgetoptionspage.h \
     uploadergadgetwidget.h \
     uploaderplugin.h
-SOURCES += uploaderGadget.cpp \
+SOURCES += uploadergadget.cpp \
     uploadergadgetconfiguration.cpp \
     uploadergadgetfactory.cpp \
     uploadergadgetoptionspage.cpp \

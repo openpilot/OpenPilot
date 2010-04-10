@@ -41,7 +41,40 @@ UploaderGadgetOptionsPage::UploaderGadgetOptionsPage(UploaderGadgetConfiguration
         IOptionsPage(parent),
         m_config(config)
 {
-#ifdef _TTY_POSIX_
+#ifdef Q_OS_WIN
+
+    BaudRateTypeString
+            <<"BAUD110"
+            <<"BAUD300"
+            <<"BAUD600"
+            <<"BAUD1200"
+            <<"BAUD2400"
+            <<"BAUD4800"
+            <<"BAUD9600"
+            <<"BAUD14400"
+            <<"BAUD19200"
+            <<"BAUD38400"
+            <<"BAUD56000"
+            <<"BAUD57600"
+            <<"BAUD115200"
+            <<"BAUD128000"
+            <<"BAUD256000";
+    DataBitsTypeString
+            <<"DATA_5"
+            <<"DATA_6"
+            <<"DATA_7"
+            <<"DATA_8";
+    ParityTypeString
+            <<"PAR_NONE"
+            <<"PAR_ODD"
+            <<"PAR_EVEN"
+            <<"PAR_MARK"               //WINDOWS ONLY
+            <<"PAR_SPACE";
+    StopBitsTypeString
+            <<"STOP_1"
+            <<"STOP_1_5"               //WINDOWS ONLY
+            <<"STOP_2";
+#else
     BaudRateTypeString
 
             <<"BAUD50"                //POSIX ONLY
@@ -74,38 +107,6 @@ UploaderGadgetOptionsPage::UploaderGadgetOptionsPage(UploaderGadgetConfiguration
             <<"PAR_SPACE";
     StopBitsTypeString
             <<"STOP_1"
-            <<"STOP_2";
-#else
-    BaudRateTypeString
-            <<"BAUD110"
-            <<"BAUD300"
-            <<"BAUD600"
-            <<"BAUD1200"
-            <<"BAUD2400"
-            <<"BAUD4800"
-            <<"BAUD9600"
-            <<"BAUD14400"
-            <<"BAUD19200"
-            <<"BAUD38400"
-            <<"BAUD56000"
-            <<"BAUD57600"
-            <<"BAUD115200"
-            <<"BAUD128000"
-            <<"BAUD256000";
-    DataBitsTypeString
-            <<"DATA_5"
-            <<"DATA_6"
-            <<"DATA_7"
-            <<"DATA_8";
-    ParityTypeString
-            <<"PAR_NONE"
-            <<"PAR_ODD"
-            <<"PAR_EVEN"
-            <<"PAR_MARK"               //WINDOWS ONLY
-            <<"PAR_SPACE";
-    StopBitsTypeString
-            <<"STOP_1"
-            <<"STOP_1_5"               //WINDOWS ONLY
             <<"STOP_2";
 #endif
 
@@ -232,6 +233,7 @@ QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
     label = new QLabel("TimeOut(ms):");
     m_timeoutSpin = new QSpinBox();
     m_timeoutSpin->setMaximum(100000);
+    m_timeoutSpin->setMinimumSize(200,22);
     timeoutLayout->addWidget(label);
     timeoutLayout->addWidget(m_timeoutSpin);
 
@@ -256,9 +258,16 @@ QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
 
     QList<QextPortInfo> ports =QextSerialEnumerator ::getPorts();
     qSort(ports.begin(), ports.end());
+#ifdef Q_OS_WIN
+    for (int i = 0; i < ports.size(); i++) {
+        m_portCB->addItem((QString)ports.at(i).portName.toLocal8Bit().constData());
+    }
+#else
     for (int i = 0; i < ports.size(); i++) {
         m_portCB->addItem((QString)ports.at(i).physName.toLocal8Bit().constData());
     }
+#endif
+
     if(m_portCB->findText(m_config->Port())!=-1){
         m_portCB->setCurrentIndex(m_portCB->findText(m_config->Port()));
     }

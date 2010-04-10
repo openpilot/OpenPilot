@@ -75,6 +75,8 @@ OPTESTS  = ./Tests
 OPMODULEDIR = ./Modules
 MODEXAMPLE = $(OPMODULEDIR)/Example
 MODEXAMPLEINC = $(MODEXAMPLE)/inc
+MODSYSTEM = $(OPMODULEDIR)/System
+MODSYSTEMINC = $(MODSYSTEM)/inc
 MODTELEMETRY = $(OPMODULEDIR)/Telemetry
 MODTELEMETRYINC = $(MODTELEMETRY)/inc
 MODGPS = $(OPMODULEDIR)/GPS
@@ -106,6 +108,7 @@ DOXYGENDIR = ../Doc/Doxygen
 
 ## MODULES
 SRC = $(MODEXAMPLE)/examplemodevent.c $(MODEXAMPLE)/examplemodperiodic.c $(MODEXAMPLE)/examplemodthread.c
+SRC = $(MODSYSTEM)/systemmod.c
 SRC +=  $(MODTELEMETRY)/telemetry.c
 SRC += $(MODGPS)/GPS.c $(MODGPS)/buffer.c
 
@@ -130,6 +133,7 @@ SRC += $(OPUAVOBJ)/eventdispatcher.c
 SRC += $(OPUAVOBJ)/exampleobject1.c
 SRC += $(OPUAVOBJ)/exampleobject2.c
 SRC += $(OPUAVOBJ)/examplesettings.c
+SRC += $(OPUAVOBJ)/settingspersistence.c
 
 ## PIOS Hardware (STM32F10x)
 SRC += $(PIOSSTM32F10X)/pios_sys.c
@@ -245,6 +249,7 @@ EXTRAINCDIRS  += $(OPUAVOBJ)
 EXTRAINCDIRS  += $(OPUAVOBJINC)
 EXTRAINCDIRS  += $(MODEXAMPLE)
 EXTRAINCDIRS  += $(MODEXAMPLEINC)
+EXTRAINCDIRS  += $(MODSYSTEMINC)
 EXTRAINCDIRS  += $(MODTELEMETRY)
 EXTRAINCDIRS  += $(MODTELEMETRYINC)
 EXTRAINCDIRS  += $(MODGPS)

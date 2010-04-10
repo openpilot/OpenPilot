@@ -663,6 +663,67 @@ int32_t UAVObjLoad(UAVObjHandle obj, uint16_t instId)
 	return 0;
 }
 
+/**
+ * Save all settings objects to the SD card.
+ * @return 0 if success or -1 if failure
+ */
+int32_t UAVObjSaveSettings()
+{
+	ObjectList* objEntry;
+
+	// Get lock
+	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+
+	// Save all settings objects
+	LL_FOREACH(objList, objEntry)
+	{
+		// Check if this is a settings object
+		if ( objEntry->isSettings )
+		{
+			// Save object
+			if ( UAVObjSave( (UAVObjHandle)objEntry, 0 ) == -1 )
+			{
+				xSemaphoreGiveRecursive(mutex);
+				return -1;
+			}
+		}
+	}
+
+	// Done
+	xSemaphoreGiveRecursive(mutex);
+	return 0;
+}
+
+/**
+ * Load all settings objects from the SD card.
+ * @return 0 if success or -1 if failure
+ */
+int32_t UAVObjLoadSettings()
+{
+	ObjectList* objEntry;
+
+	// Get lock
+	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+
+	// Load all settings objects
+	LL_FOREACH(objList, objEntry)
+	{
+		// Check if this is a settings object
+		if ( objEntry->isSettings )
+		{
+			// Load object
+			if ( UAVObjLoad( (UAVObjHandle)objEntry, 0 ) == -1 )
+			{
+				xSemaphoreGiveRecursive(mutex);
+				return -1;
+			}
+		}
+	}
+
+	// Done
+	xSemaphoreGiveRecursive(mutex);
+	return 0;
+}
 
 /**
  * Set the object data

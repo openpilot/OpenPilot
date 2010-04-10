@@ -33,6 +33,7 @@
 #include "exampleobject1.h"
 #include "exampleobject2.h"
 #include "examplesettings.h"
+#include "settingspersistence.h"
 
 
 /**
@@ -44,5 +45,6 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new ExampleObject1() );
     objMngr->registerObject( new ExampleObject2() );
     objMngr->registerObject( new ExampleSettings() );
+    objMngr->registerObject( new SettingsPersistence() );
 
 }

@@ -30,6 +30,7 @@
 
 #include <QtGui/QWidget>
 #include <QtGui/QTreeView>
+#include "uavobjects/settingspersistence.h"
 
 class QPushButton;
 class Ui_UAVObjectBrowser;
@@ -47,6 +48,8 @@ private slots:
    void sendUpdate();
    void requestUpdate();
    void showMetaData(bool show);
+   void saveSettings();
+   void readSettings();
 
 
 private:
@@ -54,6 +57,8 @@ private:
    QPushButton *m_sendUpdate;
    Ui_UAVObjectBrowser *m_browser;
    QAbstractItemModel *m_model;
+
+   void updateSettings(SettingsPersistence::OperationEnum op);
 };
 
 #endif /* UAVOBJECTBROWSERWIDGET_H_ */

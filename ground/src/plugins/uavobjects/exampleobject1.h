@@ -33,8 +33,10 @@
 
 #include "uavdataobject.h"
 
-class ExampleObject1: public UAVDataObject
+class UAVOBJECTS_EXPORT ExampleObject1: public UAVDataObject
 {
+    Q_OBJECT
+
 public:
     // Field structure
     typedef struct {
@@ -50,7 +52,7 @@ public:
     } __attribute__((packed)) DataFields;
 
     // Enumeration types
-    typedef enum { FIELD8_OPTION1=0, FIELD8_OPTION2=1,  } FIELD8Enum;
+    typedef enum { FIELD8_OPTION1=0, FIELD8_OPTION2=1,  } Field8Enum;
 
   
     // Constants

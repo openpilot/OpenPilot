@@ -22,7 +22,8 @@ HEADERS += uavobjects_global.h \
     uavobjectfielduint8.h \
     uavobjectfielduint16.h \
     uavobjectfielduint32.h \
-    uavobjectfields.h
+    uavobjectfields.h \
+    settingspersistence.h
 SOURCES += uavobject.cpp \
     uavmetaobject.cpp \
     uavobjectmanager.cpp \
@@ -41,6 +42,7 @@ SOURCES += uavobject.cpp \
     uavobjectfieldfloat.cpp \
     uavobjectfielduint8.cpp \
     uavobjectfielduint16.cpp \
-    uavobjectfielduint32.cpp
+    uavobjectfielduint32.cpp \
+    settingspersistence.cpp
 DEFINES += UAVOBJECTS_LIBRARY
 OTHER_FILES += UAVObjects.pluginspec

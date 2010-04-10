@@ -673,7 +673,7 @@ bool UAVObjectParser::generateGCSObject(int objIndex, const QString& templateInc
 
             }
             enums.append( QString(" } %1Enum;\n")
-                          .arg( info->fields[n]->name.toUpper() ) );
+                          .arg( info->fields[n]->name ) );
         }
     }
     outInclude.replace(QString("$(DATAENUM)"), enums);

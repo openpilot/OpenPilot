@@ -28,6 +28,7 @@
 #include "uavobjecttreemodel.h"
 #include "browseritemdelegate.h"
 #include "ui_uavobjectbrowser.h"
+#include "uavobjects/uavobjectmanager.h"
 #include <QStringList>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>
@@ -35,6 +36,7 @@
 #include <QtGui/QComboBox>
 #include <QtCore/QDebug>
 #include <QtGui/QItemEditorFactory>
+#include "extensionsystem/pluginmanager.h"
 
 UAVObjectBrowserWidget::UAVObjectBrowserWidget(QWidget *parent) : QWidget(parent)
 {
@@ -50,6 +52,8 @@ UAVObjectBrowserWidget::UAVObjectBrowserWidget(QWidget *parent) : QWidget(parent
     m_browser->treeView->setEditTriggers(QAbstractItemView::AllEditTriggers);
     connect(m_browser->metaCheckBox, SIGNAL(toggled(bool)), this, SLOT(showMetaData(bool)));
     showMetaData(m_browser->metaCheckBox->isChecked());
+    connect(m_browser->saveSDButton, SIGNAL(clicked()), this, SLOT(saveSettings()));
+    connect(m_browser->readSDButton, SIGNAL(clicked()), this, SLOT(readSettings()));
 }
 
 UAVObjectBrowserWidget::~UAVObjectBrowserWidget()
@@ -79,4 +83,27 @@ void UAVObjectBrowserWidget::requestUpdate()
 
 }
 
+void UAVObjectBrowserWidget::saveSettings()
+{
+    updateSettings(SettingsPersistence::OPERATION_SAVE);
+}
+
+void UAVObjectBrowserWidget::readSettings()
+{
+    updateSettings(SettingsPersistence::OPERATION_LOAD);
+}
+
+void UAVObjectBrowserWidget::updateSettings(SettingsPersistence::OperationEnum op)
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    SettingsPersistence* obj = dynamic_cast<SettingsPersistence*>( objManager->getObject(SettingsPersistence::NAME) );
+    if (obj != NULL)
+    {
+        SettingsPersistence::DataFields data;
+        data.Operation = op;
+        obj->setData(data);
+        obj->updated();
+    }
+}
 

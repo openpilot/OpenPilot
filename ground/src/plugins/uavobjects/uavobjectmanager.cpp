@@ -220,7 +220,7 @@ QList <QList<UAVMetaObject*> > UAVObjectManager::getMetaObjects()
  * Get a specific object given its name and instance ID
  * @returns The object is found or NULL if not
  */
-UAVObject* UAVObjectManager::getObject(QString& name, quint32 instId)
+UAVObject* UAVObjectManager::getObject(const QString& name, quint32 instId)
 {
     return getObject(&name, 0, instId);
 }
@@ -237,7 +237,7 @@ UAVObject* UAVObjectManager::getObject(quint32 objId, quint32 instId)
 /**
  * Helper function for the public getObject() functions.
  */
-UAVObject* UAVObjectManager::getObject(QString* name, quint32 objId, quint32 instId)
+UAVObject* UAVObjectManager::getObject(const QString* name, quint32 objId, quint32 instId)
 {
     QMutexLocker locker(mutex);
     // Check if this object type is already in the list
@@ -266,7 +266,7 @@ UAVObject* UAVObjectManager::getObject(QString* name, quint32 objId, quint32 ins
 /**
  * Get all the instances of the object specified by name
  */
-QList<UAVObject*> UAVObjectManager::getObjectInstances(QString& name)
+QList<UAVObject*> UAVObjectManager::getObjectInstances(const QString& name)
 {
     return getObjectInstances(&name, 0);
 }
@@ -282,7 +282,7 @@ QList<UAVObject*> UAVObjectManager::getObjectInstances(quint32 objId)
 /**
  * Helper function for the public getObjectInstances()
  */
-QList<UAVObject*> UAVObjectManager::getObjectInstances(QString* name, quint32 objId)
+QList<UAVObject*> UAVObjectManager::getObjectInstances(const QString* name, quint32 objId)
 {
     QMutexLocker locker(mutex);
     // Check if this object type is already in the list
@@ -304,7 +304,7 @@ QList<UAVObject*> UAVObjectManager::getObjectInstances(QString* name, quint32 ob
 /**
  * Get the number of instances for an object given its name
  */
-qint32 UAVObjectManager::getNumInstances(QString& name)
+qint32 UAVObjectManager::getNumInstances(const QString& name)
 {
     return getNumInstances(&name, 0);
 }
@@ -320,7 +320,7 @@ qint32 UAVObjectManager::getNumInstances(quint32 objId)
 /**
  * Helper function for public getNumInstances
  */
-qint32 UAVObjectManager::getNumInstances(QString* name, quint32 objId)
+qint32 UAVObjectManager::getNumInstances(const QString* name, quint32 objId)
 {
     QMutexLocker locker(mutex);
     // Check if this object type is already in the list

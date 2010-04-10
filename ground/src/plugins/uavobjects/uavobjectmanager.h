@@ -48,11 +48,11 @@ public:
     QList< QList<UAVObject*> > getObjects();
     QList< QList<UAVDataObject*> > getDataObjects();
     QList< QList<UAVMetaObject*> > getMetaObjects();
-    UAVObject* getObject(QString& name, quint32 instId = 0);
+    UAVObject* getObject(const QString& name, quint32 instId = 0);
     UAVObject* getObject(quint32 objId, quint32 instId = 0);
-    QList<UAVObject*> getObjectInstances(QString& name);
+    QList<UAVObject*> getObjectInstances(const QString& name);
     QList<UAVObject*> getObjectInstances(quint32 objId);
-    qint32 getNumInstances(QString& name);
+    qint32 getNumInstances(const QString& name);
     qint32 getNumInstances(quint32 objId);
 
 signals:
@@ -66,9 +66,9 @@ private:
     QMutex* mutex;
 
     void addObject(UAVObject* obj);
-    UAVObject* getObject(QString* name, quint32 objId, quint32 instId);
-    QList<UAVObject*> getObjectInstances(QString* name, quint32 objId);
-    qint32 getNumInstances(QString* name, quint32 objId);
+    UAVObject* getObject(const QString* name, quint32 objId, quint32 instId);
+    QList<UAVObject*> getObjectInstances(const QString* name, quint32 objId);
+    qint32 getNumInstances(const QString* name, quint32 objId);
 };
 
 

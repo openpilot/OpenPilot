@@ -33,8 +33,10 @@
 
 #include "uavdataobject.h"
 
-class ExampleObject2: public UAVDataObject
+class UAVOBJECTS_EXPORT ExampleObject2: public UAVDataObject
 {
+    Q_OBJECT
+
 public:
     // Field structure
     typedef struct {

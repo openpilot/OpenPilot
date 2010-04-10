@@ -16,7 +16,7 @@
 
 #ifndef QYMODEMSEND_H
 #define QYMODEMSEND_H
-#include "qymodem_TX.h"
+#include "qymodem_tx.h"
 #include <QString>
 #include <QFile>
 

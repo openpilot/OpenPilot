@@ -38,120 +38,120 @@
 #include <QStringList>
 #include <qextserialport/src/qextserialenumerator.h>
 UploaderGadgetOptionsPage::UploaderGadgetOptionsPage(UploaderGadgetConfiguration *config, QObject *parent) :
-    IOptionsPage(parent),
-    m_config(config)
+        IOptionsPage(parent),
+        m_config(config)
 {
 #ifdef _TTY_POSIX_
     BaudRateTypeString
 
-        <<"BAUD50"                //POSIX ONLY
-        <<"BAUD75"                //POSIX ONLY
-        <<"BAUD110"
-        <<"BAUD134"               //POSIX ONLY
-        <<"BAUD150"               //POSIX ONLY
-        <<"BAUD200"             //POSIX ONLY
-        <<"BAUD300"
-        <<"BAUD600"
-        <<"BAUD1200"
-        <<"BAUD1800"            //POSIX ONLY
-        <<"BAUD2400"
-        <<"BAUD4800"
-        <<"BAUD9600"
-        <<"BAUD19200"
-        <<"BAUD38400"
-        <<"BAUD57600"
-        <<"BAUD76800"             //POSIX ONLY
-        <<"BAUD115200";
+            <<"BAUD50"                //POSIX ONLY
+            <<"BAUD75"                //POSIX ONLY
+            <<"BAUD110"
+            <<"BAUD134"               //POSIX ONLY
+            <<"BAUD150"               //POSIX ONLY
+            <<"BAUD200"             //POSIX ONLY
+            <<"BAUD300"
+            <<"BAUD600"
+            <<"BAUD1200"
+            <<"BAUD1800"            //POSIX ONLY
+            <<"BAUD2400"
+            <<"BAUD4800"
+            <<"BAUD9600"
+            <<"BAUD19200"
+            <<"BAUD38400"
+            <<"BAUD57600"
+            <<"BAUD76800"             //POSIX ONLY
+            <<"BAUD115200";
     DataBitsTypeString
-        <<"DATA_5"
-        <<"DATA_6"
-        <<"DATA_7"
-        <<"DATA_8";
+            <<"DATA_5"
+            <<"DATA_6"
+            <<"DATA_7"
+            <<"DATA_8";
     ParityTypeString
-        <<"PAR_NONE"
-        <<"PAR_ODD"
-        <<"PAR_EVEN"
-        <<"PAR_SPACE";
+            <<"PAR_NONE"
+            <<"PAR_ODD"
+            <<"PAR_EVEN"
+            <<"PAR_SPACE";
     StopBitsTypeString
-        <<"STOP_1"
-        <<"STOP_2";
+            <<"STOP_1"
+            <<"STOP_2";
 #else
     BaudRateTypeString
-        <<"BAUD110"
-        <<"BAUD300"
-        <<"BAUD600"
-        <<"BAUD1200"
-        <<"BAUD2400"
-        <<"BAUD4800"
-        <<"BAUD9600"
-        <<"BAUD14400"
-        <<"BAUD19200"
-        <<"BAUD38400"
-        <<"BAUD56000"
-        <<"BAUD57600"
-        <<"BAUD115200"
-        <<"BAUD128000"
-        <<"BAUD256000";
+            <<"BAUD110"
+            <<"BAUD300"
+            <<"BAUD600"
+            <<"BAUD1200"
+            <<"BAUD2400"
+            <<"BAUD4800"
+            <<"BAUD9600"
+            <<"BAUD14400"
+            <<"BAUD19200"
+            <<"BAUD38400"
+            <<"BAUD56000"
+            <<"BAUD57600"
+            <<"BAUD115200"
+            <<"BAUD128000"
+            <<"BAUD256000";
     DataBitsTypeString
-        <<"DATA_5"
-        <<"DATA_6"
-        <<"DATA_7"
-        <<"DATA_8";
+            <<"DATA_5"
+            <<"DATA_6"
+            <<"DATA_7"
+            <<"DATA_8";
     ParityTypeString
-        <<"PAR_NONE"
-        <<"PAR_ODD"
-        <<"PAR_EVEN"
-        <<"PAR_MARK"               //WINDOWS ONLY
-        <<"PAR_SPACE";
+            <<"PAR_NONE"
+            <<"PAR_ODD"
+            <<"PAR_EVEN"
+            <<"PAR_MARK"               //WINDOWS ONLY
+            <<"PAR_SPACE";
     StopBitsTypeString
-        <<"STOP_1"
-        <<"STOP_1_5"               //WINDOWS ONLY
-        <<"STOP_2";
+            <<"STOP_1"
+            <<"STOP_1_5"               //WINDOWS ONLY
+            <<"STOP_2";
 #endif
 
     BaudRateTypeStringALL
-        <<"BAUD50"                //POSIX ONLY
-        <<"BAUD75"                //POSIX ONLY
-        <<"BAUD110"
-        <<"BAUD134"               //POSIX ONLY
-        <<"BAUD150"               //POSIX ONLY
-        <<"BAUD200"             //POSIX ONLY
-        <<"BAUD300"
-        <<"BAUD600"
-        <<"BAUD1200"
-        <<"BAUD1800"            //POSIX ONLY
-        <<"BAUD2400"
-        <<"BAUD4800"
-        <<"BAUD9600"
-        <<"BAUD14400"
-        <<"BAUD19200"
-        <<"BAUD38400"
-        <<"BAUD56000"
-        <<"BAUD57600"
-        <<"BAUD76800"             //POSIX ONLY
-        <<"BAUD115200"
-        <<"BAUD128000"
-        <<"BAUD256000";
+            <<"BAUD50"                //POSIX ONLY
+            <<"BAUD75"                //POSIX ONLY
+            <<"BAUD110"
+            <<"BAUD134"               //POSIX ONLY
+            <<"BAUD150"               //POSIX ONLY
+            <<"BAUD200"             //POSIX ONLY
+            <<"BAUD300"
+            <<"BAUD600"
+            <<"BAUD1200"
+            <<"BAUD1800"            //POSIX ONLY
+            <<"BAUD2400"
+            <<"BAUD4800"
+            <<"BAUD9600"
+            <<"BAUD14400"
+            <<"BAUD19200"
+            <<"BAUD38400"
+            <<"BAUD56000"
+            <<"BAUD57600"
+            <<"BAUD76800"             //POSIX ONLY
+            <<"BAUD115200"
+            <<"BAUD128000"
+            <<"BAUD256000";
     DataBitsTypeStringALL
-        <<"DATA_5"
-        <<"DATA_6"
-        <<"DATA_7"
-        <<"DATA_8";
+            <<"DATA_5"
+            <<"DATA_6"
+            <<"DATA_7"
+            <<"DATA_8";
     ParityTypeStringALL
-        <<"PAR_NONE"
-        <<"PAR_ODD"
-        <<"PAR_EVEN"
-        <<"PAR_MARK"               //WINDOWS ONLY
-        <<"PAR_SPACE";
+            <<"PAR_NONE"
+            <<"PAR_ODD"
+            <<"PAR_EVEN"
+            <<"PAR_MARK"               //WINDOWS ONLY
+            <<"PAR_SPACE";
     StopBitsTypeStringALL
-        <<"STOP_1"
-        <<"STOP_1_5"               //WINDOWS ONLY
-        <<"STOP_2";
+            <<"STOP_1"
+            <<"STOP_1_5"               //WINDOWS ONLY
+            <<"STOP_2";
 
     FlowTypeString
-        <<"FLOW_OFF"
-        <<"FLOW_HARDWARE"
-        <<"FLOW_XONXOFF";
+            <<"FLOW_OFF"
+            <<"FLOW_HARDWARE"
+            <<"FLOW_XONXOFF";
 }
 
 
@@ -171,6 +171,7 @@ QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
     x->setLayout(portLayout);
     QWidget *label = new QLabel("Port:");
     m_portCB = new QComboBox(parent);
+    m_portCB->setMinimumSize(200,22);
     portLayout->addWidget(label);
     portLayout->addWidget(m_portCB);
 
@@ -180,6 +181,7 @@ QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
     y->setLayout(speedLayout);
     label = new QLabel("Port Speed:");
     m_speedCB = new QComboBox();
+    m_speedCB->setMinimumSize(200,22);
     speedLayout->addWidget(label);
     speedLayout->addWidget(m_speedCB);
 
@@ -189,6 +191,7 @@ QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
     z->setLayout(flowLayout);
     label = new QLabel("Flow Control:");
     m_flowCB = new QComboBox();
+    m_flowCB->setMinimumSize(200,22);
     flowLayout->addWidget(label);
     flowLayout->addWidget(m_flowCB);
 
@@ -198,6 +201,7 @@ QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
     a->setLayout(databitsLayout);
     label = new QLabel("Data Bits:");
     m_databitsCB = new QComboBox();
+    m_databitsCB->setMinimumSize(200,22);
     databitsLayout->addWidget(label);
     databitsLayout->addWidget(m_databitsCB);
 
@@ -207,6 +211,7 @@ QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
     b->setLayout(stopbitsLayout);
     label = new QLabel("Stop Bits:");
     m_stopbitsCB = new QComboBox();
+    m_stopbitsCB->setMinimumSize(200,22);
     stopbitsLayout->addWidget(label);
     stopbitsLayout->addWidget(m_stopbitsCB);
 
@@ -216,6 +221,7 @@ QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
     c->setLayout(parityLayout);
     label = new QLabel("Parity:");
     m_parityCB = new QComboBox();
+    m_parityCB->setMinimumSize(200,22);
     parityLayout->addWidget(label);
     parityLayout->addWidget(m_parityCB);
 
@@ -251,7 +257,7 @@ QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
     QList<QextPortInfo> ports =QextSerialEnumerator ::getPorts();
     qSort(ports.begin(), ports.end());
     for (int i = 0; i < ports.size(); i++) {
-      m_portCB->addItem((QString)ports.at(i).portName.toLocal8Bit().constData());
+        m_portCB->addItem((QString)ports.at(i).physName.toLocal8Bit().constData());
     }
     if(m_portCB->findText(m_config->Port())!=-1){
         m_portCB->setCurrentIndex(m_portCB->findText(m_config->Port()));
@@ -261,35 +267,35 @@ QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
         m_speedCB->addItem(BaudRateTypeString.at(i).toLocal8Bit().constData() );
     }
     if(m_speedCB->findText(BaudRateTypeStringALL.at((int)m_config->Speed()).toLocal8Bit().constData())!=-1){
-    m_speedCB->setCurrentIndex(m_speedCB->findText(BaudRateTypeStringALL.at((int)m_config->Speed()).toLocal8Bit().constData()));
+        m_speedCB->setCurrentIndex(m_speedCB->findText(BaudRateTypeStringALL.at((int)m_config->Speed()).toLocal8Bit().constData()));
     }
 
     for (int i=0;i<DataBitsTypeString.size();i++){
         m_databitsCB->addItem(DataBitsTypeString.at(i).toLocal8Bit().constData() );
     }
     if(m_databitsCB->findText(DataBitsTypeStringALL.at((int)m_config->DataBits()).toLocal8Bit().constData())!=-1){
-    m_databitsCB->setCurrentIndex(m_databitsCB->findText(DataBitsTypeStringALL.at((int)m_config->DataBits()).toLocal8Bit().constData()));
+        m_databitsCB->setCurrentIndex(m_databitsCB->findText(DataBitsTypeStringALL.at((int)m_config->DataBits()).toLocal8Bit().constData()));
     }
 
     for (int i=0;i<ParityTypeString.size();i++){
         m_parityCB->addItem(ParityTypeString.at(i).toLocal8Bit().constData() );
     }
     if(m_parityCB->findText(ParityTypeStringALL.at((int)m_config->Parity()).toLocal8Bit().constData())!=-1){
-    m_parityCB->setCurrentIndex(m_parityCB->findText(ParityTypeStringALL.at((int)m_config->Parity()).toLocal8Bit().constData()));
+        m_parityCB->setCurrentIndex(m_parityCB->findText(ParityTypeStringALL.at((int)m_config->Parity()).toLocal8Bit().constData()));
     }
 
     for (int i=0;i<StopBitsTypeString.size();i++){
         m_stopbitsCB->addItem(StopBitsTypeString.at(i).toLocal8Bit().constData() );
     }
     if(m_stopbitsCB->findText(StopBitsTypeStringALL.at((int)m_config->StopBits()).toLocal8Bit().constData())!=-1){
-    m_stopbitsCB->setCurrentIndex(m_stopbitsCB->findText(StopBitsTypeStringALL.at((int)m_config->StopBits()).toLocal8Bit().constData()));
+        m_stopbitsCB->setCurrentIndex(m_stopbitsCB->findText(StopBitsTypeStringALL.at((int)m_config->StopBits()).toLocal8Bit().constData()));
     }
 
     for (int i=0;i<FlowTypeString.size();i++){
         m_flowCB->addItem(FlowTypeString.at(i).toLocal8Bit().constData() );
     }
     if(m_flowCB->findText(FlowTypeString.at((int)m_config->Flow()).toLocal8Bit().constData())!=-1){
-    m_flowCB->setCurrentIndex(m_flowCB->findText(FlowTypeString.at((int)m_config->Flow()).toLocal8Bit().constData()));
+        m_flowCB->setCurrentIndex(m_flowCB->findText(FlowTypeString.at((int)m_config->Flow()).toLocal8Bit().constData()));
     }
     m_timeoutSpin->setValue(m_config->TimeOut());
     return widget;

@@ -69,7 +69,7 @@ int main()
 	for(;;)
 	{
 		/* Check if we have an SD Card with the correct settings files on it */
-		if(!PIOS_SDCARD_MountFS(STARTUP_LOG_ENABLED) && !PIOS_Settings_CheckForFiles()) {
+		if(!PIOS_SDCARD_MountFS(STARTUP_LOG_ENABLED)) {
 			/* Found one without errors */
 			break;
 		}
@@ -87,9 +87,6 @@ int main()
 	EventDispatcherInitialize();
 	UAVObjInitialize();
 	UAVObjectsInitializeAll();
-
-	/* Call LoadSettings which populates global variables so the rest of the hardware can be configured. */
-	PIOS_Settings_Load();
 
 	/* Com ports init */
 	PIOS_COM_Init();

@@ -34,7 +34,6 @@
 
 
 /* Global Variables */
-extern SettingsTypeDef Settings;
 xSemaphoreHandle PIOS_USART1_Buffer;
 xSemaphoreHandle PIOS_USART2_Buffer;
 xSemaphoreHandle PIOS_USART3_Buffer;

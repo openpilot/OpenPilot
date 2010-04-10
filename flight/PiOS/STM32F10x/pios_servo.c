@@ -160,11 +160,11 @@ void PIOS_Servo_Set(uint8_t Servo, uint16_t Position)
 	if (Servo < PIOS_SERVO_NUM_OUTPUTS && Servo >= 0)
 	{
 		/* Clip servo position */
-		if(Position < Settings.Servos.PositionMin) {
-			Position = Settings.Servos.PositionMin;
+		if(Position < SERVOS_POSITION_MIN) {
+			Position = SERVOS_POSITION_MIN;
 		}
-		if(Position > Settings.Servos.PositionMax) {
-			Position = Settings.Servos.PositionMax;
+		if(Position > SERVOS_POSITION_MAX) {
+			Position = SERVOS_POSITION_MAX;
 		}
 
 		/* Update the position */

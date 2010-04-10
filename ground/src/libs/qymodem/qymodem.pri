@@ -1,2 +1,2 @@
-LIBS += -l$$qtLibraryTarget(Qymodem)
+LIBS += -l$$qtLibraryTarget(QYmodem)
 

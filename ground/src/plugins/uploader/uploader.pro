@@ -16,6 +16,4 @@ SOURCES += uploadergadget.cpp \
     uploadergadgetoptionspage.cpp \
     uploadergadgetwidget.cpp \
     uploaderplugin.cpp
-OTHER_FILES += uploader.pluginspec
-#LIBS += -l$$qtLibraryTarget(QExtSerialPort)
-#LIBS += -l$$qtLibraryTarget(QYmodem)
+OTHER_FILES += Uploader.pluginspec

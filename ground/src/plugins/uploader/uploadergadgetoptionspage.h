@@ -31,6 +31,7 @@
 #include "coreplugin/dialogs/ioptionspage.h"
 #include "QString"
 #include <QStringList>
+#include <QDebug>
 namespace Core {
 class IUAVGadgetConfiguration;
 }

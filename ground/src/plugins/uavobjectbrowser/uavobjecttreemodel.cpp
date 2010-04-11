@@ -34,19 +34,6 @@
 #include "extensionsystem/pluginmanager.h"
 #include <QtGui/QColor>
 #include <QtCore/QDebug>
-#include <limits>
-
-#define QINT8MIN std::numeric_limits<qint8>::min()
-#define QINT8MAX std::numeric_limits<qint8>::max()
-#define QUINTMIN std::numeric_limits<quint8>::min()
-#define QUINT8MAX std::numeric_limits<quint8>::max()
-#define QINT16MIN std::numeric_limits<qint16>::min()
-#define QINT16MAX std::numeric_limits<qint16>::max()
-#define QUINT16MAX std::numeric_limits<quint16>::max()
-#define QINT32MIN std::numeric_limits<qint32>::min()
-#define QINT32MAX std::numeric_limits<qint32>::max()
-#define QUINT32MAX std::numeric_limits<qint32>::max()
-
 
 UAVObjectTreeModel::UAVObjectTreeModel(QObject *parent) :
         QAbstractItemModel(parent)
@@ -107,36 +94,13 @@ void UAVObjectTreeModel::addDataObject(UAVDataObject *obj)
 void UAVObjectTreeModel::addMetaObject(UAVMetaObject *obj, TreeItem *parent)
 {
     MetaObjectTreeItem *meta = new MetaObjectTreeItem(tr("Meta Data"));
-    UAVObject::Metadata md = obj->getData();
-    QStringList boolList;
-    boolList << tr("False") << tr("True");
-    QStringList updateModeList;
-    updateModeList << tr("Periodic") << tr("On Change") << tr("Manual") << tr("Never");
-    QList<QVariant> data;
-    QString msUnit = tr("ms");
-    data << tr("Flight Telemetry Acked") << md.flightTelemetryAcked;
-    meta->appendChild(new EnumFieldTreeItem(obj, 0, data, boolList));
-    data.clear();
-    data << tr("Flight Telemetry Update Mode") << md.flightTelemetryUpdateMode;
-    meta->appendChild(new EnumFieldTreeItem(obj, 1, data, updateModeList));
-    data.clear();
-    data << tr("Flight Telemetry Update Period") << md.flightTelemetryUpdatePeriod << msUnit;
-    meta->appendChild(new Int32FieldTreeItem(obj, 2, data, QINT32MIN, QINT32MAX));
-    data.clear();
-    data << tr("GCS Telemetry Acked") << md.gcsTelemetryAcked;
-    meta->appendChild(new EnumFieldTreeItem(obj, 3, data, boolList));
-    data.clear();
-    data << tr("GCS Telemetry Update Mode") << md.gcsTelemetryUpdateMode;
-    meta->appendChild(new EnumFieldTreeItem(obj, 4, data, updateModeList));
-    data.clear();
-    data << tr("GCS Telemetry Update Period") << md.gcsTelemetryUpdatePeriod << msUnit;
-    meta->appendChild(new Int32FieldTreeItem(obj, 5, data, QINT32MIN, QINT32MAX));
-    data.clear();
-    data << tr("Logging Update Mode") << md.loggingUpdateMode;
-    meta->appendChild(new EnumFieldTreeItem(obj, 6, data, updateModeList));
-    data.clear();
-    data << tr("Logging Update Period") << md.loggingUpdatePeriod << msUnit;
-    meta->appendChild(new Int32FieldTreeItem(obj, 7, data, QINT32MIN, QINT32MAX));
+    foreach (UAVObjectField *field, obj->getFields()) {
+        if (field->getNumElements() > 1) {
+            addArrayField(field, meta);
+        } else {
+            addSingleField(0, field, meta);
+        }
+    }
     parent->appendChild(meta);
 }
 
@@ -146,6 +110,7 @@ void UAVObjectTreeModel::addInstance(UAVObject *obj, TreeItem *parent)
     if (!obj->isSingleInstance()) {
         QString name = tr("Instance") +  " " + QString::number(obj->getInstID());
         item = new InstanceTreeItem(name);
+        parent->appendChild(item);
     } else {
         item = parent;
     }
@@ -156,15 +121,12 @@ void UAVObjectTreeModel::addInstance(UAVObject *obj, TreeItem *parent)
             addSingleField(0, field, item);
         }
     }
-    if (item != parent)
-        parent->appendChild(item);
 }
 
 
 void UAVObjectTreeModel::addArrayField(UAVObjectField *field, TreeItem *parent)
 {
     TreeItem *item = new ArrayFieldTreeItem(field->getName());
-//    UAVObjectFieldEnum *enumField = qobject_cast<UAVObjectFieldEnum*>(field);
     for (uint i = 0; i < field->getNumElements(); ++i) {
         addSingleField(i, field, item);
     }
@@ -191,33 +153,33 @@ void UAVObjectTreeModel::addSingleField(int index, UAVObjectField *field, TreeIt
     if (enumField) {
         data.append(enumField->getSelectedIndex(index));
         data.append(field->getUnits());
-        item = new EnumFieldTreeItem(enumField, index, data, enumField->getOptions());
+        item = new EnumFieldTreeItem(enumField, index, data);
     } else if (int8Field) {
-        data.append(int8Field->getValue());
+        data.append(int8Field->getValue(index));
         data.append(field->getUnits());
-        item = new Int8FieldTreeItem(int8Field, index, data, QINT8MIN, QINT8MAX);
+        item = new Int8FieldTreeItem(int8Field, index, data);
     } else if (int16Field) {
-        data.append(int16Field->getValue());
+        data.append(int16Field->getValue(index));
         data.append(field->getUnits());
-        item = new Int16FieldTreeItem(int16Field, index, data, QINT16MIN, QINT16MAX);
+        item = new Int16FieldTreeItem(int16Field, index, data);
     } else if (int32Field) {
-        data.append(int32Field->getValue());
+        data.append(int32Field->getValue(index));
         data.append(field->getUnits());
-        item = new Int32FieldTreeItem(int32Field, index, data, QINT32MIN, QINT32MAX);
+        item = new Int32FieldTreeItem(int32Field, index, data);
     } else if (uInt8Field) {
-        data.append(uInt8Field->getValue());
+        data.append(uInt8Field->getValue(index));
         data.append(field->getUnits());
-        item = new UInt8FieldTreeItem(uInt8Field, index, data, QUINTMIN, QUINT8MAX);
+        item = new UInt8FieldTreeItem(uInt8Field, index, data);
     } else if (uInt16Field) {
-        data.append(uInt16Field->getValue());
+        data.append(uInt16Field->getValue(index));
         data.append(field->getUnits());
-        item = new UInt16FieldTreeItem(uInt16Field, index, data, QUINTMIN, QUINT16MAX);
+        item = new UInt16FieldTreeItem(uInt16Field, index, data);
     } else if (uInt32Field) {
-        data.append(uInt32Field->getValue());
+        data.append(uInt32Field->getValue(index));
         data.append(field->getUnits());
-        item = new UInt32FieldTreeItem(uInt32Field, index, data, QUINTMIN, QUINT32MAX);
+        item = new UInt32FieldTreeItem(uInt32Field, index, data);
     } else if (floatField) {
-        data.append(floatField->getValue());
+        data.append(floatField->getValue(index));
         data.append(field->getUnits());
         item = new FloatFieldTreeItem(floatField, index, data);
     } else {

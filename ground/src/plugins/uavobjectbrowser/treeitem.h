@@ -42,6 +42,18 @@
 #include <QtCore/QList>
 #include <QtCore/QVariant>
 #include <QtCore/QStringList>
+#include <limits>
+
+#define QINT8MIN std::numeric_limits<qint8>::min()
+#define QINT8MAX std::numeric_limits<qint8>::max()
+#define QUINTMIN std::numeric_limits<quint8>::min()
+#define QUINT8MAX std::numeric_limits<quint8>::max()
+#define QINT16MIN std::numeric_limits<qint16>::min()
+#define QINT16MAX std::numeric_limits<qint16>::max()
+#define QUINT16MAX std::numeric_limits<quint16>::max()
+#define QINT32MIN std::numeric_limits<qint32>::min()
+#define QINT32MAX std::numeric_limits<qint32>::max()
+#define QUINT32MAX std::numeric_limits<qint32>::max()
 
 class TreeItem
  {
@@ -145,89 +157,24 @@ private:
 class EnumFieldTreeItem : public FieldTreeItem
 {
 public:
-    EnumFieldTreeItem(UAVMetaObject *mobj, int index, const QList<QVariant> &data,
-                      QStringList enumOptions, TreeItem *parent = 0) :
-            FieldTreeItem(index, data, parent), enumOptions(enumOptions), m_field(0), m_mobj(mobj) { }
     EnumFieldTreeItem(UAVObjectFieldEnum *field, int index, const QList<QVariant> &data,
-                      QStringList enumOptions, TreeItem *parent = 0) :
-            FieldTreeItem(index, data, parent), enumOptions(enumOptions), m_field(field), m_mobj(0) { }
+                      TreeItem *parent = 0) :
+            FieldTreeItem(index, data, parent), enumOptions(field->getOptions()), m_field(field) { }
     EnumFieldTreeItem(UAVObjectFieldEnum *field, int index, const QVariant &data,
-                      QStringList enumOptions, TreeItem *parent = 0) :
-            FieldTreeItem(index, data, parent), enumOptions(enumOptions), m_field(field), m_mobj(0) { }
+                      TreeItem *parent = 0) :
+            FieldTreeItem(index, data, parent), enumOptions(field->getOptions()), m_field(field) { }
     void setData(int column, QVariant value) {
-        if (m_field)
-            setChanged(m_field->getSelectedIndex(m_index) != value);
-        else {
-            UAVObject::Metadata md = m_mobj->getData();
-            switch(m_index) {
-            case 0:
-                setChanged(md.flightTelemetryAcked != value);
-                break;
-            case 1:
-                setChanged(md.flightTelemetryUpdateMode != value);
-                break;
-            case 2:
-                setChanged(md.flightTelemetryUpdatePeriod != value);
-                break;
-            case 3:
-                setChanged(md.gcsTelemetryAcked != value);
-                break;
-            case 4:
-                setChanged(md.gcsTelemetryUpdateMode != value);
-                break;
-            case 5:
-                setChanged(md.gcsTelemetryUpdatePeriod != value);
-                break;
-            case 6:
-                setChanged(md.loggingUpdateMode != value);
-                break;
-            case 7:
-                setChanged(md.loggingUpdatePeriod != value);
-                break;
-            }
-        }
+        setChanged(m_field->getSelectedIndex(m_index) != value);
         TreeItem::setData(column, value);
     }
     void apply(int column) {
         int value = data(column).toInt();
-        if (m_field) {
             m_field->setSelectedIndex(value, m_index);
-        } else {
-            UAVObject::Metadata md = m_mobj->getData();
-            switch(m_index) {
-            case 0:
-                md.flightTelemetryAcked = value;
-                break;
-            case 1:
-                md.flightTelemetryUpdateMode = value;
-                break;
-            case 2:
-                md.flightTelemetryUpdatePeriod = value;
-                break;
-            case 3:
-                md.gcsTelemetryAcked = value;
-                break;
-            case 4:
-                md.gcsTelemetryUpdateMode = value;
-                break;
-            case 5:
-                md.gcsTelemetryUpdatePeriod = value;
-                break;
-            case 6:
-                md.loggingUpdateMode = value;
-                break;
-            case 7:
-                md.loggingUpdatePeriod = value;
-                break;
-            }
-            m_mobj->setData(md);
-        }
     }
     bool isEnum() { return true; }
     QStringList enumOptions;
 private:
     UAVObjectFieldEnum *m_field;
-    UAVMetaObject *m_mobj;
 };
 
 class IntFieldTreeItem : public FieldTreeItem
@@ -245,10 +192,10 @@ public:
 class Int8FieldTreeItem : public IntFieldTreeItem
 {
 public:
-    Int8FieldTreeItem(UAVObjectFieldInt8 *field, int index, const QList<QVariant> &data, int min, int max, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, min, max, parent), m_field(field) { }
-    Int8FieldTreeItem(UAVObjectFieldInt8 *field, int index, const QVariant &data, int min, int max, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, min, max, parent), m_field(field) { }
+    Int8FieldTreeItem(UAVObjectFieldInt8 *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, QINT8MIN, QINT8MAX, parent), m_field(field) { }
+    Int8FieldTreeItem(UAVObjectFieldInt8 *field, int index, const QVariant &data, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, QINT8MIN, QINT8MAX, parent), m_field(field) { }
     void setData(int column, QVariant value) {
         setChanged(m_field->getValue(m_index) != value);
         TreeItem::setData(column, value);
@@ -263,10 +210,10 @@ private:
 class Int16FieldTreeItem : public IntFieldTreeItem
 {
 public:
-    Int16FieldTreeItem(UAVObjectFieldInt16 *field, int index, const QList<QVariant> &data, int min, int max, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, min, max, parent), m_field(field) { }
-    Int16FieldTreeItem(UAVObjectFieldInt16 *field, int index, const QVariant &data, int min, int max, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, min, max, parent), m_field(field) { }
+    Int16FieldTreeItem(UAVObjectFieldInt16 *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, QINT16MIN, QINT16MAX, parent), m_field(field) { }
+    Int16FieldTreeItem(UAVObjectFieldInt16 *field, int index, const QVariant &data, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, QINT16MIN, QINT16MAX, parent), m_field(field) { }
     void setData(int column, QVariant value) {
         setChanged(m_field->getValue(m_index) != value);
         TreeItem::setData(column, value);
@@ -281,93 +228,29 @@ private:
 class Int32FieldTreeItem : public IntFieldTreeItem
 {
 public:
-    Int32FieldTreeItem(UAVMetaObject *mobj, int index, const QList<QVariant> &data, int min, int max, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, min, max, parent), m_field(0), m_mobj(mobj) { }
-    Int32FieldTreeItem(UAVObjectFieldInt32 *field, int index, const QList<QVariant> &data, int min, int max, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, min, max, parent), m_field(field), m_mobj(0) { }
-    Int32FieldTreeItem(UAVObjectFieldInt32 *field, int index, const QVariant &data, int min, int max, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, min, max, parent), m_field(field), m_mobj(0) { }
+    Int32FieldTreeItem(UAVObjectFieldInt32 *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, QINT32MIN, QINT32MAX, parent), m_field(field) { }
+    Int32FieldTreeItem(UAVObjectFieldInt32 *field, int index, const QVariant &data, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, QINT32MIN, QINT32MAX, parent), m_field(field) { }
     void setData(int column, QVariant value) {
-        if (m_field)
-            setChanged(m_field->getValue(m_index) != value);
-        else {
-            UAVObject::Metadata md = m_mobj->getData();
-            switch(m_index) {
-            case 0:
-                setChanged(md.flightTelemetryAcked != value);
-                break;
-            case 1:
-                setChanged(md.flightTelemetryUpdateMode != value);
-                break;
-            case 2:
-                setChanged(md.flightTelemetryUpdatePeriod != value);
-                break;
-            case 3:
-                setChanged(md.gcsTelemetryAcked != value);
-                break;
-            case 4:
-                setChanged(md.gcsTelemetryUpdateMode != value);
-                break;
-            case 5:
-                setChanged(md.gcsTelemetryUpdatePeriod != value);
-                break;
-            case 6:
-                setChanged(md.loggingUpdateMode != value);
-                break;
-            case 7:
-                setChanged(md.loggingUpdatePeriod != value);
-                break;
-            }
-        }
+        setChanged(m_field->getValue(m_index) != value);
         TreeItem::setData(column, value);
     }
     void apply(int column) {
         int value = data(column).toInt();
-        if (m_field) {
-            m_field->setValue(value);
-        } else {
-            UAVObject::Metadata md = m_mobj->getData();
-            switch(m_index) {
-            case 0:
-                md.flightTelemetryAcked = value;
-                break;
-            case 1:
-                md.flightTelemetryUpdateMode = value;
-                break;
-            case 2:
-                md.flightTelemetryUpdatePeriod = value;
-                break;
-            case 3:
-                md.gcsTelemetryAcked = value;
-                break;
-            case 4:
-                md.gcsTelemetryUpdateMode = value;
-                break;
-            case 5:
-                md.gcsTelemetryUpdatePeriod = value;
-                break;
-            case 6:
-                md.loggingUpdateMode = value;
-                break;
-            case 7:
-                md.loggingUpdatePeriod = value;
-                break;
-            }
-            m_mobj->setData(md);
-        }
+        m_field->setValue(value);
     }
 private:
     UAVObjectFieldInt32 *m_field;
-    UAVMetaObject *m_mobj;
 };
 
 class UInt8FieldTreeItem : public IntFieldTreeItem
 {
 public:
-    UInt8FieldTreeItem(UAVObjectFieldUInt8 *field, int index, const QList<QVariant> &data, int min, int max, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, min, max, parent), m_field(field) { }
-    UInt8FieldTreeItem(UAVObjectFieldUInt8 *field, int index, const QVariant &data, int min, int max, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, min, max, parent), m_field(field) { }
+    UInt8FieldTreeItem(UAVObjectFieldUInt8 *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, QUINTMIN, QUINT8MAX, parent), m_field(field) { }
+    UInt8FieldTreeItem(UAVObjectFieldUInt8 *field, int index, const QVariant &data, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, QUINTMIN, QUINT8MAX, parent), m_field(field) { }
     void setData(int column, QVariant value) {
         setChanged(m_field->getValue(m_index) != value);
         TreeItem::setData(column, value);
@@ -382,10 +265,10 @@ private:
 class UInt16FieldTreeItem : public IntFieldTreeItem
 {
 public:
-    UInt16FieldTreeItem(UAVObjectFieldUInt16 *field, int index, const QList<QVariant> &data, int min, int max, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, min, max, parent), m_field(field) { }
-    UInt16FieldTreeItem(UAVObjectFieldUInt16 *field, int index, const QVariant &data, int min, int max, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, min, max, parent), m_field(field) { }
+    UInt16FieldTreeItem(UAVObjectFieldUInt16 *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, QUINTMIN, QUINT16MAX, parent), m_field(field) { }
+    UInt16FieldTreeItem(UAVObjectFieldUInt16 *field, int index, const QVariant &data, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, QUINTMIN, QUINT16MAX, parent), m_field(field) { }
     void setData(int column, QVariant value) {
         setChanged(m_field->getValue(m_index) != value);
         TreeItem::setData(column, value);
@@ -400,10 +283,10 @@ private:
 class UInt32FieldTreeItem : public IntFieldTreeItem
 {
 public:
-    UInt32FieldTreeItem(UAVObjectFieldUInt32 *field, int index, const QList<QVariant> &data, int min, int max, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, min, max, parent), m_field(field) { }
-    UInt32FieldTreeItem(UAVObjectFieldUInt32 *field, int index, const QVariant &data, int min, int max, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, min, max, parent), m_field(field) { }
+    UInt32FieldTreeItem(UAVObjectFieldUInt32 *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, QUINTMIN, QUINT32MAX, parent), m_field(field) { }
+    UInt32FieldTreeItem(UAVObjectFieldUInt32 *field, int index, const QVariant &data, TreeItem *parent = 0) :
+            IntFieldTreeItem(index, data, QUINTMIN, QUINT32MAX, parent), m_field(field) { }
     void setData(int column, QVariant value) {
         setChanged(m_field->getValue(m_index) != value);
         TreeItem::setData(column, value);

@@ -45,15 +45,19 @@ UAVMetaObject::UAVMetaObject(quint32 objID, const QString& name, UAVObject* pare
     ownMetadata.loggingUpdateMode = UPDATEMODE_ONCHANGE;
     ownMetadata.loggingUpdatePeriod = 0;
     // Setup fields
+    QStringList boolEnum;
+    boolEnum << tr("False") << tr("True");
+    QStringList updateModeEnum;
+    updateModeEnum << tr("Periodic") << tr("On Change") << tr("Manual") << tr("Never");
     QList<UAVObjectField*> fields;
-    fields.append(new UAVObjectFieldUInt8(QString("FlightTelemetryAcked"), QString(""), 1));
-    fields.append(new UAVObjectFieldUInt8(QString("FlightTelemetryUpdateMode"), QString(""), 1));
-    fields.append(new UAVObjectFieldInt32(QString("FlightTelemetryUpdatePeriod"), QString("ms"), 1));
-    fields.append(new UAVObjectFieldUInt8(QString("GCSTelemetryAcked"), QString(""), 1));
-    fields.append(new UAVObjectFieldUInt8(QString("GCSTelemetryUpdateMode"), QString(""), 1));
-    fields.append(new UAVObjectFieldInt32(QString("GCSTelemetryUpdatePeriod"), QString("ms"), 1));
-    fields.append(new UAVObjectFieldUInt8(QString("LoggingUpdateMode"), QString(""), 1));
-    fields.append(new UAVObjectFieldUInt32(QString("LoggingUpdatePeriod"), QString("ms"), 1));
+    fields.append(new UAVObjectFieldEnum(tr("Flight Telemetry Acked"), QString(""), 1, boolEnum));
+    fields.append(new UAVObjectFieldEnum(tr("Flight Telemetry Update Mode"), QString(""), 1, updateModeEnum));
+    fields.append(new UAVObjectFieldInt32(tr("Flight Telemetry Update Period"), tr("ms"), 1));
+    fields.append(new UAVObjectFieldEnum(tr("GCS Telemetry Acked"), QString(""), 1, boolEnum));
+    fields.append(new UAVObjectFieldEnum(tr("GCS Telemetry Update Mode"), QString(""), 1, updateModeEnum));
+    fields.append(new UAVObjectFieldInt32(tr("GCS Telemetry Update Period"), tr("ms"), 1));
+    fields.append(new UAVObjectFieldEnum(tr("Logging Update Mode"), QString(""), 1, updateModeEnum));
+    fields.append(new UAVObjectFieldUInt32(tr("Logging Update Period"), tr("ms"), 1));
     // Initialize parent
     UAVObject::initialize(0);
     UAVObject::initializeFields(fields, (quint8*)&parentMetadata, sizeof(Metadata));

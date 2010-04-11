@@ -63,6 +63,12 @@ namespace jafar {
 		 * The idea is to count the number of projected landmarks per grid cell,
 		 * and use one randomly chosen cell that is empty
 		 * for feature detection and landmark initialization.
+		 * This guarantees that the system will automatically populate all the
+		 * regions of the image.
+		 *
+		 * The feature density can be controlled by
+		 * adjusting the grid's number of cells.
+		 * Typically, use grids of 5x5 to 9x9 cells.
 		 *
 		 * This class implements a few interesting features:
 		 * - The grid can be randomly re-positioned at each frame to avoid dead zones at the cell edges.
@@ -89,14 +95,14 @@ namespace jafar {
 		 * - One cell is chosen randomly among those that are empty.
 		 * - The Region of Interest (ROI) is smaller than the cell to guarantee a minimum feature separation.
 		 * 		- Use the optional 'separation' parameter at construction time to control this separation.
-		 * 		- Use pickEmptyROI() to obtain an empty ROI for initialization.
+		 * 		- Use getROI() to obtain an empty ROI for initialization.
 		 * - A new feature is to be be searched inside this ROI.
 		 * - If you need to search more than one feature per frame, proceed like this:
 		 * 		- At successful detection, add the detected pixel with addPixel().
-		 * 		- Call pickEmptyROI() again.
+		 * 		- Call getROI() again.
 		 * 		- Repeat these two steps for each feature to be searched.
 		 *
-		 * We include here a schematic active-search algorithm to illustrate its operation:
+		 * We include here a schematic active-search pseudo-code algorithm to illustrate its operation:
 		 * \code
 		 * // Init necessary objects
 		 * ActiveSearch activeSearch;
@@ -116,7 +122,7 @@ namespace jafar {
 		 *   obs.process();                           // process observation
 		 *
 		 * // Now we go to initialization
-		 * grid.pickEmptyROI(roi);                    // roi is now region of interest
+		 * grid.getROI(roi);                          // roi is now region of interest
 		 * if (detectFeature(roi))                    // detect inside ROI
 		 *   initLandmark();                          // initialize only if successful detection
 		 * \endcode
@@ -171,7 +177,7 @@ namespace jafar {
 				 * \param roi the resulting ROI
 				 * \return true if ROI exists.
 				 */
-				bool pickEmptyROI(ROI & roi);
+				bool getROI(ROI & roi);
 
 			private:
 				/**

@@ -34,7 +34,7 @@ void test_acsearch01() {
 	ROI roi;
 	int i = 0;
 	while (true) {
-		if (grid.pickEmptyROI(roi)) {
+		if (grid.getROI(roi)) {
 			pix = (roi.upleft() + roi.downright()) / 2;
 			grid.addPixel(pix);
 			cout << "pix{" << i << "}: " << pix << " , " << grid << endl;

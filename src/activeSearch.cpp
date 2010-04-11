@@ -122,7 +122,7 @@ namespace jafar {
 		/**
 		 * Get ROI of one random empty cell
 		 */
-		bool ActiveSearchGrid::pickEmptyROI(ROI & roi) {
+		bool ActiveSearchGrid::getROI(ROI & roi) {
 			veci2 cell;
 			if (pickEmptyCell(cell)) {
 				cell2roi(cell, roi);

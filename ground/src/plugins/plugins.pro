@@ -18,10 +18,15 @@ plugin_welcome.subdir = welcome
 plugin_welcome.depends = plugin_coreplugin
 SUBDIRS += plugin_welcome
 
-# RawHID plug-in
+# RawHID connection plugin
 SUBDIRS += plugin_rawhid
 plugin_rawhid.subdir = rawhid
 plugin_rawhid.depends = plugin_coreplugin
+
+# Serial port connection plugin
+SUBDIRS += plugin_serial
+plugin_serial.subdir = serialconnection
+plugin_serial.depends = plugin_coreplugin
 
 # UAVObjects plug-in
 SUBDIRS += plugin_uavobjects

@@ -90,8 +90,12 @@ protected:
     QComboBox *m_availableDevList;
     QPushButton *m_connectBtn;
     QLinkedList<devListItem> m_devList;
+
+    //currently connected connection plugin
     devListItem m_connectionDevice;
-    bool m_deviceConnected;
+
+    //currently connected QIODevice
+    QIODevice *m_ioDev;
 };
 
 } //namespace Core

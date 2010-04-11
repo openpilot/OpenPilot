@@ -126,7 +126,7 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
             if (h == INVALID_HANDLE_VALUE) continue;
             attrib.Size = sizeof(HIDD_ATTRIBUTES);
             ret = HidD_GetAttributes(h, &attrib);
-            printf("vid: %4x\n", attrib.VendorID);
+            //printf("vid: %4x\n", attrib.VendorID);
             if (!ret || (vid > 0 && attrib.VendorID != vid) ||
               (pid > 0 && attrib.ProductID != pid) ||
               !HidD_GetPreparsedData(h, &hid_data)) {

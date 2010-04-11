@@ -46,9 +46,7 @@ void UAVTalkPlugin::extensionsInitialized()
     ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
     objMngr = pm->getObject<UAVObjectManager>();
 
-    // TODO: Initialize serial port and USB libraries, get QIODevice from each
-    // ---Julien: Actually I changed a little bit from the initial plan,
-    // now you have to connect to signal emited by the connection manager
+    // Connect to connection manager so we get notified when the user connect to his device
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
     QObject::connect(cm, SIGNAL(deviceConnected(QIODevice *)),
                      this, SLOT(onDeviceConnect(QIODevice *)));

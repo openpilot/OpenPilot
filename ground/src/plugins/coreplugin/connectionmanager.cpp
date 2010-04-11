@@ -51,7 +51,7 @@ namespace Core {
 ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, Internal::FancyTabWidget *modeStack)
     : m_availableDevList(0),
     m_connectBtn(0),
-    m_deviceConnected(false)
+    m_ioDev(NULL)
 {
     QVBoxLayout *top = new QVBoxLayout;
     top->setSpacing(0);
@@ -128,37 +128,24 @@ void ConnectionManager::aboutToRemoveObject(QObject *obj)
 */
 void ConnectionManager::onConnectPressed()
 {
-    if(!m_deviceConnected)
+    //check if we are trying to connect a new device
+    //or if we are disconnecting it
+    if(!m_ioDev)
     {
         m_connectBtn->setText("Disconnect");
         m_availableDevList->setEnabled(false);
 
-        m_deviceConnected = true;
         m_connectionDevice = findDevice(m_availableDevList->currentText());
 
         if(m_connectionDevice.connection)
         {
-            QIODevice *ioDev = m_connectionDevice.connection->openDevice(m_connectionDevice.devName);
-            /*QextSerialPort *ioDev = new QextSerialPort("COM5");
-            ioDev->setBaudRate(BAUD57600);
-            ioDev->setFlowControl(FLOW_OFF);*/
-            ioDev->open(QIODevice::ReadWrite);
-            /*if(ioDev->isOpen())
-                ioDev->putChar('M');*/
-            QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
-            qDebug() << "List of ports:";
-            for (int i = 0; i < ports.size(); i++) {
-                qDebug() << "port name:" << ports.at(i).portName;
-                qDebug() << "friendly name:" << ports.at(i).friendName;
-                qDebug() << "physical name:" << ports.at(i).physName;
-                qDebug() << "enumerator name:" << ports.at(i).enumName;
-                qDebug() << "vendor ID:" << QString::number(ports.at(i).vendorID, 16);
-                qDebug() << "product ID:" << QString::number(ports.at(i).productID, 16);
-                qDebug() << "===================================";
-            }
-            if(ioDev)
+            m_ioDev = m_connectionDevice.connection->openDevice(m_connectionDevice.devName);
+
+            if(m_ioDev)
             {
-                emit deviceConnected(ioDev);
+                m_ioDev->open(QIODevice::ReadWrite);
+                //signal interested plugins that the user wants to connect to the device
+                emit deviceConnected(m_ioDev);
                 return;
             }
             else
@@ -172,13 +159,20 @@ void ConnectionManager::onConnectPressed()
     m_connectBtn->setText("Connect");
     m_availableDevList->setEnabled(true);
 
-    m_deviceConnected = false;
+    //signal interested plugins that user is disconnecting his device
+    emit deviceDisconnected();
+
+    //close the device
+    if(m_ioDev)
+    {
+        m_ioDev->close();
+        m_ioDev = NULL;
+    }
 
     if(m_connectionDevice.connection)
         m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
 
     m_connectionDevice.connection = NULL;
-    emit deviceDisconnected();
 }
 
 /**

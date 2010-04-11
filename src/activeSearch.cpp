@@ -18,8 +18,7 @@ namespace jafar {
 		using namespace jblas;
 
 		ostream& operator <<(ostream & s, ActiveSearchGrid & grid) {
-			s << "Active search grid." << endl;
-			s << "feature count: " << grid.projectionsCount << endl;
+			s << "feature count: " << grid.projectionsCount;
 			return s;
 		}
 
@@ -28,21 +27,23 @@ namespace jafar {
 		ActiveSearchGrid::ActiveSearchGrid(const int & imgSize_h, const int & imgSize_v, const int & nCells_h,
 		    const int & nCells_v, const int & separation) :
 			projectionsCount(nCells_h + 1, nCells_v + 1),
-			roiGuard(separation)
+			emptyCellsTile_tmp((nCells_h + 1)* (nCells_v + 1), 2),
+			separation(separation)
 		{
 			imgSize(0) = imgSize_h;
 			imgSize(1) = imgSize_v;
 			gridSize(0) = projectionsCount.size1();
-			gridSize(1) = projectionsCount.size2(), cellSize(0) = imgSize_h / nCells_h;
+			gridSize(1) = projectionsCount.size2(),
+			cellSize(0) = imgSize_h / nCells_h;
 			cellSize(1) = imgSize_v / nCells_v;
-			gridOffset = -cellSize / 2;
+			offset = -cellSize / 2;
 			renew();
 		}
 
 
 		// Functions to fill in cells
-		void ActiveSearchGrid::addPixel(const vec2 & exp) {
-			addToCell(pix2cell(exp));
+		void ActiveSearchGrid::addPixel(const vec2 & p) {
+			addToCell(pix2cell(p));
 		}
 		void ActiveSearchGrid::addToCell(const veci2 & cell) {
 			projectionsCount(cell(0), cell(1))++;
@@ -52,36 +53,41 @@ namespace jafar {
 			projectionsCount.clear();
 		}
 		void ActiveSearchGrid::renew() {
-			gridOffset(0) = (int) ((double) rand() / RAND_MAX * cellSize(0));
-			gridOffset(1) = (int) ((double) rand() / RAND_MAX * cellSize(1));
+			offset(0) = (int) ((double) rand() / RAND_MAX * cellSize(0));
+			offset(1) = (int) ((double) rand() / RAND_MAX * cellSize(1));
 			clear();
 		}
 
-		/**
+		/*
 		 * Get one empty cell
 		 */
 		bool ActiveSearchGrid::pickEmptyCell(veci2 & cell) {
 			int k = 0;
-			mati M((gridSize(0)-2) * (gridSize(1)-2), 2);
-			M.clear();
+			veci2 cell0;
 			for (int i = 1; i < gridSize(0) -1; i++) {
 				for (int j = 1; j < gridSize(1)-1; j++) {
-					if (projectionsCount(i, j) == 0) {
-						M(k, 0) = i;
-						M(k, 1) = j;
+					cell0(0) = i;
+					cell0(1) = j;
+					if (isEmpty(cell0)){
+						ublas::row(emptyCellsTile_tmp, k) = cell0;
 						k++;
 					}
 				}
 			}
-			if (k > 0) {
-				int n = (double) rand() / RAND_MAX * k; // number of empty inner cells
-				cell(0) = M(n, 0);
-				cell(1) = M(n, 1);
+			if (k > 0) { // number of empty inner cells
+				int idx = (double) rand() / RAND_MAX * k;
+				cell(0) = emptyCellsTile_tmp(idx, 0);
+				cell(1) = emptyCellsTile_tmp(idx, 1);
 				return true;
 			}
 			else
 				return false;
 		}
+
+		bool ActiveSearchGrid::isEmpty(const veci2 & cell){
+			return (projectionsCount(cell(0), cell(1)) == 0);
+		}
+
 
 
 		/*
@@ -89,8 +95,8 @@ namespace jafar {
 		 */
 		veci2 ActiveSearchGrid::cellOrigin(const veci2 & cell) {
 			veci2 cell0;
-			cell0(0) = gridOffset(0) + cellSize(0) * cell(0);
-			cell0(1) = gridOffset(1) + cellSize(1) * cell(1);
+			cell0(0) = offset(0) + cellSize(0) * cell(0);
+			cell0(1) = offset(1) + cellSize(1) * cell(1);
 			return cell0;
 		}
 
@@ -104,19 +110,19 @@ namespace jafar {
 
 		void ActiveSearchGrid::cell2roi(const veci2 & cell, ROI & roi) {
 			veci2 ul = cellOrigin(cell);
-			ul(0) += roiGuard;
-			ul(1) += roiGuard;
+			ul(0) += separation;
+			ul(1) += separation;
 			roi.upleft() = ul;
 			veci2 s = cellSize;
-			s(0) -= 2 * roiGuard;
-			s(1) -= 2 * roiGuard;
+			s(0) -= 2 * separation;
+			s(1) -= 2 * separation;
 			roi.size() = s;
 		}
 
 		/**
 		 * Get ROI of one random empty cell
 		 */
-		bool ActiveSearchGrid::pickROI(ROI & roi) {
+		bool ActiveSearchGrid::pickEmptyROI(ROI & roi) {
 			veci2 cell;
 			if (pickEmptyCell(cell)) {
 				cell2roi(cell, roi);

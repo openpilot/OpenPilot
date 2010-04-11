@@ -28,15 +28,16 @@ using namespace jblas;
 using namespace jafar::jmath;
 
 void test_acsearch01() {
+	cout << "\n% ACTIVE SEARCH GRID \n%======================\n" << endl;
 	ActiveSearchGrid grid(320, 240, 5, 4);
 	vec2 pix;
 	ROI roi;
 	int i = 0;
 	while (true) {
-		if (grid.pickROI(roi)) {
+		if (grid.pickEmptyROI(roi)) {
 			pix = (roi.upleft() + roi.downright()) / 2;
 			grid.addPixel(pix);
-			cout << "pix{" << i << "}: " << pix << " , count: " << grid.projectionsCount << endl;
+			cout << "pix{" << i << "}: " << pix << " , " << grid << endl;
 			i ++;
 		}
 		else
@@ -44,7 +45,7 @@ void test_acsearch01() {
 	}
 }
 
-BOOST_AUTO_TEST_CASE( test_ahp )
+BOOST_AUTO_TEST_CASE( test_acsearch )
 {
 	test_acsearch01();
 }

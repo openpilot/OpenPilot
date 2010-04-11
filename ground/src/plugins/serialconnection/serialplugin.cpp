@@ -60,6 +60,9 @@ QStringList SerialConnection::availableDevices()
 {
     QStringList list;
     QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
+
+    //sort the list by port number (nice idea from PT_Dreamer :))
+    qSort(ports.begin(), ports.end());
     foreach( QextPortInfo port, ports ) {
         list.append(port.friendName);
     }

@@ -200,17 +200,21 @@ devListItem ConnectionManager::findDevice(const QString &displayedName)
 void ConnectionManager::unregisterAll(IConnection *connection)
 {
     for(QLinkedList<devListItem>::iterator iter = m_devList.begin();
-    iter != m_devList.end(); ++iter)
+    iter != m_devList.end(); )
     {
         if(iter->connection == connection)
         {
             iter = m_devList.erase(iter);
         }
+        else
+        {
+            ++iter;
+        }
     }
 }
 
 /**
-*   Register a device from one connection plugin
+*   Register a device from a specific connection plugin
 */
 void ConnectionManager::registerDevice(IConnection *conn, const QString &devN, const QString &disp)
 {
@@ -229,18 +233,21 @@ void ConnectionManager::registerDevice(IConnection *conn, const QString &devN, c
 */
 void ConnectionManager::devChanged(IConnection *connection)
 {
-    //remove all registered devices
+    //clear device list combobox
     m_availableDevList->clear();
+
+    //remove registered devices of this IConnection from the list
     unregisterAll(connection);
 
     //and add them back in the list
-    foreach(QString dev, connection->availableDevices())
+    QStringList availableDev = connection->availableDevices();
+    foreach(QString dev, availableDev)
     {
         QString cbName = connection->shortName() + ": " + dev;
         registerDevice(connection, dev, cbName);
     }
 
-    //add all the list to the combobox
+    //add all the list again to the combobox
     foreach(devListItem d, m_devList)
     {
         m_availableDevList->addItem(d.displayedName);

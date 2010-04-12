@@ -25,7 +25,7 @@ namespace jafar {
 			 * Size constructor
 			 */
 			Measurement::Measurement(size_t _size) :
-				Gaussian(_size), score(0) {
+				Gaussian(_size), matchScore(0) {
 			}
 
 

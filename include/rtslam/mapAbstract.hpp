@@ -86,7 +86,7 @@ namespace jafar {
 				/**
 				 * Map's indirect array is a function by now.
 				 * \return the indirect array of all used states in the map.
-				 * TODO: see how to avoid constructing this each time
+				 * \todo: see how to avoid constructing this each time
 				 */
 				inline jblas::ind_array ia_used_states() {
 					jblas::ind_array res;
@@ -164,7 +164,7 @@ namespace jafar {
 				/**
 				 * Create new observation.
 				 * Creates a new observation from a sensor and a landmark.
-				 * TODO see if this can go to class Observation, possibly with a dedicated constructor.
+				 * \todo see if this can go to class Observation, possibly with a dedicated constructor.
 				 */
 				observation_ptr_t newObservation(sensor_ptr_t & senPtr, landmark_ptr_t & lmkPtr);
 

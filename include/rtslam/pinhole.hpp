@@ -218,6 +218,11 @@ namespace jafar {
 				U_v = ublas::prod(U_ud, U_v1);
 			}
 
+			template<class VPix>
+			bool isInImage(const VPix & pix, const int & width, const int & height){
+					return ((pix(0) > 0) && (pix(0) <= width) && (pix(1) > 0) && (pix(1) <= height));
+			}
+
 		} // namespace pinhole
 
 	} // namespace rtslam

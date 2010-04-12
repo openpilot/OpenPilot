@@ -134,8 +134,8 @@ namespace jafar {
 
 				/**
 				 * Add one landmark to the map.
-				 * TODO: see if we move this to MapAbstract -> lmkPtr = mapPtr->newLandmark(senPtr)
-				 * TODO: need to solve first the pointer-from-this issue of shared_ptr.
+				 * \todo: see if we move this to MapAbstract -> lmkPtr = mapPtr->newLandmark(senPtr)
+				 * \todo: need to solve first the pointer-from-this issue of shared_ptr.
 				 * \param mapPtr pointer to the slam map.
 				 */
 				landmark_ptr_t newLandmark(map_ptr_t & mapPtr);
@@ -143,6 +143,14 @@ namespace jafar {
 
 			public:
 
+
+				/**
+				 * Get sensor pose in global frame.
+				 * This function composes robot pose with sensor pose to obtain the global sensor pose.
+				 *
+				 * \return the global pose.
+				 */
+				vec7 globalPose();
 
 				/**
 				 * Get sensor pose in global frame.

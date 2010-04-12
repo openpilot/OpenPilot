@@ -31,7 +31,7 @@ namespace jafar {
 
 				Measurement(size_t _size);
 
-				double score; ///< matching quality score
+				double matchScore; ///< matching quality score
 
 		};
 

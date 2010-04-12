@@ -14,8 +14,11 @@
 #define ACTIVESEARCH_HPP_
 
 #include "jmath/random.hpp"
-#include "rtslam/gaussian.hpp"
 #include "jmath/jblas.hpp"
+#include "rtslam/gaussian.hpp"
+
+#include "rtslam/rtSlam.hpp"
+
 #include <iostream>
 
 namespace jafar {
@@ -31,22 +34,43 @@ namespace jafar {
 		 */
 		class ROI {
 			public:
-				veci2 upleft_;
-				veci2 size_;
+				int x, y;
+				int width, height;
 				ROI(const int ulx = 0, const int uly = 0, const int sx = 0, const int sy = 0) {
-					upleft_(0) = ulx;
-					upleft_(1) = uly;
-					size_(0) = sx;
-					size_(1) = sy;
+					x = ulx;
+					y = uly;
+					width = sx;
+					height = sy;
 				}
 				veci2 downright() {
-					return upleft_ + size_;
+					veci2 dr;
+					dr(0) = x + width - 1;
+					dr(1) = y + height - 1;
+					return dr;
 				}
-				veci2 & upleft() {
-					return upleft_;
+				veci2 upleft() {
+					veci2 ul;
+					ul(0) = x;
+					ul(1) = y;
+					return ul;
 				}
-				veci2 & size() {
-					return size_;
+				veci2 size() {
+					veci2 sz;
+					sz(0) = width;
+					sz(1) = height;
+					return sz;
+				}
+				void upleft(const veci & ul){
+					x = ul(0);
+					y = ul(1);
+				}
+				void downright(const veci & dr){
+					width = dr(0) - x + 1;
+					height = dr(1) - y + 1;
+				}
+				void size(const veci & sz){
+					width = sz(0);
+					height = sz(1);
 				}
 
 		};
@@ -91,9 +115,9 @@ namespace jafar {
 		 * - Projected landmarks are represented by red dots.
 		 * 		- After projection, use addPixel() to add a new dot to the grid.
 		 * - Cells with projected landmarks inside are 'occupied'.
-		 * - Only inner cells are considered (thick blue rectangle).
+		 * - Only the inner cells (thick blue rectangle) are considered for Region of Interest (ROI) extraction.
 		 * - One cell is chosen randomly among those that are empty.
-		 * - The Region of Interest (ROI) is smaller than the cell to guarantee a minimum feature separation.
+		 * - The ROI is smaller than the cell to guarantee a minimum feature separation.
 		 * 		- Use the optional 'separation' parameter at construction time to control this separation.
 		 * 		- Use getROI() to obtain an empty ROI for initialization.
 		 * - A new feature is to be be searched inside this ROI.
@@ -229,7 +253,30 @@ namespace jafar {
 		 */
 		class ActiveSearch {
 			public:
+				vecb visibleObs;
+				vecb selectedObs;
 
+				/**
+				 * Project all landmarks to the sensor space.
+				 *
+				 * This function also computes visibility and computes information gain
+				 * for each observation.
+				 * The result is a map of visible observations,
+				 * ordered from most to least expected information gain.
+				 *
+				 * \param senPtr pointer to the sensor under consideration.
+				 * \return a map of all observations that are visible from the sensor, ordered according to the information gain.
+				 */
+				map<double,observation_ptr_t> projectAll(const sensor_ptr_t & senPtr, size_t & numVis);
+
+				/**
+				 * Predict appearance of observation.
+				 */
+				void predictApp(const observation_ptr_t & obsPtr);
+				/**
+				 * Scan search region for match.
+				 */
+				void scanObs(const observation_ptr_t & obsPtr);
 		};
 
 	}

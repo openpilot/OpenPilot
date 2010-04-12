@@ -49,14 +49,10 @@ namespace jafar {
 				 */
 				Expectation(const size_t _size, const size_t _size_nonobs = 0);
 
-				void computeVisibility();
-				void estimateInfoGain();
-				inline bool isVisible(); // landmark is visible (in Field Of View).
-				inline double infoGain(); // expected "information gain" of performing an update with this observation.
+				vec nonObs; ///<         Expected value of the non-observable part.
+				bool visible;
+				double infoGain;
 
-			private:
-				bool visible_;
-				bool infoGain_;
 		};
 
 	}

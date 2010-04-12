@@ -12,6 +12,7 @@
  */
 
 #include "boost/shared_ptr.hpp"
+#include "rtslam/pinhole.hpp"
 
 #include "rtslam/observationPinHoleAnchoredHomogeneous.hpp"
 
@@ -53,7 +54,7 @@ namespace jafar {
 
 			mat SG_rs(sensorPtr->pose.size(), size_rs); // This temp was of variable size
 
-			sensorPtr->globalPose(sg, SG_rs); //      Pose of sensor wrt the map
+			sensorPtr->globalPose(sg, SG_rs); //      Pose of sensor in map, Jac. wrt. robot and sensor
 			LandmarkAnchoredHomogeneousPoint::toBearingOnlyFrame(sg, landmarkPtr->state.x(), v, invDist, V_sg, V_ahp); // lmk in sensor frame
 			// This function below uses the down-casted pointer because it needs to know the sensor parameters.
 			pinHolePtr->projectPoint(v, u, U_v); //   Project lmk, get expected pixel u and Jacobians
@@ -65,11 +66,18 @@ namespace jafar {
 			expectation.x(u); //                      Output: assign expectation mean and Jacobians
 			ublas::subrange(EXP_rsl, 0, 2, 0, size_rs) = U_rs;
 			ublas::subrange(EXP_rsl, 0, 2, size_rs, size_rsl) = U_ahp;
-			nonObs(0) = invDist; //                   Assign non-observable part (inverse-distance)
+			expectation.nonObs(0) = invDist; //       Assign non-observable part (inverse-distance)
 		}
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::backProject_func() {
-			// TODO implement back-projection
+			// \todo implement back-projection
+		}
+
+		bool ObservationPinHoleAnchoredHomogeneousPoint::predictVisibility(){
+			bool inimg = pinhole::isInImage(expectation.x(), pinHolePtr->imgSize(0), pinHolePtr->imgSize(1));
+			bool infront = (expectation.nonObs(0) > 0.0);
+			events.visible = inimg && infront;
+			return events.visible;
 		}
 
 	}

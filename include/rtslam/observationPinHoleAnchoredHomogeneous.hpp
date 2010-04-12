@@ -49,6 +49,17 @@ namespace jafar {
 				void backProject_func();
 
 
+				/**
+				 * Predict visibility.
+				 *
+				 * Visibility can only be established after project_func() has been called.
+				 *
+				 * \return true if landmark is predicted visible.
+				 */
+				virtual bool predictVisibility();
+
+
+
 		};
 
 	}

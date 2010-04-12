@@ -43,6 +43,19 @@ void test_acsearch01() {
 		else
 			break;
 	}
+	cout << endl;
+	grid.renew();
+	i = 0;
+	while (true) {
+		if (grid.getROI(roi)) {
+			pix = (roi.upleft() + roi.downright()) / 2;
+			grid.addPixel(pix);
+			cout << "pix{" << i << "}: " << pix << " , " << grid << endl;
+			i ++;
+		}
+		else
+			break;
+	}
 }
 
 BOOST_AUTO_TEST_CASE( test_acsearch )

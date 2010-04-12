@@ -29,7 +29,7 @@ namespace jafar {
 		 * Inertial measurements unit - robot motion model.
 		 * \author jsola@laas.fr
 		 *
-		 * TODO: test this class RobotInertial -- and then delete this line
+		 * \todo: test this class RobotInertial -- and then delete this line
 		 *
 		 * This motion model is driven by IMU measurements and random perturbations, and defined by:
 		 * - The state vector: position, velocity, orientation quaternion, accelerometer bias, gyrometer bias, gravity:

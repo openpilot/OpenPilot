@@ -17,7 +17,7 @@
 #include "rtslam/observationAbstract.hpp"
 #include "rtslam/quatTools.hpp"
 
-// TODO this needs to go out of here - when we'll have factories
+// \todo this needs to go out of here - when we'll have factories
 #include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
 
 namespace jafar {
@@ -59,7 +59,7 @@ namespace jafar {
 		 * Acquire raw data.
 		 */
 		void SensorAbstract::acquireRaw() {
-			// TODO Acquire raw data
+			// \todo Acquire raw data
 		}
 
 
@@ -110,6 +110,16 @@ namespace jafar {
 			robotPtr = _robPtr;
 		}
 
+		/*
+		 * Get sensor pose in global frame.
+		 */
+		vec7 SensorAbstract::globalPose() {
+			vec7 globPose;
+			jblas::vec7 robotPose = robotPtr->pose.x();
+			jblas::vec7 sensorPose = pose.x();
+			globPose = quaternion::composeFrames(robotPose, sensorPose);
+			return globPose;
+		}
 
 		/*
 		 * Get sensor pose in global frame.

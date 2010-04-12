@@ -10,6 +10,7 @@
  * \ingroup rtslam
  */
 
+#include "jmath/ublasExtra.hpp"
 #include "rtslam/expectation.hpp"
 
 namespace jafar {
@@ -25,16 +26,8 @@ namespace jafar {
 		 * Size constructor
 		 */
 		Expectation::Expectation(const size_t _size, const size_t _size_nonobs) :
-			Gaussian(_size) {
+			Gaussian(_size), nonObs(_size_nonobs) {
 		}
-
-		bool Expectation::isVisible() {
-			return visible_;
-		} // landmark is visible (in Field Of View).
-
-		double Expectation::infoGain() {
-			return infoGain_;
-		} // expected "information gain" of performing an update with this observation.
 
 	}
 }

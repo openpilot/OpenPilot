@@ -19,7 +19,7 @@
 #include "rtslam/robotAbstract.hpp"
 #include "rtslam/landmarkAbstract.hpp"
 
-// TODO this needs to go out of here - when we'll have factories
+// \todo this needs to go out of here - when we'll have factories
 #include "rtslam/observationPinHoleAnchoredHomogeneous.hpp"
 
 namespace jafar {

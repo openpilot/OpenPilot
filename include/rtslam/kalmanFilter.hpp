@@ -56,7 +56,7 @@ namespace jafar {
 				}
 
 
-				// TODO: define API for all these functions.
+				// \todo: define API for all these functions.
 				/**
 				 * Predict covariances matrix.
 				 *

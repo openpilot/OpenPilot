@@ -61,7 +61,7 @@ namespace jafar {
 			projectPoint(intrinsic, distortion, v, u, U_v);
 		}
 
-		// TODO Move these functions to a pin-hole namespace. Keep only full functions in the class.
+		// \todo Move these functions to a pin-hole namespace. Keep only full functions in the class.
 		// Pin-hole canonical projection
 		vec2 SensorPinHole::projectPointToNormalizedPlane(const jblas::vec3 & v) {
 			vec2 up;

@@ -117,9 +117,9 @@ class DataObjectTreeItem : public TreeItem
 {
 public:
     DataObjectTreeItem(const QList<QVariant> &data, TreeItem *parent = 0) :
-            TreeItem(data, parent), m_obj(0), m_highlight(false) { }
+            TreeItem(data, parent), m_obj(0) { }
     DataObjectTreeItem(const QVariant &data, TreeItem *parent = 0) :
-            TreeItem(data, parent), m_obj(0), m_highlight(false) { }
+            TreeItem(data, parent), m_obj(0) { }
     void setObject(UAVObject *obj) { m_obj = obj; }
     inline UAVObject *object() { return m_obj; }
 private:

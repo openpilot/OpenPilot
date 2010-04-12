@@ -32,23 +32,36 @@
 MapGadgetWidget::MapGadgetWidget(QWidget *parent) : QWidget(parent)
 {
     int size = 256;
-    mc = new MapControl(QSize(size, size));
+    m_mc = new MapControl(QSize(size, size));
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-    mc->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-    mc->setMinimumSize(64, 64);
-    mc->showScale(true);
-    mapadapter = new OSMMapAdapter();
-    mainlayer = new MapLayer("OpenStreetMap-Layer", mapadapter);
-    mc->addLayer(mainlayer);
+    m_mc->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    m_mc->setMinimumSize(64, 64);
+    m_mc->showScale(true);
+    m_osmAdapter = new OSMMapAdapter();
+    m_googleSatAdapter = new GoogleSatMapAdapter();
+    m_googleAdapter = new GoogleMapAdapter();
+    m_yahooAdapter = new YahooMapAdapter();
+    m_osmLayer = new MapLayer("OpenStreetMap", m_osmAdapter);
+    m_googleLayer = new MapLayer("Google", m_googleAdapter);
+    m_googleSatLayer = new MapLayer("Google Sat", m_googleSatAdapter);
+    m_yahooLayer = new MapLayer("Yahoo", m_yahooAdapter);
+    m_osmLayer->setVisible(true);
+    m_googleLayer->setVisible(false);
+    m_googleSatLayer->setVisible(false);
+    m_yahooLayer->setVisible(false);
+    m_mc->addLayer(m_osmLayer);
+    m_mc->addLayer(m_googleLayer);
+    m_mc->addLayer(m_googleSatLayer);
+    m_mc->addLayer(m_yahooLayer);
 
     addZoomButtons();
-    mc->setView(QPointF(5.718888888888, 58.963333333333));
-    mc->setZoom(10);
-    mc->updateRequestNew();
+    m_mc->setView(QPointF(5.718888888888, 58.963333333333));
+    m_mc->setZoom(10);
+    m_mc->updateRequestNew();
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(mc);
+    layout->addWidget(m_mc);
     setLayout(layout);
 }
 
@@ -58,20 +71,26 @@ MapGadgetWidget::~MapGadgetWidget()
 }
 void MapGadgetWidget::setZoom(int value)
 {
-    mc->setZoom(value);
-    mc->updateRequestNew();
+    m_mc->setZoom(value);
+    m_mc->updateRequestNew();
 }
 
 void MapGadgetWidget::setPosition(QPointF pos)
 {
-    mc->setView(pos);
-    mc->updateRequestNew();
+    m_mc->setView(pos);
+    m_mc->updateRequestNew();
+}
+
+void MapGadgetWidget::setMapProvider(QString provider)
+{
+    foreach(QString layerName, m_mc->layers())
+        m_mc->layer(layerName)->setVisible(layerName == provider);
 }
 
 
 void MapGadgetWidget::resizeEvent(QResizeEvent *event)
 {
-    mc->resize(QSize(width(), height()));
+    m_mc->resize(QSize(width(), height()));
     update();
     QWidget::resizeEvent(event);
 }
@@ -85,14 +104,14 @@ void MapGadgetWidget::addZoomButtons()
 	zoomout->setMaximumWidth(50);
 
 	connect(zoomin, SIGNAL(clicked(bool)),
-			mc, SLOT(zoomIn()));
+                        m_mc, SLOT(zoomIn()));
 	connect(zoomout, SIGNAL(clicked(bool)),
-			mc, SLOT(zoomOut()));
+                        m_mc, SLOT(zoomOut()));
 
 	// add zoom buttons to the layout of the MapControl
 	QVBoxLayout* innerlayout = new QVBoxLayout;
 	innerlayout->addWidget(zoomin);
 	innerlayout->addWidget(zoomout);
-	mc->setLayout(innerlayout);
+        m_mc->setLayout(innerlayout);
 }
 

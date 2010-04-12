@@ -28,6 +28,7 @@
 #include "mapgadgetoptionspage.h"
 #include "mapgadgetconfiguration.h"
 #include <QtGui/QLabel>
+#include <QtGui/QComboBox>
 #include <QtGui/QSpinBox>
 #include <QtGui/QDoubleSpinBox>
 #include <QtGui/QHBoxLayout>
@@ -46,10 +47,22 @@ QWidget *MapGadgetOptionsPage::createPage(QWidget *parent)
     QVBoxLayout *vl = new QVBoxLayout();
     widget->setLayout(vl);
 
+    QHBoxLayout *providerLayout = new QHBoxLayout();
+    QWidget *mp = new QWidget;
+    mp->setLayout(providerLayout);
+    QWidget *label = new QLabel("Map Provider:");
+    m_providerComboBox = new QComboBox();
+    m_providerComboBox->addItem("OpenStreetMap");
+    m_providerComboBox->addItem("Google");
+    m_providerComboBox->addItem("Google Sat");
+//    m_providerComboBox->addItem("Yahoo");
+    providerLayout->addWidget(label);
+    providerLayout->addWidget(m_providerComboBox);
+
     QHBoxLayout *zoomLayout = new QHBoxLayout();
     QWidget *x = new QWidget;
     x->setLayout(zoomLayout);
-    QWidget *label = new QLabel("Default zoom:");
+    label = new QLabel("Default zoom:");
     m_zoomSpin = new QSpinBox();
     m_zoomSpin->setMaximum(18);
     zoomLayout->addWidget(label);
@@ -66,7 +79,6 @@ QWidget *MapGadgetOptionsPage::createPage(QWidget *parent)
     latLayout->addWidget(label);
     latLayout->addWidget(m_latSpin);
 
-
     QHBoxLayout *longLayout = new QHBoxLayout();
     QWidget *z = new QWidget;
     z->setLayout(longLayout);
@@ -79,11 +91,15 @@ QWidget *MapGadgetOptionsPage::createPage(QWidget *parent)
     longLayout->addWidget(m_longSpin);
     QSpacerItem *spacer = new QSpacerItem(100, 100, QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+    vl->addWidget(mp);
     vl->addWidget(x);
     vl->addWidget(y);
     vl->addWidget(z);
     vl->addSpacerItem(spacer);
 
+    int index = m_providerComboBox->findText(m_config->mapProvider());
+    index = (index >= 0) ? index : 0;
+    m_providerComboBox->setCurrentIndex(index);
     m_zoomSpin->setValue(m_config->zoom());
     m_latSpin->setValue(m_config->latitude());
     m_longSpin->setValue(m_config->longitude());
@@ -93,10 +109,10 @@ QWidget *MapGadgetOptionsPage::createPage(QWidget *parent)
 
 void MapGadgetOptionsPage::apply()
 {
+    m_config->setMapProvider(m_providerComboBox->currentText());
     m_config->setZoom(m_zoomSpin->value());
     m_config->setLatitude(m_latSpin->value());
     m_config->setLongitude(m_longSpin->value());
-
 }
 
 void MapGadgetOptionsPage::finish()

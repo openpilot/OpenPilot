@@ -42,6 +42,7 @@ MapGadget::~MapGadget()
 void MapGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 {
     MapGadgetConfiguration *m = qobject_cast<MapGadgetConfiguration*>(config);
+    m_widget->setMapProvider(m->mapProvider());
     m_widget->setZoom(m->zoom());
     m_widget->setPosition(QPointF(m->longitude(), m->latitude()));
 }

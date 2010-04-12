@@ -43,16 +43,24 @@ public:
    ~MapGadgetWidget();
    void setZoom(int value);
    void setPosition(QPointF pos);
+   void setMapProvider(QString provider);
+
 
 protected:
    void resizeEvent(QResizeEvent *event);
 
 private:
-   MapControl *mc;
-   MapAdapter *mapadapter;
-   Layer *mainlayer;
-
    void addZoomButtons();
+
+   MapControl *m_mc;
+   MapAdapter *m_osmAdapter;
+   MapAdapter *m_googleAdapter;
+   MapAdapter *m_googleSatAdapter;
+   MapAdapter *m_yahooAdapter;
+   Layer *m_osmLayer;
+   Layer *m_googleLayer;
+   Layer *m_googleSatLayer;
+   Layer *m_yahooLayer;
 };
 
 #endif /* MAPGADGETWIDGET_H_ */

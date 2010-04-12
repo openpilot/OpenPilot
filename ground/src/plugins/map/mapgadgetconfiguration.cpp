@@ -30,6 +30,7 @@
 
 MapGadgetConfiguration::MapGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),
+    m_mapProvider("OpenStreetMap"),
     m_defaultZoom(10),
     m_defaultLatitude(0),
     m_defaultLongitude(0)
@@ -39,12 +40,16 @@ MapGadgetConfiguration::MapGadgetConfiguration(QString classId, const QByteArray
         int zoom;
         double latitude;
         double longitude;
+        QString mapProvider;
         stream >> zoom;
         stream >> latitude;
         stream >> longitude;
+        stream >> mapProvider;
         m_defaultZoom = zoom;
         m_defaultLatitude = latitude;
         m_defaultLongitude = longitude;
+        if (mapProvider != "")
+            m_mapProvider = mapProvider;
 
     }
 }
@@ -55,6 +60,7 @@ IUAVGadgetConfiguration *MapGadgetConfiguration::clone()
     m->m_defaultZoom = m_defaultZoom;
     m->m_defaultLatitude = m_defaultLatitude;
     m->m_defaultLongitude = m_defaultLongitude;
+    m->m_mapProvider = m_mapProvider;
     return m;
 }
 
@@ -65,6 +71,7 @@ QByteArray MapGadgetConfiguration::saveState() const
     stream << m_defaultZoom;
     stream << m_defaultLatitude;
     stream << m_defaultLongitude;
+    stream << m_mapProvider;
     return bytes;
 }
 

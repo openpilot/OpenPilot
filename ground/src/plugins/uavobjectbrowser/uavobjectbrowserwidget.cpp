@@ -45,13 +45,12 @@ UAVObjectBrowserWidget::UAVObjectBrowserWidget(QWidget *parent) : QWidget(parent
     m_model = new UAVObjectTreeModel();
     m_browser->treeView->setModel(m_model);
     m_browser->treeView->setColumnWidth(0, 300);
-    m_browser->treeView->setAllColumnsShowFocus(false);
     m_browser->treeView->expandAll();
     BrowserItemDelegate *m_delegate = new BrowserItemDelegate();
     m_browser->treeView->setItemDelegate(m_delegate);
     m_browser->treeView->setEditTriggers(QAbstractItemView::AllEditTriggers);
-    connect(m_browser->metaCheckBox, SIGNAL(toggled(bool)), this, SLOT(showMetaData(bool)));
     showMetaData(m_browser->metaCheckBox->isChecked());
+    connect(m_browser->metaCheckBox, SIGNAL(toggled(bool)), this, SLOT(showMetaData(bool)));
     connect(m_browser->saveSDButton, SIGNAL(clicked()), this, SLOT(saveSettings()));
     connect(m_browser->readSDButton, SIGNAL(clicked()), this, SLOT(readSettings()));
 }

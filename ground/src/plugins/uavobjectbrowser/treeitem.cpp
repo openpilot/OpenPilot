@@ -29,13 +29,14 @@
 
 TreeItem::TreeItem(const QList<QVariant> &data, TreeItem *parent) :
         m_data(data),
-        m_parent(parent)
+        m_parent(parent),
+        m_highlight(false)
 {
-
 }
 
 TreeItem::TreeItem(const QVariant &data, TreeItem *parent) :
-        m_parent(parent)
+        m_parent(parent),
+        m_highlight(false)
 {
     m_data << data << "" << "";
 }
@@ -84,7 +85,7 @@ QVariant TreeItem::data(int column) const
     return m_data.value(column);
 }
 
-void TreeItem::setData(int column, QVariant value)
+void TreeItem::setData(QVariant value, int column)
 {
     m_data.replace(column, value);
 }

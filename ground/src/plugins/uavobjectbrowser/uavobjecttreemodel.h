@@ -29,14 +29,18 @@
 #define UAVOBJECTTREEMODEL_H
 
 #include <QAbstractItemModel>
+#include <QtCore/QMap>
 
 class TreeItem;
 class TopTreeItem;
+class DataObjectTreeItem;
 class UAVObject;
 class UAVDataObject;
 class UAVMetaObject;
 class UAVObjectField;
 class UAVObjectManager;
+class QSignalMapper;
+class QTimer;
 
 class UAVObjectTreeModel : public QAbstractItemModel
 {
@@ -61,6 +65,11 @@ signals:
 public slots:
     void newObject(UAVObject *obj);
 
+private slots:
+    void highlightUpdatedObject(UAVObject *obj);
+    void resetHighlightObject(QObject *obj);
+
+
 private:
     void addDataObject(UAVDataObject *obj);
     void addMetaObject(UAVMetaObject *obj, TreeItem *parent);
@@ -70,10 +79,13 @@ private:
     void addInstance(UAVObject *obj, TreeItem *parent);
     QString updateMode(quint8 updateMode);
     void setupModelData(UAVObjectManager *objManager);
+    DataObjectTreeItem *findDataObjectTreeItem(UAVDataObject *obj);
 
     TreeItem *rootItem;
     TopTreeItem *m_settingsTree;
     TopTreeItem *m_nonSettingsTree;
+    QSignalMapper *m_signalMapper;
+    QMap<UAVObject*,QTimer*> m_timerMap;
 
 };
 

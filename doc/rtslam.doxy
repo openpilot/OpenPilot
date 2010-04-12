@@ -5,8 +5,13 @@
 
 \version 0.1
 
-\author 
-  Joan Sola, jsola@laas.fr
+\authors
+  Joan Sola,         jsola@laas.fr     \n
+  Jean-Marie Codol,  jmcodol@laas.fr   \n
+  Aurelien Gonzalez, agonzale@laas.fr  \n
+  Nicolas Mansard,   nmansard@laas.fr  \n
+  David Marquez,     dmarquez@laas.fr  \n
+  Cyril Roussillon,  croussil@laas.fr  \n
   
 \section secContents Contents
 

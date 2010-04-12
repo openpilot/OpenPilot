@@ -38,7 +38,10 @@
 #include <QtCore/QDebug>
 
 UAVObjectTreeModel::UAVObjectTreeModel(QObject *parent) :
-        QAbstractItemModel(parent)
+        QAbstractItemModel(parent),
+        m_recentlyUpdatedTimeout(500), // ms
+        m_recentlyUpdatedColor(QColor(255, 230, 230)),
+        m_manuallyChangedColor(QColor(230, 230, 255))
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -56,12 +59,12 @@ void UAVObjectTreeModel::setupModelData(UAVObjectManager *objManager)
     // root
     QList<QVariant> rootData;
     rootData << tr("Property") << tr("Value") << tr("Unit");
-    rootItem = new TreeItem(rootData);
+    m_rootItem = new TreeItem(rootData);
 
-    m_settingsTree = new TopTreeItem(tr("Settings"), rootItem);
-    rootItem->appendChild(m_settingsTree);
-    m_nonSettingsTree = new TopTreeItem(tr("Data Objects"), rootItem);
-    rootItem->appendChild(m_nonSettingsTree);
+    m_settingsTree = new TopTreeItem(tr("Settings"), m_rootItem);
+    m_rootItem->appendChild(m_settingsTree);
+    m_nonSettingsTree = new TopTreeItem(tr("Data Objects"), m_rootItem);
+    m_rootItem->appendChild(m_nonSettingsTree);
 
     QList< QList<UAVDataObject*> > objList = objManager->getDataObjects();
     foreach (QList<UAVDataObject*> list, objList) {
@@ -206,7 +209,7 @@ QModelIndex UAVObjectTreeModel::index(int row, int column, const QModelIndex &pa
     TreeItem *parentItem;
 
     if (!parent.isValid())
-        parentItem = rootItem;
+        parentItem = m_rootItem;
     else
         parentItem = static_cast<TreeItem*>(parent.internalPointer());
 
@@ -225,7 +228,7 @@ QModelIndex UAVObjectTreeModel::parent(const QModelIndex &index) const
     TreeItem *childItem = static_cast<TreeItem*>(index.internalPointer());
     TreeItem *parentItem = childItem->parent();
 
-    if (parentItem == rootItem)
+    if (parentItem == m_rootItem)
         return QModelIndex();
 
     return createIndex(parentItem->row(), 0, parentItem);
@@ -238,7 +241,7 @@ int UAVObjectTreeModel::rowCount(const QModelIndex &parent) const
         return 0;
 
     if (!parent.isValid())
-        parentItem = rootItem;
+        parentItem = m_rootItem;
     else
         parentItem = static_cast<TreeItem*>(parent.internalPointer());
 
@@ -250,7 +253,7 @@ int UAVObjectTreeModel::columnCount(const QModelIndex &parent) const
     if (parent.isValid())
         return static_cast<TreeItem*>(parent.internalPointer())->columnCount();
     else
-        return rootItem->columnCount();
+        return m_rootItem->columnCount();
 }
 
 QVariant UAVObjectTreeModel::data(const QModelIndex &index, int role) const
@@ -268,14 +271,14 @@ QVariant UAVObjectTreeModel::data(const QModelIndex &index, int role) const
     if (index.column() == 0 && role == Qt::BackgroundRole) {
         DataObjectTreeItem *dataItem = dynamic_cast<DataObjectTreeItem*>(item);
         if (dataItem && dataItem->highlight())
-            return QVariant(QColor(255, 230, 230));
+            return QVariant(m_recentlyUpdatedColor);
     }
     if (index.column() == 1 && role == Qt::BackgroundRole) {
         FieldTreeItem *fieldItem = dynamic_cast<FieldTreeItem*>(item);
         if (fieldItem && fieldItem->highlight())
-            return QVariant(QColor(255, 230, 230));
+            return QVariant(m_recentlyUpdatedColor);
         if (fieldItem && fieldItem->isChanged())
-            return QVariant(QColor(230, 230, 255));
+            return QVariant(m_manuallyChangedColor);
     }
 
     if (role != Qt::DisplayRole)
@@ -318,7 +321,7 @@ QVariant UAVObjectTreeModel::headerData(int section, Qt::Orientation orientation
                                         int role) const
 {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
-        return rootItem->data(section);
+        return m_rootItem->data(section);
 
     return QVariant();
 }
@@ -345,7 +348,7 @@ void UAVObjectTreeModel::highlightUpdatedObject(UAVObject *object)
     m_timerMap.insert(obj, timer);
     connect(timer, SIGNAL(timeout()), m_signalMapper, SLOT(map()));
     m_signalMapper->setMapping(timer, obj);
-    timer->start(500);
+    timer->start(m_recentlyUpdatedTimeout);
 }
 
 void UAVObjectTreeModel::resetHighlightObject(QObject *object)

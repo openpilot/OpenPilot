@@ -30,6 +30,7 @@
 
 #include <QAbstractItemModel>
 #include <QtCore/QMap>
+#include <QtGui/QColor>
 
 class TreeItem;
 class TopTreeItem;
@@ -81,12 +82,14 @@ private:
     void setupModelData(UAVObjectManager *objManager);
     DataObjectTreeItem *findDataObjectTreeItem(UAVDataObject *obj);
 
-    TreeItem *rootItem;
+    TreeItem *m_rootItem;
     TopTreeItem *m_settingsTree;
     TopTreeItem *m_nonSettingsTree;
     QSignalMapper *m_signalMapper;
     QMap<UAVObject*,QTimer*> m_timerMap;
-
+    int m_recentlyUpdatedTimeout;
+    QColor m_recentlyUpdatedColor;
+    QColor m_manuallyChangedColor;
 };
 
 #endif // UAVOBJECTTREEMODEL_H

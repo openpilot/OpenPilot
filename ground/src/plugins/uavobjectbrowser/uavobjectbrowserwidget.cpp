@@ -49,6 +49,7 @@ UAVObjectBrowserWidget::UAVObjectBrowserWidget(QWidget *parent) : QWidget(parent
     BrowserItemDelegate *m_delegate = new BrowserItemDelegate();
     m_browser->treeView->setItemDelegate(m_delegate);
     m_browser->treeView->setEditTriggers(QAbstractItemView::AllEditTriggers);
+    m_browser->treeView->setSelectionBehavior(QAbstractItemView::SelectItems);
     showMetaData(m_browser->metaCheckBox->isChecked());
     connect(m_browser->metaCheckBox, SIGNAL(toggled(bool)), this, SLOT(showMetaData(bool)));
     connect(m_browser->saveSDButton, SIGNAL(clicked()), this, SLOT(saveSettings()));

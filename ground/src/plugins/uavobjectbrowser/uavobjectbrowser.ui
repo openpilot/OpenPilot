@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>476</width>
+    <width>531</width>
     <height>300</height>
    </rect>
   </property>
@@ -97,10 +97,10 @@
      <item>
       <widget class="QPushButton" name="readSDButton">
        <property name="toolTip">
-        <string>Read from SD Card</string>
+        <string>Load from SD Card</string>
        </property>
        <property name="text">
-        <string>Read</string>
+        <string>Load</string>
        </property>
       </widget>
      </item>

@@ -77,14 +77,14 @@ void test_landmark01(void) {
 	jblas::mat AHP_f(7, 7), AHP_ahpf(7, 7);
 	ahpf = ahp1.state.x();
 	ahp = landmarkAHP::fromFrame(F, ahpf);
-	cout << "ahp_namespace : " << ahp << endl;
-	ahp = LandmarkAnchoredHomogeneousPoint::fromFrame(F, ahpf);
-	cout << "ahp_static : " << ahp << endl;
-	LandmarkAnchoredHomogeneousPoint::fromFrame(F, ahpf, ahp, AHP_f, AHP_ahpf);
+	cout << "ahp_namespace : " << (MATLAB) ahp << endl;
+	ahp = ahp1.fromFrame(F);
+	cout << "ahp_class : " << (MATLAB) ahp << endl;
+	ahp1.fromFrame(F, ahp, AHP_f, AHP_ahpf);
 
 	cout << "F.x = " << MATLAB(F) << endl;
 	cout << "F = updateFrame(F);" << endl;
-	cout << "ahpf = " << (MATLAB) (vec) ahpf << endl;
+	cout << "ahpf = " << (MATLAB) (vec) ahp1.state.x() << endl;
 	cout << "ahp = " << (MATLAB) ahp << endl;
 	cout << "AHP_f = " << (MATLAB) AHP_f << endl;
 	cout << "AHP_ahpf = " << (MATLAB) AHP_ahpf << endl;
@@ -94,11 +94,12 @@ void test_landmark01(void) {
 	cout << "AHP_ahpf_err = norm(AHP_ahpf-AHP_ahpf_m)" << endl;
 
 	cout << "\n% TO FRAME \n%==================" << endl;
+//	ahp1.state.x(ahp);
 	jblas::mat AHPF_f(7, 7), AHPF_ahp(7, 7);
-	LandmarkAnchoredHomogeneousPoint::toFrame(F, ahp, ahpf, AHPF_f, AHPF_ahp);
-	//	ahpf = LandmarkAnchoredHomogeneousPoint::toFrame(F, ahp);
-	cout << "ahp = " << (MATLAB) ahp << endl;
-	cout << "ahpf = " << (MATLAB) (vec) ahpf << endl;
+	ahp1.toFrame(F, ahpf, AHPF_f, AHPF_ahp);
+	//	ahpf = ahp1.toFrame(F, ahp);
+	cout << "ahp = " << (MATLAB) ahp1.state.x() << endl;
+	cout << "ahpf = " << (MATLAB) ahpf << endl;
 	cout << "AHPF_f = " << (MATLAB) AHPF_f << endl;
 	cout << "AHPF_ahp = " << (MATLAB) AHPF_ahp << endl;
 	cout << "[ahpf_m,AHPF_f_m,AHPF_ahp_m] = toFrameAhm(F,ahp);" << endl;
@@ -107,11 +108,11 @@ void test_landmark01(void) {
 	cout << "AHPF_ahp_err = norm(AHPF_ahp-AHPF_ahp_m)" << endl;
 
 	cout << "\n% REPARAMETRIZATION \n%==================" << endl;
-	cout << "ahp = " << (MATLAB) ahp << endl;
+	cout << "ahp = " << (MATLAB) ahp1.state.x() << endl;
 	jblas::vec3 euc;
 	jblas::mat EUC_ahp(3, 7);
 	//	euc = LandmarkAnchoredHomogeneousPoint::ahp2euc(ahp);
-	LandmarkAnchoredHomogeneousPoint::ahp2euc(ahp, euc, EUC_ahp);
+	ahp1.toEuclidean(euc, EUC_ahp);
 	cout << "euc = " << (MATLAB) euc << endl;
 	cout << "EUC_ahp = " << (MATLAB) EUC_ahp << endl;
 	cout << "[euc_m, EUC_ahp_m] = ahm2euc(ahp);" << endl;

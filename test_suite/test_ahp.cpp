@@ -79,12 +79,12 @@ void test_ahp01(void) {
 	cout << "\n% TO B-O FRAME \n%============" << endl;
 	cout << "F.x = " << (MATLAB) senFrame << endl;
 	cout << "ahp = " << (MATLAB) ahp << endl;
-	v2 = LandmarkAnchoredHomogeneousPoint::toBearingOnlyFrame(senFrame, ahp);
+	v2 = landmarkAHP::toBearingOnlyFrame(senFrame, ahp);
 	JFR_CHECK_VEC_EQUAL(v2, v1);
-	LandmarkAnchoredHomogeneousPoint::toBearingOnlyFrame(senFrame, ahp, v2, id);
+	landmarkAHP::toBearingOnlyFrame(senFrame, ahp, v2, id);
 	JFR_CHECK_VEC_EQUAL(v2, v1);
 	JFR_CHECK_EQUAL(id, r);
-	LandmarkAnchoredHomogeneousPoint::toBearingOnlyFrame(senFrame, ahp, v2, id, V_s, V_ahp);
+	landmarkAHP::toBearingOnlyFrame(senFrame, ahp, v2, id, V_s, V_ahp);
 	cout << "v2 = " << (MATLAB) v2 << endl;
 	cout << "id = " << id << endl;
 	cout << "V_s = " << (MATLAB) V_s << endl;

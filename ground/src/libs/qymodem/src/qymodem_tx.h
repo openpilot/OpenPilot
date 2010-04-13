@@ -1,3 +1,14 @@
+/**
+ ******************************************************************************
+ *
+ * @file       qymodem_tx.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @brief
+ * @see        The GNU Public License (GPL) Version 3
+ * @defgroup   ymodem_lib
+ * @{
+ *
+ *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,18 +25,18 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/**
-@file
-
-@brief Y-Modem transmit protocol.
+/*!
+*   \section Credits
+*   This implementation is based on J.D.Medhurst (a.k.a. Tixy) work from
+*   <a href="http://yxit.co.uk">Tixy's source code</a>.
 */
+
 #ifndef YMODEM_TX_H
 #define YMODEM_TX_H
 #include "qymodem.h"
 
 /**
-@brief Y-Modem transmiter object.
-@ingroup ymodem
+Base Class for QymodemSend.
 */
 class QymodemTx : public QymodemBase
         {
@@ -61,15 +72,6 @@ public:
                 inline virtual ~InStream() {}
                 };
 
-        /**
-        Send data using X-Modem.
-
-        @param in		The stream of data to send.
-        @param timeout	Time in milliseconds to wait receiver to become ready.
-        @param kMode	False to use 128 byte blocks, true to use 1kB blocks
-        @return Zero if transfer was successful, or a negative error value if failed.
-        */
-        int SendX(InStream& in, unsigned timeout, bool kMode);
 
         /**
         Send data using Y-Modem.
@@ -92,16 +94,19 @@ public:
                 ErrorReceiverNotBehaving		= -301,	/**< Unexpected data received */
                 ErrorTranferTerminatedByReceiver= -302,	/**< Transfer was terminated by receiver */
                 ErrorFileNameTooLong			= -303,	/**< File name was too long to be transmitted */
-                ErrorFileNotFound= -303,
-                ErrorCoulNotOpenPort= -304,
-                ErrorFileTransmissionInProgress = -305
+                ErrorFileNotFound                       = -303,/**< Error file not found */
+                ErrorCoulNotOpenPort                    = -304,/**< Error Port could not be open */
+                ErrorFileTransmissionInProgress         = -305/**< Error, user tried to transmit a File while other File transmisssion is in progress */
 
             };
+        /**
+        Enumeration of possible information values.
+        */
         enum Info
         {
-            InfoSending= -100,
-            InfoSent=-101,
-            InfoWaitingforReceiver=-102
+            InfoSending                                 = -100,/**< Info, the transmission started and the file is being sent*/
+            InfoSent                                    =-101,/**< Info, transmission finished,the file as been sent */
+            InfoWaitingforReceiver                      =-102/**< Info, the transmission is waiting for the receiver to signal begin of transfer */
         };
 
 private:

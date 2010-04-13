@@ -1,3 +1,14 @@
+/**
+ ******************************************************************************
+ *
+ * @file       qymodemsend.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @brief
+ * @see        The GNU Public License (GPL) Version 3
+ * @defgroup   ymodem_lib
+ * @{
+ *
+ *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,11 +25,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 #ifndef QYMODEMSEND_H
 #define QYMODEMSEND_H
 #include "qymodem_tx.h"
 #include <QString>
 #include <QFile>
+#include "qymodemfilestream.cpp"
 
 #ifdef Q_OS_WIN
 #define _DEVICE_SET_ QIODevice::ReadWrite|QIODevice::Unbuffered
@@ -26,6 +39,9 @@
 #define _DEVICE_SET_ QIODevice::ReadWrite
 #endif
 
+/**
+Class for sending a file via Y-Modem transmit protocol.
+*/
 class QymodemSend:public QymodemTx
 {
 
@@ -38,7 +54,7 @@ private:
     void run();
     const char* FileName;
     void Send();
-    class InFile;
+    QymodemFileStream InFile;
     QString FileNameT;
 
 };

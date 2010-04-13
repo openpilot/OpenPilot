@@ -1,3 +1,14 @@
+/**
+ ******************************************************************************
+ *
+ * @file       qymodemsend.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @brief      Implementation of Y-Modem File transmit protocol.
+ * @see        The GNU Public License (GPL) Version 3
+ * @defgroup   ymodem_lib
+ * @{
+ *
+ *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,122 +28,29 @@
 #include "qymodemsend.h"
 
 
+/**
+Constructor.
+
+@param port	The port to use for File transmission.
+
+
+*/
 QymodemSend::QymodemSend(QextSerialPort& port)
     : QymodemTx(port)
     {
 
     }
 
-/**
-Class for presenting a file as a input stream.
-*/
-class QymodemSend::InFile : public QymodemTx::InStream
-{
-public:
-    InFile()
-        : File(0)
-    {
-    }
-    /**
-        Open stream for reading a file.
-
-        @param fileName		Name of the file to read.
-
-        @return Zero if successful, or a negative error value if failed.
-        */
-
-
-    int Open(const char* fileName)
-    {
-        File = fopen(fileName,"rb");
-        if(!File)
-            return QymodemTx::ErrorInputStreamError;
-        // find file size...
-        if(fseek(File,0,SEEK_END))
-        {
-            fclose(File);
-            return QymodemTx::ErrorInputStreamError;
-        }
-        TotalSize = ftell(File);
-        if(fseek(File,0,SEEK_SET))
-        {
-            fclose(File);
-            return QymodemTx::ErrorInputStreamError;
-        }
-        TransferredSize = 0;
-        return 0;
-    }
-
-    /**
-        Close the stream.
-        */
-    void Close()
-    {
-        if(File)
-        {
-            fclose(File);
-            File = 0;
-        }
-    }
-
-    /**
-        Return the size of the file.
-
-        @return File size.
-        */
-    inline size_t Size()
-    {
-        return TotalSize;
-    }
-
-    /**
-        Read data from the stream.
-
-        @param[out] data	Pointer to buffer to hold data read from stream.
-        @param size			Maximum size of data to read.
-
-        @return Zero if successful, or a negative error value if failed.
-        */
-    int In(quint8* data, size_t size)
-    {
-       // mutex.lock();
-        percent = TotalSize ? ((quint64)TransferredSize*(quint64)100)/(quint64)TotalSize : 0;
-        //mutex.unlock();
-        fflush(stdout);
-        size=fread(data,sizeof(quint8),size,File);
-        if(size)
-        {
-            TransferredSize += size;
-            return size;
-        }
-        if(TransferredSize!=TotalSize)
-            return QymodemTx::ErrorInputStreamError;
-        return 0;
-    }
-private:
-  //  QMutex mutex;
-    FILE* File;
-    size_t TotalSize;
-    size_t TransferredSize;
-
-};
-
-
-/**
-Class for presenting a file as a output stream.
-*/
-
 
 
 /**
 Send the file.
 
-@param port	The serial port to use.
 */
 void QymodemSend::Send()
 {
 
-    InFile source;
+    QymodemFileStream source;
     int error = source.Open(FileName);
     if(error)
         emit Error("Can't open file " + QString(FileName),error);
@@ -151,7 +69,14 @@ void QymodemSend::Send()
     }
     source.Close();
 }
+/**
+Send file.
 
+@param filename	The name of the file to Send.
+
+@return Zero if successful, or a negative error value if failed.
+
+*/
 int QymodemSend::SendFile(QString filename)
 {
     QFile file;
@@ -172,7 +97,14 @@ int QymodemSend::SendFile(QString filename)
         return 0;
 
 }
+/**
+Send file on a new Thread.
 
+@param filename	The name of the file to Send.
+
+@return Zero if successful, or a negative error value if failed.
+
+*/
 int QymodemSend::SendFileT(QString filename)
 {
     if(!isRunning())
@@ -186,6 +118,7 @@ int QymodemSend::SendFileT(QString filename)
     }
     return 0;
 }
+
 void QymodemSend::run()
 {
     QFile file;

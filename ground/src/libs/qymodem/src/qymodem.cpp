@@ -1,3 +1,14 @@
+/**
+ ******************************************************************************
+ *
+ * @file       qymodem.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @brief      Implementation of base class for QymodemTx.
+ * @see        The GNU Public License (GPL) Version 3
+ * @defgroup   ymodem_lib
+ * @{
+ *
+ *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,10 +24,11 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-/**
-@file
 
-@brief Implementation of base class for YModemRx and YModemTx.
+/*!
+*   \section Credits
+*   This implementation is based on J.D.Medhurst (a.k.a. Tixy) work from
+*   <a href="http://yxit.co.uk">Tixy's source code</a>.
 */
 
 #include "qymodem.h"

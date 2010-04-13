@@ -1,3 +1,14 @@
+/**
+ ******************************************************************************
+ *
+ * @file       qymodem.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @brief
+ * @see        The GNU Public License (GPL) Version 3
+ * @defgroup   ymodem_lib
+ * @{
+ *
+ *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,20 +25,47 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+/*!
+*   \section Credits
+*   This implementation is based on J.D.Medhurst (a.k.a. Tixy) work from
+*   <a href="http://yxit.co.uk">Tixy's source code</a>.
+*/
+
 #ifndef YMODEM_H
 #define YMODEM_H
 #include <qextserialport/src/qextserialport.h>
 #include <QThread>
 
-
+/**
+Base Class for QymodemTx.
+*/
 class QymodemBase: public QThread
 {
     Q_OBJECT
 signals:
-    void Error(QString,int);
-    void Information(QString,int);
-    ///
-    void Percent(int);
+    /*!
+      An error has ocorred.
+
+      \param errorString A string containing the error that has occurred.
+
+      \param errorNumber The error code.
+    */
+    void Error(QString errorString,int errorNumber);
+    /*!
+      Information regarding a change of state in the transmission process.
+
+      \param infoString A string containing the information of the new state.
+
+      \param infoNumber The information number of the new state.
+    */
+    void Information(QString infoString,int infoNumber);
+    /*!
+      Percentage of the file already sent.
+
+      \param percentSent The percentage of the file already sent.
+
+    */
+    void Percent(int percentSent);
 
 protected:
 

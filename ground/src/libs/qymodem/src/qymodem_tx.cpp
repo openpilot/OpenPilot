@@ -1,3 +1,14 @@
+/**
+ ******************************************************************************
+ *
+ * @file       qymodem_tx.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @brief      Implementation of base class for QymodemSend.
+ * @see        The GNU Public License (GPL) Version 3
+ * @defgroup   ymodem_lib
+ * @{
+ *
+ *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,16 +24,14 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-/**
-@file
 
-@brief Implementation of Y-Modem transmit protocol.
+/*!
+*   \section Credits
+*   This implementation is based on J.D.Medhurst (a.k.a. Tixy) work from
+*   <a href="http://yxit.co.uk">Tixy's source code</a>.
 */
 
-
 #include "qymodem_tx.h"
-
-
 #include <string.h> // for memcpy and memset
 
 
@@ -366,15 +375,6 @@ QymodemTx::QymodemTx(QextSerialPort& port)
         }
 
 
-int QymodemTx::SendX(InStream& in, unsigned timeout, bool kMode)
-        {
-        Use1KBlocks = kMode;
-        int result = SendInitialise(timeout);
-        if(result<0)
-                return result;
-        return SendAll(in);
-        }
-
 
 int QymodemTx::SendY(const char* fileName, size_t size, InStream& in, unsigned timeout)
         {
@@ -417,5 +417,4 @@ int QymodemTx::SendY(const char* fileName, size_t size, InStream& in, unsigned t
         emit Percent(100);
         return 0;
         }
-
 

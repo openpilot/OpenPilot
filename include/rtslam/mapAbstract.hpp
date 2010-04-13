@@ -1,7 +1,7 @@
 /*
  * \file mapAbstract.hpp
  *
- *  Created on: Feb 9, 2010
+ * \date Feb 9, 2010
  *     \author jsola@laas.fr
  *
  * Header file for abstract maps

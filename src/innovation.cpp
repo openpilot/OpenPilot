@@ -1,8 +1,8 @@
 /**
  * \file innovation.cpp
  *
- *  Created on: 25/03/2010
- *     \author: jsola@laas.fr
+ * \date 25/03/2010
+ * \author jsola@laas.fr
  *
  *
  *  ## Add a description here ##

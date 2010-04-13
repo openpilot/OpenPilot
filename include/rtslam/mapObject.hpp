@@ -1,8 +1,8 @@
 /**
  *  \file mapObject.hpp
  *
- *  Created on: 13/03/2010
- *     \author: jsola
+ * \date 13/03/2010
+ * \author jsola
  *
  *  Header file for mappable objects
  *

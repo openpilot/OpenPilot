@@ -1,7 +1,7 @@
 /**
  * landmarkAnchoredHomogeneousPoint.cpp
  *
- *  Created on: 08/03/2010
+ * \date 08/03/2010
  *      Author: jsola
  *
  *  \file landmarkAnchoredHomogeneousPoint.cpp

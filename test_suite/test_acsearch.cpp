@@ -1,8 +1,8 @@
 /**
  * \file test_acsearch.cpp
  *
- *  Created on: 10/04/2010
- *     \author: jsola@laas.fr
+ * \date 10/04/2010
+ * \author jsola@laas.fr
  *
  *
  *  ## Add a description here ##

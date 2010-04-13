@@ -5,7 +5,7 @@
  *
  *   \author: jsola@laas.fr
  *
- *  Created on: 25/03/2010
+ * \date 25/03/2010
  *
  *
  * \ingroup rtslam

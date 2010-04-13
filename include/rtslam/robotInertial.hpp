@@ -1,8 +1,8 @@
 /**
  * \file robotInertial.hpp
  *
- *  Created on: 26/03/2010
- *     \author: jsola@laas.fr
+ * \date 26/03/2010
+ * \author jsola@laas.fr
  *
  *
  *  This file describes the class RobotInertial for a robot driven by inertial measurements.

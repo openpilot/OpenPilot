@@ -1,7 +1,7 @@
 /**
  * robotConstantVelocity.cpp
  *
- *  Created on: 07/03/2010
+ * \date 07/03/2010
  *      Author: jsola
  *
  *  \file robotConstantVelocity.cpp

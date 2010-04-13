@@ -1,8 +1,8 @@
 /**
  * \file test_raw.cpp
  *
- *  Created on: 1/04/2010
- *     \author: jmcodol@laas.fr
+ * \date 1/04/2010
+ * \author jmcodol@laas.fr
  *
  *
  *  ## Add a description here ##

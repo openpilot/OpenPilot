@@ -1,8 +1,8 @@
 /**
  * \file activeSearch.hpp
  *
- *  Created on: 10/04/2010
- *     \author: jsola@laas.fr
+ * \date 10/04/2010
+ * \author jsola@laas.fr
  *
  *
  *  ## Add a description here ##
@@ -259,10 +259,10 @@ namespace jafar {
 				/**
 				 * Project all landmarks to the sensor space.
 				 *
-				 * This function also computes visibility and computes information gain
+				 * This function also computes visibility and information gain
 				 * for each observation.
 				 * The result is a map of visible observations,
-				 * ordered from most to least expected information gain.
+				 * ordered from least to most expected information gain.
 				 *
 				 * \param senPtr pointer to the sensor under consideration.
 				 * \return a map of all observations that are visible from the sensor, ordered according to the information gain.
@@ -273,6 +273,7 @@ namespace jafar {
 				 * Predict appearance of observation.
 				 */
 				void predictApp(const observation_ptr_t & obsPtr);
+
 				/**
 				 * Scan search region for match.
 				 */

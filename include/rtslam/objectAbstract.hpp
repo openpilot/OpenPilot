@@ -3,8 +3,8 @@
  *
  * Header file for abstract objects.
  *
- *  Created on: 17/03/2010
- *     \author: jsola@laas.fr
+ * \date 17/03/2010
+ * \author jsola@laas.fr
  *
  *
  * \ingroup rtslam

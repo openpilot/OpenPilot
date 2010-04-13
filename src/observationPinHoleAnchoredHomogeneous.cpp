@@ -1,7 +1,7 @@
 /**
  * observationPinHoleAnchoredHomogeneous.cpp
  *
- *  Created on: 14/03/2010
+ * \date 14/03/2010
  *      Author: jsola
  *
  *  \file observationPinHoleAnchoredHomogeneous.cpp

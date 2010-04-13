@@ -3,8 +3,8 @@
  *
  * Header file for the robot with constant velocity motion model.
  *
- *  Created on: 14/02/2010
- *     \author: jsola
+ * \date 14/02/2010
+ * \author jsola
  *
  * \ingroup rtslam
  */

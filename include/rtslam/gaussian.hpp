@@ -1,7 +1,7 @@
 /*
  * gaussian.hpp
  *
- *  Created on: 13/02/2010
+ * \date 13/02/2010
  *      Author: jsola, croussil
  */
 

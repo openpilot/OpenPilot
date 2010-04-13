@@ -1,8 +1,8 @@
 /**
  * \file objectAbstract.cpp
  *
- *  Created on: 18/03/2010
- *     \author: jsola@laas.fr
+ * \date 18/03/2010
+ * \author jsola@laas.fr
  *
  *
  *  ## Add a description here ##

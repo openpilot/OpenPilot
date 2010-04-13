@@ -7,7 +7,7 @@
  * Quaternions operate on vectors and other quaternions.
  * Functions for Jacobian computations are also provided.
  *
- *  Created on: 20/02/2010
+ * \date 20/02/2010
  *
  * \ingroup rtslam
  */

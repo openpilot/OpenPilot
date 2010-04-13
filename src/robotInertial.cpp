@@ -1,8 +1,8 @@
 /**
  * \file robotInertial.cpp
  *
- *  Created on: 26/03/2010
- *     \author: jsola@laas.fr
+ * \date 26/03/2010
+ * \author jsola@laas.fr
  *
  *
  *  ## Add a description here ##

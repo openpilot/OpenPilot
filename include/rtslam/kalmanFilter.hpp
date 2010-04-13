@@ -3,7 +3,7 @@
  *
  * Header file for the kalman filter
  *
- *  Created on: 04/03/2010
+ * \date 04/03/2010
  *     \author jsola
  *
  * \ingroup rtslam

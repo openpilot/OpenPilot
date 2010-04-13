@@ -1,8 +1,8 @@
 /**
  * \file expectation.hpp
  *
- *  Created on: 25/03/2010
- *     \author: jsola@laas.fr
+ * \date 25/03/2010
+ * \author jsola@laas.fr
  *
  *
  *  This file defines the class Expectation.

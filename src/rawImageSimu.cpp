@@ -1,7 +1,7 @@
 /**
  * rawImageSimu.cpp
  *
- *  Created on: 1/04/2010
+ * \date 1/04/2010
  *      Author: jmcodol
  *
  *  \file rawImageSimu.cpp

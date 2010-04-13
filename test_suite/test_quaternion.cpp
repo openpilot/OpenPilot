@@ -1,7 +1,7 @@
 /**
  * test_quaterion.cpp
  *
- *  Created on: 28/02/2010
+ * \date 28/02/2010
  *      Author: jsola
  *
  *  \file test_quaterion.cpp

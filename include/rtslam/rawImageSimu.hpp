@@ -4,8 +4,8 @@
  *
  *  Header file for simulated image
  *
- *  Created on: 14/03/2010
- *     \author: jmcodol@laas.fr
+ * \date 14/03/2010
+ * \author jmcodol@laas.fr
  *
  * \ingroup rtslam
  */

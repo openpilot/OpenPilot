@@ -1,8 +1,8 @@
 /**
  * \file test_main.cpp
  *
- *  Created on: 24/03/2010
- *     \author: jsola@laas.fr
+ * \date 24/03/2010
+ * \author jsola@laas.fr
  *
  *
  *  This test acts as a main() function for rtslam.

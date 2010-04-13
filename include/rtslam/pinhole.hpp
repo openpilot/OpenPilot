@@ -1,8 +1,8 @@
 /**
  * \file pinhole.hpp
  *
- *  Created on: 06/04/2010
- *     \author: jsola@laas.fr
+ * \date 06/04/2010
+ * \author jsola@laas.fr
  *
  *
  *  ## Add a description here ##

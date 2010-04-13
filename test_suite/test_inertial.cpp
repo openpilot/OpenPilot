@@ -1,8 +1,8 @@
 /**
  * \file test_inertial.cpp
  *
- *  Created on: 28/03/2010
- *     \author: jsola@laas.fr
+ * \date 28/03/2010
+ * \author jsola@laas.fr
  *
  *
  *  ## Add a description here ##

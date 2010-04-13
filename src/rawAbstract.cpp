@@ -2,7 +2,7 @@
 /**
  * rawAbstract.cpp
  *
- *  Created on: 30/03/2010
+ * \date 30/03/2010
  *      Author: jmcodol
  *
  *  \file rawAbstract.cpp

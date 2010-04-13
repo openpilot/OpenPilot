@@ -1,7 +1,7 @@
 /**
  * mapObject.cpp
  *
- *  Created on: 13/03/2010
+ * \date 13/03/2010
  *      Author: jsola
  *
  *  \file mapObject.cpp

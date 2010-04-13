@@ -1,7 +1,7 @@
 /**
  * test_senPH.cpp
  *
- *  Created on: 12/03/2010
+ * \date 12/03/2010
  *      Author: jsola
  *
  *  \file test_senPH.cpp

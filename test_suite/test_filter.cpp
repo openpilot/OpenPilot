@@ -1,7 +1,7 @@
 /**
  * test_filter.cpp
  *
- *  Created on: 05/03/2010
+ * \date 05/03/2010
  *      Author: jsola
  *
  *  \file test_filter.cpp

@@ -3,7 +3,7 @@
  *
  * Header file for observations of Anchored Homogeneous Points (AHP) from pin-hole cameras.
  *
- *  Created on: 14/02/2010
+ * \date 14/02/2010
  *     \author jsola
  *
  * \ingroup rtslam

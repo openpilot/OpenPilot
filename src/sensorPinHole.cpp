@@ -1,7 +1,7 @@
 /**
  * sensorPinHole.cpp
  *
- *  Created on: 10/03/2010
+ * \date 10/03/2010
  *      Author: jsola
  *
  *  \file sensorPinHole.cpp

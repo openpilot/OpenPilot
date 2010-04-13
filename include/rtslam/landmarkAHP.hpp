@@ -1,8 +1,8 @@
 /**
  * \file landmarkAHP.hpp
  *
- *  Created on: 13/04/2010
- *     \author: jsola@laas.fr
+ * \date 13/04/2010
+ * \author jsola@laas.fr
  *
  *
  *  This file defines the namespace landmarkAHP in jafar::rtslam.

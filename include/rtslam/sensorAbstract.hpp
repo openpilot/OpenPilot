@@ -3,8 +3,8 @@
  *
  * Header file for the abstract sensor.
  *
- *  Created on: Jan 28, 2010
- *     \author: jsola
+ * \date Jan 28, 2010
+ * \author jsola
  *
  * \ingroup rtslam
  */

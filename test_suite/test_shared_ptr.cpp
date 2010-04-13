@@ -1,8 +1,8 @@
 /**
  * \file test_shared_ptr.cpp
  *
- *  Created on: 19/03/2010
- *     \author: jsola@laas.fr
+ * \date 19/03/2010
+ * \author jsola@laas.fr
  *
  *
  *  ## Add a description here ##

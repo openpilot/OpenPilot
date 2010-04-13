@@ -25,6 +25,11 @@ namespace jafar {
 			type("AHP");
 		}
 
+		vec3 LandmarkAnchoredHomogeneousPoint::toEuclidean() {
+			return landmarkAHP::ahp2euc(state.x());
+		}
+
+
 
 	} // namespace rtslam
 } // namespace jafar

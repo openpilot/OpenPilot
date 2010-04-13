@@ -102,9 +102,7 @@ namespace jafar {
 				 * \param ahp the anchored homogeneous point to be reparametrized.
 				 * \return the Euclidean point.
 				 */
-				vec3 toEuclidean() {
-					return landmarkAHP::ahp2euc(state.x());
-				}
+				vec3 toEuclidean();
 
 
 				/**

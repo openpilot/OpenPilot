@@ -24,27 +24,6 @@ void BasicSvgDial::setRenderer(RendererType type)
 void BasicSvgDial::paintEvent(QPaintEvent *event) {
     qDebug() << "in painEvent()";
 
-    QGraphicsScene *s = scene();
-    s->clear();
-    m_backgroundItem = new QGraphicsSvgItem(backgroundFile);
-    m_backgroundItem->setZValue(-1);
-
-    m_needleItem = new QGraphicsSvgItem(needleFile);
-    QRectF rect = m_needleItem->boundingRect();
-    m_needleItem->translate(rect.width()/2,rect.height()/2);
-    m_needleItem->rotate(angle);
-    m_needleItem->translate(-rect.width()/2,-rect.height()/2);
-    m_needleItem->setZValue(0);
-
-    m_foregroundItem = new QGraphicsSvgItem(foregroundFile);
-    m_foregroundItem->setZValue(1);
-
-    s->addItem(m_backgroundItem);
-    s->addItem(m_needleItem);
-    s->addItem(m_foregroundItem);
-
-    s->setSceneRect(m_backgroundItem->boundingRect());
-
     QGraphicsView::paintEvent(event);
 
     qDebug() << "out paintEvent()";
@@ -58,6 +37,7 @@ void BasicSvgDial::paintEvent(QPaintEvent *event) {
 void BasicSvgDial::setAngle(int i) {
     qDebug() << "BasicDial::setAngle()";
     angle = value2angle(i);
+
     update();
 }
 
@@ -79,6 +59,26 @@ qreal BasicSvgDial::value2angle(qreal value) {
 void BasicSvgDial::setValue(qreal value) {
     angle = value2angle(value);
     currentValue = value;
+    QGraphicsScene *s = scene();
+    s->clear();
+    m_backgroundItem = new QGraphicsSvgItem(backgroundFile);
+    m_backgroundItem->setZValue(-1);
+
+    m_needleItem = new QGraphicsSvgItem(needleFile);
+    QRectF rect = m_needleItem->boundingRect();
+    m_needleItem->translate(rect.width()/2,rect.height()/2);
+    m_needleItem->rotate(angle);
+    m_needleItem->translate(-rect.width()/2,-rect.height()/2);
+    m_needleItem->setZValue(0);
+
+    m_foregroundItem = new QGraphicsSvgItem(foregroundFile);
+    m_foregroundItem->setZValue(1);
+
+    s->addItem(m_backgroundItem);
+    s->addItem(m_needleItem);
+    s->addItem(m_foregroundItem);
+
+    s->setSceneRect(m_backgroundItem->boundingRect());
     update();
 }
 

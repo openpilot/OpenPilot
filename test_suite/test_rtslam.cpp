@@ -2,14 +2,14 @@
  * test_rtslam.cpp
  *
  * \date 12/03/2010
- *      Author: jsola
+ * \author jsola@laas.fr
  *
  *  \file test_rtslam.cpp
  *
  *  This test file acts as a main() program for the rtslam project.
  *
  *  Achievements (newest to oldest):
- *  - 2010/03/22: jsola: Created 1 map, 2 robots, 3 sensors, 2 landmarks, 6 observations, with parental links and print.
+ *  - 2010/03/22: jsola@laas.fr: Created 1 map, 2 robots, 3 sensors, 2 landmarks, 6 observations, with parental links and print.
  *
  * \ingroup rtslam
  */

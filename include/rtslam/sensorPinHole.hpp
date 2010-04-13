@@ -3,8 +3,8 @@
  *
  * Header file for pin-hole sensor.
  *
+ * \author jsola@laas.fr
  * \date 14/02/2010
- *  \author jsola
  *
  * \ingroup rtslam
  */
@@ -76,6 +76,7 @@ namespace jafar {
 				 * \param U_v the Jacobian of \a u wrt \a v
 				 */
 				void projectPoint(const vec3 & v, vec2 & u, mat23 & U_v);
+
 
 		};
 

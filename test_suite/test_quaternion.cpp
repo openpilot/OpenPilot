@@ -2,7 +2,7 @@
  * test_quaterion.cpp
  *
  * \date 28/02/2010
- *      Author: jsola
+ * \author jsola@laas.fr
  *
  *  \file test_quaterion.cpp
  *

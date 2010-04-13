@@ -2,7 +2,7 @@
  * mapObject.cpp
  *
  * \date 13/03/2010
- *      Author: jsola
+ * \author jsola@laas.fr
  *
  *  \file mapObject.cpp
  *

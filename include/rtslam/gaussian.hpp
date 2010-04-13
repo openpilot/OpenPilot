@@ -2,7 +2,7 @@
  * gaussian.hpp
  *
  * \date 13/02/2010
- *      Author: jsola, croussil
+ * \author jsola@laas.fr, croussil
  */
 
 /**

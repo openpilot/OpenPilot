@@ -2,7 +2,7 @@
  * test_filter.cpp
  *
  * \date 05/03/2010
- *      Author: jsola
+ * \author jsola@laas.fr
  *
  *  \file test_filter.cpp
  *

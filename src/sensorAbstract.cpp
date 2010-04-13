@@ -2,7 +2,7 @@
  * sensorAbstract.cpp
  *
  * \date 10/03/2010
- *      Author: jsola
+ * \author jsola@laas.fr
  *
  *  \file sensorAbstract.cpp
  *

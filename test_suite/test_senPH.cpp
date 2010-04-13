@@ -2,7 +2,7 @@
  * test_senPH.cpp
  *
  * \date 12/03/2010
- *      Author: jsola
+ * \author jsola@laas.fr
  *
  *  \file test_senPH.cpp
  *

@@ -3,7 +3,7 @@
  * rawAbstract.cpp
  *
  * \date 30/03/2010
- *      Author: jmcodol
+ * \author jmcodol
  *
  *  \file rawAbstract.cpp
  *

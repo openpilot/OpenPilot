@@ -2,7 +2,7 @@
  * landmarkAnchoredHomogeneousPoint.cpp
  *
  * \date 08/03/2010
- *      Author: jsola
+ * \author jsola@laas.fr
  *
  *  \file landmarkAnchoredHomogeneousPoint.cpp
  *

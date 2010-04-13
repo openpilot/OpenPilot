@@ -4,7 +4,7 @@
  * Header file for the abstract sensor.
  *
  * \date Jan 28, 2010
- * \author jsola
+ * \author jsola@laas.fr
  *
  * \ingroup rtslam
  */

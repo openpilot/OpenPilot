@@ -1,7 +1,7 @@
 /**
  *
  * \file quatTools.hpp
- * \author jsola
+ * \author jsola@laas.fr
  * File defining geometric operations with quaternions.
  *
  * Quaternions operate on vectors and other quaternions.

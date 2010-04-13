@@ -34,7 +34,7 @@ namespace jafar {
 
 		/** Base class for all map types defined in the module rtslam.
 		 *
-		 * \author jsola
+		 * \author jsola@laas.fr
 		 * \ingroup rtslam
 		 */
 		class MapAbstract {

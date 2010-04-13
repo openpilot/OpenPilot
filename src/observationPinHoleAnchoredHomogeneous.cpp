@@ -2,7 +2,7 @@
  * observationPinHoleAnchoredHomogeneous.cpp
  *
  * \date 14/03/2010
- *      Author: jsola
+ * \author jsola@laas.fr
  *
  *  \file observationPinHoleAnchoredHomogeneous.cpp
  *

@@ -66,7 +66,7 @@ namespace jafar {
 
 		/**
 		 * Base class for all observations defined in the module rtslam.
-		 * \author jsola
+		 * \author jsola@laas.fr
 		 *
 		 * In this class, the Jacobians are sparse. The states that contribute to the observation are available through an indirect array
 		 * - this->ia_rsl

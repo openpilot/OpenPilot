@@ -4,7 +4,7 @@
  * Header file for the kalman filter
  *
  * \date 04/03/2010
- *     \author jsola
+ *     \author jsola@laas.fr
  *
  * \ingroup rtslam
  */

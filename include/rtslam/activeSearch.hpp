@@ -1,11 +1,12 @@
 /**
  * \file activeSearch.hpp
  *
+ *  Active search detection and matching for points.
+ *
  * \date 10/04/2010
  * \author jsola@laas.fr
  *
- *
- *  ## Add a description here ##
+ * ## Add detailed description here ##
  *
  * \ingroup rtslam
  */

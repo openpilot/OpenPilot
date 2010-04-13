@@ -4,7 +4,7 @@
  * Header file for the robot with constant velocity motion model.
  *
  * \date 14/02/2010
- * \author jsola
+ * \author jsola@laas.fr
  *
  * \ingroup rtslam
  */

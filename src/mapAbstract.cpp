@@ -2,7 +2,7 @@
  * mapAbstract.cpp
  *
  * \date 10/03/2010
- *      Author: jsola
+ * \author jsola@laas.fr
  *
  *  \file mapAbstract.cpp
  *

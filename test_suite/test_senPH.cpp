@@ -17,6 +17,8 @@
 #include "kernel/jafarTestMacro.hpp"
 #include "jmath/random.hpp"
 #include "jmath/matlab.hpp"
+#include "jmath/jblas.hpp"
+#include "jmath/ublasExtra.hpp"
 
 #include <iostream>
 
@@ -26,6 +28,7 @@
 
 using namespace std;
 using namespace jblas;
+using namespace jafar;
 using namespace jafar::rtslam;
 using namespace jafar::jmath;
 
@@ -38,6 +41,8 @@ void test_senPH01(void) {
 	vec3 v;
 	vec2 u;
 	mat23 U_v;
+	mat32 V_u;
+	mat V_s(3,1);
 	vec4 k;
 	vec d(2), c(2);
 
@@ -45,13 +50,33 @@ void test_senPH01(void) {
 	k(1) = 100;
 	k(2) = 100;
 	k(3) = 100;
-	randVector(v);
 	randVector(d);
-	d *= 0.1;
+	randVector(d);
+	d *= 0.0;
 	c = d;
 	senPtr->set_parameters(k, d, c);
 
+	randVector(u);
+	u *= k(0);
+	double s = 2;
 
+
+	cout << "\n% BACK-PROJECTION \n%=====================\n" << endl;
+	pinhole::backProjectPoint(k, c, u, s, v, V_u, V_s);
+	cout << "k = " << (MATLAB) k << endl;
+	cout << "c = " << (MATLAB) c << endl;
+	cout << "u = " << (MATLAB) u << endl;
+	cout << "s = " << s << endl;
+	cout << "v = " << (MATLAB) v << endl;
+	cout << "[v_mat,Vmat_u,Vmat_s] = invPinHole(u, s, k, c)" << endl;
+	cout << "V_u = " << (MATLAB) V_u << endl;
+	cout << "V_s = " << (MATLAB) V_s << endl;
+	cout << "v_err = norm(v - v_mat)" << endl;
+	cout << "V_u_err = norm(V_u - Vmat_u)" << endl;
+	cout << "V_s_err = norm(V_s - Vmat_s)" << endl;
+
+
+	cout << "\n% PROJECTION \n%=====================\n" << endl;
 	//	u = senPH.projectPoint(k,d,v);
 	u = pinhole::projectPoint(senPtr->intrinsic, senPtr->distortion, v);
 	cout << "k = " << (MATLAB) k << endl;
@@ -65,7 +90,9 @@ void test_senPH01(void) {
 	cout << "u_err = norm(u - u_mat)" << endl;
 	cout << "U_v_err = norm(U_v - Umat_v)" << endl;
 
-	cout << "End" << endl;
+	cout << "\n% BACK plus FORWARD PROJECTIONS \n%=====================\n" << endl;
+	cout << "U_v_times_V_u = " << (MATLAB) ublas::prod(U_v, V_u) << endl;
+	JFR_CHECK_MAT_EQUAL(ublas::prod(U_v, V_u), identity_mat(2))
 
 }
 

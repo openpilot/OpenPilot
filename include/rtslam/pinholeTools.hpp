@@ -20,6 +20,7 @@ namespace jafar {
 
 		using namespace jblas;
 
+
 		/**
 		 * Namespace for operations related to the pin-hole model of a camera.
 		 *
@@ -66,13 +67,29 @@ namespace jafar {
 			}
 
 			template<class U>
-			vec3 backprojectPointFromNormalizedPlane(const U & u, double depth = 1) {
+			vec3 backprojectPointFromNormalizedPlane(const U & u, double s = 1) {
 
 				vec3 p;
-				p(0) = depth*u(0);
-				p(1) = depth*u(1);
-				p(2) = depth;
+				p(0) = s * u(0);
+				p(1) = s * u(1);
+				p(2) = s;
 				return p;
+			}
+
+			template<class U, class P, class MP_u, class MP_s>
+			void backprojectPointFromNormalizedPlane(const U & u, const double s, P & p, MP_u & P_u, MP_s & P_s) {
+				p = backprojectPointFromNormalizedPlane(u, s);
+
+				P_u(0, 0) = s;
+				P_u(0, 1) = 0.0;
+				P_u(1, 0) = 0.0;
+				P_u(1, 1) = s;
+				P_u(2, 0) = 0.0;
+				P_u(2, 1) = 0.0;
+
+				P_s(0, 0) = u(0);
+				P_s(1, 0) = u(1);
+				P_s(2, 0) = 1.0;
 			}
 
 
@@ -226,6 +243,7 @@ namespace jafar {
 				return u;
 			}
 
+
 			/**
 			 * Pixellization from k = [u_0, v_0, a_u, a_v] with jacobians
 			 * \param k the vector of intrinsic parameters, k = [u0, v0, au, av]
@@ -248,6 +266,7 @@ namespace jafar {
 				U_ud(1, 1) = a_v;
 			}
 
+
 			/**
 			 * Depixellization from k = [u_0, v_0, a_u, a_v]
 			 * \param k the vector of intrinsic parameters, k = [u0, v0, au, av]
@@ -266,6 +285,7 @@ namespace jafar {
 				return ud;
 			}
 
+
 			/**
 			 * Depixellization from k = [u_0, v_0, a_u, a_v], with Jacobians
 			 * \param k the vector of intrinsic parameters, k = [u0, v0, au, av]
@@ -275,8 +295,8 @@ namespace jafar {
 			 */
 			template<class VK, class VUd, class VU, class MUD_u>
 			void depixellizePoint(const VK & k, const VU & u, VUd & ud, MUD_u & UD_u) {
-					//				double u_0 = k(0);
-					//				double v_0 = k(1);
+				//				double u_0 = k(0);
+				//				double v_0 = k(1);
 				double a_u = k(2);
 				double a_v = k(3);
 
@@ -324,18 +344,39 @@ namespace jafar {
 				U_v = ublas::prod(U_ud, U_v1);
 			}
 
+
 			/**
 			 * Back-Project a point from a pin-hole camera with radial distortion
 			 * \param k the vector of intrinsic parameters, k = [u0, v0, au, av]
 			 * \param c the radial undistortion parameters vector
 			 * \param u the 2D pixel
-			 * \param depth the depth prior
+			 * \param s the depth prior
 			 * \return the back-projected 3D point
 			 */
 			template<class VK, class VC, class U>
-			vec3 backprojectPoint(const VK & k, const VC & c, const U & u, double depth = 1.0) {
-				return backprojectPointFromNormalizedPlane(undistortPoint(c, depixellizePoint(k, u)), depth);
+			vec3 backprojectPoint(const VK & k, const VC & c, const U & u, const double s = 1.0) {
+				return backprojectPointFromNormalizedPlane(undistortPoint(c, depixellizePoint(k, u)), s);
 			}
+			/**
+			 * Back-Project a point from a pin-hole camera with radial distortion; give Jacobians
+			 * \param k the vector of intrinsic parameters, k = [u0, v0, au, av]
+			 * \param c the radial undistortion parameters vector
+			 * \param u the 2D pixel
+			 * \param s the depth prior
+			 * \param v the back-projected 3D point
+			 */
+			template<class VK, class VC, class U, class P, class MP_u, class MP_s>
+			void backProjectPoint(const VK & k, const VC & c, const U & u, const double & s, P & p, MP_u & P_u, MP_s & P_s) {
+				vec2 up, ud;
+				mat32 P_up;
+				mat22 UP_ud, UD_u;
+				depixellizePoint(k, u, ud, UD_u);
+				undistortPoint(c, ud, up, UP_ud);
+				backprojectPointFromNormalizedPlane(up, s, p, P_up, P_s);
+
+				P_u = ublas::prod(P_up, ublas::prod<mat>(UP_ud, UD_u));
+			}
+
 
 			/**
 			 * Determine if a pixel is inside the image
@@ -344,8 +385,8 @@ namespace jafar {
 			 * \param height the image height, in pixels
 			 */
 			template<class VPix>
-			bool isInImage(const VPix & pix, const int & width, const int & height){
-					return ((pix(0) > 0) && (pix(0) <= width) && (pix(1) > 0) && (pix(1) <= height));
+			bool isInImage(const VPix & pix, const int & width, const int & height) {
+				return ((pix(0) > 0) && (pix(0) <= width) && (pix(1) > 0) && (pix(1) <= height));
 			}
 
 		} // namespace pinhole

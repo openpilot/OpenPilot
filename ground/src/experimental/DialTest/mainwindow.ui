@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>607</width>
-    <height>406</height>
+    <height>438</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,6 +20,9 @@
     </item>
     <item>
      <layout class="QGridLayout" name="gridLayout">
+      <property name="verticalSpacing">
+       <number>6</number>
+      </property>
       <item row="1" column="0">
        <widget class="QLabel" name="labelTopValue">
         <property name="text">
@@ -94,53 +97,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="labelColor">
-        <property name="text">
-         <string>Needle color</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QComboBox" name="comboColor">
-        <item>
-         <property name="text">
-          <string>black</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>red</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>green</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>yellow</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>blue</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="2" column="2" colspan="2">
-       <widget class="QLineEdit" name="lineFile"/>
-      </item>
-      <item row="2" column="4">
-       <widget class="QPushButton" name="buttonFile">
-        <property name="text">
-         <string>File</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1" colspan="4">
+      <item row="2" column="1" colspan="4">
        <widget class="QSlider" name="sliderValue">
         <property name="maximum">
          <number>100</number>
@@ -150,17 +107,10 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="labelValueSlider">
         <property name="text">
          <string>Set value</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="4">
-       <widget class="QPushButton" name="buttonUpdate">
-        <property name="text">
-         <string>Update</string>
         </property>
        </widget>
       </item>
@@ -168,6 +118,64 @@
        <widget class="QPushButton" name="buttonQuit">
         <property name="text">
          <string>Quit</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Background</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="lineFile"/>
+      </item>
+      <item row="3" column="2">
+       <widget class="QPushButton" name="buttonBackground">
+        <property name="text">
+         <string>Browse...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Needle</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Foreground</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="lineFileNeedle"/>
+      </item>
+      <item row="5" column="1">
+       <widget class="QLineEdit" name="lineFileForeground"/>
+      </item>
+      <item row="4" column="2">
+       <widget class="QPushButton" name="buttonNeedle">
+        <property name="text">
+         <string>Browse...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="2">
+       <widget class="QPushButton" name="buttonForeground">
+        <property name="text">
+         <string>Browse...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="4">
+       <widget class="QPushButton" name="buttonUpdate">
+        <property name="text">
+         <string>Update</string>
         </property>
        </widget>
       </item>

@@ -6,8 +6,8 @@ TARGET = DialTest
 TEMPLATE = app
 SOURCES += main.cpp \
     mainwindow.cpp \
-    basicdial.cpp
+    basicsvgdial.cpp
 HEADERS += mainwindow.h \
-    basicdial.h
+    basicsvgdial.h
 FORMS += mainwindow.ui
 RESOURCES += 

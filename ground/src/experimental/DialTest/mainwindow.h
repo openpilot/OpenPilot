@@ -5,7 +5,7 @@
 #include <QDebug>
 #include <QFileDialog>
 
-#include "basicdial.h"
+#include "basicsvgdial.h"
 
 namespace Ui
 {
@@ -22,10 +22,12 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    BasicDial      *dial;
+    BasicSvgDial      *dial;
 
 private slots:
-    void on_buttonFile_clicked();
+    void on_buttonBackground_clicked();
+    void on_buttonNeedle_clicked();
+    void on_buttonForeground_clicked();
     void on_sliderValue_valueChanged(int value);
     void on_buttonUpdate_clicked();
     void on_buttonQuit_clicked();

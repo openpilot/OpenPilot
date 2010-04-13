@@ -43,6 +43,11 @@ namespace jafar {
 				 */
 				SensorPinHole(const robot_ptr_t & _robPtr, bool inFilter = false);
 
+				jblas::vec2 imgSize;
+				jblas::vec4 intrinsic;
+				jblas::vec distortion;
+				jblas::vec correction;
+
 				/**
 				 * Pin-hole sensor setup.
 				 * \param k the vector of intrinsic parameters <c>k = [u_0, v_0, a_u, a_v]</c>.
@@ -57,75 +62,20 @@ namespace jafar {
 					return 7;
 				}
 
-				static vec2 projectPoint(const vec4 & k, const vec & d, const vec3 & v);
-				static void projectPoint(const vec4 & k, const vec & d, const vec3 & v, vec2 & u, mat23 & U_v);
+				/**
+				 * Project a point into a pin-hole camera with radial distortion
+				 * \param v the 3D point to project, or the 3D director vector
+				 * \return the projected and distorted point
+				 */
 				vec2 projectPoint(const vec3 & v);
+
+				/**
+				 * Project a point into a pin-hole camera with radial distortion
+				 * \param v the 3D point to project, or the 3D director vector
+				 * \param u the projected and distorted point
+				 * \param U_v the Jacobian of \a u wrt \a v
+				 */
 				void projectPoint(const vec3 & v, vec2 & u, mat23 & U_v);
-
-				/**
-				 * Pin hole normalized projection for 3D points.
-				 * \param p the point to project
-				 * \return the projected point in the normalized image plane (at focal distance \e f = 1).
-				 */
-				static jblas::vec2 projectPointToNormalizedPlane(const jblas::vec3 & p);
-
-				/**
-				 * Pin hole normalized projection for 3D points, with Jacobian.
-				 * \param v the point to project
-				 * \param up the projected point in the normalized image plane (at focal distance \e f = 1).
-				 * \param UP_v the Jacobian of \a up wrt \a v.
-				 */
-				static void projectPointToNormalizedPlane(const jblas::vec3 & v, vec2 & up, mat23 & UP_v);
-
-				/**
-				 * Radial distortion.
-				 * This follows the model
-				 * - ud = (1 + d_0 * r^2 + d_1 * r^4 + d_2 * r^6 + etc) * u
-				 *
-				 * with r = norm(u)^2.
-				 * \param d the radial distortion parameters d = [d_0, d_1, ...]
-				 * \param up the undistorted pixel
-				 * \return the distorted pixel
-				 */
-				static jblas::vec2 distortPoint(const jblas::vec & d, const jblas::vec2 & up);
-
-				/**
-				 * Radial distortion.
-				 * This follows the model
-				 * - ud = (1 + d_0 * r^2 + d_1 * r^4 + d_2 * r^6 + etc) * u
-				 *
-				 * with r = norm(u)^2.
-				 * \param d the radial distortion parameters d = [d_0, d_1, ...]
-				 * \param up the undistorted pixel
-				 * \param ud the distorted pixel
-				 * \param UD_up the Jacobian of \a ud wrt \a up
-				 */
-				static void distortPoint(const jblas::vec & d, const jblas::vec2 & up, vec2 & ud, mat22 & UD_up);
-
-				/**
-				 * Rectangular pixellization.
-				 * Transforms a projected point in metric coordinates into a pixel value
-				 * \param k the intrinsic parameters vector, \a k = [u_0, v_0, a_u, a_v]
-				 * \param ud the projected point
-				 * \return the pixel value
-				 */
-				static jblas::vec2 pixellizePoint(const jblas::vec4 & k, const jblas::vec2 & ud);
-
-				/**
-				 * Rectangular pixellization.
-				 * Transforms a projected point in metric coordinates into a pixel value
-				 * \param k the intrinsic parameters vector, \a k = [u_0, v_0, a_u, a_v]
-				 * \param ud the projected point
-				 * \param u the pixel value
-				 * \param U_ud the Jacobian of \a u wrt \a ud
-				 */
-				static void pixellizePoint(const jblas::vec4 & k, const jblas::vec2 & ud, jblas::vec2 & u, jblas::mat22 & U_ud);
-
-//			private:
-				jblas::vec2 imgSize;
-				jblas::vec4 intrinsic;
-				jblas::vec distortion;
-				jblas::vec correction;
 
 		};
 

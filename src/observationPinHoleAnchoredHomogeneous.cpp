@@ -12,7 +12,7 @@
  */
 
 #include "boost/shared_ptr.hpp"
-#include "rtslam/pinhole.hpp"
+#include "rtslam/pinholeTools.hpp"
 
 #include "rtslam/observationPinHoleAnchoredHomogeneous.hpp"
 

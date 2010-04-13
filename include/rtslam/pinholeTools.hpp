@@ -1,5 +1,5 @@
 /**
- * \file pinhole.hpp
+ * \file pinholeTools.hpp
  *
  * \date 06/04/2010
  * \author jsola@laas.fr

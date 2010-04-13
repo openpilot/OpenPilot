@@ -11,7 +11,7 @@
  * \ingroup rtslam
  */
 
-#include "rtslam/pinhole.hpp"
+#include "rtslam/pinholeTools.hpp"
 
 #include "rtslam/sensorPinHole.hpp"
 

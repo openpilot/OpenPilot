@@ -1,5 +1,5 @@
 /**
- * \file landmarkAHP.hpp
+ * \file ahpTools.hpp
  *
  * \date 13/04/2010
  * \author jsola@laas.fr

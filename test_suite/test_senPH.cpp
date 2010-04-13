@@ -20,7 +20,7 @@
 
 #include <iostream>
 
-#include "rtslam/pinhole.hpp"
+#include "rtslam/pinholeTools.hpp"
 #include "rtslam/robotConstantVelocity.hpp"
 #include "rtslam/sensorPinHole.hpp"
 

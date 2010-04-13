@@ -65,6 +65,16 @@ namespace jafar {
 
 			}
 
+			template<class U>
+			vec3 backprojectPointFromNormalizedPlane(const U & u, double depth = 1) {
+
+				vec3 p;
+				p(0) = depth*u(0);
+				p(1) = depth*u(1);
+				p(2) = depth;
+				return p;
+			}
+
 
 			/**
 			 * Radial distortion: ud = (1 + d_0 * r^2 + d_1 * r^4 + d_2 * r^6 + etc) * u
@@ -138,6 +148,64 @@ namespace jafar {
 				}
 
 			}
+			template<class VC, class VU>
+			jblas::vec2 undistortPoint(const VC & c, const VU & ud) {
+				size_t n = c.size();
+				if (n == 0)
+					return ud;
+				else {
+					double r2 = ud(0) * ud(0) + ud(1) * ud(1); // this is the norm squared: r2 = ||u||^2
+					double s = 1.0;
+					double r2i = 1.0;
+					for (size_t i = 0; i < n; i++) { //   here we are doing:
+						r2i = r2i * r2; //                    r2i = r^(2*(i+1))
+						s += c(i) * r2i; //                   s = 1 + c_0 * r^2 + c_1 * r^4 + c_2 * r^6 + ...
+					}
+					return s * ud; //                     finally: up = (1 + c_0 * r^2 + c_1 * r^4 + c_2 * r^6 + ...) * u;
+				}
+			}
+
+			template<class VC, class VUd, class VUp, class MUP_ud>
+			void undistortPoint(const VC & c, const VUd & ud, VUp & up, MUP_ud & UP_ud) {
+				size_t n = c.size();
+				jblas::vec2 R2_ud;
+				jblas::vec2 S_ud;
+
+				if (n == 0) {
+					up = ud;
+					UP_ud = jblas::identity_mat(2);
+				}
+
+				else {
+					double r2 = ud(0) * ud(0) + ud(1) * ud(1); // this is the norm squared: r2 = ||u||^2
+					double s = 1.0;
+					double r2i = 1.0;
+					double r2im1 = 1.0; //r2*(i-1)
+					double S_r2 = 0.0;
+
+					for (size_t i = 0; i < n; i++) { //.. here we are doing:
+						r2i = r2i * r2; //................. r2i = r^(2*(i+1))
+						s += c(i) * r2i; //................ s = 1 + c_0 * r^2 + c_1 * r^4 + c_2 * r^6 + ...
+
+						S_r2 = S_r2 + (i + 1) * c(i) * r2im1; //jacobian of s wrt r2 : S_r2 = c_0 + 2 * d1 * r^2 + 3 * c_2 * r^4 +  ...
+						r2im1 = r2im1 * r2;
+					}
+
+					up = s * ud; // finally up = (1 + c_0 * r^2 + c_1 * r^4 + c_2 * r^6 + ...) * u;
+
+					R2_ud(0) = 2 * ud(0);
+					R2_ud(1) = 2 * ud(1);
+
+					S_ud(0) = R2_ud(0) * S_r2;
+					S_ud(1) = R2_ud(1) * S_r2;
+
+					UP_ud(0, 0) = S_ud(0) * ud(0) + s;
+					UP_ud(0, 1) = S_ud(1) * ud(0);
+					UP_ud(1, 0) = S_ud(0) * ud(1);
+					UP_ud(1, 1) = S_ud(1) * ud(1) + s;
+				}
+
+			}
 
 
 			/**
@@ -157,7 +225,6 @@ namespace jafar {
 				u(1) = v_0 + a_v * ud(1);
 				return u;
 			}
-
 
 			/**
 			 * Pixellization from k = [u_0, v_0, a_u, a_v] with jacobians
@@ -179,7 +246,46 @@ namespace jafar {
 				U_ud(0, 1) = 0;
 				U_ud(1, 0) = 0;
 				U_ud(1, 1) = a_v;
+			}
 
+			/**
+			 * Depixellization from k = [u_0, v_0, a_u, a_v]
+			 * \param k the vector of intrinsic parameters, k = [u0, v0, au, av]
+			 * \param u the point to depixellize, in pixels
+			 * \return the depixellized point, adimensional
+			 */
+			template<class VK, class VU>
+			jblas::vec2 depixellizePoint(const VK & k, const VU & u) {
+				double u_0 = k(0);
+				double v_0 = k(1);
+				double a_u = k(2);
+				double a_v = k(3);
+				vec2 ud;
+				ud(0) = (u(0) - u_0) / a_u;
+				ud(1) = (u(1) - v_0) / a_v;
+				return ud;
+			}
+
+			/**
+			 * Depixellization from k = [u_0, v_0, a_u, a_v], with Jacobians
+			 * \param k the vector of intrinsic parameters, k = [u0, v0, au, av]
+			 * \param u the point to depixellize, in pixels
+			 * \param ud the depixellized point
+			 * \param UD_u the Jacobian of \a ud wrt \a u
+			 */
+			template<class VK, class VUd, class VU, class MUD_u>
+			void depixellizePoint(const VK & k, const VU & u, VUd & ud, MUD_u & UD_u) {
+					//				double u_0 = k(0);
+					//				double v_0 = k(1);
+				double a_u = k(2);
+				double a_v = k(3);
+
+				ud = depixellizePoint(k, u);
+
+				UD_u(0, 0) = 1 / a_u;
+				UD_u(0, 1) = 0;
+				UD_u(1, 0) = 0;
+				UD_u(1, 1) = 1 / a_v;
 			}
 
 
@@ -216,6 +322,19 @@ namespace jafar {
 				mat23 U_v1;
 				U_v1 = ublas::prod(UD_up, UP_v);
 				U_v = ublas::prod(U_ud, U_v1);
+			}
+
+			/**
+			 * Back-Project a point from a pin-hole camera with radial distortion
+			 * \param k the vector of intrinsic parameters, k = [u0, v0, au, av]
+			 * \param c the radial undistortion parameters vector
+			 * \param u the 2D pixel
+			 * \param depth the depth prior
+			 * \return the back-projected 3D point
+			 */
+			template<class VK, class VC, class U>
+			vec3 backprojectPoint(const VK & k, const VC & c, const U & u, double depth = 1.0) {
+				return backprojectPointFromNormalizedPlane(undistortPoint(c, depixellizePoint(k, u)), depth);
 			}
 
 			/**

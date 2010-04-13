@@ -9,13 +9,13 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="744.09448"
-   height="1052.3622"
+   width="304.01532"
+   height="289.8732"
    id="svg10068"
    version="1.1"
    inkscape:version="0.47 r22583"
    sodipodi:docname="dials-master.svg"
-   inkscape:export-filename="H:\Documents\Hobbies\W433\My Gauges\vario-001.png"
+   inkscape:export-filename="H:\Documents\Hobbies\W433\My Gauges\heading-001.png"
    inkscape:export-xdpi="103.61"
    inkscape:export-ydpi="103.61">
   <defs
@@ -182,8 +182,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.98994949"
-     inkscape:cx="388.48273"
-     inkscape:cy="563.51221"
+     inkscape:cx="254.91896"
+     inkscape:cy="116.44881"
      inkscape:document-units="px"
      inkscape:current-layer="g2932"
      showgrid="false"
@@ -214,13 +214,15 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     style="display:inline" />
+     style="display:inline"
+     transform="translate(-228.56377,-366.85416)" />
   <g
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="Light Background"
      style="display:none"
-     sodipodi:insensitive="true">
+     sodipodi:insensitive="true"
+     transform="translate(-228.56377,-366.85416)">
     <g
        id="g10267"
        transform="translate(112,108)"
@@ -243,7 +245,7 @@
          inkscape:export-xdpi="88.809998"
          inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
          transform="translate(34.216035,-446.54092)"
-         d="m 371.73615,850.33167 a 137.38075,137.38075 0 1 1 -274.76151,0 137.38075,137.38075 0 1 1 274.76151,0 z"
+         d="m 371.73615,850.33167 c 0,75.87329 -61.50746,137.38075 -137.38076,137.38075 -75.87329,0 -137.38075,-61.50746 -137.38075,-137.38075 0,-75.8733 61.50746,-137.38076 137.38075,-137.38076 75.8733,0 137.38076,61.50746 137.38076,137.38076 z"
          sodipodi:ry="137.38075"
          sodipodi:rx="137.38075"
          sodipodi:cy="850.33167"
@@ -257,7 +259,8 @@
      style="display:inline"
      inkscape:label="Dark background"
      id="g2932"
-     inkscape:groupmode="layer">
+     inkscape:groupmode="layer"
+     transform="translate(-228.56377,-366.85416)">
     <g
        id="g4687">
       <rect
@@ -279,7 +282,7 @@
          sodipodi:cy="850.33167"
          sodipodi:rx="137.38075"
          sodipodi:ry="137.38075"
-         d="m 371.73615,850.33167 a 137.38075,137.38075 0 1 1 -274.76151,0 137.38075,137.38075 0 1 1 274.76151,0 z"
+         d="m 371.73615,850.33167 c 0,75.87329 -61.50746,137.38075 -137.38076,137.38075 -75.87329,0 -137.38075,-61.50746 -137.38075,-137.38075 0,-75.8733 61.50746,-137.38076 137.38075,-137.38076 75.8733,0 137.38076,61.50746 137.38076,137.38076 z"
          transform="translate(146.21603,-338.54092)"
          inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
          inkscape:export-xdpi="88.809998"
@@ -338,8 +341,9 @@
      inkscape:groupmode="layer"
      id="layer3"
      inkscape:label="Heading Display (rotating)"
-     style="display:none"
-     sodipodi:insensitive="true">
+     style="display:inline"
+     sodipodi:insensitive="true"
+     transform="translate(-228.56377,-366.85416)">
     <g
        id="g11093"
        transform="matrix(1.0475953,0,0,1.0601734,-17.769643,-30.796186)"
@@ -883,8 +887,9 @@
      inkscape:groupmode="layer"
      id="layer4"
      inkscape:label="Heading Plane (fixed)"
-     style="display:none"
-     sodipodi:insensitive="true">
+     style="display:inline"
+     sodipodi:insensitive="true"
+     transform="translate(-228.56377,-366.85416)">
     <path
        id="path34138-1-7"
        style="fill:none;stroke:#f1b907;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
@@ -899,7 +904,8 @@
      id="layer5"
      inkscape:label="Attitude Background (rotating)"
      style="display:none"
-     sodipodi:insensitive="true">
+     sodipodi:insensitive="true"
+     transform="translate(-228.56377,-366.85416)">
     <g
        id="g3804"
        transform="matrix(0.98960109,0,0,1,310.0265,-0.12155377)">
@@ -911,7 +917,7 @@
          sodipodi:cy="850.33167"
          sodipodi:rx="137.38075"
          sodipodi:ry="137.38075"
-         d="M 371.73615,850.33167 A 137.38075,137.38075 0 0 1 96.982197,851.77265"
+         d="m 371.73615,850.33167 c 0,75.87329 -61.50746,137.38075 -137.38076,137.38075 -75.31115,0 -136.583257,-60.63276 -137.373193,-135.93977"
          transform="translate(-163.07295,-339.96688)"
          inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
          inkscape:export-xdpi="88.809998"
@@ -927,7 +933,7 @@
          inkscape:export-xdpi="88.809998"
          inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
          transform="matrix(1,0,0,-1,-163.07295,1363.7915)"
-         d="M 371.73615,850.33167 A 137.38075,137.38075 0 0 1 96.982197,851.77265"
+         d="m 371.73615,850.33167 c 0,75.87329 -61.50746,137.38075 -137.38076,137.38075 -75.31115,0 -136.583257,-60.63276 -137.373193,-135.93977"
          sodipodi:ry="137.38075"
          sodipodi:rx="137.38075"
          sodipodi:cy="850.33167"
@@ -1011,7 +1017,8 @@
      id="layer6"
      inkscape:label="Attitude (fixed)"
      style="display:none"
-     sodipodi:insensitive="true">
+     sodipodi:insensitive="true"
+     transform="translate(-228.56377,-366.85416)">
     <g
        id="g3876">
       <path
@@ -1021,7 +1028,7 @@
          style="fill:none;stroke:#f17f07;stroke-width:7;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:5;stroke-opacity:1;stroke-dasharray:none" />
       <path
          transform="translate(33.07896,50.167284)"
-         d="m 350.52292,461.42294 a 3.0304577,3.0304577 0 1 1 -6.06092,0 3.0304577,3.0304577 0 1 1 6.06092,0 z"
+         d="m 350.52292,461.42294 c 0,1.67368 -1.35678,3.03046 -3.03046,3.03046 -1.67367,0 -3.03046,-1.35678 -3.03046,-3.03046 0,-1.67367 1.35679,-3.03045 3.03046,-3.03045 1.67368,0 3.03046,1.35678 3.03046,3.03045 z"
          sodipodi:ry="3.0304577"
          sodipodi:rx="3.0304577"
          sodipodi:cy="461.42294"
@@ -1045,7 +1052,8 @@
      id="layer8"
      inkscape:label="Speed background (fixed)"
      style="display:none"
-     sodipodi:insensitive="true">
+     sodipodi:insensitive="true"
+     transform="translate(-228.56377,-366.85416)">
     <g
        id="g4734">
       <path
@@ -1059,7 +1067,7 @@
          sodipodi:cy="850.33167"
          sodipodi:rx="137.38075"
          sodipodi:ry="137.38075"
-         d="M 352.22122,779.75463 A 137.38075,137.38075 0 0 1 129.37687,938.94871"
+         d="m 352.22122,779.75463 c 38.97862,65.0955 17.80671,149.46424 -47.28879,188.44286 -57.77767,34.59681 -132.1156,22.21156 -175.55556,-29.24878"
          transform="matrix(0.95971398,0,0,0.95971398,155.20505,-304.35199)"
          inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
          inkscape:export-xdpi="88.809998"
@@ -1070,7 +1078,7 @@
          inkscape:export-xdpi="88.809998"
          inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
          transform="matrix(0.95971398,0,0,0.95971398,155.20505,-304.35199)"
-         d="M 130.14867,939.85501 A 137.38075,137.38075 0 0 1 98.172596,832.2287"
+         d="M 130.14867,939.85501 C 104.64756,910.17128 93.015889,871.02096 98.172596,832.2287"
          sodipodi:ry="137.38075"
          sodipodi:rx="137.38075"
          sodipodi:cy="850.33167"
@@ -1090,7 +1098,7 @@
          sodipodi:cy="850.33167"
          sodipodi:rx="137.38075"
          sodipodi:ry="137.38075"
-         d="M 98.200847,832.01744 A 137.38075,137.38075 0 0 1 134.7532,755.71203"
+         d="M 98.200847,832.01744 C 102.05419,803.37033 114.8451,776.66847 134.7532,755.71203"
          transform="matrix(0.95971398,0,0,0.95971398,155.20505,-304.35199)"
          inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
          inkscape:export-xdpi="88.809998"
@@ -1481,12 +1489,13 @@
      id="layer7"
      inkscape:label="Speed needle (rotating)"
      style="display:none"
-     sodipodi:insensitive="true">
+     sodipodi:insensitive="true"
+     transform="translate(-228.56377,-366.85416)">
     <g
        id="g5783">
       <path
          transform="matrix(0.40649424,-0.91365334,0.91365334,0.40649424,-53.097808,682.8684)"
-         d="m 343.95695,326.56757 a 11.111678,11.111678 0 1 1 -22.22335,0 11.111678,11.111678 0 1 1 22.22335,0 z"
+         d="m 343.95695,326.56757 c 0,6.13681 -4.97486,11.11167 -11.11167,11.11167 -6.13681,0 -11.11168,-4.97486 -11.11168,-11.11167 0,-6.13681 4.97487,-11.11168 11.11168,-11.11168 6.13681,0 11.11167,4.97487 11.11167,11.11168 z"
          sodipodi:ry="11.111678"
          sodipodi:rx="11.111678"
          sodipodi:cy="326.56757"
@@ -1515,7 +1524,7 @@
          sodipodi:cy="326.56757"
          sodipodi:rx="11.111678"
          sodipodi:ry="11.111678"
-         d="m 343.95695,326.56757 a 11.111678,11.111678 0 1 1 -22.22335,0 11.111678,11.111678 0 1 1 22.22335,0 z"
+         d="m 343.95695,326.56757 c 0,6.13681 -4.97486,11.11167 -11.11167,11.11167 -6.13681,0 -11.11168,-4.97486 -11.11168,-11.11167 0,-6.13681 4.97487,-11.11168 11.11168,-11.11168 6.13681,0 11.11167,4.97487 11.11167,11.11168 z"
          transform="matrix(0.40649424,-0.91365334,0.91365334,0.40649424,-53.097808,682.8684)" />
       <path
          style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
@@ -1528,8 +1537,9 @@
      inkscape:groupmode="layer"
      id="layer9"
      inkscape:label="Vario background (fixed)"
-     style="display:inline"
-     sodipodi:insensitive="true">
+     style="display:none"
+     sodipodi:insensitive="true"
+     transform="translate(-228.56377,-366.85416)">
     <path
        style="fill:none;stroke:#ffffff;stroke-width:8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        d="m 380.91517,404.77478 0,-26.50433"
@@ -1664,7 +1674,7 @@
        sodipodi:cy="405.93362"
        sodipodi:rx="87.14286"
        sodipodi:ry="88.571426"
-       d="m 161.61336,439.77935 a 87.14286,88.571426 0 0 1 0.0421,-67.79488"
+       d="m 161.61336,439.77935 c -8.83241,-21.7097 -8.81724,-46.09654 0.0421,-67.79488"
        transform="translate(138.42857,105.85713)"
        sodipodi:start="2.7494934"
        sodipodi:end="3.5349558"
@@ -1795,7 +1805,8 @@
      id="layer10"
      inkscape:label="Vario needle (rotating)"
      sodipodi:insensitive="true"
-     style="display:inline">
+     style="display:none"
+     transform="translate(-228.56377,-366.85416)">
     <g
        transform="matrix(0.04065879,-0.99917309,0.99917309,0.04065879,-142.46282,874.02525)"
        style="display:inline"
@@ -1810,7 +1821,7 @@
          sodipodi:cy="326.56757"
          sodipodi:rx="11.111678"
          sodipodi:ry="11.111678"
-         d="m 343.95695,326.56757 a 11.111678,11.111678 0 1 1 -22.22335,0 11.111678,11.111678 0 1 1 22.22335,0 z"
+         d="m 343.95695,326.56757 c 0,6.13681 -4.97486,11.11167 -11.11167,11.11167 -6.13681,0 -11.11168,-4.97486 -11.11168,-11.11167 0,-6.13681 4.97487,-11.11168 11.11168,-11.11168 6.13681,0 11.11167,4.97487 11.11167,11.11168 z"
          transform="matrix(0.40649424,-0.91365334,0.91365334,0.40649424,-53.097808,682.8684)" />
       <path
          style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"

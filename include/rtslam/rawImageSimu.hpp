@@ -28,6 +28,9 @@ namespace jafar {
 		 */
 		class RawImageSimu: public rawAbstract {
 
+			private:
+				map<int,FeatureAbstract*> features;
+
 			public:
 
 				/**

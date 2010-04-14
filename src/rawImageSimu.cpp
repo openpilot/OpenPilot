@@ -21,6 +21,10 @@ namespace jafar {
 		// RAW IMAGE SIMULATED
 		//////////////////////////
 
+
+		// A simulated Image have a list of visible features:
+
+
 		/**
 		 * Add a Feature on the image simulated.
 		 */

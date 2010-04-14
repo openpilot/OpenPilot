@@ -46,21 +46,6 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
-
-		/** Base class for all landmark appearances defined in the module
-		 * rtslam.
-		 *
-		 * @ingroup rtslam
-		 */
-		class AppearanceAbstract {
-			public:
-				/**
-				 * Mandatory virtual destructor
-				 */
-				virtual ~AppearanceAbstract() {
-				}
-		};
-
 		typedef boost::shared_ptr<AppearanceAbstract> appearance_ptr_t;
 
 

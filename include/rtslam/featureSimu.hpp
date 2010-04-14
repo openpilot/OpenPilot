@@ -18,14 +18,14 @@
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 /**
- * \file featureAbstract.hpp
- * File defining the abstract feature.
+ * \file featureSimu.hpp
+ * File defining the simulated feature.
  * \author jmcodol@laas.fr
  * \ingroup rtslam
  */
 
-#ifndef __FeatureAbstract_H__
-#define __FeatureAbstract_H__
+#ifndef __FeatureSimu_H__
+#define __FeatureSimu_H__
 
 /* --------------------------------------------------------------------- */
 /* --- INCLUDE --------------------------------------------------------- */
@@ -41,20 +41,18 @@ namespace jafar {
 		 *
 		 * @ingroup rtslam
 		 */
-		class FeatureAbstract {
+		class FeatureSimu: public FeatureAbstract {
 			public:
-				FeatureAbstract() {
+				FeatureSimu() {
 				}
-				virtual ~FeatureAbstract() {
+				virtual ~FeatureSimu() {
 				}
-				int id;
 		};
-
 	}
 
 }
 
-#endif // #ifndef __FeatureAbstract_H__
+#endif // #ifndef __FeatureSimu_H__
 /*
  * Local variables:
  * mode: c++

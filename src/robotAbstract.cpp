@@ -72,7 +72,13 @@ namespace jafar {
 		}
 
 		void RobotAbstract::move() {
-			move_func(); // x = F(x, u); Update Jacobians dxnew/dx and dxnew/du
+			//move_func(); // x = F(x, u); Update Jacobians dxnew/dx and dxnew/du
+			vec x = state.x();
+			vec n = perturbation.x();
+			cout<<"x : "<<x<<endl;
+			move_func(x, control, n, dt_or_dx, x, XNEW_x, XNEW_pert);
+			state.x() = x;
+			cout<<"state.x() : "<<state.x()<<endl;
 			if (!constantPerturbation)
 				computeStatePerturbation();
 			mapPtr->filter.predict(mapPtr->ia_used_states(), XNEW_x, state.ia(), Q); // P = F*P*F' + Q

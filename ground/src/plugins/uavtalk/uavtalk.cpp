@@ -109,12 +109,12 @@ bool UAVTalk::objectTransaction(UAVObject* obj, quint8 type, qint32 timeoutMs, b
     // Send object depending on if a response is needed
     if (type == TYPE_OBJ_ACK || type == TYPE_OBJ_REQ)
     {
+        respSema->tryAcquire(); // non blocking call to make sure the value is zero (binary sema)
         if ( transmitObject(obj, type, allInstances) )
         {
             respObj = obj;
             respAllInstances = allInstances;
-            mutex->unlock(); // need to release lock since the next call will block until a response is received
-            respSema->tryAcquire(); // the semaphore needs to block on the next call, here we make sure the value is zero (binary sema)
+            mutex->unlock(); // need to release lock since the next call will block until a response is received     
             respReceived = respSema->tryAcquire(1, timeoutMs); // lock on object until a response is received (or timeout)
             return respReceived;
         }

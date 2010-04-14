@@ -76,7 +76,7 @@ void test_landmark01(void) {
 	jblas::vec ahp(7), ahpf(7);
 	jblas::mat AHP_f(7, 7), AHP_ahpf(7, 7);
 	ahpf = ahp1.state.x();
-	ahp = landmarkAHP::fromFrame(F, ahpf);
+	ahp = lmkAHP::fromFrame(F, ahpf);
 	cout << "ahp_namespace : " << (MATLAB) ahp << endl;
 	ahp = ahp1.fromFrame(F);
 	cout << "ahp_class : " << (MATLAB) ahp << endl;

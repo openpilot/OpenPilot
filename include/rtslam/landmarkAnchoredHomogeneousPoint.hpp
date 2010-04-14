@@ -53,7 +53,7 @@ namespace jafar {
 				 */
 				template<class VF>
 				vec fromFrame(const VF & F) {
-					return landmarkAHP::fromFrame(F, state.x());
+					return lmkAHP::fromFrame(F, state.x());
 				}
 
 
@@ -67,7 +67,7 @@ namespace jafar {
 				 */
 				template<class VF, class Vahp, class MAHP_f, class MAHP_ahpf>
 				void fromFrame(const VF & F, Vahp & ahp, MAHP_f & AHP_f, MAHP_ahpf & AHP_ahpf) {
-					landmarkAHP::fromFrame(F, state.x(), ahp, AHP_f, AHP_ahpf);
+					lmkAHP::fromFrame(F, state.x(), ahp, AHP_f, AHP_ahpf);
 				}
 
 
@@ -79,7 +79,7 @@ namespace jafar {
 				 */
 				template<class VF>
 				vec toFrame(const VF & F) {
-					return landmarkAHP::toFrame(F, state.x());
+					return lmkAHP::toFrame(F, state.x());
 				}
 
 
@@ -93,7 +93,7 @@ namespace jafar {
 				 */
 				template<class VF, class Vahpf, class MAHPF_f, class MAHPF_ahp>
 				void toFrame(const VF & F, Vahpf & ahpf, MAHPF_f & AHPF_f, MAHPF_ahp & AHPF_ahp) {
-					landmarkAHP::toFrame(F, state.x(), ahpf, AHPF_f, AHPF_ahp);
+					lmkAHP::toFrame(F, state.x(), ahpf, AHPF_f, AHPF_ahp);
 				}
 
 
@@ -113,7 +113,7 @@ namespace jafar {
 				 */
 				template<class VE, class ME_a>
 				void toEuclidean(VE & euc, ME_a & EUC_ahp) {
-					landmarkAHP::ahp2euc(state.x(), euc, EUC_ahp);
+					lmkAHP::ahp2euc(state.x(), euc, EUC_ahp);
 				}
 
 				/**
@@ -134,7 +134,7 @@ namespace jafar {
 				 */
 				template<class VS>
 				vec3 toBearingOnlyFrame(const VS & s) {
-						return landmarkAHP::toBearingOnlyFrame(s, state.x());
+						return lmkAHP::toBearingOnlyFrame(s, state.x());
 				}
 
 				/**
@@ -158,7 +158,7 @@ namespace jafar {
 				 */
 				template<class VS, class VV>
 				void toBearingOnlyFrame(const VS & s, VV & v, double & invDist) {
-						landmarkAHP::toBearingOnlyFrame(s, state.x(), v, invDist);
+						lmkAHP::toBearingOnlyFrame(s, state.x(), v, invDist);
 				}
 
 				/**
@@ -184,7 +184,7 @@ namespace jafar {
 				 */
 				template<class VS, class VV, class MV_s, class MV_a>
 				void toBearingOnlyFrame(const VS & s, VV & v, double & invDist, MV_s & V_s, MV_a & V_ahp) {
-						landmarkAHP::toBearingOnlyFrame(s, state.x(), v, invDist, V_s, V_ahp);
+						lmkAHP::toBearingOnlyFrame(s, state.x(), v, invDist, V_s, V_ahp);
 				}
 
 				/**
@@ -204,7 +204,7 @@ namespace jafar {
 				 */
 				template<class VS, class VLS>
 				static vec7 fromBearingOnlyFrame(const VS & s, const VLS & v, const double _rho) {
-						return landmarkAHP::fromBearingOnlyFrame(s, v, _rho);
+						return lmkAHP::fromBearingOnlyFrame(s, v, _rho);
 				}
 
 				/**
@@ -227,7 +227,7 @@ namespace jafar {
 				 */
 				template<class VS, class VLS, class VA, class MA_s, class MA_v, class MA_rho>
 				static void fromBearingOnlyFrame(const VS & s, const VLS & v, const double _rho, VA & ahp, MA_s & AHP_s, MA_v & AHP_v, MA_rho & AHP_rho) {
-						landmarkAHP::fromBearingOnlyFrame(s, v, _rho, ahp, AHP_s, AHP_v, AHP_rho);
+						lmkAHP::fromBearingOnlyFrame(s, v, _rho, ahp, AHP_s, AHP_v, AHP_rho);
 				}
 
 

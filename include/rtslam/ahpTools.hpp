@@ -21,7 +21,7 @@ namespace jafar {
 		 * Namespace for operations on Anchored Homogeneous Points.
 		 * \ingroup rtslam
 		 */
-		namespace landmarkAHP {
+		namespace lmkAHP {
 			using namespace ublas;
 			using namespace jblas;
 			using namespace quaternion;

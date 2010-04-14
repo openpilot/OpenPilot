@@ -46,10 +46,10 @@ void test_senPH01(void) {
 	vec4 k;
 	vec d(2), c(2);
 
-	k(0) = 100;
-	k(1) = 100;
-	k(2) = 100;
-	k(3) = 100;
+	k(0) = 320;
+	k(1) = 240;
+	k(2) = 320;
+	k(3) = 240;
 	randVector(d);
 	randVector(d);
 	d *= 0.0;

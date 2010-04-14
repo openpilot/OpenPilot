@@ -77,6 +77,39 @@ namespace jafar {
 				 */
 				void projectPoint(const vec3 & v, vec2 & u, mat23 & U_v);
 
+				/**
+				 * Back-project pixel.
+				 * \param u the pixel
+				 * \param s the point's depth
+				 * \return the back-projected 3D point
+				 */
+				vec3 backProjectPoint(const vec2 & u, const double s = 1.0);
+
+				/**
+				 * Back-project pixel, with Jacobians.
+				 * \param u the pixel
+				 * \param s the point's depth
+				 * \param p the back-projected 3D point
+				 * \param P_u the Jacobian of p wrt u
+				 * \param P_s the Jacobian of p wrt s
+				 */
+				void backProjectPoint(const vec2 & u, const double s, vec3 & p, mat32 & P_u, mat & P_s);
+
+				/**
+				 * Back-project pixel onto vector.
+				 * \param u the pixel
+				 * \return the back-projected 3D vector
+				 */
+				vec3 backProjectVector(const vec2 & u);
+
+				/**
+				 * Back-project pixel onto vector, with Jacobians.
+				 * \param u the pixel
+				 * \param v the back-projected 3D vector
+				 * \param V_u the Jacobian of v wrt u
+				 */
+				void backProjectVector(const vec2 & u, vec3 & v, mat32 & V_u);
+
 
 		};
 

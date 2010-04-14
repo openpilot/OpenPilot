@@ -57,11 +57,11 @@ namespace jafar {
 
 				up = projectPointToNormalizedPlane(v);
 
-				UP_v(0, 0) = 1 / v(2);
-				UP_v(0, 1) = 0;
+				UP_v(0, 0) = 1.0 / v(2);
+				UP_v(0, 1) = 0.0;
 				UP_v(0, 2) = -v(0) / (v(2) * v(2));
-				UP_v(1, 0) = 0;
-				UP_v(1, 1) = 1 / v(2);
+				UP_v(1, 0) = 0.0;
+				UP_v(1, 1) = 1.0 / v(2);
 				UP_v(1, 2) = -v(1) / (v(2) * v(2));
 
 			}
@@ -302,10 +302,10 @@ namespace jafar {
 
 				ud = depixellizePoint(k, u);
 
-				UD_u(0, 0) = 1 / a_u;
-				UD_u(0, 1) = 0;
-				UD_u(1, 0) = 0;
-				UD_u(1, 1) = 1 / a_v;
+				UD_u(0, 0) = 1.0 / a_u;
+				UD_u(0, 1) = 0.0;
+				UD_u(1, 0) = 0.0;
+				UD_u(1, 1) = 1.0 / a_v;
 			}
 
 
@@ -379,6 +379,16 @@ namespace jafar {
 
 
 			/**
+			 * Determine if a pixel is inside the region of interest
+			 * \param pix the pixel to test
+			 * \param roi the region of interest, in pixels
+			 */
+			template<class VPix>
+			bool isInRoi(const VPix & pix, const int x, const int y, const int width, const int height) {
+				return ((pix(0) >= x) && (pix(0) <= x + width - 1) && (pix(1) >= y) && (pix(1) <= y + height - 1));
+			}
+
+			/**
 			 * Determine if a pixel is inside the image
 			 * \param pix the pixel to test
 			 * \param width the image width, in pixels
@@ -386,7 +396,7 @@ namespace jafar {
 			 */
 			template<class VPix>
 			bool isInImage(const VPix & pix, const int & width, const int & height) {
-				return ((pix(0) > 0) && (pix(0) <= width) && (pix(1) > 0) && (pix(1) <= height));
+				return isInRoi(pix, 0, 0, width, height);
 			}
 
 		} // namespace pinhole

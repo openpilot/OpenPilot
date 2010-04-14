@@ -9,6 +9,8 @@
  * \ingroup rtslam
  */
 
+//TODO : add comments on hpp and cpp
+
 #ifndef ROBOTODOMETRY_HPP_
 #define ROBOTODOMETRY_HPP_
 

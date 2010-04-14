@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       Uploadergadget.h
+ * @file       uploadergadget.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief
+ * @brief      Uploader Plugin Gadget configuration
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   Uploader
  * @{
@@ -32,7 +32,6 @@
 #include "uploadergadgetwidget.h"
 
 class IUAVGadget;
-//class QList<int>;
 class QWidget;
 class QString;
 class UploaderGadgetWidget;

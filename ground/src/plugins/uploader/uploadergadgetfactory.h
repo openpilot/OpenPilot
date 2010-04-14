@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       UploaderGadgetfactory.h
+ * @file       uploadergadgetfactory.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief
+ * @brief      Uploader Plugin Gadget factory
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   Uploader
  * @{

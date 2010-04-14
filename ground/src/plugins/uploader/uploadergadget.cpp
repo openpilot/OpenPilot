@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       UploaderGadget.cpp
+ * @file       uploadergadget.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief
+ * @brief      Uploader Plugin Gadget
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   Uploader
  * @{
@@ -27,11 +27,9 @@
 #include "uploadergadget.h"
 #include "uploadergadgetwidget.h"
 #include "uploadergadgetconfiguration.h"
-//#include "./qextserialport/qextserialbase.h"
-//#include  "./qextserialport/qextserialenumerator.h"
-//#include  "./qextserialport/qextserialPort.h"
 #include <qextserialport/src/qextserialport.h>
 #include <qextserialport/src/qextserialenumerator.h>
+
 UploaderGadget::UploaderGadget(QString classId,  UploaderGadgetWidget *widget, QWidget *parent) :
         IUAVGadget(classId, parent),
         m_widget(widget)
@@ -42,7 +40,10 @@ UploaderGadget::~UploaderGadget()
 {
 
 }
-
+/**
+ * Loads a configuration.
+ *
+ */
 void UploaderGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 {
     UploaderGadgetConfiguration *m = qobject_cast< UploaderGadgetConfiguration*>(config);
@@ -53,8 +54,8 @@ void UploaderGadget::loadConfiguration(IUAVGadgetConfiguration* config)
     portsettings.Parity=m->Parity();
     portsettings.StopBits=m->StopBits();
     portsettings.Timeout_Millisec=m->TimeOut();
+    //Creates new serial port with the user configuration and passes it to the widget
     QextSerialPort *port=new QextSerialPort(m->Port(),portsettings,QextSerialPort::Polling);
-
     m_widget->setPort(port);
 }
 

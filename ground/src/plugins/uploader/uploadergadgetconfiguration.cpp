@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       UploaderGadgetconfiguration.cpp
+ * @file       uploadergadgetconfiguration.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief
+ * @brief      Uploader Plugin Gadget configuration
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   Uploader
  * @{
@@ -29,6 +29,10 @@
 #include <QtCore/QDataStream>
 #include <qextserialport/src/qextserialport.h>
 
+/**
+ * Loads a saved configuration or defaults if non exist.
+ *
+ */
 UploaderGadgetConfiguration::UploaderGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),
     m_defaultPort("Unknown"),
@@ -40,9 +44,9 @@ UploaderGadgetConfiguration::UploaderGadgetConfiguration(QString classId, const 
     m_defaultTimeOut(5000)
 
 {
+    //if a saved configuration exists load it
     if (state.count() > 0) {
         QDataStream stream(state);
-
         BaudRateType speed;
         DataBitsType databits;
         FlowType flow;
@@ -76,7 +80,10 @@ UploaderGadgetConfiguration::UploaderGadgetConfiguration(QString classId, const 
     }
 
 }
-
+/**
+ * Clones a configuration.
+ *
+ */
 IUAVGadgetConfiguration *UploaderGadgetConfiguration::clone()
 {
     UploaderGadgetConfiguration *m = new UploaderGadgetConfiguration(this->classId());
@@ -89,7 +96,10 @@ IUAVGadgetConfiguration *UploaderGadgetConfiguration::clone()
     m->m_defaultPort=m_defaultPort;
     return m;
 }
-
+/**
+ * Saves a configuration.
+ *
+ */
 QByteArray UploaderGadgetConfiguration::saveState() const
 {
     QByteArray bytes;
@@ -100,7 +110,6 @@ QByteArray UploaderGadgetConfiguration::saveState() const
     stream << (int)m_defaultParity;
     stream << (int)m_defaultStopBits;
     stream << m_defaultPort;
-
     return bytes;
 }
 

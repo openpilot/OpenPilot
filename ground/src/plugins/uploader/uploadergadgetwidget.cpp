@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       UploaderGadgetwidget.cpp
+ * @file       uploadergadgetwidget.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief
+ * @brief      Uploader Plugin Gadget widget
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   Uploader
  * @{
@@ -29,8 +29,10 @@
 UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
 {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-    QVBoxLayout *layout = new QVBoxLayout;
 
+    //main layout
+    QVBoxLayout *layout = new QVBoxLayout;
+    //choose file layout and widget
     QHBoxLayout *FileLayout = new QHBoxLayout;
     QWidget *FileWidget = new QWidget;
     FileWidget->setLayout(FileLayout);
@@ -40,7 +42,7 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     FileLayout->addWidget(openFileNameLE);
     FileLayout->addWidget(loadfile);
 
-
+    //send file layout and widget
     QHBoxLayout *SendLayout = new QHBoxLayout;
     QWidget *SendWidget = new QWidget;
     SendWidget->setLayout(SendLayout);
@@ -51,52 +53,79 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     SendLayout->addWidget(progressBar);
     SendLayout->addWidget(sendBt);
 
+    //status layout and widget
     QHBoxLayout *StatusLayout = new QHBoxLayout;
     QWidget *StatusWidget = new QWidget;
     StatusWidget->setLayout(StatusLayout);
     status=new QLabel();
     StatusLayout->addWidget(status);
 
+    //add partial widgets to main widget
     layout->addWidget(FileWidget);
     layout->addWidget(SendWidget);
     layout->addWidget(StatusWidget);
     setLayout(layout);
 
+    //connect signals to slots
 
+    //fires when the user presses file button
     connect(loadfile, SIGNAL(clicked(bool)),
             this,SLOT(setOpenFileName()));
+    //fires when the user presses send button
     connect(sendBt, SIGNAL(clicked(bool)),
             this,SLOT(send()));
 }
-
+//user pressed send, send file using a new thread with qymodem library
 void UploaderGadgetWidget::send()
 {
     Ymodem->SendFileT(openFileNameLE->text());
 }
-
+//destructor !!?! do I need to delete something else?
 UploaderGadgetWidget::~UploaderGadgetWidget()
 {
     delete Port;
     delete Ymodem;
 }
 
+//from load configuration, creates a new qymodemsend class with the the port
+/**
+Cteates a new qymodemsend class.
+
+@param port	The serial port to use.
+
+
+*/
 void UploaderGadgetWidget::setPort(QextSerialPort* port)
 {
+
     Port=port;
     Ymodem=new QymodemSend(*Port);
+    //only now can we connect this signals
+    //signals errors
     connect(Ymodem,SIGNAL(Error(QString,int))
             ,this,SLOT(error(QString,int)));
+    //signals new information
     connect(Ymodem,SIGNAL(Information(QString,int)),
             this,SLOT(info(QString,int)));
+    //signals new percentage value
     connect(Ymodem,SIGNAL(Percent(int)),
             this,SLOT(updatePercSlot(int)));
 }
+/**
+Updates progress bar value.
 
+@param i	New percentage value.
+
+*/
 void UploaderGadgetWidget::updatePercSlot(int i)
 {
     progressBar->setValue(i);
 }
+/**
 
+Opens an open file dialog.
+
+*/
 void UploaderGadgetWidget::setOpenFileName()
 {
     QFileDialog::Options options;
@@ -110,7 +139,14 @@ void UploaderGadgetWidget::setOpenFileName()
     if (!fileName.isEmpty()) openFileNameLE->setText(fileName);
 
 }
+/**
+Shows a message box with an error string.
 
+@param errorString	The error string to display.
+
+@param errorNumber      Not used
+
+*/
 void UploaderGadgetWidget::error(QString errorString, int errorNumber)
 {
     QMessageBox msgBox;
@@ -119,6 +155,14 @@ void UploaderGadgetWidget::error(QString errorString, int errorNumber)
     msgBox.exec();
     status->setText(errorString);
 }
+/**
+Shows a message box with an information string.
+
+@param infoString	The information string to display.
+
+@param infoNumber       Not used
+
+*/
 void UploaderGadgetWidget::info(QString infoString, int infoNumber)
 {
     status->setText(infoString);

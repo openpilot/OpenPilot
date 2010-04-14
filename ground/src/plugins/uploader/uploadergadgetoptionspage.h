@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       UploaderGadgetoptionspage.h
+ * @file       uploadergadgetoptionspage.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief
+ * @brief      Uploader Plugin Gadget options page
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   Uploader
  * @{
@@ -32,6 +32,7 @@
 #include "QString"
 #include <QStringList>
 #include <QDebug>
+
 namespace Core {
 class IUAVGadgetConfiguration;
 }
@@ -52,9 +53,6 @@ public:
     void apply();
     void finish();
 
-signals:
-
-public slots:
 private:
     UploaderGadgetConfiguration *m_config;
     QComboBox *m_portCB;

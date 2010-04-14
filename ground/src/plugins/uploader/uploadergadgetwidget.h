@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       UploaderGadgetwidget.h
+ * @file       uploadergadgetwidget.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief
+ * @brief      Uploader Plugin Gadget widget
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   Uploader
  * @{
@@ -55,9 +55,6 @@ public:
 
    void setPort(QextSerialPort* port);
 
-
-protected:
-//   void resizeEvent(QResizeEvent *event);
 
 private:
 

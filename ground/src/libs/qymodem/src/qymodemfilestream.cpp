@@ -3,6 +3,7 @@
  *
  * @file       qymodemsend.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ *             Parts by J.D.Medhurst (a.k.a. Tixy)
  * @brief      Implementation of Class for presenting a file as a input stream.
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   ymodem_lib

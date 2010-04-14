@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       UploaderGadgetoptionspage.cpp
+ * @file       uploadergadgetoptionspage.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief
+ * @brief      Uploader Plugin Gadget options page
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   Uploader
  * @{
@@ -37,12 +37,15 @@
 #include <QtAlgorithms>
 #include <QStringList>
 #include <qextserialport/src/qextserialenumerator.h>
+
 UploaderGadgetOptionsPage::UploaderGadgetOptionsPage(UploaderGadgetConfiguration *config, QObject *parent) :
         IOptionsPage(parent),
         m_config(config)
 {
+    //the begining of some ugly code
+    //diferent OS's have diferent serial port capabilities
 #ifdef Q_OS_WIN
-
+    //load windows port capabilities
     BaudRateTypeString
             <<"BAUD110"
             <<"BAUD300"
@@ -75,6 +78,7 @@ UploaderGadgetOptionsPage::UploaderGadgetOptionsPage(UploaderGadgetConfiguration
             <<"STOP_1_5"               //WINDOWS ONLY
             <<"STOP_2";
 #else
+    //load POSIX port capabilities
     BaudRateTypeString
 
             <<"BAUD50"                //POSIX ONLY
@@ -109,7 +113,7 @@ UploaderGadgetOptionsPage::UploaderGadgetOptionsPage(UploaderGadgetConfiguration
             <<"STOP_1"
             <<"STOP_2";
 #endif
-
+    //load all OS's capabilities
     BaudRateTypeStringALL
             <<"BAUD50"                //POSIX ONLY
             <<"BAUD75"                //POSIX ONLY
@@ -155,18 +159,16 @@ UploaderGadgetOptionsPage::UploaderGadgetOptionsPage(UploaderGadgetConfiguration
             <<"FLOW_XONXOFF";
 }
 
-
+//creates options page widget
 QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
 {
-
-
-
+    //main widget
     QWidget *widget = new QWidget;
     //main layout
     QVBoxLayout *vl = new QVBoxLayout();
     widget->setLayout(vl);
 
-    //port layout
+    //port layout and widget
     QHBoxLayout *portLayout = new QHBoxLayout();
     QWidget *x = new QWidget;
     x->setLayout(portLayout);
@@ -176,7 +178,7 @@ QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
     portLayout->addWidget(label);
     portLayout->addWidget(m_portCB);
 
-    //port speed layout
+    //port speed layout and widget
     QHBoxLayout *speedLayout = new QHBoxLayout();
     QWidget *y = new QWidget;
     y->setLayout(speedLayout);
@@ -186,7 +188,7 @@ QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
     speedLayout->addWidget(label);
     speedLayout->addWidget(m_speedCB);
 
-    //flow control layout
+    //flow control layout and widget
     QHBoxLayout *flowLayout = new QHBoxLayout();
     QWidget *z = new QWidget;
     z->setLayout(flowLayout);
@@ -196,7 +198,7 @@ QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
     flowLayout->addWidget(label);
     flowLayout->addWidget(m_flowCB);
 
-    //databits layout
+    //databits layout and widget
     QHBoxLayout *databitsLayout = new QHBoxLayout();
     QWidget *a = new QWidget;
     a->setLayout(databitsLayout);
@@ -206,7 +208,7 @@ QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
     databitsLayout->addWidget(label);
     databitsLayout->addWidget(m_databitsCB);
 
-    //stopbits layout
+    //stopbits layout and widget
     QHBoxLayout *stopbitsLayout = new QHBoxLayout();
     QWidget *b = new QWidget;
     b->setLayout(stopbitsLayout);
@@ -216,7 +218,7 @@ QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
     stopbitsLayout->addWidget(label);
     stopbitsLayout->addWidget(m_stopbitsCB);
 
-    //parity layout
+    //parity layout and widget
     QHBoxLayout *parityLayout = new QHBoxLayout();
     QWidget *c = new QWidget;
     c->setLayout(parityLayout);
@@ -226,7 +228,7 @@ QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
     parityLayout->addWidget(label);
     parityLayout->addWidget(m_parityCB);
 
-    //timeout layout
+    //timeout layout and widget
     QHBoxLayout *timeoutLayout = new QHBoxLayout();
     QWidget *d = new QWidget;
     d->setLayout(timeoutLayout);
@@ -240,6 +242,7 @@ QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
 
     QSpacerItem *spacer = new QSpacerItem(100, 100, QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+    //add partial widget to main widget
     vl->addWidget(x);
     vl->addWidget(y);
     vl->addWidget(z);
@@ -249,6 +252,8 @@ QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
     vl->addWidget(d);
     vl->addSpacerItem(spacer);
 
+    //clears comboboxes, if not every time the user enters options page the lists
+    //duplicate
     m_portCB->clear();
     m_speedCB->clear();
     m_databitsCB->clear();
@@ -256,6 +261,7 @@ QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
     m_parityCB->clear();
     m_stopbitsCB->clear();
 
+    //gets available serial ports
     QList<QextPortInfo> ports =QextSerialEnumerator ::getPorts();
     qSort(ports.begin(), ports.end());
     qDebug() << "List of ports:";
@@ -269,53 +275,63 @@ QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
         qDebug() << "===================================";
     }
 #ifdef Q_OS_WIN
+    //on windows populate ports combobox with ports name
     for (int i = 0; i < ports.size(); i++) {
         m_portCB->addItem((QString)ports.at(i).portName.toLocal8Bit().constData());
     }
 #else
+    //on other OS's populate ports combobox with ports physical name
     for (int i = 0; i < ports.size(); i++) {
         m_portCB->addItem((QString)ports.at(i).physName.toLocal8Bit().constData());
     }
 #endif
-
+    //The next selections of comboboxe's saved value are ugly as hell
+    //There must be a better wat for doing this.
+    //select saved port
     if(m_portCB->findText(m_config->Port())!=-1){
         m_portCB->setCurrentIndex(m_portCB->findText(m_config->Port()));
     }
-
+    //populate serial speed combobox
     for (int i=0;i<BaudRateTypeString.size();i++){
         m_speedCB->addItem(BaudRateTypeString.at(i).toLocal8Bit().constData() );
     }
+    //select saved speed
     if(m_speedCB->findText(BaudRateTypeStringALL.at((int)m_config->Speed()).toLocal8Bit().constData())!=-1){
         m_speedCB->setCurrentIndex(m_speedCB->findText(BaudRateTypeStringALL.at((int)m_config->Speed()).toLocal8Bit().constData()));
     }
-
+    //populate databits combobox
     for (int i=0;i<DataBitsTypeString.size();i++){
         m_databitsCB->addItem(DataBitsTypeString.at(i).toLocal8Bit().constData() );
     }
+    //select saved databits
     if(m_databitsCB->findText(DataBitsTypeStringALL.at((int)m_config->DataBits()).toLocal8Bit().constData())!=-1){
         m_databitsCB->setCurrentIndex(m_databitsCB->findText(DataBitsTypeStringALL.at((int)m_config->DataBits()).toLocal8Bit().constData()));
     }
-
+    //populate parity combobox
     for (int i=0;i<ParityTypeString.size();i++){
         m_parityCB->addItem(ParityTypeString.at(i).toLocal8Bit().constData() );
     }
+    //select saved parity
     if(m_parityCB->findText(ParityTypeStringALL.at((int)m_config->Parity()).toLocal8Bit().constData())!=-1){
         m_parityCB->setCurrentIndex(m_parityCB->findText(ParityTypeStringALL.at((int)m_config->Parity()).toLocal8Bit().constData()));
     }
-
+    //populate stopbits combobox
     for (int i=0;i<StopBitsTypeString.size();i++){
         m_stopbitsCB->addItem(StopBitsTypeString.at(i).toLocal8Bit().constData() );
     }
+    //select saved stopbits
     if(m_stopbitsCB->findText(StopBitsTypeStringALL.at((int)m_config->StopBits()).toLocal8Bit().constData())!=-1){
         m_stopbitsCB->setCurrentIndex(m_stopbitsCB->findText(StopBitsTypeStringALL.at((int)m_config->StopBits()).toLocal8Bit().constData()));
     }
-
+    //populate flow control combobox
     for (int i=0;i<FlowTypeString.size();i++){
         m_flowCB->addItem(FlowTypeString.at(i).toLocal8Bit().constData() );
     }
+    //select saved flow control
     if(m_flowCB->findText(FlowTypeString.at((int)m_config->Flow()).toLocal8Bit().constData())!=-1){
         m_flowCB->setCurrentIndex(m_flowCB->findText(FlowTypeString.at((int)m_config->Flow()).toLocal8Bit().constData()));
     }
+    //fill time out spinbox with saved value
     m_timeoutSpin->setValue(m_config->TimeOut());
     return widget;
 }
@@ -327,7 +343,6 @@ QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
  */
 void UploaderGadgetOptionsPage::apply()
 {
-
     m_config->setPort(m_portCB->currentText());
     m_config->setSpeed((BaudRateType)BaudRateTypeStringALL.indexOf(m_speedCB->currentText()));
     m_config->setDataBits((DataBitsType)DataBitsTypeStringALL.indexOf(m_databitsCB->currentText()));

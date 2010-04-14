@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       UploaderGadgetconfiguration.h
+ * @file       uploadergadgetconfiguration.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief
+ * @brief      Uploader Plugin Gadget configuration
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   Uploader
  * @{
@@ -38,6 +38,8 @@ class UploaderGadgetConfiguration : public IUAVGadgetConfiguration
 Q_OBJECT
 public:
     explicit UploaderGadgetConfiguration(QString classId, const QByteArray &state = 0, QObject *parent = 0);
+
+    //set port configuration functions
     void setSpeed(BaudRateType speed) {m_defaultSpeed=speed;}
     void setDataBits(DataBitsType databits) {m_defaultDataBits=databits;}
     void setFlow(FlowType flow) {m_defaultFlow=flow;}
@@ -46,6 +48,7 @@ public:
     void setPort(QString port){m_defaultPort=port;}
     void setTimeOut(long timeout){m_defaultTimeOut=timeout;}
 
+    //get port configuration functions
     BaudRateType Speed() {return m_defaultSpeed;}
     DataBitsType DataBits() {return m_defaultDataBits;}
     FlowType Flow() {return m_defaultFlow;}
@@ -53,12 +56,9 @@ public:
     StopBitsType StopBits() {return m_defaultStopBits;}
     QString Port(){return m_defaultPort;}
     long TimeOut(){return m_defaultTimeOut;}
+
     QByteArray saveState() const;
     IUAVGadgetConfiguration *clone();
-
-signals:
-
-public slots:
 
 private:
     QString m_defaultPort;

@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       UploaderPlugin.h
+ * @file       uploaderplugin.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief
+ * @brief      A plugin to upload a file using y-modem protocol and a serial port
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   Uploader
  * @{

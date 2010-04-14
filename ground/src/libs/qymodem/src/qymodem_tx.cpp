@@ -3,6 +3,7 @@
  *
  * @file       qymodem_tx.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ *             Parts by J.D.Medhurst (a.k.a. Tixy)
  * @brief      Implementation of base class for QymodemSend.
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   ymodem_lib

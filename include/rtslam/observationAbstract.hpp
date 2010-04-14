@@ -38,6 +38,7 @@
 #include "rtslam/objectAbstract.hpp"
 #include "rtslam/sensorAbstract.hpp"
 #include "rtslam/landmarkAbstract.hpp"
+#include "rtslam/appearanceAbstract.hpp"
 
 #include "rtslam/gaussian.hpp"
 #include "rtslam/innovation.hpp"

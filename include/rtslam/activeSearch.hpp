@@ -268,10 +268,14 @@ namespace jafar {
 				 * \param senPtr pointer to the sensor under consideration.
 				 * \return a map of all observations that are visible from the sensor, ordered according to the information gain.
 				 */
-				map<double,observation_ptr_t> projectAll(const sensor_ptr_t & senPtr, size_t & numVis);
+				map<double, observation_ptr_t> projectAll(const sensor_ptr_t & senPtr, size_t & numVis);
 
 				/**
-				 * Predict appearance of observation.
+				 * Predict observed appearance.
+				 * This function predicts the appearance of the perceived landmark.
+				 * It does so by computing the appearance of the landmark descriptor from the current sensor position.
+				 * The result of this operation is an updated observation.
+				 * \param obsPtr a pointer to the observation.
 				 */
 				void predictApp(const observation_ptr_t & obsPtr);
 

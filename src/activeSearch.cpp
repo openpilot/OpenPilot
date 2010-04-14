@@ -161,9 +161,12 @@ namespace jafar {
 		}
 
 		void ActiveSearch::predictApp(const observation_ptr_t & obsPtr) {
+
+			// Get landmark descriptor
 			landmark_ptr_t lmkPtr = obsPtr->landmarkPtr;
-			sensor_ptr_t senPtr = obsPtr->sensorPtr;
-			vec7 currPose = senPtr->globalPose();
+
+			// Get the sensor's current global pose
+			vec7 senPose = obsPtr->sensorPtr->globalPose();
 		}
 
 		void ActiveSearch::scanObs(const observation_ptr_t & obsPtr) {

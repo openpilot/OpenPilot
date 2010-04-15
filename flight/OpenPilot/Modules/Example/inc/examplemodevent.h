@@ -28,7 +28,7 @@
 
 #include "openpilot.h"
 
-int32_t ExampleModEventInitialize(void);
+int32_t ExampleModEventInitialize();
 
 #endif // EXAMPLEMODEVENT_H
 

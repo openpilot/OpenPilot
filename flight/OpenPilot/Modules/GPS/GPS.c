@@ -25,6 +25,8 @@
 
 #include "openpilot.h"
 #include "buffer.h"
+#include "GPS.h"
+#include "gpsinfo.h"
 
 
 // constants/macros/typdefs

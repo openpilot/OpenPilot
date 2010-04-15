@@ -108,7 +108,7 @@ DOXYGENDIR = ../Doc/Doxygen
 
 ## MODULES
 SRC = $(MODEXAMPLE)/examplemodevent.c $(MODEXAMPLE)/examplemodperiodic.c $(MODEXAMPLE)/examplemodthread.c
-SRC = $(MODSYSTEM)/systemmod.c
+SRC += $(MODSYSTEM)/systemmod.c
 SRC +=  $(MODTELEMETRY)/telemetry.c
 SRC += $(MODGPS)/GPS.c $(MODGPS)/buffer.c
 

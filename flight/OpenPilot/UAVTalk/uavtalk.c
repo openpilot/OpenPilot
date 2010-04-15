@@ -71,6 +71,7 @@ int32_t UAVTalkInitialize(UAVTalkOutputStream outputStream)
     outStream = outputStream;
     lock = xSemaphoreCreateRecursiveMutex();
     vSemaphoreCreateBinary(respSema);
+    xSemaphoreTake(respSema, 0); // reset to zero
     return 0;
 }
 
@@ -131,11 +132,11 @@ static int32_t objectTransaction(UAVObjHandle obj, uint16_t instId, uint8_t type
     // Send object depending on if a response is needed
     if (type == TYPE_OBJ_ACK || type == TYPE_OBJ_REQ)
     {
+    	xSemaphoreTake(respSema, 0); // non blocking call to make sure the value is zero (binary sema)
         sendObject(obj, instId, type);
         respObj = obj;
         respInstId = instId;
         xSemaphoreGiveRecursive(lock); // need to release lock since the next call will block until a response is received
-    	xSemaphoreTake(respSema, 0); // the semaphore needs to block on the next call, here we make sure the value is zero (binary sema)
     	respReceived = xSemaphoreTake(respSema, timeoutMs/portTICK_RATE_MS); // lock on object until a response is received (or timeout)
     	// Check if a response was received
     	if (respReceived == pdFALSE)
@@ -194,7 +195,6 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
         if (rxCount == 4)
         {
             // Search for object, if not found reset state machine
-            //objId = (tmpBuffer[3] << 24) | (tmpBuffer[2] << 16) | (tmpBuffer[1] << 8) | (tmpBuffer[0]);
             objId = (tmpBuffer[0] << 24) | (tmpBuffer[1] << 16) | (tmpBuffer[2] << 8) | (tmpBuffer[3]);
             obj = UAVObjGetByID(objId);
             if (obj == 0)
@@ -249,7 +249,7 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
         tmpBuffer[rxCount++] = rxbyte;
         if (rxCount == 2)
         {
-        	instId = (tmpBuffer[1] << 8) | (tmpBuffer[0]);
+        	instId = (tmpBuffer[0] << 8) | (tmpBuffer[1]);
         	cs = updateChecksum(cs, tmpBuffer, 2);
         	rxCount = 0;
         	// If there is a payload get it, otherwise receive checksum
@@ -289,6 +289,7 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
     default:
         state = STATE_SYNC;
     }
+
     // Done
     return 0;
 }
@@ -455,10 +456,10 @@ static int32_t sendSingleObject(UAVObjHandle obj, uint16_t instId, uint8_t type)
     // Setup type and object id fields
     objId = UAVObjGetID(obj);
     txBuffer[0] = type;
-    txBuffer[1] = (uint8_t)(objId & 0xFF);
-    txBuffer[2] = (uint8_t)((objId >> 8) & 0xFF);
-    txBuffer[3] = (uint8_t)((objId >> 16) & 0xFF);
-    txBuffer[4] = (uint8_t)((objId >> 24) & 0xFF);
+    txBuffer[1] = (uint8_t)((objId >> 24) & 0xFF);
+    txBuffer[2] = (uint8_t)((objId >> 16) & 0xFF);
+    txBuffer[3] = (uint8_t)((objId >> 8) & 0xFF);
+    txBuffer[4] = (uint8_t)(objId & 0xFF);
 
     // Setup instance ID if one is required
     if (UAVObjIsSingleInstance(obj))
@@ -467,8 +468,8 @@ static int32_t sendSingleObject(UAVObjHandle obj, uint16_t instId, uint8_t type)
     }
     else
     {
-    	txBuffer[5] = (uint8_t)(instId & 0xFF);
-    	txBuffer[6] = (uint8_t)((instId >> 8) & 0xFF);
+    	txBuffer[5] = (uint8_t)((instId >> 8) & 0xFF);
+    	txBuffer[6] = (uint8_t)(instId & 0xFF);
     	dataOffset = 7;
     }
 
@@ -500,12 +501,11 @@ static int32_t sendSingleObject(UAVObjHandle obj, uint16_t instId, uint8_t type)
     // Calculate checksum
     cs = 0;
     cs = updateChecksum(cs, txBuffer, dataOffset+length);
-    txBuffer[dataOffset+length] = (uint8_t)(cs & 0xFF);
-    txBuffer[dataOffset+length+1] = (uint8_t)((cs >> 8) & 0xFF);
+    txBuffer[dataOffset+length] = (uint8_t)((cs >> 8) & 0xFF);
+    txBuffer[dataOffset+length+1] = (uint8_t)(cs & 0xFF);
 
     // Send buffer
-    if (outStream!=NULL)
-    	(*outStream)(txBuffer, dataOffset+length+CHECKSUM_LENGTH);
+    if (outStream!=NULL) (*outStream)(txBuffer, dataOffset+length+CHECKSUM_LENGTH);
 
     // Done
     return 0;

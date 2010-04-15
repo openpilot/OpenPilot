@@ -27,6 +27,12 @@
 /* OpenPilot Includes */
 #include "openpilot.h"
 #include "uavobjectsinit.h"
+#include "telemetry.h"
+#include "GPS.h"
+#include "systemmod.h"
+#include "examplemodevent.h"
+#include "examplemodperiodic.h"
+#include "examplemodthread.h"
 
 /* Task Priorities */
 #define PRIORITY_TASK_HOOKS             (tskIDLE_PRIORITY + 3)
@@ -38,7 +44,6 @@ static uint8_t sdcard_available;
 FILEINFO File;
 char Buffer[1024];
 uint32_t Cache;
-GpsInfoType GpsInfo;
 
 /* Function Prototypes */
 static void TaskTick(void *pvParameters);
@@ -114,8 +119,13 @@ int main()
 	//xTaskCreate(TaskTesting, (signed portCHAR *)"TaskTesting", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
 	//xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
 	//xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
-	//GpsInitialize();
+
+	/* Initialize modules */
+	//SystemModInitialize();
 	TelemetryInitialize();
+	//ExampleModEventInitialize();
+	ExampleModPeriodicInitialize();
+	//ExampleModThreadInitialize();
 
 	/* Start the FreeRTOS scheduler */
 	vTaskStartScheduler();
@@ -139,7 +149,6 @@ static void TaskTick(void *pvParameters)
 
 	/* Setup the LEDs to Alternate */
 	PIOS_LED_On(LED1);
-	PIOS_LED_Off(LED2);
 
 	for(;;)
 	{

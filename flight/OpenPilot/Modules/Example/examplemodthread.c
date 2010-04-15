@@ -66,7 +66,7 @@ static void exampleTask(void* parameters);
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-int32_t ExampleModThreadInitialize(void)
+int32_t ExampleModThreadInitialize()
 {
 	// Create object queue
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));

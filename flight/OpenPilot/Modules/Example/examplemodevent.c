@@ -62,7 +62,7 @@ static void ObjectUpdatedCb(UAVObjEvent* ev);
  * Initialise the module, called on startup.
  * \returns 0 on success or -1 if initialisation failed
  */
-int32_t ExampleModEventInitialize(void)
+int32_t ExampleModEventInitialize()
 {
 	// Listen for ExampleObject1 updates, connect a callback function
 	ExampleObject1ConnectCallback(&ObjectUpdatedCb);
@@ -84,7 +84,7 @@ static void ObjectUpdatedCb(UAVObjEvent* ev)
 {
 	ExampleSettingsData settings;
 	ExampleObject1Data data1;
-	ExampleObject1Data data2;
+	ExampleObject2Data data2;
 	int32_t step;
 
 	// Make sure that the object update is for ExampleObject1

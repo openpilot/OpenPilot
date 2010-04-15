@@ -176,7 +176,9 @@ static int32_t eventPeriodicCreate(UAVObjEvent* ev, UAVObjEventCallback cb, xQue
 	{
 		if (objEntry->evInfo.cb == cb &&
 			objEntry->evInfo.queue == queue &&
-			memcmp(&objEntry->evInfo.ev, ev, sizeof(UAVObjEvent)) == 0)
+			objEntry->evInfo.ev.obj == ev->obj &&
+			objEntry->evInfo.ev.instId == ev->instId &&
+			objEntry->evInfo.ev.event == ev->event)
 		{
 			// Already registered, do nothing
 			xSemaphoreGiveRecursive(mutex);
@@ -186,7 +188,9 @@ static int32_t eventPeriodicCreate(UAVObjEvent* ev, UAVObjEventCallback cb, xQue
     // Create handle
 	objEntry = (PeriodicObjectList*)pvPortMalloc(sizeof(PeriodicObjectList));
 	if (objEntry == NULL) return -1;
-	memcpy(&objEntry->evInfo.ev, ev, sizeof(UAVObjEvent));
+	objEntry->evInfo.ev.obj = ev->obj;
+	objEntry->evInfo.ev.instId = ev->instId;
+	objEntry->evInfo.ev.event = ev->event;
 	objEntry->evInfo.cb = cb;
 	objEntry->evInfo.queue = queue;
     objEntry->updatePeriodMs = periodMs;
@@ -216,7 +220,9 @@ static int32_t eventPeriodicUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, xQue
 	{
 		if (objEntry->evInfo.cb == cb &&
 			objEntry->evInfo.queue == queue &&
-			memcmp(&objEntry->evInfo.ev, ev, sizeof(UAVObjEvent)) == 0)
+			objEntry->evInfo.ev.obj == ev->obj &&
+			objEntry->evInfo.ev.instId == ev->instId &&
+			objEntry->evInfo.ev.event == ev->event)
 		{
 			// Object found, update period
 			objEntry->updatePeriodMs = periodMs;

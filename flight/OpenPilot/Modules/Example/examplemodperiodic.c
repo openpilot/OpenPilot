@@ -27,7 +27,7 @@
 
 /**
  * Input object: ExampleSettings
- * Output object: ExampleObject1
+ * Output object: ExampleObject2
  *
  * This module will periodically update the value of the ExampleObject object.
  * The module settings can configure how the ExampleObject is manipulated.
@@ -45,7 +45,7 @@
  */
 
 #include "examplemodperiodic.h"
-#include "exampleobject1.h" // object that will be updated by the module
+#include "exampleobject2.h" // object that will be updated by the module
 #include "examplesettings.h" // object holding module settings
 
 // Private constants
@@ -64,7 +64,7 @@ static void exampleTask(void* parameters);
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-int32_t ExampleModPeriodicInitialize(void)
+int32_t ExampleModPeriodicInitialize()
 {
 	// Start main task
 	xTaskCreate(exampleTask, (signed char*)"ExamplePeriodic", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
@@ -78,7 +78,7 @@ int32_t ExampleModPeriodicInitialize(void)
 static void exampleTask(void* parameters)
 {
 	ExampleSettingsData settings;
-	ExampleObject1Data data;
+	ExampleObject2Data data;
 	int32_t step;
 
 	// Main task loop
@@ -87,8 +87,13 @@ static void exampleTask(void* parameters)
 		// Update settings with latest value
 		ExampleSettingsGet(&settings);
 
+		// TODO: Remove, this is temporary for testing (force settings)
+		settings.StepDirection = EXAMPLESETTINGS_STEPDIRECTION_UP;
+		settings.StepSize = 1;
+		settings.UpdatePeriod = 10;
+
 		// Get the object data
-		ExampleObject1Get(&data);
+		ExampleObject2Get(&data);
 
 		// Determine how to update the data
 		if ( settings.StepDirection == EXAMPLESETTINGS_STEPDIRECTION_UP )
@@ -107,13 +112,12 @@ static void exampleTask(void* parameters)
 		data.Field4[0] += step;
 		data.Field4[1] += step;
 
-
 		// Update the ExampleObject, after this function is called
 		// notifications to any other modules listening to that object
 		// will be sent and the GCS object will be updated through the
 		// telemetry link. All operations will take place asynchronously
 		// and the following call will return immediately.
-		ExampleObject1Set(&data);
+		ExampleObject2Set(&data);
 
 		// Since this module executes at fixed time intervals, we need to
 		// block the task until it is time for the next update.

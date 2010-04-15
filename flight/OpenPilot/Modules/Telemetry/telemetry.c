@@ -27,9 +27,9 @@
 
 // Private constants
 #define MAX_QUEUE_SIZE 20
-#define STACK_SIZE 100
+#define STACK_SIZE configMINIMAL_STACK_SIZE
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 1)
-#define REQ_TIMEOUT_MS 500
+#define REQ_TIMEOUT_MS 250
 #define MAX_RETRIES 3
 
 // Private types
@@ -37,10 +37,12 @@
 // Private variables
 static COMPortTypeDef telemetryPort;
 static xQueueHandle queue;
-static xTaskHandle telemetryTaskHandle;
+static xTaskHandle telemetryTxTaskHandle;
+static xTaskHandle telemetryRxTaskHandle;
 
 // Private functions
-static void telemetryTask(void* parameters);
+static void telemetryTxTask(void* parameters);
+static void telemetryRxTask(void* parameters);
 static int32_t transmitData(uint8_t* data, int32_t length);
 static void registerObject(UAVObjHandle obj);
 static void updateObject(UAVObjHandle obj);
@@ -66,8 +68,9 @@ int32_t TelemetryInitialize(void)
 	// Process all registered objects and connect queue for updates
 	UAVObjIterate(&registerObject);
 
-	// Start telemetry task
-	xTaskCreate(telemetryTask, (signed char*)"Telemetry", STACK_SIZE, NULL, TASK_PRIORITY, &telemetryTaskHandle);
+	// Start telemetry tasks
+	xTaskCreate(telemetryTxTask, (signed char*)"TelemetryTx", STACK_SIZE, NULL, TASK_PRIORITY, &telemetryTxTaskHandle);
+	xTaskCreate(telemetryRxTask, (signed char*)"TelemetryRx", STACK_SIZE, NULL, TASK_PRIORITY, &telemetryRxTaskHandle);
 
 	return 0;
 }
@@ -145,30 +148,29 @@ static void updateObject(UAVObjHandle obj)
 }
 
 /**
- * Telemetry task. Processes queue events and periodic updates. It does not return.
+ * Telemetry transmit task. Processes queue events and periodic updates.
  */
-static void telemetryTask(void* parameters)
+static void telemetryTxTask(void* parameters)
 {
 	UAVObjEvent ev;
 	UAVObjMetadata metadata;
 	int32_t retries;
 	int32_t success;
-	PIOS_COM_SendFormattedStringNonBlocking(telemetryPort, "sendtest");
 
 	// Loop forever
 	while(1)
 	{
-//		PIOS_LED_Toggle(LED2);
 		// Wait for queue message
-		if(xQueueReceive(queue, &ev, 0) == pdTRUE)
+		if(xQueueReceive(queue, &ev, portMAX_DELAY) == pdTRUE)
 		{
 			// Get object metadata
 			UAVObjGetMetadata(ev.obj, &metadata);
 			// Act on event
+			retries = 0;
+			success = -1;
 			if(ev.event == EV_UPDATED || ev.event == EV_UPDATED_MANUAL)
 			{
 				// Send update to GCS (with retries)
-				retries = 0;
 				while(retries < MAX_RETRIES && success == -1)
 				{
 					success = UAVTalkSendObject(ev.obj, ev.instId, metadata.telemetryAcked, REQ_TIMEOUT_MS); // call blocks until ack is received or timeout
@@ -178,7 +180,6 @@ static void telemetryTask(void* parameters)
 			else if(ev.event == EV_UPDATE_REQ)
 			{
 				// Request object update from GCS (with retries)
-				retries = 0;
 				while(retries < MAX_RETRIES && success == -1)
 				{
 					success = UAVTalkSendObjectRequest(ev.obj, ev.instId, REQ_TIMEOUT_MS); // call blocks until update is received or timeout
@@ -191,28 +192,41 @@ static void telemetryTask(void* parameters)
 				updateObject(UAVObjGetLinkedObj(ev.obj)); // linked object will be the actual object the metadata are for
 			}
 		}
+	}
+}
 
-		/* This blocks the task until there is something on the buffer */
-		uint8_t bytes = PIOS_COM_ReceiveBufferUsed(telemetryPort);
-		if(bytes > 0)
+/**
+ * Telemetry transmit task. Processes queue events and periodic updates.
+ */
+static void telemetryRxTask(void* parameters)
+{
+	COMPortTypeDef inputPort;
+	int32_t len;
+
+	// Task loop
+	while (1)
+	{
+		// TODO: Disabled since the USB HID is not fully functional yet
+		inputPort = telemetryPort; // force input port, remove once USB HID is tested
+		// Determine input port (USB takes priority over telemetry port)
+		//if(!PIOS_USB_HID_CheckAvailable())
+		//{
+		//	inputPort = telemetryPort;
+		//}
+		//else
+		//{
+		//	inputPort = COM_USB_HID;
+		//}
+
+		// Block until data are available
+		// TODO: Update once the PIOS_COM is made blocking
+		//xSemaphoreTake(PIOS_USART1_Buffer, portMAX_DELAY);
+		len = PIOS_COM_ReceiveBufferUsed(inputPort);
+		for (int32_t n = 0; n < len; ++n)
 		{
-			PIOS_LED_Toggle(LED2);
-			uint8_t c=PIOS_COM_ReceiveBuffer(telemetryPort);
-			UAVTalkProcessInputStream(c);
-			//PIOS_COM_SendFormattedStringNonBlocking(COM_USART1, "%c", c);
+			//PIOS_LED_Toggle(LED1);
+			UAVTalkProcessInputStream(PIOS_COM_ReceiveBuffer(inputPort));
 		}
-		else if(PIOS_COM_ReceiveBufferUsed(COM_USB_HID) > 0)
-		{
-			PIOS_LED_Toggle(LED2);
-			//UAVTalkProcessInputStream(PIOS_COM_ReceiveBuffer(COM_USB_HID));
-			uint8_t c=PIOS_COM_ReceiveBuffer(COM_USB_HID);
-			if(c!=255)
-			{
-				PIOS_COM_SendCharNonBlocking(COM_USART1, c);
-				UAVTalkProcessInputStream(c);
-			}
-		}
-		//vTaskDelay(200 / portTICK_RATE_MS);
 	}
 }
 
@@ -224,19 +238,23 @@ static void telemetryTask(void* parameters)
  */
 static int32_t transmitData(uint8_t* data, int32_t length)
 {
-	COMPortTypeDef OutputPort;
+	COMPortTypeDef outputPort;
 
-	/* If USB HID transfer is possible */
-	if(!PIOS_USB_HID_CheckAvailable())
-	{
-		OutputPort = COM_USART1;
-	}
-	else
-	{
-		OutputPort = COM_USB_HID;
-	}
+	// TODO: Disabled since the USB HID is not fully functional yet
+	outputPort = telemetryPort; // force input port, remove once USB HID is tested
+	// Determine input port (USB takes priority over telemetry port)
+	//if(!PIOS_USB_HID_CheckAvailable())
+	//{
+	//	outputPort = telemetryPort;
+	//}
+	//else
+	//{
+	//	outputPort = COM_USB_HID;
+	//}
 
-	return PIOS_COM_SendBuffer(OutputPort, data, length);
+	// TODO: Update once the PIOS_COM is made blocking (it is implemented as a busy loop for now!)
+	//PIOS_LED_Toggle(LED2);
+	return PIOS_COM_SendBuffer(outputPort, data, length);
 }
 
 /**

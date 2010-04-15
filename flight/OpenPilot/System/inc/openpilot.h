@@ -31,11 +31,6 @@
 /* PIOS Includes */
 #include <pios.h>
 
-/* OpenPilot Modules */
-#include "telemetry.h"
-#include "GPS.h"
-#include "gpsinfo.h"
-
 /* OpenPilot Includes */
 #include <op_config.h>
 #include <op_logging.h>

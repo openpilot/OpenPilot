@@ -28,7 +28,7 @@
 
 #include "openpilot.h"
 
-int32_t ExampleModThreadInitialize(void);
+int32_t ExampleModThreadInitialize();
 
 #endif // EXAMPLEMODTHREAD_H
 

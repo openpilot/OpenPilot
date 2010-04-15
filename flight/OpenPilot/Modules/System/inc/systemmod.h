@@ -23,12 +23,12 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef SYSTEM_H
-#define SYSTEM_H
+#ifndef SYSTEMMOD_H
+#define SYSTEMMOD_H
 
 #include "openpilot.h"
 
 int32_t SystemModInitialize(void);
 
-#endif // SYSTEM_H
+#endif // SYSTEMMOD_H
 

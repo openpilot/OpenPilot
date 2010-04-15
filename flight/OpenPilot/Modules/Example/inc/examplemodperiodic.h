@@ -28,7 +28,7 @@
 
 #include "openpilot.h"
 
-int32_t ExampleModPeriodicInitialize(void);
+int32_t ExampleModPeriodicInitialize();
 
 #endif // EXAMPLEMODPERIODIC_H
 

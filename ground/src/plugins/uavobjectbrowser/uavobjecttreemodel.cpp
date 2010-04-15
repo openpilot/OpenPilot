@@ -47,12 +47,16 @@ UAVObjectTreeModel::UAVObjectTreeModel(QObject *parent) :
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
-    m_signalMapper = new QSignalMapper();
-    connect(m_signalMapper, SIGNAL(mapped(QObject*)), this, SLOT(resetHighlightObject(QObject*)));
     connect(objManager, SIGNAL(newObject(UAVObject*)), this, SLOT(newObject(UAVObject*)));
     connect(objManager, SIGNAL(newInstance(UAVObject*)), this, SLOT(newObject(UAVObject*)));
 
+    TreeItem::setHighlightTime(m_recentlyUpdatedTimeout);
     setupModelData(objManager);
+}
+
+UAVObjectTreeModel::~UAVObjectTreeModel()
+{
+    delete m_rootItem;
 }
 
 void UAVObjectTreeModel::setupModelData(UAVObjectManager *objManager)
@@ -66,6 +70,8 @@ void UAVObjectTreeModel::setupModelData(UAVObjectManager *objManager)
     m_rootItem->appendChild(m_settingsTree);
     m_nonSettingsTree = new TopTreeItem(tr("Data Objects"), m_rootItem);
     m_rootItem->appendChild(m_nonSettingsTree);
+    connect(m_settingsTree, SIGNAL(removeHighlight(TreeItem*)), this, SLOT(removeHighlight(TreeItem*)));
+    connect(m_nonSettingsTree, SIGNAL(removeHighlight(TreeItem*)), this, SLOT(removeHighlight(TreeItem*)));
 
     QList< QList<UAVDataObject*> > objList = objManager->getDataObjects();
     foreach (QList<UAVDataObject*> list, objList) {
@@ -90,6 +96,7 @@ void UAVObjectTreeModel::addDataObject(UAVDataObject *obj)
         addInstance(obj, root->child(index));
     } else {
         DataObjectTreeItem *data = new DataObjectTreeItem(obj->getName());
+        connect(data, SIGNAL(removeHighlight(TreeItem*)), this, SLOT(removeHighlight(TreeItem*)));
         int index = root->nameIndex(obj->getName());
         root->insert(index, data);
         root->insertObjId(index, obj->getObjID());
@@ -103,6 +110,7 @@ void UAVObjectTreeModel::addMetaObject(UAVMetaObject *obj, TreeItem *parent)
 {
     connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(highlightUpdatedObject(UAVObject*)));
     MetaObjectTreeItem *meta = new MetaObjectTreeItem(obj, tr("Meta Data"));
+    connect(meta, SIGNAL(removeHighlight(TreeItem*)), this, SLOT(removeHighlight(TreeItem*)));
     foreach (UAVObjectField *field, obj->getFields()) {
         if (field->getNumElements() > 1) {
             addArrayField(field, meta);
@@ -124,6 +132,7 @@ void UAVObjectTreeModel::addInstance(UAVObject *obj, TreeItem *parent)
     } else {
         QString name = tr("Instance") +  " " + QString::number(obj->getInstID());
         item = new InstanceTreeItem(obj, name);
+        connect(item, SIGNAL(removeHighlight(TreeItem*)), this, SLOT(removeHighlight(TreeItem*)));
         parent->appendChild(item);
     }
     foreach (UAVObjectField *field, obj->getFields()) {
@@ -139,6 +148,7 @@ void UAVObjectTreeModel::addInstance(UAVObject *obj, TreeItem *parent)
 void UAVObjectTreeModel::addArrayField(UAVObjectField *field, TreeItem *parent)
 {
     TreeItem *item = new ArrayFieldTreeItem(field->getName());
+    connect(item, SIGNAL(removeHighlight(TreeItem*)), this, SLOT(removeHighlight(TreeItem*)));
     for (uint i = 0; i < field->getNumElements(); ++i) {
         addSingleField(i, field, item);
     }
@@ -199,6 +209,7 @@ void UAVObjectTreeModel::addSingleField(int index, UAVObjectField *field, TreeIt
         data.append(field->getUnits());
         item = new FieldTreeItem(index, data);
     }
+    connect(item, SIGNAL(removeHighlight(TreeItem*)), this, SLOT(removeHighlight(TreeItem*)));
     parent->appendChild(item);
 }
 
@@ -220,6 +231,22 @@ QModelIndex UAVObjectTreeModel::index(int row, int column, const QModelIndex &pa
         return createIndex(row, column, childItem);
     else
         return QModelIndex();
+}
+
+QModelIndex UAVObjectTreeModel::index(TreeItem *item)
+{
+    QModelIndex root;
+    if (item->parent() == 0)
+        root = QModelIndex();
+    else
+        root = index(item->parent());
+
+    for (int i = 0; i < rowCount(root); ++i) {
+        TreeItem *parentItem = static_cast<TreeItem*>(root.child(i, 0).internalPointer());
+        if (parentItem == item)
+            return createIndex(i, 0, item);
+    }
+    return QModelIndex();
 }
 
 QModelIndex UAVObjectTreeModel::parent(const QModelIndex &index) const
@@ -337,35 +364,8 @@ void UAVObjectTreeModel::highlightUpdatedObject(UAVObject *obj)
     Q_ASSERT(item);
     item->setHighlight(true);
     item->update();
-    emit dataChanged(QModelIndex(), QModelIndex());
-
-    // any updates while highlighted will not reset timer
-    if (m_timerMap.contains(obj))
-        return;
-
-    QTimer *timer = new QTimer(this);
-    timer->setSingleShot(true);
-
-    m_timerMap.insert(obj, timer);
-    connect(timer, SIGNAL(timeout()), m_signalMapper, SLOT(map()));
-    m_signalMapper->setMapping(timer, obj);
-    timer->start(m_recentlyUpdatedTimeout);
-}
-
-void UAVObjectTreeModel::resetHighlightObject(QObject *object)
-{
-    UAVObject *obj = qobject_cast<UAVObject*>(object);
-    Q_ASSERT(obj);
-    QTimer *timer = m_timerMap.value(obj);
-    Q_ASSERT(timer);
-    delete timer;
-    m_timerMap.remove(obj);
-
-    ObjectTreeItem *item = findObjectTreeItem(obj);
-    Q_ASSERT(item);
-    item->setHighlight(false);
-    item->update();
-    emit dataChanged(QModelIndex(), QModelIndex());
+    QModelIndex itemIndex = index(item);
+    emit dataChanged(itemIndex, itemIndex);
 }
 
 ObjectTreeItem *UAVObjectTreeModel::findObjectTreeItem(UAVObject *object)
@@ -378,8 +378,12 @@ ObjectTreeItem *UAVObjectTreeModel::findObjectTreeItem(UAVObject *object)
     } else {
         dobj = qobject_cast<UAVDataObject*>(mobj->getParentObject());
         Q_ASSERT(dobj);
-        DataObjectTreeItem *dItem = findDataObjectTreeItem(dobj);
-        foreach (TreeItem *child, dItem->children()) {
+        ObjectTreeItem *dItem = findDataObjectTreeItem(dobj);
+        Q_ASSERT(dItem);
+        Q_ASSERT(dItem->object());
+        if (!dItem->object()->isSingleInstance())
+            dItem = dynamic_cast<ObjectTreeItem*>(dItem->parent());
+        foreach (TreeItem *child, dItem->treeChildren()) {
             MetaObjectTreeItem *mItem = dynamic_cast<MetaObjectTreeItem*>(child);
             if (mItem && mItem->object()) {
                 Q_ASSERT(mItem->object() == mobj);
@@ -395,20 +399,27 @@ DataObjectTreeItem *UAVObjectTreeModel::findDataObjectTreeItem(UAVDataObject *ob
 {
     Q_ASSERT(object);
     TopTreeItem *root = object->isSettings() ? m_settingsTree : m_nonSettingsTree;
-    foreach (TreeItem *child, root->children()) {
+    foreach (TreeItem *child, root->treeChildren()) {
         DataObjectTreeItem *dItem = dynamic_cast<DataObjectTreeItem*>(child);
         if (dItem && dItem->object() && dItem->object()->isSingleInstance()) {
             if(dItem->object() == object) {
                 return dItem;
             }
         } else {
-            foreach (TreeItem *c, dItem->children()) {
+            foreach (TreeItem *c, dItem->treeChildren()) {
                 DataObjectTreeItem *d = dynamic_cast<DataObjectTreeItem*>(c);
                 if (d && d->object() == object)
-                    return dItem;
+                    return d;
             }
         }
     }
     return 0;
 }
+
+void UAVObjectTreeModel::removeHighlight(TreeItem *item)
+{
+    QModelIndex itemIndex = index(item);
+    emit dataChanged(itemIndex, itemIndex.sibling(itemIndex.row(), item->dataColumn));
+}
+
 

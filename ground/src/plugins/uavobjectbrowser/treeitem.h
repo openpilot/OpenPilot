@@ -42,6 +42,8 @@
 #include <QtCore/QList>
 #include <QtCore/QVariant>
 #include <QtCore/QStringList>
+#include <QtCore/QTimer>
+#include <QtCore/QObject>
 #include <limits>
 
 #define QINT8MIN std::numeric_limits<qint8>::min()
@@ -55,54 +57,62 @@
 #define QINT32MAX std::numeric_limits<qint32>::max()
 #define QUINT32MAX std::numeric_limits<qint32>::max()
 
-class TreeItem
- {
- public:
-     TreeItem(const QList<QVariant> &data, TreeItem *parent = 0);
-     TreeItem(const QVariant &data, TreeItem *parent = 0);
-     virtual ~TreeItem();
+class TreeItem : public QObject
+{
+Q_OBJECT
+public:
+    TreeItem(const QList<QVariant> &data, TreeItem *parent = 0);
+    TreeItem(const QVariant &data, TreeItem *parent = 0);
+    virtual ~TreeItem();
 
-     void appendChild(TreeItem *child);
-     void insert(int index, TreeItem *child);
+    void appendChild(TreeItem *child);
+    void insert(int index, TreeItem *child);
 
-     TreeItem *child(int row);
-     inline QList<TreeItem*> children() const { return m_children; }
-     int childCount() const;
-     int columnCount() const;
-     QVariant data(int column = 1) const;
-     // only column 1 is changed with setData currently
-     // other columns are initialized in constructor
-     virtual void setData(QVariant value, int column = 1);
-     int row() const;
-     TreeItem *parent() { return m_parent; }
-     void setParent(TreeItem *parent) { m_parent = parent; }
-     inline virtual bool isEditable() { return false; }
-     virtual void update() {
-         foreach(TreeItem *child, children())
-             child->update();
-     }
-     virtual void apply() {
-         foreach(TreeItem *child, children())
-             child->apply();
-     }
-     inline bool highlighted() { return m_highlight; }
-     inline void setHighlight(bool highlight) { m_highlight = highlight; m_changed = false; }
-     inline bool changed() { return m_changed; }
-     inline void setChanged(bool changed) { m_changed = changed; }
+    TreeItem *child(int row);
+    inline QList<TreeItem*> treeChildren() const { return m_children; }
+    int childCount() const;
+    int columnCount() const;
+    QVariant data(int column = 1) const;
+    // only column 1 is changed with setData currently
+    // other columns are initialized in constructor
+    virtual void setData(QVariant value, int column = 1);
+    int row() const;
+    TreeItem *parent() { return m_parent; }
+    void setParentTree(TreeItem *parent) { m_parent = parent; }
+    inline virtual bool isEditable() { return false; }
+    virtual void update();
+    virtual void apply();
 
- private:
-     QList<TreeItem*> m_children;
-     // m_data contains: [0] property name, [1] value, and [2] unit
-     QList<QVariant> m_data;
-     TreeItem *m_parent;
-     bool m_highlight;
-     bool m_changed;
- public:
-     static const int dataColumn = 1;
- };
+    inline bool highlighted() { return m_highlight; }
+    void setHighlight(bool highlight);
+    static void setHighlightTime(int time) { m_highlightTimeMs = time; }
+
+    inline bool changed() { return m_changed; }
+    inline void setChanged(bool changed) { m_changed = changed; }
+
+signals:
+    void removeHighlight(TreeItem*);
+
+private slots:
+    void removeHighlight();
+
+private:
+    QList<TreeItem*> m_children;
+    // m_data contains: [0] property name, [1] value, and [2] unit
+    QList<QVariant> m_data;
+    TreeItem *m_parent;
+    bool m_highlight;
+    bool m_changed;
+    QTimer m_timer;
+public:
+    static const int dataColumn = 1;
+private:
+    static int m_highlightTimeMs;
+};
 
 class TopTreeItem : public TreeItem
 {
+Q_OBJECT
 public:
     TopTreeItem(const QList<QVariant> &data, TreeItem *parent = 0) : TreeItem(data, parent) { }
     TopTreeItem(const QVariant &data, TreeItem *parent = 0) : TreeItem(data, parent) { }
@@ -124,6 +134,7 @@ private:
 
 class ObjectTreeItem : public TreeItem
 {
+Q_OBJECT
 public:
     ObjectTreeItem(const QList<QVariant> &data, TreeItem *parent = 0) :
             TreeItem(data, parent), m_obj(0) { }
@@ -137,6 +148,7 @@ private:
 
 class MetaObjectTreeItem : public ObjectTreeItem
 {
+Q_OBJECT
 public:
     MetaObjectTreeItem(UAVObject *obj, const QList<QVariant> &data, TreeItem *parent = 0) :
             ObjectTreeItem(data, parent) { setObject(obj); }
@@ -146,20 +158,21 @@ public:
 
 class DataObjectTreeItem : public ObjectTreeItem
 {
+Q_OBJECT
 public:
     DataObjectTreeItem(const QList<QVariant> &data, TreeItem *parent = 0) :
             ObjectTreeItem(data, parent) { }
     DataObjectTreeItem(const QVariant &data, TreeItem *parent = 0) :
             ObjectTreeItem(data, parent) { }
     virtual void apply() {
-        foreach(TreeItem *child, children()) {
+        foreach(TreeItem *child, treeChildren()) {
             MetaObjectTreeItem *metaChild = dynamic_cast<MetaObjectTreeItem*>(child);
             if (!metaChild)
                 child->apply();
         }
     }
     virtual void update() {
-        foreach(TreeItem *child, children()) {
+        foreach(TreeItem *child, treeChildren()) {
             MetaObjectTreeItem *metaChild = dynamic_cast<MetaObjectTreeItem*>(child);
             if (!metaChild)
                 child->update();
@@ -169,6 +182,7 @@ public:
 
 class InstanceTreeItem : public DataObjectTreeItem
 {
+Q_OBJECT
 public:
     InstanceTreeItem(UAVObject *obj, const QList<QVariant> &data, TreeItem *parent = 0) :
             DataObjectTreeItem(data, parent) { setObject(obj); }
@@ -180,6 +194,7 @@ public:
 
 class ArrayFieldTreeItem : public TreeItem
 {
+Q_OBJECT
 public:
     ArrayFieldTreeItem(const QList<QVariant> &data, TreeItem *parent = 0) : TreeItem(data, parent) { }
     ArrayFieldTreeItem(const QVariant &data, TreeItem *parent = 0) : TreeItem(data, parent) { }
@@ -187,6 +202,7 @@ public:
 
 class FieldTreeItem : public TreeItem
 {
+Q_OBJECT
 public:
     FieldTreeItem(int index, const QList<QVariant> &data, TreeItem *parent = 0) :
             TreeItem(data, parent), m_index(index) { }
@@ -203,13 +219,14 @@ protected:
 
 class EnumFieldTreeItem : public FieldTreeItem
 {
+Q_OBJECT
 public:
     EnumFieldTreeItem(UAVObjectFieldEnum *field, int index, const QList<QVariant> &data,
                       TreeItem *parent = 0) :
-            FieldTreeItem(index, data, parent), enumOptions(field->getOptions()), m_field(field) { }
+    FieldTreeItem(index, data, parent), enumOptions(field->getOptions()), m_field(field) { }
     EnumFieldTreeItem(UAVObjectFieldEnum *field, int index, const QVariant &data,
                       TreeItem *parent = 0) :
-            FieldTreeItem(index, data, parent), enumOptions(field->getOptions()), m_field(field) { }
+    FieldTreeItem(index, data, parent), enumOptions(field->getOptions()), m_field(field) { }
     void setData(QVariant value, int column) {
         setChanged(m_field->getSelectedIndex(m_index) != value);
         TreeItem::setData(value, column);
@@ -224,8 +241,6 @@ public:
         if (data() != value || changed()) {
             setHighlight(true);
             TreeItem::setData(value);
-        } else {
-            setHighlight(false);
         }
     }
 
@@ -237,6 +252,7 @@ private:
 
 class IntFieldTreeItem : public FieldTreeItem
 {
+Q_OBJECT
 public:
     IntFieldTreeItem(int index, const QList<QVariant> &data, int min, int max, TreeItem *parent = 0) :
             FieldTreeItem(index, data, parent), MIN(min), MAX(max) { }
@@ -249,6 +265,7 @@ public:
 
 class Int8FieldTreeItem : public IntFieldTreeItem
 {
+Q_OBJECT
 public:
     Int8FieldTreeItem(UAVObjectFieldInt8 *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
             IntFieldTreeItem(index, data, QINT8MIN, QINT8MAX, parent), m_field(field) { }
@@ -267,8 +284,6 @@ public:
         if (data() != value || changed()) {
             setHighlight(true);
             TreeItem::setData(value);
-        } else {
-            setHighlight(false);
         }
     }
 private:
@@ -277,6 +292,7 @@ private:
 
 class Int16FieldTreeItem : public IntFieldTreeItem
 {
+Q_OBJECT
 public:
     Int16FieldTreeItem(UAVObjectFieldInt16 *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
             IntFieldTreeItem(index, data, QINT16MIN, QINT16MAX, parent), m_field(field) { }
@@ -295,8 +311,6 @@ public:
         if (data() != value || changed()) {
             setHighlight(true);
             TreeItem::setData(value);
-        } else {
-            setHighlight(false);
         }
     }
 private:
@@ -305,6 +319,7 @@ private:
 
 class Int32FieldTreeItem : public IntFieldTreeItem
 {
+Q_OBJECT
 public:
     Int32FieldTreeItem(UAVObjectFieldInt32 *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
             IntFieldTreeItem(index, data, QINT32MIN, QINT32MAX, parent), m_field(field) { }
@@ -323,8 +338,6 @@ public:
         if (data() != value || changed()) {
             setHighlight(true);
             TreeItem::setData(value);
-        } else {
-            setHighlight(false);
         }
     }
 private:
@@ -333,6 +346,7 @@ private:
 
 class UInt8FieldTreeItem : public IntFieldTreeItem
 {
+Q_OBJECT
 public:
     UInt8FieldTreeItem(UAVObjectFieldUInt8 *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
             IntFieldTreeItem(index, data, QUINTMIN, QUINT8MAX, parent), m_field(field) { }
@@ -351,8 +365,6 @@ public:
         if (data() != value || changed()) {
             setHighlight(true);
             TreeItem::setData(value);
-        } else {
-            setHighlight(false);
         }
     }
 private:
@@ -361,6 +373,7 @@ private:
 
 class UInt16FieldTreeItem : public IntFieldTreeItem
 {
+Q_OBJECT
 public:
     UInt16FieldTreeItem(UAVObjectFieldUInt16 *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
             IntFieldTreeItem(index, data, QUINTMIN, QUINT16MAX, parent), m_field(field) { }
@@ -379,8 +392,6 @@ public:
         if (data() != value || changed()) {
             setHighlight(true);
             TreeItem::setData(value);
-        } else {
-            setHighlight(false);
         }
     }
 private:
@@ -389,6 +400,7 @@ private:
 
 class UInt32FieldTreeItem : public IntFieldTreeItem
 {
+Q_OBJECT
 public:
     UInt32FieldTreeItem(UAVObjectFieldUInt32 *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
             IntFieldTreeItem(index, data, QUINTMIN, QUINT32MAX, parent), m_field(field) { }
@@ -407,8 +419,6 @@ public:
         if (data() != value || changed()) {
             setHighlight(true);
             TreeItem::setData(value);
-        } else {
-            setHighlight(false);
         }
     }
 private:
@@ -418,6 +428,7 @@ private:
 
 class FloatFieldTreeItem : public FieldTreeItem
 {
+Q_OBJECT
 public:
     FloatFieldTreeItem(UAVObjectFieldFloat *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
             FieldTreeItem(index, data, parent), m_field(field) { }
@@ -437,8 +448,6 @@ public:
         if (data() != value || changed()) {
             setHighlight(true);
             TreeItem::setData(value);
-        } else {
-            setHighlight(false);
         }
     }
 private:

@@ -27,20 +27,26 @@
 
 #include "treeitem.h"
 
+int TreeItem::m_highlightTimeMs = 500;
+
 TreeItem::TreeItem(const QList<QVariant> &data, TreeItem *parent) :
+        QObject(0),
         m_data(data),
         m_parent(parent),
         m_highlight(false),
         m_changed(false)
 {
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(removeHighlight()));
 }
 
 TreeItem::TreeItem(const QVariant &data, TreeItem *parent) :
+        QObject(0),
         m_parent(parent),
         m_highlight(false),
         m_changed(false)
 {
     m_data << data << "" << "";
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(removeHighlight()));
 }
 
 TreeItem::~TreeItem()
@@ -51,13 +57,13 @@ TreeItem::~TreeItem()
 void TreeItem::appendChild(TreeItem *child)
 {
     m_children.append(child);
-    child->setParent(this);
+    child->setParentTree(this);
 }
 
 void TreeItem::insert(int index, TreeItem *child)
 {
     m_children.insert(index, child);
-    child->setParent(this);
+    child->setParentTree(this);
 }
 
 TreeItem *TreeItem::child(int row)
@@ -90,4 +96,32 @@ QVariant TreeItem::data(int column) const
 void TreeItem::setData(QVariant value, int column)
 {
     m_data.replace(column, value);
+}
+
+void TreeItem::update() {
+    foreach(TreeItem *child, treeChildren())
+        child->update();
+}
+
+void TreeItem::apply() {
+    foreach(TreeItem *child, treeChildren())
+        child->apply();
+}
+
+void TreeItem::setHighlight(bool highlight) {
+    m_highlight = highlight;
+    m_changed = false;
+    if (highlight) {
+        if (m_timer.isActive()) {
+            m_timer.stop();
+        }
+        m_timer.setSingleShot(true);
+        m_timer.start(m_highlightTimeMs);
+    }
+}
+
+void TreeItem::removeHighlight() {
+    m_highlight = false;
+    update();
+    emit removeHighlight(this);
 }

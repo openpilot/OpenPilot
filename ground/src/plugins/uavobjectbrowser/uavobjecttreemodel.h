@@ -49,6 +49,7 @@ class UAVObjectTreeModel : public QAbstractItemModel
 Q_OBJECT
 public:
     explicit UAVObjectTreeModel(QObject *parent = 0);
+    ~UAVObjectTreeModel();
 
     QVariant data(const QModelIndex &index, int role) const;
     bool setData(const QModelIndex &index, const QVariant & value, int role);
@@ -69,10 +70,10 @@ public slots:
 
 private slots:
     void highlightUpdatedObject(UAVObject *obj);
-    void resetHighlightObject(QObject *obj);
-
+    void removeHighlight(TreeItem*);
 
 private:
+    QModelIndex index(TreeItem *item);
     void addDataObject(UAVDataObject *obj);
     void addMetaObject(UAVMetaObject *obj, TreeItem *parent);
     void addArrayField(UAVObjectField *field, TreeItem *parent);
@@ -87,8 +88,6 @@ private:
     TreeItem *m_rootItem;
     TopTreeItem *m_settingsTree;
     TopTreeItem *m_nonSettingsTree;
-    QSignalMapper *m_signalMapper;
-    QMap<UAVObject*,QTimer*> m_timerMap;
     int m_recentlyUpdatedTimeout;
     QColor m_recentlyUpdatedColor;
     QColor m_manuallyChangedColor;

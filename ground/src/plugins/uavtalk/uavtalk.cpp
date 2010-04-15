@@ -37,7 +37,6 @@ UAVTalk::UAVTalk(QIODevice* iodev, UAVObjectManager* objMngr)
     this->objMngr = objMngr;
     rxState = STATE_SYNC;
     mutex = new QMutex(QMutex::Recursive);
-    respSema = new QSemaphore(0);
     respObj = NULL;
     connect(io, SIGNAL(readyRead()), this, SLOT(processInputStream()));
 }
@@ -60,33 +59,42 @@ void UAVTalk::processInputStream()
  * Request an update for the specified object, on success the object data would have been
  * updated by the GCS.
  * \param[in] obj Object to update
- * \param[in] timeout Time to wait for the response, when zero it will return immediately
  * \param[in] allInstances If set true then all instances will be updated
  * \return Success (true), Failure (false)
  */
-bool UAVTalk::sendObjectRequest(UAVObject* obj, qint32 timeout, bool allInstances)
+bool UAVTalk::sendObjectRequest(UAVObject* obj, bool allInstances)
 {
-    return objectTransaction(obj, TYPE_OBJ_REQ, timeout, allInstances);
+    QMutexLocker locker(mutex);
+    return objectTransaction(obj, TYPE_OBJ_REQ, allInstances);
 }
 
 /**
  * Send the specified object through the telemetry link.
  * \param[in] obj Object to send
  * \param[in] acked Selects if an ack is required
- * \param[in] timeoutMs Time to wait for the ack, when zero it will return immediately
  * \param[in] allInstances If set true then all instances will be updated
  * \return Success (true), Failure (false)
  */
-bool UAVTalk::sendObject(UAVObject* obj, bool acked, qint32 timeoutMs, bool allInstances)
+bool UAVTalk::sendObject(UAVObject* obj, bool acked, bool allInstances)
 {
+    QMutexLocker locker(mutex);
     if (acked)
     {
-        return objectTransaction(obj, TYPE_OBJ_ACK, timeoutMs, allInstances);
+        return objectTransaction(obj, TYPE_OBJ_ACK, allInstances);
     }
     else
     {
-        return objectTransaction(obj, TYPE_OBJ, timeoutMs, allInstances);
+        return objectTransaction(obj, TYPE_OBJ, allInstances);
     }
+}
+
+/**
+ * Cancel a pending transaction
+ */
+void UAVTalk::cancelTransaction()
+{
+    QMutexLocker locker(mutex);
+    respObj = NULL;
 }
 
 /**
@@ -97,42 +105,30 @@ bool UAVTalk::sendObject(UAVObject* obj, bool acked, qint32 timeoutMs, bool allI
  * 			  TYPE_OBJ_REQ: request object update
  * 			  TYPE_OBJ_ACK: send object with an ack
  * \param[in] allInstances If set true then all instances will be updated
- * \param[in] timeoutMs Time to wait for the ack, when zero it will return immediately
  * \return Success (true), Failure (false)
  */
-bool UAVTalk::objectTransaction(UAVObject* obj, quint8 type, qint32 timeoutMs, bool allInstances)
+bool UAVTalk::objectTransaction(UAVObject* obj, quint8 type, bool allInstances)
 {
-    bool respReceived;
-
-    // Lock
-    mutex->lock();
     // Send object depending on if a response is needed
     if (type == TYPE_OBJ_ACK || type == TYPE_OBJ_REQ)
     {
-        respSema->tryAcquire(); // non blocking call to make sure the value is zero (binary sema)
         if ( transmitObject(obj, type, allInstances) )
         {
             respObj = obj;
-            respAllInstances = allInstances;
-            mutex->unlock(); // need to release lock since the next call will block until a response is received     
-            respReceived = respSema->tryAcquire(1, timeoutMs); // lock on object until a response is received (or timeout)
-            return respReceived;
+            respAllInstances = allInstances;    
+            return true;
         }
         else
         {
-            mutex->unlock();
             return false;
         }
     }
     else if (type == TYPE_OBJ)
     {
-        bool success = transmitObject(obj, TYPE_OBJ, allInstances);
-        mutex->unlock();
-        return success;
+        return transmitObject(obj, TYPE_OBJ, allInstances);
     }
     else
     {
-        mutex->unlock();
         return false;
     }
 }
@@ -410,7 +406,6 @@ void UAVTalk::updateAck(UAVObject* obj)
 {
     if (respObj != NULL && respObj->getObjID() == obj->getObjID() && (respObj->getInstID() == obj->getInstID() || respAllInstances))
     {
-        respSema->release();
         respObj = NULL;
         emit transactionCompleted(obj);
     }

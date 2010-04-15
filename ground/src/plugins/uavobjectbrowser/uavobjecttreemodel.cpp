@@ -113,7 +113,7 @@ void UAVObjectTreeModel::addMetaObject(UAVMetaObject *obj, TreeItem *parent)
 
 void UAVObjectTreeModel::addInstance(UAVObject *obj, TreeItem *parent)
 {
-    connect(obj, SIGNAL(objectUpdatedAuto(UAVObject*)), this, SLOT(highlightUpdatedObject(UAVObject*)));
+    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(highlightUpdatedObject(UAVObject*)));
     TreeItem *item;
     if (obj->isSingleInstance()) {
         item = parent;

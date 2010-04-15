@@ -77,7 +77,14 @@ QIODevice *SerialConnection::openDevice(const QString &deviceName)
         if(port.friendName == deviceName)
         {
             //we need to handle port settings here...
-            return new QextSerialPort(port.portName);
+            PortSettings set;
+            set.BaudRate = BAUD57600;
+            set.DataBits = DATA_8;
+            set.Parity = PAR_NONE;
+            set.StopBits = STOP_1;
+            set.FlowControl = FLOW_OFF;
+            set.Timeout_Millisec = 500;
+            return new QextSerialPort(port.portName, set);
         }
     }
     return NULL;

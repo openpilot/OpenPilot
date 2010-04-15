@@ -41,8 +41,9 @@ class UAVTalk: public QObject
 public:
     UAVTalk(QIODevice* iodev, UAVObjectManager* objMngr);
 
-    bool sendObject(UAVObject* obj, bool acked, qint32 timeoutMs, bool allInstances);
-    bool sendObjectRequest(UAVObject* obj, qint32 timeout, bool allInstances);
+    bool sendObject(UAVObject* obj, bool acked, bool allInstances);
+    bool sendObjectRequest(UAVObject* obj, bool allInstances);
+    void cancelTransaction();
 
 signals:
     void transactionCompleted(UAVObject* obj);
@@ -70,7 +71,6 @@ private:
     QIODevice* io;
     UAVObjectManager* objMngr;
     QMutex* mutex;
-    QSemaphore* respSema;
     UAVObject* respObj;
     bool respAllInstances;
     quint8 rxBuffer[MAX_PACKET_LENGTH];
@@ -86,7 +86,7 @@ private:
     RxStateType rxState;
 
     // Methods
-    bool objectTransaction(UAVObject* obj, quint8 type, qint32 timeoutMs, bool allInstances);
+    bool objectTransaction(UAVObject* obj, quint8 type, bool allInstances);
     bool processInputByte(quint8 rxbyte);
     bool receiveObject(quint8 type, quint32 objId, quint16 instId, quint8* data, qint32 length);
     UAVObject* updateObject(quint32 objId, quint16 instId, quint8* data);

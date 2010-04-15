@@ -52,8 +52,6 @@ void UAVTalkPlugin::extensionsInitialized()
                      this, SLOT(onDeviceConnect(QIODevice *)));
     QObject::connect(cm, SIGNAL(deviceDisconnected()),
                      this, SLOT(onDeviceDisconnect()));
-
-
 }
 
 bool UAVTalkPlugin::initialize(const QStringList & arguments, QString * errorString)
@@ -74,6 +72,7 @@ void UAVTalkPlugin::onDeviceConnect(QIODevice *dev)
     utalk = new UAVTalk(dev, objMngr);
     telemetry = new Telemetry(utalk, objMngr);
 }
+
 void UAVTalkPlugin::onDeviceDisconnect()
 {
     delete telemetry;

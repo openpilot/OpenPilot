@@ -33,16 +33,15 @@
 #include "uavobjects/uavobjectmanager.h"
 #include <QMutex>
 #include <QMutexLocker>
-#include <QThread>
 #include <QTimer>
+#include <QQueue>
 
-class Telemetry: public QThread
+class Telemetry: public QObject
 {
     Q_OBJECT
 
 public:
     Telemetry(UAVTalk* utalk, UAVObjectManager* objMngr);
-    void run();
 
 signals:
 
@@ -54,10 +53,12 @@ private slots:
     void newObject(UAVObject* obj);
     void newInstance(UAVObject* obj);
     void processPeriodicUpdates();
+    void transactionCompleted(UAVObject* obj);
+    void transactionTimeout();
 
 private:
     // Constants
-    static const int REQ_TIMEOUT_MS = 500;
+    static const int REQ_TIMEOUT_MS = 250;
     static const int MAX_RETRIES = 3;
     static const int MAX_UPDATE_PERIOD_MS = 1000;
     static const int MIN_UPDATE_PERIOD_MS = 1;
@@ -79,12 +80,29 @@ private:
         qint32 timeToNextUpdateMs; /** Time delay to the next update */
     } ObjectTimeInfo;
 
+    typedef struct {
+        UAVObject* obj;
+        EventMask event;
+        bool allInstances;
+    } ObjectQueueInfo;
+
+    typedef struct {
+        UAVObject* obj;
+        bool allInstances;
+        bool objRequest;
+        qint32 retriesRemaining;
+    } ObjectTransactionInfo;
+
     // Variables
     UAVObjectManager* objMngr;
     UAVTalk* utalk;
     QList<ObjectTimeInfo> objList;
+    QQueue<ObjectQueueInfo> objQueue;
+    ObjectTransactionInfo transInfo;
+    bool transPending;
     QMutex* mutex;
-    QTimer* timer;
+    QTimer* updateTimer;
+    QTimer* transTimer;
     qint32 timeToNextUpdateMs;
 
     // Methods
@@ -94,6 +112,8 @@ private:
     void connectToObjectInstances(UAVObject* obj, quint32 eventMask);
     void updateObject(UAVObject* obj);
     void processObjectUpdates(UAVObject* obj, EventMask event, bool allInstances);
+    void processObjectTransaction();
+    void processObjectQueue();
 
 
 };

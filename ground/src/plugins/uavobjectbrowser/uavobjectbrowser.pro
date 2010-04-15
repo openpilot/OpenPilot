@@ -10,7 +10,8 @@ HEADERS += browserplugin.h \
     uavobjectbrowseroptionspage.h \
     uavobjecttreemodel.h \
     treeitem.h \
-    browseritemdelegate.h
+    browseritemdelegate.h \
+    fieldtreeitem.h
 SOURCES += browserplugin.cpp \
     uavobjectbrowserconfiguration.cpp \
     uavobjectbrowser.cpp \
@@ -19,6 +20,7 @@ SOURCES += browserplugin.cpp \
     uavobjectbrowseroptionspage.cpp \
     uavobjecttreemodel.cpp \
     treeitem.cpp \
-    browseritemdelegate.cpp
+    browseritemdelegate.cpp \
+    fieldtreeitem.cpp
 OTHER_FILES += UAVObjectBrowser.pluginspec
 FORMS += uavobjectbrowser.ui

@@ -26,11 +26,7 @@
  */
 
 #include "browseritemdelegate.h"
-#include "treeitem.h"
-#include <QtGui/QSpinBox>
-#include <QtGui/QDoubleSpinBox>
-#include <QtGui/QComboBox>
-#include <limits>
+#include "fieldtreeitem.h"
 
 BrowserItemDelegate::BrowserItemDelegate(QObject *parent) :
         QStyledItemDelegate(parent)
@@ -42,27 +38,9 @@ QWidget *BrowserItemDelegate::createEditor(QWidget *parent,
                                            const QModelIndex & index ) const
 {
     FieldTreeItem *item = static_cast<FieldTreeItem*>(index.internalPointer());
-    if (item->isIntType()) {
-        IntFieldTreeItem *intItem = static_cast<IntFieldTreeItem*>(item);
-        QSpinBox *editor = new QSpinBox(parent);
-        editor->setMinimum(intItem->MIN);
-        editor->setMaximum(intItem->MAX);
-        return editor;
-    } else if (item->isEnum()) {
-        EnumFieldTreeItem *enumItem = static_cast<EnumFieldTreeItem*>(item);
-        QComboBox *editor = new QComboBox(parent);
-        foreach (QString option, enumItem->enumOptions)
-            editor->addItem(option);
-        return editor;
-    } else if (item->isFloatType()) {
-        FloatFieldTreeItem *floatItem = static_cast<FloatFieldTreeItem*>(item);
-        QDoubleSpinBox *editor = new QDoubleSpinBox(parent);
-        editor->setDecimals(6);
-        editor->setMinimum(-std::numeric_limits<float>::max());
-        return editor;
-    } else {
-        return QStyledItemDelegate::createEditor(parent, option, index);
-    }
+    QWidget *editor = item->createEditor(parent);
+    Q_ASSERT(editor);
+    return editor;
 }
 
 
@@ -70,44 +48,16 @@ void BrowserItemDelegate::setEditorData(QWidget *editor,
                                         const QModelIndex &index) const
 {
     FieldTreeItem *item = static_cast<FieldTreeItem*>(index.internalPointer());
-    if (item->isIntType()) {
-        int value = index.model()->data(index, Qt::EditRole).toInt();
-        QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
-        spinBox->setValue(value);
-    } else if (item->isEnum()) {
-        int value = index.model()->data(index, Qt::EditRole).toInt();
-        QComboBox *comboBox = static_cast<QComboBox*>(editor);
-        comboBox->setCurrentIndex(value);
-    } else if (item->isFloatType()) {
-        float value = index.model()->data(index, Qt::EditRole).toDouble();
-        QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
-        spinBox->setValue(value);
-    } else {
-        QStyledItemDelegate::setEditorData(editor, index);
-    }
+    QVariant value = index.model()->data(index, Qt::EditRole);
+    item->setEditorValue(editor, value);
 }
 
 void BrowserItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
                                        const QModelIndex &index) const
 {
     FieldTreeItem *item = static_cast<FieldTreeItem*>(index.internalPointer());
-    if (item->isIntType()) {
-        QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
-        spinBox->interpretText();
-        int value = spinBox->value();
-        model->setData(index, value, Qt::EditRole);
-    } else if (item->isEnum()) {
-        QComboBox *comboBox = static_cast<QComboBox*>(editor);
-        int value = comboBox->currentIndex();
-        model->setData(index, value, Qt::EditRole);
-    } else if (item->isFloatType()) {
-        QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
-        spinBox->interpretText();
-        float value = spinBox->value();
-        model->setData(index, value, Qt::EditRole);
-    } else {
-        QStyledItemDelegate::setModelData(editor, model, index);
-    }
+    QVariant value = item->getEditorValue(editor);
+    model->setData(index, value, Qt::EditRole);
 }
 
 void BrowserItemDelegate::updateEditorGeometry(QWidget *editor,

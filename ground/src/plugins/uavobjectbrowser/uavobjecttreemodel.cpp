@@ -27,6 +27,7 @@
 
 #include "uavobjecttreemodel.h"
 #include "treeitem.h"
+#include "fieldtreeitem.h"
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/uavdataobject.h"
 #include "uavobjects/uavmetaobject.h"
@@ -205,9 +206,7 @@ void UAVObjectTreeModel::addSingleField(int index, UAVObjectField *field, TreeIt
         data.append(field->getUnits());
         item = new FloatFieldTreeItem(floatField, index, data);
     } else {
-        data.append("Data Error");
-        data.append(field->getUnits());
-        item = new FieldTreeItem(index, data);
+        Q_ASSERT(false);
     }
     connect(item, SIGNAL(removeHighlight(TreeItem*)), this, SLOT(removeHighlight(TreeItem*)));
     parent->appendChild(item);
@@ -320,7 +319,7 @@ QVariant UAVObjectTreeModel::data(const QModelIndex &index, int role) const
         EnumFieldTreeItem *fieldItem = dynamic_cast<EnumFieldTreeItem*>(item);
         if (fieldItem) {
             int enumIndex = fieldItem->data(index.column()).toInt();
-            return fieldItem->enumOptions.at(enumIndex);
+            return fieldItem->enumOptions(enumIndex);
         }
     }
 

@@ -33,6 +33,7 @@
 #include "uavobjects/uavobjectfields.h"
 #include "extensionsystem/pluginmanager.h"
 #include <QtGui/QColor>
+//#include <QtGui/QIcon>
 #include <QtCore/QTimer>
 #include <QtCore/QSignalMapper>
 #include <QtCore/QDebug>
@@ -100,7 +101,8 @@ void UAVObjectTreeModel::addDataObject(UAVDataObject *obj)
 
 void UAVObjectTreeModel::addMetaObject(UAVMetaObject *obj, TreeItem *parent)
 {
-    MetaObjectTreeItem *meta = new MetaObjectTreeItem(tr("Meta Data"));
+    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(highlightUpdatedObject(UAVObject*)));
+    MetaObjectTreeItem *meta = new MetaObjectTreeItem(obj, tr("Meta Data"));
     foreach (UAVObjectField *field, obj->getFields()) {
         if (field->getNumElements() > 1) {
             addArrayField(field, meta);
@@ -265,19 +267,21 @@ QVariant UAVObjectTreeModel::data(const QModelIndex &index, int role) const
         TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
         return item->data(index.column());
     }
+//    if (role == Qt::DecorationRole)
+//        return QIcon(":/core/images/openpilot_logo_128.png");
 
     TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
 
     if (index.column() == 0 && role == Qt::BackgroundRole) {
-        DataObjectTreeItem *dataItem = dynamic_cast<DataObjectTreeItem*>(item);
-        if (dataItem && dataItem->highlight())
+        ObjectTreeItem *objItem = dynamic_cast<ObjectTreeItem*>(item);
+        if (objItem && objItem->highlighted())
             return QVariant(m_recentlyUpdatedColor);
     }
     if (index.column() == 1 && role == Qt::BackgroundRole) {
         FieldTreeItem *fieldItem = dynamic_cast<FieldTreeItem*>(item);
-        if (fieldItem && fieldItem->highlight())
+        if (fieldItem && fieldItem->highlighted())
             return QVariant(m_recentlyUpdatedColor);
-        if (fieldItem && fieldItem->isChanged())
+        if (fieldItem && fieldItem->changed())
             return QVariant(m_manuallyChangedColor);
     }
 
@@ -326,17 +330,14 @@ QVariant UAVObjectTreeModel::headerData(int section, Qt::Orientation orientation
     return QVariant();
 }
 
-void UAVObjectTreeModel::highlightUpdatedObject(UAVObject *object)
+void UAVObjectTreeModel::highlightUpdatedObject(UAVObject *obj)
 {
-    UAVDataObject *obj = qobject_cast<UAVDataObject*>(object);
-    if (!obj)
-        return;
-    DataObjectTreeItem * dobj = findDataObjectTreeItem(obj);
-    if (dobj) {
-        dobj->setHighlight(true);
-        dobj->update();
-        emit dataChanged(QModelIndex(), QModelIndex());
-    }
+    Q_ASSERT(obj);
+    ObjectTreeItem *item = findObjectTreeItem(obj);
+    Q_ASSERT(item);
+    item->setHighlight(true);
+    item->update();
+    emit dataChanged(QModelIndex(), QModelIndex());
 
     // any updates while highlighted will not reset timer
     if (m_timerMap.contains(obj))
@@ -353,35 +354,58 @@ void UAVObjectTreeModel::highlightUpdatedObject(UAVObject *object)
 
 void UAVObjectTreeModel::resetHighlightObject(QObject *object)
 {
-    UAVDataObject *obj = qobject_cast<UAVDataObject*>(object);
-    if (!obj)
-        return;
+    UAVObject *obj = qobject_cast<UAVObject*>(object);
+    Q_ASSERT(obj);
     QTimer *timer = m_timerMap.value(obj);
+    Q_ASSERT(timer);
     delete timer;
     m_timerMap.remove(obj);
 
-    DataObjectTreeItem * dobj = findDataObjectTreeItem(obj);
-    if (dobj) {
-        dobj->setHighlight(false);
-        dobj->update();
-        emit dataChanged(QModelIndex(), QModelIndex());
-    }
+    ObjectTreeItem *item = findObjectTreeItem(obj);
+    Q_ASSERT(item);
+    item->setHighlight(false);
+    item->update();
+    emit dataChanged(QModelIndex(), QModelIndex());
 }
 
-DataObjectTreeItem *UAVObjectTreeModel::findDataObjectTreeItem(UAVDataObject *obj)
+ObjectTreeItem *UAVObjectTreeModel::findObjectTreeItem(UAVObject *object)
 {
-    TopTreeItem *root = obj->isSettings() ? m_settingsTree : m_nonSettingsTree;
+    UAVDataObject *dobj = qobject_cast<UAVDataObject*>(object);
+    UAVMetaObject *mobj = qobject_cast<UAVMetaObject*>(object);
+    Q_ASSERT(dobj || mobj);
+    if (dobj) {
+        return findDataObjectTreeItem(dobj);
+    } else {
+        dobj = qobject_cast<UAVDataObject*>(mobj->getParentObject());
+        Q_ASSERT(dobj);
+        DataObjectTreeItem *dItem = findDataObjectTreeItem(dobj);
+        foreach (TreeItem *child, dItem->children()) {
+            MetaObjectTreeItem *mItem = dynamic_cast<MetaObjectTreeItem*>(child);
+            if (mItem && mItem->object()) {
+                Q_ASSERT(mItem->object() == mobj);
+                return mItem;
+            }
+        }
+    }
+
+    return 0;
+}
+
+DataObjectTreeItem *UAVObjectTreeModel::findDataObjectTreeItem(UAVDataObject *object)
+{
+    Q_ASSERT(object);
+    TopTreeItem *root = object->isSettings() ? m_settingsTree : m_nonSettingsTree;
     foreach (TreeItem *child, root->children()) {
-        DataObjectTreeItem *dobj = dynamic_cast<DataObjectTreeItem*>(child);
-        if (dobj && dobj->object() && dobj->object()->isSingleInstance()) {
-            if(dobj->object() == obj) {
-                return dobj;
+        DataObjectTreeItem *dItem = dynamic_cast<DataObjectTreeItem*>(child);
+        if (dItem && dItem->object() && dItem->object()->isSingleInstance()) {
+            if(dItem->object() == object) {
+                return dItem;
             }
         } else {
-            foreach (TreeItem *c, dobj->children()) {
+            foreach (TreeItem *c, dItem->children()) {
                 DataObjectTreeItem *d = dynamic_cast<DataObjectTreeItem*>(c);
-                if (d && d->object() == obj)
-                    return dobj;
+                if (d && d->object() == object)
+                    return dItem;
             }
         }
     }

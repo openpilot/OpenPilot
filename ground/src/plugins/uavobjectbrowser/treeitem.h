@@ -60,13 +60,13 @@ class TreeItem
  public:
      TreeItem(const QList<QVariant> &data, TreeItem *parent = 0);
      TreeItem(const QVariant &data, TreeItem *parent = 0);
-     ~TreeItem();
+     virtual ~TreeItem();
 
      void appendChild(TreeItem *child);
      void insert(int index, TreeItem *child);
 
      TreeItem *child(int row);
-     QList<TreeItem*> children() const { return m_children; }
+     inline QList<TreeItem*> children() const { return m_children; }
      int childCount() const;
      int columnCount() const;
      QVariant data(int column = 1) const;
@@ -78,11 +78,17 @@ class TreeItem
      void setParent(TreeItem *parent) { m_parent = parent; }
      inline virtual bool isEditable() { return false; }
      virtual void update() {
-         foreach(TreeItem *child, m_children)
+         foreach(TreeItem *child, children())
              child->update();
      }
-     virtual void setHighlight(bool highlight) { m_highlight = highlight; }
-     inline virtual bool highlight() { return m_highlight; }
+     virtual void apply() {
+         foreach(TreeItem *child, children())
+             child->apply();
+     }
+     inline bool highlighted() { return m_highlight; }
+     inline void setHighlight(bool highlight) { m_highlight = highlight; m_changed = false; }
+     inline bool changed() { return m_changed; }
+     inline void setChanged(bool changed) { m_changed = changed; }
 
  private:
      QList<TreeItem*> m_children;
@@ -90,6 +96,9 @@ class TreeItem
      QList<QVariant> m_data;
      TreeItem *m_parent;
      bool m_highlight;
+     bool m_changed;
+ public:
+     static const int dataColumn = 1;
  };
 
 class TopTreeItem : public TreeItem
@@ -113,12 +122,12 @@ private:
     QList<quint32> m_objIds;
 };
 
-class DataObjectTreeItem : public TreeItem
+class ObjectTreeItem : public TreeItem
 {
 public:
-    DataObjectTreeItem(const QList<QVariant> &data, TreeItem *parent = 0) :
+    ObjectTreeItem(const QList<QVariant> &data, TreeItem *parent = 0) :
             TreeItem(data, parent), m_obj(0) { }
-    DataObjectTreeItem(const QVariant &data, TreeItem *parent = 0) :
+    ObjectTreeItem(const QVariant &data, TreeItem *parent = 0) :
             TreeItem(data, parent), m_obj(0) { }
     void setObject(UAVObject *obj) { m_obj = obj; }
     inline UAVObject *object() { return m_obj; }
@@ -126,12 +135,36 @@ private:
     UAVObject *m_obj;
 };
 
-class MetaObjectTreeItem : public TreeItem
+class MetaObjectTreeItem : public ObjectTreeItem
 {
 public:
-    MetaObjectTreeItem(const QList<QVariant> &data, TreeItem *parent = 0) : TreeItem(data, parent) { }
-    MetaObjectTreeItem(const QVariant &data, TreeItem *parent = 0) : TreeItem(data, parent) { }
-    void update() { }
+    MetaObjectTreeItem(UAVObject *obj, const QList<QVariant> &data, TreeItem *parent = 0) :
+            ObjectTreeItem(data, parent) { setObject(obj); }
+    MetaObjectTreeItem(UAVObject *obj, const QVariant &data, TreeItem *parent = 0) :
+            ObjectTreeItem(data, parent) { setObject(obj); }
+};
+
+class DataObjectTreeItem : public ObjectTreeItem
+{
+public:
+    DataObjectTreeItem(const QList<QVariant> &data, TreeItem *parent = 0) :
+            ObjectTreeItem(data, parent) { }
+    DataObjectTreeItem(const QVariant &data, TreeItem *parent = 0) :
+            ObjectTreeItem(data, parent) { }
+    virtual void apply() {
+        foreach(TreeItem *child, children()) {
+            MetaObjectTreeItem *metaChild = dynamic_cast<MetaObjectTreeItem*>(child);
+            if (!metaChild)
+                child->apply();
+        }
+    }
+    virtual void update() {
+        foreach(TreeItem *child, children()) {
+            MetaObjectTreeItem *metaChild = dynamic_cast<MetaObjectTreeItem*>(child);
+            if (!metaChild)
+                child->update();
+        }
+    }
 };
 
 class InstanceTreeItem : public DataObjectTreeItem
@@ -141,6 +174,8 @@ public:
             DataObjectTreeItem(data, parent) { setObject(obj); }
     InstanceTreeItem(UAVObject *obj, const QVariant &data, TreeItem *parent = 0) :
             DataObjectTreeItem(data, parent) { setObject(obj); }
+    virtual void apply() { TreeItem::apply(); }
+    virtual void update() { TreeItem::update(); }
 };
 
 class ArrayFieldTreeItem : public TreeItem
@@ -154,20 +189,16 @@ class FieldTreeItem : public TreeItem
 {
 public:
     FieldTreeItem(int index, const QList<QVariant> &data, TreeItem *parent = 0) :
-            TreeItem(data, parent), m_index(index), m_changed(false) { }
+            TreeItem(data, parent), m_index(index) { }
     FieldTreeItem(int index, const QVariant &data, TreeItem *parent = 0) :
-            TreeItem(data, parent), m_index(index), m_changed(false) { }
+            TreeItem(data, parent), m_index(index) { }
     bool isEditable() { return true; }
-    bool isChanged() { return m_changed; }
-    void setChanged(bool changed) { m_changed = changed; }
     virtual bool isIntType() { return false; }
     virtual bool isEnum() { return false; }
     virtual bool isFloatType() { return false; }
-    virtual void apply(int column)  { }
+    virtual void apply() { }
 protected:
     int m_index;
-private:
-    bool m_changed;
 };
 
 class EnumFieldTreeItem : public FieldTreeItem
@@ -182,16 +213,15 @@ public:
     void setData(QVariant value, int column) {
         setChanged(m_field->getSelectedIndex(m_index) != value);
         TreeItem::setData(value, column);
-        apply(column);
     }
-    void apply(int column) {
-        int value = data(column).toInt();
+    void apply() {
+        int value = data(dataColumn).toInt();
         m_field->setSelectedIndex(value, m_index);
         setChanged(false);
     }
     void update() {
         int value = m_field->getSelectedIndex(m_index);
-        if (data() != value) {
+        if (data() != value || changed()) {
             setHighlight(true);
             TreeItem::setData(value);
         } else {
@@ -228,8 +258,18 @@ public:
         setChanged(m_field->getValue(m_index) != value);
         TreeItem::setData(value, column);
     }
-    void apply(int column) {
-        m_field->setValue(data(column).toInt());
+    void apply() {
+        m_field->setValue(data(dataColumn).toInt());
+        setChanged(false);
+    }
+    void update() {
+        int value = m_field->getValue(m_index);
+        if (data() != value || changed()) {
+            setHighlight(true);
+            TreeItem::setData(value);
+        } else {
+            setHighlight(false);
+        }
     }
 private:
     UAVObjectFieldInt8 *m_field;
@@ -246,8 +286,18 @@ public:
         setChanged(m_field->getValue(m_index) != value);
         TreeItem::setData(value, column);
     }
-    void apply(int column) {
-        m_field->setValue(data(column).toInt());
+    void apply() {
+        m_field->setValue(data(dataColumn).toInt());
+        setChanged(false);
+    }
+    void update() {
+        int value = m_field->getValue(m_index);
+        if (data() != value || changed()) {
+            setHighlight(true);
+            TreeItem::setData(value);
+        } else {
+            setHighlight(false);
+        }
     }
 private:
     UAVObjectFieldInt16 *m_field;
@@ -264,9 +314,18 @@ public:
         setChanged(m_field->getValue(m_index) != value);
         TreeItem::setData(value, column);
     }
-    void apply(int column) {
-        int value = data(column).toInt();
-        m_field->setValue(value);
+    void apply() {
+        m_field->setValue(data(dataColumn).toInt());
+        setChanged(false);
+    }
+    void update() {
+        int value = m_field->getValue(m_index);
+        if (data() != value || changed()) {
+            setHighlight(true);
+            TreeItem::setData(value);
+        } else {
+            setHighlight(false);
+        }
     }
 private:
     UAVObjectFieldInt32 *m_field;
@@ -283,8 +342,18 @@ public:
         setChanged(m_field->getValue(m_index) != value);
         TreeItem::setData(value, column);
     }
-    void apply(int column) {
-        m_field->setValue(data(column).toInt());
+    void apply() {
+        m_field->setValue(data(dataColumn).toInt());
+        setChanged(false);
+    }
+    void update() {
+        int value = m_field->getValue(m_index);
+        if (data() != value || changed()) {
+            setHighlight(true);
+            TreeItem::setData(value);
+        } else {
+            setHighlight(false);
+        }
     }
 private:
     UAVObjectFieldUInt8 *m_field;
@@ -301,8 +370,18 @@ public:
         setChanged(m_field->getValue(m_index) != value);
         TreeItem::setData(value, column);
     }
-    void apply(int column) {
-        m_field->setValue(data(column).toInt());
+    void apply() {
+        m_field->setValue(data(dataColumn).toInt());
+        setChanged(false);
+    }
+    void update() {
+        int value = m_field->getValue(m_index);
+        if (data() != value || changed()) {
+            setHighlight(true);
+            TreeItem::setData(value);
+        } else {
+            setHighlight(false);
+        }
     }
 private:
     UAVObjectFieldUInt16 *m_field;
@@ -319,8 +398,18 @@ public:
         setChanged(m_field->getValue(m_index) != value);
         TreeItem::setData(value, column);
     }
-    void apply(int column) {
-        m_field->setValue(data(column).toInt());
+    void apply() {
+        m_field->setValue(data(dataColumn).toInt());
+        setChanged(false);
+    }
+    void update() {
+        int value = m_field->getValue(m_index);
+        if (data() != value || changed()) {
+            setHighlight(true);
+            TreeItem::setData(value);
+        } else {
+            setHighlight(false);
+        }
     }
 private:
     UAVObjectFieldUInt32 *m_field;
@@ -339,8 +428,18 @@ public:
         setChanged(m_field->getValue(m_index) != value);
         TreeItem::setData(value, column);
     }
-    void apply(int column) {
-        m_field->setValue(data(column).toDouble(), m_index);
+    void apply() {
+        m_field->setValue(data(dataColumn).toDouble(), m_index);
+        setChanged(false);
+    }
+    void update() {
+        double value = m_field->getValue(m_index);
+        if (data() != value || changed()) {
+            setHighlight(true);
+            TreeItem::setData(value);
+        } else {
+            setHighlight(false);
+        }
     }
 private:
     UAVObjectFieldFloat *m_field;

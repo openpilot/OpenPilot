@@ -34,6 +34,7 @@
 
 class TreeItem;
 class TopTreeItem;
+class ObjectTreeItem;
 class DataObjectTreeItem;
 class UAVObject;
 class UAVDataObject;
@@ -80,6 +81,7 @@ private:
     void addInstance(UAVObject *obj, TreeItem *parent);
     QString updateMode(quint8 updateMode);
     void setupModelData(UAVObjectManager *objManager);
+    ObjectTreeItem *findObjectTreeItem(UAVObject *obj);
     DataObjectTreeItem *findDataObjectTreeItem(UAVDataObject *obj);
 
     TreeItem *m_rootItem;

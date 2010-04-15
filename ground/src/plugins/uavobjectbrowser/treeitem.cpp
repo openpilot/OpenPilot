@@ -30,13 +30,15 @@
 TreeItem::TreeItem(const QList<QVariant> &data, TreeItem *parent) :
         m_data(data),
         m_parent(parent),
-        m_highlight(false)
+        m_highlight(false),
+        m_changed(false)
 {
 }
 
 TreeItem::TreeItem(const QVariant &data, TreeItem *parent) :
         m_parent(parent),
-        m_highlight(false)
+        m_highlight(false),
+        m_changed(false)
 {
     m_data << data << "" << "";
 }

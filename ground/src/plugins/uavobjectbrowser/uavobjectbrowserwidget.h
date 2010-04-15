@@ -33,6 +33,7 @@
 #include "uavobjects/settingspersistence.h"
 
 class QPushButton;
+class ObjectTreeItem;
 class Ui_UAVObjectBrowser;
 
 
@@ -42,23 +43,26 @@ class UAVObjectBrowserWidget : public QWidget
 
 public:
     UAVObjectBrowserWidget(QWidget *parent = 0);
-   ~UAVObjectBrowserWidget();
+    ~UAVObjectBrowserWidget();
 
 private slots:
-   void sendUpdate();
-   void requestUpdate();
-   void showMetaData(bool show);
-   void saveSettings();
-   void readSettings();
+    void sendUpdate();
+    void requestUpdate();
+    void showMetaData(bool show);
+    void saveSettings();
+    void readSettings();
+    void currentChanged(const QModelIndex &current, const QModelIndex &previous);
 
 
 private:
-   QPushButton *m_requestUpdate;
-   QPushButton *m_sendUpdate;
-   Ui_UAVObjectBrowser *m_browser;
-   QAbstractItemModel *m_model;
+    QPushButton *m_requestUpdate;
+    QPushButton *m_sendUpdate;
+    Ui_UAVObjectBrowser *m_browser;
+    QAbstractItemModel *m_model;
 
-   void updateSettings(SettingsPersistence::OperationEnum op);
+    void updateSettings(SettingsPersistence::OperationEnum op);
+    void enableSendRequest(bool enable);
+    ObjectTreeItem *findCurrentObjectTreeItem();
 };
 
 #endif /* UAVOBJECTBROWSERWIDGET_H_ */

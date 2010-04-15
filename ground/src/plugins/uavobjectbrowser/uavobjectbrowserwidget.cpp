@@ -27,6 +27,7 @@
 #include "uavobjectbrowserwidget.h"
 #include "uavobjecttreemodel.h"
 #include "browseritemdelegate.h"
+#include "treeitem.h"
 #include "ui_uavobjectbrowser.h"
 #include "uavobjects/uavobjectmanager.h"
 #include <QStringList>
@@ -51,9 +52,13 @@ UAVObjectBrowserWidget::UAVObjectBrowserWidget(QWidget *parent) : QWidget(parent
     m_browser->treeView->setEditTriggers(QAbstractItemView::AllEditTriggers);
     m_browser->treeView->setSelectionBehavior(QAbstractItemView::SelectItems);
     showMetaData(m_browser->metaCheckBox->isChecked());
+    connect(m_browser->treeView->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(currentChanged(QModelIndex,QModelIndex)));
     connect(m_browser->metaCheckBox, SIGNAL(toggled(bool)), this, SLOT(showMetaData(bool)));
     connect(m_browser->saveSDButton, SIGNAL(clicked()), this, SLOT(saveSettings()));
     connect(m_browser->readSDButton, SIGNAL(clicked()), this, SLOT(readSettings()));
+    connect(m_browser->sendButton, SIGNAL(clicked()), this, SLOT(sendUpdate()));
+    connect(m_browser->requestButton, SIGNAL(clicked()), this, SLOT(requestUpdate()));
+    enableSendRequest(false);
 }
 
 UAVObjectBrowserWidget::~UAVObjectBrowserWidget()
@@ -75,12 +80,35 @@ void UAVObjectBrowserWidget::showMetaData(bool show)
 
 void UAVObjectBrowserWidget::sendUpdate()
 {
-
+    ObjectTreeItem *objItem = findCurrentObjectTreeItem();
+    Q_ASSERT(objItem);
+    objItem->apply();
+    UAVObject *obj = objItem->object();
+    Q_ASSERT(obj);
+    obj->updated();
 }
 
 void UAVObjectBrowserWidget::requestUpdate()
 {
+    ObjectTreeItem *objItem = findCurrentObjectTreeItem();
+    Q_ASSERT(objItem);
+    UAVObject *obj = objItem->object();
+    Q_ASSERT(obj);
+    obj->requestUpdate();
+}
 
+ObjectTreeItem *UAVObjectBrowserWidget::findCurrentObjectTreeItem()
+{
+    QModelIndex current = m_browser->treeView->currentIndex();
+    TreeItem *item = static_cast<TreeItem*>(current.internalPointer());
+    ObjectTreeItem *objItem = 0;
+    while (item) {
+        objItem = dynamic_cast<ObjectTreeItem*>(item);
+        if (objItem)
+            break;
+        item = item->parent();
+    }
+    return objItem;
 }
 
 void UAVObjectBrowserWidget::saveSettings()
@@ -106,4 +134,24 @@ void UAVObjectBrowserWidget::updateSettings(SettingsPersistence::OperationEnum o
         obj->updated();
     }
 }
+
+void UAVObjectBrowserWidget::currentChanged(const QModelIndex &current, const QModelIndex &previous)
+{
+    TreeItem *item = static_cast<TreeItem*>(current.internalPointer());
+    bool enable = true;
+    if (current == QModelIndex())
+        enable = false;
+    TopTreeItem *top = dynamic_cast<TopTreeItem*>(item);
+    ObjectTreeItem *data = dynamic_cast<ObjectTreeItem*>(item);
+    if (top || (data && !data->object()))
+        enable = false;
+    enableSendRequest(enable);
+}
+
+void UAVObjectBrowserWidget::enableSendRequest(bool enable)
+{
+    m_browser->sendButton->setEnabled(enable);
+    m_browser->requestButton->setEnabled(enable);
+}
+
 

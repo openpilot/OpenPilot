@@ -79,8 +79,8 @@ void UAVObject::initializeFields(QList<UAVObjectField*>& fields, quint8* data, q
  */
 void UAVObject::fieldUpdated(UAVObjectField* field)
 {
-    emit objectUpdatedAuto(this); // trigger object updated event
-    emit objectUpdated(this);
+//    emit objectUpdatedAuto(this); // trigger object updated event
+//    emit objectUpdated(this);
 }
 
 /**

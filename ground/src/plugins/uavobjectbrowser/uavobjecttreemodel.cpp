@@ -235,17 +235,18 @@ QModelIndex UAVObjectTreeModel::index(int row, int column, const QModelIndex &pa
 
 QModelIndex UAVObjectTreeModel::index(TreeItem *item)
 {
-    QModelIndex root;
     if (item->parent() == 0)
-        root = QModelIndex();
-    else
-        root = index(item->parent());
+        return QModelIndex();
+
+    QModelIndex root = index(item->parent());
 
     for (int i = 0; i < rowCount(root); ++i) {
-        TreeItem *parentItem = static_cast<TreeItem*>(root.child(i, 0).internalPointer());
-        if (parentItem == item)
-            return createIndex(i, 0, item);
+        QModelIndex childIndex = index(i, 0, root);
+        TreeItem *child = static_cast<TreeItem*>(childIndex.internalPointer());
+        if (child == item)
+            return childIndex;
     }
+    Q_ASSERT(false);
     return QModelIndex();
 }
 
@@ -365,7 +366,9 @@ void UAVObjectTreeModel::highlightUpdatedObject(UAVObject *obj)
     item->setHighlight(true);
     item->update();
     QModelIndex itemIndex = index(item);
+    Q_ASSERT(itemIndex != QModelIndex());
     emit dataChanged(itemIndex, itemIndex);
+    emit dataChanged(itemIndex.child(0, 0), itemIndex.child(rowCount(itemIndex)-1, TreeItem::dataColumn));
 }
 
 ObjectTreeItem *UAVObjectTreeModel::findObjectTreeItem(UAVObject *object)
@@ -419,7 +422,8 @@ DataObjectTreeItem *UAVObjectTreeModel::findDataObjectTreeItem(UAVDataObject *ob
 void UAVObjectTreeModel::removeHighlight(TreeItem *item)
 {
     QModelIndex itemIndex = index(item);
-    emit dataChanged(itemIndex, itemIndex.sibling(itemIndex.row(), item->dataColumn));
+    Q_ASSERT(itemIndex != QModelIndex());
+    emit dataChanged(itemIndex, itemIndex.sibling(itemIndex.row(), TreeItem::dataColumn));
 }
 
 

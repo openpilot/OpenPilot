@@ -118,10 +118,11 @@ void TreeItem::setHighlight(bool highlight) {
         m_timer.setSingleShot(true);
         m_timer.start(m_highlightTimeMs);
     }
+    emit updateHighlight(this);
 }
 
 void TreeItem::removeHighlight() {
     m_highlight = false;
     update();
-    emit removeHighlight(this);
+    emit updateHighlight(this);
 }

@@ -70,7 +70,7 @@ public slots:
 
 private slots:
     void highlightUpdatedObject(UAVObject *obj);
-    void removeHighlight(TreeItem*);
+    void updateHighlight(TreeItem*);
 
 private:
     QModelIndex index(TreeItem *item);

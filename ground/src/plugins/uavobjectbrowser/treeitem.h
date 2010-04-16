@@ -71,7 +71,7 @@ public:
     inline void setChanged(bool changed) { m_changed = changed; }
 
 signals:
-    void removeHighlight(TreeItem*);
+    void updateHighlight(TreeItem*);
 
 private slots:
     void removeHighlight();

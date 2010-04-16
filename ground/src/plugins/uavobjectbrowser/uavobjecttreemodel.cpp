@@ -71,8 +71,8 @@ void UAVObjectTreeModel::setupModelData(UAVObjectManager *objManager)
     m_rootItem->appendChild(m_settingsTree);
     m_nonSettingsTree = new TopTreeItem(tr("Data Objects"), m_rootItem);
     m_rootItem->appendChild(m_nonSettingsTree);
-    connect(m_settingsTree, SIGNAL(removeHighlight(TreeItem*)), this, SLOT(removeHighlight(TreeItem*)));
-    connect(m_nonSettingsTree, SIGNAL(removeHighlight(TreeItem*)), this, SLOT(removeHighlight(TreeItem*)));
+    connect(m_settingsTree, SIGNAL(updateHighlight(TreeItem*)), this, SLOT(updateHighlight(TreeItem*)));
+    connect(m_nonSettingsTree, SIGNAL(updateHighlight(TreeItem*)), this, SLOT(updateHighlight(TreeItem*)));
 
     QList< QList<UAVDataObject*> > objList = objManager->getDataObjects();
     foreach (QList<UAVDataObject*> list, objList) {
@@ -97,7 +97,7 @@ void UAVObjectTreeModel::addDataObject(UAVDataObject *obj)
         addInstance(obj, root->child(index));
     } else {
         DataObjectTreeItem *data = new DataObjectTreeItem(obj->getName());
-        connect(data, SIGNAL(removeHighlight(TreeItem*)), this, SLOT(removeHighlight(TreeItem*)));
+        connect(data, SIGNAL(updateHighlight(TreeItem*)), this, SLOT(updateHighlight(TreeItem*)));
         int index = root->nameIndex(obj->getName());
         root->insert(index, data);
         root->insertObjId(index, obj->getObjID());
@@ -111,7 +111,7 @@ void UAVObjectTreeModel::addMetaObject(UAVMetaObject *obj, TreeItem *parent)
 {
     connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(highlightUpdatedObject(UAVObject*)));
     MetaObjectTreeItem *meta = new MetaObjectTreeItem(obj, tr("Meta Data"));
-    connect(meta, SIGNAL(removeHighlight(TreeItem*)), this, SLOT(removeHighlight(TreeItem*)));
+    connect(meta, SIGNAL(updateHighlight(TreeItem*)), this, SLOT(updateHighlight(TreeItem*)));
     foreach (UAVObjectField *field, obj->getFields()) {
         if (field->getNumElements() > 1) {
             addArrayField(field, meta);
@@ -133,7 +133,7 @@ void UAVObjectTreeModel::addInstance(UAVObject *obj, TreeItem *parent)
     } else {
         QString name = tr("Instance") +  " " + QString::number(obj->getInstID());
         item = new InstanceTreeItem(obj, name);
-        connect(item, SIGNAL(removeHighlight(TreeItem*)), this, SLOT(removeHighlight(TreeItem*)));
+        connect(item, SIGNAL(updateHighlight(TreeItem*)), this, SLOT(updateHighlight(TreeItem*)));
         parent->appendChild(item);
     }
     foreach (UAVObjectField *field, obj->getFields()) {
@@ -149,7 +149,7 @@ void UAVObjectTreeModel::addInstance(UAVObject *obj, TreeItem *parent)
 void UAVObjectTreeModel::addArrayField(UAVObjectField *field, TreeItem *parent)
 {
     TreeItem *item = new ArrayFieldTreeItem(field->getName());
-    connect(item, SIGNAL(removeHighlight(TreeItem*)), this, SLOT(removeHighlight(TreeItem*)));
+    connect(item, SIGNAL(updateHighlight(TreeItem*)), this, SLOT(updateHighlight(TreeItem*)));
     for (uint i = 0; i < field->getNumElements(); ++i) {
         addSingleField(i, field, item);
     }
@@ -208,7 +208,7 @@ void UAVObjectTreeModel::addSingleField(int index, UAVObjectField *field, TreeIt
     } else {
         Q_ASSERT(false);
     }
-    connect(item, SIGNAL(removeHighlight(TreeItem*)), this, SLOT(removeHighlight(TreeItem*)));
+    connect(item, SIGNAL(updateHighlight(TreeItem*)), this, SLOT(updateHighlight(TreeItem*)));
     parent->appendChild(item);
 }
 
@@ -367,7 +367,6 @@ void UAVObjectTreeModel::highlightUpdatedObject(UAVObject *obj)
     QModelIndex itemIndex = index(item);
     Q_ASSERT(itemIndex != QModelIndex());
     emit dataChanged(itemIndex, itemIndex);
-    emit dataChanged(itemIndex.child(0, 0), itemIndex.child(rowCount(itemIndex)-1, TreeItem::dataColumn));
 }
 
 ObjectTreeItem *UAVObjectTreeModel::findObjectTreeItem(UAVObject *object)
@@ -418,7 +417,7 @@ DataObjectTreeItem *UAVObjectTreeModel::findDataObjectTreeItem(UAVDataObject *ob
     return 0;
 }
 
-void UAVObjectTreeModel::removeHighlight(TreeItem *item)
+void UAVObjectTreeModel::updateHighlight(TreeItem *item)
 {
     QModelIndex itemIndex = index(item);
     Q_ASSERT(itemIndex != QModelIndex());

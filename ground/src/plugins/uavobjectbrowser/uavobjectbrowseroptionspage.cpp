@@ -27,7 +27,6 @@
 
 #include "uavobjectbrowseroptionspage.h"
 #include "uavobjectbrowserconfiguration.h"
-#include "ui_uavobjectbrowseroptionspage.h"
 #include <QtGui/QLabel>
 #include <QtGui/QSpinBox>
 #include <QtGui/QPushButton>

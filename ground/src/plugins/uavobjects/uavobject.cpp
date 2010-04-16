@@ -240,6 +240,7 @@ qint32 UAVObject::unpack(const quint8* dataIn)
     }
     emit objectUnpacked(this); // trigger object updated event
     emit objectUpdated(this);
+
     return numBytes;
 }
 
@@ -285,7 +286,7 @@ bool UAVObject::save(QFile& file)
     quint8 tmpId[4];
 
     // Write the object ID
-    qToBigEndian<quint32>(objID, tmpId);
+    qToLittleEndian<quint32>(objID, tmpId);
     if ( file.write((const char*)tmpId, 4) == -1 )
     {
         return false;
@@ -294,7 +295,7 @@ bool UAVObject::save(QFile& file)
     // Write the instance ID
     if (!isSingleInst)
     {
-        qToBigEndian<quint16>(instID, tmpId);
+        qToLittleEndian<quint16>(instID, tmpId);
         if ( file.write((const char*)tmpId, 2) == -1 )
         {
             return false;
@@ -360,7 +361,7 @@ bool UAVObject::load(QFile& file)
     }
 
     // Check that the IDs match
-    if (qFromBigEndian<quint32>(tmpId) != objID)
+    if (qFromLittleEndian<quint32>(tmpId) != objID)
     {
         return false;
     }
@@ -372,7 +373,7 @@ bool UAVObject::load(QFile& file)
     }
 
     // Check that the IDs match
-    if (qFromBigEndian<quint16>(tmpId) != instID)
+    if (qFromLittleEndian<quint16>(tmpId) != instID)
     {
         return false;
     }

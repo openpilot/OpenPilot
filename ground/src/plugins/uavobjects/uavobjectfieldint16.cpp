@@ -58,7 +58,7 @@ qint32 UAVObjectFieldInt16::pack(quint8* dataOut)
     {
         qint16 value;
         memcpy(&value, &data[offset + numBytesPerElement*index], numBytesPerElement);
-        qToBigEndian<qint16>(value, &dataOut[numBytesPerElement*index]);
+        qToLittleEndian<qint16>(value, &dataOut[numBytesPerElement*index]);
     }
     // Done
     return getNumBytes();
@@ -74,7 +74,7 @@ qint32 UAVObjectFieldInt16::unpack(const quint8* dataIn)
     for (quint32 index = 0; index < numElements; ++index)
     {
         qint16 value;
-        value = qFromBigEndian<qint16>(&dataIn[numBytesPerElement*index]);
+        value = qFromLittleEndian<qint16>(&dataIn[numBytesPerElement*index]);
         memcpy(&data[offset + numBytesPerElement*index], &value, numBytesPerElement);
     }
     // Done

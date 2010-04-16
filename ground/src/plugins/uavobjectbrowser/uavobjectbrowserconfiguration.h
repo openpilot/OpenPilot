@@ -29,22 +29,36 @@
 #define UAVOBJECTBROWSERCONFIGURATION_H
 
 #include <coreplugin/iuavgadgetconfiguration.h>
+#include <QtGui/QColor>
 
 using namespace Core;
 
 class UAVObjectBrowserConfiguration : public IUAVGadgetConfiguration
 {
 Q_OBJECT
+Q_PROPERTY(QColor m_recentlyUpdatedColor READ recentlyUpdatedColor WRITE setRecentlyUpdatedColor)
+Q_PROPERTY(QColor m_manuallyChangedColor READ manuallyChangedColor WRITE setManuallyChangedColor)
+Q_PROPERTY(int m_recentlyUpdatedTimeout READ recentlyUpdatedTimeout WRITE setRecentlyUpdatedTimeout)
 public:
     explicit UAVObjectBrowserConfiguration(QString classId, const QByteArray &state = 0, QObject *parent = 0);
     QByteArray saveState() const;
     IUAVGadgetConfiguration *clone();
+
+    QColor recentlyUpdatedColor() const { return m_recentlyUpdatedColor; }
+    QColor manuallyChangedColor() const { return m_manuallyChangedColor; }
+    int recentlyUpdatedTimeout() const { return m_recentlyUpdatedTimeout; }
+
 signals:
 
 public slots:
+    void setRecentlyUpdatedColor(QColor color) { m_recentlyUpdatedColor = color; }
+    void setManuallyChangedColor(QColor color) { m_manuallyChangedColor = color; }
+    void setRecentlyUpdatedTimeout(int timeout) { m_recentlyUpdatedTimeout = timeout; }
 
 private:
-
+    QColor m_recentlyUpdatedColor;
+    QColor m_manuallyChangedColor;
+    int m_recentlyUpdatedTimeout;
 };
 
 #endif // UAVOBJECTBROWSERCONFIGURATION_H

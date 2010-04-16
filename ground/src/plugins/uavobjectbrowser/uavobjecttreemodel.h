@@ -28,11 +28,11 @@
 #ifndef UAVOBJECTTREEMODEL_H
 #define UAVOBJECTTREEMODEL_H
 
+#include "treeitem.h"
 #include <QAbstractItemModel>
 #include <QtCore/QMap>
 #include <QtGui/QColor>
 
-class TreeItem;
 class TopTreeItem;
 class ObjectTreeItem;
 class DataObjectTreeItem;
@@ -62,6 +62,12 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
 
+    void setRecentlyUpdatedColor(QColor color) { m_recentlyUpdatedColor = color; }
+    void setManuallyChangedColor(QColor color) { m_manuallyChangedColor = color; }
+    void setRecentlyUpdatedTimeout(int timeout) {
+        m_recentlyUpdatedTimeout = timeout;
+        TreeItem::setHighlightTime(timeout);
+    }
 
 signals:
 

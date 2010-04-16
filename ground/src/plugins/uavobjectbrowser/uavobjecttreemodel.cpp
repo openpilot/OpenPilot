@@ -26,7 +26,6 @@
  */
 
 #include "uavobjecttreemodel.h"
-#include "treeitem.h"
 #include "fieldtreeitem.h"
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/uavdataobject.h"
@@ -290,7 +289,7 @@ QVariant UAVObjectTreeModel::data(const QModelIndex &index, int role) const
     if (!index.isValid())
         return QVariant();
 
-    if (index.column() == 1 && role == Qt::EditRole) {
+    if (index.column() == TreeItem::dataColumn && role == Qt::EditRole) {
         TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
         return item->data(index.column());
     }
@@ -304,7 +303,7 @@ QVariant UAVObjectTreeModel::data(const QModelIndex &index, int role) const
         if (objItem && objItem->highlighted())
             return QVariant(m_recentlyUpdatedColor);
     }
-    if (index.column() == 1 && role == Qt::BackgroundRole) {
+    if (index.column() == TreeItem::dataColumn && role == Qt::BackgroundRole) {
         FieldTreeItem *fieldItem = dynamic_cast<FieldTreeItem*>(item);
         if (fieldItem && fieldItem->highlighted())
             return QVariant(m_recentlyUpdatedColor);
@@ -315,7 +314,7 @@ QVariant UAVObjectTreeModel::data(const QModelIndex &index, int role) const
     if (role != Qt::DisplayRole)
         return QVariant();
 
-    if (index.column() == 1) {
+    if (index.column() == TreeItem::dataColumn) {
         EnumFieldTreeItem *fieldItem = dynamic_cast<EnumFieldTreeItem*>(item);
         if (fieldItem) {
             int enumIndex = fieldItem->data(index.column()).toInt();
@@ -339,7 +338,7 @@ Qt::ItemFlags UAVObjectTreeModel::flags(const QModelIndex &index) const
     if (!index.isValid())
         return 0;
 
-    if (index.column() == 1) {
+    if (index.column() == TreeItem::dataColumn) {
         TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
         if (item->isEditable())
             return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;

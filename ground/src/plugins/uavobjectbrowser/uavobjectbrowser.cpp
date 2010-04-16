@@ -42,5 +42,8 @@ UAVObjectBrowser::~UAVObjectBrowser()
 void UAVObjectBrowser::loadConfiguration(IUAVGadgetConfiguration* config)
 {
     UAVObjectBrowserConfiguration *m = qobject_cast<UAVObjectBrowserConfiguration*>(config);
+    m_widget->setRecentlyUpdatedColor(m->recentlyUpdatedColor());
+    m_widget->setManuallyChangedColor(m->manuallyChangedColor());
+    m_widget->setRecentlyUpdatedTimeout(m->recentlyUpdatedTimeout());
 }
 

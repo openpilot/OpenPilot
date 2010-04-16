@@ -53,7 +53,7 @@ public:
     int childCount() const;
     int columnCount() const;
     QVariant data(int column = 1) const;
-    // only column 1 is changed with setData currently
+    // only column 1 (TreeItem::dataColumn) is changed with setData currently
     // other columns are initialized in constructor
     virtual void setData(QVariant value, int column = 1);
     int row() const;

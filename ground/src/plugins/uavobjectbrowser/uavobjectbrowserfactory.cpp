@@ -53,6 +53,6 @@ IUAVGadgetConfiguration *UAVObjectBrowserFactory::createConfiguration(const QByt
 
 IOptionsPage *UAVObjectBrowserFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
-    return 0;// new UAVObjectBrowserOptionsPage(qobject_cast<UAVObjectBrowserConfiguration*>(config));
+    return new UAVObjectBrowserOptionsPage(qobject_cast<UAVObjectBrowserConfiguration*>(config));
 }
 

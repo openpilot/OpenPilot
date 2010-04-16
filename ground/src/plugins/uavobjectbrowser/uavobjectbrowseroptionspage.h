@@ -29,13 +29,15 @@
 #define UAVOBJECTBROWSEROPTIONSPAGE_H
 
 #include "coreplugin/dialogs/ioptionspage.h"
+#include <QtGui/QColor>
 
 namespace Core {
 class IUAVGadgetConfiguration;
 }
 class UAVObjectBrowserConfiguration;
+class QLabel;
+class QPushButton;
 class QSpinBox;
-class QDoubleSpinBox;
 
 using namespace Core;
 
@@ -51,9 +53,18 @@ public:
 
 signals:
 
-public slots:
+private slots:
+    void ruButtonClicked();
+    void mcButtonClicked();
 private:
     UAVObjectBrowserConfiguration *m_config;
+    QColor m_ruColor;
+    QColor m_mcColor;
+    QLabel *m_ruLabel;
+    QLabel *m_mcLabel;
+    QPushButton *m_ruButton;
+    QPushButton *m_mcButton;
+    QSpinBox *m_timeoutSpin;
 
 };
 

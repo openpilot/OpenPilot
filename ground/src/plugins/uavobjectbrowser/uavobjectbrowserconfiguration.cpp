@@ -29,25 +29,41 @@
 #include <QtCore/QDataStream>
 
 UAVObjectBrowserConfiguration::UAVObjectBrowserConfiguration(QString classId, const QByteArray &state, QObject *parent) :
-    IUAVGadgetConfiguration(classId, parent)
+    IUAVGadgetConfiguration(classId, parent),
+    m_recentlyUpdatedColor(QColor(255, 230, 230)),
+    m_manuallyChangedColor(QColor(230, 230, 255)),
+    m_recentlyUpdatedTimeout(500)
 {
     if (state.count() > 0) {
         QDataStream stream(state);
-
+        QColor recent;
+        QColor manual;
+        int timeout;
+        stream >> recent;
+        stream >> manual;
+        stream >> timeout;
+        m_recentlyUpdatedColor = recent;
+        m_manuallyChangedColor = manual;
+        m_recentlyUpdatedTimeout = timeout;
     }
 }
 
 IUAVGadgetConfiguration *UAVObjectBrowserConfiguration::clone()
 {
     UAVObjectBrowserConfiguration *m = new UAVObjectBrowserConfiguration(this->classId());
-     return m;
+    m->m_recentlyUpdatedColor = m_recentlyUpdatedColor;
+    m->m_manuallyChangedColor = m_manuallyChangedColor;
+    m->m_recentlyUpdatedTimeout = m_recentlyUpdatedTimeout;
+    return m;
 }
 
 QByteArray UAVObjectBrowserConfiguration::saveState() const
 {
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::WriteOnly);
-
+    stream << m_recentlyUpdatedColor;
+    stream << m_manuallyChangedColor;
+    stream << m_recentlyUpdatedTimeout;
     return bytes;
 }
 

@@ -31,6 +31,7 @@
 #include <QtGui/QWidget>
 #include <QtGui/QTreeView>
 #include "uavobjects/settingspersistence.h"
+#include "uavobjecttreemodel.h"
 
 class QPushButton;
 class ObjectTreeItem;
@@ -44,21 +45,25 @@ class UAVObjectBrowserWidget : public QWidget
 public:
     UAVObjectBrowserWidget(QWidget *parent = 0);
     ~UAVObjectBrowserWidget();
+    void setRecentlyUpdatedColor(QColor color) { m_model->setRecentlyUpdatedColor(color); }
+    void setManuallyChangedColor(QColor color) { m_model->setManuallyChangedColor(color); }
+    void setRecentlyUpdatedTimeout(int timeout) { m_model->setRecentlyUpdatedTimeout(timeout); }
+
+public slots:
+    void showMetaData(bool show);
 
 private slots:
     void sendUpdate();
     void requestUpdate();
-    void showMetaData(bool show);
     void saveSettings();
     void readSettings();
     void currentChanged(const QModelIndex &current, const QModelIndex &previous);
-
 
 private:
     QPushButton *m_requestUpdate;
     QPushButton *m_sendUpdate;
     Ui_UAVObjectBrowser *m_browser;
-    QAbstractItemModel *m_model;
+    UAVObjectTreeModel *m_model;
 
     void updateSettings(SettingsPersistence::OperationEnum op);
     void enableSendRequest(bool enable);

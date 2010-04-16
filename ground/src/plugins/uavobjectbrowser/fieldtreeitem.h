@@ -87,8 +87,8 @@ public:
     void update() {
         int value = m_field->getSelectedIndex(m_index);
         if (data() != value || changed()) {
-            setHighlight(true);
             TreeItem::setData(value);
+            setHighlight(true);
         }
     }
     QWidget *createEditor(QWidget *parent) {
@@ -161,8 +161,8 @@ public:
     void update() {
         int value = m_field->getValue(m_index);
         if (data() != value || changed()) {
-            setHighlight(true);
             TreeItem::setData(value);
+            setHighlight(true);
         }
     }
 private:
@@ -188,8 +188,8 @@ public:
     void update() {
         int value = m_field->getValue(m_index);
         if (data() != value || changed()) {
-            setHighlight(true);
             TreeItem::setData(value);
+            setHighlight(true);
         }
     }
 private:
@@ -215,8 +215,8 @@ public:
     void update() {
         int value = m_field->getValue(m_index);
         if (data() != value || changed()) {
-            setHighlight(true);
             TreeItem::setData(value);
+            setHighlight(true);
         }
     }
 private:
@@ -242,8 +242,8 @@ public:
     void update() {
         int value = m_field->getValue(m_index);
         if (data() != value || changed()) {
-            setHighlight(true);
             TreeItem::setData(value);
+            setHighlight(true);
         }
     }
 private:
@@ -269,8 +269,8 @@ public:
     void update() {
         int value = m_field->getValue(m_index);
         if (data() != value || changed()) {
-            setHighlight(true);
             TreeItem::setData(value);
+            setHighlight(true);
         }
     }
 private:
@@ -296,8 +296,8 @@ public:
     void update() {
         int value = m_field->getValue(m_index);
         if (data() != value || changed()) {
-            setHighlight(true);
             TreeItem::setData(value);
+            setHighlight(true);
         }
     }
 private:
@@ -324,8 +324,8 @@ public:
     void update() {
         double value = m_field->getValue(m_index);
         if (data() != value || changed()) {
-            setHighlight(true);
             TreeItem::setData(value);
+            setHighlight(true);
         }
     }
     QWidget *createEditor(QWidget *parent) {

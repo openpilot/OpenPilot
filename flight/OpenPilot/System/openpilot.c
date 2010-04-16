@@ -121,7 +121,7 @@ int main()
 	//xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
 
 	/* Initialize modules */
-	//SystemModInitialize();
+	SystemModInitialize();
 	TelemetryInitialize();
 	//ExampleModEventInitialize();
 	ExampleModPeriodicInitialize();

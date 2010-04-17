@@ -52,10 +52,10 @@ int32_t GpsObjectInitialize()
 	metadata.telemetryUpdateMode = UPDATEMODE_PERIODIC;
 	metadata.telemetryUpdatePeriod = 1000;
 	metadata.gcsTelemetryAcked = 1;
-	metadata.gcsTelemetryUpdateMode = UPDATEMODE_ONCHANGE;
+	metadata.gcsTelemetryUpdateMode = UPDATEMODE_NEVER;
 	metadata.gcsTelemetryUpdatePeriod = 0;
-	metadata.loggingUpdateMode = UPDATEMODE_NEVER;
-	metadata.loggingUpdatePeriod = 0;
+	metadata.loggingUpdateMode = UPDATEMODE_PERIODIC;
+	metadata.loggingUpdatePeriod = 1000;
 	UAVObjSetMetadata(handle, &metadata);
 
 	// Done

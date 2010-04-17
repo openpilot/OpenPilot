@@ -37,7 +37,7 @@
 // Object constants
 #define GPSOBJECT_OBJID 4042402288U
 #define GPSOBJECT_NAME "GpsObject"
-#define GPSOBJECT_ISSINGLEINST 0
+#define GPSOBJECT_ISSINGLEINST 1
 #define GPSOBJECT_ISSETTINGS 0
 #define GPSOBJECT_NUMBYTES sizeof(GpsObjectData)
 

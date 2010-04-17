@@ -31,6 +31,8 @@
 #include "exampleobject1.h"
 #include "exampleobject2.h"
 #include "examplesettings.h"
+#include "flighttelemetrystats.h"
+#include "gcstelemetrystats.h"
 #include "gpsobject.h"
 #include "settingspersistence.h"
 
@@ -44,6 +46,8 @@ void UAVObjectsInitializeAll()
     ExampleObject1Initialize();
     ExampleObject2Initialize();
     ExampleSettingsInitialize();
+    FlightTelemetryStatsInitialize();
+    GCSTelemetryStatsInitialize();
     GpsObjectInitialize();
     SettingsPersistenceInitialize();
 

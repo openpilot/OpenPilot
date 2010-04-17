@@ -33,11 +33,24 @@
 // Public types
 typedef int32_t (*UAVTalkOutputStream)(uint8_t* data, int32_t length);
 
+typedef struct {
+    uint32_t txBytes;
+    uint32_t rxBytes;
+    uint32_t txObjectBytes;
+    uint32_t rxObjectBytes;
+    uint32_t rxObjects;
+    uint32_t txObjects;
+    uint32_t txErrors;
+    uint32_t rxErrors;
+} UAVTalkStats;
+
 // Public functions
 int32_t UAVTalkInitialize(UAVTalkOutputStream outputStream);
 int32_t UAVTalkSetOutputStream(UAVTalkOutputStream outputStream);
 int32_t UAVTalkSendObject(UAVObjHandle obj, uint16_t instId, uint8_t acked, int32_t timeoutMs);
 int32_t UAVTalkSendObjectRequest(UAVObjHandle obj, uint16_t instId, int32_t timeoutMs);
 int32_t UAVTalkProcessInputStream(uint8_t rxbyte);
+void UAVTalkGetStats(UAVTalkStats* stats);
+void UAVTalkResetStats();
 
 #endif // UAVTALK_H

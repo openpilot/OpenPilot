@@ -51,6 +51,7 @@ static UAVObjHandle respObj;
 static uint16_t respInstId;
 static uint8_t rxBuffer[MAX_PACKET_LENGTH];
 static uint8_t txBuffer[MAX_PACKET_LENGTH];
+static UAVTalkStats stats;
 
 // Private functions
 static uint16_t updateChecksum(uint16_t cs, uint8_t* data, int32_t length);
@@ -72,7 +73,39 @@ int32_t UAVTalkInitialize(UAVTalkOutputStream outputStream)
     lock = xSemaphoreCreateRecursiveMutex();
     vSemaphoreCreateBinary(respSema);
     xSemaphoreTake(respSema, 0); // reset to zero
+    UAVTalkResetStats();
     return 0;
+}
+
+/**
+ * Get communication statistics counters
+ * @param[out] statsOut Statistics counters
+ */
+void UAVTalkGetStats(UAVTalkStats* statsOut)
+{
+	// Lock
+    xSemaphoreTakeRecursive(lock, portMAX_DELAY);
+
+    // Copy stats
+    memcpy(statsOut, &stats, sizeof(UAVTalkStats));
+
+    // Release lock
+    xSemaphoreGiveRecursive(lock);
+}
+
+/**
+ * Reset the statistics counters.
+ */
+void UAVTalkResetStats()
+{
+	// Lock
+    xSemaphoreTakeRecursive(lock, portMAX_DELAY);
+
+    // Clear stats
+    memset(&stats, 0, sizeof(UAVTalkStats));
+
+    // Release lock
+    xSemaphoreGiveRecursive(lock);
 }
 
 /**
@@ -180,6 +213,7 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
     static RxState state = STATE_SYNC;
 
     // Receive state machine
+    ++stats.rxBytes;
     switch (state) {
     case STATE_SYNC:
         if ((rxbyte & TYPE_MASK) == TYPE_VER )
@@ -200,6 +234,7 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
             if (obj == 0)
             {
                 state = STATE_SYNC;
+                ++stats.rxErrors;
             }
             else
             {
@@ -218,6 +253,7 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
 				if (length >= MAX_PAYLOAD_LENGTH)
 				{
 					state = STATE_SYNC;
+					++stats.rxErrors;
 				}
 				else
 				{
@@ -281,7 +317,13 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
             {
                 xSemaphoreTakeRecursive(lock, portMAX_DELAY);
                 receiveObject(type, obj, instId, rxBuffer, length);
+                ++stats.rxObjects;
+                stats.rxObjectBytes += length;
                 xSemaphoreGiveRecursive(lock);
+            }
+            else
+            {
+            	++stats.rxErrors;
             }
             state = STATE_SYNC;
         }
@@ -392,10 +434,10 @@ static int32_t sendObject(UAVObjHandle obj, uint16_t instId, uint8_t type)
 	uint32_t numInst;
 	uint32_t n;
 
-	// If all instances are requested on a single instance object it is an error
+	// If all instances are requested and this is a single instance object, force instance ID to zero
 	if ( instId == UAVOBJ_ALL_INSTANCES && UAVObjIsSingleInstance(obj) )
 	{
-		return -1;
+		instId = 0;
 	}
 
     // Process message type
@@ -506,6 +548,11 @@ static int32_t sendSingleObject(UAVObjHandle obj, uint16_t instId, uint8_t type)
 
     // Send buffer
     if (outStream!=NULL) (*outStream)(txBuffer, dataOffset+length+CHECKSUM_LENGTH);
+
+    // Update stats
+    ++stats.txObjects;
+    stats.txBytes += dataOffset+length+CHECKSUM_LENGTH;
+    stats.txObjectBytes += length;
 
     // Done
     return 0;

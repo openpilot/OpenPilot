@@ -53,7 +53,7 @@ public:
     // Constants
     static const quint32 OBJID = 4042402288U;
     static const QString NAME;
-    static const bool ISSINGLEINST = 0;
+    static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;
     static const quint32 NUMBYTES = sizeof(DataFields);
 

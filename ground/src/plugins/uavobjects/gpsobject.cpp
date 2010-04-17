@@ -50,13 +50,13 @@ UAVObject::Metadata GpsObject::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
     metadata.gcsTelemetryAcked = 1;
-    metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
+    metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_NEVER;
     metadata.gcsTelemetryUpdatePeriod = 0;
     metadata.flightTelemetryAcked = 1;
     metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
     metadata.flightTelemetryUpdatePeriod = 1000;
-    metadata.loggingUpdateMode = UAVObject::UPDATEMODE_NEVER;
-    metadata.loggingUpdatePeriod = 0;
+    metadata.loggingUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+    metadata.loggingUpdatePeriod = 1000;
     return metadata;
 }
 

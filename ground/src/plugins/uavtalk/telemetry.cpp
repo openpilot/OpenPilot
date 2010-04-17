@@ -58,7 +58,13 @@ Telemetry::Telemetry(UAVTalk* utalk, UAVObjectManager* objMngr)
     updateTimer = new QTimer(this);
     connect(updateTimer, SIGNAL(timeout()), this, SLOT(processPeriodicUpdates()));
     updateTimer->start(1000);
-
+    // Setup and start the stats timer
+    statsObj = dynamic_cast<GCSTelemetryStats*>( objMngr->getObject(GCSTelemetryStats::NAME) );
+    txErrors = 0;
+    txRetries = 0;
+    statsTimer = new QTimer(this);
+    connect(statsTimer, SIGNAL(timeout()), this, SLOT(processStatsUpdates()));
+    statsTimer->start(STATS_UPDATE_PERIOD_MS);
 }
 
 /**
@@ -227,6 +233,7 @@ void Telemetry::transactionTimeout()
         {
             --transInfo.retriesRemaining;
             processObjectTransaction();
+            ++txRetries;
         }
         else
         {
@@ -235,6 +242,7 @@ void Telemetry::transactionTimeout()
             transPending = false;
             // Process new object updates from queue
             processObjectQueue();
+            ++txErrors;
         }
     }
 }
@@ -373,6 +381,34 @@ void Telemetry::processPeriodicUpdates()
 
     // Restart timer
     updateTimer->start(timeToNextUpdateMs);
+}
+
+void Telemetry::processStatsUpdates()
+{
+    QMutexLocker locker(mutex);
+
+    // Get UAVTalk stats
+    UAVTalk::ComStats utalkStats = utalk->getStats();
+    utalk->resetStats();
+
+    // Update stats object
+    GCSTelemetryStats::DataFields stats = statsObj->getData();
+    if (utalkStats.rxBytes > 0)
+    {
+        stats.Connected = GCSTelemetryStats::CONNECTED_TRUE;
+    }
+    else
+    {
+        stats.Connected = GCSTelemetryStats::CONNECTED_FALSE;
+    }
+    stats.RxDataRate = (float)utalkStats.rxBytes / ((float)STATS_UPDATE_PERIOD_MS/1000.0);
+    stats.TxDataRate = (float)utalkStats.txBytes / ((float)STATS_UPDATE_PERIOD_MS/1000.0);
+    stats.RxFailures += utalkStats.rxErrors;
+    stats.TxFailures += txErrors;
+    stats.TxRetries += txRetries;
+    txErrors = 0;
+    txRetries = 0;
+    statsObj->setData(stats);
 }
 
 void Telemetry::objectUpdatedAuto(UAVObject* obj)

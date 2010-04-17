@@ -38,7 +38,26 @@ UAVTalk::UAVTalk(QIODevice* iodev, UAVObjectManager* objMngr)
     rxState = STATE_SYNC;
     mutex = new QMutex(QMutex::Recursive);
     respObj = NULL;
+    memset(&stats, 0, sizeof(ComStats));
     connect(io, SIGNAL(readyRead()), this, SLOT(processInputStream()));
+}
+
+/**
+ * Reset the statistics counters
+ */
+void UAVTalk::resetStats()
+{
+    QMutexLocker locker(mutex);
+    memset(&stats, 0, sizeof(ComStats));
+}
+
+/**
+ * Get the statistics counters
+ */
+UAVTalk::ComStats UAVTalk::getStats()
+{
+    QMutexLocker locker(mutex);
+    return stats;
 }
 
 /**
@@ -140,6 +159,8 @@ bool UAVTalk::objectTransaction(UAVObject* obj, quint8 type, bool allInstances)
  */
 bool UAVTalk::processInputByte(quint8 rxbyte)
 {
+    // Update stats
+    ++stats.rxBytes;
     // Receive state machine
     switch (rxState) {
     case STATE_SYNC:
@@ -161,6 +182,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
             if (rxObj == NULL)
             {
                 rxState = STATE_SYNC;
+                ++stats.rxErrors;
             }
             else
             {
@@ -179,6 +201,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
                 if (rxLength >= MAX_PAYLOAD_LENGTH)
                 {
                     rxState = STATE_SYNC;
+                    ++stats.rxErrors;
                 }
                 else
                 {
@@ -242,13 +265,20 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
             {
                 mutex->lock();
                 receiveObject(rxType, rxObjId, rxInstId, rxBuffer, rxLength);
+                stats.rxObjectBytes += rxLength;
+                ++stats.rxObjects;
                 mutex->unlock();
+            }
+            else
+            {
+                ++stats.rxErrors;
             }
             rxState = STATE_SYNC;
         }
         break;
     default:
         rxState = STATE_SYNC;
+        ++stats.rxErrors;
     }
 
     // Done
@@ -540,6 +570,11 @@ bool UAVTalk::transmitSingleObject(UAVObject* obj, quint8 type, bool allInstance
 
     // Send buffer
     io->write((const char*)txBuffer, dataOffset+length+CHECKSUM_LENGTH);
+
+    // Update stats
+    ++stats.txObjects;
+    stats.txBytes += dataOffset+length+CHECKSUM_LENGTH;
+    stats.txObjectBytes += length;
 
     // Done
     return true;

@@ -113,7 +113,7 @@ bool UAVObjectGenerator::processAll()
             sout << "Generating code for object: " << name << endl;
             // Check for object ID conflicts
             quint32 id = parser->getObjectID(objidx);
-            if ( objIDList.contains(id) )
+            if ( objIDList.contains(id) || id == 0 )
             {
                 sout << "Error: Object ID collision found in object " << name << ", modify object name" << endl;
                 return false;

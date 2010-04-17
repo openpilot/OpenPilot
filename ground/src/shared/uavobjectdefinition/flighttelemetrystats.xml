@@ -1,0 +1,13 @@
+<xml>
+        <object name="FlightTelemetryStats" singleinstance="true" settings="false">
+            <field name="Connected" units="bool" type="enum" elements="1" options="True, False"/>
+            <field name="TxDataRate" units="bytes/sec" type="float" elements="1"/>
+            <field name="RxDataRate" units="bytes/sec" type="float" elements="1"/>
+            <field name="TxFailures" units="count" type="uint32" elements="1"/>
+            <field name="RxFailures" units="count" type="uint32" elements="1"/>
+            <field name="TxRetries" units="count" type="uint32" elements="1"/>
+            <telemetrygcs acked="true" updatemode="never" period="0"/>
+            <telemetryflight acked="true" updatemode="periodic" period="5000"/>
+            <logging updatemode="periodic" period="5000"/>
+	</object>
+</xml>

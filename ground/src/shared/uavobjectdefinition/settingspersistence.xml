@@ -1,8 +1,8 @@
 <xml>
 	<object name="SettingsPersistence" singleinstance="true" settings="false">
-        <field name="Operation" units="" type="enum" elements="1" options="Load,Save"/>
-        <telemetrygcs acked="true" updatemode="manual" period="0"/>
-        <telemetryflight acked="true" updatemode="manual" period="0"/>
-		<logging updatemode="never" period="0"/>
+            <field name="Operation" units="" type="enum" elements="1" options="Load,Save"/>
+            <telemetrygcs acked="true" updatemode="manual" period="0"/>
+            <telemetryflight acked="true" updatemode="manual" period="0"/>
+            <logging updatemode="never" period="0"/>
 	</object>
 </xml>

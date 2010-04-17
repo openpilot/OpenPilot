@@ -39,11 +39,24 @@ class UAVTalk: public QObject
     Q_OBJECT
 
 public:
+    typedef struct {
+        quint32 txBytes;
+        quint32 rxBytes;
+        quint32 txObjectBytes;
+        quint32 rxObjectBytes;
+        quint32 rxObjects;
+        quint32 txObjects;
+        quint32 txErrors;
+        quint32 rxErrors;
+    } ComStats;
+
     UAVTalk(QIODevice* iodev, UAVObjectManager* objMngr);
 
     bool sendObject(UAVObject* obj, bool acked, bool allInstances);
     bool sendObjectRequest(UAVObject* obj, bool allInstances);
     void cancelTransaction();
+    ComStats getStats();
+    void resetStats();
 
 signals:
     void transactionCompleted(UAVObject* obj);
@@ -84,6 +97,7 @@ private:
     quint16 rxCSPacket, rxCS;
     qint32 rxCount;
     RxStateType rxState;
+    ComStats stats;
 
     // Methods
     bool objectTransaction(UAVObject* obj, quint8 type, bool allInstances);

@@ -31,6 +31,7 @@
 
 #include "uavtalk.h"
 #include "uavobjects/uavobjectmanager.h"
+#include "uavobjects/gcstelemetrystats.h"
 #include <QMutex>
 #include <QMutexLocker>
 #include <QTimer>
@@ -55,6 +56,7 @@ private slots:
     void processPeriodicUpdates();
     void transactionCompleted(UAVObject* obj);
     void transactionTimeout();
+    void processStatsUpdates();
 
 private:
     // Constants
@@ -62,6 +64,7 @@ private:
     static const int MAX_RETRIES = 3;
     static const int MAX_UPDATE_PERIOD_MS = 1000;
     static const int MIN_UPDATE_PERIOD_MS = 1;
+    static const int STATS_UPDATE_PERIOD_MS = 5000;
 
     // Types
     /**
@@ -103,7 +106,11 @@ private:
     QMutex* mutex;
     QTimer* updateTimer;
     QTimer* transTimer;
+    QTimer* statsTimer;
     qint32 timeToNextUpdateMs;
+    quint32 txErrors;
+    quint32 txRetries;
+    GCSTelemetryStats* statsObj;
 
     // Methods
     void registerObject(UAVObject* obj);

@@ -134,6 +134,7 @@ SRC += $(OPUAVOBJ)/exampleobject1.c
 SRC += $(OPUAVOBJ)/exampleobject2.c
 SRC += $(OPUAVOBJ)/examplesettings.c
 SRC += $(OPUAVOBJ)/settingspersistence.c
+SRC += $(OPUAVOBJ)/gpsobject.c
 
 ## PIOS Hardware (STM32F10x)
 SRC += $(PIOSSTM32F10X)/pios_sys.c

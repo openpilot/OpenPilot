@@ -47,4 +47,5 @@ typedef struct struct_GpsInfo
 
 } __attribute__((packed)) GpsInfoType;
 
+
 #endif // GPSINFO_H

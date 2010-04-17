@@ -27,7 +27,7 @@
 #include "buffer.h"
 #include "GPS.h"
 #include "gpsinfo.h"
-
+#include "gpsobject.h"
 
 // constants/macros/typdefs
 #define NMEA_BUFFERSIZE		128
@@ -71,11 +71,11 @@ extern GpsInfoType GpsInfo;
 char NmeaPacket[NMEA_BUFFERSIZE];
 
 // Private constants
-#define MAX_QUEUE_SIZE 20
-#define STACK_SIZE 100
-#define TASK_PRIORITY (tskIDLE_PRIORITY + 5)
-#define REQ_TIMEOUT_MS 500
-#define MAX_RETRIES 3
+//#define MAX_QUEUE_SIZE 20
+#define STACK_SIZE configMINIMAL_STACK_SIZE
+#define TASK_PRIORITY (tskIDLE_PRIORITY + 10)
+//#define REQ_TIMEOUT_MS 500
+//#define MAX_RETRIES 3
 
 // Private types
 
@@ -90,6 +90,7 @@ static xTaskHandle gpsTaskHandle;
  */
 int32_t GpsInitialize(void)
 {
+	signed portBASE_TYPE xReturn;
 	// TODO: Get gps settings object
 	gpsPort = COM_USART2;
 
@@ -97,7 +98,7 @@ int32_t GpsInitialize(void)
 	bufferInit(&gpsRxBuffer, (unsigned char *)gpsRxData, 1024);
 
 	// Start gps task
-	xTaskCreate(gpsTask, (signed char*)"GPS", configMINIMAL_STACK_SIZE, NULL, TASK_PRIORITY, &gpsTaskHandle);
+	xReturn = xTaskCreate(gpsTask, (signed char*)"GPS", STACK_SIZE, NULL, TASK_PRIORITY, &gpsTaskHandle);
 
 	return 0;
 }
@@ -110,7 +111,7 @@ static void gpsTask(void* parameters)
 {
 	int32_t gpsRxOverflow=0;
 	char c;
-	portTickType xDelay = 70 / portTICK_RATE_MS;
+	portTickType xDelay = 100 / portTICK_RATE_MS;
 
 	// Loop forever
 	while(1)
@@ -280,6 +281,8 @@ uint8_t nmeaProcess(cBuffer* rxBuffer)
  */
 void nmeaProcessGPGGA(char* packet)
 {
+	GpsObjectData GpsData;
+
 	char *tokens; //*p, *tokens[MAXTOKENS];
     char *last;
     char *delimiter = ",";
@@ -304,6 +307,7 @@ void nmeaProcessGPGGA(char* packet)
 		//PIOS_LED_Toggle(LED2);
 		return;
 	}
+	GpsObjectGet(&GpsData);
 	// tokenizer for nmea sentence
     /*for ((p = strtok_r(packet, ",", &last)); p;
         (p = strtok_r(NULL, ",", &last)), i++) {
@@ -347,6 +351,7 @@ void nmeaProcessGPGGA(char* packet)
 	// correct latitute for N/S
 	tokens = strtok_r(NULL, delimiter, &last);
 	if(tokens[0] == 'S') GpsInfo.lat = -GpsInfo.lat;
+	GpsData.Latitude=GpsInfo.lat;
 
 	// next field: longitude
 	// get longitude [dddmm.mmmmm]
@@ -378,6 +383,7 @@ void nmeaProcessGPGGA(char* packet)
 	// correct latitute for E/W
 	tokens = strtok_r(NULL, delimiter, &last);
 	if(tokens[0] == 'W') GpsInfo.lon = -GpsInfo.lon;
+	GpsData.Longitude=GpsInfo.lon;
 
     // next field: position fix status
 	// position fix status
@@ -391,6 +397,7 @@ void nmeaProcessGPGGA(char* packet)
     // get number of satellites used in GPS solution
 	tokens = strtok_r(NULL, delimiter, &last);
 	GpsInfo.numSVs = atoi(tokens);
+	GpsData.Satellites=GpsInfo.numSVs;
 
 	// next field: HDOP (horizontal dilution of precision)
 	tokens = strtok_r(NULL, delimiter, &last);//HDOP, nein gebraucht
@@ -402,6 +409,7 @@ void nmeaProcessGPGGA(char* packet)
 	deg=strtol (tokens,&pEnd,10); // always 0.1m resolution?
 	desim=strtol (pEnd+1,NULL,10);
 	GpsInfo.alt=deg+desim/10.0;
+	GpsData.Altitude=GpsInfo.alt;
 
 	// next field: altitude units, always 'M'
 	// next field: geoid seperation
@@ -409,6 +417,8 @@ void nmeaProcessGPGGA(char* packet)
 	// next field: DGPS age
 	// next field: DGPS station ID
 	// next field: checksum
+	GpsObjectSet(&GpsData);
+	//PIOS_LED_Toggle(LED2);
 }
 
 /**

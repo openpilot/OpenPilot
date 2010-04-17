@@ -29,6 +29,7 @@
 #include "uavobjectsinit.h"
 #include "telemetry.h"
 #include "GPS.h"
+#include "gpsinfo.h"
 #include "systemmod.h"
 #include "examplemodevent.h"
 #include "examplemodperiodic.h"
@@ -38,6 +39,7 @@
 #define PRIORITY_TASK_HOOKS             (tskIDLE_PRIORITY + 3)
 
 /* Global Variables */
+GpsInfoType GpsInfo;
 
 /* Local Variables */
 static uint8_t sdcard_available;
@@ -126,6 +128,7 @@ int main()
 	//ExampleModEventInitialize();
 	ExampleModPeriodicInitialize();
 	//ExampleModThreadInitialize();
+	GpsInitialize();
 
 	/* Start the FreeRTOS scheduler */
 	vTaskStartScheduler();

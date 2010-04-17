@@ -40,6 +40,7 @@ GpsObject::GpsObject(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
     fields.append(new UAVObjectFieldFloat(QString("Latitude"), QString("degrees"), 1));
     fields.append(new UAVObjectFieldFloat(QString("Longitude"), QString("degrees"), 1));
     fields.append(new UAVObjectFieldFloat(QString("Altitude"), QString("meters"), 1));
+    fields.append(new UAVObjectFieldInt8(QString("Satellites"), QString(""), 1));
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
@@ -49,11 +50,11 @@ UAVObject::Metadata GpsObject::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
     metadata.gcsTelemetryAcked = 1;
-    metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
-    metadata.gcsTelemetryUpdatePeriod = 1000;
+    metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
+    metadata.gcsTelemetryUpdatePeriod = 0;
     metadata.flightTelemetryAcked = 1;
-    metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
-    metadata.flightTelemetryUpdatePeriod = 0;
+    metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+    metadata.flightTelemetryUpdatePeriod = 1000;
     metadata.loggingUpdateMode = UAVObject::UPDATEMODE_NEVER;
     metadata.loggingUpdatePeriod = 0;
     return metadata;

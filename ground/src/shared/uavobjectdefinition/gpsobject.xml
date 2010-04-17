@@ -3,8 +3,9 @@
 		<field name="Latitude" units="degrees" type="float" elements="1"/>
 		<field name="Longitude" units="degrees" type="float" elements="1"/>
         <field name="Altitude" units="meters" type="float" elements="1"/>
-        <telemetrygcs acked="true" updatemode="periodic" period="1000"/>
-        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <field name="Satellites" units="" type="int8" elements="1"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="periodic" period="1000"/>
 		<logging updatemode="never" period="0"/>
 	</object>
 </xml>

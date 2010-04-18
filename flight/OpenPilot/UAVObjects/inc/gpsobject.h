@@ -35,7 +35,7 @@
 #include "openpilot.h"
 
 // Object constants
-#define GPSOBJECT_OBJID 4042402288U
+#define GPSOBJECT_OBJID 4217926642U
 #define GPSOBJECT_NAME "GpsObject"
 #define GPSOBJECT_ISSINGLEINST 1
 #define GPSOBJECT_ISSETTINGS 0
@@ -62,6 +62,7 @@ typedef struct {
     float Longitude;
     float Altitude;
     int8_t Satellites;
+    uint16_t Updates;
 
 } __attribute__((packed)) GpsObjectData;
 

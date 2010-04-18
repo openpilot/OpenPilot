@@ -41,6 +41,7 @@ GpsObject::GpsObject(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
     fields.append(new UAVObjectFieldFloat(QString("Longitude"), QString("degrees"), 1));
     fields.append(new UAVObjectFieldFloat(QString("Altitude"), QString("meters"), 1));
     fields.append(new UAVObjectFieldInt8(QString("Satellites"), QString(""), 1));
+    fields.append(new UAVObjectFieldUInt16(QString("Updates"), QString(""), 1));
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

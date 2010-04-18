@@ -44,6 +44,7 @@ public:
         float Longitude;
         float Altitude;
         qint8 Satellites;
+        quint16 Updates;
 
     } __attribute__((packed)) DataFields;
 
@@ -51,7 +52,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 4042402288U;
+    static const quint32 OBJID = 4217926642U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

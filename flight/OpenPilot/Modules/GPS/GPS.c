@@ -73,7 +73,7 @@ char NmeaPacket[NMEA_BUFFERSIZE];
 // Private constants
 //#define MAX_QUEUE_SIZE 20
 #define STACK_SIZE configMINIMAL_STACK_SIZE
-#define TASK_PRIORITY (tskIDLE_PRIORITY + 10)
+#define TASK_PRIORITY (tskIDLE_PRIORITY + 3)
 //#define REQ_TIMEOUT_MS 500
 //#define MAX_RETRIES 3
 

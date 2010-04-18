@@ -322,12 +322,4 @@ static void TaskSDCard(void *pvParameters)
 	}
 }
 
-/**
-* Idle hook function
-*/
-void vApplicationIdleHook(void)
-{
-	/* Called when the scheduler has no tasks to run */
 
-
-}

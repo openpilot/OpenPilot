@@ -35,6 +35,8 @@
 #include "gcstelemetrystats.h"
 #include "gpsobject.h"
 #include "settingspersistence.h"
+#include "systemalarms.h"
+#include "systemstats.h"
 
 
 /**
@@ -50,5 +52,7 @@ void UAVObjectsInitializeAll()
     GCSTelemetryStatsInitialize();
     GpsObjectInitialize();
     SettingsPersistenceInitialize();
+    SystemAlarmsInitialize();
+    SystemStatsInitialize();
 
 }

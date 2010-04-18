@@ -127,6 +127,7 @@ SRC += $(OPUAVOBJ)/eventdispatcher.c
 #SRC += $(OPTESTS)/test_I2c_PCF8570.c
 #SRC += $(OPTESTS)/test_BMP085.c
 #SRC += $(OPTESTS)/test_uavobjects.c
+#SRC += $(OPTESTS)/test_cpuload.c
 
 
 ## UAVOBJECTS
@@ -137,6 +138,8 @@ SRC += $(OPUAVOBJ)/settingspersistence.c
 SRC += $(OPUAVOBJ)/gpsobject.c
 SRC += $(OPUAVOBJ)/gcstelemetrystats.c
 SRC += $(OPUAVOBJ)/flighttelemetrystats.c
+SRC += $(OPUAVOBJ)/systemstats.c
+SRC += $(OPUAVOBJ)/systemalarms.c
 
 ## PIOS Hardware (STM32F10x)
 SRC += $(PIOSSTM32F10X)/pios_sys.c

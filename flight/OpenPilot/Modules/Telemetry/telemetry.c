@@ -283,6 +283,8 @@ static void telemetryRxTask(void* parameters)
 			//PIOS_LED_Toggle(LED1);
 			UAVTalkProcessInputStream(PIOS_COM_ReceiveBuffer(inputPort));
 		}
+		vTaskDelay(1); // <- remove when blocking calls are implemented
+
 	}
 }
 

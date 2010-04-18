@@ -12,6 +12,26 @@ BasicSvgDial::BasicSvgDial(QWidget *parent) : QGraphicsView(parent)
     angle = 0;
 
     setScene(new QGraphicsScene(this));
+    QGraphicsScene *s = scene();
+    s->clear();
+    m_backgroundItem = new QGraphicsSvgItem(backgroundFile);
+    m_backgroundItem->setZValue(-1);
+
+    m_needleItem = new QGraphicsSvgItem(needleFile);
+    QRectF rect = m_needleItem->boundingRect();
+    m_needleItem->translate(rect.width()/2,rect.height()/2);
+    m_needleItem->rotate(angle);
+    m_needleItem->translate(-rect.width()/2,-rect.height()/2);
+    m_needleItem->setZValue(0);
+
+    m_foregroundItem = new QGraphicsSvgItem(foregroundFile);
+    m_foregroundItem->setZValue(1);
+
+    s->addItem(m_backgroundItem);
+    s->addItem(m_needleItem);
+    s->addItem(m_foregroundItem);
+
+    s->setSceneRect(m_backgroundItem->boundingRect());
 
 }
 
@@ -28,9 +48,6 @@ void BasicSvgDial::paintEvent(QPaintEvent *event) {
 
     qDebug() << "out paintEvent()";
 }
-
-
-
 
 
 
@@ -59,26 +76,11 @@ qreal BasicSvgDial::value2angle(qreal value) {
 void BasicSvgDial::setValue(qreal value) {
     angle = value2angle(value);
     currentValue = value;
-    QGraphicsScene *s = scene();
-    s->clear();
-    m_backgroundItem = new QGraphicsSvgItem(backgroundFile);
-    m_backgroundItem->setZValue(-1);
-
-    m_needleItem = new QGraphicsSvgItem(needleFile);
+    m_needleItem->resetTransform();
     QRectF rect = m_needleItem->boundingRect();
     m_needleItem->translate(rect.width()/2,rect.height()/2);
     m_needleItem->rotate(angle);
     m_needleItem->translate(-rect.width()/2,-rect.height()/2);
-    m_needleItem->setZValue(0);
-
-    m_foregroundItem = new QGraphicsSvgItem(foregroundFile);
-    m_foregroundItem->setZValue(1);
-
-    s->addItem(m_backgroundItem);
-    s->addItem(m_needleItem);
-    s->addItem(m_foregroundItem);
-
-    s->setSceneRect(m_backgroundItem->boundingRect());
     update();
 }
 
@@ -88,15 +90,30 @@ qreal BasicSvgDial::getValue(void) {
 
 void BasicSvgDial::setBackgroundFile(QString file) {
     backgroundFile = file;
+    scene()->removeItem(m_backgroundItem);
+    delete m_backgroundItem;
+    m_backgroundItem = new QGraphicsSvgItem(backgroundFile);
+    m_backgroundItem->setZValue(-1);
+    scene()->addItem(m_backgroundItem);
     update();
 }
 
 void BasicSvgDial::setForegroundFile(QString file) {
     foregroundFile = file;
+    scene()->removeItem(m_foregroundItem);
+    delete m_foregroundItem;
+    m_foregroundItem = new QGraphicsSvgItem(foregroundFile);
+    m_foregroundItem->setZValue(1);
+    scene()->addItem(m_foregroundItem);
     update();
 }
 
 void BasicSvgDial::setNeedleFile(QString file) {
     needleFile = file;
+    scene()->removeItem(m_needleItem);
+    delete m_needleItem;
+    m_needleItem = new QGraphicsSvgItem(needleFile);
+    m_needleItem->setZValue(0);
+    scene()->addItem(m_needleItem);
     update();
 }

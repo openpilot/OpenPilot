@@ -26,7 +26,9 @@ HEADERS += uavobjects_global.h \
     settingspersistence.h \
     gpsobject.h \
     gcstelemetrystats.h \
-    flighttelemetrystats.h
+    flighttelemetrystats.h \
+    systemstats.h \
+    systemalarms.h
 SOURCES += uavobject.cpp \
     uavmetaobject.cpp \
     uavobjectmanager.cpp \
@@ -49,6 +51,8 @@ SOURCES += uavobject.cpp \
     settingspersistence.cpp \
     gpsobject.cpp \
     gcstelemetrystats.cpp \
-    flighttelemetrystats.cpp
+    flighttelemetrystats.cpp \
+    systemstats.cpp \
+    systemalarms.cpp
 DEFINES += UAVOBJECTS_LIBRARY
 OTHER_FILES += UAVObjects.pluginspec

@@ -1,0 +1,11 @@
+<xml>
+        <object name="SystemAlarms" singleinstance="true" settings="false">
+            <field name="Type" units="" type="enum" elements="1" options="None,StackOverflow,OutOfMemory"/>
+            <field name="Severity" units="" type="enum" elements="1" options="Info,Warning,Error,Critical"/>
+            <field name="Active" units="bool" type="enum" elements="1" options="True,False"/>
+            <field name="Info" units="" type="uint32" elements="1"/>
+            <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+            <telemetryflight acked="true" updatemode="onchange" period="0"/>
+            <logging updatemode="onchange" period="0"/>
+	</object>
+</xml>

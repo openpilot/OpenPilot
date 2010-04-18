@@ -29,7 +29,6 @@
 #include "uavobjectsinit.h"
 #include "telemetry.h"
 #include "GPS.h"
-#include "gpsinfo.h"
 #include "systemmod.h"
 #include "examplemodevent.h"
 #include "examplemodperiodic.h"
@@ -39,7 +38,6 @@
 #define PRIORITY_TASK_HOOKS             (tskIDLE_PRIORITY + 3)
 
 /* Global Variables */
-GpsInfoType GpsInfo;
 
 /* Local Variables */
 static uint8_t sdcard_available;
@@ -155,12 +153,6 @@ static void TaskTick(void *pvParameters)
 
 	for(;;)
 	{
-
-		/*PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"utc: %s alt:%d\r\n",GpsInfo.TimeOfFix,(int)GpsInfo.alt);
-		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"lat: %d lon: %d\r\n",(long)(GpsInfo.lat*10000),(long)(GpsInfo.lon*10000));
-		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"SV: %d Updates: %d\r\n",GpsInfo.numSVs,GpsInfo.updates);
-		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"Heading: %s Speed: %s\r\n",GpsInfo.heading,GpsInfo.speed);
-*/
 		PIOS_LED_Toggle(LED1);
 		vTaskDelayUntil(&xLastExecutionTime, 1000 / portTICK_RATE_MS);
 	}

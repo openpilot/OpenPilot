@@ -26,13 +26,10 @@
 #include "openpilot.h"
 #include "buffer.h"
 #include "GPS.h"
-#include "gpsinfo.h"
 #include "gpsobject.h"
 
 // constants/macros/typdefs
 #define NMEA_BUFFERSIZE		128
-#define MAXTOKENS 20 //token slots for nmea parser
-
 
 // Message Codes
 #define NMEA_NODATA		0	// No data. Packet not available, bad, or not decoded
@@ -64,24 +61,20 @@ uint8_t nmeaProcess(cBuffer* rxBuffer);
 void nmeaProcessGPGGA(char* packet);
 void nmeaProcessGPVTG(char* packet);
 
-cBuffer gpsRxBuffer;
-static char gpsRxData[1024];
 // Global variables
-extern GpsInfoType GpsInfo;
-char NmeaPacket[NMEA_BUFFERSIZE];
 
 // Private constants
-//#define MAX_QUEUE_SIZE 20
 #define STACK_SIZE configMINIMAL_STACK_SIZE
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 3)
-//#define REQ_TIMEOUT_MS 500
-//#define MAX_RETRIES 3
 
 // Private types
 
 // Private variables
 static COMPortTypeDef gpsPort;
 static xTaskHandle gpsTaskHandle;
+cBuffer gpsRxBuffer;
+static char gpsRxData[1024];
+char NmeaPacket[NMEA_BUFFERSIZE];
 
 /**
  * Initialise the gps module
@@ -234,15 +227,12 @@ uint8_t nmeaProcess(cBuffer* rxBuffer)
 				bufferGetFromFront(rxBuffer);
 				bufferGetFromFront(rxBuffer);
 				//DEBUG
-				//iprintf("$%s\r\n",NmeaPacket);
-				//
 				#ifdef NMEA_DEBUG_PKT
 				//PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"$%s\r\n",NmeaPacket);
 				#endif
 				// found a packet
 				// done with this processing session
 				foundpacket = NMEA_UNKNOWN;
-				//PIOS_LED_Toggle(LED2);
 				break;
 			}
 		}
@@ -283,14 +273,12 @@ void nmeaProcessGPGGA(char* packet)
 {
 	GpsObjectData GpsData;
 
-	char *tokens; //*p, *tokens[MAXTOKENS];
+	char *tokens;
     char *last;
     char *delimiter = ",";
     char *pEnd;
 
-    uint8_t i=0;
     long deg,min,desim;
-	double degrees, minutesfrac;
 
 	#ifdef NMEA_DEBUG_GGA
 	//PIOS_COM_SendFormattedStringNonBlocking(COM_USART1,"NMEA: %s\r\n",packet);
@@ -308,19 +296,15 @@ void nmeaProcessGPGGA(char* packet)
 		return;
 	}
 	GpsObjectGet(&GpsData);
+
 	// tokenizer for nmea sentence
-    /*for ((p = strtok_r(packet, ",", &last)); p;
-        (p = strtok_r(NULL, ",", &last)), i++) {
-            if (i < MAXTOKENS - 1)
-                    tokens[i] = p;
-    }*/
 
 	//GPGGA header
 	tokens = strtok_r(packet, delimiter, &last);
 
 	// get UTC time [hhmmss.sss]
 	tokens = strtok_r(NULL, delimiter, &last);
-	strcpy(GpsInfo.TimeOfFix,tokens);
+	//strcpy(GpsInfo.TimeOfFix,tokens);
 
 	// next field: latitude
     // get latitude [ddmm.mmmmm]
@@ -331,7 +315,7 @@ void nmeaProcessGPGGA(char* packet)
 		min=deg%100;
 		deg=deg/100;
 		desim=strtol (pEnd+1,NULL,10);
-		GpsInfo.lat=deg+(min+desim/100000.0)/60.0; // to desimal degrees
+		GpsData.Latitude=deg+(min+desim/100000.0)/60.0; // to desimal degrees
 	}
 	else if(strlen(tokens)==9) // 4 desimal output
 	{
@@ -339,19 +323,13 @@ void nmeaProcessGPGGA(char* packet)
 		min=deg%100;
 		deg=deg/100;
 		desim=strtol (pEnd+1,NULL,10);
-		GpsInfo.lat=deg+(min+desim/10000.0)/60.0; // to desimal degrees
+		GpsData.Latitude=deg+(min+desim/10000.0)/60.0; // to desimal degrees
 	}
-	// convert to pure degrees [dd.dddd] format
-    /*	minutesfrac = modf(GpsInfo.PosLLA.lat.f/100, &degrees);
-	GpsInfo.PosLLA.lat.f = degrees + (minutesfrac*100)/60;
-	// convert to radians
-	GpsInfo.PosLLA.lat.f *= (M_PI/180);*/
 
     // next field: N/S indicator
 	// correct latitute for N/S
 	tokens = strtok_r(NULL, delimiter, &last);
-	if(tokens[0] == 'S') GpsInfo.lat = -GpsInfo.lat;
-	GpsData.Latitude=GpsInfo.lat;
+	if(tokens[0] == 'S') GpsData.Latitude = -GpsData.Latitude;
 
 	// next field: longitude
 	// get longitude [dddmm.mmmmm]
@@ -362,7 +340,7 @@ void nmeaProcessGPGGA(char* packet)
 		min=deg%100;
 		deg=deg/100;
 		desim=strtol (pEnd+1,NULL,10);
-		GpsInfo.lon=deg+(min+desim/100000.0)/60.0; // to desimal degrees
+		GpsData.Longitude=deg+(min+desim/100000.0)/60.0; // to desimal degrees
 	}
 	else if(strlen(tokens)==10) // 4 desimal output
 	{
@@ -370,20 +348,13 @@ void nmeaProcessGPGGA(char* packet)
 		min=deg%100;
 		deg=deg/100;
 		desim=strtol (pEnd+1,NULL,10);
-		GpsInfo.lon=deg+(min+desim/10000.0)/60.0; // to desimal degrees
+		GpsData.Longitude=deg+(min+desim/10000.0)/60.0; // to desimal degrees
 	}
-
-	// convert to pure degrees [dd.dddd] format
-	/*minutesfrac = modf(GpsInfo.PosLLA.lon.f/100, &degrees);
-	GpsInfo.PosLLA.lon.f = degrees + (minutesfrac*100)/60;
-	// convert to radians
-	GpsInfo.PosLLA.lon.f *= (M_PI/180);*/
 
     // next field: E/W indicator
 	// correct latitute for E/W
 	tokens = strtok_r(NULL, delimiter, &last);
-	if(tokens[0] == 'W') GpsInfo.lon = -GpsInfo.lon;
-	GpsData.Longitude=GpsInfo.lon;
+	if(tokens[0] == 'W') GpsData.Longitude = -GpsData.Longitude;
 
     // next field: position fix status
 	// position fix status
@@ -391,13 +362,12 @@ void nmeaProcessGPGGA(char* packet)
 	// check for good position fix
 	tokens = strtok_r(NULL, delimiter, &last);
     if((tokens[0] != '0') || (tokens[0] != 0))
-		GpsInfo.updates++;
+    	GpsData.Updates++;
 
     // next field: satellites used
     // get number of satellites used in GPS solution
 	tokens = strtok_r(NULL, delimiter, &last);
-	GpsInfo.numSVs = atoi(tokens);
-	GpsData.Satellites=GpsInfo.numSVs;
+	GpsData.Satellites=atoi(tokens);
 
 	// next field: HDOP (horizontal dilution of precision)
 	tokens = strtok_r(NULL, delimiter, &last);//HDOP, nein gebraucht
@@ -408,8 +378,7 @@ void nmeaProcessGPGGA(char* packet)
 	//reuse variables for alt
 	deg=strtol (tokens,&pEnd,10); // always 0.1m resolution?
 	desim=strtol (pEnd+1,NULL,10);
-	GpsInfo.alt=deg+desim/10.0;
-	GpsData.Altitude=GpsInfo.alt;
+	GpsData.Altitude=deg+desim/10.0;
 
 	// next field: altitude units, always 'M'
 	// next field: geoid seperation
@@ -418,7 +387,6 @@ void nmeaProcessGPGGA(char* packet)
 	// next field: DGPS station ID
 	// next field: checksum
 	GpsObjectSet(&GpsData);
-	//PIOS_LED_Toggle(LED2);
 }
 
 /**
@@ -427,12 +395,11 @@ void nmeaProcessGPGGA(char* packet)
  */
 void nmeaProcessGPVTG(char* packet)
 {
-	char *tokens; //*p, *tokens[MAXTOKENS];
+	GpsObjectData GpsData;
+
+	char *tokens;
     char *last;
     char *delimiter = ",";
-    char *pEnd;
-
-	uint8_t i=0;
 
 	#ifdef NMEA_DEBUG_VTG
 	//PIOS_COM_SendFormattedStringNonBlocking(COM_USART1,"NMEA: %s\r\n",packet);
@@ -449,43 +416,35 @@ void nmeaProcessGPVTG(char* packet)
 		//PIOS_LED_Toggle(LED2);
 		return;
 	}
+	GpsObjectGet(&GpsData);
 	// tokenizer for nmea sentence
-    /*for ((p = strtok_r(packet, ",", &last)); p;
-        (p = strtok_r(NULL, ",", &last)), i++) {
-            if (i < MAXTOKENS - 1)
-                    tokens[i] = p;
-    }*/
 
 	//GPVTG header
 	tokens = strtok_r(packet, delimiter, &last);
 
 	// get course (true north ref) in degrees [ddd.dd]
 	tokens = strtok_r(NULL, delimiter, &last);
-    strcpy(GpsInfo.heading,tokens);
     // next field: 'T'
 	tokens = strtok_r(NULL, delimiter, &last);
 
     // next field: course (magnetic north)
  	// get course (magnetic north ref) in degrees [ddd.dd]
 	tokens = strtok_r(NULL, delimiter, &last);
-    //strcpy(GpsInfo.VelHS.heading.c,tokens[1]);
 	// next field: 'M'
 	tokens = strtok_r(NULL, delimiter, &last);
 
 	// next field: speed (knots)
 	// get speed in knots
 	tokens = strtok_r(NULL, delimiter, &last);
-    //strcpy(GpsInfo.VelHS.speed.f,tokens[5]);
 	// next field: 'N'
 	tokens = strtok_r(NULL, delimiter, &last);
 
 	// next field: speed (km/h)
 	// get speed in km/h
 	tokens = strtok_r(NULL, delimiter, &last);
-	strcpy(GpsInfo.speed,tokens);
 	// next field: 'K'
 	// next field: checksum
+	GpsObjectSet(&GpsData);
 
-	GpsInfo.updates++;
 }
 

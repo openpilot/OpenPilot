@@ -226,11 +226,11 @@ namespace jafar {
 				}
 
 				MATLAB(const ublas::range& r1) {
-					initFromBubIndex(jafar::jmath::ublasExtra::ia_range(r1));
+					initFromBubIndex(jafar::jmath::ublasExtra::ia_set(r1));
 				}
 
 				MATLAB(const ublas::slice& s1) {
-					initFromBubIndex(jafar::jmath::ublasExtra::ia_slice(s1));
+					initFromBubIndex(jafar::jmath::ublasExtra::ia_set(s1));
 				}
 
 

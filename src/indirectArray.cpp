@@ -49,7 +49,7 @@ namespace jafar {
 				for (size_t i = 0; i <= i_max; i++)
 					is_in_comp(i) = (is_in_full(i) && !is_in_partial(i));
 
-				jblas::ind_array icomp = ia_bool(is_in_comp);
+				jblas::ind_array icomp = ia_set(is_in_comp);
 
 				return icomp;
 			}
@@ -115,7 +115,7 @@ namespace jafar {
 			/**
 			 * Create array from a boolean vector
 			 */
-			jblas::ind_array ia_bool(const jblas::vecb & vb) {
+			jblas::ind_array ia_set(const jblas::vecb & vb) {
 				int nb = 0;
 				for (size_t i = 0; i < vb.size(); i++)
 					if (vb(i))
@@ -124,6 +124,25 @@ namespace jafar {
 				int j = 0;
 				for (size_t i = 0; i < vb.size(); i++)
 					if (vb(i)) {
+						ia(j) = i;
+						j++;
+					}
+				return ia;
+			}
+
+
+			/**
+			 * Create array from a boolean vector
+			 */
+			jblas::ind_array ia_set(const jblas::veci & vi) {
+				int ni = 0;
+				for (size_t i = 0; i < vi.size(); i++)
+					if (vi(i)!=0)
+						ni++;
+				jblas::ind_array ia(ni);
+				int j = 0;
+				for (size_t i = 0; i < vi.size(); i++)
+					if (vi(i)!=0) {
 						ia(j) = i;
 						j++;
 					}
@@ -202,7 +221,7 @@ namespace jafar {
 			/*
 			 * Create indirect array from range.
 			 */
-			jblas::ind_array ia_range(const ublas::range & r) {
+			jblas::ind_array ia_set(const ublas::range & r) {
 				jblas::ind_array res(r.size());
 				for (size_t i = 0; i < res.size(); i++)
 					res(i) = r.start() + i;
@@ -213,7 +232,7 @@ namespace jafar {
 			/**
 			 * Create indirect array from slice.
 			 */
-			jblas::ind_array ia_slice(const ublas::slice & s) {
+			jblas::ind_array ia_set(const ublas::slice & s) {
 				jblas::ind_array res(s.size());
 				for (size_t i = 0; i < res.size(); i++)
 					res(i) = s.start() + s.stride() * i;
@@ -224,7 +243,7 @@ namespace jafar {
 			/**
 			 * Create indirect array from start and end indices.
 			 */
-			jblas::ind_array ia_range(size_t begin, size_t end) {
+			jblas::ind_array ia_set(size_t begin, size_t end) {
 				JFR_PRECOND((begin < end), "Index begin is bigger than end.");
 				jblas::ind_array res(end - begin);
 				for (size_t i = 0; i < res.size(); i++)

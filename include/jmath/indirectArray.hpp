@@ -41,6 +41,47 @@ namespace jafar {
 		namespace ublasExtra {
 
 			/**
+			 * Create array from a boolean vector.
+			 * The size of the returned indirect array is the number of true entries in the boolean vector.
+			 * The indices in the array are the positions of the true values in the boolean vector.
+			 * \param vb a boolean vector
+			 * \return the indirect array
+			 */
+			jblas::ind_array ia_set(const jblas::vecb & vb);
+
+			/**
+			 * Create array from a integer vector.
+			 * The size of the returned indirect array is the number of non-zero entries in the integer vector.
+			 * The indices in the array are the positions of the non-zero values in the integer vector.
+			 * \param vi an integer vector
+			 * \return the indirect array
+			 */
+			jblas::ind_array ia_set(const jblas::veci & vi);
+
+			/**
+			 * Create indirect array from range.
+			 * \param r a range.
+			 * \return the indirect array.
+			 */
+			jblas::ind_array ia_set(const ublas::range & r);
+
+			/**
+			 * Create indirect array from start and end indices.
+			 * The indirect array goes from \a begin to (\a end -1).
+			 * \param begin the first index
+			 * \param end the last index plus one.
+			 * \return the indirect array.
+			 */
+			jblas::ind_array ia_set(size_t begin, size_t end);
+
+			/**
+			 * Create indirect array from slice.
+			 * \param s a slice.
+			 * \return the indirect array.
+			 */
+			jblas::ind_array ia_set(const ublas::slice & s);
+
+			/**
 			 * Find the elements in indirect array \a ifull that are not contained in \a ipartial.
 			 * \param ifull the full indirect array
 			 * \param ipartial the partial indirect array
@@ -63,15 +104,6 @@ namespace jafar {
 			 * \return the N first indices in \a ia
 			 */
 			jblas::ind_array ia_head(const jblas::ind_array & ia, const size_t N);
-
-			/**
-			 * Create array from a boolean vector.
-			 * The size of the returned indirect array is the number of true entries in the boolean vector.
-			 * The indices in the array are the positions of the true values in the boolean vector.
-			 * \param vb a boolean vector
-			 * \return the indirect array
-			 */
-			jblas::ind_array ia_bool(const jblas::vecb & vb);
 
 			/**
 			 * Create indirect array from boolean vector and take the head N elements
@@ -102,29 +134,6 @@ namespace jafar {
 			 * \return the indirect array.
 			 */
 			jblas::ind_array ia_pushfront(jblas::vecb & vb, const size_t N);
-
-			/**
-			 * Create indirect array from range.
-			 * \param r a range.
-			 * \return the indirect array.
-			 */
-			jblas::ind_array ia_range(const ublas::range & r);
-
-			/**
-			 * Create indirect array from slice.
-			 * \param s a slice.
-			 * \return the indirect array.
-			 */
-			jblas::ind_array ia_slice(const ublas::slice & s);
-
-			/**
-			 * Create indirect array from start and end indices.
-			 * The indirect array goes from \a begin to (\a end -1).
-			 * \param begin the first index
-			 * \param end the last index plus one.
-			 * \return the indirect array.
-			 */
-			jblas::ind_array ia_range(size_t begin, size_t end);
 
 		}
 	}

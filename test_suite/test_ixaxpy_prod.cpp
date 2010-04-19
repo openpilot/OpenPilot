@@ -25,6 +25,7 @@
 using namespace std;
 using namespace jafar::jmath;
 using namespace ublas;
+using namespace jblas;
 
 void test_ixaxpy01(void) { // TEST FOR XAXPY_PROD()
 
@@ -114,29 +115,16 @@ void test_ixaxpy02(void) {
 	// where XXXX is not computed because P is symmetrical,
 	// and Smm neither because it's a copy of the original.
 
-	cout << "% With MS = symmetric_adaptor<matrix>" << endl;
-	cout << "MS = " << (MATLAB) MS << endl;
-	ublasExtra::ixaxpy_prod(MS, iax, J, iar);
-	cout << "MS_cpp = " << (MATLAB) MS << endl;
-	cout << "MS_mat = H * MS * H';" << endl;
-	cout << "MS_err = MS_cpp - MS_mat;" << endl;
-	cout << "norm_MS_err = norm(MS_err)" << endl; //OK
+	ind_array ia_inv = ublasExtra::ia_complement(iax, iar);
+	cout << "ia_inv = " << (MATLAB) ia_inv << endl;
 
 	cout << "% With S = symmetric_matrix " << endl;
 	cout << "S = " << (MATLAB) S << endl;
-	ublasExtra::ixaxpy_prod(S, iax, J, iar);
+	ublasExtra::ixaxpy_prod(S, ia_inv, J, iar, iar);
 	cout << "S_cpp = " << (MATLAB) S << endl;
 	cout << "S_mat = H * S * H';" << endl;
 	cout << "S_err = S_cpp - S_mat;" << endl;
 	cout << "norm_S_err = norm(S_err)" << endl; //NOK
-
-	cout << "% With SS = symmetric_adaptor<symmetric_matrix> " << endl;
-	cout << "SS = " << (MATLAB) SS << endl;
-	ublasExtra::ixaxpy_prod(SS, iax, J, iar);
-	cout << "SS_cpp = " << (MATLAB) SS << endl;
-	cout << "SS_mat = H * SS * H';" << endl;
-	cout << "SS_err = SS_cpp - SS_mat;" << endl;
-	cout << "norm_SS_err = norm(SS_err)" << endl; //OK
 
 }
 
@@ -185,12 +173,15 @@ void test_ixaxpy03(void) {
 	// where XXXX is not computed because P is symmetrical,
 	// and Smm neither because it's a copy of the original.
 
+	ind_array ia_inv = ublasExtra::ia_complement(ia_x, ia_in);
+	cout << "ia_inv = " << (MATLAB) ia_inv << endl;
+
 	cout << "% Without added covariance." << endl;
 	cout << "S = " << (MATLAB) S << endl;
-	ublasExtra::ixaxpy_prod(S, ia_x, OUT_in, ia_in, ia_out);
+	ublasExtra::ixaxpy_prod(S, ia_inv, OUT_in, ia_in, ia_out);
 	cout << "S_cpp = " << (MATLAB) S << endl;
 	cout << "S_mat = J * S * J';" << endl;
-	cout << "ia_res = " << (MATLAB) ublasExtra::ia_union(ia_x, ia_out) << endl;
+	cout << "ia_res = " << (MATLAB) ublasExtra::ia_union(ia_inv, ia_out) << endl;
 	cout << "S_err = S_cpp(ia_res,ia_res) - S_mat(ia_res,ia_res);" << endl;
 	cout << "norm_S_err = norm(S_err)" << endl;
 
@@ -201,10 +192,10 @@ void test_ixaxpy03(void) {
 	cout << "S = " << (MATLAB) S << endl;
 	cout << "ia_out = " << (MATLAB) ia_out << endl;
 	cout << "J = zeros(" << s << "); J(ia_x,ia_x) = eye(" << N << "); J(ia_out,ia_out) = 0; J(ia_out,ia_in) = OUT_in" << endl;
-	ublasExtra::ixaxpy_prod(S, ia_x, OUT_in, ia_in, ia_out);
+	ublasExtra::ixaxpy_prod(S, ia_inv, OUT_in, ia_in, ia_out);
 	cout << "S_cpp = " << (MATLAB) S << endl;
 	cout << "S_mat = J * S * J';" << endl;
-	cout << "ia_res = " << (MATLAB) ublasExtra::ia_union(ia_x, ia_out) << endl;
+	cout << "ia_res = " << (MATLAB) ublasExtra::ia_union(ia_inv, ia_out) << endl;
 	cout << "S_err = S_cpp(ia_res,ia_res) - S_mat(ia_res,ia_res);" << endl;
 	cout << "norm_S_err = norm(S_err)" << endl;
 
@@ -214,10 +205,10 @@ void test_ixaxpy03(void) {
 	cout << "S = " << (MATLAB) S << endl;
 	cout << "ia_out = " << (MATLAB) ia_out << endl;
 	cout << "J = zeros(" << s << "); J(ia_x,ia_x) = eye(" << N << "); J(ia_out,ia_out) = 0; J(ia_out,ia_in) = OUT_in" << endl;
-	ublasExtra::ixaxpy_prod(S, ia_x, OUT_in, ia_in, ia_out);
+	ublasExtra::ixaxpy_prod(S, ia_inv, OUT_in, ia_in, ia_out);
 	cout << "S_cpp = " << (MATLAB) S << endl;
 	cout << "S_mat = J * S * J';" << endl;
-	cout << "ia_res = " << (MATLAB) ublasExtra::ia_union(ia_x, ia_out) << endl;
+	cout << "ia_res = " << (MATLAB) ublasExtra::ia_union(ia_inv, ia_out) << endl;
 	cout << "S_err = S_cpp(ia_res,ia_res) - S_mat(ia_res,ia_res)" << endl;
 	cout << "norm_S_err = norm(S_err)" << endl;
 

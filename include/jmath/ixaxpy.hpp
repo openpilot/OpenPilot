@@ -25,131 +25,98 @@ namespace jafar {
 			using namespace jblas;
 			using namespace boost::numeric::ublas;
 
-			//			template<class bubMatrix>
-			//			symmetric_adaptor<matrix_indirect<bubMatrix> > projectSym(bubMatrix & M, const ind_array & ia) {
-			//				matrix_indirect<bubMatrix> Mrr(M, ia, ia);
-			//				symmetric_adaptor<matrix_indirect<bubMatrix> > Srr(Mrr);
-			//				return Srr;
-			//			}
 
-			//////////////////////////
-			// HERE WITH SYMMETRIC ADAPTORS
-			template<class bubMatrix1, class bubMatrix2>
-			void ixaxpy_offdiag_subprod(symmetric_adaptor<bubMatrix1> S, const ind_array & iax, const bubMatrix2 & Hr,
-			    const ind_array & iar) {
-				size_t sr = iar.size();
-				size_t ss = iax.size();
-				size_t sm = ss - sr;
-				ind_array iac(sm);
-				iac = ia_complement(iax, iar);
-				project(S, iar, iac) = prod(Hr, project(S, iar, iac));
-			}
-
-			template<class bubMatrix1, class bubMatrix2>
-			void ixaxpy_diag_subprod(symmetric_adaptor<bubMatrix1> S, const bubMatrix2 & Hr, const ind_array & iar) {
-				matrix<double> HrSrr = prod(Hr, project(S, iar, iar));
-				project(S, iar, iar) = prod(HrSrr, trans(Hr));
-			}
-
-			/**
-			 * Quadratic sym_matrix product with square Jacobian, indirectly indexed.
-			 * See documentation in overloaded function
-			 */
-			template<class bubMatrix1, class bubMatrix2>
-			void ixaxpy_prod(symmetric_adaptor<bubMatrix1> S, const ind_array & iax, const bubMatrix2 & Hr,
-			    const ind_array & iar) {
-				ixaxpy_offdiag_subprod(S, iax, Hr, iar);
-				ixaxpy_diag_subprod(S, Hr, iar);
-			}
-
-			///////////////////////
-			// HERE WITH ALL SYMMETRIC - EVEN THE SUBPRODS
+			////////////////////////////////////
+			// SPARSE SYMMETRIC MATRIX PRODUCT
+			////////////////////////////////////
 			template<class bubMatrix>
-			void ixaxpy_offdiag_subprod(sym_mat & S, const ind_array & iax, const bubMatrix & Hr, const ind_array & iar) {
-				ind_array iac = ia_complement(iax, iar);
-				project(S, iar, iac) = prod(Hr, project(S, iar, iac));
-			}
-
-			template<class bubMatrix>
-			void ixaxpy_diag_subprod(sym_mat & S, const bubMatrix & Hr, const ind_array & iar) {
-				matrix<double> HrSrr = prod(Hr, project(S, iar, iar));
-				project(S, iar, iar) = prod<sym_mat> (HrSrr, trans(Hr));
-			}
-
-			/**
-			 * Quadratic sym_matrix product with square Jacobian, indirectly indexed.
-			 * This function performs the product H*P*H' when P is a symmetric matrix
-			 * having the role of a covariances matrix, and H is a sparse Jacobian, H=[Hr 0; 0 I],
-			 * with \a Hr square and the elements of \a Hr indexed by indirect array \a iar.
-			 * The input symmetric matrix S is indexed by indices iax so that P = S(iax,iax).
-			 *
-			 * To explain the operation, one has to consider three parts in the storage state vector, s = [x, n] = [r, c, n], where:
-			 *  - \a x is the used part of s.
-			 *  - \a r is the part of \a s (of \a x) affected by \a Hr.
-			 *  - \a c is the part of \a s (of \a x) not affected by \a Hr.
-			 *  - \a n is the part of \a s that is not used at all, and it only serves as reserved storage.
-			 *
-			 * We index each part with an indirect array, ias = [iax, ian] = [iar, iac, ian], where:\n
-			 *  - \a ias: the full indirect array pointing to all terms of s. s(ias) is the same as s(:) in Matlab.
-			 * 	- \a iax: the part of used states in the vector. s(iax) = x.\n
-			 * 	- \a ian: the part of non-used states (ignored, not used, just here to explain). s(ian) = n.\n
-			 * 	- \a iar: the part of non-null Jacobian. s(iar) = r;\n
-			 * 	- \a iac: the complement of \a iar in \a iax (coputed internally with iac = ia_complement(iax,iar)). s(iac) = c.\n
-			 *
-			 * Having understood the partition of s, the storage covariances matrix S could be partitioned as:
-			 *  - S = [Sxx Sxn; Snx Snn] = [Srr Src Srn ; Scr Scc Scn ; Snr Snc Snn], with Sxx = P, the used block.
-			 *
-			 * Then:\n
-			 * 	- S(iar,iar) = Hr * S(iar,iar) * Hr'\n
-			 *  - S(iar,iac) = Hr * S(iar,iac)\n
-			 *  - S(iac,iar) is not computed as the matrix S is symmetric.\n
-			 *  - S(iac,iac) is unchanged\n
-			 *  - S(ian,ias) and its transpose S(ias,ian) are ignored.
-			 *
-			 * \param S a storage covariances matrix
-			 * \param iax the indices in S of used states
-			 * \param Hr a square Jacobian matrix
-			 * \param iar the indices in S that are to be affected by Hr.
-			 */
-			template<class bubMatrix>
-			void ixaxpy_prod(sym_mat & S, const ind_array & iax, const bubMatrix & Hr,
-			    const ind_array & iar) {
-				ixaxpy_offdiag_subprod(S, iax, Hr, iar);
-				ixaxpy_diag_subprod(S, Hr, iar);
-			}
-
-
-			///////////////////////
-			// HERE WITH ALL SYMMETRIC - DIFFERENT IN AND OUT INDICES - AND ADDED COVARIANCE
-			template<class bubMatrix>
-			void ixaxpy_offdiag_subprod(sym_mat & S, const ind_array & ia_x, const bubMatrix & J_oi, const ind_array & ia_in, const ind_array & ia_out){
-					ind_array iac = ia_complement(ia_x, ia_out);
-					project(S, ia_out, iac) = prod(J_oi, project(S, ia_in, iac));
+			void ixaxpy_offdiag_subprod(sym_mat & S, const ind_array & ia_invariant, const bubMatrix & J_oi,
+			    const ind_array & ia_in, const ind_array & ia_out)
+			{
+				project(S, ia_out, ia_invariant) = prod(J_oi, project(S, ia_in, ia_invariant));
 			}
 
 			template<class bubMatrix, class bubMatrixY>
-			void ixaxpy_diag_subprod(sym_mat & S, const bubMatrix & J, const ind_array & ia_in, const ind_array & ia_out, const bubMatrixY Y) {
-					matrix<double> JSii = prod(J, project(S, ia_in, ia_in));
-					project(S, ia_out, ia_out) = prod<sym_mat> (JSii, trans(J));
-					project(S, ia_out, ia_out) += Y;
+			void ixaxpy_diag_subprod(sym_mat & S, const bubMatrix & J, const ind_array & ia_in, const ind_array & ia_out,
+			    const bubMatrixY Y)
+			{
+				matrix<double> JSii = prod(J, project(S, ia_in, ia_in));
+				project(S, ia_out, ia_out) = prod<sym_mat> (JSii, trans(J));
+				project(S, ia_out, ia_out) += Y;
 			}
 
 			template<class bubMatrix>
-			void ixaxpy_diag_subprod(sym_mat & S, const bubMatrix & J, const ind_array & ia_in, const ind_array & ia_out) {
-					matrix<double> JSii = prod(J, project(S, ia_in, ia_in));
-					project(S, ia_out, ia_out) = prod<sym_mat> (JSii, trans(J));
+			void ixaxpy_diag_subprod(sym_mat & S, const bubMatrix & J, const ind_array & ia_in, const ind_array & ia_out)
+			{
+				matrix<double> JSii = prod(J, project(S, ia_in, ia_in));
+				project(S, ia_out, ia_out) = prod<sym_mat> (JSii, trans(J));
 			}
 
+
+			/**
+			 * Symmetric, sparse matrix product with indirect indexing.
+			 * This function performs the product X = A*X*A' + Y where:\n
+			 * - X is a symmetric matrix
+			 * having the role of a covariances matrix of a certain vector \a x, \n
+			 * - A is a sparse Jacobian matrix, A=[A_oi 0 0; 0 I 0;0 0 0],
+			 * which maps the elements of x indexed by indirect arrays \a ia_in into
+			 * the elements indexed by \a ia_out, that is:\n
+			 *   - x(ia_out) = A_oi * x(ia_in).\n
+			 * - Y_oo is a symmetric matrix that is added to the ia_out covariance. We have Y = [Y_oo 0;0 0]
+			 *
+			 * Due to the sparsity of the problem and to the existence of identity blocks in the Jacobian A,
+			 * a significant part of the symmetric matrix X is unchanged. The indices to these unchanged entries
+			 * must be given to the function via \a ia_invariant.
+			 *
+			 * To explain the operation, one has to consider four parts in the storage state vector, x = [s, n] = [in, out, inv, n], where:
+			 *  - \a s is the used part of x.
+			 *  - \a in is the input part of \a s (of \a x) affected by \a A_oi.
+			 *  - \a out is the output part of \a s (of \a x) affected by \a A_oi.
+			 *  - \a inv is the part of \a s (of \a x) not affected by \a A_oi.
+			 *  - \a n is the part of \a x that is not used at all, and it only serves as reserved storage.
+			 *
+			 * We index each part with indirect arrays, ia_x = [ia_s, ia_n] = [ia_in, ia_out, ia_inv, ia_n], where:\n
+			 *  - \a ia_x: the full indirect array pointing to all terms of x. x(ia_x) is the same as x(:) in Matlab.
+			 * 	- \a ia_s: the part of used states in the vector. x(ia_s) = s.\n
+			 * 	- \a ia_in: the part of input states to the Jacobian. x(ia_in) = in;\n
+			 * 	- \a ia_out: the part of output states from the Jacobian. x(ia_out) = out;\n
+			 * 	- \a ia_inv: the part of states not affected by the product. x(ia_inv) = inv.\n
+			 * 	- \a ia_n: the part of non-used states (ignored, not used, just here to explain). x(ia_n) = n.\n
+			 *
+			 * Then:\n
+			 * 	- X(ia_out,ia_out) = A_oi * X(ia_in,ia_in) * A_oi' + Y \n
+			 *  - X(ia_out,ia_inv) = A_oi* X(ia_in,ia_inv)\n
+			 *  - X(ia_inv,ia_out) is not computed as the matrix X is symmetric.\n
+			 *  - X(ia_inv,ia_inv) is unchanged\n
+			 *  - X(ia_n,ia_x) and its transpose X(ia_x,ia_n) are ignored.
+			 *
+			 * \param X a storage covariances matrix
+			 * \param ia_invariant the indices in \a x of invariant states
+			 * \param A_oi a Jacobian matrix maping \a x(in) into \a x(out)=A_oi*x(in)
+			 * \param ia_in the indices in \a x that are to be affected by \a A_oi.
+			 * \param ia_out the indices in \a x resulting from the \a A_oi mapping
+			 * \param Y a symmetric matrix to be added to the output square block \a X(ia_out,ia_out)
+			 */
 			template<class bubMatrixJ, class bubMatrixY>
-			void ixaxpy_prod(sym_mat & S, const ind_array & ia_x, const bubMatrixJ & J, const ind_array & ia_in, const ind_array & ia_out, const bubMatrixY Y){
-					ixaxpy_offdiag_subprod(S, ia_x, J, ia_in, ia_out);
-					ixaxpy_diag_subprod(S, J, ia_in, ia_out, Y);
+			void ixaxpy_prod(sym_mat & X, const ind_array & ia_invariant, const bubMatrixJ & A_oi, const ind_array & ia_in,
+			    const ind_array & ia_out, const bubMatrixY Y_oo)
+			{
+				ixaxpy_offdiag_subprod(X, ia_invariant, A_oi, ia_in, ia_out);
+				ixaxpy_diag_subprod(X, A_oi, ia_in, ia_out, Y_oo);
 			}
 
+			/**
+			 * Symmetric, sparse matrix product with indirect indexing.
+			 * This function performs the product X = A*X*A' when X is a symmetric matrix and A is sparse.
+			 *
+			 * \sa See the overloaded companion for more detailed information.
+			 */
 			template<class bubMatrixJ>
-			void ixaxpy_prod(sym_mat & S, const ind_array & ia_x, const bubMatrixJ & J, const ind_array & ia_in, const ind_array & ia_out){
-					ixaxpy_offdiag_subprod(S, ia_x, J, ia_in, ia_out);
-					ixaxpy_diag_subprod(S, J, ia_in, ia_out);
+			void ixaxpy_prod(sym_mat & X, const ind_array & ia_invariant, const bubMatrixJ & A_oi, const ind_array & ia_in,
+			    const ind_array & ia_out)
+			{
+				ixaxpy_offdiag_subprod(X, ia_invariant, A_oi, ia_in, ia_out);
+				ixaxpy_diag_subprod(X, A_oi, ia_in, ia_out);
 			}
 
 		}

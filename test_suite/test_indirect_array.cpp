@@ -178,12 +178,12 @@ void test_indirect_array02(void) {
 	ssv << "[10](0,1,0,1,0,0,1,1,0,1)";
 	ssv >> ba;
 	cout << "ba    : " << ba << endl;
-	jblas::ind_array iset = jafar::jmath::ublasExtra::ia_bool(ba);
+	jblas::ind_array iset = jafar::jmath::ublasExtra::ia_set(ba);
 	cout << "iset  = " << iset << endl;
-	jblas::ind_array irng = ublasExtra::ia_range(0, 4);
+	jblas::ind_array irng = ublasExtra::ia_set(0, 4);
 	cout << "irng  = " << irng << endl;
 	ublas::range r(3, 6);
-	jblas::ind_array irng2 = ublasExtra::ia_range(r);
+	jblas::ind_array irng2 = ublasExtra::ia_set(r);
 	cout << "irng2 = " << irng2 << endl;
 	jblas::ind_array ihdba = ublasExtra::ia_head(ba, 3);
 	cout << "ihdba = " << ihdba << endl;
@@ -205,7 +205,7 @@ void test_indirect_array02(void) {
 }
 
 void test_indirect_array03() {
-	jblas::ind_array ia = ublasExtra::ia_range(2, 5);
+	jblas::ind_array ia = ublasExtra::ia_set(2, 5);
 	jblas::vec V(10);
 	randVector(V);
 
@@ -235,8 +235,8 @@ void test_indirect_array03() {
 
 void test_indirect_array04() {
 	cout << "\n BOOST IND_ARRAY COMPOSITION\n%========================" << endl;
-	jblas::ind_array ia_base = ublasExtra::ia_range(4, 8);
-	jblas::ind_array ia_ptr = ublasExtra::ia_range(1, 3);
+	jblas::ind_array ia_base = ublasExtra::ia_set(4, 8);
+	jblas::ind_array ia_ptr = ublasExtra::ia_set(1, 3);
 	cout << "ia_base = " << ia_base << endl;
 	cout << "ia_ptr = " << ia_ptr << endl;
 	// try one among these 2:

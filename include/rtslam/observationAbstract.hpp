@@ -97,12 +97,16 @@ namespace jafar {
 				Expectation expectation;
 				Measurement measurement;
 				Innovation innovation;
+				Gaussian prior;
 
-				ind_array ia_rsl; ///<          Ind. array of indices to the map
-				jblas::mat EXP_rsl; ///<        Jacobian of the expectation wrt the states of robot, sensor and landmark.
+				ind_array ia_rsl; ///<          Ind. array of mapped indices of robot, sensor and landmark (ie, sensor might or might not be there).
+				jblas::mat EXP_rsl; ///<        Jacobian of the expectation wrt the mapped states of robot, sensor and landmark.
 				jblas::mat INN_meas; ///<       The Jacobian of the innovation wrt the measurement.
 				jblas::mat INN_exp; ///<        The Jacobian of the innovation wrt the expectation.
-				jblas::mat INN_rsl; ///<        The Jacobian of the innovation wrt the states of robot, sensor and landmark.
+				jblas::mat INN_rsl; ///<        The Jacobian of the innovation wrt the mapped states of robot, sensor and landmark.
+				//				jblas::mat LMK_meas; ///<       The Jacobian of the landmark wrt the measurement.
+				//				jblas::mat LMK_prior; ///<      The Jacobian of the landmark wrt the prior.
+				//				jblas::mat LMK_rs; ///<         the Jacobian of the landmark wrt the robot and sensor mapped states.
 
 				/**
 				 * Counters

@@ -40,10 +40,18 @@ namespace jafar {
 
 		ObservationAbstract::ObservationAbstract(const sensor_ptr_t & _senPtr, const landmark_ptr_t & _lmkPtr,
 		    const size_t _size_meas, const size_t _size_exp, const size_t _size_inn, const size_t _size_nonobs) :
-			sensorPtr(_senPtr), landmarkPtr(_lmkPtr), expectation(_size_exp, _size_nonobs), measurement(_size_meas),
-			    innovation(_size_inn), ia_rsl(ublasExtra::ia_union(sensorPtr->ia_globalPose, landmarkPtr->state.ia())),
-			    EXP_rsl(_size_exp, ia_rsl.size()), INN_meas(_size_inn, _size_meas), INN_exp(_size_inn, _size_exp), INN_rsl(
-			        _size_inn, ia_rsl.size()) {
+			sensorPtr(_senPtr),
+			landmarkPtr(_lmkPtr),
+			expectation(_size_exp, _size_nonobs),
+			measurement(_size_meas),
+			innovation(_size_inn),
+			prior(_size_nonobs),
+			ia_rsl(ublasExtra::ia_union(sensorPtr->ia_globalPose, landmarkPtr->state.ia())),
+			EXP_rsl(_size_exp, ia_rsl.size()),
+			INN_meas(_size_inn, _size_meas),
+			INN_exp(_size_inn, _size_exp),
+			INN_rsl(_size_inn, ia_rsl.size())
+		{
 			categoryName("OBSERVATION");
 		}
 

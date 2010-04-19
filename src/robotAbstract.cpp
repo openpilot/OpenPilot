@@ -47,8 +47,7 @@ namespace jafar {
 		 */
 		RobotAbstract::RobotAbstract(const map_ptr_t & _mapPtr, const size_t _size_state, const size_t _size_control, const size_t _size_pert) :
 			MapObject(_mapPtr, _size_state),
-			mapPtr(_mapPtr),
-			pose(state, jmath::ublasExtra::ia_set(0, 7)),
+			pose(state, jmath::ublasExtra::ia_range(0, 7)),
 			control(_size_control),
 			perturbation(_size_pert),
 			XNEW_x(_size_state, _size_state),
@@ -67,10 +66,6 @@ namespace jafar {
 			sensorsPtrSet[_senPtr->id()] = _senPtr;
 		}
 
-		void RobotAbstract::linkToMap(const map_ptr_t & _mapPtr) {
-			mapPtr = _mapPtr;
-		}
-
 		void RobotAbstract::move() {
 			//move_func(); // x = F(x, u); Update Jacobians dxnew/dx and dxnew/du
 			vec x = state.x();
@@ -79,7 +74,7 @@ namespace jafar {
 			state.x() = x;
 			if (!constantPerturbation)
 				computeStatePerturbation();
-			mapPtr->filter.predict(mapPtr->ia_used_states(), XNEW_x, state.ia(), Q); // P = F*P*F' + Q
+			map().filter.predict(map().ia_used_states(), XNEW_x, state.ia(), Q); // P = F*P*F' + Q
 		}
 
 		void RobotAbstract::computeStatePerturbation() {

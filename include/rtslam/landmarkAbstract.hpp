@@ -32,6 +32,9 @@
 // include parents
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/mapObject.hpp"
+#include "rtslam/parents.hpp"
+
+#include <boost/smart_ptr.hpp>
 
 namespace jafar {
 	namespace rtslam {
@@ -61,9 +64,12 @@ namespace jafar {
 		 *
 		 * @ingroup rtslam
 		 */
-		class LandmarkAbstract : public MapObject {
+		class LandmarkAbstract : public MapObject, public ChildOf<MapAbstract>, public boost::enable_shared_from_this<LandmarkAbstract> {
 
 			public:
+
+			ENABLE_LINK_TO_PARENT(MapAbstract,Map,LandmarkAbstract); // define the function linkToParentMap().
+			ENABLE_ACCESS_TO_PARENT(MapAbstract,map); // define the functions mapPtr() and map().
 
 				/**
 				 * constructor from map and size
@@ -76,14 +82,12 @@ namespace jafar {
 				virtual ~LandmarkAbstract() {
 				}
 
-				map_ptr_t mapPtr; ///<                                   Parent map
 				observations_ptr_set_t observationsPtrSet; ///<                 A set of observations (one per sensor)
 
 				// \todo use a smart pointer here.
 				DescriptorAbstract descriptor; ///<                       Landmark descriptor
 
 				void linkToObservation(const observation_ptr_t & _obsPtr); ///<   Link to observation
-				void linkToMap(const map_ptr_t & _mapPtr); ///<                   Link to map
 
 		};
 

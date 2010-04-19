@@ -42,6 +42,7 @@
 // include parents
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/mapObject.hpp"
+#include "rtslam/parents.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -154,12 +155,14 @@ namespace jafar {
 		 *
 		 * \ingroup rtslam
 		 */
-		class RobotAbstract: public MapObject {
+		class RobotAbstract: public MapObject, public ChildOf<MapAbstract>, public boost::enable_shared_from_this<RobotAbstract> {
 
 				friend ostream& operator <<(ostream & s, jafar::rtslam::RobotAbstract & rob);
 
 			public:
 
+				ENABLE_LINK_TO_PARENT(MapAbstract,Map,RobotAbstract); // define the function linkToParentMap().
+				ENABLE_ACCESS_TO_PARENT(MapAbstract,map); // define the functions mapPtr() and map().
 
 				/**
 				 * Remote constructor from remote map and size of state and control vectors.
@@ -174,7 +177,6 @@ namespace jafar {
 				virtual ~RobotAbstract() {
 				}
 
-				map_ptr_t mapPtr; ///<              Parent map
 				sensors_ptr_set_t sensorsPtrSet; ///<	  A set of sensors
 
 				Gaussian pose; ///<             Robot Gaussian pose

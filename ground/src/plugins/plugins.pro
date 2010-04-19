@@ -74,3 +74,9 @@ SUBDIRS += plugin_uploader
 plugin_airspeed.subdir = airspeed
 plugin_airspeed.depends = plugin_coreplugin
 SUBDIRS += plugin_airspeed
+
+#Config Gadget
+plugin_config.subdir = config
+plugin_config.depends = plugin_coreplugin
+SUBDIRS += plugin_config
+

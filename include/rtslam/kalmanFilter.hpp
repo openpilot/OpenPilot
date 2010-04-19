@@ -112,6 +112,42 @@ namespace jafar {
 				 */
 				void correct(const ind_array & iax, Innovation & inn, const mat & INN_rsl, const ind_array & ia_rsl);
 
+				/**
+				 * EKF initialization from fully observable info.
+				 * This function alters the state vector structure to allocate a new element to be filtered.
+				 * \param iax indirect array of indices to used states
+				 * \param G_rs Jacobian of the back-projection function wrt vehicle states (robot and sensor).
+				 * \param ia_rs indirect array of indices to robot and sensor
+				 * \param ia_l indirect array of indices to the landmark
+				 * \param G_y Jacobian of back-projection wrt the measurement
+				 * \param R measurement noise covariances matrix
+				 */
+				void initialize(const ind_array & iax, const mat & G_rs, const ind_array & ia_rs, const ind_array & ia_l, const mat & G_y, const sym_mat & R);
+
+				/**
+				 * EKF initialization from partially observable info.
+				 * This function alters the state vector structure to allocate a new element to be filtered.
+				 * \param iax indirect array of indices to used states
+				 * \param G_rs Jacobian of the back-projection function wrt vehicle states (robot and sensor).
+				 * \param ia_rs indirect array of indices to robot and sensor
+				 * \param ia_l indirect array of indices to the landmark
+				 * \param G_y Jacobian of back-projection wrt the measurement
+				 * \param R measurement noise covariances matrix
+				 * \param G_n Jacobian of back-projection wrt the non-measured prior
+				 * \param N non-measured prior covariances matrix
+				 */
+				void initialize(const ind_array & iax, const mat & G_v, const ind_array & ia_rs, const ind_array & ia_l, const mat & G_y, const sym_mat & R, const mat & G_n, const sym_mat & N);
+
+				/**
+				 * EKF reparametrization.
+				 * This function alters the state structure to modify an element that is currently being filtered.
+				 * \param iax indirect array of indices to used states
+				 * \param J_l Jacobian of reparametrization wrt old landmark
+				 * \param ia_old indices to old landmark parameters
+				 * \param ia_new indices to new landmark parameters
+				 */
+				void reparametrize(const ind_array & iax, const mat & J_l, const ind_array & ia_old, const ind_array & ia_new);
+
 				void computeInnovation();
 				void computeK();
 				void updateP();

@@ -69,3 +69,8 @@ SUBDIRS += plugin_uavobjectbrowser
 plugin_uploader.subdir = uploader
 plugin_uploader.depends = plugin_coreplugin
 SUBDIRS += plugin_uploader
+
+#Airspeed Dial Gadget
+plugin_airspeed.subdir = airspeed
+plugin_airspeed.depends = plugin_coreplugin
+SUBDIRS += plugin_airspeed

@@ -282,7 +282,7 @@ namespace jafar {
 				/**
 				 * Scan search region for match.
 				 */
-				void scanObs(const observation_ptr_t & obsPtr);
+				void scanObs(const observation_ptr_t & obsPtr, const ROI & roi);
 		};
 
 	}

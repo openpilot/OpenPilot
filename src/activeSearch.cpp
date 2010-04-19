@@ -169,7 +169,7 @@ namespace jafar {
 			vec7 senPose = obsPtr->sensorPtr->globalPose();
 		}
 
-		void ActiveSearch::scanObs(const observation_ptr_t & obsPtr) {
+		void ActiveSearch::scanObs(const observation_ptr_t & obsPtr, const ROI & roi) {
 		}
 
 	}

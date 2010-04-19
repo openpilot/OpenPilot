@@ -1,5 +1,6 @@
 TEMPLATE = lib 
 TARGET = AirspeedGadget
+QT += svg
 
 include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri) 

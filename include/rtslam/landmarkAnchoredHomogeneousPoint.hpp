@@ -197,14 +197,14 @@ namespace jafar {
 				 *
 				 * so that \a rho can be specified as being exactly inverse-distance.
 				 *
-				 * \param s the sensor frame
+				 * \param sf the sensor frame
 				 * \param v the retro-projected director vector in sensor frame
 				 * \param rho the prior, proportional to inverse-distance
 				 * \return the AHP landmark.
 				 */
 				template<class VS, class VLS>
-				static vec7 fromBearingOnlyFrame(const VS & s, const VLS & v, const double _rho) {
-						return lmkAHP::fromBearingOnlyFrame(s, v, _rho);
+				static vec7 fromBearingOnlyFrame(const VS & sf, const VLS & v, double _rho) {
+						return lmkAHP::fromBearingOnlyFrame(sf, v, _rho);
 				}
 
 				/**
@@ -217,7 +217,7 @@ namespace jafar {
 				 *
 				 * so that \a rho can be specified as being exactly inverse-distance.
 				 *
-				 * \param s the sensor frame
+				 * \param sf the sensor frame
 				 * \param v the retro-projected director vector in sensor frame
 				 * \param rho the prior, proportional to inverse-distance
 				 * \param ahp the AHP landmark.
@@ -225,9 +225,9 @@ namespace jafar {
 				 * \param AHP_v the Jacobian wrt \a v
 				 * \param AHP_rho the Jacobian wrt \a rho
 				 */
-				template<class VS, class VLS, class VA, class MA_s, class MA_v, class MA_rho>
-				static void fromBearingOnlyFrame(const VS & s, const VLS & v, const double _rho, VA & ahp, MA_s & AHP_s, MA_v & AHP_v, MA_rho & AHP_rho) {
-						lmkAHP::fromBearingOnlyFrame(s, v, _rho, ahp, AHP_s, AHP_v, AHP_rho);
+				template<class VS, class VLS, class MA_s, class MA_v, class MA_rho>
+				void fromBearingOnlyFrame(const VS & sf, const VLS & v, double _rho, MA_s & AHP_s, MA_v & AHP_v, MA_rho & AHP_rho) {
+						lmkAHP::fromBearingOnlyFrame(sf, v, _rho, state.x(), AHP_s, AHP_v, AHP_rho);
 				}
 
 

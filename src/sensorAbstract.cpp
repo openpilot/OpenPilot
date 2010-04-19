@@ -48,7 +48,7 @@ namespace jafar {
 			//          #check       ? # sensor in filter                                 : # not in filter
 			MapObject(inFilter       ? MapObject(_robPtr->mapPtr, 7)                  : 0),
 			robotPtr(_robPtr),
-			pose(inFilter            ? Gaussian(state, jmath::ublasExtra::ia_range(0, 7)) : Gaussian(7)),
+			pose(inFilter            ? Gaussian(state, jmath::ublasExtra::ia_set(0, 7)) : Gaussian(7)),
 			ia_globalPose(inFilter   ? ia_union(_robPtr->pose.ia(), pose.ia())            : pose.ia())
 		{
 			categoryName("SENSOR");

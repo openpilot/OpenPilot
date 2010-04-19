@@ -90,7 +90,7 @@ namespace jafar {
 				 */
 				inline jblas::ind_array ia_used_states() {
 					jblas::ind_array res;
-					res = jmath::ublasExtra::ia_bool(used_states);
+					res = jmath::ublasExtra::ia_set(used_states);
 					return res;
 				}
 

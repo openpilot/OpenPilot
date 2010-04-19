@@ -34,9 +34,9 @@ namespace jafar {
 			s << ".state:  " << rob.state << endl;
 			s << ".pose :  " << rob.pose << endl;
 			s << ".sens : [";
-			sensors_ptr_set_t::iterator senIter;
-			for (senIter = rob.sensorsPtrSet.begin(); senIter != rob.sensorsPtrSet.end(); senIter++)
-				s << " " << senIter->first << " ";
+			for (RobotAbstract::SensorList::const_iterator senIter = rob.senorList.begin();
+						senIter != rob.sensorList.end(); senIter++)
+				s << " " << *senIter << " "; // Print the address of the sensor.
 			s << "]";
 			return s;
 		}
@@ -59,13 +59,6 @@ namespace jafar {
 		}
 
 
-		/*
-		 * Add a sensor to this robot
-		 */
-		void RobotAbstract::linkToSensor(const sensor_ptr_t & _senPtr) {
-			sensorsPtrSet[_senPtr->id()] = _senPtr;
-		}
-
 		void RobotAbstract::move() {
 			//move_func(); // x = F(x, u); Update Jacobians dxnew/dx and dxnew/du
 			vec x = state.x();
@@ -81,13 +74,12 @@ namespace jafar {
 			Q = jmath::ublasExtra::prod_JPJt(perturbation.P(), XNEW_pert);
 		}
 
-		void RobotAbstract::exploreSensors() {
-			for (sensors_ptr_set_t::iterator senIter = sensorsPtrSet.begin(); senIter != sensorsPtrSet.end(); senIter++) {
-				sensor_ptr_t senPtr = senIter->second;
-				cout << "exploring sen: " << senPtr->id() << endl;
+		void RobotAbstract::exploreSensors() const {
+			for (SensorList::const_iterator senIter = sensorList.begin(); senIter != sensorList.end(); senIter++) {
+				cout << "exploring sen: " << *senPtr->id() << endl;
 
-				senPtr->acquireRaw();
-				senPtr->processRaw();
+				*senPtr->acquireRaw();
+				*senPtr->processRaw();
 
 			}
 		}

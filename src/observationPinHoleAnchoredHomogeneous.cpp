@@ -13,7 +13,7 @@
 
 #include "boost/shared_ptr.hpp"
 #include "rtslam/pinholeTools.hpp"
-
+#include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
 #include "rtslam/observationPinHoleAnchoredHomogeneous.hpp"
 
 namespace jafar {
@@ -84,7 +84,46 @@ namespace jafar {
 		}
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::backProject_func() {
-			// \todo implement back-projection
+			vec3 v;
+			mat32 V_u;
+			mat V_s(3,1);
+			vec7 sg;
+			mat AHP_sg(7, 7);
+			mat AHP_v(7,3);
+			mat AHP_u(7,2);
+			mat AHP_rho(7,1);
+
+			// Need to know some dynamic sizes:
+			// Sizes of Jacobian SG_rs depend on the sensor being LOCAL or REMOTE.
+			// This is easy since we have ia_rsl with the overall size of mapped robot, sensor and landmark.
+			size_t size_rsl = ia_rsl.size();
+			size_t size_l = landmarkPtr->size();
+			size_t size_rs = size_rsl - size_l;
+
+			// This matrices are of variable size <-- we need to know size_rs before initializing them.
+			mat SG_rs(sensorPtr->pose.size(), size_rs);
+			mat AHP_rs(7, size_rs);
+
+			// Inputs: measurement and prior
+			vec2 u = measurement.x();
+			double rho = prior.x(0);
+
+			// We make the back-projection.
+			// This is decomposed in three steps:
+			// - Get global sensor pose.
+			// - Back-project from pin-hole sensor to bearing-only frame
+			// - Transform Bearing-only lmk from sensor pose, using inverse-distance prior.
+			//
+			// Here it is OK to use the abstract pointer:
+			sensorPtr->globalPose(sg, SG_rs); //      Pose of sensor in map; Jacobian SG_rs wrt. robot and sensor
+			// These functions below use the down-casted pointer because they need to know the particular object parameters and/or methods:
+			pinHolePtr->backProjectPoint(u, 1.0, v, V_u, V_s); //   back-Project pixel u using prior depth 1, get expected 3D vector v and Jacobians
+			ahpPtr->fromBearingOnlyFrame(sg, v, rho, AHP_sg, AHP_v, AHP_rho); // lmk in global frame
+
+			// Here we apply the chain rule for composing Jacobians
+			AHP_rs = prod(AHP_sg, SG_rs);
+			AHP_u = prod(AHP_v, V_u);
+
 		}
 
 		bool ObservationPinHoleAnchoredHomogeneousPoint::predictVisibility() {

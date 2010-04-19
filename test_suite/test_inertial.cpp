@@ -60,7 +60,7 @@ void test_inertial01() {
 	cout << robPtr->state.x() << endl;
 
 	cout << "P(:,1) = " << (MATLAB) robPtr->state.x() << endl;
-	for (size_t t = 2; t <= 12; t++){
+	for (size_t t = 2; t <= 4; t++){
 	robPtr->move();
 	cout << "P(:," << t << ") = " << (MATLAB) robPtr->state.x() << endl;
 	}

@@ -41,7 +41,7 @@ namespace jafar {
 		 * The state vector, x = [p q v ab wb g] , of size 19.
 		 *
 		 * The transition equation is
-		 * - x+ = move(x,u,n),
+		 * - x+ = move_func(x,u,n),
 		 *
 		 * with u = [am, wm] the IMU measurements (the control input)
 		 *  and n = [an, wn, ar, wr] the perturbation impulse.
@@ -79,7 +79,7 @@ namespace jafar {
 		 *   g   16 |  0     0     0     0
 		 * -----------------------------------------------------------------------------
 		 */
-		void RobotInertial::move_func(const vec & _x, const vec & _u, const vec & _n, const double _dt, vec & _xnew, mat & _XNEW_x,
+		void RobotInertial::move_func(const vec & _x, const vec & _u, const vec & _n, double _dt, vec & _xnew, mat & _XNEW_x,
 		    mat & _XNEW_pert) {
 
 

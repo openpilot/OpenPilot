@@ -60,12 +60,11 @@ namespace jafar {
 		class RobotInertial: public RobotAbstract {
 
 			public:
-//				RobotInertial(MapAbstract & _map);
+				//				RobotInertial(MapAbstract & _map);
 				RobotInertial(const map_ptr_t & _mapPtr);
 
 				~RobotInertial() {
 				}
-
 				/**
 				 * Move one step ahead.
 				 *
@@ -87,7 +86,16 @@ namespace jafar {
 				 *
 				 * \sa See the extense comments on move_func() in file robotInertial.cpp for algebraic details.
 				 */
-				void move_func(const vec & _x, const vec & _u, const vec & _n, const double _dt, vec & _xnew, mat & _XNEW_x, mat & _XNEW_pert);
+				void move_func(const vec & _x, const vec & _u, const vec & _n, double _dt, vec & _xnew,
+				    mat & _XNEW_x, mat & _XNEW_pert);
+
+				virtual void move_func() {
+					vec x = state.x();
+					vec n = perturbation.x();
+					vec xnew;
+					move_func(x, control, n, dt_or_dx, x, XNEW_x, XNEW_pert);
+					state.x() = xnew;
+				}
 
 				static size_t size() {
 					return 19;

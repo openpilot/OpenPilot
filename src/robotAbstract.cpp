@@ -34,8 +34,8 @@ namespace jafar {
 			s << ".state:  " << rob.state << endl;
 			s << ".pose :  " << rob.pose << endl;
 			s << ".sens : [";
-			for (RobotAbstract::SensorList::const_iterator senIter = rob.senorList.begin();
-						senIter != rob.sensorList.end(); senIter++)
+			for (RobotAbstract::SensorList::const_iterator senIter = rob.sensorList().begin();
+						senIter != rob.sensorList().end(); senIter++)
 				s << " " << *senIter << " "; // Print the address of the sensor.
 			s << "]";
 			return s;
@@ -75,11 +75,12 @@ namespace jafar {
 		}
 
 		void RobotAbstract::exploreSensors() const {
-			for (SensorList::const_iterator senIter = sensorList.begin(); senIter != sensorList.end(); senIter++) {
-				cout << "exploring sen: " << *senPtr->id() << endl;
+			for (SensorList::const_iterator senIter = sensorList().begin(); senIter != sensorList().end(); senIter++) {
+				sensor_ptr_t senPtr = *senIter;
+				cout << "exploring sen: " << senPtr->id() << endl;
 
-				*senPtr->acquireRaw();
-				*senPtr->processRaw();
+				senPtr->acquireRaw();
+				senPtr->processRaw();
 
 			}
 		}

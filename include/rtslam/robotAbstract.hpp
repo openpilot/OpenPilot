@@ -260,7 +260,7 @@ namespace jafar {
 				 * Explore all sensors.
 				 * This function iterates all the sensors in the robot and calls the main sensor operations.
 				 */
-				void exploreSensors();
+				void exploreSensors() const;
 
 			protected:
 

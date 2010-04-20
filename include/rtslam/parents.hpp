@@ -65,7 +65,7 @@ public:
  * of children, with name <ACCESS>List().
  */
 #define ENABLE_ACCESS_TO_CHILDREN(Child,typeName,accessName)    \
-  typedef ParentOf<Child>::ChildList typeName##List; \
+  public: typedef ParentOf<Child>::ChildList typeName##List; \
   typeName##List & accessName##List( void )           \
   {  return ParentOf<Child>::childList; }     \
   const typeName##List & accessName##List( void ) const           \
@@ -145,7 +145,7 @@ public:
  *  - The child class (where the macro is called) should have enable_shared_from_this.
  */
 #define ENABLE_LINK_TO_FATHER(Parent,Child)                   \
-  void linkToParent( boost::shared_ptr<Parent> ptr )          \
+		public: void linkToParent( boost::shared_ptr<Parent> ptr )          \
   {                                                           \
     ChildOf<Parent>::linkToParent(ptr);                       \
     ptr->ParentOf<Child>::registerChild(shared_from_this());  \
@@ -154,7 +154,7 @@ public:
 /* Same as before, except that the function is defined with
  * name linkToParent<Parent> (ie, for Parent=Sen, linkToParentSen). */
 #define ENABLE_LINK_TO_PARENT(Parent,name,Child)              \
-  void linkToParent##name( boost::shared_ptr<Parent> ptr )  \
+		public: void linkToParent##name( boost::shared_ptr<Parent> ptr )  \
   {                                                           \
     ChildOf<Parent>::linkToParent(ptr);                       \
     ptr->ParentOf<Child>::registerChild(shared_from_this());  \
@@ -165,7 +165,7 @@ public:
  * fatherPtr() and father() respectively.
  */
 #define ENABLE_ACCESS_TO_FATHER(Parent)                       \
-  boost::shared_ptr<Parent> father##Ptr( void )               \
+		public: boost::shared_ptr<Parent> father##Ptr( void )               \
   {  return ChildOf<Parent>::parentPtr(); }                   \
   Parent& father( void )                                      \
   {    return ChildOf<Parent>::parent();  }                   \
@@ -176,7 +176,7 @@ public:
  * explicit name, to handle the case of multiple parent.
  */
 #define ENABLE_ACCESS_TO_PARENT(Parent,accessName)            \
-  boost::shared_ptr<Parent> accessName##Ptr( void )           \
+		public: boost::shared_ptr<Parent> accessName##Ptr( void )           \
   {  return ChildOf<Parent>::parentPtr(); }                   \
   Parent& accessName( void )                                  \
   {    return ChildOf<Parent>::parent();  }                   \
@@ -271,7 +271,7 @@ public:
  * but ObservationAbstract is.
  */
 #define ENABLE_LINK_TO_SPECIFIC_FATHER(ParentGen,ParentSpec,Child)   \
-  void linkToParent( const boost::shared_ptr<ParentGen>& ptr )       \
+		public: void linkToParent( const boost::shared_ptr<ParentGen>& ptr )       \
   {                                                                  \
     ChildOf<ParentGen>::linkToParent( ptr );                         \
     SpecificChildOf<ParentSpec>::linkToParentSpecific( ptr );        \
@@ -288,7 +288,7 @@ public:
  * with names <ACCESS>Ptr() and <ACCESS>().
  */
 #define ENABLE_ACCESS_TO_SPECIFIC_PARENT(Parent,accessName)         \
-  boost::shared_ptr<Parent> accessName##Ptr( void )                 \
+		public: boost::shared_ptr<Parent> accessName##Ptr( void )                 \
   {  return SpecificChildOf<Parent>::parentPtr(); }                 \
   Parent& accessName( void )                                        \
   {    return SpecificChildOf<Parent>::parent();  }                 \

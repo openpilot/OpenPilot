@@ -63,7 +63,7 @@ namespace jafar {
 
 		void ObservationAbstract::project() {
 			project_func();
-			expectation.P() = ublasExtra::prod_JPJt(ublas::project(landmarkPtr->mapPtr->filter.P(), ia_rsl, ia_rsl), EXP_rsl);
+			expectation.P() = ublasExtra::prod_JPJt(ublas::project(landmarkPtr->map().filter.P(), ia_rsl, ia_rsl), EXP_rsl);
 		}
 
 		void ObservationAbstract::computeInnovation() {

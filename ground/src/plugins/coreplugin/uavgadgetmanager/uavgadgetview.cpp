@@ -88,9 +88,12 @@ UAVGadgetView::UAVGadgetView(Core::UAVGadgetManager *uavGadgetManager, IUAVGadge
         int index = 0;
         foreach(QString classId, sl)
         {
-            m_uavGadgetList->addItem(im->gadgetName(classId), classId);
-            if (classId == QString("EmptyGadget"))
-                m_defaultIndex = index;
+            if (classId == QString("EmptyGadget")) {
+                m_defaultIndex = 0;
+                m_uavGadgetList->insertItem(0, im->gadgetName(classId), classId);
+            } else {
+                m_uavGadgetList->addItem(im->gadgetName(classId), classId);
+            }
             ++index;
         }
 

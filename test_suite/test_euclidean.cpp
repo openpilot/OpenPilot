@@ -35,6 +35,7 @@ void test_euc01(void) {
 
 	map_ptr_t mapPtr(new MapAbstract(100));
 	eucp_ptr_t eucPtr(new LandmarkEuclideanPoint(mapPtr));
+  eucPtr->linkToParentMap(mapPtr);
 
 	cout << "\n% INIT \n%============" << endl;
 	for (size_t i = 0; i < 3; i++)

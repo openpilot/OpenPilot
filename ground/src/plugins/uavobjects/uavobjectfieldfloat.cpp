@@ -36,6 +36,12 @@ UAVObjectFieldFloat::UAVObjectFieldFloat(const QString& name, const QString& uni
     numBytesPerElement = sizeof(float);
 }
 
+UAVObjectFieldFloat::UAVObjectFieldFloat(const QString& name, const QString& units, const QStringList& elementNames):
+        UAVObjectField(name, units, elementNames)
+{
+    numBytesPerElement = sizeof(float);
+}
+
 /**
  * Initialize all values
  */

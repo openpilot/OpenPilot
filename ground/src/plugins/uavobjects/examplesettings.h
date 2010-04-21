@@ -47,7 +47,8 @@ public:
     } __attribute__((packed)) DataFields;
 
     // Enumeration types
-    typedef enum { STEPDIRECTION_UP=0, STEPDIRECTION_DOWN=1,  } StepDirectionEnum;
+    /* Enumeration options for field StepDirection */
+    typedef enum { STEPDIRECTION_UP=0, STEPDIRECTION_DOWN=1,  } StepDirectionOptions;
 
   
     // Constants

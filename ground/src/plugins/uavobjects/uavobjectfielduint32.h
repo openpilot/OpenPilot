@@ -41,6 +41,7 @@ class UAVOBJECTS_EXPORT UAVObjectFieldUInt32: public UAVObjectField
 
 public:
     UAVObjectFieldUInt32(const QString& name, const QString& units, quint32 numElements);
+    UAVObjectFieldUInt32(const QString& name, const QString& units, const QStringList& elementNames);
     void initializeValues();
     qint32 pack(quint8* dataOut);
     qint32 unpack(const quint8* dataIn);

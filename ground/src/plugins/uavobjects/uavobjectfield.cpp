@@ -37,6 +37,23 @@ UAVObjectField::UAVObjectField(const QString& name, const QString& units, quint3
     this->offset = 0;
     this->data = NULL;
     this->obj = NULL;
+    // Set element names
+    for (quint32 n = 0; n < numElements; ++n)
+    {
+        elementNames.append(QString("[%1]").arg(n));
+    }
+}
+
+UAVObjectField::UAVObjectField(const QString& name, const QString& units, const QStringList& elementNames)
+{
+    // Copy params
+    this->name = name;
+    this->units = units;
+    this->numElements = elementNames.length();
+    this->offset = 0;
+    this->data = NULL;
+    this->obj = NULL;
+    this->elementNames = elementNames;
 }
 
 void UAVObjectField::initialize(quint8* data, quint32 dataOffset, UAVObject* obj)
@@ -46,6 +63,11 @@ void UAVObjectField::initialize(quint8* data, quint32 dataOffset, UAVObject* obj
     this->obj = obj;
     clear();
     initializeValues();
+}
+
+QStringList UAVObjectField::getElementNames()
+{
+    return elementNames;
 }
 
 UAVObject* UAVObjectField::getObject()

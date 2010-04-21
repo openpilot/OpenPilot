@@ -40,7 +40,8 @@ class UAVOBJECTS_EXPORT UAVObjectFieldEnum: public UAVObjectField
     Q_OBJECT
 
 public:
-    UAVObjectFieldEnum(const QString& name, const QString& units, quint32 numElements, QStringList& options);
+    UAVObjectFieldEnum(const QString& name, const QString& units, quint32 numElements, const QStringList& options);
+    UAVObjectFieldEnum(const QString& name, const QString& units, const QStringList& elementNames, const QStringList& options);
     QStringList getOptions();
     QString getSelected(quint32 arrayIndex);
     void setSelected(QString& val, quint32 arrayIndex);

@@ -41,6 +41,7 @@ class UAVOBJECTS_EXPORT UAVObjectFieldFloat: public UAVObjectField
 
 public:
     UAVObjectFieldFloat(const QString& name, const QString& units, quint32 numElements);
+    UAVObjectFieldFloat(const QString& name, const QString& units, const QStringList& elementNames);
     void initializeValues();
     qint32 pack(quint8* dataOut);
     qint32 unpack(const quint8* dataIn);

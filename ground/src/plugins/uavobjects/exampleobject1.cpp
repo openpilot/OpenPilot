@@ -37,17 +37,36 @@ ExampleObject1::ExampleObject1(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS,
 {
     // Create fields
     QList<UAVObjectField*> fields;
-    fields.append(new UAVObjectFieldInt8(QString("Field1"), QString("unit1"), 1));
-    fields.append(new UAVObjectFieldInt16(QString("Field2"), QString("unit2"), 1));
-    fields.append(new UAVObjectFieldInt32(QString("Field3"), QString("unit3"), 1));
-    fields.append(new UAVObjectFieldFloat(QString("Field4"), QString("unit4"), 4));
-    fields.append(new UAVObjectFieldUInt8(QString("Field5"), QString("unit5"), 1));
-    fields.append(new UAVObjectFieldUInt16(QString("Field6"), QString("unit6"), 1));
-    fields.append(new UAVObjectFieldUInt32(QString("Field7"), QString("unit7"), 1));
+    QStringList Field1ElemNames;
+    Field1ElemNames.append("[0]");
+    fields.append(new UAVObjectFieldInt8(QString("Field1"), QString("unit1"), Field1ElemNames));
+    QStringList Field2ElemNames;
+    Field2ElemNames.append("[0]");
+    fields.append(new UAVObjectFieldInt16(QString("Field2"), QString("unit2"), Field2ElemNames));
+    QStringList Field3ElemNames;
+    Field3ElemNames.append("[0]");
+    fields.append(new UAVObjectFieldInt32(QString("Field3"), QString("unit3"), Field3ElemNames));
+    QStringList Field4ElemNames;
+    Field4ElemNames.append("[0]");
+    Field4ElemNames.append("[1]");
+    Field4ElemNames.append("[2]");
+    Field4ElemNames.append("[3]");
+    fields.append(new UAVObjectFieldFloat(QString("Field4"), QString("unit4"), Field4ElemNames));
+    QStringList Field5ElemNames;
+    Field5ElemNames.append("[0]");
+    fields.append(new UAVObjectFieldUInt8(QString("Field5"), QString("unit5"), Field5ElemNames));
+    QStringList Field6ElemNames;
+    Field6ElemNames.append("[0]");
+    fields.append(new UAVObjectFieldUInt16(QString("Field6"), QString("unit6"), Field6ElemNames));
+    QStringList Field7ElemNames;
+    Field7ElemNames.append("[0]");
+    fields.append(new UAVObjectFieldUInt32(QString("Field7"), QString("unit7"), Field7ElemNames));
+    QStringList Field8ElemNames;
+    Field8ElemNames.append("[0]");
     QStringList Field8EnumOptions;
     Field8EnumOptions.append("Option1");
     Field8EnumOptions.append("Option2");
-    fields.append(new UAVObjectFieldEnum(QString("Field8"), QString("unit8"), 1, Field8EnumOptions));
+    fields.append(new UAVObjectFieldEnum(QString("Field8"), QString("unit8"), Field8ElemNames, Field8EnumOptions));
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

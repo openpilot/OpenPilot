@@ -36,6 +36,12 @@ UAVObjectFieldUInt32::UAVObjectFieldUInt32(const QString& name, const QString& u
     numBytesPerElement = sizeof(quint32);
 }
 
+UAVObjectFieldUInt32::UAVObjectFieldUInt32(const QString& name, const QString& units, const QStringList& elementNames):
+        UAVObjectField(name, units, elementNames)
+{
+    numBytesPerElement = sizeof(quint32);
+}
+
 /**
  * Initialize all values
  */

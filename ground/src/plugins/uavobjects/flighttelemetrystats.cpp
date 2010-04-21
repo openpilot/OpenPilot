@@ -37,15 +37,27 @@ FlightTelemetryStats::FlightTelemetryStats(): UAVDataObject(OBJID, ISSINGLEINST,
 {
     // Create fields
     QList<UAVObjectField*> fields;
+    QStringList ConnectedElemNames;
+    ConnectedElemNames.append("[0]");
     QStringList ConnectedEnumOptions;
     ConnectedEnumOptions.append("True");
     ConnectedEnumOptions.append("False");
-    fields.append(new UAVObjectFieldEnum(QString("Connected"), QString("bool"), 1, ConnectedEnumOptions));
-    fields.append(new UAVObjectFieldFloat(QString("TxDataRate"), QString("bytes/sec"), 1));
-    fields.append(new UAVObjectFieldFloat(QString("RxDataRate"), QString("bytes/sec"), 1));
-    fields.append(new UAVObjectFieldUInt32(QString("TxFailures"), QString("count"), 1));
-    fields.append(new UAVObjectFieldUInt32(QString("RxFailures"), QString("count"), 1));
-    fields.append(new UAVObjectFieldUInt32(QString("TxRetries"), QString("count"), 1));
+    fields.append(new UAVObjectFieldEnum(QString("Connected"), QString("bool"), ConnectedElemNames, ConnectedEnumOptions));
+    QStringList TxDataRateElemNames;
+    TxDataRateElemNames.append("[0]");
+    fields.append(new UAVObjectFieldFloat(QString("TxDataRate"), QString("bytes/sec"), TxDataRateElemNames));
+    QStringList RxDataRateElemNames;
+    RxDataRateElemNames.append("[0]");
+    fields.append(new UAVObjectFieldFloat(QString("RxDataRate"), QString("bytes/sec"), RxDataRateElemNames));
+    QStringList TxFailuresElemNames;
+    TxFailuresElemNames.append("[0]");
+    fields.append(new UAVObjectFieldUInt32(QString("TxFailures"), QString("count"), TxFailuresElemNames));
+    QStringList RxFailuresElemNames;
+    RxFailuresElemNames.append("[0]");
+    fields.append(new UAVObjectFieldUInt32(QString("RxFailures"), QString("count"), RxFailuresElemNames));
+    QStringList TxRetriesElemNames;
+    TxRetriesElemNames.append("[0]");
+    fields.append(new UAVObjectFieldUInt32(QString("TxRetries"), QString("count"), TxRetriesElemNames));
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

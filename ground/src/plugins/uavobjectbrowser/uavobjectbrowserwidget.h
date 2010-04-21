@@ -65,7 +65,7 @@ private:
     Ui_UAVObjectBrowser *m_browser;
     UAVObjectTreeModel *m_model;
 
-    void updateSettings(SettingsPersistence::OperationEnum op);
+    void updateSettings(SettingsPersistence::OperationOptions op);
     void enableSendRequest(bool enable);
     ObjectTreeItem *findCurrentObjectTreeItem();
 };

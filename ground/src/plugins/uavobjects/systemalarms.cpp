@@ -37,22 +37,17 @@ SystemAlarms::SystemAlarms(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAM
 {
     // Create fields
     QList<UAVObjectField*> fields;
-    QStringList TypeEnumOptions;
-    TypeEnumOptions.append("None");
-    TypeEnumOptions.append("StackOverflow");
-    TypeEnumOptions.append("OutOfMemory");
-    fields.append(new UAVObjectFieldEnum(QString("Type"), QString(""), 1, TypeEnumOptions));
-    QStringList SeverityEnumOptions;
-    SeverityEnumOptions.append("Info");
-    SeverityEnumOptions.append("Warning");
-    SeverityEnumOptions.append("Error");
-    SeverityEnumOptions.append("Critical");
-    fields.append(new UAVObjectFieldEnum(QString("Severity"), QString(""), 1, SeverityEnumOptions));
-    QStringList ActiveEnumOptions;
-    ActiveEnumOptions.append("True");
-    ActiveEnumOptions.append("False");
-    fields.append(new UAVObjectFieldEnum(QString("Active"), QString("bool"), 1, ActiveEnumOptions));
-    fields.append(new UAVObjectFieldUInt32(QString("Info"), QString(""), 1));
+    QStringList AlarmElemNames;
+    AlarmElemNames.append("OutOfMemory");
+    AlarmElemNames.append("StackOverflow");
+    AlarmElemNames.append("CPUOverload");
+    AlarmElemNames.append("EventSystem");
+    QStringList AlarmEnumOptions;
+    AlarmEnumOptions.append("None");
+    AlarmEnumOptions.append("Warning");
+    AlarmEnumOptions.append("Error");
+    AlarmEnumOptions.append("Critical");
+    fields.append(new UAVObjectFieldEnum(QString("Alarm"), QString(""), AlarmElemNames, AlarmEnumOptions));
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
@@ -65,10 +60,10 @@ UAVObject::Metadata SystemAlarms::getDefaultMetadata()
     metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
     metadata.gcsTelemetryUpdatePeriod = 0;
     metadata.flightTelemetryAcked = 1;
-    metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
-    metadata.flightTelemetryUpdatePeriod = 0;
-    metadata.loggingUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
-    metadata.loggingUpdatePeriod = 0;
+    metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+    metadata.flightTelemetryUpdatePeriod = 4000;
+    metadata.loggingUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+    metadata.loggingUpdatePeriod = 1000;
     return metadata;
 }
 

@@ -161,7 +161,7 @@ void UAVObjectTreeModel::addSingleField(int index, UAVObjectField *field, TreeIt
     if (field->getNumElements() == 1)
         data.append(field->getName());
     else
-        data.append(QString("[%1]").arg(index));
+        data.append((field->getElementNames())[index]);
     UAVObjectFieldEnum *enumField = dynamic_cast<UAVObjectFieldEnum*>(field);
     UAVObjectFieldInt8 *int8Field = dynamic_cast<UAVObjectFieldInt8*>(field);
     UAVObjectFieldInt16 *int16Field = dynamic_cast<UAVObjectFieldInt16*>(field);

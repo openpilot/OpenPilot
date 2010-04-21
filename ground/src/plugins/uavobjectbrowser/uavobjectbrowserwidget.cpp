@@ -121,7 +121,7 @@ void UAVObjectBrowserWidget::readSettings()
     updateSettings(SettingsPersistence::OPERATION_LOAD);
 }
 
-void UAVObjectBrowserWidget::updateSettings(SettingsPersistence::OperationEnum op)
+void UAVObjectBrowserWidget::updateSettings(SettingsPersistence::OperationOptions op)
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();

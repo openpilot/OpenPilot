@@ -45,7 +45,8 @@ public:
     } __attribute__((packed)) DataFields;
 
     // Enumeration types
-    typedef enum { OPERATION_LOAD=0, OPERATION_SAVE=1,  } OperationEnum;
+    /* Enumeration options for field Operation */
+    typedef enum { OPERATION_LOAD=0, OPERATION_SAVE=1,  } OperationOptions;
 
   
     // Constants

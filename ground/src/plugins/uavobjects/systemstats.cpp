@@ -37,9 +37,15 @@ SystemStats::SystemStats(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
 {
     // Create fields
     QList<UAVObjectField*> fields;
-    fields.append(new UAVObjectFieldUInt32(QString("FlightTime"), QString("ms"), 1));
-    fields.append(new UAVObjectFieldUInt16(QString("HeapRemaining"), QString("bytes"), 1));
-    fields.append(new UAVObjectFieldUInt8(QString("CPULoad"), QString("%"), 1));
+    QStringList FlightTimeElemNames;
+    FlightTimeElemNames.append("[0]");
+    fields.append(new UAVObjectFieldUInt32(QString("FlightTime"), QString("ms"), FlightTimeElemNames));
+    QStringList HeapRemainingElemNames;
+    HeapRemainingElemNames.append("[0]");
+    fields.append(new UAVObjectFieldUInt16(QString("HeapRemaining"), QString("bytes"), HeapRemainingElemNames));
+    QStringList CPULoadElemNames;
+    CPULoadElemNames.append("[0]");
+    fields.append(new UAVObjectFieldUInt8(QString("CPULoad"), QString("%"), CPULoadElemNames));
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

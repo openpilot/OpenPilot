@@ -52,7 +52,8 @@ public:
     } __attribute__((packed)) DataFields;
 
     // Enumeration types
-    typedef enum { FIELD8_OPTION1=0, FIELD8_OPTION2=1,  } Field8Enum;
+    /* Enumeration options for field Field8 */
+    typedef enum { FIELD8_OPTION1=0, FIELD8_OPTION2=1,  } Field8Options;
 
   
     // Constants

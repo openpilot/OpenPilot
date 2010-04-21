@@ -36,6 +36,12 @@ UAVObjectFieldInt16::UAVObjectFieldInt16(const QString& name, const QString& uni
     numBytesPerElement = sizeof(qint16);
 }
 
+UAVObjectFieldInt16::UAVObjectFieldInt16(const QString& name, const QString& units, const QStringList& elementNames):
+        UAVObjectField(name, units, elementNames)
+{
+    numBytesPerElement = sizeof(qint16);
+}
+
 /**
  * Initialize all values
  */

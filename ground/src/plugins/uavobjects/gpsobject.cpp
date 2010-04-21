@@ -37,11 +37,21 @@ GpsObject::GpsObject(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
 {
     // Create fields
     QList<UAVObjectField*> fields;
-    fields.append(new UAVObjectFieldFloat(QString("Latitude"), QString("degrees"), 1));
-    fields.append(new UAVObjectFieldFloat(QString("Longitude"), QString("degrees"), 1));
-    fields.append(new UAVObjectFieldFloat(QString("Altitude"), QString("meters"), 1));
-    fields.append(new UAVObjectFieldInt8(QString("Satellites"), QString(""), 1));
-    fields.append(new UAVObjectFieldUInt16(QString("Updates"), QString(""), 1));
+    QStringList LatitudeElemNames;
+    LatitudeElemNames.append("[0]");
+    fields.append(new UAVObjectFieldFloat(QString("Latitude"), QString("degrees"), LatitudeElemNames));
+    QStringList LongitudeElemNames;
+    LongitudeElemNames.append("[0]");
+    fields.append(new UAVObjectFieldFloat(QString("Longitude"), QString("degrees"), LongitudeElemNames));
+    QStringList AltitudeElemNames;
+    AltitudeElemNames.append("[0]");
+    fields.append(new UAVObjectFieldFloat(QString("Altitude"), QString("meters"), AltitudeElemNames));
+    QStringList SatellitesElemNames;
+    SatellitesElemNames.append("[0]");
+    fields.append(new UAVObjectFieldInt8(QString("Satellites"), QString(""), SatellitesElemNames));
+    QStringList UpdatesElemNames;
+    UpdatesElemNames.append("[0]");
+    fields.append(new UAVObjectFieldUInt16(QString("Updates"), QString(""), UpdatesElemNames));
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

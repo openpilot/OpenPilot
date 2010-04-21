@@ -30,6 +30,7 @@
 
 #include "uavobjects_global.h"
 #include "uavobject.h"
+#include <QStringList>
 
 class UAVObject;
 
@@ -39,12 +40,14 @@ class UAVOBJECTS_EXPORT UAVObjectField: public QObject
 
 public:
     UAVObjectField(const QString& name, const QString& units, quint32 numElements);
+    UAVObjectField(const QString& name, const QString& units, const QStringList& elementNames);
     void initialize(quint8* data, quint32 dataOffset, UAVObject* obj);
     virtual void initializeValues() = 0;
     UAVObject* getObject();
     QString getName();
     QString getUnits();
     quint32 getNumElements();
+    QStringList getElementNames();
     virtual qint32 pack(quint8* dataOut) = 0;
     virtual qint32 unpack(const quint8* dataIn) = 0;
     virtual double getDouble(quint32 index = 0) = 0;
@@ -60,6 +63,7 @@ signals:
 protected:
     QString name;
     QString units;
+    QStringList elementNames;
     quint32 numElements;
     quint32 offset;
     quint8* data;

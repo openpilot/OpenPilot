@@ -50,7 +50,8 @@ public:
     } __attribute__((packed)) DataFields;
 
     // Enumeration types
-    typedef enum { CONNECTED_TRUE=0, CONNECTED_FALSE=1,  } ConnectedEnum;
+    /* Enumeration options for field Connected */
+    typedef enum { CONNECTED_TRUE=0, CONNECTED_FALSE=1,  } ConnectedOptions;
 
   
     // Constants

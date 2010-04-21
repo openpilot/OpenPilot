@@ -64,7 +64,9 @@ public:
         QString units;
         FieldType type;
         int numElements;
+        QStringList elementNames;
         QStringList options; // for enums only
+        bool defaultElementNames;
     } FieldInfo;
 
     typedef struct {

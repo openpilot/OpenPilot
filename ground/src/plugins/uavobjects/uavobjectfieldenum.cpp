@@ -29,8 +29,15 @@
 #include "uavobjectfieldenum.h"
 #include <QtEndian>
 
-UAVObjectFieldEnum::UAVObjectFieldEnum(const QString& name, const QString& units, quint32 numElements, QStringList& options):
+UAVObjectFieldEnum::UAVObjectFieldEnum(const QString& name, const QString& units, quint32 numElements, const QStringList& options):
         UAVObjectField(name, units, numElements)
+{
+    numBytesPerElement = sizeof(quint8);
+    this->options = options;
+}
+
+UAVObjectFieldEnum::UAVObjectFieldEnum(const QString& name, const QString& units, const QStringList& elementNames, const QStringList& options):
+        UAVObjectField(name, units, elementNames)
 {
     numBytesPerElement = sizeof(quint8);
     this->options = options;

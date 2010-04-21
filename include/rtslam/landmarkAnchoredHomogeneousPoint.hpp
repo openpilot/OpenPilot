@@ -47,6 +47,7 @@ namespace jafar {
 					return 7;
 				}
 
+				//TODO remove all templates from LmkAhp class.
 
 				/**
 				 * From-frame transform.

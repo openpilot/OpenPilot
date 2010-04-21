@@ -8,6 +8,7 @@
 #ifndef APPEARANCEABSTRACT_H_
 #define APPEARANCEABSTRACT_H_
 
+
 namespace jafar {
 	namespace rtslam {
 

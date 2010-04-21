@@ -28,8 +28,6 @@ void test_raw01(void) {
 	cout << "\n% TEST OF RAW STRUCTURE\n% ==============" << endl;
 	RawImageSimu    imgSimu  ;
 	cout << imgSimu << endl ;
-//	FeaturePoint fp1   ;
-//	imgSimu.addFeature( fp1 ) ;
 
 }
 

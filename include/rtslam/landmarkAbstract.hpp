@@ -32,6 +32,7 @@
 // include parents
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/mapObject.hpp"
+#include "rtslam/DescriptorAbstract.h"
 
 namespace jafar {
 	namespace rtslam {
@@ -39,21 +40,6 @@ namespace jafar {
 
 		// Forward declarations of children
 		class ObservationAbstract;
-
-		/** Base class for all landmark descriptors defined in the module rtslam.
-		 *
-		 * \author jsola@laas.fr
-		 * \ingroup rtslam
-		 */
-		class DescriptorAbstract {
-
-			public:
-				/**
-				 * Mandatory virtual destructor
-				 */
-				virtual ~DescriptorAbstract() {
-				}
-		};
 
 
 		/** Base class for all landmarks defined in the module

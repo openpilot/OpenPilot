@@ -45,8 +45,7 @@ void test_robotOdo01() {
 
 	map_ptr_t mapPtr(new MapAbstract(100));
 	odo_ptr_t robPtr(new RobotOdometry(mapPtr));
-	mapPtr->linkToRobot(robPtr);
-	robPtr->linkToMap(mapPtr);
+	robPtr->linkToParentMap(mapPtr);
 
 	mapPtr->fillRndm();
 

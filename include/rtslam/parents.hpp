@@ -9,6 +9,7 @@
 #define __rtslam_parents_H__
 
 #include <list>
+#include <vector>
 #include <iostream>
 #include <boost/smart_ptr.hpp>
 
@@ -33,7 +34,7 @@ template<class Child>
 class ParentOf {
 public:
 	typedef boost::shared_ptr<Child> Child_ptr;
-	typedef std::list<Child_ptr> ChildList;
+	typedef std::vector<Child_ptr> ChildList;
 
 public:
 	ChildList childList;
@@ -284,11 +285,25 @@ public:
     ptr->ParentOf<Child>::registerChild(shared_from_this());         \
   }
 
+#define ENABLE_LINK_TO_SPECIFIC_PARENT(ParentGen,ParentSpec,name,Child)         \
+		public: void linkToParent##name( const boost::shared_ptr<ParentGen>& ptr )  \
+  {                                                                             \
+    ChildOf<ParentGen>::linkToParent( ptr );                                    \
+    SpecificChildOf<ParentSpec>::linkToParentSpecific( ptr );                   \
+    ptr->ParentOf<Child>::registerChild(shared_from_this());                    \
+  }                                                                             \
+  void linkToParent##name( const boost::shared_ptr<ParentSpec>& ptr )           \
+  {                                                                             \
+    ChildOf<ParentGen>::linkToParent( ptr );                                    \
+    SpecificChildOf<ParentSpec>::linkToParentSpecific( ptr );                   \
+    ptr->ParentOf<Child>::registerChild(shared_from_this());                    \
+  }
+
 /* Define three accessors (to the pointer and to the const/non-const reference)
  * with names <ACCESS>Ptr() and <ACCESS>().
  */
 #define ENABLE_ACCESS_TO_SPECIFIC_PARENT(Parent,accessName)         \
-		public: boost::shared_ptr<Parent> accessName##Ptr( void )                 \
+		public: boost::shared_ptr<Parent> accessName##Ptr( void )       \
   {  return SpecificChildOf<Parent>::parentPtr(); }                 \
   Parent& accessName( void )                                        \
   {    return SpecificChildOf<Parent>::parent();  }                 \

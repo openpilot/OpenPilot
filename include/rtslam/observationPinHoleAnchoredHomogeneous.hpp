@@ -15,7 +15,7 @@
 #include "rtslam/observationAbstract.hpp"
 #include "rtslam/sensorPinHole.hpp"
 #include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
-
+#include "rtslam/parents.hpp"
 #include "boost/shared_ptr.hpp"
 
 namespace jafar {
@@ -30,14 +30,23 @@ namespace jafar {
 		 * \author jsola@laas.fr
 		 * \ingroup rtslam
 		 */
-		class ObservationPinHoleAnchoredHomogeneousPoint: public ObservationAbstract {
+		class ObservationPinHoleAnchoredHomogeneousPoint: public ObservationAbstract,
+		    public SpecificChildOf<SensorPinHole> ,
+		    public SpecificChildOf<LandmarkAnchoredHomogeneousPoint> {
+
+
+			// Define the function linkToParentPinHole.
+			ENABLE_LINK_TO_SPECIFIC_PARENT(SensorAbstract,SensorPinHole,PinHole,ObservationAbstract);
+			// Define the functions pinHole() and pinHolePtr().
+			ENABLE_ACCESS_TO_SPECIFIC_PARENT(SensorPinHole,pinHole);
+			// Define the function linkToParentAHP.
+			ENABLE_LINK_TO_SPECIFIC_PARENT(LandmarkAbstract,LandmarkAnchoredHomogeneousPoint,AHP,ObservationAbstract);
+			// Define the functions ahp() and ahpPtr().
+			ENABLE_ACCESS_TO_SPECIFIC_PARENT(LandmarkAnchoredHomogeneousPoint,ahp);
+
 			public:
 
 				ObservationPinHoleAnchoredHomogeneousPoint(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & ahpPtr);
-				void link(const sensor_ptr_t & _senPtr, const landmark_ptr_t & _lmkPtr); ///< Link to sensor and landmark
-
-				pinhole_ptr_t pinHolePtr; ///<  Use this pointer to downcast the SensorAbstract into SensorPinHole type.
-				ahp_ptr_t ahpPtr; ///<          Use this pointer to downcast the LandmarkAbstract into LandmarkAnchoredHomogeneousPoint type.
 
 				/**
 				 * Projection function, with Jacobians and non-observable part.
@@ -48,7 +57,6 @@ namespace jafar {
 				 */
 				void backProject_func();
 
-
 				/**
 				 * Predict visibility.
 				 *
@@ -57,8 +65,6 @@ namespace jafar {
 				 * \return true if landmark is predicted visible.
 				 */
 				virtual bool predictVisibility();
-
-
 
 		};
 

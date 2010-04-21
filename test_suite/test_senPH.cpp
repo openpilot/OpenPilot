@@ -34,18 +34,27 @@ using namespace jafar::jmath;
 
 void test_senPH01(void) {
 
+  std::cout<<"#"<<__LINE__<<std::endl;
 	map_ptr_t mapPtr(new MapAbstract(100));
+  std::cout<<"#"<<__LINE__<<std::endl;
 	constvel_ptr_t robPtr(new RobotConstantVelocity(mapPtr));
+	robPtr->linkToParentMap(mapPtr);
+	std::cout<<"#"<<__LINE__<<std::endl;
 	pinhole_ptr_t senPtr(new SensorPinHole(robPtr, true));
+	senPtr->linkToParentRobot(robPtr);
+  std::cout<<"#"<<__LINE__<<std::endl;
 
 	vec3 v;
+  std::cout<<"#"<<__LINE__<<std::endl;
 	vec2 u;
+  std::cout<<"#"<<__LINE__<<std::endl;
 	mat23 U_v;
 	mat32 V_u;
 	mat V_s(3,1);
 	vec4 k;
 	vec d(2), c(2);
 
+  std::cout<<"#"<<__LINE__<<std::endl;
 	k(0) = 320;
 	k(1) = 240;
 	k(2) = 320;
@@ -56,11 +65,13 @@ void test_senPH01(void) {
 	c = d;
 	senPtr->set_parameters(k, d, c);
 
+  std::cout<<"#"<<__LINE__<<std::endl;
 	randVector(u);
 	u *= k(0);
 	double s = 2;
 
 
+  std::cout<<"#"<<__LINE__<<std::endl;
 	cout << "\n% BACK-PROJECTION \n%=====================\n" << endl;
 	pinhole::backProjectPoint(k, c, u, s, v, V_u, V_s);
 	cout << "k = " << (MATLAB) k << endl;

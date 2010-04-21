@@ -19,9 +19,11 @@
 #include "jmath/jblas.hpp"
 #include "rtslam/rtSlam.hpp"
 //include parents
+#include "rtslam/parents.hpp"
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/mapObject.hpp"
 #include "rtslam/robotAbstract.hpp"
+#include <boost/smart_ptr.hpp>
 
 namespace jafar {
 	namespace rtslam {
@@ -47,14 +49,24 @@ namespace jafar {
 		};
 
 
-
 		/**
 		 * Base class for all sensors defined in the module rtslam.
 		 * \ingroup rtslam
 		 */
-		class SensorAbstract: public MapObject {
+		class SensorAbstract: public MapObject, public ChildOf<RobotAbstract> , public boost::enable_shared_from_this<
+		    SensorAbstract>, public ParentOf<ObservationAbstract> {
 
 				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::SensorAbstract & sen);
+
+				// define the function linkToParentRobot().
+			ENABLE_LINK_TO_PARENT(RobotAbstract,Robot,SensorAbstract)
+				;
+				// define the functions robotPtr() and robot().
+			ENABLE_ACCESS_TO_PARENT(RobotAbstract,robot)
+				;
+				// define the type ObservationList, and the function observationList().
+			ENABLE_ACCESS_TO_CHILDREN(ObservationAbstract,Observation,observation)
+				;
 
 			public:
 
@@ -73,15 +85,6 @@ namespace jafar {
 				virtual ~SensorAbstract() {
 				}
 
-				/**
-				 * Parent robot
-				 */
-				robot_ptr_t robotPtr;
-
-				/**
-				 * A set of observations (one per landmark)
-				 */
-				observations_ptr_set_t observationsPtrSet;
 
 				/**
 				 * Sensor pose in robot
@@ -107,9 +110,6 @@ namespace jafar {
 
 			public:
 
-
-				void linkToObservation(const observation_ptr_t & _obsPtr); ///< Link to observation
-				void linkToRobot(const robot_ptr_t & _robPtr); ///<             Link to robot
 
 				/*
 				 * Acquire raw data.
@@ -139,7 +139,6 @@ namespace jafar {
 				 * \param mapPtr pointer to the slam map.
 				 */
 				landmark_ptr_t newLandmark(map_ptr_t & mapPtr);
-
 
 			public:
 

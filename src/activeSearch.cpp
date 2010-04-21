@@ -147,9 +147,9 @@ namespace jafar {
 
 		map<double, observation_ptr_t> ActiveSearch::projectAll(const sensor_ptr_t & senPtr, size_t & numVis) {
 			map<double, observation_ptr_t> visObs;
-			for (observations_ptr_set_t::iterator obsIter = senPtr->observationsPtrSet.begin(); obsIter
-			    != senPtr->observationsPtrSet.end(); obsIter++) {
-				observation_ptr_t obsPtr = obsIter->second;
+			for (SensorAbstract::ObservationList::iterator obsIter = senPtr->observationList().begin(); obsIter
+			    != senPtr->observationList().end(); obsIter++) {
+				observation_ptr_t obsPtr = *obsIter;
 				obsPtr->project();
 				obsPtr->predictVisibility();
 				if (obsPtr->isVisible()) {
@@ -163,10 +163,10 @@ namespace jafar {
 		void ActiveSearch::predictApp(const observation_ptr_t & obsPtr) {
 
 			// Get landmark descriptor
-			landmark_ptr_t lmkPtr = obsPtr->landmarkPtr;
+			landmark_ptr_t lmkPtr = obsPtr->landmarkPtr();
 
 			// Get the sensor's current global pose
-			vec7 senPose = obsPtr->sensorPtr->globalPose();
+			vec7 senPose = obsPtr->sensorPtr()->globalPose();
 		}
 
 		void ActiveSearch::scanObs(const observation_ptr_t & obsPtr, const ROI & roi) {

@@ -74,8 +74,7 @@ void test_rtslam01(void) {
 
 		robPtr->id(rid);
 		robPtr->name("SUBMARINE");
-		mapPtr->linkToRobot(robPtr);
-		robPtr->linkToMap(mapPtr);
+		robPtr->linkToParentMap(mapPtr);
 
 		if (mapPtr->unusedStates(size_senPH)) {
 			size_t sid = mapPtr->sensorIds.getId();
@@ -83,8 +82,7 @@ void test_rtslam01(void) {
 
 			senPtr->id(sid);
 			senPtr->name("FLEA");
-			robPtr->linkToSensor(senPtr);
-			senPtr->linkToRobot(robPtr);
+			senPtr->linkToParentRobot(robPtr);
 		}
 		if (mapPtr->unusedStates(size_senPH)) {
 			size_t sid = mapPtr->sensorIds.getId();
@@ -92,8 +90,7 @@ void test_rtslam01(void) {
 
 			senPtr->id(sid);
 			senPtr->name("MARLIN");
-			robPtr->linkToSensor(senPtr);
-			senPtr->linkToRobot(robPtr);
+			senPtr->linkToParentRobot(robPtr);
 		}
 	}
 
@@ -103,8 +100,7 @@ void test_rtslam01(void) {
 
 		robPtr->id(rid);
 		robPtr->name("AEROPLANE");
-		mapPtr->linkToRobot(robPtr);
-		robPtr->linkToMap(mapPtr);
+		robPtr->linkToParentMap(mapPtr);
 
 		if (mapPtr->unusedStates(size_senPH)) {
 			size_t sid = mapPtr->sensorIds.getId();
@@ -112,8 +108,7 @@ void test_rtslam01(void) {
 
 			senPtr->id(sid);
 			senPtr->name("VIDERE");
-			robPtr->linkToSensor(senPtr);
-			senPtr->linkToRobot(robPtr);
+			senPtr->linkToParentRobot(robPtr);
 		}
 	}
 
@@ -126,29 +121,25 @@ void test_rtslam01(void) {
 			lmkPtr->id(lid);
 			lmkPtr->name("");
 
-			mapPtr->linkToLandmark(lmkPtr);
-			lmkPtr->linkToMap(mapPtr);
+			lmkPtr->linkToParentMap(mapPtr);
 		}
 	}
 
 	// Add observations
-	robots_ptr_set_t::iterator robIter;
-	sensors_ptr_set_t::iterator senIter;
-	landmarks_ptr_set_t::iterator lmkIter;
-
-	for (robIter = mapPtr->robotsPtrSet.begin(); robIter != mapPtr->robotsPtrSet.end(); robIter++) {
-		robot_ptr_t robPtr = robIter->second;
-		for (senIter = robPtr->sensorsPtrSet.begin(); senIter != robPtr->sensorsPtrSet.end(); senIter++) {
-			sensor_ptr_t senPtr = senIter->second;
-			for(lmkIter = mapPtr->landmarksPtrSet.begin(); lmkIter != mapPtr->landmarksPtrSet.end(); lmkIter++){
-				landmark_ptr_t lmkPtr = lmkIter->second;
+	for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin(); robIter != mapPtr->robotList().end(); robIter++) {
+		robot_ptr_t robPtr = *robIter;
+		for (RobotAbstract::SensorList::iterator senIter = robPtr->sensorList().begin(); senIter != robPtr->sensorList().end(); senIter++) {
+			sensor_ptr_t senPtr = *senIter;
+			for(MapAbstract::LandmarkList::iterator lmkIter = mapPtr->landmarkList().begin(); lmkIter != mapPtr->landmarkList().end(); lmkIter++){
+				landmark_ptr_t lmkPtr = *lmkIter;
 				obs_ph_ahp_ptr_t obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint(senPtr, lmkPtr));
 				size_t id = 1000*senPtr->id() + lmkPtr->id();
 				obsPtr->id() = id;
 				//				obsPtr->linkToSensor(senPtr);
 				//				obsPtr->linkToLandmark(lmkPtr);
-				senPtr->linkToObservation(obsPtr);
-				lmkPtr->linkToObservation(obsPtr);
+				obsPtr->linkToParentAHP(lmkPtr);
+				obsPtr->linkToParentPinHole(senPtr);
+
 			}
 		}
 	}
@@ -156,39 +147,43 @@ void test_rtslam01(void) {
 
 	// Print all data
 	cout << "\n% ROBOTS, SENSORS AND OBSERVATIONS \n%==================================" << endl;
-	for (robIter = mapPtr->robotsPtrSet.begin(); robIter != mapPtr->robotsPtrSet.end(); robIter++) {
-		robot_ptr_t robPtr = robIter->second;
+	for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin(); robIter != mapPtr->robotList().end(); robIter++) {
+		robot_ptr_t robPtr = *robIter;
 		cout << *robPtr << endl;
-		for (senIter = robPtr->sensorsPtrSet.begin(); senIter != robPtr->sensorsPtrSet.end(); senIter++) {
-			sensor_ptr_t senPtr = senIter->second;
+		for (RobotAbstract::SensorList::iterator senIter = robPtr->sensorList().begin(); senIter != robPtr->sensorList().end(); senIter++) {
+			sensor_ptr_t senPtr = *senIter;
 			cout << *senPtr << endl;
-			for(lmkIter = mapPtr->landmarksPtrSet.begin(); lmkIter != mapPtr->landmarksPtrSet.end(); lmkIter++){
-				landmark_ptr_t lmkPtr = lmkIter->second;
+			for(MapAbstract::LandmarkList::iterator lmkIter = mapPtr->landmarkList().begin(); lmkIter != mapPtr->landmarkList().end(); lmkIter++){
+				landmark_ptr_t lmkPtr = *lmkIter;
 				size_t id = 1000*senPtr->id() + lmkPtr->id();
-				cout << *senPtr->observationsPtrSet[id] << endl;
+				//cout << *senPtr->observationsPtrSet[id] << endl;
+				cout << "obs id = " << id << endl;
+			}
+			for(SensorAbstract::ObservationList::iterator obsIter = senPtr->observationList().begin(); obsIter != senPtr->observationList().end(); obsIter++){
+				cout << **obsIter << endl;
 			}
 		}
 	}
 	cout << "\n% LANDMARKS \n%==========" << endl;
-	for (lmkIter = mapPtr->landmarksPtrSet.begin(); lmkIter != mapPtr->landmarksPtrSet.end(); lmkIter++) {
-		landmark_ptr_t lmkPtr = lmkIter->second;
+	for(MapAbstract::LandmarkList::iterator lmkIter = mapPtr->landmarkList().begin(); lmkIter != mapPtr->landmarkList().end(); lmkIter++){
+		landmark_ptr_t lmkPtr = *lmkIter;
 		cout << *lmkPtr << endl;
 	}
 
 	cout << "\n% POINTERS \n%=============" << endl;
 	cout << mapPtr << " <= mapPtr" << endl;
-	cout << mapPtr->robotsPtrSet[1]->mapPtr << " <= mapPtr->robots[1]->slamMap" << endl;
-	cout << mapPtr->robotsPtrSet[1]->sensorsPtrSet[1]->robotPtr->mapPtr << " <= mapPtr->robots[1]->sensors[1]->robot->slamMap" << endl;
-	cout << mapPtr->landmarksPtrSet[1]->mapPtr << " <= mapPtr->landmarks[1]->slamMap" << endl;
-	cout << mapPtr->robotsPtrSet[1] << " <= mapPtr->robots[1]" << endl;
-	cout << mapPtr->robotsPtrSet[1]->sensorsPtrSet[1] << " <= mapPtr->robots[1]->sensors[1]" << endl;
-	cout << mapPtr->robotsPtrSet[1]->sensorsPtrSet[2] << " <= mapPtr->robots[1]->sensors[2]" << endl;
-	cout << mapPtr->robotsPtrSet[2] << " <= mapPtr->robots[2]" << endl;
-	cout << mapPtr->robotsPtrSet[2]->sensorsPtrSet[3] << " <= mapPtr->robots[2]->sensors[3]" << endl;
-	cout << mapPtr->landmarksPtrSet[1] << " <= mapPtr->landmarks[1]" << endl;
-	cout << mapPtr->landmarksPtrSet[2] << " <= mapPtr->landmarks[2]" << endl;
-	cout << mapPtr->robotsPtrSet[1]->sensorsPtrSet[1]->observationsPtrSet[1001] << " <= mapPtr->robots[1]->sensors[1]->observations[1001]" << endl;
-	cout << mapPtr->landmarksPtrSet[1]->observationsPtrSet[1001] << " <= mapPtr->landmarks[2]->observations[1001]" << endl;
+	cout << mapPtr->robotList()[0]->mapPtr() << " <= mapPtr->robots[0]->slamMap" << endl;
+	cout << mapPtr->robotList()[0]->sensorList()[0]->robotPtr()->mapPtr() << " <= mapPtr->robots[0]->sensors[0]->robot->slamMap" << endl;
+	cout << mapPtr->landmarkList()[0]->mapPtr() << " <= mapPtr->landmarks[0]->slamMap" << endl;
+	cout << mapPtr->robotList()[0] << " <= mapPtr->robots[0]" << endl;
+	cout << mapPtr->robotList()[0]->sensorList()[0] << " <= mapPtr->robots[0]->sensors[0]" << endl;
+	cout << mapPtr->robotList()[0]->sensorList()[1] << " <= mapPtr->robots[0]->sensors[1]" << endl;
+	cout << mapPtr->robotList()[1] << " <= mapPtr->robots[1]" << endl;
+	cout << mapPtr->robotList()[1]->sensorList()[2] << " <= mapPtr->robots[1]->sensors[2]" << endl;
+	cout << mapPtr->landmarkList()[0] << " <= mapPtr->landmarks[0]" << endl;
+	cout << mapPtr->landmarkList()[1] << " <= mapPtr->landmarks[1]" << endl;
+	cout << mapPtr->robotList()[0]->sensorList()[0]->observationList()[0] << " <= mapPtr->robots[0]->sensors[0]->observations[0]" << endl;
+	cout << mapPtr->landmarkList()[0]->observationList()[0] << " <= mapPtr->landmarks[1]->observations[0]" << endl;
 
 	cout << "\nTHAT'S ALL, WHAT'S WRONG?" << endl;
 }

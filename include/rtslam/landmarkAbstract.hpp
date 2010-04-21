@@ -40,8 +40,10 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
+
 		// Forward declarations of children
 		class ObservationAbstract;
+
 
 		/** Base class for all landmark descriptors defined in the module rtslam.
 		 *
@@ -64,13 +66,21 @@ namespace jafar {
 		 *
 		 * @ingroup rtslam
 		 */
-		class LandmarkAbstract : public MapObject, public ChildOf<MapAbstract>, public boost::enable_shared_from_this<LandmarkAbstract> {
+		class LandmarkAbstract: public MapObject, public ChildOf<MapAbstract> , public boost::enable_shared_from_this<
+		    LandmarkAbstract>, public ParentOf<ObservationAbstract> {
+
+
+				// define the function linkToParentMap().
+			ENABLE_LINK_TO_PARENT(MapAbstract,Map,LandmarkAbstract)
+				;
+				// define the functions mapPtr() and map().
+			ENABLE_ACCESS_TO_PARENT(MapAbstract,map)
+				;
+				// define the type ObservationList, and the function observationList().
+			ENABLE_ACCESS_TO_CHILDREN(ObservationAbstract,Observation,observation)
+				;
 
 			public:
-
-			ENABLE_LINK_TO_PARENT(MapAbstract,Map,LandmarkAbstract); // define the function linkToParentMap().
-			ENABLE_ACCESS_TO_PARENT(MapAbstract,map); // define the functions mapPtr() and map().
-
 				/**
 				 * constructor from map and size
 				 */
@@ -82,12 +92,8 @@ namespace jafar {
 				virtual ~LandmarkAbstract() {
 				}
 
-				observations_ptr_set_t observationsPtrSet; ///<                 A set of observations (one per sensor)
-
 				// \todo use a smart pointer here.
 				DescriptorAbstract descriptor; ///<                       Landmark descriptor
-
-				void linkToObservation(const observation_ptr_t & _obsPtr); ///<   Link to observation
 
 		};
 

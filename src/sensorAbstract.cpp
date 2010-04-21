@@ -37,20 +37,17 @@ namespace jafar {
 				s << sen.name() << ", ";
 			s << "of type " << sen.type() << std::endl;
 			s << ".pose :  " << sen.pose << endl;
-			s << ".robot: [ " << sen.robotPtr->id() << " ]";
+			s << ".robot: [ " << sen.robot().id() << " ]";
 			if (sen.pose.storage() == sen.pose.REMOTE)
 				s << endl << " ia_rs: " << sen.ia_globalPose;
 			return s;
 		}
 
-
 		SensorAbstract::SensorAbstract(const robot_ptr_t & _robPtr, const bool inFilter = false) :
-			//          #check       ? # sensor in filter                                 : # not in filter
-			MapObject(inFilter       ? MapObject(_robPtr->mapPtr, 7)                  : 0),
-			robotPtr(_robPtr),
-			pose(inFilter            ? Gaussian(state, jmath::ublasExtra::ia_set(0, 7)) : Gaussian(7)),
-			ia_globalPose(inFilter   ? ia_union(_robPtr->pose.ia(), pose.ia())            : pose.ia())
-		{
+			    //          #check       ? # sensor in filter                                 : # not in filter
+			    MapObject(inFilter ? MapObject(_robPtr->mapPtr(), 7) : 0),
+			    pose(inFilter ? Gaussian(state, jmath::ublasExtra::ia_set(0, 7)) : Gaussian(7)),
+			    ia_globalPose(inFilter ? ia_union(_robPtr->pose.ia(), pose.ia()) : pose.ia()) {
 			categoryName("SENSOR");
 		}
 
@@ -73,17 +70,17 @@ namespace jafar {
 		}
 
 		void SensorAbstract::observeKnownLmks() {
-			for (observations_ptr_set_t::iterator obsIter = observationsPtrSet.begin(); obsIter != observationsPtrSet.end(); obsIter++) {
+			for (ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end(); obsIter++) {
 				cout << "processing raw" << endl;
 
-				observation_ptr_t obsPtr = obsIter->second;
+				observation_ptr_t obsPtr = *obsIter;
 				cout << "exploring obs: " << obsPtr->id() << endl;
 			}
 
 		}
 
 		void SensorAbstract::discoverNewLmks() {
-			map_ptr_t mapPtr = robotPtr->mapPtr;
+			map_ptr_t mapPtr = robot().mapPtr();
 			std::size_t size_lmkAHP = LandmarkAnchoredHomogeneousPoint::size();
 			if (mapPtr->unusedStates(size_lmkAHP)) {
 				landmark_ptr_t lmkPtr = newLandmark(mapPtr);
@@ -97,35 +94,28 @@ namespace jafar {
 			size_t lid = mapPtr->landmarkIds.getId();
 			lmkPtr->id(lid);
 			lmkPtr->name("");
-			mapPtr->linkToLandmark(lmkPtr);
-			lmkPtr->linkToMap(mapPtr);
+			lmkPtr->linkToParentMap(mapPtr);
 			return lmkPtr;
 		}
 
-		void SensorAbstract::linkToObservation(const observation_ptr_t & _obsPtr) {
-			observationsPtrSet[_obsPtr->id()] = _obsPtr;
-		}
-
-		void SensorAbstract::linkToRobot(const robot_ptr_t & _robPtr) {
-			robotPtr = _robPtr;
-		}
 
 		/*
 		 * Get sensor pose in global frame.
 		 */
 		vec7 SensorAbstract::globalPose() {
 			vec7 globPose;
-			jblas::vec7 robotPose = robotPtr->pose.x();
+			jblas::vec7 robotPose = robotPtr()->pose.x();
 			jblas::vec7 sensorPose = pose.x();
 			globPose = quaternion::composeFrames(robotPose, sensorPose);
 			return globPose;
 		}
 
+
 		/*
 		 * Get sensor pose in global frame.
 		 */
 		void SensorAbstract::globalPose(jblas::vec7 & senGlobalPos, jblas::mat & SG_rs) {
-			jblas::vec7 robotPose = robotPtr->pose.x();
+			jblas::vec7 robotPose = robotPtr()->pose.x();
 			jblas::vec7 sensorPose = pose.x();
 
 			if (pose.storage() == pose.LOCAL) {

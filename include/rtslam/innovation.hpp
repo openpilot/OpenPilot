@@ -10,8 +10,6 @@
  * \ingroup rtslam
  */
 
-//test
-
 #include "rtslam/expectation.hpp"
 #include "rtslam/measurement.hpp"
 #include "rtslam/gaussian.hpp"
@@ -22,8 +20,6 @@
 
 namespace jafar {
 	namespace rtslam {
-
-		// encore
 
 
 		/** Base class for all Gaussian innovations defined in the module rtslam.

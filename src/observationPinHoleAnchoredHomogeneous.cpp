@@ -26,19 +26,9 @@ namespace jafar {
 
 		ObservationPinHoleAnchoredHomogeneousPoint::ObservationPinHoleAnchoredHomogeneousPoint(
 		    const sensor_ptr_t & pinholePtr, const landmark_ptr_t & ahpPtr) :
-
-			ObservationAbstract(pinholePtr, ahpPtr, 2, pinholePtr->robotPtr->pose.size() + pinholePtr->state.size(), 1)
+		  ObservationAbstract(pinholePtr, ahpPtr, 2, pinholePtr->robotPtr()->pose.size() + pinholePtr->state.size(), 1)
 		{
 			categoryName("PINHOLE-AHP OBS");
-			link(pinholePtr, ahpPtr);
-		}
-
-		void ObservationPinHoleAnchoredHomogeneousPoint::link(const sensor_ptr_t & _senPtr, const landmark_ptr_t & _lmkPtr)
-		{ ///< Link to sensor and landmark
-			ObservationAbstract::link(_senPtr, _lmkPtr);
-			// Use this pointer below to access the pin-hole specific parameters.
-			pinHolePtr = boost::dynamic_pointer_cast<SensorPinHole>(sensorPtr);
-			ahpPtr = boost::dynamic_pointer_cast<LandmarkAnchoredHomogeneousPoint>(landmarkPtr);
 		}
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::project_func(const vec7 & sg, const vec & lmk, vec & exp,
@@ -57,7 +47,7 @@ namespace jafar {
 			//
 			// These functions below use the down-casted pointer because they need to know the particular object parameters and/or methods:
 			lmkAHP::toBearingOnlyFrame(sg, lmk, v, dist(0), V_sg, V_lmk);
-			pinhole::projectPoint(pinHolePtr->intrinsic, pinHolePtr->distortion, v, exp, EXP_v);
+			pinhole::projectPoint(pinHolePtr()->intrinsic, pinHolePtr()->distortion, v, exp, EXP_v);
 
 			// We perform Jacobian composition. We use the chain rule.
 			EXP_sg = prod(EXP_v, V_sg);
@@ -79,7 +69,7 @@ namespace jafar {
 			//
 			// These functions below use the down-casted pointer because they need to know the particular object parameters and/or methods:
 			mat V_1(3,1);
-			pinhole::backProjectPoint(pinHolePtr->intrinsic, pinHolePtr->correction, pix, 1.0, v, V_pix, V_1);
+			pinhole::backProjectPoint(pinHolePtr()->intrinsic, pinHolePtr()->correction, pix, 1.0, v, V_pix, V_1);
 			lmkAHP::fromBearingOnlyFrame(sg, v, invDist(0), ahp, AHP_sg, AHP_v, AHP_invDist);
 
 			// Here we apply the chain rule for composing Jacobians
@@ -89,7 +79,7 @@ namespace jafar {
 
 		bool ObservationPinHoleAnchoredHomogeneousPoint::predictVisibility()
 		{
-			bool inimg = pinhole::isInImage(expectation.x(), pinHolePtr->imgSize(0), pinHolePtr->imgSize(1));
+			bool inimg = pinhole::isInImage(expectation.x(), pinHolePtr()->imgSize(0), pinHolePtr()->imgSize(1));
 			bool infront = (expectation.nonObs(0) > 0.0);
 			events.visible = inimg && infront;
 			return events.visible;

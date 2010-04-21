@@ -32,9 +32,11 @@
 /* --------------------------------------------------------------------- */
 
 #include <jmath/jblas.hpp>
+#include <boost/smart_ptr.hpp>
 
 #include "rtslam/rtSlam.hpp"
 // include parents
+#include "rtslam/parents.hpp"
 #include "rtslam/objectAbstract.hpp"
 #include "rtslam/sensorAbstract.hpp"
 #include "rtslam/landmarkAbstract.hpp"
@@ -66,9 +68,25 @@ namespace jafar {
 		 *
 		 * \ingroup rtslam
 		 */
-		class ObservationAbstract: public ObjectAbstract {
+		class ObservationAbstract: public ObjectAbstract,
+		    public ChildOf<SensorAbstract> ,
+		    public ChildOf<LandmarkAbstract> ,
+		    public boost::enable_shared_from_this<ObservationAbstract> {
 
 				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObservationAbstract & obs);
+
+				// define the function linkToParentSensor().
+			ENABLE_LINK_TO_PARENT(SensorAbstract,Sensor,ObservationAbstract)
+				;
+				// define the functions sensorPtr() and sensor().
+			ENABLE_ACCESS_TO_PARENT(SensorAbstract,sensor)
+				;
+				// define the function linkToParentLandmark().
+			ENABLE_LINK_TO_PARENT(LandmarkAbstract,Landmark,ObservationAbstract)
+				;
+				// define the functions landmarkPtr() and landmark().
+			ENABLE_ACCESS_TO_PARENT(LandmarkAbstract,landmark)
+				;
 
 			public:
 
@@ -78,22 +96,18 @@ namespace jafar {
 				 * \param _size size of measurement space (used for measurement, expectation and innovation).
 				 */
 				ObservationAbstract(const sensor_ptr_t & _senPtr, const landmark_ptr_t & _lmkPtr, const size_t _size,
-				    const size_t size_nonobs = 0);
+				                    const size_t size_nonobs = 0);
 
 				/**
 				 * Sizes constructor
 				 */
 				ObservationAbstract(const sensor_ptr_t & _senPtr, const landmark_ptr_t & _lmkPtr, const size_t _size_meas,
-				    const size_t _size_exp, const size_t _size_inn, const size_t _size_nonobs = 0);
+				                    const size_t _size_exp, const size_t _size_inn, const size_t _size_nonobs = 0);
 
 				virtual ~ObservationAbstract()
 				{
 				}
 
-
-				// Links
-				sensor_ptr_t sensorPtr; ///<       Mother Sensor where it was acquired from
-				landmark_ptr_t landmarkPtr; ///<   Father Landmark where it points to
 
 				// Data
 				Expectation expectation;
@@ -133,11 +147,6 @@ namespace jafar {
 						bool matched; ///< 		Feature is matched
 						bool updated; ///< 		Landmark is updated
 				} events;
-
-				/**
-				 * Establish links with parents
-				 */
-				void link(const sensor_ptr_t & _senPtr, const landmark_ptr_t & _lmkPtr); ///< Link to sensor and landmark
 
 				/**
 				 * Project and get Jacobians.

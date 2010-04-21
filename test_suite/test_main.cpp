@@ -54,8 +54,7 @@ robot_ptr_t newRobot(map_ptr_t & mapPtr, string name) {
 	constvel_ptr_t robPtr(new RobotConstantVelocity(mapPtr));
 	robPtr->id(rid);
 	robPtr->name(name);
-	mapPtr->linkToRobot(robPtr);
-	robPtr->linkToMap(mapPtr);
+	robPtr->linkToParentMap(mapPtr);
 	cout << "    added rob: " << robPtr->id() << endl;
 	return robPtr;
 }
@@ -66,15 +65,14 @@ robot_ptr_t newRobot(map_ptr_t & mapPtr, string name) {
  * \param inInMap flag to estimate robot pose within the SLAM EKF.
  */
 sensor_ptr_t newSensor(robot_ptr_t & robPtr, string name, bool isInMap = false) {
-	map_ptr_t mapPtr = robPtr->mapPtr;
+	map_ptr_t mapPtr = robPtr->mapPtr();
 
 	size_t sid = mapPtr->sensorIds.getId();
 	pinhole_ptr_t senPtr(new SensorPinHole(robPtr, isInMap));
 
 	senPtr->id(sid);
 	senPtr->name(name);
-	robPtr->linkToSensor(senPtr);
-	senPtr->linkToRobot(robPtr);
+	senPtr->linkToParentRobot(robPtr);
 	cout << "    added sen: " << senPtr->id() << endl;
 	return senPtr;
 }
@@ -181,8 +179,8 @@ void test_main01() {
 
 
 	// setup: add a robot with 2 sensors
-	for (robots_ptr_set_t::iterator robIter = mapPtr->robotsPtrSet.begin(); robIter != mapPtr->robotsPtrSet.end(); robIter++) {
-		robot_ptr_t robPtr = robIter->second;
+	for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin(); robIter != mapPtr->robotList().end(); robIter++) {
+		robot_ptr_t robPtr = *robIter;
 
 		motionSetup(robPtr, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1);
 		// set robot control to some easy value
@@ -196,9 +194,9 @@ void test_main01() {
 
 	for (double t = 0; t < t_end; t += dt) { // start SLAM time loop
 		cout << " o-----> Time: " << t << endl;
-		for (robots_ptr_set_t::iterator robIter = mapPtr->robotsPtrSet.begin(); robIter != mapPtr->robotsPtrSet.end(); robIter++) { // loop robots
+		for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin(); robIter != mapPtr->robotList().end(); robIter++) { // loop robots
 
-			robot_ptr_t robPtr = robIter->second;
+			robot_ptr_t robPtr = *robIter;
 			cout << "exploring rob: " << robPtr->id() << endl;
 			robPtr->move();
 			robPtr->exploreSensors();
@@ -211,15 +209,15 @@ void test_main01() {
 	mat SG_rs_local(7,7);
 	mat SG_rs_remote(7,14);
 
-	mapPtr->robotsPtrSet[1]->sensorsPtrSet[1]->globalPose(sg_local, SG_rs_local);
-	mapPtr->robotsPtrSet[1]->sensorsPtrSet[2]->globalPose(sg_remote, SG_rs_remote);
+	mapPtr->robotList()[0]->sensorList()[0]->globalPose(sg_local, SG_rs_local);
+	mapPtr->robotList()[0]->sensorList()[1]->globalPose(sg_remote, SG_rs_remote);
 
 	cout << "sg_local  = " << sg_local << endl;
 	cout << "SG_rs_local  = " << SG_rs_local << endl;
-	cout << "sg_local.ia_rsl = " << mapPtr->robotsPtrSet[1]->sensorsPtrSet[1]->ia_globalPose << endl;
+	cout << "sg_local.ia_rsl = " << mapPtr->robotList()[0]->sensorList()[0]->ia_globalPose << endl;
 	cout << "sg_remote = " << sg_remote << endl;
 	cout << "SG_rs_remote = " << SG_rs_remote << endl;
-	cout << "sg_local.ia_rsl = " << mapPtr->robotsPtrSet[1]->sensorsPtrSet[2]->ia_globalPose << endl;
+	cout << "sg_local.ia_rsl = " << mapPtr->robotList()[0]->sensorList()[1]->ia_globalPose << endl;
 
 	cout << "\n THAT'S ALL, WHAT'S WRONG? " << endl;
 

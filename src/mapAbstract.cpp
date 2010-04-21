@@ -15,6 +15,7 @@
 #include <boost/shared_ptr.hpp>
 #include "jmath/random.hpp"
 
+#include "rtslam/rtSlam.hpp"
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/robotAbstract.hpp"
 #include "rtslam/landmarkAbstract.hpp"
@@ -51,14 +52,6 @@ namespace jafar {
 			return filter.P(i, j);
 		}
 
-		void MapAbstract::linkToRobot(const robot_ptr_t & _robPtr) {
-			robotsPtrSet[_robPtr->id()] = _robPtr;
-		}
-
-		void MapAbstract::linkToLandmark(const landmark_ptr_t & _lmkPtr) {
-			landmarksPtrSet[_lmkPtr->id()] = _lmkPtr;
-		}
-
 		jblas::ind_array MapAbstract::reserveStates(const std::size_t N) {
 			if (unusedStates(N)) {
 				jblas::ind_array res = jmath::ublasExtra::ia_pushfront(used_states, N);
@@ -80,11 +73,11 @@ namespace jafar {
 		}
 
 		void MapAbstract::addObservations(landmark_ptr_t & lmkPtr) {
-			for (robots_ptr_set_t::iterator robIter = robotsPtrSet.begin(); robIter != robotsPtrSet.end(); robIter++) {
-				robot_ptr_t robPtr = robIter->second;
-				for (sensors_ptr_set_t::iterator senIter = robPtr->sensorsPtrSet.begin(); senIter
-				    != robPtr->sensorsPtrSet.end(); senIter++) {
-					sensor_ptr_t senPtr = senIter->second;
+			for (RobotList::iterator robIter = robotList().begin(); robIter != robotList().end(); robIter++) {
+				robot_ptr_t robPtr = *robIter;
+				for (RobotAbstract::SensorList::iterator senIter = robPtr->sensorList().begin(); senIter
+				    != robPtr->sensorList().end(); senIter++) {
+					sensor_ptr_t senPtr = *senIter;
 					observation_ptr_t obsPtr = newObservation(senPtr, lmkPtr);
 					cout << "    added obs: " << obsPtr->id() << endl;
 				}
@@ -112,13 +105,11 @@ namespace jafar {
 		}
 
 		observation_ptr_t MapAbstract::newObservation(sensor_ptr_t & senPtr, landmark_ptr_t & lmkPtr) {
-			boost::shared_ptr<ObservationPinHoleAnchoredHomogeneousPoint> obsPtr(
-			    new ObservationPinHoleAnchoredHomogeneousPoint(senPtr, lmkPtr));
+			observation_ptr_t obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint(senPtr, lmkPtr));
 			//	obsPtr->id() = 0;
 			obsPtr->id() = 1000 * senPtr->id() + lmkPtr->id();
-			obsPtr->link(senPtr, lmkPtr);
-			senPtr->linkToObservation(obsPtr);
-			lmkPtr->linkToObservation(obsPtr);
+			obsPtr->linkToParentSensor(senPtr);
+			obsPtr->linkToParentLandmark(lmkPtr);
 
 			return obsPtr;
 		}
@@ -133,28 +124,26 @@ namespace jafar {
 		 * - landmarks
 		 *   - observations of landmark from each sensor
 		 */
-		std::ostream& operator <<(std::ostream & s, jafar::rtslam::MapAbstract & map) {
-
-			robots_ptr_set_t::iterator robIter;
-			sensors_ptr_set_t::iterator senIter;
-			landmarks_ptr_set_t::iterator lmkIter;
-			observations_ptr_set_t::iterator obsIter;
+		std::ostream& operator <<(std::ostream & s, const jafar::rtslam::MapAbstract & map) {
 
 			s << "\n% ROBOTS AND SENSORS \n%=========================" << endl;
-			for (robIter = map.robotsPtrSet.begin(); robIter != map.robotsPtrSet.end(); robIter++) {
-				robot_ptr_t robPtr = robIter->second;
+			for (MapAbstract::RobotList::const_iterator robIter = map.robotList().begin(); robIter != map.robotList().end(); robIter++) {
+				robot_ptr_t robPtr = *robIter;
 				s << *robPtr << endl;
-				for (senIter = robPtr->sensorsPtrSet.begin(); senIter != robPtr->sensorsPtrSet.end(); senIter++) {
-					sensor_ptr_t senPtr = senIter->second;
+				for (RobotAbstract::SensorList::const_iterator senIter = robPtr->sensorList().begin(); senIter
+				    != robPtr->sensorList().end(); senIter++) {
+					sensor_ptr_t senPtr = *senIter;
 					s << *senPtr << endl;
 				}
 			}
 			s << "\n% LANDMARKS AND OBSERVATIONS \n%==========================" << endl;
-			for (lmkIter = map.landmarksPtrSet.begin(); lmkIter != map.landmarksPtrSet.end(); lmkIter++) {
-				landmark_ptr_t lmkPtr = lmkIter->second;
+			for (MapAbstract::LandmarkList::const_iterator lmkIter = map.landmarkList().begin(); lmkIter
+			    != map.landmarkList().end(); lmkIter++) {
+				landmark_ptr_t lmkPtr = *lmkIter;
 				s << *lmkPtr << endl;
-				for (obsIter = lmkPtr->observationsPtrSet.begin(); obsIter != lmkPtr->observationsPtrSet.end(); obsIter++) {
-					observation_ptr_t obsPtr = obsIter->second;
+				for (LandmarkAbstract::ObservationList::iterator obsIter = lmkPtr->observationList().begin();
+						obsIter != lmkPtr->observationList().end(); obsIter++) {
+					observation_ptr_t obsPtr = *obsIter;
 					s << *obsPtr << endl;
 				}
 			}

@@ -42,6 +42,7 @@
 // include parents
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/mapObject.hpp"
+#include "rtslam/parents.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -154,11 +155,23 @@ namespace jafar {
 		 *
 		 * \ingroup rtslam
 		 */
-		class RobotAbstract: public MapObject {
+		class RobotAbstract: public MapObject, public ChildOf<MapAbstract> , public boost::enable_shared_from_this<
+		    RobotAbstract>, public ParentOf<SensorAbstract> {
 
 				friend ostream& operator <<(ostream & s, jafar::rtslam::RobotAbstract & rob);
 
 			public:
+
+
+				// define the function linkToParentMap().
+				ENABLE_LINK_TO_PARENT(MapAbstract,Map,RobotAbstract)
+				;
+				// define the functions mapPtr() and map().
+				ENABLE_ACCESS_TO_PARENT(MapAbstract,map)
+				;
+				// define the type SensorList, and the function sensorList().
+				ENABLE_ACCESS_TO_CHILDREN(SensorAbstract,Sensor,sensor);
+
 
 
 				/**
@@ -168,14 +181,12 @@ namespace jafar {
 				 * \param _size_control the size of the control vector
 				 * \param _size_pert the size of the perturbation vector
 				 */
-				RobotAbstract(const map_ptr_t & _mapPtr, const size_t _size_state, const size_t _size_control, const size_t _size_pert);
+				RobotAbstract(const map_ptr_t & _mapPtr, const size_t _size_state, const size_t _size_control,
+				              const size_t _size_pert);
 
 				// Mandatory virtual destructor.
 				virtual ~RobotAbstract() {
 				}
-
-				map_ptr_t mapPtr; ///<              Parent map
-				sensors_ptr_set_t sensorsPtrSet; ///<	  A set of sensors
 
 				Gaussian pose; ///<             Robot Gaussian pose
 				vec control; ///<               Control vector
@@ -208,15 +219,14 @@ namespace jafar {
 				static size_t size_perturbation() {
 					return 0;
 				}
-				void linkToSensor(const sensor_ptr_t & _senPtr); ///< Link to sensor
-				void linkToMap(const map_ptr_t & _mapPtr); ///<       Link to map
-				void set_control(const vec & c){
+				void set_control(const vec & c) {
 					JFR_ASSERT(c.size() == size_control(), "RobotAbstract::set_control(vec&, double): Sizes mismatch");
 					control = c;
 				}
 				void set_perturbation(const Perturbation & _pert) {
 					perturbation = _pert;
 				}
+
 
 				/**
 				 * Move one step ahead, affect SLAM filter.
@@ -235,6 +245,7 @@ namespace jafar {
 					move();
 				}
 
+
 				/**
 				 * Compute robot process noise \a Q in state space.
 				 * This function is called by move() at each iteration if constantPerturbation is \b false.
@@ -249,9 +260,10 @@ namespace jafar {
 				 * Explore all sensors.
 				 * This function iterates all the sensors in the robot and calls the main sensor operations.
 				 */
-				void exploreSensors();
+				void exploreSensors() const;
 
 			protected:
+
 
 				/**
 				 * Move one step ahead.
@@ -273,22 +285,24 @@ namespace jafar {
 				 * \param _XNEW_x the Jacobian of \a _xnew wrt \a _x
 				 * \param _XNEW_pert the Jacobian of \a _xnew wrt \a _n
 				 */
-				virtual void move_func(const vec & _x, const vec & _u, const vec& _n, const double _dt, vec & _xnew, mat & _XNEW_x, mat & _XNEW_pert) = 0;
+				virtual void move_func(const vec & _x, const vec & _u, const vec& _n, const double _dt, vec & _xnew,
+				                       mat & _XNEW_x, mat & _XNEW_pert) = 0;
 
-//				/**
-//				 * Move one step ahead, use object members as data.
-//				 */
-//				inline void move_func() {
-//					vec x = state.x();
-//					vec n = perturbation.x();
-//					cout << "x = " << x << endl;
-//					move_func(x, control, n, dt_or_dx, x, XNEW_x, XNEW_pert);
-//					state.x() = x;
-//				}
+
+				//				/**
+				//				 * Move one step ahead, use object members as data.
+				//				 */
+				//				inline void move_func() {
+				//					vec x = state.x();
+				//					vec n = perturbation.x();
+				//					cout << "x = " << x << endl;
+				//					move_func(x, control, n, dt_or_dx, x, XNEW_x, XNEW_pert);
+				//					state.x() = x;
+				//				}
 				/**
 				 * Move one step ahead, use object members as data.
 				 */
-//				virtual void move_func() = 0;
+				//				virtual void move_func() = 0;
 
 		};
 

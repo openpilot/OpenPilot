@@ -60,6 +60,7 @@ char nmeaChecksum(char* gps_buffer);
 uint8_t nmeaProcess(cBuffer* rxBuffer);
 void nmeaProcessGPGGA(char* packet);
 void nmeaProcessGPVTG(char* packet);
+void nmeaProcessGPGSA(char* packet);
 
 // Global variables
 
@@ -255,6 +256,13 @@ uint8_t nmeaProcess(cBuffer* rxBuffer)
 			// report packet type
 			foundpacket = NMEA_GPVTG;
 		}
+		else if(!strncmp(NmeaPacket, "GPGSA", 5))
+		{
+			// process packet of this type
+			nmeaProcessGPGSA(NmeaPacket);
+			// report packet type
+			foundpacket = NMEA_GPGSA;
+		}
 	}
 	else if(rxBuffer->datalength >= rxBuffer->size)
 	{
@@ -274,7 +282,6 @@ void nmeaProcessGPGGA(char* packet)
 	GpsObjectData GpsData;
 
 	char *tokens;
-    char *last;
     char *delimiter = ",";
     char *pEnd;
 
@@ -298,17 +305,16 @@ void nmeaProcessGPGGA(char* packet)
 	GpsObjectGet(&GpsData);
 
 	// tokenizer for nmea sentence
-
 	//GPGGA header
-	tokens = strtok_r(packet, delimiter, &last);
+	tokens = strsep(&packet, delimiter);
 
 	// get UTC time [hhmmss.sss]
-	tokens = strtok_r(NULL, delimiter, &last);
+	tokens = strsep(&packet, delimiter);
 	//strcpy(GpsInfo.TimeOfFix,tokens);
 
 	// next field: latitude
     // get latitude [ddmm.mmmmm]
-	tokens = strtok_r(NULL, delimiter, &last);
+	tokens = strsep(&packet, delimiter);
 	if(strlen(tokens)==10)// 5 desimal output
 	{
 		deg=strtol (tokens,&pEnd,10);
@@ -328,12 +334,12 @@ void nmeaProcessGPGGA(char* packet)
 
     // next field: N/S indicator
 	// correct latitute for N/S
-	tokens = strtok_r(NULL, delimiter, &last);
+	tokens = strsep(&packet, delimiter);
 	if(tokens[0] == 'S') GpsData.Latitude = -GpsData.Latitude;
 
 	// next field: longitude
 	// get longitude [dddmm.mmmmm]
-	tokens = strtok_r(NULL, delimiter, &last);
+	tokens = strsep(&packet, delimiter);
 	if(strlen(tokens)==11)// 5 desimal output
 	{
 		deg=strtol (tokens,&pEnd,10);
@@ -353,28 +359,28 @@ void nmeaProcessGPGGA(char* packet)
 
     // next field: E/W indicator
 	// correct latitute for E/W
-	tokens = strtok_r(NULL, delimiter, &last);
+	tokens = strsep(&packet, delimiter);
 	if(tokens[0] == 'W') GpsData.Longitude = -GpsData.Longitude;
 
     // next field: position fix status
 	// position fix status
 	// 0 = Invalid, 1 = Valid SPS, 2 = Valid DGPS, 3 = Valid PPS
 	// check for good position fix
-	tokens = strtok_r(NULL, delimiter, &last);
+	tokens = strsep(&packet, delimiter);
     if((tokens[0] != '0') || (tokens[0] != 0))
     	GpsData.Updates++;
 
     // next field: satellites used
     // get number of satellites used in GPS solution
-	tokens = strtok_r(NULL, delimiter, &last);
+    tokens = strsep(&packet, delimiter);
 	GpsData.Satellites=atoi(tokens);
 
 	// next field: HDOP (horizontal dilution of precision)
-	tokens = strtok_r(NULL, delimiter, &last);//HDOP, nein gebraucht
+	tokens = strsep(&packet, delimiter);
 
 	// next field: altitude
 	// get altitude (in meters mm.m)
-	tokens = strtok_r(NULL, delimiter, &last);
+	tokens = strsep(&packet, delimiter);
 	//reuse variables for alt
 	deg=strtol (tokens,&pEnd,10); // always 0.1m resolution?
 	desim=strtol (pEnd+1,NULL,10);
@@ -398,7 +404,6 @@ void nmeaProcessGPVTG(char* packet)
 	GpsObjectData GpsData;
 
 	char *tokens;
-    char *last;
     char *delimiter = ",";
 
 	#ifdef NMEA_DEBUG_VTG
@@ -420,31 +425,107 @@ void nmeaProcessGPVTG(char* packet)
 	// tokenizer for nmea sentence
 
 	//GPVTG header
-	tokens = strtok_r(packet, delimiter, &last);
+	tokens = strsep(&packet, delimiter);
 
 	// get course (true north ref) in degrees [ddd.dd]
-	tokens = strtok_r(NULL, delimiter, &last);
+	tokens = strsep(&packet, delimiter);
     // next field: 'T'
-	tokens = strtok_r(NULL, delimiter, &last);
+	tokens = strsep(&packet, delimiter);
 
     // next field: course (magnetic north)
  	// get course (magnetic north ref) in degrees [ddd.dd]
-	tokens = strtok_r(NULL, delimiter, &last);
+	tokens = strsep(&packet, delimiter);
 	// next field: 'M'
-	tokens = strtok_r(NULL, delimiter, &last);
+	tokens = strsep(&packet, delimiter);
 
 	// next field: speed (knots)
 	// get speed in knots
-	tokens = strtok_r(NULL, delimiter, &last);
+	tokens = strsep(&packet, delimiter);
 	// next field: 'N'
-	tokens = strtok_r(NULL, delimiter, &last);
+	tokens = strsep(&packet, delimiter);
 
 	// next field: speed (km/h)
 	// get speed in km/h
-	tokens = strtok_r(NULL, delimiter, &last);
+	tokens = strsep(&packet, delimiter);
 	// next field: 'K'
 	// next field: checksum
 	GpsObjectSet(&GpsData);
 
 }
+
+/**
+ * Prosesses NMEA GPGSA sentences
+ * \param[in] Buffer for parsed nmea GPGSA sentence
+ */
+void nmeaProcessGPGSA(char* packet)
+{
+	GpsObjectData GpsData;
+
+	char *tokens;
+    char *delimiter = ",";
+    char *pEnd;
+    long value,desim;
+
+	#ifdef NMEA_DEBUG_GSA
+	//PIOS_COM_SendFormattedStringNonBlocking(COM_USART1,"NMEA: %s\r\n",packet);
+	#endif
+
+	// start parsing just after "GPGSA,"
+	// attempt to reject empty packets right away
+	if(packet[6]==',' && packet[7]==',')
+		return;
+
+	if(!nmeaChecksum(packet))
+	{
+		// checksum not valid
+		//PIOS_LED_Toggle(LED2);
+		return;
+	}
+	GpsObjectGet(&GpsData);
+	// tokenizer for nmea sentence
+
+	//GPGSA header
+	tokens = strsep(&packet, delimiter);
+
+    // next field: Mode
+ 	// Mode: M=Manual, forced to operate in 2D or 3D, A=Automatic, 3D/2D
+	tokens = strsep(&packet, delimiter);
+    // next field: Mode
+    // Mode: 1=Fix not available, 2=2D, 3=3D
+	tokens = strsep(&packet, delimiter);
+
+    // next field: 3-14 IDs of SVs used in position fix (null for unused fields)
+	tokens = strsep(&packet, delimiter);
+	tokens = strsep(&packet, delimiter);
+	tokens = strsep(&packet, delimiter);
+	tokens = strsep(&packet, delimiter);
+	tokens = strsep(&packet, delimiter);
+	tokens = strsep(&packet, delimiter);
+	tokens = strsep(&packet, delimiter);
+	tokens = strsep(&packet, delimiter);
+	tokens = strsep(&packet, delimiter);
+	tokens = strsep(&packet, delimiter);
+	tokens = strsep(&packet, delimiter);
+	tokens = strsep(&packet, delimiter);
+
+	// next field: PDOP
+	tokens = strsep(&packet, delimiter);
+	value=strtol (tokens,&pEnd,10);
+	desim=strtol (pEnd+1,NULL,10);
+	//GpsData.PDOP=value+desim/100.0;
+	// next field: HDOP
+	tokens = strsep(&packet, delimiter);
+	value=strtol (tokens,&pEnd,10);
+	desim=strtol (pEnd+1,NULL,10);
+	//GpsData.HDOP=value+desim/100.0;
+	// next field: VDOP
+	tokens = strsep(&packet, delimiter);
+	value=strtol (tokens,&pEnd,10);
+	desim=strtol (pEnd+1,NULL,10);
+	//GpsData.VDOP=value+desim/100.0;
+	// next field: checksum
+	GpsObjectSet(&GpsData);
+
+}
+
 

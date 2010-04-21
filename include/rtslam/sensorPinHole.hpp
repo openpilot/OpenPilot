@@ -92,14 +92,14 @@ namespace jafar {
 				 * \param P_u the Jacobian of p wrt u
 				 * \param P_s the Jacobian of p wrt s
 				 */
-				void backProjectPoint(const vec2 & u, const double s, vec3 & p, mat32 & P_u, mat & P_s) {}
+				void backProjectPoint(const vec2 & u, const double s, vec3 & p, mat32 & P_u, mat & P_s){};
 
 				/**
 				 * Back-project pixel onto vector.
 				 * \param u the pixel
 				 * \return the back-projected 3D vector
 				 */
-				vec3 backProjectVector(const vec2 & u);
+				vec3 backProjectVector(const vec2 & u){};
 
 				/**
 				 * Back-project pixel onto vector, with Jacobians.

@@ -34,9 +34,9 @@ namespace jafar {
 			s << ".state:  " << rob.state << endl;
 			s << ".pose :  " << rob.pose << endl;
 			s << ".sens : [";
-			sensors_ptr_set_t::iterator senIter;
-			for (senIter = rob.sensorsPtrSet.begin(); senIter != rob.sensorsPtrSet.end(); senIter++)
-				s << " " << senIter->first << " ";
+			for (RobotAbstract::SensorList::const_iterator senIter = rob.sensorList().begin();
+						senIter != rob.sensorList().end(); senIter++)
+				s << " " << *senIter << " "; // Print the address of the sensor.
 			s << "]";
 			return s;
 		}
@@ -47,7 +47,6 @@ namespace jafar {
 		 */
 		RobotAbstract::RobotAbstract(const map_ptr_t & _mapPtr, const size_t _size_state, const size_t _size_control, const size_t _size_pert) :
 			MapObject(_mapPtr, _size_state),
-			mapPtr(_mapPtr),
 			pose(state, jmath::ublasExtra::ia_set(0, 7)),
 			control(_size_control),
 			perturbation(_size_pert),
@@ -60,17 +59,6 @@ namespace jafar {
 		}
 
 
-		/*
-		 * Add a sensor to this robot
-		 */
-		void RobotAbstract::linkToSensor(const sensor_ptr_t & _senPtr) {
-			sensorsPtrSet[_senPtr->id()] = _senPtr;
-		}
-
-		void RobotAbstract::linkToMap(const map_ptr_t & _mapPtr) {
-			mapPtr = _mapPtr;
-		}
-
 		void RobotAbstract::move() {
 			//move_func(); // x = F(x, u); Update Jacobians dxnew/dx and dxnew/du
 			vec x = state.x();
@@ -79,16 +67,16 @@ namespace jafar {
 			state.x() = x;
 			if (!constantPerturbation)
 				computeStatePerturbation();
-			mapPtr->filter.predict(mapPtr->ia_used_states(), XNEW_x, state.ia(), Q); // P = F*P*F' + Q
+			map().filter.predict(map().ia_used_states(), XNEW_x, state.ia(), Q); // P = F*P*F' + Q
 		}
 
 		void RobotAbstract::computeStatePerturbation() {
 			Q = jmath::ublasExtra::prod_JPJt(perturbation.P(), XNEW_pert);
 		}
 
-		void RobotAbstract::exploreSensors() {
-			for (sensors_ptr_set_t::iterator senIter = sensorsPtrSet.begin(); senIter != sensorsPtrSet.end(); senIter++) {
-				sensor_ptr_t senPtr = senIter->second;
+		void RobotAbstract::exploreSensors() const {
+			for (SensorList::const_iterator senIter = sensorList().begin(); senIter != sensorList().end(); senIter++) {
+				sensor_ptr_t senPtr = *senIter;
 				cout << "exploring sen: " << senPtr->id() << endl;
 
 				senPtr->acquireRaw();

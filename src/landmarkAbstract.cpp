@@ -24,18 +24,9 @@ namespace jafar {
 		 * constructor.
 		 */
 		LandmarkAbstract::LandmarkAbstract(const map_ptr_t & _mapPtr, const size_t _size) :
-			MapObject(_mapPtr, _size),
-			mapPtr(_mapPtr)
+			MapObject(_mapPtr, _size)
 		{
 			categoryName("LANDMARK");
-		}
-
-		void LandmarkAbstract::linkToObservation(const observation_ptr_t & _obsPtr) {
-			observationsPtrSet[_obsPtr->id()] = _obsPtr;
-		}
-
-		void LandmarkAbstract::linkToMap(const map_ptr_t & _mapPtr) {
-			mapPtr = _mapPtr;
 		}
 
 	}

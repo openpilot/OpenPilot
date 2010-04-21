@@ -25,7 +25,7 @@ namespace jafar {
 		///////////////////////////////////////
 
 		SensorPinHole::SensorPinHole(const robot_ptr_t & _robPtr, bool inFilter) :
-			SensorAbstract(_robPtr, inFilter){
+			SensorAbstract(_robPtr, inFilter) {
 			type("Pin-hole-camera");
 		}
 
@@ -37,14 +37,23 @@ namespace jafar {
 			correction = c;
 		}
 
-		vec2 SensorPinHole::projectPoint(const vec3 & v){
+		vec2 SensorPinHole::projectPoint(const vec3 & v) {
 			return pinhole::projectPoint(intrinsic, distortion, v);
 		}
 
-		void SensorPinHole::projectPoint(const vec3 & v, vec2 & u, mat23 & U_v){
+		void SensorPinHole::projectPoint(const vec3 & v, vec2 & u, mat23 & U_v) {
 			pinhole::projectPoint(intrinsic, distortion, v, u, U_v);
 		}
 
+		vec3 SensorPinHole::backProjectPoint(const vec2 & u, const double s) {
+			std::cout << __PRETTY_FUNCTION__ << ": TODO!" << std::endl;
+			return vec3();
+		}
+
+		void SensorPinHole::backProjectPoint(const vec2 & u, const double s, vec3 & p, mat32 & P_u, mat & P_s) {
+			std::cout << __PRETTY_FUNCTION__ << ": TODO!" << std::endl;
+			return;
+		}
 	}
 }
 

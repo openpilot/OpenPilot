@@ -18,7 +18,7 @@
 
 #include "rtslam/gaussian.hpp"
 #include "rtslam/kalmanFilter.hpp"
-
+#include "rtslam/parents.hpp"
 
 namespace jafar {
 	/**
@@ -28,16 +28,21 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
+
 		// some forward declarations.
 		class RobotAbstract;
 		class LandmarkAbstract;
+
 
 		/** Base class for all map types defined in the module rtslam.
 		 *
 		 * \author jsola@laas.fr
 		 * \ingroup rtslam
 		 */
-		class MapAbstract {
+		class MapAbstract: public ParentOf<RobotAbstract> , public ParentOf<LandmarkAbstract> {
+
+			ENABLE_ACCESS_TO_CHILDREN(RobotAbstract,Robot,robot);
+			ENABLE_ACCESS_TO_CHILDREN(LandmarkAbstract,Landmark,landmark);
 
 				/**
 				 * Print all MAP data.
@@ -52,6 +57,7 @@ namespace jafar {
 
 			public:
 
+
 				/**
 				 * Constructor
 				 */
@@ -60,17 +66,9 @@ namespace jafar {
 				/**
 				 * Mandatory virtual destructor - Map is used as-is, non-abstract by now
 				 */
-				 inline virtual ~MapAbstract(){}
+				inline virtual ~MapAbstract() {
+				}
 
-				/**
-				 * A set of robots
-				 */
-				robots_ptr_set_t robotsPtrSet;
-
-				/**
-				 * A set of landmarks
-				 */
-				landmarks_ptr_set_t landmarksPtrSet;
 
 				kernel::IdFactory robotIds;
 				kernel::IdFactory sensorIds;
@@ -122,13 +120,6 @@ namespace jafar {
 					return (unusedStates() >= N);
 				}
 
-
-				void linkToRobot(const robot_ptr_t & _robPtr); ///< Link to robot
-				void deleteRobot(const robot_ptr_t & _robPtr);
-
-				void linkToLandmark(const landmark_ptr_t & _lmkPtr); ///< Link to landmark
-				void deleteLandmark(const landmark_ptr_t & _lmkPtr);
-
 				/**
 				 * Obtain free Map space of a given size.
 				 * The free space in \a used_states and the current size \a current_size are modified accordingly.
@@ -152,14 +143,14 @@ namespace jafar {
 				 */
 				void addObservations(landmark_ptr_t & lmkPtr);
 
+				void fillSeq();
 
-				void fillSeq() ;
+				void fillDiag();
 
-				void fillDiag() ;
-
-				void fillRndm() ;
+				void fillRndm();
 
 			protected:
+
 
 				/**
 				 * Create new observation.
@@ -167,8 +158,6 @@ namespace jafar {
 				 * \todo see if this can go to class Observation, possibly with a dedicated constructor.
 				 */
 				observation_ptr_t newObservation(sensor_ptr_t & senPtr, landmark_ptr_t & lmkPtr);
-
-
 
 
 				//				void removeRobot(RobotAbstract& _rob);
@@ -189,3 +178,4 @@ namespace jafar {
 }
 
 #endif /* MAPABSTRACT_HPP_ */
+

@@ -39,6 +39,9 @@ namespace jafar {
 				 * Constructor from map
 				 */
 				LandmarkAnchoredHomogeneousPoint(const map_ptr_t & mapPtr);
+				~LandmarkAnchoredHomogeneousPoint(void)
+					{ cout << __PRETTY_FUNCTION__ << endl; }
+
 
 				static size_t size(void) {
 					return 7;

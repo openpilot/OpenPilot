@@ -43,11 +43,14 @@ void test_simu01(void) {
 	// abstract types = new concrete for simu
 	map_ptr_t      mapPtr(new MapAbstract(100));
 	robot_ptr_t    robPtr(new RobotConstantVelocity(mapPtr));
+	robPtr->linkToParentMap(mapPtr);
 	raw_ptr_t      rawSimu(new RawImageSimu()) ;
 	feature_ptr_t  featureSimu(new FeaturePointSimu());
 	sensor_ptr_t   senPH(new SensorPinHole(robPtr, true)) ;
+	senPH->linkToParentRobot(robPtr);
 	app_ptr_t      appSimu(new AppearenceImageSimu()) ;
 	landmark_ptr_t lmk(new LandmarkEuclideanPoint(mapPtr)) ;
+	lmk->linkToParentMap(mapPtr);
 	desc_ptr_t     desc(new DesscriptorImagePointSimu()) ;
 
 

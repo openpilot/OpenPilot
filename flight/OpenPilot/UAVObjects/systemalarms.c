@@ -49,13 +49,13 @@ int32_t SystemAlarmsInitialize()
 
 	// Initialize metadata
 	metadata.telemetryAcked = 1;
-	metadata.telemetryUpdateMode = UPDATEMODE_ONCHANGE;
-	metadata.telemetryUpdatePeriod = 0;
+	metadata.telemetryUpdateMode = UPDATEMODE_PERIODIC;
+	metadata.telemetryUpdatePeriod = 4000;
 	metadata.gcsTelemetryAcked = 1;
 	metadata.gcsTelemetryUpdateMode = UPDATEMODE_ONCHANGE;
 	metadata.gcsTelemetryUpdatePeriod = 0;
-	metadata.loggingUpdateMode = UPDATEMODE_ONCHANGE;
-	metadata.loggingUpdatePeriod = 0;
+	metadata.loggingUpdateMode = UPDATEMODE_PERIODIC;
+	metadata.loggingUpdatePeriod = 1000;
 	UAVObjSetMetadata(handle, &metadata);
 
 	// Done

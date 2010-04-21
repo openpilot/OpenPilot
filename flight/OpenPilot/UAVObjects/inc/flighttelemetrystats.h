@@ -68,7 +68,8 @@ typedef struct {
 } __attribute__((packed)) FlightTelemetryStatsData;
 
 // Enumeration types
-typedef enum { FLIGHTTELEMETRYSTATS_CONNECTED_TRUE=0, FLIGHTTELEMETRYSTATS_CONNECTED_FALSE=1,  } FLIGHTTELEMETRYSTATSCONNECTEDEnum;
+/* Enumeration options for field Connected */
+typedef enum { FLIGHTTELEMETRYSTATS_CONNECTED_TRUE=0, FLIGHTTELEMETRYSTATS_CONNECTED_FALSE=1,  } FlightTelemetryStatsConnectedOptions;
 
 
 // Generic interface functions

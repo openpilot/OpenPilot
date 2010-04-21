@@ -70,7 +70,8 @@ typedef struct {
 } __attribute__((packed)) ExampleObject1Data;
 
 // Enumeration types
-typedef enum { EXAMPLEOBJECT1_FIELD8_OPTION1=0, EXAMPLEOBJECT1_FIELD8_OPTION2=1,  } EXAMPLEOBJECT1FIELD8Enum;
+/* Enumeration options for field Field8 */
+typedef enum { EXAMPLEOBJECT1_FIELD8_OPTION1=0, EXAMPLEOBJECT1_FIELD8_OPTION2=1,  } ExampleObject1Field8Options;
 
 
 // Generic interface functions

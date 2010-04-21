@@ -68,7 +68,8 @@ typedef struct {
 } __attribute__((packed)) GCSTelemetryStatsData;
 
 // Enumeration types
-typedef enum { GCSTELEMETRYSTATS_CONNECTED_TRUE=0, GCSTELEMETRYSTATS_CONNECTED_FALSE=1,  } GCSTELEMETRYSTATSCONNECTEDEnum;
+/* Enumeration options for field Connected */
+typedef enum { GCSTELEMETRYSTATS_CONNECTED_TRUE=0, GCSTELEMETRYSTATS_CONNECTED_FALSE=1,  } GCSTelemetryStatsConnectedOptions;
 
 
 // Generic interface functions

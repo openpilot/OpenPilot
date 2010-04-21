@@ -63,7 +63,8 @@ typedef struct {
 } __attribute__((packed)) SettingsPersistenceData;
 
 // Enumeration types
-typedef enum { SETTINGSPERSISTENCE_OPERATION_LOAD=0, SETTINGSPERSISTENCE_OPERATION_SAVE=1,  } SETTINGSPERSISTENCEOPERATIONEnum;
+/* Enumeration options for field Operation */
+typedef enum { SETTINGSPERSISTENCE_OPERATION_LOAD=0, SETTINGSPERSISTENCE_OPERATION_SAVE=1,  } SettingsPersistenceOperationOptions;
 
 
 // Generic interface functions

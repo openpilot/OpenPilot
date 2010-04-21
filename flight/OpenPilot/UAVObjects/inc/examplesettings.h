@@ -65,7 +65,8 @@ typedef struct {
 } __attribute__((packed)) ExampleSettingsData;
 
 // Enumeration types
-typedef enum { EXAMPLESETTINGS_STEPDIRECTION_UP=0, EXAMPLESETTINGS_STEPDIRECTION_DOWN=1,  } EXAMPLESETTINGSSTEPDIRECTIONEnum;
+/* Enumeration options for field StepDirection */
+typedef enum { EXAMPLESETTINGS_STEPDIRECTION_UP=0, EXAMPLESETTINGS_STEPDIRECTION_DOWN=1,  } ExampleSettingsStepDirectionOptions;
 
 
 // Generic interface functions

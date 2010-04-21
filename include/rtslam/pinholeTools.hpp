@@ -67,29 +67,29 @@ namespace jafar {
 			}
 
 			template<class U>
-			vec3 backprojectPointFromNormalizedPlane(const U & u, double s = 1) {
+			vec3 backprojectPointFromNormalizedPlane(const U & u, double depth = 1) {
 
 				vec3 p;
-				p(0) = s * u(0);
-				p(1) = s * u(1);
-				p(2) = s;
+				p(0) = depth * u(0);
+				p(1) = depth * u(1);
+				p(2) = depth;
 				return p;
 			}
 
-			template<class U, class P, class MP_u, class MP_s>
-			void backprojectPointFromNormalizedPlane(const U & u, const double s, P & p, MP_u & P_u, MP_s & P_s) {
-				p = backprojectPointFromNormalizedPlane(u, s);
+			template<class U, class P, class MP_u, class MP_depth>
+			void backprojectPointFromNormalizedPlane(const U & u, const double depth, P & p, MP_u & P_u, MP_depth & P_depth) {
+				p = backprojectPointFromNormalizedPlane(u, depth);
 
-				P_u(0, 0) = s;
+				P_u(0, 0) = depth;
 				P_u(0, 1) = 0.0;
 				P_u(1, 0) = 0.0;
-				P_u(1, 1) = s;
+				P_u(1, 1) = depth;
 				P_u(2, 0) = 0.0;
 				P_u(2, 1) = 0.0;
 
-				P_s(0, 0) = u(0);
-				P_s(1, 0) = u(1);
-				P_s(2, 0) = 1.0;
+				P_depth(0, 0) = u(0);
+				P_depth(1, 0) = u(1);
+				P_depth(2, 0) = 1.0;
 			}
 
 
@@ -350,29 +350,31 @@ namespace jafar {
 			 * \param k the vector of intrinsic parameters, k = [u0, v0, au, av]
 			 * \param c the radial undistortion parameters vector
 			 * \param u the 2D pixel
-			 * \param s the depth prior
+			 * \param depth the depth prior
 			 * \return the back-projected 3D point
 			 */
 			template<class VK, class VC, class U>
-			vec3 backprojectPoint(const VK & k, const VC & c, const U & u, const double s = 1.0) {
-				return backprojectPointFromNormalizedPlane(undistortPoint(c, depixellizePoint(k, u)), s);
+			vec3 backprojectPoint(const VK & k, const VC & c, const U & u, const double depth = 1.0) {
+				return backprojectPointFromNormalizedPlane(undistortPoint(c, depixellizePoint(k, u)), depth);
 			}
 			/**
 			 * Back-Project a point from a pin-hole camera with radial distortion; give Jacobians
 			 * \param k the vector of intrinsic parameters, k = [u0, v0, au, av]
 			 * \param c the radial undistortion parameters vector
 			 * \param u the 2D pixel
-			 * \param s the depth prior
-			 * \param v the back-projected 3D point
+			 * \param depth the depth prior
+			 * \param p the back-projected 3D point
+			 * \param P_u Jacobian of p wrt u
+			 * \param P_depth Jacobian of p wrt depth
 			 */
-			template<class VK, class VC, class U, class P, class MP_u, class MP_s>
-			void backProjectPoint(const VK & k, const VC & c, const U & u, const double & s, P & p, MP_u & P_u, MP_s & P_s) {
+			template<class VK, class VC, class U, class P, class MP_u, class MP_depth>
+			void backProjectPoint(const VK & k, const VC & c, const U & u, double depth, P & p, MP_u & P_u, MP_depth & P_depth) {
 				vec2 up, ud;
 				mat32 P_up;
 				mat22 UP_ud, UD_u;
 				depixellizePoint(k, u, ud, UD_u);
 				undistortPoint(c, ud, up, UP_ud);
-				backprojectPointFromNormalizedPlane(up, s, p, P_up, P_s);
+				backprojectPointFromNormalizedPlane(up, depth, p, P_up, P_depth);
 
 				P_u = ublas::prod(P_up, ublas::prod<mat>(UP_ud, UD_u));
 			}

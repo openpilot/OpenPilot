@@ -205,7 +205,7 @@ namespace jafar {
 
 
 			/**
-			 * Bring landmark to bearing-only sensor frame (give inverse-distance information).
+			 * Bring landmark to bearing-only sensor frame (give distance information).
 			 *
 			 * For a landmark and sensor frame
 			 * - ahp = [p0 m rho]
@@ -216,15 +216,15 @@ namespace jafar {
 			 *
 			 * which is a vector in sensor frame in the direction of the landmark.
 			 *
-			 * The range information is recuperated in \a invDist as the inverse of the distance from sensor to landmark.
+			 * The range information is recuperated in \a dist as the distance from sensor to landmark.
 			 *
 			 * \param s the sensor frame
 			 * \param ahp the AHP landmark
 			 * \param v the bearing-only landmark in sensor frame
-			 * \param invDist the inverse of the non-observable distance
+			 * \param dist the non-observable distance
 			 */
 			template<class VS, class VA, class VV>
-			void toBearingOnlyFrame(const VS & s, const VA & ahp, VV & v, double & invDist) {
+			void toBearingOnlyFrame(const VS & s, const VA & ahp, VV & v, double & dist) {
 				vec3 p0, m;
 				double rho;
 				split(ahp, p0, m, rho);
@@ -232,12 +232,12 @@ namespace jafar {
 				vec4 q = subrange(s, 3, 7);
 				vec3 d = m - (t - p0) * rho;
 				v = rotateInv(q, d); // OK JS April 1 2010
-				invDist = rho / norm_2(v);
+				dist = norm_2(v) / rho;
 			}
 
 
 			/**
-			 * Bring landmark to bearing-only sensor frame (give inverse-distance information).
+			 * Bring landmark to bearing-only sensor frame (give distance information).
 			 *
 			 * For a landmark and sensor frame
 			 * - ahp = [p0 m rho]
@@ -248,7 +248,7 @@ namespace jafar {
 			 *
 			 * which is a vector in sensor frame in the direction of the landmark.
 			 *
-			 * The range information is recuperated in \a invDist as the inverse of the distance from sensor to landmark.
+			 * The range information is recuperated in \a dist as the distance from sensor to landmark.
 			 *
 			 * and returns the Jacobians wrt s and ahp.
 			 * \param s the sensor frame
@@ -258,7 +258,7 @@ namespace jafar {
 			 * \param V_ahp the Jacobian of \a v wrt \a ahp
 			 */
 			template<class VS, class VA, class VV, class MV_s, class MV_a>
-			void toBearingOnlyFrame(const VS & s, const VA & ahp, VV & v, double & invDist, MV_s & V_s, MV_a & V_ahp) {
+			void toBearingOnlyFrame(const VS & s, const VA & ahp, VV & v, double & dist, MV_s & V_s, MV_a & V_ahp) {
 				vec3 p0, m;
 				double rho;
 				mat34 V_q;
@@ -269,7 +269,7 @@ namespace jafar {
 				vec4 q = subrange(s, 3, 7);
 				vec3 d = m - (t - p0) * rho; //    before rotation
 				rotateInv(q, d, v, V_q, V_d); //   obtain v
-				invDist = rho / norm_2(v); //      obtain invDist
+				dist = norm_2(v) / rho; //     		 obtain non-observable distance
 				// Jacobians
 				mat33 V_p0;
 				V_p0 = V_d * rho;
@@ -279,7 +279,7 @@ namespace jafar {
 				//				V_t = - V_d * rho;
 				V_s.clear();
 				V_ahp.clear();
-				subrange(V_s, 0, 3, 0, 3) = -V_p0; //      dv / dt
+				subrange(V_s, 0, 3, 0, 3) = -V_p0; //       dv / dt
 				subrange(V_s, 0, 3, 3, 7) = V_q; //         dv / dq
 				subrange(V_ahp, 0, 3, 0, 3) = V_p0; //      dv / dp0
 				subrange(V_ahp, 0, 3, 3, 6) = V_d; //       dv / dm

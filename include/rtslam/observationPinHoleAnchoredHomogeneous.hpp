@@ -47,6 +47,7 @@ namespace jafar {
 			public:
 
 				ObservationPinHoleAnchoredHomogeneousPoint(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & ahpPtr);
+				~ObservationPinHoleAnchoredHomogeneousPoint(void){}
 
 				/**
 				 * Projection function, with Jacobians and non-observable part.

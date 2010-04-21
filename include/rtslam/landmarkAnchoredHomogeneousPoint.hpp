@@ -100,7 +100,9 @@ namespace jafar {
 				}
 
 
-				void reparametrize_func(const vec & ahp, vec & euc, mat & EUC_ahp);
+				void reparametrize_func(const vec & ahp, vec & euc, mat & EUC_ahp)
+				{ std::cout << __PRETTY_FUNCTION__ << ": TODO!" << std::endl; }
+
 //				/**
 //				 * Reparametrize to Euclidean.
 //				 * \param ahp the anchored homogeneous point to be reparametrized.

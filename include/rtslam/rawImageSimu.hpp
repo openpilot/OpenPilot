@@ -14,12 +14,15 @@
 #define RAWIMAGESIMU_HPP_
 
 #include "rtslam/rawAbstract.hpp"
-#include "rtslam/featureAbstract.hpp"
+#include "rtslam/featurePointSimu.hpp"
+#include "boost/shared_ptr.hpp"
 
 namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
+		class RawImageSimu;
+		typedef boost::shared_ptr<RawImageSimu> rawimagesimu_ptr_t;
 
 		/**
 		 * Class of simulated image
@@ -29,7 +32,7 @@ namespace jafar {
 		class RawImageSimu: public rawAbstract {
 
 			private:
-				map<int,FeatureAbstract*> features;
+				map<int,FeaturePointSimu*> features;
 
 			public:
 
@@ -39,6 +42,9 @@ namespace jafar {
 				RawImageSimu() :
 					rawAbstract() {
 				}
+
+				int coord;
+				int app  ;
 
 				/**
 				 * Add a point-typed feature on a pixel.

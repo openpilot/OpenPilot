@@ -28,6 +28,10 @@ namespace jafar {
 		class SensorAbstract;
 		class LandmarkAbstract;
 		class ObservationAbstract;
+		class FeatureAbstract;
+		class rawAbstract;
+		class AppearanceAbstract;
+		class DescriptorAbstract;
 
 
 		//		// Regular Pointers:
@@ -39,19 +43,27 @@ namespace jafar {
 
 
 		// Pointers with boost::shared_ptr:
-		typedef boost::shared_ptr<MapAbstract> map_ptr_t;
-		typedef boost::shared_ptr<RobotAbstract> robot_ptr_t;
-		typedef boost::shared_ptr<SensorAbstract> sensor_ptr_t;
-		typedef boost::shared_ptr<LandmarkAbstract> landmark_ptr_t;
+		typedef boost::shared_ptr<MapAbstract>         map_ptr_t;
+		typedef boost::shared_ptr<RobotAbstract>       robot_ptr_t;
+		typedef boost::shared_ptr<SensorAbstract>      sensor_ptr_t;
+		typedef boost::shared_ptr<LandmarkAbstract>    landmark_ptr_t;
 		typedef boost::shared_ptr<ObservationAbstract> observation_ptr_t;
+		typedef boost::shared_ptr<FeatureAbstract>     feature_ptr_t;
+		typedef boost::shared_ptr<rawAbstract>         raw_ptr_t;
+		typedef boost::shared_ptr<AppearanceAbstract>  app_ptr_t;
+		typedef boost::shared_ptr<DescriptorAbstract>  desc_ptr_t;
 
 
 		// Pointers with boost::weak_ptr:
-		typedef boost::weak_ptr<MapAbstract> map_wkptr_t;
-		typedef boost::weak_ptr<RobotAbstract> robot_wkptr_t;
-		typedef boost::weak_ptr<SensorAbstract> sensor_wkptr_t;
-		typedef boost::weak_ptr<LandmarkAbstract> landmark_wkptr_t;
+		typedef boost::weak_ptr<MapAbstract>         map_wkptr_t;
+		typedef boost::weak_ptr<RobotAbstract>       robot_wkptr_t;
+		typedef boost::weak_ptr<SensorAbstract>      sensor_wkptr_t;
+		typedef boost::weak_ptr<LandmarkAbstract>    landmark_wkptr_t;
 		typedef boost::weak_ptr<ObservationAbstract> observation_wkptr_t;
+		typedef boost::weak_ptr<FeatureAbstract>     feature_wkptr_t;
+		typedef boost::weak_ptr<rawAbstract>         raw_wkptr_t;
+		typedef boost::weak_ptr<AppearanceAbstract>  app_wkptr_t;
+		typedef boost::weak_ptr<DescriptorAbstract>  desc_wkptr_t;
 
 
 		//		// Pointers: upwards

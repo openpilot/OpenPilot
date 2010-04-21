@@ -12,7 +12,6 @@
 #ifndef SENSORPINHOLE_HPP_
 #define SENSORPINHOLE_HPP_
 
-//#include "image/Image.hpp"
 #include "rtslam/rtSlam.hpp"
 
 #include "rtslam/sensorAbstract.hpp"
@@ -83,7 +82,7 @@ namespace jafar {
 				 * \param s the point's depth
 				 * \return the back-projected 3D point
 				 */
-				vec3 backProjectPoint(const vec2 & u, const double s = 1.0);
+				vec3 backProjectPoint(const vec2 & u, const double s = 1.0) {}
 
 				/**
 				 * Back-project pixel, with Jacobians.
@@ -93,7 +92,7 @@ namespace jafar {
 				 * \param P_u the Jacobian of p wrt u
 				 * \param P_s the Jacobian of p wrt s
 				 */
-				void backProjectPoint(const vec2 & u, const double s, vec3 & p, mat32 & P_u, mat & P_s);
+				void backProjectPoint(const vec2 & u, const double s, vec3 & p, mat32 & P_u, mat & P_s) {}
 
 				/**
 				 * Back-project pixel onto vector.

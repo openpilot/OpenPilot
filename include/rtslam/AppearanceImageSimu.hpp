@@ -2,7 +2,7 @@
  * Copyright RIA-LAAS/CNRS, 2010
  *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
- * File:      featureAbstract.h
+ * File:      AppreatenceImageSimu.h
  * Project:   RT-Slam
  * Author:    Jean-Marie CODOL
  *
@@ -18,43 +18,44 @@
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 /**
- * \file featureSimu.hpp
- * File defining the simulated feature.
+ * \file AppearanceImageSimu.hpp
+ * File defining the simulated appearence.
  * \author jmcodol@laas.fr
  * \ingroup rtslam
  */
 
-#ifndef __FeatureSimu_H__
-#define __FeatureSimu_H__
-
-#include "rtslam/featureAbstract.hpp"
+#ifndef __AppearenceImageSimu_H__
+#define __AppearenceImageSimu_H__
 
 /* --------------------------------------------------------------------- */
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
+#include "rtslam/appearanceAbstract.hpp"
+#include "boost/shared_ptr.hpp"
 
 namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
-		/** Base class for all landmark appearances defined in the module
+		class AppearenceImageSimu;
+		typedef boost::shared_ptr<AppearenceImageSimu> appearenceimagesimu_ptr_t;
+
+		/** Appearence for matching
 		 * rtslam.
 		 *
 		 * @ingroup rtslam
 		 */
-		class FeatureSimu: public FeatureAbstract {
+		class AppearenceImageSimu: public AppearanceAbstract {
 			public:
-				FeatureSimu() {
-				}
-				virtual ~FeatureSimu() {
-				}
+				AppearenceImageSimu();
+				virtual ~AppearenceImageSimu();
 		};
 	}
 
 }
 
-#endif // #ifndef __FeatureSimu_H__
+#endif // #ifndef __AppearenceImageSimu_H__
 /*
  * Local variables:
  * mode: c++

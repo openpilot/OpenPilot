@@ -77,8 +77,14 @@ namespace jafar {
 				virtual ~LandmarkAbstract() {
 				}
 
+
 				// \todo use a smart pointer here.
 				DescriptorAbstract descriptor; ///<                       Landmark descriptor
+
+				jblas::mat LNEW_lmk; //Jacobian comming from reparametrisation of old lmk wrt. new lmk
+
+				void reparametrize();//																						Reparametrize landmarks
+				virtual void reparametrize_func(const vec & lmk, vec & lnew, mat & LNEW_lmk) = 0;
 
 		};
 

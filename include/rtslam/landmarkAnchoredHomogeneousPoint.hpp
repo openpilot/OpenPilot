@@ -100,24 +100,25 @@ namespace jafar {
 				}
 
 
-				/**
-				 * Reparametrize to Euclidean.
-				 * \param ahp the anchored homogeneous point to be reparametrized.
-				 * \return the Euclidean point.
-				 */
-				vec3 toEuclidean();
-
-
-				/**
-				 * Reparametrize to Euclidean, with Jacobians.
-				 * \param ahp the anchored homogeneous point to be reparametrized.
-				 * \param euc the returned Euclidean point.
-				 * \param EUC_ahp the Jacobian of the conversion.
-				 */
-				template<class VE, class ME_a>
-				void toEuclidean(VE & euc, ME_a & EUC_ahp) {
-					lmkAHP::ahp2euc(state.x(), euc, EUC_ahp);
-				}
+				void reparametrize_func(const vec & ahp, vec & euc, mat & EUC_ahp);
+//				/**
+//				 * Reparametrize to Euclidean.
+//				 * \param ahp the anchored homogeneous point to be reparametrized.
+//				 * \return the Euclidean point.
+//				 */
+//				vec3 toEuclidean();
+//
+//
+//				/**
+//				 * Reparametrize to Euclidean, with Jacobians.
+//				 * \param ahp the anchored homogeneous point to be reparametrized.
+//				 * \param euc the returned Euclidean point.
+//				 * \param EUC_ahp the Jacobian of the conversion.
+//				 */
+//				template<class VE, class ME_a>
+//				void toEuclidean(VE & euc, ME_a & EUC_ahp) {
+//					lmkAHP::ahp2euc(state.x(), euc, EUC_ahp);
+//				}
 
 				/**
 				 * Bring landmark to bearing-only sensor frame (without range information).

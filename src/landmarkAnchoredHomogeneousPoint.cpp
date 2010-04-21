@@ -25,9 +25,9 @@ namespace jafar {
 			type("AHP");
 		}
 
-		vec3 LandmarkAnchoredHomogeneousPoint::toEuclidean() {
-			return lmkAHP::ahp2euc(state.x());
-		}
+//		vec3 LandmarkAnchoredHomogeneousPoint::toEuclidean() {
+//			return lmkAHP::ahp2euc(state.x());
+//		}
 
 
 

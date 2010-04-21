@@ -112,7 +112,7 @@ void test_landmark01(void) {
 	jblas::vec3 euc;
 	jblas::mat EUC_ahp(3, 7);
 	//	euc = LandmarkAnchoredHomogeneousPoint::ahp2euc(ahp);
-	ahp1.toEuclidean(euc, EUC_ahp);
+	lmkAHP::ahp2euc(ahp1.state.x(),euc,EUC_ahp);
 	cout << "euc = " << (MATLAB) euc << endl;
 	cout << "EUC_ahp = " << (MATLAB) EUC_ahp << endl;
 	cout << "[euc_m, EUC_ahp_m] = ahm2euc(ahp);" << endl;

@@ -37,23 +37,24 @@ namespace jafar {
 			correction = c;
 		}
 
-		vec2 SensorPinHole::projectPoint(const vec3 & v) {
-			return pinhole::projectPoint(intrinsic, distortion, v);
+
+		void SensorPinHole::setup(const size_t _id, const string & _name, const vec7 & _pose, const vec7 & _std, const vec4 & _k, const vec & _d, const vec & _c){
+			id(_id);
+			name(_name);
+			pose.x(_pose);
+			pose.std(_std);
+			set_parameters(_k, _d, _c);
 		}
 
-		void SensorPinHole::projectPoint(const vec3 & v, vec2 & u, mat23 & U_v) {
-			pinhole::projectPoint(intrinsic, distortion, v, u, U_v);
-		}
 
-		vec3 SensorPinHole::backProjectPoint(const vec2 & u, const double s) {
-			std::cout << __PRETTY_FUNCTION__ << ": TODO!" << std::endl;
-			return vec3();
-		}
+//		vec2 SensorPinHole::projectPoint(const vec3 & v){
+//			return pinhole::projectPoint(intrinsic, distortion, v);
+//		}
+//
+//		void SensorPinHole::projectPoint(const vec3 & v, vec2 & u, mat23 & U_v){
+//			pinhole::projectPoint(intrinsic, distortion, v, u, U_v);
+//		}
 
-		void SensorPinHole::backProjectPoint(const vec2 & u, const double s, vec3 & p, mat32 & P_u, mat & P_s) {
-			std::cout << __PRETTY_FUNCTION__ << ": TODO!" << std::endl;
-			return;
-		}
 	}
 }
 

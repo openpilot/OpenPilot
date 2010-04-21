@@ -36,6 +36,7 @@ namespace jafar {
 				 * Constructor from map
 				 */
 				LandmarkEuclideanPoint(const map_ptr_t & mapPtr);
+				virtual ~LandmarkEuclideanPoint(void){}
 
 				static size_t size(void) {
 					return 3;
@@ -92,6 +93,13 @@ namespace jafar {
 				void toFrame(const VF & F, Vahpf & eucf, MAHPF_f & EUCF_f, MAHPF_ahp & EUCF_euc) {
 						quaternion::eucToFrame(F, state.x(), eucf, EUCF_f, EUCF_euc);
 				}
+
+				void reparametrize_func(const vec & euc, vec & euco, mat & EUC_euc){
+					euco = euc;
+				}
+
+
+
 		}; // class LandmarkEuclideanPoint
 
 

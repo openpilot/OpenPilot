@@ -98,6 +98,7 @@ namespace jafar {
 				ObservationAbstract(const sensor_ptr_t & _senPtr, const landmark_ptr_t & _lmkPtr, const size_t _size,
 				                    const size_t size_nonobs = 0);
 
+
 				/**
 				 * Sizes constructor
 				 */

@@ -111,6 +111,7 @@ namespace jafar {
 				void linkToObservation(const observation_ptr_t & _obsPtr); ///< Link to observation
 				void linkToRobot(const robot_ptr_t & _robPtr); ///<             Link to robot
 
+
 				/*
 				 * Acquire raw data.
 				 */
@@ -122,23 +123,23 @@ namespace jafar {
 				virtual void processRaw();
 
 			protected:
-				/**
-				 * Observe known landmarks
-				 */
-				virtual void observeKnownLmks();
-				/**
-				 * Discover new landmarks.
-				 * This function explores the raw data to find new features and use them for landmark initialization.
-				 */
-				virtual void discoverNewLmks();
-
-				/**
-				 * Add one landmark to the map.
-				 * \todo: see if we move this to MapAbstract -> lmkPtr = mapPtr->newLandmark(senPtr)
-				 * \todo: need to solve first the pointer-from-this issue of shared_ptr.
-				 * \param mapPtr pointer to the slam map.
-				 */
-				landmark_ptr_t newLandmark(map_ptr_t & mapPtr);
+//				/**
+//				 * Observe known landmarks
+//				 */
+//				virtual void observeKnownLmks();
+//				/**
+//				 * Discover new landmarks.
+//				 * This function explores the raw data to find new features and use them for landmark initialization.
+//				 */
+//				virtual void discoverNewLmks();
+//
+//				/**
+//				 * Add one landmark to the map.
+//				 * \todo: see if we move this to MapAbstract -> lmkPtr = mapPtr->newLandmark(senPtr)
+//				 * \todo: need to solve first the pointer-from-this issue of shared_ptr.
+//				 * \param mapPtr pointer to the slam map.
+//				 */
+//				landmark_ptr_t newLandmark(map_ptr_t & mapPtr);
 
 
 			public:

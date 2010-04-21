@@ -32,7 +32,7 @@
 // include parents
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/mapObject.hpp"
-#include "rtslam/DescriptorAbstract.h"
+#include "rtslam/DescriptorAbstract.hpp"
 
 namespace jafar {
 	namespace rtslam {

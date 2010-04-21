@@ -46,6 +46,7 @@
 namespace jafar {
 	namespace rtslam {
 		using namespace std;
+		using namespace jblas;
 
 		typedef boost::shared_ptr<AppearanceAbstract> appearance_ptr_t;
 
@@ -85,7 +86,8 @@ namespace jafar {
 				ObservationAbstract(const sensor_ptr_t & _senPtr, const landmark_ptr_t & _lmkPtr, const size_t _size_meas,
 				    const size_t _size_exp, const size_t _size_inn, const size_t _size_nonobs = 0);
 
-				virtual ~ObservationAbstract() {
+				virtual ~ObservationAbstract()
+				{
 				}
 
 
@@ -99,32 +101,37 @@ namespace jafar {
 				Innovation innovation;
 				Gaussian prior;
 
-				ind_array ia_rsl; ///<          Ind. array of mapped indices of robot, sensor and landmark (ie, sensor might or might not be there).
-				jblas::mat EXP_rsl; ///<        Jacobian of the expectation wrt the mapped states of robot, sensor and landmark.
-				jblas::mat INN_meas; ///<       The Jacobian of the innovation wrt the measurement.
-				jblas::mat INN_exp; ///<        The Jacobian of the innovation wrt the expectation.
-				jblas::mat INN_rsl; ///<        The Jacobian of the innovation wrt the mapped states of robot, sensor and landmark.
-				//				jblas::mat LMK_meas; ///<       The Jacobian of the landmark wrt the measurement.
-				//				jblas::mat LMK_prior; ///<      The Jacobian of the landmark wrt the prior.
-				//				jblas::mat LMK_rs; ///<         the Jacobian of the landmark wrt the robot and sensor mapped states.
+				ind_array ia_rsl; ///<    Ind. array of mapped indices of robot, sensor and landmark (ie, sensor might or might not be there).
+
+				mat SG_rs; ///<						Jacobian of global sensor pose wrt. robot and sensor mapped states
+				mat EXP_sg; ///<				 	Jacobian of expectation wrt. global sensor pose
+				mat EXP_l; ///< 					Jacobian of expectation wrt. landmark state
+				mat EXP_rsl; ///<        	Jacobian of the expectation wrt. the mapped states of robot, sensor and landmark.
+				mat INN_meas; ///<       	Jacobian of the innovation wrt. the measurement.
+				mat INN_exp; ///<        	Jacobian of the innovation wrt. the expectation.
+				mat INN_rsl; ///<        	Jacobian of the innovation wrt. the mapped states of robot, sensor and landmark.
+				mat LMK_sg; ///<					Jacobian of the landmark wrt. the global sensor pose.
+				mat LMK_meas; ///<       	Jacobian of the landmark wrt. the measurement.
+				mat LMK_prior; ///<      	Jacobian of the landmark wrt. the prior.
+				mat LMK_rs; ///<         	Jacobian of the landmark wrt. the robot and sensor mapped states.
 
 				/**
 				 * Counters
 				 */
 				struct counters {
-						int nSearch; ///< Number of searches
-						int nMatch; ///< number of matches
-						int nInlier; ///< Number of times declared inlier
+						int nSearch; ///< 		Number of searches
+						int nMatch; ///< 			Number of matches
+						int nInlier; ///< 		Number of times declared inlier
 				} counters;
 
 				/**
 				 * Events
 				 */
 				struct events {
-						bool visible; ///< Landmark is visible
-						bool measured; ///< Feature is measured
-						bool matched; ///< Feature is matched
-						bool updated; ///< Landmark is updated
+						bool visible; ///< 		Landmark is visible
+						bool measured; ///< 	Feature is measured
+						bool matched; ///< 		Feature is matched
+						bool updated; ///< 		Landmark is updated
 				} events;
 
 				/**
@@ -138,10 +145,11 @@ namespace jafar {
 				 * All variables are part of the class, or are accessible by the class.
 				 *
 				 * This projects the landmark into the sensor space, and gives the Jacobians of this projection
-				 * wrt the states that contributed to the projection (those of the robot, eventually the sensor, and the landmark).
+				 * wrt. the states that contributed to the projection (those of the robot, eventually the sensor, and the landmark).
 				 * These states are also available through the indirect_array \a ia_rsl, updated by this function.
 				 */
-				virtual void project_func() = 0;
+				virtual void
+				    project_func(const vec7 & sg, const vec & lmk, vec & meas, vec & nobs, mat & EXP_sg, mat & EXP_lmk) = 0;
 
 				/**
 				 * Project and get expectation covariances
@@ -152,7 +160,8 @@ namespace jafar {
 				 * Is visible
 				 * \return true if visible
 				 */
-				bool isVisible() {
+				bool isVisible()
+				{
 					return events.visible;
 				}
 
@@ -160,7 +169,12 @@ namespace jafar {
 				/**
 				 * Back-project
 				 */
-				virtual void backProject_func() = 0;
+				void backProject();
+				/**
+				 * Back-project function
+				 */
+				virtual void backProject_func(const vec7 & sg, const vec & meas, const vec & nobs, vec & lmk, mat & LMK_sg,
+				    mat & LMK_meas, mat LMK_nobs) = 0;
 
 				/**
 				 * Compute innovation from measurement and expectation.

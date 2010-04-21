@@ -40,17 +40,23 @@ namespace jafar {
 
 		ObservationAbstract::ObservationAbstract(const sensor_ptr_t & _senPtr, const landmark_ptr_t & _lmkPtr,
 		    const size_t _size_meas, const size_t _size_exp, const size_t _size_inn, const size_t _size_nonobs) :
-			sensorPtr(_senPtr),
-			landmarkPtr(_lmkPtr),
-			expectation(_size_exp, _size_nonobs),
-			measurement(_size_meas),
-			innovation(_size_inn),
-			prior(_size_nonobs),
-			ia_rsl(ublasExtra::ia_union(sensorPtr->ia_globalPose, landmarkPtr->state.ia())),
-			EXP_rsl(_size_exp, ia_rsl.size()),
-			INN_meas(_size_inn, _size_meas),
-			INN_exp(_size_inn, _size_exp),
-			INN_rsl(_size_inn, ia_rsl.size())
+		    sensorPtr(_senPtr),
+		    landmarkPtr(_lmkPtr),
+		    expectation(_size_exp, _size_nonobs),
+		    measurement(_size_meas),
+		    innovation(_size_inn),
+		    prior(_size_nonobs),
+		    ia_rsl(ublasExtra::ia_union(sensorPtr->ia_globalPose, landmarkPtr->state.ia())),
+		    EXP_sg(_size_exp, 7),
+		    EXP_l(_size_exp, _lmkPtr->state.size()),
+		    EXP_rsl(_size_exp, ia_rsl.size()),
+		    INN_meas(_size_inn, _size_meas),
+		    INN_exp(_size_inn, _size_exp),
+		    INN_rsl(_size_inn, ia_rsl.size()),
+		    LMK_sg(_lmkPtr->state.size(),7),
+		    LMK_meas(_lmkPtr->state.size(),_size_meas),
+		    LMK_prior(_lmkPtr->state.size(),_size_nonobs),
+		    LMK_rs(_lmkPtr->state.size(),sensorPtr->ia_globalPose.size())
 		{
 			categoryName("OBSERVATION");
 		}
@@ -62,8 +68,45 @@ namespace jafar {
 		}
 
 		void ObservationAbstract::project() {
-			project_func();
+
+			// Global sensor pose
+			vec7 sg;
+
+			// Get global sensor pose
+			sensorPtr->globalPose(sg, SG_rs);
+
+			vec lmk = landmarkPtr->state.x();
+			vec exp, nobs;
+			project_func(sg, lmk, exp, nobs, EXP_sg, EXP_l);
+
+			expectation.x() = exp;
 			expectation.P() = ublasExtra::prod_JPJt(ublas::project(landmarkPtr->mapPtr->filter.P(), ia_rsl, ia_rsl), EXP_rsl);
+		}
+
+		void ObservationAbstract::backProject(){
+			vec7 sg;
+
+			// Get global sensor pose
+			sensorPtr->globalPose(sg, SG_rs);
+
+			// Make some temporal variables to call function
+			vec pix = measurement.x();
+			vec invDist = prior.x();
+			vec lmk = landmarkPtr->state.x();
+			backProject_func(sg, pix, invDist, lmk, LMK_sg, LMK_meas, LMK_prior);
+
+			LMK_rs = ublas::prod(LMK_sg, SG_rs);
+
+			// Initialize in map
+			landmarkPtr->mapPtr->filter.initialize(
+					landmarkPtr->mapPtr->ia_used_states(),
+					LMK_rs,
+					sensorPtr->ia_globalPose,
+					landmarkPtr->state.ia(),
+					LMK_meas,
+					measurement.P(),
+					LMK_prior,
+					prior.P());
 		}
 
 		void ObservationAbstract::computeInnovation() {

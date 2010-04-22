@@ -64,11 +64,11 @@ robot_ptr_t newRobot(map_ptr_t & mapPtr, string name) {
  * \param robPtr a pointer to the robot owning the sensor.
  * \param inInMap flag to estimate robot pose within the SLAM EKF.
  */
-sensor_ptr_t newSensor(robot_ptr_t & robPtr, string name, bool isInMap = false) {
+sensor_ptr_t newSensor(robot_ptr_t & robPtr, string name, MapObject::filtered_obj_t inFilter = MapObject::UNFILTERED) {
 	map_ptr_t mapPtr = robPtr->mapPtr();
 
 	size_t sid = mapPtr->sensorIds.getId();
-	pinhole_ptr_t senPtr(new SensorPinHole(robPtr, isInMap));
+	pinhole_ptr_t senPtr(new SensorPinHole(robPtr, inFilter));
 
 	senPtr->id(sid);
 	senPtr->name(name);
@@ -95,14 +95,17 @@ map_ptr_t initSlam(size_t size_map) {
 	if (mapPtr->unusedStates(size_robCV)) {
 		robot_ptr_t robPtr = newRobot(mapPtr, "SUBMARINE");
 		robPtr->pose.x(quaternion::originFrame());
+		cout << *robPtr << endl;
 
 		if (mapPtr->unusedStates(size_senPH)) {
-			sensor_ptr_t senPtr = newSensor(robPtr, "FLEA", false);
+			sensor_ptr_t senPtr = newSensor(robPtr, "FLEA", MapObject::UNFILTERED);
 			senPtr->pose.x(quaternion::originFrame());
+			cout << *senPtr << endl;
 		}
 		if (mapPtr->unusedStates(size_senPH)) {
-			sensor_ptr_t senPtr = newSensor(robPtr, "MARLIN", true);
+			sensor_ptr_t senPtr = newSensor(robPtr, "MARLIN", MapObject::FILTERED);
 			senPtr->pose.x(quaternion::originFrame());
+			cout << *senPtr << endl;
 		}
 	}
 	if (mapPtr->unusedStates(size_robCV)) {
@@ -110,7 +113,7 @@ map_ptr_t initSlam(size_t size_map) {
 		robPtr->pose.x(quaternion::originFrame());
 
 		if (mapPtr->unusedStates(size_senPH)) {
-			sensor_ptr_t senPtr = newSensor(robPtr, "DRAGONFLY", false);
+			sensor_ptr_t senPtr = newSensor(robPtr, "DRAGONFLY", MapObject::UNFILTERED);
 			senPtr->pose.x(quaternion::originFrame());
 		}
 	}
@@ -209,12 +212,26 @@ void test_main01() {
 	mat SG_rs_local(7,7);
 	mat SG_rs_remote(7,14);
 
-	mapPtr->robotList()[0]->sensorList()[0]->globalPose(sg_local, SG_rs_local);
-	mapPtr->robotList()[0]->sensorList()[1]->globalPose(sg_remote, SG_rs_remote);
+	mapPtr->ParentOf<RobotAbstract>::display(cout);
+	cout << endl;
+	cout << "Rob = " << *(mapPtr->robotList()[0]) << endl;
+	mapPtr->robotList()[0]->ParentOf<SensorAbstract>::display(cout);
+	cout << endl;
+	cout << "Sen = " << *mapPtr->robotList()[0]->sensorList()[0] << endl;
 
+	sensor_ptr_t senPtr = mapPtr->robotList()[0]->sensorList()[0];
+	cout << "SenPtr = " << *senPtr << endl;
+
+	SensorAbstract & sen = *senPtr.get();
+	cout << "sn = " << sen << endl;
+	mapPtr->robotList()[0]->sensorList()[0]->globalPose(sg_local, SG_rs_local);
+//	senPtr->globalPose(sg_local, SG_rs_local);
 	cout << "sg_local  = " << sg_local << endl;
 	cout << "SG_rs_local  = " << SG_rs_local << endl;
 	cout << "sg_local.ia_rsl = " << mapPtr->robotList()[0]->sensorList()[0]->ia_globalPose << endl;
+
+	mapPtr->robotList()[0]->sensorList()[1]->globalPose(sg_remote, SG_rs_remote);
+
 	cout << "sg_remote = " << sg_remote << endl;
 	cout << "SG_rs_remote = " << SG_rs_remote << endl;
 	cout << "sg_local.ia_rsl = " << mapPtr->robotList()[0]->sensorList()[1]->ia_globalPose << endl;

@@ -40,7 +40,7 @@ void test_senPH01(void) {
 	constvel_ptr_t robPtr(new RobotConstantVelocity(mapPtr));
 	robPtr->linkToParentMap(mapPtr);
 	std::cout<<"#"<<__LINE__<<std::endl;
-	pinhole_ptr_t senPtr(new SensorPinHole(robPtr, true));
+	pinhole_ptr_t senPtr(new SensorPinHole(robPtr, MapObject::FILTERED));
 	senPtr->linkToParentRobot(robPtr);
   std::cout<<"#"<<__LINE__<<std::endl;
 

@@ -39,9 +39,6 @@ namespace jafar {
 				 * Constructor from map
 				 */
 				LandmarkAnchoredHomogeneousPoint(const map_ptr_t & mapPtr);
-				~LandmarkAnchoredHomogeneousPoint(void)
-					{ cout << __PRETTY_FUNCTION__ << endl; }
-
 
 				static size_t size(void) {
 					return 7;
@@ -54,8 +51,8 @@ namespace jafar {
 				 * \param ahpf an AHP point in F-frame
 				 * \return the AHP point in global frame
 				 */
-				template<class VF>
-				vec fromFrame(const VF & F) {
+				//template<class VF>
+				vec fromFrame(const vec7 & F) {
 					return lmkAHP::fromFrame(F, state.x());
 				}
 
@@ -68,8 +65,8 @@ namespace jafar {
 				 * \param AHP_f the Jacobian of \a ahp wrt \a F
 				 * \param AHP_ahpf the Jacobians of \a ahp wrt \a ahpf
 				 */
-				template<class VF, class Vahp, class MAHP_f, class MAHP_ahpf>
-				void fromFrame(const VF & F, Vahp & ahp, MAHP_f & AHP_f, MAHP_ahpf & AHP_ahpf) {
+				//template<class VF, class Vahp, class MAHP_f, class MAHP_ahpf>
+				void fromFrame(const vec7 & F, vec7 & ahp, mat & AHP_f, mat & AHP_ahpf) {
 					lmkAHP::fromFrame(F, state.x(), ahp, AHP_f, AHP_ahpf);
 				}
 
@@ -80,8 +77,8 @@ namespace jafar {
 				 * \param ahp an AHP point in global frame
 				 * \return the AHP point in F-frame
 				 */
-				template<class VF>
-				vec toFrame(const VF & F) {
+				//template<class VF>
+				vec toFrame(const vec7 & F) {
 					return lmkAHP::toFrame(F, state.x());
 				}
 
@@ -94,33 +91,30 @@ namespace jafar {
 				 * \param AHPF_f the Jacobian of \a ahpf wrt \a F
 				 * \param AHPF_ahp the Jacobians of \a ahpf wrt \a ahp
 				 */
-				template<class VF, class Vahpf, class MAHPF_f, class MAHPF_ahp>
-				void toFrame(const VF & F, Vahpf & ahpf, MAHPF_f & AHPF_f, MAHPF_ahp & AHPF_ahp) {
+				//template<class VF, class Vahpf, class MAHPF_f, class MAHPF_ahp>
+				void toFrame(const vec7 & F, vec7 & ahpf, mat & AHPF_f, mat & AHPF_ahp) {
 					lmkAHP::toFrame(F, state.x(), ahpf, AHPF_f, AHPF_ahp);
 				}
 
 
-				void reparametrize_func(const vec & ahp, vec & euc, mat & EUC_ahp)
-				{ std::cout << __PRETTY_FUNCTION__ << ": TODO!" << std::endl; }
+				/**
+				 * Reparametrize to Euclidean.
+				 * \param ahp the anchored homogeneous point to be reparametrized.
+				 * \return the Euclidean point.
+				 */
+				vec3 toEuclidean();
 
-//				/**
-//				 * Reparametrize to Euclidean.
-//				 * \param ahp the anchored homogeneous point to be reparametrized.
-//				 * \return the Euclidean point.
-//				 */
-//				vec3 toEuclidean();
-//
-//
-//				/**
-//				 * Reparametrize to Euclidean, with Jacobians.
-//				 * \param ahp the anchored homogeneous point to be reparametrized.
-//				 * \param euc the returned Euclidean point.
-//				 * \param EUC_ahp the Jacobian of the conversion.
-//				 */
-//				template<class VE, class ME_a>
-//				void toEuclidean(VE & euc, ME_a & EUC_ahp) {
-//					lmkAHP::ahp2euc(state.x(), euc, EUC_ahp);
-//				}
+
+				/**
+				 * Reparametrize to Euclidean, with Jacobians.
+				 * \param ahp the anchored homogeneous point to be reparametrized.
+				 * \param euc the returned Euclidean point.
+				 * \param EUC_ahp the Jacobian of the conversion.
+				 */
+				//template<class VE, class ME_a>
+				void toEuclidean(vec3 & euc, mat & EUC_ahp) {
+					lmkAHP::ahp2euc(state.x(), euc, EUC_ahp);
+				}
 
 				/**
 				 * Bring landmark to bearing-only sensor frame (without range information).

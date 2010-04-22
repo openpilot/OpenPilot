@@ -33,22 +33,27 @@ namespace jafar {
 				friend ostream& operator <<(ostream & s, jafar::rtslam::MapObject & obj);
 
 			public:
+				typedef enum {
+					FILTERED, ///<  Object's state vector is part of the SLAM filter.
+					UNFILTERED ///< Object's state vector is no part of the SLAM filter.
+				} filtered_obj_t;
 
 				Gaussian state;
 
-				/**
-				 * Local constructor from size.
-				 * With this constructor the object is not linked to any map. Use it for eg. sensors.
-				 * \param _size the state size.
-				 */
-				MapObject(const size_t _size);
+//				/**
+//				 * Local constructor from size.
+//				 * With this constructor the object is not linked to any map. Use it for eg. sensors.
+//				 * \param _size the state size.
+//				 */
+//				MapObject(const size_t _size);
 
 				/**
-				 * Remote constructor from remote map and size
-				 * \param _map the remote map
-				 * \param _begin the first index pointing to the remote storage
+				 * Selectable constructor with boolean inFilter flag.
+				 * \param _mapPtr pointer to map
+				 * \param _size size of the state vector
+				 * \param inFilter flag for filtered state
 				 */
-				MapObject(const map_ptr_t & _mapPtr, const size_t _size);
+				MapObject(const map_ptr_t & _mapPtr, const size_t _size, const filtered_obj_t inFilter = FILTERED);
 
 				/**
 				 * Mandatory virtual destructor

@@ -33,22 +33,17 @@ namespace jafar {
 		}
 
 
-		/*
-		 * Local constructor from size
+		/**
+		 * Selectable constructor with inFilter flag.
 		 */
-		MapObject::MapObject(const std::size_t _size) :
-			ObjectAbstract(), state(_size) {
+		MapObject::MapObject(const map_ptr_t & _mapPtr, const size_t _size, const filtered_obj_t inFilter) :
+			ObjectAbstract(),
+			state(inFilter == FILTERED ? Gaussian(_mapPtr->x(), _mapPtr->P(), _mapPtr->reserveStates(_size)) : _size)
+		{
 			categoryName("MAP OBJECT");
+			cout << "Created map object." << endl;
 		}
 
-
-		/*
-		 * Remote constructor from remote map and indirect array
-		 */
-		MapObject::MapObject(const map_ptr_t & _mapPtr, const size_t _size) :
-			ObjectAbstract(), state(_mapPtr->x(), _mapPtr->P(), _mapPtr->reserveStates(_size)) {
-			categoryName("MAP OBJECT");
-		}
 
 	}
 }

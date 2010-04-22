@@ -40,6 +40,9 @@ namespace jafar {
 				 */
 				LandmarkAnchoredHomogeneousPoint(const map_ptr_t & mapPtr);
 
+				virtual ~LandmarkAnchoredHomogeneousPoint() {
+								}
+
 				static size_t size(void) {
 					return 7;
 				}

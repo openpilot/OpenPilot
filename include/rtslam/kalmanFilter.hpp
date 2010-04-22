@@ -56,7 +56,6 @@ namespace jafar {
 				}
 
 
-				// \todo: define API for all these functions.
 				/**
 				 * Predict covariances matrix.
 				 *
@@ -147,6 +146,8 @@ namespace jafar {
 				 * \param ia_new indices to new landmark parameters
 				 */
 				void reparametrize(const ind_array & iax, const mat & J_l, const ind_array & ia_old, const ind_array & ia_new);
+
+				// \todo: define API for all these functions.
 
 				void computeInnovation();
 				void computeK();

@@ -34,6 +34,11 @@ namespace jafar {
 
 				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObjectAbstract & obj);
 
+			public:
+				typedef enum {
+					FOR_SIMULATION ///< Force simulation object
+				} simulation_t;
+
 			private:
 				std::size_t id_;
 				std::string categoryName_;

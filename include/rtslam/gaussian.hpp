@@ -46,18 +46,18 @@ namespace jafar {
 		 *
 		 * You just give a size, a pair {\a x , \a P } or another Gaussian:
 		 * \code
-		 * Gaussian GLa(7);               // Construct from size.
-		 * Gaussian GLb(x);               // Construct from vector.
-		 * Gaussian GLc(x, P);            // Construct from given vector and matrix.
-		 * Gaussian GLd(GL);              // Copy-construct from local Gaussian.
-		 * Gaussian GLe(GR, GR.LOCAL);    // Copy-construct from remote, force local storage.
+		 * Gaussian GLa(7);               			// Construct from size.
+		 * Gaussian GLb(x);               			// Construct from vector.
+		 * Gaussian GLc(x, P);            			// Construct from given vector and matrix.
+		 * Gaussian GLd(GL);              			// Copy-construct from local Gaussian.
+		 * Gaussian GLe(GR, Gaussian::LOCAL); 	// Copy-construct from remote, force local storage.
 		 * \endcode
 		 *
 		 * You can create Gaussians with no covariance by providing just the mean vector.
 		 * This is only possible for local Gaussians. The Gaussian \a GLb above is an example.
 		 *
 		 * See that the last constructor \a GLe takes a remote Gaussian (see below).
-		 * The directive \a GR.LOCAL tells the constructor to force local storage.
+		 * The directive \a Gaussian::LOCAL tells the constructor to force local storage.
 		 * The result is a local Gaussian (the data is copied to the local storage).
 		 *
 		 * <b> To construct a remote Gaussian </b>
@@ -66,16 +66,16 @@ namespace jafar {
 		 *
 		 * There are four methods to create a remote Gaussian:
 		 * \code
-		 * Gaussian GRa(GR);              // Copy a remote Gaussian
-		 * Gaussian GRb(GL, GL.REMOTE);   // Point to a whole local Gaussian
-		 * Gaussian GRc(x, P, ia);        // Point to a part of given x and P.
-		 * Gaussian GRd(GL, ia);          // Point to a part of a given local Gaussian
-		 * Gaussian GRe(GR, ia);          // Point to a part of a given remote Gaussian
+		 * Gaussian GRa(GR);              			// Copy a remote Gaussian
+		 * Gaussian GRb(GL, Gaussian::REMOTE);	// Point to a whole local Gaussian
+		 * Gaussian GRc(x, P, ia);        			// Point to a part of given x and P.
+		 * Gaussian GRd(GL, ia);          			// Point to a part of a given local Gaussian
+		 * Gaussian GRe(GR, ia);          			// Point to a part of a given remote Gaussian
 		 * \endcode
 		 *
 		 * In the first case, \a GRa points to the same Gaussian as \a GR.
 		 *
-		 * In the second case, the directive \a GL.REMOTE tells the constructor not to copy \a GL (as in \a GLd above)
+		 * In the second case, the directive \a Gaussian::REMOTE tells the constructor not to copy \a GL (as in \a GLd above)
 		 * but to create a remote Gaussian that points to \a GL.
 		 *
 		 * In the last three constructor modes, the produced Gaussian points to just a sub-set of the provided data.
@@ -155,9 +155,9 @@ namespace jafar {
 				 * Storage type of Gaussians: LOCAL, REMOTE.
 				 */
 				typedef enum {
-					REMOTE, ///< Mean and covariances point to an external pair {x,P}.
-					LOCAL, ///< Mean and covariances are stored in \a x_local and \a P_local.
-					UNCHANGED ///< Used **only** as the default flag for the copy constructor.
+					REMOTE, ///< 		Mean and covariances point to an external pair {x,P}.
+					LOCAL, ///<			Mean and covariances are stored in \a x_local and \a P_local.
+					UNCHANGED ///< 	Used **only** as the default flag for the copy constructor.
 				} storage_t;
 
 			private:

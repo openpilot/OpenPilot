@@ -52,6 +52,8 @@ public:
     } __attribute__((packed)) DataFields;
 
     // Enumeration types
+    /* Array element names for field Field4 */
+    typedef enum { FIELD4_0=0, FIELD4_1=1, FIELD4_2=2, FIELD4_3=3,  } Field4Elem;
     /* Enumeration options for field Field8 */
     typedef enum { FIELD8_OPTION1=0, FIELD8_OPTION2=1,  } Field8Options;
 

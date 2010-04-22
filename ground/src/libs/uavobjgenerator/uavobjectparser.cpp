@@ -352,7 +352,18 @@ QString UAVObjectParser::processObjectFields(QDomNode& childNode, ObjectInfo* in
     }
     // Get numelements or elementnames attribute
     elemAttr = elemAttributes.namedItem("elementnames");
-    if ( elemAttr.isNull() )
+    if ( !elemAttr.isNull() )
+    {
+        // Get element names
+        QStringList names = elemAttr.nodeValue().split(",", QString::SkipEmptyParts);
+        for (int n = 0; n < names.length(); ++n)
+        {
+            names[n] = names[n].trimmed();
+        }
+        field->elementNames = names;
+        field->numElements = names.length();
+    }
+    else
     {
         elemAttr = elemAttributes.namedItem("elements");
         if ( elemAttr.isNull() )
@@ -364,22 +375,9 @@ QString UAVObjectParser::processObjectFields(QDomNode& childNode, ObjectInfo* in
             field->numElements = elemAttr.nodeValue().toInt();
             for (int n = 0; n < field->numElements; ++n)
             {
-                field->elementNames.append(QString("[%1]").arg(n));
+                field->elementNames.append(QString("%1").arg(n));
             }
-            field->defaultElementNames = true;
         }
-    }
-    else
-    {
-        // Get element names
-        QStringList names = elemAttr.nodeValue().split(",", QString::SkipEmptyParts);
-        for (int n = 0; n < names.length(); ++n)
-        {
-            names[n] = names[n].trimmed();
-        }
-        field->elementNames = names;
-        field->numElements = names.length();
-        field->defaultElementNames = false;
     }
     // Get options attribute (only if an enum type)
     if (field->type == FIELDTYPE_ENUM)
@@ -598,7 +596,7 @@ bool UAVObjectParser::generateFlightObject(int objIndex, const QString& template
                           .arg( info->fields[n]->name ) );
         }
         // Generate element names (only if field has more than one element)
-        if (info->fields[n]->numElements > 1 && !info->fields[n]->defaultElementNames)
+        if (info->fields[n]->numElements > 1)
         {
             enums.append(QString("/* Array element names for field %1 */\n").arg(info->fields[n]->name));
             enums.append("typedef enum { ");
@@ -730,7 +728,7 @@ bool UAVObjectParser::generateGCSObject(int objIndex, const QString& templateInc
                           .arg( info->fields[n]->name ) );
         }
         // Generate element names (only if field has more than one element)
-        if (info->fields[n]->numElements > 1 && !info->fields[n]->defaultElementNames)
+        if (info->fields[n]->numElements > 1)
         {
             enums.append(QString("    /* Array element names for field %1 */\n").arg(info->fields[n]->name));
             enums.append("    typedef enum { ");

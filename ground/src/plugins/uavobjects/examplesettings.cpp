@@ -38,13 +38,13 @@ ExampleSettings::ExampleSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTING
     // Create fields
     QList<UAVObjectField*> fields;
     QStringList UpdatePeriodElemNames;
-    UpdatePeriodElemNames.append("[0]");
+    UpdatePeriodElemNames.append("0");
     fields.append(new UAVObjectFieldInt32(QString("UpdatePeriod"), QString("ms"), UpdatePeriodElemNames));
     QStringList StepSizeElemNames;
-    StepSizeElemNames.append("[0]");
+    StepSizeElemNames.append("0");
     fields.append(new UAVObjectFieldInt32(QString("StepSize"), QString(""), StepSizeElemNames));
     QStringList StepDirectionElemNames;
-    StepDirectionElemNames.append("[0]");
+    StepDirectionElemNames.append("0");
     QStringList StepDirectionEnumOptions;
     StepDirectionEnumOptions.append("up");
     StepDirectionEnumOptions.append("down");

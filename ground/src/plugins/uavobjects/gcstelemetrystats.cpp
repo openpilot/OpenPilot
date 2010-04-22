@@ -38,25 +38,25 @@ GCSTelemetryStats::GCSTelemetryStats(): UAVDataObject(OBJID, ISSINGLEINST, ISSET
     // Create fields
     QList<UAVObjectField*> fields;
     QStringList ConnectedElemNames;
-    ConnectedElemNames.append("[0]");
+    ConnectedElemNames.append("0");
     QStringList ConnectedEnumOptions;
     ConnectedEnumOptions.append("True");
     ConnectedEnumOptions.append("False");
     fields.append(new UAVObjectFieldEnum(QString("Connected"), QString("bool"), ConnectedElemNames, ConnectedEnumOptions));
     QStringList TxDataRateElemNames;
-    TxDataRateElemNames.append("[0]");
+    TxDataRateElemNames.append("0");
     fields.append(new UAVObjectFieldFloat(QString("TxDataRate"), QString("bytes/sec"), TxDataRateElemNames));
     QStringList RxDataRateElemNames;
-    RxDataRateElemNames.append("[0]");
+    RxDataRateElemNames.append("0");
     fields.append(new UAVObjectFieldFloat(QString("RxDataRate"), QString("bytes/sec"), RxDataRateElemNames));
     QStringList TxFailuresElemNames;
-    TxFailuresElemNames.append("[0]");
+    TxFailuresElemNames.append("0");
     fields.append(new UAVObjectFieldUInt32(QString("TxFailures"), QString("count"), TxFailuresElemNames));
     QStringList RxFailuresElemNames;
-    RxFailuresElemNames.append("[0]");
+    RxFailuresElemNames.append("0");
     fields.append(new UAVObjectFieldUInt32(QString("RxFailures"), QString("count"), RxFailuresElemNames));
     QStringList TxRetriesElemNames;
-    TxRetriesElemNames.append("[0]");
+    TxRetriesElemNames.append("0");
     fields.append(new UAVObjectFieldUInt32(QString("TxRetries"), QString("count"), TxRetriesElemNames));
 
     // Initialize object

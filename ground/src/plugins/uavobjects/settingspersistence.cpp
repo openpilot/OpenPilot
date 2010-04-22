@@ -38,7 +38,7 @@ SettingsPersistence::SettingsPersistence(): UAVDataObject(OBJID, ISSINGLEINST, I
     // Create fields
     QList<UAVObjectField*> fields;
     QStringList OperationElemNames;
-    OperationElemNames.append("[0]");
+    OperationElemNames.append("0");
     QStringList OperationEnumOptions;
     OperationEnumOptions.append("Load");
     OperationEnumOptions.append("Save");

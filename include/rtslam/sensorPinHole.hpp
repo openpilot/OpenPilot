@@ -37,10 +37,18 @@ namespace jafar {
 
 				/**
 				 * Constructor for selectable LOCAL or REMOTE pose, from robot and selector flag.
-				 * \param _rob the robot to install to.
+				 * \param _robPtr the robot to install to.
 				 * \param inFilter flag indicating in the sensor pose is filtered or not.
 				 */
-				SensorPinHole(const robot_ptr_t & _robPtr, bool inFilter = false);
+				SensorPinHole(const robot_ptr_t & _robPtr, filtered_obj_t inFilter = UNFILTERED);
+
+				/**
+				 * Selectable LOCAL or REMOTE pose constructor.
+				 * Creates a pin-hole sensor with the pose indexed in a map.
+				 * \param dummy a marker for simulation. Give value ObjectAbstract::FOR_SIMULATION.
+				 * \param _robPtr the robot
+				 */
+				SensorPinHole(const simulation_t dummy, const robot_ptr_t & _robPtr);
 
 				jblas::vec2 imgSize;
 				jblas::vec4 intrinsic;

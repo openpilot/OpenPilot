@@ -38,18 +38,30 @@ namespace jafar {
 			s << "of type " << sen.type() << std::endl;
 			s << ".pose :  " << sen.pose << endl;
 			s << ".robot: [ " << sen.robot().id() << " ]";
-			if (sen.pose.storage() == sen.pose.REMOTE)
-				s << endl << " ia_rs: " << sen.ia_globalPose;
+			if (sen.state.storage() == Gaussian::REMOTE)
+				s << endl << ".ia_rs: " << sen.ia_globalPose;
 			return s;
 		}
 
-		SensorAbstract::SensorAbstract(const robot_ptr_t & _robPtr, const bool inFilter = false) :
-			    //          #check       ? # sensor in filter                                 : # not in filter
-			    MapObject(inFilter ? MapObject(_robPtr->mapPtr(), 7) : 0),
-			    pose(inFilter ? Gaussian(state, jmath::ublasExtra::ia_set(0, 7)) : Gaussian(7)),
-			    ia_globalPose(inFilter ? ia_union(_robPtr->pose.ia(), pose.ia()) : pose.ia()) {
+		SensorAbstract::SensorAbstract(const robot_ptr_t & _robPtr, const filtered_obj_t inFilter) :
+			//          #check       ? # sensor in filter                                 : # not in filter
+			    MapObject(_robPtr->mapPtr(), 7, inFilter),
+			    pose(state, Gaussian::REMOTE),
+			    ia_globalPose(inFilter == FILTERED ? ia_union(_robPtr->pose.ia(), pose.ia()) : ublasExtra::ia_set(0, 0))
+		{
 			categoryName("SENSOR");
+			cout << "Created sensor." << endl;
 		}
+
+		SensorAbstract::SensorAbstract(const simulation_t dummy, const robot_ptr_t & _robPtr) :
+			MapObject(_robPtr->mapPtr(), 7, UNFILTERED),
+			pose(state, Gaussian::REMOTE),
+			ia_globalPose(ublasExtra::ia_set(0,0))
+		{
+			categoryName("SIMU SENSOR");
+			cout << "Created simulated sensor." << endl;
+		}
+
 
 
 
@@ -58,6 +70,7 @@ namespace jafar {
 		 * Acquire raw data.
 		 */
 		void SensorAbstract::acquireRaw() {
+			cout << "acquiring raw" << endl;
 			// \todo Acquire raw data
 		}
 
@@ -66,7 +79,7 @@ namespace jafar {
 		 * Process raw data.
 		 */
 		void SensorAbstract::processRaw() {
-			cout << "processing raw" << endl;
+			cout << "processng raw" << endl;
 			//TODO Call here the raw sensor data manager - active search in teh image case.
 			// rawManagerPtr->processKnownLmks();
 			// rawManagerPtr->discoverNewLmks();
@@ -119,10 +132,11 @@ namespace jafar {
 		 * Get sensor pose in global frame.
 		 */
 		void SensorAbstract::globalPose(jblas::vec7 & senGlobalPos, jblas::mat & SG_rs) {
+			cout << __PRETTY_FUNCTION__ << " # " << __LINE__ << std::endl;
 			jblas::vec7 robotPose = robotPtr()->pose.x();
 			jblas::vec7 sensorPose = pose.x();
 
-			if (pose.storage() == pose.LOCAL) {
+			if (state.storage() == Gaussian::LOCAL) {
 				// Sensor is not in the map. Jacobian only wrt robot.
 				senGlobalPos = quaternion::composeFrames(robotPose, sensorPose);
 				quaternion::composeFrames_by_dglobal(robotPose, sensorPose, SG_rs);

@@ -24,9 +24,16 @@ namespace jafar {
 		// Class sensor pin hole
 		///////////////////////////////////////
 
-		SensorPinHole::SensorPinHole(const robot_ptr_t & _robPtr, bool inFilter) :
+		SensorPinHole::SensorPinHole(const robot_ptr_t & _robPtr, filtered_obj_t inFilter) :
 			SensorAbstract(_robPtr, inFilter) {
 			type("Pin-hole-camera");
+			cout << "Created pinhole." << endl;
+		}
+
+		SensorPinHole::SensorPinHole(const simulation_t dummy, const robot_ptr_t & _robPtr) :
+				SensorAbstract(ObjectAbstract::FOR_SIMULATION, _robPtr) {
+			type("Pin-hole-camera");
+			cout << "Created pinhole." << endl;
 		}
 
 		void SensorPinHole::set_parameters(const jblas::vec4 & k, const jblas::vec & d, const jblas::vec & c) {

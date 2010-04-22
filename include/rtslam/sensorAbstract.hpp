@@ -77,7 +77,15 @@ namespace jafar {
 				 * \param _rob the robot
 				 * \param inFilter flag indicating if the sensor state is part of the filter (REMOTE).
 				 */
-				SensorAbstract(const robot_ptr_t & _robPtr, const bool inFilter);
+				SensorAbstract(const robot_ptr_t & _robPtr, const filtered_obj_t inFilter = UNFILTERED);
+
+				/**
+				 * Selectable LOCAL or REMOTE pose constructor.
+				 * Creates a sensor with the pose indexed in a map.
+				 * \param dummy a marker for simulation. Give value ObjectAbstract::FOR_SIMULATION.
+				 * \param _rob the robot
+				 */
+				SensorAbstract(const simulation_t dummy, const robot_ptr_t & _robPtr);
 
 				/**
 				 * Mandatory virtual destructor.

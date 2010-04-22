@@ -28,8 +28,8 @@ void test_euc01(void) {
 
 	vec3 euc;
 	vec7 senFrame;
-	vec3 v1, v2;
-	double r, id;
+	vec3 v1;
+	double r;
 	mat EUC_f(3,7);
 	mat33 EUC_euc;
 
@@ -37,7 +37,7 @@ void test_euc01(void) {
 	eucp_ptr_t eucPtr(new LandmarkEuclideanPoint(mapPtr));
   eucPtr->linkToParentMap(mapPtr);
 
-	cout << "\n% INIT \n%============" << endl;
+	cout << "\n% BIGGINING TEST_ENCLIDEAN \n%============" << endl;
 	for (size_t i = 0; i < 3; i++)
 		v1(i) = i + 2;
 		subrange(senFrame, 0, 3) = v1;
@@ -51,9 +51,9 @@ void test_euc01(void) {
 		cout << "\n% FROM FRAME \n%============" << endl;
 		cout << "F.x = " << (MATLAB) senFrame << endl;
 		cout << "euc_m = "<< (MATLAB) eucPtr->state.x()<<endl;
-		euc = eucPtr->fromFrame(senFrame);
+		euc = quaternion::vecFromFrame(senFrame,v1);
 		cout << "euc1 = " << (MATLAB) euc << endl;
-		eucPtr->fromFrame(senFrame, euc, EUC_f, EUC_euc);
+		quaternion::vecFromFrame(senFrame, v1, euc, EUC_f, EUC_euc);
 		cout << "euc2 = " << (MATLAB) euc << endl;
 		cout << "EUC_f = " << (MATLAB) EUC_f << endl;
 		cout << "EUC_euc = " << (MATLAB) EUC_euc << endl;
@@ -61,6 +61,7 @@ void test_euc01(void) {
 		cout << "euc_err = norm(euc1 - euc_mat)" << endl;
 		cout << "EUC_f_err = norm(EUC_f - EUC_f_mat)" << endl;
 		cout << "EUC_euc_err = norm(EUC_euc - EUC_euc_mat)" << endl;
+		cout << "\n% END OF TEST_ENCLIDEAN \n%============" << endl;
 
 
 }

@@ -29,5 +29,11 @@ namespace jafar {
 			categoryName("LANDMARK");
 		}
 
+		LandmarkAbstract::LandmarkAbstract(const simulation_t dummy, const map_ptr_t & _mapPtr, const size_t _size) :
+			MapObject(_mapPtr, _size, UNFILTERED)
+		{
+			categoryName("SIMU LANDMARK");
+		}
+
 	}
 }

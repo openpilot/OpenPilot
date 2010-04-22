@@ -69,7 +69,8 @@ namespace jafar {
 				/**
 				 * constructor from map and size
 				 */
-				LandmarkAbstract(const map_ptr_t & _mapPtr, const size_t _size);
+			LandmarkAbstract(const map_ptr_t & _mapPtr, const size_t _size);
+			LandmarkAbstract(const simulation_t dummy, const map_ptr_t & _mapPtr, const size_t _size);
 
 				/**
 				 * Mandatory virtual destructor.

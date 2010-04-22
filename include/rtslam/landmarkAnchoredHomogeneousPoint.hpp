@@ -42,7 +42,7 @@ namespace jafar {
 				LandmarkAnchoredHomogeneousPoint(const simulation_t dummy, const map_ptr_t & mapPtr);
 
 				virtual ~LandmarkAnchoredHomogeneousPoint() {
-								}
+				}
 
 				static size_t size(void) {
 					return 7;

@@ -37,6 +37,10 @@ namespace jafar {
 				 * Constructor from map
 				 */
 				LandmarkEuclideanPoint(const map_ptr_t & mapPtr);
+
+				/**
+				 * Constructor for simulated landmark.
+				 */
 				LandmarkEuclideanPoint(const simulation_t dummy, const map_ptr_t & mapPtr);
 
 				static size_t size(void) {
@@ -44,7 +48,7 @@ namespace jafar {
 				}
 
 				virtual ~LandmarkEuclideanPoint() {
-												}
+				}
 
 				void reparametrize_func(const vec & lmk, vec & lnew, mat & LNEW_lmk){
 					lnew = lmk;

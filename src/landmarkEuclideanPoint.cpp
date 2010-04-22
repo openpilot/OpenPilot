@@ -18,5 +18,10 @@ namespace jafar {
 			type("EUC");
 		}
 
+		LandmarkEuclideanPoint::LandmarkEuclideanPoint(const simulation_t dummy, const map_ptr_t & mapPtr) :
+			LandmarkAbstract(FOR_SIMULATION, mapPtr, 3) {
+			type("EUC");
+		}
+
 	} // namespace rtslam
 } // namespace jafar

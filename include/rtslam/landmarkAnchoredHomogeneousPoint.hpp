@@ -39,6 +39,7 @@ namespace jafar {
 				 * Constructor from map
 				 */
 				LandmarkAnchoredHomogeneousPoint(const map_ptr_t & mapPtr);
+				LandmarkAnchoredHomogeneousPoint(const simulation_t dummy, const map_ptr_t & mapPtr);
 
 				virtual ~LandmarkAnchoredHomogeneousPoint() {
 								}
@@ -113,7 +114,7 @@ namespace jafar {
 				 * - ahp = [p0 m rho]
 				 * - s = [t q],
 				 *
-				 * this function computes the chain (See Sola \e etal. PAMI 2010):
+				 * This function computes the chain (See Sola \e etal. PAMI 2010):
 				 * - R'(q) * ( m - (t - p0) * rho )
 				 *
 				 * which is a vector in sensor frame in the direction of the landmark. The range information is lost.

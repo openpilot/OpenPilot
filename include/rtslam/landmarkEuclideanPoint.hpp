@@ -37,6 +37,7 @@ namespace jafar {
 				 * Constructor from map
 				 */
 				LandmarkEuclideanPoint(const map_ptr_t & mapPtr);
+				LandmarkEuclideanPoint(const simulation_t dummy, const map_ptr_t & mapPtr);
 
 				static size_t size(void) {
 					return 3;

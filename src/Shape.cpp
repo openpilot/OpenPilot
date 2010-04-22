@@ -11,10 +11,13 @@
 namespace jafar {
 namespace qdisplay {
 
-Shape::Shape(ShapeType shapeType, double x, double y, double w, double h) :
+Shape::Shape(ShapeType shapeType, double x, double y, double w, double h, double angle) :
     m_shapeType(shapeType), m_label(0), m_fontSize(5)
 {
-  setBoundingBox(x, y, w, h );
+	setBoundingBox(x, y, w, h);
+	QTransform transform;
+	transform.rotate(angle);
+	setTransform(transform);
 }
 
 void Shape::paint(QPainter *painter, const QStyleOptionGraphicsItem * opt, QWidget * wdg)
@@ -29,13 +32,9 @@ void Shape::paint(QPainter *painter, const QStyleOptionGraphicsItem * opt, QWidg
       painter->drawLine(QPointF(m_boundingRect.left(), 0.), QPointF( m_boundingRect.right(), 0.));
       painter->drawLine(QPointF(0., m_boundingRect.top()), QPointF(0., m_boundingRect.bottom()));
       break;
-    case ShapeCrossX:
-      painter->drawLine(QPointF(m_boundingRect.left(), m_boundingRect.top()), QPointF( m_boundingRect.right(), m_boundingRect.bottom()));
-      painter->drawLine(QPointF(m_boundingRect.right(), m_boundingRect.top()), QPointF(m_boundingRect.left(), m_boundingRect.bottom()));
-      break;
     case ShapeEllipse:
-    	painter->drawEllipse(m_boundingRect);
-    	break;
+      painter->drawEllipse(m_boundingRect);
+      break;
   }
   QGraphicsItemGroup::paint(painter, opt, wdg);
 }

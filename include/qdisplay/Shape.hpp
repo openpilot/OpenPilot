@@ -17,16 +17,18 @@ class Shape : public QGraphicsItemGroup {
     enum ShapeType {
       ShapeRectangle,
       ShapeCross,
-      ShapeCrossX,
       ShapeEllipse
     };
     /**
       * Create an Shape to use with a Viewer to display a basic shape.
+      * @param shapeType the type of the shape to display
       * @param x x-coordinate of the center of the shape
       * @param y y-coordinate of the center of the shape
-      * @param shapeType the type of the shape to display
+      * @param w width of the shape
+      * @param h height of the shape
+      * @param angle angle of the shape (degrees)
       */
-    Shape(ShapeType shapeType, double x, double y, double w, double h);
+    Shape(ShapeType shapeType, double x, double y, double w, double h, double angle = 0);
     virtual QRectF boundingRect () const { return m_boundingRect; } 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
     /**

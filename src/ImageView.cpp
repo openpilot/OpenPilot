@@ -211,10 +211,10 @@ void ImageView::exportView( const std::string& _fileName )
     this->scene()->render(&painter);
     if( extension == "png")
     {
-        img.save(fileName, "PNG", 100);
+        img.save(fileName, "PNG");
     }
     else {
-        img.save(fileName, "TIFF", 100);
+        img.save(fileName, "TIFF");
     }
   } else if ( extension == "svg" )
   {

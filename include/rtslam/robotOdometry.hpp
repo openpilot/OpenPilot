@@ -47,9 +47,14 @@ namespace jafar {
 				 * Remote constructor from remote map.
 				 * \param _map the remote map
 				 */
-
-
 				RobotOdometry(const map_ptr_t _mapPtr);
+
+				/**
+				 * Remote constructor from remote map, for simulation.
+				 * \param dummy flag for simulation. Give value FOR_SIMULATION.
+				 * \param _map the remote map
+				 */
+				RobotOdometry(const simulation_t dummy, const map_ptr_t _mapPtr);
 
 				~RobotOdometry(void) {
 				}

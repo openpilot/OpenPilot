@@ -26,13 +26,15 @@ namespace jafar {
 		using namespace std;
 		using namespace jmath;
 
-		/**
-		 * Remote constructor from remote map.
-		 * \param _map the remote map
-		 */
 		RobotOdometry::RobotOdometry(const map_ptr_t _mapPtr) :
 					RobotAbstract(_mapPtr, RobotOdometry::size(), RobotOdometry::size_control(), RobotOdometry::size_perturbation()) {
 					constantPerturbation = false;
+					type("Odometry");
+				}
+
+		RobotOdometry::RobotOdometry(const simulation_t dummy, const map_ptr_t _mapPtr) :
+					RobotAbstract(FOR_SIMULATION, _mapPtr, RobotOdometry::size(), RobotOdometry::size_control(), RobotOdometry::size_perturbation()) {
+					constantPerturbation = true;
 					type("Odometry");
 				}
 

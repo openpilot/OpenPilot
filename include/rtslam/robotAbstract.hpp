@@ -86,6 +86,16 @@ namespace jafar {
 				 */
 				RobotAbstract(const map_ptr_t & _mapPtr, const size_t _size_state, const size_t _size_control,
 				              const size_t _size_pert);
+				/**
+				 * Remote constructor from remote map and size of state and control vectors.
+				 * \param dummy flag indicating simulation object. Give MapObject::FOR_SIMULATION.
+				 * \param _mapPtr a pointer to the map.
+				 * \param _size_state the size of the robot state vector
+				 * \param _size_control the size of the control vector
+				 * \param _size_pert the size of the perturbation vector
+				 */
+				RobotAbstract(const simulation_t dummy, const map_ptr_t & _mapPtr, const size_t _size_state, const size_t _size_control,
+				              const size_t _size_pert);
 
 				// Mandatory virtual destructor.
 				virtual ~RobotAbstract() {

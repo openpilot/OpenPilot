@@ -59,6 +59,12 @@ namespace jafar {
 				 * \param _map the remote map
 				 */
 				RobotConstantVelocity(const map_ptr_t & _mapPtr);
+				/**
+				 * Remote constructor from map, for simulation.
+				 * \param dummy flag for simulation. Give value FOR_SIMULATION.
+				 * \param _map the map
+				 */
+				RobotConstantVelocity(const simulation_t dummy, const map_ptr_t & _mapPtr);
 
 				~RobotConstantVelocity(void) {
 				}

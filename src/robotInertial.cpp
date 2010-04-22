@@ -34,6 +34,11 @@ namespace jafar {
 			constantPerturbation = false;
 			type("Inertial");
 		}
+		RobotInertial::RobotInertial(const simulation_t dummy, const map_ptr_t & _mapPtr) :
+			RobotAbstract(FOR_SIMULATION, _mapPtr, RobotInertial::size(), RobotInertial::size_control(), RobotInertial::size_perturbation()) {
+			constantPerturbation = true;
+			type("Inertial");
+		}
 
 
 		/*

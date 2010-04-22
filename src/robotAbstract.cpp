@@ -36,7 +36,7 @@ namespace jafar {
 			s << ".sens : [";
 			for (RobotAbstract::SensorList::const_iterator senIter = rob.sensorList().begin();
 						senIter != rob.sensorList().end(); senIter++)
-				s << " " << *senIter << " "; // Print the address of the sensor.
+				s << " " << (*senIter)->id() << " "; // Print the address of the sensor.
 			s << "]";
 			return s;
 		}
@@ -56,6 +56,19 @@ namespace jafar {
 		{
 			constantPerturbation = false;
 			categoryName("ROBOT"); // robot is categorized
+		}
+
+		RobotAbstract::RobotAbstract(const simulation_t dummy, const map_ptr_t & _mapPtr, const size_t _size_state, const size_t _size_control, const size_t _size_pert) :
+			MapObject(_mapPtr, _size_state, UNFILTERED),
+			pose(state, jmath::ublasExtra::ia_set(0, 7)),
+			control(_size_control),
+			perturbation(_size_pert),
+			XNEW_x(_size_state, _size_state),
+			XNEW_pert(_size_state, _size_pert),
+			Q(_size_state, _size_state)
+		{
+			constantPerturbation = true;
+			categoryName("SIMU ROBOT"); // robot is categorized
 		}
 
 

@@ -39,6 +39,15 @@ namespace jafar {
 			type("Constant-Velocity");
 		}
 
+		RobotConstantVelocity::RobotConstantVelocity(const simulation_t dummy, const map_ptr_t & _mapPtr) :
+			RobotAbstract(FOR_SIMULATION, _mapPtr, RobotConstantVelocity::size(), RobotConstantVelocity::size_control(), RobotConstantVelocity::size_perturbation()) {
+			// Build constant perturbation Jacobian
+			constantPerturbation = true;
+			computePertJacobian();
+			type("Constant-Velocity");
+		}
+
+
 		void RobotConstantVelocity::move_func(const vec & _x, const vec & _u, const vec & _n, const double _dt, vec & _xnew, mat & _XNEW_x, mat & _XNEW_u) {
 
 			using namespace jblas;

@@ -39,15 +39,12 @@ namespace jafar {
 				 * Constructor from map
 				 */
 				LandmarkAnchoredHomogeneousPoint(const map_ptr_t & mapPtr);
-				~LandmarkAnchoredHomogeneousPoint(void)
-					{ cout << __PRETTY_FUNCTION__ << endl; }
-
 
 				static size_t size(void) {
 					return 7;
 				}
 
-				//TODO remove all templates from LmkAhp class.
+				//TODO add tests on input arguments' sizes.
 
 				/**
 				 * From-frame transform.
@@ -55,8 +52,7 @@ namespace jafar {
 				 * \param ahpf an AHP point in F-frame
 				 * \return the AHP point in global frame
 				 */
-				template<class VF>
-				vec fromFrame(const VF & F) {
+				vec fromFrame(const vec7 & F) {
 					return lmkAHP::fromFrame(F, state.x());
 				}
 
@@ -69,8 +65,7 @@ namespace jafar {
 				 * \param AHP_f the Jacobian of \a ahp wrt \a F
 				 * \param AHP_ahpf the Jacobians of \a ahp wrt \a ahpf
 				 */
-				template<class VF, class Vahp, class MAHP_f, class MAHP_ahpf>
-				void fromFrame(const VF & F, Vahp & ahp, MAHP_f & AHP_f, MAHP_ahpf & AHP_ahpf) {
+				void fromFrame(const vec7 & F, vec & ahp, mat & AHP_f, mat & AHP_ahpf) {
 					lmkAHP::fromFrame(F, state.x(), ahp, AHP_f, AHP_ahpf);
 				}
 
@@ -81,8 +76,7 @@ namespace jafar {
 				 * \param ahp an AHP point in global frame
 				 * \return the AHP point in F-frame
 				 */
-				template<class VF>
-				vec toFrame(const VF & F) {
+				vec toFrame(const vec7 & F) {
 					return lmkAHP::toFrame(F, state.x());
 				}
 
@@ -95,33 +89,19 @@ namespace jafar {
 				 * \param AHPF_f the Jacobian of \a ahpf wrt \a F
 				 * \param AHPF_ahp the Jacobians of \a ahpf wrt \a ahp
 				 */
-				template<class VF, class Vahpf, class MAHPF_f, class MAHPF_ahp>
-				void toFrame(const VF & F, Vahpf & ahpf, MAHPF_f & AHPF_f, MAHPF_ahp & AHPF_ahp) {
+				void toFrame(const vec7 & F, vec & ahpf, mat & AHPF_f, mat & AHPF_ahp) {
 					lmkAHP::toFrame(F, state.x(), ahpf, AHPF_f, AHPF_ahp);
 				}
 
-
-				void reparametrize_func(const vec & ahp, vec & euc, mat & EUC_ahp)
-				{ std::cout << __PRETTY_FUNCTION__ << ": TODO!" << std::endl; }
-
-//				/**
-//				 * Reparametrize to Euclidean.
-//				 * \param ahp the anchored homogeneous point to be reparametrized.
-//				 * \return the Euclidean point.
-//				 */
-//				vec3 toEuclidean();
-//
-//
-//				/**
-//				 * Reparametrize to Euclidean, with Jacobians.
-//				 * \param ahp the anchored homogeneous point to be reparametrized.
-//				 * \param euc the returned Euclidean point.
-//				 * \param EUC_ahp the Jacobian of the conversion.
-//				 */
-//				template<class VE, class ME_a>
-//				void toEuclidean(VE & euc, ME_a & EUC_ahp) {
-//					lmkAHP::ahp2euc(state.x(), euc, EUC_ahp);
-//				}
+				/**
+				 * Reparametrize to Euclidean, with Jacobians.
+				 * \param ahp the anchored homogeneous point to be reparametrized.
+				 * \param euc the returned Euclidean point.
+				 * \param EUC_ahp the Jacobian of the conversion.
+				 */
+				void reparametrize_func(const vec & ahp, vec & euc, mat & EUC_ahp) {
+					lmkAHP::ahp2euc(ahp, euc, EUC_ahp);
+				}
 
 				/**
 				 * Bring landmark to bearing-only sensor frame (without range information).
@@ -139,8 +119,7 @@ namespace jafar {
 				 * \param ahp the AHP landmark
 				 * \return the bearing-only landmark in sensor frame
 				 */
-				template<class VS>
-				vec3 toBearingOnlyFrame(const VS & s) {
+				vec3 toBearingOnlyFrame(const vec & s) {
 						return lmkAHP::toBearingOnlyFrame(s, state.x());
 				}
 
@@ -163,8 +142,7 @@ namespace jafar {
 				 * \param v the bearing-only landmark in sensor frame
 				 * \param invDist the inverse of the non-observable distance
 				 */
-				template<class VS, class VV>
-				void toBearingOnlyFrame(const VS & s, VV & v, double & invDist) {
+				void toBearingOnlyFrame(const vec & s, vec & v, double & invDist) {
 						lmkAHP::toBearingOnlyFrame(s, state.x(), v, invDist);
 				}
 
@@ -189,8 +167,7 @@ namespace jafar {
 				 * \param V_s the Jacobian of \a v wrt \a s
 				 * \param V_ahp the Jacobian of \a v wrt \a ahp
 				 */
-				template<class VS, class VV, class MV_s, class MV_a>
-				void toBearingOnlyFrame(const VS & s, VV & v, double & invDist, MV_s & V_s, MV_a & V_ahp) {
+				void toBearingOnlyFrame(const vec & s, vec & v, double & invDist, mat & V_s, mat & V_ahp) {
 						lmkAHP::toBearingOnlyFrame(s, state.x(), v, invDist, V_s, V_ahp);
 				}
 
@@ -209,8 +186,7 @@ namespace jafar {
 				 * \param rho the prior, proportional to inverse-distance
 				 * \return the AHP landmark.
 				 */
-				template<class VS, class VLS>
-				static vec7 fromBearingOnlyFrame(const VS & sf, const VLS & v, double _rho) {
+				static vec7 fromBearingOnlyFrame(const vec & sf, const vec & v, double _rho) {
 						return lmkAHP::fromBearingOnlyFrame(sf, v, _rho);
 				}
 
@@ -232,8 +208,7 @@ namespace jafar {
 				 * \param AHP_v the Jacobian wrt \a v
 				 * \param AHP_rho the Jacobian wrt \a rho
 				 */
-				template<class VS, class VLS, class MA_s, class MA_v, class MA_rho>
-				void fromBearingOnlyFrame(const VS & sf, const VLS & v, double _rho, MA_s & AHP_s, MA_v & AHP_v, MA_rho & AHP_rho) {
+				void fromBearingOnlyFrame(const vec & sf, const vec & v, double _rho, mat & AHP_s, mat & AHP_v, mat & AHP_rho) {
 						lmkAHP::fromBearingOnlyFrame(sf, v, _rho, state.x(), AHP_s, AHP_v, AHP_rho);
 				}
 

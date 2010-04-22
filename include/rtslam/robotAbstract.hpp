@@ -141,8 +141,8 @@ namespace jafar {
 				 * Move one step ahead, affect SLAM filter.
 				 * This function updates the full state and covariances matrix of the robot plus the cross-variances with all other map objects.
 				 */
-				template<class V>
-				inline void move(V & _u) {
+				//template<class V>
+				inline void move(vec & _u) {
 					JFR_ASSERT(_u.size() == control.size(), "robotAbstract.hpp: move: wrong control size.");
 					control = _u;
 					move();
@@ -190,22 +190,6 @@ namespace jafar {
 				 */
 				virtual void move_func(const vec & _x, const vec & _u, const vec& _n, const double _dt, vec & _xnew,
 				                       mat & _XNEW_x, mat & _XNEW_pert) = 0;
-
-
-				//				/**
-				//				 * Move one step ahead, use object members as data.
-				//				 */
-				//				inline void move_func() {
-				//					vec x = state.x();
-				//					vec n = perturbation.x();
-				//					cout << "x = " << x << endl;
-				//					move_func(x, control, n, dt_or_dx, x, XNEW_x, XNEW_pert);
-				//					state.x() = x;
-				//				}
-				/**
-				 * Move one step ahead, use object members as data.
-				 */
-				//				virtual void move_func() = 0;
 
 		};
 

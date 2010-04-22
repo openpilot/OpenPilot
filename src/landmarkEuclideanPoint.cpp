@@ -18,6 +18,5 @@ namespace jafar {
 			type("EUC");
 		}
 
-
 	} // namespace rtslam
 } // namespace jafar

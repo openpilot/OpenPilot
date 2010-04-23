@@ -72,17 +72,17 @@ namespace jafar {
 				}
 		}
 
-		void MapAbstract::addObservations(landmark_ptr_t & lmkPtr) {
-			for (RobotList::iterator robIter = robotList().begin(); robIter != robotList().end(); robIter++) {
-				robot_ptr_t robPtr = *robIter;
-				for (RobotAbstract::SensorList::iterator senIter = robPtr->sensorList().begin(); senIter
-				    != robPtr->sensorList().end(); senIter++) {
-					sensor_ptr_t senPtr = *senIter;
-					observation_ptr_t obsPtr = newObservation(senPtr, lmkPtr);
-					cout << "    added obs: " << obsPtr->id() << endl;
-				}
-			}
-		}
+//		void MapAbstract::addObservations(landmark_ptr_t & lmkPtr) {
+//			for (RobotList::iterator robIter = robotList().begin(); robIter != robotList().end(); robIter++) {
+//				robot_ptr_t robPtr = *robIter;
+//				for (RobotAbstract::SensorList::iterator senIter = robPtr->sensorList().begin(); senIter
+//				    != robPtr->sensorList().end(); senIter++) {
+//					sensor_ptr_t senPtr = *senIter;
+//					observation_ptr_t obsPtr = newObservation(senPtr, lmkPtr);
+//					cout << "    added obs: " << obsPtr->id() << endl;
+//				}
+//			}
+//		}
 
 		void MapAbstract::fillSeq() {
 			for (size_t i = 0; i < max_size; i++) {
@@ -104,15 +104,15 @@ namespace jafar {
 			randMatrix(P());
 		}
 
-		observation_ptr_t MapAbstract::newObservation(sensor_ptr_t & senPtr, landmark_ptr_t & lmkPtr) {
-			observation_ptr_t obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint(senPtr, lmkPtr));
-			//	obsPtr->id() = 0;
-			obsPtr->id() = 1000 * senPtr->id() + lmkPtr->id();
-			obsPtr->linkToParentSensor(senPtr);
-			obsPtr->linkToParentLandmark(lmkPtr);
-
-			return obsPtr;
-		}
+//		observation_ptr_t MapAbstract::newObservation(sensor_ptr_t & senPtr, landmark_ptr_t & lmkPtr) {
+//			observation_ptr_t obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint(senPtr, lmkPtr));
+//			//	obsPtr->id() = 0;
+//			obsPtr->id() = 1000 * senPtr->id() + lmkPtr->id();
+//			obsPtr->linkToParentSensor(senPtr);
+//			obsPtr->linkToParentLandmark(lmkPtr);
+//
+//			return obsPtr;
+//		}
 
 
 		/**

@@ -1,8 +1,9 @@
-/*
- * parents.hpp
+/**
+ * \file parents.hpp
  *
- *  Created on: Apr 19, 2010
- *      Author: nmansard
+ * \date Apr 19, 2010
+ * \author nmansard
+ * \ingroup rtslam
  */
 
 #ifndef __rtslam_parents_H__
@@ -26,9 +27,10 @@ namespace jafar {
 /* --- PARENT --------------------------------------------------------------- */
 /* --- PARENT --------------------------------------------------------------- */
 
-/* Use this generic class by inhereting from it in the parent class.
+/** Use this generic class by inhereting from it in the parent class.
  * The child class can be known only partially:
  * (ie class Child; class Parent : public ParentOf<Child> {...}; class Child { ... };)
+ * \ingroup rtslam
  */
 template<class Child>
 class ParentOf {
@@ -61,9 +63,10 @@ public:
 	}
 };
 
-/* The Macro define a type to access to ParentOf::ChildList, with name <TYPE>List,
+/** The Macro define a type to access to ParentOf::ChildList, with name <TYPE>List,
  * plus two accessors (const and non-const) to access directly to the list
  * of children, with name <ACCESS>List().
+ * \ingroup rtslam
  */
 #define ENABLE_ACCESS_TO_CHILDREN(Child,typeName,accessName)    \
   public: typedef ParentOf<Child>::ChildList typeName##List; \
@@ -77,9 +80,10 @@ public:
 /* --- CHILD ---------------------------------------------------------------- */
 /* --- CHILD ---------------------------------------------------------------- */
 
-/* Use this generic class by inhereting from it in the child class.
+/** Use this generic class by inhereting from it in the child class.
  * The parent class can be known only partially:
  * (ie class Parent; class Child : public ChildOf<Parent> {...}; class Parent { ... };)
+ * \ingroup rtslam
  */
 template<class Parent>
 class ChildOf {
@@ -138,12 +142,13 @@ public:
 
 };
 
-/* Connect the link to the Parent, and register into parent.
+/** Connect the link to the Parent, and register into parent.
  * To be defined as a public member of the child class. The name
  * of the Child class has to be specified explicitely.
  * PRE:
  *  - The class <Parent> should be known at the call of the macros.
  *  - The child class (where the macro is called) should have enable_shared_from_this.
+ * \ingroup rtslam
  */
 #define ENABLE_LINK_TO_FATHER(Parent,Child)                   \
 		public: void linkToParent( boost::shared_ptr<Parent> ptr )          \
@@ -152,8 +157,9 @@ public:
     ptr->ParentOf<Child>::registerChild(shared_from_this());  \
   }
 
-/* Same as before, except that the function is defined with
- * name linkToParent<Parent> (ie, for Parent=Sen, linkToParentSen). */
+/** Same as before, except that the function is defined with
+ * name linkToParent<Parent> (ie, for Parent=Sen, linkToParentSen).
+ * \ingroup rtslam */
 #define ENABLE_LINK_TO_PARENT(Parent,name,Child)              \
 		public: void linkToParent##name( boost::shared_ptr<Parent> ptr )  \
   {                                                           \
@@ -161,9 +167,10 @@ public:
     ptr->ParentOf<Child>::registerChild(shared_from_this());  \
   }
 
-/* Define three accessor function, one to the pointer, two on
+/** Define three accessor function, one to the pointer, two on
  * the reference (const and non-const). The function are called
  * fatherPtr() and father() respectively.
+ * \ingroup rtslam
  */
 #define ENABLE_ACCESS_TO_FATHER(Parent)                       \
 		public: boost::shared_ptr<Parent> father##Ptr( void )               \
@@ -173,8 +180,9 @@ public:
   const Parent& father( void ) const                          \
   {    return ChildOf<Parent>::parent();  }
 
-/* Same as before, except that the function is given an
+/** Same as before, except that the function is given an
  * explicit name, to handle the case of multiple parent.
+ * \ingroup rtslam
  */
 #define ENABLE_ACCESS_TO_PARENT(Parent,accessName)            \
 		public: boost::shared_ptr<Parent> accessName##Ptr( void )           \
@@ -193,9 +201,10 @@ public:
 /* --- SPECIFIC CHILD ------------------------------------------------------- */
 /* --- SPECIFIC CHILD ------------------------------------------------------- */
 
-/* Use this generic class by inhereting from it in the child class.
+/** Use this generic class by inhereting from it in the child class.
  * The parent class can be known only partially:
  * (ie class Parent; class Child : public ChildOf<Parent> {...}; class Parent { ... };)
+ * \ingroup rtslam
  */
 template<class Parent>
 class SpecificChildOf {
@@ -270,6 +279,7 @@ public:
  * The <Child> class is the real child, not the specific class (that is a
  * SpecificChild). For example, the ObservationAHP is not the Child,
  * but ObservationAbstract is.
+ * \ingroup rtslam
  */
 #define ENABLE_LINK_TO_SPECIFIC_FATHER(ParentGen,ParentSpec,Child)   \
 		public: void linkToParent( const boost::shared_ptr<ParentGen>& ptr )       \
@@ -299,8 +309,9 @@ public:
     ptr->ParentOf<Child>::registerChild(shared_from_this());                    \
   }
 
-/* Define three accessors (to the pointer and to the const/non-const reference)
+/** Define three accessors (to the pointer and to the const/non-const reference)
  * with names <ACCESS>Ptr() and <ACCESS>().
+ * \ingroup rtslam
  */
 #define ENABLE_ACCESS_TO_SPECIFIC_PARENT(Parent,accessName)         \
 		public: boost::shared_ptr<Parent> accessName##Ptr( void )       \

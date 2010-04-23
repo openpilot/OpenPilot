@@ -24,14 +24,16 @@
 namespace std {
 	/**
 	 * Operator << for class for ind_array
-	 * FIXME: This operator has been defined in namespace STD.
 	 */
 	template<class A>
 	ostream& operator <<(ostream & s, boost::numeric::ublas::indirect_array<A> & ia_) {
 		s << "[" << ia_.size() << "]{";
-		for (size_t i = 0; i < ia_.size() - 1; i++)
-			s << ia_(i) << ",";
-		s << ia_(ia_.size() - 1) << "}";
+		for (size_t i = 0; i < ia_.size(); i++) {
+			s << ia_(i);
+			if (i + 1 < ia_.size())
+				s << ",";
+		}
+		s << "}";
 		return s;
 	}
 }

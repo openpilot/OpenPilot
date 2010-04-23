@@ -244,7 +244,7 @@ namespace jafar {
 			 * Create indirect array from start and end indices.
 			 */
 			jblas::ind_array ia_set(size_t begin, size_t end) {
-				JFR_PRECOND((begin < end), "Index begin is bigger than end.");
+				JFR_PRECOND((begin <= end), "Index begin is bigger than end.");
 				jblas::ind_array res(end - begin);
 				for (size_t i = 0; i < res.size(); i++)
 					res(i) = begin + i;

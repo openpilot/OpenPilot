@@ -57,7 +57,7 @@ void test_ahp01(void) {
 	cout << "F.x = " << (MATLAB) senFrame << endl;
 	cout << "v = " << (MATLAB) v1 << endl;
 	cout << "r = " << r << endl;
-	ahp = LandmarkAnchoredHomogeneousPoint::fromBearingOnlyFrame(senFrame, v1, r);
+	ahp = lmkAHP::fromBearingOnlyFrame(senFrame, v1, r);
 	cout << "ahp1 = " << (MATLAB) ahp << endl;
 	lmkAHP::fromBearingOnlyFrame(senFrame, v1, r, ahp, AHP_s, AHP_v, AHP_r);
 	cout << "ahp2 = " << (MATLAB) ahp << endl;

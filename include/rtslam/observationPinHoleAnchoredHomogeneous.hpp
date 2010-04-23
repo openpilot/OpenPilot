@@ -15,7 +15,7 @@
 #include "rtslam/observationAbstract.hpp"
 #include "rtslam/sensorPinHole.hpp"
 #include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
-#include "rtslam/parents.hpp"
+//#include "rtslam/parents.hpp"
 #include "boost/shared_ptr.hpp"
 
 namespace jafar {

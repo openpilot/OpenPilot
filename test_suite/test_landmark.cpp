@@ -78,9 +78,9 @@ void test_landmark01(void) {
 	ahpf = ahp1.state.x();
 	ahp = lmkAHP::fromFrame(F, ahpf);
 	cout << "ahp_namespace : " << (MATLAB) ahp << endl;
-	ahp = ahp1.fromFrame(F);
+	ahp = lmkAHP::fromFrame(F,ahpf);
 	cout << "ahp_class : " << (MATLAB) ahp << endl;
-	ahp1.fromFrame(F, ahp, AHP_f, AHP_ahpf);
+	lmkAHP::fromFrame(F, ahpf, ahp, AHP_f, AHP_ahpf);
 
 	cout << "F.x = " << MATLAB(F) << endl;
 	cout << "F = updateFrame(F);" << endl;
@@ -96,7 +96,7 @@ void test_landmark01(void) {
 	cout << "\n% TO FRAME \n%==================" << endl;
 //	ahp1.state.x(ahp);
 	jblas::mat AHPF_f(7, 7), AHPF_ahp(7, 7);
-	ahp1.toFrame(F, ahpf, AHPF_f, AHPF_ahp);
+	lmkAHP::toFrame(F, ahp, ahpf, AHPF_f, AHPF_ahp);
 	//	ahpf = ahp1.toFrame(F, ahp);
 	cout << "ahp = " << (MATLAB) ahp1.state.x() << endl;
 	cout << "ahpf = " << (MATLAB) ahpf << endl;

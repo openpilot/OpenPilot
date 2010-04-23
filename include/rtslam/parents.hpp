@@ -12,6 +12,7 @@
 #include <vector>
 #include <iostream>
 #include <boost/smart_ptr.hpp>
+#include <boost/bind.hpp>
 
 
 namespace jafar {
@@ -20,6 +21,7 @@ namespace jafar {
 	 * \ingroup rtslam
 	 */
 	namespace rtslam {
+
 
 
 /* --- PARENT --------------------------------------------------------------- */

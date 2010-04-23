@@ -44,6 +44,7 @@
 
 #include "rtslam/gaussian.hpp"
 #include "rtslam/innovation.hpp"
+#include "rtslam/dataManagerAbstract.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -71,7 +72,8 @@ namespace jafar {
 		class ObservationAbstract: public ObjectAbstract,
 		    public ChildOf<SensorAbstract> ,
 		    public ChildOf<LandmarkAbstract> ,
-		    public boost::enable_shared_from_this<ObservationAbstract> {
+		    public boost::enable_shared_from_this<ObservationAbstract>,
+		    public ChildOf<DataManagerAbstract> {
 
 				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObservationAbstract & obs);
 
@@ -87,6 +89,9 @@ namespace jafar {
 				// define the functions landmarkPtr() and landmark().
 			ENABLE_ACCESS_TO_PARENT(LandmarkAbstract,landmark)
 				;
+				// define the functions dataManagerPtr() and dataManager().
+			ENABLE_ACCESS_TO_PARENT(DataManagerAbstract,dataManager)
+				;
 
 			public:
 
@@ -98,15 +103,13 @@ namespace jafar {
 				ObservationAbstract(const sensor_ptr_t & _senPtr, const landmark_ptr_t & _lmkPtr, const size_t _size,
 				                    const size_t size_nonobs = 0);
 
-
 				/**
 				 * Sizes constructor
 				 */
 				ObservationAbstract(const sensor_ptr_t & _senPtr, const landmark_ptr_t & _lmkPtr, const size_t _size_meas,
 				                    const size_t _size_exp, const size_t _size_inn, const size_t _size_nonobs = 0);
 
-				virtual ~ObservationAbstract()
-				{
+				virtual ~ObservationAbstract() {
 				}
 
 
@@ -159,7 +162,7 @@ namespace jafar {
 				 * These states are also available through the indirect_array \a ia_rsl, updated by this function.
 				 */
 				virtual void
-				    project_func(const vec7 & sg, const vec & lmk, vec & meas, vec & nobs, mat & EXP_sg, mat & EXP_lmk) = 0;
+				project_func(const vec7 & sg, const vec & lmk, vec & meas, vec & nobs, mat & EXP_sg, mat & EXP_lmk) = 0;
 
 				/**
 				 * Project and get expectation covariances
@@ -170,8 +173,7 @@ namespace jafar {
 				 * Is visible
 				 * \return true if visible
 				 */
-				bool isVisible()
-				{
+				bool isVisible() {
 					return events.visible;
 				}
 
@@ -184,7 +186,7 @@ namespace jafar {
 				 * Back-project function
 				 */
 				virtual void backProject_func(const vec7 & sg, const vec & meas, const vec & nobs, vec & lmk, mat & LMK_sg,
-				    mat & LMK_meas, mat LMK_nobs) = 0;
+				                              mat & LMK_meas, mat LMK_nobs) = 0;
 
 				/**
 				 * Compute innovation from measurement and expectation.

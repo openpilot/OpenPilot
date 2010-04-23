@@ -12,6 +12,7 @@
 #include <vector>
 #include <iostream>
 #include <boost/smart_ptr.hpp>
+#include <boost/bind.hpp>
 
 
 namespace jafar {
@@ -311,7 +312,6 @@ public:
   {    return SpecificChildOf<Parent>::parent();  }
 
 
-	};}; // namespace jafar/rtslam
 
 
 
@@ -507,8 +507,8 @@ public:
 /* The weak pointer can be used for specific link (ie link from abstract-parent
  * to the abstract-child, while simultaneously the same link from the specific-
  * parent to the specific-child. The abstract child inherit from ChildOf<ParentA>
- * but **NOT** from enable_shared_from_this. The specific child inherit from
- * ChildOf<ParentS> AND from enable_shared_from_this. The macro
+ * and from enable_shared_from_this. The specific child inherit from
+ * ChildOf<ParentS> but not from enable_shared_from_this. The macro
  * ENABLE_ACCESS can be used in both child, but the macros ENABLE_LINK
  * and UNREGISTER have to be used **ONLY** in the specific child class.
  * Example below.
@@ -522,12 +522,12 @@ public:
  * {
  *   ENABLE_ACCESS_TO_WEAK_CHILDREN(ChildSpec,ChildSpec,childSpec);
  * };
- * struct ChildAbs : public ChildOf<ParentAbs>
+ * struct ChildAbs : public ChildOf<ParentAbs>,
+ * 		     public boost::enable_shared_from_this<ParentAbs>
  * {
  *   ENABLE_ACCESS_TO_PARENT(ParentAbs,parentAbs);
  * };
- * struct ChildSpec: public ChildAbs, public ChildOf<ParentSpec>,
- * 		  public boost::enable_shared_from_this<ChildSpec>
+ * struct ChildSpec: public ChildAbs, public ChildOf<ParentSpec>
  * {
  *   ENABLE_ACCESS_TO_PARENT(ParentSpec,parentSpec);
  *   ENABLE_LINK_TO_WEAK_SPECIFIC_PARENT(ParentAbs,ParentSpec,
@@ -549,10 +549,9 @@ public:
   {									    \
     ChildOf<ParentSpec>::linkToParent(ptr);                                 \
     ptr->WeakParentOf<ChildSpec>::registerChild                             \
-         (boost::enable_shared_from_this<ChildSpec>::shared_from_this());   \
+         (boost::static_pointer_cast<ChildSpec>(shared_from_this()));	    \
     ChildOf<ParentAbs>::linkToParent(ptr);                                  \
-    ptr->WeakParentOf<ChildAbs>::registerChild                              \
-         (boost::enable_shared_from_this<ChildSpec>::shared_from_this());   \
+    ptr->WeakParentOf<ChildAbs>::registerChild(shared_from_this());         \
   }
 
 /* Call this macro from inside the destructor of the specific child.
@@ -565,5 +564,6 @@ public:
 	  ->WeakParentOf<Child>::cleanExpired();            \
       } } while(0)
 
+	};}; // namespace jafar/rtslam
 
 #endif // #ifndef __rtslam_parents_H__

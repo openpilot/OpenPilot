@@ -25,20 +25,20 @@ namespace jafar {
 		using namespace ublas;
 
 		ObservationPinHoleAnchoredHomogeneousPoint::ObservationPinHoleAnchoredHomogeneousPoint(
-		    const sensor_ptr_t & pinholePtr, const landmark_ptr_t & ahpPtr) :
-		  ObservationAbstract(pinholePtr, ahpPtr, 2, pinholePtr->robotPtr()->pose.size() + pinholePtr->state.size(), 1)
-		{
+		                                                                                       const sensor_ptr_t & pinholePtr,
+		                                                                                       const landmark_ptr_t & ahpPtr) :
+			ObservationAbstract(pinholePtr, ahpPtr, 2, pinholePtr->robotPtr()->pose.size() + pinholePtr->state.size(), 1) {
 			categoryName("PINHOLE-AHP OBS");
 		}
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::project_func(const vec7 & sg, const vec & lmk, vec & exp,
-		    vec & dist, mat & EXP_sg, mat & EXP_lmk)
-		{
+		                                                              vec & dist, mat & EXP_sg, mat & EXP_lmk) {
 			// Some temps of known size
 			vec3 v;
 			mat V_sg(3, 7);
 			mat V_lmk(3, 7);
 			mat23 EXP_v;
+
 
 			// We make the projection.
 			// This is decomposed in two steps:
@@ -49,18 +49,20 @@ namespace jafar {
 			lmkAHP::toBearingOnlyFrame(sg, lmk, v, dist(0), V_sg, V_lmk);
 			pinhole::projectPoint(pinHolePtr()->intrinsic, pinHolePtr()->distortion, v, exp, EXP_v);
 
+
 			// We perform Jacobian composition. We use the chain rule.
 			EXP_sg = prod(EXP_v, V_sg);
 			EXP_lmk = prod(EXP_v, V_lmk);
 		}
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::backProject_func(const vec7 & sg, const vec & pix,
-		    const vec & invDist, vec & ahp, mat & AHP_sg, mat & AHP_pix, mat AHP_invDist)
-		{
+		                                                                  const vec & invDist, vec & ahp, mat & AHP_sg,
+		                                                                  mat & AHP_pix, mat AHP_invDist) {
 			vec3 v;
 			mat32 V_pix;
 			mat V_sg(3, 1);
 			mat AHP_v(7, 3);
+
 
 			// We make the back-projection.
 			// This is decomposed in two steps:
@@ -68,23 +70,41 @@ namespace jafar {
 			// - Transform Bearing-only lmk from sensor pose, using inverse-distance prior.
 			//
 			// These functions below use the down-casted pointer because they need to know the particular object parameters and/or methods:
-			mat V_1(3,1);
+			mat V_1(3, 1);
 			pinhole::backProjectPoint(pinHolePtr()->intrinsic, pinHolePtr()->correction, pix, 1.0, v, V_pix, V_1);
 			lmkAHP::fromBearingOnlyFrame(sg, v, invDist(0), ahp, AHP_sg, AHP_v, AHP_invDist);
+
 
 			// Here we apply the chain rule for composing Jacobians
 			AHP_pix = prod(AHP_v, V_pix);
 
 		}
 
-		bool ObservationPinHoleAnchoredHomogeneousPoint::predictVisibility()
-		{
+		bool ObservationPinHoleAnchoredHomogeneousPoint::predictVisibility() {
 			bool inimg = pinhole::isInImage(expectation.x(), pinHolePtr()->imgSize(0), pinHolePtr()->imgSize(1));
 			bool infront = (expectation.nonObs(0) > 0.0);
 			events.visible = inimg && infront;
 			return events.visible;
 		}
 
+		void ObservationPinHoleAnchoredHomogeneousPoint::linkToWeakParentDataManager(void) {
+			if (!sensorPtr()) {
+				std::cerr << __PRETTY_FUNCTION__ << ": error: senPtr not set yet, linkToParentSensor first." << std::endl;
+				//throw			"SENPTR no set.";
+			}
+			SensorAbstract & sen = *sensorPtr();
+			typedef SensorAbstract::DataManagerList dmalist_t;
+			dmalist_t & dmalist = sen.dataManagerList();
+			// Loop
+			for (dmalist_t::iterator iter = dmalist.begin(); iter != dmalist.end(); iter++) {
+				boost::shared_ptr<DataManagerAbstract> dma =  *iter;
+				boost::shared_ptr<ImageManagerPoint> dms = boost::dynamic_pointer_cast<ImageManagerPoint>(dma);
+				if ((bool)dms)
+					continue; // this is not the proper type ... continue.
+				linkToWeakParentDataManager(dms);
+				return;
+			}
+		}
 	}
 }
 

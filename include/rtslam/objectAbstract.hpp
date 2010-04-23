@@ -35,6 +35,9 @@ namespace jafar {
 				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObjectAbstract & obj);
 
 			public:
+				/**
+				 * Use this enum in constructors to indicate that the object is devoted to simulation.
+				 */
 				typedef enum {
 					FOR_SIMULATION ///< Force simulation object
 				} simulation_t;
@@ -73,13 +76,13 @@ namespace jafar {
 				inline std::string & categoryName() {
 					return categoryName_;
 				}
-				inline void setup(std::string _categoryName, size_t _id, std::string & _type, std::string & _name) {
+				inline void setup(const std::string & _categoryName, const size_t _id, const std::string & _type, const std::string & _name) {
 					categoryName(_categoryName);
 					id(_id);
 					type(_type);
 					name(_name);
 				}
-				inline void setup(size_t _id, std::string & _name) {
+				inline void setup(const size_t _id, const std::string & _name) {
 					id(_id);
 					name(_name);
 				}

@@ -46,21 +46,12 @@ namespace jafar {
 
 
 		void SensorPinHole::setup(const size_t _id, const string & _name, const vec7 & _pose, const vec7 & _std, const vec4 & _k, const vec & _d, const vec & _c){
-			id(_id);
-			name(_name);
+			SensorAbstract::MapObject::ObjectAbstract::setup(_id, _name);
 			pose.x(_pose);
 			pose.std(_std);
 			set_parameters(_k, _d, _c);
 		}
 
-
-//		vec2 SensorPinHole::projectPoint(const vec3 & v){
-//			return pinhole::projectPoint(intrinsic, distortion, v);
-//		}
-//
-//		void SensorPinHole::projectPoint(const vec3 & v, vec2 & u, mat23 & U_v){
-//			pinhole::projectPoint(intrinsic, distortion, v, u, U_v);
-//		}
 
 	}
 }

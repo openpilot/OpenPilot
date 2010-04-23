@@ -62,9 +62,7 @@ namespace jafar {
 		 *
 		 * <b> To construct a remote Gaussian </b>
 		 *
-		 * Remote Gaussians always point to local Gaussians (or to explicit {x,P} data).
-		 *
-		 * There are four methods to create a remote Gaussian:
+		 * Remote Gaussians always point to local Gaussians (or to explicit {x,P} data):
 		 * \code
 		 * Gaussian GRa(GR);              			// Copy a remote Gaussian
 		 * Gaussian GRb(GL, Gaussian::REMOTE);	// Point to a whole local Gaussian

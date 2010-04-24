@@ -123,9 +123,9 @@ int main()
 	/* Initialize modules */
 	SystemModInitialize();
 	TelemetryInitialize();
-	//ExampleModEventInitialize();
 	ExampleModPeriodicInitialize();
 	//ExampleModThreadInitialize();
+	//ExampleModEventInitialize();
 	GpsInitialize();
 
 	/* Start the FreeRTOS scheduler */

@@ -29,7 +29,9 @@
 // Private constants
 #define MAX_QUEUE_SIZE 20
 #define STACK_SIZE configMINIMAL_STACK_SIZE
-#define TASK_PRIORITY (tskIDLE_PRIORITY + 1)
+#define TASK_PRIORITY_RX (tskIDLE_PRIORITY + 2)
+#define TASK_PRIORITY_TX (tskIDLE_PRIORITY + 1)
+#define TASK_PRIORITY_TXPRI (tskIDLE_PRIORITY + 2)
 #define REQ_TIMEOUT_MS 250
 #define MAX_RETRIES 3
 #define STATS_UPDATE_PERIOD_MS 5000
@@ -39,19 +41,23 @@
 // Private variables
 static COMPortTypeDef telemetryPort;
 static xQueueHandle queue;
+static xQueueHandle priorityQueue;
 static xTaskHandle telemetryTxTaskHandle;
+static xTaskHandle telemetryTxPriTaskHandle;
 static xTaskHandle telemetryRxTaskHandle;
 static uint32_t txErrors;
 static uint32_t txRetries;
 
 // Private functions
 static void telemetryTxTask(void* parameters);
+static void telemetryTxPriTask(void* parameters);
 static void telemetryRxTask(void* parameters);
 static int32_t transmitData(uint8_t* data, int32_t length);
 static void registerObject(UAVObjHandle obj);
 static void updateObject(UAVObjHandle obj);
 static int32_t addObject(UAVObjHandle obj);
 static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs);
+static void processObjEvent(UAVObjEvent* ev);
 
 /**
  * Initialise the telemetry module
@@ -62,8 +68,9 @@ int32_t TelemetryInitialize(void)
 {
 	UAVObjEvent ev;
 
-	// Create object queue
+	// Create object queues
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
+	priorityQueue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 
 	// TODO: Get telemetry settings object
 	telemetryPort = COM_USART1;
@@ -78,11 +85,12 @@ int32_t TelemetryInitialize(void)
 	txErrors = 0;
 	txRetries = 0;
 	memset(&ev, 0, sizeof(UAVObjEvent));
-	EventPeriodicQueueCreate(&ev, queue, STATS_UPDATE_PERIOD_MS);
+	EventPeriodicQueueCreate(&ev, priorityQueue, STATS_UPDATE_PERIOD_MS);
 
 	// Start telemetry tasks
-	xTaskCreate(telemetryTxTask, (signed char*)"TelemetryTx", STACK_SIZE, NULL, TASK_PRIORITY, &telemetryTxTaskHandle);
-	xTaskCreate(telemetryRxTask, (signed char*)"TelemetryRx", STACK_SIZE, NULL, TASK_PRIORITY, &telemetryRxTaskHandle);
+	xTaskCreate(telemetryTxTask, (signed char*)"TelTx", STACK_SIZE, NULL, TASK_PRIORITY_TX, &telemetryTxTaskHandle);
+	xTaskCreate(telemetryTxPriTask, (signed char*)"TelPriTx", STACK_SIZE, NULL, TASK_PRIORITY_TXPRI, &telemetryTxPriTaskHandle);
+	xTaskCreate(telemetryRxTask, (signed char*)"TelRx", STACK_SIZE, NULL, TASK_PRIORITY_RX, &telemetryRxTaskHandle);
 
 	return 0;
 }
@@ -124,7 +132,7 @@ static void updateObject(UAVObjHandle obj)
 		{
 			eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
 		}
-		UAVObjConnectQueue(obj, queue, eventMask);
+		UAVObjConnectQueue(obj, priorityQueue, eventMask);
 	}
 	else if(metadata.telemetryUpdateMode == UPDATEMODE_ONCHANGE)
 	{
@@ -136,7 +144,7 @@ static void updateObject(UAVObjHandle obj)
 		{
 			eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
 		}
-		UAVObjConnectQueue(obj, queue, eventMask);
+		UAVObjConnectQueue(obj, priorityQueue, eventMask);
 	}
 	else if(metadata.telemetryUpdateMode == UPDATEMODE_MANUAL)
 	{
@@ -148,28 +156,106 @@ static void updateObject(UAVObjHandle obj)
 		{
 			eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
 		}
-		UAVObjConnectQueue(obj, queue, eventMask);
+		UAVObjConnectQueue(obj, priorityQueue, eventMask);
 	}
 	else if(metadata.telemetryUpdateMode == UPDATEMODE_NEVER)
 	{
 		// Set update period
 		setUpdatePeriod(obj, 0);
 		// Disconnect queue
-		UAVObjDisconnectQueue(obj, queue);
+		UAVObjDisconnectQueue(obj, priorityQueue);
 	}
 }
 
 /**
- * Telemetry transmit task. Processes queue events and periodic updates.
+ * Processes queue events
  */
-static void telemetryTxTask(void* parameters)
+static void processObjEvent(UAVObjEvent* ev)
 {
-	UAVObjEvent ev;
 	UAVObjMetadata metadata;
 	int32_t retries;
 	int32_t success;
 	UAVTalkStats utalkStats;
 	FlightTelemetryStatsData stats;
+
+	// Check if this is a periodic timer event (used to update stats)
+	if (ev->obj == 0)
+	{
+		// Get stats
+		UAVTalkGetStats(&utalkStats);
+		UAVTalkResetStats();
+
+		// Update stats object
+		FlightTelemetryStatsGet(&stats);
+		if (utalkStats.rxBytes > 0)
+		{
+			stats.Connected = FLIGHTTELEMETRYSTATS_CONNECTED_TRUE;
+		}
+		else
+		{
+			stats.Connected = FLIGHTTELEMETRYSTATS_CONNECTED_FALSE;
+		}
+		stats.RxDataRate = (float)utalkStats.rxBytes / ((float)STATS_UPDATE_PERIOD_MS/1000.0);
+		stats.TxDataRate = (float)utalkStats.txBytes / ((float)STATS_UPDATE_PERIOD_MS/1000.0);
+		stats.RxFailures += utalkStats.rxErrors;
+		stats.TxFailures += txErrors;
+		stats.TxRetries += txRetries;
+		txErrors = 0;
+		txRetries = 0;
+		FlightTelemetryStatsSet(&stats);
+	}
+	// This is an object update, handle based on event type
+	else
+	{
+		// Get object metadata
+		UAVObjGetMetadata(ev->obj, &metadata);
+		// Act on event
+		retries = 0;
+		success = -1;
+		if(ev->event == EV_UPDATED || ev->event == EV_UPDATED_MANUAL)
+		{
+			// Send update to GCS (with retries)
+			while(retries < MAX_RETRIES && success == -1)
+			{
+				success = UAVTalkSendObject(ev->obj, ev->instId, metadata.telemetryAcked, REQ_TIMEOUT_MS); // call blocks until ack is received or timeout
+				++retries;
+			}
+			// Update stats
+			txRetries += (retries-1);
+			if ( success == -1 )
+			{
+				++txErrors;
+			}
+		}
+		else if(ev->event == EV_UPDATE_REQ)
+		{
+			// Request object update from GCS (with retries)
+			while(retries < MAX_RETRIES && success == -1)
+			{
+				success = UAVTalkSendObjectRequest(ev->obj, ev->instId, REQ_TIMEOUT_MS); // call blocks until update is received or timeout
+				++retries;
+			}
+			// Update stats
+			txRetries += (retries-1);
+			if ( success == -1 )
+			{
+				++txErrors;
+			}
+		}
+		// If this is a metaobject then make necessary telemetry updates
+		if(UAVObjIsMetaobject(ev->obj))
+		{
+			updateObject(UAVObjGetLinkedObj(ev->obj)); // linked object will be the actual object the metadata are for
+		}
+	}
+}
+
+/**
+ * Telemetry transmit task, regular priority
+ */
+static void telemetryTxTask(void* parameters)
+{
+	UAVObjEvent ev;
 
 	// Loop forever
 	while(1)
@@ -177,76 +263,27 @@ static void telemetryTxTask(void* parameters)
 		// Wait for queue message
 		if(xQueueReceive(queue, &ev, portMAX_DELAY) == pdTRUE)
 		{
-			// Check if this is a periodic timer event (used to update stats)
-			if (ev.obj == 0)
-			{
-			    // Get stats
-				UAVTalkGetStats(&utalkStats);
-				UAVTalkResetStats();
+			// Process event
+			processObjEvent(&ev);
+		}
+	}
+}
 
-			    // Update stats object
-			    FlightTelemetryStatsGet(&stats);
-			    if (utalkStats.rxBytes > 0)
-			    {
-			        stats.Connected = FLIGHTTELEMETRYSTATS_CONNECTED_TRUE;
-			    }
-			    else
-			    {
-			        stats.Connected = FLIGHTTELEMETRYSTATS_CONNECTED_FALSE;
-			    }
-			    stats.RxDataRate = (float)utalkStats.rxBytes / ((float)STATS_UPDATE_PERIOD_MS/1000.0);
-			    stats.TxDataRate = (float)utalkStats.txBytes / ((float)STATS_UPDATE_PERIOD_MS/1000.0);
-			    stats.RxFailures += utalkStats.rxErrors;
-			    stats.TxFailures += txErrors;
-			    stats.TxRetries += txRetries;
-			    txErrors = 0;
-			    txRetries = 0;
-			    FlightTelemetryStatsSet(&stats);
-			}
-			// This is an object update, handle based on event type
-			else
-			{
-				// Get object metadata
-				UAVObjGetMetadata(ev.obj, &metadata);
-				// Act on event
-				retries = 0;
-				success = -1;
-				if(ev.event == EV_UPDATED || ev.event == EV_UPDATED_MANUAL)
-				{
-					// Send update to GCS (with retries)
-					while(retries < MAX_RETRIES && success == -1)
-					{
-						success = UAVTalkSendObject(ev.obj, ev.instId, metadata.telemetryAcked, REQ_TIMEOUT_MS); // call blocks until ack is received or timeout
-						++retries;
-					}
-					// Update stats
-					txRetries += (retries-1);
-					if ( success == -1 )
-					{
-						++txErrors;
-					}
-				}
-				else if(ev.event == EV_UPDATE_REQ)
-				{
-					// Request object update from GCS (with retries)
-					while(retries < MAX_RETRIES && success == -1)
-					{
-						success = UAVTalkSendObjectRequest(ev.obj, ev.instId, REQ_TIMEOUT_MS); // call blocks until update is received or timeout
-						++retries;
-					}
-					// Update stats
-					txRetries += (retries-1);
-					if ( success == -1 )
-					{
-						++txErrors;
-					}
-				}
-				// If this is a metaobject then make necessary telemetry updates
-				if(UAVObjIsMetaobject(ev.obj))
-				{
-					updateObject(UAVObjGetLinkedObj(ev.obj)); // linked object will be the actual object the metadata are for
-				}
-			}
+/**
+ * Telemetry transmit task, high priority
+ */
+static void telemetryTxPriTask(void* parameters)
+{
+	UAVObjEvent ev;
+
+	// Loop forever
+	while(1)
+	{
+		// Wait for queue message
+		if(xQueueReceive(priorityQueue, &ev, portMAX_DELAY) == pdTRUE)
+		{
+			// Process event
+			processObjEvent(&ev);
 		}
 	}
 }
@@ -283,7 +320,7 @@ static void telemetryRxTask(void* parameters)
 			//PIOS_LED_Toggle(LED1);
 			UAVTalkProcessInputStream(PIOS_COM_ReceiveBuffer(inputPort));
 		}
-		vTaskDelay(1); // <- remove when blocking calls are implemented
+		vTaskDelay(5); // <- remove when blocking calls are implemented
 
 	}
 }

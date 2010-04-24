@@ -126,3 +126,11 @@ void vApplicationIdleHook(void)
 	}
 }
 
+/**
+ * Called by the RTOS when a stack overflow is detected.
+ */
+void vApplicationStackOverflowHook( xTaskHandle *pxTask, signed portCHAR *pcTaskName )
+{
+
+}
+

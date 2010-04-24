@@ -453,7 +453,7 @@ bool UAVTalk::transmitObject(UAVObject* obj, quint8 type, bool allInstances)
     // If all instances are requested on a single instance object it is an error
     if (allInstances && obj->isSingleInstance())
     {
-        return false;
+        allInstances = false;
     }
 
     // Process message type

@@ -65,6 +65,7 @@ private:
     static const int MAX_UPDATE_PERIOD_MS = 1000;
     static const int MIN_UPDATE_PERIOD_MS = 1;
     static const int STATS_UPDATE_PERIOD_MS = 5000;
+    static const int MAX_QUEUE_SIZE = 20;
 
     // Types
     /**
@@ -94,6 +95,7 @@ private:
         bool allInstances;
         bool objRequest;
         qint32 retriesRemaining;
+        bool acked;
     } ObjectTransactionInfo;
 
     // Variables
@@ -101,6 +103,7 @@ private:
     UAVTalk* utalk;
     QList<ObjectTimeInfo> objList;
     QQueue<ObjectQueueInfo> objQueue;
+    QQueue<ObjectQueueInfo> objPriorityQueue;
     ObjectTransactionInfo transInfo;
     bool transPending;
     QMutex* mutex;
@@ -118,7 +121,7 @@ private:
     void setUpdatePeriod(UAVObject* obj, qint32 periodMs);
     void connectToObjectInstances(UAVObject* obj, quint32 eventMask);
     void updateObject(UAVObject* obj);
-    void processObjectUpdates(UAVObject* obj, EventMask event, bool allInstances);
+    void processObjectUpdates(UAVObject* obj, EventMask event, bool allInstances, bool priority);
     void processObjectTransaction();
     void processObjectQueue();
 

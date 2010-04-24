@@ -261,25 +261,60 @@ void Telemetry::processObjectTransaction()
         }
         else
         {
-            UAVObject::Metadata metadata = transInfo.obj->getMetadata();
-            utalk->sendObject(transInfo.obj, metadata.gcsTelemetryAcked, transInfo.allInstances);
+            utalk->sendObject(transInfo.obj, transInfo.acked, transInfo.allInstances);
         }
-        // Start timer
-        transTimer->start(REQ_TIMEOUT_MS);
+        // Start timer if a response is expected
+        if ( transInfo.objRequest || transInfo.acked )
+        {
+            transTimer->start(REQ_TIMEOUT_MS);
+        }
+        else
+        {
+            transTimer->stop();
+            transPending = false;
+        }
     }
 }
 
 /**
  * Process the event received from an object
  */
-void Telemetry::processObjectUpdates(UAVObject* obj, EventMask event, bool allInstances)
+void Telemetry::processObjectUpdates(UAVObject* obj, EventMask event, bool allInstances, bool priority)
 {
+    // Check if queue is full
+    if ( objQueue.length() > MAX_QUEUE_SIZE )
+    {
+        ++txErrors;
+        return;
+    }
+
     // Push event into queue
     ObjectQueueInfo objInfo;
     objInfo.obj = obj;
     objInfo.event = event;
     objInfo.allInstances = allInstances;
-    objQueue.enqueue(objInfo);
+    if (priority)
+    {
+        if ( objPriorityQueue.length() < MAX_QUEUE_SIZE )
+        {
+            objPriorityQueue.enqueue(objInfo);
+        }
+        else
+        {
+            ++txErrors;
+        }
+    }
+    else
+    {
+        if ( objQueue.length() < MAX_QUEUE_SIZE )
+        {
+            objQueue.enqueue(objInfo);
+        }
+        else
+        {
+            ++txErrors;
+        }
+    }
 
     // If there is no transaction in progress then process event
     if (!transPending)
@@ -293,30 +328,41 @@ void Telemetry::processObjectUpdates(UAVObject* obj, EventMask event, bool allIn
  */
 void Telemetry::processObjectQueue()
 {
-    // If the queue is empty there is nothing to do
-    if (objQueue.isEmpty())
+    // Get object information from queue (first the priority and then the regular queue)
+    ObjectQueueInfo objInfo;
+    if ( !objPriorityQueue.isEmpty() )
+    {
+        objInfo = objPriorityQueue.dequeue();
+    }
+    else if ( !objQueue.isEmpty() )
+    {
+        objInfo = objQueue.dequeue();
+    }
+    else
     {
         return;
     }
 
-    // Get updated object from the queue
-    ObjectQueueInfo objInfo = objQueue.dequeue();
-
-    // Setup transaction
-    transInfo.obj = objInfo.obj;
-    transInfo.allInstances = objInfo.allInstances;
-    transInfo.retriesRemaining = MAX_RETRIES;
-    if ( objInfo.event == EV_UPDATED || objInfo.event == EV_UPDATED_MANUAL )
+    // Setup transaction (skip if unpack event)
+    if ( objInfo.event != EV_UNPACKED )
     {
-        transInfo.objRequest = false;
+        UAVObject::Metadata metadata = objInfo.obj->getMetadata();
+        transInfo.obj = objInfo.obj;
+        transInfo.allInstances = objInfo.allInstances;
+        transInfo.retriesRemaining = MAX_RETRIES;
+        transInfo.acked = metadata.gcsTelemetryAcked;
+        if ( objInfo.event == EV_UPDATED || objInfo.event == EV_UPDATED_MANUAL )
+        {
+            transInfo.objRequest = false;
+        }
+        else if ( objInfo.event == EV_UPDATE_REQ )
+        {
+            transInfo.objRequest = true;
+        }
+        // Start transaction
+        transPending = true;
+        processObjectTransaction();
     }
-    else if ( objInfo.event == EV_UPDATE_REQ )
-    {
-        transInfo.objRequest = true;
-    }
-    // Start transaction
-    transPending = true;
-    processObjectTransaction();
 
     // If this is a metaobject then make necessary telemetry updates
     UAVMetaObject* metaobj = dynamic_cast<UAVMetaObject*>(objInfo.obj);
@@ -357,7 +403,7 @@ void Telemetry::processPeriodicUpdates()
                 objinfo.timeToNextUpdateMs = objinfo.updatePeriodMs;
                 // Send object
                 time.start();
-                processObjectUpdates(objinfo.obj, EV_UPDATED_MANUAL, true);
+                processObjectUpdates(objinfo.obj, EV_UPDATED_MANUAL, true, false);
                 elapsedMs = time.elapsed();
                 // Update timeToNextUpdateMs with the elapsed delay of sending the object;
                 timeToNextUpdateMs += elapsedMs;
@@ -414,25 +460,25 @@ void Telemetry::processStatsUpdates()
 void Telemetry::objectUpdatedAuto(UAVObject* obj)
 {
     QMutexLocker locker(mutex);
-    processObjectUpdates(obj, EV_UPDATED, false);
+    processObjectUpdates(obj, EV_UPDATED, false, true);
 }
 
 void Telemetry::objectUpdatedManual(UAVObject* obj)
 {
     QMutexLocker locker(mutex);
-    processObjectUpdates(obj, EV_UPDATED_MANUAL, false);
+    processObjectUpdates(obj, EV_UPDATED_MANUAL, false, true);
 }
 
 void Telemetry::objectUnpacked(UAVObject* obj)
 {
     QMutexLocker locker(mutex);
-    processObjectUpdates(obj, EV_UNPACKED, false);
+    processObjectUpdates(obj, EV_UNPACKED, false, true);
 }
 
 void Telemetry::updateRequested(UAVObject* obj)
 {
     QMutexLocker locker(mutex);
-    processObjectUpdates(obj, EV_UPDATE_REQ, false);
+    processObjectUpdates(obj, EV_UPDATE_REQ, false, true);
 }
 
 void Telemetry::newObject(UAVObject* obj)

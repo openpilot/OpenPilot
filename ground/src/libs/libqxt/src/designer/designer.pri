@@ -1,0 +1,44 @@
+INCLUDEPATH += $$PWD
+DEPENDPATH += $$PWD
+
+RESOURCES += resources.qrc
+
+HEADERS   += qxtbasespinboxplugin.h
+HEADERS   += qxtcheckcomboboxplugin.h
+HEADERS   += qxtcountrycomboboxplugin.h
+HEADERS   += qxtdesignerplugin.h
+HEADERS   += qxtdesignerplugins.h
+HEADERS   += qxtflowviewplugin.h
+HEADERS   += qxtgroupboxplugin.h
+HEADERS   += qxtlabelplugin.h
+HEADERS   += qxtlanguagecomboboxplugin.h
+HEADERS   += qxtletterboxwidgetplugin.h
+HEADERS   += qxtlineeditplugin.h
+HEADERS   += qxtlistwidgetplugin.h
+HEADERS   += qxtprogresslabelplugin.h
+HEADERS   += qxtpushbuttonplugin.h
+HEADERS   += qxtspansliderplugin.h
+HEADERS   += qxtstarsplugin.h
+HEADERS   += qxtstringspinboxplugin.h
+HEADERS   += qxttablewidgetplugin.h
+HEADERS   += qxttreewidgetplugin.h
+
+SOURCES   += qxtbasespinboxplugin.cpp
+SOURCES   += qxtcheckcomboboxplugin.cpp
+SOURCES   += qxtcountrycomboboxplugin.cpp
+SOURCES   += qxtdesignerplugin.cpp
+SOURCES   += qxtdesignerplugins.cpp
+SOURCES   += qxtflowviewplugin.cpp
+SOURCES   += qxtgroupboxplugin.cpp
+SOURCES   += qxtlabelplugin.cpp
+SOURCES   += qxtlanguagecomboboxplugin.cpp
+SOURCES   += qxtletterboxwidgetplugin.cpp
+SOURCES   += qxtlineeditplugin.cpp
+SOURCES   += qxtlistwidgetplugin.cpp
+SOURCES   += qxtprogresslabelplugin.cpp
+SOURCES   += qxtpushbuttonplugin.cpp
+SOURCES   += qxtspansliderplugin.cpp
+SOURCES   += qxtstarsplugin.cpp
+SOURCES   += qxtstringspinboxplugin.cpp
+SOURCES   += qxttablewidgetplugin.cpp
+SOURCES   += qxttreewidgetplugin.cpp

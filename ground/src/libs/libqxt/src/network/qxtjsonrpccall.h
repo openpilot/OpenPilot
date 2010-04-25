@@ -1,0 +1,60 @@
+/****************************************************************************
+ **
+ ** Copyright (C) Qxt Foundation. Some rights reserved.
+ **
+ ** This file is part of the QxtWeb module of the Qxt library.
+ **
+ ** This library is free software; you can redistribute it and/or modify it
+ ** under the terms of the Common Public License, version 1.0, as published
+ ** by IBM, and/or under the terms of the GNU Lesser General Public License,
+ ** version 2.1, as published by the Free Software Foundation.
+ **
+ ** This file is provided "AS IS", without WARRANTIES OR CONDITIONS OF ANY
+ ** KIND, EITHER EXPRESS OR IMPLIED INCLUDING, WITHOUT LIMITATION, ANY
+ ** WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY OR
+ ** FITNESS FOR A PARTICULAR PURPOSE.
+ **
+ ** You should have received a copy of the CPL and the LGPL along with this
+ ** file. See the LICENSE file and the cpl1.0.txt/lgpl-2.1.txt files
+ ** included with the source distribution for more information.
+ ** If you did not receive a copy of the licenses, contact the Qxt Foundation.
+ **
+ ** <http://libqxt.org>  <foundation@libqxt.org>
+ **
+ ****************************************************************************/
+#ifndef QXTJSONRPCRESPONSE_H
+#define QXTJSONRPCRESPONSE_H
+
+#include <QObject>
+#include <QVariant>
+#include <QString>
+#include <QNetworkReply>
+#include "qxtglobal.h"
+#include <memory>
+
+class QxtJSONRpcCallPrivate;
+class QXT_NETWORK_EXPORT QxtJSONRpcCall : public QObject
+{
+    Q_OBJECT
+public:
+    bool isFault() const;
+    QVariant result() const;
+    QNetworkReply::NetworkError error() const;
+signals:
+    void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
+    void error(QNetworkReply::NetworkError code);
+    void finished();
+    void sslErrors(const QList<QSslError> & errors);
+    void uploadProgress(qint64 bytesSent, qint64 bytesTotal);
+
+protected:
+    QxtJSONRpcCall(QNetworkReply * reply);
+    friend class QxtJSONRpcClient;
+private:
+    friend class QxtJSONRpcCallPrivate;
+    std::auto_ptr<QxtJSONRpcCallPrivate> d;
+    Q_PRIVATE_SLOT(d, void d_finished());
+};
+
+#endif
+

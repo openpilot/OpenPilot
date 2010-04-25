@@ -128,9 +128,7 @@ void TextEditLoggerEngine::writeToTextEdit(const QString& level, const QList<QVa
         count++;
     }
     Q_ASSERT(m_textEdit);
-    QTextCharFormat format = m_textEdit->currentCharFormat();
-    format.setForeground(QBrush(color));
-    m_textEdit->setCurrentCharFormat(format);
+    appendText = QString("<font color=%1>%2</font>").arg(color.name()).arg(appendText);
     m_textEdit->append(appendText);
     if (scroll)
         sb->setValue(sb->maximum());

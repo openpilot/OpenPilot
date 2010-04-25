@@ -49,7 +49,7 @@
 #include "examplesettings.h" // object holding module settings
 
 // Private constants
-#define STACK_SIZE 200
+#define STACK_SIZE configMINIMAL_STACK_SIZE
 #define TASK_PRIORITY (tskIDLE_PRIORITY+1)
 
 // Private types
@@ -80,8 +80,10 @@ static void exampleTask(void* parameters)
 	ExampleSettingsData settings;
 	ExampleObject2Data data;
 	int32_t step;
+	portTickType lastSysTime;
 
 	// Main task loop
+	lastSysTime = xTaskGetTickCount();
 	while (1)
 	{
 		// Update settings with latest value
@@ -124,6 +126,6 @@ static void exampleTask(void* parameters)
 		// block the task until it is time for the next update.
 		// The settings field is in ms, to convert to RTOS ticks we need
 		// to divide by portTICK_RATE_MS.
-		vTaskDelay( settings.UpdatePeriod / portTICK_RATE_MS );
+		vTaskDelayUntil(&lastSysTime, settings.UpdatePeriod / portTICK_RATE_MS );
 	}
 }

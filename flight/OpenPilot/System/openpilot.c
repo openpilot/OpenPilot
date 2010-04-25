@@ -58,9 +58,37 @@ void OP_ADC_NotifyChange(uint32_t pin, uint32_t pin_value);
 */
 int main()
 {
+	/* NOTE: Do NOT modify the following start-up sequence */
+	/* Any new initialization functions should be added in */
+	/* OpenPilotInit() */
+
 	/* Brings up System using CMSIS functions, enables the LEDs. */
 	PIOS_SYS_Init();
 
+	/* Initialize the system thread */
+	SystemModInitialize();
+
+	/* Start the FreeRTOS scheduler */
+	vTaskStartScheduler();
+
+	/* If all is well we will never reach here as the scheduler will now be running. */
+	/* If we do get here, it will most likely be because we ran out of heap space. */
+	PIOS_LED_Off(LED1);
+	PIOS_LED_Off(LED2);
+	for(;;) {
+		PIOS_LED_Toggle(LED1);
+		PIOS_LED_Toggle(LED2);
+		PIOS_DELAY_WaitmS(100);
+	}
+
+	return 0;
+}
+
+/**
+ * Initialize the hardware, libraries and modules (called by the System thread in systemmod.c)
+ */
+void OpenPilotInit()
+{
 	/* Delay system */
 	PIOS_DELAY_Init();
 
@@ -74,7 +102,7 @@ int main()
 	for(;;)
 	{
 		/* Check if we have an SD Card with the correct settings files on it */
-		if(!PIOS_SDCARD_MountFS(STARTUP_LOG_ENABLED)) {
+		if(!PIOS_SDCARD_MountFS(0)) {
 			/* Found one without errors */
 			break;
 		}
@@ -115,47 +143,16 @@ int main()
 	PIOS_Servo_SetHz(50, 450);
 
 	/* Create a FreeRTOS task */
-	xTaskCreate(TaskTick, (signed portCHAR *)"Test", configMINIMAL_STACK_SIZE , NULL, 1, NULL);
 	//xTaskCreate(TaskTesting, (signed portCHAR *)"TaskTesting", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
 	//xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
 	//xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
 
 	/* Initialize modules */
-	SystemModInitialize();
 	TelemetryInitialize();
-	ExampleModPeriodicInitialize();
+	//ExampleModPeriodicInitialize();
 	//ExampleModThreadInitialize();
-	//ExampleModEventInitialize();
+	ExampleModEventInitialize();
 	GpsInitialize();
-
-	/* Start the FreeRTOS scheduler */
-	vTaskStartScheduler();
-
-	/* If all is well we will never reach here as the scheduler will now be running. */
-	/* If we do get here, it will most likely be because we ran out of heap space. */
-	PIOS_LED_Off(LED1);
-	PIOS_LED_Off(LED2);
-	for(;;) {
-		PIOS_LED_Toggle(LED1);
-		PIOS_LED_Toggle(LED2);
-		PIOS_DELAY_WaitmS(100);
-	}
-
-	return 0;
-}
-
-static void TaskTick(void *pvParameters)
-{
-	portTickType xLastExecutionTime;
-
-	/* Setup the LEDs to Alternate */
-	PIOS_LED_On(LED1);
-
-	for(;;)
-	{
-		PIOS_LED_Toggle(LED1);
-		vTaskDelayUntil(&xLastExecutionTime, 1000 / portTICK_RATE_MS);
-	}
 }
 
 static void TaskTesting(void *pvParameters)

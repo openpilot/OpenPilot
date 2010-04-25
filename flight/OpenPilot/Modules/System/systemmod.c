@@ -29,21 +29,24 @@
 #include "systemstats.h"
 
 // Private constants
-#define STATS_UPDATE_PERIOD_MS 1000
+#define SYSTEM_UPDATE_PERIOD_MS 1000
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 995998 // calibrated by running tests/test_cpuload.c
-									   // must be updated if the FreeRTOS or compiler
-									   // optimisation options are changed.
+											  // must be updated if the FreeRTOS or compiler
+											  // optimisation options are changed.
+#define STACK_SIZE configMINIMAL_STACK_SIZE
+#define TASK_PRIORITY (tskIDLE_PRIORITY+3)
 
 // Private types
 
 // Private variables
 static uint32_t idleCounter;
 static uint32_t idleCounterClear;
-static xSemaphoreHandle mutex;
+static xTaskHandle systemTaskHandle;
 
 // Private functions
-static void ObjectUpdatedCb(UAVObjEvent* ev);
-static void StatsUpdateCb(UAVObjEvent* ev);
+static void objectUpdatedCb(UAVObjEvent* ev);
+static void updateStats();
+static void systemTask(void* parameters);
 
 /**
  * Initialise the module, called on startup.
@@ -51,27 +54,47 @@ static void StatsUpdateCb(UAVObjEvent* ev);
  */
 int32_t SystemModInitialize(void)
 {
-	UAVObjEvent ev;
+	// Create system task
+	xTaskCreate(systemTask, (signed char*)"System", STACK_SIZE, NULL, TASK_PRIORITY, &systemTaskHandle);
+	return 0;
+}
 
-	// Create the mutex
-	mutex = xSemaphoreCreateRecursiveMutex();
+/**
+ * System task, periodically executes every SYSTEM_UPDATE_PERIOD_MS
+ */
+static void systemTask(void* parameters)
+{
+	portTickType lastSysTime;
 
-	// Listen for ExampleObject1 updates, connect a callback function
-	SettingsPersistenceConnectCallback(&ObjectUpdatedCb);
+	// System initialization
+	OpenPilotInit();
 
-	// Create periodic event that will be used to update the system stats
+	// Initialize vars
 	idleCounter = 0;
 	idleCounterClear = 0;
-	memset(&ev, 0, sizeof(UAVObjEvent));
-	EventPeriodicCallbackCreate(&ev, StatsUpdateCb, STATS_UPDATE_PERIOD_MS);
+	lastSysTime = xTaskGetTickCount();
 
-	return 0;
+	// Listen for SettingPersistance object updates, connect a callback function
+	SettingsPersistenceConnectCallback(&objectUpdatedCb);
+
+	// Main system loop
+	while (1)
+	{
+		// Update the system statistics
+		updateStats();
+
+		// Flash the LED
+		PIOS_LED_Toggle(LED1);
+
+		// Wait until next period
+		vTaskDelayUntil(&lastSysTime, SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS);
+	}
 }
 
 /**
  * Function called in response to object updates
  */
-static void ObjectUpdatedCb(UAVObjEvent* ev)
+static void objectUpdatedCb(UAVObjEvent* ev)
 {
 	SettingsPersistenceData setper;
 
@@ -96,7 +119,7 @@ static void ObjectUpdatedCb(UAVObjEvent* ev)
 /**
  * Called periodically to update the system stats
  */
-static void StatsUpdateCb(UAVObjEvent* ev)
+static void updateStats()
 {
 	SystemStatsData stats;
 
@@ -104,7 +127,7 @@ static void StatsUpdateCb(UAVObjEvent* ev)
 	SystemStatsGet(&stats);
 	stats.FlightTime = xTaskGetTickCount()*portTICK_RATE_MS;
 	stats.HeapRemaining = xPortGetFreeHeapSize();
-	stats.CPULoad = 100 - (uint8_t)round(100.0*((float)idleCounter/(float)(STATS_UPDATE_PERIOD_MS/1000))/(float)IDLE_COUNTS_PER_SEC_AT_NO_LOAD);
+	stats.CPULoad = 100 - (uint8_t)round(100.0*((float)idleCounter/(float)(SYSTEM_UPDATE_PERIOD_MS/1000))/(float)IDLE_COUNTS_PER_SEC_AT_NO_LOAD);
 	idleCounterClear = 1;
 	SystemStatsSet(&stats);
 }

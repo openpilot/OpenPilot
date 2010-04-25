@@ -44,6 +44,6 @@
 #include "uavtalk.h"
 
 /* Global Functions */
-extern void OpenPilotInit(void);
+void OpenPilotInit(void);
 
 #endif /* OPENPILOT_H */

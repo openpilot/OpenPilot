@@ -312,8 +312,7 @@ static void telemetryRxTask(void* parameters)
 		//}
 
 		// Block until data are available
-		// TODO: Update once the PIOS_COM is made blocking
-		//xSemaphoreTake(PIOS_USART1_Buffer, portMAX_DELAY);
+		// TODO: Currently we periodically check the buffer for data, update once the PIOS_COM is made blocking
 		len = PIOS_COM_ReceiveBufferUsed(inputPort);
 		for (int32_t n = 0; n < len; ++n)
 		{

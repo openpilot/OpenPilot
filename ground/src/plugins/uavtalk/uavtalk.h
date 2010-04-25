@@ -73,12 +73,14 @@ private:
     static const int TYPE_OBJ_ACK = (TYPE_VER | 0x02);
     static const int TYPE_ACK = (TYPE_VER | 0x03);
     static const int HEADER_LENGTH = 7; // type (1), object ID (4), instance ID (2, not used in single objects)
-    static const int CHECKSUM_LENGTH = 2;
+    static const int CHECKSUM_LENGTH = 1;
     static const int MAX_PAYLOAD_LENGTH = 256;
     static const int MAX_PACKET_LENGTH = (HEADER_LENGTH+MAX_PAYLOAD_LENGTH+CHECKSUM_LENGTH);
     static const quint16 ALL_INSTANCES = 0xFFFF;
     static const int TX_BUFFER_SIZE = 2*1024;
+    static const quint8 crc_table[256];
 
+    // Types
     typedef enum {STATE_SYNC, STATE_OBJID, STATE_INSTID, STATE_DATA, STATE_CS} RxStateType;
 
     // Variables
@@ -95,7 +97,7 @@ private:
     quint32 rxObjId;
     quint16 rxInstId;
     quint8 rxLength;
-    quint16 rxCSPacket, rxCS;
+    quint8 rxCSPacket, rxCS;
     qint32 rxCount;
     RxStateType rxState;
     ComStats stats;
@@ -108,7 +110,7 @@ private:
     void updateAck(UAVObject* obj);
     bool transmitObject(UAVObject* obj, quint8 type, bool allInstances);
     bool transmitSingleObject(UAVObject* obj, quint8 type, bool allInstances);
-    quint16 updateChecksum(quint16 cs, quint8* data, qint32 length);
+    quint8 updateCRC(quint8 crc, const quint8* data, qint32 length);
 
 };
 

@@ -5,7 +5,7 @@ QXT              = core network
 CONVENIENCE     += $$CLEAN_TARGET
 
 include(zeroconf.pri)
-include(../qxtbase.pri)
+#include(../qxtbase.pri)
 
 unix:!macx:LIBS += -ldns_sd 
 !contains(CONFIG,NO_AVAHI): unix:!macx:LIBS +=  -lavahi-client -lavahi-common

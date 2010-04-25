@@ -5,7 +5,7 @@ QXT              = core
 CONVENIENCE     += $$CLEAN_TARGET
 
 include(gui.pri)
-include(../qxtbase.pri)
+#include(../qxtbase.pri)
 
 contains(DEFINES,HAVE_XRANDR){
     !win32:LIBS += -lXrandr

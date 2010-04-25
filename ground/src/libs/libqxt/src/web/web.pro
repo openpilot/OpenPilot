@@ -5,4 +5,4 @@ QXT              = core network
 CONVENIENCE     += $$CLEAN_TARGET
 
 include(web.pri)
-include(../qxtbase.pri)
+#include(../qxtbase.pri)

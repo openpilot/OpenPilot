@@ -5,7 +5,7 @@ QXT              = core gui
 CONVENIENCE     +=
 
 include(designer.pri)
-include(../qxtbase.pri)
+#include(../qxtbase.pri)
 
 CONFIG          += designer plugin
 target.path      = $$[QT_INSTALL_PLUGINS]/designer

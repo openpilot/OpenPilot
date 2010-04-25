@@ -5,6 +5,6 @@ QXT              = core
 CONVENIENCE     += $$CLEAN_TARGET
 
 include(berkeley.pri)
-include(../qxtbase.pri)
+#include(../qxtbase.pri)
 
 !win32:LIBS     += -ldb

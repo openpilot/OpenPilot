@@ -34,9 +34,6 @@
 
 
 /* Global Variables */
-xSemaphoreHandle PIOS_USART1_Buffer;
-xSemaphoreHandle PIOS_USART2_Buffer;
-xSemaphoreHandle PIOS_USART3_Buffer;
 static portBASE_TYPE xHigherPriorityTaskWoken;
 
 /* Local Variables */
@@ -181,9 +178,6 @@ void PIOS_USART_Init(void)
 	USART_Cmd(PIOS_USART3_USART, ENABLE);
 #endif
 
-	vSemaphoreCreateBinary(PIOS_USART1_Buffer);
-	vSemaphoreCreateBinary(PIOS_USART2_Buffer);
-	vSemaphoreCreateBinary(PIOS_USART3_Buffer);
 }
 
 /**
@@ -345,19 +339,6 @@ int32_t PIOS_USART_RxBufferPut(USARTNumTypeDef usart, uint8_t b)
 	}
 	++rx_buffer_size[usart];
 	PIOS_IRQ_Enable();
-
-
-	switch(usart) {
-		case USART_1:
-			xSemaphoreGiveFromISR(PIOS_USART1_Buffer, &xHigherPriorityTaskWoken);
-			break;
-		case USART_2:
-			xSemaphoreGiveFromISR(PIOS_USART2_Buffer, &xHigherPriorityTaskWoken);
-			break;
-		case USART_3:
-			xSemaphoreGiveFromISR(PIOS_USART3_Buffer, &xHigherPriorityTaskWoken);
-			break;
-	}
 
 	/* No error */
 	return 0;

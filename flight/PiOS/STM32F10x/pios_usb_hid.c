@@ -45,8 +45,6 @@ typedef enum _HID_REQUESTS {
 } HID_REQUESTS;
 
 /* Global Variables */
-xSemaphoreHandle PIOS_HID_Buffer;
-static portBASE_TYPE xHigherPriorityTaskWoken;
 
 /* Local Variables */
 static uint32_t ProtocolValue;
@@ -101,8 +99,6 @@ int32_t PIOS_USB_HID_Init(uint32_t mode)
 		/* Unsupported mode */
 		return -1;
 	}
-
-	vSemaphoreCreateBinary(PIOS_HID_Buffer);
 
 	return 0; /* No error */
 }
@@ -317,7 +313,6 @@ void PIOS_USB_HID_EP1_OUT_Callback(void)
 
 	/* We now have data waiting */
 	rx_buffer_new_data_ctr = PIOS_USB_HID_DATA_LENGTH;
-	xSemaphoreGiveFromISR(PIOS_HID_Buffer, &xHigherPriorityTaskWoken);
 
 #else
 	// FOR DEBUGGING USE ONLY

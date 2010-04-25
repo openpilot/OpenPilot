@@ -46,6 +46,7 @@ typedef enum {STATE_SYNC, STATE_OBJID, STATE_INSTID, STATE_DATA, STATE_CS} RxSta
 // Private variables
 static UAVTalkOutputStream outStream;
 static xSemaphoreHandle lock;
+static xSemaphoreHandle transLock;
 static xSemaphoreHandle respSema;
 static UAVObjHandle respObj;
 static uint16_t respInstId;
@@ -71,6 +72,7 @@ int32_t UAVTalkInitialize(UAVTalkOutputStream outputStream)
 {
     outStream = outputStream;
     lock = xSemaphoreCreateRecursiveMutex();
+    transLock = xSemaphoreCreateRecursiveMutex();
     vSemaphoreCreateBinary(respSema);
     xSemaphoreTake(respSema, 0); // reset to zero
     UAVTalkResetStats();
@@ -159,37 +161,45 @@ static int32_t objectTransaction(UAVObjHandle obj, uint16_t instId, uint8_t type
 {
 	int32_t respReceived;
 
-	// Lock
-    xSemaphoreTakeRecursive(lock, portMAX_DELAY);
-
     // Send object depending on if a response is needed
     if (type == TYPE_OBJ_ACK || type == TYPE_OBJ_REQ)
     {
-    	xSemaphoreTake(respSema, 0); // non blocking call to make sure the value is zero (binary sema)
-        sendObject(obj, instId, type);
+    	// Get transaction lock (will block if a transaction is pending)
+    	xSemaphoreTakeRecursive(transLock, portMAX_DELAY);
+    	// Send object
+    	xSemaphoreTakeRecursive(lock, portMAX_DELAY);
         respObj = obj;
         respInstId = instId;
-        xSemaphoreGiveRecursive(lock); // need to release lock since the next call will block until a response is received
-    	respReceived = xSemaphoreTake(respSema, timeoutMs/portTICK_RATE_MS); // lock on object until a response is received (or timeout)
+        sendObject(obj, instId, type);
+        xSemaphoreGiveRecursive(lock);
+        // Wait for response (or timeout)
+    	respReceived = xSemaphoreTake(respSema, timeoutMs/portTICK_RATE_MS);
     	// Check if a response was received
     	if (respReceived == pdFALSE)
     	{
+    		// Cancel transaction
+    		xSemaphoreTakeRecursive(lock, portMAX_DELAY);
+    		xSemaphoreTake(respSema, 0); // non blocking call to make sure the value is reset to zero (binary sema)
+    		respObj = 0;
+    		xSemaphoreGiveRecursive(lock);
+    		xSemaphoreGiveRecursive(transLock);
     		return -1;
     	}
     	else
     	{
+    		xSemaphoreGiveRecursive(transLock);
     		return 0;
     	}
     }
     else if (type == TYPE_OBJ)
     {
+    	xSemaphoreTakeRecursive(lock, portMAX_DELAY);
         sendObject(obj, instId, TYPE_OBJ);
         xSemaphoreGiveRecursive(lock);
         return 0;
     }
     else
     {
-    	xSemaphoreGiveRecursive(lock);
         return -1;
     }
 }

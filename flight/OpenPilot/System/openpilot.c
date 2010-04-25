@@ -149,9 +149,9 @@ void OpenPilotInit()
 
 	/* Initialize modules */
 	TelemetryInitialize();
-	//ExampleModPeriodicInitialize();
+	ExampleModPeriodicInitialize();
 	//ExampleModThreadInitialize();
-	ExampleModEventInitialize();
+	//ExampleModEventInitialize();
 	GpsInitialize();
 }
 

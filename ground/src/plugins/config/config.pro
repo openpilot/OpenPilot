@@ -2,7 +2,7 @@ TEMPLATE = lib
 TARGET = Config
 include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
-OTHER_FILES += config.pluginspec
+OTHER_FILES += Config.pluginspec
 HEADERS += configplugin.h \
     configgadgetconfiguration.h \
     configgadgetwidget.h \

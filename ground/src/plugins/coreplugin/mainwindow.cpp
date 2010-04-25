@@ -45,6 +45,8 @@
 #include "uavgadgetmanager.h"
 #include "uavgadgetinstancemanager.h"
 #include "connectionmanager.h"
+#include "qxtlogger.h"
+#include "qxtbasicstdloggerengine.h"
 
 #include "settingsdialog.h"
 #include "variablemanager.h"
@@ -184,6 +186,11 @@ MainWindow::MainWindow() :
 
     statusBar()->setProperty("p_styled", true);
     setAcceptDrops(true);
+    foreach (QString engine, qxtLog->allLoggerEngines())
+        qxtLog->removeLoggerEngine(engine);
+    qxtLog->addLoggerEngine("std", new QxtBasicSTDLoggerEngine());
+    qxtLog->installAsMessageHandler();
+    qxtLog->enableAllLogLevels();
 }
 
 MainWindow::~MainWindow()

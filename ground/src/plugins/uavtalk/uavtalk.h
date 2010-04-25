@@ -77,6 +77,7 @@ private:
     static const int MAX_PAYLOAD_LENGTH = 256;
     static const int MAX_PACKET_LENGTH = (HEADER_LENGTH+MAX_PAYLOAD_LENGTH+CHECKSUM_LENGTH);
     static const quint16 ALL_INSTANCES = 0xFFFF;
+    static const int TX_BUFFER_SIZE = 2*1024;
 
     typedef enum {STATE_SYNC, STATE_OBJID, STATE_INSTID, STATE_DATA, STATE_CS} RxStateType;
 

@@ -568,8 +568,16 @@ bool UAVTalk::transmitSingleObject(UAVObject* obj, quint8 type, bool allInstance
     cs = updateChecksum(cs, txBuffer, dataOffset+length);
     qToLittleEndian<quint16>(cs, &txBuffer[dataOffset+length]);
 
-    // Send buffer
-    io->write((const char*)txBuffer, dataOffset+length+CHECKSUM_LENGTH);
+    // Send buffer, check that the transmit backlog does not grow above limit
+    if ( io->bytesToWrite() < TX_BUFFER_SIZE )
+    {
+        io->write((const char*)txBuffer, dataOffset+length+CHECKSUM_LENGTH);
+    }
+    else
+    {
+        ++stats.txErrors;
+        return false;
+    }
 
     // Update stats
     ++stats.txObjects;

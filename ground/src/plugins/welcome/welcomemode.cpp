@@ -156,15 +156,15 @@ void WelcomeMode::initPlugins()
     QList<IWelcomePage*> plugins = PluginManager::instance()->getObjects<IWelcomePage>();
     qSort(plugins.begin(), plugins.end(), &sortFunction);
     foreach (IWelcomePage* plugin, plugins) {
-        QToolButton * btn = new QToolButton;
-        btn->setCheckable(true);
-        btn->setText(plugin->title());
-        btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-        btn->setAutoExclusive(true);
-        connect (btn, SIGNAL(clicked()), SLOT(showClickedPage()));
+//        QToolButton * btn = new QToolButton;
+//        btn->setCheckable(true);
+//        btn->setText(plugin->title());
+//        btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+//        btn->setAutoExclusive(true);
+//        connect (btn, SIGNAL(clicked()), SLOT(showClickedPage()));
         m_d->ui.stackedWidget->addWidget(plugin->page());
 //        m_d->buttonLayout->addWidget(btn);
-        m_d->buttonMap.insert(btn, plugin->page());
+//        m_d->buttonMap.insert(btn, plugin->page());
     }
     m_d->buttonLayout->addSpacing(5);
 

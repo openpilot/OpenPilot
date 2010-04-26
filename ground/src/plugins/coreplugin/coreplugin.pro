@@ -10,7 +10,6 @@ include(../../openpilotgcsplugin.pri)
 include(../../libs/utils/utils.pri)
 include(../../shared/scriptwrapper/scriptwrapper.pri)
 include(coreplugin_dependencies.pri)
-include(../../libs/libqxt/libqxt.pri)
 INCLUDEPATH += dialogs \
     uavgadgetmanager \
     actionmanager

@@ -28,10 +28,7 @@
 #ifndef EMPTYGADGETWIDGET_H_
 #define EMPTYGADGETWIDGET_H_
 
-#include <QtGui/QWidget>
 #include <QtGui/QLabel>
-class QWidget;
-class QLabel;
 
 class EmptyGadgetWidget : public QLabel
 {

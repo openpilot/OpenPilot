@@ -12,7 +12,6 @@
 #ifndef MAPABSTRACT_HPP_
 #define MAPABSTRACT_HPP_
 
-#include "kernel/IdFactory.hpp"
 #include "jmath/jblas.hpp"
 #include "rtslam/rtSlam.hpp"
 
@@ -69,10 +68,6 @@ namespace jafar {
 				inline virtual ~MapAbstract() {
 				}
 
-
-				kernel::IdFactory robotIds;
-				kernel::IdFactory sensorIds;
-				kernel::IdFactory landmarkIds;
 
 				/**
 				 * Size things and map usage management

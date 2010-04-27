@@ -18,6 +18,7 @@
 
 #include "jmath/jblas.hpp"
 #include "rtslam/rtSlam.hpp"
+#include "kernel/IdFactory.hpp"
 //include parents
 #include "rtslam/parents.hpp"
 #include "rtslam/mapAbstract.hpp"
@@ -96,6 +97,8 @@ namespace jafar {
 				 */
 				virtual ~SensorAbstract() {
 				}
+
+				static kernel::IdFactory sensorIds;
 
 
 				/**

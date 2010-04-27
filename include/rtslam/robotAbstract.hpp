@@ -35,6 +35,7 @@
 
 #include <jmath/jblas.hpp>
 #include "kernel/jafarDebug.hpp"
+#include "kernel/IdFactory.hpp"
 
 #include "rtslam/rtSlam.hpp"
 #include "rtslam/gaussian.hpp"
@@ -100,6 +101,9 @@ namespace jafar {
 				// Mandatory virtual destructor.
 				virtual ~RobotAbstract() {
 				}
+
+				static kernel::IdFactory robotIds;
+
 
 				Gaussian pose; ///<             Robot Gaussian pose
 				vec control; ///<               Control vector

@@ -27,6 +27,8 @@
 #ifndef __LandmarkAbstract_H__
 #define __LandmarkAbstract_H__
 
+#include "kernel/IdFactory.hpp"
+
 #include "rtslam/rtSlam.hpp"
 
 // include parents
@@ -78,6 +80,16 @@ namespace jafar {
 				virtual ~LandmarkAbstract() {
 				}
 
+				static kernel::IdFactory landmarkIds;
+
+				typedef enum geometry_t {
+						POINT,
+						LINE,
+						PLANE,
+						ELLIPSE
+				} geometry_t;
+
+				geometry_t geomType;
 
 				// \todo use a smart pointer here.
 				DescriptorAbstract descriptor; ///<                       Landmark descriptor

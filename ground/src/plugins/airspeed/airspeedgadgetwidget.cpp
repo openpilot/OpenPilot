@@ -101,6 +101,14 @@ void AirspeedGadgetWidget::paintEvent(QPaintEvent *event)
    QGraphicsView::paintEvent(event);
 }
 
+// This event enables the dial to be dynamically resized
+// whenever the gadget is resized, taking advantage of the vector
+// nature of SVG dials.
+void AirspeedGadgetWidget::resizeEvent(QResizeEvent *event)
+{
+    fitInView(m_background, Qt::KeepAspectRatio );
+}
+
 // Take a unitless speed value and sets the actual needle accordingly
 // scale fixed at 0-90 for now
 void AirspeedGadgetWidget::setActual(int speed)

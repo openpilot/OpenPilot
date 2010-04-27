@@ -44,6 +44,7 @@
  *
  */
 
+#include "openpilot.h"
 #include "examplemodevent.h"
 #include "exampleobject1.h" // object the module will listen for updates (input)
 #include "exampleobject2.h" // object the module will update (output)

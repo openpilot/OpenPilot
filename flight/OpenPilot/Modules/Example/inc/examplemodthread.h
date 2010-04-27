@@ -26,8 +26,6 @@
 #ifndef EXAMPLEMODTHREAD_H
 #define EXAMPLEMODTHREAD_H
 
-#include "openpilot.h"
-
 int32_t ExampleModThreadInitialize();
 
 #endif // EXAMPLEMODTHREAD_H

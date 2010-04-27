@@ -59,8 +59,7 @@ void OP_ADC_NotifyChange(uint32_t pin, uint32_t pin_value);
 int main()
 {
 	/* NOTE: Do NOT modify the following start-up sequence */
-	/* Any new initialization functions should be added in */
-	/* OpenPilotInit() */
+	/* Any new initialization functions should be added in OpenPilotInit() */
 
 	/* Brings up System using CMSIS functions, enables the LEDs. */
 	PIOS_SYS_Init();
@@ -95,57 +94,28 @@ void OpenPilotInit()
 	/* SPI Init */
 	PIOS_SPI_Init();
 
-	/* Enables the SDCard */
+	/* Enable and mount the SDCard */
 	PIOS_SDCARD_Init();
-
-	/* Wait for SD card for ever */
-	for(;;)
-	{
-		/* Check if we have an SD Card with the correct settings files on it */
-		if(!PIOS_SDCARD_MountFS(0)) {
-			/* Found one without errors */
-			break;
-		}
-
-		/* SD Card not found, flash for 1 second */
-		PIOS_LED_On(LED1);
-		PIOS_LED_On(LED2);
-		for(uint32_t i = 0; i < 10; i++) {
-			PIOS_LED_Toggle(LED2);
-			PIOS_DELAY_WaitmS(100);
-		}
-	}
+	PIOS_SDCARD_MountFS(0);
 
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();
 	UAVObjInitialize();
 	UAVObjectsInitializeAll();
 
-	/* Com ports init */
+	/* Initialize the alarms library */
+	AlarmsInitialize();
+
+	/* Initialize the PiOS library */
 	PIOS_COM_Init();
-
-	/* Initialise servo outputs */
 	PIOS_Servo_Init();
-
-	/* Analog to digital converter initialise */
 	PIOS_ADC_Init();
-
 	PIOS_GPIO_Init();
-
 	//PIOS_PPM_Init();
-
 	PIOS_PWM_Init();
-
 	PIOS_USB_Init(0);
-
 	PIOS_I2C_Init();
-
 	PIOS_Servo_SetHz(50, 450);
-
-	/* Create a FreeRTOS task */
-	//xTaskCreate(TaskTesting, (signed portCHAR *)"TaskTesting", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
-	//xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
-	//xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
 
 	/* Initialize modules */
 	TelemetryInitialize();
@@ -153,6 +123,11 @@ void OpenPilotInit()
 	//ExampleModThreadInitialize();
 	//ExampleModEventInitialize();
 	GpsInitialize();
+
+	/* Create test tasks */
+	//xTaskCreate(TaskTesting, (signed portCHAR *)"TaskTesting", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
+	//xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
+	//xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
 }
 
 static void TaskTesting(void *pvParameters)

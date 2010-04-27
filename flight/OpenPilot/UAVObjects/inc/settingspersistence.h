@@ -32,8 +32,6 @@
 #ifndef SETTINGSPERSISTENCE_H
 #define SETTINGSPERSISTENCE_H
 
-#include "openpilot.h"
-
 // Object constants
 #define SETTINGSPERSISTENCE_OBJID 3652432370U
 #define SETTINGSPERSISTENCE_NAME "SettingsPersistence"
@@ -62,7 +60,8 @@ typedef struct {
 
 } __attribute__((packed)) SettingsPersistenceData;
 
-// Enumeration types
+// Field information
+// Field Operation information
 /* Enumeration options for field Operation */
 typedef enum { SETTINGSPERSISTENCE_OPERATION_LOAD=0, SETTINGSPERSISTENCE_OPERATION_SAVE=1,  } SettingsPersistenceOperationOptions;
 

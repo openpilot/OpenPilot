@@ -32,8 +32,6 @@
 #ifndef SYSTEMSTATS_H
 #define SYSTEMSTATS_H
 
-#include "openpilot.h"
-
 // Object constants
 #define SYSTEMSTATS_OBJID 680908530U
 #define SYSTEMSTATS_NAME "SystemStats"
@@ -64,7 +62,10 @@ typedef struct {
 
 } __attribute__((packed)) SystemStatsData;
 
-// Enumeration types
+// Field information
+// Field FlightTime information
+// Field HeapRemaining information
+// Field CPULoad information
 
 
 // Generic interface functions

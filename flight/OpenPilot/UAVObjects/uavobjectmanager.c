@@ -80,6 +80,7 @@ static int32_t disconnectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCa
 static ObjectList* objList;
 static xSemaphoreHandle mutex;
 static UAVObjMetadata defMetadata;
+static UAVObjStats stats;
 
 /**
  * Initialize the object manager
@@ -88,8 +89,9 @@ static UAVObjMetadata defMetadata;
  */
 int32_t UAVObjInitialize()
 {
-	// Initialize object list
+	// Initialize variables
 	objList = NULL;
+	memset(&stats, 0, sizeof(UAVObjStats));
 
 	// Create mutex
 	mutex = xSemaphoreCreateRecursiveMutex();
@@ -108,6 +110,27 @@ int32_t UAVObjInitialize()
 
 	// Done
 	return 0;
+}
+
+/**
+ * Get the statistics counters
+ * @param[out] statsOut The statistics counters will be copied there
+ */
+void UAVObjGetStats(UAVObjStats* statsOut)
+{
+	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	memcpy(statsOut, &stats, sizeof(UAVObjStats));
+	xSemaphoreGiveRecursive(mutex);
+}
+
+/**
+ * Clear the statistics counters
+ */
+void UAVObjClearStats()
+{
+	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	memset(&stats, 0, sizeof(UAVObjStats));
+	xSemaphoreGiveRecursive(mutex);
 }
 
 /**
@@ -459,6 +482,12 @@ int32_t UAVObjSaveToFile(UAVObjHandle obj, uint16_t instId, FILEINFO* file)
 	ObjectList* objEntry;
 	ObjectInstList* instEntry;
 
+	// Check for file system availability
+	if ( POIS_SDCARD_IsMounted() == 0 )
+	{
+		return -1;
+	}
+
 	// Lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
@@ -510,6 +539,12 @@ int32_t UAVObjSave(UAVObjHandle obj, uint16_t instId)
 	FILEINFO file;
 	ObjectList* objEntry;
 
+	// Check for file system availability
+	if ( POIS_SDCARD_IsMounted() == 0 )
+	{
+		return -1;
+	}
+
 	// Lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
@@ -550,6 +585,12 @@ UAVObjHandle UAVObjLoadFromFile(FILEINFO* file)
 	uint32_t objId;
 	uint16_t instId;
 	UAVObjHandle obj;
+
+	// Check for file system availability
+	if ( POIS_SDCARD_IsMounted() == 0 )
+	{
+		return -1;
+	}
 
 	// Lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
@@ -625,6 +666,12 @@ int32_t UAVObjLoad(UAVObjHandle obj, uint16_t instId)
 	ObjectList* objEntry;
 	UAVObjHandle loadedObj;
 	ObjectList* loadedObjEntry;
+
+	// Check for file system availability
+	if ( POIS_SDCARD_IsMounted() == 0 )
+	{
+		return -1;
+	}
 
 	// Lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
@@ -983,7 +1030,7 @@ void UAVObjUpdated(UAVObjHandle obj)
 void UAVObjInstanceUpdated(UAVObjHandle obj, uint16_t instId)
 {
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-	sendEvent((ObjectList*)obj, instId, EV_UPDATED);
+	sendEvent((ObjectList*)obj, instId, EV_UPDATED_MANUAL);
 	xSemaphoreGiveRecursive(mutex);
 }
 
@@ -1030,12 +1077,18 @@ static int32_t sendEvent(ObjectList* obj, uint16_t instId, UAVObjEventType event
     		// Send to queue if a valid queue is registered
     		if (eventEntry->queue != 0)
     		{
-    			xQueueSend(eventEntry->queue, &msg, 0); // do not wait if queue is full
+    			if ( xQueueSend(eventEntry->queue, &msg, 0) != pdTRUE ) // will not block
+    			{
+    				++stats.eventErrors;
+    			}
     		}
     		// Invoke callback (from event task) if a valid one is registered
     		if (eventEntry->cb != 0)
     		{
-    			EventCallbackDispatch(&msg, eventEntry->cb); // invoke callback from the event task
+    			if ( EventCallbackDispatch(&msg, eventEntry->cb) != pdTRUE ) // invoke callback from the event task, will not block
+    			{
+    				++stats.eventErrors;
+    			}
     		}
     	}
     }

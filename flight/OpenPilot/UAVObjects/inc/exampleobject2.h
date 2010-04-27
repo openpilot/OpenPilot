@@ -32,8 +32,6 @@
 #ifndef EXAMPLEOBJECT2_H
 #define EXAMPLEOBJECT2_H
 
-#include "openpilot.h"
-
 // Object constants
 #define EXAMPLEOBJECT2_OBJID 2743296914U
 #define EXAMPLEOBJECT2_NAME "ExampleObject2"
@@ -65,7 +63,13 @@ typedef struct {
 
 } __attribute__((packed)) ExampleObject2Data;
 
-// Enumeration types
+// Field information
+// Field Field1 information
+// Field Field2 information
+// Field Field3 information
+// Field Field4 information
+/* Number of elements for field Field4 */
+#define EXAMPLEOBJECT2_FIELD4_NUMELEM 4
 
 
 // Generic interface functions

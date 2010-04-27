@@ -1,10 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       examplemodevent.c
+ * @file       alarms.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Example module to be used as a template for actual modules.
- *
+ * @brief      Include file of the alarm library
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -23,10 +22,19 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef EXAMPLEMODEVENT_H
-#define EXAMPLEMODEVENT_H
+#ifndef ALARMS_H
+#define ALARMS_H
 
-int32_t ExampleModEventInitialize();
+#include "systemalarms.h"
 
-#endif // EXAMPLEMODEVENT_H
+int32_t AlarmsInitialize(void);
+int32_t AlarmsSet(SystemAlarmsAlarmElem alarm, SystemAlarmsAlarmOptions severity);
+SystemAlarmsAlarmOptions AlarmsGet(SystemAlarmsAlarmElem alarm);
+int32_t AlarmsClear(SystemAlarmsAlarmElem alarm);
+void AlarmsClearAll();
+int32_t AlarmsHasWarnings();
+int32_t AlarmsHasErrors();
+int32_t AlarmsHasCritical();
+
+#endif // ALARMS_H
 

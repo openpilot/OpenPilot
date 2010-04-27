@@ -32,8 +32,6 @@
 #ifndef GCSTELEMETRYSTATS_H
 #define GCSTELEMETRYSTATS_H
 
-#include "openpilot.h"
-
 // Object constants
 #define GCSTELEMETRYSTATS_OBJID 607270704U
 #define GCSTELEMETRYSTATS_NAME "GCSTelemetryStats"
@@ -67,9 +65,15 @@ typedef struct {
 
 } __attribute__((packed)) GCSTelemetryStatsData;
 
-// Enumeration types
+// Field information
+// Field Connected information
 /* Enumeration options for field Connected */
 typedef enum { GCSTELEMETRYSTATS_CONNECTED_TRUE=0, GCSTELEMETRYSTATS_CONNECTED_FALSE=1,  } GCSTelemetryStatsConnectedOptions;
+// Field TxDataRate information
+// Field RxDataRate information
+// Field TxFailures information
+// Field RxFailures information
+// Field TxRetries information
 
 
 // Generic interface functions

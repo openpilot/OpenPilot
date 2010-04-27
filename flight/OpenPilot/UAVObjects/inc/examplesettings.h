@@ -32,8 +32,6 @@
 #ifndef EXAMPLESETTINGS_H
 #define EXAMPLESETTINGS_H
 
-#include "openpilot.h"
-
 // Object constants
 #define EXAMPLESETTINGS_OBJID 1640607828U
 #define EXAMPLESETTINGS_NAME "ExampleSettings"
@@ -64,7 +62,10 @@ typedef struct {
 
 } __attribute__((packed)) ExampleSettingsData;
 
-// Enumeration types
+// Field information
+// Field UpdatePeriod information
+// Field StepSize information
+// Field StepDirection information
 /* Enumeration options for field StepDirection */
 typedef enum { EXAMPLESETTINGS_STEPDIRECTION_UP=0, EXAMPLESETTINGS_STEPDIRECTION_DOWN=1,  } ExampleSettingsStepDirectionOptions;
 

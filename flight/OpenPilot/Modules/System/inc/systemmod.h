@@ -26,8 +26,6 @@
 #ifndef SYSTEMMOD_H
 #define SYSTEMMOD_H
 
-#include "openpilot.h"
-
 int32_t SystemModInitialize(void);
 
 #endif // SYSTEMMOD_H

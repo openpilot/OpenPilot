@@ -203,6 +203,16 @@ static void processObjEvent(UAVObjEvent* ev)
 		txErrors = 0;
 		txRetries = 0;
 		FlightTelemetryStatsSet(&stats);
+
+		// Update the telemetry alarm
+		if ( stats.Connected == FLIGHTTELEMETRYSTATS_CONNECTED_TRUE )
+		{
+			AlarmsClear(SYSTEMALARMS_ALARM_TELEMETRY);
+		}
+		else
+		{
+			AlarmsSet(SYSTEMALARMS_ALARM_TELEMETRY, SYSTEMALARMS_ALARM_ERROR);
+		}
 	}
 	// This is an object update, handle based on event type
 	else

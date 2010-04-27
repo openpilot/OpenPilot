@@ -31,16 +31,13 @@
 /* PIOS Includes */
 #include <pios.h>
 
-/* OpenPilot Includes */
-#include <op_config.h>
-#include <op_logging.h>
-
-/* UAVObjects */
+/* OpenPilot Libraries */
+#include "op_config.h"
+#include "op_logging.h"
+#include "utlist.h"
 #include "uavobjectmanager.h"
 #include "eventdispatcher.h"
-#include "utlist.h"
-
-/* UAVTalk */
+#include "alarms.h"
 #include "uavtalk.h"
 
 /* Global Functions */

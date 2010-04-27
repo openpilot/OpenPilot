@@ -32,8 +32,6 @@
 #ifndef GPSOBJECT_H
 #define GPSOBJECT_H
 
-#include "openpilot.h"
-
 // Object constants
 #define GPSOBJECT_OBJID 4217926642U
 #define GPSOBJECT_NAME "GpsObject"
@@ -66,7 +64,12 @@ typedef struct {
 
 } __attribute__((packed)) GpsObjectData;
 
-// Enumeration types
+// Field information
+// Field Latitude information
+// Field Longitude information
+// Field Altitude information
+// Field Satellites information
+// Field Updates information
 
 
 // Generic interface functions

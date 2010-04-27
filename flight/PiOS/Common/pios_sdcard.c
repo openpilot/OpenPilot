@@ -87,6 +87,7 @@ uint8_t PIOS_SDCARD_Sector[SECTOR_SIZE];
 #define CT_SDC                          (CT_SD1|CT_SD2)
 #define CT_BLOCK                        0x08
 static uint8_t CardType;
+static int32_t sdcard_mounted;
 
 /**
 * Initialises SPI pins and peripheral to access MMC/SD Card
@@ -96,6 +97,9 @@ static uint8_t CardType;
 int32_t PIOS_SDCARD_Init(void)
 {
 	SDCARD_MUTEX_TAKE;
+
+	sdcard_mounted = 0;
+
 	/* Ensure that fast pin drivers are activated */
 	PIOS_SPI_IO_Init(PIOS_SDCARD_SPI, PIOS_SPI_PIN_DRIVER_STRONG);
 
@@ -805,6 +809,16 @@ int32_t PIOS_SDCARD_StartupLog(void)
 }
 
 /**
+ * Check if the SD card has been mounted
+ * @return 0 if no
+ * @return 1 if yes
+ */
+int32_t POIS_SDCARD_IsMounted()
+{
+	return sdcard_mounted;
+}
+
+/**
 * Mounts the file system
 * param[in] CreateStartupLog 1 = True, 0 = False
 * return 0 No errors
@@ -845,6 +859,7 @@ int32_t PIOS_SDCARD_MountFS(uint32_t CreateStartupLog)
 	}
 
 	/* No errors */
+	sdcard_mounted = 1;
 	return 0;
 }
 

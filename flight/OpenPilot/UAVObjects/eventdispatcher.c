@@ -60,6 +60,7 @@ static PeriodicObjectList* objList;
 static xQueueHandle queue;
 static xTaskHandle eventTaskHandle;
 static xSemaphoreHandle mutex;
+static EventStats stats;
 
 // Private functions
 static int32_t processPeriodicUpdates();
@@ -74,8 +75,9 @@ static int32_t eventPeriodicUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, xQue
  */
 int32_t EventDispatcherInitialize()
 {
-	// Initialize list
+	// Initialize variables
 	objList = NULL;
+	memset(&stats, 0, sizeof(EventStats));
 
 	// Create mutex
 	mutex = xSemaphoreCreateRecursiveMutex();
@@ -90,6 +92,27 @@ int32_t EventDispatcherInitialize()
 
 	// Done
 	return 0;
+}
+
+/**
+ * Get the statistics counters
+ * @param[out] statsOut The statistics counters will be copied there
+ */
+void EventGetStats(EventStats* statsOut)
+{
+	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	memcpy(statsOut, &stats, sizeof(EventStats));
+	xSemaphoreGiveRecursive(mutex);
+}
+
+/**
+ * Clear the statistics counters
+ */
+void EventClearStats()
+{
+	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	memset(&stats, 0, sizeof(EventStats));
+	xSemaphoreGiveRecursive(mutex);
 }
 
 /**
@@ -312,7 +335,10 @@ static int32_t processPeriodicUpdates()
     			// Push event to queue, if one
     			if ( objEntry->evInfo.queue != 0)
     			{
-    				xQueueSend(objEntry->evInfo.queue, &objEntry->evInfo.ev, 0); // do not block if queue is full
+    				if ( xQueueSend(objEntry->evInfo.queue, &objEntry->evInfo.ev, 0) != pdTRUE ) // do not block if queue is full
+    				{
+    					++stats.eventErrors;
+    				}
     			}
             }
             // Update minimum delay

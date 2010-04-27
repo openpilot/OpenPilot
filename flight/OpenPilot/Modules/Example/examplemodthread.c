@@ -43,6 +43,7 @@
  * http://www.openpilot.org/OpenPilot_Application_Architecture
  */
 
+#include "openpilot.h"
 #include "examplemodthread.h"
 #include "exampleobject1.h" // object the module will listen for updates (input)
 #include "exampleobject2.h" // object the module will update (output)

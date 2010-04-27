@@ -24,6 +24,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include "openpilot.h"
 #include "systemmod.h"
 #include "settingspersistence.h"
 #include "systemstats.h"
@@ -36,16 +37,23 @@
 #define STACK_SIZE configMINIMAL_STACK_SIZE
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
 
+#define HEAP_LIMIT_WARNING 4000
+#define HEAP_LIMIT_CRITICAL 1000
+#define CPULOAD_LIMIT_WARNING 80
+#define CPULOAD_LIMIT_CRITICAL 95
+
 // Private types
 
 // Private variables
 static uint32_t idleCounter;
 static uint32_t idleCounterClear;
 static xTaskHandle systemTaskHandle;
+static int32_t stackOverflow;
 
 // Private functions
 static void objectUpdatedCb(UAVObjEvent* ev);
 static void updateStats();
+static void updateSystemAlarms();
 static void systemTask(void* parameters);
 
 /**
@@ -54,6 +62,8 @@ static void systemTask(void* parameters);
  */
 int32_t SystemModInitialize(void)
 {
+	// Initialize vars
+	stackOverflow = 0;
 	// Create system task
 	xTaskCreate(systemTask, (signed char*)"System", STACK_SIZE, NULL, TASK_PRIORITY, &systemTaskHandle);
 	return 0;
@@ -83,8 +93,21 @@ static void systemTask(void* parameters)
 		// Update the system statistics
 		updateStats();
 
-		// Flash the LED
+		// Update the system alarms
+		updateSystemAlarms();
+
+		// Flash system alive the LED
 		PIOS_LED_Toggle(LED1);
+
+		// Flash the error LED if an alarm is set
+		if ( AlarmsHasWarnings() )
+		{
+			PIOS_LED_Toggle(LED2);
+		}
+		else
+		{
+			PIOS_LED_Off(LED2);
+		}
 
 		// Wait until next period
 		vTaskDelayUntil(&lastSysTime, SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS);
@@ -133,6 +156,79 @@ static void updateStats()
 }
 
 /**
+ * Update system alarms
+ */
+static void updateSystemAlarms()
+{
+	SystemStatsData stats;
+	UAVObjStats objStats;
+	EventStats evStats;
+	SystemStatsGet(&stats);
+
+	// Check heap
+	if ( stats.HeapRemaining < HEAP_LIMIT_CRITICAL )
+	{
+		AlarmsSet(SYSTEMALARMS_ALARM_OUTOFMEMORY, SYSTEMALARMS_ALARM_CRITICAL);
+	}
+	else if ( stats.HeapRemaining < HEAP_LIMIT_WARNING )
+	{
+		AlarmsSet(SYSTEMALARMS_ALARM_OUTOFMEMORY, SYSTEMALARMS_ALARM_WARNING);
+	}
+	else
+	{
+		AlarmsClear(SYSTEMALARMS_ALARM_OUTOFMEMORY);
+	}
+
+	// Check CPU load
+	if ( stats.CPULoad > CPULOAD_LIMIT_CRITICAL )
+	{
+		AlarmsSet(SYSTEMALARMS_ALARM_CPUOVERLOAD, SYSTEMALARMS_ALARM_CRITICAL);
+	}
+	else if ( stats.CPULoad > CPULOAD_LIMIT_WARNING )
+	{
+		AlarmsSet(SYSTEMALARMS_ALARM_CPUOVERLOAD, SYSTEMALARMS_ALARM_WARNING);
+	}
+	else
+	{
+		AlarmsClear(SYSTEMALARMS_ALARM_CPUOVERLOAD);
+	}
+
+	// Check for stack overflow
+	if ( stackOverflow == 1 )
+	{
+		AlarmsSet(SYSTEMALARMS_ALARM_STACKOVERFLOW, SYSTEMALARMS_ALARM_CRITICAL);
+	}
+	else
+	{
+		AlarmsClear(SYSTEMALARMS_ALARM_STACKOVERFLOW);
+	}
+
+	// Check for SD card
+	if ( POIS_SDCARD_IsMounted() == 0 )
+	{
+		AlarmsSet(SYSTEMALARMS_ALARM_SDCARD, SYSTEMALARMS_ALARM_WARNING);
+	}
+	else
+	{
+		AlarmsClear(SYSTEMALARMS_ALARM_SDCARD);
+	}
+
+	// Check for event errors
+	UAVObjGetStats(&objStats);
+	EventGetStats(&evStats);
+	UAVObjClearStats();
+	EventClearStats();
+	if ( objStats.eventErrors > 0 || evStats.eventErrors > 0 )
+	{
+		AlarmsSet(SYSTEMALARMS_ALARM_EVENTSYSTEM, SYSTEMALARMS_ALARM_WARNING);
+	}
+	else
+	{
+		AlarmsClear(SYSTEMALARMS_ALARM_EVENTSYSTEM);
+	}
+}
+
+/**
  * Called by the RTOS when the CPU is idle, used to measure the CPU idle time.
  */
 void vApplicationIdleHook(void)
@@ -154,6 +250,6 @@ void vApplicationIdleHook(void)
  */
 void vApplicationStackOverflowHook( xTaskHandle *pxTask, signed portCHAR *pcTaskName )
 {
-
+	stackOverflow = 1;
 }
 

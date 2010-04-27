@@ -44,6 +44,7 @@
  *
  */
 
+#include "openpilot.h"
 #include "examplemodperiodic.h"
 #include "exampleobject2.h" // object that will be updated by the module
 #include "examplesettings.h" // object holding module settings

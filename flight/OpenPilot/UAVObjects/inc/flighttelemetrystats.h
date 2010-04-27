@@ -32,8 +32,6 @@
 #ifndef FLIGHTTELEMETRYSTATS_H
 #define FLIGHTTELEMETRYSTATS_H
 
-#include "openpilot.h"
-
 // Object constants
 #define FLIGHTTELEMETRYSTATS_OBJID 766280320U
 #define FLIGHTTELEMETRYSTATS_NAME "FlightTelemetryStats"
@@ -67,9 +65,15 @@ typedef struct {
 
 } __attribute__((packed)) FlightTelemetryStatsData;
 
-// Enumeration types
+// Field information
+// Field Connected information
 /* Enumeration options for field Connected */
 typedef enum { FLIGHTTELEMETRYSTATS_CONNECTED_TRUE=0, FLIGHTTELEMETRYSTATS_CONNECTED_FALSE=1,  } FlightTelemetryStatsConnectedOptions;
+// Field TxDataRate information
+// Field RxDataRate information
+// Field TxFailures information
+// Field RxFailures information
+// Field TxRetries information
 
 
 // Generic interface functions

@@ -32,8 +32,6 @@
 #ifndef EXAMPLEOBJECT1_H
 #define EXAMPLEOBJECT1_H
 
-#include "openpilot.h"
-
 // Object constants
 #define EXAMPLEOBJECT1_OBJID 3852936276U
 #define EXAMPLEOBJECT1_NAME "ExampleObject1"
@@ -69,7 +67,17 @@ typedef struct {
 
 } __attribute__((packed)) ExampleObject1Data;
 
-// Enumeration types
+// Field information
+// Field Field1 information
+// Field Field2 information
+// Field Field3 information
+// Field Field4 information
+/* Number of elements for field Field4 */
+#define EXAMPLEOBJECT1_FIELD4_NUMELEM 4
+// Field Field5 information
+// Field Field6 information
+// Field Field7 information
+// Field Field8 information
 /* Enumeration options for field Field8 */
 typedef enum { EXAMPLEOBJECT1_FIELD8_OPTION1=0, EXAMPLEOBJECT1_FIELD8_OPTION2=1,  } ExampleObject1Field8Options;
 

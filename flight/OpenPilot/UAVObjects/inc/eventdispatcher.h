@@ -27,9 +27,17 @@
 #define EVENTDISPATCHER_H
 
 // Public types
+/**
+ * Event dispatcher statistics
+ */
+typedef struct {
+	uint32_t eventErrors;
+} EventStats;
 
 // Public functions
 int32_t EventDispatcherInitialize();
+void EventGetStats(EventStats* statsOut);
+void EventClearStats();
 int32_t EventCallbackDispatch(UAVObjEvent* ev, UAVObjEventCallback cb);
 int32_t EventPeriodicCallbackCreate(UAVObjEvent* ev, UAVObjEventCallback cb, int32_t periodMs);
 int32_t EventPeriodicCallbackUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, int32_t periodMs);

@@ -32,8 +32,6 @@
 #ifndef $(NAMEUC)_H
 #define $(NAMEUC)_H
 
-#include "openpilot.h"
-
 // Object constants
 #define $(NAMEUC)_OBJID $(OBJID)U
 #define $(NAMEUC)_NAME "$(NAME)"
@@ -61,8 +59,8 @@ typedef struct {
 $(DATAFIELDS)
 } __attribute__((packed)) $(NAME)Data;
 
-// Enumeration types
-$(DATAENUM)
+// Field information
+$(DATAFIELDINFO)
 
 // Generic interface functions
 int32_t $(NAME)Initialize();

@@ -32,10 +32,8 @@
 #ifndef SYSTEMALARMS_H
 #define SYSTEMALARMS_H
 
-#include "openpilot.h"
-
 // Object constants
-#define SYSTEMALARMS_OBJID 2311311912U
+#define SYSTEMALARMS_OBJID 2311311458U
 #define SYSTEMALARMS_NAME "SystemAlarms"
 #define SYSTEMALARMS_ISSINGLEINST 1
 #define SYSTEMALARMS_ISSETTINGS 0
@@ -58,15 +56,18 @@
 
 // Object data
 typedef struct {
-    uint8_t Alarm[4];
+    uint8_t Alarm[6];
 
 } __attribute__((packed)) SystemAlarmsData;
 
-// Enumeration types
+// Field information
+// Field Alarm information
 /* Enumeration options for field Alarm */
-typedef enum { SYSTEMALARMS_ALARM_NONE=0, SYSTEMALARMS_ALARM_WARNING=1, SYSTEMALARMS_ALARM_ERROR=2, SYSTEMALARMS_ALARM_CRITICAL=3,  } SystemAlarmsAlarmOptions;
+typedef enum { SYSTEMALARMS_ALARM_OK=0, SYSTEMALARMS_ALARM_WARNING=1, SYSTEMALARMS_ALARM_ERROR=2, SYSTEMALARMS_ALARM_CRITICAL=3,  } SystemAlarmsAlarmOptions;
 /* Array element names for field Alarm */
-typedef enum { SYSTEMALARMS_ALARM_OUTOFMEMORY=0, SYSTEMALARMS_ALARM_STACKOVERFLOW=1, SYSTEMALARMS_ALARM_CPUOVERLOAD=2, SYSTEMALARMS_ALARM_EVENTSYSTEM=3,  } SystemAlarmsAlarmElem;
+typedef enum { SYSTEMALARMS_ALARM_OUTOFMEMORY=0, SYSTEMALARMS_ALARM_STACKOVERFLOW=1, SYSTEMALARMS_ALARM_CPUOVERLOAD=2, SYSTEMALARMS_ALARM_EVENTSYSTEM=3, SYSTEMALARMS_ALARM_SDCARD=4, SYSTEMALARMS_ALARM_TELEMETRY=5,  } SystemAlarmsAlarmElem;
+/* Number of elements for field Alarm */
+#define SYSTEMALARMS_ALARM_NUMELEM 6
 
 
 // Generic interface functions

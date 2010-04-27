@@ -115,6 +115,7 @@ SRC += $(MODGPS)/GPS.c $(MODGPS)/buffer.c
 ## OPENPILOT:
 SRC += $(OPSYSTEM)/openpilot.c
 SRC += $(OPSYSTEM)/op_logging.c
+SRC += $(OPSYSTEM)/alarms.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/uavobjectsinit.c

@@ -99,6 +99,7 @@ extern int32_t PIOS_SDCARD_CIDRead(SDCARDCidTypeDef *cid);
 extern int32_t PIOS_SDCARD_CSDRead(SDCARDCsdTypeDef *csd);
 
 extern int32_t PIOS_SDCARD_StartupLog(void);
+extern int32_t POIS_SDCARD_IsMounted();
 extern int32_t PIOS_SDCARD_MountFS(uint32_t StartupLog);
 extern int32_t PIOS_SDCARD_GetFree(void);
 

@@ -88,7 +88,16 @@ typedef struct {
  */
 typedef void (*UAVObjEventCallback)(UAVObjEvent* ev);
 
+/**
+ * Event manager statistics
+ */
+typedef struct {
+	uint32_t eventErrors;
+} UAVObjStats;
+
 int32_t UAVObjInitialize();
+void UAVObjGetStats(UAVObjStats* statsOut);
+void UAVObjClearStats();
 UAVObjHandle UAVObjRegister(uint32_t id, const char* name, int32_t isMetaobject, int32_t isSingleInstance,
 		int32_t isSettings, uint32_t numBytes);
 UAVObjHandle UAVObjGetByID(uint32_t id);

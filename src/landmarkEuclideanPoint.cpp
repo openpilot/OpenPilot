@@ -15,11 +15,13 @@ namespace jafar {
 		 */
 		LandmarkEuclideanPoint::LandmarkEuclideanPoint(const map_ptr_t & mapPtr) :
 			LandmarkAbstract(mapPtr, 3) {
+			geomType = POINT,
 			type("EUC");
 		}
 
 		LandmarkEuclideanPoint::LandmarkEuclideanPoint(const simulation_t dummy, const map_ptr_t & mapPtr) :
 			LandmarkAbstract(FOR_SIMULATION, mapPtr, 3) {
+			geomType = POINT,
 			type("EUC");
 		}
 

@@ -22,19 +22,15 @@ namespace jafar {
 		 */
 		LandmarkAnchoredHomogeneousPoint::LandmarkAnchoredHomogeneousPoint(const map_ptr_t & mapPtr) :
 			LandmarkAbstract(mapPtr, 7) {
+			geomType = POINT,
 			type("AHP");
 		}
 
 		LandmarkAnchoredHomogeneousPoint::LandmarkAnchoredHomogeneousPoint(const simulation_t dummy, const map_ptr_t & mapPtr) :
 			LandmarkAbstract(FOR_SIMULATION, mapPtr, 7) {
+			geomType = POINT,
 			type("AHP");
 		}
-
-//		vec3 LandmarkAnchoredHomogeneousPoint::toEuclidean(const vec3 & euc, mat & EUC_ahp) {
-//			return lmkAHP::ahp2euc(state.x());
-//		}
-
-
 
 	} // namespace rtslam
 } // namespace jafar

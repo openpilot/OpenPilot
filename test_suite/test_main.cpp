@@ -25,9 +25,10 @@
 #include <boost/shared_ptr.hpp>
 
 #include "rtslam/rtSlam.hpp"
-#include "rtslam/objectAbstract.hpp"
-#include "rtslam/robotAbstract.hpp"
+//#include "rtslam/objectAbstract.hpp"
+//#include "rtslam/robotAbstract.hpp"
 #include "rtslam/robotConstantVelocity.hpp"
+//#include "rtslam/sensorAbstract.hpp"
 #include "rtslam/sensorPinHole.hpp"
 #include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
 #include "rtslam/observationPinHoleAnchoredHomogeneous.hpp"
@@ -42,6 +43,9 @@ using namespace jafar::jmath::ublasExtra;
 using namespace jafar::rtslam;
 using namespace boost;
 
+jafar::kernel::IdFactory RobotAbstract::robotIds = jafar::kernel::IdFactory();
+jafar::kernel::IdFactory SensorAbstract::sensorIds = jafar::kernel::IdFactory();
+jafar::kernel::IdFactory LandmarkAbstract::landmarkIds = jafar::kernel::IdFactory();
 
 /**
  * Add a new robot to map
@@ -50,8 +54,8 @@ using namespace boost;
  */
 robot_ptr_t newRobot(map_ptr_t & mapPtr, string name) {
 
-	size_t rid = mapPtr->robotIds.getId();
 	constvel_ptr_t robPtr(new RobotConstantVelocity(mapPtr));
+	size_t rid = robPtr->robotIds.getId();
 	robPtr->id(rid);
 	robPtr->name(name);
 	robPtr->linkToParentMap(mapPtr);
@@ -67,9 +71,9 @@ robot_ptr_t newRobot(map_ptr_t & mapPtr, string name) {
 sensor_ptr_t newSensor(robot_ptr_t & robPtr, string name, MapObject::filtered_obj_t inFilter = MapObject::UNFILTERED) {
 	map_ptr_t mapPtr = robPtr->mapPtr();
 
-	size_t sid = mapPtr->sensorIds.getId();
 	pinhole_ptr_t senPtr(new SensorPinHole(robPtr, inFilter));
 
+	size_t sid = senPtr->sensorIds.getId();
 	senPtr->id(sid);
 	senPtr->name(name);
 	senPtr->linkToParentRobot(robPtr);

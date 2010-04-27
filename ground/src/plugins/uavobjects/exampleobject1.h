@@ -51,7 +51,17 @@ public:
 
     } __attribute__((packed)) DataFields;
 
-    // Enumeration types
+    // Field information
+    // Field Field1 information
+    // Field Field2 information
+    // Field Field3 information
+    // Field Field4 information
+    /* Number of elements for field Field4 */
+    static const quint32 FIELD4_NUMELEM = 4;
+    // Field Field5 information
+    // Field Field6 information
+    // Field Field7 information
+    // Field Field8 information
     /* Enumeration options for field Field8 */
     typedef enum { FIELD8_OPTION1=0, FIELD8_OPTION2=1,  } Field8Options;
 

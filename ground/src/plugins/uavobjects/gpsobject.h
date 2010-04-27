@@ -48,7 +48,12 @@ public:
 
     } __attribute__((packed)) DataFields;
 
-    // Enumeration types
+    // Field information
+    // Field Latitude information
+    // Field Longitude information
+    // Field Altitude information
+    // Field Satellites information
+    // Field Updates information
 
   
     // Constants

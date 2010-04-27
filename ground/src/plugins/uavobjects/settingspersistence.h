@@ -44,7 +44,8 @@ public:
 
     } __attribute__((packed)) DataFields;
 
-    // Enumeration types
+    // Field information
+    // Field Operation information
     /* Enumeration options for field Operation */
     typedef enum { OPERATION_LOAD=0, OPERATION_SAVE=1,  } OperationOptions;
 

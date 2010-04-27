@@ -42,8 +42,10 @@ SystemAlarms::SystemAlarms(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAM
     AlarmElemNames.append("StackOverflow");
     AlarmElemNames.append("CPUOverload");
     AlarmElemNames.append("EventSystem");
+    AlarmElemNames.append("SDCard");
+    AlarmElemNames.append("Telemetry");
     QStringList AlarmEnumOptions;
-    AlarmEnumOptions.append("None");
+    AlarmEnumOptions.append("OK");
     AlarmEnumOptions.append("Warning");
     AlarmEnumOptions.append("Error");
     AlarmEnumOptions.append("Critical");

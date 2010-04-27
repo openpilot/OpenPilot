@@ -47,7 +47,13 @@ public:
 
     } __attribute__((packed)) DataFields;
 
-    // Enumeration types
+    // Field information
+    // Field Field1 information
+    // Field Field2 information
+    // Field Field3 information
+    // Field Field4 information
+    /* Number of elements for field Field4 */
+    static const quint32 FIELD4_NUMELEM = 4;
 
   
     // Constants

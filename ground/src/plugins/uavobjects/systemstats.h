@@ -46,7 +46,10 @@ public:
 
     } __attribute__((packed)) DataFields;
 
-    // Enumeration types
+    // Field information
+    // Field FlightTime information
+    // Field HeapRemaining information
+    // Field CPULoad information
 
   
     // Constants

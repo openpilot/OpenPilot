@@ -43,8 +43,8 @@ public:
 $(DATAFIELDS)
     } __attribute__((packed)) DataFields;
 
-    // Enumeration types
-$(DATAENUM)
+    // Field information
+$(DATAFIELDINFO)
   
     // Constants
     static const quint32 OBJID = $(OBJID)U;

@@ -49,9 +49,15 @@ public:
 
     } __attribute__((packed)) DataFields;
 
-    // Enumeration types
+    // Field information
+    // Field Connected information
     /* Enumeration options for field Connected */
     typedef enum { CONNECTED_TRUE=0, CONNECTED_FALSE=1,  } ConnectedOptions;
+    // Field TxDataRate information
+    // Field RxDataRate information
+    // Field TxFailures information
+    // Field RxFailures information
+    // Field TxRetries information
 
   
     // Constants

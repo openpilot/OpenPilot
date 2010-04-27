@@ -52,6 +52,7 @@ namespace jafar {
 
 				void reparametrize_func(const vec & lmk, vec & lnew, mat & LNEW_lmk){
 					lnew = lmk;
+					LNEW_lmk = identity_mat(size());
 				}
 
 		}; // class LandmarkEuclideanPoint

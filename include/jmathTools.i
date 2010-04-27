@@ -151,22 +151,26 @@ namespace jafar {
     /** Dummy function that returns the ith element of a vec
      * 
      */
-    template<class V>
-    double getElementAt(const V& v, const unsigned int& rank) {
-      if(rank < v.size()) {
-        return v(rank);
-      }
-    };
+		template<class V>
+		double getElementAt(const V& v, const unsigned int& rank) {
+			if(rank < v.size()) return v(rank); else return 0.;
+		};
+		template<class V>
+		double setElementAt(V& v, const unsigned int& rank, double val) {
+			if(rank < v.size()) return v(rank) = val;
+		};
 		
 		/** Dummy function that returns the (i,j)th element of a mat
 		* 
 		*/
 		template<class Mat>
-				double getMatElementAt(const Mat& m, const unsigned int& i, const unsigned int& j) {
-			if( (i < m.size1() ) and (j < m.size2() )) {
-				return m(i,j);
-			}
-				};
+		double getMatElementAt(const Mat& m, const unsigned int& i, const unsigned int& j) {
+			if( (i < m.size1()) and (j < m.size2()) ) return m(i,j); else return 0.;
+		};
+		template<class Mat>
+		double setMatElementAt(Mat& m, const unsigned int& i, const unsigned int& j, double val) {
+			if( (i < m.size1()) and (j < m.size2()) ) m(i,j)= val;
+		};
  
   }
 }

@@ -155,9 +155,11 @@
 %template(trans) jafar::jmath::trans<jblas::mat22>;
 %template(assignMat) jafar::jmath::assignMat<jblas::sym_mat,jblas::mat>;
 
+%template(getElementAt) jafar::jmath::getElementAt<jblas::vec>;
 %template(getElementAt) jafar::jmath::getElementAt<jblas::vec2>;
 %template(getElementAt) jafar::jmath::getElementAt<jblas::vec3>;
 %template(getElementAt) jafar::jmath::getElementAt<jblas::vec4>;
+%template(getElementAt) jafar::jmath::getMatElementAt<jblas::mat>;
 %template(getElementAt) jafar::jmath::getMatElementAt<jblas::mat22>;
 %template(getElementAt) jafar::jmath::getMatElementAt<jblas::mat33>;
 %template(getElementAt) jafar::jmath::getMatElementAt<jblas::mat44>;

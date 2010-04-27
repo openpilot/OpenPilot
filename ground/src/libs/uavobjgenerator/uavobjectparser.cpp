@@ -572,11 +572,12 @@ bool UAVObjectParser::generateFlightObject(int objIndex, const QString& template
     }
     outInclude.replace(QString("$(DATAFIELDS)"), fields);
 
-    // Replace the $(DATAENUM) tag
+    // Replace the $(DATAFIELDINFO) tag
     QString name;
     QString enums;
     for (int n = 0; n < info->fields.length(); ++n)
     {
+        enums.append(QString("// Field %1 information\n").arg(info->fields[n]->name));
         // Only for enum types
         if (info->fields[n]->type == FIELDTYPE_ENUM)
         {
@@ -617,8 +618,17 @@ bool UAVObjectParser::generateFlightObject(int objIndex, const QString& template
                           .arg( info->name )
                           .arg( info->fields[n]->name ) );
         }
+        // Generate array information
+        if (info->fields[n]->numElements > 1)
+        {
+            enums.append(QString("/* Number of elements for field %1 */\n").arg(info->fields[n]->name));
+            enums.append( QString("#define %1_%2_NUMELEM %3\n")
+                          .arg( info->name.toUpper() )
+                          .arg( info->fields[n]->name.toUpper() )
+                          .arg( info->fields[n]->numElements ) );
+        }
     }
-    outInclude.replace(QString("$(DATAENUM)"), enums);
+    outInclude.replace(QString("$(DATAFIELDINFO)"), enums);
 
     // Done
     return true;
@@ -706,11 +716,12 @@ bool UAVObjectParser::generateGCSObject(int objIndex, const QString& templateInc
     }
     outCode.replace(QString("$(FIELDSINIT)"), finit);
 
-    // Replace the $(DATAENUM) tag
+    // Replace the $(DATAFIELDINFO) tag
     QString name;
     QString enums;
     for (int n = 0; n < info->fields.length(); ++n)
     {
+        enums.append(QString("    // Field %1 information\n").arg(info->fields[n]->name));
         // Only for enum types
         if (info->fields[n]->type == FIELDTYPE_ENUM)
         {
@@ -747,8 +758,16 @@ bool UAVObjectParser::generateGCSObject(int objIndex, const QString& templateInc
             enums.append( QString(" } %1Elem;\n")
                           .arg( info->fields[n]->name ) );
         }
+        // Generate array information
+        if (info->fields[n]->numElements > 1)
+        {
+            enums.append(QString("    /* Number of elements for field %1 */\n").arg(info->fields[n]->name));
+            enums.append( QString("    static const quint32 %1_NUMELEM = %2;\n")
+                          .arg( info->fields[n]->name.toUpper() )
+                          .arg( info->fields[n]->numElements ) );
+        }
     }
-    outInclude.replace(QString("$(DATAENUM)"), enums);
+    outInclude.replace(QString("$(DATAFIELDINFO)"), enums);
 
     // Done
     return true;

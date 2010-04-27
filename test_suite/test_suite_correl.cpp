@@ -10,19 +10,104 @@ using boost::unit_test_framework::test_case;
 // jafar debug include
 #include "kernel/jafarDebug.hpp"
 
+#include <iostream>
+#include <fstream>
+
 // include here your defined test suite
 #include "correl/explorer.hpp"
 using namespace jafar;
 using namespace jafar::correl;
 
+
+		void trackPoint(char* filePattern, int fileNBegin, int fileNEnd, int x, int y, int winHalfSize, int searchHalfW, int searchHalfH )
+		{
+			std::ofstream logfile("track.dat");
+			logfile << "# Correl.trackPoint" << std::endl;
+			
+			double currentX = x;
+			double currentY = y;
+
+			image::Image *im1 = NULL, *im2 = NULL;
+			char imgName[256];
+			
+			for (int i = fileNBegin; i <= fileNEnd; ++i)
+			{
+				sprintf(imgName, filePattern, i);
+				std::cout << imgName << ": tracking from " << x << ", " << y;;
+				
+				if (i != fileNBegin)
+				{
+					delete im1;
+					im1 = im2;
+					im1->set_roi(cvRect(x-winHalfSize,y-winHalfSize,2*winHalfSize+1,2*winHalfSize+1));
+				}
+				im2 = new image::Image();
+				im2->load(imgName);
+				
+				if (i != fileNBegin)
+				{
+					correl::Explorer<correl::Zncc>::exploreTranslation(im1, im2, x-searchHalfW, x+searchHalfW, 1, y-searchHalfH, y+searchHalfH, 1, currentX, currentY);
+					x = currentX+0.5;
+					y = currentY+0.5;
+					std::cout << " to " << currentX << ", " << currentY << std::endl;
+					
+				}
+				
+				logfile << i << "\t" << currentX << "\t" << currentY << std::endl;
+			}
+			
+			logfile.close();
+		}
+
+		void trackPointRef(char* filePattern, int fileNBegin, int fileNEnd, int x, int y, int winHalfSize, int searchHalfW, int searchHalfH )
+		{
+			std::ofstream logfile("track.dat");
+			logfile << "# Correl.trackPoint" << std::endl;
+			
+			double currentX = x;
+			double currentY = y;
+
+			image::Image *im1 = new image::Image(), *im2 = new image::Image();
+			char imgName[256];
+			
+			for (int i = fileNBegin; i <= fileNEnd; ++i)
+			{
+				sprintf(imgName, filePattern, i);
+				std::cout << imgName << ": tracking from " << x << ", " << y;;
+				
+				if (i == fileNBegin)
+				{
+					im1->load(imgName);
+					im1->set_roi(cvRect(x-winHalfSize,y-winHalfSize,2*winHalfSize+1,2*winHalfSize+1));
+				} else
+				{
+					im2->load(imgName);
+					correl::Explorer<correl::Zncc>::exploreTranslation(im1, im2, x-searchHalfW, x+searchHalfW, 1, y-searchHalfH, y+searchHalfH, 1, currentX, currentY);
+					x = currentX+0.5;
+					y = currentY+0.5;
+					std::cout << " to " << currentX << ", " << currentY << std::endl;
+				}
+				
+				logfile << i << "\t" << currentX << "\t" << currentY << std::endl;
+			}
+			
+			logfile.close();
+		}
+
+
 BOOST_AUTO_TEST_CASE( dummy )
 {
-	image::Image *im1 = new image::Image(10, 10, IPL_DEPTH_8U, JfrImage_CS_GRAY);
-	image::Image *im2 = new image::Image(10, 10, IPL_DEPTH_8U, JfrImage_CS_GRAY);
-	float xres, yres;
-	Explorer<Zncc>::exploreTranslation(im1, im2, 0, 10, 1, 0, 10, 1, xres, yres, NULL);
-	Explorer<Zncc>::exploreRotation(im1, im2, 0, 360, 10, xres, NULL);
+	image::Image *im1 = new image::Image(11, 11, IPL_DEPTH_8U, JfrImage_CS_GRAY);
+	image::Image *im2 = new image::Image(11, 11, IPL_DEPTH_8U, JfrImage_CS_GRAY);
+	double xres, yres;
+	Zncc::compute(im1, im2, NULL);
+	Explorer<Zncc>::exploreTranslation(im1, im2, 5, 5, 1, 5, 5, 1, xres, yres, NULL);
+//	trackPointRef("/net/pelican/data1/robots/dala/data/tests/2010-04-23_gyro-study/serie02/preproc2/img.l.%04d.png", 0, 235, 221, 220, 10, 80, 20);
+//	trackPointRef("/net/pelican/data1/robots/dala/data/tests/2010-04-23_gyro-study/serie02/preproc4/img.l.%04d.png", 0, 235, 110, 110, 5, 40, 10);
+
+	//Explorer<Zncc>::exploreRotation(im1, im2, 0, 360, 10, xres, NULL);
 }
+
 
 
 /*

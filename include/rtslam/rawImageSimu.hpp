@@ -29,7 +29,7 @@ namespace jafar {
 		 * \author jmcodol
 		 * \ingroup rtslam
 		 */
-		class RawImageSimu: public rawAbstract {
+		class RawImageSimu: public RawAbstract {
 
 			private:
 				map<int,FeaturePointSimu*> features;
@@ -40,7 +40,7 @@ namespace jafar {
 				 * Constructor
 				 */
 				RawImageSimu() :
-					rawAbstract() {
+					RawAbstract() {
 				}
 
 				int coord;

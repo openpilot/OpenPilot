@@ -87,12 +87,29 @@ namespace jafar {
 				 */
 				virtual bool predictVisibility();
 
+				/**
+				 * Predict appearance
+				 */
+				virtual void predictAppearance();
+
+				virtual double getMatchScore(){
+					//todo implement getScoreMatchInPercent()
+					return 50.0;
+				}
+
+
+				/**
+				 * find and match the expected appearence in the raw-data
+				 */
+				virtual void matchFeature(raw_ptr_t rawPtr);
 
 			public:
 				/* Search in the sensor().dataManagerList() the manager of the proper type, to be
 				 * linked as the weak-father of this observation.
 				 */
 				void linkToWeakParentDataManager(void);
+
+
 		};
 
 	}

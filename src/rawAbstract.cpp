@@ -19,10 +19,10 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
-		rawAbstract::rawAbstract() {
+		RawAbstract::RawAbstract() {
 		}
 
-		rawAbstract::~rawAbstract() {
+		RawAbstract::~RawAbstract() {
 		}
 
 		// PRINT UTILS
@@ -30,7 +30,7 @@ namespace jafar {
 		 * Operator << for class rawAbstract.
 		 * It shows some informations
 		 */
-		std::ostream& operator <<(std::ostream & s, jafar::rtslam::rawAbstract & rawA) {
+		std::ostream& operator <<(std::ostream & s, jafar::rtslam::RawAbstract & rawA) {
 			s << " I am a raw-data abstract" << endl;
 			return s;
 		}

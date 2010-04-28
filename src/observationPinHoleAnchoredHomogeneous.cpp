@@ -105,6 +105,19 @@ namespace jafar {
 				return;
 			}
 		}
+
+		void ObservationPinHoleAnchoredHomogeneousPoint::predictAppearance(){
+			// TODO implement predict appearance
+		}
+
+		/**
+		 * find and match the expected appearence in the raw-data
+		 */
+		void ObservationPinHoleAnchoredHomogeneousPoint::matchFeature(raw_ptr_t rawPtr) {
+			// TODO call the namespace image with the raw
+		}
+
+
 	}
 }
 

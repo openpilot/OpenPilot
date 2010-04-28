@@ -131,12 +131,12 @@ namespace jafar {
 				 */
 				void liberateStates(const jblas::ind_array & _ia);
 
-//				/**
-//				 * Add observations to landmark.
-//				 * This requires traversing all the map tree and this is why this function goes here.
-//				 * \param lmkPtr the pointer to the landmark to associate observations to.
-//				 */
-//				void addObservations(landmark_ptr_t & lmkPtr);
+				/**
+				 * Add observations to landmark.
+				 * This requires traversing all the map tree and this is why this function goes here.
+				 * \param lmkPtr the pointer to the landmark to associate observations to.
+				 */
+				void completeObservationsInGraph(const sensor_ptr_t & senPtr, const landmark_ptr_t & lmkPtr);
 
 				void fillSeq();
 
@@ -144,15 +144,15 @@ namespace jafar {
 
 				void fillRndm();
 
-			protected:
+			private:
 
 
-//				/**
-//				 * Create new observation.
-//				 * Creates a new observation from a sensor and a landmark.
-//				 * \todo see if this can go to class Observation, possibly with a dedicated constructor.
-//				 */
-//				observation_ptr_t newObservation(sensor_ptr_t & senPtr, landmark_ptr_t & lmkPtr);
+				/**
+				 * Create new observation.
+				 * Creates a new observation from a sensor and a landmark.
+				 * \todo see if this can go to class Observation, possibly with a dedicated constructor.
+				 */
+				observation_ptr_t newObservation(const sensor_ptr_t & senPtr, const landmark_ptr_t & lmkPtr);
 
 				//				void removeRobot(RobotAbstract& _rob);
 				//				void removeLandmark(LandmarkAbstract& _lmk);

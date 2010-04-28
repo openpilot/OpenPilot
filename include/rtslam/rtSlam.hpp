@@ -29,9 +29,10 @@ namespace jafar {
 		class LandmarkAbstract;
 		class ObservationAbstract;
 		class FeatureAbstract;
-		class rawAbstract;
+		class RawAbstract;
 		class AppearanceAbstract;
 		class DescriptorAbstract;
+		class Gaussian;
 
 		// Pointers with boost::shared_ptr:
 		typedef boost::shared_ptr<MapAbstract>         map_ptr_t;
@@ -40,9 +41,11 @@ namespace jafar {
 		typedef boost::shared_ptr<LandmarkAbstract>    landmark_ptr_t;
 		typedef boost::shared_ptr<ObservationAbstract> observation_ptr_t;
 		typedef boost::shared_ptr<FeatureAbstract>     feature_ptr_t;
-		typedef boost::shared_ptr<rawAbstract>         raw_ptr_t;
-		typedef boost::shared_ptr<AppearanceAbstract>  app_ptr_t;
+		typedef boost::shared_ptr<RawAbstract>         raw_ptr_t;
+		typedef boost::shared_ptr<AppearanceAbstract>  appearance_ptr_t;
 		typedef boost::shared_ptr<DescriptorAbstract>  desc_ptr_t;
+
+		typedef boost::shared_ptr<Gaussian>						gaussian_ptr_t;
 
 	}
 }

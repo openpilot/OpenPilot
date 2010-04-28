@@ -51,7 +51,6 @@ namespace jafar {
 		using namespace std;
 		using namespace jblas;
 
-		typedef boost::shared_ptr<AppearanceAbstract> appearance_ptr_t;
 
 
 		/**
@@ -118,6 +117,8 @@ namespace jafar {
 				Measurement measurement;
 				Innovation innovation;
 				Gaussian prior;
+				appearance_ptr_t predictedAppearance;
+				appearance_ptr_t observedAppearance;
 
 				ind_array ia_rsl; ///<    Ind. array of mapped indices of robot, sensor and landmark (ie, sensor might or might not be there).
 
@@ -163,6 +164,10 @@ namespace jafar {
 				 */
 				virtual void
 				project_func(const vec7 & sg, const vec & lmk, vec & meas, vec & nobs, mat & EXP_sg, mat & EXP_lmk) = 0;
+
+				virtual void setup(const feature_ptr_t & featPtr, const Gaussian & prior){
+					// todo implement setup()
+				}
 
 				/**
 				 * Project and get expectation covariances
@@ -243,6 +248,8 @@ namespace jafar {
 				 * Clear all event flags
 				 */
 				void clearEvents();
+				void clearCounters();
+
 
 				/**
 				 * Predict visibility.
@@ -254,6 +261,26 @@ namespace jafar {
 				 * \return true if landmark is predicted visible.
 				 */
 				virtual bool predictVisibility() = 0;
+
+				/**
+				 * Predict appearance
+				 */
+				virtual void predictAppearance() = 0;
+
+				/**
+				 * find and match the expected appearence in the raw-data
+				 */
+				virtual void matchFeature(raw_ptr_t) = 0;
+
+
+				virtual double getMatchScore() = 0;
+
+				/**
+				 * Provide prior to initialization algorithm.
+				 */
+				static Gaussian getPrior(){Gaussian dummy(1);return dummy;} // todo implement getPrior()
+
+				void update() ;
 
 		};
 

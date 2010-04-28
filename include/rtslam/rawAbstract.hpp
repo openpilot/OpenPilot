@@ -42,16 +42,16 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
-		class rawAbstract: public ObjectAbstract {
+		class RawAbstract: public ObjectAbstract {
 			private:
 			public:
-				rawAbstract();
-				virtual ~rawAbstract();
+				RawAbstract();
+				virtual ~RawAbstract();
 				/*
 				 * Operator << for class rawAbstract.
 				 * It shows some informations
 				 */
-				friend ostream& operator <<(ostream & s, jafar::rtslam::rawAbstract & rawA);
+				friend ostream& operator <<(ostream & s, jafar::rtslam::RawAbstract & rawA);
 		};
 	}
 }

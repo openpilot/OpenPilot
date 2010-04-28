@@ -31,6 +31,9 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
+#include "jmath/jblas.hpp"
+
+#include "rtslam/rtSlam.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -43,11 +46,14 @@ namespace jafar {
 		 */
 		class FeatureAbstract {
 			public:
+				int id;
+				appearance_ptr_t appearancePtr;
+				gaussian_ptr_t statePtr;
+
 				FeatureAbstract() {
 				}
 				virtual ~FeatureAbstract() {
 				}
-				int id;
 		};
 
 	}

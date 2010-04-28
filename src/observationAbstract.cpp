@@ -57,6 +57,8 @@ namespace jafar {
 		    LMK_rs(_lmkPtr->state.size(),sensorPtr()->ia_globalPose.size())
 		{
 			categoryName("OBSERVATION");
+			clearCounters();
+			clearEvents();
 		}
 
 		void ObservationAbstract::project() {
@@ -119,6 +121,18 @@ namespace jafar {
 			events.measured = false;
 			events.updated = false;
 			events.visible = false;
+		}
+
+		void ObservationAbstract::clearCounters(){
+			counters.nSearch = 0;
+			counters.nMatch = 0;
+			counters.nInlier = 0;
+		}
+
+		void ObservationAbstract::update() {
+			map_ptr_t mapPtr = sensorPtr()->robotPtr()->mapPtr();
+			ind_array ia_x = mapPtr->ia_used_states();
+			sensorPtr()->robotPtr()->mapPtr()->filter.correct(ia_x,innovation,INN_rsl,ia_rsl) ;
 		}
 
 	} // namespace rtslam

@@ -33,6 +33,9 @@
 
 const QString GpsObject::NAME = QString("GpsObject");
 
+/**
+ * Constructor
+ */
 GpsObject::GpsObject(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
 {
     // Create fields
@@ -55,8 +58,13 @@ GpsObject::GpsObject(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
+    // Set the default field values
+    setDefaultFieldValues();
 }
 
+/**
+ * Get the default metadata for this object
+ */
 UAVObject::Metadata GpsObject::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
@@ -71,13 +79,29 @@ UAVObject::Metadata GpsObject::getDefaultMetadata()
     return metadata;
 }
 
+/**
+ * Initialize object fields with the default values.
+ * If a default value is not specified the object fields
+ * will be initialized to zero.
+ */
+void GpsObject::setDefaultFieldValues()
+{
+
+}
+
+/**
+ * Get the object data fields
+ */
 GpsObject::DataFields GpsObject::getData()
 {
     QMutexLocker locker(mutex);
     return data;
 }
 
-void GpsObject::setData(DataFields& data)
+/**
+ * Set the object data fields
+ */
+void GpsObject::setData(const DataFields& data)
 {
     QMutexLocker locker(mutex);
     this->data = data;
@@ -85,6 +109,11 @@ void GpsObject::setData(DataFields& data)
     emit objectUpdated(this);
 }
 
+/**
+ * Create a clone of this object, a new instance ID must be specified.
+ * Do not use this function directly to create new instances, the
+ * UAVObjectManager should be used instead.
+ */
 UAVDataObject* GpsObject::clone(quint32 instID)
 {
     GpsObject* obj = new GpsObject();

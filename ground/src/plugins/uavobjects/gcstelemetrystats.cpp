@@ -33,6 +33,9 @@
 
 const QString GCSTelemetryStats::NAME = QString("GCSTelemetryStats");
 
+/**
+ * Constructor
+ */
 GCSTelemetryStats::GCSTelemetryStats(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
 {
     // Create fields
@@ -61,8 +64,13 @@ GCSTelemetryStats::GCSTelemetryStats(): UAVDataObject(OBJID, ISSINGLEINST, ISSET
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
+    // Set the default field values
+    setDefaultFieldValues();
 }
 
+/**
+ * Get the default metadata for this object
+ */
 UAVObject::Metadata GCSTelemetryStats::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
@@ -77,13 +85,29 @@ UAVObject::Metadata GCSTelemetryStats::getDefaultMetadata()
     return metadata;
 }
 
+/**
+ * Initialize object fields with the default values.
+ * If a default value is not specified the object fields
+ * will be initialized to zero.
+ */
+void GCSTelemetryStats::setDefaultFieldValues()
+{
+
+}
+
+/**
+ * Get the object data fields
+ */
 GCSTelemetryStats::DataFields GCSTelemetryStats::getData()
 {
     QMutexLocker locker(mutex);
     return data;
 }
 
-void GCSTelemetryStats::setData(DataFields& data)
+/**
+ * Set the object data fields
+ */
+void GCSTelemetryStats::setData(const DataFields& data)
 {
     QMutexLocker locker(mutex);
     this->data = data;
@@ -91,6 +115,11 @@ void GCSTelemetryStats::setData(DataFields& data)
     emit objectUpdated(this);
 }
 
+/**
+ * Create a clone of this object, a new instance ID must be specified.
+ * Do not use this function directly to create new instances, the
+ * UAVObjectManager should be used instead.
+ */
 UAVDataObject* GCSTelemetryStats::clone(quint32 instID)
 {
     GCSTelemetryStats* obj = new GCSTelemetryStats();

@@ -400,6 +400,23 @@ QString UAVObjectParser::processObjectFields(QDomNode& childNode, ObjectInfo* in
             field->options = options;
         }
     }
+    // Get the default value attribute (required for settings objects, optional for the rest)
+    elemAttr = elemAttributes.namedItem("defaultvalue");
+    if ( elemAttr.isNull() )
+    {
+        if ( info->isSettings )
+        {
+            return QString("Object:field:defaultvalue attribute is missing (required for settings objects)");
+        }
+        else
+        {
+            field->defaultValue = QString();
+        }
+    }
+    else
+    {
+        field->defaultValue = elemAttr.nodeValue().trimmed();
+    }
     // Add field to object
     info->fields.append(field);
     // Done
@@ -573,7 +590,6 @@ bool UAVObjectParser::generateFlightObject(int objIndex, const QString& template
     outInclude.replace(QString("$(DATAFIELDS)"), fields);
 
     // Replace the $(DATAFIELDINFO) tag
-    QString name;
     QString enums;
     for (int n = 0; n < info->fields.length(); ++n)
     {
@@ -629,6 +645,34 @@ bool UAVObjectParser::generateFlightObject(int objIndex, const QString& template
         }
     }
     outInclude.replace(QString("$(DATAFIELDINFO)"), enums);
+
+    // Replace the $(INITFIELDS) tag
+    QString initfields;
+    for (int n = 0; n < info->fields.length(); ++n)
+    {
+        if ( !info->fields[n]->defaultValue.isNull() && !info->fields[n]->defaultValue.isEmpty() )
+        {
+            if ( info->fields[n]->type == FIELDTYPE_ENUM )
+            {
+                initfields.append( QString("    data.%1 = %2;\n")
+                            .arg( info->fields[n]->name )
+                            .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValue ) ) );
+            }
+            else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
+            {
+                initfields.append( QString("    data.%1 = %2;\n")
+                            .arg( info->fields[n]->name )
+                            .arg( info->fields[n]->defaultValue.toFloat() ) );
+            }
+            else
+            {
+                initfields.append( QString("    data.%1 = %2;\n")
+                            .arg( info->fields[n]->name )
+                            .arg( info->fields[n]->defaultValue.toInt() ) );
+            }
+        }
+    }
+    outCode.replace(QString("$(INITFIELDS)"), initfields);
 
     // Done
     return true;
@@ -768,6 +812,34 @@ bool UAVObjectParser::generateGCSObject(int objIndex, const QString& templateInc
         }
     }
     outInclude.replace(QString("$(DATAFIELDINFO)"), enums);
+
+    // Replace the $(INITFIELDS) tag
+    QString initfields;
+    for (int n = 0; n < info->fields.length(); ++n)
+    {
+        if ( !info->fields[n]->defaultValue.isNull() && !info->fields[n]->defaultValue.isEmpty() )
+        {
+            if ( info->fields[n]->type == FIELDTYPE_ENUM )
+            {
+                initfields.append( QString("    data.%1 = %2;\n")
+                            .arg( info->fields[n]->name )
+                            .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValue ) ) );
+            }
+            else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
+            {
+                initfields.append( QString("    data.%1 = %2;\n")
+                            .arg( info->fields[n]->name )
+                            .arg( info->fields[n]->defaultValue.toFloat() ) );
+            }
+            else
+            {
+                initfields.append( QString("    data.%1 = %2;\n")
+                            .arg( info->fields[n]->name )
+                            .arg( info->fields[n]->defaultValue.toInt() ) );
+            }
+        }
+    }
+    outCode.replace(QString("$(INITFIELDS)"), initfields);
 
     // Done
     return true;

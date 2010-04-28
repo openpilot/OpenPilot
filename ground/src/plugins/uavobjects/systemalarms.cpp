@@ -33,6 +33,9 @@
 
 const QString SystemAlarms::NAME = QString("SystemAlarms");
 
+/**
+ * Constructor
+ */
 SystemAlarms::SystemAlarms(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
 {
     // Create fields
@@ -53,8 +56,13 @@ SystemAlarms::SystemAlarms(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAM
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
+    // Set the default field values
+    setDefaultFieldValues();
 }
 
+/**
+ * Get the default metadata for this object
+ */
 UAVObject::Metadata SystemAlarms::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
@@ -69,13 +77,29 @@ UAVObject::Metadata SystemAlarms::getDefaultMetadata()
     return metadata;
 }
 
+/**
+ * Initialize object fields with the default values.
+ * If a default value is not specified the object fields
+ * will be initialized to zero.
+ */
+void SystemAlarms::setDefaultFieldValues()
+{
+
+}
+
+/**
+ * Get the object data fields
+ */
 SystemAlarms::DataFields SystemAlarms::getData()
 {
     QMutexLocker locker(mutex);
     return data;
 }
 
-void SystemAlarms::setData(DataFields& data)
+/**
+ * Set the object data fields
+ */
+void SystemAlarms::setData(const DataFields& data)
 {
     QMutexLocker locker(mutex);
     this->data = data;
@@ -83,6 +107,11 @@ void SystemAlarms::setData(DataFields& data)
     emit objectUpdated(this);
 }
 
+/**
+ * Create a clone of this object, a new instance ID must be specified.
+ * Do not use this function directly to create new instances, the
+ * UAVObjectManager should be used instead.
+ */
 UAVDataObject* SystemAlarms::clone(quint32 instID)
 {
     SystemAlarms* obj = new SystemAlarms();

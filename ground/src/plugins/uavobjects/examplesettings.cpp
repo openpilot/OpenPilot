@@ -33,6 +33,9 @@
 
 const QString ExampleSettings::NAME = QString("ExampleSettings");
 
+/**
+ * Constructor
+ */
 ExampleSettings::ExampleSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
 {
     // Create fields
@@ -52,8 +55,13 @@ ExampleSettings::ExampleSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTING
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
+    // Set the default field values
+    setDefaultFieldValues();
 }
 
+/**
+ * Get the default metadata for this object
+ */
 UAVObject::Metadata ExampleSettings::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
@@ -68,13 +76,32 @@ UAVObject::Metadata ExampleSettings::getDefaultMetadata()
     return metadata;
 }
 
+/**
+ * Initialize object fields with the default values.
+ * If a default value is not specified the object fields
+ * will be initialized to zero.
+ */
+void ExampleSettings::setDefaultFieldValues()
+{
+    data.UpdatePeriod = 10;
+    data.StepSize = 1;
+    data.StepDirection = 0;
+
+}
+
+/**
+ * Get the object data fields
+ */
 ExampleSettings::DataFields ExampleSettings::getData()
 {
     QMutexLocker locker(mutex);
     return data;
 }
 
-void ExampleSettings::setData(DataFields& data)
+/**
+ * Set the object data fields
+ */
+void ExampleSettings::setData(const DataFields& data)
 {
     QMutexLocker locker(mutex);
     this->data = data;
@@ -82,6 +109,11 @@ void ExampleSettings::setData(DataFields& data)
     emit objectUpdated(this);
 }
 
+/**
+ * Create a clone of this object, a new instance ID must be specified.
+ * Do not use this function directly to create new instances, the
+ * UAVObjectManager should be used instead.
+ */
 UAVDataObject* ExampleSettings::clone(quint32 instID)
 {
     ExampleSettings* obj = new ExampleSettings();

@@ -33,6 +33,9 @@
 
 const QString SettingsPersistence::NAME = QString("SettingsPersistence");
 
+/**
+ * Constructor
+ */
 SettingsPersistence::SettingsPersistence(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
 {
     // Create fields
@@ -46,8 +49,13 @@ SettingsPersistence::SettingsPersistence(): UAVDataObject(OBJID, ISSINGLEINST, I
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
+    // Set the default field values
+    setDefaultFieldValues();
 }
 
+/**
+ * Get the default metadata for this object
+ */
 UAVObject::Metadata SettingsPersistence::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
@@ -62,13 +70,29 @@ UAVObject::Metadata SettingsPersistence::getDefaultMetadata()
     return metadata;
 }
 
+/**
+ * Initialize object fields with the default values.
+ * If a default value is not specified the object fields
+ * will be initialized to zero.
+ */
+void SettingsPersistence::setDefaultFieldValues()
+{
+
+}
+
+/**
+ * Get the object data fields
+ */
 SettingsPersistence::DataFields SettingsPersistence::getData()
 {
     QMutexLocker locker(mutex);
     return data;
 }
 
-void SettingsPersistence::setData(DataFields& data)
+/**
+ * Set the object data fields
+ */
+void SettingsPersistence::setData(const DataFields& data)
 {
     QMutexLocker locker(mutex);
     this->data = data;
@@ -76,6 +100,11 @@ void SettingsPersistence::setData(DataFields& data)
     emit objectUpdated(this);
 }
 
+/**
+ * Create a clone of this object, a new instance ID must be specified.
+ * Do not use this function directly to create new instances, the
+ * UAVObjectManager should be used instead.
+ */
 UAVDataObject* SettingsPersistence::clone(quint32 instID)
 {
     SettingsPersistence* obj = new SettingsPersistence();

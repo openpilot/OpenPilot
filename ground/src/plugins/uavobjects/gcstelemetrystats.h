@@ -71,12 +71,14 @@ public:
     GCSTelemetryStats();
 
     DataFields getData();
-    void setData(DataFields& data);
+    void setData(const DataFields& data);
     Metadata getDefaultMetadata();
     UAVDataObject* clone(quint32 instID);
 	
 private:
     DataFields data;
+
+    void setDefaultFieldValues();
 
 };
 

@@ -33,6 +33,9 @@
 
 const QString FlightTelemetryStats::NAME = QString("FlightTelemetryStats");
 
+/**
+ * Constructor
+ */
 FlightTelemetryStats::FlightTelemetryStats(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
 {
     // Create fields
@@ -61,8 +64,13 @@ FlightTelemetryStats::FlightTelemetryStats(): UAVDataObject(OBJID, ISSINGLEINST,
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
+    // Set the default field values
+    setDefaultFieldValues();
 }
 
+/**
+ * Get the default metadata for this object
+ */
 UAVObject::Metadata FlightTelemetryStats::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
@@ -77,13 +85,29 @@ UAVObject::Metadata FlightTelemetryStats::getDefaultMetadata()
     return metadata;
 }
 
+/**
+ * Initialize object fields with the default values.
+ * If a default value is not specified the object fields
+ * will be initialized to zero.
+ */
+void FlightTelemetryStats::setDefaultFieldValues()
+{
+
+}
+
+/**
+ * Get the object data fields
+ */
 FlightTelemetryStats::DataFields FlightTelemetryStats::getData()
 {
     QMutexLocker locker(mutex);
     return data;
 }
 
-void FlightTelemetryStats::setData(DataFields& data)
+/**
+ * Set the object data fields
+ */
+void FlightTelemetryStats::setData(const DataFields& data)
 {
     QMutexLocker locker(mutex);
     this->data = data;
@@ -91,6 +115,11 @@ void FlightTelemetryStats::setData(DataFields& data)
     emit objectUpdated(this);
 }
 
+/**
+ * Create a clone of this object, a new instance ID must be specified.
+ * Do not use this function directly to create new instances, the
+ * UAVObjectManager should be used instead.
+ */
 UAVDataObject* FlightTelemetryStats::clone(quint32 instID)
 {
     FlightTelemetryStats* obj = new FlightTelemetryStats();

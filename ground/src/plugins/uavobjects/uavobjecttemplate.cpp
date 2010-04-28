@@ -33,6 +33,9 @@
 
 const QString $(NAME)::NAME = QString("$(NAME)");
 
+/**
+ * Constructor
+ */
 $(NAME)::$(NAME)(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
 {
     // Create fields
@@ -40,8 +43,13 @@ $(NAME)::$(NAME)(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
 $(FIELDSINIT)
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
+    // Set the default field values
+    setDefaultFieldValues();
 }
 
+/**
+ * Get the default metadata for this object
+ */
 UAVObject::Metadata $(NAME)::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
@@ -56,13 +64,29 @@ UAVObject::Metadata $(NAME)::getDefaultMetadata()
     return metadata;
 }
 
+/**
+ * Initialize object fields with the default values.
+ * If a default value is not specified the object fields
+ * will be initialized to zero.
+ */
+void $(NAME)::setDefaultFieldValues()
+{
+$(INITFIELDS)
+}
+
+/**
+ * Get the object data fields
+ */
 $(NAME)::DataFields $(NAME)::getData()
 {
     QMutexLocker locker(mutex);
     return data;
 }
 
-void $(NAME)::setData(DataFields& data)
+/**
+ * Set the object data fields
+ */
+void $(NAME)::setData(const DataFields& data)
 {
     QMutexLocker locker(mutex);
     this->data = data;
@@ -70,6 +94,11 @@ void $(NAME)::setData(DataFields& data)
     emit objectUpdated(this);
 }
 
+/**
+ * Create a clone of this object, a new instance ID must be specified.
+ * Do not use this function directly to create new instances, the
+ * UAVObjectManager should be used instead.
+ */
 UAVDataObject* $(NAME)::clone(quint32 instID)
 {
     $(NAME)* obj = new $(NAME)();

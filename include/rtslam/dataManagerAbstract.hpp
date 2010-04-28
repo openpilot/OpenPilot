@@ -1,8 +1,9 @@
 /*
- * dataManagerAbstract.hpp
+ * \file dataManagerAbstract.hpp
  *
  *  Created on: Apr 22, 2010
  *      Author: nmansard
+ *      \ingroup rtslam
  */
 
 #ifndef DATAMANAGERABSTRACT_HPP_
@@ -16,11 +17,16 @@ namespace jafar {
 
 		class ObservationAbstract;
 
-		class DataManagerAbstract: public WeakParentOf<ObservationAbstract>, public ChildOf<SensorAbstract> {
-			ENABLE_ACCESS_TO_WEAK_CHILDREN(ObservationAbstract,Observation,observation)
-				;
 
-			virtual ~DataManagerAbstract( void ) { }
+		/**
+		 * \ingroup rtslam
+		 */
+		class DataManagerAbstract: public WeakParentOf<ObservationAbstract> , public ChildOf<SensorAbstract> {
+			ENABLE_ACCESS_TO_WEAK_CHILDREN(ObservationAbstract,Observation,observation)
+
+				virtual ~DataManagerAbstract(void)
+				{
+				}
 
 		};
 

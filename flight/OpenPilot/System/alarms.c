@@ -55,7 +55,6 @@ int32_t AlarmsInitialize(void)
 int32_t AlarmsSet(SystemAlarmsAlarmElem alarm, SystemAlarmsAlarmOptions severity)
 {
 	SystemAlarmsData alarms;
-	uint8_t changed;
 
 	// Check that this is a valid alarm
 	if (alarm >= SYSTEMALARMS_ALARM_NUMELEM)

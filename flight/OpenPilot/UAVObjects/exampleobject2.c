@@ -35,6 +35,9 @@
 // Private variables
 static UAVObjHandle handle;
 
+// Private functions
+static void setDefaultFieldValues();
+
 /**
  * Initialize object.
  * \return 0 Success
@@ -59,8 +62,25 @@ int32_t ExampleObject2Initialize()
 	metadata.loggingUpdatePeriod = 0;
 	UAVObjSetMetadata(handle, &metadata);
 
+    // Initialize field values
+    setDefaultFieldValues();
+
 	// Done
 	return 0;
+}
+
+/**
+ * Initialize object fields with the default values.
+ * If a default value is not specified the object fields
+ * will be initialized to zero.
+ */
+static void setDefaultFieldValues()
+{
+	ExampleObject2Data data;
+	ExampleObject2Get(&data);
+	memset(&data, 0, sizeof(ExampleObject2Data));
+
+	ExampleObject2Set(&data);
 }
 
 /**
@@ -70,5 +90,6 @@ UAVObjHandle ExampleObject2Handle()
 {
 	return handle;
 }
+
 
 

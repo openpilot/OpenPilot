@@ -35,6 +35,9 @@
 // Private variables
 static UAVObjHandle handle;
 
+// Private functions
+static void setDefaultFieldValues();
+
 /**
  * Initialize object.
  * \return 0 Success
@@ -59,8 +62,25 @@ int32_t GCSTelemetryStatsInitialize()
 	metadata.loggingUpdatePeriod = 0;
 	UAVObjSetMetadata(handle, &metadata);
 
+    // Initialize field values
+    setDefaultFieldValues();
+
 	// Done
 	return 0;
+}
+
+/**
+ * Initialize object fields with the default values.
+ * If a default value is not specified the object fields
+ * will be initialized to zero.
+ */
+static void setDefaultFieldValues()
+{
+	GCSTelemetryStatsData data;
+	GCSTelemetryStatsGet(&data);
+	memset(&data, 0, sizeof(GCSTelemetryStatsData));
+
+	GCSTelemetryStatsSet(&data);
 }
 
 /**
@@ -70,5 +90,6 @@ UAVObjHandle GCSTelemetryStatsHandle()
 {
 	return handle;
 }
+
 
 

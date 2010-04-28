@@ -35,6 +35,7 @@
 // Object constants
 #define SYSTEMALARMS_OBJID 2311311458U
 #define SYSTEMALARMS_NAME "SystemAlarms"
+#define SYSTEMALARMS_METANAME "SystemAlarmsMeta"
 #define SYSTEMALARMS_ISSINGLEINST 1
 #define SYSTEMALARMS_ISSETTINGS 0
 #define SYSTEMALARMS_NUMBYTES sizeof(SystemAlarmsData)

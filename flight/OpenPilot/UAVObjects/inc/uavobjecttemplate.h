@@ -35,6 +35,7 @@
 // Object constants
 #define $(NAMEUC)_OBJID $(OBJID)U
 #define $(NAMEUC)_NAME "$(NAME)"
+#define $(NAMEUC)_METANAME "$(NAME)Meta"
 #define $(NAMEUC)_ISSINGLEINST $(ISSINGLEINST)
 #define $(NAMEUC)_ISSETTINGS $(ISSETTINGS)
 #define $(NAMEUC)_NUMBYTES sizeof($(NAME)Data)

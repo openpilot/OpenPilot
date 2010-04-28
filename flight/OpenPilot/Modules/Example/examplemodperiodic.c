@@ -90,12 +90,6 @@ static void exampleTask(void* parameters)
 		// Update settings with latest value
 		ExampleSettingsGet(&settings);
 
-		// TODO: Remove, this is temporary for testing (force settings)
-		// will remove when default setting values are implemented
-		settings.StepDirection = EXAMPLESETTINGS_STEPDIRECTION_UP;
-		settings.StepSize = 1;
-		settings.UpdatePeriod = 100;
-
 		// Get the object data
 		ExampleObject2Get(&data);
 

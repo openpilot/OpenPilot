@@ -96,13 +96,13 @@ static void systemTask(void* parameters)
 		// Update the system alarms
 		updateSystemAlarms();
 
-		// Flash system alive the LED
+		// Flash the heartbeat LED
 		PIOS_LED_Toggle(LED1);
 
-		// Flash the error LED if an alarm is set
+		// Turn on the error LED if an alarm is set
 		if ( AlarmsHasWarnings() )
 		{
-			PIOS_LED_Toggle(LED2);
+			PIOS_LED_On(LED2);
 		}
 		else
 		{

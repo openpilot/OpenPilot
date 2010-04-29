@@ -74,7 +74,7 @@ namespace jafar {
 			project_func(sg, lmk, exp, nobs, EXP_sg, EXP_l);
 
 			expectation.x() = exp;
-			expectation.P() = ublasExtra::prod_JPJt(ublas::project(landmarkPtr()->mapPtr()->filter.P(), ia_rsl, ia_rsl), EXP_rsl);
+			expectation.P() = ublasExtra::prod_JPJt(ublas::project(landmarkPtr()->mapPtr()->filterPtr->P(), ia_rsl, ia_rsl), EXP_rsl);
 		}
 
 		void ObservationAbstract::backProject(){
@@ -92,7 +92,7 @@ namespace jafar {
 			LMK_rs = ublas::prod(LMK_sg, SG_rs);
 
 			// Initialize in map
-			landmarkPtr()->mapPtr()->filter.initialize(
+			landmarkPtr()->mapPtr()->filterPtr->initialize(
 					landmarkPtr()->mapPtr()->ia_used_states(),
 					LMK_rs,
 					sensorPtr()->ia_globalPose,
@@ -132,7 +132,7 @@ namespace jafar {
 		void ObservationAbstract::update() {
 			map_ptr_t mapPtr = sensorPtr()->robotPtr()->mapPtr();
 			ind_array ia_x = mapPtr->ia_used_states();
-			sensorPtr()->robotPtr()->mapPtr()->filter.correct(ia_x,innovation,INN_rsl,ia_rsl) ;
+			sensorPtr()->robotPtr()->mapPtr()->filterPtr->correct(ia_x,innovation,INN_rsl,ia_rsl) ;
 		}
 
 	} // namespace rtslam

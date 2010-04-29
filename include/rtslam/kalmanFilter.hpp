@@ -27,11 +27,11 @@ namespace jafar {
 		 * \ingroup rtslam
 		 */
 		class ExtendedKalmanFilterIndirect {
-			public:
-				size_t size; // state size
-				size_t measurementSize;
-				size_t expectationSize;
-				size_t innovationSize;
+			private:
+				size_t size_; // state size
+//				size_t measurementSize;
+//				size_t expectationSize;
+//				size_t innovationSize;
 			private:
 				vec x_;
 				sym_mat P_;
@@ -42,6 +42,9 @@ namespace jafar {
 
 				ExtendedKalmanFilterIndirect(size_t _size);
 
+				size_t size(){
+					return size_;
+				}
 				jblas::vec & x() {
 					return x_;
 				}

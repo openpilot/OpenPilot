@@ -81,11 +81,13 @@ namespace jafar {
 					move_func(x, control, n, dt_or_dx, xnew, XNEW_x, XNEW_pert);
 					state.x() = xnew;
 
+					if (mapPtr()->filterPtr){
+
 					if (!constantPerturbation)
 						computeStatePerturbation();
 
-					mapPtr()->filter.predict(mapPtr()->ia_used_states(), XNEW_x, state.ia(), Q); // P = F*P*F' + Q
-
+					mapPtr()->filterPtr->predict(mapPtr()->ia_used_states(), XNEW_x, state.ia(), Q); // P = F*P*F' + Q
+					}
 				}
 
 //		void RobotAbstract::move() {
@@ -96,7 +98,7 @@ namespace jafar {
 //			state.x() = x;
 //			if (!constantPerturbation)
 //				computeStatePerturbation();
-//			mapPtr->filter.predict(mapPtr->ia_used_states(), XNEW_x, state.ia(), Q); // P = F*P*F' + Q
+//			mapPtr->filterPtr->predict(mapPtr->ia_used_states(), XNEW_x, state.ia(), Q); // P = F*P*F' + Q
 //		}
 
 		void RobotAbstract::computeStatePerturbation() {

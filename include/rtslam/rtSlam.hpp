@@ -33,6 +33,7 @@ namespace jafar {
 		class AppearanceAbstract;
 		class DescriptorAbstract;
 		class Gaussian;
+		class ExtendedKalmanFilterIndirect;
 
 		// Pointers with boost::shared_ptr:
 		typedef boost::shared_ptr<MapAbstract>         map_ptr_t;
@@ -46,7 +47,7 @@ namespace jafar {
 		typedef boost::shared_ptr<DescriptorAbstract>  desc_ptr_t;
 
 		typedef boost::shared_ptr<Gaussian>						gaussian_ptr_t;
-
+		typedef boost::shared_ptr<ExtendedKalmanFilterIndirect> ekfInd_ptr_t;
 	}
 }
 

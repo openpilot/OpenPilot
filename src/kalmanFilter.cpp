@@ -25,7 +25,7 @@ namespace jafar {
 		using namespace jmath::ublasExtra;
 
 		ExtendedKalmanFilterIndirect::ExtendedKalmanFilterIndirect(size_t _size) :
-			size(_size), x_(size), P_(size)
+			size_(_size), x_(size_), P_(size_)
 		{
 			x_.clear();
 			P_.clear();

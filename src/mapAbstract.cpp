@@ -35,21 +35,31 @@ namespace jafar {
 		 * Constructor
 		 */
 		MapAbstract::MapAbstract(size_t _max_size) :
-			max_size(_max_size), current_size(0), used_states(max_size), filter(max_size) {
+			max_size(_max_size), current_size(0), used_states(max_size) {
+			used_states.clear();
+			ekfInd_ptr_t filtPtr(new ExtendedKalmanFilterIndirect(_max_size));
+			filterPtr = filtPtr;
+		}
+		MapAbstract::MapAbstract(const ekfInd_ptr_t & ekfPtr) :
+			filterPtr(ekfPtr),
+			max_size(ekfPtr->size()),
+			current_size(0),
+			used_states(ekfPtr->size())
+		{
 			used_states.clear();
 		}
 
 		jblas::vec & MapAbstract::x() {
-			return filter.x();
+			return filterPtr->x();
 		}
 		jblas::sym_mat & MapAbstract::P() {
-			return filter.P();
+			return filterPtr->P();
 		}
 		double & MapAbstract::x(size_t i) {
-			return filter.x(i);
+			return filterPtr->x(i);
 		}
 		double & MapAbstract::P(size_t i, size_t j) {
-			return filter.P(i, j);
+			return filterPtr->P(i, j);
 		}
 
 		jblas::ind_array MapAbstract::reserveStates(const std::size_t N) {

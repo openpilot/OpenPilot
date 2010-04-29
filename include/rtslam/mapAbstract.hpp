@@ -61,6 +61,7 @@ namespace jafar {
 				 * Constructor
 				 */
 				MapAbstract(size_t _max_size);
+				MapAbstract(const ekfInd_ptr_t & ekfPtr);
 
 				/**
 				 * Mandatory virtual destructor - Map is used as-is, non-abstract by now
@@ -68,6 +69,12 @@ namespace jafar {
 				inline virtual ~MapAbstract() {
 				}
 
+
+				/**
+				 * EKF engine
+				 */
+				ekfInd_ptr_t filterPtr;
+//				ExtendedKalmanFilterIndirect filter;
 
 				/**
 				 * Size things and map usage management
@@ -87,11 +94,6 @@ namespace jafar {
 					return res;
 				}
 
-
-				/**
-				 * EKF engine
-				 */
-				ExtendedKalmanFilterIndirect filter;
 
 				jblas::vec & x();
 				jblas::sym_mat & P();

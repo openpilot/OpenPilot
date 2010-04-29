@@ -130,6 +130,9 @@ namespace jafar {
 				jblas::mat XNEW_pert; ///<      Jacobian wrt perturbation
 				jblas::sym_mat Q; ///<          Process noise covariances matrix in state space, Q = XNEW_pert * perturbation.P * trans(XNEW_pert);
 
+				virtual size_t mySize() = 0;
+				virtual size_t mySize_control() = 0;
+				virtual size_t mySize_perturbation() = 0;
 				static size_t size_control() {
 					return 0;
 				}
@@ -137,7 +140,7 @@ namespace jafar {
 					return 0;
 				}
 				void set_control(const vec & c) {
-					JFR_ASSERT(c.size() == size_control(), "RobotAbstract::set_control(vec&, double): Sizes mismatch");
+					JFR_ASSERT(c.size() == mySize_control(), "RobotAbstract::set_control(vec&, double): Sizes mismatch");
 					control = c;
 				}
 				void set_perturbation(const Perturbation & _pert) {

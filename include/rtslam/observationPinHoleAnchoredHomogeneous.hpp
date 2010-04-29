@@ -71,7 +71,7 @@ namespace jafar {
 				/**
 				 * Projection function, with Jacobians and non-observable part.
 				 */
-				void project_func(const vec7 & sg, const vec & lmk, vec & meas, vec & nobs, mat & EXP_sg, mat & EXP_lmk);
+				virtual void project_func(const vec7 & sg, const vec & lmk, vec & meas, vec & nobs, mat & EXP_sg, mat & EXP_lmk);
 				/**
 				 * Retro-projection function, with Jacobians
 				 */
@@ -94,7 +94,7 @@ namespace jafar {
 
 				virtual double getMatchScore(){
 					//todo implement getScoreMatchInPercent()
-					return 50.0;
+					return 85.0;
 				}
 
 

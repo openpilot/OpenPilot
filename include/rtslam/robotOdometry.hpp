@@ -20,7 +20,7 @@ namespace jafar {
 	namespace rtslam {
 
 		class RobotOdometry;
-				typedef boost::shared_ptr<RobotOdometry> odo_ptr_t;
+				typedef boost::shared_ptr<RobotOdometry> robodo_ptr_t;
 
 
 		/**
@@ -88,6 +88,10 @@ namespace jafar {
 				static size_t size_perturbation() {
 					return 6;
 				}
+				virtual size_t mySize() {return size();}
+				virtual size_t mySize_control() {return size_control();}
+				virtual size_t mySize_perturbation() {return size_perturbation();}
+
 
 			protected:
 				/**

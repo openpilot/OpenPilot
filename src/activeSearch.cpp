@@ -47,7 +47,9 @@ namespace jafar {
 
 		// Functions to fill in cells
 		void ActiveSearchGrid::addPixel(const vec2 & p) {
-			addToCell(pix2cell(p));
+			cout << "Pixel to add to cell: " << p << endl;
+			veci2 cell = pix2cell(p);
+			addToCell(cell);
 		}
 		void ActiveSearchGrid::addToCell(const veci2 & cell) {
 			projectionsCount(cell(0), cell(1))++;

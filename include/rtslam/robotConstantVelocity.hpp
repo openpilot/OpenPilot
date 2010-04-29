@@ -18,7 +18,7 @@ namespace jafar {
 	namespace rtslam {
 
 		class RobotConstantVelocity;
-		typedef boost::shared_ptr<RobotConstantVelocity> constvel_ptr_t;
+		typedef boost::shared_ptr<RobotConstantVelocity> robconstvel_ptr_t;
 
 
 		/**
@@ -91,14 +91,16 @@ namespace jafar {
 				static size_t size() {
 					return 13;
 				}
-
 				static size_t size_control() {
 					return 0;
 				}
-
 				static size_t size_perturbation() {
 					return 6;
 				}
+
+				virtual size_t mySize() {return size();}
+				virtual size_t mySize_control() {return size_control();}
+				virtual size_t mySize_perturbation() {return size_perturbation();}
 
 			protected:
 				/**
@@ -147,7 +149,7 @@ namespace jafar {
 				 * \param wi the angular impulse.
 				 */
 				template<class Vu, class V>
-				inline void splitControl(Vu & u, V & vi, V & wi) {
+				inline void splitControl(const Vu & u, V & vi, V & wi) {
 					vi = project(u, ublas::range(0, 3));
 					wi = project(u, ublas::range(3, 6));
 				}

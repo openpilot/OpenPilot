@@ -89,7 +89,6 @@ namespace jafar {
 					sensor_ptr_t senPtr = *senIter;
 					if (senPtr != existingSenPtr){
 						observation_ptr_t obsPtr = newObservation(senPtr, lmkPtr);
-						cout << "    added obs: " << obsPtr->id() << endl;
 					}
 				}
 			}
@@ -117,10 +116,12 @@ namespace jafar {
 
 		observation_ptr_t MapAbstract::newObservation(const sensor_ptr_t & senPtr, const landmark_ptr_t & lmkPtr) {
 			// todo make obs creation dynamic with factories or switch or other.
-			observation_ptr_t obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint(senPtr, lmkPtr));
+			obs_ph_ahp_ptr_t obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint(senPtr, lmkPtr));
 			obsPtr->id() = lmkPtr->id();
-			obsPtr->linkToParentSensor(senPtr);
-			obsPtr->linkToParentLandmark(lmkPtr);
+//			obsPtr->linkToParentSensor(senPtr);
+//			obsPtr->linkToParentLandmark(lmkPtr);
+			obsPtr->linkToParentPinHole(senPtr);
+			obsPtr->linkToParentAHP(lmkPtr);
 
 			return obsPtr;
 		}

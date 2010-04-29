@@ -108,6 +108,11 @@ namespace jafar {
 					return 12;
 				}
 
+				virtual size_t mySize() {return size();}
+				virtual size_t mySize_control() {return size_control();}
+				virtual size_t mySize_perturbation() {return size_perturbation();}
+
+
 			protected:
 				/**
 				 * Split state vector.

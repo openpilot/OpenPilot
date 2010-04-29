@@ -161,6 +161,5 @@ namespace jafar {
 			subrange(XNEW_pert, 10, 13, 3, 6) = I;
 		}
 
-
 	}
 }

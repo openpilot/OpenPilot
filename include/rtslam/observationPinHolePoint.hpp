@@ -19,6 +19,7 @@
 #include "rtslam/observationAbstract.hpp"
 #include "rtslam/rtSlam.hpp"
 #include "rtslam/activeSearch.hpp"
+#include "rtslam/featureAbstract.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -30,7 +31,12 @@ namespace jafar {
 
 			public:
 				static bool detectInRoi(const raw_ptr_t & rawPtr, const ROI & roi, feature_ptr_t & featPtr){
+
 					// todo implement detectInRoi()
+//					vec2 pix;
+//					pix(0) = 100; pix(1) = 100;
+//					featPtr->statePtr->x(pix);
+					return true;
 				}
 
 		};

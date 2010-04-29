@@ -105,6 +105,10 @@ namespace jafar {
 				virtual void reparametrize_func(const vec & lmk, vec & lnew, mat & LNEW_lmk) = 0;
 
 				virtual void createDescriptor(const appearance_ptr_t & appPtr, const vec7 & sensorPose){
+					cout << __PRETTY_FUNCTION__ << endl;
+					cout << appPtr << endl;
+					cout << sensorPose << endl;
+
 					// todo implement createDescriptor()
 				}
 

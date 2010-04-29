@@ -23,4 +23,4 @@ LIBS += -lkernel -ljmath
 # CPPFLAGS += -DJFR_NDEBUG
 CPPFLAGS += $(BOOST_CPPFLAGS) $(BOOST_SANDBOX_CPPFLAGS) 
 
-CXXFLAGS += -g -ggdb -Wall
+CXXFLAGS += -g -O0 -ggdb -Wall

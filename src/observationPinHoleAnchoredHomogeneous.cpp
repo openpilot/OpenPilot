@@ -33,6 +33,10 @@ namespace jafar {
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::project_func(const vec7 & sg, const vec & lmk, vec & exp,
 		                                                              vec & dist, mat & EXP_sg, mat & EXP_lmk) {
+			// resize input vectors
+			exp.resize(expectation.size());
+			dist.resize(prior.size());
+
 			// Some temps of known size
 			vec3 v;
 			mat V_sg(3, 7);
@@ -47,7 +51,9 @@ namespace jafar {
 			//
 			// These functions below use the down-casted pointer because they need to know the particular object parameters and/or methods:
 			lmkAHP::toBearingOnlyFrame(sg, lmk, v, dist(0), V_sg, V_lmk);
-			pinhole::projectPoint(pinHolePtr()->intrinsic, pinHolePtr()->distortion, v, exp, EXP_v);
+			vec4 k = pinHolePtr()->intrinsic;
+			vec d = pinHolePtr()->distortion;
+			pinhole::projectPoint(k, d, v, exp, EXP_v);
 
 
 			// We perform Jacobian composition. We use the chain rule.
@@ -60,7 +66,7 @@ namespace jafar {
 		                                                                  mat & AHP_pix, mat AHP_invDist) {
 			vec3 v;
 			mat32 V_pix;
-			mat V_sg(3, 1);
+			mat V_sg(3, 7);
 			mat AHP_v(7, 3);
 
 
@@ -71,7 +77,8 @@ namespace jafar {
 			//
 			// These functions below use the down-casted pointer because they need to know the particular object parameters and/or methods:
 			mat V_1(3, 1);
-			pinhole::backProjectPoint(pinHolePtr()->intrinsic, pinHolePtr()->correction, pix, 1.0, v, V_pix, V_1);
+			pinhole_ptr_t phPtr = pinHolePtr();
+			pinhole::backProjectPoint(phPtr->intrinsic, phPtr->correction, pix, 1.0, v, V_pix, V_1);
 			lmkAHP::fromBearingOnlyFrame(sg, v, invDist(0), ahp, AHP_sg, AHP_v, AHP_invDist);
 
 

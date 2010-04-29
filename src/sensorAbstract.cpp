@@ -47,7 +47,7 @@ namespace jafar {
 			//          #check       ? # sensor in filter                                 : # not in filter
 			    MapObject(_robPtr->mapPtr(), 7, inFilter),
 			    pose(state, Gaussian::REMOTE),
-			    ia_globalPose(inFilter == FILTERED ? ia_union(_robPtr->pose.ia(), pose.ia()) : ublasExtra::ia_set(0, 0))
+			    ia_globalPose(inFilter == FILTERED ? ia_union(_robPtr->pose.ia(), pose.ia()) : _robPtr->pose.ia())
 		{
 			categoryName("SENSOR");
 			cout << "Created sensor." << endl;
@@ -132,7 +132,6 @@ namespace jafar {
 		 * Get sensor pose in global frame.
 		 */
 		void SensorAbstract::globalPose(jblas::vec7 & senGlobalPos, jblas::mat & SG_rs) {
-			cout << __PRETTY_FUNCTION__ << " # " << __LINE__ << std::endl;
 			jblas::vec7 robotPose = robotPtr()->pose.x();
 			jblas::vec7 sensorPose = pose.x();
 

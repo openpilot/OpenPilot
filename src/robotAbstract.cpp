@@ -83,10 +83,10 @@ namespace jafar {
 
 					if (mapPtr()->filterPtr){
 
-					if (!constantPerturbation)
-						computeStatePerturbation();
+						if (!constantPerturbation)
+							computeStatePerturbation();
 
-					mapPtr()->filterPtr->predict(mapPtr()->ia_used_states(), XNEW_x, state.ia(), Q); // P = F*P*F' + Q
+						mapPtr()->filterPtr->predict(mapPtr()->ia_used_states(), XNEW_x, state.ia(), Q); // P = F*P*F' + Q
 					}
 				}
 

@@ -51,18 +51,18 @@ void test_slam01() {
 	ActiveSearchGrid acGrid(640, 480, 8, 8, 10);
 	// INIT : 1 map, 2 robs, 3 sens
 	map_ptr_t mapPtr(new MapAbstract(100));
-	robot_ptr_t robPtr1(new RobotConstantVelocity(mapPtr));
+	robconstvel_ptr_t robPtr1(new RobotConstantVelocity(mapPtr));
 	robPtr1->linkToParentMap(mapPtr);
-	sensor_ptr_t senPtr11 (new SensorPinHole(robPtr1, MapObject::UNFILTERED));
+	pinhole_ptr_t senPtr11 (new SensorPinHole(robPtr1, MapObject::UNFILTERED));
 	senPtr11->linkToParentRobot(robPtr1);
-	sensor_ptr_t senPtr12 (new SensorPinHole(robPtr1, MapObject::FILTERED));
+	pinhole_ptr_t senPtr12 (new SensorPinHole(robPtr1, MapObject::FILTERED));
 	senPtr12->linkToParentRobot(robPtr1);
-	robot_ptr_t robPtr2(new RobotOdometry(mapPtr));
+	robodo_ptr_t robPtr2(new RobotOdometry(mapPtr));
 	robPtr2->linkToParentMap(mapPtr);
-	sensor_ptr_t senPtr21 (new SensorPinHole(robPtr2, MapObject::UNFILTERED));
+	pinhole_ptr_t senPtr21 (new SensorPinHole(robPtr2, MapObject::UNFILTERED));
 	senPtr21->linkToParentRobot(robPtr2);
 
-	sensor_ptr_t senPtrCopy;
+	pinhole_ptr_t senPtrCopy;
 	senPtrCopy = senPtr11;
 
 
@@ -79,13 +79,15 @@ void test_slam01() {
 	// loop all lmks
 	// create sen--lmk observation
 	// Temporal loop
-	for (int t = 1; t <= 100; t++) {
+	for (int t = 1; t <= 3; t++) {
+
+		cout << "Time : " << t << endl;
 
 		// foreach robot
 		for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin(); robIter != mapPtr->robotList().end(); robIter++)
 		{
 			robot_ptr_t robPtr = *robIter;
-			vec u(robPtr->size_control()); // TODO put some real values in u.
+			vec u(robPtr->mySize_control()); // TODO put some real values in u.
 			robPtr->set_control(u);
 			robPtr->move();
 			// foreach sensor
@@ -100,13 +102,16 @@ void test_slam01() {
 				for (SensorAbstract::ObservationList::iterator obsIter = senPtr->observationList().begin(); obsIter != senPtr->observationList().end(); obsIter++)
 				{
 					observation_ptr_t obsPtr = *obsIter;
+//					obs_ph_ahp_ptr_t obsPtr = dynamic_pointer_cast<ObservationPinHoleAnchoredHomogeneousPoint>(*obsIter);
 					obsPtr->clearEvents();
 					// 1a. project
 					obsPtr->project();
 					// 1b. check visibility
 					obsPtr->predictVisibility();
 					if (obsPtr->isVisible()){
-						acGrid.addPixel(obsPtr->expectation.x());
+						vec2 pix = obsPtr->expectation.x();
+						pix(0) = 100; pix(1) = 100; // todo remove this when turning with data.
+						acGrid.addPixel(pix);
 						obsPtr->counters.nSearch++;
 						// 1c. predict appearance
 						obsPtr->predictAppearance();
@@ -119,7 +124,7 @@ void test_slam01() {
 							obsPtr->counters.nMatch++;
 							obsPtr->events.matched = true;
 							obsPtr->computeInnovation() ;
-							if (obsPtr->compatibilityTest(3.0)) {
+							if (obsPtr->compatibilityTest(0)) {
 								obsPtr->counters.nInlier++;
 								obsPtr->update() ;
 								obsPtr->events.updated = true;
@@ -139,14 +144,14 @@ void test_slam01() {
 						if (ObservationPinHolePoint::detectInRoi(senPtr->getRaw(), roi, featPtr)){
 
 							// create lmk object
-							landmark_ptr_t lmkPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr));
+							ahp_ptr_t lmkPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr));
 							lmkPtr->linkToParentMap(mapPtr);
 
 							// create all obs objects
 							// todo make lmk creation dynamic with factories or switch or other.
-							observation_ptr_t obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint(senPtr,lmkPtr));
-							obsPtr->linkToParentSensor(senPtr);
-							obsPtr->linkToParentLandmark(lmkPtr);
+							obs_ph_ahp_ptr_t obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint(senPtr,lmkPtr));
+							obsPtr->linkToParentPinHole(senPtr);
+							obsPtr->linkToParentAHP(lmkPtr);
 
 							// fill data for this obs
 							obsPtr->setup(featPtr, ObservationPinHoleAnchoredHomogeneousPoint::getPrior());
@@ -154,7 +159,9 @@ void test_slam01() {
 							// fill data for the landmark
 							obsPtr->backProject();
 
-							lmkPtr->createDescriptor(featPtr->appearancePtr, senPtr->globalPose());
+							vec7 globalSensorPose = senPtr->globalPose();
+							cout << globalSensorPose << endl;
+//							lmkPtr->createDescriptor(featPtr->appearancePtr, globalSensorPose);
 //							obsPtr->createDescriptor(featPtr->appearancePtr, senPtr->globalPose());
 
 							// Complete with all other obs

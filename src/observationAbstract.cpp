@@ -68,6 +68,7 @@ namespace jafar {
 		    innovation(_size),
 		    prior(_size_nonobs),
 		    ia_rsl(ublasExtra::ia_union(_senPtr->ia_globalPose, _lmkPtr->state.ia())),
+		    SG_rs(7, _senPtr->ia_globalPose.size()),
 		    EXP_sg(_size, 7),
 		    EXP_l(_size, _lmkPtr->state.size()),
 		    EXP_rsl(_size, ia_rsl.size()),
@@ -82,6 +83,7 @@ namespace jafar {
 			categoryName("OBSERVATION");
 			clearCounters();
 			clearEvents();
+			cout << "created obs." << endl;
 		}
 
 		void ObservationAbstract::project() {
@@ -136,6 +138,8 @@ namespace jafar {
 		}
 
 		bool ObservationAbstract::compatibilityTest(const double MahaDistSquare){
+			return true;
+			//todo remove "return true"
 			return (innovation.mahalanobis() < MahaDistSquare);
 		}
 

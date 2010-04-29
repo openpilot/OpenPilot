@@ -82,14 +82,18 @@ namespace jafar {
 
 				static kernel::IdFactory landmarkIds;
 
-				typedef enum geometry_t {
+				enum geometry_t {
 						POINT,
 						LINE,
 						PLANE,
 						ELLIPSE
-				} geometry_t;
+				} ;
 
+
+			protected:
 				geometry_t geomType;
+			public:
+				geometry_t getGeomType(){return geomType;}
 
 				// \todo use a smart pointer here.
 				DescriptorAbstract descriptor; ///<                       Landmark descriptor

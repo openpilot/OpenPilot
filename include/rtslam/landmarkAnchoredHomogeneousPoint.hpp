@@ -48,6 +48,8 @@ namespace jafar {
 					return 7;
 				}
 
+				virtual size_t mySize() {return size();}
+
 				/**
 				 * Reparametrize to Euclidean, with Jacobians.
 				 * \param ahp the anchored homogeneous point to be reparametrized.

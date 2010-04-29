@@ -34,6 +34,8 @@
 #include "jmath/jblas.hpp"
 
 #include "rtslam/rtSlam.hpp"
+#include "rtslam/objectAbstract.hpp"
+#include "rtslam/gaussian.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -44,13 +46,14 @@ namespace jafar {
 		 *
 		 * @ingroup rtslam
 		 */
-		class FeatureAbstract {
+		class FeatureAbstract : public ObjectAbstract {
 			public:
 				int id;
 				appearance_ptr_t appearancePtr;
-				gaussian_ptr_t statePtr;
+				Gaussian state;
 
-				FeatureAbstract() {
+				FeatureAbstract(size_t size) : state(size) {
+
 				}
 				virtual ~FeatureAbstract() {
 				}

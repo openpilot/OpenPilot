@@ -48,19 +48,36 @@ jafar::kernel::IdFactory SensorAbstract::sensorIds = jafar::kernel::IdFactory();
 jafar::kernel::IdFactory LandmarkAbstract::landmarkIds = jafar::kernel::IdFactory();
 
 void test_slam01() {
-	ActiveSearchGrid acGrid(640, 480, 8, 8, 10);
+	ActiveSearchGrid acGrid(640, 480, 3, 3, 10);
+	vec4 k;
+	vec d(0), c(0);
+	k(0) = 320; k(1) = 320; k(2) = 320; k(3) = 320;
 	// INIT : 1 map, 2 robs, 3 sens
 	map_ptr_t mapPtr(new MapAbstract(100));
+	mapPtr->fillSeq();
 	robconstvel_ptr_t robPtr1(new RobotConstantVelocity(mapPtr));
 	robPtr1->linkToParentMap(mapPtr);
-	pinhole_ptr_t senPtr11 (new SensorPinHole(robPtr1, MapObject::UNFILTERED));
+	robPtr1->state.clear();
+	robPtr1->pose.x(quaternion::originFrame());
+	pinhole_ptr_t senPtr11 (new SensorPinHole(robPtr1, MapObject::FILTERED));
 	senPtr11->linkToParentRobot(robPtr1);
+	senPtr11->state.clear();
+	senPtr11->pose.x(quaternion::originFrame());
+	senPtr11->set_parameters(k, d, c);
 	pinhole_ptr_t senPtr12 (new SensorPinHole(robPtr1, MapObject::FILTERED));
 	senPtr12->linkToParentRobot(robPtr1);
+	senPtr12->state.clear();
+	senPtr12->pose.x(quaternion::originFrame());
+	senPtr12->set_parameters(k, d, c);
 	robodo_ptr_t robPtr2(new RobotOdometry(mapPtr));
 	robPtr2->linkToParentMap(mapPtr);
-	pinhole_ptr_t senPtr21 (new SensorPinHole(robPtr2, MapObject::UNFILTERED));
+	robPtr2->state.clear();
+	robPtr2->pose.x(quaternion::originFrame());
+	pinhole_ptr_t senPtr21 (new SensorPinHole(robPtr2, MapObject::FILTERED));
 	senPtr21->linkToParentRobot(robPtr2);
+	senPtr21->state.clear();
+	senPtr21->pose.x(quaternion::originFrame());
+	senPtr21->set_parameters(k, d, c);
 
 	pinhole_ptr_t senPtrCopy;
 	senPtrCopy = senPtr11;
@@ -102,17 +119,22 @@ void test_slam01() {
 				for (SensorAbstract::ObservationList::iterator obsIter = senPtr->observationList().begin(); obsIter != senPtr->observationList().end(); obsIter++)
 				{
 					observation_ptr_t obsPtr = *obsIter;
-//					obs_ph_ahp_ptr_t obsPtr = dynamic_pointer_cast<ObservationPinHoleAnchoredHomogeneousPoint>(*obsIter);
 					obsPtr->clearEvents();
+
 					// 1a. project
 					obsPtr->project();
+
 					// 1b. check visibility
 					obsPtr->predictVisibility();
 					if (obsPtr->isVisible()){
+
 						vec2 pix = obsPtr->expectation.x();
-						pix(0) = 100; pix(1) = 100; // todo remove this when turning with data.
+						cout << "true expected pixel: " << pix << endl;
+						pix(0) = rand()%640; pix(1) = rand()%480; // todo remove these two lines when turning with data.
+						cout << "actually used pixel: " << pix << endl; // todo this one also.
 						acGrid.addPixel(pix);
 						obsPtr->counters.nSearch++;
+
 						// 1c. predict appearance
 						obsPtr->predictAppearance();
 
@@ -124,6 +146,8 @@ void test_slam01() {
 							obsPtr->counters.nMatch++;
 							obsPtr->events.matched = true;
 							obsPtr->computeInnovation() ;
+
+							// 1f. if feature is inlier
 							if (obsPtr->compatibilityTest(0)) {
 								obsPtr->counters.nInlier++;
 								obsPtr->update() ;
@@ -136,32 +160,35 @@ void test_slam01() {
 
 
 
-				// 2 init new landmarks
+				// 2. init new landmarks
 				if (mapPtr->unusedStates(LandmarkAnchoredHomogeneousPoint::size())) {
+
 					ROI roi;
 					if (acGrid.getROI(roi)){
-						feature_ptr_t featPtr;
+
+						feature_ptr_t featPtr(new FeatureAbstract(2));
 						if (ObservationPinHolePoint::detectInRoi(senPtr->getRaw(), roi, featPtr)){
 
-							// create lmk object
+							// 2a. create lmk object
 							ahp_ptr_t lmkPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr));
 							lmkPtr->linkToParentMap(mapPtr);
 
-							// create all obs objects
+							// 2b. create all obs objects
 							// todo make lmk creation dynamic with factories or switch or other.
 							obs_ph_ahp_ptr_t obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint(senPtr,lmkPtr));
 							obsPtr->linkToParentPinHole(senPtr);
 							obsPtr->linkToParentAHP(lmkPtr);
 
-							// fill data for this obs
+							// 2c. fill data for this obs
 							obsPtr->setup(featPtr, ObservationPinHoleAnchoredHomogeneousPoint::getPrior());
 
-							// fill data for the landmark
+							// 2d. fill data for the landmark
 							obsPtr->backProject();
+							cout << *lmkPtr << endl;
 
 							vec7 globalSensorPose = senPtr->globalPose();
 							cout << globalSensorPose << endl;
-//							lmkPtr->createDescriptor(featPtr->appearancePtr, globalSensorPose);
+							lmkPtr->createDescriptor(featPtr->appearancePtr, globalSensorPose);
 //							obsPtr->createDescriptor(featPtr->appearancePtr, senPtr->globalPose());
 
 							// Complete with all other obs

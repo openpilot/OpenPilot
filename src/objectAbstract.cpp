@@ -33,7 +33,7 @@ namespace jafar {
 
 		ObjectAbstract::ObjectAbstract() :
 			id_(0), categoryName_("OBJECT") {
-			cout << "Created object." << endl;
+//			cout << "Created object." << endl;
 		}
 
 	}

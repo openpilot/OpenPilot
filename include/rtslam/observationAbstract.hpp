@@ -165,9 +165,7 @@ namespace jafar {
 				virtual void
 				project_func(const vec7 & sg, const vec & lmk, vec & meas, vec & nobs, mat & EXP_sg, mat & EXP_lmk) = 0;
 
-				virtual void setup(const feature_ptr_t & featPtr, const Gaussian & prior){
-					// todo implement setup()
-				}
+				virtual void setup(const feature_ptr_t & featPtr, const Gaussian & _prior);
 
 				/**
 				 * Project and get expectation covariances
@@ -280,7 +278,14 @@ namespace jafar {
 				/**
 				 * Provide prior to initialization algorithm.
 				 */
-				static Gaussian getPrior(){Gaussian dummy(1);return dummy;} // todo implement getPrior()
+				static Gaussian getPrior(){
+					Gaussian dummy(1);
+					vec v(1);
+					v(0) = 1;
+					dummy.x(v);
+					dummy.std(v);
+					return dummy; // todo implement getPrior() -  lines above just for compilation issues
+					}
 
 				void update() ;
 

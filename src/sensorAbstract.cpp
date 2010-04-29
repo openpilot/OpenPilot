@@ -50,7 +50,7 @@ namespace jafar {
 			    ia_globalPose(inFilter == FILTERED ? ia_union(_robPtr->pose.ia(), pose.ia()) : _robPtr->pose.ia())
 		{
 			categoryName("SENSOR");
-			cout << "Created sensor." << endl;
+//			cout << "Created sensor." << endl;
 		}
 
 		SensorAbstract::SensorAbstract(const simulation_t dummy, const robot_ptr_t & _robPtr) :

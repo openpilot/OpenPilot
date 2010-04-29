@@ -372,6 +372,7 @@ namespace jafar {
 				vec2 up, ud;
 				mat32 P_up;
 				mat22 UP_ud, UD_u;
+				cout << "intrinsics" << k << c << std::endl;
 				depixellizePoint(k, u, ud, UD_u);
 				undistortPoint(c, ud, up, UP_ud);
 				backprojectPointFromNormalizedPlane(up, depth, p, P_up, P_depth);

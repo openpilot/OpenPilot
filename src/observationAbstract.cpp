@@ -15,6 +15,8 @@
 #include "rtslam/sensorAbstract.hpp"
 #include "rtslam/landmarkAbstract.hpp"
 
+#include "rtslam/featureAbstract.hpp"
+
 namespace jafar {
 	namespace rtslam {
 		using namespace std;
@@ -83,8 +85,17 @@ namespace jafar {
 			categoryName("OBSERVATION");
 			clearCounters();
 			clearEvents();
-			cout << "created obs." << endl;
+//			cout << "created obs." << endl;
 		}
+
+		void ObservationAbstract::setup(const feature_ptr_t & featPtr, const Gaussian & _prior){
+			// todo implement setup()
+			measurement.x() = featPtr->state.x();
+			measurement.P() = featPtr->state.P();
+			prior.x(_prior.x());
+			prior.P(_prior.P());
+		}
+
 
 		void ObservationAbstract::project() {
 
@@ -111,8 +122,14 @@ namespace jafar {
 			// Make some temporal variables to call function
 			vec pix = measurement.x();
 			vec invDist = prior.x();
-			vec lmk = landmarkPtr()->state.x();
+			vec lmk(landmarkPtr()->mySize());
+			cout << "sg:" << sg << endl;
+			cout << "pix:" << pix << endl;
+			cout << "invDist:" << invDist << endl;
 			backProject_func(sg, pix, invDist, lmk, LMK_sg, LMK_meas, LMK_prior);
+			cout << "lmk:" << lmk << endl;
+
+			landmarkPtr()->state.x(lmk);
 
 			LMK_rs = ublas::prod(LMK_sg, SG_rs);
 

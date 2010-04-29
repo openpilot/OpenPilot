@@ -53,7 +53,7 @@ namespace jafar {
 		 */
 		class FeaturePointSimu: public FeatureAbstract {
 			public:
-				FeaturePointSimu() {
+				FeaturePointSimu() : FeatureAbstract(2) {
 				}
 				virtual ~FeaturePointSimu() {
 				}

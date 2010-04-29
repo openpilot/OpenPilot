@@ -20,6 +20,7 @@
 #include "rtslam/rtSlam.hpp"
 #include "rtslam/activeSearch.hpp"
 #include "rtslam/featureAbstract.hpp"
+#include "rtslam/AppearanceImageSimu.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -32,10 +33,21 @@ namespace jafar {
 			public:
 				static bool detectInRoi(const raw_ptr_t & rawPtr, const ROI & roi, feature_ptr_t & featPtr){
 
-					// todo implement detectInRoi()
-//					vec2 pix;
-//					pix(0) = 100; pix(1) = 100;
-//					featPtr->statePtr->x(pix);
+					// todo implement detectInRoi() - the code below is just to ensure compilation
+
+					// 1. generate random pixel
+					vec2 pix;
+					pix(0) = roi.x + rand()%roi.width; pix(1) = roi.y + rand()%roi.height;
+					cout << "Detected pixel: " << pix << endl;
+
+					// Assign pixel and covariance
+					featPtr->state.x(pix);
+
+					// initialize appearance
+					appearenceimagesimu_ptr_t appPtr(new AppearenceImageSimu);
+					featPtr->appearancePtr = appPtr;
+
+					// return true if successful
 					return true;
 				}
 

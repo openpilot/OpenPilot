@@ -44,7 +44,9 @@ public:
     AirspeedGadgetFactory(QObject *parent = 0);
     ~AirspeedGadgetFactory();
 
-    IUAVGadget *createGadget(QWidget *parent);
+    Core::IUAVGadget *createGadget(QWidget *parent);
+    IUAVGadgetConfiguration *createConfiguration(const QByteArray &state);
+    IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
 };
 
 #endif // AIRSPEEDGADGETFACTORY_H_

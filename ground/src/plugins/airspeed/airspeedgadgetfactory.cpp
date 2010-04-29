@@ -24,25 +24,37 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 #include "airspeedgadgetfactory.h"
 #include "airspeedgadgetwidget.h"
 #include "airspeedgadget.h"
+#include "airspeedgadgetconfiguration.h"
+#include "airspeedgadgetoptionspage.h"
 #include <coreplugin/iuavgadget.h>
 
 AirspeedGadgetFactory::AirspeedGadgetFactory(QObject *parent) :
         IUAVGadgetFactory(QString("AirspeedGadget"),
-                          tr("Analog Airspeed Gadget"),
+                          tr("Analog Dial Gadget"),
                           parent)
 {
 }
 
 AirspeedGadgetFactory::~AirspeedGadgetFactory()
 {
-
 }
 
-Core::IUAVGadget* AirspeedGadgetFactory::createGadget(QWidget *parent) {
+Core::IUAVGadget* AirspeedGadgetFactory::createGadget(QWidget *parent)
+{
     AirspeedGadgetWidget* gadgetWidget = new AirspeedGadgetWidget(parent);
     return new AirspeedGadget(QString("AirspeedGadget"), gadgetWidget, parent);
 }
+
+IUAVGadgetConfiguration *AirspeedGadgetFactory::createConfiguration(const QByteArray &state)
+{
+    return new AirspeedGadgetConfiguration(QString("AirspeedGadget"), state);
+}
+
+IOptionsPage *AirspeedGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
+{
+    return new AirspeedGadgetOptionsPage(qobject_cast<AirspeedGadgetConfiguration*>(config));
+}
+

@@ -27,7 +27,7 @@ namespace jafar {
 		ObservationPinHoleAnchoredHomogeneousPoint::ObservationPinHoleAnchoredHomogeneousPoint(
 		                                                                                       const sensor_ptr_t & pinholePtr,
 		                                                                                       const landmark_ptr_t & ahpPtr) :
-			ObservationAbstract(pinholePtr, ahpPtr, 2, pinholePtr->robotPtr()->pose.size() + pinholePtr->state.size(), 1) {
+			ObservationAbstract(pinholePtr, ahpPtr, 2, 1) {
 			categoryName("PINHOLE-AHP OBS");
 		}
 

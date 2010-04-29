@@ -52,15 +52,15 @@ void test_slam01() {
 	// INIT : 1 map, 2 robs, 3 sens
 	map_ptr_t mapPtr(new MapAbstract(100));
 	robot_ptr_t robPtr1(new RobotConstantVelocity(mapPtr));
-	robPtr1->linkToParent(mapPtr);
+	robPtr1->linkToParentMap(mapPtr);
 	sensor_ptr_t senPtr11 (new SensorPinHole(robPtr1, MapObject::UNFILTERED));
-	senPtr11->linkToParent(robPtr1);
+	senPtr11->linkToParentRobot(robPtr1);
 	sensor_ptr_t senPtr12 (new SensorPinHole(robPtr1, MapObject::FILTERED));
-	senPtr12->linkToParent(robPtr1);
+	senPtr12->linkToParentRobot(robPtr1);
 	robot_ptr_t robPtr2(new RobotOdometry(mapPtr));
-	robPtr2->linkToParent(mapPtr);
+	robPtr2->linkToParentMap(mapPtr);
 	sensor_ptr_t senPtr21 (new SensorPinHole(robPtr2, MapObject::UNFILTERED));
-	senPtr21->linkToParent(robPtr2);
+	senPtr21->linkToParentRobot(robPtr2);
 
 	sensor_ptr_t senPtrCopy;
 	senPtrCopy = senPtr11;
@@ -103,10 +103,10 @@ void test_slam01() {
 					obsPtr->clearEvents();
 					// 1a. project
 					obsPtr->project();
-					acGrid.addPixel(obsPtr->expectation.x());
 					// 1b. check visibility
 					obsPtr->predictVisibility();
 					if (obsPtr->isVisible()){
+						acGrid.addPixel(obsPtr->expectation.x());
 						obsPtr->counters.nSearch++;
 						// 1c. predict appearance
 						obsPtr->predictAppearance();
@@ -140,7 +140,7 @@ void test_slam01() {
 
 							// create lmk object
 							landmark_ptr_t lmkPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr));
-							lmkPtr->linkToParent(mapPtr);
+							lmkPtr->linkToParentMap(mapPtr);
 
 							// create all obs objects
 							// todo make lmk creation dynamic with factories or switch or other.
@@ -153,7 +153,9 @@ void test_slam01() {
 
 							// fill data for the landmark
 							obsPtr->backProject();
+
 							lmkPtr->createDescriptor(featPtr->appearancePtr, senPtr->globalPose());
+//							obsPtr->createDescriptor(featPtr->appearancePtr, senPtr->globalPose());
 
 							// Complete with all other obs
 							mapPtr->completeObservationsInGraph(senPtr, lmkPtr);

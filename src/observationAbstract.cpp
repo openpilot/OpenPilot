@@ -44,7 +44,7 @@ namespace jafar {
 		    measurement(_size_meas),
 		    innovation(_size_inn),
 		    prior(_size_nonobs),
-		    ia_rsl(ublasExtra::ia_union(sensorPtr()->ia_globalPose, landmarkPtr()->state.ia())),
+		    ia_rsl(ublasExtra::ia_union(_senPtr->ia_globalPose, _lmkPtr->state.ia())),
 		    EXP_sg(_size_exp, 7),
 		    EXP_l(_size_exp, _lmkPtr->state.size()),
 		    EXP_rsl(_size_exp, ia_rsl.size()),
@@ -54,7 +54,30 @@ namespace jafar {
 		    LMK_sg(_lmkPtr->state.size(),7),
 		    LMK_meas(_lmkPtr->state.size(),_size_meas),
 		    LMK_prior(_lmkPtr->state.size(),_size_nonobs),
-		    LMK_rs(_lmkPtr->state.size(),sensorPtr()->ia_globalPose.size())
+		    LMK_rs(_lmkPtr->state.size(),_senPtr->ia_globalPose.size())
+		{
+			categoryName("OBSERVATION");
+			clearCounters();
+			clearEvents();
+		}
+
+		ObservationAbstract::ObservationAbstract(const sensor_ptr_t & _senPtr, const landmark_ptr_t & _lmkPtr,
+		    const size_t _size, const size_t _size_nonobs) :
+		    expectation(_size, _size_nonobs),
+		    measurement(_size),
+		    innovation(_size),
+		    prior(_size_nonobs),
+		    ia_rsl(ublasExtra::ia_union(_senPtr->ia_globalPose, _lmkPtr->state.ia())),
+		    EXP_sg(_size, 7),
+		    EXP_l(_size, _lmkPtr->state.size()),
+		    EXP_rsl(_size, ia_rsl.size()),
+		    INN_meas(_size, _size),
+		    INN_exp(_size, _size),
+		    INN_rsl(_size, ia_rsl.size()),
+		    LMK_sg(_lmkPtr->state.size(),7),
+		    LMK_meas(_lmkPtr->state.size(),_size),
+		    LMK_prior(_lmkPtr->state.size(),_size_nonobs),
+		    LMK_rs(_lmkPtr->state.size(),_senPtr->ia_globalPose.size())
 		{
 			categoryName("OBSERVATION");
 			clearCounters();

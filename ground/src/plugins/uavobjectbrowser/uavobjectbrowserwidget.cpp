@@ -113,23 +113,24 @@ ObjectTreeItem *UAVObjectBrowserWidget::findCurrentObjectTreeItem()
 
 void UAVObjectBrowserWidget::saveSettings()
 {
-    updateSettings(SettingsPersistence::OPERATION_SAVE);
+    updateSettings(ObjectPersistence::OPERATION_SAVE);
 }
 
 void UAVObjectBrowserWidget::readSettings()
 {
-    updateSettings(SettingsPersistence::OPERATION_LOAD);
+    updateSettings(ObjectPersistence::OPERATION_LOAD);
 }
 
-void UAVObjectBrowserWidget::updateSettings(SettingsPersistence::OperationOptions op)
+void UAVObjectBrowserWidget::updateSettings(ObjectPersistence::OperationOptions op)
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    SettingsPersistence* obj = dynamic_cast<SettingsPersistence*>( objManager->getObject(SettingsPersistence::NAME) );
+    ObjectPersistence* obj = dynamic_cast<ObjectPersistence*>( objManager->getObject(ObjectPersistence::NAME) );
     if (obj != NULL)
     {
-        SettingsPersistence::DataFields data;
+        ObjectPersistence::DataFields data;
         data.Operation = op;
+        data.Objects = ObjectPersistence::OBJECTS_ALL;
         obj->setData(data);
         obj->updated();
     }

@@ -30,7 +30,7 @@
 
 #include <QtGui/QWidget>
 #include <QtGui/QTreeView>
-#include "uavobjects/settingspersistence.h"
+#include "uavobjects/objectpersistence.h"
 #include "uavobjecttreemodel.h"
 
 class QPushButton;
@@ -65,7 +65,7 @@ private:
     Ui_UAVObjectBrowser *m_browser;
     UAVObjectTreeModel *m_model;
 
-    void updateSettings(SettingsPersistence::OperationOptions op);
+    void updateSettings(ObjectPersistence::OperationOptions op);
     void enableSendRequest(bool enable);
     ObjectTreeItem *findCurrentObjectTreeItem();
 };

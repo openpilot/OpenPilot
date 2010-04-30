@@ -36,7 +36,7 @@
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
 #include "gpsobject.h"
-#include "settingspersistence.h"
+#include "objectpersistence.h"
 #include "systemalarms.h"
 #include "systemstats.h"
 
@@ -53,7 +53,7 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new FlightTelemetryStats() );
     objMngr->registerObject( new GCSTelemetryStats() );
     objMngr->registerObject( new GpsObject() );
-    objMngr->registerObject( new SettingsPersistence() );
+    objMngr->registerObject( new ObjectPersistence() );
     objMngr->registerObject( new SystemAlarms() );
     objMngr->registerObject( new SystemStats() );
 

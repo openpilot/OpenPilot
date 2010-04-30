@@ -15,10 +15,14 @@ namespace jafar {
 	namespace rtslam {
 
 		class ObservationPinHoleAnchoredHomogeneousPoint;
+		class ObservationPinHoleEuclideanPoint;
 
 		class ImageManagerPoint: public DataManagerAbstract,
-		    public WeakParentOf<ObservationPinHoleAnchoredHomogeneousPoint> {
-			ENABLE_ACCESS_TO_WEAK_CHILDREN(ObservationPinHoleAnchoredHomogeneousPoint,AHP,ahp)
+				public WeakParentOf<ObservationPinHoleAnchoredHomogeneousPoint> ,
+		    public WeakParentOf<ObservationPinHoleEuclideanPoint> {
+			ENABLE_ACCESS_TO_WEAK_CHILDREN(ObservationPinHoleAnchoredHomogeneousPoint,AHP,ahp);
+			ENABLE_ACCESS_TO_WEAK_CHILDREN(ObservationPinHoleEuclideanPoint,EUC,euc)
+
 				;
 
 			virtual ~ ImageManagerPoint( void ){}

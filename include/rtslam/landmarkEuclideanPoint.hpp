@@ -43,12 +43,14 @@ namespace jafar {
 				 */
 				LandmarkEuclideanPoint(const simulation_t dummy, const map_ptr_t & mapPtr);
 
+				virtual ~LandmarkEuclideanPoint() {
+				}
+
 				static size_t size(void) {
 					return 3;
 				}
 
-				virtual ~LandmarkEuclideanPoint() {
-				}
+				virtual size_t mySize() {return size();}
 
 				void reparametrize_func(const vec & lmk, vec & lnew, mat & LNEW_lmk){
 					lnew = lmk;

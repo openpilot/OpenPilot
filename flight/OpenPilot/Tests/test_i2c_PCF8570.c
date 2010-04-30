@@ -38,6 +38,8 @@
 
 #define USE_DEBUG_PINS
 
+#define DEVICE_ADDRESS 0x51
+
 /* Task Priorities */
 #define PRIORITY_TASK_HOOKS             (tskIDLE_PRIORITY + 3)
 
@@ -104,7 +106,7 @@ static void TestTask(void *pvParameters)
 
 	xLastExecutionTime = xTaskGetTickCount();
 
-	PIOS_I2C_Transfer(I2C_Write, 0x50<<1, (uint8_t*)"\x20\xB0\xB1\xB2", 4);
+	PIOS_I2C_Transfer(I2C_Write, DEVICE_ADDRESS<<1, (uint8_t*)"\x20\xB0\xB1\xB2", 4);
 
 	for(;;)
 	{
@@ -117,22 +119,22 @@ static void TestTask(void *pvParameters)
 
 		{
 			uint8_t buf[20];
-			if (PIOS_I2C_Transfer(I2C_Write, 0x50<<1, (uint8_t*)"\x10\xA0\xA1\xA2", 4) != 0)
+			if (PIOS_I2C_Transfer(I2C_Write, DEVICE_ADDRESS<<1, (uint8_t*)"\x10\xA0\xA1\xA2", 4) != 0)
 				OnError();
 
-			if (PIOS_I2C_Transfer(I2C_Write_WithoutStop, 0x50<<1, (uint8_t*)"\x20", 1) != 0)
+			if (PIOS_I2C_Transfer(I2C_Write_WithoutStop, DEVICE_ADDRESS<<1, (uint8_t*)"\x20", 1) != 0)
 				OnError();
 
-			if (PIOS_I2C_Transfer(I2C_Read, 0x50<<1, buf, 3) != 0)
+			if (PIOS_I2C_Transfer(I2C_Read, DEVICE_ADDRESS<<1, buf, 3) != 0)
 				OnError();
 
 			if (memcmp(buf, "\xB0\xB1\xB2",3) != 0)
 				OnError();
 
-			if (PIOS_I2C_Transfer(I2C_Write_WithoutStop, 0x50<<1, (uint8_t*)"\x10", 1) != 0)
+			if (PIOS_I2C_Transfer(I2C_Write_WithoutStop, DEVICE_ADDRESS<<1, (uint8_t*)"\x10", 1) != 0)
 				OnError();
 
-			if (PIOS_I2C_Transfer(I2C_Read, 0x50<<1, buf, 3) != 0)
+			if (PIOS_I2C_Transfer(I2C_Read, DEVICE_ADDRESS<<1, buf, 3) != 0)
 				OnError();
 
 			if (memcmp(buf, "\xA0\xA1\xA2",3) != 0)

@@ -89,6 +89,11 @@ typedef struct {
 typedef void (*UAVObjEventCallback)(UAVObjEvent* ev);
 
 /**
+ * Callback used to initialize the object fields to their default values.
+ */
+typedef void (*UAVObjInitializeCallback)(UAVObjHandle obj, uint16_t instId);
+
+/**
  * Event manager statistics
  */
 typedef struct {
@@ -98,8 +103,8 @@ typedef struct {
 int32_t UAVObjInitialize();
 void UAVObjGetStats(UAVObjStats* statsOut);
 void UAVObjClearStats();
-UAVObjHandle UAVObjRegister(uint32_t id, const char* name, int32_t isMetaobject, int32_t isSingleInstance,
-		int32_t isSettings, uint32_t numBytes);
+UAVObjHandle UAVObjRegister(uint32_t id, const char* name, const char* metaName, int32_t isMetaobject,
+		int32_t isSingleInstance, int32_t isSettings, uint32_t numBytes, UAVObjInitializeCallback initCb);
 UAVObjHandle UAVObjGetByID(uint32_t id);
 UAVObjHandle UAVObjGetByName(char* name);
 uint32_t UAVObjGetID(UAVObjHandle obj);
@@ -119,6 +124,8 @@ int32_t UAVObjSaveToFile(UAVObjHandle obj, uint16_t instId, FILEINFO* file);
 UAVObjHandle UAVObjLoadFromFile(FILEINFO* file);
 int32_t UAVObjSaveSettings();
 int32_t UAVObjLoadSettings();
+int32_t UAVObjSaveMetaobjects();
+int32_t UAVObjLoadMetaobjects();
 int32_t UAVObjSetData(UAVObjHandle obj, const void* dataIn);
 int32_t UAVObjGetData(UAVObjHandle obj, void* dataOut);
 int32_t UAVObjSetInstanceData(UAVObjHandle obj, uint16_t instId, const void* dataIn);

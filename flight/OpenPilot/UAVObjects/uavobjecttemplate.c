@@ -36,7 +36,7 @@
 static UAVObjHandle handle;
 
 // Private functions
-static void setDefaultFieldValues();
+static void setDefaults(UAVObjHandle obj, uint16_t instId);
 
 /**
  * Initialize object.
@@ -45,13 +45,38 @@ static void setDefaultFieldValues();
  */
 int32_t $(NAME)Initialize()
 {
+	// Register object with the object manager
+	handle = UAVObjRegister($(NAMEUC)_OBJID, $(NAMEUC)_NAME, $(NAMEUC)_METANAME, 0,
+			$(NAMEUC)_ISSINGLEINST, $(NAMEUC)_ISSETTINGS, $(NAMEUC)_NUMBYTES, &setDefaults);
+
+	// Done
+	if (handle != 0)
+	{
+		return 0;
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+/**
+ * Initialize object fields and metadata with the default values.
+ * If a default value is not specified the object fields
+ * will be initialized to zero.
+ */
+static void setDefaults(UAVObjHandle obj, uint16_t instId)
+{
+	$(NAME)Data data;
 	UAVObjMetadata metadata;
 
-	// Register object with the object manager
-	handle = UAVObjRegister($(NAMEUC)_OBJID, $(NAMEUC)_NAME, 0, $(NAMEUC)_ISSINGLEINST, $(NAMEUC)_ISSETTINGS, $(NAMEUC)_NUMBYTES);
-	if (handle == 0) return -1;
+	// Initialize object fields to their default values
+	UAVObjGetInstanceData(obj, instId, &data);
+	memset(&data, 0, sizeof($(NAME)Data));
+$(INITFIELDS)
+	UAVObjSetInstanceData(obj, instId, &data);
 
-	// Initialize metadata
+	// Initialize object metadata to their default values
 	metadata.telemetryAcked = $(FLIGHTTELEM_ACKED);
 	metadata.telemetryUpdateMode = $(FLIGHTTELEM_UPDATEMODE);
 	metadata.telemetryUpdatePeriod = $(FLIGHTTELEM_UPDATEPERIOD);
@@ -60,27 +85,7 @@ int32_t $(NAME)Initialize()
 	metadata.gcsTelemetryUpdatePeriod = $(GCSTELEM_UPDATEPERIOD);
 	metadata.loggingUpdateMode = $(LOGGING_UPDATEMODE);
 	metadata.loggingUpdatePeriod = $(LOGGING_UPDATEPERIOD);
-	UAVObjSetMetadata(handle, &metadata);
-
-    // Initialize field values
-    setDefaultFieldValues();
-
-	// Done
-	return 0;
-}
-
-/**
- * Initialize object fields with the default values.
- * If a default value is not specified the object fields
- * will be initialized to zero.
- */
-static void setDefaultFieldValues()
-{
-	$(NAME)Data data;
-	$(NAME)Get(&data);
-	memset(&data, 0, sizeof($(NAME)Data));
-$(INITFIELDS)
-	$(NAME)Set(&data);
+	UAVObjSetMetadata(obj, &metadata);
 }
 
 /**

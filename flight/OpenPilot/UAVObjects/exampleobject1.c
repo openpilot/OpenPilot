@@ -36,7 +36,7 @@
 static UAVObjHandle handle;
 
 // Private functions
-static void setDefaultFieldValues();
+static void setDefaults(UAVObjHandle obj, uint16_t instId);
 
 /**
  * Initialize object.
@@ -45,13 +45,38 @@ static void setDefaultFieldValues();
  */
 int32_t ExampleObject1Initialize()
 {
+	// Register object with the object manager
+	handle = UAVObjRegister(EXAMPLEOBJECT1_OBJID, EXAMPLEOBJECT1_NAME, EXAMPLEOBJECT1_METANAME, 0,
+			EXAMPLEOBJECT1_ISSINGLEINST, EXAMPLEOBJECT1_ISSETTINGS, EXAMPLEOBJECT1_NUMBYTES, &setDefaults);
+
+	// Done
+	if (handle != 0)
+	{
+		return 0;
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+/**
+ * Initialize object fields and metadata with the default values.
+ * If a default value is not specified the object fields
+ * will be initialized to zero.
+ */
+static void setDefaults(UAVObjHandle obj, uint16_t instId)
+{
+	ExampleObject1Data data;
 	UAVObjMetadata metadata;
 
-	// Register object with the object manager
-	handle = UAVObjRegister(EXAMPLEOBJECT1_OBJID, EXAMPLEOBJECT1_NAME, 0, EXAMPLEOBJECT1_ISSINGLEINST, EXAMPLEOBJECT1_ISSETTINGS, EXAMPLEOBJECT1_NUMBYTES);
-	if (handle == 0) return -1;
+	// Initialize object fields to their default values
+	UAVObjGetInstanceData(obj, instId, &data);
+	memset(&data, 0, sizeof(ExampleObject1Data));
 
-	// Initialize metadata
+	UAVObjSetInstanceData(obj, instId, &data);
+
+	// Initialize object metadata to their default values
 	metadata.telemetryAcked = 1;
 	metadata.telemetryUpdateMode = UPDATEMODE_ONCHANGE;
 	metadata.telemetryUpdatePeriod = 0;
@@ -60,27 +85,7 @@ int32_t ExampleObject1Initialize()
 	metadata.gcsTelemetryUpdatePeriod = 200;
 	metadata.loggingUpdateMode = UPDATEMODE_NEVER;
 	metadata.loggingUpdatePeriod = 0;
-	UAVObjSetMetadata(handle, &metadata);
-
-    // Initialize field values
-    setDefaultFieldValues();
-
-	// Done
-	return 0;
-}
-
-/**
- * Initialize object fields with the default values.
- * If a default value is not specified the object fields
- * will be initialized to zero.
- */
-static void setDefaultFieldValues()
-{
-	ExampleObject1Data data;
-	ExampleObject1Get(&data);
-	memset(&data, 0, sizeof(ExampleObject1Data));
-
-	ExampleObject1Set(&data);
+	UAVObjSetMetadata(obj, &metadata);
 }
 
 /**

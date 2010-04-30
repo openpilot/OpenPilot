@@ -62,6 +62,7 @@ struct ObjectListStruct {
 	int8_t isSettings; /** Set to 1 if this object is a settings object */
 	uint16_t numBytes; /** Number of data bytes contained in the object (for a single instance) */
 	uint16_t numInstances; /** Number of instances */
+	UAVObjInitializeCallback initCb; /** Object field and metadata initialization callback */
 	struct ObjectListStruct* linkedObj; /** Linked object, for regular objects this is the metaobject and for metaobjects it is the parent object */
 	ObjectInstList* instances; /** List of object instances, instance 0 always exists */
 	ObjectEventList* events; /** Event queues registered on the object */
@@ -75,6 +76,8 @@ static ObjectInstList* createInstance(ObjectList* obj, uint16_t instId);
 static ObjectInstList* getInstance(ObjectList* obj, uint16_t instId);
 static int32_t connectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb, int32_t eventMask);
 static int32_t disconnectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb);
+static void objectFilename(ObjectList* obj, uint8_t* filename);
+static void customSPrintf(uint8_t* buffer, uint8_t* format, ...);
 
 // Private variables
 static ObjectList* objList;
@@ -137,15 +140,17 @@ void UAVObjClearStats()
  * Register and new object in the object manager.
  * \param[in] id Unique object ID
  * \param[in] name Object name
+ * \param[in] nameName Metaobject name
  * \param[in] isMetaobject Is this a metaobject (1:true, 0:false)
  * \param[in] isSingleInstance Is this a single instance or multi-instance object
  * \param[in] isSettings Is this a settings object
  * \param[in] numBytes Number of bytes of object data (for one instance)
+ * \param[in] initCb Default field and metadata initialization function
  * \return Object handle, or 0 if failure.
  * \return
  */
-UAVObjHandle UAVObjRegister(uint32_t id, const char* name, int32_t isMetaobject,
-		int32_t isSingleInstance, int32_t isSettings, uint32_t numBytes)
+UAVObjHandle UAVObjRegister(uint32_t id, const char* name, const char* metaName, int32_t isMetaobject,
+		int32_t isSingleInstance, int32_t isSettings, uint32_t numBytes, UAVObjInitializeCallback initCb)
 {
 	ObjectList* objEntry;
 	ObjectInstList* instEntry;
@@ -180,12 +185,13 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char* name, int32_t isMetaobject,
 	objEntry->numBytes = numBytes;
 	objEntry->events = NULL;
 	objEntry->numInstances = 0;
+	objEntry->initCb = initCb;
 	objEntry->instances = NULL;
 	objEntry->linkedObj = NULL; // will be set later
 	LL_APPEND(objList, objEntry);
 
 	// Create instance zero
-	instEntry = createInstance(objEntry, objEntry->numInstances);
+	instEntry = createInstance(objEntry, 0);
 	if ( instEntry == NULL )
 	{
 		xSemaphoreGiveRecursive(mutex);
@@ -200,13 +206,25 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char* name, int32_t isMetaobject,
 	else
 	{
 		// Create metaobject
-		metaObj = (ObjectList*)UAVObjRegister(id+1, NULL, 1, 1, 0, sizeof(UAVObjMetadata));
+		metaObj = (ObjectList*)UAVObjRegister(id+1, metaName, NULL, 1, 1, 0, sizeof(UAVObjMetadata), NULL);
 		// Link two objects
 		objEntry->linkedObj = metaObj;
 		metaObj->linkedObj = objEntry;
 	}
 
-	// If this is a settings object attempt to load its data from the file system
+	// Initialize object fields and metadata to default values
+	if ( objEntry->initCb != NULL )
+	{
+		objEntry->initCb((UAVObjHandle)objEntry, 0);
+	}
+
+	// Attempt to load object's metadata from the SD card (not done directly on the metaobject, but through the object)
+	if ( !objEntry->isMetaobject )
+	{
+		UAVObjLoad( (UAVObjHandle)objEntry->linkedObj, 0 );
+	}
+
+	// If this is a settings object, attempt to load from SD card
 	if ( objEntry->isSettings )
 	{
 		UAVObjLoad( (UAVObjHandle)objEntry, 0 );
@@ -351,6 +369,12 @@ uint16_t UAVObjCreateInstance(UAVObjHandle obj)
 	{
 		xSemaphoreGiveRecursive(mutex);
 		return -1;
+	}
+
+	// Initialize instance data
+	if ( objEntry->initCb != NULL )
+	{
+		objEntry->initCb(obj, instEntry->instId);
 	}
 
 	// Unlock
@@ -538,6 +562,7 @@ int32_t UAVObjSave(UAVObjHandle obj, uint16_t instId)
 {
 	FILEINFO file;
 	ObjectList* objEntry;
+	uint8_t filename[14];
 
 	// Check for file system availability
 	if ( POIS_SDCARD_IsMounted() == 0 )
@@ -551,8 +576,11 @@ int32_t UAVObjSave(UAVObjHandle obj, uint16_t instId)
 	// Cast to object
 	objEntry = (ObjectList*)obj;
 
+	// Get filename
+	objectFilename(objEntry, filename);
+
 	// Open file
-	if ( DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *)objEntry->name, DFS_WRITE, PIOS_SDCARD_Sector, &file) != DFS_OK )
+	if ( DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *)filename, DFS_WRITE, PIOS_SDCARD_Sector, &file) != DFS_OK )
 	{
 		xSemaphoreGiveRecursive(mutex);
 		return -1;
@@ -666,6 +694,7 @@ int32_t UAVObjLoad(UAVObjHandle obj, uint16_t instId)
 	ObjectList* objEntry;
 	UAVObjHandle loadedObj;
 	ObjectList* loadedObjEntry;
+	uint8_t filename[14];
 
 	// Check for file system availability
 	if ( POIS_SDCARD_IsMounted() == 0 )
@@ -679,8 +708,11 @@ int32_t UAVObjLoad(UAVObjHandle obj, uint16_t instId)
 	// Cast to object
 	objEntry = (ObjectList*)obj;
 
+	// Get filename
+	objectFilename(objEntry, filename);
+
 	// Open file
-	if ( DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *)objEntry->name, DFS_WRITE, PIOS_SDCARD_Sector, &file) != DFS_OK )
+	if ( DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *)filename, DFS_WRITE, PIOS_SDCARD_Sector, &file) != DFS_OK )
 	{
 		xSemaphoreGiveRecursive(mutex);
 		return -1;
@@ -757,6 +789,68 @@ int32_t UAVObjLoadSettings()
 	{
 		// Check if this is a settings object
 		if ( objEntry->isSettings )
+		{
+			// Load object
+			if ( UAVObjLoad( (UAVObjHandle)objEntry, 0 ) == -1 )
+			{
+				xSemaphoreGiveRecursive(mutex);
+				return -1;
+			}
+		}
+	}
+
+	// Done
+	xSemaphoreGiveRecursive(mutex);
+	return 0;
+}
+
+/**
+ * Save all metaobjects to the SD card.
+ * @return 0 if success or -1 if failure
+ */
+int32_t UAVObjSaveMetaobjects()
+{
+	ObjectList* objEntry;
+
+	// Get lock
+	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+
+	// Save all settings objects
+	LL_FOREACH(objList, objEntry)
+	{
+		// Check if this is a settings object
+		if ( objEntry->isMetaobject )
+		{
+			// Save object
+			if ( UAVObjSave( (UAVObjHandle)objEntry, 0 ) == -1 )
+			{
+				xSemaphoreGiveRecursive(mutex);
+				return -1;
+			}
+		}
+	}
+
+	// Done
+	xSemaphoreGiveRecursive(mutex);
+	return 0;
+}
+
+/**
+ * Load all metaobjects from the SD card.
+ * @return 0 if success or -1 if failure
+ */
+int32_t UAVObjLoadMetaobjects()
+{
+	ObjectList* objEntry;
+
+	// Get lock
+	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+
+	// Load all settings objects
+	LL_FOREACH(objList, objEntry)
+	{
+		// Check if this is a settings object
+		if ( objEntry->isMetaobject )
 		{
 			// Load object
 			if ( UAVObjLoad( (UAVObjHandle)objEntry, 0 ) == -1 )
@@ -1234,6 +1328,24 @@ static int32_t disconnectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCa
 
 	// If this point is reached the queue was not found
 	return -1;
+}
+
+/**
+ * Wrapper for the sprintf function
+ */
+static void customSPrintf(uint8_t* buffer, uint8_t* format, ...)
+{
+	va_list args;
+	va_start(args, format);
+	vsprintf((char *)buffer, (char *)format, args);
+}
+
+/**
+ * Get an 8 character (plus extension) filename for the object.
+ */
+static void objectFilename(ObjectList* obj, uint8_t* filename)
+{
+	customSPrintf(filename, (uint8_t*)"%X.obj", obj->id);
 }
 
 

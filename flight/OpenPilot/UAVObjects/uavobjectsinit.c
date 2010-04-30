@@ -34,7 +34,7 @@
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
 #include "gpsobject.h"
-#include "settingspersistence.h"
+#include "objectpersistence.h"
 #include "systemalarms.h"
 #include "systemstats.h"
 
@@ -51,7 +51,7 @@ void UAVObjectsInitializeAll()
     FlightTelemetryStatsInitialize();
     GCSTelemetryStatsInitialize();
     GpsObjectInitialize();
-    SettingsPersistenceInitialize();
+    ObjectPersistenceInitialize();
     SystemAlarmsInitialize();
     SystemStatsInitialize();
 

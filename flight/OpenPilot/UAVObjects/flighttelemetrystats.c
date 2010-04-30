@@ -36,7 +36,7 @@
 static UAVObjHandle handle;
 
 // Private functions
-static void setDefaultFieldValues();
+static void setDefaults(UAVObjHandle obj, uint16_t instId);
 
 /**
  * Initialize object.
@@ -45,13 +45,38 @@ static void setDefaultFieldValues();
  */
 int32_t FlightTelemetryStatsInitialize()
 {
+	// Register object with the object manager
+	handle = UAVObjRegister(FLIGHTTELEMETRYSTATS_OBJID, FLIGHTTELEMETRYSTATS_NAME, FLIGHTTELEMETRYSTATS_METANAME, 0,
+			FLIGHTTELEMETRYSTATS_ISSINGLEINST, FLIGHTTELEMETRYSTATS_ISSETTINGS, FLIGHTTELEMETRYSTATS_NUMBYTES, &setDefaults);
+
+	// Done
+	if (handle != 0)
+	{
+		return 0;
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+/**
+ * Initialize object fields and metadata with the default values.
+ * If a default value is not specified the object fields
+ * will be initialized to zero.
+ */
+static void setDefaults(UAVObjHandle obj, uint16_t instId)
+{
+	FlightTelemetryStatsData data;
 	UAVObjMetadata metadata;
 
-	// Register object with the object manager
-	handle = UAVObjRegister(FLIGHTTELEMETRYSTATS_OBJID, FLIGHTTELEMETRYSTATS_NAME, 0, FLIGHTTELEMETRYSTATS_ISSINGLEINST, FLIGHTTELEMETRYSTATS_ISSETTINGS, FLIGHTTELEMETRYSTATS_NUMBYTES);
-	if (handle == 0) return -1;
+	// Initialize object fields to their default values
+	UAVObjGetInstanceData(obj, instId, &data);
+	memset(&data, 0, sizeof(FlightTelemetryStatsData));
 
-	// Initialize metadata
+	UAVObjSetInstanceData(obj, instId, &data);
+
+	// Initialize object metadata to their default values
 	metadata.telemetryAcked = 1;
 	metadata.telemetryUpdateMode = UPDATEMODE_PERIODIC;
 	metadata.telemetryUpdatePeriod = 5000;
@@ -60,27 +85,7 @@ int32_t FlightTelemetryStatsInitialize()
 	metadata.gcsTelemetryUpdatePeriod = 0;
 	metadata.loggingUpdateMode = UPDATEMODE_PERIODIC;
 	metadata.loggingUpdatePeriod = 5000;
-	UAVObjSetMetadata(handle, &metadata);
-
-    // Initialize field values
-    setDefaultFieldValues();
-
-	// Done
-	return 0;
-}
-
-/**
- * Initialize object fields with the default values.
- * If a default value is not specified the object fields
- * will be initialized to zero.
- */
-static void setDefaultFieldValues()
-{
-	FlightTelemetryStatsData data;
-	FlightTelemetryStatsGet(&data);
-	memset(&data, 0, sizeof(FlightTelemetryStatsData));
-
-	FlightTelemetryStatsSet(&data);
+	UAVObjSetMetadata(obj, &metadata);
 }
 
 /**

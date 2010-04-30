@@ -36,7 +36,7 @@
 static UAVObjHandle handle;
 
 // Private functions
-static void setDefaultFieldValues();
+static void setDefaults(UAVObjHandle obj, uint16_t instId);
 
 /**
  * Initialize object.
@@ -45,13 +45,38 @@ static void setDefaultFieldValues();
  */
 int32_t SystemAlarmsInitialize()
 {
+	// Register object with the object manager
+	handle = UAVObjRegister(SYSTEMALARMS_OBJID, SYSTEMALARMS_NAME, SYSTEMALARMS_METANAME, 0,
+			SYSTEMALARMS_ISSINGLEINST, SYSTEMALARMS_ISSETTINGS, SYSTEMALARMS_NUMBYTES, &setDefaults);
+
+	// Done
+	if (handle != 0)
+	{
+		return 0;
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+/**
+ * Initialize object fields and metadata with the default values.
+ * If a default value is not specified the object fields
+ * will be initialized to zero.
+ */
+static void setDefaults(UAVObjHandle obj, uint16_t instId)
+{
+	SystemAlarmsData data;
 	UAVObjMetadata metadata;
 
-	// Register object with the object manager
-	handle = UAVObjRegister(SYSTEMALARMS_OBJID, SYSTEMALARMS_NAME, 0, SYSTEMALARMS_ISSINGLEINST, SYSTEMALARMS_ISSETTINGS, SYSTEMALARMS_NUMBYTES);
-	if (handle == 0) return -1;
+	// Initialize object fields to their default values
+	UAVObjGetInstanceData(obj, instId, &data);
+	memset(&data, 0, sizeof(SystemAlarmsData));
 
-	// Initialize metadata
+	UAVObjSetInstanceData(obj, instId, &data);
+
+	// Initialize object metadata to their default values
 	metadata.telemetryAcked = 1;
 	metadata.telemetryUpdateMode = UPDATEMODE_PERIODIC;
 	metadata.telemetryUpdatePeriod = 4000;
@@ -60,27 +85,7 @@ int32_t SystemAlarmsInitialize()
 	metadata.gcsTelemetryUpdatePeriod = 0;
 	metadata.loggingUpdateMode = UPDATEMODE_PERIODIC;
 	metadata.loggingUpdatePeriod = 1000;
-	UAVObjSetMetadata(handle, &metadata);
-
-    // Initialize field values
-    setDefaultFieldValues();
-
-	// Done
-	return 0;
-}
-
-/**
- * Initialize object fields with the default values.
- * If a default value is not specified the object fields
- * will be initialized to zero.
- */
-static void setDefaultFieldValues()
-{
-	SystemAlarmsData data;
-	SystemAlarmsGet(&data);
-	memset(&data, 0, sizeof(SystemAlarmsData));
-
-	SystemAlarmsSet(&data);
+	UAVObjSetMetadata(obj, &metadata);
 }
 
 /**

@@ -26,7 +26,7 @@
 
 #include "openpilot.h"
 #include "systemmod.h"
-#include "settingspersistence.h"
+#include "objectpersistence.h"
 #include "systemstats.h"
 
 // Private constants
@@ -85,7 +85,7 @@ static void systemTask(void* parameters)
 	lastSysTime = xTaskGetTickCount();
 
 	// Listen for SettingPersistance object updates, connect a callback function
-	SettingsPersistenceConnectCallback(&objectUpdatedCb);
+	ObjectPersistenceConnectCallback(&objectUpdatedCb);
 
 	// Main system loop
 	while (1)
@@ -119,22 +119,36 @@ static void systemTask(void* parameters)
  */
 static void objectUpdatedCb(UAVObjEvent* ev)
 {
-	SettingsPersistenceData setper;
+	ObjectPersistenceData objper;
 
-	// If the object updated was the SettingsPersistence execute requested action
-	if ( ev->obj == SettingsPersistenceHandle() )
+	// If the object updated was the ObjectPersistence execute requested action
+	if ( ev->obj == ObjectPersistenceHandle() )
 	{
 		// Get object data
-		SettingsPersistenceGet(&setper);
+		ObjectPersistenceGet(&objper);
 
 		// Execute action
-		if ( setper.Operation == SETTINGSPERSISTENCE_OPERATION_LOAD)
+		if ( objper.Operation == OBJECTPERSISTENCE_OPERATION_LOAD)
 		{
-			UAVObjLoadSettings();
+			if ( objper.Objects == OBJECTPERSISTENCE_OBJECTS_SETTINGS || objper.Objects == OBJECTPERSISTENCE_OBJECTS_ALL)
+			{
+				UAVObjLoadSettings();
+			}
+			if ( objper.Objects == OBJECTPERSISTENCE_OBJECTS_METAOBJECTS || objper.Objects == OBJECTPERSISTENCE_OBJECTS_ALL)
+			{
+				UAVObjLoadMetaobjects();
+			}
 		}
-		else if ( setper.Operation == SETTINGSPERSISTENCE_OPERATION_SAVE)
+		else if ( objper.Operation == OBJECTPERSISTENCE_OPERATION_SAVE)
 		{
-			UAVObjSaveSettings();
+			if ( objper.Objects == OBJECTPERSISTENCE_OBJECTS_SETTINGS || objper.Objects == OBJECTPERSISTENCE_OBJECTS_ALL)
+			{
+				UAVObjSaveSettings();
+			}
+			if ( objper.Objects == OBJECTPERSISTENCE_OBJECTS_METAOBJECTS || objper.Objects == OBJECTPERSISTENCE_OBJECTS_ALL)
+			{
+				UAVObjSaveMetaobjects();
+			}
 		}
 	}
 }

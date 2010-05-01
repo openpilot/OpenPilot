@@ -117,6 +117,7 @@ static void TestTask(void *pvParameters)
 			i = 0;
 		}
 
+		if (PIOS_I2C_LockDevice(0))
 		{
 			uint8_t buf[20];
 			if (PIOS_I2C_Transfer(I2C_Write, DEVICE_ADDRESS<<1, (uint8_t*)"\x10\xA0\xA1\xA2", 4) != 0)
@@ -140,6 +141,12 @@ static void TestTask(void *pvParameters)
 			if (memcmp(buf, "\xA0\xA1\xA2",3) != 0)
 				OnError();
 
+			PIOS_I2C_UnlockDevice();
+		}
+		else
+		{
+			// Could not lock device
+			OnError();
 		}
 
 		vTaskDelayUntil(&xLastExecutionTime, 10 / portTICK_RATE_MS);

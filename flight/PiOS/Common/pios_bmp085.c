@@ -196,7 +196,7 @@ int32_t PIOS_BMP085_GetPressure(void)
 int32_t PIOS_BMP085_Read(uint8_t address, uint8_t *buffer, uint8_t len)
 {
 	/* Try to get the I2C peripheral */
-	if(PIOS_I2C_LockDevice(I2C_Non_Blocking) < 0) {
+	if(PIOS_I2C_LockDevice(0) < 0) {
 		/* Request a retry */
 		return -2;
 	}
@@ -230,7 +230,7 @@ int32_t PIOS_BMP085_Read(uint8_t address, uint8_t *buffer, uint8_t len)
 int32_t PIOS_BMP085_Write(uint8_t address, uint8_t buffer)
 {
 	/* Try to get the IIC peripheral */
-	if(PIOS_I2C_LockDevice(I2C_Non_Blocking) < 0) {
+	if(PIOS_I2C_LockDevice(0) < 0) {
 		/* Request a retry */
 		return -2;
 	}

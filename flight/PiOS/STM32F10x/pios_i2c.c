@@ -77,9 +77,9 @@ typedef struct {
 #ifdef USE_FREERTOS
 	xSemaphoreHandle sem_readySignal;
 	portBASE_TYPE xHigherPriorityTaskWoken;
+	xSemaphoreHandle xBusyMutex;
 #endif
 
-	volatile uint8_t i2c_semaphore;
 } I2CRecTypeDef;
 
 /* Local Prototypes */
@@ -131,11 +131,11 @@ int32_t PIOS_I2C_Init(void)
 
 	PIOS_I2C_InitPeripheral();
 
-	/* Now accessible for other tasks */
-	I2CRec.i2c_semaphore = 0;
+
 #ifdef USE_FREERTOS
 	vSemaphoreCreateBinary(I2CRec.sem_readySignal);
-#endif
+	I2CRec.xBusyMutex = xSemaphoreCreateMutex();
+#endif // USE_FREERTOS
 
 	TransferEnd(&I2CRec);
 
@@ -197,44 +197,37 @@ static void PIOS_I2C_InitPeripheral(void)
 }
 
 
+#ifdef USE_FREERTOS
 /**
 * Semaphore handling: requests the IIC interface
-* \param[in] semaphore_type is either IIC_Blocking or IIC_Non_Blocking
-* \return Non_Blocking: returns -1 to request a retry
-* \return 0 if IIC interface free
+* \param[in] timeout Timeout in ticks, 0 for no delay
+* \return TRUE when the lock to the device was obtained
 */
-int32_t PIOS_I2C_LockDevice(I2CSemaphoreTypeDef semaphore_type)
+bool PIOS_I2C_LockDevice(portTickType timeout)
 {
-	volatile I2CRecTypeDef *i2cx = &I2CRec;
-	int32_t status = -1;
-
-	do {
-		PIOS_IRQ_Disable();
-		if(!i2cx->i2c_semaphore) {
-			i2cx->i2c_semaphore = 1;
-			status = 0;
-		}
-		PIOS_IRQ_Enable();
-	} while(semaphore_type == I2C_Blocking && status != 0);
-
-	/* Clear transfer errors of last transmission */
-	i2cx->transfer_error = 0;
-
-	return status;
+	if (xSemaphoreTake(I2CRec.xBusyMutex, timeout) == pdTRUE)
+	{
+		// Ok, got device
+		return TRUE;
+	}
+	else
+	{
+		return FALSE;
+	}
 }
+
 
 
 /**
 * Semaphore handling: releases the IIC interface for other tasks
 * \return < 0 on errors
 */
-int32_t PIOS_I2C_UnlockDevice(void)
+void PIOS_I2C_UnlockDevice(void)
 {
-	I2CRec.i2c_semaphore = 0;
-
-	/* No error */
-	return 0;
+	xSemaphoreGive(I2CRec.xBusyMutex);
 }
+
+#endif // USE_FREERTOS
 
 
 /**

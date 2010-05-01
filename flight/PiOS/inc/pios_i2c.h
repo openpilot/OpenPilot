@@ -41,10 +41,6 @@
 
 
 /* Global Types */
-typedef enum {
-	I2C_Blocking,
-	I2C_Non_Blocking
-} I2CSemaphoreTypeDef;
 
 typedef enum {
 	I2C_Read,
@@ -54,11 +50,14 @@ typedef enum {
 
 /* Public Functions */
 extern int32_t PIOS_I2C_Init(void);
-extern int32_t PIOS_I2C_LockDevice(I2CSemaphoreTypeDef semaphore_type);
-extern int32_t PIOS_I2C_UnlockDevice(void);
 extern int32_t PIOS_I2C_TransferCheck(void);
 extern int32_t PIOS_I2C_TransferWait(void);
 extern int32_t PIOS_I2C_Transfer(I2CTransferTypeDef transfer, uint8_t address, uint8_t *buffer, uint16_t len);
 extern void PIOS_I2C_StartTransfer(I2CTransferTypeDef transfer, uint8_t address, uint8_t *buffer, uint16_t len);
+
+#ifdef PIOS_INCLUDE_FREERTOS
+extern bool PIOS_I2C_LockDevice(portTickType timeout);
+extern void PIOS_I2C_UnlockDevice(void);
+#endif // PIOS_INCLUDE_FREERTOS
 
 #endif /* PIOS_I2C_H */

@@ -43,7 +43,7 @@ public:
 
 
     //get port configuration functions
-    QString dialFile(){return m_defaultDial;}
+    QString dialFile() {return m_defaultDial;}
 
     QByteArray saveState() const;
     IUAVGadgetConfiguration *clone();

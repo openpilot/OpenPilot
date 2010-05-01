@@ -42,8 +42,8 @@ AirspeedGadgetWidget::AirspeedGadgetWidget(QWidget *parent) : QGraphicsView(pare
     m_foreground = new QGraphicsSvgItem();
     m_desired = new QGraphicsSvgItem();
     m_actual = new QGraphicsSvgItem();
-    setDialFile(QFileDialog::getOpenFileName(qobject_cast<QWidget*>(this),
-        tr("Airspeed Dial"), "../artwork/", tr("SVG File (*.svg)")) );
+    //setDialFile(QFileDialog::getOpenFileName(qobject_cast<QWidget*>(this),
+    //    tr("Airspeed Dial"), "../artwork/", tr("SVG File (*.svg)")) );
     //setDialFile(QString("/usr/src/openpilot/artwork/Dials/extracts/speed-complete.svg"));
     paint();
 
@@ -76,7 +76,12 @@ void AirspeedGadgetWidget::setDialFile(QString dfn)
 
          m_actual->setSharedRenderer(m_renderer);
          m_actual->setElementId(QString("needle"));
-      }
+
+         std::cout<<"Dial file loaded"<<std::endl;
+         QGraphicsScene *l_scene = scene();
+         l_scene->setSceneRect(m_background->boundingRect());
+
+     }
    }
    else
    { std::cout<<"no file: "<<std::endl; }
@@ -84,6 +89,7 @@ void AirspeedGadgetWidget::setDialFile(QString dfn)
 
 void AirspeedGadgetWidget::paint()
 {
+
     QGraphicsScene *l_scene = scene();
     l_scene->clear();
 
@@ -98,6 +104,11 @@ void AirspeedGadgetWidget::paint()
 
 void AirspeedGadgetWidget::paintEvent(QPaintEvent *event)
 {
+    // Skip painting until the dial file is loaded
+    if (! m_renderer->isValid()) {
+        std::cout<<"Dial file not loaded"<<std::endl;
+        return;
+    }
    QGraphicsView::paintEvent(event);
 }
 

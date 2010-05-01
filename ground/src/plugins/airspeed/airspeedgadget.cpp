@@ -27,6 +27,7 @@
 
 #include "airspeedgadget.h"
 #include "airspeedgadgetwidget.h"
+#include "airspeedgadgetconfiguration.h"
 
 AirspeedGadget::AirspeedGadget(QString classId, AirspeedGadgetWidget *widget, QWidget *parent) :
         IUAVGadget(classId, parent),
@@ -36,5 +37,12 @@ AirspeedGadget::AirspeedGadget(QString classId, AirspeedGadgetWidget *widget, QW
 
 AirspeedGadget::~AirspeedGadget()
 {
+
+}
+
+void AirspeedGadget::loadConfiguration(IUAVGadgetConfiguration* config)
+{
+    AirspeedGadgetConfiguration *m = qobject_cast<AirspeedGadgetConfiguration*>(config);
+    m_widget->setDialFile(m->dialFile());
 
 }

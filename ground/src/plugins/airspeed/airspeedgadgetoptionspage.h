@@ -38,7 +38,7 @@ class IUAVGadgetConfiguration;
 }
 class AirspeedGadgetConfiguration;
 class QTextEdit;
-class QComboBox;
+class QLineEdit;
 class QSpinBox;
 
 using namespace Core;
@@ -55,7 +55,10 @@ public:
 
 private:
     AirspeedGadgetConfiguration *m_config;
-    QComboBox *m_portCB;
+    QLineEdit* svgSourceFile;
+
+private slots:
+    void setOpenFileName();
 };
 
 #endif // AIRSPEEDGADGETOPTIONSPAGE_H

@@ -60,7 +60,6 @@ private slots:
 // End test functions
 
 private:
-   QString dialFilename;
    QSvgRenderer *m_renderer;
    QGraphicsSvgItem *m_background;
    QGraphicsSvgItem *m_foreground;

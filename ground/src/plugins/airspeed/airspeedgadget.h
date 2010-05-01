@@ -46,6 +46,7 @@ public:
     ~AirspeedGadget();
 
     QWidget *widget() { return m_widget; }
+    void loadConfiguration(IUAVGadgetConfiguration* config);
 
 private:
     AirspeedGadgetWidget *m_widget;

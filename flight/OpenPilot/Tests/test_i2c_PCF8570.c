@@ -38,7 +38,9 @@
 
 #define USE_DEBUG_PINS
 
-#define DEVICE_ADDRESS 0x51
+#define DEVICE_1_ADDRESS 0x50
+#define DEVICE_2_ADDRESS 0x51
+
 
 /* Task Priorities */
 #define PRIORITY_TASK_HOOKS             (tskIDLE_PRIORITY + 3)
@@ -57,7 +59,8 @@
 /* Local Variables */
 
 /* Function Prototypes */
-static void TestTask(void *pvParameters);
+static void Task1(void *pvParameters);
+static void Task2(void *pvParameters);
 
 
 /**
@@ -73,8 +76,14 @@ int main()
 	PIOS_USB_Init(0);
 	PIOS_I2C_Init();
 
+	// Both leds off
+	PIOS_LED_Off(LED1);
+	PIOS_LED_Off(LED2);
+
 	// Create task
-	xTaskCreate(TestTask, (signed portCHAR *)"Test", configMINIMAL_STACK_SIZE , NULL, 1, NULL);
+	xTaskCreate(Task1, (signed portCHAR *)"Task1", configMINIMAL_STACK_SIZE , NULL, 1, NULL);
+	xTaskCreate(Task2, (signed portCHAR *)"Task2", configMINIMAL_STACK_SIZE , NULL, 2, NULL);
+
 
 	// Start the FreeRTOS scheduler
 	vTaskStartScheduler();
@@ -95,47 +104,41 @@ static void OnError(void)
 }
 
 
-static void TestTask(void *pvParameters)
+static void Task1(void *pvParameters)
 {
 	int i = 0;
-	portTickType xLastExecutionTime;
 
-	// Both leds off
-	PIOS_LED_Off(LED1);
-	PIOS_LED_Off(LED2);
 
-	xLastExecutionTime = xTaskGetTickCount();
-
-	PIOS_I2C_Transfer(I2C_Write, DEVICE_ADDRESS<<1, (uint8_t*)"\x20\xB0\xB1\xB2", 4);
+	PIOS_I2C_Transfer(I2C_Write, DEVICE_1_ADDRESS<<1, (uint8_t*)"\x20\xB0\xB1\xB2", 4);
 
 	for(;;)
 	{
 		i++;
-		if (i==10)
+		if (i==100)
 		{
 			PIOS_LED_Toggle(LED1);
 			i = 0;
 		}
 
-		if (PIOS_I2C_LockDevice(0))
+		if (PIOS_I2C_LockDevice(100))
 		{
 			uint8_t buf[20];
-			if (PIOS_I2C_Transfer(I2C_Write, DEVICE_ADDRESS<<1, (uint8_t*)"\x10\xA0\xA1\xA2", 4) != 0)
+			if (PIOS_I2C_Transfer(I2C_Write, DEVICE_1_ADDRESS<<1, (uint8_t*)"\x10\xA0\xA1\xA2", 4) != 0)
 				OnError();
 
-			if (PIOS_I2C_Transfer(I2C_Write_WithoutStop, DEVICE_ADDRESS<<1, (uint8_t*)"\x20", 1) != 0)
+			if (PIOS_I2C_Transfer(I2C_Write_WithoutStop, DEVICE_1_ADDRESS<<1, (uint8_t*)"\x20", 1) != 0)
 				OnError();
 
-			if (PIOS_I2C_Transfer(I2C_Read, DEVICE_ADDRESS<<1, buf, 3) != 0)
+			if (PIOS_I2C_Transfer(I2C_Read, DEVICE_1_ADDRESS<<1, buf, 3) != 0)
 				OnError();
 
 			if (memcmp(buf, "\xB0\xB1\xB2",3) != 0)
 				OnError();
 
-			if (PIOS_I2C_Transfer(I2C_Write_WithoutStop, DEVICE_ADDRESS<<1, (uint8_t*)"\x10", 1) != 0)
+			if (PIOS_I2C_Transfer(I2C_Write_WithoutStop, DEVICE_1_ADDRESS<<1, (uint8_t*)"\x10", 1) != 0)
 				OnError();
 
-			if (PIOS_I2C_Transfer(I2C_Read, DEVICE_ADDRESS<<1, buf, 3) != 0)
+			if (PIOS_I2C_Transfer(I2C_Read, DEVICE_1_ADDRESS<<1, buf, 3) != 0)
 				OnError();
 
 			if (memcmp(buf, "\xA0\xA1\xA2",3) != 0)
@@ -145,7 +148,49 @@ static void TestTask(void *pvParameters)
 		}
 		else
 		{
-			// Could not lock device
+			OnError();
+		}
+	}
+}
+
+
+static void Task2(void *pvParameters)
+{
+	portTickType xLastExecutionTime;
+
+    xLastExecutionTime = xTaskGetTickCount();
+
+	for(;;)
+	{
+		uint8_t buf[20];
+
+		if (PIOS_I2C_LockDevice(100))
+		{
+			if (PIOS_I2C_Transfer(I2C_Write, DEVICE_2_ADDRESS<<1, (uint8_t*)"\x10\xF0\xF1\xF2", 4) != 0)
+				OnError();
+			PIOS_I2C_UnlockDevice();
+		}
+		else
+		{
+			OnError();
+		}
+
+		vTaskDelayUntil(&xLastExecutionTime, 10 / portTICK_RATE_MS);
+
+		if (PIOS_I2C_LockDevice(100))
+		{
+			if (PIOS_I2C_Transfer(I2C_Write_WithoutStop, DEVICE_1_ADDRESS<<1, (uint8_t*)"\x10", 1) != 0)
+				OnError();
+
+			if (PIOS_I2C_Transfer(I2C_Read, DEVICE_1_ADDRESS<<1, buf, 3) != 0)
+				OnError();
+
+			if (memcmp(buf, "\xF0\xF1\xF2",3) != 0)
+				OnError();
+			PIOS_I2C_UnlockDevice();
+		}
+		else
+		{
 			OnError();
 		}
 

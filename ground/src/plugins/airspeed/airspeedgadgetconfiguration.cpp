@@ -39,9 +39,9 @@ AirspeedGadgetConfiguration::AirspeedGadgetConfiguration(QString classId, const 
     dialForegroundID("foreground"),
     dialNeedleID1("needle"),
     dialNeedleID2("needle-2"),
-    needle1MinValue(0),
+    needle1MinValue(0.001),
     needle1MaxValue(100),
-    needle2MinValue(0),
+    needle2MinValue(0.001),
     needle2MaxValue(100)
 {
     //if a saved configuration exists load it

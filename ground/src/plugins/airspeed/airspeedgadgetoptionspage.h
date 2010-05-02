@@ -36,10 +36,12 @@
 namespace Core {
 class IUAVGadgetConfiguration;
 }
+
 class AirspeedGadgetConfiguration;
-class QTextEdit;
-class QLineEdit;
-class QSpinBox;
+
+namespace Ui {
+    class AirspeedGadgetOptionsPage;
+}
 
 using namespace Core;
 
@@ -54,11 +56,11 @@ public:
     void finish();
 
 private:
+    Ui::AirspeedGadgetOptionsPage *options_page;
     AirspeedGadgetConfiguration *m_config;
-    QLineEdit* svgSourceFile;
 
 private slots:
-    void setOpenFileName();
+    void on_loadFile_clicked();
 };
 
 #endif // AIRSPEEDGADGETOPTIONSPAGE_H

@@ -27,15 +27,8 @@
 
 #include "airspeedgadgetoptionspage.h"
 #include "airspeedgadgetconfiguration.h"
-#include <QtGui/QLabel>
-#include <QtGui/QSpinBox>
-#include <QtGui/QDoubleSpinBox>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QTextEdit>
-#include <QtGui/QLineEdit>
-#include <QtGui/QPushButton>
-#include <QtGui/QComboBox>
+#include "ui_airspeedgadgetoptionspage.h"
+
 #include <QFileDialog>
 #include <QtAlgorithms>
 #include <QStringList>
@@ -46,47 +39,25 @@ AirspeedGadgetOptionsPage::AirspeedGadgetOptionsPage(AirspeedGadgetConfiguration
 {
 }
 
-//creates options page widget
+//creates options page widget (uses the UI file)
 QWidget *AirspeedGadgetOptionsPage::createPage(QWidget *parent)
 {
+
+    options_page = new Ui::AirspeedGadgetOptionsPage();
     //main widget
     QWidget *optionsPageWidget = new QWidget;
     //main layout
-    QVBoxLayout *vl = new QVBoxLayout();
-    optionsPageWidget->setLayout(vl);
-
-    //SVG file select layout and widget
-    //choose file layout and widget
-    QHBoxLayout *FileLayout = new QHBoxLayout;
-    QWidget *FileWidget = new QWidget;
-    FileWidget->setLayout(FileLayout);
-    QWidget *label = new QLabel("Dial SVG:");
-    svgSourceFile = new QLineEdit();
-    QPushButton* loadfile = new QPushButton("Load File");
-    loadfile->setMaximumWidth(80);
-    FileLayout->addWidget(label);
-    FileLayout->addWidget(svgSourceFile);
-    FileLayout->addWidget(loadfile);
-
-
-    QSpacerItem *spacer = new QSpacerItem(100, 100, QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-    //add partial widget to main widget
-    vl->addWidget(FileWidget);
-    vl->addSpacerItem(spacer);
-
-    //clears comboboxes, if not every time the user enters options page the lists
-    //duplicate
-    svgSourceFile->clear();
-
-    //connect signals to slots
-
-    //fires when the user presses file button
-    connect(loadfile, SIGNAL(clicked(bool)),
-            this,SLOT(setOpenFileName()));
+    options_page->setupUi(optionsPageWidget);
 
     // Restore the contents from the settings:
-    svgSourceFile->setText(m_config->dialFile());
+    options_page->svgSourceFile->setText(m_config->dialFile());
+    options_page->backgroundID->setText(m_config->dialBackground());
+    options_page->foregroundID->setText(m_config->dialForeground());
+    options_page->needle1ID->setText(m_config->dialNeedle1());
+    options_page->needle2ID->setText(m_config->dialNeedle2());
+
+    connect(options_page->loadFile, SIGNAL(clicked()), this, SLOT(on_loadFile_clicked()));
+
 
     return optionsPageWidget;
 }
@@ -98,7 +69,7 @@ QWidget *AirspeedGadgetOptionsPage::createPage(QWidget *parent)
  */
 void AirspeedGadgetOptionsPage::apply()
 {
-    m_config->setDialFile(svgSourceFile->text());
+    m_config->setDialFile(options_page->svgSourceFile->text());
 
 }
 
@@ -107,17 +78,17 @@ void AirspeedGadgetOptionsPage::apply()
 Opens an open file dialog.
 
 */
-void AirspeedGadgetOptionsPage::setOpenFileName()
+void AirspeedGadgetOptionsPage::on_loadFile_clicked()
 {
     QFileDialog::Options options;
     QString selectedFilter;
     QString fileName = QFileDialog::getOpenFileName(qobject_cast<QWidget*>(this),
                                                     tr("QFileDialog::getOpenFileName()"),
-                                                    svgSourceFile->text(),
+                                                    options_page->svgSourceFile->text(),
                                                     tr("All Files (*);;SVG Files (*.svg)"),
                                                     &selectedFilter,
                                                     options);
-    if (!fileName.isEmpty()) svgSourceFile->setText(fileName);
+    if (!fileName.isEmpty()) options_page->svgSourceFile->setText(fileName);
 
 }
 

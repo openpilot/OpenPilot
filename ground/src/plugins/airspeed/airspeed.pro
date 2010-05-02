@@ -1,11 +1,9 @@
-TEMPLATE = lib 
+TEMPLATE = lib
 TARGET = AirspeedGadget
 QT += svg
-
 include(../../openpilotgcsplugin.pri)
-include(../../plugins/coreplugin/coreplugin.pri) 
+include(../../plugins/coreplugin/coreplugin.pri)
 include(../../libs/qwt/qwt.pri)
-
 HEADERS += airspeedplugin.h
 HEADERS += airspeedgadget.h
 HEADERS += airspeedgadgetwidget.h
@@ -18,5 +16,5 @@ SOURCES += airspeedgadgetfactory.cpp
 SOURCES += airspeedgadgetwidget.cpp
 SOURCES += airspeedgadgetconfiguration.cpp
 SOURCES += airspeedgadgetoptionspage.cpp
-
 OTHER_FILES += AirspeedGadget.pluginspec
+FORMS += airspeedgadgetoptionspage.ui

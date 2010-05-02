@@ -34,7 +34,15 @@
  */
 AirspeedGadgetConfiguration::AirspeedGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),
-    m_defaultDial("Unknown")
+    m_defaultDial("Unknown"),
+    dialBackgroundID("background"),
+    dialForegroundID("foreground"),
+    dialNeedleID1("needle"),
+    dialNeedleID2("needle-2"),
+    needle1MinValue(0),
+    needle1MaxValue(100),
+    needle2MinValue(0),
+    needle2MaxValue(100)
 {
     //if a saved configuration exists load it
     if (state.count() > 0) {
@@ -42,6 +50,15 @@ AirspeedGadgetConfiguration::AirspeedGadgetConfiguration(QString classId, const 
         QString dialFile;
         stream >> dialFile;
         m_defaultDial=dialFile;
+        stream >> dialBackgroundID;
+        stream >> dialForegroundID;
+        stream >> dialNeedleID1;
+        stream >> dialNeedleID2;
+        stream >> needle1MinValue;
+        stream >> needle1MaxValue;
+        stream >> needle2MinValue;
+        stream >> needle2MaxValue;
+
     }
 }
 /**
@@ -63,5 +80,13 @@ QByteArray AirspeedGadgetConfiguration::saveState() const
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::WriteOnly);
     stream << m_defaultDial;
+    stream << dialBackgroundID;
+    stream << dialForegroundID;
+    stream << dialNeedleID1;
+    stream << dialNeedleID2;
+    stream << needle1MinValue;
+    stream << needle1MaxValue;
+    stream << needle2MinValue;
+    stream << needle2MaxValue;
     return bytes;
 }

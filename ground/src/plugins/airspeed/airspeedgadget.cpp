@@ -37,9 +37,14 @@ AirspeedGadget::AirspeedGadget(QString classId, AirspeedGadgetWidget *widget, QW
 
 AirspeedGadget::~AirspeedGadget()
 {
-
 }
 
+/*
+  This is called when a configuration is loaded, and updates the plugin's settings.
+  Careful: the plugin is already drawn before the loadConfiguration method is called the
+  first time, so you have to be careful not to assume all the plugin values are initialized
+  the first time you use them
+ */
 void AirspeedGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 {
     AirspeedGadgetConfiguration *m = qobject_cast<AirspeedGadgetConfiguration*>(config);

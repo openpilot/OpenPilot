@@ -94,9 +94,9 @@ void AirspeedGadgetWidget::paint()
     l_scene->clear();
 
     l_scene->addItem(m_background);
-    l_scene->addItem(m_foreground);
     l_scene->addItem(m_desired);
     l_scene->addItem(m_actual);
+    l_scene->addItem(m_foreground);
 
     l_scene->setSceneRect(m_background->boundingRect());
     update();

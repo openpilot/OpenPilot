@@ -304,11 +304,30 @@ bool RawHID::open(OpenMode mode)
         return false;
 
     QIODevice::open(mode);
+
+    if(!m_readThread)
+        m_readThread = new RawHIDReadThread(this);
+
+    if(!m_writeThread)
+        m_writeThread = new RawHIDWriteThread(this);
+
     return true;
 }
 
 void RawHID::close()
 {
+    if(m_readThread)
+    {
+        delete m_readThread;
+        m_readThread = NULL;
+    }
+
+    if(m_writeThread)
+    {
+        delete m_writeThread;
+        m_writeThread = NULL;
+    }
+
     dev.close(m_deviceNo);
 
     QIODevice::close();

@@ -53,6 +53,8 @@ public:
 
     /**
     *   Open a device, and return a QIODevice interface from it
+    *   It should be a dynamically created object as it will be
+    *   deleted by the connection manager.
     */
     virtual QIODevice *openDevice(const QString &deviceName) = 0;
 

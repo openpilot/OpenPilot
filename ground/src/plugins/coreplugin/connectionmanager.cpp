@@ -166,6 +166,9 @@ void ConnectionManager::onConnectPressed()
     if(m_ioDev)
     {
         m_ioDev->close();
+
+        //delete the object created by the IConnection class
+        delete m_ioDev;
         m_ioDev = NULL;
     }
 

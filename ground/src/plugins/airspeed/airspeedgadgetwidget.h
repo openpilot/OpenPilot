@@ -28,6 +28,7 @@
 #ifndef AIRSPEEDGADGETWIDGET_H_
 #define AIRSPEEDGADGETWIDGET_H_
 
+#include "airspeedgadgetconfiguration.h"
 #include <QGraphicsView>
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
@@ -43,10 +44,16 @@ class AirspeedGadgetWidget : public QGraphicsView
 public:
     AirspeedGadgetWidget(QWidget *parent = 0);
    ~AirspeedGadgetWidget();
-   void setDialFile(QString dfn);
+   void setDialFile(QString dfn, QString bg, QString fg, QString n1, QString n2);
    void paint();
-   void setActual(int speed);
-   void setDesired(int speed);
+    // setNeedle1 and setNeedle2 use a timer to simulate
+    // needle inertia
+   void setNeedle1(double value);
+   void setNeedle2(double value);
+   void setN1Min(double value) {n1MinValue = value;}
+   void setN1Max(double value) {n1MaxValue = value;}
+   void setN2Min(double value) {n1MinValue = value;}
+   void setN2Max(double value) {n2MaxValue = value;}
 
 protected:
    void paintEvent(QPaintEvent *event);
@@ -54,17 +61,29 @@ protected:
 
 private:
 
-// Test functions
 private slots:
+   // Test function
    void testRotate();
-// End test functions
+   void rotateNeedles();
 
 private:
    QSvgRenderer *m_renderer;
    QGraphicsSvgItem *m_background;
    QGraphicsSvgItem *m_foreground;
-   QGraphicsSvgItem *m_desired;
-   QGraphicsSvgItem *m_actual;
+   QGraphicsSvgItem *m_needle1;
+   QGraphicsSvgItem *m_needle2;
+   double n1MinValue;
+   double n1MaxValue;
+   double n2MinValue;
+   double n2MaxValue;
+
+   double needle1Target;
+   double needle1Value;
+   double needle2Target;
+   double needle2Value;
+
+   // Rotation timer
+   QTimer dialTimer;
 
    // Test variables
    int testSpeed;

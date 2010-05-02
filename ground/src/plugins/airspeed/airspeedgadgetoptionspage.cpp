@@ -55,6 +55,10 @@ QWidget *AirspeedGadgetOptionsPage::createPage(QWidget *parent)
     options_page->foregroundID->setText(m_config->dialForeground());
     options_page->needle1ID->setText(m_config->dialNeedle1());
     options_page->needle2ID->setText(m_config->dialNeedle2());
+    options_page->needle1Min->setValue(m_config->getN1Min());
+    options_page->needle1Max->setValue(m_config->getN1Max());
+    options_page->needle2Min->setValue(m_config->getN2Min());
+    options_page->needle2Max->setValue(m_config->getN2Max());
 
     connect(options_page->loadFile, SIGNAL(clicked()), this, SLOT(on_loadFile_clicked()));
 
@@ -70,6 +74,14 @@ QWidget *AirspeedGadgetOptionsPage::createPage(QWidget *parent)
 void AirspeedGadgetOptionsPage::apply()
 {
     m_config->setDialFile(options_page->svgSourceFile->text());
+    m_config->setDialBackgroundID(options_page->backgroundID->text());
+    m_config->setDialForegroundID(options_page->foregroundID->text());
+    m_config->setDialNeedleID1(options_page->needle1ID->text());
+    m_config->setDialNeedleID2(options_page->needle2ID->text());
+    m_config->setN1Min(options_page->needle1Min->value());
+    m_config->setN1Max(options_page->needle1Max->value());
+    m_config->setN2Min(options_page->needle2Min->value());
+    m_config->setN2Max(options_page->needle2Max->value());
 
 }
 

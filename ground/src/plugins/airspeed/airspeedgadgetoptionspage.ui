@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>513</width>
+    <width>486</width>
     <height>300</height>
    </rect>
   </property>
@@ -24,11 +24,14 @@
     <rect>
      <x>-1</x>
      <y>-1</y>
-     <width>511</width>
+     <width>481</width>
      <height>339</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0,0">
+    <property name="sizeConstraint">
+     <enum>QLayout::SetMinimumSize</enum>
+    </property>
     <property name="leftMargin">
      <number>10</number>
     </property>
@@ -137,7 +140,14 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="needle1ID"/>
+         <widget class="QLineEdit" name="needle1ID">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="label_6">
@@ -147,7 +157,17 @@
          </widget>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="needle1Min"/>
+         <widget class="QDoubleSpinBox" name="needle1Min">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximum">
+           <double>100000.000000000000000</double>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="label_7">
@@ -157,7 +177,17 @@
          </widget>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="needle1Max"/>
+         <widget class="QDoubleSpinBox" name="needle1Max">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximum">
+           <double>100000.000000000000000</double>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -174,7 +204,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit_4"/>
+         <widget class="QLineEdit" name="uavObject1"/>
         </item>
         <item>
          <widget class="QLabel" name="label_9">
@@ -184,7 +214,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit_5"/>
+         <widget class="QLineEdit" name="objectField1"/>
         </item>
        </layout>
       </item>
@@ -225,7 +255,14 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="needle2ID"/>
+         <widget class="QLineEdit" name="needle2ID">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="label_18">
@@ -235,7 +272,17 @@
          </widget>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="needle2Min"/>
+         <widget class="QDoubleSpinBox" name="needle2Min">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximum">
+           <double>100000.000000000000000</double>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="label_19">
@@ -245,7 +292,17 @@
          </widget>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="needle2Max"/>
+         <widget class="QDoubleSpinBox" name="needle2Max">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximum">
+           <double>100000.000000000000000</double>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -262,7 +319,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit_10"/>
+         <widget class="QLineEdit" name="uavObject2"/>
         </item>
         <item>
          <widget class="QLabel" name="label_21">
@@ -272,7 +329,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit_11"/>
+         <widget class="QLineEdit" name="objectField2"/>
         </item>
        </layout>
       </item>

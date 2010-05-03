@@ -51,6 +51,10 @@ public:
     void setN2Min(double val) { needle2MinValue = val;}
     void setN1Max(double val) { needle1MaxValue = val;}
     void setN2Max(double val) { needle2MaxValue = val;}
+    void setN1DataObject(QString text) {needle1DataObject = text; }
+    void setN2DataObject(QString text){ needle2DataObject = text; }
+    void setN1ObjField(QString text) { needle1ObjectField = text; }
+    void setN2ObjField(QString text) { needle2ObjectField = text; }
 
     //get dial configuration functions
     QString dialFile() {return m_defaultDial;}
@@ -62,6 +66,12 @@ public:
     double getN2Min() { return needle2MinValue;}
     double getN1Max() { return needle1MaxValue;}
     double getN2Max() { return needle2MaxValue;}
+    QString getN1DataObject() { return needle1DataObject; }
+    QString getN2DataObject() { return needle2DataObject; }
+    QString getN1ObjField() { return needle1ObjectField; }
+    QString getN2ObjField() { return needle2ObjectField; }
+
+
 
     QByteArray saveState() const;
     IUAVGadgetConfiguration *clone();
@@ -72,12 +82,17 @@ private:
     QString dialForegroundID; // ... of the foreground
     QString dialNeedleID1;     // ... and the first needle
     QString dialNeedleID2;     // ... and the second
-    // TODO: define additional elements such as secondary needle
 
+    // Note: MinValue not used at the moment!
     double needle1MinValue; // Value corresponding to a 0 degree angle;
     double needle1MaxValue; // Value corresponding to a 360 degree angle;
     double needle2MinValue;
     double needle2MaxValue;
+
+    QString needle1DataObject;
+    QString needle1ObjectField;
+    QString needle2DataObject;
+    QString needle2ObjectField;
 };
 
 #endif // AIRSPEEDGADGETCONFIGURATION_H

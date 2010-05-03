@@ -55,4 +55,6 @@ void AirspeedGadget::loadConfiguration(IUAVGadgetConfiguration* config)
     m_widget->setN1Max(m->getN1Max());
     m_widget->setN2Min(m->getN2Min());
     m_widget->setN2Max(m->getN2Max());
+    m_widget->connectNeedles(m->getN1DataObject(),m->getN1ObjField(),
+                             m->getN2DataObject(),m->getN2ObjField());
 }

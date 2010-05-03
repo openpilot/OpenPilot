@@ -58,6 +58,10 @@ AirspeedGadgetConfiguration::AirspeedGadgetConfiguration(QString classId, const 
         stream >> needle1MaxValue;
         stream >> needle2MinValue;
         stream >> needle2MaxValue;
+        stream >> needle1DataObject;
+        stream >> needle1ObjectField;
+        stream >> needle2DataObject;
+        stream >> needle2ObjectField;
 
     }
 }
@@ -88,5 +92,10 @@ QByteArray AirspeedGadgetConfiguration::saveState() const
     stream << needle1MaxValue;
     stream << needle2MinValue;
     stream << needle2MaxValue;
+    stream << needle1DataObject;
+    stream << needle1ObjectField;
+    stream << needle2DataObject;
+    stream << needle2ObjectField;
+
     return bytes;
 }

@@ -54,6 +54,9 @@ public:
    void setN1Max(double value) {n1MaxValue = value;}
    void setN2Min(double value) {n1MinValue = value;}
    void setN2Max(double value) {n2MaxValue = value;}
+   // Sets up needle/UAVObject connections:
+   void connectNeedles(QString object1, QString field1,
+                       QString object2, QString field2);
 
 protected:
    void paintEvent(QPaintEvent *event);
@@ -72,11 +75,17 @@ private:
    QGraphicsSvgItem *m_foreground;
    QGraphicsSvgItem *m_needle1;
    QGraphicsSvgItem *m_needle2;
+
+   bool n2enabled; // Simple flag to skip rendering if the
+   bool fgenabled; // layer does not exist.
+
    double n1MinValue;
    double n1MaxValue;
    double n2MinValue;
    double n2MaxValue;
 
+   // The Value and target variables
+   // are expressed in degrees
    double needle1Target;
    double needle1Value;
    double needle2Target;

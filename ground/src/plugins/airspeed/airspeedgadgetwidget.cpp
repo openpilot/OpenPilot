@@ -49,6 +49,7 @@ AirspeedGadgetWidget::AirspeedGadgetWidget(QWidget *parent) : QGraphicsView(pare
     needle1Value = 0;
     needle2Value = 0;
 
+    // This timer mechanism makes needles rotate smoothly
     connect(&dialTimer, SIGNAL(timeout()), this, SLOT(rotateNeedles()));
     dialTimer.start(30);
 
@@ -63,6 +64,12 @@ AirspeedGadgetWidget::~AirspeedGadgetWidget()
    // Do nothing
 }
 
+void AirspeedGadgetWidget::connectNeedles(QString object1, QString field1, QString object2, QString field2 ) {
+
+}
+
+
+
 void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QString n1, QString n2)
 {
    if (QFile::exists(dfn))
@@ -70,19 +77,25 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
       m_renderer->load(dfn);
       if(m_renderer->isValid())
       {
+         fgenabled = false;
+         n2enabled = false;
 
          m_background->setSharedRenderer(m_renderer);
          m_background->setElementId(bg);
-
-         m_foreground->setSharedRenderer(m_renderer);
-         m_foreground->setElementId(fg);
-
          m_needle1->setSharedRenderer(m_renderer);
          m_needle1->setElementId(n1);
 
-         m_needle2->setSharedRenderer(m_renderer);
-         m_needle2->setElementId(n2);
+         if (m_renderer->elementExists(fg)) {
+            m_foreground->setSharedRenderer(m_renderer);
+            m_foreground->setElementId(fg);
+            fgenabled = true;
+        }
 
+         if (m_renderer->elementExists(n2)) {
+             m_needle2->setSharedRenderer(m_renderer);
+             m_needle2->setElementId(n2);
+             n2enabled = true;
+         }
 
          std::cout<<"Dial file loaded"<<std::endl;
          QGraphicsScene *l_scene = scene();
@@ -102,6 +115,7 @@ void AirspeedGadgetWidget::paint()
 
     l_scene->addItem(m_background);
     l_scene->addItem(m_needle1);
+
     l_scene->addItem(m_needle2);
     l_scene->addItem(m_foreground);
 
@@ -113,7 +127,7 @@ void AirspeedGadgetWidget::paintEvent(QPaintEvent *event)
 {
     // Skip painting until the dial file is loaded
     if (! m_renderer->isValid()) {
-        std::cout<<"Dial file not loaded"<<std::endl;
+        std::cout<<"Dial file not loaded, not rendering"<<std::endl;
         return;
     }
    QGraphicsView::paintEvent(event);
@@ -127,33 +141,38 @@ void AirspeedGadgetWidget::resizeEvent(QResizeEvent *event)
     fitInView(m_background, Qt::KeepAspectRatio );
 }
 
+// Converts the value into an angle:
+// this enables smooth rotation in rotateNeedles below
 void AirspeedGadgetWidget::setNeedle1(double value) {
-    needle1Target = value;
+    needle1Target = 360*value/n1MaxValue;
 }
 
 void AirspeedGadgetWidget::setNeedle2(double value) {
-    needle2Target = value;
+    needle2Target = 360*value/n2MaxValue;
 }
 
 
 // Take an input value and rotate the dial accordingly
+// Rotation is smooth, starts fast and slows down when
+// approaching the target.
+// We aim for a 0.5 degree precision.
 void AirspeedGadgetWidget::rotateNeedles()
 {
-    if (needle2Value != needle2Target) {
-        (needle2Value > needle2Target) ? needle2Value-- : needle2Value++;
+    if ((abs((needle2Value-needle2Target)*10) > 5) && n2enabled) {
+        needle2Value+=(needle2Target - needle2Value)/10;
         m_needle2->resetTransform();
         QRectF rect = m_needle2->boundingRect();
         m_needle2->translate(rect.width()/2,rect.height()/2);
-        m_needle2->rotate(360*needle2Value/n2MaxValue);
+        m_needle2->rotate(needle2Value);
         m_needle2->translate(-rect.width()/2,-rect.height()/2);
     }
 
-    if (needle1Value != needle1Target) {
-      (needle1Value > needle1Target) ? needle1Value-- : needle1Value++;
+    if ((abs((needle1Value-needle1Target)*10) > 5)) {
+        needle1Value += (needle1Target - needle1Value)/10;
        m_needle1->resetTransform();
        QRectF rect = m_needle1->boundingRect();
        m_needle1->translate(rect.width()/2,rect.height()/2);
-       m_needle1->rotate(360*needle1Value/n1MaxValue);
+       m_needle1->rotate(needle1Value);
        m_needle1->translate(-rect.width()/2,-rect.height()/2);
     }
 

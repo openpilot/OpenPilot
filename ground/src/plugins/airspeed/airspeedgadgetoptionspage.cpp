@@ -59,6 +59,10 @@ QWidget *AirspeedGadgetOptionsPage::createPage(QWidget *parent)
     options_page->needle1Max->setValue(m_config->getN1Max());
     options_page->needle2Min->setValue(m_config->getN2Min());
     options_page->needle2Max->setValue(m_config->getN2Max());
+    options_page->uavObject1->setText(m_config->getN1DataObject());
+    options_page->uavObject2->setText(m_config->getN2DataObject());
+    options_page->objectField1->setText(m_config->getN1ObjField());
+    options_page->objectField2->setText(m_config->getN2ObjField());
 
     connect(options_page->loadFile, SIGNAL(clicked()), this, SLOT(on_loadFile_clicked()));
 
@@ -82,6 +86,10 @@ void AirspeedGadgetOptionsPage::apply()
     m_config->setN1Max(options_page->needle1Max->value());
     m_config->setN2Min(options_page->needle2Min->value());
     m_config->setN2Max(options_page->needle2Max->value());
+    m_config->setN1DataObject(options_page->uavObject1->text());
+    m_config->setN2DataObject(options_page->uavObject2->text());
+    m_config->setN1ObjField(options_page->objectField1->text());
+    m_config->setN2ObjField(options_page->objectField2->text());
 
 }
 

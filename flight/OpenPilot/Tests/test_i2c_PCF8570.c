@@ -168,6 +168,7 @@ static void Task2(void *pvParameters)
 	portTickType xLastExecutionTime;
 
     xLastExecutionTime = xTaskGetTickCount();
+    uint32_t count = 0;
 
 	for(;;)
 	{
@@ -175,7 +176,9 @@ static void Task2(void *pvParameters)
 
 		if (PIOS_I2C_LockDevice(100))
 		{
-			if (PIOS_I2C_Transfer(I2C_Write, DEVICE_2_ADDRESS<<1, (uint8_t*)"\x10\xF0\xF1\xF2", 4) != 0)
+			buf[0] = 0x10;				// The address
+			memcpy(&buf[1], &count, 4);	// The data to write
+			if (PIOS_I2C_Transfer(I2C_Write, DEVICE_2_ADDRESS<<1, buf, 5) != 0)
 				OnError();
 			PIOS_I2C_UnlockDevice();
 		}
@@ -191,11 +194,12 @@ static void Task2(void *pvParameters)
 			if (PIOS_I2C_Transfer(I2C_Write_WithoutStop, DEVICE_2_ADDRESS<<1, (uint8_t*)"\x10", 1) != 0)
 				OnError();
 
-			if (PIOS_I2C_Transfer(I2C_Read, DEVICE_2_ADDRESS<<1, buf, 3) != 0)
+			if (PIOS_I2C_Transfer(I2C_Read, DEVICE_2_ADDRESS<<1, buf, 4) != 0)
 				OnError();
 
-			if (memcmp(buf, "\xF0\xF1\xF2",3) != 0)
+			if (memcmp(buf, &count, 4) != 0)
 				OnError();
+
 			PIOS_I2C_UnlockDevice();
 		}
 		else
@@ -204,6 +208,8 @@ static void Task2(void *pvParameters)
 		}
 
 		vTaskDelayUntil(&xLastExecutionTime, 10 / portTICK_RATE_MS);
+
+		count++;
 	}
 }
 

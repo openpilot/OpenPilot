@@ -9,8 +9,6 @@
  * \ingroup rtslam
  */
 
-//TODO : add comments on hpp and cpp
-
 #ifndef ROBOTODOMETRY_HPP_
 #define ROBOTODOMETRY_HPP_
 
@@ -20,8 +18,7 @@ namespace jafar {
 	namespace rtslam {
 
 		class RobotOdometry;
-				typedef boost::shared_ptr<RobotOdometry> robodo_ptr_t;
-
+		typedef boost::shared_ptr<RobotOdometry> robodo_ptr_t;
 
 		/**
 		 * Odometry motion model robot class.
@@ -29,11 +26,25 @@ namespace jafar {
 		 * \author agonzale@laas.fr
 		 *
 		 * This class implements a rigid frame in 3D moving with an odometry motion model.
-		 * This model performs one step on the pose F of a vehicle, given odometry increments U=[dx,dv].
+		 * This model performs one step on the pose F of a vehicle, given odometry increments U=[dx,dv] given by the robot frame.
 		 *
 		 *
 		 * This model is the following:\n
-		 * -
+		 * -p += dx <- position
+		 * -q += v2q(dv) <- quaternion
+		 * dx : position increment <- given by odometry sensors
+		 * dv : orientation increment <- given by odometry sensors
+		 *
+		 *
+		 * This model is embedded into the system variables as follows:
+		 * - the prediction function is x+ = f(x,u), implemented with method move().
+		 * - the state vector is x = state.x = [p q]
+		 * - the state covariance is in the map, P = state.P = (map.filter).P(state.ia, state.ia)
+		 * - the control vector is u = control.x = [dx dv]
+		 * - the control covariances matrix is U = control.P
+		 * - the Jacobians of f(x,u) provided by move() are XNEW_x and XNEW_control.
+		 * - the perturbation covariance is obtained with the method computeStatePerturbation(), as follows:
+		 * 		- Q = XNEW_control * control.P * XNEW_control'\n
 		 *
 		 * \sa Explore the comments in file robotOdometry.cpp for full algebraic details.
 		 *
@@ -41,7 +52,6 @@ namespace jafar {
 		 */
 		class RobotOdometry: public RobotAbstract {
 			public:
-
 
 				/**
 				 * Remote constructor from remote map.
@@ -59,21 +69,21 @@ namespace jafar {
 				~RobotOdometry(void) {
 				}
 
-
 				/**
 				 * Move one step ahead.
 				 *
 				 * This function predicts the robot state one step of length \a dt ahead in time,
 				 * according to the control input \a control.x and the time interval \a control.dt.
 				 *
-				 * \param _x the current state vecto
-				 * \param _p the perturbation vector
+				 * \param _x the current state vector
+				 * \param _u the odometry input vector
 				 * \param _dt the sampling time
 				 * \param _xnew the new state vector
 				 * \param _XNEW_x the Jacobian of xnew wrt x
-				 * \param _XNEW_pert the Jacobian of xnew wrt p
+				 * \param _XNEW_pert the Jacobian of xnew wrt u
 				 */
-				void move_func(const vec & _x, const vec & _u, const vec & _n, const double _dt, vec & _xnew, mat & _XNEW_x, mat & _XNEW_u);
+				void move_func(const vec & _x, const vec & _u, const vec & _n,
+				    const double _dt, vec & _xnew, mat & _XNEW_x, mat & _XNEW_u);
 
 				void computePertJacobian();
 
@@ -88,21 +98,24 @@ namespace jafar {
 				static size_t size_perturbation() {
 					return 6;
 				}
-				virtual size_t mySize() {return size();}
-				virtual size_t mySize_control() {return size_control();}
-				virtual size_t mySize_perturbation() {return size_perturbation();}
-
+				virtual size_t mySize() {
+					return size();
+				}
+				virtual size_t mySize_control() {
+					return size_control();
+				}
+				virtual size_t mySize_perturbation() {
+					return size_perturbation();
+				}
 
 			protected:
 				/**
 				 * Split state vector.
 				 *
-				 * Extracts \a p, \a q, \a v and \a w from the state vector, \a x = [\a p, \a q, \a v, \a w].
+				 * Extracts \a p and \a q from the state vector, \a x = [\a p, \a q].
 				 * \param x the state vector
 				 * \param p the position
 				 * \param q the quaternion
-				 * \param v the linear velocity
-				 * \param w the angular velocity
 				 */
 				template<class Vx, class Vp, class Vq>
 				inline void splitState(const Vx x, Vp & p, Vq & q) {
@@ -110,9 +123,13 @@ namespace jafar {
 					q = ublas::subrange(x, 3, 7);
 				}
 
-
 				/**
 				 * Compose state vector.
+				 *
+				 * Composes the state vector with \a p and \a q, \a x = [\a p, \a q].
+				 * \param p the position
+				 * \param q the quaternion
+				 * \param x the state vector
 				 */
 				template<class Vp, class Vq, class Vx>
 				inline void unsplitState(const Vp & p, const Vq & q, Vx & x) {
@@ -120,13 +137,12 @@ namespace jafar {
 					ublas::subrange(x, 3, 7) = q;
 				}
 
-
 				/**
 				 * Split control vector.
 				 *
-				 * Extracts impulses \a vi and \a wi from the control vector.
-				 * \param vi the linear impulse.
-				 * \param wi the angular impulse.
+				 * Extracts odometry datas \a dx and \a dv from the odometry vector.
+				 * \param dx the position increment.
+				 * \param dv the orientation increment.
 				 */
 				template<class Vu, class V>
 				inline void splitControl(Vu & u, V & dx, V & dv) {
@@ -135,12 +151,14 @@ namespace jafar {
 				}
 
 			private:
+				// todo : try to compile with matrix defined here
 				// temporary matrices to speed up Jacobian computation
-//				mat33 PNEW_v; ///<      Temporary Jacobian matrix
-//				mat43 QWDT_wdt; ///< Temporary Jacobian matrix
-//				mat44 QNEW_qwdt; ///<   Temporary Jacobian matrix
-//				mat43 QNEW_wdt; ///<    Temporary Jacobian matrix
-//				mat44 QNEW_q; ///<      Temporary Jacobian matrix
+								mat33 PNEW_dx; ///<      Temporary Jacobian matrix
+								mat34 PNEW_q;
+								mat43 QDV_dv; ///< Temporary Jacobian matrix
+								mat44 QNEW_qdv; ///<   Temporary Jacobian matrix
+			  				mat43 QNEW_dv; ///<    Temporary Jacobian matrix
+								mat44 QNEW_q; ///<      Temporary Jacobian matrix
 
 		};
 	}

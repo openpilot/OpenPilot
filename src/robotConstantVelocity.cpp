@@ -26,33 +26,37 @@ namespace jafar {
 		using namespace std;
 		using namespace jmath;
 
-
 		/**
 		 * Remote constructor from remote map.
 		 * \param _map the remote map
 		 */
 		RobotConstantVelocity::RobotConstantVelocity(const map_ptr_t & _mapPtr) :
-			RobotAbstract(_mapPtr, RobotConstantVelocity::size(), RobotConstantVelocity::size_control(), RobotConstantVelocity::size_perturbation()) {
+			RobotAbstract(_mapPtr, RobotConstantVelocity::size(),
+			              RobotConstantVelocity::size_control(),
+			              RobotConstantVelocity::size_perturbation()) {
 			// Build constant perturbation Jacobian
 			constantPerturbation = true;
 			computePertJacobian();
 			type("Constant-Velocity");
 		}
 
-		RobotConstantVelocity::RobotConstantVelocity(const simulation_t dummy, const map_ptr_t & _mapPtr) :
-			RobotAbstract(FOR_SIMULATION, _mapPtr, RobotConstantVelocity::size(), RobotConstantVelocity::size_control(), RobotConstantVelocity::size_perturbation()) {
+		RobotConstantVelocity::RobotConstantVelocity(const simulation_t dummy,
+		    const map_ptr_t & _mapPtr) :
+			RobotAbstract(FOR_SIMULATION, _mapPtr, RobotConstantVelocity::size(),
+			              RobotConstantVelocity::size_control(),
+			              RobotConstantVelocity::size_perturbation()) {
 			// Build constant perturbation Jacobian
 			constantPerturbation = true;
 			computePertJacobian();
 			type("Constant-Velocity");
 		}
 
-
-		void RobotConstantVelocity::move_func(const vec & _x, const vec & _u, const vec & _n, const double _dt, vec & _xnew, mat & _XNEW_x, mat & _XNEW_u) {
+		void RobotConstantVelocity::move_func(const vec & _x, const vec & _u,
+		    const vec & _n, const double _dt, vec & _xnew, mat & _XNEW_x,
+		    mat & _XNEW_u) {
 
 			using namespace jblas;
 			using namespace ublas;
-
 
 			/*
 			 * This motion model is defined by:
@@ -96,11 +100,9 @@ namespace jafar {
 			vec4 q;
 			splitState(_x, p, q, v, w);
 
-
 			// split perturbation vector
 			vec3 vi, wi;
 			splitControl(_n, vi, wi);
-
 
 			// Non-trivial Jacobian blocks
 			identity_mat I_3(3);
@@ -118,17 +120,14 @@ namespace jafar {
 			vnew = v + vi;
 			wnew = w + wi;
 
-
 			// Compose state - this is the output state.
 			unsplitState(pnew, qnew, vnew, wnew, _xnew);
-
 
 			// Build transition Jacobian matrix XNEW_x
 			_XNEW_x.assign(identity_mat(state.size()));
 			project(_XNEW_x, range(0, 3), range(7, 10)) = PNEW_v;
 			project(_XNEW_x, range(3, 7), range(3, 7)) = QNEW_q;
 			project(_XNEW_x, range(3, 7), range(10, 13)) = QNEW_wdt * _dt;
-
 
 			/*
 			 * We are normally supposed here to build the perturbation Jacobian matrix XNEW_pert.

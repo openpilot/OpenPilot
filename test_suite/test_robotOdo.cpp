@@ -41,10 +41,10 @@ using namespace boost;
 
 void test_robotOdo01() {
 
-	cout << "Beggening test"<<endl;
+	cout << "beginning test"<<endl;
 
 	map_ptr_t mapPtr(new MapAbstract(100));
-	odo_ptr_t robPtr(new RobotOdometry(mapPtr));
+	robodo_ptr_t robPtr(new RobotOdometry(mapPtr));
 	robPtr->linkToParentMap(mapPtr);
 
 	mapPtr->fillRndm();

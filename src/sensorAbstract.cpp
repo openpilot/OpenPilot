@@ -79,8 +79,8 @@ namespace jafar {
 		 * Process raw data.
 		 */
 		void SensorAbstract::processRaw() {
-			cout << "processng raw" << endl;
-			//TODO Call here the raw sensor data manager - active search in teh image case.
+			cout << "processing raw" << endl;
+			//TODO Call here the raw sensor data manager - active search in the image case.
 			// rawManagerPtr->processKnownLmks();
 			// rawManagerPtr->discoverNewLmks();
 		}

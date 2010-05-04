@@ -47,13 +47,20 @@ ObjectPersistence::ObjectPersistence(): UAVDataObject(OBJID, ISSINGLEINST, ISSET
     OperationEnumOptions.append("Save");
     OperationEnumOptions.append("Delete");
     fields.append(new UAVObjectFieldEnum(QString("Operation"), QString(""), OperationElemNames, OperationEnumOptions));
-    QStringList ObjectsElemNames;
-    ObjectsElemNames.append("0");
-    QStringList ObjectsEnumOptions;
-    ObjectsEnumOptions.append("All");
-    ObjectsEnumOptions.append("Settings");
-    ObjectsEnumOptions.append("MetaObjects");
-    fields.append(new UAVObjectFieldEnum(QString("Objects"), QString(""), ObjectsElemNames, ObjectsEnumOptions));
+    QStringList SelectionElemNames;
+    SelectionElemNames.append("0");
+    QStringList SelectionEnumOptions;
+    SelectionEnumOptions.append("SingleObject");
+    SelectionEnumOptions.append("AllSettings");
+    SelectionEnumOptions.append("AllMetaObjects");
+    SelectionEnumOptions.append("AllObjects");
+    fields.append(new UAVObjectFieldEnum(QString("Selection"), QString(""), SelectionElemNames, SelectionEnumOptions));
+    QStringList ObjectIDElemNames;
+    ObjectIDElemNames.append("0");
+    fields.append(new UAVObjectFieldUInt32(QString("ObjectID"), QString(""), ObjectIDElemNames));
+    QStringList InstanceIDElemNames;
+    InstanceIDElemNames.append("0");
+    fields.append(new UAVObjectFieldUInt32(QString("InstanceID"), QString(""), InstanceIDElemNames));
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

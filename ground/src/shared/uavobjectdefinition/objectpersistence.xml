@@ -1,7 +1,9 @@
 <xml>
         <object name="ObjectPersistence" singleinstance="true" settings="false">
             <field name="Operation" units="" type="enum" elements="1" options="Load,Save,Delete"/>
-            <field name="Objects" units="" type="enum" elements="1" options="All,Settings,MetaObjects"/>
+            <field name="Selection" units="" type="enum" elements="1" options="SingleObject,AllSettings,AllMetaObjects,AllObjects"/>
+            <field name="ObjectID" units="" type="uint32" elements="1"/>
+            <field name="InstanceID" units="" type="uint32" elements="1"/>
             <telemetrygcs acked="true" updatemode="manual" period="0"/>
             <telemetryflight acked="true" updatemode="manual" period="0"/>
             <logging updatemode="never" period="0"/>

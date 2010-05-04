@@ -54,8 +54,9 @@ UAVObjectBrowserWidget::UAVObjectBrowserWidget(QWidget *parent) : QWidget(parent
     showMetaData(m_browser->metaCheckBox->isChecked());
     connect(m_browser->treeView->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(currentChanged(QModelIndex,QModelIndex)));
     connect(m_browser->metaCheckBox, SIGNAL(toggled(bool)), this, SLOT(showMetaData(bool)));
-    connect(m_browser->saveSDButton, SIGNAL(clicked()), this, SLOT(saveSettings()));
-    connect(m_browser->readSDButton, SIGNAL(clicked()), this, SLOT(readSettings()));
+    connect(m_browser->saveSDButton, SIGNAL(clicked()), this, SLOT(saveObject()));
+    connect(m_browser->readSDButton, SIGNAL(clicked()), this, SLOT(loadObject()));
+    connect(m_browser->eraseSDButton, SIGNAL(clicked()), this, SLOT(eraseObject()));
     connect(m_browser->sendButton, SIGNAL(clicked()), this, SLOT(sendUpdate()));
     connect(m_browser->requestButton, SIGNAL(clicked()), this, SLOT(requestUpdate()));
     enableSendRequest(false);
@@ -111,28 +112,53 @@ ObjectTreeItem *UAVObjectBrowserWidget::findCurrentObjectTreeItem()
     return objItem;
 }
 
-void UAVObjectBrowserWidget::saveSettings()
+void UAVObjectBrowserWidget::saveObject()
 {
-    updateSettings(ObjectPersistence::OPERATION_SAVE);
+    // Send update so that the latest value is saved
+    sendUpdate();
+    // Save object
+    ObjectTreeItem *objItem = findCurrentObjectTreeItem();
+    Q_ASSERT(objItem);
+    UAVObject *obj = objItem->object();
+    Q_ASSERT(obj);
+    updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
 }
 
-void UAVObjectBrowserWidget::readSettings()
+void UAVObjectBrowserWidget::loadObject()
 {
-    updateSettings(ObjectPersistence::OPERATION_LOAD);
+    // Load object
+    ObjectTreeItem *objItem = findCurrentObjectTreeItem();
+    Q_ASSERT(objItem);
+    UAVObject *obj = objItem->object();
+    Q_ASSERT(obj);
+    updateObjectPersistance(ObjectPersistence::OPERATION_LOAD, obj);
+    // Retrieve object so that latest value is displayed
+    requestUpdate();
 }
 
-void UAVObjectBrowserWidget::updateSettings(ObjectPersistence::OperationOptions op)
+void UAVObjectBrowserWidget::eraseObject()
+{
+    ObjectTreeItem *objItem = findCurrentObjectTreeItem();
+    Q_ASSERT(objItem);
+    UAVObject *obj = objItem->object();
+    Q_ASSERT(obj);
+    updateObjectPersistance(ObjectPersistence::OPERATION_DELETE, obj);
+}
+
+void UAVObjectBrowserWidget::updateObjectPersistance(ObjectPersistence::OperationOptions op, UAVObject *obj)
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    ObjectPersistence* obj = dynamic_cast<ObjectPersistence*>( objManager->getObject(ObjectPersistence::NAME) );
+    ObjectPersistence* objper = dynamic_cast<ObjectPersistence*>( objManager->getObject(ObjectPersistence::NAME) );
     if (obj != NULL)
     {
         ObjectPersistence::DataFields data;
         data.Operation = op;
-        data.Objects = ObjectPersistence::OBJECTS_ALL;
-        obj->setData(data);
-        obj->updated();
+        data.Selection = ObjectPersistence::SELECTION_SINGLEOBJECT;
+        data.ObjectID = obj->getObjID();
+        data.InstanceID = obj->getInstID();
+        objper->setData(data);
+        objper->updated();
     }
 }
 
@@ -153,6 +179,9 @@ void UAVObjectBrowserWidget::enableSendRequest(bool enable)
 {
     m_browser->sendButton->setEnabled(enable);
     m_browser->requestButton->setEnabled(enable);
+    m_browser->saveSDButton->setEnabled(enable);
+    m_browser->readSDButton->setEnabled(enable);
+    m_browser->eraseSDButton->setEnabled(enable);
 }
 
 

@@ -42,7 +42,9 @@ public:
     // Field structure
     typedef struct {
         quint8 Operation;
-        quint8 Objects;
+        quint8 Selection;
+        quint32 ObjectID;
+        quint32 InstanceID;
 
     } __attribute__((packed)) DataFields;
 
@@ -50,13 +52,15 @@ public:
     // Field Operation information
     /* Enumeration options for field Operation */
     typedef enum { OPERATION_LOAD=0, OPERATION_SAVE=1, OPERATION_DELETE=2,  } OperationOptions;
-    // Field Objects information
-    /* Enumeration options for field Objects */
-    typedef enum { OBJECTS_ALL=0, OBJECTS_SETTINGS=1, OBJECTS_METAOBJECTS=2,  } ObjectsOptions;
+    // Field Selection information
+    /* Enumeration options for field Selection */
+    typedef enum { SELECTION_SINGLEOBJECT=0, SELECTION_ALLSETTINGS=1, SELECTION_ALLMETAOBJECTS=2, SELECTION_ALLOBJECTS=3,  } SelectionOptions;
+    // Field ObjectID information
+    // Field InstanceID information
 
   
     // Constants
-    static const quint32 OBJID = 2407027612U;
+    static const quint32 OBJID = 572614706U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

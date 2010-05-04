@@ -55,8 +55,9 @@ public slots:
 private slots:
     void sendUpdate();
     void requestUpdate();
-    void saveSettings();
-    void readSettings();
+    void saveObject();
+    void loadObject();
+    void eraseObject();
     void currentChanged(const QModelIndex &current, const QModelIndex &previous);
 
 private:
@@ -65,7 +66,7 @@ private:
     Ui_UAVObjectBrowser *m_browser;
     UAVObjectTreeModel *m_model;
 
-    void updateSettings(ObjectPersistence::OperationOptions op);
+    void updateObjectPersistance(ObjectPersistence::OperationOptions op, UAVObject *obj);
     void enableSendRequest(bool enable);
     ObjectTreeItem *findCurrentObjectTreeItem();
 };

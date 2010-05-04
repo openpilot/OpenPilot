@@ -48,6 +48,7 @@ uint32_t Cache;
 /* Function Prototypes */
 static void TaskTick(void *pvParameters);
 static void TaskTesting(void *pvParameters);
+static void TaskHIDTest(void *pvParameters);
 static void TaskServos(void *pvParameters);
 static void TaskSDCard(void *pvParameters);
 int32_t CONSOLE_Parse(COMPortTypeDef port, char c);
@@ -115,7 +116,6 @@ void OpenPilotInit()
 	PIOS_PWM_Init();
 	PIOS_USB_Init(0);
 	PIOS_I2C_Init();
-	PIOS_Servo_SetHz(50, 450);
 
 	/* Initialize modules */
 	TelemetryInitialize();
@@ -125,7 +125,8 @@ void OpenPilotInit()
 	GpsInitialize();
 
 	/* Create test tasks */
-	//xTaskCreate(TaskTesting, (signed portCHAR *)"TaskTesting", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
+	//xTaskCreate(TaskTesting, (signed portCHAR *)"Testing", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
+	xTaskCreate(TaskHIDTest, (signed portCHAR *)"HIDTest", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
 	//xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
 	//xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
 }
@@ -176,6 +177,28 @@ static void TaskTesting(void *pvParameters)
 		PIOS_COM_SendFormattedString(COM_DEBUG_USART, "AUX1: %d, AUX2: %d, AUX3: %d\r", PIOS_ADC_PinGet(4), PIOS_ADC_PinGet(5), PIOS_ADC_PinGet(6));
 
 		vTaskDelay(xDelay);
+	}
+}
+
+static void TaskHIDTest(void *pvParameters)
+{
+	uint8_t byte;
+	uint8_t line_buffer[64];
+	uint16_t line_ix;
+
+	for(;;)
+	{
+		/* HID Loopback Test */
+		if(PIOS_COM_ReceiveBufferUsed(COM_USB_HID) != 0) {
+			byte = PIOS_COM_ReceiveBuffer(COM_USB_HID);
+			if(byte == '\r' || byte == '\n' || byte == 0) {
+				PIOS_COM_SendFormattedString(COM_USB_HID, "RX: %s\r", line_buffer);
+				line_ix = 0;
+			} else if(line_ix < (64 - 1)) {
+				line_buffer[line_ix++] = byte;
+				line_buffer[line_ix] = 0;
+			}
+		}
 	}
 }
 

@@ -184,15 +184,13 @@ int32_t PIOS_USB_HID_TxBufferPutMore(uint8_t *buffer, uint16_t len)
 */
 uint8_t PIOS_USB_HID_RxBufferGet(void)
 {
-	if(!rx_buffer_new_data_ctr) {
+	if(rx_buffer_new_data_ctr == 0) {
 		/* Nothing new in buffer */
 		return -1;
 	}
 
 	/* This stops returning bytes after the first occurrence of '\0' */
-	/* We don't need to do this but it does optimise things quite a bit */
 	if(rx_buffer[rx_buffer_ix] == 0) {
-		/* TODO: Evaluate if this is really needed */
 		/* Clean the buffer */
 		for(uint8_t i = 0; i < PIOS_USB_HID_DATA_LENGTH; i++) {
 			rx_buffer[i] = 0;
@@ -200,15 +198,16 @@ uint8_t PIOS_USB_HID_RxBufferGet(void)
 
 		rx_buffer_new_data_ctr = 0;
 		rx_buffer_ix = 0;
-		//SetEPRxStatus(ENDP1, EP_RX_VALID);
 		return -1;
 	}
 
 	/* There is still data in the buffer */
 	uint8_t b = rx_buffer[rx_buffer_ix++];
-	if(!--rx_buffer_new_data_ctr) {
+	//PIOS_COM_SendFormattedString(COM_DEBUG_USART, "b: %c\r", b);
+	//PIOS_COM_SendFormattedString(COM_DEBUG_USART, "ix: %u\r", rx_buffer_ix);
+	//PIOS_COM_SendFormattedString(COM_DEBUG_USART, "ctr: %u\r\r", rx_buffer_new_data_ctr);
+	if(--rx_buffer_new_data_ctr == 0) {
 		rx_buffer_ix = 0;
-		//SetEPRxStatus(ENDP1, EP_RX_VALID);
 	}
 
 	/* Return received byte */
@@ -223,11 +222,7 @@ uint8_t PIOS_USB_HID_RxBufferGet(void)
 */
 int32_t PIOS_USB_HID_RxBufferUsed(void)
 {
-	if(!rx_buffer_new_data_ctr) {
-		return 0;
-	} else {
-		return PIOS_USB_HID_DATA_LENGTH;
-	}
+	return rx_buffer_new_data_ctr;
 }
 
 int32_t PIOS_USB_HID_CB_Data_Setup(uint8_t RequestNo)
@@ -316,12 +311,12 @@ static uint8_t *PIOS_USB_HID_GetProtocolValue(uint16_t Length)
 */
 void PIOS_USB_HID_EP1_OUT_Callback(void)
 {
-#if 0
+#if 1
 	uint32_t DataLength = 0;
 
+	/* Read received data (63 bytes) */
 	/* Get the number of received data on the selected Endpoint */
 	DataLength = GetEPRxCount(ENDP1 & 0x7F);
-
 	/* Use the memory interface function to write to the selected endpoint */
 	PMAToUserBufferCopy((uint8_t *) rx_buffer, GetEPRxAddr(ENDP1 & 0x7F), DataLength);
 
@@ -329,20 +324,16 @@ void PIOS_USB_HID_EP1_OUT_Callback(void)
 	rx_buffer_new_data_ctr = PIOS_USB_HID_DATA_LENGTH;
 #else
 	// FOR DEBUGGING USE ONLY
-	uint8_t Receive_Buffer[PIOS_USB_HID_DATA_LENGTH];
 	uint32_t DataLength = 0;
 
 	/* Read received data (63 bytes) */
-	//USB_SIL_Read(EP1_OUT, Receive_Buffer);
-
 	/* Get the number of received data on the selected Endpoint */
 	DataLength = GetEPRxCount(ENDP1 & 0x7F);
-
 	/* Use the memory interface function to write to the selected endpoint */
-	PMAToUserBufferCopy((uint8_t *) Receive_Buffer, GetEPRxAddr(ENDP1 & 0x7F), DataLength);
+	PMAToUserBufferCopy((uint8_t *) rx_buffer, GetEPRxAddr(ENDP1 & 0x7F), DataLength);
 
 	/* Send it back */
-	PIOS_COM_SendFormattedStringNonBlocking(COM_USB_HID, "Received: %s", Receive_Buffer);
+	PIOS_COM_SendFormattedStringNonBlocking(COM_USB_HID, "Received: %s", rx_buffer);
 #endif
 
 	SetEPRxStatus(ENDP1, EP_RX_VALID);

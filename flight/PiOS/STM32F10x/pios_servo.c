@@ -157,16 +157,8 @@ void PIOS_Servo_Set(uint8_t Servo, uint16_t Position)
 {
 #ifndef PIOS_ENABLE_DEBUG_PINS
 	/* Make sure servo exists */
-	if (Servo < PIOS_SERVO_NUM_OUTPUTS && Servo >= 0)
+	if (Servo <= PIOS_SERVO_NUM_OUTPUTS && Servo > 0)
 	{
-		/* Clip servo position */
-		if(Position < SERVOS_POSITION_MIN) {
-			Position = SERVOS_POSITION_MIN;
-		}
-		if(Position > SERVOS_POSITION_MAX) {
-			Position = SERVOS_POSITION_MAX;
-		}
-
 		/* Update the position */
 		ServoPosition[Servo] = Position;
 

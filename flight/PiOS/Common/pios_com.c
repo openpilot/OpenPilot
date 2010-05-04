@@ -265,7 +265,7 @@ int32_t PIOS_COM_ReceiveBufferUsed(COMPortTypeDef port)
 			return PIOS_USART_RxBufferUsed(USART_3);
 #endif
 		case COM_USB_HID:
-			return PIOS_USB_HID_DATA_LENGTH;
+			return PIOS_USB_HID_RxBufferUsed();
 		/* To suppress warnings */
 		default:
 			return 0;

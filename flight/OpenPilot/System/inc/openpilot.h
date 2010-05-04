@@ -33,7 +33,6 @@
 
 /* OpenPilot Libraries */
 #include "op_config.h"
-#include "op_logging.h"
 #include "utlist.h"
 #include "uavobjectmanager.h"
 #include "eventdispatcher.h"

@@ -33,7 +33,7 @@
 #define FLIGHTTELEMETRYSTATS_H
 
 // Object constants
-#define FLIGHTTELEMETRYSTATS_OBJID 766280320U
+#define FLIGHTTELEMETRYSTATS_OBJID 1712072286U
 #define FLIGHTTELEMETRYSTATS_NAME "FlightTelemetryStats"
 #define FLIGHTTELEMETRYSTATS_METANAME "FlightTelemetryStatsMeta"
 #define FLIGHTTELEMETRYSTATS_ISSINGLEINST 1
@@ -57,7 +57,7 @@
 
 // Object data
 typedef struct {
-    uint8_t Connected;
+    uint8_t Status;
     float TxDataRate;
     float RxDataRate;
     uint32_t TxFailures;
@@ -67,9 +67,9 @@ typedef struct {
 } __attribute__((packed)) FlightTelemetryStatsData;
 
 // Field information
-// Field Connected information
-/* Enumeration options for field Connected */
-typedef enum { FLIGHTTELEMETRYSTATS_CONNECTED_TRUE=0, FLIGHTTELEMETRYSTATS_CONNECTED_FALSE=1,  } FlightTelemetryStatsConnectedOptions;
+// Field Status information
+/* Enumeration options for field Status */
+typedef enum { FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED=0, FLIGHTTELEMETRYSTATS_STATUS_HANDSHAKEREQ=1, FLIGHTTELEMETRYSTATS_STATUS_HANDSHAKEACK=2, FLIGHTTELEMETRYSTATS_STATUS_CONNECTED=3,  } FlightTelemetryStatsStatusOptions;
 // Field TxDataRate information
 // Field RxDataRate information
 // Field TxFailures information

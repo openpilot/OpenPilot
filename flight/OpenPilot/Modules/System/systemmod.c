@@ -150,6 +150,17 @@ static void objectUpdatedCb(UAVObjEvent* ev)
 				UAVObjSaveMetaobjects();
 			}
 		}
+		else if ( objper.Operation == OBJECTPERSISTENCE_OPERATION_DELETE)
+		{
+			if ( objper.Objects == OBJECTPERSISTENCE_OBJECTS_SETTINGS || objper.Objects == OBJECTPERSISTENCE_OBJECTS_ALL)
+			{
+				UAVObjDeleteSettings();
+			}
+			if ( objper.Objects == OBJECTPERSISTENCE_OBJECTS_METAOBJECTS || objper.Objects == OBJECTPERSISTENCE_OBJECTS_ALL)
+			{
+				UAVObjDeleteMetaobjects();
+			}
+		}
 	}
 }
 

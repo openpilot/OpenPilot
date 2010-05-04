@@ -33,7 +33,7 @@
 #define GCSTELEMETRYSTATS_H
 
 // Object constants
-#define GCSTELEMETRYSTATS_OBJID 607270704U
+#define GCSTELEMETRYSTATS_OBJID 1998458950U
 #define GCSTELEMETRYSTATS_NAME "GCSTelemetryStats"
 #define GCSTELEMETRYSTATS_METANAME "GCSTelemetryStatsMeta"
 #define GCSTELEMETRYSTATS_ISSINGLEINST 1
@@ -57,7 +57,7 @@
 
 // Object data
 typedef struct {
-    uint8_t Connected;
+    uint8_t Status;
     float TxDataRate;
     float RxDataRate;
     uint32_t TxFailures;
@@ -67,9 +67,9 @@ typedef struct {
 } __attribute__((packed)) GCSTelemetryStatsData;
 
 // Field information
-// Field Connected information
-/* Enumeration options for field Connected */
-typedef enum { GCSTELEMETRYSTATS_CONNECTED_TRUE=0, GCSTELEMETRYSTATS_CONNECTED_FALSE=1,  } GCSTelemetryStatsConnectedOptions;
+// Field Status information
+/* Enumeration options for field Status */
+typedef enum { GCSTELEMETRYSTATS_STATUS_DISCONNECTED=0, GCSTELEMETRYSTATS_STATUS_HANDSHAKEREQ=1, GCSTELEMETRYSTATS_STATUS_HANDSHAKEACK=2, GCSTELEMETRYSTATS_STATUS_CONNECTED=3,  } GCSTelemetryStatsStatusOptions;
 // Field TxDataRate information
 // Field RxDataRate information
 // Field TxFailures information

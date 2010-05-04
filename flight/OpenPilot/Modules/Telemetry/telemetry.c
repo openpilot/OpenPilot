@@ -25,6 +25,7 @@
 
 #include "openpilot.h"
 #include "flighttelemetrystats.h"
+#include "gcstelemetrystats.h"
 
 // Private constants
 #define MAX_QUEUE_SIZE 20
@@ -58,6 +59,8 @@ static void updateObject(UAVObjHandle obj);
 static int32_t addObject(UAVObjHandle obj);
 static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs);
 static void processObjEvent(UAVObjEvent* ev);
+static void updateTelemetryStats();
+static void gcsTelemetryStatsUpdated();
 
 /**
  * Initialise the telemetry module
@@ -85,7 +88,8 @@ int32_t TelemetryInitialize(void)
 	txErrors = 0;
 	txRetries = 0;
 	memset(&ev, 0, sizeof(UAVObjEvent));
-	EventPeriodicQueueCreate(&ev, priorityQueue, STATS_UPDATE_PERIOD_MS);
+	EventPeriodicQueueCreate(&ev, queue, STATS_UPDATE_PERIOD_MS);
+	GCSTelemetryStatsConnectQueue(queue);
 
 	// Start telemetry tasks
 	xTaskCreate(telemetryTxTask, (signed char*)"TelTx", STACK_SIZE, NULL, TASK_PRIORITY_TX, &telemetryTxTaskHandle);
@@ -175,46 +179,15 @@ static void processObjEvent(UAVObjEvent* ev)
 	UAVObjMetadata metadata;
 	int32_t retries;
 	int32_t success;
-	UAVTalkStats utalkStats;
-	FlightTelemetryStatsData stats;
 
-	// Check if this is a periodic timer event (used to update stats)
-	if (ev->obj == 0)
+	if ( ev->obj == 0 )
 	{
-		// Get stats
-		UAVTalkGetStats(&utalkStats);
-		UAVTalkResetStats();
-
-		// Update stats object
-		FlightTelemetryStatsGet(&stats);
-		if (utalkStats.rxBytes > 0)
-		{
-			stats.Connected = FLIGHTTELEMETRYSTATS_CONNECTED_TRUE;
-		}
-		else
-		{
-			stats.Connected = FLIGHTTELEMETRYSTATS_CONNECTED_FALSE;
-		}
-		stats.RxDataRate = (float)utalkStats.rxBytes / ((float)STATS_UPDATE_PERIOD_MS/1000.0);
-		stats.TxDataRate = (float)utalkStats.txBytes / ((float)STATS_UPDATE_PERIOD_MS/1000.0);
-		stats.RxFailures += utalkStats.rxErrors;
-		stats.TxFailures += txErrors;
-		stats.TxRetries += txRetries;
-		txErrors = 0;
-		txRetries = 0;
-		FlightTelemetryStatsSet(&stats);
-
-		// Update the telemetry alarm
-		if ( stats.Connected == FLIGHTTELEMETRYSTATS_CONNECTED_TRUE )
-		{
-			AlarmsClear(SYSTEMALARMS_ALARM_TELEMETRY);
-		}
-		else
-		{
-			AlarmsSet(SYSTEMALARMS_ALARM_TELEMETRY, SYSTEMALARMS_ALARM_ERROR);
-		}
+		updateTelemetryStats();
 	}
-	// This is an object update, handle based on event type
+	else if ( ev->obj == GCSTelemetryStatsHandle() )
+	{
+		gcsTelemetryStatsUpdated();
+	}
 	else
 	{
 		// Get object metadata
@@ -394,5 +367,121 @@ static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs)
 	ev.instId = UAVOBJ_ALL_INSTANCES;
 	ev.event = EV_UPDATED_MANUAL;
 	return EventPeriodicQueueUpdate(&ev, queue, updatePeriodMs);
+}
+
+/**
+ * Called each time the GCS telemetry stats object is updated.
+ * Trigger a flight telemetry stats update if a connection is not
+ * yet established.
+ */
+static void gcsTelemetryStatsUpdated()
+{
+	FlightTelemetryStatsData flightStats;
+	GCSTelemetryStatsData gcsStats;
+	FlightTelemetryStatsGet(&flightStats);
+	GCSTelemetryStatsGet(&gcsStats);
+	if ( flightStats.Status != FLIGHTTELEMETRYSTATS_STATUS_CONNECTED ||
+		 gcsStats.Status != GCSTELEMETRYSTATS_STATUS_CONNECTED )
+	{
+		updateTelemetryStats();
+	}
+}
+
+/**
+ * Update telemetry statistics and handle connection handshake
+ */
+static void updateTelemetryStats()
+{
+	UAVTalkStats utalkStats;
+	FlightTelemetryStatsData flightStats;
+	GCSTelemetryStatsData gcsStats;
+	uint8_t forceUpdate;
+
+	// Get stats
+	UAVTalkGetStats(&utalkStats);
+	UAVTalkResetStats();
+
+	// Get object data
+	FlightTelemetryStatsGet(&flightStats);
+	GCSTelemetryStatsGet(&gcsStats);
+
+	// Update stats object
+	if ( flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED )
+	{
+		flightStats.RxDataRate = (float)utalkStats.rxBytes / ((float)STATS_UPDATE_PERIOD_MS/1000.0);
+		flightStats.TxDataRate = (float)utalkStats.txBytes / ((float)STATS_UPDATE_PERIOD_MS/1000.0);
+		flightStats.RxFailures += utalkStats.rxErrors;
+		flightStats.TxFailures += txErrors;
+		flightStats.TxRetries += txRetries;
+		txErrors = 0;
+		txRetries = 0;
+	}
+	else
+	{
+		flightStats.RxDataRate = 0;
+		flightStats.TxDataRate = 0;
+		flightStats.RxFailures = 0;
+		flightStats.TxFailures = 0;
+		flightStats.TxRetries = 0;
+		txErrors = 0;
+		txRetries = 0;
+	}
+
+    // Update connection state
+	forceUpdate = 1;
+	if ( flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED )
+	{
+		// Wait for connection request
+		if ( gcsStats.Status == GCSTELEMETRYSTATS_STATUS_HANDSHAKEREQ  )
+		{
+			flightStats.Status = FLIGHTTELEMETRYSTATS_STATUS_HANDSHAKEACK;
+		}
+	}
+	else if ( flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_HANDSHAKEACK )
+	{
+		// Wait for connection
+		if ( gcsStats.Status == GCSTELEMETRYSTATS_STATUS_CONNECTED  )
+		{
+			flightStats.Status = FLIGHTTELEMETRYSTATS_STATUS_CONNECTED;
+		}
+		else if ( gcsStats.Status == GCSTELEMETRYSTATS_STATUS_DISCONNECTED )
+		{
+			flightStats.Status = FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED;
+		}
+	}
+	else if ( flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED )
+	{
+		if ( gcsStats.Status != GCSTELEMETRYSTATS_STATUS_CONNECTED || utalkStats.rxBytes == 0 )
+		{
+			flightStats.Status = FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED;
+		}
+		else
+		{
+			forceUpdate = 0;
+		}
+	}
+	else
+	{
+		flightStats.Status = FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED;
+	}
+
+	// Update the telemetry alarm
+	if ( flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED )
+	{
+		AlarmsClear(SYSTEMALARMS_ALARM_TELEMETRY);
+	}
+	else
+	{
+		AlarmsSet(SYSTEMALARMS_ALARM_TELEMETRY, SYSTEMALARMS_ALARM_ERROR);
+	}
+
+	// Update object
+	FlightTelemetryStatsSet(&flightStats);
+
+	// Force telemetry update if not connected
+	if ( forceUpdate )
+	{
+		FlightTelemetryStatsUpdated();
+	}
 }
 

@@ -65,7 +65,7 @@ typedef struct {
 // Field information
 // Field Operation information
 /* Enumeration options for field Operation */
-typedef enum { OBJECTPERSISTENCE_OPERATION_LOAD=0, OBJECTPERSISTENCE_OPERATION_SAVE=1,  } ObjectPersistenceOperationOptions;
+typedef enum { OBJECTPERSISTENCE_OPERATION_LOAD=0, OBJECTPERSISTENCE_OPERATION_SAVE=1, OBJECTPERSISTENCE_OPERATION_DELETE=2,  } ObjectPersistenceOperationOptions;
 // Field Objects information
 /* Enumeration options for field Objects */
 typedef enum { OBJECTPERSISTENCE_OBJECTS_ALL=0, OBJECTPERSISTENCE_OBJECTS_SETTINGS=1, OBJECTPERSISTENCE_OBJECTS_METAOBJECTS=2,  } ObjectPersistenceObjectsOptions;

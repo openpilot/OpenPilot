@@ -743,6 +743,40 @@ int32_t UAVObjLoad(UAVObjHandle obj, uint16_t instId)
 }
 
 /**
+ * Delete an object from the file system (SD card).
+ * @param[in] obj The object handle.
+ * @param[in] instId The object instance
+ * @return 0 if success or -1 if failure
+ */
+int32_t UAVObjDelete(UAVObjHandle obj, uint16_t instId)
+{
+	ObjectList* objEntry;
+	uint8_t filename[14];
+
+	// Check for file system availability
+	if ( POIS_SDCARD_IsMounted() == 0 )
+	{
+		return -1;
+	}
+
+	// Lock
+	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+
+	// Cast to object
+	objEntry = (ObjectList*)obj;
+
+	// Get filename
+	objectFilename(objEntry, filename);
+
+	// Delete file
+	DFS_UnlinkFile(&PIOS_SDCARD_VolInfo, (uint8_t *)filename, PIOS_SDCARD_Sector);
+
+	// Done
+	xSemaphoreGiveRecursive(mutex);
+	return 0;
+}
+
+/**
  * Save all settings objects to the SD card.
  * @return 0 if success or -1 if failure
  */
@@ -805,6 +839,37 @@ int32_t UAVObjLoadSettings()
 }
 
 /**
+ * Delete all settings objects from the SD card.
+ * @return 0 if success or -1 if failure
+ */
+int32_t UAVObjDeleteSettings()
+{
+	ObjectList* objEntry;
+
+	// Get lock
+	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+
+	// Save all settings objects
+	LL_FOREACH(objList, objEntry)
+	{
+		// Check if this is a settings object
+		if ( objEntry->isSettings )
+		{
+			// Save object
+			if ( UAVObjDelete( (UAVObjHandle)objEntry, 0 ) == -1 )
+			{
+				xSemaphoreGiveRecursive(mutex);
+				return -1;
+			}
+		}
+	}
+
+	// Done
+	xSemaphoreGiveRecursive(mutex);
+	return 0;
+}
+
+/**
  * Save all metaobjects to the SD card.
  * @return 0 if success or -1 if failure
  */
@@ -854,6 +919,37 @@ int32_t UAVObjLoadMetaobjects()
 		{
 			// Load object
 			if ( UAVObjLoad( (UAVObjHandle)objEntry, 0 ) == -1 )
+			{
+				xSemaphoreGiveRecursive(mutex);
+				return -1;
+			}
+		}
+	}
+
+	// Done
+	xSemaphoreGiveRecursive(mutex);
+	return 0;
+}
+
+/**
+ * Delete all metaobjects from the SD card.
+ * @return 0 if success or -1 if failure
+ */
+int32_t UAVObjDeleteMetaobjects()
+{
+	ObjectList* objEntry;
+
+	// Get lock
+	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+
+	// Load all settings objects
+	LL_FOREACH(objList, objEntry)
+	{
+		// Check if this is a settings object
+		if ( objEntry->isMetaobject )
+		{
+			// Load object
+			if ( UAVObjDelete( (UAVObjHandle)objEntry, 0 ) == -1 )
 			{
 				xSemaphoreGiveRecursive(mutex);
 				return -1;

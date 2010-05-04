@@ -31,6 +31,7 @@
 #include <extensionsystem/iplugin.h>
 #include <extensionsystem/pluginmanager.h>
 #include <QtPlugin>
+#include "telemetrymonitor.h"
 #include "telemetry.h"
 #include "uavtalk.h"
 #include "uavobjects/uavobjectmanager.h"
@@ -55,6 +56,7 @@ private:
     UAVObjectManager* objMngr;
     UAVTalk* utalk;
     Telemetry* telemetry;
+    TelemetryMonitor* telemetryMon;
 };
 
 #endif // UAVTALKPLUGIN_H

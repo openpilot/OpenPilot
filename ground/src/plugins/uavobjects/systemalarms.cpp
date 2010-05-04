@@ -118,3 +118,11 @@ UAVDataObject* SystemAlarms::clone(quint32 instID)
     obj->initialize(instID, this->getMetaObject());
     return obj;
 }
+
+/**
+ * Static function to retrieve an instance of the object.
+ */
+SystemAlarms* SystemAlarms::GetInstance(UAVObjectManager* objMngr, quint32 instID)
+{
+    return dynamic_cast<SystemAlarms*>(objMngr->getObject(SystemAlarms::OBJID, instID));
+}

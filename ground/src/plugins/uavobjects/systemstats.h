@@ -32,6 +32,7 @@
 #define SYSTEMSTATS_H
 
 #include "uavdataobject.h"
+#include "uavobjectmanager.h"
 
 class UAVOBJECTS_EXPORT SystemStats: public UAVDataObject
 {
@@ -66,6 +67,8 @@ public:
     void setData(const DataFields& data);
     Metadata getDefaultMetadata();
     UAVDataObject* clone(quint32 instID);
+
+    static SystemStats* GetInstance(UAVObjectManager* objMngr, quint32 instID = 0);
 	
 private:
     DataFields data;

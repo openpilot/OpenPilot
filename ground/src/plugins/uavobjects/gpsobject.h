@@ -32,6 +32,7 @@
 #define GPSOBJECT_H
 
 #include "uavdataobject.h"
+#include "uavobjectmanager.h"
 
 class UAVOBJECTS_EXPORT GpsObject: public UAVDataObject
 {
@@ -70,6 +71,8 @@ public:
     void setData(const DataFields& data);
     Metadata getDefaultMetadata();
     UAVDataObject* clone(quint32 instID);
+
+    static GpsObject* GetInstance(UAVObjectManager* objMngr, quint32 instID = 0);
 	
 private:
     DataFields data;

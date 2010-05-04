@@ -71,10 +71,12 @@ void UAVTalkPlugin::onDeviceConnect(QIODevice *dev)
 {
     utalk = new UAVTalk(dev, objMngr);
     telemetry = new Telemetry(utalk, objMngr);
+    telemetryMon = new TelemetryMonitor(objMngr, telemetry);
 }
 
 void UAVTalkPlugin::onDeviceDisconnect()
 {
+    delete telemetryMon;
     delete telemetry;
     delete utalk;
 }

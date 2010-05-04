@@ -40,12 +40,14 @@ GCSTelemetryStats::GCSTelemetryStats(): UAVDataObject(OBJID, ISSINGLEINST, ISSET
 {
     // Create fields
     QList<UAVObjectField*> fields;
-    QStringList ConnectedElemNames;
-    ConnectedElemNames.append("0");
-    QStringList ConnectedEnumOptions;
-    ConnectedEnumOptions.append("True");
-    ConnectedEnumOptions.append("False");
-    fields.append(new UAVObjectFieldEnum(QString("Connected"), QString("bool"), ConnectedElemNames, ConnectedEnumOptions));
+    QStringList StatusElemNames;
+    StatusElemNames.append("0");
+    QStringList StatusEnumOptions;
+    StatusEnumOptions.append("Disconnected");
+    StatusEnumOptions.append("HandshakeReq");
+    StatusEnumOptions.append("HandshakeAck");
+    StatusEnumOptions.append("Connected");
+    fields.append(new UAVObjectFieldEnum(QString("Status"), QString(""), StatusElemNames, StatusEnumOptions));
     QStringList TxDataRateElemNames;
     TxDataRateElemNames.append("0");
     fields.append(new UAVObjectFieldFloat(QString("TxDataRate"), QString("bytes/sec"), TxDataRateElemNames));
@@ -75,10 +77,10 @@ UAVObject::Metadata GCSTelemetryStats::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
     metadata.gcsTelemetryAcked = 1;
-    metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_NEVER;
-    metadata.gcsTelemetryUpdatePeriod = 0;
+    metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+    metadata.gcsTelemetryUpdatePeriod = 5000;
     metadata.flightTelemetryAcked = 1;
-    metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_NEVER;
+    metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_MANUAL;
     metadata.flightTelemetryUpdatePeriod = 0;
     metadata.loggingUpdateMode = UAVObject::UPDATEMODE_NEVER;
     metadata.loggingUpdatePeriod = 0;
@@ -125,4 +127,12 @@ UAVDataObject* GCSTelemetryStats::clone(quint32 instID)
     GCSTelemetryStats* obj = new GCSTelemetryStats();
     obj->initialize(instID, this->getMetaObject());
     return obj;
+}
+
+/**
+ * Static function to retrieve an instance of the object.
+ */
+GCSTelemetryStats* GCSTelemetryStats::GetInstance(UAVObjectManager* objMngr, quint32 instID)
+{
+    return dynamic_cast<GCSTelemetryStats*>(objMngr->getObject(GCSTelemetryStats::OBJID, instID));
 }

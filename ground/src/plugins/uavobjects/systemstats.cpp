@@ -63,7 +63,7 @@ UAVObject::Metadata SystemStats::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
     metadata.gcsTelemetryAcked = 1;
-    metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_NEVER;
+    metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_MANUAL;
     metadata.gcsTelemetryUpdatePeriod = 0;
     metadata.flightTelemetryAcked = 1;
     metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
@@ -113,4 +113,12 @@ UAVDataObject* SystemStats::clone(quint32 instID)
     SystemStats* obj = new SystemStats();
     obj->initialize(instID, this->getMetaObject());
     return obj;
+}
+
+/**
+ * Static function to retrieve an instance of the object.
+ */
+SystemStats* SystemStats::GetInstance(UAVObjectManager* objMngr, quint32 instID)
+{
+    return dynamic_cast<SystemStats*>(objMngr->getObject(SystemStats::OBJID, instID));
 }

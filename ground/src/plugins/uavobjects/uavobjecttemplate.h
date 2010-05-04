@@ -32,6 +32,7 @@
 #define $(NAMEUC)_H
 
 #include "uavdataobject.h"
+#include "uavobjectmanager.h"
 
 class UAVOBJECTS_EXPORT $(NAME): public UAVDataObject
 {
@@ -60,6 +61,8 @@ $(DATAFIELDINFO)
     void setData(const DataFields& data);
     Metadata getDefaultMetadata();
     UAVDataObject* clone(quint32 instID);
+
+    static $(NAME)* GetInstance(UAVObjectManager* objMngr, quint32 instID = 0);
 	
 private:
     DataFields data;

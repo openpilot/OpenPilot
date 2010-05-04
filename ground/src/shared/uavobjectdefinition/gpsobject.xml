@@ -5,7 +5,7 @@
             <field name="Altitude" units="meters" type="float" elements="1"/>
             <field name="Satellites" units="" type="int8" elements="1"/>
             <field name="Updates" units="" type="uint16" elements="1"/>
-            <telemetrygcs acked="true" updatemode="never" period="0"/>
+            <telemetrygcs acked="true" updatemode="manual" period="0"/>
             <telemetryflight acked="true" updatemode="periodic" period="1000"/>
             <logging updatemode="periodic" period="1000"/>
 	</object>

@@ -428,3 +428,11 @@ QString UAVObject::toStringData()
     }
     return sout;
 }
+
+/**
+ * Emit the transactionCompleted event (used by the UAVTalk plugin)
+ */
+void UAVObject::emitTransactionCompleted(bool success)
+{
+    emit transactionCompleted(this, success);
+}

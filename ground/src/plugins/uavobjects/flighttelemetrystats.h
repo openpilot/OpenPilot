@@ -32,6 +32,7 @@
 #define FLIGHTTELEMETRYSTATS_H
 
 #include "uavdataobject.h"
+#include "uavobjectmanager.h"
 
 class UAVOBJECTS_EXPORT FlightTelemetryStats: public UAVDataObject
 {
@@ -40,7 +41,7 @@ class UAVOBJECTS_EXPORT FlightTelemetryStats: public UAVDataObject
 public:
     // Field structure
     typedef struct {
-        quint8 Connected;
+        quint8 Status;
         float TxDataRate;
         float RxDataRate;
         quint32 TxFailures;
@@ -50,9 +51,9 @@ public:
     } __attribute__((packed)) DataFields;
 
     // Field information
-    // Field Connected information
-    /* Enumeration options for field Connected */
-    typedef enum { CONNECTED_TRUE=0, CONNECTED_FALSE=1,  } ConnectedOptions;
+    // Field Status information
+    /* Enumeration options for field Status */
+    typedef enum { STATUS_DISCONNECTED=0, STATUS_HANDSHAKEREQ=1, STATUS_HANDSHAKEACK=2, STATUS_CONNECTED=3,  } StatusOptions;
     // Field TxDataRate information
     // Field RxDataRate information
     // Field TxFailures information
@@ -61,7 +62,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 766280320U;
+    static const quint32 OBJID = 1712072286U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;
@@ -74,6 +75,8 @@ public:
     void setData(const DataFields& data);
     Metadata getDefaultMetadata();
     UAVDataObject* clone(quint32 instID);
+
+    static FlightTelemetryStats* GetInstance(UAVObjectManager* objMngr, quint32 instID = 0);
 	
 private:
     DataFields data;

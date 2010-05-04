@@ -45,6 +45,7 @@ ObjectPersistence::ObjectPersistence(): UAVDataObject(OBJID, ISSINGLEINST, ISSET
     QStringList OperationEnumOptions;
     OperationEnumOptions.append("Load");
     OperationEnumOptions.append("Save");
+    OperationEnumOptions.append("Delete");
     fields.append(new UAVObjectFieldEnum(QString("Operation"), QString(""), OperationElemNames, OperationEnumOptions));
     QStringList ObjectsElemNames;
     ObjectsElemNames.append("0");
@@ -117,4 +118,12 @@ UAVDataObject* ObjectPersistence::clone(quint32 instID)
     ObjectPersistence* obj = new ObjectPersistence();
     obj->initialize(instID, this->getMetaObject());
     return obj;
+}
+
+/**
+ * Static function to retrieve an instance of the object.
+ */
+ObjectPersistence* ObjectPersistence::GetInstance(UAVObjectManager* objMngr, quint32 instID)
+{
+    return dynamic_cast<ObjectPersistence*>(objMngr->getObject(ObjectPersistence::OBJID, instID));
 }

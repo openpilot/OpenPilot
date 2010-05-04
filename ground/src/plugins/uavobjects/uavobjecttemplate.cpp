@@ -105,3 +105,11 @@ UAVDataObject* $(NAME)::clone(quint32 instID)
     obj->initialize(instID, this->getMetaObject());
     return obj;
 }
+
+/**
+ * Static function to retrieve an instance of the object.
+ */
+$(NAME)* $(NAME)::GetInstance(UAVObjectManager* objMngr, quint32 instID)
+{
+    return dynamic_cast<$(NAME)*>(objMngr->getObject($(NAME)::OBJID, instID));
+}

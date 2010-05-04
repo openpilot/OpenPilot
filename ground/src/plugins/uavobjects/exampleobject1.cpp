@@ -135,3 +135,11 @@ UAVDataObject* ExampleObject1::clone(quint32 instID)
     obj->initialize(instID, this->getMetaObject());
     return obj;
 }
+
+/**
+ * Static function to retrieve an instance of the object.
+ */
+ExampleObject1* ExampleObject1::GetInstance(UAVObjectManager* objMngr, quint32 instID)
+{
+    return dynamic_cast<ExampleObject1*>(objMngr->getObject(ExampleObject1::OBJID, instID));
+}

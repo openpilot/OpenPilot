@@ -32,6 +32,7 @@
 #define EXAMPLESETTINGS_H
 
 #include "uavdataobject.h"
+#include "uavobjectmanager.h"
 
 class UAVOBJECTS_EXPORT ExampleSettings: public UAVDataObject
 {
@@ -68,6 +69,8 @@ public:
     void setData(const DataFields& data);
     Metadata getDefaultMetadata();
     UAVDataObject* clone(quint32 instID);
+
+    static ExampleSettings* GetInstance(UAVObjectManager* objMngr, quint32 instID = 0);
 	
 private:
     DataFields data;

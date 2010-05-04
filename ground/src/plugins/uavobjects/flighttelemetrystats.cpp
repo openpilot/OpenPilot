@@ -40,12 +40,14 @@ FlightTelemetryStats::FlightTelemetryStats(): UAVDataObject(OBJID, ISSINGLEINST,
 {
     // Create fields
     QList<UAVObjectField*> fields;
-    QStringList ConnectedElemNames;
-    ConnectedElemNames.append("0");
-    QStringList ConnectedEnumOptions;
-    ConnectedEnumOptions.append("True");
-    ConnectedEnumOptions.append("False");
-    fields.append(new UAVObjectFieldEnum(QString("Connected"), QString("bool"), ConnectedElemNames, ConnectedEnumOptions));
+    QStringList StatusElemNames;
+    StatusElemNames.append("0");
+    QStringList StatusEnumOptions;
+    StatusEnumOptions.append("Disconnected");
+    StatusEnumOptions.append("HandshakeReq");
+    StatusEnumOptions.append("HandshakeAck");
+    StatusEnumOptions.append("Connected");
+    fields.append(new UAVObjectFieldEnum(QString("Status"), QString(""), StatusElemNames, StatusEnumOptions));
     QStringList TxDataRateElemNames;
     TxDataRateElemNames.append("0");
     fields.append(new UAVObjectFieldFloat(QString("TxDataRate"), QString("bytes/sec"), TxDataRateElemNames));
@@ -75,7 +77,7 @@ UAVObject::Metadata FlightTelemetryStats::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
     metadata.gcsTelemetryAcked = 1;
-    metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_NEVER;
+    metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_MANUAL;
     metadata.gcsTelemetryUpdatePeriod = 0;
     metadata.flightTelemetryAcked = 1;
     metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
@@ -125,4 +127,12 @@ UAVDataObject* FlightTelemetryStats::clone(quint32 instID)
     FlightTelemetryStats* obj = new FlightTelemetryStats();
     obj->initialize(instID, this->getMetaObject());
     return obj;
+}
+
+/**
+ * Static function to retrieve an instance of the object.
+ */
+FlightTelemetryStats* FlightTelemetryStats::GetInstance(UAVObjectManager* objMngr, quint32 instID)
+{
+    return dynamic_cast<FlightTelemetryStats*>(objMngr->getObject(FlightTelemetryStats::OBJID, instID));
 }

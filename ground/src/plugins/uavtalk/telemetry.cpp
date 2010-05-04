@@ -27,6 +27,7 @@
  */
 
 #include "telemetry.h"
+#include "qxtlogger.h"
 #include <QTime>
 
 /**
@@ -59,12 +60,8 @@ Telemetry::Telemetry(UAVTalk* utalk, UAVObjectManager* objMngr)
     connect(updateTimer, SIGNAL(timeout()), this, SLOT(processPeriodicUpdates()));
     updateTimer->start(1000);
     // Setup and start the stats timer
-    statsObj = dynamic_cast<GCSTelemetryStats*>( objMngr->getObject(GCSTelemetryStats::NAME) );
     txErrors = 0;
     txRetries = 0;
-    statsTimer = new QTimer(this);
-    connect(statsTimer, SIGNAL(timeout()), this, SLOT(processStatsUpdates()));
-    statsTimer->start(STATS_UPDATE_PERIOD_MS);
 }
 
 /**
@@ -211,6 +208,8 @@ void Telemetry::transactionCompleted(UAVObject* obj)
     // Check if there is a pending transaction and the objects match
     if ( transPending && transInfo.obj->getObjID() == obj->getObjID() )
     {
+        // Send signal
+        obj->emitTransactionCompleted(true);
         // Complete transaction
         transTimer->stop();
         transPending = false;
@@ -237,6 +236,8 @@ void Telemetry::transactionTimeout()
         }
         else
         {
+            // Send signal
+            transInfo.obj->emitTransactionCompleted(false);
             // Terminate transaction
             utalk->cancelTransaction();
             transPending = false;
@@ -281,13 +282,6 @@ void Telemetry::processObjectTransaction()
  */
 void Telemetry::processObjectUpdates(UAVObject* obj, EventMask event, bool allInstances, bool priority)
 {
-    // Check if queue is full
-    if ( objQueue.length() > MAX_QUEUE_SIZE )
-    {
-        ++txErrors;
-        return;
-    }
-
     // Push event into queue
     ObjectQueueInfo objInfo;
     objInfo.obj = obj;
@@ -302,6 +296,7 @@ void Telemetry::processObjectUpdates(UAVObject* obj, EventMask event, bool allIn
         else
         {
             ++txErrors;
+            qxtLog->warning(tr("Telemetry: priority event queue is full, event lost (%1)").arg(obj->getName()));
         }
     }
     else
@@ -328,6 +323,13 @@ void Telemetry::processObjectUpdates(UAVObject* obj, EventMask event, bool allIn
  */
 void Telemetry::processObjectQueue()
 {
+    // Don nothing if a transaction is already in progress (should not happen)
+    if (transPending)
+    {
+        qxtLog->error("Telemetry: Dequeue while a transaction pending!");
+        return;
+    }
+
     // Get object information from queue (first the priority and then the regular queue)
     ObjectQueueInfo objInfo;
     if ( !objPriorityQueue.isEmpty() )
@@ -429,32 +431,35 @@ void Telemetry::processPeriodicUpdates()
     updateTimer->start(timeToNextUpdateMs);
 }
 
-void Telemetry::processStatsUpdates()
+Telemetry::TelemetryStats Telemetry::getStats()
 {
     QMutexLocker locker(mutex);
 
     // Get UAVTalk stats
     UAVTalk::ComStats utalkStats = utalk->getStats();
-    utalk->resetStats();
 
-    // Update stats object
-    GCSTelemetryStats::DataFields stats = statsObj->getData();
-    if (utalkStats.rxBytes > 0)
-    {
-        stats.Connected = GCSTelemetryStats::CONNECTED_TRUE;
-    }
-    else
-    {
-        stats.Connected = GCSTelemetryStats::CONNECTED_FALSE;
-    }
-    stats.RxDataRate = (float)utalkStats.rxBytes / ((float)STATS_UPDATE_PERIOD_MS/1000.0);
-    stats.TxDataRate = (float)utalkStats.txBytes / ((float)STATS_UPDATE_PERIOD_MS/1000.0);
-    stats.RxFailures += utalkStats.rxErrors;
-    stats.TxFailures += txErrors;
-    stats.TxRetries += txRetries;
+    // Update stats
+    TelemetryStats stats;
+    stats.txBytes = utalkStats.txBytes;
+    stats.rxBytes = utalkStats.rxBytes;
+    stats.txObjectBytes = utalkStats.txObjectBytes;
+    stats.rxObjectBytes = utalkStats.rxObjectBytes;
+    stats.rxObjects = utalkStats.rxObjects;
+    stats.txObjects = utalkStats.txObjects;
+    stats.txErrors = utalkStats.txErrors + txErrors;
+    stats.rxErrors = utalkStats.rxErrors;
+    stats.txRetries = txRetries;
+
+    // Done
+    return stats;
+}
+
+void Telemetry::resetStats()
+{
+    QMutexLocker locker(mutex);
+    utalk->resetStats();
     txErrors = 0;
     txRetries = 0;
-    statsObj->setData(stats);
 }
 
 void Telemetry::objectUpdatedAuto(UAVObject* obj)

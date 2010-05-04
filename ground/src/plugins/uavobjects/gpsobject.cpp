@@ -69,7 +69,7 @@ UAVObject::Metadata GpsObject::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
     metadata.gcsTelemetryAcked = 1;
-    metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_NEVER;
+    metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_MANUAL;
     metadata.gcsTelemetryUpdatePeriod = 0;
     metadata.flightTelemetryAcked = 1;
     metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
@@ -119,4 +119,12 @@ UAVDataObject* GpsObject::clone(quint32 instID)
     GpsObject* obj = new GpsObject();
     obj->initialize(instID, this->getMetaObject());
     return obj;
+}
+
+/**
+ * Static function to retrieve an instance of the object.
+ */
+GpsObject* GpsObject::GetInstance(UAVObjectManager* objMngr, quint32 instID)
+{
+    return dynamic_cast<GpsObject*>(objMngr->getObject(GpsObject::OBJID, instID));
 }

@@ -100,6 +100,7 @@ public:
     QString toString();
     QString toStringBrief();
     QString toStringData();
+    void emitTransactionCompleted(bool success);
 
 signals:
     void objectUpdated(UAVObject* obj);
@@ -107,6 +108,7 @@ signals:
     void objectUpdatedManual(UAVObject* obj);
     void objectUnpacked(UAVObject* obj);
     void updateRequested(UAVObject* obj);
+    void transactionCompleted(UAVObject* obj, bool success);
 
 private slots:
     void fieldUpdated(UAVObjectField* field);

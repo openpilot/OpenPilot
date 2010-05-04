@@ -32,6 +32,7 @@
 #define OBJECTPERSISTENCE_H
 
 #include "uavdataobject.h"
+#include "uavobjectmanager.h"
 
 class UAVOBJECTS_EXPORT ObjectPersistence: public UAVDataObject
 {
@@ -48,7 +49,7 @@ public:
     // Field information
     // Field Operation information
     /* Enumeration options for field Operation */
-    typedef enum { OPERATION_LOAD=0, OPERATION_SAVE=1,  } OperationOptions;
+    typedef enum { OPERATION_LOAD=0, OPERATION_SAVE=1, OPERATION_DELETE=2,  } OperationOptions;
     // Field Objects information
     /* Enumeration options for field Objects */
     typedef enum { OBJECTS_ALL=0, OBJECTS_SETTINGS=1, OBJECTS_METAOBJECTS=2,  } ObjectsOptions;
@@ -68,6 +69,8 @@ public:
     void setData(const DataFields& data);
     Metadata getDefaultMetadata();
     UAVDataObject* clone(quint32 instID);
+
+    static ObjectPersistence* GetInstance(UAVObjectManager* objMngr, quint32 instID = 0);
 	
 private:
     DataFields data;

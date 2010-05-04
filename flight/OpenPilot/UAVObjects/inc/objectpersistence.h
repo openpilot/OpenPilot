@@ -33,7 +33,7 @@
 #define OBJECTPERSISTENCE_H
 
 // Object constants
-#define OBJECTPERSISTENCE_OBJID 2407027612U
+#define OBJECTPERSISTENCE_OBJID 572614706U
 #define OBJECTPERSISTENCE_NAME "ObjectPersistence"
 #define OBJECTPERSISTENCE_METANAME "ObjectPersistenceMeta"
 #define OBJECTPERSISTENCE_ISSINGLEINST 1
@@ -58,7 +58,9 @@
 // Object data
 typedef struct {
     uint8_t Operation;
-    uint8_t Objects;
+    uint8_t Selection;
+    uint32_t ObjectID;
+    uint32_t InstanceID;
 
 } __attribute__((packed)) ObjectPersistenceData;
 
@@ -66,9 +68,11 @@ typedef struct {
 // Field Operation information
 /* Enumeration options for field Operation */
 typedef enum { OBJECTPERSISTENCE_OPERATION_LOAD=0, OBJECTPERSISTENCE_OPERATION_SAVE=1, OBJECTPERSISTENCE_OPERATION_DELETE=2,  } ObjectPersistenceOperationOptions;
-// Field Objects information
-/* Enumeration options for field Objects */
-typedef enum { OBJECTPERSISTENCE_OBJECTS_ALL=0, OBJECTPERSISTENCE_OBJECTS_SETTINGS=1, OBJECTPERSISTENCE_OBJECTS_METAOBJECTS=2,  } ObjectPersistenceObjectsOptions;
+// Field Selection information
+/* Enumeration options for field Selection */
+typedef enum { OBJECTPERSISTENCE_SELECTION_SINGLEOBJECT=0, OBJECTPERSISTENCE_SELECTION_ALLSETTINGS=1, OBJECTPERSISTENCE_SELECTION_ALLMETAOBJECTS=2, OBJECTPERSISTENCE_SELECTION_ALLOBJECTS=3,  } ObjectPersistenceSelectionOptions;
+// Field ObjectID information
+// Field InstanceID information
 
 
 // Generic interface functions

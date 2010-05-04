@@ -120,6 +120,7 @@ static void systemTask(void* parameters)
 static void objectUpdatedCb(UAVObjEvent* ev)
 {
 	ObjectPersistenceData objper;
+	UAVObjHandle obj;
 
 	// If the object updated was the ObjectPersistence execute requested action
 	if ( ev->obj == ObjectPersistenceHandle() )
@@ -130,33 +131,66 @@ static void objectUpdatedCb(UAVObjEvent* ev)
 		// Execute action
 		if ( objper.Operation == OBJECTPERSISTENCE_OPERATION_LOAD)
 		{
-			if ( objper.Objects == OBJECTPERSISTENCE_OBJECTS_SETTINGS || objper.Objects == OBJECTPERSISTENCE_OBJECTS_ALL)
+			if ( objper.Selection == OBJECTPERSISTENCE_SELECTION_SINGLEOBJECT )
+			{
+				// Get selected object
+				obj = UAVObjGetByID(objper.ObjectID);
+				if ( obj == 0)
+				{
+					return;
+				}
+				// Load selected instance
+				UAVObjLoad(obj, objper.InstanceID);
+			}
+			else if ( objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLSETTINGS || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS)
 			{
 				UAVObjLoadSettings();
 			}
-			if ( objper.Objects == OBJECTPERSISTENCE_OBJECTS_METAOBJECTS || objper.Objects == OBJECTPERSISTENCE_OBJECTS_ALL)
+			else if ( objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLMETAOBJECTS || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS)
 			{
 				UAVObjLoadMetaobjects();
 			}
 		}
 		else if ( objper.Operation == OBJECTPERSISTENCE_OPERATION_SAVE)
 		{
-			if ( objper.Objects == OBJECTPERSISTENCE_OBJECTS_SETTINGS || objper.Objects == OBJECTPERSISTENCE_OBJECTS_ALL)
+			if ( objper.Selection == OBJECTPERSISTENCE_SELECTION_SINGLEOBJECT )
+			{
+				// Get selected object
+				obj = UAVObjGetByID(objper.ObjectID);
+				if ( obj == 0)
+				{
+					return;
+				}
+				// Save selected instance
+				UAVObjSave(obj, objper.InstanceID);
+			}
+			else if ( objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLSETTINGS || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS)
 			{
 				UAVObjSaveSettings();
 			}
-			if ( objper.Objects == OBJECTPERSISTENCE_OBJECTS_METAOBJECTS || objper.Objects == OBJECTPERSISTENCE_OBJECTS_ALL)
+			else if ( objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLMETAOBJECTS || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS)
 			{
 				UAVObjSaveMetaobjects();
 			}
 		}
 		else if ( objper.Operation == OBJECTPERSISTENCE_OPERATION_DELETE)
 		{
-			if ( objper.Objects == OBJECTPERSISTENCE_OBJECTS_SETTINGS || objper.Objects == OBJECTPERSISTENCE_OBJECTS_ALL)
+			if ( objper.Selection == OBJECTPERSISTENCE_SELECTION_SINGLEOBJECT )
+			{
+				// Get selected object
+				obj = UAVObjGetByID(objper.ObjectID);
+				if ( obj == 0)
+				{
+					return;
+				}
+				// Delete selected instance
+				UAVObjDelete(obj, objper.InstanceID);
+			}
+			else if ( objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLSETTINGS || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS)
 			{
 				UAVObjDeleteSettings();
 			}
-			if ( objper.Objects == OBJECTPERSISTENCE_OBJECTS_METAOBJECTS || objper.Objects == OBJECTPERSISTENCE_OBJECTS_ALL)
+			else if ( objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLMETAOBJECTS || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS)
 			{
 				UAVObjDeleteMetaobjects();
 			}

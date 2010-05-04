@@ -151,7 +151,6 @@ namespace jafar {
 				}
 
 			private:
-				// todo : try to compile with matrix defined here
 				// temporary matrices to speed up Jacobian computation
 								mat33 PNEW_dx; ///<      Temporary Jacobian matrix
 								mat34 PNEW_q;

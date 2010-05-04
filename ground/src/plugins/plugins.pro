@@ -75,6 +75,11 @@ plugin_airspeed.subdir = airspeed
 plugin_airspeed.depends = plugin_coreplugin
 SUBDIRS += plugin_airspeed
 
+#Linear Dial Gadget
+plugin_lineardial.subdir = lineardial
+plugin_lineardial.depends = plugin_coreplugin
+SUBDIRS += plugin_lineardial
+
 #Config Gadget
 plugin_config.subdir = config
 plugin_config.depends = plugin_coreplugin

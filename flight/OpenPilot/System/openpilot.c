@@ -126,7 +126,7 @@ void OpenPilotInit()
 
 	/* Create test tasks */
 	//xTaskCreate(TaskTesting, (signed portCHAR *)"Testing", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
-	xTaskCreate(TaskHIDTest, (signed portCHAR *)"HIDTest", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
+	xTaskCreate(TaskHIDTest, (signed portCHAR *)"HIDTest", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
 	//xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
 	//xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
 }

@@ -126,7 +126,7 @@ void OpenPilotInit()
 
 	/* Create test tasks */
 	//xTaskCreate(TaskTesting, (signed portCHAR *)"Testing", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
-	xTaskCreate(TaskHIDTest, (signed portCHAR *)"HIDTest", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
+	//xTaskCreate(TaskHIDTest, (signed portCHAR *)"HIDTest", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
 	//xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
 	//xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
 }
@@ -193,6 +193,7 @@ static void TaskHIDTest(void *pvParameters)
 			byte = PIOS_COM_ReceiveBuffer(COM_USB_HID);
 			if(byte == '\r' || byte == '\n' || byte == 0) {
 				PIOS_COM_SendFormattedString(COM_USB_HID, "RX: %s\r", line_buffer);
+				PIOS_COM_SendFormattedString(COM_DEBUG_USART, "RX: %s\r", line_buffer);
 				line_ix = 0;
 			} else if(line_ix < (64 - 1)) {
 				line_buffer[line_ix++] = byte;
@@ -308,5 +309,4 @@ static void TaskSDCard(void *pvParameters)
 		}
 	}
 }
-
 

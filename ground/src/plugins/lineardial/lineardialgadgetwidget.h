@@ -80,6 +80,7 @@ private:
    qreal startY; // green/yellow/red zones.
    qreal bargraphWidth;
    qreal indexHeight;
+   qreal indexWidth;
 
    double testVal;
 

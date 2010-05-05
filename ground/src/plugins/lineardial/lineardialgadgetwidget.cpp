@@ -105,17 +105,23 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
          QMatrix barMatrix = m_renderer->matrixForElement("bargraph");
          startX = barMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).x();
          startY = barMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).y();
+         std::cout << "StartX: " << startX << std::endl;
+         std::cout << "StartY: " << startY << std::endl;
          bargraphWidth = barMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).width();
          indexHeight = m_renderer->matrixForElement("needle").mapRect(m_renderer->boundsOnElement("needle")).height();
+         indexWidth = m_renderer->matrixForElement("needle").mapRect(m_renderer->boundsOnElement("needle")).width();
          std::cout << "Index height: " << indexHeight << std::endl;
 
+         QTransform matrix;
+         matrix.translate(startX-indexWidth/2,startY-indexHeight/2);
+         index->setTransform(matrix,false);
          // Now adjust the red/yellow/green zones:
          double range = maxValue-minValue;
 
          green->resetTransform();
          double greenScale = (greenMax-greenMin)/range;
          double greenStart = (greenMin-minValue)/range*green->boundingRect().width();
-         QTransform matrix;
+         matrix.reset();
          matrix.scale(greenScale,1);
          matrix.translate((greenStart+startX)/greenScale,startY);
          green->setTransform(matrix,false);
@@ -194,8 +200,12 @@ void LineardialGadgetWidget::moveIndex()
     if ((abs((indexValue-indexTarget)*10) > 3)) {
         indexValue += (indexTarget - indexValue)/10;
        index->resetTransform();
+       // TODO: do not do so many calculations during the update
+       // code, precompute everything;
        qreal factor = bargraphWidth/100;
-       index->translate(indexValue*factor+startX,startY-indexHeight/2);
+       QTransform matrix;
+       matrix.translate(indexValue*factor+startX-indexWidth/2,startY-indexHeight/2);
+       index->setTransform(matrix,false);
        update();
    }
 }
@@ -204,7 +214,7 @@ void LineardialGadgetWidget::moveIndex()
 // Test function for timer to rotate needles
 void LineardialGadgetWidget::testRotate()
 {
-    testVal+=15;
+    testVal=0;
     if (testVal > maxValue) testVal=minValue;
    setIndex((double)testVal);
 }

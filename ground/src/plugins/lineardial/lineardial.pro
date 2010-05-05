@@ -1,5 +1,5 @@
 TEMPLATE = lib
-TARGET = lineardialGadget
+TARGET = LineardialGadget
 QT += svg
 include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)

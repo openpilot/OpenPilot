@@ -80,6 +80,12 @@ plugin_lineardial.subdir = lineardial
 plugin_lineardial.depends = plugin_coreplugin
 SUBDIRS += plugin_lineardial
 
+#System health Gadget
+plugin_systemhealth.subdir = systemhealth
+plugin_systemhealth.depends = plugin_coreplugin
+SUBDIRS += plugin_systemhealth
+
+
 #Config Gadget
 plugin_config.subdir = config
 plugin_config.depends = plugin_coreplugin

@@ -225,16 +225,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="38.77253"
+     inkscape:zoom="3.959798"
+     inkscape:cx="137.09042"
      inkscape:cy="20.867055"
      inkscape:document-units="px"
-     inkscape:current-layer="g2932"
+     inkscape:current-layer="background"
      showgrid="false"
      inkscape:window-width="1280"
-     inkscape:window-height="800"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-height="744"
+     inkscape:window-x="-4"
+     inkscape:window-y="1020"
      inkscape:window-maximized="1"
      inkscape:object-paths="true"
      showguides="true"
@@ -310,8 +310,20 @@
          x="250.30202"
          height="9.2538376"
          width="260.53882"
-         id="bargraph"
+         id="bargraph-outer"
          style="fill:#332d2d;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+      <rect
+         style="fill:#332d2d;fill-opacity:1;stroke:none;stroke-width:2;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         id="bargraph"
+         width="260.53882"
+         height="9.2538376"
+         x="250.30202"
+         y="395.16541"
+         ry="0.68289828"
+         inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
+         inkscape:export-xdpi="88.809998"
+         inkscape:export-ydpi="88.809998"
+         inkscape:label="#rect4388" />
     </g>
   </g>
   <g
@@ -319,31 +331,18 @@
      id="layer5"
      inkscape:label="Green Zone"
      style="display:inline">
-    <g
-       style="display:inline"
+    <rect
+       inkscape:label="#rect5741"
+       style="fill:#04b629;fill-opacity:1;stroke:none;display:inline"
        id="green"
-       inkscape:label="#g3825">
-      <rect
-         transform="translate(-227.44331,-365.7337)"
-         inkscape:export-ydpi="88.809998"
-         inkscape:export-xdpi="88.809998"
-         inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
-         ry="0.68289828"
-         y="395.16541"
-         x="250.30202"
-         height="9.2538376"
-         width="260.53882"
-         id="rect3827"
-         style="fill:#04b629;fill-opacity:1;stroke:none;display:inline"
-         inkscape:label="#rect5741" />
-      <rect
-         y="0.0040975953"
-         x="0"
-         height="47.110001"
-         width="306.26001"
-         id="rect3829"
-         style="fill:none;stroke:none" />
-    </g>
+       width="260.53882"
+       height="9.2538376"
+       x="22.858707"
+       y="29.431705"
+       ry="0.68289828"
+       inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
+       inkscape:export-xdpi="88.809998"
+       inkscape:export-ydpi="88.809998" />
   </g>
   <g
      inkscape:groupmode="layer"
@@ -373,61 +372,36 @@
          id="rect3786"
          style="fill:none;stroke:none" />
     </g>
-    <g
+    <rect
+       inkscape:export-ydpi="88.809998"
+       inkscape:export-xdpi="88.809998"
+       inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
+       ry="0.68289828"
+       y="29.431705"
+       x="22.858707"
+       height="9.2538376"
+       width="260.53882"
        id="yellow"
-       inkscape:label="#g3803">
-      <rect
-         inkscape:label="#rect5741"
-         style="fill:#f1b907;fill-opacity:1;stroke:none;display:inline"
-         id="rect3805"
-         width="260.53882"
-         height="9.2538376"
-         x="250.30202"
-         y="395.16541"
-         ry="0.68289828"
-         inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
-         inkscape:export-xdpi="88.809998"
-         inkscape:export-ydpi="88.809998"
-         transform="translate(-227.44331,-365.7337)" />
-      <rect
-         style="fill:none;stroke:none"
-         id="rect3807"
-         width="306.26001"
-         height="47.110001"
-         x="0"
-         y="0.0040975953" />
-    </g>
+       style="fill:#f1b907;fill-opacity:1;stroke:none;display:inline"
+       inkscape:label="#rect5741" />
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer3"
      inkscape:label="Red zone"
      style="display:inline">
-    <g
-       style="display:inline"
+    <rect
+       inkscape:label="#rect5741"
+       style="fill:#cf0e0e;fill-opacity:1;stroke:none;display:inline"
        id="red"
-       inkscape:label="#g3816">
-      <rect
-         transform="translate(-227.44331,-365.7337)"
-         inkscape:export-ydpi="88.809998"
-         inkscape:export-xdpi="88.809998"
-         inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
-         ry="0.68289828"
-         y="395.16541"
-         x="250.30202"
-         height="9.2538376"
-         width="260.53882"
-         id="rect3818"
-         style="fill:#cf0e0e;fill-opacity:1;stroke:none;display:inline"
-         inkscape:label="#rect5741" />
-      <rect
-         y="0.0040975953"
-         x="0"
-         height="47.110001"
-         width="306.26001"
-         id="rect3820"
-         style="fill:none;stroke:none" />
-    </g>
+       width="260.53882"
+       height="9.2538376"
+       x="22.858707"
+       y="29.431705"
+       ry="0.68289828"
+       inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
+       inkscape:export-xdpi="88.809998"
+       inkscape:export-ydpi="88.809998" />
   </g>
   <g
      inkscape:groupmode="layer"

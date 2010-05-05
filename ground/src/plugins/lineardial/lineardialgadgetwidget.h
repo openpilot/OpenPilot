@@ -48,7 +48,7 @@ public:
    void setRange(double min, double max) { minValue=min; maxValue=max;}
    void setGreenRange(double min, double max) {greenMin=min; greenMax=max;}
    void setYellowRange(double min, double max) {yellowMin=min; yellowMax=max;}
-   void setRedRange(double min, double max) {redMin=min; yellowMax=max;}
+   void setRedRange(double min, double max) {redMin=min; redMax=max;}
    void connectInput(QString obj, QString field);
 
    void setIndex(double val);
@@ -68,7 +68,6 @@ private:
    QSvgRenderer *m_renderer;
    QGraphicsSvgItem *background;
    QGraphicsSvgItem *foreground;
-   QGraphicsSvgItem *bargraph;
    QGraphicsSvgItem *index;
    QGraphicsSvgItem *green;
    QGraphicsSvgItem *yellow;
@@ -76,6 +75,13 @@ private:
 
                    // Simple flag to skip rendering if the
    bool fgenabled; // layer does not exist.
+
+   qreal startX; // Where we should draw the bargraph
+   qreal startY; // green/yellow/red zones.
+   qreal bargraphWidth;
+   qreal indexHeight;
+
+   double testVal;
 
    double minValue;
    double maxValue;

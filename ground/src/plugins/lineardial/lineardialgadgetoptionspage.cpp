@@ -51,10 +51,16 @@ QWidget *LineardialGadgetOptionsPage::createPage(QWidget *parent)
 
     // Restore the contents from the settings:
     options_page->svgSourceFile->setText(m_config->getDialFile());
-
+    options_page->minValue->setValue(m_config->getMin());
+    options_page->maxValue->setValue(m_config->getMax());
+    options_page->greenMin->setValue(m_config->getGreenMin());
+    options_page->greenMax->setValue(m_config->getGreenMax());
+    options_page->yellowMin->setValue(m_config->getYellowMin());
+    options_page->yellowMax->setValue(m_config->getYellowMax());
+    options_page->redMin->setValue(m_config->getRedMin());
+    options_page->redMax->setValue(m_config->getRedMax());
 
     connect(options_page->loadFile, SIGNAL(clicked()), this, SLOT(on_loadFile_clicked()));
-
 
     return optionsPageWidget;
 }
@@ -67,7 +73,10 @@ QWidget *LineardialGadgetOptionsPage::createPage(QWidget *parent)
 void LineardialGadgetOptionsPage::apply()
 {
     m_config->setDialFile(options_page->svgSourceFile->text());
-
+    m_config->setRange(options_page->minValue->value(),options_page->maxValue->value());
+    m_config->setGreenRange(options_page->greenMin->value(),options_page->greenMax->value());
+    m_config->setYellowRange(options_page->yellowMin->value(),options_page->yellowMax->value());
+    m_config->setRedRange(options_page->redMin->value(),options_page->redMax->value());
 }
 
 /**

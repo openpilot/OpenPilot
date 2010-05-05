@@ -33,14 +33,13 @@
 
 LineardialGadgetWidget::LineardialGadgetWidget(QWidget *parent) : QGraphicsView(parent)
 {
-    setMinimumSize(64,64);
+    setMinimumSize(128,32);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setScene(new QGraphicsScene(this));
  
     m_renderer = new QSvgRenderer();
     background = new QGraphicsSvgItem();
     foreground = new QGraphicsSvgItem();
-    bargraph = new QGraphicsSvgItem();
     green = new QGraphicsSvgItem();
     yellow = new QGraphicsSvgItem();
     red = new QGraphicsSvgItem();
@@ -50,14 +49,14 @@ LineardialGadgetWidget::LineardialGadgetWidget(QWidget *parent) : QGraphicsView(
     indexTarget = 0;
     indexValue = 0;
 
-    // This timer mechanism makes needles rotate smoothly
+    // This timer mechanism makes the index rotate smoothly
     connect(&dialTimer, SIGNAL(timeout()), this, SLOT(moveIndex()));
     dialTimer.start(30);
 
-    // Test code for timer to rotate the needle
+    // Test code for timer to move the index
     testSpeed=0;
     connect(&m_testTimer, SIGNAL(timeout()), this, SLOT(testRotate()));
-    m_testTimer.start(4000);
+    m_testTimer.start(1000);
 }
 
 LineardialGadgetWidget::~LineardialGadgetWidget()
@@ -98,42 +97,44 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
             foreground->setElementId("foreground");
             fgenabled = true;
         }
-
          std::cout<<"Dial file loaded"<<std::endl;
          QGraphicsScene *l_scene = scene();
 
-         maxValue = 100;
-         minValue = 0;
-         redMin = 0;
-         redMax = 100;
-         yellowMin = 30;
-         yellowMax = 90;
-         greenMin = 50;
-         greenMax = 70;
+         // In order to properly render the Green/Yellow/Red graphs, we need to find out
+         // the starting location of the bargraph rendering area:
+         QMatrix barMatrix = m_renderer->matrixForElement("bargraph");
+         startX = barMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).x();
+         startY = barMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).y();
+         bargraphWidth = barMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).width();
+         indexHeight = m_renderer->matrixForElement("needle").mapRect(m_renderer->boundsOnElement("needle")).height();
+         std::cout << "Index height: " << indexHeight << std::endl;
+
          // Now adjust the red/yellow/green zones:
          double range = maxValue-minValue;
+
+         green->resetTransform();
          double greenScale = (greenMax-greenMin)/range;
-         double greenStart = greenMin/range*green->boundingRect().width();
-         std::cout << "Width:" << green->boundingRect().width();
+         double greenStart = (greenMin-minValue)/range*green->boundingRect().width();
          QTransform matrix;
-         matrix.translate(greenStart,0);
          matrix.scale(greenScale,1);
+         matrix.translate((greenStart+startX)/greenScale,startY);
          green->setTransform(matrix,false);
 
+         yellow->resetTransform();
          double yellowScale = (yellowMax-yellowMin)/range;
-         double yellowStart = yellowMin/range*yellow->boundingRect().width();
+         double yellowStart = (yellowMin-minValue)/range*yellow->boundingRect().width();
          matrix.reset();
-         matrix.translate(yellowStart,0);
          matrix.scale(yellowScale,1);
+         matrix.translate((yellowStart+startX)/yellowScale,startY);
          yellow->setTransform(matrix,false);
 
+         red->resetTransform();
          double redScale = (redMax-redMin)/range;
-         double redStart = redMin/range*red->boundingRect().width();
+         double redStart = (redMin-minValue)/range*red->boundingRect().width();
          matrix.reset();
-         matrix.translate(redStart,0);
          matrix.scale(redScale,1);
+         matrix.translate((redStart+startX)/redScale,startY);
          red->setTransform(matrix,false);
-
 
          l_scene->setSceneRect(background->boundingRect());
 
@@ -193,17 +194,17 @@ void LineardialGadgetWidget::moveIndex()
     if ((abs((indexValue-indexTarget)*10) > 3)) {
         indexValue += (indexTarget - indexValue)/10;
        index->resetTransform();
-       double factor = index->boundingRect().width()/100;
-       index->translate(indexValue*factor,0);
-    }
-   update();
+       qreal factor = bargraphWidth/100;
+       index->translate(indexValue*factor+startX,startY-indexHeight/2);
+       update();
+   }
 }
 
 
 // Test function for timer to rotate needles
 void LineardialGadgetWidget::testRotate()
 {
-    int testVal = rand() % (int)maxValue;
+    testVal+=15;
+    if (testVal > maxValue) testVal=minValue;
    setIndex((double)testVal);
-
 }

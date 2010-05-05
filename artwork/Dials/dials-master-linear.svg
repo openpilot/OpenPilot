@@ -225,11 +225,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.959798"
+     inkscape:zoom="1.979899"
      inkscape:cx="137.09042"
      inkscape:cy="20.867055"
      inkscape:document-units="px"
-     inkscape:current-layer="background"
+     inkscape:current-layer="layer6"
      showgrid="false"
      inkscape:window-width="1280"
      inkscape:window-height="744"
@@ -408,23 +408,12 @@
      id="layer6"
      inkscape:label="Indicator"
      style="display:inline">
-    <g
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:#c2bfbf;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 29.39406,23.75432 -14.268403,0 7.134202,12 7.134201,-12 z"
        id="needle"
-       inkscape:label="#g3702">
-      <path
-         inkscape:label="#path5747"
-         sodipodi:nodetypes="cccc"
-         id="needle0"
-         d="m 29.39406,23.75432 -14.268403,0 7.134202,12 7.134201,-12 z"
-         style="fill:#ffffff;fill-opacity:1;stroke:#c2bfbf;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-      <rect
-         y="0.0040975953"
-         x="0"
-         height="47.110001"
-         width="306.26001"
-         id="rect2922"
-         style="fill:none;stroke:none" />
-    </g>
+       sodipodi:nodetypes="cccc"
+       inkscape:label="#path5747" />
   </g>
   <g
      inkscape:groupmode="layer"

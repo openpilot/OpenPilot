@@ -64,30 +64,43 @@ SystemHealthGadgetWidget::SystemHealthGadgetWidget(QWidget *parent) : QGraphicsV
 
 void SystemHealthGadgetWidget::updateAlarms(UAVObject* systemAlarm)
 {
+    // This code does not know anything about alarms beforehand, and
+    // I found to efficient way to locate items inside the scene by
+    // name, so it's just as simple to reset the scene:
+    // And add the one with the right name.
+    QGraphicsScene *m_scene = scene();
+    foreach ( QGraphicsItem* item , m_scene->items()){
+        m_scene->removeItem(item);
+    }
+    m_scene->addItem(background);
+
     QString alarm = systemAlarm->getName();
-    std::cout << "System Alarm: " << alarm.toStdString() << std::endl;
-    std::cout << "Object Name: " << systemAlarm->objectName().toStdString() << std::endl;
-    std::cout << "Object Elements: " << std::endl;
     foreach (UAVObjectField *field, systemAlarm->getFields()) {
-        std::cout << "Field Name: " << field->getName().toStdString() << std::endl;
         for (uint i = 0; i < field->getNumElements(); ++i) {
-            std::cout << "  Option: " << field->getElementNames()[i].toStdString() << std::endl;
             QString element = field->getElementNames()[i];
+            QString value = field->getValue(i).toString();
             if (m_renderer->elementExists(element)) {
                 QMatrix blockMatrix = m_renderer->matrixForElement(element);
                 qreal startX = blockMatrix.mapRect(m_renderer->boundsOnElement(element)).x();
                 qreal startY = blockMatrix.mapRect(m_renderer->boundsOnElement(element)).y();
-                std::cout << "     StartX: " << startX << std::endl;
-                std::cout << "     StartY: " << startY << std::endl;
+                QString element2 = element + "-" + value;
+                if (m_renderer->elementExists(element2)) {
+                    QGraphicsSvgItem *ind = new QGraphicsSvgItem();
+                    ind->setSharedRenderer(m_renderer);
+                    ind->setElementId(element2);
+                    QTransform matrix;
+                    matrix.translate(startX,startY);
+                    ind->setTransform(matrix,false);
+                    m_scene->addItem(ind);
+                } else {
+                    std::cout << "Warning: element " << element2.toStdString() << " not found in SVG."<<std::endl;
+                }
             } else {
-                std::cout << "     Element not found in SVG" << std::endl;
+                std::cout << "Warning: Element " << element.toStdString() << " not found in SVG." << std::endl;
             }
-            std::cout << "  Option value: " << field->getValue(i).toString().toStdString() << std::endl;
         }
-
-
     }
-
+    m_scene->addItem(foreground);
 }
 
 SystemHealthGadgetWidget::~SystemHealthGadgetWidget()
@@ -111,11 +124,11 @@ void SystemHealthGadgetWidget::setSystemFile(QString dfn)
          if (m_renderer->elementExists("foreground")) {
             foreground->setSharedRenderer(m_renderer);
             foreground->setElementId("foreground");
+            foreground->setZValue(99);
             fgenabled = true;
         }
          std::cout<<"Dial file loaded"<<std::endl;
          QGraphicsScene *l_scene = scene();
-
          l_scene->setSceneRect(background->boundingRect());
          fitInView(background, Qt::KeepAspectRatio );
      }

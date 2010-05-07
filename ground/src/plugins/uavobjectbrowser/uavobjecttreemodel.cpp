@@ -165,41 +165,31 @@ void UAVObjectTreeModel::addSingleField(int index, UAVObjectField *field, TreeIt
 
     FieldTreeItem *item;
     UAVObjectField::FieldType type = field->getType();
-    if (type == UAVObjectField::ENUM) {
+    switch (type) {
+    case UAVObjectField::ENUM: {
         QStringList options = field->getOptions();
         QVariant value = field->getValue();
         data.append( options.indexOf(value.toString()) );
         data.append(field->getUnits());
         item = new EnumFieldTreeItem(field, index, data);
-    } else if (type == UAVObjectField::INT8) {
+        break;
+    }
+    case UAVObjectField::INT8:
+    case UAVObjectField::INT16:
+    case UAVObjectField::INT32:
+    case UAVObjectField::UINT8:
+    case UAVObjectField::UINT16:
+    case UAVObjectField::UINT32:
         data.append(field->getValue(index));
         data.append(field->getUnits());
-        item = new Int8FieldTreeItem(field, index, data);
-    } else if (type == UAVObjectField::INT16) {
-        data.append(field->getValue(index));
-        data.append(field->getUnits());
-        item = new Int16FieldTreeItem(field, index, data);
-    } else if (type == UAVObjectField::INT32) {
-        data.append(field->getValue(index));
-        data.append(field->getUnits());
-        item = new Int32FieldTreeItem(field, index, data);
-    } else if (type == UAVObjectField::UINT8) {
-        data.append(field->getValue(index));
-        data.append(field->getUnits());
-        item = new UInt8FieldTreeItem(field, index, data);
-    } else if (type == UAVObjectField::UINT16) {
-        data.append(field->getValue(index));
-        data.append(field->getUnits());
-        item = new UInt16FieldTreeItem(field, index, data);
-    } else if (type == UAVObjectField::UINT32) {
-        data.append(field->getValue(index));
-        data.append(field->getUnits());
-        item = new UInt32FieldTreeItem(field, index, data);
-    } else if (type == UAVObjectField::FLOAT32) {
+        item = new IntFieldTreeItem(field, index, data);
+        break;
+    case UAVObjectField::FLOAT32:
         data.append(field->getValue(index));
         data.append(field->getUnits());
         item = new FloatFieldTreeItem(field, index, data);
-    } else {
+        break;
+    default:
         Q_ASSERT(false);
     }
     connect(item, SIGNAL(updateHighlight(TreeItem*)), this, SLOT(updateHighlight(TreeItem*)));

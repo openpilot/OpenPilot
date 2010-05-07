@@ -3,25 +3,25 @@
  *
  * @file       fieldtreeitem.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   uavobjectbrowser
  * @{
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -122,10 +122,47 @@ class IntFieldTreeItem : public FieldTreeItem
 {
 Q_OBJECT
 public:
-    IntFieldTreeItem(int index, const QList<QVariant> &data, int min, int max, TreeItem *parent = 0) :
-            FieldTreeItem(index, data, parent), m_minValue(min), m_maxValue(max) { }
-    IntFieldTreeItem(int index, const QVariant &data, int min, int max, TreeItem *parent = 0) :
-            FieldTreeItem(index, data, parent), m_minValue(min), m_maxValue(max) { }
+    IntFieldTreeItem(UAVObjectField *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
+            FieldTreeItem(index, data, parent), m_field(field) {
+        setMinMaxValues();
+    }
+    IntFieldTreeItem(UAVObjectField *field, int index, const QVariant &data, TreeItem *parent = 0) :
+            FieldTreeItem(index, data, parent), m_field(field) {
+        setMinMaxValues();
+    }
+
+    void setMinMaxValues() {
+        switch (m_field->getType()) {
+        case UAVObjectField::INT8:
+            m_minValue = QINT8MIN;
+            m_maxValue = QINT8MAX;
+            break;
+        case UAVObjectField::INT16:
+            m_minValue = QINT16MIN;
+            m_maxValue = QINT16MAX;
+            break;
+        case UAVObjectField::INT32:
+            m_minValue = QINT32MIN;
+            m_maxValue = QINT32MAX;
+            break;
+        case UAVObjectField::UINT8:
+            m_minValue = QUINTMIN;
+            m_maxValue = QUINT8MAX;
+            break;
+        case UAVObjectField::UINT16:
+            m_minValue = QUINTMIN;
+            m_maxValue = QUINT16MAX;
+            break;
+        case UAVObjectField::UINT32:
+            m_minValue = QUINTMIN;
+            m_maxValue = QUINT32MAX;
+            break;
+        default:
+            Q_ASSERT(false);
+            break;
+        }
+    }
+
     QWidget *createEditor(QWidget *parent) {
         QSpinBox *editor = new QSpinBox(parent);
         editor->setMinimum(m_minValue);
@@ -143,173 +180,27 @@ public:
         QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
         spinBox->setValue(value.toInt());
     }
+    void setData(QVariant value, int column) {
+        setChanged(m_field->getValue(m_index) != value);
+        TreeItem::setData(value, column);
+    }
+    void apply() {
+        m_field->setValue(data(dataColumn).toInt(), m_index);
+        setChanged(false);
+    }
+    void update() {
+        int value = m_field->getValue(m_index).toInt();
+        if (data() != value || changed()) {
+            TreeItem::setData(value);
+            setHighlight(true);
+        }
+    }
+
 private:
+    UAVObjectField *m_field;
     int m_minValue;
     int m_maxValue;
 };
-
-class Int8FieldTreeItem : public IntFieldTreeItem
-{
-Q_OBJECT
-public:
-    Int8FieldTreeItem(UAVObjectField *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, QINT8MIN, QINT8MAX, parent), m_field(field) { }
-    Int8FieldTreeItem(UAVObjectField *field, int index, const QVariant &data, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, QINT8MIN, QINT8MAX, parent), m_field(field) { }
-    void setData(QVariant value, int column) {
-        setChanged(m_field->getValue(m_index) != value);
-        TreeItem::setData(value, column);
-    }
-    void apply() {
-        m_field->setValue(data(dataColumn).toInt(), m_index);
-        setChanged(false);
-    }
-    void update() {
-        int value = m_field->getValue(m_index).toInt();
-        if (data() != value || changed()) {
-            TreeItem::setData(value);
-            setHighlight(true);
-        }
-    }
-private:
-    UAVObjectField *m_field;
-};
-
-class Int16FieldTreeItem : public IntFieldTreeItem
-{
-Q_OBJECT
-public:
-    Int16FieldTreeItem(UAVObjectField *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, QINT16MIN, QINT16MAX, parent), m_field(field) { }
-    Int16FieldTreeItem(UAVObjectField *field, int index, const QVariant &data, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, QINT16MIN, QINT16MAX, parent), m_field(field) { }
-    void setData(QVariant value, int column) {
-        setChanged(m_field->getValue(m_index) != value);
-        TreeItem::setData(value, column);
-    }
-    void apply() {
-        m_field->setValue(data(dataColumn).toInt(), m_index);
-        setChanged(false);
-    }
-    void update() {
-        int value = m_field->getValue(m_index).toInt();
-        if (data() != value || changed()) {
-            TreeItem::setData(value);
-            setHighlight(true);
-        }
-    }
-private:
-    UAVObjectField *m_field;
-};
-
-class Int32FieldTreeItem : public IntFieldTreeItem
-{
-Q_OBJECT
-public:
-    Int32FieldTreeItem(UAVObjectField *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, QINT32MIN, QINT32MAX, parent), m_field(field) { }
-    Int32FieldTreeItem(UAVObjectField *field, int index, const QVariant &data, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, QINT32MIN, QINT32MAX, parent), m_field(field) { }
-    void setData(QVariant value, int column) {
-        setChanged(m_field->getValue(m_index) != value);
-        TreeItem::setData(value, column);
-    }
-    void apply() {
-        m_field->setValue(data(dataColumn).toInt(), m_index);
-        setChanged(false);
-    }
-    void update() {
-        int value = m_field->getValue(m_index).toInt();
-        if (data() != value || changed()) {
-            TreeItem::setData(value);
-            setHighlight(true);
-        }
-    }
-private:
-    UAVObjectField *m_field;
-};
-
-class UInt8FieldTreeItem : public IntFieldTreeItem
-{
-Q_OBJECT
-public:
-    UInt8FieldTreeItem(UAVObjectField *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, QUINTMIN, QUINT8MAX, parent), m_field(field) { }
-    UInt8FieldTreeItem(UAVObjectField *field, int index, const QVariant &data, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, QUINTMIN, QUINT8MAX, parent), m_field(field) { }
-    void setData(QVariant value, int column) {
-        setChanged(m_field->getValue(m_index) != value);
-        TreeItem::setData(value, column);
-    }
-    void apply() {
-        m_field->setValue(data(dataColumn).toInt(), m_index);
-        setChanged(false);
-    }
-    void update() {
-        int value = m_field->getValue(m_index).toInt();
-        if (data() != value || changed()) {
-            TreeItem::setData(value);
-            setHighlight(true);
-        }
-    }
-private:
-    UAVObjectField *m_field;
-};
-
-class UInt16FieldTreeItem : public IntFieldTreeItem
-{
-Q_OBJECT
-public:
-    UInt16FieldTreeItem(UAVObjectField *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, QUINTMIN, QUINT16MAX, parent), m_field(field) { }
-    UInt16FieldTreeItem(UAVObjectField *field, int index, const QVariant &data, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, QUINTMIN, QUINT16MAX, parent), m_field(field) { }
-    void setData(QVariant value, int column) {
-        setChanged(m_field->getValue(m_index) != value);
-        TreeItem::setData(value, column);
-    }
-    void apply() {
-        m_field->setValue(data(dataColumn).toInt(), m_index);
-        setChanged(false);
-    }
-    void update() {
-        int value = m_field->getValue(m_index).toInt();
-        if (data() != value || changed()) {
-            TreeItem::setData(value);
-            setHighlight(true);
-        }
-    }
-private:
-    UAVObjectField *m_field;
-};
-
-class UInt32FieldTreeItem : public IntFieldTreeItem
-{
-Q_OBJECT
-public:
-    UInt32FieldTreeItem(UAVObjectField *field, int index, const QList<QVariant> &data, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, QUINTMIN, QUINT32MAX, parent), m_field(field) { }
-    UInt32FieldTreeItem(UAVObjectField *field, int index, const QVariant &data, TreeItem *parent = 0) :
-            IntFieldTreeItem(index, data, QUINTMIN, QUINT32MAX, parent), m_field(field) { }
-    void setData(QVariant value, int column) {
-        setChanged(m_field->getValue(m_index) != value);
-        TreeItem::setData(value, column);
-    }
-    void apply() {
-        m_field->setValue(data(dataColumn).toInt(), m_index);
-        setChanged(false);
-    }
-    void update() {
-        int value = m_field->getValue(m_index).toInt();
-        if (data() != value || changed()) {
-            TreeItem::setData(value);
-            setHighlight(true);
-        }
-    }
-private:
-    UAVObjectField *m_field;
-};
-
 
 class FloatFieldTreeItem : public FieldTreeItem
 {

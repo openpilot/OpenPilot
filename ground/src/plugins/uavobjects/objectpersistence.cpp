@@ -29,7 +29,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "objectpersistence.h"
-#include "uavobjectfields.h"
+#include "uavobjectfield.h"
 
 const QString ObjectPersistence::NAME = QString("ObjectPersistence");
 
@@ -46,7 +46,7 @@ ObjectPersistence::ObjectPersistence(): UAVDataObject(OBJID, ISSINGLEINST, ISSET
     OperationEnumOptions.append("Load");
     OperationEnumOptions.append("Save");
     OperationEnumOptions.append("Delete");
-    fields.append(new UAVObjectFieldEnum(QString("Operation"), QString(""), OperationElemNames, OperationEnumOptions));
+    fields.append( new UAVObjectField(QString("Operation"), QString(""), UAVObjectField::ENUM, OperationElemNames, OperationEnumOptions) );
     QStringList SelectionElemNames;
     SelectionElemNames.append("0");
     QStringList SelectionEnumOptions;
@@ -54,13 +54,13 @@ ObjectPersistence::ObjectPersistence(): UAVDataObject(OBJID, ISSINGLEINST, ISSET
     SelectionEnumOptions.append("AllSettings");
     SelectionEnumOptions.append("AllMetaObjects");
     SelectionEnumOptions.append("AllObjects");
-    fields.append(new UAVObjectFieldEnum(QString("Selection"), QString(""), SelectionElemNames, SelectionEnumOptions));
+    fields.append( new UAVObjectField(QString("Selection"), QString(""), UAVObjectField::ENUM, SelectionElemNames, SelectionEnumOptions) );
     QStringList ObjectIDElemNames;
     ObjectIDElemNames.append("0");
-    fields.append(new UAVObjectFieldUInt32(QString("ObjectID"), QString(""), ObjectIDElemNames));
+    fields.append( new UAVObjectField(QString("ObjectID"), QString(""), UAVObjectField::UINT32, ObjectIDElemNames, QStringList()) );
     QStringList InstanceIDElemNames;
     InstanceIDElemNames.append("0");
-    fields.append(new UAVObjectFieldUInt32(QString("InstanceID"), QString(""), InstanceIDElemNames));
+    fields.append( new UAVObjectField(QString("InstanceID"), QString(""), UAVObjectField::UINT32, InstanceIDElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

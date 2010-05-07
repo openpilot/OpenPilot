@@ -29,7 +29,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "examplesettings.h"
-#include "uavobjectfields.h"
+#include "uavobjectfield.h"
 
 const QString ExampleSettings::NAME = QString("ExampleSettings");
 
@@ -42,16 +42,16 @@ ExampleSettings::ExampleSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTING
     QList<UAVObjectField*> fields;
     QStringList UpdatePeriodElemNames;
     UpdatePeriodElemNames.append("0");
-    fields.append(new UAVObjectFieldInt32(QString("UpdatePeriod"), QString("ms"), UpdatePeriodElemNames));
+    fields.append( new UAVObjectField(QString("UpdatePeriod"), QString("ms"), UAVObjectField::INT32, UpdatePeriodElemNames, QStringList()) );
     QStringList StepSizeElemNames;
     StepSizeElemNames.append("0");
-    fields.append(new UAVObjectFieldInt32(QString("StepSize"), QString(""), StepSizeElemNames));
+    fields.append( new UAVObjectField(QString("StepSize"), QString(""), UAVObjectField::INT32, StepSizeElemNames, QStringList()) );
     QStringList StepDirectionElemNames;
     StepDirectionElemNames.append("0");
     QStringList StepDirectionEnumOptions;
     StepDirectionEnumOptions.append("up");
     StepDirectionEnumOptions.append("down");
-    fields.append(new UAVObjectFieldEnum(QString("StepDirection"), QString(""), StepDirectionElemNames, StepDirectionEnumOptions));
+    fields.append( new UAVObjectField(QString("StepDirection"), QString(""), UAVObjectField::ENUM, StepDirectionElemNames, StepDirectionEnumOptions) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

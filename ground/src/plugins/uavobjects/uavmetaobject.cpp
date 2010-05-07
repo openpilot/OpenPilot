@@ -26,7 +26,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "uavmetaobject.h"
-#include "uavobjectfields.h"
+#include "uavobjectfield.h"
 
 /**
  * Constructor
@@ -50,14 +50,14 @@ UAVMetaObject::UAVMetaObject(quint32 objID, const QString& name, UAVObject* pare
     QStringList updateModeEnum;
     updateModeEnum << tr("Periodic") << tr("On Change") << tr("Manual") << tr("Never");
     QList<UAVObjectField*> fields;
-    fields.append(new UAVObjectFieldEnum(tr("Flight Telemetry Acked"), QString(""), 1, boolEnum));
-    fields.append(new UAVObjectFieldEnum(tr("Flight Telemetry Update Mode"), QString(""), 1, updateModeEnum));
-    fields.append(new UAVObjectFieldInt32(tr("Flight Telemetry Update Period"), tr("ms"), 1));
-    fields.append(new UAVObjectFieldEnum(tr("GCS Telemetry Acked"), QString(""), 1, boolEnum));
-    fields.append(new UAVObjectFieldEnum(tr("GCS Telemetry Update Mode"), QString(""), 1, updateModeEnum));
-    fields.append(new UAVObjectFieldInt32(tr("GCS Telemetry Update Period"), tr("ms"), 1));
-    fields.append(new UAVObjectFieldEnum(tr("Logging Update Mode"), QString(""), 1, updateModeEnum));
-    fields.append(new UAVObjectFieldUInt32(tr("Logging Update Period"), tr("ms"), 1));
+    fields.append( new UAVObjectField(tr("Flight Telemetry Acked"), tr(""), UAVObjectField::ENUM, 1, boolEnum) );
+    fields.append( new UAVObjectField(tr("Flight Telemetry Update Mode"), tr(""), UAVObjectField::ENUM, 1, updateModeEnum) );
+    fields.append( new UAVObjectField(tr("Flight Telemetry Update Period"), tr(""), UAVObjectField::UINT32, 1, QStringList()) );
+    fields.append( new UAVObjectField(tr("GCS Telemetry Acked"), tr(""), UAVObjectField::ENUM, 1, boolEnum) );
+    fields.append( new UAVObjectField(tr("GCS Telemetry Update Mode"), tr(""), UAVObjectField::ENUM, 1, updateModeEnum) );
+    fields.append( new UAVObjectField(tr("GCS Telemetry Update Period"), tr(""), UAVObjectField::UINT32, 1, QStringList()) );
+    fields.append( new UAVObjectField(tr("Logging Update Mode"), tr(""), UAVObjectField::ENUM, 1, updateModeEnum) );
+    fields.append( new UAVObjectField(tr("Logging Update Period"), tr(""), UAVObjectField::UINT32, 1, QStringList()) );
     // Initialize parent
     UAVObject::initialize(0);
     UAVObject::initializeFields(fields, (quint8*)&parentMetadata, sizeof(Metadata));

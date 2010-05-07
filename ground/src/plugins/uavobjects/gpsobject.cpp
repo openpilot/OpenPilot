@@ -29,7 +29,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "gpsobject.h"
-#include "uavobjectfields.h"
+#include "uavobjectfield.h"
 
 const QString GpsObject::NAME = QString("GpsObject");
 
@@ -42,19 +42,19 @@ GpsObject::GpsObject(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
     QList<UAVObjectField*> fields;
     QStringList LatitudeElemNames;
     LatitudeElemNames.append("0");
-    fields.append(new UAVObjectFieldFloat(QString("Latitude"), QString("degrees"), LatitudeElemNames));
+    fields.append( new UAVObjectField(QString("Latitude"), QString("degrees"), UAVObjectField::FLOAT32, LatitudeElemNames, QStringList()) );
     QStringList LongitudeElemNames;
     LongitudeElemNames.append("0");
-    fields.append(new UAVObjectFieldFloat(QString("Longitude"), QString("degrees"), LongitudeElemNames));
+    fields.append( new UAVObjectField(QString("Longitude"), QString("degrees"), UAVObjectField::FLOAT32, LongitudeElemNames, QStringList()) );
     QStringList AltitudeElemNames;
     AltitudeElemNames.append("0");
-    fields.append(new UAVObjectFieldFloat(QString("Altitude"), QString("meters"), AltitudeElemNames));
+    fields.append( new UAVObjectField(QString("Altitude"), QString("meters"), UAVObjectField::FLOAT32, AltitudeElemNames, QStringList()) );
     QStringList SatellitesElemNames;
     SatellitesElemNames.append("0");
-    fields.append(new UAVObjectFieldInt8(QString("Satellites"), QString(""), SatellitesElemNames));
+    fields.append( new UAVObjectField(QString("Satellites"), QString(""), UAVObjectField::INT8, SatellitesElemNames, QStringList()) );
     QStringList UpdatesElemNames;
     UpdatesElemNames.append("0");
-    fields.append(new UAVObjectFieldUInt16(QString("Updates"), QString(""), UpdatesElemNames));
+    fields.append( new UAVObjectField(QString("Updates"), QString(""), UAVObjectField::UINT16, UpdatesElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

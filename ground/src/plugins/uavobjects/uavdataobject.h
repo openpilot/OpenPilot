@@ -31,7 +31,6 @@
 #include "uavobjects_global.h"
 #include "uavobject.h"
 #include "uavobjectfield.h"
-#include "uavobjectfields.h"
 #include "uavmetaobject.h"
 #include <QList>
 

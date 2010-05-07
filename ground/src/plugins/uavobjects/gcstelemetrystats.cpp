@@ -29,7 +29,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "gcstelemetrystats.h"
-#include "uavobjectfields.h"
+#include "uavobjectfield.h"
 
 const QString GCSTelemetryStats::NAME = QString("GCSTelemetryStats");
 
@@ -47,22 +47,22 @@ GCSTelemetryStats::GCSTelemetryStats(): UAVDataObject(OBJID, ISSINGLEINST, ISSET
     StatusEnumOptions.append("HandshakeReq");
     StatusEnumOptions.append("HandshakeAck");
     StatusEnumOptions.append("Connected");
-    fields.append(new UAVObjectFieldEnum(QString("Status"), QString(""), StatusElemNames, StatusEnumOptions));
+    fields.append( new UAVObjectField(QString("Status"), QString(""), UAVObjectField::ENUM, StatusElemNames, StatusEnumOptions) );
     QStringList TxDataRateElemNames;
     TxDataRateElemNames.append("0");
-    fields.append(new UAVObjectFieldFloat(QString("TxDataRate"), QString("bytes/sec"), TxDataRateElemNames));
+    fields.append( new UAVObjectField(QString("TxDataRate"), QString("bytes/sec"), UAVObjectField::FLOAT32, TxDataRateElemNames, QStringList()) );
     QStringList RxDataRateElemNames;
     RxDataRateElemNames.append("0");
-    fields.append(new UAVObjectFieldFloat(QString("RxDataRate"), QString("bytes/sec"), RxDataRateElemNames));
+    fields.append( new UAVObjectField(QString("RxDataRate"), QString("bytes/sec"), UAVObjectField::FLOAT32, RxDataRateElemNames, QStringList()) );
     QStringList TxFailuresElemNames;
     TxFailuresElemNames.append("0");
-    fields.append(new UAVObjectFieldUInt32(QString("TxFailures"), QString("count"), TxFailuresElemNames));
+    fields.append( new UAVObjectField(QString("TxFailures"), QString("count"), UAVObjectField::UINT32, TxFailuresElemNames, QStringList()) );
     QStringList RxFailuresElemNames;
     RxFailuresElemNames.append("0");
-    fields.append(new UAVObjectFieldUInt32(QString("RxFailures"), QString("count"), RxFailuresElemNames));
+    fields.append( new UAVObjectField(QString("RxFailures"), QString("count"), UAVObjectField::UINT32, RxFailuresElemNames, QStringList()) );
     QStringList TxRetriesElemNames;
     TxRetriesElemNames.append("0");
-    fields.append(new UAVObjectFieldUInt32(QString("TxRetries"), QString("count"), TxRetriesElemNames));
+    fields.append( new UAVObjectField(QString("TxRetries"), QString("count"), UAVObjectField::UINT32, TxRetriesElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

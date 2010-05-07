@@ -29,7 +29,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "systemstats.h"
-#include "uavobjectfields.h"
+#include "uavobjectfield.h"
 
 const QString SystemStats::NAME = QString("SystemStats");
 
@@ -42,13 +42,13 @@ SystemStats::SystemStats(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
     QList<UAVObjectField*> fields;
     QStringList FlightTimeElemNames;
     FlightTimeElemNames.append("0");
-    fields.append(new UAVObjectFieldUInt32(QString("FlightTime"), QString("ms"), FlightTimeElemNames));
+    fields.append( new UAVObjectField(QString("FlightTime"), QString("ms"), UAVObjectField::UINT32, FlightTimeElemNames, QStringList()) );
     QStringList HeapRemainingElemNames;
     HeapRemainingElemNames.append("0");
-    fields.append(new UAVObjectFieldUInt16(QString("HeapRemaining"), QString("bytes"), HeapRemainingElemNames));
+    fields.append( new UAVObjectField(QString("HeapRemaining"), QString("bytes"), UAVObjectField::UINT16, HeapRemainingElemNames, QStringList()) );
     QStringList CPULoadElemNames;
     CPULoadElemNames.append("0");
-    fields.append(new UAVObjectFieldUInt8(QString("CPULoad"), QString("%"), CPULoadElemNames));
+    fields.append( new UAVObjectField(QString("CPULoad"), QString("%"), UAVObjectField::UINT8, CPULoadElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

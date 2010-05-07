@@ -29,7 +29,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "systemalarms.h"
-#include "uavobjectfields.h"
+#include "uavobjectfield.h"
 
 const QString SystemAlarms::NAME = QString("SystemAlarms");
 
@@ -52,7 +52,7 @@ SystemAlarms::SystemAlarms(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAM
     AlarmEnumOptions.append("Warning");
     AlarmEnumOptions.append("Error");
     AlarmEnumOptions.append("Critical");
-    fields.append(new UAVObjectFieldEnum(QString("Alarm"), QString(""), AlarmElemNames, AlarmEnumOptions));
+    fields.append( new UAVObjectField(QString("Alarm"), QString(""), UAVObjectField::ENUM, AlarmElemNames, AlarmEnumOptions) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

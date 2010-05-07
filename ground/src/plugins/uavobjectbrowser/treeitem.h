@@ -30,7 +30,7 @@
 
 #include "uavobjects/uavobject.h"
 #include "uavobjects/uavmetaobject.h"
-#include "uavobjects/uavobjectfields.h"
+#include "uavobjects/uavobjectfield.h"
 #include <QtCore/QList>
 #include <QtCore/QVariant>
 #include <QtCore/QTimer>

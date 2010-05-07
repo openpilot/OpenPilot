@@ -11,18 +11,8 @@ HEADERS += uavobjects_global.h \
     uavobjectsinit.h \
     uavobjectsplugin.h \
     examplesettings.h \
-    uavobjectfieldenum.h \
-    uavobjectfieldstring.h \
     exampleobject2.h \
     exampleobject1.h \
-    uavobjectfieldint8.h \
-    uavobjectfieldint16.h \
-    uavobjectfieldint32.h \
-    uavobjectfieldfloat.h \
-    uavobjectfielduint8.h \
-    uavobjectfielduint16.h \
-    uavobjectfielduint32.h \
-    uavobjectfields.h \
     gpsobject.h \
     gcstelemetrystats.h \
     flighttelemetrystats.h \
@@ -37,17 +27,8 @@ SOURCES += uavobject.cpp \
     uavobjectsinit.cpp \
     uavobjectsplugin.cpp \
     examplesettings.cpp \
-    uavobjectfieldenum.cpp \
-    uavobjectfieldstring.cpp \
     exampleobject2.cpp \
     exampleobject1.cpp \
-    uavobjectfieldint8.cpp \
-    uavobjectfieldint16.cpp \
-    uavobjectfieldint32.cpp \
-    uavobjectfieldfloat.cpp \
-    uavobjectfielduint8.cpp \
-    uavobjectfielduint16.cpp \
-    uavobjectfielduint32.cpp \
     gpsobject.cpp \
     gcstelemetrystats.cpp \
     flighttelemetrystats.cpp \

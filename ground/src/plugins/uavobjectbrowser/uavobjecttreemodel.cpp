@@ -30,7 +30,7 @@
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/uavdataobject.h"
 #include "uavobjects/uavmetaobject.h"
-#include "uavobjects/uavobjectfields.h"
+#include "uavobjects/uavobjectfield.h"
 #include "extensionsystem/pluginmanager.h"
 #include <QtGui/QColor>
 //#include <QtGui/QIcon>
@@ -162,48 +162,43 @@ void UAVObjectTreeModel::addSingleField(int index, UAVObjectField *field, TreeIt
         data.append(field->getName());
     else
         data.append( QString("[%1]").arg((field->getElementNames())[index]) );
-    UAVObjectFieldEnum *enumField = dynamic_cast<UAVObjectFieldEnum*>(field);
-    UAVObjectFieldInt8 *int8Field = dynamic_cast<UAVObjectFieldInt8*>(field);
-    UAVObjectFieldInt16 *int16Field = dynamic_cast<UAVObjectFieldInt16*>(field);
-    UAVObjectFieldInt32 *int32Field = dynamic_cast<UAVObjectFieldInt32*>(field);
-    UAVObjectFieldUInt8 *uInt8Field = dynamic_cast<UAVObjectFieldUInt8*>(field);
-    UAVObjectFieldUInt16 *uInt16Field = dynamic_cast<UAVObjectFieldUInt16*>(field);
-    UAVObjectFieldUInt32 *uInt32Field = dynamic_cast<UAVObjectFieldUInt32*>(field);
-    UAVObjectFieldFloat *floatField = dynamic_cast<UAVObjectFieldFloat*>(field);
 
     FieldTreeItem *item;
-    if (enumField) {
-        data.append(enumField->getSelectedIndex(index));
+    UAVObjectField::FieldType type = field->getType();
+    if (type == UAVObjectField::ENUM) {
+        QStringList options = field->getOptions();
+        QVariant value = field->getValue();
+        data.append( options.indexOf(value.toString()) );
         data.append(field->getUnits());
-        item = new EnumFieldTreeItem(enumField, index, data);
-    } else if (int8Field) {
-        data.append(int8Field->getValue(index));
+        item = new EnumFieldTreeItem(field, index, data);
+    } else if (type == UAVObjectField::INT8) {
+        data.append(field->getValue(index));
         data.append(field->getUnits());
-        item = new Int8FieldTreeItem(int8Field, index, data);
-    } else if (int16Field) {
-        data.append(int16Field->getValue(index));
+        item = new Int8FieldTreeItem(field, index, data);
+    } else if (type == UAVObjectField::INT16) {
+        data.append(field->getValue(index));
         data.append(field->getUnits());
-        item = new Int16FieldTreeItem(int16Field, index, data);
-    } else if (int32Field) {
-        data.append(int32Field->getValue(index));
+        item = new Int16FieldTreeItem(field, index, data);
+    } else if (type == UAVObjectField::INT32) {
+        data.append(field->getValue(index));
         data.append(field->getUnits());
-        item = new Int32FieldTreeItem(int32Field, index, data);
-    } else if (uInt8Field) {
-        data.append(uInt8Field->getValue(index));
+        item = new Int32FieldTreeItem(field, index, data);
+    } else if (type == UAVObjectField::UINT8) {
+        data.append(field->getValue(index));
         data.append(field->getUnits());
-        item = new UInt8FieldTreeItem(uInt8Field, index, data);
-    } else if (uInt16Field) {
-        data.append(uInt16Field->getValue(index));
+        item = new UInt8FieldTreeItem(field, index, data);
+    } else if (type == UAVObjectField::UINT16) {
+        data.append(field->getValue(index));
         data.append(field->getUnits());
-        item = new UInt16FieldTreeItem(uInt16Field, index, data);
-    } else if (uInt32Field) {
-        data.append(uInt32Field->getValue(index));
+        item = new UInt16FieldTreeItem(field, index, data);
+    } else if (type == UAVObjectField::UINT32) {
+        data.append(field->getValue(index));
         data.append(field->getUnits());
-        item = new UInt32FieldTreeItem(uInt32Field, index, data);
-    } else if (floatField) {
-        data.append(floatField->getValue(index));
+        item = new UInt32FieldTreeItem(field, index, data);
+    } else if (type == UAVObjectField::FLOAT32) {
+        data.append(field->getValue(index));
         data.append(field->getUnits());
-        item = new FloatFieldTreeItem(floatField, index, data);
+        item = new FloatFieldTreeItem(field, index, data);
     } else {
         Q_ASSERT(false);
     }

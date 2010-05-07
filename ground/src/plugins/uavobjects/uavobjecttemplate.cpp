@@ -29,7 +29,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "$(NAMELC).h"
-#include "uavobjectfields.h"
+#include "uavobjectfield.h"
 
 const QString $(NAME)::NAME = QString("$(NAME)");
 

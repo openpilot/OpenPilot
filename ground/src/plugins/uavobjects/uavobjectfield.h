@@ -31,6 +31,7 @@
 #include "uavobjects_global.h"
 #include "uavobject.h"
 #include <QStringList>
+#include <QVariant>
 
 class UAVObject;
 
@@ -39,22 +40,29 @@ class UAVOBJECTS_EXPORT UAVObjectField: public QObject
     Q_OBJECT
 
 public:
-    UAVObjectField(const QString& name, const QString& units, quint32 numElements);
-    UAVObjectField(const QString& name, const QString& units, const QStringList& elementNames);
+    typedef enum { INT8 = 0, INT16, INT32, UINT8, UINT16, UINT32, FLOAT32, ENUM, STRING } FieldType;
+
+    UAVObjectField(const QString& name, const QString& units, FieldType type, quint32 numElements, const QStringList& options);
+    UAVObjectField(const QString& name, const QString& units, FieldType type, const QStringList& elementNames, const QStringList& options);
     void initialize(quint8* data, quint32 dataOffset, UAVObject* obj);
-    virtual void initializeValues() = 0;
     UAVObject* getObject();
+    FieldType getType();
     QString getName();
     QString getUnits();
     quint32 getNumElements();
     QStringList getElementNames();
-    virtual qint32 pack(quint8* dataOut) = 0;
-    virtual qint32 unpack(const quint8* dataIn) = 0;
-    virtual double getDouble(quint32 index = 0) = 0;
-    virtual void setDouble(double value, quint32 index = 0) = 0;
+    QStringList getOptions();
+    qint32 pack(quint8* dataOut);
+    qint32 unpack(const quint8* dataIn);
+    QVariant getValue(quint32 index = 0);
+    void setValue(const QVariant& data, quint32 index = 0);
+    double getDouble(quint32 index = 0);
+    void setDouble(double value, quint32 index = 0);
     quint32 getDataOffset();
     quint32 getNumBytes();
-    virtual quint32 getNumBytesElement() = 0;
+    quint32 getNumBytesElement();
+    bool isNumeric();
+    bool isText();
     QString toString();
 
 signals:
@@ -63,13 +71,17 @@ signals:
 protected:
     QString name;
     QString units;
+    FieldType type;
     QStringList elementNames;
+    QStringList options;
     quint32 numElements;
+    quint32 numBytesPerElement;
     quint32 offset;
     quint8* data;
     UAVObject* obj;
 
     void clear();
+    void constructorInitialize(const QString& name, const QString& units, FieldType type, const QStringList& elementNames, const QStringList& options);
 
 
 };

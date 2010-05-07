@@ -41,9 +41,9 @@ UAVObjectParser::UAVObjectParser()
                        QString( "quint8") << QString("quint16") << QString("quint32") <<
                        QString("float") << QString("quint8");
 
-    fieldTypeStrCPPClass << QString("Int8") << QString("Int16") << QString("Int32") <<
-                            QString( "UInt8") << QString("UInt16") << QString("UInt32") <<
-                            QString("Float") << QString("Enum");
+    fieldTypeStrCPPClass << QString("INT8") << QString("INT16") << QString("INT32") <<
+                            QString( "UINT8") << QString("UINT16") << QString("UINT32") <<
+                            QString("FLOAT32") << QString("ENUM");
 
     fieldTypeStrXML << QString("int8") << QString("int16") << QString("int32") <<
                        QString("uint8") << QString("uint16") << QString("uint32") <<
@@ -742,7 +742,7 @@ bool UAVObjectParser::generateGCSObject(int objIndex, const QString& templateInc
                               .arg(varOptionName)
                               .arg(options[m]) );
             }
-            finit.append( QString("    fields.append(new UAVObjectFieldEnum(QString(\"%1\"), QString(\"%2\"), %3, %4));\n")
+            finit.append( QString("    fields.append( new UAVObjectField(QString(\"%1\"), QString(\"%2\"), UAVObjectField::ENUM, %3, %4) );\n")
                           .arg(info->fields[n]->name)
                           .arg(info->fields[n]->units)
                           .arg(varElemName)
@@ -751,10 +751,10 @@ bool UAVObjectParser::generateGCSObject(int objIndex, const QString& templateInc
         // For all other types
         else
         {
-            finit.append( QString("    fields.append(new UAVObjectField%1(QString(\"%2\"), QString(\"%3\"), %4));\n")
-                          .arg(fieldTypeStrCPPClass[info->fields[n]->type])
+            finit.append( QString("    fields.append( new UAVObjectField(QString(\"%1\"), QString(\"%2\"), UAVObjectField::%3, %4, QStringList()) );\n")
                           .arg(info->fields[n]->name)
                           .arg(info->fields[n]->units)
+                          .arg(fieldTypeStrCPPClass[info->fields[n]->type])
                           .arg(varElemName) );
         }
     }

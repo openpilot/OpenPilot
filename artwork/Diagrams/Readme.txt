@@ -1,0 +1,2 @@
+system-health-path.svg: system health diagram to be used by the System Health gadget in the GCS. All vertical text was converted to path so that the Qt SVG engine renders it properly.
+system-health-text.svg: identical but all text is actually text objects (edit this one if you want to make changes)

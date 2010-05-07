@@ -1,0 +1,4 @@
+target remote localhost:3333
+monitor reset halt
+monitor cortex_m3 vector_catch all
+file ./build/openpilot/OpenPilot.elf

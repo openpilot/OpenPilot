@@ -29,6 +29,7 @@
 #define SYSTEMHEALTHGADGETWIDGET_H_
 
 #include "systemhealthgadgetconfiguration.h"
+#include "uavobjects/uavobject.h"
 #include <QGraphicsView>
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
@@ -47,17 +48,14 @@ public:
    void setIndicator(QString indicator);
    void paint();
 
-
-
 protected:
    void paintEvent(QPaintEvent *event);
    void resizeEvent(QResizeEvent *event);
 
-private:
-
 private slots:
    // Test function
    void test();
+   void updateAlarms(UAVObject *systemAlarm); // Called by the systemalarms UAVObject
 
 private:
    QSvgRenderer *m_renderer;

@@ -34,7 +34,7 @@
 #define TASK_PRIORITY_TX (tskIDLE_PRIORITY + 1)
 #define TASK_PRIORITY_TXPRI (tskIDLE_PRIORITY + 2)
 #define REQ_TIMEOUT_MS 250
-#define MAX_RETRIES 3
+#define MAX_RETRIES 2
 #define STATS_UPDATE_PERIOD_MS 5000
 
 // Private types
@@ -177,6 +177,7 @@ static void updateObject(UAVObjHandle obj)
 static void processObjEvent(UAVObjEvent* ev)
 {
 	UAVObjMetadata metadata;
+	FlightTelemetryStatsData flightStats;
 	int32_t retries;
 	int32_t success;
 
@@ -190,45 +191,50 @@ static void processObjEvent(UAVObjEvent* ev)
 	}
 	else
 	{
-		// Get object metadata
-		UAVObjGetMetadata(ev->obj, &metadata);
-		// Act on event
-		retries = 0;
-		success = -1;
-		if(ev->event == EV_UPDATED || ev->event == EV_UPDATED_MANUAL)
+		// Only process event if connected to GCS or if object FlightTelemetryStats is updated
+		FlightTelemetryStatsGet(&flightStats);
+		if ( flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED || UAVObjGetID(ev->obj) == FLIGHTTELEMETRYSTATS_OBJID )
 		{
-			// Send update to GCS (with retries)
-			while(retries < MAX_RETRIES && success == -1)
+			// Get object metadata
+			UAVObjGetMetadata(ev->obj, &metadata);
+			// Act on event
+			retries = 0;
+			success = -1;
+			if(ev->event == EV_UPDATED || ev->event == EV_UPDATED_MANUAL)
 			{
-				success = UAVTalkSendObject(ev->obj, ev->instId, metadata.telemetryAcked, REQ_TIMEOUT_MS); // call blocks until ack is received or timeout
-				++retries;
+				// Send update to GCS (with retries)
+				while(retries < MAX_RETRIES && success == -1)
+				{
+					success = UAVTalkSendObject(ev->obj, ev->instId, metadata.telemetryAcked, REQ_TIMEOUT_MS); // call blocks until ack is received or timeout
+					++retries;
+				}
+				// Update stats
+				txRetries += (retries-1);
+				if ( success == -1 )
+				{
+					++txErrors;
+				}
 			}
-			// Update stats
-			txRetries += (retries-1);
-			if ( success == -1 )
+			else if(ev->event == EV_UPDATE_REQ)
 			{
-				++txErrors;
+				// Request object update from GCS (with retries)
+				while(retries < MAX_RETRIES && success == -1)
+				{
+					success = UAVTalkSendObjectRequest(ev->obj, ev->instId, REQ_TIMEOUT_MS); // call blocks until update is received or timeout
+					++retries;
+				}
+				// Update stats
+				txRetries += (retries-1);
+				if ( success == -1 )
+				{
+					++txErrors;
+				}
 			}
-		}
-		else if(ev->event == EV_UPDATE_REQ)
-		{
-			// Request object update from GCS (with retries)
-			while(retries < MAX_RETRIES && success == -1)
+			// If this is a metaobject then make necessary telemetry updates
+			if(UAVObjIsMetaobject(ev->obj))
 			{
-				success = UAVTalkSendObjectRequest(ev->obj, ev->instId, REQ_TIMEOUT_MS); // call blocks until update is received or timeout
-				++retries;
+				updateObject(UAVObjGetLinkedObj(ev->obj)); // linked object will be the actual object the metadata are for
 			}
-			// Update stats
-			txRetries += (retries-1);
-			if ( success == -1 )
-			{
-				++txErrors;
-			}
-		}
-		// If this is a metaobject then make necessary telemetry updates
-		if(UAVObjIsMetaobject(ev->obj))
-		{
-			updateObject(UAVObjGetLinkedObj(ev->obj)); // linked object will be the actual object the metadata are for
 		}
 	}
 }

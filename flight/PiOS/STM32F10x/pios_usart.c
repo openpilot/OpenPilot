@@ -182,38 +182,24 @@ void PIOS_USART_Init(void)
 
 /**
 * Changes the baud rate of the USART peripheral without re-initialising.
-* \param[in] USARTx USART name (GPS, TELEM, AUX)
-* \param[in] Baud Requested baud rate         
+* \param[in] usart USART name (GPS, TELEM, AUX)
+* \param[in] baud Requested baud rate
 */
-void PIOS_USART_ChangeBaud(USART_TypeDef* USARTx, uint32_t Baud)
+void PIOS_USART_ChangeBaud(USARTNumTypeDef usart, uint32_t baud)
 {
-	/* USART BRR Configuration */
-	/* Configure the USART Baud Rate */
-	/* Adapted from stm32f01x_usart.c */
-	
-	uint32_t TmpReg = 0x00, ApbClock = 0x00;
-	uint32_t IntegerDivider = 0x00;
-	uint32_t FractionalDivider = 0x00;
-	uint32_t USARTxBase = (uint32_t)USARTx;
-	RCC_ClocksTypeDef RCC_ClocksStatus;
-	
-	RCC_GetClocksFreq(&RCC_ClocksStatus);
-	if (USARTxBase == USART1_BASE) {
-		ApbClock = RCC_ClocksStatus.PCLK2_Frequency;
-	} else {
-		ApbClock = RCC_ClocksStatus.PCLK1_Frequency;
-	}
-	
-	/* Determine the integer part */
-	IntegerDivider = ((0x19 * ApbClock) / (0x04 * (Baud)));
-	TmpReg = (IntegerDivider / 0x64) << 0x04;
-	
-	/* Determine the fractional part */
-	FractionalDivider = IntegerDivider - (0x64 * (TmpReg >> 0x04));
-	TmpReg |= ((((FractionalDivider * 0x10) + 0x32) / 0x64)) & ((uint8_t)0x0F);
-	
-	/* Write to USART BRR */
-	USARTx->BRR = (uint16_t)TmpReg;
+	USART_InitTypeDef USART_InitStructure;
+	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+	USART_InitStructure.USART_Parity = USART_Parity_No;
+	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+	USART_InitStructure.USART_BaudRate = baud;
+	if (usart == USART_1)
+		USART_Init(PIOS_USART1_USART, &USART_InitStructure);
+	else if (usart == USART_2)
+		USART_Init(PIOS_USART2_USART, &USART_InitStructure);
+	else if (usart == USART_3)
+		USART_Init(PIOS_USART3_USART, &USART_InitStructure);
 }
 
 /**

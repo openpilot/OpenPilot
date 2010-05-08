@@ -26,6 +26,7 @@
 #include "openpilot.h"
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
+#include "telemetrysettings.h"
 
 // Private constants
 #define MAX_QUEUE_SIZE 20
@@ -48,6 +49,7 @@ static xTaskHandle telemetryTxPriTaskHandle;
 static xTaskHandle telemetryRxTaskHandle;
 static uint32_t txErrors;
 static uint32_t txRetries;
+static TelemetrySettingsData settings;
 
 // Private functions
 static void telemetryTxTask(void* parameters);
@@ -61,6 +63,7 @@ static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs);
 static void processObjEvent(UAVObjEvent* ev);
 static void updateTelemetryStats();
 static void gcsTelemetryStatsUpdated();
+static void updateSettings();
 
 /**
  * Initialise the telemetry module
@@ -75,8 +78,8 @@ int32_t TelemetryInitialize(void)
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 	priorityQueue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 
-	// TODO: Get telemetry settings object
-	telemetryPort = COM_USART1;
+	// Get telemetry settings object
+	updateSettings();
 
 	// Initialise UAVTalk
 	UAVTalkInitialize(&transmitData);
@@ -88,8 +91,11 @@ int32_t TelemetryInitialize(void)
 	txErrors = 0;
 	txRetries = 0;
 	memset(&ev, 0, sizeof(UAVObjEvent));
-	EventPeriodicQueueCreate(&ev, queue, STATS_UPDATE_PERIOD_MS);
-	GCSTelemetryStatsConnectQueue(queue);
+	EventPeriodicQueueCreate(&ev, priorityQueue, STATS_UPDATE_PERIOD_MS);
+
+	// Listen to objects of interest
+	GCSTelemetryStatsConnectQueue(priorityQueue);
+	TelemetrySettingsConnectQueue(priorityQueue);
 
 	// Start telemetry tasks
 	xTaskCreate(telemetryTxTask, (signed char*)"TelTx", STACK_SIZE, NULL, TASK_PRIORITY_TX, &telemetryTxTaskHandle);
@@ -189,11 +195,15 @@ static void processObjEvent(UAVObjEvent* ev)
 	{
 		gcsTelemetryStatsUpdated();
 	}
+	else if ( ev->obj == TelemetrySettingsHandle() )
+	{
+		updateSettings();
+	}
 	else
 	{
 		// Only process event if connected to GCS or if object FlightTelemetryStats is updated
 		FlightTelemetryStatsGet(&flightStats);
-		if ( flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED || UAVObjGetID(ev->obj) == FLIGHTTELEMETRYSTATS_OBJID )
+		if ( flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED || ev->obj == FlightTelemetryStatsHandle() )
 		{
 			// Get object metadata
 			UAVObjGetMetadata(ev->obj, &metadata);
@@ -457,7 +467,7 @@ static void updateTelemetryStats()
 	}
 	else if ( flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED )
 	{
-		if ( gcsStats.Status != GCSTELEMETRYSTATS_STATUS_CONNECTED || utalkStats.rxBytes == 0 )
+		if ( gcsStats.Status != GCSTELEMETRYSTATS_STATUS_CONNECTED || utalkStats.rxObjects == 0 )
 		{
 			flightStats.Status = FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED;
 		}
@@ -488,6 +498,27 @@ static void updateTelemetryStats()
 	if ( forceUpdate )
 	{
 		FlightTelemetryStatsUpdated();
+	}
+}
+
+/**
+ * Update the telemetry settings, called on startup and
+ * each time the settings object is updated
+ */
+static void updateSettings()
+{
+	// Set port
+	telemetryPort = COM_USART1;
+	// Retrieve settings
+	TelemetrySettingsGet(&settings);
+	// Set port speed
+	if (settings.Speed == TELEMETRYSETTINGS_SPEED_9600)
+	{
+		PIOS_COM_ChangeBaud(telemetryPort, 9600);
+	}
+	else if (settings.Speed == TELEMETRYSETTINGS_SPEED_57600)
+	{
+		PIOS_COM_ChangeBaud(telemetryPort, 57600);
 	}
 }
 

@@ -33,7 +33,7 @@ typedef enum {USART_1 = 0, USART_2 = 1, USART_3 = 2} USARTNumTypeDef;
 
 /* Public Functions */
 extern void PIOS_USART_Init(void);
-extern void PIOS_USART_ChangeBaud(USART_TypeDef* USARTx, uint32_t Baud);
+extern void PIOS_USART_ChangeBaud(USARTNumTypeDef usart, uint32_t baud);
 
 extern int32_t PIOS_USART_RxBufferFree(USARTNumTypeDef uart);
 extern int32_t PIOS_USART_RxBufferUsed(USARTNumTypeDef uart);

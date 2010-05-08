@@ -64,6 +64,39 @@ int32_t PIOS_COM_Init(void)
 }
 
 /**
+* Change the port speed without re-initializing
+* \param[in] port COM port
+* \param[in] baud Requested baud rate
+* \return -1 if port not available
+* \return 0 on success
+*/
+int32_t PIOS_COM_ChangeBaud(COMPortTypeDef port, uint32_t baud)
+{
+	/* Branch depending on selected port */
+	switch(port) {
+#if defined(PIOS_INCLUDE_USART)
+		case COM_DEBUG_USART:
+			PIOS_USART_ChangeBaud(PIOS_COM_DEBUG_PORT, baud);
+			return 0;
+		case COM_USART1:
+			PIOS_USART_ChangeBaud(USART_1, baud);
+			return 0;
+		case COM_USART2:
+			PIOS_USART_ChangeBaud(USART_2, baud);
+			return 0;
+		case COM_USART3:
+			PIOS_USART_ChangeBaud(USART_3, baud);
+			return 0;
+#endif
+		case COM_USB_HID:
+			return 0;
+		default:
+			/* Invalid port */
+			return -1;
+	}
+}
+
+/**
 * Sends a package over given port
 * \param[in] port COM port
 * \param[in] buffer character buffer

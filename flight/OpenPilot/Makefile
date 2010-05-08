@@ -140,6 +140,7 @@ SRC += $(OPUAVOBJ)/gcstelemetrystats.c
 SRC += $(OPUAVOBJ)/flighttelemetrystats.c
 SRC += $(OPUAVOBJ)/systemstats.c
 SRC += $(OPUAVOBJ)/systemalarms.c
+SRC += $(OPUAVOBJ)/telemetrysettings.c
 
 ## PIOS Hardware (STM32F10x)
 SRC += $(PIOSSTM32F10X)/pios_sys.c

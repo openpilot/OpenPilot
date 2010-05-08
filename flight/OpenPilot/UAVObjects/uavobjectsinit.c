@@ -37,6 +37,7 @@
 #include "objectpersistence.h"
 #include "systemalarms.h"
 #include "systemstats.h"
+#include "telemetrysettings.h"
 
 
 /**
@@ -54,5 +55,6 @@ void UAVObjectsInitializeAll()
     ObjectPersistenceInitialize();
     SystemAlarmsInitialize();
     SystemStatsInitialize();
+    TelemetrySettingsInitialize();
 
 }

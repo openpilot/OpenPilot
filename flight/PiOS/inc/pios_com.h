@@ -38,7 +38,7 @@ typedef enum {
 
 /* Public Functions */
 extern int32_t PIOS_COM_Init(void);
-
+extern int32_t PIOS_COM_ChangeBaud(COMPortTypeDef port, uint32_t baud);
 extern int32_t PIOS_COM_SendCharNonBlocking(COMPortTypeDef port, char c);
 extern int32_t PIOS_COM_SendChar(COMPortTypeDef port, char c);
 extern int32_t PIOS_COM_SendBufferNonBlocking(COMPortTypeDef port, uint8_t *buffer, uint16_t len);

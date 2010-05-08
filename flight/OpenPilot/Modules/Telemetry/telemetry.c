@@ -36,7 +36,8 @@
 #define TASK_PRIORITY_TXPRI (tskIDLE_PRIORITY + 2)
 #define REQ_TIMEOUT_MS 250
 #define MAX_RETRIES 2
-#define STATS_UPDATE_PERIOD_MS 5000
+#define STATS_UPDATE_PERIOD_MS 4000
+#define CONNECTION_TIMEOUT_MS 8000
 
 // Private types
 
@@ -50,6 +51,7 @@ static xTaskHandle telemetryRxTaskHandle;
 static uint32_t txErrors;
 static uint32_t txRetries;
 static TelemetrySettingsData settings;
+static uint32_t timeOfLastObjectUpdate;
 
 // Private functions
 static void telemetryTxTask(void* parameters);
@@ -73,6 +75,9 @@ static void updateSettings();
 int32_t TelemetryInitialize(void)
 {
 	UAVObjEvent ev;
+
+	// Initialize vars
+	timeOfLastObjectUpdate = 0;
 
 	// Create object queues
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
@@ -412,6 +417,8 @@ static void updateTelemetryStats()
 	FlightTelemetryStatsData flightStats;
 	GCSTelemetryStatsData gcsStats;
 	uint8_t forceUpdate;
+	uint8_t connectionTimeout;
+	uint32_t timeNow;
 
 	// Get stats
 	UAVTalkGetStats(&utalkStats);
@@ -443,6 +450,21 @@ static void updateTelemetryStats()
 		txRetries = 0;
 	}
 
+	// Check for connection timeout
+	timeNow = xTaskGetTickCount()*portTICK_RATE_MS;
+	if ( utalkStats.rxObjects > 0 )
+	{
+		timeOfLastObjectUpdate = timeNow;
+	}
+	if ( (timeNow - timeOfLastObjectUpdate) > CONNECTION_TIMEOUT_MS )
+	{
+		connectionTimeout = 1;
+	}
+	else
+	{
+		connectionTimeout = 0;
+	}
+
     // Update connection state
 	forceUpdate = 1;
 	if ( flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED )
@@ -467,7 +489,7 @@ static void updateTelemetryStats()
 	}
 	else if ( flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED )
 	{
-		if ( gcsStats.Status != GCSTELEMETRYSTATS_STATUS_CONNECTED || utalkStats.rxObjects == 0 )
+		if ( gcsStats.Status != GCSTELEMETRYSTATS_STATUS_CONNECTED || connectionTimeout )
 		{
 			flightStats.Status = FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED;
 		}

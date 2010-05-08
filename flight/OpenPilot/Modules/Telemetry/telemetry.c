@@ -542,5 +542,9 @@ static void updateSettings()
 	{
 		PIOS_COM_ChangeBaud(telemetryPort, 57600);
 	}
+	else if (settings.Speed == TELEMETRYSETTINGS_SPEED_38400)
+	{
+		PIOS_COM_ChangeBaud(telemetryPort, 38400);
+	}
 }
 

@@ -14,7 +14,7 @@
    id="svg3604"
    version="1.1"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="system-health-text-2.svg"
+   sodipodi:docname="system-health-path.svg"
    inkscape:export-filename="C:\NoBackup\OpenPilot\mainboard-health.png"
    inkscape:export-xdpi="269.53"
    inkscape:export-ydpi="269.53"
@@ -429,9 +429,9 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="4.911941"
-     inkscape:cx="40.750891"
+     inkscape:cx="-6.0737753"
      inkscape:cy="44.721665"
-     inkscape:current-layer="foreground"
+     inkscape:current-layer="layer21"
      id="namedview3608"
      showgrid="false"
      inkscape:window-width="1280"
@@ -462,7 +462,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -636,7 +636,7 @@
        x="17.566181"
        height="8.1216154"
        width="18.153212"
-       id="rect3325"
+       id="EventSystem-OK"
        style="fill:#04b629;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
        inkscape:label="#rect4000-7-6-7-1" />
   </g>

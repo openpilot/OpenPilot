@@ -32,6 +32,7 @@
 #include <QObject>
 #include <QQueue>
 #include <QTimer>
+#include <QTime>
 #include <QMutex>
 #include <QMutexLocker>
 #include "uavobjects/uavobjectmanager.h"
@@ -53,8 +54,9 @@ public slots:
     void flightStatsUpdated(UAVObject* obj);
 
 private:
-    static const int STATS_UPDATE_PERIOD_MS = 5000;
+    static const int STATS_UPDATE_PERIOD_MS = 4000;
     static const int STATS_CONNECT_PERIOD_MS = 1000;
+    static const int CONNECTION_TIMEOUT_MS = 8000;
 
     UAVObjectManager* objMngr;
     Telemetry* tel;
@@ -64,6 +66,7 @@ private:
     QTimer* statsTimer;
     UAVObject* objPending;
     QMutex* mutex;
+    QTime* connectionTimer;
 
     void startRetrievingObjects();
     void retrieveNextObject();

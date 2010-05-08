@@ -37,6 +37,7 @@ TelemetryMonitor::TelemetryMonitor(UAVObjectManager* objMngr, Telemetry* tel)
     this->objMngr = objMngr;
     this->tel = tel;
     this->objPending = NULL;
+    this->connectionTimer = new QTime();
 
     // Create mutex
     mutex = new QMutex(QMutex::Recursive);
@@ -185,6 +186,21 @@ void TelemetryMonitor::processStatsUpdates()
     gcsStats.TxFailures += telStats.txErrors;
     gcsStats.TxRetries += telStats.txRetries;
 
+    // Check for a connection timeout
+    bool connectionTimeout;
+    if ( telStats.rxObjects > 0 )
+    {
+        connectionTimer->start();
+    }
+    if ( connectionTimer->elapsed() > CONNECTION_TIMEOUT_MS  )
+    {
+        connectionTimeout = true;
+    }
+    else
+    {
+        connectionTimeout = false;
+    }
+
     // Update connection state
     int oldStatus = gcsStats.Status;
     if ( gcsStats.Status == GCSTelemetryStats::STATUS_DISCONNECTED )
@@ -203,7 +219,7 @@ void TelemetryMonitor::processStatsUpdates()
     else if ( gcsStats.Status == GCSTelemetryStats::STATUS_CONNECTED )
     {
         // Check if the connection is still active and the the autopilot is still connected
-        if (flightStats.Status == FlightTelemetryStats::STATUS_DISCONNECTED || telStats.rxObjects == 0)
+        if (flightStats.Status == FlightTelemetryStats::STATUS_DISCONNECTED || connectionTimeout)
         {
             gcsStats.Status = GCSTelemetryStats::STATUS_DISCONNECTED;
         }

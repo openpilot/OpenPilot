@@ -1,0 +1,8 @@
+<xml>
+        <object name="TelemetrySettings" singleinstance="true" settings="true">
+            <field name="Speed" units="" type="enum" elements="1" options="9600,57600" defaultvalue="57600"/>
+            <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+            <telemetryflight acked="true" updatemode="onchange" period="0"/>
+            <logging updatemode="never" period="0"/>
+	</object>
+</xml>

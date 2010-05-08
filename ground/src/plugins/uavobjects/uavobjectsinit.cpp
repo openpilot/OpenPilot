@@ -39,6 +39,7 @@
 #include "objectpersistence.h"
 #include "systemalarms.h"
 #include "systemstats.h"
+#include "telemetrysettings.h"
 
 
 /**
@@ -56,5 +57,6 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new ObjectPersistence() );
     objMngr->registerObject( new SystemAlarms() );
     objMngr->registerObject( new SystemStats() );
+    objMngr->registerObject( new TelemetrySettings() );
 
 }

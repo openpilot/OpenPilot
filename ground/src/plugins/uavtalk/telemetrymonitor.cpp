@@ -203,7 +203,7 @@ void TelemetryMonitor::processStatsUpdates()
     else if ( gcsStats.Status == GCSTelemetryStats::STATUS_CONNECTED )
     {
         // Check if the connection is still active and the the autopilot is still connected
-        if (flightStats.Status == FlightTelemetryStats::STATUS_DISCONNECTED || telStats.rxBytes == 0)
+        if (flightStats.Status == FlightTelemetryStats::STATUS_DISCONNECTED || telStats.rxObjects == 0)
         {
             gcsStats.Status = GCSTelemetryStats::STATUS_DISCONNECTED;
         }

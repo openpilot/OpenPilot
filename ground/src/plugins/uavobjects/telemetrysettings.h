@@ -48,7 +48,7 @@ public:
     // Field information
     // Field Speed information
     /* Enumeration options for field Speed */
-    typedef enum { SPEED_9600=0, SPEED_57600=1,  } SpeedOptions;
+    typedef enum { SPEED_9600=0, SPEED_38400=1, SPEED_57600=2,  } SpeedOptions;
 
   
     // Constants

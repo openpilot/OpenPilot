@@ -49,6 +49,8 @@ Telemetry::Telemetry(UAVTalk* utalk, UAVObjectManager* objMngr)
     connect(objMngr, SIGNAL(newInstance(UAVObject*)), this, SLOT(newInstance(UAVObject*)));
     // Listen to transaction completions
     connect(utalk, SIGNAL(transactionCompleted(UAVObject*)), this, SLOT(transactionCompleted(UAVObject*)));
+    // Get GCS stats object
+    gcsStatsObj = GCSTelemetryStats::GetInstance(objMngr);
     // Setup transaction timer
     transPending = false;
     transTimer = new QTimer(this);
@@ -296,6 +298,7 @@ void Telemetry::processObjectUpdates(UAVObject* obj, EventMask event, bool allIn
         else
         {
             ++txErrors;
+            obj->emitTransactionCompleted(false);
             qxtLog->warning(tr("Telemetry: priority event queue is full, event lost (%1)").arg(obj->getName()));
         }
     }
@@ -308,6 +311,7 @@ void Telemetry::processObjectUpdates(UAVObject* obj, EventMask event, bool allIn
         else
         {
             ++txErrors;
+            obj->emitTransactionCompleted(false);
         }
     }
 
@@ -343,6 +347,19 @@ void Telemetry::processObjectQueue()
     else
     {
         return;
+    }
+
+    // Check if a connection has been established, only process GCSTelemetryStats updates
+    // (used to establish the connection)
+    GCSTelemetryStats::DataFields gcsStats = gcsStatsObj->getData();
+    if ( gcsStats.Status != GCSTelemetryStats::STATUS_CONNECTED )
+    {
+        objQueue.clear();
+        if ( objInfo.obj->getObjID() != GCSTelemetryStats::OBJID )
+        {
+            objInfo.obj->emitTransactionCompleted(false);
+            return;
+        }
     }
 
     // Setup transaction (skip if unpack event)

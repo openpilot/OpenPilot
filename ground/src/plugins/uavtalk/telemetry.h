@@ -31,6 +31,7 @@
 
 #include "uavtalk.h"
 #include "uavobjects/uavobjectmanager.h"
+#include "uavobjects/gcstelemetrystats.h"
 #include <QMutex>
 #include <QMutexLocker>
 #include <QTimer>
@@ -74,7 +75,7 @@ private slots:
 private:
     // Constants
     static const int REQ_TIMEOUT_MS = 250;
-    static const int MAX_RETRIES = 3;
+    static const int MAX_RETRIES = 2;
     static const int MAX_UPDATE_PERIOD_MS = 1000;
     static const int MIN_UPDATE_PERIOD_MS = 1;
     static const int MAX_QUEUE_SIZE = 20;
@@ -113,6 +114,7 @@ private:
     // Variables
     UAVObjectManager* objMngr;
     UAVTalk* utalk;
+    GCSTelemetryStats* gcsStatsObj;
     QList<ObjectTimeInfo> objList;
     QQueue<ObjectQueueInfo> objQueue;
     QQueue<ObjectQueueInfo> objPriorityQueue;

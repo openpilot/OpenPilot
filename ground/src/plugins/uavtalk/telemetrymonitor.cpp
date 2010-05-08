@@ -186,12 +186,11 @@ void TelemetryMonitor::processStatsUpdates()
     gcsStats.TxRetries += telStats.txRetries;
 
     // Update connection state
+    int oldStatus = gcsStats.Status;
     if ( gcsStats.Status == GCSTelemetryStats::STATUS_DISCONNECTED )
     {
         // Request connection
         gcsStats.Status = GCSTelemetryStats::STATUS_HANDSHAKEREQ;
-        statsTimer->setInterval(STATS_CONNECT_PERIOD_MS);
-        qxtLog->info("Trying to connect to the autopilot");
     }
     else if ( gcsStats.Status == GCSTelemetryStats::STATUS_HANDSHAKEREQ )
     {
@@ -199,9 +198,6 @@ void TelemetryMonitor::processStatsUpdates()
         if ( flightStats.Status == FlightTelemetryStats::STATUS_HANDSHAKEACK )
         {
             gcsStats.Status = GCSTelemetryStats::STATUS_CONNECTED;
-            statsTimer->setInterval(STATS_UPDATE_PERIOD_MS);
-            qxtLog->info("Connection with the autopilot established");
-            startRetrievingObjects();
         }
     }
     else if ( gcsStats.Status == GCSTelemetryStats::STATUS_CONNECTED )
@@ -210,7 +206,6 @@ void TelemetryMonitor::processStatsUpdates()
         if (flightStats.Status == FlightTelemetryStats::STATUS_DISCONNECTED || telStats.rxBytes == 0)
         {
             gcsStats.Status = GCSTelemetryStats::STATUS_DISCONNECTED;
-            qxtLog->info("Connection with the autopilot lost");
         }
     }
 
@@ -222,6 +217,20 @@ void TelemetryMonitor::processStatsUpdates()
          flightStats.Status != FlightTelemetryStats::STATUS_CONNECTED )
     {
         gcsStatsObj->updated();
+    }
+
+    // Act on new connections or disconnections
+    if (gcsStats.Status == GCSTelemetryStats::STATUS_CONNECTED && gcsStats.Status != oldStatus)
+    {
+        statsTimer->setInterval(STATS_UPDATE_PERIOD_MS);
+        qxtLog->info("Connection with the autopilot established");
+        startRetrievingObjects();
+    }
+    if (gcsStats.Status == GCSTelemetryStats::STATUS_DISCONNECTED && gcsStats.Status != oldStatus)
+    {
+        statsTimer->setInterval(STATS_CONNECT_PERIOD_MS);
+        qxtLog->info("Connection with the autopilot lost");
+        qxtLog->info("Trying to connect to the autopilot");
     }
 }
 

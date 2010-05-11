@@ -25,9 +25,11 @@
 
 # Set developer code and compile options
 # Set to YES for debugging
-DEBUG = YES
+DEBUG ?= YES
+USE_BOOTLOADER ?= NO
+
 # Set to YES when using Code Sourcery toolchain
-CODE_SOURCERY = YES
+CODE_SOURCERY ?= YES
 
 # Toolchain prefix (i.e arm-elf- -> arm-elf-gcc.exe)
 TCHAIN_PREFIX = arm-none-eabi-
@@ -50,8 +52,12 @@ USE_THUMB_MODE = YES
 # - BOARD just passed as define (optional)
 MCU      = cortex-m3
 CHIP     = STM32F103CBT
-MODEL    = MD
 BOARD    = STM32103CB_AHRS
+ifeq ($(USE_BOOTLOADER), YES)
+MODEL    = MD
+else
+MODEL    = MD
+endif
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
 OUTDIR = Build
@@ -88,7 +94,7 @@ SRC += $(PIOSSTM32F10X)/pios_delay.c
 SRC += $(PIOSSTM32F10X)/pios_usart.c
 SRC += $(PIOSSTM32F10X)/pios_irq.c
 SRC += $(PIOSSTM32F10X)/pios_adc.c
-SRC += $(PIOSSTM32F10X)/pios_spi.c
+#SRC += $(PIOSSTM32F10X)/pios_spi.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_com.c
@@ -278,7 +284,7 @@ OOCD_EXE=openocd
 # debug level
 OOCD_CL=-d0
 # interface and board/target settings (using the OOCD target-library here)
-OOCD_CL+=-f project/OpenOCD/floss-jtag.cfg -f project/OpenOCD/stm32.cfg
+OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.cfg -f ../Project/OpenOCD/stm32.cfg
 # initialize
 OOCD_CL+=-c init
 # show the targets

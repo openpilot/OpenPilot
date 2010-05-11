@@ -126,7 +126,7 @@ void OpenPilotInit()
 
 	/* Create test tasks */
 	//xTaskCreate(TaskTesting, (signed portCHAR *)"Testing", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
-	//xTaskCreate(TaskHIDTest, (signed portCHAR *)"HIDTest", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
+	xTaskCreate(TaskHIDTest, (signed portCHAR *)"HIDTest", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
 	//xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
 	//xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
 }
@@ -140,7 +140,6 @@ static void TaskTesting(void *pvParameters)
 
 	for(;;)
 	{
-
 		/* This blocks the task until the BMP085 EOC */
 		/*
 		PIOS_BMP085_StartADC(TemperatureConv);
@@ -154,7 +153,7 @@ static void TaskTesting(void *pvParameters)
 		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u\r", PIOS_BMP085_GetPressure());
 		*/
 
-		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u,%u,%u,%u,%u,%u,%u,%u uS\r", PIOS_PWM_Get(0), PIOS_PWM_Get(1), PIOS_PWM_Get(2), PIOS_PWM_Get(3), PIOS_PWM_Get(4), PIOS_PWM_Get(5), PIOS_PWM_Get(6), PIOS_PWM_Get(7));
+		PIOS_COM_SendFormattedStringNonBlocking(COM_USART2, "%u,%u,%u,%u,%u,%u,%u,%u uS\r", PIOS_PWM_Get(0), PIOS_PWM_Get(1), PIOS_PWM_Get(2), PIOS_PWM_Get(3), PIOS_PWM_Get(4), PIOS_PWM_Get(5), PIOS_PWM_Get(6), PIOS_PWM_Get(7));
 		//PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u,%u,%u,%u,%u,%u,%u,%u uS\r", PIOS_PPM_Get(0), PIOS_PPM_Get(1), PIOS_PPM_Get(2), PIOS_PPM_Get(3), PIOS_PPM_Get(4), PIOS_PPM_Get(5), PIOS_PPM_Get(6), PIOS_PPM_Get(7));
 
 		/* This blocks the task until there is something on the buffer */
@@ -173,8 +172,8 @@ static void TaskTesting(void *pvParameters)
 		//temp = ((1.43 - ((Vsense / 4096) * 3.3)) / 4.3) + 25;
 		//uint32_t vsense = PIOS_ADC_PinGet(0);
 		//uint32_t Temp = (1.42 -  vsense * 3.3 / 4096) * 1000 / 4.35 + 25;
-		PIOS_COM_SendFormattedString(COM_DEBUG_USART, "Temp: %d, CS_I: %d, CS_V: %d, 5v: %d\r", PIOS_ADC_PinGet(0), PIOS_ADC_PinGet(1), PIOS_ADC_PinGet(2), PIOS_ADC_PinGet(3));
-		PIOS_COM_SendFormattedString(COM_DEBUG_USART, "AUX1: %d, AUX2: %d, AUX3: %d\r", PIOS_ADC_PinGet(4), PIOS_ADC_PinGet(5), PIOS_ADC_PinGet(6));
+		//PIOS_COM_SendFormattedString(COM_DEBUG_USART, "Temp: %d, CS_I: %d, CS_V: %d, 5v: %d\r", PIOS_ADC_PinGet(0), PIOS_ADC_PinGet(1), PIOS_ADC_PinGet(2), PIOS_ADC_PinGet(3));
+		//PIOS_COM_SendFormattedString(COM_DEBUG_USART, "AUX1: %d, AUX2: %d, AUX3: %d\r", PIOS_ADC_PinGet(4), PIOS_ADC_PinGet(5), PIOS_ADC_PinGet(6));
 
 		vTaskDelay(xDelay);
 	}
@@ -183,13 +182,13 @@ static void TaskTesting(void *pvParameters)
 static void TaskHIDTest(void *pvParameters)
 {
 	uint8_t byte;
-	uint8_t line_buffer[64];
+	uint8_t line_buffer[128];
 	uint16_t line_ix;
 
 	for(;;)
 	{
 		/* HID Loopback Test */
-		if(PIOS_COM_ReceiveBufferUsed(COM_USB_HID) != 0) {
+		/*if(PIOS_COM_ReceiveBufferUsed(COM_USB_HID) != 0) {
 			byte = PIOS_COM_ReceiveBuffer(COM_USB_HID);
 			if(byte == '\r' || byte == '\n' || byte == 0) {
 				PIOS_COM_SendFormattedString(COM_USB_HID, "RX: %s\r", line_buffer);
@@ -199,6 +198,19 @@ static void TaskHIDTest(void *pvParameters)
 				line_buffer[line_ix++] = byte;
 				line_buffer[line_ix] = 0;
 			}
+		}*/
+
+		/* HID Loopback Test */
+		if(PIOS_COM_ReceiveBufferUsed(COM_USART2) != 0) {
+			byte = PIOS_COM_ReceiveBuffer(COM_USART2);
+			/*if(byte == '\r' || byte == '\n' || byte == 0) {
+				PIOS_COM_SendFormattedString(COM_DEBUG_USART, "RX: %s\r", line_buffer);
+				line_ix = 0;
+			} else if(line_ix < (128 - 1)) {
+				line_buffer[line_ix++] = byte;
+				line_buffer[line_ix] = 0;
+			}*/
+			PIOS_COM_SendChar(COM_DEBUG_USART, (char)byte);
 		}
 	}
 }

@@ -34,7 +34,7 @@
 
 
 /* Global Variables */
-static portBASE_TYPE xHigherPriorityTaskWoken;
+
 
 /* Local Variables */
 static uint8_t rx_buffer[PIOS_USART_NUM][PIOS_USART_RX_BUFFER_SIZE];
@@ -49,7 +49,7 @@ static volatile uint8_t tx_buffer_size[PIOS_USART_NUM];
 
 
 /**
-* Initialise the GPS and TELEM onboard USARTs
+* Initialise the onboard USARTs
 */
 void PIOS_USART_Init(void)
 {
@@ -64,7 +64,6 @@ void PIOS_USART_Init(void)
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_StructInit(&GPIO_InitStructure);
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_OD;
 
 	/* Configure and Init USARTs */
 	USART_InitTypeDef USART_InitStructure;
@@ -83,7 +82,7 @@ void PIOS_USART_Init(void)
 	/* Enable the USART Pins Software Remapping */
 	PIOS_USART1_REMAP_FUNC;
 
-	/* Configure and Init USART Tx as alternate function open-drain */
+	/* Configure and Init USART Tx as alternate function push-pull */
 	GPIO_InitStructure.GPIO_Pin = PIOS_USART1_TX_PIN;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	GPIO_Init(PIOS_USART1_GPIO_PORT, &GPIO_InitStructure);
@@ -116,7 +115,7 @@ void PIOS_USART_Init(void)
 	/* Enable the USART Pins Software Remapping */
 	PIOS_USART2_REMAP_FUNC;
 
-	/* Configure and Init USART Tx as alternate function open-drain */
+	/* Configure and Init USART Tx as alternate function push-pull */
 	GPIO_InitStructure.GPIO_Pin = PIOS_USART2_TX_PIN;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	GPIO_Init(PIOS_USART2_GPIO_PORT, &GPIO_InitStructure);
@@ -149,7 +148,7 @@ void PIOS_USART_Init(void)
 	/* Enable the USART Pins Software Remapping */
 	PIOS_USART3_REMAP_FUNC;
 
-	/* Configure and Init USART Tx as alternate function open-drain */
+	/* Configure and Init USART Tx as alternate function push-pull */
 	GPIO_InitStructure.GPIO_Pin = PIOS_USART3_TX_PIN;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	GPIO_Init(PIOS_USART3_GPIO_PORT, &GPIO_InitStructure);
@@ -433,13 +432,19 @@ int32_t PIOS_USART_TxBufferPutMoreNonBlocking(USARTNumTypeDef usart, uint8_t *bu
 		/* Enable Tx interrupt if buffer was empty */
 		if(++tx_buffer_size[usart] == 1) {
 			switch(usart) {
+				#if (PIOS_USART1_ENABLED)
 				/* Enable TXE interrupt (TXEIE=1) */
 				case 0: PIOS_USART1_USART->CR1 |= (1 << 7); break;
+				#endif
+				#if (PIOS_USART2_ENABLED)
 				/* Enable TXE interrupt (TXEIE=1) */
 				case 1: PIOS_USART2_USART->CR1 |= (1 << 7); break;
+				#endif
+				#if (PIOS_USART3_ENABLED)
 				/* Enable TXE interrupt (TXEIE=1) */
 				case 2: PIOS_USART3_USART->CR1 |= (1 << 7); break;
 				/* USART not supported by routine (yet) */
+				#endif
 				default: PIOS_IRQ_Enable(); return -3;
 			}
 		}
@@ -524,7 +529,7 @@ PIOS_USART1_IRQHANDLER_FUNC
 	if(PIOS_USART1_USART->SR & (1 << 7)) {
 		if(PIOS_USART_TxBufferUsed(USART_1) > 0) {
 			int b = PIOS_USART_TxBufferGet(USART_1);
-			if( b < 0 ) {
+			if(b < 0) {
 				/* Here we could add some error handling */
 				PIOS_USART1_USART->DR = 0xff;
 			} else {
@@ -538,7 +543,7 @@ PIOS_USART1_IRQHANDLER_FUNC
 }
 #endif
 
-#if (PIOS_USART1_ENABLED)
+#if (PIOS_USART2_ENABLED)
 /* Interrupt handler for USART2 */
 PIOS_USART2_IRQHANDLER_FUNC
 {
@@ -569,7 +574,7 @@ PIOS_USART2_IRQHANDLER_FUNC
 }
 #endif
 
-#if (PIOS_USART1_ENABLED)
+#if (PIOS_USART3_ENABLED)
 /* Interrupt handler for USART3 */
 PIOS_USART3_IRQHANDLER_FUNC
 {

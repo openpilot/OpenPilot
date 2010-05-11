@@ -113,15 +113,24 @@ int32_t PIOS_COM_SendBufferNonBlocking(COMPortTypeDef port, uint8_t *buffer, uin
 #if defined(PIOS_INCLUDE_USART)
 		case COM_DEBUG_USART:
 			return PIOS_USART_TxBufferPutMoreNonBlocking(PIOS_COM_DEBUG_PORT, buffer, len);
+#endif
+#if PIOS_USART1_ENABLED
 		case COM_USART1:
 			return PIOS_USART_TxBufferPutMoreNonBlocking(USART_1, buffer, len);
+#endif
+#if PIOS_USART2_ENABLED
 		case COM_USART2:
 			return PIOS_USART_TxBufferPutMoreNonBlocking(USART_2, buffer, len);
+#endif
+#if PIOS_USART3_ENABLED
 		case COM_USART3:
 			return PIOS_USART_TxBufferPutMoreNonBlocking(USART_3, buffer, len);
 #endif
+
+#if defined(PIOS_INCLUDE_USB_HID)
 		case COM_USB_HID:
 			return PIOS_USB_HID_TxBufferPutMoreNonBlocking(buffer, len);
+#endif
 		default:
 			/* Invalid port */
 			return -1;
@@ -144,15 +153,24 @@ int32_t PIOS_COM_SendBuffer(COMPortTypeDef port, uint8_t *buffer, uint16_t len)
 #if defined(PIOS_INCLUDE_USART)
 		case COM_DEBUG_USART:
 			return PIOS_USART_TxBufferPutMore(PIOS_COM_DEBUG_PORT, buffer, len);
+#endif
+#if PIOS_USART1_ENABLED
 		case COM_USART1:
 			return PIOS_USART_TxBufferPutMore(USART_1, buffer, len);
+#endif
+#if PIOS_USART2_ENABLED
 		case COM_USART2:
 			return PIOS_USART_TxBufferPutMore(USART_2, buffer, len);
+#endif
+#if PIOS_USART3_ENABLED
 		case COM_USART3:
 			return PIOS_USART_TxBufferPutMore(USART_3, buffer, len);
 #endif
+
+#if defined(PIOS_INCLUDE_USB_HID)
 		case COM_USB_HID:
 			return PIOS_USB_HID_TxBufferPutMore(buffer, len);
+#endif
 		default:
 			/* Invalid port */
 			return -1;
@@ -264,15 +282,24 @@ uint8_t PIOS_COM_ReceiveBuffer(COMPortTypeDef port)
 #if defined(PIOS_INCLUDE_USART)
 		case COM_DEBUG_USART:
 			return PIOS_USART_RxBufferGet(PIOS_COM_DEBUG_PORT);
+#endif
+#if PIOS_USART1_ENABLED
 		case COM_USART1:
 			return PIOS_USART_RxBufferGet(USART_1);
+#endif
+#if PIOS_USART2_ENABLED
 		case COM_USART2:
 			return PIOS_USART_RxBufferGet(USART_2);
+#endif
+#if PIOS_USART3_ENABLED
 		case COM_USART3:
 			return PIOS_USART_RxBufferGet(USART_3);
 #endif
+
+#if defined(PIOS_INCLUDE_USB_HID)
 		case COM_USB_HID:
 			return PIOS_USB_HID_RxBufferGet();
+#endif
 		/* To suppress warnings */
 		default:
 			return 0;
@@ -287,18 +314,27 @@ uint8_t PIOS_COM_ReceiveBuffer(COMPortTypeDef port)
 int32_t PIOS_COM_ReceiveBufferUsed(COMPortTypeDef port)
 {
 	switch(port) {
+
 #if defined(PIOS_INCLUDE_USART)
 		case COM_DEBUG_USART:
 			return PIOS_USART_RxBufferUsed(PIOS_COM_DEBUG_PORT);
+#if PIOS_USART1_ENABLED
 		case COM_USART1:
 			return PIOS_USART_RxBufferUsed(USART_1);
+#endif
+#if PIOS_USART2_ENABLED
 		case COM_USART2:
 			return PIOS_USART_RxBufferUsed(USART_2);
+#endif
+#if PIOS_USART3_ENABLED
 		case COM_USART3:
 			return PIOS_USART_RxBufferUsed(USART_3);
 #endif
+#endif
+#if defined(PIOS_INCLUDE_USB_HID)
 		case COM_USB_HID:
 			return PIOS_USB_HID_RxBufferUsed();
+#endif
 		/* To suppress warnings */
 		default:
 			return 0;

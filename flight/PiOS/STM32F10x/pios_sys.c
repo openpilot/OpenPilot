@@ -101,8 +101,14 @@ int32_t PIOS_SYS_Reset(void)
 	PIOS_IRQ_Disable();
 
 	// turn off all board LEDs
+	#if (PIOS_LED_NUM == 1)
+	PIOS_LED_Off(LED1);
+	#elif (PIOS_LED_NUM == 2)
 	PIOS_LED_Off(LED1);
 	PIOS_LED_Off(LED2);
+	#endif
+
+
 
 	/* Reset STM32 */
 	//RCC_APB2PeriphResetCmd(0xfffffff8, ENABLE); /* MBHP_CORE_STM32: don't reset GPIOA/AF due to USB pins */

@@ -44,13 +44,19 @@ int main()
 	/* Delay system */
 	PIOS_DELAY_Init();
 
+	/* Communication system */
+	PIOS_COM_Init();
+
+	/* ADC system */
+	PIOS_ADC_Init();
+
 	/* Toggle LED's forever */
 	PIOS_LED_On(LED1);
-	PIOS_LED_On(LED2);
-	for(;;)
-	{
-		PIOS_LED_Toggle(LED2);
-		PIOS_DELAY_WaitmS(100);
+
+	for(;;) {
+		PIOS_LED_Toggle(LED1);
+		PIOS_COM_SendFormattedString(COM_USART1, "%d,%d,%d,%d,%d,%d,%d,%d\r", PIOS_ADC_PinGet(0), PIOS_ADC_PinGet(1), PIOS_ADC_PinGet(2), PIOS_ADC_PinGet(3), PIOS_ADC_PinGet(4), PIOS_ADC_PinGet(5), PIOS_ADC_PinGet(6), PIOS_ADC_PinGet(7));
+		PIOS_DELAY_WaitmS(25);
 	}
 
 

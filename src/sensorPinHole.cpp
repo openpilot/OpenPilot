@@ -12,12 +12,15 @@
  */
 
 #include "rtslam/pinholeTools.hpp"
-
 #include "rtslam/sensorPinHole.hpp"
+#include "rtslam/rawImageSimu.hpp"
+
+#include "image/Image.hpp"
 
 namespace jafar {
 	namespace rtslam {
 		using namespace std;
+		using namespace jafar::image;
 
 
 		///////////////////////////////////////
@@ -50,6 +53,18 @@ namespace jafar {
 			pose.x(_pose);
 			pose.std(_std);
 			set_parameters(_k, _d, _c);
+		}
+
+		void SensorPinHole::acquireRaw(){
+
+			Image *i;
+			i =  Image::loadImage("/home/agonzale/workspace/opencv/img_pan01.jpeg",1);
+
+			rawimagesimu_ptr_t imgRawPtr(new RawImageSimu());
+			imgRawPtr->setImage(i);
+
+			this->currentRawPtr = imgRawPtr;
+
 		}
 
 

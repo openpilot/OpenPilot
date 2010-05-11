@@ -69,10 +69,10 @@ namespace jafar {
 		/*
 		 * Acquire raw data.
 		 */
-		void SensorAbstract::acquireRaw() {
-			cout << "acquiring raw" << endl;
-			// \todo Acquire raw data
-		}
+//		void SensorAbstract::acquireRaw() {
+//			cout << "acquiring raw" << endl;
+//			// \todo Acquire raw data
+//		}
 
 
 		/**

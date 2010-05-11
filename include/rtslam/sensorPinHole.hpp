@@ -76,6 +76,8 @@ namespace jafar {
 					return 7;
 				}
 
+				void acquireRaw();
+
 				raw_ptr_t getRaw() {
 					return currentRawPtr ;
 				}

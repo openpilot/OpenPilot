@@ -39,6 +39,7 @@
 
 using namespace jblas;
 using namespace jafar::jmath;
+using namespace jafar::image;
 using namespace jafar::jmath::ublasExtra;
 using namespace jafar::rtslam;
 using namespace boost;
@@ -112,7 +113,8 @@ void test_slam01() {
 			{
 				sensor_ptr_t senPtr = *senIter;
 				// get raw-data
-				senPtr->acquireRaw() ; // todo define-it in sensorPinHole
+				senPtr->acquireRaw() ;
+
 
 				// 1. Observe known landmarks
 				// foreach observation

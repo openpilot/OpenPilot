@@ -129,7 +129,7 @@ namespace jafar {
 				/*
 				 * Acquire raw data.
 				 */
-				virtual void acquireRaw();
+				virtual void acquireRaw() = 0;
 
 				virtual raw_ptr_t getRaw() = 0;
 

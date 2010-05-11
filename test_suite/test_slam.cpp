@@ -39,7 +39,6 @@
 
 using namespace jblas;
 using namespace jafar::jmath;
-using namespace jafar::image;
 using namespace jafar::jmath::ublasExtra;
 using namespace jafar::rtslam;
 using namespace boost;

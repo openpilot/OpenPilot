@@ -37,7 +37,7 @@
 #define I2C_ERROR_SLAVE_NOT_CONNECTED			-7
 #define I2C_ERROR_UNEXPECTED_EVENT			-8
 #define I2C_ERROR_RX_BUFFER_OVERRUN			-9
-#define I2C_ERROR_BUSY						-10
+#define I2C_ERROR_BUSY					-10
 
 
 /* Global Types */

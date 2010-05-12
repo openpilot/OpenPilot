@@ -3,7 +3,7 @@
  *
  * @file       pios_bmp085.c  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      IRQ Enable/Disable routines
+ * @brief      BMP085 Pressure Sensor Routines
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   PIOS_BMP085 BMP085 Functions
  * @{

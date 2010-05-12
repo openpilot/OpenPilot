@@ -94,11 +94,12 @@ SRC += $(PIOSSTM32F10X)/pios_delay.c
 SRC += $(PIOSSTM32F10X)/pios_usart.c
 SRC += $(PIOSSTM32F10X)/pios_irq.c
 SRC += $(PIOSSTM32F10X)/pios_adc.c
-#SRC += $(PIOSSTM32F10X)/pios_i2c.c
+SRC += $(PIOSSTM32F10X)/pios_i2c.c
 #SRC += $(PIOSSTM32F10X)/pios_spi.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_com.c
+SRC += $(PIOSCOMMON)/pios_hmc5843.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 
 ## CMSIS for STM32

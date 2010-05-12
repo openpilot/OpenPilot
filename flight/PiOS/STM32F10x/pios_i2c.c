@@ -139,15 +139,15 @@ int32_t PIOS_I2C_Init(void)
 
 	TransferEnd(&I2CRec);
 
-	/* Configure and enable I2C2 interrupts */
+	/* Configure and enable I2C interrupts */
 	NVIC_InitTypeDef NVIC_InitStructure;
-	NVIC_InitStructure.NVIC_IRQChannel = I2C2_EV_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannel = PIOS_I2C_IRQ_EV_CHANNEL;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_I2C_IRQ_EV_PRIORITY;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 
-	NVIC_InitStructure.NVIC_IRQChannel = I2C2_ER_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannel = PIOS_I2C_IRQ_ER_CHANNEL;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_I2C_IRQ_ER_PRIORITY;
 	NVIC_Init(&NVIC_InitStructure);
 
@@ -174,10 +174,10 @@ static void PIOS_I2C_InitPeripheral(void)
 	I2C_InitStructure.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
 
 	/* Define base address */
-	i2cx->base = I2C2;
+	i2cx->base = PIOS_I2C_PORT;
 
 	/* enable peripheral clock of I2C */
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);
+	RCC_APB1PeriphClockCmd(PIOS_I2C_CLK, ENABLE);
 
 	/* Set I2C clock bus clock params */
 	/* Note that the STM32 driver handles value <= 100kHz differently! (duty cycle always 1:1) */
@@ -650,12 +650,12 @@ static void ER_IRQHandler(I2CRecTypeDef *i2cx)
 
 
 /* Interrupt vectors */
-void I2C2_EV_IRQHandler(void)
+PIOS_I2C_IRQ_EV_HANDLER
 {
   EV_IRQHandler((I2CRecTypeDef *)&I2CRec);
 }
 
-void I2C2_ER_IRQHandler(void)
+PIOS_I2C_IRQ_ER_HANDLER
 {
   ER_IRQHandler((I2CRecTypeDef *)&I2CRec);
 }

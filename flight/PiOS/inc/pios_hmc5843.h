@@ -1,10 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       pios_config.h  
+ * @file       pios_hmc5843.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      PiOS configuration header. 
- *                 - Central compile time config for the project.
+ * @brief      HMC5843 functions header.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -24,20 +23,22 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#ifndef PIOS_HMC5843_H
+#define PIOS_HMC5843_H
 
-#ifndef PIOS_CONFIG_H
-#define PIOS_CONFIG_H
-
-/* Enable/Disable PiOS Modules */
-#define PIOS_INCLUDE_ADC
-#define PIOS_INCLUDE_DELAY
-#define PIOS_INCLUDE_I2C
-#define PIOS_INCLUDE_IRQ
-#define PIOS_INCLUDE_LED
-#define PIOS_INCLUDE_SYS
-#define PIOS_INCLUDE_USART
-#define PIOS_INCLUDE_COM
-#define PIOS_INCLUDE_HMC5843
+/* BMP085 Addresses */
+#define HMC5843_I2C_ADDR		0x3C
 
 
-#endif /* PIOS_CONFIG_H */
+/* Local Types */
+
+
+/* Global Variables */
+
+
+/* Public Functions */
+extern void PIOS_HMC5843_Init(void);
+extern int32_t PIOS_HMC5843_Read(uint8_t address, uint8_t *buffer, uint8_t len);
+extern int32_t PIOS_HMC5843_Write(uint8_t address, uint8_t buffer);
+
+#endif /* PIOS_HMC5843_H */

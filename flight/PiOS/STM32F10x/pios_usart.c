@@ -193,12 +193,17 @@ void PIOS_USART_ChangeBaud(USARTNumTypeDef usart, uint32_t baud)
 	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
 	USART_InitStructure.USART_BaudRate = baud;
-	if (usart == USART_1)
+	if (usart == USART_1) {
 		USART_Init(PIOS_USART1_USART, &USART_InitStructure);
-	else if (usart == USART_2)
+	} else if (usart == USART_2) {
+#if (PIOS_USART2_ENABLED)
 		USART_Init(PIOS_USART2_USART, &USART_InitStructure);
-	else if (usart == USART_3)
+#endif
+	} else if (usart == USART_3) {
+#if (PIOS_USART3_ENABLED)
 		USART_Init(PIOS_USART3_USART, &USART_InitStructure);
+#endif
+	}
 }
 
 /**

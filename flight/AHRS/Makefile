@@ -94,6 +94,7 @@ SRC += $(PIOSSTM32F10X)/pios_delay.c
 SRC += $(PIOSSTM32F10X)/pios_usart.c
 SRC += $(PIOSSTM32F10X)/pios_irq.c
 SRC += $(PIOSSTM32F10X)/pios_adc.c
+#SRC += $(PIOSSTM32F10X)/pios_i2c.c
 #SRC += $(PIOSSTM32F10X)/pios_spi.c
 
 ## PIOS Hardware (Common)

@@ -56,8 +56,7 @@ void PIOS_ADC_Init(void)
 
 	/* Clear arrays and variables */
 	for(i = 0; i < PIOS_ADC_NUM_CHANNELS; ++i) {
-		adc_conversion_values[i] = 55;
-		//adc_conversion_values_sum[i] = 0;
+		adc_conversion_values[i] = 0;
 	}
 	for(i = 0; i < PIOS_ADC_NUM_CHANNELS; ++i) {
 		adc_pin_values[i] = 0;

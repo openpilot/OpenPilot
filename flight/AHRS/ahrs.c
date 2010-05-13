@@ -51,7 +51,7 @@ int main()
 	PIOS_ADC_Init();
 
 	/* Magnetic sensor system */
-	#if 0
+	#if 1
 	PIOS_I2C_Init();
 	PIOS_HMC5843_Init();
 	#endif
@@ -65,16 +65,16 @@ int main()
 	for(;;) {
 		PIOS_LED_Toggle(LED1);
 
-		// Test ADC
-		PIOS_COM_SendFormattedString(COM_USART1, "%d,%d,%d,%d,%d,%d\r", PIOS_ADC_PinGet(0), PIOS_ADC_PinGet(1), PIOS_ADC_PinGet(2), PIOS_ADC_PinGet(3), PIOS_ADC_PinGet(4), PIOS_ADC_PinGet(5));
-
-		#if 0
+		#if 1
 		result = PIOS_HMC5843_Read(0x0A, buffer, 3);
-		PIOS_COM_SendFormattedString(COM_USART1, "Result: %d\r", result);
-		PIOS_COM_SendFormattedString(COM_USART1, "Ident: %s\r", buffer);
+		//PIOS_COM_SendFormattedString(COM_USART1, "Result: %d\r", result);
+		//PIOS_COM_SendFormattedString(COM_USART1, "Ident: \r", buffer);
 		#endif
 
-		PIOS_DELAY_WaitmS(25);
+		// Test ADC
+		PIOS_COM_SendFormattedString(COM_USART1, "%s,%d,%d,%d,%d,%d,%d\r\n", buffer, PIOS_ADC_PinGet(0), PIOS_ADC_PinGet(1), PIOS_ADC_PinGet(2), PIOS_ADC_PinGet(3), PIOS_ADC_PinGet(4), PIOS_ADC_PinGet(5));
+
+		PIOS_DELAY_WaitmS(100);
 	}
 
 

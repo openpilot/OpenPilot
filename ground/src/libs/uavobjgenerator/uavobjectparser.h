@@ -97,12 +97,14 @@ public:
                                  QString& outInclude, QString& outCode);
     bool generateGCSObject(int objIndex, const QString& templateInclude, const QString& templateCode,
                               QString& outInclude, QString& outCode);
+    bool generatePythonObject(int objIndex, const QString& templateCode, QString& outCode);
 
 private:
     QList<ObjectInfo*> objInfo;
     QString filename;
     QStringList fieldTypeStrC;
     QStringList fieldTypeStrCPP;
+    QStringList fieldTypeStrPython;
     QStringList fieldTypeStrCPPClass;
     QStringList fieldTypeStrXML;
     QStringList updateModeStr;

@@ -41,6 +41,10 @@ UAVObjectParser::UAVObjectParser()
                        QString( "quint8") << QString("quint16") << QString("quint32") <<
                        QString("float") << QString("quint8");
 
+    fieldTypeStrPython << QString("b") << QString("h") << QString("i") <<
+                          QString( "B") << QString("H") << QString("I") <<
+                          QString("f") << QString("b");
+
     fieldTypeStrCPPClass << QString("INT8") << QString("INT16") << QString("INT32") <<
                             QString( "UINT8") << QString("UINT16") << QString("UINT32") <<
                             QString("FLOAT32") << QString("ENUM");
@@ -840,6 +844,63 @@ bool UAVObjectParser::generateGCSObject(int objIndex, const QString& templateInc
         }
     }
     outCode.replace(QString("$(INITFIELDS)"), initfields);
+
+    // Done
+    return true;
+}
+
+/**
+ * Generate the Python object files
+ */
+bool UAVObjectParser::generatePythonObject(int objIndex, const QString& templateCode, QString& outCode)
+{
+    // Get object
+    ObjectInfo* info = objInfo[objIndex];
+    if (info == NULL) return false;
+
+    // Prepare output strings
+    outCode = templateCode;
+
+    // Replace common tags
+    replaceCommonTags(outCode, info);
+
+    // Replace the $(DATAFIELDS) tag
+    QString fields;
+
+    fields.append(QString("[ \\\n"));
+    for (int n = 0; n < info->fields.length(); ++n)
+    {
+      fields.append(QString("\tuavobject.UAVObjectField(\n"));
+      fields.append(QString("\t\t'%1',\n").arg(info->fields[n]->name));
+      fields.append(QString("\t\t'%1',\n").arg(fieldTypeStrPython[info->fields[n]->type]));
+      fields.append(QString("\t\t%1,\n").arg(info->fields[n]->numElements));
+
+      QStringList elemNames = info->fields[n]->elementNames;
+      fields.append(QString("\t\t[\n"));
+      for (int m = 0; m < elemNames.length(); ++m)
+      {
+	fields.append(QString("\t\t\t'%1',\n").arg(elemNames[m]));
+      }
+      fields.append(QString("\t\t],\n"));
+
+
+      fields.append(QString("\t\t{\n"));
+      if (info->fields[n]->type == FIELDTYPE_ENUM)
+      {
+	// Go through each option
+	QStringList options = info->fields[n]->options;
+	for (int m = 0; m < options.length(); ++m)
+        {
+	  fields.append( QString("\t\t\t'%1' : '%2',\n")
+			 .arg(m)
+			 .arg( options[m] ) );
+	}
+      }
+      fields.append(QString("\t\t}\n"));
+      fields.append(QString("\t),\n"));
+    }
+    fields.append(QString("]\n"));
+    outCode.replace(QString("$(DATAFIELDS)"), fields);
 
     // Done
     return true;

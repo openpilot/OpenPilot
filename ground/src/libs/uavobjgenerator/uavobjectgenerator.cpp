@@ -47,6 +47,11 @@ UAVObjectGenerator::UAVObjectGenerator(QString& basepath, FILE* out) :
     xmlPath = QDir( basepath + QString("ground/src/shared/uavobjectdefinition"));
     flightCodePath = QDir( basepath + QString("flight/OpenPilot/UAVObjects"));
     gcsCodePath = QDir( basepath + QString("ground/src/plugins/uavobjects"));
+    pythonTemplatePath = QDir( basepath + QString("flight/OpenPilot/UAVObjects"));
+    // synthetic output files should go into the build directory once the various GUI build systems
+    // learn how to find these output files in the build directory.
+    //pythonCodePath = QDir( basepath + QString("build/uavobjects"));
+    pythonCodePath = QDir( basepath + QString("flight/OpenPilot/UAVObjects"));
     objectTemplateFilename = QString("uavobjecttemplate");
     objectsInitTemplateFilename = QString("uavobjectsinittemplate");
     objectsInitFilename = QString("uavobjectsinit");
@@ -65,8 +70,10 @@ bool UAVObjectGenerator::processAll()
     QString gcsCodeTemplate = readFile( gcsCodePath.absoluteFilePath(objectTemplateFilename + ".cpp") );
     QString gcsIncludeTemplate = readFile( gcsCodePath.absoluteFilePath(objectTemplateFilename + ".h") );
     QString gcsInitTemplate = readFile( gcsCodePath.absoluteFilePath(objectsInitTemplateFilename + ".cpp") );
+    QString pythonCodeTemplate = readFile( pythonTemplatePath.absoluteFilePath(objectTemplateFilename + ".py") );
     if ( flightCodeTemplate.isNull() || flightIncludeTemplate.isNull() ||
          gcsCodeTemplate.isNull() || gcsIncludeTemplate.isNull() ||
+	 pythonCodeTemplate.isNull() ||
          flightInitTemplate.isNull() || gcsInitTemplate.isNull() )
     {
         sout << "Error: Could not open template files." << endl;
@@ -100,8 +107,10 @@ bool UAVObjectGenerator::processAll()
     // Generate the code for each object and write it to the destination directory
     QList<quint32> objIDList;
     QString objInc;
+    QString pythonImport;
     QString flightObjInit;
     QString gcsObjInit;
+    QString pythonObjInit;
     bool res;
     for (int parseridx = 0; parseridx < parsers.length(); ++ parseridx)
     {
@@ -142,6 +151,14 @@ bool UAVObjectGenerator::processAll()
                 sout << "Error: Improperly formatted GCS object template file" << endl;
                 return false;
             }
+            // Generate the Python code
+            QString pythonCode;
+            res = parser->generatePythonObject(objidx, pythonCodeTemplate, pythonCode);
+            if (!res)
+            {
+                sout << "Error: Improperly formatted Python object template file" << endl;
+                return false;
+            }
             // Write the flight code
             // TODO: Only write file if modified
             res = writeFile( flightCodePath.absolutePath() + "/" + namelc + ".c", flightCode );
@@ -170,10 +187,20 @@ bool UAVObjectGenerator::processAll()
                 sout << "Error: Could not write output files" << endl;
                 return false;
             }
+            // Write the Python code
+            // TODO: Only write file if modified
+            res = writeFile( pythonCodePath.absolutePath() + "/" + namelc + ".py", pythonCode );
+            if (!res)
+            {
+                sout << "Error: Could not write output files" << endl;
+                return false;
+            }
             // Update strings for the object initialization
             objInc.append("#include \"" + namelc + ".h\"\n");
+	    pythonImport.append("import " + namelc + "\n");
             flightObjInit.append("    " + name + "Initialize();\n");
             gcsObjInit.append("    objMngr->registerObject( new " + name + "() );\n");
+	    pythonObjInit.append("\tuavobjectsinit.uavobjects.append(" + name + "." + name + "())\n");
         }
     }
 

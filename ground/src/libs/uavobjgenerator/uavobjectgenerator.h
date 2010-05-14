@@ -45,6 +45,8 @@ private:
     QDir xmlPath;
     QDir flightCodePath;
     QDir gcsCodePath;
+    QDir pythonTemplatePath;
+    QDir pythonCodePath;
     QString objectTemplateFilename;
     QString objectsInitTemplateFilename;
     QString objectsInitFilename;

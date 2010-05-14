@@ -78,7 +78,7 @@ qt_sdk_install: qt_sdk_clean $(TOOLS_DIR)
 
 .PHONY: qt_sdk_clean
 qt_sdk_clean:
-	[ ! -d "$(QT_SDK_DIR)" ] || $(RM) -r $(QT_SDK_DIR)
+	[ ! -d "$(QT_SDK_DIR)" ] || $(RM) -rf $(QT_SDK_DIR)
 
 # Set up ARM (STM32) SDK
 ARM_SDK_DIR := $(TOOLS_DIR)/arm-2009q3
@@ -191,6 +191,7 @@ uavobjgenerator:
 
 .PHONY: uavobjects
 uavobjects: uavobjgenerator
+	mkdir -p $(BUILD_DIR)/$@
 	"$(BUILD_DIR)/uavobjgenerator/uavobjgenerator" "$(ROOT_DIR)/"
 
 ##############################
@@ -200,7 +201,7 @@ uavobjects: uavobjgenerator
 ##############################
 
 .PHONY: all_flight
-all_flight: openpilot_elf   # ahrs_elf
+all_flight: openpilot_elf ahrs_elf
 
 .PHONY: openpilot
 openpilot: openpilot_elf

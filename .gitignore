@@ -1,3 +1,9 @@
+.metadata/
+flight/.cproject
+flight/.project
+flight/.settings/
+ground/openpilotgcs.pro.user
+ground/src/libs/uavobjgenerator/uavobjgenerator.pro.user
 tools/
 build/
 downloads/

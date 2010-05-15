@@ -656,23 +656,55 @@ bool UAVObjectParser::generateFlightObject(int objIndex, const QString& template
     {
         if ( !info->fields[n]->defaultValue.isNull() && !info->fields[n]->defaultValue.isEmpty() )
         {
-            if ( info->fields[n]->type == FIELDTYPE_ENUM )
+            // For non-array fields
+            if ( info->fields[n]->numElements == 1)
             {
-                initfields.append( QString("    data.%1 = %2;\n")
-                            .arg( info->fields[n]->name )
-                            .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValue ) ) );
-            }
-            else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
-            {
-                initfields.append( QString("    data.%1 = %2;\n")
-                            .arg( info->fields[n]->name )
-                            .arg( info->fields[n]->defaultValue.toFloat() ) );
+                if ( info->fields[n]->type == FIELDTYPE_ENUM )
+                {
+                    initfields.append( QString("    data.%1 = %2;\n")
+                                .arg( info->fields[n]->name )
+                                .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValue ) ) );
+                }
+                else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
+                {
+                    initfields.append( QString("    data.%1 = %2;\n")
+                                .arg( info->fields[n]->name )
+                                .arg( info->fields[n]->defaultValue.toFloat() ) );
+                }
+                else
+                {
+                    initfields.append( QString("    data.%1 = %2;\n")
+                                .arg( info->fields[n]->name )
+                                .arg( info->fields[n]->defaultValue.toInt() ) );
+                }
             }
             else
             {
-                initfields.append( QString("    data.%1 = %2;\n")
-                            .arg( info->fields[n]->name )
-                            .arg( info->fields[n]->defaultValue.toInt() ) );
+                // Initialize all fields in the array
+                for (int idx = 0; idx < info->fields[n]->numElements; ++idx)
+                {
+                    if ( info->fields[n]->type == FIELDTYPE_ENUM )
+                    {
+                        initfields.append( QString("    data.%1[%2] = %3;\n")
+                                    .arg( info->fields[n]->name )
+                                    .arg( idx )
+                                    .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValue ) ) );
+                    }
+                    else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
+                    {
+                        initfields.append( QString("    data.%1[%2] = %3;\n")
+                                    .arg( info->fields[n]->name )
+                                    .arg( idx )
+                                    .arg( info->fields[n]->defaultValue.toFloat() ) );
+                    }
+                    else
+                    {
+                        initfields.append( QString("    data.%1[%2] = %3;\n")
+                                    .arg( info->fields[n]->name )
+                                    .arg( idx )
+                                    .arg( info->fields[n]->defaultValue.toInt() ) );
+                    }
+                }
             }
         }
     }
@@ -823,23 +855,55 @@ bool UAVObjectParser::generateGCSObject(int objIndex, const QString& templateInc
     {
         if ( !info->fields[n]->defaultValue.isNull() && !info->fields[n]->defaultValue.isEmpty() )
         {
-            if ( info->fields[n]->type == FIELDTYPE_ENUM )
+            // For non-array fields
+            if ( info->fields[n]->numElements == 1)
             {
-                initfields.append( QString("    data.%1 = %2;\n")
-                            .arg( info->fields[n]->name )
-                            .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValue ) ) );
-            }
-            else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
-            {
-                initfields.append( QString("    data.%1 = %2;\n")
-                            .arg( info->fields[n]->name )
-                            .arg( info->fields[n]->defaultValue.toFloat() ) );
+                if ( info->fields[n]->type == FIELDTYPE_ENUM )
+                {
+                    initfields.append( QString("    data.%1 = %2;\n")
+                                .arg( info->fields[n]->name )
+                                .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValue ) ) );
+                }
+                else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
+                {
+                    initfields.append( QString("    data.%1 = %2;\n")
+                                .arg( info->fields[n]->name )
+                                .arg( info->fields[n]->defaultValue.toFloat() ) );
+                }
+                else
+                {
+                    initfields.append( QString("    data.%1 = %2;\n")
+                                .arg( info->fields[n]->name )
+                                .arg( info->fields[n]->defaultValue.toInt() ) );
+                }
             }
             else
             {
-                initfields.append( QString("    data.%1 = %2;\n")
-                            .arg( info->fields[n]->name )
-                            .arg( info->fields[n]->defaultValue.toInt() ) );
+                // Initialize all fields in the array
+                for (int idx = 0; idx < info->fields[n]->numElements; ++idx)
+                {
+                    if ( info->fields[n]->type == FIELDTYPE_ENUM )
+                    {
+                        initfields.append( QString("    data.%1[%2] = %3;\n")
+                                    .arg( info->fields[n]->name )
+                                    .arg( idx )
+                                    .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValue ) ) );
+                    }
+                    else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
+                    {
+                        initfields.append( QString("    data.%1[%2] = %3;\n")
+                                    .arg( info->fields[n]->name )
+                                    .arg( idx )
+                                    .arg( info->fields[n]->defaultValue.toFloat() ) );
+                    }
+                    else
+                    {
+                        initfields.append( QString("    data.%1[%2] = %3;\n")
+                                    .arg( info->fields[n]->name )
+                                    .arg( idx )
+                                    .arg( info->fields[n]->defaultValue.toInt() ) );
+                    }
+                }
             }
         }
     }

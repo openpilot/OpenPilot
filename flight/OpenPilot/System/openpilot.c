@@ -112,8 +112,15 @@ void OpenPilotInit()
 	PIOS_Servo_Init();
 	PIOS_ADC_Init();
 	PIOS_GPIO_Init();
-	//PIOS_PPM_Init();
+#if defined(PIOS_INCLUDE_SPEKTRUM)
+	PIOS_SPEKTRUM_Init();
+#endif
+#if defined(PIOS_INCLUDE_PWM)
 	PIOS_PWM_Init();
+#endif
+#if defined(PIOS_INCLUDE_PPM)
+	PIOS_PPM_Init();
+#endif
 	PIOS_USB_Init(0);
 	PIOS_I2C_Init();
 
@@ -153,8 +160,18 @@ static void TaskTesting(void *pvParameters)
 		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u\r", PIOS_BMP085_GetPressure());
 		*/
 
+#if defined(PIOS_INCLUDE_SPEKTRUM)
+		int32_t len = PIOS_SPEKTRUM_RxBufferUsed(COM_USART3);
+		for(int32_t i = 0; i < len; i++) {
+			PIOS_COM_SendFormattedString(COM_DEBUG_USART, "%c", PIOS_SPEKTRUM_RxBufferGet(USART_3));
+		}
+#endif
+#if defined(PIOS_INCLUDE_PWM)
 		PIOS_COM_SendFormattedStringNonBlocking(COM_USART2, "%u,%u,%u,%u,%u,%u,%u,%u uS\r", PIOS_PWM_Get(0), PIOS_PWM_Get(1), PIOS_PWM_Get(2), PIOS_PWM_Get(3), PIOS_PWM_Get(4), PIOS_PWM_Get(5), PIOS_PWM_Get(6), PIOS_PWM_Get(7));
-		//PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u,%u,%u,%u,%u,%u,%u,%u uS\r", PIOS_PPM_Get(0), PIOS_PPM_Get(1), PIOS_PPM_Get(2), PIOS_PPM_Get(3), PIOS_PPM_Get(4), PIOS_PPM_Get(5), PIOS_PPM_Get(6), PIOS_PPM_Get(7));
+#endif
+#if defined(PIOS_INCLUDE_PPM)
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u,%u,%u,%u,%u,%u,%u,%u uS\r", PIOS_PPM_Get(0), PIOS_PPM_Get(1), PIOS_PPM_Get(2), PIOS_PPM_Get(3), PIOS_PPM_Get(4), PIOS_PPM_Get(5), PIOS_PPM_Get(6), PIOS_PPM_Get(7));
+#endif
 
 		/* This blocks the task until there is something on the buffer */
 		/*xSemaphoreTake(PIOS_USART1_Buffer, portMAX_DELAY);

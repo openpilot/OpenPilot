@@ -75,6 +75,7 @@
 #include <pios_spi.h>
 #include <pios_ppm.h>
 #include <pios_pwm.h>
+#include <pios_spektrum.h>
 #include <pios_usb.h>
 #include <pios_usb_hid.h>
 #include <pios_debug.h>

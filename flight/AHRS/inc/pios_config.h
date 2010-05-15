@@ -38,6 +38,7 @@
 #define PIOS_INCLUDE_USART
 #define PIOS_INCLUDE_COM
 #define PIOS_INCLUDE_HMC5843
+#define PIOS_INCLUDE_GPIO
 
 
 #endif /* PIOS_CONFIG_H */

@@ -33,6 +33,7 @@
 
 /* Function Prototypes */
 
+
 /**
 * AHRS Main function
 */
@@ -53,6 +54,10 @@ int main()
 	/* Magnetic sensor system */
 	PIOS_I2C_Init();
 	PIOS_HMC5843_Init();
+
+	/* Setup the Accelerometer FS (Full-Scale) GPIO */
+	PIOS_GPIO_Enable(0);
+	SET_ACCEL_2G;
 
 	/* Configure the HMC5843 Sensor */
 	PIOS_HMC5843_ConfigTypeDef HMC5843_InitStructure;
@@ -82,12 +87,13 @@ int main()
 		if(heading < 0) heading += 360;
 
 		// Output Heading data to
-		PIOS_COM_SendFormattedString(COM_USART1, "Chip ID: %s\rHeading: %d\rRaw Mag Values: X=%d Y=%d Y=%d\r", id, heading, data[0], data[1], data[2]);
+		PIOS_COM_SendFormattedString(COM_USART1, "HMC5843 Chip ID: %s\rHeading: %d\rRaw Mag Values: X=%d Y=%d Y=%d\r", id, heading, data[0], data[1], data[2]);
 
 		// Test ADC
 		PIOS_COM_SendFormattedString(COM_USART1, "ADC Values: %d,%d,%d,%d,%d,%d\r\n", PIOS_ADC_PinGet(0), PIOS_ADC_PinGet(1), PIOS_ADC_PinGet(2), PIOS_ADC_PinGet(3), PIOS_ADC_PinGet(4), PIOS_ADC_PinGet(5));
 
-		PIOS_DELAY_WaitmS(250);
+		// Delay until next reading
+		PIOS_DELAY_WaitmS(500);
 	}
 
 	return 0;

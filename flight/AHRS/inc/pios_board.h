@@ -302,4 +302,17 @@ TIM8  |           |           |           |
 						/* (1 / (ADCCLK / CYCLES)) = Sample Time (�S) */
 #define PIOS_ADC_IRQ_PRIO			PIOS_IRQ_PRIO_HIGH
 
+//-------------------------
+// GPIO
+//-------------------------
+#define PIOS_GPIO_1_PORT			GPIOB
+#define PIOS_GPIO_1_PIN				GPIO_Pin_9
+#define PIOS_GPIO_1_GPIO_CLK			RCC_APB2Periph_GPIOB
+#define PIOS_GPIO_PORTS				{ PIOS_GPIO_1_PORT }
+#define PIOS_GPIO_PINS				{ PIOS_GPIO_1_PIN }
+#define PIOS_GPIO_CLKS				{ PIOS_GPIO_1_GPIO_CLK }
+#define PIOS_GPIO_NUM				1
+#define SET_ACCEL_2G PIOS_GPIO_On(0);
+#define SET_ACCEL_6G PIOS_GPIO_Off(0)
+
 #endif /* PIOS_BOARD_H */

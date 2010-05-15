@@ -41,7 +41,7 @@ static const uint32_t GPIO_CLK[PIOS_GPIO_NUM] = PIOS_GPIO_CLKS;
 
 
 /**
-* Initialises all the LED's
+* Initialises all the GPIO's
 */
 void PIOS_GPIO_Init(void)
 {

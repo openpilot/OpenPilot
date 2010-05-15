@@ -51,32 +51,45 @@ int main()
 	PIOS_ADC_Init();
 
 	/* Magnetic sensor system */
-	#if 1
 	PIOS_I2C_Init();
 	PIOS_HMC5843_Init();
-	#endif
 
-	/* Toggle LED's forever */
-	PIOS_LED_On(LED1);
+	/* Configure the HMC5843 Sensor */
+	PIOS_HMC5843_ConfigTypeDef HMC5843_InitStructure;
+	HMC5843_InitStructure.M_ODR = PIOS_HMC5843_ODR_10;
+	HMC5843_InitStructure.Meas_Conf = PIOS_HMC5843_MEASCONF_NORMAL;
+	HMC5843_InitStructure.Gain = PIOS_HMC5843_GAIN_2;
+	HMC5843_InitStructure.Mode = PIOS_HMC5843_MODE_CONTINUOS;
+	PIOS_HMC5843_Config(&HMC5843_InitStructure);
 
-	uint8_t buffer[3] = {0};
-	int32_t result;
+	uint8_t id[3] = {0};
+	int16_t data[3] = {0};
+	int32_t heading = 0;
 
+	// Main loop
 	for(;;) {
+		// Alive signal
 		PIOS_LED_Toggle(LED1);
 
-		#if 1
-		result = PIOS_HMC5843_Read(0x0A, buffer, 3);
-		//PIOS_COM_SendFormattedString(COM_USART1, "Result: %d\r", result);
-		//PIOS_COM_SendFormattedString(COM_USART1, "Ident: \r", buffer);
-		#endif
+		// Get 3 ID bytes
+		PIOS_HMC5843_ReadID(id);
+
+		// Get magnetic readings
+		PIOS_HMC5843_ReadMag(data);
+
+		// Calculate the heading
+		heading = atan2((double)(data[0]), (double)(-1 * data[1])) * (180 / M_PI);
+		if(heading < 0) heading += 360;
+
+		// Output Heading data to
+		PIOS_COM_SendFormattedString(COM_USART1, "Chip ID: %s\rHeading: %d\rRaw Mag Values: X=%d Y=%d Y=%d\r", id, heading, data[0], data[1], data[2]);
 
 		// Test ADC
-		PIOS_COM_SendFormattedString(COM_USART1, "%s,%d,%d,%d,%d,%d,%d\r\n", buffer, PIOS_ADC_PinGet(0), PIOS_ADC_PinGet(1), PIOS_ADC_PinGet(2), PIOS_ADC_PinGet(3), PIOS_ADC_PinGet(4), PIOS_ADC_PinGet(5));
+		PIOS_COM_SendFormattedString(COM_USART1, "ADC Values: %d,%d,%d,%d,%d,%d\r\n", PIOS_ADC_PinGet(0), PIOS_ADC_PinGet(1), PIOS_ADC_PinGet(2), PIOS_ADC_PinGet(3), PIOS_ADC_PinGet(4), PIOS_ADC_PinGet(5));
 
-		PIOS_DELAY_WaitmS(100);
+		PIOS_DELAY_WaitmS(250);
 	}
-
 
 	return 0;
 }
+

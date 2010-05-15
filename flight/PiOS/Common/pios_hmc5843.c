@@ -35,16 +35,162 @@
 
 /* Local Variables */
 
-
 /**
 * Initialise the HMC5843 sensor
 */
 void PIOS_HMC5843_Init(void)
 {
-	// Set in continuous mode
-	PIOS_HMC5843_Write(0x02, 0x00);
+	// Nothing to do here
+	// If we were using the DRDY (data ready) interrupt input, we would set it up here
 }
 
+/**
+* Initialise the HMC5843 sensor
+*
+* CTRL_REGA: Control Register A
+* Read Write
+* Default value: 0x10
+* 7:5  0   These bits must be cleared for correct operation.
+* 4:2 DO2-DO0: Data Output Rate Bits
+*             DO2 |  DO1 |  DO0 |   Minimum Data Output Rate (Hz)
+*            ------------------------------------------------------
+*              0  |  0   |  0   |            0.5
+*              0  |  0   |  1   |            1
+*              0  |  1   |  0   |            2
+*              0  |  1   |  1   |            5
+*              1  |  0   |  0   |           10 (default)
+*              1  |  0   |  1   |           20
+*              1  |  1   |  0   |           50
+*              1  |  1   |  1   |           Not Used
+* 1:0 MS1-MS0: Measurement Configuration Bits
+*             MS1 | MS0 |   MODE
+*            ------------------------------
+*              0  |  0   |  Normal
+*              0  |  1   |  Positive Bias
+*              1  |  0   |  Negative Bias
+*              1  |  1   |  Not Used
+*
+* CTRL_REGB: Control RegisterB
+* Read Write
+* Default value: 0x20
+* 7:5 GN2-GN0: Gain Configuration Bits.
+*             GN2 |  GN1 |  GN0 |   Mag Input   | Gain       | Output Range
+*                 |      |      |  Range[Ga]    | [LSB/mGa]  |
+*            ------------------------------------------------------
+*              0  |  0   |  0   |  ±0.7Ga       |   1620     | 0xF800–0x07FF (-2048:2047)
+*              0  |  0   |  1   |  ±1.0Ga (def) |   1300     | 0xF800–0x07FF (-2048:2047)
+*              0  |  1   |  0   |  ±1.5Ga       |   970      | 0xF800–0x07FF (-2048:2047)
+*              0  |  1   |  1   |  ±2.0Ga       |   780      | 0xF800–0x07FF (-2048:2047)
+*              1  |  0   |  0   |  ±3.2Ga       |   530      | 0xF800–0x07FF (-2048:2047)
+*              1  |  0   |  1   |  ±3.8Ga       |   460      | 0xF800–0x07FF (-2048:2047)
+*              1  |  1   |  0   |  ±4.5Ga       |   390      | 0xF800–0x07FF (-2048:2047)
+*              1  |  1   |  1   |  ±6.5Ga       |   280      | 0xF800–0x07FF (-2048:2047)
+*                               |Not recommended|
+*
+* 4:0 CRB4-CRB: 0 This bit must be cleared for correct operation.
+*
+* _MODE_REG: Mode Register
+* Read Write
+* Default value: 0x02
+* 7:2  0   These bits must be cleared for correct operation.
+* 1:0 MD1-MD0: Mode Select Bits
+*             MS1 | MS0 |   MODE
+*            ------------------------------
+*              0  |  0   |  Continuous-Conversion Mode.
+*              0  |  1   |  Single-Conversion Mode
+*              1  |  0   |  Negative Bias
+*              1  |  1   |  Sleep Mode
+*/
+void PIOS_HMC5843_Config(PIOS_HMC5843_ConfigTypeDef *HMC5843_Config_Struct)
+{
+	uint8_t CRTLA = 0x00;
+	uint8_t CRTLB = 0x00;
+	uint8_t MODE = 0x00;
+
+	CRTLA |= (uint8_t) (HMC5843_Config_Struct->M_ODR | HMC5843_Config_Struct->Meas_Conf);
+	CRTLB |= (uint8_t) (HMC5843_Config_Struct->Gain);
+	MODE  |= (uint8_t) (HMC5843_Config_Struct->Mode);
+
+	// CRTL_REGA
+	PIOS_HMC5843_Write(PIOS_HMC5843_CONFIG_REG_A, CRTLA);
+
+	// CRTL_REGB
+	PIOS_HMC5843_Write(PIOS_HMC5843_CONFIG_REG_B, CRTLB);
+
+	// Mode register
+	PIOS_HMC5843_Write(PIOS_HMC5843_MODE_REG, MODE);
+}
+
+/**
+* Read the magnetic readings from the sensor
+*/
+void PIOS_HMC5843_ReadMag(int16_t *out)
+{
+	uint8_t buffer[6];
+	uint8_t crtlB;
+
+	PIOS_HMC5843_Read(PIOS_HMC5843_CONFIG_REG_B, &crtlB, 1);
+	PIOS_HMC5843_Read(PIOS_HMC5843_DATAOUT_XMSB_REG, buffer, 6);
+
+	switch(crtlB & 0xE0) {
+		case 0x00:
+			for(int i = 0; i < 3; i++)
+				out[i] = ((int16_t) ((uint16_t) buffer[2 * i] << 8)
+						+ buffer[2 * i + 1]) * 1000
+						/ PIOS_HMC5843_Sensitivity_0_7Ga;
+			break;
+		case 0x20:
+			for(int i = 0; i < 3; i++)
+				out[i] = ((int16_t) ((uint16_t) buffer[2 * i] << 8)
+						+ buffer[2 * i + 1]) * 1000
+						/ PIOS_HMC5843_Sensitivity_1Ga;
+			break;
+		case 0x40:
+			for(int i = 0; i < 3; i++)
+				out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
+						+ buffer[2 * i + 1]) * 1000
+						/ PIOS_HMC5843_Sensitivity_1_5Ga;
+			break;
+		case 0x60:
+			for(int i = 0; i < 3; i++)
+				out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
+						+ buffer[2 * i + 1]) * 1000
+						/ PIOS_HMC5843_Sensitivity_2Ga;
+			break;
+		case 0x80:
+			for(int i = 0; i < 3; i++)
+				out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
+						+ buffer[2 * i + 1]) * 1000
+						/ PIOS_HMC5843_Sensitivity_3_2Ga;
+			break;
+		case 0xA0:
+			for(int i = 0; i < 3; i++)
+				out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
+						+ buffer[2 * i + 1]) * 1000
+						/ PIOS_HMC5843_Sensitivity_3_8Ga;
+			break;
+		case 0xC0:
+			for(int i = 0; i < 3; i++)
+				out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
+						+ buffer[2 * i + 1]) * 1000
+						/ PIOS_HMC5843_Sensitivity_4_5Ga;
+			break;
+		case 0xE0:
+			for(int i = 0; i < 3; i++)
+				out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
+						+ buffer[2 * i + 1]) * 1000
+						/ PIOS_HMC5843_Sensitivity_6_5Ga;
+			break;
+	}
+}
+
+/**
+* Read the identification bytes from the sensor
+*/
+void PIOS_HMC5843_ReadID(uint8_t *out)
+{
+	PIOS_HMC5843_Read(PIOS_HMC5843_DATAOUT_IDA_REG, out, 3);
+}
 
 /**
 * Reads one or more bytes into a buffer
@@ -60,11 +206,11 @@ int32_t PIOS_HMC5843_Read(uint8_t address, uint8_t *buffer, uint8_t len)
 	/* Send I2C address and register address */
 	/* To avoid issues copy address into temporary buffer */
 	uint8_t addr_buffer[1] = {(uint8_t)address};
-	int32_t error = PIOS_I2C_Transfer(I2C_Write_WithoutStop, HMC5843_I2C_ADDR, addr_buffer, 1);
+	int32_t error = PIOS_I2C_Transfer(I2C_Write_WithoutStop, PIOS_HMC5843_I2C_ADDR, addr_buffer, 1);
 
 	/* Now receive byte(s) */
 	if(!error) {
-		error = PIOS_I2C_Transfer(I2C_Read, HMC5843_I2C_ADDR, buffer, len);
+		error = PIOS_I2C_Transfer(I2C_Read, PIOS_HMC5843_I2C_ADDR, buffer, len);
 	}
 	
 	/* Return error status */
@@ -86,7 +232,7 @@ int32_t PIOS_HMC5843_Write(uint8_t address, uint8_t buffer)
 	WriteBuffer[0] = address;
 	WriteBuffer[1] = buffer;
 	
-	int32_t error = PIOS_I2C_Transfer(I2C_Write, HMC5843_I2C_ADDR, WriteBuffer, 2);
+	int32_t error = PIOS_I2C_Transfer(I2C_Write, PIOS_HMC5843_I2C_ADDR, WriteBuffer, 2);
 	
 	/* Return error status */
 	return error < 0 ? -1 : 0;

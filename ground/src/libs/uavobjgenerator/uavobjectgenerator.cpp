@@ -47,11 +47,11 @@ UAVObjectGenerator::UAVObjectGenerator(QString& basepath, FILE* out) :
     xmlPath = QDir( basepath + QString("ground/src/shared/uavobjectdefinition"));
     flightCodePath = QDir( basepath + QString("flight/OpenPilot/UAVObjects"));
     gcsCodePath = QDir( basepath + QString("ground/src/plugins/uavobjects"));
-    pythonTemplatePath = QDir( basepath + QString("flight/OpenPilot/UAVObjects"));
+    pythonTemplatePath = QDir( basepath + QString("ground/src/plugins/uavobjects"));
     // synthetic output files should go into the build directory once the various GUI build systems
     // learn how to find these output files in the build directory.
     //pythonCodePath = QDir( basepath + QString("build/uavobjects"));
-    pythonCodePath = QDir( basepath + QString("flight/OpenPilot/UAVObjects"));
+    pythonCodePath = QDir( basepath + QString("ground/src/plugins/uavobjects"));
     objectTemplateFilename = QString("uavobjecttemplate");
     objectsInitTemplateFilename = QString("uavobjectsinittemplate");
     objectsInitFilename = QString("uavobjectsinit");

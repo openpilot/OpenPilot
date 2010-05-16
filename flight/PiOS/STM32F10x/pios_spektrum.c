@@ -39,10 +39,7 @@
 
 
 /* Local Variables, use pios_usart */
-static uint8_t spektrum_buffer[PIOS_USART_RX_BUFFER_SIZE];
-static volatile uint8_t spektrum_buffer_tail;
-static volatile uint8_t spektrum_buffer_head;
-static volatile uint8_t spektrum_buffer_size;
+static uint16_t CaptureValue[12];
 
 
 /**
@@ -50,9 +47,6 @@ static volatile uint8_t spektrum_buffer_size;
 */
 void PIOS_SPEKTRUM_Init(void)
 {
-	/* Clear buffer counters */
-	spektrum_buffer_tail = spektrum_buffer_head = spektrum_buffer_size = 0;
-	
 	/* Configure USART Pins */
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_StructInit(&GPIO_InitStructure);
@@ -98,109 +92,64 @@ void PIOS_SPEKTRUM_Init(void)
 	USART_Cmd(PIOS_USART3_USART, ENABLE);
 }
 
-/**
-* Returns number of free bytes in receive buffer
-* \param[in] USART USART name
-* \return USART number of free bytes
-* \return 1: USART available
-* \return 0: USART not available
-*/
-int32_t PIOS_SPEKTRUM_RxBufferFree()
-{
-		return PIOS_USART_RX_BUFFER_SIZE - spektrum_buffer_size;
-}
 
 /**
-* Returns number of used bytes in receive buffer
-* \param[in] USART USART name
-* \return > 0: number of used bytes
-* \return 0 if USART not available
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
+* Get the value of an input channel
+* \param[in] Channel Number of the channel desired
+* \output -1 Channel not available
+* \output >0 Channel value
 */
-int32_t PIOS_SPEKTRUM_RxBufferUsed()
+int16_t PIOS_SPEKTRUM_Get(int8_t Channel)
 {
-		return spektrum_buffer_size;
-}
-
-/**
-* Gets a byte from the receive buffer
-* \param[in] USART USART name
-* \return -1 if USART not available
-* \return -2 if no new byte available
-* \return >= 0: number of received bytes
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
-*/
-int32_t PIOS_SPEKTRUM_RxBufferGet()
-{
-	if(!spektrum_buffer_size) {
-		/* nothing new in buffer */
-		return -2;
+	/* Return error if channel not available */
+	if(Channel >= 12) {
+		return -1;
 	}
-	
-	/* get byte - this operation should be atomic! */
-	PIOS_IRQ_Disable();
-	uint8_t b = spektrum_buffer[spektrum_buffer_tail];
-	if(++spektrum_buffer_tail >= PIOS_USART_RX_BUFFER_SIZE) {
-		spektrum_buffer_tail = 0;
-	}
-	--spektrum_buffer_size;
-	PIOS_IRQ_Enable();
-	
-	/* Return received byte */
-	return b;
+	return CaptureValue[Channel];
 }
 
 /**
-* Returns the next byte of the receive buffer without taking it
-* \param[in] USART USART name
-* \return -1 if USART not available
-* \return -2 if no new byte available
-* \return >= 0: number of received bytes
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
-*/
-int32_t PIOS_SPEKTRUM_RxBufferPeek()
-{
-	if(!spektrum_buffer_size) {
-		/* Nothing new in buffer */
-		return -2;
-	}
-
-	/* Get byte - this operation should be atomic! */
-	PIOS_IRQ_Disable();
-	uint8_t b = spektrum_buffer[spektrum_buffer_tail];
-	PIOS_IRQ_Enable();
-
-	/* Return received byte */
-	return b;
-}
-
-/**
-* puts a byte onto the receive buffer
-* \param[in] USART USART name
-* \param[in] b byte which should be put into Rx buffer
+* Decodes a byte
+* \param[in] b byte which should be spektrum decoded
 * \return 0 if no error
 * \return -1 if USART not available
 * \return -2 if buffer full (retry)
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
+* \note Applications shouldn't call these functions directly
 */
-int32_t PIOS_SPEKTRUM_RxBufferPut(uint8_t b)
+int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 {
-	if(spektrum_buffer_size >= PIOS_USART_RX_BUFFER_SIZE) {
-		/* Buffer full (retry) */
-		return -2;
+	static uint8_t prev_byte=0xFF,sync=0,bytecount=0;;
+	static uint16_t channel=0,sync_word=0;
+	uint8_t channeln=0,frame=0;
+	uint16_t data=0;
+	bytecount++;
+	if(sync==0)
+	{
+		sync_word=(prev_byte<<8)+b;
+		if((sync_word&0xCCFE)==0)
+		{
+			sync=1;
+			bytecount=2;
+		}
 	}
-
-	/* Copy received byte into receive buffer */
-	/* This operation should be atomic! */
-	PIOS_IRQ_Disable();
-	spektrum_buffer[spektrum_buffer_head] = b;
-	if(++spektrum_buffer_head >= PIOS_USART_RX_BUFFER_SIZE) {
-		spektrum_buffer_head = 0;
+	else
+	{
+		if((bytecount%2)==0)
+		{
+			channel=(prev_byte<<8)+b;
+			frame=channel>>15;
+			channeln=(channel>>10)&0x0F;
+			data=channel&0x03FF;
+			if(channeln < 12)
+				CaptureValue[channeln]=data;
+		}
 	}
-	++spektrum_buffer_size;
-	PIOS_IRQ_Enable();
-
-	/* No error */
+	if(bytecount==16)
+	{
+		bytecount=0;
+		sync=0;
+	}
+	prev_byte=b;
 	return 0;
 }
 
@@ -211,7 +160,7 @@ PIOS_USART3_IRQHANDLER_FUNC
 	if(PIOS_USART3_USART->SR & (1 << 5)) {
 		uint8_t b = PIOS_USART3_USART->DR;
 		
-		if(PIOS_SPEKTRUM_RxBufferPut(b) < 0) {
+		if(PIOS_SPEKTRUM_Decode(b) < 0) {
 			/* Here we could add some error handling */
 		}
 	}

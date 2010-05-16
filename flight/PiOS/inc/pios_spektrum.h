@@ -32,11 +32,7 @@
 
 /* Public Functions */
 extern void PIOS_SPEKTRUM_Init(void);
-
-extern int32_t PIOS_SPEKTRUM_RxBufferFree();
-extern int32_t PIOS_SPEKTRUM_RxBufferUsed();
-extern int32_t PIOS_SPEKTRUM_RxBufferGet();
-extern int32_t PIOS_SPEKTRUM_RxBufferPeek();
-extern int32_t PIOS_SPEKTRUM_RxBufferPut(uint8_t b);
+extern int32_t PIOS_SPEKTRUM_Decode(uint8_t b);
+extern int16_t PIOS_SPEKTRUM_Get(int8_t Channel);
 
 #endif /* PIOS_SPEKTRUM_H */

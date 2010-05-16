@@ -33,10 +33,10 @@
 /* Public Functions */
 extern void PIOS_SPEKTRUM_Init(void);
 
-extern int32_t PIOS_SPEKTRUM_RxBufferFree(USARTNumTypeDef uart);
-extern int32_t PIOS_SPEKTRUM_RxBufferUsed(USARTNumTypeDef uart);
-extern int32_t PIOS_SPEKTRUM_RxBufferGet(USARTNumTypeDef uart);
-extern int32_t PIOS_SPEKTRUM_RxBufferPeek(USARTNumTypeDef uart);
-extern int32_t PIOS_SPEKTRUM_RxBufferPut(USARTNumTypeDef uart, uint8_t b);
+extern int32_t PIOS_SPEKTRUM_RxBufferFree();
+extern int32_t PIOS_SPEKTRUM_RxBufferUsed();
+extern int32_t PIOS_SPEKTRUM_RxBufferGet();
+extern int32_t PIOS_SPEKTRUM_RxBufferPeek();
+extern int32_t PIOS_SPEKTRUM_RxBufferPut(uint8_t b);
 
 #endif /* PIOS_SPEKTRUM_H */

@@ -143,7 +143,7 @@ static void TaskTesting(void *pvParameters)
 	portTickType xDelay = 250 / portTICK_RATE_MS;
 	portTickType xTimeout = 10 / portTICK_RATE_MS;
 
-	PIOS_BMP085_Init();
+	//PIOS_BMP085_Init();
 
 	for(;;)
 	{
@@ -161,9 +161,9 @@ static void TaskTesting(void *pvParameters)
 		*/
 
 #if defined(PIOS_INCLUDE_SPEKTRUM)
-		int32_t len = PIOS_SPEKTRUM_RxBufferUsed(COM_USART3);
+		int32_t len = PIOS_SPEKTRUM_RxBufferUsed();
 		for(int32_t i = 0; i < len; i++) {
-			PIOS_COM_SendFormattedString(COM_DEBUG_USART, "%c", PIOS_SPEKTRUM_RxBufferGet(USART_3));
+			PIOS_COM_SendFormattedString(COM_DEBUG_USART, "%02X ", PIOS_SPEKTRUM_RxBufferGet());
 		}
 #endif
 #if defined(PIOS_INCLUDE_PWM)

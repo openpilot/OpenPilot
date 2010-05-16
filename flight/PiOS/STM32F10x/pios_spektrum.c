@@ -50,7 +50,6 @@ static volatile uint8_t spektrum_buffer_size;
 */
 void PIOS_SPEKTRUM_Init(void)
 {
-#if (PIOS_SPEKTRUM_ENABLED)
 	/* Clear buffer counters */
 	spektrum_buffer_tail = spektrum_buffer_head = spektrum_buffer_size = 0;
 	
@@ -97,8 +96,6 @@ void PIOS_SPEKTRUM_Init(void)
 
 	/* Enable USART */
 	USART_Cmd(PIOS_USART3_USART, ENABLE);
-#endif
-
 }
 
 /**
@@ -108,13 +105,9 @@ void PIOS_SPEKTRUM_Init(void)
 * \return 1: USART available
 * \return 0: USART not available
 */
-int32_t PIOS_SPEKTRUM_RxBufferFree(USARTNumTypeDef usart)
+int32_t PIOS_SPEKTRUM_RxBufferFree()
 {
-	if(usart >= PIOS_USART_NUM) {
-		return 0;
-	} else {
 		return PIOS_USART_RX_BUFFER_SIZE - spektrum_buffer_size;
-	}
 }
 
 /**
@@ -124,13 +117,9 @@ int32_t PIOS_SPEKTRUM_RxBufferFree(USARTNumTypeDef usart)
 * \return 0 if USART not available
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_SPEKTRUM_RxBufferUsed(USARTNumTypeDef usart)
+int32_t PIOS_SPEKTRUM_RxBufferUsed()
 {
-	if(usart >= PIOS_USART_NUM) {
-		return 0;
-	} else {
 		return spektrum_buffer_size;
-	}
 }
 
 /**
@@ -141,12 +130,8 @@ int32_t PIOS_SPEKTRUM_RxBufferUsed(USARTNumTypeDef usart)
 * \return >= 0: number of received bytes
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_SPEKTRUM_RxBufferGet(USARTNumTypeDef usart)
+int32_t PIOS_SPEKTRUM_RxBufferGet()
 {
-	if(usart >= PIOS_USART_NUM) {
-		/* USART not available */
-		return -1;
-	}
 	if(!spektrum_buffer_size) {
 		/* nothing new in buffer */
 		return -2;
@@ -173,13 +158,8 @@ int32_t PIOS_SPEKTRUM_RxBufferGet(USARTNumTypeDef usart)
 * \return >= 0: number of received bytes
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_SPEKTRUM_RxBufferPeek(USARTNumTypeDef usart)
+int32_t PIOS_SPEKTRUM_RxBufferPeek()
 {
-	if(usart >= PIOS_USART_NUM) {
-		/* USART not available */
-		return -1;
-	}
-
 	if(!spektrum_buffer_size) {
 		/* Nothing new in buffer */
 		return -2;
@@ -203,13 +183,8 @@ int32_t PIOS_SPEKTRUM_RxBufferPeek(USARTNumTypeDef usart)
 * \return -2 if buffer full (retry)
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_SPEKTRUM_RxBufferPut(USARTNumTypeDef usart, uint8_t b)
+int32_t PIOS_SPEKTRUM_RxBufferPut(uint8_t b)
 {
-	if(usart >= PIOS_USART_NUM) {
-		/* USART not available */
-		return -1;
-	}
-
 	if(spektrum_buffer_size >= PIOS_USART_RX_BUFFER_SIZE) {
 		/* Buffer full (retry) */
 		return -2;
@@ -229,7 +204,6 @@ int32_t PIOS_SPEKTRUM_RxBufferPut(USARTNumTypeDef usart, uint8_t b)
 	return 0;
 }
 
-#if (PIOS_SPEKTRUM_ENABLED)
 /* Interrupt handler for USART3 */
 PIOS_USART3_IRQHANDLER_FUNC
 {
@@ -237,26 +211,15 @@ PIOS_USART3_IRQHANDLER_FUNC
 	if(PIOS_USART3_USART->SR & (1 << 5)) {
 		uint8_t b = PIOS_USART3_USART->DR;
 		
-		if(PIOS_USART_RxBufferPut(USART_3, b) < 0) {
+		if(PIOS_SPEKTRUM_RxBufferPut(b) < 0) {
 			/* Here we could add some error handling */
 		}
 	}
 
 	if(PIOS_USART3_USART->SR & (1 << 7)) { // check if TXE flag is set
-		if(PIOS_USART_TxBufferUsed(USART_3) > 0) {
-			int b = PIOS_USART_TxBufferGet(USART_3);
-			if(b < 0) {
-				/* Here we could add some error handling */
-				PIOS_USART3_USART->DR = 0xff;
-			} else {
-				PIOS_USART3_USART->DR = b;
-			}
-		} else {
 			/* Disable TXE interrupt (TXEIE=0) */
 			PIOS_USART3_USART->CR1 &= ~(1 << 7);
-		}
 	}
 }
-#endif
 
 #endif

@@ -41,18 +41,28 @@
 #define DEVICE_1_ADDRESS 0x50
 #define DEVICE_2_ADDRESS 0x51
 
-
-/* Task Priorities */
-#define PRIORITY_TASK_HOOKS             (tskIDLE_PRIORITY + 3)
-
 #ifdef USE_DEBUG_PINS
-	#define	DEBUG_PIN_IDLE	5
+	#define	DEBUG_PIN_TASK1_WAIT	0
+	#define DEBUG_PIN_TASK1_LOCKED	1
+	#define	DEBUG_PIN_TASK2_WAIT	2
+	#define DEBUG_PIN_TASK2_LOCKED	3
+    #define DEBUG_PIN_TRANSFER		4
+	#define DEBUG_PIN_IDLE			6
+	#define DEBUG_PIN_ERROR			7
 	#define DebugPinHigh(x) PIOS_DEBUG_PinHigh(x)
 	#define DebugPinLow(x)	PIOS_DEBUG_PinLow(x)
 #else
 	#define DebugPinHigh(x)
 	#define DebugPinLow(x)
 #endif
+
+
+
+#define MAX_LOCK_WAIT				2		// Time in ms that a thread can normally block I2C
+
+/* Task Priorities */
+#define PRIORITY_TASK_HOOKS             (tskIDLE_PRIORITY + 3)
+
 
 /* Global Variables */
 
@@ -98,8 +108,10 @@ static void OnError(void)
 	PIOS_LED_Off(LED1);
 	while(1)
 	{
+		DebugPinHigh(DEBUG_PIN_ERROR);
 		PIOS_LED_Toggle(LED2);
 		vTaskDelay(50 / portTICK_RATE_MS);
+		DebugPinLow(DEBUG_PIN_ERROR);
 	}
 }
 
@@ -109,7 +121,7 @@ static void Task1(void *pvParameters)
 	int i = 0;
 
 
-	if (PIOS_I2C_LockDevice(100))
+	if (PIOS_I2C_LockDevice(MAX_LOCK_WAIT / portTICK_RATE_MS))
 	{
 		if (PIOS_I2C_Transfer(I2C_Write, DEVICE_1_ADDRESS<<1, (uint8_t*)"\x20\xB0\xB1\xB2", 4) != 0)
 			OnError();
@@ -129,30 +141,49 @@ static void Task1(void *pvParameters)
 			i = 0;
 		}
 
-		if (PIOS_I2C_LockDevice(100))
+		DebugPinHigh(DEBUG_PIN_TASK1_WAIT);
+		if (PIOS_I2C_LockDevice(MAX_LOCK_WAIT / portTICK_RATE_MS))
 		{
 			uint8_t buf[20];
+
+			DebugPinLow(DEBUG_PIN_TASK1_WAIT);
+			DebugPinHigh(DEBUG_PIN_TASK1_LOCKED);
+
+			// Write A0 A1 A2  at address 0x10
+			DebugPinHigh(DEBUG_PIN_TRANSFER);
 			if (PIOS_I2C_Transfer(I2C_Write, DEVICE_1_ADDRESS<<1, (uint8_t*)"\x10\xA0\xA1\xA2", 4) != 0)
 				OnError();
+			DebugPinLow(DEBUG_PIN_TRANSFER);
 
+
+			// Read 3 bytes at address 0x20 and check
+			DebugPinHigh(DEBUG_PIN_TRANSFER);
 			if (PIOS_I2C_Transfer(I2C_Write_WithoutStop, DEVICE_1_ADDRESS<<1, (uint8_t*)"\x20", 1) != 0)
 				OnError();
 
+			DebugPinHigh(DEBUG_PIN_TRANSFER);
 			if (PIOS_I2C_Transfer(I2C_Read, DEVICE_1_ADDRESS<<1, buf, 3) != 0)
 				OnError();
+			DebugPinLow(DEBUG_PIN_TRANSFER);
 
 			if (memcmp(buf, "\xB0\xB1\xB2",3) != 0)
 				OnError();
 
+			// Read 3 bytes at address 0x10 and check
+			DebugPinHigh(DEBUG_PIN_TRANSFER);
 			if (PIOS_I2C_Transfer(I2C_Write_WithoutStop, DEVICE_1_ADDRESS<<1, (uint8_t*)"\x10", 1) != 0)
 				OnError();
+			DebugPinLow(DEBUG_PIN_TRANSFER);
 
+			DebugPinHigh(DEBUG_PIN_TRANSFER);
 			if (PIOS_I2C_Transfer(I2C_Read, DEVICE_1_ADDRESS<<1, buf, 3) != 0)
 				OnError();
+			DebugPinLow(DEBUG_PIN_TRANSFER);
 
 			if (memcmp(buf, "\xA0\xA1\xA2",3) != 0)
 				OnError();
 
+			DebugPinLow(DEBUG_PIN_TASK1_LOCKED);
 			PIOS_I2C_UnlockDevice();
 		}
 		else
@@ -174,12 +205,21 @@ static void Task2(void *pvParameters)
 	{
 		uint8_t buf[20];
 
-		if (PIOS_I2C_LockDevice(100))
+		DebugPinHigh(DEBUG_PIN_TASK2_WAIT);
+		if (PIOS_I2C_LockDevice(MAX_LOCK_WAIT / portTICK_RATE_MS))
 		{
+			DebugPinLow(DEBUG_PIN_TASK2_WAIT);
+			DebugPinHigh(DEBUG_PIN_TASK2_LOCKED);
+
+			// Write value of count to address 0x10
 			buf[0] = 0x10;				// The address
 			memcpy(&buf[1], &count, 4);	// The data to write
+			DebugPinHigh(DEBUG_PIN_TRANSFER);
 			if (PIOS_I2C_Transfer(I2C_Write, DEVICE_2_ADDRESS<<1, buf, 5) != 0)
 				OnError();
+			DebugPinLow(DEBUG_PIN_TRANSFER);
+
+			DebugPinLow(DEBUG_PIN_TASK2_LOCKED);
 			PIOS_I2C_UnlockDevice();
 		}
 		else
@@ -187,19 +227,33 @@ static void Task2(void *pvParameters)
 			OnError();
 		}
 
-		vTaskDelayUntil(&xLastExecutionTime, 10 / portTICK_RATE_MS);
+		//vTaskDelayUntil(&xLastExecutionTime, 5 / portTICK_RATE_MS);
+		vTaskDelay(2 / portTICK_RATE_MS);
 
-		if (PIOS_I2C_LockDevice(100))
+		DebugPinHigh(DEBUG_PIN_TASK2_WAIT);
+		if (PIOS_I2C_LockDevice(1 / portTICK_RATE_MS))
 		{
+			DebugPinLow(DEBUG_PIN_TASK2_WAIT);
+			DebugPinHigh(DEBUG_PIN_TASK2_LOCKED);
+
+			// Read at address 0x10 and check
+			DebugPinHigh(DEBUG_PIN_TRANSFER);
 			if (PIOS_I2C_Transfer(I2C_Write_WithoutStop, DEVICE_2_ADDRESS<<1, (uint8_t*)"\x10", 1) != 0)
 				OnError();
+			DebugPinLow(DEBUG_PIN_TRANSFER);
 
+			DebugPinHigh(DEBUG_PIN_TRANSFER);
 			if (PIOS_I2C_Transfer(I2C_Read, DEVICE_2_ADDRESS<<1, buf, 4) != 0)
 				OnError();
+			DebugPinLow(DEBUG_PIN_TRANSFER);
 
+			DebugPinHigh(DEBUG_PIN_TRANSFER);
 			if (memcmp(buf, &count, 4) != 0)
 				OnError();
+			DebugPinLow(DEBUG_PIN_TRANSFER);
 
+
+			DebugPinLow(DEBUG_PIN_TASK2_LOCKED);
 			PIOS_I2C_UnlockDevice();
 		}
 		else
@@ -207,7 +261,8 @@ static void Task2(void *pvParameters)
 			OnError();
 		}
 
-		vTaskDelayUntil(&xLastExecutionTime, 10 / portTICK_RATE_MS);
+		//vTaskDelayUntil(&xLastExecutionTime, 10 / portTICK_RATE_MS);
+		vTaskDelay(5 / portTICK_RATE_MS);
 
 		count++;
 	}

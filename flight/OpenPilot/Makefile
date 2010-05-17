@@ -81,6 +81,10 @@ MODTELEMETRY = $(OPMODULEDIR)/Telemetry
 MODTELEMETRYINC = $(MODTELEMETRY)/inc
 MODGPS = $(OPMODULEDIR)/GPS
 MODGPSINC = $(MODGPS)/inc
+MODMANUALCONTROL = $(OPMODULEDIR)/ManualControl
+MODMANUALCONTROLINC = $(MODMANUALCONTROL)/inc
+MODACTUATOR = $(OPMODULEDIR)/Actuator
+MODACTUATORINC = $(MODACTUATOR)/inc
 PIOS = ../PiOS
 PIOSINC = $(PIOS)/inc
 PIOSSTM32F10X = $(PIOS)/STM32F10x
@@ -109,8 +113,10 @@ DOXYGENDIR = ../Doc/Doxygen
 ## MODULES
 SRC = $(MODEXAMPLE)/examplemodevent.c $(MODEXAMPLE)/examplemodperiodic.c $(MODEXAMPLE)/examplemodthread.c
 SRC += $(MODSYSTEM)/systemmod.c
-SRC +=  $(MODTELEMETRY)/telemetry.c
+SRC += $(MODTELEMETRY)/telemetry.c
 SRC += $(MODGPS)/GPS.c $(MODGPS)/buffer.c
+SRC += $(MODMANUALCONTROL)/manualcontrol.c
+SRC += $(MODACTUATOR)/actuator.c
 
 ## OPENPILOT:
 SRC += $(OPSYSTEM)/openpilot.c
@@ -140,7 +146,15 @@ SRC += $(OPUAVOBJ)/gcstelemetrystats.c
 SRC += $(OPUAVOBJ)/flighttelemetrystats.c
 SRC += $(OPUAVOBJ)/systemstats.c
 SRC += $(OPUAVOBJ)/systemalarms.c
+SRC += $(OPUAVOBJ)/systemsettings.c
 SRC += $(OPUAVOBJ)/telemetrysettings.c
+SRC += $(OPUAVOBJ)/actuatorcommand.c
+SRC += $(OPUAVOBJ)/actuatordesired.c
+SRC += $(OPUAVOBJ)/actuatorsettings.c
+SRC += $(OPUAVOBJ)/manualcontrolcommand.c
+SRC += $(OPUAVOBJ)/manualcontrolsettings.c
+SRC += $(OPUAVOBJ)/attitudedesired.c
+SRC += $(OPUAVOBJ)/stabilizationsettings.c
 
 ## PIOS Hardware (STM32F10x)
 SRC += $(PIOSSTM32F10X)/pios_sys.c
@@ -262,6 +276,10 @@ EXTRAINCDIRS  += $(MODTELEMETRY)
 EXTRAINCDIRS  += $(MODTELEMETRYINC)
 EXTRAINCDIRS  += $(MODGPS)
 EXTRAINCDIRS  += $(MODGPSINC)
+EXTRAINCDIRS  += $(MODMANUALCONTROL)
+EXTRAINCDIRS  += $(MODMANUALCONTROLINC)
+EXTRAINCDIRS  += $(MODACTUATOR)
+EXTRAINCDIRS  += $(MODACTUATORINC)
 EXTRAINCDIRS  += $(PIOS)
 EXTRAINCDIRS  += $(PIOSINC)
 EXTRAINCDIRS  += $(PIOSSTM32F10X)

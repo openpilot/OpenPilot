@@ -28,14 +28,22 @@
  */
 
 #include "openpilot.h"
+#include "actuatorcommand.h"
+#include "actuatordesired.h"
+#include "actuatorsettings.h"
+#include "attitudedesired.h"
 #include "exampleobject1.h"
 #include "exampleobject2.h"
 #include "examplesettings.h"
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
 #include "gpsobject.h"
+#include "manualcontrolcommand.h"
+#include "manualcontrolsettings.h"
 #include "objectpersistence.h"
+#include "stabilizationsettings.h"
 #include "systemalarms.h"
+#include "systemsettings.h"
 #include "systemstats.h"
 #include "telemetrysettings.h"
 
@@ -46,14 +54,22 @@
  */
 void UAVObjectsInitializeAll()
 {
+    ActuatorCommandInitialize();
+    ActuatorDesiredInitialize();
+    ActuatorSettingsInitialize();
+    AttitudeDesiredInitialize();
     ExampleObject1Initialize();
     ExampleObject2Initialize();
     ExampleSettingsInitialize();
     FlightTelemetryStatsInitialize();
     GCSTelemetryStatsInitialize();
     GpsObjectInitialize();
+    ManualControlCommandInitialize();
+    ManualControlSettingsInitialize();
     ObjectPersistenceInitialize();
+    StabilizationSettingsInitialize();
     SystemAlarmsInitialize();
+    SystemSettingsInitialize();
     SystemStatsInitialize();
     TelemetrySettingsInitialize();
 

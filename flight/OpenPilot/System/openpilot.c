@@ -33,6 +33,8 @@
 #include "examplemodevent.h"
 #include "examplemodperiodic.h"
 #include "examplemodthread.h"
+#include "manualcontrol.h"
+#include "actuator.h"
 
 /* Task Priorities */
 #define PRIORITY_TASK_HOOKS             (tskIDLE_PRIORITY + 3)
@@ -130,10 +132,12 @@ void OpenPilotInit()
 	//ExampleModThreadInitialize();
 	//ExampleModEventInitialize();
 	GpsInitialize();
+	ManualControlInitialize();
+	ActuatorInitialize();
 
 	/* Create test tasks */
 	//xTaskCreate(TaskTesting, (signed portCHAR *)"Testing", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
-	xTaskCreate(TaskHIDTest, (signed portCHAR *)"HIDTest", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
+	//xTaskCreate(TaskHIDTest, (signed portCHAR *)"HIDTest", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
 	//xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
 	//xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
 }

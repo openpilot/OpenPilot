@@ -46,7 +46,7 @@ UAVObjectBrowserWidget::UAVObjectBrowserWidget(QWidget *parent) : QWidget(parent
     m_model = new UAVObjectTreeModel();
     m_browser->treeView->setModel(m_model);
     m_browser->treeView->setColumnWidth(0, 300);
-    m_browser->treeView->expandAll();
+    //m_browser->treeView->expandAll();
     BrowserItemDelegate *m_delegate = new BrowserItemDelegate();
     m_browser->treeView->setItemDelegate(m_delegate);
     m_browser->treeView->setEditTriggers(QAbstractItemView::AllEditTriggers);

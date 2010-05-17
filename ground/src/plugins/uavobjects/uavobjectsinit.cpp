@@ -30,14 +30,22 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "uavobjectsinit.h"
+#include "actuatorcommand.h"
+#include "actuatordesired.h"
+#include "actuatorsettings.h"
+#include "attitudedesired.h"
 #include "exampleobject1.h"
 #include "exampleobject2.h"
 #include "examplesettings.h"
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
 #include "gpsobject.h"
+#include "manualcontrolcommand.h"
+#include "manualcontrolsettings.h"
 #include "objectpersistence.h"
+#include "stabilizationsettings.h"
 #include "systemalarms.h"
+#include "systemsettings.h"
 #include "systemstats.h"
 #include "telemetrysettings.h"
 
@@ -48,14 +56,22 @@
  */
 void UAVObjectsInitialize(UAVObjectManager* objMngr)
 {
+    objMngr->registerObject( new ActuatorCommand() );
+    objMngr->registerObject( new ActuatorDesired() );
+    objMngr->registerObject( new ActuatorSettings() );
+    objMngr->registerObject( new AttitudeDesired() );
     objMngr->registerObject( new ExampleObject1() );
     objMngr->registerObject( new ExampleObject2() );
     objMngr->registerObject( new ExampleSettings() );
     objMngr->registerObject( new FlightTelemetryStats() );
     objMngr->registerObject( new GCSTelemetryStats() );
     objMngr->registerObject( new GpsObject() );
+    objMngr->registerObject( new ManualControlCommand() );
+    objMngr->registerObject( new ManualControlSettings() );
     objMngr->registerObject( new ObjectPersistence() );
+    objMngr->registerObject( new StabilizationSettings() );
     objMngr->registerObject( new SystemAlarms() );
+    objMngr->registerObject( new SystemSettings() );
     objMngr->registerObject( new SystemStats() );
     objMngr->registerObject( new TelemetrySettings() );
 

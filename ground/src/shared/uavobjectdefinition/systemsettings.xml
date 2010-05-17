@@ -1,0 +1,8 @@
+<xml>
+        <object name="SystemSettings" singleinstance="true" settings="true">
+            <field name="AirframeType" units="" type="enum" elements="1" options="FixedWing,FixedWingElevon,VTOL" defaultvalue="FixedWing"/>
+            <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+            <telemetryflight acked="true" updatemode="onchange" period="0"/>
+            <logging updatemode="never" period="0"/>
+	</object>
+</xml>

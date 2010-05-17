@@ -19,7 +19,15 @@ HEADERS += uavobjects_global.h \
     systemstats.h \
     systemalarms.h \
     objectpersistence.h \
-    telemetrysettings.h
+    telemetrysettings.h \
+    systemsettings.h \
+    stabilizationsettings.h \
+    manualcontrolsettings.h \
+    manualcontrolcommand.h \
+    attitudedesired.h \
+    actuatorsettings.h \
+    actuatordesired.h \
+    actuatorcommand.h
 SOURCES += uavobject.cpp \
     uavmetaobject.cpp \
     uavobjectmanager.cpp \
@@ -36,6 +44,14 @@ SOURCES += uavobject.cpp \
     systemstats.cpp \
     systemalarms.cpp \
     objectpersistence.cpp \
-    telemetrysettings.cpp
+    telemetrysettings.cpp \
+    systemsettings.cpp \
+    stabilizationsettings.cpp \
+    manualcontrolsettings.cpp \
+    manualcontrolcommand.cpp \
+    attitudedesired.cpp \
+    actuatorsettings.cpp \
+    actuatordesired.cpp \
+    actuatorcommand.cpp
 DEFINES += UAVOBJECTS_LIBRARY
 OTHER_FILES += UAVObjects.pluginspec

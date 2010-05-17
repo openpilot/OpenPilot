@@ -1,0 +1,14 @@
+<xml>
+        <object name="ManualControlCommand" singleinstance="true" settings="false">
+            <field name="Connected" units="" type="enum" elements="1" options="False,True"/>
+            <field name="Roll" units="%" type="float" elements="1"/>
+            <field name="Pitch" units="%" type="float" elements="1"/>
+            <field name="Yaw" units="%" type="float" elements="1"/>
+            <field name="Throttle" units="%" type="float" elements="1"/>
+            <field name="FlightMode" units="" type="enum" elements="1" options="Manual,Stabilized,Auto"/>
+            <field name="Channel" units="us" type="int16" elements="8"/>
+            <telemetrygcs acked="true" updatemode="manual" period="0"/>
+            <telemetryflight acked="true" updatemode="periodic" period="3000"/>
+            <logging updatemode="never" period="0"/>
+        </object>
+</xml>

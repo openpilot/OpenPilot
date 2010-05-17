@@ -1,0 +1,11 @@
+<xml>
+        <object name="AttitudeDesired" singleinstance="true" settings="false">
+            <field name="Roll" units="degrees" type="float" elements="1"/>
+            <field name="Pitch" units="degrees" type="float" elements="1"/>
+            <field name="Yaw" units="degrees" type="float" elements="1"/>
+            <field name="Throttle" units="%" type="float" elements="1"/>
+            <telemetrygcs acked="true" updatemode="manual" period="0"/>
+            <telemetryflight acked="true" updatemode="periodic" period="1000"/>
+            <logging updatemode="never" period="0"/>
+        </object>
+</xml>

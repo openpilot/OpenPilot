@@ -1,0 +1,8 @@
+<xml>
+        <object name="ActuatorCommand" singleinstance="true" settings="false">
+            <field name="Channel" units="us" type="int16" elements="8"/>
+            <telemetrygcs acked="true" updatemode="manual" period="0"/>
+            <telemetryflight acked="true" updatemode="periodic" period="1000"/>
+            <logging updatemode="never" period="0"/>
+        </object>
+</xml>

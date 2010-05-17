@@ -429,9 +429,9 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="4.911941"
-     inkscape:cx="17.338558"
-     inkscape:cy="44.721665"
-     inkscape:current-layer="layer21"
+     inkscape:cx="40.649098"
+     inkscape:cy="38.317711"
+     inkscape:current-layer="layer36"
      id="namedview3608"
      showgrid="false"
      inkscape:window-width="1280"
@@ -496,15 +496,17 @@
        x="499.10913"
        height="56.637238"
        width="13.893178"
-       id="rect4000-8-5"
-       style="fill:#332d2d;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+       id="Actuator"
+       style="fill:#332d2d;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:label="#rect4000-8-5" />
     <rect
        y="365.44907"
        x="576.71594"
        height="56.637238"
        width="13.893178"
-       id="rect4000-8-0-9"
-       style="fill:#332d2d;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+       id="ManualControl"
+       style="fill:#332d2d;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:label="#rect4000-8-0-9" />
     <rect
        style="fill:#332d2d;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="SDCard"
@@ -625,6 +627,134 @@
        id="Telemetry"
        style="fill:none;stroke:#ffffff;stroke-width:0.29055119;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
        transform="translate(497.66563,344.28037)" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer36"
+     inkscape:label="ManualControl-OK">
+    <rect
+       transform="translate(-497.66563,-344.28037)"
+       inkscape:label="#rect4000-8-0-9"
+       style="display:inline;fill:#04b629;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605000000000;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="ManualControl-OK"
+       width="13.893178"
+       height="56.637238"
+       x="576.71594"
+       y="365.44907" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer33"
+     inkscape:label="ManualControl-Warning"
+     style="display:inline">
+    <rect
+       transform="translate(-497.66563,-344.28037)"
+       inkscape:label="#rect4000-8-0-9"
+       style="fill:#f1b907;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       id="ManualControl-Warning"
+       width="13.893178"
+       height="56.637238"
+       x="576.71594"
+       y="365.44907" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer34"
+     inkscape:label="ManualControl-Error"
+     style="display:inline">
+    <g
+       inkscape:label="#g3878"
+       style="stroke:#cf0e0e;stroke-opacity:1;display:inline"
+       id="ManualControl-Error"
+       transform="translate(78,0)">
+      <path
+         style="fill:none;stroke:#cf0e0e;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="M 2.0153937,22.13633 14.539626,77.127787"
+         id="path5066" />
+      <path
+         id="path5068"
+         d="M 14.539626,22.13633 2.0153937,77.127787"
+         style="fill:none;stroke:#cf0e0e;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer35"
+     inkscape:label="ManualControl-Critical"
+     style="display:inline">
+    <rect
+       y="365.44907"
+       x="576.71594"
+       height="56.637238"
+       width="13.893178"
+       id="ManualControl-Critical"
+       style="fill:#cf0e0e;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       inkscape:label="#rect4000-8-0-9"
+       transform="translate(-497.66563,-344.28037)" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer29"
+     inkscape:label="Actuator-OK"
+     style="display:inline">
+    <rect
+       transform="translate(-497.66563,-344.28037)"
+       inkscape:label="#rect4000-8-5"
+       style="fill:#04b629;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       id="Actuator-OK"
+       width="13.893178"
+       height="56.637238"
+       x="499.10913"
+       y="365.44907" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer30"
+     inkscape:label="Actuator-Warning"
+     style="display:inline">
+    <rect
+       y="365.44907"
+       x="499.10913"
+       height="56.637238"
+       width="13.893178"
+       id="Actuator-Warning"
+       style="fill:#f1b907;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       inkscape:label="#rect4000-8-5"
+       transform="translate(-497.66563,-344.28037)" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer31"
+     inkscape:label="Actuator-Error"
+     style="display:inline">
+    <g
+       id="Actuator-Error"
+       style="stroke:#cf0e0e;stroke-opacity:1"
+       inkscape:label="#g3878">
+      <path
+         id="path3874"
+         d="M 2.0153937,22.13633 14.539626,77.127787"
+         style="fill:none;stroke:#cf0e0e;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         style="fill:none;stroke:#cf0e0e;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="M 14.539626,22.13633 2.0153937,77.127787"
+         id="path3876" />
+    </g>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer32"
+     inkscape:label="Actuator-Critical"
+     style="display:inline">
+    <rect
+       transform="translate(-497.66563,-344.28037)"
+       inkscape:label="#rect4000-8-5"
+       style="fill:#cf0e0e;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       id="Actuator-Critical"
+       width="13.893178"
+       height="56.637238"
+       x="499.10913"
+       y="365.44907" />
   </g>
   <g
      inkscape:groupmode="layer"

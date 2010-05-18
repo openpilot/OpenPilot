@@ -91,8 +91,8 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define PIOS_I2C_IRQ_ER_HANDLER			void I2C2_ER_IRQHandler(void)
 #define PIOS_I2C_IRQ_EV_CHANNEL			I2C2_EV_IRQn
 #define PIOS_I2C_IRQ_ER_CHANNEL			I2C2_EV_IRQn
-#define PIOS_I2C_IRQ_EV_PRIORITY		2
-#define PIOS_I2C_IRQ_ER_PRIORITY		2
+#define PIOS_I2C_IRQ_EV_PRIORITY		PIOS_IRQ_PRIO_HIGH
+#define PIOS_I2C_IRQ_ER_PRIORITY		PIOS_IRQ_PRIO_HIGH
 
 //------------------------
 // PIOS_BMP085

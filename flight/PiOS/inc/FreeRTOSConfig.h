@@ -58,9 +58,9 @@ to exclude the API function. */
 
 
 /* This is the raw value as per the Cortex-M3 NVIC.  Values can be 255
-(lowest) to 0 (1?) (highest). */
-#define configKERNEL_INTERRUPT_PRIORITY 		255
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY 	191 /* equivalent to 0xb0, or priority 11. */
+(lowest) to 1 (highest maskable) to 0 (highest non-maskable). */
+#define configKERNEL_INTERRUPT_PRIORITY 	15 << 4 /* equivalent to NVIC priority 15 */
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY 	 3 << 4 /* equivalent to NVIC priority  3 */
 
 
 /* This is the value being used as per the ST library which permits 16

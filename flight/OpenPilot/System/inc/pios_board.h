@@ -1,4 +1,4 @@
-/**
+﻿/**
  ******************************************************************************
  *
  * @file       pios_board.h   
@@ -135,7 +135,7 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define PIOS_USART2_IRQHANDLER_FUNC		void USART3_IRQHandler(void)
 #define PIOS_USART2_CLK_FUNC			RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE)
 #define PIOS_USART2_NVIC_PRIO			PIOS_IRQ_PRIO_HIGH
-#define PIOS_USART2_BAUDRATE			38400
+#define PIOS_USART2_BAUDRATE			57600
 
 //-------------------------
 //  PIOS_USART3 (AUX) (RX5/RX6)

@@ -26,9 +26,9 @@
  */
 
 #include "airspeedgadgetwidget.h"
-
+#include "extensionsystem/pluginmanager.h"
+#include "uavobjects/uavobjectmanager.h"
 #include <iostream>
-#include <QtGui/QFileDialog>
 #include <QDebug>
 
 AirspeedGadgetWidget::AirspeedGadgetWidget(QWidget *parent) : QGraphicsView(parent)
@@ -64,7 +64,42 @@ AirspeedGadgetWidget::~AirspeedGadgetWidget()
    // Do nothing
 }
 
+/*!
+  \brief Connects the widget to the relevant UAVObjects
+  */
 void AirspeedGadgetWidget::connectNeedles(QString object1, QString field1, QString object2, QString field2 ) {
+
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+
+    // Check validity of arguments first, reject empty args and unknown fields.
+    if (!(object1.isEmpty() || field1.isEmpty())) {
+        UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(object1) );
+        if (obj != NULL ) {
+            connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateNeedles(UAVObject*)));
+        } else {
+            std::cout << "Error: Object is unknown (" << object1.toStdString() << ")." << std::endl;
+        }
+    }
+
+    // And do the same for the second needle.
+    if (!(object2.isEmpty() || field2.isEmpty())) {
+        UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(object2) );
+        if (obj != NULL ) {
+            connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateNeedles(UAVObject*)));
+        } else {
+            std::cout << "Error: Object is unknown (" << object2.toStdString() << ")." << std::endl;
+        }
+    }
+}
+
+
+/*!
+  \brief Called by the systemalarms UAVObject
+  */
+void AirspeedGadgetWidget::updateNeedles(UAVObject *systemObject) {
+
+    // UAVObjectField* field = obj->getField(QString("Field1"));
 
 }
 

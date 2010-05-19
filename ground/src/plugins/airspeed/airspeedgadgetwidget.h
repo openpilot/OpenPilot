@@ -29,12 +29,12 @@
 #define AIRSPEEDGADGETWIDGET_H_
 
 #include "airspeedgadgetconfiguration.h"
+#include "uavobjects/uavobject.h"
 #include <QGraphicsView>
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
 
 #include <QFile>
-// Used for test purposes
 #include <QTimer>
 
 class AirspeedGadgetWidget : public QGraphicsView
@@ -67,6 +67,7 @@ private:
 private slots:
    // Test function
    void testRotate();
+   void updateNeedles(UAVObject *systemAlarm); // Called by the systemalarms UAVObject
    void rotateNeedles();
 
 private:

@@ -29,4 +29,4 @@
 /* Public Functions */
 
 
-#endif /* PIOS_LED_H */
+#endif /* PIOS_EXTI_H */

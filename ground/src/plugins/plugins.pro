@@ -73,6 +73,7 @@ SUBDIRS += plugin_uploader
 #Airspeed Dial Gadget
 plugin_airspeed.subdir = airspeed
 plugin_airspeed.depends = plugin_coreplugin
+plugin_airspeed.depends = plugin_uavobjects
 SUBDIRS += plugin_airspeed
 
 #Linear Dial Gadget
@@ -83,8 +84,8 @@ SUBDIRS += plugin_lineardial
 #System health Gadget
 plugin_systemhealth.subdir = systemhealth
 plugin_systemhealth.depends = plugin_coreplugin
+plugin_systemhealth.depends = plugin_uavobjects
 SUBDIRS += plugin_systemhealth
-
 
 #Config Gadget
 plugin_config.subdir = config

@@ -77,12 +77,14 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	UAVObjSetInstanceData(obj, instId, &data);
 
 	// Initialize object metadata to their default values
+	metadata.access = ACCESS_READWRITE;
+	metadata.gcsAccess = ACCESS_READWRITE;
 	metadata.telemetryAcked = 1;
-	metadata.telemetryUpdateMode = UPDATEMODE_ONCHANGE;
-	metadata.telemetryUpdatePeriod = 0;
+	metadata.telemetryUpdateMode = UPDATEMODE_PERIODIC;
+	metadata.telemetryUpdatePeriod = 1000;
 	metadata.gcsTelemetryAcked = 1;
-	metadata.gcsTelemetryUpdateMode = UPDATEMODE_PERIODIC;
-	metadata.gcsTelemetryUpdatePeriod = 200;
+	metadata.gcsTelemetryUpdateMode = UPDATEMODE_MANUAL;
+	metadata.gcsTelemetryUpdatePeriod = 0;
 	metadata.loggingUpdateMode = UPDATEMODE_NEVER;
 	metadata.loggingUpdatePeriod = 0;
 	UAVObjSetMetadata(obj, &metadata);

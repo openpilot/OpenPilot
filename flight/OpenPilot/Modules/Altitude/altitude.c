@@ -37,6 +37,7 @@
 // Private constants
 #define STACK_SIZE configMINIMAL_STACK_SIZE
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
+#define UPDATE_PERIOD 100
 
 // Private types
 
@@ -72,9 +73,6 @@ static void altitudeTask(void* parameters)
 	lastSysTime = xTaskGetTickCount();
 	while (1)
 	{
-		// Get the object data
-		AltitudeActualGet(&data);
-
 		// Update the temperature data
 		PIOS_BMP085_StartADC(TemperatureConv);
 #if 0
@@ -104,6 +102,6 @@ static void altitudeTask(void* parameters)
 		AltitudeActualSet(&data);
 
 		// Delay until it is time to read the next sample
-		vTaskDelayUntil(&lastSysTime, 1000 / portTICK_RATE_MS );
+		vTaskDelayUntil(&lastSysTime, UPDATE_PERIOD / portTICK_RATE_MS );
 	}
 }

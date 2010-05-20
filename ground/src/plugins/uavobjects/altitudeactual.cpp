@@ -62,12 +62,14 @@ AltitudeActual::AltitudeActual(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS,
 UAVObject::Metadata AltitudeActual::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
+    metadata.flightAccess = ACCESS_READWRITE;
+    metadata.gcsAccess = ACCESS_READWRITE;
     metadata.gcsTelemetryAcked = 1;
-    metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
-    metadata.gcsTelemetryUpdatePeriod = 200;
+    metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_MANUAL;
+    metadata.gcsTelemetryUpdatePeriod = 0;
     metadata.flightTelemetryAcked = 1;
-    metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
-    metadata.flightTelemetryUpdatePeriod = 0;
+    metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+    metadata.flightTelemetryUpdatePeriod = 1000;
     metadata.loggingUpdateMode = UAVObject::UPDATEMODE_NEVER;
     metadata.loggingUpdatePeriod = 0;
     return metadata;
@@ -98,9 +100,15 @@ AltitudeActual::DataFields AltitudeActual::getData()
 void AltitudeActual::setData(const DataFields& data)
 {
     QMutexLocker locker(mutex);
-    this->data = data;
-    emit objectUpdatedAuto(this); // trigger object updated event
-    emit objectUpdated(this);
+    // Get metadata
+    Metadata mdata = getMetadata();
+    // Update object if the access mode permits
+    if ( mdata.gcsAccess == ACCESS_READWRITE )
+    {
+        this->data = data;
+        emit objectUpdatedAuto(this); // trigger object updated event
+        emit objectUpdated(this);
+    }
 }
 
 /**

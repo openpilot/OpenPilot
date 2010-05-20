@@ -3,8 +3,9 @@
             <field name="Altitude" units="m" type="float" elements="1"/>
             <field name="Temperature" units="C" type="float" elements="1"/>
             <field name="Pressure" units="kPa" type="float" elements="1"/>
-            <telemetrygcs acked="true" updatemode="periodic" period="200"/>
-            <telemetryflight acked="true" updatemode="onchange" period="0"/>
+            <access gcs="readwrite" flight="readwrite"/>
+            <telemetrygcs acked="true" updatemode="manual" period="0"/>
+            <telemetryflight acked="true" updatemode="periodic" period="1000"/>
             <logging updatemode="never" period="0"/>
 	</object>
 </xml>

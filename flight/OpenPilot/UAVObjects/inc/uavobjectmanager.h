@@ -46,6 +46,8 @@ typedef enum {
  * properties for each object and can be used by multiple modules (e.g. telemetry and logger)
  */
 typedef struct {
+	uint8_t access; /** Defines the access level for the local transactions (readonly and readwrite) */
+	uint8_t gcsAccess; /** Defines the access level for the local GCS transactions (readonly and readwrite), not used in the flight s/w */
 	uint8_t telemetryAcked; /** Defines if an ack is required for the transactions of this object (1:acked, 0:not acked) */
 	uint8_t telemetryUpdateMode; /** Update mode used by the telemetry module (UAVObjUpdateMode) */
 	int32_t telemetryUpdatePeriod; /** Update period used by the telemetry module (only if telemetry mode is PERIODIC) */
@@ -71,6 +73,14 @@ typedef enum {
  */
 #define EV_MASK_ALL 0
 #define EV_MASK_ALL_UPDATES (EV_UNPACKED | EV_UPDATED | EV_UPDATED_MANUAL)
+
+/**
+ * Access types
+ */
+typedef enum {
+	ACCESS_READWRITE = 0,
+	ACCESS_READONLY = 1
+} UAVObjAccessType;
 
 /**
  * Event message, this structure is sent in the event queue each time an event is generated

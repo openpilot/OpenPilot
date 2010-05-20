@@ -102,6 +102,8 @@ int32_t UAVObjInitialize()
 		return -1;
 
 	// Initialize default metadata structure (metadata of metaobjects)
+	defMetadata.access = ACCESS_READWRITE;
+	defMetadata.gcsAccess = ACCESS_READWRITE;
 	defMetadata.telemetryAcked = 1;
 	defMetadata.telemetryUpdateMode = UPDATEMODE_ONCHANGE;
 	defMetadata.telemetryUpdatePeriod = 0;
@@ -995,12 +997,24 @@ int32_t UAVObjSetInstanceData(UAVObjHandle obj, uint16_t instId, const void* dat
 {
 	ObjectList* objEntry;
 	ObjectInstList* instEntry;
+	UAVObjMetadata* mdata;
 
 	// Lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
 	// Cast to object info
 	objEntry = (ObjectList*)obj;
+
+	// Check access level
+	if ( !objEntry->isMetaobject )
+	{
+		mdata = (UAVObjMetadata*)(objEntry->linkedObj->instances->data);
+		if ( mdata->access == ACCESS_READONLY )
+		{
+			xSemaphoreGiveRecursive(mutex);
+			return -1;
+		}
+	}
 
 	// Get instance information
 	instEntry = getInstance(objEntry, instId);

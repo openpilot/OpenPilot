@@ -77,6 +77,8 @@ $(INITFIELDS)
 	UAVObjSetInstanceData(obj, instId, &data);
 
 	// Initialize object metadata to their default values
+	metadata.access = $(FLIGHTACCESS);
+	metadata.gcsAccess = $(GCSACCESS);
 	metadata.telemetryAcked = $(FLIGHTTELEM_ACKED);
 	metadata.telemetryUpdateMode = $(FLIGHTTELEM_UPDATEMODE);
 	metadata.telemetryUpdatePeriod = $(FLIGHTTELEM_UPDATEPERIOD);

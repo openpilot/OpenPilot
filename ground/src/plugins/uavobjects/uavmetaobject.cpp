@@ -36,6 +36,8 @@ UAVMetaObject::UAVMetaObject(quint32 objID, const QString& name, UAVObject* pare
 {
     this->parent = parent;
     // Setup default metadata of metaobject (can not be changed)
+    ownMetadata.flightAccess = ACCESS_READWRITE;
+    ownMetadata.gcsAccess = ACCESS_READWRITE;
     ownMetadata.flightTelemetryAcked = 1;
     ownMetadata.flightTelemetryUpdateMode = UPDATEMODE_ONCHANGE;
     ownMetadata.flightTelemetryUpdatePeriod = 0;
@@ -49,7 +51,11 @@ UAVMetaObject::UAVMetaObject(quint32 objID, const QString& name, UAVObject* pare
     boolEnum << tr("False") << tr("True");
     QStringList updateModeEnum;
     updateModeEnum << tr("Periodic") << tr("On Change") << tr("Manual") << tr("Never");
-    QList<UAVObjectField*> fields;
+    QStringList accessModeEnum;
+    accessModeEnum << tr("Read/Write") << tr("Read Only");
+    QList<UAVObjectField*> fields;    
+    fields.append( new UAVObjectField(tr("Flight Access Mode"), tr(""), UAVObjectField::ENUM, 1, accessModeEnum) );
+    fields.append( new UAVObjectField(tr("GCS Access Mode"), tr(""), UAVObjectField::ENUM, 1, accessModeEnum) );
     fields.append( new UAVObjectField(tr("Flight Telemetry Acked"), tr(""), UAVObjectField::ENUM, 1, boolEnum) );
     fields.append( new UAVObjectField(tr("Flight Telemetry Update Mode"), tr(""), UAVObjectField::ENUM, 1, updateModeEnum) );
     fields.append( new UAVObjectField(tr("Flight Telemetry Update Period"), tr(""), UAVObjectField::UINT32, 1, QStringList()) );

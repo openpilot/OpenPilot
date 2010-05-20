@@ -8,6 +8,7 @@
             <field name="Field6" units="unit6" type="uint16" elements="1"/>
             <field name="Field7" units="unit7" type="uint32" elements="1"/>
             <field name="Field8" units="unit8" type="enum" elements="1" options="Option1, Option2"/>
+            <access gcs="readwrite" flight="readwrite"/>
             <telemetrygcs acked="true" updatemode="periodic" period="200"/>
             <telemetryflight acked="true" updatemode="onchange" period="0"/>
             <logging updatemode="never" period="0"/>

@@ -466,69 +466,74 @@ void UAVObjectField::setValue(const QVariant& value, quint32 index)
     if ( index >= numElements )
     {
         return;
-    }
-    // Set value
-    switch (type)
+    } 
+    // Get metadata
+    UAVObject::Metadata mdata = obj->getMetadata();
+    // Update value if the access mode permits
+    if ( mdata.gcsAccess == UAVObject::ACCESS_READWRITE )
     {
-        case INT8:
+        switch (type)
         {
-            qint8 tmpint8 = value.toInt();
-            memcpy(&data[offset + numBytesPerElement*index], &tmpint8, numBytesPerElement);
-            break;
-        }
-        case INT16:
-        {
-            qint16 tmpint16 = value.toInt();
-            memcpy(&data[offset + numBytesPerElement*index], &tmpint16, numBytesPerElement);
-            break;
-        }
-        case INT32:
-        {
-            qint32 tmpint32 = value.toInt();
-            memcpy(&data[offset + numBytesPerElement*index], &tmpint32, numBytesPerElement);
-            break;
-        }
-        case UINT8:
-        {
-            quint8 tmpuint8 = value.toUInt();
-            memcpy(&data[offset + numBytesPerElement*index], &tmpuint8, numBytesPerElement);
-            break;
-        }
-        case UINT16:
-        {
-            quint16 tmpuint16 = value.toUInt();
-            memcpy(&data[offset + numBytesPerElement*index], &tmpuint16, numBytesPerElement);
-            break;
-        }
-        case UINT32:
-        {
-            quint32 tmpuint32 = value.toUInt();
-            memcpy(&data[offset + numBytesPerElement*index], &tmpuint32, numBytesPerElement);
-            break;
-        }
-        case FLOAT32:
-        {
-            float tmpfloat = value.toFloat();
-            memcpy(&data[offset + numBytesPerElement*index], &tmpfloat, numBytesPerElement);
-            break;
-        }
-        case ENUM:
-        {
-            qint8 tmpenum = options.indexOf( value.toString() );
-            memcpy(&data[offset + numBytesPerElement*index], &tmpenum, numBytesPerElement);
-            break;
-        }
-        case STRING:
-        {
-            QString str = value.toString();
-            QByteArray barray = str.toAscii();
-            quint32 index;
-            for (index = 0; index < (quint32)barray.length() && index < (numElements-1); ++index)
+            case INT8:
             {
-                data[offset+index] = barray[index];
+                qint8 tmpint8 = value.toInt();
+                memcpy(&data[offset + numBytesPerElement*index], &tmpint8, numBytesPerElement);
+                break;
             }
-            barray[index] = '\0';
-            break;
+            case INT16:
+            {
+                qint16 tmpint16 = value.toInt();
+                memcpy(&data[offset + numBytesPerElement*index], &tmpint16, numBytesPerElement);
+                break;
+            }
+            case INT32:
+            {
+                qint32 tmpint32 = value.toInt();
+                memcpy(&data[offset + numBytesPerElement*index], &tmpint32, numBytesPerElement);
+                break;
+            }
+            case UINT8:
+            {
+                quint8 tmpuint8 = value.toUInt();
+                memcpy(&data[offset + numBytesPerElement*index], &tmpuint8, numBytesPerElement);
+                break;
+            }
+            case UINT16:
+            {
+                quint16 tmpuint16 = value.toUInt();
+                memcpy(&data[offset + numBytesPerElement*index], &tmpuint16, numBytesPerElement);
+                break;
+            }
+            case UINT32:
+            {
+                quint32 tmpuint32 = value.toUInt();
+                memcpy(&data[offset + numBytesPerElement*index], &tmpuint32, numBytesPerElement);
+                break;
+            }
+            case FLOAT32:
+            {
+                float tmpfloat = value.toFloat();
+                memcpy(&data[offset + numBytesPerElement*index], &tmpfloat, numBytesPerElement);
+                break;
+            }
+            case ENUM:
+            {
+                qint8 tmpenum = options.indexOf( value.toString() );
+                memcpy(&data[offset + numBytesPerElement*index], &tmpenum, numBytesPerElement);
+                break;
+            }
+            case STRING:
+            {
+                QString str = value.toString();
+                QByteArray barray = str.toAscii();
+                quint32 index;
+                for (index = 0; index < (quint32)barray.length() && index < (numElements-1); ++index)
+                {
+                    data[offset+index] = barray[index];
+                }
+                barray[index] = '\0';
+                break;
+            }
         }
     }
 }

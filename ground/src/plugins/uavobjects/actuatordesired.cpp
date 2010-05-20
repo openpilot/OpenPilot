@@ -65,6 +65,8 @@ ActuatorDesired::ActuatorDesired(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTING
 UAVObject::Metadata ActuatorDesired::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
+    metadata.flightAccess = ACCESS_READWRITE;
+    metadata.gcsAccess = ACCESS_READWRITE;
     metadata.gcsTelemetryAcked = 1;
     metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_MANUAL;
     metadata.gcsTelemetryUpdatePeriod = 0;
@@ -101,9 +103,15 @@ ActuatorDesired::DataFields ActuatorDesired::getData()
 void ActuatorDesired::setData(const DataFields& data)
 {
     QMutexLocker locker(mutex);
-    this->data = data;
-    emit objectUpdatedAuto(this); // trigger object updated event
-    emit objectUpdated(this);
+    // Get metadata
+    Metadata mdata = getMetadata();
+    // Update object if the access mode permits
+    if ( mdata.gcsAccess == ACCESS_READWRITE )
+    {
+        this->data = data;
+        emit objectUpdatedAuto(this); // trigger object updated event
+        emit objectUpdated(this);
+    }
 }
 
 /**

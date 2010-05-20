@@ -59,6 +59,11 @@ public:
             UPDATEMODE_NEVER /** Object is never updated */
     } UpdateMode;
 
+    typedef enum {
+            ACCESS_READWRITE = 0,
+            ACCESS_READONLY = 1
+    } AccessMode;
+
     typedef struct {
         QString name;
         QString units;
@@ -75,6 +80,8 @@ public:
         quint32 id;
         bool isSingleInst;
         bool isSettings;
+        AccessMode gcsAccess;
+        AccessMode flightAccess;
         bool flightTelemetryAcked;
         UpdateMode flightTelemetryUpdateMode; /** Update mode used by the autopilot (UpdateMode) */
         int flightTelemetryUpdatePeriod; /** Update period used by the autopilot (only if telemetry mode is PERIODIC) */
@@ -109,9 +116,12 @@ private:
     QStringList fieldTypeStrXML;
     QStringList updateModeStr;
     QStringList updateModeStrXML;
+    QStringList accessModeStr;
+    QStringList accessModeStrXML;
 
     QString processObjectAttributes(QDomNode& node, ObjectInfo* info);
     QString processObjectFields(QDomNode& childNode, ObjectInfo* info);
+    QString processObjectAccess(QDomNode& childNode, ObjectInfo* info);
     QString processObjectMetadata(QDomNode& childNode, UpdateMode* mode, int* period, bool* acked);
     void calculateID(ObjectInfo* info);
     quint32 updateHash(quint32 value, quint32 hash);

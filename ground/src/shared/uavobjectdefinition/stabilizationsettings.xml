@@ -3,6 +3,7 @@
             <field name="RollMax" units="degrees" type="float" elements="1" defaultvalue="35"/>
             <field name="PitchMax" units="degrees" type="float" elements="1" defaultvalue="35"/>
             <field name="ThrottleMax" units="%" type="float" elements="1" defaultvalue="100.0"/>
+            <access gcs="readwrite" flight="readwrite"/>
             <telemetrygcs acked="true" updatemode="onchange" period="0"/>
             <telemetryflight acked="true" updatemode="onchange" period="0"/>
             <logging updatemode="never" period="0"/>

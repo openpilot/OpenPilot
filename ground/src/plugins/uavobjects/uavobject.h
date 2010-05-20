@@ -57,10 +57,20 @@ public:
     } UpdateMode;
 
     /**
+     * Access mode
+     */
+    typedef enum {
+            ACCESS_READWRITE = 0,
+            ACCESS_READONLY = 1
+    } AccessMode;
+
+    /**
      * Object metadata, each object has a meta object that holds its metadata. The metadata define
      * properties for each object and can be used by multiple modules (e.g. telemetry and logger)
      */
     typedef struct {
+            quint8 flightAccess; /** Defines the access level for the local flight transactions (readonly and readwrite) */
+            quint8 gcsAccess; /** Defines the access level for the local GCS transactions (readonly and readwrite) */
             quint8 flightTelemetryAcked; /** Defines if an ack is required for the transactions of this object (1:acked, 0:not acked) */
             quint8 flightTelemetryUpdateMode; /** Update mode used by the autopilot (UpdateMode) */
             qint32 flightTelemetryUpdatePeriod; /** Update period used by the autopilot (only if telemetry mode is PERIODIC) */

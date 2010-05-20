@@ -53,6 +53,8 @@ $(FIELDSINIT)
 UAVObject::Metadata $(NAME)::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
+    metadata.flightAccess = $(FLIGHTACCESS);
+    metadata.gcsAccess = $(GCSACCESS);
     metadata.gcsTelemetryAcked = $(GCSTELEM_ACKED);
     metadata.gcsTelemetryUpdateMode = UAVObject::$(GCSTELEM_UPDATEMODE);
     metadata.gcsTelemetryUpdatePeriod = $(GCSTELEM_UPDATEPERIOD);
@@ -89,9 +91,15 @@ $(NAME)::DataFields $(NAME)::getData()
 void $(NAME)::setData(const DataFields& data)
 {
     QMutexLocker locker(mutex);
-    this->data = data;
-    emit objectUpdatedAuto(this); // trigger object updated event
-    emit objectUpdated(this);
+    // Get metadata
+    Metadata mdata = getMetadata();
+    // Update object if the access mode permits
+    if ( mdata.gcsAccess == ACCESS_READWRITE )
+    {
+        this->data = data;
+        emit objectUpdatedAuto(this); // trigger object updated event
+        emit objectUpdated(this);
+    }
 }
 
 /**

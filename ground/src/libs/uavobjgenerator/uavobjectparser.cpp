@@ -58,6 +58,10 @@ UAVObjectParser::UAVObjectParser()
 
     updateModeStrXML << QString("periodic") << QString("onchange") <<
                         QString("manual") << QString("never");
+
+    accessModeStr << QString("ACCESS_READWRITE") << QString("ACCESS_READONLY");
+
+    accessModeStrXML << QString("readwrite") << QString("readonly");
 }
 
 /**
@@ -138,6 +142,11 @@ QString UAVObjectParser::parseXML(QString& xml, QString& filename)
 
         // Process child elements (fields and metadata)
         QDomNode childNode = node.firstChild();
+        bool fieldFound = false;
+        bool accessFound = false;
+        bool telGCSFound = false;
+        bool telFlightFound = false;
+        bool logFound = false;
         while ( !childNode.isNull() )
         {
             // Process element depending on its type
@@ -148,6 +157,16 @@ QString UAVObjectParser::parseXML(QString& xml, QString& filename)
                 {
                     return status;
                 }
+                fieldFound = true;
+            }
+            else if ( childNode.nodeName().compare(QString("access")) == 0 )
+            {
+                QString status = processObjectAccess(childNode, info);
+                if (!status.isNull())
+                {
+                    return status;
+                }
+                accessFound = true;
             }
             else if ( childNode.nodeName().compare(QString("telemetrygcs")) == 0 )
             {
@@ -157,6 +176,7 @@ QString UAVObjectParser::parseXML(QString& xml, QString& filename)
                 {
                     return status;
                 }
+                telGCSFound = true;
             }
             else if ( childNode.nodeName().compare(QString("telemetryflight")) == 0 )
             {
@@ -166,6 +186,7 @@ QString UAVObjectParser::parseXML(QString& xml, QString& filename)
                 {
                     return status;
                 }
+                telFlightFound = true;
             }
             else if ( childNode.nodeName().compare(QString("logging")) == 0 )
             {
@@ -175,6 +196,7 @@ QString UAVObjectParser::parseXML(QString& xml, QString& filename)
                 {
                     return status;
                 }
+                logFound = true;
             }
             else
             {
@@ -182,6 +204,24 @@ QString UAVObjectParser::parseXML(QString& xml, QString& filename)
             }
             // Get next element
             childNode = childNode.nextSibling();
+        }
+
+        // Make sure that required elements were found
+        if ( !accessFound )
+        {
+            return QString("Object::access element is missing");
+        }
+        else if ( !telGCSFound )
+        {
+            return QString("Object::telemetrygcs element is missing");
+        }
+        else if ( !telFlightFound )
+        {
+            return QString("Object::telemetryflight element is missing");
+        }
+        else if ( !logFound )
+        {
+            return QString("Object::logging element is missing");
         }
 
         // Calculate ID
@@ -302,6 +342,52 @@ QString UAVObjectParser::processObjectMetadata(QDomNode& childNode, UpdateMode* 
             {
                 return QString("Object:telemetrygcs:acked attribute value is invalid");
             }
+        }
+    }
+    // Done
+    return QString();
+}
+
+/**
+ * Process the object access tag of the XML
+ */
+QString UAVObjectParser::processObjectAccess(QDomNode& childNode, ObjectInfo* info)
+{
+    // Get gcs attribute
+    QDomNamedNodeMap elemAttributes = childNode.attributes();
+    QDomNode elemAttr = elemAttributes.namedItem("gcs");
+    if ( elemAttr.isNull() )
+    {
+        return QString("Object:access:gcs attribute is missing");
+    }
+    else
+    {   
+        int index = accessModeStrXML.indexOf( elemAttr.nodeValue() );
+        if (index >= 0)
+        {
+            info->gcsAccess = (AccessMode)index;
+        }
+        else
+        {
+            return QString("Object:access:gcs attribute value is invalid");
+        }
+    }
+    // Get flight attribute
+    elemAttr = elemAttributes.namedItem("flight");
+    if ( elemAttr.isNull() )
+    {
+        return QString("Object:access:flight attribute is missing");
+    }
+    else
+    {
+        int index = accessModeStrXML.indexOf( elemAttr.nodeValue() );
+        if (index >= 0)
+        {
+            info->flightAccess = (AccessMode)index;
+        }
+        else
+        {
+            return QString("Object:access:flight attribute value is invalid");
         }
     }
     // Done
@@ -516,7 +602,13 @@ void UAVObjectParser::replaceCommonTags(QString& out, ObjectInfo* info)
     out.replace(QString("$(ISSINGLEINST)"), value);
     // Replace $(ISSETTINGS) tag
     value = boolToString( info->isSettings );
-    out.replace(QString("$(ISSETTINGS)"), value);
+    out.replace(QString("$(ISSETTINGS)"), value);  
+    // Replace $(GCSACCESS) tag
+    value = accessModeStr[info->gcsAccess];
+    out.replace(QString("$(GCSACCESS)"), value);
+    // Replace $(FLIGHTACCESS) tag
+    value = accessModeStr[info->flightAccess];
+    out.replace(QString("$(FLIGHTACCESS)"), value);
     // Replace $(FLIGHTTELEM_ACKED) tag
     value = boolToString( info->flightTelemetryAcked );
     out.replace(QString("$(FLIGHTTELEM_ACKED)"), value);

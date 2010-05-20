@@ -76,6 +76,8 @@ GCSTelemetryStats::GCSTelemetryStats(): UAVDataObject(OBJID, ISSINGLEINST, ISSET
 UAVObject::Metadata GCSTelemetryStats::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
+    metadata.flightAccess = ACCESS_READWRITE;
+    metadata.gcsAccess = ACCESS_READWRITE;
     metadata.gcsTelemetryAcked = 1;
     metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
     metadata.gcsTelemetryUpdatePeriod = 5000;
@@ -112,9 +114,15 @@ GCSTelemetryStats::DataFields GCSTelemetryStats::getData()
 void GCSTelemetryStats::setData(const DataFields& data)
 {
     QMutexLocker locker(mutex);
-    this->data = data;
-    emit objectUpdatedAuto(this); // trigger object updated event
-    emit objectUpdated(this);
+    // Get metadata
+    Metadata mdata = getMetadata();
+    // Update object if the access mode permits
+    if ( mdata.gcsAccess == ACCESS_READWRITE )
+    {
+        this->data = data;
+        emit objectUpdatedAuto(this); // trigger object updated event
+        emit objectUpdated(this);
+    }
 }
 
 /**

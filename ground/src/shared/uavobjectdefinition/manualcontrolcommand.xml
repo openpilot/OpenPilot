@@ -7,6 +7,7 @@
             <field name="Throttle" units="%" type="float" elements="1"/>
             <field name="FlightMode" units="" type="enum" elements="1" options="Manual,Stabilized,Auto"/>
             <field name="Channel" units="us" type="int16" elements="8"/>
+            <access gcs="readwrite" flight="readwrite"/>
             <telemetrygcs acked="true" updatemode="manual" period="0"/>
             <telemetryflight acked="true" updatemode="periodic" period="3000"/>
             <logging updatemode="never" period="0"/>

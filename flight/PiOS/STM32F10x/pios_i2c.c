@@ -564,7 +564,7 @@ static void EV_IRQHandler(I2CRecTypeDef *i2cx)
 		if(i2cx->transfer_state.STOP_REQUESTED) {
 			TransferEnd(i2cx);
 			DebugPinLow(DEBUG_PIN_ISR);
-			return;
+			goto isr_return;
 		}
 		
 		/* Send IIC address */
@@ -620,6 +620,8 @@ static void ER_IRQHandler(I2CRecTypeDef *i2cx)
 	/* Read SR1 and SR2 at the beginning (if not done so, flags may get lost) */
 	uint32_t event = I2C_GetLastEvent(i2cx->base);
 
+	i2cx->transfer_state.INIRQ = 1;
+
 	/* Note that only one error number is available */
 	/* The order of these checks defines the priority */
 
@@ -646,6 +648,8 @@ static void ER_IRQHandler(I2CRecTypeDef *i2cx)
 
 	/* Notify that transfer has finished (due to the error) */
 	TransferEnd(i2cx);
+
+	i2cx->transfer_state.INIRQ = 0;
 }
 
 

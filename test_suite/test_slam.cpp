@@ -43,9 +43,6 @@ using namespace jafar::jmath::ublasExtra;
 using namespace jafar::rtslam;
 using namespace boost;
 
-jafar::kernel::IdFactory RobotAbstract::robotIds = jafar::kernel::IdFactory();
-jafar::kernel::IdFactory SensorAbstract::sensorIds = jafar::kernel::IdFactory();
-jafar::kernel::IdFactory LandmarkAbstract::landmarkIds = jafar::kernel::IdFactory();
 
 void test_slam01() {
 	ActiveSearchGrid acGrid(640, 480, 3, 3, 10);

@@ -37,7 +37,7 @@ using namespace std;
 
 void test_landmark01(void) {
 
-	jafar::kernel::IdFactory IdFac;
+	IdFactory IdFac;
 
 	size_t size_map = 300;
 

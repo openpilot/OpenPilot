@@ -26,6 +26,7 @@ namespace jafar {
 		using namespace boost;
 		using namespace ublasExtra;
 
+		IdFactory SensorAbstract::sensorIds = IdFactory();
 
 		/*
 		 * Operator << for class SensorAbstract.

@@ -193,9 +193,9 @@ namespace display {
 			}
 			
 		public:
-			static kernel::IdFactory& idFactory()
+			static IdFactory& idFactory()
 			{
-				static kernel::IdFactory idFactory_(-1);
+				static IdFactory idFactory_;
 				return idFactory_;
 			}
 			//static kernel::IdFactory idFactory_;
@@ -270,9 +270,9 @@ namespace display {
 			
 			
 		public:
-			static kernel::IdFactory::storage_t& id()
+			static IdFactory::storage_t& id()
 			{
-				static kernel::IdFactory::storage_t id = ViewerAbstract::idFactory().getId();
+				static IdFactory::storage_t id = ViewerAbstract::idFactory().getId()-1;
 				return id;
 			}
 			

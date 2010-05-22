@@ -19,6 +19,7 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
+		IdFactory LandmarkAbstract::landmarkIds = IdFactory();
 
 		/*
 		 * constructor.

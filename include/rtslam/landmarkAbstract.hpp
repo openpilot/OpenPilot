@@ -80,7 +80,7 @@ namespace jafar {
 				virtual ~LandmarkAbstract() {
 				}
 
-				static kernel::IdFactory landmarkIds;
+				static IdFactory landmarkIds;
 
 				enum geometry_t {
 						POINT,

@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE( test_display )
 	display::ViewerGdhe vgdhe;
 	JFR_CHECK_EQUAL(vqt.id(), 0);
 	JFR_CHECK_EQUAL(vgdhe.id(), 1);
-	JFR_CHECK_EQUAL(display::ViewerAbstract::idFactory().countUsed(), 1);
+	JFR_CHECK_EQUAL(display::ViewerAbstract::idFactory().countUsed(), 2);
 
 	
 	/*

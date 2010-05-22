@@ -36,7 +36,7 @@
 /* OpenPilot Includes */
 #include "openpilot.h"
 
-#define USE_DEBUG_PINS
+//#define USE_DEBUG_PINS
 
 #define DEVICE_1_ADDRESS 0x50
 #define DEVICE_2_ADDRESS 0x51
@@ -91,8 +91,8 @@ int main()
 	PIOS_LED_Off(LED2);
 
 	// Create task
-	xTaskCreate(Task1, (signed portCHAR *)"Task1", configMINIMAL_STACK_SIZE , NULL, 1, NULL);
-	xTaskCreate(Task2, (signed portCHAR *)"Task2", configMINIMAL_STACK_SIZE , NULL, 2, NULL);
+	xTaskCreate(Task1, (signed portCHAR *)"Task1", 1024 , NULL, 1, NULL);
+	xTaskCreate(Task2, (signed portCHAR *)"Task2", 1024 , NULL, 2, NULL);
 
 
 	// Start the FreeRTOS scheduler
@@ -114,8 +114,10 @@ static void OnError(void)
 		DebugPinLow(DEBUG_PIN_ERROR);
 	}
 }
-
-
+//
+// This is a low priority task that will continuously access one I2C device
+// Frequently it will release the I2C device so that others can also use I2C
+//
 static void Task1(void *pvParameters)
 {
 	int i = 0;
@@ -160,6 +162,7 @@ static void Task1(void *pvParameters)
 			DebugPinHigh(DEBUG_PIN_TRANSFER);
 			if (PIOS_I2C_Transfer(I2C_Write_WithoutStop, DEVICE_1_ADDRESS<<1, (uint8_t*)"\x20", 1) != 0)
 				OnError();
+			DebugPinLow(DEBUG_PIN_TRANSFER);
 
 			DebugPinHigh(DEBUG_PIN_TRANSFER);
 			if (PIOS_I2C_Transfer(I2C_Read, DEVICE_1_ADDRESS<<1, buf, 3) != 0)
@@ -193,7 +196,8 @@ static void Task1(void *pvParameters)
 	}
 }
 
-
+// This is a high priority task that will periodically perform some actions on the second I2C device
+// Most of the time it will have to wait for the other task task to release I2C
 static void Task2(void *pvParameters)
 {
 	portTickType xLastExecutionTime;
@@ -227,7 +231,6 @@ static void Task2(void *pvParameters)
 			OnError();
 		}
 
-		//vTaskDelayUntil(&xLastExecutionTime, 5 / portTICK_RATE_MS);
 		vTaskDelay(2 / portTICK_RATE_MS);
 
 		DebugPinHigh(DEBUG_PIN_TASK2_WAIT);
@@ -261,7 +264,6 @@ static void Task2(void *pvParameters)
 			OnError();
 		}
 
-		//vTaskDelayUntil(&xLastExecutionTime, 10 / portTICK_RATE_MS);
 		vTaskDelay(5 / portTICK_RATE_MS);
 
 		count++;

@@ -94,6 +94,11 @@ namespace jafar {
 				geometry_t geomType;
 			public:
 				geometry_t getGeomType(){return geomType;}
+				virtual landmark_ptr_t convertToStandardParametrization() = 0;
+				/* FIXME how to implement convertToStandardParametrization in concrete types ?
+				- for the standard type, if we return a shared_from_this, does it share the reference counter with the existing shared_ptr ?
+				- for the other types, we need to construct a new landmark, but without any map, is it possible ?
+				*/
 
 				// \todo use a smart pointer here.
 				DescriptorAbstract descriptor; ///<                       Landmark descriptor
@@ -101,13 +106,13 @@ namespace jafar {
 				jblas::mat LNEW_lmk; //Jacobian comming from reparametrisation of old lmk wrt. new lmk
 
 				//Reparametrize old Landmarks into new ones
-				void reparametrize(){}
+				void reparametrize(){} // TODO (implement here or not? why reparametrize_func if not here? how to know the standard type if here?)
 				virtual void reparametrize_func(const vec & lmk, vec & lnew, mat & LNEW_lmk) = 0;
 
 				virtual size_t mySize() = 0;
 
 				virtual void createDescriptor(const appearance_ptr_t & appPtr, const vec7 & sensorPose){
-					// todo implement createDescriptor()
+					// TODO implement createDescriptor()
 				}
 
 		};

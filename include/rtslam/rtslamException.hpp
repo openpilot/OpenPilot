@@ -21,6 +21,8 @@ namespace jafar {
 				 * rtslam.
 				 */
 				enum ExceptionId {
+					UNKNOWN_FEATURE_TYPE,
+					UNKNOWN_SENSOR_TYPE
 				//        MY_ERROR /**< my error */
 				};
 

@@ -45,6 +45,12 @@ namespace jafar {
 
 				virtual ~LandmarkEuclideanPoint() {
 				}
+				
+				virtual landmark_ptr_t convertToStandardParametrization()
+				{
+					// TODO
+					return shared_from_this(); // FIXME not sure that this does exactly what we want
+				}
 
 				static size_t size(void) {
 					return 3;

@@ -18,6 +18,7 @@
 #include "rtslam/gaussian.hpp"
 #include "rtslam/kalmanFilter.hpp"
 #include "rtslam/parents.hpp"
+#include "rtslam/worldAbstract.hpp"
 
 namespace jafar {
 	/**
@@ -38,8 +39,13 @@ namespace jafar {
 		 * \author jsola@laas.fr
 		 * \ingroup rtslam
 		 */
-		class MapAbstract: public ParentOf<RobotAbstract> , public ParentOf<LandmarkAbstract> {
+		class MapAbstract: public ObjectAbstract, public ChildOf<WorldAbstract>, 
+			public boost::enable_shared_from_this<MapAbstract>,
+			public ParentOf<RobotAbstract> , public ParentOf<LandmarkAbstract> {
 
+			ENABLE_LINK_TO_PARENT(WorldAbstract,World,MapAbstract);
+			ENABLE_ACCESS_TO_PARENT(WorldAbstract,world);
+			
 			ENABLE_ACCESS_TO_CHILDREN(RobotAbstract,Robot,robot);
 			ENABLE_ACCESS_TO_CHILDREN(LandmarkAbstract,Landmark,landmark);
 
@@ -66,7 +72,7 @@ namespace jafar {
 				/**
 				 * Mandatory virtual destructor - Map is used as-is, non-abstract by now
 				 */
-				inline virtual ~MapAbstract() {
+				virtual ~MapAbstract() {
 				}
 
 

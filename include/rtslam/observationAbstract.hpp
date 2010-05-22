@@ -147,6 +147,7 @@ namespace jafar {
 				 * Events
 				 */
 				struct events {
+						bool predicted; ///<	Landmark is not new and has been predicted TODO
 						bool visible; ///< 		Landmark is visible
 						bool measured; ///< 	Feature is measured
 						bool matched; ///< 		Feature is matched

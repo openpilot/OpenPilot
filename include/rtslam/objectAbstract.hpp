@@ -14,12 +14,16 @@
 #define OBJECTABSTRACT_HPP_
 
 #include <string>
+#include <vector>
 
 #include "rtslam/rtSlam.hpp"
 
 namespace jafar {
 	namespace rtslam {
 
+		namespace display {
+			class DisplayDataAbstract;
+		}
 
 		/**
 		 * Class for generic objects in rtslam.
@@ -86,6 +90,7 @@ namespace jafar {
 					id(_id);
 					name(_name);
 				}
+				std::vector<display::DisplayDataAbstract*> displayData;
 		};
 	}
 }

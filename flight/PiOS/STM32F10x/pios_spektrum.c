@@ -47,6 +47,11 @@ static uint16_t CaptureValue[12];
 */
 void PIOS_SPEKTRUM_Init(void)
 {
+	// need setting flag for bind on next powerup
+	if(1)
+	{
+		PIOS_SPEKTRUM_Bind();
+	}
 	/* Configure USART Pins */
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_StructInit(&GPIO_InitStructure);
@@ -69,6 +74,7 @@ void PIOS_SPEKTRUM_Init(void)
 	PIOS_USART3_REMAP_FUNC;
 
 	/* Configure and Init USART Rx input with internal pull-ups */
+	//GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
 	GPIO_InitStructure.GPIO_Pin = PIOS_USART3_RX_PIN;
 	GPIO_Init(PIOS_USART3_GPIO_PORT, &GPIO_InitStructure);
@@ -109,6 +115,58 @@ int16_t PIOS_SPEKTRUM_Get(int8_t Channel)
 }
 
 /**
+* Spektrum bind function
+* \output 1 Successful bind
+* \output 0 Bind failed
+* \note Applications shouldn't call these functions directly
+*/
+uint8_t PIOS_SPEKTRUM_Bind(void)
+{
+	GPIO_InitTypeDef GPIO_InitStructure;
+	GPIO_StructInit(&GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_InitStructure.GPIO_Pin = PIOS_USART3_RX_PIN;
+	GPIO_Init(PIOS_USART3_GPIO_PORT, &GPIO_InitStructure);
+	/* GPIO's Off */
+	/* powerup, RX line stay low for 75ms */
+	/* system init takes longer!!! */
+	/* I have no idea how long the powerup init window for satellite is but works with this */
+	PIOS_USART3_GPIO_PORT->BRR = PIOS_USART3_RX_PIN;
+	//PIOS_DELAY_WaitmS(75);
+	/* RX line, drive high for 10us */
+	PIOS_USART3_GPIO_PORT->BSRR = PIOS_USART3_RX_PIN;
+	PIOS_DELAY_WaituS(10);
+	/* RX line, drive low for 120us */
+	PIOS_USART3_GPIO_PORT->BRR = PIOS_USART3_RX_PIN;
+	PIOS_DELAY_WaituS(120);
+	/* RX line, drive high for 120us */
+	PIOS_USART3_GPIO_PORT->BSRR = PIOS_USART3_RX_PIN;
+	PIOS_DELAY_WaituS(120);
+	/* RX line, drive low for 120us */
+	PIOS_USART3_GPIO_PORT->BRR = PIOS_USART3_RX_PIN;
+	PIOS_DELAY_WaituS(120);
+	/* RX line, drive high for 120us */
+	PIOS_USART3_GPIO_PORT->BSRR = PIOS_USART3_RX_PIN;
+	PIOS_DELAY_WaituS(120);
+	/* RX line, drive low for 120us */
+	PIOS_USART3_GPIO_PORT->BRR = PIOS_USART3_RX_PIN;
+	PIOS_DELAY_WaituS(120);
+	/* RX line, drive high for 120us */
+	PIOS_USART3_GPIO_PORT->BSRR = PIOS_USART3_RX_PIN;
+	PIOS_DELAY_WaituS(120);
+	/* RX line, drive low for 120us */
+	PIOS_USART3_GPIO_PORT->BRR = PIOS_USART3_RX_PIN;
+	PIOS_DELAY_WaituS(120);
+	/* RX line, drive high for 120us */
+	PIOS_USART3_GPIO_PORT->BSRR = PIOS_USART3_RX_PIN;
+	PIOS_DELAY_WaituS(120);
+	/* RX line, set input and wait for data, PIOS_SPEKTRUM_Init */
+	return 1;
+}
+
+
+/**
 * Decodes a byte
 * \param[in] b byte which should be spektrum decoded
 * \return 0 if no error
@@ -118,18 +176,22 @@ int16_t PIOS_SPEKTRUM_Get(int8_t Channel)
 */
 int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 {
-	static uint8_t prev_byte=0xFF,sync=0,bytecount=0;;
+	static uint8_t prev_byte=0xFF,sync=0,bytecount=0,byte_array[20]={0};
 	static uint16_t channel=0,sync_word=0;
 	uint8_t channeln=0,frame=0;
 	uint16_t data=0;
+	byte_array[bytecount]=b;
 	bytecount++;
 	if(sync==0)
 	{
 		sync_word=(prev_byte<<8)+b;
 		if((sync_word&0xCCFE)==0)
 		{
-			sync=1;
-			bytecount=2;
+			if(sync_word&0x01)
+			{
+				sync=1;
+				bytecount=2;
+			}
 		}
 	}
 	else
@@ -146,6 +208,7 @@ int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 	}
 	if(bytecount==16)
 	{
+		//PIOS_COM_SendBufferNonBlocking(COM_DEBUG_USART,byte_array,16);
 		bytecount=0;
 		sync=0;
 	}

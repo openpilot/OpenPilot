@@ -32,6 +32,7 @@
 
 /* Public Functions */
 extern void PIOS_SPEKTRUM_Init(void);
+extern uint8_t PIOS_SPEKTRUM_Bind(void);
 extern int32_t PIOS_SPEKTRUM_Decode(uint8_t b);
 extern int16_t PIOS_SPEKTRUM_Get(int8_t Channel);
 

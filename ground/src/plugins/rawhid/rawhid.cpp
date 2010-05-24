@@ -215,8 +215,6 @@ void RawHIDWriteThread::run()
         memcpy(buffer, m_writeBuffer.constData(), size);
         m_writeBufMtx.unlock();
 
-        qDebug() << "Data to write";
-
         int ret = hiddev->send(hidno, buffer, size, WRITE_TIMEOUT);
 
         if(ret > 0)

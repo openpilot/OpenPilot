@@ -1,0 +1,16 @@
+<xml>
+	<object name="AttitudeActual" singleinstance="true" settings="false">
+		<field name="seq" units="none" type="uint32" elements="1"/>
+		<field name="q1" units="none" type="float" elements="1"/>
+		<field name="q2" units="none" type="float" elements="1"/>
+		<field name="q3" units="none" type="float" elements="1"/>
+		<field name="q4" units="none" type="float" elements="1"/>
+		<field name="ex" units="none" type="float" elements="1"/>
+		<field name="ey" units="none" type="float" elements="1"/>
+		<field name="ez" units="none" type="float" elements="1"/>
+		<access gcs="readwrite" flight="readwrite"/>
+		<telemetrygcs acked="true" updatemode="manual" period="0"/>
+		<telemetryflight acked="true" updatemode="periodic" period="1000"/>
+		<logging updatemode="never" period="0"/>
+	</object>
+</xml>

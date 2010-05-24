@@ -87,6 +87,8 @@ MODACTUATOR = $(OPMODULEDIR)/Actuator
 MODACTUATORINC = $(MODACTUATOR)/inc
 MODALTITUDE = $(OPMODULEDIR)/Altitude
 MODALTITUDEINC = $(MODALTITUDE)/inc
+MODATTITUDE = $(OPMODULEDIR)/Attitude
+MODATTITUDEINC = $(MODATTITUDE)/inc
 PIOS = ../PiOS
 PIOSINC = $(PIOS)/inc
 PIOSSTM32F10X = $(PIOS)/STM32F10x
@@ -120,6 +122,7 @@ SRC += $(MODGPS)/GPS.c $(MODGPS)/buffer.c
 SRC += $(MODMANUALCONTROL)/manualcontrol.c
 SRC += $(MODACTUATOR)/actuator.c
 SRC += $(MODALTITUDE)/altitude.c
+SRC += $(MODATTITUDE)/attitude.c
 
 ## OPENPILOT:
 SRC += $(OPSYSTEM)/openpilot.c
@@ -159,6 +162,8 @@ SRC += $(OPUAVOBJ)/manualcontrolsettings.c
 SRC += $(OPUAVOBJ)/attitudedesired.c
 SRC += $(OPUAVOBJ)/stabilizationsettings.c
 SRC += $(OPUAVOBJ)/altitudeactual.c
+SRC += $(OPUAVOBJ)/attitudeactual.c
+SRC += $(OPUAVOBJ)/attitudesettings.c
 
 ## PIOS Hardware (STM32F10x)
 SRC += $(PIOSSTM32F10X)/pios_sys.c
@@ -183,6 +188,7 @@ SRC += $(PIOSSTM32F10X)/pios_exti.c
 SRC += $(PIOSCOMMON)/pios_sdcard.c
 SRC += $(PIOSCOMMON)/pios_com.c
 SRC += $(PIOSCOMMON)/pios_bmp085.c
+SRC += $(PIOSCOMMON)/pios_opahrs.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 
 ## CMSIS for STM32
@@ -286,6 +292,8 @@ EXTRAINCDIRS  += $(MODACTUATOR)
 EXTRAINCDIRS  += $(MODACTUATORINC)
 EXTRAINCDIRS  += $(MODALTITUDE)
 EXTRAINCDIRS  += $(MODALTITUDEINC)
+EXTRAINCDIRS  += $(MODATTITUDE)
+EXTRAINCDIRS  += $(MODATTITUDEINC)
 EXTRAINCDIRS  += $(PIOS)
 EXTRAINCDIRS  += $(PIOSINC)
 EXTRAINCDIRS  += $(PIOSSTM32F10X)
@@ -429,7 +437,7 @@ LDFLAGS +=-T$(LINKERSCRIPTPATH)/link_stm32f10x_$(MODEL).ld
 # see openocd.pdf/openocd.texi for further information
 #
 OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).elf
-# if OpenOCD is in the $PATH just set OPENOCDEXE=openocd
+# if OpenOCD is in the $PATH just set OOCD_EXE=openocd
 OOCD_EXE=openocd
 # debug level
 OOCD_CL=-d0

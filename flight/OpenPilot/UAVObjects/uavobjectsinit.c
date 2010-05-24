@@ -32,7 +32,9 @@
 #include "actuatordesired.h"
 #include "actuatorsettings.h"
 #include "altitudeactual.h"
+#include "attitudeactual.h"
 #include "attitudedesired.h"
+#include "attitudesettings.h"
 #include "exampleobject1.h"
 #include "exampleobject2.h"
 #include "examplesettings.h"
@@ -59,7 +61,9 @@ void UAVObjectsInitializeAll()
     ActuatorDesiredInitialize();
     ActuatorSettingsInitialize();
     AltitudeActualInitialize();
+    AttitudeActualInitialize();
     AttitudeDesiredInitialize();
+    AttitudeSettingsInitialize();
     ExampleObject1Initialize();
     ExampleObject2Initialize();
     ExampleSettingsInitialize();

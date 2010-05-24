@@ -1,0 +1,9 @@
+<xml>
+	<object name="AttitudeSettings" singleinstance="true" settings="true">
+		<field name="UpdatePeriod" units="ms" type="int32" elements="1" defaultvalue="500"/>
+		<access gcs="readwrite" flight="readwrite"/>
+		<telemetrygcs acked="true" updatemode="onchange" period="0"/>
+		<telemetryflight acked="true" updatemode="onchange" period="0"/>
+		<logging updatemode="never" period="0"/>
+	</object>
+</xml>

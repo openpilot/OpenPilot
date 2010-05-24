@@ -12,6 +12,8 @@ HEADERS += uavobjects_global.h \
     uavobjectsplugin.h \
     examplesettings.h \
     altitudeactual.h \
+    attitudeactual.h \
+    attitudesettings.h \
     exampleobject2.h \
     exampleobject1.h \
     gpsobject.h \
@@ -37,6 +39,8 @@ SOURCES += uavobject.cpp \
     uavobjectsinit.cpp \
     uavobjectsplugin.cpp \
     altitudeactual.cpp \
+    attitudeactual.cpp \
+    attitudesettings.cpp \
     examplesettings.cpp \
     exampleobject2.cpp \
     exampleobject1.cpp \

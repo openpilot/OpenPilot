@@ -36,6 +36,7 @@
 #include "manualcontrol.h"
 #include "actuator.h"
 #include "altitude.h"
+#include "attitude.h"
 
 /* Task Priorities */
 #define PRIORITY_TASK_HOOKS             (tskIDLE_PRIORITY + 3)
@@ -136,6 +137,7 @@ void OpenPilotInit()
 	ManualControlInitialize();
 	ActuatorInitialize();
 	AltitudeInitialize();
+	AttitudeInitialize();
 
 	/* Create test tasks */
 	//xTaskCreate(TaskTesting, (signed portCHAR *)"Testing", configMINIMAL_STACK_SIZE , NULL, 4, NULL);

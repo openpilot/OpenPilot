@@ -44,17 +44,22 @@
 /* Global Variables */
 
 /* Local Variables */
+#define INCLUDE_TEST_TASKS 0
+#if INCLUDE_TEST_TASKS
 static uint8_t sdcard_available;
+#endif
 FILEINFO File;
 char Buffer[1024];
 uint32_t Cache;
 
 /* Function Prototypes */
+#if INCLUDE_TEST_TASKS
 static void TaskTick(void *pvParameters);
 static void TaskTesting(void *pvParameters);
 static void TaskHIDTest(void *pvParameters);
 static void TaskServos(void *pvParameters);
 static void TaskSDCard(void *pvParameters);
+#endif
 int32_t CONSOLE_Parse(COMPortTypeDef port, char c);
 void OP_ADC_NotifyChange(uint32_t pin, uint32_t pin_value);
 
@@ -146,6 +151,7 @@ void OpenPilotInit()
 	//xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
 }
 
+#if INCLUDE_TEST_TASKS
 static void TaskTesting(void *pvParameters)
 {
 	portTickType xDelay = 250 / portTICK_RATE_MS;
@@ -200,7 +206,9 @@ static void TaskTesting(void *pvParameters)
 		vTaskDelay(xDelay);
 	}
 }
+#endif
 
+#if INCLUDE_TEST_TASKS
 static void TaskHIDTest(void *pvParameters)
 {
 	uint8_t byte;
@@ -240,7 +248,9 @@ static void TaskHIDTest(void *pvParameters)
 		}
 	}
 }
+#endif
 
+#if INCLUDE_TEST_TASKS
 static void TaskServos(void *pvParameters)
 {
 	/* For testing servo outputs */
@@ -308,7 +318,9 @@ static void TaskServos(void *pvParameters)
 		}
 	}
 }
+#endif
 
+#if INCLUDE_TEST_TASKS
 static void TaskSDCard(void *pvParameters)
 {
 	uint16_t second_delay_ctr = 0;
@@ -347,4 +359,5 @@ static void TaskSDCard(void *pvParameters)
 		}
 	}
 }
+#endif
 

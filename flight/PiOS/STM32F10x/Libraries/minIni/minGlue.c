@@ -53,7 +53,7 @@ int dosfs_ini_read(char *buffer, int size, PFILEINFO file)
 	return 1;
 }
 
-int dosfs_ini_write(char *buffer, PFILEINFO file)
+int dosfs_ini_write(const char *buffer, PFILEINFO file)
 {
 	/* TODO: Check this works */
 	DFS_WriteFile(file, PIOS_SDCARD_Sector, (uint8_t *)buffer, &SuccessCount, sizeof(buffer));

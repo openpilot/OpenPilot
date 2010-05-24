@@ -21,7 +21,7 @@ extern int dosfs_ini_openread(const char *filename, PFILEINFO file);
 extern int dosfs_ini_openwrite(const char *filename, PFILEINFO file);
 extern int dosfs_ini_close(PFILEINFO file);
 extern int dosfs_ini_read(char *buffer, int size, PFILEINFO file);
-extern int dosfs_ini_write(char *buffer, PFILEINFO file);
+extern int dosfs_ini_write(const char *buffer, PFILEINFO file);
 extern int dosfs_ini_rename(const char *source, const char *dest);
 extern int dosfs_ini_remove(const char *filename);
 extern int dosfs_ini_rewind(PFILEINFO file);

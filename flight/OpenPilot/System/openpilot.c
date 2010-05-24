@@ -35,6 +35,7 @@
 #include "examplemodthread.h"
 #include "manualcontrol.h"
 #include "actuator.h"
+#include "altitude.h"
 
 /* Task Priorities */
 #define PRIORITY_TASK_HOOKS             (tskIDLE_PRIORITY + 3)

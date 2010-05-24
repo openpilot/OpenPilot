@@ -49,6 +49,8 @@
 	#define NMEA_DEBUG_PKT	///< define to enable debug of all NMEA messages
 	#define NMEA_DEBUG_GGA	///< define to enable debug of GGA messages
 	#define NMEA_DEBUG_VTG	///< define to enable debug of VTG messages
+	#define NMEA_DEBUG_RMC	///< define to enable debug of RMC messages
+	#define NMEA_DEBUG_GSA	///< define to enable debug of GSA messages
 #endif
 
 // Private functions
@@ -59,6 +61,7 @@ char* nmeaGetPacketBuffer(void);
 char nmeaChecksum(char* gps_buffer);
 uint8_t nmeaProcess(cBuffer* rxBuffer);
 void nmeaProcessGPGGA(char* packet);
+void nmeaProcessGPRMC(char* packet);
 void nmeaProcessGPVTG(char* packet);
 void nmeaProcessGPGSA(char* packet);
 
@@ -74,7 +77,7 @@ void nmeaProcessGPGSA(char* packet);
 static COMPortTypeDef gpsPort;
 static xTaskHandle gpsTaskHandle;
 cBuffer gpsRxBuffer;
-static char gpsRxData[1024];
+static char gpsRxData[512];
 char NmeaPacket[NMEA_BUFFERSIZE];
 
 /**
@@ -89,7 +92,7 @@ int32_t GpsInitialize(void)
 	gpsPort = COM_USART2;
 
 	// Init input buffer size 512
-	bufferInit(&gpsRxBuffer, (unsigned char *)gpsRxData, 1024);
+	bufferInit(&gpsRxBuffer, (unsigned char *)gpsRxData, 512);
 
 	// Start gps task
 	xReturn = xTaskCreate(gpsTask, (signed char*)"GPS", STACK_SIZE, NULL, TASK_PRIORITY, &gpsTaskHandle);
@@ -121,10 +124,8 @@ static void gpsTask(void* parameters)
 				gpsRxOverflow++;
 				break;
 			}
-			//PIOS_COM_SendFormattedStringNonBlocking(COM_USART1, "%d\r", PIOS_COM_ReceiveBufferUsed(gpsPort));
-			//vTaskDelay(xDelay);
+			nmeaProcess(&gpsRxBuffer);
 		}
-		nmeaProcess(&gpsRxBuffer);
 		vTaskDelay(xDelay);
 	}
 }
@@ -161,10 +162,17 @@ char nmeaChecksum(char* gps_buffer)
 	}
 	//PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"$%d=%d\r\n",checksum_received,checksum);
 	if(checksum == checksum_received)
+	{
+		GpsObjectData GpsData;
+		GpsObjectGet(&GpsData);
+		GpsData.Updates++;
+		GpsObjectSet(&GpsData);
 		return 1;
+	}
 	else
+	{
 		return 0;
-
+	}
 }
 
 /**
@@ -266,7 +274,7 @@ uint8_t nmeaProcess(cBuffer* rxBuffer)
 		else if(!strncmp(NmeaPacket, "GPRMC", 5))
 		{
 			// process packet of this type
-			//nmeaProcessGPRMC(NmeaPacket);
+			nmeaProcessGPRMC(NmeaPacket);
 			// report packet type
 			foundpacket = NMEA_GPRMC;
 		}
@@ -296,7 +304,7 @@ void nmeaProcessGPGGA(char* packet)
     long deg,min,desim;
 
 	#ifdef NMEA_DEBUG_GGA
-	//PIOS_COM_SendFormattedStringNonBlocking(COM_USART1,"NMEA: %s\r\n",packet);
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"$%s\r\n",packet);
 	#endif
 
 	// start parsing just after "GPGGA,"
@@ -307,11 +315,10 @@ void nmeaProcessGPGGA(char* packet)
 	if(!nmeaChecksum(packet))
 	{
 		// checksum not valid
-		//PIOS_LED_Toggle(LED2);
 		return;
 	}
-	GpsObjectGet(&GpsData);
 
+	GpsObjectGet(&GpsData);
 	// tokenizer for nmea sentence
 	//GPGGA header
 	tokens = strsep(&packet, delimiter);
@@ -376,8 +383,8 @@ void nmeaProcessGPGGA(char* packet)
 	// 0 = Invalid, 1 = Valid SPS, 2 = Valid DGPS, 3 = Valid PPS
 	// check for good position fix
 	tokens = strsep(&packet, delimiter);
-    if((tokens[0] != '0') || (tokens[0] != 0))
-    	GpsData.Updates++;
+    //if((tokens[0] != '0') || (tokens[0] != 0))
+    //	GpsData.Updates++;
 
     // next field: satellites used
     // get number of satellites used in GPS solution
@@ -408,6 +415,117 @@ void nmeaProcessGPGGA(char* packet)
 }
 
 /**
+ * Prosesses NMEA GPRMC sentences
+ * \param[in] Buffer for parsed nmea GPRMC sentence
+ */
+void nmeaProcessGPRMC(char* packet)
+{
+	GpsObjectData GpsData;
+
+	char *tokens;
+    char *delimiter = ",";
+    char *pEnd;
+    char token_length=0;
+
+    long deg,min,desim;
+
+	#ifdef NMEA_DEBUG_RMC
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"$%s\r\n",packet);
+	#endif
+
+	// start parsing just after "GPRMC,"
+	// attempt to reject empty packets right away
+	if(packet[6]==',' && packet[7]==',')
+		return;
+
+	if(!nmeaChecksum(packet))
+	{
+		// checksum not valid
+		return;
+	}
+
+	GpsObjectGet(&GpsData);
+	// tokenizer for nmea sentence
+	//GPRMC header
+	tokens = strsep(&packet, delimiter);
+
+	// get UTC time [hhmmss.sss]
+	tokens = strsep(&packet, delimiter);
+	//strcpy(GpsInfo.TimeOfFix,tokens);
+	// next field: Navigation receiver warning A = OK, V = warning
+	tokens = strsep(&packet, delimiter);
+
+	// next field: latitude
+    // get latitude [ddmm.mmmmm]
+	tokens = strsep(&packet, delimiter);
+	token_length=strlen(tokens);
+	deg=strtol (tokens,&pEnd,10);
+	min=deg%100;
+	deg=deg/100;
+	desim=strtol (pEnd+1,NULL,10);
+	/*if(token_length==10)// 5 desimal output
+	{
+		GpsData.Latitude=deg+(min+desim/100000.0)/60.0; // to desimal degrees
+	}
+	else if(token_length==9) // 4 desimal output
+	{
+		GpsData.Latitude=deg+(min+desim/10000.0)/60.0; // to desimal degrees
+	}
+	else if(token_length==11) // 6 desimal output OPGPS
+	{
+		GpsData.Latitude=deg+(min+desim/1000000.0)/60.0; // to desimal degrees
+	}*/
+
+    // next field: N/S indicator
+	// correct latitute for N/S
+	tokens = strsep(&packet, delimiter);
+	//if(tokens[0] == 'S') GpsData.Latitude = -GpsData.Latitude;
+
+	// next field: longitude
+	// get longitude [dddmm.mmmmm]
+	tokens = strsep(&packet, delimiter);
+	token_length=strlen(tokens);
+	deg=strtol (tokens,&pEnd,10);
+	min=deg%100;
+	deg=deg/100;
+	desim=strtol (pEnd+1,NULL,10);
+	/*if(token_length==11)// 5 desimal output
+	{
+		GpsData.Longitude=deg+(min+desim/100000.0)/60.0; // to desimal degrees
+	}
+	else if(token_length==10) // 4 desimal output
+	{
+		GpsData.Longitude=deg+(min+desim/10000.0)/60.0; // to desimal degrees
+	}
+	else if(token_length==12) // 6 desimal output OPGPS
+	{
+		GpsData.Longitude=deg+(min+desim/1000000.0)/60.0; // to desimal degrees
+	}*/
+    // next field: E/W indicator
+	// correct latitute for E/W
+	tokens = strsep(&packet, delimiter);
+	//if(tokens[0] == 'W') GpsData.Longitude = -GpsData.Longitude;
+
+	// next field: speed (knots)
+	// get speed in knots
+	tokens = strsep(&packet, delimiter);
+
+	// next field: True course
+	// get True course
+	tokens = strsep(&packet, delimiter);
+
+	// next field: Date of fix
+	// get Date of fix
+	tokens = strsep(&packet, delimiter);
+
+	// next field: Magnetic variation
+	// next field: E or W
+	// next field: checksum
+	GpsObjectSet(&GpsData);
+}
+
+
+/**
  * Prosesses NMEA GPVTG sentences
  * \param[in] Buffer for parsed nmea GPVTG sentence
  */
@@ -419,7 +537,7 @@ void nmeaProcessGPVTG(char* packet)
     char *delimiter = ",";
 
 	#ifdef NMEA_DEBUG_VTG
-	//PIOS_COM_SendFormattedStringNonBlocking(COM_USART1,"NMEA: %s\r\n",packet);
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"$%s\r\n",packet);
 	#endif
 
 	// start parsing just after "GPVTG,"
@@ -430,7 +548,6 @@ void nmeaProcessGPVTG(char* packet)
 	if(!nmeaChecksum(packet))
 	{
 		// checksum not valid
-		//PIOS_LED_Toggle(LED2);
 		return;
 	}
 	GpsObjectGet(&GpsData);
@@ -479,7 +596,7 @@ void nmeaProcessGPGSA(char* packet)
     long value,desim;
 
 	#ifdef NMEA_DEBUG_GSA
-	//PIOS_COM_SendFormattedStringNonBlocking(COM_USART1,"NMEA: %s\r\n",packet);
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"$%s\r\n",packet);
 	#endif
 
 	// start parsing just after "GPGSA,"
@@ -490,7 +607,6 @@ void nmeaProcessGPGSA(char* packet)
 	if(!nmeaChecksum(packet))
 	{
 		// checksum not valid
-		//PIOS_LED_Toggle(LED2);
 		return;
 	}
 	GpsObjectGet(&GpsData);

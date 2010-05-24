@@ -39,7 +39,7 @@ xSemaphoreHandle PIOS_BMP085_EOC;
 
 /* Local Variables */
 static BMP085CalibDataTypeDef CalibData;
-static portBASE_TYPE xHigherPriorityTaskWoken;
+
 /* Straight from the datasheet */
 static int32_t X1, X2, X3, B3, B5, B6, P;
 static uint32_t B4, B7;
@@ -58,6 +58,11 @@ void PIOS_BMP085_Init(void)
 	EXTI_InitTypeDef EXTI_InitStructure;
 	NVIC_InitTypeDef NVIC_InitStructure;
 	
+	/* Semaphore used by ISR to signal End-Of-Conversion */
+	vSemaphoreCreateBinary(PIOS_BMP085_EOC);
+	/* Must start off empty so that first transfer waits for EOC */
+	xSemaphoreTake(PIOS_BMP085_EOC, portMAX_DELAY);
+
 	/* Enable EOC GPIO clock */
 	RCC_APB2PeriphClockCmd(PIOS_BMP085_EOC_CLK | RCC_APB2Periph_AFIO, ENABLE);
 
@@ -101,11 +106,6 @@ void PIOS_BMP085_Init(void)
 	CalibData.MB =  (Data[16] << 8) | Data[17];
 	CalibData.MC =  (Data[18] << 8) | Data[19];
 	CalibData.MD =  (Data[20] << 8) | Data[21];
-
-	/* Semaphore used by ISR to signal End-Of-Conversion */
-	vSemaphoreCreateBinary(PIOS_BMP085_EOC);
-	/* Must start off empty so that first transfer waits for EOC */
-	xSemaphoreTake(PIOS_BMP085_EOC, portMAX_DELAY);
 }
 
 

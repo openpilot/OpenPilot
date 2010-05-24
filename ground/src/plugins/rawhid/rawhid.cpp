@@ -213,7 +213,6 @@ void RawHIDWriteThread::run()
         //make a temporary copy so we don't need to lock the mutex
         //during actual device access
         memcpy(buffer, m_writeBuffer.constData(), size);
-        m_writeBuffer.remove(0, size);
         m_writeBufMtx.unlock();
 
         qDebug() << "Data to write";

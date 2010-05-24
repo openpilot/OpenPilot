@@ -146,12 +146,11 @@ static const uint8_t PIOS_USB_ConfigDescriptor[PIOS_USB_SIZ_CONFIG_DESC] = {
 		/* 18 */
 		0x09, /* bLength: HID Descriptor size */
 		0x21, /* bDescriptorType: HID */
-		0x10, /* bcdHID: HID Class Spec release number */
-		0x01, 0x00, /* bCountryCode: Hardware target country */
+		0x10, 0x01, /* bcdHID: HID Class Spec release number */
+		0x00, /* bCountryCode: Hardware target country */
 		0x01, /* bNumDescriptors: Number of HID class descriptors to follow */
 		0x22, /* bDescriptorType */
-		PIOS_USB_HID_SIZ_REPORT_DESC,/* wItemLength: Total length of Report descriptor */
-		0x00,
+		PIOS_USB_HID_SIZ_REPORT_DESC, 0x00, /* wItemLength: Total length of Report descriptor */
 
 		/******************** Descriptor of Custom HID endpoints ******************/
 		/* 27 */
@@ -160,8 +159,8 @@ static const uint8_t PIOS_USB_ConfigDescriptor[PIOS_USB_SIZ_CONFIG_DESC] = {
 
 		0x81, /* bEndpointAddress: Endpoint Address (IN) */
 		0x03, /* bmAttributes: Interrupt endpoint */
-		(PIOS_USB_HID_DATA_LENGTH + 1), /* wMaxPacketSize: 2 Bytes max */
-		0x00, 2,//0x20, /* bInterval: Polling Interval (2 ms) */
+		(PIOS_USB_HID_DATA_LENGTH), 0x00, /* wMaxPacketSize */
+		0x02, /* bInterval: Polling Interval (2 ms) */
 		/* 34 */
 
 		0x07, /* bLength: Endpoint Descriptor size */
@@ -170,7 +169,7 @@ static const uint8_t PIOS_USB_ConfigDescriptor[PIOS_USB_SIZ_CONFIG_DESC] = {
 		0x01, /* bEndpointAddress: */
 		/*	Endpoint Address (OUT) */
 		0x03, /* bmAttributes: Interrupt endpoint */
-		(PIOS_USB_HID_DATA_LENGTH + 1), /* wMaxPacketSize: 2 Bytes max  */
+		(PIOS_USB_HID_DATA_LENGTH), /* wMaxPacketSize */
 		0x00, 8,//0x20, /* bInterval: Polling Interval (8 ms) */
 		/* 41 */
 	};
@@ -255,7 +254,7 @@ int32_t PIOS_USB_Init(uint32_t mode)
 	if(mode != 2) {
 		/* Note: usually no need to duplicate this for external drivers */
 		pInformation = &My_Device_Info;
-		pInformation->Ctrl_Info.Usb_wLength = (PIOS_USB_HID_DATA_LENGTH + 1); /* TODO: Is this required? */
+		pInformation->Ctrl_Info.Usb_wLength = (PIOS_USB_HID_DATA_LENGTH); /* TODO: Is this required? */
 
 		/* Following hooks/pointers should be replaced by external drivers */
 		memcpy(&Device_Table, (DEVICE *) &My_Device_Table, sizeof(Device_Table));
@@ -411,8 +410,8 @@ static void PIOS_USB_CB_Reset(void)
 	SetEPType(ENDP1, EP_INTERRUPT);
 	SetEPTxAddr(ENDP1, PIOS_USB_ENDP1_TXADDR);
 	SetEPRxAddr(ENDP1, PIOS_USB_ENDP1_RXADDR);
-	SetEPTxCount(ENDP1, (PIOS_USB_HID_DATA_LENGTH + 1));
-	SetEPRxCount(ENDP1, (PIOS_USB_HID_DATA_LENGTH + 1));
+	SetEPTxCount(ENDP1, (PIOS_USB_HID_DATA_LENGTH));
+	SetEPRxCount(ENDP1, (PIOS_USB_HID_DATA_LENGTH));
 	SetEPTxStatus(ENDP1, EP_TX_NAK);
 	SetEPRxStatus(ENDP1, EP_RX_VALID);
 

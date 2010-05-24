@@ -52,7 +52,7 @@
 
 // Private constants
 #define STACK_SIZE 200
-#define TASK_PRIORITY (tskIDLE_PRIORITY+1)
+#define TASK_PRIORITY (tskIDLE_PRIORITY+2)
 
 // Private types
 

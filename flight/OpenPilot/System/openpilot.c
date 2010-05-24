@@ -205,33 +205,37 @@ static void TaskHIDTest(void *pvParameters)
 {
 	uint8_t byte;
 	uint8_t line_buffer[128];
-	uint16_t line_ix;
+	uint16_t line_ix = 0;
 
 	for(;;)
 	{
 		/* HID Loopback Test */
-		/*if(PIOS_COM_ReceiveBufferUsed(COM_USB_HID) != 0) {
+#if 0
+		if(PIOS_COM_ReceiveBufferUsed(COM_USB_HID) != 0) {
 			byte = PIOS_COM_ReceiveBuffer(COM_USB_HID);
 			if(byte == '\r' || byte == '\n' || byte == 0) {
 				PIOS_COM_SendFormattedString(COM_USB_HID, "RX: %s\r", line_buffer);
 				PIOS_COM_SendFormattedString(COM_DEBUG_USART, "RX: %s\r", line_buffer);
 				line_ix = 0;
-			} else if(line_ix < (64 - 1)) {
+			} else if(line_ix < sizeof(line_buffer)) {
 				line_buffer[line_ix++] = byte;
 				line_buffer[line_ix] = 0;
 			}
-		}*/
+		}
+#endif
 
 		/* HID Loopback Test */
 		if(PIOS_COM_ReceiveBufferUsed(COM_USART2) != 0) {
 			byte = PIOS_COM_ReceiveBuffer(COM_USART2);
-			/*if(byte == '\r' || byte == '\n' || byte == 0) {
+#if 0
+			if(byte == '\r' || byte == '\n' || byte == 0) {
 				PIOS_COM_SendFormattedString(COM_DEBUG_USART, "RX: %s\r", line_buffer);
 				line_ix = 0;
-			} else if(line_ix < (128 - 1)) {
+			} else if(line_ix < sizeof(line_buffer)) {
 				line_buffer[line_ix++] = byte;
 				line_buffer[line_ix] = 0;
-			}*/
+			}
+#endif
 			PIOS_COM_SendChar(COM_DEBUG_USART, (char)byte);
 		}
 	}

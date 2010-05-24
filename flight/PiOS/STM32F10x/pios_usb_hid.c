@@ -148,8 +148,8 @@ int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t *buffer, uint16_t len)
 	}
 
 	/* Copy bytes to be transmitted into transmit buffer */
-	UserToPMABufferCopy((uint8_t*) buffer, GetEPTxAddr(EP1_IN & 0x7F), (PIOS_USB_HID_DATA_LENGTH + 1));
-	SetEPTxCount(ENDP1, (PIOS_USB_HID_DATA_LENGTH + 1));
+	UserToPMABufferCopy((uint8_t*) buffer, GetEPTxAddr(EP1_IN & 0x7F), len);
+	SetEPTxCount(ENDP1, len);
 
 	/* Send Buffer */
 	SetEPTxValid(ENDP1);
@@ -189,23 +189,8 @@ uint8_t PIOS_USB_HID_RxBufferGet(void)
 		return -1;
 	}
 
-	/* This stops returning bytes after the first occurrence of '\0' */
-	if(rx_buffer[rx_buffer_ix] == 0) {
-		/* Clean the buffer */
-		for(uint8_t i = 0; i < PIOS_USB_HID_DATA_LENGTH; i++) {
-			rx_buffer[i] = 0;
-		}
-
-		rx_buffer_new_data_ctr = 0;
-		rx_buffer_ix = 0;
-		return -1;
-	}
-
 	/* There is still data in the buffer */
 	uint8_t b = rx_buffer[rx_buffer_ix++];
-	//PIOS_COM_SendFormattedString(COM_DEBUG_USART, "b: %c\r", b);
-	//PIOS_COM_SendFormattedString(COM_DEBUG_USART, "ix: %u\r", rx_buffer_ix);
-	//PIOS_COM_SendFormattedString(COM_DEBUG_USART, "ctr: %u\r\r", rx_buffer_new_data_ctr);
 	if(--rx_buffer_new_data_ctr == 0) {
 		rx_buffer_ix = 0;
 	}
@@ -311,7 +296,6 @@ static uint8_t *PIOS_USB_HID_GetProtocolValue(uint16_t Length)
 */
 void PIOS_USB_HID_EP1_OUT_Callback(void)
 {
-#if 1
 	uint32_t DataLength = 0;
 
 	/* Read received data (63 bytes) */
@@ -321,21 +305,7 @@ void PIOS_USB_HID_EP1_OUT_Callback(void)
 	PMAToUserBufferCopy((uint8_t *) rx_buffer, GetEPRxAddr(ENDP1 & 0x7F), DataLength);
 
 	/* We now have data waiting */
-	rx_buffer_new_data_ctr = PIOS_USB_HID_DATA_LENGTH;
-#else
-	// FOR DEBUGGING USE ONLY
-	uint32_t DataLength = 0;
-
-	/* Read received data (63 bytes) */
-	/* Get the number of received data on the selected Endpoint */
-	DataLength = GetEPRxCount(ENDP1 & 0x7F);
-	/* Use the memory interface function to write to the selected endpoint */
-	PMAToUserBufferCopy((uint8_t *) rx_buffer, GetEPRxAddr(ENDP1 & 0x7F), DataLength);
-
-	/* Send it back */
-	PIOS_COM_SendFormattedStringNonBlocking(COM_USB_HID, "Received: %s", rx_buffer);
-#endif
-
+	rx_buffer_new_data_ctr = DataLength;
 	SetEPRxStatus(ENDP1, EP_RX_VALID);
 }
 

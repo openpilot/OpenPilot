@@ -28,11 +28,14 @@
 #include "gcstelemetrystats.h"
 #include "telemetrysettings.h"
 
+// Set this to 1 to enable telemetry via the USB HID interface
+#define ALLOW_HID_TELEMETRY 0
+
 // Private constants
 #define MAX_QUEUE_SIZE 20
 #define STACK_SIZE configMINIMAL_STACK_SIZE
 #define TASK_PRIORITY_RX (tskIDLE_PRIORITY + 2)
-#define TASK_PRIORITY_TX (tskIDLE_PRIORITY + 1)
+#define TASK_PRIORITY_TX (tskIDLE_PRIORITY + 2)
 #define TASK_PRIORITY_TXPRI (tskIDLE_PRIORITY + 2)
 #define REQ_TIMEOUT_MS 250
 #define MAX_RETRIES 2
@@ -303,17 +306,17 @@ static void telemetryRxTask(void* parameters)
 	// Task loop
 	while (1)
 	{
-		// TODO: Disabled since the USB HID is not fully functional yet
-		inputPort = telemetryPort; // force input port, remove once USB HID is tested
+#if ALLOW_HID_TELEMETRY
 		// Determine input port (USB takes priority over telemetry port)
-		//if(!PIOS_USB_HID_CheckAvailable())
-		//{
-		//	inputPort = telemetryPort;
-		//}
-		//else
-		//{
-		//	inputPort = COM_USB_HID;
-		//}
+		if(PIOS_USB_HID_CheckAvailable())
+		{
+			inputPort = COM_USB_HID;
+		}
+		else
+#endif /* ALLOW_HID_TELEMETRY */
+		{
+			inputPort = telemetryPort;
+		}
 
 		// Block until data are available
 		// TODO: Currently we periodically check the buffer for data, update once the PIOS_COM is made blocking
@@ -338,17 +341,17 @@ static int32_t transmitData(uint8_t* data, int32_t length)
 {
 	COMPortTypeDef outputPort;
 
-	// TODO: Disabled since the USB HID is not fully functional yet
-	outputPort = telemetryPort; // force input port, remove once USB HID is tested
 	// Determine input port (USB takes priority over telemetry port)
-	//if(!PIOS_USB_HID_CheckAvailable())
-	//{
-	//	outputPort = telemetryPort;
-	//}
-	//else
-	//{
-	//	outputPort = COM_USB_HID;
-	//}
+#if ALLOW_HID_TELEMETRY
+	if(PIOS_USB_HID_CheckAvailable())
+	{
+		outputPort = COM_USB_HID;
+	}
+	else
+#endif /* ALLOW_HID_TELEMETRY */
+	{
+		outputPort = telemetryPort;
+	}
 
 	// TODO: Update once the PIOS_COM is made blocking (it is implemented as a busy loop for now!)
 	//PIOS_LED_Toggle(LED2);

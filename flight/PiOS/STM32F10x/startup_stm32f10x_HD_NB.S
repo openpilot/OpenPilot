@@ -50,7 +50,6 @@ defined in linker script */
 .word  _ebss
 /* stack used for SystemInit_ExtMemCtl; always internal RAM used */
 
-.equ  Initial_spTop,  0x20000400 
 .equ  BootRAM,        0xF1E0F85F
 /**
  * @brief  This is the code that gets called when the processor first
@@ -140,7 +139,7 @@ Infinite_Loop:
     
     
 g_pfnVectors:
-  .word  Initial_spTop
+  .word  _irq_stack_top
   .word  Reset_Handler
   .word  NMI_Handler
   .word  HardFault_Handler

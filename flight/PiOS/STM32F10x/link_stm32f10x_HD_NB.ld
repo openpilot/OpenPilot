@@ -39,6 +39,9 @@ MEMORY
 /* higher address of the user mode stack */
 _estack = 0x20010000;
 
+/* This is the size of the stack for early init and for all FreeRTOS IRQs */
+_irq_stack_size = 0x400;
+
 /* default stack sizes. 
 
 These are used by the startup in order to allocate stacks for the different modes.
@@ -258,7 +261,23 @@ SECTIONS
          _sidata = _etext;
     } >FLASH
     
- 
+
+    /* 
+     * This stack is used both as the initial sp during early init as well as ultimately
+     * being used as the STM32's MSP (Main Stack Pointer) which is the same stack that
+     * is used for _all_ interrupt handlers.  The end of this stack should be placed
+     * against the lowest address in RAM so that a stack overrun results in a hard fault
+     * at the first access beyond the end of the stack.
+     */
+    .irq_stack :
+    {
+         . = ALIGN(4);
+         _irq_stack_end = . ;
+         . = . + _irq_stack_size ;
+         . = ALIGN(4);
+         _irq_stack_top = . ;
+    } >RAM
+	
 
     /* This is the initialized data section
     The program executes knowing that the data is in the RAM

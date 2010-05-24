@@ -7,3 +7,7 @@ ground/src/libs/uavobjgenerator/uavobjgenerator.pro.user
 tools/
 build/
 downloads/
+GPATH
+GRTAGS
+GSYMS
+GTAGS

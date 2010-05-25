@@ -88,7 +88,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'ex',
+		'Roll',
 		'f',
 		1,
 		[
@@ -98,7 +98,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'ey',
+		'Pitch',
 		'f',
 		1,
 		[
@@ -108,7 +108,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'ez',
+		'Yaw',
 		'f',
 		1,
 		[
@@ -122,7 +122,7 @@ _fields = [ \
 
 class AttitudeActual(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 1949256792
+    OBJID        = 1730350400
     NAME         = "AttitudeActual"
     METANAME     = "AttitudeActualMeta"
     ISSINGLEINST = 1

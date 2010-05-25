@@ -46,9 +46,9 @@ public:
         float q2;
         float q3;
         float q4;
-        float ex;
-        float ey;
-        float ez;
+        float Roll;
+        float Pitch;
+        float Yaw;
 
     } __attribute__((packed)) DataFields;
 
@@ -58,13 +58,13 @@ public:
     // Field q2 information
     // Field q3 information
     // Field q4 information
-    // Field ex information
-    // Field ey information
-    // Field ez information
+    // Field Roll information
+    // Field Pitch information
+    // Field Yaw information
 
   
     // Constants
-    static const quint32 OBJID = 1949256792U;
+    static const quint32 OBJID = 1730350400U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

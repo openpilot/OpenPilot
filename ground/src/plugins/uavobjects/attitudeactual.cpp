@@ -55,15 +55,15 @@ AttitudeActual::AttitudeActual(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS,
     QStringList q4ElemNames;
     q4ElemNames.append("0");
     fields.append( new UAVObjectField(QString("q4"), QString("none"), UAVObjectField::FLOAT32, q4ElemNames, QStringList()) );
-    QStringList exElemNames;
-    exElemNames.append("0");
-    fields.append( new UAVObjectField(QString("ex"), QString("none"), UAVObjectField::FLOAT32, exElemNames, QStringList()) );
-    QStringList eyElemNames;
-    eyElemNames.append("0");
-    fields.append( new UAVObjectField(QString("ey"), QString("none"), UAVObjectField::FLOAT32, eyElemNames, QStringList()) );
-    QStringList ezElemNames;
-    ezElemNames.append("0");
-    fields.append( new UAVObjectField(QString("ez"), QString("none"), UAVObjectField::FLOAT32, ezElemNames, QStringList()) );
+    QStringList RollElemNames;
+    RollElemNames.append("0");
+    fields.append( new UAVObjectField(QString("Roll"), QString("degrees"), UAVObjectField::FLOAT32, RollElemNames, QStringList()) );
+    QStringList PitchElemNames;
+    PitchElemNames.append("0");
+    fields.append( new UAVObjectField(QString("Pitch"), QString("degrees"), UAVObjectField::FLOAT32, PitchElemNames, QStringList()) );
+    QStringList YawElemNames;
+    YawElemNames.append("0");
+    fields.append( new UAVObjectField(QString("Yaw"), QString("degrees"), UAVObjectField::FLOAT32, YawElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
@@ -79,12 +79,12 @@ UAVObject::Metadata AttitudeActual::getDefaultMetadata()
     UAVObject::Metadata metadata;
     metadata.flightAccess = ACCESS_READWRITE;
     metadata.gcsAccess = ACCESS_READWRITE;
-    metadata.gcsTelemetryAcked = 1;
+    metadata.gcsTelemetryAcked = 0;
     metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_MANUAL;
     metadata.gcsTelemetryUpdatePeriod = 0;
-    metadata.flightTelemetryAcked = 1;
+    metadata.flightTelemetryAcked = 0;
     metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
-    metadata.flightTelemetryUpdatePeriod = 1000;
+    metadata.flightTelemetryUpdatePeriod = 500;
     metadata.loggingUpdateMode = UAVObject::UPDATEMODE_NEVER;
     metadata.loggingUpdatePeriod = 0;
     return metadata;

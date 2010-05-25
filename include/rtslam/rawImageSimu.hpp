@@ -49,6 +49,10 @@ namespace jafar {
 					this->image = img;
 				}
 
+				jafar::image::Image* getImage(){
+									return this->image;
+								}
+
 				int coord;
 				int app  ;
 				Image* image;

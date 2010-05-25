@@ -34,6 +34,10 @@
 #include "rtslam/activeSearch.hpp"
 #include "rtslam/observationPinHolePoint.hpp"
 #include "rtslam/featureAbstract.hpp"
+#include "rtslam/rawImageSimu.hpp"
+
+#include "qdisplay/ImageView.hpp"
+#include "image/Image.hpp"
 
 //#include <map>
 
@@ -114,6 +118,8 @@ void test_slam01() {
 				// get raw-data
 				senPtr->acquireRaw() ;
 
+//				rawimagesimu_ptr_t imgRawPtr;
+//				jafar::qdisplay::ImageView(imgRawPtr->getImage()->clone());
 
 				// 1. Observe known landmarks
 				// foreach observation
@@ -131,7 +137,11 @@ void test_slam01() {
 
 						vec2 pix = obsPtr->expectation.x();
 						cout << "true expected pixel: " << pix << endl;
-						pix(0) = rand()%640; pix(1) = rand()%480; // todo remove these two lines when turning with data.
+
+						 // todo remove these two lines when turning with data.
+//						pix(0) = rand()%640;
+//						pix(1) = rand()%480;
+
 						cout << "actually used pixel: " << pix << endl; // todo this one also.
 						acGrid.addPixel(pix);
 						obsPtr->counters.nSearch++;

@@ -24,11 +24,13 @@ namespace qdisplay {
 class ImageView : public QObject, public QGraphicsItemGroup {
   Q_OBJECT
   public:
+    ImageView();
     /**
      * Create an ImageView to use with a Viewer to display a jafar::image::Image in the Viewer.
      * @param img the jafar image to display
      */
     ImageView(const jafar::image::Image& img);
+    void connectEvents();
     ~ImageView();
     int imageWidth() const;
     int imageHeight() const;

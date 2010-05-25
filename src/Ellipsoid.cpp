@@ -17,16 +17,16 @@ Ellipsoid::Ellipsoid( double x, double y, double cov_x, double cov_y, double cov
 	_x(0) = x, _x(1) = y;
 	jblas::sym_mat22 _xCov;
 	_xCov(0,0) = cov_x, _xCov(1,1) = cov_y, _xCov(0,1) = cov_xy;
-	create(_x, _xCov, scale);
+	set(_x, _xCov, scale);
 }
 
 Ellipsoid::Ellipsoid( const jblas::vec2& _x, const jblas::sym_mat22& _xCov, double _scale ) : 
 	Shape( Shape::ShapeEllipse, 0.0, 0.0, 1.0, 1.0 )
 {
-	create(_x, _xCov, _scale);
+	set(_x, _xCov, _scale);
 }
 
-void Ellipsoid::create( const jblas::vec2& _x, const jblas::sym_mat22& _xCov, double _scale )
+void Ellipsoid::set( const jblas::vec2& _x, const jblas::sym_mat22& _xCov, double _scale )
 {
   namespace lapack = boost::numeric::bindings::lapack;
   jblas::vec2 lambda;

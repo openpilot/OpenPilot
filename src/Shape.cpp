@@ -39,7 +39,7 @@ void Shape::paint(QPainter *painter, const QStyleOptionGraphicsItem * opt, QWidg
   QGraphicsItemGroup::paint(painter, opt, wdg);
 }
 
-void Shape::setLabel(char * text, double relX, double relY)
+void Shape::setLabel(const char * text, double relX, double relY)
 {
   if(!m_label)
   {

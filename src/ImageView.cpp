@@ -24,6 +24,17 @@
 
 using namespace jafar::qdisplay;
 
+ImageView::ImageView() :
+    m_pixmapItem(new QGraphicsPixmapItem()),
+    m_currentZ(0.),
+    m_eventHandler(0)
+{
+  m_pixmapItem->setZValue(m_currentZ++);
+  addToGroup(m_pixmapItem);
+  connectEvents();
+}
+
+
 ImageView::ImageView(const jafar::image::Image& img) :
     m_pixmapItem(new QGraphicsPixmapItem()),
     m_currentZ(0.),
@@ -32,6 +43,11 @@ ImageView::ImageView(const jafar::image::Image& img) :
   setImage(img);
   m_pixmapItem->setZValue(m_currentZ++);
   addToGroup(m_pixmapItem);
+  connectEvents();
+}
+
+void ImageView::connectEvents()
+{
   m_lutRandomizeAction = new QAction("Randomize the lut", (QObject*)this);
   connect(m_lutRandomizeAction, SIGNAL(triggered()), this, SLOT(lutRandomize()));
   m_lutGrayscaleAction = new QAction("Use a grayscale lut", (QObject*)this);
@@ -49,6 +65,7 @@ ImageView::ImageView(const jafar::image::Image& img) :
   m_addShapeAction = new QAction("Add shape", (QObject*)this);
   connect(m_addShapeAction, SIGNAL(triggered()), this, SLOT(addShape()));
 }
+
 
 ImageView::~ImageView()
 {

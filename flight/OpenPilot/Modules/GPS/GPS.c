@@ -145,6 +145,8 @@ char nmeaChecksum(char* gps_buffer)
 {
 	char checksum=0;
 	char checksum_received=0;
+	GpsObjectData GpsData;
+	GpsObjectGet(&GpsData);
 
 	for(int x=0; x<NMEA_BUFFERSIZE; x++)
 	{
@@ -163,14 +165,14 @@ char nmeaChecksum(char* gps_buffer)
 	//PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"$%d=%d\r\n",checksum_received,checksum);
 	if(checksum == checksum_received)
 	{
-		GpsObjectData GpsData;
-		GpsObjectGet(&GpsData);
 		GpsData.Updates++;
 		GpsObjectSet(&GpsData);
 		return 1;
 	}
 	else
 	{
+		GpsData.Failures++;
+		GpsObjectSet(&GpsData);
 		return 0;
 	}
 }
@@ -640,17 +642,17 @@ void nmeaProcessGPGSA(char* packet)
 	tokens = strsep(&packet, delimiter);
 	value=strtol (tokens,&pEnd,10);
 	desim=strtol (pEnd+1,NULL,10);
-	//GpsData.PDOP=value+desim/100.0;
+	GpsData.PDOP=value+desim/100.0;
 	// next field: HDOP
 	tokens = strsep(&packet, delimiter);
 	value=strtol (tokens,&pEnd,10);
 	desim=strtol (pEnd+1,NULL,10);
-	//GpsData.HDOP=value+desim/100.0;
+	GpsData.HDOP=value+desim/100.0;
 	// next field: VDOP
 	tokens = strsep(&packet, delimiter);
 	value=strtol (tokens,&pEnd,10);
 	desim=strtol (pEnd+1,NULL,10);
-	//GpsData.VDOP=value+desim/100.0;
+	GpsData.VDOP=value+desim/100.0;
 	// next field: checksum
 	GpsObjectSet(&GpsData);
 

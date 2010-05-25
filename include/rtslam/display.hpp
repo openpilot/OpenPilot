@@ -45,7 +45,7 @@ namespace display {
 	{
 		public:
 			rtslam::WorldAbstract *slamWor_; // cannot use shared_ptr or it will never be freed
-			WorldDisplay(rtslam::WorldAbstract *_slamWor, rtslam::WorldAbstract *_garbage): 
+			WorldDisplay(rtslam::WorldAbstract *_slamWor, WorldDisplay *_garbage):
 				slamWor_(_slamWor) {}
 	};
 	
@@ -295,7 +295,7 @@ namespace display {
 					bufferizeObject<WorldDisplayType, WorldDisplayType, world_ptr_t, world_ptr_t>(wor, wor, id());
 				// bufferize maps
 				for(WorldAbstract::MapList::iterator map = wor->mapList().begin(); map != wor->mapList().end(); ++map)
-					bufferize(*map);
+					bufferize(*map, wor);
 			}
 			
 			inline void bufferize(rtslam::map_ptr_t map, rtslam::world_ptr_t wor)

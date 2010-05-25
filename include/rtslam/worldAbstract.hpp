@@ -45,7 +45,7 @@ namespace jafar {
 				/**
 				 * Constructor
 				 */
-				WorldAbstract();
+				WorldAbstract() {}
 
 				/**
 				 * Mandatory virtual destructor - Map is used as-is, non-abstract by now
@@ -53,7 +53,11 @@ namespace jafar {
 				virtual ~WorldAbstract() {
 				}
 
-			
+			void addMap(map_ptr_t map)
+			{
+				mapList().push_back(map);
+			}
+
 
 		};
 

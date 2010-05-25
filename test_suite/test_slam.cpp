@@ -36,8 +36,8 @@
 #include "rtslam/featureAbstract.hpp"
 #include "rtslam/rawImageSimu.hpp"
 
-#include "qdisplay/ImageView.hpp"
-#include "image/Image.hpp"
+//#include "rtslam/display_qt.hpp"
+//#include "image/Image.hpp"
 
 //#include <map>
 
@@ -54,7 +54,9 @@ void test_slam01() {
 	vec d(0), c(0);
 	k(0) = 320; k(1) = 320; k(2) = 320; k(3) = 320;
 	// INIT : 1 map, 2 robs, 3 sens
+	world_ptr_t worldPtr(new WorldAbstract());
 	map_ptr_t mapPtr(new MapAbstract(100));
+	worldPtr->addMap(mapPtr);
 	mapPtr->fillSeq();
 	robconstvel_ptr_t robPtr1(new RobotConstantVelocity(mapPtr));
 	robPtr1->linkToParentMap(mapPtr);
@@ -97,6 +99,10 @@ void test_slam01() {
 	// loop all lmks
 	// create sen--lmk observation
 	// Temporal loop
+
+	//display::ViewerQt viewerQt;
+
+
 	for (int t = 1; t <= 3; t++) {
 
 		cout << "Time : " << t << endl;
@@ -114,9 +120,6 @@ void test_slam01() {
 				sensor_ptr_t senPtr = *senIter;
 				// get raw-data
 				senPtr->acquireRaw() ;
-
-//				rawimagesimu_ptr_t imgRawPtr;
-//				jafar::qdisplay::ImageView(imgRawPtr->getImage()->clone());
 
 				// 1. Observe known landmarks
 				// foreach observation
@@ -209,7 +212,8 @@ void test_slam01() {
 			}
 		}
 
-
+		//viewerQt.bufferize(worldPtr);
+		//viewerQt.render();
 	}
 
 

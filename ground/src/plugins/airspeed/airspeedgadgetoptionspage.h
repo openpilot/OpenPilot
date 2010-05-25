@@ -61,6 +61,8 @@ private:
 
 private slots:
     void on_loadFile_clicked();
+    void on_uavObject1_currentIndexChanged(QString val);
+    void on_uavObject2_currentIndexChanged(QString val);
 };
 
 #endif // AIRSPEEDGADGETOPTIONSPAGE_H

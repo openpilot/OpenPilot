@@ -213,7 +213,14 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="uavObject1"/>
+         <widget class="QComboBox" name="uavObject1">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="label_9">
@@ -223,7 +230,14 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="objectField1"/>
+         <widget class="QComboBox" name="objectField1">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -337,7 +351,14 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="uavObject2"/>
+         <widget class="QComboBox" name="uavObject2">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="label_21">
@@ -347,7 +368,14 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="objectField2"/>
+         <widget class="QComboBox" name="objectField2">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>

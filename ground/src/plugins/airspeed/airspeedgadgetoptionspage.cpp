@@ -28,6 +28,10 @@
 #include "airspeedgadgetoptionspage.h"
 #include "airspeedgadgetconfiguration.h"
 #include "ui_airspeedgadgetoptionspage.h"
+#include "extensionsystem/pluginmanager.h"
+#include "uavobjects/uavobjectmanager.h"
+#include "uavobjects/uavdataobject.h"
+
 
 #include <QFileDialog>
 #include <QtAlgorithms>
@@ -49,6 +53,17 @@ QWidget *AirspeedGadgetOptionsPage::createPage(QWidget *parent)
     //main layout
     options_page->setupUi(optionsPageWidget);
 
+    // Fills the combo boxes for the UAVObjects
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    QList< QList<UAVDataObject*> > objList = objManager->getDataObjects();
+    foreach (QList<UAVDataObject*> list, objList) {
+        foreach (UAVDataObject* obj, list) {
+            options_page->uavObject1->addItem(obj->getName());
+            options_page->uavObject2->addItem(obj->getName());
+        }
+    }
+
     // Restore the contents from the settings:
     options_page->svgSourceFile->setText(m_config->dialFile());
     options_page->backgroundID->setText(m_config->dialBackground());
@@ -59,16 +74,39 @@ QWidget *AirspeedGadgetOptionsPage::createPage(QWidget *parent)
     options_page->needle1Max->setValue(m_config->getN1Max());
     options_page->needle2Min->setValue(m_config->getN2Min());
     options_page->needle2Max->setValue(m_config->getN2Max());
-    options_page->uavObject1->setText(m_config->getN1DataObject());
-    options_page->uavObject2->setText(m_config->getN2DataObject());
-    options_page->objectField1->setText(m_config->getN1ObjField());
-    options_page->objectField2->setText(m_config->getN2ObjField());
 
+    //select saved UAV Object field values
+    if(options_page->uavObject1->findText(m_config->getN1DataObject())!=-1){
+        options_page->uavObject1->setCurrentIndex(options_page->uavObject1->findText(m_config->getN1DataObject()));
+        // Now load the object field values:
+        UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(m_config->getN1DataObject()) );
+        if (obj != NULL ) {
+                QList<UAVObjectField*> fieldList = obj->getFields();                
+                foreach (UAVObjectField* field, fieldList) {
+                   options_page->objectField1->addItem(field->getName());
+                }
+                // And set the highlighed value from the settings:
+                options_page->objectField1->setCurrentIndex(options_page->objectField1->findText(m_config->getN1ObjField()));
+        }
+    }
+    connect(options_page->uavObject1, SIGNAL(currentIndexChanged(QString)), this, SLOT(on_uavObject1_currentIndexChanged(QString)));
+    if(options_page->uavObject2->findText(m_config->getN2DataObject())!=-1){
+        options_page->uavObject2->setCurrentIndex(options_page->uavObject2->findText(m_config->getN2DataObject()));
+        // Now load the object field values:
+        UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(m_config->getN2DataObject()));
+        if (obj != NULL ) {
+                QList<UAVObjectField*> fieldList = obj->getFields();
+                foreach (UAVObjectField* field, fieldList) {
+                    options_page->objectField2->addItem(field->getName());
+                }
+                options_page->objectField2->setCurrentIndex(options_page->objectField2->findText(m_config->getN2ObjField()));
+        }
+    }
+    connect(options_page->uavObject2, SIGNAL(currentIndexChanged(QString)), this, SLOT(on_uavObject2_currentIndexChanged(QString)));
     connect(options_page->loadFile, SIGNAL(clicked()), this, SLOT(on_loadFile_clicked()));
-
-
     return optionsPageWidget;
 }
+
 /**
  * Called when the user presses apply or OK.
  *
@@ -86,15 +124,44 @@ void AirspeedGadgetOptionsPage::apply()
     m_config->setN1Max(options_page->needle1Max->value());
     m_config->setN2Min(options_page->needle2Min->value());
     m_config->setN2Max(options_page->needle2Max->value());
-    m_config->setN1DataObject(options_page->uavObject1->text());
-    m_config->setN2DataObject(options_page->uavObject2->text());
-    m_config->setN1ObjField(options_page->objectField1->text());
-    m_config->setN2ObjField(options_page->objectField2->text());
-
+    m_config->setN1DataObject(options_page->uavObject1->currentText());
+    m_config->setN2DataObject(options_page->uavObject2->currentText());
+    m_config->setN1ObjField(options_page->objectField1->currentText());
+    m_config->setN2ObjField(options_page->objectField2->currentText());
 }
 
-/**
+/*
+  Fills in the field1 combo box when value is changed in the
+  object1 field
+*/
+void AirspeedGadgetOptionsPage::on_uavObject1_currentIndexChanged(QString val) {
+    options_page->objectField1->clear();
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(val) );
+    QList<UAVObjectField*> fieldList = obj->getFields();
+    foreach (UAVObjectField* field, fieldList) {
+        options_page->objectField1->addItem(field->getName());
+    }
+}
 
+/*
+  Fills in the field2 combo box when value is changed in the
+  object1 field
+*/
+void AirspeedGadgetOptionsPage::on_uavObject2_currentIndexChanged(QString val) {
+    options_page->objectField2->clear();
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(val) );
+    QList<UAVObjectField*> fieldList = obj->getFields();
+    foreach (UAVObjectField* field, fieldList) {
+        options_page->objectField2->addItem(field->getName());
+    }
+}
+
+
+/*
 Opens an open file dialog.
 
 */

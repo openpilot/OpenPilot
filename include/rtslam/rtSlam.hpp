@@ -19,10 +19,18 @@
 #include <list>
 
 namespace jafar {
+	namespace kernel {
+		template<typename> class IdCollectorNone;
+		template<typename> class IdCollectorList;
+		template<typename> class IdCollectorSet;
+		template<typename, template<typename> class> class IdFactory;
+	}
+	
 	namespace rtslam {
 
 
 		// forward declarations
+		class WorldAbstract;
 		class MapAbstract;
 		class RobotAbstract;
 		class SensorAbstract;
@@ -36,6 +44,7 @@ namespace jafar {
 		class ExtendedKalmanFilterIndirect;
 
 		// Pointers with boost::shared_ptr:
+		typedef boost::shared_ptr<WorldAbstract>       world_ptr_t;
 		typedef boost::shared_ptr<MapAbstract>         map_ptr_t;
 		typedef boost::shared_ptr<RobotAbstract>       robot_ptr_t;
 		typedef boost::shared_ptr<SensorAbstract>      sensor_ptr_t;
@@ -48,6 +57,10 @@ namespace jafar {
 
 		typedef boost::shared_ptr<Gaussian>						gaussian_ptr_t;
 		typedef boost::shared_ptr<ExtendedKalmanFilterIndirect> ekfInd_ptr_t;
+		
+		typedef kernel::IdFactory<unsigned, kernel::IdCollectorNone> IdFactory; // FIXME maybe we should change for a smarter IdFactory ? eg:
+		//typedef kernel::IdFactory<unsigned, kernel::IdCollectorList> IdFactory;
+		//typedef kernel::IdFactory<unsigned, kernel::IdCollectorSet> IdFactory;
 	}
 }
 

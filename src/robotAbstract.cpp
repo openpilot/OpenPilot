@@ -21,6 +21,7 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
+		IdFactory RobotAbstract::robotIds = IdFactory();
 
 		/*
 		 * Operator << for class RobotAbstract.

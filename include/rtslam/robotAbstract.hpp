@@ -102,7 +102,7 @@ namespace jafar {
 				virtual ~RobotAbstract() {
 				}
 
-				static kernel::IdFactory robotIds;
+				static IdFactory robotIds;
 
 
 				Gaussian pose; ///<             Robot Gaussian pose

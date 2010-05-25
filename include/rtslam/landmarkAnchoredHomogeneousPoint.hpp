@@ -44,6 +44,15 @@ namespace jafar {
 				virtual ~LandmarkAnchoredHomogeneousPoint() {
 				}
 
+				virtual landmark_ptr_t convertToStandardParametrization()
+				{
+					// TODO
+					//landmark_ptr_t lmk_euc = landmark_ptr_t(new LandmarkEuclideanPoint(??));
+					//reparametrize_func(x(), lmk_euc->x(), jac);
+					//lmk_euc->P() = compose(P(), jac);
+					return landmark_ptr_t(new LandmarkAnchoredHomogeneousPoint(*this)); // FIXME this is not what we want
+				}
+
 				static size_t size(void) {
 					return 7;
 				}

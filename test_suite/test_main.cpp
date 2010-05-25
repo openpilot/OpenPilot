@@ -43,9 +43,6 @@ using namespace jafar::jmath::ublasExtra;
 using namespace jafar::rtslam;
 using namespace boost;
 
-jafar::kernel::IdFactory RobotAbstract::robotIds = jafar::kernel::IdFactory();
-jafar::kernel::IdFactory SensorAbstract::sensorIds = jafar::kernel::IdFactory();
-jafar::kernel::IdFactory LandmarkAbstract::landmarkIds = jafar::kernel::IdFactory();
 
 /**
  * Add a new robot to map
@@ -54,7 +51,7 @@ jafar::kernel::IdFactory LandmarkAbstract::landmarkIds = jafar::kernel::IdFactor
  */
 robot_ptr_t newRobot(map_ptr_t & mapPtr, string name) {
 
-	constvel_ptr_t robPtr(new RobotConstantVelocity(mapPtr));
+	robconstvel_ptr_t robPtr(new RobotConstantVelocity(mapPtr));
 	size_t rid = robPtr->robotIds.getId();
 	robPtr->id(rid);
 	robPtr->name(name);

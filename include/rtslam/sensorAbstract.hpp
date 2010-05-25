@@ -98,7 +98,7 @@ namespace jafar {
 				virtual ~SensorAbstract() {
 				}
 
-				static kernel::IdFactory sensorIds;
+				static IdFactory sensorIds;
 
 
 				/**

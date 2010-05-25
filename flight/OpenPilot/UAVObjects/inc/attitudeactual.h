@@ -33,7 +33,7 @@
 #define ATTITUDEACTUAL_H
 
 // Object constants
-#define ATTITUDEACTUAL_OBJID 1949256792U
+#define ATTITUDEACTUAL_OBJID 1730350400U
 #define ATTITUDEACTUAL_NAME "AttitudeActual"
 #define ATTITUDEACTUAL_METANAME "AttitudeActualMeta"
 #define ATTITUDEACTUAL_ISSINGLEINST 1
@@ -62,9 +62,9 @@ typedef struct {
     float q2;
     float q3;
     float q4;
-    float ex;
-    float ey;
-    float ez;
+    float Roll;
+    float Pitch;
+    float Yaw;
 
 } __attribute__((packed)) AttitudeActualData;
 
@@ -74,9 +74,9 @@ typedef struct {
 // Field q2 information
 // Field q3 information
 // Field q4 information
-// Field ex information
-// Field ey information
-// Field ez information
+// Field Roll information
+// Field Pitch information
+// Field Yaw information
 
 
 // Generic interface functions

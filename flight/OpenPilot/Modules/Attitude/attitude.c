@@ -52,7 +52,7 @@
 
 // Private constants
 #define STACK_SIZE 200
-#define TASK_PRIORITY (tskIDLE_PRIORITY+2)
+#define TASK_PRIORITY (tskIDLE_PRIORITY+4)
 
 // Private types
 
@@ -101,9 +101,9 @@ static void attitudeTask(void* parameters)
 		data.q3 += 7.0;
 		data.q4 -= 2.321;
 
-		data.ex += 0.01;
-		data.ey -= 0.03;
-		data.ez += 0.05;
+		data.Roll += 0.01;
+		data.Pitch -= 0.03;
+		data.Yaw += 0.05;
 
 		// Update the ExampleObject, after this function is called
 		// notifications to any other modules listening to that object

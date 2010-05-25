@@ -33,7 +33,7 @@
 #define GPSOBJECT_H
 
 // Object constants
-#define GPSOBJECT_OBJID 4217926642U
+#define GPSOBJECT_OBJID 2363300180U
 #define GPSOBJECT_NAME "GpsObject"
 #define GPSOBJECT_METANAME "GpsObjectMeta"
 #define GPSOBJECT_ISSINGLEINST 1
@@ -62,6 +62,10 @@ typedef struct {
     float Altitude;
     int8_t Satellites;
     uint16_t Updates;
+    uint16_t Failures;
+    float PDOP;
+    float HDOP;
+    float VDOP;
 
 } __attribute__((packed)) GpsObjectData;
 
@@ -71,6 +75,10 @@ typedef struct {
 // Field Altitude information
 // Field Satellites information
 // Field Updates information
+// Field Failures information
+// Field PDOP information
+// Field HDOP information
+// Field VDOP information
 
 
 // Generic interface functions

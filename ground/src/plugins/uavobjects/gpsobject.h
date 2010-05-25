@@ -46,6 +46,10 @@ public:
         float Altitude;
         qint8 Satellites;
         quint16 Updates;
+        quint16 Failures;
+        float PDOP;
+        float HDOP;
+        float VDOP;
 
     } __attribute__((packed)) DataFields;
 
@@ -55,10 +59,14 @@ public:
     // Field Altitude information
     // Field Satellites information
     // Field Updates information
+    // Field Failures information
+    // Field PDOP information
+    // Field HDOP information
+    // Field VDOP information
 
   
     // Constants
-    static const quint32 OBJID = 4217926642U;
+    static const quint32 OBJID = 2363300180U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

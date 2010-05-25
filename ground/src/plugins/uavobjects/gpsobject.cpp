@@ -55,6 +55,18 @@ GpsObject::GpsObject(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
     QStringList UpdatesElemNames;
     UpdatesElemNames.append("0");
     fields.append( new UAVObjectField(QString("Updates"), QString(""), UAVObjectField::UINT16, UpdatesElemNames, QStringList()) );
+    QStringList FailuresElemNames;
+    FailuresElemNames.append("0");
+    fields.append( new UAVObjectField(QString("Failures"), QString(""), UAVObjectField::UINT16, FailuresElemNames, QStringList()) );
+    QStringList PDOPElemNames;
+    PDOPElemNames.append("0");
+    fields.append( new UAVObjectField(QString("PDOP"), QString(""), UAVObjectField::FLOAT32, PDOPElemNames, QStringList()) );
+    QStringList HDOPElemNames;
+    HDOPElemNames.append("0");
+    fields.append( new UAVObjectField(QString("HDOP"), QString(""), UAVObjectField::FLOAT32, HDOPElemNames, QStringList()) );
+    QStringList VDOPElemNames;
+    VDOPElemNames.append("0");
+    fields.append( new UAVObjectField(QString("VDOP"), QString(""), UAVObjectField::FLOAT32, VDOPElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

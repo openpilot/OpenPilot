@@ -87,12 +87,52 @@ _fields = [ \
 		{
 		}
 	),
+	uavobject.UAVObjectField(
+		'Failures',
+		'H',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'PDOP',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'HDOP',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'VDOP',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
 ]
 
 
 class GpsObject(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 4217926642
+    OBJID        = 2363300180
     NAME         = "GpsObject"
     METANAME     = "GpsObjectMeta"
     ISSINGLEINST = 1

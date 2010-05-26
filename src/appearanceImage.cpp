@@ -5,16 +5,16 @@
  *      Author: jeanmarie
  */
 
-#include "rtslam/AppearanceImageSimu.hpp"
+#include "rtslam/AppearanceImage.hpp"
 
 namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
-		AppearenceImageSimu::AppearenceImageSimu() {
+		AppearenceImage::AppearenceImage() {
 		}
 
-		AppearenceImageSimu::~AppearenceImageSimu() {
+		AppearenceImage::~AppearenceImage() {
 		}
 
 	}

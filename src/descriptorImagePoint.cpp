@@ -5,17 +5,17 @@
  *      Author: jeanmarie
  */
 
-#include "rtslam/DesscriptorImagePointSimu.hpp"
+#include "rtslam/DesscriptorImagePoint.hpp"
 
 namespace jafar {
 
 	namespace rtslam {
-		DesscriptorImagePointSimu::DesscriptorImagePointSimu() {
+		DesscriptorImagePoint::DesscriptorImagePoint() {
 			// TODO Auto-generated constructor stub
 
 		}
 
-		DesscriptorImagePointSimu::~DesscriptorImagePointSimu() {
+		DesscriptorImagePoint::~DesscriptorImagePoint() {
 			// TODO Auto-generated destructor stub
 		}
 	}

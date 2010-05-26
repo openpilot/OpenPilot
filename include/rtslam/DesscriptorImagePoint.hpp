@@ -14,14 +14,14 @@
 namespace jafar {
 	namespace rtslam {
 
-		class DesscriptorImagePointSimu;
-		typedef boost::shared_ptr<DesscriptorImagePointSimu> descimgpntsimu_ptr_t;
+		class DesscriptorImagePoint;
+		typedef boost::shared_ptr<DesscriptorImagePoint> descimgpnt_ptr_t;
 
 
-		class DesscriptorImagePointSimu: public jafar::rtslam::DescriptorAbstract {
+		class DesscriptorImagePoint: public jafar::rtslam::DescriptorAbstract {
 			public:
-				DesscriptorImagePointSimu();
-				virtual ~DesscriptorImagePointSimu();
+				DesscriptorImagePoint();
+				virtual ~DesscriptorImagePoint();
 		};
 	}
 }

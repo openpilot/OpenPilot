@@ -38,18 +38,18 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
-		class AppearenceImageSimu;
-		typedef boost::shared_ptr<AppearenceImageSimu> appearenceimagesimu_ptr_t;
+		class AppearenceImage;
+		typedef boost::shared_ptr<AppearenceImage> appearenceimage_ptr_t;
 
 		/** Appearence for matching
 		 * rtslam.
 		 *
 		 * @ingroup rtslam
 		 */
-		class AppearenceImageSimu: public AppearanceAbstract {
+		class AppearenceImage: public AppearanceAbstract {
 			public:
-				AppearenceImageSimu();
-				virtual ~AppearenceImageSimu();
+				AppearenceImage();
+				virtual ~AppearenceImage();
 		};
 	}
 

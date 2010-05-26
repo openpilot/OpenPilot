@@ -4,7 +4,7 @@ Core::Core():currentPosition(0,0),currentPositionPixel(0,0),LastLocationInBounds
         ,minOfTiles(0,0),maxOfTiles(0,0),started(false),isDragging(false),TooltipTextPadding(10,10),MouseWheelZooming(false),loaderLimit(5)
 {
     mousewheelzoomtype=MouseWheelZoomType::MousePositionAndCenter;
-
+    this->setAutoDelete(false);
 }
 void Core::run()
 {
@@ -19,7 +19,7 @@ void Core::run()
             task = tileLoadQueue.dequeue();
             {
                 last = tileLoadQueue.count() == 0;
-                //Debug.WriteLine("TileLoadQueue: " + tileLoadQueue.Count);
+                qDebug()<<"TileLoadQueue: " << tileLoadQueue.count();
             }
         }
     }
@@ -69,7 +69,10 @@ void Core::run()
                             {
                                 qDebug()<<"ProcessLoadTask: " << task.ToString()<< " -> empty tile, retry " << retry;
                                 {
-                                    //QThread::usleep(1111);
+                                    QWaitCondition wait;
+                                    QMutex m;
+                                    m.lock();
+                                    wait.wait(&m,1111);
                                 }
                             }
                         }
@@ -476,33 +479,79 @@ void Core::CancelAsyncTasks()
     }
 }
 void Core::UpdateBounds()
+{
+    MtileDrawingList.lock();
     {
-       MtileDrawingList.lock();
-       {
-          //FindTilesAround(tileDrawingList);
+        FindTilesAround(tileDrawingList);
 
-          qDebug()<<"OnTileLoadStart: " << tileDrawingList.count() << " tiles to load at zoom " << Zoom() << ", time: " << QDateTime::currentDateTime().date();
+        qDebug()<<"OnTileLoadStart: " << tileDrawingList.count() << " tiles to load at zoom " << Zoom() << ", time: " << QDateTime::currentDateTime().date();
 
-          emit OnTileLoadStart();
+        emit OnTileLoadStart();
 
 
-          foreach(Point p,tileDrawingList)
-          {
-             LoadTask task = LoadTask(p, Zoom());
-             {
+        foreach(Point p,tileDrawingList)
+        {
+            LoadTask task = LoadTask(p, Zoom());
+            {
                 MtileLoadQueue.lock();
                 {
-                   if(!tileLoadQueue.contains(task))
-                   {
-                      tileLoadQueue.enqueue(task);
-                      //this->.QueueUserWorkItem(ProcessLoadTaskCallback);
-                   }
+                    if(!tileLoadQueue.contains(task))
+                    {
+                        tileLoadQueue.enqueue(task);
+                        ProcessLoadTaskCallback.start(this);
+                    }
                 }
                 MtileLoadQueue.unlock();
-             }
+            }
 
-          }
-       }
-
-       //UpdateGroundResolution();
+        }
     }
+    MtileDrawingList.unlock();
+    UpdateGroundResolution();
+}
+void Core::FindTilesAround(QList<Point> &list)
+      {
+         list.clear();;
+         for(int i = -sizeOfMapArea.Width(); i <= sizeOfMapArea.Width(); i++)
+         {
+            for(int j = -sizeOfMapArea.Height(); j <= sizeOfMapArea.Height(); j++)
+            {
+               Point p = centerTileXYLocation;
+               p.SetX(p.X() + i);
+               p.SetY(p.Y() + j);
+
+               //if(p.X < minOfTiles.Width)
+               //{
+               //   p.X += (maxOfTiles.Width + 1);
+               //}
+
+               //if(p.X > maxOfTiles.Width)
+               //{
+               //   p.X -= (maxOfTiles.Width + 1);
+               //}
+
+               if(p.X() >= minOfTiles.Width() && p.Y() >= minOfTiles.Height() && p.X() <= maxOfTiles.Width() && p.Y() <= maxOfTiles.Height())
+               {
+                  if(!list.contains(p))
+                  {
+                     list.append(p);
+                  }
+               }
+            }
+         }
+
+//         if(GMaps::Instance()->ShuffleTilesOnLoad)
+//         {
+//            Stuff.Shuffle<Point>(list);
+//         }
+      }
+void Core::UpdateGroundResolution()
+{
+    double rez = Projection()->GetGroundResolution(Zoom(), CurrentPosition().Lat());
+    pxRes100m =   (int) (100.0 / rez); // 100 meters
+    pxRes1000m =  (int) (1000.0 / rez); // 1km
+    pxRes10km =   (int) (10000.0 / rez); // 10km
+    pxRes100km =  (int) (100000.0 / rez); // 100km
+    pxRes1000km = (int) (1000000.0 / rez); // 1000km
+    pxRes5000km = (int) (5000000.0 / rez); // 5000km
+}

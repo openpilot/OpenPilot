@@ -140,6 +140,9 @@ public:
 
     void CancelAsyncTasks();
 
+    void FindTilesAround(QList<Point> &list);
+
+    void UpdateGroundResolution();
 signals:
     void OnCurrentPositionChanged(PointLatLng point);
     void OnTileLoadComplete();
@@ -195,6 +198,8 @@ private:
     MapType::Types mapType;
 
     QSemaphore loaderLimit;
+
+    QThreadPool ProcessLoadTaskCallback;
 
 protected:
     bool started;

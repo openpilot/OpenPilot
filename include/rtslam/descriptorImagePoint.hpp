@@ -1,28 +1,28 @@
 /*
- * DesscriptorImagePointSimu.h
+ * DescriptorImagePointSimu.h
  *
  *  Created on: 20 avr. 2010
  *      Author: jeanmarie
  */
 
-#ifndef DESSCRIPTORIMAGEPOINTSIMU_H_
-#define DESSCRIPTORIMAGEPOINTSIMU_H_
+#ifndef DESCRIPTORIMAGEPOINTSIMU_H_
+#define DESCRIPTORIMAGEPOINTSIMU_H_
 
-#include "rtslam/DescriptorAbstract.hpp"
+#include "rtslam/descriptorAbstract.hpp"
 #include "boost/shared_ptr.hpp"
 
 namespace jafar {
 	namespace rtslam {
 
-		class DesscriptorImagePoint;
-		typedef boost::shared_ptr<DesscriptorImagePoint> descimgpnt_ptr_t;
+		class DescriptorImagePoint;
+		typedef boost::shared_ptr<DescriptorImagePoint> descimgpnt_ptr_t;
 
 
-		class DesscriptorImagePoint: public jafar::rtslam::DescriptorAbstract {
+		class DescriptorImagePoint: public jafar::rtslam::DescriptorAbstract {
 			public:
-				DesscriptorImagePoint();
-				virtual ~DesscriptorImagePoint();
+				DescriptorImagePoint();
+				virtual ~DescriptorImagePoint();
 		};
 	}
 }
-#endif /* DESSCRIPTORIMAGEPOINTSIMU_H_ */
+#endif /* DESCRIPTORIMAGEPOINTSIMU_H_ */

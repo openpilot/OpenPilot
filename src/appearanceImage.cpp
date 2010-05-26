@@ -5,7 +5,7 @@
  *      Author: jeanmarie
  */
 
-#include "rtslam/AppearanceImage.hpp"
+#include "rtslam/appearanceImage.hpp"
 
 namespace jafar {
 	namespace rtslam {

@@ -34,7 +34,7 @@
 #include "rtslam/activeSearch.hpp"
 #include "rtslam/observationPinHolePoint.hpp"
 #include "rtslam/featureAbstract.hpp"
-#include "rtslam/rawImageSimu.hpp"
+#include "rtslam/rawImage.hpp"
 
 //#include "rtslam/display_qt.hpp"
 //#include "image/Image.hpp"

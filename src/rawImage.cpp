@@ -11,33 +11,27 @@
  * \ingroup rtslam
  */
 
-#include "rtslam/rawImageSimu.hpp"
+#include "rtslam/rawImage.hpp"
 
 namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
-		//////////////////////////
-		// RAW IMAGE SIMULATED
-		//////////////////////////
+		///////////////////////////////////
+		// RAW IMAGE CONTAINING REAL IMAGE
+		///////////////////////////////////
 
-
-		// A simulated Image have a list of visible features:
-
-
-		/**
-		 * Add a Feature on the image simulated.
-		 */
-		 void RawImageSimu::addFeature(const FeatureAbstract) {
-			 return ;
-		 }
 			/*
 			 * Operator << for class rawAbstract.
 			 * It shows some informations
 			 */
-			std::ostream& operator <<(std::ostream & s, jafar::rtslam::RawImageSimu & rawIS) {
-				s << " I am a raw-data image simu" << endl;
+			std::ostream& operator <<(std::ostream & s, jafar::rtslam::RawImage & rawIS) {
+				s << " I am a raw-data image structure" << endl;
 				return s;
+			}
+
+			void RawImage::setJafarImage(jafarImage_ptr_t img_) {
+				this->img = img_ ;
 			}
 
 	} // namespace rtslam

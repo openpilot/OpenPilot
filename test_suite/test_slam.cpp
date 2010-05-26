@@ -34,6 +34,10 @@
 #include "rtslam/activeSearch.hpp"
 #include "rtslam/observationPinHolePoint.hpp"
 #include "rtslam/featureAbstract.hpp"
+#include "rtslam/rawImage.hpp"
+
+//#include "rtslam/display_qt.hpp"
+//#include "image/Image.hpp"
 
 //#include <map>
 
@@ -50,7 +54,9 @@ void test_slam01() {
 	vec d(0), c(0);
 	k(0) = 320; k(1) = 320; k(2) = 320; k(3) = 320;
 	// INIT : 1 map, 2 robs, 3 sens
+	world_ptr_t worldPtr(new WorldAbstract());
 	map_ptr_t mapPtr(new MapAbstract(100));
+	worldPtr->addMap(mapPtr);
 	mapPtr->fillSeq();
 	robconstvel_ptr_t robPtr1(new RobotConstantVelocity(mapPtr));
 	robPtr1->linkToParentMap(mapPtr);
@@ -93,6 +99,10 @@ void test_slam01() {
 	// loop all lmks
 	// create sen--lmk observation
 	// Temporal loop
+
+	//display::ViewerQt viewerQt;
+
+
 	for (int t = 1; t <= 3; t++) {
 
 		cout << "Time : " << t << endl;
@@ -111,7 +121,6 @@ void test_slam01() {
 				// get raw-data
 				senPtr->acquireRaw() ;
 
-
 				// 1. Observe known landmarks
 				// foreach observation
 				for (SensorAbstract::ObservationList::iterator obsIter = senPtr->observationList().begin(); obsIter != senPtr->observationList().end(); obsIter++)
@@ -128,7 +137,11 @@ void test_slam01() {
 
 						vec2 pix = obsPtr->expectation.x();
 						cout << "true expected pixel: " << pix << endl;
-						pix(0) = rand()%640; pix(1) = rand()%480; // todo remove these two lines when turning with data.
+
+						 // todo remove these two lines when turning with data.
+//						pix(0) = rand()%640;
+//						pix(1) = rand()%480;
+
 						cout << "actually used pixel: " << pix << endl; // todo this one also.
 						acGrid.addPixel(pix);
 						obsPtr->counters.nSearch++;
@@ -199,7 +212,8 @@ void test_slam01() {
 			}
 		}
 
-
+		//viewerQt.bufferize(worldPtr);
+		//viewerQt.render();
 	}
 
 

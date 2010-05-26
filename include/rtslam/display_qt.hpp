@@ -35,7 +35,7 @@ namespace display {
 class WorldQt : public WorldDisplay
 {
 	public:
-		WorldQt(rtslam::WorldAbstract *_slamWor, rtslam::WorldAbstract *garbage):
+		WorldQt(rtslam::WorldAbstract *_slamWor, rtslam::WorldDisplay *garbage):
 			WorldDisplay(_slamWor, garbage) {}
 		void bufferize() {}
 		void render() {}

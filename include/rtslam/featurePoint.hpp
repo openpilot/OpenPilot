@@ -43,19 +43,19 @@ namespace jafar {
 //		typedef boost::shared_ptr<RawImageSimu> rawimagesimu_ptr_t2;
 
 
-		class FeaturePointSimu;
-		typedef boost::shared_ptr<FeaturePointSimu> featurepointsimu_ptr_t;
+		class FeaturePoint;
+		typedef boost::shared_ptr<FeaturePoint> featurepointsimu_ptr_t;
 
 		/** Base class for all landmark appearances defined in the module
 		 * rtslam.
 		 *
 		 * @ingroup rtslam
 		 */
-		class FeaturePointSimu: public FeatureAbstract {
+		class FeaturePoint: public FeatureAbstract {
 			public:
-				FeaturePointSimu() : FeatureAbstract(2) {
+				FeaturePoint() : FeatureAbstract(2) {
 				}
-				virtual ~FeaturePointSimu() {
+				virtual ~FeaturePoint() {
 				}
 		};
 	}

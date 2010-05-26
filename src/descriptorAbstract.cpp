@@ -1,22 +1,25 @@
 /*
- * DesscriptorImagePointSimu.cpp
+ * DescriptorAbstract.cpp
  *
  *  Created on: 20 avr. 2010
  *      Author: jeanmarie
  */
 
-#include "rtslam/DesscriptorImagePointSimu.hpp"
+#include "rtslam/descriptorAbstract.hpp"
 
 namespace jafar {
 
 	namespace rtslam {
-		DesscriptorImagePointSimu::DesscriptorImagePointSimu() {
+
+		DescriptorAbstract::DescriptorAbstract() {
 			// TODO Auto-generated constructor stub
 
 		}
 
-		DesscriptorImagePointSimu::~DesscriptorImagePointSimu() {
+		DescriptorAbstract::~DescriptorAbstract() {
 			// TODO Auto-generated destructor stub
 		}
+
 	}
+
 }

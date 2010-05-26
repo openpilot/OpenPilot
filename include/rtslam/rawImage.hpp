@@ -21,6 +21,7 @@ namespace jafar {
 		class RawImage;
 		typedef boost::shared_ptr<RawImage> rawimage_ptr_t;
 
+		typedef boost::shared_ptr<image::Image> jafarImage_ptr_t;
 		/**
 		 * Class for image
 		 * \author croussil
@@ -29,8 +30,8 @@ namespace jafar {
 		class RawImage: public RawAbstract {
 
 			public:
-				image::Image img;
-
+				jafarImage_ptr_t img;
+				void setJafarImage(jafarImage_ptr_t img) ;
 			private:
 
 		};

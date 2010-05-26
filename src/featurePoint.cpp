@@ -12,7 +12,7 @@
  * \ingroup rtslam
  */
 
-#include "rtslam/featurePointSimu.hpp"
+#include "rtslam/featurePoint.hpp"
 
 namespace jafar {
 	namespace rtslam {

@@ -85,7 +85,7 @@ namespace jafar {
 				 *
 				 * \return true if landmark is predicted visible.
 				 */
-				virtual bool predictVisibility();
+				bool predictVisibility();
 
 				/**
 				 * Predict appearance

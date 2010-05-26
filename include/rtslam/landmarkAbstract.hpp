@@ -34,7 +34,7 @@
 // include parents
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/mapObject.hpp"
-#include "rtslam/DescriptorAbstract.hpp"
+#include "rtslam/descriptorAbstract.hpp"
 #include "rtslam/parents.hpp"
 
 #include <boost/smart_ptr.hpp>

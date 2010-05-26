@@ -5,7 +5,7 @@
  *      Author: jeanmarie
  */
 
-#include "rtslam/DescriptorAbstract.hpp"
+#include "rtslam/descriptorAbstract.hpp"
 
 namespace jafar {
 

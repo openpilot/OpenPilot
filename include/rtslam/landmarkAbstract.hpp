@@ -101,7 +101,7 @@ namespace jafar {
 				*/
 
 				// \todo use a smart pointer here.
-				DescriptorAbstract descriptor; ///<                       Landmark descriptor
+				desc_ptr_t descriptor; ///<                       Landmark descriptor
 
 				jblas::mat LNEW_lmk; //Jacobian comming from reparametrisation of old lmk wrt. new lmk
 

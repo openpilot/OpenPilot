@@ -20,7 +20,7 @@
 #include "rtslam/rtSlam.hpp"
 #include "rtslam/activeSearch.hpp"
 #include "rtslam/featureAbstract.hpp"
-#include "rtslam/AppearanceImageSimu.hpp"
+#include "rtslam/appearanceImage.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -44,7 +44,7 @@ namespace jafar {
 					featPtr->state.x(pix);
 
 					// initialize appearance
-					appearenceimagesimu_ptr_t appPtr(new AppearenceImageSimu);
+					appearenceimage_ptr_t appPtr(new AppearenceImage);
 					featPtr->appearancePtr = appPtr;
 
 					// return true if successful

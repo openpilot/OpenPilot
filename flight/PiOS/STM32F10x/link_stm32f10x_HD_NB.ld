@@ -275,7 +275,8 @@ SECTIONS
          _irq_stack_end = . ;
          . = . + _irq_stack_size ;
          . = ALIGN(4);
-         _irq_stack_top = . ;
+         _irq_stack_top = . - 4 ;
+         . = ALIGN(4);
     } >RAM
 	
 

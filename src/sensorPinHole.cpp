@@ -47,7 +47,6 @@ namespace jafar {
 			correction = c;
 		}
 
-
 		void SensorPinHole::setup(const size_t _id, const string & _name, const vec7 & _pose, const vec7 & _std, const vec4 & _k, const vec & _d, const vec & _c){
 			SensorAbstract::MapObject::ObjectAbstract::setup(_id, _name);
 			pose.x(_pose);

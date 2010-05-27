@@ -66,12 +66,12 @@ void test_slam01() {
 	senPtr11->linkToParentRobot(robPtr1);
 	senPtr11->state.clear();
 	senPtr11->pose.x(quaternion::originFrame());
-//	senPtr11->set_parameters(k, d, c);
+	senPtr11->set_parameters(k, d, c);
 	pinhole_ptr_t senPtr12 (new SensorPinHole(robPtr1, MapObject::FILTERED));
 	senPtr12->linkToParentRobot(robPtr1);
 	senPtr12->state.clear();
 	senPtr12->pose.x(quaternion::originFrame());
-//	senPtr12->set_parameters(k, d, c);
+	senPtr12->set_parameters(k, d, c);
 	robodo_ptr_t robPtr2(new RobotOdometry(mapPtr));
 	robPtr2->linkToParentMap(mapPtr);
 	robPtr2->state.clear();
@@ -80,7 +80,7 @@ void test_slam01() {
 	senPtr21->linkToParentRobot(robPtr2);
 	senPtr21->state.clear();
 	senPtr21->pose.x(quaternion::originFrame());
-//	senPtr21->set_parameters(k, d, c);
+	senPtr21->set_parameters(k, d, c);
 
 	pinhole_ptr_t senPtrCopy;
 	senPtrCopy = senPtr11;

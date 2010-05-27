@@ -127,7 +127,34 @@ namespace jafar {
 		}
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::predictAppearance() {
-			// TODO implement predict appearance
+
+			//Update
+			vec3 lmkP = lmkAHP::ahp2euc(landmarkPtr()->state.x());
+			vec3 sensorP0 = subrange(this->landmarkPtr()->descriptor->pose0,0,3);
+			vec3 sensorP = subrange(this->sensorPtr()->globalPose(),0,3);
+
+			vec7 sensorPose0 = this->landmarkPtr()->descriptor->pose0;
+			vec7 sensorPose = this->sensorPtr()->globalPose();
+
+			//Zoom factor
+			double d0 = ublasExtra::norm_2(lmkP - sensorP0);
+			double dt = ublasExtra::norm_2(lmkP - sensorP);
+
+			double zoom = d0/dt;
+
+			//Rotation factor
+			vec7 sensorPoseInv = quaternion::invertFrame(sensorPose);
+			vec7 sensorPose0Inv = quaternion::invertFrame(sensorPose0);
+
+			vec7 C0t = quaternion::composeFrames(sensorPoseInv,sensorPoseInv);
+
+			vec3 qC0t = subrange(C0t,3,6);
+			vec3 e0t = quaternion::q2e(qC0t);
+
+			double yaw = -e0t(2);
+
+			// TODO use image method to apply a transformation on a patch
+
 		}
 
 		/**

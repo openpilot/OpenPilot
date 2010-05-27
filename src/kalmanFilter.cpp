@@ -56,12 +56,14 @@ namespace jafar {
 		}
 
 		void ExtendedKalmanFilterIndirect::initialize(const ind_array & ia_x, const mat & G_v, const ind_array & ia_rs, const ind_array & ia_l, const mat & G_y, const sym_mat & R){
-			ixaxpy_prod(P_, ia_x, G_v, ia_rs, ia_l, prod_JPJt(R, G_y));
+			ind_array ia_invariant = ia_complement(ia_x, ia_l);
+			ixaxpy_prod(P_, ia_invariant, G_v, ia_rs, ia_l, prod_JPJt(R, G_y));
 			// \todo build output indirect-array
 		}
 
 		void ExtendedKalmanFilterIndirect::initialize(const ind_array & ia_x, const mat & G_v, const ind_array & ia_rs, const ind_array & ia_l, const mat & G_y, const sym_mat & R, const mat & G_n, const sym_mat & N){
-			ixaxpy_prod(P_, ia_x, G_v, ia_rs, ia_l, prod_JPJt(R, G_y) + prod_JPJt(N, G_n));
+			ind_array ia_invariant = ia_complement(ia_x, ia_l);
+			ixaxpy_prod(P_, ia_invariant, G_v, ia_rs, ia_l, prod_JPJt(R, G_y) + prod_JPJt(N, G_n));
 			// \todo build output indirect-array
 		}
 

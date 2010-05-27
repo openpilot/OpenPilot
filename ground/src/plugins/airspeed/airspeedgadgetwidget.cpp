@@ -54,9 +54,11 @@ AirspeedGadgetWidget::AirspeedGadgetWidget(QWidget *parent) : QGraphicsView(pare
     dialTimer.start(30);
 
     // Test code for timer to rotate the needle
+#if 0
     testSpeed=0;
     connect(&m_testTimer, SIGNAL(timeout()), this, SLOT(testRotate()));
     m_testTimer.start(4000);
+#endif
 }
 
 AirspeedGadgetWidget::~AirspeedGadgetWidget()
@@ -67,26 +69,31 @@ AirspeedGadgetWidget::~AirspeedGadgetWidget()
 /*!
   \brief Connects the widget to the relevant UAVObjects
   */
-void AirspeedGadgetWidget::connectNeedles(QString object1, QString field1, QString object2, QString field2 ) {
+void AirspeedGadgetWidget::connectNeedles(QString object1, QString nfield1, QString object2, QString nfield2 ) {
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    std::cout << "Connect needles." << std::endl;
 
     // Check validity of arguments first, reject empty args and unknown fields.
-    if (!(object1.isEmpty() || field1.isEmpty())) {
+    if (!(object1.isEmpty() || nfield1.isEmpty())) {
         UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(object1) );
         if (obj != NULL ) {
-            connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateNeedles(UAVObject*)));
+            std::cout << "Connected Object 1 (" << object1.toStdString() << ")." << std::endl;
+            connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateNeedle1(UAVObject*)));
+            field1 = nfield1;
         } else {
             std::cout << "Error: Object is unknown (" << object1.toStdString() << ")." << std::endl;
         }
     }
 
     // And do the same for the second needle.
-    if (!(object2.isEmpty() || field2.isEmpty())) {
+    if (!(object2.isEmpty() || nfield2.isEmpty())) {
         UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(object2) );
         if (obj != NULL ) {
-            connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateNeedles(UAVObject*)));
+            std::cout << "Connected Object 2 (" << object2.toStdString() << ")." << std::endl;
+            connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateNeedle2(UAVObject*)));
+            field2 = nfield2;
         } else {
             std::cout << "Error: Object is unknown (" << object2.toStdString() << ")." << std::endl;
         }
@@ -95,15 +102,20 @@ void AirspeedGadgetWidget::connectNeedles(QString object1, QString field1, QStri
 
 
 /*!
-  \brief Called by the systemalarms UAVObject
+  \brief Called by the UAVObject which got updated
   */
-void AirspeedGadgetWidget::updateNeedles(UAVObject *systemObject) {
-
-    // UAVObjectField* field = obj->getField(QString("Field1"));
-
+void AirspeedGadgetWidget::updateNeedle1(UAVObject *object1) {
+    UAVObjectField* field = object1->getField(field1);
+    setNeedle1(field->getDouble());
 }
 
-
+/*!
+  \brief Called by the UAVObject which got updated
+  */
+void AirspeedGadgetWidget::updateNeedle2(UAVObject *object2) {
+    UAVObjectField* field = object2->getField(field2);
+    setNeedle2(field->getDouble());
+}
 
 void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QString n1, QString n2)
 {

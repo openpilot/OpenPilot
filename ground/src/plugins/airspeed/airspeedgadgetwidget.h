@@ -62,12 +62,11 @@ protected:
    void paintEvent(QPaintEvent *event);
    void resizeEvent(QResizeEvent *event);
 
-private:
-
 private slots:
    // Test function
    void testRotate();
-   void updateNeedles(UAVObject *systemAlarm); // Called by the systemalarms UAVObject
+   void updateNeedle1(UAVObject *object1); // Called by the UAVObject
+   void updateNeedle2(UAVObject *object2); // Called by the UAVObject
    void rotateNeedles();
 
 private:
@@ -92,12 +91,18 @@ private:
    double needle2Target;
    double needle2Value;
 
+   // Name of the fields to read when an update is received:
+   QString field1;
+   QString field2;
+
    // Rotation timer
    QTimer dialTimer;
 
    // Test variables
+#if 0
    int testSpeed;
    QTimer m_testTimer;
    // End test variables
+#endif
 };
 #endif /* AIRSPEEDGADGETWIDGET_H_ */

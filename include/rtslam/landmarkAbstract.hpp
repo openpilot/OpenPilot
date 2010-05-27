@@ -111,8 +111,13 @@ namespace jafar {
 
 				virtual size_t mySize() = 0;
 
+				// Create a landmark descriptor
 				virtual void createDescriptor(const appearance_ptr_t & appPtr, const vec7 & sensorPose){
-					// TODO implement createDescriptor()
+
+					this->descriptor = desc_ptr_t (new DescriptorAbstract()) ;
+					this->descriptor->pose0 = sensorPose;
+					this->descriptor->app0Ptr = appPtr;
+
 				}
 
 		};

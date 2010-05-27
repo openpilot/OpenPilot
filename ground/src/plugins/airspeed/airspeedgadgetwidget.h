@@ -29,6 +29,8 @@
 #define AIRSPEEDGADGETWIDGET_H_
 
 #include "airspeedgadgetconfiguration.h"
+#include "extensionsystem/pluginmanager.h"
+#include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/uavobject.h"
 #include <QGraphicsView>
 #include <QtSvg/QSvgRenderer>
@@ -58,15 +60,20 @@ public:
    void connectNeedles(QString object1, QString field1,
                        QString object2, QString field2);
 
+public slots:
+   void updateNeedle1(UAVObject *object1); // Called by the UAVObject
+   void updateNeedle2(UAVObject *object2); // Called by the UAVObject
+
+
+
 protected:
    void paintEvent(QPaintEvent *event);
    void resizeEvent(QResizeEvent *event);
 
+
 private slots:
    // Test function
    void testRotate();
-   void updateNeedle1(UAVObject *object1); // Called by the UAVObject
-   void updateNeedle2(UAVObject *object2); // Called by the UAVObject
    void rotateNeedles();
 
 private:
@@ -92,6 +99,8 @@ private:
    double needle2Value;
 
    // Name of the fields to read when an update is received:
+   UAVDataObject* obj1;
+   UAVDataObject* obj2;
    QString field1;
    QString field2;
 

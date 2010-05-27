@@ -26,8 +26,6 @@
  */
 
 #include "airspeedgadgetwidget.h"
-#include "extensionsystem/pluginmanager.h"
-#include "uavobjects/uavobjectmanager.h"
 #include <iostream>
 #include <QDebug>
 
@@ -70,17 +68,19 @@ AirspeedGadgetWidget::~AirspeedGadgetWidget()
   \brief Connects the widget to the relevant UAVObjects
   */
 void AirspeedGadgetWidget::connectNeedles(QString object1, QString nfield1, QString object2, QString nfield2 ) {
-
+    disconnect(0,0,this,SLOT(updateNeedle1(UAVObject*)));
+    disconnect(0,0,this,SLOT(updateNeedle2(UAVObject*)));
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    std::cout << "Connect needles." << std::endl;
+    std::cout << "Connect needles - " << object1.toStdString() << "-"<< nfield1.toStdString() << "  -   " <<
+            object2.toStdString() << "-" << nfield2.toStdString() << std::endl;
 
     // Check validity of arguments first, reject empty args and unknown fields.
     if (!(object1.isEmpty() || nfield1.isEmpty())) {
-        UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(object1) );
-        if (obj != NULL ) {
+        obj1 = dynamic_cast<UAVDataObject*>( objManager->getObject(object1) );
+        if (obj1 != NULL ) {
             std::cout << "Connected Object 1 (" << object1.toStdString() << ")." << std::endl;
-            connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateNeedle1(UAVObject*)));
+            connect(obj1, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateNeedle1(UAVObject*)));
             field1 = nfield1;
         } else {
             std::cout << "Error: Object is unknown (" << object1.toStdString() << ")." << std::endl;
@@ -89,10 +89,10 @@ void AirspeedGadgetWidget::connectNeedles(QString object1, QString nfield1, QStr
 
     // And do the same for the second needle.
     if (!(object2.isEmpty() || nfield2.isEmpty())) {
-        UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(object2) );
-        if (obj != NULL ) {
+        obj2 = dynamic_cast<UAVDataObject*>( objManager->getObject(object2) );
+        if (obj2 != NULL ) {
             std::cout << "Connected Object 2 (" << object2.toStdString() << ")." << std::endl;
-            connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateNeedle2(UAVObject*)));
+            connect(obj2, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateNeedle2(UAVObject*)));
             field2 = nfield2;
         } else {
             std::cout << "Error: Object is unknown (" << object2.toStdString() << ")." << std::endl;
@@ -100,13 +100,18 @@ void AirspeedGadgetWidget::connectNeedles(QString object1, QString nfield1, QStr
     }
 }
 
-
 /*!
   \brief Called by the UAVObject which got updated
   */
 void AirspeedGadgetWidget::updateNeedle1(UAVObject *object1) {
+    // Double check that the field exists:
     UAVObjectField* field = object1->getField(field1);
-    setNeedle1(field->getDouble());
+    if (field) {
+        setNeedle1(field->getDouble());
+    } else {
+        std::cout << "Wrong field, maybe an issue with object disconnection ?" << std::endl;
+    }
+    std::cout << "Update Needle 1" << std::endl;
 }
 
 /*!
@@ -144,7 +149,7 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
              n2enabled = true;
          }
 
-         std::cout<<"Dial file loaded"<<std::endl;
+         std::cout<<"Dial file loaded ("<< dfn.toStdString() << ")" << std::endl;
          QGraphicsScene *l_scene = scene();
          l_scene->setSceneRect(m_background->boundingRect());
 
@@ -156,16 +161,12 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
 
 void AirspeedGadgetWidget::paint()
 {
-
     QGraphicsScene *l_scene = scene();
     l_scene->clear();
-
     l_scene->addItem(m_background);
     l_scene->addItem(m_needle1);
-
     l_scene->addItem(m_needle2);
     l_scene->addItem(m_foreground);
-
     l_scene->setSceneRect(m_background->boundingRect());
     update();
 }

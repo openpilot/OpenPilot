@@ -47,6 +47,9 @@ AirspeedGadgetWidget::AirspeedGadgetWidget(QWidget *parent) : QGraphicsView(pare
     needle1Value = 0;
     needle2Value = 0;
 
+    obj1 = NULL;
+    obj2 = NULL;
+
     // This timer mechanism makes needles rotate smoothly
     connect(&dialTimer, SIGNAL(timeout()), this, SLOT(rotateNeedles()));
     dialTimer.start(30);
@@ -68,8 +71,10 @@ AirspeedGadgetWidget::~AirspeedGadgetWidget()
   \brief Connects the widget to the relevant UAVObjects
   */
 void AirspeedGadgetWidget::connectNeedles(QString object1, QString nfield1, QString object2, QString nfield2 ) {
-    disconnect(0,0,this,SLOT(updateNeedle1(UAVObject*)));
-    disconnect(0,0,this,SLOT(updateNeedle2(UAVObject*)));
+    if (obj1 != NULL)
+        disconnect(obj1,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(updateNeedle1(UAVObject*)));
+    if (obj2 != NULL)
+        disconnect(obj2,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(updateNeedle2(UAVObject*)));
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     std::cout << "Connect needles - " << object1.toStdString() << "-"<< nfield1.toStdString() << "  -   " <<
@@ -111,7 +116,7 @@ void AirspeedGadgetWidget::updateNeedle1(UAVObject *object1) {
     } else {
         std::cout << "Wrong field, maybe an issue with object disconnection ?" << std::endl;
     }
-    std::cout << "Update Needle 1" << std::endl;
+    std::cout << "Update Needle 1 with value of field " << field1.toStdString() << std::endl;
 }
 
 /*!
@@ -119,7 +124,11 @@ void AirspeedGadgetWidget::updateNeedle1(UAVObject *object1) {
   */
 void AirspeedGadgetWidget::updateNeedle2(UAVObject *object2) {
     UAVObjectField* field = object2->getField(field2);
-    setNeedle2(field->getDouble());
+    if (field) {
+        setNeedle2(field->getDouble());
+    } else {
+        std::cout << "Wrong field, maybe an issue with object disconnection ?" << std::endl;
+    }
 }
 
 void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QString n1, QString n2)
@@ -131,6 +140,7 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
       {
          fgenabled = false;
          n2enabled = false;
+         QGraphicsScene *l_scene = scene();
 
          m_background->setSharedRenderer(m_renderer);
          m_background->setElementId(bg);
@@ -140,19 +150,29 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
          if (m_renderer->elementExists(fg)) {
             m_foreground->setSharedRenderer(m_renderer);
             m_foreground->setElementId(fg);
+            if (!l_scene->items().contains(m_foreground))
+                l_scene->addItem(m_foreground);
             fgenabled = true;
+        } else {
+            if (l_scene->items().contains(m_foreground))
+                l_scene->removeItem(m_foreground);
+            fgenabled = false;
         }
 
          if (m_renderer->elementExists(n2)) {
              m_needle2->setSharedRenderer(m_renderer);
              m_needle2->setElementId(n2);
+             if (!l_scene->items().contains(m_needle2))
+                l_scene->addItem(m_needle2);
              n2enabled = true;
+         } else {
+             if (l_scene->items().contains(m_needle2))
+                l_scene->removeItem(m_needle2);
+             n2enabled = false;
          }
 
-         std::cout<<"Dial file loaded ("<< dfn.toStdString() << ")" << std::endl;
-         QGraphicsScene *l_scene = scene();
+         // std::cout<<"Dial file loaded ("<< dfn.toStdString() << ")" << std::endl;
          l_scene->setSceneRect(m_background->boundingRect());
-
      }
    }
    else
@@ -162,7 +182,7 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
 void AirspeedGadgetWidget::paint()
 {
     QGraphicsScene *l_scene = scene();
-    l_scene->clear();
+    l_scene->clear(); // Careful: clear() deletes the objects
     l_scene->addItem(m_background);
     l_scene->addItem(m_needle1);
     l_scene->addItem(m_needle2);

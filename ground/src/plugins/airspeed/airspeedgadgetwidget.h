@@ -64,8 +64,6 @@ public slots:
    void updateNeedle1(UAVObject *object1); // Called by the UAVObject
    void updateNeedle2(UAVObject *object2); // Called by the UAVObject
 
-
-
 protected:
    void paintEvent(QPaintEvent *event);
    void resizeEvent(QResizeEvent *event);

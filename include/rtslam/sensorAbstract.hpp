@@ -105,6 +105,7 @@ namespace jafar {
 				 * Sensor pose in robot
 				 */
 				Gaussian pose;
+				Gaussian pose0;
 
 				/**
 				 * Indices of sensor's global pose in map (this is either the \a ia of the robot, \a rob.ia to make it short, or the \b ia_union() of \a rob.ia and \a sen.ia)

@@ -128,6 +128,30 @@ namespace jafar {
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::predictAppearance() {
 			// TODO implement predict appearance
+
+			//Update
+			vec3 lmkP0 = landmarkPtr()->descriptor->pose0;
+			vec3 sensorP0 = subrange(this->sensorPtr()->pose0.x(),0,3);
+
+			vec3 sensorP = subrange(this->sensorPtr()->pose.x(),0,3);
+			vec3 lmkP = subrange(this->expectation.x(),0 ,3);
+
+			//Zoom factor
+			double d0 = (lmkP0(0)-sensorP0(0))*(lmkP0(0)-sensorP0(0)) + (lmkP0(1)-sensorP0(1))*(lmkP0(1)-sensorP0(1)) + (lmkP0(2)-sensorP0(2))*(lmkP0(2)-sensorP0(2));
+			d0 = sqrt(d0);
+
+
+
+
+
+			predictedAppearance = this->landmarkPtr()->descriptor->app0Ptr;
+			//predictedPose = this->landmarkPtr()->descriptor->pose0;
+
+//			observedAppearance = this->  //featPtr->appearancePtr
+//			observedPose =
+
+			//this->descriptor->app0Ptr = appPtr;
+
 		}
 
 		/**

@@ -26,7 +26,7 @@ namespace std {
 	 * Operator << for class for ind_array
 	 */
 	template<class A>
-	ostream& operator <<(ostream & s, boost::numeric::ublas::indirect_array<A> & ia_) {
+	ostream& operator <<(ostream & s, const boost::numeric::ublas::indirect_array<A> & ia_) {
 		s << "[" << ia_.size() << "]{";
 		for (size_t i = 0; i < ia_.size(); i++) {
 			s << ia_(i);

@@ -374,7 +374,7 @@ int32_t PIOS_SPI_TransferModeInit(uint8_t spi, SPIModeTypeDef spi_mode, SPIPresc
 			} break;
 
 		case 1: {
-			uint16_t prev_cr1 = PIOS_SPI0_PTR->CR1;
+			uint16_t prev_cr1 = PIOS_SPI1_PTR->CR1;
 
 			/* SPI2 perpipheral is located in APB1 domain and clocked at half speed */
 			if(spi_prescaler == 0) {
@@ -384,7 +384,7 @@ int32_t PIOS_SPI_TransferModeInit(uint8_t spi, SPIModeTypeDef spi_mode, SPIPresc
 			}
 			SPI_Init(PIOS_SPI1_PTR, &SPI_InitStructure);
 
-			if((prev_cr1 ^ PIOS_SPI0_PTR->CR1) & 3) {
+			if((prev_cr1 ^ PIOS_SPI1_PTR->CR1) & 3) {
 				/* CPOL and CPHA located at bit #1 and #0 */
 				/* clock configuration has been changed - we should send a dummy byte */
 				/* before the application activates chip select. */

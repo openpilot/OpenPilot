@@ -11,10 +11,10 @@ public:
     TileMatrix();
     void Clear();
     void ClearPointsNotIn(QList<Point> list);
-    Tile TileAt(const Point &p);
-    void SetTileAt(const Point &p,const Tile &tile);
+    Tile* TileAt(const Point &p);
+    void SetTileAt(const Point &p,Tile* tile);
 protected:
-    QHash<Point,Tile> matrix;
+    QHash<Point,Tile*> matrix;
     QList<Point> removals;
     QMutex mutex;
 };

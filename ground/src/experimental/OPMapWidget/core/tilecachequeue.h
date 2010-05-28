@@ -16,6 +16,7 @@ class TileCacheQueue:public QThread
     Q_OBJECT
 public:
     TileCacheQueue();
+
     void EnqueueCacheTask(CacheItemQueue &task);
 
 protected:

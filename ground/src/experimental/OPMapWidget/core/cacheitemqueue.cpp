@@ -41,6 +41,7 @@ CacheItemQueue& CacheItemQueue::operator =(const CacheItemQueue &cSource)
     pos=cSource.pos;
     type=cSource.type;
     zoom=cSource.zoom;
+    return *this;
 }
 bool CacheItemQueue::operator ==(const CacheItemQueue &cSource)
 {

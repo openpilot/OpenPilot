@@ -22,6 +22,7 @@ public:
         this->zoom=cSource.zoom;
         this->pos=cSource.pos;
     }
+    bool HasValue(){return !(zoom==0);}
     QList<QByteArray> Overlays;
 protected:
 

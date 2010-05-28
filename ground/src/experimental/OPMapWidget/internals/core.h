@@ -143,6 +143,10 @@ public:
     void FindTilesAround(QList<Point> &list);
 
     void UpdateGroundResolution();
+
+    TileMatrix Matrix;
+
+    Rectangle tileRect;
 signals:
     void OnCurrentPositionChanged(PointLatLng point);
     void OnTileLoadComplete();
@@ -171,13 +175,12 @@ private:
     Size minOfTiles;
     Size maxOfTiles;
 
-    Rectangle tileRect;
+
 
     Point tilePoint;
 
     Rectangle CurrentRegion;
 
-    TileMatrix Matrix;
 
     QQueue<LoadTask> tileLoadQueue;
 

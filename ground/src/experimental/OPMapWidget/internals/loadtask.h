@@ -24,7 +24,7 @@ struct LoadTask
     }
     bool HasValue()
     {
-        return Zoom==-1;
+        return !(Zoom==-1);
     }
 
     QString ToString()const

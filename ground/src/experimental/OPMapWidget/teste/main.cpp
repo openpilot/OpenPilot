@@ -16,7 +16,6 @@
 #include "../core/alllayersoftype.h"
 #include "geodecoderstatus.h"
 //#include "QTest"
-#include "threadpool.h"
 #include "../internals/core.h"
 #include "../core/size.h"
 #include "../internals/rectangle.h"

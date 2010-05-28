@@ -24,6 +24,7 @@ bool PureImageCache::CreateEmptyDB(const QString &file)
     QDir dir=File.absoluteDir();
     QString path=dir.absolutePath();
     QString filename=File.fileName();
+    if(File.exists())   QFile(filename).remove();
     if(!dir.exists())
     {
         qDebug()<<"CreateEmptyDB: Cache path doesn't exist, try to create";
@@ -35,7 +36,7 @@ bool PureImageCache::CreateEmptyDB(const QString &file)
     }
     QSqlDatabase db;
 
-    db = QSqlDatabase::addDatabase("QSQLITE",QLatin1String("MapsConnection"));
+    db = QSqlDatabase::addDatabase("QSQLITE",QLatin1String("CreateConn"));
     db.setDatabaseName(file);
     if (!db.open())
     {
@@ -99,14 +100,14 @@ bool PureImageCache::CreateEmptyDB(const QString &file)
     db.close();
     return true;
 }
-bool PureImageCache::PutImageToCache(const QByteArray &tile, const MapType::Types &type,const Point &pos,const int &zoom) const
+bool PureImageCache::PutImageToCache(const QByteArray &tile, const MapType::Types &type,const Point &pos,const int &zoom)
 {
     qDebug()<<"PutImageToCache Start:";//<<pos;
     bool ret=true;
     QDir d;
     QString dir=gtilecache;
     qDebug()<<"PutImageToCache Cache dir="<<dir;
-    qDebug()<<"PutImageToCache Cache dir="<<dir<<" Try to PUT:";//<<pos;
+    qDebug()<<"PutImageToCache Cache dir="<<dir<<" Try to PUT:"<<pos.ToString();
     if(!d.exists(dir))
     {
         d.mkdir(dir);
@@ -122,10 +123,10 @@ bool PureImageCache::PutImageToCache(const QByteArray &tile, const MapType::Type
         if(ret)
         {
             QSqlDatabase cn;
-            if (QSqlDatabase::contains(QLatin1String("MapsConnection")))
-                cn = QSqlDatabase::database(QLatin1String("MapsConnection"));
-            else
-                cn = QSqlDatabase::addDatabase("QSQLITE",QLatin1String("MapsConnection"));
+            Mcounter.lock();
+            qlonglong id=++ConnCounter;
+            Mcounter.unlock();
+            cn = QSqlDatabase::addDatabase("QSQLITE",QString::number(id));
 
             cn.setDatabaseName(db);
             if(cn.open())
@@ -170,10 +171,10 @@ QByteArray PureImageCache::GetImageFromCache(MapType::Types type, Point pos, int
         if(ret)
         {
             QSqlDatabase cn;
-            if (QSqlDatabase::contains(QLatin1String("MapsConnection")))
-                cn = QSqlDatabase::database(QLatin1String("MapsConnection"));
-            else
-                cn = QSqlDatabase::addDatabase("QSQLITE",QLatin1String("MapsConnection"));
+            Mcounter.lock();
+            qlonglong id=++ConnCounter;
+            Mcounter.unlock();
+            cn = QSqlDatabase::addDatabase("QSQLITE",QString::number(id));
             cn.setDatabaseName(db);
             if(cn.open())
             {

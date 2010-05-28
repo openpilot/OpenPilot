@@ -24,5 +24,6 @@ Tile& Tile::operator =(const Tile &cSource)
 {
     this->zoom=cSource.zoom;
     this->pos=cSource.pos;
+    return *this;
 }
 

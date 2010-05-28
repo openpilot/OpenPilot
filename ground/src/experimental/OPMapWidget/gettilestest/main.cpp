@@ -17,7 +17,6 @@
 #include "../core/alllayersoftype.h"
 #include "geodecoderstatus.h"
 //#include "QTest"
-#include "threadpool.h"
 #include "../internals/core.h"
 #include "../core/size.h"
 #include "../internals/rectangle.h"
@@ -30,6 +29,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    PureImageCache* p=new PureImageCache();
     QPixmap pixmap;
     //Tile Polling test
     pixmap=PureImageProxy::FromStream(GMaps::Instance()->GetImageFrom(MapType::GoogleSatellite,Point(1,0),1));

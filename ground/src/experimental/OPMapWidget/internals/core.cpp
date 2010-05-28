@@ -4,10 +4,14 @@ Core::Core():currentPosition(0,0),currentPositionPixel(0,0),LastLocationInBounds
         ,minOfTiles(0,0),maxOfTiles(0,0),started(false),isDragging(false),TooltipTextPadding(10,10),MouseWheelZooming(false),loaderLimit(5)
 {
     mousewheelzoomtype=MouseWheelZoomType::MousePositionAndCenter;
+    SetProjection(new MercatorProjection());
     this->setAutoDelete(false);
+    renderOffset=Point(0,0);
+    dragPoint=Point(0,0);
 }
 void Core::run()
 {
+    qDebug()<<"core:run";
     bool last = false;
 
     LoadTask task;
@@ -19,24 +23,25 @@ void Core::run()
             task = tileLoadQueue.dequeue();
             {
                 last = tileLoadQueue.count() == 0;
-                qDebug()<<"TileLoadQueue: " << tileLoadQueue.count();
+                qDebug()<<"TileLoadQueue: " << tileLoadQueue.count()<<" Point:"<<task.Pos.ToString();
             }
         }
     }
     MtileLoadQueue.unlock();
     if(loaderLimit.tryAcquire(1,GMaps::Instance()->Timeout))
     {
+
         if(task.HasValue())
         {
-
+ qDebug()<<"AKI";
             {
-                Tile m = Matrix.TileAt(task.Pos);
+                Tile* m = Matrix.TileAt(task.Pos);
 
-                if(m.Overlays.count() == 0)
+                if(m==0 || m->Overlays.count() == 0)
                 {
                     qDebug()<<"Fill empty TileMatrix: " + task.ToString();
 
-                    Tile t = Tile(task.Zoom, task.Pos);
+                    Tile* t = new Tile(task.Zoom, task.Pos);
                     QVector<MapType::Types> layers= GMaps::Instance()->GetAllLayersOfType(GetMapType());
 
                     foreach(MapType::Types tl,layers)
@@ -54,14 +59,17 @@ void Core::run()
                             else // ok
                             {
                                 img = GMaps::Instance()->GetImageFrom(tl, task.Pos, task.Zoom);
+                                qDebug()<<"Core::run:gotimage size:"<<img.count();
                             }
 
                             if(img.length()!=0)
                             {
                                 Moverlays.lock();
                                 {
-                                    t.Overlays.append(img);
-                                }
+                                    t->Overlays.append(img);
+                                     qDebug()<<"Core::run append img:"<<img.length()<<" to tile:"<<t->GetPos().ToString()<<" now has "<<t->Overlays.count()<<" overlays";
+
+                                 }
                                 Moverlays.unlock();
                                 break;
                             }
@@ -79,14 +87,16 @@ void Core::run()
                         while(++retry < GMaps::Instance()->RetryLoadTile);
                     }
 
-                    if(t.Overlays.count() > 0)
+                    if(t->Overlays.count() > 0)
                     {
                         Matrix.SetTileAt(task.Pos,t);
+                        qDebug()<<"Core::run add tile "<<t->GetPos().ToString()<<" to matrix index "<<task.Pos.ToString();
+                        qDebug()<<"Core::run matrix index "<<task.Pos.ToString()<<" as tile with "<<Matrix.TileAt(task.Pos)->Overlays.count();
                     }
                     else
                     {
-                        t.Clear();
-                        //t = null;
+                        delete t;
+                        t = 0;
                     }
 
                     // layers = null;
@@ -185,7 +195,7 @@ void Core::SetMapType(const MapType::Types &value)
             {
                 if(Projection()->Type()!="PlateCarreeProjection")
                 {
-                    projection = new PlateCarreeProjection();
+                    SetProjection(new PlateCarreeProjection());
                 }
             }
             break;
@@ -197,7 +207,7 @@ void Core::SetMapType(const MapType::Types &value)
             {
                 if(Projection()->Type()!="LKS94Projection")
                 {
-                    projection = new LKS94Projection();
+                    SetProjection(new LKS94Projection());
                 }
             }
             break;
@@ -206,7 +216,7 @@ void Core::SetMapType(const MapType::Types &value)
             {
                 if(Projection()->Type()!="PlateCarreeProjectionPergo")
                 {
-                    projection = new PlateCarreeProjectionPergo();
+                    SetProjection(new PlateCarreeProjectionPergo());
                 }
             }
             break;
@@ -215,7 +225,7 @@ void Core::SetMapType(const MapType::Types &value)
             {
                 if(Projection()->Type()!="MercatorProjectionYandex")
                 {
-                    projection = new MercatorProjectionYandex();
+                    SetProjection(new MercatorProjectionYandex());
                 }
             }
             break;
@@ -224,7 +234,7 @@ void Core::SetMapType(const MapType::Types &value)
             {
                 if(Projection()->Type()!="MercatorProjection")
                 {
-                    projection = new MercatorProjection();
+                    SetProjection(new MercatorProjection());
                 }
             }
             break;
@@ -476,6 +486,7 @@ void Core::CancelAsyncTasks()
             tileLoadQueue.clear();
         }
         MtileLoadQueue.unlock();
+        ProcessLoadTaskCallback.waitForDone();
     }
 }
 void Core::UpdateBounds()

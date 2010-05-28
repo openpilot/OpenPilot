@@ -12,7 +12,6 @@ SOURCES += gmaps.cpp \
     alllayersoftype.cpp \
     urlfactory.cpp \
     placemark.cpp \
-    threadpool.cpp \
     point.cpp \
     size.cpp \
     kibertilecache.cpp
@@ -33,6 +32,5 @@ HEADERS += gmaps.h \
     urlfactory.h \
     geodecoderstatus.h \
     placemark.h \
-    threadpool.h \
     point.h \
     kibertilecache.h

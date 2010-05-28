@@ -10,10 +10,10 @@ GMaps* GMaps::Instance()
 }
 GMaps::GMaps():useMemoryCache(true),MaxZoom(19),RetryLoadTile(2)
 {
-    accessmode=AccessMode::ServerOnly;
+    accessmode=AccessMode::ServerAndCache;
     Language=LanguageType::PortuguesePortugal;
     LanguageStr=LanguageType().toString(Language);
-    Cache::Instance()->ImageCache=PureImageCache();
+ //   Cache::Instance()->ImageCache=PureImageCache();
 
 }
 

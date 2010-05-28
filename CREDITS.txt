@@ -1,4 +1,4 @@
-This is a credits file of people that have been / are key contributors to the OpenPilot project. Without the work of the people in this file OpenPilot would not be what it is today. 
+This is a credits file of people that are or have been key contributors to the OpenPilot project. Without the work of the people in this file OpenPilot would not be what it is today. 
 
 It is sorted alphabetically by name and formatted so that it allows for easy grepping and beautification by scripts.  
 
@@ -24,16 +24,24 @@ D: GCS Settings Widget & Plugin
 
 N: Jose Barros
 E: josembarros (at) hotmail (dot) com
-D: GCS Y-Modem Plugin  
+D: GCS Y-Modem Plugin, Next-Gen Map plugin
+
+N: David "Buzz" Carlson 
+E: chebuzz (at) gmail (dot) com
+D: 3D ModelView GCS Plugin
 
 N: Frederic Goddeeris
 E: fredericgoddeeris (at) hotmail (dot) com
-D: I2C work and FreeRTOS work. 
+D: I2C work and FreeRTOS work, MK intergration  
 
 N: Peter Gunnarsson
 E: peter (at) pyne (dot) se
 D: GCS Core Developer
-D: Multiple GCS plugins, Gadget foundations
+D: Multiple GCS plugins, Gadget foundations, UAVObject viewer
+
+N: Samik Korhonen
+E: samik.korhonen (at) gmail (dot) com
+D: GPS Module, Spektrum RC Module 
 
 N: Thorsten Klose
 E: thorsten.klose (at) dmx (dot) de
@@ -41,11 +49,15 @@ D: Embedded STM32 infrastructure
 
 N: Edouard Lafargue 
 E: edouard (at) lafargue (dot) name
-D: Artwork including Display Dials
+D: GCS Dial Plugins, Artwork including Display Dials
 
 N: Ken Northup
 E: helos360 (at) bellsouth (dot) net
 D: 3D Modelling for the GCS  
+
+N: Guy McCaldin 
+E: guymcc (at) gmail (dot) com
+D: Artwork and design work
 
 N: Angus Peart
 E: gussy (at) openpilot (dot) org
@@ -65,6 +77,10 @@ D: GCS Framework and Plugins for the GCS
 N: Zik Saleeba
 E: zik (at) zikzak (dot) net
 D: Initial schematic based on Zik's Flying Fox schematic     
+
+N: Stacey Sheldon
+E: stac (at) solidgoldbomb (dot) org
+D: SPI protocol for AHRS, IRQ and HID stability fixes and core AHRS work.  
 
 N: Pete Stapley
 E: pete (at) stapleylabs (dot) com

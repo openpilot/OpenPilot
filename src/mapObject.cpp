@@ -41,7 +41,6 @@ namespace jafar {
 			state(inFilter == FILTERED ? Gaussian(_mapPtr->x(), _mapPtr->P(), _mapPtr->reserveStates(_size)) : _size)
 		{
 			categoryName("MAP OBJECT");
-//			cout << "Created map object." << endl;
 		}
 
 

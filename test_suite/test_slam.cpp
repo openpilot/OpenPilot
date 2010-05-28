@@ -114,6 +114,9 @@ void test_slam01() {
 			vec u(robPtr->mySize_control()); // TODO put some real values in u.
 			robPtr->set_control(u);
 			robPtr->move();
+
+			cout << *robPtr << endl;
+
 			// foreach sensor
 			for (RobotAbstract::SensorList::iterator senIter = robPtr->sensorList().begin(); senIter != robPtr->sensorList().end(); senIter++)
 			{
@@ -138,7 +141,7 @@ void test_slam01() {
 					if (obsPtr->isVisible()){
 
 						vec2 pix = obsPtr->expectation.x();
-						cout << "expected pixel: " << pix << endl;
+//						cout << "expected pixel: " << pix << endl;
 
 						acGrid.addPixel(pix);
 						obsPtr->counters.nSearch++;

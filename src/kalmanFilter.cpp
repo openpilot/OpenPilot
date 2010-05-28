@@ -48,10 +48,6 @@ namespace jafar {
 		void ExtendedKalmanFilterIndirect::correct(const ind_array & ia_x, Innovation & inn, const mat & INN_rsl,
 		    const ind_array & ia_rsl)
 		{
-			cout << "ia_x   : " << ia_x << endl;
-			cout << "ia_rsl : " << ia_rsl << endl;
-			cout << "inn    : " << inn << endl;
-			cout << "INN_rsl: " << INN_rsl << endl;
 			PHt_tmp.resize(ia_x.size(),INN_rsl.size1());
 			PHt_tmp = prod(project(P_, ia_x, ia_rsl), trans(INN_rsl));
 			inn.invertCov();

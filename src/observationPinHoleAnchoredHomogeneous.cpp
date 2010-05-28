@@ -63,10 +63,6 @@ namespace jafar {
 		    const vec7 & sg, const vec & pix, const vec & invDist, vec & ahp,
 		    mat & AHP_sg, mat & AHP_pix, mat & AHP_invDist) {
 
-//			cout << "sg:" << sg << endl;
-//			cout << "pix:" << pix << endl;
-//			cout << "invDist:" << invDist << endl;
-
 			vec3 v;
 			mat32 V_pix;
 			mat V_sg(3, 7);
@@ -97,7 +93,6 @@ namespace jafar {
 			                                pinHolePtr()->imgSize(1));
 			bool infront = (expectation.nonObs(0) > 0.0);
 			events.visible = inimg && infront;
-			cout << "Visibility: pix: " << expectation.x() << " / depth: " << expectation.nonObs(0) << " / imgSize: " << pinHolePtr()->imgSize(0) << "x" << pinHolePtr()->imgSize(1) << " / visible: " << events.visible << endl;
 			return events.visible;
 		}
 

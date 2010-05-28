@@ -52,7 +52,6 @@ namespace jafar {
 		{
 			id(sensorIds.getId());
 			categoryName("SENSOR");
-//			cout << "Created sensor." << endl;
 		}
 
 		SensorAbstract::SensorAbstract(const simulation_t dummy, const robot_ptr_t & _robPtr) :
@@ -61,20 +60,8 @@ namespace jafar {
 			ia_globalPose(ublasExtra::ia_set(0,0))
 		{
 			categoryName("SIMU SENSOR");
-			cout << "Created simulated sensor." << endl;
 		}
 
-
-
-
-
-		/*
-		 * Acquire raw data.
-		 */
-//		void SensorAbstract::acquireRaw() {
-//			cout << "acquiring raw" << endl;
-//			// \todo Acquire raw data
-//		}
 
 
 		/**

@@ -37,7 +37,7 @@ namespace jafar {
 			s << " .expectation:  " << obs.expectation << endl;
 			s << " .measurement:  " << obs.measurement << endl;
 			s << " .innovation:   " << obs.innovation << endl;
-			s << "prd: " << obs.events.predicted << " / vis: " << obs.events.visible << " / meas: " << obs.events.measured << " / mch: " << obs.events.matched << " / upd: " << obs.events.updated;
+			s << " .ev: | prj: " << obs.events.predicted << " | vis: " << obs.events.visible << " | mea: " << obs.events.measured << " | mch: " << obs.events.matched << " | upd: " << obs.events.updated << " | ";
 			return s;
 		}
 
@@ -83,10 +83,10 @@ namespace jafar {
 		    LMK_prior(_lmkPtr->state.size(),_size_nonobs),
 		    LMK_rs(_lmkPtr->state.size(),_senPtr->ia_globalPose.size())
 		{
+			id(_lmkPtr->id());
 			categoryName("OBSERVATION");
 			clearCounters();
 			clearEvents();
-//			cout << "created obs." << endl;
 		}
 
 		void ObservationAbstract::setup(const feature_ptr_t & featPtr, const Gaussian & _prior){
@@ -110,6 +110,11 @@ namespace jafar {
 			vec exp, nobs;
 			project_func(sg, lmk, exp, nobs, EXP_sg, EXP_l);
 
+			mat EXP_rs = prod(EXP_sg, SG_rs);
+
+			subrange(EXP_rsl, 0,expectation.size(), 0,sensorPtr()->ia_globalPose.size()) = EXP_rs;
+			subrange(EXP_rsl, 0,expectation.size(), sensorPtr()->ia_globalPose.size(),sensorPtr()->ia_globalPose.size()+landmarkPtr()->state.size()) = EXP_l;
+
 			expectation.x() = exp;
 			expectation.P() = ublasExtra::prod_JPJt(ublas::project(landmarkPtr()->mapPtr()->filterPtr->P(), ia_rsl, ia_rsl), EXP_rsl);
 
@@ -128,14 +133,7 @@ namespace jafar {
 			vec pix = measurement.x();
 			vec invDist = prior.x();
 			vec lmk(landmarkPtr()->mySize());
-			cout << "sg       :" << sg << endl;
-			cout << "pix      :" << pix << endl;
-			cout << "invDist  :" << invDist << endl;
 			backProject_func(sg, pix, invDist, lmk, LMK_sg, LMK_meas, LMK_prior);
-			cout << "lmk      :" << lmk << endl;
-			cout << "LMK_sg   :" << LMK_sg << endl;
-			cout << "LMK_meas :" << LMK_meas << endl;
-			cout << "LMK_prior:" << LMK_prior << endl;
 
 			landmarkPtr()->state.x(lmk);
 

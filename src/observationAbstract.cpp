@@ -113,6 +113,8 @@ namespace jafar {
 			expectation.x() = exp;
 			expectation.P() = ublasExtra::prod_JPJt(ublas::project(landmarkPtr()->mapPtr()->filterPtr->P(), ia_rsl, ia_rsl), EXP_rsl);
 
+			expectation.nonObs = nobs;
+
 			events.predicted = true;
 		}
 
@@ -126,11 +128,14 @@ namespace jafar {
 			vec pix = measurement.x();
 			vec invDist = prior.x();
 			vec lmk(landmarkPtr()->mySize());
-//			cout << "sg:" << sg << endl;
-//			cout << "pix:" << pix << endl;
-//			cout << "invDist:" << invDist << endl;
+			cout << "sg       :" << sg << endl;
+			cout << "pix      :" << pix << endl;
+			cout << "invDist  :" << invDist << endl;
 			backProject_func(sg, pix, invDist, lmk, LMK_sg, LMK_meas, LMK_prior);
-//			cout << "lmk:" << lmk << endl;
+			cout << "lmk      :" << lmk << endl;
+			cout << "LMK_sg   :" << LMK_sg << endl;
+			cout << "LMK_meas :" << LMK_meas << endl;
+			cout << "LMK_prior:" << LMK_prior << endl;
 
 			landmarkPtr()->state.x(lmk);
 

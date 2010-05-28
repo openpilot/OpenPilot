@@ -76,7 +76,7 @@ namespace jafar {
 				 * Retro-projection function, with Jacobians
 				 */
 				void backProject_func(const vec7 & sg, const vec & meas, const vec & nobs, vec & lmk, mat & LMK_sg,
-				                      mat & LMK_meas, mat LMK_nobs);
+				                      mat & LMK_meas, mat & LMK_nobs);
 
 				/**
 				 * Predict visibility.

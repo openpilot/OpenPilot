@@ -61,7 +61,7 @@ namespace jafar {
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::backProject_func(
 		    const vec7 & sg, const vec & pix, const vec & invDist, vec & ahp,
-		    mat & AHP_sg, mat & AHP_pix, mat AHP_invDist) {
+		    mat & AHP_sg, mat & AHP_pix, mat & AHP_invDist) {
 
 //			cout << "sg:" << sg << endl;
 //			cout << "pix:" << pix << endl;
@@ -83,12 +83,8 @@ namespace jafar {
 			pinhole::backProjectPoint(phPtr->intrinsic, phPtr->correction, pix, 1.0,
 			                          v, V_pix, V_1);
 
-//			cout << "v:" << v << endl;
-
 			lmkAHP::fromBearingOnlyFrame(sg, v, invDist(0), ahp, AHP_sg, AHP_v,
 			                             AHP_invDist);
-
-//			cout << "ahp:" << ahp << endl;
 
 			// Here we apply the chain rule for composing Jacobians
 			AHP_pix = prod(AHP_v, V_pix);

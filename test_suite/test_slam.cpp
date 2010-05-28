@@ -179,6 +179,7 @@ void test_slam01() {
 
 						feature_ptr_t featPtr(new FeatureAbstract(2));
 						if (ObservationPinHolePoint::detectInRoi(senPtr->getRaw(), roi, featPtr)){
+							cout << "Initializing lmk..." << endl;
 
 							// 2a. create lmk object
 							ahp_ptr_t lmkPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr));
@@ -189,10 +190,10 @@ void test_slam01() {
 							obs_ph_ahp_ptr_t obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint(senPtr,lmkPtr));
 							obsPtr->linkToParentPinHole(senPtr);
 							obsPtr->linkToParentAHP(lmkPtr);
-							obsPtr->events.visible = true;
-							obsPtr->events.measured = true;
 
 							// 2c. fill data for this obs
+							obsPtr->events.visible = true;
+							obsPtr->events.measured = true;
 							obsPtr->setup(featPtr, ObservationPinHoleAnchoredHomogeneousPoint::getPrior());
 
 							// 2d. comute and fill data for the landmark

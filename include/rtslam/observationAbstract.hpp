@@ -190,7 +190,7 @@ namespace jafar {
 				 * Back-project function
 				 */
 				virtual void backProject_func(const vec7 & sg, const vec & meas, const vec & nobs, vec & lmk, mat & LMK_sg,
-				                              mat & LMK_meas, mat LMK_nobs) = 0;
+				                              mat & LMK_meas, mat & LMK_nobs) = 0;
 
 				/**
 				 * Compute innovation from measurement and expectation.
@@ -280,7 +280,7 @@ namespace jafar {
 				static Gaussian getPrior(){
 					Gaussian dummy(1);
 					vec v(1);
-					v(0) = 1;
+					v(0) = 1.0;
 					dummy.x(v);
 					dummy.std(v);
 					return dummy; // todo implement getPrior() -  lines above just for compilation issues

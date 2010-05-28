@@ -39,7 +39,8 @@ namespace jafar {
 			cout << "Created pinhole." << endl;
 		}
 
-		void SensorPinHole::set_parameters(const jblas::vec4 & k, const jblas::vec & d, const jblas::vec & c) {
+		void SensorPinHole::set_parameters(const jblas::vec2 & imSz, const jblas::vec4 & k, const jblas::vec & d, const jblas::vec & c) {
+			imgSize   = imSz;
 			intrinsic = k;
 			distortion.resize(d.size());
 			distortion = d;
@@ -47,11 +48,11 @@ namespace jafar {
 			correction = c;
 		}
 
-		void SensorPinHole::setup(const size_t _id, const string & _name, const vec7 & _pose, const vec7 & _std, const vec4 & _k, const vec & _d, const vec & _c){
+		void SensorPinHole::setup(const size_t _id, const string & _name, const vec7 & _pose, const vec7 & _std, const jblas::vec2 & _s, const vec4 & _k, const vec & _d, const vec & _c){
 			SensorAbstract::MapObject::ObjectAbstract::setup(_id, _name);
 			pose.x(_pose);
 			pose.std(_std);
-			set_parameters(_k, _d, _c);
+			set_parameters(_s, _k, _d, _c);
 		}
 
 		void SensorPinHole::acquireRaw(){

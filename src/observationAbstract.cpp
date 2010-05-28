@@ -36,7 +36,8 @@ namespace jafar {
 			s << "Sensor: " << obs.sensorPtr()->id() << ", landmark: " << obs.landmarkPtr()->id() << endl;
 			s << " .expectation:  " << obs.expectation << endl;
 			s << " .measurement:  " << obs.measurement << endl;
-			s << " .innovation:   " << obs.innovation;
+			s << " .innovation:   " << obs.innovation << endl;
+			s << "prd: " << obs.events.predicted << " / vis: " << obs.events.visible << " / meas: " << obs.events.measured << " / mch: " << obs.events.matched << " / upd: " << obs.events.updated;
 			return s;
 		}
 
@@ -111,6 +112,8 @@ namespace jafar {
 
 			expectation.x() = exp;
 			expectation.P() = ublasExtra::prod_JPJt(ublas::project(landmarkPtr()->mapPtr()->filterPtr->P(), ia_rsl, ia_rsl), EXP_rsl);
+
+			events.predicted = true;
 		}
 
 		void ObservationAbstract::backProject(){
@@ -161,6 +164,7 @@ namespace jafar {
 		}
 
 		void ObservationAbstract::clearEvents(){
+			events.predicted = false;
 			events.matched = false;
 			events.measured = false;
 			events.updated = false;

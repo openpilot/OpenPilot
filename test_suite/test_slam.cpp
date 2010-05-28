@@ -49,7 +49,9 @@ using namespace boost;
 
 
 void test_slam01() {
-	ActiveSearchGrid acGrid(640, 480, 3, 3, 10);
+	ActiveSearchGrid acGrid(640, 480, 5, 5, 10);
+	vec2 imSz;
+	imSz(0) = 640; imSz(1) = 480;
 	vec4 k;
 	vec d(0), c(0);
 	k(0) = 320; k(1) = 320; k(2) = 320; k(3) = 320;
@@ -66,12 +68,12 @@ void test_slam01() {
 	senPtr11->linkToParentRobot(robPtr1);
 	senPtr11->state.clear();
 	senPtr11->pose.x(quaternion::originFrame());
-	senPtr11->set_parameters(k, d, c);
+	senPtr11->set_parameters(imSz, k, d, c);
 	pinhole_ptr_t senPtr12 (new SensorPinHole(robPtr1, MapObject::FILTERED));
 	senPtr12->linkToParentRobot(robPtr1);
 	senPtr12->state.clear();
 	senPtr12->pose.x(quaternion::originFrame());
-	senPtr12->set_parameters(k, d, c);
+	senPtr12->set_parameters(imSz, k, d, c);
 	robodo_ptr_t robPtr2(new RobotOdometry(mapPtr));
 	robPtr2->linkToParentMap(mapPtr);
 	robPtr2->state.clear();
@@ -80,17 +82,14 @@ void test_slam01() {
 	senPtr21->linkToParentRobot(robPtr2);
 	senPtr21->state.clear();
 	senPtr21->pose.x(quaternion::originFrame());
-	senPtr21->set_parameters(k, d, c);
+	senPtr21->set_parameters(imSz, k, d, c);
 
 	pinhole_ptr_t senPtrCopy;
 	senPtrCopy = senPtr11;
 
 
-	if (senPtr11 == senPtrCopy){
-		cout << "EQ" << endl;
-	}else{
-		cout << "NEQ" << endl;
-	}
+	// Show empty map
+	cout << *mapPtr << endl;
 
 
 
@@ -128,7 +127,6 @@ void test_slam01() {
 				for (SensorAbstract::ObservationList::iterator obsIter = senPtr->observationList().begin(); obsIter != senPtr->observationList().end(); obsIter++)
 				{
 					observation_ptr_t obsPtr = *obsIter;
-					cout << "\nOBSERVING Lmk: " << obsPtr->landmarkPtr()->id() << endl;
 
 					obsPtr->clearEvents();
 
@@ -140,13 +138,8 @@ void test_slam01() {
 					if (obsPtr->isVisible()){
 
 						vec2 pix = obsPtr->expectation.x();
-						cout << "true expected pixel: " << pix << endl;
+						cout << "expected pixel: " << pix << endl;
 
-						 // todo remove these two lines when turning with data.
-//						pix(0) = rand()%640;
-//						pix(1) = rand()%480;
-
-						cout << "actually used pixel: " << pix << endl; // todo this one also.
 						acGrid.addPixel(pix);
 						obsPtr->counters.nSearch++;
 
@@ -170,6 +163,9 @@ void test_slam01() {
 							} // obsPtr->compatibilityTest(3.0)
 						} // obsPtr->getScoreMatchInPercent()>80
 					} // obsPtr->isVisible()
+
+					cout << *obsPtr << endl;
+
 				} // foreach observation
 
 
@@ -193,13 +189,14 @@ void test_slam01() {
 							obs_ph_ahp_ptr_t obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint(senPtr,lmkPtr));
 							obsPtr->linkToParentPinHole(senPtr);
 							obsPtr->linkToParentAHP(lmkPtr);
+							obsPtr->events.visible = true;
+							obsPtr->events.measured = true;
 
 							// 2c. fill data for this obs
 							obsPtr->setup(featPtr, ObservationPinHoleAnchoredHomogeneousPoint::getPrior());
 
 							// 2d. comute and fill data for the landmark
 							obsPtr->backProject();
-							cout << *lmkPtr << endl;
 
 							// 2e. Create descriptor
 							vec7 globalSensorPose = senPtr->globalPose();
@@ -208,6 +205,7 @@ void test_slam01() {
 							// Complete SLAM graph with all other obs
 							mapPtr->completeObservationsInGraph(senPtr, lmkPtr);
 
+							cout << *lmkPtr << endl;
 						}
 					}
 				}

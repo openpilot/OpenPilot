@@ -64,12 +64,12 @@ namespace jafar {
 				 * \param hsize the horizontal image size.
 				 * \param vsize the vertical image size.
 				 */
-				void set_parameters(const jblas::vec4 & k, const jblas::vec & d, const jblas::vec & c);
+				void set_parameters(const jblas::vec2 & imSz, const jblas::vec4 & k, const jblas::vec & d, const jblas::vec & c);
 
 				/**
 				 * Pin-hole sensor setup
 				 */
-				void setup(const size_t id, const string & name, const vec7 & pose, const vec7 & std, const vec4 & k, const vec & d, const vec & c);
+				void setup(const size_t id, const string & name, const vec7 & pose, const vec7 & std, const jblas::vec2 & _s, const vec4 & k, const vec & d, const vec & c);
 
 
 				static size_t size(void) {

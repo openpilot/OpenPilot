@@ -101,6 +101,7 @@ namespace jafar {
 			                                pinHolePtr()->imgSize(1));
 			bool infront = (expectation.nonObs(0) > 0.0);
 			events.visible = inimg && infront;
+			cout << "Visibility: pix: " << expectation.x() << " / depth: " << expectation.nonObs(0) << " / imgSize: " << pinHolePtr()->imgSize(0) << "x" << pinHolePtr()->imgSize(1) << " / visible: " << events.visible << endl;
 			return events.visible;
 		}
 
@@ -166,6 +167,8 @@ namespace jafar {
 			identity_mat I(2);
 			measurement.P(I);
 			measurement.matchScore = 1.00;
+
+			events.measured = true;
 		}
 
 	}

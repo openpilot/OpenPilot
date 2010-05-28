@@ -178,9 +178,7 @@ namespace jafar {
 				 * \return true if visible
 				 */
 				virtual bool isVisible() {
-					return true;
-					// todo remove "return true" and keep the line below:
-					//					return events.visible;
+					return events.visible;
 				}
 
 

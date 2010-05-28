@@ -57,7 +57,7 @@ void test_slam01() {
 	world_ptr_t worldPtr(new WorldAbstract());
 	map_ptr_t mapPtr(new MapAbstract(100));
 	worldPtr->addMap(mapPtr);
-	mapPtr->fillSeq();
+	mapPtr->fillDiag();
 	robconstvel_ptr_t robPtr1(new RobotConstantVelocity(mapPtr));
 	robPtr1->linkToParentMap(mapPtr);
 	robPtr1->state.clear();
@@ -105,12 +105,13 @@ void test_slam01() {
 
 	for (int t = 1; t <= 3; t++) {
 
-		cout << "Time : " << t << endl;
+		cout << "\nTIME : " << t << endl;
 
 		// foreach robot
 		for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin(); robIter != mapPtr->robotList().end(); robIter++)
 		{
 			robot_ptr_t robPtr = *robIter;
+			cout << "\nROBOT: " << robPtr->id() << endl;
 			vec u(robPtr->mySize_control()); // TODO put some real values in u.
 			robPtr->set_control(u);
 			robPtr->move();
@@ -118,6 +119,7 @@ void test_slam01() {
 			for (RobotAbstract::SensorList::iterator senIter = robPtr->sensorList().begin(); senIter != robPtr->sensorList().end(); senIter++)
 			{
 				sensor_ptr_t senPtr = *senIter;
+				cout << "\nSENSOR: " << senPtr->id() << endl;
 				// get raw-data
 				senPtr->acquireRaw() ;
 
@@ -126,6 +128,8 @@ void test_slam01() {
 				for (SensorAbstract::ObservationList::iterator obsIter = senPtr->observationList().begin(); obsIter != senPtr->observationList().end(); obsIter++)
 				{
 					observation_ptr_t obsPtr = *obsIter;
+					cout << "\nOBSERVING Lmk: " << obsPtr->landmarkPtr()->id() << endl;
+
 					obsPtr->clearEvents();
 
 					// 1a. project
@@ -153,13 +157,13 @@ void test_slam01() {
 						obsPtr->matchFeature(senPtr->getRaw()) ;
 
 						// 1e. if feature is find
-						if (obsPtr->getMatchScore()>80) {
+						if (obsPtr->getMatchScore()>0.80) {
 							obsPtr->counters.nMatch++;
 							obsPtr->events.matched = true;
 							obsPtr->computeInnovation() ;
 
 							// 1f. if feature is inlier
-							if (obsPtr->compatibilityTest(0)) {
+							if (obsPtr->compatibilityTest(3.0)) { // use 3.0 for 3-sigma or the 5% proba from the chi-square tables.
 								obsPtr->counters.nInlier++;
 								obsPtr->update() ;
 								obsPtr->events.updated = true;
@@ -184,7 +188,7 @@ void test_slam01() {
 							ahp_ptr_t lmkPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr));
 							lmkPtr->linkToParentMap(mapPtr);
 
-							// 2b. create all obs objects
+							// 2b. create obs object
 							// todo make lmk creation dynamic with factories or switch or other.
 							obs_ph_ahp_ptr_t obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint(senPtr,lmkPtr));
 							obsPtr->linkToParentPinHole(senPtr);
@@ -193,16 +197,15 @@ void test_slam01() {
 							// 2c. fill data for this obs
 							obsPtr->setup(featPtr, ObservationPinHoleAnchoredHomogeneousPoint::getPrior());
 
-							// 2d. fill data for the landmark
+							// 2d. comute and fill data for the landmark
 							obsPtr->backProject();
 							cout << *lmkPtr << endl;
 
+							// 2e. Create descriptor
 							vec7 globalSensorPose = senPtr->globalPose();
-							cout << globalSensorPose << endl;
 							lmkPtr->createDescriptor(featPtr->appearancePtr, globalSensorPose);
-//							obsPtr->createDescriptor(featPtr->appearancePtr, senPtr->globalPose());
 
-							// Complete with all other obs
+							// Complete SLAM graph with all other obs
 							mapPtr->completeObservationsInGraph(senPtr, lmkPtr);
 
 						}

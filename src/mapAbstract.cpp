@@ -105,6 +105,13 @@ namespace jafar {
 		void MapAbstract::fillDiag() {
 			for (size_t i = 0; i < max_size; i++) {
 				x(i) = i;
+				P(i, i) = 1;
+			}
+		}
+
+		void MapAbstract::fillDiagSeq() {
+			for (size_t i = 0; i < max_size; i++) {
+				x(i) = i;
 				P(i, i) = i;
 			}
 		}

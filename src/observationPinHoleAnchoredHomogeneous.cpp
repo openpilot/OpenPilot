@@ -128,7 +128,7 @@ namespace jafar {
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::predictAppearance() {
 
-			//Update
+			// lmk and sensor positions (initial and currnet for sensor)
 			vec3 lmkP = lmkAHP::ahp2euc(landmarkPtr()->state.x());
 			vec3 sensorP0 = subrange(this->landmarkPtr()->descriptor->pose0,0,3);
 			vec3 sensorP = subrange(this->sensorPtr()->globalPose(),0,3);
@@ -143,12 +143,10 @@ namespace jafar {
 			double zoom = d0/dt;
 
 			//Rotation factor
-			vec7 sensorPoseInv = quaternion::invertFrame(sensorPose);
 			vec7 sensorPose0Inv = quaternion::invertFrame(sensorPose0);
+			vec7 C0t = quaternion::composeFrames(sensorPose,sensorPose0Inv);
 
-			vec7 C0t = quaternion::composeFrames(sensorPoseInv,sensorPoseInv);
-
-			vec3 qC0t = subrange(C0t,3,6);
+			vec4 qC0t = subrange(C0t,3,7);
 			vec3 e0t = quaternion::q2e(qC0t);
 
 			double yaw = -e0t(2);
@@ -163,6 +161,11 @@ namespace jafar {
 		void ObservationPinHoleAnchoredHomogeneousPoint::matchFeature(
 		    raw_ptr_t rawPtr) {
 			// TODO call the namespace image with the raw
+			// fixme these lines below only for compilation purposes
+			measurement.x(expectation.x());
+			identity_mat I(2);
+			measurement.P(I);
+			measurement.matchScore = 1.00;
 		}
 
 	}

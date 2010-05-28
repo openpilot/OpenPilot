@@ -50,6 +50,7 @@ namespace jafar {
 			    pose(state, Gaussian::REMOTE),
 			    ia_globalPose(inFilter == FILTERED ? ia_union(_robPtr->pose.ia(), pose.ia()) : _robPtr->pose.ia())
 		{
+			id(sensorIds.getId());
 			categoryName("SENSOR");
 //			cout << "Created sensor." << endl;
 		}

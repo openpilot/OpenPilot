@@ -147,9 +147,8 @@ namespace jafar {
 				void completeObservationsInGraph(const sensor_ptr_t & senPtr, const landmark_ptr_t & lmkPtr);
 
 				void fillSeq();
-
 				void fillDiag();
-
+				void fillDiagSeq();
 				void fillRndm();
 
 			private:

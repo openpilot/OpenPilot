@@ -38,10 +38,12 @@ namespace jafar {
 					// 1. generate random pixel
 					vec2 pix;
 					pix(0) = roi.x + rand()%roi.width; pix(1) = roi.y + rand()%roi.height;
-					cout << "Detected pixel: " << pix << endl;
+//					cout << "Detected pixel: " << pix << endl;
 
 					// Assign pixel and covariance
 					featPtr->state.x(pix);
+					identity_mat I(2);
+					featPtr->state.P(I);
 
 					// initialize appearance
 					appearenceimage_ptr_t appPtr(new AppearenceImage);

@@ -27,7 +27,7 @@
 #ifndef __LandmarkAbstract_H__
 #define __LandmarkAbstract_H__
 
-#include "kernel/IdFactory.hpp"
+//#include "kernel/IdFactory.hpp"
 
 #include "rtslam/rtSlam.hpp"
 

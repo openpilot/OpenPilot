@@ -32,6 +32,7 @@ namespace jafar {
 		 * The Mahalanobis distance.
 		 */
 		double Innovation::mahalanobis() {
+			cout << "mahalanobis::inn.P: " << P() << endl;
 			invertCov();
 			mahalanobis_ = ublasExtra::prod_xt_iP_x(iP_, x());
 			return mahalanobis_;

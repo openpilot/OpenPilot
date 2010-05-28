@@ -123,11 +123,11 @@ namespace jafar {
 			vec pix = measurement.x();
 			vec invDist = prior.x();
 			vec lmk(landmarkPtr()->mySize());
-			cout << "sg:" << sg << endl;
-			cout << "pix:" << pix << endl;
-			cout << "invDist:" << invDist << endl;
+//			cout << "sg:" << sg << endl;
+//			cout << "pix:" << pix << endl;
+//			cout << "invDist:" << invDist << endl;
 			backProject_func(sg, pix, invDist, lmk, LMK_sg, LMK_meas, LMK_prior);
-			cout << "lmk:" << lmk << endl;
+//			cout << "lmk:" << lmk << endl;
 
 			landmarkPtr()->state.x(lmk);
 
@@ -155,7 +155,7 @@ namespace jafar {
 		}
 
 		bool ObservationAbstract::compatibilityTest(const double MahaDistSquare){
-			return true;
+//			return true;
 			//todo remove "return true"
 			return (innovation.mahalanobis() < MahaDistSquare);
 		}

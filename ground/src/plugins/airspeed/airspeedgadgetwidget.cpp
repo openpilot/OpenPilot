@@ -212,11 +212,11 @@ void AirspeedGadgetWidget::resizeEvent(QResizeEvent *event)
 // Converts the value into an angle:
 // this enables smooth rotation in rotateNeedles below
 void AirspeedGadgetWidget::setNeedle1(double value) {
-    needle1Target = 360*value/n1MaxValue;
+    needle1Target = 360*value/(n1MaxValue-n1MinValue);
 }
 
 void AirspeedGadgetWidget::setNeedle2(double value) {
-    needle2Target = 360*value/n2MaxValue;
+    needle2Target = 360*value/(n2MaxValue-n2MinValue);
 }
 
 

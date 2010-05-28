@@ -54,7 +54,7 @@ public:
    void setNeedle2(double value);
    void setN1Min(double value) {n1MinValue = value;}
    void setN1Max(double value) {n1MaxValue = value;}
-   void setN2Min(double value) {n1MinValue = value;}
+   void setN2Min(double value) {n2MinValue = value;}
    void setN2Max(double value) {n2MaxValue = value;}
    // Sets up needle/UAVObject connections:
    void connectNeedles(QString object1, QString field1,

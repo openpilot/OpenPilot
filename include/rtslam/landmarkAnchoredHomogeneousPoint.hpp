@@ -59,6 +59,8 @@ namespace jafar {
 
 				virtual size_t mySize() {return size();}
 
+				virtual size_t stdSize() {return LandmarkEuclideanPoint::size();}
+
 				/**
 				 * Reparametrize to Euclidean, with Jacobians.
 				 * \param ahp the anchored homogeneous point to be reparametrized.

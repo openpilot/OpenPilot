@@ -94,6 +94,7 @@ namespace jafar {
 				geometry_t geomType;
 			public:
 				geometry_t getGeomType(){return geomType;}
+
 				virtual landmark_ptr_t convertToStandardParametrization() = 0;
 				/* FIXME how to implement convertToStandardParametrization in concrete types ?
 				- for the standard type, if we return a shared_from_this, does it share the reference counter with the existing shared_ptr ?
@@ -105,10 +106,18 @@ namespace jafar {
 				jblas::mat LNEW_lmk; //Jacobian comming from reparametrisation of old lmk wrt. new lmk
 
 				//Reparametrize old Landmarks into new ones
-				void reparametrize(){} // TODO (implement here or not? why reparametrize_func if not here? how to know the standard type if here?)
+				void reparametrize();
 				virtual void reparametrize_func(const vec & lmk, vec & lnew, mat & LNEW_lmk) = 0;
 
+				/**
+				 * Size of the landmark state
+				 */
 				virtual size_t mySize() = 0;
+
+				/**
+				 * Size of the reparametrized landmark
+				 */
+				virtual size_t stdSize() = 0;
 
 				// Create a landmark descriptor
 				virtual void createDescriptor(const appearance_ptr_t & appPtr, const vec7 & sensorPose){

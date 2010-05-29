@@ -37,5 +37,20 @@ namespace jafar {
 			categoryName("SIMU LANDMARK");
 		}
 
+		void LandmarkAbstract::reparametrize() {
+			//TODO Implement reparametrize():
+			// - create a new STD landmark.
+			// - create its set of observations, one per sensor.
+			// - Link the landmark to map and observations.
+			// - Link the sensors to the new observations.
+			// - call reparametrize_func()
+			// - compute the new ind_array as a sub-set of the old one
+			// - call filter->reparametrize()
+			// - transfer info from the old lmk to the new one
+			// - transfer info from old obs to new obs.
+			// - delete old lmk <-- this may delete all old obs! If not:
+			// - delete old obs
+		}
+
 	}
 }

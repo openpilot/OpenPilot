@@ -100,7 +100,6 @@ namespace jafar {
 				- for the other types, we need to construct a new landmark, but without any map, is it possible ?
 				*/
 
-				// \todo use a smart pointer here.
 				desc_ptr_t descriptor; ///<                       Landmark descriptor
 
 				jblas::mat LNEW_lmk; //Jacobian comming from reparametrisation of old lmk wrt. new lmk

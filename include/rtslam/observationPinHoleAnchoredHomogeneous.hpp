@@ -93,7 +93,6 @@ namespace jafar {
 				virtual void predictAppearance();
 
 				virtual double getMatchScore(){
-					//todo implement getScoreMatchInPercent()
 					return measurement.matchScore;
 				}
 

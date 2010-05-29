@@ -157,7 +157,7 @@ namespace jafar {
 				/**
 				 * Create new observation.
 				 * Creates a new observation from a sensor and a landmark.
-				 * \todo see if this can go to class Observation, possibly with a dedicated constructor.
+				 * \todo see if this can go to class Observation, or Landmark!, possibly with a dedicated constructor.
 				 */
 				observation_ptr_t newObservation(const sensor_ptr_t & senPtr, const landmark_ptr_t & lmkPtr);
 

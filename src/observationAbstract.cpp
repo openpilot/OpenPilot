@@ -161,8 +161,6 @@ namespace jafar {
 		}
 
 		bool ObservationAbstract::compatibilityTest(const double MahaDistSquare){
-//			return true;
-			//todo remove "return true"
 			return (innovation.mahalanobis() < MahaDistSquare);
 		}
 

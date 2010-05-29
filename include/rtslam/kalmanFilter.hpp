@@ -151,10 +151,6 @@ namespace jafar {
 				void reparametrize(const ind_array & iax, const mat & J_l, const ind_array & ia_old, const ind_array & ia_new);
 
 				// \todo: define API for all these functions.
-
-				void computeInnovation();
-				void computeK();
-				void updateP();
 				void stackCorrection();
 				void correctAllStacked();
 

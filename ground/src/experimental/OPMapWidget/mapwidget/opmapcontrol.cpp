@@ -1,6 +1,6 @@
 #include "opmapcontrol.h"
 
-OPMapControl::OPMapControl(QWidget *parent):QWidget(parent),MapRenderTransform(1)
+OPMapControl::OPMapControl(QWidget *parent):QWidget(parent),MapRenderTransform(1), maxZoom(2),minZoom(2)
 {
     EmptytileBrush = Qt::blue;
     MissingDataFont =QFont ("Times",10,QFont::Bold);
@@ -8,13 +8,19 @@ OPMapControl::OPMapControl(QWidget *parent):QWidget(parent),MapRenderTransform(1
     EmptyTileBorders = QPen(Qt::white);
     ShowTileGridLines=true;
     core.SetCurrentRegion(Rectangle(-50, -50, this->width()+100, this->height()+100));
-    core.SetMapType(MapType::GoogleMap);
-    resize();
+    core.SetMapType(MapType::GoogleSatellite);
     core.SetZoom(2);
     connect(&core,SIGNAL(OnNeedInvalidation()),this,SLOT(Core_OnNeedInvalidation()));
-    core.StartSystem();
+
 
 }
+void OPMapControl::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    core.StartSystem();
+    resize();
+}
+
 void OPMapControl::Core_OnNeedInvalidation()
 {
     this->repaint();
@@ -24,7 +30,8 @@ void OPMapControl::paintEvent(QPaintEvent* evnt)
 {
     QWidget::paintEvent(evnt);
     QPainter painter(this);
-
+   // painter.setBrush(palette().foreground().color());
+   // painter.fillRect(this->rect(),painter.background());
     if(MapRenderTransform!=1)
     {
         QTransform transform;
@@ -39,12 +46,12 @@ void OPMapControl::paintEvent(QPaintEvent* evnt)
     {
         DrawMap2D(painter);
     }
-      painter.drawText(10,10,"TESTE");
+    //  painter.drawText(10,10,"TESTE");
 }
 
 void OPMapControl::DrawMap2D(QPainter &painter)
 {
-    painter.drawText(10,10,"TESTE");
+   // painter.drawText(10,10,"TESTE");
     for(int i = -core.GetsizeOfMapArea().Width(); i <= core.GetsizeOfMapArea().Width(); i++)
              {
                 for(int j = -core.GetsizeOfMapArea().Height(); j <= core.GetsizeOfMapArea().Height(); j++)
@@ -94,7 +101,7 @@ void OPMapControl::DrawMap2D(QPainter &painter)
                                     painter.setFont(MissingDataFont);
                                     painter.setPen(Qt::red);
                                     painter.drawText(QRectF(core.tileRect.X(), core.tileRect.Y(), core.tileRect.Width(), core.tileRect.Height()),Qt::AlignCenter,(core.GettilePoint() == core.GetcenterTileXYLocation()? "CENTER: " :"TILE: ")+core.GettilePoint().ToString());
-
+                                    qDebug()<<"ShowTileGridLine:"<<core.GettilePoint().ToString()<<"=="<<core.GetcenterTileXYLocation().ToString();
                                 }
                             }
 

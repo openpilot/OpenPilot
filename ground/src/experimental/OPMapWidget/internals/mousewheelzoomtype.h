@@ -1,6 +1,8 @@
 #ifndef MOUSEWHEELZOOMTYPE_H
 #define MOUSEWHEELZOOMTYPE_H
-
+#include <QObject>
+#include <QStringList>
+#include <QMetaType>
 struct MouseWheelZoomType
 {
     enum Types
@@ -21,6 +23,11 @@ struct MouseWheelZoomType
         /// </summary>
         ViewCenter,
     };
+    static QStringList TypesStrList(){return strList;}
+    static Types TypeByStr(QString const& value){return (Types)MouseWheelZoomType::strList.indexOf(value);}
+private:
+    static QStringList strList;
 };
-
+Q_DECLARE_METATYPE(MouseWheelZoomType::Types)
 #endif // MOUSEWHEELZOOMTYPE_H
+

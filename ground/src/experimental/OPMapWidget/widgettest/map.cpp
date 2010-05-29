@@ -1,5 +1,4 @@
 #include "map.h"
-
 map::map(QWidget* parent)
 {
     mc= new OPMapControl();

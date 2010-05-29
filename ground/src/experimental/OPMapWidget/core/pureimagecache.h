@@ -32,7 +32,7 @@ public:
 private:
     QString gtilecache;
     QMutex Mcounter;
-
+    static qlonglong ConnCounter;
 };
-static qlonglong ConnCounter=0;
+
 #endif // PUREIMAGECACHE_H

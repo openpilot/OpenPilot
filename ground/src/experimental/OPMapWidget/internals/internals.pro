@@ -18,7 +18,8 @@ SOURCES += core.cpp \
     rectlatlng.cpp \
     sizelatlng.cpp \
     pointlatlng.cpp \
-    loadtask.cpp
+    loadtask.cpp \
+    MouseWheelZoomType.cpp
 HEADERS += ./projections/lks94projection.h \
     ./projections/mercatorprojection.h \
     ./projections/mercatorprojectionyandex.h \
@@ -30,4 +31,4 @@ SOURCES += ./projections/lks94projection.cpp \
     ./projections/platecarreeprojection.cpp \
     ./projections/platecarreeprojectionpergo.cpp
 LIBS += -L../build \
-    -lcore \
+    -lcore

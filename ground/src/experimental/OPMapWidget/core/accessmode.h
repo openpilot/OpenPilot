@@ -24,6 +24,4 @@ public:
     };
 
 };
-
-
 #endif // ACCESSMODE_H

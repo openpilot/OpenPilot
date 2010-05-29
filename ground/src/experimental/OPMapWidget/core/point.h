@@ -2,7 +2,7 @@
 #define POINT_H
 
 
-#include "QString"
+#include <QString>
 //#include "size.h"
 struct Size;
 struct Point
@@ -16,11 +16,11 @@ public:
     Point(int x,int y);
     Point(Size sz);
     Point(int dw);
-    bool IsEmpty(){return (x==-1 && y==-1);}
+    bool IsEmpty(){return empty;}
     int X()const{return this->x;}
     int Y()const{return this->y;}
-    void SetX(const int &value){x=value;}
-    void SetY(const int &value){y=value;}
+    void SetX(const int &value){x=value;empty=false;}
+    void SetY(const int &value){y=value;empty=false;}
     QString ToString()const{return "{"+QString::number(x)+","+QString::number(y)+"}";}
 
     static Point Empty;
@@ -39,6 +39,7 @@ public:
 private:
     int x;
     int y;
+    bool empty;
 };
 
 

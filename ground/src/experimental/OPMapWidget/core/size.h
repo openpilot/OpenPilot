@@ -7,7 +7,6 @@
 struct Size
 {
 
-public:
     Size();
     Size(Point pt){width=pt.X(); height=pt.Y();};
     Size(int Width,int Height){width=Width; height=Height;};

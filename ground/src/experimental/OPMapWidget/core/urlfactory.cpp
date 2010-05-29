@@ -77,7 +77,7 @@ void UrlFactory::TryCorrectGoogleVersions()
         reply=network.get(qheader);
         QTime time;
         time.start();
-        while( !(reply->isFinished() | time.elapsed()>(6*Timeout)) ){QCoreApplication::processEvents(QEventLoop::AllEvents);}
+        while( (!(reply->isFinished()) || (time.elapsed()>(6*Timeout))) ){QCoreApplication::processEvents(QEventLoop::AllEvents);}
         qDebug()<<"Finished?"<<reply->error()<<" abort?"<<(time.elapsed()>Timeout*6);
         if( (reply->error()!=QNetworkReply::NoError) | (time.elapsed()>Timeout*6))
         {
@@ -546,7 +546,7 @@ PointLatLng UrlFactory::GetLatLngFromGeocoderUrl(const QString &url, const bool 
         qDebug()<<"GetLatLngFromGeocoderUrl:URL="<<url;
         QTime time;
         time.start();
-        while( !(reply->isFinished() | time.elapsed()>(6*Timeout)) ){QCoreApplication::processEvents(QEventLoop::AllEvents);}
+        while( (!(reply->isFinished()) || (time.elapsed()>(6*Timeout))) ){QCoreApplication::processEvents(QEventLoop::AllEvents);}
         qDebug()<<"Finished?"<<reply->error()<<" abort?"<<(time.elapsed()>Timeout*6);
         if( (reply->error()!=QNetworkReply::NoError) | (time.elapsed()>Timeout*6))
         {
@@ -626,7 +626,7 @@ Placemark UrlFactory::GetPlacemarkFromReverseGeocoderUrl(const QString &url, con
         qDebug()<<"GetLatLngFromGeocoderUrl:URL="<<url;
         QTime time;
         time.start();
-        while( !(reply->isFinished() | time.elapsed()>(6*Timeout)) ){QCoreApplication::processEvents(QEventLoop::AllEvents);}
+        while( (!(reply->isFinished()) || (time.elapsed()>(6*Timeout))) ){QCoreApplication::processEvents(QEventLoop::AllEvents);}
         qDebug()<<"Finished?"<<reply->error()<<" abort?"<<(time.elapsed()>Timeout*6);
         if( (reply->error()!=QNetworkReply::NoError) | (time.elapsed()>Timeout*6))
         {

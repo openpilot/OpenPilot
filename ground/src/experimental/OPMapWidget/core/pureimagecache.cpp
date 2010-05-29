@@ -1,5 +1,7 @@
 #include "pureimagecache.h"
 
+qlonglong PureImageCache::ConnCounter=0;
+
 PureImageCache::PureImageCache()
 {
     gtilecache=QDir::currentPath()+QDir::separator()+"mapscache"+QDir::separator();
@@ -19,7 +21,6 @@ QString PureImageCache::GtileCache()
 bool PureImageCache::CreateEmptyDB(const QString &file)
 {
     qDebug()<<"Create database at:"<<file;
-    bool ret=true;
     QFileInfo File(file);
     QDir dir=File.absoluteDir();
     QString path=dir.absolutePath();

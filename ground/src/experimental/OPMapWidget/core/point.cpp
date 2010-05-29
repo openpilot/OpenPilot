@@ -4,18 +4,21 @@ Point::Point(int dw)
 {
     this->x=(short)Point::LOWORD(dw);
     this->y=(short)Point::HIWORD(dw);
+    empty=false;
 }
 Point::Point(Size sz)
 {
     this->x=sz.Width();
     this->y=sz.Height();
+    empty=false;
 }
 Point::Point(int x, int y)
 {
     this->x=x;
     this->y=y;
+    empty=false;
 }
-Point::Point():x(-1),y(-1)
+Point::Point():x(0),y(0),empty(true)
 {}
 uint qHash(Point const& point)
 {

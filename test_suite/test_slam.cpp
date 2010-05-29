@@ -49,7 +49,7 @@ using namespace boost;
 
 
 void test_slam01() {
-	ActiveSearchGrid acGrid(640, 480, 5, 5, 10);
+	ActiveSearchGrid asGrid(640, 480, 5, 5, 10);
 	vec2 imSz;
 	imSz(0) = 640; imSz(1) = 480;
 	vec4 k;
@@ -84,10 +84,6 @@ void test_slam01() {
 	senPtr21->pose.x(quaternion::originFrame());
 	senPtr21->set_parameters(imSz, k, d, c);
 
-	pinhole_ptr_t senPtrCopy;
-	senPtrCopy = senPtr11;
-
-
 	// Show empty map
 	cout << *mapPtr << endl;
 
@@ -99,8 +95,7 @@ void test_slam01() {
 	// create sen--lmk observation
 	// Temporal loop
 
-	//display::ViewerQt viewerQt;
-
+	// display::ViewerQt viewerQt;
 
 	for (int t = 1; t <= 3; t++) {
 
@@ -143,7 +138,7 @@ void test_slam01() {
 						vec2 pix = obsPtr->expectation.x();
 //						cout << "expected pixel: " << pix << endl;
 
-						acGrid.addPixel(pix);
+						asGrid.addPixel(pix);
 						obsPtr->counters.nSearch++;
 
 						// 1c. predict appearance
@@ -178,7 +173,7 @@ void test_slam01() {
 				if (mapPtr->unusedStates(LandmarkAnchoredHomogeneousPoint::size())) {
 
 					ROI roi;
-					if (acGrid.getROI(roi)){
+					if (asGrid.getROI(roi)){
 
 						feature_ptr_t featPtr(new FeatureAbstract(2));
 						if (ObservationPinHolePoint::detectInRoi(senPtr->getRaw(), roi, featPtr)){

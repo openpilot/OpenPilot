@@ -56,7 +56,6 @@ namespace jafar {
 			Q(_size_state, _size_state)
 		{
 			constantPerturbation = false;
-			id(robotIds.getId());
 			categoryName("ROBOT"); // robot is categorized
 		}
 

@@ -27,7 +27,6 @@ namespace jafar {
 		LandmarkAbstract::LandmarkAbstract(const map_ptr_t & _mapPtr, const size_t _size) :
 			MapObject(_mapPtr, _size)
 		{
-			id(landmarkIds.getId());
 			categoryName("LANDMARK");
 		}
 

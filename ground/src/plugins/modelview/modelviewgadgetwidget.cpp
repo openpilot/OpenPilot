@@ -25,6 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "modelviewgadgetwidget.h"
+#include "extensionsystem/pluginmanager.h"
 #include <iostream>
 
 ModelViewGadgetWidget::ModelViewGadgetWidget(QWidget *parent) 
@@ -48,11 +49,17 @@ ModelViewGadgetWidget::ModelViewGadgetWidget(QWidget *parent)
     m_MoverController= m_pFactory->createDefaultMoverController(repColor, &m_GlView);
 
     m_GlView.cameraHandle()->setDefaultUpVector(glc::Y_AXIS);
+    m_GlView.cameraHandle()->setRightView();
     //m_GlView.cameraHandle()->setIsoView();
+
+    // Get required UAVObjects
+    ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
+    attActual = AttitudeActual::GetInstance(objManager);
 
     // Create objects to display
     CreateScene();
-    connect(&m_MotionTimer, SIGNAL(timeout()), this, SLOT(rotateView()));
+    connect(&m_MotionTimer, SIGNAL(timeout()), this, SLOT(updateAttitude()));
 }
 
 ModelViewGadgetWidget::~ModelViewGadgetWidget()
@@ -78,7 +85,7 @@ void ModelViewGadgetWidget::initializeGL()
     m_GlView.setDistMinAndMax(m_World.boundingBox());
     glEnable(GL_NORMALIZE);
 
-    m_MotionTimer.start(60);
+    m_MotionTimer.start(100);
 }
 
 void ModelViewGadgetWidget::resizeEvent(QResizeEvent *event)
@@ -172,10 +179,20 @@ void ModelViewGadgetWidget::mouseReleaseEvent(QMouseEvent*)
 //////////////////////////////////////////////////////////////////////
 // Private slots Functions
 //////////////////////////////////////////////////////////////////////
-// Rotate the view
-void ModelViewGadgetWidget::rotateView()
+void ModelViewGadgetWidget::updateAttitude()
 {
-        m_GlView.cameraHandle()->rotateAroundTarget(glc::Y_AXIS, 2.0 * glc::PI / static_cast<double>(200));
-        updateGL();
+    // Reset view to zero angles
+    // NOTE: Some aircraft 3D models have different orientation and axis
+    m_GlView.cameraHandle()->setTopView();
+    m_GlView.cameraHandle()->rotateAroundTarget(glc::X_AXIS, 180.0*glc::PI/180.0);
+    m_GlView.cameraHandle()->rotateAroundTarget(glc::Z_AXIS, 90.0*glc::PI/180.0);
+    // Rotate to the actual angles (if a gimbal lock at yaw 90/270 deg, change sequence of rotations)
+    AttitudeActual::DataFields data = attActual->getData();
+    m_GlView.cameraHandle()->rotateAroundTarget(glc::Z_AXIS, data.Yaw*glc::PI/180.0);
+    m_GlView.cameraHandle()->rotateAroundTarget(glc::X_AXIS, data.Roll*glc::PI/180.0);
+    m_GlView.cameraHandle()->rotateAroundTarget(glc::Y_AXIS, -data.Pitch*glc::PI/180.0);
+    updateGL();
 }
+
+
 

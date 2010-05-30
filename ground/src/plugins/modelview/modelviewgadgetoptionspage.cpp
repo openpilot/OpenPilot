@@ -82,7 +82,7 @@ void ModelViewGadgetOptionsPage::finish()
 void ModelViewGadgetOptionsPage::changeAC()
 {
     QString ac = QFileDialog::getOpenFileName(qobject_cast<QWidget*>(this), 
-	tr("Model 3D File"), "../artwork/", tr("3D File (*.dae)") );
+        tr("Model 3D File"), "../artwork/", tr("3D File (*.dae *.3ds)") );
     m_config->setAcFilename(ac);
     m_acFileLabel->setText(ac);
 }

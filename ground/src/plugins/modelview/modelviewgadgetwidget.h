@@ -37,6 +37,9 @@
 #include <GLC_Light>
 #include <GLC_World>
 
+#include "uavobjects/uavobjectmanager.h"
+#include "uavobjects/attitudeactual.h"
+
 
 
 class ModelViewGadgetWidget : public QGLWidget
@@ -70,8 +73,7 @@ private:
 // Private slots Functions
 //////////////////////////////////////////////////////////////////////
 private slots:
-    //! Rotate the view
-    void rotateView();
+    void updateAttitude();
 
 private:
     GLC_Factory* m_pFactory;
@@ -85,6 +87,8 @@ private:
 
     QString acFilename;
     QString bgFilename;
+
+    AttitudeActual* attActual;
 };
 
 #endif /* MODELVIEWGADGETWIDGET_H_ */

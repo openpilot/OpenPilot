@@ -67,10 +67,10 @@ UAVObject::Metadata ActuatorDesired::getDefaultMetadata()
     UAVObject::Metadata metadata;
     metadata.flightAccess = ACCESS_READWRITE;
     metadata.gcsAccess = ACCESS_READWRITE;
-    metadata.gcsTelemetryAcked = 1;
+    metadata.gcsTelemetryAcked = 0;
     metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_MANUAL;
     metadata.gcsTelemetryUpdatePeriod = 0;
-    metadata.flightTelemetryAcked = 1;
+    metadata.flightTelemetryAcked = 0;
     metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
     metadata.flightTelemetryUpdatePeriod = 1000;
     metadata.loggingUpdateMode = UAVObject::UPDATEMODE_NEVER;

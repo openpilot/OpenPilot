@@ -75,7 +75,7 @@ UAVObject::Metadata ExampleObject2::getDefaultMetadata()
     metadata.gcsTelemetryUpdatePeriod = 0;
     metadata.flightTelemetryAcked = 1;
     metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
-    metadata.flightTelemetryUpdatePeriod = 100;
+    metadata.flightTelemetryUpdatePeriod = 500;
     metadata.loggingUpdateMode = UAVObject::UPDATEMODE_NEVER;
     metadata.loggingUpdatePeriod = 0;
     return metadata;

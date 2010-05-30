@@ -6,7 +6,7 @@
             <field name="Field4" units="unit4" type="float" elements="4"/>
             <access gcs="readwrite" flight="readwrite"/>
             <telemetrygcs acked="true" updatemode="onchange" period="0"/>
-            <telemetryflight acked="true" updatemode="periodic" period="100"/>
+            <telemetryflight acked="true" updatemode="periodic" period="500"/>
             <logging updatemode="never" period="0"/>
 	</object>
 </xml>

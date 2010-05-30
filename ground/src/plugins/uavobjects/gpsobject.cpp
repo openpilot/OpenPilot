@@ -49,6 +49,12 @@ GpsObject::GpsObject(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
     QStringList AltitudeElemNames;
     AltitudeElemNames.append("0");
     fields.append( new UAVObjectField(QString("Altitude"), QString("meters"), UAVObjectField::FLOAT32, AltitudeElemNames, QStringList()) );
+    QStringList HeadingElemNames;
+    HeadingElemNames.append("0");
+    fields.append( new UAVObjectField(QString("Heading"), QString("degrees"), UAVObjectField::FLOAT32, HeadingElemNames, QStringList()) );
+    QStringList GroundSpeedElemNames;
+    GroundSpeedElemNames.append("0");
+    fields.append( new UAVObjectField(QString("GroundSpeed"), QString("m/s"), UAVObjectField::FLOAT32, GroundSpeedElemNames, QStringList()) );
     QStringList SatellitesElemNames;
     SatellitesElemNames.append("0");
     fields.append( new UAVObjectField(QString("Satellites"), QString(""), UAVObjectField::INT8, SatellitesElemNames, QStringList()) );
@@ -82,10 +88,10 @@ UAVObject::Metadata GpsObject::getDefaultMetadata()
     UAVObject::Metadata metadata;
     metadata.flightAccess = ACCESS_READWRITE;
     metadata.gcsAccess = ACCESS_READWRITE;
-    metadata.gcsTelemetryAcked = 1;
+    metadata.gcsTelemetryAcked = 0;
     metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_MANUAL;
     metadata.gcsTelemetryUpdatePeriod = 0;
-    metadata.flightTelemetryAcked = 1;
+    metadata.flightTelemetryAcked = 0;
     metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
     metadata.flightTelemetryUpdatePeriod = 1000;
     metadata.loggingUpdateMode = UAVObject::UPDATEMODE_PERIODIC;

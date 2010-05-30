@@ -68,6 +68,26 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
+		'Heading',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'GroundSpeed',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
 		'Satellites',
 		'b',
 		1,
@@ -132,7 +152,7 @@ _fields = [ \
 
 class GpsObject(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 2363300180
+    OBJID        = 3887395742
     NAME         = "GpsObject"
     METANAME     = "GpsObjectMeta"
     ISSINGLEINST = 1

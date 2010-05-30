@@ -40,6 +40,7 @@
 #include "outputpane.h"
 #include "plugindialog.h"
 #include "shortcutsettings.h"
+#include "workspacesettings.h"
 #include "modemanager.h"
 #include "uavgadgetmode.h"
 #include "uavgadgetmanager.h"
@@ -123,6 +124,7 @@ MainWindow::MainWindow() :
     m_activeContext(0),
     m_generalSettings(new GeneralSettings),
     m_shortcutSettings(new ShortcutSettings),
+    m_workspaceSettings(new WorkspaceSettings),
     m_focusToEditor(0),
     m_newAction(0),
     m_openAction(0),
@@ -206,12 +208,15 @@ MainWindow::~MainWindow()
     }
     pm->removeObject(m_shortcutSettings);
     pm->removeObject(m_generalSettings);
+    pm->removeObject(m_workspaceSettings);
     delete m_messageManager;
     m_messageManager = 0;
     delete m_shortcutSettings;
     m_shortcutSettings = 0;
     delete m_generalSettings;
     m_generalSettings = 0;
+    delete m_workspaceSettings;
+    m_workspaceSettings = 0;
     delete m_settings;
     m_settings = 0;
     delete m_uniqueIDManager;
@@ -245,6 +250,7 @@ bool MainWindow::init(QString *errorMessage)
 
     pm->addObject(m_generalSettings);
     pm->addObject(m_shortcutSettings);
+    pm->addObject(m_workspaceSettings);
 
     return true;
 }
@@ -256,32 +262,11 @@ void MainWindow::modeChanged(Core::IMode */*mode*/)
 
 void MainWindow::extensionsInitialized()
 {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 
     m_uavGadgetInstanceManager = new UAVGadgetInstanceManager(this);
     m_uavGadgetInstanceManager->readConfigurations();
 
-    // Workspace 1
-    UAVGadgetMode *uavGadgetMode;
-    Core::UAVGadgetManager *m_uavGadgetManager;
-    m_uavGadgetManager = new Core::UAVGadgetManager(CoreImpl::instance(), this);
-    m_uavGadgetManager->hide();
-    uavGadgetMode = new UAVGadgetMode(m_uavGadgetManager, QString(tr("Workspace 1")),
-                                      QIcon(":/core/images/openpilot_logo_64.png"), 90, QString("Mode1"));
-    m_uavGadgetManager->setUAVGadgetMode(uavGadgetMode);
-    m_uavGadgetModes.append(uavGadgetMode);
-    pm->addObject(uavGadgetMode);
-    addUAVGadgetManager(m_uavGadgetManager);
-
-    // Workspace 2
-    m_uavGadgetManager = new Core::UAVGadgetManager(CoreImpl::instance(), this);
-    m_uavGadgetManager->hide();
-    uavGadgetMode = new UAVGadgetMode(m_uavGadgetManager, QString(tr("Workspace 2")),
-                                      QIcon(":/core/images/plus.png"), 60, QString("Mode2"));
-    m_uavGadgetManager->setUAVGadgetMode(uavGadgetMode);
-    m_uavGadgetModes.append(uavGadgetMode);
-    pm->addObject(uavGadgetMode);
-    addUAVGadgetManager(m_uavGadgetManager);
+    createWorkspaces();
 
     m_viewManager->extensionsInitalized();
 
@@ -902,6 +887,35 @@ void MainWindow::shutdown()
     disconnect(QApplication::instance(), SIGNAL(focusChanged(QWidget*,QWidget*)),
                this, SLOT(updateFocusWidget(QWidget*,QWidget*)));
     m_activeContext = 0;
+}
+
+void MainWindow::createWorkspaces() {
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+
+    m_settings->beginGroup(QLatin1String("Workspace"));
+    const int numberOfWorkspaces = m_settings->value(QLatin1String("NumberOfWorkspaces"), 2).toInt();
+
+    UAVGadgetMode *uavGadgetMode;
+    Core::UAVGadgetManager *m_uavGadgetManager;
+    for (int i = 1; i <= numberOfWorkspaces; ++i) {
+
+        m_uavGadgetManager = new Core::UAVGadgetManager(CoreImpl::instance(), this);
+        m_uavGadgetManager->hide();
+        QString numberString = QString::number(i);
+        QString defaultName = "Workspace" + numberString;
+        QString defaultIconName = "Icon" + numberString;
+        const QString name = m_settings->value(defaultName, defaultName).toString();
+        const QString iconName = m_settings->value(defaultIconName, ":/core/images/openpilot_logo_64.png").toString();
+
+        uavGadgetMode = new UAVGadgetMode(m_uavGadgetManager, name,
+                                          QIcon(iconName), 90-i, QString("Mode" + numberString));
+        m_uavGadgetManager->setUAVGadgetMode(uavGadgetMode);
+        m_uavGadgetModes.append(uavGadgetMode);
+        pm->addObject(uavGadgetMode);
+        addUAVGadgetManager(m_uavGadgetManager);
+    }
+
+    m_settings->endGroup();
 }
 
 static const char *settingsGroup = "MainWindow";

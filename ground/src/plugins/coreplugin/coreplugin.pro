@@ -59,7 +59,8 @@ SOURCES += mainwindow.cpp \
     iuavgadgetconfiguration.cpp \
     uavgadgetinstancemanager.cpp \
     uavgadgetoptionspagedecorator.cpp \
-    uavgadgetdecorator.cpp
+    uavgadgetdecorator.cpp \
+    workspacesettings.cpp
 HEADERS += mainwindow.h \
     tabpositionindicator.h \
     fancyactionbar.h \
@@ -115,11 +116,13 @@ HEADERS += mainwindow.h \
     iuavgadgetconfiguration.h \
     uavgadgetinstancemanager.h \
     uavgadgetoptionspagedecorator.h \
-    uavgadgetdecorator.h
+    uavgadgetdecorator.h \
+    workspacesettings.h
 FORMS += dialogs/settingsdialog.ui \
     dialogs/shortcutsettings.ui \
     generalsettings.ui \
-    uavgadgetoptionspage.ui
+    uavgadgetoptionspage.ui \
+    workspacesettings.ui
 RESOURCES += core.qrc \
     fancyactionbar.qrc
 unix:!macx { 

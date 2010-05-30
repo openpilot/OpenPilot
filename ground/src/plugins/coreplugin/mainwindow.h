@@ -69,6 +69,7 @@ class CoreImpl;
 class FancyTabWidget;
 class GeneralSettings;
 class ShortcutSettings;
+class WorkspaceSettings;
 class ViewManager;
 class VersionDialog;
 class UAVGadgetMode;
@@ -157,6 +158,7 @@ private:
     void registerDefaultContainers();
     void registerDefaultActions();
 
+    void createWorkspaces();
     void readSettings();
     void writeSettings();
 
@@ -187,6 +189,7 @@ private:
 
     GeneralSettings *m_generalSettings;
     ShortcutSettings *m_shortcutSettings;
+    WorkspaceSettings *m_workspaceSettings;
 
     // actions
     QShortcut *m_focusToEditor;

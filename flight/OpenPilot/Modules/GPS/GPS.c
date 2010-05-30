@@ -513,7 +513,7 @@ void nmeaProcessGPRMC(char* packet)
 	tokens = strsep(&packet, delimiter);
 	deg=strtol (tokens,&pEnd,10);
 	desim=strtol (pEnd+1,NULL,10);
-	GpsData.GroundSpeed = deg+(desim/100.0); //OPGPS style
+	GpsData.GroundSpeed = (deg+(desim/100.0))*0.51444; //OPGPS style to m/s
 
 	// next field: True course
 	// get True course

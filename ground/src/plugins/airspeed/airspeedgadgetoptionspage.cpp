@@ -74,6 +74,8 @@ QWidget *AirspeedGadgetOptionsPage::createPage(QWidget *parent)
     options_page->needle1Max->setValue(m_config->getN1Max());
     options_page->needle2Min->setValue(m_config->getN2Min());
     options_page->needle2Max->setValue(m_config->getN2Max());
+    options_page->factor1->setValue(m_config->getN1Factor());
+    options_page->factor2->setValue(m_config->getN2Factor());
 
     //select saved UAV Object field values
     if(options_page->uavObject1->findText(m_config->getN1DataObject())!=-1){
@@ -122,8 +124,10 @@ void AirspeedGadgetOptionsPage::apply()
     m_config->setDialNeedleID2(options_page->needle2ID->text());
     m_config->setN1Min(options_page->needle1Min->value());
     m_config->setN1Max(options_page->needle1Max->value());
+    m_config->setN1Factor(options_page->factor1->value());
     m_config->setN2Min(options_page->needle2Min->value());
     m_config->setN2Max(options_page->needle2Max->value());
+    m_config->setN2Factor(options_page->factor2->value());
     m_config->setN1DataObject(options_page->uavObject1->currentText());
     m_config->setN2DataObject(options_page->uavObject2->currentText());
     m_config->setN1ObjField(options_page->objectField1->currentText());

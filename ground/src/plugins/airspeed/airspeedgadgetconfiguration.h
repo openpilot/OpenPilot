@@ -51,6 +51,8 @@ public:
     void setN2Min(double val) { needle2MinValue = val;}
     void setN1Max(double val) { needle1MaxValue = val;}
     void setN2Max(double val) { needle2MaxValue = val;}
+    void setN1Factor(double val) { needle1Factor = val;}
+    void setN2Factor(double val) { needle2Factor = val;}
     void setN1DataObject(QString text) {needle1DataObject = text; }
     void setN2DataObject(QString text){ needle2DataObject = text; }
     void setN1ObjField(QString text) { needle1ObjectField = text; }
@@ -66,6 +68,8 @@ public:
     double getN2Min() { return needle2MinValue;}
     double getN1Max() { return needle1MaxValue;}
     double getN2Max() { return needle2MaxValue;}
+    double getN1Factor() { return needle1Factor;}
+    double getN2Factor() { return needle2Factor;}
     QString getN1DataObject() { return needle1DataObject; }
     QString getN2DataObject() { return needle2DataObject; }
     QString getN1ObjField() { return needle1ObjectField; }
@@ -88,6 +92,8 @@ private:
     double needle1MaxValue; // Value corresponding to a 360 degree angle;
     double needle2MinValue;
     double needle2MaxValue;
+    double needle1Factor;
+    double needle2Factor;
 
     QString needle1DataObject;
     QString needle1ObjectField;

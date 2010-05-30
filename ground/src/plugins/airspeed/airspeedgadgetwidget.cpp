@@ -52,7 +52,7 @@ AirspeedGadgetWidget::AirspeedGadgetWidget(QWidget *parent) : QGraphicsView(pare
 
     // This timer mechanism makes needles rotate smoothly
     connect(&dialTimer, SIGNAL(timeout()), this, SLOT(rotateNeedles()));
-    dialTimer.start(30);
+    dialTimer.start(20);
 
     // Test code for timer to rotate the needle
 #if 0
@@ -212,11 +212,11 @@ void AirspeedGadgetWidget::resizeEvent(QResizeEvent *event)
 // Converts the value into an angle:
 // this enables smooth rotation in rotateNeedles below
 void AirspeedGadgetWidget::setNeedle1(double value) {
-    needle1Target = 360*value/(n1MaxValue-n1MinValue);
+    needle1Target = 360*value*n1Factor/(n1MaxValue-n1MinValue);
 }
 
 void AirspeedGadgetWidget::setNeedle2(double value) {
-    needle2Target = 360*value/(n2MaxValue-n2MinValue);
+    needle2Target = 360*value*n2Factor/(n2MaxValue-n2MinValue);
 }
 
 
@@ -227,7 +227,7 @@ void AirspeedGadgetWidget::setNeedle2(double value) {
 void AirspeedGadgetWidget::rotateNeedles()
 {
     if ((abs((needle2Value-needle2Target)*10) > 5) && n2enabled) {
-        needle2Value+=(needle2Target - needle2Value)/10;
+        needle2Value+=(needle2Target - needle2Value)/5;
         m_needle2->resetTransform();
         QRectF rect = m_needle2->boundingRect();
         m_needle2->translate(rect.width()/2,rect.height()/2);
@@ -236,7 +236,7 @@ void AirspeedGadgetWidget::rotateNeedles()
     }
 
     if ((abs((needle1Value-needle1Target)*10) > 5)) {
-        needle1Value += (needle1Target - needle1Value)/10;
+        needle1Value += (needle1Target - needle1Value)/5;
        m_needle1->resetTransform();
        QRectF rect = m_needle1->boundingRect();
        m_needle1->translate(rect.width()/2,rect.height()/2);

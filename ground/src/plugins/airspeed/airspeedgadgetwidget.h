@@ -54,8 +54,10 @@ public:
    void setNeedle2(double value);
    void setN1Min(double value) {n1MinValue = value;}
    void setN1Max(double value) {n1MaxValue = value;}
+   void setN1Factor(double value) {n1Factor = value;}
    void setN2Min(double value) {n2MinValue = value;}
    void setN2Max(double value) {n2MaxValue = value;}
+   void setN2Factor(double value) {n2Factor = value;}
    // Sets up needle/UAVObject connections:
    void connectNeedles(QString object1, QString field1,
                        QString object2, QString field2);
@@ -86,8 +88,10 @@ private:
 
    double n1MinValue;
    double n1MaxValue;
+   double n1Factor;
    double n2MinValue;
    double n2MaxValue;
+   double n2Factor;
 
    // The Value and target variables
    // are expressed in degrees

@@ -39,10 +39,12 @@ AirspeedGadgetConfiguration::AirspeedGadgetConfiguration(QString classId, const 
     dialForegroundID("foreground"),
     dialNeedleID1("needle"),
     dialNeedleID2("needle-2"),
-    needle1MinValue(0.001),
+    needle1MinValue(0),
     needle1MaxValue(100),
-    needle2MinValue(0.001),
-    needle2MaxValue(100)
+    needle2MinValue(0),
+    needle2MaxValue(100),
+    needle1Factor(1),
+    needle2Factor(1)
 {
     //if a saved configuration exists load it
     if (state.count() > 0) {
@@ -62,6 +64,8 @@ AirspeedGadgetConfiguration::AirspeedGadgetConfiguration(QString classId, const 
         stream >> needle1ObjectField;
         stream >> needle2DataObject;
         stream >> needle2ObjectField;
+        stream >> needle1Factor;
+        stream >> needle2Factor;
 
     }
 }
@@ -96,6 +100,8 @@ QByteArray AirspeedGadgetConfiguration::saveState() const
     stream << needle1ObjectField;
     stream << needle2DataObject;
     stream << needle2ObjectField;
+    stream << needle1Factor;
+    stream << needle2Factor;
 
     return bytes;
 }

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>486</width>
-    <height>300</height>
+    <width>487</width>
+    <height>326</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,7 +25,7 @@
      <x>-1</x>
      <y>-1</y>
      <width>481</width>
-     <height>339</height>
+     <height>354</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0,0">
@@ -114,6 +114,9 @@
     </item>
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="spacing">
+       <number>4</number>
+      </property>
       <property name="rightMargin">
        <number>0</number>
       </property>
@@ -121,11 +124,57 @@
        <number>10</number>
       </property>
       <item>
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Indicator 1</string>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Indicator 1</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>ID:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="needle1ID">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -133,26 +182,9 @@
          <number>10</number>
         </property>
         <item>
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>ID</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="needle1ID">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QLabel" name="label_6">
           <property name="text">
-           <string>Min</string>
+           <string>Min:</string>
           </property>
          </widget>
         </item>
@@ -178,7 +210,7 @@
         <item>
          <widget class="QLabel" name="label_7">
           <property name="text">
-           <string>Max</string>
+           <string>Max:</string>
           </property>
          </widget>
         </item>
@@ -194,7 +226,30 @@
            <number>3</number>
           </property>
           <property name="minimum">
-           <double>0.001000000000000</double>
+           <double>-100000.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>100000.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_10">
+          <property name="text">
+           <string>Factor:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QDoubleSpinBox" name="factor1">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimum">
+           <double>-100000.000000000000000</double>
           </property>
           <property name="maximum">
            <double>100000.000000000000000</double>
@@ -262,21 +317,31 @@
        <number>10</number>
       </property>
       <item>
-       <widget class="QLabel" name="label_16">
-        <property name="text">
-         <string>Indicator 2</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_7">
-        <property name="topMargin">
-         <number>10</number>
-        </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QLabel" name="label_16">
+          <property name="text">
+           <string>Indicator 2</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
         <item>
          <widget class="QLabel" name="label_17">
           <property name="text">
-           <string>ID</string>
+           <string>ID:</string>
           </property>
          </widget>
         </item>
@@ -290,10 +355,17 @@
           </property>
          </widget>
         </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_7">
+        <property name="topMargin">
+         <number>10</number>
+        </property>
         <item>
          <widget class="QLabel" name="label_18">
           <property name="text">
-           <string>Min</string>
+           <string>Min:</string>
           </property>
          </widget>
         </item>
@@ -319,7 +391,7 @@
         <item>
          <widget class="QLabel" name="label_19">
           <property name="text">
-           <string>Max</string>
+           <string>Max:</string>
           </property>
          </widget>
         </item>
@@ -335,7 +407,30 @@
            <number>3</number>
           </property>
           <property name="minimum">
-           <double>0.001000000000000</double>
+           <double>-100000.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>100000.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_11">
+          <property name="text">
+           <string>Factor:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QDoubleSpinBox" name="factor2">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimum">
+           <double>-100000.000000000000000</double>
           </property>
           <property name="maximum">
            <double>100000.000000000000000</double>

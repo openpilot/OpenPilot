@@ -1,12 +1,12 @@
 /**
  ******************************************************************************
  *
- * @file       uavtalkplugin.h
+ * @file       uavobjects_global.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
  * @brief      
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup   uavobjects_plugin
  * @{
  * 
  *****************************************************************************/
@@ -25,37 +25,16 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef UAVTALKPLUGIN_H
-#define UAVTALKPLUGIN_H
 
-#include <extensionsystem/iplugin.h>
-#include <extensionsystem/pluginmanager.h>
-#include <QtPlugin>
-#include "telemetrymonitor.h"
-#include "telemetry.h"
-#include "uavtalk.h"
-#include "telemetrymanager.h"
-#include "uavobjects/uavobjectmanager.h"
+#ifndef UAVTALK_GLOBAL_H
+#define UAVTALK_GLOBAL_H
 
-class UAVTALK_EXPORT UAVTalkPlugin: public ExtensionSystem::IPlugin
-{
-    Q_OBJECT
+#include <QtCore/qglobal.h>
 
-public:
-    UAVTalkPlugin();
-    ~UAVTalkPlugin();
+#if defined(UAVTALK_LIBRARY)
+#  define UAVTALK_EXPORT Q_DECL_EXPORT
+#else
+#  define UAVTALK_EXPORT Q_DECL_IMPORT
+#endif
 
-    void extensionsInitialized();
-    bool initialize(const QStringList & arguments, QString * errorString);
-    void shutdown();
-
-protected slots:
-    void onDeviceConnect(QIODevice *dev);
-    void onDeviceDisconnect();
-
-private:
-    UAVObjectManager* objMngr;
-    TelemetryManager* telMngr;
-};
-
-#endif // UAVTALKPLUGIN_H
+#endif // UAVTALK_GLOBAL_H

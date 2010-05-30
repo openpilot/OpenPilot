@@ -46,6 +46,10 @@ void UAVTalkPlugin::extensionsInitialized()
     ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
     objMngr = pm->getObject<UAVObjectManager>();
 
+    // Create TelemetryManager
+    telMngr = new TelemetryManager();
+    addAutoReleasedObject(telMngr);
+
     // Connect to connection manager so we get notified when the user connect to his device
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
     QObject::connect(cm, SIGNAL(deviceConnected(QIODevice *)),
@@ -69,16 +73,12 @@ void UAVTalkPlugin::shutdown()
 
 void UAVTalkPlugin::onDeviceConnect(QIODevice *dev)
 {
-    utalk = new UAVTalk(dev, objMngr);
-    telemetry = new Telemetry(utalk, objMngr);
-    telemetryMon = new TelemetryMonitor(objMngr, telemetry);
+    telMngr->start(dev);
 }
 
 void UAVTalkPlugin::onDeviceDisconnect()
 {
-    delete telemetryMon;
-    delete telemetry;
-    delete utalk;
+    telMngr->stop();
 }
 
 Q_EXPORT_PLUGIN(UAVTalkPlugin)

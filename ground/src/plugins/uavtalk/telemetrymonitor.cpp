@@ -116,6 +116,7 @@ void TelemetryMonitor::retrieveNextObject()
     if ( queue.isEmpty() )
     {
         qxtLog->debug("Object retrieval completed");
+        emit connected();
         return;
     }
     // Get next object from the queue
@@ -247,6 +248,7 @@ void TelemetryMonitor::processStatsUpdates()
         statsTimer->setInterval(STATS_CONNECT_PERIOD_MS);
         qxtLog->info("Connection with the autopilot lost");
         qxtLog->info("Trying to connect to the autopilot");
+        emit disconnected();
     }
 }
 

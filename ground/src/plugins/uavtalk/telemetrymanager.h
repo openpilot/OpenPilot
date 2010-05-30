@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       telemetrymonitor.cpp
+ * @file       telemetrymanager.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
  * @brief
@@ -26,55 +26,41 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef TELEMETRYMONITOR_H
-#define TELEMETRYMONITOR_H
+#ifndef TELEMETRYMANAGER_H
+#define TELEMETRYMANAGER_H
 
-#include <QObject>
-#include <QQueue>
-#include <QTimer>
-#include <QTime>
-#include <QMutex>
-#include <QMutexLocker>
-#include "uavobjects/uavobjectmanager.h"
-#include "uavobjects/gcstelemetrystats.h"
-#include "uavobjects/flighttelemetrystats.h"
-#include "uavobjects/systemstats.h"
+#include "uavtalk_global.h"
+#include "telemetrymonitor.h"
 #include "telemetry.h"
+#include "uavtalk.h"
+#include "uavobjects/uavobjectmanager.h"
+#include <QIODevice>
+#include <QObject>
 
-class TelemetryMonitor : public QObject
+class UAVTALK_EXPORT TelemetryManager: public QObject
 {
     Q_OBJECT
 
 public:
-    TelemetryMonitor(UAVObjectManager* objMngr, Telemetry* tel);
+    TelemetryManager();
+    ~TelemetryManager();
+
+    void start(QIODevice *dev);
+    void stop();
 
 signals:
     void connected();
     void disconnected();
 
-public slots:
-    void transactionCompleted(UAVObject* obj, bool success);
-    void processStatsUpdates();
-    void flightStatsUpdated(UAVObject* obj);
+private slots:
+    void onConnect();
+    void onDisconnect();
 
 private:
-    static const int STATS_UPDATE_PERIOD_MS = 4000;
-    static const int STATS_CONNECT_PERIOD_MS = 1000;
-    static const int CONNECTION_TIMEOUT_MS = 8000;
-
     UAVObjectManager* objMngr;
-    Telemetry* tel;
-    QQueue<UAVObject*> queue;
-    GCSTelemetryStats* gcsStatsObj;
-    FlightTelemetryStats* flightStatsObj;
-    QTimer* statsTimer;
-    UAVObject* objPending;
-    QMutex* mutex;
-    QTime* connectionTimer;
-
-    void startRetrievingObjects();
-    void retrieveNextObject();
-    void stopRetrievingObjects();
+    UAVTalk* utalk;
+    Telemetry* telemetry;
+    TelemetryMonitor* telemetryMon;
 };
 
-#endif // TELEMETRYMONITOR_H
+#endif // TELEMETRYMANAGER_H

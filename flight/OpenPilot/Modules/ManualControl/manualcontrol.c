@@ -192,13 +192,27 @@ static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutr
 {
 	float valueScaled;
 	// Scale
-	if ( value >= neutral)
+	if ( (max > min && value >= neutral) || (min > max && value <= neutral) )
 	{
-		valueScaled = (float)(value-neutral)/(float)(max-neutral);
+		if ( max != neutral )
+		{
+			valueScaled = (float)(value-neutral)/(float)(max-neutral);
+		}
+		else
+		{
+			valueScaled = 0;
+		}
 	}
 	else
 	{
-		valueScaled = (float)(value-neutral)/(float)(neutral-min);
+		if ( min != neutral )
+		{
+			valueScaled = (float)(value-neutral)/(float)(neutral-min);
+		}
+		else
+		{
+			valueScaled = 0;
+		}
 	}
 	// Bound
 	if ( valueScaled > 1.0 )

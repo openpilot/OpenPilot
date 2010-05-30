@@ -511,10 +511,16 @@ void nmeaProcessGPRMC(char* packet)
 	// next field: speed (knots)
 	// get speed in knots
 	tokens = strsep(&packet, delimiter);
+	deg=strtol (tokens,&pEnd,10);
+	desim=strtol (pEnd+1,NULL,10);
+	GpsData.GroundSpeed = deg+(desim/100.0); //OPGPS style
 
 	// next field: True course
 	// get True course
 	tokens = strsep(&packet, delimiter);
+	deg=strtol (tokens,&pEnd,10);
+	desim=strtol (pEnd+1,NULL,10);
+	GpsData.Heading = deg+(desim/100.0); //OPGPS style
 
 	// next field: Date of fix
 	// get Date of fix

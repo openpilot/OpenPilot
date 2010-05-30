@@ -47,6 +47,7 @@ SUBDIRS += plugin_emptygadget
 # Map UAVGadget
 plugin_map.subdir = map
 plugin_map.depends = plugin_coreplugin
+plugin_map.depends = plugin_uavobjects
 SUBDIRS += plugin_map
 
 # Scope UAVGadget
@@ -54,16 +55,17 @@ plugin_scope.subdir = scope
 plugin_scope.depends = plugin_coreplugin
 SUBDIRS += plugin_scope
 
-# ModelView UAVGadget
-plugin_modelview.subdir = modelview
-plugin_scope.depends = plugin_coreplugin
-SUBDIRS += plugin_modelview
-
 # UAVObject Browser Gadget
 plugin_uavobjectbrowser.subdir = uavobjectbrowser
 plugin_uavobjectbrowser.depends = plugin_coreplugin
 plugin_uavobjectbrowser.depends = plugin_uavobjects
 SUBDIRS += plugin_uavobjectbrowser
+
+# ModelView UAVGadget
+plugin_modelview.subdir = modelview
+plugin_modelview.depends = plugin_coreplugin
+plugin_modelview.depends = plugin_uavobjects
+SUBDIRS += plugin_modelview
 
 #Uploader Gadget
 plugin_uploader.subdir = uploader
@@ -91,4 +93,11 @@ SUBDIRS += plugin_systemhealth
 plugin_config.subdir = config
 plugin_config.depends = plugin_coreplugin
 SUBDIRS += plugin_config
+
+#HITL simulation Gadget
+plugin_hitl.subdir = hitl
+plugin_hitl.depends = plugin_coreplugin
+plugin_hitl.depends += plugin_uavobjects
+plugin_hitl.depends += plugin_uavtalk
+SUBDIRS += plugin_hitl
 

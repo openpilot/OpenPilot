@@ -3,6 +3,7 @@ TARGET = MapGadget
 include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
 include(../../libs/qmapcontrol/qmapcontrol.pri)
+include(../../plugins/uavobjects/uavobjects.pri)
 HEADERS += mapplugin.h \
     mapgadgetconfiguration.h \
     mapgadget.h \

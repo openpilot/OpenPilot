@@ -30,7 +30,8 @@
 
 #include "qmapcontrol/qmapcontrol.h"
 #include <QtGui/QWidget>
-
+#include "uavobjects/uavobjectmanager.h"
+#include "uavobjects/gpsobject.h"
 
 using namespace qmapcontrol;
 
@@ -49,6 +50,9 @@ public:
 protected:
    void resizeEvent(QResizeEvent *event);
 
+private slots:
+   void updatePosition();
+
 private:
    void addZoomButtons();
 
@@ -61,6 +65,8 @@ private:
    Layer *m_googleLayer;
    Layer *m_googleSatLayer;
    Layer *m_yahooLayer;
+   QTimer *m_updateTimer;
+   GpsObject *m_gpsObj;
 };
 
 #endif /* MAPGADGETWIDGET_H_ */

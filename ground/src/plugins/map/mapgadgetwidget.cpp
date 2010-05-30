@@ -28,6 +28,7 @@
 #include <QStringList>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
+#include "extensionsystem/pluginmanager.h"
 
 MapGadgetWidget::MapGadgetWidget(QWidget *parent) : QWidget(parent)
 {
@@ -63,6 +64,16 @@ MapGadgetWidget::MapGadgetWidget(QWidget *parent) : QWidget(parent)
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_mc);
     setLayout(layout);
+
+    // Get required UAVObjects
+    ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
+    m_gpsObj = GpsObject::GetInstance(objManager);
+
+    m_updateTimer = new QTimer();
+    m_updateTimer->setInterval(250);
+    connect(m_updateTimer, SIGNAL(timeout()), this, SLOT(updatePosition()));
+    m_updateTimer->start();
 }
 
 MapGadgetWidget::~MapGadgetWidget()
@@ -79,6 +90,12 @@ void MapGadgetWidget::setPosition(QPointF pos)
 {
     m_mc->setView(pos);
     m_mc->updateRequestNew();
+}
+
+void MapGadgetWidget::updatePosition()
+{
+    GpsObject::DataFields data = m_gpsObj->getData();
+    setPosition(QPointF(data.Longitude, data.Latitude));
 }
 
 void MapGadgetWidget::setMapProvider(QString provider)

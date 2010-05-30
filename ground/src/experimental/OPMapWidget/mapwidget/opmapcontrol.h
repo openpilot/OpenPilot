@@ -15,13 +15,16 @@ class OPMapControl:public QWidget
     Q_PROPERTY(int MinZoom READ MinZoom WRITE SetMinZoom)
     Q_PROPERTY(MouseWheelZoomType::Types MouseWheelZoom READ GetMouseWheelZoomType WRITE SetMouseWheelZoomType)
     Q_PROPERTY(QString MouseWheelZoomStr READ GetMouseWheelZoomTypeStr WRITE SetMouseWheelZoomTypeByStr)
-
+    Q_PROPERTY(bool ShowTileGridLines READ ShowTileGridLines WRITE SetShowTileGridLines)
 public:
     OPMapControl(QWidget *parent=0);
     QBrush EmptytileBrush;
     QString EmptyTileText;
     QPen EmptyTileBorders;
-    bool ShowTileGridLines;
+    QPen ScalePen;
+    QPen SelectionPen;
+    bool ShowTileGridLines()const {return showTileGridLines;}
+    void SetShowTileGridLines(bool const& value){showTileGridLines=value;this->repaint();}
     int MaxZoom()const{return maxZoom;}
     void SetMaxZoom(int const& value){maxZoom = value;}
     int MinZoom()const{return minZoom;}
@@ -30,6 +33,15 @@ public:
     void SetMouseWheelZoomType(MouseWheelZoomType::Types const& value){core.SetMouseWheelZoomType(value);}
     void SetMouseWheelZoomTypeByStr(const QString &value){core.SetMouseWheelZoomType(MouseWheelZoomType::TypeByStr(value));}
     QString GetMouseWheelZoomTypeStr(){return MouseWheelZoomType::TypesStrList().at((int)core.GetMouseWheelZoomType());}
+    bool MapScaleInfoEnabled;
+    Qt::MouseButton DragButton;
+    RectLatLng SelectedArea()const{return selectedArea;}
+    void SetSelectedArea(RectLatLng const& value){selectedArea = value;this->repaint();}
+    RectLatLng BoundsOfMap;
+    void Offset(int const& x, int const& y);
+    bool CanDragMap()const{return core.CanDragMap;}
+    void SetCanDragMap(bool const& value){core.CanDragMap = value;}
+
 protected:
     void paintEvent ( QPaintEvent* evnt );
     void mousePressEvent ( QMouseEvent* evnt );
@@ -37,7 +49,12 @@ protected:
     void mouseMoveEvent ( QMouseEvent* evnt );
     void resizeEvent ( QResizeEvent * event );
     void showEvent ( QShowEvent * event );
+    void closeEvent ( QCloseEvent * event );
+    bool IsDragging()const{return core.IsDragging();}
+    bool IsMouseOverMarker()const{return isMouseOverMarker;}
+
 private:
+    bool showTileGridLines;
     Core core;
     qreal MapRenderTransform;
     void DrawMap2D(QPainter &painter);
@@ -45,6 +62,14 @@ private:
     void resize();
     int maxZoom;
     int minZoom;
+    RectLatLng selectedArea;
+    PointLatLng selectionStart;
+    PointLatLng selectionEnd;
+    double zoomReal;
+    bool isSelected;
+    bool isMouseOverMarker;
+    void SetIsMouseOverMarker(bool const& value){isMouseOverMarker = value;}
+    PointLatLng FromLocalToLatLng(int x, int y);
 private slots:
     void Core_OnNeedInvalidation();
 };

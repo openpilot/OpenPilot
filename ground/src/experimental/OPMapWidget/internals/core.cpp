@@ -8,6 +8,7 @@ Core::Core():currentPosition(0,0),currentPositionPixel(0,0),LastLocationInBounds
     this->setAutoDelete(false);
     renderOffset=Point(0,0);
     dragPoint=Point(0,0);
+    CanDragMap=true;
 }
 void Core::run()
 {
@@ -509,6 +510,7 @@ void Core::UpdateBounds()
                     if(!tileLoadQueue.contains(task))
                     {
                         tileLoadQueue.enqueue(task);
+                        qDebug()<<"Core::UpdateBounds new Task"<<task.Pos.ToString();
                         ProcessLoadTaskCallback.start(this);
                     }
                 }
@@ -551,10 +553,7 @@ void Core::FindTilesAround(QList<Point> &list)
             }
          }
 
-//         if(GMaps::Instance()->ShuffleTilesOnLoad)
-//         {
-//            Stuff.Shuffle<Point>(list);
-//         }
+
       }
 void Core::UpdateGroundResolution()
 {

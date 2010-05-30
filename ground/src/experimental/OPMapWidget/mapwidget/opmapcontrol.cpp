@@ -1,15 +1,20 @@
 #include "opmapcontrol.h"
 
-OPMapControl::OPMapControl(QWidget *parent):QWidget(parent),MapRenderTransform(1), maxZoom(2),minZoom(2)
+OPMapControl::OPMapControl(QWidget *parent):QWidget(parent),MapRenderTransform(1), maxZoom(2),minZoom(2),zoomReal(0),isSelected(false)
 {
-    EmptytileBrush = Qt::blue;
+    EmptytileBrush = Qt::cyan;
     MissingDataFont =QFont ("Times",10,QFont::Bold);
     EmptyTileText = "We are sorry, but we don't\nhave imagery at this zoom\nlevel for this region.";
     EmptyTileBorders = QPen(Qt::white);
-    ShowTileGridLines=true;
+    ScalePen = QPen(Qt::blue);
+    SelectionPen = QPen(Qt::blue);
+    MapScaleInfoEnabled = true;
+    showTileGridLines=true;
+    DragButton = Qt::RightButton;
+    isMouseOverMarker=false;
     core.SetCurrentRegion(Rectangle(-50, -50, this->width()+100, this->height()+100));
     core.SetMapType(MapType::GoogleSatellite);
-    core.SetZoom(2);
+    core.SetZoom(3);
     connect(&core,SIGNAL(OnNeedInvalidation()),this,SLOT(Core_OnNeedInvalidation()));
 
 
@@ -93,7 +98,7 @@ void OPMapControl::DrawMap2D(QPainter &painter)
                                }
                             }
 
-                            if(ShowTileGridLines)
+                            if(showTileGridLines)
                             {
                                 painter.setPen(EmptyTileBorders);
                                 painter.drawRect(core.tileRect.X(), core.tileRect.Y(), core.tileRect.Width(), core.tileRect.Height());
@@ -130,9 +135,40 @@ void OPMapControl::DrawMap2D(QPainter &painter)
 
 void OPMapControl::mousePressEvent ( QMouseEvent* evnt )
 {
+    if(!IsMouseOverMarker())
+            {
+               if(evnt->button() == DragButton && CanDragMap())
+               {
+                  core.mouseDown.SetX(evnt->x());
+                  core.mouseDown.SetY(evnt->y());
 
+
+                  this->setCursor(Qt::SizeAllCursor);
+
+                  core.BeginDrag(core.mouseDown);
+                    this->repaint();
+
+               }
+               else if(!isSelected)
+               {
+                  isSelected = true;
+                  SetSelectedArea (RectLatLng::Empty);
+                  selectionEnd = PointLatLng::Empty;
+                  selectionStart = FromLocalToLatLng(evnt->x(), evnt->y());
+               }
+            }
+
+    QWidget::mousePressEvent(evnt);
 }
-
+PointLatLng OPMapControl::FromLocalToLatLng(int x, int y)
+{
+    if(MapRenderTransform!=-1)
+    {
+        x = (int) (x * MapRenderTransform);
+        y = (int) (y * MapRenderTransform);
+    }
+    return core.FromLocalToLatLng(x, y);
+}
 void OPMapControl::mouseReleaseEvent ( QMouseEvent* evnt )
 {
 
@@ -140,7 +176,16 @@ void OPMapControl::mouseReleaseEvent ( QMouseEvent* evnt )
 
 void OPMapControl::mouseMoveEvent ( QMouseEvent* evnt )
 {
+    if(core.IsDragging())
+            {
+                  core.mouseCurrent.SetX(evnt->x());
+                  core.mouseCurrent.SetY(evnt->y());
 
+                  {
+                     core.Drag(core.mouseCurrent);
+                  }
+
+            }
 }
 void OPMapControl::resizeEvent ( QResizeEvent * event )
 {
@@ -156,4 +201,13 @@ void OPMapControl::resize()
     {
         core.GoToCurrentPosition();
     }
+}
+void OPMapControl::Offset(int const& x, int const& y)
+{
+    core.DragOffset(Point(x, y));
+}
+void OPMapControl::closeEvent(QCloseEvent *event)
+{
+    core.OnMapClose();
+    event->accept();
 }

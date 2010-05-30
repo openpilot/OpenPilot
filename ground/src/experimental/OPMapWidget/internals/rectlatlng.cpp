@@ -1,8 +1,6 @@
 #include "rectlatlng.h"
 
-RectLatLng::RectLatLng():lng(0),lat(0),widthLng(0),heightLat(0)
-{
-}
+
 RectLatLng RectLatLng::Empty=RectLatLng();
 uint qHash(RectLatLng const& rect)
 {

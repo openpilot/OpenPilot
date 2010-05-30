@@ -44,6 +44,7 @@ void TileMatrix::ClearPointsNotIn(QList<Point>list)
 }
 Tile* TileMatrix::TileAt(const Point &p)
 {
+
     qDebug()<<"TileMatrix:TileAt:"<<p.ToString();
     Tile* ret;
     mutex.lock();

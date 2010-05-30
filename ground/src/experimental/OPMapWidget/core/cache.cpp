@@ -31,14 +31,20 @@ Cache::Cache()
 }
 QString Cache::GetGeocoderFromCache(const QString &urlEnd)
 {
+#ifdef DEBUG_GetGeocoderFromCache
     qDebug()<<"Entered GetGeocoderFromCache";
+#endif
     QString ret=QString::null;
     QString filename=geoCache+QString(urlEnd)+".geo";
+#ifdef DEBUG_GetGeocoderFromCache
     qDebug()<<"GetGeocoderFromCache: Does file exist?:"<<filename;
+#endif
     QFileInfo File(filename);
     if (File .exists())
     {
+#ifdef DEBUG_GetGeocoderFromCache
         qDebug()<<"GetGeocoderFromCache:File exists!!";
+#endif
         QFile file(filename);
         if (file.open(QIODevice::ReadOnly))
         {
@@ -47,7 +53,9 @@ QString Cache::GetGeocoderFromCache(const QString &urlEnd)
             stream>>ret;
         }
     }
+#ifdef DEBUG_GetGeocoderFromCache
     qDebug()<<"GetGeocoderFromCache:Returning:"<<ret;
+#endif
     return ret;
 }
 void Cache::CacheGeocoder(const QString &urlEnd, const QString &content)

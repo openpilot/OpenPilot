@@ -93,7 +93,7 @@ public:
         projection=value;
         tileRect=Rectangle(Point(0,0),value->TileSize());
     }
-    bool IsDragging(){return isDragging;}
+    bool IsDragging()const{return isDragging;}
 
     int Zoom(){return zoom;}
 
@@ -147,6 +147,9 @@ public:
     TileMatrix Matrix;
 
     Rectangle tileRect;
+    Point mouseDown;
+    bool CanDragMap;
+    Point mouseCurrent;
 signals:
     void OnCurrentPositionChanged(PointLatLng point);
     void OnTileLoadComplete();
@@ -156,6 +159,7 @@ signals:
     void OnMapTypeChanged(MapType::Types type);
     void OnEmptyTileError(int zoom, Point pos);
     void OnNeedInvalidation();
+
 private:
 
     PointLatLng currentPosition;
@@ -164,8 +168,8 @@ private:
     Point centerTileXYLocation;
     Point centerTileXYLocationLast;
     Point dragPoint;
-    Point mouseDown;
-    Point mouseCurrent;
+
+
     Point mouseLastZoom;
 
     MouseWheelZoomType::Types mousewheelzoomtype;

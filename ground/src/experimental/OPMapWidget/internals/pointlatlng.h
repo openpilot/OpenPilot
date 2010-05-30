@@ -17,7 +17,7 @@ struct PointLatLng
    private:
     double lat;
     double lng;
-
+    bool empty;
    public:
     PointLatLng();
 
@@ -28,11 +28,12 @@ struct PointLatLng
       {
          this->lat = lat;
          this->lng = lng;
+         empty=false;
       }
 
       bool IsEmpty()
       {
-            return ((this->lng == 0) && (this->lat == 0));
+            return empty;
       }
 
       double Lat()const
@@ -43,6 +44,7 @@ struct PointLatLng
       void SetLat(const double &value)
       {
           this->lat = value;
+          empty=false;
       }
 
 
@@ -53,6 +55,7 @@ struct PointLatLng
       void SetLng(const double &value)
       {
           this->lng = value;
+          empty=false;
       }
 
 

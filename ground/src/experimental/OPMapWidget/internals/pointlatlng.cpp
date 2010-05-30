@@ -1,7 +1,7 @@
 #include "pointlatlng.h"
 
 PointLatLng PointLatLng::Empty=PointLatLng();
-PointLatLng::PointLatLng():lat(0),lng(0)
+PointLatLng::PointLatLng():lat(0),lng(0),empty(true)
 {
 
 }

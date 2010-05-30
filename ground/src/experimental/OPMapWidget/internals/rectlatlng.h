@@ -9,7 +9,6 @@
 struct RectLatLng
 {
 public:
-    RectLatLng();
     static RectLatLng Empty;
     friend uint qHash(RectLatLng const& rect);
     friend bool operator==(RectLatLng const& left,RectLatLng const& right);
@@ -20,6 +19,7 @@ public:
         this->lat = lat;
         this->widthLng = widthLng;
         this->heightLat = heightLat;
+        isempty=false;
     }
     RectLatLng(PointLatLng const& location, SizeLatLng const& size)
     {
@@ -27,7 +27,17 @@ public:
         this->lat = location.Lat();
         this->widthLng = size.WidthLng();
         this->heightLat = size.HeightLat();
+        isempty=false;
     }
+    RectLatLng()
+    {
+        this->lng = 0;
+        this->lat = 0;
+        this->widthLng = 0;
+        this->heightLat = 0;
+        isempty=true;
+    }
+
     static RectLatLng FromLTRB(double const& lng, double const& lat, double const& rightLng, double const& bottomLat)
     {
         return RectLatLng(lat, lng, rightLng - lng, lat - bottomLat);
@@ -40,6 +50,7 @@ public:
     {
         this->lng = value.Lng();
         this->lat = value.Lat();
+        isempty=false;
     }
     PointLatLng LocationRightBottom()
     {
@@ -56,6 +67,7 @@ public:
     {
         this->widthLng = value.WidthLng();
         this->heightLat = value.HeightLat();
+        isempty=false;
     }
     double Lng()const
     {
@@ -64,6 +76,7 @@ public:
     void SetLng(double const& value)
     {
         this->lng = value;
+        isempty=false;
     }
 
 
@@ -74,6 +87,7 @@ public:
     void SetLat(double const& value)
     {
         this->lat = value;
+        isempty=false;
     }
 
     double WidthLng()const
@@ -83,6 +97,7 @@ public:
     void SetWidthLng(double const& value)
     {
         this->widthLng = value;
+        isempty=false;
     }
     double HeightLat()const
     {
@@ -91,6 +106,7 @@ public:
     void SetHeightLat(double const& value)
     {
         this->heightLat = value;
+        isempty=false;
     }
     double Left()const
     {
@@ -113,11 +129,7 @@ public:
     }
     bool IsEmpty()const
     {      
-        if(this->WidthLng() > 0)
-        {
-            return (this->HeightLat() <= 0);
-        }
-        return true;
+        return isempty;
     }
     bool Contains(double const& lat, double const& lng)
     {
@@ -209,6 +221,7 @@ private:
     double lat;
     double widthLng;
     double heightLat;
+    bool isempty;
 };
 
 #endif // RECTLATLNG_H

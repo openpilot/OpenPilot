@@ -280,11 +280,3 @@ void vApplicationIdleHook(void)
 	DebugPinHigh(DEBUG_PIN_IDLE);
 	DebugPinLow(DEBUG_PIN_IDLE);
 }
-
-/**
- * Called by the RTOS when a stack overflow is detected.
- */
-void vApplicationStackOverflowHook( xTaskHandle *pxTask, signed portCHAR *pcTaskName )
-{
-	OnError();
-}

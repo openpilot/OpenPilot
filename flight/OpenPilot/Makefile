@@ -115,6 +115,7 @@ DOXYGENDIR = ../Doc/Doxygen
 # use file-extension c for "c-only"-files
 
 ## MODULES
+ifndef TESTAPP
 SRC = $(MODEXAMPLE)/examplemodevent.c $(MODEXAMPLE)/examplemodperiodic.c $(MODEXAMPLE)/examplemodthread.c
 SRC += $(MODSYSTEM)/systemmod.c
 SRC += $(MODTELEMETRY)/telemetry.c
@@ -131,18 +132,16 @@ SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/uavobjectsinit.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
+else
+## TESTCODE
+SRC += $(OPTESTS)/test_common.c
+SRC += $(OPTESTS)/$(TESTAPP).c
+endif
 
-## OPENPILOT Testcode
-##
-## This is only a temp solution. When activating one of lines below, openpilot.c must be commented
-##    
-#SRC += $(OPTESTS)/test_I2c_PCF8570.c
-#SRC += $(OPTESTS)/test_BMP085.c
-#SRC += $(OPTESTS)/test_uavobjects.c
-#SRC += $(OPTESTS)/test_cpuload.c
 
 
 ## UAVOBJECTS
+ifndef TESTAPP
 SRC += $(OPUAVOBJ)/exampleobject1.c
 SRC += $(OPUAVOBJ)/exampleobject2.c
 SRC += $(OPUAVOBJ)/examplesettings.c
@@ -164,6 +163,7 @@ SRC += $(OPUAVOBJ)/stabilizationsettings.c
 SRC += $(OPUAVOBJ)/altitudeactual.c
 SRC += $(OPUAVOBJ)/attitudeactual.c
 SRC += $(OPUAVOBJ)/attitudesettings.c
+endif
 
 ## PIOS Hardware (STM32F10x)
 SRC += $(PIOSSTM32F10X)/pios_sys.c

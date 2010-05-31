@@ -102,7 +102,7 @@ void test_slam01() {
 
 	// display::ViewerQt viewerQt;
 
-	for (int t = 1; t <= 3; t++) {
+	for (int t = 1; t <= 4; t++) {
 
 		cout << "\nTIME : " << t << endl;
 

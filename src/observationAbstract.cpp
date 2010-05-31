@@ -37,7 +37,14 @@ namespace jafar {
 			s << " .expectation:  " << obs.expectation << endl;
 			s << " .measurement:  " << obs.measurement << endl;
 			s << " .innovation:   " << obs.innovation << endl;
-			s << " .ev: | prj: " << obs.events.predicted << " | vis: " << obs.events.visible << " | mea: " << obs.events.measured << " | mch: " << obs.events.matched << " | upd: " << obs.events.updated << " | ";
+			s << " .ev: | prj: " << obs.events.predicted
+					<< " | vis: " << obs.events.visible
+					<< " | mea: " << obs.events.measured
+					<< " | mch: " << obs.events.matched
+					<< " | upd: " << obs.events.updated << " | " << endl;
+			s << " .cnt:| search: " << obs.counters.nSearch
+					<< " | match: " << obs.counters.nMatch
+					<< " | inlier: " << obs.counters.nInlier << " | ";
 			return s;
 		}
 

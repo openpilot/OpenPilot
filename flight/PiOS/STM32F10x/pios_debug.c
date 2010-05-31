@@ -30,7 +30,7 @@
 #include "pios.h"
 
 // Global variables
-const uint8_t* PIOS_DEBUG_AssertMsg = (uint8_t*)"ASSERT FAILED";
+const char* PIOS_DEBUG_AssertMsg = "ASSERT FAILED";
 
 /* Private Function Prototypes */
 
@@ -89,7 +89,7 @@ void PIOS_DEBUG_PinLow(uint8_t Pin)
 /**
  * Report a serious error and halt
  */
-void PIOS_DEBUG_Panic(const uint8_t* msg)
+void PIOS_DEBUG_Panic(const char* msg)
 {
 	register int *lr asm ("lr");	// Link-register holds the PC of the caller
 

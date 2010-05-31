@@ -61,29 +61,29 @@ void test_slam01() {
 	worldPtr->addMap(mapPtr);
 	mapPtr->fillDiag();
 	robconstvel_ptr_t robPtr1(new RobotConstantVelocity(mapPtr));
-	robPtr1->id(robPtr1->robotIds->getId());
+	robPtr1->id(robPtr1->robotIds.getId());
 	robPtr1->linkToParentMap(mapPtr);
 	robPtr1->state.clear();
 	robPtr1->pose.x(quaternion::originFrame());
 	pinhole_ptr_t senPtr11 (new SensorPinHole(robPtr1, MapObject::FILTERED));
-	senPtr11->id(senPtr11->sensorIds->getId());
+	senPtr11->id(senPtr11->sensorIds.getId());
 	senPtr11->linkToParentRobot(robPtr1);
 	senPtr11->state.clear();
 	senPtr11->pose.x(quaternion::originFrame());
 	senPtr11->set_parameters(imSz, k, d, c);
 	pinhole_ptr_t senPtr12 (new SensorPinHole(robPtr1, MapObject::FILTERED));
-	senPtr12->id(senPtr12->sensorIds->getId());
+	senPtr12->id(senPtr12->sensorIds.getId());
 	senPtr12->linkToParentRobot(robPtr1);
 	senPtr12->state.clear();
 	senPtr12->pose.x(quaternion::originFrame());
 	senPtr12->set_parameters(imSz, k, d, c);
 	robodo_ptr_t robPtr2(new RobotOdometry(mapPtr));
-	robPtr2->id(robPtr2->robotIds->getId());
+	robPtr2->id(robPtr2->robotIds.getId());
 	robPtr2->linkToParentMap(mapPtr);
 	robPtr2->state.clear();
 	robPtr2->pose.x(quaternion::originFrame());
 	pinhole_ptr_t senPtr21 (new SensorPinHole(robPtr2, MapObject::FILTERED));
-	senPtr21->id(senPtr21->sensorIds->getId());
+	senPtr21->id(senPtr21->sensorIds.getId());
 	senPtr21->linkToParentRobot(robPtr2);
 	senPtr21->state.clear();
 	senPtr21->pose.x(quaternion::originFrame());
@@ -186,7 +186,7 @@ void test_slam01() {
 
 							// 2a. create lmk object
 							ahp_ptr_t lmkPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr));
-							lmkPtr->id(lmkPtr->landmarkIds->getId());
+							lmkPtr->id(lmkPtr->landmarkIds.getId());
 							lmkPtr->linkToParentMap(mapPtr);
 
 							// 2b. create obs object

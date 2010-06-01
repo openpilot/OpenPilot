@@ -55,8 +55,6 @@ public:
 signals:
 
 private slots:
-    void onLoadFileBinClicked();
-    void onLoadFileDataClicked();
 
 private:
     HITLConfiguration* m_config;

@@ -60,7 +60,6 @@ private:
     SystemHealthGadgetConfiguration *m_config;
 
 private slots:
-    void on_loadFile_clicked();
 };
 
 #endif // SYSTEMHEALTHGADGETOPTIONSPAGE_H

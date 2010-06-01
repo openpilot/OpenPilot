@@ -198,6 +198,9 @@ MainWindow::MainWindow() :
 MainWindow::~MainWindow()
 {
     hide();
+    qxtLog->removeAsMessageHandler();
+    foreach (QString engine, qxtLog->allLoggerEngines())
+        qxtLog->removeLoggerEngine(engine);
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     if (m_uavGadgetModes.count() > 0) {
         foreach (UAVGadgetMode *mode, m_uavGadgetModes)
@@ -206,6 +209,7 @@ MainWindow::~MainWindow()
             delete mode;
         }
     }
+
     pm->removeObject(m_shortcutSettings);
     pm->removeObject(m_generalSettings);
     pm->removeObject(m_workspaceSettings);

@@ -1,6 +1,6 @@
 #include "opmapcontrol.h"
 
-OPMapControl::OPMapControl(QWidget *parent):QWidget(parent),MapRenderTransform(1), maxZoom(2),minZoom(2),zoomReal(0),isSelected(false)
+OPMapControl::OPMapControl(QWidget *parent):QWidget(parent),MapRenderTransform(1), maxZoom(17),minZoom(2),zoomReal(0),isSelected(false)
 {
     EmptytileBrush = Qt::cyan;
     MissingDataFont =QFont ("Times",10,QFont::Bold);
@@ -56,6 +56,7 @@ void OPMapControl::paintEvent(QPaintEvent* evnt)
 
 void OPMapControl::DrawMap2D(QPainter &painter)
 {
+    qDebug()<<core.Matrix.count();
    // painter.drawText(10,10,"TESTE");
     for(int i = -core.GetsizeOfMapArea().Width(); i <= core.GetsizeOfMapArea().Width(); i++)
              {
@@ -72,7 +73,7 @@ void OPMapControl::DrawMap2D(QPainter &painter)
                       //Tile t = Core.Matrix[tileToDraw];
                       if(t!=0)
                       {
-                         qDebug()<< "opmapcontrol:draw2d TileHasValue:"<<t->GetPos().ToString();
+                         //qDebug()<< "opmapcontrol:draw2d TileHasValue:"<<t->GetPos().ToString();
                          core.tileRect.SetX(core.GettilePoint().X()*core.tileRect.Width());
                          core.tileRect.SetY(core.GettilePoint().Y()*core.tileRect.Height());
                          core.tileRect.Offset(core.GetrenderOffset());
@@ -106,7 +107,7 @@ void OPMapControl::DrawMap2D(QPainter &painter)
                                     painter.setFont(MissingDataFont);
                                     painter.setPen(Qt::red);
                                     painter.drawText(QRectF(core.tileRect.X(), core.tileRect.Y(), core.tileRect.Width(), core.tileRect.Height()),Qt::AlignCenter,(core.GettilePoint() == core.GetcenterTileXYLocation()? "CENTER: " :"TILE: ")+core.GettilePoint().ToString());
-                                    qDebug()<<"ShowTileGridLine:"<<core.GettilePoint().ToString()<<"=="<<core.GetcenterTileXYLocation().ToString();
+                                    //qDebug()<<"ShowTileGridLine:"<<core.GettilePoint().ToString()<<"=="<<core.GetcenterTileXYLocation().ToString();
                                 }
                             }
 
@@ -171,6 +172,37 @@ PointLatLng OPMapControl::FromLocalToLatLng(int x, int y)
 }
 void OPMapControl::mouseReleaseEvent ( QMouseEvent* evnt )
 {
+    QWidget::mouseReleaseEvent(evnt);
+
+            if(isSelected)
+            {
+               isSelected = false;
+            }
+
+            if(core.IsDragging())
+            {
+               core.EndDrag();
+
+               this->setCursor(Qt::ArrowCursor);
+               if(!BoundsOfMap.IsEmpty() && !BoundsOfMap.Contains(CurrentPosition()))
+               {
+                  if(!core.LastLocationInBounds.IsEmpty())
+                  {
+                     SetCurrentPosition(core.LastLocationInBounds);
+                  }
+               }
+            }
+            else
+            {
+               if(!selectionEnd.IsEmpty() && !selectionStart.IsEmpty())
+               {
+                   if(!SelectedArea().IsEmpty() && evnt->modifiers() == Qt::ShiftModifier)
+                  {
+                  //   SetZoomToFitRect(SelectedArea());TODO
+                  }
+               }
+
+            }
 
 }
 
@@ -202,6 +234,123 @@ void OPMapControl::resize()
         core.GoToCurrentPosition();
     }
 }
+void OPMapControl::wheelEvent(QWheelEvent *event)
+{
+    QWidget::wheelEvent(event);
+
+             if(!IsMouseOverMarker() && !IsDragging())
+             {
+                if(core.GetmouseLastZoom().X() != event->pos().x() && core.mouseLastZoom.Y() != event->pos().y())
+                {
+                    if(GetMouseWheelZoomType() == MouseWheelZoomType::MousePositionAndCenter)
+                   {
+                      core.SetCurrentPosition(FromLocalToLatLng(event->pos().x(), event->pos().y()));
+                   }
+                    else if(GetMouseWheelZoomType() == MouseWheelZoomType::ViewCenter)
+                   {
+                      core.SetCurrentPosition(FromLocalToLatLng((int) width()/2, (int) height()/2));
+                   }
+                    else if(GetMouseWheelZoomType() == MouseWheelZoomType::MousePositionWithoutCenter)
+                   {
+                      core.SetCurrentPosition(FromLocalToLatLng(event->pos().x(), event->pos().y()));
+
+                   }
+
+                   core.mouseLastZoom.SetX((event->pos().x()));
+                   core.mouseLastZoom.SetY((event->pos().y()));
+                }
+
+                // set mouse position to map center
+                if(GetMouseWheelZoomType() != MouseWheelZoomType::MousePositionWithoutCenter)
+                {
+                   {
+//                      System.Drawing.Point p = PointToScreen(new System.Drawing.Point(Width/2, Height/2));
+//                      Stuff.SetCursorPos((int) p.X, (int) p.Y);
+                   }
+                }
+
+                core.MouseWheelZooming = true;
+
+                if(event->delta() > 0)
+                {
+                   SetZoom(Zoom()+1);
+                }
+                else if(event->delta() < 0)
+                {
+                   SetZoom(Zoom()-1);
+                }
+
+                core.MouseWheelZooming = false;
+             }
+}
+double OPMapControl::Zoom()
+{
+
+
+    return zoomReal;
+}
+void OPMapControl::SetZoom(double const& value)
+{
+    if(zoomReal != value)
+    {
+        if(value > MaxZoom())
+        {
+            zoomReal = MaxZoom();
+        }
+        else
+            if(value < MinZoom())
+            {
+            zoomReal = MinZoom();
+        }
+        else
+        {
+            zoomReal = value;
+        }
+
+        float remainder = (float)std::fmod((float) value, (float) 1);
+        if(remainder != 0)
+        {
+            float scaleValue = remainder + 1;
+            {
+                MapRenderTransform = scaleValue;
+            }
+
+            SetZoomStep((qint32)(value - remainder));
+
+            this->repaint();
+
+        }
+        else
+        {
+
+            MapRenderTransform = 1;
+
+            SetZoomStep ((qint32)(value));
+            zoomReal = ZoomStep();
+            this->repaint();
+        }
+    }
+}
+int OPMapControl::ZoomStep()const
+{
+    return core.Zoom();
+}
+void OPMapControl::SetZoomStep(int const& value)
+{
+    if(value > MaxZoom())
+    {
+        core.SetZoom(MaxZoom());
+    }
+    else if(value < MinZoom())
+    {
+        core.SetZoom(MinZoom());
+    }
+    else
+    {
+        core.SetZoom(value);
+    }
+}
+
 void OPMapControl::Offset(int const& x, int const& y)
 {
     core.DragOffset(Point(x, y));

@@ -1,5 +1,34 @@
+/**
+******************************************************************************
+*
+* @file       pureimagecache.cpp
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+*             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
+* @brief      
+* @see        The GNU Public License (GPL) Version 3
+* @defgroup   OPMapWidget
+* @{
+* 
+*****************************************************************************/
+/* 
+* This program is free software; you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation; either version 3 of the License, or 
+* (at your option) any later version.
+* 
+* This program is distributed in the hope that it will be useful, but 
+* WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+* or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+* for more details.
+* 
+* You should have received a copy of the GNU General Public License along 
+* with this program; if not, write to the Free Software Foundation, Inc., 
+* 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+*/
 #include "pureimagecache.h"
 
+ 
+namespace core {
 qlonglong PureImageCache::ConnCounter=0;
 
 PureImageCache::PureImageCache()
@@ -20,7 +49,9 @@ QString PureImageCache::GtileCache()
 
 bool PureImageCache::CreateEmptyDB(const QString &file)
 {
+#ifdef DEBUG_PUREIMAGECACHE
     qDebug()<<"Create database at:"<<file;
+#endif //DEBUG_PUREIMAGECACHE
     QFileInfo File(file);
     QDir dir=File.absoluteDir();
     QString path=dir.absolutePath();
@@ -28,10 +59,14 @@ bool PureImageCache::CreateEmptyDB(const QString &file)
     if(File.exists())   QFile(filename).remove();
     if(!dir.exists())
     {
+#ifdef DEBUG_PUREIMAGECACHE
         qDebug()<<"CreateEmptyDB: Cache path doesn't exist, try to create";
+#endif //DEBUG_PUREIMAGECACHE
         if(!dir.mkpath(path))
         {
+#ifdef DEBUG_PUREIMAGECACHE
             qDebug()<<"CreateEmptyDB: Could not create path";
+#endif //DEBUG_PUREIMAGECACHE
             return false;
         }
     }
@@ -41,7 +76,9 @@ bool PureImageCache::CreateEmptyDB(const QString &file)
     db.setDatabaseName(file);
     if (!db.open())
     {
+#ifdef DEBUG_PUREIMAGECACHE
         qDebug()<<"CreateEmptyDB: Unable to create database";
+#endif //DEBUG_PUREIMAGECACHE
 
         return false;
     }
@@ -49,14 +86,18 @@ bool PureImageCache::CreateEmptyDB(const QString &file)
     query.exec("CREATE TABLE IF NOT EXISTS Tiles (id INTEGER NOT NULL PRIMARY KEY, X INTEGER NOT NULL, Y INTEGER NOT NULL, Zoom INTEGER NOT NULL, Type INTEGER NOT NULL)");
     if(query.numRowsAffected()==-1)
     {
+#ifdef DEBUG_PUREIMAGECACHE
         qDebug()<<"CreateEmptyDB: "<<query.lastError().driverText();
+#endif //DEBUG_PUREIMAGECACHE
         db.close();
         return false;
     }
     query.exec("CREATE TABLE IF NOT EXISTS TilesData (id INTEGER NOT NULL PRIMARY KEY CONSTRAINT fk_Tiles_id REFERENCES Tiles(id) ON DELETE CASCADE, Tile BLOB NULL)");
     if(query.numRowsAffected()==-1)
     {
+#ifdef DEBUG_PUREIMAGECACHE
         qDebug()<<"CreateEmptyDB: "<<query.lastError().driverText();
+#endif //DEBUG_PUREIMAGECACHE
         db.close();
         return false;
     }
@@ -69,7 +110,9 @@ bool PureImageCache::CreateEmptyDB(const QString &file)
             "END");
     if(query.numRowsAffected()==-1)
     {
+#ifdef DEBUG_PUREIMAGECACHE
         qDebug()<<"CreateEmptyDB: "<<query.lastError().driverText();
+#endif //DEBUG_PUREIMAGECACHE
         db.close();
         return false;
     }
@@ -82,7 +125,9 @@ bool PureImageCache::CreateEmptyDB(const QString &file)
             "END");
     if(query.numRowsAffected()==-1)
     {
+#ifdef DEBUG_PUREIMAGECACHE
         qDebug()<<"CreateEmptyDB: "<<query.lastError().driverText();
+#endif //DEBUG_PUREIMAGECACHE
         db.close();
         return false;
     }
@@ -94,7 +139,9 @@ bool PureImageCache::CreateEmptyDB(const QString &file)
             "END");
     if(query.numRowsAffected()==-1)
     {
+#ifdef DEBUG_PUREIMAGECACHE
         qDebug()<<"CreateEmptyDB: "<<query.lastError().driverText();
+#endif //DEBUG_PUREIMAGECACHE
         db.close();
         return false;
     }
@@ -103,22 +150,30 @@ bool PureImageCache::CreateEmptyDB(const QString &file)
 }
 bool PureImageCache::PutImageToCache(const QByteArray &tile, const MapType::Types &type,const Point &pos,const int &zoom)
 {
+#ifdef DEBUG_PUREIMAGECACHE
     qDebug()<<"PutImageToCache Start:";//<<pos;
+#endif //DEBUG_PUREIMAGECACHE
     bool ret=true;
     QDir d;
     QString dir=gtilecache;
+#ifdef DEBUG_PUREIMAGECACHE
     qDebug()<<"PutImageToCache Cache dir="<<dir;
     qDebug()<<"PutImageToCache Cache dir="<<dir<<" Try to PUT:"<<pos.ToString();
+#endif //DEBUG_PUREIMAGECACHE
     if(!d.exists(dir))
     {
         d.mkdir(dir);
+#ifdef DEBUG_PUREIMAGECACHE
         qDebug()<<"Create Cache directory";
+#endif //DEBUG_PUREIMAGECACHE
     }
     {
         QString db=dir+"Data.qmdb";
         if(!QFileInfo(db).exists())
         {
+#ifdef DEBUG_PUREIMAGECACHE
             qDebug()<<"Try to create EmptyDB";
+#endif //DEBUG_PUREIMAGECACHE
             ret=CreateEmptyDB(db);
         }
         if(ret)
@@ -153,7 +208,9 @@ bool PureImageCache::PutImageToCache(const QByteArray &tile, const MapType::Type
         }
         else
         {
+#ifdef DEBUG_PUREIMAGECACHE
             qDebug()<<"PutImageToCache Could not create DB";
+#endif //DEBUG_PUREIMAGECACHE
             return false;
         }
     }
@@ -164,7 +221,9 @@ QByteArray PureImageCache::GetImageFromCache(MapType::Types type, Point pos, int
     bool ret=true;
     QByteArray ar;
     QString dir=gtilecache;
+#ifdef DEBUG_PUREIMAGECACHE
     qDebug()<<"Cache dir="<<dir<<" Try to GET:"<<pos.X()+","+pos.Y();
+#endif //DEBUG_PUREIMAGECACHE
 
     {
         QString db=dir+"Data.qmdb";
@@ -199,7 +258,9 @@ bool PureImageCache::ExportMapDataToDB(QString sourceFile, QString destFile)
     QList<long> add;
     if(!QFileInfo(destFile).exists())
     {
+#ifdef DEBUG_PUREIMAGECACHE
         qDebug()<<"Try to create EmptyDB";
+#endif //DEBUG_PUREIMAGECACHE
         ret=CreateEmptyDB(destFile);
     }
     if(!ret) return false;
@@ -245,3 +306,4 @@ bool PureImageCache::ExportMapDataToDB(QString sourceFile, QString destFile)
 
 }
 
+}

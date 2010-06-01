@@ -32,13 +32,13 @@ int main(int argc, char *argv[])
     PureImageCache* p=new PureImageCache();
     QPixmap pixmap;
     //Tile Polling test
-    pixmap=PureImageProxy::FromStream(GMaps::Instance()->GetImageFrom(MapType::GoogleSatellite,Point(1,0),1));
+    pixmap=PureImageProxy::FromStream(OPMaps::Instance()->GetImageFrom(MapType::GoogleSatellite,Point(1,0),1));
     QLabel label;
     label.setPixmap(pixmap);
     label.show();
     //Geocoding Test
     GeoCoderStatusCode::Types status;
-    qDebug()<<"Lisbon Coordinates:"<<GMaps::Instance()->GetLatLngFromGeodecoder("lisbon",status).ToString();
+    qDebug()<<"Lisbon Coordinates:"<<OPMaps::Instance()->GetLatLngFromGeodecoder("lisbon",status).ToString();
 
     return a.exec();
 }

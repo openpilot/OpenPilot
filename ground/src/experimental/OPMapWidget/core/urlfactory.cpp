@@ -1,5 +1,34 @@
+/**
+******************************************************************************
+*
+* @file       urlfactory.cpp
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+*             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
+* @brief      
+* @see        The GNU Public License (GPL) Version 3
+* @defgroup   OPMapWidget
+* @{
+* 
+*****************************************************************************/
+/* 
+* This program is free software; you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation; either version 3 of the License, or 
+* (at your option) any later version.
+* 
+* This program is distributed in the hope that it will be useful, but 
+* WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+* or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+* for more details.
+* 
+* You should have received a copy of the GNU General Public License along 
+* with this program; if not, write to the Free Software Foundation, Inc., 
+* 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+*/
 #include "urlfactory.h"
 
+ 
+namespace core {
 UrlFactory::UrlFactory()
 {
     /// <summary>
@@ -68,7 +97,9 @@ void UrlFactory::TryCorrectGoogleVersions()
         QNetworkRequest qheader;
         QNetworkAccessManager network;
         network.setProxy(Proxy);
+#ifdef DEBUG_URLFACTORY
         qDebug()<<"Correct GoogleVersion";
+#endif //DEBUG_URLFACTORY
         setIsCorrectGoogleVersions(true);
         QString url = "http://maps.google.com";
 
@@ -78,14 +109,20 @@ void UrlFactory::TryCorrectGoogleVersions()
         QTime time;
         time.start();
         while( (!(reply->isFinished()) || (time.elapsed()>(6*Timeout))) ){QCoreApplication::processEvents(QEventLoop::AllEvents);}
+#ifdef DEBUG_URLFACTORY
         qDebug()<<"Finished?"<<reply->error()<<" abort?"<<(time.elapsed()>Timeout*6);
+#endif //DEBUG_URLFACTORY
         if( (reply->error()!=QNetworkReply::NoError) | (time.elapsed()>Timeout*6))
         {
+#ifdef DEBUG_URLFACTORY
             qDebug()<<"Try corrected version network error:";
+#endif //DEBUG_URLFACTORY
             return;
         }
         {
+#ifdef DEBUG_URLFACTORY
             qDebug()<<"Try corrected version withou abort or error:"<<reply->errorString();
+#endif //DEBUG_URLFACTORY
             QString html=QString(reply->readAll());
             // find it
             // apiCallback(["http://mt0.google.com/vt/v\x3dw2.106\x26hl\x3dlt\x26","http://mt1.google.com/vt/v\x3dw2.106\x26hl\x3dlt\x26","http://mt2.google.com/vt/v\x3dw2.106\x26hl\x3dlt\x26","http://mt3.google.com/vt/v\x3dw2.106\x26hl\x3dlt\x26"],
@@ -122,12 +159,16 @@ void UrlFactory::TryCorrectGoogleVersions()
                                         {
                                             if(u.startsWith("m@"))
                                             {
+#ifdef DEBUG_URLFACTORY
                                                 qDebug()<<("TryCorrectGoogleVersions[map]: " + u);
+#endif //DEBUG_URLFACTORY
                                                 VersionGoogleMap = u;
                                             }
                                             else
                                             {
+#ifdef DEBUG_URLFACTORY
                                                 qDebug()<<("TryCorrectGoogleVersions[map FAILED]: " + u);
+#endif //DEBUG_URLFACTORY
                                             }
                                         }
                                         else
@@ -136,12 +177,16 @@ void UrlFactory::TryCorrectGoogleVersions()
                                             // 45
                                             if(u[0].isDigit())
                                             {
+#ifdef DEBUG_URLFACTORY
                                                 qDebug()<<("TryCorrectGoogleVersions[satelite]: " + u);
+#endif //DEBUG_URLFACTORY
                                                 VersionGoogleSatellite = u;
                                             }
                                             else
                                             {
+#ifdef DEBUG_URLFACTORY
                                                 qDebug()<<("TryCorrectGoogleVersions[satelite FAILED]: " + u);
+#endif //DEBUG_URLFACTORY
                                             }
                                         }
                                         else
@@ -149,12 +194,16 @@ void UrlFactory::TryCorrectGoogleVersions()
                                             {
                                             if(u.startsWith("h@"))
                                             {
+#ifdef DEBUG_URLFACTORY
                                                 qDebug()<<("TryCorrectGoogleVersions[labels]: " + u);
+#endif //DEBUG_URLFACTORY
                                                 VersionGoogleLabels = u;
                                             }
                                             else
                                             {
+#ifdef DEBUG_URLFACTORY
                                                 qDebug()<<("TryCorrectGoogleVersions[labels FAILED]: " + u);
+#endif //DEBUG_URLFACTORY
                                             }
                                         }
                                         else
@@ -163,13 +212,17 @@ void UrlFactory::TryCorrectGoogleVersions()
                                             // t@108,r@120
                                             if(u.startsWith("t@"))
                                             {
+#ifdef DEBUG_URLFACTORY
                                                 qDebug()<<("TryCorrectGoogleVersions[terrain]: " + u);
+#endif //DEBUG_URLFACTORY
                                                 VersionGoogleTerrain = u;
                                                 VersionGoogleTerrainChina = u;
                                             }
                                             else
                                             {
+#ifdef DEBUG_URLFACTORY
                                                 qDebug()<<("TryCorrectGoogleVersions[terrain FAILED]: " + u);
+#endif //DEBUG_URLFACTORY
                                             }
                                             break;
                                         }
@@ -187,7 +240,9 @@ void UrlFactory::TryCorrectGoogleVersions()
 }
 QString UrlFactory::MakeImageUrl(const MapType::Types &type,const Point &pos,const int &zoom,const QString &language)
 {
+#ifdef DEBUG_URLFACTORY
     qDebug()<<"Entered MakeImageUrl";
+#endif //DEBUG_URLFACTORY
     switch(type)
     {
     case MapType::GoogleMap:
@@ -517,7 +572,9 @@ PointLatLng UrlFactory::GetLatLngFromGeodecoder(const QString &keywords, GeoCode
 }
 PointLatLng UrlFactory::GetLatLngFromGeocoderUrl(const QString &url, const bool &useCache, GeoCoderStatusCode::Types &status)
 {
+#ifdef DEBUG_URLFACTORY
     qDebug()<<"Entered GetLatLngFromGeocoderUrl:";
+#endif //DEBUG_URLFACTORY
     status = GeoCoderStatusCode::Unknow;
     PointLatLng ret(0,0);
     QString urlEnd = url.right(url.indexOf("geo?q="));
@@ -535,7 +592,9 @@ PointLatLng UrlFactory::GetLatLngFromGeocoderUrl(const QString &url, const bool 
 
     if(geo.isNull()|geo.isEmpty())
     {
+#ifdef DEBUG_URLFACTORY
         qDebug()<<"GetLatLngFromGeocoderUrl:Not in cache going internet";
+#endif //DEBUG_URLFACTORY
         QNetworkReply *reply;
         QNetworkRequest qheader;
         QNetworkAccessManager network;
@@ -543,18 +602,26 @@ PointLatLng UrlFactory::GetLatLngFromGeocoderUrl(const QString &url, const bool 
         qheader.setUrl(QUrl(url));
         qheader.setRawHeader("User-Agent",UserAgent);
         reply=network.get(qheader);
+#ifdef DEBUG_URLFACTORY
         qDebug()<<"GetLatLngFromGeocoderUrl:URL="<<url;
+#endif //DEBUG_URLFACTORY
         QTime time;
         time.start();
         while( (!(reply->isFinished()) || (time.elapsed()>(6*Timeout))) ){QCoreApplication::processEvents(QEventLoop::AllEvents);}
+#ifdef DEBUG_URLFACTORY
         qDebug()<<"Finished?"<<reply->error()<<" abort?"<<(time.elapsed()>Timeout*6);
+#endif //DEBUG_URLFACTORY
         if( (reply->error()!=QNetworkReply::NoError) | (time.elapsed()>Timeout*6))
         {
+#ifdef DEBUG_URLFACTORY
             qDebug()<<"GetLatLngFromGeocoderUrl::Network error";
+#endif //DEBUG_URLFACTORY
             return PointLatLng(0,0);
         }
         {
+#ifdef DEBUG_URLFACTORY
             qDebug()<<"GetLatLngFromGeocoderUrl:Reply ok";
+#endif //DEBUG_URLFACTORY
             geo=reply->readAll();
 
 
@@ -582,7 +649,9 @@ PointLatLng UrlFactory::GetLatLngFromGeocoderUrl(const QString &url, const bool 
                 double lng = QString(values[3]).toDouble();
 
                 ret = PointLatLng(lat, lng);
+#ifdef DEBUG_URLFACTORY
                 qDebug()<<"Lat="<<lat<<" Lng="<<lng;
+#endif //DEBUG_URLFACTORY
             }
         }
     }
@@ -598,7 +667,9 @@ Placemark UrlFactory::GetPlacemarkFromReverseGeocoderUrl(const QString &url, con
 {
 
     Placemark ret("");
+#ifdef DEBUG_URLFACTORY
     qDebug()<<"Entered GetPlacemarkFromReverseGeocoderUrl:";
+#endif //DEBUG_URLFACTORY
    // status = GeoCoderStatusCode::Unknow;
     QString urlEnd = url.right(url.indexOf("geo?hl="));
     urlEnd.replace( QRegExp(
@@ -615,7 +686,9 @@ Placemark UrlFactory::GetPlacemarkFromReverseGeocoderUrl(const QString &url, con
 
     if(reverse.isNull()|reverse.isEmpty())
     {
+#ifdef DEBUG_URLFACTORY
         qDebug()<<"GetLatLngFromGeocoderUrl:Not in cache going internet";
+#endif //DEBUG_URLFACTORY
         QNetworkReply *reply;
         QNetworkRequest qheader;
         QNetworkAccessManager network;
@@ -623,22 +696,32 @@ Placemark UrlFactory::GetPlacemarkFromReverseGeocoderUrl(const QString &url, con
         qheader.setUrl(QUrl(url));
         qheader.setRawHeader("User-Agent",UserAgent);
         reply=network.get(qheader);
+#ifdef DEBUG_URLFACTORY
         qDebug()<<"GetLatLngFromGeocoderUrl:URL="<<url;
+#endif //DEBUG_URLFACTORY
         QTime time;
         time.start();
         while( (!(reply->isFinished()) || (time.elapsed()>(6*Timeout))) ){QCoreApplication::processEvents(QEventLoop::AllEvents);}
+#ifdef DEBUG_URLFACTORY
         qDebug()<<"Finished?"<<reply->error()<<" abort?"<<(time.elapsed()>Timeout*6);
+#endif //DEBUG_URLFACTORY
         if( (reply->error()!=QNetworkReply::NoError) | (time.elapsed()>Timeout*6))
         {
+#ifdef DEBUG_URLFACTORY
             qDebug()<<"GetLatLngFromGeocoderUrl::Network error";
+#endif //DEBUG_URLFACTORY
             return ret;
         }
         {
+#ifdef DEBUG_URLFACTORY
             qDebug()<<"GetLatLngFromGeocoderUrl:Reply ok";
+#endif //DEBUG_URLFACTORY
             QByteArray a=(reply->readAll());
             QTextCodec *codec = QTextCodec::codecForName("UTF-8");
             reverse = codec->toUnicode(a);
+#ifdef DEBUG_URLFACTORY
             qDebug()<<reverse;
+#endif //DEBUG_URLFACTORY
             // cache geocoding
             if(useCache && reverse.startsWith("200"))
             {
@@ -673,4 +756,5 @@ double UrlFactory::GetDistance(PointLatLng p1, PointLatLng p2)
     double c = 2 * atan2(sqrt(a), sqrt(1 - a));
     double dDistance = EarthRadiusKm * c;
     return dDistance;
+}
 }

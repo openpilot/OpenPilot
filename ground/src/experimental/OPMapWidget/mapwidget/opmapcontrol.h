@@ -7,15 +7,20 @@
 #include <QWidget>
 #include <QBrush>
 #include <QFont>
+
+using namespace core;
+//using namespace internals;
+
 class OPMapControl:public QWidget
 {
     Q_OBJECT
 
     Q_PROPERTY(int MaxZoom READ MaxZoom WRITE SetMaxZoom)
     Q_PROPERTY(int MinZoom READ MinZoom WRITE SetMinZoom)
-    Q_PROPERTY(MouseWheelZoomType::Types MouseWheelZoom READ GetMouseWheelZoomType WRITE SetMouseWheelZoomType)
+    Q_PROPERTY(internals::MouseWheelZoomType::Types MouseWheelZoom READ GetMouseWheelZoomType WRITE SetMouseWheelZoomType)
     Q_PROPERTY(QString MouseWheelZoomStr READ GetMouseWheelZoomTypeStr WRITE SetMouseWheelZoomTypeByStr)
     Q_PROPERTY(bool ShowTileGridLines READ ShowTileGridLines WRITE SetShowTileGridLines)
+    Q_PROPERTY(double Zoom READ Zoom WRITE SetZoom)
 public:
     OPMapControl(QWidget *parent=0);
     QBrush EmptytileBrush;
@@ -41,7 +46,10 @@ public:
     void Offset(int const& x, int const& y);
     bool CanDragMap()const{return core.CanDragMap;}
     void SetCanDragMap(bool const& value){core.CanDragMap = value;}
-
+    PointLatLng CurrentPosition()const{return core.CurrentPosition();}
+    void SetCurrentPosition(PointLatLng const& value){core.SetCurrentPosition(value);}
+    double Zoom();
+    void SetZoom(double const& value);
 protected:
     void paintEvent ( QPaintEvent* evnt );
     void mousePressEvent ( QMouseEvent* evnt );
@@ -52,7 +60,9 @@ protected:
     void closeEvent ( QCloseEvent * event );
     bool IsDragging()const{return core.IsDragging();}
     bool IsMouseOverMarker()const{return isMouseOverMarker;}
-
+    void wheelEvent ( QWheelEvent * event );
+    int ZoomStep()const;
+    void SetZoomStep(int const& value);
 private:
     bool showTileGridLines;
     Core core;

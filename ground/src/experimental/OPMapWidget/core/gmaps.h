@@ -1,5 +1,38 @@
-#ifndef GMAPS_H
-#define GMAPS_H
+/**
+******************************************************************************
+*
+* @file       OPMaps.h
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+*             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
+* @brief      
+* @see        The GNU Public License (GPL) Version 3
+* @defgroup   OPMapWidget
+* @{
+* 
+*****************************************************************************/
+/* 
+* This program is free software; you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation; either version 3 of the License, or 
+* (at your option) any later version.
+* 
+* This program is distributed in the hope that it will be useful, but 
+* WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+* or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+* for more details.
+* 
+* You should have received a copy of the GNU General Public License along 
+* with this program; if not, write to the Free Software Foundation, Inc., 
+* 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+*/
+#ifndef OPMaps_H
+#define OPMaps_H
+
+//#define DEBUG_CACHE
+//#define DEBUG_GMAPS
+//#define DEBUG_PUREIMAGECACHE
+//#define DEBUG_TILECACHEQUEUE
+//#define DEBUG_URLFACTORY
 
 #include "memorycache.h"
 #include "rawtile.h"
@@ -13,15 +46,17 @@
 #include "urlfactory.h"
 //#include "point.h"
 
-class GMaps: public MemoryCache,public AllLayersOfType,public UrlFactory
+ 
+namespace core {
+class OPMaps: public MemoryCache,public AllLayersOfType,public UrlFactory
 {
 
 
 public:
 
-    ~GMaps();
+    ~OPMaps();
 
-    static GMaps* Instance();
+    static OPMaps* Instance();
     bool ImportFromGMDB(const QString &file);
     bool ExportToGMDB(const QString &file);
     /// <summary>
@@ -49,11 +84,11 @@ private:
 
     //  PureImageCache ImageCacheLocal;//TODO Criar acesso Get Set
     TileCacheQueue TileDBcacheQueue;
-    GMaps();
+    OPMaps();
 
-    GMaps(GMaps const&){};
-    GMaps& operator=(GMaps const&){};
-    static GMaps* m_pInstance;
+    OPMaps(OPMaps const&){};
+    OPMaps& operator=(OPMaps const&){};
+    static OPMaps* m_pInstance;
 
 
 protected:
@@ -63,4 +98,5 @@ protected:
 
 };
 
-#endif // GMAPS_H
+}
+#endif // OPMaps_H

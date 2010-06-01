@@ -1,5 +1,37 @@
+/**
+******************************************************************************
+*
+* @file       core.cpp
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+*             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
+* @brief      
+* @see        The GNU Public License (GPL) Version 3
+* @defgroup   OPMapWidget
+* @{
+* 
+*****************************************************************************/
+/* 
+* This program is free software; you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation; either version 3 of the License, or 
+* (at your option) any later version.
+* 
+* This program is distributed in the hope that it will be useful, but 
+* WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+* or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+* for more details.
+* 
+* You should have received a copy of the GNU General Public License along 
+* with this program; if not, write to the Free Software Foundation, Inc., 
+* 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+*/
 #include "core.h"
 
+qlonglong internals::Core::debugcounter=0;
+
+using namespace projections;
+ 
+namespace internals {
 Core::Core():currentPosition(0,0),currentPositionPixel(0,0),LastLocationInBounds(-1,-1),sizeOfMapArea(0,0)
         ,minOfTiles(0,0),maxOfTiles(0,0),isDragging(false),started(false),MouseWheelZooming(false),TooltipTextPadding(10,10),zoom(0),loaderLimit(5)
 {
@@ -12,7 +44,14 @@ Core::Core():currentPosition(0,0),currentPositionPixel(0,0),LastLocationInBounds
 }
 void Core::run()
 {
-    qDebug()<<"core:run";
+    qlonglong debug;
+    Mdebug.lock();
+    debug=++debugcounter;
+    Mdebug.unlock();
+
+#ifdef DEBUG_CORE
+    qDebug()<<"core:run"<<" ID="<<debug;
+#endif //DEBUG_CORE
     bool last = false;
 
     LoadTask task;
@@ -24,26 +63,34 @@ void Core::run()
             task = tileLoadQueue.dequeue();
             {
                 last = tileLoadQueue.count() == 0;
-                qDebug()<<"TileLoadQueue: " << tileLoadQueue.count()<<" Point:"<<task.Pos.ToString();
+#ifdef DEBUG_CORE
+                qDebug()<<"TileLoadQueue: " << tileLoadQueue.count()<<" Point:"<<task.Pos.ToString()<<" ID="<<debug;;
+#endif //DEBUG_CORE
             }
         }
     }
     MtileLoadQueue.unlock();
-    if(loaderLimit.tryAcquire(1,GMaps::Instance()->Timeout))
+    if(loaderLimit.tryAcquire(1,OPMaps::Instance()->Timeout))
     {
-
+#ifdef DEBUG_CORE
+ qDebug()<<"loadLimit semaphore aquired "<<loaderLimit.available()<<" ID="<<debug<<" TASK="<<task.Pos.ToString()<<" "<<task.Zoom;
+#endif //DEBUG_CORE
         if(task.HasValue())
         {
- qDebug()<<"AKI";
+#ifdef DEBUG_CORE
+ qDebug()<<"task as value, begining get"<<" ID="<<debug;;
+#endif //DEBUG_CORE
             {
                 Tile* m = Matrix.TileAt(task.Pos);
 
                 if(m==0 || m->Overlays.count() == 0)
                 {
-                    qDebug()<<"Fill empty TileMatrix: " + task.ToString();
+#ifdef DEBUG_CORE
+                    qDebug()<<"Fill empty TileMatrix: " + task.ToString()<<" ID="<<debug;;
+#endif //DEBUG_CORE
 
                     Tile* t = new Tile(task.Zoom, task.Pos);
-                    QVector<MapType::Types> layers= GMaps::Instance()->GetAllLayersOfType(GetMapType());
+                    QVector<MapType::Types> layers= OPMaps::Instance()->GetAllLayersOfType(GetMapType());
 
                     foreach(MapType::Types tl,layers)
                     {
@@ -55,12 +102,15 @@ void Core::run()
                             // tile number inversion(BottomLeft -> TopLeft) for pergo maps
                             if(tl == MapType::PergoTurkeyMap)
                             {
-                                img = GMaps::Instance()->GetImageFrom(tl, Point(task.Pos.X(), maxOfTiles.Height() - task.Pos.Y()), task.Zoom);
+                                img = OPMaps::Instance()->GetImageFrom(tl, Point(task.Pos.X(), maxOfTiles.Height() - task.Pos.Y()), task.Zoom);
                             }
                             else // ok
                             {
-                                img = GMaps::Instance()->GetImageFrom(tl, task.Pos, task.Zoom);
-                                qDebug()<<"Core::run:gotimage size:"<<img.count();
+                                qDebug()<<"start getting image"<<" ID="<<debug;
+                                img = OPMaps::Instance()->GetImageFrom(tl, task.Pos, task.Zoom);
+#ifdef DEBUG_CORE
+                                qDebug()<<"Core::run:gotimage size:"<<img.count()<<" ID="<<debug;
+#endif //DEBUG_CORE
                             }
 
                             if(img.length()!=0)
@@ -68,15 +118,20 @@ void Core::run()
                                 Moverlays.lock();
                                 {
                                     t->Overlays.append(img);
-                                     qDebug()<<"Core::run append img:"<<img.length()<<" to tile:"<<t->GetPos().ToString()<<" now has "<<t->Overlays.count()<<" overlays";
+#ifdef DEBUG_CORE
+                                     qDebug()<<"Core::run append img:"<<img.length()<<" to tile:"<<t->GetPos().ToString()<<" now has "<<t->Overlays.count()<<" overlays"<<" ID="<<debug;
+#endif //DEBUG_CORE
 
                                  }
                                 Moverlays.unlock();
+
                                 break;
                             }
-                            else if(GMaps::Instance()->RetryLoadTile > 0)
+                            else if(OPMaps::Instance()->RetryLoadTile > 0)
                             {
-                                qDebug()<<"ProcessLoadTask: " << task.ToString()<< " -> empty tile, retry " << retry;
+#ifdef DEBUG_CORE
+                                qDebug()<<"ProcessLoadTask: " << task.ToString()<< " -> empty tile, retry " << retry<<" ID="<<debug;;
+#endif //DEBUG_CORE
                                 {
                                     QWaitCondition wait;
                                     QMutex m;
@@ -85,14 +140,17 @@ void Core::run()
                                 }
                             }
                         }
-                        while(++retry < GMaps::Instance()->RetryLoadTile);
+                        while(++retry < OPMaps::Instance()->RetryLoadTile);
                     }
 
                     if(t->Overlays.count() > 0)
                     {
                         Matrix.SetTileAt(task.Pos,t);
-                        qDebug()<<"Core::run add tile "<<t->GetPos().ToString()<<" to matrix index "<<task.Pos.ToString();
-                        qDebug()<<"Core::run matrix index "<<task.Pos.ToString()<<" as tile with "<<Matrix.TileAt(task.Pos)->Overlays.count();
+                        emit OnNeedInvalidation();
+#ifdef DEBUG_CORE
+                        qDebug()<<"Core::run add tile "<<t->GetPos().ToString()<<" to matrix index "<<task.Pos.ToString()<<" ID="<<debug;
+                        qDebug()<<"Core::run matrix index "<<task.Pos.ToString()<<" as tile with "<<Matrix.TileAt(task.Pos)->Overlays.count()<<" ID="<<debug;
+#endif //DEBUG_CORE
                     }
                     else
                     {
@@ -109,9 +167,9 @@ void Core::run()
                 // last buddy cleans stuff ;}
                 if(last)
                 {
-                    GMaps::Instance()->kiberCacheLock.lockForWrite();
-                    GMaps::Instance()->TilesInMemory.RemoveMemoryOverload();
-                    GMaps::Instance()->kiberCacheLock.unlock();
+                    OPMaps::Instance()->kiberCacheLock.lockForWrite();
+                    OPMaps::Instance()->TilesInMemory.RemoveMemoryOverload();
+                    OPMaps::Instance()->kiberCacheLock.unlock();
 
                     MtileDrawingList.lock();
                     {
@@ -127,8 +185,12 @@ void Core::run()
 
                 }
             }
-            loaderLimit.release();
+
+
+
         }
+         qDebug()<<"loaderLimit release:"+loaderLimit.available()<<" ID="<<debug;
+         loaderLimit.release();
     }
 }
 void Core::SetZoom(const int &value)
@@ -311,7 +373,7 @@ void Core::OnMapClose()
 GeoCoderStatusCode::Types Core::SetCurrentPositionByKeywords(QString const& keys)
 {
     GeoCoderStatusCode::Types status = GeoCoderStatusCode::Unknow;
-    PointLatLng pos = GMaps::Instance()->GetLatLngFromGeodecoder(keys, status);
+    PointLatLng pos = OPMaps::Instance()->GetLatLngFromGeodecoder(keys, status);
     if(pos.IsEmpty() && status == GeoCoderStatusCode::G_GEO_SUCCESS)
     {
         SetCurrentPosition(pos);
@@ -343,7 +405,7 @@ int Core::GetMaxZoomToFitRect(RectLatLng const& rect)
 {
     int zoom = 0;
 
-    for(int i = 1; i <= GMaps::Instance()->MaxZoom; i++)
+    for(int i = 1; i <= OPMaps::Instance()->MaxZoom; i++)
     {
         Point p1 = Projection()->FromLatLngToPixel(rect.LocationTopLeft(), i);
         Point p2 = Projection()->FromLatLngToPixel(rect.Bottom(), rect.Right(), i);
@@ -376,7 +438,9 @@ void Core::ReloadMap()
 {
     if(started)
     {
+#ifdef DEBUG_CORE
         qDebug()<<"------------------";
+#endif //DEBUG_CORE
 
         MtileLoadQueue.lock();
         {
@@ -482,12 +546,13 @@ void Core::CancelAsyncTasks()
 {
     if(started)
     {
+        ProcessLoadTaskCallback.waitForDone();
         MtileLoadQueue.lock();
         {
             tileLoadQueue.clear();
         }
         MtileLoadQueue.unlock();
-        ProcessLoadTaskCallback.waitForDone();
+      //  ProcessLoadTaskCallback.waitForDone();
     }
 }
 void Core::UpdateBounds()
@@ -496,7 +561,9 @@ void Core::UpdateBounds()
     {
         FindTilesAround(tileDrawingList);
 
+#ifdef DEBUG_CORE
         qDebug()<<"OnTileLoadStart: " << tileDrawingList.count() << " tiles to load at zoom " << Zoom() << ", time: " << QDateTime::currentDateTime().date();
+#endif //DEBUG_CORE
 
         emit OnTileLoadStart();
 
@@ -510,7 +577,9 @@ void Core::UpdateBounds()
                     if(!tileLoadQueue.contains(task))
                     {
                         tileLoadQueue.enqueue(task);
+#ifdef DEBUG_CORE
                         qDebug()<<"Core::UpdateBounds new Task"<<task.Pos.ToString();
+#endif //DEBUG_CORE
                         ProcessLoadTaskCallback.start(this);
                     }
                 }
@@ -564,4 +633,5 @@ void Core::UpdateGroundResolution()
     pxRes100km =  (int) (100000.0 / rez); // 100km
     pxRes1000km = (int) (1000000.0 / rez); // 1000km
     pxRes5000km = (int) (5000000.0 / rez); // 5000km
+}
 }

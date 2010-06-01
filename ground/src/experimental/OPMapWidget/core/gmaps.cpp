@@ -1,14 +1,43 @@
+/**
+******************************************************************************
+*
+* @file       OPMaps.cpp
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+*             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
+* @brief      
+* @see        The GNU Public License (GPL) Version 3
+* @defgroup   OPMapWidget
+* @{
+* 
+*****************************************************************************/
+/* 
+* This program is free software; you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation; either version 3 of the License, or 
+* (at your option) any later version.
+* 
+* This program is distributed in the hope that it will be useful, but 
+* WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+* or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+* for more details.
+* 
+* You should have received a copy of the GNU General Public License along 
+* with this program; if not, write to the Free Software Foundation, Inc., 
+* 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+*/
 #include "gmaps.h"
 
-GMaps* GMaps::m_pInstance=0;
+ 
+namespace core {
+OPMaps* OPMaps::m_pInstance=0;
 
-GMaps* GMaps::Instance()
+OPMaps* OPMaps::Instance()
 {
     if(!m_pInstance)
-        m_pInstance=new GMaps;
+        m_pInstance=new OPMaps;
     return m_pInstance;
 }
-GMaps::GMaps():useMemoryCache(true),MaxZoom(19),RetryLoadTile(2)
+OPMaps::OPMaps():useMemoryCache(true),MaxZoom(19),RetryLoadTile(2)
 {
     accessmode=AccessMode::ServerAndCache;
     Language=LanguageType::PortuguesePortugal;
@@ -18,37 +47,49 @@ GMaps::GMaps():useMemoryCache(true),MaxZoom(19),RetryLoadTile(2)
 }
 
 
-GMaps::~GMaps()
+OPMaps::~OPMaps()
 {
     //delete Proxy;
 }
 
 
 
-QByteArray GMaps::GetImageFrom(const MapType::Types &type,const Point &pos,const int &zoom)
+QByteArray OPMaps::GetImageFrom(const MapType::Types &type,const Point &pos,const int &zoom)
 {
+#ifdef DEBUG_GMAPS
     qDebug()<<"Entered GetImageFrom";
+#endif //DEBUG_GMAPS
     QByteArray ret;
 
     if(useMemoryCache)
     {
+#ifdef DEBUG_GMAPS
         qDebug()<<"Try Tile from memory:Size="<<TilesInMemory.MemoryCacheSize();
+#endif //DEBUG_GMAPS
         ret=GetTileFromMemoryCache(RawTile(type,pos,zoom));
 
     }
     if(ret.isEmpty())
     {
+#ifdef DEBUG_GMAPS
         qDebug()<<"Tile not in memory";
+#endif //DEBUG_GMAPS
         if(accessmode != (AccessMode::ServerOnly))
         {
+#ifdef DEBUG_GMAPS
             qDebug()<<"Try tile from DataBase";
+#endif //DEBUG_GMAPS
             ret=Cache::Instance()->ImageCache.GetImageFromCache(type,pos,zoom);
             if(!ret.isEmpty())
             {
+#ifdef DEBUG_GMAPS
                 qDebug()<<"Tile found in Database";
+#endif //DEBUG_GMAPS
                 if(useMemoryCache)
                 {
+#ifdef DEBUG_GMAPS
                     qDebug()<<"Add Tile to memory";
+#endif //DEBUG_GMAPS
                     AddTileToMemoryCache(RawTile(type,pos,zoom),ret);
                 }
                 return ret;
@@ -60,7 +101,9 @@ QByteArray GMaps::GetImageFrom(const MapType::Types &type,const Point &pos,const
             QNetworkRequest qheader;
             QNetworkAccessManager network;
             network.setProxy(Proxy);
+#ifdef DEBUG_GMAPS
             qDebug()<<"Try Tile from the Internet";
+#endif //DEBUG_GMAPS
             QString url=MakeImageUrl(type,pos,zoom,LanguageStr);
             qheader.setUrl(QUrl(url));
             qheader.setRawHeader("User-Agent",UserAgent);
@@ -136,33 +179,49 @@ QByteArray GMaps::GetImageFrom(const MapType::Types &type,const Point &pos,const
                 break;
             }
             reply=network.get(qheader);
+#ifdef DEBUG_GMAPS
             qDebug()<<"Starting get response ";//<<pos.X()+","+pos.Y();
+#endif //DEBUG_GMAPS
             QTime time;
             time.start();
             while( !(reply->isFinished() | time.elapsed()>(6*Timeout)) ){QCoreApplication::processEvents(QEventLoop::AllEvents);}
+#ifdef DEBUG_GMAPS
             qDebug()<<"Finished?"<<reply->error()<<" abort?"<<(time.elapsed()>Timeout*6);
+#endif //DEBUG_GMAPS
             if( (reply->error()!=QNetworkReply::NoError) | (time.elapsed()>Timeout*6))
             {
+#ifdef DEBUG_GMAPS
                 qDebug()<<"Request timed out ";//<<pos.x+","+pos.y;
+#endif //DEBUG_GMAPS
                 return ret;
             }
+#ifdef DEBUG_GMAPS
             qDebug()<<"Response OK ";//<<pos.x+","+pos.y;
+#endif //DEBUG_GMAPS
             ret=reply->readAll();
             reply->deleteLater();//TODO can't this be global??
             if(ret.isEmpty())
             {
+#ifdef DEBUG_GMAPS
                 qDebug()<<"Invalid Tile";
+#endif //DEBUG_GMAPS
                 return ret;
             }
+#ifdef DEBUG_GMAPS
             qDebug()<<"Received Tile from the Internet";
+#endif //DEBUG_GMAPS
             if (useMemoryCache)
             {
+#ifdef DEBUG_GMAPS
                 qDebug()<<"Add Tile to memory cache";
+#endif //DEBUG_GMAPS
                 AddTileToMemoryCache(RawTile(type,pos,zoom),ret);
             }
             if(accessmode!=AccessMode::ServerOnly)
             {
+#ifdef DEBUG_GMAPS
                 qDebug()<<"Add tile to DataBase";
+#endif //DEBUG_GMAPS
                 CacheItemQueue item(type,pos,ret,zoom);
                 TileDBcacheQueue.EnqueueCacheTask(item);
             }
@@ -170,15 +229,18 @@ QByteArray GMaps::GetImageFrom(const MapType::Types &type,const Point &pos,const
 
         }
     }
+#ifdef DEBUG_GMAPS
     qDebug()<<"Entered GetImageFrom";
+#endif //DEBUG_GMAPS
     return ret;
 }
 
-bool GMaps::ExportToGMDB(const QString &file)
+bool OPMaps::ExportToGMDB(const QString &file)
 {
     return Cache::Instance()->ImageCache.ExportMapDataToDB(Cache::Instance()->ImageCache.GtileCache()+QDir::separator()+"Data.qmdb",file);
 }
-bool GMaps::ImportFromGMDB(const QString &file)
+bool OPMaps::ImportFromGMDB(const QString &file)
 {
     return Cache::Instance()->ImageCache.ExportMapDataToDB(file,Cache::Instance()->ImageCache.GtileCache()+QDir::separator()+"Data.qmdb");
+}
 }

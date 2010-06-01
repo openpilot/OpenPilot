@@ -25,10 +25,15 @@
 #include "../core/size.h"
 #include "../internals/copyrightstrings.h"
 #include "../internals/projections/lks94projection.h"
+
+using namespace core;
+using namespace internals;
+using namespace projections;
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
- //   GMaps g;
+ //   OPMaps g;
 //    qDebug()<<g.GoogleMapsAPIKey;
 //    qDebug()<<QString(g.levelsForSigPacSpainMap[2]);
 //    qDebug()<<g.MakeImageUrl(GoogleMap,Point(18,10),5,QString("en"));
@@ -76,17 +81,17 @@ int main(int argc, char *argv[])
 ////   // QTest::qsleep(200);
 ////    queue.EnqueueCacheTask(item);
 ////}
-//pixmapb=PureImageProxy::FromStream(GMaps::Instance()->GetImageFrom(MapType::GoogleMap,Point(7,5),8));
+//pixmapb=PureImageProxy::FromStream(OPMaps::Instance()->GetImageFrom(MapType::GoogleMap,Point(7,5),8));
 //qDebug()<<"WITH"<<pixmapb.width();
 labell.setPixmap(pixmapb);
 ////
 labell.show();
 // QCoreApplication::processEvents(QEventLoop::AllEvents);
-////pixmapb=GMaps::Instance()->GetImageFrom(MapType::GoogleSatellite,Point(1,0),1);
+////pixmapb=OPMaps::Instance()->GetImageFrom(MapType::GoogleSatellite,Point(1,0),1);
 ////labell.setPixmap(pixmapb);
 ////GeoCoderStatusCode::Types f;
-////qDebug()<<"LAT"<<GMaps::Instance()->GetLatLngFromGeodecoder("lisbon",f).Lat();
-////QString s=GMaps::Instance()->GetPlacemarkFromGeocoder(GMaps::Instance()->GetLatLngFromGeodecoder("lisbon",f)).Address();
+////qDebug()<<"LAT"<<OPMaps::Instance()->GetLatLngFromGeodecoder("lisbon",f).Lat();
+////QString s=OPMaps::Instance()->GetPlacemarkFromGeocoder(OPMaps::Instance()->GetLatLngFromGeodecoder("lisbon",f)).Address();
 ////labell.show();
 ////labell.setText(s);
 //threadpool *g=new threadpool();

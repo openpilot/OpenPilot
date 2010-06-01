@@ -1,5 +1,36 @@
+/**
+******************************************************************************
+*
+* @file       core.h
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+*             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
+* @brief      
+* @see        The GNU Public License (GPL) Version 3
+* @defgroup   OPMapWidget
+* @{
+* 
+*****************************************************************************/
+/* 
+* This program is free software; you can redistribute it and/or modify 
+* it under the terms of the GNU General Public License as published by 
+* the Free Software Foundation; either version 3 of the License, or 
+* (at your option) any later version.
+* 
+* This program is distributed in the hope that it will be useful, but 
+* WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+* or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+* for more details.
+* 
+* You should have received a copy of the GNU General Public License along 
+* with this program; if not, write to the Free Software Foundation, Inc., 
+* 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+*/
 #ifndef CORE_H
 #define CORE_H
+
+#define DEBUG_CORE
+//#define DEBUG_TILE
+//#define DEBUG_TILEMATRIX
 
 #include "../internals/PointLatlng.h"
 #include "mousewheelzoomtype.h"
@@ -25,13 +56,15 @@
 
 //#include <QObject>
 
+ 
+namespace internals {
 class Core:public QObject,public QRunnable
 {
     Q_OBJECT
 public:
     Core();
     void run();
-    PointLatLng CurrentPosition(){return currentPosition;};
+    PointLatLng CurrentPosition()const{return currentPosition;};
     void SetCurrentPosition(const PointLatLng &value);
 
     Point GetcurrentPositionGPixel(){return currentPositionPixel;};
@@ -95,7 +128,7 @@ public:
     }
     bool IsDragging()const{return isDragging;}
 
-    int Zoom(){return zoom;}
+    int Zoom()const{return zoom;}
 
     void SetZoom(int const& value);
 
@@ -150,6 +183,8 @@ public:
     Point mouseDown;
     bool CanDragMap;
     Point mouseCurrent;
+    PointLatLng LastLocationInBounds;
+    Point mouseLastZoom;
 signals:
     void OnCurrentPositionChanged(PointLatLng point);
     void OnTileLoadComplete();
@@ -162,6 +197,7 @@ signals:
 
 private:
 
+    static qlonglong debugcounter;
     PointLatLng currentPosition;
     Point currentPositionPixel;
     Point renderOffset;
@@ -170,10 +206,8 @@ private:
     Point dragPoint;
 
 
-    Point mouseLastZoom;
-
     MouseWheelZoomType::Types mousewheelzoomtype;
-    PointLatLng LastLocationInBounds;
+
 
     Size sizeOfMapArea;
     Size minOfTiles;
@@ -200,6 +234,8 @@ private:
 
     QMutex MtileDrawingList;
 
+    QMutex Mdebug;
+
     Size TooltipTextPadding;
 
     MapType::Types mapType;
@@ -224,4 +260,5 @@ protected:
 
 };
 
+}
 #endif // CORE_H

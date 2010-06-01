@@ -164,6 +164,9 @@ void PathChooser::slotBrowse()
             predefined.clear();
     }
 
+    if (predefined.startsWith(":"))
+        predefined.clear();
+
     // Prompt for a file/dir
     QString dialogTitle;
     QString newPath;

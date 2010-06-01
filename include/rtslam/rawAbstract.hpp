@@ -45,6 +45,9 @@ namespace jafar {
 		class RawAbstract: public ObjectAbstract {
 			private:
 			public:
+				enum detect_method {
+					HARRIS ///< Harris corner detector.
+				};
 				RawAbstract();
 				virtual ~RawAbstract();
 				/*
@@ -52,6 +55,7 @@ namespace jafar {
 				 * It shows some informations
 				 */
 				friend ostream& operator <<(ostream & s, jafar::rtslam::RawAbstract & rawA);
+//				virtual bool detect(const detect_method met, feature_ptr_t & featurePtr) = 0;
 		};
 	}
 }

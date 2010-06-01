@@ -34,8 +34,8 @@ namespace jafar {
 		void ExtendedKalmanFilterIndirect::predict(const ind_array & ia_x, const mat & F_v, const ind_array & ia_v,
 		    const mat & F_u, const sym_mat & U)
 		{
-			ind_array ia_inv = ublasExtra::ia_complement(ia_x, ia_v);
-			ixaxpy_prod(P_, ia_inv, F_v, ia_v, ia_v, prod_JPJt(U, F_u));
+			ind_array ia_invariant = ublasExtra::ia_complement(ia_x, ia_v);
+			ixaxpy_prod(P_, ia_invariant, F_v, ia_v, ia_v, prod_JPJt(U, F_u));
 		}
 
 		void ExtendedKalmanFilterIndirect::predict(const ind_array & ia_x, const mat & F_v, const ind_array & ia_v,
@@ -68,7 +68,8 @@ namespace jafar {
 		}
 
 		void ExtendedKalmanFilterIndirect::reparametrize(const ind_array & ia_x, const mat & J_l, const ind_array & ia_old, const ind_array & ia_new){
-			ixaxpy_prod(P_, ia_x, J_l, ia_old, ia_new);
+			ind_array ia_invariant = ia_complement(ia_x, ia_old);
+			ixaxpy_prod(P_, ia_invariant, J_l, ia_old, ia_new);
 			// \todo build output indirect-array
 		}
 

@@ -67,6 +67,7 @@ namespace jafar {
 					UNREGISTER_FROM_WEAK_SPECIFIC_PARENT(ImageManagerPoint,ObservationPinHoleAnchoredHomogeneousPoint);
 				}
 
+//				void setup(double _pixNoise = 1.0);
 
 				/**
 				 * Projection function, with Jacobians and non-observable part.
@@ -108,6 +109,8 @@ namespace jafar {
 				 */
 				void linkToWeakParentDataManager(void);
 
+			public:
+				double pixelNoise;
 
 		};
 

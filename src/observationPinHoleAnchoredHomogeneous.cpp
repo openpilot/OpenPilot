@@ -30,6 +30,12 @@ namespace jafar {
 			categoryName("PINHOLE-AHP OBS");
 		}
 
+//		void ObservationPinHoleAnchoredHomogeneousPoint::setup(double _pixNoise = 1.0) {
+//			pixelNoise = _pixNoise;
+//		  noiseCovariance = pixelNoise*pixelNoise*identity_mat(2);
+//		}
+
+
 		void ObservationPinHoleAnchoredHomogeneousPoint::project_func(
 		    const vec7 & sg, const vec & lmk, vec & exp, vec & dist, mat & EXP_sg,
 		    mat & EXP_lmk) {

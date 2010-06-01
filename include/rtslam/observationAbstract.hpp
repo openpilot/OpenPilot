@@ -119,9 +119,12 @@ namespace jafar {
 				Gaussian prior;
 				appearance_ptr_t predictedAppearance;
 				appearance_ptr_t observedAppearance;
+				jblas::sym_mat noiseCovariance;
 
+				// indirect arrays
 				ind_array ia_rsl; ///<    Ind. array of mapped indices of robot, sensor and landmark (ie, sensor might or might not be there).
 
+				// Jacobians
 				mat SG_rs; ///<						Jacobian of global sensor pose wrt. robot and sensor mapped states
 				mat EXP_sg; ///<				 	Jacobian of expectation wrt. global sensor pose
 				mat EXP_l; ///< 					Jacobian of expectation wrt. landmark state
@@ -147,7 +150,7 @@ namespace jafar {
 				 * Events
 				 */
 				struct events {
-						bool predicted; ///<	Landmark is not new and has been predicted TODO
+						bool predicted; ///<	Landmark is not new and has been predicted
 						bool visible; ///< 		Landmark is visible
 						bool measured; ///< 	Feature is measured
 						bool matched; ///< 		Feature is matched
@@ -166,7 +169,9 @@ namespace jafar {
 				virtual void
 				project_func(const vec7 & sg, const vec & lmk, vec & meas, vec & nobs, mat & EXP_sg, mat & EXP_lmk) = 0;
 
-				virtual void setup(const feature_ptr_t & featPtr, const Gaussian & _prior);
+//				virtual void setup(const feature_ptr_t & featPtr, const Gaussian & _prior);
+//				virtual void setup(const vec & _noiseStd);
+				virtual void setup(const vec & _noiseStd, const Gaussian & _prior);
 
 				/**
 				 * Project and get expectation covariances

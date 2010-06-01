@@ -17,6 +17,10 @@
 
 #include "image/Image.hpp"
 
+#include "qdisplay/Viewer.hpp"
+#include "qdisplay/ViewerManager.hpp"
+#include "qdisplay/ImageView.hpp"
+
 namespace jafar {
 	namespace rtslam {
 		using namespace std;
@@ -63,6 +67,16 @@ namespace jafar {
 			imgRawPtr->setJafarImage(i) ;
 
 			this->currentRawPtr = imgRawPtr;
+
+			// try to print the image
+			// todo remove this test
+//			cout << "creating viewer manager..." << endl;
+//			jafar::qdisplay::ViewerManager viewerManager;
+//			cout << "creating image viewer..." << endl;
+//			jafar::qdisplay::ImageView imgView;
+//			cout << "creating viewer..." << endl;
+//			jafar::qdisplay::Viewer viewer;
+//			cout << "after vewer" << endl;
 
 		}
 

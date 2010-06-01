@@ -1,6 +1,6 @@
 /**
  * \file observationPinHolePoint.hpp
- * 
+ *
  * ## Add brief description here ##
  *
  * \author jsola@laas.fr
@@ -38,7 +38,6 @@ namespace jafar {
 					// 1. generate random pixel
 					vec2 pix;
 					pix(0) = roi.x + rand()%roi.width; pix(1) = roi.y + rand()%roi.height;
-//					cout << "Detected pixel: " << pix << endl;
 
 					// Assign pixel and covariance
 					featPtr->state.x(pix);

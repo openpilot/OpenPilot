@@ -1,6 +1,6 @@
 /**
  * \file test_slam.cpp
- * 
+ *
  * ## Add brief description here ##
  *
  * \author jsola@laas.fr
@@ -34,7 +34,7 @@
 #include "rtslam/activeSearch.hpp"
 #include "rtslam/observationPinHolePoint.hpp"
 #include "rtslam/featureAbstract.hpp"
-#include "rtslam/rawImage.hpp"
+//#include "rtslam/rawImage.hpp"
 
 //#include "rtslam/display_qt.hpp"
 //#include "image/Image.hpp"
@@ -63,31 +63,37 @@ void test_slam01() {
 	robconstvel_ptr_t robPtr1(new RobotConstantVelocity(mapPtr));
 	robPtr1->id(robPtr1->robotIds.getId());
 	robPtr1->linkToParentMap(mapPtr);
-	robPtr1->state.clear();
+	vec v(13);
+	fillVector(v, 0.1);
+	robPtr1->state.x(v);
 	robPtr1->pose.x(quaternion::originFrame());
+	robPtr1->dt_or_dx = 1;
 	pinhole_ptr_t senPtr11 (new SensorPinHole(robPtr1, MapObject::FILTERED));
 	senPtr11->id(senPtr11->sensorIds.getId());
 	senPtr11->linkToParentRobot(robPtr1);
 	senPtr11->state.clear();
 	senPtr11->pose.x(quaternion::originFrame());
 	senPtr11->set_parameters(imSz, k, d, c);
-	pinhole_ptr_t senPtr12 (new SensorPinHole(robPtr1, MapObject::FILTERED));
-	senPtr12->id(senPtr12->sensorIds.getId());
-	senPtr12->linkToParentRobot(robPtr1);
-	senPtr12->state.clear();
-	senPtr12->pose.x(quaternion::originFrame());
-	senPtr12->set_parameters(imSz, k, d, c);
-	robodo_ptr_t robPtr2(new RobotOdometry(mapPtr));
-	robPtr2->id(robPtr2->robotIds.getId());
-	robPtr2->linkToParentMap(mapPtr);
-	robPtr2->state.clear();
-	robPtr2->pose.x(quaternion::originFrame());
-	pinhole_ptr_t senPtr21 (new SensorPinHole(robPtr2, MapObject::FILTERED));
-	senPtr21->id(senPtr21->sensorIds.getId());
-	senPtr21->linkToParentRobot(robPtr2);
-	senPtr21->state.clear();
-	senPtr21->pose.x(quaternion::originFrame());
-	senPtr21->set_parameters(imSz, k, d, c);
+//	pinhole_ptr_t senPtr12 (new SensorPinHole(robPtr1, MapObject::FILTERED));
+//	senPtr12->id(senPtr12->sensorIds.getId());
+//	senPtr12->linkToParentRobot(robPtr1);
+//	senPtr12->state.clear();
+//	senPtr12->pose.x(quaternion::originFrame());
+//	senPtr12->set_parameters(imSz, k, d, c);
+//	robodo_ptr_t robPtr2(new RobotOdometry(mapPtr));
+//	robPtr2->id(robPtr2->robotIds.getId());
+//	robPtr2->linkToParentMap(mapPtr);
+//	robPtr2->state.clear();
+//	robPtr2->pose.x(quaternion::originFrame());
+//	v.resize(6);
+//	fillVector(v, 0.1);
+//	robPtr2->control = v;
+//	pinhole_ptr_t senPtr21 (new SensorPinHole(robPtr2, MapObject::FILTERED));
+//	senPtr21->id(senPtr21->sensorIds.getId());
+//	senPtr21->linkToParentRobot(robPtr2);
+//	senPtr21->state.clear();
+//	senPtr21->pose.x(quaternion::originFrame());
+//	senPtr21->set_parameters(imSz, k, d, c);
 
 	// Show empty map
 	cout << *mapPtr << endl;
@@ -112,6 +118,7 @@ void test_slam01() {
 			robot_ptr_t robPtr = *robIter;
 			cout << "\nROBOT: " << robPtr->id() << endl;
 			vec u(robPtr->mySize_control()); // TODO put some real values in u.
+			fillVector(u, 0.1);
 			robPtr->set_control(u);
 			robPtr->move();
 
@@ -124,6 +131,7 @@ void test_slam01() {
 				cout << "\nSENSOR: " << senPtr->id() << endl;
 				// get raw-data
 				senPtr->acquireRaw() ;
+
 
 				// 1. Observe known landmarks
 				// foreach observation
@@ -183,6 +191,7 @@ void test_slam01() {
 						feature_ptr_t featPtr(new FeatureAbstract(2));
 						if (ObservationPinHolePoint::detectInRoi(senPtr->getRaw(), roi, featPtr)){
 							cout << "Initializing lmk..." << endl;
+							cout << "Detected pixel: " << featPtr->state.x() << endl;
 
 							// 2a. create lmk object
 							ahp_ptr_t lmkPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr));
@@ -198,7 +207,10 @@ void test_slam01() {
 							// 2c. fill data for this obs
 							obsPtr->events.visible = true;
 							obsPtr->events.measured = true;
-							obsPtr->setup(featPtr, ObservationPinHoleAnchoredHomogeneousPoint::getPrior());
+							vec measNoiseStd(2);
+							fillVector(measNoiseStd, 1.0);
+							obsPtr->setup(measNoiseStd, ObservationPinHoleAnchoredHomogeneousPoint::getPrior());
+							obsPtr->measurement.x(featPtr->state.x());
 
 							// 2d. comute and fill data for the landmark
 							obsPtr->backProject();

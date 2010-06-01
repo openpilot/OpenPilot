@@ -23,6 +23,11 @@ namespace jafar {
 			categoryName("PINHOLE-EUC OBS");
 		}
 
+//		void ObservationPinHoleEuclideanPoint::setup(double _pixNoise = 1.0) {
+//					pixelNoise = _pixNoise;
+//				  noiseCovariance = pixelNoise*pixelNoise*identity_mat(2);
+//		}
+
 		void ObservationPinHoleEuclideanPoint::project_func(const vec7 & sg,
 		    const vec & lmk, vec & exp, vec & dist, mat & EXP_sg, mat & EXP_lmk) {
 			// resize input vectors

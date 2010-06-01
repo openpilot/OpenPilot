@@ -77,6 +77,7 @@ namespace jafar {
 		    measurement(_size),
 		    innovation(_size),
 		    prior(_size_nonobs),
+		    noiseCovariance(_size),
 		    ia_rsl(ublasExtra::ia_union(_senPtr->ia_globalPose, _lmkPtr->state.ia())),
 		    SG_rs(7, _senPtr->ia_globalPose.size()),
 		    EXP_sg(_size, 7),
@@ -96,10 +97,14 @@ namespace jafar {
 			clearEvents();
 		}
 
-		void ObservationAbstract::setup(const feature_ptr_t & featPtr, const Gaussian & _prior){
-			// todo implement setup()
-			measurement.x() = featPtr->state.x();
-			measurement.P() = featPtr->state.P();
+//		void ObservationAbstract::setup(const feature_ptr_t & featPtr, const Gaussian & _prior){
+		void ObservationAbstract::setup(const vec & _noiseStd, const Gaussian & _prior){
+			noiseCovariance.clear();
+			for (size_t i = 0; i < measurement.size(); i++){
+				noiseCovariance(i,i) = _noiseStd(i)*_noiseStd(i);
+			}
+			measurement.clear();
+			measurement.P(noiseCovariance);
 			prior.x(_prior.x());
 			prior.P(_prior.P());
 		}

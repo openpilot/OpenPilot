@@ -25,7 +25,7 @@ namespace jafar {
 		template<typename> class IdCollectorSet;
 		template<typename, template<typename> class> class IdFactory;
 	}
-	
+
 	namespace rtslam {
 
 
@@ -57,8 +57,8 @@ namespace jafar {
 
 		typedef boost::shared_ptr<Gaussian>						gaussian_ptr_t;
 		typedef boost::shared_ptr<ExtendedKalmanFilterIndirect> ekfInd_ptr_t;
-		
-		typedef kernel::IdFactory<uint64_t, kernel::IdCollectorNone> IdFactory; // FIXME maybe we should change for a smarter IdFactory ? eg:
+
+		typedef kernel::IdFactory<unsigned int, kernel::IdCollectorNone> IdFactory; // FIXME maybe we should change for a smarter IdFactory ? eg:
 		//typedef kernel::IdFactory<unsigned, kernel::IdCollectorList> IdFactory;
 		//typedef kernel::IdFactory<unsigned, kernel::IdCollectorSet> IdFactory;
 	}

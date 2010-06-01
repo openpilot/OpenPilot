@@ -87,9 +87,19 @@ QString UAVGadgetMode::name() const
     return m_name;
 }
 
+void UAVGadgetMode::setName(QString name)
+{
+    m_name = name;
+}
+
 QIcon UAVGadgetMode::icon() const
 {
     return m_icon;
+}
+
+void UAVGadgetMode::setIcon(QIcon icon)
+{
+    m_icon = icon;
 }
 
 int UAVGadgetMode::priority() const

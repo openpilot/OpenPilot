@@ -110,7 +110,7 @@ PathChooser::PathChooser(QWidget *parent) :
     connect(m_d->m_lineEdit, SIGNAL(validChanged(bool)), this, SIGNAL(validChanged(bool)));
     connect(m_d->m_lineEdit, SIGNAL(editingFinished()), this, SIGNAL(editingFinished()));
 
-    m_d->m_lineEdit->setMinimumWidth(200);
+    m_d->m_lineEdit->setMinimumWidth(50);
     m_d->m_hLayout->addWidget(m_d->m_lineEdit);
     m_d->m_hLayout->setSizeConstraint(QLayout::SetMinimumSize);
 

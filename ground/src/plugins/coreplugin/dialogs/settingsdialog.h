@@ -78,6 +78,8 @@ private:
     bool m_applied;
     QString m_currentCategory;
     QString m_currentPage;
+    int m_windowWidth;
+    int m_windowHeight;
 };
 
 } // namespace Internal

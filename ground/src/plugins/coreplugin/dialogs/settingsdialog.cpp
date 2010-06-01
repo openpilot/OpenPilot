@@ -53,7 +53,10 @@ using namespace Core::Internal;
 
 SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId,
                                const QString &pageId)
-    : QDialog(parent), m_applied(false)
+    : QDialog(parent),
+    m_applied(false),
+    m_windowWidth(0),
+    m_windowHeight(0)
 {
     setupUi(this);
 #ifdef Q_OS_MAC
@@ -67,7 +70,11 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId,
         QSettings *settings = ICore::instance()->settings();
         initialCategory = settings->value("General/LastPreferenceCategory", QVariant(QString())).toString();
         initialPage = settings->value("General/LastPreferencePage", QVariant(QString())).toString();
+        m_windowWidth = settings->value("General/SettingsWindowWidth", 0).toInt();
+        m_windowHeight = settings->value("General/SettingsWindowHeight", 0).toInt();
     }
+    if (m_windowWidth > 0 && m_windowHeight > 0)
+        resize(m_windowWidth, m_windowHeight);
     buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
 
     connect(buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(apply()));
@@ -77,6 +84,7 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId,
     connect(this, SIGNAL(settingsDialogShown(Core::Internal::SettingsDialog*)), m_instanceManager, SLOT(settingsDialogShown(Core::Internal::SettingsDialog*)));
     connect(this, SIGNAL(settingsDialogRemoved()), m_instanceManager, SLOT(settingsDialogRemoved()));
 
+    splitter->setCollapsible(0, false);
     splitter->setCollapsible(1, false);
     pageTree->header()->setVisible(false);
 
@@ -250,5 +258,7 @@ void SettingsDialog::done(int val)
     QSettings *settings = ICore::instance()->settings();
     settings->setValue("General/LastPreferenceCategory", m_currentCategory);
     settings->setValue("General/LastPreferencePage", m_currentPage);
+    settings->setValue("General/SettingsWindowWidth", this->width());
+    settings->setValue("General/SettingsWindowHeight", this->height());
     QDialog::done(val);
 }

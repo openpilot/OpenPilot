@@ -45,52 +45,29 @@ QWidget *HITLOptionsPage::createPage(QWidget *parent)
     m_optionsPage = new Ui::HITLOptionsPage();
     QWidget* optionsPageWidget = new QWidget;
     m_optionsPage->setupUi(optionsPageWidget);
-    connect(m_optionsPage->loadFileBin, SIGNAL(clicked()), this, SLOT(onLoadFileBinClicked()));
-    connect(m_optionsPage->loadFileData, SIGNAL(clicked()), this, SLOT(onLoadFileDataClicked()));
+
+    m_optionsPage->executablePathChooser->setExpectedKind(Utils::PathChooser::File);
+    m_optionsPage->executablePathChooser->setPromptDialogTitle(tr("Choose FlightGear executable"));
+    m_optionsPage->dataDirectoryPathChooser->setExpectedKind(Utils::PathChooser::Directory);
+    m_optionsPage->dataDirectoryPathChooser->setPromptDialogTitle(tr("Choose FlightGear data directory"));
 
     // Restore the contents from the settings:
-    m_optionsPage->fgPathBin->setText(m_config->fgPathBin());
-    m_optionsPage->fgPathData->setText(m_config->fgPathData());
+    m_optionsPage->executablePathChooser->setPath(m_config->fgPathBin());
+    m_optionsPage->dataDirectoryPathChooser->setPath(m_config->fgPathData());
     m_optionsPage->fgManualControl->setChecked(m_config->fgManualControl());
+
 
     return optionsPageWidget;
 }
 
 void HITLOptionsPage::apply()
 {
-    m_config->setFGPathBin( m_optionsPage->fgPathBin->text());
-    m_config->setFGPathData( m_optionsPage->fgPathData->text());
+    m_config->setFGPathBin( m_optionsPage->executablePathChooser->path());
+    m_config->setFGPathData( m_optionsPage->dataDirectoryPathChooser->path());
     m_config->setFGManualControl( m_optionsPage->fgManualControl->isChecked());
 }
 
 void HITLOptionsPage::finish()
 {
-    disconnect(this);
     delete m_optionsPage;
 }
-
-void HITLOptionsPage::onLoadFileBinClicked()
-{
-    QFileDialog::Options options;
-    QString selectedFilter;
-    QString fileName = QFileDialog::getOpenFileName(qobject_cast<QWidget*>(this),
-                                                    tr("QFileDialog::getOpenFileName()"),
-                                                    m_optionsPage->fgPathBin->text(),
-                                                    tr("All Files (*)"),
-                                                    &selectedFilter,
-                                                    options);
-    if (!fileName.isEmpty())  m_optionsPage->fgPathBin->setText(fileName);
-}
-
-void HITLOptionsPage::onLoadFileDataClicked()
-{
-    QFileDialog::Options options;
-    QString selectedFilter;
-    QString fileName = QFileDialog::getExistingDirectory(qobject_cast<QWidget*>(this),
-                                                         tr("Open Directory"),
-                                                         m_optionsPage->fgPathData->text(),
-                                                         QFileDialog::ShowDirsOnly
-                                                         | QFileDialog::DontResolveSymlinks);
-    if (!fileName.isEmpty()) m_optionsPage->fgPathData->setText(fileName);
-}
-

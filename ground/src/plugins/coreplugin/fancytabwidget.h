@@ -78,6 +78,7 @@ public:
     void removeTab(int index) {
         m_tabs.removeAt(index);
     }
+    void updateTabNameIcon(int index, const QIcon &icon, const QString &label);
     void setCurrentIndex(int index);
     int currentIndex() const { return m_currentIndex; }
 
@@ -123,6 +124,7 @@ public:
     void insertCornerWidget(int pos, QWidget *widget);
     int cornerWidgetCount() const;
     void setTabToolTip(int index, const QString &toolTip);
+    void updateTabNameIcon(int index, const QIcon &icon, const QString &label);
 
     void paintEvent(QPaintEvent *event);
 

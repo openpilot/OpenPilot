@@ -23,4 +23,5 @@ SOURCES += browserplugin.cpp \
     browseritemdelegate.cpp \
     fieldtreeitem.cpp
 OTHER_FILES += UAVObjectBrowser.pluginspec
-FORMS += uavobjectbrowser.ui
+FORMS += uavobjectbrowser.ui \
+    uavobjectbrowseroptionspage.ui

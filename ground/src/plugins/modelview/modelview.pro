@@ -18,3 +18,4 @@ SOURCES += modelviewplugin.cpp \
     modelviewgadgetwidget.cpp \
     modelviewgadgetoptionspage.cpp
 OTHER_FILES += ModelViewGadget.pluginspec
+FORMS += modelviewoptionspage.ui

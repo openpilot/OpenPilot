@@ -63,6 +63,8 @@ public:
     const char* uniqueModeName() const;
     QList<int> context() const;
     UAVGadgetManager* uavGadgetManager() const { return m_uavGadgetManager; }
+    void setName(QString name);
+    void setIcon(QIcon icon);
 
 private slots:
     void grabUAVGadgetManager(Core::IMode *mode);

@@ -36,6 +36,8 @@ class QSettings;
 
 namespace Core {
 
+    class ModeManager;
+
 namespace Internal {
 
 namespace Ui {
@@ -62,12 +64,14 @@ public:
 signals:
 
 public slots:
-    void selectWorkspace(int index);
+    void selectWorkspace(int index, bool store = false);
     void numberOfWorkspacesChanged(int value);
     void textEdited(QString string);
+    void iconChanged();
 private:
     Ui::WorkspaceSettings *m_page;
     QSettings *m_settings;
+    ModeManager *m_modeManager;
     QStringList m_iconNames;
     QStringList m_names;
     int m_currentIndex;

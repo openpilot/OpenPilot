@@ -27,6 +27,8 @@
 
 #include "workspacesettings.h"
 #include <coreplugin/icore.h>
+#include <coreplugin/modemanager.h>
+#include <coreplugin/uavgadgetmode.h>
 #include <QtCore/QSettings>
 
 #include "ui_workspacesettings.h"
@@ -73,7 +75,10 @@ QWidget *WorkspaceSettings::createPage(QWidget *parent)
     m_page = new Ui::WorkspaceSettings();
     QWidget *w = new QWidget(parent);
     m_page->setupUi(w);
+
+    // Read workspaces from settings
     m_page->numberOfWorkspacesSpinBox->setMaximum(MAX_WORKSPACES);
+    m_modeManager = Core::ICore::instance()->modeManager();
     m_settings = Core::ICore::instance()->settings();
     m_settings->beginGroup(QLatin1String("Workspace"));
     const int numberOfWorkspaces = m_settings->value(QLatin1String("NumberOfWorkspaces"), 2).toInt();
@@ -89,26 +94,26 @@ QWidget *WorkspaceSettings::createPage(QWidget *parent)
         if (i <= numberOfWorkspaces)
             m_page->workspaceComboBox->addItem(QIcon(iconName), name);
     }
+    m_page->iconPathChooser->setExpectedKind(Utils::PathChooser::File);
+    m_page->iconPathChooser->setPromptDialogFilter(tr("Images (*.png *.jpg *.bmp *.xpm)"));
+    m_page->iconPathChooser->setPromptDialogTitle(tr("Choose icon"));
 
     m_settings->endGroup();
 
     connect(m_page->workspaceComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(selectWorkspace(int)));
     connect(m_page->numberOfWorkspacesSpinBox, SIGNAL(valueChanged(int)), this, SLOT(numberOfWorkspacesChanged(int)));
     connect(m_page->nameEdit, SIGNAL(textEdited(QString)), this, SLOT(textEdited(QString)));
+    connect(m_page->iconPathChooser, SIGNAL(browsingFinished()), this, SLOT(iconChanged()));
 
     m_currentIndex = 0;
-    QString iconName = m_iconNames.at(m_currentIndex);
-    m_page->iconEdit->setText(iconName);
-    m_page->iconLabel->setPixmap(QIcon(iconName).pixmap(16, 16));
-    m_page->nameEdit->setText(m_names.at(m_currentIndex));
+    selectWorkspace(m_currentIndex);
+
     return w;
 }
 
 void WorkspaceSettings::apply()
 {
-
-    m_iconNames.replace(m_currentIndex, m_page->iconEdit->text());
-    m_names.replace(m_currentIndex, m_page->nameEdit->text());
+    selectWorkspace(m_currentIndex, true);
 
     m_settings->beginGroup(QLatin1String("Workspace"));
     m_settings->setValue(QLatin1String("NumberOfWorkspaces"), m_page->numberOfWorkspacesSpinBox->value());
@@ -118,6 +123,11 @@ void WorkspaceSettings::apply()
         QString defaultIconName = "Icon" + numberString;
         m_settings->setValue(defaultName, m_names.at(i-1));
         m_settings->setValue(defaultIconName, m_iconNames.at(i-1));
+        QString modeName = "Mode" + numberString;
+        Core::Internal::UAVGadgetMode *mode = qobject_cast<Core::Internal::UAVGadgetMode*>(m_modeManager->mode(modeName));
+        if (mode) {
+            m_modeManager->updateModeNameIcon(mode, QIcon(m_iconNames.at(i-1)), m_names.at(i-1));
+        }
     }
     m_settings->endGroup();
 
@@ -131,6 +141,12 @@ void WorkspaceSettings::finish()
 void WorkspaceSettings::textEdited(QString name)
 {
     m_page->workspaceComboBox->setItemText(m_currentIndex, m_page->nameEdit->text());
+}
+
+void WorkspaceSettings::iconChanged()
+{
+    QString iconName = m_page->iconPathChooser->path();
+    m_page->workspaceComboBox->setItemIcon(m_currentIndex, QIcon(iconName));
 }
 
 void WorkspaceSettings::numberOfWorkspacesChanged(int value)
@@ -147,18 +163,19 @@ void WorkspaceSettings::numberOfWorkspacesChanged(int value)
     }
 }
 
-void WorkspaceSettings::selectWorkspace(int index)
+void WorkspaceSettings::selectWorkspace(int index, bool store)
 {
-    // write old values of workspace not shown anymore
-    m_iconNames.replace(m_currentIndex, m_page->iconEdit->text());
-    m_names.replace(m_currentIndex, m_page->nameEdit->text());
-    m_page->workspaceComboBox->setItemIcon(m_currentIndex, QIcon(m_page->iconEdit->text()));
-    m_page->workspaceComboBox->setItemText(m_currentIndex, m_page->nameEdit->text());
+    if (store || (index != m_currentIndex)) {
+        // write old values of workspace not shown anymore
+        m_iconNames.replace(m_currentIndex, m_page->iconPathChooser->path());
+        m_names.replace(m_currentIndex, m_page->nameEdit->text());
+        m_page->workspaceComboBox->setItemIcon(m_currentIndex, QIcon(m_page->iconPathChooser->path()));
+        m_page->workspaceComboBox->setItemText(m_currentIndex, m_page->nameEdit->text());
+    }
 
-    // display current workspace
+    // display current workspace   
     QString iconName = m_iconNames.at(index);
-    m_page->iconEdit->setText(iconName);
-    m_page->iconLabel->setPixmap(QIcon(iconName).pixmap(16, 16));
+    m_page->iconPathChooser->setPath(iconName);
     m_page->nameEdit->setText(m_names.at(index));
     m_currentIndex = index;
 }

@@ -17,3 +17,4 @@ SOURCES += mapplugin.cpp \
     mapgadgetwidget.cpp \
     mapgadgetoptionspage.cpp
 OTHER_FILES += MapGadget.pluginspec
+FORMS += mapgadgetoptionspage.ui

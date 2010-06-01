@@ -162,6 +162,12 @@ void FancyTabBar::leaveEvent(QEvent *e)
     }
 }
 
+void FancyTabBar::updateTabNameIcon(int index, const QIcon &icon, const QString &label)
+{
+    m_tabs[index].icon = icon;
+    m_tabs[index].text = label;
+}
+
 QSize FancyTabBar::sizeHint() const
 {
     QSize sh = tabSizeHint();
@@ -358,6 +364,13 @@ void FancyTabWidget::removeTab(int index)
     m_modesStack->removeWidget(m_modesStack->widget(index));
     m_tabBar->removeTab(index);
 }
+
+void FancyTabWidget::updateTabNameIcon(int index, const QIcon &icon, const QString &label)
+{
+    m_tabBar->updateTabNameIcon(index, icon, label);
+    m_tabBar->repaint();
+}
+
 
 void FancyTabWidget::setBackgroundBrush(const QBrush &brush)
 {

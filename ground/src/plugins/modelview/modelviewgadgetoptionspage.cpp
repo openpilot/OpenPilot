@@ -28,6 +28,8 @@
 #include "modelviewgadgetoptionspage.h"
 #include "modelviewgadgetconfiguration.h"
 
+#include "ui_modelviewoptionspage.h"
+
 
 ModelViewGadgetOptionsPage::ModelViewGadgetOptionsPage(ModelViewGadgetConfiguration *config, QObject *parent) :
     IOptionsPage(parent),
@@ -37,60 +39,32 @@ ModelViewGadgetOptionsPage::ModelViewGadgetOptionsPage(ModelViewGadgetConfigurat
 
 QWidget *ModelViewGadgetOptionsPage::createPage(QWidget *parent)
 {
-    QWidget *widget = new QWidget;
-    QVBoxLayout *vl = new QVBoxLayout();
-    widget->setLayout(vl);
+    m_page = new Ui::ModelViewOptionsPage();
+    QWidget *w = new QWidget(parent);
+    m_page->setupUi(w);
 
-    QWidget *label = new QLabel("3D Object File:");
-    vl->addWidget(label);
-    
-    m_acFileLabel = new QLabel(m_config->acFilename());
-    QWidget* acPushbutton = new QPushButton("Change model");
-    vl->addWidget(m_acFileLabel);
-    vl->addWidget(acPushbutton);
+    m_page->modelPathChooser->setExpectedKind(Utils::PathChooser::File);
+    m_page->modelPathChooser->setPromptDialogFilter(tr("3D model (*.dae *.3ds)"));
+    m_page->modelPathChooser->setPromptDialogTitle(tr("Choose 3D model"));
+    m_page->backgroundPathChooser->setExpectedKind(Utils::PathChooser::File);
+    m_page->backgroundPathChooser->setPromptDialogFilter(tr("Images (*.png *.jpg *.bmp *.xpm)"));
+    m_page->backgroundPathChooser->setPromptDialogTitle(tr("Choose background image"));
 
-    QSpacerItem *spacer = new QSpacerItem(100, 100, QSizePolicy::Expanding, QSizePolicy::Expanding);
-    vl->addSpacerItem(spacer);
 
-    label = new QLabel("Background image file:");
-    vl->addWidget(label);
-    
-    m_bgFileLabel = new QLabel(m_config->bgFilename());
-    QWidget* bgPushbutton = new QPushButton("Change background");
-    vl->addWidget(m_bgFileLabel);
-    vl->addWidget(bgPushbutton);
+    m_page->modelPathChooser->setPath(m_config->acFilename());
+    m_page->backgroundPathChooser->setPath(m_config->bgFilename());
 
-    QSpacerItem *spacer2 = new QSpacerItem(100, 100, QSizePolicy::Expanding, QSizePolicy::Expanding);
-    vl->addSpacerItem(spacer2);
-
-    connect(acPushbutton, SIGNAL(clicked()), this, SLOT(changeAC()) );
-    connect(bgPushbutton, SIGNAL(clicked()), this, SLOT(changeBG()) );
-
-    return widget;
+    return w;
 }
 
 void ModelViewGadgetOptionsPage::apply()
 {
-    //m_config->setAcFilename(m_acFileName->selectedFiles());
-    //m_config->setBgFilename(m_bgFileName->selectedFiles());
+    m_config->setAcFilename(m_page->modelPathChooser->path());
+    m_config->setBgFilename(m_page->backgroundPathChooser->path());
 }
 
 void ModelViewGadgetOptionsPage::finish()
 {
+    delete m_page;
 }
 
-void ModelViewGadgetOptionsPage::changeAC()
-{
-    QString ac = QFileDialog::getOpenFileName(qobject_cast<QWidget*>(this), 
-        tr("Model 3D File"), "../artwork/", tr("3D File (*.dae *.3ds)") );
-    m_config->setAcFilename(ac);
-    m_acFileLabel->setText(ac);
-}
-
-void ModelViewGadgetOptionsPage::changeBG()
-{
-    QString bg = QFileDialog::getOpenFileName(qobject_cast<QWidget*>(this), 
-	tr("Background Image File"), "../artwork", tr("Image Files (*.png *.jpg *.bmp)") );
-    m_config->setBgFilename(bg);
-    m_bgFileLabel->setText(bg);
-}

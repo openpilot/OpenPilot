@@ -175,6 +175,14 @@ void ModeManager::updateModeToolTip()
     }
 }
 
+void ModeManager::updateModeNameIcon(IMode *mode, const QIcon &icon, const QString &label)
+{
+    int index = indexOf(mode->uniqueModeName());
+    if (index < 0)
+        return;
+    m_modeStack->updateTabNameIcon(index, icon, label);
+}
+
 void ModeManager::aboutToRemoveObject(QObject *obj)
 {
     IMode *mode = Aggregation::query<IMode>(obj);

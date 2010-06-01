@@ -30,13 +30,15 @@
 
 #include "coreplugin/dialogs/ioptionspage.h"
 
-namespace Core {
-class IUAVGadgetConfiguration;
-}
 class MapGadgetConfiguration;
-class QComboBox;
-class QSpinBox;
-class QDoubleSpinBox;
+
+namespace Core {
+    class IUAVGadgetConfiguration;
+}
+
+namespace Ui {
+    class MapGadgetOptionsPage;
+}
 
 using namespace Core;
 
@@ -55,11 +57,7 @@ signals:
 public slots:
 private:
     MapGadgetConfiguration *m_config;
-    QComboBox *m_providerComboBox;
-    QSpinBox *m_zoomSpin;
-    QDoubleSpinBox *m_latSpin;
-    QDoubleSpinBox *m_longSpin;
-
+    Ui::MapGadgetOptionsPage *m_page;
 };
 
 #endif // MAPGADGETOPTIONSPAGE_H

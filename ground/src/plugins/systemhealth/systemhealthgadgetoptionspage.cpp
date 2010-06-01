@@ -50,9 +50,10 @@ QWidget *SystemHealthGadgetOptionsPage::createPage(QWidget *parent)
     options_page->setupUi(optionsPageWidget);
 
     // Restore the contents from the settings:
-    options_page->svgSourceFile->setText(m_config->getSystemFile());
-
-    connect(options_page->loadFile, SIGNAL(clicked()), this, SLOT(on_loadFile_clicked()));
+    options_page->svgFilePathChooser->setExpectedKind(Utils::PathChooser::File);
+    options_page->svgFilePathChooser->setPromptDialogFilter(tr("SVG image (*.svg)"));
+    options_page->svgFilePathChooser->setPromptDialogTitle(tr("Choose SVG image"));
+    options_page->svgFilePathChooser->setPath(m_config->getSystemFile());
 
     return optionsPageWidget;
 }
@@ -64,30 +65,11 @@ QWidget *SystemHealthGadgetOptionsPage::createPage(QWidget *parent)
  */
 void SystemHealthGadgetOptionsPage::apply()
 {
-    m_config->setSystemFile(options_page->svgSourceFile->text());
-}
-
-/**
-
-Opens an open file dialog.
-
-*/
-void SystemHealthGadgetOptionsPage::on_loadFile_clicked()
-{
-    QFileDialog::Options options;
-    QString selectedFilter;
-    QString fileName = QFileDialog::getOpenFileName(qobject_cast<QWidget*>(this),
-                                                    tr("QFileDialog::getOpenFileName()"),
-                                                    options_page->svgSourceFile->text(),
-                                                    tr("All Files (*);;SVG Files (*.svg)"),
-                                                    &selectedFilter,
-                                                    options);
-    if (!fileName.isEmpty()) options_page->svgSourceFile->setText(fileName);
-
+    m_config->setSystemFile(options_page->svgFilePathChooser->path());
 }
 
 
 void SystemHealthGadgetOptionsPage::finish()
 {
-
+    delete options_page;
 }

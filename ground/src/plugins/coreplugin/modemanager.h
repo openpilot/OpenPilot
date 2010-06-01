@@ -39,6 +39,7 @@
 QT_BEGIN_NAMESPACE
 class QSignalMapper;
 class QMenu;
+class QIcon;
 QT_END_NAMESPACE
 
 namespace Core {
@@ -67,6 +68,7 @@ public:
 
     void addAction(Command *command, int priority, QMenu *menu = 0);
     void addWidget(QWidget *widget);
+    void updateModeNameIcon(IMode *mode, const QIcon &icon, const QString &label);
 
 signals:
     void currentModeAboutToChange(Core::IMode *mode);

@@ -35,11 +35,14 @@
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>
 
-namespace Core {
-class IUAVGadgetConfiguration;
-}
 class ModelViewGadgetConfiguration;
 class QFileDialog;
+namespace Core {
+    class IUAVGadgetConfiguration;
+}
+namespace Ui {
+    class ModelViewOptionsPage;
+}
 
 using namespace Core;
 
@@ -62,13 +65,10 @@ signals:
 
 public slots:
 private slots:
-    void changeAC();
-    void changeBG();
 
 private:
     ModelViewGadgetConfiguration *m_config;
-    QLabel *m_acFileLabel;
-    QLabel *m_bgFileLabel;
+    Ui::ModelViewOptionsPage *m_page;
 };
 
 #endif // MODELVIEWGADGETOPTIONSPAGE_H

@@ -49,7 +49,7 @@
 #include "../internals/projections/platecarreeprojection.h"
 #include "../internals/projections/platecarreeprojectionpergo.h"
 #include "../core/geodecoderstatus.h"
-#include "../core/gmaps.h"
+#include "../core/opmaps.h"
 #include <QSemaphore>
 #include <QThread>
 #include <QDateTime>

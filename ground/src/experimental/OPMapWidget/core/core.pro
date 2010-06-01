@@ -1,5 +1,5 @@
 include (../common.pri)
-SOURCES += gmaps.cpp \
+SOURCES += opmaps.cpp \
     pureimagecache.cpp \
     pureimage.cpp \
     rawtile.cpp \
@@ -15,7 +15,7 @@ SOURCES += gmaps.cpp \
     point.cpp \
     size.cpp \
     kibertilecache.cpp
-HEADERS += gmaps.h \
+HEADERS += opmaps.h \
     size.h \
     maptype.h \
     pureimagecache.h \

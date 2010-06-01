@@ -1,6 +1,6 @@
 #include <QApplication>
 
-#include "gmaps.h"
+#include "opmaps.h"
 #include <QDebug>
 #include "../core/pureimagecache.h"
 #include "QPixmap"

@@ -34,7 +34,7 @@ namespace jafar {
 		class ObservationPinHolePoint: public ObservationAbstract {
 
 			public:
-				static bool detectInRoi(const raw_ptr_t & rawPtr, const ROI & roi, feature_ptr_t & featPtr){
+				static bool detectInRoi(const raw_ptr_t & rawPtr, const jafar::image::ROI & roi, feature_ptr_t & featPtr){
 
 					// todo implement detectInRoi() - the code below is just to ensure compilation
 

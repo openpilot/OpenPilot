@@ -155,7 +155,7 @@ namespace jafar {
 				 * \param roi the resulting ROI
 				 * \return true if ROI exists.
 				 */
-				bool getROI(ROI & roi);
+				bool getROI(jafar::image::ROI & roi);
 
 			private:
 				/**
@@ -197,7 +197,7 @@ namespace jafar {
 				/**
 				 * Get the region of interest, reduced by a margin.
 				 */
-				void cell2roi(const veci2 & cell, ROI & roi);
+				void cell2roi(const veci2 & cell, jafar::image::ROI & roi);
 
 		};
 
@@ -235,7 +235,7 @@ namespace jafar {
 				/**
 				 * Scan search region for match.
 				 */
-				void scanObs(const observation_ptr_t & obsPtr, const ROI & roi);
+				void scanObs(const observation_ptr_t & obsPtr, const jafar::image::ROI & roi);
 		};
 
 	}

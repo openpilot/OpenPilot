@@ -187,6 +187,7 @@ void test_slam01() {
 
 					ROI roi;
 					if (asGrid.getROI(roi)){
+						cout << roi << endl;
 
 						feature_ptr_t featPtr(new FeatureAbstract(2));
 //						if (ObservationPinHolePoint::detectInRoi(senPtr->getRaw(), roi, featPtr)){

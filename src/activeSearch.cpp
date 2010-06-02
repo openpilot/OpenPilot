@@ -19,6 +19,7 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 		using namespace jblas;
+		using namespace image;
 
 		///////////////////////////////////////////
 		// ACTIVE SEARCH TESSELATION GRID

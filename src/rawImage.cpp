@@ -52,9 +52,14 @@ namespace jafar {
 
 						featPtr = featPntPtr;
 
+						JFR_DEBUG("Feature detected: " << featPntPtr->state.x())
+						cout << "Feature detected: " << featPntPtr->state.x() << endl;
 						return true;
 
 					} else {
+
+						JFR_DEBUG("No feature detected.")
+						cout << "No feature detected." << endl;
 						return false;
 					}
 				}

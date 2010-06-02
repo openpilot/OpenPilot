@@ -399,6 +399,34 @@ namespace jafar {
 #ifdef THALES_TAROT
 #undef max
 #endif
+			/** General matrix inversion routine.
+			 *  It uses lu_factorize and lu_substitute in uBLAS to invert a matrix
+			 */
+			template<class M1, class M2>
+			void lu_inv(M1 const& m, M2& inv) {
+				JFR_PRECOND(m.size1() == m.size2(),
+						"ublasExtra::lu_inv(): input matrix must be squared");
+				JFR_PRECOND(inv.size1() == m.size1() && inv.size2() == m.size2(),
+						"ublasExtra::lu_inv(): invalid size for inverse matrix");
+
+				using namespace boost::numeric::ublas;
+				// create a working copy of the input
+				jblas::mat mLu(m);
+
+				// perform LU-factorization
+				JFR_TRACE_BEGIN;
+				lu_factorize(mLu);
+				JFR_TRACE_END("ublasExtra::lu_inv");
+
+				// create identity matrix of "inverse"
+				jblas::mat mLuInv(jblas::identity_mat(m.size1()));
+
+				// backsubstitute to get the inverse
+				JFR_TRACE_BEGIN;
+				lu_substitute<jblas::mat const, jblas::mat> (mLu, mLuInv);
+				JFR_TRACE_END("ublasExtra::lu_inv");
+				inv.assign(mLuInv);
+			}
 
 			/** Find maximum value of a matrix.
 			 * \warning it returns a double whatever matrix type...
@@ -478,34 +506,6 @@ namespace jafar {
 				}
 			}
 
-			/** General matrix inversion routine.
-			 *  It uses lu_factorize and lu_substitute in uBLAS to invert a matrix
-			 */
-			template<class M1, class M2>
-			void lu_inv(M1 const& m, M2& inv) {
-				JFR_PRECOND(m.size1() == m.size2(),
-						"ublasExtra::lu_inv(): input matrix must be squared");
-				JFR_PRECOND(inv.size1() == m.size1() && inv.size2() == m.size2(),
-						"ublasExtra::lu_inv(): invalid size for inverse matrix");
-
-				using namespace boost::numeric::ublas;
-				// create a working copy of the input
-				jblas::mat mLu(m);
-
-				// perform LU-factorization
-				JFR_TRACE_BEGIN;
-				lu_factorize(mLu);
-				JFR_TRACE_END("ublasExtra::lu_inv");
-
-				// create identity matrix of "inverse"
-				jblas::mat mLuInv(jblas::identity_mat(m.size1()));
-
-				// backsubstitute to get the inverse
-				JFR_TRACE_BEGIN;
-				lu_substitute<jblas::mat const, jblas::mat> (mLu, mLuInv);
-				JFR_TRACE_END("ublasExtra::lu_inv");
-				inv.assign(mLuInv);
-			}
 
 #ifdef HAVE_BOOST_SANDBOX
 #ifdef HAVE_LAPACK

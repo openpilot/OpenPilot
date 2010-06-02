@@ -28,7 +28,8 @@
 #ifndef ACCESSMODE_H
 #define ACCESSMODE_H
 
- 
+#include "debugheader.h"
+
 namespace core {
 struct AccessMode
 {

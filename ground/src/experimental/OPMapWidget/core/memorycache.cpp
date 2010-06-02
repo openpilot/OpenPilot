@@ -48,7 +48,10 @@ void MemoryCache::AddTileToMemoryCache(const RawTile &tile, const QByteArray &pi
 {
     kiberCacheLock.lockForWrite();
    // QPixmapCache::Key key=TilesInMemory.insert(pic);
-    TilesInMemory.memoryCacheSize +=pic.count();
+    TilesInMemory.memoryCacheSize +=pic.size();
+#ifdef DEBUG_MEMORY_CACHE
+    qDebug()<<"Current memory="<<TilesInMemory.memoryCacheSize<<" in "<<TilesInMemory.cachequeue.count()<<" tiles";
+#endif
     TilesInMemory.cachequeue.insert(tile,pic);
     TilesInMemory.list.enqueue(tile);
 

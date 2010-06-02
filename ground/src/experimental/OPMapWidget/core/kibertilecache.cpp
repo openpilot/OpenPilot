@@ -51,14 +51,20 @@ int KiberTileCache::MemoryCacheCapacity()
 
 void KiberTileCache::RemoveMemoryOverload()
 {
-    while(memoryCacheSize>MemoryCacheCapacity())
+    while(MemoryCacheSize()>MemoryCacheCapacity())
     {
         if(cachequeue.count()>0 && list.count()>0)
         {
+#ifdef DEBUG_MEMORY_CACHE
+    qDebug()<<"Cleaning Memory cache="<<" started with "<<cachequeue.count()<<" tile "<<"ocupying "<<memoryCacheSize<<" bytes";
+#endif
             RawTile first=list.dequeue();
-            memoryCacheSize-=cachequeue.value(first).length();
+            memoryCacheSize-=cachequeue.value(first).size();
             cachequeue.remove(first);
         }
     }
+#ifdef DEBUG_MEMORY_CACHE
+    qDebug()<<"Cleaning Memory cache="<<" ended with "<<cachequeue.count()<<" tile "<<"ocupying "<<memoryCacheSize<<" bytes";
+#endif
 }
 }

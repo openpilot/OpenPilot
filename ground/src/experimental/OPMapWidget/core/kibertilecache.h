@@ -28,13 +28,12 @@
 #ifndef KIBERTILECACHE_H
 #define KIBERTILECACHE_H
 
-#include <QPixmapCache>
 #include "rawtile.h"
 #include <QMutex>
 #include <QReadWriteLock>
 #include <QQueue>
-
- 
+#include <QDebug>
+#include "debugheader.h"
 namespace core {
 class KiberTileCache
 {
@@ -51,9 +50,6 @@ public:
     long memoryCacheSize;
 private:
     int _MemoryCacheCapacity;
-
-  //  QPixmapCache TilesInMemory;
-
 
 };
 

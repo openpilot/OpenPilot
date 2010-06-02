@@ -33,4 +33,5 @@ HEADERS += opmaps.h \
     geodecoderstatus.h \
     placemark.h \
     point.h \
-    kibertilecache.h
+    kibertilecache.h \
+    debugheader.h

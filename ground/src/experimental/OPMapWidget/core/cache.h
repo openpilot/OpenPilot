@@ -29,7 +29,7 @@
 #define CACHE_H
 
 #include "pureimagecache.h"
-
+#include "debugheader.h"
  
 namespace core {
 class Cache

@@ -30,7 +30,6 @@
 
 
 #include <QString>
-//#include "size.h"
  
 namespace core {
 struct Size;

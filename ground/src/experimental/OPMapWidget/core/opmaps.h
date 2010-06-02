@@ -28,12 +28,8 @@
 #ifndef OPMaps_H
 #define OPMaps_H
 
-//#define DEBUG_CACHE
-//#define DEBUG_GMAPS
-//#define DEBUG_PUREIMAGECACHE
-//#define DEBUG_TILECACHEQUEUE
-//#define DEBUG_URLFACTORY
 
+#include "debugheader.h"
 #include "memorycache.h"
 #include "rawtile.h"
 #include "cache.h"
@@ -66,22 +62,17 @@ public:
 
     QByteArray GetImageFrom(const MapType::Types &type,const Point &pos,const int &zoom);
     bool UseMemoryCache();//TODO
-    void setUseMemoryCache(const bool& value);//TODO
+    void setUseMemoryCache(const bool& value){useMemoryCache=value;}
     void setLanguage(const LanguageType::Types& language);//TODO
     LanguageType::Types GetLanguage();//TODO
-    AccessMode GetAccessMode();
-    void setAccessMode(const AccessMode& mode);
+    AccessMode::Types GetAccessMode()const{return accessmode;};
+    void setAccessMode(const AccessMode::Types& mode){accessmode=mode;};
     int MaxZoom;
     int RetryLoadTile;
 private:
-
-
-
-
     bool useMemoryCache;
     LanguageType::Types Language;
     AccessMode::Types accessmode;
-
     //  PureImageCache ImageCacheLocal;//TODO Criar acesso Get Set
     TileCacheQueue TileDBcacheQueue;
     OPMaps();

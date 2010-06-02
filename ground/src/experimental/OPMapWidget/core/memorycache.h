@@ -28,13 +28,13 @@
 #ifndef MEMORYCACHE_H
 #define MEMORYCACHE_H
 
-#include <QPixmapCache>
 #include "rawtile.h"
 #include <QMutex>
 #include <QReadWriteLock>
 #include <QQueue>
 #include "kibertilecache.h"
- 
+#include <QDebug>
+#include "debugheader.h"
 namespace core {
 class MemoryCache
 {
@@ -45,7 +45,6 @@ public:
     QByteArray GetTileFromMemoryCache(const RawTile &tile);
     void AddTileToMemoryCache(const RawTile &tile, const QByteArray &pic);
     QReadWriteLock kiberCacheLock;
-
 };
 
 

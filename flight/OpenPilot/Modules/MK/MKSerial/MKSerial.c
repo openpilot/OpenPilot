@@ -40,6 +40,7 @@
 #define DEBUG_MSG(format, ...) PIOS_COM_SendFormattedString(DEBUG_PORT, format, ## __VA_ARGS__)
 
 #define MSG_ANY		0
+#define MSG_DEBUG	'D'
 
 //
 // Private types
@@ -98,6 +99,16 @@ void PrintMsg(const MkMsg_t* msg)
 
 }
 
+
+static int16_t Par2SignedInt(const MkMsg_t* msg, uint8_t index)
+{
+	int16_t res;
+
+  res = (int)(msg->pars[index+1])*256+msg->pars[index];
+  if (res > 0xFFFF/2)
+    res -= 0xFFFF;
+  return res;
+}
 
 static uint8_t WaitForBytes(uint8_t* buf, uint8_t nbBytes, portTickType xTicksToWait)
 {
@@ -270,9 +281,10 @@ static void MkSerialTask(void* parameters)
 	while(1)
 	{
 		MkMsg_t msg;
-		if (WaitForMsg(MSG_ANY, &msg))
+		if (WaitForMsg(MSG_DEBUG, &msg))
 		{
-			PrintMsg(&msg);
+			//PrintMsg(&msg);
+			DEBUG_MSG("Att: Nick=%5d Roll=%5d\n", Par2SignedInt(&msg,2+2*2), Par2SignedInt(&msg,2+3*2));
 		}
 		else
 		{

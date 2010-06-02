@@ -16,11 +16,14 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include "image/roi.hpp"
+
 #include "rtslam/observationAbstract.hpp"
 #include "rtslam/rtSlam.hpp"
 #include "rtslam/activeSearch.hpp"
 #include "rtslam/featureAbstract.hpp"
 #include "rtslam/appearanceImage.hpp"
+#include "fdetect/HarrisDetector.hpp"
 
 namespace jafar {
 	namespace rtslam {

@@ -16,8 +16,9 @@
 
 #include "jmath/random.hpp"
 #include "jmath/jblas.hpp"
-#include "rtslam/gaussian.hpp"
+#include "image/roi.hpp"
 
+#include "rtslam/gaussian.hpp"
 #include "rtslam/rtSlam.hpp"
 
 #include <iostream>
@@ -27,54 +28,6 @@ namespace jafar {
 		using namespace jblas;
 		using namespace std;
 
-		/**
-		 * Region of Interest class.
-		 *
-		 * This class stores an upper-left corner and a size of a region of interest (ROI).
-		 * \ingroup rtslam
-		 */
-		class ROI {
-			public:
-				int x, y;
-				int width, height;
-				ROI(const int ulx = 0, const int uly = 0, const int sx = 0, const int sy = 0) {
-					x = ulx;
-					y = uly;
-					width = sx;
-					height = sy;
-				}
-				veci2 downright() {
-					veci2 dr;
-					dr(0) = x + width - 1;
-					dr(1) = y + height - 1;
-					return dr;
-				}
-				veci2 upleft() {
-					veci2 ul;
-					ul(0) = x;
-					ul(1) = y;
-					return ul;
-				}
-				veci2 size() {
-					veci2 sz;
-					sz(0) = width;
-					sz(1) = height;
-					return sz;
-				}
-				void upleft(const veci & ul){
-					x = ul(0);
-					y = ul(1);
-				}
-				void downright(const veci & dr){
-					width = dr(0) - x + 1;
-					height = dr(1) - y + 1;
-				}
-				void size(const veci & sz){
-					width = sz(0);
-					height = sz(1);
-				}
-
-		};
 
 		/**
 		 * Active search tesselation grid.

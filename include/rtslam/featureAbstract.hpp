@@ -51,10 +51,12 @@ namespace jafar {
 				int id;
 				appearance_ptr_t appearancePtr;
 				Gaussian state;
+				double quality;
 
 				FeatureAbstract(size_t size) : state(size) {
-
+					quality = 0.0;
 				}
+
 				virtual ~FeatureAbstract() {
 				}
 		};

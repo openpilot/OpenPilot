@@ -94,6 +94,11 @@ namespace jafar {
 			}
 		}
 
+		void MapAbstract::clear() {
+			x().clear();
+			P().clear();
+		}
+
 		void MapAbstract::fillSeq() {
 			for (size_t i = 0; i < max_size; i++) {
 				x(i) = i;

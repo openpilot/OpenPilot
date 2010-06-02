@@ -54,7 +54,7 @@ namespace jafar {
 				jblas::vec4 intrinsic;
 				jblas::vec distortion;
 				jblas::vec correction;
-				raw_ptr_t currentRawPtr ;
+				raw_ptr_t rawPtr ;
 
 				/**
 				 * Pin-hole sensor setup.
@@ -79,7 +79,7 @@ namespace jafar {
 				void acquireRaw();
 
 				raw_ptr_t getRaw() {
-					return currentRawPtr ;
+					return rawPtr ;
 				}
 
 		};

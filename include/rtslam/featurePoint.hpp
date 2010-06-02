@@ -44,7 +44,7 @@ namespace jafar {
 
 
 		class FeaturePoint;
-		typedef boost::shared_ptr<FeaturePoint> featurepointsimu_ptr_t;
+		typedef boost::shared_ptr<FeaturePoint> featurepoint_ptr_t;
 
 		/** Base class for all landmark appearances defined in the module
 		 * rtslam.
@@ -57,6 +57,7 @@ namespace jafar {
 				}
 				virtual ~FeaturePoint() {
 				}
+				void setup(double u, double v, double quality);
 		};
 	}
 

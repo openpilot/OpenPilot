@@ -22,7 +22,8 @@ namespace jafar {
 				 */
 				enum ExceptionId {
 					UNKNOWN_FEATURE_TYPE,
-					UNKNOWN_SENSOR_TYPE
+					UNKNOWN_SENSOR_TYPE,
+					UNKNOWN_DETECTION_METHOD
 				//        MY_ERROR /**< my error */
 				};
 

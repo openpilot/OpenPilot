@@ -61,12 +61,14 @@ namespace jafar {
 
 		void SensorPinHole::acquireRaw(){
 
-			jafarImage_ptr_t i(Image::loadImage("/home/agonzale/workspace/opencv/img_pan01.jpeg",1));
+//			jafarImage_ptr_t i(Image::loadImage("/home/agonzale/workspace/opencv/img_pan01.jpeg",1));
+//			jafarImage_ptr_t i(Image::loadImage("pelican.laas.fr:/data1/robots/dala/data/2009-02-27-someLoops/serie01/images/image.r.0000.tiff",1));
+			jafarImage_ptr_t i(Image::loadImage("/home/jsola/imageSample2.ppm",0));
 
 			rawimage_ptr_t imgRawPtr(new RawImage()) ;
 			imgRawPtr->setJafarImage(i) ;
 
-			this->currentRawPtr = imgRawPtr;
+			this->rawPtr = imgRawPtr;
 
 			// try to print the image
 			// todo remove this test

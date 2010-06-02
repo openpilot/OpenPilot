@@ -34,28 +34,36 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
+#include <iostream>
+
+#include "image/roi.hpp"
+
 #include "rtslam/objectAbstract.hpp"
 
-#include <iostream>
 
 namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
 		class RawAbstract: public ObjectAbstract {
-			private:
-			public:
-				enum detect_method {
-					HARRIS ///< Harris corner detector.
-				};
-				RawAbstract();
-				virtual ~RawAbstract();
+
 				/*
 				 * Operator << for class rawAbstract.
 				 * It shows some informations
 				 */
 				friend ostream& operator <<(ostream & s, jafar::rtslam::RawAbstract & rawA);
-//				virtual bool detect(const detect_method met, feature_ptr_t & featurePtr) = 0;
+
+			public:
+				enum detect_method {
+					HARRIS ///< Harris corner detector.
+				};
+
+				virtual ~RawAbstract();
+
+				virtual bool detect(const detect_method met, feature_ptr_t & featPtr, const jafar::image::ROI* roiPtr = 0) = 0;
+
+				//				virtual bool match(observation_ptr_t & obsPtr) = 0;
+
 		};
 	}
 }

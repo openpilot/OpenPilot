@@ -34,7 +34,7 @@
 #include "rtslam/activeSearch.hpp"
 #include "rtslam/observationPinHolePoint.hpp"
 #include "rtslam/featureAbstract.hpp"
-//#include "rtslam/rawImage.hpp"
+#include "rtslam/rawImage.hpp"
 
 //#include "rtslam/display_qt.hpp"
 //#include "image/Image.hpp"
@@ -59,15 +59,15 @@ void test_slam01() {
 	world_ptr_t worldPtr(new WorldAbstract());
 	map_ptr_t mapPtr(new MapAbstract(100));
 	worldPtr->addMap(mapPtr);
-	mapPtr->fillDiag();
+	mapPtr->clear();
 	robconstvel_ptr_t robPtr1(new RobotConstantVelocity(mapPtr));
 	robPtr1->id(robPtr1->robotIds.getId());
 	robPtr1->linkToParentMap(mapPtr);
 	vec v(13);
-	fillVector(v, 0.1);
+	fillVector(v, 0.0);
 	robPtr1->state.x(v);
 	robPtr1->pose.x(quaternion::originFrame());
-	robPtr1->dt_or_dx = 1;
+	robPtr1->dt_or_dx = 0.001;
 	pinhole_ptr_t senPtr11 (new SensorPinHole(robPtr1, MapObject::FILTERED));
 	senPtr11->id(senPtr11->sensorIds.getId());
 	senPtr11->linkToParentRobot(robPtr1);
@@ -108,7 +108,7 @@ void test_slam01() {
 
 	// display::ViewerQt viewerQt;
 
-	for (int t = 1; t <= 4; t++) {
+	for (int t = 1; t <= 2; t++) {
 
 		cout << "\nTIME : " << t << endl;
 
@@ -118,7 +118,7 @@ void test_slam01() {
 			robot_ptr_t robPtr = *robIter;
 			cout << "\nROBOT: " << robPtr->id() << endl;
 			vec u(robPtr->mySize_control()); // TODO put some real values in u.
-			fillVector(u, 0.1);
+			fillVector(u, 0.0);
 			robPtr->set_control(u);
 			robPtr->move();
 
@@ -189,7 +189,8 @@ void test_slam01() {
 					if (asGrid.getROI(roi)){
 
 						feature_ptr_t featPtr(new FeatureAbstract(2));
-						if (ObservationPinHolePoint::detectInRoi(senPtr->getRaw(), roi, featPtr)){
+//						if (ObservationPinHolePoint::detectInRoi(senPtr->getRaw(), roi, featPtr)){
+						if (senPtr->getRaw()->detect(RawAbstract::HARRIS, featPtr, &roi)) {
 							cout << "Initializing lmk..." << endl;
 							cout << "Detected pixel: " << featPtr->state.x() << endl;
 

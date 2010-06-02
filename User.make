@@ -10,15 +10,15 @@ MODULE_VERSION = 0
 MODULE_REVISION = 1 
 
 # modules dependencies
-REQUIRED_MODULES = kernel jmath image 
+REQUIRED_MODULES = kernel jmath image fdetect
 OPTIONAL_MODULES = qdisplay
 
 # external libraries dependencies
-REQUIRED_EXTLIBS = boost_sandbox opencv
+REQUIRED_EXTLIBS = boost_sandbox opencv 
 OPTIONAL_EXTLIBS = qt4
 
 # LDFLAGS +=
-LIBS += -lkernel -ljmath -limage -lqdisplay 
+LIBS += -lkernel -ljmath -limage -lqdisplay -lfdetect
 
 # CPPFLAGS += -DJFR_NDEBUG
 CPPFLAGS += $(OPENCV_CPPFLAGS) $(QT4_CPPFLAGS) $(BOOST_CPPFLAGS) $(BOOST_SANDBOX_CPPFLAGS) 

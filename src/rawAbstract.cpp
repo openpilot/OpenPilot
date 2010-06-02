@@ -19,8 +19,8 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
-		RawAbstract::RawAbstract() {
-		}
+//		RawAbstract::RawAbstract() {
+//		}
 
 		RawAbstract::~RawAbstract() {
 		}

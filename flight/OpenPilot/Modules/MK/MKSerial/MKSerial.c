@@ -39,8 +39,11 @@
 
 #define DEBUG_MSG(format, ...) PIOS_COM_SendFormattedString(DEBUG_PORT, format, ## __VA_ARGS__)
 
-#define MSG_ANY		0
-#define MSG_DEBUG	'D'
+#define MSG_ANY				0
+#define MSG_GET_DEBUG		'd'
+#define MSG_DEBUG			'D'
+#define MSG_GET_VERSION		'v'
+#define MSG_VERSION			'V'
 
 //
 // Private types
@@ -61,7 +64,6 @@ enum
 	MK_ADDR_MAG = 3,
 };
 
-
 //
 // Private variables
 //
@@ -77,37 +79,45 @@ static void OnError(int line)
 	DEBUG_MSG("MKProcol error %d\n", line);
 }
 
-
 void PrintMsg(const MkMsg_t* msg)
 {
-  switch(msg->address)
-  {
-  case MK_ADDR_ALL: DEBUG_MSG("ALL "); break;
-  case MK_ADDR_FC:  DEBUG_MSG("FC  "); break;
-  case MK_ADDR_NC:  DEBUG_MSG("NC  "); break;
-  case MK_ADDR_MAG: DEBUG_MSG("MAG "); break;
-  default:          DEBUG_MSG("??? "); break;
-  }
+	switch (msg->address)
+	{
+	case MK_ADDR_ALL:
+		DEBUG_MSG("ALL ");
+		break;
+	case MK_ADDR_FC:
+		DEBUG_MSG("FC  ");
+		break;
+	case MK_ADDR_NC:
+		DEBUG_MSG("NC  ");
+		break;
+	case MK_ADDR_MAG:
+		DEBUG_MSG("MAG ");
+		break;
+	default:
+		DEBUG_MSG("??? ");
+		break;
+	}
 
-  DEBUG_MSG("%c ", msg->cmd);
+	DEBUG_MSG("%c ", msg->cmd);
 
-  for (int i=0; i<msg->nbPars; i++)
-  {
-	  DEBUG_MSG("%02x ", msg->pars[i]);
-  }
-  DEBUG_MSG("\n");
+	for (int i = 0; i < msg->nbPars; i++)
+	{
+		DEBUG_MSG("%02x ", msg->pars[i]);
+	}
+	DEBUG_MSG("\n");
 
 }
-
 
 static int16_t Par2SignedInt(const MkMsg_t* msg, uint8_t index)
 {
 	int16_t res;
 
-  res = (int)(msg->pars[index+1])*256+msg->pars[index];
-  if (res > 0xFFFF/2)
-    res -= 0xFFFF;
-  return res;
+	res = (int) (msg->pars[index + 1]) * 256 + msg->pars[index];
+	if (res > 0xFFFF / 2)
+		res -= 0xFFFF;
+	return res;
 }
 
 static uint8_t WaitForBytes(uint8_t* buf, uint8_t nbBytes, portTickType xTicksToWait)
@@ -115,7 +125,7 @@ static uint8_t WaitForBytes(uint8_t* buf, uint8_t nbBytes, portTickType xTicksTo
 	uint8_t nbBytesLeft = nbBytes;
 	xTimeOutType xTimeOut;
 
-	vTaskSetTimeOutState( &xTimeOut );
+	vTaskSetTimeOutState(&xTimeOut);
 
 	// Loop until
 	// - all bytes are received
@@ -124,7 +134,7 @@ static uint8_t WaitForBytes(uint8_t* buf, uint8_t nbBytes, portTickType xTicksTo
 	do
 	{
 		// Check if timeout occured
-		if (xTaskCheckForTimeOut( &xTimeOut, &xTicksToWait ))
+		if (xTaskCheckForTimeOut(&xTimeOut, &xTicksToWait))
 			break;
 
 		// Check if there are some bytes
@@ -185,15 +195,15 @@ bool WaitForMsg(uint8_t cmd, MkMsg_t* msg)
 
 			// Parse parameters
 			msg->nbPars = 0;
-			while(!done && !error)
+			while (!done && !error)
 			{
 				n = WaitForBytes(buf, 4, 10 / portTICK_RATE_MS);
-				if (n>0 && buf[n-1] == '\r')
+				if (n > 0 && buf[n - 1] == '\r')
 				{
 					n--;
 					// This is the end of the message
 					// Get check bytes
-					if (n>=2)
+					if (n >= 2)
 					{
 						unsigned int msgCeckVal;
 						msgCeckVal = (buf[n-1]-'=') + (buf[n-2]-'=')*64;
@@ -216,11 +226,11 @@ bool WaitForMsg(uint8_t cmd, MkMsg_t* msg)
 						error = TRUE;
 					}
 				}
-				else if (n==4)
+				else if (n == 4)
 				{
 					// Parse parameters
 					int i;
-					for (i=0; i<4; i++)
+					for (i = 0; i < 4; i++)
 					{
 						checkVal += buf[i];
 						buf[i] -= '=';
@@ -253,12 +263,99 @@ bool WaitForMsg(uint8_t cmd, MkMsg_t* msg)
 	return (done && !error);
 }
 
+void SendMsg(const MkMsg_t* msg)
+{
+	uint8_t buf[10];
+	uint16_t checkVal;
+	uint8_t nbParsRemaining;
+	const uint8_t* pPar;
+
+	// Header
+	buf[0] = '#';
+	buf[1] = msg->address + 'a';
+	buf[2] = msg->cmd;
+	PIOS_COM_SendBuffer(PORT, buf, 3);
+	checkVal = (unsigned int) '#' + buf[1] + buf[2];
+
+	// Parameters
+	nbParsRemaining = msg->nbPars;
+	pPar = msg->pars;
+	while (nbParsRemaining)
+	{
+		uint8_t a, b, c;
+
+		a = *pPar;
+		b = 0;
+		c = 0;
+
+		nbParsRemaining--;
+		pPar++;
+		if (nbParsRemaining)
+		{
+			b = *pPar;
+			nbParsRemaining--;
+			pPar++;
+			if (nbParsRemaining)
+			{
+				c = *pPar;
+				nbParsRemaining--;
+				pPar++;
+			}
+		}
+
+		buf[0] = (a >> 2) + '=';
+		buf[1] = (((a & 0x03) << 4) | ((b & 0xf0) >> 4)) + '=';
+		buf[2] = (((b & 0x0f) << 2) | ((c & 0xc0) >> 6)) + '=';
+		buf[3] = (c & 0x3f) + '=';
+		checkVal += buf[0];
+		checkVal += buf[1];
+		checkVal += buf[2];
+		checkVal += buf[3];
+
+		PIOS_COM_SendBuffer(PORT, buf, 4);
+	}
+
+	checkVal &= 0xFFF;
+	buf[0] = (checkVal / 64) + '=';
+	buf[1] = (checkVal % 64) + '=';
+	buf[2] = '\r';
+	PIOS_COM_SendBuffer(PORT, buf, 3);
+}
+
+void SendMsgParNone(uint8_t address, uint8_t cmd)
+{
+	MkMsg_t msg;
+
+	msg.address = address;
+	msg.cmd = cmd;
+	msg.nbPars = 0;
+
+	SendMsg(&msg);
+}
+
+void SendMsgPar8(uint8_t address, uint8_t cmd, uint8_t par0)
+{
+	MkMsg_t msg;
+
+	msg.address = address;
+	msg.cmd = cmd;
+	msg.nbPars = 1;
+	msg.pars[0] = par0;
+
+	SendMsg(&msg);
+}
+
+uint16_t VersionMsg_GetVersion(const MkMsg_t* msg)
+{
+	return msg->pars[0] * 100 + msg->pars[1];
+}
+
 /**
  * Initialise the module
  * \return -1 if initialisation failed
  * \return 0 on success
  */
-int32_t MkSerialInitialize(void)
+int32_t MKSerialInitialize(void)
 {
 	// Start gps task
 	xTaskCreate(MkSerialTask, (signed char*) "MkSerial", STACK_SIZE, NULL,
@@ -272,13 +369,23 @@ int32_t MkSerialInitialize(void)
  */
 static void MkSerialTask(void* parameters)
 {
+	MkMsg_t msg;
 
 	PIOS_COM_ChangeBaud(PORT, 57600);
 	PIOS_COM_ChangeBaud(DEBUG_PORT, 57600);
 
 	DEBUG_MSG("MKSerial Started\n");
 
-	while(1)
+	SendMsgParNone(MK_ADDR_ALL, MSG_GET_VERSION);
+	if (WaitForMsg(MSG_GET_VERSION, &msg))
+	{
+		//PrintMsg(&msg);
+		DEBUG_MSG("Version = %d\n", VersionMsg_GetVersion(&msg));
+	}
+
+	SendMsgPar8(MK_ADDR_ALL, MSG_GET_DEBUG, 10);
+
+	while (1)
 	{
 		MkMsg_t msg;
 		if (WaitForMsg(MSG_DEBUG, &msg))
@@ -291,24 +398,4 @@ static void MkSerialTask(void* parameters)
 			DEBUG_MSG("NoMsg\n");
 		}
 	}
-
-//	while (1)
-//	{
-//		int32_t len;
-//
-//		len = PIOS_COM_ReceiveBufferUsed(PORT);
-//		if (len)
-//		{
-//			PIOS_COM_SendFormattedString(PORT, "Received %d: ", len);
-//
-//			for (int32_t n = 0; n < len; ++n)
-//			{
-//				PIOS_COM_SendChar(PORT, PIOS_COM_ReceiveBuffer(PORT));
-//			}
-//
-//			PIOS_COM_SendString(PORT, "\n");
-//		}
-//		vTaskDelay(100 / portTICK_RATE_MS);
-//	}
-
 }

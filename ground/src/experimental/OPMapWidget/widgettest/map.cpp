@@ -1,7 +1,7 @@
 #include "map.h"
 map::map(QWidget* parent)
 {
-    mc= new OPMapControl();
+    mc= new mapcontrol::OPMapControl();
     QVBoxLayout* layout = new QVBoxLayout;
     layout->addWidget(mc);
 

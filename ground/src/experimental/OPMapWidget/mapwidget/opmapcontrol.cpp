@@ -1,5 +1,6 @@
 #include "opmapcontrol.h"
-
+namespace mapcontrol
+{
 OPMapControl::OPMapControl(QWidget *parent):QWidget(parent),MapRenderTransform(1), maxZoom(17),minZoom(2),zoomReal(0),isSelected(false)
 {
     EmptytileBrush = Qt::cyan;
@@ -13,8 +14,9 @@ OPMapControl::OPMapControl(QWidget *parent):QWidget(parent),MapRenderTransform(1
     DragButton = Qt::RightButton;
     isMouseOverMarker=false;
     core.SetCurrentRegion(Rectangle(-50, -50, this->width()+100, this->height()+100));
-    core.SetMapType(MapType::GoogleSatellite);
+    core.SetMapType(MapType::OpenStreetMap);
     core.SetZoom(3);
+
     connect(&core,SIGNAL(OnNeedInvalidation()),this,SLOT(Core_OnNeedInvalidation()));
 
 
@@ -56,7 +58,7 @@ void OPMapControl::paintEvent(QPaintEvent* evnt)
 
 void OPMapControl::DrawMap2D(QPainter &painter)
 {
-    qDebug()<<core.Matrix.count();
+   // qDebug()<<core.Matrix.count();
    // painter.drawText(10,10,"TESTE");
     for(int i = -core.GetsizeOfMapArea().Width(); i <= core.GetsizeOfMapArea().Width(); i++)
              {
@@ -359,4 +361,5 @@ void OPMapControl::closeEvent(QCloseEvent *event)
 {
     core.OnMapClose();
     event->accept();
+}
 }

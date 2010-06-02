@@ -32,7 +32,14 @@ int main(int argc, char *argv[])
     PureImageCache* p=new PureImageCache();
     QPixmap pixmap;
     //Tile Polling test
+    QTime t;
+    t.start();
+    OPMaps::Instance()->setUseMemoryCache(false);
+    OPMaps::Instance()->setAccessMode(AccessMode::ServerOnly);
     pixmap=PureImageProxy::FromStream(OPMaps::Instance()->GetImageFrom(MapType::GoogleSatellite,Point(1,0),1));
+    OPMaps::Instance()->GetImageFrom(MapType::GoogleSatellite,Point(0,1),1);
+    OPMaps::Instance()->GetImageFrom(MapType::GoogleSatellite,Point(1,1),1);
+    qDebug()<<"elapsed="<<t.elapsed();
     QLabel label;
     label.setPixmap(pixmap);
     label.show();

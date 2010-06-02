@@ -1,15 +1,15 @@
-DESTDIR                 = ../build
+DESTDIR = ../build
 QT += network
 QT += sql
-INCLUDEPATH += . ..
+INCLUDEPATH += . \
+    ..
 WARNINGS += -Wall
-#CONFIG += console
-#CONFIG -= app_bundle
+
+# CONFIG += console
+# CONFIG -= app_bundle
 CONFIG += dll
 TEMPLATE = lib
-
-
 UI_DIR = uics
 MOC_DIR = mocs
 OBJECTS_DIR = objs
-
+HEADERS += 

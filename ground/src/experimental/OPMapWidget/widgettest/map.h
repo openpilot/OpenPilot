@@ -7,7 +7,7 @@ class map:public QMainWindow
 public:
     map(QWidget* parent = 0);
 private:
-    OPMapControl* mc;
+    mapcontrol::OPMapControl* mc;
 };
 
 #endif // MAP_H

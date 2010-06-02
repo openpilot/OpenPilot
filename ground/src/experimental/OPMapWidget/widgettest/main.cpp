@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 //      mw->setWindowTitle("Map");
 //      mw->adjustSize();
 //      mw->show();1022 680
-      OPMapControl map;
+      mapcontrol::OPMapControl map;
       map.setGeometry(20,20,1022,680);
       map.show();
       return app.exec();

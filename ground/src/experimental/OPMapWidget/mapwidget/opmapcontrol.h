@@ -8,8 +8,13 @@
 #include <QBrush>
 #include <QFont>
 
+namespace mapcontrol
+{
+
 using namespace core;
 //using namespace internals;
+
+class internals::Core;
 
 class OPMapControl:public QWidget
 {
@@ -83,5 +88,5 @@ private:
 private slots:
     void Core_OnNeedInvalidation();
 };
-
+}
 #endif // OPMAPCONTROL_H

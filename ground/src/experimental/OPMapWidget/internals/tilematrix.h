@@ -32,7 +32,7 @@
 #include "tile.h"
 #include <QList>
 #include "../core/point.h"
- 
+#include "debugheader.h"
 namespace internals {
 class TileMatrix
 {

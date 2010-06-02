@@ -33,6 +33,7 @@
 #include "../core/point.h"
 #include <QMutex>
 #include <QDebug>
+#include "debugheader.h"
 using namespace core;
 namespace internals
 {

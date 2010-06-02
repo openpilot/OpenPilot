@@ -9,7 +9,8 @@ HEADERS += core.h \
     pureprojection.h \
     pointlatlng.h \
     rectlatlng.h \
-    sizelatlng.h
+    sizelatlng.h \
+    debugheader.h
 SOURCES += core.cpp \
     rectangle.cpp \
     tile.cpp \
@@ -19,7 +20,7 @@ SOURCES += core.cpp \
     sizelatlng.cpp \
     pointlatlng.cpp \
     loadtask.cpp \
-    MouseWheelZoomType.cpp
+    mousewheelzoomtype.cpp
 HEADERS += ./projections/lks94projection.h \
     ./projections/mercatorprojection.h \
     ./projections/mercatorprojectionyandex.h \

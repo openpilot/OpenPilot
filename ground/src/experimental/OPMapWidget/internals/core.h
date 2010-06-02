@@ -28,9 +28,7 @@
 #ifndef CORE_H
 #define CORE_H
 
-#define DEBUG_CORE
-//#define DEBUG_TILE
-//#define DEBUG_TILEMATRIX
+#include "debugheader.h"
 
 #include "../internals/PointLatlng.h"
 #include "mousewheelzoomtype.h"
@@ -56,11 +54,16 @@
 
 //#include <QObject>
 
+namespace mapcontrol
+{
+    class OPMapControl;
+}
  
 namespace internals {
 class Core:public QObject,public QRunnable
 {
     Q_OBJECT
+    friend class mapcontrol::OPMapControl;
 public:
     Core();
     void run();
@@ -179,12 +182,7 @@ public:
 
     TileMatrix Matrix;
 
-    Rectangle tileRect;
-    Point mouseDown;
-    bool CanDragMap;
-    Point mouseCurrent;
-    PointLatLng LastLocationInBounds;
-    Point mouseLastZoom;
+
 signals:
     void OnCurrentPositionChanged(PointLatLng point);
     void OnTileLoadComplete();
@@ -197,14 +195,19 @@ signals:
 
 private:
 
-    static qlonglong debugcounter;
+
     PointLatLng currentPosition;
     Point currentPositionPixel;
     Point renderOffset;
     Point centerTileXYLocation;
     Point centerTileXYLocationLast;
     Point dragPoint;
-
+    Rectangle tileRect;
+    Point mouseDown;
+    bool CanDragMap;
+    Point mouseCurrent;
+    PointLatLng LastLocationInBounds;
+    Point mouseLastZoom;
 
     MouseWheelZoomType::Types mousewheelzoomtype;
 
@@ -233,9 +236,10 @@ private:
     QMutex Moverlays;
 
     QMutex MtileDrawingList;
-
+#ifdef DEBUG_CORE
     QMutex Mdebug;
-
+    static qlonglong debugcounter;
+#endif
     Size TooltipTextPadding;
 
     MapType::Types mapType;

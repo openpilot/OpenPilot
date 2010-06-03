@@ -25,7 +25,8 @@
 
 #include "openpilot.h"
 #include "MkSerial.h"
-#include "gpsobject.h"
+
+#include "attitudeactual.h" // object that will be updated by the module
 
 //
 // Private constants
@@ -39,11 +40,15 @@
 
 #define DEBUG_MSG(format, ...) PIOS_COM_SendFormattedString(DEBUG_PORT, format, ## __VA_ARGS__)
 
-#define MSG_ANY				0
-#define MSG_GET_DEBUG		'd'
-#define MSG_DEBUG			'D'
-#define MSG_GET_VERSION		'v'
-#define MSG_VERSION			'V'
+#define MSGCMD_ANY				0
+#define MSGCMD_GET_DEBUG		'd'
+#define MSGCMD_DEBUG			'D'
+#define MSGCMD_GET_VERSION		'v'
+#define MSGCMD_VERSION			'V'
+
+#define DEBUG_MSG_NICK_IDX	(2+2*2)
+#define DEBUG_MSG_ROLL_IDX	(2+3*2)
+
 
 //
 // Private types
@@ -370,28 +375,41 @@ int32_t MKSerialInitialize(void)
 static void MkSerialTask(void* parameters)
 {
 	MkMsg_t msg;
+	AttitudeActualData data;
 
 	PIOS_COM_ChangeBaud(PORT, 57600);
 	PIOS_COM_ChangeBaud(DEBUG_PORT, 57600);
 
 	DEBUG_MSG("MKSerial Started\n");
 
-	SendMsgParNone(MK_ADDR_ALL, MSG_GET_VERSION);
-	if (WaitForMsg(MSG_GET_VERSION, &msg))
+	SendMsgParNone(MK_ADDR_ALL, MSGCMD_GET_VERSION);
+	if (WaitForMsg(MSGCMD_VERSION, &msg))
 	{
 		//PrintMsg(&msg);
 		DEBUG_MSG("Version = %d\n", VersionMsg_GetVersion(&msg));
 	}
 
-	SendMsgPar8(MK_ADDR_ALL, MSG_GET_DEBUG, 10);
+	SendMsgPar8(MK_ADDR_ALL, MSGCMD_GET_DEBUG, 10);
+
+	memset(&data, 0, sizeof(data));
 
 	while (1)
 	{
-		MkMsg_t msg;
-		if (WaitForMsg(MSG_DEBUG, &msg))
+		if (WaitForMsg(MSGCMD_DEBUG, &msg))
 		{
+			uint16_t nick;
+			uint16_t roll;
+
 			//PrintMsg(&msg);
-			DEBUG_MSG("Att: Nick=%5d Roll=%5d\n", Par2SignedInt(&msg,2+2*2), Par2SignedInt(&msg,2+3*2));
+			nick = Par2SignedInt(&msg, DEBUG_MSG_NICK_IDX);
+			roll = Par2SignedInt(&msg, DEBUG_MSG_ROLL_IDX);
+
+			DEBUG_MSG("Att: Nick=%5d Roll=%5d\n", nick, roll);
+
+			data.seq++;
+			data.Pitch = (float)nick/10;
+			data.Roll = (float)roll/10;
+			AttitudeActualSet(&data);
 		}
 		else
 		{

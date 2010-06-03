@@ -76,15 +76,27 @@ enum
 //
 // Private functions
 //
+static void OnError(int line);
+//static void PrintMsg(const MkMsg_t* msg);
+static int16_t Par2SignedInt(const MkMsg_t* msg, uint8_t index);
 static uint8_t WaitForBytes(uint8_t* buf, uint8_t nbBytes, portTickType xTicksToWait);
+static bool WaitForMsg(uint8_t cmd, MkMsg_t* msg, portTickType xTicksToWait);
+static void SendMsg(const MkMsg_t* msg);
+static void SendMsgParNone(uint8_t address, uint8_t cmd);
+static void SendMsgPar8(uint8_t address, uint8_t cmd, uint8_t par0);
+static uint16_t VersionMsg_GetVersion(const MkMsg_t* msg);
 static void MkSerialTask(void* parameters);
+
+
 
 static void OnError(int line)
 {
 	DEBUG_MSG("MKProcol error %d\n", line);
 }
 
-void PrintMsg(const MkMsg_t* msg)
+
+#if 0
+static void PrintMsg(const MkMsg_t* msg)
 {
 	switch (msg->address)
 	{
@@ -112,8 +124,8 @@ void PrintMsg(const MkMsg_t* msg)
 		DEBUG_MSG("%02x ", msg->pars[i]);
 	}
 	DEBUG_MSG("\n");
-
 }
+#endif
 
 static int16_t Par2SignedInt(const MkMsg_t* msg, uint8_t index)
 {
@@ -163,17 +175,28 @@ static uint8_t WaitForBytes(uint8_t* buf, uint8_t nbBytes, portTickType xTicksTo
 	return nbBytes - nbBytesLeft;
 }
 
-bool WaitForMsg(uint8_t cmd, MkMsg_t* msg)
+static bool WaitForMsg(uint8_t cmd, MkMsg_t* msg, portTickType xTicksToWait)
 {
 	uint8_t buf[10];
 	uint8_t n;
 	bool done = FALSE;
 	bool error = FALSE;
 	unsigned int checkVal;
+	xTimeOutType xTimeOut;
 
+
+	vTaskSetTimeOutState(&xTimeOut);
 
 	while (!done && !error)
 	{
+		// When we are here, it means we did not encounter the message we are waiting for
+		// Check if we did not timeout yet.
+		if (xTaskCheckForTimeOut(&xTimeOut, &xTicksToWait))
+		{
+			error = TRUE;
+			break;
+		}
+
 		// Wait for start
 		buf[0] = 0;
 		do
@@ -268,7 +291,7 @@ bool WaitForMsg(uint8_t cmd, MkMsg_t* msg)
 	return (done && !error);
 }
 
-void SendMsg(const MkMsg_t* msg)
+static void SendMsg(const MkMsg_t* msg)
 {
 	uint8_t buf[10];
 	uint16_t checkVal;
@@ -327,7 +350,7 @@ void SendMsg(const MkMsg_t* msg)
 	PIOS_COM_SendBuffer(PORT, buf, 3);
 }
 
-void SendMsgParNone(uint8_t address, uint8_t cmd)
+static void SendMsgParNone(uint8_t address, uint8_t cmd)
 {
 	MkMsg_t msg;
 
@@ -338,7 +361,7 @@ void SendMsgParNone(uint8_t address, uint8_t cmd)
 	SendMsg(&msg);
 }
 
-void SendMsgPar8(uint8_t address, uint8_t cmd, uint8_t par0)
+static void SendMsgPar8(uint8_t address, uint8_t cmd, uint8_t par0)
 {
 	MkMsg_t msg;
 
@@ -350,10 +373,74 @@ void SendMsgPar8(uint8_t address, uint8_t cmd, uint8_t par0)
 	SendMsg(&msg);
 }
 
-uint16_t VersionMsg_GetVersion(const MkMsg_t* msg)
+static uint16_t VersionMsg_GetVersion(const MkMsg_t* msg)
 {
 	return msg->pars[0] * 100 + msg->pars[1];
 }
+
+
+static void MkSerialTask(void* parameters)
+{
+	MkMsg_t msg;
+	AttitudeActualData data;
+	bool connectionOk = FALSE;
+
+	PIOS_COM_ChangeBaud(PORT, 57600);
+	PIOS_COM_ChangeBaud(DEBUG_PORT, 57600);
+
+	memset(&data, 0, sizeof(data));
+
+	DEBUG_MSG("MKSerial Started\n");
+
+	while (1)
+	{
+		// Wait until we get version from MK
+		while (!connectionOk)
+		{
+			SendMsgParNone(MK_ADDR_ALL, MSGCMD_GET_VERSION);
+			DEBUG_MSG("Version... ");
+			if (WaitForMsg(MSGCMD_VERSION, &msg, 100 / portTICK_RATE_MS))
+			{
+				//PrintMsg(&msg);
+				DEBUG_MSG("%d\n", VersionMsg_GetVersion(&msg));
+				connectionOk = TRUE;
+			}
+			else
+			{
+				DEBUG_MSG("TO\n");
+			}
+		}
+
+		// Configure MK for fast reporting
+		SendMsgPar8(MK_ADDR_ALL, MSGCMD_GET_DEBUG, 10);
+
+		while (connectionOk)
+		{
+			if (WaitForMsg(MSGCMD_DEBUG, &msg, 500 / portTICK_RATE_MS))
+			{
+				uint16_t nick;
+				uint16_t roll;
+
+				//PrintMsg(&msg);
+				nick = Par2SignedInt(&msg, DEBUG_MSG_NICK_IDX);
+				roll = Par2SignedInt(&msg, DEBUG_MSG_ROLL_IDX);
+
+				DEBUG_MSG("Att: Nick=%5d Roll=%5d\n", nick, roll);
+
+				data.seq++;
+				data.Pitch = (float)nick/10;
+				data.Roll = (float)roll/10;
+				AttitudeActualSet(&data);
+			}
+			else
+			{
+				DEBUG_MSG("TO\n");
+				connectionOk = FALSE;
+			}
+		}
+	}
+}
+
 
 /**
  * Initialise the module
@@ -367,53 +454,4 @@ int32_t MKSerialInitialize(void)
 			TASK_PRIORITY, NULL);
 
 	return 0;
-}
-
-/**
- * gps task. Processes input buffer. It does not return.
- */
-static void MkSerialTask(void* parameters)
-{
-	MkMsg_t msg;
-	AttitudeActualData data;
-
-	PIOS_COM_ChangeBaud(PORT, 57600);
-	PIOS_COM_ChangeBaud(DEBUG_PORT, 57600);
-
-	DEBUG_MSG("MKSerial Started\n");
-
-	SendMsgParNone(MK_ADDR_ALL, MSGCMD_GET_VERSION);
-	if (WaitForMsg(MSGCMD_VERSION, &msg))
-	{
-		//PrintMsg(&msg);
-		DEBUG_MSG("Version = %d\n", VersionMsg_GetVersion(&msg));
-	}
-
-	SendMsgPar8(MK_ADDR_ALL, MSGCMD_GET_DEBUG, 10);
-
-	memset(&data, 0, sizeof(data));
-
-	while (1)
-	{
-		if (WaitForMsg(MSGCMD_DEBUG, &msg))
-		{
-			uint16_t nick;
-			uint16_t roll;
-
-			//PrintMsg(&msg);
-			nick = Par2SignedInt(&msg, DEBUG_MSG_NICK_IDX);
-			roll = Par2SignedInt(&msg, DEBUG_MSG_ROLL_IDX);
-
-			DEBUG_MSG("Att: Nick=%5d Roll=%5d\n", nick, roll);
-
-			data.seq++;
-			data.Pitch = (float)nick/10;
-			data.Roll = (float)roll/10;
-			AttitudeActualSet(&data);
-		}
-		else
-		{
-			DEBUG_MSG("NoMsg\n");
-		}
-	}
 }

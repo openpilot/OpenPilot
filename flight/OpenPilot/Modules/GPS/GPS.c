@@ -233,7 +233,11 @@ uint8_t nmeaProcess(cBuffer* rxBuffer)
 						bufferGetFromFront(rxBuffer);
 				}
 				// null terminate it
-				NmeaPacket[j] = 0;
+				if (j<(NMEA_BUFFERSIZE-1)) {
+					NmeaPacket[j] = 0;
+				} else {
+					NmeaPacket[NMEA_BUFFERSIZE-1] = 0;
+				}
 				// dump <CR><LF> from rxBuffer
 				bufferGetFromFront(rxBuffer);
 				bufferGetFromFront(rxBuffer);

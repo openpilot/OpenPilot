@@ -191,16 +191,16 @@ static bool WaitForMsg(uint8_t cmd, MkMsg_t* msg, portTickType xTicksToWait)
 	{
 		// When we are here, it means we did not encounter the message we are waiting for
 		// Check if we did not timeout yet.
-		if (xTaskCheckForTimeOut(&xTimeOut, &xTicksToWait))
-		{
-			error = TRUE;
-			break;
-		}
+
 
 		// Wait for start
 		buf[0] = 0;
 		do
 		{
+			if (xTaskCheckForTimeOut(&xTimeOut, &xTicksToWait))
+			{
+				return FALSE;
+			}
 			WaitForBytes(buf, 1, 100 / portTICK_RATE_MS);
 			// TODO: check to TO
 		} while (buf[0] != '#');
@@ -418,8 +418,8 @@ static void MkSerialTask(void* parameters)
 		{
 			if (WaitForMsg(MSGCMD_DEBUG, &msg, 500 / portTICK_RATE_MS))
 			{
-				uint16_t nick;
-				uint16_t roll;
+				int16_t nick;
+				int16_t roll;
 
 				//PrintMsg(&msg);
 				nick = Par2SignedInt(&msg, DEBUG_MSG_NICK_IDX);

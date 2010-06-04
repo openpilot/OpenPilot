@@ -11,6 +11,7 @@
  * \ingroup rtslam
  */
 #include "boost/shared_ptr.hpp"
+#include "image/roi.hpp"
 
 #include "rtslam/rtslamException.hpp"
 #include "rtslam/rawImage.hpp"
@@ -19,6 +20,7 @@
 namespace jafar {
 	namespace rtslam {
 		using namespace std;
+		using namespace jafar::image;
 
 		///////////////////////////////////
 		// RAW IMAGE CONTAINING REAL IMAGE
@@ -33,33 +35,28 @@ namespace jafar {
 			return s;
 		}
 
+		RawImage::RawImage() : quickHarrisDetector(5, 10.0){
+		}
+
 		void RawImage::setJafarImage(jafarImage_ptr_t img_) {
 			this->img = img_;
 		}
 
 		bool RawImage::detect(const detect_method met, feature_ptr_t & featPtr,
-		    const ROI* roiPtr) {
+		    ROI* roiPtr) {
 
 			switch (met) {
 				case HARRIS: {
-					InterestFeature feat_fdetect(0, 0);
 
-					if (harrisDetector.detectBestPntInRoi(*(img.get()), &feat_fdetect), roiPtr) {
+					featurepoint_ptr_t featPntPtr(new FeaturePoint);
 
-						boost::shared_ptr<FeaturePoint> featPntPtr(new FeaturePoint);
-
-						featPntPtr->setup(feat_fdetect.u(), feat_fdetect.v(), feat_fdetect.quality());
+					if (quickHarrisDetector.detectIn(*(img.get()), featPntPtr, roiPtr)) {
 
 						featPtr = featPntPtr;
 
-						JFR_DEBUG("Feature detected: " << featPntPtr->state.x())
-						cout << "Feature detected: " << featPntPtr->state.x() << endl;
 						return true;
 
 					} else {
-
-						JFR_DEBUG("No feature detected.")
-						cout << "No feature detected." << endl;
 						return false;
 					}
 				}

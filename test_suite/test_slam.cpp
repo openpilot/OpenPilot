@@ -49,7 +49,7 @@ using namespace boost;
 
 
 void test_slam01() {
-	ActiveSearchGrid asGrid(640, 480, 5, 5, 10);
+	ActiveSearchGrid asGrid(640, 480, 5, 5, 0);
 	vec2 imSz;
 	imSz(0) = 640; imSz(1) = 480;
 	vec4 k;
@@ -108,7 +108,7 @@ void test_slam01() {
 
 	// display::ViewerQt viewerQt;
 
-	for (int t = 1; t <= 2; t++) {
+	for (int t = 1; t <= 60; t++) {
 
 		cout << "\nTIME : " << t << endl;
 
@@ -117,6 +117,7 @@ void test_slam01() {
 		{
 			robot_ptr_t robPtr = *robIter;
 			cout << "\nROBOT: " << robPtr->id() << endl;
+
 			vec u(robPtr->mySize_control()); // TODO put some real values in u.
 			fillVector(u, 0.0);
 			robPtr->set_control(u);
@@ -129,6 +130,7 @@ void test_slam01() {
 			{
 				sensor_ptr_t senPtr = *senIter;
 				cout << "\nSENSOR: " << senPtr->id() << endl;
+
 				// get raw-data
 				senPtr->acquireRaw() ;
 
@@ -148,11 +150,11 @@ void test_slam01() {
 					obsPtr->predictVisibility();
 					if (obsPtr->isVisible()){
 
-						vec2 pix = obsPtr->expectation.x();
-//						cout << "expected pixel: " << pix << endl;
-
-						asGrid.addPixel(pix);
+						// update counter
 						obsPtr->counters.nSearch++;
+
+						// Add to tesselation grid for active search
+						asGrid.addPixel(obsPtr->expectation.x());
 
 						// 1c. predict appearance
 						obsPtr->predictAppearance();
@@ -187,13 +189,12 @@ void test_slam01() {
 
 					ROI roi;
 					if (asGrid.getROI(roi)){
-						cout << roi << endl;
 
 						feature_ptr_t featPtr(new FeatureAbstract(2));
 //						if (ObservationPinHolePoint::detectInRoi(senPtr->getRaw(), roi, featPtr)){
 						if (senPtr->getRaw()->detect(RawAbstract::HARRIS, featPtr, &roi)) {
-							cout << "Initializing lmk..." << endl;
 							cout << "Detected pixel: " << featPtr->state.x() << endl;
+							cout << "Initializing lmk..." << endl;
 
 							// 2a. create lmk object
 							ahp_ptr_t lmkPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr));

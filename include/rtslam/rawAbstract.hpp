@@ -60,7 +60,7 @@ namespace jafar {
 
 				virtual ~RawAbstract();
 
-				virtual bool detect(const detect_method met, feature_ptr_t & featPtr, const jafar::image::ROI* roiPtr = 0) = 0;
+				virtual bool detect(const detect_method met, feature_ptr_t & featPtr, jafar::image::ROI* roiPtr = 0) = 0;
 
 				//				virtual bool match(observation_ptr_t & obsPtr) = 0;
 

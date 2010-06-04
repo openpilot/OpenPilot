@@ -64,22 +64,15 @@ namespace jafar {
 //			jafarImage_ptr_t i(Image::loadImage("/home/agonzale/workspace/opencv/img_pan01.jpeg",1));
 //			jafarImage_ptr_t i(Image::loadImage("pelican.laas.fr:/data1/robots/dala/data/2009-02-27-someLoops/serie01/images/image.r.0000.tiff",1));
 //			jafarImage_ptr_t i(Image::loadImage("/home/jsola/imageSample2.ppm",0));
-			jafarImage_ptr_t i(Image::loadImage("/home/jeanmarie/imageSample2.ppm",0));
+//			jafarImage_ptr_t i(Image::loadImage("/home/jsola/imageSample4.ppm",0));
+			jafarImage_ptr_t i(Image::loadImage("/home/jsola/imageSample3.ppm",0));
 
-			rawimage_ptr_t imgRawPtr(new RawImage()) ;
+
+			//rawimage_ptr_t imgRawPtr(new RawImage()) ;
+			RawImage* imgRawPtr = new RawImage;
 			imgRawPtr->setJafarImage(i) ;
 
-			this->rawPtr = imgRawPtr;
-
-			// try to print the image
-			// todo remove this test
-//			cout << "creating viewer manager..." << endl;
-//			jafar::qdisplay::ViewerManager viewerManager;
-//			cout << "creating image viewer..." << endl;
-//			jafar::qdisplay::ImageView imgView;
-//			cout << "creating viewer..." << endl;
-//			jafar::qdisplay::Viewer viewer;
-//			cout << "after vewer" << endl;
+			rawPtr.reset(imgRawPtr);
 
 		}
 

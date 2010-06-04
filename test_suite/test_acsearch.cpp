@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include "jmath/matlab.hpp"
+#include "image/roi.hpp"
 #include "rtslam/activeSearch.hpp"
 
 using namespace std;
@@ -26,15 +27,17 @@ using namespace jafar;
 using namespace jafar::rtslam;
 using namespace jblas;
 using namespace jafar::jmath;
+using namespace jafar::image;
 
 void test_acsearch01() {
 	cout << "\n% ACTIVE SEARCH GRID \n%======================\n" << endl;
-	ActiveSearchGrid grid(320, 240, 5, 4);
+	ActiveSearchGrid grid(640, 480, 5, 5, 10);
 	vec2 pix;
 	ROI roi;
 	int i = 0;
 	while (true) {
 		if (grid.getROI(roi)) {
+			cout << roi << endl;
 			pix = (roi.upleft() + roi.downright()) / 2;
 			grid.addPixel(pix);
 			cout << "pix{" << i << "}: " << pix << " , " << grid << endl;

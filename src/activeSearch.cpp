@@ -59,10 +59,8 @@ namespace jafar {
 			projectionsCount.clear();
 		}
 		void ActiveSearchGrid::renew() {
-			offset(0) = rand() % cellSize(0); // from 0 to cellSize(0)-1
-			offset(1) = rand() % cellSize(1); // from 0 to cellSize(0)-1
-			//			offset(0) = (int) ((double) rand() / RAND_MAX * cellSize(0));
-			//			offset(1) = (int) ((double) rand() / RAND_MAX * cellSize(1));
+			offset(0) = - rand() % cellSize(0); // from 0 to -(cellSize(0)-1)
+			offset(1) = - rand() % cellSize(1); // from 0 to -(cellSize(0)-1)
 			clear();
 		}
 

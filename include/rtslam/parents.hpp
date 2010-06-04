@@ -43,7 +43,7 @@ public:
 
 public:
 	~ParentOf(void) {
-		std::cout << "Destroy Parent. " << std::endl;
+//		std::cout << "Destroy Parent. " << std::endl;
 	}
 
 	void registerChild(const Child_ptr & ptr) {
@@ -407,7 +407,7 @@ public:
 
 public:
   ~WeakParentOf(void) {
-    std::cout << "Destroy Parent. " << std::endl;
+//    std::cout << "Destroy Parent. " << std::endl;
   }
 
   void registerChild(const Child_ptr & ptr) {

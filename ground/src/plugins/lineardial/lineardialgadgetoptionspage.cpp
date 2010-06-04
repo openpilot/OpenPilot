@@ -28,6 +28,9 @@
 #include "lineardialgadgetoptionspage.h"
 #include "lineardialgadgetconfiguration.h"
 #include "ui_lineardialgadgetoptionspage.h"
+#include "extensionsystem/pluginmanager.h"
+#include "uavobjects/uavobjectmanager.h"
+#include "uavobjects/uavdataobject.h"
 
 #include <QFileDialog>
 #include <QtAlgorithms>
@@ -60,10 +63,36 @@ QWidget *LineardialGadgetOptionsPage::createPage(QWidget *parent)
     options_page->redMin->setValue(m_config->getRedMin());
     options_page->redMax->setValue(m_config->getRedMax());
 
+    // Fills the combo boxes for the UAVObjects
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    QList< QList<UAVDataObject*> > objList = objManager->getDataObjects();
+    foreach (QList<UAVDataObject*> list, objList) {
+        foreach (UAVDataObject* obj, list) {
+            options_page->objectName->addItem(obj->getName());
+        }
+    }
+    //select saved UAV Object field values
+    if(options_page->objectName->findText(m_config->getSourceDataObject())!=-1){
+        options_page->objectName->setCurrentIndex(options_page->objectName->findText(m_config->getSourceDataObject()));
+        // Now load the object field values:
+        UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(m_config->getSourceDataObject()) );
+        if (obj != NULL ) {
+                QList<UAVObjectField*> fieldList = obj->getFields();
+                foreach (UAVObjectField* field, fieldList) {
+                   options_page->objectField->addItem(field->getName());
+                }
+                // And set the highlighed value from the settings:
+                options_page->objectField->setCurrentIndex(options_page->objectField->findText(m_config->getSourceObjectField()));
+        }
+    }
+
+    connect(options_page->objectName, SIGNAL(currentIndexChanged(QString)), this, SLOT(on_objectName_currentIndexChanged(QString)));
     connect(options_page->loadFile, SIGNAL(clicked()), this, SLOT(on_loadFile_clicked()));
 
     return optionsPageWidget;
 }
+
 /**
  * Called when the user presses apply or OK.
  *
@@ -77,6 +106,8 @@ void LineardialGadgetOptionsPage::apply()
     m_config->setGreenRange(options_page->greenMin->value(),options_page->greenMax->value());
     m_config->setYellowRange(options_page->yellowMin->value(),options_page->yellowMax->value());
     m_config->setRedRange(options_page->redMin->value(),options_page->redMax->value());
+    m_config->setSourceDataObject(options_page->objectName->currentText());
+    m_config->setSourceObjField(options_page->objectField->currentText());
 }
 
 /**
@@ -98,6 +129,20 @@ void LineardialGadgetOptionsPage::on_loadFile_clicked()
 
 }
 
+/*
+  Fills in the field1 combo box when value is changed in the
+  object1 field
+*/
+void LineardialGadgetOptionsPage::on_objectName_currentIndexChanged(QString val) {
+    options_page->objectField->clear();
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(val) );
+    QList<UAVObjectField*> fieldList = obj->getFields();
+    foreach (UAVObjectField* field, fieldList) {
+        options_page->objectField->addItem(field->getName());
+    }
+}
 
 void LineardialGadgetOptionsPage::finish()
 {

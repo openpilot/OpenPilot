@@ -81,6 +81,7 @@ SUBDIRS += plugin_airspeed
 #Linear Dial Gadget
 plugin_lineardial.subdir = lineardial
 plugin_lineardial.depends = plugin_coreplugin
+plugin_lineardial.depends = plugin_uavobjects
 SUBDIRS += plugin_lineardial
 
 #System health Gadget

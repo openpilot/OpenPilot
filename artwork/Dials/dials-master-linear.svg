@@ -217,6 +217,13 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective2940"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -225,16 +232,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.979899"
-     inkscape:cx="137.09042"
+     inkscape:zoom="7.9195959"
+     inkscape:cx="197.58205"
      inkscape:cy="20.867055"
      inkscape:document-units="px"
-     inkscape:current-layer="layer6"
+     inkscape:current-layer="g2932"
      showgrid="false"
      inkscape:window-width="1280"
-     inkscape:window-height="744"
+     inkscape:window-height="998"
      inkscape:window-x="-4"
-     inkscape:window-y="1020"
+     inkscape:window-y="-4"
      inkscape:window-maximized="1"
      inkscape:object-paths="true"
      showguides="true"
@@ -313,7 +320,7 @@
          id="bargraph-outer"
          style="fill:#332d2d;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
       <rect
-         style="fill:#332d2d;fill-opacity:1;stroke:none;stroke-width:2;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         style="fill:#332d2d;fill-opacity:1;stroke:none"
          id="bargraph"
          width="260.53882"
          height="9.2538376"
@@ -324,6 +331,18 @@
          inkscape:export-xdpi="88.809998"
          inkscape:export-ydpi="88.809998"
          inkscape:label="#rect4388" />
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 249.16159,372.07875 1.13642,0.12627"
+         id="field"
+         sodipodi:nodetypes="cc"
+         inkscape:label="#path2930" />
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
+         d="m 451.7298,372.12602 1.13642,0.12627"
+         id="value"
+         sodipodi:nodetypes="cc"
+         inkscape:label="#path2930" />
     </g>
   </g>
   <g
@@ -421,16 +440,16 @@
      inkscape:label="Text"
      style="display:inline">
     <text
-       transform="translate(-227.44331,-365.7337)"
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Vera Sans"
-       x="247.64636"
-       y="386.07877"
-       id="text4390"><tspan
+       x="22.203053"
+       y="20.345066"
+       id="bb"
+       inkscape:label="#text4390"><tspan
          sodipodi:role="line"
          id="tspan4392"
-         x="247.64636"
-         y="386.07877"
+         x="22.203053"
+         y="20.345066"
          style="font-size:18px;fill:#ffffff;fill-opacity:1">Vbat</tspan></text>
     <text
        transform="translate(-227.44331,-365.7337)"

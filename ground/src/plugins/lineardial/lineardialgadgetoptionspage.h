@@ -61,6 +61,8 @@ private:
 
 private slots:
     void on_loadFile_clicked();
+    void on_objectName_currentIndexChanged(QString val);
+
 };
 
 #endif // LINEARDIALGADGETOPTIONSPAGE_H

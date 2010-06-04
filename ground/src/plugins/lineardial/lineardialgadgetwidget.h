@@ -29,6 +29,9 @@
 #define LINEARDIALGADGETWIDGET_H_
 
 #include "lineardialgadgetconfiguration.h"
+#include "extensionsystem/pluginmanager.h"
+#include "uavobjects/uavobjectmanager.h"
+#include "uavobjects/uavobject.h"
 #include <QGraphicsView>
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
@@ -50,8 +53,11 @@ public:
    void setYellowRange(double min, double max) {yellowMin=min; yellowMax=max;}
    void setRedRange(double min, double max) {redMin=min; redMax=max;}
    void connectInput(QString obj, QString field);
-
    void setIndex(double val);
+
+public slots:
+    void updateIndex(UAVObject *object1);
+
 
 protected:
    void paintEvent(QPaintEvent *event);
@@ -72,6 +78,9 @@ private:
    QGraphicsSvgItem *green;
    QGraphicsSvgItem *yellow;
    QGraphicsSvgItem *red;
+
+   QGraphicsTextItem *fieldName;
+   QGraphicsTextItem *fieldValue;
 
                    // Simple flag to skip rendering if the
    bool fgenabled; // layer does not exist.
@@ -100,6 +109,11 @@ private:
 
    // Rotation timer
    QTimer dialTimer;
+
+   // Name of the fields to read when an update is received:
+   UAVDataObject* obj1;
+   QString field1;
+
 
    // Test variables
    int testSpeed;

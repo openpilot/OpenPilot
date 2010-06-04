@@ -44,8 +44,13 @@ LineardialGadgetWidget::LineardialGadgetWidget(QWidget *parent) : QGraphicsView(
     yellow = new QGraphicsSvgItem();
     red = new QGraphicsSvgItem();
     index = new QGraphicsSvgItem();
+    fieldName = new QGraphicsTextItem("Field");
+    fieldName->setDefaultTextColor(QColor("White"));
+    fieldValue = new QGraphicsTextItem("3.0 V");
+
     paint();
 
+    obj1 = NULL;
     indexTarget = 0;
     indexValue = 0;
 
@@ -53,10 +58,12 @@ LineardialGadgetWidget::LineardialGadgetWidget(QWidget *parent) : QGraphicsView(
     connect(&dialTimer, SIGNAL(timeout()), this, SLOT(moveIndex()));
     dialTimer.start(30);
 
+#if 0
     // Test code for timer to move the index
     testSpeed=0;
     connect(&m_testTimer, SIGNAL(timeout()), this, SLOT(testRotate()));
     m_testTimer.start(1000);
+#endif
 }
 
 LineardialGadgetWidget::~LineardialGadgetWidget()
@@ -64,11 +71,47 @@ LineardialGadgetWidget::~LineardialGadgetWidget()
    // Do nothing
 }
 
-void LineardialGadgetWidget::connectInput(QString object1, QString field1) {
+/*!
+  \brief Connects the widget to the relevant UAVObjects
+  */
+void LineardialGadgetWidget::connectInput(QString object1, QString nfield1) {
 
+    if (obj1 != NULL)
+        disconnect(obj1,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(updateIndex(UAVObject*)));
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+
+    std::cout << "Lineadial Connect needles - " << object1.toStdString() << "-"<< nfield1.toStdString() << std::endl;
+
+    // Check validity of arguments first, reject empty args and unknown fields.
+    if (!(object1.isEmpty() || nfield1.isEmpty())) {
+        obj1 = dynamic_cast<UAVDataObject*>( objManager->getObject(object1) );
+        if (obj1 != NULL ) {
+            connect(obj1, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateIndex(UAVObject*)));
+            field1 = nfield1;
+            fieldName->setPlainText(nfield1);
+        } else {
+            std::cout << "Error: Object is unknown (" << object1.toStdString() << ") this should not happen." << std::endl;
+        }
+    }
 }
 
-
+/*!
+  \brief Called by the UAVObject which got updated
+  */
+void LineardialGadgetWidget::updateIndex(UAVObject *object1) {
+    // Double check that the field exists:
+    UAVObjectField* field = object1->getField(field1);
+    if (field) {
+        double v = field->getDouble();
+        setIndex(v);
+        QString s;
+        s.sprintf("%.2f",v);
+        fieldValue->setPlainText(s);
+    } else {
+        std::cout << "Wrong field, maybe an issue with object disconnection ?" << std::endl;
+    }
+}
 
 void LineardialGadgetWidget::setDialFile(QString dfn)
 {
@@ -83,8 +126,6 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
          background->setElementId("background");
          index->setSharedRenderer(m_renderer);
          index->setElementId("needle");
-         // TODO: transform the green, yellow & red zones
-         // according to their min/max.
          green->setSharedRenderer(m_renderer);
          green->setElementId("green");
          yellow->setSharedRenderer(m_renderer);
@@ -97,22 +138,38 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
             foreground->setElementId("foreground");
             fgenabled = true;
         }
-         std::cout<<"Dial file loaded"<<std::endl;
+         //std::cout<<"Dial file loaded"<<std::endl;
          QGraphicsScene *l_scene = scene();
+
+         QMatrix textMatrix = m_renderer->matrixForElement("field");
+         startX = textMatrix.mapRect(m_renderer->boundsOnElement("field")).x();
+         startY = textMatrix.mapRect(m_renderer->boundsOnElement("field")).y();
+         QTransform matrix;
+         matrix.translate(startX,startY);
+         fieldName->setTransform(matrix,false);
+
+         textMatrix = m_renderer->matrixForElement("value");
+         startX = textMatrix.mapRect(m_renderer->boundsOnElement("field")).x();
+         startY = textMatrix.mapRect(m_renderer->boundsOnElement("field")).y();
+         matrix.reset();
+         matrix.translate(startX,startY);
+         fieldValue->setTransform(matrix,false);
+
 
          // In order to properly render the Green/Yellow/Red graphs, we need to find out
          // the starting location of the bargraph rendering area:
          QMatrix barMatrix = m_renderer->matrixForElement("bargraph");
          startX = barMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).x();
          startY = barMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).y();
-         std::cout << "StartX: " << startX << std::endl;
-         std::cout << "StartY: " << startY << std::endl;
+         //std::cout << "StartX: " << startX << std::endl;
+         //std::cout << "StartY: " << startY << std::endl;
          bargraphWidth = barMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).width();
          indexHeight = m_renderer->matrixForElement("needle").mapRect(m_renderer->boundsOnElement("needle")).height();
          indexWidth = m_renderer->matrixForElement("needle").mapRect(m_renderer->boundsOnElement("needle")).width();
-         std::cout << "Index height: " << indexHeight << std::endl;
+         //std::cout << "Index height: " << indexHeight << std::endl;
 
-         QTransform matrix;
+//         QTransform matrix;
+         matrix.reset();
          matrix.translate(startX-indexWidth/2,startY-indexHeight/2);
          index->setTransform(matrix,false);
          // Now adjust the red/yellow/green zones:
@@ -163,6 +220,7 @@ void LineardialGadgetWidget::paint()
     l_scene->addItem(yellow);
     l_scene->addItem(green);
     l_scene->addItem(index);
+    l_scene->addItem(fieldName);
     l_scene->addItem(foreground);
 
     update();

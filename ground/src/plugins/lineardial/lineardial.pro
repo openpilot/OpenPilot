@@ -3,7 +3,7 @@ TARGET = LineardialGadget
 QT += svg
 include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
-include(../../libs/qwt/qwt.pri)
+include(lineardial_dependencies.pri)
 HEADERS += lineardialplugin.h
 HEADERS += lineardialgadget.h
 HEADERS += lineardialgadgetwidget.h

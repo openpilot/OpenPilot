@@ -29,6 +29,6 @@
 #ifndef GPS_H
 #define GPS_H
 
-int32_t GpsInitialize(void);
+int32_t GPSInitialize(void);
 
 #endif // GPS_H

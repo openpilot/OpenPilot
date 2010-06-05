@@ -30,13 +30,7 @@
 #include "telemetry.h"
 #include "GPS.h"
 #include "systemmod.h"
-#include "examplemodevent.h"
-#include "examplemodperiodic.h"
-#include "examplemodthread.h"
-#include "manualcontrol.h"
-#include "actuator.h"
-#include "altitude.h"
-#include "attitude.h"
+
 
 /* Task Priorities */
 #define PRIORITY_TASK_HOOKS             (tskIDLE_PRIORITY + 3)
@@ -62,6 +56,9 @@ static void TaskSDCard(void *pvParameters);
 #endif
 int32_t CONSOLE_Parse(COMPortTypeDef port, char c);
 void OP_ADC_NotifyChange(uint32_t pin, uint32_t pin_value);
+
+/* Prototype of generated InitModules() function */
+extern void InitModules(void);
 
 /**
 * OpenPilot Main function
@@ -134,15 +131,7 @@ void OpenPilotInit()
 	PIOS_I2C_Init();
 
 	/* Initialize modules */
-	TelemetryInitialize();
-	ExampleModPeriodicInitialize();
-	//ExampleModThreadInitialize();
-	//ExampleModEventInitialize();
-	GpsInitialize();
-	ManualControlInitialize();
-	ActuatorInitialize();
-	AltitudeInitialize();
-	AttitudeInitialize();
+	InitModules();
 
 	/* Create test tasks */
 	//xTaskCreate(TaskTesting, (signed portCHAR *)"Testing", configMINIMAL_STACK_SIZE , NULL, 4, NULL);

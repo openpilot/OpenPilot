@@ -85,7 +85,7 @@ char NmeaPacket[NMEA_BUFFERSIZE];
  * \return -1 if initialisation failed
  * \return 0 on success
  */
-int32_t GpsInitialize(void)
+int32_t GPSInitialize(void)
 {
 	signed portBASE_TYPE xReturn;
 	// TODO: Get gps settings object

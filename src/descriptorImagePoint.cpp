@@ -12,7 +12,6 @@ namespace jafar {
 	namespace rtslam {
 		DescriptorImagePoint::DescriptorImagePoint() {
 			// TODO Auto-generated constructor stub
-
 		}
 
 		DescriptorImagePoint::~DescriptorImagePoint() {

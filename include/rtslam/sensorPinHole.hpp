@@ -12,6 +12,7 @@
 #ifndef SENSORPINHOLE_HPP_
 #define SENSORPINHOLE_HPP_
 
+#include "image/Image.hpp"
 #include "rtslam/rtSlam.hpp"
 
 #include "rtslam/sensorAbstract.hpp"
@@ -54,7 +55,7 @@ namespace jafar {
 				jblas::vec4 intrinsic;
 				jblas::vec distortion;
 				jblas::vec correction;
-				raw_ptr_t rawPtr ;
+//				image::image_ptr_t imagePtr ;
 
 				/**
 				 * Pin-hole sensor setup.
@@ -78,9 +79,7 @@ namespace jafar {
 
 				void acquireRaw();
 
-				raw_ptr_t getRaw() {
-					return rawPtr ;
-				}
+				raw_ptr_t getRaw() ;
 
 		};
 

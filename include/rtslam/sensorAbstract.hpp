@@ -114,6 +114,7 @@ namespace jafar {
 				 * Flag indicating if the sensor pose is being filtered
 				 */
 				bool isInFilter;
+				raw_ptr_t rawPtr;
 
 			protected:
 				/**

@@ -16,6 +16,7 @@
 #include "rtslam/rtslamException.hpp"
 #include "rtslam/rawImage.hpp"
 #include "rtslam/featurePoint.hpp"
+#include "rtslam/appearanceImage.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -42,6 +43,19 @@ namespace jafar {
 			this->img = img_;
 		}
 
+
+		void RawImage::extractPatch(const size_t width, const size_t height, featurepoint_ptr_t & featPntPtr){
+			Image dst(width, height, img.get()->depth(), JfrImage_CS_GRAY);
+			int shift_x = (width-1)/2;
+			int shift_y = (height-1)/2;
+			int x_src = featPntPtr->state.x(0)-shift_x;
+			int y_src = featPntPtr->state.x(1)-shift_y;
+			img.get()->copy(dst, x_src, y_src, 0, 0, width, height);
+			appearenceimage_ptr_t appImgPtr(new AppearenceImage);
+			featPntPtr->appearancePtr = appImgPtr;
+		}
+
+
 		bool RawImage::detect(const detect_method met, feature_ptr_t & featPtr,
 		    ROI* roiPtr) {
 
@@ -51,6 +65,9 @@ namespace jafar {
 					featurepoint_ptr_t featPntPtr(new FeaturePoint);
 
 					if (quickHarrisDetector.detectIn(*(img.get()), featPntPtr, roiPtr)) {
+
+						// get patch and construct feature
+						extractPatch(45, 45, featPntPtr);
 
 						featPtr = featPntPtr;
 

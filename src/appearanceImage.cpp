@@ -6,6 +6,7 @@
  */
 
 #include "rtslam/appearanceImage.hpp"
+#include "image/Image.hpp"
 
 namespace jafar {
 	namespace rtslam {

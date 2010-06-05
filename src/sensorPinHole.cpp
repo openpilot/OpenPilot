@@ -65,16 +65,19 @@ namespace jafar {
 //			jafarImage_ptr_t i(Image::loadImage("pelican.laas.fr:/data1/robots/dala/data/2009-02-27-someLoops/serie01/images/image.r.0000.tiff",1));
 //			jafarImage_ptr_t i(Image::loadImage("/home/jsola/imageSample2.ppm",0));
 //			jafarImage_ptr_t i(Image::loadImage("/home/jsola/imageSample4.ppm",0));
-			jafarImage_ptr_t i(Image::loadImage("/home/jsola/imageSample3.ppm",0));
+			jafarImage_ptr_t i(Image::loadImage("/home/jsola/imageSample.ppm",0));
 
-
-			//rawimage_ptr_t imgRawPtr(new RawImage()) ;
 			RawImage* imgRawPtr = new RawImage;
 			imgRawPtr->setJafarImage(i) ;
 
 			rawPtr.reset(imgRawPtr);
-
 		}
+
+		raw_ptr_t SensorPinHole::getRaw() {
+//			image_ptr_t ip = rawPtr;
+			return rawPtr;
+		}
+
 
 
 	}

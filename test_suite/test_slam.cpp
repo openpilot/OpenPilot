@@ -108,7 +108,7 @@ void test_slam01() {
 
 	// display::ViewerQt viewerQt;
 
-	for (int t = 1; t <= 60; t++) {
+	for (int t = 1; t <= 100; t++) {
 
 		cout << "\nTIME : " << t << endl;
 
@@ -134,7 +134,7 @@ void test_slam01() {
 				// get raw-data
 				senPtr->acquireRaw() ;
 
-
+				asGrid.renew();
 				// 1. Observe known landmarks
 				// foreach observation
 				for (SensorAbstract::ObservationList::iterator obsIter = senPtr->observationList().begin(); obsIter != senPtr->observationList().end(); obsIter++)

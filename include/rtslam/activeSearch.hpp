@@ -119,6 +119,7 @@ namespace jafar {
 				mati projectionsCount;
 				mati emptyCellsTile_tmp;
 				int separation;
+				int margin;
 
 			public:
 				/**
@@ -129,7 +130,7 @@ namespace jafar {
 				 * \param nCells_v vertical number of cells per image height.
 				 * \param separation minimum separation between existing and new points.
 				 */
-				ActiveSearchGrid(const int & imgSize_h, const int & imgSize_v, const int & nCells_h, const int & nCells_v,
+				ActiveSearchGrid(const int & imgSize_h, const int & imgSize_v, const int & nCells_h, const int & nCells_v, const int & margin = 0,
 				    const int & separation = 0);
 
 				/**

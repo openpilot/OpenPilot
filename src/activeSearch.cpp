@@ -33,9 +33,9 @@ namespace jafar {
 
 		// CLASS ActiveSearchGrid
 		ActiveSearchGrid::ActiveSearchGrid(const int & imgSize_h, const int & imgSize_v, const int & nCells_h,
-		    const int & nCells_v, const int & separation) :
+		    const int & nCells_v, const int & margin, const int & separation) :
 			projectionsCount(nCells_h + 1, nCells_v + 1), emptyCellsTile_tmp((nCells_h + 1) * (nCells_v + 1), 2), separation(
-			    separation) {
+			    separation), margin(margin) {
 			imgSize(0) = imgSize_h;
 			imgSize(1) = imgSize_v;
 			gridSize(0) = projectionsCount.size1();
@@ -59,8 +59,8 @@ namespace jafar {
 			projectionsCount.clear();
 		}
 		void ActiveSearchGrid::renew() {
-			offset(0) = - rand() % cellSize(0); // from 0 to -(cellSize(0)-1)
-			offset(1) = - rand() % cellSize(1); // from 0 to -(cellSize(0)-1)
+			offset(0) = - (margin + rand() % (cellSize(0) - 2*margin)); // from -margin to -(cellSize(0)-margin)
+			offset(1) = - (margin + rand() % (cellSize(1) - 2*margin)); // from -margin to -(cellSize(0)-margin)
 			clear();
 		}
 

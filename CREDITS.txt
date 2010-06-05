@@ -6,7 +6,6 @@ The fields are:
 
 Name (N)
 Email (E),
-Web-address (W) 
 Description of work (D) 
 
 
@@ -16,23 +15,27 @@ Description of work (D)
 N: David Ankers
 E: david (at) openpilot (dot) org
 D: Co-founder, Project Coordination     
-D: Minor GCS infrastruture 
+D: Minor GCS infrastruture, updating the credit file 
 
 N: Pedro Assuncao
-E: pedro (dot) agda (at) gmail (dot) com
-D: GCS Settings Widget & Plugin
+E: pedro (dot) agda (plus) openpilot (at) gmail (dot) com
+D: GCS Settings Gadget & Plugin
 
 N: Jose Barros
 E: josembarros (at) hotmail (dot) com
 D: GCS Y-Modem Plugin, Next-Gen Map plugin
 
 N: David "Buzz" Carlson 
-E: chebuzz (at) gmail (dot) com
+E: chebuzz (plus) openpilot (at) gmail (dot) com
 D: 3D ModelView GCS Plugin
 
 N: Frederic Goddeeris
 E: fredericgoddeeris (at) hotmail (dot) com
 D: I2C work and FreeRTOS work, MK intergration  
+
+N: Bani Greyling
+E: bani (dot) greyling (plus) openpilot (at) gmail (dot) com
+D: GCS Scope plugin
 
 N: Peter Gunnarsson
 E: peter (at) pyne (dot) se
@@ -40,7 +43,7 @@ D: GCS Core Developer
 D: Multiple GCS plugins, Gadget foundations, UAVObject viewer
 
 N: Samik Korhonen
-E: samik.korhonen (at) gmail (dot) com
+E: samik.korhonen (plus) openpilot (at) gmail (dot) com
 D: GPS Module, Spektrum RC Module 
 
 N: Thorsten Klose
@@ -66,11 +69,11 @@ D: Hardware design of OpenPilot, AHRS, GPS and other hardware
 D: Core developer embedded code
 
 N: Richard Querin
-E: rfquerin (at) gmail (dot) com
+E: rfquerin (plus) openpilot (at) gmail (dot) com
 D: Graphic Design, OpenPilot Logo
 
 N: Julien Rouviere
-E: julien.rouviere (at) gmail (dot) com
+E: julien.rouviere (plus) openpilot (at) gmail (dot) com
 D: GCS Core Developer
 D: GCS Framework and Plugins for the GCS
 

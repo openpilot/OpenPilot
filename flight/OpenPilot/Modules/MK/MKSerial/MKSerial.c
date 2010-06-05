@@ -28,18 +28,20 @@
 
 #include "attitudeactual.h" // object that will be updated by the module
 
+
 //
-// Private constants
+// Configuration
 //
-#define PORT			COM_USART1
+#define PORT			COM_USART2
+#define DEBUG_PORT		COM_USART1
 #define STACK_SIZE		1024
 #define TASK_PRIORITY	(tskIDLE_PRIORITY + 3)
 #define MAX_NB_PARS 	40
+//#define ENABLE_DEBUG_MSG
 
-#define DEBUG_PORT		COM_USART2
-
-#define DEBUG_MSG(format, ...) PIOS_COM_SendFormattedString(DEBUG_PORT, format, ## __VA_ARGS__)
-
+//
+// Private constants
+//
 #define MSGCMD_ANY				0
 #define MSGCMD_GET_DEBUG		'd'
 #define MSGCMD_DEBUG			'D'
@@ -48,6 +50,12 @@
 
 #define DEBUG_MSG_NICK_IDX	(2+2*2)
 #define DEBUG_MSG_ROLL_IDX	(2+3*2)
+
+#ifdef ENABLE_DEBUG_MSG
+	#define DEBUG_MSG(format, ...) PIOS_COM_SendFormattedString(DEBUG_PORT, format, ## __VA_ARGS__)
+#else
+	#define DEBUG_MSG(format, ...)
+#endif
 
 
 //
@@ -84,8 +92,8 @@ static bool WaitForMsg(uint8_t cmd, MkMsg_t* msg, portTickType xTicksToWait);
 static void SendMsg(const MkMsg_t* msg);
 static void SendMsgParNone(uint8_t address, uint8_t cmd);
 static void SendMsgPar8(uint8_t address, uint8_t cmd, uint8_t par0);
-static uint16_t VersionMsg_GetVersion(const MkMsg_t* msg);
 static void MkSerialTask(void* parameters);
+
 
 
 
@@ -373,10 +381,12 @@ static void SendMsgPar8(uint8_t address, uint8_t cmd, uint8_t par0)
 	SendMsg(&msg);
 }
 
+#ifdef ENABLE_DEBUG_MSG
 static uint16_t VersionMsg_GetVersion(const MkMsg_t* msg)
 {
 	return msg->pars[0] * 100 + msg->pars[1];
 }
+#endif
 
 
 static void MkSerialTask(void* parameters)
@@ -401,8 +411,10 @@ static void MkSerialTask(void* parameters)
 			DEBUG_MSG("Version... ");
 			if (WaitForMsg(MSGCMD_VERSION, &msg, 100 / portTICK_RATE_MS))
 			{
-				//PrintMsg(&msg);
-				DEBUG_MSG("%d\n", VersionMsg_GetVersion(&msg));
+				#ifdef ENABLE_DEBUG_MSG
+					uint32_t version = VersionMsg_GetVersion(&msg);
+					DEBUG_MSG("%d\n", version);
+				#endif
 				connectionOk = TRUE;
 			}
 			else
@@ -428,8 +440,8 @@ static void MkSerialTask(void* parameters)
 				DEBUG_MSG("Att: Nick=%5d Roll=%5d\n", nick, roll);
 
 				data.seq++;
-				data.Pitch = (float)nick/10;
-				data.Roll = (float)roll/10;
+				data.Pitch = -(float)nick/10;
+				data.Roll = -(float)roll/10;
 				AttitudeActualSet(&data);
 			}
 			else
@@ -450,8 +462,7 @@ static void MkSerialTask(void* parameters)
 int32_t MKSerialInitialize(void)
 {
 	// Start gps task
-	xTaskCreate(MkSerialTask, (signed char*) "MkSerial", STACK_SIZE, NULL,
-			TASK_PRIORITY, NULL);
+	xTaskCreate(MkSerialTask, (signed char*) "MkSerial", STACK_SIZE, NULL, TASK_PRIORITY, NULL);
 
 	return 0;
 }

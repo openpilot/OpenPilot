@@ -29,6 +29,6 @@
 #ifndef MK_SERIAL_H
 #define MK_SERIAL_H
 
-int32_t MkSerialInitialize(void);
+int32_t MKSerialInitialize(void);
 
 #endif // MK_SER_INPUT_H

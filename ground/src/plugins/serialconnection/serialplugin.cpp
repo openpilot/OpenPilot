@@ -94,7 +94,11 @@ QIODevice *SerialConnection::openDevice(const QString &deviceName)
             set.StopBits = STOP_1;
             set.FlowControl = FLOW_OFF;
             set.Timeout_Millisec = 500;
+#ifdef Q_OS_WIN
             return new QextSerialPort(port.portName, set);
+#else
+            return new QextSerialPort(port.physName, set);
+#endif
         }
     }
     return NULL;

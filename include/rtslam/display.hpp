@@ -16,7 +16,6 @@
 
 #include "kernel/IdFactory.hpp"
 #include "boost/variant.hpp"
-//#include <typeinfo>
 #include <boost/type_traits/is_same.hpp>
 
 namespace jafar {
@@ -185,10 +184,10 @@ namespace display {
 						else
 							parentDisp = static_cast<ParentDisplayType*>(parentSlam->displayData[id]);
 					}
-					slamObject->displayData[id] = new DisplayType(slamObject, parentDisp);
+					slamObject->displayData[id] = new DisplayType(&*slamObject, parentDisp);
 				}
 				// bufferize the object
-				DisplayType objDisp = static_cast<DisplayType*>(slamObject->displayData[id]);
+				DisplayType *objDisp = static_cast<DisplayType*>(slamObject->displayData[id]);
 				objDisp->bufferize();
 			}
 			

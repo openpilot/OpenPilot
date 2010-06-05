@@ -53,11 +53,10 @@ namespace jafar {
 				virtual ~WorldAbstract() {
 				}
 
-			void addMap(map_ptr_t map)
-			{
-				mapList().push_back(map);
-			}
-
+				void addMap(map_ptr_t map)
+				{
+					mapList().push_back(map);
+				}
 
 		};
 

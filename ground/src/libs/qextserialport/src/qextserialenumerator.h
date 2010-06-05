@@ -33,9 +33,6 @@ struct QextPortInfo {
     QString enumName;   ///< Enumerator name.
     int vendorID;       ///< Vendor ID.
     int productID;      ///< Product ID
-    //added operator to alow sorting (PT_Dreamer)
-    bool operator<(const QextPortInfo & other) const {
-        return portName < other.portName;}
 };
 
 #ifdef Q_OS_WIN

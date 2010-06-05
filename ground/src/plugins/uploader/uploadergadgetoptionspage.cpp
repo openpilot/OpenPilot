@@ -36,7 +36,7 @@
 #include <QtGui/QComboBox>
 #include <QtAlgorithms>
 #include <QStringList>
-#include <qextserialport/src/qextserialenumerator.h>
+
 
 UploaderGadgetOptionsPage::UploaderGadgetOptionsPage(UploaderGadgetConfiguration *config, QObject *parent) :
         IOptionsPage(parent),
@@ -158,7 +158,10 @@ UploaderGadgetOptionsPage::UploaderGadgetOptionsPage(UploaderGadgetConfiguration
             <<"FLOW_HARDWARE"
             <<"FLOW_XONXOFF";
 }
-
+bool sortPorts(QextPortInfo const& s1,QextPortInfo const& s2)
+{
+    return s1.portName<s2.portName;
+}
 //creates options page widget
 QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
 {
@@ -263,7 +266,7 @@ QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
 
     //gets available serial ports
     QList<QextPortInfo> ports =QextSerialEnumerator ::getPorts();
-    qSort(ports.begin(), ports.end());
+    qSort(ports.begin(), ports.end(),sortPorts);
     qDebug() << "List of ports:";
     for (int i = 0; i < ports.size(); i++) {
         qDebug() << "port name:" << ports.at(i).portName;

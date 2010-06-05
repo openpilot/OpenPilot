@@ -29,7 +29,8 @@
 #define SERIALPLUGIN_H
 
 #include "serial_global.h"
-
+#include <qextserialport.h>
+#include <qextserialenumerator.h>
 #include "coreplugin/iconnection.h"
 #include <extensionsystem/iplugin.h>
 

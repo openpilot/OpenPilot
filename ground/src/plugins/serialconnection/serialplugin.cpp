@@ -32,8 +32,6 @@
 
 #include <QtCore/QtPlugin>
 #include <QtGui/QMainWindow>
-#include <qextserialport.h>
-#include <qextserialenumerator.h>
 
 #include <QDebug>
 
@@ -55,6 +53,10 @@ void SerialConnection::onEnumerationChanged()
 {
     emit availableDevChanged(this);
 }
+bool sortPorts(const QextPortInfo &s1,const QextPortInfo &s2)
+{
+    return s1.portName<s2.portName;
+}
 
 QStringList SerialConnection::availableDevices()
 {
@@ -62,9 +64,13 @@ QStringList SerialConnection::availableDevices()
     QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
 
     //sort the list by port number (nice idea from PT_Dreamer :))
-    qSort(ports.begin(), ports.end());
+    qSort(ports.begin(), ports.end(),sortPorts);
     foreach( QextPortInfo port, ports ) {
-        list.append(port.friendName);
+#ifdef Q_OS_WIN
+        list.append(port.portName);
+#else
+        list.append(port.physName);
+#endif
     }
 
     return list;
@@ -74,8 +80,12 @@ QIODevice *SerialConnection::openDevice(const QString &deviceName)
 {
     QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
     foreach( QextPortInfo port, ports ) {
-        if(port.friendName == deviceName)
-        {
+#ifdef Q_OS_WIN
+        if(port.portName == deviceName)
+#else
+            if(port.physName == deviceName)
+#endif
+            {
             //we need to handle port settings here...
             PortSettings set;
             set.BaudRate = BAUD57600;

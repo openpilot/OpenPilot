@@ -49,7 +49,7 @@ QList<QextPortInfo> QextSerialEnumerator::getPorts()
     foreach (QString str , portNameList) {
         QextPortInfo inf;
         inf.physName = "/dev/"+str;
-        inf.portName = "/dev/"+str;
+        inf.portName = str;
 
         if (str.contains("ttyS")) {
             inf.friendName = "Serial port "+str.remove(0, 4);

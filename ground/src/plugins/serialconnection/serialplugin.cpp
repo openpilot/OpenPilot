@@ -66,11 +66,7 @@ QStringList SerialConnection::availableDevices()
     //sort the list by port number (nice idea from PT_Dreamer :))
     qSort(ports.begin(), ports.end(),sortPorts);
     foreach( QextPortInfo port, ports ) {
-#ifdef Q_OS_WIN
-        list.append(port.portName);
-#else
-        list.append(port.physName);
-#endif
+       list.append(port.friendName);
     }
 
     return list;
@@ -80,11 +76,7 @@ QIODevice *SerialConnection::openDevice(const QString &deviceName)
 {
     QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
     foreach( QextPortInfo port, ports ) {
-#ifdef Q_OS_WIN
-        if(port.portName == deviceName)
-#else
-            if(port.physName == deviceName)
-#endif
+           if(port.friendName == deviceName)
             {
             //we need to handle port settings here...
             PortSettings set;

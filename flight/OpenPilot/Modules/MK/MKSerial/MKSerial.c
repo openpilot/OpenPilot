@@ -27,6 +27,7 @@
 #include "MkSerial.h"
 
 #include "attitudeactual.h" // object that will be updated by the module
+#include "gpsobject.h"
 
 
 //
@@ -37,7 +38,7 @@
 #define STACK_SIZE		1024
 #define TASK_PRIORITY	(tskIDLE_PRIORITY + 3)
 #define MAX_NB_PARS 	40
-//#define ENABLE_DEBUG_MSG
+#define ENABLE_DEBUG_MSG
 
 //
 // Private constants
@@ -47,9 +48,18 @@
 #define MSGCMD_DEBUG			'D'
 #define MSGCMD_GET_VERSION		'v'
 #define MSGCMD_VERSION			'V'
+#define MSGCMD_GET_OSD			'o'
+#define MSGCMD_OSD				'O'
+
 
 #define DEBUG_MSG_NICK_IDX	(2+2*2)
 #define DEBUG_MSG_ROLL_IDX	(2+3*2)
+
+#define OSD_MSG_CURRPOS_IDX	1
+#define OSD_MSG_NB_SATS_IDX 50
+#define OSD_MSG_BATT_IDX	57
+#define OSD_MSG_NICK_IDX	64
+#define OSD_MSG_ROLL_IDX	65
 
 #ifdef ENABLE_DEBUG_MSG
 	#define DEBUG_MSG(format, ...) PIOS_COM_SendFormattedString(DEBUG_PORT, format, ## __VA_ARGS__)
@@ -69,6 +79,14 @@ typedef struct
 	uint8_t pars[MAX_NB_PARS];
 } MkMsg_t;
 
+typedef struct
+{
+  float longitute;
+  float latitude;
+  float altitude;
+  uint8_t status;
+} GpsPosition_t;
+
 enum
 {
 	MK_ADDR_ALL = 0,
@@ -86,7 +104,10 @@ enum
 //
 static void OnError(int line);
 //static void PrintMsg(const MkMsg_t* msg);
-static int16_t Par2SignedInt(const MkMsg_t* msg, uint8_t index);
+static int16_t Par2Int16(const MkMsg_t* msg, uint8_t index);
+static int32_t Par2Int32(const MkMsg_t* msg, uint8_t index);
+static int8_t Par2Int8(const MkMsg_t* msg, uint8_t index);
+static void GetGpsPos(const MkMsg_t* msg, uint8_t index, GpsPosition_t* pos);
 static uint8_t WaitForBytes(uint8_t* buf, uint8_t nbBytes, portTickType xTicksToWait);
 static bool WaitForMsg(uint8_t cmd, MkMsg_t* msg, portTickType xTicksToWait);
 static void SendMsg(const MkMsg_t* msg);
@@ -135,7 +156,7 @@ static void PrintMsg(const MkMsg_t* msg)
 }
 #endif
 
-static int16_t Par2SignedInt(const MkMsg_t* msg, uint8_t index)
+static int16_t Par2Int16(const MkMsg_t* msg, uint8_t index)
 {
 	int16_t res;
 
@@ -144,6 +165,34 @@ static int16_t Par2SignedInt(const MkMsg_t* msg, uint8_t index)
 		res -= 0xFFFF;
 	return res;
 }
+
+static int32_t Par2Int32(const MkMsg_t* msg, uint8_t index)
+{
+	uint32_t val = 0;
+
+	val = (((int)msg->pars[index])<<0)+(((int)msg->pars[index+1])<<8);
+	val += (((int)msg->pars[index+2])<<16)+((int)msg->pars[index+3]<<24);
+	if (val > 0xFFFFFFFF/2)
+		val -= 0xFFFFFFFF;
+	return (int32_t)val;
+}
+
+static int8_t Par2Int8(const MkMsg_t* msg, uint8_t index)
+{
+	if (msg->pars[index] > 127)
+		return msg->pars[index]-256;
+	else
+		return msg->pars[index];
+}
+
+static void GetGpsPos(const MkMsg_t* msg, uint8_t index, GpsPosition_t* pos)
+{
+  pos->longitute = (float)Par2Int32(msg, index) * (float)1e-7;
+  pos->latitude = (float)Par2Int32(msg, index+4) * (float)1e-7;
+  pos->altitude = (float)Par2Int32(msg, index+8) * (float)1e-3 ;
+  pos->status = msg->pars[index+12];
+}
+
 
 static uint8_t WaitForBytes(uint8_t* buf, uint8_t nbBytes, portTickType xTicksToWait)
 {
@@ -381,24 +430,105 @@ static void SendMsgPar8(uint8_t address, uint8_t cmd, uint8_t par0)
 	SendMsg(&msg);
 }
 
-#ifdef ENABLE_DEBUG_MSG
+
 static uint16_t VersionMsg_GetVersion(const MkMsg_t* msg)
 {
 	return msg->pars[0] * 100 + msg->pars[1];
 }
-#endif
+
+
+static void DoConnectedToFC(void)
+{
+	AttitudeActualData attitudeData;
+	MkMsg_t msg;
+
+	DEBUG_MSG("FC\n");
+
+	memset(&attitudeData, 0, sizeof(attitudeData));
+
+	// Configure FC for fast reporting of the debug-message
+	SendMsgPar8(MK_ADDR_ALL, MSGCMD_GET_DEBUG, 10);
+
+	while (TRUE)
+	{
+		if (WaitForMsg(MSGCMD_DEBUG, &msg, 500 / portTICK_RATE_MS))
+		{
+			int16_t nick;
+			int16_t roll;
+
+			//PrintMsg(&msg);
+			nick = Par2Int16(&msg, DEBUG_MSG_NICK_IDX);
+			roll = Par2Int16(&msg, DEBUG_MSG_ROLL_IDX);
+
+			DEBUG_MSG("Att: Nick=%5d Roll=%5d\n", nick, roll);
+
+			attitudeData.seq++;
+			attitudeData.Pitch = -(float)nick/10;
+			attitudeData.Roll = -(float)roll/10;
+			AttitudeActualSet(&attitudeData);
+		}
+		else
+		{
+			DEBUG_MSG("TO\n");
+			break;
+		}
+	}
+}
+
+static void DoConnectedToNC(void)
+{
+	MkMsg_t msg;
+	GpsPosition_t pos;
+	AttitudeActualData attitudeData;
+	GpsObjectData gpsData;
+
+	DEBUG_MSG("NC\n");
+
+	memset(&attitudeData, 0, sizeof(attitudeData));
+	memset(&gpsData, 0, sizeof(gpsData));
+
+	// Configure NC for fast reporting of the osd-message
+	SendMsgPar8(MK_ADDR_ALL, MSGCMD_GET_OSD, 10);
+
+	while (TRUE)
+	{
+		if (WaitForMsg(MSGCMD_OSD, &msg, 500 / portTICK_RATE_MS))
+		{
+			GetGpsPos(&msg, OSD_MSG_CURRPOS_IDX, &pos);
+
+			DEBUG_MSG("Bat=%f V\n", (float)msg.pars[OSD_MSG_BATT_IDX]/10);
+			DEBUG_MSG("Nick=%d Roll=%d\n", Par2Int8(&msg,OSD_MSG_NICK_IDX), Par2Int8(&msg,OSD_MSG_ROLL_IDX));
+			DEBUG_MSG("POS #Sats=%d stat=%d lat=%f lon=%f alt=%f\n", msg.pars[OSD_MSG_NB_SATS_IDX], pos.status, pos.latitude, pos.longitute, pos.altitude);
+
+			attitudeData.seq++;
+			attitudeData.Pitch = -Par2Int8(&msg,OSD_MSG_NICK_IDX);
+			attitudeData.Roll = -Par2Int8(&msg,OSD_MSG_ROLL_IDX);
+			AttitudeActualSet(&attitudeData);
+
+			gpsData.Longitude = pos.longitute;
+			gpsData.Latitude = pos.latitude;
+			gpsData.Altitude = pos.altitude;
+			gpsData.Satellites = msg.pars[OSD_MSG_NB_SATS_IDX];
+			gpsData.Updates++;
+			GpsObjectSet(&gpsData);
+		}
+		else
+		{
+			DEBUG_MSG("TO\n");
+			break;
+		}
+	}
+}
 
 
 static void MkSerialTask(void* parameters)
 {
 	MkMsg_t msg;
-	AttitudeActualData data;
+	uint32_t version;
 	bool connectionOk = FALSE;
 
 	PIOS_COM_ChangeBaud(PORT, 57600);
 	PIOS_COM_ChangeBaud(DEBUG_PORT, 57600);
-
-	memset(&data, 0, sizeof(data));
 
 	DEBUG_MSG("MKSerial Started\n");
 
@@ -411,10 +541,8 @@ static void MkSerialTask(void* parameters)
 			DEBUG_MSG("Version... ");
 			if (WaitForMsg(MSGCMD_VERSION, &msg, 100 / portTICK_RATE_MS))
 			{
-				#ifdef ENABLE_DEBUG_MSG
-					uint32_t version = VersionMsg_GetVersion(&msg);
-					DEBUG_MSG("%d\n", version);
-				#endif
+				version = VersionMsg_GetVersion(&msg);
+				DEBUG_MSG("%d\n", version);
 				connectionOk = TRUE;
 			}
 			else
@@ -423,32 +551,14 @@ static void MkSerialTask(void* parameters)
 			}
 		}
 
-		// Configure MK for fast reporting
-		SendMsgPar8(MK_ADDR_ALL, MSGCMD_GET_DEBUG, 10);
-
-		while (connectionOk)
+		// Dependent on version, decide it we are connected to NC or FC
+		if (version < 60)
 		{
-			if (WaitForMsg(MSGCMD_DEBUG, &msg, 500 / portTICK_RATE_MS))
-			{
-				int16_t nick;
-				int16_t roll;
-
-				//PrintMsg(&msg);
-				nick = Par2SignedInt(&msg, DEBUG_MSG_NICK_IDX);
-				roll = Par2SignedInt(&msg, DEBUG_MSG_ROLL_IDX);
-
-				DEBUG_MSG("Att: Nick=%5d Roll=%5d\n", nick, roll);
-
-				data.seq++;
-				data.Pitch = -(float)nick/10;
-				data.Roll = -(float)roll/10;
-				AttitudeActualSet(&data);
-			}
-			else
-			{
-				DEBUG_MSG("TO\n");
-				connectionOk = FALSE;
-			}
+			DoConnectedToNC();	// Will only return after an error
+		}
+		else
+		{
+			DoConnectedToFC();	// Will only return after an error
 		}
 	}
 }

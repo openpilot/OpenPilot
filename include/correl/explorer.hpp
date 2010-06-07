@@ -43,7 +43,8 @@ namespace jafar {
 
 		#define DO_CORRELATION(im1, im2, weightMatrix, xx, yy, score, best_score, bestx, besty, roi) \
 				{ \
-				im2->set_roi(cvRect(xx-roi.width/2,yy-roi.height/2,roi.width,roi.height)); \
+				CvRect roi = cvRect(xx-roi.width/2,yy-roi.height/2,roi.width,roi.height); \
+				im2->setROI(roi); \
 				score = Correl::compute(im1, im2, weightMatrix); \
 				results[(yy-(ymin))*sa_w+(xx-(xmin))] = score; \
 				if (score > best_score) { best_score = score; bestx = xx; besty = yy; } \
@@ -52,7 +53,7 @@ namespace jafar {
 		template<class Correl>
 		double Explorer<Correl>::exploreTranslation(image::Image const* im1, image::Image* im2, int xmin, int xmax, int xstep, int ymin, int ymax, int ystep, double &xres, double &yres, float const* weightMatrix)
 		{
-			CvRect roi = im1->roi();
+			CvRect roi = im1->getROI();
 			double score;
 			double best_score = 0.;
 			int bestx = -1, besty = -1;

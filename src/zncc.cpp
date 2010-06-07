@@ -17,8 +17,8 @@ namespace correl {
 		JFR_PRECOND( im1->channels() == im2->channels(), "The channels number of both images are different" );
 		JFR_PRECOND( !useWeightMatrix || weightMatrix, "Template parameter tells to use weightMatrix but no one is given" );
 		
-		CvRect roi1 = im1->roi();
-		CvRect roi2 = im2->roi();
+		CvRect roi1 = im1->getROI();
+		CvRect roi2 = im2->getROI();
 		JFR_PRECOND( roi1.width  == roi2.width , "The width of both images or roi are different" );
 		JFR_PRECOND( roi1.height == roi2.height, "The height of both images or roi are different" );
 		
@@ -106,36 +106,36 @@ namespace correl {
 		JFR_PRECOND(im1->depth() == im2->depth(), "The depth of both images is different");
 		switch(im1->depth())
 		{
-			case IPL_DEPTH_1U:
+// 			case CV_1U:
+// 				if (weightMatrix == NULL)
+// 					return computeTpl<CV_1U, bool,bool,0,1,true,false>(im1,im2);
+// 				else
+// 					return computeTpl<CV_1U, bool,bool,0,1,true,true>(im1,im2,weightMatrix);
+			case CV_8U:
 				if (weightMatrix == NULL)
-					return computeTpl<IPL_DEPTH_1U, bool,bool,0,1,true,false>(im1,im2);
+					return computeTpl<CV_8U, uint8_t,uint8_t,0,255,true,false>(im1,im2);
 				else
-					return computeTpl<IPL_DEPTH_1U, bool,bool,0,1,true,true>(im1,im2,weightMatrix);
-			case IPL_DEPTH_8U:
+					return computeTpl<CV_8U, uint8_t,uint8_t,0,255,true,true>(im1,im2,weightMatrix);
+			case CV_8S:
 				if (weightMatrix == NULL)
-					return computeTpl<IPL_DEPTH_8U, uint8_t,uint8_t,0,255,true,false>(im1,im2);
+					return computeTpl<CV_8S, int8_t,int8_t, -128,127,true,false>(im1,im2);
 				else
-					return computeTpl<IPL_DEPTH_8U, uint8_t,uint8_t,0,255,true,true>(im1,im2,weightMatrix);
-			case IPL_DEPTH_8S:
+					return computeTpl<CV_8S, int8_t,int8_t, -128,127,true,true>(im1,im2,weightMatrix);
+			case CV_16U:
 				if (weightMatrix == NULL)
-					return computeTpl<IPL_DEPTH_8S, int8_t,int8_t, -128,127,true,false>(im1,im2);
+					return computeTpl<CV_16U, uint16_t,uint16_t, 0,65535,true,false>(im1,im2);
 				else
-					return computeTpl<IPL_DEPTH_8S, int8_t,int8_t, -128,127,true,true>(im1,im2,weightMatrix);
-			case IPL_DEPTH_16U:
+					return computeTpl<CV_16U, uint16_t,uint16_t, 0,65535,true,true>(im1,im2,weightMatrix);
+			case CV_16S:
 				if (weightMatrix == NULL)
-					return computeTpl<IPL_DEPTH_16U, uint16_t,uint16_t, 0,65535,true,false>(im1,im2);
+					return computeTpl<CV_16S, int16_t,int16_t, -32768,32767,true,false>(im1,im2);
 				else
-					return computeTpl<IPL_DEPTH_16U, uint16_t,uint16_t, 0,65535,true,true>(im1,im2,weightMatrix);
-			case IPL_DEPTH_16S:
-				if (weightMatrix == NULL)
-					return computeTpl<IPL_DEPTH_16S, int16_t,int16_t, -32768,32767,true,false>(im1,im2);
-				else
-					return computeTpl<IPL_DEPTH_16S, int16_t,int16_t, -32768,32767,true,true>(im1,im2,weightMatrix);
-			case IPL_DEPTH_32F:
+					return computeTpl<CV_16S, int16_t,int16_t, -32768,32767,true,true>(im1,im2,weightMatrix);
+			case CV_32F:
 				if (weightMatrix == NULL) // bool and no borne because cannot use a float as a template parameter, and anyway would be useless here
-					return computeTpl<IPL_DEPTH_32F, float,bool, 0,0,false,false>(im1,im2);
+					return computeTpl<CV_32F, float,bool, 0,0,false,false>(im1,im2);
 				else
-					return computeTpl<IPL_DEPTH_32F, float,bool, 0,0,false,true>(im1,im2,weightMatrix);
+					return computeTpl<CV_32F, float,bool, 0,0,false,true>(im1,im2,weightMatrix);
 			default:
 				JFR_PRECOND(false, "Unknown image depth");
 				return FP_NAN;
@@ -146,7 +146,7 @@ namespace correl {
 	// TODO : test / maybe improve it to manage more nicely rois
 	double Zncc::exploreRotation(image::Image const* im1, image::Image const* im2, int rotationStep)
 	{
-		CvRect roi2 = im2->roi();
+		CvRect roi2 = im2->getROI();
 //		int dim = (roi2->width > roi2->height ? roi2->width : roi2->height)*1.5;// 1.5 > sqrt(2)
 //		image::Image* im2bis = new image::Image(dim, dim, im2->depth(), im2->colorSpace());
 		image::Image* im2bis = new image::Image(roi2.width, roi2.height, im2->depth(), im2->colorSpace());
@@ -165,8 +165,8 @@ namespace correl {
 			m[4] = m[0];
 			m[5] = h * 0.5f;
 			CvMat M = cvMat( 2, 3, CV_32F, m );
-			cvFillImage(*im2bis, 0);
-			cvGetQuadrangleSubPix( *im2, *im2bis, &M);
+			cvFillImage(&(*im2bis), 0);
+			cvGetQuadrangleSubPix( &(*im2), &(*im2bis), &M);
 			double zncc = compute(im1,im2bis);
 			if(zncc > bestZncc) { bestZncc = zncc; /*tempBestAngle = radangle;*/}
 		}

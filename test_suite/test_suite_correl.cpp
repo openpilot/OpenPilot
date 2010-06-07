@@ -97,13 +97,14 @@ using namespace jafar::correl;
 
 BOOST_AUTO_TEST_CASE( dummy )
 {
-	image::Image *im1 = new image::Image(11, 11, IPL_DEPTH_8U, JfrImage_CS_GRAY);
-	image::Image *im2 = new image::Image(11, 11, IPL_DEPTH_8U, JfrImage_CS_GRAY);
+	image::Image *im1 = new image::Image(11, 11, CV_8U, JfrImage_CS_GRAY);
+	image::Image *im2 = new image::Image(11, 11, CV_8U, JfrImage_CS_GRAY);
 	double xres, yres;
 	Zncc::compute(im1, im2, NULL);
 	Explorer<Zncc>::exploreTranslation(im1, im2, 5, 5, 1, 5, 5, 1, xres, yres, NULL);
 //	trackPointRef("/net/pelican/data1/robots/dala/data/tests/2010-04-23_gyro-study/serie02/preproc2/img.l.%04d.png", 0, 235, 221, 220, 10, 80, 20);
 //	trackPointRef("/net/pelican/data1/robots/dala/data/tests/2010-04-23_gyro-study/serie02/preproc4/img.l.%04d.png", 0, 235, 110, 110, 5, 40, 10);
+//	trackPointRef("/net/pelican/data1/robots/dala/data/tests/2010-04-23_gyro-study/serie04/preproc1/img.l.%04d.png", 0, 528, 548, 439, 5, 40, 10);
 
 	//Explorer<Zncc>::exploreRotation(im1, im2, 0, 360, 10, xres, NULL);
 }

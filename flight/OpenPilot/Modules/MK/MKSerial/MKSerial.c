@@ -37,7 +37,7 @@
 #define DEBUG_PORT		COM_USART1
 #define STACK_SIZE		1024
 #define TASK_PRIORITY	(tskIDLE_PRIORITY + 3)
-#define MAX_NB_PARS 	40
+#define MAX_NB_PARS 	100
 #define ENABLE_DEBUG_MSG
 
 //
@@ -120,7 +120,7 @@ static void MkSerialTask(void* parameters);
 
 static void OnError(int line)
 {
-	DEBUG_MSG("MKProcol error %d\n", line);
+	DEBUG_MSG("MKProcol error %d\n\r", line);
 }
 
 
@@ -152,7 +152,7 @@ static void PrintMsg(const MkMsg_t* msg)
 	{
 		DEBUG_MSG("%02x ", msg->pars[i]);
 	}
-	DEBUG_MSG("\n");
+	DEBUG_MSG("\n\r");
 }
 #endif
 
@@ -442,7 +442,7 @@ static void DoConnectedToFC(void)
 	AttitudeActualData attitudeData;
 	MkMsg_t msg;
 
-	DEBUG_MSG("FC\n");
+	DEBUG_MSG("FC\n\r");
 
 	memset(&attitudeData, 0, sizeof(attitudeData));
 
@@ -460,7 +460,7 @@ static void DoConnectedToFC(void)
 			nick = Par2Int16(&msg, DEBUG_MSG_NICK_IDX);
 			roll = Par2Int16(&msg, DEBUG_MSG_ROLL_IDX);
 
-			DEBUG_MSG("Att: Nick=%5d Roll=%5d\n", nick, roll);
+			DEBUG_MSG("Att: Nick=%5d Roll=%5d\n\r", nick, roll);
 
 			attitudeData.seq++;
 			attitudeData.Pitch = -(float)nick/10;
@@ -469,7 +469,7 @@ static void DoConnectedToFC(void)
 		}
 		else
 		{
-			DEBUG_MSG("TO\n");
+			DEBUG_MSG("TO\n\r");
 			break;
 		}
 	}
@@ -482,7 +482,7 @@ static void DoConnectedToNC(void)
 	AttitudeActualData attitudeData;
 	GpsObjectData gpsData;
 
-	DEBUG_MSG("NC\n");
+	DEBUG_MSG("NC\n\r");
 
 	memset(&attitudeData, 0, sizeof(attitudeData));
 	memset(&gpsData, 0, sizeof(gpsData));
@@ -494,11 +494,12 @@ static void DoConnectedToNC(void)
 	{
 		if (WaitForMsg(MSGCMD_OSD, &msg, 500 / portTICK_RATE_MS))
 		{
+			//PrintMsg(&msg);
 			GetGpsPos(&msg, OSD_MSG_CURRPOS_IDX, &pos);
 
-			DEBUG_MSG("Bat=%f V\n", (float)msg.pars[OSD_MSG_BATT_IDX]/10);
-			DEBUG_MSG("Nick=%d Roll=%d\n", Par2Int8(&msg,OSD_MSG_NICK_IDX), Par2Int8(&msg,OSD_MSG_ROLL_IDX));
-			DEBUG_MSG("POS #Sats=%d stat=%d lat=%f lon=%f alt=%f\n", msg.pars[OSD_MSG_NB_SATS_IDX], pos.status, pos.latitude, pos.longitute, pos.altitude);
+			DEBUG_MSG("Bat=%d\n\r", msg.pars[OSD_MSG_BATT_IDX]);
+			DEBUG_MSG("Nick=%d Roll=%d\n\r", Par2Int8(&msg,OSD_MSG_NICK_IDX), Par2Int8(&msg,OSD_MSG_ROLL_IDX));
+			DEBUG_MSG("POS #Sats=%d stat=%d lat=%d lon=%d alt=%d\n\r", msg.pars[OSD_MSG_NB_SATS_IDX], pos.status, (int)pos.latitude, (int)pos.longitute, (int)pos.altitude);
 
 			attitudeData.seq++;
 			attitudeData.Pitch = -Par2Int8(&msg,OSD_MSG_NICK_IDX);
@@ -514,7 +515,7 @@ static void DoConnectedToNC(void)
 		}
 		else
 		{
-			DEBUG_MSG("TO\n");
+			DEBUG_MSG("TO\n\r");
 			break;
 		}
 	}
@@ -530,7 +531,7 @@ static void MkSerialTask(void* parameters)
 	PIOS_COM_ChangeBaud(PORT, 57600);
 	PIOS_COM_ChangeBaud(DEBUG_PORT, 57600);
 
-	DEBUG_MSG("MKSerial Started\n");
+	DEBUG_MSG("MKSerial Started\n\r");
 
 	while (1)
 	{
@@ -542,12 +543,12 @@ static void MkSerialTask(void* parameters)
 			if (WaitForMsg(MSGCMD_VERSION, &msg, 100 / portTICK_RATE_MS))
 			{
 				version = VersionMsg_GetVersion(&msg);
-				DEBUG_MSG("%d\n", version);
+				DEBUG_MSG("%d\n\r", version);
 				connectionOk = TRUE;
 			}
 			else
 			{
-				DEBUG_MSG("TO\n");
+				DEBUG_MSG("TO\n\r");
 			}
 		}
 
@@ -560,6 +561,8 @@ static void MkSerialTask(void* parameters)
 		{
 			DoConnectedToFC();	// Will only return after an error
 		}
+
+		connectionOk = FALSE;
 	}
 }
 

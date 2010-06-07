@@ -28,7 +28,6 @@
 #include "openpilot.h"
 #include "uavobjectsinit.h"
 #include "telemetry.h"
-#include "GPS.h"
 #include "systemmod.h"
 
 

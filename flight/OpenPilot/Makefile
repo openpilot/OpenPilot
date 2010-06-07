@@ -46,6 +46,7 @@ USE_THUMB_MODE = YES
 
 # List of modules to include
 MODULES = Telemetry GPS ManualControl Actuator Altitude Attitude
+#MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
 
 

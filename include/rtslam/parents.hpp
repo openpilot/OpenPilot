@@ -112,7 +112,7 @@ public:
 	Parent_ptr parentPtr(void) {
 		Parent_ptr sptr = parent_wptr.lock();
 		if (!sptr) {
-			std::cerr << "Throw weak" << std::endl;
+			std::cerr << __FILE__ << ":" << __LINE__ << " ChildOf::parentPtr threw weak" << std::endl;
 			throw "WEAK";
 		}
 		return sptr;
@@ -120,7 +120,7 @@ public:
 	Parent& parent(void) {
 		Parent_ptr sptr = parent_wptr.lock();
 		if (!sptr) {
-			std::cerr << "Throw weak" << std::endl;
+			std::cerr << __FILE__ << ":" << __LINE__ << " ChildOf::parent threw weak" << std::endl;
 			throw "WEAK";
 		}
 		return *sptr;
@@ -128,7 +128,7 @@ public:
 	const Parent& parent(void) const {
 		Parent_ptr sptr = parent_wptr.lock();
 		if (!sptr) {
-			std::cerr << "Throw weak" << std::endl;
+			std::cerr << __FILE__ << ":" << __LINE__ << " ChildOf::parent const threw weak" << std::endl;
 			throw "WEAK";
 		}
 		return *sptr;
@@ -236,7 +236,7 @@ public:
 	Parent_ptr parentPtr(void) {
 		Parent_ptr sptr = parent_wptr.lock();
 		if (!sptr) {
-			std::cerr << "Throw weak" << std::endl;
+			std::cerr << __FILE__ << ":" << __LINE__ << " SpecificChildOf::parentPtr threw weak" << std::endl;
 			throw "WEAK";
 		}
 		return sptr;
@@ -244,7 +244,7 @@ public:
 	Parent& parent(void) {
 		Parent_ptr sptr = parent_wptr.lock();
 		if (!sptr) {
-			std::cerr << "Throw weak" << std::endl;
+			std::cerr << __FILE__ << ":" << __LINE__ << " SpecificChildOf::parent threw weak" << std::endl;
 			throw "WEAK";
 		}
 		return *sptr;
@@ -252,7 +252,7 @@ public:
 	const Parent& parent(void) const {
 		Parent_ptr sptr = parent_wptr.lock();
 		if (!sptr) {
-			std::cerr << "Throw weak" << std::endl;
+			std::cerr << __FILE__ << ":" << __LINE__ << " SpecificChildOf::parent const threw weak" << std::endl;
 			throw "WEAK";
 		}
 		return *sptr;
@@ -387,7 +387,7 @@ protected: // Iterator
       Insider ptr = iter->lock();
       if(! ptr )
 	{
-	  std::cerr << "Throw weak" << std::endl;
+	  std::cerr << __FILE__ << ":" << __LINE__ << " WeakParentOf::operator* threw weak" << std::endl;
 	  throw "WEAK";
 	}
       return ptr;
@@ -495,10 +495,8 @@ public:
  * the corresponding (expired) smart pointer from the child list of the father.
  */
 #define UNREGISTER_FROM_WEAK_PARENT(Parent)	         \
-  do { if( NULL!=ChildOf<Parent>::parentPtr() )		 \
-      {                                                  \
-	ChildOf<Parent>::parentPtr()->cleanExpired();    \
-      } } while(0)
+	try { ChildOf<Parent>::parentPtr()->cleanExpired(); } \
+	catch(const char *e) { if (strcmp(e,"WEAK")) throw e; }
 
 
 /* --- SPEC WEAK CHILD ------------------------------------------------------ */
@@ -559,11 +557,8 @@ public:
  * Remove the _this_ reference from the parents (spec and abs) childlist.
  */
 #define UNREGISTER_FROM_WEAK_SPECIFIC_PARENT(Parent,Child)  \
-  do { if( NULL!=ChildOf<Parent>::parentPtr() )		    \
-      {                                                     \
-	ChildOf<Parent>::parentPtr()			    \
-	  ->WeakParentOf<Child>::cleanExpired();            \
-      } } while(0)
+	try { ChildOf<Parent>::parentPtr()->WeakParentOf<Child>::cleanExpired(); } \
+	catch(const char *e) { if (strcmp(e,"WEAK")) throw e; }
 
 	};}; // namespace jafar/rtslam
 

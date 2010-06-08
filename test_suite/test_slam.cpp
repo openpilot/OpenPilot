@@ -236,6 +236,8 @@ void test_slam01() {
 		//viewerQt.bufferize(worldPtr);
 		//viewerQt.render();
 	}
+	
+	std::cout << "FINISHED !" << std::endl;
 
 
 }

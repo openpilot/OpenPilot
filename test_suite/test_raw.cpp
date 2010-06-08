@@ -16,33 +16,43 @@
 // jafar debug include
 #include "kernel/jafarDebug.hpp"
 
-#include "rtslam/rawImageSimu.hpp"
+#include "rtslam/rawImage.hpp"
 //#include "rtslam/FeaturePoint.hpp"
 
 #include <iostream>
 #include "image/Image.hpp"
+#include "qdisplay/init.hpp"
 #include "qdisplay/ImageView.hpp"
 #include "qdisplay/Viewer.hpp"
 #include "qdisplay/Shape.hpp"
 
 using namespace jafar::rtslam;
 using namespace std;
-using namespace jafar::image;
+using namespace jafar;
+
+void test_raw01_display(void*)
+{
+		image::Image img;
+		img.load("doc/images/slam.png");
+		qdisplay::ImageView *view = new qdisplay::ImageView;
+		qdisplay::Viewer *viewer = new qdisplay::Viewer;
+		viewer->setImageView(view, 0, 0);
+		
+		qdisplay::Shape *s = new qdisplay::Shape(qdisplay::Shape::ShapeRectangle, 23,24 ,10,15);
+		s->setVisible(true);
+		s->setColor(255, 0, 0); // red
+		view->addShape(s);
+	
+		view->setImage(img);
+		viewer->resize(400,300);
+}
 
 void test_raw01(void) {
 	cout << "\n% TEST OF RAW STRUCTURE\n% ==============" << endl;
-	RawImageSimu    imgSimu  ;
+	RawImage    imgSimu  ;
 	cout << imgSimu << endl ;
 
-	jafar::image::Image *img = Image::loadImage("/home/jeanmarie/Images/day_picture/afgan.jpg", 1) ;
-	const Image i = img->clone();
-
-	//	jafar::image::Image &i = &img ;
-//	jafar::qdisplay::ImageView iv(i) ;
-//	iv.setImage(&i) ;
-	jafar::qdisplay::Viewer viewer = new jafar::qdisplay::Viewer() ;
-	jafar::qdisplay::Shape shape = Qdisplay::Shape.new(Qdisplay::Shape::ShapeRectangle, 3,4 ,10,15) ;
-	viewer.addShape(shape) ;
+	qdisplay::QtAppStart((qdisplay::FUNC)&test_raw01_display,NULL,0,NULL);
 
 
 }

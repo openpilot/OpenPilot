@@ -30,11 +30,22 @@ namespace jafar {
 			categoryName("PINHOLE-AHP OBS");
 		}
 
-//		void ObservationPinHoleAnchoredHomogeneousPoint::setup(double _pixNoise = 1.0) {
-//			pixelNoise = _pixNoise;
-//		  noiseCovariance = pixelNoise*pixelNoise*identity_mat(2);
-//		}
 
+		void ObservationPinHoleAnchoredHomogeneousPoint::project_func(
+		    const vec7 & sg, const vec & lmk, vec & exp, vec & dist) {
+			// resize input vectors
+			exp.resize(expectation.size());
+			dist.resize(prior.size());
+
+			// Some temps of known size
+			vec3 v;
+
+			lmkAHP::toBearingOnlyFrame(sg, lmk, v, dist(0));
+			vec4 k = pinHolePtr()->intrinsic;
+			vec d = pinHolePtr()->distortion;
+			pinhole::projectPoint(k, d, v);
+
+		}
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::project_func(
 		    const vec7 & sg, const vec & lmk, vec & exp, vec & dist, mat & EXP_sg,
@@ -63,6 +74,13 @@ namespace jafar {
 			// We perform Jacobian composition. We use the chain rule.
 			EXP_sg = prod(EXP_v, V_sg);
 			EXP_lmk = prod(EXP_v, V_lmk);
+		}
+
+		void ObservationPinHoleAnchoredHomogeneousPoint::backProject_func(
+		    const vec7 & sg, const vec & pix, const vec & invDist, vec & ahp) {
+			vec3 v;
+			v = pinhole::backprojectPoint(pinHolePtr()->intrinsic, pinHolePtr()->correction, pix, (double)1.0);
+			ahp = lmkAHP::fromBearingOnlyFrame(sg, v, invDist(0));
 		}
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::backProject_func(

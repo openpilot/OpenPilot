@@ -357,6 +357,7 @@ namespace jafar {
 			vec3 backprojectPoint(const VK & k, const VC & c, const U & u, const double depth = 1.0) {
 				return backprojectPointFromNormalizedPlane(undistortPoint(c, depixellizePoint(k, u)), depth);
 			}
+
 			/**
 			 * Back-Project a point from a pin-hole camera with radial distortion; give Jacobians
 			 * \param k the vector of intrinsic parameters, k = [u0, v0, au, av]

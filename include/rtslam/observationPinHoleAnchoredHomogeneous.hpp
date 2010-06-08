@@ -72,11 +72,19 @@ namespace jafar {
 				/**
 				 * Projection function, with Jacobians and non-observable part.
 				 */
+				virtual void project_func(const vec7 & sg, const vec & lmk, vec & meas, vec & nobs);
+				/**
+				 * Projection function, with Jacobians and non-observable part.
+				 */
 				virtual void project_func(const vec7 & sg, const vec & lmk, vec & meas, vec & nobs, mat & EXP_sg, mat & EXP_lmk);
 				/**
 				 * Retro-projection function, with Jacobians
 				 */
-				void backProject_func(const vec7 & sg, const vec & meas, const vec & nobs, vec & lmk, mat & LMK_sg,
+				virtual void backProject_func(const vec7 & sg, const vec & meas, const vec & nobs, vec & lmk);
+				/**
+				 * Retro-projection function, with Jacobians
+				 */
+				virtual void backProject_func(const vec7 & sg, const vec & meas, const vec & nobs, vec & lmk, mat & LMK_sg,
 				                      mat & LMK_meas, mat & LMK_nobs);
 
 				/**

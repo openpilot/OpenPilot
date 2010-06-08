@@ -23,10 +23,20 @@ namespace jafar {
 			categoryName("PINHOLE-EUC OBS");
 		}
 
-//		void ObservationPinHoleEuclideanPoint::setup(double _pixNoise = 1.0) {
-//					pixelNoise = _pixNoise;
-//				  noiseCovariance = pixelNoise*pixelNoise*identity_mat(2);
-//		}
+
+		void ObservationPinHoleEuclideanPoint::project_func(const vec7 & sg,
+		    const vec & lmk, vec & exp, vec & dist) {
+			// resize input vectors
+			exp.resize(expectation.size());
+			dist.resize(prior.size());
+
+			// Some temps of known size
+			vec3 v;
+			v = quaternion::eucToFrame(sg, lmk);
+
+			exp = pinhole::projectPoint(pinHolePtr()->intrinsic, pinHolePtr()->distortion, v);
+
+		}
 
 		void ObservationPinHoleEuclideanPoint::project_func(const vec7 & sg,
 		    const vec & lmk, vec & exp, vec & dist, mat & EXP_sg, mat & EXP_lmk) {
@@ -48,6 +58,17 @@ namespace jafar {
 			// We perform Jacobian composition. We use the chain rule.
 			EXP_sg = prod(EXP_v, V_sg);
 			EXP_lmk = prod(EXP_v, V_lmk);
+
+		}
+
+		void ObservationPinHoleEuclideanPoint::backProject_func(const vec7 & sg,
+		    const vec & meas, const vec & nobs, vec & lmk) {
+
+//			// TODO : implement back-projection of ObsPHEucPt
+//			pinhole_ptr_t phPtr = pinHolePtr();
+//			pinhole::backProjectPoint(phPtr->intrinsic, phPtr->correction, meas, 1.0, v);
+//
+//			quaternion::eucFromFrame(sg,v,euc);
 
 		}
 

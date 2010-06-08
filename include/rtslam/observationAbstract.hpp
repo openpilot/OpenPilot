@@ -158,6 +158,16 @@ namespace jafar {
 				} events;
 
 				/**
+				 * Project.
+				 *
+				 * All variables are part of the class, or are accessible by the class.
+				 *
+				 * This projects the landmark into the sensor space.
+				 */
+				virtual void
+				project_func(const vec7 & sg, const vec & lmk, vec & meas, vec & nobs) = 0;
+
+				/**
 				 * Project and get Jacobians.
 				 *
 				 * All variables are part of the class, or are accessible by the class.
@@ -169,14 +179,12 @@ namespace jafar {
 				virtual void
 				project_func(const vec7 & sg, const vec & lmk, vec & meas, vec & nobs, mat & EXP_sg, mat & EXP_lmk) = 0;
 
-//				virtual void setup(const feature_ptr_t & featPtr, const Gaussian & _prior);
-//				virtual void setup(const vec & _noiseStd);
-				virtual void setup(const vec & _noiseStd, const Gaussian & _prior);
-
 				/**
 				 * Project and get expectation covariances
 				 */
 				void project();
+
+				virtual void setup(const vec & _noiseStd, const Gaussian & _prior);
 
 				/**
 				 * Is visible
@@ -191,6 +199,12 @@ namespace jafar {
 				 * Back-project
 				 */
 				void backProject();
+
+				/**
+				 * Back-project function
+				 */
+				virtual void backProject_func(const vec7 & sg, const vec & meas, const vec & nobs, vec & lmk) = 0;
+
 				/**
 				 * Back-project function
 				 */

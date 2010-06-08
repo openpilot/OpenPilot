@@ -3,6 +3,7 @@ PROJECT = gettilestest
 TEMPLATE = app
 QT += network
 QT += sql
+QT += opengl
 CONFIG += console
 CONFIG -= app_bundle
 DEPENDPATH += .

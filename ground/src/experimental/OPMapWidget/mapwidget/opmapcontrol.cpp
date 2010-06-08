@@ -1,4 +1,5 @@
 #include "opmapcontrol.h"
+#include <QImage>
 namespace mapcontrol
 {
 OPMapControl::OPMapControl(QWidget *parent):QWidget(parent),MapRenderTransform(1), maxZoom(17),minZoom(2),zoomReal(0),isSelected(false)
@@ -14,7 +15,7 @@ OPMapControl::OPMapControl(QWidget *parent):QWidget(parent),MapRenderTransform(1
     DragButton = Qt::RightButton;
     isMouseOverMarker=false;
     core.SetCurrentRegion(Rectangle(-50, -50, this->width()+100, this->height()+100));
-    core.SetMapType(MapType::OpenStreetMap);
+    core.SetMapType(MapType::GoogleHybrid);
     core.SetZoom(3);
 
     connect(&core,SIGNAL(OnNeedInvalidation()),this,SLOT(Core_OnNeedInvalidation()));
@@ -94,7 +95,7 @@ void OPMapControl::DrawMap2D(QPainter &painter)
                                      if(!found)
                                         found = true;
                                      {
-                                         painter.drawPixmap(core.tileRect.X(), core.tileRect.Y(), core.tileRect.Width(), core.tileRect.Height(),PureImageProxy::FromStream(img));
+                                         painter.drawImage(QRectF(core.tileRect.X(), core.tileRect.Y(), core.tileRect.Width(), core.tileRect.Height()),QImage::fromData(img));
 
                                      }
                                   }
@@ -140,7 +141,7 @@ void OPMapControl::mousePressEvent ( QMouseEvent* evnt )
 {
     if(!IsMouseOverMarker())
             {
-               if(evnt->button() == DragButton && CanDragMap())
+               if(evnt->button() == DragButton && core.CanDragMap)
                {
                   core.mouseDown.SetX(evnt->x());
                   core.mouseDown.SetY(evnt->y());
@@ -186,11 +187,11 @@ void OPMapControl::mouseReleaseEvent ( QMouseEvent* evnt )
                core.EndDrag();
 
                this->setCursor(Qt::ArrowCursor);
-               if(!BoundsOfMap.IsEmpty() && !BoundsOfMap.Contains(CurrentPosition()))
+               if(!BoundsOfMap.IsEmpty() && !BoundsOfMap.Contains(core.CurrentPosition()))
                {
                   if(!core.LastLocationInBounds.IsEmpty())
                   {
-                     SetCurrentPosition(core.LastLocationInBounds);
+                     core.SetCurrentPosition(core.LastLocationInBounds);
                   }
                }
             }
@@ -198,7 +199,7 @@ void OPMapControl::mouseReleaseEvent ( QMouseEvent* evnt )
             {
                if(!selectionEnd.IsEmpty() && !selectionStart.IsEmpty())
                {
-                   if(!SelectedArea().IsEmpty() && evnt->modifiers() == Qt::ShiftModifier)
+                   if(!selectedArea.IsEmpty() && evnt->modifiers() == Qt::ShiftModifier)
                   {
                   //   SetZoomToFitRect(SelectedArea());TODO
                   }

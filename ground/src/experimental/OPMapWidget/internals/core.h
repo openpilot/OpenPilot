@@ -57,6 +57,7 @@
 namespace mapcontrol
 {
     class OPMapControl;
+    class MapGraphicItem;
 }
  
 namespace internals {
@@ -64,6 +65,7 @@ class Core:public QObject,public QRunnable
 {
     Q_OBJECT
     friend class mapcontrol::OPMapControl;
+    friend class mapcontrol::MapGraphicItem;
 public:
     Core();
     void run();

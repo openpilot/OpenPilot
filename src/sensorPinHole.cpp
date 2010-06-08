@@ -65,7 +65,7 @@ namespace jafar {
 //			jafarImage_ptr_t i(Image::loadImage("pelican.laas.fr:/data1/robots/dala/data/2009-02-27-someLoops/serie01/images/image.r.0000.tiff",1));
 //			jafarImage_ptr_t i(Image::loadImage("/home/jsola/imageSample2.ppm",0));
 //			jafarImage_ptr_t i(Image::loadImage("/home/jsola/imageSample4.ppm",0));
-			jafarImage_ptr_t i(Image::loadImage("/home/jsola/imageSample.ppm",0));
+			jafarImage_ptr_t i(Image::loadImage("test_suite/imageSample.ppm",0));
 
 			RawImage* imgRawPtr = new RawImage;
 			imgRawPtr->setJafarImage(i) ;

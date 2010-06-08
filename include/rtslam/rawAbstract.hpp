@@ -62,6 +62,8 @@ namespace jafar {
 
 				virtual bool detect(const detect_method met, feature_ptr_t & featPtr, jafar::image::ROI* roiPtr = 0) = 0;
 
+				virtual void extractAppearance(const jblas::veci & pos, const jblas::veci & size, appearance_ptr_t & appPtr) = 0;
+
 				//				virtual bool match(observation_ptr_t & obsPtr) = 0;
 
 		};

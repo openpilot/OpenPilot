@@ -24,6 +24,8 @@ namespace jafar{
       private:
         void quickDerivatives(const jafar::image::Image & image, jafar::image::ROI & roi);
         bool quickConvolutionWithBestPoint(const jafar::image::ROI & roi, int pixMax[2], float & scoreMax);
+
+
         void writeHarrisImagesAsPPM(jafar::image::ROI & roi);
 
       private:

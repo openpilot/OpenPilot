@@ -45,13 +45,18 @@ namespace jafar {
 			ixaxpy_prod(P_, ia_inv, F_v, ia_v, ia_v, Q);
 		}
 
-		void ExtendedKalmanFilterIndirect::correct(const ind_array & ia_x, Innovation & inn, const mat & INN_rsl,
-		    const ind_array & ia_rsl)
+		void ExtendedKalmanFilterIndirect::correct(const ind_array & ia_x, Innovation & inn, const mat & INN_rsl, const ind_array & ia_rsl)
 		{
+			JFR_DEBUG("ia_x: " << ia_x);
+			JFR_DEBUG("ia_rsl: " << ia_rsl);
+			JFR_DEBUG("INN_rsl: " << INN_rsl);
 			PHt_tmp.resize(ia_x.size(),INN_rsl.size1());
 			PHt_tmp = prod(project(P_, ia_x, ia_rsl), trans(INN_rsl));
+			JFR_DEBUG("PHt_tmp: " << PHt_tmp)
 			inn.invertCov();
+			JFR_DEBUG("iP: " << inn.iP_)
 			K = prod(PHt_tmp, inn.iP_);
+			JFR_DEBUG("K: " << K)
 			ublas::project(P_, ia_x, ia_x) += prod<sym_mat> (K, trans(PHt_tmp));
 		}
 

@@ -42,8 +42,8 @@ namespace jafar {
 				void setJafarImage(jafarImage_ptr_t img) ;
 
 				virtual bool detect(const detect_method met, feature_ptr_t & featPtr, ROI* roiPtr = 0) ;
-				void extractPatch(const size_t width, const size_t height, featurepoint_ptr_t & featPntPtr);
-			private:
+				void extractAppearance(const jblas::veci & pos, const jblas::veci & size, appearance_ptr_t & appPtr);
+				private:
 
 		};
 	}

@@ -44,7 +44,7 @@ namespace jafar {
 
 			quickDerivatives(image, localRoi);
 			bool success = quickConvolutionWithBestPoint(localRoi, pixBest, scoreBest);
-			    // writeHarrisImagesAsPPM(localRoi);
+			// writeHarrisImagesAsPPM(localRoi);
 
 			delete[] m_quickData;
 
@@ -185,15 +185,15 @@ namespace jafar {
 					// get eigenvalues: EIG/eig = I_xx + I_yy +/- sqrt((Ixx - I_yy)^2 + 4*I_xy^2)
 					sm = int_center->im_conv_xx + int_center->im_conv_yy;
 					df = int_center->im_conv_xx - int_center->im_conv_yy;
-					sr = sqrt((double) ((double) df * (double) df + 4
-					    * ((double) int_center->im_conv_xy)
-					    * ((double) int_center->im_conv_xy)));
+
+					sr = sqrt((double) ((double) df * (double) df + 4 * ((double) int_center->im_conv_xy) * ((double) int_center->im_conv_xy)));
+
 					int_center->im_high_curv = (double) sm + sr; // Smallest eigenvalue.
 					int_center->im_low_curv = (double) sm - sr; // Largest eigenvalue.
 
 					// detect and write pixel corresponding to strongest corner, with score.
 					corner_ratio = int_center->im_high_curv / int_center->im_low_curv; // CAUTION should be high/low
-					if (corner_ratio < 2) {
+					if (corner_ratio < 5) {
 						if (int_center->im_low_curv > im_low_curv_max) {
 							im_low_curv_max = int_center->im_low_curv;
 							pixMax[0] = roi.x + rj;
@@ -239,9 +239,9 @@ namespace jafar {
 				for (int i = 0; i < (roi.height * roi.width); i++) {
 					fprintf(pFile_x, "%d ", 128 + (ptr->im_x) / 2);
 					fprintf(pFile_y, "%d ", 128 + (ptr->im_y) / 2);
-					fprintf(pFile_xx, "%d ", 128 + (ptr->im_conv_xx) / 1024);
-					fprintf(pFile_xy, "%d ", 128 + (ptr->im_conv_xy) / 1024);
-					fprintf(pFile_yy, "%d ", 128 + (ptr->im_conv_yy) / 1024);
+					fprintf(pFile_xx, "%d ", 128 + (ptr->im_conv_xx) / 2048);
+					fprintf(pFile_xy, "%d ", 128 + (ptr->im_conv_xy) / 2048);
+					fprintf(pFile_yy, "%d ", 128 + (ptr->im_conv_yy) / 2048);
 					fprintf(pFile_min, "%d ", (unsigned char) (ptr->im_low_curv / 1024));
 					fprintf(pFile_max, "%d ", (unsigned char) (ptr->im_high_curv / 2048));
 					ptr++;

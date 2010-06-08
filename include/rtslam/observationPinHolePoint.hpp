@@ -23,7 +23,7 @@
 #include "rtslam/activeSearch.hpp"
 #include "rtslam/featureAbstract.hpp"
 #include "rtslam/appearanceImage.hpp"
-#include "fdetect/HarrisDetector.hpp"
+//#include "fdetect/HarrisDetector.hpp"
 
 namespace jafar {
 	namespace rtslam {

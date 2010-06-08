@@ -31,6 +31,7 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
+#include "image/Image.hpp"
 #include "rtslam/appearanceAbstract.hpp"
 #include "boost/shared_ptr.hpp"
 
@@ -48,6 +49,7 @@ namespace jafar {
 		 */
 		class AppearenceImage: public AppearanceAbstract {
 			public:
+				image::Image patch;
 				AppearenceImage();
 				virtual ~AppearenceImage();
 		};

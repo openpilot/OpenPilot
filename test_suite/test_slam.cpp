@@ -67,7 +67,7 @@ void test_slam01() {
 	fillVector(v, 0.0);
 	robPtr1->state.x(v);
 	robPtr1->pose.x(quaternion::originFrame());
-	robPtr1->dt_or_dx = 0.001;
+	robPtr1->dt_or_dx = 0.1;
 	pinhole_ptr_t senPtr11 (new SensorPinHole(robPtr1, MapObject::FILTERED));
 	senPtr11->id(senPtr11->sensorIds.getId());
 	senPtr11->linkToParentRobot(robPtr1);
@@ -108,7 +108,7 @@ void test_slam01() {
 
 	// display::ViewerQt viewerQt;
 
-	for (int t = 1; t <= 100; t++) {
+	for (int t = 1; t <= 2; t++) {
 
 		cout << "\nTIME : " << t << endl;
 
@@ -130,6 +130,7 @@ void test_slam01() {
 			{
 				sensor_ptr_t senPtr = *senIter;
 				cout << "\nSENSOR: " << senPtr->id() << endl;
+				cout << *senPtr << endl;
 
 				// get raw-data
 				senPtr->acquireRaw() ;
@@ -171,7 +172,9 @@ void test_slam01() {
 							// 1f. if feature is inlier
 							if (obsPtr->compatibilityTest(3.0)) { // use 3.0 for 3-sigma or the 5% proba from the chi-square tables.
 								obsPtr->counters.nInlier++;
+								JFR_DEBUG("P_rsl: " << ublas::project(obsPtr->landmarkPtr()->mapPtr()->filterPtr->P(), obsPtr->ia_rsl, obsPtr->ia_rsl))
 								obsPtr->update() ;
+								JFR_DEBUG("P_rsl: " << ublas::project(obsPtr->landmarkPtr()->mapPtr()->filterPtr->P(), obsPtr->ia_rsl, obsPtr->ia_rsl))
 								obsPtr->events.updated = true;
 							} // obsPtr->compatibilityTest(3.0)
 						} // obsPtr->getScoreMatchInPercent()>80

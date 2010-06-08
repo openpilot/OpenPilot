@@ -91,7 +91,7 @@ struct Stereo_struct
 
 void main_stereo(Stereo_struct *sparam)
 {
-	while (true)
+	for(int i = 0; i < 5; i++)
 	{
 		TRACE; sparam->mutex.lock();
 		TRACE; sparam->t++;

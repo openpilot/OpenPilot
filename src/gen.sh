@@ -15,3 +15,4 @@ fi
 $UIC_CMD AddShapeDialog.ui > AddShapeDialog.h
 $MOC_CMD ../include/qdisplay/ImageView.hpp > ImageView.moc
 $MOC_CMD ../include/qdisplay/Viewer.hpp > Viewer.moc
+$MOC_CMD ../include/qdisplay/init.hpp > init.moc

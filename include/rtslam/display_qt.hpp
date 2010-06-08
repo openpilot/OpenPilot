@@ -29,13 +29,14 @@ namespace display {
 // Objects
 
 #if DEFINE_USELESS_OBJECTS
+
 /** **************************************************************************
 
 */
 class WorldQt : public WorldDisplay
 {
 	public:
-		WorldQt(rtslam::WorldAbstract *_slamWor, rtslam::WorldDisplay *garbage):
+		WorldQt(rtslam::WorldAbstract *_slamWor, WorldDisplay *garbage):
 			WorldDisplay(_slamWor, garbage) {}
 		void bufferize() {}
 		void render() {}
@@ -98,7 +99,7 @@ class SensorQt : public SensorDisplay
 		void bufferize()
 		{
 			raw_ptr_t raw = slamSen_->getRaw();
-			image = dynamic_cast<RawImage&>(*raw).img;
+			image = *(dynamic_cast<RawImage&>(*raw).img);
 		}
 		void render()
 		{

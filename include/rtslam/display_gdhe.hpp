@@ -19,7 +19,7 @@ namespace display {
 class WorldGdhe : public WorldDisplay
 {
 	public:
-		WorldGdhe(rtslam::WorldAbstract *_slamWor, rtslam::WorldAbstract *garbage): 
+		WorldGdhe(rtslam::WorldAbstract *_slamWor, WorldQt *garbage): 
 			WorldDisplay(_slamWor, garbage) {}
 		void bufferize() {}
 		void render() {}

@@ -19,7 +19,7 @@ namespace display {
 class WorldEx : public WorldDisplay
 {
 	public:
-		WorldEx(rtslam::WorldAbstract *_slamWor, rtslam::WorldAbstract *garbage): 
+		WorldEx(rtslam::WorldAbstract *_slamWor, WorldDisplay *garbage): 
 			WorldDisplay(_slamWor, garbage) {}
 		void bufferize() {}
 		void render() {}

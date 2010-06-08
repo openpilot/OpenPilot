@@ -59,11 +59,10 @@ namespace jafar {
 
 				/**
 				 * Pin-hole sensor setup.
+				 * \param imSz image size
 				 * \param k the vector of intrinsic parameters <c>k = [u_0, v_0, a_u, a_v]</c>.
 				 * \param d the radial distortion parameters vector <c>d = [d_2, d_4, ...] </c>.
 				 * \param c the radial distortion correction parameters vector <c>c = [c_2, c_4, ...] </c>.
-				 * \param hsize the horizontal image size.
-				 * \param vsize the vertical image size.
 				 */
 				void set_parameters(const jblas::vec2 & imSz, const jblas::vec4 & k, const jblas::vec & d, const jblas::vec & c);
 

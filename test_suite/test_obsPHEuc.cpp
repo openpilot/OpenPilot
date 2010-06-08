@@ -77,9 +77,10 @@ void test_obsPHEuc01() {
 
 	vec4 k;
 	vec d, c;
+	vec2 imSize;
 
 	randVector(k);
-	senPtr->set_parameters(k, d, c);
+	senPtr->set_parameters(imSize, k, d, c);
 
 	obsPtr->project();
 

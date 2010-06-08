@@ -5,6 +5,7 @@
  *      Author: agonzale
  */
 
+#include "jmath/ublasExtra.hpp"
 #include "boost/shared_ptr.hpp"
 #include "rtslam/pinholeTools.hpp"
 #include "rtslam/landmarkEuclideanPoint.hpp"
@@ -62,29 +63,41 @@ namespace jafar {
 		}
 
 		void ObservationPinHoleEuclideanPoint::backProject_func(const vec7 & sg,
-		    const vec & meas, const vec & nobs, vec & lmk) {
+		    const vec & meas, const vec & nobs, vec & euc) {
 
-//			// TODO : implement back-projection of ObsPHEucPt
-//			pinhole_ptr_t phPtr = pinHolePtr();
-//			pinhole::backProjectPoint(phPtr->intrinsic, phPtr->correction, meas, 1.0, v);
-//
-//			quaternion::eucFromFrame(sg,v,euc);
+			vec3 v;
+			vec4 k = pinHolePtr()->intrinsic;
+			vec c = pinHolePtr()->correction;
+			v = pinhole::backprojectPoint(k, c, meas, (double)1.0);
+			ublasExtra::normalize(v);
+			v /= nobs(0); // nobs is inverse-distance
+			euc = quaternion::eucFromFrame(sg, v);
 
 		}
 
 		void ObservationPinHoleEuclideanPoint::backProject_func(const vec7 & sg,
-		    const vec & meas, const vec & nobs, vec & lmk, mat & EUC_sg,
-		    mat & EUC_meas, mat & LMK_nobs) {
+		    const vec & meas, const vec & nobs, vec & euc, mat & EUC_sg,
+		    mat & EUC_meas, mat & EUC_nobs) {
 
-//			// TODO : implement back-projection of ObsPHEucPt
-//			mat V_1(3, 1);
-//			pinhole_ptr_t phPtr = pinHolePtr();
-//			pinhole::backProjectPoint(phPtr->intrinsic, phPtr->correction, meas, 1.0,
-//			                          v, V_meas, V_1);
-//
-//			quaternion::eucFromFrame(sg,v,euc,EUC_sg,EUC_v);
-//
-//			AHP_pix = prod(AHP_v, V_pix);
+			vec3 v;
+			mat V_meas(3, 2);
+			mat V_1(3, 1), VN_v(3,3), VN_meas(3, 2), VS_nobs(3,1), VS_vn(3,3), EUC_vs(3,3), VS_meas(3,2);
+
+			pinhole::backProjectPoint(pinHolePtr()->intrinsic, pinHolePtr()->correction, meas, 1.0,
+			                          v, V_meas, V_1);
+
+			vec3 vn = v;
+			ublasExtra::normalize(vn); // nobs is inverse-distance
+			ublasExtra::normalizeJac(v, VN_v);
+			vec3 vs = vn / nobs(0);
+			VS_vn = identity_mat(3) / nobs(0);
+			ublas::column(VS_nobs,1) = - vn / (nobs(0)*nobs(0));
+			VN_meas = prod(VN_v, V_meas);
+			VS_meas = prod(VS_vn, VN_meas);
+			quaternion::eucFromFrame(sg, vs, euc, EUC_sg, EUC_vs);
+
+			EUC_nobs = prod(EUC_vs, VS_nobs);
+			EUC_meas = prod(EUC_vs, VS_meas);
 
 		}
 

@@ -53,17 +53,20 @@ void test_senPH01(void) {
 	mat V_s(3,1);
 	vec4 k;
 	vec d(2), c(2);
+	vec2 imgSize;
 
   std::cout<<"#"<<__LINE__<<std::endl;
 	k(0) = 320;
 	k(1) = 240;
 	k(2) = 320;
 	k(3) = 240;
+	imgSize(0)=640;
+	imgSize(1)=480;
 	randVector(d);
 	randVector(d);
 	d *= 0.0;
 	c = d;
-	senPtr->set_parameters(k, d, c);
+	senPtr->set_parameters(imgSize, k, d, c);
 
   std::cout<<"#"<<__LINE__<<std::endl;
 	randVector(u);

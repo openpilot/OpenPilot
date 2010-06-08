@@ -53,9 +53,9 @@ namespace jafar {
 
 		void ObservationPinHoleEuclideanPoint::backProject_func(const vec7 & sg,
 		    const vec & meas, const vec & nobs, vec & lmk, mat & EUC_sg,
-		    mat & EUC_meas, mat LMK_nobs) {
+		    mat & EUC_meas, mat & LMK_nobs) {
 
-//			// todo : implement back-projection of ObsPHEucPt
+//			// TODO : implement back-projection of ObsPHEucPt
 //			mat V_1(3, 1);
 //			pinhole_ptr_t phPtr = pinHolePtr();
 //			pinhole::backProjectPoint(phPtr->intrinsic, phPtr->correction, meas, 1.0,

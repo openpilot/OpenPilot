@@ -22,6 +22,8 @@
 
 #include <iostream>
 
+#if 0
+
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/robotConstantVelocity.hpp"
 #include "rtslam/sensorPinHole.hpp"
@@ -62,3 +64,4 @@ BOOST_AUTO_TEST_CASE( test_simu )
 	test_simu01();
 }
 
+#endif

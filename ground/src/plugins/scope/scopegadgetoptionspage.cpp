@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       scopegadgetfactory.cpp
+ * @file       scopegadgetoptionspage.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Scope Gadget Factory
+ * @brief      Scope Plugin Gadget options page
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   Scope
  * @{
@@ -24,36 +24,52 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include "scopegadgetfactory.h"
-#include "scopegadgetwidget.h"
-#include "scopegadgetconfiguration.h"
+
 #include "scopegadgetoptionspage.h"
-#include "scopegadget.h"
-#include <coreplugin/iuavgadget.h>
+#include "scopegadgetconfiguration.h"
+#include "ui_scopegadgetoptionspage.h"
 
-ScopeGadgetFactory::ScopeGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("ScopeGadget"),
-                          tr("Scope Gadget"),
-                          parent)
+#include "extensionsystem/pluginmanager.h"
+#include "uavobjects/uavobjectmanager.h"
+#include "uavobjects/uavdataobject.h"
+
+ScopeGadgetOptionsPage::ScopeGadgetOptionsPage(ScopeGadgetConfiguration *config, QObject *parent) :
+        IOptionsPage(parent),
+        m_config(config)
 {
+    //nothing to do here...
 }
 
-ScopeGadgetFactory::~ScopeGadgetFactory()
+//creates options page widget (uses the UI file)
+QWidget* ScopeGadgetOptionsPage::createPage(QWidget *parent)
 {
+    options_page = new Ui::ScopeGadgetOptionsPage();
+    //main widget
+    QWidget *optionsPageWidget = new QWidget;
+    //main layout
+    options_page->setupUi(optionsPageWidget);
+
+    //TODO: Rest of the init stuff here
+
+
+    return optionsPageWidget;
 }
 
-Core::IUAVGadget* ScopeGadgetFactory::createGadget(QWidget *parent)
+/**
+ * Called when the user presses apply or OK.
+ *
+ * Saves the current values
+ *
+ */
+void ScopeGadgetOptionsPage::apply()
 {
-    ScopeGadgetWidget* gadgetWidget = new ScopeGadgetWidget(parent);
-    return new ScopeGadget(QString("ScopeGadget"), gadgetWidget, parent);
+
+    //Apply configuration changes
+    // m_config->setDialFile(options_page->svgSourceFile->text());
+
 }
 
-IUAVGadgetConfiguration *ScopeGadgetFactory::createConfiguration(const QByteArray &state)
+void ScopeGadgetOptionsPage::finish()
 {
-    return new ScopeGadgetConfiguration(QString("ScopeGadget"), state);
-}
 
-IOptionsPage *ScopeGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
-{
-    return new ScopeGadgetOptionsPage(qobject_cast<ScopeGadgetConfiguration*>(config));
 }

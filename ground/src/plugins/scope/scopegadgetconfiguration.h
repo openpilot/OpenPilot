@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       scopegadget.h
+ * @file       scopegadgetconfiguration.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Scope Plugin Gadget
+ * @brief      Scope Plugin Gadget configuration
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   Scope
  * @{
@@ -25,41 +25,22 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#ifndef SCOPEGADGETCONFIGURATION_H
+#define SCOPEGADGETCONFIGURATION_H
 
-#ifndef SCOPEGADGET_H_
-#define SCOPEGADGET_H_
-
-#include <coreplugin/iuavgadget.h>
-
-class IUAVGadget;
-//class QList<int>;
-class QWidget;
-class QString;
-class ScopeGadgetWidget;
+#include <coreplugin/iuavgadgetconfiguration.h>
 
 using namespace Core;
 
-class ScopeGadget : public Core::IUAVGadget
+class ScopeGadgetConfiguration : public IUAVGadgetConfiguration
 {
     Q_OBJECT
 public:
-    ScopeGadget(QString classId, ScopeGadgetWidget *widget, QWidget *parent = 0);
-    ~ScopeGadget();
+    explicit ScopeGadgetConfiguration(QString classId, const QByteArray &state = 0, QObject *parent = 0);
 
-    QList<int> context() const {
-        return m_context;
-    }
-    QWidget *widget() {
-        return m_widget;
-    }
-    QString contextHelpId() const {
-        return QString();
-    }
 
-private:
-    QWidget *m_widget;
-    QList<int> m_context;
+    QByteArray saveState() const;
+    IUAVGadgetConfiguration *clone();
 };
 
-
-#endif // SCOPEGADGET_H_
+#endif // SCOPEGADGETCONFIGURATION_H

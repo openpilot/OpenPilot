@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       scopegadget.h
+ * @file       scopegadgetoptionspage.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Scope Plugin Gadget
+ * @brief      Scope Plugin Gadget options page
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   Scope
  * @{
@@ -25,41 +25,42 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#ifndef SCOPEGADGETOPTIONSPAGE_H
+#define SCOPEGADGETOPTIONSPAGE_H
 
-#ifndef SCOPEGADGET_H_
-#define SCOPEGADGET_H_
+#include "coreplugin/dialogs/ioptionspage.h"
+#include "QString"
+#include <QStringList>
+#include <QDebug>
 
-#include <coreplugin/iuavgadget.h>
+namespace Core
+{
+class IUAVGadgetConfiguration;
+}
 
-class IUAVGadget;
-//class QList<int>;
-class QWidget;
-class QString;
-class ScopeGadgetWidget;
+class ScopeGadgetConfiguration;
+
+namespace Ui
+{
+class ScopeGadgetOptionsPage;
+}
 
 using namespace Core;
 
-class ScopeGadget : public Core::IUAVGadget
+class ScopeGadgetOptionsPage :  public IOptionsPage
 {
     Q_OBJECT
 public:
-    ScopeGadget(QString classId, ScopeGadgetWidget *widget, QWidget *parent = 0);
-    ~ScopeGadget();
+    explicit ScopeGadgetOptionsPage(ScopeGadgetConfiguration *config, QObject *parent = 0);
 
-    QList<int> context() const {
-        return m_context;
-    }
-    QWidget *widget() {
-        return m_widget;
-    }
-    QString contextHelpId() const {
-        return QString();
-    }
+    QWidget *createPage(QWidget *parent);
+    void apply();
+    void finish();
 
 private:
-    QWidget *m_widget;
-    QList<int> m_context;
+    Ui::ScopeGadgetOptionsPage *options_page;
+    ScopeGadgetConfiguration *m_config;
+
 };
 
-
-#endif // SCOPEGADGET_H_
+#endif // SCOPEGADGETOPTIONSPAGE_H

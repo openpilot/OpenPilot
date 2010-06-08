@@ -33,7 +33,7 @@
 
 LineardialGadgetWidget::LineardialGadgetWidget(QWidget *parent) : QGraphicsView(parent)
 {
-    setMinimumSize(128,32);
+    setMinimumSize(32,32);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setScene(new QGraphicsScene(this));
  
@@ -46,7 +46,9 @@ LineardialGadgetWidget::LineardialGadgetWidget(QWidget *parent) : QGraphicsView(
     index = new QGraphicsSvgItem();
     fieldName = new QGraphicsTextItem("Field");
     fieldName->setDefaultTextColor(QColor("White"));
-    fieldValue = new QGraphicsTextItem("3.0 V");
+    fieldValue = new QGraphicsTextItem("0.00");
+    fieldValue->setDefaultTextColor(QColor("White"));
+    verticalDial = false;
 
     paint();
 
@@ -149,54 +151,79 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
          fieldName->setTransform(matrix,false);
 
          textMatrix = m_renderer->matrixForElement("value");
-         startX = textMatrix.mapRect(m_renderer->boundsOnElement("field")).x();
-         startY = textMatrix.mapRect(m_renderer->boundsOnElement("field")).y();
+         startX = textMatrix.mapRect(m_renderer->boundsOnElement("value")).x();
+         startY = textMatrix.mapRect(m_renderer->boundsOnElement("value")).y();
          matrix.reset();
          matrix.translate(startX,startY);
          fieldValue->setTransform(matrix,false);
 
-
          // In order to properly render the Green/Yellow/Red graphs, we need to find out
          // the starting location of the bargraph rendering area:
-         QMatrix barMatrix = m_renderer->matrixForElement("bargraph");
-         startX = barMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).x();
-         startY = barMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).y();
+         textMatrix = m_renderer->matrixForElement("bargraph");
+         startX = textMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).x();
+         startY = textMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).y();
          //std::cout << "StartX: " << startX << std::endl;
          //std::cout << "StartY: " << startY << std::endl;
-         bargraphWidth = barMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).width();
+         bargraphSize = textMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).width();
+         // Detect if the bargraph is vertical or horizontal.
+         qreal bargraphHeight = textMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).height();
+         if (bargraphHeight > bargraphSize) {
+               verticalDial = true;
+               bargraphSize = bargraphHeight;
+           } else {
+               verticalDial = false;
+           }
+
+           // Move the index to its base position:
          indexHeight = m_renderer->matrixForElement("needle").mapRect(m_renderer->boundsOnElement("needle")).height();
          indexWidth = m_renderer->matrixForElement("needle").mapRect(m_renderer->boundsOnElement("needle")).width();
-         //std::cout << "Index height: " << indexHeight << std::endl;
-
-//         QTransform matrix;
          matrix.reset();
          matrix.translate(startX-indexWidth/2,startY-indexHeight/2);
          index->setTransform(matrix,false);
+
          // Now adjust the red/yellow/green zones:
          double range = maxValue-minValue;
 
          green->resetTransform();
          double greenScale = (greenMax-greenMin)/range;
-         double greenStart = (greenMin-minValue)/range*green->boundingRect().width();
+         double greenStart = verticalDial ? (maxValue-greenMax)/range*green->boundingRect().height() :
+                             (greenMin-minValue)/range*green->boundingRect().width();
          matrix.reset();
-         matrix.scale(greenScale,1);
-         matrix.translate((greenStart+startX)/greenScale,startY);
+         if (verticalDial) {
+             matrix.scale(1,greenScale);
+             matrix.translate(startX,(greenStart+startY)/greenScale);
+         } else {
+             matrix.scale(greenScale,1);
+             matrix.translate((greenStart+startX)/greenScale,startY);
+         }
          green->setTransform(matrix,false);
 
          yellow->resetTransform();
          double yellowScale = (yellowMax-yellowMin)/range;
-         double yellowStart = (yellowMin-minValue)/range*yellow->boundingRect().width();
+         double yellowStart = verticalDial ? (maxValue-yellowMax)/range*yellow->boundingRect().height() :
+                              (yellowMin-minValue)/range*yellow->boundingRect().width();
          matrix.reset();
-         matrix.scale(yellowScale,1);
-         matrix.translate((yellowStart+startX)/yellowScale,startY);
+         if (verticalDial) {
+             matrix.scale(1,yellowScale);
+             matrix.translate(startX,(yellowStart+startY)/yellowScale);
+         } else {
+             matrix.scale(yellowScale,1);
+             matrix.translate((yellowStart+startX)/yellowScale,startY);
+         }
          yellow->setTransform(matrix,false);
 
          red->resetTransform();
          double redScale = (redMax-redMin)/range;
-         double redStart = (redMin-minValue)/range*red->boundingRect().width();
+         double redStart = verticalDial ? (maxValue-redMax)/range*red->boundingRect().height() :
+                           (redMin-minValue)/range*red->boundingRect().width();
          matrix.reset();
-         matrix.scale(redScale,1);
-         matrix.translate((redStart+startX)/redScale,startY);
+         if (verticalDial) {
+             matrix.scale(1,redScale);
+             matrix.translate(startX,(redStart+startY)/redScale);
+         } else {
+             matrix.scale(redScale,1);
+             matrix.translate((redStart+startX)/redScale,startY);
+         }
          red->setTransform(matrix,false);
 
          l_scene->setSceneRect(background->boundingRect());
@@ -209,10 +236,9 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
 
 void LineardialGadgetWidget::paint()
 {
-
     QGraphicsScene *l_scene = scene();
-    l_scene->clear();
-
+    l_scene->clear(); // Beware: clear also deletes all objects
+                      // which are currently in the scene
     l_scene->addItem(background);
     // Order is important: red, then yellow then green
     // overlayed on top of each other
@@ -221,8 +247,8 @@ void LineardialGadgetWidget::paint()
     l_scene->addItem(green);
     l_scene->addItem(index);
     l_scene->addItem(fieldName);
+    l_scene->addItem(fieldValue);
     l_scene->addItem(foreground);
-
     update();
 }
 
@@ -247,7 +273,11 @@ void LineardialGadgetWidget::resizeEvent(QResizeEvent *event)
 // Converts the value into an percentage:
 // this enables smooth movement in moveIndex below
 void LineardialGadgetWidget::setIndex(double value) {
-    indexTarget = 100*(value-minValue)/maxValue;
+    if (verticalDial) {
+        indexTarget = 100*(maxValue-value)/(maxValue-minValue);
+    } else {
+        indexTarget = 100*(value-minValue)/(maxValue-minValue);
+    }
 }
 
 // Take an input value and move the index accordingly
@@ -256,13 +286,15 @@ void LineardialGadgetWidget::setIndex(double value) {
 void LineardialGadgetWidget::moveIndex()
 {
     if ((abs((indexValue-indexTarget)*10) > 3)) {
-        indexValue += (indexTarget - indexValue)/10;
+        indexValue += (indexTarget - indexValue)/5;
        index->resetTransform();
-       // TODO: do not do so many calculations during the update
-       // code, precompute everything;
-       qreal factor = bargraphWidth/100;
+       qreal factor = indexValue*bargraphSize/100;
        QTransform matrix;
-       matrix.translate(indexValue*factor+startX-indexWidth/2,startY-indexHeight/2);
+       if (verticalDial) {
+           matrix.translate(startX-indexWidth/2,factor+startY-indexHeight/2);
+       } else {
+           matrix.translate(factor+startX-indexWidth/2,startY-indexHeight/2);
+       }
        index->setTransform(matrix,false);
        update();
    }

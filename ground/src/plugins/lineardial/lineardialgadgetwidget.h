@@ -84,10 +84,11 @@ private:
 
                    // Simple flag to skip rendering if the
    bool fgenabled; // layer does not exist.
+   bool verticalDial; // True if the dials scales vertically.
 
    qreal startX; // Where we should draw the bargraph
    qreal startY; // green/yellow/red zones.
-   qreal bargraphWidth;
+   qreal bargraphSize;
    qreal indexHeight;
    qreal indexWidth;
 

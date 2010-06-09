@@ -1,0 +1,4 @@
+All sounds for the OpenPilot project are licensed under the cc-by-sa.
+
+
+ 

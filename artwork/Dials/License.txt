@@ -1,8 +1,7 @@
 
 Artwork by Edouard Lafargue (edouard@lafargue.name) for the OpenPilot project.
 
-This artwork is covered by the CC-BY-NC-SA license.
+This artwork is covered by the CC-BY-SA license.
 
-This means the OpenPilot branding must be retained amoungst other restrictions. 
 
  

@@ -1,0 +1,86 @@
+Sounds for the notifaction plugin
+
+Work in progress, any ideas, add them.
+
+Noises:
+
+Alarm
+Beep
+Ding
+Whoop
+
+
+Spoken Collections (sorted alphabetically):
+
+active
+active
+alarm
+alert
+altitude
+amps
+autonomous flight
+battery
+camera
+cancelled
+complete
+control
+critical
+disabled
+flight
+Ground Station
+heading
+initiated
+initiazlised
+landing
+low
+manual flight
+max
+mode
+navigation
+OpenPilot
+point
+range
+return home
+return to launch
+stabalisation
+Started
+take off
+time
+triggered
+volts
+warning
+waypoint
+
+
+Numbers:
+
+one
+two
+three
+four
+five
+six
+seven
+eight
+nine
+ten
+eleven
+tweleve
+thriteen
+fourteen
+fiveteen
+sixteen
+seventeen
+eightteen
+nineteen
+twenty
+thirty
+fourty
+fivty
+sixty
+seventy
+eighty
+ninety
+hundread
+thousand
+million

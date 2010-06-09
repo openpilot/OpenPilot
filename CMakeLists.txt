@@ -1,0 +1,20 @@
+# $Id: CMakeLists.txt 4492 2010-05-31 08:56:24Z nksallem $ #
+
+#
+# User part of the makefiles
+# module rtslam
+# 
+
+build_jafar_module(rtslam
+  VERSION 0
+  REVISION 1 
+
+  REQUIRED_MODULES kernel image jmath
+  OPTIONAL_MODULES qdisplay
+
+  REQUIRED_EXTLIBS boost_thread
+  OPTIONAL_EXTLIBS qt4
+
+  CXXFLAGS -g -ggdb -O0 -Wall
+  #CPPFLAGS -Werror
+)

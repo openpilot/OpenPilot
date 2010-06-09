@@ -466,25 +466,25 @@ REMOVE  = $(REMOVE_CMD) -f
 # Define Messages
 # English
 MSG_ERRORS_NONE = Errors: none
-MSG_BEGIN = "-------- begin (mode: $(RUN_MODE)) --------"
-MSG_END = --------  end  --------
-MSG_MODINIT = "**** Generating ModInit.c:"
-MSG_SIZE_BEFORE = Size before: 
-MSG_SIZE_AFTER = Size after build:
-MSG_LOAD_FILE = Creating load file:
-MSG_EXTENDED_LISTING = Creating Extended Listing/Disassembly:
-MSG_SYMBOL_TABLE = Creating Symbol Table:
-MSG_LINKING = "**** Linking :"
-MSG_COMPILING = "**** Compiling C :"
-MSG_COMPILING_ARM = "**** Compiling C (ARM-only):"
-MSG_COMPILINGCPP = "Compiling C++ :"
-MSG_COMPILINGCPP_ARM = "Compiling C++ (ARM-only):"
-MSG_ASSEMBLING = "**** Assembling:"
-MSG_ASSEMBLING_ARM = "****Assembling (ARM-only):"
-MSG_CLEANING = Cleaning project:
-MSG_FORMATERROR = Can not handle output-format
-MSG_ASMFROMC = "Creating asm-File from C-Source:"
-MSG_ASMFROMC_ARM = "Creating asm-File from C-Source (ARM-only):"
+MSG_BEGIN = ${quote}-------- begin (mode: $(RUN_MODE)) --------${quote}
+MSG_END = ${quote}--------  end  --------${quote}
+MSG_MODINIT = ${quote}**** Generating ModInit.c${quote}
+MSG_SIZE_BEFORE = ${quote}Size before:${quote} 
+MSG_SIZE_AFTER = ${quote}Size after build:${quote}
+MSG_LOAD_FILE = ${quote}Creating load file:${quote}
+MSG_EXTENDED_LISTING = ${quote}Creating Extended Listing/Disassembly:${quote}
+MSG_SYMBOL_TABLE = ${quote}Creating Symbol Table:${quote}
+MSG_LINKING = ${quote}**** Linking :${quote}
+MSG_COMPILING = ${quote}**** Compiling C :${quote}
+MSG_COMPILING_ARM = ${quote}**** Compiling C (ARM-only):${quote}
+MSG_COMPILINGCPP = ${quote}Compiling C++ :${quote}
+MSG_COMPILINGCPP_ARM = ${quote}Compiling C++ (ARM-only):${quote}
+MSG_ASSEMBLING = ${quote}**** Assembling:${quote}
+MSG_ASSEMBLING_ARM = ${quote}****Assembling (ARM-only):${quote}
+MSG_CLEANING = ${quote}Cleaning project:${quote}
+MSG_FORMATERROR = ${quote}Can not handle output-format${quote}
+MSG_ASMFROMC = ${quote}Creating asm-File from C-Source:${quote}
+MSG_ASMFROMC_ARM = ${quote}Creating asm-File from C-Source (ARM-only):${quote}
 
 # List of all source files.
 ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) $(CPPSRCARM) $(CPPSRC)
@@ -571,7 +571,7 @@ gccversion :
 ifeq ($(FLASH_TOOL),OPENOCD)
 # Program the device with Dominic Rath's OPENOCD in "batch-mode", needs cfg and "reset-script".
 program: $(OUTDIR)/$(TARGET).elf
-	@echo "Programming with OPENOCD"
+	@echo ${quote}Programming with OPENOCD${quote}
 	$(OOCD_EXE) $(OOCD_CL)
 endif
 
@@ -605,7 +605,6 @@ endif
 .SECONDARY : $(TARGET).elf
 .PRECIOUS : $(ALLOBJ)
 %.elf:  $(ALLOBJ)
-	@echo
 	@echo $(MSG_LINKING) $@
 # use $(CC) for C-only projects or $(CPP) for C++-projects:
 	$(CC) $(THUMB) $(CFLAGS) $(ALLOBJ) --output $@ $(LDFLAGS)
@@ -616,7 +615,7 @@ endif
 define ASSEMBLE_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 ##	@echo
-	@echo $(MSG_ASSEMBLING) $$< "->" $$@
+	@echo $(MSG_ASSEMBLING) $$< ${quote}->${quote} $$@
 	$(CC) -c $(THUMB) $$(ASFLAGS) $$< -o $$@ 
 endef
 $(foreach src, $(ASRC), $(eval $(call ASSEMBLE_TEMPLATE, $(src)))) 
@@ -625,7 +624,7 @@ $(foreach src, $(ASRC), $(eval $(call ASSEMBLE_TEMPLATE, $(src))))
 define ASSEMBLE_ARM_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 ##	@echo
-	@echo $(MSG_ASSEMBLING_ARM) $$< "->" $$@
+	@echo $(MSG_ASSEMBLING_ARM) $$< ${quote}->${quote} $$@
 	$(CC) -c $$(ASFLAGS) $$< -o $$@ 
 endef
 $(foreach src, $(ASRCARM), $(eval $(call ASSEMBLE_ARM_TEMPLATE, $(src)))) 
@@ -635,7 +634,7 @@ $(foreach src, $(ASRCARM), $(eval $(call ASSEMBLE_ARM_TEMPLATE, $(src))))
 define COMPILE_C_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 ##	@echo
-	@echo $(MSG_COMPILING) $$< "->" $$@
+	@echo $(MSG_COMPILING) $$< ${quote}->${quote} $$@
 	$(CC) -c $(THUMB) $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@ 
 endef
 $(foreach src, $(SRC), $(eval $(call COMPILE_C_TEMPLATE, $(src)))) 
@@ -644,7 +643,7 @@ $(foreach src, $(SRC), $(eval $(call COMPILE_C_TEMPLATE, $(src))))
 define COMPILE_C_ARM_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 ##	@echo
-	@echo $(MSG_COMPILING_ARM) $$< "->" $$@
+	@echo $(MSG_COMPILING_ARM) $$< ${quote}->${quote} $$@
 	$(CC) -c $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@ 
 endef
 $(foreach src, $(SRCARM), $(eval $(call COMPILE_C_ARM_TEMPLATE, $(src)))) 
@@ -654,7 +653,7 @@ $(foreach src, $(SRCARM), $(eval $(call COMPILE_C_ARM_TEMPLATE, $(src))))
 define COMPILE_CPP_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 ##	@echo
-	@echo $(MSG_COMPILINGCPP) $$< "->" $$@
+	@echo $(MSG_COMPILINGCPP) $$< ${quote}->${quote} $$@
 	$(CC) -c $(THUMB) $$(CFLAGS) $$(CPPFLAGS) $$< -o $$@ 
 endef
 $(foreach src, $(CPPSRC), $(eval $(call COMPILE_CPP_TEMPLATE, $(src)))) 
@@ -663,7 +662,7 @@ $(foreach src, $(CPPSRC), $(eval $(call COMPILE_CPP_TEMPLATE, $(src))))
 define COMPILE_CPP_ARM_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 ##	@echo
-	@echo $(MSG_COMPILINGCPP_ARM) $$< "->" $$@
+	@echo $(MSG_COMPILINGCPP_ARM) $$< ${quote}->${quote} $$@
 	$(CC) -c $$(CFLAGS) $$(CPPFLAGS) $$< -o $$@ 
 endef
 $(foreach src, $(CPPSRCARM), $(eval $(call COMPILE_CPP_ARM_TEMPLATE, $(src)))) 

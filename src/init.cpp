@@ -5,7 +5,6 @@
 #include <QTime>
  
 //#include <boost/thread/thread.hpp>
-#include <boost/version.hpp>
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include "qdisplay/Viewer.hpp"
@@ -48,9 +47,7 @@ namespace qdisplay {
 	void QtAppStart::display()
 	{
 		//std::cout << "timer fire" << std::endl;
-		#if BOOST_VERSION >= 103500
 		if (thread_main && thread_main->timed_join(boost::posix_time::milliseconds (0))) app->exit();
-		#endif
 		(*display_)(sharedDataStructure);
 	}
 
@@ -60,6 +57,8 @@ void qtSleep(int ms)
 	while(QTime::currentTime() < dieTime)
 		QApplication::instance()->processEvents();
 }
+
+
 
 #include "init.moc"
 

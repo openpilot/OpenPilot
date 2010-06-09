@@ -13,9 +13,6 @@
 #include "qdisplay/Shape.hpp"
 #include "kernel/threads.hpp"
 
-#include <boost/thread/shared_mutex.hpp>
-
-
 #include <iostream>
 
 using namespace jafar;
@@ -31,7 +28,7 @@ void display_mono_unique(void*)
 {
 	TRACE; qdisplay::Viewer *viewer = new qdisplay::Viewer;
 	TRACE; image::Image img;
-	TRACE; img.load("/home/cyril/laas/Libs/jafar/modules/qdisplay/test_suite/qt.png");
+	TRACE; img.load("test_suite/qt.png");
 	TRACE; qdisplay::ImageView *view = new qdisplay::ImageView(img);
 	TRACE; view->setImage(img);
 	TRACE; viewer->setImageView(view, 0, 0);
@@ -62,7 +59,7 @@ void display_mono_periodic(void*)
 	{
 		TRACE; qdisplay::Viewer *viewer = new qdisplay::Viewer;
 		TRACE; image::Image img;
-		TRACE; img.load("/home/cyril/laas/Libs/jafar/modules/qdisplay/test_suite/qt.png");
+		TRACE; img.load("test_suite/qt.png");
 		TRACE; qdisplay::ImageView *view = new qdisplay::ImageView(img);
 		TRACE; view->setImage(img);
 		TRACE; viewer->setImageView(view, 0, 0);
@@ -112,7 +109,7 @@ void display_stereo_unique(Stereo_struct *sparam)
 			TRACE; sparam->s = new qdisplay::Shape(qdisplay::Shape::ShapeRectangle, 20*(1.5+cos(2*PI*sparam->t/15)), 20*(1.5+sin(2*PI*sparam->t/15)), 3, 3);
 			TRACE; qdisplay::Viewer *viewer = new qdisplay::Viewer;
 			TRACE; image::Image img;
-			TRACE; img.load("/home/cyril/laas/Libs/jafar/modules/qdisplay/test_suite/qt.png");
+			TRACE; img.load("test_suite/qt.png");
 			TRACE; qdisplay::ImageView *view = new qdisplay::ImageView(img);
 			TRACE; view->setImage(img);
 			TRACE; viewer->setImageView(view, 0, 0);
@@ -145,7 +142,7 @@ void display_stereo_periodic(Stereo_struct *sparam)
 		TRACE; sparam->s = new qdisplay::Shape(qdisplay::Shape::ShapeRectangle, 20*(1.5+cos(2*PI*sparam->t/15)), 20*(1.5+sin(2*PI*sparam->t/15)), 3, 3);
 		TRACE; qdisplay::Viewer *viewer = new qdisplay::Viewer;
 		TRACE; image::Image img;
-		TRACE; img.load("/home/cyril/laas/Libs/jafar/modules/qdisplay/test_suite/qt.png");
+		TRACE; img.load("test_suite/qt.png");
 		TRACE; qdisplay::ImageView *view = new qdisplay::ImageView(img);
 		TRACE; view->setImage(img);
 		TRACE; viewer->setImageView(view, 0, 0);
@@ -162,46 +159,6 @@ void display_stereo_periodic(Stereo_struct *sparam)
 	TRACE; sparam->mutex.unlock();
 }
 
-/******************************************************************************/
-
-//boost::mutex m;
-//kernel::YieldMutex m;
-kernel::FifoMutex m;
-void writer()
-{
-	while(true)
-	{
-		m.lock();
-		std::cout << "writer" << std::endl;
-		sleep(1);
-		m.unlock();
-//		boost::this_thread::yield();
-	}
-}
-void reader1()
-{
-	while(true)
-	{
-		m.lock();
-		std::cout << "reader1" << std::endl;
-		sleep(1);
-		m.unlock();
-		sleep(5);
-//		boost::this_thread::yield();
-	}
-}
-void reader2()
-{
-	while(true)
-	{
-		m.lock();
-		std::cout << "reader2" << std::endl;
-		sleep(1);
-		m.unlock();
-		sleep(4);
-//		boost::this_thread::yield();
-	}
-}
 
 /******************************************************************************/
 
@@ -212,11 +169,5 @@ BOOST_AUTO_TEST_CASE( test_cpp )
 //	qdisplay::QtAppStart((qdisplay::FUNC)&display_stereo_unique,(qdisplay::FUNC)&main_stereo,0, &stereo_struct);
 	qdisplay::QtAppStart((qdisplay::FUNC)&display_stereo_periodic,(qdisplay::FUNC)&main_stereo,1000,&stereo_struct);
 
-/*	boost::thread *thread_writer, *thread_reader1, *thread_reader2;
-	thread_writer = new boost::thread(writer);
-	thread_reader1 = new boost::thread(reader1);
-	thread_reader2 = new boost::thread(reader2);
-	sleep(1000);
-*/
 }
 

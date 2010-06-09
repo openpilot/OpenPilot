@@ -58,7 +58,22 @@ class QtAppStart: public QObject
 
 typedef void(*FUNC)(void*);
 
+/**
+Special sleep function that processes qt events to refresh display
+@param ms sleep time in milliseconds
+*/
 void qtSleep(int ms);
+
+/**
+Special lock function that processes qt events to refresh display
+@param mutex the mutex to lock, that must provide a try_lock implementation
+*/
+template<class Mutex>
+void qtMutexLock(Mutex &mutex)
+{
+	while (!mutex.try_lock())
+		QApplication::instance()->processEvents();
+}
 
 }}
 

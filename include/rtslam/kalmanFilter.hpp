@@ -38,7 +38,7 @@ namespace jafar {
 			public:
 				//				boost::posix_time::time_duration curTime;
 				mat K;
-				mat PHt_tmp;
+				mat PJt_tmp;
 
 				ExtendedKalmanFilterIndirect(size_t _size);
 

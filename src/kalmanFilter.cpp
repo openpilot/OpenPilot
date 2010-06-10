@@ -47,17 +47,14 @@ namespace jafar {
 
 		void ExtendedKalmanFilterIndirect::correct(const ind_array & ia_x, Innovation & inn, const mat & INN_rsl, const ind_array & ia_rsl)
 		{
-			JFR_DEBUG("ia_x: " << ia_x);
-			JFR_DEBUG("ia_rsl: " << ia_rsl);
-			JFR_DEBUG("INN_rsl: " << INN_rsl);
-			PHt_tmp.resize(ia_x.size(),INN_rsl.size1());
-			PHt_tmp = prod(project(P_, ia_x, ia_rsl), trans(INN_rsl));
-			JFR_DEBUG("PHt_tmp: " << PHt_tmp)
+			PJt_tmp.resize(ia_x.size(),INN_rsl.size1());
+			PJt_tmp = - prod(project(P_, ia_x, ia_rsl), trans(INN_rsl));
 			inn.invertCov();
-			JFR_DEBUG("iP: " << inn.iP_)
-			K = prod(PHt_tmp, inn.iP_);
-			JFR_DEBUG("K: " << K)
-			ublas::project(P_, ia_x, ia_x) += prod<sym_mat> (K, trans(PHt_tmp));
+			K = prod(PJt_tmp, inn.iP_);
+
+			// mean and covariances update:
+			ublas::project(x_, ia_x) += prod(K, inn.x());
+			ublas::project(P_, ia_x, ia_x) += prod<sym_mat> (K, trans(PJt_tmp));
 		}
 
 		void ExtendedKalmanFilterIndirect::initialize(const ind_array & ia_x, const mat & G_v, const ind_array & ia_rs, const ind_array & ia_l, const mat & G_y, const sym_mat & R){

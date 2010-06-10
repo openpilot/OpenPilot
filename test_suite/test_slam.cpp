@@ -108,15 +108,16 @@ void test_slam01() {
 
 	// display::ViewerQt viewerQt;
 
-	for (int t = 1; t <= 2; t++) {
+	for (int t = 1; t <= 4; t++) {
 
-		cout << "\nTIME : " << t << endl;
+		cout << "\n************************************************** " << endl;
+		cout << "TIME : " << t << endl;
 
 		// foreach robot
 		for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin(); robIter != mapPtr->robotList().end(); robIter++)
 		{
 			robot_ptr_t robPtr = *robIter;
-			cout << "\nROBOT: " << robPtr->id() << endl;
+			cout << "\n================================================== " << endl;
 
 			vec u(robPtr->mySize_control()); // TODO put some real values in u.
 			fillVector(u, 0.0);
@@ -129,7 +130,7 @@ void test_slam01() {
 			for (RobotAbstract::SensorList::iterator senIter = robPtr->sensorList().begin(); senIter != robPtr->sensorList().end(); senIter++)
 			{
 				sensor_ptr_t senPtr = *senIter;
-				cout << "\nSENSOR: " << senPtr->id() << endl;
+				cout << "\n________________________________________________ " << endl;
 				cout << *senPtr << endl;
 
 				// get raw-data
@@ -172,14 +173,15 @@ void test_slam01() {
 							// 1f. if feature is inlier
 							if (obsPtr->compatibilityTest(3.0)) { // use 3.0 for 3-sigma or the 5% proba from the chi-square tables.
 								obsPtr->counters.nInlier++;
-								JFR_DEBUG("P_rsl: " << ublas::project(obsPtr->landmarkPtr()->mapPtr()->filterPtr->P(), obsPtr->ia_rsl, obsPtr->ia_rsl))
+//								JFR_DEBUG("P_rsl: " << ublas::project(obsPtr->landmarkPtr()->mapPtr()->filterPtr->P(), obsPtr->ia_rsl, obsPtr->ia_rsl))
 								obsPtr->update() ;
-								JFR_DEBUG("P_rsl: " << ublas::project(obsPtr->landmarkPtr()->mapPtr()->filterPtr->P(), obsPtr->ia_rsl, obsPtr->ia_rsl))
+//								JFR_DEBUG("P_rsl: " << ublas::project(obsPtr->landmarkPtr()->mapPtr()->filterPtr->P(), obsPtr->ia_rsl, obsPtr->ia_rsl))
 								obsPtr->events.updated = true;
 							} // obsPtr->compatibilityTest(3.0)
 						} // obsPtr->getScoreMatchInPercent()>80
 					} // obsPtr->isVisible()
 
+					cout << "\n-------------------------------------------------- " << endl;
 					cout << *obsPtr << endl;
 
 				} // foreach observation
@@ -196,6 +198,7 @@ void test_slam01() {
 						feature_ptr_t featPtr(new FeatureAbstract(2));
 //						if (ObservationPinHolePoint::detectInRoi(senPtr->getRaw(), roi, featPtr)){
 						if (senPtr->getRaw()->detect(RawAbstract::HARRIS, featPtr, &roi)) {
+							cout << "\n-------------------------------------------------- " << endl;
 							cout << "Detected pixel: " << featPtr->state.x() << endl;
 							cout << "Initializing lmk..." << endl;
 
@@ -218,10 +221,10 @@ void test_slam01() {
 							obsPtr->setup(measNoiseStd, ObservationPinHoleAnchoredHomogeneousPoint::getPrior());
 							obsPtr->measurement.x(featPtr->state.x());
 
-							// 2d. comute and fill data for the landmark
+							// 2d. compute and fill stochastic data for the landmark
 							obsPtr->backProject();
 
-							// 2e. Create descriptor
+							// 2e. Create lmk descriptor
 							vec7 globalSensorPose = senPtr->globalPose();
 							lmkPtr->createDescriptor(featPtr->appearancePtr, globalSensorPose);
 
@@ -240,7 +243,7 @@ void test_slam01() {
 		//viewerQt.render();
 	}
 	
-	std::cout << "FINISHED !" << std::endl;
+	std::cout << "\nFINISHED !" << std::endl;
 
 
 }

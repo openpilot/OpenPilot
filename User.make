@@ -23,4 +23,4 @@ LIBS += -lkernel -ljmath -limage -lqdisplay
 # CPPFLAGS += -DJFR_NDEBUG
 CPPFLAGS += $(OPENCV_CPPFLAGS) $(QT4_CPPFLAGS) $(BOOST_CPPFLAGS) $(BOOST_SANDBOX_CPPFLAGS) 
 
-CXXFLAGS += -g -O0 -ggdb -Wall
+CXXFLAGS += -g -O0 -ggdb -Wall -pthread

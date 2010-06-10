@@ -74,7 +74,6 @@ namespace jafar {
 
 
 				void RobotAbstract::move() {
-					//move_func(); // x = F(x, u); Update Jacobians dxnew/dx and dxnew/du
 					vec x = state.x();
 					vec n = perturbation.x();
 					vec xnew(x.size());
@@ -91,16 +90,6 @@ namespace jafar {
 					}
 				}
 
-//		void RobotAbstract::move() {
-//			//move_func(); // x = F(x, u); Update Jacobians dxnew/dx and dxnew/du
-//			vec x = state.x();
-//			vec n = perturbation.x();
-//			move_func(x, control, n, dt_or_dx, x, XNEW_x, XNEW_pert);
-//			state.x() = x;
-//			if (!constantPerturbation)
-//				computeStatePerturbation();
-//			mapPtr->filterPtr->predict(mapPtr->ia_used_states(), XNEW_x, state.ia(), Q); // P = F*P*F' + Q
-//		}
 
 		void RobotAbstract::computeStatePerturbation() {
 			Q = jmath::ublasExtra::prod_JPJt(perturbation.P(), XNEW_pert);

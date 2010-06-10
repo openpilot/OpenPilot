@@ -13,6 +13,7 @@
 #include "qdisplay/Viewer.hpp"
 #include "qdisplay/Shape.hpp"
 #include "qdisplay/Ellipsoid.hpp"
+#include "qdisplay/init.hpp"
 
 #include "rtslam/display.hpp"
 #include "rtslam/rawImage.hpp"
@@ -90,6 +91,7 @@ class SensorQt : public SensorDisplay
 			viewer_ = new qdisplay::Viewer();
 			view_ = new qdisplay::ImageView();
 			viewer_->setImageView(view_, 0, 0);
+			viewer_->resize(640,480);
 		}
 		~SensorQt()
 		{

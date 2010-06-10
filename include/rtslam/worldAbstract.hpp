@@ -12,6 +12,7 @@
 #ifndef WORLDABSTRACT_HPP_
 #define WORLDABSTRACT_HPP_
 
+#include "kernel/threads.hpp"
 #include "jmath/jblas.hpp"
 #include "rtslam/rtSlam.hpp"
 #include "rtslam/objectAbstract.hpp"
@@ -26,9 +27,9 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
-
 		// some forward declarations.
 		class MapAbstract;
+		namespace display { class ViewerAbstract; }
 
 
 		/** Base class for all world types defined in the module rtslam.
@@ -39,6 +40,7 @@ namespace jafar {
 		class WorldAbstract: public ObjectAbstract, public ParentOf<MapAbstract> {
 
 			ENABLE_ACCESS_TO_CHILDREN(MapAbstract,Map,map);
+			std::vector<display::ViewerAbstract*> display_viewers;
 
 			public:
 
@@ -57,7 +59,10 @@ namespace jafar {
 				{
 					mapList().push_back(map);
 				}
-
+				
+				kernel::FifoMutex display_mutex;
+				void addDisplayViewer(display::ViewerAbstract *viewer, unsigned id);
+				display::ViewerAbstract* getDisplayViewer(unsigned id);
 		};
 
 	}

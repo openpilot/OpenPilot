@@ -36,19 +36,20 @@
 #include "rtslam/featureAbstract.hpp"
 #include "rtslam/rawImage.hpp"
 
-//#include "rtslam/display_qt.hpp"
+#include "rtslam/display_qt.hpp"
 //#include "image/Image.hpp"
 
 //#include <map>
 
 using namespace jblas;
+using namespace jafar;
 using namespace jafar::jmath;
 using namespace jafar::jmath::ublasExtra;
 using namespace jafar::rtslam;
 using namespace boost;
 
 
-void test_slam01() {
+void test_slam01_main(world_ptr_t *world) {
 	ActiveSearchGrid asGrid(640, 480, 5, 5, 0);
 	vec2 imSz;
 	imSz(0) = 640; imSz(1) = 480;
@@ -56,7 +57,9 @@ void test_slam01() {
 	vec d(0), c(0);
 	k(0) = 320; k(1) = 320; k(2) = 320; k(3) = 320;
 	// INIT : 1 map, 2 robs, 3 sens
-	world_ptr_t worldPtr(new WorldAbstract());
+	//world_ptr_t worldPtr(new WorldAbstract());
+	world_ptr_t worldPtr = *world;
+	worldPtr->display_mutex.lock();
 	map_ptr_t mapPtr(new MapAbstract(100));
 	worldPtr->addMap(mapPtr);
 	mapPtr->clear();
@@ -98,6 +101,7 @@ void test_slam01() {
 	// Show empty map
 	cout << *mapPtr << endl;
 
+	worldPtr->display_mutex.unlock();
 
 
 	// INIT : complete observations set
@@ -106,13 +110,14 @@ void test_slam01() {
 	// create sen--lmk observation
 	// Temporal loop
 
-	// display::ViewerQt viewerQt;
 
-	for (int t = 1; t <= 4; t++) {
 
+	for (int t = 1; t <= 100; t++) {
+		sleep(1);
+
+		worldPtr->display_mutex.lock();
 		cout << "\n************************************************** " << endl;
 		cout << "TIME : " << t << endl;
-
 		// foreach robot
 		for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin(); robIter != mapPtr->robotList().end(); robIter++)
 		{
@@ -238,15 +243,40 @@ void test_slam01() {
 
 			}
 		}
+		worldPtr->display_mutex.unlock();
 
-		//viewerQt.bufferize(worldPtr);
-		//viewerQt.render();
 	}
 	
 	std::cout << "\nFINISHED !" << std::endl;
 
 
 }
+
+
+void test_slam01_display(world_ptr_t *world)
+{
+	//(*world)->display_mutex.lock();
+	qdisplay::qtMutexLock<kernel::FifoMutex>((*world)->display_mutex);
+	display::ViewerQt *viewerQt = static_cast<display::ViewerQt*>((*world)->getDisplayViewer(display::ViewerQt::id()));
+	if (viewerQt == NULL)
+	{
+		viewerQt = new display::ViewerQt();
+		(*world)->addDisplayViewer(viewerQt, display::ViewerQt::id());
+	}
+	viewerQt->bufferize(*world);
+	(*world)->display_mutex.unlock();
+	
+	viewerQt->render();
+}
+
+
+void test_slam01() {
+	world_ptr_t worldPtr(new WorldAbstract());
+	
+	qdisplay::QtAppStart((qdisplay::FUNC)&test_slam01_display,(qdisplay::FUNC)&test_slam01_main,1000,&worldPtr);
+	JFR_DEBUG("terminated");
+}
+
 
 
 BOOST_AUTO_TEST_CASE( test_slam )

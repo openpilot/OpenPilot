@@ -45,7 +45,7 @@ FlightGearBridge::FlightGearBridge()
     actDesired = ActuatorDesired::GetInstance(objManager);
     altActual = AltitudeActual::GetInstance(objManager);
     attActual = AttitudeActual::GetInstance(objManager);
-    gps = GpsObject::GetInstance(objManager);
+    posActual = PositionActual::GetInstance(objManager);
     telStats = GCSTelemetryStats::GetInstance(objManager);
 
     // Listen to autopilot connection events
@@ -152,7 +152,7 @@ void FlightGearBridge::setupObjects()
     setupInputObject(actDesired, 50);
     setupOutputObject(altActual, 250);
     setupOutputObject(attActual, 50);
-    setupOutputObject(gps, 250);
+    setupOutputObject(posActual, 250);
 }
 
 void FlightGearBridge::setupInputObject(UAVObject* obj, int updatePeriod)
@@ -270,15 +270,15 @@ void FlightGearBridge::processUpdate(QString& data)
     attActual->setData(attActualData);
 
     // Update gps objects
-    GpsObject::DataFields gpsData;
+    PositionActual::DataFields gpsData;
     gpsData.Altitude = altitude;
     gpsData.Heading = heading;
-    gpsData.GroundSpeed = groundspeed;
+    gpsData.Groundspeed = groundspeed;
     gpsData.Latitude = latitude;
     gpsData.Longitude = longitude;
     gpsData.Satellites = 10;
-    gpsData.Updates = 0;
-    gps->setData(gpsData);
+    gpsData.Status = PositionActual::STATUS_FIX3D;
+    posActual->setData(gpsData);
 }
 
 void FlightGearBridge::telStatsUpdated(UAVObject* obj)

@@ -68,7 +68,7 @@ MapGadgetWidget::MapGadgetWidget(QWidget *parent) : QWidget(parent)
     // Get required UAVObjects
     ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
-    m_gpsObj = GpsObject::GetInstance(objManager);
+    m_positionActual = PositionActual::GetInstance(objManager);
 
     m_updateTimer = new QTimer();
     m_updateTimer->setInterval(250);
@@ -94,7 +94,7 @@ void MapGadgetWidget::setPosition(QPointF pos)
 
 void MapGadgetWidget::updatePosition()
 {
-    GpsObject::DataFields data = m_gpsObj->getData();
+    PositionActual::DataFields data = m_positionActual->getData();
     setPosition(QPointF(data.Longitude, data.Latitude));
 }
 

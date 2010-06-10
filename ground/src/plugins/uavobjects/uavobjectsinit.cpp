@@ -42,10 +42,10 @@
 #include "examplesettings.h"
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
-#include "gpsobject.h"
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
 #include "objectpersistence.h"
+#include "positionactual.h"
 #include "stabilizationsettings.h"
 #include "systemalarms.h"
 #include "systemsettings.h"
@@ -71,10 +71,10 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new ExampleSettings() );
     objMngr->registerObject( new FlightTelemetryStats() );
     objMngr->registerObject( new GCSTelemetryStats() );
-    objMngr->registerObject( new GpsObject() );
     objMngr->registerObject( new ManualControlCommand() );
     objMngr->registerObject( new ManualControlSettings() );
     objMngr->registerObject( new ObjectPersistence() );
+    objMngr->registerObject( new PositionActual() );
     objMngr->registerObject( new StabilizationSettings() );
     objMngr->registerObject( new SystemAlarms() );
     objMngr->registerObject( new SystemSettings() );

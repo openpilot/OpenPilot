@@ -273,7 +273,7 @@ TestDataGen::TestDataGen()
     UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
 
     altActual = AltitudeActual::GetInstance(objManager);
-    gps = GpsObject::GetInstance(objManager);
+    gps = PositionActual::GetInstance(objManager);
 
     //Setup timer
     timer = new QTimer(this);
@@ -292,14 +292,13 @@ void TestDataGen::genTestData()
 
 
     // Update gps objects
-    GpsObject::DataFields gpsData;
+    PositionActual::DataFields gpsData;
     gpsData.Altitude = 0;
     gpsData.Heading = 0;
-    gpsData.GroundSpeed = 0;
+    gpsData.Groundspeed = 0;
     gpsData.Latitude = 0;
     gpsData.Longitude = 0;
     gpsData.Satellites = 10;
-    gpsData.Updates = 0;
     gps->setData(gpsData);
 
     testTime++;

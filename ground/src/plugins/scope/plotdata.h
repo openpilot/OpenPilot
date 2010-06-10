@@ -30,7 +30,7 @@
 
 #include "uavobjects/uavobject.h"
 #include "uavobjects/altitudeactual.h"
-#include "uavobjects/gpsobject.h"
+#include "uavobjects/positionactual.h"
 
 
 #include "qwt/src/qwt.h"

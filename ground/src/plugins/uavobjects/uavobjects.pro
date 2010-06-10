@@ -16,7 +16,6 @@ HEADERS += uavobjects_global.h \
     attitudesettings.h \
     exampleobject2.h \
     exampleobject1.h \
-    gpsobject.h \
     gcstelemetrystats.h \
     flighttelemetrystats.h \
     systemstats.h \
@@ -30,7 +29,8 @@ HEADERS += uavobjects_global.h \
     attitudedesired.h \
     actuatorsettings.h \
     actuatordesired.h \
-    actuatorcommand.h
+    actuatorcommand.h \
+    positionactual.h
 SOURCES += uavobject.cpp \
     uavmetaobject.cpp \
     uavobjectmanager.cpp \
@@ -44,7 +44,6 @@ SOURCES += uavobject.cpp \
     examplesettings.cpp \
     exampleobject2.cpp \
     exampleobject1.cpp \
-    gpsobject.cpp \
     gcstelemetrystats.cpp \
     flighttelemetrystats.cpp \
     systemstats.cpp \
@@ -58,6 +57,7 @@ SOURCES += uavobject.cpp \
     attitudedesired.cpp \
     actuatorsettings.cpp \
     actuatordesired.cpp \
-    actuatorcommand.cpp
+    actuatorcommand.cpp \
+    positionactual.cpp
 DEFINES += UAVOBJECTS_LIBRARY
 OTHER_FILES += UAVObjects.pluginspec

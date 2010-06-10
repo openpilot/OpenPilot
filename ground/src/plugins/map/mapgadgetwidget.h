@@ -31,7 +31,7 @@
 #include "qmapcontrol/qmapcontrol.h"
 #include <QtGui/QWidget>
 #include "uavobjects/uavobjectmanager.h"
-#include "uavobjects/gpsobject.h"
+#include "uavobjects/positionactual.h"
 
 using namespace qmapcontrol;
 
@@ -66,7 +66,7 @@ private:
    Layer *m_googleSatLayer;
    Layer *m_yahooLayer;
    QTimer *m_updateTimer;
-   GpsObject *m_gpsObj;
+   PositionActual *m_positionActual;
 };
 
 #endif /* MAPGADGETWIDGET_H_ */

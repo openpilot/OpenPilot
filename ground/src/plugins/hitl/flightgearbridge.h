@@ -37,7 +37,7 @@
 #include "uavobjects/actuatordesired.h"
 #include "uavobjects/altitudeactual.h"
 #include "uavobjects/attitudeactual.h"
-#include "uavobjects/gpsobject.h"
+#include "uavobjects/positionactual.h"
 #include "uavobjects/gcstelemetrystats.h"
 
 class FlightGearBridge: public QObject
@@ -75,7 +75,7 @@ private:
     ActuatorDesired* actDesired;
     AltitudeActual* altActual;
     AttitudeActual* attActual;
-    GpsObject* gps;
+    PositionActual* posActual;
     GCSTelemetryStats* telStats;
     QHostAddress fgHost;
     int inPort;

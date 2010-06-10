@@ -1,13 +1,12 @@
 <xml>
-        <object name="GpsObject" singleinstance="true" settings="false">
+        <object name="PositionActual" singleinstance="true" settings="false">
+            <field name="Status" units="" type="enum" elements="1" options="NoGPS,NoFix,Fix2D,Fix3D"/>
             <field name="Latitude" units="degrees" type="float" elements="1"/>
             <field name="Longitude" units="degrees" type="float" elements="1"/>
             <field name="Altitude" units="meters" type="float" elements="1"/>
             <field name="Heading" units="degrees" type="float" elements="1"/>
-            <field name="GroundSpeed" units="m/s" type="float" elements="1"/>
+            <field name="Groundspeed" units="m/s" type="float" elements="1"/>
             <field name="Satellites" units="" type="int8" elements="1"/>
-            <field name="Updates" units="" type="uint16" elements="1"/>
-            <field name="Failures" units="" type="uint16" elements="1"/>
             <field name="PDOP" units="" type="float" elements="1"/>
             <field name="HDOP" units="" type="float" elements="1"/>
             <field name="VDOP" units="" type="float" elements="1"/>

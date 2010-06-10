@@ -26,7 +26,7 @@
 #include "openpilot.h"
 #include "buffer.h"
 #include "GPS.h"
-#include "gpsobject.h"
+#include "positionactual.h"
 
 // constants/macros/typdefs
 #define NMEA_BUFFERSIZE		128
@@ -40,6 +40,8 @@
 #define NMEA_GPGSA		5	// GPS DOP and active satellites
 #define NMEA_GPRMC		6	// Recommended minimum specific GPS data
 #define NMEA_UNKNOWN	0xFF// Packet received but not known
+
+#define GPS_TIMEOUT_MS 500
 
 // Debugging
 
@@ -79,6 +81,9 @@ static xTaskHandle gpsTaskHandle;
 cBuffer gpsRxBuffer;
 static char gpsRxData[512];
 char NmeaPacket[NMEA_BUFFERSIZE];
+static uint32_t numUpdates;
+static uint32_t numErrors;
+static uint32_t timeOfLastUpdateMs;
 
 /**
  * Initialise the gps module
@@ -88,6 +93,12 @@ char NmeaPacket[NMEA_BUFFERSIZE];
 int32_t GPSInitialize(void)
 {
 	signed portBASE_TYPE xReturn;
+
+	// Init vars
+	numUpdates = 0;
+	numErrors = 0;
+	timeOfLastUpdateMs = 0;
+
 	// TODO: Get gps settings object
 	gpsPort = COM_USART2;
 
@@ -109,6 +120,8 @@ static void gpsTask(void* parameters)
 	int32_t gpsRxOverflow=0;
 	char c;
 	portTickType xDelay = 100 / portTICK_RATE_MS;
+	PositionActualData GpsData;
+	uint32_t timeNowMs;
 
 	// Loop forever
 	while(1)
@@ -126,6 +139,15 @@ static void gpsTask(void* parameters)
 			}
 			nmeaProcess(&gpsRxBuffer);
 		}
+		// Check for GPS timeout
+		timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
+		if ( (timeNowMs - timeOfLastUpdateMs) > GPS_TIMEOUT_MS )
+		{
+			PositionActualGet(&GpsData);
+			GpsData.Status = POSITIONACTUAL_STATUS_NOGPS;
+			PositionActualSet(&GpsData);
+		}
+		// Block task until next update
 		vTaskDelay(xDelay);
 	}
 }
@@ -145,8 +167,8 @@ char nmeaChecksum(char* gps_buffer)
 {
 	char checksum=0;
 	char checksum_received=0;
-	GpsObjectData GpsData;
-	GpsObjectGet(&GpsData);
+	PositionActualData GpsData;
+	PositionActualGet(&GpsData);
 
 	for(int x=0; x<NMEA_BUFFERSIZE; x++)
 	{
@@ -165,14 +187,13 @@ char nmeaChecksum(char* gps_buffer)
 	//PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"$%d=%d\r\n",checksum_received,checksum);
 	if(checksum == checksum_received)
 	{
-		GpsData.Updates++;
-		GpsObjectSet(&GpsData);
+		++numUpdates;
+		timeOfLastUpdateMs = xTaskGetTickCount() * portTICK_RATE_MS;
 		return 1;
 	}
 	else
 	{
-		GpsData.Failures++;
-		GpsObjectSet(&GpsData);
+		++numErrors;
 		return 0;
 	}
 }
@@ -300,7 +321,7 @@ uint8_t nmeaProcess(cBuffer* rxBuffer)
  */
 void nmeaProcessGPGGA(char* packet)
 {
-	GpsObjectData GpsData;
+	PositionActualData GpsData;
 
 	char *tokens;
     char *delimiter = ",";
@@ -324,7 +345,7 @@ void nmeaProcessGPGGA(char* packet)
 		return;
 	}
 
-	GpsObjectGet(&GpsData);
+	PositionActualGet(&GpsData);
 	// tokenizer for nmea sentence
 	//GPGGA header
 	tokens = strsep(&packet, delimiter);
@@ -417,7 +438,7 @@ void nmeaProcessGPGGA(char* packet)
 	// next field: DGPS age
 	// next field: DGPS station ID
 	// next field: checksum
-	GpsObjectSet(&GpsData);
+	PositionActualSet(&GpsData);
 }
 
 /**
@@ -426,7 +447,7 @@ void nmeaProcessGPGGA(char* packet)
  */
 void nmeaProcessGPRMC(char* packet)
 {
-	GpsObjectData GpsData;
+	PositionActualData GpsData;
 
 	char *tokens;
     char *delimiter = ",";
@@ -450,7 +471,7 @@ void nmeaProcessGPRMC(char* packet)
 		return;
 	}
 
-	GpsObjectGet(&GpsData);
+	PositionActualGet(&GpsData);
 	// tokenizer for nmea sentence
 	//GPRMC header
 	tokens = strsep(&packet, delimiter);
@@ -517,7 +538,7 @@ void nmeaProcessGPRMC(char* packet)
 	tokens = strsep(&packet, delimiter);
 	deg=strtol (tokens,&pEnd,10);
 	desim=strtol (pEnd+1,NULL,10);
-	GpsData.GroundSpeed = (deg+(desim/100.0))*0.51444; //OPGPS style to m/s
+	GpsData.Groundspeed = (deg+(desim/100.0))*0.51444; //OPGPS style to m/s
 
 	// next field: True course
 	// get True course
@@ -533,7 +554,7 @@ void nmeaProcessGPRMC(char* packet)
 	// next field: Magnetic variation
 	// next field: E or W
 	// next field: checksum
-	GpsObjectSet(&GpsData);
+	PositionActualSet(&GpsData);
 }
 
 
@@ -543,7 +564,7 @@ void nmeaProcessGPRMC(char* packet)
  */
 void nmeaProcessGPVTG(char* packet)
 {
-	GpsObjectData GpsData;
+	PositionActualData GpsData;
 
 	char *tokens;
     char *delimiter = ",";
@@ -562,7 +583,7 @@ void nmeaProcessGPVTG(char* packet)
 		// checksum not valid
 		return;
 	}
-	GpsObjectGet(&GpsData);
+	PositionActualGet(&GpsData);
 	// tokenizer for nmea sentence
 
 	//GPVTG header
@@ -590,7 +611,7 @@ void nmeaProcessGPVTG(char* packet)
 	tokens = strsep(&packet, delimiter);
 	// next field: 'K'
 	// next field: checksum
-	GpsObjectSet(&GpsData);
+	PositionActualSet(&GpsData);
 
 }
 
@@ -600,12 +621,13 @@ void nmeaProcessGPVTG(char* packet)
  */
 void nmeaProcessGPGSA(char* packet)
 {
-	GpsObjectData GpsData;
+	PositionActualData GpsData;
 
 	char *tokens;
     char *delimiter = ",";
     char *pEnd;
     long value,desim;
+    int mode;
 
 	#ifdef NMEA_DEBUG_GSA
 		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"$%s\r\n",packet);
@@ -621,7 +643,7 @@ void nmeaProcessGPGSA(char* packet)
 		// checksum not valid
 		return;
 	}
-	GpsObjectGet(&GpsData);
+	PositionActualGet(&GpsData);
 	// tokenizer for nmea sentence
 
 	//GPGSA header
@@ -633,6 +655,19 @@ void nmeaProcessGPGSA(char* packet)
     // next field: Mode
     // Mode: 1=Fix not available, 2=2D, 3=3D
 	tokens = strsep(&packet, delimiter);
+	mode = atoi(tokens);
+	if (mode == 1)
+	{
+		GpsData.Status = POSITIONACTUAL_STATUS_NOFIX;
+	}
+	else if (mode == 2)
+	{
+		GpsData.Status = POSITIONACTUAL_STATUS_FIX2D;
+	}
+	else if (mode == 3)
+	{
+		GpsData.Status = POSITIONACTUAL_STATUS_FIX3D;
+	}
 
     // next field: 3-14 IDs of SVs used in position fix (null for unused fields)
 	tokens = strsep(&packet, delimiter);
@@ -664,7 +699,7 @@ void nmeaProcessGPGSA(char* packet)
 	desim=strtol (pEnd+1,NULL,10);
 	GpsData.VDOP=value+desim/100.0;
 	// next field: checksum
-	GpsObjectSet(&GpsData);
+	PositionActualSet(&GpsData);
 
 }
 

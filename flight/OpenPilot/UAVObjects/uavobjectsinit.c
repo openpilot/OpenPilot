@@ -40,10 +40,10 @@
 #include "examplesettings.h"
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
-#include "gpsobject.h"
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
 #include "objectpersistence.h"
+#include "positionactual.h"
 #include "stabilizationsettings.h"
 #include "systemalarms.h"
 #include "systemsettings.h"
@@ -69,10 +69,10 @@ void UAVObjectsInitializeAll()
     ExampleSettingsInitialize();
     FlightTelemetryStatsInitialize();
     GCSTelemetryStatsInitialize();
-    GpsObjectInitialize();
     ManualControlCommandInitialize();
     ManualControlSettingsInitialize();
     ObjectPersistenceInitialize();
+    PositionActualInitialize();
     StabilizationSettingsInitialize();
     SystemAlarmsInitialize();
     SystemSettingsInitialize();

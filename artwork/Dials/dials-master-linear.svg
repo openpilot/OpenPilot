@@ -232,16 +232,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="7.9195959"
-     inkscape:cx="197.58205"
+     inkscape:zoom="2.8"
+     inkscape:cx="150.43919"
      inkscape:cy="20.867055"
      inkscape:document-units="px"
-     inkscape:current-layer="g2932"
+     inkscape:current-layer="background"
      showgrid="false"
      inkscape:window-width="1280"
-     inkscape:window-height="998"
+     inkscape:window-height="744"
      inkscape:window-x="-4"
-     inkscape:window-y="-4"
+     inkscape:window-y="1020"
      inkscape:window-maximized="1"
      inkscape:object-paths="true"
      showguides="true"
@@ -286,27 +286,6 @@
          inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
          inkscape:export-xdpi="88.809998"
          inkscape:export-ydpi="88.809998" />
-      <g
-         id="g2591"
-         transform="matrix(0.03233219,0,0,0.03233219,689.99156,319.28907)"
-         style="display:inline">
-        <path
-           sodipodi:nodetypes="cccccccccccccccccccccccccccccccc"
-           id="path2603"
-           transform="translate(-6411.3421,1598.2484)"
-           d="m 1212.9375,688.875 c -10.0494,-0.18009 -18.8265,4.06634 -22.625,16.1875 l -34.75,117.34375 55.9063,30.59375 24.0937,-91.5 c 6.8335,-10.5642 16.8382,-6.50038 27.3437,-0.125 l 82.8438,54.5625 c 7.1912,6.0887 12.0843,14.26627 11.625,27.375 l -5.125,72.5625 c -1.0457,9.9542 -7.0498,16.15838 -11.7812,15.3125 l -130.875,-71.09375 -23.1563,87.78125 12.0937,4.375 19.75,7.15625 130.75,47.31255 c 19.5177,7.1453 36.967,-14.45887 37.5938,-46.62505 L 1387.1875,844.5 c -0.3794,-28.3851 -14.1686,-43.93703 -27.9375,-55.0625 l -109.2812,-85.34375 c -9.1011,-7.43642 -24.1106,-14.9872 -37.0313,-15.21875 z m -108.8503,112.40874 -27.4622,106.84126 18.1809,5.34624 0,-0.0312 98.1868,36.80116 28.7911,-83.5022 -117.6966,-65.45521 z m 14.194,147.06001 -23.9687,81.03125 61.7187,33.9688 24.9376,-94.68755 -62.6876,-20.3125 z"
-           style="fill:#ffffff;fill-opacity:1;stroke:none" />
-        <path
-           sodipodi:nodetypes="cccccccccccc"
-           id="path2605"
-           d="m -5331.9089,2431.23 -11.3323,-6.4174 9.9517,-36.7409 -25.1805,-13.7542 -55.5528,23.5818 -76.6225,-20.2729 68.1271,46.1567 26.6499,63.8068 34.5303,11.3175 10.8525,-40.7996 10.7025,1.6951 7.8741,-28.5729 z"
-           style="fill:#ffffff;fill-opacity:1;stroke:none"
-           inkscape:transform-center-x="-8.1593243"
-           inkscape:transform-center-y="82.140396"
-           inkscape:export-filename="C:\Documents and Settings\t12\My Documents\My Dropbox\graphicswork\openpilot.org\textplay.png"
-           inkscape:export-xdpi="122.68"
-           inkscape:export-ydpi="122.68" />
-      </g>
       <rect
          inkscape:label="#rect4388"
          inkscape:export-ydpi="88.809998"

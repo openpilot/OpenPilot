@@ -61,6 +61,7 @@ void ModelViewGadgetOptionsPage::apply()
 {
     m_config->setAcFilename(m_page->modelPathChooser->path());
     m_config->setBgFilename(m_page->backgroundPathChooser->path());
+    m_config->setVboEnabled(m_page->enableVbo->isChecked());
 }
 
 void ModelViewGadgetOptionsPage::finish()

@@ -31,12 +31,14 @@
 ModelViewGadgetConfiguration::ModelViewGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),
     m_acFilename("../artwork/3D Model/quad.dae"),
-    m_bgFilename("../artwork/3D Model/default_background.png")
+    m_bgFilename("../artwork/3D Model/default_background.png"),
+    m_enableVbo(false)
 {
     if (state.count() > 0) {
         QDataStream stream(state);
         stream >> m_acFilename;
         stream >> m_bgFilename;
+	stream >> m_enableVbo;
     }
 }
 
@@ -45,6 +47,7 @@ IUAVGadgetConfiguration *ModelViewGadgetConfiguration::clone()
     ModelViewGadgetConfiguration *mv = new ModelViewGadgetConfiguration(this->classId());
     mv->m_acFilename = m_acFilename;
     mv->m_bgFilename = m_bgFilename;
+    mv->m_enableVbo = m_enableVbo;
     return mv;
 }
 
@@ -55,6 +58,7 @@ QByteArray ModelViewGadgetConfiguration::saveState() const
     QDataStream stream(&bytes, QIODevice::WriteOnly);
     stream << m_acFilename;
     stream << m_bgFilename;
+    stream << m_enableVbo;
     return bytes;
 }
 

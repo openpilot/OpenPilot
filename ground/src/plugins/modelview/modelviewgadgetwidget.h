@@ -51,6 +51,7 @@ public:
    ~ModelViewGadgetWidget();
    void setAcFilename(QString acf) { acFilename = acf; }
    void setBgFilename(QString bgf) { bgFilename = bgf; }
+   void setVboEnable(bool eVbo) { vboEnable = eVbo; }
    void reloadScene();
    void updateAttitude(int value);
 
@@ -87,6 +88,7 @@ private:
 
     QString acFilename;
     QString bgFilename;
+    bool vboEnable;
 
     AttitudeActual* attActual;
 };

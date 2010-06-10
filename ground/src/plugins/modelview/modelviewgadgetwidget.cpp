@@ -78,9 +78,13 @@ void ModelViewGadgetWidget::initializeGL()
 {
     // OpenGL initialization
     m_GlView.initGl();
+    if (!vboEnable) 
+    {
+	GLC_State::setVboUsage(false); 
+	qDebug("VBOs disabled.  Enable for better performance if GPU supports it.");
+    }
 
     m_GlView.reframe(m_ModelBoundingBox);
-    //m_GlView.reframe(m_World.boundingBox());
     // Calculate camera depth of view
     m_GlView.setDistMinAndMax(m_World.boundingBox());
     glEnable(GL_NORMALIZE);
@@ -90,7 +94,6 @@ void ModelViewGadgetWidget::initializeGL()
 
 void ModelViewGadgetWidget::resizeEvent(QResizeEvent *event)
 {
-//   printf("%d,%d\n", width(), height());
 //   m_GlView.setWinGLSize(width(), height());
    QWidget::resizeEvent(event);
 }
@@ -124,7 +127,6 @@ void ModelViewGadgetWidget::resizeGL(int width, int height)
 // Create GLC_Object to display
 void ModelViewGadgetWidget::CreateScene()
 {
-    // TODO: Replace with files from configuration page
     if (QFile::exists(bgFilename))
     {
         m_GlView.loadBackGroundImage(bgFilename);

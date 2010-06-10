@@ -43,6 +43,8 @@ public:
     void setAcFilename(QString acFile) { m_acFilename = acFile; }
     QString bgFilename() { return m_bgFilename; }
     void setBgFilename(QString bgFile) { m_bgFilename = bgFile; }
+    bool vboEnabled() { return m_enableVbo; }
+    void setVboEnabled(bool vboEnable) { m_enableVbo = vboEnable; }
 signals:
 
 public slots:
@@ -50,6 +52,7 @@ public slots:
 private:
     QString m_acFilename;
     QString m_bgFilename;
+    bool m_enableVbo;  // Vertex buffer objects, a few GPUs crash if enabled
 };
 
 #endif // MODELVIEWGADGETCONFIGURATION_H

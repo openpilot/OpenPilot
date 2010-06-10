@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>378</width>
     <height>300</height>
    </rect>
   </property>
@@ -37,7 +37,7 @@
    <item row="0" column="1">
     <widget class="Utils::PathChooser" name="modelPathChooser" native="true"/>
    </item>
-   <item row="2" column="0">
+   <item row="3" column="0">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -49,6 +49,23 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item row="2" column="1">
+    <widget class="QCheckBox" name="enableVbo">
+     <property name="whatsThis">
+      <string>VBO allow for performance gains for GPUs that support it (most cards).  This may cause cards with faulty drivers to crash.</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Enable VBOs:</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

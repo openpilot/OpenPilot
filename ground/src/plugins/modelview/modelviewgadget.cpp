@@ -44,6 +44,7 @@ void ModelViewGadget::loadConfiguration(IUAVGadgetConfiguration* config)
     ModelViewGadgetConfiguration *m = qobject_cast<ModelViewGadgetConfiguration*>(config);
     m_widget->setAcFilename(m->acFilename());
     m_widget->setBgFilename(m->bgFilename());
+    m_widget->setVboEnable(m->vboEnabled());
     m_widget->reloadScene();
 }
 

@@ -29,7 +29,8 @@
 #define LINEARDIALGADGETOPTIONSPAGE_H
 
 #include "coreplugin/dialogs/ioptionspage.h"
-#include "QString"
+#include <QString>
+#include <QFont>
 #include <QStringList>
 #include <QDebug>
 
@@ -58,9 +59,11 @@ public:
 private:
     Ui::LineardialGadgetOptionsPage *options_page;
     LineardialGadgetConfiguration *m_config;
+    QFont font;
 
 private slots:
     void on_loadFile_clicked();
+    void on_fontPicker_clicked();
     void on_objectName_currentIndexChanged(QString val);
 
 };

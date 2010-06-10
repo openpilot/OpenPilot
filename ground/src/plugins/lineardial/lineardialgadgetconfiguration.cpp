@@ -60,6 +60,7 @@ LineardialGadgetConfiguration::LineardialGadgetConfiguration(QString classId, co
         stream >> yellowMax;
         stream >> greenMin;
         stream >> greenMax;
+        stream >> font;
     }
 }
 /**
@@ -91,6 +92,7 @@ QByteArray LineardialGadgetConfiguration::saveState() const
     stream << yellowMax;
     stream << greenMin;
     stream << greenMax;
+    stream << font;
 
     return bytes;
 }

@@ -234,6 +234,16 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
    { std::cout<<"no file: "<<std::endl; }
 }
 
+
+void LineardialGadgetWidget::setDialFont(QString fontProps)
+{
+    QFont font = QFont("Arial",12);
+    font.fromString(fontProps);
+    fieldName->setFont(font);
+    fieldValue->setFont(font);
+}
+
+
 void LineardialGadgetWidget::paint()
 {
     QGraphicsScene *l_scene = scene();

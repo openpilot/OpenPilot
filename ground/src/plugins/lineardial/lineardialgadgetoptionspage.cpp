@@ -35,11 +35,13 @@
 #include <QFileDialog>
 #include <QtAlgorithms>
 #include <QStringList>
+#include <QFontDialog>
 
 LineardialGadgetOptionsPage::LineardialGadgetOptionsPage(LineardialGadgetConfiguration *config, QObject *parent) :
         IOptionsPage(parent),
         m_config(config)
 {
+    font = QFont("Arial", 12); // Default in case nothing exists yet.
 }
 
 //creates options page widget (uses the UI file)
@@ -62,6 +64,7 @@ QWidget *LineardialGadgetOptionsPage::createPage(QWidget *parent)
     options_page->yellowMax->setValue(m_config->getYellowMax());
     options_page->redMin->setValue(m_config->getRedMin());
     options_page->redMax->setValue(m_config->getRedMax());
+    font.fromString(m_config->getFont());
 
     // Fills the combo boxes for the UAVObjects
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -89,6 +92,7 @@ QWidget *LineardialGadgetOptionsPage::createPage(QWidget *parent)
 
     connect(options_page->objectName, SIGNAL(currentIndexChanged(QString)), this, SLOT(on_objectName_currentIndexChanged(QString)));
     connect(options_page->loadFile, SIGNAL(clicked()), this, SLOT(on_loadFile_clicked()));
+    connect(options_page->fontPicker, SIGNAL(clicked()), this, SLOT(on_fontPicker_clicked()));
 
     return optionsPageWidget;
 }
@@ -108,7 +112,19 @@ void LineardialGadgetOptionsPage::apply()
     m_config->setRedRange(options_page->redMin->value(),options_page->redMax->value());
     m_config->setSourceDataObject(options_page->objectName->currentText());
     m_config->setSourceObjField(options_page->objectField->currentText());
+    m_config->setFont(font.toString());
 }
+
+/**
+ * Opens a font picker.
+ *
+ */
+void LineardialGadgetOptionsPage::on_fontPicker_clicked()
+{
+    bool ok;
+     font = QFontDialog::getFont(&ok, QFont("Arial", 12), qobject_cast<QWidget*>(this));
+}
+
 
 /**
 

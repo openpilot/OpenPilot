@@ -54,6 +54,7 @@ public:
    void setRedRange(double min, double max) {redMin=min; redMax=max;}
    void connectInput(QString obj, QString field);
    void setIndex(double val);
+   void setDialFont(QString fontProps);
 
 public slots:
     void updateIndex(UAVObject *object1);

@@ -48,6 +48,8 @@ public:
     void setYellowRange(double min, double max) { yellowMin = min; yellowMax = max;}
     void setRedRange(double min, double max) { redMin = min; redMax = max;}
 
+    void setFont(QString text) { font = text; }
+
     void setSourceDataObject(QString text) {sourceDataObject = text; }
     void setSourceObjField(QString text) { sourceObjectField = text; }
 
@@ -63,6 +65,7 @@ public:
     double getRedMax(){ return redMax;}
     QString getSourceDataObject() { return sourceDataObject;}
     QString getSourceObjectField() { return sourceObjectField;}
+    QString getFont() { return font;}
 
     QByteArray saveState() const;
     IUAVGadgetConfiguration *clone();
@@ -76,6 +79,8 @@ private:
     // * The name of the UAVObject field to display
     QString sourceDataObject;
     QString sourceObjectField;
+    // The font used for the dial
+    QString font;
     // * The minimum and maximum values to be displayed
     double minValue;
     double maxValue;

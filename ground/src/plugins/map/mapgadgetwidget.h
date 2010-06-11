@@ -50,8 +50,8 @@ public slots:
 //    void coordinateClicked(const QMouseEvent* evnt, const QPointF coordinate);	// added by cathy
     void geometryClicked(Geometry* geom, QPoint coord_px);			// added by cathy
 
-    void gscButtonClick();  // added by cathy
-    void uavButtonClick();  // added by cathy
+    void gscButtonClick();		// added by cathy
+    void uavButtonClick(bool checked);  // added by cathy
 
 protected:
     void resizeEvent(QResizeEvent *event);
@@ -80,6 +80,8 @@ private:
    QTimer *m_updateTimer;
 
    PositionActual *m_positionActual;
+
+    QPointF gscPosition;
 
     QPushButton *gscButton;	// added by cathy
     QPushButton *uavButton;	// added by cathy

@@ -70,7 +70,10 @@ MapGadgetWidget::MapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     addUserControls();
 
-    m_mc->setView(QPointF(5.718888888888, 58.963333333333));
+    gscPosition.setX(5.718888888888);	    // longitude
+    gscPosition.setY(58.963333333333);	    // latitude
+
+    m_mc->setView(gscPosition);
     m_mc->setZoom(10);
     m_mc->updateRequestNew();
 
@@ -98,6 +101,7 @@ MapGadgetWidget::~MapGadgetWidget()
 {
    // Do nothing
 }
+
 void MapGadgetWidget::setZoom(int value)
 {
     m_mc->setZoom(value);
@@ -148,7 +152,7 @@ void MapGadgetWidget::addUserControls()
 	uavButton->setMaximumWidth(50);
 	uavButton->setCheckable(true);
 	uavButton->setToolTip("Stay centered on the UAV");
-	connect(uavButton, SIGNAL(clicked(bool)), this, SLOT(uavButtonClick()));
+	connect(uavButton, SIGNAL(clicked(bool)), this, SLOT(uavButtonClick(bool)));
 
 	QPushButton* zoomin = new QPushButton("+");
 	zoomin->setMinimumWidth(50);
@@ -179,15 +183,16 @@ void MapGadgetWidget::addUserControls()
 void MapGadgetWidget::gscButtonClick()  // added by cathy
 {
     follow_uav = false;
-    uavButton->setChecked(false);
+    uavButton->setChecked(follow_uav);
 
     // jump straight too the GSC location
-
+    setPosition(gscPosition);
 }
 
-void MapGadgetWidget::uavButtonClick()  // added by cathy
+void MapGadgetWidget::uavButtonClick(bool checked)  // added by cathy
 {
-    follow_uav = uavButton->isChecked();
+    follow_uav = checked;
+//    follow_uav = uavButton->isChecked();
 
     if (follow_uav)
     {
@@ -246,9 +251,9 @@ void MapGadgetWidget::keyPressEvent(QKeyEvent* event)
     else
     if (event->key() == Qt::Key_F2) // F2
     {
-	uavButton->setChecked(!follow_uav);
-	follow_uav = uavButton->isChecked();
-	uavButtonClick();
+	follow_uav = !follow_uav;
+	uavButton->setChecked(follow_uav);
+	uavButtonClick(follow_uav);
     }
     else
     if (event->key() == Qt::Key_Up)

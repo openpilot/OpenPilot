@@ -29,6 +29,8 @@
 #include "telemetry.h"
 #include "qxtlogger.h"
 #include <QTime>
+#include <QtGlobal>
+#include <stdlib.h>
 
 /**
  * Constructor
@@ -112,7 +114,7 @@ void Telemetry::setUpdatePeriod(UAVObject* obj, qint32 periodMs)
         if ( objList[n].obj->getObjID() == obj->getObjID() )
         {
             objList[n].updatePeriodMs = periodMs;
-            objList[n].timeToNextUpdateMs = 0;
+            objList[n].timeToNextUpdateMs = quint32((float)periodMs * (float)qrand() / (float)RAND_MAX); // avoid bunching of updates
         }
     }
 }

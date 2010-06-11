@@ -23,11 +23,7 @@
 *
 */
 
-
-
-// http://code.google.com/apis/maps/terms.html ... cmoss
-
-
+// Modified by Cathy, 11th Jun 2010
 
 #include "googlesatmapadapter.h"
 
@@ -36,16 +32,12 @@ namespace qmapcontrol
 {
     GoogleSatMapAdapter::GoogleSatMapAdapter()
 //        : TileMapAdapter("khm.google.com", "/kh?v=58&x=%2&s=&y=%3&z=%1", 256, 0, 17)
-//	: TileMapAdapter("khm.google.com", "/kh?v=58&x=%2&s=&y=%3&z=%1", 256, 0, 22)		// cmoss .. max_zoom increased
 
+	// added by cathy .. to use more up-to-date and cleaner maps, the servers also appear much more reliable
+//	: TileMapAdapter("khm1.google.com", "/kh/v=49&x=%2&s=&y=%3&z=%1", 256, 0, 17)	// cathy .. satellite
+	: TileMapAdapter("mt1.google.com", "/vt/lyrs=y&x=%2&s=&y=%3&z=%1", 256, 0, 17)	// cathy .. hybrid
 
-	// found addresses at http://gc-livepedia.de/wiki/Map_servers .. cmoss
-//	: TileMapAdapter("khm1.google.com", "/kh/v=49&x=%2&s=&y=%3&z=%1", 256, 0, 22)	// cmoss .. max_zoom increased .. satellite
-	: TileMapAdapter("mt1.google.com", "/vt/lyrs=y&x=%2&s=&y=%3&z=%1", 256, 0, 22)	// cmoss .. max_zoom increased .. hybrid
-//	: TileMapAdapter("mt.google.com", "/vt/v=w2p.106&hl=en&x=%2&s=&y=%3&z=%1", 256, 0, 22)	// cmoss .. max_zoom increased .. terrain
-
-
-  {
+    {
     }
 
     GoogleSatMapAdapter::~GoogleSatMapAdapter()

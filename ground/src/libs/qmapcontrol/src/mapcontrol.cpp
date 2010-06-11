@@ -24,21 +24,24 @@
 */
 
 #include "mapcontrol.h"
-
 namespace qmapcontrol
 {
     MapControl::MapControl(QSize size, MouseMode mousemode) :
 	size(size),
 	mymousemode(mousemode),
-	scaleVisible(false)
+	scaleVisible(false),
+	latLonVisible(false)	// cathy
     {
         layermanager = new LayerManager(this, size);
         screen_middle = QPoint(size.width()/2, size.height()/2);
 
         mousepressed = false;
 
-	connect(ImageManager::instance(), SIGNAL(imageReceived()), this, SLOT(updateRequestNew()));
-	connect(ImageManager::instance(), SIGNAL(loadingFinished()), this, SLOT(loadingFinished()));
+        connect(ImageManager::instance(), SIGNAL(imageReceived()),
+                this, SLOT(updateRequestNew()));
+
+        connect(ImageManager::instance(), SIGNAL(loadingFinished()),
+                this, SLOT(loadingFinished()));
 
         this->setMaximumSize(size.width()+1, size.height()+1);
     }
@@ -70,7 +73,8 @@ namespace qmapcontrol
 
     void MapControl::followGeometry(const Geometry* geom) const
     {
-	connect(geom, SIGNAL(positionChanged(Geometry*)), this, SLOT(positionChanged(Geometry*)));
+        connect(geom, SIGNAL(positionChanged(Geometry*)),
+                this, SLOT(positionChanged(Geometry*)));
     }
 
     void MapControl::positionChanged(Geometry* geom)
@@ -105,7 +109,7 @@ namespace qmapcontrol
         QPoint dest = layermanager->layer()->mapadapter()->coordinateToDisplay(target);
 
         QPoint step = (dest-start)/steps;
-	QPointF next = currentCoordinate() - step;
+        QPointF next = currentCoordinate()- step;
 
         // setView(Coordinate(next.x(), next.y()));
         layermanager->scrollView(step);
@@ -179,34 +183,41 @@ namespace qmapcontrol
             }
         }
 
-	painter.setPen(Qt::black);
-	painter.drawLine(screen_middle.x(), screen_middle.y()-10, screen_middle.x(), screen_middle.y()+10); // |
-	painter.drawLine(screen_middle.x()-10, screen_middle.y(), screen_middle.x()+10, screen_middle.y()); // -
+        painter.drawLine(screen_middle.x(), screen_middle.y()-10,
+                         screen_middle.x(), screen_middle.y()+10); // |
+        painter.drawLine(screen_middle.x()-10, screen_middle.y(),
+                         screen_middle.x()+10, screen_middle.y()); // -
 
-	// int cross_x = int(layermanager->getMapmiddle_px().x())%256;
-	// int cross_y = int(layermanager->getMapmiddle_px().y())%256;
-	// painter.drawLine(screen_middle.x()-cross_x+cross_x, screen_middle.y()-cross_y+0,
-	//   screen_middle.x()-cross_x+cross_x, screen_middle.y()-cross_y+256); // |
-	// painter.drawLine(screen_middle.x()-cross_x+0, screen_middle.y()-cross_y+cross_y,
-	//   screen_middle.x()-cross_x+256, screen_middle.y()-cross_y+cross_y); // -
+        // int cross_x = int(layermanager->getMapmiddle_px().x())%256;
+        // int cross_y = int(layermanager->getMapmiddle_px().y())%256;
+        // painter.drawLine(screen_middle.x()-cross_x+cross_x, screen_middle.y()-cross_y+0,
+        //   screen_middle.x()-cross_x+cross_x, screen_middle.y()-cross_y+256); // |
+        // painter.drawLine(screen_middle.x()-cross_x+0, screen_middle.y()-cross_y+cross_y,
+        //   screen_middle.x()-cross_x+256, screen_middle.y()-cross_y+cross_y); // -
 
 
 
 
-	// show the current lat/long position (center of the map) .. cathy
-	QPointF lat_lon = currentCoordinate();
-	QString ll_str = "lat " + QString::number(lat_lon.y(), 'f', 6) + ", lon " + QString::number(lat_lon.x(), 'f', 6) + ", zoom " + QString::number(currentZoom());
-	int x = 200;
-	int y = size.height() - 15;
-	QFontMetrics fm = QFontMetrics(painter.font());
-	QRect tr = fm.tightBoundingRect(ll_str);
-	int tw = tr.width();
-	int th = tr.height();
-	painter.setPen(Qt::NoPen);
-	painter.setBrush(QColor(255, 255, 255, 140));
-	painter.drawRect(x - 2, y - th - 2, tw + 4, th + 4);	// draw a semi-transparent background for the text (to make it readable)
-	painter.setPen(Qt::black);
-	painter.drawText(x, y, ll_str);
+	// added by cathy
+	if (latLonVisible)
+	{   // show the lat, lon and zoom details for the center of the map display
+	    QPointF lat_lon = currentCoordinate();
+	    QString ll_str = "lat " + QString::number(lat_lon.y(), 'f', 6) + ", lon " + QString::number(lat_lon.x(), 'f', 6) + ", zoom " + QString::number(currentZoom());
+	    int x = 200;
+	    int y = size.height() - 15;
+	    QFontMetrics fm = QFontMetrics(painter.font());
+	    QRect tr = fm.tightBoundingRect(ll_str);
+	    int tw = tr.width();
+	    int th = tr.height();
+	    painter.setPen(Qt::NoPen);
+	    painter.setBrush(QColor(255, 255, 255, 140));
+	    painter.drawRect(x - 2, y - th - 2, tw + 4, th + 4);	// draw a semi-transparent background for the text .. to make it readable
+	    painter.setPen(Qt::black);
+	    painter.drawText(x, y, ll_str);
+	}
+
+
+
 
 //        painter.drawRect(0,0, size.width(), size.height());
         /*
@@ -234,7 +245,7 @@ namespace qmapcontrol
 
         layermanager->mouseEvent(evnt);
 
-	if (layermanager->layers().size() > 0)
+        if (layermanager->layers().size()>0)
         {
             if (evnt->button() == 1)
             {
@@ -243,10 +254,10 @@ namespace qmapcontrol
             }
             else if (evnt->button() == 2 && mymousemode != None) // zoom in
             {
-                zoomIn();
+//                zoomIn();  // removed by cathy .. zoom in/out now done using the mouse wheel
             } else if  (evnt->button() == 4 && mymousemode != None) // zoom out
             {
-                zoomOut();
+//                zoomOut();  // removed by cathy .. zoom in/out now done using the mouse wheel
             }
         }
 
@@ -295,11 +306,21 @@ namespace qmapcontrol
         // emit(mouseEventCoordinate(evnt, clickToWorldCoordinate(evnt->pos())));
     }
 
+    // added by cathy
+    void MapControl::wheelEvent(QWheelEvent *event)
+    {
+//	event->ignore();
+
+	if (event->delta() > 0) zoomIn();
+	else
+	if (event->delta() < 0) zoomOut();
+    }
+
     QPointF MapControl::clickToWorldCoordinate(QPoint click)
     {
         // click coordinate to image coordinate
-	QPoint displayToImage = QPoint(click.x()-screen_middle.x()+layermanager->getMapmiddle_px().x(),
-				       click.y()-screen_middle.y()+layermanager->getMapmiddle_px().y());
+        QPoint displayToImage= QPoint(click.x()-screen_middle.x()+layermanager->getMapmiddle_px().x(),
+                                      click.y()-screen_middle.y()+layermanager->getMapmiddle_px().y());
         // image coordinate to world coordinate
         return layermanager->layer()->mapadapter()->displayToCoordinate(displayToImage);
     }
@@ -417,6 +438,13 @@ namespace qmapcontrol
     void MapControl::showScale(bool show)
     {
         scaleVisible = show;
+    }
+
+    // added by cathy
+    // this shows or hides the lat/long/zoom details for the center of the map display
+    void MapControl::showLatLon(bool show)
+    {
+	latLonVisible = show;
     }
 
     void MapControl::resize(const QSize newSize)

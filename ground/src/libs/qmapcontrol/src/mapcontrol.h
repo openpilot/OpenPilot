@@ -214,6 +214,15 @@ namespace qmapcontrol
          */
         void showScale ( bool show );
 
+	// added by cathy
+	// show/hide the center latitude & longitude coord
+	//! Show/Hide the center of the maps latitude & longitude coord
+	/*!
+	 *
+	 * @param show true if the details should be displayed
+	 */
+	void showLatLon(bool show);
+
     private:
         LayerManager* layermanager;
         QPoint screen_middle; // middle of the widget (half size)
@@ -227,7 +236,7 @@ namespace qmapcontrol
         MouseMode mymousemode;
 
         bool scaleVisible;
-        bool latLonVisible;
+	bool latLonVisible;
 
         bool m_loadingFlag;
 
@@ -244,6 +253,7 @@ namespace qmapcontrol
         void mousePressEvent ( QMouseEvent* evnt );
         void mouseReleaseEvent ( QMouseEvent* evnt );
         void mouseMoveEvent ( QMouseEvent* evnt );
+	void wheelEvent(QWheelEvent *event);	// added by cathy
 
     signals:
         // void mouseEvent(const QMouseEvent* evnt);

@@ -27,10 +27,7 @@
 namespace qmapcontrol
 {
     GoogleMapAdapter::GoogleMapAdapter()
-//        : TileMapAdapter("mt0.google.com", "/vt/lyrs=&x=%2&s=&y=%3&z=%1", 256, 0, 17)	// cmoss .. max_zoom increased
-
-	// found addresses at http://gc-livepedia.de/wiki/Map_servers .. cmoss
-	: TileMapAdapter("mt0.google.com", "/vt/x=%2&s=&y=%3&z=%1", 256, 0, 22)	// cmoss .. max_zoom increased
+	: TileMapAdapter("mt0.google.com", "/vt/lyrs=&x=%2&s=&y=%3&z=%1", 256, 0, 17)
     {
     }
 

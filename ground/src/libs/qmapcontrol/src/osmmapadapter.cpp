@@ -27,8 +27,7 @@
 namespace qmapcontrol
 {
     OSMMapAdapter::OSMMapAdapter()
-//	: TileMapAdapter("tile.openstreetmap.org", "/%1/%2/%3.png", 256, 0, 17)
-	: TileMapAdapter("tile.openstreetmap.org", "/%1/%2/%3.png", 256, 0, 22)	// cmoss .. max_zoom increased
+	: TileMapAdapter("tile.openstreetmap.org", "/%1/%2/%3.png", 256, 0, 17)
     {
     }
 

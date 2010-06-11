@@ -27,8 +27,7 @@
 namespace qmapcontrol
 {
     OpenAerialMapAdapter::OpenAerialMapAdapter()
-//        : TileMapAdapter("tile.openaerialmap.org", "/tiles/1.0.0/openaerialmap-900913/%1/%2/%3.png", 256, 0, 17)
-	: TileMapAdapter("tile.openaerialmap.org", "/tiles/1.0.0/openaerialmap-900913/%1/%2/%3.png", 256, 0, 22)	// cmoss .. max_zoom increased
+	: TileMapAdapter("tile.openaerialmap.org", "/tiles/1.0.0/openaerialmap-900913/%1/%2/%3.png", 256, 0, 17)
     {
     }
 

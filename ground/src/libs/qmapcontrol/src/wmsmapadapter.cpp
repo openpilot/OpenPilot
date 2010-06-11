@@ -27,8 +27,7 @@
 namespace qmapcontrol
 {
     WMSMapAdapter::WMSMapAdapter(QString host, QString serverPath, int tilesize)
-//        : MapAdapter(host, serverPath, tilesize, 0, 17)
-	: MapAdapter(host, serverPath, tilesize, 0, 22)	// cmoss .. max_zoom increased
+	: MapAdapter(host, serverPath, tilesize, 0, 17)
     {
         // param1 = serverPath.indexOf("%1");
         // param2 = serverPath.indexOf("%2");

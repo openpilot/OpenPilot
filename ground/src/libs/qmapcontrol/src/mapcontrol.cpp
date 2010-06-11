@@ -33,15 +33,12 @@ namespace qmapcontrol
 	latLonVisible(false)	// cathy
     {
         layermanager = new LayerManager(this, size);
-        screen_middle = QPoint(size.width()/2, size.height()/2);
+	screen_middle = QPoint(size.width() / 2, size.height() / 2);
 
         mousepressed = false;
 
-        connect(ImageManager::instance(), SIGNAL(imageReceived()),
-                this, SLOT(updateRequestNew()));
-
-        connect(ImageManager::instance(), SIGNAL(loadingFinished()),
-                this, SLOT(loadingFinished()));
+	connect(ImageManager::instance(), SIGNAL(imageReceived()), this, SLOT(updateRequestNew()));
+	connect(ImageManager::instance(), SIGNAL(loadingFinished()), this, SLOT(loadingFinished()));
 
         this->setMaximumSize(size.width()+1, size.height()+1);
     }
@@ -73,8 +70,7 @@ namespace qmapcontrol
 
     void MapControl::followGeometry(const Geometry* geom) const
     {
-        connect(geom, SIGNAL(positionChanged(Geometry*)),
-                this, SLOT(positionChanged(Geometry*)));
+	connect(geom, SIGNAL(positionChanged(Geometry*)), this, SLOT(positionChanged(Geometry*)));
     }
 
     void MapControl::positionChanged(Geometry* geom)

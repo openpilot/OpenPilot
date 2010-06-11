@@ -81,9 +81,8 @@ private:
 
    PositionActual *m_positionActual;
 
-    QPushButton *gcsButton;	// added by cathy
+    QPushButton *gscButton;	// added by cathy
     QPushButton *uavButton;	// added by cathy
-
 };
 
 #endif /* MAPGADGETWIDGET_H_ */

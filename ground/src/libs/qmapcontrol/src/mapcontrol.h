@@ -225,7 +225,9 @@ namespace qmapcontrol
 
         bool mousepressed;
         MouseMode mymousemode;
+
         bool scaleVisible;
+        bool latLonVisible;
 
         bool m_loadingFlag;
 

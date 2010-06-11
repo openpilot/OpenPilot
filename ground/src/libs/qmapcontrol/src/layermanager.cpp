@@ -323,7 +323,7 @@ namespace qmapcontrol
         QList<const MapAdapter*> doneadapters;
         while (it.hasNext())
         {
-            Layer* l = it.next();
+	    Layer *l = it.next();
             if (!doneadapters.contains(l->mapadapter()))
             {
                 l->zoomOut();

@@ -27,7 +27,7 @@
 #include "MkSerial.h"
 
 #include "attitudeactual.h" // object that will be updated by the module
-#include "gpsobject.h"
+#include "positionactual.h"
 
 
 //
@@ -480,12 +480,12 @@ static void DoConnectedToNC(void)
 	MkMsg_t msg;
 	GpsPosition_t pos;
 	AttitudeActualData attitudeData;
-	GpsObjectData gpsData;
+	PositionActualData positionData;
 
 	DEBUG_MSG("NC\n\r");
 
 	memset(&attitudeData, 0, sizeof(attitudeData));
-	memset(&gpsData, 0, sizeof(gpsData));
+	memset(&positionData, 0, sizeof(positionData));
 
 	// Configure NC for fast reporting of the osd-message
 	SendMsgPar8(MK_ADDR_ALL, MSGCMD_GET_OSD, 10);
@@ -506,12 +506,12 @@ static void DoConnectedToNC(void)
 			attitudeData.Roll = -Par2Int8(&msg,OSD_MSG_ROLL_IDX);
 			AttitudeActualSet(&attitudeData);
 
-			gpsData.Longitude = pos.longitute;
-			gpsData.Latitude = pos.latitude;
-			gpsData.Altitude = pos.altitude;
-			gpsData.Satellites = msg.pars[OSD_MSG_NB_SATS_IDX];
-			gpsData.Updates++;
-			GpsObjectSet(&gpsData);
+			positionData.Longitude = pos.longitute;
+			positionData.Latitude = pos.latitude;
+			positionData.Altitude = pos.altitude;
+			positionData.Satellites = msg.pars[OSD_MSG_NB_SATS_IDX];
+			positionData.Status = POSITIONACTUAL_STATUS_FIX3D;				// FIXME
+			PositionActualSet(&positionData);
 		}
 		else
 		{

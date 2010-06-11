@@ -67,6 +67,7 @@ static int32_t processPeriodicUpdates();
 static void eventTask();
 static int32_t eventPeriodicCreate(UAVObjEvent* ev, UAVObjEventCallback cb, xQueueHandle queue, int32_t periodMs);
 static int32_t eventPeriodicUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, xQueueHandle queue, int32_t periodMs);
+static uint32_t randomizePeriod(uint32_t periodMs);
 
 
 /**
@@ -217,7 +218,7 @@ static int32_t eventPeriodicCreate(UAVObjEvent* ev, UAVObjEventCallback cb, xQue
 	objEntry->evInfo.cb = cb;
 	objEntry->evInfo.queue = queue;
     objEntry->updatePeriodMs = periodMs;
-    objEntry->timeToNextUpdateMs = 0;
+    objEntry->timeToNextUpdateMs = randomizePeriod(periodMs); // avoid bunching of updates
     // Add to list
     LL_APPEND(objList, objEntry);
 	// Release lock
@@ -249,7 +250,7 @@ static int32_t eventPeriodicUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, xQue
 		{
 			// Object found, update period
 			objEntry->updatePeriodMs = periodMs;
-			objEntry->timeToNextUpdateMs = 0;
+			objEntry->timeToNextUpdateMs = randomizePeriod(periodMs); // avoid bunching of updates
 			// Release lock
 			xSemaphoreGiveRecursive(mutex);
 			return 0;
@@ -352,5 +353,23 @@ static int32_t processPeriodicUpdates()
     // Done
     xSemaphoreGiveRecursive(mutex);
     return timeToNextUpdate;
+}
+
+/**
+ * Return a psedorandom integer from 0 to periodMs
+ * Based on the Park-Miller-Carta Pseudo-Random Number Generator
+ * http://www.firstpr.com.au/dsp/rand31/
+ */
+static uint32_t randomizePeriod(uint32_t periodMs)
+{
+	static uint32_t seed = 1;
+	uint32_t hi, lo;
+	lo = 16807 * (seed & 0xFFFF);
+	hi = 16807 * (seed >> 16);
+	lo += (hi & 0x7FFF) << 16;
+	lo += hi >> 15;
+	if (lo > 0x7FFFFFFF) lo -= 0x7FFFFFFF;
+	seed = lo;
+	return (uint32_t)( ((float)periodMs * (float)lo) / (float)0x7FFFFFFF );
 }
 

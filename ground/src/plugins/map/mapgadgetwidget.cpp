@@ -27,15 +27,17 @@
 #include "mapgadgetwidget.h"
 #include <QStringList>
 #include <QtGui/QVBoxLayout>
-#include <QtGui/QHBoxLayout>
 #include <QtGui/QPushButton>
 #include "extensionsystem/pluginmanager.h"
 
 MapGadgetWidget::MapGadgetWidget(QWidget *parent) : QWidget(parent)
 {
-    follow_uav = false;	// cmoss
-
     int size = 256;
+
+    gcsButton = 0;	// added by cathy
+    uavButton = 0;	// added by cathy
+
+    follow_uav = false;	// added by cathy
 
     m_mc = new MapControl(QSize(size, size));
 
@@ -44,6 +46,7 @@ MapGadgetWidget::MapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_mc->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     m_mc->setMinimumSize(64, 64);
     m_mc->showScale(true);
+    m_mc->showLatLon(true); // added by cathy
 
     m_osmAdapter = new OSMMapAdapter();
     m_googleSatAdapter = new GoogleSatMapAdapter();
@@ -65,77 +68,25 @@ MapGadgetWidget::MapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_mc->addLayer(m_googleSatLayer);
     m_mc->addLayer(m_yahooLayer);
 
+    addUserControls();
 
-
-
-
-
-
-
-
-    // *********************************
-    // add a geometry layer .. cmoss
-
-//    m_customLayer = new MapLayer("Custom Layer", m_osmAdapter);	// create layer
-
-    // create a LineString
-    QList<Point*> way_points;
-
-    // Image points
-//    way_points.append(new ImagePoint(-2.463293, 52.647245, "images/plane.png", "QuadCopter 1", Point::BottomLeft));
-
-    // Circle points
-    QPen *pointpen = new QPen(QColor(255, 128, 64)); pointpen->setWidth(2);
-    way_points.append(new CirclePoint(-2.463293, 52.647245, 15, "WP1", Point::Middle, pointpen));
-    way_points.append(new CirclePoint(-2.465000, 52.647240, 15, "WP2", Point::Middle, pointpen));
-    way_points.append(new CirclePoint(-2.468000, 52.649240, 15, "WP3", Point::Middle, pointpen));
-    way_points.append(new CirclePoint(-2.470000, 52.649300, 15, "WP4", Point::Middle, pointpen));
-
-    // A QPen also can use transparency
-//    QPen *linepen = new QPen(QColor(255, 255, 255, 128)); linepen->setWidth(3);
-    QPen *linepen = new QPen(QColor(255, 255, 255)); linepen->setWidth(1);
-    // Add the Points and the QPen to a LineString
-    LineString *ls = new LineString(way_points, "GSC", linepen);
-
-//    m_customLayer->setVisible(true);	// make it visible
-//    m_customLayer->addGeometry(ls);	// Add the LineString to the layer
-//    connect(m_customLayer, SIGNAL(geometryClicked(Geometry*, QPoint)), this, SLOT(geometryClicked(Geometry*, QPoint)));	// Connect click events of the layer to this object
-//    m_mc->addLayer(m_customLayer);					// add the custom layer into the system
-
-    m_googleSatLayer->addGeometry(ls);	// Add the LineString to the layer
-
-//    m_googleSatLayer->clearGeometries();
-
-    // *********************************
-
-
-
-
-
-
-
-
-
-
-
-
-
-    addZoomButtons();
     m_mc->setView(QPointF(5.718888888888, 58.963333333333));
     m_mc->setZoom(10);
     m_mc->updateRequestNew();
+
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_mc);
     setLayout(layout);
 
-//    connect(m_mc, SIGNAL(mouseEventCoordinate(const QMouseEvent*, const QPointF)), this, SLOT(coordinateClicked(const QMouseEvent*, const QPointF)));	// cmoss
-
     // Get required UAVObjects
     ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
     m_positionActual = PositionActual::GetInstance(objManager);
+
+    // added by cathy .. slot for receiving mouse click Coordinate events
+//    connect(m_mc, SIGNAL(mouseEventCoordinate(const QMouseEvent*, const QPointF)), this, SLOT(coordinateClicked(const QMouseEvent*, const QPointF)));	// cmoss
 
     m_updateTimer = new QTimer();
     m_updateTimer->setInterval(250);
@@ -161,35 +112,18 @@ void MapGadgetWidget::setPosition(QPointF pos)
 
 void MapGadgetWidget::updatePosition()
 {
-    PositionActual::DataFields data = m_positionActual->getData();
-
     if (follow_uav)
     {
-//    setPosition(QPointF(data.Longitude, data.Latitude));  	// cmoss
+	PositionActual::DataFields data = m_positionActual->getData();
+	setPosition(QPointF(data.Longitude, data.Latitude));
     }
-
 }
 
 void MapGadgetWidget::setMapProvider(QString provider)
 {
-//    for (int i = 0; i < m_mc->layers().size(); i++)
-//    {
-//	Layer *layer = m_mc->layers().at(i);
-//	QString layerName = layer->layername();
-//
-//	if (layerName == "Custom Layer") continue;    // cmoss .. leave the custom layer visible
-//	layer->setVisible(layerName == provider);
-//    }
-
-    foreach (QString layerName, m_mc->layers())
-    {
-	m_mc->layer(layerName)->setVisible(layerName == provider);
-
-//	QMessageBox::information(this, provider, layerName);
-//	m_mc->layer(layerName)->setVisible(layerName == provider || layerName == QString("Custom Layer"));   // cmoss
-    }
+    foreach(QString layerName, m_mc->layers())
+        m_mc->layer(layerName)->setVisible(layerName == provider);
 }
-
 
 void MapGadgetWidget::resizeEvent(QResizeEvent *event)
 {
@@ -198,52 +132,74 @@ void MapGadgetWidget::resizeEvent(QResizeEvent *event)
     QWidget::resizeEvent(event);
 }
 
-void MapGadgetWidget::addZoomButtons()
+// changed by cathy
+void MapGadgetWidget::addUserControls()
 {
-	// create buttons as controls for zoom
-	QPushButton *zoomin = new QPushButton("+");
-	QPushButton *zoomout = new QPushButton("-");
-	QPushButton *gcs = new QPushButton("GCS");	// cmoss
-	QPushButton *uav = new QPushButton("UAV");	// cmoss
+	// create user controls
+	gcsButton = new QPushButton("GCS");	// added by cathy
+	uavButton = new QPushButton("UAV");	// added by cathy
+	QPushButton* zoomin = new QPushButton("+");
+	QPushButton* zoomout = new QPushButton("-");
 
-	// cmoss
-	gcs->setMaximumWidth(50);
-	gcs->setToolTip("Go to the ground station");
+	// cathy
+	gcsButton->setMinimumWidth(50);
+	gcsButton->setMaximumWidth(50);
+	gcsButton->setToolTip("Jump too ground station control");
+	connect(gcsButton, SIGNAL(clicked(bool)), this, SLOT(gcsButtonClick()));
 
-	uav->setMaximumWidth(50);
-	uav->setCheckable(true);
-	uav->setToolTip("Follow the UAV");
+	// cathy
+	uavButton->setMinimumWidth(50);
+	uavButton->setMaximumWidth(50);
+	uavButton->setCheckable(true);
+	uavButton->setToolTip("Stay centered on the UAV if checked");
+	connect(uavButton, SIGNAL(clicked(bool)), this, SLOT(uavButtonClick()));
 
-	zoomin->setMinimumSize(50, 50);
-	zoomin->setMaximumSize(50, 50);
-//	zoomin->setMaximumWidth(50);
-
-	zoomout->setMinimumSize(50, 50);
-	zoomout->setMaximumSize(50, 50);
-//	zoomout->setMaximumWidth(50);
-
+	zoomin->setMinimumWidth(50);
+	zoomin->setMaximumWidth(50);
+	zoomin->setToolTip("Zoom in");
 	connect(zoomin, SIGNAL(clicked(bool)), m_mc, SLOT(zoomIn()));
+
+	zoomout->setMinimumWidth(50);
+	zoomout->setMaximumWidth(50);
+	zoomout->setToolTip("Zoom out");
 	connect(zoomout, SIGNAL(clicked(bool)), m_mc, SLOT(zoomOut()));
 
 	// add zoom buttons to the layout of the MapControl
 	QVBoxLayout* innerlayout = new QVBoxLayout;
-//	QHBoxLayout *innerlayout = new QHBoxLayout;
-
     	innerlayout->setSpacing(3);
 	innerlayout->setMargin(2);
-
 	innerlayout->addSpacing(10);
-	innerlayout->addWidget(gcs);
-	innerlayout->addWidget(uav);
+	innerlayout->addWidget(gcsButton);
+	innerlayout->addWidget(uavButton);
 	innerlayout->addSpacing(10);
 	innerlayout->addWidget(zoomin);
 	innerlayout->addWidget(zoomout);
-
 	innerlayout->addStretch(0);
-
 	m_mc->setLayout(innerlayout);
 }
 
+void MapGadgetWidget::gscButtonClick()  // added by cathy
+{
+    uavButton->setChecked(false);
+    follow_uav = uavButton->isChecked();
+
+    // jump straight too the GSC location
+
+}
+
+void MapGadgetWidget::uavButtonClick()  // added by cathy
+{
+    follow_uav = uavButton->isChecked();
+
+    if (follow_uav)
+    {
+	PositionActual::DataFields data = m_positionActual->getData();
+	setPosition(QPointF(data.Longitude, data.Latitude));
+    }
+}
+
+/*
+// added by cathy .. comes here when the user mouse clicks on the map
 void MapGadgetWidget::coordinateClicked(const QMouseEvent * evnt, const QPointF coordinate) // cmoss
 {
     if (evnt->type() == QEvent::MouseButtonPress && evnt->buttons() == Qt::LeftButton)
@@ -255,7 +211,8 @@ void MapGadgetWidget::coordinateClicked(const QMouseEvent * evnt, const QPointF 
 	QMessageBox::information(this, "Coordinate Clicked", coord_str);
     }
 }
-
+*/
+// added by cathy .. comes here when the user mouse clicks on an added geometry feature (ie, way points etc)
 void MapGadgetWidget::geometryClicked(Geometry* geom, QPoint)	// cmoss
 {
 	qDebug() << "parent: " << geom->parentGeometry();
@@ -276,54 +233,15 @@ void MapGadgetWidget::geometryClicked(Geometry* geom, QPoint)	// cmoss
 	}
 }
 
-void MapGadgetWidget::keyPressEvent(QKeyEvent* evnt)	// cmoss
+// added by cathy
+void MapGadgetWidget::keyPressEvent(QKeyEvent* event)
 {
-	if (evnt->key() == 49 || evnt->key() == 17825792)  // tastatur '1'
-	{
-		m_mc->zoomIn();
-	}
-	else
-	if (evnt->key() == 50)
-	{
-		m_mc->moveTo(QPointF(8.25, 60));
-	}
-	else
-	if (evnt->key() == 51 || evnt->key() == 16777313)     // tastatur '3'
-	{
-		m_mc->zoomOut();
-	}
-	else
-	if (evnt->key() == 54) // 6
-	{
-		m_mc->setView(QPointF(8,50));
-	}
-	else
-	if (evnt->key() == 16777234) // left
-	{
-		m_mc->scrollLeft();
-	}
-	else
-	if (evnt->key() == 16777236) // right
-	{
-		m_mc->scrollRight();
-	}
-	else
-	if (evnt->key() == 16777235 ) // up
-	{
-		m_mc->scrollUp();
-	}
-	else
-	if (evnt->key() == 16777237) // down
-	{
-		m_mc->scrollDown();
-	}
-	else
-	if (evnt->key() == Qt::Key_Escape) // ESC
-	{
-		emit(close());
-	}
-	else
-	{
-		qDebug() << evnt->key() << endl;
-	}
+    if (event->key() == Qt::Key_Escape) // ESC
+    {
+//	emit(close());
+    }
+    else
+    {
+	qDebug() << event->key() << endl;
+    }
 }

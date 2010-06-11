@@ -47,33 +47,43 @@ public:
    void setMapProvider(QString provider);
 
 public slots:
-    void coordinateClicked(const QMouseEvent* evnt, const QPointF coordinate);	// cmoss
-    void geometryClicked(Geometry* geom, QPoint coord_px);	// cmoss
+//    void coordinateClicked(const QMouseEvent* evnt, const QPointF coordinate);	// added by cathy
+    void geometryClicked(Geometry* geom, QPoint coord_px);			// added by cathy
+
+    void gscButtonClick();  // added by cathy
+    void uavButtonClick();  // added by cathy
 
 protected:
-   void resizeEvent(QResizeEvent *event);
-    void keyPressEvent(QKeyEvent* evnt);	// cmoss
+    void resizeEvent(QResizeEvent *event);
+    void keyPressEvent(QKeyEvent* event);	// added by cathy
 
 private slots:
    void updatePosition();
 
 private:
-   void addZoomButtons();
+   void addUserControls();  // changed by cathy
+
+    bool follow_uav;    // true if the map is to stay centered on the UAV
 
    MapControl *m_mc;
+
    MapAdapter *m_osmAdapter;
    MapAdapter *m_googleAdapter;
    MapAdapter *m_googleSatAdapter;
    MapAdapter *m_yahooAdapter;
+
    Layer *m_osmLayer;
    Layer *m_googleLayer;
    Layer *m_googleSatLayer;
    Layer *m_yahooLayer;
-   Layer *m_customLayer;
+
    QTimer *m_updateTimer;
+
    PositionActual *m_positionActual;
 
-   bool follow_uav; // cmoss
+    QPushButton *gcsButton;	// added by cathy
+    QPushButton *uavButton;	// added by cathy
+
 };
 
 #endif /* MAPGADGETWIDGET_H_ */

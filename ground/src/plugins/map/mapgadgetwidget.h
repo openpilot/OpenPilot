@@ -46,9 +46,13 @@ public:
    void setPosition(QPointF pos);
    void setMapProvider(QString provider);
 
+public slots:
+    void coordinateClicked(const QMouseEvent* evnt, const QPointF coordinate);	// cmoss
+    void geometryClicked(Geometry* geom, QPoint coord_px);	// cmoss
 
 protected:
    void resizeEvent(QResizeEvent *event);
+    void keyPressEvent(QKeyEvent* evnt);	// cmoss
 
 private slots:
    void updatePosition();
@@ -65,8 +69,11 @@ private:
    Layer *m_googleLayer;
    Layer *m_googleSatLayer;
    Layer *m_yahooLayer;
+   Layer *m_customLayer;
    QTimer *m_updateTimer;
    PositionActual *m_positionActual;
+
+   bool follow_uav; // cmoss
 };
 
 #endif /* MAPGADGETWIDGET_H_ */

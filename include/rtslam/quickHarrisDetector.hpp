@@ -1,9 +1,11 @@
 /*
- * quickHarrisDetector.hpp
+ * \file quickHarrisDetector.hpp
  *
  *     Project: jafar
  *  Created on: Jun 4, 2010
- *      Author: jsola
+ *      \Author: jsola
+ *
+ *  \ingroup rtslam
  */
 
 #ifndef QUICKHARRISDETECTOR_HPP_
@@ -17,6 +19,24 @@
 namespace jafar{
 	namespace rtslam{
 
+		/**
+		 * Quick Harris detector class.
+		 * \ingroup rtslam
+		 * \author Joan Sola jsola@laas.fr
+		 *
+		 * This class detects the strongest Harris point inside a given region of interest.
+		 *
+		 * The class is called Quick because the algorithm is accelerated using 5 strategies:
+		 *  - the use of a simple derivative mask [-1 0 1] that avoids products and minimizes sums.
+		 *  - the use of a square convolution mask of fixed amplitude = 1.
+		 *  - this mask allows us to compute the convolution via integral images of I_xx, I_xy and I_yy.
+		 *  - we extract the best point, so we don't need to perform theresholding and sub-maxima suppression (both expensive).
+		 *  - we purposely use small regions of interest.
+		 *
+		 * Because of simplifications 1. 2. and 3., the result is sub-optimal in the sense
+		 * of Harris standards, but it gives strong corner points that can
+		 * be tracked by means of correlation (zncc for example).
+		 */
 		class QuickHarrisDetector {
       public:
         QuickHarrisDetector(int convolutionBoxSize = 5, float threshold = 15.0, float edge = 2.0);
@@ -24,7 +44,6 @@ namespace jafar{
       private:
         void quickDerivatives(const jafar::image::Image & image, jafar::image::ROI & roi);
         bool quickConvolutionWithBestPoint(const jafar::image::ROI & roi, int pixMax[2], float & scoreMax);
-
 
         void writeHarrisImagesAsPPM(jafar::image::ROI & roi);
 

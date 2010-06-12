@@ -117,7 +117,7 @@ void test_slam01_main(world_ptr_t *world) {
 
 		worldPtr->display_mutex.lock();
 		cout << "\n************************************************** " << endl;
-		cout << "TIME : " << t << endl;
+		cout << "\n                 TIME : " << t << endl;
 		// foreach robot
 		for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin(); robIter != mapPtr->robotList().end(); robIter++)
 		{

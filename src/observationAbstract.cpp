@@ -36,10 +36,10 @@ namespace jafar {
 			s << "OBSERVATION " << obs.id() << ": of " << obs.landmarkPtr()->type() << " from " << obs.sensorPtr()->type()
 			    << endl;
 			s << "Sensor: " << obs.sensorPtr()->id() << ", landmark: " << obs.landmarkPtr()->id() << endl;
+			s << " .ia_rsl: " << obs.ia_rsl << endl;
 			s << " .expectation:  " << obs.expectation << endl;
 			s << " .measurement:  " << obs.measurement << endl;
 			s << " .innovation:   " << obs.innovation << endl;
-			s << " .ia_rsl: " << obs.ia_rsl << endl;
 			s << " .ev: | prj: " << obs.events.predicted
 					<< " | vis: " << obs.events.visible
 					<< " | mea: " << obs.events.measured

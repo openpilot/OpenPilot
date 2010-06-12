@@ -54,7 +54,7 @@ namespace jafar {
 
 			// mean and covariances update:
 			ublas::project(x_, ia_x) += prod(K, inn.x());
-			ublas::project(P_, ia_x, ia_x) += prod<sym_mat> (K, trans(PJt_tmp));
+			ublas::project(P_, ia_x, ia_x) -= prod<sym_mat> (K, trans(PJt_tmp));
 		}
 
 		void ExtendedKalmanFilterIndirect::initialize(const ind_array & ia_x, const mat & G_v, const ind_array & ia_rs, const ind_array & ia_l, const mat & G_y, const sym_mat & R){

@@ -27,11 +27,16 @@
 */
 #ifndef MAPTYPE_H
 #define MAPTYPE_H
-
+#include <QMetaObject>
+#include <QMetaEnum>
+#include <QStringList>
  
 namespace core {
-struct MapType
+    class MapType:public QObject
 {
+        Q_OBJECT
+        Q_ENUMS(Types)
+public:
     enum Types
     {
         GoogleMap=1,
@@ -94,6 +99,32 @@ struct MapType
 
         YandexMapRu = 5000,
     };
+        static QString StrByType(Types const& value)
+        {
+            QMetaObject metaObject = MapType().staticMetaObject;
+            QMetaEnum metaEnum= metaObject.enumerator( metaObject.indexOfEnumerator("Types"));
+            QString s=metaEnum.valueToKey(value);
+            return s;
+        }
+        static Types TypeByStr(QString const& value)
+        {
+            QMetaObject metaObject = MapType().staticMetaObject;
+            QMetaEnum metaEnum= metaObject.enumerator( metaObject.indexOfEnumerator("Types"));
+            Types s=(Types)metaEnum.keyToValue(value.toLatin1());
+            return s;
+        }
+        static QStringList TypesList()
+        {
+            QStringList ret;
+            QMetaObject metaObject = MapType().staticMetaObject;
+            QMetaEnum metaEnum= metaObject.enumerator( metaObject.indexOfEnumerator("Types"));
+            for(int x=0;x<metaEnum.keyCount();++x)
+            {
+                ret.append(metaEnum.key(x));
+            }
+            return ret;
+        }
 };
+
 }
 #endif // MAPTYPE_H

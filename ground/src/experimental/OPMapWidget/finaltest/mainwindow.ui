@@ -45,6 +45,18 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
+        <widget class="QGroupBox" name="groupBox_5">
+         <property name="title">
+          <string>MapType</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_8">
+          <item>
+           <widget class="QComboBox" name="comboBox"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
           <string>Goto Place</string>

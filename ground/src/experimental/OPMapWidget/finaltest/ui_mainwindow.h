@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Sat 12. Jun 21:18:37 2010
+** Created: Sat 12. Jun 23:14:21 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -15,6 +15,7 @@
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
 #include <QtGui/QCheckBox>
+#include <QtGui/QComboBox>
 #include <QtGui/QDoubleSpinBox>
 #include <QtGui/QGroupBox>
 #include <QtGui/QHBoxLayout>
@@ -38,6 +39,9 @@ public:
     QWidget *widget;
     QVBoxLayout *verticalLayout_4;
     QVBoxLayout *verticalLayout_3;
+    QGroupBox *groupBox_5;
+    QVBoxLayout *verticalLayout_8;
+    QComboBox *comboBox;
     QGroupBox *groupBox;
     QVBoxLayout *verticalLayout_6;
     QVBoxLayout *verticalLayout_5;
@@ -90,6 +94,20 @@ public:
         verticalLayout_3 = new QVBoxLayout();
         verticalLayout_3->setSpacing(6);
         verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
+        groupBox_5 = new QGroupBox(widget);
+        groupBox_5->setObjectName(QString::fromUtf8("groupBox_5"));
+        verticalLayout_8 = new QVBoxLayout(groupBox_5);
+        verticalLayout_8->setSpacing(6);
+        verticalLayout_8->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_8->setObjectName(QString::fromUtf8("verticalLayout_8"));
+        comboBox = new QComboBox(groupBox_5);
+        comboBox->setObjectName(QString::fromUtf8("comboBox"));
+
+        verticalLayout_8->addWidget(comboBox);
+
+
+        verticalLayout_3->addWidget(groupBox_5);
+
         groupBox = new QGroupBox(widget);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
         verticalLayout_6 = new QVBoxLayout(groupBox);
@@ -242,6 +260,7 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0, QApplication::UnicodeUTF8));
+        groupBox_5->setTitle(QApplication::translate("MainWindow", "MapType", 0, QApplication::UnicodeUTF8));
         groupBox->setTitle(QApplication::translate("MainWindow", "Goto Place", 0, QApplication::UnicodeUTF8));
         pushButtonGO->setText(QApplication::translate("MainWindow", "GO", 0, QApplication::UnicodeUTF8));
         label->setText(QApplication::translate("MainWindow", "GeoCoderStatusCode", 0, QApplication::UnicodeUTF8));

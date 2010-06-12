@@ -77,6 +77,9 @@ private:
     void start();
     void  ReloadMap(){core->ReloadMap();}
     GeoCoderStatusCode::Types SetCurrentPositionByKeywords(QString const& keys){return core->SetCurrentPositionByKeywords(keys);}
+    MapType::Types GetMapType(){return core->GetMapType();}
+    void SetMapType(MapType::Types const& value){core->SetMapType(value);}
+
 private slots:
     void Core_OnNeedInvalidation();
 public slots:

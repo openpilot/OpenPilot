@@ -3,10 +3,17 @@
 
 #include "../mapwidget/mapgraphicitem.h"
 #include "../core/geodecoderstatus.h"
+#include "../core/maptype.h"
+
 #include <QObject>
 #include <QGLWidget>
 namespace mapcontrol
 {
+    class Helper
+    {
+
+    };
+
     class OPMapWidget:public QGraphicsView
     {
         Q_OBJECT
@@ -21,7 +28,13 @@ namespace mapcontrol
         Q_ENUMS(internals::MouseWheelZoomType::Types)
         Q_ENUMS(internals::GeoCoderStatusCode::Types)
     public:
-        GeoCoderStatusCode geodecoderstatus;
+        GeoCoderStatusCode x;
+        MapType y;
+        MapType::Types MapTypeFromString(QString const& value){return MapType::TypeByStr(value);}
+        QString StrFromMapType(MapType::Types const& value){return MapType::StrByType(value);}
+        QStringList MapTypes(){return MapType::TypesList();}
+        GeoCoderStatusCode::Types GeoCoderStatusCodeFromString(QString const& value){return GeoCoderStatusCode::TypeByStr(value);}
+        QString StrFromGeoCoderStatusCode(GeoCoderStatusCode::Types const& value){return GeoCoderStatusCode::StrByType(value);}
         QSize sizeHint() const;
         OPMapWidget(QWidget *parent=0);
         ~OPMapWidget();
@@ -49,6 +62,9 @@ namespace mapcontrol
         GeoCoderStatusCode::Types SetCurrentPositionByKeywords(QString const& keys){return map->SetCurrentPositionByKeywords(keys);}
         bool UseOpenGL(){return useOpenGL;}
         void SetUseOpenGL(bool const& value);
+        MapType::Types GetMapType(){return map->core->GetMapType();}
+        void SetMapType(MapType::Types const& value){map->core->SetMapType(value);}
+        bool isStarted(){return map->core->isStarted();}
     private:
         Core *core;
         MapGraphicItem *map;

@@ -6,8 +6,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
     map=new mapcontrol::OPMapWidget();
+    ui->setupUi(this);
+    ui->comboBox->addItems(map->MapTypes());
+    ui->comboBox->setCurrentIndex(map->MapTypes().indexOf("GoogleHybrid"));
     QHBoxLayout *layout=new QHBoxLayout(parent);
     layout->addWidget(map);
     layout->addWidget(ui->widget);
@@ -78,11 +80,17 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::on_pushButtonGO_clicked()
 {
     core::GeoCoderStatusCode::Types x=map->SetCurrentPositionByKeywords(ui->lineEdit->text());
-    ui->label->setText( map->geodecoderstatus.StrByType(x));
+    ui->label->setText( map->StrFromGeoCoderStatusCode(x));
 
 }
 
 void MainWindow::on_checkBox_2_clicked(bool checked)
 {
     map->SetUseOpenGL(checked);
+}
+
+void MainWindow::on_comboBox_currentIndexChanged(QString value)
+{
+    if (map->isStarted())
+        map->SetMapType(map->MapTypeFromString(value));
 }

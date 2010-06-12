@@ -62,13 +62,10 @@ namespace mapcontrol
 
 namespace internals {
 
-    class MouseWheelZoomType;
-
 class Core:public QObject,public QRunnable
 {
     Q_OBJECT
-    Q_ENUMS(core::GeoCoderStatusCode::Types);
-    Q_ENUMS(MouseWheelZoomType::Types);
+
     friend class mapcontrol::OPMapControl;
     friend class mapcontrol::MapGraphicItem;
 public:
@@ -188,6 +185,8 @@ public:
     void UpdateGroundResolution();
 
     TileMatrix Matrix;
+
+    bool isStarted(){return started;}
 
 
 signals:

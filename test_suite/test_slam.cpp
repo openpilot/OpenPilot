@@ -71,7 +71,11 @@ void test_slam01_main(world_ptr_t *world) {
 	robPtr1->state.x(v);
 	robPtr1->pose.x(quaternion::originFrame());
 	robPtr1->dt_or_dx = 0.1;
-	pinhole_ptr_t senPtr11 (new SensorPinHole(robPtr1, MapObject::FILTERED));
+	v.resize(robPtr1->mySize_perturbation());
+	fillVector(v, 0.01);
+	robPtr1->perturbation.clear();
+	robPtr1->perturbation.std(v);
+	pinhole_ptr_t senPtr11 (new SensorPinHole(robPtr1, MapObject::UNFILTERED));
 	senPtr11->id(senPtr11->sensorIds.getId());
 	senPtr11->linkToParentRobot(robPtr1);
 	senPtr11->state.clear();
@@ -122,13 +126,13 @@ void test_slam01_main(world_ptr_t *world) {
 		for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin(); robIter != mapPtr->robotList().end(); robIter++)
 		{
 			robot_ptr_t robPtr = *robIter;
-			cout << "\n================================================== " << endl;
 
 			vec u(robPtr->mySize_control()); // TODO put some real values in u.
 			fillVector(u, 0.0);
 			robPtr->set_control(u);
 			robPtr->move();
 
+			cout << "\n================================================== " << endl;
 			cout << *robPtr << endl;
 
 			// foreach sensor
@@ -184,8 +188,8 @@ void test_slam01_main(world_ptr_t *world) {
 						} // obsPtr->getScoreMatchInPercent()>80
 					} // obsPtr->isVisible()
 
-					cout << "\n-------------------------------------------------- " << endl;
-					cout << *obsPtr << endl;
+//					cout << "\n-------------------------------------------------- " << endl;
+//					cout << *obsPtr << endl;
 
 				} // foreach observation
 
@@ -199,14 +203,13 @@ void test_slam01_main(world_ptr_t *world) {
 					if (asGrid.getROI(roi)){
 
 						feature_ptr_t featPtr(new FeatureAbstract(2));
-//						if (ObservationPinHolePoint::detectInRoi(senPtr->getRaw(), roi, featPtr)){
 						if (senPtr->getRaw()->detect(RawAbstract::HARRIS, featPtr, &roi)) {
 							cout << "\n-------------------------------------------------- " << endl;
 							cout << "Detected pixel: " << featPtr->state.x() << endl;
 							cout << "Initializing lmk..." << endl;
 
 							// 2a. create lmk object
-							ahp_ptr_t lmkPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr));
+							ahp_ptr_t lmkPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr)); // add featImgPnt in constructor
 							lmkPtr->id(lmkPtr->landmarkIds.getId());
 							lmkPtr->linkToParentMap(mapPtr);
 
@@ -234,7 +237,8 @@ void test_slam01_main(world_ptr_t *world) {
 							// Complete SLAM graph with all other obs
 							mapPtr->completeObservationsInGraph(senPtr, lmkPtr);
 
-							cout << *lmkPtr << endl;
+//							cout << "\n-------------------------------------------------- " << endl;
+//							cout << *lmkPtr << endl;
 						}
 					}
 				}
@@ -271,7 +275,7 @@ void test_slam01_display(world_ptr_t *world)
 void test_slam01() {
 	world_ptr_t worldPtr(new WorldAbstract());
 	
-	qdisplay::QtAppStart((qdisplay::FUNC)&test_slam01_display,(qdisplay::FUNC)&test_slam01_main,1000,&worldPtr);
+	qdisplay::QtAppStart((qdisplay::FUNC)&test_slam01_display,(qdisplay::FUNC)&test_slam01_main,900,&worldPtr);
 	JFR_DEBUG("terminated");
 }
 

@@ -33,6 +33,7 @@ namespace jafar {
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::project_func(
 		    const vec7 & sg, const vec & lmk, vec & exp, vec & dist) {
+			// OK JS 12/6/2010
 			// resize input vectors
 			exp.resize(expectation.size());
 			dist.resize(prior.size());
@@ -43,13 +44,13 @@ namespace jafar {
 			lmkAHP::toBearingOnlyFrame(sg, lmk, v, dist(0));
 			vec4 k = pinHolePtr()->intrinsic;
 			vec d = pinHolePtr()->distortion;
-			pinhole::projectPoint(k, d, v);
-
+			exp = pinhole::projectPoint(k, d, v);
 		}
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::project_func(
 		    const vec7 & sg, const vec & lmk, vec & exp, vec & dist, mat & EXP_sg,
 		    mat & EXP_lmk) {
+			// OK JS 12/6/2010
 			// resize input vectors
 			exp.resize(expectation.size());
 			dist.resize(prior.size());
@@ -78,8 +79,10 @@ namespace jafar {
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::backProject_func(
 		    const vec7 & sg, const vec & pix, const vec & invDist, vec & ahp) {
+			// OK JS 12/6/2010
 			vec3 v;
 			v = pinhole::backprojectPoint(pinHolePtr()->intrinsic, pinHolePtr()->correction, pix, (double)1.0);
+			ublasExtra::normalize(v);
 			ahp = lmkAHP::fromBearingOnlyFrame(sg, v, invDist(0));
 		}
 
@@ -87,27 +90,28 @@ namespace jafar {
 		    const vec7 & sg, const vec & pix, const vec & invDist, vec & ahp,
 		    mat & AHP_sg, mat & AHP_pix, mat & AHP_invDist) {
 
-			vec3 v;
-			mat32 V_pix;
+			// OK JS 12/6/2010
+			vec3 v, vn; // 3d vector and normalized vector
+			// temporal Jacobians:
+			mat V_pix(3,2);
 			mat V_sg(3, 7);
-			mat AHP_v(7, 3);
-
-			// We make the back-projection.
-			// This is decomposed in two steps:
-			// - Back-project from pin-hole sensor to bearing-only frame
-			// - Transform Bearing-only lmk from sensor pose, using inverse-distance prior.
-			//
-			// These functions below use the down-casted pointer because they need to know the particular object parameters and/or methods:
+			mat AHP_vn(7,3);
 			mat V_1(3, 1);
-			pinhole_ptr_t phPtr = pinHolePtr();
-			pinhole::backProjectPoint(phPtr->intrinsic, phPtr->correction, pix, 1.0,
+			mat VN_v(3,3), VN_pix(3,2);
+
+			pinhole::backProjectPoint(pinHolePtr()->intrinsic, pinHolePtr()->correction, pix, 1.0,
 			                          v, V_pix, V_1);
 
-			lmkAHP::fromBearingOnlyFrame(sg, v, invDist(0), ahp, AHP_sg, AHP_v,
+			vn = v;
+			ublasExtra::normalize(vn);
+			ublasExtra::normalizeJac(v, VN_v);
+
+			lmkAHP::fromBearingOnlyFrame(sg, vn, invDist(0), ahp, AHP_sg, AHP_vn,
 			                             AHP_invDist);
 
 			// Here we apply the chain rule for composing Jacobians
-			AHP_pix = prod(AHP_v, V_pix);
+			VN_pix = prod(VN_v, V_pix);
+			AHP_pix = prod(AHP_vn, VN_pix);
 
 		}
 

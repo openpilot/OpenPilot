@@ -63,10 +63,10 @@ void test_slam01_main(world_ptr_t *world) {
 	map_ptr_t mapPtr(new MapAbstract(100));
 	worldPtr->addMap(mapPtr);
 	mapPtr->clear();
-	robconstvel_ptr_t robPtr1(new RobotConstantVelocity(mapPtr));
+	robodo_ptr_t robPtr1(new RobotOdometry(mapPtr));
 	robPtr1->id(robPtr1->robotIds.getId());
 	robPtr1->linkToParentMap(mapPtr);
-	vec v(13);
+	vec v(robPtr1->mySize());
 	fillVector(v, 0.0);
 	robPtr1->state.x(v);
 	robPtr1->pose.x(quaternion::originFrame());

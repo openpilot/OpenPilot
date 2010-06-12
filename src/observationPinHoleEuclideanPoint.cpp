@@ -94,6 +94,7 @@ namespace jafar {
 			ublas::column(VS_nobs,1) = - vn / (nobs(0)*nobs(0));
 			VN_meas = prod(VN_v, V_meas);
 			VS_meas = prod(VS_vn, VN_meas);
+
 			quaternion::eucFromFrame(sg, vs, euc, EUC_sg, EUC_vs);
 
 			EUC_nobs = prod(EUC_vs, VS_nobs);

@@ -11,7 +11,12 @@ namespace mapcontrol
 {
     class Helper
     {
-
+    public:
+        static MapType::Types MapTypeFromString(QString const& value){return MapType::TypeByStr(value);}
+        static QString StrFromMapType(MapType::Types const& value){return MapType::StrByType(value);}
+        static QStringList MapTypes(){return MapType::TypesList();}
+        static GeoCoderStatusCode::Types GeoCoderStatusCodeFromString(QString const& value){return GeoCoderStatusCode::TypeByStr(value);}
+        static QString StrFromGeoCoderStatusCode(GeoCoderStatusCode::Types const& value){return GeoCoderStatusCode::StrByType(value);}
     };
 
     class OPMapWidget:public QGraphicsView
@@ -28,13 +33,8 @@ namespace mapcontrol
         Q_ENUMS(internals::MouseWheelZoomType::Types)
         Q_ENUMS(internals::GeoCoderStatusCode::Types)
     public:
-        GeoCoderStatusCode x;
-        MapType y;
-        MapType::Types MapTypeFromString(QString const& value){return MapType::TypeByStr(value);}
-        QString StrFromMapType(MapType::Types const& value){return MapType::StrByType(value);}
-        QStringList MapTypes(){return MapType::TypesList();}
-        GeoCoderStatusCode::Types GeoCoderStatusCodeFromString(QString const& value){return GeoCoderStatusCode::TypeByStr(value);}
-        QString StrFromGeoCoderStatusCode(GeoCoderStatusCode::Types const& value){return GeoCoderStatusCode::StrByType(value);}
+       // GeoCoderStatusCode x;
+       // MapType y;
         QSize sizeHint() const;
         OPMapWidget(QWidget *parent=0);
         ~OPMapWidget();
@@ -65,11 +65,14 @@ namespace mapcontrol
         MapType::Types GetMapType(){return map->core->GetMapType();}
         void SetMapType(MapType::Types const& value){map->core->SetMapType(value);}
         bool isStarted(){return map->core->isStarted();}
+        void X(){map->core->GoToCurrentPosition();}
     private:
         Core *core;
         MapGraphicItem *map;
         QGraphicsScene mscene;
         bool useOpenGL;
+        GeoCoderStatusCode x;
+        MapType y;
     protected:
         void resizeEvent(QResizeEvent *event);
         void showEvent ( QShowEvent * event );

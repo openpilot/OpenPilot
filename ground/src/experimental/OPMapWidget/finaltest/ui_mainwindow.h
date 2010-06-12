@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Sat 12. Jun 23:14:21 2010
+** Created: Sun 13. Jun 00:01:04 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -42,6 +42,7 @@ public:
     QGroupBox *groupBox_5;
     QVBoxLayout *verticalLayout_8;
     QComboBox *comboBox;
+    QPushButton *pushButton_2;
     QGroupBox *groupBox;
     QVBoxLayout *verticalLayout_6;
     QVBoxLayout *verticalLayout_5;
@@ -104,6 +105,11 @@ public:
         comboBox->setObjectName(QString::fromUtf8("comboBox"));
 
         verticalLayout_8->addWidget(comboBox);
+
+        pushButton_2 = new QPushButton(groupBox_5);
+        pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
+
+        verticalLayout_8->addWidget(pushButton_2);
 
 
         verticalLayout_3->addWidget(groupBox_5);
@@ -261,6 +267,7 @@ public:
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0, QApplication::UnicodeUTF8));
         groupBox_5->setTitle(QApplication::translate("MainWindow", "MapType", 0, QApplication::UnicodeUTF8));
+        pushButton_2->setText(QApplication::translate("MainWindow", "PushButton", 0, QApplication::UnicodeUTF8));
         groupBox->setTitle(QApplication::translate("MainWindow", "Goto Place", 0, QApplication::UnicodeUTF8));
         pushButtonGO->setText(QApplication::translate("MainWindow", "GO", 0, QApplication::UnicodeUTF8));
         label->setText(QApplication::translate("MainWindow", "GeoCoderStatusCode", 0, QApplication::UnicodeUTF8));

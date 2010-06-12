@@ -21,6 +21,7 @@ private:
     mapcontrol::OPMapWidget *map;
 
 private slots:
+    void on_pushButton_2_clicked();
     void on_comboBox_currentIndexChanged(QString );
     void on_checkBox_2_clicked(bool checked);
     void on_pushButtonGO_clicked();

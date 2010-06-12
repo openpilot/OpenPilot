@@ -319,6 +319,7 @@ namespace internals {
                 OnMapSizeChanged(Width, Height);
                 GoToCurrentPosition();
                 ReloadMap();
+                GoToCurrentPosition();
                 emit OnMapTypeChanged(value);
 
             }

@@ -8,8 +8,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     map=new mapcontrol::OPMapWidget();
     ui->setupUi(this);
-    ui->comboBox->addItems(map->MapTypes());
-    ui->comboBox->setCurrentIndex(map->MapTypes().indexOf("GoogleHybrid"));
+    ui->comboBox->addItems(mapcontrol::Helper::MapTypes());
+    ui->comboBox->setCurrentIndex(mapcontrol::Helper::MapTypes().indexOf("GoogleHybrid"));
     QHBoxLayout *layout=new QHBoxLayout(parent);
     layout->addWidget(map);
     layout->addWidget(ui->widget);
@@ -80,7 +80,7 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::on_pushButtonGO_clicked()
 {
     core::GeoCoderStatusCode::Types x=map->SetCurrentPositionByKeywords(ui->lineEdit->text());
-    ui->label->setText( map->StrFromGeoCoderStatusCode(x));
+    ui->label->setText( mapcontrol::Helper::StrFromGeoCoderStatusCode(x));
 
 }
 
@@ -92,5 +92,10 @@ void MainWindow::on_checkBox_2_clicked(bool checked)
 void MainWindow::on_comboBox_currentIndexChanged(QString value)
 {
     if (map->isStarted())
-        map->SetMapType(map->MapTypeFromString(value));
+        map->SetMapType(mapcontrol::Helper::MapTypeFromString(value));
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    map->X();
 }

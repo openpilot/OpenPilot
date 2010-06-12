@@ -50,7 +50,7 @@ using namespace boost;
 
 
 void test_slam01_main(world_ptr_t *world) {
-	ActiveSearchGrid asGrid(640, 480, 5, 5, 0);
+	ActiveSearchGrid asGrid(640, 480, 5, 5, 22, 0);
 	vec2 imSz;
 	imSz(0) = 640; imSz(1) = 480;
 	vec4 k;
@@ -60,7 +60,7 @@ void test_slam01_main(world_ptr_t *world) {
 	//world_ptr_t worldPtr(new WorldAbstract());
 	world_ptr_t worldPtr = *world;
 	worldPtr->display_mutex.lock();
-	map_ptr_t mapPtr(new MapAbstract(100));
+	map_ptr_t mapPtr(new MapAbstract(200));
 	worldPtr->addMap(mapPtr);
 	mapPtr->clear();
 	robodo_ptr_t robPtr1(new RobotOdometry(mapPtr));
@@ -178,9 +178,7 @@ void test_slam01_main(world_ptr_t *world) {
 							// 1f. if feature is inlier
 							if (obsPtr->compatibilityTest(3.0)) { // use 3.0 for 3-sigma or the 5% proba from the chi-square tables.
 								obsPtr->counters.nInlier++;
-//								JFR_DEBUG("P_rsl: " << ublas::project(obsPtr->landmarkPtr()->mapPtr()->filterPtr->P(), obsPtr->ia_rsl, obsPtr->ia_rsl))
 								obsPtr->update() ;
-//								JFR_DEBUG("P_rsl: " << ublas::project(obsPtr->landmarkPtr()->mapPtr()->filterPtr->P(), obsPtr->ia_rsl, obsPtr->ia_rsl))
 								obsPtr->events.updated = true;
 							} // obsPtr->compatibilityTest(3.0)
 						} // obsPtr->getScoreMatchInPercent()>80

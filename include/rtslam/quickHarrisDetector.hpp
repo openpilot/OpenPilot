@@ -19,7 +19,7 @@ namespace jafar{
 
 		class QuickHarrisDetector {
       public:
-        QuickHarrisDetector(float convolutionBoxSize = 5, float threshold = 0.0);
+        QuickHarrisDetector(int convolutionBoxSize = 5, float threshold = 15.0, float edge = 2.0);
         virtual bool detectIn(jafar::image::Image const& image, featurepoint_ptr_t featPtr, jafar::image::ROI * roiPtr = 0 );
       private:
         void quickDerivatives(const jafar::image::Image & image, jafar::image::ROI & roi);
@@ -29,8 +29,9 @@ namespace jafar{
         void writeHarrisImagesAsPPM(jafar::image::ROI & roi);
 
       private:
-        float m_threshold;
         int m_derivationSize, m_convolutionSize;
+        float m_threshold;
+        float m_edge;
         struct HQuickData {
         	int im_x, im_y, im_xx, im_xy, im_yy, im_conv_xx, im_conv_xy, im_conv_yy;
         	int int_xx, int_xy, int_yy;

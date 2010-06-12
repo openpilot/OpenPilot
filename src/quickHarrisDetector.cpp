@@ -16,9 +16,9 @@ namespace jafar {
 		using namespace image;
 
 		jafar::rtslam::QuickHarrisDetector::QuickHarrisDetector(
-		    float convolutionBoxSize, float threshold) :
-			m_threshold(threshold), m_derivationSize(1),
-			    m_convolutionSize(convolutionBoxSize) {
+		    int convolutionBoxSize, float threshold, float edge) :
+			m_derivationSize(1), m_convolutionSize(convolutionBoxSize),
+			    m_threshold(threshold), m_edge(edge) {
 		}
 
 		bool jafar::rtslam::QuickHarrisDetector::detectIn(
@@ -43,7 +43,8 @@ namespace jafar {
 			m_quickData = new HQuickData[localRoi.width * localRoi.height]; // processing data structure with integral convolution images
 
 			quickDerivatives(image, localRoi);
-			bool success = quickConvolutionWithBestPoint(localRoi, pixBest, scoreBest);
+			bool success =
+			    quickConvolutionWithBestPoint(localRoi, pixBest, scoreBest);
 			// writeHarrisImagesAsPPM(localRoi);
 
 			delete[] m_quickData;
@@ -186,14 +187,16 @@ namespace jafar {
 					sm = int_center->im_conv_xx + int_center->im_conv_yy;
 					df = int_center->im_conv_xx - int_center->im_conv_yy;
 
-					sr = sqrt((double) ((double) df * (double) df + 4 * ((double) int_center->im_conv_xy) * ((double) int_center->im_conv_xy)));
+					sr = sqrt((double) ((double) df * (double) df + 4
+					    * ((double) int_center->im_conv_xy)
+					    * ((double) int_center->im_conv_xy)));
 
 					int_center->im_high_curv = (double) sm + sr; // Smallest eigenvalue.
 					int_center->im_low_curv = (double) sm - sr; // Largest eigenvalue.
 
 					// detect and write pixel corresponding to strongest corner, with score.
 					corner_ratio = int_center->im_high_curv / int_center->im_low_curv; // CAUTION should be high/low
-					if (corner_ratio < 5) {
+					if (corner_ratio < m_edge) {
 						if (int_center->im_low_curv > im_low_curv_max) {
 							im_low_curv_max = int_center->im_low_curv;
 							pixMax[0] = roi.x + rj;
@@ -211,8 +214,7 @@ namespace jafar {
 			}
 
 			// normalized score: over the size of the derivative and convolution windows
-			scoreMax = sqrt(im_low_curv_max / (2 * m_convolutionSize
-			    * m_convolutionSize));
+			scoreMax = sqrt(im_low_curv_max) / m_convolutionSize;
 
 			return (scoreMax > m_threshold);
 
@@ -253,7 +255,6 @@ namespace jafar {
 				fclose(pFile_yy);
 			}
 		}
-
 
 	}
 }

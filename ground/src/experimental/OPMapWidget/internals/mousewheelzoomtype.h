@@ -32,8 +32,10 @@
 #include <QMetaType>
  
 namespace internals {
-struct MouseWheelZoomType
+    struct MouseWheelZoomType:public QObject
 {
+    Q_OBJECT
+public:
     enum Types
     {
         /// <summary>
@@ -52,6 +54,7 @@ struct MouseWheelZoomType
         /// </summary>
         ViewCenter,
     };
+    Q_ENUMS(Types)
     static QStringList TypesStrList(){return strList;}
     static Types TypeByStr(QString const& value){return (Types)MouseWheelZoomType::strList.indexOf(value);}
 private:

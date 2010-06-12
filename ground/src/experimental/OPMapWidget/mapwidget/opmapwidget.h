@@ -2,7 +2,9 @@
 #define OPMAPWIDGET_H
 
 #include "../mapwidget/mapgraphicitem.h"
+#include "../core/geodecoderstatus.h"
 #include <QObject>
+#include <QGLWidget>
 namespace mapcontrol
 {
     class OPMapWidget:public QGraphicsView
@@ -16,8 +18,13 @@ namespace mapcontrol
         Q_PROPERTY(bool ShowTileGridLines READ ShowTileGridLines WRITE SetShowTileGridLines)
         Q_PROPERTY(double Zoom READ Zoom WRITE SetZoom)
         Q_PROPERTY(qreal Rotate READ Rotate WRITE SetRotate)
+        Q_ENUMS(internals::MouseWheelZoomType::Types)
+        Q_ENUMS(internals::GeoCoderStatusCode::Types)
     public:
+        GeoCoderStatusCode geodecoderstatus;
+        QSize sizeHint() const;
         OPMapWidget(QWidget *parent=0);
+        ~OPMapWidget();
         bool ShowTileGridLines()const {return map->showTileGridLines;}
         void SetShowTileGridLines(bool const& value){map->showTileGridLines=value;map->update();}
         int MaxZoom()const{return map->maxZoom;}
@@ -34,17 +41,27 @@ namespace mapcontrol
         void SetCanDragMap(bool const& value){map->SetCanDragMap(value);}
         PointLatLng CurrentPosition()const{return map->core->CurrentPosition();}
         void SetCurrentPosition(PointLatLng const& value){map->core->SetCurrentPosition(value);}
-        double Zoom(){map->Zoom();}
+        double Zoom(){return map->Zoom();}
         void SetZoom(double const& value){map->SetZoom(value);}
         qreal Rotate(){return map->rotation;}
-        void SetRotate(qreal const& value){return map->mapRotate(value);}
+        void SetRotate(qreal const& value){map->mapRotate(value);}
+        void ReloadMap(){map->ReloadMap(); map->resize();;}
+        GeoCoderStatusCode::Types SetCurrentPositionByKeywords(QString const& keys){return map->SetCurrentPositionByKeywords(keys);}
+        bool UseOpenGL(){return useOpenGL;}
+        void SetUseOpenGL(bool const& value);
     private:
-        internals::Core *core;
+        Core *core;
         MapGraphicItem *map;
         QGraphicsScene mscene;
+        bool useOpenGL;
     protected:
-           void resizeEvent(QResizeEvent *event);
-   //    private slots:
+        void resizeEvent(QResizeEvent *event);
+        void showEvent ( QShowEvent * event );
+        void closeEvent(QCloseEvent *event);
+        //    private slots:
+     signals:
+        void zoomChanged(double zoom);
+
 
     };
 }

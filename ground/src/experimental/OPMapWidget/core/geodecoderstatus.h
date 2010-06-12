@@ -28,10 +28,15 @@
 #ifndef GEODECODERSTATUS_H
 #define GEODECODERSTATUS_H
 
- 
+#include <QObject>
+#include <QMetaObject>
+#include <QMetaEnum>
 namespace core {
-struct GeoCoderStatusCode
+    class GeoCoderStatusCode:public QObject
 {
+    Q_OBJECT
+    Q_ENUMS(Types)
+public:
     enum Types
     {
         /// <summary>
@@ -95,7 +100,21 @@ struct GeoCoderStatusCode
         G_GEO_TOO_MANY_QUERIES=620,
 
     };
-};
+    static QString StrByType(Types const& value)
+    {
+        QMetaObject metaObject = GeoCoderStatusCode().staticMetaObject;
+        QMetaEnum metaEnum= metaObject.enumerator( metaObject.indexOfEnumerator("Types"));
+        QString s=metaEnum.valueToKey(value);
+        return s;
+    }
+    static Types TypeByStr(QString const& value)
+    {
+        QMetaObject metaObject = GeoCoderStatusCode().staticMetaObject;
+        QMetaEnum metaEnum= metaObject.enumerator( metaObject.indexOfEnumerator("Types"));
+        Types s=(Types)metaEnum.keyToValue(value.toLatin1());
+        return s;
+    }
 
+};
 }
 #endif // GEODECODERSTATUS_H

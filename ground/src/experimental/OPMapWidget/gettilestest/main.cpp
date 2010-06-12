@@ -46,6 +46,7 @@ int main(int argc, char *argv[])
     //Geocoding Test
     GeoCoderStatusCode::Types status;
     qDebug()<<"Lisbon Coordinates:"<<OPMaps::Instance()->GetLatLngFromGeodecoder("lisbon",status).ToString();
-
+    qDebug()<<googleCopyright;
+    Core *core=new Core;
     return a.exec();
 }

@@ -9,4 +9,4 @@ DEPENDPATH += .
 INCLUDEPATH  += ../core
 SOURCES += main.cpp
 
-LIBS += -L../build -lcore -linternals
+LIBS += -L../build -lcore -linternals  -lcore

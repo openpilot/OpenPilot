@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 //      mapcontrol::MapGraphicItem *mapi=new mapcontrol::MapGraphicItem(c);
 //      scene.addItem(mapi);
 //      QGraphicsView view(&scene);
-//      view.setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+      view.setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 //      view.setRenderHints(QPainter::Antialiasing
 //                               | QPainter::TextAntialiasing);
 //

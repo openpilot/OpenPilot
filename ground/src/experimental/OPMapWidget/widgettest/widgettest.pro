@@ -11,5 +11,5 @@ INCLUDEPATH += ../core
 SOURCES += main.cpp \
     map.cpp
 LIBS += -L../build \
-    -lmapwidget -lcore -linternals
+    -lmapwidget# -lcore -linternals -lcore
 HEADERS += map.h

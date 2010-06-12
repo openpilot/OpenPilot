@@ -52,18 +52,23 @@
 #include <QThread>
 #include <QDateTime>
 
-//#include <QObject>
+#include <QObject>
 
 namespace mapcontrol
 {
     class OPMapControl;
     class MapGraphicItem;
 }
- 
+
 namespace internals {
+
+    class MouseWheelZoomType;
+
 class Core:public QObject,public QRunnable
 {
     Q_OBJECT
+    Q_ENUMS(core::GeoCoderStatusCode::Types);
+    Q_ENUMS(MouseWheelZoomType::Types);
     friend class mapcontrol::OPMapControl;
     friend class mapcontrol::MapGraphicItem;
 public:

@@ -1,9 +1,10 @@
 TEMPLATE = subdirs
+CONFIG += ordered
 SUBDIRS = core
 SUBDIRS += internals
 SUBDIRS += mapwidget
-CONFIG += ordered
-SUBDIRS +=teste
-SUBDIRS +=gettilestest
-SUBDIRS +=widgettest
-
+#SUBDIRS +=teste
+#SUBDIRS +=gettilestest
+#SUBDIRS +=widgettest
+#SUBDIRS +=opmapplugin
+SUBDIRS+=finaltest

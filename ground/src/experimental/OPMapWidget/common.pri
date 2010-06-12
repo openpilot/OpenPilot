@@ -7,7 +7,8 @@ WARNINGS += -Wall
 
 # CONFIG += console
 # CONFIG -= app_bundle
-CONFIG += dll
+#CONFIG += dll
+CONFIG += staticlib
 TEMPLATE = lib
 UI_DIR = uics
 MOC_DIR = mocs

@@ -22,7 +22,7 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                 QWidget *widget);
 
-
+    QSize sizeHint()const;
 
 
 protected:
@@ -74,10 +74,15 @@ private:
     double Zoom();
     void SetZoom(double const& value);
     void mapRotate ( qreal angle );
+    void start();
+    void  ReloadMap(){core->ReloadMap();}
+    GeoCoderStatusCode::Types SetCurrentPositionByKeywords(QString const& keys){return core->SetCurrentPositionByKeywords(keys);}
 private slots:
     void Core_OnNeedInvalidation();
 public slots:
-    void resize ( QRectF const &rect );
+    void resize ( QRectF const &rect=QRectF() );
+signals:
+    void zoomChanged(double zoom);
 };
 }
 #endif // MAPGRAPHICITEM_H

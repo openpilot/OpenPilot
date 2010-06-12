@@ -380,7 +380,7 @@ namespace internals {
     {
         GeoCoderStatusCode::Types status = GeoCoderStatusCode::Unknow;
         PointLatLng pos = OPMaps::Instance()->GetLatLngFromGeodecoder(keys, status);
-        if(pos.IsEmpty() && status == GeoCoderStatusCode::G_GEO_SUCCESS)
+        if(!pos.IsEmpty() && (status == GeoCoderStatusCode::G_GEO_SUCCESS))
         {
             SetCurrentPosition(pos);
         }

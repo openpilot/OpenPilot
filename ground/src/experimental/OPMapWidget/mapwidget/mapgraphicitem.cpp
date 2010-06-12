@@ -1,7 +1,7 @@
 #include "mapgraphicitem.h"
 namespace mapcontrol
 {
-    MapGraphicItem::MapGraphicItem(Core *core):core(core),MapRenderTransform(1), maxZoom(17),minZoom(2),zoomReal(0),isSelected(false)
+    MapGraphicItem::MapGraphicItem(Core *core):core(core),MapRenderTransform(1), maxZoom(17),minZoom(2),zoomReal(0),isSelected(false),rotation(0)
     {
         EmptytileBrush = Qt::cyan;
         MissingDataFont =QFont ("Times",10,QFont::Bold);
@@ -20,20 +20,24 @@ namespace mapcontrol
 
         connect(core,SIGNAL(OnNeedInvalidation()),this,SLOT(Core_OnNeedInvalidation()));
 
-        core->StartSystem();
+
         //resize();
     }
+    void MapGraphicItem::start()
+    {
+        core->StartSystem();
+    }
+
     void MapGraphicItem::resize(const QRectF &rect)
     {
-        if(rotation!=0)
+
         {
             maprect=boundingBox(scene()->sceneRect(),rotation);
             this->setTransform(QTransform().translate(-(maprect.width()-scene()->width())/2,-(maprect.height()-scene()->height())/2));
             this->setTransformOriginPoint(maprect.center().x(),maprect.center().y());
             this->setRotation(rotation);
         }
-        else
-            maprect=rect;
+
         core->OnMapSizeChanged(maprect.width(),maprect.height());
         core->SetCurrentRegion(Rectangle(0, 0, maprect.width(), maprect.height()));
         if(isVisible())
@@ -330,15 +334,19 @@ namespace mapcontrol
         if(value > MaxZoom())
         {
             core->SetZoom(MaxZoom());
+            emit zoomChanged(MaxZoom());
         }
         else if(value < MinZoom())
         {
             core->SetZoom(MinZoom());
+            emit zoomChanged(MinZoom());
         }
         else
         {
             core->SetZoom(value);
+            emit zoomChanged(value);
         }
+
     }
 
     void MapGraphicItem::Offset(int const& x, int const& y)
@@ -358,5 +366,12 @@ namespace mapcontrol
         ret.setHeight(rect.height()*fabs(c)+rect.width()*fabs(s));
         ret.setWidth(rect.width()*fabs(c)+rect.height()*fabs(s));
         return ret;
+    }
+    QSize MapGraphicItem::sizeHint()const
+    {
+        core::Size size=core->projection->GetTileMatrixMaxXY(MinZoom());
+        core::Size tilesize=core->projection->TileSize();
+        QSize rsize((size.Width()+1)*tilesize.Width(),(size.Height()+1)*tilesize.Height());
+        return rsize;
     }
 }

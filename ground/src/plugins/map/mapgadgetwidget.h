@@ -33,6 +33,8 @@
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/positionactual.h"
 
+#include <QPixmap>
+
 using namespace qmapcontrol;
 
 class MapGadgetWidget : public QWidget
@@ -47,8 +49,9 @@ public:
    void setMapProvider(QString provider);
 
 public slots:
-//    void coordinateClicked(const QMouseEvent* evnt, const QPointF coordinate);	// added by cathy
-    void geometryClicked(Geometry* geom, QPoint coord_px);			// added by cathy
+    void coordinateEvent(const QMouseEvent* evnt, const QPointF coordinate);	// added by cathy
+    void gsc_uav_ClickEvent(Geometry* geom, QPoint coord_px);			// added by cathy
+    void wayPointClickEvent(Geometry* geom, QPoint coord_px);			// added by cathy
 
     void gscButtonClick();		// added by cathy
     void uavButtonClick(bool checked);  // added by cathy
@@ -65,6 +68,8 @@ private:
 
     bool follow_uav;    // true if the map is to stay centered on the UAV
 
+    double heading;	// compass/uav heading
+
    MapControl *m_mc;
 
    MapAdapter *m_osmAdapter;
@@ -77,14 +82,29 @@ private:
    Layer *m_googleSatLayer;
    Layer *m_yahooLayer;
 
+    Layer *m_positionLayer;
+    Layer *m_wayPointLayer;
+
+    FixedImageOverlay *m_compassImageOverlay;
+
+    ImagePoint *gscPoint;
+    ImagePoint *uavPoint;
+
    QTimer *m_updateTimer;
 
    PositionActual *m_positionActual;
 
-    QPointF gscPosition;
-
     QPushButton *gscButton;	// added by cathy
     QPushButton *uavButton;	// added by cathy
+
+    QPixmap gsc_pixmap;
+    QPixmap uav_pixmap;
+    QPixmap waypoint_pixmap;
+    QPixmap compass_background_pixmap;
+    QPixmap compass_needle_pixmap;
+
+    void addWayPoint(QPointF pos, QString name);
+    void addCompass(QPointF pos, int size = 200, QString name = "compass");
 };
 
 #endif /* MAPGADGETWIDGET_H_ */

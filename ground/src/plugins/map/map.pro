@@ -18,3 +18,4 @@ SOURCES += mapplugin.cpp \
     mapgadgetoptionspage.cpp
 OTHER_FILES += MapGadget.pluginspec
 FORMS += mapgadgetoptionspage.ui
+RESOURCES += map.qrc

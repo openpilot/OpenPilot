@@ -292,14 +292,17 @@ namespace qmapcontrol
             layermanager->scrollView(offset);
             pre_click_px = QPoint(evnt->x(), evnt->y());
         }
-        else if (mousepressed && mymousemode == Dragging)
+	else
+	if (mousepressed && mymousemode == Dragging)
         {
             current_mouse_pos = QPoint(evnt->x(), evnt->y());
         }
-        // emit(mouseEventCoordinate(evnt, clickToWorldCoordinate(evnt->pos())));
+
+	emit mouseEventCoordinate(evnt, clickToWorldCoordinate(evnt->pos()));	// cathy .. uncommented to produce mouse move events
 
         update();
-        // emit(mouseEventCoordinate(evnt, clickToWorldCoordinate(evnt->pos())));
+
+//	emit mouseEventCoordinate(evnt, clickToWorldCoordinate(evnt->pos()));
     }
 
     // added by cathy

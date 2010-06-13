@@ -32,7 +32,6 @@
 #include "rtslam/landmarkEuclideanPoint.hpp"
 #include "rtslam/observationPinHoleAnchoredHomogeneous.hpp"
 #include "rtslam/activeSearch.hpp"
-//#include "rtslam/observationPinHolePoint.hpp"
 #include "rtslam/featureAbstract.hpp"
 #include "rtslam/rawImage.hpp"
 

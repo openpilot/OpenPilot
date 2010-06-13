@@ -8,7 +8,7 @@
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   PIOS_SPI SPI Functions
  * @notes
- * J19 provides two RCLK (alias Chip Select) lines.<BR>
+ * J19 provides two SSEL (alias Chip Select) lines.<BR>
  * It's a software emulated SPI, therefore the selected spi_prescaler has no
  * effect! Bytes are transfered so fast as possible. The usage of
  * PIOS_SPI_PIN_DRIVER_STRONG is strongly recommended ;)<BR>
@@ -41,12 +41,18 @@
 
 #if defined(PIOS_INCLUDE_SPI)
 
+#include <pios_spi_priv.h>
 
-/* Local variables */
-static void (*spi_callback[PIOS_SPI_NUM])(void);
-static uint8_t tx_dummy_byte;
-static uint8_t rx_dummy_byte;
+static struct pios_spi_dev * find_spi_dev_by_id (uint8_t spi)
+{
+  if (spi >= pios_spi_num_devices) {
+    /* Undefined SPI port for this board (see pios_board.c) */
+    return NULL;
+  }
 
+  /* Get a handle for the device configuration */
+  return &(pios_spi_devs[spi]);
+}
 
 /**
 * Initialises SPI pins
@@ -55,251 +61,94 @@ static uint8_t rx_dummy_byte;
 */
 int32_t PIOS_SPI_Init(void)
 {
-	DMA_InitTypeDef DMA_InitStructure;
-	DMA_StructInit(&DMA_InitStructure);
-	NVIC_InitTypeDef NVIC_InitStructure;
+	struct pios_spi_dev * spi_dev;
+	uint8_t               i;
 
-#if (PIOS_SPI0_ENABLED)
-	/* SPI0 */
-	/* Disable callback function */
-	spi_callback[0] = NULL;
+	for (i = 0; i < pios_spi_num_devices; i++) {
+	  /* Get a handle for the device configuration */
+	  spi_dev = find_spi_dev_by_id(i);
+	  PIOS_DEBUG_Assert(spi_dev);
 
-	/* Set RC pin(s) to 1 */
-	PIOS_SPI_RC_PinSet(0, 1); // spi, rc_pin, pin_value
+	  /* Disable callback function */
+	  spi_dev->callback = NULL;
 
-	/* IO configuration */
-	PIOS_SPI_IO_Init(0, PIOS_SPI_PIN_DRIVER_WEAK_OD);
+	  /* Set rx/tx dummy bytes to a known value */
+	  spi_dev->rx_dummy_byte = 0xFF;
+	  spi_dev->tx_dummy_byte = 0xFF;
 
-	/* Enable SPI peripheral clock (APB2 == high speed) */
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
+	  switch (spi_dev->cfg->init.SPI_NSS) {
+	  case SPI_NSS_Soft:
+	    if (spi_dev->cfg->init.SPI_Mode == SPI_Mode_Master) {
+	      /* We're a master in soft NSS mode, make sure we see NSS high at all times. */
+	      SPI_NSSInternalSoftwareConfig(spi_dev->cfg->regs, SPI_NSSInternalSoft_Set);
+	      /* Since we're driving the SSEL pin in software, ensure that the slave is deselected */
+	      GPIO_SetBits(spi_dev->cfg->ssel.gpio, spi_dev->cfg->ssel.init.GPIO_Pin);
+	      GPIO_Init(spi_dev->cfg->ssel.gpio, &(spi_dev->cfg->ssel.init));
+	    } else {
+	      /* We're a slave in soft NSS mode, make sure we see NSS low at all times. */
+	      SPI_NSSInternalSoftwareConfig(spi_dev->cfg->regs, SPI_NSSInternalSoft_Reset);
+	    }
+	    break;
+	  case SPI_NSS_Hard:
+	      GPIO_Init(spi_dev->cfg->ssel.gpio, &(spi_dev->cfg->ssel.init));
+	    break;
+	  default:
+	    PIOS_DEBUG_Assert(0);
+	  }
+	  
+	  /* Initialize the GPIO pins */
+	  GPIO_Init(spi_dev->cfg->sclk.gpio, &(spi_dev->cfg->sclk.init));
+	  GPIO_Init(spi_dev->cfg->mosi.gpio, &(spi_dev->cfg->mosi.init));
+	  GPIO_Init(spi_dev->cfg->miso.gpio, &(spi_dev->cfg->miso.init));
 
-	/* Enable DMA1 clock */
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
+	  /* Enable the associated peripheral clock */
+	  switch ((uint32_t)spi_dev->cfg->regs) {
+	  case (uint32_t)SPI1:
+	    /* Enable SPI peripheral clock (APB2 == high speed) */
+	    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
+	    break;
+	  case (uint32_t)SPI2:
+	    /* Enable SPI peripheral clock (APB1 == slow speed) */
+	    RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
+	    break;
+	  case (uint32_t)SPI3:
+	    /* Enable SPI peripheral clock (APB1 == slow speed) */
+	    RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI3, ENABLE);
+	    break;
+	  }  
+	  
+	  /* Enable DMA clock */
+	  RCC_AHBPeriphClockCmd(spi_dev->cfg->dma.ahb_clk, ENABLE);
+	  
+	  /* Configure DMA for SPI Rx */
+	  DMA_Cmd(spi_dev->cfg->dma.rx.channel, DISABLE);
+	  DMA_Init(spi_dev->cfg->dma.rx.channel, &(spi_dev->cfg->dma.rx.init));
+	
+	  /* Configure DMA for SPI Tx */
+	  DMA_Cmd(spi_dev->cfg->dma.tx.channel, DISABLE);
+	  DMA_Init(spi_dev->cfg->dma.tx.channel, &(spi_dev->cfg->dma.tx.init));
 
-	/* DMA Configuration for SPI Rx Event */
-	DMA_Cmd(PIOS_SPI0_DMA_RX_PTR, DISABLE);
-	DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&PIOS_SPI0_PTR->DR;
-	DMA_InitStructure.DMA_MemoryBaseAddr = 0; /* Will be configured later */
-	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;
-	DMA_InitStructure.DMA_BufferSize = 0; /* Will be configured later */
-	DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-	DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
-	DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
-	DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
-	DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;
-	DMA_InitStructure.DMA_Priority = DMA_Priority_Medium;
-	DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;
-	DMA_Init(PIOS_SPI0_DMA_RX_PTR, &DMA_InitStructure);
+	  /* Initialize the SPI block */
+	  SPI_Init(spi_dev->cfg->regs, &(spi_dev->cfg->init));
 
-	/* DMA Configuration for SPI Tx Event */
-	/* (partly re-using previous DMA setup) */
-	DMA_Cmd(PIOS_SPI0_DMA_TX_PTR, DISABLE);
-	DMA_InitStructure.DMA_MemoryBaseAddr = 0; /* Will be configured later */
-	DMA_InitStructure.DMA_BufferSize = 0; /* Will be configured later */
-	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralDST;
-	DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
-	DMA_Init(PIOS_SPI0_DMA_TX_PTR, &DMA_InitStructure);
+	  /* Enable SPI */
+	  SPI_Cmd(spi_dev->cfg->regs, ENABLE);
 
-	/* Initial SPI peripheral configuration */
-	PIOS_SPI_TransferModeInit(0, PIOS_SPI_MODE_CLK1_PHASE1, PIOS_SPI_PRESCALER_128);
+	  /* Enable SPI interrupts to DMA */
+	  SPI_I2S_DMACmd(spi_dev->cfg->regs, SPI_I2S_DMAReq_Tx | SPI_I2S_DMAReq_Rx, ENABLE);
 
-	/* Enable SPI */
-	SPI_Cmd(PIOS_SPI0_PTR, ENABLE);
+	  /* Configure DMA interrupt */
+	  NVIC_Init(&(spi_dev->cfg->dma.irq.init));
+	}
 
-	/* Enable SPI interrupts to DMA */
-	SPI_I2S_DMACmd(PIOS_SPI0_PTR, SPI_I2S_DMAReq_Tx | SPI_I2S_DMAReq_Rx, ENABLE);
-
-	/* Configure DMA interrupt */
-	NVIC_InitStructure.NVIC_IRQChannel = PIOS_SPI0_DMA_IRQ_CHANNEL;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_SPI_IRQ_DMA_PRIORITY;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
-#endif
-
-#if (PIOS_SPI1_ENABLED)
-	/* SPI1 */
-	/* Disable callback function */
-	spi_callback[1] = NULL;
-
-	/* Set RC pin(s) to 1 */
-	PIOS_SPI_RC_PinSet(1, 1); /* spi, pin_value */
-
-	/* IO configuration */
-	PIOS_SPI_IO_Init(1, PIOS_SPI_PIN_DRIVER_WEAK_OD);
-
-	/* Enable SPI peripheral clock (APB1 == slow speed) */
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
-
-	/* Enable DMA1 clock */
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
-
-	/* DMA Configuration for SPI Rx Event */
-	DMA_Cmd(PIOS_SPI1_DMA_RX_PTR, DISABLE);
-	DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&PIOS_SPI1_PTR->DR;
-	DMA_InitStructure.DMA_MemoryBaseAddr = 0; // will be configured later
-	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;
-	DMA_InitStructure.DMA_BufferSize = 0; // will be configured later
-	DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-	DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
-	DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
-	DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
-	DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;
-	DMA_InitStructure.DMA_Priority = DMA_Priority_Medium;
-	DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;
-	DMA_Init(PIOS_SPI1_DMA_RX_PTR, &DMA_InitStructure);
-
-	/* DMA Configuration for SPI Tx Event */
-	/* (partly re-using previous DMA setup) */
-	DMA_Cmd(PIOS_SPI1_DMA_TX_PTR, DISABLE);
-	DMA_InitStructure.DMA_MemoryBaseAddr = 0; // will be configured later
-	DMA_InitStructure.DMA_BufferSize = 0; // will be configured later
-	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralDST;
-	DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
-	DMA_Init(PIOS_SPI1_DMA_TX_PTR, &DMA_InitStructure);
-
-	/* Initial SPI peripheral configuration */
-	PIOS_SPI_TransferModeInit(1, PIOS_SPI_MODE_CLK1_PHASE1, PIOS_SPI_PRESCALER_128);
-
-	/* Enable SPI */
-	SPI_Cmd(PIOS_SPI1_PTR, ENABLE);
-
-	/* Enable SPI interrupts to DMA */
-	SPI_I2S_DMACmd(PIOS_SPI1_PTR, SPI_I2S_DMAReq_Tx | SPI_I2S_DMAReq_Rx, ENABLE);
-
-	/* Configure DMA interrupt */
-	NVIC_InitStructure.NVIC_IRQChannel = PIOS_SPI1_DMA_IRQ_CHANNEL;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_SPI_IRQ_DMA_PRIORITY; /* defined in PIOS_irq.h */
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
-#endif
-
-	/* No error */
 	return 0;
 }
 
 
 /**
-* (Re-)initializes SPI IO Pins
-* By default, all output pins are configured with weak open drain drivers for 2 MHz
-* \param[in] spi SPI number (0, 1 or 2)
-* \param[in] spi_pin_driver configures the driver strength:
-* <UL>
-*   <LI>PIOS_SPI_PIN_DRIVER_STRONG: Configures outputs for up to 50 MHz
-*   <LI>PIOS_SPI_PIN_DRIVER_STRONG_OD: Configures outputs as open drain
-*       for up to 50 MHz (allows voltage shifting via pull-resistors)
-*   <LI>PIOS_SPI_PIN_DRIVER_WEAK: Configures outputs for up to 2 MHz (better EMC)
-*   <LI>PIOS_SPI_PIN_DRIVER_WEAK_OD: Configures outputs as open drain for
-*       up to 2 MHz (allows voltage shifting via pull-resistors)
-* </UL>
-* \return 0 if no error
-* \return -1 if disabled SPI port selected
-* \return -2 if unsupported SPI port selected
-* \return -3 if unsupported pin driver mode
-*/
-int32_t PIOS_SPI_IO_Init(uint8_t spi, SPIPinDriverTypeDef spi_pin_driver)
-{
-	/* Init GPIO structure */
-	GPIO_InitTypeDef GPIO_InitStructure;
-	GPIO_StructInit(&GPIO_InitStructure);
-
-	/* Select pin driver and output mode */
-	uint32_t af_mode;
-	uint32_t gp_mode;
-
-	switch(spi_pin_driver) {
-		case PIOS_SPI_PIN_DRIVER_STRONG:
-			GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-			af_mode = GPIO_Mode_AF_PP;
-			gp_mode = GPIO_Mode_Out_PP;
-			break;
-
-		case PIOS_SPI_PIN_DRIVER_STRONG_OD:
-			GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-			af_mode = GPIO_Mode_AF_OD;
-			gp_mode = GPIO_Mode_Out_OD;
-			break;
-
-		case PIOS_SPI_PIN_DRIVER_WEAK:
-			GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-			af_mode = GPIO_Mode_AF_PP;
-			gp_mode = GPIO_Mode_Out_PP;
-			break;
-
-		case PIOS_SPI_PIN_DRIVER_WEAK_OD:
-			GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-			af_mode = GPIO_Mode_AF_OD;
-			gp_mode = GPIO_Mode_Out_OD;
-			break;
-
-		default:
-			 /* Unsupported pin driver mode */
-			return -3;
-	}
-
-	switch(spi) {
-		case 0:
-			/* SCLK and DOUT are outputs assigned to alternate functions */
-			GPIO_InitStructure.GPIO_Mode = af_mode;
-			GPIO_InitStructure.GPIO_Pin  = PIOS_SPI0_SCLK_PIN;
-			GPIO_Init(PIOS_SPI0_SCLK_PORT, &GPIO_InitStructure);
-			GPIO_InitStructure.GPIO_Pin  = PIOS_SPI0_MOSI_PIN;
-			GPIO_Init(PIOS_SPI0_MOSI_PORT, &GPIO_InitStructure);
-
-			/* RCLK outputs assigned to GPIO */
-			GPIO_InitStructure.GPIO_Mode = gp_mode;
-			GPIO_InitStructure.GPIO_Pin  = PIOS_SPI0_RCLK1_PIN;
-			GPIO_Init(PIOS_SPI0_RCLK1_PORT, &GPIO_InitStructure);
-
-			/* DIN is input with pull-up */
-			GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-			GPIO_InitStructure.GPIO_Pin  = PIOS_SPI0_MISO_PIN;
-			GPIO_Init(PIOS_SPI0_MISO_PORT, &GPIO_InitStructure);
-			break;
-
-		case 1:
-			/* SCLK and DOUT are outputs assigned to alternate functions */
-			GPIO_InitStructure.GPIO_Mode = af_mode;
-			GPIO_InitStructure.GPIO_Pin  = PIOS_SPI1_SCLK_PIN;
-			GPIO_Init(PIOS_SPI1_SCLK_PORT, &GPIO_InitStructure);
-			GPIO_InitStructure.GPIO_Pin  = PIOS_SPI1_MOSI_PIN;
-			GPIO_Init(PIOS_SPI1_MOSI_PORT, &GPIO_InitStructure);
-
-			/* RCLK outputs assigned to GPIO */
-			GPIO_InitStructure.GPIO_Mode = gp_mode;
-			GPIO_InitStructure.GPIO_Pin  = PIOS_SPI1_RCLK1_PIN;
-			GPIO_Init(PIOS_SPI1_RCLK1_PORT, &GPIO_InitStructure);
-
-			/* DIN is input with pull-up */
-			GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-			GPIO_InitStructure.GPIO_Pin  = PIOS_SPI1_MISO_PIN;
-			GPIO_Init(PIOS_SPI1_MISO_PORT, &GPIO_InitStructure);
-			break;
-
-		default:
-			/* Unsupported SPI port */
-			return -2;
-	}
-
-	/* No error */
-	return 0;
-}
-
-
-/**
-* (Re-)initialises SPI peripheral transfer mode
-* By default, all SPI peripherals are configured with
-* PIOS_SPI_MODE_CLK1_PHASE1 and PIOS_SPI_PRESCALER_128
+* (Re-)initialises SPI peripheral clock rate
 *
 * \param[in] spi SPI number (0 or 1)
-* \param[in] spi_mode configures clock and capture phase:
-* <UL>
-*   <LI>PIOS_SPI_MODE_CLK0_PHASE0: Idle level of clock is 0, data captured at rising edge
-*   <LI>PIOS_SPI_MODE_CLK0_PHASE1: Idle level of clock is 0, data captured at falling edge
-*   <LI>PIOS_SPI_MODE_CLK1_PHASE0: Idle level of clock is 1, data captured at falling edge
-*   <LI>PIOS_SPI_MODE_CLK1_PHASE1: Idle level of clock is 1, data captured at rising edge
-* </UL>
 * \param[in] spi_prescaler configures the SPI speed:
 * <UL>
 *   <LI>PIOS_SPI_PRESCALER_2: sets clock rate 27.7~ nS @ 72 MHz (36 MBit/s) (only supported for spi==0, spi1 uses 4 instead)
@@ -315,93 +164,37 @@ int32_t PIOS_SPI_IO_Init(uint8_t spi, SPIPinDriverTypeDef spi_pin_driver)
 * \return -1 if disabled SPI port selected
 * \return -2 if unsupported SPI port selected
 * \return -3 if invalid spi_prescaler selected
-* \return -4 if invalid spi_mode selected
 */
-int32_t PIOS_SPI_TransferModeInit(uint8_t spi, SPIModeTypeDef spi_mode, SPIPrescalerTypeDef spi_prescaler)
+int32_t PIOS_SPI_SetClockSpeed(uint8_t spi, SPIPrescalerTypeDef spi_prescaler)
 {
-	/* SPI configuration */
-	SPI_InitTypeDef SPI_InitStructure;
-	SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
-	SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
-	SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
-	SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
-	SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
-	SPI_InitStructure.SPI_CRCPolynomial = 7;
+  struct pios_spi_dev * spi_dev;
+  SPI_InitTypeDef       SPI_InitStructure;
 
-	switch(spi_mode) {
-		case PIOS_SPI_MODE_CLK0_PHASE0:
-			SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;
-			SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
-			break;
-		case PIOS_SPI_MODE_CLK0_PHASE1:
-			SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;
-			SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;
-			break;
-		case PIOS_SPI_MODE_CLK1_PHASE0:
-			SPI_InitStructure.SPI_CPOL = SPI_CPOL_High;
-			SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
-			break;
-		case PIOS_SPI_MODE_CLK1_PHASE1:
-			SPI_InitStructure.SPI_CPOL = SPI_CPOL_High;
-			SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;
-			break;
-		default:
-			/* Invalid SPI clock/phase mode */
-			return -4;
-	}
+  /* Get a handle for the device configuration */
+  spi_dev = find_spi_dev_by_id(spi);
 
-	if(spi_prescaler >= 8) {
-		/* Invalid prescaler selected */
-		return -3;
-	}
+  if (!spi_dev) {
+    /* Undefined SPI port for this board (see pios_board.c) */
+    return -2;
+  }
 
-	switch(spi) {
-		case 0: {
-			uint16_t prev_cr1 = PIOS_SPI0_PTR->CR1;
-			/* SPI1 perpipheral is located in APB2 domain and clocked at full speed */
-			/* therefore we have to add +1 to the prescaler */
-			SPI_InitStructure.SPI_BaudRatePrescaler = ((uint16_t)spi_prescaler&7) << 3;
-			SPI_Init(PIOS_SPI0_PTR, &SPI_InitStructure);
+  if(spi_prescaler >= 8) {
+    /* Invalid prescaler selected */
+    return -3;
+  }
 
-			if((prev_cr1 ^ PIOS_SPI0_PTR->CR1) & 3) {
-				/* CPOL and CPHA located at bit #1 and #0 */
-				/* clock configuration has been changed - we should send a dummy byte */
-				/* before the application activates chip select. */
-				/* this solves a dependency between SDCard and ENC28J60 driver */
-				PIOS_SPI_TransferByte(spi, 0xff);
-			}
+  /* Start with a copy of the default configuration for the peripheral */
+  SPI_InitStructure = spi_dev->cfg->init;
 
-			} break;
+  /* Adjust the prescaler for the peripheral's clock */
+  SPI_InitStructure.SPI_BaudRatePrescaler = ((uint16_t)spi_prescaler & 7) << 3;
 
-		case 1: {
-			uint16_t prev_cr1 = PIOS_SPI1_PTR->CR1;
+  /* Write back the new configuration */
+  SPI_Init(spi_dev->cfg->regs, &SPI_InitStructure);
 
-			/* SPI2 perpipheral is located in APB1 domain and clocked at half speed */
-			if(spi_prescaler == 0) {
-				SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2;
-			} else {
-				SPI_InitStructure.SPI_BaudRatePrescaler = (((uint16_t)spi_prescaler&7)-1) << 3;
-			}
-			SPI_Init(PIOS_SPI1_PTR, &SPI_InitStructure);
-
-			if((prev_cr1 ^ PIOS_SPI1_PTR->CR1) & 3) {
-				/* CPOL and CPHA located at bit #1 and #0 */
-				/* clock configuration has been changed - we should send a dummy byte */
-				/* before the application activates chip select. */
-				/* this solves a dependency between SDCard and ENC28J60 driver */
-				PIOS_SPI_TransferByte(spi, 0xff);
-			}
-			} break;
-
-		default:
-			/* Unsupported SPI port */
-			return -2;
-	}
-
-	/* No error */
-	return 0;
+  PIOS_SPI_TransferByte(spi, 0xFF);
+  return 0;
 }
-
 
 /**
 * Controls the RC (Register Clock alias Chip Select) pin of a SPI port
@@ -413,33 +206,24 @@ int32_t PIOS_SPI_TransferModeInit(uint8_t spi, SPIModeTypeDef spi_mode, SPIPresc
 */
 int32_t PIOS_SPI_RC_PinSet(uint8_t spi, uint8_t pin_value)
 {
-	switch(spi) {
-		case 0:
-			if(pin_value) {
-				PIOS_SPI0_RCLK1_PORT->BSRR = PIOS_SPI0_RCLK1_PIN;
-			} else {
-				PIOS_SPI0_RCLK1_PORT->BRR = PIOS_SPI0_RCLK1_PIN;
-			}
-			break;
+  struct pios_spi_dev * spi_dev;
 
-		case 1:
-			if(pin_value) {
-				PIOS_SPI1_RCLK1_PORT->BSRR = PIOS_SPI1_RCLK1_PIN;
-			} else {
-				PIOS_SPI1_RCLK1_PORT->BRR  = PIOS_SPI1_RCLK1_PIN;
-			}
+  /* Get a handle for the device configuration */
+  spi_dev = find_spi_dev_by_id(spi);
 
-			break;
+  if (!spi_dev) {
+    /* Undefined SPI port for this board (see pios_board.c) */
+    return -2;
+  }
 
-		default:
-			/* Unsupported SPI port */
-			return -2;
-	}
+  if (pin_value) {
+    GPIO_SetBits(spi_dev->cfg->ssel.gpio, spi_dev->cfg->ssel.init.GPIO_Pin);
+  } else {
+    GPIO_ResetBits(spi_dev->cfg->ssel.gpio, spi_dev->cfg->ssel.init.GPIO_Pin);
+  }
 
-	/* No error */
-	return 0;
+  return 0;
 }
-
 
 /**
 * Transfers a byte to SPI output and reads back the return value from SPI input
@@ -452,41 +236,42 @@ int32_t PIOS_SPI_RC_PinSet(uint8_t spi, uint8_t pin_value)
 */
 int32_t PIOS_SPI_TransferByte(uint8_t spi, uint8_t b)
 {
-	SPI_TypeDef *spi_ptr;
+  struct pios_spi_dev * spi_dev;
+  uint8_t dummy;
+  uint8_t rx_byte;
 
-	switch(spi) {
-		case 0:
-			spi_ptr = PIOS_SPI0_PTR;
-			break;
+  /* Get a handle for the device configuration */
+  spi_dev = find_spi_dev_by_id(spi);
 
-		case 1:
-			spi_ptr = PIOS_SPI1_PTR;
-			break;
+  if (!spi_dev) {
+    /* Undefined SPI port for this board (see pios_board.c) */
+    return -2;
+  }
 
-		default:
-			/* Unsupported SPI port */
-			return -2;
-	}
+  /* 
+   * Procedure taken from STM32F10xxx Reference Manual section 23.3.5
+   */
 
-	/* Send byte */
-	spi_ptr->DR = b;
+  /* Make sure the RXNE flag is cleared by reading the DR register */
+  dummy = spi_dev->cfg->regs->DR;
 
-	if(spi_ptr->SR); /* Dummy read due to undocumented pipelining issue :-/ */
-	/* TK: without this read (which can be done to any bus location) we could sporadically */
-	/* get the status byte at the moment where DR is written. Accordingly, the busy bit */
-	/* will be 0. */
-	/* you won't see this dummy read in STM drivers, as they never have a DR write */
-	/* followed by SR read, or as they are using SPI1/SPI2 pointers, which results into */
-	/* some additional CPU instructions between strh/ldrh accesses. */
-	/* We use a bus access instead of NOPs to avoid any risk for back-to-back transactions */
-	/* over AHB (if SPI1/SPI2 pointers are used, there is still a risk for such a scenario, */
-	/* e.g. if DMA loads the bus!) */
+  /* Start the transfer */
+  spi_dev->cfg->regs->DR = b;
 
-	/* Wait until SPI transfer finished */
-	while(spi_ptr->SR & SPI_I2S_FLAG_BSY);
+  /* Wait until there is a byte to read */
+  while(!(spi_dev->cfg->regs->SR & SPI_I2S_FLAG_RXNE));
 
-	/* Return received byte */
-	return spi_ptr->DR;
+  /* Read the rx'd byte */
+  rx_byte = spi_dev->cfg->regs->DR;
+
+  /* Wait until the TXE goes high */
+  while (!(spi_dev->cfg->regs->SR & SPI_I2S_FLAG_TXE));
+
+  /* Wait for SPI transfer to have fully completed */
+  while (spi_dev->cfg->regs->SR & SPI_I2S_FLAG_BSY);
+
+  /* Return received byte */
+  return rx_byte;
 }
 
 
@@ -509,94 +294,90 @@ int32_t PIOS_SPI_TransferByte(uint8_t spi, uint8_t b)
 */
 int32_t PIOS_SPI_TransferBlock(uint8_t spi, uint8_t *send_buffer, uint8_t *receive_buffer, uint16_t len, void *callback)
 {
-	DMA_Channel_TypeDef *dma_tx_ptr, *dma_rx_ptr;
+  struct pios_spi_dev * spi_dev;
+  DMA_InitTypeDef       dma_init;
 
-	switch(spi) {
-		case 0:
-			dma_tx_ptr = PIOS_SPI0_DMA_TX_PTR;
-			dma_rx_ptr = PIOS_SPI0_DMA_RX_PTR;
-			break;
+  /* Get a handle for the device configuration */
+  spi_dev = find_spi_dev_by_id(spi);
 
-		case 1:
-			dma_tx_ptr = PIOS_SPI1_DMA_TX_PTR;
-			dma_rx_ptr = PIOS_SPI1_DMA_RX_PTR;
-			break;
+  if (!spi_dev) {
+    /* Undefined SPI port for this board (see pios_board.c) */
+    return -2;
+  }
 
-		default:
-			/* Unsupported SPI port */
-			return -2;
-	}
 
-	/* Exit if ongoing transfer */
-	if(dma_rx_ptr->CNDTR) {
-		return -3;
-	}
+  /* Exit if ongoing transfer */
+  if(spi_dev->cfg->dma.rx.channel->CNDTR) {
+    return -3;
+  }
 
-	/* Set callback function */
-	spi_callback[spi] = callback;
+  /* Set callback function */
+  spi_dev->callback = callback;
 
-	/* Configure Rx channel */
-	DMA_Cmd(dma_rx_ptr, DISABLE);
-	if(receive_buffer != NULL) {
-		/* Enable memory addr. increment - bytes written into receive buffer */
-		dma_rx_ptr->CMAR = (uint32_t)receive_buffer;
-		dma_rx_ptr->CCR |= DMA_MemoryInc_Enable;
-	} else {
-		/* Disable memory addr. increment - bytes written into dummy buffer */
-		rx_dummy_byte = 0xff;
-		dma_rx_ptr->CMAR = (uint32_t)&rx_dummy_byte;
-		dma_rx_ptr->CCR &= ~DMA_MemoryInc_Enable;
-	}
-	dma_rx_ptr->CNDTR = len;
-	DMA_Cmd(dma_rx_ptr, ENABLE);
+  /* Configure Rx channel */
+  DMA_Cmd(spi_dev->cfg->dma.rx.channel, DISABLE);
 
-	/* Configure Tx channel */
-	DMA_Cmd(dma_tx_ptr, DISABLE);
-	if(send_buffer != NULL) {
-		/* Enable memory addr. increment - bytes read from send buffer */
-		dma_tx_ptr->CMAR = (uint32_t)send_buffer;
-		dma_tx_ptr->CCR |= DMA_MemoryInc_Enable;
-	} else {
-		/* Disable memory addr. increment - bytes read from dummy buffer */
-		tx_dummy_byte = 0xff;
-		dma_tx_ptr->CMAR = (uint32_t)&tx_dummy_byte;
-		dma_tx_ptr->CCR &= ~DMA_MemoryInc_Enable;
-	}
-	dma_tx_ptr->CNDTR = len;
+  /* Start with the default configuration for this peripheral */
+  dma_init = spi_dev->cfg->dma.rx.init;
 
-	/* Enable DMA interrupt if callback function active */
-	DMA_ITConfig(dma_rx_ptr, DMA_IT_TC, (callback != NULL) ? ENABLE : DISABLE);
+  if(receive_buffer != NULL) {
+    /* Enable memory addr. increment - bytes written into receive buffer */
+    dma_init.DMA_MemoryBaseAddr = (uint32_t)receive_buffer;
+    dma_init.DMA_MemoryInc      = DMA_MemoryInc_Enable;
+  } else {
+    /* Disable memory addr. increment - bytes written into dummy buffer */
+    spi_dev->rx_dummy_byte = 0xff;
+    dma_init.DMA_MemoryBaseAddr = (uint32_t)&spi_dev->rx_dummy_byte;
+    dma_init.DMA_MemoryInc      = DMA_MemoryInc_Disable;
+  }
+  dma_init.DMA_MemoryDataSize = len;
+  DMA_Init(spi_dev->cfg->dma.rx.channel, &(dma_init));
+  DMA_Cmd(spi_dev->cfg->dma.rx.channel, ENABLE);
 
-	/* Start DMA transfer */
-	DMA_Cmd(dma_tx_ptr, ENABLE);
+  /* Configure Tx channel */
+  DMA_Cmd(spi_dev->cfg->dma.tx.channel, DISABLE);
 
-	/* Wait until all bytes have been transmitted/received */
-	while(dma_rx_ptr->CNDTR);
+  /* Start with the default configuration for this peripheral */
+  dma_init = spi_dev->cfg->dma.tx.init;
 
-	/* No error */
-	return 0;
+  if(send_buffer != NULL) {
+    /* Enable memory addr. increment - bytes written into receive buffer */
+    dma_init.DMA_MemoryBaseAddr = (uint32_t)send_buffer;
+    dma_init.DMA_MemoryInc      = DMA_MemoryInc_Enable;
+  } else {
+    /* Disable memory addr. increment - bytes written into dummy buffer */
+    spi_dev->tx_dummy_byte = 0xff;
+    dma_init.DMA_MemoryBaseAddr = (uint32_t)&spi_dev->tx_dummy_byte;
+    dma_init.DMA_MemoryInc      = DMA_MemoryInc_Disable;
+  }
+  dma_init.DMA_MemoryDataSize = len;
+  DMA_Init(spi_dev->cfg->dma.tx.channel, &(dma_init));
+
+  /* Enable DMA interrupt if callback function active */
+  DMA_ITConfig(spi_dev->cfg->dma.rx.channel, DMA_IT_TC, (callback != NULL) ? ENABLE : DISABLE);
+
+  /* Start DMA Tx transfer */
+  DMA_Cmd(spi_dev->cfg->dma.tx.channel, ENABLE);
+
+  /* Wait until all bytes have been transmitted/received */
+  while(DMA_GetCurrDataCounter(spi_dev->cfg->dma.tx.channel));
+
+  /* No error */
+  return 0;
 }
 
-
-/**
-* Called when callback function has been defined and SPI transfer has finished
-*/
-PIOS_SPI0_DMA_IRQHANDLER_FUNC
+void PIOS_SPI_IRQ_Handler(uint8_t spi)
 {
-	DMA_ClearFlag(PIOS_SPI0_DMA_RX_IRQ_FLAGS);
+  struct pios_spi_dev * spi_dev;
 
-	if(spi_callback[0] != NULL) {
-		spi_callback[0]();
-	}
-}
+  spi_dev = find_spi_dev_by_id (spi);
+  PIOS_DEBUG_Assert(spi_dev);
 
-PIOS_SPI1_DMA_IRQHANDLER_FUNC
-{
-	DMA_ClearFlag(PIOS_SPI1_DMA_RX_IRQ_FLAGS);
+  DMA_ClearFlag(spi_dev->cfg->dma.irq.flags);
 
-	if(spi_callback[1] != NULL) {
-		spi_callback[1]();
-	}
+  if(spi_dev->callback != NULL) {
+    spi_dev->callback();
+  }
 }
 
 #endif

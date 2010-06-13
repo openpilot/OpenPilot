@@ -86,6 +86,7 @@ CMSISDIR  = $(STMLIBDIR)/CMSIS/Core/CM3
 
 ## AHRS:
 SRC = ahrs.c
+SRC += pios_board.c
 
 ## PIOS Hardware (STM32F10x)
 SRC += $(PIOSSTM32F10X)/pios_sys.c
@@ -96,7 +97,7 @@ SRC += $(PIOSSTM32F10X)/pios_irq.c
 SRC += $(PIOSSTM32F10X)/pios_adc.c
 SRC += $(PIOSSTM32F10X)/pios_i2c.c
 SRC += $(PIOSSTM32F10X)/pios_gpio.c
-#SRC += $(PIOSSTM32F10X)/pios_spi.c
+SRC += $(PIOSSTM32F10X)/pios_spi.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_com.c

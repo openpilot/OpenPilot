@@ -100,12 +100,12 @@ int32_t PIOS_SDCARD_Init(void)
 
 	sdcard_mounted = 0;
 
-	/* Ensure that fast pin drivers are activated */
-	PIOS_SPI_IO_Init(PIOS_SDCARD_SPI, PIOS_SPI_PIN_DRIVER_STRONG);
+	//PIOS_SPI_Init(PIOS_SDCARD_SPI);
 
 	/* Init SPI port for slow frequency access (ca. 0.3 MBit/s) */
-	PIOS_SPI_TransferModeInit(PIOS_SDCARD_SPI, PIOS_SPI_MODE_CLK1_PHASE1, PIOS_SPI_PRESCALER_256);
+	PIOS_SPI_SetClockSpeed(PIOS_SDCARD_SPI, PIOS_SPI_PRESCALER_256);
 
+	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xFF);
 	SDCARD_MUTEX_GIVE;
 
 	/* No error */
@@ -127,7 +127,7 @@ int32_t PIOS_SDCARD_PowerOn(void)
 	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1); /* spi, pin_value */
 
 	/* Init SPI port for slow frequency access (ca. 0.3 MBit/s) */
-	PIOS_SPI_TransferModeInit(PIOS_SDCARD_SPI, PIOS_SPI_MODE_CLK1_PHASE1, PIOS_SPI_PRESCALER_256);
+	PIOS_SPI_SetClockSpeed(PIOS_SDCARD_SPI, PIOS_SPI_PRESCALER_256);
 
 	/* Send 80 clock cycles to start up */
 	for(i=0; i<10; ++i) {
@@ -270,7 +270,7 @@ int32_t PIOS_SDCARD_CheckAvailable(uint8_t was_available)
 	if(was_available) {
 		/* Init SPI port for fast frequency access (ca. 18 MBit/s) */
 		/* This is required for the case that the SPI port is shared with other devices */
-		PIOS_SPI_TransferModeInit(PIOS_SDCARD_SPI, PIOS_SPI_MODE_CLK1_PHASE1, PIOS_SPI_PRESCALER_4);
+		PIOS_SPI_SetClockSpeed(PIOS_SDCARD_SPI, PIOS_SPI_PRESCALER_4);
 
 		/* Activate chip select */
 		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0); /* spi, pin_value */
@@ -279,7 +279,7 @@ int32_t PIOS_SDCARD_CheckAvailable(uint8_t was_available)
 		ret = PIOS_SDCARD_SendSDCCmd(SDCMD_SEND_STATUS, 0, SDCMD_SEND_STATUS_CRC);
 	} else {
 		/* Ensure that SPI interface is clocked at low speed */
-		PIOS_SPI_TransferModeInit(PIOS_SDCARD_SPI, PIOS_SPI_MODE_CLK1_PHASE1, PIOS_SPI_PRESCALER_256);
+		PIOS_SPI_SetClockSpeed(PIOS_SDCARD_SPI, PIOS_SPI_PRESCALER_256);
 
 		/* Deactivate chip select */
 		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1); /* spi, pin_value */
@@ -430,7 +430,7 @@ int32_t PIOS_SDCARD_SectorRead(uint32_t sector, uint8_t *buffer)
 
 	/* Init SPI port for fast frequency access (ca. 18 MBit/s) */
 	/* this is required for the case that the SPI port is shared with other devices */
-	PIOS_SPI_TransferModeInit(PIOS_SDCARD_SPI, PIOS_SPI_MODE_CLK1_PHASE1, PIOS_SPI_PRESCALER_4);
+	PIOS_SPI_SetClockSpeed(PIOS_SDCARD_SPI, PIOS_SPI_PRESCALER_4);
 
 	if((status=PIOS_SDCARD_SendSDCCmd(SDCMD_READ_SINGLE_BLOCK, sector, SDCMD_READ_SINGLE_BLOCK_CRC))) {
 		status = (status < 0) ? -256 : status; /* return timeout indicator or error flags */
@@ -503,7 +503,7 @@ int32_t PIOS_SDCARD_SectorWrite(uint32_t sector, uint8_t *buffer)
 
 	/* Init SPI port for fast frequency access (ca. 18 MBit/s) */
 	/* This is required for the case that the SPI port is shared with other devices */
-	PIOS_SPI_TransferModeInit(PIOS_SDCARD_SPI, PIOS_SPI_MODE_CLK1_PHASE1, PIOS_SPI_PRESCALER_4);
+	PIOS_SPI_SetClockSpeed(PIOS_SDCARD_SPI, PIOS_SPI_PRESCALER_4);
 
 	if((status=PIOS_SDCARD_SendSDCCmd(SDCMD_WRITE_SINGLE_BLOCK, sector, SDCMD_WRITE_SINGLE_BLOCK_CRC))) {
 		status = (status < 0) ? -256 : status; /* Return timeout indicator or error flags */
@@ -571,7 +571,7 @@ int32_t PIOS_SDCARD_CIDRead(SDCARDCidTypeDef *cid)
 	/* This is required for the case that the SPI port is shared with other devices */
 	SDCARD_MUTEX_TAKE;
 
-	PIOS_SPI_TransferModeInit(PIOS_SDCARD_SPI, PIOS_SPI_MODE_CLK1_PHASE1, PIOS_SPI_PRESCALER_4);
+	PIOS_SPI_SetClockSpeed(PIOS_SDCARD_SPI, PIOS_SPI_PRESCALER_4);
 
 	if((status = PIOS_SDCARD_SendSDCCmd(SDCMD_SEND_CID, 0, SDCMD_SEND_CID_CRC))) {
 		status = (status < 0) ? -256 : status; /* return timeout indicator or error flags */
@@ -661,7 +661,7 @@ int32_t PIOS_SDCARD_CSDRead(SDCARDCsdTypeDef *csd)
 
 	/* Init SPI port for fast frequency access (ca. 18 MBit/s) */
 	/* This is required for the case that the SPI port is shared with other devices */
-	PIOS_SPI_TransferModeInit(PIOS_SDCARD_SPI, PIOS_SPI_MODE_CLK1_PHASE1, PIOS_SPI_PRESCALER_4);
+	PIOS_SPI_SetClockSpeed(PIOS_SDCARD_SPI, PIOS_SPI_PRESCALER_4);
 
 	if((status = PIOS_SDCARD_SendSDCCmd(SDCMD_SEND_CSD, 0, SDCMD_SEND_CSD_CRC))) {
 		status = (status < 0) ? -256 : status; /* Return timeout indicator or error flags */

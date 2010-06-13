@@ -28,9 +28,8 @@
 #ifndef PIOS_H
 #define PIOS_H
 
-/* PIOS Compile Time Configuration */
+/* PIOS Feature Selection */
 #include "pios_config.h"
-#include "pios_board.h"
 
 #if defined(PIOS_INCLUDE_FREERTOS)
 /* FreeRTOS Includes */
@@ -61,6 +60,9 @@
 /* Mass Storage Device Includes */
 #include <msd.h>
 #endif
+
+/* PIOS Board Specific Device Configuration */
+#include "pios_board.h"
 
 /* PIOS Hardware Includes (STM32F10x) */
 #include <pios_sys.h>
@@ -99,5 +101,7 @@
 /* USB Libs */
 #include <usb_lib.h>
 #endif
+
+#define NELEMENTS(x) (sizeof(x) / sizeof(*(x)))
 
 #endif /* PIOS_H */

@@ -1,4 +1,4 @@
-/**
+ /**
  ******************************************************************************
  *
  * @file       pios_board.h
@@ -114,6 +114,13 @@ TIM8  |           |           |           |
 #define PIOS_I2C_IRQ_ER_CHANNEL			I2C1_EV_IRQn
 #define PIOS_I2C_IRQ_EV_PRIORITY		2
 #define PIOS_I2C_IRQ_ER_PRIORITY		2
+
+//-------------------------
+// SPI
+//
+// See also pios_board.c
+//-------------------------
+#define PIOS_OP_SPI				0
 
 //-------------------------
 // PIOS_USART1

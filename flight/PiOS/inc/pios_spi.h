@@ -29,20 +29,6 @@
 
 /* Global types */
 typedef enum {
-	PIOS_SPI_PIN_DRIVER_STRONG = 0,
-	PIOS_SPI_PIN_DRIVER_STRONG_OD = 1,
-	PIOS_SPI_PIN_DRIVER_WEAK = 2,
-	PIOS_SPI_PIN_DRIVER_WEAK_OD = 3,
-} SPIPinDriverTypeDef;
-
-typedef enum {
-	PIOS_SPI_MODE_CLK0_PHASE0 = 0,
-	PIOS_SPI_MODE_CLK0_PHASE1 = 1,
-	PIOS_SPI_MODE_CLK1_PHASE0 = 2,
-	PIOS_SPI_MODE_CLK1_PHASE1 = 3
-} SPIModeTypeDef;
-
-typedef enum {
 	PIOS_SPI_PRESCALER_2 = 0,
 	PIOS_SPI_PRESCALER_4 = 1,
 	PIOS_SPI_PRESCALER_8 = 2,
@@ -53,13 +39,12 @@ typedef enum {
 	PIOS_SPI_PRESCALER_256 = 7
 } SPIPrescalerTypeDef;
 
-
-/* PUblic Functions */
+/* Public Functions */
 extern int32_t PIOS_SPI_Init(void);
-extern int32_t PIOS_SPI_IO_Init(uint8_t spi, SPIPinDriverTypeDef spi_pin_driver);
-extern int32_t PIOS_SPI_TransferModeInit(uint8_t spi, SPIModeTypeDef spi_mode, SPIPrescalerTypeDef spi_prescaler);
+extern int32_t PIOS_SPI_SetClockSpeed(uint8_t spi, SPIPrescalerTypeDef spi_prescaler);
 extern int32_t PIOS_SPI_RC_PinSet(uint8_t spi, uint8_t pin_value);
 extern int32_t PIOS_SPI_TransferByte(uint8_t spi, uint8_t b);
 extern int32_t PIOS_SPI_TransferBlock(uint8_t spi, uint8_t *send_buffer, uint8_t *receive_buffer, uint16_t len, void *callback);
+extern void    PIOS_SPI_IRQ_Handler(uint8_t spi);
 
-#endif /* PIOS_SSPI_H */
+#endif /* PIOS_SPI_H */

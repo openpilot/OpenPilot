@@ -71,6 +71,9 @@ int main()
 	int16_t data[3] = {0};
 	int32_t heading = 0;
 
+	/* SPI link to master */
+	PIOS_SPI_Init();
+
 	// Main loop
 	for(;;) {
 		// Alive signal

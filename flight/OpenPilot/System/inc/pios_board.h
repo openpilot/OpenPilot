@@ -162,44 +162,11 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 
 //-------------------------
 // SPI
-//-------------------------
-#define PIOS_SPI_IRQ_DMA_PRIORITY		PIOS_IRQ_PRIO_HIGH
-#define PIOS_SPI_NUM				2
-#define PIOS_SPI0_ENABLED			1
-#define PIOS_SPI0_PTR				SPI1
-#define PIOS_SPI0_DMA_RX_PTR			DMA1_Channel2
-#define PIOS_SPI0_DMA_TX_PTR			DMA1_Channel3
-#define PIOS_SPI0_DMA_RX_IRQ_FLAGS		(DMA1_FLAG_TC2 | DMA1_FLAG_TE2 | DMA1_FLAG_HT2 | DMA1_FLAG_GL2)
-#define PIOS_SPI0_DMA_IRQ_CHANNEL		DMA1_Channel2_IRQn
-#define PIOS_SPI0_DMA_IRQHANDLER_FUNC		void DMA1_Channel2_IRQHandler(void)
-#define PIOS_SPI0_RCLK1_PORT			GPIOA
-#define PIOS_SPI0_RCLK1_PIN			GPIO_Pin_4
-#define PIOS_SPI0_SCLK_PORT			GPIOA
-#define PIOS_SPI0_SCLK_PIN			GPIO_Pin_5
-#define PIOS_SPI0_MISO_PORT			GPIOA
-#define PIOS_SPI0_MISO_PIN			GPIO_Pin_6
-#define PIOS_SPI0_MOSI_PORT			GPIOA
-#define PIOS_SPI0_MOSI_PIN			GPIO_Pin_7
-#define PIOS_SPI1_ENABLED			1
-#define PIOS_SPI1_PTR				SPI2
-#define PIOS_SPI1_DMA_RX_PTR			DMA1_Channel4
-#define PIOS_SPI1_DMA_TX_PTR			DMA1_Channel5
-#define PIOS_SPI1_DMA_RX_IRQ_FLAGS		(DMA1_FLAG_TC4 | DMA1_FLAG_TE4 | DMA1_FLAG_HT4 | DMA1_FLAG_GL4)
-#define PIOS_SPI1_DMA_IRQ_CHANNEL		DMA1_Channel4_IRQn
-#define PIOS_SPI1_DMA_IRQHANDLER_FUNC		void DMA1_Channel4_IRQHandler(void)
-#define PIOS_SPI1_RCLK1_PORT			GPIOB
-#define PIOS_SPI1_RCLK1_PIN			GPIO_Pin_12
-#define PIOS_SPI1_SCLK_PORT			GPIOB
-#define PIOS_SPI1_SCLK_PIN			GPIO_Pin_13
-#define PIOS_SPI1_MISO_PORT			GPIOB
-#define PIOS_SPI1_MISO_PIN			GPIO_Pin_14
-#define PIOS_SPI1_MOSI_PORT			GPIOB
-#define PIOS_SPI1_MOSI_PIN			GPIO_Pin_15
-
-//-------------------------
-// PIOS_SDCARD
+//
+// See also pios_board.c
 //-------------------------
 #define PIOS_SDCARD_SPI				0
+#define PIOS_OPAHRS_SPI				1
 
 //-------------------------
 // Delay Timer

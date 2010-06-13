@@ -522,7 +522,7 @@ int32_t PIOS_USART_TxBufferPut(USARTNumTypeDef usart, uint8_t b)
 PIOS_USART1_IRQHANDLER_FUNC
 {
 	/* Check if RXNE flag is set */
-	if(PIOS_USART1_USART->SR & (1 << 5)) {
+	if(PIOS_USART1_USART->SR & USART_SR_RXNE) {
 		uint8_t b = PIOS_USART1_USART->DR;
 		
 		if(PIOS_USART_RxBufferPut(USART_1, b) < 0) {
@@ -531,7 +531,7 @@ PIOS_USART1_IRQHANDLER_FUNC
 	}
 
 	/* Check if TXE flag is set */
-	if(PIOS_USART1_USART->SR & (1 << 7)) {
+	if(PIOS_USART1_USART->SR & USART_SR_TXE) {
 		if(PIOS_USART_TxBufferUsed(USART_1) > 0) {
 			int b = PIOS_USART_TxBufferGet(USART_1);
 			if(b < 0) {
@@ -542,7 +542,7 @@ PIOS_USART1_IRQHANDLER_FUNC
 			}
 		} else {
 			/* Disable TXE interrupt (TXEIE=0) */
-			PIOS_USART1_USART->CR1 &= ~(1 << 7);
+			PIOS_USART1_USART->CR1 &= ~(USART_CR1_TXEIE);
 		}
 	}
 }
@@ -553,7 +553,7 @@ PIOS_USART1_IRQHANDLER_FUNC
 PIOS_USART2_IRQHANDLER_FUNC
 {
 	/* check if RXNE flag is set */
-	if(PIOS_USART2_USART->SR & (1 << 5)) {
+	if(PIOS_USART2_USART->SR & USART_SR_RXNE) {
 		uint8_t b = PIOS_USART2_USART->DR;
 		
 		if(PIOS_USART_RxBufferPut(USART_2, b) < 0) {
@@ -562,7 +562,7 @@ PIOS_USART2_IRQHANDLER_FUNC
 	}
 	
 	/* Check if TXE flag is set */
-	if(PIOS_USART2_USART->SR & (1 << 7)) {
+	if(PIOS_USART2_USART->SR & USART_SR_TXE) {
 		if(PIOS_USART_TxBufferUsed(USART_2) > 0) {
 			int b = PIOS_USART_TxBufferGet(USART_2);
 			if(b < 0) {
@@ -573,7 +573,7 @@ PIOS_USART2_IRQHANDLER_FUNC
 			}
 		} else {
 			/* Disable TXE interrupt (TXEIE=0) */
-			PIOS_USART2_USART->CR1 &= ~(1 << 7);
+			PIOS_USART2_USART->CR1 &= ~(USART_CR1_TXEIE);
 		}
 	}
 }
@@ -584,7 +584,7 @@ PIOS_USART2_IRQHANDLER_FUNC
 PIOS_USART3_IRQHANDLER_FUNC
 {
 	/* check if RXNE flag is set */
-	if(PIOS_USART3_USART->SR & (1 << 5)) {
+	if(PIOS_USART3_USART->SR & USART_SR_RXNE) {
 		uint8_t b = PIOS_USART3_USART->DR;
 		
 		if(PIOS_USART_RxBufferPut(USART_3, b) < 0) {
@@ -592,7 +592,7 @@ PIOS_USART3_IRQHANDLER_FUNC
 		}
 	}
 
-	if(PIOS_USART3_USART->SR & (1 << 7)) { // check if TXE flag is set
+	if(PIOS_USART3_USART->SR & USART_SR_TXE) { // check if TXE flag is set
 		if(PIOS_USART_TxBufferUsed(USART_3) > 0) {
 			int b = PIOS_USART_TxBufferGet(USART_3);
 			if(b < 0) {
@@ -603,7 +603,7 @@ PIOS_USART3_IRQHANDLER_FUNC
 			}
 		} else {
 			/* Disable TXE interrupt (TXEIE=0) */
-			PIOS_USART3_USART->CR1 &= ~(1 << 7);
+			PIOS_USART3_USART->CR1 &= ~(USART_CR1_TXEIE);
 		}
 	}
 }

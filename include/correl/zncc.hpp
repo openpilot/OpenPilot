@@ -28,8 +28,8 @@ namespace jafar {
 				same size, and can apply a spatially distributed weight. It ignores pixels with extremum value
 				(eg 0 and 255 for char), and ignores parts outside of images, but requires at least half of pixels not ignored
 				to return non 0.
-				@param im1 the second image ; the roi can be set (with set_roi(CvRect))
-				@param im2 the second image ; the roi can be set (with set_roi(CvRect)) and must have the same size than the first one
+				@param im1 the second image ; the roi can be set (with Image::setROI)
+				@param im2 the second image ; the roi can be set (with Image::setROI) and must have the same size than the first one
 				@param weightMatrix the weight matrix that must have the same size than the regions of interest ; if NULL not used
 				@return ZNCC correlation score between 0 and 1
 			*/

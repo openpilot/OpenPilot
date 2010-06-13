@@ -22,6 +22,7 @@ namespace correl {
 //		JFR_PRECOND( roi1.width  == roi2.width , "The width of both images or roi are different" );
 //		JFR_PRECOND( roi1.height == roi2.height, "The height of both images or roi are different" );
 
+		// FIXME weightMatrix should be a cv::Mat in order to have a ROI too, and to adjust it
 		int dw = roi1.width - roi2.width, dh = roi1.height - roi2.height;
 		if (dw != 0)
 		{

@@ -23,6 +23,14 @@ namespace jafar {
 
 			/**
 			This function explores translation to find the best correlation score
+			@param im1 the image representing the patch that is searched in im2 (you can set the ROI)
+			@param im2 the image where the patch represented by im1 is searched
+			@param xmin,xmax the search range along x axis in im2
+			@param xstep the search step along x axis
+			@param ymin,ymax the search range along x axis in im2
+			@param xstep the search step along y axis
+			@param xres,yres the result position in im2 of maximum correlation
+			@param weightMatrix the optional weight matrix applied on correlation, must be of same size than im1 patch size ; if NULL not used
 			*/
 			static double exploreTranslation(image::Image const& im1, image::Image const& im2, int xmin, int xmax, int xstep, int ymin, int ymax, int ystep, double &xres, double &yres, float const* weightMatrix = NULL);
 			

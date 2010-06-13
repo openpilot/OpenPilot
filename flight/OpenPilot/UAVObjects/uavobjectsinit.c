@@ -38,6 +38,7 @@
 #include "exampleobject1.h"
 #include "exampleobject2.h"
 #include "examplesettings.h"
+#include "flightbatterystate.h"
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
 #include "manualcontrolcommand.h"
@@ -67,6 +68,7 @@ void UAVObjectsInitializeAll()
     ExampleObject1Initialize();
     ExampleObject2Initialize();
     ExampleSettingsInitialize();
+    FlightBatteryStateInitialize();
     FlightTelemetryStatsInitialize();
     GCSTelemetryStatsInitialize();
     ManualControlCommandInitialize();

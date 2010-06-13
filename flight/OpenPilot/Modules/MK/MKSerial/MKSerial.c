@@ -28,6 +28,8 @@
 
 #include "attitudeactual.h" // object that will be updated by the module
 #include "positionactual.h"
+#include "flightbatterystate.h"
+
 
 
 //
@@ -481,11 +483,13 @@ static void DoConnectedToNC(void)
 	GpsPosition_t pos;
 	AttitudeActualData attitudeData;
 	PositionActualData positionData;
+	FlightBatteryStateData flightBatteryData;
 
 	DEBUG_MSG("NC\n\r");
 
 	memset(&attitudeData, 0, sizeof(attitudeData));
 	memset(&positionData, 0, sizeof(positionData));
+	memset(&flightBatteryData, 0, sizeof(flightBatteryData));
 
 	// Configure NC for fast reporting of the osd-message
 	SendMsgPar8(MK_ADDR_ALL, MSGCMD_GET_OSD, 10);
@@ -512,6 +516,9 @@ static void DoConnectedToNC(void)
 			positionData.Satellites = msg.pars[OSD_MSG_NB_SATS_IDX];
 			positionData.Status = POSITIONACTUAL_STATUS_FIX3D;				// FIXME
 			PositionActualSet(&positionData);
+
+			flightBatteryData.Tension = (uint32_t)msg.pars[OSD_MSG_BATT_IDX]*100;
+			FlightBatteryStateSet(&flightBatteryData);
 		}
 		else
 		{

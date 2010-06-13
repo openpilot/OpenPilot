@@ -1,0 +1,21 @@
+
+
+Features
+------------------------------------
+- segments
+- multimap
+
+
+
+
+Organization
+------------------------------------
+- move QuickHarrisDetector to fdetect
+- move ExtendedKalmanFilterIndirect to filter
+
+
+
+Performance
+------------------------------------
+- zncc that can use integral image
+

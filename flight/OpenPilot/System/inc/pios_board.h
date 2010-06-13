@@ -108,57 +108,21 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define PIOS_BMP085_OVERSAMPLING		2
 
 //-------------------------
-// PIOS_USART1 (TELEM)
+// USART
+//
+// See also pios_board.c
 //-------------------------
-#define PIOS_USART1_ENABLED			1
-#define PIOS_USART1_USART			USART2
-#define PIOS_USART1_GPIO_PORT			GPIOA
-#define PIOS_USART1_RX_PIN			GPIO_Pin_3
-#define PIOS_USART1_TX_PIN			GPIO_Pin_2
-#define PIOS_USART1_REMAP_FUNC			{ }
-#define PIOS_USART1_IRQ_CHANNEL			USART2_IRQn
-#define PIOS_USART1_IRQHANDLER_FUNC		void USART2_IRQHandler(void)
-#define PIOS_USART1_CLK_FUNC			RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE)
-#define PIOS_USART1_NVIC_PRIO			PIOS_IRQ_PRIO_HIGHEST
-#define PIOS_USART1_BAUDRATE			57600
-
-//-------------------------
-// PIOS_USART2 (GPS)
-//-------------------------
-#define PIOS_USART2_ENABLED			1
-#define PIOS_USART2_USART       		USART3
-#define PIOS_USART2_GPIO_PORT			GPIOC
-#define PIOS_USART2_RX_PIN      		GPIO_Pin_11
-#define PIOS_USART2_TX_PIN      		GPIO_Pin_10
-#define PIOS_USART2_REMAP_FUNC			{ GPIO_PinRemapConfig(GPIO_PartialRemap_USART3, ENABLE); }
-#define PIOS_USART2_IRQ_CHANNEL			USART3_IRQn
-#define PIOS_USART2_IRQHANDLER_FUNC		void USART3_IRQHandler(void)
-#define PIOS_USART2_CLK_FUNC			RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE)
-#define PIOS_USART2_NVIC_PRIO			PIOS_IRQ_PRIO_HIGH
-#define PIOS_USART2_BAUDRATE			57600
-
-//-------------------------
-//  PIOS_USART3 (AUX) (RX5/RX6)
-//-------------------------
-#define PIOS_USART3_ENABLED			0
-#define PIOS_USART3_USART			USART1
-#define PIOS_USART3_GPIO_PORT			GPIOA
-#define PIOS_USART3_RX_PIN			GPIO_Pin_10
-#define PIOS_USART3_TX_PIN			GPIO_Pin_9
-#define PIOS_USART3_REMAP_FUNC			{ }
-#define PIOS_USART3_IRQ_CHANNEL			USART1_IRQn
-#define PIOS_USART3_IRQHANDLER_FUNC		void USART1_IRQHandler(void)
-#define PIOS_USART3_CLK_FUNC			RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE)
-#define PIOS_USART3_NVIC_PRIO			PIOS_IRQ_PRIO_HIGH
-#define PIOS_USART3_BAUDRATE			57600
-
-//-------------------------
-// PIOS_USART
-//-------------------------
-#define PIOS_USART_NUM				3
 #define PIOS_USART_RX_BUFFER_SIZE		1024
 #define PIOS_USART_TX_BUFFER_SIZE		256
-#define PIOS_COM_DEBUG_PORT			USART_1
+
+#define PIOS_COM_TELEM_RF                       0
+#define PIOS_COM_GPS                            1
+#define PIOS_COM_TELEM_USB                      2
+
+#if 0
+#define PIOS_COM_AUX                            3
+#define PIOS_COM_DEBUG                          PIOS_COM_AUX
+#endif
 
 //-------------------------
 // SPI

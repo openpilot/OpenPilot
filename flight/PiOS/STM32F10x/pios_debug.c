@@ -91,9 +91,10 @@ void PIOS_DEBUG_PinLow(uint8_t Pin)
  */
 void PIOS_DEBUG_Panic(const char* msg)
 {
+#ifdef PIOS_COM_DEBUG
 	register int *lr asm ("lr");	// Link-register holds the PC of the caller
-
-	PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "\r%s @0x%x\r", msg, lr);
+	PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_DEBUG, "\r%s @0x%x\r", msg, lr);
+#endif
 
 	// Stay put
 	while(1);

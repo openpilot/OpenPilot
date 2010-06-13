@@ -33,6 +33,12 @@
 
 #if defined(PIOS_INCLUDE_USB_HID)
 
+const struct pios_com_driver pios_usb_com_driver = {
+  .tx_nb    = PIOS_USB_HID_TxBufferPutMoreNonBlocking,
+  .tx       = PIOS_USB_HID_TxBufferPutMore,
+  .rx       = PIOS_USB_HID_RxBufferGet,
+  .rx_avail = PIOS_USB_HID_RxBufferUsed,
+};
 
 /* Local types */
 typedef enum _HID_REQUESTS {
@@ -127,7 +133,7 @@ int32_t PIOS_USB_HID_ChangeConnectionState(uint32_t Connected)
 * \return 0: interface not available
 * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_USB_HID_CheckAvailable(void)
+int32_t PIOS_USB_HID_CheckAvailable(uint8_t id)
 {
   return transfer_possible ? 1 : 0;
 }
@@ -140,7 +146,7 @@ int32_t PIOS_USB_HID_CheckAvailable(void)
 * \return -1 if too many bytes to be send
 * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t *buffer, uint16_t len)
+int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, uint8_t *buffer, uint16_t len)
 {
 	if(len > PIOS_USB_HID_DATA_LENGTH) {
 		/* Cannot send all requested bytes */
@@ -167,11 +173,11 @@ int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t *buffer, uint16_t len)
 * \return -1 if too many bytes to be send
 * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_USB_HID_TxBufferPutMore(uint8_t *buffer, uint16_t len)
+int32_t PIOS_USB_HID_TxBufferPutMore(uint8_t id, uint8_t *buffer, uint16_t len)
 {
   int32_t error;
 
-  while((error = PIOS_USB_HID_TxBufferPutMoreNonBlocking(buffer, len)) == -2);
+  while((error = PIOS_USB_HID_TxBufferPutMoreNonBlocking(id, buffer, len)) == -2);
 
   return error;
 }
@@ -182,7 +188,7 @@ int32_t PIOS_USB_HID_TxBufferPutMore(uint8_t *buffer, uint16_t len)
 * \return >= 0: received byte
 * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
 */
-uint8_t PIOS_USB_HID_RxBufferGet(void)
+int32_t PIOS_USB_HID_RxBufferGet(uint8_t id)
 {
 	if(rx_buffer_new_data_ctr == 0) {
 		/* Nothing new in buffer */
@@ -205,7 +211,7 @@ uint8_t PIOS_USB_HID_RxBufferGet(void)
 * \return 0 nothing available
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_USB_HID_RxBufferUsed(void)
+int32_t PIOS_USB_HID_RxBufferUsed(uint8_t id)
 {
 	return rx_buffer_new_data_ctr;
 }

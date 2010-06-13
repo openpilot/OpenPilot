@@ -32,151 +32,78 @@
 
 #if defined(PIOS_INCLUDE_USART)
 
+#include <pios_usart_priv.h>
 
-/* Global Variables */
+/* Provide a COM driver */
+const struct pios_com_driver pios_usart_com_driver = {
+  .set_baud = PIOS_USART_ChangeBaud,
+  .tx_nb    = PIOS_USART_TxBufferPutMoreNonBlocking,
+  .tx       = PIOS_USART_TxBufferPutMore,
+  .rx       = PIOS_USART_RxBufferGet,
+  .rx_avail = PIOS_USART_RxBufferUsed,
+};
 
+static struct pios_usart_dev * find_usart_dev_by_id (uint8_t usart)
+{
+  if (usart >= pios_usart_num_devices) {
+    /* Undefined USART port for this board (see pios_board.c) */
+    return NULL;
+  }
 
-/* Local Variables */
-static uint8_t rx_buffer[PIOS_USART_NUM][PIOS_USART_RX_BUFFER_SIZE];
-static volatile uint8_t rx_buffer_tail[PIOS_USART_NUM];
-static volatile uint8_t rx_buffer_head[PIOS_USART_NUM];
-static volatile uint8_t rx_buffer_size[PIOS_USART_NUM];
-
-static uint8_t tx_buffer[PIOS_USART_NUM][PIOS_USART_TX_BUFFER_SIZE];
-static volatile uint8_t tx_buffer_tail[PIOS_USART_NUM];
-static volatile uint8_t tx_buffer_head[PIOS_USART_NUM];
-static volatile uint8_t tx_buffer_size[PIOS_USART_NUM];
-
+  /* Get a handle for the device configuration */
+  return &(pios_usart_devs[usart]);
+}
 
 /**
 * Initialise the onboard USARTs
 */
 void PIOS_USART_Init(void)
 {
-	/* Clear buffer counters */
-	uint8_t i;
-	for(i = 0; i < PIOS_USART_NUM; ++i) {
-		rx_buffer_tail[i] = rx_buffer_head[i] = rx_buffer_size[i] = 0;
-		tx_buffer_tail[i] = tx_buffer_head[i] = tx_buffer_size[i] = 0;
-	}
-	
-	/* Configure USART Pins */
-	GPIO_InitTypeDef GPIO_InitStructure;
-	GPIO_StructInit(&GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+  struct pios_usart_dev * usart_dev;
+  uint8_t                 i;
 
-	/* Configure and Init USARTs */
-	USART_InitTypeDef USART_InitStructure;
-	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-	USART_InitStructure.USART_StopBits = USART_StopBits_1;
-	USART_InitStructure.USART_Parity = USART_Parity_No;
-	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+  for (i = 0; i < pios_usart_num_devices; i++) {
+    /* Get a handle for the device configuration */
+    usart_dev = find_usart_dev_by_id(i);
+    PIOS_DEBUG_Assert(usart_dev);
 
-	/* Configure the USART Interrupts */
-	NVIC_InitTypeDef NVIC_InitStructure;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    /* Clear buffer counters */
+    usart_dev->rx.head = usart_dev->rx.tail = usart_dev->rx.size = 0;
+    usart_dev->tx.head = usart_dev->tx.tail = usart_dev->tx.size = 0;
 
-#if (PIOS_USART1_ENABLED)
-	/* Enable the USART Pins Software Remapping */
-	PIOS_USART1_REMAP_FUNC;
+    /* Enable the USART Pins Software Remapping */
+    if (usart_dev->cfg->remap) {
+      GPIO_PinRemapConfig(usart_dev->cfg->remap, ENABLE);
+    }
 
-	/* Configure and Init USART Tx as alternate function push-pull */
-	GPIO_InitStructure.GPIO_Pin = PIOS_USART1_TX_PIN;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_Init(PIOS_USART1_GPIO_PORT, &GPIO_InitStructure);
-	
-	/* Configure and Init USART Rx input with internal pull-ups */
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-	GPIO_InitStructure.GPIO_Pin = PIOS_USART1_RX_PIN;
-	GPIO_Init(PIOS_USART1_GPIO_PORT, &GPIO_InitStructure);
+    /* Initialize the USART Rx and Tx pins */
+    GPIO_Init(usart_dev->cfg->rx.gpio, &usart_dev->cfg->rx.init);
+    GPIO_Init(usart_dev->cfg->tx.gpio, &usart_dev->cfg->tx.init);
 
-	/* Enable USART clock */
-	PIOS_USART1_CLK_FUNC;
+    /* Enable USART clock */
+    switch ((uint32_t)usart_dev->cfg->regs) {
+    case (uint32_t)USART1:
+      RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
+      break;
+    case (uint32_t)USART2:
+      RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
+      break;
+    case (uint32_t)USART3:
+      RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
+      break;
+    }
 
-	/* Enable USART Receive and Transmit interrupts */
-	USART_InitStructure.USART_BaudRate = PIOS_USART1_BAUDRATE;
-	USART_Init(PIOS_USART1_USART, &USART_InitStructure);
-	USART_ITConfig(PIOS_USART1_USART, USART_IT_RXNE, ENABLE);
-	USART_ITConfig(PIOS_USART1_USART, USART_IT_TXE, ENABLE);
+    /* Enable USART */
+    USART_Init(usart_dev->cfg->regs, &usart_dev->cfg->init);
 
-	/* Configure the USART Interrupts */
-	NVIC_InitStructure.NVIC_IRQChannel = PIOS_USART1_IRQ_CHANNEL;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_USART1_NVIC_PRIO;
-	NVIC_Init(&NVIC_InitStructure);
-	USART_ITConfig(PIOS_USART1_USART, USART_IT_RXNE, ENABLE);
+    /* Configure USART Interrupts */
+    NVIC_Init(&usart_dev->cfg->irq.init);
+    USART_ITConfig(usart_dev->cfg->regs, USART_IT_RXNE, ENABLE);
+    USART_ITConfig(usart_dev->cfg->regs, USART_IT_TXE,  ENABLE);
 
-	/* Enable USART */
-	USART_Cmd(PIOS_USART1_USART, ENABLE);
-#endif
-
-#if (PIOS_USART2_ENABLED)
-	/* Enable the USART Pins Software Remapping */
-	PIOS_USART2_REMAP_FUNC;
-
-	/* Configure and Init USART Tx as alternate function push-pull */
-	GPIO_InitStructure.GPIO_Pin = PIOS_USART2_TX_PIN;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_Init(PIOS_USART2_GPIO_PORT, &GPIO_InitStructure);
-
-	/* Configure and Init USART Rx input with internal pull-ups */
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-	GPIO_InitStructure.GPIO_Pin = PIOS_USART2_RX_PIN;
-	GPIO_Init(PIOS_USART2_GPIO_PORT, &GPIO_InitStructure);
-
-	/* Enable USART clock */
-	PIOS_USART2_CLK_FUNC;
-
-	/* Enable USART Receive and Transmit interrupts */
-	USART_InitStructure.USART_BaudRate = PIOS_USART2_BAUDRATE;
-	USART_Init(PIOS_USART2_USART, &USART_InitStructure);
-	USART_ITConfig(PIOS_USART2_USART, USART_IT_RXNE, ENABLE);
-	USART_ITConfig(PIOS_USART2_USART, USART_IT_TXE, ENABLE);
-
-	/* Configure the USART Interrupts */
-	NVIC_InitStructure.NVIC_IRQChannel = PIOS_USART2_IRQ_CHANNEL;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_USART2_NVIC_PRIO;
-	NVIC_Init(&NVIC_InitStructure);
-	USART_ITConfig(PIOS_USART2_USART, USART_IT_RXNE, ENABLE);
-
-	/* Enable USART */
-	USART_Cmd(PIOS_USART2_USART, ENABLE);
-#endif
-
-#if (PIOS_USART3_ENABLED)
-	/* Enable the USART Pins Software Remapping */
-	PIOS_USART3_REMAP_FUNC;
-
-	/* Configure and Init USART Tx as alternate function push-pull */
-	GPIO_InitStructure.GPIO_Pin = PIOS_USART3_TX_PIN;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_Init(PIOS_USART3_GPIO_PORT, &GPIO_InitStructure);
-
-	/* Configure and Init USART Rx input with internal pull-ups */
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-	GPIO_InitStructure.GPIO_Pin = PIOS_USART3_RX_PIN;
-	GPIO_Init(PIOS_USART3_GPIO_PORT, &GPIO_InitStructure);
-
-	/* Enable USART clock */
-	PIOS_USART3_CLK_FUNC;
-
-	/* Enable USART Receive and Transmit interrupts */
-	USART_InitStructure.USART_BaudRate = PIOS_USART3_BAUDRATE;
-	USART_Init(PIOS_USART3_USART, &USART_InitStructure);
-	USART_ITConfig(PIOS_USART3_USART, USART_IT_RXNE, ENABLE);
-	USART_ITConfig(PIOS_USART3_USART, USART_IT_TXE, ENABLE);
-
-	/* Configure the USART Interrupts */
-	NVIC_InitStructure.NVIC_IRQChannel = PIOS_USART3_IRQ_CHANNEL;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_USART3_NVIC_PRIO;
-	NVIC_Init(&NVIC_InitStructure);
-	USART_ITConfig(PIOS_USART3_USART, USART_IT_RXNE, ENABLE);
-
-	/* Enable USART */
-	USART_Cmd(PIOS_USART3_USART, ENABLE);
-#endif
-
+    /* Enable USART */
+    USART_Cmd(usart_dev->cfg->regs, ENABLE);
+  }
 }
 
 /**
@@ -184,26 +111,29 @@ void PIOS_USART_Init(void)
 * \param[in] usart USART name (GPS, TELEM, AUX)
 * \param[in] baud Requested baud rate
 */
-void PIOS_USART_ChangeBaud(USARTNumTypeDef usart, uint32_t baud)
+void PIOS_USART_ChangeBaud(uint8_t usart, uint32_t baud)
 {
-	USART_InitTypeDef USART_InitStructure;
-	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-	USART_InitStructure.USART_StopBits = USART_StopBits_1;
-	USART_InitStructure.USART_Parity = USART_Parity_No;
-	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-	USART_InitStructure.USART_BaudRate = baud;
-	if (usart == USART_1) {
-		USART_Init(PIOS_USART1_USART, &USART_InitStructure);
-	} else if (usart == USART_2) {
-#if (PIOS_USART2_ENABLED)
-		USART_Init(PIOS_USART2_USART, &USART_InitStructure);
+  struct pios_usart_dev * usart_dev;
+  USART_InitTypeDef USART_InitStructure;
+
+  /* Get a handle for the device configuration */
+  usart_dev = find_usart_dev_by_id(usart);
+
+#if 0
+  if (!usart_dev) {
+    /* Undefined USART port for this board (see pios_board.c) */
+    return -2;
+  }
 #endif
-	} else if (usart == USART_3) {
-#if (PIOS_USART3_ENABLED)
-		USART_Init(PIOS_USART3_USART, &USART_InitStructure);
-#endif
-	}
+
+  /* Start with a copy of the default configuration for the peripheral */
+  USART_InitStructure = usart_dev->cfg->init;
+
+  /* Adjust the baud rate */
+  USART_InitStructure.USART_BaudRate = baud;
+  
+  /* Write back the new configuration */
+  USART_Init(usart_dev->cfg->regs, &USART_InitStructure);
 }
 
 /**
@@ -213,13 +143,19 @@ void PIOS_USART_ChangeBaud(USARTNumTypeDef usart, uint32_t baud)
 * \return 1: USART available
 * \return 0: USART not available
 */
-int32_t PIOS_USART_RxBufferFree(USARTNumTypeDef usart)
+int32_t PIOS_USART_RxBufferFree(uint8_t usart)
 {
-	if(usart >= PIOS_USART_NUM) {
-		return 0;
-	} else {
-		return PIOS_USART_RX_BUFFER_SIZE - rx_buffer_size[usart];
-	}
+  struct pios_usart_dev * usart_dev;
+
+  /* Get a handle for the device configuration */
+  usart_dev = find_usart_dev_by_id(usart);
+
+  if (!usart_dev) {
+    /* Undefined USART port for this board (see pios_board.c) */
+    return -2;
+  }
+
+  return (sizeof(usart_dev->rx.buf) - usart_dev->rx.size);
 }
 
 /**
@@ -229,13 +165,19 @@ int32_t PIOS_USART_RxBufferFree(USARTNumTypeDef usart)
 * \return 0 if USART not available
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_USART_RxBufferUsed(USARTNumTypeDef usart)
+int32_t PIOS_USART_RxBufferUsed(uint8_t usart)
 {
-	if(usart >= PIOS_USART_NUM) {
-		return 0;
-	} else {
-		return rx_buffer_size[usart];
-	}
+  struct pios_usart_dev * usart_dev;
+
+  /* Get a handle for the device configuration */
+  usart_dev = find_usart_dev_by_id(usart);
+
+  if (!usart_dev) {
+    /* Undefined USART port for this board (see pios_board.c) */
+    return -2;
+  }
+
+  return (usart_dev->rx.size);
 }
 
 /**
@@ -246,28 +188,34 @@ int32_t PIOS_USART_RxBufferUsed(USARTNumTypeDef usart)
 * \return >= 0: number of received bytes
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_USART_RxBufferGet(USARTNumTypeDef usart)
+int32_t PIOS_USART_RxBufferGet(uint8_t usart)
 {
-	if(usart >= PIOS_USART_NUM) {
-		/* USART not available */
-		return -1;
-	}
-	if(!rx_buffer_size[usart]) {
-		/* nothing new in buffer */
-		return -2;
-	}
-	
-	/* get byte - this operation should be atomic! */
-	PIOS_IRQ_Disable();
-	uint8_t b = rx_buffer[usart][rx_buffer_tail[usart]];
-	if(++rx_buffer_tail[usart] >= PIOS_USART_RX_BUFFER_SIZE) {
-		rx_buffer_tail[usart] = 0;
-	}
-	--rx_buffer_size[usart];
-	PIOS_IRQ_Enable();
-	
-	/* Return received byte */
-	return b;
+  struct pios_usart_dev * usart_dev;
+
+  /* Get a handle for the device configuration */
+  usart_dev = find_usart_dev_by_id(usart);
+
+  if (!usart_dev) {
+    /* Undefined USART port for this board (see pios_board.c) */
+    return -2;
+  }
+
+  if (!usart_dev->rx.size) {
+    /* Nothing new in the buffer */
+    return -1;
+  }
+
+  /* get byte - this operation should be atomic! */
+  PIOS_IRQ_Disable();
+  uint8_t b = usart_dev->rx.buf[usart_dev->rx.tail++];
+  if (usart_dev->rx.tail >= sizeof(usart_dev->rx.buf)) {
+    usart_dev->rx.tail = 0;
+  }
+  usart_dev->rx.size--;
+  PIOS_IRQ_Enable();
+  
+  /* Return received byte */
+  return b;
 }
 
 /**
@@ -278,25 +226,30 @@ int32_t PIOS_USART_RxBufferGet(USARTNumTypeDef usart)
 * \return >= 0: number of received bytes
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_USART_RxBufferPeek(USARTNumTypeDef usart)
+int32_t PIOS_USART_RxBufferPeek(uint8_t usart)
 {
-	if(usart >= PIOS_USART_NUM) {
-		/* USART not available */
-		return -1;
-	}
+  struct pios_usart_dev * usart_dev;
 
-	if(!rx_buffer_size[usart]) {
-		/* Nothing new in buffer */
-		return -2;
-	}
+  /* Get a handle for the device configuration */
+  usart_dev = find_usart_dev_by_id(usart);
 
-	/* Get byte - this operation should be atomic! */
-	PIOS_IRQ_Disable();
-	uint8_t b = rx_buffer[usart][rx_buffer_tail[usart]];
-	PIOS_IRQ_Enable();
+  if (!usart_dev) {
+    /* Undefined USART port for this board (see pios_board.c) */
+    return -2;
+  }
 
-	/* Return received byte */
-	return b;
+  if (!usart_dev->rx.size) {
+    /* Nothing new in the buffer */
+    return -1;
+  }
+
+  /* get byte - this operation should be atomic! */
+  PIOS_IRQ_Disable();
+  uint8_t b = usart_dev->rx.buf[usart_dev->rx.tail];
+  PIOS_IRQ_Enable();
+  
+  /* Return received byte */
+  return b;
 }
 
 /**
@@ -308,30 +261,35 @@ int32_t PIOS_USART_RxBufferPeek(USARTNumTypeDef usart)
 * \return -2 if buffer full (retry)
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_USART_RxBufferPut(USARTNumTypeDef usart, uint8_t b)
+int32_t PIOS_USART_RxBufferPut(uint8_t usart, uint8_t b)
 {
-	if(usart >= PIOS_USART_NUM) {
-		/* USART not available */
-		return -1;
-	}
+  struct pios_usart_dev * usart_dev;
 
-	if(rx_buffer_size[usart] >= PIOS_USART_RX_BUFFER_SIZE) {
-		/* Buffer full (retry) */
-		return -2;
-	}
+  /* Get a handle for the device configuration */
+  usart_dev = find_usart_dev_by_id(usart);
 
-	/* Copy received byte into receive buffer */
-	/* This operation should be atomic! */
-	PIOS_IRQ_Disable();
-	rx_buffer[usart][rx_buffer_head[usart]] = b;
-	if(++rx_buffer_head[usart] >= PIOS_USART_RX_BUFFER_SIZE) {
-		rx_buffer_head[usart] = 0;
-	}
-	++rx_buffer_size[usart];
-	PIOS_IRQ_Enable();
+  if (!usart_dev) {
+    /* Undefined USART port for this board (see pios_board.c) */
+    return -1;
+  }
 
-	/* No error */
-	return 0;
+  if (usart_dev->rx.size >= sizeof(usart_dev->rx.buf)) {
+    /* Buffer full (retry) */
+    return -2;
+  }
+
+  /* Copy received byte into receive buffer */
+  /* This operation should be atomic! */
+  PIOS_IRQ_Disable();
+  usart_dev->rx.buf[usart_dev->rx.head++] = b;
+  if (usart_dev->rx.head >= sizeof(usart_dev->rx.buf)) {
+    usart_dev->rx.head = 0;
+  }
+  usart_dev->rx.size++;
+  PIOS_IRQ_Enable();
+
+  /* No error */
+  return 0;
 }
 
 /**
@@ -341,13 +299,19 @@ int32_t PIOS_USART_RxBufferPut(USARTNumTypeDef usart, uint8_t b)
 * \return 0 if USART not available
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_USART_TxBufferFree(USARTNumTypeDef usart)
+int32_t PIOS_USART_TxBufferFree(uint8_t usart)
 {
-	if(usart >= PIOS_USART_NUM) {
-		return 0;
-	} else {
-		return PIOS_USART_TX_BUFFER_SIZE - tx_buffer_size[usart];
-	}
+  struct pios_usart_dev * usart_dev;
+
+  /* Get a handle for the device configuration */
+  usart_dev = find_usart_dev_by_id(usart);
+
+  if (!usart_dev) {
+    /* Undefined USART port for this board (see pios_board.c) */
+    return 0;
+  }
+
+  return (sizeof(usart_dev->tx.buf) - usart_dev->tx.size);
 }
 
 /**
@@ -357,13 +321,19 @@ int32_t PIOS_USART_TxBufferFree(USARTNumTypeDef usart)
 * \return 0 if USART not available
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_USART_TxBufferUsed(USARTNumTypeDef usart)
+int32_t PIOS_USART_TxBufferUsed(uint8_t usart)
 {
-	if(usart >= PIOS_USART_NUM) {
-		return 0;
-	} else {
-		return tx_buffer_size[usart];
-	}
+  struct pios_usart_dev * usart_dev;
+
+  /* Get a handle for the device configuration */
+  usart_dev = find_usart_dev_by_id(usart);
+
+  if (!usart_dev) {
+    /* Undefined USART port for this board (see pios_board.c) */
+    return 0;
+  }
+
+  return (usart_dev->tx.size);
 }
 
 /**
@@ -374,29 +344,34 @@ int32_t PIOS_USART_TxBufferUsed(USARTNumTypeDef usart)
 * \return >= 0: transmitted byte
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_USART_TxBufferGet(USARTNumTypeDef usart)
+int32_t PIOS_USART_TxBufferGet(uint8_t usart)
 {
-	if(usart >= PIOS_USART_NUM) {
-		/* USART not available */
-		return -1;
-	}
+  struct pios_usart_dev * usart_dev;
 
-	if(!tx_buffer_size[usart]) {
-		/* Nothing new in buffer */
-		return -2;
-	}
+  /* Get a handle for the device configuration */
+  usart_dev = find_usart_dev_by_id(usart);
 
-	/* Get byte - this operation should be atomic! */
-	PIOS_IRQ_Disable();
-	uint8_t b = tx_buffer[usart][tx_buffer_tail[usart]];
-	if(++tx_buffer_tail[usart] >= PIOS_USART_TX_BUFFER_SIZE) {
-		tx_buffer_tail[usart] = 0;
-	}
-	--tx_buffer_size[usart];
-	PIOS_IRQ_Enable();
+  if (!usart_dev) {
+    /* Undefined USART port for this board (see pios_board.c) */
+    return -1;
+  }
 
-	/* Return transmitted byte */
-	return b;
+  if (!usart_dev->tx.size) {
+    /* Nothing new in the buffer */
+    return -2;
+  }
+
+  /* get byte - this operation should be atomic! */
+  PIOS_IRQ_Disable();
+  uint8_t b = usart_dev->tx.buf[usart_dev->tx.tail++];
+  if (usart_dev->tx.tail >= sizeof(usart_dev->tx.buf)) {
+    usart_dev->tx.tail = 0;
+  }
+  usart_dev->tx.size--;
+  PIOS_IRQ_Enable();
+  
+  /* Return received byte */
+  return b;
 }
 
 /**
@@ -410,55 +385,45 @@ int32_t PIOS_USART_TxBufferGet(USARTNumTypeDef usart)
 * \return -3 if USART not supported by USARTTxBufferPut Routine
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_USART_TxBufferPutMoreNonBlocking(USARTNumTypeDef usart, uint8_t *buffer, uint16_t len)
+int32_t PIOS_USART_TxBufferPutMoreNonBlocking(uint8_t usart, uint8_t *buffer, uint16_t len)
 {
-	if(usart >= PIOS_USART_NUM) {
-		/* USART not available */
-		return -1;
-	}
+  struct pios_usart_dev * usart_dev;
 
-	if((tx_buffer_size[usart]+len) >= PIOS_USART_TX_BUFFER_SIZE) {
-		/* Buffer full or cannot get all requested bytes (retry) */
-		return -2;
-	}
+  /* Get a handle for the device configuration */
+  usart_dev = find_usart_dev_by_id(usart);
 
-	/* Copy bytes to be transmitted into transmit buffer */
-	/* This operation should be atomic! */
-	PIOS_IRQ_Disable();
+  if (!usart_dev) {
+    /* Undefined USART port for this board (see pios_board.c) */
+    return -1;
+  }
 
-	uint16_t i;
-	for(i = 0; i < len; ++i) {
-		tx_buffer[usart][tx_buffer_head[usart]] = *buffer++;
-		
-		if(++tx_buffer_head[usart] >= PIOS_USART_TX_BUFFER_SIZE) {
-			tx_buffer_head[usart] = 0;
-		}
-		
-		/* Enable Tx interrupt if buffer was empty */
-		if(++tx_buffer_size[usart] == 1) {
-			switch(usart) {
-				#if (PIOS_USART1_ENABLED)
-				/* Enable TXE interrupt (TXEIE=1) */
-				case 0: PIOS_USART1_USART->CR1 |= (1 << 7); break;
-				#endif
-				#if (PIOS_USART2_ENABLED)
-				/* Enable TXE interrupt (TXEIE=1) */
-				case 1: PIOS_USART2_USART->CR1 |= (1 << 7); break;
-				#endif
-				#if (PIOS_USART3_ENABLED)
-				/* Enable TXE interrupt (TXEIE=1) */
-				case 2: PIOS_USART3_USART->CR1 |= (1 << 7); break;
-				/* USART not supported by routine (yet) */
-				#endif
-				default: PIOS_IRQ_Enable(); return -3;
-			}
-		}
-	}
+  if (usart_dev->tx.size + len >= sizeof(usart_dev->tx.buf)) {
+    /* Buffer cannot accept all requested bytes (retry) */
+    return -2;
+  }
 
-	PIOS_IRQ_Enable();
+  /* Copy bytes to be transmitted into transmit buffer */
+  /* This operation should be atomic! */
+  PIOS_IRQ_Disable();
 
-	/* No error */
-	return 0;
+  uint16_t i;
+  for(i = 0; i < len; ++i) {
+    usart_dev->tx.buf[usart_dev->tx.head++] = *buffer++;
+    if (usart_dev->tx.head >= sizeof(usart_dev->tx.buf)) {
+      usart_dev->tx.head = 0;
+    }
+
+    usart_dev->tx.size++;
+    if (usart_dev->tx.size == 1) {
+      /* Buffer has just become non-empty, enable tx interrupt. */
+      USART_ITConfig(usart_dev->cfg->regs, USART_IT_TXE, ENABLE);
+    }
+  }
+
+  PIOS_IRQ_Enable();
+
+  /* No error */
+  return 0;
 }
 
 /**
@@ -472,13 +437,13 @@ int32_t PIOS_USART_TxBufferPutMoreNonBlocking(USARTNumTypeDef usart, uint8_t *bu
 * \return -3 if USART not supported by USARTTxBufferPut Routine
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_USART_TxBufferPutMore(USARTNumTypeDef usart, uint8_t *buffer, uint16_t len)
+int32_t PIOS_USART_TxBufferPutMore(uint8_t usart, uint8_t *buffer, uint16_t len)
 {
-	int error;
+  int32_t rc;
 
-	while((error = PIOS_USART_TxBufferPutMoreNonBlocking(usart, buffer, len)) == -2);
+  while((rc = PIOS_USART_TxBufferPutMoreNonBlocking(usart, buffer, len)) == -2);
 
-	return error;
+  return rc;
 }
 
 /**
@@ -491,11 +456,9 @@ int32_t PIOS_USART_TxBufferPutMore(USARTNumTypeDef usart, uint8_t *buffer, uint1
 * \return -3 if USART not supported by USARTTxBufferPut Routine
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_USART_TxBufferPut_NonBlocking(USARTNumTypeDef usart, uint8_t b)
+int32_t PIOS_USART_TxBufferPut_NonBlocking(uint8_t usart, uint8_t b)
 {
-	/* For more comfortable usage... */
-	/* -> Just forward to USARTTxBufferPutMore */
-	return PIOS_USART_TxBufferPutMore(usart, &b, 1);
+  return PIOS_USART_TxBufferPutMoreNonBlocking(usart, &b, 1);
 }
 
 /**
@@ -508,105 +471,44 @@ int32_t PIOS_USART_TxBufferPut_NonBlocking(USARTNumTypeDef usart, uint8_t b)
 * \return -3 if USART not supported by USARTTxBufferPut Routine
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_USART_TxBufferPut(USARTNumTypeDef usart, uint8_t b)
+int32_t PIOS_USART_TxBufferPut(uint8_t usart, uint8_t b)
 {
-	int error;
-
-	while((error = PIOS_USART_TxBufferPutMore(usart, &b, 1)) == -2);
-
-	return error;
+  return PIOS_USART_TxBufferPutMore(usart, &b, 1);
 }
 
-#if (PIOS_USART1_ENABLED)
-/* Interrupt handler for USART1 */
-PIOS_USART1_IRQHANDLER_FUNC
+void PIOS_USART_IRQ_Handler(uint8_t usart)
 {
-	/* Check if RXNE flag is set */
-	if(PIOS_USART1_USART->SR & USART_SR_RXNE) {
-		uint8_t b = PIOS_USART1_USART->DR;
+  struct pios_usart_dev * usart_dev;
+
+  /* Get a handle for the device configuration */
+  usart_dev = find_usart_dev_by_id(usart);
+  PIOS_DEBUG_Assert(usart_dev);
+
+  /* Check if RXNE flag is set */
+  if (usart_dev->cfg->regs->SR & USART_SR_RXNE) {
+    uint8_t b = usart_dev->cfg->regs->DR;
 		
-		if(PIOS_USART_RxBufferPut(USART_1, b) < 0) {
-			/* Here we could add some error handling */
-		}
-	}
+    if (PIOS_USART_RxBufferPut(usart, b) < 0) {
+      /* Here we could add some error handling */
+    }
+  }
 
-	/* Check if TXE flag is set */
-	if(PIOS_USART1_USART->SR & USART_SR_TXE) {
-		if(PIOS_USART_TxBufferUsed(USART_1) > 0) {
-			int b = PIOS_USART_TxBufferGet(USART_1);
-			if(b < 0) {
-				/* Here we could add some error handling */
-				PIOS_USART1_USART->DR = 0xff;
-			} else {
-				PIOS_USART1_USART->DR = b;
-			}
-		} else {
-			/* Disable TXE interrupt (TXEIE=0) */
-			PIOS_USART1_USART->CR1 &= ~(USART_CR1_TXEIE);
-		}
-	}
+  /* Check if TXE flag is set */
+  if (usart_dev->cfg->regs->SR & USART_SR_TXE) {
+    if (PIOS_USART_TxBufferUsed(usart) > 0) {
+      int32_t b = PIOS_USART_TxBufferGet(usart);
+
+      if(b < 0) {
+	/* Here we could add some error handling */
+	usart_dev->cfg->regs->DR = 0xff;
+      } else {
+	usart_dev->cfg->regs->DR = b & 0xff;
+      }
+    } else {
+      /* Disable TXE interrupt (TXEIE=0) */
+      USART_ITConfig(usart_dev->cfg->regs, USART_IT_TXE, DISABLE);
+    }
+  }
 }
-#endif
-
-#if (PIOS_USART2_ENABLED)
-/* Interrupt handler for USART2 */
-PIOS_USART2_IRQHANDLER_FUNC
-{
-	/* check if RXNE flag is set */
-	if(PIOS_USART2_USART->SR & USART_SR_RXNE) {
-		uint8_t b = PIOS_USART2_USART->DR;
-		
-		if(PIOS_USART_RxBufferPut(USART_2, b) < 0) {
-			/* Here we could add some error handling */
-		}
-	}
-	
-	/* Check if TXE flag is set */
-	if(PIOS_USART2_USART->SR & USART_SR_TXE) {
-		if(PIOS_USART_TxBufferUsed(USART_2) > 0) {
-			int b = PIOS_USART_TxBufferGet(USART_2);
-			if(b < 0) {
-				/* Here we could add some error handling */
-				PIOS_USART2_USART->DR = 0xff;
-			} else {
-				PIOS_USART2_USART->DR = b;
-			}
-		} else {
-			/* Disable TXE interrupt (TXEIE=0) */
-			PIOS_USART2_USART->CR1 &= ~(USART_CR1_TXEIE);
-		}
-	}
-}
-#endif
-
-#if (PIOS_USART3_ENABLED)
-/* Interrupt handler for USART3 */
-PIOS_USART3_IRQHANDLER_FUNC
-{
-	/* check if RXNE flag is set */
-	if(PIOS_USART3_USART->SR & USART_SR_RXNE) {
-		uint8_t b = PIOS_USART3_USART->DR;
-		
-		if(PIOS_USART_RxBufferPut(USART_3, b) < 0) {
-			/* Here we could add some error handling */
-		}
-	}
-
-	if(PIOS_USART3_USART->SR & USART_SR_TXE) { // check if TXE flag is set
-		if(PIOS_USART_TxBufferUsed(USART_3) > 0) {
-			int b = PIOS_USART_TxBufferGet(USART_3);
-			if(b < 0) {
-				/* Here we could add some error handling */
-				PIOS_USART3_USART->DR = 0xff;
-			} else {
-				PIOS_USART3_USART->DR = b;
-			}
-		} else {
-			/* Disable TXE interrupt (TXEIE=0) */
-			PIOS_USART3_USART->CR1 &= ~(USART_CR1_TXEIE);
-		}
-	}
-}
-#endif
 
 #endif

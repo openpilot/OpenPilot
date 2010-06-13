@@ -76,7 +76,7 @@ void nmeaProcessGPGSA(char* packet);
 // Private types
 
 // Private variables
-static COMPortTypeDef gpsPort;
+static uint8_t gpsPort;
 static xTaskHandle gpsTaskHandle;
 cBuffer gpsRxBuffer;
 static char gpsRxData[512];
@@ -100,7 +100,7 @@ int32_t GPSInitialize(void)
 	timeOfLastUpdateMs = 0;
 
 	// TODO: Get gps settings object
-	gpsPort = COM_USART2;
+	gpsPort = PIOS_COM_GPS;
 
 	// Init input buffer size 512
 	bufferInit(&gpsRxBuffer, (unsigned char *)gpsRxData, 512);

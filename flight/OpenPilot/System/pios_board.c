@@ -25,6 +25,8 @@
 
 #include <pios.h>
 #include <pios_spi_priv.h>
+#include <pios_usart_priv.h>
+#include <pios_com_priv.h>
 
 /* MicroSD Interface
  * 
@@ -243,3 +245,205 @@ void PIOS_SPI_ahrs_irq_handler(void)
   /* Call into the generic code to handle the IRQ for this specific device */
   PIOS_SPI_IRQ_Handler(PIOS_OPAHRS_SPI);
 }
+
+/*
+ * Telemetry USART
+ */
+void PIOS_USART_telem_irq_handler(void);
+void USART2_IRQHandler() __attribute__ ((alias ("PIOS_USART_telem_irq_handler")));
+const struct pios_usart_cfg pios_usart_telem_cfg = {
+  .regs  = USART2,
+  .init = {
+    .USART_BaudRate            = 57600,
+    .USART_WordLength          = USART_WordLength_8b,
+    .USART_Parity              = USART_Parity_No,
+    .USART_StopBits            = USART_StopBits_1,
+    .USART_HardwareFlowControl = USART_HardwareFlowControl_None,
+    .USART_Mode                = USART_Mode_Rx | USART_Mode_Tx,
+  },
+  .irq = {
+    .handler = PIOS_USART_telem_irq_handler,
+    .init    = {
+      .NVIC_IRQChannel                   = USART2_IRQn,
+      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGHEST,
+      .NVIC_IRQChannelSubPriority        = 0,
+      .NVIC_IRQChannelCmd                = ENABLE,
+    },
+  },
+  .rx   = {
+    .gpio = GPIOA,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_3,
+      .GPIO_Speed = GPIO_Speed_2MHz,
+      .GPIO_Mode  = GPIO_Mode_IPU,
+    },
+  },
+  .tx   = {
+    .gpio = GPIOA,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_2,
+      .GPIO_Speed = GPIO_Speed_2MHz,
+      .GPIO_Mode  = GPIO_Mode_AF_PP,
+    },
+  },
+};
+
+/*
+ * GPS USART
+ */
+void PIOS_USART_gps_irq_handler(void);
+void USART3_IRQHandler() __attribute__ ((alias ("PIOS_USART_gps_irq_handler")));
+const struct pios_usart_cfg pios_usart_gps_cfg = {
+  .regs = USART3,
+  .remap = GPIO_PartialRemap_USART3,
+  .init = {
+    .USART_BaudRate            = 57600,
+    .USART_WordLength          = USART_WordLength_8b,
+    .USART_Parity              = USART_Parity_No,
+    .USART_StopBits            = USART_StopBits_1,
+    .USART_HardwareFlowControl = USART_HardwareFlowControl_None,
+    .USART_Mode                = USART_Mode_Rx | USART_Mode_Tx,
+  },
+  .irq = {
+    .handler = PIOS_USART_gps_irq_handler,
+    .init    = {
+      .NVIC_IRQChannel                   = USART3_IRQn,
+      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+      .NVIC_IRQChannelSubPriority        = 0,
+      .NVIC_IRQChannelCmd                = ENABLE,
+    },
+  },
+  .rx   = {
+    .gpio = GPIOC,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_11,
+      .GPIO_Speed = GPIO_Speed_2MHz,
+      .GPIO_Mode  = GPIO_Mode_IPU,
+    },
+  },
+  .tx   = {
+    .gpio = GPIOC,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_10,
+      .GPIO_Speed = GPIO_Speed_2MHz,
+      .GPIO_Mode  = GPIO_Mode_AF_PP,
+    },
+  },
+};
+
+#ifdef PIOS_COM_AUX
+/*
+ * AUX USART
+ */
+void PIOS_USART_aux_irq_handler(void);
+void USART1_IRQHandler() __attribute__ ((alias ("PIOS_USART_aux_irq_handler")));
+const struct pios_usart_cfg pios_usart_aux_cfg = {
+  .regs = USART1,
+  .init = {
+    .USART_BaudRate            = 57600,
+    .USART_WordLength          = USART_WordLength_8b,
+    .USART_Parity              = USART_Parity_No,
+    .USART_StopBits            = USART_StopBits_1,
+    .USART_HardwareFlowControl = USART_HardwareFlowControl_None,
+    .USART_Mode                = USART_Mode_Rx | USART_Mode_Tx,
+  },
+  .irq = {
+    .handler = PIOS_USART_aux_irq_handler,
+    .init    = {
+      .NVIC_IRQChannel                   = USART1_IRQn,
+      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+      .NVIC_IRQChannelSubPriority        = 0,
+      .NVIC_IRQChannelCmd                = ENABLE,
+    },
+  },
+  .rx   = {
+    .gpio = GPIOA,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_10,
+      .GPIO_Speed = GPIO_Speed_2MHz,
+      .GPIO_Mode  = GPIO_Mode_IPU,
+    },
+  },
+  .tx   = {
+    .gpio = GPIOA,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_9,
+      .GPIO_Speed = GPIO_Speed_2MHz,
+      .GPIO_Mode  = GPIO_Mode_AF_PP,
+    },
+  },
+};
+#endif
+
+/*
+ * Board specific number of devices.
+ */
+struct pios_usart_dev pios_usart_devs[] = {
+#define PIOS_USART_TELEM  0
+  {
+    .cfg = &pios_usart_telem_cfg,
+  },
+#define PIOS_USART_GPS    1
+  {
+    .cfg = &pios_usart_gps_cfg,
+  },
+#ifdef PIOS_COM_AUX
+#define PIOS_USART_AUX    2
+  {
+    .cfg = &pios_usart_aux_cfg,
+  },
+#endif
+};
+
+uint8_t pios_usart_num_devices = NELEMENTS(pios_usart_devs);
+
+void PIOS_USART_telem_irq_handler(void)
+{
+  PIOS_USART_IRQ_Handler(PIOS_USART_TELEM);
+}
+
+void PIOS_USART_gps_irq_handler(void)
+{
+  PIOS_USART_IRQ_Handler(PIOS_USART_GPS);
+}
+
+#ifdef PIOS_COM_AUX
+void PIOS_USART_aux_irq_handler(void)
+{
+  PIOS_USART_IRQ_Handler(PIOS_USART_AUX);
+}
+#endif
+
+/*
+ * COM devices
+ */
+
+/*
+ * Board specific number of devices.
+ */
+extern const struct pios_com_driver pios_usart_com_driver;
+extern const struct pios_com_driver pios_usb_com_driver;
+
+struct pios_com_dev pios_com_devs[] = {
+  {
+    .id     = PIOS_USART_TELEM,
+    .driver = &pios_usart_com_driver,
+  },
+  {
+    .id     = PIOS_USART_GPS,
+    .driver = &pios_usart_com_driver,
+  },
+  {
+    .id     = 0,
+    .driver = &pios_usb_com_driver,
+  },
+#ifdef PIOS_COM_AUX
+  {
+    .id     = PIOS_USART_AUX,
+    .driver = &pios_usart_com_driver,
+  },
+#endif
+};
+
+uint8_t pios_com_num_devices = NELEMENTS(pios_com_devs);
+

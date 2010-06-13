@@ -27,29 +27,29 @@
 #ifndef PIOS_COM_H
 #define PIOS_COM_H
 
-/* Global Types */
-typedef enum {
-	COM_DEBUG_USART = 0,
-	COM_USART1 = 1,
-	COM_USART2 = 2,
-	COM_USART3 = 3,
-	COM_USB_HID = 4
-} COMPortTypeDef;
-
 /* Public Functions */
 extern int32_t PIOS_COM_Init(void);
-extern int32_t PIOS_COM_ChangeBaud(COMPortTypeDef port, uint32_t baud);
-extern int32_t PIOS_COM_SendCharNonBlocking(COMPortTypeDef port, char c);
-extern int32_t PIOS_COM_SendChar(COMPortTypeDef port, char c);
-extern int32_t PIOS_COM_SendBufferNonBlocking(COMPortTypeDef port, uint8_t *buffer, uint16_t len);
-extern int32_t PIOS_COM_SendBuffer(COMPortTypeDef port, uint8_t *buffer, uint16_t len);
-extern int32_t PIOS_COM_SendStringNonBlocking(COMPortTypeDef port, char *str);
-extern int32_t PIOS_COM_SendString(COMPortTypeDef port, char *str);
-extern int32_t PIOS_COM_SendFormattedStringNonBlocking(COMPortTypeDef port, char *format, ...);
-extern int32_t PIOS_COM_SendFormattedString(COMPortTypeDef port, char *format, ...);
-extern uint8_t PIOS_COM_ReceiveBuffer(COMPortTypeDef port);
-extern int32_t PIOS_COM_ReceiveBufferUsed(COMPortTypeDef port);
+extern int32_t PIOS_COM_ChangeBaud(uint8_t port, uint32_t baud);
+extern int32_t PIOS_COM_SendCharNonBlocking(uint8_t port, char c);
+extern int32_t PIOS_COM_SendChar(uint8_t port, char c);
+extern int32_t PIOS_COM_SendBufferNonBlocking(uint8_t port, uint8_t *buffer, uint16_t len);
+extern int32_t PIOS_COM_SendBuffer(uint8_t port, uint8_t *buffer, uint16_t len);
+extern int32_t PIOS_COM_SendStringNonBlocking(uint8_t port, char *str);
+extern int32_t PIOS_COM_SendString(uint8_t port, char *str);
+extern int32_t PIOS_COM_SendFormattedStringNonBlocking(uint8_t port, char *format, ...);
+extern int32_t PIOS_COM_SendFormattedString(uint8_t port, char *format, ...);
+extern uint8_t PIOS_COM_ReceiveBuffer(uint8_t port);
+extern int32_t PIOS_COM_ReceiveBufferUsed(uint8_t port);
 
 extern int32_t PIOS_COM_ReceiveHandler(void);
+
+struct pios_com_driver {
+  void    (*init)(uint8_t id);
+  void    (*set_baud)(uint8_t id, uint32_t baud);
+  int32_t (*tx_nb)(uint8_t id, uint8_t *buffer, uint16_t len);
+  int32_t (*tx)(uint8_t id, uint8_t *buffer, uint16_t len);
+  int32_t (*rx)(uint8_t id);
+  int32_t (*rx_avail)(uint8_t id);
+};
 
 #endif /* PIOS_COM_H */

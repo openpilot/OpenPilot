@@ -39,11 +39,11 @@
 /* Global functions */
 extern int32_t PIOS_USB_HID_Init(uint32_t mode);
 extern int32_t PIOS_USB_HID_ChangeConnectionState(uint32_t Connected);
-extern int32_t PIOS_USB_HID_CheckAvailable(void);
-extern int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t *buffer, uint16_t len);
-extern int32_t PIOS_USB_HID_TxBufferPutMore(uint8_t *buffer, uint16_t len);
-extern uint8_t PIOS_USB_HID_RxBufferGet(void);
-extern int32_t PIOS_USB_HID_RxBufferUsed(void);
+extern int32_t PIOS_USB_HID_CheckAvailable(uint8_t id);
+extern int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, uint8_t *buffer, uint16_t len);
+extern int32_t PIOS_USB_HID_TxBufferPutMore(uint8_t id, uint8_t *buffer, uint16_t len);
+extern int32_t PIOS_USB_HID_RxBufferGet(uint8_t id);
+extern int32_t PIOS_USB_HID_RxBufferUsed(uint8_t id);
 extern int32_t PIOS_USB_HID_CB_Data_Setup(uint8_t RequestNo);
 extern int32_t PIOS_USB_HID_CB_NoData_Setup(uint8_t RequestNo);
 extern void PIOS_USB_HID_EP1_OUT_Callback(void);

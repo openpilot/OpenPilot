@@ -67,7 +67,7 @@ int main()
 	HMC5843_InitStructure.Mode = PIOS_HMC5843_MODE_CONTINUOS;
 	PIOS_HMC5843_Config(&HMC5843_InitStructure);
 
-	uint8_t id[3] = {0};
+	uint8_t id[4] = {0};
 	int16_t data[3] = {0};
 	int32_t heading = 0;
 
@@ -90,10 +90,10 @@ int main()
 		if(heading < 0) heading += 360;
 
 		// Output Heading data to
-		PIOS_COM_SendFormattedString(COM_USART1, "HMC5843 Chip ID: %s\rHeading: %d\rRaw Mag Values: X=%d Y=%d Y=%d\r", id, heading, data[0], data[1], data[2]);
+		PIOS_COM_SendFormattedString(PIOS_COM_AUX, "HMC5843 Chip ID: %s  Heading: %d   Raw Mag Values: X=%d Y=%d Z=%d  ", id, heading, data[0], data[1], data[2]);
 
 		// Test ADC
-		PIOS_COM_SendFormattedString(COM_USART1, "ADC Values: %d,%d,%d,%d,%d,%d\r\n", PIOS_ADC_PinGet(0), PIOS_ADC_PinGet(1), PIOS_ADC_PinGet(2), PIOS_ADC_PinGet(3), PIOS_ADC_PinGet(4), PIOS_ADC_PinGet(5));
+		PIOS_COM_SendFormattedString(PIOS_COM_AUX, "ADC Values: %d,%d,%d,%d,%d,%d\r\n", PIOS_ADC_PinGet(0), PIOS_ADC_PinGet(1), PIOS_ADC_PinGet(2), PIOS_ADC_PinGet(3), PIOS_ADC_PinGet(4), PIOS_ADC_PinGet(5));
 
 		// Delay until next reading
 		PIOS_DELAY_WaitmS(500);

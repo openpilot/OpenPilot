@@ -32,12 +32,18 @@
 
 #if defined(PIOS_INCLUDE_COM)
 
+#include <pios_com_priv.h>
 
-/* Global Variables */
+static struct pios_com_dev * find_com_dev_by_id (uint8_t port)
+{
+  if (port >= pios_com_num_devices) {
+    /* Undefined COM port for this board (see pios_board.c) */
+    return NULL;
+  }
 
-/* Local Variables */
-static int32_t (*receive_callback_func)(COMPortTypeDef port, char c);
-
+  /* Get a handle for the device configuration */
+  return &(pios_com_devs[port]);
+}
 
 /**
 * Initialises COM layer
@@ -47,9 +53,6 @@ static int32_t (*receive_callback_func)(COMPortTypeDef port, char c);
 int32_t PIOS_COM_Init(void)
 {
 	int32_t ret = 0;
-
-	/* Disable callback by default */
-	receive_callback_func = NULL;
 
 	/* If any COM assignment: */
 #if defined(PIOS_INCLUDE_USART)
@@ -70,30 +73,23 @@ int32_t PIOS_COM_Init(void)
 * \return -1 if port not available
 * \return 0 on success
 */
-int32_t PIOS_COM_ChangeBaud(COMPortTypeDef port, uint32_t baud)
+int32_t PIOS_COM_ChangeBaud(uint8_t port, uint32_t baud)
 {
-	/* Branch depending on selected port */
-	switch(port) {
-#if defined(PIOS_INCLUDE_USART)
-		case COM_DEBUG_USART:
-			PIOS_USART_ChangeBaud(PIOS_COM_DEBUG_PORT, baud);
-			return 0;
-		case COM_USART1:
-			PIOS_USART_ChangeBaud(USART_1, baud);
-			return 0;
-		case COM_USART2:
-			PIOS_USART_ChangeBaud(USART_2, baud);
-			return 0;
-		case COM_USART3:
-			PIOS_USART_ChangeBaud(USART_3, baud);
-			return 0;
-#endif
-		case COM_USB_HID:
-			return 0;
-		default:
-			/* Invalid port */
-			return -1;
-	}
+  struct pios_com_dev * com_dev;
+
+  com_dev = find_com_dev_by_id (port);
+
+  if (!com_dev) {
+    /* Undefined COM port for this board (see pios_board.c) */
+    return -1;
+  }
+
+  /* Invoke the driver function if it exists */
+  if (com_dev->driver->set_baud) {
+    com_dev->driver->set_baud(com_dev->id, baud);
+  }
+
+  return 0;
 }
 
 /**
@@ -106,35 +102,23 @@ int32_t PIOS_COM_ChangeBaud(COMPortTypeDef port, uint32_t baud)
 *            caller should retry until buffer is free again
 * \return 0 on success
 */
-int32_t PIOS_COM_SendBufferNonBlocking(COMPortTypeDef port, uint8_t *buffer, uint16_t len)
+int32_t PIOS_COM_SendBufferNonBlocking(uint8_t port, uint8_t *buffer, uint16_t len)
 {
-	/* Branch depending on selected port */
-	switch(port) {
-#if defined(PIOS_INCLUDE_USART)
-		case COM_DEBUG_USART:
-			return PIOS_USART_TxBufferPutMoreNonBlocking(PIOS_COM_DEBUG_PORT, buffer, len);
-#endif
-#if PIOS_USART1_ENABLED
-		case COM_USART1:
-			return PIOS_USART_TxBufferPutMoreNonBlocking(USART_1, buffer, len);
-#endif
-#if PIOS_USART2_ENABLED
-		case COM_USART2:
-			return PIOS_USART_TxBufferPutMoreNonBlocking(USART_2, buffer, len);
-#endif
-#if PIOS_USART3_ENABLED
-		case COM_USART3:
-			return PIOS_USART_TxBufferPutMoreNonBlocking(USART_3, buffer, len);
-#endif
+  struct pios_com_dev * com_dev;
 
-#if defined(PIOS_INCLUDE_USB_HID)
-		case COM_USB_HID:
-			return PIOS_USB_HID_TxBufferPutMoreNonBlocking(buffer, len);
-#endif
-		default:
-			/* Invalid port */
-			return -1;
-	}
+  com_dev = find_com_dev_by_id (port);
+
+  if (!com_dev) {
+    /* Undefined COM port for this board (see pios_board.c) */
+    return -1;
+  }
+
+  /* Invoke the driver function if it exists */
+  if (com_dev->driver->tx_nb) {
+    return com_dev->driver->tx_nb(com_dev->id, buffer, len);
+  }
+
+  return 0;
 }
 
 /**
@@ -146,35 +130,23 @@ int32_t PIOS_COM_SendBufferNonBlocking(COMPortTypeDef port, uint8_t *buffer, uin
 * \return -1 if port not available
 * \return 0 on success
 */
-int32_t PIOS_COM_SendBuffer(COMPortTypeDef port, uint8_t *buffer, uint16_t len)
+int32_t PIOS_COM_SendBuffer(uint8_t port, uint8_t *buffer, uint16_t len)
 {
-	/* Branch depending on selected port */
-	switch(port) {
-#if defined(PIOS_INCLUDE_USART)
-		case COM_DEBUG_USART:
-			return PIOS_USART_TxBufferPutMore(PIOS_COM_DEBUG_PORT, buffer, len);
-#endif
-#if PIOS_USART1_ENABLED
-		case COM_USART1:
-			return PIOS_USART_TxBufferPutMore(USART_1, buffer, len);
-#endif
-#if PIOS_USART2_ENABLED
-		case COM_USART2:
-			return PIOS_USART_TxBufferPutMore(USART_2, buffer, len);
-#endif
-#if PIOS_USART3_ENABLED
-		case COM_USART3:
-			return PIOS_USART_TxBufferPutMore(USART_3, buffer, len);
-#endif
+  struct pios_com_dev * com_dev;
 
-#if defined(PIOS_INCLUDE_USB_HID)
-		case COM_USB_HID:
-			return PIOS_USB_HID_TxBufferPutMore(buffer, len);
-#endif
-		default:
-			/* Invalid port */
-			return -1;
-	}
+  com_dev = find_com_dev_by_id (port);
+
+  if (!com_dev) {
+    /* Undefined COM port for this board (see pios_board.c) */
+    return -1;
+  }
+
+  /* Invoke the driver function if it exists */
+  if (com_dev->driver->tx) {
+    return com_dev->driver->tx(com_dev->id, buffer, len);
+  }
+
+  return 0;
 }
 
 /**
@@ -186,7 +158,7 @@ int32_t PIOS_COM_SendBuffer(COMPortTypeDef port, uint8_t *buffer, uint16_t len)
 *            caller should retry until buffer is free again
 * \return 0 on success
 */
-int32_t PIOS_COM_SendCharNonBlocking(COMPortTypeDef port, char c)
+int32_t PIOS_COM_SendCharNonBlocking(uint8_t port, char c)
 {
 	return PIOS_COM_SendBufferNonBlocking(port, (uint8_t *)&c, 1);
 }
@@ -199,7 +171,7 @@ int32_t PIOS_COM_SendCharNonBlocking(COMPortTypeDef port, char c)
 * \return -1 if port not available
 * \return 0 on success
 */
-int32_t PIOS_COM_SendChar(COMPortTypeDef port, char c)
+int32_t PIOS_COM_SendChar(uint8_t port, char c)
 {
 	return PIOS_COM_SendBuffer(port, (uint8_t *)&c, 1);
 }
@@ -213,7 +185,7 @@ int32_t PIOS_COM_SendChar(COMPortTypeDef port, char c)
 *         caller should retry until buffer is free again
 * \return 0 on success
 */
-int32_t PIOS_COM_SendStringNonBlocking(COMPortTypeDef port, char *str)
+int32_t PIOS_COM_SendStringNonBlocking(uint8_t port, char *str)
 {
 	return PIOS_COM_SendBufferNonBlocking(port, (uint8_t *)str, (uint16_t)strlen(str));
 }
@@ -226,7 +198,7 @@ int32_t PIOS_COM_SendStringNonBlocking(COMPortTypeDef port, char *str)
 * \return -1 if port not available
 * \return 0 on success
 */
-int32_t PIOS_COM_SendString(COMPortTypeDef port, char *str)
+int32_t PIOS_COM_SendString(uint8_t port, char *str)
 {
 	return PIOS_COM_SendBuffer(port, (uint8_t *)str, strlen(str));
 }
@@ -241,7 +213,7 @@ int32_t PIOS_COM_SendString(COMPortTypeDef port, char *str)
 *         caller should retry until buffer is free again
 * \return 0 on success
 */
-int32_t PIOS_COM_SendFormattedStringNonBlocking(COMPortTypeDef port, char *format, ...)
+int32_t PIOS_COM_SendFormattedStringNonBlocking(uint8_t port, char *format, ...)
 {
 	uint8_t buffer[128]; // TODO: tmp!!! Provide a streamed COM method later!
 
@@ -261,7 +233,7 @@ int32_t PIOS_COM_SendFormattedStringNonBlocking(COMPortTypeDef port, char *forma
 * \return -1 if port not available
 * \return 0 on success
 */
-int32_t PIOS_COM_SendFormattedString(COMPortTypeDef port, char *format, ...)
+int32_t PIOS_COM_SendFormattedString(uint8_t port, char *format, ...)
 {
 	uint8_t buffer[128]; // TODO: tmp!!! Provide a streamed COM method later!
 	va_list args;
@@ -276,34 +248,15 @@ int32_t PIOS_COM_SendFormattedString(COMPortTypeDef port, char *format, ...)
 * \param[in] port COM port
 * \returns Byte from buffer
 */
-uint8_t PIOS_COM_ReceiveBuffer(COMPortTypeDef port)
+uint8_t PIOS_COM_ReceiveBuffer(uint8_t port)
 {
-	switch(port) {
-#if defined(PIOS_INCLUDE_USART)
-		case COM_DEBUG_USART:
-			return PIOS_USART_RxBufferGet(PIOS_COM_DEBUG_PORT);
-#endif
-#if PIOS_USART1_ENABLED
-		case COM_USART1:
-			return PIOS_USART_RxBufferGet(USART_1);
-#endif
-#if PIOS_USART2_ENABLED
-		case COM_USART2:
-			return PIOS_USART_RxBufferGet(USART_2);
-#endif
-#if PIOS_USART3_ENABLED
-		case COM_USART3:
-			return PIOS_USART_RxBufferGet(USART_3);
-#endif
+  struct pios_com_dev * com_dev;
 
-#if defined(PIOS_INCLUDE_USB_HID)
-		case COM_USB_HID:
-			return PIOS_USB_HID_RxBufferGet();
-#endif
-		/* To suppress warnings */
-		default:
-			return 0;
-	}
+  com_dev = find_com_dev_by_id (port);
+  PIOS_DEBUG_Assert(com_dev);
+  PIOS_DEBUG_Assert(com_dev->driver->rx);
+
+  return com_dev->driver->rx(com_dev->id);
 }
 
 /**
@@ -311,34 +264,22 @@ uint8_t PIOS_COM_ReceiveBuffer(COMPortTypeDef port)
 * \param[in] port COM port
 * \return Number of bytes used in buffer
 */
-int32_t PIOS_COM_ReceiveBufferUsed(COMPortTypeDef port)
+int32_t PIOS_COM_ReceiveBufferUsed(uint8_t port)
 {
-	switch(port) {
+  struct pios_com_dev * com_dev;
 
-#if defined(PIOS_INCLUDE_USART)
-		case COM_DEBUG_USART:
-			return PIOS_USART_RxBufferUsed(PIOS_COM_DEBUG_PORT);
-#if PIOS_USART1_ENABLED
-		case COM_USART1:
-			return PIOS_USART_RxBufferUsed(USART_1);
-#endif
-#if PIOS_USART2_ENABLED
-		case COM_USART2:
-			return PIOS_USART_RxBufferUsed(USART_2);
-#endif
-#if PIOS_USART3_ENABLED
-		case COM_USART3:
-			return PIOS_USART_RxBufferUsed(USART_3);
-#endif
-#endif
-#if defined(PIOS_INCLUDE_USB_HID)
-		case COM_USB_HID:
-			return PIOS_USB_HID_RxBufferUsed();
-#endif
-		/* To suppress warnings */
-		default:
-			return 0;
-	}
+  com_dev = find_com_dev_by_id (port);
+
+  if (!com_dev) {
+    /* Undefined COM port for this board (see pios_board.c) */
+    return 0;
+  }
+
+  if (!com_dev->driver->rx_avail) {
+    return 0;
+  }
+
+  return com_dev->driver->rx_avail(com_dev->id);
 }
 
 #endif

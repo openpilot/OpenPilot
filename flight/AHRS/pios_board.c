@@ -141,4 +141,92 @@ void PIOS_SPI_op_irq_handler(void)
   PIOS_SPI_IRQ_Handler(PIOS_OP_SPI);
 }
 
-#endif
+#endif /* PIOS_INCLUDE_SPI */
+
+#if defined(PIOS_INCLUDE_USART)
+#include <pios_usart_priv.h>
+
+/*
+ * AUX USART
+ */
+void PIOS_USART_aux_irq_handler(void);
+void USART3_IRQHandler() __attribute__ ((alias ("PIOS_USART_aux_irq_handler")));
+const struct pios_usart_cfg pios_usart_aux_cfg = {
+  .regs = USART3,
+  .init = {
+    .USART_BaudRate            = 57600,
+    .USART_WordLength          = USART_WordLength_8b,
+    .USART_Parity              = USART_Parity_No,
+    .USART_StopBits            = USART_StopBits_1,
+    .USART_HardwareFlowControl = USART_HardwareFlowControl_None,
+    .USART_Mode                = USART_Mode_Rx | USART_Mode_Tx,
+  },
+  .irq = {
+    .handler = PIOS_USART_aux_irq_handler,
+    .init    = {
+      .NVIC_IRQChannel                   = USART3_IRQn,
+      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+      .NVIC_IRQChannelSubPriority        = 0,
+      .NVIC_IRQChannelCmd                = ENABLE,
+    },
+  },
+  .rx   = {
+    .gpio = GPIOB,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_11,
+      .GPIO_Speed = GPIO_Speed_2MHz,
+      .GPIO_Mode  = GPIO_Mode_IPU,
+    },
+  },
+  .tx   = {
+    .gpio = GPIOB,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_10,
+      .GPIO_Speed = GPIO_Speed_2MHz,
+      .GPIO_Mode  = GPIO_Mode_AF_PP,
+    },
+  },
+};
+
+/*
+ * Board specific number of devices.
+ */
+struct pios_usart_dev pios_usart_devs[] = {
+#define PIOS_USART_AUX    0
+  {
+    .cfg = &pios_usart_aux_cfg,
+  },
+};
+
+uint8_t pios_usart_num_devices = NELEMENTS(pios_usart_devs);
+
+void PIOS_USART_aux_irq_handler(void)
+{
+  PIOS_USART_IRQ_Handler(PIOS_USART_AUX);
+}
+
+#endif /* PIOS_INCLUDE_USART */
+
+#if defined(PIOS_INCLUDE_COM)
+#include <pios_com_priv.h>
+
+/*
+ * COM devices
+ */
+
+/*
+ * Board specific number of devices.
+ */
+extern const struct pios_com_driver pios_usart_com_driver;
+
+struct pios_com_dev pios_com_devs[] = {
+  {
+    .id     = PIOS_USART_AUX,
+    .driver = &pios_usart_com_driver,
+  },
+};
+
+uint8_t pios_com_num_devices = NELEMENTS(pios_com_devs);
+
+#endif /* PIOS_INCLUDE_COM */
+

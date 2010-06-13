@@ -39,14 +39,13 @@
 
 static void printchar(char **str, int c)
 {
-  //    extern int putchar(int c);
-        
         if (str) {
                 **str = c;
                 ++(*str);
         }
-
-        else PIOS_COM_SendChar(COM_DEBUG_USART, c); // (void)putchar(c);
+#ifdef PIOS_COM_DEBUG
+        else PIOS_COM_SendChar(PIOS_COM_DEBUG, c);
+#endif
 
 }
 

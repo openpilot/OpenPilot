@@ -53,7 +53,7 @@ static void TaskHIDTest(void *pvParameters);
 static void TaskServos(void *pvParameters);
 static void TaskSDCard(void *pvParameters);
 #endif
-int32_t CONSOLE_Parse(COMPortTypeDef port, char c);
+int32_t CONSOLE_Parse(uint8_t port, char c);
 void OP_ADC_NotifyChange(uint32_t pin, uint32_t pin_value);
 
 /* Prototype of generated InitModules() function */

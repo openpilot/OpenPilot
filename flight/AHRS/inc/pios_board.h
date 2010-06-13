@@ -123,27 +123,12 @@ TIM8  |           |           |           |
 #define PIOS_OP_SPI				0
 
 //-------------------------
-// PIOS_USART1
-//-------------------------
-#define PIOS_USART1_ENABLED			1
-#define PIOS_USART1_USART       		USART3
-#define PIOS_USART1_GPIO_PORT			GPIOB
-#define PIOS_USART1_RX_PIN      		GPIO_Pin_11
-#define PIOS_USART1_TX_PIN      		GPIO_Pin_10
-#define PIOS_USART1_REMAP_FUNC			{ }
-#define PIOS_USART1_IRQ_CHANNEL			USART3_IRQn
-#define PIOS_USART1_IRQHANDLER_FUNC		void USART3_IRQHandler(void)
-#define PIOS_USART1_CLK_FUNC			RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE)
-#define PIOS_USART1_NVIC_PRIO			PIOS_IRQ_PRIO_HIGH
-#define PIOS_USART1_BAUDRATE			57600
-
-//-------------------------
 // PIOS_USART
 //-------------------------
-#define PIOS_USART_NUM				1
 #define PIOS_USART_RX_BUFFER_SIZE		256
 #define PIOS_USART_TX_BUFFER_SIZE		256
-#define PIOS_COM_DEBUG_PORT			USART_1
+#define PIOS_COM_AUX				0
+#define PIOS_COM_DEBUG				PIOS_COM_AUX
 
 #if 0
 //-------------------------

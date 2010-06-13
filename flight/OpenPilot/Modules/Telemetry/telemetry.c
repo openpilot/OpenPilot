@@ -45,7 +45,7 @@
 // Private types
 
 // Private variables
-static COMPortTypeDef telemetryPort;
+static uint8_t telemetryPort;
 static xQueueHandle queue;
 static xQueueHandle priorityQueue;
 static xTaskHandle telemetryTxTaskHandle;
@@ -300,7 +300,7 @@ static void telemetryTxPriTask(void* parameters)
  */
 static void telemetryRxTask(void* parameters)
 {
-	COMPortTypeDef inputPort;
+	uint8_t inputPort;
 	int32_t len;
 
 	// Task loop
@@ -310,7 +310,7 @@ static void telemetryRxTask(void* parameters)
 		// Determine input port (USB takes priority over telemetry port)
 		if(PIOS_USB_HID_CheckAvailable())
 		{
-			inputPort = COM_USB_HID;
+			inputPort = PIOS_COM_TELEM_USB;
 		}
 		else
 #endif /* ALLOW_HID_TELEMETRY */
@@ -339,7 +339,7 @@ static void telemetryRxTask(void* parameters)
  */
 static int32_t transmitData(uint8_t* data, int32_t length)
 {
-	COMPortTypeDef outputPort;
+	uint8_t outputPort;
 
 	// Determine input port (USB takes priority over telemetry port)
 #if ALLOW_HID_TELEMETRY
@@ -533,7 +533,7 @@ static void updateTelemetryStats()
 static void updateSettings()
 {
 	// Set port
-	telemetryPort = COM_USART1;
+	telemetryPort = PIOS_COM_TELEM_RF;
 	// Retrieve settings
 	TelemetrySettingsGet(&settings);
 	// Set port speed

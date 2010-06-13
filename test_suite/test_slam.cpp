@@ -50,7 +50,7 @@ using namespace boost;
 
 
 void test_slam01_main(world_ptr_t *world) {
-	ActiveSearchGrid asGrid(640, 480, 5, 5, 22, 0);
+	ActiveSearchGrid asGrid(640, 480, 5, 5, 22, 20);
 	vec2 imSz;
 	imSz(0) = 640; imSz(1) = 480;
 	vec4 k;
@@ -199,6 +199,7 @@ void test_slam01_main(world_ptr_t *world) {
 				// 2. init new landmarks
 				if (mapPtr->unusedStates(LandmarkAnchoredHomogeneousPoint::size())) {
 
+					cout << "Roi's cells status: " << asGrid << endl;
 					ROI roi;
 					if (asGrid.getROI(roi)){
 
@@ -206,12 +207,12 @@ void test_slam01_main(world_ptr_t *world) {
 						if (senPtr->getRaw()->detect(RawAbstract::HARRIS, featPtr, &roi)) {
 							cout << "\n-------------------------------------------------- " << endl;
 							cout << "Detected pixel: " << featPtr->state.x() << endl;
-							cout << "Initializing lmk..." << endl;
 
 							// 2a. create lmk object
 							ahp_ptr_t lmkPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr)); // add featImgPnt in constructor
 							lmkPtr->id(lmkPtr->landmarkIds.getId());
 							lmkPtr->linkToParentMap(mapPtr);
+							cout << "Initializing lmk " << lmkPtr->id() << endl;
 
 							// 2b. create obs object
 							// todo make lmk creation dynamic with factories or switch or other.

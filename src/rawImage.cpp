@@ -37,7 +37,7 @@ namespace jafar {
 			return s;
 		}
 
-		RawImage::RawImage() : quickHarrisDetector(5, 15, 2){
+		RawImage::RawImage() : quickHarrisDetector(5, 10, 5){
 		}
 
 		void RawImage::setJafarImage(jafarImage_ptr_t img_) {

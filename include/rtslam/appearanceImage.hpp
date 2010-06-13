@@ -50,8 +50,14 @@ namespace jafar {
 		class AppearenceImage: public AppearanceAbstract {
 			public:
 				image::Image patch;
-				AppearenceImage();
+				unsigned int patchSum;
+				unsigned int patchSquareSum;
+			public:
+				AppearenceImage(const image::Image& patch);
 				virtual ~AppearenceImage();
+
+			private:
+				void computePatchIntegrals();
 		};
 	}
 

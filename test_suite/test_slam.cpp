@@ -199,7 +199,6 @@ void test_slam01_main(world_ptr_t *world) {
 				// 2. init new landmarks
 				if (mapPtr->unusedStates(LandmarkAnchoredHomogeneousPoint::size())) {
 
-					cout << "Roi's cells status: " << asGrid << endl;
 					ROI roi;
 					if (asGrid.getROI(roi)){
 

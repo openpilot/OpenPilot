@@ -829,7 +829,6 @@ namespace jafar {
 				return H;
 			}
 
-
 			/**
 			 * Jacobian of frame composition wrt global frame.
 			 * \param G the global frame
@@ -913,7 +912,7 @@ namespace jafar {
 			 * \return the inverse of \a F.
 			 */
 			template<class VecF>
-			jblas::vec7 invertFrame(VecF & F) {
+			jblas::vec7 invertFrame(const VecF & F) {
 				vec3 t = subrange(F, 0, 3);
 				vec4 q = subrange(F, 3, 7);
 				vec7 res;
@@ -930,7 +929,7 @@ namespace jafar {
 			 * \param I_f the Jacobian
 			 */
 			template<class VecF, class VecI, class MatI_f>
-			void invertFrame(VecF & F, VecI & I, MatI_f & I_f) {
+			void invertFrame(const VecF & F, const VecI & I, MatI_f & I_f) {
 
 				vec3 Ft = subrange(F, 0, 3);
 				vec4 Fq = subrange(F, 3, 7);
@@ -948,6 +947,63 @@ namespace jafar {
 				subrange(I_f, 3, 7, 3, 7) = Q_q;
 
 			}
+
+			/**
+			 * Frame increment.
+			 * Returns F = composeFrames(invertFrame(F1) , F2)
+			 * \param F1 the first frame
+			 * \param F2 the second frame
+			 * \return the frame F2 expressed in F1
+			 */
+			template<class VecF1, class VecF2>
+			jblas::vec7 frameIncrement(VecF1 & F1, VecF2 & F2){
+					return composeFrames(invertFrame(F1), F2);
+			}
+
+			/**
+			 * Frame increment, first Jacobian.
+			 * \param F1 the first frame
+			 * \param F2 the second frame
+			 * \param F_f1 the Jacobian of frameIncrement() wrt F1
+			 */
+			template<class VecF1, class VecF2, class MatF_f1>
+			void frameIncrement_by_f1(const VecF1 & F1, const VecF2 & F2, MatF_f1 & F_f1){
+					jblas::vec7 IF1;
+					jblas::mat IF1_f1(7,7), F_if1(7,7);
+					invertFrame(F1, IF1, IF1_f1);
+					composeFrames_by_dglobal(IF1, F2, F_if1);
+					F_f1 = ublas::prod(F_if1, IF1_f1);
+			}
+
+			/**
+			 * Frame increment, second Jacobian.
+			 * \param F1 the first frame
+			 * \param F2 the second frame
+			 * \param F_f2 the Jacobian of frameIncrement() wrt F2
+			 */
+			template<class VecF1, class VecF2, class MatF_f2>
+			void frameIncrement_by_f2(const VecF1 & F1, const VecF2 & F2, MatF_f2 & F_f2){
+					composeFrames_by_dlocal(invertFrame(F1), F2, F_f2);
+			}
+
+			/**
+			 * Frame increment, first Jacobian.
+			 * \param F1 the first frame
+			 * \param F2 the second frame
+			 * \param F the incremental frame from F1 to F2
+			 * \param F_f1 the Jacobian of frameIncrement() wrt F1
+			 * \param F_f2 the Jacobian of frameIncrement() wrt F2
+			 */
+			template<class VecF1, class VecF2, class VecF, class MatF_f1, class MatF_f2>
+			void frameIncrement(const VecF1 & F1, const VecF2 & F2, VecF & F, MatF_f1 & F_f1, MatF_f2 & F_f2){
+					jblas::vec7 IF1;
+					jblas::mat IF1_f1(7,7), F_if1(7,7);
+					invertFrame(F1, IF1, IF1_f1);
+					composeFrames(IF1, F, F_if1, F_f2);
+					F_f1 = ublas::prod(F_if1, IF1_f1);
+			}
+
+
 
 		}
 	}

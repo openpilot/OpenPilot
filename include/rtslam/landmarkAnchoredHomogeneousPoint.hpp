@@ -61,6 +61,10 @@ namespace jafar {
 
 				virtual size_t stdSize() {return LandmarkAnchoredHomogeneousPoint::size();}
 
+				virtual vec reparametrize_func(const vec & lmk){
+					return lmkAHP::ahp2euc(lmk);
+				}
+
 				/**
 				 * Reparametrize to Euclidean, with Jacobians.
 				 * \param ahp the anchored homogeneous point to be reparametrized.

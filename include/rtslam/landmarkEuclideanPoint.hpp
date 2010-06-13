@@ -60,6 +60,10 @@ namespace jafar {
 
 				virtual size_t stdSize() {return size();}
 
+				virtual vec reparametrize_func(const vec & lmk){
+					return lmk;
+				}
+
 				void reparametrize_func(const vec & lmk, vec & lnew, mat & LNEW_lmk){
 					lnew = lmk;
 					LNEW_lmk = identity_mat(size());

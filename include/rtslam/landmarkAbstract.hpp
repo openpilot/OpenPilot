@@ -107,6 +107,7 @@ namespace jafar {
 
 				//Reparametrize old Landmarks into new ones
 				void reparametrize();
+				virtual vec reparametrize_func(const vec & lmk) = 0;
 				virtual void reparametrize_func(const vec & lmk, vec & lnew, mat & LNEW_lmk) = 0;
 
 				/**
@@ -122,9 +123,9 @@ namespace jafar {
 				// Create a landmark descriptor
 				virtual void createDescriptor(const appearance_ptr_t & appPtr, const vec7 & sensorPose){
 
-					this->descriptor = desc_ptr_t (new DescriptorAbstract()) ;
-					this->descriptor->pose0 = sensorPose;
-					this->descriptor->app0Ptr = appPtr;
+//					this->descriptor = desc_ptr_t (new DescriptorAbstract()) ;
+//					this->descriptor->pose0 = sensorPose;
+//					this->descriptor->app0Ptr = appPtr;
 
 				}
 

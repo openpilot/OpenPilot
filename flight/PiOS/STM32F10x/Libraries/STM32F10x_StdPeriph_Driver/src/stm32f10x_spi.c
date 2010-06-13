@@ -154,7 +154,7 @@ void SPI_I2S_DeInit(SPI_TypeDef* SPIx)
   *   contains the configuration information for the specified SPI peripheral.
   * @retval None
   */
-void SPI_Init(SPI_TypeDef* SPIx, SPI_InitTypeDef* SPI_InitStruct)
+void SPI_Init(SPI_TypeDef* SPIx, const SPI_InitTypeDef* SPI_InitStruct)
 {
   uint16_t tmpreg = 0;
   

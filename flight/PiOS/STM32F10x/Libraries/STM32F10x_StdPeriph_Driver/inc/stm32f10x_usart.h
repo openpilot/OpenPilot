@@ -362,7 +362,7 @@ typedef struct
   */
 
 void USART_DeInit(USART_TypeDef* USARTx);
-void USART_Init(USART_TypeDef* USARTx, USART_InitTypeDef* USART_InitStruct);
+void USART_Init(USART_TypeDef* USARTx, const USART_InitTypeDef* USART_InitStruct);
 void USART_StructInit(USART_InitTypeDef* USART_InitStruct);
 void USART_ClockInit(USART_TypeDef* USARTx, USART_ClockInitTypeDef* USART_ClockInitStruct);
 void USART_ClockStructInit(USART_ClockInitTypeDef* USART_ClockInitStruct);

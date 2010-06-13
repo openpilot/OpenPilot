@@ -162,7 +162,7 @@ void USART_DeInit(USART_TypeDef* USARTx)
   *   that contains the configuration information for the specified USART peripheral.
   * @retval None
   */
-void USART_Init(USART_TypeDef* USARTx, USART_InitTypeDef* USART_InitStruct)
+void USART_Init(USART_TypeDef* USARTx, const USART_InitTypeDef* USART_InitStruct)
 {
   uint32_t tmpreg = 0x00, apbclock = 0x00;
   uint32_t integerdivider = 0x00;

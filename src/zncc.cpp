@@ -9,52 +9,77 @@ namespace correl {
 	// a bit faster than normal implementation, but a bit less precise (but it should be ok even for a full image)
 	// all ifs on boolean template parameters cost nothing
 	template<int depth, typename worktype, typename bornetype, bornetype borneinf, bornetype bornesup, bool useBornes, bool useWeightMatrix>
-	double Zncc::computeTpl(image::Image const* im1, image::Image const* im2, float const* weightMatrix)
+	double Zncc::computeTpl(image::Image const& im1_, image::Image const& im2_, float const* weightMatrix)
 	{
 		// preconds
-		JFR_PRECOND( im1->depth() == depth, "Image 1 depth is different from the template parameter" );
-		JFR_PRECOND( im2->depth() == depth, "Image 2 depth is different from the template parameter" );
-		JFR_PRECOND( im1->channels() == im2->channels(), "The channels number of both images are different" );
+		JFR_PRECOND( im1_.depth() == depth, "Image 1 depth is different from the template parameter" );
+		JFR_PRECOND( im2_.depth() == depth, "Image 2 depth is different from the template parameter" );
+		JFR_PRECOND( im1_.channels() == im2_.channels(), "The channels number of both images are different" );
 		JFR_PRECOND( !useWeightMatrix || weightMatrix, "Template parameter tells to use weightMatrix but no one is given" );
 		
-		CvRect roi1 = im1->getROI();
-		CvRect roi2 = im2->getROI();
-		JFR_PRECOND( roi1.width  == roi2.width , "The width of both images or roi are different" );
-		JFR_PRECOND( roi1.height == roi2.height, "The height of both images or roi are different" );
+		cv::Size size1; cv::Rect roi1 = im1_.getROI(size1);
+		cv::Size size2; cv::Rect roi2 = im2_.getROI(size2);
+//		JFR_PRECOND( roi1.width  == roi2.width , "The width of both images or roi are different" );
+//		JFR_PRECOND( roi1.height == roi2.height, "The height of both images or roi are different" );
+
+		int dw = roi1.width - roi2.width, dh = roi1.height - roi2.height;
+		if (dw != 0)
+		{
+			cv::Rect &roiA = (dw<0 ? roi1 : roi2), &roiB = (dw<0 ? roi2 : roi1);
+			cv::Size &sizeA = (dw<0 ? size1 : size2);
+			if (roiA.x == 0) { roiB.x += dw; roiB.width -= dw; } else
+			if (roiA.x+roiA.width == sizeA.width) { roiB.width -= dw; }
+		}
+		if (dh != 0)
+		{
+			cv::Rect &roiA = (dh<0 ? roi1 : roi2), &roiB = (dh<0 ? roi2 : roi1);
+			cv::Size &sizeA = (dh<0 ? size1 : size2);
+			if (roiA.y == 0) { roiB.y += dh; roiB.height -= dh; } else
+			if (roiA.y+roiA.height == sizeA.height) { roiB.height -= dh; }
+		}
+//		image::Image im1(im1_, cv::Rect(0,0,im1_.width(),im1_.height())); im1.setROI(roi1);
+//		image::Image im2(im2_, cv::Rect(0,0,im2_.width(),im2_.height())); im2.setROI(roi2);
+		image::Image im1(im1_); im1.setROI(roi1);
+		image::Image im2(im2_); im2.setROI(roi2);
+		
+		JFR_PRECOND( im1.size()  == im2.size() , "The size of images or roi are different (" << im1.width() << "," << im1.height() << " != " << im2.width() << "," << im2.height() << ")" );
+		int height = im1.height();
+		int width = im1.width();
+		int step = im1.step()/sizeof(worktype);
 		
 		// reduce rois if a part is outside of the image
-		int delta;
+/*		int delta;
 		if (roi1.x < 0) { roi2.x -= roi1.x; roi2.width += roi1.x; roi1.width = roi2.width; roi1.x = 0; }
 		if (roi2.x < 0) { roi1.x -= roi2.x; roi1.width += roi2.x; roi2.width = roi1.width; roi2.x = 0; }
 		if (roi1.y < 0) { roi2.y -= roi1.y; roi2.height += roi1.y; roi1.height = roi2.height; roi1.y = 0; }
 		if (roi2.y < 0) { roi1.y -= roi2.y; roi1.height += roi2.y; roi2.height = roi1.height; roi2.y = 0; }
-		delta = im1->width()-(roi1.x+roi1.width); if (delta < 0) { roi1.width += delta; roi2.width = roi1.width; }
-		delta = im2->width()-(roi2.x+roi2.width); if (delta < 0) { roi2.width += delta; roi1.width = roi2.width; }
-		delta = im1->height()-(roi1.y+roi1.height); if (delta < 0) { roi1.height += delta; roi2.height = roi1.height; }
-		delta = im2->height()-(roi2.y+roi2.height); if (delta < 0) { roi2.height += delta; roi1.height = roi2.height; }
-
+		delta = im1.width()-(roi1.x+roi1.width); if (delta < 0) { roi1.width += delta; roi2.width = roi1.width; }
+		delta = im2.width()-(roi2.x+roi2.width); if (delta < 0) { roi2.width += delta; roi1.width = roi2.width; }
+		delta = im1.height()-(roi1.y+roi1.height); if (delta < 0) { roi1.height += delta; roi2.height = roi1.height; }
+		delta = im2.height()-(roi2.y+roi2.height); if (delta < 0) { roi2.height += delta; roi1.height = roi2.height; }
+*/
 		// some variables initialization
-		unsigned roi1_step, roi2_step;
-		roi1_step = im1->step() - roi1.width;
-		roi2_step = im2->step() - roi2.width;
-		
+/*		unsigned roi1_step, roi2_step;
+		roi1_step = im1.step() - roi1.width;
+		roi2_step = im2.step() - roi2.width;
+*/		
 		double mean1 = 0., mean2 = 0.;
 		double sigma1 = 0., sigma2 = 0.;
 		double zncc_sum = 0.;
 		double zncc_count = 0.;
 		double zncc_total = 0.;
 		
-		worktype const* im1ptr = reinterpret_cast<worktype const*>(im1->data());
-		worktype const* im2ptr = reinterpret_cast<worktype const*>(im2->data());
-		im1ptr += roi1.y*im1->step()+roi1.x;
-		im2ptr += roi2.y*im2->step()+roi2.x;
+		worktype const* im1ptr = reinterpret_cast<worktype const*>(im1.data());
+		worktype const* im2ptr = reinterpret_cast<worktype const*>(im2.data());
+//		im1ptr += roi1.y*im1.step()+roi1.x;
+//		im2ptr += roi2.y*im2.step()+roi2.x;
 		float const* wptr = weightMatrix;
 		double w;
 		
 		// start the loops
-		for(int i = 0; i < roi1.height; ++i) 
+		for(int i = 0; i < height; ++i) 
 		{
-			for(int j = 0; j < roi1.width; ++j) 
+			for(int j = 0; j < width; ++j) 
 			{
 				worktype im1v = *(im1ptr++);
 				worktype im2v = *(im2ptr++);
@@ -84,8 +109,8 @@ namespace correl {
 #endif
 				}
 			}
-			im1ptr += roi1_step;
-			im2ptr += roi2_step;
+			im1ptr += step;
+			im2ptr += step;
 		}
 		
 		if (useBornes) if (zncc_count / zncc_total < 0.5) return 0;
@@ -101,10 +126,10 @@ namespace correl {
 	}
 
 
-	double Zncc::compute(image::Image const* im1, image::Image const* im2, float const* weightMatrix)
+	double Zncc::compute(image::Image const& im1, image::Image const& im2, float const* weightMatrix)
 	{
-		JFR_PRECOND(im1->depth() == im2->depth(), "The depth of both images is different");
-		switch(im1->depth())
+		JFR_PRECOND(im1.depth() == im2.depth(), "The depth of both images is different");
+		switch(im1.depth())
 		{
 // 			case CV_1U:
 // 				if (weightMatrix == NULL)
@@ -143,14 +168,14 @@ namespace correl {
 	}
 
 	#if 1
-	// TODO : test / maybe improve it to manage more nicely rois
+	// FIXME : test / improve it to really manage rois
 	double Zncc::exploreRotation(image::Image const* im1, image::Image const* im2, int rotationStep)
 	{
-		CvRect roi2 = im2->getROI();
+		cv::Rect roi2 = im2->getROI();
 //		int dim = (roi2->width > roi2->height ? roi2->width : roi2->height)*1.5;// 1.5 > sqrt(2)
 //		image::Image* im2bis = new image::Image(dim, dim, im2->depth(), im2->colorSpace());
 		image::Image* im2bis = new image::Image(roi2.width, roi2.height, im2->depth(), im2->colorSpace());
-		double bestZncc = compute(im1,im2);
+		double bestZncc = compute(*im1,*im2);
 	//   double tempBestAngle = 0.;
 		for(int angle = rotationStep; angle < 360; angle += rotationStep)
 		{
@@ -167,7 +192,7 @@ namespace correl {
 			CvMat M = cvMat( 2, 3, CV_32F, m );
 			cvFillImage(&(*im2bis), 0);
 			cvGetQuadrangleSubPix( &(*im2), &(*im2bis), &M);
-			double zncc = compute(im1,im2bis);
+			double zncc = compute(*im1,*im2bis);
 			if(zncc > bestZncc) { bestZncc = zncc; /*tempBestAngle = radangle;*/}
 		}
 	//   JFR_DEBUG(tempBestAngle);

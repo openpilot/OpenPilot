@@ -20,7 +20,7 @@ namespace jafar {
 		*/
 		class Zncc {
 			template<int depth, typename worktype, typename bornetype, bornetype borneinf, bornetype bornesup, bool useBornes, bool useWeightMatrix>
-			static double computeTpl(image::Image const* im1, image::Image const* im2, float const* weightMatrix = NULL);
+			static double computeTpl(image::Image const& im1, image::Image const& im2, float const* weightMatrix = NULL);
 		public:
 
 			/**
@@ -33,7 +33,7 @@ namespace jafar {
 				@param weightMatrix the weight matrix that must have the same size than the regions of interest ; if NULL not used
 				@return ZNCC correlation score between 0 and 1
 			*/
-			static double compute(image::Image const* im1, image::Image const* im2, float const* weightMatrix = NULL);
+			static double compute(image::Image const& im1, image::Image const& im2, float const* weightMatrix = NULL);
 			/**
 			* This function return the best ZNCC between two images, the second images get rotated
 			* @param im1 the first image ; the roi can be set (with set_roi(CvRect))

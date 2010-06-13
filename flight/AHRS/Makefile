@@ -287,7 +287,7 @@ OOCD_EXE=openocd
 # debug level
 OOCD_CL=-d0
 # interface and board/target settings (using the OOCD target-library here)
-OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.cfg -f ../Project/OpenOCD/stm32.cfg
+OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.ahrs.cfg -f ../Project/OpenOCD/stm32.cfg
 # initialize
 OOCD_CL+=-c init
 # show the targets

@@ -36,36 +36,11 @@ MEMORY
   EXTMEMB3 (rx) : ORIGIN = 0x00000000, LENGTH = 0
 }
 
-/* higher address of the user mode stack */
-_estack = 0x20010000;
-
 /* This is the size of the stack for early init and for all FreeRTOS IRQs */
 _irq_stack_size = 0x400;
 
-/* default stack sizes. 
-
-These are used by the startup in order to allocate stacks for the different modes.
-
-Note: FreeRTOS gives each task an own stack
-*/
-
-__Stack_Size = 128 ;
-
-PROVIDE ( _Stack_Size = __Stack_Size ) ;
-
-__Stack_Init = _estack  - __Stack_Size ;
-
-/*"PROVIDE" allows to easily override these values from an object file or the commmand line.*/
-PROVIDE ( _Stack_Init = __Stack_Init ) ;
-
-/*
-There will be a link error if there is not this amount of RAM free at the end.
-*/
-_Minimum_Stack_Size = 0x100 ;
-
 /* Check valid alignment for VTOR */
 ASSERT(ORIGIN(FLASH) == ALIGN(ORIGIN(FLASH), 0x80), "Start of memory region flash not aligned for startup vector table");
-
 
 /*
 this sends all unreferenced IRQHandlers to reset
@@ -316,24 +291,7 @@ SECTIONS
     
     PROVIDE ( end = _ebss );
     PROVIDE ( _end = _ebss );
-    
-    /* This is the user stack section 
-    This is just to check that there is enough RAM left for the User mode stack
-    It should generate an error if it's full.
-     */
-    ._usrstack :
-    {
-            . = ALIGN(4);
-        _susrstack = . ;
-        
-        . = . + _Minimum_Stack_Size ;
-        
-            . = ALIGN(4);
-        _eusrstack = . ;
-    } >RAM
-    
 
-   
     /* this is the FLASH Bank1 */
     /* the C or assembly source must explicitly place the code or data there
     using the "section" attribute */

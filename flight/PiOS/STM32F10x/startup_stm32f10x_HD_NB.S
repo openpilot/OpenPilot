@@ -69,7 +69,7 @@ Reset_Handler:
   required, then adjust the Register Addresses */
   bl  SystemInit_ExtMemCtl
 /* restore original stack pointer */  
-  LDR r0, =_estack
+  LDR r0, =_irq_stack_top
   MSR msp, r0
 /* Copy the data segment initializers from flash to SRAM */  
   movs  r1, #0

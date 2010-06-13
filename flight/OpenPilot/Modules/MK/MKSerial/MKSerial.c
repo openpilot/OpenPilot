@@ -33,8 +33,8 @@
 //
 // Configuration
 //
-#define PORT			COM_USART2
-#define DEBUG_PORT		COM_USART1
+#define PORT			PIOS_COM_GPS
+#define DEBUG_PORT		PIOS_COM_AUX
 #define STACK_SIZE		1024
 #define TASK_PRIORITY	(tskIDLE_PRIORITY + 3)
 #define MAX_NB_PARS 	100

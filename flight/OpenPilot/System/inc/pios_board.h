@@ -119,7 +119,7 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define PIOS_COM_GPS                            1
 #define PIOS_COM_TELEM_USB                      2
 
-#if 0
+#if 1
 #define PIOS_COM_AUX                            3
 #define PIOS_COM_DEBUG                          PIOS_COM_AUX
 #endif

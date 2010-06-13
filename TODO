@@ -4,14 +4,16 @@ Features
 ------------------------------------
 - segments
 - multimap
-
-
+- True Active Search: search depending on ellipse area.
+- feature appearance prediction
+- Adapt ActiveSearchGrid and QuickHarrisDetector to the new ROI specifications in module image
 
 
 Organization
 ------------------------------------
-- move QuickHarrisDetector to fdetect
+- move QuickHarrisDetector to fdetect: attention to the prototype of detectIn() !!!
 - move ExtendedKalmanFilterIndirect to filter
+- move Gaussian to jmath
 
 
 

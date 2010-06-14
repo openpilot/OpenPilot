@@ -28,31 +28,35 @@
 #include "airspeedgadgetwidget.h"
 #include <iostream>
 #include <QDebug>
-#include "math.h"
 
 AirspeedGadgetWidget::AirspeedGadgetWidget(QWidget *parent) : QGraphicsView(parent)
 {
+    // TODO: create a proper "needle" object instead of hardcoding all this
+    // which is ugly (but easy).
+
     setMinimumSize(64,64);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setScene(new QGraphicsScene(this));
+
  
     m_renderer = new QSvgRenderer();
     m_background = new QGraphicsSvgItem();
     m_foreground = new QGraphicsSvgItem();
     m_needle1 = new QGraphicsSvgItem();
     m_needle2 = new QGraphicsSvgItem();
+    m_needle3 = new QGraphicsSvgItem();
     paint();
 
     needle1Target = 0;
     needle2Target = 0;
+    needle3Target = 0;
     needle1Value = 0;
     needle2Value = 0;
+    needle3Value = 0;
 
     obj1 = NULL;
     obj2 = NULL;
-
-    rotateN1 = horizN1 = vertN1 = false;
-    rotateN2 = horizN2 = vertN2 = false;
+    obj3 = NULL;
 
     // This timer mechanism makes needles rotate smoothly
     connect(&dialTimer, SIGNAL(timeout()), this, SLOT(rotateNeedles()));
@@ -68,15 +72,18 @@ AirspeedGadgetWidget::~AirspeedGadgetWidget()
 /*!
   \brief Connects the widget to the relevant UAVObjects
   */
-void AirspeedGadgetWidget::connectNeedles(QString object1, QString nfield1, QString object2, QString nfield2 ) {
+void AirspeedGadgetWidget::connectNeedles(QString object1, QString nfield1,
+                                          QString object2, QString nfield2,
+                                          QString object3, QString nfield3) {
     if (obj1 != NULL)
         disconnect(obj1,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(updateNeedle1(UAVObject*)));
     if (obj2 != NULL)
         disconnect(obj2,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(updateNeedle2(UAVObject*)));
+    if (obj3 != NULL)
+        disconnect(obj3,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(updateNeedle3(UAVObject*)));
+
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    std::cout << "Connect needles - " << object1.toStdString() << "-"<< nfield1.toStdString() << "  -   " <<
-            object2.toStdString() << "-" << nfield2.toStdString() << std::endl;
 
     // Check validity of arguments first, reject empty args and unknown fields.
     if (!(object1.isEmpty() || nfield1.isEmpty())) {
@@ -101,6 +108,18 @@ void AirspeedGadgetWidget::connectNeedles(QString object1, QString nfield1, QStr
             std::cout << "Error: Object is unknown (" << object2.toStdString() << ")." << std::endl;
         }
     }
+
+    // And do the same for the third needle.
+    if (!(object3.isEmpty() || nfield3.isEmpty())) {
+        obj3 = dynamic_cast<UAVDataObject*>( objManager->getObject(object3) );
+        if (obj3 != NULL ) {
+            std::cout << "Connected Object 3 (" << object3.toStdString() << ")." << std::endl;
+            connect(obj3, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateNeedle3(UAVObject*)));
+            field3 = nfield3;
+        } else {
+            std::cout << "Error: Object is unknown (" << object3.toStdString() << ")." << std::endl;
+        }
+    }
 }
 
 /*!
@@ -114,7 +133,6 @@ void AirspeedGadgetWidget::updateNeedle1(UAVObject *object1) {
     } else {
         std::cout << "Wrong field, maybe an issue with object disconnection ?" << std::endl;
     }
-    std::cout << "Update Needle 1 with value of field " << field1.toStdString() << std::endl;
 }
 
 /*!
@@ -129,8 +147,24 @@ void AirspeedGadgetWidget::updateNeedle2(UAVObject *object2) {
     }
 }
 
+/*!
+  \brief Called by the UAVObject which got updated
+  */
+void AirspeedGadgetWidget::updateNeedle3(UAVObject *object3) {
+    UAVObjectField* field = object3->getField(field3);
+    if (field) {
+        setNeedle3(field->getDouble());
+    } else {
+        std::cout << "Wrong field, maybe an issue with object disconnection ?" << std::endl;
+    }
+}
+
+/*
+  Initializes the dial file, and does all the one-time calculations for
+  display later.
+  */
 void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QString n1, QString n2,
-                                       QString n1Move, QString n2Move)
+                                       QString n3, QString n1Move, QString n2Move, QString n3Move)
 {
    if (QFile::exists(dfn))
    {
@@ -139,25 +173,28 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
       {
          fgenabled = false;
          n2enabled = false;
+         n3enabled = false;
          QGraphicsScene *l_scene = scene();
+         l_scene->removeItem(m_foreground);
+         l_scene->removeItem(m_background);
+         l_scene->removeItem(m_needle1);
+         l_scene->removeItem(m_needle2);
+         l_scene->removeItem(m_needle3);
 
+         // We assume the scene contains at least the background
+         // and needle1
          m_background->setSharedRenderer(m_renderer);
          m_background->setElementId(bg);
+         l_scene->addItem(m_background);
+
          m_needle1->setSharedRenderer(m_renderer);
          m_needle1->setElementId(n1);
+         l_scene->addItem(m_needle1);
 
-         if (m_renderer->elementExists(fg)) {
-            m_foreground->setSharedRenderer(m_renderer);
-            m_foreground->setElementId(fg);
-            if (!l_scene->items().contains(m_foreground))
-                l_scene->addItem(m_foreground);
-            fgenabled = true;
-        } else {
-            if (l_scene->items().contains(m_foreground))
-                l_scene->removeItem(m_foreground);
-            fgenabled = false;
-        }
 
+        // The dial gadget allows Needle1 and Needle2 to be
+        // the same element, for combined movement. Needle3
+        // is always independent.
         if (n1 == n2) {
             m_needle2 = m_needle1;
             n2enabled = true;
@@ -165,15 +202,35 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
          if (m_renderer->elementExists(n2)) {
              m_needle2->setSharedRenderer(m_renderer);
              m_needle2->setElementId(n2);
-             if (!l_scene->items().contains(m_needle2))
-                l_scene->addItem(m_needle2);
+             l_scene->addItem(m_needle2);
              n2enabled = true;
-         } else {
-             if (l_scene->items().contains(m_needle2))
-                l_scene->removeItem(m_needle2);
-             n2enabled = false;
+            }
          }
-     }
+
+        if (m_renderer->elementExists(n3)) {
+            m_needle3->setSharedRenderer(m_renderer);
+            m_needle3->setElementId(n3);
+            l_scene->addItem(m_needle3);
+            n3enabled = true;
+           }
+
+           if (m_renderer->elementExists(fg)) {
+              m_foreground->setSharedRenderer(m_renderer);
+              m_foreground->setElementId(fg);
+              l_scene->addItem(m_foreground);
+              fgenabled = true;
+          }
+
+           rotateN1 = false;
+           horizN1 =  false;
+           vertN1 = false;
+           rotateN2 = false;
+           horizN2 = false;
+           vertN2 = false;
+           rotateN3 = false;
+           horizN3 = false;
+           vertN3 = false;
+
 
          // Now setup the rotation/translation settings:
          // this is UGLY UGLY UGLY, sorry...
@@ -193,17 +250,37 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
              vertN2 = true;
          }
 
-         // std::cout<<"Dial file loaded ("<< dfn.toStdString() << ")" << std::endl;
-         l_scene->setSceneRect(m_background->boundingRect());
+         if (n3Move.contains("Rotate")) {
+             rotateN3 = true;
+         } else if (n3Move.contains("Horizontal")) {
+             horizN3 = true;
+         } else if (n3Move.contains("Vertical")) {
+             vertN3 = true;
+         }
 
-         // Initialize the center for all transforms of the dials to the
+         l_scene->setSceneRect(m_background->boundingRect());
+         // Now Initialize the center for all transforms of the dial needles to the
          // center of the background:
-         QRectF rect1 = m_background->boundingRect();
-         QPointF tr1 = m_background->mapToScene(rect1.width()/2,rect1.height()/2);
-         QPointF tr = m_needle1->mapFromScene(tr1);
-         m_needle1->setTransformOriginPoint(tr.x(),tr.y());
-         tr = m_needle2->mapFromScene(tr1);
-         m_needle2->setTransformOriginPoint(tr.x(),tr.y());
+         // - Move the center of the needle to the center of the background.
+         QRectF rectB = m_background->boundingRect();
+         QRectF rectN = m_needle1->boundingRect();
+         m_needle1->setPos(rectB.width()/2-rectN.width()/2,rectB.height()/2-rectN.height()/2);
+         // - Put the transform origin point of the needle at its center.
+         m_needle1->setTransformOriginPoint(rectN.width()/2,rectN.height()/2);
+         if ((n1 != n2) && n2enabled) {
+             // Only do it for needle1 if it is not the same as n2
+             rectN = m_needle2->boundingRect();
+             m_needle2->setPos(rectB.width()/2-rectN.width()/2,rectB.height()/2-rectN.height()/2);
+             m_needle2->setTransformOriginPoint(rectN.width()/2,rectN.height()/2);
+         }
+         if (n3enabled) {
+             rectN = m_needle3->boundingRect();
+             m_needle3->setPos(rectB.width()/2-rectN.width()/2,rectB.height()/2-rectN.height()/2);
+             m_needle3->setTransformOriginPoint(rectN.width()/2,rectN.height()/2);
+         }
+
+         // Last: clip the display region to the rectangle of the background
+         // TODO
      }
    }
    else
@@ -217,6 +294,7 @@ void AirspeedGadgetWidget::paint()
     l_scene->addItem(m_background);
     l_scene->addItem(m_needle1);
     l_scene->addItem(m_needle2);
+    l_scene->addItem(m_needle3);
     l_scene->addItem(m_foreground);
     l_scene->setSceneRect(m_background->boundingRect());
     update();
@@ -266,6 +344,18 @@ void AirspeedGadgetWidget::setNeedle2(double value) {
     }
 }
 
+void AirspeedGadgetWidget::setNeedle3(double value) {
+    if (rotateN3) {
+        needle3Target = 360*value*n3Factor/(n3MaxValue-n3MinValue);
+    }
+    if (horizN3) {
+        needle3Target = value*n3Factor/(n3MaxValue-n3MinValue);
+    }
+    if (vertN3) {
+        needle3Target = value*n3Factor/(n3MaxValue-n3MinValue);
+    }
+}
+
 // Take an input value and rotate the dial accordingly
 // Rotation is smooth, starts fast and slows down when
 // approaching the target.
@@ -275,6 +365,9 @@ void AirspeedGadgetWidget::setNeedle2(double value) {
 // to the same element.
 void AirspeedGadgetWidget::rotateNeedles()
 {
+    // TODO: watch out of potential drift of needles due to
+    // rounding errors. Should implement a way to set the value
+    // exactly to the target once it falls below the threshold.
     if ((abs((needle2Value-needle2Target)*10) > 5) && n2enabled) {
         double needle2Diff;
         needle2Diff =(needle2Target - needle2Value)/5;
@@ -293,7 +386,7 @@ void AirspeedGadgetWidget::rotateNeedles()
            // the transform origin point the opposite way
            // so that it keeps rotating from the same point.
            // (this is only useful if needle1 and needle2 are the
-           // same object, for combined movement.
+           // same object, for combined movement such as attitude indicator).
            QPointF oop = m_needle2->transformOriginPoint();
            m_needle2->setTransformOriginPoint(oop.x()-opd.x(),oop.y()-opd.y());
         }
@@ -320,6 +413,25 @@ void AirspeedGadgetWidget::rotateNeedles()
        needle1Value += needle1Diff;
     }
 
+    if ((abs((needle3Value-needle3Target)*10) > 5)) {
+        double needle3Diff;
+        needle3Diff = (needle3Target - needle3Value)/5;
+        if (rotateN3) {
+           m_needle3->setRotation(m_needle3->rotation()+needle3Diff);
+       } else {
+           QPointF opd = QPointF(0,0);
+           if (horizN3) {
+               opd = QPointF(needle3Diff,0);
+           }
+           if (vertN3) {
+               opd = QPointF(0,needle3Diff);
+           }
+           m_needle3->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), true);
+           QPointF oop = m_needle3->transformOriginPoint();
+           m_needle3->setTransformOriginPoint((oop.x()-opd.x()),(oop.y()-opd.y()));
+       }
+       needle3Value += needle3Diff;
+    }
+
    update();
 }
-

@@ -49,7 +49,8 @@ void AirspeedGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 {
     AirspeedGadgetConfiguration *m = qobject_cast<AirspeedGadgetConfiguration*>(config);
     m_widget->setDialFile(m->dialFile(), m->dialBackground(), m->dialForeground(), m->dialNeedle1(),
-                          m->dialNeedle2(),m->getN1Move(), m->getN2Move());
+                          m->dialNeedle2(),m->dialNeedle3(),m->getN1Move(), m->getN2Move(),
+                          m->getN3Move());
 
     m_widget->setN1Min(m->getN1Min());
     m_widget->setN1Max(m->getN1Max());
@@ -57,6 +58,11 @@ void AirspeedGadget::loadConfiguration(IUAVGadgetConfiguration* config)
     m_widget->setN2Min(m->getN2Min());
     m_widget->setN2Max(m->getN2Max());
     m_widget->setN2Factor(m->getN2Factor());
+    m_widget->setN3Min(m->getN3Min());
+    m_widget->setN3Max(m->getN3Max());
+    m_widget->setN3Factor(m->getN3Factor());
     m_widget->connectNeedles(m->getN1DataObject(),m->getN1ObjField(),
-                             m->getN2DataObject(),m->getN2ObjField());
+                             m->getN2DataObject(),m->getN2ObjField(),
+                             m->getN3DataObject(),m->getN3ObjField()
+                             );
 }

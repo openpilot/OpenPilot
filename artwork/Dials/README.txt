@@ -12,3 +12,6 @@ extracts directory:
 
    TODO: ideally, extracting the layers from the master SVG should be automated, but for now we are doing it manually.
 
+defaultset directory:
+
+   This directory contains dials which are ready for use in the GCS.

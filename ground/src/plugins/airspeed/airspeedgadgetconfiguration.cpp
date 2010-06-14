@@ -39,14 +39,19 @@ AirspeedGadgetConfiguration::AirspeedGadgetConfiguration(QString classId, const 
     dialForegroundID("foreground"),
     dialNeedleID1("needle"),
     dialNeedleID2("needle2"),
+    dialNeedleID3("needle3"),
     needle1MinValue(0),
     needle1MaxValue(100),
     needle2MinValue(0),
     needle2MaxValue(100),
+    needle3MinValue(0),
+    needle3MaxValue(100),
     needle1Factor(1),
     needle2Factor(1),
+    needle3Factor(1),
     needle1Move("Rotate"),
-    needle2Move("Rotate")
+    needle2Move("Rotate"),
+    needle3Move("Rotate")
 {
     //if a saved configuration exists load it
     if (state.count() > 0) {
@@ -58,18 +63,25 @@ AirspeedGadgetConfiguration::AirspeedGadgetConfiguration(QString classId, const 
         stream >> dialForegroundID;
         stream >> dialNeedleID1;
         stream >> dialNeedleID2;
+        stream >> dialNeedleID3;
         stream >> needle1MinValue;
         stream >> needle1MaxValue;
         stream >> needle2MinValue;
         stream >> needle2MaxValue;
+        stream >> needle3MinValue;
+        stream >> needle3MaxValue;
         stream >> needle1DataObject;
         stream >> needle1ObjectField;
         stream >> needle2DataObject;
         stream >> needle2ObjectField;
+        stream >> needle3DataObject;
+        stream >> needle3ObjectField;
         stream >> needle1Factor;
         stream >> needle2Factor;
+        stream >> needle3Factor;
         stream >> needle1Move;
         stream >> needle2Move;
+        stream >> needle3Move;
     }
 }
 /**
@@ -95,18 +107,25 @@ QByteArray AirspeedGadgetConfiguration::saveState() const
     stream << dialForegroundID;
     stream << dialNeedleID1;
     stream << dialNeedleID2;
+    stream << dialNeedleID3;
     stream << needle1MinValue;
     stream << needle1MaxValue;
     stream << needle2MinValue;
     stream << needle2MaxValue;
+    stream << needle3MinValue;
+    stream << needle3MaxValue;
     stream << needle1DataObject;
     stream << needle1ObjectField;
     stream << needle2DataObject;
     stream << needle2ObjectField;
+    stream << needle3DataObject;
+    stream << needle3ObjectField;
     stream << needle1Factor;
     stream << needle2Factor;
+    stream << needle3Factor;
     stream << needle1Move;
     stream << needle2Move;
+    stream << needle3Move;
 
     return bytes;
 }

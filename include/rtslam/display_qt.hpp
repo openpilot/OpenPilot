@@ -105,6 +105,7 @@ class SensorQt : public SensorDisplay
 		{
 			delete view_;
 			delete viewer_;
+			delete framenumber_label;
 		}
 		void bufferize()
 		{

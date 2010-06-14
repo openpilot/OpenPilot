@@ -30,7 +30,7 @@
 
 #include "debugheader.h"
 
-#include "../internals/PointLatlng.h"
+#include "../internals/pointlatlng.h"
 #include "mousewheelzoomtype.h"
 #include "../core/size.h"
 #include "../core/maptype.h"

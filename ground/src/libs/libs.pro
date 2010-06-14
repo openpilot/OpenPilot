@@ -6,6 +6,7 @@ SUBDIRS   = \
     aggregation \
     extensionsystem \
     qmapcontrol \
+    opmapcontrol \
     qwt \
     qextserialport \
     utils \

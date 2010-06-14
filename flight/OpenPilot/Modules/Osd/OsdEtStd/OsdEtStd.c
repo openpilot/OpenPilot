@@ -25,12 +25,15 @@
 
 #include "openpilot.h"
 
+#include "flightbatterystate.h"
+#include "positionactual.h"
+
 
 
 //
 // Configuration
 //
-#define DEBUG_PORT		COM_USART1
+#define DEBUG_PORT		PIOS_COM_TELEM_RF
 #define STACK_SIZE		1024
 #define TASK_PRIORITY	(tskIDLE_PRIORITY + 3)
 #define ENABLE_DEBUG_MSG
@@ -62,7 +65,8 @@
 //	uint8_t msg[63] = {0x03,0x3F,0x03,0x00,0x00,0x00,0x00,0x00,0x90,0x0A,0x8A,0x00,0x00,0x00,0x00,0x00,0x00,0xFC,0x17,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x57,0x37,0x14,0x33,0x02,0x24,0x09,0x60,0x10,0x02,0x00,0x00,0x90,0x00,0x54,0x54,0x00,0x00,0x33,0x28,0x13,0x00,0x00,0x08,0x03,0x00,0x90,0x0A};
 
 static bool fix=FALSE;
-static bool newGpsData=FALSE;
+static bool newPosData=FALSE;
+static bool newBattData=FALSE;
 
 static void WriteToMsg8(uint8_t index, uint8_t value)
 {
@@ -106,61 +110,114 @@ static void SetVoltage(uint32_t milliVolt)
 	msg[10] = (milliVolt % 6444)*256/6444;
 }
 
+static void FlightBatteryStateUpdatedCb(UAVObjEvent* ev)
+{
+	newBattData = TRUE;
+}
+
+static void PositionActualUpdatedCb(UAVObjEvent* ev)
+{
+	newPosData = TRUE;
+}
+
+
 //
 // Private functions
 //
 static void Task(void* parameters)
 {
-	int dir=0;
-	int alt=100;
-	int voltage = 0;
+	//int dir=0;
+	//int alt=100;
+	//int voltage = 0;
+	uint32_t cnt = 0;
 	PIOS_COM_ChangeBaud(DEBUG_PORT, 57600);
+
+	FlightBatteryStateConnectCallback(FlightBatteryStateUpdatedCb);
+	PositionActualConnectCallback(PositionActualUpdatedCb);
 
 	DEBUG_MSG("OSD ET Std Started\n\r");
 
 	while (1)
 	{
-		SetHomeDir(dir);
-		dir++;
-		if (dir>90)
+//		SetHomeDir(dir);
+//		dir++;
+//		if (dir>90)
+//		{
+//			fix=TRUE;
+//		}
+//		if (dir>360)
+//		{
+//			dir = 0;
+//			// Change coordinates
+//			msg[39]++;
+//		}
+//
+//		SetAltitude(alt);
+//		alt++;
+//
+//		SetVoltage(voltage);
+//		voltage += 50;
+//
+//		// GPS status
+//		if (fix)
+//			msg[59] = 0x2B;
+//		else
+//			msg[59] = 0x03;
+//
+//		if (newGpsData)
+//		{
+//			msg[59] |= 0x10;
+//			newGpsData = FALSE;
+//		}
+//		else
+//		{
+//			newGpsData = TRUE;
+//		}
+
+
+		if ( newBattData )
 		{
-			fix=TRUE;
+			FlightBatteryStateData flightBatteryData;
+
+			FlightBatteryStateGet(&flightBatteryData);
+
+			DEBUG_MSG("%5d Batt: V=%dmV\n\r", cnt, flightBatteryData.Tension);
+
+			SetVoltage(flightBatteryData.Tension);
+			newBattData = FALSE;
 		}
-		if (dir>360)
+
+		if (newPosData)
 		{
-			dir = 0;
-			// Change coordinates
-			msg[39]++;
-		}
+			PositionActualData positionData;
 
-		SetAltitude(alt);
-		alt++;
+			PositionActualGet(&positionData);
 
-		SetVoltage(voltage);
-		voltage += 50;
+			DEBUG_MSG("%5d Pos: #stat=%d #sats=%d\n\r", cnt, positionData.Status, positionData.Satellites);
 
-		// GPS status
-		if (fix)
-			msg[59] = 0x2B;
-		else
-			msg[59] = 0x03;
-
-		if (newGpsData)
-		{
+			if (positionData.Status == POSITIONACTUAL_STATUS_FIX3D)
+				msg[59] = 0x2B;
+			else
+				msg[59] = 0x03;
 			msg[59] |= 0x10;
-			newGpsData = FALSE;
+
+			msg[58] = positionData.Satellites;
+
+			newPosData = FALSE;
 		}
 		else
 		{
-			newGpsData = TRUE;
+			msg[59] &= ~0x10;
 		}
-
 
 		if (PIOS_I2C_LockDevice(5000 / portTICK_RATE_MS))
 		{
 			PIOS_I2C_Transfer(I2C_Write, 0x30<<1, msg, sizeof(msg));
 			PIOS_I2C_UnlockDevice();
 		}
+
+		cnt++;
+
 		vTaskDelay(100 / portTICK_RATE_MS);
 
 	}

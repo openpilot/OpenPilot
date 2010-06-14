@@ -295,7 +295,7 @@ namespace jafar {
 			 * It uses the formula (See Sola \e etal. PAMI 2010):
 			 * - AHP = [ t ;  R(q) * v ; rho * norm(v) ]
 			 *
-			 * \param s the sensor frame
+			 * \param s the sensor frame s = [t ; q]
 			 * \param v the retro-projected director vector in sensor frame
 			 * \param rho the prior, proportional to inverse-distance
 			 * \return the AHP landmark.
@@ -358,6 +358,8 @@ namespace jafar {
 				subrange(AHP_v, 6, 7, 0, 3) = _rho * NV_v; //  drho / dv
 				AHP_rho(6, 0) = nv; //                         drho / drho
 			} // OK JS April 1 2010
+
+
 
 		} // namespace landmarkAHP
 

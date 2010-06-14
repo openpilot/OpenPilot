@@ -20,7 +20,11 @@ OPTIONAL_EXTLIBS = qt4
 # LDFLAGS +=
 LIBS += -lkernel -ljmath -limage -lqdisplay 
 
-# CPPFLAGS += -DJFR_NDEBUG
 CPPFLAGS += $(OPENCV_CPPFLAGS) $(QT4_CPPFLAGS) $(BOOST_CPPFLAGS) $(BOOST_SANDBOX_CPPFLAGS) 
 
-CXXFLAGS += -g -O0 -ggdb -Wall -pthread
+# debug:
+#CXXFLAGS += -g -O0 -ggdb -Wall -pthread
+
+# release:
+CXXFLAGS += -Wall -pthread -O2
+CPPFLAGS += -DJFR_NDEBUG -DNDEBUG

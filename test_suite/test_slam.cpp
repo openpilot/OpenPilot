@@ -17,6 +17,7 @@
 // jafar debug include
 #include "kernel/jafarDebug.hpp"
 #include "kernel/jafarTestMacro.hpp"
+#include "kernel/timingTools.hpp"
 #include "jmath/random.hpp"
 #include "jmath/matlab.hpp"
 
@@ -49,7 +50,7 @@ using namespace boost;
 
 
 void test_slam01_main(world_ptr_t *world) {
-	ActiveSearchGrid asGrid(640, 480, 5, 5, 22, 20);
+	ActiveSearchGrid asGrid(640, 480, 8, 8, 22, 3);
 	vec2 imSz;
 	imSz(0) = 640; imSz(1) = 480;
 	vec4 k;
@@ -59,7 +60,7 @@ void test_slam01_main(world_ptr_t *world) {
 	//world_ptr_t worldPtr(new WorldAbstract());
 	world_ptr_t worldPtr = *world;
 	worldPtr->display_mutex.lock();
-	map_ptr_t mapPtr(new MapAbstract(200));
+	map_ptr_t mapPtr(new MapAbstract(307));
 	worldPtr->addMap(mapPtr);
 	mapPtr->clear();
 	robodo_ptr_t robPtr1(new RobotOdometry(mapPtr));
@@ -113,14 +114,21 @@ void test_slam01_main(world_ptr_t *world) {
 	// create sen--lmk observation
 	// Temporal loop
 
+	const int NFRAME = 1000;
 
-
-	for (int t = 1; t <= 100; t++) {
-		sleep(1);
+	kernel::Chrono chrono;
+	kernel::Chrono total_chrono;
+	kernel::Chrono mutex_chrono;
+	int dt, max_dt = 0;
+	for (int t = 1; t <= NFRAME; t++) {
+//		sleep(1);
 
 		worldPtr->display_mutex.lock();
-		cout << "\n************************************************** " << endl;
-		cout << "\n                 TIME : " << t << endl;
+		//cout << "\n************************************************** " << endl;
+		//cout << "\n                 FRAME : " << t << " (blocked " << mutex_chrono.elapsedMicrosecond() << " us)" << endl;
+		chrono.reset();
+
+
 		// foreach robot
 		for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin(); robIter != mapPtr->robotList().end(); robIter++)
 		{
@@ -131,15 +139,15 @@ void test_slam01_main(world_ptr_t *world) {
 			robPtr->set_control(u);
 			robPtr->move();
 
-			cout << "\n================================================== " << endl;
-			cout << *robPtr << endl;
+//			cout << "\n================================================== " << endl;
+//			cout << *robPtr << endl;
 
 			// foreach sensor
 			for (RobotAbstract::SensorList::iterator senIter = robPtr->sensorList().begin(); senIter != robPtr->sensorList().end(); senIter++)
 			{
 				sensor_ptr_t senPtr = *senIter;
-				cout << "\n________________________________________________ " << endl;
-				cout << *senPtr << endl;
+//				cout << "\n________________________________________________ " << endl;
+//				cout << *senPtr << endl;
 
 				// get raw-data
 				senPtr->acquireRaw() ;
@@ -147,6 +155,7 @@ void test_slam01_main(world_ptr_t *world) {
 				asGrid.renew();
 				// 1. Observe known landmarks
 				// foreach observation
+				int numObs = 0;
 				for (SensorAbstract::ObservationList::iterator obsIter = senPtr->observationList().begin(); obsIter != senPtr->observationList().end(); obsIter++)
 				{
 					observation_ptr_t obsPtr = *obsIter;
@@ -190,7 +199,12 @@ void test_slam01_main(world_ptr_t *world) {
 //					cout << "\n-------------------------------------------------- " << endl;
 //					cout << *obsPtr << endl;
 
+					numObs ++;
+					if (numObs >= 12) break;
 				} // foreach observation
+
+
+				//cout << chrono.elapsedMicrosecond() << " us ; observed lmks: " << numObs << endl;
 
 
 
@@ -203,14 +217,14 @@ void test_slam01_main(world_ptr_t *world) {
 
 						feature_ptr_t featPtr(new FeatureAbstract(2));
 						if (senPtr->getRaw()->detect(RawAbstract::HARRIS, featPtr, &roi)) {
-							cout << "\n-------------------------------------------------- " << endl;
-							cout << "Detected pixel: " << featPtr->state.x() << endl;
+//							cout << "\n-------------------------------------------------- " << endl;
+//							cout << "Detected pixel: " << featPtr->state.x() << endl;
 
 							// 2a. create lmk object
 							ahp_ptr_t lmkPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr)); // add featImgPnt in constructor
 							lmkPtr->id(lmkPtr->landmarkIds.getId());
 							lmkPtr->linkToParentMap(mapPtr);
-							cout << "Initializing lmk " << lmkPtr->id() << endl;
+//							cout << "Initializing lmk " << lmkPtr->id() << endl;
 
 							// 2b. create obs object
 							// todo make lmk creation dynamic with factories or switch or other.
@@ -244,12 +258,21 @@ void test_slam01_main(world_ptr_t *world) {
 
 			}
 		}
+
+		//cout << "total lmks: " << mapPtr->landmarkList().size() << endl;
+
+		dt = chrono.elapsedMicrosecond();
+		if (dt > max_dt) max_dt = dt;
+		//cout << "frame time : " << dt << " us" << endl;
 		worldPtr->display_mutex.unlock();
+		mutex_chrono.reset();
 
 	}
+	cout << "average time : " << total_chrono.elapsed()/NFRAME << " ms, max frame time " << max_dt << endl;
+
 	
 	std::cout << "\nFINISHED !" << std::endl;
-
+  sleep(2);
 
 }
 
@@ -274,8 +297,9 @@ void test_slam01_display(world_ptr_t *world)
 void test_slam01() {
 	world_ptr_t worldPtr(new WorldAbstract());
 	
-	qdisplay::QtAppStart((qdisplay::FUNC)&test_slam01_display,(qdisplay::FUNC)&test_slam01_main,900,&worldPtr);
-	JFR_DEBUG("terminated");
+//	test_slam01_main(&worldPtr);
+	qdisplay::QtAppStart((qdisplay::FUNC)&test_slam01_display,(qdisplay::FUNC)&test_slam01_main,40,&worldPtr);
+	JFR_DEBUG("Terminated");
 }
 
 

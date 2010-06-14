@@ -109,7 +109,7 @@ class SensorQt : public SensorDisplay
 		void bufferize()
 		{
 			raw_ptr_t raw = slamSen_->getRaw();
-			if (raw) image = *(dynamic_cast<RawImage&>(*raw).img);
+			if (raw) image = static_cast<RawImage&>(*raw).img->clone();
 			// TODO set framenumber
 		}
 		void render()
@@ -176,7 +176,7 @@ class ObservationQt : public ObservationDisplay
 					measObs_.resize(2);
 					break;
 				default:
-					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark" << landmarkType_);
+					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark: " << landmarkType_);
 					break;
 			}
 		}
@@ -206,7 +206,7 @@ class ObservationQt : public ObservationDisplay
 							predObs_ = slamObs_->expectation.x();
 							predObsCov_ = slamObs_->expectation.P();
 						}
-						if (matched_)
+						if (matched_ || !predicted_)
 						{
 							measObs_ = slamObs_->measurement.x();
 							match_score = slamObs_->getMatchScore();
@@ -214,7 +214,7 @@ class ObservationQt : public ObservationDisplay
 					}
 					break;
 				default:
-					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmarks" << landmarkType_);
+					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark: " << landmarkType_);
 					break;
 			}
 		}
@@ -260,19 +260,21 @@ class ObservationQt : public ObservationDisplay
 						
 					}
 					{
+						bool disp;
 						// prediction point
 						std::list<QGraphicsItemGroup*>::iterator it = items_.begin();
 						s = static_cast<qdisplay::Shape*>(*it);
 						std::ostringstream oss; oss << id_ << " - " << int(match_score*100);
 						s->setLabel(oss.str().c_str());
-						(*it)->setVisible(visible_ && predicted_);
-						if (visible_ && predicted_)
+						disp = visible_ && predicted_;
+						(*it)->setVisible(disp);
+						if (disp)
 							(*it)->setPos(predObs_(0), predObs_(1));
 						
 						// prediction ellipse
 						++it;
-						(*it)->setVisible(visible_ && predicted_);
-						if (visible_ && predicted_)
+						(*it)->setVisible(disp);
+						if (disp)
 						{
 							qdisplay::Ellipsoid *ell = dynamic_cast<qdisplay::Ellipsoid*>(*it);
 							ell->set(predObs_, predObsCov_, 3.0);
@@ -280,15 +282,18 @@ class ObservationQt : public ObservationDisplay
 						
 						// measure point
 						++it;
-						(*it)->setVisible(visible_ && matched_);
-						if (visible_ && matched_)
+//std::cout << "display obs " << id_ << " with flags visible " << visible_ << " matched " << matched_
+//		<< " predicted " << predicted_ << " position " << measObs_ << std::endl;
+						disp = visible_ && (matched_ || !predicted_);
+						(*it)->setVisible(disp);
+						if (disp)
 							(*it)->setPos(measObs_(0), measObs_(1));
 					}
 					break;
 				}
 
 				default:
-					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark" << landmarkType_);
+					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark: " << landmarkType_);
 			}
 		}
 };

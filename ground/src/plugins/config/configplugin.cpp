@@ -44,8 +44,8 @@ bool ConfigPlugin::initialize(const QStringList& args, QString *errMsg)
 {
    Q_UNUSED(args);
    Q_UNUSED(errMsg);
-//   cf = new ConfigGadgetFactory(this);
-//   addAutoReleasedObject(cf);
+  cf = new ConfigGadgetFactory(this);
+  addAutoReleasedObject(cf);
 
    return true;
 }

@@ -25,6 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "configgadgetwidget.h"
+#include "ui_configgadget.h"
 
 
 #include <QStringList>
@@ -35,12 +36,14 @@
 
 ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
 {
-    setMinimumSize(64,64);
+    m_config = new Ui_ConfigGadget();
+    m_config->setupUi(this);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-    this->
-    setToolTip(tr("Choose a gadget to display in this view.\n") +
-            tr("You can also split this view in two.\n\n") +
-            tr("Maybe you first have to choose Show Toolbars in the Window menu."));
+//    this->
+//    setToolTip(tr("Choose a gadget to display in this view.\n") +
+//            tr("You can also split this view in two.\n\n") +
+//            tr("Maybe you first have to choose Show Toolbars in the Window menu."));
+
 }
 
 ConfigGadgetWidget::~ConfigGadgetWidget()

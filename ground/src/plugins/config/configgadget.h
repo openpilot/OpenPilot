@@ -35,6 +35,7 @@ class IUAVGadget;
 class QWidget;
 class QString;
 class ConfigGadgetWidget;
+class Ui_ConfigGadget;
 
 using namespace Core;
 

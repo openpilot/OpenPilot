@@ -15,3 +15,4 @@ SOURCES += configplugin.cpp \
     configgadgetfactory.cpp \
     configgadgetoptionspage.cpp \
     configgadget.cpp
+FORMS += configgadget.ui

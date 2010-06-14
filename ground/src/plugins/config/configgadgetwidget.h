@@ -27,7 +27,10 @@
 #ifndef CONFIGGADGETWIDGET_H
 #define CONFIGGADGETWIDGET_H
 
+#include "ui_configgadget.h"
 #include <QtGui/QWidget>
+
+class Ui_ConfigGadget;
 
 class ConfigGadgetWidget: public QWidget
 {
@@ -39,6 +42,10 @@ public:
 
 protected:
         void resizeEvent(QResizeEvent * event);
+
+private:
+        Ui_ConfigGadget *m_config;
+
 };
 
 #endif // CONFIGGADGETWIDGET_H

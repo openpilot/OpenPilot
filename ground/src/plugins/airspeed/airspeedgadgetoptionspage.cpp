@@ -64,6 +64,15 @@ QWidget *AirspeedGadgetOptionsPage::createPage(QWidget *parent)
         }
     }
 
+    // Fills the combo boxes for Needle movement options
+    options_page->moveNeedle1->addItem("Rotate");
+    options_page->moveNeedle1->addItem("Horizontal");
+    options_page->moveNeedle1->addItem("Vertical");
+
+    options_page->moveNeedle2->addItem("Rotate");
+    options_page->moveNeedle2->addItem("Horizontal");
+    options_page->moveNeedle2->addItem("Vertical");
+
     // Restore the contents from the settings:
     options_page->svgSourceFile->setText(m_config->dialFile());
     options_page->backgroundID->setText(m_config->dialBackground());
@@ -76,6 +85,8 @@ QWidget *AirspeedGadgetOptionsPage::createPage(QWidget *parent)
     options_page->needle2Max->setValue(m_config->getN2Max());
     options_page->factor1->setValue(m_config->getN1Factor());
     options_page->factor2->setValue(m_config->getN2Factor());
+    options_page->moveNeedle1->setCurrentIndex(options_page->moveNeedle1->findText(m_config->getN1Move()));
+    options_page->moveNeedle2->setCurrentIndex(options_page->moveNeedle2->findText(m_config->getN2Move()));
 
     //select saved UAV Object field values
     if(options_page->uavObject1->findText(m_config->getN1DataObject())!=-1){
@@ -132,6 +143,8 @@ void AirspeedGadgetOptionsPage::apply()
     m_config->setN2DataObject(options_page->uavObject2->currentText());
     m_config->setN1ObjField(options_page->objectField1->currentText());
     m_config->setN2ObjField(options_page->objectField2->currentText());
+    m_config->setN1Move(options_page->moveNeedle1->currentText());
+    m_config->setN2Move(options_page->moveNeedle2->currentText());
 }
 
 /*

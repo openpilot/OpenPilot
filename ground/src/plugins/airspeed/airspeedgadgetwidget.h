@@ -46,7 +46,8 @@ class AirspeedGadgetWidget : public QGraphicsView
 public:
     AirspeedGadgetWidget(QWidget *parent = 0);
    ~AirspeedGadgetWidget();
-   void setDialFile(QString dfn, QString bg, QString fg, QString n1, QString n2);
+   void setDialFile(QString dfn, QString bg, QString fg, QString n1, QString n2, QString n1Move,
+                    QString n2Move);
    void paint();
     // setNeedle1 and setNeedle2 use a timer to simulate
     // needle inertia
@@ -72,8 +73,6 @@ protected:
 
 
 private slots:
-   // Test function
-   void testRotate();
    void rotateNeedles();
 
 private:
@@ -85,6 +84,14 @@ private:
 
    bool n2enabled; // Simple flag to skip rendering if the
    bool fgenabled; // layer does not exist.
+
+   // Settings concerning move of the dials
+   bool rotateN1;
+   bool rotateN2;
+   bool horizN1;
+   bool horizN2;
+   bool vertN1;
+   bool vertN2;
 
    double n1MinValue;
    double n1MaxValue;
@@ -109,11 +116,5 @@ private:
    // Rotation timer
    QTimer dialTimer;
 
-   // Test variables
-#if 0
-   int testSpeed;
-   QTimer m_testTimer;
-   // End test variables
-#endif
 };
 #endif /* AIRSPEEDGADGETWIDGET_H_ */

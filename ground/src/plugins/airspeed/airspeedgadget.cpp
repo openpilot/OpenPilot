@@ -49,7 +49,7 @@ void AirspeedGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 {
     AirspeedGadgetConfiguration *m = qobject_cast<AirspeedGadgetConfiguration*>(config);
     m_widget->setDialFile(m->dialFile(), m->dialBackground(), m->dialForeground(), m->dialNeedle1(),
-                          m->dialNeedle2());
+                          m->dialNeedle2(),m->getN1Move(), m->getN2Move());
 
     m_widget->setN1Min(m->getN1Min());
     m_widget->setN1Max(m->getN1Max());

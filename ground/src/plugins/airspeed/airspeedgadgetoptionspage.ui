@@ -146,6 +146,16 @@
          </spacer>
         </item>
         <item>
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>Movement:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="moveNeedle1"/>
+        </item>
+        <item>
          <widget class="QLabel" name="label_5">
           <property name="text">
            <string>ID:</string>
@@ -337,6 +347,16 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_13">
+          <property name="text">
+           <string>Movement:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="moveNeedle2"/>
         </item>
         <item>
          <widget class="QLabel" name="label_17">

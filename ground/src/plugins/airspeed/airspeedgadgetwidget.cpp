@@ -28,6 +28,7 @@
 #include "airspeedgadgetwidget.h"
 #include <iostream>
 #include <QDebug>
+#include "math.h"
 
 AirspeedGadgetWidget::AirspeedGadgetWidget(QWidget *parent) : QGraphicsView(parent)
 {
@@ -50,16 +51,13 @@ AirspeedGadgetWidget::AirspeedGadgetWidget(QWidget *parent) : QGraphicsView(pare
     obj1 = NULL;
     obj2 = NULL;
 
+    rotateN1 = horizN1 = vertN1 = false;
+    rotateN2 = horizN2 = vertN2 = false;
+
     // This timer mechanism makes needles rotate smoothly
     connect(&dialTimer, SIGNAL(timeout()), this, SLOT(rotateNeedles()));
     dialTimer.start(20);
 
-    // Test code for timer to rotate the needle
-#if 0
-    testSpeed=0;
-    connect(&m_testTimer, SIGNAL(timeout()), this, SLOT(testRotate()));
-    m_testTimer.start(4000);
-#endif
 }
 
 AirspeedGadgetWidget::~AirspeedGadgetWidget()
@@ -131,7 +129,8 @@ void AirspeedGadgetWidget::updateNeedle2(UAVObject *object2) {
     }
 }
 
-void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QString n1, QString n2)
+void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QString n1, QString n2,
+                                       QString n1Move, QString n2Move)
 {
    if (QFile::exists(dfn))
    {
@@ -159,6 +158,10 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
             fgenabled = false;
         }
 
+        if (n1 == n2) {
+            m_needle2 = m_needle1;
+            n2enabled = true;
+        } else {
          if (m_renderer->elementExists(n2)) {
              m_needle2->setSharedRenderer(m_renderer);
              m_needle2->setElementId(n2);
@@ -170,9 +173,37 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
                 l_scene->removeItem(m_needle2);
              n2enabled = false;
          }
+     }
+
+         // Now setup the rotation/translation settings:
+         // this is UGLY UGLY UGLY, sorry...
+         if (n1Move.contains("Rotate")) {
+             rotateN1 = true;
+         } else if (n1Move.contains("Horizontal")) {
+             horizN1 = true;
+         } else if (n1Move.contains("Vertical")) {
+             vertN1 = true;
+         }
+
+         if (n2Move.contains("Rotate")) {
+             rotateN2 = true;
+         } else if (n2Move.contains("Horizontal")) {
+             horizN2 = true;
+         } else if (n2Move.contains("Vertical")) {
+             vertN2 = true;
+         }
 
          // std::cout<<"Dial file loaded ("<< dfn.toStdString() << ")" << std::endl;
          l_scene->setSceneRect(m_background->boundingRect());
+
+         // Initialize the center for all transforms of the dials to the
+         // center of the background:
+         QRectF rect1 = m_background->boundingRect();
+         QPointF tr1 = m_background->mapToScene(rect1.width()/2,rect1.height()/2);
+         QPointF tr = m_needle1->mapFromScene(tr1);
+         m_needle1->setTransformOriginPoint(tr.x(),tr.y());
+         tr = m_needle2->mapFromScene(tr1);
+         m_needle2->setTransformOriginPoint(tr.x(),tr.y());
      }
    }
    else
@@ -212,48 +243,83 @@ void AirspeedGadgetWidget::resizeEvent(QResizeEvent *event)
 // Converts the value into an angle:
 // this enables smooth rotation in rotateNeedles below
 void AirspeedGadgetWidget::setNeedle1(double value) {
-    needle1Target = 360*value*n1Factor/(n1MaxValue-n1MinValue);
+    if (rotateN1) {
+        needle1Target = 360*value*n1Factor/(n1MaxValue-n1MinValue);
+    }
+    if (horizN1) {
+        needle1Target = value*n1Factor/(n1MaxValue-n1MinValue);
+    }
+    if (vertN1) {
+        needle1Target = value*n1Factor/(n1MaxValue-n1MinValue);
+    }
 }
 
 void AirspeedGadgetWidget::setNeedle2(double value) {
-    needle2Target = 360*value*n2Factor/(n2MaxValue-n2MinValue);
+    if (rotateN2) {
+        needle2Target = 360*value*n2Factor/(n2MaxValue-n2MinValue);
+    }
+    if (horizN2) {
+        needle2Target = value*n2Factor/(n2MaxValue-n2MinValue);
+    }
+    if (vertN2) {
+        needle2Target = value*n2Factor/(n2MaxValue-n2MinValue);
+    }
 }
-
 
 // Take an input value and rotate the dial accordingly
 // Rotation is smooth, starts fast and slows down when
 // approaching the target.
 // We aim for a 0.5 degree precision.
+//
+// Note: this code is valid even if needle1 and needle2 point
+// to the same element.
 void AirspeedGadgetWidget::rotateNeedles()
 {
     if ((abs((needle2Value-needle2Target)*10) > 5) && n2enabled) {
-        needle2Value+=(needle2Target - needle2Value)/5;
-        m_needle2->resetTransform();
-        QRectF rect = m_needle2->boundingRect();
-        m_needle2->translate(rect.width()/2,rect.height()/2);
-        m_needle2->rotate(needle2Value);
-        m_needle2->translate(-rect.width()/2,-rect.height()/2);
+        double needle2Diff;
+        needle2Diff =(needle2Target - needle2Value)/5;
+        if (rotateN2) {
+            m_needle2->setRotation(m_needle2->rotation()+needle2Diff);
+        } else {
+            QPointF opd = QPointF(0,0);
+           if (horizN2)  {
+               opd = QPointF(needle2Diff,0);
+           }
+           if (vertN2) {
+               opd = QPointF(0,needle2Diff);
+           }
+           m_needle2->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), true);
+           // Since we have moved the needle, we need to move
+           // the transform origin point the opposite way
+           // so that it keeps rotating from the same point.
+           // (this is only useful if needle1 and needle2 are the
+           // same object, for combined movement.
+           QPointF oop = m_needle2->transformOriginPoint();
+           m_needle2->setTransformOriginPoint(oop.x()-opd.x(),oop.y()-opd.y());
+        }
+        needle2Value += needle2Diff;
     }
 
     if ((abs((needle1Value-needle1Target)*10) > 5)) {
-        needle1Value += (needle1Target - needle1Value)/5;
-       m_needle1->resetTransform();
-       QRectF rect = m_needle1->boundingRect();
-       m_needle1->translate(rect.width()/2,rect.height()/2);
-       m_needle1->rotate(needle1Value);
-       m_needle1->translate(-rect.width()/2,-rect.height()/2);
+        double needle1Diff;
+        needle1Diff = (needle1Target - needle1Value)/5;
+        if (rotateN1) {
+           m_needle1->setRotation(m_needle1->rotation()+needle1Diff);
+       } else {
+           QPointF opd = QPointF(0,0);
+           if (horizN1) {
+               opd = QPointF(needle1Diff,0);
+           }
+           if (vertN1) {
+               opd = QPointF(0,needle1Diff);
+           }
+           m_needle1->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), true);
+           QPointF oop = m_needle1->transformOriginPoint();
+           m_needle1->setTransformOriginPoint((oop.x()-opd.x()),(oop.y()-opd.y()));
+       }
+       needle1Value += needle1Diff;
     }
 
    update();
 }
 
-
-// Test function for timer to rotate needles
-void AirspeedGadgetWidget::testRotate()
-{
-    int testVal1 = rand() % (int)n1MaxValue;
-    int testVal2 = rand() % (int)n2MaxValue;
-   setNeedle1((double)testVal1);
-   setNeedle2((double)testVal2);
-
-}

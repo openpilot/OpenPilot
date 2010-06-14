@@ -57,6 +57,8 @@ public:
     void setN2DataObject(QString text){ needle2DataObject = text; }
     void setN1ObjField(QString text) { needle1ObjectField = text; }
     void setN2ObjField(QString text) { needle2ObjectField = text; }
+    void setN1Move( QString move) { needle1Move = move; }
+    void setN2Move( QString move) { needle2Move = move; }
 
     //get dial configuration functions
     QString dialFile() {return m_defaultDial;}
@@ -74,8 +76,8 @@ public:
     QString getN2DataObject() { return needle2DataObject; }
     QString getN1ObjField() { return needle1ObjectField; }
     QString getN2ObjField() { return needle2ObjectField; }
-
-
+    QString getN1Move() { return needle1Move; }
+    QString getN2Move() { return needle2Move; }
 
     QByteArray saveState() const;
     IUAVGadgetConfiguration *clone();
@@ -99,6 +101,10 @@ private:
     QString needle1ObjectField;
     QString needle2DataObject;
     QString needle2ObjectField;
+
+    // How the two dials move:
+    QString needle1Move;
+    QString needle2Move;
 };
 
 #endif // AIRSPEEDGADGETCONFIGURATION_H

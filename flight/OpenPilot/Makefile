@@ -45,9 +45,9 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-#MODULES = Telemetry GPS ManualControl Actuator Altitude Attitude
+MODULES = Telemetry GPS ManualControl Actuator Altitude Attitude
 #MODULES = Telemetry Example
-MODULES = Telemetry MK/MKSerial
+#MODULES = Telemetry MK/MKSerial
 
 
 # MCU name, submodel and board

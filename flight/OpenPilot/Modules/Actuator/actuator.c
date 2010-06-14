@@ -35,6 +35,7 @@
 #define MAX_QUEUE_SIZE 2
 #define STACK_SIZE configMINIMAL_STACK_SIZE
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
+#define FAILSAFE_TIMEOUT_MS 100
 
 // Private types
 
@@ -48,6 +49,7 @@ static int32_t mixerFixedWing(const ActuatorSettingsData* settings, const Actuat
 static int32_t mixerFixedWingElevon(const ActuatorSettingsData* settings, const ActuatorDesiredData* desired, ActuatorCommandData* cmd);
 static int32_t mixerVTOL(const ActuatorSettingsData* settings, const ActuatorDesiredData* desired, ActuatorCommandData* cmd);
 static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutral);
+static void setFailsafe();
 
 /**
  * Module initialization
@@ -81,11 +83,18 @@ static void actuatorTask(void* parameters)
 	ActuatorSettingsGet(&settings);
 	PIOS_Servo_SetHz(settings.ChannelUpdateFreq[0], settings.ChannelUpdateFreq[1]);
 
+	// Go to the neutral (failsafe) values until an ActuatorDesired update is received
+	setFailsafe();
+
 	// Main task loop
 	while (1)
 	{
-		// Wait until the ActuatorDesired object is updated
-		while ( xQueueReceive(queue, &ev, portMAX_DELAY) != pdTRUE );
+		// Wait until the ActuatorDesired object is updated, if a timeout then go to failsafe
+		if ( xQueueReceive(queue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE )
+		{
+			setFailsafe();
+			continue;
+		}
 
 		// Read settings
 		ActuatorSettingsGet(&settings);
@@ -235,4 +244,34 @@ static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutr
 		valueScaled = (int16_t)(value*((float)(neutral-min))) + neutral;
 	}
 	return valueScaled;
+}
+
+/**
+ * Set actuator output to the neutral values (failsafe)
+ */
+static void setFailsafe()
+{
+	ActuatorSettingsData settings;
+	ActuatorCommandData cmd;
+
+	// Read settings
+	ActuatorSettingsGet(&settings);
+
+	// Reset ActuatorCommand to neutral values
+	for (int n = 0; n < ACTUATORCOMMAND_CHANNEL_NUMELEM; ++n)
+	{
+		cmd.Channel[n] = settings.ChannelNeutral[n];
+	}
+
+	// Set alarm
+	AlarmsSet(SYSTEMALARMS_ALARM_ACTUATOR, SYSTEMALARMS_ALARM_CRITICAL);
+
+	// Update servo outputs
+	for (int n = 0; n < ACTUATORCOMMAND_CHANNEL_NUMELEM; ++n)
+	{
+		PIOS_Servo_Set( n+1, cmd.Channel[n] );
+	}
+
+	// Update output object
+	ActuatorCommandSet(&cmd);
 }

@@ -45,6 +45,20 @@ namespace jafar {
 				return up;
 			}
 
+			/**
+			 * Pin-hole canonical projection. Give distance.
+			 * \param v a 3D point
+			 * \param up the projected point in the normalized 2D plane
+			 * \param dist the distance from the camera to the point
+			 */
+			template<class V, class P, class D>
+			void projectPointToNormalizedPlane(const V & v, P & up, D & dist) {
+
+				up(0) = v(0) / v(2);
+				up(1) = v(1) / v(2);
+				dist = ublas::norm_2(v);
+			}
+
 
 			/**
 			 * Pin-hole canonical projection, with jacobian
@@ -66,6 +80,33 @@ namespace jafar {
 
 			}
 
+			/**
+			 * Pin-hole canonical projection, distance and with jacobian
+			 * \param v the 3D point to project
+			 * \param up the projected 2D point
+			 * \param dist the distance from the camera to the point
+			 * \param UP_v the Jacibian of \a u wrt \a v
+			 */
+			template<class V, class U, class DST, class MU_v>
+			void projectPointToNormalizedPlane(const V & v, U & up, DST & dist, MU_v & UP_v) {
+
+				projectPointToNormalizedPlane(v, up, dist);
+
+				UP_v(0, 0) = 1.0 / v(2);
+				UP_v(0, 1) = 0.0;
+				UP_v(0, 2) = -v(0) / (v(2) * v(2));
+				UP_v(1, 0) = 0.0;
+				UP_v(1, 1) = 1.0 / v(2);
+				UP_v(1, 2) = -v(1) / (v(2) * v(2));
+
+			}
+
+			/**
+			 * Canonical back-projection.
+			 * \param u the 2D point in the image plane
+			 * \param depth point's depth orthogonal to image plane. Defaults to 1.0
+			 * \return the 3D point
+			 */
 			template<class U>
 			vec3 backprojectPointFromNormalizedPlane(const U & u, double depth = 1) {
 
@@ -76,6 +117,14 @@ namespace jafar {
 				return p;
 			}
 
+			/**
+			 * Canonical back-projection.
+			 * \param u the 2D point in the image plane.
+			 * \param depth point's depth orthogonal to image plane.
+			 * \param p the 3D point.
+			 * \param P_u Jacobian of p wrt u.
+			 * \param P_depth Jacobian of p wrt depth.
+			 */
 			template<class U, class P, class MP_u, class MP_depth>
 			void backprojectPointFromNormalizedPlane(const U & u, const double depth, P & p, MP_u & P_u, MP_depth & P_depth) {
 				p = backprojectPointFromNormalizedPlane(u, depth);
@@ -321,6 +370,20 @@ namespace jafar {
 				return pixellizePoint(k, distortPoint(d, projectPointToNormalizedPlane(v)));
 			}
 
+			/**
+			 * Project a point into a pin-hole camera with radial distortion.
+			 * \param k the vector of intrinsic parameters, k = [u0, v0, au, av]
+			 * \param d the radial distortion parameters vector
+			 * \param v the 3D point to project, or the 3D director vector
+			 * \param u the projected and distorted point
+			 */
+			template<class VK, class VD, class V, class U, class DST>
+			void projectPoint(const VK & k, const VD & d, const V & v, U & u, DST & dist) {
+				vec2 u, up;
+				projectPointToNormalizedPlane(v, up, dist);
+				u = pixellizePoint(k, distortPoint(d, up));
+			}
+
 
 			/**
 			 * Project a point into a pin-hole camera with radial distortion
@@ -336,6 +399,29 @@ namespace jafar {
 				mat23 UP_v;
 				mat22 UD_up, U_ud;
 				projectPointToNormalizedPlane(v, up, UP_v);
+				distortPoint(d, up, ud, UD_up);
+				pixellizePoint(k, ud, u, U_ud);
+
+				mat23 U_v1;
+				U_v1 = ublas::prod(UD_up, UP_v);
+				U_v = ublas::prod(U_ud, U_v1);
+			}
+
+			/**
+			 * Project a point into a pin-hole camera with radial distortion
+			 * \param k the vector of intrinsic parameters, k = [u0, v0, au, av]
+			 * \param d the radial distortion parameters vector
+			 * \param v the 3D point to project, or the 3D director vector
+			 * \param u the projected and distorted point
+			 * \param dist the distance from the camera to the point
+			 * \param U_v the Jacobian of \a u wrt \a v
+			 */
+			template<class VK, class VD, class V, class DST, class VU, class MU_v>
+			void projectPoint(const VK & k, const VD & d, const V & v, VU & u, DST & dist, MU_v & U_v) {
+				vec2 up, ud;
+				mat23 UP_v;
+				mat22 UD_up, U_ud;
+				projectPointToNormalizedPlane(v, up, dist, UP_v);
 				distortPoint(d, up, ud, UD_up);
 				pixellizePoint(k, ud, u, U_ud);
 
@@ -373,7 +459,6 @@ namespace jafar {
 				vec2 up, ud;
 				mat32 P_up;
 				mat22 UP_ud, UD_u;
-//				std::cout << "intrinsics" << k << c << std::endl;
 				depixellizePoint(k, u, ud, UD_u);
 				undistortPoint(c, ud, up, UP_ud);
 				backprojectPointFromNormalizedPlane(up, depth, p, P_up, P_depth);

@@ -36,7 +36,6 @@ namespace jafar {
 			v = quaternion::eucToFrame(sg, lmk);
 
 			exp = pinhole::projectPoint(pinHolePtr()->intrinsic, pinHolePtr()->distortion, v);
-
 		}
 
 		void ObservationPinHoleEuclideanPoint::project_func(const vec7 & sg,
@@ -59,7 +58,6 @@ namespace jafar {
 			// We perform Jacobian composition. We use the chain rule.
 			EXP_sg = prod(EXP_v, V_sg);
 			EXP_lmk = prod(EXP_v, V_lmk);
-
 		}
 
 		void ObservationPinHoleEuclideanPoint::backProject_func(const vec7 & sg,
@@ -70,9 +68,8 @@ namespace jafar {
 			vec c = pinHolePtr()->correction;
 			v = pinhole::backprojectPoint(k, c, meas, (double)1.0);
 			ublasExtra::normalize(v);
-			v /= nobs(0); // nobs is inverse-distance
+			v *= nobs(0); // nobs is distance
 			euc = quaternion::eucFromFrame(sg, v);
-
 		}
 
 		void ObservationPinHoleEuclideanPoint::backProject_func(const vec7 & sg,

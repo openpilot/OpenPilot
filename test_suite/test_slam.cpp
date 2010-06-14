@@ -298,7 +298,7 @@ void test_slam01() {
 	world_ptr_t worldPtr(new WorldAbstract());
 	
 //	test_slam01_main(&worldPtr);
-	qdisplay::QtAppStart((qdisplay::FUNC)&test_slam01_display,(qdisplay::FUNC)&test_slam01_main,40,&worldPtr);
+	qdisplay::QtAppStart((qdisplay::FUNC)&test_slam01_display,10,(qdisplay::FUNC)&test_slam01_main,-10,100,&worldPtr);
 	JFR_DEBUG("Terminated");
 }
 

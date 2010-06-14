@@ -50,10 +50,10 @@ public:
 
 public slots:
     void coordinateEvent(const QMouseEvent* evnt, const QPointF coordinate);	// added by cathy
-    void gsc_uav_ClickEvent(Geometry* geom, QPoint coord_px);			// added by cathy
+    void gcs_uav_ClickEvent(Geometry* geom, QPoint coord_px);			// added by cathy
     void wayPointClickEvent(Geometry* geom, QPoint coord_px);			// added by cathy
 
-    void gscButtonClick();		// added by cathy
+    void gcsButtonClick();		// added by cathy
     void uavButtonClick(bool checked);  // added by cathy
 
 protected:
@@ -64,7 +64,7 @@ private slots:
    void updatePosition();
 
 private:
-   void addUserControls();  // changed by cathy
+   void addUserControls();
 
     bool follow_uav;    // true if the map is to stay centered on the UAV
 
@@ -87,17 +87,17 @@ private:
 
     FixedImageOverlay *m_compassImageOverlay;
 
-    ImagePoint *gscPoint;
+    ImagePoint *gcsPoint;
     ImagePoint *uavPoint;
 
    QTimer *m_updateTimer;
 
    PositionActual *m_positionActual;
 
-    QPushButton *gscButton;	// added by cathy
-    QPushButton *uavButton;	// added by cathy
+    QPushButton *gcsButton;
+    QPushButton *uavButton;
 
-    QPixmap gsc_pixmap;
+    QPixmap gcs_pixmap;
     QPixmap uav_pixmap;
     QPixmap waypoint_pixmap;
     QPixmap compass_background_pixmap;

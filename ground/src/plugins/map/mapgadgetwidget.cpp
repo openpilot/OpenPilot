@@ -37,23 +37,20 @@ MapGadgetWidget::MapGadgetWidget(QWidget *parent) : QWidget(parent)
 {
     int size = 256;
 
-    gscButton = NULL;
+    gcsButton = NULL;
     uavButton = NULL;
 
     follow_uav = false;
 
-    gsc_pixmap.load(QString::fromUtf8(":/map/images/gsc.png"));
+    gcs_pixmap.load(QString::fromUtf8(":/map/images/gsc.png"));
     uav_pixmap.load(QString::fromUtf8(":/map/images/uav.png"));
     waypoint_pixmap.load(QString::fromUtf8(":/map/images/waypoint.png"));
 //    waypoint_pixmap.load(QCoreApplication::applicationDirPath() + "/images/waypoint.png");
 
     // test
-    if (gsc_pixmap.isNull()) QMessageBox::warning(this, tr("Image Error"), tr("Missing ") + QString::fromUtf8(":/map/images/gsc.png"));
+    if (gcs_pixmap.isNull()) QMessageBox::warning(this, tr("Image Error"), tr("Missing ") + QString::fromUtf8(":/map/images/gsc.png"));
     if (uav_pixmap.isNull()) QMessageBox::warning(this, tr("Image Error"), tr("Missing ") + QString::fromUtf8(":/map/images/uav.png"));
     if (waypoint_pixmap.isNull()) QMessageBox::warning(this, tr("Image Error"), tr("Missing ") + QString::fromUtf8(":/map/images/waypoint.png"));
-
-    // test
-    gsc_pixmap.save(QCoreApplication::applicationDirPath() + "/images/gsc2.png", "PNG");
 
     // Get required UAVObjects
     ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
@@ -81,7 +78,7 @@ MapGadgetWidget::MapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_googleSatLayer = new MapLayer("Google Sat", m_googleSatAdapter);
     m_yahooLayer = new MapLayer("Yahoo", m_yahooAdapter);
 
-    // gsc and uav position layer
+    // gcs and uav position layer
     m_positionLayer = new GeometryLayer("PositionsLayer", m_osmAdapter);
 
     // Waypoint layer
@@ -107,19 +104,19 @@ MapGadgetWidget::MapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     addCompass(QPointF(100, 100), 200);
 
-    // create and add the GSC icon
-    gscPoint = new ImagePoint(data.Longitude, data.Latitude, &gsc_pixmap, "GSC", Point::Middle);
-    m_positionLayer->addGeometry(gscPoint);
-    connect(gscPoint, SIGNAL(geometryClicked(Geometry*, QPoint)), this, SLOT(gsc_uav_ClickEvent(Geometry*, QPoint)));
+    // create and add the GCS icon
+    gcsPoint = new ImagePoint(data.Longitude, data.Latitude, &gcs_pixmap, "GSC", Point::Middle);
+    m_positionLayer->addGeometry(gcsPoint);
+    connect(gcsPoint, SIGNAL(geometryClicked(Geometry*, QPoint)), this, SLOT(gcs_uav_ClickEvent(Geometry*, QPoint)));
 
     // create and add the UAV icon
     uavPoint = new ImagePoint(data.Longitude, data.Latitude, &uav_pixmap, "UAV", Point::Middle);
     m_positionLayer->addGeometry(uavPoint);
-    connect(uavPoint, SIGNAL(geometryClicked(Geometry*, QPoint)), this, SLOT(gsc_uav_ClickEvent(Geometry*, QPoint)));
+    connect(uavPoint, SIGNAL(geometryClicked(Geometry*, QPoint)), this, SLOT(gcs_uav_ClickEvent(Geometry*, QPoint)));
 
     addUserControls();
 
-    m_mc->setView(gscPoint->coordinate());
+    m_mc->setView(gcsPoint->coordinate());
     m_mc->setZoom(2);
     m_mc->updateRequestNew();
 
@@ -216,11 +213,11 @@ void MapGadgetWidget::resizeEvent(QResizeEvent *event)
 void MapGadgetWidget::addUserControls()
 {   // create the user controls
 
-	gscButton = new QPushButton(tr("GCS"));
-	gscButton->setMinimumWidth(50);
-	gscButton->setMaximumWidth(50);
-	gscButton->setToolTip(tr("Center onto ground station control"));
-	connect(gscButton, SIGNAL(clicked(bool)), this, SLOT(gscButtonClick()));
+	gcsButton = new QPushButton(tr("GCS"));
+	gcsButton->setMinimumWidth(50);
+	gcsButton->setMaximumWidth(50);
+	gcsButton->setToolTip(tr("Center onto ground control station"));
+	connect(gcsButton, SIGNAL(clicked(bool)), this, SLOT(gcsButtonClick()));
 
 	uavButton = new QPushButton(tr("UAV"));
 	uavButton->setMinimumWidth(50);
@@ -246,7 +243,7 @@ void MapGadgetWidget::addUserControls()
     	innerlayout->setSpacing(3);
 	innerlayout->setMargin(2);
 	innerlayout->addSpacing(10);
-	innerlayout->addWidget(gscButton);
+	innerlayout->addWidget(gcsButton);
 	innerlayout->addWidget(uavButton);
 	innerlayout->addSpacing(10);
 	innerlayout->addWidget(zoomin);
@@ -257,12 +254,12 @@ void MapGadgetWidget::addUserControls()
 
 // *************************************************************************************
 
-void MapGadgetWidget::gscButtonClick()
+void MapGadgetWidget::gcsButtonClick()
 {
     follow_uav = false;
     uavButton->setChecked(follow_uav);
 
-    setPosition(gscPoint->coordinate());    // center the map onto the ground station
+    setPosition(gcsPoint->coordinate());    // center the map onto the ground station
 }
 
 // *************************************************************************************
@@ -302,9 +299,9 @@ void MapGadgetWidget::coordinateEvent(const QMouseEvent * evnt, const QPointF co
 }
 
 // *************************************************************************************
-// comes here when the user mouse clicks on the GSC or the UAV
+// comes here when the user mouse clicks on the GCS or the UAV
 
-void MapGadgetWidget::gsc_uav_ClickEvent(Geometry* geom, QPoint)
+void MapGadgetWidget::gcs_uav_ClickEvent(Geometry* geom, QPoint)
 {
     qDebug() << "parent: " << geom->parentGeometry();
     qDebug() << "Element clicked: " << geom->name();
@@ -328,9 +325,9 @@ void MapGadgetWidget::gsc_uav_ClickEvent(Geometry* geom, QPoint)
 	    QMessageBox::information(this, geom->name(), tr("The UAV location"));
 	}
 	else
-	if (geom->name() == "GSC")
+	if (geom->name() == "GCS")
 	{
-	    QMessageBox::information(this, geom->name(), tr("The GSC location"));
+	    QMessageBox::information(this, geom->name(), tr("The GCS location"));
 	}
 	else
 	    QMessageBox::information(this, geom->name(), tr("just a point"));
@@ -439,7 +436,7 @@ void MapGadgetWidget::keyPressEvent(QKeyEvent* event)
     else
     if (event->key() == Qt::Key_F1) // F1
     {
-	gscButtonClick();
+	gcsButtonClick();
     }
     else
     if (event->key() == Qt::Key_F2) // F2

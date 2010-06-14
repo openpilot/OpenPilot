@@ -12,14 +12,14 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
-		AppearenceImage::AppearenceImage(const image::Image& patch) : patch(patch) {
+		AppearenceImagePoint::AppearenceImagePoint(const image::Image& patch) : patch(patch) {
 			computePatchIntegrals();
 		}
 
-		AppearenceImage::~AppearenceImage() {
+		AppearenceImagePoint::~AppearenceImagePoint() {
 		}
 
-		void AppearenceImage::computePatchIntegrals(){
+		void AppearenceImagePoint::computePatchIntegrals(){
 			patchSum = 0;
 			patchSquareSum = 0;
 			uchar* pix = patch.data();

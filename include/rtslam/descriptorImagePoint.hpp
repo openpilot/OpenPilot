@@ -33,8 +33,15 @@ namespace jafar {
 				    const jblas::vec7 & pose0, observation_ptr_t & obsPtr);
 				virtual ~DescriptorImagePoint();
 
+				/**
+				 * Predict appearance.
+				 * \param lmkPtr pointer to landmark.
+				 * \param obsPtrNew pointer to the new observation model
+				 * \param appPtr pointer to the destination appearance.
+				 * \param patchSize size of the square patch in the appearance.
+				 */
 				virtual bool predictAppearance(const landmark_ptr_t & lmkPtr,
-				    const observation_ptr_t & obsPtrNew, appearenceimage_ptr_t & appPtr);
+				    const observation_ptr_t & obsPtrNew, app_img_pnt_ptr_t & appPtr, unsigned char patchSize);
 
 		};
 	}

@@ -54,7 +54,7 @@ namespace jafar {
 
 			img->copy(dst, x_src, y_src, 0, 0, size(0), size(1));
 
-			appearenceimage_ptr_t appImgPtr(new AppearenceImage(dst));
+			app_img_pnt_ptr_t appImgPtr(new AppearenceImagePoint(dst));
 //			cout << "patch sum: " << appImgPtr->patchSum << "; squareSum: " << appImgPtr->patchSquareSum << endl;
 			appPtr = appImgPtr;
 

@@ -25,7 +25,7 @@ namespace jafar {
 		}
 
 		bool DescriptorImagePoint::predictAppearance(const landmark_ptr_t & lmkPtr,
-		    const observation_ptr_t & obsPtrNew, appearenceimage_ptr_t & appPtr) {
+		    const observation_ptr_t & obsPtrNew, app_img_pnt_ptr_t & appPtr, unsigned char patchSize) {
 
 			// First implementation: zoom and rotation
 			vec7 poseNew = obsPtrNew->sensorPtr()->globalPose();

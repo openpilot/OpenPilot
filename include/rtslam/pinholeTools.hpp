@@ -51,8 +51,8 @@ namespace jafar {
 			 * \param up the projected point in the normalized 2D plane
 			 * \param dist the distance from the camera to the point
 			 */
-			template<class V, class P, class D>
-			void projectPointToNormalizedPlane(const V & v, P & up, D & dist) {
+			template<class V, class P>
+			void projectPointToNormalizedPlane(const V & v, P & up, double & dist) {
 
 				up(0) = v(0) / v(2);
 				up(1) = v(1) / v(2);
@@ -87,8 +87,8 @@ namespace jafar {
 			 * \param dist the distance from the camera to the point
 			 * \param UP_v the Jacibian of \a u wrt \a v
 			 */
-			template<class V, class U, class DST, class MU_v>
-			void projectPointToNormalizedPlane(const V & v, U & up, DST & dist, MU_v & UP_v) {
+			template<class V, class U, class MU_v>
+			void projectPointToNormalizedPlane(const V & v, U & up, double & dist, MU_v & UP_v) {
 
 				projectPointToNormalizedPlane(v, up, dist);
 
@@ -377,9 +377,9 @@ namespace jafar {
 			 * \param v the 3D point to project, or the 3D director vector
 			 * \param u the projected and distorted point
 			 */
-			template<class VK, class VD, class V, class U, class DST>
-			void projectPoint(const VK & k, const VD & d, const V & v, U & u, DST & dist) {
-				vec2 u, up;
+			template<class VK, class VD, class V, class U>
+			void projectPoint(const VK & k, const VD & d, const V & v, U & u, double & dist) {
+				vec2 up;
 				projectPointToNormalizedPlane(v, up, dist);
 				u = pixellizePoint(k, distortPoint(d, up));
 			}
@@ -416,8 +416,8 @@ namespace jafar {
 			 * \param dist the distance from the camera to the point
 			 * \param U_v the Jacobian of \a u wrt \a v
 			 */
-			template<class VK, class VD, class V, class DST, class VU, class MU_v>
-			void projectPoint(const VK & k, const VD & d, const V & v, VU & u, DST & dist, MU_v & U_v) {
+			template<class VK, class VD, class V, class VU, class MU_v>
+			void projectPoint(const VK & k, const VD & d, const V & v, VU & u, double & dist, MU_v & U_v) {
 				vec2 up, ud;
 				mat23 UP_v;
 				mat22 UD_up, U_ud;

@@ -11,5 +11,6 @@ SUBDIRS   = \
     utils \
     glc_lib\
     qymodem \
-    libqxt
+    libqxt# \
+   # opmapcontrol
 

@@ -80,10 +80,12 @@ class SensorQt : public SensorDisplay
 {
 	public:
 		// buffered data
+		image::Image image;
+		int framenumber;
 		// graphical objects
 		qdisplay::Viewer *viewer_;
 		qdisplay::ImageView* view_;
-		image::Image image;
+		QGraphicsTextItem* framenumber_label;
 	public:
 		SensorQt(rtslam::SensorAbstract *_slamSen, RobotDisplay *_dispRob): 
 			SensorDisplay(_slamSen, _dispRob)
@@ -91,7 +93,13 @@ class SensorQt : public SensorDisplay
 			viewer_ = new qdisplay::Viewer();
 			view_ = new qdisplay::ImageView();
 			viewer_->setImageView(view_, 0, 0);
-			viewer_->resize(640,480);
+			viewer_->resize(650,490);
+			framenumber = 0;
+			
+			framenumber_label = new QGraphicsTextItem(view_);
+			//framenumber_label->setFont(QFont( m_label->font().family(), m_fontSize));
+			framenumber_label->setDefaultTextColor(QColor(0,0,0));
+			framenumber_label->translate(0,0);
 		}
 		~SensorQt()
 		{
@@ -101,7 +109,8 @@ class SensorQt : public SensorDisplay
 		void bufferize()
 		{
 			raw_ptr_t raw = slamSen_->getRaw();
-			image = *(dynamic_cast<RawImage&>(*raw).img);
+			if (raw) image = *(dynamic_cast<RawImage&>(*raw).img);
+			// TODO set framenumber
 		}
 		void render()
 		{
@@ -110,6 +119,7 @@ class SensorQt : public SensorDisplay
 				case SensorDisplay::stCameraPinhole:
 				case SensorDisplay::stCameraBarreto:
 					view_->setImage(image);
+					framenumber_label->setPlainText(jmath::toStr(framenumber).c_str());
 					break;
 				default:
 					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_SENSOR_TYPE, "Don't know how to display this type of sensor" << type_);
@@ -149,6 +159,7 @@ class ObservationQt : public ObservationDisplay
 		jblas::sym_mat predObsCov_;
 		jblas::vec measObs_;
 		unsigned int id_;
+		double match_score;
 		// TODO grid
 		// graphical objects
 		qdisplay::ImageView* view_; // not owner
@@ -198,6 +209,7 @@ class ObservationQt : public ObservationDisplay
 						if (matched_)
 						{
 							measObs_ = slamObs_->measurement.x();
+							match_score = slamObs_->getMatchScore();
 						}
 					}
 					break;
@@ -211,6 +223,8 @@ class ObservationQt : public ObservationDisplay
 			switch (landmarkType_)
 			{
 				case LandmarkDisplay::ltPoint:
+				{
+					qdisplay::Shape *s;
 					if (items_.size() != 3)
 					{
 						// clear
@@ -226,31 +240,31 @@ class ObservationQt : public ObservationDisplay
 						}
 						
 						// prediction point
-						qdisplay::Shape *s = new qdisplay::Shape(qdisplay::Shape::ShapeCross, predObs_(0), predObs_(1), 3, 3);
-						s->setVisible(visible_ && predicted_);
+						s = new qdisplay::Shape(qdisplay::Shape::ShapeCross, predObs_(0), predObs_(1), 3, 3);
 						s->setColor(0, 0, 255); // blue
-						s->setLabel(jmath::toStr(id_).c_str());
+						s->setFontColor(255,255,0); // yellow
 						items_.push_back(s);
 						view_->addShape(s);
 						
 						// prediction ellipse
 						s = new qdisplay::Ellipsoid(predObs_, predObsCov_, 3.0);
-						s->setVisible(visible_ && predicted_);
 						s->setColor(255,255,0); // yellow
 						items_.push_back(s);
 						view_->addShape(s);
 						
 						// measure point
 						s = new qdisplay::Shape(qdisplay::Shape::ShapeCross, measObs_(0), measObs_(1), 3, 3, 45);
-						s->setVisible(visible_ && matched_);
 						s->setColor(255, 0, 0); // red
 						items_.push_back(s);
 						view_->addShape(s);
 						
-					} else
+					}
 					{
 						// prediction point
 						std::list<QGraphicsItemGroup*>::iterator it = items_.begin();
+						s = static_cast<qdisplay::Shape*>(*it);
+						std::ostringstream oss; oss << id_ << " - " << int(match_score*100);
+						s->setLabel(oss.str().c_str());
 						(*it)->setVisible(visible_ && predicted_);
 						if (visible_ && predicted_)
 							(*it)->setPos(predObs_(0), predObs_(1));
@@ -271,6 +285,7 @@ class ObservationQt : public ObservationDisplay
 							(*it)->setPos(measObs_(0), measObs_(1));
 					}
 					break;
+				}
 
 				default:
 					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark" << landmarkType_);

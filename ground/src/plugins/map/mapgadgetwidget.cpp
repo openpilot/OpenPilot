@@ -42,13 +42,13 @@ MapGadgetWidget::MapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     follow_uav = false;
 
-    gcs_pixmap.load(QString::fromUtf8(":/map/images/gsc.png"));
+    gcs_pixmap.load(QString::fromUtf8(":/map/images/gcs.png"));
     uav_pixmap.load(QString::fromUtf8(":/map/images/uav.png"));
     waypoint_pixmap.load(QString::fromUtf8(":/map/images/waypoint.png"));
 //    waypoint_pixmap.load(QCoreApplication::applicationDirPath() + "/images/waypoint.png");
 
     // test
-    if (gcs_pixmap.isNull()) QMessageBox::warning(this, tr("Image Error"), tr("Missing ") + QString::fromUtf8(":/map/images/gsc.png"));
+    if (gcs_pixmap.isNull()) QMessageBox::warning(this, tr("Image Error"), tr("Missing ") + QString::fromUtf8(":/map/images/gcs.png"));
     if (uav_pixmap.isNull()) QMessageBox::warning(this, tr("Image Error"), tr("Missing ") + QString::fromUtf8(":/map/images/uav.png"));
     if (waypoint_pixmap.isNull()) QMessageBox::warning(this, tr("Image Error"), tr("Missing ") + QString::fromUtf8(":/map/images/waypoint.png"));
 

@@ -1002,7 +1002,25 @@ namespace jafar {
 					composeFrames(IF1, F, F_if1, F_f2);
 					F_f1 = ublas::prod(F_if1, IF1_f1);
 			}
+			
 
+		/**
+			get zoom and rotation of appearance between two points of view
+		*/
+		template<class Vec1, class Vec2, class VecL>
+		void getZoomRotation(const Vec1 &sensorPose1, const Vec2 &sensorPose2, const VecL &landmarkPosition, double &zoom, double &rotation)
+		{
+					// First implementation: zoom and rotation
+			vec3 position1 = ublas::subrange(sensorPose1, 0, 3);
+			vec3 position2 = ublas::subrange(sensorPose2, 0, 3);
+			vec4 quat1 = ublas::subrange(sensorPose1, 3, 7);
+			vec4 quat2 = ublas::subrange(sensorPose2, 3, 7);
+
+			zoom = (norm_2(landmarkPosition - position1))/(norm_2(landmarkPosition-position2));
+			vec4 quat12 = qProd(q2qc(quat1),quat2);
+			vec3 euler12 = q2e(quat12);
+			rotation = -euler12(2); // take negative yaw angle
+		}
 
 
 		}

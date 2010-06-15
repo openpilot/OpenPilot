@@ -18,7 +18,7 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
-		void FeaturePoint::setup(double _u, double _v, double _quality){
+		void FeatureImagePoint::setup(double _u, double _v, double _quality){
 			state.x(0) = _u;
 			state.x(1) = _v;
 			quality = _quality;

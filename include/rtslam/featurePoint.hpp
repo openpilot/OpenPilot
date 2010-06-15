@@ -28,6 +28,7 @@
 #define __FeaturePOINTSimu_H__
 
 #include "rtslam/featureAbstract.hpp"
+#include "rtslam/appearanceImage.hpp"
 #include "boost/shared_ptr.hpp"
 
 /* --------------------------------------------------------------------- */
@@ -43,19 +44,20 @@ namespace jafar {
 //		typedef boost::shared_ptr<RawImageSimu> rawimagesimu_ptr_t2;
 
 
-		class FeaturePoint;
-		typedef boost::shared_ptr<FeaturePoint> featurepoint_ptr_t;
+		class FeatureImagePoint;
+		typedef boost::shared_ptr<FeatureImagePoint> feat_img_pnt_ptr_t;
 
 		/** Base class for all landmark appearances defined in the module
 		 * rtslam.
 		 *
 		 * @ingroup rtslam
 		 */
-		class FeaturePoint: public FeatureAbstract {
+		class FeatureImagePoint: public FeatureAbstract {
 			public:
-				FeaturePoint() : FeatureAbstract(2) {
+				app_img_pnt_ptr_t appImgPntPtr;
+				FeatureImagePoint() : FeatureAbstract(2) {
 				}
-				virtual ~FeaturePoint() {
+				virtual ~FeatureImagePoint() {
 				}
 				void setup(double u, double v, double quality);
 		};

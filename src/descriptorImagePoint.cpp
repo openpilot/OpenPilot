@@ -1,8 +1,8 @@
 /*
- * DesscriptorImagePointSimu.cpp
+ * DesscriptorImagePoint.cpp
  *
  *  Created on: 20 avr. 2010
- *      Author: jeanmarie
+ *      Author: jmcodol@laas.fr
  */
 
 #include "jmath/ublasExtra.hpp"
@@ -16,7 +16,9 @@ namespace jafar {
 		using namespace jblas;
 		using namespace quaternion;
 
-		DescriptorImagePoint::DescriptorImagePoint(const featurepoint_ptr_t & featPtr, const vec7 & pose0, observation_ptr_t & obsPtr) {
+		DescriptorImagePoint::DescriptorImagePoint(const feat_img_pnt_ptr_t & featImgPntPtr_, const vec7 & senPoseInit_, observation_ptr_t & obsInitPtr_):
+			DescriptorAbstract(), senPoseInit(senPoseInit_), obsInitPtr(obsInitPtr_), featImgPntPtr(featImgPntPtr_)
+		{
 			// TODO Auto-generated constructor stub
 		}
 
@@ -24,26 +26,28 @@ namespace jafar {
 			// TODO Auto-generated destructor stub
 		}
 
-		bool DescriptorImagePoint::predictAppearance(const landmark_ptr_t & lmkPtr,
-		    const observation_ptr_t & obsPtrNew, app_img_pnt_ptr_t & appPtr, unsigned char patchSize) {
 
-			// First implementation: zoom and rotation
-			vec7 poseNew = obsPtrNew->sensorPtr()->globalPose();
-			vec3 position0 = ublas::subrange(pose0, 0, 3);
-			vec3 positionNew = ublas::subrange(poseNew, 0, 3);
-			vec4 quat0 = ublas::subrange(pose0, 3, 7);
-			vec4 quatNew = ublas::subrange(poseNew, 3, 7);
+		bool DescriptorImagePoint::predictAppearance(obs_ph_euc_ptr_t & obsPtrNew)
+		{
+			return predictAppearance_img_pt(obsPtrNew);
+		}
+		bool DescriptorImagePoint::predictAppearance(obs_ph_ahp_ptr_t & obsPtrNew)
+		{
+			return predictAppearance_img_pt(obsPtrNew);
+		}
+		
+		bool DescriptorImagePoint::predictAppearance_img_pt(const observation_ptr_t & obsPtrNew) {
 
+			double zoom, rotation;
+			landmark_ptr_t lmkPtr = obsPtrNew->landmarkPtr();
 			vec lmk = lmkPtr->state.x();
 			vec pnt = lmkPtr->reparametrize_func(lmk);
+			quaternion::getZoomRotation(senPoseInit, obsPtrNew->sensorPtr()->globalPose(), pnt, zoom, rotation);
 
-			double zoom = (norm_2(pnt - position0))/(norm_2(pnt-positionNew));
-			vec4 quatIncr = qProd(q2qc(quat0),quatNew);
-			vec3 eulerIncr = q2e(quatIncr);
-			double rotation = -eulerIncr(2); // take negative yaw angle
-
-			// TODO: rotate and zoom the patch, and cut it to the appropriate size
-
+			// rotate and zoom the patch, and cut it to the appropriate size
+			app_img_pnt_ptr_t app = boost::static_pointer_cast<AppearenceImagePoint>(obsPtrNew->predictedAppearance);
+			featImgPntPtr->appImgPntPtr->patch.rotateScale(rotation, zoom, app->patch);
+			
 			return true;
 		}
 

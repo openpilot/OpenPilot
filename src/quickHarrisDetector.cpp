@@ -22,7 +22,7 @@ namespace jafar {
 		}
 
 		bool jafar::rtslam::QuickHarrisDetector::detectIn(
-		    const jafar::image::Image & image, featurepoint_ptr_t featPtr,
+		    const jafar::image::Image & image, feat_img_pnt_ptr_t featPtr,
 		    jafar::image::ROI *roiPtr) {
 			//	JFR_PRED_ERROR( image.colorSpace() == JfrImage_CS_GRAY, FdetectException, FdetectException::INVALID_COLORSPACE,"QuickHarrisDetector::detectIn image must be of the same colorspace and in Greyscale");
 

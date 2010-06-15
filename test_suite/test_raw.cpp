@@ -52,7 +52,7 @@ void test_raw01(void) {
 	RawImage    imgSimu  ;
 	cout << imgSimu << endl ;
 
-	qdisplay::QtAppStart((qdisplay::FUNC)&test_raw01_display,NULL,0,NULL);
+	qdisplay::QtAppStart((qdisplay::FUNC)&test_raw01_display,0,NULL,0,0,NULL);
 
 
 }

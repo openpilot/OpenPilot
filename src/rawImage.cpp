@@ -66,7 +66,7 @@ namespace jafar {
 			switch (met) {
 				case HARRIS: {
 
-					featurepoint_ptr_t featPntPtr(new FeaturePoint);
+					feat_img_pnt_ptr_t featPntPtr(new FeatureImagePoint);
 
 					if (quickHarrisDetector.detectIn(*(img.get()), featPntPtr, roiPtr)) {
 

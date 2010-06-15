@@ -40,7 +40,7 @@ namespace jafar{
 		class QuickHarrisDetector {
       public:
         QuickHarrisDetector(int convolutionBoxSize = 5, float threshold = 15.0, float edge = 2.0);
-        virtual bool detectIn(jafar::image::Image const& image, featurepoint_ptr_t featPtr, jafar::image::ROI * roiPtr = 0 );
+        virtual bool detectIn(jafar::image::Image const& image, feat_img_pnt_ptr_t featPtr, jafar::image::ROI * roiPtr = 0 );
       private:
         void quickDerivatives(const jafar::image::Image & image, jafar::image::ROI & roi);
         bool quickConvolutionWithBestPoint(const jafar::image::ROI & roi, int pixMax[2], float & scoreMax);

@@ -21,14 +21,15 @@ namespace jafar {
 	namespace rtslam {
 
 		class DescriptorAbstract {
+			
+			
 			public:
 
 				DescriptorAbstract();
 				virtual ~DescriptorAbstract();
 
 				//FIXME See the stuff on using DescAbs::predApp... ask Nico.
-				virtual bool predictAppearance(const landmark_ptr_t & lmkPtr, const observation_ptr_t & obsPtr, appearance_ptr_t & appPtr){return false;}
-				virtual bool predictAppearance(const landmark_ptr_t & lmkPtr, const observation_ptr_t & obsPtr, app_img_pnt_ptr_t & appPtr){return false;}
+				bool predictAppearance(observation_ptr_t & obsPtr) {return false;}
 
 		};
 

@@ -48,7 +48,6 @@ namespace jafar {
 		 */
 		class FeatureAbstract : public ObjectAbstract {
 			public:
-				int id;
 				appearance_ptr_t appearancePtr;
 				Gaussian state;
 				double quality;

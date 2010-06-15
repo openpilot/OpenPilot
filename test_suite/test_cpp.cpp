@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE( test_cpp )
 //	qdisplay::QtAppStart qas(&display_mono_unique,NULL,0, NULL);
 //	qdisplay::QtAppStart qas(&display_mono_periodic,NULL,1000, NULL);
 //	qdisplay::QtAppStart((qdisplay::FUNC)&display_stereo_unique,(qdisplay::FUNC)&main_stereo,0, &stereo_struct);
-	qdisplay::QtAppStart((qdisplay::FUNC)&display_stereo_periodic,(qdisplay::FUNC)&main_stereo,1000,&stereo_struct);
+	qdisplay::QtAppStart((qdisplay::FUNC)&display_stereo_periodic,0, (qdisplay::FUNC)&main_stereo, 0, 1000,&stereo_struct);
 
 }
 

@@ -39,13 +39,13 @@ class TileMatrix
 public:
     TileMatrix();
     void Clear();
-    void ClearPointsNotIn(QList<Point> list);
-    Tile* TileAt(const Point &p);
-    void SetTileAt(const Point &p,Tile* tile);
+    void ClearPointsNotIn(QList<core::Point> list);
+    Tile* TileAt(const core::Point &p);
+    void SetTileAt(const core::Point &p,Tile* tile);
     int count()const{return matrix.count();}
 protected:
-    QHash<Point,Tile*> matrix;
-    QList<Point> removals;
+    QHash<core::Point,Tile*> matrix;
+    QList<core::Point> removals;
     QMutex mutex;
 };
 

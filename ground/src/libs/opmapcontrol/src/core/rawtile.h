@@ -40,17 +40,17 @@ namespace core {
         friend bool operator==(RawTile const& lhs,RawTile const& rhs);
 
     public:
-        RawTile(const MapType::Types &Type,const Point &Pos,const int &Zoom);
+        RawTile(const MapType::Types &Type,const core::Point &Pos,const int &Zoom);
         QString ToString(void);
         MapType::Types Type();
-        Point Pos();
+        core::Point Pos();
         int Zoom();
         void setType(const MapType::Types &value);
-        void setPos(const Point &value);
+        void setPos(const core::Point &value);
         void setZoom(const int &value);
     private:
         MapType::Types type;
-        Point pos;
+        core::Point pos;
         int zoom;
     };
 }

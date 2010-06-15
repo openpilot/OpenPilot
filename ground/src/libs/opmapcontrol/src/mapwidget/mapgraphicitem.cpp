@@ -1,7 +1,7 @@
 #include "mapgraphicitem.h"
 namespace mapcontrol
 {
-    MapGraphicItem::MapGraphicItem(Core *core):core(core),MapRenderTransform(1), maxZoom(17),minZoom(2),zoomReal(0),isSelected(false),rotation(0)
+    MapGraphicItem::MapGraphicItem(internals::Core *core):core(core),MapRenderTransform(1), maxZoom(17),minZoom(2),zoomReal(0),isSelected(false),rotation(0)
     {
         EmptytileBrush = Qt::cyan;
         MissingDataFont =QFont ("Times",10,QFont::Bold);
@@ -14,10 +14,9 @@ namespace mapcontrol
         DragButton = Qt::RightButton;
         isMouseOverMarker=false;
         maprect=QRectF(0,0,1022,680);
-        core->SetCurrentRegion(Rectangle(0, 0, maprect.width(), maprect.height()));
+        core->SetCurrentRegion(internals::Rectangle(0, 0, maprect.width(), maprect.height()));
         core->SetMapType(MapType::GoogleHybrid);
         this->SetZoom(2);
-
         connect(core,SIGNAL(OnNeedInvalidation()),this,SLOT(Core_OnNeedInvalidation()));
 
 
@@ -39,7 +38,7 @@ namespace mapcontrol
         }
 
         core->OnMapSizeChanged(maprect.width(),maprect.height());
-        core->SetCurrentRegion(Rectangle(0, 0, maprect.width(), maprect.height()));
+        core->SetCurrentRegion(internals::Rectangle(0, 0, maprect.width(), maprect.height()));
         if(isVisible())
         {
             core->GoToCurrentPosition();
@@ -106,8 +105,8 @@ namespace mapcontrol
             else if(!isSelected)
             {
                 isSelected = true;
-                SetSelectedArea (RectLatLng::Empty);
-                selectionEnd = PointLatLng::Empty;
+                SetSelectedArea (internals::RectLatLng::Empty);
+                selectionEnd = internals::PointLatLng::Empty;
                 selectionStart = FromLocalToLatLng(event->pos().x(), event->pos().y());
             }
         }
@@ -150,15 +149,15 @@ namespace mapcontrol
         {
             if(core->GetmouseLastZoom().X() != event->pos().x() && core->mouseLastZoom.Y() != event->pos().y())
             {
-                if(GetMouseWheelZoomType() == MouseWheelZoomType::MousePositionAndCenter)
+                if(GetMouseWheelZoomType() == internals::MouseWheelZoomType::MousePositionAndCenter)
                 {
                     core->SetCurrentPosition(FromLocalToLatLng(event->pos().x(), event->pos().y()));
                 }
-                else if(GetMouseWheelZoomType() == MouseWheelZoomType::ViewCenter)
+                else if(GetMouseWheelZoomType() == internals::MouseWheelZoomType::ViewCenter)
                 {
                     core->SetCurrentPosition(FromLocalToLatLng((int) maprect.width()/2, (int) maprect.height()/2));
                 }
-                else if(GetMouseWheelZoomType() == MouseWheelZoomType::MousePositionWithoutCenter)
+                else if(GetMouseWheelZoomType() == internals::MouseWheelZoomType::MousePositionWithoutCenter)
                 {
                     core->SetCurrentPosition(FromLocalToLatLng(event->pos().x(), event->pos().y()));
 
@@ -169,7 +168,7 @@ namespace mapcontrol
             }
 
             // set mouse position to map center
-            if(GetMouseWheelZoomType() != MouseWheelZoomType::MousePositionWithoutCenter)
+            if(GetMouseWheelZoomType() != internals::MouseWheelZoomType::MousePositionWithoutCenter)
             {
                 {
                     //                      System.Drawing.Point p = PointToScreen(new System.Drawing.Point(Width/2, Height/2));
@@ -205,7 +204,7 @@ namespace mapcontrol
 
 
                 {
-                    Tile* t = core->Matrix.TileAt(core->GettilePoint());
+                    internals::Tile* t = core->Matrix.TileAt(core->GettilePoint());
                     //qDebug()<<"OPMapControl::DrawMap2D tile:"<<t->GetPos().ToString()<<" as "<<t->Overlays.count()<<" overlays";
                     //Tile t = core->Matrix[tileToDraw];
                     if(t!=0)
@@ -270,7 +269,7 @@ namespace mapcontrol
             }
         }
     }
-    PointLatLng MapGraphicItem::FromLocalToLatLng(int x, int y)
+    internals::PointLatLng MapGraphicItem::FromLocalToLatLng(int x, int y)
     {
         if(MapRenderTransform!=-1)
         {

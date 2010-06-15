@@ -38,7 +38,7 @@ struct LoadTask
   {
      friend bool operator==(LoadTask const& lhs,LoadTask const& rhs);
   public:
-    Point Pos;
+    core::Point Pos;
     int Zoom;
 
 
@@ -49,7 +49,7 @@ struct LoadTask
     }
     LoadTask()
     {
-        Pos=Point(-1,-1);
+        Pos=core::Point(-1,-1);
         Zoom=-1;
     }
     bool HasValue()

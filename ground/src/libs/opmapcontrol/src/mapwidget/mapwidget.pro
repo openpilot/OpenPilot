@@ -1,16 +1,14 @@
 TEMPLATE = lib
-TARGET = OPMapWidget
+TARGET = opmapwidget
 DEFINES += OPMAPWIDGET_LIBRARY
 
 include(../../../../openpilotgcslibrary.pri)
-
-SOURCES += opmapcontrol.cpp \
-    mapgraphicitem.cpp \
+#DESTDIR = ../build
+SOURCES += mapgraphicitem.cpp \
     opmapwidget.cpp
 
 LIBS += -L../build -lcore -linternals -lcore
-HEADERS += opmapcontrol.h \
-    mapgraphicitem.h \
+HEADERS += mapgraphicitem.h \
     opmapwidget.h 
 
 QT += opengl

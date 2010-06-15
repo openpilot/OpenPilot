@@ -31,7 +31,6 @@
 #include "cmath"
 #include "../pureprojection.h"
 
-using namespace internals;
  
 namespace projections {
 class LKS94Projection:public internals::PureProjection
@@ -43,8 +42,8 @@ public:
     virtual Size TileSize() const;
     virtual double Axis() const;
     virtual double Flattening() const;
-    virtual Point FromLatLngToPixel(double lat, double lng, int const& zoom);
-    virtual PointLatLng FromPixelToLatLng(int const& x, int const&  y, int const&  zoom);
+    virtual core::Point FromLatLngToPixel(double lat, double lng, int const& zoom);
+    virtual internals::PointLatLng FromPixelToLatLng(int const& x, int const&  y, int const&  zoom);
     virtual double GetGroundResolution(int const& zoom, double const& latitude);
     virtual Size GetTileMatrixMinXY(int const& zoom);
     virtual Size GetTileMatrixMaxXY(int const& zoom);

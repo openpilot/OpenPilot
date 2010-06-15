@@ -44,16 +44,16 @@ namespace mapcontrol
         void SetMaxZoom(int const& value){map->maxZoom = value;}
         int MinZoom()const{return map->minZoom;}
         void SetMinZoom(int const& value){map->minZoom = value;}
-        MouseWheelZoomType::Types GetMouseWheelZoomType(){return  map->core->GetMouseWheelZoomType();}
-        void SetMouseWheelZoomType(MouseWheelZoomType::Types const& value){map->core->SetMouseWheelZoomType(value);}
-        void SetMouseWheelZoomTypeByStr(const QString &value){map->core->SetMouseWheelZoomType(MouseWheelZoomType::TypeByStr(value));}
+        internals::MouseWheelZoomType::Types GetMouseWheelZoomType(){return  map->core->GetMouseWheelZoomType();}
+        void SetMouseWheelZoomType(internals::MouseWheelZoomType::Types const& value){map->core->SetMouseWheelZoomType(value);}
+        void SetMouseWheelZoomTypeByStr(const QString &value){map->core->SetMouseWheelZoomType(internals::MouseWheelZoomType::TypeByStr(value));}
         QString GetMouseWheelZoomTypeStr(){return map->GetMouseWheelZoomTypeStr();}
-        RectLatLng SelectedArea()const{return  map->selectedArea;}
-        void SetSelectedArea(RectLatLng const& value){ map->selectedArea = value;this->update();}
+        internals::RectLatLng SelectedArea()const{return  map->selectedArea;}
+        void SetSelectedArea(internals::RectLatLng const& value){ map->selectedArea = value;this->update();}
         bool CanDragMap()const{return map->CanDragMap();}
         void SetCanDragMap(bool const& value){map->SetCanDragMap(value);}
-        PointLatLng CurrentPosition()const{return map->core->CurrentPosition();}
-        void SetCurrentPosition(PointLatLng const& value){map->core->SetCurrentPosition(value);}
+        internals::PointLatLng CurrentPosition()const{return map->core->CurrentPosition();}
+        void SetCurrentPosition(internals::PointLatLng const& value){map->core->SetCurrentPosition(value);}
         double Zoom(){return map->Zoom();}
         void SetZoom(double const& value){map->SetZoom(value);}
         qreal Rotate(){return map->rotation;}
@@ -67,7 +67,7 @@ namespace mapcontrol
         bool isStarted(){return map->core->isStarted();}
         void X(){map->core->GoToCurrentPosition();}
     private:
-        Core *core;
+        internals::Core *core;
         MapGraphicItem *map;
         QGraphicsScene mscene;
         bool useOpenGL;

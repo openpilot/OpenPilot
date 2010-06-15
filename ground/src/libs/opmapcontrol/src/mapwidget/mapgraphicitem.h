@@ -11,13 +11,13 @@
 #include <QObject>
 namespace mapcontrol
 {
-    class OPMapWidget;
+class OPMapWidget;
 class MapGraphicItem:public QObject,public QGraphicsItem
 {
     friend class mapcontrol::OPMapWidget;
     Q_OBJECT
 public:
-    MapGraphicItem(Core *core);
+    MapGraphicItem(internals::Core *core);
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                 QWidget *widget);
@@ -36,22 +36,22 @@ protected:
     void SetZoomStep(int const& value);
 
 private:
-    Core *core;
+    internals::Core *core;
     bool showTileGridLines;
     qreal MapRenderTransform;
     void DrawMap2D(QPainter *painter);
     QFont MissingDataFont;
     int maxZoom;
     int minZoom;
-    RectLatLng selectedArea;
-    PointLatLng selectionStart;
-    PointLatLng selectionEnd;
+    internals::RectLatLng selectedArea;
+    internals::PointLatLng selectionStart;
+    internals::PointLatLng selectionEnd;
     double zoomReal;
     QRectF maprect;
     bool isSelected;
     bool isMouseOverMarker;
     void SetIsMouseOverMarker(bool const& value){isMouseOverMarker = value;}
-    PointLatLng FromLocalToLatLng(int x, int y);
+    internals::PointLatLng FromLocalToLatLng(int x, int y);
     qreal rotation;
     QRectF boundingBox(QRectF const& rect, qreal const& angle);
 
@@ -62,12 +62,12 @@ private:
     QPen SelectionPen;
     int MaxZoom()const{return maxZoom;}
     int MinZoom()const{return minZoom;}
-    MouseWheelZoomType::Types GetMouseWheelZoomType(){return core->GetMouseWheelZoomType();}
-    QString GetMouseWheelZoomTypeStr(){return MouseWheelZoomType::TypesStrList().at((int)core->GetMouseWheelZoomType());}
+    internals::MouseWheelZoomType::Types GetMouseWheelZoomType(){return core->GetMouseWheelZoomType();}
+    QString GetMouseWheelZoomTypeStr(){return internals::MouseWheelZoomType::TypesStrList().at((int)core->GetMouseWheelZoomType());}
     bool MapScaleInfoEnabled;
     Qt::MouseButton DragButton;
-    void SetSelectedArea(RectLatLng const& value){selectedArea = value;this->update();}
-    RectLatLng BoundsOfMap;
+    void SetSelectedArea(internals::RectLatLng const& value){selectedArea = value;this->update();}
+    internals::RectLatLng BoundsOfMap;
     void Offset(int const& x, int const& y);
     bool CanDragMap()const{return core->CanDragMap;}
     void SetCanDragMap(bool const& value){core->CanDragMap = value;}

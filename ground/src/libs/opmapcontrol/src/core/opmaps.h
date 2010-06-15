@@ -60,7 +60,7 @@ namespace core {
         /// </summary>
 
 
-        QByteArray GetImageFrom(const MapType::Types &type,const Point &pos,const int &zoom);
+        QByteArray GetImageFrom(const MapType::Types &type,const core::Point &pos,const int &zoom);
         bool UseMemoryCache();//TODO
         void setUseMemoryCache(const bool& value){useMemoryCache=value;}
         void setLanguage(const LanguageType::Types& language);//TODO

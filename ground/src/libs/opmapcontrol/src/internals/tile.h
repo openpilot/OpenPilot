@@ -40,13 +40,13 @@ namespace internals
 class Tile
 {
 public:
-    Tile(int zoom,Point pos);
+    Tile(int zoom,core::Point pos);
     Tile();
     void Clear();
     int GetZoom(){return zoom;}
-    Point GetPos(){return pos;}
+    core::Point GetPos(){return pos;}
     void SetZoom(const int &value){zoom=value;}
-    void SetPos(const Point &value){pos=value;}
+    void SetPos(const core::Point &value){pos=value;}
     Tile& operator= (const Tile &cSource);
     Tile(const Tile &cSource)
     {
@@ -60,7 +60,7 @@ protected:
     QMutex mutex;
 private:
     int zoom;
-    Point pos;
+    core::Point pos;
 
 
 };

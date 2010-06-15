@@ -50,8 +50,8 @@ namespace core {
     public:
         PureImageCache();
         static bool CreateEmptyDB(const QString &file);
-        bool PutImageToCache(const QByteArray &tile,const MapType::Types &type,const Point &pos, const int &zoom);
-        QByteArray GetImageFromCache(MapType::Types type, Point pos, int zoom);
+        bool PutImageToCache(const QByteArray &tile,const MapType::Types &type,const core::Point &pos, const int &zoom);
+        QByteArray GetImageFromCache(MapType::Types type, core::Point pos, int zoom);
         QString GtileCache();
         void setGtileCache(const QString &value);
         static bool ExportMapDataToDB(QString sourceFile, QString destFile);

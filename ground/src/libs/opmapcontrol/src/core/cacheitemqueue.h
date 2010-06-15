@@ -29,7 +29,7 @@
 #define CACHEITEMQUEUE_H
 
 #include "maptype.h"
-#include "point.h"
+#include "Point.h"
 #include <QByteArray>
 
 
@@ -38,7 +38,7 @@ namespace core {
     class CacheItemQueue
     {
     public:
-        CacheItemQueue(const MapType::Types &Type,const Point &Pos,const QByteArray &Img,const int &Zoom);
+        CacheItemQueue(const MapType::Types &Type,const core::Point &Pos,const QByteArray &Img,const int &Zoom);
         CacheItemQueue(){};
         CacheItemQueue(const CacheItemQueue &cSource)
         {
@@ -50,10 +50,10 @@ namespace core {
         CacheItemQueue& operator= (const CacheItemQueue &cSource);
         bool operator== (const CacheItemQueue &cSource);
         void SetMapType(const MapType::Types &value);
-        void SetPosition(const Point &value);
+        void SetPosition(const core::Point &value);
         void SetImg(const QByteArray &value);
         MapType::Types GetMapType();
-        Point GetPosition();
+        core::Point GetPosition();
         QByteArray GetImg();
         int GetZoom(){return zoom;};
         void SetZoom(const int &value) {zoom=value;};
@@ -61,7 +61,7 @@ namespace core {
 
 
         MapType::Types type;
-        Point pos;
+        core::Point pos;
         QByteArray img;
         int zoom;
     };

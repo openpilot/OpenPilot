@@ -71,9 +71,9 @@ Point LKS94Projection::FromLatLngToPixel(double lat, double lng, int const&  zoo
     return ret;
 }
 
-PointLatLng LKS94Projection::FromPixelToLatLng(int const& x, int const&  y, int const&  zoom)
+internals::PointLatLng LKS94Projection::FromPixelToLatLng(int const& x, int const&  y, int const&  zoom)
 {
-    PointLatLng ret;// = PointLatLng::Empty;
+    internals::PointLatLng ret;// = internals::PointLatLng::Empty;
 
     double res = GetTileMatrixResolution(zoom);
 

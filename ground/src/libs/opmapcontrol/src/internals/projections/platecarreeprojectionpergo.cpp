@@ -51,9 +51,9 @@ Point PlateCarreeProjectionPergo::FromLatLngToPixel(double lat, double lng, cons
 
     return ret;
 }
-PointLatLng PlateCarreeProjectionPergo::FromPixelToLatLng(const int &x, const int &y, const int &zoom)
+internals::PointLatLng PlateCarreeProjectionPergo::FromPixelToLatLng(const int &x, const int &y, const int &zoom)
 {
-    PointLatLng ret;// = PointLatLng.Empty;
+    internals::PointLatLng ret;// = internals::PointLatLng.Empty;
 
     Size s = GetTileMatrixSizePixel(zoom);
     double mapSizeX = s.Width();

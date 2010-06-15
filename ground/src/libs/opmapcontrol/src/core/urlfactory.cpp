@@ -560,23 +560,23 @@ QString UrlFactory::MakeGeocoderUrl(QString keywords)
     QString key = keywords.replace(' ', '+');
     return QString("http://maps.google.com/maps/geo?q=%1&output=csv&key=%2").arg(key).arg(GoogleMapsAPIKey);
 }
-QString UrlFactory::MakeReverseGeocoderUrl(PointLatLng &pt,const QString &language)
+QString UrlFactory::MakeReverseGeocoderUrl(internals::PointLatLng &pt,const QString &language)
 {
 
     return QString("http://maps.google.com/maps/geo?hl=%1&ll=%2,%3&output=csv&key=%4").arg(language).arg(QString::number(pt.Lat())).arg(QString::number(pt.Lng())).arg(GoogleMapsAPIKey);
 
 }
-PointLatLng UrlFactory::GetLatLngFromGeodecoder(const QString &keywords, GeoCoderStatusCode::Types &status)
+internals::PointLatLng UrlFactory::GetLatLngFromGeodecoder(const QString &keywords, GeoCoderStatusCode::Types &status)
 {
     return GetLatLngFromGeocoderUrl(MakeGeocoderUrl(keywords),UseGeocoderCache,status);
 }
-PointLatLng UrlFactory::GetLatLngFromGeocoderUrl(const QString &url, const bool &useCache, GeoCoderStatusCode::Types &status)
+internals::PointLatLng UrlFactory::GetLatLngFromGeocoderUrl(const QString &url, const bool &useCache, GeoCoderStatusCode::Types &status)
 {
 #ifdef DEBUG_URLFACTORY
     qDebug()<<"Entered GetLatLngFromGeocoderUrl:";
 #endif //DEBUG_URLFACTORY
     status = GeoCoderStatusCode::Unknow;
-    PointLatLng ret(0,0);
+    internals::PointLatLng ret(0,0);
     QString urlEnd = url.right(url.indexOf("geo?q="));
     urlEnd.replace( QRegExp(
             "[^"
@@ -616,7 +616,7 @@ PointLatLng UrlFactory::GetLatLngFromGeocoderUrl(const QString &url, const bool 
 #ifdef DEBUG_URLFACTORY
             qDebug()<<"GetLatLngFromGeocoderUrl::Network error";
 #endif //DEBUG_URLFACTORY
-            return PointLatLng(0,0);
+            return internals::PointLatLng(0,0);
         }
         {
 #ifdef DEBUG_URLFACTORY
@@ -648,7 +648,7 @@ PointLatLng UrlFactory::GetLatLngFromGeocoderUrl(const QString &url, const bool 
                 double lat = QString(values[2]).toDouble();
                 double lng = QString(values[3]).toDouble();
 
-                ret = PointLatLng(lat, lng);
+                ret = internals::PointLatLng(lat, lng);
 #ifdef DEBUG_URLFACTORY
                 qDebug()<<"Lat="<<lat<<" Lng="<<lng;
 #endif //DEBUG_URLFACTORY
@@ -658,7 +658,7 @@ PointLatLng UrlFactory::GetLatLngFromGeocoderUrl(const QString &url, const bool 
     return ret;
 }
 
-Placemark UrlFactory::GetPlacemarkFromGeocoder(PointLatLng location)
+Placemark UrlFactory::GetPlacemarkFromGeocoder(internals::PointLatLng location)
 {
     return GetPlacemarkFromReverseGeocoderUrl(MakeReverseGeocoderUrl(location, LanguageStr), UsePlacemarkCache);
 }
@@ -744,7 +744,7 @@ Placemark UrlFactory::GetPlacemarkFromReverseGeocoderUrl(const QString &url, con
     }
     return ret;
 }
-double UrlFactory::GetDistance(PointLatLng p1, PointLatLng p2)
+double UrlFactory::GetDistance(internals::PointLatLng p1, internals::PointLatLng p2)
 {
     double dLat1InRad = p1.Lat() * (M_PI / 180);
     double dLong1InRad = p1.Lng() * (M_PI / 180);

@@ -33,6 +33,8 @@
 #include "../internals/pointlatlng.h"
 #include "mousewheelzoomtype.h"
 #include "../core/size.h"
+#include "../core/point.h"
+
 #include "../core/maptype.h"
 #include "rectangle.h"
 #include "QThreadPool"
@@ -74,29 +76,29 @@ public:
     PointLatLng CurrentPosition()const{return currentPosition;};
     void SetCurrentPosition(const PointLatLng &value);
 
-    Point GetcurrentPositionGPixel(){return currentPositionPixel;};
-    void SetcurrentPositionGPixel(const Point &value){currentPositionPixel=value;};
+    core::Point GetcurrentPositionGPixel(){return currentPositionPixel;};
+    void SetcurrentPositionGPixel(const core::Point &value){currentPositionPixel=value;};
 
-    Point GetrenderOffset(){return renderOffset;};
-    void SetrenderOffset(const Point &value){renderOffset=value;};
+    core::Point GetrenderOffset(){return renderOffset;};
+    void SetrenderOffset(const core::Point &value){renderOffset=value;};
 
-    Point GetcenterTileXYLocation(){return centerTileXYLocation;};
-    void SetcenterTileXYLocation(const Point &value){centerTileXYLocation=value;};
+    core::Point GetcenterTileXYLocation(){return centerTileXYLocation;};
+    void SetcenterTileXYLocation(const core::Point &value){centerTileXYLocation=value;};
 
-    Point GetcenterTileXYLocationLast(){return centerTileXYLocationLast;};
-    void SetcenterTileXYLocationLast(const Point &value){centerTileXYLocationLast=value;};
+    core::Point GetcenterTileXYLocationLast(){return centerTileXYLocationLast;};
+    void SetcenterTileXYLocationLast(const core::Point &value){centerTileXYLocationLast=value;};
 
-    Point GetdragPoint(){return dragPoint;};
-    void SetdragPoint(const Point &value){dragPoint=value;};
+    core::Point GetdragPoint(){return dragPoint;};
+    void SetdragPoint(const core::Point &value){dragPoint=value;};
 
-    Point GetmouseDown(){return mouseDown;};
-    void SetmouseDown(const Point &value){mouseDown=value;};
+    core::Point GetmouseDown(){return mouseDown;};
+    void SetmouseDown(const core::Point &value){mouseDown=value;};
 
-    Point GetmouseCurrent(){return mouseCurrent;};
-    void SetmouseCurrent(const Point &value){mouseCurrent=value;};
+    core::Point GetmouseCurrent(){return mouseCurrent;};
+    void SetmouseCurrent(const core::Point &value){mouseCurrent=value;};
 
-    Point GetmouseLastZoom(){return mouseLastZoom;};
-    void SetmouseLastZoom(const Point &value){mouseLastZoom=value;};
+    core::Point GetmouseLastZoom(){return mouseLastZoom;};
+    void SetmouseLastZoom(const core::Point &value){mouseLastZoom=value;};
 
     MouseWheelZoomType::Types GetMouseWheelZoomType(){return mousewheelzoomtype;};
     void SetMouseWheelZoomType(const MouseWheelZoomType::Types &value){mousewheelzoomtype=value;};
@@ -116,13 +118,13 @@ public:
     Rectangle GettileRect(){return tileRect;}
     void SettileRect(const Rectangle &value){tileRect=value;}
 
-    Point GettilePoint(){return tilePoint;}
-    void SettilePoint(const Point &value){tilePoint=value;}
+    core::Point GettilePoint(){return tilePoint;}
+    void SettilePoint(const core::Point &value){tilePoint=value;}
 
     Rectangle GetCurrentRegion(){return CurrentRegion;}
     void SetCurrentRegion(const Rectangle &value){CurrentRegion=value;}
 
-    QList<Point> tileDrawingList;
+    QList<core::Point> tileDrawingList;
 
     PureProjection* Projection()
     {
@@ -131,7 +133,7 @@ public:
     void SetProjection(PureProjection* value)
     {
         projection=value;
-        tileRect=Rectangle(Point(0,0),value->TileSize());
+        tileRect=Rectangle(core::Point(0,0),value->TileSize());
     }
     bool IsDragging()const{return isDragging;}
 
@@ -164,7 +166,7 @@ public:
 
     int GetMaxZoomToFitRect(RectLatLng const& rect);
 
-    void BeginDrag(Point const& pt);
+    void BeginDrag(core::Point const& pt);
 
     void EndDrag();
 
@@ -174,13 +176,13 @@ public:
 
     bool MouseWheelZooming;
 
-    void DragOffset(Point const& offset);
+    void DragOffset(core::Point const& offset);
 
-    void Drag(Point const& pt);
+    void Drag(core::Point const& pt);
 
     void CancelAsyncTasks();
 
-    void FindTilesAround(QList<Point> &list);
+    void FindTilesAround(QList<core::Point> &list);
 
     void UpdateGroundResolution();
 
@@ -196,24 +198,24 @@ signals:
     void OnMapDrag();
     void OnMapZoomChanged();
     void OnMapTypeChanged(MapType::Types type);
-    void OnEmptyTileError(int zoom, Point pos);
+    void OnEmptyTileError(int zoom, core::Point pos);
     void OnNeedInvalidation();
 
 private:
 
 
     PointLatLng currentPosition;
-    Point currentPositionPixel;
-    Point renderOffset;
-    Point centerTileXYLocation;
-    Point centerTileXYLocationLast;
-    Point dragPoint;
+    core::Point currentPositionPixel;
+    core::Point renderOffset;
+    core::Point centerTileXYLocation;
+    core::Point centerTileXYLocationLast;
+    core::Point dragPoint;
     Rectangle tileRect;
-    Point mouseDown;
+    core::Point mouseDown;
     bool CanDragMap;
-    Point mouseCurrent;
+    core::Point mouseCurrent;
     PointLatLng LastLocationInBounds;
-    Point mouseLastZoom;
+    core::Point mouseLastZoom;
 
     MouseWheelZoomType::Types mousewheelzoomtype;
 
@@ -224,7 +226,7 @@ private:
 
 
 
-    Point tilePoint;
+    core::Point tilePoint;
 
     Rectangle CurrentRegion;
 
@@ -265,7 +267,7 @@ protected:
     int pxRes100km; // 100km
     int pxRes1000km; // 1000km
     int pxRes5000km; // 5000km
-    void SetCurrentPositionGPixel(Point const& value){currentPositionPixel = value;}
+    void SetCurrentPositionGPixel(core::Point const& value){currentPositionPixel = value;}
     void GoToCurrentPositionOnZoom();
 
 };

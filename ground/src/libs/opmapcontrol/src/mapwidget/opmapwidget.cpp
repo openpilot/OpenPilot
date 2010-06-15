@@ -7,7 +7,7 @@ namespace mapcontrol
     {
         setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
-        core=new Core;
+        core=new internals::Core;
         map=new MapGraphicItem(core);
         //text.setZValue(20);
         //QGraphicsTextItem *t=new QGraphicsTextItem(map);

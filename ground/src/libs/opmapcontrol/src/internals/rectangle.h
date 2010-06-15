@@ -49,17 +49,17 @@ public:
         this->width = width;
         this->height = height;
     }
-    Rectangle(Point location, Size size)
+    Rectangle(core::Point location, core::Size size)
     {
         this->x = location.X();
         this->y = location.Y();
         this->width = size.Width();
         this->height = size.Height();
     }
-    Point GetLocation() {
-        return Point(x, y);
+    core::Point GetLocation() {
+        return core::Point(x, y);
     }
-    void SetLocation(const Point &value)
+    void SetLocation(const core::Point &value)
     {
         x = value.X();
         y = value.Y();
@@ -88,7 +88,7 @@ public:
     {
         return this->x<=x && x<this->x+this->width && this->y<=y && y<this->y+this->height;
     }
-    bool Contains(const Point &pt)
+    bool Contains(const core::Point &pt)
     {
         return Contains(pt.X(),pt.Y());
     }
@@ -133,7 +133,7 @@ public:
                (this->y < rect.y + rect.height);
          }
     static Rectangle Union(const Rectangle &a,const Rectangle &b);
-    void Offset(const Point &pos)
+    void Offset(const core::Point &pos)
     {
         Offset(pos.X(), pos.Y());
     }

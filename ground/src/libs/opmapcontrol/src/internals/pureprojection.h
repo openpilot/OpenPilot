@@ -51,22 +51,22 @@ public:
 
     virtual double Flattening()const=0;
 
-    virtual Point FromLatLngToPixel(double lat, double lng, int const& zoom)=0;
+    virtual core::Point FromLatLngToPixel(double lat, double lng, int const& zoom)=0;
 
     virtual PointLatLng FromPixelToLatLng(const int &x,const int &y,const int &zoom)=0;
 
     virtual QString Type(){return "PureProjection";}
-    Point FromLatLngToPixel(const PointLatLng &p,const int &zoom);
+    core::Point FromLatLngToPixel(const PointLatLng &p,const int &zoom);
 
     PointLatLng FromPixelToLatLng(const Point &p,const int &zoom);
-    virtual Point FromPixelToTileXY(const Point &p);
-    virtual Point FromTileXYToPixel(const Point &p);
+    virtual core::Point FromPixelToTileXY(const core::Point &p);
+    virtual core::Point FromTileXYToPixel(const core::Point &p);
     virtual  Size GetTileMatrixMinXY(const int &zoom)=0;
     virtual  Size GetTileMatrixMaxXY(const int &zoom)=0;
     virtual Size GetTileMatrixSizeXY(const int &zoom);
     int GetTileMatrixItemCount(const int &zoom);
     virtual Size GetTileMatrixSizePixel(const int &zoom);
-    QList<Point> GetAreaTileList(const RectLatLng &rect,const int &zoom,const int &padding);
+    QList<core::Point> GetAreaTileList(const RectLatLng &rect,const int &zoom,const int &padding);
     virtual double GetGroundResolution(const int &zoom,const double &latitude);
 
     double DegreesToRadians(const double &deg)const

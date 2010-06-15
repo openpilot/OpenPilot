@@ -25,8 +25,8 @@
 * with this program; if not, write to the Free Software Foundation, Inc., 
 * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
-#ifndef POINT_H
-#define POINT_H
+#ifndef OPOINT_H
+#define OPOINT_H
 
 
 #include <QString>

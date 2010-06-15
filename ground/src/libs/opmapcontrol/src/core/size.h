@@ -54,7 +54,6 @@ namespace core {
     private:
         int width;
         int height;
-        Point p;
     };
 }
 #endif // SIZE_H

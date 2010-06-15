@@ -30,10 +30,9 @@
 
 #include "../pureprojection.h"
 
-using namespace internals;
  
 namespace projections {
-class MercatorProjectionYandex:public PureProjection
+    class MercatorProjectionYandex:public internals::PureProjection
 {
 public:
     MercatorProjectionYandex();
@@ -41,8 +40,8 @@ public:
     virtual Size TileSize() const;
     virtual double Axis() const;
     virtual double Flattening()const;
-    virtual Point FromLatLngToPixel(double lat, double lng, int const& zoom);
-    virtual PointLatLng FromPixelToLatLng(const int &x,const int &y,const int &zoom);
+    virtual core::Point FromLatLngToPixel(double lat, double lng, int const& zoom);
+    virtual internals::PointLatLng FromPixelToLatLng(const int &x,const int &y,const int &zoom);
     virtual  Size GetTileMatrixMinXY(const int &zoom);
     virtual  Size GetTileMatrixMaxXY(const int &zoom);
 private:

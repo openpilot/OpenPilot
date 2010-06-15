@@ -58,7 +58,7 @@ Point MercatorProjectionYandex::FromLatLngToPixel(double lat, double lng, const 
     return ret;
 
 }
-PointLatLng MercatorProjectionYandex::FromPixelToLatLng(const int &x, const int &y, const int &zoom)
+internals::PointLatLng MercatorProjectionYandex::FromPixelToLatLng(const int &x, const int &y, const int &zoom)
 {
     Size s = GetTileMatrixSizePixel(zoom);
 
@@ -77,7 +77,7 @@ PointLatLng MercatorProjectionYandex::FromPixelToLatLng(const int &x, const int 
     double g = M_PI /2 - 2 *atan(1 / exp(mercY /a));
     double z = g + c1 * sin(2 * g) + c2 * sin(4 * g) + c3 * sin(6 * g) + c4 * sin(8 * g);
 
-    PointLatLng ret;// = PointLatLng.Empty;
+    internals::PointLatLng ret;// = internals::PointLatLng.Empty;
     ret.SetLat(z * RAD_DEG);
     ret.SetLng (mercX / a * RAD_DEG);
 

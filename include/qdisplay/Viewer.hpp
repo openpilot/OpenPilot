@@ -86,7 +86,7 @@ class Viewer : public QGraphicsView {
     void exportView( const std::string& fileName );
   protected:
     virtual void contextMenuEvent ( QContextMenuEvent * event );
-    virtual void mouseReleaseEvent ( QMouseEvent * event );
+    //virtual void mouseReleaseEvent ( QMouseEvent * event );
     virtual void keyPressEvent ( QKeyEvent * event );
     virtual void wheelEvent(QWheelEvent *event);
   private:

@@ -7,6 +7,7 @@
 
 #include <boost/bind.hpp>
 #include <boost/thread/thread.hpp>
+#include "kernel/threads.hpp"
 
 namespace jafar {
 namespace qdisplay {
@@ -45,8 +46,8 @@ class QtAppStart: public QObject
 		@param display_interval the interval in ms at which the display function is called. 0 means only once.
 		@param _sharedDataStructure the data structure that is passed to _main and _display functions
 		*/
-		QtAppStart(void (*_display)(SharedDataStructure*),
-			void (*_main)(SharedDataStructure*) = NULL, 
+		QtAppStart(void (*_display)(SharedDataStructure*), int prioDisplay = 0,
+			void (*_main)(SharedDataStructure*) = NULL, int prioMain = 0,
 			int display_interval = 0, SharedDataStructure *_sharedDataStructure = NULL);
 		~QtAppStart();
 		
@@ -54,7 +55,7 @@ class QtAppStart: public QObject
 		void display();
 		
 };
-	
+
 
 typedef void(*FUNC)(void*);
 

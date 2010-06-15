@@ -209,9 +209,11 @@ void Viewer::contextMenuEvent( QContextMenuEvent * event )
 }
 
 // WORKAROUND Qt4.4 regression where mouseReleaseEvent are not forwarded to QGraphicsItem
+// is this problem still there with Qt4.6 ? Disabling it because it is messing with
+// DragMode ScrollHandDrag (not releasing the drag)
 #include <QGraphicsSceneMouseEvent>
 #include <QApplication>
-
+#if 0
 void Viewer::mouseReleaseEvent( QMouseEvent* event )
 {
   
@@ -238,6 +240,7 @@ void Viewer::mouseReleaseEvent( QMouseEvent* event )
   }
   QGraphicsView::mouseReleaseEvent( event );
 }
+#endif
 
 void Viewer::exportView()
 {

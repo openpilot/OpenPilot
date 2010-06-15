@@ -14,13 +14,19 @@
 namespace jafar {
 namespace qdisplay {
 
-	QtAppStart::QtAppStart(void (*_display)(SharedDataStructure*),
-		void (*_main)(SharedDataStructure*), 
+	QtAppStart::QtAppStart(void (*_display)(SharedDataStructure*), int prioDisplay,
+		void (*_main)(SharedDataStructure*), int prioMain,
 		int display_interval, SharedDataStructure *_sharedDataStructure):
 		main_(_main), display_(_display), thread_main(NULL), app(NULL), timer(NULL), 
 		sharedDataStructure(_sharedDataStructure)
 	{
-		if (main_) thread_main = new boost::thread(boost::bind(main_,sharedDataStructure));
+		if (main_) 
+		{
+			kernel::setCurrentThreadPriority(prioMain);
+			thread_main = new boost::thread(boost::bind(main_,sharedDataStructure));
+		}
+		kernel::setCurrentThreadPriority(prioDisplay);
+		
 		int argc = 0;
 		app = new QApplication(argc, NULL);
 		//app->setQuitOnLastWindowClosed(false);

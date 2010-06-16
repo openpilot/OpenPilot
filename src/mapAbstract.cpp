@@ -88,7 +88,10 @@ namespace jafar {
 				for (RobotAbstract::SensorList::iterator senIter = robPtr->sensorList().begin(); senIter != robPtr->sensorList().end(); senIter++) {
 					sensor_ptr_t senPtr = *senIter;
 					if (senPtr != existingSenPtr){
-						observation_ptr_t obsPtr = newObservation(senPtr, lmkPtr);
+						// FIXME dynamic creation
+						int width = 11, height = 11;
+						observation_ptr_t obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint(senPtr, lmkPtr));
+//						obsPtr->setup(senPtr, lmkPtr, width, height); //todo uncomment here
 					}
 				}
 			}
@@ -124,18 +127,6 @@ namespace jafar {
 		void MapAbstract::fillRndm() {
 			randVector(x());
 			randMatrix(P());
-		}
-
-		observation_ptr_t MapAbstract::newObservation(const sensor_ptr_t & senPtr, const landmark_ptr_t & lmkPtr) {
-			// todo make obs creation dynamic with factories or switch or other.
-			obs_ph_ahp_ptr_t obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint(senPtr, lmkPtr));
-			obsPtr->id() = lmkPtr->id();
-//			obsPtr->linkToParentSensor(senPtr);
-//			obsPtr->linkToParentLandmark(lmkPtr);
-			obsPtr->linkToParentPinHole(senPtr);
-			obsPtr->linkToParentAHP(lmkPtr);
-
-			return obsPtr;
 		}
 
 

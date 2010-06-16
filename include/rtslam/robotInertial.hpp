@@ -64,6 +64,11 @@ namespace jafar {
 
 				~RobotInertial() {
 				}
+
+				virtual std::string typeName() {
+					return "Inertial";
+				}
+
 				/**
 				 * Move one step ahead.
 				 *

@@ -55,6 +55,8 @@ void test_slam01_main(world_ptr_t *world) {
 	vec4 k;
 	vec d(0), c(0);
 	k(0) = 320; k(1) = 320; k(2) = 320; k(3) = 320;
+	int patchMatchSize = 11;
+	int patchInitSize = patchMatchSize * 3;
 	// INIT : 1 map, 2 robs, 3 sens
 	//world_ptr_t worldPtr(new WorldAbstract());
 	world_ptr_t worldPtr = *world;
@@ -217,7 +219,7 @@ void test_slam01_main(world_ptr_t *world) {
 					if (asGrid.getROI(roi)){
 
 						//feature_ptr_t featPtr(new FeatureAbstract(2));
-						feat_img_pnt_ptr_t featPtr(new FeatureImagePoint);
+						feat_img_pnt_ptr_t featPtr(new FeatureImagePoint(patchInitSize,patchInitSize,CV_8U));
 						if (senPtr->getRaw()->detect(RawAbstract::HARRIS, featPtr, &roi)) {
 //							cout << "\n-------------------------------------------------- " << endl;
 //							cout << "Detected pixel: " << featPtr->state.x() << endl;
@@ -239,7 +241,7 @@ void test_slam01_main(world_ptr_t *world) {
 							obsPtr->events.measured = true;
 							vec measNoiseStd(2);
 							fillVector(measNoiseStd, 1.0);
-							obsPtr->setup(measNoiseStd, ObservationPinHoleAnchoredHomogeneousPoint::getPrior());
+							obsPtr->ObservationAbstract::setup(measNoiseStd, ObservationPinHoleAnchoredHomogeneousPoint::getPrior());
 							obsPtr->measurement.x(featPtr->state.x());
 
 							// 2d. compute and fill stochastic data for the landmark
@@ -247,7 +249,7 @@ void test_slam01_main(world_ptr_t *world) {
 
 							// 2e. Create lmk descriptor
 							vec7 globalSensorPose = senPtr->globalPose();
-							descimgpnt_ptr_t descPtr(new DescriptorImagePoint(featPtr, globalSensorPose, obsPtr));
+							desc_img_pnt_ptr_t descPtr(new DescriptorImagePoint(featPtr, globalSensorPose, obsPtr));
 							lmkPtr->setDescriptor(descPtr);
 
 							// Complete SLAM graph with all other obs

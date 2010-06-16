@@ -51,6 +51,13 @@ namespace jafar {
 				 */
 				SensorPinHole(const simulation_t dummy, const robot_ptr_t & _robPtr);
 
+				~SensorPinHole(){}
+
+				virtual std::string typeName() {
+					return "Pin-hole-camera";
+				}
+
+
 				jblas::vec2 imgSize;
 				jblas::vec4 intrinsic;
 				jblas::vec distortion;

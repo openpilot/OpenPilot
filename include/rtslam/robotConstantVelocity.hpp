@@ -69,6 +69,10 @@ namespace jafar {
 				~RobotConstantVelocity(void) {
 				}
 
+				virtual std::string typeName() {
+					return "Constant-velocity";
+				}
+
 
 				/**
 				 * Move one step ahead.

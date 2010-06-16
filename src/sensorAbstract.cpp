@@ -36,7 +36,7 @@ namespace jafar {
 			s << sen.categoryName() << " " << sen.id() << ": ";
 			if (sen.name().size() > 0)
 				s << sen.name() << ", ";
-			s << "of type " << sen.type() << std::endl;
+			s << "of type " << sen.typeName() << std::endl;
 			s << ".pose :  " << sen.pose << endl;
 			s << ".robot: [ " << sen.robot().id() << " ]";
 			if (sen.state.storage() == Gaussian::REMOTE)
@@ -50,7 +50,7 @@ namespace jafar {
 			    pose(state, Gaussian::REMOTE),
 			    ia_globalPose(inFilter == FILTERED ? ia_union(_robPtr->pose.ia(), pose.ia()) : _robPtr->pose.ia())
 		{
-			categoryName("SENSOR");
+			category = SENSOR;
 		}
 
 		SensorAbstract::SensorAbstract(const simulation_t dummy, const robot_ptr_t & _robPtr) :
@@ -58,10 +58,8 @@ namespace jafar {
 			pose(state, Gaussian::REMOTE),
 			ia_globalPose(ublasExtra::ia_set(0,0))
 		{
-			categoryName("SIMU SENSOR");
+			category = SENSOR;
 		}
-
-
 
 		/**
 		 * Process raw data.

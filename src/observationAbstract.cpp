@@ -33,7 +33,7 @@ namespace jafar {
 		 * It shows different information of the observation.
 		 */
 		std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObservationAbstract & obs) {
-			s << "OBSERVATION " << obs.id() << ": of " << obs.landmarkPtr()->type() << " from " << obs.sensorPtr()->type()
+			s << "OBSERVATION " << obs.id() << ": of " << obs.landmarkPtr()->typeName() << " from " << obs.sensorPtr()->typeName()
 			    << endl;
 			s << "Sensor: " << obs.sensorPtr()->id() << ", landmark: " << obs.landmarkPtr()->id() << endl;
 			s << " .ia_rsl: " << obs.ia_rsl << endl;
@@ -69,7 +69,6 @@ namespace jafar {
 		    LMK_prior(_lmkPtr->state.size(),_size_nonobs),
 		    LMK_rs(_lmkPtr->state.size(),_senPtr->ia_globalPose.size())
 		{
-			categoryName("OBSERVATION");
 			clearCounters();
 			clearEvents();
 		}
@@ -94,8 +93,8 @@ namespace jafar {
 		    LMK_prior(_lmkPtr->state.size(),_size_nonobs),
 		    LMK_rs(_lmkPtr->state.size(),_senPtr->ia_globalPose.size())
 		{
+	    category = OBSERVATION;
 			id(_lmkPtr->id());
-			categoryName("OBSERVATION");
 			clearCounters();
 			clearEvents();
 		}
@@ -206,6 +205,9 @@ namespace jafar {
 			ind_array ia_x = mapPtr->ia_used_states();
 			sensorPtr()->robotPtr()->mapPtr()->filterPtr->correct(ia_x,innovation,INN_rsl,ia_rsl) ;
 		}
+
+
+
 
 
 

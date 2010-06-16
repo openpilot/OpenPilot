@@ -57,6 +57,8 @@ namespace jafar {
 				app_img_pnt_ptr_t appImgPntPtr;
 				FeatureImagePoint() : FeatureAbstract(2) {
 				}
+				FeatureImagePoint(int width, int height, int depth)  : FeatureAbstract(2), appImgPntPtr(new AppearenceImagePoint(width,height,depth)) {
+				}
 				virtual ~FeatureImagePoint() {
 				}
 				void setup(double u, double v, double quality);

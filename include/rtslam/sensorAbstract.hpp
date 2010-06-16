@@ -75,6 +75,10 @@ namespace jafar {
 
 			public:
 
+			enum type_enum {
+				PINHOLE, BARRETO
+			};
+			type_enum type;
 
 				/**
 				 * Selectable LOCAL or REMOTE pose constructor.

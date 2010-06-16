@@ -22,7 +22,7 @@ namespace jafar {
 		ObservationPinHoleEuclideanPoint::ObservationPinHoleEuclideanPoint(
 		    const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr) :
 			ObservationAbstract(pinholePtr, eucPtr, 2, 1) {
-			categoryName("PINHOLE-EUC OBS");
+			type = PNT_PH_EUC;
 		}
 
 
@@ -134,7 +134,7 @@ namespace jafar {
 		}
 
 		void ObservationPinHoleEuclideanPoint::predictAppearance() {
-			descimgpnt_ptr_t descPtr = boost::static_pointer_cast<DescriptorImagePoint>(landmarkPtr()->descriptor);
+			desc_img_pnt_ptr_t descPtr = boost::static_pointer_cast<DescriptorImagePoint>(landmarkPtr()->descriptorPtr);
 			obs_ph_euc_ptr_t _this = boost::static_pointer_cast<ObservationPinHoleEuclideanPoint>(shared_from_this());
 			descPtr->predictAppearance(_this);
 		}

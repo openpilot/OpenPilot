@@ -46,11 +46,15 @@ namespace jafar {
 					FOR_SIMULATION ///< Force simulation object
 				} simulation_t;
 
+				enum category_enum { WORLD, MAP, OBJECT, MAPPABLE_OBJECT, ROBOT, SENSOR, LANDMARK, OBSERVATION, FEATURE, APPEARANCE, RAW, DATA_MANAGER};
+
 			private:
 				std::size_t id_;
-				std::string categoryName_;
-				std::string type_;
+
 				std::string name_;
+
+			protected:
+				category_enum category;
 
 			public:
 				ObjectAbstract();
@@ -59,31 +63,25 @@ namespace jafar {
 				inline void id(std::size_t _id) {
 					id_ = _id;
 				}
-				inline void type(std::string _type) {
-					type_ = _type;
-				}
 				inline void name(std::string _name) {
 					name_ = _name;
-				}
-				inline void categoryName(std::string _categoryName) {
-					categoryName_ = _categoryName;
 				}
 				inline std::size_t & id() {
 					return id_;
 				}
-				inline std::string & type() {
-					return type_;
-				}
 				inline std::string & name() {
 					return name_;
 				}
-				inline std::string & categoryName() {
-					return categoryName_;
+				virtual std::string categoryName() {
+					return "OBJECT";
 				}
-				inline void setup(const std::string & _categoryName, const size_t _id, const std::string & _type, const std::string & _name) {
-					categoryName(_categoryName);
+				virtual std::string typeName() {
+					return "Undefined";
+				}
+
+				inline void setup(const category_enum & _category, const size_t _id, const std::string & _name) {
+					category = _category;
 					id(_id);
-					type(_type);
 					name(_name);
 				}
 				inline void setup(const size_t _id, const std::string & _name) {

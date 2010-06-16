@@ -24,7 +24,7 @@ namespace jafar {
 	namespace rtslam {
 
 		class DescriptorImagePoint;
-		typedef boost::shared_ptr<DescriptorImagePoint> descimgpnt_ptr_t;
+		typedef boost::shared_ptr<DescriptorImagePoint> desc_img_pnt_ptr_t;
 
 		class DescriptorImagePoint: public jafar::rtslam::DescriptorAbstract {
 			public:
@@ -36,6 +36,11 @@ namespace jafar {
 				DescriptorImagePoint(const feat_img_pnt_ptr_t & featImgPntPtr_,
 				    const jblas::vec7 & senPoseInit_, const observation_ptr_t & obsInitPtr_);
 				virtual ~DescriptorImagePoint();
+
+				virtual std::string typeName() {
+					return "Image point";
+				}
+
 
 				/**
 				 * Predict appearance.

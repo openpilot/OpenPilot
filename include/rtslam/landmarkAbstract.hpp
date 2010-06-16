@@ -80,6 +80,11 @@ namespace jafar {
 				virtual ~LandmarkAbstract() {
 				}
 
+				virtual std::string categoryName() {
+					return "LANDMARK";
+				}
+
+
 				static IdFactory landmarkIds;
 
 				enum geometry_t {
@@ -88,6 +93,12 @@ namespace jafar {
 						PLANE,
 						ELLIPSE
 				} ;
+
+				enum type_enum{
+						PNT_EUC, PNT_AH
+				};
+				type_enum type;
+
 
 
 			protected:
@@ -101,9 +112,9 @@ namespace jafar {
 				- for the other types, we need to construct a new landmark, but without any map, is it possible ?
 				*/
 
-				descriptor_ptr_t descriptor; ///<                       Landmark descriptor
+				descriptor_ptr_t descriptorPtr; ///< Landmark descriptor
 
-				jblas::mat LNEW_lmk; //Jacobian comming from reparametrisation of old lmk wrt. new lmk
+				jblas::mat LNEW_lmk; ///<Jacobian comming from reparametrisation of old lmk wrt. new lmk
 
 				//Reparametrize old Landmarks into new ones
 				void reparametrize();
@@ -123,7 +134,7 @@ namespace jafar {
 				// Create a landmark descriptor
 				virtual void setDescriptor(const descriptor_ptr_t & descPtr)
 				{
-					descriptor = descPtr;
+					descriptorPtr = descPtr;
 				}
 //				{
 //					this->descriptor = desc_ptr_t (new DescriptorAbstract()) ;

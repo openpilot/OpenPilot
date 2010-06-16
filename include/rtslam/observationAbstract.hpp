@@ -94,6 +94,18 @@ namespace jafar {
 
 			public:
 
+			enum type_enum {
+				PNT_PH_EUC, ///< Pin hole Euclidean point
+				PNT_PH_AH ///< Pin hole Anchored homogeneous point
+			};
+
+			type_enum type;
+
+			virtual std::string categoryName() {
+				return "OBSERVATION";
+			}
+
+
 
 				/**
 				 * Size constructor

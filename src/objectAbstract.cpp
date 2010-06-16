@@ -27,12 +27,12 @@ namespace jafar {
 			s << obj.categoryName() << " " << obj.id() << ": ";
 			if (obj.name().size() > 0)
 				s << obj.name() << ", ";
-			s << "of type " << obj.type();
+			s << "of type " << obj.typeName();
 			return s;
 		}
 
 		ObjectAbstract::ObjectAbstract() :
-			id_(0), categoryName_("OBJECT") {
+			id_(0), category(OBJECT) {
 		}
 
 	}

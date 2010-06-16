@@ -23,13 +23,13 @@ namespace jafar {
 		LandmarkAnchoredHomogeneousPoint::LandmarkAnchoredHomogeneousPoint(const map_ptr_t & mapPtr) :
 			LandmarkAbstract(mapPtr, 7) {
 			geomType = POINT,
-			type("AHP");
+			type = PNT_AH;
 		}
 
 		LandmarkAnchoredHomogeneousPoint::LandmarkAnchoredHomogeneousPoint(const simulation_t dummy, const map_ptr_t & mapPtr) :
 			LandmarkAbstract(FOR_SIMULATION, mapPtr, 7) {
 			geomType = POINT,
-			type("AHP");
+			type = PNT_AH;
 		}
 
 	} // namespace rtslam

@@ -37,7 +37,7 @@ namespace jafar {
 			// Build constant perturbation Jacobian
 			constantPerturbation = true;
 			computePertJacobian();
-			type("Constant-Velocity");
+			type = CONSTANT_VELOCITY;
 		}
 
 		RobotConstantVelocity::RobotConstantVelocity(const simulation_t dummy,
@@ -48,7 +48,7 @@ namespace jafar {
 			// Build constant perturbation Jacobian
 			constantPerturbation = true;
 			computePertJacobian();
-			type("Constant-Velocity");
+			type = CONSTANT_VELOCITY;
 		}
 
 		void RobotConstantVelocity::move_func(const vec & _x, const vec & _u,

@@ -27,7 +27,7 @@ namespace jafar {
 			s << obj.categoryName() << " " << obj.id() << ": ";
 			if (obj.name().size() > 0)
 				s << obj.name() << ", ";
-			s << "of type " << obj.type() << endl;
+			s << "of type " << obj.typeName() << endl;
 			s << ".state:  " << obj.state;
 			return s;
 		}
@@ -40,7 +40,7 @@ namespace jafar {
 			ObjectAbstract(),
 			state(inFilter == FILTERED ? Gaussian(_mapPtr->x(), _mapPtr->P(), _mapPtr->reserveStates(_size)) : _size)
 		{
-			categoryName("MAP OBJECT");
+				category = MAPPABLE_OBJECT;
 		}
 
 

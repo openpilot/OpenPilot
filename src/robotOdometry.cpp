@@ -35,7 +35,7 @@ namespace jafar {
 			              RobotOdometry::size_control(),
 			              RobotOdometry::size_perturbation()) {
 			constantPerturbation = false;
-			type("Odometry");
+			type = ODOMETRY;
 		}
 
 		RobotOdometry::RobotOdometry(const simulation_t dummy,
@@ -44,7 +44,7 @@ namespace jafar {
 			              RobotOdometry::size_control(),
 			              RobotOdometry::size_perturbation()) {
 			constantPerturbation = true;
-			type("Odometry");
+			type = ODOMETRY;
 		}
 
 		void RobotOdometry::move_func(const vec & _x, const vec & _u,

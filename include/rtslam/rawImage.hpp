@@ -36,6 +36,8 @@ namespace jafar {
 			public:
 				RawImage();
 				~RawImage(){}
+
+
 				jafarImage_ptr_t img;
 				QuickHarrisDetector quickHarrisDetector;
 

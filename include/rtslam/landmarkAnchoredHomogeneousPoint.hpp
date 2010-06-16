@@ -44,6 +44,11 @@ namespace jafar {
 				virtual ~LandmarkAnchoredHomogeneousPoint() {
 				}
 
+				virtual std::string typeName() {
+					return "Anchored homogeneous point";
+				}
+
+
 				virtual landmark_ptr_t convertToStandardParametrization()
 				{
 					// TODO
@@ -56,6 +61,8 @@ namespace jafar {
 				static size_t size(void) {
 					return 7;
 				}
+
+
 
 				virtual size_t mySize() {return size();}
 

@@ -46,6 +46,11 @@ namespace jafar {
 				virtual ~LandmarkEuclideanPoint() {
 				}
 				
+				virtual std::string typeName() {
+					return "Euclidean point";
+				}
+
+
 				virtual landmark_ptr_t convertToStandardParametrization()
 				{
 					// TODO

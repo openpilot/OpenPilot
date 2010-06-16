@@ -28,7 +28,14 @@ namespace jafar {
 		ObservationPinHoleAnchoredHomogeneousPoint::ObservationPinHoleAnchoredHomogeneousPoint(
 		    const sensor_ptr_t & pinholePtr, const landmark_ptr_t & ahpPtr) :
 			ObservationAbstract(pinholePtr, ahpPtr, 2, 1) {
-			categoryName("PINHOLE-AHP OBS");
+			type = PNT_PH_AH;
+		}
+
+		void ObservationPinHoleAnchoredHomogeneousPoint::setup(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & ahpPtr)
+		{
+			id() = ahpPtr->id();
+			linkToParentPinHole(pinholePtr);
+			linkToParentAHP(ahpPtr);
 		}
 
 
@@ -148,9 +155,14 @@ namespace jafar {
 		}
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::predictAppearance() {
-			descimgpnt_ptr_t descPtr = boost::static_pointer_cast<DescriptorImagePoint>(landmarkPtr()->descriptor);
+			cout << __FILE__ << ":" << __LINE__ << endl;
+
+			desc_img_pnt_ptr_t descPtr = boost::static_pointer_cast<DescriptorImagePoint>(landmarkPtr()->descriptorPtr);
+			cout << __FILE__ << ":" << __LINE__ << endl;
 			obs_ph_ahp_ptr_t _this = boost::static_pointer_cast<ObservationPinHoleAnchoredHomogeneousPoint>(shared_from_this());
+			cout << __FILE__ << ":" << __LINE__ << endl;
 			descPtr->predictAppearance(_this);
+			cout << __FILE__ << ":" << __LINE__ << endl;
 		}
 
 		/**

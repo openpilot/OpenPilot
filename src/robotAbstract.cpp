@@ -31,7 +31,7 @@ namespace jafar {
 			s << rob.categoryName() << " " << rob.id() << ": ";
 			if (rob.name().size() > 0)
 				s << rob.name() << ", ";
-			s << "of type " << rob.type() << endl;
+			s << "of type " << rob.typeName() << endl;
 			s << ".state:  " << rob.state << endl;
 			s << ".pose :  " << rob.pose << endl;
 			s << ".sens : [";
@@ -56,7 +56,7 @@ namespace jafar {
 			Q(_size_state, _size_state)
 		{
 			constantPerturbation = false;
-			categoryName("ROBOT"); // robot is categorized
+			category = ROBOT;
 		}
 
 		RobotAbstract::RobotAbstract(const simulation_t dummy, const map_ptr_t & _mapPtr, const size_t _size_state, const size_t _size_control, const size_t _size_pert) :
@@ -69,7 +69,7 @@ namespace jafar {
 			Q(_size_state, _size_state)
 		{
 			constantPerturbation = true;
-			categoryName("SIMU ROBOT"); // robot is categorized
+			category = ROBOT;
 		}
 
 

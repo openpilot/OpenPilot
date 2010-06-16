@@ -48,18 +48,14 @@ namespace jafar {
 
 
 		void RawImage::extractAppearance(const jblas::veci & pos, const jblas::veci & size, appearance_ptr_t & appPtr){
-			Image dst(size(0), size(1), img->depth(), JfrImage_CS_GRAY);
+			Image newPatch(size(0), size(1), img->depth(), JfrImage_CS_GRAY);
 			int shift_x = (size(0)-1)/2;
 			int shift_y = (size(1)-1)/2;
 			int x_src = pos(0)-shift_x;
 			int y_src = pos(1)-shift_y;
+			img->copy(newPatch, x_src, y_src, 0, 0, size(0), size(1));
 
-			img->copy(dst, x_src, y_src, 0, 0, size(0), size(1));
-
-			app_img_pnt_ptr_t appImgPtr(new AppearenceImagePoint(dst));
-//			cout << "patch sum: " << appImgPtr->patchSum << "; squareSum: " << appImgPtr->patchSquareSum << endl;
-			appPtr = appImgPtr;
-
+			appPtr.reset(new AppearenceImagePoint(newPatch));
 		}
 
 		bool RawImage::detect(const detect_method met, const feature_ptr_t & featPtr,
@@ -78,7 +74,8 @@ namespace jafar {
 						// get patch and construct feature
 						vec pix(2);
 						pix = featPntPtr->state.x();
-						veci size(2); size(0) = 45, size(1) = 45;
+						veci size(2);
+						size(0) = 45, size(1) = 45;
 						extractAppearance(pix, size, featPntPtr->appearancePtr);
 
 						return true;

@@ -66,6 +66,11 @@ namespace jafar {
 
 			public:
 
+				enum type_enum {
+					ODOMETRY, CONSTANT_VELOCITY, INERTIAL
+				};
+				type_enum type;
+
 
 				// define the function linkToParentMap().
 				ENABLE_LINK_TO_PARENT(MapAbstract,Map,RobotAbstract)
@@ -101,6 +106,11 @@ namespace jafar {
 				// Mandatory virtual destructor.
 				virtual ~RobotAbstract() {
 				}
+
+				virtual std::string categoryName() {
+					return "ROBOT";
+				}
+
 
 				static IdFactory robotIds;
 

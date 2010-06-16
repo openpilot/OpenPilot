@@ -64,6 +64,11 @@ namespace jafar {
 
 				virtual ~RawAbstract();
 
+				virtual std::string categoryName() {
+					return "RAW";
+				}
+
+
 				virtual bool detect(const detect_method met, const feature_ptr_t & featPtr, jafar::image::ROI* roiPtr = 0) = 0;
 				virtual bool match(const match_method met, const appearance_ptr_t & targetApp, cv::Rect &roi, Measurement & measure, const appearance_ptr_t & app) = 0;
 

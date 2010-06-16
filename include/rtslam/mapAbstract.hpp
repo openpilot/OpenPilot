@@ -75,6 +75,11 @@ namespace jafar {
 				virtual ~MapAbstract() {
 				}
 
+				virtual std::string categoryName() {
+					return "MAP";
+				}
+
+
 
 				/**
 				 * EKF engine

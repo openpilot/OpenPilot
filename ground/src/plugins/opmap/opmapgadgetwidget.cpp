@@ -45,17 +45,17 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
     map = NULL;
- //   map = new mapcontrol::OPMapWidget();
- //   map->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
- //   map->setMinimumSize(64, 64);
+    map = new mapcontrol::OPMapWidget();
+    map->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    map->setMinimumSize(64, 64);
 
     PositionActual::DataFields data = m_positionActual->getData();  // get current position data
 
- //  QVBoxLayout *layout = new QVBoxLayout;
- //   layout->setSpacing(0);
- //   layout->setContentsMargins(0, 0, 0, 0);
- //   layout->addWidget(map);
- //   setLayout(layout);
+   QVBoxLayout *layout = new QVBoxLayout;
+    layout->setSpacing(0);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addWidget(map);
+    setLayout(layout);
 
 //    m_updateTimer = new QTimer();
 //    m_updateTimer->setInterval(250);

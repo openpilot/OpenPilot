@@ -97,9 +97,9 @@ plugin_systemhealth.depends = plugin_uavobjects
 SUBDIRS += plugin_systemhealth
 
 #Config Gadget
-plugin_config.subdir = config
-plugin_config.depends = plugin_coreplugin
-SUBDIRS += plugin_config
+#plugin_config.subdir = config
+#plugin_config.depends = plugin_coreplugin
+#SUBDIRS += plugin_config
 
 #HITL simulation Gadget
 plugin_hitl.subdir = hitl

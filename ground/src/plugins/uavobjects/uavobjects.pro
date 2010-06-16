@@ -31,7 +31,7 @@ HEADERS += uavobjects_global.h \
     actuatorsettings.h \
     actuatordesired.h \
     actuatorcommand.h \
-    positionactual.h \
+    positionactual.h
 #    flightbatterystate.h
 SOURCES += uavobject.cpp \
     uavmetaobject.cpp \
@@ -60,6 +60,6 @@ SOURCES += uavobject.cpp \
     actuatorsettings.cpp \
     actuatordesired.cpp \
     actuatorcommand.cpp \
-    positionactual.cpp \
+    positionactual.cpp
 #    flightbatterystate.cpp
 OTHER_FILES += UAVObjects.pluginspec

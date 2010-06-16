@@ -70,7 +70,7 @@ private:
 
     double heading;	// compass/uav heading
 
-   MapControl *m_mc;
+   qmapcontrol::MapControl *m_mc;
 
    MapAdapter *m_osmAdapter;
    MapAdapter *m_googleAdapter;

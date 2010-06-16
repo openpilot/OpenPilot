@@ -57,7 +57,7 @@ MapGadgetWidget::MapGadgetWidget(QWidget *parent) : QWidget(parent)
     UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
     m_positionActual = PositionActual::GetInstance(objManager);
 
-    m_mc = new MapControl(QSize(size, size));
+    m_mc = new qmapcontrol::MapControl(QSize(size, size));
 
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
@@ -102,15 +102,15 @@ MapGadgetWidget::MapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     heading = data.Heading;
 
-    addCompass(QPointF(100, 100), 200);
+//    addCompass(QPointF(100, 100), 200);
 
     // create and add the GCS icon
-    gcsPoint = new ImagePoint(data.Longitude, data.Latitude, &gcs_pixmap, "GSC", Point::Middle);
+    gcsPoint = new ImagePoint(data.Longitude, data.Latitude, &gcs_pixmap, "GSC", qmapcontrol::Point::Middle);
     m_positionLayer->addGeometry(gcsPoint);
     connect(gcsPoint, SIGNAL(geometryClicked(Geometry*, QPoint)), this, SLOT(gcs_uav_ClickEvent(Geometry*, QPoint)));
 
     // create and add the UAV icon
-    uavPoint = new ImagePoint(data.Longitude, data.Latitude, &uav_pixmap, "UAV", Point::Middle);
+    uavPoint = new ImagePoint(data.Longitude, data.Latitude, &uav_pixmap, "UAV", qmapcontrol::Point::Middle);
     m_positionLayer->addGeometry(uavPoint);
     connect(uavPoint, SIGNAL(geometryClicked(Geometry*, QPoint)), this, SLOT(gcs_uav_ClickEvent(Geometry*, QPoint)));
 

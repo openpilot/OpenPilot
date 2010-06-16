@@ -25,7 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "opmapplugin.h"
-//#include "opmapgadgetfactory.h"
+#include "opmapgadgetfactory.h"
 #include <QtPlugin>
 #include <QStringList>
 #include <extensionsystem/pluginmanager.h>
@@ -45,8 +45,8 @@ bool OPMapPlugin::initialize(const QStringList& args, QString *errMsg)
    Q_UNUSED(args);
    Q_UNUSED(errMsg);
 
-//   mf = new OPMapGadgetFactory(this);
-//   addAutoReleasedObject(mf);
+   mf = new OPMapGadgetFactory(this);
+   addAutoReleasedObject(mf);
 
    return true;
 }

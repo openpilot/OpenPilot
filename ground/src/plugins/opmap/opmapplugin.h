@@ -30,7 +30,7 @@
 
 #include <extensionsystem/iplugin.h>
 
-//class OPMapGadgetFactory;
+class OPMapGadgetFactory;
 
 class OPMapPlugin : public ExtensionSystem::IPlugin
 {
@@ -42,6 +42,6 @@ public:
    bool initialize(const QStringList & arguments, QString * errorString);
    void shutdown();
 private:
-//   OPMapGadgetFactory *mf;
+   OPMapGadgetFactory *mf;
 };
 #endif /* OPMAP_PLUGIN_H_ */

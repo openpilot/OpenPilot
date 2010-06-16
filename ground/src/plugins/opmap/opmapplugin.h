@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       map2plugin.h
+ * @file       opmapplugin.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   map2
+ * @defgroup   opmap
  * @{
  *
  *****************************************************************************/
@@ -25,23 +25,23 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef MAP2_PLUGIN_H_
-#define MAP2_PLUGIN_H_
+#ifndef OPMAP_PLUGIN_H_
+#define OPMAP_PLUGIN_H_
 
 #include <extensionsystem/iplugin.h>
 
-//class Map2GadgetFactory;
+//class OPMapGadgetFactory;
 
-class Map2Plugin : public ExtensionSystem::IPlugin
+class OPMapPlugin : public ExtensionSystem::IPlugin
 {
 public:
-    Map2Plugin();
-    ~Map2Plugin();
+    OPMapPlugin();
+    ~OPMapPlugin();
 
    void extensionsInitialized();
    bool initialize(const QStringList & arguments, QString * errorString);
    void shutdown();
 private:
-//   Map2GadgetFactory *mf;
+//   OPMapGadgetFactory *mf;
 };
-#endif /* MAP2_PLUGIN_H_ */
+#endif /* OPMAP_PLUGIN_H_ */

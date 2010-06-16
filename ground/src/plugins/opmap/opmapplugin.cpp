@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       map2plugin.cpp
+ * @file       opmapplugin.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   map2
+ * @defgroup   opmap
  * @{
  *
  *****************************************************************************/
@@ -24,40 +24,40 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include "map2plugin.h"
-//#include "map2gadgetfactory.h"
+#include "opmapplugin.h"
+//#include "opmapgadgetfactory.h"
 #include <QtPlugin>
 #include <QStringList>
 #include <extensionsystem/pluginmanager.h>
 
-Map2Plugin::Map2Plugin()
+OPMapPlugin::OPMapPlugin()
 {
    // Do nothing
 }
 
-Map2Plugin::~Map2Plugin()
+OPMapPlugin::~OPMapPlugin()
 {
    // Do nothing
 }
 
-bool Map2Plugin::initialize(const QStringList& args, QString *errMsg)
+bool OPMapPlugin::initialize(const QStringList& args, QString *errMsg)
 {
    Q_UNUSED(args);
    Q_UNUSED(errMsg);
 
-//   mf = new Map2GadgetFactory(this);
+//   mf = new OPMapGadgetFactory(this);
 //   addAutoReleasedObject(mf);
 
    return true;
 }
 
-void Map2Plugin::extensionsInitialized()
+void OPMapPlugin::extensionsInitialized()
 {
    // Do nothing
 }
 
-void Map2Plugin::shutdown()
+void OPMapPlugin::shutdown()
 {
    // Do nothing
 }
-Q_EXPORT_PLUGIN(Map2Plugin)
+Q_EXPORT_PLUGIN(OPMapPlugin)

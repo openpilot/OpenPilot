@@ -50,11 +50,11 @@ plugin_map.depends = plugin_coreplugin
 plugin_map.depends = plugin_uavobjects
 SUBDIRS += plugin_map
 
-# Map2 UAVGadget
-plugin_map2.subdir = map2
-plugin_map2.depends = plugin_coreplugin
-plugin_map2.depends = plugin_uavobjects
-SUBDIRS += plugin_map2
+# OPMap UAVGadget
+plugin_opmap.subdir = opmap
+plugin_opmap.depends = plugin_coreplugin
+plugin_opmap.depends = plugin_uavobjects
+SUBDIRS += plugin_opmap
 
 # Scope UAVGadget
 plugin_scope.subdir = scope

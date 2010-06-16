@@ -59,6 +59,7 @@ SUBDIRS += plugin_opmap
 # Scope UAVGadget
 plugin_scope.subdir = scope
 plugin_scope.depends = plugin_coreplugin
+plugin_scope.depends = plugin_uavobjects
 SUBDIRS += plugin_scope
 
 # UAVObject Browser Gadget

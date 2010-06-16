@@ -1,7 +1,7 @@
 <RCC>
-    <qresource prefix="/map2">
-        <file>images/waypoint.png</file>
-        <file>images/uav.png</file>
+    <qresource prefix="/opmap">
         <file>images/gcs.png</file>
+        <file>images/uav.png</file>
+        <file>images/waypoint.png</file>
     </qresource>
 </RCC>

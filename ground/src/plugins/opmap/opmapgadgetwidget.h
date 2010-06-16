@@ -48,12 +48,12 @@ public:
    void setMapProvider(QString provider);
 
 public slots:
-//    void gcsButtonClick();		// added by cathy
-//    void uavButtonClick(bool checked);  // added by cathy
+//    void gcsButtonClick();
+//    void uavButtonClick(bool checked);
 
 protected:
     void resizeEvent(QResizeEvent *event);
-    void keyPressEvent(QKeyEvent* event);	// added by cathy
+    void keyPressEvent(QKeyEvent* event);
 
 private slots:
    void updatePosition();

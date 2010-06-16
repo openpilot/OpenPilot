@@ -43,7 +43,7 @@ OPMapGadgetFactory::~OPMapGadgetFactory()
 Core::IUAVGadget* OPMapGadgetFactory::createGadget(QWidget *parent)
 {
     OPMapGadgetWidget* gadgetWidget = new OPMapGadgetWidget(parent);
-    return new OPMapGadget(QString("MapGadget"), gadgetWidget, parent);
+    return new OPMapGadget(QString("OPMapGadget"), gadgetWidget, parent);
 }
 
 IUAVGadgetConfiguration *OPMapGadgetFactory::createConfiguration(const QByteArray &state)

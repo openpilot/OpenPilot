@@ -45,17 +45,17 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
     map = NULL;
-//    map = new mapcontrol::OPMapWidget();
-//    map->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-//    map->setMinimumSize(64, 64);
+ //   map = new mapcontrol::OPMapWidget();
+ //   map->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+ //   map->setMinimumSize(64, 64);
 
     PositionActual::DataFields data = m_positionActual->getData();  // get current position data
 
-//   QVBoxLayout *layout = new QVBoxLayout;
-//    layout->setSpacing(0);
-//    layout->setContentsMargins(0, 0, 0, 0);
-//    layout->addWidget(map);
-//    setLayout(layout);
+ //  QVBoxLayout *layout = new QVBoxLayout;
+ //   layout->setSpacing(0);
+ //   layout->setContentsMargins(0, 0, 0, 0);
+ //   layout->addWidget(map);
+ //   setLayout(layout);
 
 //    m_updateTimer = new QTimer();
 //    m_updateTimer->setInterval(250);
@@ -76,19 +76,28 @@ OPMapGadgetWidget::~OPMapGadgetWidget()
 
 void OPMapGadgetWidget::setZoom(int value)
 {
+    if (map)
+    {
 //    map->setZoom(value);
 //    map->updateRequestNew();
+    }
 }
 
 void OPMapGadgetWidget::setPosition(QPointF pos)
 {
+    if (map)
+    {
 //    map->setView(pos);
 //    map->updateRequestNew();
+    }
 }
 
 void OPMapGadgetWidget::setMapProvider(QString provider)
 {
+    if (map)
+    {
 //  map->
+    }
 }
 
 // *************************************************************************************
@@ -107,7 +116,7 @@ void OPMapGadgetWidget::updatePosition()
 
 void OPMapGadgetWidget::resizeEvent(QResizeEvent *event)
 {
-//    map->resize(QSize(width(), height()));
+    if (map) map->resize(QSize(width(), height()));
     update();
     QWidget::resizeEvent(event);
 }

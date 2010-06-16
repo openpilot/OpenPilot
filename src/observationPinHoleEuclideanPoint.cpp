@@ -10,6 +10,7 @@
 #include "rtslam/pinholeTools.hpp"
 #include "rtslam/landmarkEuclideanPoint.hpp"
 #include "rtslam/observationPinHoleEuclideanPoint.hpp"
+#include "rtslam/descriptorImagePoint.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -133,7 +134,9 @@ namespace jafar {
 		}
 
 		void ObservationPinHoleEuclideanPoint::predictAppearance() {
-			// TODO implement predict appearance
+			descimgpnt_ptr_t descPtr = boost::static_pointer_cast<DescriptorImagePoint>(landmarkPtr()->descriptor);
+			obs_ph_euc_ptr_t _this = boost::static_pointer_cast<ObservationPinHoleEuclideanPoint>(shared_from_this());
+			descPtr->predictAppearance(_this);
 		}
 
 		/**

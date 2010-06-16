@@ -16,7 +16,7 @@ namespace jafar {
 		using namespace jblas;
 		using namespace quaternion;
 
-		DescriptorImagePoint::DescriptorImagePoint(const feat_img_pnt_ptr_t & featImgPntPtr_, const vec7 & senPoseInit_, observation_ptr_t & obsInitPtr_):
+		DescriptorImagePoint::DescriptorImagePoint(const feat_img_pnt_ptr_t & featImgPntPtr_, const vec7 & senPoseInit_, const observation_ptr_t & obsInitPtr_):
 			DescriptorAbstract(), senPoseInit(senPoseInit_), obsInitPtr(obsInitPtr_), featImgPntPtr(featImgPntPtr_)
 		{
 			// TODO Auto-generated constructor stub
@@ -27,11 +27,11 @@ namespace jafar {
 		}
 
 
-		bool DescriptorImagePoint::predictAppearance(obs_ph_euc_ptr_t & obsPtrNew)
+		bool DescriptorImagePoint::predictAppearance(const obs_ph_euc_ptr_t & obsPtrNew)
 		{
 			return predictAppearance_img_pt(obsPtrNew);
 		}
-		bool DescriptorImagePoint::predictAppearance(obs_ph_ahp_ptr_t & obsPtrNew)
+		bool DescriptorImagePoint::predictAppearance(const obs_ph_ahp_ptr_t & obsPtrNew)
 		{
 			return predictAppearance_img_pt(obsPtrNew);
 		}

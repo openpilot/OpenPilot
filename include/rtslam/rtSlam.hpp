@@ -53,7 +53,7 @@ namespace jafar {
 		typedef boost::shared_ptr<FeatureAbstract>     feature_ptr_t;
 		typedef boost::shared_ptr<RawAbstract>         raw_ptr_t;
 		typedef boost::shared_ptr<AppearanceAbstract>  appearance_ptr_t;
-		typedef boost::shared_ptr<DescriptorAbstract>  desc_ptr_t;
+		typedef boost::shared_ptr<DescriptorAbstract>  descriptor_ptr_t;
 
 		typedef boost::shared_ptr<Gaussian>						gaussian_ptr_t;
 		typedef boost::shared_ptr<ExtendedKalmanFilterIndirect> ekfInd_ptr_t;

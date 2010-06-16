@@ -33,6 +33,7 @@
 #include "rtslam/activeSearch.hpp"
 #include "rtslam/featureAbstract.hpp"
 #include "rtslam/rawImage.hpp"
+#include "rtslam/descriptorImagePoint.hpp"
 
 #include "rtslam/display_qt.hpp"
 //#include "image/Image.hpp"
@@ -177,9 +178,11 @@ void test_slam01_main(world_ptr_t *world) {
 						obsPtr->predictAppearance();
 
 						// 1d. search appearence in raw
-						obsPtr->matchFeature(senPtr->getRaw()) ;
+						//obsPtr->matchFeature(senPtr->getRaw()) ;
+						cv::Rect roi(10,10,100,100); // TODO set with ellipse bounding box
+						senPtr->getRaw()->match(RawAbstract::ZNCC, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
 
-						// 1e. if feature is find
+						// 1e. if feature is found
 						if (obsPtr->getMatchScore()>0.80) {
 							obsPtr->counters.nMatch++;
 							obsPtr->events.matched = true;
@@ -213,7 +216,8 @@ void test_slam01_main(world_ptr_t *world) {
 					ROI roi;
 					if (asGrid.getROI(roi)){
 
-						feature_ptr_t featPtr(new FeatureAbstract(2));
+						//feature_ptr_t featPtr(new FeatureAbstract(2));
+						feat_img_pnt_ptr_t featPtr(new FeatureImagePoint);
 						if (senPtr->getRaw()->detect(RawAbstract::HARRIS, featPtr, &roi)) {
 //							cout << "\n-------------------------------------------------- " << endl;
 //							cout << "Detected pixel: " << featPtr->state.x() << endl;
@@ -243,7 +247,8 @@ void test_slam01_main(world_ptr_t *world) {
 
 							// 2e. Create lmk descriptor
 							vec7 globalSensorPose = senPtr->globalPose();
-							lmkPtr->createDescriptor(featPtr->appearancePtr, globalSensorPose);
+							descimgpnt_ptr_t descPtr(new DescriptorImagePoint(featPtr, globalSensorPose, obsPtr));
+							lmkPtr->setDescriptor(descPtr);
 
 							// Complete SLAM graph with all other obs
 							mapPtr->completeObservationsInGraph(senPtr, lmkPtr);

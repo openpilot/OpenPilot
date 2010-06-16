@@ -19,6 +19,8 @@
 #include "rtslam/featurePoint.hpp"
 #include "rtslam/appearanceImage.hpp"
 
+#include "correl/explorer.hpp"
+
 namespace jafar {
 	namespace rtslam {
 		using namespace std;
@@ -60,17 +62,18 @@ namespace jafar {
 
 		}
 
-		bool RawImage::detect(const detect_method met, feature_ptr_t & featPtr,
+		bool RawImage::detect(const detect_method met, const feature_ptr_t & featPtr,
 		    ROI* roiPtr) {
 
 			switch (met) {
 				case HARRIS: {
 
-					feat_img_pnt_ptr_t featPntPtr(new FeatureImagePoint);
+					//feat_img_pnt_ptr_t featPntPtr(new FeatureImagePoint);
+					feat_img_pnt_ptr_t featPntPtr = boost::dynamic_pointer_cast<FeatureImagePoint>(featPtr);
 
 					if (quickHarrisDetector.detectIn(*(img.get()), featPntPtr, roiPtr)) {
 
-						featPtr = featPntPtr;
+						//featPtr = featPntPtr;
 
 						// get patch and construct feature
 						vec pix(2);
@@ -86,9 +89,31 @@ namespace jafar {
 				}
 					break;
 				default:
-					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_DETECTION_METHOD, "Unrecognized or inexistent feature detection method.")
-					;
-					break;
+					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_DETECTION_METHOD, "Unrecognized or inexistent feature detection method.");
+					return false;
+			}
+		}
+		
+		bool RawImage::match(const match_method met, const appearance_ptr_t & targetApp, cv::Rect &roi, Measurement & measure, const appearance_ptr_t & app)
+		{
+			switch (met) {
+				case ZNCC: {
+					app_img_pnt_ptr_t targetAppImg = boost::dynamic_pointer_cast<AppearenceImagePoint>(targetApp);
+					app_img_pnt_ptr_t appImg = boost::dynamic_pointer_cast<AppearenceImagePoint>(app);
+					
+					measure.matchScore = correl::Explorer<correl::Zncc>::exploreTranslation(targetAppImg->patch, *img, roi.x, roi.y, 1, roi.x+roi.width-1, roi.y+roi.height-1, 1, measure.x()(0), measure.x()(1));
+			
+					measure.P()(0,0) = measure.P()(1,1) = 1.0;
+					measure.P()(1,0) = measure.P()(0,1) = 0.0;
+					
+					// TODO set appearance
+					//app = img->copy(appImg->patch, measure.x()(0), measure.x()(1));
+			
+					return true;
+				}
+				default:
+					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_MATCHING_METHOD, "Unrecognized or inexistent feature matching method.");
+					return false;
 			}
 		}
 

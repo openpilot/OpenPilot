@@ -39,7 +39,8 @@
 #include "image/roi.hpp"
 
 #include "rtslam/objectAbstract.hpp"
-
+#include "rtslam/measurement.hpp"
+#include <cv.h> // opencv 
 
 namespace jafar {
 	namespace rtslam {
@@ -57,10 +58,14 @@ namespace jafar {
 				enum detect_method {
 					HARRIS ///< Harris corner detector.
 				};
+				enum match_method {
+					ZNCC ///< Zncc matching algorithm
+				};
 
 				virtual ~RawAbstract();
 
-				virtual bool detect(const detect_method met, feature_ptr_t & featPtr, jafar::image::ROI* roiPtr = 0) = 0;
+				virtual bool detect(const detect_method met, const feature_ptr_t & featPtr, jafar::image::ROI* roiPtr = 0) = 0;
+				virtual bool match(const match_method met, const appearance_ptr_t & targetApp, cv::Rect &roi, Measurement & measure, const appearance_ptr_t & app) = 0;
 
 				virtual void extractAppearance(const jblas::veci & pos, const jblas::veci & size, appearance_ptr_t & appPtr) = 0;
 

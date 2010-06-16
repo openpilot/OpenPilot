@@ -34,15 +34,15 @@ namespace jafar {
 
 			public:
 				DescriptorImagePoint(const feat_img_pnt_ptr_t & featImgPntPtr_,
-				    const jblas::vec7 & senPoseInit_, observation_ptr_t & obsInitPtr_);
+				    const jblas::vec7 & senPoseInit_, const observation_ptr_t & obsInitPtr_);
 				virtual ~DescriptorImagePoint();
 
 				/**
 				 * Predict appearance.
 				 * \param obsPtrNew pointer to the new observation model
 				 */
-				bool predictAppearance(obs_ph_euc_ptr_t & obsPtrNew);
-				bool predictAppearance(obs_ph_ahp_ptr_t & obsPtrNew);
+				bool predictAppearance(const obs_ph_euc_ptr_t & obsPtrNew);
+				bool predictAppearance(const obs_ph_ahp_ptr_t & obsPtrNew);
 			protected:
 				bool predictAppearance_img_pt(const observation_ptr_t & obsPtrNew);
 

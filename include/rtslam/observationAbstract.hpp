@@ -306,7 +306,6 @@ namespace jafar {
 					}
 
 				void update() ;
-
 		};
 
 	}

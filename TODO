@@ -8,6 +8,8 @@ Features
 - feature appearance prediction
 - Adapt ActiveSearchGrid and QuickHarrisDetector to the new ROI specifications in module image
 
+- factories
+- sensors hardware
 
 Organization
 ------------------------------------

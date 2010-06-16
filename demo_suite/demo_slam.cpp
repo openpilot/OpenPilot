@@ -29,7 +29,7 @@
 #include "rtslam/sensorPinHole.hpp"
 #include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
 #include "rtslam/landmarkEuclideanPoint.hpp"
-#include "rtslam/observationPinHoleAnchoredHomogeneous.hpp"
+//#include "rtslam/observationFactory.hpp"
 #include "rtslam/activeSearch.hpp"
 #include "rtslam/featureAbstract.hpp"
 #include "rtslam/rawImage.hpp"

@@ -37,11 +37,10 @@
 #include "attitudeactual.h"
 #include "attitudedesired.h"
 #include "attitudesettings.h"
-#include "flightbatterystate.h"
+//#include "flightbatterystate.h"
 #include "exampleobject1.h"
 #include "exampleobject2.h"
 #include "examplesettings.h"
-#include "flightbatterystate.h"
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
 #include "manualcontrolcommand.h"
@@ -68,11 +67,11 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new AttitudeActual() );
     objMngr->registerObject( new AttitudeDesired() );
     objMngr->registerObject( new AttitudeSettings() );
-    objMngr->registerObject( new FlightBatteryState() );
+//    objMngr->registerObject( new FlightBatteryState() );
     objMngr->registerObject( new ExampleObject1() );
     objMngr->registerObject( new ExampleObject2() );
     objMngr->registerObject( new ExampleSettings() );
-    objMngr->registerObject( new FlightBatteryState() );
+//    objMngr->registerObject( new FlightBatteryState() );
     objMngr->registerObject( new FlightTelemetryStats() );
     objMngr->registerObject( new GCSTelemetryStats() );
     objMngr->registerObject( new ManualControlCommand() );

@@ -1,5 +1,6 @@
 TEMPLATE = lib
 TARGET = UAVObjects
+DEFINES += UAVOBJECTS_LIBRARY
 include(../../openpilotgcsplugin.pri)
 include(uavobjects_dependencies.pri)
 HEADERS += uavobjects_global.h \
@@ -31,7 +32,7 @@ HEADERS += uavobjects_global.h \
     actuatordesired.h \
     actuatorcommand.h \
     positionactual.h \
-    flightbatterystate.h
+#    flightbatterystate.h
 SOURCES += uavobject.cpp \
     uavmetaobject.cpp \
     uavobjectmanager.cpp \
@@ -60,6 +61,5 @@ SOURCES += uavobject.cpp \
     actuatordesired.cpp \
     actuatorcommand.cpp \
     positionactual.cpp \
-    flightbatterystate.cpp
-DEFINES += UAVOBJECTS_LIBRARY
+#    flightbatterystate.cpp
 OTHER_FILES += UAVObjects.pluginspec

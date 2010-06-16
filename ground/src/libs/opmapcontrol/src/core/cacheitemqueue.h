@@ -29,7 +29,7 @@
 #define CACHEITEMQUEUE_H
 
 #include "maptype.h"
-#include "Point.h"
+#include "point.h"
 #include <QByteArray>
 
 

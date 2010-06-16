@@ -11,8 +11,6 @@
  * \ingroup rtslam
  */
 
-// boost unit test includes
-#include <boost/test/auto_unit_test.hpp>
 
 // jafar debug include
 #include "kernel/jafarDebug.hpp"
@@ -304,7 +302,7 @@ void test_slam01() {
 
 
 
-BOOST_AUTO_TEST_CASE( test_slam )
+int main()
 {
 	test_slam01();
 }

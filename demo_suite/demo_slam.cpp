@@ -29,7 +29,7 @@
 #include "rtslam/sensorPinHole.hpp"
 #include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
 #include "rtslam/landmarkEuclideanPoint.hpp"
-//#include "rtslam/observationFactory.hpp"
+#include "rtslam/observationFactory.hpp"
 #include "rtslam/activeSearch.hpp"
 #include "rtslam/featureAbstract.hpp"
 #include "rtslam/rawImage.hpp"
@@ -57,6 +57,10 @@ void test_slam01_main(world_ptr_t *world) {
 	k(0) = 320; k(1) = 320; k(2) = 320; k(3) = 320;
 	int patchMatchSize = 11;
 	int patchInitSize = patchMatchSize * 3;
+	ObservationFactory obsFact;
+	obsFact.addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PhEuc_ObservationMaker(patchMatchSize)));
+	obsFact.addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PhAhp_ObservationMaker(patchMatchSize)));
+
 	// INIT : 1 map, 2 robs, 3 sens
 	//world_ptr_t worldPtr(new WorldAbstract());
 	world_ptr_t worldPtr = *world;
@@ -232,15 +236,12 @@ void test_slam01_main(world_ptr_t *world) {
 
 							// 2b. create obs object
 							// todo make lmk creation dynamic with factories or switch or other.
-							obs_ph_ahp_ptr_t obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint(senPtr,lmkPtr));
-							obsPtr->linkToParentPinHole(senPtr);
-							obsPtr->linkToParentAHP(lmkPtr);
+							observation_ptr_t obsPtr = obsFact.create(senPtr,lmkPtr);
 
 							// 2c. fill data for this obs
 							obsPtr->events.visible = true;
 							obsPtr->events.measured = true;
-							vec measNoiseStd(2);
-							fillVector(measNoiseStd, 1.0);
+							vec measNoiseStd(2); fillVector(measNoiseStd, 1.0);
 							obsPtr->ObservationAbstract::setup(measNoiseStd, ObservationPinHoleAnchoredHomogeneousPoint::getPrior());
 							obsPtr->measurement.x(featPtr->state.x());
 

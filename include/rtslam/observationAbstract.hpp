@@ -101,7 +101,8 @@ namespace jafar {
 
 			type_enum type;
 
-			virtual std::string categoryName() {
+			std::string typeName();
+			std::string categoryName() {
 				return "OBSERVATION";
 			}
 

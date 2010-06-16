@@ -20,9 +20,19 @@ namespace jafar {
 		using namespace ublas;
 
 		ObservationPinHoleEuclideanPoint::ObservationPinHoleEuclideanPoint(
-		    const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr) :
+		    const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr, int patchSize) :
 			ObservationAbstract(pinholePtr, eucPtr, 2, 1) {
 			type = PNT_PH_EUC;
+		}
+
+		void ObservationPinHoleEuclideanPoint::setup(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr, const vec & _noiseStd, int patchSize)
+		{
+			ObservationAbstract::setup(_noiseStd, getPrior());
+			id() = ahpPtr->id();
+			linkToParentPinHole(pinholePtr);
+			linkToParentEuc(eucPtr);
+			predictedAppearance.reset(new AppearenceImagePoint(patchSize, patchSize, CV_8U));
+			observedAppearance.reset(new AppearenceImagePoint(patchSize, patchSize, CV_8U));
 		}
 
 

@@ -73,7 +73,7 @@ namespace jafar {
 
 						// get patch and construct feature
 						vec pix(2);
-						pix = featPntPtr->state.x();
+						pix = featPntPtr->measurement.x();
 						veci size(2);
 						size(0) = 45, size(1) = 45;
 						extractAppearance(pix, size, featPntPtr->appearancePtr);

@@ -80,11 +80,6 @@ namespace jafar {
 				virtual ~LandmarkAbstract() {
 				}
 
-				virtual std::string categoryName() {
-					return "LANDMARK";
-				}
-
-
 				static IdFactory landmarkIds;
 
 				enum geometry_t {
@@ -99,12 +94,12 @@ namespace jafar {
 				};
 				type_enum type;
 
-
-
 			protected:
 				geometry_t geomType;
 			public:
 				geometry_t getGeomType(){return geomType;}
+//				std::string typeName();
+				std::string categoryName(){return "LANDMARK";}
 
 				virtual landmark_ptr_t convertToStandardParametrization() = 0;
 				/* FIXME how to implement convertToStandardParametrization in concrete types ?

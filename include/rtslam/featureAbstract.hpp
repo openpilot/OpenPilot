@@ -49,11 +49,10 @@ namespace jafar {
 		class FeatureAbstract : public ObjectAbstract {
 			public:
 				appearance_ptr_t appearancePtr;
-				Gaussian state;
-				double quality;
+				Measurement measurement;
 
-				FeatureAbstract(size_t size) : state(size) {
-					quality = 0.0;
+				FeatureAbstract(size_t size) : measurement(size) {
+					measurement.matchScore = 0.0;
 				}
 
 				virtual ~FeatureAbstract() {

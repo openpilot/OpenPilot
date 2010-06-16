@@ -31,11 +31,14 @@ namespace jafar {
 			type = PNT_PH_AH;
 		}
 
-		void ObservationPinHoleAnchoredHomogeneousPoint::setup(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & ahpPtr)
+		void ObservationPinHoleAnchoredHomogeneousPoint::setup(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & ahpPtr, const vec & _noiseStd, int patchSize)
 		{
+			ObservationAbstract::setup(_noiseStd, getPrior());
 			id() = ahpPtr->id();
 			linkToParentPinHole(pinholePtr);
 			linkToParentAHP(ahpPtr);
+			predictedAppearance.reset(new AppearenceImagePoint(patchSize, patchSize, CV_8U));
+			observedAppearance.reset(new AppearenceImagePoint(patchSize, patchSize, CV_8U));
 		}
 
 

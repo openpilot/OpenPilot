@@ -19,9 +19,9 @@ namespace jafar {
 		using namespace std;
 
 		void FeatureImagePoint::setup(double _u, double _v, double _quality){
-			state.x(0) = _u;
-			state.x(1) = _v;
-			quality = _quality;
+			measurement.x(0) = _u;
+			measurement.x(1) = _v;
+			measurement.matchScore = _quality;
 		}
 
 	}

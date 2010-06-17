@@ -97,6 +97,13 @@ plugin_systemhealth.depends = plugin_coreplugin
 plugin_systemhealth.depends = plugin_uavobjects
 SUBDIRS += plugin_systemhealth
 
+#Notify Gadget
+plugin_notify.subdir = notify
+plugin_notify.depends = plugin_coreplugin
+plugin_notify.depends = plugin_uavobjects
+SUBDIRS += plugin_notify
+
+
 #Config Gadget
 #plugin_config.subdir = config
 #plugin_config.depends = plugin_coreplugin

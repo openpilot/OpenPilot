@@ -15,7 +15,7 @@ SOURCES += notifyplugin.cpp \
     notifypluginoptionspage.cpp \
     notifypluginconfiguration.cpp
  
-OTHER_FILES += notifyplugin.pluginspec
+OTHER_FILES += NotifyPlugin.pluginspec
 
 FORMS += \
     notifypluginoptionspage.ui

@@ -10,12 +10,17 @@
  *
  * \ingroup rtslam
  */
+
+#include "boost/assign/std/vector.hpp"
 #include "boost/shared_ptr.hpp"
 #include "jmath/indirectArray.hpp"
 #include "rtslam/sensorAbstract.hpp"
 #include "rtslam/robotAbstract.hpp"
 #include "rtslam/observationAbstract.hpp"
 #include "rtslam/quatTools.hpp"
+
+#include "jmath/angle.hpp"
+#include <vector>
 
 // \todo this needs to go out of here - when we'll have factories
 #include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
@@ -24,6 +29,7 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 		using namespace boost;
+		using namespace ublas;
 		using namespace ublasExtra;
 
 		IdFactory SensorAbstract::sensorIds = IdFactory();
@@ -32,33 +38,77 @@ namespace jafar {
 		 * Operator << for class SensorAbstract.
 		 * It shows different information of the sensor.
 		 */
-		std::ostream& operator <<(std::ostream & s, jafar::rtslam::SensorAbstract & sen) {
+		std::ostream& operator <<(std::ostream & s,
+		    jafar::rtslam::SensorAbstract & sen) {
 			s << sen.categoryName() << " " << sen.id() << ": ";
-			if (sen.name().size() > 0)
-				s << sen.name() << ", ";
+			if (sen.name().size() > 0) s << sen.name() << ", ";
 			s << "of type " << sen.typeName() << std::endl;
 			s << ".pose :  " << sen.pose << endl;
 			s << ".robot: [ " << sen.robot().id() << " ]";
-			if (sen.state.storage() == Gaussian::REMOTE)
-				s << endl << ".ia_rs: " << sen.ia_globalPose;
+			if (sen.state.storage() == Gaussian::REMOTE) s << endl << ".ia_rs: "
+			    << sen.ia_globalPose;
 			return s;
 		}
 
-		SensorAbstract::SensorAbstract(const robot_ptr_t & _robPtr, const filtered_obj_t inFilter) :
-			//          #check       ? # sensor in filter                                 : # not in filter
-			    MapObject(_robPtr->mapPtr(), 7, inFilter),
-			    pose(state, Gaussian::REMOTE),
-			    ia_globalPose(inFilter == FILTERED ? ia_union(_robPtr->pose.ia(), pose.ia()) : _robPtr->pose.ia())
-		{
+		SensorAbstract::SensorAbstract(const robot_ptr_t & _robPtr,
+		    const filtered_obj_t inFilter) :
+			    //          #check       ? # sensor in filter                                 : # not in filter
+			    MapObject(_robPtr->mapPtr(), 7, inFilter), pose(state,
+			                                                    Gaussian::REMOTE),
+			    ia_globalPose(inFilter == FILTERED ? ia_union(_robPtr->pose.ia(),
+			                                                  pose.ia())
+			        : _robPtr->pose.ia()) {
 			category = SENSOR;
 		}
 
-		SensorAbstract::SensorAbstract(const simulation_t dummy, const robot_ptr_t & _robPtr) :
+		SensorAbstract::SensorAbstract(const simulation_t dummy,
+		    const robot_ptr_t & _robPtr) :
 			MapObject(_robPtr->mapPtr(), 7, UNFILTERED),
-			pose(state, Gaussian::REMOTE),
-			ia_globalPose(ublasExtra::ia_set(0,0))
-		{
+			    pose(state, Gaussian::REMOTE),
+			    ia_globalPose(ublasExtra::ia_set(0, 0)) {
 			category = SENSOR;
+		}
+
+		void SensorAbstract::setPose(double x, double y, double z, double rollDeg,
+		    double pitchDeg, double yawDeg) {
+			const double pos_[3] = { x, y, z };
+			const double euler_[3] = { jmath::degToRad(rollDeg),
+			    jmath::degToRad(pitchDeg), jmath::degToRad(yawDeg) };
+			ublas::subrange(pose.x(), 0, 3) = createVector<3> (pos_);
+			ublas::subrange(pose.x(), 3, 7)
+			    = quaternion::e2q(createVector<3> (euler_));
+		}
+
+		void SensorAbstract::setPoseStd(double x, double y, double z, double rollDeg,
+		    double pitchDeg, double yawDeg, double xStd, double yStd, double zStd,
+		    double rollDegStd, double pitchDegStd, double yawDegStd) {
+
+			const double pos_[3] = { x, y, z };
+			const double euler_[3] = { jmath::degToRad(rollDeg), jmath::degToRad(pitchDeg), jmath::degToRad(yawDeg) };
+
+			// convert euler pose to quat pose
+			ublas::subrange(pose.x(), 0, 3) = createVector<3> (pos_);
+
+			vec3 euler = createVector<3> (euler_);
+			ublas::subrange(pose.x(), 3, 7) = quaternion::e2q(euler);
+
+			// convert euler uncertainty to quaternion uncertainty
+			const double posStd_[3] = { xStd, yStd, zStd };
+			const double eulerStd_[3] = { jmath::degToRad(rollDegStd),
+			    jmath::degToRad(pitchDegStd), jmath::degToRad(yawDegStd) };
+
+			vec3 eulerStd = createVector<3> (eulerStd_);
+
+			Gaussian E(3);	E.std(eulerStd);
+			vec4 q;
+			mat Q_e(4, 3);
+
+			quaternion::e2q(euler, q, Q_e);
+
+			// write pose
+			subrange(pose.P(), 0,3, 0,3) = createSymMat<3>(posStd_);
+			subrange(pose.P(), 3,7, 3,7) = prod(Q_e, prod<mat>(E.P(), trans(Q_e)));
+
 		}
 
 		/**
@@ -71,35 +121,35 @@ namespace jafar {
 			// rawManagerPtr->discoverNewLmks();
 		}
 
-//		void SensorAbstract::observeKnownLmks() {
-//			for (observations_ptr_set_t::iterator obsIter = observationsPtrSet.begin(); obsIter != observationsPtrSet.end(); obsIter++) {
-//				cout << "processing raw" << endl;
-//
-//				observation_ptr_t obsPtr = obsIter->second;
-//				cout << "exploring obs: " << obsPtr->id() << endl;
-//			}
-//
-//		}
-//
-//		void SensorAbstract::discoverNewLmks() {
-//			map_ptr_t mapPtr = robotPtr->mapPtr;
-//			std::size_t size_lmkAHP = LandmarkAnchoredHomogeneousPoint::size();
-//			if (mapPtr->unusedStates(size_lmkAHP)) {
-//				landmark_ptr_t lmkPtr = newLandmark(mapPtr);
-//				cout << "    added lmk: " << lmkPtr->id() << endl;
-//				mapPtr->addObservations(lmkPtr);
-//			}
-//		}
-//
-//		landmark_ptr_t SensorAbstract::newLandmark(map_ptr_t & mapPtr) {
-//			shared_ptr<LandmarkAnchoredHomogeneousPoint> lmkPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr));
-//			size_t lid = mapPtr->landmarkIds.getId();
-//			lmkPtr->id(lid);
-//			lmkPtr->name("");
-//			mapPtr->linkToLandmark(lmkPtr);
-//			lmkPtr->linkToMap(mapPtr);
-//			return lmkPtr;
-//		}
+		//		void SensorAbstract::observeKnownLmks() {
+		//			for (observations_ptr_set_t::iterator obsIter = observationsPtrSet.begin(); obsIter != observationsPtrSet.end(); obsIter++) {
+		//				cout << "processing raw" << endl;
+		//
+		//				observation_ptr_t obsPtr = obsIter->second;
+		//				cout << "exploring obs: " << obsPtr->id() << endl;
+		//			}
+		//
+		//		}
+		//
+		//		void SensorAbstract::discoverNewLmks() {
+		//			map_ptr_t mapPtr = robotPtr->mapPtr;
+		//			std::size_t size_lmkAHP = LandmarkAnchoredHomogeneousPoint::size();
+		//			if (mapPtr->unusedStates(size_lmkAHP)) {
+		//				landmark_ptr_t lmkPtr = newLandmark(mapPtr);
+		//				cout << "    added lmk: " << lmkPtr->id() << endl;
+		//				mapPtr->addObservations(lmkPtr);
+		//			}
+		//		}
+		//
+		//		landmark_ptr_t SensorAbstract::newLandmark(map_ptr_t & mapPtr) {
+		//			shared_ptr<LandmarkAnchoredHomogeneousPoint> lmkPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr));
+		//			size_t lid = mapPtr->landmarkIds.getId();
+		//			lmkPtr->id(lid);
+		//			lmkPtr->name("");
+		//			mapPtr->linkToLandmark(lmkPtr);
+		//			lmkPtr->linkToMap(mapPtr);
+		//			return lmkPtr;
+		//		}
 
 
 		/*
@@ -113,11 +163,11 @@ namespace jafar {
 			return globPose;
 		}
 
-
 		/*
 		 * Get sensor pose in global frame.
 		 */
-		void SensorAbstract::globalPose(jblas::vec7 & senGlobalPos, jblas::mat & SG_rs) {
+		void SensorAbstract::globalPose(jblas::vec7 & senGlobalPos,
+		    jblas::mat & SG_rs) {
 			jblas::vec7 robotPose = robotPtr()->pose.x();
 			jblas::vec7 sensorPose = pose.x();
 
@@ -125,11 +175,11 @@ namespace jafar {
 				// Sensor is not in the map. Jacobian only wrt robot.
 				senGlobalPos = quaternion::composeFrames(robotPose, sensorPose);
 				quaternion::composeFrames_by_dglobal(robotPose, sensorPose, SG_rs);
-			}
-			else {
+			} else {
 				// Sensor is in the map. Give composed Jacobian.
 				jblas::mat PG_r(7, 7), PG_s(7, 7);
-				quaternion::composeFrames(robotPose, sensorPose, senGlobalPos, PG_r, PG_s);
+				quaternion::composeFrames(robotPose, sensorPose, senGlobalPos, PG_r,
+				                          PG_s);
 				project(SG_rs, range(0, 7), range(0, 7)) = PG_r;
 				project(SG_rs, range(0, 7), range(7, 14)) = PG_s;
 			}

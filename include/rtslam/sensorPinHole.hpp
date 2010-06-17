@@ -17,6 +17,7 @@
 
 #include "rtslam/sensorAbstract.hpp"
 #include "rtslam/gaussian.hpp"
+#include "rtslam/sensorImageParameters.hpp"
 #include "iostream"
 
 namespace jafar {
@@ -53,31 +54,13 @@ namespace jafar {
 
 				~SensorPinHole(){}
 
+				SensorImageParameters params;
+
+				void setup(const size_t id, const string & name, const int _width, const int _height, const vec7 & pose, const vec7 & std, const jblas::vec2 & _s, const vec4 & k, const vec & d, const vec & c);
+
 				virtual std::string typeName() {
 					return "Pin-hole-camera";
 				}
-
-
-				jblas::vec2 imgSize;
-				jblas::vec4 intrinsic;
-				jblas::vec distortion;
-				jblas::vec correction;
-//				image::image_ptr_t imagePtr ;
-
-				/**
-				 * Pin-hole sensor setup.
-				 * \param imSz image size
-				 * \param k the vector of intrinsic parameters <c>k = [u_0, v_0, a_u, a_v]</c>.
-				 * \param d the radial distortion parameters vector <c>d = [d_2, d_4, ...] </c>.
-				 * \param c the radial distortion correction parameters vector <c>c = [c_2, c_4, ...] </c>.
-				 */
-				void set_parameters(const jblas::vec2 & imSz, const jblas::vec4 & k, const jblas::vec & d, const jblas::vec & c);
-
-				/**
-				 * Pin-hole sensor setup
-				 */
-				void setup(const size_t id, const string & name, const vec7 & pose, const vec7 & std, const jblas::vec2 & _s, const vec4 & k, const vec & d, const vec & c);
-
 
 				static size_t size(void) {
 					return 7;

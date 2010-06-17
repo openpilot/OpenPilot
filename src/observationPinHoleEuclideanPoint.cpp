@@ -20,7 +20,7 @@ namespace jafar {
 		using namespace ublas;
 
 		ObservationPinHoleEuclideanPoint::ObservationPinHoleEuclideanPoint(
-		    const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr, int patchSize) :
+		    const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr) :
 			ObservationAbstract(pinholePtr, eucPtr, 2, 1) {
 			type = PNT_PH_EUC;
 		}
@@ -28,9 +28,9 @@ namespace jafar {
 		void ObservationPinHoleEuclideanPoint::setup(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr, const vec & _noiseStd, int patchSize)
 		{
 			ObservationAbstract::setup(_noiseStd, getPrior());
-			id() = ahpPtr->id();
+			id() = eucPtr->id();
 			linkToParentPinHole(pinholePtr);
-			linkToParentEuc(eucPtr);
+			linkToParentEUC(eucPtr);
 			predictedAppearance.reset(new AppearenceImagePoint(patchSize, patchSize, CV_8U));
 			observedAppearance.reset(new AppearenceImagePoint(patchSize, patchSize, CV_8U));
 		}
@@ -46,7 +46,7 @@ namespace jafar {
 			vec3 v;
 			v = quaternion::eucToFrame(sg, lmk);
 
-			exp = pinhole::projectPoint(pinHolePtr()->intrinsic, pinHolePtr()->distortion, v);
+			exp = pinhole::projectPoint(pinHolePtr()->params.intrinsic, pinHolePtr()->params.distortion, v);
 		}
 
 		void ObservationPinHoleEuclideanPoint::project_func(const vec7 & sg,
@@ -63,7 +63,7 @@ namespace jafar {
 
 			quaternion::eucToFrame(sg, lmk, v, V_sg, V_lmk);
 
-			pinhole::projectPoint(pinHolePtr()->intrinsic, pinHolePtr()->distortion,
+			pinhole::projectPoint(pinHolePtr()->params.intrinsic, pinHolePtr()->params.distortion,
 			                      v, exp, EXP_v);
 
 			// We perform Jacobian composition. We use the chain rule.
@@ -75,8 +75,8 @@ namespace jafar {
 		    const vec & meas, const vec & nobs, vec & euc) {
 
 			vec3 v;
-			vec4 k = pinHolePtr()->intrinsic;
-			vec c = pinHolePtr()->correction;
+			vec4 k = pinHolePtr()->params.intrinsic;
+			vec c = pinHolePtr()->params.correction;
 			v = pinhole::backprojectPoint(k, c, meas, (double)1.0);
 			ublasExtra::normalize(v);
 			v *= nobs(0); // nobs is distance
@@ -91,7 +91,7 @@ namespace jafar {
 			mat V_meas(3, 2);
 			mat V_1(3, 1), VN_v(3,3), VN_meas(3, 2), VS_nobs(3,1), VS_vn(3,3), EUC_vs(3,3), VS_meas(3,2);
 
-			pinhole::backProjectPoint(pinHolePtr()->intrinsic, pinHolePtr()->correction, meas, 1.0,
+			pinhole::backProjectPoint(pinHolePtr()->params.intrinsic, pinHolePtr()->params.correction, meas, 1.0,
 			                          v, V_meas, V_1);
 
 			vec3 vn = v;
@@ -114,8 +114,8 @@ namespace jafar {
 
 		bool ObservationPinHoleEuclideanPoint::predictVisibility() {
 			bool inimg = pinhole::isInImage(expectation.x(),
-			                                pinHolePtr()->imgSize(0),
-			                                pinHolePtr()->imgSize(1));
+			                                pinHolePtr()->params.width,
+			                                pinHolePtr()->params.height);
 			bool infront = (expectation.nonObs(0) > 0.0);
 			events.visible = inimg && infront;
 			return events.visible;

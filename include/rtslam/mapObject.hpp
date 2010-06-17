@@ -41,10 +41,6 @@ namespace jafar {
 					UNFILTERED ///< Object's state vector is not part of the SLAM filter.
 				} filtered_obj_t;
 
-				virtual std::string categoryName() {
-					return "MAP OBJECT";
-				}
-
 
 				Gaussian state;
 
@@ -62,8 +58,21 @@ namespace jafar {
 				virtual ~MapObject() {
 				}
 
+				void setup(const vec & _state, const vec & _stateStdDev){
+					state.x(_state);
+					state.std(_stateStdDev);
+				}
+				void setup(const vec & _state, const sym_mat & _stateCov){
+					state.x(_state);
+					state.P(_stateCov);
+				}
+
 				inline static size_t size() {
 					return 0;
+				}
+
+				virtual std::string categoryName() {
+					return "MAP OBJECT";
 				}
 
 		};

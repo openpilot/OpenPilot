@@ -50,8 +50,7 @@ using namespace boost;
 
 void test_slam01_main(world_ptr_t *world) {
 	ActiveSearchGrid asGrid(640, 480, 8, 8, 22, 3);
-	vec2 imSz;
-	imSz(0) = 640; imSz(1) = 480;
+	int imgWidth = 640, imgHeight = 480;
 	vec4 k;
 	vec d(0), c(0);
 	k(0) = 320; k(1) = 320; k(2) = 320; k(3) = 320;
@@ -85,7 +84,9 @@ void test_slam01_main(world_ptr_t *world) {
 	senPtr11->linkToParentRobot(robPtr1);
 	senPtr11->state.clear();
 	senPtr11->pose.x(quaternion::originFrame());
-	senPtr11->set_parameters(imSz, k, d, c);
+	senPtr11->params.setImgSize(imgWidth, imgHeight);
+	senPtr11->params.setIntrinsicCalibration(k, d, c);
+	senPtr11->params.setMiscellaneous(1.0, 1.0, 9);
 //	pinhole_ptr_t senPtr12 (new SensorPinHole(robPtr1, MapObject::FILTERED));
 //	senPtr12->id(senPtr12->sensorIds.getId());
 //	senPtr12->linkToParentRobot(robPtr1);
@@ -243,7 +244,7 @@ void test_slam01_main(world_ptr_t *world) {
 							obsPtr->events.measured = true;
 							vec measNoiseStd(2); fillVector(measNoiseStd, 1.0);
 							obsPtr->ObservationAbstract::setup(measNoiseStd, ObservationPinHoleAnchoredHomogeneousPoint::getPrior());
-							obsPtr->measurement.x(featPtr->state.x());
+							obsPtr->measurement.x(featPtr->measurement.x());
 
 							// 2d. compute and fill stochastic data for the landmark
 							obsPtr->backProject();

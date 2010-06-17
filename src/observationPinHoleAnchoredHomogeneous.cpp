@@ -53,8 +53,8 @@ namespace jafar {
 			vec3 v;
 
 			lmkAHP::toBearingOnlyFrame(sg, lmk, v, dist(0));
-			vec4 k = pinHolePtr()->intrinsic;
-			vec d = pinHolePtr()->distortion;
+			vec4 k = pinHolePtr()->params.intrinsic;
+			vec d = pinHolePtr()->params.distortion;
 			exp = pinhole::projectPoint(k, d, v);
 		}
 
@@ -79,8 +79,8 @@ namespace jafar {
 			//
 			// These functions below use the down-casted pointer because they need to know the particular object parameters and/or methods:
 			lmkAHP::toBearingOnlyFrame(sg, lmk, v, dist(0), V_sg, V_lmk);
-			vec4 k = pinHolePtr()->intrinsic;
-			vec d = pinHolePtr()->distortion;
+			vec4 k = pinHolePtr()->params.intrinsic;
+			vec d = pinHolePtr()->params.distortion;
 			pinhole::projectPoint(k, d, v, exp, EXP_v);
 
 			// We perform Jacobian composition. We use the chain rule.
@@ -92,7 +92,7 @@ namespace jafar {
 		    const vec7 & sg, const vec & pix, const vec & invDist, vec & ahp) {
 			// OK JS 12/6/2010
 			vec3 v;
-			v = pinhole::backprojectPoint(pinHolePtr()->intrinsic, pinHolePtr()->correction, pix, (double)1.0);
+			v = pinhole::backprojectPoint(pinHolePtr()->params.intrinsic, pinHolePtr()->params.correction, pix, (double)1.0);
 			ublasExtra::normalize(v);
 			ahp = lmkAHP::fromBearingOnlyFrame(sg, v, invDist(0));
 		}
@@ -110,7 +110,7 @@ namespace jafar {
 			mat V_1(3, 1);
 			mat VN_v(3,3), VN_pix(3,2);
 
-			pinhole::backProjectPoint(pinHolePtr()->intrinsic, pinHolePtr()->correction, pix, 1.0,
+			pinhole::backProjectPoint(pinHolePtr()->params.intrinsic, pinHolePtr()->params.correction, pix, 1.0,
 			                          v, V_pix, V_1);
 
 			vn = v;
@@ -128,8 +128,8 @@ namespace jafar {
 
 		bool ObservationPinHoleAnchoredHomogeneousPoint::predictVisibility() {
 			bool inimg = pinhole::isInImage(expectation.x(),
-			                                pinHolePtr()->imgSize(0),
-			                                pinHolePtr()->imgSize(1));
+			                                pinHolePtr()->params.width,
+			                                pinHolePtr()->params.height);
 			bool infront = (expectation.nonObs(0) > 0.0);
 			events.visible = inimg && infront;
 			return events.visible;

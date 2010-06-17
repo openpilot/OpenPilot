@@ -36,6 +36,7 @@
 #include "rtslam/rtSlam.hpp"
 #include "rtslam/objectAbstract.hpp"
 #include "rtslam/gaussian.hpp"
+#include "rtslam/measurement.hpp"
 
 namespace jafar {
 	namespace rtslam {

@@ -99,14 +99,6 @@ namespace jafar {
 				PNT_PH_AH ///< Pin hole Anchored homogeneous point
 			};
 
-			type_enum type;
-
-			std::string typeName();
-			std::string categoryName() {
-				return "OBSERVATION";
-			}
-
-
 
 				/**
 				 * Size constructor
@@ -123,6 +115,8 @@ namespace jafar {
 
 				virtual ~ObservationAbstract() {
 				}
+
+				virtual void setup(const vec & _noiseStd, const Gaussian & _prior);
 
 
 				// Data
@@ -170,6 +164,15 @@ namespace jafar {
 						bool updated; ///< 		Landmark is updated
 				} events;
 
+				type_enum type;
+
+				virtual std::string typeName(){return "Observation Abstract";}
+				std::string categoryName() {
+					return "OBSERVATION";
+				}
+
+
+
 				/**
 				 * Project.
 				 *
@@ -196,8 +199,6 @@ namespace jafar {
 				 * Project and get expectation covariances
 				 */
 				void project();
-
-				virtual void setup(const vec & _noiseStd, const Gaussian & _prior);
 
 				/**
 				 * Is visible

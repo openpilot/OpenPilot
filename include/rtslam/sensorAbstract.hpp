@@ -30,35 +30,37 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
-
 		// Forward declarations of children
 		class ObservationAbstract;
 		class DataManagerAbstract;
 
-
-		/**
-		 * Base class for all parameter sets in module rtslam.
-		 * \ingroup rtslam
-		 */
-		class ParametersAbstract {
-			public:
-				/**
-				 * Mandatory virtual destructor.
-				 */
-				inline virtual ~ParametersAbstract(void) {
-				}
-
-		};
+		//		/**
+		//		 * Base class for all parameter sets in module rtslam.
+		//		 * \ingroup rtslam
+		//		 */
+		//		class ParametersAbstract {
+		//			public:
+		//				/**
+		//				 * Mandatory virtual destructor.
+		//				 */
+		//				inline virtual ~ParametersAbstract(void) {
+		//				}
+		//
+		//		};
 
 
 		/**
 		 * Base class for all sensors defined in the module rtslam.
 		 * \ingroup rtslam
 		 */
-		class SensorAbstract: public MapObject, public ChildOf<RobotAbstract> , public boost::enable_shared_from_this<
-		    SensorAbstract>, public ParentOf<ObservationAbstract> , public ParentOf<DataManagerAbstract> {
+		class SensorAbstract: public MapObject,
+		    public ChildOf<RobotAbstract> ,
+		    public boost::enable_shared_from_this<SensorAbstract>,
+		    public ParentOf<ObservationAbstract> ,
+		    public ParentOf<DataManagerAbstract> {
 
-				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::SensorAbstract & sen);
+				friend std::ostream& operator <<(std::ostream & s,
+				    jafar::rtslam::SensorAbstract & sen);
 
 				// define the function linkToParentRobot().
 			ENABLE_LINK_TO_PARENT(RobotAbstract,Robot,SensorAbstract)
@@ -75,10 +77,10 @@ namespace jafar {
 
 			public:
 
-			enum type_enum {
-				PINHOLE, BARRETO
-			};
-			type_enum type;
+				enum type_enum {
+					PINHOLE, BARRETO
+				};
+				type_enum type;
 
 				/**
 				 * Selectable LOCAL or REMOTE pose constructor.
@@ -86,7 +88,8 @@ namespace jafar {
 				 * \param _rob the robot
 				 * \param inFilter flag indicating if the sensor state is part of the filter (REMOTE).
 				 */
-				SensorAbstract(const robot_ptr_t & _robPtr, const filtered_obj_t inFilter = UNFILTERED);
+				SensorAbstract(const robot_ptr_t & _robPtr,
+				    const filtered_obj_t inFilter = UNFILTERED);
 
 				/**
 				 * Selectable LOCAL or REMOTE pose constructor.
@@ -102,8 +105,19 @@ namespace jafar {
 				virtual ~SensorAbstract() {
 				}
 
-				static IdFactory sensorIds;
+				void setPose(double x, double y, double z, double rollDeg,
+				    double pitchDeg, double yawDeg);
+				void setPoseStd(double x, double y, double z, double rollDeg,
+				    double pitchDeg, double yawDeg, double xStd, double yStd,
+				    double zStd, double rollDegStd, double pitchDegStd,
+				    double yawDegStd);
+				void setPoseStd(double x, double y, double z, double rollDeg,
+				    double pitchDeg, double yawDeg, double posStd, double oriDegStd) {
+					setPoseStd(x, y, z, rollDeg, pitchDeg, yawDeg, posStd, posStd,
+					           posStd, oriDegStd, oriDegStd, oriDegStd);
+				}
 
+				static IdFactory sensorIds;
 
 				/**
 				 * Sensor pose in robot
@@ -126,10 +140,9 @@ namespace jafar {
 				 * Derive this class for real sensors,
 				 * and use dynamic down-cast in the associated observation classes to access the derived parameters.
 				 */
-				ParametersAbstract* paramsAbs;
+				//				ParametersAbstract* paramsAbs;
 
 			public:
-
 
 				/*
 				 * Acquire raw data.
@@ -144,26 +157,25 @@ namespace jafar {
 				virtual void processRaw();
 
 			protected:
-//								/**
-//								 * Observe known landmarks
-//								 */
-//								virtual void observeKnownLmks();
-//								/**
-//								 * Discover new landmarks.
-//								 * This function explores the raw data to find new features and use them for landmark initialization.
-//								 */
-//								virtual void discoverNewLmks();
-//
-//								/**
-//								 * Add one landmark to the map.
-//								 * \todo: see if we move this to MapAbstract -> lmkPtr = mapPtr->newLandmark(senPtr)
-//								 * \todo: need to solve first the pointer-from-this issue of shared_ptr.
-//								 * \param mapPtr pointer to the slam map.
-//								 */
-//								landmark_ptr_t newLandmark(map_ptr_t & mapPtr);
+				//								/**
+				//								 * Observe known landmarks
+				//								 */
+				//								virtual void observeKnownLmks();
+				//								/**
+				//								 * Discover new landmarks.
+				//								 * This function explores the raw data to find new features and use them for landmark initialization.
+				//								 */
+				//								virtual void discoverNewLmks();
+				//
+				//								/**
+				//								 * Add one landmark to the map.
+				//								 * \todo: see if we move this to MapAbstract -> lmkPtr = mapPtr->newLandmark(senPtr)
+				//								 * \todo: need to solve first the pointer-from-this issue of shared_ptr.
+				//								 * \param mapPtr pointer to the slam map.
+				//								 */
+				//								landmark_ptr_t newLandmark(map_ptr_t & mapPtr);
 
 			public:
-
 
 				/**
 				 * Get sensor pose in global frame.

@@ -85,8 +85,8 @@ class PhEuc_ObservationMaker: public ObservationMakerAbstract
 			
 		observation_ptr_t create(sensor_ptr_t senPtr, landmark_ptr_t lmkPtr)
 		{
-			observation_ptr_t res(new ObservationPinHoleEuclideanPoint(senPtr, lmkPtr));
-			res->setup(senPtr, lmkPtr, match_size);
+			obs_ph_euc_ptr_t res(new ObservationPinHoleEuclideanPoint(senPtr, lmkPtr));
+//			res->setup(senPtr, lmkPtr, match_size);
 			return res;
 		}
 };
@@ -105,7 +105,7 @@ class PhAhp_ObservationMaker: public ObservationMakerAbstract
 		observation_ptr_t create(sensor_ptr_t senPtr, landmark_ptr_t lmkPtr)
 		{
 			observation_ptr_t res(new ObservationPinHoleEuclideanPoint(senPtr, lmkPtr));
-			res->setup(senPtr, lmkPtr, match_size);
+//			res->setup(senPtr, lmkPtr, match_size);
 			return res;
 		}
 };

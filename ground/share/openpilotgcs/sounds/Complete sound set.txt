@@ -1,6 +1,6 @@
 Sounds for the notifaction plugin
 
-Work in progress, any ideas, add them.
+Work in progress, any ideas PM me - dankers.
 
 Noises:
 
@@ -12,43 +12,70 @@ Whoop
 
 Spoken Collections (sorted alphabetically):
 
+aborted
 active
 alarm
 alert
 altitude
 amps
+aquired
 autonomous flight
 battery
 camera
 cancelled
+changed
+circle position
+cleared
 complete
+connected
+connection
 control
 critical
 disabled
+disconnected
+figure eight
 flight
-Ground Station
+GPS 
+ground station
 heading
+height
+high
+hippodrome
+hold position
+Home location
 initiated
 initiazlised
 landing
+launch
+left
+lock
+logging
+lost
 low
 manual flight
-max
+maxium
+minimum 
 mode
 navigation
 OpenPilot
 point
 range
+ready
 return home
-return to launch
+right
+set
 stabalisation
 Started
+stopped
 take off
+telemtry
 time
 triggered
+UAV
 volts
 warning
 waypoint
+
 
 
 Numbers:
@@ -67,7 +94,7 @@ eleven
 tweleve
 thriteen
 fourteen
-fiveteen
+fifteen
 sixteen
 seventeen
 eightteen
@@ -75,7 +102,7 @@ nineteen
 twenty
 thirty
 fourty
-fivty
+fifty
 sixty
 seventy
 eighty
@@ -83,3 +110,6 @@ ninety
 hundread
 thousand
 million
+
+
+

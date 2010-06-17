@@ -10,6 +10,11 @@
  *
  * \ingroup rtslam
  */
+
+#include "cv.h"
+#include "highgui.h"
+
+
 #include "boost/shared_ptr.hpp"
 #include "image/Image.hpp"
 #include "image/roi.hpp"
@@ -98,8 +103,15 @@ namespace jafar {
 					app_img_pnt_ptr_t targetAppImg = boost::dynamic_pointer_cast<AppearenceImagePoint>(targetApp);
 					app_img_pnt_ptr_t appImg = boost::dynamic_pointer_cast<AppearenceImagePoint>(app);
 					
-					measure.matchScore = correl::Explorer<correl::Zncc>::exploreTranslation(targetAppImg->patch, *img, roi.x, roi.y, 1, roi.x+roi.width-1, roi.y+roi.height-1, 1, measure.x()(0), measure.x()(1));
+					measure.matchScore = correl::Explorer<correl::Zncc>::exploreTranslation(targetAppImg->patch, *img, roi.x, roi.x+roi.width-1, 1, roi.y, roi.y+roi.height-1, 1, measure.x()(0), measure.x()(1));
 			
+//					cv::namedWindow( "Descriptor patch", 1 );
+//					cv::namedWindow( "Predicted patch", 1 );
+//					cv::imshow("Predicted patch", targetAppImg->patch );
+//					cv::namedWindow( "Matched patch", 1 );
+//					cv::imshow("Matched patch", appImg->patch );
+//					cv::waitKey(0);
+
 					measure.P()(0,0) = measure.P()(1,1) = 1.0;
 					measure.P()(1,0) = measure.P()(0,1) = 0.0;
 					

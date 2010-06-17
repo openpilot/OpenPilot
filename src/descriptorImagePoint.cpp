@@ -33,28 +33,20 @@ namespace jafar {
 		}
 		bool DescriptorImagePoint::predictAppearance(const obs_ph_ahp_ptr_t & obsPtrNew)
 		{
-			cout << __FILE__ << ":" << __LINE__ << endl;
 			return predictAppearance_img_pt(obsPtrNew);
-			cout << __FILE__ << ":" << __LINE__ << endl;
 		}
 		
 		bool DescriptorImagePoint::predictAppearance_img_pt(const observation_ptr_t & obsPtrNew) {
 
 			double zoom, rotation;
-			cout << __FILE__ << ":" << __LINE__ << endl;
 			landmark_ptr_t lmkPtr = obsPtrNew->landmarkPtr();
-			cout << __FILE__ << ":" << __LINE__ << endl;
 			vec lmk = lmkPtr->state.x();
-			cout << __FILE__ << ":" << __LINE__ << endl;
 			vec pnt = lmkPtr->reparametrize_func(lmk);
-			cout << __FILE__ << ":" << __LINE__ << endl;
 			quaternion::getZoomRotation(senPoseInit, obsPtrNew->sensorPtr()->globalPose(), pnt, zoom, rotation);
 
 			// rotate and zoom the patch, and cut it to the appropriate size
 			app_img_pnt_ptr_t app = boost::static_pointer_cast<AppearenceImagePoint>(obsPtrNew->predictedAppearance);
-			cout << __FILE__ << ":" << __LINE__ << endl;
 			featImgPntPtr->appImgPntPtr->patch.rotateScale(rotation, zoom, app->patch);
-			cout << __FILE__ << ":" << __LINE__ << endl;
 			
 			return true;
 		}

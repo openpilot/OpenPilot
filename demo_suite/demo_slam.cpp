@@ -130,8 +130,8 @@ void test_slam01_main(world_ptr_t *world) {
 //		sleep(1);
 
 		worldPtr->display_mutex.lock();
-		//cout << "\n************************************************** " << endl;
-		//cout << "\n                 FRAME : " << t << " (blocked " << mutex_chrono.elapsedMicrosecond() << " us)" << endl;
+		cout << "\n************************************************** " << endl;
+		cout << "\n                 FRAME : " << t << " (blocked " << mutex_chrono.elapsedMicrosecond() << " us)" << endl;
 		chrono.reset();
 
 
@@ -188,8 +188,23 @@ void test_slam01_main(world_ptr_t *world) {
 
 						// 1d. search appearence in raw
 						//obsPtr->matchFeature(senPtr->getRaw()) ;
-						cv::Rect roi(10,10,100,100); // TODO set with ellipse bounding box
+						double x, y, dx, dy;
+						dx = 3.0*sqrt(obsPtr->expectation.P(0,0));
+						dy = 3.0*sqrt(obsPtr->expectation.P(1,1));
+						x = obsPtr->expectation.x(0) - dx;
+						y = obsPtr->expectation.x(1) - dy;
+
+						const int border = 15;
+						if (x < border) x = border;
+						if (x+2*dx > imgWidth-border) dx = (imgWidth-border-x)/2;
+						if (y < border) y = border;
+						if (y+2*dy > imgHeight-border) dy = (imgHeight-border-y)/2;
+
+						cv::Rect roi(x,y,2*dx,2*dy); // TODO set with ellipse bounding box
 						senPtr->getRaw()->match(RawAbstract::ZNCC, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
+
+
+						cout << "matched pix: " << obsPtr->measurement.x() << "; score: " << obsPtr->getMatchScore() << endl;
 
 						// 1e. if feature is found
 						if (obsPtr->getMatchScore()>0.80) {
@@ -206,8 +221,8 @@ void test_slam01_main(world_ptr_t *world) {
 						} // obsPtr->getScoreMatchInPercent()>80
 					} // obsPtr->isVisible()
 
-//					cout << "\n-------------------------------------------------- " << endl;
-//					cout << *obsPtr << endl;
+					cout << "\n-------------------------------------------------- " << endl;
+					cout << *obsPtr << endl;
 
 					numObs ++;
 					if (numObs >= 12) break;
@@ -240,8 +255,8 @@ void test_slam01_main(world_ptr_t *world) {
 						//feature_ptr_t featPtr = obsFact.createFeat(
 						feat_img_pnt_ptr_t featPtr(new FeatureImagePoint(patchInitSize,patchInitSize,CV_8U));
 						if (senPtr->getRaw()->detect(RawAbstract::HARRIS, featPtr, &roi)) {
-//							cout << "\n-------------------------------------------------- " << endl;
-//							cout << "Detected pixel: " << featPtr->state.x() << endl;
+							cout << "\n-------------------------------------------------- " << endl;
+							cout << "Detected pixel: " << featPtr->measurement.x() << endl;
 
 							// 2a. create lmk object
 							ahp_ptr_t lmkPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr)); // add featImgPnt in constructor
@@ -271,8 +286,8 @@ void test_slam01_main(world_ptr_t *world) {
 							// Complete SLAM graph with all other obs
 							mapPtr->completeObservationsInGraph(senPtr, lmkPtr);
 
-//							cout << "\n-------------------------------------------------- " << endl;
-//							cout << *lmkPtr << endl;
+							cout << "\n-------------------------------------------------- " << endl;
+							cout << *lmkPtr << endl;
 						}
 					}
 				}

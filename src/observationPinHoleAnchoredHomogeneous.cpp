@@ -158,14 +158,9 @@ namespace jafar {
 		}
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::predictAppearance() {
-			cout << __FILE__ << ":" << __LINE__ << endl;
-
 			desc_img_pnt_ptr_t descPtr = boost::static_pointer_cast<DescriptorImagePoint>(landmarkPtr()->descriptorPtr);
-			cout << __FILE__ << ":" << __LINE__ << endl;
 			obs_ph_ahp_ptr_t _this = boost::static_pointer_cast<ObservationPinHoleAnchoredHomogeneousPoint>(shared_from_this());
-			cout << __FILE__ << ":" << __LINE__ << endl;
 			descPtr->predictAppearance(_this);
-			cout << __FILE__ << ":" << __LINE__ << endl;
 		}
 
 		/**

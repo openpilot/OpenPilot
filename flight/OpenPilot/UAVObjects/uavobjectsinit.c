@@ -35,7 +35,6 @@
 #include "attitudeactual.h"
 #include "attitudedesired.h"
 #include "attitudesettings.h"
-#include "flightbatterystate.h"
 #include "exampleobject1.h"
 #include "exampleobject2.h"
 #include "examplesettings.h"
@@ -66,7 +65,6 @@ void UAVObjectsInitializeAll()
     AttitudeActualInitialize();
     AttitudeDesiredInitialize();
     AttitudeSettingsInitialize();
-    FlightBatteryStateInitialize();
     ExampleObject1Initialize();
     ExampleObject2Initialize();
     ExampleSettingsInitialize();

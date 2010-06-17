@@ -13,7 +13,6 @@ Whoop
 Spoken Collections (sorted alphabetically):
 
 active
-active
 alarm
 alert
 altitude

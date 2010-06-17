@@ -29,16 +29,18 @@
 #define LANGUAGETYPE_H
 
 #include <QString>
+#include <QMetaObject>
+#include <QMetaEnum>
 #include <QStringList>
 
 
-
 namespace core {
-    class LanguageType
+    class LanguageType:public QObject
     {
+        Q_OBJECT
+        Q_ENUMS(Types)
     public:
-
-        enum Types
+                enum Types
         {
             Arabic,
             Bulgarian,
@@ -95,14 +97,38 @@ namespace core {
             ChineseSimplified,
             ChineseTraditional,
         };
-
-
-        QString toString(Types type);
+        
+        static QString StrByType(Types const& value)
+        {
+            QMetaObject metaObject = LanguageType().staticMetaObject;
+            QMetaEnum metaEnum= metaObject.enumerator( metaObject.indexOfEnumerator("Types"));
+            QString s=metaEnum.valueToKey(value);
+            return s;
+        }
+        static Types TypeByStr(QString const& value)
+        {
+            QMetaObject metaObject = LanguageType().staticMetaObject;
+            QMetaEnum metaEnum= metaObject.enumerator( metaObject.indexOfEnumerator("Types"));
+            Types s=(Types)metaEnum.keyToValue(value.toLatin1());
+            return s;
+        }
+        static QStringList TypesList()
+        {
+            QStringList ret;
+            QMetaObject metaObject = LanguageType().staticMetaObject;
+            QMetaEnum metaEnum= metaObject.enumerator( metaObject.indexOfEnumerator("Types"));
+            for(int x=0;x<metaEnum.keyCount();++x)
+            {
+                ret.append(metaEnum.key(x));
+            }
+            return ret;
+        }
+        QString toShortString(Types type);
         LanguageType();
         ~LanguageType();
     private:
         QStringList list;
     };
-
+    
 }
 #endif // LANGUAGETYPE_H

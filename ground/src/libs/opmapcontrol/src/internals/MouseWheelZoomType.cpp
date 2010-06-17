@@ -29,6 +29,5 @@
 
  
 namespace internals {
-QStringList MouseWheelZoomType::strList=QStringList()<<"MousePositionAndCenter"<<"MousePositionWithoutCenter"<<"ViewCenter";
 
 }

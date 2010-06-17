@@ -3,6 +3,7 @@
 
 #include <QGraphicsItem>
 #include "../internals/core.h"
+#include "configuration.h"
 #include <QtGui>
 #include <QTransform>
 #include <QWidget>
@@ -17,7 +18,7 @@ class MapGraphicItem:public QObject,public QGraphicsItem
     friend class mapcontrol::OPMapWidget;
     Q_OBJECT
 public:
-    MapGraphicItem(internals::Core *core);
+    MapGraphicItem(internals::Core *core,Configuration *configuration);
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                 QWidget *widget);
@@ -37,10 +38,13 @@ protected:
 
 private:
     internals::Core *core;
+    Configuration *config;
     bool showTileGridLines;
     qreal MapRenderTransform;
     void DrawMap2D(QPainter *painter);
-    QFont MissingDataFont;
+    ///
+   // QFont MissingDataFont;
+    ///
     int maxZoom;
     int minZoom;
     internals::RectLatLng selectedArea;
@@ -54,17 +58,18 @@ private:
     internals::PointLatLng FromLocalToLatLng(int x, int y);
     qreal rotation;
     QRectF boundingBox(QRectF const& rect, qreal const& angle);
-
-    QBrush EmptytileBrush;
-    QString EmptyTileText;
-    QPen EmptyTileBorders;
-    QPen ScalePen;
-    QPen SelectionPen;
+///
+//    QBrush EmptytileBrush;
+//    QString EmptyTileText;
+ //   QPen EmptyTileBorders;
+  //  QPen ScalePen;
+  //  QPen SelectionPen;
+    ///
     int MaxZoom()const{return maxZoom;}
     int MinZoom()const{return minZoom;}
     internals::MouseWheelZoomType::Types GetMouseWheelZoomType(){return core->GetMouseWheelZoomType();}
-    QString GetMouseWheelZoomTypeStr(){return internals::MouseWheelZoomType::TypesStrList().at((int)core->GetMouseWheelZoomType());}
-    bool MapScaleInfoEnabled;
+   // QString GetMouseWheelZoomTypeStr(){return internals::MouseWheelZoomType::TypesStrList().at((int)core->GetMouseWheelZoomType());}
+  //  bool MapScaleInfoEnabled;
     Qt::MouseButton DragButton;
     void SetSelectedArea(internals::RectLatLng const& value){selectedArea = value;this->update();}
     internals::RectLatLng BoundsOfMap;

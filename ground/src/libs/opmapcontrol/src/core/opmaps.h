@@ -63,8 +63,8 @@ namespace core {
         QByteArray GetImageFrom(const MapType::Types &type,const core::Point &pos,const int &zoom);
         bool UseMemoryCache();//TODO
         void setUseMemoryCache(const bool& value){useMemoryCache=value;}
-        void setLanguage(const LanguageType::Types& language);//TODO
-        LanguageType::Types GetLanguage();//TODO
+        void setLanguage(const LanguageType::Types& language){Language=language;}//TODO
+        LanguageType::Types GetLanguage(){return Language;}//TODO
         AccessMode::Types GetAccessMode()const{return accessmode;};
         void setAccessMode(const AccessMode::Types& mode){accessmode=mode;};
         int MaxZoom;

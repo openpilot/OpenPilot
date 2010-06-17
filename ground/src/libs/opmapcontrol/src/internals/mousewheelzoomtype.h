@@ -30,12 +30,14 @@
 #include <QObject>
 #include <QStringList>
 #include <QMetaType>
- 
+#include <QMetaObject>
+#include <QMetaEnum>
 namespace internals {
-    struct MouseWheelZoomType:public QObject
-{
-    Q_OBJECT
-public:
+    class MouseWheelZoomType:public QObject
+    {
+        Q_OBJECT
+        Q_ENUMS(Types)
+    public:
     enum Types
     {
         /// <summary>
@@ -54,11 +56,32 @@ public:
         /// </summary>
         ViewCenter,
     };
-    Q_ENUMS(Types)
-    static QStringList TypesStrList(){return strList;}
-    static Types TypeByStr(QString const& value){return (Types)MouseWheelZoomType::strList.indexOf(value);}
-private:
-    static QStringList strList;
+    static QString StrByType(Types const& value)
+    {
+        QMetaObject metaObject = MouseWheelZoomType().staticMetaObject;
+        QMetaEnum metaEnum= metaObject.enumerator( metaObject.indexOfEnumerator("Types"));
+        QString s=metaEnum.valueToKey(value);
+        return s;
+    }
+    static Types TypeByStr(QString const& value)
+    {
+        QMetaObject metaObject = MouseWheelZoomType().staticMetaObject;
+        QMetaEnum metaEnum= metaObject.enumerator( metaObject.indexOfEnumerator("Types"));
+        Types s=(Types)metaEnum.keyToValue(value.toLatin1());
+        return s;
+    }
+    static QStringList TypesList()
+    {
+        QStringList ret;
+        QMetaObject metaObject = MouseWheelZoomType().staticMetaObject;
+        QMetaEnum metaEnum= metaObject.enumerator( metaObject.indexOfEnumerator("Types"));
+        for(int x=0;x<metaEnum.keyCount();++x)
+        {
+            ret.append(metaEnum.key(x));
+        }
+        return ret;
+    }
+
 };
 
 }

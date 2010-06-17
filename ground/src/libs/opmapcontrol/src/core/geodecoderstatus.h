@@ -31,6 +31,7 @@
 #include <QObject>
 #include <QMetaObject>
 #include <QMetaEnum>
+#include <QStringList>
 namespace core {
     class GeoCoderStatusCode:public QObject
     {
@@ -113,6 +114,17 @@ namespace core {
             QMetaEnum metaEnum= metaObject.enumerator( metaObject.indexOfEnumerator("Types"));
             Types s=(Types)metaEnum.keyToValue(value.toLatin1());
             return s;
+        }
+        static QStringList TypesList()
+        {
+            QStringList ret;
+            QMetaObject metaObject = GeoCoderStatusCode().staticMetaObject;
+            QMetaEnum metaEnum= metaObject.enumerator( metaObject.indexOfEnumerator("Types"));
+            for(int x=0;x<metaEnum.keyCount();++x)
+            {
+                ret.append(metaEnum.key(x));
+            }
+            return ret;
         }
 
     };

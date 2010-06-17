@@ -41,7 +41,7 @@ namespace core {
     {
         accessmode=AccessMode::ServerAndCache;
         Language=LanguageType::PortuguesePortugal;
-        LanguageStr=LanguageType().toString(Language);
+        LanguageStr=LanguageType().toShortString(Language);
         //   Cache::Instance()->ImageCache=PureImageCache();
 
     }

@@ -1,16 +1,10 @@
 #include "mapgraphicitem.h"
 namespace mapcontrol
 {
-    MapGraphicItem::MapGraphicItem(internals::Core *core):core(core),MapRenderTransform(1), maxZoom(17),minZoom(2),zoomReal(0),isSelected(false),rotation(0)
+    MapGraphicItem::MapGraphicItem(internals::Core *core, Configuration *configuration):core(core),config(configuration),MapRenderTransform(1), maxZoom(17),minZoom(2),zoomReal(0),isSelected(false),rotation(0)
     {
-        EmptytileBrush = Qt::cyan;
-        MissingDataFont =QFont ("Times",10,QFont::Bold);
-        EmptyTileText = "We are sorry, but we don't\nhave imagery at this zoom\nlevel for this region.";
-        EmptyTileBorders = QPen(Qt::white);
-        ScalePen = QPen(Qt::blue);
-        SelectionPen = QPen(Qt::blue);
-        MapScaleInfoEnabled = true;
-        showTileGridLines=true;
+
+        showTileGridLines=false;
         DragButton = Qt::RightButton;
         isMouseOverMarker=false;
         maprect=QRectF(0,0,1022,680);
@@ -237,10 +231,10 @@ namespace mapcontrol
 
                             if(showTileGridLines)
                             {
-                                painter->setPen(EmptyTileBorders);
+                                painter->setPen(config->EmptyTileBorders);
                                 painter->drawRect(core->tileRect.X(), core->tileRect.Y(), core->tileRect.Width(), core->tileRect.Height());
                                 {
-                                    painter->setFont(MissingDataFont);
+                                    painter->setFont(config->MissingDataFont);
                                     painter->setPen(Qt::red);
                                     painter->drawText(QRectF(core->tileRect.X(), core->tileRect.Y(), core->tileRect.Width(), core->tileRect.Height()),Qt::AlignCenter,(core->GettilePoint() == core->GetcenterTileXYLocation()? "CENTER: " :"TILE: ")+core->GettilePoint().ToString());
                                     //qDebug()<<"ShowTileGridLine:"<<core->GettilePoint().ToString()<<"=="<<core->GetcenterTileXYLocation().ToString();
@@ -251,13 +245,13 @@ namespace mapcontrol
                             if(!found)
                             {
 
-                                painter->fillRect(QRectF(core->tileRect.X(), core->tileRect.Y(), core->tileRect.Width(), core->tileRect.Height()),EmptytileBrush);
-                                painter->setFont(MissingDataFont);
-                                painter->drawText(QRectF(core->tileRect.X(), core->tileRect.Y(), core->tileRect.Width(), core->tileRect.Height()),EmptyTileText);
+                                painter->fillRect(QRectF(core->tileRect.X(), core->tileRect.Y(), core->tileRect.Width(), core->tileRect.Height()),config->EmptytileBrush);
+                                painter->setFont(config->MissingDataFont);
+                                painter->drawText(QRectF(core->tileRect.X(), core->tileRect.Y(), core->tileRect.Width(), core->tileRect.Height()),config->EmptyTileText);
 
 
 
-                                painter->setPen(EmptyTileBorders);
+                                painter->setPen(config->EmptyTileBorders);
                                 painter->drawRect(core->tileRect.X(), core->tileRect.Y(), core->tileRect.Width(), core->tileRect.Height());
 
                                 // raise error

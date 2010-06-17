@@ -138,9 +138,7 @@ public:
     bool IsDragging()const{return isDragging;}
 
     int Zoom()const{return zoom;}
-
     void SetZoom(int const& value);
-
 
     void UpdateBounds();
 
@@ -160,7 +158,6 @@ public:
     RectLatLng CurrentViewArea();
 
     PointLatLng FromLocalToLatLng(int const& x, int const& y);
-
 
     Point FromLatLngToLocal(PointLatLng const& latlng);
 
@@ -194,6 +191,7 @@ public:
 signals:
     void OnCurrentPositionChanged(PointLatLng point);
     void OnTileLoadComplete();
+    void OnTilesStillToLoad(int number);
     void OnTileLoadStart();
     void OnMapDrag();
     void OnMapZoomChanged();
@@ -224,12 +222,9 @@ private:
     Size minOfTiles;
     Size maxOfTiles;
 
-
-
     core::Point tilePoint;
 
     Rectangle CurrentRegion;
-
 
     QQueue<LoadTask> tileLoadQueue;
 

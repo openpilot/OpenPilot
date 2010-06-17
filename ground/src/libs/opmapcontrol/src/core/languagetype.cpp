@@ -89,7 +89,7 @@ namespace core {
                 <<"zh-TW";
 
     }
-    QString LanguageType::toString(Types type)
+    QString LanguageType::toShortString(Types type)
     {
         return list[type];
     }

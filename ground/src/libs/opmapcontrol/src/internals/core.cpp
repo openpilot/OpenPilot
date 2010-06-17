@@ -55,6 +55,7 @@ namespace internals {
         qDebug()<<"core:run"<<" ID="<<debug;
 #endif //DEBUG_CORE
         bool last = false;
+        int stillToGo;
 
         LoadTask task;
 
@@ -64,7 +65,8 @@ namespace internals {
             {
                 task = tileLoadQueue.dequeue();
                 {
-                    last = tileLoadQueue.count() == 0;
+                    stillToGo=tileLoadQueue.count();
+                    last = (stillToGo == 0);
 #ifdef DEBUG_CORE
                     qDebug()<<"TileLoadQueue: " << tileLoadQueue.count()<<" Point:"<<task.Pos.ToString()<<" ID="<<debug;;
 #endif //DEBUG_CORE
@@ -151,6 +153,7 @@ namespace internals {
                         {
                             Matrix.SetTileAt(task.Pos,t);
                             emit OnNeedInvalidation();
+                            emit OnTilesStillToLoad(stillToGo);
 #ifdef DEBUG_CORE
                             qDebug()<<"Core::run add tile "<<t->GetPos().ToString()<<" to matrix index "<<task.Pos.ToString()<<" ID="<<debug;
                             qDebug()<<"Core::run matrix index "<<task.Pos.ToString()<<" as tile with "<<Matrix.TileAt(task.Pos)->Overlays.count()<<" ID="<<debug;

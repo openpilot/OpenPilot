@@ -29,11 +29,15 @@
 #define ACCESSMODE_H
 
 #include "debugheader.h"
-
+#include <QObject>
+#include <QMetaObject>
+#include <QMetaEnum>
+#include <QStringList>
 namespace core {
-    struct AccessMode
+    class AccessMode:public QObject
     {
-
+        Q_OBJECT
+        Q_ENUMS(Types)
     public:
         enum Types
         {
@@ -52,6 +56,31 @@ namespace core {
             /// </summary>
             CacheOnly,
         };
+        static QString StrByType(Types const& value)
+        {
+            QMetaObject metaObject = AccessMode().staticMetaObject;
+            QMetaEnum metaEnum= metaObject.enumerator( metaObject.indexOfEnumerator("Types"));
+            QString s=metaEnum.valueToKey(value);
+            return s;
+        }
+        static Types TypeByStr(QString const& value)
+        {
+            QMetaObject metaObject = AccessMode().staticMetaObject;
+            QMetaEnum metaEnum= metaObject.enumerator( metaObject.indexOfEnumerator("Types"));
+            Types s=(Types)metaEnum.keyToValue(value.toLatin1());
+            return s;
+        }
+        static QStringList TypesList()
+        {
+            QStringList ret;
+            QMetaObject metaObject = AccessMode().staticMetaObject;
+            QMetaEnum metaEnum= metaObject.enumerator( metaObject.indexOfEnumerator("Types"));
+            for(int x=0;x<metaEnum.keyCount();++x)
+            {
+                ret.append(metaEnum.key(x));
+            }
+            return ret;
+        }
 
     };
 }

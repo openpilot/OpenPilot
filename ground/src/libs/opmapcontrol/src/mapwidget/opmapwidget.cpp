@@ -3,28 +3,45 @@
 #include <QMetaObject>
 namespace mapcontrol
 {
-    OPMapWidget::OPMapWidget(QWidget *parent):QGraphicsView(parent),useOpenGL(false)
+//    OPMapWidget::OPMapWidget(QWidget *parent):QGraphicsView(parent),useOpenGL(false)
+//    {
+//        setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+//
+//        core=new internals::Core;
+//        map=new MapGraphicItem(core);
+//        //text.setZValue(20);
+//        //QGraphicsTextItem *t=new QGraphicsTextItem(map);
+//       // t->setPos(10,10);
+//        mscene.addItem(map);
+//        map->setZValue(-1);
+//        //t->setZValue(10);
+//        this->setScene(&mscene);
+//        this->adjustSize();
+//       // t->setFlag(QGraphicsItem::ItemIsMovable,true);
+//        connect(&mscene,SIGNAL(sceneRectChanged(QRectF)),map,SLOT(resize(QRectF)));
+//        connect(map,SIGNAL(zoomChanged(double)),this,SIGNAL(zoomChanged(double)));
+//    }
+    OPMapWidget::OPMapWidget(QWidget *parent, Configuration *config):QGraphicsView(parent),configuration(config)
     {
         setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-
         core=new internals::Core;
-        map=new MapGraphicItem(core);
-        //text.setZValue(20);
-        //QGraphicsTextItem *t=new QGraphicsTextItem(map);
-       // t->setPos(10,10);
+        map=new MapGraphicItem(core,config);
         mscene.addItem(map);
         map->setZValue(-1);
-        //t->setZValue(10);
         this->setScene(&mscene);
         this->adjustSize();
-       // t->setFlag(QGraphicsItem::ItemIsMovable,true);
         connect(&mscene,SIGNAL(sceneRectChanged(QRectF)),map,SLOT(resize(QRectF)));
         connect(map,SIGNAL(zoomChanged(double)),this,SIGNAL(zoomChanged(double)));
-        QMetaObject metaObject = this->staticMetaObject;
-        QMetaEnum metaEnum= metaObject.enumerator( metaObject.indexOfEnumerator("internals::MouseWheelZoomType::Types"));
-        QString s=metaEnum.valueToKey(1);
-        QString ss=s;
+        connect(map->core,SIGNAL(OnCurrentPositionChanged(internals::PointLatLng)),this,SIGNAL(OnCurrentPositionChanged(internals::PointLatLng)));
+        connect(map->core,SIGNAL(OnEmptyTileError(int,core::Point)),this,SIGNAL(OnEmptyTileError(int,core::Point)));
+        connect(map->core,SIGNAL(OnMapDrag()),this,SIGNAL(OnMapDrag()));
+        connect(map->core,SIGNAL(OnMapTypeChanged(MapType::Types)),this,SIGNAL(OnMapTypeChanged(MapType::Types)));
+        connect(map->core,SIGNAL(OnMapZoomChanged()),this,SIGNAL(OnMapZoomChanged()));
+        connect(map->core,SIGNAL(OnTileLoadComplete()),this,SIGNAL(OnTileLoadComplete()));
+        connect(map->core,SIGNAL(OnTileLoadStart()),this,SIGNAL(OnTileLoadStart()));
+        connect(map->core,SIGNAL(OnTilesStillToLoad(int)),this,SIGNAL(OnTilesStillToLoad(int)));
     }
+
     void OPMapWidget::resizeEvent(QResizeEvent *event)
     {
         if (scene())
@@ -45,6 +62,7 @@ namespace mapcontrol
     {
         delete map;
         delete core;
+        delete configuration;
     }
     void OPMapWidget::closeEvent(QCloseEvent *event)
     {

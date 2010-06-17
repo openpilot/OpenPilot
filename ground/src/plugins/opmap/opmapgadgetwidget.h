@@ -30,8 +30,11 @@
 
 #include "opmapcontrol/opmapcontrol.h"
 #include <QtGui/QWidget>
+#include <QtGui/QMainWindow>
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/positionactual.h"
+
+namespace Ui { class OPMapControlPanel; }
 
 using namespace mapcontrol;
 
@@ -48,8 +51,6 @@ public:
    void setMapProvider(QString provider);
 
 public slots:
-//    void gcsButtonClick();
-//    void uavButtonClick(bool checked);
 
 protected:
     void resizeEvent(QResizeEvent *event);
@@ -58,21 +59,29 @@ protected:
 private slots:
    void updatePosition();
 
-private:
-//   void addUserControls();
+    // control panel slots
+    void on_checkBox_clicked(bool checked);
+    void on_comboBox_currentIndexChanged(QString );
+    void on_pushButtonGO_clicked();
+    void on_pushButtonRR_clicked();
+    void on_pushButtonRC_clicked();
+    void on_pushButtonRL_clicked();
+    void on_pushButtonZoomM_clicked();
+    void on_pushButtonZoomP_clicked();
+    void zoomChanged(double zoom);
+    void on_checkBox_2_clicked(bool checked);
 
+private:
     bool follow_uav;    // true if the map is to stay centered on the UAV
 
     double heading;	// compass/uav heading
-
-    mapcontrol::OPMapWidget *map;
 
    QTimer *m_updateTimer;
 
    PositionActual *m_positionActual;
 
-    QPushButton *gcsButton;
-    QPushButton *uavButton;
+    Ui::OPMapControlPanel *controlpanel_ui;
+    mapcontrol::OPMapWidget *map;
 };
 
 #endif /* OPMAP_GADGETWIDGET_H_ */

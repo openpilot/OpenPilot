@@ -26,41 +26,78 @@
  */
 #include "opmapgadgetwidget.h"
 #include <QStringList>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QPushButton>
+#include <QtGui/QHBoxLayout>
 #include "extensionsystem/pluginmanager.h"
+
+#include "ui_opmap_controlpanel.h"
 
 // *************************************************************************************
 // constructor
 
 OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 {
-    int size = 256;
+    // **************
 
+    map = NULL;
+    controlpanel_ui = NULL;
+
+    follow_uav = false;
+
+    // **************
     // Get required UAVObjects
+
     ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
     m_positionActual = PositionActual::GetInstance(objManager);
 
-    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    // **************
+    // create the user control panel
 
-    map = NULL;
+    controlpanel_ui = new Ui::OPMapControlPanel();
+    controlpanel_ui->setupUi(this);
+
+    // **************
+    // create the map display
+
     map = new mapcontrol::OPMapWidget();
-    map->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+//    map->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     map->setMinimumSize(64, 64);
 
-    PositionActual::DataFields data = m_positionActual->getData();  // get current position data
+    // **************
+    // set the user control options
 
-   QVBoxLayout *layout = new QVBoxLayout;
+    controlpanel_ui->comboBox->addItems(mapcontrol::Helper::MapTypes());
+    controlpanel_ui->comboBox->setCurrentIndex(mapcontrol::Helper::MapTypes().indexOf("GoogleHybrid"));
+
+    // **************
+
+    map->SetShowTileGridLines(controlpanel_ui->checkBox->isChecked());
+
+    // get current position data
+    PositionActual::DataFields data = m_positionActual->getData();
+
+    // set the default map position
+    map->SetCurrentPosition(internals::PointLatLng(data.Latitude, data.Longitude));
+
+    // **************
+
+    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+
+    QHBoxLayout *layout = new QHBoxLayout;
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
+    layout->addWidget(controlpanel_ui->layoutWidget);
     layout->addWidget(map);
     setLayout(layout);
 
-//    m_updateTimer = new QTimer();
-//    m_updateTimer->setInterval(250);
-//    connect(m_updateTimer, SIGNAL(timeout()), this, SLOT(updatePosition()));
-//    m_updateTimer->start();
+    // **************
+
+    m_updateTimer = new QTimer();
+    m_updateTimer->setInterval(250);
+    connect(m_updateTimer, SIGNAL(timeout()), this, SLOT(updatePosition()));
+    m_updateTimer->start();
+
+    // **************
 }
 
 // *************************************************************************************
@@ -69,7 +106,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 OPMapGadgetWidget::~OPMapGadgetWidget()
 {
     if (map) delete map;
-   // Do nothing
+    if (controlpanel_ui) delete controlpanel_ui;
 }
 
 // *************************************************************************************
@@ -78,8 +115,7 @@ void OPMapGadgetWidget::setZoom(int value)
 {
     if (map)
     {
-//    map->setZoom(value);
-//    map->updateRequestNew();
+	map->SetZoom(value);
     }
 }
 
@@ -87,36 +123,35 @@ void OPMapGadgetWidget::setPosition(QPointF pos)
 {
     if (map)
     {
-//    map->setView(pos);
-//    map->updateRequestNew();
+	map->SetCurrentPosition(internals::PointLatLng(pos.y(), pos.x()));
     }
 }
 
 void OPMapGadgetWidget::setMapProvider(QString provider)
 {
-    if (map)
-    {
-//  map->
-    }
+//    if (map)
+//	if (map->isStarted())
+//	    map->SetMapType(mapcontrol::Helper::MapTypeFromString(provider));
 }
 
 // *************************************************************************************
 
 void OPMapGadgetWidget::updatePosition()
 {
-    PositionActual::DataFields data = m_positionActual->getData();	// get current position data
+    // get current position data
+    PositionActual::DataFields data = m_positionActual->getData();
 
-//    uavPoint->setCoordinate(QPointF(data.Longitude, data.Latitude));	// move the UAV icon
-//
-//    if (follow_uav)
-//	setPosition(uavPoint->coordinate());				// center the map onto the UAV
+    if (map && follow_uav)
+    {	// center the map onto the UAV
+	map->SetCurrentPosition(internals::PointLatLng(data.Latitude, data.Longitude));
+    }
 }
 
 // *************************************************************************************
 
 void OPMapGadgetWidget::resizeEvent(QResizeEvent *event)
 {
-    if (map) map->resize(QSize(width(), height()));
+//    if (map) map->resize(QSize(width(), height()));
     update();
     QWidget::resizeEvent(event);
 }
@@ -164,6 +199,75 @@ void OPMapGadgetWidget::keyPressEvent(QKeyEvent* event)
     {
 	qDebug() << event->key() << endl;
     }
+}
+
+// *************************************************************************************
+
+void OPMapGadgetWidget::zoomChanged(double zoom)
+{
+    controlpanel_ui->label_5->setText("CurrentZoom=" + QString::number(zoom));
+}
+
+void OPMapGadgetWidget::on_checkBox_clicked(bool checked)
+{
+    if (map)
+	map->SetShowTileGridLines(checked);
+}
+
+void OPMapGadgetWidget::on_comboBox_currentIndexChanged(QString value)
+{
+    if (map)
+	if (map->isStarted())
+	    map->SetMapType(mapcontrol::Helper::MapTypeFromString(value));
+}
+
+void OPMapGadgetWidget::on_pushButtonGO_clicked()
+{
+    if (map)
+    {
+	core::GeoCoderStatusCode::Types x = map->SetCurrentPositionByKeywords(controlpanel_ui->lineEdit->text());
+	controlpanel_ui->label->setText(mapcontrol::Helper::StrFromGeoCoderStatusCode(x));
+    }
+}
+
+void OPMapGadgetWidget::on_pushButtonRL_clicked()
+{
+    if (map)
+	map->SetRotate(map->Rotate() - 1);
+}
+
+void OPMapGadgetWidget::on_pushButtonRC_clicked()
+{
+    if (map)
+	map->SetRotate(0);
+}
+
+void OPMapGadgetWidget::on_pushButtonRR_clicked()
+{
+    if (map)
+	map->SetRotate(map->Rotate() + 1);
+}
+
+void OPMapGadgetWidget::on_pushButtonZoomP_clicked()
+{
+    if (map)
+    {
+	double x = map->Zoom();
+	double y = controlpanel_ui->doubleSpinBox->value();
+	map->SetZoom(map->Zoom() + controlpanel_ui->doubleSpinBox->value());
+    }
+}
+
+void OPMapGadgetWidget::on_pushButtonZoomM_clicked()
+{
+    if (map)
+	map->SetZoom(map->Zoom() - controlpanel_ui->doubleSpinBox->value());
+}
+
+void OPMapGadgetWidget::on_checkBox_2_clicked(bool checked)
+{
+    if (map)
+	map->SetUseOpenGL(checked);
 }
 
 // *************************************************************************************

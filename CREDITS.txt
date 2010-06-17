@@ -19,11 +19,11 @@ D: Minor GCS infrastruture, updating the credit file
 
 N: Pedro Assuncao
 E: pedro (dot) agda (plus) openpilot (at) gmail (dot) com
-D: GCS Settings Gadget & Plugin
+D: GCS Settings Gadget work
 
 N: Jose Barros
 E: josembarros (at) hotmail (dot) com
-D: GCS Y-Modem Plugin, Next-Gen Map plugin
+D: Next-Gen OP Map Lib, GCS Y-Modem Plugin
 
 N: David "Buzz" Carlson 
 E: chebuzz (plus) openpilot (at) gmail (dot) com
@@ -31,7 +31,12 @@ D: 3D ModelView GCS Plugin
 
 N: Frederic Goddeeris
 E: fredericgoddeeris (at) hotmail (dot) com
-D: I2C work and FreeRTOS work, MK intergration  
+D: I2C work and FreeRTOS work, MK intergration
+D: EagleTree OSD support   
+
+N: Daniel Godin
+E: dgodin (at) dnsct (dot) com
+W: Notify Plugin for the GCS
 
 N: Bani Greyling
 E: bani (dot) greyling (plus) openpilot (at) gmail (dot) com
@@ -62,6 +67,10 @@ N: Guy McCaldin
 E: guymcc (at) gmail (dot) com
 D: Artwork and design work
 
+N: Cathy Moss
+E: cmoss296 (at) blueyonder (dot) co (dot) uk
+D: OP Map Plugin
+
 N: Angus Peart
 E: gussy (at) openpilot (dot) org
 D: Co-founder, Principal hardware architect.  
@@ -83,6 +92,7 @@ D: Initial schematic based on Zik's Flying Fox schematic
 
 N: Stacey Sheldon
 E: stac (at) solidgoldbomb (dot) org
+D: Core embedded developer
 D: SPI protocol for AHRS, IRQ and HID stability fixes and core AHRS work.  
 
 N: Pete Stapley

@@ -1,6 +1,0 @@
-
-
-Serial port classes:
-
-http://code.google.com/p/qextserialport/
-

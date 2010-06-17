@@ -270,4 +270,23 @@ void OPMapGadgetWidget::on_checkBox_2_clicked(bool checked)
 	map->SetUseOpenGL(checked);
 }
 
+void OPMapGadgetWidget::on_pushButtonGeoFenceM_clicked()
+{
+    int geo_fence_distance = controlpanel_ui->spinBoxGeoFenceDistance->value();
+    int step = controlpanel_ui->spinBoxGeoFenceDistance->singleStep();
+    controlpanel_ui->spinBoxGeoFenceDistance->setValue(geo_fence_distance - step);
+
+    geo_fence_distance = controlpanel_ui->spinBoxGeoFenceDistance->value();
+}
+
+void OPMapGadgetWidget::on_pushButtonGeoFenceP_clicked()
+{
+    int geo_fence_distance = controlpanel_ui->spinBoxGeoFenceDistance->value();
+    int step = controlpanel_ui->spinBoxGeoFenceDistance->singleStep();
+    controlpanel_ui->spinBoxGeoFenceDistance->setValue(geo_fence_distance + step);
+
+    geo_fence_distance = controlpanel_ui->spinBoxGeoFenceDistance->value();
+}
+
+
 // *************************************************************************************

@@ -68,6 +68,8 @@ private slots:
     void on_pushButtonRL_clicked();
     void on_pushButtonZoomM_clicked();
     void on_pushButtonZoomP_clicked();
+    void on_pushButtonGeoFenceM_clicked();
+    void on_pushButtonGeoFenceP_clicked();
     void zoomChanged(double zoom);
     void on_checkBox_2_clicked(bool checked);
 

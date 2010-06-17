@@ -58,7 +58,7 @@ void test_slam01_main(world_ptr_t *world) {
 	int patchInitSize = patchMatchSize * 3;
 	ObservationFactory obsFact;
 	obsFact.addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeEucpObservationMaker()));
-	obsFact.addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholAhpObservationMaker()));
+	obsFact.addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhpObservationMaker()));
 
 	// INIT : 1 map, 2 robs, 3 sens
 	//world_ptr_t worldPtr(new WorldAbstract());
@@ -256,8 +256,8 @@ void test_slam01_main(world_ptr_t *world) {
 							// 2c. fill data for this obs
 							obsPtr->events.visible = true;
 							obsPtr->events.measured = true;
-							vec measNoiseStd(2); fillVector(measNoiseStd, 1.0);
-							obsPtr->ObservationAbstract::setup(measNoiseStd, ObservationPinHoleAnchoredHomogeneousPoint::getPrior());
+							//vec measNoiseStd(2); fillVector(measNoiseStd, 1.0);
+							//obsPtr->ObservationAbstract::setup(measNoiseStd, ObservationPinHoleAnchoredHomogeneousPoint::getPrior());
 							obsPtr->measurement.x(featPtr->measurement.x());
 
 							// 2d. compute and fill stochastic data for the landmark

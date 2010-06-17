@@ -65,7 +65,7 @@ namespace jafar {
 					UNREGISTER_FROM_WEAK_SPECIFIC_PARENT(ImageManagerPoint,ObservationPinHoleAnchoredHomogeneousPoint);
 				}
 
-			void setup(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr, const vec & _noiseStd, int patchSize);
+			void setup(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr, double _noiseStd, int patchSize);
 
 				virtual std::string typeName() {
 					return "Obs. Pinhole Euclidean point";

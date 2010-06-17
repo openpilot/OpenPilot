@@ -17,6 +17,8 @@
 #include "rtslam/observationPinHoleAnchoredHomogeneous.hpp"
 #include "rtslam/sensorAbstract.hpp"
 #include "rtslam/landmarkAbstract.hpp"
+#include "rtslam/featurePoint.hpp"
+#include "rtslam/descriptorImagePoint.hpp"
 
 namespace jafar {
 namespace rtslam {
@@ -57,9 +59,11 @@ class ObservationFactory
 		
 		observation_maker_ptr_t getMaker(SenLmk senLmk)
 		{
-			CreatorsMap::iterator it = creators.find(SenLmk(senPtr->type,lmkPtr->type));
+			CreatorsMap::iterator it = creators.find(senLmk);
 			if (it == creators.end())
-				JFR_ERROR(RtslamException, RtslamException::UNKNOWN_TYPES_FOR_FACTORY, "ObservationFactory: do not know how to create an observation from sensor type " << senPtr->type << " and landmark type " << lmkPtr->type);
+				JFR_ERROR(RtslamException, RtslamException::UNKNOWN_TYPES_FOR_FACTORY,
+				          "ObservationFactory: do not know how to create an observation from sensor type "
+				          << senLmk.first << " and landmark type " << senLmk.second);
 			return it->second;
 		}
 		
@@ -93,33 +97,33 @@ class ObservationFactory
 //////////////////////////////////////////////////////
 
 
-template<class ObsType, class SenType, class LmkType, int SenType, int LmkType>
+template<class ObsType, class SenType, class LmkType, SensorAbstract::type_enum SenTypeId, LandmarkAbstract::type_enum LmkTypeId>
 class ImagePointObservationMaker: public ObservationMakerAbstract
 {
 	private:
 		
 	public:
 		ImagePointObservationMaker():
-			ObservationMakerAbstract(SenType, LmkType) {}
+			ObservationMakerAbstract(SenTypeId, LmkTypeId) {}
 			
 		observation_ptr_t create(const sensor_ptr_t &senPtr, const landmark_ptr_t &lmkPtr)
 		{
 			SenType *sen = PTR_CAST<SenType*>(senPtr.get());
-			obs_ph_euc_ptr_t res(new ObsType(senPtr, lmkPtr));
-			res->setup(senPtr, lmkPtr, sen->params.matchsize);
+			boost::shared_ptr<ObsType> res(new ObsType(senPtr, lmkPtr));
+			res->setup(senPtr, lmkPtr, sen->params.pixNoise, sen->params.patchSize);
 			return res;
 		}
 		
 		feature_ptr_t createFeat(const sensor_ptr_t &senPtr, const landmark_ptr_t &lmkPtr)
 		{
 			SenType *sen = PTR_CAST<SenType*>(senPtr.get());
-			feature_ptr_t res(new FeatureImagePoint(sen->params.matchsize, sen->params.matchsize, CV_8U));
+			feature_ptr_t res(new FeatureImagePoint(sen->params.patchSize, sen->params.patchSize, CV_8U));
 			return res;
 		}
 		
 		descriptor_ptr_t createDesc(const sensor_ptr_t &senPtr, const landmark_ptr_t &lmkPtr, const feature_ptr_t &featPtr, const jblas::vec7 &senPoseInit, const observation_ptr_t &obsInitPtr)
 		{
-			SenType *sen = PTR_CAST<SenType*>(senPtr.get());
+			//SenType *sen = PTR_CAST<SenType*>(senPtr.get());
 			feat_img_pnt_ptr_t featSpecPtr = SPTR_CAST<FeatureImagePoint>(featPtr);
 			descriptor_ptr_t res(new DescriptorImagePoint(featSpecPtr, senPoseInit, obsInitPtr));
 			return res;
@@ -129,8 +133,8 @@ class ImagePointObservationMaker: public ObservationMakerAbstract
 typedef ImagePointObservationMaker<ObservationPinHoleEuclideanPoint, SensorPinHole, LandmarkEuclideanPoint, 
 	SensorAbstract::PINHOLE, LandmarkAbstract::PNT_EUC> 
 	PinholeEucpObservationMaker;
-typedef ImagePointObservationMaker<ObservationPinHoleAnchoredHomogeneousPoint, SensorPinHole, LandmearkHomogeneousAnchoredPoint,
-	SensorAbstract::PINHOLE, LandmarkAbstract::PNT_AHP>
+typedef ImagePointObservationMaker<ObservationPinHoleAnchoredHomogeneousPoint, SensorPinHole, LandmarkAnchoredHomogeneousPoint,
+	SensorAbstract::PINHOLE, LandmarkAbstract::PNT_AH>
 	PinholeAhpObservationMaker;
 
 

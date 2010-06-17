@@ -25,7 +25,7 @@ namespace jafar {
 			type = PNT_PH_EUC;
 		}
 
-		void ObservationPinHoleEuclideanPoint::setup(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr, const vec & _noiseStd, int patchSize)
+		void ObservationPinHoleEuclideanPoint::setup(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr, double _noiseStd, int patchSize)
 		{
 			ObservationAbstract::setup(_noiseStd, getPrior());
 			id() = eucPtr->id();

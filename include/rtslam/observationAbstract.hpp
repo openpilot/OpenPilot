@@ -116,7 +116,7 @@ namespace jafar {
 				virtual ~ObservationAbstract() {
 				}
 
-				virtual void setup(const vec & _noiseStd, const Gaussian & _prior);
+				virtual void setup(double _noiseStd, const Gaussian & _prior);
 
 
 				// Data

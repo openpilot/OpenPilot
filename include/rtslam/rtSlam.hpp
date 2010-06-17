@@ -18,6 +18,14 @@
 #include <map>
 #include <list>
 
+#ifdef JFR_NDEBUG
+	#define PTR_CAST static_cast
+	#define SPTR_CAST boost::static_pointer_cast
+#else
+	#define PTR_CAST dynamic_cast
+	#define SPTR_CAST boost::dynamic_pointer_cast
+#endif
+
 namespace jafar {
 	namespace kernel {
 		template<typename> class IdCollectorNone;

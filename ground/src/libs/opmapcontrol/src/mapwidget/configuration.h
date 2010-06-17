@@ -7,6 +7,7 @@
 #include <QFont>
 #include "../core/opmaps.h"
 #include "../core/accessmode.h"
+#include "../core/cache.h"
 class Configuration
 {
 public:
@@ -26,6 +27,9 @@ public:
 
     void SetUseMemoryCache(bool const& value){core::OPMaps::Instance()->setUseMemoryCache(value);}
     bool UseMemoryCache(){return core::OPMaps::Instance()->UseMemoryCache();}
+
+    void SetCacheLocation(QString const& dir){core::Cache::Instance()->setCacheLocation(dir);}
+    QString CacheLocation(){return core::Cache::Instance()->CacheLocation();}
 };
 
 #endif // CONFIGURATION_H

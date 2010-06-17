@@ -53,6 +53,8 @@ namespace jafar {
 				const double EPSILON = 1e-8;
 			}
 
+
+
 			/*
 			 * Vector
 			 */
@@ -72,6 +74,38 @@ namespace jafar {
 				for (std::size_t i = 0; i < v.size(); ++i)
 					v(i) = value;
 			}
+
+			/** Fills vector with the contents of a c-array
+			 */
+			template<class V, typename W>
+			void fillVector(V& out, const W* in) {
+				for (std::size_t i = 0; i < out.size(); ++i)
+					out(i) = in[i];
+			}
+
+			/** Creates a vector with the contents of a c-array
+			 */
+			template<int size, typename W>
+			jblas::vec createVector(const W in[size]) {
+				jblas::vec out(size);
+				for (std::size_t i = 0; i < size; ++i)
+					out(i) = in[i];
+				return out;
+			}
+
+			/** Creates a vector with the contents of a c-array
+			 */
+			template<int size, typename W>
+			jblas::sym_mat createSymMat(const W std[size]) {
+				jblas::sym_mat out(size);
+				for (std::size_t i = 0; i < size; ++i)
+					out(i,i) = std[i] * std[i];
+				return out;
+			}
+
+#define DECL_VEC(name,size,values) jblas::vec name(size); { const double tmp[size] = {values}; fillVector(name, tmp); }
+#define INIT_VEC(size,values) fillVector2<size>((double[]){ values })
+
 
 			template<class V>
 			bool isZeroVector(const V& v) {

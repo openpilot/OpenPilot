@@ -252,8 +252,8 @@ void OPMapGadgetWidget::on_pushButtonZoomP_clicked()
 {
     if (map)
     {
-	double x = map->Zoom();
-	double y = controlpanel_ui->doubleSpinBox->value();
+//	double x = map->Zoom();
+//	double y = controlpanel_ui->doubleSpinBox->value();
 	map->SetZoom(map->Zoom() + controlpanel_ui->doubleSpinBox->value());
     }
 }

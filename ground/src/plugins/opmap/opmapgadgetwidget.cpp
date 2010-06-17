@@ -60,7 +60,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     // create the map display
 
     map = new mapcontrol::OPMapWidget();
-//    map->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    map->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     map->setMinimumSize(64, 64);
 
     // **************
@@ -70,6 +70,9 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     controlpanel_ui->comboBox->setCurrentIndex(mapcontrol::Helper::MapTypes().indexOf("GoogleHybrid"));
 
     // **************
+
+    // receive map zoom changes
+    connect(map, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
 
     map->SetShowTileGridLines(controlpanel_ui->checkBox->isChecked());
 
@@ -205,7 +208,7 @@ void OPMapGadgetWidget::keyPressEvent(QKeyEvent* event)
 
 void OPMapGadgetWidget::zoomChanged(double zoom)
 {
-    controlpanel_ui->label_5->setText("CurrentZoom=" + QString::number(zoom));
+    controlpanel_ui->labelZoom->setText(" " + QString::number(zoom));
 }
 
 void OPMapGadgetWidget::on_checkBox_clicked(bool checked)
@@ -230,6 +233,12 @@ void OPMapGadgetWidget::on_pushButtonGO_clicked()
     }
 }
 
+void OPMapGadgetWidget::on_pushButtonReload_clicked()
+{
+    if (map)
+	map->ReloadMap();
+}
+
 void OPMapGadgetWidget::on_pushButtonRL_clicked()
 {
     if (map)
@@ -252,16 +261,22 @@ void OPMapGadgetWidget::on_pushButtonZoomP_clicked()
 {
     if (map)
     {
-//	double x = map->Zoom();
-//	double y = controlpanel_ui->doubleSpinBox->value();
-	map->SetZoom(map->Zoom() + controlpanel_ui->doubleSpinBox->value());
+	double zoom = map->Zoom();
+//	double zoom_step = controlpanel_ui->doubleSpinBox->value();
+	double zoom_step = 1;
+	map->SetZoom(zoom + zoom_step);
     }
 }
 
 void OPMapGadgetWidget::on_pushButtonZoomM_clicked()
 {
     if (map)
-	map->SetZoom(map->Zoom() - controlpanel_ui->doubleSpinBox->value());
+    {
+	double zoom = map->Zoom();
+//	double zoom_step = controlpanel_ui->doubleSpinBox->value();
+	double zoom_step = 1;
+	map->SetZoom(zoom - zoom_step);
+    }
 }
 
 void OPMapGadgetWidget::on_checkBox_2_clicked(bool checked)

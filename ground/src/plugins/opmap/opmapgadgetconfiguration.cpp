@@ -31,7 +31,7 @@
 OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),
     m_mapProvider("OpenStreetMap"),
-    m_defaultZoom(10),
+    m_defaultZoom(2),
     m_defaultLatitude(0),
     m_defaultLongitude(0)
 {

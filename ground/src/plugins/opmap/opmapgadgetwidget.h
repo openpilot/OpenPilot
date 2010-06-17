@@ -63,6 +63,7 @@ private slots:
     void on_checkBox_clicked(bool checked);
     void on_comboBox_currentIndexChanged(QString );
     void on_pushButtonGO_clicked();
+    void on_pushButtonReload_clicked();
     void on_pushButtonRR_clicked();
     void on_pushButtonRC_clicked();
     void on_pushButtonRL_clicked();

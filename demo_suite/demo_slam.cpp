@@ -57,8 +57,8 @@ void test_slam01_main(world_ptr_t *world) {
 	int patchMatchSize = 11;
 	int patchInitSize = patchMatchSize * 3;
 	ObservationFactory obsFact;
-	obsFact.addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PhEuc_ObservationMaker(patchMatchSize)));
-	obsFact.addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PhAhp_ObservationMaker(patchMatchSize)));
+	obsFact.addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeEucpObservationMaker()));
+	obsFact.addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholAhpObservationMaker()));
 
 	// INIT : 1 map, 2 robs, 3 sens
 	//world_ptr_t worldPtr(new WorldAbstract());
@@ -140,11 +140,6 @@ void test_slam01_main(world_ptr_t *world) {
 		{
 			robot_ptr_t robPtr = *robIter;
 
-			vec u(robPtr->mySize_control()); // TODO put some real values in u.
-			fillVector(u, 0.0);
-			robPtr->set_control(u);
-			robPtr->move();
-
 //			cout << "\n================================================== " << endl;
 //			cout << *robPtr << endl;
 
@@ -156,8 +151,15 @@ void test_slam01_main(world_ptr_t *world) {
 //				cout << *senPtr << endl;
 
 				// get raw-data
-				senPtr->acquireRaw() ;
+				senPtr->acquireRaw() ; // FIXME acquireRaw should not be in the rtslam lib
 
+				// move the filter time to the data raw
+				vec u(robPtr->mySize_control()); // TODO put some real values in u.
+				fillVector(u, 0.0);
+				robPtr->set_control(u);
+				robPtr->move();
+				
+				
 				asGrid.renew();
 				// 1. Observe known landmarks
 				// foreach observation
@@ -218,12 +220,24 @@ void test_slam01_main(world_ptr_t *world) {
 
 
 				// 2. init new landmarks
+				#if 0
+				for (LandmarkFactoryList::iterator it = senPtr->lmkFactories.begin(); it != senPtr->lmkFactories.end(); ++it)
+				{
+					if (mapPtr->unusedStates(it->size())) 
+					{
+					
+					}
+				}
+				
+				
+				#endif
 				if (mapPtr->unusedStates(LandmarkAnchoredHomogeneousPoint::size())) {
 
 					ROI roi;
 					if (asGrid.getROI(roi)){
 
 						//feature_ptr_t featPtr(new FeatureAbstract(2));
+						//feature_ptr_t featPtr = obsFact.createFeat(
 						feat_img_pnt_ptr_t featPtr(new FeatureImagePoint(patchInitSize,patchInitSize,CV_8U));
 						if (senPtr->getRaw()->detect(RawAbstract::HARRIS, featPtr, &roi)) {
 //							cout << "\n-------------------------------------------------- " << endl;

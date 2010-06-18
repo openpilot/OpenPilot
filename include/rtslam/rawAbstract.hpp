@@ -62,6 +62,8 @@ namespace jafar {
 					ZNCC ///< Zncc matching algorithm
 				};
 
+				double timestamp;
+				
 				virtual ~RawAbstract();
 
 				virtual std::string categoryName() {

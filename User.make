@@ -15,12 +15,12 @@ OPTIONAL_MODULES = qdisplay
 
 # external libraries dependencies
 REQUIRED_EXTLIBS = boost_sandbox opencv 
-OPTIONAL_EXTLIBS = qt4
+OPTIONAL_EXTLIBS = qt4 viam
 
 # LDFLAGS +=
 LIBS += -lkernel -ljmath -limage -lqdisplay -lcorrel
 
-CPPFLAGS += $(OPENCV_CPPFLAGS) $(QT4_CPPFLAGS) $(BOOST_CPPFLAGS) $(BOOST_SANDBOX_CPPFLAGS) 
+CPPFLAGS += $(OPENCV_CPPFLAGS) $(QT4_CPPFLAGS) $(BOOST_CPPFLAGS) $(BOOST_SANDBOX_CPPFLAGS) $(VIAM_CPPFLAGS) -I$(ROBOTPKG_BASE)/include
 
 # debug:
 CXXFLAGS += -g -O0 -ggdb -Wall -pthread

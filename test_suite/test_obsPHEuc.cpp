@@ -76,19 +76,20 @@ void test_obsPHEuc01() {
 	lmkPtr-> state.x() = lmkPoint;
 
 	vec4 k;
-	vec d, c;
+	vec d;
 	vec2 imSize;
-
+	
 	randVector(k);
-	senPtr->set_parameters(imSize, k, d, c);
+	senPtr->params.setImgSize(imSize(0), imSize(1));
+	senPtr->params.setIntrinsicCalibration(k, d, d.size());
 
 	obsPtr->project();
 
 	//Matlab stuff
 	cout << "Rf = " << (MATLAB) robPtr->pose.x() << endl;
 	cout << "Sf = " << (MATLAB) senPtr->pose.x() << endl;
-	cout << "Spk = " << (MATLAB) senPtr->intrinsic << endl;
-	cout << "Spd = " << (MATLAB) senPtr->distortion << endl;
+	cout << "Spk = " << (MATLAB) senPtr->params.intrinsic << endl;
+	cout << "Spd = " << (MATLAB) senPtr->params.distortion << endl;
 	cout << "l = " << (MATLAB) lmkPoint << endl;
 	cout
 	    << "[um, sm, U_rm, U_sm, U_km, U_dm, U_lm] = projEucPntIntoPinHoleOnRob(Rf, Sf, Spk, Spd, l);"

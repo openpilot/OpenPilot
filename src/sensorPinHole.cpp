@@ -44,6 +44,7 @@ namespace jafar {
 
 		void SensorPinHole::acquireRaw(){
 
+
 			jafarImage_ptr_t i(Image::loadImage("test_suite/imageSample.ppm",0));
 
 			RawImage* imgRawPtr = new RawImage;
@@ -56,8 +57,6 @@ namespace jafar {
 //			image_ptr_t ip = rawPtr;
 			return rawPtr;
 		}
-
-
 
 	}
 }

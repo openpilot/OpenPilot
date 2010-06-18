@@ -55,7 +55,7 @@ namespace jafar {
 			public:
 				AppearanceImagePoint(const image::Image& patch);
 				AppearanceImagePoint(int width, int height, int depth) : patch(width, height, depth, JfrImage_CS_GRAY) {
-					cout << "Created patch with " << width << "x" << height << " pixels; depth: " << depth << "; color space: " << JfrImage_CS_GRAY << endl;
+//					cout << "Created patch with " << width << "x" << height << " pixels; depth: " << depth << "; color space: " << JfrImage_CS_GRAY << endl;
 				}
 				virtual ~AppearanceImagePoint();
 

@@ -18,6 +18,7 @@
 #include "kernel/timingTools.hpp"
 #include "jmath/random.hpp"
 #include "jmath/matlab.hpp"
+#include "jmath/ublasExtra.hpp"
 
 #include <iostream>
 #include <boost/shared_ptr.hpp>
@@ -49,13 +50,15 @@ using namespace boost;
 
 
 void test_slam01_main(world_ptr_t *world) {
-	ActiveSearchGrid asGrid(640, 480, 8, 8, 22, 3);
+	ActiveSearchGrid asGrid(640, 480, 7, 7, 22, 3);
 	int imgWidth = 640, imgHeight = 480;
-	vec4 k;
-	vec d(0), c(0);
-	k(0) = 320; k(1) = 320; k(2) = 320; k(3) = 320;
+	double _d[3] = {-0.27965, 0.20059, -0.14215};
+//	double _d[0];
+	vec d = createVector<3>(_d);
+	double _k[4] = {551.379, 365.793, 1079.2, 1076.73};
+//	double _k[4] = {320, 240, 320, 320};
+	vec k = createVector<4>(_k);
 	int patchMatchSize = 11;
-	int patchInitSize = patchMatchSize * 3;
 	ObservationFactory obsFact;
 	obsFact.addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeEucpObservationMaker()));
 	obsFact.addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhpObservationMaker()));
@@ -71,7 +74,9 @@ void test_slam01_main(world_ptr_t *world) {
 	mapPtr->clear();
 	
 	// create robots
-	robodo_ptr_t robPtr1(new RobotOdometry(mapPtr));
+//	robodo_ptr_t robPtr1(new RobotOdometry(mapPtr));
+	robconstvel_ptr_t robPtr1(new RobotConstantVelocity(mapPtr));
+//	inertial_ptr_t robPtr1(new RobotInertial(mapPtr));
 	robPtr1->id(robPtr1->robotIds.getId());
 	robPtr1->linkToParentMap(mapPtr);
 	vec v(robPtr1->mySize());
@@ -80,9 +85,10 @@ void test_slam01_main(world_ptr_t *world) {
 	robPtr1->pose.x(quaternion::originFrame());
 	robPtr1->dt_or_dx = 0.1;
 	v.resize(robPtr1->mySize_perturbation());
-	fillVector(v, 0.01);
+	fillVector(v, 0.005);
 	robPtr1->perturbation.clear();
 	robPtr1->perturbation.std(v);
+
 	
 	// create sensors
 	pinhole_ptr_t senPtr11 (new SensorPinHole(robPtr1, MapObject::UNFILTERED));
@@ -91,8 +97,10 @@ void test_slam01_main(world_ptr_t *world) {
 	senPtr11->state.clear();
 	senPtr11->pose.x(quaternion::originFrame());
 	senPtr11->params.setImgSize(imgWidth, imgHeight);
-	senPtr11->params.setIntrinsicCalibration(k, d, c);
+	senPtr11->params.setIntrinsicCalibration(k, d, d.size());
 	senPtr11->params.setMiscellaneous(1.0, 1.0, patchMatchSize);
+
+	cout << "d: " << senPtr11->params.distortion << "\nc: " << senPtr11->params.correction << endl;
 //	pinhole_ptr_t senPtr12 (new SensorPinHole(robPtr1, MapObject::FILTERED));
 //	senPtr12->id(senPtr12->sensorIds.getId());
 //	senPtr12->linkToParentRobot(robPtr1);
@@ -127,6 +135,7 @@ void test_slam01_main(world_ptr_t *world) {
 	// Temporal loop
 
 	const int NFRAME = 1000;
+	const int NUPDATES = 1000;
 
 	kernel::Chrono chrono;
 	kernel::Chrono total_chrono;
@@ -136,8 +145,8 @@ void test_slam01_main(world_ptr_t *world) {
 //		sleep(1);
 
 		worldPtr->display_mutex.lock();
-		cout << "\n************************************************** " << endl;
-		cout << "\n                 FRAME : " << t << " (blocked " << mutex_chrono.elapsedMicrosecond() << " us)" << endl;
+//		cout << "\n************************************************** " << endl;
+//		cout << "\n                 FRAME : " << t << " (blocked " << mutex_chrono.elapsedMicrosecond() << " us)" << endl;
 		chrono.reset();
 
 
@@ -210,7 +219,7 @@ void test_slam01_main(world_ptr_t *world) {
 						senPtr->getRaw()->match(RawAbstract::ZNCC, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
 
 
-						cout << "matched pix: " << obsPtr->measurement.x() << "; score: " << obsPtr->getMatchScore() << endl;
+//						cout << "matched pix: " << obsPtr->measurement.x() << "; score: " << obsPtr->getMatchScore() << endl;
 
 						// 1e. if feature is found
 						if (obsPtr->getMatchScore()>0.80) {
@@ -227,11 +236,11 @@ void test_slam01_main(world_ptr_t *world) {
 						} // obsPtr->getScoreMatchInPercent()>80
 					} // obsPtr->isVisible()
 
-					cout << "\n-------------------------------------------------- " << endl;
-					cout << *obsPtr << endl;
+//					cout << "\n-------------------------------------------------- " << endl;
+//					cout << *obsPtr << endl;
 
 					numObs ++;
-					if (numObs >= 12) break;
+					if (numObs >= NUPDATES) break;
 				} // foreach observation
 
 
@@ -259,10 +268,10 @@ void test_slam01_main(world_ptr_t *world) {
 
 						//feature_ptr_t featPtr(new FeatureAbstract(2));
 						//feature_ptr_t featPtr = obsFact.createFeat(
-						feat_img_pnt_ptr_t featPtr(new FeatureImagePoint(patchInitSize,patchInitSize,CV_8U));
+						feat_img_pnt_ptr_t featPtr(new FeatureImagePoint(patchMatchSize*3,patchMatchSize*3,CV_8U));
 						if (senPtr->getRaw()->detect(RawAbstract::HARRIS, featPtr, &roi)) {
-							cout << "\n-------------------------------------------------- " << endl;
-							cout << "Detected pixel: " << featPtr->measurement.x() << endl;
+//							cout << "\n-------------------------------------------------- " << endl;
+//							cout << "Detected pixel: " << featPtr->measurement.x() << endl;
 
 //((AppearanceImagePoint*)(featPtr->appearancePtr.get()))->patch.save("detected_patch.png");
 							
@@ -294,8 +303,8 @@ void test_slam01_main(world_ptr_t *world) {
 							// Complete SLAM graph with all other obs
 							//mapPtr->completeObservationsInGraph(senPtr, lmkPtr); // FIXME
 
-							cout << "\n-------------------------------------------------- " << endl;
-							cout << *lmkPtr << endl;
+//							cout << "\n-------------------------------------------------- " << endl;
+//							cout << *lmkPtr << endl;
 						}
 					}
 				}

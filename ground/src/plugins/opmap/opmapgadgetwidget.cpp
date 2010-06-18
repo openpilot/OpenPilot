@@ -27,6 +27,7 @@
 #include "opmapgadgetwidget.h"
 #include <QStringList>
 #include <QtGui/QHBoxLayout>
+#include <QtGui/QVBoxLayout>
 #include "extensionsystem/pluginmanager.h"
 
 #include "ui_opmap_controlpanel.h"
@@ -38,8 +39,8 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 {
     // **************
 
-    map = NULL;
     controlpanel_ui = NULL;
+    map = NULL;
 
     follow_uav = false;
 
@@ -56,6 +57,25 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     controlpanel_ui = new Ui::OPMapControlPanel();
     controlpanel_ui->setupUi(this);
 
+
+
+
+
+
+/*
+    QWidget *dialog = new QWidget(this, Qt::Dialog);
+
+    controlpanel_ui = new Ui::OPMapControlPanel();
+    controlpanel_ui->setupUi(dialog);
+
+    QHBoxLayout *d_layout = new QHBoxLayout(dialog);
+    d_layout->setSpacing(0);
+    d_layout->setContentsMargins(0, 0, 0, 0);
+    d_layout->addWidget(controlpanel_ui->layoutWidget);
+    dialog->setLayout(d_layout);
+
+    dialog->show();
+*/
     // **************
     // create the map display
 
@@ -68,6 +88,8 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     controlpanel_ui->comboBox->addItems(mapcontrol::Helper::MapTypes());
     controlpanel_ui->comboBox->setCurrentIndex(mapcontrol::Helper::MapTypes().indexOf("GoogleHybrid"));
+    controlpanel_ui->labelZoom->setText(" " + QString::number(map->Zoom()));
+    controlpanel_ui->labelRotate->setText(" " + QString::number(map->Rotate()));
 
     // **************
 
@@ -90,8 +112,14 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(controlpanel_ui->layoutWidget);
+//    layout->addWidget(dialog);
     layout->addWidget(map);
     setLayout(layout);
+
+    // **************
+    // create the user controls overlayed onto the map
+
+    createMapOverlayUserControls();
 
     // **************
 
@@ -206,6 +234,21 @@ void OPMapGadgetWidget::keyPressEvent(QKeyEvent* event)
 
 // *************************************************************************************
 
+void OPMapGadgetWidget::zoomIn()
+{
+    if (map)
+	map->SetZoom(map->Zoom() + 1);
+}
+
+void OPMapGadgetWidget::zoomOut()
+{
+    if (map)
+	map->SetZoom(map->Zoom() - 1);
+}
+
+
+// *************************************************************************************
+
 void OPMapGadgetWidget::zoomChanged(double zoom)
 {
     controlpanel_ui->labelZoom->setText(" " + QString::number(zoom));
@@ -242,19 +285,28 @@ void OPMapGadgetWidget::on_pushButtonReload_clicked()
 void OPMapGadgetWidget::on_pushButtonRL_clicked()
 {
     if (map)
+    {
 	map->SetRotate(map->Rotate() - 1);
+	controlpanel_ui->labelRotate->setText(" " + QString::number(map->Rotate()));
+    }
 }
 
 void OPMapGadgetWidget::on_pushButtonRC_clicked()
 {
     if (map)
+    {
 	map->SetRotate(0);
+	controlpanel_ui->labelRotate->setText(" " + QString::number(map->Rotate()));
+    }
 }
 
 void OPMapGadgetWidget::on_pushButtonRR_clicked()
 {
     if (map)
+    {
 	map->SetRotate(map->Rotate() + 1);
+	controlpanel_ui->labelRotate->setText(" " + QString::number(map->Rotate()));
+    }
 }
 
 void OPMapGadgetWidget::on_pushButtonZoomP_clicked()
@@ -303,5 +355,72 @@ void OPMapGadgetWidget::on_pushButtonGeoFenceP_clicked()
     geo_fence_distance = controlpanel_ui->spinBoxGeoFenceDistance->value();
 }
 
+// *************************************************************************************
+// create some user controls overlayed onto the map area
+
+QPushButton * OPMapGadgetWidget::createTransparentButton(QWidget *parent, QString text, QString icon)
+{
+    QPixmap pix;
+    pix.load(icon);
+
+    QPushButton *but = new QPushButton(parent);
+
+    QColor transparent_color(0,0,0,0);
+    QPalette but_pal(but->palette());
+
+    but_pal.setColor(QPalette::Button, transparent_color);
+    but->setPalette(but_pal);
+
+    but->setIcon(pix);
+    but->setText(text);
+    but->setIconSize(pix.size());
+
+    return but;
+}
+
+void OPMapGadgetWidget::createMapOverlayUserControls()
+{
+    QPushButton *zoomin = createTransparentButton(map, "", QString::fromUtf8(":/core/images/plus.png"));
+    zoomin->setStyleSheet("");
+//    QPushButton *zoomin = new QPushButton("");
+    zoomin->setFixedSize(24, 24);
+    zoomin->setToolTip(tr("Zoom in"));
+    zoomin->setCursor(Qt::OpenHandCursor);
+//    zoomin->setIcon(QIcon(QString::fromUtf8(":/core/images/plus.png")));
+    zoomin->setIconSize(QSize(12, 12));
+    connect(zoomin, SIGNAL(clicked(bool)), this, SLOT(zoomIn()));
+
+	QPushButton *zoomout = new QPushButton("");
+	zoomout->setFixedSize(24, 24);
+	zoomout->setToolTip(tr("Zoom out"));
+	zoomout->setCursor(Qt::OpenHandCursor);
+	zoomout->setIcon(QIcon(QString::fromUtf8(":/core/images/minus.png")));
+	zoomout->setIconSize(QSize(12, 12));
+//	zoomout->setWindowOpacity(0.7);
+//	zoomout->setBackgroundRole(QPalette(QColor(0, 0, 0, 0)));
+	connect(zoomout, SIGNAL(clicked(bool)), this, SLOT(zoomOut()));
+
+    	// add zoom buttons to the layout of the MapControl
+	QVBoxLayout* overlay_layout_v1 = new QVBoxLayout;
+	overlay_layout_v1->setMargin(4);
+    	overlay_layout_v1->setSpacing(4);
+	overlay_layout_v1->addSpacing(10);
+
+	QHBoxLayout* overlay_layout_h1 = new QHBoxLayout;
+	overlay_layout_h1->setMargin(0);
+    	overlay_layout_h1->setSpacing(4);
+	overlay_layout_h1->addSpacing(10);
+//	overlay_layout_h1->addWidget(gcsButton);
+//	overlay_layout_h1->addWidget(uavButton);
+//	overlay_layout_h1->addSpacing(10);
+	overlay_layout_h1->addWidget(zoomout);
+	overlay_layout_h1->addWidget(zoomin);
+	overlay_layout_h1->addStretch(0);
+
+	overlay_layout_v1->addLayout(overlay_layout_h1);
+	overlay_layout_v1->addStretch(0);
+
+	map->setLayout(overlay_layout_v1);
+}
 
 // *************************************************************************************

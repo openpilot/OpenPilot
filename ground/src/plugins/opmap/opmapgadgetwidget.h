@@ -30,7 +30,6 @@
 
 #include "opmapcontrol/opmapcontrol.h"
 #include <QtGui/QWidget>
-#include <QtGui/QMainWindow>
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/positionactual.h"
 
@@ -59,6 +58,9 @@ protected:
 private slots:
    void updatePosition();
 
+    void zoomIn();
+    void zoomOut();
+
     // control panel slots
     void on_checkBox_clicked(bool checked);
     void on_comboBox_currentIndexChanged(QString );
@@ -85,6 +87,10 @@ private:
 
     Ui::OPMapControlPanel *controlpanel_ui;
     mapcontrol::OPMapWidget *map;
+
+    QPushButton * createTransparentButton(QWidget *parent, QString text, QString icon);
+    void createMapOverlayUserControls();
+
 };
 
 #endif /* OPMAP_GADGETWIDGET_H_ */

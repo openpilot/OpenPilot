@@ -121,13 +121,12 @@ namespace jafar {
 
 				void set_std_continuous(vec & _std) {
 
-					sym_mat _P_ct;
-
-					int i;
+					JFR_ASSERT(size() == _std.size(), "Sizes mismatch");
+					P_ct.resize(size(), size());
+					size_t i;
 					for (i = 0 ; i< _std.size() ; i++)
-						_P_ct(i,i) = _std(i)*_std(i);
+						P_ct(i,i) = _std(i)*_std(i);
 
-					set_P_continuous(_P_ct);
 				}
 		};
 

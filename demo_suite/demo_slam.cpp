@@ -80,14 +80,16 @@ void test_slam01_main(world_ptr_t *world) {
 	robPtr1->id(robPtr1->robotIds.getId());
 	robPtr1->linkToParentMap(mapPtr);
 	vec v(robPtr1->mySize());
-	fillVector(v, 0.0);
+	fillVector(v, 1.0);
 	robPtr1->state.x(v);
 	robPtr1->pose.x(quaternion::originFrame());
 	robPtr1->dt_or_dx = 1/15;
 	v.resize(robPtr1->mySize_perturbation());
 	fillVector(v, 0.005);
 	robPtr1->perturbation.clear();
-	robPtr1->perturbation.std(v);
+	robPtr1->perturbation.set_std_continuous(v);
+	robPtr1->perturbation.set_P_from_continuous(robPtr1->dt_or_dx);
+	//robPtr1->perturbation.std(v);
 
 	
 	// create sensors

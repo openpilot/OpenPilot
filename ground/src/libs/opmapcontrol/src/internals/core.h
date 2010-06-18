@@ -250,6 +250,8 @@ private:
     QSemaphore loaderLimit;
 
     QThreadPool ProcessLoadTaskCallback;
+    QMutex MtileToload;
+    int tilesToload;
 
 protected:
     bool started;

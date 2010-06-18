@@ -44,6 +44,7 @@ namespace internals {
         renderOffset=Point(0,0);
         dragPoint=Point(0,0);
         CanDragMap=true;
+        tilesToload=0;
     }
     void Core::run()
     {
@@ -55,7 +56,6 @@ namespace internals {
         qDebug()<<"core:run"<<" ID="<<debug;
 #endif //DEBUG_CORE
         bool last = false;
-        int stillToGo;
 
         LoadTask task;
 
@@ -65,8 +65,8 @@ namespace internals {
             {
                 task = tileLoadQueue.dequeue();
                 {
-                    stillToGo=tileLoadQueue.count();
-                    last = (stillToGo == 0);
+
+                    last = (tileLoadQueue.count() == 0);
 #ifdef DEBUG_CORE
                     qDebug()<<"TileLoadQueue: " << tileLoadQueue.count()<<" Point:"<<task.Pos.ToString()<<" ID="<<debug;;
 #endif //DEBUG_CORE
@@ -74,13 +74,19 @@ namespace internals {
             }
         }
         MtileLoadQueue.unlock();
+
+        if(task.HasValue())
         if(loaderLimit.tryAcquire(1,OPMaps::Instance()->Timeout))
         {
+            MtileToload.lock();
+            --tilesToload;
+            MtileToload.unlock();
 #ifdef DEBUG_CORE
             qDebug()<<"loadLimit semaphore aquired "<<loaderLimit.available()<<" ID="<<debug<<" TASK="<<task.Pos.ToString()<<" "<<task.Zoom;
 #endif //DEBUG_CORE
-            if(task.HasValue())
+           
             {
+
 #ifdef DEBUG_CORE
                 qDebug()<<"task as value, begining get"<<" ID="<<debug;;
 #endif //DEBUG_CORE
@@ -153,7 +159,7 @@ namespace internals {
                         {
                             Matrix.SetTileAt(task.Pos,t);
                             emit OnNeedInvalidation();
-                            emit OnTilesStillToLoad(stillToGo);
+
 #ifdef DEBUG_CORE
                             qDebug()<<"Core::run add tile "<<t->GetPos().ToString()<<" to matrix index "<<task.Pos.ToString()<<" ID="<<debug;
                             qDebug()<<"Core::run matrix index "<<task.Pos.ToString()<<" as tile with "<<Matrix.TileAt(task.Pos)->Overlays.count()<<" ID="<<debug;
@@ -161,6 +167,8 @@ namespace internals {
                         }
                         else
                         {
+                           // emit OnTilesStillToLoad(tilesToload);
+
                             delete t;
                             t = 0;
                         }
@@ -199,6 +207,7 @@ namespace internals {
 #ifdef DEBUG_CORE
             qDebug()<<"loaderLimit release:"+loaderLimit.available()<<" ID="<<debug;
 #endif
+            emit OnTilesStillToLoad(tilesToload<0? 0:tilesToload);
             loaderLimit.release();
         }
     }
@@ -215,6 +224,9 @@ namespace internals {
                 MtileLoadQueue.lock();
                 tileLoadQueue.clear();
                 MtileLoadQueue.unlock();
+                MtileToload.lock();
+                tilesToload=0;
+                MtileToload.unlock();
                 Matrix.Clear();
                 GoToCurrentPositionOnZoom();
                 UpdateBounds();
@@ -457,6 +469,9 @@ namespace internals {
                 tileLoadQueue.clear();
             }
             MtileLoadQueue.unlock();
+            MtileToload.lock();
+            tilesToload=0;
+            MtileToload.unlock();
             Matrix.Clear();
 
             emit OnNeedInvalidation();
@@ -560,8 +575,12 @@ namespace internals {
             MtileLoadQueue.lock();
             {
                 tileLoadQueue.clear();
+                //tilesToload=0;
             }
             MtileLoadQueue.unlock();
+            MtileToload.lock();
+            tilesToload=0;
+            MtileToload.unlock();
             //  ProcessLoadTaskCallback.waitForDone();
         }
     }
@@ -586,6 +605,9 @@ namespace internals {
                     {
                         if(!tileLoadQueue.contains(task))
                         {
+                            MtileToload.lock();
+                            ++tilesToload;
+                            MtileToload.unlock();
                             tileLoadQueue.enqueue(task);
 #ifdef DEBUG_CORE
                             qDebug()<<"Core::UpdateBounds new Task"<<task.Pos.ToString();

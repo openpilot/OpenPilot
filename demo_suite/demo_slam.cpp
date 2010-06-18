@@ -87,11 +87,10 @@ void test_slam01_main(world_ptr_t *world) {
 	robPtr1->pose.x(quaternion::originFrame());
 	robPtr1->dt_or_dx = 1/15.0;
 	v.resize(robPtr1->mySize_perturbation());
-	fillVector(v, 1.0);
+	fillVector(v, 10.0);
 	robPtr1->perturbation.clear();
 	robPtr1->perturbation.set_std_continuous(v);
 	robPtr1->perturbation.set_P_from_continuous(robPtr1->dt_or_dx);
-
 	
 	// create sensors
 	pinhole_ptr_t senPtr11 (new SensorPinHole(robPtr1, MapObject::UNFILTERED));
@@ -101,7 +100,7 @@ void test_slam01_main(world_ptr_t *world) {
 	senPtr11->pose.x(quaternion::originFrame());
 	senPtr11->params.setImgSize(imgWidth, imgHeight);
 	senPtr11->params.setIntrinsicCalibration(k, d, d.size());
-	senPtr11->params.setMiscellaneous(3.0, 1.0, patchMatchSize);
+	senPtr11->params.setMiscellaneous(1.0, 1.0, patchMatchSize);
 
 	viam_hwmode_t hwmode = { VIAM_HWSZ_640x480, VIAM_HWFMT_MONO8, VIAM_HW_FIXED, VIAM_HWFPS_60, VIAM_HWTRIGGER_INTERNAL };
 	//hardware_sensor_ptr_t hardSen11(new HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode));
@@ -148,8 +147,9 @@ void test_slam01_main(world_ptr_t *world) {
 	kernel::Chrono total_chrono;
 	kernel::Chrono mutex_chrono;
 	int dt, max_dt = 0;
-	for (int t = 1; t <= NFRAME; t++) {
+	for (int t = 1; t <= NFRAME;) {
 //		sleep(1);
+		bool had_data = false;
 
 		worldPtr->display_mutex.lock();
 //		cout << "\n************************************************** " << endl;
@@ -173,7 +173,7 @@ void test_slam01_main(world_ptr_t *world) {
 //				cout << *senPtr << endl;
 
 				// get raw-data
-				senPtr->acquireRaw() ; // FIXME acquireRaw should not be in the rtslam lib
+				if (senPtr->acquireRaw() < 0) continue;
 
 				// move the filter time to the data raw
 				vec u(robPtr->mySize_control()); // TODO put some real values in u.
@@ -317,7 +317,7 @@ void test_slam01_main(world_ptr_t *world) {
 				}
 
 				senPtr->releaseRaw();
-
+				had_data = true;
 			}
 		}
 
@@ -326,6 +326,7 @@ void test_slam01_main(world_ptr_t *world) {
 		dt = chrono.elapsedMicrosecond();
 		if (dt > max_dt) max_dt = dt;
 		//cout << "frame time : " << dt << " us" << endl;
+		if (had_data) t++;
 		worldPtr->display_mutex.unlock();
 		mutex_chrono.reset();
 

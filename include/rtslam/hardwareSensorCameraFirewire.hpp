@@ -35,13 +35,12 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 		viam_handle_t handle;
 		
 		boost::mutex mutex_data;
-		boost::mutex mutex_in_use;
 		
 		int buff_in_use;
 		int buff_ready;
 		int buff_write;
 		int missed_count;
-		image::Image* buffer[2];
+		IplImage* buffer[2];
 		raw_ptr_t bufferPtr[2];
 		rawimage_ptr_t bufferSpecPtr[2];
 		
@@ -52,13 +51,10 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 		{
 			struct timeval ts, *pts = &ts;
 			int r;
-			
-			IplImage iplIm[2] = { (IplImage)(*(buffer[0])), (IplImage)(*(buffer[1])) };
-			IplImage *piplIm[2] = { &(iplIm[0]), &(iplIm[1]) };
-				
+
 			while(true)
 			{
-				r = viam_oneshot(handle, bank, piplIm+buff_write, &pts, 1);
+				r = viam_oneshot(handle, bank, buffer+buff_write, &pts, 1);
 				boost::unique_lock<boost::mutex> l(mutex_data);
 				bufferPtr[buff_write]->timestamp = ts.tv_sec + ts.tv_usec*1e-6;
 				buff_ready = buff_write;
@@ -84,18 +80,18 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 			r = viam_datatransmit(handle, bank, VIAM_ON);
 
 			// configure data
-			buffer[0] = new image::Image(640,480,CV_8U,JfrImage_CS_GRAY); // TODO choose right size
+			buffer[0] = cvCreateImage(cvSize(640,480), 8, 1); // TODO choose right size
 			bufferPtr[0].reset(new RawImage()); bufferSpecPtr[0] = SPTR_CAST<RawImage>(bufferPtr[0]);
-			bufferSpecPtr[0]->setJafarImage(jafarImage_ptr_t(buffer[0]));
+			bufferSpecPtr[0]->setJafarImage(jafarImage_ptr_t(new image::Image(buffer[0])));
 			
-			buffer[1] = new image::Image(640,480,CV_8U,JfrImage_CS_GRAY); // TODO choose right size
-			bufferPtr[1].reset(new RawImage()); bufferSpecPtr[1] = SPTR_CAST<RawImage>(bufferPtr[0]);
-			bufferSpecPtr[1]->setJafarImage(jafarImage_ptr_t(buffer[1]));
+			buffer[1] = cvCreateImage(cvSize(640,480), 8, 1); // TODO choose right size
+			bufferPtr[1].reset(new RawImage()); bufferSpecPtr[1] = SPTR_CAST<RawImage>(bufferPtr[1]);
+			bufferSpecPtr[1]->setJafarImage(jafarImage_ptr_t(new image::Image(buffer[1])));
 			
 			buff_in_use = -1;
 			buff_ready = -1;
 			buff_write = 0;
-			
+
 			// start acquire task
 			preloadTask_thread = new boost::thread(boost::bind(&HardwareSensorCameraFirewire::preloadTask,this));
 		}
@@ -107,7 +103,7 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 		}
 		
 		
-		virtual int getRaw(raw_ptr_t &rawPtr)
+		virtual int acquireRaw(raw_ptr_t &rawPtr)
 		{
 			boost::unique_lock<boost::mutex> l(mutex_data);
 			if (buff_ready < 0) return -1;
@@ -116,13 +112,11 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 			buff_ready = -1;
 			rawPtr = bufferPtr[buff_in_use];
 			l.unlock();
-			mutex_in_use.lock();
 			return 0;
 		}
 		
 		virtual void releaseRaw()
 		{
-			mutex_in_use.unlock();
 			boost::unique_lock<boost::mutex> l(mutex_data);
 			buff_in_use = -1;
 			l.unlock();

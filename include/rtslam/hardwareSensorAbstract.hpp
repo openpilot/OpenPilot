@@ -33,7 +33,7 @@ class HardwareSensorAbstract
 		@return the number of missed raws, -1 if no raw is available since last call
 		@note must be non blocking
 		*/
-		virtual int getRaw(raw_ptr_t &rawPtr) = 0;
+		virtual int acquireRaw(raw_ptr_t &rawPtr) = 0;
 		virtual void releaseRaw() = 0;
 		virtual ~HardwareSensorAbstract() {}
 };

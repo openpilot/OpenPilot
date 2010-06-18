@@ -330,7 +330,7 @@ int32_t PIOS_SPI_TransferBlock(uint8_t spi, uint8_t *send_buffer, uint8_t *recei
     dma_init.DMA_MemoryBaseAddr = (uint32_t)&spi_dev->rx_dummy_byte;
     dma_init.DMA_MemoryInc      = DMA_MemoryInc_Disable;
   }
-  dma_init.DMA_MemoryDataSize = len;
+  dma_init.DMA_BufferSize = len;
   DMA_Init(spi_dev->cfg->dma.rx.channel, &(dma_init));
   DMA_Cmd(spi_dev->cfg->dma.rx.channel, ENABLE);
 
@@ -350,7 +350,7 @@ int32_t PIOS_SPI_TransferBlock(uint8_t spi, uint8_t *send_buffer, uint8_t *recei
     dma_init.DMA_MemoryBaseAddr = (uint32_t)&spi_dev->tx_dummy_byte;
     dma_init.DMA_MemoryInc      = DMA_MemoryInc_Disable;
   }
-  dma_init.DMA_MemoryDataSize = len;
+  dma_init.DMA_BufferSize = len;
   DMA_Init(spi_dev->cfg->dma.tx.channel, &(dma_init));
 
   /* Enable DMA interrupt if callback function active */

@@ -18,7 +18,7 @@ REQUIRED_EXTLIBS = boost_sandbox opencv
 OPTIONAL_EXTLIBS = qt4 viam
 
 # LDFLAGS +=
-LIBS += -lkernel -ljmath -limage -lqdisplay -lcorrel
+LIBS += -lkernel -ljmath -limage -lqdisplay -lcorrel -lviam
 
 CPPFLAGS += $(OPENCV_CPPFLAGS) $(QT4_CPPFLAGS) $(BOOST_CPPFLAGS) $(BOOST_SANDBOX_CPPFLAGS) $(VIAM_CPPFLAGS) -I$(ROBOTPKG_BASE)/include
 

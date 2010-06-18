@@ -21,7 +21,8 @@
 namespace jafar {
 namespace rtslam {
 
-
+class HardwareSensorAbstract;
+typedef boost::shared_ptr<HardwareSensorAbstract> hardware_sensor_ptr_t;
 
 class HardwareSensorAbstract
 {

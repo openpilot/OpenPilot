@@ -102,8 +102,12 @@ void test_slam01_main(world_ptr_t *world) {
 	senPtr11->pose.x(quaternion::originFrame());
 	senPtr11->params.setImgSize(imgWidth, imgHeight);
 	senPtr11->params.setIntrinsicCalibration(k, d, d.size());
-	senPtr11->params.setMiscellaneous(1.0, 1.0, patchMatchSize);
+	senPtr11->params.setMiscellaneous(4.0, 4.0, patchMatchSize);
 
+	viam_hwmode_t hwmode = { VIAM_HWSZ_640x480, VIAM_HWFMT_MONO8, VIAM_HW_FIXED, VIAM_HWFPS_60, VIAM_HWTRIGGER_INTERNAL };
+	//hardware_sensor_ptr_t hardSen11(new HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode));
+	//senPtr11->setHardwareSensor(hardSen11);
+	
 	cout << "d: " << senPtr11->params.distortion << "\nc: " << senPtr11->params.correction << endl;
 //	pinhole_ptr_t senPtr12 (new SensorPinHole(robPtr1, MapObject::FILTERED));
 //	senPtr12->id(senPtr12->sensorIds.getId());
@@ -312,6 +316,8 @@ void test_slam01_main(world_ptr_t *world) {
 						}
 					}
 				}
+
+				senPtr->releaseRaw();
 
 			}
 		}

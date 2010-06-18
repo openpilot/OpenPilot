@@ -45,6 +45,8 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 		raw_ptr_t bufferPtr[2];
 		rawimage_ptr_t bufferSpecPtr[2];
 		
+		// TODO count missed frames
+		
 		boost::thread *preloadTask_thread;
 		void preloadTask(void)
 		{
@@ -115,6 +117,7 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 			rawPtr = bufferPtr[buff_in_use];
 			l.unlock();
 			mutex_in_use.lock();
+			return 0;
 		}
 		
 		virtual void releaseRaw()

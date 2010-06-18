@@ -42,11 +42,11 @@ namespace correl {
 //		image::Image im2(im2_, cv::Rect(0,0,im2_.width(),im2_.height())); im2.setROI(roi2);
 		image::Image im1(im1_); im1.setROI(roi1);
 		image::Image im2(im2_); im2.setROI(roi2);
-		
 		JFR_PRECOND( im1.size()  == im2.size() , "The size of images or roi are different (" << im1.width() << "," << im1.height() << " != " << im2.width() << "," << im2.height() << ")" );
 		int height = im1.height();
 		int width = im1.width();
-		int step = im1.step()/sizeof(worktype);
+		int step1 = im1.step()/sizeof(worktype) - width;
+		int step2 = im2.step()/sizeof(worktype) - width;
 		
 		// reduce rois if a part is outside of the image
 /*		int delta;
@@ -110,8 +110,8 @@ namespace correl {
 #endif
 				}
 			}
-			im1ptr += step;
-			im2ptr += step;
+			im1ptr += step1;
+			im2ptr += step2;
 		}
 		
 		if (useBornes) if (zncc_count / zncc_total < 0.5) return 0;

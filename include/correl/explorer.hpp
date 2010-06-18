@@ -31,6 +31,7 @@ namespace jafar {
 			@param xstep the search step along y axis
 			@param xres,yres the result position in im2 of maximum correlation
 			@param weightMatrix the optional weight matrix applied on correlation, must be of same size than im1 patch size ; if NULL not used
+			@return score of best correlation
 			*/
 			static double exploreTranslation(image::Image const& im1, image::Image const& im2, int xmin, int xmax, int xstep, int ymin, int ymax, int ystep, double &xres, double &yres, float const* weightMatrix = NULL);
 			
@@ -122,7 +123,7 @@ namespace jafar {
 			
 			// FIXME maybe should interpolate anyway
 
-			delete results;
+			delete[] results;
 			return best_score;
 		}
 			

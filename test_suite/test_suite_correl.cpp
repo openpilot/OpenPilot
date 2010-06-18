@@ -109,6 +109,23 @@ BOOST_AUTO_TEST_CASE( dummy )
 
 	im2.resetROI();
 	Explorer<Zncc>::exploreTranslation(im1, im2, 1, 5, 1, 0, 4, 1, xres, yres, NULL);
+
+	image::Image im3; if (!im3.load(std::string("../rtslam/test_suite/imageSample.ppm"), 0)) return;
+	image::Image im4; if (!im4.load(std::string("../rtslam/test_suite/imageSample.ppm"), 0)) return;
+	
+	JFR_DEBUG(im3.size());
+
+	JFR_DEBUG(Zncc::compute(im3, im4, NULL));
+	im3.setROI(146-11,348-11,22,22);
+	im4.setROI(146-11,348-11,22,22);
+	JFR_DEBUG(Zncc::compute(im3, im4, NULL));
+	im3.setROI(136-11,338-11,22,22);
+	JFR_DEBUG(Zncc::compute(im3, im4, NULL));
+	
+	JFR_DEBUG(Explorer<Zncc>::exploreTranslation(im4, im3, 146-5, 146+5, 1, 348-5, 348+5, 1, xres, yres, NULL));
+	JFR_DEBUG("pos " << xres << "," << xres);
+	
+	
 	
 //	trackPointRef("/net/pelican/data1/robots/dala/data/tests/2010-04-23_gyro-study/serie02/preproc2/img.l.%04d.png", 0, 235, 221, 220, 10, 80, 20);
 //	trackPointRef("/net/pelican/data1/robots/dala/data/tests/2010-04-23_gyro-study/serie02/preproc4/img.l.%04d.png", 0, 235, 110, 110, 5, 40, 10);

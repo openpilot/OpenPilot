@@ -55,6 +55,10 @@ public:
 signals:
 
 public slots:
+
+private slots:
+    void on_pushButtonCacheLocation_clicked();
+
 private:
     OPMapGadgetConfiguration *m_config;
     Ui::OPMapGadgetOptionsPage *m_page;

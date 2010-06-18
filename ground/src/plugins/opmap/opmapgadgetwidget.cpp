@@ -90,11 +90,15 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     controlpanel_ui->comboBox->setCurrentIndex(mapcontrol::Helper::MapTypes().indexOf("GoogleHybrid"));
     controlpanel_ui->labelZoom->setText(" " + QString::number(map->Zoom()));
     controlpanel_ui->labelRotate->setText(" " + QString::number(map->Rotate()));
+    controlpanel_ui->labelNumTilesToLoad->setText(" 0");
 
     // **************
 
     // receive map zoom changes
     connect(map, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
+
+    // receive tile loading messages
+    connect(map, SIGNAL(OnTilesStillToLoad(int)), this, SLOT(OnTilesStillToLoad(int)));
 
     map->SetShowTileGridLines(controlpanel_ui->checkBox->isChecked());
 
@@ -145,17 +149,13 @@ OPMapGadgetWidget::~OPMapGadgetWidget()
 void OPMapGadgetWidget::setZoom(int value)
 {
     if (map)
-    {
 	map->SetZoom(value);
-    }
 }
 
 void OPMapGadgetWidget::setPosition(QPointF pos)
 {
     if (map)
-    {
 	map->SetCurrentPosition(internals::PointLatLng(pos.y(), pos.x()));
-    }
 }
 
 void OPMapGadgetWidget::setMapProvider(QString provider)
@@ -163,6 +163,18 @@ void OPMapGadgetWidget::setMapProvider(QString provider)
 //    if (map)
 //	if (map->isStarted())
 //	    map->SetMapType(mapcontrol::Helper::MapTypeFromString(provider));
+}
+
+void OPMapGadgetWidget::setUseMemoryCache(bool useMemoryCache)
+{
+    if (map)
+	map->configuration->SetUseMemoryCache(useMemoryCache);
+}
+
+void OPMapGadgetWidget::setCacheLocation(QString cacheLocation)
+{
+    if (map)
+	map->configuration->SetCacheLocation(cacheLocation);
 }
 
 // *************************************************************************************
@@ -254,6 +266,12 @@ void OPMapGadgetWidget::zoomChanged(double zoom)
     controlpanel_ui->labelZoom->setText(" " + QString::number(zoom));
 }
 
+void OPMapGadgetWidget::OnTilesStillToLoad(int number)
+{
+    controlpanel_ui->labelNumTilesToLoad->setText(" " + QString::number(number));
+}
+
+// *************************************************************************************
 void OPMapGadgetWidget::on_checkBox_clicked(bool checked)
 {
     if (map)

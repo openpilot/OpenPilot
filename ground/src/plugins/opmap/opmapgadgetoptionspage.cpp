@@ -33,6 +33,7 @@
 #include <QtGui/QDoubleSpinBox>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>
+#include <QtGui/QFileDialog>
 
 #include "ui_opmapgadgetoptionspage.h"
 
@@ -55,8 +56,25 @@ QWidget *OPMapGadgetOptionsPage::createPage(QWidget *parent)
     m_page->zoomSpinBox->setValue(m_config->zoom());
     m_page->latitudeSpinBox->setValue(m_config->latitude());
     m_page->longitudeSpinBox->setValue(m_config->longitude());
+    m_page->pushButtonUseMemoryCache->setChecked(m_config->useMemoryCache());
+    m_page->lineEditCacheLocation->setText(m_config->cacheLocation());
+
+    connect(m_page->pushButtonCacheLocation, SIGNAL(clicked()), this, SLOT(on_pushButtonCacheLocation_clicked()));
 
     return w;
+}
+
+void OPMapGadgetOptionsPage::on_pushButtonCacheLocation_clicked()
+{
+    QString dir = m_page->lineEditCacheLocation->text();
+
+//    QDir dirPath(dir);
+//    dir = dirPath.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
+//    m_page->lineEditCacheLocation->setText(dir);
+
+    QFileDialog::Options options;
+    QString path = QFileDialog::getExistingDirectory(qobject_cast<QWidget*>(this), tr("Choose a directory"), dir, options);
+    if (!path.isNull()) m_page->lineEditCacheLocation->setText(path);
 }
 
 void OPMapGadgetOptionsPage::apply()
@@ -65,10 +83,11 @@ void OPMapGadgetOptionsPage::apply()
     m_config->setZoom(m_page->zoomSpinBox->value());
     m_config->setLatitude(m_page->latitudeSpinBox->value());
     m_config->setLongitude(m_page->longitudeSpinBox->value());
+    m_config->setUseMemoryCache(m_page->pushButtonUseMemoryCache->isChecked());
+    m_config->setCacheLocation(m_page->lineEditCacheLocation->text());
 }
 
 void OPMapGadgetOptionsPage::finish()
 {
     delete m_page;
 }
-

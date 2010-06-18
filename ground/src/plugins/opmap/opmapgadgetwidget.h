@@ -48,6 +48,8 @@ public:
    void setZoom(int value);
    void setPosition(QPointF pos);
    void setMapProvider(QString provider);
+    void setUseMemoryCache(bool useMemoryCache);
+    void setCacheLocation(QString cacheLocation);
 
 public slots:
 
@@ -73,8 +75,10 @@ private slots:
     void on_pushButtonZoomP_clicked();
     void on_pushButtonGeoFenceM_clicked();
     void on_pushButtonGeoFenceP_clicked();
-    void zoomChanged(double zoom);
     void on_checkBox_2_clicked(bool checked);
+
+    void zoomChanged(double zoom);
+    void OnTilesStillToLoad(int number);
 
 private:
     bool follow_uav;    // true if the map is to stay centered on the UAV

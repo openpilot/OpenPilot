@@ -36,10 +36,14 @@ using namespace Core;
 class OPMapGadgetConfiguration : public IUAVGadgetConfiguration
 {
 Q_OBJECT
+
 Q_PROPERTY(QString mapProvider READ mapProvider WRITE setMapProvider)
 Q_PROPERTY(int zoommo READ zoom WRITE setZoom)
 Q_PROPERTY(double latitude READ latitude WRITE setLatitude)
 Q_PROPERTY(double longitude READ longitude WRITE setLongitude)
+Q_PROPERTY(bool useMemoryCache READ useMemoryCache WRITE setUseMemoryCache)
+Q_PROPERTY(QString cacheLocation READ cacheLocation WRITE setCacheLocation)
+
 public:
     explicit OPMapGadgetConfiguration(QString classId, const QByteArray &state = 0, QObject *parent = 0);
     QByteArray saveState() const;
@@ -49,18 +53,24 @@ public:
     int zoom() const { return m_defaultZoom; }
     double latitude() const { return m_defaultLatitude; }
     double longitude() const { return m_defaultLongitude; }
+    bool useMemoryCache() const { return m_useMemoryCache; }
+    QString cacheLocation() const { return m_cacheLocation; }
 
 public slots:
     void setMapProvider(QString provider) { m_mapProvider = provider; }
     void setZoom(int zoom) { m_defaultZoom = zoom; }
     void setLatitude(double latitude) { m_defaultLatitude = latitude; }
     void setLongitude(double longitude) { m_defaultLongitude = longitude; }
+    void setUseMemoryCache(bool useMemoryCache) { m_useMemoryCache = useMemoryCache; }
+    void setCacheLocation(QString cacheLocation) { m_cacheLocation = cacheLocation; }
 
 private:
     QString m_mapProvider;
     int m_defaultZoom;
     double m_defaultLatitude;
     double m_defaultLongitude;
+    bool m_useMemoryCache;
+    QString m_cacheLocation;
 
 };
 

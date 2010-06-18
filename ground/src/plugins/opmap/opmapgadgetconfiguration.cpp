@@ -33,7 +33,9 @@ OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId, const QByteA
     m_mapProvider("OpenStreetMap"),
     m_defaultZoom(2),
     m_defaultLatitude(0),
-    m_defaultLongitude(0)
+    m_defaultLongitude(0),
+    m_useMemoryCache(true),
+    m_cacheLocation("")
 {
     if (state.count() > 0) {
         QDataStream stream(state);
@@ -41,16 +43,20 @@ OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId, const QByteA
         double latitude;
         double longitude;
         QString mapProvider;
-        stream >> zoom;
+	bool useMemoryCache;
+	QString cacheLocation;
+	stream >> zoom;
         stream >> latitude;
         stream >> longitude;
         stream >> mapProvider;
-        m_defaultZoom = zoom;
+	stream >> useMemoryCache;
+	stream >> cacheLocation;
+	m_defaultZoom = zoom;
         m_defaultLatitude = latitude;
         m_defaultLongitude = longitude;
-        if (mapProvider != "")
-            m_mapProvider = mapProvider;
-
+	if (mapProvider != "") m_mapProvider = mapProvider;
+	m_useMemoryCache = useMemoryCache;
+	if (cacheLocation != "") m_cacheLocation = cacheLocation;
     }
 }
 
@@ -61,6 +67,8 @@ IUAVGadgetConfiguration *OPMapGadgetConfiguration::clone()
     m->m_defaultLatitude = m_defaultLatitude;
     m->m_defaultLongitude = m_defaultLongitude;
     m->m_mapProvider = m_mapProvider;
+    m->m_useMemoryCache = m_useMemoryCache;
+    m->m_cacheLocation = m_cacheLocation;
     return m;
 }
 
@@ -72,6 +80,8 @@ QByteArray OPMapGadgetConfiguration::saveState() const
     stream << m_defaultLatitude;
     stream << m_defaultLongitude;
     stream << m_mapProvider;
+    stream << m_useMemoryCache;
+    stream << m_cacheLocation;
     return bytes;
 }
 

@@ -26,6 +26,8 @@
  */
 #include "configgadgetoptionspage.h"
 
+#include <QWidget>
+
 ConfigGadgetOptionsPage::ConfigGadgetOptionsPage(ConfigGadgetConfiguration *config, QObject *parent)
 {
 //todo:implement
@@ -34,7 +36,7 @@ ConfigGadgetOptionsPage::ConfigGadgetOptionsPage(ConfigGadgetConfiguration *conf
 QWidget *ConfigGadgetOptionsPage::createPage(QWidget *parent)
 {
     //todo:implement
-    return parent;
+    return new QWidget;
 }
 
 void ConfigGadgetOptionsPage::apply()

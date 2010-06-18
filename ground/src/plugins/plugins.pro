@@ -103,12 +103,6 @@ plugin_notify.depends = plugin_coreplugin
 plugin_notify.depends = plugin_uavobjects
 SUBDIRS += plugin_notify
 
-
-#Config Gadget
-#plugin_config.subdir = config
-#plugin_config.depends = plugin_coreplugin
-#SUBDIRS += plugin_config
-
 #HITL simulation Gadget
 plugin_hitl.subdir = hitl
 plugin_hitl.depends = plugin_coreplugin
@@ -116,3 +110,7 @@ plugin_hitl.depends += plugin_uavobjects
 plugin_hitl.depends += plugin_uavtalk
 SUBDIRS += plugin_hitl
 
+#Config Gadget
+plugin_config.subdir = config
+plugin_config.depends = plugin_coreplugin
+SUBDIRS += plugin_config

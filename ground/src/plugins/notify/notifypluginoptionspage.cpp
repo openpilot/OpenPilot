@@ -217,14 +217,14 @@ void NotifyPluginOptionsPage::on_UAVObject_indexChanged(QString val) {
 // locate collection folder on disk
 void NotifyPluginOptionsPage::on_buttonSoundFolder_clicked(const QString& path)
 {
-	disconnect(options_page->SoundCollectionList, SIGNAL(currentIndexChanged (int)), this, SLOT(on_soundLanguage_indexChanged(int)));
+	//disconnect(options_page->SoundCollectionList, SIGNAL(currentIndexChanged (int)), this, SLOT(on_soundLanguage_indexChanged(int)));
 
 	QDir dirPath(path);
 	listDirCollections = dirPath.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
 	options_page->SoundCollectionList->clear();
 	options_page->SoundCollectionList->addItems(listDirCollections);
 
-	connect(options_page->SoundCollectionList, SIGNAL(currentIndexChanged (int)), this, SLOT(on_soundLanguage_indexChanged(int)));
+	//connect(options_page->SoundCollectionList, SIGNAL(currentIndexChanged (int)), this, SLOT(on_soundLanguage_indexChanged(int)));
 }
 
 

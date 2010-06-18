@@ -3,5 +3,7 @@
         <file>images/gcs.png</file>
         <file>images/uav.png</file>
         <file>images/waypoint.png</file>
+        <file>images/minus.png</file>
+        <file>images/plus.png</file>
     </qresource>
 </RCC>

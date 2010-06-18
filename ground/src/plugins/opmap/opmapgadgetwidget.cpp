@@ -380,47 +380,53 @@ QPushButton * OPMapGadgetWidget::createTransparentButton(QWidget *parent, QStrin
 
 void OPMapGadgetWidget::createMapOverlayUserControls()
 {
-    QPushButton *zoomin = createTransparentButton(map, "", QString::fromUtf8(":/core/images/plus.png"));
-    zoomin->setStyleSheet("");
-//    QPushButton *zoomin = new QPushButton("");
-    zoomin->setFixedSize(24, 24);
+    QPushButton *zoomout = new QPushButton("");
+    zoomout->setFlat(true);
+    zoomout->setToolTip(tr("Zoom out"));
+    zoomout->setCursor(Qt::OpenHandCursor);
+    zoomout->setIcon(QIcon(QString::fromUtf8(":/opmap/images/minus.png")));
+//    zoomout->setIconSize(QSize(12, 12));
+    zoomout->setIconSize(QSize(32, 32));
+    zoomout->setFixedSize(32, 32);
+//    zoomout->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+//  zoomout->setWindowOpacity(0.7);
+//  zoomout->setBackgroundRole(QPalette(QColor(0, 0, 0, 0)));
+    connect(zoomout, SIGNAL(clicked(bool)), this, SLOT(zoomOut()));
+
+//    QPushButton *zoomin = createTransparentButton(map, "", QString::fromUtf8(":/core/images/plus.png"));
+//    zoomin->setStyleSheet("");
+    QPushButton *zoomin = new QPushButton("");
+    zoomin->setFlat(true);
     zoomin->setToolTip(tr("Zoom in"));
     zoomin->setCursor(Qt::OpenHandCursor);
-//    zoomin->setIcon(QIcon(QString::fromUtf8(":/core/images/plus.png")));
-    zoomin->setIconSize(QSize(12, 12));
+    zoomin->setIcon(QIcon(QString::fromUtf8(":/opmap/images/plus.png")));
+//    zoomin->setIconSize(QSize(12, 12));
+    zoomin->setIconSize(QSize(32, 32));
+    zoomin->setFixedSize(32, 32);
+//    zoomin->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(zoomin, SIGNAL(clicked(bool)), this, SLOT(zoomIn()));
 
-	QPushButton *zoomout = new QPushButton("");
-	zoomout->setFixedSize(24, 24);
-	zoomout->setToolTip(tr("Zoom out"));
-	zoomout->setCursor(Qt::OpenHandCursor);
-	zoomout->setIcon(QIcon(QString::fromUtf8(":/core/images/minus.png")));
-	zoomout->setIconSize(QSize(12, 12));
-//	zoomout->setWindowOpacity(0.7);
-//	zoomout->setBackgroundRole(QPalette(QColor(0, 0, 0, 0)));
-	connect(zoomout, SIGNAL(clicked(bool)), this, SLOT(zoomOut()));
+    // add zoom buttons to the layout of the MapControl
+    QVBoxLayout* overlay_layout_v1 = new QVBoxLayout;
+    overlay_layout_v1->setMargin(4);
+    overlay_layout_v1->setSpacing(4);
+    overlay_layout_v1->addSpacing(10);
 
-    	// add zoom buttons to the layout of the MapControl
-	QVBoxLayout* overlay_layout_v1 = new QVBoxLayout;
-	overlay_layout_v1->setMargin(4);
-    	overlay_layout_v1->setSpacing(4);
-	overlay_layout_v1->addSpacing(10);
+    QHBoxLayout* overlay_layout_h1 = new QHBoxLayout;
+    overlay_layout_h1->setMargin(0);
+    overlay_layout_h1->setSpacing(4);
+    overlay_layout_h1->addSpacing(10);
+//  overlay_layout_h1->addWidget(gcsButton);
+//  overlay_layout_h1->addWidget(uavButton);
+//  overlay_layout_h1->addSpacing(10);
+    overlay_layout_h1->addWidget(zoomout);
+    overlay_layout_h1->addWidget(zoomin);
+    overlay_layout_h1->addStretch(0);
 
-	QHBoxLayout* overlay_layout_h1 = new QHBoxLayout;
-	overlay_layout_h1->setMargin(0);
-    	overlay_layout_h1->setSpacing(4);
-	overlay_layout_h1->addSpacing(10);
-//	overlay_layout_h1->addWidget(gcsButton);
-//	overlay_layout_h1->addWidget(uavButton);
-//	overlay_layout_h1->addSpacing(10);
-	overlay_layout_h1->addWidget(zoomout);
-	overlay_layout_h1->addWidget(zoomin);
-	overlay_layout_h1->addStretch(0);
+    overlay_layout_v1->addLayout(overlay_layout_h1);
+    overlay_layout_v1->addStretch(0);
 
-	overlay_layout_v1->addLayout(overlay_layout_h1);
-	overlay_layout_v1->addStretch(0);
-
-	map->setLayout(overlay_layout_v1);
+    map->setLayout(overlay_layout_v1);
 }
 
 // *************************************************************************************

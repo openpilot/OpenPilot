@@ -72,15 +72,16 @@ void test_slam01_main(world_ptr_t *world) {
 	
 	// create robots
 	robodo_ptr_t robPtr1(new RobotOdometry(mapPtr));
+	//robodo_ptr_t robPtr1(new RobotConstantVelocity(mapPtr));
 	robPtr1->id(robPtr1->robotIds.getId());
 	robPtr1->linkToParentMap(mapPtr);
 	vec v(robPtr1->mySize());
 	fillVector(v, 0.0);
 	robPtr1->state.x(v);
 	robPtr1->pose.x(quaternion::originFrame());
-	robPtr1->dt_or_dx = 0.1;
+	robPtr1->dt_or_dx = 1/15;
 	v.resize(robPtr1->mySize_perturbation());
-	fillVector(v, 0.01);
+	fillVector(v, 0.002);
 	robPtr1->perturbation.clear();
 	robPtr1->perturbation.std(v);
 	

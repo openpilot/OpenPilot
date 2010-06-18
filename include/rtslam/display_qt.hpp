@@ -242,7 +242,7 @@ class ObservationQt : public ObservationDisplay
 						
 						// prediction point
 						s = new qdisplay::Shape(qdisplay::Shape::ShapeCross, predObs_(0), predObs_(1), 3, 3);
-						s->setColor(0, 0, 255); // blue
+						s->setColor(255,255,0); // blue
 						s->setFontColor(255,255,0); // yellow
 						items_.push_back(s);
 						view_->addShape(s);

@@ -43,11 +43,13 @@ namespace jafar {
 			vec lmk = lmkPtr->state.x();
 			vec pnt = lmkPtr->reparametrize_func(lmk);
 			quaternion::getZoomRotation(senPoseInit, obsPtrNew->sensorPtr()->globalPose(), pnt, zoom, rotation);
-
+//std::cout << "predictAppearance: zoom,rotation " << zoom << " " << rotation << std::endl;
 			// rotate and zoom the patch, and cut it to the appropriate size
-			app_img_pnt_ptr_t app = boost::static_pointer_cast<AppearenceImagePoint>(obsPtrNew->predictedAppearance);
-			featImgPntPtr->appImgPntPtr->patch.rotateScale(rotation, zoom, app->patch);
-			
+			app_img_pnt_ptr_t app_dst = SPTR_CAST<AppearanceImagePoint>(obsPtrNew->predictedAppearance);
+			app_img_pnt_ptr_t app_src = SPTR_CAST<AppearanceImagePoint>(featImgPntPtr->appearancePtr);
+			app_src->patch.rotateScale(rotation, zoom, app_dst->patch);
+//app_src->patch.save("descriptor_patch.png");
+//app_dst->patch.save("predicted_patch.png");
 			return true;
 		}
 

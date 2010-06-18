@@ -31,8 +31,8 @@ namespace jafar {
 			id() = eucPtr->id();
 			linkToParentPinHole(pinholePtr);
 			linkToParentEUC(eucPtr);
-			predictedAppearance.reset(new AppearenceImagePoint(patchSize, patchSize, CV_8U));
-			observedAppearance.reset(new AppearenceImagePoint(patchSize, patchSize, CV_8U));
+			predictedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
+			observedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
 		}
 
 

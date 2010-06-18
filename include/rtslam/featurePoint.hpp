@@ -54,10 +54,9 @@ namespace jafar {
 		 */
 		class FeatureImagePoint: public FeatureAbstract {
 			public:
-				app_img_pnt_ptr_t appImgPntPtr;
-				FeatureImagePoint() : FeatureAbstract(2) {
+				FeatureImagePoint() : FeatureAbstract(2, appearance_ptr_t()) {
 				}
-				FeatureImagePoint(int width, int height, int depth)  : FeatureAbstract(2), appImgPntPtr(new AppearenceImagePoint(width,height,depth)) {
+				FeatureImagePoint(int width, int height, int depth)  : FeatureAbstract(2, appearance_ptr_t(new AppearanceImagePoint(width,height,depth))) {
 				}
 				virtual ~FeatureImagePoint() {
 				}

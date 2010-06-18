@@ -39,25 +39,25 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
-		class AppearenceImagePoint;
-		typedef boost::shared_ptr<AppearenceImagePoint> app_img_pnt_ptr_t;
+		class AppearanceImagePoint;
+		typedef boost::shared_ptr<AppearanceImagePoint> app_img_pnt_ptr_t;
 
 		/** Appearence for matching
 		 * rtslam.
 		 *
 		 * @ingroup rtslam
 		 */
-		class AppearenceImagePoint: public AppearanceAbstract {
+		class AppearanceImagePoint: public AppearanceAbstract {
 			public:
 				image::Image patch;
 				unsigned int patchSum;
 				unsigned int patchSquareSum;
 			public:
-				AppearenceImagePoint(const image::Image& patch);
-				AppearenceImagePoint(int width, int height, int depth) : patch(width, height, depth, JfrImage_CS_GRAY) {
+				AppearanceImagePoint(const image::Image& patch);
+				AppearanceImagePoint(int width, int height, int depth) : patch(width, height, depth, JfrImage_CS_GRAY) {
 					cout << "Created patch with " << width << "x" << height << " pixels; depth: " << depth << "; color space: " << JfrImage_CS_GRAY << endl;
 				}
-				virtual ~AppearenceImagePoint();
+				virtual ~AppearanceImagePoint();
 
 			private:
 				void computePatchIntegrals();

@@ -64,9 +64,13 @@ void test_slam01_main(world_ptr_t *world) {
 	//world_ptr_t worldPtr(new WorldAbstract());
 	world_ptr_t worldPtr = *world;
 	worldPtr->display_mutex.lock();
+	
+	// create maps
 	map_ptr_t mapPtr(new MapAbstract(307));
 	worldPtr->addMap(mapPtr);
 	mapPtr->clear();
+	
+	// create robots
 	robodo_ptr_t robPtr1(new RobotOdometry(mapPtr));
 	robPtr1->id(robPtr1->robotIds.getId());
 	robPtr1->linkToParentMap(mapPtr);
@@ -79,6 +83,8 @@ void test_slam01_main(world_ptr_t *world) {
 	fillVector(v, 0.01);
 	robPtr1->perturbation.clear();
 	robPtr1->perturbation.std(v);
+	
+	// create sensors
 	pinhole_ptr_t senPtr11 (new SensorPinHole(robPtr1, MapObject::UNFILTERED));
 	senPtr11->id(senPtr11->sensorIds.getId());
 	senPtr11->linkToParentRobot(robPtr1);
@@ -86,7 +92,7 @@ void test_slam01_main(world_ptr_t *world) {
 	senPtr11->pose.x(quaternion::originFrame());
 	senPtr11->params.setImgSize(imgWidth, imgHeight);
 	senPtr11->params.setIntrinsicCalibration(k, d, c);
-	senPtr11->params.setMiscellaneous(1.0, 1.0, 9);
+	senPtr11->params.setMiscellaneous(1.0, 1.0, patchMatchSize);
 //	pinhole_ptr_t senPtr12 (new SensorPinHole(robPtr1, MapObject::FILTERED));
 //	senPtr12->id(senPtr12->sensorIds.getId());
 //	senPtr12->linkToParentRobot(robPtr1);
@@ -199,8 +205,8 @@ void test_slam01_main(world_ptr_t *world) {
 						if (x+2*dx > imgWidth-border) dx = (imgWidth-border-x)/2;
 						if (y < border) y = border;
 						if (y+2*dy > imgHeight-border) dy = (imgHeight-border-y)/2;
-
-						cv::Rect roi(x,y,2*dx,2*dy); // TODO set with ellipse bounding box
+						cv::Rect roi(x,y,2*dx,2*dy);
+//((AppearanceImagePoint*)(obsPtr->predictedAppearance.get()))->patch.save("predicted_app.png");
 						senPtr->getRaw()->match(RawAbstract::ZNCC, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
 
 
@@ -258,6 +264,8 @@ void test_slam01_main(world_ptr_t *world) {
 							cout << "\n-------------------------------------------------- " << endl;
 							cout << "Detected pixel: " << featPtr->measurement.x() << endl;
 
+//((AppearanceImagePoint*)(featPtr->appearancePtr.get()))->patch.save("detected_patch.png");
+							
 							// 2a. create lmk object
 							ahp_ptr_t lmkPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr)); // add featImgPnt in constructor
 							lmkPtr->id(lmkPtr->landmarkIds.getId());
@@ -284,7 +292,7 @@ void test_slam01_main(world_ptr_t *world) {
 							lmkPtr->setDescriptor(descPtr);
 
 							// Complete SLAM graph with all other obs
-							mapPtr->completeObservationsInGraph(senPtr, lmkPtr);
+							//mapPtr->completeObservationsInGraph(senPtr, lmkPtr); // FIXME
 
 							cout << "\n-------------------------------------------------- " << endl;
 							cout << *lmkPtr << endl;
@@ -308,7 +316,7 @@ void test_slam01_main(world_ptr_t *world) {
 
 	
 	std::cout << "\nFINISHED !" << std::endl;
-  sleep(2);
+  sleep(60);
 
 }
 

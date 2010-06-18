@@ -52,7 +52,9 @@ namespace jafar {
 				appearance_ptr_t appearancePtr;
 				Measurement measurement;
 
-				FeatureAbstract(size_t size) : measurement(size) {
+				FeatureAbstract(size_t size, appearance_ptr_t appearancePtr_) : 
+					appearancePtr(appearancePtr_), measurement(size)
+				{
 					measurement.matchScore = 0.0;
 				}
 

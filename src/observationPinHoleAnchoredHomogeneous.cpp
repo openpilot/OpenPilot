@@ -37,8 +37,8 @@ namespace jafar {
 			id() = ahpPtr->id();
 			linkToParentPinHole(pinholePtr);
 			linkToParentAHP(ahpPtr);
-			predictedAppearance.reset(new AppearenceImagePoint(patchSize, patchSize, CV_8U));
-			observedAppearance.reset(new AppearenceImagePoint(patchSize, patchSize, CV_8U));
+			predictedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
+			observedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
 		}
 
 
@@ -158,8 +158,8 @@ namespace jafar {
 		}
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::predictAppearance() {
-			desc_img_pnt_ptr_t descPtr = boost::static_pointer_cast<DescriptorImagePoint>(landmarkPtr()->descriptorPtr);
-			obs_ph_ahp_ptr_t _this = boost::static_pointer_cast<ObservationPinHoleAnchoredHomogeneousPoint>(shared_from_this());
+			desc_img_pnt_ptr_t descPtr = SPTR_CAST<DescriptorImagePoint>(landmarkPtr()->descriptorPtr);
+			obs_ph_ahp_ptr_t _this = SPTR_CAST<ObservationPinHoleAnchoredHomogeneousPoint>(shared_from_this());
 			descPtr->predictAppearance(_this);
 		}
 

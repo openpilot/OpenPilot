@@ -52,15 +52,14 @@ namespace jafar {
 		}
 
 
-		void RawImage::extractAppearance(const jblas::veci & pos, const jblas::veci & size, appearance_ptr_t & appPtr){
-			Image newPatch(size(0), size(1), img->depth(), JfrImage_CS_GRAY);
-			int shift_x = (size(0)-1)/2;
-			int shift_y = (size(1)-1)/2;
+		void RawImage::extractAppearance(const jblas::veci & pos, appearance_ptr_t & appPtr){
+			app_img_pnt_ptr_t app = SPTR_CAST<AppearanceImagePoint>(appPtr);
+			cv::Size size = app->patch.size();
+			int shift_x = (size.width-1)/2;
+			int shift_y = (size.height-1)/2;
 			int x_src = pos(0)-shift_x;
 			int y_src = pos(1)-shift_y;
-			img->copy(newPatch, x_src, y_src, 0, 0, size(0), size(1));
-
-			appPtr.reset(new AppearenceImagePoint(newPatch));
+			img->copy(app->patch, x_src, y_src, 0, 0, size.width, size.height);
 		}
 
 		bool RawImage::detect(const detect_method met, const feature_ptr_t & featPtr,
@@ -70,19 +69,16 @@ namespace jafar {
 				case HARRIS: {
 
 					//feat_img_pnt_ptr_t featPntPtr(new FeatureImagePoint);
-					feat_img_pnt_ptr_t featPntPtr = boost::dynamic_pointer_cast<FeatureImagePoint>(featPtr);
+					feat_img_pnt_ptr_t featPntPtr = SPTR_CAST<FeatureImagePoint>(featPtr);
 
 					if (quickHarrisDetector.detectIn(*(img.get()), featPntPtr, roiPtr)) {
 
 						//featPtr = featPntPtr;
 
 						// get patch and construct feature
-						vec pix(2);
-						pix = featPntPtr->measurement.x();
-						veci size(2);
-						size(0) = 45, size(1) = 45;
-						extractAppearance(pix, size, featPntPtr->appearancePtr);
-
+						vec pix = featPntPtr->measurement.x();
+						extractAppearance(pix, featPntPtr->appearancePtr);
+//((AppearanceImagePoint*)(featPntPtr->appearancePtr.get()))->patch.save("extracted_app.png");
 						return true;
 
 					} else {
@@ -100,17 +96,17 @@ namespace jafar {
 		{
 			switch (met) {
 				case ZNCC: {
-					app_img_pnt_ptr_t targetAppImg = boost::dynamic_pointer_cast<AppearenceImagePoint>(targetApp);
-					app_img_pnt_ptr_t appImg = boost::dynamic_pointer_cast<AppearenceImagePoint>(app);
+					app_img_pnt_ptr_t targetAppImg = boost::dynamic_pointer_cast<AppearanceImagePoint>(targetApp);
+					app_img_pnt_ptr_t appImg = boost::dynamic_pointer_cast<AppearanceImagePoint>(app);
 					
 					measure.matchScore = correl::Explorer<correl::Zncc>::exploreTranslation(targetAppImg->patch, *img, roi.x, roi.x+roi.width-1, 1, roi.y, roi.y+roi.height-1, 1, measure.x()(0), measure.x()(1));
 			
-//					cv::namedWindow( "Descriptor patch", 1 );
-//					cv::namedWindow( "Predicted patch", 1 );
-//					cv::imshow("Predicted patch", targetAppImg->patch );
-//					cv::namedWindow( "Matched patch", 1 );
-//					cv::imshow("Matched patch", appImg->patch );
-//					cv::waitKey(0);
+// 					//cv::namedWindow( "Descriptor patch", 1 );
+// 					cv::namedWindow( "Predicted patch", 1 );
+// 					cv::imshow("Predicted patch", targetAppImg->patch );
+// 					cv::namedWindow( "Matched patch", 1 );
+// 					cv::imshow("Matched patch", appImg->patch );
+// 					//cv::waitKey(0);
 
 					measure.P()(0,0) = measure.P()(1,1) = 1.0;
 					measure.P()(1,0) = measure.P()(0,1) = 0.0;

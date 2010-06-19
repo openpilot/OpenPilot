@@ -111,8 +111,8 @@ void test_slam01_main(world_ptr_t *world) {
 
 	viam_hwmode_t hwmode = { VIAM_HWSZ_640x480, VIAM_HWFMT_MONO8, VIAM_HW_FIXED, VIAM_HWFPS_60, VIAM_HWTRIGGER_INTERNAL };
 	// UNCOMMENT THESE TWO LINES TO ENABLE FIREWIRE CAMERA OPERATION
-//	hardware_sensor_ptr_t hardSen11(new HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode));
-//	senPtr11->setHardwareSensor(hardSen11);
+	hardware_sensor_ptr_t hardSen11(new HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode));
+	senPtr11->setHardwareSensor(hardSen11);
 	
 	cout << "d: " << senPtr11->params.distortion << "\nc: " << senPtr11->params.correction << endl;
 
@@ -306,7 +306,7 @@ void test_slam01_main(world_ptr_t *world) {
 		if (dt > max_dt) max_dt = dt;
 		if (had_data) {
 			t++;
-			cout << "frame time : " << (double)dt/1000 << " ms" << endl;
+			cout << "frame time : " << (double)dt/1000 << " ms. Position: " << 100*ublas::subrange(robPtr1->pose.x(),0,3) << endl;
 		}
 		worldPtr->display_mutex.unlock();
 		mutex_chrono.reset();

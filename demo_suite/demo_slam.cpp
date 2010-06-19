@@ -83,7 +83,7 @@ void test_slam01_main(world_ptr_t *world) {
 	fillVector(v, 0.0);
 	robPtr1->state.x(v);
 	robPtr1->pose.x(quaternion::originFrame());
-	robPtr1->dt_or_dx = 1/15.0;
+	robPtr1->dt_or_dx = 1/15;
 	v.resize(robPtr1->mySize_perturbation());
 	fillVector(v, 0.2);
 	robPtr1->perturbation.clear();
@@ -122,7 +122,7 @@ void test_slam01_main(world_ptr_t *world) {
 	// Temporal loop
 
 	const int NFRAME = 1000;
-	const int NUPDATES = 100;
+	const int NUPDATES = 1000;
 
 	kernel::Chrono chrono;
 	kernel::Chrono total_chrono;
@@ -176,15 +176,18 @@ void test_slam01_main(world_ptr_t *world) {
 					// 1a. project
 					obsPtr->project();
 
+					// Add to tesselation grid for active search
+					asGrid.addPixel(obsPtr->expectation.x());
+
 					// 1b. check visibility
 					obsPtr->predictVisibility();
 					if (obsPtr->isVisible()){
 
+						numObs ++;
+						if (numObs <= NUPDATES){
+
 						// update counter
 						obsPtr->counters.nSearch++;
-
-						// Add to tesselation grid for active search
-						asGrid.addPixel(obsPtr->expectation.x());
 
 						// 1c. predict appearance
 						obsPtr->predictAppearance();
@@ -207,7 +210,7 @@ void test_slam01_main(world_ptr_t *world) {
 						senPtr->getRaw()->match(RawAbstract::ZNCC, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
 
 						// 1e. if feature is found
-						if (obsPtr->getMatchScore()>0.80) {
+						if (obsPtr->getMatchScore()>0.95) {
 							obsPtr->counters.nMatch++;
 							obsPtr->events.matched = true;
 							obsPtr->computeInnovation() ;
@@ -219,13 +222,13 @@ void test_slam01_main(world_ptr_t *world) {
 								obsPtr->events.updated = true;
 							} // obsPtr->compatibilityTest(3.0)
 						} // obsPtr->getScoreMatchInPercent()>80
+						} // number of observations
 					} // obsPtr->isVisible()
 
 //					cout << "\n-------------------------------------------------- " << endl;
 //					cout << *obsPtr << endl;
 
-					numObs ++;
-					if (numObs >= NUPDATES) break;
+
 				} // foreach observation
 
 				//cout << chrono.elapsedMicrosecond() << " us ; observed lmks: " << numObs << endl;

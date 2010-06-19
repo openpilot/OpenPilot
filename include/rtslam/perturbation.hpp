@@ -19,10 +19,13 @@
 #include "jmath/jblas.hpp"
 #include "jmath/ublasExtra.hpp"
 
+#include "rtslam/gaussian.hpp"
+
 namespace jafar {
 	namespace rtslam {
 		using namespace std;
-		using namespace ublasExtra;
+		using namespace jblas;
+		using namespace jmath::ublasExtra;
 
 		/** Base class for all Gaussian perturbation vectors defined in the module rtslam.
 		 * \author jsola@laas.fr
@@ -47,6 +50,27 @@ namespace jafar {
 				Perturbation(const vec & p, const sym_mat & P) :
 					Gaussian(p, P), x_ct(0), P_ct(0) {
 				}
+				Perturbation(const vec & p, const vec & _std) :
+					Gaussian(p.size()), x_ct(0), P_ct(0) {
+					this->x(p);
+					this->std(_std);
+				}
+
+				/**
+				 * Continuous-time specified constructor.
+				 * \param p the perturbation mean in continuous time.
+				 * \param P the perturbation covariance in continuous time
+				 * \param dt the sampling time
+				 */
+				Perturbation(const vec & p, const sym_mat & P, double dt) ;
+				/**
+				 * Continuous-time specified constructor.
+				 * \param p the perturbation mean in continuous time.
+				 * \param P the perturbation std. deviation in continuous time
+				 * \param dt the sampling time
+				 */
+				Perturbation(const vec & p, const vec & _std, double dt) ;
+
 				Perturbation(const Gaussian & p) :
 					Gaussian(p), x_ct(0), P_ct(0) {
 				}
@@ -62,6 +86,33 @@ namespace jafar {
 					x_ct.resize(size());
 					x_ct = _x_ct;
 				}
+				/**
+				 * Set continuous-time covariance from standard deviation specification
+				 * \param _std a vector with the standard deviations.
+				 */
+				void set_std_continuous(const vec & _std) {
+					JFR_ASSERT(size() == _std.size(), "Sizes mismatch");
+					P_ct.resize(size(), size());
+					P_ct.clear();
+					size_t i;
+					for (i = 0 ; i< _std.size() ; i++)
+						P_ct(i,i) = _std(i)*_std(i);
+				}
+				/**
+				 * Set continuous-time perturbation
+				 */
+				void set_continuous(const vec & _x, const vec & _std){
+					set_x_continuous(_x);
+					set_std_continuous(_std);
+				}
+				/**
+				 * Set continuous-time perturbation
+				 */
+				void set_continuous(const vec & _x, const sym_mat & _P){
+					set_x_continuous(_x);
+					set_P_continuous(_P);
+				}
+
 				/**
 				 * Discrete perturbation from continuous specification.
 				 * - The white, Gaussian random values integrate with the square root of dt. Their variance integrates linearly with dt:
@@ -117,16 +168,6 @@ namespace jafar {
 					set_x_continuous(Pct.x());
 					set_P_continuous(Pct.P());
 					set_from_continuous(_dt);
-				}
-
-				void set_std_continuous(const vec & _std) {
-
-					JFR_ASSERT(size() == _std.size(), "Sizes mismatch");
-					P_ct.resize(size(), size());
-					P_ct.clear();
-					size_t i;
-					for (i = 0 ; i< _std.size() ; i++)
-						P_ct(i,i) = _std(i)*_std(i);
 				}
 
 		};

@@ -1,0 +1,30 @@
+/*
+ * perturbation.cpp
+
+ *
+ *     Project: jafar
+ *  Created on: Jun 19, 2010
+ *      Author: jsola
+ */
+
+#include "rtslam/perturbation.hpp"
+
+namespace jafar {
+	namespace rtslam {
+		using namespace jblas;
+
+		Perturbation::Perturbation(const vec & p, const sym_mat & P, double dt) :
+			Gaussian(p.size()) {
+			set_x_continuous(p);
+			set_P_continuous(P);
+			set_from_continuous(dt);
+		}
+		Perturbation::Perturbation(const vec & _p, const vec & _std, double _dt) :
+			Gaussian(_p.size()) {
+			set_x_continuous(_p);
+			set_std_continuous(_std);
+			set_from_continuous(_dt);
+		}
+
+	}
+}

@@ -17,10 +17,12 @@
 #define PERTURBATION_HPP_
 
 #include "jmath/jblas.hpp"
+#include "jmath/ublasExtra.hpp"
 
 namespace jafar {
 	namespace rtslam {
 		using namespace std;
+		using namespace ublasExtra;
 
 		/** Base class for all Gaussian perturbation vectors defined in the module rtslam.
 		 * \author jsola@laas.fr
@@ -116,6 +118,17 @@ namespace jafar {
 					set_P_continuous(Pct.P());
 					set_from_continuous(_dt);
 				}
+
+				void set_std_continuous(const vec & _std) {
+
+					JFR_ASSERT(size() == _std.size(), "Sizes mismatch");
+					P_ct.resize(size(), size());
+					P_ct.clear();
+					size_t i;
+					for (i = 0 ; i< _std.size() ; i++)
+						P_ct(i,i) = _std(i)*_std(i);
+				}
+
 		};
 
 

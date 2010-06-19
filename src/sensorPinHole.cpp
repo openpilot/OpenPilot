@@ -42,22 +42,35 @@ namespace jafar {
 		}
 
 
-		void SensorPinHole::acquireRaw(){
+		int SensorPinHole::acquireRaw(){
 
-			jafarImage_ptr_t i(Image::loadImage("test_suite/imageSample.ppm",0));
+			if (hardwareSensorPtr)
+			{
+				return hardwareSensorPtr->acquireRaw(rawPtr);
+			} else
+			{
+				jafarImage_ptr_t i(Image::loadImage("test_suite/imageSample.ppm",0));
 
-			RawImage* imgRawPtr = new RawImage;
-			imgRawPtr->setJafarImage(i) ;
+				RawImage* imgRawPtr = new RawImage;
+				imgRawPtr->setJafarImage(i) ;
 
-			rawPtr.reset(imgRawPtr);
+				rawPtr.reset(imgRawPtr);
+				return 0;
+			}
 		}
 
+		void SensorPinHole::releaseRaw(){
+
+			if (hardwareSensorPtr)
+			{
+				hardwareSensorPtr->releaseRaw();
+			}
+		}
+		
 		raw_ptr_t SensorPinHole::getRaw() {
 //			image_ptr_t ip = rawPtr;
 			return rawPtr;
 		}
-
-
 
 	}
 }

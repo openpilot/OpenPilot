@@ -76,12 +76,12 @@ void test_obsPHEuc01() {
 	lmkPtr-> state.x() = lmkPoint;
 
 	vec4 k;
-	vec d, c;
+	vec d;
 	vec2 imSize;
-
+	
 	randVector(k);
-	senPtr->params.setImgSize(imSize(0),imSize(1));
-	senPtr->params.setIntrinsicCalibration(k, d, c);
+	senPtr->params.setImgSize(imSize(0), imSize(1));
+	senPtr->params.setIntrinsicCalibration(k, d, d.size());
 
 	obsPtr->project();
 

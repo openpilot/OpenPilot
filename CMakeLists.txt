@@ -13,7 +13,7 @@ build_jafar_module(rtslam
   OPTIONAL_MODULES 
 
   REQUIRED_EXTLIBS boost_thread
-  OPTIONAL_EXTLIBS qt4
+  OPTIONAL_EXTLIBS qt4 viam
 
   CXXFLAGS -g -ggdb -O0 -Wall
   #CPPFLAGS -Werror

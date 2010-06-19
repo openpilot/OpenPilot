@@ -65,11 +65,10 @@ void test_senPH01(void) {
 	randVector(d);
 	randVector(d);
 	d *= 0.0;
-	c = d;
-	senPtr->params.setImgSize(imgSize(0),imgSize(1));
-	senPtr->params.setIntrinsicCalibration(k, d, c);
+	senPtr->params.setImgSize(imgSize(0), imgSize(1));
+	senPtr->params.setIntrinsicCalibration(k, d, d.size());
+	c = senPtr->params.correction;
 
-  std::cout<<"#"<<__LINE__<<std::endl;
 	randVector(u);
 	u *= k(0);
 	double s = 2;

@@ -9,6 +9,7 @@
 #ifndef SENSORIMAGEPARAMETERS_HPP_
 #define SENSORIMAGEPARAMETERS_HPP_
 
+#include "rtslam/pinholeTools.hpp"
 #include "jmath/jblas.hpp"
 
 namespace jafar{
@@ -51,12 +52,12 @@ namespace jafar{
 				 * \param d the radial distortion parameters vector <c>d = [d_2, d_4, ...] </c>.
 				 * \param c the radial distortion correction parameters vector <c>c = [c_2, c_4, ...] </c>.
 				 */
-				void setIntrinsicCalibration(const vec4 _k, const vec & _d, const vec & _c){
+				void setIntrinsicCalibration(const vec4 _k, const vec & _d, size_t size_c){
 					intrinsic = _k;
 					distortion.resize(_d.size());
 					distortion = _d;
-					correction.resize(_c.size());
-					correction = _c;
+					correction.resize(size_c);
+					pinhole::computeCorrectionModel(intrinsic, distortion, correction);
 				}
 
 				void setMiscellaneous(double _pixNoise,

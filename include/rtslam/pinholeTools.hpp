@@ -14,6 +14,10 @@
 #define PINHOLE_HPP_
 
 #include "jmath/jblas.hpp"
+#include "jmath/linearSolvers.hpp"
+#include "jmath/ublasExtra.hpp"
+
+#include "jmath/matlab.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -141,6 +145,23 @@ namespace jafar {
 				P_depth(2, 0) = 1.0;
 			}
 
+			/**
+			 * Distortion factor for the model s = 1 + d_0 * r^2 + d_1 * r^4 + d_2 * r^6 + ...
+			 * \param r2 the square of the radius to evaluate, r2 = r^2.
+			 * \return the distortion factor so that rd = s*r
+			 */
+			template<class VD>
+			double distortFactor(const VD & d, double r2){
+				if (d.size() == 0) return 1.0;
+				double s = 1.0;
+				double r2i = 1.0;
+				for (size_t i = 0; i < d.size(); i++) { //   here we are doing:
+					r2i = r2i * r2; //                    r2i = r^(2*(i+1))
+					s += d(i) * r2i; //                   s = 1 + d_0 * r^2 + d_1 * r^4 + d_2 * r^6 + ...
+				}
+				return s;
+			}
+
 
 			/**
 			 * Radial distortion: ud = (1 + d_0 * r^2 + d_1 * r^4 + d_2 * r^6 + etc) * u
@@ -155,13 +176,14 @@ namespace jafar {
 					return up;
 				else {
 					double r2 = up(0) * up(0) + up(1) * up(1); // this is the norm squared: r2 = ||u||^2
-					double s = 1.0;
-					double r2i = 1.0;
-					for (size_t i = 0; i < n; i++) { //   here we are doing:
-						r2i = r2i * r2; //                    r2i = r^(2*(i+1))
-						s += d(i) * r2i; //                   s = 1 + d_0 * r^2 + d_1 * r^4 + d_2 * r^6 + ...
-					}
-					return s * up; //                     finally: ud = (1 + d_0 * r^2 + d_1 * r^4 + d_2 * r^6 + ...) * u;
+					return distortFactor(d, r2) * up;
+//					double s = 1.0;
+//					double r2i = 1.0;
+//					for (size_t i = 0; i < n; i++) { //   here we are doing:
+//						r2i = r2i * r2; //                    r2i = r^(2*(i+1))
+//						s += d(i) * r2i; //                   s = 1 + d_0 * r^2 + d_1 * r^4 + d_2 * r^6 + ...
+//					}
+//					return s * up; //                     finally: ud = (1 + d_0 * r^2 + d_1 * r^4 + d_2 * r^6 + ...) * u;
 				}
 			}
 
@@ -221,13 +243,14 @@ namespace jafar {
 					return ud;
 				else {
 					double r2 = ud(0) * ud(0) + ud(1) * ud(1); // this is the norm squared: r2 = ||u||^2
-					double s = 1.0;
-					double r2i = 1.0;
-					for (size_t i = 0; i < n; i++) { //   here we are doing:
-						r2i = r2i * r2; //                    r2i = r^(2*(i+1))
-						s += c(i) * r2i; //                   s = 1 + c_0 * r^2 + c_1 * r^4 + c_2 * r^6 + ...
-					}
-					return s * ud; //                     finally: up = (1 + c_0 * r^2 + c_1 * r^4 + c_2 * r^6 + ...) * u;
+					return distortFactor(c, r2) * ud;
+//					double s = 1.0;
+//					double r2i = 1.0;
+//					for (size_t i = 0; i < n; i++) { //   here we are doing:
+//						r2i = r2i * r2; //                    r2i = r^(2*(i+1))
+//						s += c(i) * r2i; //                   s = 1 + c_0 * r^2 + c_1 * r^4 + c_2 * r^6 + ...
+//					}
+//					return s * ud; //                     finally: up = (1 + c_0 * r^2 + c_1 * r^4 + c_2 * r^6 + ...) * u;
 				}
 			}
 
@@ -486,6 +509,66 @@ namespace jafar {
 			template<class VPix>
 			bool isInImage(const VPix & pix, const int & width, const int & height) {
 				return isInRoi(pix, 0, 0, width, height);
+			}
+
+
+			/**
+			 * Compute distortion correction parameters.
+			 *
+			 * This method follows the one in Joan Sola's thesis [1], pag 46--49.
+			 *
+			 * \param size: the size of the desired correction vector.
+			 */
+			template<class Vk, class Vd, class Vc>
+			void computeCorrectionModel(const Vk & k, const Vd & d, Vc & c) {
+				size_t size = c.size();
+
+				if (size != 0) {
+
+					double r_max = sqrt(k(0)*k(0) / (k(2)*k(2)) + k(1)*k(1) / (k(3)*k(3)));
+					double rd_max = 1.1 * r_max;
+
+					size_t N_samples = 100; // number of samples
+					double iN_samples = 1 / (double) N_samples;
+					double rd_n, rc_2, rd_2;
+					vec rd(N_samples+1), rc(N_samples+1);
+					mat Rd(N_samples+1, size);
+
+
+					for (size_t sample = 0; sample <= N_samples; sample++) {
+
+						rc(sample) = sample * rd_max * iN_samples; // sample * rd_max / N_samples
+						rc_2 = rc(sample) * rc(sample);
+						rd(sample) = distortFactor(d, rc_2) * rc(sample);
+						rd_2 = rd(sample) * rd(sample);
+
+						rd_n = rd(sample); // start with rd
+
+						for (size_t order = 0; order < size; order++) {
+							rd_n *= rd_2; // increment:
+							Rd(sample, order) = rd_n; // we have : rd^3, rd^5, rd^7, ...
+						}
+					}
+
+
+					// solve Rd*c = (rc-rd) for c, with least-squares SVD method:
+					// the result is c = pseudo_inv(Rd)*(rc-rd)
+					//  with pseudo_inv(Rd) = (Rd'*Rd)^-1 * Rd'
+
+					// this does not work:
+					// jmath::LinearSolvers::solve_Cholesky(Rd, (rc - rd), c);
+
+					// therefore we solve manually the pseudo-inverse:
+					using namespace ublas;
+					using namespace jmath::ublasExtra;
+					mat RdtRd(size,size);
+					RdtRd = prod(trans(Rd), Rd);
+					mat iRdtRd(size, size);
+					inv(RdtRd, iRdtRd);
+					mat iRd = prod(iRdtRd, trans<mat>(Rd));
+
+					c = prod(iRd,(rc-rd));
+				}
 			}
 
 		} // namespace pinhole

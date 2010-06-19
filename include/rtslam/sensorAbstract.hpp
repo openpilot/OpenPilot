@@ -24,6 +24,7 @@
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/mapObject.hpp"
 #include "rtslam/robotAbstract.hpp"
+#include "rtslam/hardwareSensorAbstract.hpp"
 #include <boost/smart_ptr.hpp>
 
 namespace jafar {
@@ -75,6 +76,8 @@ namespace jafar {
 			ENABLE_ACCESS_TO_CHILDREN(DataManagerAbstract,DataManager,dataManager)
 				;
 
+				hardware_sensor_ptr_t hardwareSensorPtr;
+				
 			public:
 
 				enum type_enum {
@@ -144,10 +147,16 @@ namespace jafar {
 
 			public:
 
+				void setHardwareSensor(hardware_sensor_ptr_t hardwareSensorPtr_)
+				{
+					hardwareSensorPtr = hardwareSensorPtr_;
+				}
+				
 				/*
 				 * Acquire raw data.
 				 */
-				virtual void acquireRaw() = 0;
+				virtual int acquireRaw() = 0;
+				virtual void releaseRaw() = 0;
 
 				virtual raw_ptr_t getRaw() = 0;
 

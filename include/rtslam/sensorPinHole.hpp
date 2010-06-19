@@ -65,7 +65,8 @@ namespace jafar {
 					return 7;
 				}
 
-				void acquireRaw();
+				int acquireRaw();
+				void releaseRaw();
 
 				raw_ptr_t getRaw() ;
 

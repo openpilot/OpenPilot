@@ -101,18 +101,8 @@ namespace jafar {
 					
 					measure.matchScore = correl::Explorer<correl::Zncc>::exploreTranslation(targetAppImg->patch, *img, roi.x, roi.x+roi.width-1, 1, roi.y, roi.y+roi.height-1, 1, measure.x()(0), measure.x()(1));
 			
-// 					//cv::namedWindow( "Descriptor patch", 1 );
-// 					cv::namedWindow( "Predicted patch", 1 );
-// 					cv::imshow("Predicted patch", targetAppImg->patch );
-// 					cv::namedWindow( "Matched patch", 1 );
-// 					cv::imshow("Matched patch", appImg->patch );
-// 					//cv::waitKey(0);
-
-					measure.P()(0,0) = measure.P()(1,1) = 1.0;
-					measure.P()(1,0) = measure.P()(0,1) = 0.0;
-					
 					// TODO set appearance
-					//app = img->copy(appImg->patch, measure.x()(0), measure.x()(1));
+//					app = img->copy(appImg->patch, measure.x()(0), measure.x()(1));
 			
 					return true;
 				}

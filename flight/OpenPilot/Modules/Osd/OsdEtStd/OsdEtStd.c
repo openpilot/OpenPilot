@@ -36,7 +36,7 @@
 #define DEBUG_PORT		PIOS_COM_TELEM_RF
 #define STACK_SIZE		1024
 #define TASK_PRIORITY	(tskIDLE_PRIORITY + 3)
-#define ENABLE_DEBUG_MSG
+//#define ENABLE_DEBUG_MSG
 
 //
 // Private constants
@@ -47,6 +47,20 @@
 #else
 	#define DEBUG_MSG(format, ...)
 #endif
+
+#define OSDMSG_V_LS_IDX		10
+#define OSDMSG_V_MS_IDX		18
+#define OSDMSG_LAT_IDX		33
+#define OSDMSG_LON_IDX		37
+#define OSDMSG_HOME_IDX		47
+#define OSDMSG_ALT_IDX		49
+#define OSDMSG_NB_SATS		58
+#define OSDMSG_GPS_STAT		59
+
+#define OSDMSG_GPS_STAT_NOFIX	0x03
+#define OSDMSG_GPS_STAT_FIX		0x2B
+#define OSDMSG_GPS_STAT_HB_FLAG	0x10
+
 
 
 //
@@ -59,15 +73,15 @@
 
 //	                  | Header / cmd?|                                  | V  |                                  |  V |                                                                     | LAT: 37 57.0000   | LONG: 24 00.4590  |                             | Hom<-179| Alt 545.4 m       |                        |#sat|stat|
 //	                     00   01   02   03   04   05   06   07   08   09   10   11   12   13   14   15   16   17   18   19   20   21   22   23   24   25   26   27   28   29   30   31   32   33   34   35   36   37   38   39   40   41   42   43   44   45   46   47   48   49   50   51   52   53   54   55   56   57   58   59   60   61   62
-//	uint8_t msg[63] = {0x03,0x3F,0x03,0x00,0x00,0x00,0x00,0x00,0x91,0x0A,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xFD,0x17,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x91,0x0A};
-//	uint8_t msg[63] = {0x03,0x3F,0x03,0x00,0x00,0x00,0x00,0x00,0x8F,0x0A,0x40,0x00,0x00,0x00,0x00,0x00,0x00,0xFD,0x17,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x57,0x37,0x90,0x45,0x00,0x24,0x09,0x00,0x24,0x03,0x00,0x00,0x90,0x00,0x54,0x54,0x00,0x00,0x52,0x11,0x20,0x00,0x00,0x06,0x2B,0x00,0x8F,0x0A};
-	uint8_t msg[63] = {0x03,0x3F,0x03,0x00,0x00,0x00,0x00,0x00,0x90,0x0A,0x8A,0x00,0x00,0x00,0x00,0x00,0x00,0xFC,0x17,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x57,0x37,0x14,0x33,0x02,0x24,0x09,0x60,0x10,0x02,0x00,0x00,0x90,0x00,0x54,0x54,0x00,0x00,0x33,0x28,0x13,0x00,0x00,0x08,0x00,0x00,0x90,0x0A};
-//	uint8_t msg[63] = {0x03,0x3F,0x03,0x00,0x00,0x00,0x00,0x00,0x90,0x0A,0x8A,0x00,0x00,0x00,0x00,0x00,0x00,0xFC,0x17,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x57,0x37,0x14,0x33,0x02,0x24,0x09,0x60,0x10,0x02,0x00,0x00,0x90,0x00,0x54,0x54,0x00,0x00,0x33,0x28,0x13,0x00,0x00,0x08,0x03,0x00,0x90,0x0A};
+	uint8_t msg[63] = {0x03,0x3F,0x03,0x00,0x00,0x00,0x00,0x00,0x90,0x0A,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xFC,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x09,0x60,0x10,0x02,0x00,0x00,0x90,0x00,0x54,0x54,0x00,0x00,0x33,0x28,0x13,0x00,0x00,0x08,0x00,0x00,0x90,0x0A};
 
-static bool fix=FALSE;
-static bool newPosData=FALSE;
-static bool newBattData=FALSE;
+static volatile bool newPosData=FALSE;
+static volatile bool newBattData=FALSE;
 
+
+//
+// Private functions
+//
 static void WriteToMsg8(uint8_t index, uint8_t value)
 {
 	if (value>100)
@@ -82,32 +96,46 @@ static void WriteToMsg16(uint8_t index, uint16_t value)
 	WriteToMsg8(index+1, value / 100);
 }
 
+static void WriteToMsg24(uint8_t index, uint32_t value)
+{
+	WriteToMsg16(index, value % 10000);
+	WriteToMsg8(index+2, value / 10000);
+}
+
 static void WriteToMsg32(uint8_t index, uint32_t value)
 {
 	WriteToMsg16(index, value % 10000);
 	WriteToMsg16(index+2, value / 10000);
 }
 
-static void SetHomeDir(uint32_t dir)
+static void SetCoord(uint8_t index, float coord)
 {
-	int etDir;
+	uint32_t deg = (uint32_t)coord;
+	float sec = (coord-deg)*60;
 
-	etDir = dir - 89;
-	if (etDir < 0)
-		etDir += 360;
+	WriteToMsg24(index, sec*10000);
+	WriteToMsg8(index+3, deg);
+}
 
-	WriteToMsg16(47, etDir);
+static void SetCourse(uint16_t dir)
+{
+	WriteToMsg16(OSDMSG_HOME_IDX, dir);
 }
 
 static void SetAltitude(uint32_t altitudeMeter)
 {
-	WriteToMsg32(49, altitudeMeter*10);
+	WriteToMsg32(OSDMSG_ALT_IDX, altitudeMeter*10);
 }
 
 static void SetVoltage(uint32_t milliVolt)
 {
-	msg[18] = (milliVolt / 6444)<<4;
-	msg[10] = (milliVolt % 6444)*256/6444;
+	msg[OSDMSG_V_MS_IDX] = (milliVolt / 6444)<<4;
+	msg[OSDMSG_V_LS_IDX] = (milliVolt % 6444)*256/6444;
+}
+
+static void SetNbSats(uint8_t nb)
+{
+	msg[OSDMSG_NB_SATS] = nb;
 }
 
 static void FlightBatteryStateUpdatedCb(UAVObjEvent* ev)
@@ -121,69 +149,30 @@ static void PositionActualUpdatedCb(UAVObjEvent* ev)
 }
 
 
-//
-// Private functions
-//
 static void Task(void* parameters)
 {
-	//int dir=0;
-	//int alt=100;
-	//int voltage = 0;
 	uint32_t cnt = 0;
-	PIOS_COM_ChangeBaud(DEBUG_PORT, 57600);
 
-	FlightBatteryStateConnectCallback(FlightBatteryStateUpdatedCb);
+
+	//PIOS_COM_ChangeBaud(DEBUG_PORT, 57600);
+
 	PositionActualConnectCallback(PositionActualUpdatedCb);
+	FlightBatteryStateConnectCallback(FlightBatteryStateUpdatedCb);
 
 	DEBUG_MSG("OSD ET Std Started\n\r");
 
 	while (1)
 	{
-//		SetHomeDir(dir);
-//		dir++;
-//		if (dir>90)
-//		{
-//			fix=TRUE;
-//		}
-//		if (dir>360)
-//		{
-//			dir = 0;
-//			// Change coordinates
-//			msg[39]++;
-//		}
-//
-//		SetAltitude(alt);
-//		alt++;
-//
-//		SetVoltage(voltage);
-//		voltage += 50;
-//
-//		// GPS status
-//		if (fix)
-//			msg[59] = 0x2B;
-//		else
-//			msg[59] = 0x03;
-//
-//		if (newGpsData)
-//		{
-//			msg[59] |= 0x10;
-//			newGpsData = FALSE;
-//		}
-//		else
-//		{
-//			newGpsData = TRUE;
-//		}
-
-
+		DEBUG_MSG("%d\n\r", cnt);
 		if ( newBattData )
 		{
 			FlightBatteryStateData flightBatteryData;
 
 			FlightBatteryStateGet(&flightBatteryData);
 
-			DEBUG_MSG("%5d Batt: V=%dmV\n\r", cnt, flightBatteryData.Tension);
+			DEBUG_MSG("%5d Batt: V=%dmV\n\r", cnt, flightBatteryData.Voltage);
 
-			SetVoltage(flightBatteryData.Tension);
+			SetVoltage(flightBatteryData.Voltage);
 			newBattData = FALSE;
 		}
 
@@ -193,37 +182,51 @@ static void Task(void* parameters)
 
 			PositionActualGet(&positionData);
 
-			DEBUG_MSG("%5d Pos: #stat=%d #sats=%d\n\r", cnt, positionData.Status, positionData.Satellites);
+			DEBUG_MSG("%5d Pos: #stat=%d #sats=%d alt=%d\n\r", cnt,
+					positionData.Status, positionData.Satellites, (uint32_t)positionData.Altitude);
 
+			// GPS Status
 			if (positionData.Status == POSITIONACTUAL_STATUS_FIX3D)
-				msg[59] = 0x2B;
+				msg[OSDMSG_GPS_STAT] = OSDMSG_GPS_STAT_FIX;
 			else
-				msg[59] = 0x03;
-			msg[59] |= 0x10;
+				msg[OSDMSG_GPS_STAT] = OSDMSG_GPS_STAT_NOFIX;
+			msg[OSDMSG_GPS_STAT] |= OSDMSG_GPS_STAT_HB_FLAG;
 
-			msg[58] = positionData.Satellites;
+
+			// GPS info
+			SetCoord(OSDMSG_LAT_IDX, positionData.Latitude);
+			SetCoord(OSDMSG_LON_IDX, positionData.Longitude);
+			SetAltitude(positionData.Altitude);
+			SetNbSats(positionData.Satellites);
+			SetCourse(positionData.Heading);
 
 			newPosData = FALSE;
 		}
 		else
 		{
-			msg[59] &= ~0x10;
+			msg[OSDMSG_GPS_STAT] &= ~OSDMSG_GPS_STAT_HB_FLAG;
 		}
 
+		DEBUG_MSG("SendMsg .");
 		if (PIOS_I2C_LockDevice(5000 / portTICK_RATE_MS))
 		{
+			DEBUG_MSG(".");
 			PIOS_I2C_Transfer(I2C_Write, 0x30<<1, msg, sizeof(msg));
+			DEBUG_MSG(".");
 			PIOS_I2C_UnlockDevice();
 		}
+		DEBUG_MSG("\n\r");
 
 		cnt++;
 
 		vTaskDelay(100 / portTICK_RATE_MS);
-
 	}
-
 }
 
+
+//
+// Public functions
+//
 
 /**
  * Initialise the module

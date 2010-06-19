@@ -146,6 +146,18 @@ OPMapGadgetWidget::~OPMapGadgetWidget()
 
 // *************************************************************************************
 
+void OPMapGadgetWidget::zoomIn()
+{
+    if (map)
+	map->SetZoom(map->Zoom() + 1);
+}
+
+void OPMapGadgetWidget::zoomOut()
+{
+    if (map)
+	map->SetZoom(map->Zoom() - 1);
+}
+
 void OPMapGadgetWidget::setZoom(int value)
 {
     if (map)
@@ -160,6 +172,7 @@ void OPMapGadgetWidget::setPosition(QPointF pos)
 
 void OPMapGadgetWidget::setMapProvider(QString provider)
 {
+    // haven't yet decided how to populate the map provider combobox on the options page
 //    if (map)
 //	if (map->isStarted())
 //	    map->SetMapType(mapcontrol::Helper::MapTypeFromString(provider));
@@ -173,6 +186,25 @@ void OPMapGadgetWidget::setUseMemoryCache(bool useMemoryCache)
 
 void OPMapGadgetWidget::setCacheLocation(QString cacheLocation)
 {
+    cacheLocation = cacheLocation.trimmed();	// remove any surrounding spaces
+
+    if (cacheLocation.isEmpty()) return;	// tut tut
+
+    #if defined(Q_WS_WIN)
+	if (!cacheLocation.endsWith('/')) cacheLocation += '/';
+    #elif defined(Q_WS_X11)
+	if (!cacheLocation.endsWith('/')) cacheLocation += '/';
+    #elif defined(Q_WS_MAC)
+	if (!cacheLocation.endsWith('/')) cacheLocation += '/';
+    #endif
+
+    QDir dir(cacheLocation);
+    if (!dir.exists())
+	if (!dir.mkpath(cacheLocation))
+	    return;
+
+    qDebug() << "map cache dir: " << cacheLocation;
+
     if (map)
 	map->configuration->SetCacheLocation(cacheLocation);
 }
@@ -245,21 +277,7 @@ void OPMapGadgetWidget::keyPressEvent(QKeyEvent* event)
 }
 
 // *************************************************************************************
-
-void OPMapGadgetWidget::zoomIn()
-{
-    if (map)
-	map->SetZoom(map->Zoom() + 1);
-}
-
-void OPMapGadgetWidget::zoomOut()
-{
-    if (map)
-	map->SetZoom(map->Zoom() - 1);
-}
-
-
-// *************************************************************************************
+// signals from the map library
 
 void OPMapGadgetWidget::zoomChanged(double zoom)
 {
@@ -272,6 +290,7 @@ void OPMapGadgetWidget::OnTilesStillToLoad(int number)
 }
 
 // *************************************************************************************
+
 void OPMapGadgetWidget::on_checkBox_clicked(bool checked)
 {
     if (map)
@@ -329,24 +348,12 @@ void OPMapGadgetWidget::on_pushButtonRR_clicked()
 
 void OPMapGadgetWidget::on_pushButtonZoomP_clicked()
 {
-    if (map)
-    {
-	double zoom = map->Zoom();
-//	double zoom_step = controlpanel_ui->doubleSpinBox->value();
-	double zoom_step = 1;
-	map->SetZoom(zoom + zoom_step);
-    }
+    zoomIn();
 }
 
 void OPMapGadgetWidget::on_pushButtonZoomM_clicked()
 {
-    if (map)
-    {
-	double zoom = map->Zoom();
-//	double zoom_step = controlpanel_ui->doubleSpinBox->value();
-	double zoom_step = 1;
-	map->SetZoom(zoom - zoom_step);
-    }
+    zoomOut();
 }
 
 void OPMapGadgetWidget::on_checkBox_2_clicked(bool checked)
@@ -362,6 +369,12 @@ void OPMapGadgetWidget::on_pushButtonGeoFenceM_clicked()
     controlpanel_ui->spinBoxGeoFenceDistance->setValue(geo_fence_distance - step);
 
     geo_fence_distance = controlpanel_ui->spinBoxGeoFenceDistance->value();
+
+
+    // to do
+
+
+
 }
 
 void OPMapGadgetWidget::on_pushButtonGeoFenceP_clicked()
@@ -371,6 +384,12 @@ void OPMapGadgetWidget::on_pushButtonGeoFenceP_clicked()
     controlpanel_ui->spinBoxGeoFenceDistance->setValue(geo_fence_distance + step);
 
     geo_fence_distance = controlpanel_ui->spinBoxGeoFenceDistance->value();
+
+
+    // to do
+
+
+
 }
 
 // *************************************************************************************

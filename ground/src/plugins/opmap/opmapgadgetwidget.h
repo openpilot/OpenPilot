@@ -55,17 +55,19 @@ public slots:
 
 protected:
     void resizeEvent(QResizeEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent* event);
 
 private slots:
-   void updatePosition();
+    void updatePosition();
+
+    void statusUpdate();
 
     void zoomIn();
     void zoomOut();
 
     // control panel slots
     void on_checkBox_clicked(bool checked);
-    void on_comboBox_currentIndexChanged(QString );
     void on_pushButtonGO_clicked();
     void on_pushButtonReload_clicked();
     void on_pushButtonRR_clicked();
@@ -85,7 +87,12 @@ private:
 
     double m_heading;	// uav heading
 
+    internals::PointLatLng mouse_lat_lon;
+
+    QLabel statusLabel;
+
    QTimer *m_updateTimer;
+   QTimer *m_statusUpdateTimer;
 
    PositionActual *m_positionActual;
 

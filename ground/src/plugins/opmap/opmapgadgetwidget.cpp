@@ -45,6 +45,8 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_follow_uav = false;
 
+    setMouseTracking(true);
+
     // **************
     // Get required UAVObjects
 
@@ -87,13 +89,19 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     // **************
     // set the user control options
 
-    controlpanel_ui->comboBox->addItems(mapcontrol::Helper::MapTypes());
-    controlpanel_ui->comboBox->setCurrentIndex(mapcontrol::Helper::MapTypes().indexOf("GoogleHybrid"));
     controlpanel_ui->labelZoom->setText(" " + QString::number(map->Zoom()));
     controlpanel_ui->labelRotate->setText(" " + QString::number(map->Rotate()));
-    controlpanel_ui->labelNumTilesToLoad->setText(" 0");
+//    controlpanel_ui->labelNumTilesToLoad->setText(" 0");
+    controlpanel_ui->labelNumTilesToLoad->setText("");
+
+    controlpanel_ui->labelStatus->setText("");
+
+    controlpanel_ui->progressBarMap->setMaximum(1);
 
     // **************
+
+    // for fetching a contiuous mouse position
+    map->SetFollowMouse(true);
 
     // receive map zoom changes
     connect(map, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));
@@ -133,6 +141,11 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_updateTimer, SIGNAL(timeout()), this, SLOT(updatePosition()));
     m_updateTimer->start();
 
+    m_statusUpdateTimer = new QTimer();
+    m_statusUpdateTimer->setInterval(40);
+    connect(m_statusUpdateTimer, SIGNAL(timeout()), this, SLOT(statusUpdate()));
+    m_statusUpdateTimer->start();
+
     // **************
 }
 
@@ -143,6 +156,32 @@ OPMapGadgetWidget::~OPMapGadgetWidget()
 {
     if (map) delete map;
     if (controlpanel_ui) delete controlpanel_ui;
+}
+
+// *************************************************************************************
+
+void OPMapGadgetWidget::resizeEvent(QResizeEvent *event)
+{
+//    if (map) map->resize(QSize(width(), height()));
+    update();
+    QWidget::resizeEvent(event);
+}
+
+void OPMapGadgetWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    if (map)
+    {
+	// fetch the current latitude and longitude for the current mouse position
+//	mouse_lat_lon = map->currentMousePosition();
+
+//	QString coord_str = "lat " + QString::number(lat_lon.Lat(), 'f', 6) + ", lon " + QString::number(lat_lon.Lng(), 'f', 6);
+//	controlpanel_ui->labelStatus->setText(coord_str);
+    }
+
+    if (event->buttons() & Qt::LeftButton)
+    {
+	 QPoint pos = event->pos();
+    }
 }
 
 // *************************************************************************************
@@ -222,13 +261,20 @@ void OPMapGadgetWidget::updatePosition()
     }
 }
 
-// *************************************************************************************
-
-void OPMapGadgetWidget::resizeEvent(QResizeEvent *event)
+void OPMapGadgetWidget::statusUpdate()
 {
-//    if (map) map->resize(QSize(width(), height()));
-    update();
-    QWidget::resizeEvent(event);
+    // fetch the current latitude and longitude for the current mouse position
+    internals::PointLatLng lat_lon = map->currentMousePosition();
+
+    if (mouse_lat_lon != lat_lon)
+    {
+	mouse_lat_lon = lat_lon;
+
+	QString coord_str = " " + QString::number(mouse_lat_lon.Lat(), 'f', 6) + "   " + QString::number(mouse_lat_lon.Lng(), 'f', 6);
+
+	statusLabel.setText(coord_str);
+	controlpanel_ui->labelStatus->setText(coord_str);
+    }
 }
 
 // *************************************************************************************
@@ -286,7 +332,11 @@ void OPMapGadgetWidget::zoomChanged(double zoom)
 
 void OPMapGadgetWidget::OnTilesStillToLoad(int number)
 {
-    controlpanel_ui->labelNumTilesToLoad->setText(" " + QString::number(number));
+    if (controlpanel_ui->progressBarMap->maximum() < number)
+	controlpanel_ui->progressBarMap->setMaximum(number);
+    controlpanel_ui->progressBarMap->setValue(controlpanel_ui->progressBarMap->maximum() - number);
+
+//    controlpanel_ui->labelNumTilesToLoad->setText(" " + QString::number(number));
 }
 
 // *************************************************************************************
@@ -295,13 +345,6 @@ void OPMapGadgetWidget::on_checkBox_clicked(bool checked)
 {
     if (map)
 	map->SetShowTileGridLines(checked);
-}
-
-void OPMapGadgetWidget::on_comboBox_currentIndexChanged(QString value)
-{
-    if (map)
-	if (map->isStarted())
-	    map->SetMapType(mapcontrol::Helper::MapTypeFromString(value));
 }
 
 void OPMapGadgetWidget::on_pushButtonGO_clicked()
@@ -439,16 +482,16 @@ void OPMapGadgetWidget::createMapOverlayUserControls()
 //    zoomin->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     connect(zoomin, SIGNAL(clicked(bool)), this, SLOT(zoomIn()));
 
+//    statusLabel.font().setPointSize(20);
+
     // add zoom buttons to the layout of the MapControl
     QVBoxLayout* overlay_layout_v1 = new QVBoxLayout;
     overlay_layout_v1->setMargin(4);
     overlay_layout_v1->setSpacing(4);
-    overlay_layout_v1->addSpacing(10);
 
     QHBoxLayout* overlay_layout_h1 = new QHBoxLayout;
     overlay_layout_h1->setMargin(0);
     overlay_layout_h1->setSpacing(4);
-    overlay_layout_h1->addSpacing(10);
 //  overlay_layout_h1->addWidget(gcsButton);
 //  overlay_layout_h1->addWidget(uavButton);
 //  overlay_layout_h1->addSpacing(10);
@@ -456,8 +499,18 @@ void OPMapGadgetWidget::createMapOverlayUserControls()
     overlay_layout_h1->addWidget(zoomin);
     overlay_layout_h1->addStretch(0);
 
+    QHBoxLayout* overlay_layout_h2 = new QHBoxLayout;
+    overlay_layout_h2->setMargin(0);
+    overlay_layout_h2->setSpacing(4);
+    overlay_layout_h2->addStretch(0);
+    overlay_layout_h2->addWidget(&statusLabel);
+    overlay_layout_h2->addStretch(0);
+
+    overlay_layout_v1->addSpacing(10);
     overlay_layout_v1->addLayout(overlay_layout_h1);
     overlay_layout_v1->addStretch(0);
+//    overlay_layout_v1->addLayout(overlay_layout_h2);
+    overlay_layout_v1->addSpacing(10);
 
     map->setLayout(overlay_layout_v1);
 }

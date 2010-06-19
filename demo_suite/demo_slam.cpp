@@ -52,6 +52,13 @@ using namespace boost;
 
 
 void test_slam01_main(world_ptr_t *world) {
+
+	const int MAPSIZE = 150;
+	const int NFRAME = 1000;
+	const int NUPDATES = 1000;
+
+	const double FRAMERATE = 60;
+
 	ActiveSearchGrid asGrid(640, 480, 5, 5, 22, 3);
 	int imgWidth = 640, imgHeight = 480;
 	double _d[3] = {-0.27965, 0.20059, -0.14215};
@@ -71,7 +78,7 @@ void test_slam01_main(world_ptr_t *world) {
 	worldPtr->display_mutex.lock();
 	
 	// create maps
-	map_ptr_t mapPtr(new MapAbstract(307));
+	map_ptr_t mapPtr(new MapAbstract(MAPSIZE));
 	worldPtr->addMap(mapPtr);
 	mapPtr->clear();
 	
@@ -83,9 +90,9 @@ void test_slam01_main(world_ptr_t *world) {
 	fillVector(v, 0.0);
 	robPtr1->state.x(v);
 	robPtr1->pose.x(quaternion::originFrame());
-	robPtr1->dt_or_dx = 1/15.0;
+	robPtr1->dt_or_dx = 1/FRAMERATE;
 	v.resize(robPtr1->mySize_perturbation());
-	fillVector(v, 0.2);
+	fillVector(v, 0.5);
 	robPtr1->perturbation.clear();
 	robPtr1->perturbation.set_std_continuous(v);
 	robPtr1->perturbation.set_P_from_continuous(robPtr1->dt_or_dx);
@@ -102,9 +109,10 @@ void test_slam01_main(world_ptr_t *world) {
 	senPtr11->params.setIntrinsicCalibration(k, d, d.size());
 	senPtr11->params.setMiscellaneous(1.0, 0.1, patchMatchSize);
 
-	viam_hwmode_t hwmode = { VIAM_HWSZ_640x480, VIAM_HWFMT_MONO8, VIAM_HW_FIXED, VIAM_HWFPS_15, VIAM_HWTRIGGER_INTERNAL };
-	hardware_sensor_ptr_t hardSen11(new HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode));
-	senPtr11->setHardwareSensor(hardSen11);
+	viam_hwmode_t hwmode = { VIAM_HWSZ_640x480, VIAM_HWFMT_MONO8, VIAM_HW_FIXED, VIAM_HWFPS_60, VIAM_HWTRIGGER_INTERNAL };
+	// UNCOMMENT THESE TWO LINES TO ENABLE FIREWIRE CAMERA OPERATION
+//	hardware_sensor_ptr_t hardSen11(new HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode));
+//	senPtr11->setHardwareSensor(hardSen11);
 	
 	cout << "d: " << senPtr11->params.distortion << "\nc: " << senPtr11->params.correction << endl;
 
@@ -120,9 +128,6 @@ void test_slam01_main(world_ptr_t *world) {
 	// loop all lmks
 	// create sen--lmk observation
 	// Temporal loop
-
-	const int NFRAME = 1000;
-	const int NUPDATES = 100;
 
 	kernel::Chrono chrono;
 	kernel::Chrono total_chrono;
@@ -176,15 +181,18 @@ void test_slam01_main(world_ptr_t *world) {
 					// 1a. project
 					obsPtr->project();
 
+					// Add to tesselation grid for active search
+					asGrid.addPixel(obsPtr->expectation.x());
+
 					// 1b. check visibility
 					obsPtr->predictVisibility();
 					if (obsPtr->isVisible()){
 
+						numObs ++;
+						if (numObs <= NUPDATES){
+
 						// update counter
 						obsPtr->counters.nSearch++;
-
-						// Add to tesselation grid for active search
-						asGrid.addPixel(obsPtr->expectation.x());
 
 						// 1c. predict appearance
 						obsPtr->predictAppearance();
@@ -202,12 +210,12 @@ void test_slam01_main(world_ptr_t *world) {
 						if (x+2*dx > imgWidth-border) dx = (imgWidth-border-x)/2;
 						if (y < border) y = border;
 						if (y+2*dy > imgHeight-border) dy = (imgHeight-border-y)/2;
-						cv::Rect roi(x,y,2*dx,2*dy);
+						cv::Rect roi(x,y,2*dx+1,2*dy+1);
 //((AppearanceImagePoint*)(obsPtr->predictedAppearance.get()))->patch.save("predicted_app.png");
 						senPtr->getRaw()->match(RawAbstract::ZNCC, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
 
 						// 1e. if feature is found
-						if (obsPtr->getMatchScore()>0.80) {
+						if (obsPtr->getMatchScore()>0.95) {
 							obsPtr->counters.nMatch++;
 							obsPtr->events.matched = true;
 							obsPtr->computeInnovation() ;
@@ -219,13 +227,13 @@ void test_slam01_main(world_ptr_t *world) {
 								obsPtr->events.updated = true;
 							} // obsPtr->compatibilityTest(3.0)
 						} // obsPtr->getScoreMatchInPercent()>80
+						} // number of observations
 					} // obsPtr->isVisible()
 
 //					cout << "\n-------------------------------------------------- " << endl;
 //					cout << *obsPtr << endl;
 
-					numObs ++;
-					if (numObs >= NUPDATES) break;
+
 				} // foreach observation
 
 				//cout << chrono.elapsedMicrosecond() << " us ; observed lmks: " << numObs << endl;

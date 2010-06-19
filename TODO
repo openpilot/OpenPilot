@@ -5,11 +5,22 @@ Features
 - segments
 - multimap
 - True Active Search: search depending on ellipse area.
-- feature appearance prediction
+- feature appearance prediction <- DONE
 - Adapt ActiveSearchGrid and QuickHarrisDetector to the new ROI specifications in module image
 
-- factories
-- sensors hardware
+- factories 		<- DONE FOR OBS ONLY
+- sensors hardware 	<- DONE FOR PIN-HOLE firewire 1394
+
+- Map management:
+	- use a loop
+	- Lmk reparametrization:
+		- linearity test in OBS.
+		- heuristic for lmk reparametrization in Lmk
+	- Lmk deletion :
+		- non-reparametrized die when out of view in initializer sensor. 
+		- events already collected in Obs.
+		- heuristic for feature deletion in Lmk
+		- deletion in Map, of Lmk and Obs.
 
 Organization
 ------------------------------------
@@ -22,6 +33,6 @@ Organization
 Performance
 ------------------------------------
 - zncc that can use integral image
-- check algorithm speed
+- check algorithm speed <- Good 30Hz. See issues with RT and OS
 - find a more clever way to manipulate the map used space: ia_indirectArray() is possibly an expensive way to go.
 

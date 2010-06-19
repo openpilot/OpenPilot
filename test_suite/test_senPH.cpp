@@ -66,7 +66,8 @@ void test_senPH01(void) {
 	randVector(d);
 	d *= 0.0;
 	c = d;
-	senPtr->set_parameters(imgSize, k, d, c);
+	senPtr->params.setImgSize(imgSize(0),imgSize(1));
+	senPtr->params.setIntrinsicCalibration(k, d, c);
 
   std::cout<<"#"<<__LINE__<<std::endl;
 	randVector(u);
@@ -92,12 +93,12 @@ void test_senPH01(void) {
 
 	cout << "\n% PROJECTION \n%=====================\n" << endl;
 	//	u = senPH.projectPoint(k,d,v);
-	u = pinhole::projectPoint(senPtr->intrinsic, senPtr->distortion, v);
+	u = pinhole::projectPoint(senPtr->params.intrinsic, senPtr->params.distortion, v);
 	cout << "k = " << (MATLAB) k << endl;
 	cout << "d = " << (MATLAB) d << endl;
 	cout << "v = " << (MATLAB) v << endl;
 	cout << "u = " << (MATLAB) u << endl;
-	pinhole::projectPoint(senPtr->intrinsic, senPtr->distortion, v, u, U_v);
+	pinhole::projectPoint(senPtr->params.intrinsic, senPtr->params.distortion, v, u, U_v);
 	cout << "u = " << (MATLAB) u << endl;
 	cout << "U_v = " << (MATLAB) U_v << endl;
 	cout << "[u_mat,smat,Umat_v] = pinHole(v, k, d)" << endl;

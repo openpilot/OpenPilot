@@ -85,7 +85,8 @@ void test_obsap01(void) {
 	pinhole_ptr_t pinholePtr(new SensorPinHole(robPtr,MapObject::UNFILTERED));
 	pinholePtr->id(pinholePtr->sensorIds.getId());
 	pinholePtr->linkToParentRobot(robPtr);
-	pinholePtr->set_parameters(imsz, k, d, c);
+	pinholePtr->params.setImgSize(imsz(0),imsz(1));
+	pinholePtr->params.setIntrinsicCalibration(k, d, c);
 	ahp_ptr_t ahpPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr));
 	ahpPtr->linkToParentMap(mapPtr);
 	obs_ph_ahp_ptr_t obspaPtr(new ObservationPinHoleAnchoredHomogeneousPoint(pinholePtr, ahpPtr));

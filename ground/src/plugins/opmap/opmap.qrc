@@ -5,5 +5,6 @@
         <file>images/waypoint.png</file>
         <file>images/minus.png</file>
         <file>images/plus.png</file>
+        <file>images/ok.png</file>
     </qresource>
 </RCC>

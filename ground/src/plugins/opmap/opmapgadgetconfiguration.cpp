@@ -27,48 +27,55 @@
 
 #include "opmapgadgetconfiguration.h"
 #include <QtCore/QDataStream>
+#include <QDir>
 
 OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),
-    m_mapProvider("OpenStreetMap"),
+    m_mapProvider("GoogleHybrid"),
     m_defaultZoom(2),
     m_defaultLatitude(0),
     m_defaultLongitude(0),
     m_useMemoryCache(true),
-    m_cacheLocation("")
+    m_cacheLocation(QDir::currentPath() + QDir::separator() + "mapscache" + QDir::separator())
 {
-    if (state.count() > 0) {
+    if (state.count() > 0)
+    {
         QDataStream stream(state);
+
         int zoom;
         double latitude;
         double longitude;
         QString mapProvider;
 	bool useMemoryCache;
 	QString cacheLocation;
+
 	stream >> zoom;
         stream >> latitude;
         stream >> longitude;
         stream >> mapProvider;
 	stream >> useMemoryCache;
 	stream >> cacheLocation;
+
 	m_defaultZoom = zoom;
         m_defaultLatitude = latitude;
         m_defaultLongitude = longitude;
-	if (mapProvider != "") m_mapProvider = mapProvider;
+	if (!mapProvider.isEmpty()) m_mapProvider = mapProvider;
 	m_useMemoryCache = useMemoryCache;
-	if (cacheLocation != "") m_cacheLocation = cacheLocation;
+	if (!cacheLocation.isEmpty()) m_cacheLocation = cacheLocation;
     }
 }
 
-IUAVGadgetConfiguration *OPMapGadgetConfiguration::clone()
+IUAVGadgetConfiguration * OPMapGadgetConfiguration::clone()
 {
     OPMapGadgetConfiguration *m = new OPMapGadgetConfiguration(this->classId());
+
     m->m_defaultZoom = m_defaultZoom;
     m->m_defaultLatitude = m_defaultLatitude;
     m->m_defaultLongitude = m_defaultLongitude;
     m->m_mapProvider = m_mapProvider;
     m->m_useMemoryCache = m_useMemoryCache;
     m->m_cacheLocation = m_cacheLocation;
+
     return m;
 }
 
@@ -76,12 +83,13 @@ QByteArray OPMapGadgetConfiguration::saveState() const
 {
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::WriteOnly);
+
     stream << m_defaultZoom;
     stream << m_defaultLatitude;
     stream << m_defaultLongitude;
     stream << m_mapProvider;
     stream << m_useMemoryCache;
     stream << m_cacheLocation;
+
     return bytes;
 }
-

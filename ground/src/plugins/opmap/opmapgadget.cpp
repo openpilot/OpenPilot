@@ -36,12 +36,12 @@ OPMapGadget::OPMapGadget(QString classId, OPMapGadgetWidget *widget, QWidget *pa
 
 OPMapGadget::~OPMapGadget()
 {
-
 }
 
-void OPMapGadget::loadConfiguration(IUAVGadgetConfiguration* config)
+void OPMapGadget::loadConfiguration(IUAVGadgetConfiguration *config)
 {
     OPMapGadgetConfiguration *m = qobject_cast<OPMapGadgetConfiguration*>(config);
+
     m_widget->setMapProvider(m->mapProvider());
     m_widget->setZoom(m->zoom());
     m_widget->setPosition(QPointF(m->longitude(), m->latitude()));

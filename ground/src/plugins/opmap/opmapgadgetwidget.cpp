@@ -28,6 +28,7 @@
 #include <QStringList>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>
+#include <QDir>
 #include "extensionsystem/pluginmanager.h"
 
 #include "ui_opmap_controlpanel.h"
@@ -42,7 +43,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     controlpanel_ui = NULL;
     map = NULL;
 
-    follow_uav = false;
+    m_follow_uav = false;
 
     // **************
     // Get required UAVObjects
@@ -172,10 +173,9 @@ void OPMapGadgetWidget::setPosition(QPointF pos)
 
 void OPMapGadgetWidget::setMapProvider(QString provider)
 {
-    // haven't yet decided how to populate the map provider combobox on the options page
-//    if (map)
-//	if (map->isStarted())
-//	    map->SetMapType(mapcontrol::Helper::MapTypeFromString(provider));
+    if (map)
+	if (map->isStarted())
+	    map->SetMapType(mapcontrol::Helper::MapTypeFromString(provider));
 }
 
 void OPMapGadgetWidget::setUseMemoryCache(bool useMemoryCache)
@@ -188,18 +188,18 @@ void OPMapGadgetWidget::setCacheLocation(QString cacheLocation)
 {
     cacheLocation = cacheLocation.trimmed();	// remove any surrounding spaces
 
-    if (cacheLocation.isEmpty()) return;	// tut tut
+    if (cacheLocation.isEmpty()) return;
 
     #if defined(Q_WS_WIN)
 	if (!cacheLocation.endsWith('/')) cacheLocation += '/';
     #elif defined(Q_WS_X11)
-	if (!cacheLocation.endsWith('/')) cacheLocation += '/';
+	if (!cacheLocation.endsWith(QDir::separator())) cacheLocation += QDir::separator();
     #elif defined(Q_WS_MAC)
-	if (!cacheLocation.endsWith('/')) cacheLocation += '/';
+	if (!cacheLocation.endsWith(QDir::separator())) cacheLocation += QDir::separator();
     #endif
 
-    QDir dir(cacheLocation);
-    if (!dir.exists())
+    QDir dir;
+    if (!dir.exists(cacheLocation))
 	if (!dir.mkpath(cacheLocation))
 	    return;
 
@@ -216,7 +216,7 @@ void OPMapGadgetWidget::updatePosition()
     // get current position data
     PositionActual::DataFields data = m_positionActual->getData();
 
-    if (map && follow_uav)
+    if (map && m_follow_uav)
     {	// center the map onto the UAV
 	map->SetCurrentPosition(internals::PointLatLng(data.Latitude, data.Longitude));
     }
@@ -418,16 +418,12 @@ QPushButton * OPMapGadgetWidget::createTransparentButton(QWidget *parent, QStrin
 void OPMapGadgetWidget::createMapOverlayUserControls()
 {
     QPushButton *zoomout = new QPushButton("");
-    zoomout->setFlat(true);
     zoomout->setToolTip(tr("Zoom out"));
     zoomout->setCursor(Qt::OpenHandCursor);
+    zoomout->setFlat(true);
     zoomout->setIcon(QIcon(QString::fromUtf8(":/opmap/images/minus.png")));
-//    zoomout->setIconSize(QSize(12, 12));
     zoomout->setIconSize(QSize(32, 32));
     zoomout->setFixedSize(32, 32);
-//    zoomout->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-//  zoomout->setWindowOpacity(0.7);
-//  zoomout->setBackgroundRole(QPalette(QColor(0, 0, 0, 0)));
     connect(zoomout, SIGNAL(clicked(bool)), this, SLOT(zoomOut()));
 
 //    QPushButton *zoomin = createTransparentButton(map, "", QString::fromUtf8(":/core/images/plus.png"));

@@ -35,8 +35,11 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QFileDialog>
 
+#include "opmapcontrol/opmapcontrol.h"
+
 #include "ui_opmapgadgetoptionspage.h"
 
+// *********************************************
 
 OPMapGadgetOptionsPage::OPMapGadgetOptionsPage(OPMapGadgetConfiguration *config, QObject *parent) :
     IOptionsPage(parent),
@@ -50,6 +53,10 @@ QWidget *OPMapGadgetOptionsPage::createPage(QWidget *parent)
     QWidget *w = new QWidget(parent);
     m_page->setupUi(w);
 
+    // populate the map provider combobox
+    m_page->providerComboBox->clear();
+    m_page->providerComboBox->addItems(mapcontrol::Helper::MapTypes());
+
     int index = m_page->providerComboBox->findText(m_config->mapProvider());
     index = (index >= 0) ? index : 0;
     m_page->providerComboBox->setCurrentIndex(index);
@@ -60,6 +67,7 @@ QWidget *OPMapGadgetOptionsPage::createPage(QWidget *parent)
     m_page->lineEditCacheLocation->setText(m_config->cacheLocation());
 
     connect(m_page->pushButtonCacheLocation, SIGNAL(clicked()), this, SLOT(on_pushButtonCacheLocation_clicked()));
+    connect(m_page->pushButtonCacheDefaults, SIGNAL(clicked()), this, SLOT(on_pushButtonCacheDefaults_clicked()));
 
     return w;
 }
@@ -70,11 +78,17 @@ void OPMapGadgetOptionsPage::on_pushButtonCacheLocation_clicked()
 
 //    QDir dirPath(dir);
 //    dir = dirPath.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
-//    m_page->lineEditCacheLocation->setText(dir);
+//    if (!dir.isEmpty()) m_page->lineEditCacheLocation->setText(dir);
 
-    QFileDialog::Options options;
-    QString path = QFileDialog::getExistingDirectory(qobject_cast<QWidget*>(this), tr("Choose a directory"), dir, options);
-    if (!path.isNull()) m_page->lineEditCacheLocation->setText(path);
+    QFileDialog::Options options(QFileDialog::ShowDirsOnly);
+    QString path = QFileDialog::getExistingDirectory(qobject_cast<QWidget*>(this), tr("Choose a cache directory"), dir, options);
+    if (!path.isEmpty()) m_page->lineEditCacheLocation->setText(path);
+}
+
+void OPMapGadgetOptionsPage::on_pushButtonCacheDefaults_clicked()
+{
+    m_page->pushButtonUseMemoryCache->setChecked(true);
+    m_page->lineEditCacheLocation->setText(QDir::currentPath() + QDir::separator() + "mapscache" + QDir::separator());
 }
 
 void OPMapGadgetOptionsPage::apply()

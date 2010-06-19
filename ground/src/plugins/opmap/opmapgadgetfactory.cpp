@@ -40,18 +40,18 @@ OPMapGadgetFactory::~OPMapGadgetFactory()
 {
 }
 
-Core::IUAVGadget* OPMapGadgetFactory::createGadget(QWidget *parent)
+Core::IUAVGadget * OPMapGadgetFactory::createGadget(QWidget *parent)
 {
-    OPMapGadgetWidget* gadgetWidget = new OPMapGadgetWidget(parent);
+    OPMapGadgetWidget *gadgetWidget = new OPMapGadgetWidget(parent);
     return new OPMapGadget(QString("OPMapGadget"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *OPMapGadgetFactory::createConfiguration(const QByteArray &state)
+IUAVGadgetConfiguration * OPMapGadgetFactory::createConfiguration(const QByteArray &state)
 {
     return new OPMapGadgetConfiguration(QString("OPMapGadget"), state);
 }
 
-IOptionsPage *OPMapGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
+IOptionsPage * OPMapGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
     return new OPMapGadgetOptionsPage(qobject_cast<OPMapGadgetConfiguration*>(config));
 }

@@ -81,15 +81,16 @@ private slots:
     void OnTilesStillToLoad(int number);
 
 private:
-    bool follow_uav;    // true if the map is to stay centered on the UAV
+    bool m_follow_uav;    // true if the map is to stay centered on the UAV
 
-    double heading;	// compass/uav heading
+    double m_heading;	// uav heading
 
    QTimer *m_updateTimer;
 
    PositionActual *m_positionActual;
 
     Ui::OPMapControlPanel *controlpanel_ui;
+
     mapcontrol::OPMapWidget *map;
 
     QPushButton * createTransparentButton(QWidget *parent, QString text, QString icon);

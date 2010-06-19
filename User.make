@@ -15,7 +15,7 @@ OPTIONAL_MODULES = qdisplay
 
 # external libraries dependencies
 REQUIRED_EXTLIBS = boost_sandbox opencv 
-OPTIONAL_EXTLIBS = qt4 viam
+OPTIONAL_EXTLIBS = qt4 viam MTI
 
 # LDFLAGS +=
 LIBS += -lkernel -ljmath -limage -lqdisplay -lcorrel -lviam

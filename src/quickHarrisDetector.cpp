@@ -25,7 +25,6 @@ namespace jafar {
 		    const jafar::image::Image & image, feat_img_pnt_ptr_t featPtr,
 		    jafar::image::ROI *roiPtr) {
 			//	JFR_PRED_ERROR( image.colorSpace() == JfrImage_CS_GRAY, FdetectException, FdetectException::INVALID_COLORSPACE,"QuickHarrisDetector::detectIn image must be of the same colorspace and in Greyscale");
-
 			ROI localRoi;
 
 			if (roiPtr == 0) {
@@ -50,7 +49,7 @@ namespace jafar {
 			delete[] m_quickData;
 
 			if (success) {
-				featPtr->setup(pixBest[0], pixBest[1], scoreBest);
+				featPtr->setup(pixBest[0]+0.5, pixBest[1]+0.5, scoreBest);
 			}
 			return success;
 		}

@@ -8,15 +8,17 @@ Features
 - feature appearance prediction <- DONE
 - Adapt ActiveSearchGrid and QuickHarrisDetector to the new ROI specifications in module image
 
-- factories <- DONE FOR OBS ONLY
-- sensors hardware <- DONE FOR PIN-HOLE firewire 1394
+- factories 		<- DONE FOR OBS ONLY
+- sensors hardware 	<- DONE FOR PIN-HOLE firewire 1394
 
 - Map management:
+	- use a loop
 	- Lmk reparametrization:
 		- linearity test in OBS.
 		- heuristic for lmk reparametrization in Lmk
-	- Lmk deletion : 
-		- events collected in Obs.
+	- Lmk deletion :
+		- non-reparametrized die when out of view in initializer sensor. 
+		- events already collected in Obs.
 		- heuristic for feature deletion in Lmk
 		- deletion in Map, of Lmk and Obs.
 

@@ -52,6 +52,13 @@ using namespace boost;
 
 
 void test_slam01_main(world_ptr_t *world) {
+
+	const int MAPSIZE = 150;
+	const int NFRAME = 1000;
+	const int NUPDATES = 1000;
+
+	const double FRAMERATE = 60;
+
 	ActiveSearchGrid asGrid(640, 480, 5, 5, 22, 3);
 	int imgWidth = 640, imgHeight = 480;
 	double _d[3] = {-0.27965, 0.20059, -0.14215};
@@ -71,7 +78,7 @@ void test_slam01_main(world_ptr_t *world) {
 	worldPtr->display_mutex.lock();
 	
 	// create maps
-	map_ptr_t mapPtr(new MapAbstract(307));
+	map_ptr_t mapPtr(new MapAbstract(MAPSIZE));
 	worldPtr->addMap(mapPtr);
 	mapPtr->clear();
 	
@@ -83,9 +90,9 @@ void test_slam01_main(world_ptr_t *world) {
 	fillVector(v, 0.0);
 	robPtr1->state.x(v);
 	robPtr1->pose.x(quaternion::originFrame());
-	robPtr1->dt_or_dx = 1/15;
+	robPtr1->dt_or_dx = 1/FRAMERATE;
 	v.resize(robPtr1->mySize_perturbation());
-	fillVector(v, 0.2);
+	fillVector(v, 0.5);
 	robPtr1->perturbation.clear();
 	robPtr1->perturbation.set_std_continuous(v);
 	robPtr1->perturbation.set_P_from_continuous(robPtr1->dt_or_dx);
@@ -102,7 +109,7 @@ void test_slam01_main(world_ptr_t *world) {
 	senPtr11->params.setIntrinsicCalibration(k, d, d.size());
 	senPtr11->params.setMiscellaneous(1.0, 0.1, patchMatchSize);
 
-	viam_hwmode_t hwmode = { VIAM_HWSZ_640x480, VIAM_HWFMT_MONO8, VIAM_HW_FIXED, VIAM_HWFPS_15, VIAM_HWTRIGGER_INTERNAL };
+	viam_hwmode_t hwmode = { VIAM_HWSZ_640x480, VIAM_HWFMT_MONO8, VIAM_HW_FIXED, VIAM_HWFPS_60, VIAM_HWTRIGGER_INTERNAL };
 	// UNCOMMENT THESE TWO LINES TO ENABLE FIREWIRE CAMERA OPERATION
 //	hardware_sensor_ptr_t hardSen11(new HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode));
 //	senPtr11->setHardwareSensor(hardSen11);
@@ -121,9 +128,6 @@ void test_slam01_main(world_ptr_t *world) {
 	// loop all lmks
 	// create sen--lmk observation
 	// Temporal loop
-
-	const int NFRAME = 1000;
-	const int NUPDATES = 1000;
 
 	kernel::Chrono chrono;
 	kernel::Chrono total_chrono;

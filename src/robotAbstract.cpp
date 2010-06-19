@@ -95,15 +95,6 @@ namespace jafar {
 			Q = jmath::ublasExtra::prod_JPJt(perturbation.P(), XNEW_pert);
 		}
 
-		void RobotAbstract::exploreSensors() const {
-			for (SensorList::const_iterator senIter = sensorList().begin(); senIter != sensorList().end(); senIter++) {
-				sensor_ptr_t senPtr = *senIter;
-
-				senPtr->acquireRaw();
-				senPtr->processRaw();
-
-			}
-		}
 
 	}
 }

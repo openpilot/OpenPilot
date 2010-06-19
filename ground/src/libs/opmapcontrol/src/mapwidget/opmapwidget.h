@@ -97,6 +97,11 @@ namespace mapcontrol
 
         Configuration* configuration;
 
+        internals::PointLatLng currentMousePosition();
+
+        void SetFollowMouse(bool const& value){followmouse=value;this->setMouseTracking(followmouse);}
+        bool FollowMouse(){return followmouse;}
+
     private:
         internals::Core *core;
         MapGraphicItem *map;
@@ -105,12 +110,14 @@ namespace mapcontrol
         GeoCoderStatusCode x;
         MapType y;
         core::AccessMode xx;
-
+        internals::PointLatLng currentmouseposition;
+        bool followmouse;
 
     protected:
         void resizeEvent(QResizeEvent *event);
         void showEvent ( QShowEvent * event );
         void closeEvent(QCloseEvent *event);
+        void mouseMoveEvent ( QMouseEvent * event );
         //    private slots:
      signals:
         void zoomChanged(double zoom);

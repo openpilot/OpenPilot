@@ -13,7 +13,6 @@ namespace mapcontrol
         this->SetZoom(2);
         connect(core,SIGNAL(OnNeedInvalidation()),this,SLOT(Core_OnNeedInvalidation()));
 
-
         //resize();
     }
     void MapGraphicItem::start()
@@ -79,6 +78,7 @@ namespace mapcontrol
             }
 
         }
+        QGraphicsItem::mouseMoveEvent(event);
     }
     void MapGraphicItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     {
@@ -272,6 +272,7 @@ namespace mapcontrol
         }
         return core->FromLocalToLatLng(x, y);
     }
+
     double MapGraphicItem::Zoom()
     {
         return zoomReal;

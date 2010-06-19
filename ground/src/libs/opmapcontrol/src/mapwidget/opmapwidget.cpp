@@ -21,7 +21,7 @@ namespace mapcontrol
 //        connect(&mscene,SIGNAL(sceneRectChanged(QRectF)),map,SLOT(resize(QRectF)));
 //        connect(map,SIGNAL(zoomChanged(double)),this,SIGNAL(zoomChanged(double)));
 //    }
-    OPMapWidget::OPMapWidget(QWidget *parent, Configuration *config):QGraphicsView(parent),configuration(config)
+    OPMapWidget::OPMapWidget(QWidget *parent, Configuration *config):QGraphicsView(parent),configuration(config),followmouse(true)
     {
         setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         core=new internals::Core;
@@ -40,6 +40,7 @@ namespace mapcontrol
         connect(map->core,SIGNAL(OnTileLoadComplete()),this,SIGNAL(OnTileLoadComplete()));
         connect(map->core,SIGNAL(OnTileLoadStart()),this,SIGNAL(OnTileLoadStart()));
         connect(map->core,SIGNAL(OnTilesStillToLoad(int)),this,SIGNAL(OnTilesStillToLoad(int)));
+        this->setMouseTracking(followmouse);
     }
 
     void OPMapWidget::resizeEvent(QResizeEvent *event)
@@ -77,6 +78,17 @@ namespace mapcontrol
         else
             setupViewport(new QWidget());
         update();
+    }
+    internals::PointLatLng OPMapWidget::currentMousePosition()
+    {
+        return currentmouseposition;
+    }
+    void OPMapWidget::mouseMoveEvent(QMouseEvent *event)
+    {
+        QGraphicsView::mouseMoveEvent(event);
+        QPointF p=event->posF();
+        p=map->mapFromParent(p);
+        currentmouseposition=map->FromLocalToLatLng(p.x(),p.y());
     }
 
 }

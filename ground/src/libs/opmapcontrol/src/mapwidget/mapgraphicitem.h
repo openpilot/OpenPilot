@@ -37,6 +37,7 @@ protected:
     void SetZoomStep(int const& value);
 
 private:
+
     internals::Core *core;
     Configuration *config;
     bool showTileGridLines;
@@ -58,18 +59,9 @@ private:
     internals::PointLatLng FromLocalToLatLng(int x, int y);
     qreal rotation;
     QRectF boundingBox(QRectF const& rect, qreal const& angle);
-///
-//    QBrush EmptytileBrush;
-//    QString EmptyTileText;
- //   QPen EmptyTileBorders;
-  //  QPen ScalePen;
-  //  QPen SelectionPen;
-    ///
     int MaxZoom()const{return maxZoom;}
     int MinZoom()const{return minZoom;}
     internals::MouseWheelZoomType::Types GetMouseWheelZoomType(){return core->GetMouseWheelZoomType();}
-   // QString GetMouseWheelZoomTypeStr(){return internals::MouseWheelZoomType::TypesStrList().at((int)core->GetMouseWheelZoomType());}
-  //  bool MapScaleInfoEnabled;
     Qt::MouseButton DragButton;
     void SetSelectedArea(internals::RectLatLng const& value){selectedArea = value;this->update();}
     internals::RectLatLng BoundsOfMap;

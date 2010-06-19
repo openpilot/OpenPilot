@@ -50,7 +50,7 @@ namespace jafar {
 			} else
 			{
 				jafarImage_ptr_t i(Image::loadImage("test_suite/imageSample.ppm",0));
-
+				if (i->data() == NULL) throw "IMAGE_NOT_FOUND";
 				RawImage* imgRawPtr = new RawImage;
 				imgRawPtr->setJafarImage(i) ;
 

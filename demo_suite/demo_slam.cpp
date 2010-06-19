@@ -199,18 +199,16 @@ void test_slam01_main(world_ptr_t *world) {
 
 						// 1d. search appearence in raw
 						//obsPtr->matchFeature(senPtr->getRaw()) ;
-						double x, y, dx, dy;
+						int xmin, xmax, ymin, ymax;
+						double dx, dy;
 						dx = 3.0*sqrt(obsPtr->expectation.P(0,0));
 						dy = 3.0*sqrt(obsPtr->expectation.P(1,1));
-						x = obsPtr->expectation.x(0) - dx;
-						y = obsPtr->expectation.x(1) - dy;
+						xmin = (int)(obsPtr->expectation.x(0)-dx);
+						xmax = (int)(obsPtr->expectation.x(0)+dx+0.9999);
+						ymin = (int)(obsPtr->expectation.x(1)-dy);
+						ymax = (int)(obsPtr->expectation.x(1)+dy+0.9999);
 
-						const int border = 15;
-						if (x < border) x = border;
-						if (x+2*dx > imgWidth-border) dx = (imgWidth-border-x)/2;
-						if (y < border) y = border;
-						if (y+2*dy > imgHeight-border) dy = (imgHeight-border-y)/2;
-						cv::Rect roi(x,y,2*dx+1,2*dy+1);
+						cv::Rect roi(xmin,ymin,xmax-xmin+1,ymax-ymin+1);
 //((AppearanceImagePoint*)(obsPtr->predictedAppearance.get()))->patch.save("predicted_app.png");
 						senPtr->getRaw()->match(RawAbstract::ZNCC, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
 

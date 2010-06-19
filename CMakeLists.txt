@@ -9,8 +9,8 @@ build_jafar_module(rtslam
   VERSION 0
   REVISION 1 
 
-  REQUIRED_MODULES kernel image jmath correl
-  OPTIONAL_MODULES qdisplay
+  REQUIRED_MODULES kernel image jmath correl qdisplay
+  OPTIONAL_MODULES 
 
   REQUIRED_EXTLIBS boost_thread
   OPTIONAL_EXTLIBS qt4

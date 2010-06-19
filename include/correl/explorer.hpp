@@ -50,12 +50,13 @@ namespace jafar {
 		}; // class Explorer
 		
 
+		#define RESULTS(y,x) results[((y)-(ymin-1))*sa_w+((x)-(xmin-1))]
 		#define DO_CORRELATION(im1, im2, weightMatrix, xx, yy, score, best_score, bestx, besty, roi) \
 				{ \
-				cv::Rect roi2 = cv::Rect(xx-roi.width/2,yy-roi.height/2,roi.width,roi.height); \
+				cv::Rect roi2 = cv::Rect((xx)-roi.width/2,(yy)-roi.height/2,roi.width,roi.height); \
 				im2.setROI(roi2); \
 				score = Correl::compute(im1, im2, weightMatrix); \
-				results[(yy-(ymin))*sa_w+(xx-(xmin))] = score; \
+				RESULTS(yy,xx) = score; \
 				if (score > best_score) { best_score = score; bestx = xx; besty = yy; } \
 				}
 		
@@ -69,8 +70,13 @@ namespace jafar {
 			double best_score = 0.;
 			int bestx = -1, besty = -1;
 			
+			if (xmin < 0) xmin = 0; if (xmax >= im2.width ()) xmax = im2.width ()-1;
+			if (ymin < 0) ymin = 0; if (ymax >= im2.height()) ymax = im2.height()-1;
+			
 			int sa_w = (xmax-xmin+1), sa_h = (ymax-ymin+1); // search area
-			double *results = new double[sa_w*sa_h];
+			int nresults = (sa_w+2)*(sa_h+2);
+			double *results = new double[nresults]; // add 1 border for interpolation
+			for(int i = 0; i < nresults; i++) results[i] = -1e6;
 			
 			// explore
 			for(int y = ymin; y <= ymax; y += ystep)
@@ -90,39 +96,37 @@ namespace jafar {
 			
 			// ensure that all values that will be used by interpolation are computed
 			int newnewbestx = newbestx, newnewbesty = newbesty;
-			if (((newbestx == bestx-xstep+1 || newbestx == bestx+xstep-1) && (newbesty-ymin)%ystep) ||
+/*			if (((newbestx == bestx-xstep+1 || newbestx == bestx+xstep-1) && (newbesty-ymin)%ystep) ||
 			    ((newbesty == besty-ystep+1 || newbesty == besty+ystep-1) && (newbestx-xmin)%xstep))
 			{
 				if (newbestx == bestx-xstep+1) DO_CORRELATION(im1, im2, weightMatrix, newbestx-1, newbesty, score, best_score, newnewbestx, newnewbesty, roi);
 				if (newbestx == bestx+xstep-1) DO_CORRELATION(im1, im2, weightMatrix, newbestx+1, newbesty, score, best_score, newnewbestx, newnewbesty, roi);
 				if (newbesty == besty-ystep+1) DO_CORRELATION(im1, im2, weightMatrix, newbestx, newbesty-1, score, best_score, newnewbestx, newnewbesty, roi);
 				if (newbesty == besty+ystep-1) DO_CORRELATION(im1, im2, weightMatrix, newbestx, newbesty+1, score, best_score, newnewbestx, newnewbesty, roi);
-			}
+			}*/
+			if (newbestx>0 && RESULTS(newbesty,newbestx-1)<-1e5)
+				DO_CORRELATION(im1, im2, weightMatrix, newbestx-1, newbesty, score, best_score, newnewbestx, newnewbesty, roi);
+			if (newbestx<im2.width()-1 && RESULTS(newbesty,newbestx+1)<-1e5)
+				DO_CORRELATION(im1, im2, weightMatrix, newbestx+1, newbesty, score, best_score, newnewbestx, newnewbesty, roi);
+			if (newbesty>0 && RESULTS(newbesty-1,newbestx)<-1e5)
+				DO_CORRELATION(im1, im2, weightMatrix, newbestx, newbesty-1, score, best_score, newnewbestx, newnewbesty, roi);
+			if (newbesty<im2.height()-1 && RESULTS(newbesty+1,newbestx)<-1e5)
+				DO_CORRELATION(im1, im2, weightMatrix, newbestx, newbesty+1, score, best_score, newnewbestx, newnewbesty, roi);
 			
-			// FIXME maybe should do something if newnewbestx != newbestx or newnewbesty != newbesty
+			// FIXME maybe should do something if newnewbestx != newbestx or newnewbesty != newbesty ... will interpolation be right ?
 			
 			bestx = newbestx;
 			besty = newbesty;
 			
-			// interpolate
-			if (bestx > xmin && bestx < xmax)
-				jmath::parabolicInterpolation(
-					results[(besty-ymin)*sa_w+(bestx-1-xmin)], 
-					results[(besty-ymin)*sa_w+(bestx-0-xmin)], 
-					results[(besty-ymin)*sa_w+(bestx+1-xmin)], xres);
-			else xres = 0;
-			xres += bestx;
+			// interpolate x
+			double a1 = RESULTS(besty,bestx-1), a2 = RESULTS(besty,bestx-0), a3 = RESULTS(besty,bestx+1);
+			if (a1 > -1e5 && a3 > -1e5) jmath::parabolicInterpolation(a1,a2,a3, xres); else xres = 0;
+			xres += bestx+0.5;
+			// interpolate y
+			a1 = RESULTS(besty-1,bestx), a2 = RESULTS(besty-0,bestx), a3 = RESULTS(besty+1,bestx);
+			if (a1 > -1e5 && a3 > -1e5) jmath::parabolicInterpolation(a1,a2,a3, yres); else yres = 0;
+			yres += besty+0.5;
 			
-			if (besty > ymin && besty < ymax)
-				jmath::parabolicInterpolation(
-					results[(besty-1-ymin)*sa_w+(bestx-xmin)], 
-					results[(besty-0-ymin)*sa_w+(bestx-xmin)], 
-					results[(besty+1-ymin)*sa_w+(bestx-xmin)], yres);
-			else yres = 0;
-			yres += besty;
-			
-			// FIXME maybe should interpolate anyway
-
 			delete[] results;
 			return best_score;
 		}

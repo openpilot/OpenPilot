@@ -36,11 +36,11 @@
 // Configuration
 //
 #define PORT			PIOS_COM_GPS
-#define DEBUG_PORT		PIOS_COM_AUX
+#define DEBUG_PORT		PIOS_COM_TELEM_RF
 #define STACK_SIZE		1024
 #define TASK_PRIORITY	(tskIDLE_PRIORITY + 3)
 #define MAX_NB_PARS 	100
-#define ENABLE_DEBUG_MSG
+//#define ENABLE_DEBUG_MSG
 
 //
 // Private constants
@@ -57,11 +57,12 @@
 #define DEBUG_MSG_NICK_IDX	(2+2*2)
 #define DEBUG_MSG_ROLL_IDX	(2+3*2)
 
-#define OSD_MSG_CURRPOS_IDX	1
-#define OSD_MSG_NB_SATS_IDX 50
-#define OSD_MSG_BATT_IDX	57
-#define OSD_MSG_NICK_IDX	64
-#define OSD_MSG_ROLL_IDX	65
+#define OSD_MSG_CURRPOS_IDX		1
+#define OSD_MSG_NB_SATS_IDX 	50
+#define OSD_MSG_BATT_IDX		57
+#define OSD_MSG_COMPHEADING_IDX	62
+#define OSD_MSG_NICK_IDX		64
+#define OSD_MSG_ROLL_IDX		65
 
 #ifdef ENABLE_DEBUG_MSG
 	#define DEBUG_MSG(format, ...) PIOS_COM_SendFormattedString(DEBUG_PORT, format, ## __VA_ARGS__)
@@ -261,7 +262,6 @@ static bool WaitForMsg(uint8_t cmd, MkMsg_t* msg, portTickType xTicksToWait)
 				return FALSE;
 			}
 			WaitForBytes(buf, 1, 100 / portTICK_RATE_MS);
-			// TODO: check to TO
 		} while (buf[0] != '#');
 
 		// Wait for cmd and address
@@ -484,6 +484,7 @@ static void DoConnectedToNC(void)
 	AttitudeActualData attitudeData;
 	PositionActualData positionData;
 	FlightBatteryStateData flightBatteryData;
+	uint8_t battStateCnt=0;
 
 	DEBUG_MSG("NC\n\r");
 
@@ -501,24 +502,39 @@ static void DoConnectedToNC(void)
 			//PrintMsg(&msg);
 			GetGpsPos(&msg, OSD_MSG_CURRPOS_IDX, &pos);
 
+#if 0
 			DEBUG_MSG("Bat=%d\n\r", msg.pars[OSD_MSG_BATT_IDX]);
 			DEBUG_MSG("Nick=%d Roll=%d\n\r", Par2Int8(&msg,OSD_MSG_NICK_IDX), Par2Int8(&msg,OSD_MSG_ROLL_IDX));
 			DEBUG_MSG("POS #Sats=%d stat=%d lat=%d lon=%d alt=%d\n\r", msg.pars[OSD_MSG_NB_SATS_IDX], pos.status, (int)pos.latitude, (int)pos.longitute, (int)pos.altitude);
-
+#else
+			DEBUG_MSG(".");
+#endif
 			attitudeData.seq++;
-			attitudeData.Pitch = -Par2Int8(&msg,OSD_MSG_NICK_IDX);
-			attitudeData.Roll = -Par2Int8(&msg,OSD_MSG_ROLL_IDX);
+			attitudeData.Pitch = -Par2Int8(&msg, OSD_MSG_NICK_IDX);
+			attitudeData.Roll = -Par2Int8(&msg, OSD_MSG_ROLL_IDX);
 			AttitudeActualSet(&attitudeData);
 
 			positionData.Longitude = pos.longitute;
 			positionData.Latitude = pos.latitude;
 			positionData.Altitude = pos.altitude;
 			positionData.Satellites = msg.pars[OSD_MSG_NB_SATS_IDX];
-			positionData.Status = POSITIONACTUAL_STATUS_FIX3D;				// FIXME
+			positionData.Heading = Par2Int16(&msg, OSD_MSG_COMPHEADING_IDX);
+			if (positionData.Satellites<4)
+			{
+				positionData.Status = POSITIONACTUAL_STATUS_NOFIX;
+			}
+			else
+			{
+				positionData.Status = POSITIONACTUAL_STATUS_FIX3D;
+			}
 			PositionActualSet(&positionData);
 
-			flightBatteryData.Tension = (uint32_t)msg.pars[OSD_MSG_BATT_IDX]*100;
-			FlightBatteryStateSet(&flightBatteryData);
+			if (++battStateCnt > 2)
+			{
+				flightBatteryData.Voltage = (uint32_t)msg.pars[OSD_MSG_BATT_IDX]*100;
+				FlightBatteryStateSet(&flightBatteryData);
+				battStateCnt = 0;
+			}
 		}
 		else
 		{
@@ -547,7 +563,7 @@ static void MkSerialTask(void* parameters)
 		{
 			SendMsgParNone(MK_ADDR_ALL, MSGCMD_GET_VERSION);
 			DEBUG_MSG("Version... ");
-			if (WaitForMsg(MSGCMD_VERSION, &msg, 100 / portTICK_RATE_MS))
+			if (WaitForMsg(MSGCMD_VERSION, &msg, 250 / portTICK_RATE_MS))
 			{
 				version = VersionMsg_GetVersion(&msg);
 				DEBUG_MSG("%d\n\r", version);
@@ -570,6 +586,8 @@ static void MkSerialTask(void* parameters)
 		}
 
 		connectionOk = FALSE;
+
+		vTaskDelay(250 / portTICK_RATE_MS);
 	}
 }
 

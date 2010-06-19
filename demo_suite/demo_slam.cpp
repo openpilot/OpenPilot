@@ -52,7 +52,7 @@ using namespace boost;
 
 
 void test_slam01_main(world_ptr_t *world) {
-	ActiveSearchGrid asGrid(640, 480, 7, 7, 22, 3);
+	ActiveSearchGrid asGrid(640, 480, 5, 5, 22, 3);
 	int imgWidth = 640, imgHeight = 480;
 	double _d[3] = {-0.27965, 0.20059, -0.14215};
 //	double _d[0];
@@ -76,9 +76,7 @@ void test_slam01_main(world_ptr_t *world) {
 	mapPtr->clear();
 	
 	// create robots
-//	robodo_ptr_t robPtr1(new RobotOdometry(mapPtr));
 	robconstvel_ptr_t robPtr1(new RobotConstantVelocity(mapPtr));
-//	inertial_ptr_t robPtr1(new RobotInertial(mapPtr));
 	robPtr1->id(robPtr1->robotIds.getId());
 	robPtr1->linkToParentMap(mapPtr);
 	vec v(robPtr1->mySize());
@@ -87,10 +85,12 @@ void test_slam01_main(world_ptr_t *world) {
 	robPtr1->pose.x(quaternion::originFrame());
 	robPtr1->dt_or_dx = 1/15.0;
 	v.resize(robPtr1->mySize_perturbation());
-	fillVector(v, 10.0);
+	fillVector(v, 0.2);
 	robPtr1->perturbation.clear();
 	robPtr1->perturbation.set_std_continuous(v);
 	robPtr1->perturbation.set_P_from_continuous(robPtr1->dt_or_dx);
+	robPtr1->computeStatePerturbation();
+	cout << "pert. " << robPtr1->perturbation << "\n .Q: " << robPtr1->Q << endl;
 	
 	// create sensors
 	pinhole_ptr_t senPtr11 (new SensorPinHole(robPtr1, MapObject::UNFILTERED));
@@ -100,33 +100,14 @@ void test_slam01_main(world_ptr_t *world) {
 	senPtr11->pose.x(quaternion::originFrame());
 	senPtr11->params.setImgSize(imgWidth, imgHeight);
 	senPtr11->params.setIntrinsicCalibration(k, d, d.size());
-	senPtr11->params.setMiscellaneous(1.0, 1.0, patchMatchSize);
+	senPtr11->params.setMiscellaneous(1.0, 0.1, patchMatchSize);
 
-	viam_hwmode_t hwmode = { VIAM_HWSZ_640x480, VIAM_HWFMT_MONO8, VIAM_HW_FIXED, VIAM_HWFPS_60, VIAM_HWTRIGGER_INTERNAL };
-	//hardware_sensor_ptr_t hardSen11(new HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode));
-	//senPtr11->setHardwareSensor(hardSen11);
+	viam_hwmode_t hwmode = { VIAM_HWSZ_640x480, VIAM_HWFMT_MONO8, VIAM_HW_FIXED, VIAM_HWFPS_15, VIAM_HWTRIGGER_INTERNAL };
+	hardware_sensor_ptr_t hardSen11(new HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode));
+	senPtr11->setHardwareSensor(hardSen11);
 	
 	cout << "d: " << senPtr11->params.distortion << "\nc: " << senPtr11->params.correction << endl;
-//	pinhole_ptr_t senPtr12 (new SensorPinHole(robPtr1, MapObject::FILTERED));
-//	senPtr12->id(senPtr12->sensorIds.getId());
-//	senPtr12->linkToParentRobot(robPtr1);
-//	senPtr12->state.clear();
-//	senPtr12->pose.x(quaternion::originFrame());
-//	senPtr12->set_parameters(imSz, k, d, c);
-//	robodo_ptr_t robPtr2(new RobotOdometry(mapPtr));
-//	robPtr2->id(robPtr2->robotIds.getId());
-//	robPtr2->linkToParentMap(mapPtr);
-//	robPtr2->state.clear();
-//	robPtr2->pose.x(quaternion::originFrame());
-//	v.resize(6);
-//	fillVector(v, 0.1);
-//	robPtr2->control = v;
-//	pinhole_ptr_t senPtr21 (new SensorPinHole(robPtr2, MapObject::FILTERED));
-//	senPtr21->id(senPtr21->sensorIds.getId());
-//	senPtr21->linkToParentRobot(robPtr2);
-//	senPtr21->state.clear();
-//	senPtr21->pose.x(quaternion::originFrame());
-//	senPtr21->set_parameters(imSz, k, d, c);
+
 
 	// Show empty map
 	cout << *mapPtr << endl;
@@ -141,7 +122,7 @@ void test_slam01_main(world_ptr_t *world) {
 	// Temporal loop
 
 	const int NFRAME = 1000;
-	const int NUPDATES = 1000;
+	const int NUPDATES = 100;
 
 	kernel::Chrono chrono;
 	kernel::Chrono total_chrono;
@@ -225,9 +206,6 @@ void test_slam01_main(world_ptr_t *world) {
 //((AppearanceImagePoint*)(obsPtr->predictedAppearance.get()))->patch.save("predicted_app.png");
 						senPtr->getRaw()->match(RawAbstract::ZNCC, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
 
-
-//						cout << "matched pix: " << obsPtr->measurement.x() << "; score: " << obsPtr->getMatchScore() << endl;
-
 						// 1e. if feature is found
 						if (obsPtr->getMatchScore()>0.80) {
 							obsPtr->counters.nMatch++;
@@ -250,9 +228,7 @@ void test_slam01_main(world_ptr_t *world) {
 					if (numObs >= NUPDATES) break;
 				} // foreach observation
 
-
 				//cout << chrono.elapsedMicrosecond() << " us ; observed lmks: " << numObs << endl;
-
 
 
 
@@ -265,16 +241,14 @@ void test_slam01_main(world_ptr_t *world) {
 					
 					}
 				}
-				
-				
 				#endif
+				
+				
 				if (mapPtr->unusedStates(LandmarkAnchoredHomogeneousPoint::size())) {
 
 					ROI roi;
 					if (asGrid.getROI(roi)){
 
-						//feature_ptr_t featPtr(new FeatureAbstract(2));
-						//feature_ptr_t featPtr = obsFact.createFeat(
 						feat_img_pnt_ptr_t featPtr(new FeatureImagePoint(patchMatchSize*3,patchMatchSize*3,CV_8U));
 						if (senPtr->getRaw()->detect(RawAbstract::HARRIS, featPtr, &roi)) {
 //							cout << "\n-------------------------------------------------- " << endl;
@@ -289,14 +263,11 @@ void test_slam01_main(world_ptr_t *world) {
 //							cout << "Initializing lmk " << lmkPtr->id() << endl;
 
 							// 2b. create obs object
-							// todo make lmk creation dynamic with factories or switch or other.
 							observation_ptr_t obsPtr = obsFact.create(senPtr,lmkPtr);
 
 							// 2c. fill data for this obs
 							obsPtr->events.visible = true;
 							obsPtr->events.measured = true;
-							//vec measNoiseStd(2); fillVector(measNoiseStd, 1.0);
-							//obsPtr->ObservationAbstract::setup(measNoiseStd, ObservationPinHoleAnchoredHomogeneousPoint::getPrior());
 							obsPtr->measurement.x(featPtr->measurement.x());
 
 							// 2d. compute and fill stochastic data for the landmark
@@ -325,17 +296,19 @@ void test_slam01_main(world_ptr_t *world) {
 
 		dt = chrono.elapsedMicrosecond();
 		if (dt > max_dt) max_dt = dt;
-		//cout << "frame time : " << dt << " us" << endl;
-		if (had_data) t++;
+		if (had_data) {
+			t++;
+			cout << "frame time : " << (double)dt/1000 << " ms" << endl;
+		}
 		worldPtr->display_mutex.unlock();
 		mutex_chrono.reset();
 
 	}
-	cout << "average time : " << total_chrono.elapsed()/NFRAME << " ms, max frame time " << max_dt << endl;
 
-	
+	cout << "average time : " << total_chrono.elapsed()/NFRAME << " ms, max frame time " << max_dt << endl;
 	std::cout << "\nFINISHED !" << std::endl;
-  sleep(60);
+
+	sleep(60);
 
 }
 
@@ -360,7 +333,6 @@ void test_slam01_display(world_ptr_t *world)
 void test_slam01() {
 	world_ptr_t worldPtr(new WorldAbstract());
 	
-//	test_slam01_main(&worldPtr);
 	qdisplay::QtAppStart((qdisplay::FUNC)&test_slam01_display,10,(qdisplay::FUNC)&test_slam01_main,-10,100,&worldPtr);
 	JFR_DEBUG("Terminated");
 }

@@ -103,8 +103,9 @@ void test_slam01_main(world_ptr_t *world) {
 	senPtr11->params.setMiscellaneous(1.0, 0.1, patchMatchSize);
 
 	viam_hwmode_t hwmode = { VIAM_HWSZ_640x480, VIAM_HWFMT_MONO8, VIAM_HW_FIXED, VIAM_HWFPS_15, VIAM_HWTRIGGER_INTERNAL };
-	hardware_sensor_ptr_t hardSen11(new HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode));
-	senPtr11->setHardwareSensor(hardSen11);
+	// UNCOMMENT THESE TWO LINES TO ENABLE FIREWIRE CAMERA OPERATION
+//	hardware_sensor_ptr_t hardSen11(new HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode));
+//	senPtr11->setHardwareSensor(hardSen11);
 	
 	cout << "d: " << senPtr11->params.distortion << "\nc: " << senPtr11->params.correction << endl;
 
@@ -202,7 +203,7 @@ void test_slam01_main(world_ptr_t *world) {
 						if (x+2*dx > imgWidth-border) dx = (imgWidth-border-x)/2;
 						if (y < border) y = border;
 						if (y+2*dy > imgHeight-border) dy = (imgHeight-border-y)/2;
-						cv::Rect roi(x,y,2*dx,2*dy);
+						cv::Rect roi(x,y,2*dx+1,2*dy+1);
 //((AppearanceImagePoint*)(obsPtr->predictedAppearance.get()))->patch.save("predicted_app.png");
 						senPtr->getRaw()->match(RawAbstract::ZNCC, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
 

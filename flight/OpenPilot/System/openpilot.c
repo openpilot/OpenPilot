@@ -27,7 +27,6 @@
 /* OpenPilot Includes */
 #include "openpilot.h"
 #include "uavobjectsinit.h"
-#include "telemetry.h"
 #include "systemmod.h"
 
 

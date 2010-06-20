@@ -115,33 +115,29 @@ namespace jafar {
 
 		void ObservationAbstract::project() {
 
-			// Global sensor pose
-			vec7 sg;
-
 			// Get global sensor pose
+			vec7 sg;
 			sensorPtr()->globalPose(sg, SG_rs);
-//			JFR_DEBUG("sg:" << sg);
 
+			// project lmk
 			vec lmk = landmarkPtr()->state.x();
 			vec exp, nobs;
 			project_func(sg, lmk, exp, nobs, EXP_sg, EXP_l);
-//			JFR_DEBUG("EXP_sg: " << EXP_sg << "\nEXP_l: " << EXP_l);
 
+			// chain rule for Jacobians
 			mat EXP_rs = prod(EXP_sg, SG_rs);
-//			JFR_DEBUG("EXP_rs: " << EXP_rs)
+			subrange(EXP_rsl, 0, expectation.size(), 0, sensorPtr()->ia_globalPose.size()) = EXP_rs;
+			subrange(EXP_rsl, 0, expectation.size(), sensorPtr()->ia_globalPose.size(), sensorPtr()->ia_globalPose.size()+landmarkPtr()->state.size()) = EXP_l;
 
-			subrange(EXP_rsl, 0,expectation.size(), 0,sensorPtr()->ia_globalPose.size()) = EXP_rs;
-			subrange(EXP_rsl, 0,expectation.size(), sensorPtr()->ia_globalPose.size(),sensorPtr()->ia_globalPose.size()+landmarkPtr()->state.size()) = EXP_l;
-//			JFR_DEBUG("EXP_rsl: " << EXP_rsl)
-
+			// Assignments:
+			// x+ = f(x, u, n) :
 			expectation.x() = exp;
-//			JFR_DEBUG("x_rsl: " << ublas::project(landmarkPtr()->mapPtr()->filterPtr->x(), ia_rsl))
-//			JFR_DEBUG("P_rsl: " << ublas::project(landmarkPtr()->mapPtr()->filterPtr->P(), ia_rsl, ia_rsl))
+			// P+ = F_x * P * F_x' + F_n * Q * F_n' :
 			expectation.P() = ublasExtra::prod_JPJt(ublas::project(landmarkPtr()->mapPtr()->filterPtr->P(), ia_rsl, ia_rsl), EXP_rsl);
-//			JFR_DEBUG("EXP: " << expectation.P())
-
+			// noon-observable
 			expectation.nonObs = nobs;
 
+			// Events
 			events.predicted = true;
 		}
 

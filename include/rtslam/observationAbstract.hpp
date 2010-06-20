@@ -180,9 +180,11 @@ namespace jafar {
 				/**
 				 * Project.
 				 *
-				 * All variables are part of the class, or are accessible by the class.
-				 *
 				 * This projects the landmark into the sensor space.
+				 * \param sg global sensor pose
+				 * \param lmk landmark state vector
+				 * \param exp expectation vector
+				 * \param nobs non-observable vector
 				 */
 				virtual void
 				project_func(const vec7 & sg, const vec & lmk, vec & meas, vec & nobs) = 0;
@@ -190,14 +192,17 @@ namespace jafar {
 				/**
 				 * Project and get Jacobians.
 				 *
-				 * All variables are part of the class, or are accessible by the class.
-				 *
 				 * This projects the landmark into the sensor space, and gives the Jacobians of this projection
-				 * wrt. the states that contributed to the projection (those of the robot, eventually the sensor, and the landmark).
-				 * These states are also available through the indirect_array \a ia_rsl, updated by this function.
+				 * wrt. the global sensor pose and the landmark.
+				 * \param sg global sensor pose
+				 * \param lmk landmark state vector
+				 * \param exp expectation vector
+				 * \param nobs non-observable vector
+				 * \param EXP_sg Jacobian of \a exp wrt \a sg
+				 * \param EXP_lmk Jacobian of \a exp wrt \a lmk
 				 */
 				virtual void
-				project_func(const vec7 & sg, const vec & lmk, vec & meas, vec & nobs, mat & EXP_sg, mat & EXP_lmk) = 0;
+				project_func(const vec7 & sg, const vec & lmk, vec & exp, vec & nobs, mat & EXP_sg, mat & EXP_lmk) = 0;
 
 				/**
 				 * Project and get expectation covariances

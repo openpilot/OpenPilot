@@ -31,9 +31,6 @@
 
 #if defined(PIOS_INCLUDE_SERVO)
 
-#ifdef PIOS_ENABLE_DEBUG_PINS
-#warning "*** PIOS_ENABLE_DEBUG_PINS defined => Servo outputs will not function ***"
-#endif
 
 /* Private Function Prototypes */
 
@@ -53,7 +50,10 @@ void PIOS_Servo_Init(void)
 	GPIO_StructInit(&GPIO_InitStructure);
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	GPIO_InitStructure.GPIO_Pin = PIOS_SERVO_GPIO_PIN_1 | PIOS_SERVO_GPIO_PIN_2 | PIOS_SERVO_GPIO_PIN_3 | PIOS_SERVO_GPIO_PIN_4;
+	GPIO_InitStructure.GPIO_Pin = PIOS_SERVO_GPIO_PIN_3 | PIOS_SERVO_GPIO_PIN_4;
+	#ifndef PIOS_COM_AUX
+	GPIO_InitStructure.GPIO_Pin |= PIOS_SERVO_GPIO_PIN_1 | PIOS_SERVO_GPIO_PIN_2;
+	#endif
 	GPIO_Init(PIOS_SERVO_GPIO_PORT_1TO4, &GPIO_InitStructure);
 	GPIO_InitStructure.GPIO_Pin = PIOS_SERVO_GPIO_PIN_5 | PIOS_SERVO_GPIO_PIN_6 | PIOS_SERVO_GPIO_PIN_7 | PIOS_SERVO_GPIO_PIN_8;
 	GPIO_Init(PIOS_SERVO_GPIO_PORT_5TO8, &GPIO_InitStructure);

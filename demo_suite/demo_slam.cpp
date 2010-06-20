@@ -172,9 +172,10 @@ void demo_slam01_main(world_ptr_t *world) {
 				// 1. Observe known landmarks
 				// foreach observation
 				int numObs = 0;
+				observation_ptr_t obsPtr;
 				for (SensorAbstract::ObservationList::iterator obsIter = senPtr->observationList().begin(); obsIter != senPtr->observationList().end(); obsIter++)
 				{
-					observation_ptr_t obsPtr = *obsIter;
+					obsPtr = *obsIter;
 
 					obsPtr->clearEvents();
 
@@ -186,53 +187,58 @@ void demo_slam01_main(world_ptr_t *world) {
 
 					// 1b. check visibility
 					obsPtr->predictVisibility();
-					if (obsPtr->isVisible()){
+					if (obsPtr->isVisible()) {
 
-						numObs ++;
-						if (numObs <= NUPDATES){
+						numObs++;
+						if (numObs <= NUPDATES) {
 
-						// update counter
-						obsPtr->counters.nSearch++;
+							// update counter
+							obsPtr->counters.nSearch++;
 
-						// 1c. predict appearance
-						obsPtr->predictAppearance();
+							// 1c. predict appearance
+							obsPtr->predictAppearance();
 
-						// 1d. search appearence in raw
-						//obsPtr->matchFeature(senPtr->getRaw()) ;
-						double x, y, dx, dy;
-						dx = 3.0*sqrt(obsPtr->expectation.P(0,0));
-						dy = 3.0*sqrt(obsPtr->expectation.P(1,1));
-						x = obsPtr->expectation.x(0) - dx;
-						y = obsPtr->expectation.x(1) - dy;
+							// 1d. search appearence in raw
+							//obsPtr->matchFeature(senPtr->getRaw()) ;
+							double x, y, dx, dy;
+							dx = 3.0 * sqrt(obsPtr->expectation.P(0, 0));
+							dy = 3.0 * sqrt(obsPtr->expectation.P(1, 1));
+							x = obsPtr->expectation.x(0) - dx;
+							y = obsPtr->expectation.x(1) - dy;
 
-						const int border = 15;
-						if (x < border) x = border;
-						if (x+2*dx > imgWidth-border) dx = (imgWidth-border-x)/2;
-						if (y < border) y = border;
-						if (y+2*dy > imgHeight-border) dy = (imgHeight-border-y)/2;
-						cv::Rect roi(x,y,2*dx+1,2*dy+1);
-//((AppearanceImagePoint*)(obsPtr->predictedAppearance.get()))->patch.save("predicted_app.png");
-						senPtr->getRaw()->match(RawAbstract::ZNCC, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
+							const int border = 15;
+							if (x < border)
+								x = border;
+							if (x + 2 * dx > imgWidth - border)
+								dx = (imgWidth - border - x) / 2;
+							if (y < border)
+								y = border;
+							if (y + 2 * dy > imgHeight - border)
+								dy = (imgHeight - border - y) / 2;
+							cv::Rect roi(x, y, 2 * dx + 1, 2 * dy + 1);
+							//((AppearanceImagePoint*)(obsPtr->predictedAppearance.get()))->patch.save("predicted_app.png");
+							senPtr->getRaw()->match(RawAbstract::ZNCC, obsPtr->predictedAppearance, roi, obsPtr->measurement,
+							    obsPtr->observedAppearance);
 
-						// 1e. if feature is found
-						if (obsPtr->getMatchScore()>0.95) {
-							obsPtr->counters.nMatch++;
-							obsPtr->events.matched = true;
-							obsPtr->computeInnovation() ;
+							// 1e. if feature is found
+							if (obsPtr->getMatchScore() > 0.95) {
+								obsPtr->counters.nMatch++;
+								obsPtr->events.matched = true;
+								obsPtr->computeInnovation();
 
-							// 1f. if feature is inlier
-							if (obsPtr->compatibilityTest(3.0)) { // use 3.0 for 3-sigma or the 5% proba from the chi-square tables.
-								obsPtr->counters.nInlier++;
-								obsPtr->update() ;
-								obsPtr->events.updated = true;
-							} // obsPtr->compatibilityTest(3.0)
-						} // obsPtr->getScoreMatchInPercent()>80
+								// 1f. if feature is inlier
+								if (obsPtr->compatibilityTest(3.0)) { // use 3.0 for 3-sigma or the 5% proba from the chi-square tables.
+									obsPtr->counters.nInlier++;
+									obsPtr->update();
+									obsPtr->events.updated = true;
+								} // obsPtr->compatibilityTest(xxx)
+
+							} // obsPtr->getScoreMatch() > xxx
 						} // number of observations
 					} // obsPtr->isVisible()
 
 //					cout << "\n-------------------------------------------------- " << endl;
 //					cout << *obsPtr << endl;
-
 
 				} // foreach observation
 
@@ -292,14 +298,15 @@ void demo_slam01_main(world_ptr_t *world) {
 
 //							cout << "\n-------------------------------------------------- " << endl;
 //							cout << *lmkPtr << endl;
-						}
-					}
-				}
+						} // detect()
+					} // getROI()
+				} // unusedStates()
 
 				senPtr->releaseRaw();
 				had_data = true;
-			}
-		}
+
+			} // for each sensor
+		} // for each robot
 
 		//cout << "total lmks: " << mapPtr->landmarkList().size() << endl;
 
@@ -312,14 +319,14 @@ void demo_slam01_main(world_ptr_t *world) {
 		worldPtr->display_mutex.unlock();
 		mutex_chrono.reset();
 
-	}
+	} // temporal loop
 
 	cout << "average time : " << total_chrono.elapsed()/NFRAME << " ms, max frame time " << max_dt << endl;
 	std::cout << "\nFINISHED !" << std::endl;
 
 	sleep(60);
 
-}
+} // demo_slam01_main
 
 
 void demo_slam01_display(world_ptr_t *world)

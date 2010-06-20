@@ -35,13 +35,18 @@
 //
 // Configuration
 //
-#define PORT			PIOS_COM_GPS
-#define DEBUG_PORT		PIOS_COM_TELEM_RF
+#define PORT			PIOS_COM_AUX
+#define DEBUG_PORT		PIOS_COM_GPS
 #define STACK_SIZE		1024
 #define TASK_PRIORITY	(tskIDLE_PRIORITY + 3)
 #define MAX_NB_PARS 	100
 //#define ENABLE_DEBUG_MSG
 
+#if PORT == PIOS_COM_AUX
+	#ifndef PIOS_ENABLE_AUX_UART
+		#error "This module cannot be included without the AUX UART enabled"
+	#endif
+#endif
 //
 // Private constants
 //

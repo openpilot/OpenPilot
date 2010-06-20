@@ -1,5 +1,5 @@
 /**
- * \file test_slam.cpp
+ * \file demo_slam.cpp
  *
  * ## Add brief description here ##
  *
@@ -51,7 +51,7 @@ using namespace jafar::rtslam;
 using namespace boost;
 
 
-void test_slam01_main(world_ptr_t *world) {
+void demo_slam01_main(world_ptr_t *world) {
 
 	const int MAPSIZE = 150;
 	const int NFRAME = 1000;
@@ -322,7 +322,7 @@ void test_slam01_main(world_ptr_t *world) {
 }
 
 
-void test_slam01_display(world_ptr_t *world)
+void demo_slam01_display(world_ptr_t *world)
 {
 	//(*world)->display_mutex.lock();
 	qdisplay::qtMutexLock<kernel::FifoMutex>((*world)->display_mutex);
@@ -339,10 +339,10 @@ void test_slam01_display(world_ptr_t *world)
 }
 
 
-void test_slam01() {
+void demo_slam01() {
 	world_ptr_t worldPtr(new WorldAbstract());
 	
-	qdisplay::QtAppStart((qdisplay::FUNC)&test_slam01_display,10,(qdisplay::FUNC)&test_slam01_main,-10,100,&worldPtr);
+	qdisplay::QtAppStart((qdisplay::FUNC)&demo_slam01_display,10,(qdisplay::FUNC)&demo_slam01_main,-10,100,&worldPtr);
 	JFR_DEBUG("Terminated");
 }
 
@@ -350,5 +350,5 @@ void test_slam01() {
 
 int main()
 {
-	test_slam01();
+	demo_slam01();
 }

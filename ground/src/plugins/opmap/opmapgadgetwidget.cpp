@@ -84,6 +84,8 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_map->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     m_map->setMinimumSize(64, 64);
 
+    m_map->configuration->DragButton = Qt::LeftButton;
+
     // **************
     // set the user control options
 

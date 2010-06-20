@@ -30,6 +30,7 @@
 
 #include "opmapcontrol/opmapcontrol.h"
 #include <QtGui/QWidget>
+#include <QtGui/QMenu>
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/positionactual.h"
 
@@ -56,6 +57,7 @@ public slots:
 protected:
     void resizeEvent(QResizeEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
+    void contextMenuEvent(QContextMenuEvent *event);
     void keyPressEvent(QKeyEvent* event);
 
 private slots:
@@ -66,18 +68,14 @@ private slots:
     void zoomIn();
     void zoomOut();
 
-    // control panel slots
-    void on_checkBox_clicked(bool checked);
-    void on_pushButtonGO_clicked();
-    void on_pushButtonReload_clicked();
-    void on_pushButtonRR_clicked();
-    void on_pushButtonRC_clicked();
-    void on_pushButtonRL_clicked();
-    void on_pushButtonZoomM_clicked();
-    void on_pushButtonZoomP_clicked();
+    // control panel signals
+    void on_toolButtonRR_clicked();
+    void on_toolButtonRC_clicked();
+    void on_toolButtonRL_clicked();
+    void on_toolButtonZoomM_clicked();
+    void on_toolButtonZoomP_clicked();
     void on_pushButtonGeoFenceM_clicked();
     void on_pushButtonGeoFenceP_clicked();
-    void on_checkBox_2_clicked(bool checked);
 
     // map signals
     void zoomChanged(double zoom);
@@ -90,9 +88,36 @@ private slots:
     void OnEmptyTileError(int zoom, core::Point pos);
     void OnTilesStillToLoad(int number);
 
-private:
-    bool m_follow_uav;    // true if the map is to stay centered on the UAV
+    // context menu signals
+    void reload();
+    void findPlace();
+    void goHome();
+    void goUAV();
+    void followUAV();
+    void openWayPointEditor();
+    void addWayPoint();
+    void deleteWayPoint();
+    void clearWayPoints();
+    void gridLines();
+    void openGL();
+    void zoom2() { setZoom(2); }
+    void zoom3() { setZoom(3); }
+    void zoom4() { setZoom(4); }
+    void zoom5() { setZoom(5); }
+    void zoom6() { setZoom(6); }
+    void zoom7() { setZoom(7); }
+    void zoom8() { setZoom(8); }
+    void zoom9() { setZoom(9); }
+    void zoom10() { setZoom(10); }
+    void zoom11() { setZoom(11); }
+    void zoom12() { setZoom(12); }
+    void zoom13() { setZoom(13); }
+    void zoom14() { setZoom(14); }
+    void zoom15() { setZoom(15); }
+    void zoom16() { setZoom(16); }
+    void zoom17() { setZoom(17); }
 
+private:
     double m_heading;	// uav heading
 
     internals::PointLatLng mouse_lat_lon;
@@ -106,11 +131,45 @@ private:
 
     Ui::OPMapControlPanel *controlpanel_ui;
 
-    mapcontrol::OPMapWidget *map;
+    mapcontrol::OPMapWidget *m_map;
 
     QPushButton * createTransparentButton(QWidget *parent, QString text, QString icon);
     void createMapOverlayUserControls();
 
+    void createActions();
+
+    QAction *closeAct;
+    QAction *reloadAct;
+    QAction *findPlaceAct;
+    QAction *zoomInAct;
+    QAction *zoomOutAct;
+    QAction *goHomeAct;
+    QAction *goUAVAct;
+    QAction *followUAVAct;
+    QAction *wayPointEditorAct;
+    QAction *addWayPointAct;
+    QAction *deleteWayPointAct;
+    QAction *clearWayPointsAct;
+    QAction *gridLinesAct;
+    QAction *openGLAct;
+
+    QActionGroup *zoomActGroup;
+    QAction *zoom2Act;
+    QAction *zoom3Act;
+    QAction *zoom4Act;
+    QAction *zoom5Act;
+    QAction *zoom6Act;
+    QAction *zoom7Act;
+    QAction *zoom8Act;
+    QAction *zoom9Act;
+    QAction *zoom10Act;
+    QAction *zoom11Act;
+    QAction *zoom12Act;
+    QAction *zoom13Act;
+    QAction *zoom14Act;
+    QAction *zoom15Act;
+    QAction *zoom16Act;
+    QAction *zoom17Act;
 };
 
 #endif /* OPMAP_GADGETWIDGET_H_ */

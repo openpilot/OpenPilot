@@ -226,7 +226,7 @@ struct pios_com_dev pios_com_devs[] = {
   },
 };
 
-uint8_t pios_com_num_devices = NELEMENTS(pios_com_devs);
+const uint8_t pios_com_num_devices = NELEMENTS(pios_com_devs);
 
 #endif /* PIOS_INCLUDE_COM */
 

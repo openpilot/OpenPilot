@@ -35,7 +35,7 @@ struct pios_com_dev {
 };
 
 extern struct pios_com_dev pios_com_devs[];
-extern uint8_t             pios_com_num_devices;
+extern const uint8_t             pios_com_num_devices;
 
 #endif /* PIOS_COM_PRIV_H */
 

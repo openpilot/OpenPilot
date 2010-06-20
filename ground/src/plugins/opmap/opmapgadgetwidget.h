@@ -79,7 +79,15 @@ private slots:
     void on_pushButtonGeoFenceP_clicked();
     void on_checkBox_2_clicked(bool checked);
 
+    // map signals
     void zoomChanged(double zoom);
+    void OnCurrentPositionChanged(internals::PointLatLng point);
+    void OnTileLoadComplete();
+    void OnTileLoadStart();
+    void OnMapDrag();
+    void OnMapZoomChanged();
+    void OnMapTypeChanged(MapType::Types type);
+    void OnEmptyTileError(int zoom, core::Point pos);
     void OnTilesStillToLoad(int number);
 
 private:

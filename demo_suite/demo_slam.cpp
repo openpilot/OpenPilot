@@ -84,7 +84,7 @@ void test_slam01_main(world_ptr_t *world) {
 	
 	// create robots
 	robconstvel_ptr_t robPtr1(new RobotConstantVelocity(mapPtr));
-	robPtr1->id(robPtr1->robotIds.getId());
+	robPtr1->setId();
 	robPtr1->linkToParentMap(mapPtr);
 	vec v(robPtr1->mySize());
 	fillVector(v, 0.0);
@@ -101,7 +101,7 @@ void test_slam01_main(world_ptr_t *world) {
 	
 	// create sensors
 	pinhole_ptr_t senPtr11 (new SensorPinHole(robPtr1, MapObject::UNFILTERED));
-	senPtr11->id(senPtr11->sensorIds.getId());
+	senPtr11->setId();
 	senPtr11->linkToParentRobot(robPtr1);
 	senPtr11->state.clear();
 	senPtr11->pose.x(quaternion::originFrame());
@@ -266,12 +266,13 @@ void test_slam01_main(world_ptr_t *world) {
 							
 							// 2a. create lmk object
 							ahp_ptr_t lmkPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr)); // add featImgPnt in constructor
-							lmkPtr->id(lmkPtr->landmarkIds.getId());
+							lmkPtr->setId();
 							lmkPtr->linkToParentMap(mapPtr);
 //							cout << "Initializing lmk " << lmkPtr->id() << endl;
 
 							// 2b. create obs object
 							observation_ptr_t obsPtr = obsFact.create(senPtr,lmkPtr);
+							obsPtr->setId();
 
 							// 2c. fill data for this obs
 							obsPtr->events.visible = true;

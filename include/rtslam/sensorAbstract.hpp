@@ -121,6 +121,7 @@ namespace jafar {
 				}
 
 				static IdFactory sensorIds;
+				void setId(){id(sensorIds.getId());}
 
 				/**
 				 * Sensor pose in robot

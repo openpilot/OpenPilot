@@ -81,6 +81,7 @@ namespace jafar {
 				}
 
 				static IdFactory landmarkIds;
+				void setId(){id(landmarkIds.getId());}
 
 				enum geometry_t {
 						POINT,

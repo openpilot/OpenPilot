@@ -166,6 +166,10 @@ namespace jafar {
 
 				type_enum type;
 
+				void setId(){
+					id(landmarkPtr()->id());
+				}
+
 				virtual std::string typeName(){return "Observation Abstract";}
 				std::string categoryName() {
 					return "OBSERVATION";

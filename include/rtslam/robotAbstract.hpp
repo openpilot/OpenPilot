@@ -114,6 +114,7 @@ namespace jafar {
 
 				static IdFactory robotIds;
 
+				void setId(){id(robotIds.getId());}
 
 				Gaussian pose; ///<             Robot Gaussian pose
 				vec control; ///<               Control vector

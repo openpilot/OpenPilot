@@ -13,6 +13,7 @@
 #ifndef RTSLAM_HPP_
 #define RTSLAM_HPP_
 
+#include "kernel/IdFactory.hpp"
 #include "boost/shared_ptr.hpp"
 #include "boost/weak_ptr.hpp"
 #include <map>

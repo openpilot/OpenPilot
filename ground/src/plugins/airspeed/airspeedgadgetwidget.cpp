@@ -37,14 +37,22 @@ AirspeedGadgetWidget::AirspeedGadgetWidget(QWidget *parent) : QGraphicsView(pare
     setMinimumSize(64,64);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setScene(new QGraphicsScene(this));
+    setRenderHints(QPainter::Antialiasing);
 
- 
     m_renderer = new QSvgRenderer();
     m_background = new QGraphicsSvgItem();
+    // All other items will be clipped to the shape of the background
+    m_background->setFlags(QGraphicsItem::ItemClipsChildrenToShape|
+                           QGraphicsItem::ItemClipsToShape);
     m_foreground = new QGraphicsSvgItem();
     m_needle1 = new QGraphicsSvgItem();
     m_needle2 = new QGraphicsSvgItem();
     m_needle3 = new QGraphicsSvgItem();
+    m_foreground->setParentItem(m_background);
+    m_needle1->setParentItem(m_background);
+    m_needle2->setParentItem(m_background);
+    m_needle3->setParentItem(m_background);
+
     paint();
 
     needle1Target = 0;
@@ -259,6 +267,9 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
          }
 
          l_scene->setSceneRect(m_background->boundingRect());
+         m_renderer->setViewBox(m_background->boundingRect());
+
+
          // Now Initialize the center for all transforms of the dial needles to the
          // center of the background:
          // - Move the center of the needle to the center of the background.

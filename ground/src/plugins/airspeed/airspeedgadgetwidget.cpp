@@ -40,6 +40,7 @@ AirspeedGadgetWidget::AirspeedGadgetWidget(QWidget *parent) : QGraphicsView(pare
     setRenderHints(QPainter::Antialiasing);
 
     m_renderer = new QSvgRenderer();
+/*
     m_background = new QGraphicsSvgItem();
     // All other items will be clipped to the shape of the background
     m_background->setFlags(QGraphicsItem::ItemClipsChildrenToShape|
@@ -54,7 +55,7 @@ AirspeedGadgetWidget::AirspeedGadgetWidget(QWidget *parent) : QGraphicsView(pare
     m_needle3->setParentItem(m_background);
 
     paint();
-
+*/
     needle1Target = 0;
     needle2Target = 0;
     needle3Target = 0;
@@ -183,13 +184,21 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
          n2enabled = false;
          n3enabled = false;
          QGraphicsScene *l_scene = scene();
-         l_scene->removeItem(m_foreground);
-         l_scene->removeItem(m_background);
-         l_scene->removeItem(m_needle1);
-         l_scene->removeItem(m_needle2);
-         l_scene->removeItem(m_needle3);
+         l_scene->clear(); // Deletes all items contained in the scene as well.
+         m_background = new QGraphicsSvgItem();
+         // All other items will be clipped to the shape of the background
+         m_background->setFlags(QGraphicsItem::ItemClipsChildrenToShape|
+                                QGraphicsItem::ItemClipsToShape);
+         m_foreground = new QGraphicsSvgItem();
+         m_needle1 = new QGraphicsSvgItem();
+         m_needle2 = new QGraphicsSvgItem();
+         m_needle3 = new QGraphicsSvgItem();
+         m_needle1->setParentItem(m_background);
+         m_needle2->setParentItem(m_background);
+         m_needle3->setParentItem(m_background);
+         m_foreground->setParentItem(m_background);
 
-         // We assume the scene contains at least the background
+         // We assume the dial contains at least the background
          // and needle1
          m_background->setSharedRenderer(m_renderer);
          m_background->setElementId(bg);
@@ -198,7 +207,6 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
          m_needle1->setSharedRenderer(m_renderer);
          m_needle1->setElementId(n1);
          l_scene->addItem(m_needle1);
-
 
         // The dial gadget allows Needle1 and Needle2 to be
         // the same element, for combined movement. Needle3
@@ -222,76 +230,72 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
             n3enabled = true;
            }
 
-           if (m_renderer->elementExists(fg)) {
-              m_foreground->setSharedRenderer(m_renderer);
-              m_foreground->setElementId(fg);
-              l_scene->addItem(m_foreground);
-              fgenabled = true;
-          }
+        if (m_renderer->elementExists(fg)) {
+            m_foreground->setSharedRenderer(m_renderer);
+            m_foreground->setElementId(fg);
+            l_scene->addItem(m_foreground);
+            fgenabled = true;
+        }
 
-           rotateN1 = false;
-           horizN1 =  false;
-           vertN1 = false;
-           rotateN2 = false;
-           horizN2 = false;
-           vertN2 = false;
-           rotateN3 = false;
-           horizN3 = false;
-           vertN3 = false;
-
-
-         // Now setup the rotation/translation settings:
-         // this is UGLY UGLY UGLY, sorry...
-         if (n1Move.contains("Rotate")) {
-             rotateN1 = true;
-         } else if (n1Move.contains("Horizontal")) {
-             horizN1 = true;
-         } else if (n1Move.contains("Vertical")) {
-             vertN1 = true;
-         }
-
-         if (n2Move.contains("Rotate")) {
-             rotateN2 = true;
-         } else if (n2Move.contains("Horizontal")) {
-             horizN2 = true;
-         } else if (n2Move.contains("Vertical")) {
-             vertN2 = true;
-         }
-
-         if (n3Move.contains("Rotate")) {
-             rotateN3 = true;
-         } else if (n3Move.contains("Horizontal")) {
-             horizN3 = true;
-         } else if (n3Move.contains("Vertical")) {
-             vertN3 = true;
-         }
-
-         l_scene->setSceneRect(m_background->boundingRect());
-         m_renderer->setViewBox(m_background->boundingRect());
+        rotateN1 = false;
+        horizN1 =  false;
+        vertN1 = false;
+        rotateN2 = false;
+        horizN2 = false;
+        vertN2 = false;
+        rotateN3 = false;
+        horizN3 = false;
+        vertN3 = false;
 
 
-         // Now Initialize the center for all transforms of the dial needles to the
-         // center of the background:
-         // - Move the center of the needle to the center of the background.
-         QRectF rectB = m_background->boundingRect();
-         QRectF rectN = m_needle1->boundingRect();
-         m_needle1->setPos(rectB.width()/2-rectN.width()/2,rectB.height()/2-rectN.height()/2);
-         // - Put the transform origin point of the needle at its center.
-         m_needle1->setTransformOriginPoint(rectN.width()/2,rectN.height()/2);
-         if ((n1 != n2) && n2enabled) {
-             // Only do it for needle1 if it is not the same as n2
-             rectN = m_needle2->boundingRect();
-             m_needle2->setPos(rectB.width()/2-rectN.width()/2,rectB.height()/2-rectN.height()/2);
-             m_needle2->setTransformOriginPoint(rectN.width()/2,rectN.height()/2);
-         }
-         if (n3enabled) {
-             rectN = m_needle3->boundingRect();
-             m_needle3->setPos(rectB.width()/2-rectN.width()/2,rectB.height()/2-rectN.height()/2);
-             m_needle3->setTransformOriginPoint(rectN.width()/2,rectN.height()/2);
-         }
+        // Now setup the rotation/translation settings:
+        // this is UGLY UGLY UGLY, sorry...
+        if (n1Move.contains("Rotate")) {
+            rotateN1 = true;
+        } else if (n1Move.contains("Horizontal")) {
+            horizN1 = true;
+        } else if (n1Move.contains("Vertical")) {
+            vertN1 = true;
+        }
 
-         // Last: clip the display region to the rectangle of the background
-         // TODO
+        if (n2Move.contains("Rotate")) {
+            rotateN2 = true;
+        } else if (n2Move.contains("Horizontal")) {
+            horizN2 = true;
+        } else if (n2Move.contains("Vertical")) {
+            vertN2 = true;
+        }
+
+        if (n3Move.contains("Rotate")) {
+            rotateN3 = true;
+        } else if (n3Move.contains("Horizontal")) {
+            horizN3 = true;
+        } else if (n3Move.contains("Vertical")) {
+            vertN3 = true;
+        }
+
+        l_scene->setSceneRect(m_background->boundingRect());
+
+        // Now Initialize the center for all transforms of the dial needles to the
+        // center of the background:
+        // - Move the center of the needle to the center of the background.
+        QRectF rectB = m_background->boundingRect();
+        QRectF rectN = m_needle1->boundingRect();
+        m_needle1->setPos(rectB.width()/2-rectN.width()/2,rectB.height()/2-rectN.height()/2);
+        // - Put the transform origin point of the needle at its center.
+        m_needle1->setTransformOriginPoint(rectN.width()/2,rectN.height()/2);
+        if ((n1 != n2) && n2enabled) {
+            // Only do it for needle1 if it is not the same as n2
+            rectN = m_needle2->boundingRect();
+            m_needle2->setPos(rectB.width()/2-rectN.width()/2,rectB.height()/2-rectN.height()/2);
+            m_needle2->setTransformOriginPoint(rectN.width()/2,rectN.height()/2);
+        }
+        if (n3enabled) {
+            rectN = m_needle3->boundingRect();
+            m_needle3->setPos(rectB.width()/2-rectN.width()/2,rectB.height()/2-rectN.height()/2);
+            m_needle3->setTransformOriginPoint(rectN.width()/2,rectN.height()/2);
+        }
+
      }
    }
    else
@@ -300,7 +304,7 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
 
 void AirspeedGadgetWidget::paint()
 {
-    QGraphicsScene *l_scene = scene();
+  /*  QGraphicsScene *l_scene = scene();
     l_scene->clear(); // Careful: clear() deletes the objects
     l_scene->addItem(m_background);
     l_scene->addItem(m_needle1);
@@ -308,6 +312,7 @@ void AirspeedGadgetWidget::paint()
     l_scene->addItem(m_needle3);
     l_scene->addItem(m_foreground);
     l_scene->setSceneRect(m_background->boundingRect());
+    */
     update();
 }
 

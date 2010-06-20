@@ -53,13 +53,13 @@ using namespace boost;
 
 void test_slam01_main(world_ptr_t *world) {
 
-	const int MAPSIZE = 150;
-	const int NFRAME = 1000;
+	const int MAPSIZE = 200;
+	const int NFRAME = 5000;
 	const int NUPDATES = 1000;
 
 	const double FRAMERATE = 60;
 
-	ActiveSearchGrid asGrid(640, 480, 5, 5, 22, 3);
+	ActiveSearchGrid asGrid(640, 480, 4, 4, 22, 3);
 	int imgWidth = 640, imgHeight = 480;
 	double _d[3] = {-0.27965, 0.20059, -0.14215};
 //	double _d[0];

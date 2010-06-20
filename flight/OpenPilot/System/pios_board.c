@@ -356,18 +356,19 @@ const struct pios_usart_cfg pios_usart_aux_cfg = {
       .NVIC_IRQChannelCmd                = ENABLE,
     },
   },
+  .remap = GPIO_Remap_USART1,
   .rx   = {
-    .gpio = GPIOA,
+    .gpio = GPIOB,
     .init = {
-      .GPIO_Pin   = GPIO_Pin_10,
+      .GPIO_Pin   = GPIO_Pin_7,
       .GPIO_Speed = GPIO_Speed_2MHz,
       .GPIO_Mode  = GPIO_Mode_IPU,
     },
   },
   .tx   = {
-    .gpio = GPIOA,
+    .gpio = GPIOB,
     .init = {
-      .GPIO_Pin   = GPIO_Pin_9,
+      .GPIO_Pin   = GPIO_Pin_6,
       .GPIO_Speed = GPIO_Speed_2MHz,
       .GPIO_Mode  = GPIO_Mode_AF_PP,
     },
@@ -445,5 +446,5 @@ struct pios_com_dev pios_com_devs[] = {
 #endif
 };
 
-uint8_t pios_com_num_devices = NELEMENTS(pios_com_devs);
+const uint8_t pios_com_num_devices = NELEMENTS(pios_com_devs);
 

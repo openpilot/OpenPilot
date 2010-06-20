@@ -1,8 +1,9 @@
 /*
- * landmarkEuclideanPoint.hpp
+ * \file landmarkEuclideanPoint.hpp
  *
  *  Created on: Apr 14, 2010
  *      Author: agonzale
+ *      \ingroup rtslam
  */
 
 #ifndef LANDMARKEUCLIDEANPOINT_HPP_

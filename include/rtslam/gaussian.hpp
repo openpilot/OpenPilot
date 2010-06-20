@@ -1,13 +1,8 @@
-/*
- * gaussian.hpp
- *
- * \date 13/02/2010
- * \author jsola@laas.fr, croussil
- */
 
 /**
  * \file gaussian.hpp
  * \author jsola@laas.fr, croussil@laas.fr
+ * \date 13/02/2010
  * File defining the gaussian class.
  * \ingroup rtslam
  */

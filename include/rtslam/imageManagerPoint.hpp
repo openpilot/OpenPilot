@@ -3,6 +3,7 @@
  *
  *  Created on: Apr 23, 2010
  *      Author: nmansard
+ *      \ingroup rtslam
  */
 
 #ifndef IMAGEMANAGERPOINT_HPP_

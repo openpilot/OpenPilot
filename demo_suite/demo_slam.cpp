@@ -1,5 +1,5 @@
 /**
- * \file test_slam.cpp
+ * \file demo_slam.cpp
  *
  * ## Add brief description here ##
  *
@@ -51,7 +51,7 @@ using namespace jafar::rtslam;
 using namespace boost;
 
 
-void test_slam01_main(world_ptr_t *world) {
+void demo_slam01_main(world_ptr_t *world) {
 
 	const int MAPSIZE = 200;
 	const int NFRAME = 5000;
@@ -84,7 +84,7 @@ void test_slam01_main(world_ptr_t *world) {
 	
 	// create robots
 	robconstvel_ptr_t robPtr1(new RobotConstantVelocity(mapPtr));
-	robPtr1->id(robPtr1->robotIds.getId());
+	robPtr1->setId();
 	robPtr1->linkToParentMap(mapPtr);
 	vec v(robPtr1->mySize());
 	fillVector(v, 0.0);
@@ -101,7 +101,7 @@ void test_slam01_main(world_ptr_t *world) {
 	
 	// create sensors
 	pinhole_ptr_t senPtr11 (new SensorPinHole(robPtr1, MapObject::UNFILTERED));
-	senPtr11->id(senPtr11->sensorIds.getId());
+	senPtr11->setId();
 	senPtr11->linkToParentRobot(robPtr1);
 	senPtr11->state.clear();
 	senPtr11->pose.x(quaternion::originFrame());
@@ -172,9 +172,10 @@ void test_slam01_main(world_ptr_t *world) {
 				// 1. Observe known landmarks
 				// foreach observation
 				int numObs = 0;
+				observation_ptr_t obsPtr;
 				for (SensorAbstract::ObservationList::iterator obsIter = senPtr->observationList().begin(); obsIter != senPtr->observationList().end(); obsIter++)
 				{
-					observation_ptr_t obsPtr = *obsIter;
+					obsPtr = *obsIter;
 
 					obsPtr->clearEvents();
 
@@ -231,7 +232,6 @@ void test_slam01_main(world_ptr_t *world) {
 //					cout << "\n-------------------------------------------------- " << endl;
 //					cout << *obsPtr << endl;
 
-
 				} // foreach observation
 
 				//cout << chrono.elapsedMicrosecond() << " us ; observed lmks: " << numObs << endl;
@@ -264,12 +264,13 @@ void test_slam01_main(world_ptr_t *world) {
 							
 							// 2a. create lmk object
 							ahp_ptr_t lmkPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr)); // add featImgPnt in constructor
-							lmkPtr->id(lmkPtr->landmarkIds.getId());
+							lmkPtr->setId();
 							lmkPtr->linkToParentMap(mapPtr);
 //							cout << "Initializing lmk " << lmkPtr->id() << endl;
 
 							// 2b. create obs object
 							observation_ptr_t obsPtr = obsFact.create(senPtr,lmkPtr);
+							obsPtr->setId();
 
 							// 2c. fill data for this obs
 							obsPtr->events.visible = true;
@@ -289,14 +290,15 @@ void test_slam01_main(world_ptr_t *world) {
 
 //							cout << "\n-------------------------------------------------- " << endl;
 //							cout << *lmkPtr << endl;
-						}
-					}
-				}
+						} // detect()
+					} // getROI()
+				} // unusedStates()
 
 				senPtr->releaseRaw();
 				had_data = true;
-			}
-		}
+
+			} // for each sensor
+		} // for each robot
 
 		//cout << "total lmks: " << mapPtr->landmarkList().size() << endl;
 
@@ -309,17 +311,17 @@ void test_slam01_main(world_ptr_t *world) {
 		worldPtr->display_mutex.unlock();
 		mutex_chrono.reset();
 
-	}
+	} // temporal loop
 
 	cout << "average time : " << total_chrono.elapsed()/NFRAME << " ms, max frame time " << max_dt << endl;
 	std::cout << "\nFINISHED !" << std::endl;
 
 	sleep(60);
 
-}
+} // demo_slam01_main
 
 
-void test_slam01_display(world_ptr_t *world)
+void demo_slam01_display(world_ptr_t *world)
 {
 	//(*world)->display_mutex.lock();
 	qdisplay::qtMutexLock<kernel::FifoMutex>((*world)->display_mutex);
@@ -336,10 +338,10 @@ void test_slam01_display(world_ptr_t *world)
 }
 
 
-void test_slam01() {
+void demo_slam01() {
 	world_ptr_t worldPtr(new WorldAbstract());
 	
-	qdisplay::QtAppStart((qdisplay::FUNC)&test_slam01_display,10,(qdisplay::FUNC)&test_slam01_main,-10,100,&worldPtr);
+	qdisplay::QtAppStart((qdisplay::FUNC)&demo_slam01_display,10,(qdisplay::FUNC)&demo_slam01_main,-10,100,&worldPtr);
 	JFR_DEBUG("Terminated");
 }
 
@@ -347,5 +349,5 @@ void test_slam01() {
 
 int main()
 {
-	test_slam01();
+	demo_slam01();
 }

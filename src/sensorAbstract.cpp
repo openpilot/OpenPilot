@@ -111,46 +111,6 @@ namespace jafar {
 
 		}
 
-		/**
-		 * Process raw data.
-		 */
-		void SensorAbstract::processRaw() {
-			cout << "processing raw" << endl;
-			//TODO Call here the raw sensor data manager - active search in the image case.
-			// rawManagerPtr->processKnownLmks();
-			// rawManagerPtr->discoverNewLmks();
-		}
-
-		//		void SensorAbstract::observeKnownLmks() {
-		//			for (observations_ptr_set_t::iterator obsIter = observationsPtrSet.begin(); obsIter != observationsPtrSet.end(); obsIter++) {
-		//				cout << "processing raw" << endl;
-		//
-		//				observation_ptr_t obsPtr = obsIter->second;
-		//				cout << "exploring obs: " << obsPtr->id() << endl;
-		//			}
-		//
-		//		}
-		//
-		//		void SensorAbstract::discoverNewLmks() {
-		//			map_ptr_t mapPtr = robotPtr->mapPtr;
-		//			std::size_t size_lmkAHP = LandmarkAnchoredHomogeneousPoint::size();
-		//			if (mapPtr->unusedStates(size_lmkAHP)) {
-		//				landmark_ptr_t lmkPtr = newLandmark(mapPtr);
-		//				cout << "    added lmk: " << lmkPtr->id() << endl;
-		//				mapPtr->addObservations(lmkPtr);
-		//			}
-		//		}
-		//
-		//		landmark_ptr_t SensorAbstract::newLandmark(map_ptr_t & mapPtr) {
-		//			shared_ptr<LandmarkAnchoredHomogeneousPoint> lmkPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr));
-		//			size_t lid = mapPtr->landmarkIds.getId();
-		//			lmkPtr->id(lid);
-		//			lmkPtr->name("");
-		//			mapPtr->linkToLandmark(lmkPtr);
-		//			lmkPtr->linkToMap(mapPtr);
-		//			return lmkPtr;
-		//		}
-
 
 		/*
 		 * Get sensor pose in global frame.

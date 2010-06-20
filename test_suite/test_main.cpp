@@ -203,7 +203,7 @@ void test_main01() {
 			robot_ptr_t robPtr = *robIter;
 			cout << "exploring rob: " << robPtr->id() << endl;
 			robPtr->move();
-			robPtr->exploreSensors();
+//			robPtr->exploreSensors();
 
 		} // end of robots loop
 	} // end of time loop

@@ -114,6 +114,7 @@ namespace jafar {
 
 				static IdFactory robotIds;
 
+				void setId(){id(robotIds.getId());}
 
 				Gaussian pose; ///<             Robot Gaussian pose
 				vec control; ///<               Control vector
@@ -186,11 +187,6 @@ namespace jafar {
 				 */
 				void computeStatePerturbation();
 
-				/**
-				 * Explore all sensors.
-				 * This function iterates all the sensors in the robot and calls the main sensor operations.
-				 */
-				void exploreSensors() const;
 
 			protected:
 

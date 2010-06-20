@@ -69,7 +69,6 @@ void test_senPH01(void) {
 	senPtr->params.setIntrinsicCalibration(k, d, d.size());
 	c = senPtr->params.correction;
 
-  std::cout<<"#"<<__LINE__<<std::endl;
 	randVector(u);
 	u *= k(0);
 	double s = 2;

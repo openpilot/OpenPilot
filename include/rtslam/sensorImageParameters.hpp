@@ -4,6 +4,7 @@
  *     Project: jafar
  *  Created on: Jun 17, 2010
  *      Author: jsola
+ * \ingroup rtslam
  */
 
 #ifndef SENSORIMAGEPARAMETERS_HPP_

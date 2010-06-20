@@ -18,13 +18,12 @@
 #include "rtslam/sensorAbstract.hpp"
 #include "rtslam/gaussian.hpp"
 #include "rtslam/sensorImageParameters.hpp"
-#include "iostream"
+#include <iostream>
 
 namespace jafar {
 	namespace rtslam {
 
 		class SensorPinHole;
-
 		typedef boost::shared_ptr<SensorPinHole> pinhole_ptr_t;
 
 

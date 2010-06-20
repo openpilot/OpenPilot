@@ -44,29 +44,31 @@ namespace jafar {
 		class SensorAbstract;
 		class LandmarkAbstract;
 		class ObservationAbstract;
-		class FeatureAbstract;
 		class RawAbstract;
 		class AppearanceAbstract;
+		class FeatureAbstract;
 		class DescriptorAbstract;
 		class Gaussian;
 		class ExtendedKalmanFilterIndirect;
 
 		// Pointers with boost::shared_ptr:
-		typedef boost::shared_ptr<WorldAbstract>       world_ptr_t;
-		typedef boost::shared_ptr<MapAbstract>         map_ptr_t;
-		typedef boost::shared_ptr<RobotAbstract>       robot_ptr_t;
-		typedef boost::shared_ptr<SensorAbstract>      sensor_ptr_t;
-		typedef boost::shared_ptr<LandmarkAbstract>    landmark_ptr_t;
-		typedef boost::shared_ptr<ObservationAbstract> observation_ptr_t;
-		typedef boost::shared_ptr<FeatureAbstract>     feature_ptr_t;
-		typedef boost::shared_ptr<RawAbstract>         raw_ptr_t;
-		typedef boost::shared_ptr<AppearanceAbstract>  appearance_ptr_t;
-		typedef boost::shared_ptr<DescriptorAbstract>  descriptor_ptr_t;
+		typedef boost::shared_ptr<WorldAbstract>       										world_ptr_t;
+		typedef boost::shared_ptr<MapAbstract>         										map_ptr_t;
+		typedef boost::shared_ptr<RobotAbstract>       										robot_ptr_t;
+		typedef boost::shared_ptr<SensorAbstract>      										sensor_ptr_t;
+		typedef boost::shared_ptr<LandmarkAbstract>    										landmark_ptr_t;
+		typedef boost::shared_ptr<ObservationAbstract> 										observation_ptr_t;
 
-		typedef boost::shared_ptr<Gaussian>						gaussian_ptr_t;
-		typedef boost::shared_ptr<ExtendedKalmanFilterIndirect> ekfInd_ptr_t;
+		typedef boost::shared_ptr<RawAbstract>         										raw_ptr_t;
+		typedef boost::shared_ptr<AppearanceAbstract>  										appearance_ptr_t;
+		typedef boost::shared_ptr<FeatureAbstract>     										feature_ptr_t;
+		typedef boost::shared_ptr<DescriptorAbstract>  										descriptor_ptr_t;
 
-		typedef kernel::IdFactory<unsigned int, kernel::IdCollectorNone> IdFactory; // FIXME maybe we should change for a smarter IdFactory ? eg:
+		typedef boost::shared_ptr<Gaussian>						 										gaussian_ptr_t;
+
+		typedef boost::shared_ptr<ExtendedKalmanFilterIndirect>          	ekfInd_ptr_t;
+
+		typedef kernel::IdFactory<unsigned int, kernel::IdCollectorNone> 	IdFactory; // FIXME maybe we should change for a smarter IdFactory ? eg:
 		//typedef kernel::IdFactory<unsigned, kernel::IdCollectorList> IdFactory;
 		//typedef kernel::IdFactory<unsigned, kernel::IdCollectorSet> IdFactory;
 	}

@@ -96,8 +96,8 @@ namespace jafar {
 		{
 			switch (met) {
 				case ZNCC: {
-					app_img_pnt_ptr_t targetAppImg = boost::dynamic_pointer_cast<AppearanceImagePoint>(targetApp);
-					app_img_pnt_ptr_t appImg = boost::dynamic_pointer_cast<AppearanceImagePoint>(app);
+					app_img_pnt_ptr_t targetAppImg = SPTR_CAST<AppearanceImagePoint>(targetApp);
+					app_img_pnt_ptr_t appImg = SPTR_CAST<AppearanceImagePoint>(app);
 					
 					measure.matchScore = correl::Explorer<correl::Zncc>::exploreTranslation(targetAppImg->patch, *img, roi.x, roi.x+roi.width-1, 1, roi.y, roi.y+roi.height-1, 1, measure.x()(0), measure.x()(1));
 			

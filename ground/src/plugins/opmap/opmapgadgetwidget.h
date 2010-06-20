@@ -91,6 +91,9 @@ private slots:
     // context menu signals
     void reload();
     void findPlace();
+    void goZoomIn();
+    void goZoomOut();
+    void goMouseClick();
     void goHome();
     void goUAV();
     void followUAV();
@@ -143,6 +146,7 @@ private:
     QAction *findPlaceAct;
     QAction *zoomInAct;
     QAction *zoomOutAct;
+    QAction *goMouseClickAct;
     QAction *goHomeAct;
     QAction *goUAVAct;
     QAction *followUAVAct;

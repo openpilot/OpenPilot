@@ -242,6 +242,7 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     menu.addSeparator()->setText(tr("Position"));
 
+    menu.addAction(goMouseClickAct);
     menu.addAction(goHomeAct);
     menu.addAction(goUAVAct);
     menu.addAction(followUAVAct);
@@ -509,7 +510,14 @@ void OPMapGadgetWidget::zoomOut()
 void OPMapGadgetWidget::setZoom(int value)
 {
     if (m_map)
+    {
+	internals::MouseWheelZoomType::Types zoom_type = m_map->GetMouseWheelZoomType();
+	m_map->SetMouseWheelZoomType(internals::MouseWheelZoomType::ViewCenter);
+
 	m_map->SetZoom(value);
+
+	m_map->SetMouseWheelZoomType(zoom_type);
+    }
 }
 
 void OPMapGadgetWidget::setPosition(QPointF pos)
@@ -659,14 +667,18 @@ void OPMapGadgetWidget::createActions()
     connect(findPlaceAct, SIGNAL(triggered()), this, SLOT(findPlace()));
 
     zoomInAct = new QAction(tr("Zoom &In"), this);
-    zoomInAct->setShortcut(tr("PageDown"));
+    zoomInAct->setShortcut(Qt::Key_PageUp);
     zoomInAct->setStatusTip(tr("Zoom the map in"));
-    connect(zoomInAct, SIGNAL(triggered()), this, SLOT(zoomIn()));
+    connect(zoomInAct, SIGNAL(triggered()), this, SLOT(goZoomIn()));
 
     zoomOutAct = new QAction(tr("Zoom &Out"), this);
-    zoomOutAct->setShortcut(tr("PageUp"));
+    zoomOutAct->setShortcut(Qt::Key_PageDown);
     zoomOutAct->setStatusTip(tr("Zoom the map out"));
-    connect(zoomOutAct, SIGNAL(triggered()), this, SLOT(zoomOut()));
+    connect(zoomOutAct, SIGNAL(triggered()), this, SLOT(goZoomOut()));
+
+    goMouseClickAct = new QAction(tr("Go too where you right clicked the mouse"), this);
+    goMouseClickAct->setStatusTip(tr("Center the map onto where you right clicked the mouse"));
+    connect(goMouseClickAct, SIGNAL(triggered()), this, SLOT(goMouseClick()));
 
     goHomeAct = new QAction(tr("Go too &Home location"), this);
     goHomeAct->setShortcut(tr("Ctrl+H"));
@@ -797,7 +809,7 @@ void OPMapGadgetWidget::reload()
 void OPMapGadgetWidget::findPlace()
 {
     bool ok;
-    QString text = QInputDialog::getText(this, tr("GCS"), tr("Find place"), QLineEdit::Normal, QString::null, &ok);
+    QString text = QInputDialog::getText(this, tr("OpenPilot GCS"), tr("Find place"), QLineEdit::Normal, QString::null, &ok);
     if (ok && !text.isEmpty())
     {
 	if (m_map)
@@ -805,9 +817,27 @@ void OPMapGadgetWidget::findPlace()
 	    core::GeoCoderStatusCode::Types x = m_map->SetCurrentPositionByKeywords(text);
 	    QString returned_text = mapcontrol::Helper::StrFromGeoCoderStatusCode(x);
 
-	    int ret = QMessageBox::information(this, tr("GCS"), returned_text, QMessageBox::Ok);
+	    int ret = QMessageBox::information(this, tr("OpenPilot GCS"), returned_text, QMessageBox::Ok);
 	}
     }
+}
+
+void OPMapGadgetWidget::goZoomIn()
+{
+    if (m_map)
+	setZoom(m_map->Zoom() + 1);
+}
+
+void OPMapGadgetWidget::goZoomOut()
+{
+    if (m_map)
+	setZoom(m_map->Zoom() - 1);
+}
+
+void OPMapGadgetWidget::goMouseClick()
+{
+    if (m_map)
+	m_map->SetCurrentPosition(m_map->currentMousePosition());   // center the map onto the mouse position
 }
 
 void OPMapGadgetWidget::goHome()

@@ -24,10 +24,18 @@
 
 
 # Set developer code and compile options
-# Set to YES for debugging
+# Set to YES to compile for debugging
 DEBUG ?= YES
+
+# Set to YES to use the Servo output pins for debugging via scope or logic analyser
 ENABLE_DEBUG_PINS ?= NO
+
+# Set to Yes to enable the AUX UART which is mapped on the S1 (Tx) and S2 (Rx) servo outputs  
+ENABLE_AUX_UART ?= NO
+
+#
 USE_BOOTLOADER ?= NO
+
 
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY ?= YES
@@ -45,9 +53,11 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES = Telemetry GPS ManualControl Actuator Altitude Attitude
+MODULES =  Telemetry GPS ManualControl Actuator Altitude Attitude 
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
+
+#MODULES += Osd/OsdEtStd
 
 
 # MCU name, submodel and board
@@ -343,6 +353,9 @@ CDEFS += -DUSE_$(BOARD)
 ifeq ($(ENABLE_DEBUG_PINS), YES)
 CDEFS += -DPIOS_ENABLE_DEBUG_PINS
 endif
+ifeq ($(ENABLE_AUX_UART), YES)
+CDEFS += -DPIOS_ENABLE_AUX_UART
+endif
 ifeq ($(USE_BOOTLOADER), YES)
 CDEFS += -DUSE_BOOTLOADER
 endif
@@ -388,7 +401,8 @@ ifeq ($(CODE_SOURCERY), YES)
 CFLAGS += -fpromote-loop-indices
 endif
 
-CFLAGS += -Wall -Werror
+CFLAGS += -Wall 
+CFLAGS += -Werror
 CFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))
 # Compiler flags to generate dependency files:
 CFLAGS += -MD -MP -MF $(OUTDIR)/dep/$(@F).d

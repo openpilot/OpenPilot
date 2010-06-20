@@ -62,7 +62,6 @@ private:
     int MaxZoom()const{return maxZoom;}
     int MinZoom()const{return minZoom;}
     internals::MouseWheelZoomType::Types GetMouseWheelZoomType(){return core->GetMouseWheelZoomType();}
-    Qt::MouseButton DragButton;
     void SetSelectedArea(internals::RectLatLng const& value){selectedArea = value;this->update();}
     internals::RectLatLng BoundsOfMap;
     void Offset(int const& x, int const& y);

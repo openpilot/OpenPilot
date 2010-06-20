@@ -19,6 +19,8 @@ public:
     QPen SelectionPen;
     QFont MissingDataFont;
 
+    Qt::MouseButton DragButton;
+
     void SetAccessMode(core::AccessMode::Types const& type);
     core::AccessMode::Types AccessMode();
 
@@ -28,7 +30,10 @@ public:
     void SetUseMemoryCache(bool const& value){core::OPMaps::Instance()->setUseMemoryCache(value);}
     bool UseMemoryCache(){return core::OPMaps::Instance()->UseMemoryCache();}
 
-    void SetCacheLocation(QString const& dir){core::Cache::Instance()->setCacheLocation(dir);}
+    void SetCacheLocation(QString const& dir){
+        core::Cache::Instance()->setCacheLocation(dir);
+
+    }
     QString CacheLocation(){return core::Cache::Instance()->CacheLocation();}
 };
 

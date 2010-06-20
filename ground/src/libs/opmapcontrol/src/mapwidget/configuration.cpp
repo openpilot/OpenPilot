@@ -8,6 +8,7 @@ Configuration::Configuration()
     EmptyTileBorders = QPen(Qt::white);
     ScalePen = QPen(Qt::blue);
     SelectionPen = QPen(Qt::blue);
+    DragButton = Qt::RightButton;
 }
 void Configuration::SetAccessMode(core::AccessMode::Types const& type)
 {

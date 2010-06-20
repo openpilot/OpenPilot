@@ -5,7 +5,6 @@ namespace mapcontrol
     {
 
         showTileGridLines=false;
-        DragButton = Qt::RightButton;
         isMouseOverMarker=false;
         maprect=QRectF(0,0,1022,680);
         core->SetCurrentRegion(internals::Rectangle(0, 0, maprect.width(), maprect.height()));
@@ -84,7 +83,7 @@ namespace mapcontrol
     {
         if(!IsMouseOverMarker())
         {
-            if(event->button() == DragButton && CanDragMap())
+            if(event->button() == config->DragButton && CanDragMap())
             {
                 core->mouseDown.SetX(event->pos().x());
                 core->mouseDown.SetY(event->pos().y());

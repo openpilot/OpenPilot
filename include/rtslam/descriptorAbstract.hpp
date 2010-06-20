@@ -3,6 +3,7 @@
  *
  *  Created on: 20 avr. 2010
  *      Author: jeanmarie
+ * \ingroup rtslam
  */
 
 #ifndef DESCRIPTORABSTRACT_H_

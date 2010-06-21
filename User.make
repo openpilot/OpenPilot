@@ -21,10 +21,11 @@ OPTIONAL_EXTLIBS = qt4 viam MTI
 LIBS += -lkernel -ljmath -limage -lqdisplay -lcorrel -lviam
 
 CPPFLAGS += $(OPENCV_CPPFLAGS) $(QT4_CPPFLAGS) $(BOOST_CPPFLAGS) $(BOOST_SANDBOX_CPPFLAGS) $(VIAM_CPPFLAGS) -I$(ROBOTPKG_BASE)/include
+CXXFLAGS += -Wall -pthread
 
 # debug:
-#CXXFLAGS += -g -O0 -ggdb -Wall -pthread
+#CXXFLAGS += -g -O0 -ggdb -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC
 
 # release:
-CXXFLAGS += -Wall -pthread -O2
-CPPFLAGS += -DJFR_NDEBUG -DNDEBUG
+CXXFLAGS += -O2 
+CPPFLAGS += -DJFR_NDEBUG -DNDEBUG -DBOOST_UBLAS_NDEBUG

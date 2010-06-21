@@ -327,7 +327,7 @@ int32_t PIOS_I2C_TransferWait(void)
 	}
 
 #else
-	uint32_t repeat_ctr = PIOS_I2C_TIMEOUT_VALUE;
+	uint32_t repeat_ctr = PIOS_I2C_TIMEOUT_VALUE*100;	// FIXME
 	uint16_t last_buffer_ix = i2cx->buffer_ix;
 
 	if (i2cx->transfer_state.BUSY)

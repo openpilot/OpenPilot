@@ -85,8 +85,8 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define PIOS_I2C_SDA_PIN			GPIO_Pin_11
 #define PIOS_I2C_SCL_PIN			GPIO_Pin_10
 #define PIOS_I2C_DUTY_CYCLE			I2C_DutyCycle_2
-#define PIOS_I2C_BUS_FREQ			400000
-#define PIOS_I2C_TIMEOUT_VALUE			5000
+#define PIOS_I2C_BUS_FREQ			400000	// bit/s
+#define PIOS_I2C_TIMEOUT_VALUE			50 	// ms
 #define PIOS_I2C_IRQ_EV_HANDLER			void I2C2_EV_IRQHandler(void)
 #define PIOS_I2C_IRQ_ER_HANDLER			void I2C2_ER_IRQHandler(void)
 #define PIOS_I2C_IRQ_EV_CHANNEL			I2C2_EV_IRQn

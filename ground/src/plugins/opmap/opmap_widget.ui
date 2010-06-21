@@ -299,14 +299,14 @@
      <item>
       <widget class="QProgressBar" name="progressBarMap">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
        <property name="minimumSize">
         <size>
-         <width>100</width>
+         <width>40</width>
          <height>14</height>
         </size>
        </property>

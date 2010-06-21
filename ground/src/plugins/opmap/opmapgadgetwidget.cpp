@@ -54,6 +54,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_positionActual = PositionActual::GetInstance(objManager);
 
     // **************
+    // create the widget that holds the user controls and the map
 
     m_widget = new Ui_OPMap_Widget();
     m_widget->setupUi(this);
@@ -62,7 +63,6 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     // create the map display
 
     m_map = new mapcontrol::OPMapWidget();
-//    m_map = new mapcontrol::OPMapWidget(widget->mapWidget);
 
     if (m_map)
     {
@@ -75,8 +75,8 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     // **************
     // set the user control options
 
-    m_widget->labelZoom->setText(" " + QString::number(m_map->Zoom()));
-    m_widget->labelRotate->setText(" " + QString::number(m_map->Rotate()));
+    m_widget->labelZoom->setText(QString::number(m_map->Zoom()));
+    m_widget->labelRotate->setText(QString::number(m_map->Rotate()));
 //  m_widget->labelNumTilesToLoad->setText(" 0");
     m_widget->labelMapPos->setText("");
     m_widget->labelMousePos->setText("");
@@ -96,20 +96,20 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     {
 	connect(m_map, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));					// map zoom change signals
 	connect(m_map, SIGNAL(OnCurrentPositionChanged(internals::PointLatLng)), this, SLOT(OnCurrentPositionChanged(internals::PointLatLng)));    // map poisition change signals
-	connect(m_map, SIGNAL(OnTileLoadComplete()), this, SLOT(OnTileLoadComplete()));				// tile loading stop signals
+	connect(m_map, SIGNAL(OnTileLoadComplete()), this, SLOT(OnTileLoadComplete()));					// tile loading stop signals
 	connect(m_map, SIGNAL(OnTileLoadStart()), this, SLOT(OnTileLoadStart()));					// tile loading start signals
 	connect(m_map, SIGNAL(OnMapDrag()), this, SLOT(OnMapDrag()));							// map drag signals
 	connect(m_map, SIGNAL(OnMapZoomChanged()), this, SLOT(OnMapZoomChanged()));					// map zoom changed
-	connect(m_map, SIGNAL(OnMapTypeChanged(MapType::Types)), this, SLOT(OnMapTypeChanged(MapType::Types)));	// map type changed
+	connect(m_map, SIGNAL(OnMapTypeChanged(MapType::Types)), this, SLOT(OnMapTypeChanged(MapType::Types)));		// map type changed
 	connect(m_map, SIGNAL(OnEmptyTileError(int, core::Point)), this, SLOT(OnEmptyTileError(int, core::Point)));	// tile error
 	connect(m_map, SIGNAL(OnTilesStillToLoad(int)), this, SLOT(OnTilesStillToLoad(int)));				// tile loading signals
 
 	m_map->SetMaxZoom(19);									    // increase the maximum zoom level
-	m_map->SetMouseWheelZoomType(internals::MouseWheelZoomType::MousePositionWithoutCenter);	    // set how the mouse wheel zoom functions
+	m_map->SetMouseWheelZoomType(internals::MouseWheelZoomType::MousePositionWithoutCenter);    // set how the mouse wheel zoom functions
 	m_map->SetFollowMouse(true);								    // we want a contiuous mouse position reading
 	m_map->SetUseOpenGL(openGLAct->isChecked());						    // enable/disable openGL
 	m_map->SetShowTileGridLines(gridLinesAct->isChecked());					    // map grid lines on/off
-	m_map->SetCurrentPosition(internals::PointLatLng(data.Latitude, data.Longitude));		    // set the default map position
+	m_map->SetCurrentPosition(internals::PointLatLng(data.Latitude, data.Longitude));	    // set the default map position
     }
 
     // **************
@@ -157,7 +157,6 @@ OPMapGadgetWidget::~OPMapGadgetWidget()
 
 void OPMapGadgetWidget::resizeEvent(QResizeEvent *event)
 {
-//    if (map) map->resize(QSize(width(), height()));
     update();
     QWidget::resizeEvent(event);
 }

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>647</width>
-    <height>441</height>
+    <width>656</width>
+    <height>171</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -239,29 +239,28 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="labelZoom">
+           <widget class="QComboBox" name="comboBoxZoom">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="font">
-             <font>
-              <pointsize>8</pointsize>
-              <weight>50</weight>
-              <bold>false</bold>
-             </font>
+            <property name="toolTip">
+             <string>Zoom level</string>
+            </property>
+            <property name="autoFillBackground">
+             <bool>false</bool>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgba(255, 255, 255, 0);
-color: rgb(255, 255, 255);</string>
+             <string notr="true">color: rgb(255, 255, 255);
+</string>
             </property>
-            <property name="text">
-             <string>Zoom</string>
+            <property name="maxVisibleItems">
+             <number>20</number>
             </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            <property name="frame">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -651,8 +650,6 @@ border: none;
          </layout>
         </item>
        </layout>
-       <zorder>labelMapPos</zorder>
-       <zorder>layoutWidget_2</zorder>
       </widget>
      </item>
     </layout>

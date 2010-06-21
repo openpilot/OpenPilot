@@ -73,18 +73,22 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     }
 
     // **************
+
+    createActions();
+
+    // **************
     // set the user control options
 
-    m_widget->labelZoom->setText(QString::number(m_map->Zoom()));
     m_widget->labelRotate->setText(QString::number(m_map->Rotate()));
 //  m_widget->labelNumTilesToLoad->setText(" 0");
     m_widget->labelMapPos->setText("");
     m_widget->labelMousePos->setText("");
     m_widget->progressBarMap->setMaximum(1);
 
-    // **************
-
-    createActions();
+    m_widget->comboBoxZoom->clear();
+    for (int i = 2; i <= 19; i++)
+	m_widget->comboBoxZoom->addItem(QString::number(i), i);
+    m_widget->comboBoxZoom->setCurrentIndex((int)(m_map->Zoom() + 0.5) - 2);
 
     // **************
     // map stuff
@@ -141,6 +145,8 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_statusUpdateTimer->start();
 
     // **************
+
+    connect(m_widget->comboBoxZoom, SIGNAL(currentIndexChanged(int)), this, SLOT(on_comboBoxZoom_currentIndexChanged(int)));
 }
 
 // *************************************************************************************
@@ -335,7 +341,13 @@ void OPMapGadgetWidget::zoomChanged(double zoom)
     int i_zoom = (int)(zoom + 0.5);
 
     if (m_widget)
-	m_widget->labelZoom->setText(" " + QString::number(zoom));
+    {
+//	m_widget->labelZoom->setText(" " + QString::number(zoom));
+
+	disconnect(m_widget->comboBoxZoom, SIGNAL(currentIndexChanged(int)), this, 0);
+	m_widget->comboBoxZoom->setCurrentIndex(i_zoom - 2);
+	connect(m_widget->comboBoxZoom, SIGNAL(currentIndexChanged(int)), this, SLOT(on_comboBoxZoom_currentIndexChanged(int)));
+    }
 
     switch (i_zoom)
     {
@@ -364,7 +376,7 @@ void OPMapGadgetWidget::zoomChanged(double zoom)
 void OPMapGadgetWidget::OnMapDrag()
 {
     if (followUAVAct->isChecked())
-	followUAVAct->setChecked(false);	// disable follow UAV mode
+	followUAVAct->setChecked(false);	// disable follow UAV mode when the user starts to manually drag the map
 }
 
 void OPMapGadgetWidget::OnCurrentPositionChanged(internals::PointLatLng point)
@@ -497,6 +509,14 @@ void OPMapGadgetWidget::on_pushButtonGeoFenceP_clicked()
 
     }
 }
+
+void OPMapGadgetWidget::on_comboBoxZoom_currentIndexChanged(int index)
+{
+    bool ok;
+    int i = (int)m_widget->comboBoxZoom->itemData(index).toInt(&ok);
+    setZoom(2 + index);
+}
+
 
 // *************************************************************************************
 // public functions

@@ -78,6 +78,7 @@ private slots:
     void on_toolButtonZoomP_clicked();
     void on_pushButtonGeoFenceM_clicked();
     void on_pushButtonGeoFenceP_clicked();
+    void on_comboBoxZoom_currentIndexChanged(int index);
 
     // map signals
     void zoomChanged(double zoom);

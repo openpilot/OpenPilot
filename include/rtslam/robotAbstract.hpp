@@ -118,7 +118,6 @@ namespace jafar {
 
 				Gaussian pose; ///<             Robot Gaussian pose
 				vec control; ///<               Control vector
-				double dt_or_dx; ///<           Sampling time or any other relevant increment (e.g. odometry is not time-driven but distance-driven)
 				Perturbation perturbation; ///< Perturbation Gaussian vector
 				/**
 				 * Constant perturbation flag.
@@ -136,6 +135,8 @@ namespace jafar {
 				 *   and perform all the above operations to obtain Q inside the constructor body.
 				 */
 				bool constantPerturbation;
+				double self_time; ///< 					Current estimation time
+				double dt_or_dx; ///<           Sampling time or any other relevant increment (e.g. odometry is not time-driven but distance-driven)
 
 				jblas::mat XNEW_x; ///<         Jacobian wrt state
 				jblas::mat XNEW_pert; ///<      Jacobian wrt perturbation
@@ -170,10 +171,26 @@ namespace jafar {
 				 * This function updates the full state and covariances matrix of the robot plus the cross-variances with all other map objects.
 				 */
 				//template<class V>
-				inline void move(vec & _u) {
+				inline void move(const vec & _u) {
 					JFR_ASSERT(_u.size() == control.size(), "robotAbstract.hpp: move: wrong control size.");
 					control = _u;
 					move();
+				}
+
+				void move(double time){
+					if (self_time < 1.) dt_or_dx = 0;
+					else dt_or_dx = time - self_time;
+					perturbation.set_from_continuous(dt_or_dx);
+					move();
+					self_time = time;
+				}
+
+				void move(const vec & u, double time){
+					if (self_time < 1.) dt_or_dx = 0;
+					else dt_or_dx = time - self_time;
+					perturbation.set_from_continuous(dt_or_dx);
+					move(u);
+					self_time = time;
 				}
 
 

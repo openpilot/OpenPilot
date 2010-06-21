@@ -58,6 +58,7 @@ namespace jafar {
 //					cout << "Created patch with " << width << "x" << height << " pixels; depth: " << depth << "; color space: " << JfrImage_CS_GRAY << endl;
 				}
 				virtual ~AppearanceImagePoint();
+				virtual AppearanceAbstract* clone();
 
 			private:
 				void computePatchIntegrals();

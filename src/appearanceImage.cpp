@@ -19,6 +19,15 @@ namespace jafar {
 		AppearanceImagePoint::~AppearanceImagePoint() {
 		}
 
+		AppearanceAbstract* AppearanceImagePoint::clone()
+		{
+			AppearanceImagePoint* app = new AppearanceImagePoint(patch.width(), patch.height(), patch.depth());
+			patch.copy(app->patch,0,0,0,0);
+			app->patchSum = patchSum;
+			app->patchSquareSum = patchSquareSum;
+			return app;
+		}
+
 		void AppearanceImagePoint::computePatchIntegrals(){
 			patchSum = 0;
 			patchSquareSum = 0;

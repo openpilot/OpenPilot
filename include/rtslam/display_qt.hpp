@@ -22,6 +22,9 @@
 
 #define DEFINE_USELESS_OBJECTS 1
 
+// FIXME for EMBED_PREDICTED_APP: the image is modified (in obs) after it is displayed (in sensor)...
+#define EMBED_PREDICTED_APP 0
+
 namespace jafar {
 namespace rtslam {
 namespace display {
@@ -159,6 +162,9 @@ class ObservationQt : public ObservationDisplay
 		jblas::vec predObs_;
 		jblas::sym_mat predObsCov_;
 		jblas::vec measObs_;
+#if EMBED_PREDICTED_APP
+		AppearanceAbstract *predictedApp_;
+#endif
 		unsigned int id_;
 		double match_score;
 		// TODO grid
@@ -169,6 +175,9 @@ class ObservationQt : public ObservationDisplay
 		ObservationQt(rtslam::ObservationAbstract *_slamObs, SensorQt *_dispSen):
 			ObservationDisplay(_slamObs, _dispSen), view_(_dispSen->view_) 
 		{
+#if EMBED_PREDICTED_APP
+			predictedApp_ = NULL;
+#endif
 			switch (landmarkType_)
 			{
 				case LandmarkDisplay::ltPoint:
@@ -213,6 +222,10 @@ class ObservationQt : public ObservationDisplay
 							match_score = slamObs_->getMatchScore();
 						}
 					}
+#if EMBED_PREDICTED_APP
+					delete predictedApp_;
+					predictedApp_ = slamObs_->predictedAppearance->clone();
+#endif
 					break;
 				default:
 					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark: " << landmarkType_);
@@ -226,6 +239,7 @@ class ObservationQt : public ObservationDisplay
 				case LandmarkDisplay::ltPoint:
 				{
 					qdisplay::Shape *s;
+					// Build display objects if it is the first time they are displayed
 					if (items_.size() != 3)
 					{
 						// clear
@@ -260,6 +274,7 @@ class ObservationQt : public ObservationDisplay
 						view_->addShape(s);
 						
 					}
+					// Refresh the display objects every time
 					{
 						bool disp;
 						// prediction point
@@ -289,6 +304,25 @@ class ObservationQt : public ObservationDisplay
 						(*it)->setVisible(disp);
 						if (disp)
 							(*it)->setPos(measObs_(0), measObs_(1));
+
+#if EMBED_PREDICTED_APP
+						// display predicted appearance
+						switch (slamObs_->sensorPtr()->type)
+						{
+							case SensorAbstract::PINHOLE: case SensorAbstract::BARRETO:
+							{
+								AppearanceImagePoint* appImgPtr = PTR_CAST<AppearanceImagePoint*>(slamObs_->predictedAppearance.get());
+								jblas::veci shift(2); shift(0) = (appImgPtr->patch.width()-1)/2; shift(1) = (appImgPtr->patch.height()-1)/2;
+								appImgPtr->patch.robustCopy(PTR_CAST<SensorQt*>(dispSen_)->image, 0, 0, predObs_(0)-shift(0), predObs_(1)-shift(1));
+							}
+							default:
+							{
+
+							}
+
+						}
+#endif
+
 					}
 					break;
 				}

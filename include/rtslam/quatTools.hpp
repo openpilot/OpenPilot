@@ -665,6 +665,20 @@ namespace jafar {
 			 */
 			vec7 originFrame();
 
+			/**
+			 * Quaternion defining the RDF frame from a FLU frame.
+			 * RDF: x-Right, y-Down, z-Front frame used for pin-hole cameras.
+			 * FLU: x-Front, y-Left, z-Up frame used for mobile objects.
+			 * This transformation is the typical expressed by Euler angles [-90 0 -90] deg.
+			 * \return a quaternion \a q = [0.5 -0.5 0.5 -0.5]
+			 */
+			vec4 flu2rdfQuat();
+
+			/**
+			 * A frame at the origin position and the orientation at [-90, 0, -90] deg.
+			 * \sa flu2rdfQuat()
+			 */
+			vec7 flu2rdfFrame();
 
 			/**
 			 * To-frame transformation for Euclidean points.
@@ -1019,7 +1033,7 @@ namespace jafar {
 			zoom = (norm_2(landmarkPosition - position1))/(norm_2(landmarkPosition-position2));
 			vec4 quat12 = qProd(q2qc(quat1),quat2);
 			vec3 euler12 = q2e(quat12);
-			rotation = -euler12(2); // take negative yaw angle
+			rotation = euler12(2); // take negative yaw angle
 		}
 
 

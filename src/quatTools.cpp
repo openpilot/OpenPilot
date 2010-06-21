@@ -11,6 +11,7 @@
  */
 
 #include "jmath/jblas.hpp"
+#include "jmath/angle.hpp"
 #include "rtslam/quatTools.hpp"
 
 namespace jafar {
@@ -30,6 +31,21 @@ namespace jafar {
 				F.clear();
 				F(3) = 1.0;
 				return F;
+			}
+
+			jblas::vec4 flu2rdfQuat(){
+				jblas::vec3 e;
+				e.clear();
+				e(0) = jmath::degToRad(-90.0);
+				e(1) = 0.0;
+				e(2) = e(0);
+				return e2q(e);
+			}
+
+			jblas::vec7 flu2rdfFrame(){
+				vec7 F;
+				F.clear();
+				ublas::subrange(F, 3, 7) = flu2rdfQuat();
 			}
 
 		}

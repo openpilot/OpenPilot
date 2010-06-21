@@ -23,11 +23,17 @@
 #include "rtslam/hardwareSensorAbstract.hpp"
 #include "image/Image.hpp"
 
+// TODO move this generic swap function to jmath of kernel
+namespace jafar {
+namespace jmath {
+	template<typename T>
+	inline void swap(T &a, T &b) { T tmp = a; a = b; b = tmp; }
+}}
 
 namespace jafar {
 namespace rtslam {
 
-	
+
 class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 {
 	private:
@@ -39,10 +45,11 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 		int buff_in_use;
 		int buff_ready;
 		int buff_write;
+		bool has_ready;
 		int missed_count;
-		IplImage* buffer[2];
-		raw_ptr_t bufferPtr[2];
-		rawimage_ptr_t bufferSpecPtr[2];
+		IplImage* buffer[3];
+		raw_ptr_t bufferPtr[3];
+		rawimage_ptr_t bufferSpecPtr[3];
 		
 		// TODO count missed frames
 		
@@ -56,8 +63,9 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 			{
 				r = viam_oneshot(handle, bank, buffer+buff_write, &pts, 1);
 				boost::unique_lock<boost::mutex> l(mutex_data);
-				bufferPtr[buff_write]->timestamp = ts.tv_sec + ts.tv_usec*1e-6;
-				buff_ready = buff_write;
+				jmath::swap(buff_write, buff_ready);
+				bufferPtr[buff_ready]->timestamp = ts.tv_sec + ts.tv_usec*1e-6;
+				has_ready = true;
 				l.unlock();
 			}
 			
@@ -80,17 +88,17 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 			r = viam_datatransmit(handle, bank, VIAM_ON);
 
 			// configure data
-			buffer[0] = cvCreateImage(cvSize(640,480), 8, 1); // TODO choose right size
-			bufferPtr[0].reset(new RawImage()); bufferSpecPtr[0] = SPTR_CAST<RawImage>(bufferPtr[0]);
-			bufferSpecPtr[0]->setJafarImage(jafarImage_ptr_t(new image::Image(buffer[0])));
+			for(int i = 0; i < 3; ++i)
+			{
+				buffer[i] = cvCreateImage(cvSize(640,480), 8, 1); // TODO choose right size
+				bufferPtr[i].reset(new RawImage()); bufferSpecPtr[i] = SPTR_CAST<RawImage>(bufferPtr[i]);
+				bufferSpecPtr[i]->setJafarImage(jafarImage_ptr_t(new image::Image(buffer[i])));
+			}
 			
-			buffer[1] = cvCreateImage(cvSize(640,480), 8, 1); // TODO choose right size
-			bufferPtr[1].reset(new RawImage()); bufferSpecPtr[1] = SPTR_CAST<RawImage>(bufferPtr[1]);
-			bufferSpecPtr[1]->setJafarImage(jafarImage_ptr_t(new image::Image(buffer[1])));
-			
-			buff_in_use = -1;
-			buff_ready = -1;
-			buff_write = 0;
+			buff_in_use = 0;
+			buff_write = 1;
+			buff_ready = 2;
+			has_ready = false;
 
 			// start acquire task
 			preloadTask_thread = new boost::thread(boost::bind(&HardwareSensorCameraFirewire::preloadTask,this));
@@ -106,10 +114,9 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 		virtual int acquireRaw(raw_ptr_t &rawPtr)
 		{
 			boost::unique_lock<boost::mutex> l(mutex_data);
-			if (buff_ready < 0) return -1;
-			buff_in_use = buff_ready;
-			buff_write = 1-buff_in_use;
-			buff_ready = -1;
+			if (!has_ready) return -1;
+			jmath::swap(buff_in_use, buff_ready);
+			has_ready = false;
 			rawPtr = bufferPtr[buff_in_use];
 			l.unlock();
 			return 0;
@@ -117,9 +124,9 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 		
 		virtual void releaseRaw()
 		{
-			boost::unique_lock<boost::mutex> l(mutex_data);
-			buff_in_use = -1;
-			l.unlock();
+//			boost::unique_lock<boost::mutex> l(mutex_data);
+//			buff_in_use = -1;
+//			l.unlock();
 		}
 		
 };

@@ -59,15 +59,15 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	const double FRAMERATE = 60;
 
-	ActiveSearchGrid asGrid(640, 480, 4, 4, 22, 3);
 	int imgWidth = 640, imgHeight = 480;
+	ActiveSearchGrid asGrid(imgWidth, imgHeight, 4, 4, 16, 5);
 	double _d[3] = {-0.27965, 0.20059, -0.14215};
 //	double _d[0];
 	vec d = createVector<3>(_d);
 	double _k[4] = {551.379, 365.793, 1079.2, 1076.73};
 //	double _k[4] = {320, 240, 320, 320};
 	vec k = createVector<4>(_k);
-	int patchMatchSize = 11;
+	int patchMatchSize = 7;
 	ObservationFactory obsFact;
 	obsFact.addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeEucpObservationMaker()));
 	obsFact.addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhpObservationMaker()));
@@ -92,12 +92,13 @@ void demo_slam01_main(world_ptr_t *world) {
 	robPtr1->pose.x(quaternion::originFrame());
 	robPtr1->dt_or_dx = 1/FRAMERATE;
 	v.resize(robPtr1->mySize_perturbation());
-	fillVector(v, 0.5);
+	fillVector(v, 1.0);
 	robPtr1->perturbation.clear();
 	robPtr1->perturbation.set_std_continuous(v);
-	robPtr1->perturbation.set_P_from_continuous(robPtr1->dt_or_dx);
-	robPtr1->computeStatePerturbation();
-	cout << "pert. " << robPtr1->perturbation << "\n .Q: " << robPtr1->Q << endl;
+	robPtr1->constantPerturbation = false;
+//	robPtr1->perturbation.set_P_from_continuous(robPtr1->dt_or_dx);
+//	robPtr1->computeStatePerturbation();
+//	cout << "pert. " << robPtr1->perturbation << "\n .Q: " << robPtr1->Q << endl;
 	
 	// create sensors
 	pinhole_ptr_t senPtr11 (new SensorPinHole(robPtr1, MapObject::UNFILTERED));
@@ -152,6 +153,7 @@ void demo_slam01_main(world_ptr_t *world) {
 //			cout << *robPtr << endl;
 
 			// foreach sensor
+//kernel::Chrono chronototal;
 			for (RobotAbstract::SensorList::iterator senIter = robPtr->sensorList().begin(); senIter != robPtr->sensorList().end(); senIter++)
 			{
 				sensor_ptr_t senPtr = *senIter;
@@ -160,27 +162,32 @@ void demo_slam01_main(world_ptr_t *world) {
 
 				// get raw-data
 				if (senPtr->acquireRaw() < 0) continue;
+//std::cout << chronototal.elapsed() << " has acquired" << std::endl;
 
 				// move the filter time to the data raw
 				vec u(robPtr->mySize_control()); // TODO put some real values in u.
 				fillVector(u, 0.0);
-				robPtr->set_control(u);
-				robPtr->move();
-				
+//				robPtr->set_control(u);
+				robPtr->move(u, senPtr->getRaw()->timestamp);
 				
 				asGrid.renew();
+				
 				// 1. Observe known landmarks
 				// foreach observation
 				int numObs = 0;
 				observation_ptr_t obsPtr;
+int total_match_time = 0;
 				for (SensorAbstract::ObservationList::iterator obsIter = senPtr->observationList().begin(); obsIter != senPtr->observationList().end(); obsIter++)
 				{
+//std::cout << chronototal.elapsed() << " process observation" << std::endl;
 					obsPtr = *obsIter;
 
 					obsPtr->clearEvents();
+					obsPtr->measurement.matchScore = 0;
 
 					// 1a. project
 					obsPtr->project();
+//std::cout << chronototal.elapsed() << " has projected" << std::endl;
 
 					// Add to tesselation grid for active search
 					asGrid.addPixel(obsPtr->expectation.x());
@@ -197,6 +204,7 @@ void demo_slam01_main(world_ptr_t *world) {
 
 						// 1c. predict appearance
 						obsPtr->predictAppearance();
+//std::cout << chronototal.elapsed() << " has predicted appearance" << std::endl;
 
 						// 1d. search appearence in raw
 						//obsPtr->matchFeature(senPtr->getRaw()) ;
@@ -210,9 +218,27 @@ void demo_slam01_main(world_ptr_t *world) {
 						ymax = (int)(obsPtr->expectation.x(1)+dy+0.9999);
 
 						cv::Rect roi(xmin,ymin,xmax-xmin+1,ymax-ymin+1);
-//((AppearanceImagePoint*)(obsPtr->predictedAppearance.get()))->patch.save("predicted_app.png");
-						senPtr->getRaw()->match(RawAbstract::ZNCC, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
 
+//kernel::Chrono chronomatch;
+						senPtr->getRaw()->match(RawAbstract::ZNCC, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
+//total_match_time += chronomatch.elapsedMicrosecond();
+//std::cout << chronototal.elapsed() << " has matched" << std::endl;
+/*
+						// DEBUG: save some appearances to file
+						((AppearanceImagePoint*)(((DescriptorImagePoint*)(obsPtr->landmark().descriptorPtr.get()))->featImgPntPtr->appearancePtr.get()))->patch.save("descriptor_app.png");
+						((AppearanceImagePoint*)(obsPtr->predictedAppearance.get()))->patch.save("predicted_app.png");
+						((AppearanceImagePoint*)(obsPtr->observedAppearance.get()))->patch.save("matched_app.png");
+
+						// DEBUG: display predicted appearances on image, disable it when operating normally because can have side effects
+						AppearanceImagePoint* appImgPtr = PTR_CAST<AppearanceImagePoint*>(obsPtr->predictedAppearance.get());
+						jblas::veci shift(2); shift(0) = (appImgPtr->patch.width()-1)/2; shift(1) = (appImgPtr->patch.height()-1)/2;
+						appImgPtr->patch.robustCopy(*PTR_CAST<RawImage*>(senPtr->getRaw().get())->img, 0, 0, obsPtr->expectation.x(0)-shift(0), obsPtr->expectation.x(1)-shift(1));
+
+						// DEBUG: some display
+						cout << obsPtr->expectation.x() << endl;
+						cout << roi << endl;
+						cout << obsPtr->getMatchScore() << endl;
+*/
 						// 1e. if feature is found
 						if (obsPtr->getMatchScore()>0.95) {
 							obsPtr->counters.nMatch++;
@@ -223,6 +249,7 @@ void demo_slam01_main(world_ptr_t *world) {
 							if (obsPtr->compatibilityTest(3.0)) { // use 3.0 for 3-sigma or the 5% proba from the chi-square tables.
 								obsPtr->counters.nInlier++;
 								obsPtr->update() ;
+//std::cout << chronototal.elapsed() << " has updated" << std::endl;
 								obsPtr->events.updated = true;
 							} // obsPtr->compatibilityTest(3.0)
 						} // obsPtr->getScoreMatchInPercent()>80
@@ -233,6 +260,7 @@ void demo_slam01_main(world_ptr_t *world) {
 //					cout << *obsPtr << endl;
 
 				} // foreach observation
+//std::cout << "all matches took " << total_match_time/1000 << " ms" << std::endl;
 
 				//cout << chrono.elapsedMicrosecond() << " us ; observed lmks: " << numObs << endl;
 
@@ -256,7 +284,9 @@ void demo_slam01_main(world_ptr_t *world) {
 					if (asGrid.getROI(roi)){
 
 						feat_img_pnt_ptr_t featPtr(new FeatureImagePoint(patchMatchSize*3,patchMatchSize*3,CV_8U));
+//kernel::Chrono chronodetect;
 						if (senPtr->getRaw()->detect(RawAbstract::HARRIS, featPtr, &roi)) {
+//std::cout << "detect in roi " << roi << " took " << chronodetect.elapsed() << " ms" << std::endl;
 //							cout << "\n-------------------------------------------------- " << endl;
 //							cout << "Detected pixel: " << featPtr->measurement.x() << endl;
 
@@ -306,7 +336,11 @@ void demo_slam01_main(world_ptr_t *world) {
 		if (dt > max_dt) max_dt = dt;
 		if (had_data) {
 			t++;
-			cout << "frame time : " << (double)dt/1000 << " ms. Position: " << 100*ublas::subrange(robPtr1->pose.x(),0,3) << endl;
+			vec7 F = robPtr1->pose.x();
+			vec3 p = subrange(F, 0, 3);
+			vec4 q = subrange(F, 3, 7);
+			vec3 e = quaternion::q2e(q);
+			cout << "dt: " << (int)(1000*robPtr1->dt_or_dx) << " ms. p: " << 100*p << " cm. e: " << (180.0 / 3.14)*e << " deg." << endl;
 		}
 		worldPtr->display_mutex.unlock();
 		mutex_chrono.reset();
@@ -341,7 +375,14 @@ void demo_slam01_display(world_ptr_t *world)
 void demo_slam01() {
 	world_ptr_t worldPtr(new WorldAbstract());
 	
-	qdisplay::QtAppStart((qdisplay::FUNC)&demo_slam01_display,10,(qdisplay::FUNC)&demo_slam01_main,-10,100,&worldPtr);
+	// to start with qt display
+	const int slam_priority = 10; // needs to be started as root to be > 0
+	const int display_priority = -10;
+	const int display_period = 100; // ms
+	qdisplay::QtAppStart((qdisplay::FUNC)&demo_slam01_display,slam_priority,(qdisplay::FUNC)&demo_slam01_main,display_priority,display_period,&worldPtr);
+	// to start without display
+	//demo_slam01_main(&worldPtr);
+
 	JFR_DEBUG("Terminated");
 }
 

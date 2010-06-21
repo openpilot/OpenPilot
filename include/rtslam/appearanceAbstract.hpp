@@ -17,6 +17,10 @@ namespace jafar {
 			public:
 				AppearanceAbstract();
 				virtual ~AppearanceAbstract();
+				/**
+				 * @return a new object that is a copy (clone) of this
+				 */
+				virtual AppearanceAbstract* clone() = 0;
 		};
 	}
 }

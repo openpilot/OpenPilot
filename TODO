@@ -33,6 +33,7 @@ Organization
 Performance
 ------------------------------------
 - zncc that can use integral image
+- zncc uses a real ellipse roi (mahalanobis dist)
 - check algorithm speed <- Good 30Hz. See issues with RT and OS
 - find a more clever way to manipulate the map used space: ia_indirectArray() is possibly an expensive way to go.
 

@@ -21,6 +21,7 @@ amps
 aquired
 autonomous flight
 battery
+battery critical
 camera
 cancelled
 changed
@@ -30,9 +31,9 @@ complete
 connected
 connection
 control
-critical
 disabled
 disconnected
+feet
 figure eight
 flight
 GPS 
@@ -45,27 +46,33 @@ hold position
 Home location
 initiated
 initiazlised
+KPH
 landing
 launch
 left
 lock
 logging
 lost
-low
+low altitude
+low battery
 manual flight
 maxium
+meters
 minimum 
 mode
+MPH
 navigation
 OpenPilot
 point
 range
+reached
 ready
 return home
 right
 set
+speed
 stabalisation
-Started
+started
 stopped
 take off
 telemtry
@@ -80,6 +87,7 @@ waypoint
 
 Numbers:
 
+zero
 one
 two
 three
@@ -109,7 +117,5 @@ eighty
 ninety
 hundread
 thousand
-million
-
 
 

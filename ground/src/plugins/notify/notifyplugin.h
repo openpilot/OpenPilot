@@ -32,7 +32,7 @@
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/uavobject.h"
 #include <QSettings>
-#include <Phonon>
+#include <phonon>
 
 class NotifyPluginOptionsPage;
 class NotifyPluginConfiguration;

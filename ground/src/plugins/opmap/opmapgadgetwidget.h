@@ -34,7 +34,7 @@
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/positionactual.h"
 
-namespace Ui { class OPMapControlPanel; }
+class Ui_OPMap_Widget;
 
 using namespace mapcontrol;
 
@@ -69,6 +69,8 @@ private slots:
     void zoomOut();
 
     // control panel signals
+    void on_toolButtonReload_clicked();
+    void on_toolButtonFindPlace_clicked();
     void on_toolButtonRR_clicked();
     void on_toolButtonRC_clicked();
     void on_toolButtonRL_clicked();
@@ -132,7 +134,7 @@ private:
 
    PositionActual *m_positionActual;
 
-    Ui::OPMapControlPanel *controlpanel_ui;
+    Ui_OPMap_Widget *m_widget;
 
     mapcontrol::OPMapWidget *m_map;
 

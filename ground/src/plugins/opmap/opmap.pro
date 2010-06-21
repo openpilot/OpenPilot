@@ -18,5 +18,6 @@ SOURCES += opmapplugin.cpp \
     opmapgadget.cpp
 OTHER_FILES += OPMapGadget.pluginspec
 FORMS += opmapgadgetoptionspage.ui \
-    opmap_controlpanel.ui
+    opmap_controlpanel.ui \
+    opmap_widget.ui
 RESOURCES += opmap.qrc

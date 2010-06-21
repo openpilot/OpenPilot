@@ -24,14 +24,15 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
 #include "opmapgadgetwidget.h"
+#include "ui_opmap_widget.h"
+
 #include <QStringList>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>
 #include <QDir>
 #include "extensionsystem/pluginmanager.h"
-
-#include "ui_opmap_controlpanel.h"
 
 // *************************************************************************************
 // constructor
@@ -40,7 +41,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 {
     // **************
 
-    controlpanel_ui = NULL;
+    m_widget = NULL;
     m_map = NULL;
 
     setMouseTracking(true);
@@ -48,55 +49,38 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     // **************
     // Get required UAVObjects
 
-    ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     m_positionActual = PositionActual::GetInstance(objManager);
 
     // **************
-    // create the user control panel
 
-//    controlpanel_ui = new Ui::OPMapControlPanel();
-//    controlpanel_ui->setupUi(this);
+    m_widget = new Ui_OPMap_Widget();
+    m_widget->setupUi(this);
 
-
-
-
-
-
-/*
-    QWidget *dialog = new QWidget(this, Qt::Dialog);
-
-    controlpanel_ui = new Ui::OPMapControlPanel();
-    controlpanel_ui->setupUi(dialog);
-
-    QHBoxLayout *d_layout = new QHBoxLayout(dialog);
-    d_layout->setSpacing(0);
-    d_layout->setContentsMargins(0, 0, 0, 0);
-    d_layout->addWidget(controlpanel_ui->layoutWidget);
-    dialog->setLayout(d_layout);
-
-    dialog->show();
-*/
     // **************
     // create the map display
 
     m_map = new mapcontrol::OPMapWidget();
-    m_map->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-    m_map->setMinimumSize(64, 64);
+//    m_map = new mapcontrol::OPMapWidget(widget->mapWidget);
 
-    m_map->configuration->DragButton = Qt::LeftButton;
+    if (m_map)
+    {
+	m_map->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+	m_map->setMinimumSize(64, 64);
+
+	m_map->configuration->DragButton = Qt::LeftButton;  // use the left mouse button for map dragging
+    }
 
     // **************
     // set the user control options
 
-    if (controlpanel_ui)
-    {
-	controlpanel_ui->labelZoom->setText(" " + QString::number(m_map->Zoom()));
-	controlpanel_ui->labelRotate->setText(" " + QString::number(m_map->Rotate()));
-//    controlpanel_ui->labelNumTilesToLoad->setText(" 0");
-	controlpanel_ui->labelStatus->setText("");
-	controlpanel_ui->progressBarMap->setMaximum(1);
-    }
+    m_widget->labelZoom->setText(" " + QString::number(m_map->Zoom()));
+    m_widget->labelRotate->setText(" " + QString::number(m_map->Rotate()));
+//  m_widget->labelNumTilesToLoad->setText(" 0");
+    m_widget->labelMapPos->setText("");
+    m_widget->labelStatus->setText("");
+    m_widget->progressBarMap->setMaximum(1);
 
     // **************
 
@@ -108,22 +92,25 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     // get current UAV data
     PositionActual::DataFields data = m_positionActual->getData();
 
-    connect(m_map, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));					// map zoom change signals
-    connect(m_map, SIGNAL(OnCurrentPositionChanged(internals::PointLatLng)), this, SLOT(OnCurrentPositionChanged(internals::PointLatLng)));    // map poisition change signals
-    connect(m_map, SIGNAL(OnTileLoadComplete()), this, SLOT(OnTileLoadComplete()));				// tile loading stop signals
-    connect(m_map, SIGNAL(OnTileLoadStart()), this, SLOT(OnTileLoadStart()));					// tile loading start signals
-    connect(m_map, SIGNAL(OnMapDrag()), this, SLOT(OnMapDrag()));							// map drag signals
-    connect(m_map, SIGNAL(OnMapZoomChanged()), this, SLOT(OnMapZoomChanged()));					// map zoom changed
-    connect(m_map, SIGNAL(OnMapTypeChanged(MapType::Types)), this, SLOT(OnMapTypeChanged(MapType::Types)));	// map type changed
-    connect(m_map, SIGNAL(OnEmptyTileError(int, core::Point)), this, SLOT(OnEmptyTileError(int, core::Point)));	// tile error
-    connect(m_map, SIGNAL(OnTilesStillToLoad(int)), this, SLOT(OnTilesStillToLoad(int)));				// tile loading signals
+    if (m_map)
+    {
+	connect(m_map, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));					// map zoom change signals
+	connect(m_map, SIGNAL(OnCurrentPositionChanged(internals::PointLatLng)), this, SLOT(OnCurrentPositionChanged(internals::PointLatLng)));    // map poisition change signals
+	connect(m_map, SIGNAL(OnTileLoadComplete()), this, SLOT(OnTileLoadComplete()));				// tile loading stop signals
+	connect(m_map, SIGNAL(OnTileLoadStart()), this, SLOT(OnTileLoadStart()));					// tile loading start signals
+	connect(m_map, SIGNAL(OnMapDrag()), this, SLOT(OnMapDrag()));							// map drag signals
+	connect(m_map, SIGNAL(OnMapZoomChanged()), this, SLOT(OnMapZoomChanged()));					// map zoom changed
+	connect(m_map, SIGNAL(OnMapTypeChanged(MapType::Types)), this, SLOT(OnMapTypeChanged(MapType::Types)));	// map type changed
+	connect(m_map, SIGNAL(OnEmptyTileError(int, core::Point)), this, SLOT(OnEmptyTileError(int, core::Point)));	// tile error
+	connect(m_map, SIGNAL(OnTilesStillToLoad(int)), this, SLOT(OnTilesStillToLoad(int)));				// tile loading signals
 
-    m_map->SetMaxZoom(20);									    // increase the maximum zoom level
-    m_map->SetMouseWheelZoomType(internals::MouseWheelZoomType::MousePositionWithoutCenter);	    // set how the mouse wheel zoom functions
-    m_map->SetFollowMouse(true);								    // we want a contiuous mouse position reading
-    m_map->SetUseOpenGL(openGLAct->isChecked());						    // enable/disable openGL
-    m_map->SetShowTileGridLines(gridLinesAct->isChecked());					    // map grid lines on/off
-    m_map->SetCurrentPosition(internals::PointLatLng(data.Latitude, data.Longitude));		    // set the default map position
+	m_map->SetMaxZoom(20);									    // increase the maximum zoom level
+	m_map->SetMouseWheelZoomType(internals::MouseWheelZoomType::MousePositionWithoutCenter);	    // set how the mouse wheel zoom functions
+	m_map->SetFollowMouse(true);								    // we want a contiuous mouse position reading
+	m_map->SetUseOpenGL(openGLAct->isChecked());						    // enable/disable openGL
+	m_map->SetShowTileGridLines(gridLinesAct->isChecked());					    // map grid lines on/off
+	m_map->SetCurrentPosition(internals::PointLatLng(data.Latitude, data.Longitude));		    // set the default map position
+    }
 
     // **************
 
@@ -132,9 +119,8 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
-    //if (controlpanel_ui) layout->addWidget(controlpanel_ui->layoutWidget);
     layout->addWidget(m_map);
-    setLayout(layout);
+    m_widget->mapWidget->setLayout(layout);
 
     // **************
     // create the user controls overlayed onto the map
@@ -163,7 +149,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 OPMapGadgetWidget::~OPMapGadgetWidget()
 {
     if (m_map) delete m_map;
-    if (controlpanel_ui) delete controlpanel_ui;
+    if (m_widget) delete m_widget;
 }
 
 // *************************************************************************************
@@ -185,10 +171,10 @@ void OPMapGadgetWidget::mouseMoveEvent(QMouseEvent *event)
 //	{	// the mouse has moved
 //	    mouse_lat_lon = lat_lon;
 //
-//	    QString coord_str = " " + QString::number(mouse_lat_lon.Lat(), 'f', 6) + "   " + QString::number(mouse_lat_lon.Lng(), 'f', 6);
+//	    QString coord_str = " " + QString::number(mouse_lat_lon.Lat(), 'f', 6) + "   " + QString::number(mouse_lat_lon.Lng(), 'f', 6) + " ";
 //
 //	    statusLabel.setText(coord_str);
-//	    controlpanel_ui->labelStatus->setText(coord_str);
+//	    widget->labelStatus->setText(coord_str);
 //	}
     }
 
@@ -336,7 +322,7 @@ void OPMapGadgetWidget::statusUpdate()
 	QString coord_str = " " + QString::number(mouse_lat_lon.Lat(), 'f', 6) + "   " + QString::number(mouse_lat_lon.Lng(), 'f', 6);
 
 	statusLabel.setText(coord_str);
-	if (controlpanel_ui) controlpanel_ui->labelStatus->setText(coord_str);
+	if (m_widget) m_widget->labelStatus->setText(coord_str);
     }
 }
 
@@ -347,8 +333,8 @@ void OPMapGadgetWidget::zoomChanged(double zoom)
 {
     int i_zoom = (int)(zoom + 0.5);
 
-    if (controlpanel_ui)
-	controlpanel_ui->labelZoom->setText(" " + QString::number(zoom));
+    if (m_widget)
+	m_widget->labelZoom->setText(" " + QString::number(zoom));
 
     switch (i_zoom)
     {
@@ -381,28 +367,33 @@ void OPMapGadgetWidget::OnMapDrag()
 
 void OPMapGadgetWidget::OnCurrentPositionChanged(internals::PointLatLng point)
 {
+    if (m_widget)
+    {
+	QString coord_str = " " + QString::number(point.Lat(), 'f', 6) + "   " + QString::number(point.Lng(), 'f', 6) + " ";
+	m_widget->labelMapPos->setText(coord_str);
+    }
 }
 
 void OPMapGadgetWidget::OnTilesStillToLoad(int number)
 {
-    if (controlpanel_ui)
+    if (m_widget)
     {
-	if (controlpanel_ui->progressBarMap->maximum() < number)
-	    controlpanel_ui->progressBarMap->setMaximum(number);						// update the maximum number of tiles used
-	controlpanel_ui->progressBarMap->setValue(controlpanel_ui->progressBarMap->maximum() - number);	// update the progress bar
+	if (m_widget->progressBarMap->maximum() < number)
+	    m_widget->progressBarMap->setMaximum(number);					// update the maximum number of tiles used
+	m_widget->progressBarMap->setValue(m_widget->progressBarMap->maximum() - number);	// update the progress bar
 
-//	controlpanel_ui->labelNumTilesToLoad->setText(" " + QString::number(number));
+//	m_widget->labelNumTilesToLoad->setText(" " + QString::number(number));
     }
 }
 
 void OPMapGadgetWidget::OnTileLoadStart()
 {
-    if (controlpanel_ui) controlpanel_ui->progressBarMap->setVisible(true);
+    if (m_widget) m_widget->progressBarMap->setVisible(true);
 }
 
 void OPMapGadgetWidget::OnTileLoadComplete()
 {
-    if (controlpanel_ui) controlpanel_ui->progressBarMap->setVisible(false);
+    if (m_widget) m_widget->progressBarMap->setVisible(false);
 }
 
 void OPMapGadgetWidget::OnMapZoomChanged()
@@ -420,12 +411,23 @@ void OPMapGadgetWidget::OnEmptyTileError(int zoom, core::Point pos)
 // *************************************************************************************
 // user control panel signals
 
+void OPMapGadgetWidget::on_toolButtonReload_clicked()
+{
+    if (m_map)
+	m_map->ReloadMap();
+}
+
+void OPMapGadgetWidget::on_toolButtonFindPlace_clicked()
+{
+    findPlace();
+}
+
 void OPMapGadgetWidget::on_toolButtonRL_clicked()
 {
     if (m_map)
     {
 	m_map->SetRotate(m_map->Rotate() - 1);
-	if (controlpanel_ui) controlpanel_ui->labelRotate->setText(" " + QString::number(m_map->Rotate()));
+	if (m_widget) m_widget->labelRotate->setText(" " + QString::number(m_map->Rotate()));
     }
 }
 
@@ -434,7 +436,7 @@ void OPMapGadgetWidget::on_toolButtonRC_clicked()
     if (m_map)
     {
 	m_map->SetRotate(0);
-	if (controlpanel_ui) controlpanel_ui->labelRotate->setText(" " + QString::number(m_map->Rotate()));
+	if (m_widget) m_widget->labelRotate->setText(" " + QString::number(m_map->Rotate()));
     }
 }
 
@@ -443,7 +445,7 @@ void OPMapGadgetWidget::on_toolButtonRR_clicked()
     if (m_map)
     {
 	m_map->SetRotate(m_map->Rotate() + 1);
-	if (controlpanel_ui) controlpanel_ui->labelRotate->setText(" " + QString::number(m_map->Rotate()));
+	if (m_widget) m_widget->labelRotate->setText(" " + QString::number(m_map->Rotate()));
     }
 }
 
@@ -459,37 +461,39 @@ void OPMapGadgetWidget::on_toolButtonZoomM_clicked()
 
 void OPMapGadgetWidget::on_pushButtonGeoFenceM_clicked()
 {
-    if (controlpanel_ui)
+    if (m_widget)
     {
-	int geo_fence_distance = controlpanel_ui->spinBoxGeoFenceDistance->value();
-	int step = controlpanel_ui->spinBoxGeoFenceDistance->singleStep();
-	controlpanel_ui->spinBoxGeoFenceDistance->setValue(geo_fence_distance - step);
+//	int geo_fence_distance = m_widget->spinBoxGeoFenceDistance->value();
+//	int step = m_widget->spinBoxGeoFenceDistance->singleStep();
+//	m_widget->spinBoxGeoFenceDistance->setValue(geo_fence_distance - step);
 
-	geo_fence_distance = controlpanel_ui->spinBoxGeoFenceDistance->value();
+//	geo_fence_distance = m_widget->spinBoxGeoFenceDistance->value();
+
+
+
+	// to do
+
+
+
     }
-
-
-    // to do
-
-
-
 }
 
 void OPMapGadgetWidget::on_pushButtonGeoFenceP_clicked()
 {
-    if (controlpanel_ui)
+    if (m_widget)
     {
-	int geo_fence_distance = controlpanel_ui->spinBoxGeoFenceDistance->value();
-	int step = controlpanel_ui->spinBoxGeoFenceDistance->singleStep();
-	controlpanel_ui->spinBoxGeoFenceDistance->setValue(geo_fence_distance + step);
+//	int geo_fence_distance = m_widget->spinBoxGeoFenceDistance->value();
+//	int step = m_widget->spinBoxGeoFenceDistance->singleStep();
+//	m_widget->spinBoxGeoFenceDistance->setValue(geo_fence_distance + step);
 
-	geo_fence_distance = controlpanel_ui->spinBoxGeoFenceDistance->value();
+//	geo_fence_distance = m_widget->spinBoxGeoFenceDistance->value();
+
+
+	// to do
+
+
+
     }
-
-    // to do
-
-
-
 }
 
 // *************************************************************************************

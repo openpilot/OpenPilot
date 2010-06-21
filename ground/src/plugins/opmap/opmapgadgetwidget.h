@@ -63,7 +63,7 @@ protected:
 private slots:
     void updatePosition();
 
-    void statusUpdate();
+    void updateMousePos();
 
     void zoomIn();
     void zoomOut();
@@ -121,6 +121,8 @@ private slots:
     void zoom15() { setZoom(15); }
     void zoom16() { setZoom(16); }
     void zoom17() { setZoom(17); }
+    void zoom18() { setZoom(18); }
+    void zoom19() { setZoom(19); }
 
 private:
     double m_heading;	// uav heading
@@ -176,6 +178,8 @@ private:
     QAction *zoom15Act;
     QAction *zoom16Act;
     QAction *zoom17Act;
+    QAction *zoom18Act;
+    QAction *zoom19Act;
 };
 
 #endif /* OPMAP_GADGETWIDGET_H_ */

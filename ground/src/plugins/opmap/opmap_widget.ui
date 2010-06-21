@@ -392,7 +392,7 @@ border: none;
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="labelStatus">
+      <widget class="QLabel" name="labelMousePos">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -409,7 +409,7 @@ border: none;
         </font>
        </property>
        <property name="text">
-        <string>labelStatus</string>
+        <string>labelMousePos</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>

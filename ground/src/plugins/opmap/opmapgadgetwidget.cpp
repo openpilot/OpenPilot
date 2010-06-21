@@ -79,7 +79,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_widget->labelRotate->setText(" " + QString::number(m_map->Rotate()));
 //  m_widget->labelNumTilesToLoad->setText(" 0");
     m_widget->labelMapPos->setText("");
-    m_widget->labelStatus->setText("");
+    m_widget->labelMousePos->setText("");
     m_widget->progressBarMap->setMaximum(1);
 
     // **************
@@ -104,7 +104,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 	connect(m_map, SIGNAL(OnEmptyTileError(int, core::Point)), this, SLOT(OnEmptyTileError(int, core::Point)));	// tile error
 	connect(m_map, SIGNAL(OnTilesStillToLoad(int)), this, SLOT(OnTilesStillToLoad(int)));				// tile loading signals
 
-	m_map->SetMaxZoom(20);									    // increase the maximum zoom level
+	m_map->SetMaxZoom(19);									    // increase the maximum zoom level
 	m_map->SetMouseWheelZoomType(internals::MouseWheelZoomType::MousePositionWithoutCenter);	    // set how the mouse wheel zoom functions
 	m_map->SetFollowMouse(true);								    // we want a contiuous mouse position reading
 	m_map->SetUseOpenGL(openGLAct->isChecked());						    // enable/disable openGL
@@ -125,7 +125,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     // **************
     // create the user controls overlayed onto the map
 
-    createMapOverlayUserControls();
+//    createMapOverlayUserControls();
 
     // **************
     // create the desired timers
@@ -137,7 +137,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_statusUpdateTimer = new QTimer();
     m_statusUpdateTimer->setInterval(100);
-    connect(m_statusUpdateTimer, SIGNAL(timeout()), this, SLOT(statusUpdate()));
+    connect(m_statusUpdateTimer, SIGNAL(timeout()), this, SLOT(updateMousePos()));
     m_statusUpdateTimer->start();
 
     // **************
@@ -205,6 +205,8 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
     zoomMenu.addAction(zoom15Act);
     zoomMenu.addAction(zoom16Act);
     zoomMenu.addAction(zoom17Act);
+    zoomMenu.addAction(zoom18Act);
+    zoomMenu.addAction(zoom19Act);
 
     // ****************
 
@@ -311,7 +313,7 @@ void OPMapGadgetWidget::updatePosition()
     }
 }
 
-void OPMapGadgetWidget::statusUpdate()
+void OPMapGadgetWidget::updateMousePos()
 {
     internals::PointLatLng lat_lon = m_map->currentMousePosition();				// fetch the current lat/lon mouse position
 
@@ -322,7 +324,7 @@ void OPMapGadgetWidget::statusUpdate()
 	QString coord_str = " " + QString::number(mouse_lat_lon.Lat(), 'f', 6) + "   " + QString::number(mouse_lat_lon.Lng(), 'f', 6);
 
 	statusLabel.setText(coord_str);
-	if (m_widget) m_widget->labelStatus->setText(coord_str);
+	if (m_widget) m_widget->labelMousePos->setText(coord_str);
     }
 }
 
@@ -341,21 +343,22 @@ void OPMapGadgetWidget::zoomChanged(double zoom)
 	case 2: if (zoom2Act) zoom2Act->setChecked(true); break;
 	case 3: if (zoom3Act) zoom3Act->setChecked(true); break;
 	case 4: if (zoom4Act) zoom4Act->setChecked(true); break;
-	case 5: if (zoom4Act) zoom5Act->setChecked(true); break;
-	case 6: if (zoom4Act) zoom6Act->setChecked(true); break;
-	case 7: if (zoom4Act) zoom7Act->setChecked(true); break;
-	case 8: if (zoom4Act) zoom8Act->setChecked(true); break;
-	case 9: if (zoom4Act) zoom9Act->setChecked(true); break;
-	case 10: if (zoom4Act) zoom10Act->setChecked(true); break;
-	case 11: if (zoom4Act) zoom11Act->setChecked(true); break;
-	case 12: if (zoom4Act) zoom12Act->setChecked(true); break;
-	case 13: if (zoom4Act) zoom13Act->setChecked(true); break;
-	case 14: if (zoom4Act) zoom14Act->setChecked(true); break;
-	case 15: if (zoom4Act) zoom15Act->setChecked(true); break;
-	case 16: if (zoom4Act) zoom16Act->setChecked(true); break;
-	case 17: if (zoom4Act) zoom17Act->setChecked(true); break;
-	default:
-	    break;
+	case 5: if (zoom5Act) zoom5Act->setChecked(true); break;
+	case 6: if (zoom6Act) zoom6Act->setChecked(true); break;
+	case 7: if (zoom7Act) zoom7Act->setChecked(true); break;
+	case 8: if (zoom8Act) zoom8Act->setChecked(true); break;
+	case 9: if (zoom9Act) zoom9Act->setChecked(true); break;
+	case 10: if (zoom10Act) zoom10Act->setChecked(true); break;
+	case 11: if (zoom11Act) zoom11Act->setChecked(true); break;
+	case 12: if (zoom12Act) zoom12Act->setChecked(true); break;
+	case 13: if (zoom13Act) zoom13Act->setChecked(true); break;
+	case 14: if (zoom14Act) zoom14Act->setChecked(true); break;
+	case 15: if (zoom15Act) zoom15Act->setChecked(true); break;
+	case 16: if (zoom16Act) zoom16Act->setChecked(true); break;
+	case 17: if (zoom17Act) zoom17Act->setChecked(true); break;
+	case 18: if (zoom18Act) zoom18Act->setChecked(true); break;
+	case 19: if (zoom19Act) zoom19Act->setChecked(true); break;
+	default: break;
     }
 }
 
@@ -409,7 +412,7 @@ void OPMapGadgetWidget::OnEmptyTileError(int zoom, core::Point pos)
 }
 
 // *************************************************************************************
-// user control panel signals
+// user control signals
 
 void OPMapGadgetWidget::on_toolButtonReload_clicked()
 {
@@ -783,6 +786,12 @@ void OPMapGadgetWidget::createActions()
     zoom17Act = new QAction(tr("17"), this);
     zoom17Act->setCheckable(true);
     connect(zoom17Act, SIGNAL(triggered()), this, SLOT(zoom17()));
+    zoom18Act = new QAction(tr("18"), this);
+    zoom18Act->setCheckable(true);
+    connect(zoom18Act, SIGNAL(triggered()), this, SLOT(zoom18()));
+    zoom19Act = new QAction(tr("19"), this);
+    zoom19Act->setCheckable(true);
+    connect(zoom19Act, SIGNAL(triggered()), this, SLOT(zoom19()));
     zoomActGroup = new QActionGroup(this);
     zoomActGroup->addAction(zoom2Act);
     zoomActGroup->addAction(zoom3Act);
@@ -800,6 +809,8 @@ void OPMapGadgetWidget::createActions()
     zoomActGroup->addAction(zoom15Act);
     zoomActGroup->addAction(zoom16Act);
     zoomActGroup->addAction(zoom17Act);
+    zoomActGroup->addAction(zoom18Act);
+    zoomActGroup->addAction(zoom19Act);
 
     // ***********************
 }

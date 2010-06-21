@@ -131,11 +131,61 @@ QString NotifyPluginConfiguration::parseNotifyMessage()
 
 	if(position!=0xFF)
 	{
-		if(QFile::exists(getSoundCollectionPath()+"\\"+getCurrentLanguage()+"\\"+QString("%L1 ").arg(getSpinBoxValue())+".wav"))
-			notifyMessageList.insert(position,getSoundCollectionPath()+"\\"+getCurrentLanguage()+"\\"+QString("%L1 ").arg(getSpinBoxValue())+".wav");
-		else
-			if(QFile::exists(getSoundCollectionPath()+"\\"+getCurrentLanguage()+"\\"+QString("%L1 ").arg(getSpinBoxValue())+".wav"))
-				notifyMessageList.insert(position,getSoundCollectionPath()+"\\default\\"+QString("%L1 ").arg(getSpinBoxValue())+".wav");
+		QStringList numberParts = QString("%1").arg(getSpinBoxValue()).trimmed().split(".");
+		QStringList numberFiles;
+
+		if((numberParts.at(0).size()==1) || (numberParts.at(0).toInt()<20))
+		{
+			if(numberParts.at(0)!="0")
+				numberFiles.append(numberParts.at(0));
+		} else {
+			int i=0;
+			if(numberParts.at(0).right(2).toInt()<20) {
+				if(numberParts.at(0).right(2).toInt()<10)
+					numberFiles.append(numberParts.at(0).right(1));
+				else
+					numberFiles.append(numberParts.at(0).right(2));
+				i=2;
+			}
+			for(;i<numberParts.at(0).size();i++)
+			{
+				numberFiles.prepend(numberParts.at(0).at(numberParts.at(0).size()-i-1));
+				if(numberFiles.first()==QString("0")) {
+					numberFiles.removeFirst();
+					continue;
+				}
+				if(i==1)
+					numberFiles.replace(0,numberFiles.first()+'0');
+				if(i==2)
+					numberFiles.insert(1,"100");
+				if(i==3)
+					numberFiles.insert(1,"1000");
+			}
+		}
+
+		if(numberParts.size()>1) {
+			numberFiles.append("point");
+			if((numberParts.at(1).size()==1)  || (numberParts.at(1).toInt()<20))
+				numberFiles.append(numberParts.at(1));
+			else {
+				numberFiles.append(numberParts.at(1).left(1)+'0');
+				numberFiles.append(numberParts.at(1).right(1));
+			}
+		}
+		foreach(QString fileName,numberFiles) {
+			fileName+=".wav";
+			QString filePath = getSoundCollectionPath()+"\\"+getCurrentLanguage()+"\\"+fileName;
+			if(QFile::exists(filePath))
+				notifyMessageList.insert(position++,getSoundCollectionPath()+"\\"+getCurrentLanguage()+"\\"+fileName);
+			else {
+				if(QFile::exists(getSoundCollectionPath()+"\\default\\"+fileName))
+					notifyMessageList.insert(position++,getSoundCollectionPath()+"\\default\\"+fileName);
+				else {
+					notifyMessageList.clear();
+					break; // if no some of *.wav files, then don't play number!
+				}
+			}
+		}
 	}
 
 	//str.replace(QString(".wav | .mp3"), QString(""));

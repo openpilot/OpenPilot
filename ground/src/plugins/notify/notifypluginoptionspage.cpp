@@ -125,6 +125,7 @@ QWidget *NotifyPluginOptionsPage::createPage(QWidget *parent)
 	}
 	options_page->buttonModify->setEnabled(false);
 	options_page->buttonDelete->setEnabled(false);
+	options_page->buttonPlayNotification->setEnabled(false);
 
 	sound1 = Phonon::createPlayer(Phonon::NotificationCategory);
 	sound2 = Phonon::createPlayer(Phonon::NotificationCategory);
@@ -189,7 +190,7 @@ void NotifyPluginOptionsPage::apply()
 	settings->setValue(QLatin1String("EnableSound"), options_page->chkEnableSound->isChecked());
 	settings->endGroup();
 
-	emit updateNotifications();
+	//emit updateNotifications();
 }
 
 void NotifyPluginOptionsPage::finish()
@@ -318,6 +319,7 @@ void NotifyPluginOptionsPage::on_buttonTestSoundNotification_clicked()
 {
 	QList <Phonon::MediaSource> messageNotify;
 	//getOptionsPageValues();
+	if(options_page->tableNotifications->currentRow()==-1) return;
 	notify = privListNotifications.at(options_page->tableNotifications->currentRow());
 	notify->parseNotifyMessage();
 	QStringList stringList = notify->getNotifyMessageList();
@@ -424,6 +426,7 @@ void NotifyPluginOptionsPage::on_tableNotification_changeSelection()
 	updateConfigView(privListNotifications.at(item->row()));
 	options_page->buttonModify->setEnabled(item->isSelected());
 	options_page->buttonDelete->setEnabled(item->isSelected());
+	options_page->buttonPlayNotification->setEnabled(item->isSelected());
 }
 
 void NotifyPluginOptionsPage::on_buttonAddNotification_clicked()
@@ -436,8 +439,6 @@ void NotifyPluginOptionsPage::on_buttonAddNotification_clicked()
 		options_page->SoundDirectoryPathChooser->setPath("please select sound collection folder");
 		return;
 	}
-
-
 
 	notify->setSoundCollectionPath(options_page->SoundDirectoryPathChooser->path());
 	notify->setCurrentLanguage(options_page->SoundCollectionList->currentText());
@@ -476,12 +477,18 @@ void NotifyPluginOptionsPage::on_buttonDeleteNotification_clicked()
 //	if(!privListNotifications.size())
 //		notify = new NotifyPluginConfiguration;
 
+	if(options_page->tableNotifications->rowCount()>1 && row < options_page->tableNotifications->rowCount()-1
+	   /*&& row*/)
+		if(item->isSelected())
+			item->setSelected(false);
+
 	options_page->tableNotifications->removeRow(row);
 
 	if(!options_page->tableNotifications->rowCount())
 	{
 		options_page->buttonDelete->setEnabled(false);
 		options_page->buttonModify->setEnabled(false);
+		options_page->buttonPlayNotification->setEnabled(false);
 	}
 
 }

@@ -23,7 +23,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>140</y>
+     <y>150</y>
      <width>501</width>
      <height>71</height>
     </rect>
@@ -58,6 +58,12 @@
     </item>
     <item row="1" column="7" colspan="3">
      <widget class="QDoubleSpinBox" name="ValueSpinBox">
+      <property name="decimals">
+       <number>2</number>
+      </property>
+      <property name="maximum">
+       <double>9999.899999999999636</double>
+      </property>
       <property name="singleStep">
        <double>1.000000000000000</double>
       </property>
@@ -448,7 +454,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>7</x>
      <y>130</y>
-     <width>481</width>
+     <width>501</width>
      <height>20</height>
     </rect>
    </property>

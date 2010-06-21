@@ -28,6 +28,7 @@
 
 #include "notifyplugin.h"
 #include "notifypluginconfiguration.h"
+#include "notifypluginoptionspage.h"
 #include <coreplugin/icore.h>
 #include <QDebug>
 #include <QtPlugin>
@@ -93,6 +94,11 @@ void SoundNotifyPlugin::connectNotifications()
 
 	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 	UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+
+	QList<Phonon::MediaObject*> deleteList = mapMediaObjects.values();
+	if(!deleteList.isEmpty())
+		foreach(Phonon::MediaObject* mediaObj,deleteList)
+			delete mediaObj;
 
 	// Check validity of arguments first, reject empty args and unknown fields.
 	foreach(NotifyPluginConfiguration* notify,lstNotifications) {

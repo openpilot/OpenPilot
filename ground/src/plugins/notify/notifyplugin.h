@@ -29,8 +29,13 @@
 #define SOUNDNOTIFYPLUGIN_H
 
 #include <extensionsystem/iplugin.h> 
-#include "notifypluginoptionspage.h"
+#include "uavobjects/uavobjectmanager.h"
+#include "uavobjects/uavobject.h"
 #include <QSettings>
+#include <Phonon>
+
+class NotifyPluginOptionsPage;
+class NotifyPluginConfiguration;
 
 class SoundNotifyPlugin : public ExtensionSystem::IPlugin
 { 

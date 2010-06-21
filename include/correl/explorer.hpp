@@ -50,6 +50,8 @@ namespace jafar {
 		}; // class Explorer
 		
 
+		//std::cout << xx << "," << yy << ":" << score << std::endl; \
+
 		#define RESULTS(y,x) results[((y)-(ymin-1))*sa_w+((x)-(xmin-1))]
 		#define DO_CORRELATION(im1, im2, weightMatrix, xx, yy, score, best_score, bestx, besty, roi) \
 				{ \
@@ -67,7 +69,7 @@ namespace jafar {
 //			image::Image im2(im2_, cv::Rect(0,0,im2_.width(),im2_.height()));
 			image::Image im2(im2_);
 			double score;
-			double best_score = 0.;
+			double best_score = -1.;
 			int bestx = -1, besty = -1;
 			
 			if (xmin < 0) xmin = 0; if (xmax >= im2.width ()) xmax = im2.width ()-1;

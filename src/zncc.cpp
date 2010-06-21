@@ -87,8 +87,10 @@ namespace correl {
 				if (useWeightMatrix) w = *(wptr++); else w = 1;
 				if (useBornes) zncc_total += w;
 				
+//std::cout << "will correl ? " << useBornes << ", " << (int)im1v << ", " << (int)im2v << std::endl;
 				if (!useBornes || (im1v != borneinf && im1v != bornesup && im2v != borneinf && im2v != bornesup))
 				{
+//std::cout << "correl one pixel" << std::endl;
 #if 0
 					double im1vw, im2vw;
 					if (useWeightMatrix)
@@ -114,7 +116,8 @@ namespace correl {
 			im2ptr += step2;
 		}
 		
-		if (useBornes) if (zncc_count / zncc_total < 0.5) return 0;
+		if (useBornes) if (zncc_count / zncc_total < 0.5)
+			{ /*std::cout << "zncc failed: " << zncc_count << "," << zncc_total << std::endl; return 0;*/ }
 		
 		// finish
 		mean1 /= zncc_count;

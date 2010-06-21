@@ -36,7 +36,9 @@
 #define DEBUG_PORT		PIOS_COM_TELEM_RF
 #define STACK_SIZE		1024
 #define TASK_PRIORITY	(tskIDLE_PRIORITY + 3)
-//#define ENABLE_DEBUG_MSG
+#define ENABLE_DEBUG_MSG
+//#define DUMP_CONFIG
+
 
 //
 // Private constants
@@ -47,6 +49,9 @@
 #else
 	#define DEBUG_MSG(format, ...)
 #endif
+
+#define CONFIG_LENGTH 6726
+#define MIN(a,b) ((a)<(b)?(a):(b))
 
 #define OSDMSG_V_LS_IDX		10
 #define OSDMSG_V_MS_IDX		18
@@ -148,6 +153,97 @@ static void PositionActualUpdatedCb(UAVObjEvent* ev)
 	newPosData = TRUE;
 }
 
+#ifdef DUMP_CONFIG
+
+static bool Read(uint32_t start, uint8_t length, uint8_t* buffer)
+{
+	bool res = FALSE;
+
+	if (PIOS_I2C_LockDevice(5000 / portTICK_RATE_MS))
+	{
+		uint8_t cmd[5];
+
+		cmd[0] = 0x02;
+		cmd[1] = 0x05;
+		cmd[2] = (uint8_t)(start & 0xFF);
+		cmd[3] = (uint8_t)(start >> 8);
+		cmd[4] = length;
+
+		PIOS_I2C_Transfer(I2C_Write_WithoutStop, 0x30<<1, cmd, 0);
+
+		if (PIOS_I2C_Transfer(I2C_Write_WithoutStop, 0x30<<1, cmd, 5) == 0)
+		{
+			if (PIOS_I2C_Transfer(I2C_Read, 0x30<<1, buffer, length) == 0)
+			{
+				res = TRUE;
+			}
+		}
+		PIOS_I2C_UnlockDevice();
+	}
+
+	return res;
+}
+
+
+
+static void DumpConfig(void)
+{
+	uint8_t buf[50];
+	uint32_t addr=0;
+	uint32_t n;
+	uint32_t i;
+	bool ok;
+
+	while (addr<CONFIG_LENGTH)
+	{
+		n = MIN(CONFIG_LENGTH-addr, sizeof(buf));
+		ok = FALSE;
+		while (!ok)
+		{
+			if (Read(addr, n, buf))
+			{
+#if 0
+				for(i=0; i<n; i++)
+					DEBUG_MSG("%02x ", buf[i]);
+#else
+				PIOS_COM_SendBuffer(DEBUG_PORT, buf, n);
+#endif
+				ok = TRUE;
+			}
+		}
+		//DEBUG_MSG("\n\r");
+		addr += n;
+	}
+
+//	{
+//		FILEINFO file;
+//		uint32_t res;
+//
+//		res = DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t*)"\\a.txt", DFS_READ, PIOS_SDCARD_Sector, &file);
+//		if (res == DFS_OK)
+//		{
+//			DFS_Close(&file);
+//		}
+//		DEBUG_MSG("ReadFile = 0x%x\n", res);
+//
+//		res = DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t*)"\\ConfDump", DFS_WRITE, PIOS_SDCARD_Sector, &file);
+//		if (  res == DFS_OK )
+//		{
+//			uint32_t bytesWritten;
+//			DEBUG_MSG("File Open\n");
+//			res = DFS_WriteFile(&file, PIOS_SDCARD_Sector, buf, &bytesWritten, 10);
+//
+//			DEBUG_MSG("Write 0x%x\n", res);
+//			DFS_Close(&file);
+//		}
+//		else
+//		{
+//			DEBUG_MSG("Error Opening File %x\n", res);
+//		}
+//	}
+}
+#endif
+
 
 static void Task(void* parameters)
 {
@@ -159,7 +255,16 @@ static void Task(void* parameters)
 	PositionActualConnectCallback(PositionActualUpdatedCb);
 	FlightBatteryStateConnectCallback(FlightBatteryStateUpdatedCb);
 
-	DEBUG_MSG("OSD ET Std Started\n\r");
+#ifdef DUMP_CONFIG
+	vTaskDelay(1000 / portTICK_RATE_MS);
+	DEBUG_MSG("DUMP Start\n");
+	DumpConfig();
+	DEBUG_MSG("DUMP End\n");
+	while(1)
+		vTaskDelay(100 / portTICK_RATE_MS);
+#endif
+
+	DEBUG_MSG("OSD ET Std Started\n");
 
 	while (1)
 	{

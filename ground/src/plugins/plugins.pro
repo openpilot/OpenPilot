@@ -114,3 +114,9 @@ SUBDIRS += plugin_hitl
 plugin_config.subdir = config
 plugin_config.depends = plugin_coreplugin
 SUBDIRS += plugin_config
+
+#GPS Display Gadget
+plugin_gpsdisplay.subdir = gpsdisplay
+plugin_gpsdisplay.depends = plugin_coreplugin
+plugin_gpsdisplay.depends = plugin_uavtalk
+SUBDIRS += plugin_gpsdisplay

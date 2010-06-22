@@ -24,7 +24,6 @@
 
 #include "rtslam/hardwareSensorAbstract.hpp"
 #include <image/Image.hpp>
-#include <kernel/misc.hpp>
 
 
 namespace jafar {

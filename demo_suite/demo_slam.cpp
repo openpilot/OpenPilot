@@ -131,7 +131,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	kernel::Chrono chrono;
 	kernel::Chrono total_chrono;
 	kernel::Chrono mutex_chrono;
-	int dt, max_dt = 0;
+	int max_dt = 0;
 	for (int t = 1; t <= NFRAME;) {
 //		sleep(1);
 		bool had_data = false;

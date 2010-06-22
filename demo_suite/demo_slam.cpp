@@ -36,7 +36,7 @@
 #include "rtslam/rawImage.hpp"
 #include "rtslam/descriptorImagePoint.hpp"
 
-#include "rtslam/hardwareSensorCameraFirewire.hpp"
+//#include "rtslam/hardwareSensorCameraFirewire.hpp"
 
 #include "rtslam/display_qt.hpp"
 //#include "image/Image.hpp"
@@ -250,6 +250,7 @@ int total_match_time = 0;
 								obsPtr->counters.nInlier++;
 								obsPtr->update() ;
 //std::cout << chronototal.elapsed() << " has updated" << std::endl;
+
 								obsPtr->events.updated = true;
 							} // obsPtr->compatibilityTest(3.0)
 						} // obsPtr->getScoreMatchInPercent()>80
@@ -376,8 +377,8 @@ void demo_slam01() {
 	world_ptr_t worldPtr(new WorldAbstract());
 	
 	// to start with qt display
-	const int slam_priority = 10; // needs to be started as root to be > 0
-	const int display_priority = -10;
+	const int slam_priority = 0; // needs to be started as root to be > 0
+	const int display_priority = 0;
 	const int display_period = 100; // ms
 	qdisplay::QtAppStart((qdisplay::FUNC)&demo_slam01_display,slam_priority,(qdisplay::FUNC)&demo_slam01_main,display_priority,display_period,&worldPtr);
 	// to start without display

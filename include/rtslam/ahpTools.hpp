@@ -359,7 +359,27 @@ namespace jafar {
 				AHP_rho(6, 0) = nv; //                         drho / drho
 			} // OK JS April 1 2010
 
+			template<class VA, class VS, class MA_s>
+			double linearityScore(const VA & ahp, const VS & sen, const MA_s & RHO){
 
+					vec3 euc;
+					mat EUC_ahp(1,7);
+
+					ahp2euc(ahp,euc,EUC_ahp);
+
+					vec3 hw = euc - subrange(sen, 0, 3);
+
+					double sigma_rho = sqrt(RHO(7,7));
+
+					double sigma_d   = sigma_rho/ahp(7)^2;
+					double d1        = norm_2(hw);
+					double cos_a     =  trans(subrange(sen, 3, 6)) * hw/d1;
+
+					return 4*sigma_d/d1*abs(cos_a);
+
+
+
+		}
 
 		} // namespace landmarkAHP
 

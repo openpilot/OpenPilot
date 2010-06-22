@@ -35,6 +35,7 @@
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/mapObject.hpp"
 #include "rtslam/descriptorAbstract.hpp"
+//#include "rtslam/observationAbstract.hpp"
 #include "rtslam/parents.hpp"
 
 #include <boost/smart_ptr.hpp>
@@ -76,9 +77,13 @@ namespace jafar {
 
 				/**
 				 * Mandatory virtual destructor.
+				 *
+				 * We purposely kill all links from sensors to the observations depending on this landmark.
+				 * This way, killing the landmark will kill all derived observations because
+				 * all shared_ptr will be eliminated.
 				 */
-				virtual ~LandmarkAbstract() {
-				}
+				virtual ~LandmarkAbstract();
+
 
 				static IdFactory landmarkIds;
 				void setId(){id(landmarkIds.getId());}
@@ -132,11 +137,28 @@ namespace jafar {
 				{
 					descriptorPtr = descPtr;
 				}
-//				{
-//					this->descriptor = desc_ptr_t (new DescriptorAbstract()) ;
-//					this->descriptor->pose0 = sensorPose;
-//					this->descriptor->app0Ptr = appPtr;
-//				}
+
+				enum DieMethod {
+						ANY,
+						ALL,
+						MAJORITY
+				};
+
+				/**
+				 * Evaluate the landmark's need to die.
+				 *
+				 * This is a heuristic based on each observation statistics (the counters).
+				 * \param dieMet the method defining the heuristic: ANY, ALL or MAJORITY
+				 * \return \a true if the landmark should die.
+				 */
+				bool needToDie(DieMethod dieMet = ANY);
+
+				/**
+				 * Suicide
+				 *
+				 * We cut the linik to parent and the object naturally dies.
+				 */
+				void suicide();
 
 		};
 

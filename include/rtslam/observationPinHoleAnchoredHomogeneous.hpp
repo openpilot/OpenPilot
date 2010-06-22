@@ -15,7 +15,6 @@
 #include "rtslam/observationAbstract.hpp"
 #include "rtslam/sensorPinHole.hpp"
 #include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
-#include "rtslam/imageManagerPoint.hpp"
 //#include "rtslam/parents.hpp"
 #include "boost/shared_ptr.hpp"
 
@@ -33,9 +32,8 @@ namespace jafar {
 		 */
 		class ObservationPinHoleAnchoredHomogeneousPoint: public ObservationAbstract,
 		    public SpecificChildOf<SensorPinHole> ,
-		    public SpecificChildOf<LandmarkAnchoredHomogeneousPoint> ,
-		    public ChildOf<ImageManagerPoint> {
-
+		    public SpecificChildOf<LandmarkAnchoredHomogeneousPoint>
+		    {
 
 				// Define the function linkToParentPinHole.
 			ENABLE_LINK_TO_SPECIFIC_PARENT(SensorAbstract,SensorPinHole,PinHole,ObservationAbstract)
@@ -50,21 +48,10 @@ namespace jafar {
 			ENABLE_ACCESS_TO_SPECIFIC_PARENT(LandmarkAnchoredHomogeneousPoint,ahp)
 				;
 
-				// Define the function linkToWeakParentDataManager().
-				ENABLE_LINK_TO_WEAK_SPECIFIC_PARENT(DataManagerAbstract,ImageManagerPoint,
-						ObservationAbstract,ObservationPinHoleAnchoredHomogeneousPoint,DataManager)
-				;
-
-				// Define the functions imageManager() and imageManagerPtr().
-			ENABLE_ACCESS_TO_PARENT(ImageManagerPoint,imageManager)
-				;
-
 			public:
 
 				ObservationPinHoleAnchoredHomogeneousPoint(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & ahpPtr);
 				~ObservationPinHoleAnchoredHomogeneousPoint(void) {
-					UNREGISTER_FROM_WEAK_SPECIFIC_PARENT(DataManagerAbstract,ObservationAbstract);
-					UNREGISTER_FROM_WEAK_SPECIFIC_PARENT(ImageManagerPoint,ObservationPinHoleAnchoredHomogeneousPoint);
 				}
 
 				virtual std::string typeName() {
@@ -117,12 +104,6 @@ namespace jafar {
 				 * find and match the expected appearence in the raw-data
 				 */
 				virtual void matchFeature(raw_ptr_t rawPtr);
-
-			public:
-				/* Search in the sensor().dataManagerList() the manager of the proper type, to be
-				 * linked as the weak-father of this observation.
-				 */
-				void linkToWeakParentDataManager(void);
 
 			public:
 				double pixelNoise;

@@ -204,6 +204,19 @@ namespace jafar {
 		}
 
 
+		bool ObservationAbstract::voteForKillingLandmark(){
+			predictInfoGain();
+			if (expectation.infoGain > 60000) {
+				return true;
+				cout << "infoGain(" << id() << "): " << expectation.infoGain << endl;
+			}
+			if (counters.nSearch > 10) {
+				double matchRatio = counters.nMatch / (double) counters.nSearch;
+				double consistencyRatio = counters.nInlier / (double)counters.nMatch;
+				if (matchRatio < 0.1 || consistencyRatio < 0.5)	return true;
+			}
+			return false;
+		}
 
 
 

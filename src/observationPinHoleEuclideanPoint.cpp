@@ -121,28 +121,6 @@ namespace jafar {
 			return events.visible;
 		}
 
-		void ObservationPinHoleEuclideanPoint::linkToWeakParentDataManager(
-		    void) {
-			if (!sensorPtr()) {
-				std::cerr << __PRETTY_FUNCTION__
-				    << ": error: senPtr not set yet, linkToParentSensor first."
-				    << std::endl;
-				//throw			"SENPTR no set.";
-			}
-			SensorAbstract & sen = *sensorPtr();
-			typedef SensorAbstract::DataManagerList dmalist_t;
-			dmalist_t & dmalist = sen.dataManagerList();
-			// Loop
-			for (dmalist_t::iterator iter = dmalist.begin(); iter != dmalist.end(); iter++) {
-				boost::shared_ptr<DataManagerAbstract> dma = *iter;
-				boost::shared_ptr<ImageManagerPoint> dms = boost::dynamic_pointer_cast<
-				    ImageManagerPoint>(dma);
-				if ((bool) dms) continue; // this is not the proper type ... continue.
-				linkToWeakParentDataManager(dms);
-				return;
-			}
-		}
-
 		void ObservationPinHoleEuclideanPoint::predictAppearance() {
 			desc_img_pnt_ptr_t descPtr = boost::static_pointer_cast<DescriptorImagePoint>(landmarkPtr()->descriptorPtr);
 			obs_ph_euc_ptr_t _this = boost::static_pointer_cast<ObservationPinHoleEuclideanPoint>(shared_from_this());

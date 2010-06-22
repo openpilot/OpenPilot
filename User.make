@@ -26,5 +26,5 @@ CPPFLAGS += $(OPENCV_CPPFLAGS) $(QT4_CPPFLAGS) $(BOOST_CPPFLAGS) $(BOOST_SANDBOX
 #CXXFLAGS += -g -O0 -ggdb -Wall -pthread
 
 # release:
-CXXFLAGS += -Wall -pthread -O2
+CXXFLAGS += -Wall -pthread -O2 -g
 CPPFLAGS += -DJFR_NDEBUG -DNDEBUG

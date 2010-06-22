@@ -114,6 +114,7 @@ namespace jafar {
 				                    const size_t _size_exp, const size_t _size_inn, const size_t _size_nonobs = 0);
 
 				virtual ~ObservationAbstract() {
+//					cout << "Deleted observation: " << id() << endl;
 				}
 
 				virtual void setup(double _noiseStd, const Gaussian & _prior);
@@ -131,6 +132,7 @@ namespace jafar {
 				// indirect arrays
 				ind_array ia_rsl; ///<    Ind. array of mapped indices of robot, sensor and landmark (ie, sensor might or might not be there).
 
+			public:
 				// Jacobians
 				mat SG_rs; ///<						Jacobian of global sensor pose wrt. robot and sensor mapped states
 				mat EXP_sg; ///<				 	Jacobian of expectation wrt. global sensor pose
@@ -144,6 +146,7 @@ namespace jafar {
 				mat LMK_prior; ///<      	Jacobian of the landmark wrt. the prior.
 				mat LMK_rs; ///<         	Jacobian of the landmark wrt. the robot and sensor mapped states.
 
+			public:
 				/**
 				 * Counters
 				 */
@@ -329,6 +332,9 @@ namespace jafar {
 					}
 
 				void update() ;
+
+				bool voteForKillingLandmark();
+
 		};
 
 	}

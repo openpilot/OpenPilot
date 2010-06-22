@@ -36,7 +36,7 @@ template<class Child>
 class ParentOf {
 public:
 	typedef boost::shared_ptr<Child> Child_ptr;
-	typedef std::vector<Child_ptr> ChildList;
+	typedef std::list<Child_ptr> ChildList;
 
 public:
 	ChildList childList;
@@ -50,7 +50,9 @@ public:
 		childList.push_back(ptr);
 	}
 	void unregisterChild(const Child_ptr & ptr) {
-		remove(childList.begin(), childList.end(), ptr);
+//		remove(childList.begin(), childList.end(), ptr);
+		childList.remove(ptr);
+//		childList.pop_back();
 	}
 
 	void display(std::ostream& os) const {

@@ -120,3 +120,9 @@ plugin_gpsdisplay.subdir = gpsdisplay
 plugin_gpsdisplay.depends = plugin_coreplugin
 plugin_gpsdisplay.depends = plugin_uavtalk
 SUBDIRS += plugin_gpsdisplay
+
+# Primary Flight Display (PFD) Gadget
+plugin_pfd.subdir = pfd
+plugin_pfd.depends = plugin_coreplugin
+plugin_pfd.depends = plugin_uavobjects
+SUBDIRS += plugin_pfd

@@ -37,7 +37,7 @@
 #include "rtslam/rawImage.hpp"
 #include "rtslam/descriptorImagePoint.hpp"
 
-#include "rtslam/hardwareSensorCameraFirewire.hpp"
+//#include "rtslam/hardwareSensorCameraFirewire.hpp"
 
 #include "rtslam/display_qt.hpp"
 

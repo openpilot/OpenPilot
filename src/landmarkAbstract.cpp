@@ -14,6 +14,8 @@
 #include "rtslam/landmarkAbstract.hpp"
 #include "rtslam/observationAbstract.hpp"
 #include "rtslam/mapAbstract.hpp"
+#include "rtslam/landmarkEuclideanPoint.hpp"
+#include "rtslam/observationPinHoleEuclideanPoint.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -91,10 +93,25 @@ namespace jafar {
 
 		void LandmarkAbstract::reparametrize() {
 			//TODO Implement reparametrize():
+
 			// - create a new STD landmark.
+			eucp_ptr_t lmkPtr(new LandmarkEuclideanPoint(mapPtr()));
+
 			// - create its set of observations, one per sensor.
-			// - Link the landmark to map and observations.
-			// - Link the sensors to the new observations.
+			observation_ptr_t obsPtr;
+							for (LandmarkAbstract::ObservationList::iterator obsIter = this->observationList().begin(); obsIter != this->observationList().end(); obsIter++)
+							{
+								obsPtr = *obsIter;
+								obs_ph_euc_ptr_t obsPtrEuc(new ObservationPinHoleEuclideanPoint(obsPtr->sensorPtr(), lmkPtr));
+
+								// - Link the landmark to map and observations.
+								obsPtrEuc->linkToParentEUC(lmkPtr);
+
+								// - Link the sensors to the new observations.
+								obsPtrEuc->linkToParentPinHole(obsPtr->sensorPtr());
+
+							}
+
 			// - call reparametrize_func()
 			// - compute the new ind_array as a sub-set of the old one
 			// - call filter->reparametrize()

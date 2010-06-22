@@ -1,10 +1,13 @@
 <RCC>
     <qresource prefix="/opmap">
-        <file>images/gcs.png</file>
         <file>images/uav.png</file>
         <file>images/waypoint.png</file>
         <file>images/minus.png</file>
         <file>images/plus.png</file>
         <file>images/ok.png</file>
+        <file>images/go.png</file>
+        <file>images/home.png</file>
+        <file>images/pause.png</file>
+        <file>images/gcs.png</file>
     </qresource>
 </RCC>

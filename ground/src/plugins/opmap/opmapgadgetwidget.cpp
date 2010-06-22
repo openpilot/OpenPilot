@@ -512,11 +512,27 @@ void OPMapGadgetWidget::on_pushButtonGeoFenceP_clicked()
 
 void OPMapGadgetWidget::on_comboBoxZoom_currentIndexChanged(int index)
 {
-    bool ok;
-    int i = (int)m_widget->comboBoxZoom->itemData(index).toInt(&ok);
-    setZoom(2 + index);
+    if (m_widget)
+    {
+	bool ok;
+	int i = (int)m_widget->comboBoxZoom->itemData(index).toInt(&ok);
+	setZoom(2 + index);
+    }
 }
 
+
+void OPMapGadgetWidget::on_toolButtonFlightControlsShowHide_clicked()
+{
+    if (m_widget)
+    {
+	m_widget->widgetFlightControlButtons->setVisible(!m_widget->widgetFlightControlButtons->isVisible());
+
+	if (m_widget->widgetFlightControlButtons->isVisible())
+	    m_widget->toolButtonFlightControlsShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/next.png")));
+	else
+	    m_widget->toolButtonFlightControlsShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/prev.png")));
+    }
+}
 
 // *************************************************************************************
 // public functions

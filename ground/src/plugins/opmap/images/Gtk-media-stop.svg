@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd"
+[
+ <!ATTLIST svg
+  xmlns:xlink CDATA #FIXED "http://www.w3.org/1999/xlink">
+]>
+<!-- Created with Sodipodi ("http://www.sodipodi.com/") -->
+<svg
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   version="1"
+   x="0.00000000"
+   y="0.00000000"
+   width="60.0000000"
+   height="60.0000000"
+   viewBox="0 0 256 256"
+   id="svg548">
+  <defs
+     id="defs573" />
+  <g
+     style="font-size:12;stroke:#000000;"
+     id="Layer_1">
+    <path
+       d="M 256 256 L 0 256 L 0 0 L 256 0 L 256 256 z "
+       style="fill:none;stroke:none;"
+       id="path550" />
+  </g>
+  <g
+     style="font-size:12;stroke:#000000;"
+     id="Layer_2">
+    <path
+       d="M 244.664 239 C 244.664 244.522 240.187 249 234.664 249 L 35 249 C 29.477 249 25 244.522 25 239 L 25 39.333 C 25 33.81 29.477 29.333 35 29.333 L 234.664 29.333 C 240.187 29.333 244.664 33.81 244.664 39.333 L 244.664 239 z "
+       style="opacity:0.2;stroke:none;"
+       id="path552" />
+    <path
+       d="M 233.54 228 C 233.54 233.522 229.063 238 223.54 238 L 23.875 238 C 18.352 238 13.875 233.522 13.875 228 L 13.875 28.333 C 13.875 22.81 18.352 18.333 23.875 18.333 L 223.54 18.333 C 229.063 18.333 233.54 22.81 233.54 28.333 L 233.54 228 z "
+       style="fill:#660000;stroke:none;"
+       id="path553" />
+    <path
+       d="M 23.875 28.333 L 23.862 28.333 L 23.875 228 L 223.54 228 L 223.54 28.333 L 23.875 28.333 z "
+       style="fill:#cc0000;stroke:none;"
+       id="path554" />
+    <linearGradient
+       x1="123.706100"
+       y1="230.664093"
+       x2="123.706100"
+       y2="174.664795"
+       id="XMLID_1_"
+       gradientUnits="userSpaceOnUse"
+       spreadMethod="pad">
+      <stop
+         style="stop-color:#ff9999;stop-opacity:1;"
+         offset="0.00000000"
+         id="stop556" />
+      <stop
+         style="stop-color:#ff0000;stop-opacity:1;"
+         offset="0.03370000"
+         id="stop557" />
+      <stop
+         style="stop-color:#cc0000;stop-opacity:1;"
+         offset="1.00000000"
+         id="stop558" />
+      <a:midPointStop
+         offset="0"
+         style="stop-color:#FF9999"
+         id="midPointStop559" />
+      <a:midPointStop
+         offset="0.5"
+         style="stop-color:#FF9999"
+         id="midPointStop560" />
+      <a:midPointStop
+         offset="0.0337"
+         style="stop-color:#FF0000"
+         id="midPointStop561" />
+      <a:midPointStop
+         offset="0.5"
+         style="stop-color:#FF0000"
+         id="midPointStop562" />
+      <a:midPointStop
+         offset="1"
+         style="stop-color:#CC0000"
+         id="midPointStop563" />
+    </linearGradient>
+    <path
+       d="M 28.872 160.333 C 28.872 168.364 28.875 214.97 28.875 223 C 38.136 223 209.278 223 218.54 223 C 218.54 214.97 218.54 168.363 218.54 160.333 C 209.278 160.333 38.133 160.333 28.872 160.333 z "
+       style="fill:url(#XMLID_1_);stroke:none;"
+       id="path564" />
+    <linearGradient
+       x1="123.701698"
+       y1="31.3300991"
+       x2="123.701698"
+       y2="102.665001"
+       id="XMLID_2_"
+       gradientUnits="userSpaceOnUse"
+       spreadMethod="pad">
+      <stop
+         style="stop-color:#ff9999;stop-opacity:1;"
+         offset="0.00000000"
+         id="stop566" />
+      <stop
+         style="stop-color:#cc0000;stop-opacity:1;"
+         offset="1.00000000"
+         id="stop567" />
+      <a:midPointStop
+         offset="0"
+         style="stop-color:#FF9999"
+         id="midPointStop568" />
+      <a:midPointStop
+         offset="0.5"
+         style="stop-color:#FF9999"
+         id="midPointStop569" />
+      <a:midPointStop
+         offset="1"
+         style="stop-color:#CC0000"
+         id="midPointStop570" />
+    </linearGradient>
+    <path
+       d="M 28.863 33.333 C 28.863 41.469 28.866 92.197 28.867 100.333 C 38.128 100.333 209.278 100.333 218.54 100.333 C 218.54 92.197 218.54 41.469 218.54 33.333 C 209.278 33.333 38.103 33.333 28.863 33.333 z "
+       style="fill:url(#XMLID_2_);stroke:none;"
+       id="path571" />
+  </g>
+</svg>

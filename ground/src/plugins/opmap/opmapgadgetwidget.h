@@ -68,7 +68,7 @@ private slots:
     void zoomIn();
     void zoomOut();
 
-    // control panel signals
+    // user control signals
     void on_toolButtonReload_clicked();
     void on_toolButtonFindPlace_clicked();
     void on_toolButtonRR_clicked();
@@ -79,6 +79,8 @@ private slots:
     void on_pushButtonGeoFenceM_clicked();
     void on_pushButtonGeoFenceP_clicked();
     void on_comboBoxZoom_currentIndexChanged(int index);
+    void on_toolButtonFlightControlsShowHide_clicked();
+
 
     // map signals
     void zoomChanged(double zoom);

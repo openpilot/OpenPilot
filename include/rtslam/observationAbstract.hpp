@@ -311,12 +311,6 @@ namespace jafar {
 				 */
 				virtual void predictAppearance() = 0;
 
-				/**
-				 * find and match the expected appearence in the raw-data
-				 */
-				virtual void matchFeature(raw_ptr_t) = 0;
-
-
 				virtual double getMatchScore() = 0;
 
 				/**
@@ -333,7 +327,9 @@ namespace jafar {
 
 				void update() ;
 
-				bool voteForKillingLandmark();
+				virtual bool voteForKillingLandmark();
+
+				virtual bool voteForReparametrizeLandmark() = 0;
 
 		};
 

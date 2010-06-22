@@ -138,7 +138,7 @@ namespace jafar {
 					descriptorPtr = descPtr;
 				}
 
-				enum DieMethod {
+				enum DecisionMethod {
 						ANY,
 						ALL,
 						MAJORITY
@@ -151,7 +151,7 @@ namespace jafar {
 				 * \param dieMet the method defining the heuristic: ANY, ALL or MAJORITY
 				 * \return \a true if the landmark should die.
 				 */
-				bool needToDie(DieMethod dieMet = ANY);
+				bool needToDie(DecisionMethod dieMet = ANY);
 
 				/**
 				 * Suicide
@@ -159,6 +159,11 @@ namespace jafar {
 				 * We cut the linik to parent and the object naturally dies.
 				 */
 				void suicide();
+
+				/**
+				 * Evaluate the landmark's conditions for reparametrization
+				 */
+				virtual bool needToReparametrize(DecisionMethod repMethod = ALL);
 
 		};
 

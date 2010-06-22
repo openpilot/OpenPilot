@@ -51,6 +51,7 @@ namespace jafar {
 			if (success) {
 				featPtr->setup(pixBest[0]+0.5, pixBest[1]+0.5, scoreBest);
 			}
+//			cout << "Harris [" << scoreBest << "]: (" << pixBest[0] << "," << pixBest[1] << ")" << endl;
 			return success;
 		}
 

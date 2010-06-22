@@ -99,11 +99,10 @@ namespace jafar {
 					return measurement.matchScore;
 				}
 
-
-				/**
-				 * find and match the expected appearence in the raw-data
-				 */
-				virtual void matchFeature(raw_ptr_t rawPtr);
+				virtual bool voteForReparametrizeLandmark(){
+					// TODO implement this.
+					return true;
+				}
 
 			public:
 				double pixelNoise;

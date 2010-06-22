@@ -141,20 +141,6 @@ namespace jafar {
 			descPtr->predictAppearance(_this);
 		}
 
-		/**
-		 * find and match the expected appearence in the raw-data
-		 */
-		void ObservationPinHoleAnchoredHomogeneousPoint::matchFeature(
-		    raw_ptr_t rawPtr) {
-			// TODO call the namespace image with the raw
-			// fixme these lines below only for compilation purposes
-			measurement.x(expectation.x());
-			identity_mat I(2);
-			measurement.P(I);
-			measurement.matchScore = 1.00;
-
-			events.measured = true;
-		}
 
 	}
 }

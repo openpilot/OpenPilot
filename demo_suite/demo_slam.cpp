@@ -55,16 +55,16 @@ void demo_slam01_main(world_ptr_t *world) {
 	const int    	NFRAME      = 5000;
 	const int    	NUPDATES    = 1000;
 	const double 	FRAMERATE   = 60;
-	const int    	PATCHSIZE   = 9;
+	const int    	PATCHSIZE   = 11;
 	const int			PATCHDESC		= PATCHSIZE*3;
 	const double 	HARRIS_TH   = 20;
 	const double 	HARRIS_EDGE = 2;
-	const int 		GRID_UCELLS	= 4;
-	const int			GRID_VCELLS	= 4;
+	const int 		GRID_UCELLS	= 5;
+	const int			GRID_VCELLS	= 5;
 	const int			GRID_MARGIN	= (PATCHDESC-1)/2;
-	const int			GRID_SEPAR	= PATCHSIZE*2;
-	const double	PERT_VLIN		= 1.0; // m/s per sqrt(s)
-	const double	PERT_VANG		= 2.0; // rad/s per sqrt(s)
+	const int			GRID_SEPAR	= PATCHSIZE*3;
+	const double	PERT_VLIN		= 2.0; // m/s per sqrt(s)
+	const double	PERT_VANG		= 4.0; // rad/s per sqrt(s)
 
 	int imgWidth = 640, imgHeight = 480;
 	double _d[3] = {-0.27572, 0.28827}; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};

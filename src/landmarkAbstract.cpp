@@ -46,6 +46,48 @@ namespace jafar {
 //			cout << "Deleted landmark: " << id() << endl;
 		}
 
+		bool LandmarkAbstract::needToReparametrize(DecisionMethod repMet){
+			switch (repMet) {
+				case ANY : {
+					for (ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end(); obsIter++)
+					{
+						observation_ptr_t obsPtr = *obsIter;
+						// Drastic option: ANY vote for reparametrization declares the need of reparametrization.
+						if (obsPtr->voteForReparametrizeLandmark()) return true;
+					}
+					return false;
+				}
+				case ALL : {
+					for (ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end(); obsIter++)
+					{
+						observation_ptr_t obsPtr = *obsIter;
+						// Magnanimous option: ALL votes for reparametrization necessary to declare the need of reparametrization.
+						if (!obsPtr->voteForReparametrizeLandmark()) return false;
+					}
+					return true;
+				}
+				case MAJORITY : {
+					int nRepar = 0, nKeep = 0;
+					for (ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end(); obsIter++)
+					{
+						observation_ptr_t obsPtr = *obsIter;
+						// Democratic option: MAJORITY votes declares the need of reparametrization.
+						if (obsPtr->voteForReparametrizeLandmark()) nRepar++;
+						else nKeep++;
+					}
+					if (nRepar > nKeep) return true;
+					return false;
+
+				}
+				default : {
+					cout << __FILE__ << ":" << __LINE__ << ": Bad evaluation method. Using ANY." << endl;
+					return needToReparametrize(ANY);
+				}
+			}
+			return false;
+		}
+
+
 
 		void LandmarkAbstract::reparametrize() {
 			//TODO Implement reparametrize():
@@ -61,7 +103,7 @@ namespace jafar {
 			// - delete old lmk <-- this will delete all old obs!
 		}
 
-		bool LandmarkAbstract::needToDie(DieMethod dieMet){
+		bool LandmarkAbstract::needToDie(DecisionMethod dieMet){
 			switch (dieMet) {
 				case ANY : {
 					for (ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end(); obsIter++)

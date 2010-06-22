@@ -127,13 +127,5 @@ namespace jafar {
 			descPtr->predictAppearance(_this);
 		}
 
-		/**
-		 * find and match the expected appearence in the raw-data
-		 */
-		void ObservationPinHoleEuclideanPoint::matchFeature(
-		    raw_ptr_t rawPtr) {
-			// TODO call the namespace image with the raw
-		}
-
 	}
 }

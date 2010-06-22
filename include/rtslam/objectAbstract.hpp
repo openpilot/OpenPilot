@@ -58,10 +58,7 @@ namespace jafar {
 
 			public:
 				ObjectAbstract();
-				virtual ~ObjectAbstract() {
-					for(std::vector<display::DisplayDataAbstract*>::iterator it = displayData.begin(); it != displayData.end(); ++it)
-						delete *it;
-				}
+				virtual ~ObjectAbstract();
 				inline void id(std::size_t _id) {
 					id_ = _id;
 				}

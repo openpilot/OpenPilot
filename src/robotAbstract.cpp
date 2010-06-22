@@ -29,8 +29,7 @@ namespace jafar {
 		 */
 		ostream& operator <<(ostream & s, RobotAbstract & rob) {
 			s << rob.categoryName() << " " << rob.id() << ": ";
-			if (rob.name().size() > 0)
-				s << rob.name() << ", ";
+			if (rob.name().size() > 0) s << rob.name() << ", ";
 			s << "of type " << rob.typeName() << endl;
 			s << ".state:  " << rob.state << endl;
 			s << ".pose :  " << rob.pose << endl;

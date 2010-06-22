@@ -11,7 +11,6 @@
 #include "rtslam/observationAbstract.hpp"
 #include "rtslam/sensorPinHole.hpp"
 #include "rtslam/landmarkEuclideanPoint.hpp"
-#include "rtslam/imageManagerPoint.hpp"
 #include "boost/shared_ptr.hpp"
 
 namespace jafar {
@@ -28,8 +27,8 @@ namespace jafar {
 		 */
 		class ObservationPinHoleEuclideanPoint: public ObservationAbstract,
 		    public SpecificChildOf<SensorPinHole> ,
-		    public SpecificChildOf<LandmarkEuclideanPoint> ,
-		    public ChildOf<ImageManagerPoint>{
+		    public SpecificChildOf<LandmarkEuclideanPoint>
+		{
 
 
 			// Define the function linkToParentPinHole.
@@ -44,26 +43,11 @@ namespace jafar {
 			// Define the functions euc() and eucPtr().
 			ENABLE_ACCESS_TO_SPECIFIC_PARENT(LandmarkEuclideanPoint,euc);
 
-			// Define the function linkToWeakParentDataManager().
-			ENABLE_LINK_TO_WEAK_SPECIFIC_PARENT(
-					DataManagerAbstract,
-					ImageManagerPoint,
-					ObservationAbstract,
-					ObservationPinHoleEuclideanPoint,
-					DataManager)
-			;
-
-			// Define the functions imageManager() and imageManagerPtr().
-		ENABLE_ACCESS_TO_PARENT(ImageManagerPoint,imageManager)
-			;
-
 			public:
 
 			ObservationPinHoleEuclideanPoint(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr);
 			~ObservationPinHoleEuclideanPoint(void){
-					UNREGISTER_FROM_WEAK_SPECIFIC_PARENT(DataManagerAbstract,ObservationAbstract);
-					UNREGISTER_FROM_WEAK_SPECIFIC_PARENT(ImageManagerPoint,ObservationPinHoleAnchoredHomogeneousPoint);
-				}
+					}
 
 			void setup(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr, double _noiseStd, int patchSize);
 
@@ -112,17 +96,10 @@ namespace jafar {
 					return measurement.matchScore;
 				}
 
-
-				/**
-				 * find and match the expected appearence in the raw-data
-				 */
-				virtual void matchFeature(raw_ptr_t rawPtr);
-
-			public:
-				/* Search in the sensor().dataManagerList() the manager of the proper type, to be
-				 * linked as the weak-father of this observation.
-				 */
-				void linkToWeakParentDataManager(void);
+				virtual bool voteForReparametrizeLandmark(){
+					// TODO implement this.
+					return false;
+				}
 
 			public:
 				double pixelNoise;

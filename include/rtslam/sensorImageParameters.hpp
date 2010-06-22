@@ -25,6 +25,7 @@ namespace jafar{
 
 			public:
 
+				// Image size
 				unsigned int width;
 				unsigned int height;
 

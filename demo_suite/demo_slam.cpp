@@ -325,7 +325,6 @@ int total_match_time = 0;
 					} // getROI()
 				} // unusedStates()
 
-				senPtr->releaseRaw();
 				had_data = true;
 
 			} // for each sensor

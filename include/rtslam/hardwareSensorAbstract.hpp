@@ -34,7 +34,6 @@ class HardwareSensorAbstract
 		@note must be non blocking
 		*/
 		virtual int acquireRaw(raw_ptr_t &rawPtr) = 0;
-		virtual void releaseRaw() = 0;
 		virtual ~HardwareSensorAbstract() {}
 };
 

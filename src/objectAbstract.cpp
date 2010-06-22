@@ -13,6 +13,7 @@
 #include <iostream>
 
 #include "rtslam/objectAbstract.hpp"
+#include "rtslam/display.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -33,6 +34,12 @@ namespace jafar {
 		ObjectAbstract::ObjectAbstract() :
 			id_(0), category(OBJECT) {
 		}
+		
+		ObjectAbstract::~ObjectAbstract() {
+			for(std::vector<display::DisplayDataAbstract*>::iterator it = displayData.begin(); it != displayData.end(); ++it)
+				delete *it;
+		}
+		
 
 	}
 }

@@ -59,14 +59,6 @@ namespace jafar {
 			}
 		}
 
-		void SensorPinHole::releaseRaw(){
-
-			if (hardwareSensorPtr)
-			{
-				hardwareSensorPtr->releaseRaw();
-			}
-		}
-		
 		raw_ptr_t SensorPinHole::getRaw() {
 //			image_ptr_t ip = rawPtr;
 			return rawPtr;

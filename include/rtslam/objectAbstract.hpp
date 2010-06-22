@@ -58,8 +58,7 @@ namespace jafar {
 
 			public:
 				ObjectAbstract();
-				virtual ~ObjectAbstract() {
-				}
+				virtual ~ObjectAbstract();
 				inline void id(std::size_t _id) {
 					id_ = _id;
 				}

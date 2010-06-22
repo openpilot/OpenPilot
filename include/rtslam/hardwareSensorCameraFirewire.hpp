@@ -85,7 +85,7 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 			// configure data
 			for(int i = 0; i < 3; ++i)
 			{
-				buffer[i] = cvCreateImage(viamSize_to_size(mode.size, 8, 1);
+				buffer[i] = cvCreateImage(viamSize_to_size(mode.size), 8, 1);
 				bufferPtr[i].reset(new RawImage()); bufferSpecPtr[i] = SPTR_CAST<RawImage>(bufferPtr[i]);
 				bufferSpecPtr[i]->setJafarImage(jafarImage_ptr_t(new image::Image(buffer[i])));
 			}

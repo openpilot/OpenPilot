@@ -309,7 +309,6 @@ void demo_slam01_main(world_ptr_t *world) {
 					} // getROI()
 				} // unusedStates()
 
-				senPtr->releaseRaw();
 				had_data = true;
 
 			} // for each sensor

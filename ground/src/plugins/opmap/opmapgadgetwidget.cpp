@@ -90,6 +90,9 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 	m_widget->comboBoxZoom->addItem(QString::number(i), i);
     m_widget->comboBoxZoom->setCurrentIndex((int)(m_map->Zoom() + 0.5) - 2);
 
+    m_widget->widgetFlightControls->setVisible(false);
+    m_widget->toolButtonFlightControlsShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/next.png")));
+
     // **************
     // map stuff
 
@@ -516,6 +519,7 @@ void OPMapGadgetWidget::on_comboBoxZoom_currentIndexChanged(int index)
     {
 	bool ok;
 	int i = (int)m_widget->comboBoxZoom->itemData(index).toInt(&ok);
+
 	setZoom(2 + index);
     }
 }
@@ -525,12 +529,12 @@ void OPMapGadgetWidget::on_toolButtonFlightControlsShowHide_clicked()
 {
     if (m_widget)
     {
-	m_widget->widgetFlightControlButtons->setVisible(!m_widget->widgetFlightControlButtons->isVisible());
+	m_widget->widgetFlightControls->setVisible(!m_widget->widgetFlightControls->isVisible());
 
-	if (m_widget->widgetFlightControlButtons->isVisible())
-	    m_widget->toolButtonFlightControlsShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/next.png")));
-	else
+	if (m_widget->widgetFlightControls->isVisible())
 	    m_widget->toolButtonFlightControlsShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/prev.png")));
+	else
+	    m_widget->toolButtonFlightControlsShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/next.png")));
     }
 }
 

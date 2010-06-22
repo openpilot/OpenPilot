@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>704</width>
-    <height>273</height>
+    <height>475</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -91,39 +91,33 @@
            <number>8</number>
           </property>
           <item>
-           <widget class="QToolButton" name="toolButtonReload">
+           <widget class="QToolButton" name="toolButtonFlightControlsShowHide">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
             <property name="toolTip">
-             <string>Reload map</string>
+             <string>Show/Hide Flight Controls</string>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgba(255, 255, 255, 0);
-color: rgb(255, 255, 255);</string>
+             <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
             </property>
             <property name="text">
-             <string>Reload</string>
+             <string/>
             </property>
-            <property name="iconSize">
-             <size>
-              <width>16</width>
-              <height>16</height>
-             </size>
+            <property name="icon">
+             <iconset resource="../coreplugin/core.qrc">
+              <normaloff>:/core/images/prev.png</normaloff>:/core/images/prev.png</iconset>
             </property>
             <property name="autoRaise">
              <bool>true</bool>
             </property>
-            <property name="arrowType">
-             <enum>Qt::NoArrow</enum>
-            </property>
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer_5">
+           <spacer name="horizontalSpacer_9">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -532,6 +526,38 @@ color: rgb(255, 255, 255);</string>
             </property>
            </spacer>
           </item>
+          <item>
+           <widget class="QToolButton" name="toolButtonReload">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>Reload map</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgba(255, 255, 255, 0);
+color: rgb(255, 255, 255);</string>
+            </property>
+            <property name="text">
+             <string>Reload</string>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>16</width>
+              <height>16</height>
+             </size>
+            </property>
+            <property name="autoRaise">
+             <bool>true</bool>
+            </property>
+            <property name="arrowType">
+             <enum>Qt::NoArrow</enum>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
        </layout>
@@ -544,23 +570,6 @@ color: rgb(255, 255, 255);</string>
      <property name="spacing">
       <number>0</number>
      </property>
-     <item>
-      <widget class="QWidget" name="mapWidget" native="true">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="mouseTracking">
-        <bool>false</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">background-color: rgb(0, 0, 0);</string>
-       </property>
-       <zorder>widgetFlightControls</zorder>
-      </widget>
-     </item>
      <item>
       <widget class="QWidget" name="widgetFlightControls" native="true">
        <property name="sizePolicy">
@@ -585,32 +594,46 @@ color: rgb(255, 255, 255);</string>
         <bool>false</bool>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(72, 72, 72, 255), stop:1 rgba(117, 117, 117, 255));</string>
+        <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(72, 72, 72, 255), stop:1 rgba(68, 68, 68, 255));</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <property name="margin">
          <number>0</number>
         </property>
         <item>
-         <widget class="QToolButton" name="toolButtonFlightControlsShowHide">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
+         <widget class="QToolButton" name="toolButtonHome">
           <property name="toolTip">
-           <string>Show/Hide Flight Controls</string>
+           <string>UAV go home</string>
+          </property>
+          <property name="autoFillBackground">
+           <bool>false</bool>
           </property>
           <property name="styleSheet">
-           <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+           <string notr="true">QToolButton {
+background-color: rgba(255, 255, 255, 0);
+color: rgb(255, 255, 255);
+}
+QToolButton:hover {
+
+}
+QToolButton:pressed {
+}</string>
           </property>
           <property name="text">
            <string/>
           </property>
           <property name="icon">
-           <iconset resource="../coreplugin/core.qrc">
-            <normaloff>:/core/images/next.png</normaloff>:/core/images/next.png</iconset>
+           <iconset resource="opmap.qrc">
+            <normaloff>:/opmap/images/home.png</normaloff>:/opmap/images/home.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>70</width>
+            <height>70</height>
+           </size>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonIconOnly</enum>
           </property>
           <property name="autoRaise">
            <bool>true</bool>
@@ -618,102 +641,79 @@ color: rgb(255, 255, 255);</string>
          </widget>
         </item>
         <item>
-         <widget class="QWidget" name="widgetFlightControlButtons" native="true">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+         <widget class="QToolButton" name="toolButtonHoldPosition">
+          <property name="toolTip">
+           <string>UAV hold position</string>
           </property>
           <property name="styleSheet">
-           <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+           <string notr="true">background-color: rgba(255, 255, 255, 0);
+color: rgb(255, 255, 255);</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_2">
-           <item>
-            <widget class="QToolButton" name="toolButtonHome">
-             <property name="toolTip">
-              <string>UAV go home</string>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">background-color: rgba(255, 255, 255, 0);
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="opmap.qrc">
+            <normaloff>:/opmap/images/hold.png</normaloff>:/opmap/images/hold.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>70</width>
+            <height>70</height>
+           </size>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="toolButtonGo">
+          <property name="toolTip">
+           <string>UAV go!</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: rgba(255, 255, 255, 0);
 color: rgb(255, 255, 255);</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="icon">
-              <iconset resource="opmap.qrc">
-               <normaloff>:/opmap/images/home.png</normaloff>:/opmap/images/home.png</iconset>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>70</width>
-               <height>70</height>
-              </size>
-             </property>
-             <property name="autoRaise">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QToolButton" name="toolButtonPause">
-             <property name="toolTip">
-              <string>UAV hover</string>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">background-color: rgba(255, 255, 255, 0);
-color: rgb(255, 255, 255);</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="icon">
-              <iconset resource="opmap.qrc">
-               <normaloff>:/opmap/images/pause.png</normaloff>:/opmap/images/pause.png</iconset>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>70</width>
-               <height>70</height>
-              </size>
-             </property>
-             <property name="autoRaise">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QToolButton" name="toolButtonGo">
-             <property name="toolTip">
-              <string>UAV go!</string>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">background-color: rgba(255, 255, 255, 0);
-color: rgb(255, 255, 255);</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="icon">
-              <iconset resource="opmap.qrc">
-               <normaloff>:/opmap/images/go.png</normaloff>:/opmap/images/go.png</iconset>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>70</width>
-               <height>70</height>
-              </size>
-             </property>
-             <property name="autoRaise">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="opmap.qrc">
+            <normaloff>:/opmap/images/go.png</normaloff>:/opmap/images/go.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>70</width>
+            <height>70</height>
+           </size>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
        </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QWidget" name="mapWidget" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="mouseTracking">
+        <bool>false</bool>
+       </property>
+       <property name="acceptDrops">
+        <bool>true</bool>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(0, 0, 0);</string>
+       </property>
       </widget>
      </item>
     </layout>

@@ -141,6 +141,12 @@ namespace jafar {
 			descPtr->predictAppearance(_this);
 		}
 
+		virtual bool ObservationPinHoleAnchoredHomogeneousPoint::voteForReparametrizeLandmark(){
+			// TODO implement this.
+			return true;
+		}
+
+
 
 	}
 }

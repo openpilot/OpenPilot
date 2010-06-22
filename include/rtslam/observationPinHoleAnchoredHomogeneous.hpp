@@ -99,10 +99,7 @@ namespace jafar {
 					return measurement.matchScore;
 				}
 
-				virtual bool voteForReparametrizeLandmark(){
-					// TODO implement this.
-					return true;
-				}
+				virtual bool voteForReparametrizeLandmark();
 
 			public:
 				double pixelNoise;

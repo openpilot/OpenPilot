@@ -141,9 +141,9 @@ namespace jafar {
 			descPtr->predictAppearance(_this);
 		}
 
-		virtual bool ObservationPinHoleAnchoredHomogeneousPoint::voteForReparametrizeLandmark(){
-			// TODO implement this.
-			return true;
+		bool ObservationPinHoleAnchoredHomogeneousPoint::voteForReparametrizeLandmark(){
+			//TODO: use a parameter for the linearity test threshold.
+			return (lmkAHP::linearityScore(sensorPtr()->globalPose(), landmarkPtr()->state.x(), landmarkPtr()->state.P()) < 0.1);
 		}
 
 

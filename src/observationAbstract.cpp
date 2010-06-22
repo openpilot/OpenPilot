@@ -212,13 +212,15 @@ namespace jafar {
 				return true;
 			}
 
-			return false; // FIXME remove this line!
+//			return false; // FIXME remove this line!
 
 			// kill unstable and inconsistent lmks
 			if (counters.nSearch > 10) {
 				double matchRatio = counters.nMatch / (double) counters.nSearch;
 				double consistencyRatio = counters.nInlier / (double)counters.nMatch;
-				cout << "(matchRatio/consistencyRatio): (" << matchRatio << "/" << consistencyRatio << ")" << endl;
+
+cout << "(matchRatio/consistencyRatio): (" << matchRatio << "/" << consistencyRatio << ")" << endl;
+
 				if (matchRatio < 0.7 || consistencyRatio < 0.7)	{
 					cout << "Killed by unstability." << endl;
 					return true;

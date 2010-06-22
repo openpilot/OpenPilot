@@ -363,9 +363,8 @@ namespace jafar {
 			double linearityScore(const VA & ahp, const VS & sen, const MA_s & RHO){
 
 					vec3 euc;
-					mat EUC_ahp(1,7);
 
-					ahp2euc(ahp,euc,EUC_ahp);
+					euc = ahp2euc(ahp);
 
 					vec3 hw = euc - subrange(sen, 0, 3);
 

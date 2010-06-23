@@ -16,6 +16,7 @@
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/landmarkEuclideanPoint.hpp"
 #include "rtslam/observationPinHoleEuclideanPoint.hpp"
+#include "rtslam/ahpTools.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -95,29 +96,43 @@ namespace jafar {
 			//TODO Implement reparametrize():
 
 			// - create a new STD landmark.
-			eucp_ptr_t lmkPtr(new LandmarkEuclideanPoint(mapPtr()));
+			if (mapPtr()->unusedStates(LandmarkEuclideanPoint::size())){
+				eucp_ptr_t lmkPtr(new LandmarkEuclideanPoint(mapPtr()));
 
-			// - create its set of observations, one per sensor.
-			observation_ptr_t obsPtr;
-							for (LandmarkAbstract::ObservationList::iterator obsIter = this->observationList().begin(); obsIter != this->observationList().end(); obsIter++)
-							{
-								obsPtr = *obsIter;
-								obs_ph_euc_ptr_t obsPtrEuc(new ObservationPinHoleEuclideanPoint(obsPtr->sensorPtr(), lmkPtr));
+				// - create its set of observations, one per sensor.
+				observation_ptr_t obsPtr;
+					for (LandmarkAbstract::ObservationList::iterator obsIter = this->observationList().begin(); obsIter != this->observationList().end(); obsIter++)
+					{
+						obsPtr = *obsIter;
+						obs_ph_euc_ptr_t obsPtrEuc(new ObservationPinHoleEuclideanPoint(obsPtr->sensorPtr(), lmkPtr));
 
-								// - Link the landmark to map and observations.
-								obsPtrEuc->linkToParentEUC(lmkPtr);
+						// - Link the landmark to map and observations.
+						obsPtrEuc->linkToParentEUC(lmkPtr);
 
-								// - Link the sensors to the new observations.
-								obsPtrEuc->linkToParentPinHole(obsPtr->sensorPtr());
+						// - Link the sensors to the new observations.
+						obsPtrEuc->linkToParentSensor(obsPtr->sensorPtr());
 
-							}
+						// - transfer info from old obs to new obs.
+						obsPtrEuc->transferInfoObs(obsPtr);
 
-			// - call reparametrize_func()
-			// - compute the new ind_array as a sub-set of the old one
-			// - call filter->reparametrize()
-			// - transfer info from the old lmk to the new one
-			// - transfer info from old obs to new obs.
-			// - delete old lmk <-- this will delete all old obs!
+					}
+
+				// - call reparametrize_func()
+					mat LMKNEW_lmk(lmkPtr->mySize(),this->mySize());
+					vec lmk = this->state.x();
+					vec lmkNEW(lmkPtr->mySize());
+					reparametrize_func(lmk,lmkNEW,LMKNEW_lmk);
+					lmkPtr->state.x(lmkNEW);
+
+				// - call filter->reparametrize()
+					mapPtr()->filterPtr->reparametrize(mapPtr()->ia_used_states(),LMKNEW_lmk,this->state.ia(),lmkPtr->state.ia());
+
+				// - transfer info from the old lmk to the new one
+					lmkPtr->transferInfoLmk(this->shared_from_this());
+
+				// - delete old lmk <-- this will delete all old obs!
+					this->suicide();
+				}
 		}
 
 		bool LandmarkAbstract::needToDie(DecisionMethod dieMet){

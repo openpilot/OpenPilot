@@ -101,6 +101,8 @@ namespace jafar {
 					return false;
 				}
 
+				void transferInfoObs(const observation_ptr_t & obs){};
+
 			public:
 				double pixelNoise;
 

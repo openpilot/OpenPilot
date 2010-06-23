@@ -165,6 +165,8 @@ namespace jafar {
 				 */
 				virtual bool needToReparametrize(DecisionMethod repMethod = ALL);
 
+				virtual void transferInfo(const landmark_ptr_t & lmkSourcePtr);
+
 		};
 
 	}

@@ -331,6 +331,8 @@ namespace jafar {
 
 				virtual bool voteForReparametrizeLandmark() = 0;
 
+				virtual void transferInfoObs(const observation_ptr_t & obs);
+
 		};
 
 	}

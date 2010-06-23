@@ -74,7 +74,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	if (mode == 1)
 	{
 		std::fstream f((dump_path + std::string("/rseed.log")).c_str(), std::ios_base::out);
-		f << rseed;
+		f << rseed << std::endl;
 		f.close();
 	} else if (mode == 2)
 	{
@@ -82,6 +82,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		f >> rseed;
 		f.close();
 	}
+	std::cout << "rseed " << rseed << std::endl;
 	srand(rseed);
 
 	int imgWidth = 640, imgHeight = 480;
@@ -422,7 +423,6 @@ If you want to replay the last execution, change 1 to 2
 */
 int main(int argc, const char* argv[])
 {
-	int mode = 0;
 	if (argc == 3)
 	{
 		mode = atoi(argv[1]);

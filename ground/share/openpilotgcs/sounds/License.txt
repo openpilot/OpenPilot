@@ -1,4 +1,16 @@
-All sounds for the OpenPilot project are licensed under the cc-by-sa.
+All sounds for the OpenPilot project are licensed under the Creative Commons Sampling Plus 1.0 License.
+
+http://creativecommons.org/licenses/sampling+/1.0/
+
+Attribution to the OpenPilot project is required if you reuse these sounds. 
+
+OpenPilot wishes to thank Guitar Guy 1985 for his work on the alarms, 3 of his sounds were modified and included as part of the OpenPilot sound set:
+
+alarmsound
+beepsound
+whoopsound
+
+  
 
 
  

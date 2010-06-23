@@ -4,10 +4,9 @@ Work in progress, any ideas PM me - dankers.
 
 Noises:
 
-Alarm
-Beep
-Ding
-Whoop
+alarmsound
+beepsound
+whoopsound
 
 
 Spoken Collections (sorted alphabetically):

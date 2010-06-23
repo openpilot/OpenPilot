@@ -309,13 +309,10 @@ void PFDGadgetWidget::resizeEvent(QResizeEvent *event)
 }
 
 
-// Take an input value and rotate the dial accordingly
-// Rotation is smooth, starts fast and slows down when
+// Take an input value and move the elements accordingly.
+// Movement is smooth, starts fast and slows down when
 // approaching the target.
-// We aim for a 0.5 degree precision.
 //
-// Note: this code is valid even if needle1 and needle2 point
-// to the same element.
 void PFDGadgetWidget::rotateNeedles()
 {
     int dialCount = 3;
@@ -359,11 +356,12 @@ void PFDGadgetWidget::rotateNeedles()
         dialCount--;
     }
     double threshold = -180*compassBandWidth/540;
-    // The below does not work 100% perfect yet, visually speaking...
-    if ((headingValue < threshold) && ((headingValue+headingDiff)>threshold)) {
+    // Note: rendering can jump oh so very slightly when crossing the 180 degree
+    // boundary, should not impact actual useability of the display.
+    if ((headingValue < threshold) && ((headingValue+headingDiff)>=threshold)) {
         // We went over 180°: activate a -360 degree offset
         headingOffset = 2*threshold;
-    } else if ((headingValue > threshold) && ((headingValue+headingDiff)<threshold)) {
+    } else if ((headingValue >= threshold) && ((headingValue+headingDiff)<threshold)) {
         // We went under 180°: remove the -360 degree offset
         headingOffset = -2*threshold;
     }

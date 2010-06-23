@@ -1,4 +1,4 @@
-<plugin name="UAVObjects" version="0.0.1" compatVersion="0.0.1">
+<plugin name="UAVObjects" version="1.0.0" compatVersion="1.0.0">
     <vendor>The OpenPilot Project</vendor>
     <copyright>(C) 2010 OpenPilot Project</copyright>
     <license>The GNU Public License (GPL) Version 3</license>

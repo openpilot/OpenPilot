@@ -3,10 +3,9 @@
  *
  * @file       uavdataobject.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
  * @brief      
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   uavobjects_plugin
+ * @defgroup   uavobjectsplugin
  * @{
  * 
  *****************************************************************************/

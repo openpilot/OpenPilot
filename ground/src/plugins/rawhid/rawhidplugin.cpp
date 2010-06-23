@@ -5,7 +5,7 @@
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Register connection object for the core connection manager
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   rawhid_plugin
+ * @defgroup   rawhidplugin
  * @{
  * 
  *****************************************************************************/

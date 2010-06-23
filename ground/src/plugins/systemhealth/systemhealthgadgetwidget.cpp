@@ -5,7 +5,7 @@
  * @author     Edouard Lafargue Copyright (C) 2010.
  * @brief      System Health widget, does the actual drawing
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   systemhealth
+ * @defgroup   systemhealthplugin
  * @{
  *
  *****************************************************************************/

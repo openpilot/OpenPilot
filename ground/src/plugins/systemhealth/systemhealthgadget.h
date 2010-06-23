@@ -5,7 +5,7 @@
  * @author     Edouard Lafargue Copyright (C) 2010.
  * @brief      System health gadget to display system alarms
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   systemhealth
+ * @defgroup   systemhealthplugin
  * @{
  *
  *****************************************************************************/

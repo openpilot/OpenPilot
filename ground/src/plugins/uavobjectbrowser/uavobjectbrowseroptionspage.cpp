@@ -3,9 +3,9 @@
  *
  * @file       uavobjectbrowseroptionspage.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      
+ * @brief      Options page for the UAVObject Browser Plugin
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   uavobjectbrowser
+ * @defgroup   uavobjectbrowserplugin
  * @{
  * 
  *****************************************************************************/

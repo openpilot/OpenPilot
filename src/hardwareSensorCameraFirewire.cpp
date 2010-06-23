@@ -46,6 +46,12 @@ namespace rtslam {
 		int r;
 		int last_processed_index = index-1;
 
+		if (mode == 1)
+		{
+			std::ostringstream oss; oss << "mkdir -p " << dump_path << " ; rm -f " << dump_path << "/*.pgm ; rm -f " << dump_path << "/*.time" << std::endl;
+			system(oss.str().c_str());
+		}
+
 		while(true)
 		{
 			// acquire the image

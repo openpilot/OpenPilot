@@ -315,8 +315,16 @@ void OPMapGadgetWidget::updatePosition()
 	if (followUAVAct->isChecked())
 	{
 	    internals::PointLatLng uav_pos = internals::PointLatLng(data.Latitude, data.Longitude);	// current UAV position
+	    double uav_heading = data.Heading;
+
 	    internals::PointLatLng map_pos = m_map->CurrentPosition();					// current MAP position
-	    if (map_pos != uav_pos) m_map->SetCurrentPosition(uav_pos);					// center the map onto the UAV
+	    double map_heading = m_map->Rotate();
+
+	    if (map_pos != uav_pos || map_heading != uav_heading)
+	    {
+		m_map->SetCurrentPosition(uav_pos);							// keep the map centered on the UAV
+		m_map->SetRotate(uav_heading);								// rotate the map to match the uav heading
+	    }
 	}
     }
 }
@@ -380,7 +388,7 @@ void OPMapGadgetWidget::OnMapDrag()
 {
     if (followUAVAct)
     {	// disable follow UAV mode when the user starts to manually drag the map
-	if (followUAVAct->isChecked()) followUAVAct->setChecked(false);
+//	if (followUAVAct->isChecked()) followUAVAct->setChecked(false);
     }
 }
 

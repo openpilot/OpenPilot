@@ -241,7 +241,8 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
     menu.addAction(goMouseClickAct);
     menu.addAction(goHomeAct);
     menu.addAction(goUAVAct);
-    menu.addAction(followUAVAct);
+    menu.addAction(followUAVpositionAct);
+    menu.addAction(followUAVheadingAct);
 
     menu.addSeparator()->setText(tr("Waypoints"));
 
@@ -310,9 +311,9 @@ void OPMapGadgetWidget::updatePosition()
 {
     PositionActual::DataFields data = m_positionActual->getData();					// get current UAV data
 
-    if (m_map && followUAVAct)
+    if (m_map && followUAVpositionAct && followUAVheadingAct)
     {
-	if (followUAVAct->isChecked())
+	if (followUAVpositionAct->isChecked())
 	{
 	    internals::PointLatLng uav_pos = internals::PointLatLng(data.Latitude, data.Longitude);	// current UAV position
 	    double uav_heading = data.Heading;
@@ -323,7 +324,9 @@ void OPMapGadgetWidget::updatePosition()
 	    if (map_pos != uav_pos || map_heading != uav_heading)
 	    {
 		m_map->SetCurrentPosition(uav_pos);							// keep the map centered on the UAV
-		m_map->SetRotate(uav_heading);								// rotate the map to match the uav heading
+
+		if (followUAVheadingAct->isChecked())
+		    m_map->SetRotate(-uav_heading);							// rotate the map to match the uav heading
 	    }
 	}
     }
@@ -386,10 +389,6 @@ void OPMapGadgetWidget::zoomChanged(double zoom)
 
 void OPMapGadgetWidget::OnMapDrag()
 {
-    if (followUAVAct)
-    {	// disable follow UAV mode when the user starts to manually drag the map
-//	if (followUAVAct->isChecked()) followUAVAct->setChecked(false);
-    }
 }
 
 void OPMapGadgetWidget::OnCurrentPositionChanged(internals::PointLatLng point)
@@ -550,12 +549,12 @@ void OPMapGadgetWidget::on_toolButtonFlightControlsShowHide_clicked()
 
 void OPMapGadgetWidget::on_toolButtonMapHome_clicked()
 {
-    followUAVAct->setChecked(false);
+    followUAVpositionAct->setChecked(false);
 }
 
 void OPMapGadgetWidget::on_toolButtonMapUAV_clicked()
 {
-    followUAVAct->toggle();
+    followUAVpositionAct->toggle();
 }
 
 void OPMapGadgetWidget::on_toolButtonHome_clicked()
@@ -768,12 +767,19 @@ void OPMapGadgetWidget::createActions()
     goUAVAct->setStatusTip(tr("Center the map onto the UAV location"));
     connect(goUAVAct, SIGNAL(triggered()), this, SLOT(goUAV()));
 
-    followUAVAct = new QAction(tr("Follow UAV"), this);
-    followUAVAct->setShortcut(tr("Ctrl+F"));
-    followUAVAct->setStatusTip(tr("Keep the map centered onto the UAV"));
-    followUAVAct->setCheckable(true);
-    followUAVAct->setChecked(false);
-    connect(followUAVAct, SIGNAL(toggled(bool)), this, SLOT(on_followUAVAct_toggled(bool)));
+    followUAVpositionAct = new QAction(tr("Follow UAV position"), this);
+    followUAVpositionAct->setShortcut(tr("Ctrl+F"));
+    followUAVpositionAct->setStatusTip(tr("Keep the map centered onto the UAV"));
+    followUAVpositionAct->setCheckable(true);
+    followUAVpositionAct->setChecked(false);
+    connect(followUAVpositionAct, SIGNAL(toggled(bool)), this, SLOT(on_followUAVpositionAct_toggled(bool)));
+
+    followUAVheadingAct = new QAction(tr("Follow UAV heading"), this);
+    followUAVheadingAct->setShortcut(tr("Ctrl+F"));
+    followUAVheadingAct->setStatusTip(tr("Keep the map rotation to the UAV heading"));
+    followUAVheadingAct->setCheckable(true);
+    followUAVheadingAct->setChecked(true);
+    connect(followUAVheadingAct, SIGNAL(toggled(bool)), this, SLOT(on_followUAVheadingAct_toggled(bool)));
 
     wayPointEditorAct = new QAction(tr("&Way point editor"), this);
     wayPointEditorAct->setShortcut(tr("Ctrl+W"));
@@ -928,7 +934,7 @@ void OPMapGadgetWidget::goMouseClick()
 
 void OPMapGadgetWidget::goHome()
 {
-    followUAVAct->setChecked(false);
+    followUAVpositionAct->setChecked(false);
 }
 
 void OPMapGadgetWidget::goUAV()
@@ -943,11 +949,15 @@ void OPMapGadgetWidget::goUAV()
     }
 }
 
-void OPMapGadgetWidget::on_followUAVAct_toggled(bool checked)
+void OPMapGadgetWidget::on_followUAVpositionAct_toggled(bool checked)
 {
     if (m_widget)
-	if (m_widget->toolButtonMapUAV->isChecked() != followUAVAct->isChecked())
-	    m_widget->toolButtonMapUAV->setChecked(followUAVAct->isChecked());
+	if (m_widget->toolButtonMapUAV->isChecked() != followUAVpositionAct->isChecked())
+	    m_widget->toolButtonMapUAV->setChecked(followUAVpositionAct->isChecked());
+}
+
+void OPMapGadgetWidget::on_followUAVheadingAct_toggled(bool checked)
+{
 }
 
 void OPMapGadgetWidget::openWayPointEditor()

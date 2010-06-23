@@ -106,7 +106,8 @@ private slots:
     void goMouseClick();
     void goHome();
     void goUAV();
-    void on_followUAVAct_toggled(bool checked);
+    void on_followUAVpositionAct_toggled(bool checked);
+    void on_followUAVheadingAct_toggled(bool checked);
     void openWayPointEditor();
     void addWayPoint();
     void deleteWayPoint();
@@ -161,7 +162,8 @@ private:
     QAction *goMouseClickAct;
     QAction *goHomeAct;
     QAction *goUAVAct;
-    QAction *followUAVAct;
+    QAction *followUAVpositionAct;
+    QAction *followUAVheadingAct;
     QAction *wayPointEditorAct;
     QAction *addWayPointAct;
     QAction *deleteWayPointAct;

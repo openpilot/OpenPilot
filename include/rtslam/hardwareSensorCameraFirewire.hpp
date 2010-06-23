@@ -69,28 +69,31 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 				{
 					if (index != last_processed_index)
 					{
-						std::ostringstream oss; oss << dump_path << "/image_" << std::setw(3) << std::setfill('0') << index;
-						bufferSpecPtr[buff_write]->img->load(oss.str() + std::string(".png"));
+						std::ostringstream oss; oss << dump_path << "/image_" << std::setw(4) << std::setfill('0') << index;
+						bufferSpecPtr[buff_write]->img->load(oss.str() + std::string(".pgm"));
+						if (bufferSpecPtr[buff_write]->img->data() == NULL) break;
 						std::fstream f((oss.str() + std::string(".time")).c_str(), std::ios_base::in);
 						f >> bufferPtr[buff_write]->timestamp; f.close();
 						last_processed_index = index;
 					} else continue;
 				} else
+				{
 					r = viam_oneshot(handle, bank, buffer+buff_write, &pts, 1);
+					bufferPtr[buff_write]->timestamp = ts.tv_sec + ts.tv_usec*1e-6;
+				}
 				// update the buffer infos
 				boost::unique_lock<boost::mutex> l(mutex_data);
 				std::swap(buff_write, buff_ready);
-				bufferPtr[buff_ready]->timestamp = ts.tv_sec + ts.tv_usec*1e-6;
 				image_count++;
-				l.unlock();
 				// dump the images
 				if (mode == 1)
 				{
-					std::ostringstream oss; oss << dump_path << "/image_" << std::setw(3) << std::setfill('0') << index;
-					bufferSpecPtr[buff_ready]->img->save(oss.str() + std::string(".png"));
+					std::ostringstream oss; oss << dump_path << "/image_" << std::setw(4) << std::setfill('0') << index;
+					bufferSpecPtr[buff_ready]->img->save(oss.str() + std::string(".pgm"));
 					fstream f; f.open((oss.str() + std::string(".time")).c_str(), ios_base::out); 
-					f << std::setprecision(6) << bufferPtr[buff_ready]->timestamp << std::endl; f.close();
+					f << std::setprecision(20) << bufferPtr[buff_ready]->timestamp << std::endl; f.close();
 				}
+				l.unlock();
 			}
 		}
 	
@@ -100,7 +103,7 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 		@param camera_id the Firewire camera id (0x....)
 		@param hwmode the hardware mode
 		@param mode 0 = normal, 1 = dump used images, 2 = from dumped images
-		@param dump_path the path where the images are saved/read... use a local drive (or even better: a ram disk) !!!
+		@param dump_path the path where the images are saved/read... Use a ram disk !!!
 		*/
 		HardwareSensorCameraFirewire(const std::string &camera_id, viam_hwmode_t &hwmode, int mode = 0, std::string dump_path = "."):
 			mode(mode), dump_path(dump_path)

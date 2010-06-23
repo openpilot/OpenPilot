@@ -42,6 +42,8 @@ PFDGadgetWidget::PFDGadgetWidget(QWidget *parent) : QGraphicsView(parent)
     m_renderer = new QSvgRenderer();
 
     attitudeObj = NULL;
+    headingObj = NULL;
+    compassBandWidth = 0;
 /*
     obj2 = NULL;
     obj3 = NULL;
@@ -66,6 +68,10 @@ PFDGadgetWidget::~PFDGadgetWidget()
 void PFDGadgetWidget::connectNeedles() {
     if (attitudeObj != NULL)
         disconnect(attitudeObj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(updateAttitude(UAVObject*)));
+
+    if (headingObj != NULL)
+        disconnect(headingObj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(updateHeading(UAVObject*)));
+
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
@@ -76,10 +82,18 @@ void PFDGadgetWidget::connectNeedles() {
         std::cout << "Error: Object is unknown (AttitudeActual)." << std::endl;
    }
 
+   headingObj = dynamic_cast<UAVDataObject*>(objManager->getObject("PositionActual"));
+   if (headingObj != NULL ) {
+       connect(headingObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateHeading(UAVObject*)));
+   } else {
+        std::cout << "Error: Object is unknown (PositionActual)." << std::endl;
+   }
+
+
 }
 
 /*!
-  \brief Called by the UAVObject which got updated
+  \brief Reads the updated attitude and computes the new display position
   */
 void PFDGadgetWidget::updateAttitude(UAVObject *object1) {
     // Double check that the field exists:
@@ -104,7 +118,20 @@ void PFDGadgetWidget::updateAttitude(UAVObject *object1) {
 /*!
   \brief Called by the UAVObject which got updated
   */
-void PFDGadgetWidget::updateHeading(UAVObject *object2) {
+void PFDGadgetWidget::updateHeading(UAVObject *object1) {
+    // Double check that the field exists:
+    QString heading = QString("Heading");
+    UAVObjectField* field = object1->getField(heading);
+    if (field) {
+        // These factors assume some things about the PFD SVG, namely:
+        // - Heading value in degrees
+        // - Scale is 540 degrees large
+        headingTarget = field->getDouble()*compassBandWidth/(-540);
+        if (!dialTimer.isActive())
+            dialTimer.start(); // Rearm the dial Timer which might be stopped.
+    } else {
+        std::cout << "UpdateHeading: Wrong field, maybe an issue with object disconnection ?" << std::endl;
+    }
 }
 
 /*!
@@ -138,18 +165,18 @@ void PFDGadgetWidget::setDialFile(QString dfn)
       m_renderer->load(dfn);
       if(m_renderer->isValid())
       {
-          /* The PFD element IDs are fixed, not like with the analog dial.
+/* The PFD element IDs are fixed, not like with the analog dial.
      - Background: background
      - Foreground: foreground (contains all fixed elements, including plane)
      - earth/sky : world
-     - red pointer: needle3
+     - Roll scale: rollscale
      - compass frame: compass (part of the foreground)
      - compass band : compass-band
      - Home point: homewaypoint
      - Next point: nextwaypoint
      - Home point bearing: homewaypoint-bearing
      - Next point bearing: nextwaypoint-bearing
-          */
+ */
          QGraphicsScene *l_scene = scene();
          l_scene->clear(); // Deletes all items contained in the scene as well.
          m_background = new QGraphicsSvgItem();
@@ -166,15 +193,12 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          m_world->setElementId("world");
          l_scene->addItem(m_world);
 
-         // red pointer: redpointer
-         m_redpointer = new QGraphicsSvgItem();
-         // Compass band:
-         // Get the location of the Compass:
-         QMatrix compassMatrix = m_renderer->matrixForElement("compass");
-         // Then once we have the initial location, we can put it
-         // into a QGraphicsSvgItem which we will display at the same
-         // place:
-         m_compassband = new QGraphicsSvgItem();
+         // red Roll scale: rollscale
+         m_rollscale = new QGraphicsSvgItem();
+         m_rollscale->setSharedRenderer(m_renderer);
+         m_rollscale->setElementId("rollscale");
+         l_scene->addItem(m_rollscale);
+
          // Home point:
          m_homewaypoint = new QGraphicsSvgItem();
          // Next point:
@@ -190,17 +214,61 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          m_foreground->setElementId("foreground");
          l_scene->addItem(m_foreground);
 
+         // Compass:
+         // Get the default location of the Compass:
+         QMatrix compassMatrix = m_renderer->matrixForElement("compass");
+         qreal startX = compassMatrix.mapRect(m_renderer->boundsOnElement("compass")).x();
+         qreal startY = compassMatrix.mapRect(m_renderer->boundsOnElement("compass")).y();
+         // Then once we have the initial location, we can put it
+         // into a QGraphicsSvgItem which we will display at the same
+         // place: we do this so that the heading scale can be clipped to
+         // the compass dial region.
+         m_compass = new QGraphicsSvgItem();
+         m_compass->setSharedRenderer(m_renderer);
+         m_compass->setElementId("compass");
+         m_compass->setFlags(QGraphicsItem::ItemClipsChildrenToShape|
+                             QGraphicsItem::ItemClipsToShape);
+         l_scene->addItem(m_compass);
+         QTransform matrix;
+         matrix.translate(startX,startY);
+         m_compass->setTransform(matrix,false);
+
+         // Now place the compass scale inside:
+         m_compassband = new QGraphicsSvgItem();
+         m_compassband->setSharedRenderer(m_renderer);
+         m_compassband->setElementId("compass-band");
+         m_compassband->setParentItem(m_compass);
+         l_scene->addItem(m_compassband);
+         matrix.reset();
+         // Note: the compass band has to be a path, which means all text elements have to be
+         // converted, ortherwise boundsOnElement does not compute the height correctly
+         // if the highest element is a text element. This is a Qt Bug as far as I can tell.
+
+         // compass-scale is the while bottom line inside the band: using the band's width
+         // includes half the width of the letters, which causes errors:
+         compassBandWidth = m_renderer->boundsOnElement("compass-scale").width();
+
         l_scene->setSceneRect(m_background->boundingRect());
 
-        // Now Initialize the center for all transforms of the dial needles to the
+        // Now Initialize the center for all transforms of the relevant elements to the
         // center of the background:
-        // - Move the center of the needle to the center of the background.
+
+        // 1) Move the center of the needle to the center of the background.
         QRectF rectB = m_background->boundingRect();
         QRectF rectN = m_world->boundingRect();
         m_world->setPos(rectB.width()/2-rectN.width()/2,rectB.height()/2-rectN.height()/2);
-        // - Put the transform origin point of the needle at its center.
+        // 2) Put the transform origin point of the needle at its center.
         m_world->setTransformOriginPoint(rectN.width()/2,rectN.height()/2);
 
+        rectN = m_rollscale->boundingRect();
+        m_rollscale->setPos(rectB.width()/2-rectN.width()/2,rectB.height()/2-rectN.height()/2);
+        m_rollscale->setTransformOriginPoint(rectN.width()/2,rectN.height()/2);
+
+        // Also to the same init for the compass:
+        rectB = m_compass->boundingRect();
+        rectN = m_compassband->boundingRect();
+        m_compassband->setPos(rectB.width()/2-rectN.width()/2,rectB.height()/2-rectN.height()/2);
+        m_compassband->setTransformOriginPoint(rectN.width()/2,rectN.height()/2);
 
         // Last: we just loaded the dial file which is by default valid for a "zero" value
         // of the needles, so we have to reset the needles too upon dial file loading, otherwise
@@ -208,6 +276,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
         // is not zero at that time.
         rollValue = 0;
         pitchValue = 0;
+        headingValue = 0;
         if (!dialTimer.isActive())
             dialTimer.start(); // Rearm the dial Timer which might be stopped.
      }
@@ -249,14 +318,19 @@ void PFDGadgetWidget::resizeEvent(QResizeEvent *event)
 // to the same element.
 void PFDGadgetWidget::rotateNeedles()
 {
-    int dialCount = 2;
+    int dialCount = 3;
     if ((abs((rollValue-rollTarget)*10) > 5)) {
         double rollDiff;
         rollDiff =(rollTarget - rollValue)/5;
         m_world->setRotation(m_world->rotation()+rollDiff);
+        m_rollscale->setRotation(m_rollscale->rotation()+rollDiff);
         rollValue += rollDiff;
     } else {
+        // This avoids any sort of offset resulting from rounding
+        // errors on the dichotomy above
         rollValue = rollTarget;
+        m_world->setRotation(rollValue);
+        m_rollscale->setRotation(rollValue);
         dialCount--;
     }
 
@@ -270,8 +344,32 @@ void PFDGadgetWidget::rotateNeedles()
         pitchValue += pitchDiff;
     } else {
         pitchValue = pitchTarget;
+        // TODO: should maybe reset the transformOriginpoint here one last
+        // time with the pitchValue=pitchTarget ? To be checked later.
         dialCount--;
     }
+
+    double headingOffset = 0;
+    double headingDiff;
+    if ((abs((headingValue-headingTarget)*10) > 5)) {
+
+        headingDiff = (headingTarget - headingValue)/5;
+    } else {
+        headingDiff = headingTarget-headingValue;
+        dialCount--;
+    }
+    double threshold = -180*compassBandWidth/540;
+    // The below does not work 100% perfect yet, visually speaking...
+    if ((headingValue < threshold) && ((headingValue+headingDiff)>threshold)) {
+        // We went over 180°: activate a -360 degree offset
+        headingOffset = 2*threshold;
+    } else if ((headingValue > threshold) && ((headingValue+headingDiff)<threshold)) {
+        // We went under 180°: remove the -360 degree offset
+        headingOffset = -2*threshold;
+    }
+    QPointF opd = QPointF(headingDiff+headingOffset,0);
+    m_compassband->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), true);
+    headingValue += headingDiff;
 
    update();
    if (!dialCount)

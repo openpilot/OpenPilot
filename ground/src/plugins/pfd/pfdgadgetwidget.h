@@ -48,9 +48,6 @@ public:
    ~PFDGadgetWidget();
    void setDialFile(QString dfn);
    void paint();
-   void setN1Min(double value) {n1MinValue = value;}
-   void setN1Max(double value) {n1MaxValue = value;}
-   void setN1Factor(double value) {n1Factor = value;}
    void setN2Min(double value) {n2MinValue = value;}
    void setN2Max(double value) {n2MaxValue = value;}
    void setN2Factor(double value) {n2Factor = value;}
@@ -84,8 +81,10 @@ private:
    QGraphicsSvgItem *m_foreground;
    // earth/sky : world
    QGraphicsSvgItem *m_world;
-   // red pointer: redpointer
-   QGraphicsSvgItem *m_redpointer;
+   // Roll scale: rollscale
+   QGraphicsSvgItem *m_rollscale;
+   // Compass dial:
+   QGraphicsSvgItem *m_compass;
    // Compass band:
    QGraphicsSvgItem *m_compassband;
    // Home point:
@@ -113,9 +112,14 @@ private:
    double rollValue;
    double pitchTarget;
    double pitchValue;
+   double headingTarget;
+   double headingValue;
+
+   qreal compassBandWidth;
 
    // Name of the fields to read when an update is received:
    UAVDataObject* attitudeObj;
+   UAVDataObject* headingObj;
 
    // Rotation timer
    QTimer dialTimer;

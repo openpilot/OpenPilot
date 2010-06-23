@@ -278,13 +278,11 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
         // of the needles, so we have to reset the needles too upon dial file loading, otherwise
         // we would end up with an offset when we change a dial file and the needle value
         // is not zero at that time.
-        needle1Target = 0;
-        needle2Target = 0;
-        needle3Target = 0;
         needle1Value = 0;
         needle2Value = 0;
         needle3Value = 0;
-
+        if (!dialTimer.isActive())
+            dialTimer.start();
      }
    }
    else
@@ -421,8 +419,8 @@ void AirspeedGadgetWidget::rotateNeedles()
         needle1Value += needle1Diff;
     } else { // value is close enough to target, value to exact target
              // to cancel out any potential drift
-    needle1Value = needle1Target;
-    dialRun--;
+        needle1Value = needle1Target;
+        dialRun--;
     }
 
    if (n3enabled) {
@@ -449,7 +447,7 @@ void AirspeedGadgetWidget::rotateNeedles()
            dialRun--;
        }
     } else {
-    dialRun--;
+        dialRun--;
     }
     update();
     // Now check: if dialRun is now zero, we should

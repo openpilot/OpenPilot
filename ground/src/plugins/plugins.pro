@@ -10,15 +10,14 @@ SUBDIRS   = plugin_coreplugin
 #plugin_donothing.subdir = donothing
 #plugin_donothing.depends = plugin_coreplugin
 
-# Another example, with more details such as options page
-# Empty UAVGadget
-#plugin_emptygadget.subdir = emptygadget
-#plugin_emptygadget.depends = plugin_coreplugin
-#SUBDIRS += plugin_emptygadget
-
 
 # Core Plugin
 plugin_coreplugin.subdir = coreplugin
+
+# Empty UAVGadget - Default for new splits
+plugin_emptygadget.subdir = emptygadget
+plugin_emptygadget.depends = plugin_coreplugin
+SUBDIRS += plugin_emptygadget
 
 # Welcome Plugin
 plugin_welcome.subdir = welcome

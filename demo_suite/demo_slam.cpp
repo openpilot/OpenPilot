@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <boost/shared_ptr.hpp>
+#include <time.h>
 
 // jafar debug include
 #include "kernel/jafarDebug.hpp"
@@ -48,6 +49,9 @@ using namespace jafar::jmath::ublasExtra;
 using namespace jafar::rtslam;
 using namespace boost;
 
+int mode = 0;
+std::string dump_path = ".";
+
 
 void demo_slam01_main(world_ptr_t *world) {
 
@@ -65,6 +69,20 @@ void demo_slam01_main(world_ptr_t *world) {
 	const int			GRID_SEPAR	= PATCHSIZE*3;
 	const double	PERT_VLIN		= 2.0; // m/s per sqrt(s)
 	const double	PERT_VANG		= 4.0; // rad/s per sqrt(s)
+
+	time_t rseed = time(NULL);
+	if (mode == 1)
+	{
+		std::fstream f((dump_path + std::string("/rseed.log")).c_str(), std::ios_base::out);
+		f << rseed;
+		f.close();
+	} else if (mode == 2)
+	{
+		std::fstream f((dump_path + std::string("/rseed.log")).c_str(), std::ios_base::in);
+		f >> rseed;
+		f.close();
+	}
+	srand(rseed);
 
 	int imgWidth = 640, imgHeight = 480;
 	double _d[3] = {-0.27572, 0.28827}; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
@@ -113,7 +131,7 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	viam_hwmode_t hwmode = { VIAM_HWSZ_640x480, VIAM_HWFMT_MONO8, VIAM_HW_FIXED, VIAM_HWFPS_60, VIAM_HWTRIGGER_INTERNAL };
 	// UNCOMMENT THESE TWO LINES TO ENABLE FIREWIRE CAMERA OPERATION
-	hardware_sensor_ptr_t hardSen11(new HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode));
+	hardware_sensor_ptr_t hardSen11(new HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode, mode, dump_path));
 	senPtr11->setHardwareSensor(hardSen11);
 
 	// Show empty map
@@ -397,9 +415,19 @@ void demo_slam01() {
 	JFR_DEBUG("Terminated");
 }
 
-
-
-int main(int argc, char **argv)
+/**
+If you want to debug, pass as argument to the executable 1 and a path where
+you want the processed images be saved.
+If you want to replay the last execution, change 1 to 2
+*/
+int main(int argc, const char* argv[])
 {
+	int mode = 0;
+	if (argc == 3)
+	{
+		mode = atoi(argv[1]);
+		dump_path = argv[2];
+	}
+	
 	demo_slam01();
 }

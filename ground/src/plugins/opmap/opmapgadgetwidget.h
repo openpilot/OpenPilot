@@ -34,7 +34,11 @@
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/positionactual.h"
 
-class Ui_OPMap_Widget;
+//class Ui_OPMap_Widget;
+
+namespace Ui {
+    class OPMap_Widget;
+}
 
 using namespace mapcontrol;
 
@@ -71,17 +75,14 @@ private slots:
     // user control signals
     void on_toolButtonReload_clicked();
     void on_toolButtonFindPlace_clicked();
-    void on_toolButtonRR_clicked();
-    void on_toolButtonRC_clicked();
-    void on_toolButtonRL_clicked();
     void on_toolButtonZoomM_clicked();
     void on_toolButtonZoomP_clicked();
     void on_pushButtonGeoFenceM_clicked();
     void on_pushButtonGeoFenceP_clicked();
-    void on_comboBoxZoom_currentIndexChanged(int index);
     void on_toolButtonFlightControlsShowHide_clicked();
     void on_toolButtonMapHome_clicked();
     void on_toolButtonMapUAV_clicked();
+    void on_horizontalSliderZoom_sliderMoved(int position);
 
     void on_toolButtonHome_clicked();
     void on_toolButtonHoldPosition_clicked();
@@ -145,7 +146,8 @@ private:
 
    PositionActual *m_positionActual;
 
-    Ui_OPMap_Widget *m_widget;
+//    Ui_OPMap_Widget *m_widget;
+    Ui::OPMap_Widget *m_widget;
 
     mapcontrol::OPMapWidget *m_map;
 

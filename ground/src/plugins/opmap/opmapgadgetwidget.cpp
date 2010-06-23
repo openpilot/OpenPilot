@@ -56,7 +56,8 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     // **************
     // create the widget that holds the user controls and the map
 
-    m_widget = new Ui_OPMap_Widget();
+    m_widget = new Ui::OPMap_Widget();
+//    m_widget = new Ui_OPMap_Widget();
     m_widget->setupUi(this);
 
     // **************
@@ -79,16 +80,10 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     // **************
     // set the user control options
 
-    m_widget->labelRotate->setText(QString::number(m_map->Rotate()));
 //  m_widget->labelNumTilesToLoad->setText(" 0");
     m_widget->labelMapPos->setText("");
     m_widget->labelMousePos->setText("");
     m_widget->progressBarMap->setMaximum(1);
-
-    m_widget->comboBoxZoom->clear();
-    for (int i = 2; i <= 19; i++)
-	m_widget->comboBoxZoom->addItem(QString::number(i), i);
-    m_widget->comboBoxZoom->setCurrentIndex((int)(m_map->Zoom() + 0.5) - 2);
 
     m_widget->widgetFlightControls->setVisible(false);
     m_widget->toolButtonFlightControlsShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/next.png")));
@@ -148,8 +143,6 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_statusUpdateTimer->start();
 
     // **************
-
-    connect(m_widget->comboBoxZoom, SIGNAL(currentIndexChanged(int)), this, SLOT(on_comboBoxZoom_currentIndexChanged(int)));
 }
 
 // *************************************************************************************
@@ -241,6 +234,9 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
     menu.addAction(goMouseClickAct);
     menu.addAction(goHomeAct);
     menu.addAction(goUAVAct);
+
+    menu.addSeparator()->setText(tr("Follow"));
+
     menu.addAction(followUAVpositionAct);
     menu.addAction(followUAVheadingAct);
 
@@ -253,7 +249,7 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     menu.addSeparator();
 
-    menu.addAction(gridLinesAct);
+//    menu.addAction(gridLinesAct);
     menu.addAction(openGLAct);
 
     menu.exec(event->globalPos());
@@ -327,6 +323,9 @@ void OPMapGadgetWidget::updatePosition()
 
 		if (followUAVheadingAct->isChecked())
 		    m_map->SetRotate(-uav_heading);							// rotate the map to match the uav heading
+		else
+		if (m_map->Rotate() != 0)
+		    m_map->SetRotate(0);								// reset the rotation to '0'
 	    }
 	}
     }
@@ -357,10 +356,7 @@ void OPMapGadgetWidget::zoomChanged(double zoom)
     if (m_widget)
     {
 //	m_widget->labelZoom->setText(" " + QString::number(zoom));
-
-	disconnect(m_widget->comboBoxZoom, SIGNAL(currentIndexChanged(int)), this, 0);
-	m_widget->comboBoxZoom->setCurrentIndex(i_zoom - 2);
-	connect(m_widget->comboBoxZoom, SIGNAL(currentIndexChanged(int)), this, SLOT(on_comboBoxZoom_currentIndexChanged(int)));
+	m_widget->horizontalSliderZoom->setValue(i_zoom);
     }
 
     switch (i_zoom)
@@ -448,33 +444,6 @@ void OPMapGadgetWidget::on_toolButtonFindPlace_clicked()
     findPlace();
 }
 
-void OPMapGadgetWidget::on_toolButtonRL_clicked()
-{
-    if (m_map)
-    {
-	m_map->SetRotate(m_map->Rotate() - 1);
-	if (m_widget) m_widget->labelRotate->setText(" " + QString::number(m_map->Rotate()));
-    }
-}
-
-void OPMapGadgetWidget::on_toolButtonRC_clicked()
-{
-    if (m_map)
-    {
-	m_map->SetRotate(0);
-	if (m_widget) m_widget->labelRotate->setText(" " + QString::number(m_map->Rotate()));
-    }
-}
-
-void OPMapGadgetWidget::on_toolButtonRR_clicked()
-{
-    if (m_map)
-    {
-	m_map->SetRotate(m_map->Rotate() + 1);
-	if (m_widget) m_widget->labelRotate->setText(" " + QString::number(m_map->Rotate()));
-    }
-}
-
 void OPMapGadgetWidget::on_toolButtonZoomP_clicked()
 {
     zoomIn();
@@ -522,18 +491,6 @@ void OPMapGadgetWidget::on_pushButtonGeoFenceP_clicked()
     }
 }
 
-void OPMapGadgetWidget::on_comboBoxZoom_currentIndexChanged(int index)
-{
-    if (m_widget)
-    {
-	bool ok;
-	int i = (int)m_widget->comboBoxZoom->itemData(index).toInt(&ok);
-
-	setZoom(2 + index);
-    }
-}
-
-
 void OPMapGadgetWidget::on_toolButtonFlightControlsShowHide_clicked()
 {
     if (m_widget)
@@ -555,6 +512,11 @@ void OPMapGadgetWidget::on_toolButtonMapHome_clicked()
 void OPMapGadgetWidget::on_toolButtonMapUAV_clicked()
 {
     followUAVpositionAct->toggle();
+}
+
+void OPMapGadgetWidget::on_horizontalSliderZoom_sliderMoved(int position)
+{
+    setZoom(position);
 }
 
 void OPMapGadgetWidget::on_toolButtonHome_clicked()
@@ -952,12 +914,19 @@ void OPMapGadgetWidget::goUAV()
 void OPMapGadgetWidget::on_followUAVpositionAct_toggled(bool checked)
 {
     if (m_widget)
+    {
 	if (m_widget->toolButtonMapUAV->isChecked() != followUAVpositionAct->isChecked())
 	    m_widget->toolButtonMapUAV->setChecked(followUAVpositionAct->isChecked());
+
+	if (m_map)
+	    m_map->SetRotate(0);				    				// reset the rotation to '0'
+    }
 }
 
 void OPMapGadgetWidget::on_followUAVheadingAct_toggled(bool checked)
 {
+    if (!checked && m_map)
+	m_map->SetRotate(0);									// reset the rotation to '0'
 }
 
 void OPMapGadgetWidget::openWayPointEditor()

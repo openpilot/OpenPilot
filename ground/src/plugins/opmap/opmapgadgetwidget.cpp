@@ -378,8 +378,10 @@ void OPMapGadgetWidget::zoomChanged(double zoom)
 
 void OPMapGadgetWidget::OnMapDrag()
 {
-    if (followUAVAct->isChecked())
-	followUAVAct->setChecked(false);	// disable follow UAV mode when the user starts to manually drag the map
+    if (followUAVAct)
+    {	// disable follow UAV mode when the user starts to manually drag the map
+	if (followUAVAct->isChecked()) followUAVAct->setChecked(false);
+    }
 }
 
 void OPMapGadgetWidget::OnCurrentPositionChanged(internals::PointLatLng point)
@@ -536,6 +538,28 @@ void OPMapGadgetWidget::on_toolButtonFlightControlsShowHide_clicked()
 	else
 	    m_widget->toolButtonFlightControlsShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/next.png")));
     }
+}
+
+void OPMapGadgetWidget::on_toolButtonMapHome_clicked()
+{
+    followUAVAct->setChecked(false);
+}
+
+void OPMapGadgetWidget::on_toolButtonMapUAV_clicked()
+{
+    followUAVAct->toggle();
+}
+
+void OPMapGadgetWidget::on_toolButtonHome_clicked()
+{
+}
+
+void OPMapGadgetWidget::on_toolButtonHoldPosition_clicked()
+{
+}
+
+void OPMapGadgetWidget::on_toolButtonGo_clicked()
+{
 }
 
 // *************************************************************************************
@@ -696,7 +720,7 @@ void OPMapGadgetWidget::createMapOverlayUserControls()
 void OPMapGadgetWidget::createActions()
 {
     // ***********************
-    // create the menu actions
+    // create menu actions
 
     closeAct = new QAction(tr("&Close menu"), this);
 //    closeAct->setShortcuts(QKeySequence::New);
@@ -741,7 +765,7 @@ void OPMapGadgetWidget::createActions()
     followUAVAct->setStatusTip(tr("Keep the map centered onto the UAV"));
     followUAVAct->setCheckable(true);
     followUAVAct->setChecked(false);
-    connect(followUAVAct, SIGNAL(triggered()), this, SLOT(followUAV()));
+    connect(followUAVAct, SIGNAL(toggled(bool)), this, SLOT(on_followUAVAct_toggled(bool)));
 
     wayPointEditorAct = new QAction(tr("&Way point editor"), this);
     wayPointEditorAct->setShortcut(tr("Ctrl+W"));
@@ -911,8 +935,11 @@ void OPMapGadgetWidget::goUAV()
     }
 }
 
-void OPMapGadgetWidget::followUAV()
+void OPMapGadgetWidget::on_followUAVAct_toggled(bool checked)
 {
+    if (m_widget)
+	if (m_widget->toolButtonMapUAV->isChecked() != followUAVAct->isChecked())
+	    m_widget->toolButtonMapUAV->setChecked(followUAVAct->isChecked());
 }
 
 void OPMapGadgetWidget::openWayPointEditor()

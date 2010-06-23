@@ -80,7 +80,12 @@ private slots:
     void on_pushButtonGeoFenceP_clicked();
     void on_comboBoxZoom_currentIndexChanged(int index);
     void on_toolButtonFlightControlsShowHide_clicked();
+    void on_toolButtonMapHome_clicked();
+    void on_toolButtonMapUAV_clicked();
 
+    void on_toolButtonHome_clicked();
+    void on_toolButtonHoldPosition_clicked();
+    void on_toolButtonGo_clicked();
 
     // map signals
     void zoomChanged(double zoom);
@@ -101,7 +106,7 @@ private slots:
     void goMouseClick();
     void goHome();
     void goUAV();
-    void followUAV();
+    void on_followUAVAct_toggled(bool checked);
     void openWayPointEditor();
     void addWayPoint();
     void deleteWayPoint();

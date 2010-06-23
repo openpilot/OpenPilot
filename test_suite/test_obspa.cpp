@@ -93,7 +93,7 @@ void test_obsap01(void) {
 	ahpPtr->linkToParentMap(mapPtr);
 	obs_ph_ahp_ptr_t obspaPtr(new ObservationPinHoleAnchoredHomogeneousPoint(pinholePtr, ahpPtr));
 	obspaPtr->linkToParentAHP(ahpPtr);
-	obspaPtr->linkToParentPinHole(pinholePtr);
+	obspaPtr->linkToPinHole(pinholePtr);
 
 	// setup objects
 	cout << "\n% INIT \n%============" << endl;

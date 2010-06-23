@@ -36,7 +36,7 @@
 #include "rtslam/rawImage.hpp"
 #include "rtslam/descriptorImagePoint.hpp"
 
-#include "rtslam/hardwareSensorCameraFirewire.hpp"
+//#include "rtslam/hardwareSensorCameraFirewire.hpp"
 
 #include "rtslam/display_qt.hpp"
 //#include "image/Image.hpp"
@@ -110,10 +110,10 @@ void demo_slam01_main(world_ptr_t *world) {
 	senPtr11->params.setIntrinsicCalibration(k, d, d.size());
 	senPtr11->params.setMiscellaneous(1.0, 0.1, patchMatchSize);
 
-	viam_hwmode_t hwmode = { VIAM_HWSZ_640x480, VIAM_HWFMT_MONO8, VIAM_HW_FIXED, VIAM_HWFPS_60, VIAM_HWTRIGGER_INTERNAL };
-	// UNCOMMENT THESE TWO LINES TO ENABLE FIREWIRE CAMERA OPERATION
-	hardware_sensor_ptr_t hardSen11(new HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode));
-	senPtr11->setHardwareSensor(hardSen11);
+	//viam_hwmode_t hwmode = { VIAM_HWSZ_640x480, VIAM_HWFMT_MONO8, VIAM_HW_FIXED, VIAM_HWFPS_60, VIAM_HWTRIGGER_INTERNAL };
+	// UNCOMMENT THESE TWO LINES ENABLE FIREWIRE CAMERA OPERATION
+	//hardware_sensor_ptr_t hardSen11(new HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode));
+	//senPtr11->setHardwareSensor(hardSen11);
 	
 	cout << "d: " << senPtr11->params.distortion << "\nc: " << senPtr11->params.correction << endl;
 
@@ -176,8 +176,12 @@ void demo_slam01_main(world_ptr_t *world) {
 				// foreach observation
 				int numObs = 0;
 				observation_ptr_t obsPtr;
-int total_match_time = 0;
-				for (SensorAbstract::ObservationList::iterator obsIter = senPtr->observationList().begin(); obsIter != senPtr->observationList().end(); obsIter++)
+				int total_match_time = 0;
+
+				for( SensorAbstract::DataManagerList::iterator dmaIter = senPtr->dataManagerList().begin(); dmaIter!= senPtr->dataManagerList().begin(); dmaIter++)
+				  {
+				    data_manager_ptr_t dmaPtr = *dmaIter;
+				    for (DataManagerAbstract::ObservationList::iterator obsIter = dmaPtr->observationList().begin(); obsIter != dmaPtr->observationList().end(); obsIter++)
 				{
 //std::cout << chronototal.elapsed() << " process observation" << std::endl;
 					obsPtr = *obsIter;
@@ -259,7 +263,7 @@ int total_match_time = 0;
 //					cout << "\n-------------------------------------------------- " << endl;
 //					cout << *obsPtr << endl;
 
-				} // foreach observation
+				}} // foreach observation
 //std::cout << "all matches took " << total_match_time/1000 << " ms" << std::endl;
 
 				//cout << chrono.elapsedMicrosecond() << " us ; observed lmks: " << numObs << endl;

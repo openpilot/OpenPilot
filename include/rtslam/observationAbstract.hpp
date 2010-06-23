@@ -69,28 +69,44 @@ namespace jafar {
 		 * \ingroup rtslam
 		 */
 		class ObservationAbstract: public ObjectAbstract,
-		    public ChildOf<SensorAbstract> ,
 		    public ChildOf<LandmarkAbstract> ,
 		    public boost::enable_shared_from_this<ObservationAbstract>,
 		    public ChildOf<DataManagerAbstract> {
 
 				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObservationAbstract & obs);
 
-				// define the function linkToParentSensor().
-			ENABLE_LINK_TO_PARENT(SensorAbstract,Sensor,ObservationAbstract)
-				;
-				// define the functions sensorPtr() and sensor().
-			ENABLE_ACCESS_TO_PARENT(SensorAbstract,sensor)
-				;
 				// define the function linkToParentLandmark().
 			ENABLE_LINK_TO_PARENT(LandmarkAbstract,Landmark,ObservationAbstract)
 				;
 				// define the functions landmarkPtr() and landmark().
 			ENABLE_ACCESS_TO_PARENT(LandmarkAbstract,landmark)
 				;
+				// define the function linkToParentDataManager().
+			ENABLE_LINK_TO_PARENT(DataManagerAbstract,DataManager,ObservationAbstract)
+				;
 				// define the functions dataManagerPtr() and dataManager().
 			ENABLE_ACCESS_TO_PARENT(DataManagerAbstract,dataManager)
 				;
+
+		public:
+		  typedef boost::weak_ptr<SensorAbstract> sensor_wptr_t;
+		protected:
+		  sensor_wptr_t sensorWPtr;
+		public:
+		  void linkToSensor( sensor_ptr_t ptr )
+		  {
+		    sensorWPtr = ptr;
+		  }
+		  sensor_ptr_t sensorPtr( void )
+		  {
+		    sensor_ptr_t sptr = sensorWPtr.lock();
+		    if (!sptr) {
+		      std::cerr << __FILE__ << ":" << __LINE__
+				<< " ObsSpec::sensor threw weak" << std::endl;
+		      throw "WEAK";
+		    }
+		    return sptr;
+		  }
 
 			public:
 
@@ -334,6 +350,32 @@ namespace jafar {
 	}
 
 }
+
+
+#define ENABLE_LINK_TO_SENSOR_SPEC(className)            \
+	protected:\
+	  sensor_spec_wptr_t sensorSpecWPtr;\
+	public:\
+	  void linkTo##className( sensor_spec_ptr_t ptr )\
+	  {\
+	    sensorSpecWPtr = ptr;\
+	    ObservationAbstract::linkToSensor(ptr);\
+	  }
+
+
+#define ENABLE_ACCESS_TO_SENSOR_SPEC(accessName)            \
+	  sensor_spec_ptr_t accessName##Ptr( void )\
+	  {\
+	    sensor_spec_ptr_t sptr = sensorSpecWPtr.lock();\
+	    if (!sptr) {\
+	      std::cerr << __FILE__ << ":" << __LINE__\
+			<< " ObsSpec::sensor threw weak" << std::endl;\
+	      throw "WEAK";\
+	    }\
+	    return sptr;\
+	  }
+
+
 
 #endif // #ifndef __ObservationAbstract_H__
 /*

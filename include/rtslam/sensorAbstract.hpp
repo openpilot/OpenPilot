@@ -57,7 +57,6 @@ namespace jafar {
 		class SensorAbstract: public MapObject,
 		    public ChildOf<RobotAbstract> ,
 		    public boost::enable_shared_from_this<SensorAbstract>,
-		    public ParentOf<ObservationAbstract> ,
 		    public ParentOf<DataManagerAbstract> {
 
 				friend std::ostream& operator <<(std::ostream & s,
@@ -69,15 +68,12 @@ namespace jafar {
 				// define the functions robotPtr() and robot().
 			ENABLE_ACCESS_TO_PARENT(RobotAbstract,robot)
 				;
-				// define the type ObservationList, and the function observationList().
-			ENABLE_ACCESS_TO_CHILDREN(ObservationAbstract,Observation,observation)
-				;
 				// define the type DataManagerList, and the function dataManagerList().
 			ENABLE_ACCESS_TO_CHILDREN(DataManagerAbstract,DataManager,dataManager)
 				;
 
 				hardware_sensor_ptr_t hardwareSensorPtr;
-				
+
 			public:
 
 				enum type_enum {

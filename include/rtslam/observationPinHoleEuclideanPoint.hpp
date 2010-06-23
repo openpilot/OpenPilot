@@ -27,16 +27,8 @@ namespace jafar {
 		 * \ingroup rtslam
 		 */
 		class ObservationPinHoleEuclideanPoint: public ObservationAbstract,
-		    public SpecificChildOf<SensorPinHole> ,
-		    public SpecificChildOf<LandmarkEuclideanPoint> ,
-		    public ChildOf<ImageManagerPoint>{
-
-
-			// Define the function linkToParentPinHole.
-			ENABLE_LINK_TO_SPECIFIC_PARENT(SensorAbstract,SensorPinHole,PinHole,ObservationAbstract);
-
-			// Define the functions pinHole() and pinHolePtr().
-			ENABLE_ACCESS_TO_SPECIFIC_PARENT(SensorPinHole,pinHole);
+		    public SpecificChildOf<LandmarkEuclideanPoint>
+		{
 
 			// Define the function linkToParentEUC.
 			ENABLE_LINK_TO_SPECIFIC_PARENT(LandmarkAbstract,LandmarkEuclideanPoint,EUC,ObservationAbstract);
@@ -44,25 +36,34 @@ namespace jafar {
 			// Define the functions euc() and eucPtr().
 			ENABLE_ACCESS_TO_SPECIFIC_PARENT(LandmarkEuclideanPoint,euc);
 
-			// Define the function linkToWeakParentDataManager().
-			ENABLE_LINK_TO_WEAK_SPECIFIC_PARENT(
-					DataManagerAbstract,
-					ImageManagerPoint,
-					ObservationAbstract,
-					ObservationPinHoleEuclideanPoint,
-					DataManager)
-			;
 
-			// Define the functions imageManager() and imageManagerPtr().
-		ENABLE_ACCESS_TO_PARENT(ImageManagerPoint,imageManager)
-			;
+		public:
+		  typedef SensorPinHole sensor_spec_t;
+		  typedef boost::shared_ptr<sensor_spec_t> sensor_spec_ptr_t;
+		  typedef boost::weak_ptr<sensor_spec_t> sensor_spec_wptr_t;
+		protected:
+		  sensor_spec_wptr_t sensorSpecWPtr;
+		public:
+		  void linkToPinHole( sensor_spec_ptr_t ptr )
+		  {
+		    sensorSpecWPtr = ptr;
+		    ObservationAbstract::linkToSensor(ptr);
+		  }
+		  sensor_spec_ptr_t pinHolePtr( void )
+		  {
+		    sensor_spec_ptr_t sptr = sensorSpecWPtr.lock();
+		    if (!sptr) {
+		      std::cerr << __FILE__ << ":" << __LINE__
+				<< " ObsSpec::sensor threw weak" << std::endl;
+		      throw "WEAK";
+		    }
+		    return sptr;
+		  }
 
 			public:
 
 			ObservationPinHoleEuclideanPoint(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr);
 			~ObservationPinHoleEuclideanPoint(void){
-					UNREGISTER_FROM_WEAK_SPECIFIC_PARENT(DataManagerAbstract,ObservationAbstract);
-					UNREGISTER_FROM_WEAK_SPECIFIC_PARENT(ImageManagerPoint,ObservationPinHoleAnchoredHomogeneousPoint);
 				}
 
 			void setup(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr, double _noiseStd, int patchSize);

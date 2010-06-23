@@ -147,16 +147,20 @@ namespace jafar {
 
 		map<double, observation_ptr_t> ActiveSearch::projectAll(const sensor_ptr_t & senPtr, size_t & numVis) {
 			map<double, observation_ptr_t> visObs;
-			for (SensorAbstract::ObservationList::iterator obsIter = senPtr->observationList().begin(); obsIter
-			    != senPtr->observationList().end(); obsIter++) {
-				observation_ptr_t obsPtr = *obsIter;
-				obsPtr->project();
-				obsPtr->predictVisibility();
-				if (obsPtr->isVisible()) {
-					obsPtr->predictInfoGain();
-					visObs[obsPtr->expectation.infoGain] = obsPtr; // this automatically sorts the observations ! ;-)
-				}
-			}
+			for (SensorAbstract::DataManagerList::iterator dmaIter = senPtr->dataManagerList().begin(); dmaIter!=senPtr->dataManagerList().end(); dmaIter++ )
+			  {
+			    data_manager_ptr_t dmaPtr = *dmaIter;
+			    for (DataManagerAbstract::ObservationList::iterator obsIter = dmaPtr->observationList().begin(); obsIter
+				   != dmaPtr->observationList().end(); obsIter++) {
+			      observation_ptr_t obsPtr = *obsIter;
+			      obsPtr->project();
+			      obsPtr->predictVisibility();
+			      if (obsPtr->isVisible()) {
+				obsPtr->predictInfoGain();
+				visObs[obsPtr->expectation.infoGain] = obsPtr; // this automatically sorts the observations ! ;-)
+			      }
+			    }
+			  }
 			return visObs;
 		}
 

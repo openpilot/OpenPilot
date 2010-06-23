@@ -326,8 +326,9 @@ namespace display {
 				if (!boost::is_same<SensorDisplayType,SensorDisplay>::value)
 					bufferizeObject<SensorDisplayType, RobotDisplayType, sensor_ptr_t, robot_ptr_t>(sen, rob, id());
 				// bufferize observations
-				for(LandmarkAbstract::ObservationList::iterator obs = sen->observationList().begin(); obs != sen->observationList().end(); ++obs)
-					bufferize(*obs,sen);
+				for(SensorAbstract::DataManagerList::iterator dma = sen->dataManagerList().begin(); dma!=sen->dataManagerList().end();++dma)
+				  for(LandmarkAbstract::ObservationList::iterator obs = (*dma)->observationList().begin(); obs != (*dma)->observationList().end(); ++obs)
+				    bufferize(*obs,sen);
 			}
 
 			inline void bufferize(rtslam::observation_ptr_t obs, rtslam::sensor_ptr_t sen)

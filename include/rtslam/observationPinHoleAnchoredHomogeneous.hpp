@@ -32,17 +32,9 @@ namespace jafar {
 		 * \ingroup rtslam
 		 */
 		class ObservationPinHoleAnchoredHomogeneousPoint: public ObservationAbstract,
-		    public SpecificChildOf<SensorPinHole> ,
-		    public SpecificChildOf<LandmarkAnchoredHomogeneousPoint> ,
-		    public ChildOf<ImageManagerPoint> {
+		    public SpecificChildOf<LandmarkAnchoredHomogeneousPoint>
+		{
 
-
-				// Define the function linkToParentPinHole.
-			ENABLE_LINK_TO_SPECIFIC_PARENT(SensorAbstract,SensorPinHole,PinHole,ObservationAbstract)
-				;
-				// Define the functions pinHole() and pinHolePtr().
-			ENABLE_ACCESS_TO_SPECIFIC_PARENT(SensorPinHole,pinHole)
-				;
 				// Define the function linkToParentAHP.
 			ENABLE_LINK_TO_SPECIFIC_PARENT(LandmarkAbstract,LandmarkAnchoredHomogeneousPoint,AHP,ObservationAbstract)
 				;
@@ -50,21 +42,33 @@ namespace jafar {
 			ENABLE_ACCESS_TO_SPECIFIC_PARENT(LandmarkAnchoredHomogeneousPoint,ahp)
 				;
 
-				// Define the function linkToWeakParentDataManager().
-				ENABLE_LINK_TO_WEAK_SPECIFIC_PARENT(DataManagerAbstract,ImageManagerPoint,
-						ObservationAbstract,ObservationPinHoleAnchoredHomogeneousPoint,DataManager)
-				;
+		public:
+		  typedef SensorPinHole sensor_spec_t;
+		  typedef boost::shared_ptr<sensor_spec_t> sensor_spec_ptr_t;
+		  typedef boost::weak_ptr<sensor_spec_t> sensor_spec_wptr_t;
+		protected:
+		  sensor_spec_wptr_t sensorSpecWPtr;
+		public:
+		  void linkToPinHole( sensor_spec_ptr_t ptr )
+		  {
+		    sensorSpecWPtr = ptr;
+		    ObservationAbstract::linkToSensor(ptr);
+		  }
+		  sensor_spec_ptr_t pinHolePtr( void )
+		  {
+		    sensor_spec_ptr_t sptr = sensorSpecWPtr.lock();
+		    if (!sptr) {
+		      std::cerr << __FILE__ << ":" << __LINE__
+				<< " ObsSpec::sensor threw weak" << std::endl;
+		      throw "WEAK";
+		    }
+		    return sptr;
+		  }
 
-				// Define the functions imageManager() and imageManagerPtr().
-			ENABLE_ACCESS_TO_PARENT(ImageManagerPoint,imageManager)
-				;
-
-			public:
+		public:
 
 				ObservationPinHoleAnchoredHomogeneousPoint(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & ahpPtr);
 				~ObservationPinHoleAnchoredHomogeneousPoint(void) {
-					UNREGISTER_FROM_WEAK_SPECIFIC_PARENT(DataManagerAbstract,ObservationAbstract);
-					UNREGISTER_FROM_WEAK_SPECIFIC_PARENT(ImageManagerPoint,ObservationPinHoleAnchoredHomogeneousPoint);
 				}
 
 				virtual std::string typeName() {
@@ -117,12 +121,6 @@ namespace jafar {
 				 * find and match the expected appearence in the raw-data
 				 */
 				virtual void matchFeature(raw_ptr_t rawPtr);
-
-			public:
-				/* Search in the sensor().dataManagerList() the manager of the proper type, to be
-				 * linked as the weak-father of this observation.
-				 */
-				void linkToWeakParentDataManager(void);
 
 			public:
 				double pixelNoise;

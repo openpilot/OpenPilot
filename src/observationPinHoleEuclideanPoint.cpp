@@ -29,7 +29,9 @@ namespace jafar {
 		{
 			ObservationAbstract::setup(_noiseStd, getPrior());
 			id() = eucPtr->id();
-			linkToParentPinHole(pinholePtr);
+			// TODO: is this cast necessary? Change the arg of the setup if not.
+			linkToPinHole(boost::dynamic_pointer_cast<SensorPinHole>
+				      (pinholePtr));
 			linkToParentEUC(eucPtr);
 			predictedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
 			observedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
@@ -119,28 +121,6 @@ namespace jafar {
 			bool infront = (expectation.nonObs(0) > 0.0);
 			events.visible = inimg && infront;
 			return events.visible;
-		}
-
-		void ObservationPinHoleEuclideanPoint::linkToWeakParentDataManager(
-		    void) {
-			if (!sensorPtr()) {
-				std::cerr << __PRETTY_FUNCTION__
-				    << ": error: senPtr not set yet, linkToParentSensor first."
-				    << std::endl;
-				//throw			"SENPTR no set.";
-			}
-			SensorAbstract & sen = *sensorPtr();
-			typedef SensorAbstract::DataManagerList dmalist_t;
-			dmalist_t & dmalist = sen.dataManagerList();
-			// Loop
-			for (dmalist_t::iterator iter = dmalist.begin(); iter != dmalist.end(); iter++) {
-				boost::shared_ptr<DataManagerAbstract> dma = *iter;
-				boost::shared_ptr<ImageManagerPoint> dms = boost::dynamic_pointer_cast<
-				    ImageManagerPoint>(dma);
-				if ((bool) dms) continue; // this is not the proper type ... continue.
-				linkToWeakParentDataManager(dms);
-				return;
-			}
 		}
 
 		void ObservationPinHoleEuclideanPoint::predictAppearance() {

@@ -68,7 +68,7 @@ void test_obsPHEuc01() {
 	//		lmkPtr->linkToParentMap(mapPtr);
 
 	obs_ph_euc_ptr_t obsPtr(new ObservationPinHoleEuclideanPoint(senPtr, lmkPtr));
-	obsPtr->linkToParentPinHole(senPtr);
+	obsPtr->linkToPinHole(senPtr);
 	obsPtr->linkToParentEUC(lmkPtr);
 
 	vec3 lmkPoint;

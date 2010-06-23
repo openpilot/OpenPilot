@@ -67,8 +67,6 @@ protected:
 private:
 
 private slots:
-   // Test function
-   void testRotate();
    void moveIndex();
 
 private:
@@ -116,10 +114,5 @@ private:
    UAVDataObject* obj1;
    QString field1;
 
-
-   // Test variables
-   int testSpeed;
-   QTimer m_testTimer;
-   // End test variables
 };
 #endif /* LINEARDIALGADGETWIDGET_H_ */

@@ -60,12 +60,6 @@ LineardialGadgetWidget::LineardialGadgetWidget(QWidget *parent) : QGraphicsView(
     connect(&dialTimer, SIGNAL(timeout()), this, SLOT(moveIndex()));
     dialTimer.start(30);
 
-#if 0
-    // Test code for timer to move the index
-    testSpeed=0;
-    connect(&m_testTimer, SIGNAL(timeout()), this, SLOT(testRotate()));
-    m_testTimer.start(1000);
-#endif
 }
 
 LineardialGadgetWidget::~LineardialGadgetWidget()
@@ -110,6 +104,8 @@ void LineardialGadgetWidget::updateIndex(UAVObject *object1) {
         QString s;
         s.sprintf("%.2f",v);
         fieldValue->setPlainText(s);
+        if (!dialTimer.isActive())
+            dialTimer.start();
     } else {
         std::cout << "Wrong field, maybe an issue with object disconnection ?" << std::endl;
     }
@@ -228,6 +224,10 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
 
          l_scene->setSceneRect(background->boundingRect());
 
+         // Reset the current index value:
+         indexValue = 0;
+         if (!dialTimer.isActive())
+             dialTimer.start();
      }
    }
    else
@@ -296,10 +296,10 @@ void LineardialGadgetWidget::setIndex(double value) {
 void LineardialGadgetWidget::moveIndex()
 {
     if ((abs((indexValue-indexTarget)*10) > 3)) {
-        indexValue += (indexTarget - indexValue)/5;
+       QTransform matrix;
+       indexValue += (indexTarget - indexValue)/5;
        index->resetTransform();
        qreal factor = indexValue*bargraphSize/100;
-       QTransform matrix;
        if (verticalDial) {
            matrix.translate(startX-indexWidth/2,factor+startY-indexHeight/2);
        } else {
@@ -307,14 +307,8 @@ void LineardialGadgetWidget::moveIndex()
        }
        index->setTransform(matrix,false);
        update();
+    } else {
+       indexValue = indexTarget;
+       dialTimer.stop();
    }
-}
-
-
-// Test function for timer to rotate needles
-void LineardialGadgetWidget::testRotate()
-{
-    testVal=0;
-    if (testVal > maxValue) testVal=minValue;
-   setIndex((double)testVal);
 }

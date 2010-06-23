@@ -123,7 +123,7 @@ void RSSFetcher::fetch(const QUrl &url)
     if (proxies.count() > 0)
         m_http.setProxy(proxies.first());
     m_http.setHost(url.host());
-    QString agentStr = QString("Qt-Creator/%1 (QHttp %2; %3; %4; %5 bit)")
+    QString agentStr = QString("OP-GCS/%1 (QHttp %2; %3; %4; %5 bit)")
                     .arg(Core::Constants::GCS_VERSION_LONG).arg(qVersion())
                     .arg(getOsString()).arg(QLocale::system().name())
                     .arg(QSysInfo::WordSize);

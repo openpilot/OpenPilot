@@ -59,7 +59,7 @@ public:
     const char *uniqueModeName() const;
     QList<int> context() const;
     void activated();
-    QString contextHelpId() const { return QLatin1String("Qt Creator"); }
+    QString contextHelpId() const { return QLatin1String("OpenPilot GCS"); }
     void initPlugins();
 
 private slots:

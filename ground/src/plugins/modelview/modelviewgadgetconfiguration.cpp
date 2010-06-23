@@ -30,8 +30,8 @@
 
 ModelViewGadgetConfiguration::ModelViewGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),
-    m_acFilename("../artwork/3D Model/quad.dae"),
-    m_bgFilename("../artwork/3D Model/default_background.png"),
+    m_acFilename("../share/openpilotgcs/models/Easystar/EasyStar.3ds"),
+    m_bgFilename(""),
     m_enableVbo(false)
 {
     if (state.count() > 0) {

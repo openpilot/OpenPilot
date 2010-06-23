@@ -106,7 +106,7 @@ private:
     int m_priority;
 };
 
-/* Mime type data used in Qt Creator. Contains most information from
+/* Mime type data used in the OpenPilot GCS. Contains most information from
  * standard mime type XML database files.
  * Omissions:
  * - Only magic of type "string" is supported. In addition, C++ classes

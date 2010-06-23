@@ -47,7 +47,7 @@ using namespace Core::Internal;
     \class ActionContainer
     \mainclass
 
-    \brief The ActionContainer class represents a menu or menu bar in Qt Creator.
+    \brief The ActionContainer class represents a menu or menu bar in the OpenPilot GCS.
 
     You don't create instances of this class directly, but instead use the
     \l{ActionManager::createMenu()}

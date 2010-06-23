@@ -301,7 +301,7 @@ int main(int argc, char **argv)
                 errors.append(p->errorString());
         if (!errors.isEmpty())
             QMessageBox::warning(0,
-                QCoreApplication::translate("Application", "Qt Creator - Plugin loader messages"),
+                QCoreApplication::translate("Application", "OpenPilot GCS - Plugin loader messages"),
                 errors.join(QString::fromLatin1("\n\n")));
     }
 

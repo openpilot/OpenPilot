@@ -471,7 +471,7 @@ static QString formatFilterString(const QString &description, const QList<QRegEx
 
 QString MimeType::filterString() const
 {
-    // @todo: Use localeComment() once creator is shipped with translations
+    // @todo: Use localeComment() once the GCS is shipped with translations
     return formatFilterString(comment(), m_d->globPatterns);
 }
 

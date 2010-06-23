@@ -99,6 +99,11 @@ namespace jafar {
 			clearEvents();
 		}
 
+		ObservationAbstract::~ObservationAbstract() {
+//			cout << "Deleted observation: " << id() << endl;
+		}
+
+
 //		void ObservationAbstract::setup(const feature_ptr_t & featPtr, const Gaussian & _prior){
 		void ObservationAbstract::setup(double _noiseStd, const Gaussian & _prior){
 			noiseCovariance.clear();
@@ -207,22 +212,18 @@ namespace jafar {
 		bool ObservationAbstract::voteForKillingLandmark(){
 			// kill big ellipses
 			int searchSize = 36*sqrt(expectation.P(0,0)*expectation.P(1,1));
-			if (searchSize > 10000) {
-				cout << "Killed by size." << endl;
+			if (searchSize > 30000) {
+//				cout << "Killed by size." << endl;
 				return true;
 			}
-
-//			return false; // FIXME remove this line!
 
 			// kill unstable and inconsistent lmks
 			if (counters.nSearch > 10) {
 				double matchRatio = counters.nMatch / (double) counters.nSearch;
 				double consistencyRatio = counters.nInlier / (double)counters.nMatch;
 
-cout << "(matchRatio/consistencyRatio): (" << matchRatio << "/" << consistencyRatio << ")" << endl;
-
 				if (matchRatio < 0.7 || consistencyRatio < 0.7)	{
-					cout << "Killed by unstability." << endl;
+//					cout << "Killed by unstability." << endl;
 					return true;
 				}
 			}

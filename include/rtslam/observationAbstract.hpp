@@ -113,9 +113,7 @@ namespace jafar {
 				ObservationAbstract(const sensor_ptr_t & _senPtr, const landmark_ptr_t & _lmkPtr, const size_t _size_meas,
 				                    const size_t _size_exp, const size_t _size_inn, const size_t _size_nonobs = 0);
 
-				virtual ~ObservationAbstract() {
-//					cout << "Deleted observation: " << id() << endl;
-				}
+				virtual ~ObservationAbstract();
 
 				virtual void setup(double _noiseStd, const Gaussian & _prior);
 

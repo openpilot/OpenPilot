@@ -55,8 +55,8 @@ std::string dump_path = ".";
 
 void demo_slam01_main(world_ptr_t *world) {
 
-	const int    	MAPSIZE     = 313;
 	const int    	NFRAME      = 5000;
+	const int    	MAPSIZE     = 313;
 	const int    	NUPDATES    = 1000;
 	const double 	FRAMERATE   = 60;
 	const int    	PATCHSIZE   = 11;
@@ -346,22 +346,20 @@ void demo_slam01_main(world_ptr_t *world) {
 			    != mapPtr->landmarkList().end(); lmkIter++) {
 				cout << (*lmkIter)->id() << " ";
 			}
-			cout << endl;
 
 			// Landmark reparametrization and deletion management
-			cout << "Deleted lmk: ";
+			cout << " ; ";
 			for (MapAbstract::LandmarkList::iterator lmkIter =
 			    mapPtr->landmarkList().begin(); lmkIter != mapPtr->landmarkList().end(); lmkIter++) {
 				landmark_ptr_t lmkPtr = *lmkIter;
 				if (lmkPtr->needToDie()) {
-					cout << lmkPtr->id() << " ";
+					cout << "-" << lmkPtr->id() << " ";
 					lmkIter++; // move iterator before killing list member
 					lmkPtr->suicide();
 					lmkIter--;
 				}
 			}
 			cout << endl;
-
 			//			vec7 F = robPtr1->pose.x();
 			//			vec3 p = subrange(F, 0, 3);
 			//			vec4 q = subrange(F, 3, 7);

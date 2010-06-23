@@ -86,16 +86,19 @@ namespace rtslam {
 		mode(mode), dump_path(dump_path)
 	{
 		// configure camera
-		int r;
-		handle = viam_init();
-		viam_camera_t camera = viam_camera_create(handle, camera_id.c_str(), "camera1");
-		bank = viam_bank_create(handle,"bank1");
-		r = viam_bank_cameraadd(handle,bank,camera,"image1");
-		r = viam_camera_sethwmode(handle, camera, &hwmode);
-		r = viam_hardware_load(handle,"dc1394");
-		r = viam_hardware_attach(handle);
-		r = viam_bank_configure(handle, bank);
-		r = viam_datatransmit(handle, bank, VIAM_ON);
+		if (mode != 2)
+		{
+			int r;
+			handle = viam_init();
+			viam_camera_t camera = viam_camera_create(handle, camera_id.c_str(), "camera1");
+			bank = viam_bank_create(handle,"bank1");
+			r = viam_bank_cameraadd(handle,bank,camera,"image1");
+			r = viam_camera_sethwmode(handle, camera, &hwmode);
+			r = viam_hardware_load(handle,"dc1394");
+			r = viam_hardware_attach(handle);
+			r = viam_bank_configure(handle, bank);
+			r = viam_datatransmit(handle, bank, VIAM_ON);
+		}
 
 		// configure data
 		for(int i = 0; i < 3; ++i)

@@ -40,12 +40,6 @@ namespace jafar {
 		}
 
 		LandmarkAbstract::~LandmarkAbstract() {
-			for (ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end(); obsIter++)
-			{
-				observation_ptr_t obsPtr = *obsIter;
-				obsPtr->sensorPtr()->ParentOf<ObservationAbstract>::unregisterChild(obsPtr);
-//				cout << "Should unregister obs: " << obsPtr->id() << endl;
-			}
 //			cout << "Deleted landmark: " << id() << endl;
 		}
 
@@ -187,6 +181,16 @@ namespace jafar {
 			landmark_ptr_t selfPtr = shared_from_this();
 			mapPtr()->liberateStates(state.ia()); // remove from map
 			mapPtr()->ParentOf<LandmarkAbstract>::unregisterChild(selfPtr); // remove from graph
+
+			int i = 0;
+			for (ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end(); obsIter++)
+			{
+				observation_ptr_t obsPtr = *obsIter;
+				obsIter++;
+				unregisterChild(obsPtr);
+				obsIter--;
+				obsPtr->sensorPtr()->ParentOf<ObservationAbstract>::unregisterChild(obsPtr);
+			}
 		}
 
 	}

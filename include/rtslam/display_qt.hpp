@@ -192,9 +192,10 @@ class ObservationQt : public ObservationDisplay
 		}
 		~ObservationQt()
 		{
+//JFR_DEBUG("deleting ObservationQt and all the graphics objects " << items_.size());
 			for(std::list<QGraphicsItemGroup*>::iterator it = items_.begin(); it != items_.end(); ++it)
 			{
-				view_->removeFromGroup(*it);
+				(*it)->setParentItem(NULL);
 				delete *it;
 			}
 		}
@@ -341,6 +342,7 @@ class ObservationQt : public ObservationDisplay
 #if DEFINE_USELESS_OBJECTS
 typedef Viewer<WorldQt,MapQt,RobotQt,SensorQt,LandmarkQt,ObservationQt> ViewerQt;
 #else
+#error "does not work"
 typedef Viewer<WorldDisplay,MapDisplay,RobotDisplay,SensorQt,LandmarkDisplay,ObservationQt> ViewerQt;
 #endif
 

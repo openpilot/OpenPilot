@@ -10,6 +10,13 @@ SUBDIRS   = plugin_coreplugin
 #plugin_donothing.subdir = donothing
 #plugin_donothing.depends = plugin_coreplugin
 
+# Another example, with more details such as options page
+# Empty UAVGadget
+#plugin_emptygadget.subdir = emptygadget
+#plugin_emptygadget.depends = plugin_coreplugin
+#SUBDIRS += plugin_emptygadget
+
+
 # Core Plugin
 plugin_coreplugin.subdir = coreplugin
 
@@ -38,11 +45,6 @@ SUBDIRS += plugin_uavtalk
 plugin_uavtalk.subdir = uavtalk
 plugin_uavtalk.depends = plugin_uavobjects
 plugin_uavtalk.depends += plugin_coreplugin
-
-# Empty UAVGadget
-plugin_emptygadget.subdir = emptygadget
-plugin_emptygadget.depends = plugin_coreplugin
-SUBDIRS += plugin_emptygadget
 
 # Map UAVGadget
 plugin_map.subdir = map
@@ -103,7 +105,7 @@ plugin_notify.depends = plugin_coreplugin
 plugin_notify.depends = plugin_uavobjects
 SUBDIRS += plugin_notify
 
-#HITL simulation Gadget
+#HITL Simulation Gadget
 plugin_hitl.subdir = hitl
 plugin_hitl.depends = plugin_coreplugin
 plugin_hitl.depends += plugin_uavobjects

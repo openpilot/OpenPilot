@@ -5,7 +5,7 @@
  * @author     Edouard Lafargue Copyright (C) 2010.
  * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   gpsdisplay
+ * @defgroup   gpsdisplayplugin
  * @{
  *
  *****************************************************************************/

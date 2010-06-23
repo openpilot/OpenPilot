@@ -6,7 +6,7 @@
  *             Parts by Qxt Foundation http://www.libqxt.org Copyright (C)
  * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   consolegadget
+ * @defgroup   consoleplugin
  * @{
  * 
  *****************************************************************************/

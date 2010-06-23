@@ -5,7 +5,7 @@
  * @author     Edouard Lafargue Copyright (C) 2010.
  * @brief      Bargraph gadget with red/yellow/green zones
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   lineardial
+ * @defgroup   lineardialplugin
  * @{
  *
  *****************************************************************************/

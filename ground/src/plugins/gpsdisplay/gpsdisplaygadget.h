@@ -3,9 +3,9 @@
  *
  * @file       gpsdisplaygadget.h
  * @author     Edouard Lafargue Copyright (C) 2010.
- * @brief      Gps gadget to display GPS Status
+ * @brief      GPS gadget to display GPS Status header
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   gpsdisplay
+ * @defgroup   gpsdisplayplugin
  * @{
  *
  *****************************************************************************/

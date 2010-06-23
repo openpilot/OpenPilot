@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       systemhealthgadget.cpp
+ * @file       gpsdisplaygadget.cpp
  * @author     Edouard Lafargue Copyright (C) 2010.
- * @brief
+ * @brief      GPS gadget to display GPS Status
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   systemhealth
+ * @defgroup   gpsdisplayplugin
  * @{
  *
  *****************************************************************************/

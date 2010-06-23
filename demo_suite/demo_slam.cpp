@@ -399,17 +399,21 @@ void demo_slam01_display(world_ptr_t *world)
 }
 
 
-void demo_slam01() {
+void demo_slam01(bool display) {
 	world_ptr_t worldPtr(new WorldAbstract());
 	
 	// to start with qt display
 	const int slam_priority = -10; // needs to be started as root to be < 0
-	const int display_priority = 2;
+	const int display_priority = 10;
 	const int display_period = 100; // ms
-	qdisplay::QtAppStart((qdisplay::FUNC)&demo_slam01_display,display_priority,(qdisplay::FUNC)&demo_slam01_main,slam_priority,display_period,&worldPtr);
-
-	// to start without display
-	//demo_slam01_main(&worldPtr);
+	if (display)
+	{
+		qdisplay::QtAppStart((qdisplay::FUNC)&demo_slam01_display,display_priority,(qdisplay::FUNC)&demo_slam01_main,slam_priority,display_period,&worldPtr);
+	} else
+	{
+		kernel::setCurrentThreadPriority(slam_priority);
+		demo_slam01_main(&worldPtr);
+	}
 
 	JFR_DEBUG("Terminated");
 }
@@ -421,11 +425,14 @@ If you want to replay the last execution, change 1 to 2
 */
 int main(int argc, const char* argv[])
 {
-	if (argc == 3)
+	bool display = 1;
+	if (argc == 4)
 	{
-		mode = atoi(argv[1]);
-		dump_path = argv[2];
-	}
+		display = atoi(argv[1]);
+		mode = atoi(argv[2]);
+		dump_path = argv[3];
+	} else if (argc != 0)
+	std::cout << "Usage: demo_slam <display-enabled=1> <image-mode=0> <dump-path=.>" << std::endl;
 	
-	demo_slam01();
+	demo_slam01(display);
 }

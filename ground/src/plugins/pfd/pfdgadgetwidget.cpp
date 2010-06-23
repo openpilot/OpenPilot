@@ -127,6 +127,7 @@ void PFDGadgetWidget::updateHeading(UAVObject *object1) {
         // - Heading value in degrees
         // - Scale is 540 degrees large
         headingTarget = field->getDouble()*compassBandWidth/(-540);
+
         if (!dialTimer.isActive())
             dialTimer.start(); // Rearm the dial Timer which might be stopped.
     } else {
@@ -315,41 +316,36 @@ void PFDGadgetWidget::resizeEvent(QResizeEvent *event)
 //
 void PFDGadgetWidget::rotateNeedles()
 {
-    int dialCount = 3;
-    if ((abs((rollValue-rollTarget)*10) > 5)) {
-        double rollDiff;
-        rollDiff =(rollTarget - rollValue)/5;
-        m_world->setRotation(m_world->rotation()+rollDiff);
-        m_rollscale->setRotation(m_rollscale->rotation()+rollDiff);
-        rollValue += rollDiff;
-    } else {
-        // This avoids any sort of offset resulting from rounding
-        // errors on the dichotomy above
-        rollValue = rollTarget;
-        m_world->setRotation(rollValue);
-        m_rollscale->setRotation(rollValue);
-        dialCount--;
-    }
+    int dialCount = 3; // Gets decreased by one for each element
+                       // which has finished moving
 
-    if ((abs((pitchValue-pitchTarget)*10) > 5)) {
-        double pitchDiff;
-        pitchDiff = (pitchTarget - pitchValue)/5;
-        QPointF opd = QPointF(0,pitchDiff);
-        m_world->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), true);
-        QPointF oop = m_world->transformOriginPoint();
-        m_world->setTransformOriginPoint((oop.x()-opd.x()),(oop.y()-opd.y()));
-        pitchValue += pitchDiff;
+    double rollDiff;
+    if ((abs((rollValue-rollTarget)*10) > 5)) {
+        rollDiff =(rollTarget - rollValue)/5;
     } else {
-        pitchValue = pitchTarget;
-        // TODO: should maybe reset the transformOriginpoint here one last
-        // time with the pitchValue=pitchTarget ? To be checked later.
+        rollDiff = rollTarget - rollValue;
         dialCount--;
     }
+    m_world->setRotation(m_world->rotation()+rollDiff);
+    m_rollscale->setRotation(m_rollscale->rotation()+rollDiff);
+    rollValue += rollDiff;
+
+    double pitchDiff;
+    if ((abs((pitchValue-pitchTarget)*10) > 5)) {
+        pitchDiff = (pitchTarget - pitchValue)/5;
+    } else {
+        pitchDiff = pitchTarget - pitchValue;
+        dialCount--;
+    }
+    QPointF opd = QPointF(0,pitchDiff);
+    m_world->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), true);
+    QPointF oop = m_world->transformOriginPoint();
+    m_world->setTransformOriginPoint((oop.x()-opd.x()),(oop.y()-opd.y()));
+    pitchValue += pitchDiff;
 
     double headingOffset = 0;
     double headingDiff;
     if ((abs((headingValue-headingTarget)*10) > 5)) {
-
         headingDiff = (headingTarget - headingValue)/5;
     } else {
         headingDiff = headingTarget-headingValue;
@@ -365,11 +361,11 @@ void PFDGadgetWidget::rotateNeedles()
         // We went under 180°: remove the -360 degree offset
         headingOffset = -2*threshold;
     }
-    QPointF opd = QPointF(headingDiff+headingOffset,0);
+    opd = QPointF(headingDiff+headingOffset,0);
     m_compassband->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), true);
     headingValue += headingDiff;
 
-   update();
+   //update();
    if (!dialCount)
        dialTimer.stop();
 }

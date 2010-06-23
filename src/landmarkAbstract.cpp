@@ -93,7 +93,6 @@ namespace jafar {
 
 
 		void LandmarkAbstract::reparametrize() {
-			//TODO Implement reparametrize():
 
 			// - create a new STD landmark.
 			if (mapPtr()->unusedStates(LandmarkEuclideanPoint::size())){
@@ -114,7 +113,6 @@ namespace jafar {
 
 						// - transfer info from old obs to new obs.
 						obsPtrEuc->transferInfoObs(obsPtr);
-
 					}
 
 				// - call reparametrize_func()
@@ -128,11 +126,20 @@ namespace jafar {
 					mapPtr()->filterPtr->reparametrize(mapPtr()->ia_used_states(),LMKNEW_lmk,this->state.ia(),lmkPtr->state.ia());
 
 				// - transfer info from the old lmk to the new one
-					lmkPtr->transferInfoLmk(this->shared_from_this());
+					landmark_ptr_t lmkPtrOld = this->shared_from_this();
+					lmkPtr->transferInfoLmk(lmkPtrOld);
 
 				// - delete old lmk <-- this will delete all old obs!
 					this->suicide();
 				}
+		}
+
+		void LandmarkAbstract::transferInfoLmk(landmark_ptr_t & lmkSourcePtr){
+
+			this->id(lmkSourcePtr->id());
+			this->name(lmkSourcePtr->name());
+			this->geomType = lmkSourcePtr->getGeomType();
+
 		}
 
 		bool LandmarkAbstract::needToDie(DecisionMethod dieMet){

@@ -229,7 +229,28 @@ cout << "(matchRatio/consistencyRatio): (" << matchRatio << "/" << consistencyRa
 			return false;
 		}
 
+		void ObservationAbstract::transferInfoObs(observation_ptr_t & obs){
+			this->id(obs->id());
+			this->name(obs->name());
 
+			this->expectation.x(obs->expectation.x());
+			this->expectation.P(obs->expectation.P());
+			this->expectation.infoGain = obs->expectation.infoGain;
+			this->expectation.nonObs = obs->expectation.nonObs;
+			this->expectation.visible = obs->expectation.visible;
+
+			this->innovation.x(obs->innovation.x());
+			this->innovation.P(obs->innovation.P());
+			this->innovation.iP_ = obs->innovation.iP_;
+			this->innovation.mahalanobis_ = obs->innovation.mahalanobis_;
+
+			this->measurement.x(obs->measurement.x());
+			this->measurement.P(obs->measurement.P());
+			this->measurement.matchScore = obs->measurement.matchScore;
+
+			this->counters = obs->counters;
+			this->events = obs->events;
+		};
 
 	} // namespace rtslam
 } // namespace jafar

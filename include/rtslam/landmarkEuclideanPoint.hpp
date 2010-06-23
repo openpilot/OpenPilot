@@ -78,11 +78,6 @@ namespace jafar {
 				virtual bool needToReparametrize(){
 					return false; // never reparametrize an Euclidean point
 				}
-
-				//TODO: implement transferInfoLmk
-				void transferInfoLmk(const landmark_ptr_t & lmkSourcePtr){}
-
-
 		}; // class LandmarkEuclideanPoint
 	} // namespace rtslam
 } // namespace jafar

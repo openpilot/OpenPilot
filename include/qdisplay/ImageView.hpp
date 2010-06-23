@@ -22,7 +22,7 @@ namespace qdisplay {
  * the command addShape
  */
 class ImageView : public QObject, public QGraphicsItemGroup {
-  Q_OBJECT
+  Q_OBJECT;
   public:
     ImageView();
     /**
@@ -42,6 +42,10 @@ class ImageView : public QObject, public QGraphicsItemGroup {
      * @param si a Shape to display on the scene.
      */
     void addShape(Shape* si);
+    /**
+     * @param si the shape to remove from this ImageView
+     */
+    void removeShape(Shape* si);
     /**
      * @param li a Line to display on the scene.
      */

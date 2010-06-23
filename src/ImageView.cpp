@@ -79,6 +79,11 @@ void ImageView::addShape(Shape* si)
   si->moveBy(pos().x(), pos().y());
 }
 
+void ImageView::removeShape(Shape* si)
+{
+	si->setParentItem(0);
+}
+
 void ImageView::addLine(Line* li)
 {
   addToGroup(li);

@@ -36,6 +36,7 @@ disconnected
 feet
 figure eight
 flight
+Geofence
 GPS 
 ground station
 heading

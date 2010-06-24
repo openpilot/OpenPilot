@@ -12,9 +12,10 @@ build_jafar_module(correl
   #OPTIONAL_MODULES 
   REQUIRED_EXTLIBS opencv
   #OPTIONAL_EXTLIBS 
-  # LDFLAGS 
-  # CPPFLAGS -DJFR_NDEBUG
-  CXXFLAGS -g -ggdb -Wall
+  #LDFLAGS 
+  #CPPFLAGS
+  #CXXFLAGS
+  #CPPFLAGS_MODULE
 )
 
 

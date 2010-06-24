@@ -52,6 +52,7 @@ namespace jafar {
 
 				ObservationPinHoleAnchoredHomogeneousPoint(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & ahpPtr);
 				~ObservationPinHoleAnchoredHomogeneousPoint(void) {
+					cout << "Deleted observation: " << id() << ": " << typeName() << endl;
 				}
 
 				virtual std::string typeName() {
@@ -99,7 +100,7 @@ namespace jafar {
 					return measurement.matchScore;
 				}
 
-				virtual bool voteForReparametrizeLandmark();
+				virtual bool voteForReparametrizingLandmark();
 
 			public:
 				double pixelNoise;

@@ -47,6 +47,7 @@ namespace jafar {
 
 			ObservationPinHoleEuclideanPoint(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr);
 			~ObservationPinHoleEuclideanPoint(void){
+				cout << "Deleted observation: " << id() << ": " << typeName() << endl;
 					}
 
 			void setup(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr, double _noiseStd, int patchSize);
@@ -96,8 +97,7 @@ namespace jafar {
 					return measurement.matchScore;
 				}
 
-				virtual bool voteForReparametrizeLandmark(){
-					// TODO implement this.
+				virtual bool voteForReparametrizingLandmark(){
 					return false;
 				}
 

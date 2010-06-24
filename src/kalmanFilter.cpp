@@ -48,13 +48,13 @@ namespace jafar {
 		void ExtendedKalmanFilterIndirect::correct(const ind_array & ia_x, Innovation & inn, const mat & INN_rsl, const ind_array & ia_rsl)
 		{
 			PJt_tmp.resize(ia_x.size(),INN_rsl.size1());
-			PJt_tmp = - prod(project(P_, ia_x, ia_rsl), trans(INN_rsl));
+			PJt_tmp = prod(project(P_, ia_x, ia_rsl), trans(INN_rsl));
 			inn.invertCov();
-			K = prod(PJt_tmp, inn.iP_);
+			K = - prod(PJt_tmp, inn.iP_);
 
 			// mean and covariances update:
 			ublas::project(x_, ia_x) += prod(K, inn.x());
-			ublas::project(P_, ia_x, ia_x) -= prod<sym_mat> (K, trans(PJt_tmp));
+			ublas::project(P_, ia_x, ia_x) += prod<sym_mat> (K, trans(PJt_tmp));
 		}
 
 		void ExtendedKalmanFilterIndirect::initialize(const ind_array & ia_x, const mat & G_v, const ind_array & ia_rs, const ind_array & ia_l, const mat & G_y, const sym_mat & R){

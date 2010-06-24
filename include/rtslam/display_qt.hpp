@@ -195,7 +195,7 @@ class ObservationQt : public ObservationDisplay
 //JFR_DEBUG("deleting ObservationQt and all the graphics objects " << items_.size());
 			for(std::list<QGraphicsItemGroup*>::iterator it = items_.begin(); it != items_.end(); ++it)
 			{
-				(*it)->setParentItem(NULL);
+				//(*it)->setParentItem(NULL);
 				delete *it;
 			}
 		}
@@ -215,7 +215,8 @@ class ObservationQt : public ObservationDisplay
 						if (predicted_)
 						{
 							predObs_ = slamObs_->expectation.x();
-							predObsCov_ = slamObs_->expectation.P();
+							predObsCov_ = slamObs_->innovation.P();
+//							cout << "display: noise/exp/inn:  " << slamObs_->measurement.P() << " / " << slamObs_->expectation.P() << " / " << slamObs_->innovation.P() << " / " << endl;
 						}
 						if (matched_ || !predicted_)
 						{

@@ -327,7 +327,7 @@ namespace jafar {
 
 				virtual bool voteForKillingLandmark();
 
-				virtual bool voteForReparametrizeLandmark() = 0;
+				virtual bool voteForReparametrizingLandmark() = 0;
 
 				virtual void transferInfoObs(observation_ptr_t & obs);
 

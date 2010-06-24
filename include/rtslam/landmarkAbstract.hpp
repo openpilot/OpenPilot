@@ -103,9 +103,9 @@ namespace jafar {
 			protected:
 				geometry_t geomType;
 			public:
-				geometry_t getGeomType(){return geomType;}
-//				std::string typeName();
 				std::string categoryName(){return "LANDMARK";}
+				geometry_t getGeomType(){return geomType;}
+				virtual std::string typeName() {return "Abstract";}
 
 				virtual landmark_ptr_t convertToStandardParametrization() = 0;
 				/* FIXME how to implement convertToStandardParametrization in concrete types ?

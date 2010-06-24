@@ -99,7 +99,9 @@ namespace jafar {
 					app_img_pnt_ptr_t targetAppImg = SPTR_CAST<AppearanceImagePoint>(targetApp);
 					app_img_pnt_ptr_t appImg = SPTR_CAST<AppearanceImagePoint>(app);
 					
-					measure.matchScore = correl::Explorer<correl::Zncc>::exploreTranslation(targetAppImg->patch, *img, roi.x, roi.x+roi.width-1, 1, roi.y, roi.y+roi.height-1, 1, measure.x()(0), measure.x()(1));
+					measure.matchScore = correl::Explorer<correl::Zncc>::exploreTranslation(
+							targetAppImg->patch, *img, roi.x, roi.x+roi.width-1, 1, roi.y, roi.y+roi.height-1, 1,
+							measure.x()(0), measure.x()(1));
 			
 					// TODO set appearance
 //					app = img->copy(appImg->patch, measure.x()(0), measure.x()(1));

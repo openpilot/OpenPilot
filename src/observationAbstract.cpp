@@ -100,7 +100,7 @@ namespace jafar {
 		}
 
 		ObservationAbstract::~ObservationAbstract() {
-//			cout << "Deleted observation: " << id() << endl;
+			cout << "Deleted observation: " << id() << ": " << typeName() << endl;
 		}
 
 

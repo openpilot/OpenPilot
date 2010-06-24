@@ -40,7 +40,7 @@ namespace jafar {
 		}
 
 		LandmarkAbstract::~LandmarkAbstract() {
-//			cout << "Deleted landmark: " << id() << endl;
+			cout << "Deleted landmark: " << id() << ": " << typeName() << endl;
 		}
 
 		bool LandmarkAbstract::needToReparametrize(DecisionMethod repMet){
@@ -49,8 +49,8 @@ namespace jafar {
 					for (ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end(); obsIter++)
 					{
 						observation_ptr_t obsPtr = *obsIter;
-						// Drastic option: ANY vote for reparametrization declares the need of reparametrization.
-						if (obsPtr->voteForReparametrizeLandmark()) return true;
+						// Lazy option: ANY vote for reparametrization declares the need of reparametrization.
+						if (obsPtr->voteForReparametrizingLandmark()) return true;
 					}
 					return false;
 				}
@@ -58,8 +58,8 @@ namespace jafar {
 					for (ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end(); obsIter++)
 					{
 						observation_ptr_t obsPtr = *obsIter;
-						// Magnanimous option: ALL votes for reparametrization necessary to declare the need of reparametrization.
-						if (!obsPtr->voteForReparametrizeLandmark()) return false;
+						// Strict option: ALL votes for reparametrization necessary to declare the need of reparametrization.
+						if (!obsPtr->voteForReparametrizingLandmark()) return false;
 					}
 					return true;
 				}
@@ -69,7 +69,7 @@ namespace jafar {
 					{
 						observation_ptr_t obsPtr = *obsIter;
 						// Democratic option: MAJORITY votes declares the need of reparametrization.
-						if (obsPtr->voteForReparametrizeLandmark()) nRepar++;
+						if (obsPtr->voteForReparametrizingLandmark()) nRepar++;
 						else nKeep++;
 					}
 					if (nRepar > nKeep) return true;
@@ -90,6 +90,7 @@ namespace jafar {
 
 			// - create a new STD landmark.
 			if (mapPtr()->unusedStates(LandmarkEuclideanPoint::size())){
+				cout << __PRETTY_FUNCTION__ << "about to create new lmk" << endl;
 				eucp_ptr_t lmkPtr(new LandmarkEuclideanPoint(mapPtr()));
 
 				// - create its set of observations, one per sensor.
@@ -97,15 +98,19 @@ namespace jafar {
 					for (LandmarkAbstract::ObservationList::iterator obsIter = this->observationList().begin(); obsIter != this->observationList().end(); obsIter++)
 					{
 						obsPtr = *obsIter;
+						cout << __PRETTY_FUNCTION__ << "about to create new obs" << endl;
 						obs_ph_euc_ptr_t obsPtrEuc(new ObservationPinHoleEuclideanPoint(obsPtr->sensorPtr(), lmkPtr));
 
 						// - Link the landmark to map and observations.
+						cout << __PRETTY_FUNCTION__ << "about to link new obs to new lmk" << endl;
 						obsPtrEuc->linkToParentEUC(lmkPtr);
 
 						// - Link the sensors to the new observations.
+						cout << __PRETTY_FUNCTION__ << "about to link new obs to sen" << endl;
 						obsPtrEuc->linkToParentSensor(obsPtr->sensorPtr());
 
 						// - transfer info from old obs to new obs.
+						cout << __PRETTY_FUNCTION__ << "about to transfer obs info" << endl;
 						obsPtrEuc->transferInfoObs(obsPtr);
 					}
 
@@ -113,17 +118,21 @@ namespace jafar {
 					mat LMKNEW_lmk(lmkPtr->mySize(),this->mySize());
 					vec lmk = this->state.x();
 					vec lmkNEW(lmkPtr->mySize());
+					cout << __PRETTY_FUNCTION__ << "about to call reparametrize_func()" << endl;
 					reparametrize_func(lmk,lmkNEW,LMKNEW_lmk);
 					lmkPtr->state.x(lmkNEW);
 
 				// - call filter->reparametrize()
+					cout << __PRETTY_FUNCTION__ << "about to call filter->reparametrize()" << endl;
 					mapPtr()->filterPtr->reparametrize(mapPtr()->ia_used_states(),LMKNEW_lmk,this->state.ia(),lmkPtr->state.ia());
 
 				// - transfer info from the old lmk to the new one
 					landmark_ptr_t lmkPtrOld = this->shared_from_this();
+					cout << __PRETTY_FUNCTION__ << "about to transfer lmk info" << endl;
 					lmkPtr->transferInfoLmk(lmkPtrOld);
 
 				// - delete old lmk <-- this will delete all old obs!
+					cout << __PRETTY_FUNCTION__ << "about to kill the old lmk" << endl;
 					this->suicide();
 				}
 		}
@@ -143,7 +152,10 @@ namespace jafar {
 					{
 						observation_ptr_t obsPtr = *obsIter;
 						// Drastic option: ANY vote for killing declares the need to die.
-						if (obsPtr->voteForKillingLandmark()) return true;
+						if (obsPtr->voteForKillingLandmark()) {
+							cout << __PRETTY_FUNCTION__ << ": obs will vote for killing lmk: " << id() << endl;
+							return true;
+						}
 					}
 					return false;
 				}
@@ -180,15 +192,17 @@ namespace jafar {
 		void LandmarkAbstract::suicide(){
 			landmark_ptr_t selfPtr = shared_from_this();
 			mapPtr()->liberateStates(state.ia()); // remove from map
+			cout << __PRETTY_FUNCTION__ << "about to unregister the old lmk" << endl;
 			mapPtr()->ParentOf<LandmarkAbstract>::unregisterChild(selfPtr); // remove from graph
 
-			int i = 0;
 			for (ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end(); obsIter++)
 			{
 				observation_ptr_t obsPtr = *obsIter;
 				obsIter++;
+				cout << __PRETTY_FUNCTION__ << "about to unregister obs from lmk" << endl;
 				unregisterChild(obsPtr);
 				obsIter--;
+				cout << __PRETTY_FUNCTION__ << "about to unregister obs from sen" << endl;
 				obsPtr->sensorPtr()->ParentOf<ObservationAbstract>::unregisterChild(obsPtr);
 			}
 		}

@@ -15,6 +15,7 @@
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 #include <time.h>
+#include <map>
 
 // jafar debug include
 #include "kernel/jafarDebug.hpp"
@@ -55,20 +56,23 @@ std::string dump_path = ".";
 
 void demo_slam01_main(world_ptr_t *world) {
 
-	const int    	NFRAME      = 5000;
-	const int    	MAPSIZE     = 313;
-	const int    	NUPDATES    = 1000;
-	const double 	FRAMERATE   = 60;
-	const int    	PATCHSIZE   = 11;
-	const int			PATCHDESC		= PATCHSIZE*3;
-	const double 	HARRIS_TH   = 20;
-	const double 	HARRIS_EDGE = 2;
-	const int 		GRID_UCELLS	= 5;
-	const int			GRID_VCELLS	= 5;
-	const int			GRID_MARGIN	= (PATCHDESC-1)/2;
-	const int			GRID_SEPAR	= PATCHSIZE*3;
-	const double	PERT_VLIN		= 2.0; // m/s per sqrt(s)
-	const double	PERT_VANG		= 4.0; // rad/s per sqrt(s)
+	const int    	N_FRAMES    = 5000;
+	const int    	MAP_SIZE    = 250;
+	const int    	N_UPDATES   = 15;
+	const double 	FRAME_RATE  = 60;
+
+	const int    	PATCH_SIZE  = 7;
+	const int			DESC_SIZE		= PATCH_SIZE*3;
+	const int 		GRID_UCELLS	= 3;
+	const int			GRID_VCELLS	= 3;
+	const int			GRID_MARGIN	= (DESC_SIZE-1)/2;
+	const int			GRID_SEPAR	= PATCH_SIZE;
+
+	const double	PERT_VLIN		= 4.0; // m/s per sqrt(s)
+	const double	PERT_VANG		= 1.0; // rad/s per sqrt(s)
+
+	const bool		SHOW_PATCH	= true;
+
 
 	time_t rseed = time(NULL);
 	if (mode == 1)
@@ -104,7 +108,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	worldPtr->display_mutex.lock();
 
 	// create map
-	map_ptr_t mapPtr(new MapAbstract(MAPSIZE));
+	map_ptr_t mapPtr(new MapAbstract(MAP_SIZE));
 	worldPtr->addMap(mapPtr);
 	mapPtr->clear();
 
@@ -114,7 +118,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	robPtr1->linkToParentMap(mapPtr);
 	robPtr1->state.clear();
 	robPtr1->pose.x(quaternion::originFrame());
-	robPtr1->dt_or_dx = 1/FRAMERATE;
+	robPtr1->dt_or_dx = 1/FRAME_RATE;
 	double _v[6] = {PERT_VLIN,PERT_VLIN,PERT_VLIN,PERT_VANG,PERT_VANG,PERT_VANG};
 	robPtr1->perturbation.clear();
 	robPtr1->perturbation.set_std_continuous(createVector<6>(_v));
@@ -128,7 +132,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	senPtr11->pose.x(quaternion::originFrame());
 	senPtr11->params.setImgSize(imgWidth, imgHeight);
 	senPtr11->params.setIntrinsicCalibration(k, d, d.size());
-	senPtr11->params.setMiscellaneous(1.0, 0.1, PATCHSIZE);
+	senPtr11->params.setMiscellaneous(1.0, 0.1, PATCH_SIZE);
 
 	viam_hwmode_t hwmode = { VIAM_HWSZ_640x480, VIAM_HWFMT_MONO8, VIAM_HW_FIXED, VIAM_HWFPS_60, VIAM_HWTRIGGER_INTERNAL };
 	// UNCOMMENT THESE TWO LINES TO ENABLE FIREWIRE CAMERA OPERATION
@@ -150,8 +154,8 @@ void demo_slam01_main(world_ptr_t *world) {
 	kernel::Chrono chrono;
 	kernel::Chrono total_chrono;
 	kernel::Chrono mutex_chrono;
-	int max_dt = 0;
-	for (int t = 1; t <= NFRAME;) {
+	double max_dt = 0;
+	for (int t = 1; t <= N_FRAMES;) {
 //		sleep(1);
 		bool had_data = false;
 
@@ -159,7 +163,8 @@ void demo_slam01_main(world_ptr_t *world) {
 //		cout << "\n************************************************** " << endl;
 //		cout << "\n                 FRAME : " << t << " (blocked " << mutex_chrono.elapsedMicrosecond() << " us)" << endl;
 		chrono.reset();
-
+		int total_match_time = 0;
+		int total_update_time = 0;
 
 		// foreach robot
 		for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin(); robIter != mapPtr->robotList().end(); robIter++)
@@ -194,6 +199,11 @@ void demo_slam01_main(world_ptr_t *world) {
 				int numObs = 0;
 				observation_ptr_t obsPtr;
 
+				// the list of observations sorted by information gain
+				map<double, observation_ptr_t> obsSortedList;
+
+
+				// loop all observations
 				for (SensorAbstract::ObservationList::iterator obsIter = senPtr->observationList().begin(); obsIter != senPtr->observationList().end(); obsIter++)
 				{
 					obsPtr = *obsIter;
@@ -206,13 +216,37 @@ void demo_slam01_main(world_ptr_t *world) {
 
 						// 1b. check visibility
 					obsPtr->predictVisibility();
+
 					if (obsPtr->isVisible()) {
 
 						// Add to tesselation grid for active search
 						asGrid.addPixel(obsPtr->expectation.x());
 
-						numObs++;
-						if (numObs <= NUPDATES) {
+						// predict information gain
+						obsPtr->predictInfoGain();
+
+						// add to sorted list
+						obsSortedList[obsPtr->expectation.infoGain] = obsPtr;
+					} // visible obs
+				} // for each obs
+
+
+
+				// loop only the N_UPDATES most interesting obs, from largest info gain to smallest
+				for (map<double, observation_ptr_t>::reverse_iterator obsIter = obsSortedList.rbegin(); obsIter != obsSortedList.rend(); obsIter++) {
+					obsPtr = obsIter->second;
+
+					// 1a. project
+					obsPtr->project();
+
+						// 1b. check visibility
+					obsPtr->predictVisibility();
+
+					if (obsPtr->isVisible()) {
+
+//cout << "info gain " << obsPtr->expectation.infoGain << endl;
+
+						if (numObs < N_UPDATES) {
 
 						// update counter
 						obsPtr->counters.nSearch++;
@@ -225,8 +259,8 @@ void demo_slam01_main(world_ptr_t *world) {
 						// 1d. search appearence in raw
 						int xmin, xmax, ymin, ymax;
 						double dx, dy;
-						dx = 3.0*sqrt(obsPtr->expectation.P(0,0));
-						dy = 3.0*sqrt(obsPtr->expectation.P(1,1));
+						dx = 3.0*sqrt(obsPtr->expectation.P(0,0)+1.0);
+						dy = 3.0*sqrt(obsPtr->expectation.P(1,1)+1.0);
 						xmin = (int)(obsPtr->expectation.x(0)-dx);
 						xmax = (int)(obsPtr->expectation.x(0)+dx+0.9999);
 						ymin = (int)(obsPtr->expectation.x(1)-dy);
@@ -236,17 +270,26 @@ void demo_slam01_main(world_ptr_t *world) {
 
 
 
+						kernel::Chrono match_chrono;
 						senPtr->getRaw()->match(RawAbstract::ZNCC, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
-/*
-						// DEBUG: save some appearances to file
-						((AppearanceImagePoint*)(((DescriptorImagePoint*)(obsPtr->landmark().descriptorPtr.get()))->featImgPntPtr->appearancePtr.get()))->patch.save("descriptor_app.png");
-						((AppearanceImagePoint*)(obsPtr->predictedAppearance.get()))->patch.save("predicted_app.png");
-						((AppearanceImagePoint*)(obsPtr->observedAppearance.get()))->patch.save("matched_app.png");
-*/
+						total_match_time += match_chrono.elapsedMicrosecond();
+
+						/*
+  					 // DEBUG: save some appearances to file
+						 ((AppearanceImagePoint*)(((DescriptorImagePoint*)(obsPtr->landmark().descriptorPtr.get()))->featImgPntPtr->appearancePtr.get()))->patch.save("descriptor_app.png");
+						 ((AppearanceImagePoint*)(obsPtr->predictedAppearance.get()))->patch.save("predicted_app.png");
+						 ((AppearanceImagePoint*)(obsPtr->observedAppearance.get()))->patch.save("matched_app.png");
+            */
 						// DEBUG: display predicted appearances on image, disable it when operating normally because can have side effects
-						AppearanceImagePoint* appImgPtr = PTR_CAST<AppearanceImagePoint*>(obsPtr->predictedAppearance.get());
-						jblas::veci shift(2); shift(0) = (appImgPtr->patch.width()-1)/2; shift(1) = (appImgPtr->patch.height()-1)/2;
-						appImgPtr->patch.robustCopy(*PTR_CAST<RawImage*>(senPtr->getRaw().get())->img, 0, 0, obsPtr->expectation.x(0)-shift(0), obsPtr->expectation.x(1)-shift(1));
+						if (SHOW_PATCH) {
+							AppearanceImagePoint
+							* appImgPtr =
+									PTR_CAST<AppearanceImagePoint*> (obsPtr->predictedAppearance.get());
+							jblas::veci shift(2);
+							shift(0) = (appImgPtr->patch.width() - 1) / 2;
+							shift(1) = (appImgPtr->patch.height() - 1) / 2;
+							appImgPtr->patch.robustCopy(*PTR_CAST<RawImage*> (senPtr->getRaw().get())->img, 0, 0, obsPtr->expectation.x(0) - shift(0), obsPtr->expectation.x(1) - shift(1));
+						}
 
 						// 1e. if feature is found
 						if (obsPtr->getMatchScore()>0.90) {
@@ -256,12 +299,18 @@ void demo_slam01_main(world_ptr_t *world) {
 
 							// 1f. if feature is inlier
 							if (obsPtr->compatibilityTest(3.0)) { // use 3.0 for 3-sigma or the 5% proba from the chi-square tables.
+								numObs++;
 								obsPtr->counters.nInlier++;
+								kernel::Chrono update_chrono;
 								obsPtr->update() ;
+								total_update_time += update_chrono.elapsedMicrosecond();
 								obsPtr->events.updated = true;
 							} // obsPtr->compatibilityTest(3.0)
+
 						} // obsPtr->getScoreMatchInPercent()>80
+
 						} // number of observations
+
 					} // obsPtr->isVisible()
 
 					// cout << "\n-------------------------------------------------- " << endl;
@@ -288,7 +337,7 @@ void demo_slam01_main(world_ptr_t *world) {
 					ROI roi;
 					if (asGrid.getROI(roi)){
 
-						feat_img_pnt_ptr_t featPtr(new FeatureImagePoint(PATCHSIZE*3,PATCHSIZE*3,CV_8U));
+						feat_img_pnt_ptr_t featPtr(new FeatureImagePoint(PATCH_SIZE*3,PATCH_SIZE*3,CV_8U));
 						if (senPtr->getRaw()->detect(RawAbstract::HARRIS, featPtr, &roi)) {
 //							cout << "\n-------------------------------------------------- " << endl;
 //							cout << "Detected pixel: " << featPtr->measurement.x() << endl;
@@ -322,7 +371,7 @@ void demo_slam01_main(world_ptr_t *world) {
 
 //							cout << "\n-------------------------------------------------- " << endl;
 //							cout << *lmkPtr << endl;
-							cout << "Initialized lmk: " << lmkPtr->id() << endl;
+//							cout << "Initialized lmk: " << lmkPtr->id() << endl;
 
 						} // detect()
 					} // getROI()
@@ -338,8 +387,11 @@ void demo_slam01_main(world_ptr_t *world) {
 		if (had_data) {
 			t++;
 
+			if (robPtr1->dt_or_dx > max_dt) max_dt = robPtr1->dt_or_dx;
+
 			// Output info
-			cout << "dt: " << (int) (1000 * robPtr1->dt_or_dx) << "ms. Lmk: [";
+			cout << "dt: " << (int) (1000 * robPtr1->dt_or_dx) << "ms (match "
+					<< total_match_time/1000 << " ms, update " << total_update_time/1000 << "ms). Lmk: [";
 			cout << mapPtr->landmarkList().size() << "] ";
 			for (MapAbstract::LandmarkList::iterator lmkIter =
 			    mapPtr->landmarkList().begin(); lmkIter
@@ -358,6 +410,14 @@ void demo_slam01_main(world_ptr_t *world) {
 					lmkPtr->suicide();
 					lmkIter--;
 				}
+				else{
+					if (lmkPtr->needToReparametrize()){
+						cout << "R" << lmkPtr->id() << " ";
+//						lmkIter++; // move iterator before killing list member
+//						lmkPtr->reparametrize();
+//						lmkIter--; // restore iterator after killing list member
+					}
+				}
 			}
 			cout << endl;
 			//			vec7 F = robPtr1->pose.x();
@@ -374,7 +434,7 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	} // temporal loop
 
-	cout << "average time : " << total_chrono.elapsed()/NFRAME << " ms, max frame time " << max_dt << endl;
+	cout << "time avg(max): " << total_chrono.elapsed()/N_FRAMES << "(" << (int)(1000*max_dt) <<") ms" << endl;
 	std::cout << "\nFINISHED !" << std::endl;
 
 	sleep(60);
@@ -403,7 +463,7 @@ void demo_slam01(bool display) {
 	world_ptr_t worldPtr(new WorldAbstract());
 	
 	// to start with qt display
-	const int slam_priority = -10; // needs to be started as root to be < 0
+	const int slam_priority = -20; // needs to be started as root to be < 0
 	const int display_priority = 10;
 	const int display_period = 100; // ms
 	if (display)
@@ -419,10 +479,19 @@ void demo_slam01(bool display) {
 }
 
 /**
-If you want to debug, pass as argument to the executable 1 and a path where
-you want the processed images be saved.
-If you want to replay the last execution, change 1 to 2
-*/
+ * Function call usage:
+ *
+ * 	demo_slam DISP DUMP PATH
+ *
+ * If you want display, pass a first argument DISP="1" to the executable, otherwise "0".
+ * If you want to dump images, pass a second argument to the executable DUMP="1" and a path where
+ * you want the processed images be saved. If you want to replay the last execution, change 1 to 2
+ *
+ * Example 1: demo_slam 1 1 /home/you/rtslam dumps images to /home/you/rtslam
+ * example 2: demo_slam 1 2 /home/you/rtslam replays the saved sequence
+ * example 3: demo_slam 1 0 /anything does not dump
+ * example 4: demo_slam 0 ahy /anything does not display nor dump.
+ */
 int main(int argc, const char* argv[])
 {
 	bool display = 1;
@@ -432,7 +501,7 @@ int main(int argc, const char* argv[])
 		mode = atoi(argv[2]);
 		dump_path = argv[3];
 	} else if (argc != 0)
-	std::cout << "Usage: demo_slam <display-enabled=1> <image-mode=0> <dump-path=.>" << std::endl;
+		std::cout << "Usage: demo_slam <display-enabled=1> <image-mode=0> <dump-path=.>" << std::endl;
 	
 	demo_slam01(display);
 }

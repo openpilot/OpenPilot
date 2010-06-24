@@ -10,6 +10,7 @@
  * \ingroup rtslam
  */
 
+#include "jmath/misc.hpp"
 #include "rtslam/quatTools.hpp"
 
 #ifndef LANDMARKAHP_HPP_
@@ -362,9 +363,7 @@ namespace jafar {
 			template<class VS, class VA, class MA_s>
 			double linearityScore(const VS & senpose, const VA & ahp, const MA_s & AHP){
 
-					vec3 euc;
-
-					euc = ahp2euc(ahp);
+					vec3 euc = ahp2euc(ahp);
 
 					vec3 hw = euc - subrange(senpose, 0, 3);
 
@@ -375,7 +374,12 @@ namespace jafar {
 					double norm_m    = norm_2(subrange(ahp, 3, 6));
 					double cos_a     = inner_prod(subrange(ahp, 3, 6) , hw) / (norm_hw*norm_m);
 
-					return 4*sigma_d/norm_hw*abs(cos_a);
+					double L = 4.0*sigma_d/norm_hw*jmath::abs(cos_a);
+
+//					std::cout << "rho="<<ahp(6)<<", sr="<<sigma_rho<<", sd="<<sigma_d<<", nh="<<norm_hw<<", nm="<<norm_m<<", cos="<<jmath::abs(cos_a)<<std::endl;
+//					std::cout << "linearity score: " << L << std::endl;
+
+					return L;
 			}
 
 		} // namespace landmarkAHP

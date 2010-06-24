@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>355</width>
+    <width>388</width>
     <height>300</height>
    </rect>
   </property>
@@ -17,27 +17,7 @@
    <property name="margin">
     <number>0</number>
    </property>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Host Name/Number</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1" rowspan="3">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="0" column="3" rowspan="5">
+   <item row="0" column="3">
     <spacer name="horizontalSpacer">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -50,16 +30,30 @@
      </property>
     </spacer>
    </item>
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="HostName"/>
+   <item row="4" column="2">
+    <widget class="QSpinBox" name="Port">
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>999999</number>
+     </property>
+    </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QSpinBox" name="Port"/>
-   </item>
-   <item row="1" column="0">
+   <item row="4" column="1">
     <widget class="QLabel" name="label_3">
      <property name="text">
       <string>Port</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QLineEdit" name="HostName"/>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Host Name/Number</string>
      </property>
     </widget>
    </item>

@@ -29,6 +29,7 @@
 #define TCPtelemetryOPTIONSPAGE_H
 
 #include "coreplugin/dialogs/ioptionspage.h"
+//#include <QtCore/QSettings>
 
 class TCPtelemetryConfiguration;
 
@@ -47,17 +48,26 @@ class TCPtelemetryOptionsPage : public IOptionsPage
 Q_OBJECT
 public:
     explicit TCPtelemetryOptionsPage(TCPtelemetryConfiguration *config, QObject *parent = 0);
+    virtual ~TCPtelemetryOptionsPage();
+
+    QString id() const { return QLatin1String("settings"); }
+    QString trName() const { return tr("settings"); }
+    QString category() const { return "TCP Connection"; };
+    QString trCategory() const { return "TCP Connection"; };
 
     QWidget *createPage(QWidget *parent);
     void apply();
     void finish();
 
 signals:
+    void availableDevChanged();
 
 public slots:
 private:
     TCPtelemetryConfiguration *m_config;
     Ui::TCPtelemetryOptionsPage *m_page;
+    //QSettings* settings;
+
 };
 
 #endif // TCPtelemetryOPTIONSPAGE_H

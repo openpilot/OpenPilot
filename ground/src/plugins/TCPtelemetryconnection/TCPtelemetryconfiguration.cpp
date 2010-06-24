@@ -27,25 +27,18 @@
 
 #include "TCPtelemetryconfiguration.h"
 #include <QtCore/QDataStream>
+#include <coreplugin/icore.h>
 
 TCPtelemetryConfiguration::TCPtelemetryConfiguration(QString classId, const QByteArray &state, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),
     m_HostName("127.0.0.1"),
     m_Port(1000)
 {
-    if (state.count() > 0) {
-        QDataStream stream(state);
-        int Port;
-        QString HostName;
-        stream >> Port;
-        stream >> HostName;
-        m_Port = Port;
-        if (HostName != "")
-            m_HostName = HostName;
-
-    }
+    settings = Core::ICore::instance()->settings();
 }
-
+TCPtelemetryConfiguration::~TCPtelemetryConfiguration()
+{
+}
 IUAVGadgetConfiguration *TCPtelemetryConfiguration::clone()
 {
     TCPtelemetryConfiguration *m = new TCPtelemetryConfiguration(this->classId());
@@ -56,10 +49,39 @@ IUAVGadgetConfiguration *TCPtelemetryConfiguration::clone()
 
 QByteArray TCPtelemetryConfiguration::saveState() const
 {
-    QByteArray bytes;
+   QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::WriteOnly);
     stream << m_Port;
     stream << m_HostName;
     return bytes;
+
+}
+
+
+void TCPtelemetryConfiguration::savesettings() const
+{
+    settings->beginGroup(QLatin1String("TCPtelemetryconnection"));
+
+        settings->beginWriteArray("Current");
+        settings->setArrayIndex(0);
+        settings->setValue(QLatin1String("HostName"), m_HostName);
+        settings->setValue(QLatin1String("Port"), m_Port);
+        settings->endArray();
+        settings->endGroup();
+}
+
+
+void TCPtelemetryConfiguration::restoresettings()
+{
+    settings->beginGroup(QLatin1String("TCPtelemetryconnection"));
+
+        settings->beginReadArray("Current");
+        settings->setArrayIndex(0);
+        m_HostName = (settings->value(QLatin1String("HostName"), tr("")).toString());
+        m_Port = (settings->value(QLatin1String("Port"), tr("")).toInt());
+        settings->endArray();
+        settings->endGroup();
+
+
 }
 

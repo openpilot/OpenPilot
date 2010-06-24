@@ -41,10 +41,14 @@ TCPtelemetryOptionsPage::TCPtelemetryOptionsPage(TCPtelemetryConfiguration *conf
     IOptionsPage(parent),
     m_config(config)
 {
-}
 
+}
+TCPtelemetryOptionsPage::~TCPtelemetryOptionsPage()
+{
+}
 QWidget *TCPtelemetryOptionsPage::createPage(QWidget *parent)
 {
+
     m_page = new Ui::TCPtelemetryOptionsPage();
     QWidget *w = new QWidget(parent);
     m_page->setupUi(w);
@@ -59,6 +63,12 @@ void TCPtelemetryOptionsPage::apply()
 {
     m_config->setPort(m_page->Port->value());
     m_config->setHostName(m_page->HostName->text());
+    m_config->savesettings();
+
+    emit availableDevChanged();
+
+
+
 }
 
 void TCPtelemetryOptionsPage::finish()

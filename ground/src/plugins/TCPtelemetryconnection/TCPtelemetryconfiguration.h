@@ -30,6 +30,7 @@
 
 #include <coreplugin/iuavgadgetconfiguration.h>
 #include <QtCore/QString>
+#include <QtCore/QSettings>
 
 using namespace Core;
 
@@ -41,11 +42,17 @@ Q_PROPERTY(int Port READ Port WRITE setPort)
 
 public:
     explicit TCPtelemetryConfiguration(QString classId, const QByteArray &state = 0, QObject *parent = 0);
+    virtual ~TCPtelemetryConfiguration();
     QByteArray saveState() const;
-    IUAVGadgetConfiguration *clone();
+    //void savesettings(QSettings* settings) const;
+    //void restoresettings(QSettings* settings);
+    void savesettings() const;
+    void restoresettings();
+     IUAVGadgetConfiguration *clone();
 
     QString HostName() const { return m_HostName; }
     int Port() const { return m_Port; }
+
 
 public slots:
     void setHostName(QString HostName) { m_HostName = HostName; }
@@ -54,6 +61,7 @@ public slots:
 private:
     QString m_HostName;
     int m_Port;
+    QSettings* settings;
 
 
 };

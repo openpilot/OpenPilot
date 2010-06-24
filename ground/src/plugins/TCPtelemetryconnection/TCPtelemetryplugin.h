@@ -31,9 +31,12 @@
 #include "TCPtelemetry_global.h"
 #include "TCPtelemetryoptionspage.h"
 #include "TCPtelemetryconfiguration.h"
-#include "TCPtelemetryfactory.h"
+//#include "TCPtelemetryfactory.h"
 #include "coreplugin/iconnection.h"
 #include <extensionsystem/iplugin.h>
+//#include <QtCore/QSettings>
+
+
 class QTcpSocket;
 
 class IConnection;
@@ -57,10 +60,18 @@ public:
     virtual QString connectionName();
     virtual QString shortName();
 
+    TCPtelemetryConfiguration * Config() const { return m_config; }
+    TCPtelemetryOptionsPage * Optionspage() const { return m_optionspage; }
+
+
+
 protected slots:
     void onEnumerationChanged();
 private:
        QTcpSocket *tcpSocket;
+       TCPtelemetryConfiguration *m_config;
+       TCPtelemetryOptionsPage *m_optionspage;
+       //QSettings* settings;
 
 };
 
@@ -78,9 +89,6 @@ public:
     virtual void extensionsInitialized();
 
 private:
-    //TCPtelemetryConfiguration *m_config;
-    //TCPtelemetryOptionsPage *m_optionspage;
-    TCPtelemetryFactory *m_factory;
     TCPtelemetryConnection *m_connection;
 
 };

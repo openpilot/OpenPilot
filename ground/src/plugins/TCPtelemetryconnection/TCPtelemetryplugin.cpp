@@ -35,24 +35,38 @@
 
 #include <QtCore/QtPlugin>
 #include <QtGui/QMainWindow>
+#include <QtGui/QMessageBox>
 #include <QtNetwork/QTcpSocket>
 
 #include <QDebug>
 
 TCPtelemetryConnection::TCPtelemetryConnection()
-{//no change from serial plugin
+{
+    tcpSocket = new QTcpSocket(this);
 
-    //I'm cheating a little bit here:
-    //Knowing if the device enumeration really changed is a bit complicated
-    //so I just signal it whenever we have a device event...
+    m_config = new TCPtelemetryConfiguration("TCP Connection", NULL, this);
+    m_config->restoresettings();
+
+    m_optionspage = new TCPtelemetryOptionsPage(m_config,this);
+
+    //just signal whenever we have a device event...
     QMainWindow *mw = Core::ICore::instance()->mainWindow();
     QObject::connect(mw, SIGNAL(deviceChange()),
+                     this, SLOT(onEnumerationChanged()));
+    QObject::connect(m_optionspage, SIGNAL(availableDevChanged()),
                      this, SLOT(onEnumerationChanged()));
 }
 
 TCPtelemetryConnection::~TCPtelemetryConnection()
-{//no change from serial plugin
+{
+    /* if (tcpSocket->state()>0){
+         tcpSocket->disconnectFromHost ();
+     }*/
+    tcpSocket->close ();
 
+
+   // delete(m_optionspage);
+   // delete(m_config);
 
 }
 
@@ -63,69 +77,43 @@ void TCPtelemetryConnection::onEnumerationChanged()
     emit availableDevChanged(this);
 }
 
-/*bool sortPorts(const QextPortInfo &s1,const QextPortInfo &s2)
-{
-    return s1.portName<s2.portName;
-}*/
+
 
 QStringList TCPtelemetryConnection::availableDevices()
 {
     QStringList list;
-    /*QList<QextPortInfo> ports = QextTCPtelemetryEnumerator::getPorts();
 
-    //sort the list by port number (nice idea from PT_Dreamer :))
-    qSort(ports.begin(), ports.end(),sortPorts);
-    foreach( QextPortInfo port, ports ) {
-       list.append(port.friendName);
-    }*/
-    //for the first attempt just hard code the IP and PORT
-    list.append((const QString )"Test OpenPilot");
+    list.append((const QString )m_config->HostName());
 
     return list;
 }
 
 QIODevice *TCPtelemetryConnection::openDevice(const QString &deviceName)
 {
-
-    /*QList<QextPortInfo> ports = QextTCPtelemetryEnumerator::getPorts();
-    foreach( QextPortInfo port, ports ) {
-           if(port.friendName == deviceName)
-            {
-            //we need to handle port settings here...
-            PortSettings set;
-            set.BaudRate = BAUD57600;
-            set.DataBits = DATA_8;
-            set.Parity = PAR_NONE;
-            set.StopBits = STOP_1;
-            set.FlowControl = FLOW_OFF;
-            set.Timeout_Millisec = 500;
-#ifdef Q_OS_WIN
-            return new QextTCPtelemetryPort(port.portName, set);
-#else
-            return new QextTCPtelemetryPort(port.physName, set);
-#endif
-        }
-    }*/
            const int Timeout = 5 * 1000;
 
 
-            tcpSocket = new QTcpSocket(this);
-
-            tcpSocket->connectToHost((const QString )"192.168.10.77", 9100);
+            //if (tcpSocket->state()>0){
+            //    tcpSocket->close();
+            //}
+            tcpSocket->connectToHost((const QString )m_config->HostName(), m_config->Port());
 
             if (tcpSocket->waitForConnected(Timeout)) {
                 return tcpSocket;
             }
 
-
+            QMessageBox msgBox;
+             msgBox.setText((const QString )tcpSocket->errorString ());
+             msgBox.exec();
     return NULL;
 }
 
 void TCPtelemetryConnection::closeDevice(const QString &deviceName)
-{//no change from serial plugin
-
-
-    //nothing to do here
+{
+   /* if (tcpSocket->state()>0){
+        tcpSocket->disconnectFromHost ();
+    }*/
+//tcpSocket->close();
 }
 
 
@@ -133,7 +121,7 @@ QString TCPtelemetryConnection::connectionName()
 {//updated from serial plugin
 
 
-    return QString("TCPtelemetry port");
+    return QString("TCP telemetry port");
 }
 
 QString TCPtelemetryConnection::shortName()
@@ -166,11 +154,8 @@ bool TCPtelemetryPlugin::initialize(const QStringList &arguments, QString *error
 
     Q_UNUSED(arguments);
     Q_UNUSED(errorString);
-    //m_optionspage = new TCPtelemetryOptionsPage(NULL,this);
-    //addAutoReleasedObject(m_optionspage);
     m_connection = new TCPtelemetryConnection();
-    //m_factory = new TCPtelemetryFactory(this);
-    //addAutoReleasedObject(m_factory);
+    addAutoReleasedObject(m_connection->Optionspage());
 
     return true;
 }

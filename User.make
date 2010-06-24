@@ -18,9 +18,9 @@ REQUIRED_EXTLIBS = boost_sandbox opencv
 OPTIONAL_EXTLIBS = qt4 viam MTI
 
 # LDFLAGS +=
-LIBS += -lkernel -ljmath -limage -lqdisplay -lcorrel -lviam
+LIBS += -lkernel -ljmath -limage -lqdisplay -lcorrel -lviam -lMTI
 
-CPPFLAGS += $(OPENCV_CPPFLAGS) $(QT4_CPPFLAGS) $(BOOST_CPPFLAGS) $(BOOST_SANDBOX_CPPFLAGS) $(VIAM_CPPFLAGS) -I$(ROBOTPKG_BASE)/include
+CPPFLAGS += $(OPENCV_CPPFLAGS) $(QT4_CPPFLAGS) $(BOOST_CPPFLAGS) $(BOOST_SANDBOX_CPPFLAGS) $(VIAM_CPPFLAGS) -I$(ROBOTPKG_BASE)/include -I$(ROBOTPKG_BASE)/include/MTI-clients
 CXXFLAGS += -Wall -pthread
 
 # debug:

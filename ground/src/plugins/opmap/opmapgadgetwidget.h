@@ -29,10 +29,14 @@
 #define OPMAP_GADGETWIDGET_H_
 
 #include "opmapcontrol/opmapcontrol.h"
+
 #include <QtGui/QWidget>
 #include <QtGui/QMenu>
+
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/positionactual.h"
+
+#include "opmap_waypointeditor_dialog.h"
 
 namespace Ui {
     class OPMap_Widget;
@@ -75,12 +79,11 @@ private slots:
     void on_toolButtonFindPlace_clicked();
     void on_toolButtonZoomM_clicked();
     void on_toolButtonZoomP_clicked();
-    void on_pushButtonGeoFenceM_clicked();
-    void on_pushButtonGeoFenceP_clicked();
     void on_toolButtonFlightControlsShowHide_clicked();
     void on_toolButtonMapHome_clicked();
     void on_toolButtonMapUAV_clicked();
     void on_horizontalSliderZoom_sliderMoved(int position);
+    void on_toolButtonWaypointEditor_clicked();
 
     void on_toolButtonHome_clicked();
     void on_toolButtonHoldPosition_clicked();
@@ -145,6 +148,8 @@ private:
     Ui::OPMap_Widget *m_widget;
 
     mapcontrol::OPMapWidget *m_map;
+
+    opmap_waypointeditor_dialog *waypoint_editor;
 
     QPushButton * createTransparentButton(QWidget *parent, QString text, QString icon);
     void createMapOverlayUserControls();

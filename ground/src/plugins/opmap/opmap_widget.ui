@@ -112,7 +112,7 @@ color: rgb(255, 255, 255);</string>
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="../coreplugin/core.qrc">
+             <iconset>
               <normaloff>:/core/images/prev.png</normaloff>:/core/images/prev.png</iconset>
             </property>
             <property name="autoRaise">
@@ -144,7 +144,7 @@ color: rgb(255, 255, 255);
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="../coreplugin/core.qrc">
+             <iconset>
               <normaloff>:/core/images/find.png</normaloff>:/core/images/find.png</iconset>
             </property>
             <property name="iconSize">
@@ -184,7 +184,7 @@ color: rgb(255, 255, 255);</string>
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="opmap.qrc">
+             <iconset>
               <normaloff>:/opmap/images/gcs.png</normaloff>:/opmap/images/gcs.png</iconset>
             </property>
             <property name="iconSize">
@@ -214,7 +214,7 @@ color: rgb(255, 255, 255);</string>
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="opmap.qrc">
+             <iconset>
               <normaloff>:/opmap/images/uav.png</normaloff>:/opmap/images/uav.png</iconset>
             </property>
             <property name="iconSize">
@@ -257,7 +257,37 @@ color: rgb(255, 255, 255);</string>
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="opmap.qrc">
+             <iconset>
+              <normaloff>:/opmap/images/waypoint.png</normaloff>:/opmap/images/waypoint.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>16</width>
+              <height>16</height>
+             </size>
+            </property>
+            <property name="autoRepeat">
+             <bool>true</bool>
+            </property>
+            <property name="autoRaise">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="toolButtonWaypointEditor">
+            <property name="toolTip">
+             <string>Opens the waypoint editor</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgba(71, 71, 71, 0);
+color: rgb(255, 255, 255);</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset>
               <normaloff>:/opmap/images/waypoint.png</normaloff>:/opmap/images/waypoint.png</iconset>
             </property>
             <property name="iconSize">
@@ -297,7 +327,7 @@ color: rgb(255, 255, 255);</string>
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="opmap.qrc">
+             <iconset>
               <normaloff>:/opmap/images/minus.png</normaloff>:/opmap/images/minus.png</iconset>
             </property>
             <property name="iconSize">
@@ -328,7 +358,7 @@ color: rgb(255, 255, 255);</string>
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="opmap.qrc">
+             <iconset>
               <normaloff>:/opmap/images/plus.png</normaloff>:/opmap/images/plus.png</iconset>
             </property>
             <property name="iconSize">
@@ -515,7 +545,7 @@ color: rgb(255, 255, 255);</string>
            <string/>
           </property>
           <property name="icon">
-           <iconset resource="opmap.qrc">
+           <iconset>
             <normaloff>:/opmap/images/home.png</normaloff>:/opmap/images/home.png</iconset>
           </property>
           <property name="iconSize">
@@ -545,7 +575,7 @@ color: rgb(255, 255, 255);</string>
            <string/>
           </property>
           <property name="icon">
-           <iconset resource="opmap.qrc">
+           <iconset>
             <normaloff>:/opmap/images/hold.png</normaloff>:/opmap/images/hold.png</iconset>
           </property>
           <property name="iconSize">
@@ -572,7 +602,7 @@ color: rgb(255, 255, 255);</string>
            <string/>
           </property>
           <property name="icon">
-           <iconset resource="opmap.qrc">
+           <iconset>
             <normaloff>:/opmap/images/go.png</normaloff>:/opmap/images/go.png</iconset>
           </property>
           <property name="iconSize">
@@ -833,9 +863,6 @@ border: none;
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../coreplugin/core.qrc"/>
-  <include location="opmap.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

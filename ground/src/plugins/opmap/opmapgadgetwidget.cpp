@@ -32,6 +32,7 @@
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>
 #include <QDir>
+
 #include "extensionsystem/pluginmanager.h"
 
 // *************************************************************************************
@@ -43,6 +44,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_widget = NULL;
     m_map = NULL;
+    waypoint_editor = NULL;
 
     setMouseTracking(true);
 
@@ -125,6 +127,11 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_widget->mapWidget->setLayout(layout);
 
     // **************
+    // create the waypoint editor dialog
+
+    waypoint_editor = new opmap_waypointeditor_dialog(this);
+
+    // **************
     // create the user controls overlayed onto the map
 
 //    createMapOverlayUserControls();
@@ -150,6 +157,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
 OPMapGadgetWidget::~OPMapGadgetWidget()
 {
+    if (waypoint_editor) delete waypoint_editor;
     if (m_map) delete m_map;
     if (m_widget) delete m_widget;
 }
@@ -461,43 +469,6 @@ void OPMapGadgetWidget::on_toolButtonZoomM_clicked()
     zoomOut();
 }
 
-void OPMapGadgetWidget::on_pushButtonGeoFenceM_clicked()
-{
-    if (m_widget)
-    {
-//	int geo_fence_distance = m_widget->spinBoxGeoFenceDistance->value();
-//	int step = m_widget->spinBoxGeoFenceDistance->singleStep();
-//	m_widget->spinBoxGeoFenceDistance->setValue(geo_fence_distance - step);
-
-//	geo_fence_distance = m_widget->spinBoxGeoFenceDistance->value();
-
-
-
-	// to do
-
-
-
-    }
-}
-
-void OPMapGadgetWidget::on_pushButtonGeoFenceP_clicked()
-{
-    if (m_widget)
-    {
-//	int geo_fence_distance = m_widget->spinBoxGeoFenceDistance->value();
-//	int step = m_widget->spinBoxGeoFenceDistance->singleStep();
-//	m_widget->spinBoxGeoFenceDistance->setValue(geo_fence_distance + step);
-
-//	geo_fence_distance = m_widget->spinBoxGeoFenceDistance->value();
-
-
-	// to do
-
-
-
-    }
-}
-
 void OPMapGadgetWidget::on_toolButtonFlightControlsShowHide_clicked()
 {
     if (m_widget)
@@ -536,6 +507,12 @@ void OPMapGadgetWidget::on_toolButtonHoldPosition_clicked()
 
 void OPMapGadgetWidget::on_toolButtonGo_clicked()
 {
+}
+
+void OPMapGadgetWidget::on_toolButtonWaypointEditor_clicked()
+{
+    if (waypoint_editor)
+	waypoint_editor->show();
 }
 
 // *************************************************************************************
@@ -938,7 +915,8 @@ void OPMapGadgetWidget::on_followUAVheadingAct_toggled(bool checked)
 
 void OPMapGadgetWidget::openWayPointEditor()
 {
-    // to do
+    if (waypoint_editor)
+	waypoint_editor->show();
 }
 
 void OPMapGadgetWidget::addWayPoint()

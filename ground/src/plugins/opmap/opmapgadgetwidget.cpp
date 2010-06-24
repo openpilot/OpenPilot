@@ -133,12 +133,12 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     // create the desired timers
 
     m_updateTimer = new QTimer();
-    m_updateTimer->setInterval(250);
+    m_updateTimer->setInterval(200);
     connect(m_updateTimer, SIGNAL(timeout()), this, SLOT(updatePosition()));
     m_updateTimer->start();
 
     m_statusUpdateTimer = new QTimer();
-    m_statusUpdateTimer->setInterval(100);
+    m_statusUpdateTimer->setInterval(200);
     connect(m_statusUpdateTimer, SIGNAL(timeout()), this, SLOT(updateMousePos()));
     m_statusUpdateTimer->start();
 
@@ -305,15 +305,24 @@ void OPMapGadgetWidget::keyPressEvent(QKeyEvent* event)
 
 void OPMapGadgetWidget::updatePosition()
 {
-    PositionActual::DataFields data = m_positionActual->getData();					// get current UAV data
+    PositionActual::DataFields data = m_positionActual->getData();				// get current UAV data
+    internals::PointLatLng uav_pos = internals::PointLatLng(data.Latitude, data.Longitude);	// current UAV position
+    double uav_heading = data.Heading;								// current UAV heading
+    double uav_height_feet = data.Altitude * 3.2808399;						// current UAV height
+    double uav_ground_speed = data.Groundspeed;							// current UAV ground speed
+
+    // display the UAV lat/lon position
+    QString str =   " lat:" + QString::number(uav_pos.Lat(), 'f', 6) +
+		    "   lon:" + QString::number(uav_pos.Lng(), 'f', 6) +
+		    "   " + QString::number(uav_heading, 'f', 1) + "deg" +
+		    "   " + QString::number(uav_height_feet, 'f', 1) + "feet" +
+		    "   " + QString::number(uav_ground_speed, 'f', 1) + "mph";
+    if (m_widget) m_widget->labelMapPos->setText(str);
 
     if (m_map && followUAVpositionAct && followUAVheadingAct)
     {
 	if (followUAVpositionAct->isChecked())
 	{
-	    internals::PointLatLng uav_pos = internals::PointLatLng(data.Latitude, data.Longitude);	// current UAV position
-	    double uav_heading = data.Heading;
-
 	    internals::PointLatLng map_pos = m_map->CurrentPosition();					// current MAP position
 	    double map_heading = m_map->Rotate();
 
@@ -339,10 +348,8 @@ void OPMapGadgetWidget::updateMousePos()
     {	// the mouse has moved
 	mouse_lat_lon = lat_lon;
 
-	QString coord_str = " " + QString::number(mouse_lat_lon.Lat(), 'f', 6) + "   " + QString::number(mouse_lat_lon.Lng(), 'f', 6);
-
-	statusLabel.setText(coord_str);
-	if (m_widget) m_widget->labelMousePos->setText(coord_str);
+	QString str = " " + QString::number(mouse_lat_lon.Lat(), 'f', 6) + "   " + QString::number(mouse_lat_lon.Lng(), 'f', 6);
+	if (m_widget) m_widget->labelMousePos->setText(str);
     }
 }
 
@@ -392,7 +399,7 @@ void OPMapGadgetWidget::OnCurrentPositionChanged(internals::PointLatLng point)
     if (m_widget)
     {
 	QString coord_str = " " + QString::number(point.Lat(), 'f', 6) + "   " + QString::number(point.Lng(), 'f', 6) + " ";
-	m_widget->labelMapPos->setText(coord_str);
+//	m_widget->labelMapPos->setText(coord_str);
     }
 }
 
@@ -671,7 +678,7 @@ void OPMapGadgetWidget::createMapOverlayUserControls()
     overlay_layout_h2->setMargin(0);
     overlay_layout_h2->setSpacing(4);
     overlay_layout_h2->addStretch(0);
-    overlay_layout_h2->addWidget(&statusLabel);
+//    overlay_layout_h2->addWidget(&statusLabel);
     overlay_layout_h2->addStretch(0);
 
     overlay_layout_v1->addSpacing(10);

@@ -139,8 +139,6 @@ private:
 
     internals::PointLatLng mouse_lat_lon;
 
-    QLabel statusLabel;
-
    QTimer *m_updateTimer;
    QTimer *m_statusUpdateTimer;
 

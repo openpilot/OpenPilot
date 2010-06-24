@@ -85,7 +85,7 @@
         <item>
          <layout class="QHBoxLayout" name="layoutWidget_8">
           <property name="spacing">
-           <number>8</number>
+           <number>5</number>
           </property>
           <property name="leftMargin">
            <number>8</number>
@@ -121,20 +121,14 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer_9">
+           <widget class="Line" name="line_3">
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Vertical</enum>
             </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
+           </widget>
           </item>
           <item>
            <widget class="QToolButton" name="toolButtonFindPlace">
@@ -168,20 +162,14 @@ color: rgb(255, 255, 255);
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer_4">
+           <widget class="Line" name="line_4">
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Vertical</enum>
             </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
+           </widget>
           </item>
           <item>
            <widget class="QToolButton" name="toolButtonMapHome">
@@ -247,20 +235,14 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer_8">
+           <widget class="Line" name="line_5">
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Vertical</enum>
             </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
+           </widget>
           </item>
           <item>
            <widget class="QToolButton" name="toolButtonAddWaypoint">
@@ -293,20 +275,14 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer_6">
+           <widget class="Line" name="line_6">
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Vertical</enum>
             </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
+           </widget>
           </item>
           <item>
            <widget class="QToolButton" name="toolButtonZoomM">
@@ -386,6 +362,9 @@ color: rgb(255, 255, 255);</string>
               <height>16777215</height>
              </size>
             </property>
+            <property name="toolTip">
+             <string>Zoom level</string>
+            </property>
             <property name="styleSheet">
              <string notr="true">background-color: rgba(255, 255, 255, 0);
 color: rgb(255, 255, 255);</string>
@@ -405,6 +384,16 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
           <item>
+           <widget class="Line" name="line_7">
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="horizontalSpacer_2">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -416,6 +405,16 @@ color: rgb(255, 255, 255);</string>
              </size>
             </property>
            </spacer>
+          </item>
+          <item>
+           <widget class="Line" name="line_8">
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QToolButton" name="toolButtonReload">
@@ -488,7 +487,16 @@ color: rgb(255, 255, 255);</string>
         <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(120, 120, 120, 255), stop:1 rgba(68, 68, 68, 255));</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>5</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>5</number>
+        </property>
+        <property name="bottomMargin">
          <number>0</number>
         </property>
         <item>
@@ -525,6 +533,16 @@ color: rgb(255, 255, 255);</string>
          </widget>
         </item>
         <item>
+         <widget class="Line" name="line_9">
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QToolButton" name="toolButtonHoldPosition">
           <property name="toolTip">
            <string>UAV hold position</string>
@@ -548,6 +566,16 @@ color: rgb(255, 255, 255);</string>
           </property>
           <property name="autoRaise">
            <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Line" name="line_10">
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
           </property>
          </widget>
         </item>
@@ -644,7 +672,7 @@ color: rgb(255, 255, 255);</string>
          <number>0</number>
         </property>
         <property name="topMargin">
-         <number>0</number>
+         <number>5</number>
         </property>
         <property name="rightMargin">
          <number>0</number>
@@ -655,10 +683,10 @@ color: rgb(255, 255, 255);</string>
         <item>
          <layout class="QHBoxLayout" name="layoutWidgetStatusBar">
           <property name="spacing">
-           <number>8</number>
+           <number>12</number>
           </property>
           <property name="leftMargin">
-           <number>8</number>
+           <number>12</number>
           </property>
           <property name="rightMargin">
            <number>8</number>
@@ -696,20 +724,14 @@ background-color: rgba(255, 255, 255, 0);</string>
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer">
+           <widget class="Line" name="line">
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Vertical</enum>
             </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
+           </widget>
           </item>
           <item>
            <widget class="QLabel" name="labelMousePos">
@@ -740,6 +762,16 @@ background-color: rgba(255, 255, 255, 0);</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="Line" name="line_2">
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
             </property>
            </widget>
           </item>

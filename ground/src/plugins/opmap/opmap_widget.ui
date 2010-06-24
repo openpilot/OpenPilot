@@ -58,7 +58,7 @@
         <bool>false</bool>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(71, 71, 71, 255), stop:1 rgba(120, 120, 120, 255));</string>
+        <string notr="true">background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(110, 110, 110, 255), stop:1 rgba(71, 71, 71, 255));</string>
        </property>
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
@@ -105,7 +105,7 @@
              <string>Show/Hide Flight Controls</string>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgba(71, 71, 71, 0);
+             <string notr="true">background-color: rgba(255, 255, 255, 0);
 color: rgb(255, 255, 255);</string>
             </property>
             <property name="text">
@@ -136,7 +136,7 @@ color: rgb(255, 255, 255);</string>
              <string>Find place</string>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgba(71, 71, 71, 0);
+             <string notr="true">background-color: rgba(255, 255, 255, 0);
 color: rgb(255, 255, 255);
 </string>
             </property>
@@ -177,7 +177,7 @@ color: rgb(255, 255, 255);
              <string>Center map over home position</string>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgba(71, 71, 71, 0);
+             <string notr="true">background-color: rgba(255, 255, 255, 0);
 color: rgb(255, 255, 255);</string>
             </property>
             <property name="text">
@@ -207,7 +207,7 @@ color: rgb(255, 255, 255);</string>
              <string>Center map over UAV position</string>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgba(71, 71, 71, 0);
+             <string notr="true">background-color: rgba(255, 255, 255, 0);
 color: rgb(255, 255, 255);</string>
             </property>
             <property name="text">
@@ -428,8 +428,8 @@ color: rgb(255, 255, 255);</string>
              <string>Reload map</string>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgba(71, 71, 71, 0);
-color: rgb(255, 255, 255);</string>
+             <string notr="true">color: rgb(255, 255, 255);
+background-color: rgba(255, 255, 255, 0);</string>
             </property>
             <property name="text">
              <string>Reload</string>
@@ -484,7 +484,7 @@ color: rgb(255, 255, 255);</string>
         <bool>false</bool>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(120, 120, 120, 255), stop:1 rgba(68, 68, 68, 255));</string>
+        <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(71, 71, 71, 255), stop:1 rgba(110, 110, 110, 255));</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <property name="leftMargin">
@@ -533,16 +533,6 @@ color: rgb(255, 255, 255);</string>
          </widget>
         </item>
         <item>
-         <widget class="Line" name="line_9">
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QToolButton" name="toolButtonHoldPosition">
           <property name="toolTip">
            <string>UAV hold position</string>
@@ -566,16 +556,6 @@ color: rgb(255, 255, 255);</string>
           </property>
           <property name="autoRaise">
            <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="Line" name="line_10">
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
           </property>
          </widget>
         </item>
@@ -656,7 +636,7 @@ color: rgb(255, 255, 255);</string>
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(68, 68, 68, 255), stop:1 rgba(117, 117, 117, 255));</string>
+        <string notr="true">background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(110, 110, 110, 255), stop:1 rgba(71, 71, 71, 255));</string>
        </property>
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
@@ -668,25 +648,16 @@ color: rgb(255, 255, 255);</string>
         <property name="spacing">
          <number>0</number>
         </property>
-        <property name="leftMargin">
+        <property name="margin">
          <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>5</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>5</number>
         </property>
         <item>
          <layout class="QHBoxLayout" name="layoutWidgetStatusBar">
           <property name="spacing">
-           <number>12</number>
+           <number>0</number>
           </property>
           <property name="leftMargin">
-           <number>12</number>
+           <number>0</number>
           </property>
           <property name="rightMargin">
            <number>8</number>
@@ -715,11 +686,17 @@ color: rgb(255, 255, 255);</string>
              <string notr="true">color: rgb(255, 255, 255);
 background-color: rgba(255, 255, 255, 0);</string>
             </property>
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
             <property name="text">
              <string>labelMapPos</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
+            </property>
+            <property name="margin">
+             <number>5</number>
             </property>
            </widget>
           </item>
@@ -762,6 +739,9 @@ background-color: rgba(255, 255, 255, 0);</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
+            </property>
+            <property name="margin">
+             <number>5</number>
             </property>
            </widget>
           </item>

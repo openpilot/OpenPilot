@@ -34,8 +34,6 @@
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/positionactual.h"
 
-//class Ui_OPMap_Widget;
-
 namespace Ui {
     class OPMap_Widget;
 }
@@ -144,7 +142,6 @@ private:
 
    PositionActual *m_positionActual;
 
-//    Ui_OPMap_Widget *m_widget;
     Ui::OPMap_Widget *m_widget;
 
     mapcontrol::OPMapWidget *m_map;

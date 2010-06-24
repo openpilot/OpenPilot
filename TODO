@@ -10,6 +10,7 @@ Features
 
 - factories 		<- DONE FOR OBS ONLY
 - sensors hardware 	<- DONE FOR PIN-HOLE firewire 1394
+- estimation hardware <- IN PROGRESS FOR MTI
 
 - Map management:
 	- use a loop
@@ -32,8 +33,14 @@ Organization
 
 Performance
 ------------------------------------
-- zncc that can use integral image
-- zncc uses a real ellipse roi (mahalanobis dist)
+- zncc optimizations :
+	- use integral images in explorer
+	- test when half of the correlation has been done if it is still possible to reach the goal score
+	- work first with half resolution images (small investment at first, but 16 times faster then)
+	- use a real ellipse roi (mahalanobis dist)
+	- progressively enable optimizations when search area are larger
+	- try to copy the search area in another image for a better use of cache
+	- try to use cpu vectorialization (compute 4 zncc at once)
 - check algorithm speed <- Good 30Hz. See issues with RT and OS
 - find a more clever way to manipulate the map used space: ia_indirectArray() is possibly an expensive way to go.
 

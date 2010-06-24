@@ -96,7 +96,7 @@ class SensorQt : public SensorDisplay
 			viewer_ = new qdisplay::Viewer();
 			view_ = new qdisplay::ImageView();
 			viewer_->setImageView(view_, 0, 0);
-			viewer_->resize(650,490);
+			viewer_->resize(660,500);
 			framenumber = 0;
 			
 			framenumber_label = new QGraphicsTextItem(view_);
@@ -173,7 +173,7 @@ class ObservationQt : public ObservationDisplay
 		std::list<QGraphicsItemGroup*> items_;
 	public:
 		ObservationQt(rtslam::ObservationAbstract *_slamObs, SensorQt *_dispSen):
-			ObservationDisplay(_slamObs, _dispSen), view_(_dispSen->view_) 
+			ObservationDisplay(_slamObs, _dispSen), view_(_dispSen->view_)
 		{
 #if EMBED_PREDICTED_APP
 			predictedApp_ = NULL;
@@ -196,6 +196,7 @@ class ObservationQt : public ObservationDisplay
 			for(std::list<QGraphicsItemGroup*>::iterator it = items_.begin(); it != items_.end(); ++it)
 			{
 				//(*it)->setParentItem(NULL);
+				//viewer_->scene()->removeItem(*it);
 				delete *it;
 			}
 		}

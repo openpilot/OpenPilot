@@ -15,12 +15,17 @@
 #include <viam/viamlib.h>
 #include <viam/viamcv.h>
 
+#include <boost/thread.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/thread/mutex.hpp>
+
 #include "rtslam/hardwareSensorAbstract.hpp"
 #include "rtslam/rawImage.hpp"
 
 
 namespace jafar {
 namespace rtslam {
+namespace hardware {
 
 /**
 This class allows to get images from firewire with non blocking procedure,
@@ -67,7 +72,7 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 };
 
 
-}}
+}}}
 
 #endif
 

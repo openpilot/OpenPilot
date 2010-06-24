@@ -76,7 +76,7 @@ namespace jafar {
 			ENABLE_ACCESS_TO_CHILDREN(DataManagerAbstract,DataManager,dataManager)
 				;
 
-				hardware_sensor_ptr_t hardwareSensorPtr;
+				hardware::hardware_sensor_ptr_t hardwareSensorPtr;
 				
 			public:
 
@@ -148,7 +148,7 @@ namespace jafar {
 
 			public:
 
-				void setHardwareSensor(hardware_sensor_ptr_t hardwareSensorPtr_)
+				void setHardwareSensor(hardware::hardware_sensor_ptr_t hardwareSensorPtr_)
 				{
 					hardwareSensorPtr = hardwareSensorPtr_;
 				}

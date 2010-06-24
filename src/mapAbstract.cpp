@@ -92,7 +92,6 @@ namespace jafar {
 					sensor_ptr_t senPtr = *senIter;
 					if (senPtr != existingSenPtr){
 						// FIXME dynamic creation
-						int width = 11, height = 11;
 						observation_ptr_t obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint(senPtr, lmkPtr));
 //						obsPtr->setup(senPtr, lmkPtr, width, height); //todo uncomment here
 					}

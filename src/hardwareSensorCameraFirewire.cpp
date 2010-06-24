@@ -12,9 +12,6 @@
 #include <fstream>
 
 
-#include <boost/thread.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
 #include <boost/bind.hpp>
 
 #include <image/Image.hpp>
@@ -23,6 +20,7 @@
 
 namespace jafar {
 namespace rtslam {
+namespace hardware {
 
 	cv::Size HardwareSensorCameraFirewire::viamSize_to_size(viam_hwsize_t viamsize)
 	{
@@ -61,7 +59,11 @@ namespace rtslam {
 				{
 					std::ostringstream oss; oss << dump_path << "/image_" << std::setw(4) << std::setfill('0') << index;
 					bufferSpecPtr[buff_write]->img->load(oss.str() + std::string(".pgm"));
-					if (bufferSpecPtr[buff_write]->img->data() == NULL) break;
+					if (bufferSpecPtr[buff_write]->img->data() == NULL)
+					{
+						std::cout << "No more images to read." << std::endl;
+						break;
+					}
 					std::fstream f((oss.str() + std::string(".time")).c_str(), std::ios_base::in);
 					f >> bufferPtr[buff_write]->timestamp; f.close();
 					last_processed_index = index;
@@ -149,6 +151,6 @@ namespace rtslam {
 	
 
 
-}}
+}}}
 
 

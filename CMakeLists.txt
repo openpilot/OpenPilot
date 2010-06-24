@@ -12,6 +12,6 @@ build_jafar_module(qdisplay
   #OPTIONAL_MODULES 
   REQUIRED_EXTLIBS qt4 boost_thread
   #OPTIONAL_EXTLIBS 
-  CXXFLAGS -g -ggdb -Wall
-  #CPPFLAGS -Werror
+  #CXXFLAGS
+  #CPPFLAGS
 )

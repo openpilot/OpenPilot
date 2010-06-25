@@ -45,10 +45,12 @@ AirspeedGadgetWidget::AirspeedGadgetWidget(QWidget *parent) : QGraphicsView(pare
     obj2 = NULL;
     obj3 = NULL;
 
+    needle1Target = 0;
+    needle2Target = 0;
+    needle3Target = 0;
+
     // This timer mechanism makes needles rotate smoothly
     connect(&dialTimer, SIGNAL(timeout()), this, SLOT(rotateNeedles()));
-    dialTimer.start(20);
-
 }
 
 AirspeedGadgetWidget::~AirspeedGadgetWidget()
@@ -367,89 +369,88 @@ void AirspeedGadgetWidget::rotateNeedles()
 {
     int dialRun = 3;
     if (n2enabled) {
+        double needle2Diff;
         if (abs((needle2Value-needle2Target)*10) > 5) {
-            double needle2Diff;
             needle2Diff =(needle2Target - needle2Value)/5;
-            if (rotateN2) {
-                m_needle2->setRotation(m_needle2->rotation()+needle2Diff);
-            } else {
-                QPointF opd = QPointF(0,0);
-               if (horizN2)  {
-                   opd = QPointF(needle2Diff,0);
-               }
-               if (vertN2) {
-                   opd = QPointF(0,needle2Diff);
-               }
-               m_needle2->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), true);
-               // Since we have moved the needle, we need to move
-               // the transform origin point the opposite way
-               // so that it keeps rotating from the same point.
-               // (this is only useful if needle1 and needle2 are the
-               // same object, for combined movement such as attitude indicator).
-               QPointF oop = m_needle2->transformOriginPoint();
-               m_needle2->setTransformOriginPoint(oop.x()-opd.x(),oop.y()-opd.y());
-            }
-            needle2Value += needle2Diff;
         } else {
-            needle2Value = needle2Target;
+            needle2Diff = needle2Target - needle2Value;
             dialRun--;
         }
+        if (rotateN2) {
+            m_needle2->setRotation(m_needle2->rotation()+needle2Diff);
+        } else {
+            QPointF opd = QPointF(0,0);
+           if (horizN2)  {
+               opd = QPointF(needle2Diff,0);
+           }
+           if (vertN2) {
+               opd = QPointF(0,needle2Diff);
+           }
+           m_needle2->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), true);
+           // Since we have moved the needle, we need to move
+           // the transform origin point the opposite way
+           // so that it keeps rotating from the same point.
+           // (this is only useful if needle1 and needle2 are the
+           // same object, for combined movement such as attitude indicator).
+           QPointF oop = m_needle2->transformOriginPoint();
+           m_needle2->setTransformOriginPoint(oop.x()-opd.x(),oop.y()-opd.y());
+        }
+        needle2Value += needle2Diff;
     } else {
         dialRun--;
     }
 
     // We assume that needle1 always exists!
+    double needle1Diff;
     if ((abs((needle1Value-needle1Target)*10) > 5)) {
-        double needle1Diff;
         needle1Diff = (needle1Target - needle1Value)/5;
-        if (rotateN1) {
-           m_needle1->setRotation(m_needle1->rotation()+needle1Diff);
-        } else {
-            QPointF opd = QPointF(0,0);
-            if (horizN1) {
-               opd = QPointF(needle1Diff,0);
-            }
-            if (vertN1) {
-               opd = QPointF(0,needle1Diff);
-            }
-            m_needle1->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), true);
-            QPointF oop = m_needle1->transformOriginPoint();
-            m_needle1->setTransformOriginPoint((oop.x()-opd.x()),(oop.y()-opd.y()));
-        }
-        needle1Value += needle1Diff;
-    } else { // value is close enough to target, value to exact target
-             // to cancel out any potential drift
-        needle1Value = needle1Target;
+    } else {
+        needle1Diff = needle1Target - needle1Value;
         dialRun--;
     }
+    if (rotateN1) {
+       m_needle1->setRotation(m_needle1->rotation()+needle1Diff);
+    } else {
+        QPointF opd = QPointF(0,0);
+        if (horizN1) {
+           opd = QPointF(needle1Diff,0);
+        }
+        if (vertN1) {
+           opd = QPointF(0,needle1Diff);
+        }
+        m_needle1->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), true);
+        QPointF oop = m_needle1->transformOriginPoint();
+        m_needle1->setTransformOriginPoint((oop.x()-opd.x()),(oop.y()-opd.y()));
+    }
+    needle1Value += needle1Diff;
 
    if (n3enabled) {
+       double needle3Diff;
        if ((abs((needle3Value-needle3Target)*10) > 5)) {
-           double needle3Diff;
            needle3Diff = (needle3Target - needle3Value)/5;
-           if (rotateN3) {
-                m_needle3->setRotation(m_needle3->rotation()+needle3Diff);
-           } else {
-                QPointF opd = QPointF(0,0);
-                if (horizN3) {
-                    opd = QPointF(needle3Diff,0);
-                }
-           if (vertN3) {
-               opd = QPointF(0,needle3Diff);
-           }
-           m_needle3->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), true);
-           QPointF oop = m_needle3->transformOriginPoint();
-           m_needle3->setTransformOriginPoint((oop.x()-opd.x()),(oop.y()-opd.y()));
-           }
-       needle3Value += needle3Diff;
        } else {
-           needle3Value = needle3Target;
+           needle3Diff = needle3Target - needle3Value;
            dialRun--;
        }
+       if (rotateN3) {
+            m_needle3->setRotation(m_needle3->rotation()+needle3Diff);
+       } else {
+            QPointF opd = QPointF(0,0);
+            if (horizN3) {
+                opd = QPointF(needle3Diff,0);
+            }
+       if (vertN3) {
+           opd = QPointF(0,needle3Diff);
+       }
+       m_needle3->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), true);
+       QPointF oop = m_needle3->transformOriginPoint();
+       m_needle3->setTransformOriginPoint((oop.x()-opd.x()),(oop.y()-opd.y()));
+       }
+       needle3Value += needle3Diff;
     } else {
         dialRun--;
     }
-    update();
+    //update();
     // Now check: if dialRun is now zero, we should
     // just stop the timer since all needles have finished moving
     if (!dialRun) dialTimer.stop();

@@ -306,8 +306,9 @@ namespace display {
 				for(MapAbstract::RobotList::iterator rob = map->robotList().begin(); rob != map->robotList().end(); ++rob)
 					bufferize(*rob,map);
 				// bufferize landmarks
-				for(MapAbstract::LandmarkList::iterator lmk = map->landmarkList().begin(); lmk != map->landmarkList().end(); ++lmk)
-					bufferize(*lmk,map);
+				for(MapAbstract::MapManagerList::iterator mm = map->mapManagerList().begin(); mm!=map->mapManagerList().end(); ++mm )
+				  for(MapManagerAbstract::LandmarkList::iterator lmk = (*mm)->landmarkList().begin(); lmk != (*mm)->landmarkList().end(); ++lmk)
+				    bufferize(*lmk,map);
 			}
 			
 			inline void bufferize(rtslam::robot_ptr_t rob, rtslam::map_ptr_t map)

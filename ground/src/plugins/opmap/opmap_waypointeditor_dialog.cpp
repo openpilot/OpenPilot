@@ -26,6 +26,7 @@
  */
 
 #include <QPainter>
+#include <QGraphicsSceneDragDropEvent>
 
 #include "opmap_waypointeditor_dialog.h"
 #include "ui_opmap_waypointeditor_dialog.h"
@@ -33,24 +34,35 @@
 #include "extensionsystem/pluginmanager.h"
 
 // ***************************************************************
+// Waypoint object
 
-Waypoint::Waypoint()
+WaypointItem::WaypointItem(QString name, double latitude, double longitude, double height, int time, int hold) :
+    waypoint_name(name),
+    latitude_degress(latitude),
+    longitude_degress(longitude),
+    height_feet(height),
+    time_seconds(time),
+    hold_seconds(hold)
 {
+    setToolTip(waypoint_name);
+    setFlag(QGraphicsItem::ItemIsMovable, true);
+    setFlag(QGraphicsItem::ItemIsSelectable, true);
+    setFlag(QGraphicsItem::ItemSendsScenePositionChanges, true);
 }
 
-QRectF Waypoint::boundingRect() const
+QRectF WaypointItem::boundingRect() const
 {
     return QRectF(-6, -10, 12, 20);
 }
 
-QPainterPath Waypoint::shape() const
+QPainterPath WaypointItem::shape() const
 {
     QPainterPath path;
     path.addEllipse(QPointF(0, 0), 6, 10);
     return path;
 }
 
- void Waypoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+ void WaypointItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     painter->setPen(Qt::black);
     painter->setBrush(QColor(255, 0, 0, 128));
@@ -58,6 +70,44 @@ QPainterPath Waypoint::shape() const
  }
 
 // ***************************************************************
+// Scene object
+
+OurScene::OurScene(QObject *parent) : QGraphicsScene(parent)
+{
+    movingItem = 0;
+}
+
+void OurScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    QPointF mousePos(event->buttonDownScenePos(Qt::LeftButton).x(), event->buttonDownScenePos(Qt::LeftButton).y());
+
+    movingItem = itemAt(mousePos.x(), mousePos.y());
+
+    if (movingItem != 0 && event->button() == Qt::LeftButton)
+    {
+	oldPos = movingItem->pos();
+    }
+
+    clearSelection();
+
+    QGraphicsScene::mousePressEvent(event);
+ }
+
+ void OurScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+ {
+    if (movingItem != 0 && event->button() == Qt::LeftButton)
+    {
+	if (oldPos != movingItem->pos())
+	    emit itemMoved(qgraphicsitem_cast<WaypointItem *>(movingItem), oldPos);
+
+	movingItem = 0;
+    }
+
+    QGraphicsScene::mouseReleaseEvent(event);
+ }
+
+// ***************************************************************
+// main dialogue
 
 opmap_waypointeditor_dialog::opmap_waypointeditor_dialog(QWidget *parent) :
     QDialog(parent),
@@ -68,37 +118,27 @@ opmap_waypointeditor_dialog::opmap_waypointeditor_dialog(QWidget *parent) :
 
     view = ui->graphicsViewWaypointHeightAndTimeline;
 
-    scene = new QGraphicsScene(0, 0, 1800, 1000);
+    scene = new OurScene();
+    scene->setSceneRect(QRect(0, 0, 1800, 500));
     view->setScene(scene);
 
-    view->setRenderHint(QPainter::HighQualityAntialiasing);
-    //view->setDragMode(QGraphicsView::ScrollHandDrag);
+    undoStack = new QUndoStack();
+
+    connect(scene, SIGNAL(itemMoved(WaypointItem *, const QPointF &)), this, SLOT(itemMoved(WaypointItem *, const QPointF &)));
 
     // *****
     // test
 
-    Waypoint *waypoint1 = new Waypoint;
+    WaypointItem *waypoint1 = new WaypointItem(tr("Waypoint 1"), 0, 0, 10, 5, 10);
     waypoint1->setPos(scene->width() / 2, scene->height() / 2);
-    waypoint1->setFlag(QGraphicsItem::ItemIsMovable, true);
-    waypoint1->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    waypoint1->setFlag(QGraphicsItem::ItemSendsScenePositionChanges, true);
-    waypoint1->setToolTip(tr("Waypoint 1"));
     scene->addItem(waypoint1);
 
-    Waypoint *waypoint2 = new Waypoint;
+    WaypointItem *waypoint2 = new WaypointItem(tr("Waypoint 2"), 0, 0, 50, 8, 5);
     waypoint2->setPos(scene->width() / 2 + 30, scene->height() / 2);
-    waypoint2->setFlag(QGraphicsItem::ItemIsMovable);
-    waypoint2->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    waypoint2->setFlag(QGraphicsItem::ItemSendsScenePositionChanges, true);
-    waypoint2->setToolTip(tr("Waypoint 2"));
     scene->addItem(waypoint2);
 
-    Waypoint *waypoint3 = new Waypoint;
+    WaypointItem *waypoint3 = new WaypointItem(tr("Waypoint 3"), 0, 0, 100, 8, 5);
     waypoint3->setPos(scene->width() / 2 + 60, scene->height() / 2);
-    waypoint3->setFlag(QGraphicsItem::ItemIsMovable);
-    waypoint3->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    waypoint3->setFlag(QGraphicsItem::ItemSendsScenePositionChanges, true);
-    waypoint3->setToolTip(tr("Waypoint 3"));
     scene->addItem(waypoint3);
 
     // *****
@@ -120,3 +160,10 @@ void opmap_waypointeditor_dialog::changeEvent(QEvent *e)
         break;
     }
 }
+
+void opmap_waypointeditor_dialog::itemMoved(WaypointItem *movedItem, const QPointF &oldPosition)
+{
+//     undoStack->push(new MoveCommand(movedItem, oldPosition));
+}
+
+// ***************************************************************

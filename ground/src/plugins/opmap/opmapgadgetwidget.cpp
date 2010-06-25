@@ -45,6 +45,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_widget = NULL;
     m_map = NULL;
     waypoint_editor = NULL;
+    wayPoint_treeView_model = NULL;
 
     setMouseTracking(true);
 
@@ -88,7 +89,10 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_widget->progressBarMap->setMaximum(1);
 
     m_widget->widgetFlightControls->setVisible(false);
-    m_widget->toolButtonFlightControlsShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/next.png")));
+    m_widget->toolButtonFlightControlsShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/prev.png")));
+
+    m_widget->treeViewWaypoints->setVisible(false);
+    m_widget->toolButtonWaypointsTreeViewShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/next.png")));
 
     // **************
     // map stuff
@@ -132,6 +136,69 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     waypoint_editor = new opmap_waypointeditor_dialog(this);
 
     // **************
+
+
+
+/*
+    // test
+    wayPoint_treeView_model = new QStandardItemModel(5, 2);
+    for (int r = 0; r < 5; r++)
+    {
+	for (int c = 0; c < 2; c++)
+	{
+	    QStandardItem *item = new QStandardItem(QString("Row:%0, Column:%1").arg(r).arg(c));
+
+	    if (c == 0)
+    	    {
+		for (int i = 0; i < 3; i++)
+		{
+		    QStandardItem *child = new QStandardItem(QString("Item %0").arg(i));
+		    child->setEditable(false);
+		    item->appendRow(child);
+		}
+	    }
+
+	    wayPoint_treeView_model->setItem(r, c, item);
+	}
+    }
+    wayPoint_treeView_model->setHorizontalHeaderItem(0, new QStandardItem("Foo"));
+    wayPoint_treeView_model->setHorizontalHeaderItem(1, new QStandardItem("Bar-Baz"));
+
+    m_widget->treeViewWaypoints->setModel(wayPoint_treeView_model);
+*/
+
+    // test
+    wayPoint_treeView_model = new QStandardItemModel();
+    for (int r = 0; r < 5; r++)
+    {
+	// waypoint group
+	QStandardItem *item = new QStandardItem(QString("UK waypoint group %0").arg(r));
+
+	// add the way points
+	for (int i = 1; i < 5; i++)
+	{
+	    QStandardItem *child = new QStandardItem(QIcon(QString::fromUtf8(":/opmap/images/waypoint.png")), QString("Waypoint %0").arg(i));
+	    child->setEditable(false);
+	    item->appendRow(child);
+	}
+
+	wayPoint_treeView_model->appendRow(item);
+    }
+//    wayPoint_treeView_model->setHorizontalHeaderItem(0, new QStandardItem("Waypoint list"));
+
+    m_widget->treeViewWaypoints->setModel(wayPoint_treeView_model);
+
+
+
+
+
+
+
+
+
+
+
+    // **************
     // create the user controls overlayed onto the map
 
 //    createMapOverlayUserControls();
@@ -157,6 +224,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
 OPMapGadgetWidget::~OPMapGadgetWidget()
 {
+    if (wayPoint_treeView_model) delete wayPoint_treeView_model;
     if (waypoint_editor) delete waypoint_editor;
     if (m_map) delete m_map;
     if (m_widget) delete m_widget;
@@ -469,6 +537,19 @@ void OPMapGadgetWidget::on_toolButtonZoomM_clicked()
     zoomOut();
 }
 
+void OPMapGadgetWidget::on_toolButtonWaypointsTreeViewShowHide_clicked()
+{
+    if (m_widget)
+    {
+	m_widget->treeViewWaypoints->setVisible(!m_widget->treeViewWaypoints->isVisible());
+
+	if (m_widget->treeViewWaypoints->isVisible())
+	    m_widget->toolButtonWaypointsTreeViewShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/prev.png")));
+	else
+	    m_widget->toolButtonWaypointsTreeViewShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/next.png")));
+    }
+}
+
 void OPMapGadgetWidget::on_toolButtonFlightControlsShowHide_clicked()
 {
     if (m_widget)
@@ -476,9 +557,9 @@ void OPMapGadgetWidget::on_toolButtonFlightControlsShowHide_clicked()
 	m_widget->widgetFlightControls->setVisible(!m_widget->widgetFlightControls->isVisible());
 
 	if (m_widget->widgetFlightControls->isVisible())
-	    m_widget->toolButtonFlightControlsShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/prev.png")));
-	else
 	    m_widget->toolButtonFlightControlsShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/next.png")));
+	else
+	    m_widget->toolButtonFlightControlsShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/prev.png")));
     }
 }
 
@@ -513,6 +594,16 @@ void OPMapGadgetWidget::on_toolButtonWaypointEditor_clicked()
 {
     if (waypoint_editor)
 	waypoint_editor->show();
+}
+
+void OPMapGadgetWidget::on_treeViewWaypoints_clicked(QModelIndex index)
+{
+    if (!wayPoint_treeView_model) return;
+
+    QStandardItem *item = wayPoint_treeView_model->itemFromIndex(index);
+    if (!item) return;
+
+    // Do something with the item ...
 }
 
 // *************************************************************************************

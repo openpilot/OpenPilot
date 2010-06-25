@@ -32,6 +32,7 @@
 
 #include <QtGui/QWidget>
 #include <QtGui/QMenu>
+#include <QStandardItemModel>
 
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/positionactual.h"
@@ -80,11 +81,14 @@ private slots:
     void on_toolButtonFindPlace_clicked();
     void on_toolButtonZoomM_clicked();
     void on_toolButtonZoomP_clicked();
+    void on_toolButtonWaypointsTreeViewShowHide_clicked();
     void on_toolButtonFlightControlsShowHide_clicked();
     void on_toolButtonMapHome_clicked();
     void on_toolButtonMapUAV_clicked();
     void on_horizontalSliderZoom_sliderMoved(int position);
     void on_toolButtonWaypointEditor_clicked();
+
+    void on_treeViewWaypoints_clicked(QModelIndex index);
 
     void on_toolButtonHome_clicked();
     void on_toolButtonHoldPosition_clicked();
@@ -154,6 +158,9 @@ private:
 
     QPushButton * createTransparentButton(QWidget *parent, QString text, QString icon);
     void createMapOverlayUserControls();
+
+
+    QStandardItemModel *wayPoint_treeView_model;
 
     void createActions();
 

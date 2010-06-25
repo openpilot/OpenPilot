@@ -34,6 +34,7 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QGraphicsItem>
+#include <QUndoStack>
 
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/positionactual.h"
@@ -43,18 +44,21 @@ namespace Ui {
 }
 
 // ***************************************************************
+// Waypoint object
 
-class Waypoint : public QObject, public QGraphicsItem
+class WaypointItem : public QObject, public QGraphicsItem
 {
     Q_OBJECT
 
  public:
-    Waypoint();
+    WaypointItem(QString name = "", double latitude = 0, double longitude = 0, double height_feet = 0, int time_seconds = 0, int hold_seconds = 0);
 
+    QString waypoint_name;
     double latitude_degress;
     double longitude_degress;
     double height_feet;
-    double relative_time_seconds;
+    int time_seconds;
+    int hold_seconds;
 
     QRectF boundingRect() const;
     QPainterPath shape() const;
@@ -64,13 +68,32 @@ class Waypoint : public QObject, public QGraphicsItem
 //    void timerEvent(QTimerEvent *event);
 
  private:
-//    qreal angle;
-//    qreal speed;
-//    qreal mouseEyeDirection;
-//    QColor color;
+
 };
 
 // ***************************************************************
+
+class OurScene : public QGraphicsScene
+ {
+     Q_OBJECT
+
+ public:
+     OurScene(QObject *parent = 0);
+
+ signals:
+     void itemMoved(WaypointItem *movedItem, const QPointF &movedFromPosition);
+
+ protected:
+     void mousePressEvent(QGraphicsSceneMouseEvent *event);
+     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+
+ private:
+     QGraphicsItem *movingItem;
+     QPointF oldPos;
+ };
+
+// ***************************************************************
+// main dialog widget
 
 class opmap_waypointeditor_dialog : public QDialog
 {
@@ -79,12 +102,17 @@ public:
     opmap_waypointeditor_dialog(QWidget *parent = 0);
     ~opmap_waypointeditor_dialog();
 
+ public slots:
+     void itemMoved(WaypointItem *movedDiagram, const QPointF &moveStartPosition);
+
 protected:
     void changeEvent(QEvent *e);
 
 private:
     QGraphicsView *view;
     QGraphicsScene *scene;
+
+    QUndoStack *undoStack;
 
     Ui::opmap_waypointeditor_dialog *ui;
 };

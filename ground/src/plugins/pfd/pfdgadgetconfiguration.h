@@ -5,7 +5,7 @@
  * @author     Edouard Lafargue Copyright (C) 2010.
  * @brief      Primary Flight Display Plugin Gadget configuration
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   pfd
+ * @defgroup   pfdplugin
  * @{
  *
  *****************************************************************************/

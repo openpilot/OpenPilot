@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       airspeedgadget.cpp
- * @author     David "Buzz" Carlson Copyright (C) 2010.
+ * @file       pfdgadget.cpp
+ * @author     Edouard Lafargue Copyright (C) 2010.
  * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   airspeed 
+ * @defgroup   pfdplugin
  * @{
  *
  *****************************************************************************/

@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       airspeedgadget.h
- * @author     David "Buzz" Carlson Copyright (C) 2010.
+ * @author     Edouard Lafargue and David Carlson Copyright (C) 2010.
  * @brief
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   dialplugin

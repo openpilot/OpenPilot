@@ -5,7 +5,7 @@
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Primary Flight Display Plugin Gadget options page
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   pfd
+ * @defgroup   pfdplugin
  * @{
  *
  *****************************************************************************/

@@ -7,6 +7,8 @@
  * \ingroup rtslam
  */
 
+#ifdef HAVE_MTI
+
 #include <sys/time.h>
 #include <boost/bind.hpp>
 
@@ -111,3 +113,4 @@ namespace hardware {
 }}}
 
 
+#endif // #ifdef HAVE_MTI

@@ -6,6 +6,7 @@
  *
  * \ingroup rtslam
  */
+#ifdef HAVE_VIAM
 
 #include <algorithm>
 #include <sstream>
@@ -153,4 +154,4 @@ namespace hardware {
 
 }}}
 
-
+#endif // #ifdef HAVE_VIAM

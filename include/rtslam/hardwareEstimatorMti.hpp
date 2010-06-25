@@ -12,6 +12,8 @@
 #ifndef HARDWARE_ESTIMATOR_MTI_HPP_
 #define HARDWARE_ESTIMATOR_MTI_HPP_
 
+#ifdef HAVE_MTI
+
 #include <MTI.h>
 
 #include <boost/thread.hpp>
@@ -52,5 +54,6 @@ namespace hardware {
 
 }}}
 
+#endif // #ifdef HAVE_MTI
 #endif
 

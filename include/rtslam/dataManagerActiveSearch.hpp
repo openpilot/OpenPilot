@@ -27,8 +27,8 @@ namespace jafar {
       // Define the functions sensorSpec() and sensorSpecPtr().
       ENABLE_ACCESS_TO_SPECIFIC_PARENT(SensorSpec,sensorSpec);
 
-    protected: // Parameters
-      //public: // TODO? Should be protected?
+			//protected: // Parameters
+    public: // TODO? Should be protected?
       static const int NUPDATES = 1000;
       static const int patchMatchSize = 7;
 

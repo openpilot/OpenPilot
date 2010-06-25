@@ -66,12 +66,6 @@ void demo_slam01_main(world_ptr_t *world) {
 	const int MAP_SIZE = 250;
 	const double FRAME_RATE = 60;
 
-	const int DESC_SIZE = PATCH_SIZE * 3;
-	const int GRID_UCELLS = 3;
-	const int GRID_VCELLS = 3;
-	const int GRID_MARGIN = (DESC_SIZE - 1) / 2;
-	const int GRID_SEPAR = PATCH_SIZE;
-
 	const double PERT_VLIN = 4.0; // m/s per sqrt(s)
 	const double PERT_VANG = 1.0; // rad/s per sqrt(s)
 
@@ -116,7 +110,7 @@ void demo_slam01_main(world_ptr_t *world) {
 
 
 	// 1. Create maps.
-	map_ptr_t mapPtr(new MapAbstract(MAPSIZE));
+	map_ptr_t mapPtr(new MapAbstract(MAP_SIZE));
 	worldPtr->addMap(mapPtr);
 	mapPtr->clear();
 	// 1b. Create map manager.
@@ -160,7 +154,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	// UNCOMMENT THESE TWO LINES TO ENABLE FIREWIRE CAMERA OPERATION
 	//hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode,
 	//                                                                                     mode, dump_path));
-	senPtr11->setHardwareSensor(hardSen11);
+	//senPtr11->setHardwareSensor(hardSen11);
 
 	// Show empty map
 	cout << *mapPtr << endl;
@@ -239,10 +233,10 @@ void demo_slam01_main(world_ptr_t *world) {
 			// Output info
 			cout << "dt: " << (int) (1000 * robPtr1->dt_or_dx) << "ms (match "
 			<< total_match_time/1000 << " ms, update " << total_update_time/1000 << "ms). Lmk: [";
-			cout << mapPtr->landmarkList().size() << "] ";
-			for (MapAbstract::LandmarkList::iterator lmkIter =
-					mapPtr->landmarkList().begin(); lmkIter
-					!= mapPtr->landmarkList().end(); lmkIter++) {
+			cout << mmPoint->landmarkList().size() << "] ";
+			for (MapManagerAbstract::LandmarkList::iterator lmkIter =
+					mmPoint->landmarkList().begin(); lmkIter
+					!= mmPoint->landmarkList().end(); lmkIter++) {
 				cout << (*lmkIter)->id() << " ";
 			}
 			// TODO-NMSD: MM::reparam+delete

@@ -38,6 +38,16 @@ from collections import namedtuple
 # This is a list of instances of the data fields contained in this object
 _fields = [ \
 	uavobject.UAVObjectField(
+		'UpdatePeriod',
+		'H',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
 		'RollMax',
 		'f',
 		1,
@@ -67,12 +77,102 @@ _fields = [ \
 		{
 		}
 	),
+	uavobject.UAVObjectField(
+		'PitchKp',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'PitchKi',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'PitchKd',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'RollKp',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'RollKi',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'RollKd',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'YawKp',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'YawKi',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'YawKd',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
 ]
 
 
 class StabilizationSettings(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 1855169608
+    OBJID        = 2185681924
     NAME         = "StabilizationSettings"
     METANAME     = "StabilizationSettingsMeta"
     ISSINGLEINST = 1

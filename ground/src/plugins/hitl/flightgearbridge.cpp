@@ -49,7 +49,6 @@ FlightGearBridge::FlightGearBridge()
     telStats = GCSTelemetryStats::GetInstance(objManager);
 
     // Listen to autopilot connection events
-    // NOTE: Disabled due to linker errors, when fixed uncomment next three lines and comment out fourth
     TelemetryManager* telMngr = pm->getObject<TelemetryManager>();
     connect(telMngr, SIGNAL(connected()), this, SLOT(onAutopilotConnect()));
     connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()));
@@ -149,9 +148,9 @@ void FlightGearBridge::receiveUpdate()
 
 void FlightGearBridge::setupObjects()
 {
-    setupInputObject(actDesired, 50);
+    setupInputObject(actDesired, 75);
     setupOutputObject(altActual, 250);
-    setupOutputObject(attActual, 50);
+    setupOutputObject(attActual, 75);
     setupOutputObject(posActual, 250);
 }
 

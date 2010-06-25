@@ -40,7 +40,7 @@ _fields = [ \
 	uavobject.UAVObjectField(
 		'Alarm',
 		'b',
-		8,
+		9,
 		[
 			'OutOfMemory',
 			'StackOverflow',
@@ -50,6 +50,7 @@ _fields = [ \
 			'Telemetry',
 			'ManualControl',
 			'Actuator',
+			'Stabilization',
 		],
 		{
 			'0' : 'OK',

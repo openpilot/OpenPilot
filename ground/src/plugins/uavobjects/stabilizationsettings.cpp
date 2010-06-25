@@ -40,6 +40,9 @@ StabilizationSettings::StabilizationSettings(): UAVDataObject(OBJID, ISSINGLEINS
 {
     // Create fields
     QList<UAVObjectField*> fields;
+    QStringList UpdatePeriodElemNames;
+    UpdatePeriodElemNames.append("0");
+    fields.append( new UAVObjectField(QString("UpdatePeriod"), QString("ms"), UAVObjectField::UINT16, UpdatePeriodElemNames, QStringList()) );
     QStringList RollMaxElemNames;
     RollMaxElemNames.append("0");
     fields.append( new UAVObjectField(QString("RollMax"), QString("degrees"), UAVObjectField::FLOAT32, RollMaxElemNames, QStringList()) );
@@ -49,6 +52,33 @@ StabilizationSettings::StabilizationSettings(): UAVDataObject(OBJID, ISSINGLEINS
     QStringList ThrottleMaxElemNames;
     ThrottleMaxElemNames.append("0");
     fields.append( new UAVObjectField(QString("ThrottleMax"), QString("%"), UAVObjectField::FLOAT32, ThrottleMaxElemNames, QStringList()) );
+    QStringList PitchKpElemNames;
+    PitchKpElemNames.append("0");
+    fields.append( new UAVObjectField(QString("PitchKp"), QString(""), UAVObjectField::FLOAT32, PitchKpElemNames, QStringList()) );
+    QStringList PitchKiElemNames;
+    PitchKiElemNames.append("0");
+    fields.append( new UAVObjectField(QString("PitchKi"), QString(""), UAVObjectField::FLOAT32, PitchKiElemNames, QStringList()) );
+    QStringList PitchKdElemNames;
+    PitchKdElemNames.append("0");
+    fields.append( new UAVObjectField(QString("PitchKd"), QString(""), UAVObjectField::FLOAT32, PitchKdElemNames, QStringList()) );
+    QStringList RollKpElemNames;
+    RollKpElemNames.append("0");
+    fields.append( new UAVObjectField(QString("RollKp"), QString(""), UAVObjectField::FLOAT32, RollKpElemNames, QStringList()) );
+    QStringList RollKiElemNames;
+    RollKiElemNames.append("0");
+    fields.append( new UAVObjectField(QString("RollKi"), QString(""), UAVObjectField::FLOAT32, RollKiElemNames, QStringList()) );
+    QStringList RollKdElemNames;
+    RollKdElemNames.append("0");
+    fields.append( new UAVObjectField(QString("RollKd"), QString(""), UAVObjectField::FLOAT32, RollKdElemNames, QStringList()) );
+    QStringList YawKpElemNames;
+    YawKpElemNames.append("0");
+    fields.append( new UAVObjectField(QString("YawKp"), QString(""), UAVObjectField::FLOAT32, YawKpElemNames, QStringList()) );
+    QStringList YawKiElemNames;
+    YawKiElemNames.append("0");
+    fields.append( new UAVObjectField(QString("YawKi"), QString(""), UAVObjectField::FLOAT32, YawKiElemNames, QStringList()) );
+    QStringList YawKdElemNames;
+    YawKdElemNames.append("0");
+    fields.append( new UAVObjectField(QString("YawKd"), QString(""), UAVObjectField::FLOAT32, YawKdElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
@@ -82,9 +112,19 @@ UAVObject::Metadata StabilizationSettings::getDefaultMetadata()
  */
 void StabilizationSettings::setDefaultFieldValues()
 {
+    data.UpdatePeriod = 10;
     data.RollMax = 35;
     data.PitchMax = 35;
-    data.ThrottleMax = 100;
+    data.ThrottleMax = 1;
+    data.PitchKp = 0.04;
+    data.PitchKi = 4e-06;
+    data.PitchKd = 0.01;
+    data.RollKp = 0.02;
+    data.RollKi = 4e-06;
+    data.RollKd = 0.01;
+    data.YawKp = 1;
+    data.YawKi = 0;
+    data.YawKd = 0;
 
 }
 

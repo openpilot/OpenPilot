@@ -49,6 +49,7 @@ SystemAlarms::SystemAlarms(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAM
     AlarmElemNames.append("Telemetry");
     AlarmElemNames.append("ManualControl");
     AlarmElemNames.append("Actuator");
+    AlarmElemNames.append("Stabilization");
     QStringList AlarmEnumOptions;
     AlarmEnumOptions.append("OK");
     AlarmEnumOptions.append("Warning");

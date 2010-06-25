@@ -41,20 +41,40 @@ class UAVOBJECTS_EXPORT StabilizationSettings: public UAVDataObject
 public:
     // Field structure
     typedef struct {
+        quint16 UpdatePeriod;
         float RollMax;
         float PitchMax;
         float ThrottleMax;
+        float PitchKp;
+        float PitchKi;
+        float PitchKd;
+        float RollKp;
+        float RollKi;
+        float RollKd;
+        float YawKp;
+        float YawKi;
+        float YawKd;
 
     } __attribute__((packed)) DataFields;
 
     // Field information
+    // Field UpdatePeriod information
     // Field RollMax information
     // Field PitchMax information
     // Field ThrottleMax information
+    // Field PitchKp information
+    // Field PitchKi information
+    // Field PitchKd information
+    // Field RollKp information
+    // Field RollKi information
+    // Field RollKd information
+    // Field YawKp information
+    // Field YawKi information
+    // Field YawKd information
 
   
     // Constants
-    static const quint32 OBJID = 1855169608U;
+    static const quint32 OBJID = 2185681924U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

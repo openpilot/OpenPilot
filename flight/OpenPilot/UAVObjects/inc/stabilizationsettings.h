@@ -33,7 +33,7 @@
 #define STABILIZATIONSETTINGS_H
 
 // Object constants
-#define STABILIZATIONSETTINGS_OBJID 1855169608U
+#define STABILIZATIONSETTINGS_OBJID 2185681924U
 #define STABILIZATIONSETTINGS_NAME "StabilizationSettings"
 #define STABILIZATIONSETTINGS_METANAME "StabilizationSettingsMeta"
 #define STABILIZATIONSETTINGS_ISSINGLEINST 1
@@ -57,16 +57,36 @@
 
 // Object data
 typedef struct {
+    uint16_t UpdatePeriod;
     float RollMax;
     float PitchMax;
     float ThrottleMax;
+    float PitchKp;
+    float PitchKi;
+    float PitchKd;
+    float RollKp;
+    float RollKi;
+    float RollKd;
+    float YawKp;
+    float YawKi;
+    float YawKd;
 
 } __attribute__((packed)) StabilizationSettingsData;
 
 // Field information
+// Field UpdatePeriod information
 // Field RollMax information
 // Field PitchMax information
 // Field ThrottleMax information
+// Field PitchKp information
+// Field PitchKi information
+// Field PitchKd information
+// Field RollKp information
+// Field RollKi information
+// Field RollKd information
+// Field YawKp information
+// Field YawKi information
+// Field YawKd information
 
 
 // Generic interface functions

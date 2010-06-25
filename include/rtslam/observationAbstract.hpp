@@ -107,6 +107,8 @@ namespace jafar {
 		    }
 		    return sptr;
 		  }
+			// Cast to specific sensor type in the specialized task.
+			virtual void linkToSensorSpecific( sensor_ptr_t ptr ) = 0;
 
 			public:
 

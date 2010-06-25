@@ -64,6 +64,16 @@ namespace jafar {
 		    }
 		    return sptr;
 		  }
+		  virtual void linkToSensorSpecific( sensor_ptr_t ptr )
+		  {
+		    boost::shared_ptr<SensorPinHole> sptr = SPTR_CAST<SensorPinHole>( ptr );
+		    if( sptr==NULL )
+		      {
+			std::cerr << __FILE__ << ":" << __LINE__ << " : cast unfair." << std::endl;
+			throw "CAST";
+		      }
+		    linkToPinHole( sptr );
+		  }
 
 		public:
 

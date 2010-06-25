@@ -5,11 +5,11 @@
  *      Author: agonzale
  */
 
+#include "rtslam/observationPinHoleEuclideanPoint.hpp"
 #include "jmath/ublasExtra.hpp"
 #include "boost/shared_ptr.hpp"
 #include "rtslam/pinholeTools.hpp"
 #include "rtslam/landmarkEuclideanPoint.hpp"
-#include "rtslam/observationPinHoleEuclideanPoint.hpp"
 #include "rtslam/descriptorImagePoint.hpp"
 
 namespace jafar {

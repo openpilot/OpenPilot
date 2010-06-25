@@ -133,7 +133,7 @@ namespace jafar {
 			// x+ = f(x, u, n) :
 			expectation.x() = exp;
 			// P+ = F_x * P * F_x' + F_n * Q * F_n' :
-			expectation.P() = ublasExtra::prod_JPJt(ublas::project(landmarkPtr()->mapPtr()->filterPtr->P(), ia_rsl, ia_rsl), EXP_rsl);
+			expectation.P() = ublasExtra::prod_JPJt(ublas::project(landmarkPtr()->mapManagerPtr()->mapPtr()->filterPtr->P(), ia_rsl, ia_rsl), EXP_rsl);
 			// noon-observable
 			expectation.nonObs = nobs;
 
@@ -158,8 +158,9 @@ namespace jafar {
 			LMK_rs = ublas::prod(LMK_sg, SG_rs);
 
 			// Initialize in map
-			landmarkPtr()->mapPtr()->filterPtr->initialize(
-					landmarkPtr()->mapPtr()->ia_used_states(),
+			landmarkPtr()->mapManagerPtr()->mapPtr()->filterPtr
+			  ->initialize(
+				       landmarkPtr()->mapManagerPtr()->mapPtr()->ia_used_states(),
 					LMK_rs,
 					sensorPtr()->ia_globalPose,
 					landmarkPtr()->state.ia(),

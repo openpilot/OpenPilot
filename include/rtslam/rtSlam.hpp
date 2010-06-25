@@ -46,6 +46,7 @@ namespace jafar {
   	        class DataManagerAbstract;
 		class LandmarkAbstract;
 		class ObservationAbstract;
+	  class MapManagerAbstract;
 		class RawAbstract;
 		class AppearanceAbstract;
 		class FeatureAbstract;
@@ -61,6 +62,7 @@ namespace jafar {
 		typedef boost::shared_ptr<DataManagerAbstract>      										data_manager_ptr_t;
 		typedef boost::shared_ptr<LandmarkAbstract>    										landmark_ptr_t;
 		typedef boost::shared_ptr<ObservationAbstract> 										observation_ptr_t;
+		typedef boost::shared_ptr<MapManagerAbstract>    										map_manager_ptr_t;
 
 		typedef boost::shared_ptr<RawAbstract>         										raw_ptr_t;
 		typedef boost::shared_ptr<AppearanceAbstract>  										appearance_ptr_t;

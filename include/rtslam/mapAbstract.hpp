@@ -32,7 +32,8 @@ namespace jafar {
 		// some forward declarations.
 		class RobotAbstract;
 		class LandmarkAbstract;
-
+		class MapManagerAbstract;
+	  class ObservationFactory;
 
 		/** Base class for all map types defined in the module rtslam.
 		 *
@@ -41,14 +42,15 @@ namespace jafar {
 		 */
 		class MapAbstract: public ObjectAbstract, public ChildOf<WorldAbstract>, 
 			public boost::enable_shared_from_this<MapAbstract>,
-			public ParentOf<RobotAbstract> , public ParentOf<LandmarkAbstract> {
+			public ParentOf<RobotAbstract> , public ParentOf<MapManagerAbstract> {
 
 			ENABLE_LINK_TO_PARENT(WorldAbstract,World,MapAbstract);
 			ENABLE_ACCESS_TO_PARENT(WorldAbstract,world);
 			
 			ENABLE_ACCESS_TO_CHILDREN(RobotAbstract,Robot,robot);
-			ENABLE_ACCESS_TO_CHILDREN(LandmarkAbstract,Landmark,landmark);
+		  ENABLE_ACCESS_TO_CHILDREN(MapManagerAbstract,MapManager,mapManager);
 
+		public:
 				/**
 				 * Print all MAP data.
 				 *

@@ -152,8 +152,11 @@ namespace jafar {
 				}
 			}
 			s << "\n% LANDMARKS AND OBSERVATIONS \n%==========================" << endl;
-			for (MapAbstract::LandmarkList::const_iterator lmkIter = map.landmarkList().begin(); lmkIter
-			    != map.landmarkList().end(); lmkIter++) {
+			for( MapAbstract::MapManagerList::const_iterator mmIter = map.mapManagerList().begin(); mmIter!=map.mapManagerList().end();mmIter++ )
+			  {
+			    const map_manager_ptr_t mm = *mmIter;
+			    for (MapManagerAbstract::LandmarkList::const_iterator lmkIter = mm->landmarkList().begin(); lmkIter
+			    != mm->landmarkList().end(); lmkIter++) {
 				landmark_ptr_t lmkPtr = *lmkIter;
 				s << *lmkPtr << endl;
 				for (LandmarkAbstract::ObservationList::iterator obsIter = lmkPtr->observationList().begin();
@@ -162,6 +165,7 @@ namespace jafar {
 					s << *obsPtr << endl;
 				}
 			}
+			  }
 			return s;
 		}
 

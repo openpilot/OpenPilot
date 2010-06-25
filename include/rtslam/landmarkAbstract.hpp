@@ -33,6 +33,7 @@
 
 // include parents
 #include "rtslam/mapAbstract.hpp"
+#include "rtslam/mapManager.hpp"
 #include "rtslam/mapObject.hpp"
 #include "rtslam/descriptorAbstract.hpp"
 #include "rtslam/parents.hpp"
@@ -53,15 +54,15 @@ namespace jafar {
 		 *
 		 * @ingroup rtslam
 		 */
-		class LandmarkAbstract: public MapObject, public ChildOf<MapAbstract> , public boost::enable_shared_from_this<
+		class LandmarkAbstract: public MapObject, public ChildOf<MapManagerAbstract> , public boost::enable_shared_from_this<
 		    LandmarkAbstract>, public ParentOf<ObservationAbstract> {
 
 
-				// define the function linkToParentMap().
-			ENABLE_LINK_TO_PARENT(MapAbstract,Map,LandmarkAbstract)
+				// define the function linkToParentMapManager().
+		       ENABLE_LINK_TO_PARENT(MapManagerAbstract,MapManager,LandmarkAbstract)
 				;
-				// define the functions mapPtr() and map().
-			ENABLE_ACCESS_TO_PARENT(MapAbstract,map)
+				// define the functions mapManagerPtr() and mapManager().
+			ENABLE_ACCESS_TO_PARENT(MapManagerAbstract,mapManager)
 				;
 				// define the type ObservationList, and the function observationList().
 			ENABLE_ACCESS_TO_CHILDREN(ObservationAbstract,Observation,observation)

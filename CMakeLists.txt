@@ -10,4 +10,6 @@ build_jafar_module(jmath
   CPPFLAGS -DBOOST_UBLAS_USE_EXCEPTIONS
   #CXXFLAGS
   #CPPFLAGS_MODULE
+  ROBOTPKG_CATEGORY math
+  SHORT_DESCRIPTION "Jafar module that defines some common mathematical tools: vector and matrix manipulation, random number generation,..."
 )

@@ -556,6 +556,12 @@ void OPMapGadgetWidget::setMapProvider(QString provider)
 	    m_map->SetMapType(mapcontrol::Helper::MapTypeFromString(provider));
 }
 
+void OPMapGadgetWidget::setAccessMode(QString accessMode)
+{
+    if (m_map)
+	m_map->configuration->SetAccessMode(mapcontrol::Helper::AccessModeFromString(accessMode));
+}
+
 void OPMapGadgetWidget::setUseMemoryCache(bool useMemoryCache)
 {
     if (m_map)

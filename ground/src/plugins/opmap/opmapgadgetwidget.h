@@ -55,6 +55,7 @@ public:
    void setZoom(int value);
    void setPosition(QPointF pos);
    void setMapProvider(QString provider);
+   void setAccessMode(QString accessMode);
     void setUseMemoryCache(bool useMemoryCache);
     void setCacheLocation(QString cacheLocation);
 

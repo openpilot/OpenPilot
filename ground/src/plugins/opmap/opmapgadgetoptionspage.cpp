@@ -57,12 +57,22 @@ QWidget *OPMapGadgetOptionsPage::createPage(QWidget *parent)
     m_page->providerComboBox->clear();
     m_page->providerComboBox->addItems(mapcontrol::Helper::MapTypes());
 
+    // populate the access mode combobox
+    m_page->accessModeComboBox->clear();
+    m_page->accessModeComboBox->addItems(mapcontrol::Helper::AccessModeTypes());
+
     int index = m_page->providerComboBox->findText(m_config->mapProvider());
     index = (index >= 0) ? index : 0;
     m_page->providerComboBox->setCurrentIndex(index);
+
     m_page->zoomSpinBox->setValue(m_config->zoom());
     m_page->latitudeSpinBox->setValue(m_config->latitude());
     m_page->longitudeSpinBox->setValue(m_config->longitude());
+
+    index = m_page->accessModeComboBox->findText(m_config->accessMode());
+    index = (index >= 0) ? index : 0;
+    m_page->accessModeComboBox->setCurrentIndex(index);
+
     m_page->pushButtonUseMemoryCache->setChecked(m_config->useMemoryCache());
     m_page->lineEditCacheLocation->setText(m_config->cacheLocation());
 
@@ -87,7 +97,12 @@ void OPMapGadgetOptionsPage::on_pushButtonCacheLocation_clicked()
 
 void OPMapGadgetOptionsPage::on_pushButtonCacheDefaults_clicked()
 {
+    int index = m_page->accessModeComboBox->findText("ServerAndCache");
+    index = (index >= 0) ? index : 0;
+    m_page->accessModeComboBox->setCurrentIndex(index);
+
     m_page->pushButtonUseMemoryCache->setChecked(true);
+
     m_page->lineEditCacheLocation->setText(QDir::currentPath() + QDir::separator() + "mapscache" + QDir::separator());
 }
 
@@ -97,6 +112,7 @@ void OPMapGadgetOptionsPage::apply()
     m_config->setZoom(m_page->zoomSpinBox->value());
     m_config->setLatitude(m_page->latitudeSpinBox->value());
     m_config->setLongitude(m_page->longitudeSpinBox->value());
+    m_config->setAccessMode(m_page->accessModeComboBox->currentText());
     m_config->setUseMemoryCache(m_page->pushButtonUseMemoryCache->isChecked());
     m_config->setCacheLocation(m_page->lineEditCacheLocation->text());
 }

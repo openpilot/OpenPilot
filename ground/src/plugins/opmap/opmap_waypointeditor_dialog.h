@@ -31,6 +31,10 @@
 #include <QtGui/QWidget>
 #include <QtGui/QMenu>
 #include <QtGui/QDialog>
+#include <QGraphicsView>
+#include <QGraphicsScene>
+#include <QGraphicsItem>
+
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/positionactual.h"
 
@@ -38,7 +42,38 @@ namespace Ui {
     class opmap_waypointeditor_dialog;
 }
 
-class opmap_waypointeditor_dialog : public QDialog {
+// ***************************************************************
+
+class Waypoint : public QObject, public QGraphicsItem
+{
+    Q_OBJECT
+
+ public:
+    Waypoint();
+
+    double latitude_degress;
+    double longitude_degress;
+    double height_feet;
+    double relative_time_seconds;
+
+    QRectF boundingRect() const;
+    QPainterPath shape() const;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+ protected:
+//    void timerEvent(QTimerEvent *event);
+
+ private:
+//    qreal angle;
+//    qreal speed;
+//    qreal mouseEyeDirection;
+//    QColor color;
+};
+
+// ***************************************************************
+
+class opmap_waypointeditor_dialog : public QDialog
+{
     Q_OBJECT
 public:
     opmap_waypointeditor_dialog(QWidget *parent = 0);
@@ -48,7 +83,12 @@ protected:
     void changeEvent(QEvent *e);
 
 private:
+    QGraphicsView *view;
+    QGraphicsScene *scene;
+
     Ui::opmap_waypointeditor_dialog *ui;
 };
+
+// ***************************************************************
 
 #endif // OPMAP_WAYPOINTEDITOR_DIALOG_H

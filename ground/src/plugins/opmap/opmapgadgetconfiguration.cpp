@@ -35,6 +35,7 @@ OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId, const QByteA
     m_defaultZoom(2),
     m_defaultLatitude(0),
     m_defaultLongitude(0),
+    m_accessMode("ServerAndCache"),
     m_useMemoryCache(true),
     m_cacheLocation(QDir::currentPath() + QDir::separator() + "mapscache" + QDir::separator())
 {
@@ -46,6 +47,7 @@ OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId, const QByteA
         double latitude;
         double longitude;
         QString mapProvider;
+	QString accessMode;
 	bool useMemoryCache;
 	QString cacheLocation;
 
@@ -53,6 +55,7 @@ OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId, const QByteA
         stream >> latitude;
         stream >> longitude;
         stream >> mapProvider;
+	stream >> accessMode;
 	stream >> useMemoryCache;
 	stream >> cacheLocation;
 
@@ -60,6 +63,7 @@ OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId, const QByteA
         m_defaultLatitude = latitude;
         m_defaultLongitude = longitude;
 	if (!mapProvider.isEmpty()) m_mapProvider = mapProvider;
+	if (!accessMode.isEmpty()) m_accessMode = accessMode;
 	m_useMemoryCache = useMemoryCache;
 	if (!cacheLocation.isEmpty()) m_cacheLocation = cacheLocation;
     }
@@ -73,6 +77,7 @@ IUAVGadgetConfiguration * OPMapGadgetConfiguration::clone()
     m->m_defaultLatitude = m_defaultLatitude;
     m->m_defaultLongitude = m_defaultLongitude;
     m->m_mapProvider = m_mapProvider;
+    m->m_accessMode = m_accessMode;
     m->m_useMemoryCache = m_useMemoryCache;
     m->m_cacheLocation = m_cacheLocation;
 
@@ -88,6 +93,7 @@ QByteArray OPMapGadgetConfiguration::saveState() const
     stream << m_defaultLatitude;
     stream << m_defaultLongitude;
     stream << m_mapProvider;
+    stream << m_accessMode;
     stream << m_useMemoryCache;
     stream << m_cacheLocation;
 

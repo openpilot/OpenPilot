@@ -131,8 +131,7 @@ namespace jafar {
 				ObservationAbstract(const sensor_ptr_t & _senPtr, const landmark_ptr_t & _lmkPtr, const size_t _size_meas,
 				                    const size_t _size_exp, const size_t _size_inn, const size_t _size_nonobs = 0);
 
-				virtual ~ObservationAbstract() {
-				}
+				virtual ~ObservationAbstract();
 
 				virtual void setup(double _noiseStd, const Gaussian & _prior);
 
@@ -149,6 +148,7 @@ namespace jafar {
 				// indirect arrays
 				ind_array ia_rsl; ///<    Ind. array of mapped indices of robot, sensor and landmark (ie, sensor might or might not be there).
 
+			public:
 				// Jacobians
 				mat SG_rs; ///<						Jacobian of global sensor pose wrt. robot and sensor mapped states
 				mat EXP_sg; ///<				 	Jacobian of expectation wrt. global sensor pose
@@ -162,6 +162,7 @@ namespace jafar {
 				mat LMK_prior; ///<      	Jacobian of the landmark wrt. the prior.
 				mat LMK_rs; ///<         	Jacobian of the landmark wrt. the robot and sensor mapped states.
 
+			public:
 				/**
 				 * Counters
 				 */
@@ -326,12 +327,6 @@ namespace jafar {
 				 */
 				virtual void predictAppearance() = 0;
 
-				/**
-				 * find and match the expected appearence in the raw-data
-				 */
-				virtual void matchFeature(raw_ptr_t) = 0;
-
-
 				virtual double getMatchScore() = 0;
 
 				/**
@@ -347,6 +342,13 @@ namespace jafar {
 					}
 
 				void update() ;
+
+				virtual bool voteForKillingLandmark();
+
+				virtual bool voteForReparametrizingLandmark() = 0;
+
+				virtual void transferInfoObs(observation_ptr_t & obs);
+
 		};
 
 	}

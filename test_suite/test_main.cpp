@@ -213,29 +213,30 @@ void test_main01() {
 	mat SG_rs_local(7,7);
 	mat SG_rs_remote(7,14);
 
-	mapPtr->ParentOf<RobotAbstract>::display(cout);
-	cout << endl;
-	cout << "Rob = " << *(mapPtr->robotList()[0]) << endl;
-	mapPtr->robotList()[0]->ParentOf<SensorAbstract>::display(cout);
-	cout << endl;
-	cout << "Sen = " << *mapPtr->robotList()[0]->sensorList()[0] << endl;
-
-	sensor_ptr_t senPtr = mapPtr->robotList()[0]->sensorList()[0];
-	cout << "SenPtr = " << *senPtr << endl;
-
-	SensorAbstract & sen = *senPtr.get();
-	cout << "sn = " << sen << endl;
-	mapPtr->robotList()[0]->sensorList()[0]->globalPose(sg_local, SG_rs_local);
-//	senPtr->globalPose(sg_local, SG_rs_local);
-	cout << "sg_local  = " << sg_local << endl;
-	cout << "SG_rs_local  = " << SG_rs_local << endl;
-	cout << "sg_local.ia_rsl = " << mapPtr->robotList()[0]->sensorList()[0]->ia_globalPose << endl;
-
-	mapPtr->robotList()[0]->sensorList()[1]->globalPose(sg_remote, SG_rs_remote);
-
-	cout << "sg_remote = " << sg_remote << endl;
-	cout << "SG_rs_remote = " << SG_rs_remote << endl;
-	cout << "sg_local.ia_rsl = " << mapPtr->robotList()[0]->sensorList()[1]->ia_globalPose << endl;
+	// cannot access direcly with index anymore
+// 	mapPtr->ParentOf<RobotAbstract>::display(cout);
+// 	cout << endl;
+// 	cout << "Rob = " << *(mapPtr->robotList()[0]) << endl;
+// 	mapPtr->robotList()[0]->ParentOf<SensorAbstract>::display(cout);
+// 	cout << endl;
+// 	cout << "Sen = " << *mapPtr->robotList()[0]->sensorList()[0] << endl;
+// 
+// 	sensor_ptr_t senPtr = mapPtr->robotList()[0]->sensorList()[0];
+// 	cout << "SenPtr = " << *senPtr << endl;
+// 
+// 	SensorAbstract & sen = *senPtr.get();
+// 	cout << "sn = " << sen << endl;
+// 	mapPtr->robotList()[0]->sensorList()[0]->globalPose(sg_local, SG_rs_local);
+// //	senPtr->globalPose(sg_local, SG_rs_local);
+// 	cout << "sg_local  = " << sg_local << endl;
+// 	cout << "SG_rs_local  = " << SG_rs_local << endl;
+// 	cout << "sg_local.ia_rsl = " << mapPtr->robotList()[0]->sensorList()[0]->ia_globalPose << endl;
+// 
+// 	mapPtr->robotList()[0]->sensorList()[1]->globalPose(sg_remote, SG_rs_remote);
+// 
+// 	cout << "sg_remote = " << sg_remote << endl;
+// 	cout << "SG_rs_remote = " << SG_rs_remote << endl;
+// 	cout << "sg_local.ia_rsl = " << mapPtr->robotList()[0]->sensorList()[1]->ia_globalPose << endl;
 
 	cout << "\n THAT'S ALL, WHAT'S WRONG? " << endl;
 

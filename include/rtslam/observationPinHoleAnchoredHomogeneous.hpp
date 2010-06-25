@@ -15,7 +15,6 @@
 #include "rtslam/observationAbstract.hpp"
 #include "rtslam/sensorPinHole.hpp"
 #include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
-#include "rtslam/imageManagerPoint.hpp"
 //#include "rtslam/parents.hpp"
 #include "boost/shared_ptr.hpp"
 
@@ -32,10 +31,10 @@ namespace jafar {
 		 * \ingroup rtslam
 		 */
 		class ObservationPinHoleAnchoredHomogeneousPoint: public ObservationAbstract,
-		    public SpecificChildOf<LandmarkAnchoredHomogeneousPoint>
+ 	    public SpecificChildOf<LandmarkAnchoredHomogeneousPoint>
 		{
-
-				// Define the function linkToParentAHP.
+			public:
+			// Define the function linkToParentAHP.
 			ENABLE_LINK_TO_SPECIFIC_PARENT(LandmarkAbstract,LandmarkAnchoredHomogeneousPoint,AHP,ObservationAbstract)
 				;
 				// Define the functions ahp() and ahpPtr().
@@ -79,6 +78,7 @@ namespace jafar {
 
 				ObservationPinHoleAnchoredHomogeneousPoint(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & ahpPtr);
 				~ObservationPinHoleAnchoredHomogeneousPoint(void) {
+					cout << "Deleted observation: " << id() << ": " << typeName() << endl;
 				}
 
 				virtual std::string typeName() {
@@ -126,11 +126,7 @@ namespace jafar {
 					return measurement.matchScore;
 				}
 
-
-				/**
-				 * find and match the expected appearence in the raw-data
-				 */
-				virtual void matchFeature(raw_ptr_t rawPtr);
+				virtual bool voteForReparametrizingLandmark();
 
 			public:
 				double pixelNoise;

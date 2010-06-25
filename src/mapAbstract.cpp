@@ -75,11 +75,14 @@ namespace jafar {
 		}
 
 		void MapAbstract::liberateStates(const jblas::ind_array & _ia) {
-			for (size_t i = 0; _ia.size(); i++)
-				if (used_states(_ia(i)) == true) {
-					used_states(_ia(i)) = false;
+			for (size_t i = 0; i <_ia.size(); i++)
+			{
+				int j = _ia(i);
+				if (used_states(j) == true) {
+					used_states(j) = false;
 					current_size += 1;
 				}
+			}
 		}
 
 		void MapAbstract::completeObservationsInGraph(const sensor_ptr_t & existingSenPtr, const landmark_ptr_t & lmkPtr) {
@@ -89,7 +92,6 @@ namespace jafar {
 					sensor_ptr_t senPtr = *senIter;
 					if (senPtr != existingSenPtr){
 						// FIXME dynamic creation
-						int width = 11, height = 11;
 						observation_ptr_t obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint(senPtr, lmkPtr));
 //						obsPtr->setup(senPtr, lmkPtr, width, height); //todo uncomment here
 					}

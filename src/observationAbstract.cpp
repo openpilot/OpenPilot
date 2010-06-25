@@ -99,6 +99,11 @@ namespace jafar {
 			clearEvents();
 		}
 
+		ObservationAbstract::~ObservationAbstract() {
+			cout << "Deleted observation: " << id() << ": " << typeName() << endl;
+		}
+
+
 //		void ObservationAbstract::setup(const feature_ptr_t & featPtr, const Gaussian & _prior){
 		void ObservationAbstract::setup(double _noiseStd, const Gaussian & _prior){
 			noiseCovariance.clear();
@@ -205,9 +210,49 @@ namespace jafar {
 		}
 
 
+		bool ObservationAbstract::voteForKillingLandmark(){
+			// kill big ellipses
+			int searchSize = 36*sqrt(expectation.P(0,0)*expectation.P(1,1));
+			if (searchSize > 30000) {
+//				cout << "Killed by size." << endl;
+				return true;
+			}
 
+			// kill unstable and inconsistent lmks
+			if (counters.nSearch > 10) {
+				double matchRatio = counters.nMatch / (double) counters.nSearch;
+				double consistencyRatio = counters.nInlier / (double)counters.nMatch;
 
+				if (matchRatio < 0.7 || consistencyRatio < 0.7)	{
+//					cout << "Killed by unstability." << endl;
+					return true;
+				}
+			}
+			return false;
+		}
 
+		void ObservationAbstract::transferInfoObs(observation_ptr_t & obs){
+			this->id(obs->id());
+			this->name(obs->name());
+
+			this->expectation.x(obs->expectation.x());
+			this->expectation.P(obs->expectation.P());
+			this->expectation.infoGain = obs->expectation.infoGain;
+			this->expectation.nonObs = obs->expectation.nonObs;
+			this->expectation.visible = obs->expectation.visible;
+
+			this->innovation.x(obs->innovation.x());
+			this->innovation.P(obs->innovation.P());
+			this->innovation.iP_ = obs->innovation.iP_;
+			this->innovation.mahalanobis_ = obs->innovation.mahalanobis_;
+
+			this->measurement.x(obs->measurement.x());
+			this->measurement.P(obs->measurement.P());
+			this->measurement.matchScore = obs->measurement.matchScore;
+
+			this->counters = obs->counters;
+			this->events = obs->events;
+		};
 
 	} // namespace rtslam
 } // namespace jafar

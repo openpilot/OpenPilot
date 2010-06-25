@@ -143,20 +143,13 @@ namespace jafar {
 			descPtr->predictAppearance(_this);
 		}
 
-		/**
-		 * find and match the expected appearence in the raw-data
-		 */
-		void ObservationPinHoleAnchoredHomogeneousPoint::matchFeature(
-		    raw_ptr_t rawPtr) {
-			// TODO call the namespace image with the raw
-			// fixme these lines below only for compilation purposes
-			measurement.x(expectation.x());
-			identity_mat I(2);
-			measurement.P(I);
-			measurement.matchScore = 1.00;
-
-			events.measured = true;
+		bool ObservationPinHoleAnchoredHomogeneousPoint::voteForReparametrizingLandmark(){
+			//TODO: use a parameter for the linearity test threshold.
+//			cout << "evaluating linearity for lmk: " << id() << endl;
+			return (lmkAHP::linearityScore(sensorPtr()->globalPose(), landmarkPtr()->state.x(), landmarkPtr()->state.P()) < 0.1);
 		}
+
+
 
 	}
 }

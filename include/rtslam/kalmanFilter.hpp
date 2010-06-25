@@ -102,12 +102,12 @@ namespace jafar {
 				 *
 				 * Also, the Jacobian and indirect-array associated to the innovation:
 				 * - INN_rsl: the Jacobian wrt the states that contributed to the innovation
-				 * - ia: the indices to these states
+				 * - ia_rsl: the indices to these states
 				 *
-				 * The EKF update is then the following:
-				 * - K = -P * trans(INN_rsl) * inv(Z)
-				 * - x = x + K * z
-				 * - P = P - K * INN_rsl * P
+				 * The EKF update is then the following (see Sola etal., IROS 2009):
+				 * - K  = -P * trans(INN_rsl) * inv(Z)
+				 * - x <-- x + K * z
+				 * - P <-- P + K * INN_rsl * P
 				 *
 				 * \param iax the indirect array of used indices in the map.
 				 * \param inn the Innovation.

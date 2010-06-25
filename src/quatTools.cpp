@@ -46,6 +46,7 @@ namespace jafar {
 				vec7 F;
 				F.clear();
 				ublas::subrange(F, 3, 7) = flu2rdfQuat();
+				return F;
 			}
 
 		}

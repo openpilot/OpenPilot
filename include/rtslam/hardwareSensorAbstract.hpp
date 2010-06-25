@@ -20,6 +20,7 @@
 
 namespace jafar {
 namespace rtslam {
+namespace hardware {
 
 class HardwareSensorAbstract;
 typedef boost::shared_ptr<HardwareSensorAbstract> hardware_sensor_ptr_t;
@@ -34,11 +35,10 @@ class HardwareSensorAbstract
 		@note must be non blocking
 		*/
 		virtual int acquireRaw(raw_ptr_t &rawPtr) = 0;
-		virtual void releaseRaw() = 0;
 		virtual ~HardwareSensorAbstract() {}
 };
 
-}}
+}}}
 
 #endif
 

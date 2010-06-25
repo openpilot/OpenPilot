@@ -96,7 +96,7 @@ class SensorQt : public SensorDisplay
 			viewer_ = new qdisplay::Viewer();
 			view_ = new qdisplay::ImageView();
 			viewer_->setImageView(view_, 0, 0);
-			viewer_->resize(650,490);
+			viewer_->resize(660,500);
 			framenumber = 0;
 			
 			framenumber_label = new QGraphicsTextItem(view_);
@@ -173,7 +173,7 @@ class ObservationQt : public ObservationDisplay
 		std::list<QGraphicsItemGroup*> items_;
 	public:
 		ObservationQt(rtslam::ObservationAbstract *_slamObs, SensorQt *_dispSen):
-			ObservationDisplay(_slamObs, _dispSen), view_(_dispSen->view_) 
+			ObservationDisplay(_slamObs, _dispSen), view_(_dispSen->view_)
 		{
 #if EMBED_PREDICTED_APP
 			predictedApp_ = NULL;
@@ -192,9 +192,11 @@ class ObservationQt : public ObservationDisplay
 		}
 		~ObservationQt()
 		{
+//JFR_DEBUG("deleting ObservationQt and all the graphics objects " << items_.size());
 			for(std::list<QGraphicsItemGroup*>::iterator it = items_.begin(); it != items_.end(); ++it)
 			{
-				view_->removeFromGroup(*it);
+				//(*it)->setParentItem(NULL);
+				//viewer_->scene()->removeItem(*it);
 				delete *it;
 			}
 		}
@@ -214,7 +216,8 @@ class ObservationQt : public ObservationDisplay
 						if (predicted_)
 						{
 							predObs_ = slamObs_->expectation.x();
-							predObsCov_ = slamObs_->expectation.P();
+							predObsCov_ = slamObs_->innovation.P();
+//							cout << "display: noise/exp/inn:  " << slamObs_->measurement.P() << " / " << slamObs_->expectation.P() << " / " << slamObs_->innovation.P() << " / " << endl;
 						}
 						if (matched_ || !predicted_)
 						{
@@ -341,6 +344,7 @@ class ObservationQt : public ObservationDisplay
 #if DEFINE_USELESS_OBJECTS
 typedef Viewer<WorldQt,MapQt,RobotQt,SensorQt,LandmarkQt,ObservationQt> ViewerQt;
 #else
+#error "does not work"
 typedef Viewer<WorldDisplay,MapDisplay,RobotDisplay,SensorQt,LandmarkDisplay,ObservationQt> ViewerQt;
 #endif
 

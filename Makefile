@@ -287,6 +287,54 @@ src/appearanceImage.cpp.s:
 	cd /home/nmansard/src/jafar-like/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/appearanceImage.cpp.s
 .PHONY : src/appearanceImage.cpp.s
 
+src/dataManagerAbstract.o: src/dataManagerAbstract.cpp.o
+.PHONY : src/dataManagerAbstract.o
+
+# target to build an object file
+src/dataManagerAbstract.cpp.o:
+	cd /home/nmansard/src/jafar-like/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerAbstract.cpp.o
+.PHONY : src/dataManagerAbstract.cpp.o
+
+src/dataManagerAbstract.i: src/dataManagerAbstract.cpp.i
+.PHONY : src/dataManagerAbstract.i
+
+# target to preprocess a source file
+src/dataManagerAbstract.cpp.i:
+	cd /home/nmansard/src/jafar-like/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerAbstract.cpp.i
+.PHONY : src/dataManagerAbstract.cpp.i
+
+src/dataManagerAbstract.s: src/dataManagerAbstract.cpp.s
+.PHONY : src/dataManagerAbstract.s
+
+# target to generate assembly for a file
+src/dataManagerAbstract.cpp.s:
+	cd /home/nmansard/src/jafar-like/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerAbstract.cpp.s
+.PHONY : src/dataManagerAbstract.cpp.s
+
+src/dataManagerActiveSearch.o: src/dataManagerActiveSearch.cpp.o
+.PHONY : src/dataManagerActiveSearch.o
+
+# target to build an object file
+src/dataManagerActiveSearch.cpp.o:
+	cd /home/nmansard/src/jafar-like/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerActiveSearch.cpp.o
+.PHONY : src/dataManagerActiveSearch.cpp.o
+
+src/dataManagerActiveSearch.i: src/dataManagerActiveSearch.cpp.i
+.PHONY : src/dataManagerActiveSearch.i
+
+# target to preprocess a source file
+src/dataManagerActiveSearch.cpp.i:
+	cd /home/nmansard/src/jafar-like/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerActiveSearch.cpp.i
+.PHONY : src/dataManagerActiveSearch.cpp.i
+
+src/dataManagerActiveSearch.s: src/dataManagerActiveSearch.cpp.s
+.PHONY : src/dataManagerActiveSearch.s
+
+# target to generate assembly for a file
+src/dataManagerActiveSearch.cpp.s:
+	cd /home/nmansard/src/jafar-like/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerActiveSearch.cpp.s
+.PHONY : src/dataManagerActiveSearch.cpp.s
+
 src/descriptorAbstract.o: src/descriptorAbstract.cpp.o
 .PHONY : src/descriptorAbstract.o
 
@@ -431,6 +479,54 @@ src/gaussian.cpp.s:
 	cd /home/nmansard/src/jafar-like/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/gaussian.cpp.s
 .PHONY : src/gaussian.cpp.s
 
+src/hardwareEstimatorMti.o: src/hardwareEstimatorMti.cpp.o
+.PHONY : src/hardwareEstimatorMti.o
+
+# target to build an object file
+src/hardwareEstimatorMti.cpp.o:
+	cd /home/nmansard/src/jafar-like/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hardwareEstimatorMti.cpp.o
+.PHONY : src/hardwareEstimatorMti.cpp.o
+
+src/hardwareEstimatorMti.i: src/hardwareEstimatorMti.cpp.i
+.PHONY : src/hardwareEstimatorMti.i
+
+# target to preprocess a source file
+src/hardwareEstimatorMti.cpp.i:
+	cd /home/nmansard/src/jafar-like/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hardwareEstimatorMti.cpp.i
+.PHONY : src/hardwareEstimatorMti.cpp.i
+
+src/hardwareEstimatorMti.s: src/hardwareEstimatorMti.cpp.s
+.PHONY : src/hardwareEstimatorMti.s
+
+# target to generate assembly for a file
+src/hardwareEstimatorMti.cpp.s:
+	cd /home/nmansard/src/jafar-like/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hardwareEstimatorMti.cpp.s
+.PHONY : src/hardwareEstimatorMti.cpp.s
+
+src/hardwareSensorCameraFirewire.o: src/hardwareSensorCameraFirewire.cpp.o
+.PHONY : src/hardwareSensorCameraFirewire.o
+
+# target to build an object file
+src/hardwareSensorCameraFirewire.cpp.o:
+	cd /home/nmansard/src/jafar-like/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hardwareSensorCameraFirewire.cpp.o
+.PHONY : src/hardwareSensorCameraFirewire.cpp.o
+
+src/hardwareSensorCameraFirewire.i: src/hardwareSensorCameraFirewire.cpp.i
+.PHONY : src/hardwareSensorCameraFirewire.i
+
+# target to preprocess a source file
+src/hardwareSensorCameraFirewire.cpp.i:
+	cd /home/nmansard/src/jafar-like/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hardwareSensorCameraFirewire.cpp.i
+.PHONY : src/hardwareSensorCameraFirewire.cpp.i
+
+src/hardwareSensorCameraFirewire.s: src/hardwareSensorCameraFirewire.cpp.s
+.PHONY : src/hardwareSensorCameraFirewire.s
+
+# target to generate assembly for a file
+src/hardwareSensorCameraFirewire.cpp.s:
+	cd /home/nmansard/src/jafar-like/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hardwareSensorCameraFirewire.cpp.s
+.PHONY : src/hardwareSensorCameraFirewire.cpp.s
+
 src/innovation.o: src/innovation.cpp.o
 .PHONY : src/innovation.o
 
@@ -574,6 +670,30 @@ src/mapAbstract.s: src/mapAbstract.cpp.s
 src/mapAbstract.cpp.s:
 	cd /home/nmansard/src/jafar-like/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/mapAbstract.cpp.s
 .PHONY : src/mapAbstract.cpp.s
+
+src/mapManager.o: src/mapManager.cpp.o
+.PHONY : src/mapManager.o
+
+# target to build an object file
+src/mapManager.cpp.o:
+	cd /home/nmansard/src/jafar-like/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/mapManager.cpp.o
+.PHONY : src/mapManager.cpp.o
+
+src/mapManager.i: src/mapManager.cpp.i
+.PHONY : src/mapManager.i
+
+# target to preprocess a source file
+src/mapManager.cpp.i:
+	cd /home/nmansard/src/jafar-like/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/mapManager.cpp.i
+.PHONY : src/mapManager.cpp.i
+
+src/mapManager.s: src/mapManager.cpp.s
+.PHONY : src/mapManager.s
+
+# target to generate assembly for a file
+src/mapManager.cpp.s:
+	cd /home/nmansard/src/jafar-like/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/mapManager.cpp.s
+.PHONY : src/mapManager.cpp.s
 
 src/mapObject.o: src/mapObject.cpp.o
 .PHONY : src/mapObject.o
@@ -1467,6 +1587,12 @@ help:
 	@echo "... src/appearanceImage.o"
 	@echo "... src/appearanceImage.i"
 	@echo "... src/appearanceImage.s"
+	@echo "... src/dataManagerAbstract.o"
+	@echo "... src/dataManagerAbstract.i"
+	@echo "... src/dataManagerAbstract.s"
+	@echo "... src/dataManagerActiveSearch.o"
+	@echo "... src/dataManagerActiveSearch.i"
+	@echo "... src/dataManagerActiveSearch.s"
 	@echo "... src/descriptorAbstract.o"
 	@echo "... src/descriptorAbstract.i"
 	@echo "... src/descriptorAbstract.s"
@@ -1485,6 +1611,12 @@ help:
 	@echo "... src/gaussian.o"
 	@echo "... src/gaussian.i"
 	@echo "... src/gaussian.s"
+	@echo "... src/hardwareEstimatorMti.o"
+	@echo "... src/hardwareEstimatorMti.i"
+	@echo "... src/hardwareEstimatorMti.s"
+	@echo "... src/hardwareSensorCameraFirewire.o"
+	@echo "... src/hardwareSensorCameraFirewire.i"
+	@echo "... src/hardwareSensorCameraFirewire.s"
 	@echo "... src/innovation.o"
 	@echo "... src/innovation.i"
 	@echo "... src/innovation.s"
@@ -1503,6 +1635,9 @@ help:
 	@echo "... src/mapAbstract.o"
 	@echo "... src/mapAbstract.i"
 	@echo "... src/mapAbstract.s"
+	@echo "... src/mapManager.o"
+	@echo "... src/mapManager.i"
+	@echo "... src/mapManager.s"
 	@echo "... src/mapObject.o"
 	@echo "... src/mapObject.i"
 	@echo "... src/mapObject.s"

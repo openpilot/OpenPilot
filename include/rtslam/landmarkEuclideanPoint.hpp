@@ -45,6 +45,7 @@ namespace jafar {
 				LandmarkEuclideanPoint(const simulation_t dummy, const map_ptr_t & mapPtr);
 
 				virtual ~LandmarkEuclideanPoint() {
+					cout << "Deleted landmark: " << id() << ": " << typeName() << endl;
 				}
 				
 				virtual std::string typeName() {
@@ -75,6 +76,9 @@ namespace jafar {
 					LNEW_lmk = identity_mat(size());
 				}
 
+				virtual bool needToReparametrize(){
+					return false; // never reparametrize an Euclidean point
+				}
 		}; // class LandmarkEuclideanPoint
 	} // namespace rtslam
 } // namespace jafar

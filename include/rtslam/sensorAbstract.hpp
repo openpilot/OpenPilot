@@ -72,7 +72,7 @@ namespace jafar {
 			ENABLE_ACCESS_TO_CHILDREN(DataManagerAbstract,DataManager,dataManager)
 				;
 
-				hardware_sensor_ptr_t hardwareSensorPtr;
+				hardware::hardware_sensor_ptr_t hardwareSensorPtr;
 
 			public:
 
@@ -144,7 +144,7 @@ namespace jafar {
 
 			public:
 
-				void setHardwareSensor(hardware_sensor_ptr_t hardwareSensorPtr_)
+				void setHardwareSensor(hardware::hardware_sensor_ptr_t hardwareSensorPtr_)
 				{
 					hardwareSensorPtr = hardwareSensorPtr_;
 				}
@@ -153,7 +153,6 @@ namespace jafar {
 				 * Acquire raw data.
 				 */
 				virtual int acquireRaw() = 0;
-				virtual void releaseRaw() = 0;
 
 				virtual raw_ptr_t getRaw() = 0;
 
@@ -182,6 +181,10 @@ namespace jafar {
 				 * \param PG_rs the Jacobian wrt the mapped states of robot and sensor.
 				 */
 				void globalPose(jblas::vec7 & senGlobalPose, jblas::mat & SG_rs);
+
+				virtual std::string categoryName() {
+					return "SENSOR";
+				}
 
 		};
 

@@ -356,7 +356,7 @@ namespace display {
 			{
 				for(SlamObjectsList::iterator it = slamObjects_.begin(); it != slamObjects_.end(); ++it)
 					boost::apply_visitor(Render(), *it);
-				clear();
+				//clear(); // we're not in a hurry, it will be done at next render
 			}
 			
 			

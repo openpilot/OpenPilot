@@ -11,7 +11,6 @@
 #include "rtslam/observationAbstract.hpp"
 #include "rtslam/sensorPinHole.hpp"
 #include "rtslam/landmarkEuclideanPoint.hpp"
-#include "rtslam/imageManagerPoint.hpp"
 #include "boost/shared_ptr.hpp"
 
 namespace jafar {
@@ -29,13 +28,12 @@ namespace jafar {
 		class ObservationPinHoleEuclideanPoint: public ObservationAbstract,
 		    public SpecificChildOf<LandmarkEuclideanPoint>
 		{
-
+			public:
 			// Define the function linkToParentEUC.
 			ENABLE_LINK_TO_SPECIFIC_PARENT(LandmarkAbstract,LandmarkEuclideanPoint,EUC,ObservationAbstract);
 
 			// Define the functions euc() and eucPtr().
 			ENABLE_ACCESS_TO_SPECIFIC_PARENT(LandmarkEuclideanPoint,euc);
-
 
 		public:
 		  typedef SensorPinHole sensor_spec_t;
@@ -74,7 +72,8 @@ namespace jafar {
 
 			ObservationPinHoleEuclideanPoint(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr);
 			~ObservationPinHoleEuclideanPoint(void){
-				}
+				cout << "Deleted observation: " << id() << ": " << typeName() << endl;
+					}
 
 			void setup(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr, double _noiseStd, int patchSize);
 
@@ -123,17 +122,9 @@ namespace jafar {
 					return measurement.matchScore;
 				}
 
-
-				/**
-				 * find and match the expected appearence in the raw-data
-				 */
-				virtual void matchFeature(raw_ptr_t rawPtr);
-
-			public:
-				/* Search in the sensor().dataManagerList() the manager of the proper type, to be
-				 * linked as the weak-father of this observation.
-				 */
-				void linkToWeakParentDataManager(void);
+				virtual bool voteForReparametrizingLandmark(){
+					return false;
+				}
 
 			public:
 				double pixelNoise;

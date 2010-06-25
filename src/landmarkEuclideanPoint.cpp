@@ -24,6 +24,5 @@ namespace jafar {
 			geomType = POINT,
 			type = PNT_EUC;
 		}
-
 	} // namespace rtslam
 } // namespace jafar

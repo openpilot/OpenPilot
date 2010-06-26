@@ -39,7 +39,7 @@ from collections import namedtuple
 _fields = [ \
 	uavobject.UAVObjectField(
 		'Voltage',
-		'I',
+		'f',
 		1,
 		[
 			'0',
@@ -49,7 +49,7 @@ _fields = [ \
 	),
 	uavobject.UAVObjectField(
 		'Current',
-		'I',
+		'f',
 		1,
 		[
 			'0',
@@ -72,7 +72,7 @@ _fields = [ \
 
 class FlightBatteryState(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 4176558368
+    OBJID        = 144318184
     NAME         = "FlightBatteryState"
     METANAME     = "FlightBatteryStateMeta"
     ISSINGLEINST = 1

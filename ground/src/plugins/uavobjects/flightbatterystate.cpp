@@ -42,10 +42,10 @@ FlightBatteryState::FlightBatteryState(): UAVDataObject(OBJID, ISSINGLEINST, ISS
     QList<UAVObjectField*> fields;
     QStringList VoltageElemNames;
     VoltageElemNames.append("0");
-    fields.append( new UAVObjectField(QString("Voltage"), QString("mV"), UAVObjectField::UINT32, VoltageElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("Voltage"), QString("V"), UAVObjectField::FLOAT32, VoltageElemNames, QStringList()) );
     QStringList CurrentElemNames;
     CurrentElemNames.append("0");
-    fields.append( new UAVObjectField(QString("Current"), QString("mA"), UAVObjectField::UINT32, CurrentElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("Current"), QString("A"), UAVObjectField::FLOAT32, CurrentElemNames, QStringList()) );
     QStringList ConsumedEnergyElemNames;
     ConsumedEnergyElemNames.append("0");
     fields.append( new UAVObjectField(QString("ConsumedEnergy"), QString("mAh"), UAVObjectField::UINT32, ConsumedEnergyElemNames, QStringList()) );

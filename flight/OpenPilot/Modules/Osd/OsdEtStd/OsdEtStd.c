@@ -339,10 +339,10 @@ static void Task(void* parameters)
 
 			FlightBatteryStateGet(&flightBatteryData);
 
-			DEBUG_MSG("%5d Batt: V=%dmV\n\r", cnt, flightBatteryData.Voltage);
+			DEBUG_MSG("%5d Batt: V=%dmV\n\r", cnt, (uint32_t)(flightBatteryData.Voltage*1000));
 
-			SetVoltage(flightBatteryData.Voltage);
-			SetCurrent(flightBatteryData.Current);
+			SetVoltage((uint32_t)(flightBatteryData.Voltage*1000));
+			SetCurrent((uint32_t)(flightBatteryData.Current*1000));
 			newBattData = FALSE;
 		}
 

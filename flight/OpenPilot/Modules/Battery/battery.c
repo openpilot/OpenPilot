@@ -108,8 +108,8 @@ static void task(void* parameters)
 		DEBUG_MSG("%03d %06d => %06dmV   %06d => %06dmA  %06dmAh\n", cnt,  PIOS_ADC_PinGet(2), mV, PIOS_ADC_PinGet(1), mA, mAs/3600);
 		cnt++;
 
-		flightBatteryData.Voltage = mV;
-		flightBatteryData.Current = mA;
+		flightBatteryData.Voltage = (float)mV/1000;
+		flightBatteryData.Current = (float)mA/1000;
 		flightBatteryData.ConsumedEnergy = mAs / 3600;
 		FlightBatteryStateSet(&flightBatteryData);
 

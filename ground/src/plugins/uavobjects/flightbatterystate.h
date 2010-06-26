@@ -41,8 +41,8 @@ class UAVOBJECTS_EXPORT FlightBatteryState: public UAVDataObject
 public:
     // Field structure
     typedef struct {
-        quint32 Voltage;
-        quint32 Current;
+        float Voltage;
+        float Current;
         quint32 ConsumedEnergy;
 
     } __attribute__((packed)) DataFields;
@@ -54,7 +54,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 4176558368U;
+    static const quint32 OBJID = 144318184U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

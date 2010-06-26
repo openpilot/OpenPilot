@@ -540,7 +540,7 @@ static void DoConnectedToNC(void)
 #if GENERATE_BATTERY_INFO
 			if (++battStateCnt > 2)
 			{
-				flightBatteryData.Voltage = (uint32_t)msg.pars[OSD_MSG_BATT_IDX]*100;
+				flightBatteryData.Voltage = (float)msg.pars[OSD_MSG_BATT_IDX]/10;
 				FlightBatteryStateSet(&flightBatteryData);
 				battStateCnt = 0;
 			}

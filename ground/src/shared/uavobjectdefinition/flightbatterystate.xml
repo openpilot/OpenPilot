@@ -1,8 +1,8 @@
 <xml>
         <object name="FlightBatteryState" singleinstance="true" settings="false">
             
-            <field name="Voltage" units="mV" type="uint32" elements="1"/>
-            <field name="Current" units="mA" type="uint32" elements="1"/>
+            <field name="Voltage" units="V" type="float" elements="1"/>
+            <field name="Current" units="A" type="float" elements="1"/>
             <field name="ConsumedEnergy" units="mAh" type="uint32" elements="1"/>
              
             <access gcs="readonly" flight="readwrite"/>

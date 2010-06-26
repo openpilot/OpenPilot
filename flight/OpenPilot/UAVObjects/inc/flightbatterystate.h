@@ -33,7 +33,7 @@
 #define FLIGHTBATTERYSTATE_H
 
 // Object constants
-#define FLIGHTBATTERYSTATE_OBJID 4176558368U
+#define FLIGHTBATTERYSTATE_OBJID 144318184U
 #define FLIGHTBATTERYSTATE_NAME "FlightBatteryState"
 #define FLIGHTBATTERYSTATE_METANAME "FlightBatteryStateMeta"
 #define FLIGHTBATTERYSTATE_ISSINGLEINST 1
@@ -57,8 +57,8 @@
 
 // Object data
 typedef struct {
-    uint32_t Voltage;
-    uint32_t Current;
+    float Voltage;
+    float Current;
     uint32_t ConsumedEnergy;
 
 } __attribute__((packed)) FlightBatteryStateData;

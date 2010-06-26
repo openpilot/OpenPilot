@@ -41,6 +41,7 @@
 #define TASK_PRIORITY	(tskIDLE_PRIORITY + 3)
 #define MAX_NB_PARS 	100
 //#define ENABLE_DEBUG_MSG
+//#define GENERATE_BATTERY_INFO		// The MK can report battery voltage, but normally the current sensor will be used, so this module should not report battery state
 
 #if PORT == PIOS_COM_AUX
 	#ifndef PIOS_ENABLE_AUX_UART
@@ -489,7 +490,9 @@ static void DoConnectedToNC(void)
 	AttitudeActualData attitudeData;
 	PositionActualData positionData;
 	FlightBatteryStateData flightBatteryData;
+#ifdef GENERATE_BATTERY_INFO
 	uint8_t battStateCnt=0;
+#endif
 
 	DEBUG_MSG("NC\n\r");
 
@@ -524,7 +527,7 @@ static void DoConnectedToNC(void)
 			positionData.Altitude = pos.altitude;
 			positionData.Satellites = msg.pars[OSD_MSG_NB_SATS_IDX];
 			positionData.Heading = Par2Int16(&msg, OSD_MSG_COMPHEADING_IDX);
-			if (positionData.Satellites<4)
+			if (positionData.Satellites<5)
 			{
 				positionData.Status = POSITIONACTUAL_STATUS_NOFIX;
 			}
@@ -534,12 +537,14 @@ static void DoConnectedToNC(void)
 			}
 			PositionActualSet(&positionData);
 
+#if GENERATE_BATTERY_INFO
 			if (++battStateCnt > 2)
 			{
 				flightBatteryData.Voltage = (uint32_t)msg.pars[OSD_MSG_BATT_IDX]*100;
 				FlightBatteryStateSet(&flightBatteryData);
 				battStateCnt = 0;
 			}
+#endif
 		}
 		else
 		{

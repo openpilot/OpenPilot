@@ -11,5 +11,6 @@
         <file>images/minus.png</file>
         <file>images/waypoint.png</file>
         <file>images/hold.png</file>
+        <file>images/combobox_down_arrow.png</file>
     </qresource>
 </RCC>

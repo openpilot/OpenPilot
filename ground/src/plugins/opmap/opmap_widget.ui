@@ -22,6 +22,9 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>0</number>
@@ -58,7 +61,79 @@
         <bool>false</bool>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(110, 110, 110, 255), stop:1 rgba(71, 71, 71, 255));</string>
+        <string notr="true">QFrame {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(110, 110, 110, 255), stop:1 rgba(71, 71, 71, 255));
+color: rgba(255, 255, 255, 70);
+}
+
+QLabel { /* all label types */
+/* background-color: rgba(255, 255, 255, 0); */
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(64, 64, 64, 255), stop:1 rgba(128, 128, 128, 255));
+color: rgb(255, 255, 255);
+}
+
+QToolButton {	/* all types of tool button */ 
+background-color: rgba(255, 255, 255, 0);
+color: rgb(255, 255, 255);
+/*border-style: none;*/
+border: 0px; 
+}
+QToolButton:hover {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(255, 160, 0, 255), stop:1 rgba(160, 100, 0, 255));
+color: rgb(255, 255, 255);
+}
+QToolButton:pressed {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
+color: rgb(255, 255, 255);
+}
+
+QToolButton:checked {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
+color: rgb(255, 255, 255);
+}
+
+QSlider::groove:horizontal {
+border: none;
+height: 4px;
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(80, 80, 80, 255));
+margin: 2px 0;
+}
+QSlider::handle:horizontal {
+border: 1px solid #5c5c5c;
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(255, 255, 255, 255), stop:1 rgba(128, 128, 128, 255));
+width: 24px;
+margin: -2px 0;
+border-radius: 3px;
+}
+
+QComboBox {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
+color: rgb(255, 255, 255);
+}
+QComboBox:hover {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
+	background-color: rgb(197, 138, 0);
+}
+QComboBox::down-arrow {
+     image: url(:/opmap/images/combobox_down_arrow.png);
+}
+QComboBox:drop-down {
+     subcontrol-origin: padding;
+     subcontrol-position: top right;
+     border-left-style: none;
+     border-top-right-radius: 1px;
+     border-bottom-right-radius: 1px;
+}
+
+QToolTip {
+background-color: white;
+color: black;
+border: 1px solid black;
+padding: 5px;
+border-radius: 2px;
+/* opacity: 170; */ 
+}
+</string>
        </property>
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
@@ -105,8 +180,7 @@
              <string>Show/Hide Waypoint Treeview</string>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgba(255, 255, 255, 0);
-color: rgb(255, 255, 255);</string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string/>
@@ -131,14 +205,43 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
           <item>
+           <widget class="QComboBox" name="comboBoxFindPlace">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>120</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+            <property name="maxVisibleItems">
+             <number>20</number>
+            </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::AdjustToContents</enum>
+            </property>
+            <property name="frame">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QToolButton" name="toolButtonFindPlace">
             <property name="toolTip">
              <string>Find place</string>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgba(255, 255, 255, 0);
-color: rgb(255, 255, 255);
-</string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string/>
@@ -177,8 +280,7 @@ color: rgb(255, 255, 255);
              <string>Center map over home position</string>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgba(255, 255, 255, 0);
-color: rgb(255, 255, 255);</string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string/>
@@ -207,8 +309,7 @@ color: rgb(255, 255, 255);</string>
              <string>Center map over UAV position</string>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgba(255, 255, 255, 0);
-color: rgb(255, 255, 255);</string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string/>
@@ -250,8 +351,7 @@ color: rgb(255, 255, 255);</string>
              <string>Add a waypoint</string>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgba(71, 71, 71, 0);
-color: rgb(255, 255, 255);</string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string/>
@@ -280,8 +380,7 @@ color: rgb(255, 255, 255);</string>
              <string>Opens the waypoint editor</string>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgba(71, 71, 71, 0);
-color: rgb(255, 255, 255);</string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string/>
@@ -320,8 +419,7 @@ color: rgb(255, 255, 255);</string>
              <string>Zoom out</string>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgba(71, 71, 71, 0);
-color: rgb(255, 255, 255);</string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string/>
@@ -351,8 +449,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; color:#ffffff;&quot;&gt;Zoom in&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgba(71, 71, 71, 0);
-color: rgb(255, 255, 255);</string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string/>
@@ -395,6 +492,9 @@ color: rgb(255, 255, 255);</string>
             <property name="toolTip">
              <string>Zoom level</string>
             </property>
+            <property name="autoFillBackground">
+             <bool>false</bool>
+            </property>
             <property name="styleSheet">
              <string notr="true">background-color: rgba(255, 255, 255, 0);
 color: rgb(255, 255, 255);</string>
@@ -410,6 +510,15 @@ color: rgb(255, 255, 255);</string>
             </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="invertedControls">
+             <bool>false</bool>
+            </property>
+            <property name="tickPosition">
+             <enum>QSlider::NoTicks</enum>
+            </property>
+            <property name="tickInterval">
+             <number>2</number>
             </property>
            </widget>
           </item>
@@ -458,8 +567,7 @@ color: rgb(255, 255, 255);</string>
              <string>Reload map</string>
             </property>
             <property name="styleSheet">
-             <string notr="true">color: rgb(255, 255, 255);
-background-color: rgba(255, 255, 255, 0);</string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string>Reload</string>
@@ -500,8 +608,7 @@ background-color: rgba(255, 255, 255, 0);</string>
              <string>Show/Hide Flight Controls</string>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgba(255, 255, 255, 0);
-color: rgb(255, 255, 255);</string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string/>
@@ -530,7 +637,7 @@ color: rgb(255, 255, 255);</string>
      <item>
       <widget class="QSplitter" name="splitter">
        <property name="styleSheet">
-        <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(71, 71, 71, 255), stop:1 rgba(110, 110, 110, 255));</string>
+        <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));</string>
        </property>
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
@@ -621,7 +728,19 @@ QTreeView::branch:open:has-children:!has-siblings, QTreeView::branch:open:has-ch
          <bool>true</bool>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(0, 0, 0);</string>
+         <string notr="true">QWidget {
+background-color: black;
+}
+
+QToolTip {
+background-color: white;
+color: black;
+border: 1px solid black;
+padding: 2px;
+border-radius: 3px;
+/* opacity: 170; */ 
+}
+</string>
         </property>
        </widget>
       </widget>
@@ -650,18 +769,45 @@ QTreeView::branch:open:has-children:!has-siblings, QTreeView::branch:open:has-ch
         <bool>false</bool>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(71, 71, 71, 255), stop:1 rgba(110, 110, 110, 255));
-color: rgb(255, 255, 255);</string>
+        <string notr="true">QWidget { /* all types of qwidget */
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(71, 71, 71, 255), stop:1 rgba(110, 110, 110, 255));
+color: rgb(255, 255, 255);
+}
+
+QToolButton {	/* all types of tool button */ 
+background-color: rgba(255, 255, 255, 0);
+color: rgb(255, 255, 255);
+/*border-style: none;*/
+border: 0px; 
+}
+QToolButton:hover {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(128, 128, 128, 255), stop:1 rgba(64, 64, 64, 255));
+color: rgb(255, 255, 255);
+}
+QToolButton:pressed {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
+color: rgb(255, 255, 255);
+}
+
+QToolTip {
+background-color: white;
+color: black;
+border: 1px solid black;
+padding: 2px;
+border-radius: 3px;
+/* opacity: 170; */ 
+}
+</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <property name="leftMargin">
-         <number>5</number>
+         <number>8</number>
         </property>
         <property name="topMargin">
          <number>0</number>
         </property>
         <property name="rightMargin">
-         <number>5</number>
+         <number>0</number>
         </property>
         <property name="bottomMargin">
          <number>0</number>
@@ -675,8 +821,7 @@ color: rgb(255, 255, 255);</string>
            <bool>false</bool>
           </property>
           <property name="styleSheet">
-           <string notr="true">background-color: rgba(255, 255, 255, 0);
-color: rgb(255, 255, 255);</string>
+           <string notr="true"/>
           </property>
           <property name="text">
            <string/>
@@ -705,8 +850,7 @@ color: rgb(255, 255, 255);</string>
            <string>UAV hold position</string>
           </property>
           <property name="styleSheet">
-           <string notr="true">background-color: rgba(255, 255, 255, 0);
-color: rgb(255, 255, 255);</string>
+           <string notr="true"/>
           </property>
           <property name="text">
            <string/>
@@ -732,8 +876,7 @@ color: rgb(255, 255, 255);</string>
            <string>UAV go!</string>
           </property>
           <property name="styleSheet">
-           <string notr="true">background-color: rgba(255, 255, 255, 0);
-color: rgb(255, 255, 255);</string>
+           <string notr="true"/>
           </property>
           <property name="text">
            <string/>
@@ -784,7 +927,26 @@ color: rgb(255, 255, 255);</string>
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(110, 110, 110, 255), stop:1 rgba(71, 71, 71, 255));</string>
+        <string notr="true">QFrame{
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(110, 110, 110, 255), stop:1 rgba(71, 71, 71, 255));
+color: rgba(255, 255, 255, 70);
+}
+
+QLabel { /* all label types */
+/* background-color: rgba(255, 255, 255, 0); */
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(64, 64, 64, 255), stop:1 rgba(128, 128, 128, 255));
+color: rgb(255, 255, 255);
+}
+
+QToolTip {
+background-color: rgb(255, 255, 255);
+color: rgb(0, 0, 0);
+border: 1px solid blacki;
+padding: 5px;
+border-radius: 3px;
+/* opacity: 170; */
+}
+</string>
        </property>
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
@@ -802,10 +964,10 @@ color: rgb(255, 255, 255);</string>
         <item>
          <layout class="QHBoxLayout" name="layoutWidgetStatusBar">
           <property name="spacing">
-           <number>0</number>
+           <number>3</number>
           </property>
           <property name="leftMargin">
-           <number>0</number>
+           <number>3</number>
           </property>
           <property name="rightMargin">
            <number>8</number>
@@ -831,8 +993,7 @@ color: rgb(255, 255, 255);</string>
              <string>Map position</string>
             </property>
             <property name="styleSheet">
-             <string notr="true">color: rgb(255, 255, 255);
-background-color: rgba(255, 255, 255, 0);</string>
+             <string notr="true"/>
             </property>
             <property name="frameShape">
              <enum>QFrame::NoFrame</enum>
@@ -845,16 +1006,6 @@ background-color: rgba(255, 255, 255, 0);</string>
             </property>
             <property name="margin">
              <number>5</number>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="Line" name="line">
-            <property name="frameShadow">
-             <enum>QFrame::Plain</enum>
-            </property>
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
             </property>
            </widget>
           </item>
@@ -879,8 +1030,7 @@ background-color: rgba(255, 255, 255, 0);</string>
              <string>Mouse position</string>
             </property>
             <property name="styleSheet">
-             <string notr="true">color: rgb(255, 255, 255);
-background-color: rgba(255, 255, 255, 0);</string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string>labelMousePos</string>
@@ -890,16 +1040,6 @@ background-color: rgba(255, 255, 255, 0);</string>
             </property>
             <property name="margin">
              <number>5</number>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="Line" name="line_2">
-            <property name="frameShadow">
-             <enum>QFrame::Plain</enum>
-            </property>
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
             </property>
            </widget>
           </item>
@@ -941,14 +1081,10 @@ background-color: rgba(255, 255, 255, 0);</string>
             </property>
             <property name="styleSheet">
              <string notr="true">QProgressBar {
-/*border: 1px solid black;*/
 border: none;
 padding: 1px;
-/*border-top-left-radius: 7px;
-border-bottom-left-radius: 7px;*/
-background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(100, 100, 100, 255));
-/*width: 15px;*/
-	color: rgb(255, 255, 255);
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
+color: rgb(255, 255, 255);
 }
 QProgressBar::chunk {
 	background-color: rgb(85, 85, 255);

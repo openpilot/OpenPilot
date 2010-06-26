@@ -32,6 +32,7 @@
 
 #include <QtGui/QWidget>
 #include <QtGui/QMenu>
+#include <QStringList>
 #include <QStandardItemModel>
 
 #include "uavobjects/uavobjectmanager.h"
@@ -78,6 +79,7 @@ private slots:
 
     // user control signals
     void on_toolButtonReload_clicked();
+    void on_comboBoxFindPlace_returnPressed();
     void on_toolButtonFindPlace_clicked();
     void on_toolButtonZoomM_clicked();
     void on_toolButtonZoomP_clicked();
@@ -144,6 +146,11 @@ private:
     double m_heading;	// uav heading
 
     internals::PointLatLng mouse_lat_lon;
+
+    int prev_tile_number;
+
+    QStringList findPlaceWordList;
+    QCompleter *findPlaceCompleter;
 
    QTimer *m_updateTimer;
    QTimer *m_statusUpdateTimer;

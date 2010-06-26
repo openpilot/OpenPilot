@@ -46,8 +46,11 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_map = NULL;
     waypoint_editor = NULL;
     wayPoint_treeView_model = NULL;
+    findPlaceCompleter = NULL;
 
-    setMouseTracking(true);
+//    setMouseTracking(true);
+
+    prev_tile_number = 0;
 
     // **************
     // Get required UAVObjects
@@ -93,6 +96,21 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_widget->treeViewWaypoints->setVisible(false);
     m_widget->toolButtonWaypointsTreeViewShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/next.png")));
+
+
+    // **************
+    // add an auto-completer to the find-place line edit box
+/*
+    findPlaceWordList << "england" << "london" << "birmingham" << "shropshire";
+    QCompleter *findPlaceCompleter = new QCompleter(findPlaceWordList, this);
+    findPlaceCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    findPlaceCompleter->setCompletionMode(QCompleter::PopupCompletion);
+    findPlaceCompleter->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
+    m_widget->comboBoxFindPlace->setCompleter(findPlaceCompleter);
+*/
+    m_widget->comboBoxFindPlace->setAutoCompletion(true);
+
+    connect( m_widget->comboBoxFindPlace->lineEdit(), SIGNAL(returnPressed()), this, SLOT(on_comboBoxFindPlace_returnPressed()));
 
     // **************
     // map stuff
@@ -483,11 +501,17 @@ void OPMapGadgetWidget::OnTilesStillToLoad(int number)
 {
     if (m_widget)
     {
+//	if (prev_tile_number < number || m_widget->progressBarMap->maximum() < number)
+//	    m_widget->progressBarMap->setMaximum(number);
+
 	if (m_widget->progressBarMap->maximum() < number)
-	    m_widget->progressBarMap->setMaximum(number);					// update the maximum number of tiles used
+	    m_widget->progressBarMap->setMaximum(number);
+
 	m_widget->progressBarMap->setValue(m_widget->progressBarMap->maximum() - number);	// update the progress bar
 
 //	m_widget->labelNumTilesToLoad->setText(" " + QString::number(number));
+
+	prev_tile_number = number;
     }
 }
 
@@ -522,9 +546,36 @@ void OPMapGadgetWidget::on_toolButtonReload_clicked()
 	m_map->ReloadMap();
 }
 
+void OPMapGadgetWidget::on_comboBoxFindPlace_returnPressed()
+{
+    QString place = m_widget->comboBoxFindPlace->currentText().simplified();
+    if (place.isNull() || place.isEmpty()) return;
+
+    if (!findPlaceWordList.contains(place, Qt::CaseInsensitive))
+    {
+	findPlaceWordList << place;	// add the new word into the history list
+/*
+	m_widget->comboBoxFindPlace->setCompleter(NULL);
+	delete findPlaceCompleter;
+	findPlaceCompleter = new QCompleter(findPlaceWordList, this);
+	findPlaceCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+	findPlaceCompleter->setCompletionMode(QCompleter::PopupCompletion);
+	findPlaceCompleter->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
+	m_widget->comboBoxFindPlace->setCompleter(findPlaceCompleter);
+*/
+    }
+
+    if (!m_map) return;
+
+    core::GeoCoderStatusCode::Types x = m_map->SetCurrentPositionByKeywords(place);
+    QString returned_text = mapcontrol::Helper::StrFromGeoCoderStatusCode(x);
+
+    QMessageBox::information(this, tr("OpenPilot GCS"), returned_text, QMessageBox::Ok);
+}
+
 void OPMapGadgetWidget::on_toolButtonFindPlace_clicked()
 {
-    findPlace();
+    on_comboBoxFindPlace_returnPressed();
 }
 
 void OPMapGadgetWidget::on_toolButtonZoomP_clicked()
@@ -661,7 +712,7 @@ void OPMapGadgetWidget::setUseMemoryCache(bool useMemoryCache)
 
 void OPMapGadgetWidget::setCacheLocation(QString cacheLocation)
 {
-    cacheLocation = cacheLocation.trimmed();	// remove any surrounding spaces
+    cacheLocation = cacheLocation.simplified();	// remove any surrounding spaces
 
     if (cacheLocation.isEmpty()) return;
 
@@ -943,18 +994,26 @@ void OPMapGadgetWidget::reload()
 
 void OPMapGadgetWidget::findPlace()
 {
-    bool ok;
-    QString text = QInputDialog::getText(this, tr("OpenPilot GCS"), tr("Find place"), QLineEdit::Normal, QString::null, &ok);
-    if (ok && !text.isEmpty())
-    {
-	if (m_map)
-	{
-	    core::GeoCoderStatusCode::Types x = m_map->SetCurrentPositionByKeywords(text);
-	    QString returned_text = mapcontrol::Helper::StrFromGeoCoderStatusCode(x);
+    m_widget->comboBoxFindPlace->setFocus();	// move focus to the 'find place' text box
 
-	    int ret = QMessageBox::information(this, tr("OpenPilot GCS"), returned_text, QMessageBox::Ok);
-	}
+/*
+    bool ok;
+    QString place = QInputDialog::getText(this, tr("OpenPilot GCS"), tr("Find place"), QLineEdit::Normal, QString::null, &ok);
+    place = place.simplified();
+    if (!ok || place.isNull() || place.isEmpty()) return;
+
+    if (!findPlaceWordList.contains(place, Qt::CaseInsensitive))
+    {
+	findPlaceWordList += place;	// add the new word into the history list
     }
+
+    if (!m_map) return;
+
+    core::GeoCoderStatusCode::Types x = m_map->SetCurrentPositionByKeywords(place);
+    QString returned_text = mapcontrol::Helper::StrFromGeoCoderStatusCode(x);
+
+    QMessageBox::information(this, tr("OpenPilot GCS"), returned_text, QMessageBox::Ok);
+*/
 }
 
 void OPMapGadgetWidget::goZoomIn()

@@ -86,7 +86,7 @@ namespace jafar {
 				}
 
 
-				void setup(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & ahpPtr, double _noiseStd, int patchSize);
+				void setup(int patchSize, double dmin);
 
 //				void setup(double _pixNoise = 1.0);
 

@@ -21,22 +21,23 @@ template<class ObsType, class SenType, class LmkType,
 class ImagePointObservationMaker
   : public ObservationMakerAbstract
 {
+	private:
+  	int patchSize;
+  	double dmin;
 	public:
-		ImagePointObservationMaker():
-			ObservationMakerAbstract(SenTypeId, LmkTypeId) {}
+		ImagePointObservationMaker(int _patchSize, double _dmin):
+			ObservationMakerAbstract(SenTypeId, LmkTypeId), patchSize(_patchSize), dmin(_dmin) {}
 
 		observation_ptr_t create(const sensor_ptr_t &senPtr, const landmark_ptr_t &lmkPtr)
 		{
-			SenType *sen = PTR_CAST<SenType*>(senPtr.get());
 			boost::shared_ptr<ObsType> res(new ObsType(senPtr, lmkPtr));
-			res->setup(senPtr, lmkPtr, sen->params.pixNoise, sen->params.patchSize);
+			res->setup(patchSize, dmin);
 			return res;
 		}
 
 		feature_ptr_t createFeat(const sensor_ptr_t &senPtr, const landmark_ptr_t &lmkPtr)
 		{
-			SenType *sen = PTR_CAST<SenType*>(senPtr.get());
-			feature_ptr_t res(new FeatureImagePoint(sen->params.patchSize, sen->params.patchSize, CV_8U));
+			feature_ptr_t res(new FeatureImagePoint(patchSize, patchSize, CV_8U));
 			return res;
 		}
 

@@ -131,7 +131,7 @@ namespace jafar {
 				/**
 				 * Size of the reparametrized landmark
 				 */
-				virtual size_t stdSize() = 0;
+				virtual size_t reparamSize() = 0;
 
 				// Create a landmark descriptor
 				virtual void setDescriptor(const descriptor_ptr_t & descPtr)

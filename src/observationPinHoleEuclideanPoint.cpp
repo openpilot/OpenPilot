@@ -25,14 +25,16 @@ namespace jafar {
 			type = PNT_PH_EUC;
 		}
 
-		void ObservationPinHoleEuclideanPoint::setup(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr, double _noiseStd, int patchSize)
+		void ObservationPinHoleEuclideanPoint::setup(int patchSize, double dmin)
 		{
-			ObservationAbstract::setup(_noiseStd, getPrior());
-			id() = eucPtr->id();
+			//ObservationAbstract::setup(_noiseStd, getPrior());
+			Gaussian prior(1); // should never be used
+			setPrior(prior);
+//			id() = landmarkPtr()->id();
 			// TODO: is this cast necessary? Change the arg of the setup if not.
-			linkToPinHole(boost::dynamic_pointer_cast<SensorPinHole>
-				      (pinholePtr));
-			linkToParentEUC(eucPtr);
+			//linkToPinHole(boost::dynamic_pointer_cast<SensorPinHole>
+			//	      (pinholePtr));
+			//linkToParentEUC(eucPtr);
 			predictedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
 			observedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
 		}

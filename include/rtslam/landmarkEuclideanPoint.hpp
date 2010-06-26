@@ -65,7 +65,7 @@ namespace jafar {
 
 				virtual size_t mySize() {return size();}
 
-				virtual size_t stdSize() {return size();}
+				virtual size_t reparamSize() {return size();}
 
 				virtual vec reparametrize_func(const vec & lmk){
 					return lmk;

@@ -67,7 +67,7 @@ namespace jafar {
 
 				virtual size_t mySize() {return size();}
 
-				virtual size_t stdSize() {return LandmarkAnchoredHomogeneousPoint::size();}
+				virtual size_t reparamSize() {return LandmarkAnchoredHomogeneousPoint::size();}
 
 				virtual vec reparametrize_func(const vec & lmk){
 					return lmkAHP::ahp2euc(lmk);

@@ -15,9 +15,9 @@
 namespace jafar {
   namespace rtslam {
 
-    template<class RawSpec,class SensorSpec>
-    void DataManagerActiveSearch<RawSpec,SensorSpec>::
-    processData( boost::shared_ptr<RawAbstract> rawData )
+    template<class RawSpec,class SensorSpec, class Detector, class Matcher >
+    void DataManagerActiveSearch<RawSpec,SensorSpec, Detector, Matcher >::
+    processData( boost::shared_ptr<RawSpec> rawData )
     {
 			int numObs = 0;
 			asGrid->renew();
@@ -97,8 +97,12 @@ namespace jafar {
 
 						cv::Rect roi(xmin, ymin, xmax - xmin + 1, ymax - ymin + 1);
 
+						cout << "roi: " << roi << endl;
+
 						//						kernel::Chrono match_chrono;
-						sensorPtr()->getRaw()->match(RawAbstract::ZNCC, obsPtr->predictedAppearance, roi, obsPtr->measurement,
+						obsPtr->measurement.std(detectorParams_.measStd);
+						boost::shared_ptr<RawSpec> rawSpecPtr = SPTR_CAST<RawSpec>(sensorPtr()->getRaw());
+						match(rawSpecPtr, obsPtr->predictedAppearance, roi, obsPtr->measurement,
 																		obsPtr->observedAppearance);
 						//						total_match_time += match_chrono.elapsedMicrosecond();
 
@@ -152,45 +156,84 @@ namespace jafar {
 
     }
 
+
+    template<>
+    bool DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> >::
+		match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, cv::Rect &roi, Measurement & measure, const appearance_ptr_t & app)
+    {
+					app_img_pnt_ptr_t targetAppImg = SPTR_CAST<AppearanceImagePoint>(targetApp);
+					app_img_pnt_ptr_t appImg = SPTR_CAST<AppearanceImagePoint>(app);
+
+					measure.matchScore = correl::Explorer<correl::Zncc>::exploreTranslation(
+							targetAppImg->patch, *(rawPtr->img), roi.x, roi.x+roi.width-1, 1, roi.y, roi.y+roi.height-1, 1,
+							measure.x()(0), measure.x()(1));
+
+					// set appearance
+					// FIXME reenable this when Image::robustCopy will be fixed
+//					rawPtr->img->robustCopy(appImg->patch, (int)(measure.x()(0)-0.5)-appImg->patch.width()/2,
+//             (int)(measure.x()(1)-0.5)-appImg->patch.height()/2, 0, 0, appImg->patch.width(), appImg->patch.height());
+
+					return true;
+
+    }
+
     //template<class SensorSpec>
     //void DataManagerActiveSearch<RawImage,SensorSpec>::
+    // FIXME make this more abstract...
     template<>
-    void DataManagerActiveSearch<RawImage,SensorPinHole>::
-    detectNewData( boost::shared_ptr<RawAbstract> rawData )
+    void DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> >::
+    detectNewData( boost::shared_ptr<RawImage> rawData )
     {
-      ROI roi;
-      if (asGrid->getROI(roi))
-			{
-				feat_img_pnt_ptr_t featPtr(new FeatureImagePoint(PATCH_SIZE*3,PATCH_SIZE*3,CV_8U));
-				if(rawData->detect(RawAbstract::HARRIS,featPtr,&roi))
-				{
-					// 2a. Create the lmk and associated obs object.
-					observation_ptr_t obsPtr = mapManagerPtr()->createNewLandmark( shared_from_this() );
+    	if (mapManagerPtr()->mapSpaceForInit()) {
+    		//boost::shared_ptr<RawImage> rawDataSpec = SPTR_CAST<RawImage>(rawData);
+				ROI roi;
+				if (asGrid->getROI(roi)) {
+					feat_img_pnt_ptr_t featPtr(new FeatureImagePoint(detectorParams_.patchSize,
+					                                                 detectorParams_.patchSize,
+					                                                 CV_8U));
+					featPtr->measurement.std(detectorParams_.measStd);
+					if (detector->detectIn(*(rawData->img.get()), featPtr, &roi)) {
 
-					// 2b. fill data for this obs
-					obsPtr->events.visible = true;
-					obsPtr->events.measured = true;
-					obsPtr->measurement.x(featPtr->measurement.x());
-	
-					// 2c. compute and fill stochastic data for the landmark
-					obsPtr->backProject();
+						// 2a. Create the lmk and associated obs object.
+						observation_ptr_t obsPtr =
+						    mapManagerPtr()->createNewLandmark(shared_from_this());
 
-					// 2d. Create lmk descriptor
-					vec7 globalSensorPose = sensorPtr()->globalPose();
-					desc_img_pnt_ptr_t descPtr(new DescriptorImagePoint(featPtr, globalSensorPose, obsPtr));
-					obsPtr->landmarkPtr()->setDescriptor(descPtr);
-				} // create&init
-			} // getROI()
+						// 2b. fill data for this obs
+						obsPtr->events.visible = true;
+						obsPtr->events.measured = true;
+						obsPtr->measurement.x(featPtr->measurement.x());
+
+//						obsPtr->setup(sensorSpecPtr()->params.pixNoise, matcherParams_.patchSize);
+
+						app_img_pnt_ptr_t app_src = SPTR_CAST<AppearanceImagePoint>(featPtr->appearancePtr);
+						app_img_pnt_ptr_t app_dst = SPTR_CAST<AppearanceImagePoint>(obsPtr->observedAppearance);
+						app_src->patch.copy(app_dst->patch, (app_src->patch.width()-app_dst->patch.width())/2,
+						                    (app_src->patch.height()-app_dst->patch.height())/2, 0, 0,
+						                    app_dst->patch.width(), app_dst->patch.height());
+
+						// 2c. compute and fill stochastic data for the landmark
+						obsPtr->backProject();
+
+						// 2d. Create lmk descriptor
+						vec7 globalSensorPose = sensorPtr()->globalPose();
+						desc_img_pnt_ptr_t
+						    descPtr(new DescriptorImagePoint(featPtr, globalSensorPose,
+						                                     obsPtr));
+						obsPtr->landmarkPtr()->setDescriptor(descPtr);
+					} // create&init
+				} // getROI()
+			} // if space in map
     } // detect()
 
-    template<class RawSpec,class SensorSpec>
-    void DataManagerActiveSearch<RawSpec,SensorSpec>::
+    template<class RawSpec,class SensorSpec, class Detector, class Matcher>
+    void DataManagerActiveSearch<RawSpec,SensorSpec,Detector,Matcher>::
     process( boost::shared_ptr<RawAbstract> data )
     {
+    	boost::shared_ptr<RawImage> dataSpec = SPTR_CAST<RawImage>(data);
       // 1. Observe known landmarks.
-      processData(data); // process known landmarks
+      processData(dataSpec); // process known landmarks
       // 2. Initialize new landmark.
-      detectNewData(data);
+      detectNewData(dataSpec);
     }
 
   }  // namespace ::rtslam

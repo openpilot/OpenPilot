@@ -351,6 +351,18 @@ namespace jafar {
 				}
 
 				/**
+				 * Set covariances matrix from standard deviation scalar value.
+				 * \param std the standard deviation.
+				 */
+				inline void std(double _std) {
+					hasNullCov_ = false;
+					P_.assign(jblas::zero_mat(size_));
+					for (std::size_t i = 0; i < size_; i++) {
+						P_(i, i) = _std * _std;
+					}
+				}
+
+				/**
 				 * Set off-diagonal block in the covariances matrix.
 				 * Only works for local Gaussians.
 				 * \param M the off-diagonal block.

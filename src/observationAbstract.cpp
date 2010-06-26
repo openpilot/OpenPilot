@@ -104,19 +104,25 @@ namespace jafar {
 		}
 
 
-//		void ObservationAbstract::setup(const feature_ptr_t & featPtr, const Gaussian & _prior){
-		void ObservationAbstract::setup(double _noiseStd, const Gaussian & _prior){
-			noiseCovariance.clear();
-			_noiseStd *= _noiseStd;
-			for (size_t i = 0; i < measurement.size(); i++){
-				noiseCovariance(i,i) = _noiseStd;
-			}
-			measurement.clear();
-			measurement.P(noiseCovariance);
-			prior.x(_prior.x());
-			prior.P(_prior.P());
-		}
+////		void ObservationAbstract::setup(const feature_ptr_t & featPtr, const Gaussian & _prior){
+//		void ObservationAbstract::setup(double _noiseStd, const Gaussian & _prior){
+//			noiseCovariance.clear();
+//			_noiseStd *= _noiseStd;
+//			for (size_t i = 0; i < measurement.size(); i++){
+//				noiseCovariance(i,i) = _noiseStd;
+//			}
+//			measurement.clear();
+//			measurement.P(noiseCovariance);
+//			prior.x(_prior.x());
+//			prior.P(_prior.P());
+//		}
 
+		//		void ObservationAbstract::setup(const feature_ptr_t & featPtr, const Gaussian & _prior){
+				void ObservationAbstract::setPrior(const Gaussian & _prior) {
+					prior = _prior;
+//					prior.x(_prior.x());
+//					prior.P(_prior.P());
+				}
 
 		void ObservationAbstract::project() {
 

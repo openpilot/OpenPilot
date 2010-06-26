@@ -40,13 +40,17 @@ namespace jafar {
 	{
 	  data_manager_ptr_t dma = *iterDMA;
 	  observation_ptr_t newObs
-	    = observationFactory()->create( dma->sensorPtr(),newLmk );
+	    = dma->observationFactory()->create( dma->sensorPtr(),newLmk );
 
 	  /* Insert the observation in the graph. */
-	  newObs->setId();
 	  newObs->linkToParentDataManager( dma );
 	  newObs->linkToParentLandmark( newLmk );
 	  newObs->linkToSensor( dma->sensorPtr() );
+	  newObs->linkToSensorSpecific(dma->sensorPtr());
+	  newObs->setId();
+
+
+
 
 	  /* Store for the return the obs corresponding to the dma origin. */
 	  if(dma == dmaOrigin) resObs = newObs;

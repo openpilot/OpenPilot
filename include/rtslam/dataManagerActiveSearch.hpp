@@ -11,12 +11,11 @@
 
 #include "rtslam/dataManagerAbstract.hpp"
 #include "rtslam/activeSearch.hpp"
-#include "rtslam/quickHarrisDetector.hpp"
 
 namespace jafar {
   namespace rtslam {
 
-    template< class RawSpec,class SensorSpec >
+    template< class RawSpec,class SensorSpec, class Detector, class Matcher >
     class DataManagerActiveSearch
       : public DataManagerAbstract
       , public SpecificChildOf<SensorSpec>
@@ -32,44 +31,46 @@ namespace jafar {
     public: // TODO? Should be protected?
       static const int N_UPDATES = 1000;
       static const int PATCH_SIZE = 7;
-			QuickHarrisDetector quickHarrisDetector;
 
     protected:
+			boost::shared_ptr<Detector> detector;
+			boost::shared_ptr<Matcher> matcher;
       boost::shared_ptr<ActiveSearchGrid> asGrid;
 			// the list of observations sorted by information gain
       typedef map<double, observation_ptr_t> ObservationListSorted;
       ObservationListSorted obsListSorted;
       struct detector_params_t {
-      		int convolutionMaskSize;
-      		double cornernessThreshold;
-      		double edgeRatioThreshold;
       		int patchSize;
+      		double measStd;
       } detectorParams_;
       struct matcher_params_t {
       		int patchSize;
       		double regionSigma;
       		double threshold;
+      		double measStd;
       } matcherParams_;
     public:
-      void setDetectorParams(const int _convolutionSize, const double cornerTh, const double edgeRatio, const int patchSize){
-      	detectorParams_.convolutionMaskSize = _convolutionSize;
-      	detectorParams_.cornernessThreshold = cornerTh;
-      	detectorParams_.edgeRatioThreshold = edgeRatio;
+      void setDetector(const boost::shared_ptr<Detector> & _detector, int patchSize, double _measStd){
+      	detector = _detector;
       	detectorParams_.patchSize = patchSize;
+      	detectorParams_.measStd = _measStd;
       }
       detector_params_t detectorParams(){return detectorParams_;}
-      void setMatcherParams(const int patchSize, const double nSigma, const double threshold){
+      void setMatcher(boost::shared_ptr<Matcher> & _matcher, int patchSize, double nSigma, double threshold, double _measStd){
+      	matcher = _matcher;
       	matcherParams_.patchSize = patchSize;
       	matcherParams_.regionSigma = nSigma;
       	matcherParams_.threshold = threshold;
+      	matcherParams_.measStd = _measStd;
       }
       matcher_params_t matcherParams(){return matcherParams_;}
       void setActiveSearchGrid( boost::shared_ptr<ActiveSearchGrid> arg ) { asGrid=arg; }
       boost::shared_ptr<ActiveSearchGrid> activeSearchGrid( void ) { return asGrid; }
 
     protected:
-      void detectNewData( boost::shared_ptr<RawAbstract> data );
-      void processData( boost::shared_ptr<RawAbstract> data );
+      void detectNewData( boost::shared_ptr<RawSpec> data );
+      bool match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, cv::Rect &roi, Measurement & measure, const appearance_ptr_t & app);
+      void processData( boost::shared_ptr<RawSpec> data );
 
     public:
       virtual ~DataManagerActiveSearch( void ) {}
@@ -87,7 +88,7 @@ namespace jafar {
 namespace jafar {
   namespace rtslam {
 
-    typedef DataManagerActiveSearch<RawImage,SensorPinHole> DataManagerActiveSearch_Image_PH;
+//    typedef DataManagerActiveSearch<RawImage,SensorPinHole> DataManagerActiveSearch_Image_PH;
 
   }
 }//namespace jafar::rtslam

@@ -39,9 +39,17 @@ namespace jafar {
       // define the type ObservationList, and the function observationList().
       ENABLE_ACCESS_TO_CHILDREN(ObservationAbstract,Observation,observation);
 
+    protected:
+      boost::shared_ptr<ObservationFactory> obsFactory;
+    public:
+      void setObservationFactory( boost::shared_ptr<ObservationFactory> of ) { obsFactory=of; }
+      boost::shared_ptr<ObservationFactory> observationFactory( void ) { return obsFactory; }
+
+    public:
       virtual ~DataManagerAbstract(void) {}
 
       virtual void process( boost::shared_ptr<RawAbstract> data ) = 0;
+
     };
 
   }

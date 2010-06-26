@@ -133,8 +133,7 @@ namespace jafar {
 
 				virtual ~ObservationAbstract();
 
-				virtual void setup(double _noiseStd, const Gaussian & _prior);
-
+				void setPrior(const Gaussian & _prior);
 
 				// Data
 				Expectation expectation;
@@ -329,17 +328,17 @@ namespace jafar {
 
 				virtual double getMatchScore() = 0;
 
-				/**
-				 * Provide prior to initialization algorithm.
-				 */
-				static Gaussian getPrior(){
-					Gaussian dummy(1);
-					vec v(1);
-					v(0) = 1.0;
-					dummy.x(v);
-					dummy.std(v);
-					return dummy; // todo implement getPrior() -  lines above just for compilation issues
-					}
+//				/**
+//				 * Provide prior to initialization algorithm.
+//				 */
+//				static Gaussian getPrior(){
+//					Gaussian dummy(1);
+//					vec v(1);
+//					v(0) = 1.0;
+//					dummy.x(v);
+//					dummy.std(v);
+//					return dummy; // todo implement getPrior() -  lines above just for compilation issues
+//					}
 
 				void update() ;
 

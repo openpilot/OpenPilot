@@ -6,6 +6,8 @@
  *
  * \ingroup rtslam
  */
+#include "rtslam/hardwareSensorCameraFirewire.hpp"
+
 #ifdef HAVE_VIAM
 
 #include <algorithm>
@@ -16,8 +18,6 @@
 #include <boost/bind.hpp>
 
 #include <image/Image.hpp>
-
-#include "rtslam/hardwareSensorCameraFirewire.hpp"
 
 namespace jafar {
 namespace rtslam {

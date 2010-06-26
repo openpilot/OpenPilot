@@ -75,7 +75,7 @@ namespace jafar {
 				cout << "Deleted observation: " << id() << ": " << typeName() << endl;
 					}
 
-			void setup(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr, double _noiseStd, int patchSize);
+			void setup(int patchSize, double dmin);
 
 				virtual std::string typeName() {
 					return "Obs. Pinhole Euclidean point";

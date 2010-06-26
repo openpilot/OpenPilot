@@ -7,13 +7,12 @@
  * \ingroup rtslam
  */
 
+#include "rtslam/hardwareEstimatorMti.hpp"
+
 #ifdef HAVE_MTI
 
 #include <sys/time.h>
 #include <boost/bind.hpp>
-
-#include "rtslam/hardwareEstimatorMti.hpp"
-
 
 namespace jafar {
 namespace rtslam {
@@ -111,6 +110,5 @@ namespace hardware {
 
 
 }}}
-
 
 #endif // #ifdef HAVE_MTI

@@ -34,11 +34,6 @@ namespace jafar {
       // define the type DataManagerList, and the function dataManagerList().
       ENABLE_ACCESS_TO_CHILDREN(DataManagerAbstract,DataManager,dataManager);
 
-    protected:
-      boost::shared_ptr<ObservationFactory> obsFactory;
-    public:
-      void setObservationFactory( boost::shared_ptr<ObservationFactory> of ) { obsFactory=of; }
-      boost::shared_ptr<ObservationFactory> observationFactory( void ) { return obsFactory; }
 
     protected:
       virtual landmark_ptr_t createLandmarkInit( void ) = 0;
@@ -47,6 +42,7 @@ namespace jafar {
     public:
       virtual ~MapManagerAbstract( void ) {}
 
+      virtual bool mapSpaceForInit() = 0;
       /* Return the pointer to the created observation that correspond to the
        * dmaOrigin. */
       observation_ptr_t createNewLandmark( data_manager_ptr_t dmaOrigin );
@@ -72,7 +68,9 @@ namespace jafar {
 
     public:
       virtual ~MapManager( void ) {}
-
+      virtual bool mapSpaceForInit(){
+      	return mapPtr()->unusedStates(LandmarkInit::size());
+      }
 
     };
 

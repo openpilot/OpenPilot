@@ -23,6 +23,9 @@
 #include "jmath/random.hpp"
 #include "jmath/matlab.hpp"
 
+#include "correl/explorer.hpp"
+#include "rtslam/quickHarrisDetector.hpp"
+
 #include "jmath/ublasExtra.hpp"
 
 #include "rtslam/rtSlam.hpp"
@@ -73,6 +76,8 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	const int IMG_WIDTH = 640;
 	const int IMG_HEIGHT = 480;
+	const double PIX_NOISE = 1.0;
+	const double D_MIN = 0.1;
 
 	const int GRID_VCELLS = 4;
 	const int GRID_HCELLS = 4;
@@ -113,8 +118,8 @@ void demo_slam01_main(world_ptr_t *world) {
 	vec k = createVector<4> (_k);
 
 	boost::shared_ptr<ObservationFactory> obsFact(new ObservationFactory());
-	obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeEucpObservationMaker()));
-	obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhpObservationMaker()));
+	obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeEucpObservationMaker(PATCH_SIZE, D_MIN)));
+	obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhpObservationMaker(PATCH_SIZE, D_MIN)));
 
 
 	// ---------------------------------------------------------------------------
@@ -133,7 +138,6 @@ void demo_slam01_main(world_ptr_t *world) {
 	boost::shared_ptr<MapManager<LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint> > mmPoint(new MapManager<
 	    LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint> ());
 	mmPoint->linkToParentMap(mapPtr);
-	mmPoint->setObservationFactory(obsFact);
 
 
 	// 2. Create robots.
@@ -157,23 +161,25 @@ void demo_slam01_main(world_ptr_t *world) {
 	senPtr11->params.setImgSize(IMG_WIDTH, IMG_HEIGHT);
 	senPtr11->params.setIntrinsicCalibration(k, d, d.size());
 	senPtr11->params.setMiscellaneous(1.0, 0.1);
-	senPtr11->params.patchSize = PATCH_SIZE; // FIXME: See how to propagate patch size properly (obs factory needs it to be in sensor)
+	senPtr11->params.patchSize = -1; // FIXME: See how to propagate patch size properly (obs factory needs it to be in sensor)
 
 	// 3b. Create data manager.
 	boost::shared_ptr<ActiveSearchGrid> asGrid(new ActiveSearchGrid(IMG_WIDTH, IMG_HEIGHT, GRID_HCELLS, GRID_VCELLS, GRID_MARGIN, GRID_SEPAR));
-	boost::shared_ptr<DataManagerActiveSearch<RawImage, SensorPinHole> > dmPt11(new DataManagerActiveSearch<RawImage,
-			SensorPinHole> ());
+	boost::shared_ptr<QuickHarrisDetector> harrisDetector(new QuickHarrisDetector(HARRIS_CONV_SIZE, HARRIS_TH, HARRIS_EDDGE));
+	boost::shared_ptr<correl::Explorer<correl::Zncc> > znccMatcher(new correl::Explorer<correl::Zncc>());
+	boost::shared_ptr<DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> > > dmPt11(new DataManagerActiveSearch<RawImage,
+			SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> > ());
 	dmPt11->linkToParentSensorSpec(senPtr11);
 	dmPt11->linkToParentMapManager(mmPoint);
 	dmPt11->setActiveSearchGrid(asGrid);
-	dmPt11->setDetectorParams(HARRIS_CONV_SIZE, HARRIS_TH, HARRIS_EDDGE, PATCH_DESC);
-	dmPt11->setMatcherParams(PATCH_SIZE, SEARCH_SIGMA, MATCH_TH);
+	dmPt11->setDetector(harrisDetector, PATCH_DESC, PIX_NOISE);
+	dmPt11->setMatcher(znccMatcher, PATCH_SIZE, SEARCH_SIGMA, MATCH_TH, PIX_NOISE);
+	dmPt11->setObservationFactory(obsFact);
 
-//	viam_hwmode_t hwmode = { VIAM_HWSZ_640x480, VIAM_HWFMT_MONO8, VIAM_HW_FIXED, VIAM_HWFPS_60, VIAM_HWTRIGGER_INTERNAL };
-	// UNCOMMENT THESE TWO LINES TO ENABLE FIREWIRE CAMERA OPERATION
-//	hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode,
-//	                                                                                     mode, dump_path));
-//	senPtr11->setHardwareSensor(hardSen11);
+	viam_hwmode_t hwmode = { VIAM_HWSZ_640x480, VIAM_HWFMT_MONO8, VIAM_HW_FIXED, VIAM_HWFPS_60, VIAM_HWTRIGGER_INTERNAL };
+//	 UNCOMMENT THESE TWO LINES TO ENABLE FIREWIRE CAMERA OPERATION
+	hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode, mode, dump_path));
+	senPtr11->setHardwareSensor(hardSen11);
 
 	// Show empty map
 	cout << *mapPtr << endl;

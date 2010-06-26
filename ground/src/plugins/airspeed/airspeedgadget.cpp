@@ -61,6 +61,7 @@ void AirspeedGadget::loadConfiguration(IUAVGadgetConfiguration* config)
     m_widget->setN3Min(m->getN3Min());
     m_widget->setN3Max(m->getN3Max());
     m_widget->setN3Factor(m->getN3Factor());
+    m_widget->setDialFont(m->getFont());
     m_widget->connectNeedles(m->getN1DataObject(),m->getN1ObjField(),
                              m->getN2DataObject(),m->getN2ObjField(),
                              m->getN3DataObject(),m->getN3ObjField()

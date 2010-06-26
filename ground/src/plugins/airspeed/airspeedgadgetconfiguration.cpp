@@ -82,6 +82,8 @@ AirspeedGadgetConfiguration::AirspeedGadgetConfiguration(QString classId, const 
         stream >> needle1Move;
         stream >> needle2Move;
         stream >> needle3Move;
+        stream >> font;
+
     }
 }
 /**
@@ -126,6 +128,7 @@ QByteArray AirspeedGadgetConfiguration::saveState() const
     stream << needle1Move;
     stream << needle2Move;
     stream << needle3Move;
+    stream << font;
 
     return bytes;
 }

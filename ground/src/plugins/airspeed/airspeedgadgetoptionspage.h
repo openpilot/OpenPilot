@@ -32,6 +32,8 @@
 #include "QString"
 #include <QStringList>
 #include <QDebug>
+#include <QFont>
+#include <QFontDialog>
 
 namespace Core {
 class IUAVGadgetConfiguration;
@@ -58,9 +60,11 @@ public:
 private:
     Ui::AirspeedGadgetOptionsPage *options_page;
     AirspeedGadgetConfiguration *m_config;
+    QFont font;
 
 private slots:
     void on_loadFile_clicked();
+    void on_fontPicker_clicked();
     void on_uavObject1_currentIndexChanged(QString val);
     void on_uavObject2_currentIndexChanged(QString val);
     void on_uavObject3_currentIndexChanged(QString val);

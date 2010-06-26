@@ -150,7 +150,7 @@ void AirspeedGadgetWidget::updateNeedle3(UAVObject *object3) {
 
 /*
   Initializes the dial file, and does all the one-time calculations for
-  display later.
+  display later. This is the method which really initializes the dial.
   */
 void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QString n1, QString n2,
                                        QString n3, QString n1Move, QString n2Move, QString n3Move)
@@ -164,7 +164,7 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
          n2enabled = false;
          n3enabled = false;
          QGraphicsScene *l_scene = scene();
-         l_scene->clear(); // Deletes all items contained in the scene as well.
+         l_scene->clear(); // This also deletes all items contained in the scene.
          m_background = new QGraphicsSvgItem();
          // All other items will be clipped to the shape of the background
          m_background->setFlags(QGraphicsItem::ItemClipsChildrenToShape|
@@ -186,7 +186,10 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
 
          m_needle1->setSharedRenderer(m_renderer);
          m_needle1->setElementId(n1);
-         l_scene->addItem(m_needle1);
+         // Note: no need to add the item explicitely because it
+         // is done automatically since it's a child item of the
+         // background.
+         //l_scene->addItem(m_needle1);
 
         // The dial gadget allows Needle1 and Needle2 to be
         // the same element, for combined movement. Needle3
@@ -198,7 +201,7 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
          if (m_renderer->elementExists(n2)) {
              m_needle2->setSharedRenderer(m_renderer);
              m_needle2->setElementId(n2);
-             l_scene->addItem(m_needle2);
+             //l_scene->addItem(m_needle2);
              n2enabled = true;
             }
          }
@@ -206,14 +209,14 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
         if (m_renderer->elementExists(n3)) {
             m_needle3->setSharedRenderer(m_renderer);
             m_needle3->setElementId(n3);
-            l_scene->addItem(m_needle3);
+            //l_scene->addItem(m_needle3);
             n3enabled = true;
            }
 
         if (m_renderer->elementExists(fg)) {
             m_foreground->setSharedRenderer(m_renderer);
             m_foreground->setElementId(fg);
-            l_scene->addItem(m_foreground);
+            //l_scene->addItem(m_foreground);
             fgenabled = true;
         }
 
@@ -226,7 +229,6 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
         rotateN3 = false;
         horizN3 = false;
         vertN3 = false;
-
 
         // Now setup the rotation/translation settings:
         // this is UGLY UGLY UGLY, sorry...
@@ -264,21 +266,68 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
         m_needle1->setPos(rectB.width()/2-rectN.width()/2,rectB.height()/2-rectN.height()/2);
         // - Put the transform origin point of the needle at its center.
         m_needle1->setTransformOriginPoint(rectN.width()/2,rectN.height()/2);
+
+        // Check whether the dial also wants display the numeric value:
+        if (m_renderer->elementExists(n1+"-text")) {
+            QMatrix textMatrix = m_renderer->matrixForElement(n1+"-text");
+            qreal startX = textMatrix.mapRect(m_renderer->boundsOnElement(n1+"-text")).x();
+            qreal startY = textMatrix.mapRect(m_renderer->boundsOnElement(n1+"-text")).y();
+            QTransform matrix;
+            matrix.translate(startX,startY);
+            m_text1 = new QGraphicsTextItem("0.00");
+            m_text1->setDefaultTextColor(QColor("White"));
+            m_text1->setTransform(matrix,false);
+            l_scene->addItem(m_text1);
+        } else {
+            m_text1 = NULL;
+        }
+
+
         if ((n1 != n2) && n2enabled) {
-            // Only do it for needle1 if it is not the same as n2
+            // Only do it for needle2 if it is not the same as n1
             rectN = m_needle2->boundingRect();
             m_needle2->setPos(rectB.width()/2-rectN.width()/2,rectB.height()/2-rectN.height()/2);
             m_needle2->setTransformOriginPoint(rectN.width()/2,rectN.height()/2);
+            // Check whether the dial also wants display the numeric value:
+            if (m_renderer->elementExists(n2+"-text")) {
+                QMatrix textMatrix = m_renderer->matrixForElement(n2+"-text");
+                qreal startX = textMatrix.mapRect(m_renderer->boundsOnElement(n2+"-text")).x();
+                qreal startY = textMatrix.mapRect(m_renderer->boundsOnElement(n2+"-text")).y();
+                QTransform matrix;
+                matrix.translate(startX,startY);
+                m_text2 = new QGraphicsTextItem("0.00");
+                m_text2->setDefaultTextColor(QColor("White"));
+                m_text2->setTransform(matrix,false);
+                l_scene->addItem(m_text2);
+            } else {
+                m_text2 = NULL;
+            }
+
         }
         if (n3enabled) {
             rectN = m_needle3->boundingRect();
             m_needle3->setPos(rectB.width()/2-rectN.width()/2,rectB.height()/2-rectN.height()/2);
             m_needle3->setTransformOriginPoint(rectN.width()/2,rectN.height()/2);
+            // Check whether the dial also wants display the numeric value:
+            if (m_renderer->elementExists(n3+"-text")) {
+                QMatrix textMatrix = m_renderer->matrixForElement(n3+"-text");
+                qreal startX = textMatrix.mapRect(m_renderer->boundsOnElement(n3+"-text")).x();
+                qreal startY = textMatrix.mapRect(m_renderer->boundsOnElement(n3+"-text")).y();
+                QTransform matrix;
+                matrix.translate(startX,startY);
+                m_text3 = new QGraphicsTextItem("0.00");
+                m_text3->setDefaultTextColor(QColor("White"));
+                m_text3->setTransform(matrix,false);
+                l_scene->addItem(m_text3);
+            } else {
+                m_text3 = NULL;
+            }
+
         }
 
-        // Last: we just loaded the dial file which is by default valid for a "zero" value
-        // of the needles, so we have to reset the needles too upon dial file loading, otherwise
-        // we would end up with an offset when we change a dial file and the needle value
+        // Last: we just loaded the dial file which is by default positioned on a "zero" value
+        // of the needles, so we have to reset the needle values too upon dial file loading, otherwise
+        // we would end up with an offset whenever we change a dial file and the needle value
         // is not zero at that time.
         needle1Value = 0;
         needle2Value = 0;
@@ -314,6 +363,16 @@ void AirspeedGadgetWidget::resizeEvent(QResizeEvent *event)
     fitInView(m_background, Qt::KeepAspectRatio );
 }
 
+void AirspeedGadgetWidget::setDialFont(QString fontProps)
+{
+    QFont font = QFont("Arial",12);
+    font.fromString(fontProps);
+    if (m_text1) {
+        m_text1->setFont(font);
+    }
+}
+
+
 // Converts the value into an angle:
 // this enables smooth rotation in rotateNeedles below
 void AirspeedGadgetWidget::setNeedle1(double value) {
@@ -328,6 +387,11 @@ void AirspeedGadgetWidget::setNeedle1(double value) {
     }
     if (!dialTimer.isActive())
         dialTimer.start();
+    if (m_text1) {
+        QString s;
+        s.sprintf("%.2f",value*n1Factor);
+        m_text1->setPlainText(s);
+    }
 }
 
 void AirspeedGadgetWidget::setNeedle2(double value) {
@@ -342,6 +406,12 @@ void AirspeedGadgetWidget::setNeedle2(double value) {
     }
     if (!dialTimer.isActive())
         dialTimer.start();
+    if (m_text2) {
+        QString s;
+        s.sprintf("%.2f",value*n1Factor);
+        m_text2->setPlainText(s);
+    }
+
 }
 
 void AirspeedGadgetWidget::setNeedle3(double value) {
@@ -356,6 +426,11 @@ void AirspeedGadgetWidget::setNeedle3(double value) {
     }
     if (!dialTimer.isActive())
         dialTimer.start();
+    if (m_text3) {
+        QString s;
+        s.sprintf("%.2f",value*n1Factor);
+        m_text3->setPlainText(s);
+    }
 }
 
 // Take an input value and rotate the dial accordingly
@@ -450,7 +525,7 @@ void AirspeedGadgetWidget::rotateNeedles()
     } else {
         dialRun--;
     }
-    //update();
+
     // Now check: if dialRun is now zero, we should
     // just stop the timer since all needles have finished moving
     if (!dialRun) dialTimer.stop();

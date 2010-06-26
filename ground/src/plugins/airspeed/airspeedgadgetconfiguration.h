@@ -66,6 +66,8 @@ public:
     void setN1Move( QString move) { needle1Move = move; }
     void setN2Move( QString move) { needle2Move = move; }
     void setN3Move( QString move) { needle3Move = move; }
+    void setFont(QString text) { font = text; }
+
 
     //get dial configuration functions
     QString dialFile() {return m_defaultDial;}
@@ -92,6 +94,7 @@ public:
     QString getN1Move() { return needle1Move; }
     QString getN2Move() { return needle2Move; }
     QString getN3Move() { return needle3Move; }
+    QString getFont() { return font;}
 
     QByteArray saveState() const;
     IUAVGadgetConfiguration *clone();
@@ -114,6 +117,9 @@ private:
     double needle1Factor;
     double needle2Factor;
     double needle3Factor;
+
+    // The font used for the dial
+    QString font;
 
     QString needle1DataObject;
     QString needle1ObjectField;

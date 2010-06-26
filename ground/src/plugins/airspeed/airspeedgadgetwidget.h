@@ -67,6 +67,7 @@ public:
    void connectNeedles(QString object1, QString field1,
                        QString object2, QString field2,
                        QString object3, QString field3);
+   void setDialFont(QString fontProps);
 
 public slots:
    void updateNeedle1(UAVObject *object1); // Called by the UAVObject
@@ -88,6 +89,9 @@ private:
    QGraphicsSvgItem *m_needle1;
    QGraphicsSvgItem *m_needle2;
    QGraphicsSvgItem *m_needle3;
+   QGraphicsTextItem *m_text1;
+   QGraphicsTextItem *m_text2;
+   QGraphicsTextItem *m_text3;
 
    bool n3enabled;
    bool n2enabled; // Simple flag to skip rendering if the

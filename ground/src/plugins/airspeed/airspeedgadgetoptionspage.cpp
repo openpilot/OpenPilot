@@ -143,6 +143,8 @@ QWidget *AirspeedGadgetOptionsPage::createPage(QWidget *parent)
     connect(options_page->uavObject3, SIGNAL(currentIndexChanged(QString)), this, SLOT(on_uavObject3_currentIndexChanged(QString)));
 
     connect(options_page->loadFile, SIGNAL(clicked()), this, SLOT(on_loadFile_clicked()));
+    connect(options_page->fontPicker, SIGNAL(clicked()), this, SLOT(on_fontPicker_clicked()));
+
     return optionsPageWidget;
 }
 
@@ -178,7 +180,20 @@ void AirspeedGadgetOptionsPage::apply()
     m_config->setN1Move(options_page->moveNeedle1->currentText());
     m_config->setN2Move(options_page->moveNeedle2->currentText());
     m_config->setN3Move(options_page->moveNeedle3->currentText());
+    m_config->setFont(font.toString());
+
 }
+
+/**
+ * Opens a font picker.
+ *
+ */
+void AirspeedGadgetOptionsPage::on_fontPicker_clicked()
+{
+    bool ok;
+     font = QFontDialog::getFont(&ok, QFont("Arial", 12), qobject_cast<QWidget*>(this));
+}
+
 
 /*
   Fills in the field1 combo box when value is changed in the

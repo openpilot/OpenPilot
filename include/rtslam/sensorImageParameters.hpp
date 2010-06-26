@@ -63,10 +63,9 @@ namespace jafar{
 				}
 
 				void setMiscellaneous(double _pixNoise,
-				    double d_min, unsigned int _patchSize){
+				    double d_min){
 					pixNoise = _pixNoise;
 					distMin = d_min;
-					patchSize = _patchSize;
 				}
 
 

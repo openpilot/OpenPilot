@@ -12,6 +12,7 @@
 #ifndef HARDWARE_SENSOR_CAMERA_FIREWIRE_HPP_
 #define HARDWARE_SENSOR_CAMERA_FIREWIRE_HPP_
 
+#include "jafarConfig.h"
 #ifdef HAVE_VIAM
 
 #include <viam/viamlib.h>

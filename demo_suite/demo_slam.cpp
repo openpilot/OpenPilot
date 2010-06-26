@@ -40,7 +40,7 @@
 #include "rtslam/descriptorImagePoint.hpp"
 #include "rtslam/dataManagerActiveSearch.hpp"
 
-//#include "rtslam/hardwareSensorCameraFirewire.hpp"
+#include "rtslam/hardwareSensorCameraFirewire.hpp"
 //#include "rtslam/hardwareEstimatorMti.hpp"
 
 #include "rtslam/display_qt.hpp"
@@ -62,14 +62,33 @@ std::string dump_path = ".";
 
 void demo_slam01_main(world_ptr_t *world) {
 
-	const int N_FRAMES = 5000;
 	const int MAP_SIZE = 250;
-	const double FRAME_RATE = 60;
+
+	const int N_FRAMES = 5000;
 
 	const double PERT_VLIN = 4.0; // m/s per sqrt(s)
 	const double PERT_VANG = 1.0; // rad/s per sqrt(s)
 
-	const bool SHOW_PATCH = true;
+	const double FRAME_RATE = 60;
+
+	const int IMG_WIDTH = 640;
+	const int IMG_HEIGHT = 480;
+
+	const int GRID_VCELLS = 4;
+	const int GRID_HCELLS = 4;
+	const int GRID_MARGIN = 10;
+	const int GRID_SEPAR = 10;
+
+	const int PATCH_SIZE = 11;
+	const double MATCH_TH = 0.90;
+	const double SEARCH_SIGMA = 3.0;
+
+	const int HARRIS_CONV_SIZE = 5;
+	const double HARRIS_TH = 15.0;
+	const double HARRIS_EDDGE = 2.0;
+	const int PATCH_DESC = 3*PATCH_SIZE;
+
+//	const bool SHOW_PATCH = true;
 
 	time_t rseed = time(NULL);
 	if (mode == 1) {
@@ -85,9 +104,6 @@ void demo_slam01_main(world_ptr_t *world) {
 	std::cout << "rseed " << rseed << std::endl;
 	srand(rseed);
 
-	int imgWidth = 640, imgHeight = 480;
-
-	boost::shared_ptr<ActiveSearchGrid> asGrid(new ActiveSearchGrid(imgWidth, imgHeight, 4, 4, 16, 5));
 
 	double _d[2] = { -0.27572, 0.28827 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
 	//	double _d[0];
@@ -126,7 +142,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	robPtr1->linkToParentMap(mapPtr);
 	robPtr1->state.clear();
 	robPtr1->pose.x(quaternion::originFrame());
-	robPtr1->dt_or_dx = 1 / FRAME_RATE;
+	robPtr1->dt_or_dx = 1. / FRAME_RATE;
 	double _v[6] = { PERT_VLIN, PERT_VLIN, PERT_VLIN, PERT_VANG, PERT_VANG, PERT_VANG };
 	robPtr1->perturbation.clear();
 	robPtr1->perturbation.set_std_continuous(createVector<6> (_v));
@@ -138,23 +154,26 @@ void demo_slam01_main(world_ptr_t *world) {
 	senPtr11->linkToParentRobot(robPtr1);
 	senPtr11->state.clear();
 	senPtr11->pose.x(quaternion::originFrame());
-	senPtr11->params.setImgSize(imgWidth, imgHeight);
+	senPtr11->params.setImgSize(IMG_WIDTH, IMG_HEIGHT);
 	senPtr11->params.setIntrinsicCalibration(k, d, d.size());
+	senPtr11->params.setMiscellaneous(1.0, 0.1);
+	senPtr11->params.patchSize = PATCH_SIZE; // FIXME: See how to propagate patch size properly (obs factory needs it to be in sensor)
 
 	// 3b. Create data manager.
+	boost::shared_ptr<ActiveSearchGrid> asGrid(new ActiveSearchGrid(IMG_WIDTH, IMG_HEIGHT, GRID_HCELLS, GRID_VCELLS, GRID_MARGIN, GRID_SEPAR));
 	boost::shared_ptr<DataManagerActiveSearch<RawImage, SensorPinHole> > dmPt11(new DataManagerActiveSearch<RawImage,
 			SensorPinHole> ());
 	dmPt11->linkToParentSensorSpec(senPtr11);
 	dmPt11->linkToParentMapManager(mmPoint);
 	dmPt11->setActiveSearchGrid(asGrid);
-	/* TODO-NMSD: this should not be in sensor ... */
-	senPtr11->params.setMiscellaneous(1.0, 0.1, DataManagerActiveSearch<RawImage, SensorPinHole>::patchMatchSize);
+	dmPt11->setDetectorParams(HARRIS_CONV_SIZE, HARRIS_TH, HARRIS_EDDGE, PATCH_DESC);
+	dmPt11->setMatcherParams(PATCH_SIZE, SEARCH_SIGMA, MATCH_TH);
 
-	//viam_hwmode_t hwmode = { VIAM_HWSZ_640x480, VIAM_HWFMT_MONO8, VIAM_HW_FIXED, VIAM_HWFPS_60, VIAM_HWTRIGGER_INTERNAL };
+//	viam_hwmode_t hwmode = { VIAM_HWSZ_640x480, VIAM_HWFMT_MONO8, VIAM_HW_FIXED, VIAM_HWFPS_60, VIAM_HWTRIGGER_INTERNAL };
 	// UNCOMMENT THESE TWO LINES TO ENABLE FIREWIRE CAMERA OPERATION
-	//hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode,
-	//                                                                                     mode, dump_path));
-	//senPtr11->setHardwareSensor(hardSen11);
+//	hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode,
+//	                                                                                     mode, dump_path));
+//	senPtr11->setHardwareSensor(hardSen11);
 
 	// Show empty map
 	cout << *mapPtr << endl;
@@ -199,8 +218,8 @@ void demo_slam01_main(world_ptr_t *world) {
 				for (RobotAbstract::SensorList::iterator senIter = robPtr->sensorList().begin(); senIter
 				    != robPtr->sensorList().end(); senIter++) {
 					sensor_ptr_t senPtr = *senIter;
-					cout << "\n________________________________________________ " << endl;
-					cout << *senPtr << endl;
+					//					cout << "\n________________________________________________ " << endl;
+					//					cout << *senPtr << endl;
 
 
 					// get raw-data
@@ -231,6 +250,7 @@ void demo_slam01_main(world_ptr_t *world) {
 			if (robPtr1->dt_or_dx > max_dt) max_dt = robPtr1->dt_or_dx;
 
 			// Output info
+			cout << endl;
 			cout << "dt: " << (int) (1000 * robPtr1->dt_or_dx) << "ms (match "
 			<< total_match_time/1000 << " ms, update " << total_update_time/1000 << "ms). Lmk: [";
 			cout << mmPoint->landmarkList().size() << "] ";

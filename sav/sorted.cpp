@@ -143,7 +143,7 @@
 
 					} // foreach observation
 
-				// 2. init new landmarks
+// 2. init new landmarks
 
 					if (mapPtr->unusedStates(LandmarkAnchoredHomogeneousPoint::size())) {
 

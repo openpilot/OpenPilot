@@ -12,6 +12,7 @@
 #ifndef HARDWARE_ESTIMATOR_MTI_HPP_
 #define HARDWARE_ESTIMATOR_MTI_HPP_
 
+#include "jafarConfig.h"
 #ifdef HAVE_MTI
 
 #include <MTI.h>

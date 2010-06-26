@@ -80,11 +80,11 @@ plugin_uploader.subdir = uploader
 plugin_uploader.depends = plugin_coreplugin
 SUBDIRS += plugin_uploader
 
-#Airspeed Dial Gadget
-plugin_airspeed.subdir = airspeed
-plugin_airspeed.depends = plugin_coreplugin
-plugin_airspeed.depends = plugin_uavobjects
-SUBDIRS += plugin_airspeed
+#Dial Gadget
+plugin_dial.subdir = airspeed
+plugin_dial.depends = plugin_coreplugin
+plugin_dial.depends = plugin_uavobjects
+SUBDIRS += plugin_dial
 
 #Linear Dial Gadget
 plugin_lineardial.subdir = lineardial

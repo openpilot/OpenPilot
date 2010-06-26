@@ -36,8 +36,9 @@
 #define DEBUG_PORT		PIOS_COM_TELEM_RF
 #define STACK_SIZE		1024
 #define TASK_PRIORITY	(tskIDLE_PRIORITY + 3)
-#define ENABLE_DEBUG_MSG
-//#define DUMP_CONFIG
+//#define ENABLE_DEBUG_MSG
+//#define DUMP_CONFIG		// Enable this do read and dump the OSD config
+//#define DO_PAR_SEEK		// Enable this to start a tool to find where parameters are encoded
 
 
 //
@@ -54,7 +55,8 @@
 #define MIN(a,b) ((a)<(b)?(a):(b))
 
 #define OSDMSG_V_LS_IDX		10
-#define OSDMSG_V_MS_IDX		18
+#define OSDMSG_A_LS_IDX		17
+#define OSDMSG_VA_MS_IDX	18
 #define OSDMSG_LAT_IDX		33
 #define OSDMSG_LON_IDX		37
 #define OSDMSG_HOME_IDX		47
@@ -80,8 +82,10 @@
 //	                     00   01   02   03   04   05   06   07   08   09   10   11   12   13   14   15   16   17   18   19   20   21   22   23   24   25   26   27   28   29   30   31   32   33   34   35   36   37   38   39   40   41   42   43   44   45   46   47   48   49   50   51   52   53   54   55   56   57   58   59   60   61   62
 	uint8_t msg[63] = {0x03,0x3F,0x03,0x00,0x00,0x00,0x00,0x00,0x90,0x0A,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xFC,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x09,0x60,0x10,0x02,0x00,0x00,0x90,0x00,0x54,0x54,0x00,0x00,0x33,0x28,0x13,0x00,0x00,0x08,0x00,0x00,0x90,0x0A};
 
+
 static volatile bool newPosData=FALSE;
 static volatile bool newBattData=FALSE;
+
 
 
 //
@@ -134,9 +138,19 @@ static void SetAltitude(uint32_t altitudeMeter)
 
 static void SetVoltage(uint32_t milliVolt)
 {
-	msg[OSDMSG_V_MS_IDX] = (milliVolt / 6444)<<4;
+	msg[OSDMSG_VA_MS_IDX] &= 0x0F;
+	msg[OSDMSG_VA_MS_IDX] |= (milliVolt / 6444)<<4;
 	msg[OSDMSG_V_LS_IDX] = (milliVolt % 6444)*256/6444;
 }
+
+static void SetCurrent(uint32_t milliAmp)
+{
+	uint32_t value = (milliAmp*16570/1000000) + 0x7FA;
+	msg[OSDMSG_VA_MS_IDX] &= 0xF0;
+	msg[OSDMSG_VA_MS_IDX] |= ((value >> 8) & 0x0F);
+	msg[OSDMSG_A_LS_IDX] = (value & 0xFF);
+}
+
 
 static void SetNbSats(uint8_t nb)
 {
@@ -245,12 +259,56 @@ static void DumpConfig(void)
 #endif
 
 
+#ifdef DO_PAR_SEEK
+
+static void DoParSeek(void)
+{
+	int pos=3;
+	char save;
+	while(1)
+	{
+		int i;
+
+		SetVoltage(pos*1000+100);
+		save = msg[pos];
+		for (i=0;i<256; i+=5)
+		{
+			//msg[pos]=i;
+			DEBUG_MSG("SendMsg .");
+			if (PIOS_I2C_LockDevice(5000 / portTICK_RATE_MS))
+			{
+				DEBUG_MSG(".");
+				PIOS_I2C_Transfer(I2C_Write, 0x30<<1, msg, sizeof(msg));
+				DEBUG_MSG(".");
+				PIOS_I2C_UnlockDevice();
+			}
+			DEBUG_MSG("\n\r");
+
+
+			vTaskDelay(100 / portTICK_RATE_MS);
+		}
+		msg[pos] = save;
+		pos+=1;
+
+		if (pos == OSDMSG_V_LS_IDX || pos == OSDMSG_VA_MS_IDX)
+			pos++;
+
+		if (pos>sizeof(msg))
+			pos = 3;
+
+
+	}
+}
+
+#endif
+
 static void Task(void* parameters)
 {
 	uint32_t cnt = 0;
 
-
-	//PIOS_COM_ChangeBaud(DEBUG_PORT, 57600);
+#ifdef ENABLE_DEBUG_MSG
+	PIOS_COM_ChangeBaud(DEBUG_PORT, 57600);
+#endif
 
 	PositionActualConnectCallback(PositionActualUpdatedCb);
 	FlightBatteryStateConnectCallback(FlightBatteryStateUpdatedCb);
@@ -265,10 +323,16 @@ static void Task(void* parameters)
 #endif
 
 	DEBUG_MSG("OSD ET Std Started\n");
+	vTaskDelay(2000 / portTICK_RATE_MS);
+
+#ifdef DO_PAR_SEEK
+	DoParSeek();
+#endif
 
 	while (1)
 	{
 		DEBUG_MSG("%d\n\r", cnt);
+#if 1
 		if ( newBattData )
 		{
 			FlightBatteryStateData flightBatteryData;
@@ -278,8 +342,10 @@ static void Task(void* parameters)
 			DEBUG_MSG("%5d Batt: V=%dmV\n\r", cnt, flightBatteryData.Voltage);
 
 			SetVoltage(flightBatteryData.Voltage);
+			SetCurrent(flightBatteryData.Current);
 			newBattData = FALSE;
 		}
+
 
 		if (newPosData)
 		{
@@ -311,6 +377,7 @@ static void Task(void* parameters)
 		{
 			msg[OSDMSG_GPS_STAT] &= ~OSDMSG_GPS_STAT_HB_FLAG;
 		}
+#endif
 
 		DEBUG_MSG("SendMsg .");
 		if (PIOS_I2C_LockDevice(5000 / portTICK_RATE_MS))

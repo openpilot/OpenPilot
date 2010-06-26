@@ -46,10 +46,10 @@ namespace core {
     public:
         TileCacheQueue();
 
-        void EnqueueCacheTask(CacheItemQueue &task);
+        void EnqueueCacheTask(CacheItemQueue *task);
 
     protected:
-        QQueue<CacheItemQueue> tileCacheQueue;
+        QQueue<CacheItemQueue*> tileCacheQueue;
     private:
         void run();
         QMutex mutex;

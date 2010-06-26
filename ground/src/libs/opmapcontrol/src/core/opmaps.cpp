@@ -235,7 +235,7 @@ namespace core {
 #ifdef DEBUG_GMAPS
                     qDebug()<<"Add tile to DataBase";
 #endif //DEBUG_GMAPS
-                    CacheItemQueue item(type,pos,ret,zoom);
+                    CacheItemQueue * item=new CacheItemQueue(type,pos,ret,zoom);
                     TileDBcacheQueue.EnqueueCacheTask(item);
                 }
 

@@ -36,7 +36,7 @@ TileCacheQueue::TileCacheQueue()
 
 }
 
-void TileCacheQueue::EnqueueCacheTask(CacheItemQueue &task)
+void TileCacheQueue::EnqueueCacheTask(CacheItemQueue *task)
 {
 #ifdef DEBUG_TILECACHEQUEUE
     qDebug()<<"DB Do I EnqueueCacheTask"<<task.GetPosition().X()<<","<<task.GetPosition().Y();
@@ -73,7 +73,7 @@ void TileCacheQueue::run()
 #endif //DEBUG_TILECACHEQUEUE
     while(true)
     {
-        CacheItemQueue task;
+        CacheItemQueue *task;
 #ifdef DEBUG_TILECACHEQUEUE
         qDebug()<<"Cache";
 #endif //DEBUG_TILECACHEQUEUE
@@ -83,10 +83,11 @@ void TileCacheQueue::run()
             task=tileCacheQueue.dequeue();
             mutex.unlock();
 #ifdef DEBUG_TILECACHEQUEUE
-            qDebug()<<"Cache engine Put:"<<task.GetPosition().X()<<","<<task.GetPosition().Y();
+            qDebug()<<"Cache engine Put:"<<task->GetPosition().X()<<","<<task->GetPosition().Y();
 #endif //DEBUG_TILECACHEQUEUE
-            Cache::Instance()->ImageCache.PutImageToCache(task.GetImg(),task.GetMapType(),task.GetPosition(),task.GetZoom());
+            Cache::Instance()->ImageCache.PutImageToCache(task->GetImg(),task->GetMapType(),task->GetPosition(),task->GetZoom());
             QThread::usleep(44);            
+            delete task;
         }
 
         else

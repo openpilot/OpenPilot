@@ -47,27 +47,20 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     waypoint_editor = NULL;
     wayPoint_treeView_model = NULL;
     findPlaceCompleter = NULL;
-
-//    setMouseTracking(true);
+    m_map_graphics_scene = NULL;
+    m_map_scene_proxy = NULL;
+    m_map_overlay_widget = NULL;
 
     prev_tile_number = 0;
-
-    // **************
-    // Get required UAVObjects
-
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    m_positionActual = PositionActual::GetInstance(objManager);
 
     // **************
     // create the widget that holds the user controls and the map
 
     m_widget = new Ui::OPMap_Widget();
-//    m_widget = new Ui_OPMap_Widget();
     m_widget->setupUi(this);
 
     // **************
-    // create the map display
+    // create the map widget
 
     m_map = new mapcontrol::OPMapWidget();
 
@@ -76,22 +69,54 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 	m_map->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	m_map->setMinimumSize(64, 64);
 
+	m_map->setFrameStyle(QFrame::NoFrame);
+
 	m_map->configuration->DragButton = Qt::LeftButton;  // use the left mouse button for map dragging
     }
 
     // **************
+
+    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setSpacing(0);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addWidget(m_map);
+//    layout->addChildWidget();
+    m_widget->mapWidget->setLayout(layout);
+
+    // **************
+    // create the user controls overlayed onto the map
+/*
+    m_map_overlay_widget = new OPMap_MapOverlayWidget();
+
+    m_map_graphics_scene = m_map->scene();
+    m_map_scene_proxy = m_map_graphics_scene->addWidget(m_map_overlay_widget);
+
+    m_map_overlay_widget->setGeometry(m_map->geometry());
+*/
+    // **************
+    // Get required UAVObjects
+
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    m_positionActual = PositionActual::GetInstance(objManager);
+
+    // **************
+    // create various context (mouse right click) menu actions
 
     createActions();
 
     // **************
     // set the user control options
 
-//  m_widget->labelNumTilesToLoad->setText(" 0");
-    m_widget->labelMapPos->setText("");
-    m_widget->labelMousePos->setText("");
+    m_widget->labelUAVPos->setText("---");
+    m_widget->labelMapPos->setText("---");
+    m_widget->labelMousePos->setText("---");
+
     m_widget->progressBarMap->setMaximum(1);
 
-    m_widget->widgetFlightControls->setVisible(false);
+    m_widget->frameFlightControls->setVisible(false);
     m_widget->toolButtonFlightControlsShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/prev.png")));
 
     m_widget->treeViewWaypoints->setVisible(false);
@@ -137,16 +162,6 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 	m_map->SetShowTileGridLines(gridLinesAct->isChecked());					    // map grid lines on/off
 	m_map->SetCurrentPosition(internals::PointLatLng(data.Latitude, data.Longitude));	    // set the default map position
     }
-
-    // **************
-
-    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setSpacing(0);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(m_map);
-    m_widget->mapWidget->setLayout(layout);
 
     // **************
     // create the waypoint editor dialog
@@ -217,11 +232,6 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
 
     // **************
-    // create the user controls overlayed onto the map
-
-//    createMapOverlayUserControls();
-
-    // **************
     // create the desired timers
 
     m_updateTimer = new QTimer();
@@ -242,6 +252,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
 OPMapGadgetWidget::~OPMapGadgetWidget()
 {
+    if (m_map_overlay_widget) delete m_map_overlay_widget;
     if (wayPoint_treeView_model) delete wayPoint_treeView_model;
     if (waypoint_editor) delete waypoint_editor;
     if (m_map) delete m_map;
@@ -411,7 +422,7 @@ void OPMapGadgetWidget::updatePosition()
 		    "   " + QString::number(uav_heading, 'f', 1) + "deg" +
 		    "   " + QString::number(uav_height_feet, 'f', 1) + "feet" +
 		    "   " + QString::number(uav_ground_speed, 'f', 1) + "mph";
-    if (m_widget) m_widget->labelMapPos->setText(str);
+    if (m_widget) m_widget->labelUAVPos->setText(str);
 
     if (m_map && followUAVpositionAct && followUAVheadingAct)
     {
@@ -493,7 +504,7 @@ void OPMapGadgetWidget::OnCurrentPositionChanged(internals::PointLatLng point)
     if (m_widget)
     {
 	QString coord_str = " " + QString::number(point.Lat(), 'f', 6) + "   " + QString::number(point.Lng(), 'f', 6) + " ";
-//	m_widget->labelMapPos->setText(coord_str);
+	m_widget->labelMapPos->setText(coord_str);
     }
 }
 
@@ -575,6 +586,7 @@ void OPMapGadgetWidget::on_comboBoxFindPlace_returnPressed()
 
 void OPMapGadgetWidget::on_toolButtonFindPlace_clicked()
 {
+    m_widget->comboBoxFindPlace->setFocus();
     on_comboBoxFindPlace_returnPressed();
 }
 
@@ -605,9 +617,9 @@ void OPMapGadgetWidget::on_toolButtonFlightControlsShowHide_clicked()
 {
     if (m_widget)
     {
-	m_widget->widgetFlightControls->setVisible(!m_widget->widgetFlightControls->isVisible());
+	m_widget->frameFlightControls->setVisible(!m_widget->frameFlightControls->isVisible());
 
-	if (m_widget->widgetFlightControls->isVisible())
+	if (m_widget->frameFlightControls->isVisible())
 	    m_widget->toolButtonFlightControlsShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/next.png")));
 	else
 	    m_widget->toolButtonFlightControlsShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/prev.png")));
@@ -733,86 +745,6 @@ void OPMapGadgetWidget::setCacheLocation(QString cacheLocation)
 
     if (m_map)
 	m_map->configuration->SetCacheLocation(cacheLocation);
-}
-
-// *************************************************************************************
-// create some user controls overlayed onto the map area
-
-QPushButton * OPMapGadgetWidget::createTransparentButton(QWidget *parent, QString text, QString icon)
-{
-    QPixmap pix;
-    pix.load(icon);
-
-    QPushButton *but = new QPushButton(parent);
-
-    QColor transparent_color(0,0,0,0);
-    QPalette but_pal(but->palette());
-
-    but_pal.setColor(QPalette::Button, transparent_color);
-    but->setPalette(but_pal);
-
-    but->setIcon(pix);
-    but->setText(text);
-    but->setIconSize(pix.size());
-
-    return but;
-}
-
-void OPMapGadgetWidget::createMapOverlayUserControls()
-{
-    QPushButton *zoomout = new QPushButton("");
-    zoomout->setToolTip(tr("Zoom out"));
-    zoomout->setCursor(Qt::OpenHandCursor);
-    zoomout->setFlat(true);
-    zoomout->setIcon(QIcon(QString::fromUtf8(":/opmap/images/minus.png")));
-    zoomout->setIconSize(QSize(32, 32));
-    zoomout->setFixedSize(28, 28);
-    connect(zoomout, SIGNAL(clicked(bool)), this, SLOT(zoomOut()));
-
-//    QPushButton *zoomin = createTransparentButton(map, "", QString::fromUtf8(":/core/images/plus.png"));
-//    zoomin->setStyleSheet("");
-    QPushButton *zoomin = new QPushButton("");
-    zoomin->setFlat(true);
-    zoomin->setToolTip(tr("Zoom in"));
-    zoomin->setCursor(Qt::OpenHandCursor);
-    zoomin->setIcon(QIcon(QString::fromUtf8(":/opmap/images/plus.png")));
-//    zoomin->setIconSize(QSize(12, 12));
-    zoomin->setIconSize(QSize(28, 28));
-    zoomin->setFixedSize(32, 32);
-//    zoomin->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    connect(zoomin, SIGNAL(clicked(bool)), this, SLOT(zoomIn()));
-
-//    statusLabel.font().setPointSize(20);
-
-    // add zoom buttons to the layout of the MapControl
-    QVBoxLayout* overlay_layout_v1 = new QVBoxLayout;
-    overlay_layout_v1->setMargin(4);
-    overlay_layout_v1->setSpacing(4);
-
-    QHBoxLayout* overlay_layout_h1 = new QHBoxLayout;
-    overlay_layout_h1->setMargin(0);
-    overlay_layout_h1->setSpacing(4);
-//  overlay_layout_h1->addWidget(gcsButton);
-//  overlay_layout_h1->addWidget(uavButton);
-//  overlay_layout_h1->addSpacing(10);
-    overlay_layout_h1->addWidget(zoomout);
-    overlay_layout_h1->addWidget(zoomin);
-    overlay_layout_h1->addStretch(0);
-
-    QHBoxLayout* overlay_layout_h2 = new QHBoxLayout;
-    overlay_layout_h2->setMargin(0);
-    overlay_layout_h2->setSpacing(4);
-    overlay_layout_h2->addStretch(0);
-//    overlay_layout_h2->addWidget(&statusLabel);
-    overlay_layout_h2->addStretch(0);
-
-    overlay_layout_v1->addSpacing(10);
-    overlay_layout_v1->addLayout(overlay_layout_h1);
-    overlay_layout_v1->addStretch(0);
-//    overlay_layout_v1->addLayout(overlay_layout_h2);
-    overlay_layout_v1->addSpacing(10);
-
-    m_map->setLayout(overlay_layout_v1);
 }
 
 // *************************************************************************************

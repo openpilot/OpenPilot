@@ -38,9 +38,11 @@
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/positionactual.h"
 
+#include "opmap_mapoverlaywidget.h"
 #include "opmap_waypointeditor_dialog.h"
 
-namespace Ui {
+namespace Ui
+{
     class OPMap_Widget;
 }
 
@@ -163,9 +165,9 @@ private:
 
     opmap_waypointeditor_dialog *waypoint_editor;
 
-    QPushButton * createTransparentButton(QWidget *parent, QString text, QString icon);
-    void createMapOverlayUserControls();
-
+    QGraphicsScene *m_map_graphics_scene;
+    QGraphicsProxyWidget *m_map_scene_proxy;
+    OPMap_MapOverlayWidget *m_map_overlay_widget;
 
     QStandardItemModel *wayPoint_treeView_model;
 

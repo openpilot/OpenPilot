@@ -37,7 +37,7 @@ namespace jafar {
 
     protected:
       virtual landmark_ptr_t createLandmarkInit( void ) = 0;
-      virtual landmark_ptr_t createLandmarkAdvanced( void ) = 0;
+      virtual landmark_ptr_t createLandmarkConverged( void ) = 0;
 
     public:
       virtual ~MapManagerAbstract( void ) {}
@@ -61,7 +61,7 @@ namespace jafar {
       {
 	return boost::shared_ptr<LandmarkInit>( new LandmarkInit(mapPtr()) );
       }
-      virtual landmark_ptr_t createLandmarkAdvanced( void )
+      virtual landmark_ptr_t createLandmarkConverged( void )
       {
 	return boost::shared_ptr<LandmarkAdvanced>( new LandmarkAdvanced(mapPtr()) );
       }

@@ -8,11 +8,13 @@
         <file>images/waypoint.png</file>
         <file>images/right_but.png</file>
         <file>images/left_but.png</file>
+        <file>images/next_waypoint.png</file>
+        <file>images/prev_waypoint.png</file>
         <file>images/combobox_down_arrow.png</file>
+        <file>images/plus2.png</file>
+        <file>images/minus2.png</file>
         <file>images/home.png</file>
         <file>images/hold.png</file>
         <file>images/go.png</file>
-        <file>images/next_waypoint.png</file>
-        <file>images/prev_waypoint.png</file>
     </qresource>
 </RCC>

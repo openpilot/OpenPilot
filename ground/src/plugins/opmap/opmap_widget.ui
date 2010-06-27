@@ -1218,7 +1218,7 @@ border-radius: 3px;
              </font>
             </property>
             <property name="toolTip">
-             <string>Map position</string>
+             <string>UAV position</string>
             </property>
             <property name="styleSheet">
              <string notr="true"/>

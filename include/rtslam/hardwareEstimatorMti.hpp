@@ -15,7 +15,7 @@
 #include "jafarConfig.h"
 #ifdef HAVE_MTI
 
-#include <MTI.h>
+#include <MTI-clients/MTI.h>
 
 #include <boost/thread.hpp>
 #include <boost/thread/thread.hpp>

@@ -42,8 +42,7 @@
 
 TCPtelemetryConnection::TCPtelemetryConnection()
 {
-    tcpSocket = new QTcpSocket(this);
-
+    //create all our objects
     m_config = new TCPtelemetryConfiguration("TCP Connection", NULL, this);
     m_config->restoresettings();
 
@@ -59,21 +58,12 @@ TCPtelemetryConnection::TCPtelemetryConnection()
 
 TCPtelemetryConnection::~TCPtelemetryConnection()
 {
-    /* if (tcpSocket->state()>0){
-         tcpSocket->disconnectFromHost ();
-     }*/
-    tcpSocket->close ();
-
-
-   // delete(m_optionspage);
-   // delete(m_config);
-
+    //tcpSocket->close ();
+    //delete(tcpSocket);
 }
 
 void TCPtelemetryConnection::onEnumerationChanged()
 {//no change from serial plugin
-
-
     emit availableDevChanged(this);
 }
 
@@ -83,6 +73,7 @@ QStringList TCPtelemetryConnection::availableDevices()
 {
     QStringList list;
 
+    //we only have one "device" as defined by the configuration m_config
     list.append((const QString )m_config->HostName());
 
     return list;
@@ -91,71 +82,81 @@ QStringList TCPtelemetryConnection::availableDevices()
 QIODevice *TCPtelemetryConnection::openDevice(const QString &deviceName)
 {
            const int Timeout = 5 * 1000;
-
-
-            //if (tcpSocket->state()>0){
-            //    tcpSocket->close();
-            //}
-            tcpSocket->connectToHost((const QString )m_config->HostName(), m_config->Port());
-
-            if (tcpSocket->waitForConnected(Timeout)) {
-                return tcpSocket;
-            }
-
+            int state;
+            QString HostName;
+            int Port;
             QMessageBox msgBox;
-             msgBox.setText((const QString )tcpSocket->errorString ());
-             msgBox.exec();
+
+            tcpSocket = new QTcpSocket(this);
+
+            //get the configuration info
+            HostName = m_config->HostName();
+            Port = m_config->Port();
+
+            //do sanity check on hostname and port...
+            if((HostName.length()==0)||(Port<1)){
+                msgBox.setText((const QString )"Please configure Host and Port options before opening the connection");
+                msgBox.exec();
+
+            }
+            else {
+                //try to connect...
+                tcpSocket->connectToHost((const QString )HostName, Port);
+
+                //in blocking mode so we wait for the connection to succeed
+                if (tcpSocket->waitForConnected(Timeout)) {
+                    return tcpSocket;
+                }
+                //tell user something went wrong
+                msgBox.setText((const QString )tcpSocket->errorString ());
+                msgBox.exec();
+            }
     return NULL;
 }
 
 void TCPtelemetryConnection::closeDevice(const QString &deviceName)
 {
-   /* if (tcpSocket->state()>0){
-        tcpSocket->disconnectFromHost ();
-    }*/
-//tcpSocket->close();
+    //still having problems with the app crashing when we reference the tcpsocket outside the openDevice function...
+    //tcpSocket->close ();
+    //delete(tcpSocket);
+
 }
 
 
 QString TCPtelemetryConnection::connectionName()
 {//updated from serial plugin
-
-
     return QString("TCP telemetry port");
 }
 
 QString TCPtelemetryConnection::shortName()
 {//updated from serial plugin
-
-
     return QString("TCP");
 }
 
 
 TCPtelemetryPlugin::TCPtelemetryPlugin()
 {//no change from serial plugin
-
 }
 
 TCPtelemetryPlugin::~TCPtelemetryPlugin()
-{//no change from serial plugin
-
-
+{//manually remove the options page object
+    removeObject(m_connection->Optionspage());
 }
 
 void TCPtelemetryPlugin::extensionsInitialized()
-{//updated from serial plugin
-
+{
     addAutoReleasedObject(m_connection);
 }
 
 bool TCPtelemetryPlugin::initialize(const QStringList &arguments, QString *errorString)
-{//no change from serial plugin
-
+{
     Q_UNUSED(arguments);
     Q_UNUSED(errorString);
     m_connection = new TCPtelemetryConnection();
-    addAutoReleasedObject(m_connection->Optionspage());
+    //must manage this registration of child object ourselves
+    //if we use an autorelease here it causes the GCS to crash
+    //as it is deleting objects as the app closes...
+    addObject(m_connection->Optionspage());
 
     return true;
 }

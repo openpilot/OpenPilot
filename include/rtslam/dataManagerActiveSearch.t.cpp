@@ -35,7 +35,6 @@ namespace jafar {
 				// 1a. project
 				obsPtr->project();
 
-
 				// 1b. check visibility
 				obsPtr->predictVisibility();
 
@@ -66,11 +65,14 @@ namespace jafar {
 				// 1a. re-project to get up-to-date means and Jacobians
 				obsPtr->project();
 
+				obsPtr->events.predicted = true;
 
 				// 1b. re-check visibility, just in case re-projection caused this obs to be invisible
 				obsPtr->predictVisibility();
 
 				if (obsPtr->isVisible()) {
+
+					obsPtr->events.visible = true;
 
 					if (numObs < N_UPDATES) {
 
@@ -102,17 +104,17 @@ namespace jafar {
 						//						kernel::Chrono match_chrono;
 						obsPtr->measurement.std(detectorParams_.measStd);
 						boost::shared_ptr<RawSpec> rawSpecPtr = SPTR_CAST<RawSpec>(sensorPtr()->getRaw());
+
 						match(rawSpecPtr, obsPtr->predictedAppearance, roi, obsPtr->measurement,
 																		obsPtr->observedAppearance);
 						//						total_match_time += match_chrono.elapsedMicrosecond();
 
 
-						/*
 							// DEBUG: save some appearances to file
 							((AppearanceImagePoint*)(((DescriptorImagePoint*)(obsPtr->landmark().descriptorPtr.get()))->featImgPntPtr->appearancePtr.get()))->patch.save("descriptor_app.png");
 							((AppearanceImagePoint*)(obsPtr->predictedAppearance.get()))->patch.save("predicted_app.png");
 							((AppearanceImagePoint*)(obsPtr->observedAppearance.get()))->patch.save("matched_app.png");
-							*/
+
 						// DEBUG: display predicted appearances on image, disable it when operating normally because can have side effects
 /*
 						if (SHOW_PATCH) {
@@ -133,17 +135,23 @@ namespace jafar {
 							obsPtr->computeInnovation();
 
 
+
 							// 1f. if feature is inlier
 							if (obsPtr->compatibilityTest(3.0)) { // use 3.0 for 3-sigma or the 5% proba from the chi-square tables.
 								numObs++;
 								obsPtr->counters.nInlier++;
 								//								kernel::Chrono update_chrono;
+								cout << "\n===== Rob before update :\n" << *(obsPtr->sensorPtr()->robotPtr()) << endl;
 								obsPtr->update();
+								cout << "\n===== Rob after update :\n" << *(obsPtr->sensorPtr()->robotPtr()) << endl;
 								//								total_update_time += update_chrono.elapsedMicrosecond();
 								obsPtr->events.updated = true;
 							} // obsPtr->compatibilityTest(3.0)
 
 						} // obsPtr->getScoreMatchInPercent()>80
+
+						cout << *obsPtr << endl;
+
 
 					} // number of observations
 
@@ -177,6 +185,36 @@ namespace jafar {
 
     }
 
+//    template<>
+//    bool DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> >::
+//		detect(const boost::shared_ptr<RawImage> & rawPtr, cv::Rect &roi)
+//    {
+//			feat_img_pnt_ptr_t featPtr(new FeatureImagePoint(detectorParams_.patchSize,
+//			                                                 detectorParams_.patchSize,
+//			                                                 CV_8U));
+//
+//			featPtr->measurement.std(detectorParams_.measStd);
+//			if (detector->detectIn(*(rawData->img.get()), featPtr, &roi)) {
+//				vec pix = featPtr->measurement.x();
+//				extractAppearance(pix, featPtr->appearancePtr);
+//
+//  			app_img_pnt_ptr_t app = SPTR_CAST<AppearanceImagePoint>(appPtr);
+//  			cv::Size size = app->patch.size();
+//  			int shift_x = (size.width-1)/2;
+//  			int shift_y = (size.height-1)/2;
+//  			int x_src = pix(0)-shift_x;
+//  			int y_src = pix(1)-shift_y;
+//  			img->copy(app->patch, x_src, y_src, 0, 0, size.width, size.height);
+//
+//
+//((AppearanceImagePoint*)(featPtr->appearancePtr.get()))->patch.save("detected_feature.png");
+//((AppearanceImagePoint*)(featPtr->appearancePtr.get()))->patch.save("detected_feature.png");
+//				cout << "Detected pix: " << featPtr->measurement << endl;
+//
+//				return true;
+//
+//    }
+
     //template<class SensorSpec>
     //void DataManagerActiveSearch<RawImage,SensorSpec>::
     // FIXME make this more abstract...
@@ -193,15 +231,41 @@ namespace jafar {
 					                                                 CV_8U));
 					featPtr->measurement.std(detectorParams_.measStd);
 					if (detector->detectIn(*(rawData->img.get()), featPtr, &roi)) {
+						vec pix = featPtr->measurement.x();
+			 			app_img_pnt_ptr_t appPtr = SPTR_CAST<AppearanceImagePoint>(featPtr->appearancePtr);
+
+			 			cv::Size size = appPtr->patch.size();
+
+			 			int shift_x = (size.width-1)/2;
+			 			int shift_y = (size.height-1)/2;
+			 			int x_src = pix(0)-shift_x;
+			 			int y_src = pix(1)-shift_y;
+			 			rawData->img->copy(appPtr->patch, x_src, y_src, 0, 0, size.width, size.height);
+
+
+appPtr->patch.save("detected_feature.png");
+
+						cout << "Detected pix: " << featPtr->measurement << endl;
 
 						// 2a. Create the lmk and associated obs object.
 						observation_ptr_t obsPtr =
 						    mapManagerPtr()->createNewLandmark(shared_from_this());
 
 						// 2b. fill data for this obs
+						obsPtr->counters.nSearch = 1;
+						obsPtr->counters.nMatch = 1;
+						obsPtr->counters.nInlier = 1;
 						obsPtr->events.visible = true;
+						obsPtr->events.predicted = false;
 						obsPtr->events.measured = true;
-						obsPtr->measurement.x(featPtr->measurement.x());
+						obsPtr->events.matched = false;
+						obsPtr->events.updated = false;
+						obsPtr->measurement = featPtr->measurement;
+//						obsPtr->measurement.x(featPtr->measurement.x());
+//						obsPtr->measurement.P(featPtr->measurement.P());
+//						obsPtr->measurement.matchScore = featPtr->measurement.matchScore;
+
+						cout << "Measured pix: " << obsPtr->measurement << endl;
 
 //						obsPtr->setup(sensorSpecPtr()->params.pixNoise, matcherParams_.patchSize);
 
@@ -220,6 +284,7 @@ namespace jafar {
 						    descPtr(new DescriptorImagePoint(featPtr, globalSensorPose,
 						                                     obsPtr));
 						obsPtr->landmarkPtr()->setDescriptor(descPtr);
+
 					} // create&init
 				} // getROI()
 			} // if space in map

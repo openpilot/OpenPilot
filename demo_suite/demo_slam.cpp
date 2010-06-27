@@ -69,7 +69,9 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	const int N_FRAMES = 5000;
 
-	const double PERT_VLIN = 4.0; // m/s per sqrt(s)
+	const double UNCERT_VLIN = 0.05; // m/s
+	const double UNCERT_VANG = 0.05; // rad/s
+	const double PERT_VLIN = 1.0; // m/s per sqrt(s)
 	const double PERT_VANG = 1.0; // rad/s per sqrt(s)
 
 	const double FRAME_RATE = 60;
@@ -150,6 +152,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	double _v[6] = { PERT_VLIN, PERT_VLIN, PERT_VLIN, PERT_VANG, PERT_VANG, PERT_VANG };
 	robPtr1->perturbation.clear();
 	robPtr1->perturbation.set_std_continuous(createVector<6> (_v));
+	robPtr1->setVelocityStd(UNCERT_VLIN,UNCERT_VANG);
 	robPtr1->constantPerturbation = false;
 
 	// 3. Create sensors.
@@ -233,11 +236,13 @@ void demo_slam01_main(world_ptr_t *world) {
 						continue;
 					else had_data=true;
 					//std::cout << chronototal.elapsed() << " has acquired" << std::endl;
-
+cout << "\nNEW FRAME\n" << endl;
 					// move the filter time to the data raw.
 					vec u(robPtr->mySize_control()); // TODO put some real values in u.
 					fillVector(u, 0.0);
 					robPtr->move(u, senPtr->getRaw()->timestamp);
+
+					cout << *robPtr << endl;
 
 					// foreach dataManager
 					for (SensorAbstract::DataManagerList::iterator dmaIter = senPtr->dataManagerList().begin(); dmaIter

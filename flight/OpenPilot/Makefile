@@ -44,7 +44,11 @@ CODE_SOURCERY ?= YES
 TCHAIN_PREFIX ?= arm-none-eabi-
 
 # Remove command is different for Code Sourcery on Windows
-REMOVE_CMD ?= cs-rm
+ifeq ($(CODE_SOURCERY), YES)
+REMOVE_CMD = cs-rm
+else
+REMOVE_CMD = rm
+endif
 
 FLASH_TOOL = OPENOCD
 

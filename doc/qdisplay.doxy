@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: $ */
 
 /*!
   \addtogroup qdisplay Module qdisplay
@@ -8,7 +8,7 @@
 \author 
   jafar@laas.fr
 
-  This modules enables the display of objects jafar::image::JfrImage for Ruby scripts.
+  This module enables the display of objects jafar::image::JfrImage in Ruby scripts.
 
 \section secQdisplayHistory  History
 

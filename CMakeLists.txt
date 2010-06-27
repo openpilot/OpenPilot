@@ -14,4 +14,6 @@ build_jafar_module(qdisplay
   #OPTIONAL_EXTLIBS 
   #CXXFLAGS
   #CPPFLAGS
+  ROBOTPKG_CATEGORY graphics
+  SHORT_DESCRIPTION "Jafar module to display objects of type jafar::image::JfrImage in Ruby scripts."
 )

@@ -99,7 +99,7 @@ namespace jafar {
 
 						cv::Rect roi(xmin, ymin, xmax - xmin + 1, ymax - ymin + 1);
 
-						cout << "roi: " << roi << endl;
+//						cout << "roi: " << roi << endl;
 
 						//						kernel::Chrono match_chrono;
 						obsPtr->measurement.std(detectorParams_.measStd);
@@ -141,16 +141,16 @@ namespace jafar {
 								numObs++;
 								obsPtr->counters.nInlier++;
 								//								kernel::Chrono update_chrono;
-								cout << "\n===== Rob before update :\n" << obsPtr->sensorPtr()->robotPtr()->state.P() << endl;
+//								cout << "\n===== Rob before update :\n" << obsPtr->sensorPtr()->robotPtr()->state.P() << endl;
 								obsPtr->update();
-								cout << "\n===== Rob after update :\n" << obsPtr->sensorPtr()->robotPtr()->state.P() << endl;
+//								cout << "\n===== Rob after update :\n" << obsPtr->sensorPtr()->robotPtr()->state.P() << endl;
 								//								total_update_time += update_chrono.elapsedMicrosecond();
 								obsPtr->events.updated = true;
 							} // obsPtr->compatibilityTest(3.0)
 
 						} // obsPtr->getScoreMatchInPercent()>80
 
-						cout << *obsPtr << endl;
+//						cout << *obsPtr << endl;
 
 
 					} // number of observations
@@ -245,7 +245,7 @@ namespace jafar {
 
 //appPtr->patch.save("detected_feature.png");
 
-						cout << "Detected pix: " << featPtr->measurement << endl;
+//						cout << "Detected pix: " << featPtr->measurement << endl;
 
 						// 2a. Create the lmk and associated obs object.
 						observation_ptr_t obsPtr =
@@ -265,7 +265,7 @@ namespace jafar {
 //						obsPtr->measurement.P(featPtr->measurement.P());
 //						obsPtr->measurement.matchScore = featPtr->measurement.matchScore;
 
-						cout << "Measured pix: " << obsPtr->measurement << endl;
+//						cout << "Measured pix: " << obsPtr->measurement << endl;
 
 //						obsPtr->setup(sensorSpecPtr()->params.pixNoise, matcherParams_.patchSize);
 

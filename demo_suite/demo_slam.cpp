@@ -71,8 +71,8 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	const double UNCERT_VLIN = 0.1; // m/s
 	const double UNCERT_VANG = 0.1; // rad/s
-	const double PERT_VLIN = 0.1; // m/s per sqrt(s)
-	const double PERT_VANG = 0.1; // rad/s per sqrt(s)
+	const double PERT_VLIN = 1; // m/s per sqrt(s)
+	const double PERT_VANG = 1; // rad/s per sqrt(s)
 
 	const double FRAME_RATE = 60;
 
@@ -164,7 +164,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	senPtr11->params.setImgSize(IMG_WIDTH, IMG_HEIGHT);
 	senPtr11->params.setIntrinsicCalibration(k, d, d.size());
 	senPtr11->params.setMiscellaneous(1.0, 0.1);
-	senPtr11->params.patchSize = -1; // FIXME: See how to propagate patch size properly (obs factory needs it to be in sensor)
+//	senPtr11->params.patchSize = -1; // FIXME: See how to propagate patch size properly (obs factory needs it to be in sensor)
 
 	// 3b. Create data manager.
 	boost::shared_ptr<ActiveSearchGrid> asGrid(new ActiveSearchGrid(IMG_WIDTH, IMG_HEIGHT, GRID_HCELLS, GRID_VCELLS, GRID_MARGIN, GRID_SEPAR));
@@ -236,13 +236,13 @@ void demo_slam01_main(world_ptr_t *world) {
 						continue;
 					else had_data=true;
 					//std::cout << chronototal.elapsed() << " has acquired" << std::endl;
-cout << "\nNEW FRAME\n" << endl;
+//cout << "\nNEW FRAME\n" << endl;
 					// move the filter time to the data raw.
 					vec u(robPtr->mySize_control()); // TODO put some real values in u.
 					fillVector(u, 0.0);
 					robPtr->move(u, senPtr->getRaw()->timestamp);
 
-					cout << *robPtr << endl;
+//					cout << *robPtr << endl;
 
 					// foreach dataManager
 					for (SensorAbstract::DataManagerList::iterator dmaIter = senPtr->dataManagerList().begin(); dmaIter
@@ -279,7 +279,7 @@ cout << "\nNEW FRAME\n" << endl;
 
 	} // temporal loop
 
-	cout << "time avg(max): " << total_chrono.elapsed()/N_FRAMES << "(" << (int)(1000*max_dt) <<") ms" << endl;
+//	cout << "time avg(max): " << total_chrono.elapsed()/N_FRAMES << "(" << (int)(1000*max_dt) <<") ms" << endl;
 	std::cout << "\nFINISHED !" << std::endl;
 
 	sleep(60);

@@ -15,6 +15,8 @@ QT += opengl \
 #    warn_on
 #VERSION = 1.2.0
 
+macx:LIBS += -lz
+
 unix:OBJECTS_DIR = .
 unix:MOC_DIR = .
 unix:UI_DIR = .

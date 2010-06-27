@@ -60,7 +60,6 @@ macx {
     GCS_LIBEXEC_PATH = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/Resources
     GCS_DATA_PATH    = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/Resources
     GCS_DOC_PATH     = $$GCS_DATA_PATH/doc
-    contains(QT_CONFIG, ppc):CONFIG += ppc x86
     copydata = 1
 } else {
     win32 {

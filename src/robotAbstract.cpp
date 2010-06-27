@@ -32,7 +32,8 @@ namespace jafar {
 			if (rob.name().size() > 0) s << rob.name() << ", ";
 			s << "of type " << rob.typeName() << endl;
 			s << ".state:  " << rob.state << endl;
-			s << ".pose :  " << rob.pose << endl;
+//			s << ".pose :  " << rob.pose << endl;
+			s << ".st.pert:   " << rob.Q << endl;
 			s << ".sens : [";
 			for (RobotAbstract::SensorList::const_iterator senIter = rob.sensorList().begin();
 						senIter != rob.sensorList().end(); senIter++)

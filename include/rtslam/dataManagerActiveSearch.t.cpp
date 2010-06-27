@@ -109,12 +109,12 @@ namespace jafar {
 																		obsPtr->observedAppearance);
 						//						total_match_time += match_chrono.elapsedMicrosecond();
 
-
+/*
 							// DEBUG: save some appearances to file
 							((AppearanceImagePoint*)(((DescriptorImagePoint*)(obsPtr->landmark().descriptorPtr.get()))->featImgPntPtr->appearancePtr.get()))->patch.save("descriptor_app.png");
 							((AppearanceImagePoint*)(obsPtr->predictedAppearance.get()))->patch.save("predicted_app.png");
 							((AppearanceImagePoint*)(obsPtr->observedAppearance.get()))->patch.save("matched_app.png");
-
+*/
 						// DEBUG: display predicted appearances on image, disable it when operating normally because can have side effects
 /*
 						if (SHOW_PATCH) {
@@ -141,9 +141,9 @@ namespace jafar {
 								numObs++;
 								obsPtr->counters.nInlier++;
 								//								kernel::Chrono update_chrono;
-								cout << "\n===== Rob before update :\n" << *(obsPtr->sensorPtr()->robotPtr()) << endl;
+								cout << "\n===== Rob before update :\n" << obsPtr->sensorPtr()->robotPtr()->state.P() << endl;
 								obsPtr->update();
-								cout << "\n===== Rob after update :\n" << *(obsPtr->sensorPtr()->robotPtr()) << endl;
+								cout << "\n===== Rob after update :\n" << obsPtr->sensorPtr()->robotPtr()->state.P() << endl;
 								//								total_update_time += update_chrono.elapsedMicrosecond();
 								obsPtr->events.updated = true;
 							} // obsPtr->compatibilityTest(3.0)
@@ -173,7 +173,7 @@ namespace jafar {
 					app_img_pnt_ptr_t appImg = SPTR_CAST<AppearanceImagePoint>(app);
 
 					measure.matchScore = correl::Explorer<correl::Zncc>::exploreTranslation(
-							targetAppImg->patch, *(rawPtr->img), roi.x, roi.x+roi.width-1, 1, roi.y, roi.y+roi.height-1, 1,
+							targetAppImg->patch, *(rawPtr->img), roi.x, roi.x+roi.width-1, 2, roi.y, roi.y+roi.height-1, 2,
 							measure.x()(0), measure.x()(1));
 
 					// set appearance
@@ -243,7 +243,7 @@ namespace jafar {
 			 			rawData->img->copy(appPtr->patch, x_src, y_src, 0, 0, size.width, size.height);
 
 
-appPtr->patch.save("detected_feature.png");
+//appPtr->patch.save("detected_feature.png");
 
 						cout << "Detected pix: " << featPtr->measurement << endl;
 

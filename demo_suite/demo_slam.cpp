@@ -69,10 +69,10 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	const int N_FRAMES = 5000;
 
-	const double UNCERT_VLIN = 0.05; // m/s
-	const double UNCERT_VANG = 0.05; // rad/s
-	const double PERT_VLIN = 1.0; // m/s per sqrt(s)
-	const double PERT_VANG = 1.0; // rad/s per sqrt(s)
+	const double UNCERT_VLIN = 0.1; // m/s
+	const double UNCERT_VANG = 0.1; // rad/s
+	const double PERT_VLIN = 0.1; // m/s per sqrt(s)
+	const double PERT_VANG = 0.1; // rad/s per sqrt(s)
 
 	const double FRAME_RATE = 60;
 

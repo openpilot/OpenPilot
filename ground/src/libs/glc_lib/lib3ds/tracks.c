@@ -1548,5 +1548,7 @@ lib3ds_dump_tracks(Lib3dsNode *node)
       printf("pos: ");
       lib3ds_lin3Track_dump(&node->data.spot.pos_track);
       break;
+    case LIB3DS_UNKNOWN_NODE:
+      break;
   }
 }

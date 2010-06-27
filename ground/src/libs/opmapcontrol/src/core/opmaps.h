@@ -78,7 +78,7 @@ namespace core {
         OPMaps();
 
         OPMaps(OPMaps const&){};
-        OPMaps& operator=(OPMaps const&){};
+        OPMaps& operator=(OPMaps const&){ return *this; }
         static OPMaps* m_pInstance;
 
 

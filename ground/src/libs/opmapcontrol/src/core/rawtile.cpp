@@ -66,7 +66,7 @@ void RawTile::setZoom(const int &value)
 uint qHash(RawTile const& tile)
 {
     // RawTile tile=tilee;
-    quint64 tmp=(((quint64)(tile.zoom))<<54)+(((int)(tile.type))<<36)+(((quint64)(tile.pos.X()))<<18)+(((quint64)(tile.pos.Y())));
+    quint64 tmp=(((quint64)(tile.zoom))<<54)+(((quint64)(tile.type))<<36)+(((quint64)(tile.pos.X()))<<18)+(((quint64)(tile.pos.Y())));
   //  quint64 tmp5=tmp+tmp2+tmp3+tmp4;
     return ::qHash(tmp);
 }

@@ -221,7 +221,7 @@ void GLC_RepTrackBallMover::computeRadius()
 	// Circle radius in OpenGL unit = Radius(Pixel) * (dimend GL / dimens Pixel)
 	const double RayonSph= fabs((static_cast<double>(nRayonSph) * ChampsVision / winVSize));
 
-	if (not qFuzzyCompare(RayonSph, 0.0) and not qFuzzyCompare(RayonSph - m_Radius, 0.0) or (RayonSph < 2.0))
+        if (((not qFuzzyCompare(RayonSph, 0.0)) and (not qFuzzyCompare(RayonSph - m_Radius, 0.0))) or (RayonSph < 2.0))
 	{
 		// Main circle radius
 		m_MainCircle.setRadius(RayonSph);

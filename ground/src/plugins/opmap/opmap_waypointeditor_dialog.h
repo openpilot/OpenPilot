@@ -49,6 +49,7 @@ namespace Ui {
 class WaypointItem : public QObject, public QGraphicsItem
 {
     Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
 
  public:
     WaypointItem(QString name = "", double latitude = 0, double longitude = 0, double height_feet = 0, int time_seconds = 0, int hold_seconds = 0);

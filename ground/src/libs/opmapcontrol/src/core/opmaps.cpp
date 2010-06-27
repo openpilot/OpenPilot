@@ -37,7 +37,7 @@ namespace core {
             m_pInstance=new OPMaps;
         return m_pInstance;
     }
-    OPMaps::OPMaps():useMemoryCache(true),MaxZoom(19),RetryLoadTile(2)
+    OPMaps::OPMaps():MaxZoom(19),RetryLoadTile(2),useMemoryCache(true)
     {
         accessmode=AccessMode::ServerAndCache;
         Language=LanguageType::PortuguesePortugal;
@@ -194,14 +194,14 @@ namespace core {
 #endif //DEBUG_GMAPS
                 QTime time;
                 time.start();
-                while( !(reply->isFinished() | time.elapsed()>(6*Timeout)) ){QCoreApplication::processEvents(QEventLoop::AllEvents);}
+                while( !(reply->isFinished() || (time.elapsed()>(6*Timeout))) ){QCoreApplication::processEvents(QEventLoop::AllEvents);}
 #ifdef DEBUG_TIMINGS
                 qDebug()<<"Network time:"<<time.elapsed();
 #endif
 #ifdef DEBUG_GMAPS
                 qDebug()<<"Finished?"<<reply->error()<<" abort?"<<(time.elapsed()>Timeout*6);
 #endif //DEBUG_GMAPS
-                if( (reply->error()!=QNetworkReply::NoError) | (time.elapsed()>Timeout*6))
+                if( (reply->error()!=QNetworkReply::NoError) || (time.elapsed()>Timeout*6))
                 {
 #ifdef DEBUG_GMAPS
                     qDebug()<<"Request timed out ";//<<pos.x+","+pos.y;

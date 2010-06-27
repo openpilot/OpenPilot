@@ -17,6 +17,7 @@ class MapGraphicItem:public QObject,public QGraphicsItem
 {
     friend class mapcontrol::OPMapWidget;
     Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
 public:
     MapGraphicItem(internals::Core *core,Configuration *configuration);
     QRectF boundingRect() const;

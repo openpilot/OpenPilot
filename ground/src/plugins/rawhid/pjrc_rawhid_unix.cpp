@@ -156,8 +156,8 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
                     if (parsed_usage_page && parsed_usage) break;
                 }
                 if ((!parsed_usage_page) || (!parsed_usage) ||
-                    (usage_page > 0 && parsed_usage_page != usage_page) ||
-                    (usage > 0 && parsed_usage != usage)) {
+                    (usage_page > 0 && parsed_usage_page != (uint32_t)usage_page) ||
+                    (usage > 0 && parsed_usage != (uint32_t)usage)) {
                     usb_release_interface(u, i);
                     continue;
                 }

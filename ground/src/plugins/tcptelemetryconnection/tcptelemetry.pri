@@ -1,3 +1,3 @@
-include(TCPtelemetry_dependencies.pri)
+include(tcptelemetry_dependencies.pri)
 
 LIBS *= -l$$qtLibraryTarget(TCPtelemetry)

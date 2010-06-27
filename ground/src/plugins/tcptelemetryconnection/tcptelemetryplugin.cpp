@@ -27,7 +27,7 @@
 
 //The core of this plugin has been directly copied from the serial plugin and converted to work over a TCP link instead of a direct serial link
 
-#include "TCPtelemetryplugin.h"
+#include "tcptelemetryplugin.h"
 
 
 #include <extensionsystem/pluginmanager.h>

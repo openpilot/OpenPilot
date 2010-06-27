@@ -25,8 +25,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "TCPtelemetryoptionspage.h"
-#include "TCPtelemetryconfiguration.h"
+#include "tcptelemetryoptionspage.h"
+#include "tcptelemetryconfiguration.h"
 #include <QtGui/QLabel>
 #include <QtGui/QComboBox>
 #include <QtGui/QSpinBox>
@@ -34,7 +34,7 @@
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>
 
-#include "ui_TCPtelemetryoptionspage.h"
+#include "ui_tcptelemetryoptionspage.h"
 
 
 TCPtelemetryOptionsPage::TCPtelemetryOptionsPage(TCPtelemetryConfiguration *config, QObject *parent) :

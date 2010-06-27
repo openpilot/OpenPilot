@@ -130,6 +130,6 @@ SUBDIRS += plugin_pfd
 
 
 #TCPtelemetry connection plugin
-plugin_TCPtelemetry.subdir = TCPtelemetryconnection
-plugin_TCPtelemetry.depends = plugin_coreplugin
-SUBDIRS += plugin_TCPtelemetry
+plugin_tcptelemetry.subdir = tcptelemetryconnection
+plugin_tcptelemetry.depends = plugin_coreplugin
+SUBDIRS += plugin_tcptelemetry

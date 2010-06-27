@@ -28,10 +28,10 @@
 #ifndef TCPtelemetryPLUGIN_H
 #define TCPtelemetryPLUGIN_H
 
-#include "TCPtelemetry_global.h"
-#include "TCPtelemetryoptionspage.h"
-#include "TCPtelemetryconfiguration.h"
-//#include "TCPtelemetryfactory.h"
+#include "tcptelemetry_global.h"
+#include "tcptelemetryoptionspage.h"
+#include "tcptelemetryconfiguration.h"
+//#include "tcptelemetryfactory.h"
 #include "coreplugin/iconnection.h"
 #include <extensionsystem/iplugin.h>
 //#include <QtCore/QSettings>

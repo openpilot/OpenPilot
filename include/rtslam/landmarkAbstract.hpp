@@ -119,7 +119,7 @@ namespace jafar {
 				jblas::mat LNEW_lmk; ///<Jacobian comming from reparametrisation of old lmk wrt. new lmk
 
 				//Reparametrize old Landmarks into new ones
-				void reparametrize();
+				void reparametrize(const landmark_ptr_t & lmkDestPtr);
 				virtual vec reparametrize_func(const vec & lmk) = 0;
 				virtual void reparametrize_func(const vec & lmk, vec & lnew, mat & LNEW_lmk) = 0;
 

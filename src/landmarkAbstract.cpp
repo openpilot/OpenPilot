@@ -86,7 +86,7 @@ namespace jafar {
 
 
 
-		void LandmarkAbstract::reparametrize() {
+		void LandmarkAbstract::reparametrize(const landmark_ptr_t & lmkPtr) {
 //
 //			// - create a new STD landmark.
 //			if (mapManagerPtr()->mapPtr()->unusedStates(LandmarkEuclideanPoint::size())){
@@ -113,24 +113,24 @@ namespace jafar {
 //						cout << __PRETTY_FUNCTION__ << "about to transfer obs info" << endl;
 //						obsPtrEuc->transferInfoObs(obsPtr);
 //					}
-//
-//				// - call reparametrize_func()
-//					mat LMKNEW_lmk(lmkPtr->mySize(),this->mySize());
-//					vec lmk = this->state.x();
-//					vec lmkNEW(lmkPtr->mySize());
-//					cout << __PRETTY_FUNCTION__ << "about to call reparametrize_func()" << endl;
-//					reparametrize_func(lmk,lmkNEW,LMKNEW_lmk);
-//					lmkPtr->state.x(lmkNEW);
-//
-//				// - call filter->reparametrize()
-//					cout << __PRETTY_FUNCTION__ << "about to call filter->reparametrize()" << endl;
-//					mapPtr()->filterPtr->reparametrize(mapPtr()->ia_used_states(),LMKNEW_lmk,this->state.ia(),lmkPtr->state.ia());
-//
-//				// - transfer info from the old lmk to the new one
-//					landmark_ptr_t lmkPtrOld = this->shared_from_this();
-//					cout << __PRETTY_FUNCTION__ << "about to transfer lmk info" << endl;
-//					lmkPtr->transferInfoLmk(lmkPtrOld);
-//
+
+				// - call reparametrize_func()
+					mat LMKNEW_lmk(lmkPtr->mySize(),this->mySize());
+					vec lmk = this->state.x();
+					vec lmkNEW(lmkPtr->mySize());
+					cout << __PRETTY_FUNCTION__ << "about to call reparametrize_func()" << endl;
+					reparametrize_func(lmk,lmkNEW,LMKNEW_lmk);
+					lmkPtr->state.x(lmkNEW);
+
+				// - call filter->reparametrize()
+					cout << __PRETTY_FUNCTION__ << "about to call filter->reparametrize()" << endl;
+					mapManagerPtr()->mapPtr()->filterPtr->reparametrize(mapPtr()->ia_used_states(), LMKNEW_lmk, this->state.ia(), lmkPtr->state.ia());
+
+				// - transfer info from the old lmk to the new one
+					landmark_ptr_t lmkPtrOld = this->shared_from_this();
+					cout << __PRETTY_FUNCTION__ << "about to transfer lmk info" << endl;
+					lmkPtr->transferInfoLmk(lmkPtrOld);
+
 //				// - delete old lmk <-- this will delete all old obs!
 //					cout << __PRETTY_FUNCTION__ << "about to kill the old lmk" << endl;
 //					this->suicide();

@@ -31,6 +31,7 @@
 #include <QtGui/QComboBox>
 #include <QtGui/QSpinBox>
 #include <QtGui/QDoubleSpinBox>
+#include <QtGui/QRadioButton>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>
 
@@ -55,6 +56,8 @@ QWidget *TCPtelemetryOptionsPage::createPage(QWidget *parent)
 
     m_page->Port->setValue(m_config->Port());
     m_page->HostName->setText(m_config->HostName());
+    m_page->UseTCP->setChecked(m_config->UseTCP()?true:false);
+    m_page->UseUDP->setChecked(m_config->UseTCP()?false:true);
 
     return w;
 }
@@ -63,6 +66,7 @@ void TCPtelemetryOptionsPage::apply()
 {
     m_config->setPort(m_page->Port->value());
     m_config->setHostName(m_page->HostName->text());
+    m_config->setUseTCP(m_page->UseTCP->isChecked()?1:0);
     m_config->savesettings();
 
     emit availableDevChanged();

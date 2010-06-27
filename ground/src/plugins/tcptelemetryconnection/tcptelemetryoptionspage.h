@@ -52,8 +52,8 @@ public:
 
     QString id() const { return QLatin1String("settings"); }
     QString trName() const { return tr("settings"); }
-    QString category() const { return "TCP Connection"; };
-    QString trCategory() const { return "TCP Connection"; };
+    QString category() const { return "IP Network Telemetry"; };
+    QString trCategory() const { return "IP Network Telemetry"; };
 
     QWidget *createPage(QWidget *parent);
     void apply();

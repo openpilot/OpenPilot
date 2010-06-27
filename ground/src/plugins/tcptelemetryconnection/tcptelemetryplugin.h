@@ -37,7 +37,9 @@
 //#include <QtCore/QSettings>
 
 
+class QAbstractSocket;
 class QTcpSocket;
+class QUdpSocket;
 
 class IConnection;
 /**
@@ -68,7 +70,7 @@ public:
 protected slots:
     void onEnumerationChanged();
 private:
-       QTcpSocket *tcpSocket;
+       QAbstractSocket *tcpSocket;
        TCPtelemetryConfiguration *m_config;
        TCPtelemetryOptionsPage *m_optionspage;
        //QSettings* settings;

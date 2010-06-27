@@ -32,7 +32,8 @@
 TCPtelemetryConfiguration::TCPtelemetryConfiguration(QString classId, const QByteArray &state, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),
     m_HostName("127.0.0.1"),
-    m_Port(1000)
+    m_Port(1000),
+    m_UseTCP(1)
 {
     settings = Core::ICore::instance()->settings();
 }
@@ -44,6 +45,7 @@ IUAVGadgetConfiguration *TCPtelemetryConfiguration::clone()
     TCPtelemetryConfiguration *m = new TCPtelemetryConfiguration(this->classId());
     m->m_Port = m_Port;
     m->m_HostName = m_HostName;
+    m->m_UseTCP = m_UseTCP;
     return m;
 }
 
@@ -53,6 +55,7 @@ QByteArray TCPtelemetryConfiguration::saveState() const
     QDataStream stream(&bytes, QIODevice::WriteOnly);
     stream << m_Port;
     stream << m_HostName;
+    stream << m_UseTCP;
     return bytes;
 
 }
@@ -66,6 +69,7 @@ void TCPtelemetryConfiguration::savesettings() const
         settings->setArrayIndex(0);
         settings->setValue(QLatin1String("HostName"), m_HostName);
         settings->setValue(QLatin1String("Port"), m_Port);
+        settings->setValue(QLatin1String("UseTCP"), m_UseTCP);
         settings->endArray();
         settings->endGroup();
 }
@@ -79,6 +83,7 @@ void TCPtelemetryConfiguration::restoresettings()
         settings->setArrayIndex(0);
         m_HostName = (settings->value(QLatin1String("HostName"), tr("")).toString());
         m_Port = (settings->value(QLatin1String("Port"), tr("")).toInt());
+        m_UseTCP = (settings->value(QLatin1String("UseTCP"), tr("")).toInt());
         settings->endArray();
         settings->endGroup();
 

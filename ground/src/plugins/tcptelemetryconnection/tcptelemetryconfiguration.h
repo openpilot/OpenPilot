@@ -39,6 +39,7 @@ class TCPtelemetryConfiguration : public IUAVGadgetConfiguration
 Q_OBJECT
 Q_PROPERTY(QString HostName READ HostName WRITE setHostName)
 Q_PROPERTY(int Port READ Port WRITE setPort)
+Q_PROPERTY(int UseTCP READ UseTCP WRITE setUseTCP)
 
 public:
     explicit TCPtelemetryConfiguration(QString classId, const QByteArray &state = 0, QObject *parent = 0);
@@ -52,15 +53,18 @@ public:
 
     QString HostName() const { return m_HostName; }
     int Port() const { return m_Port; }
+    int UseTCP() const { return m_UseTCP; }
 
 
 public slots:
     void setHostName(QString HostName) { m_HostName = HostName; }
     void setPort(int Port) { m_Port = Port; }
+    void setUseTCP(int UseTCP) { m_UseTCP = UseTCP; }
 
 private:
     QString m_HostName;
     int m_Port;
+    int m_UseTCP;
     QSettings* settings;
 
 

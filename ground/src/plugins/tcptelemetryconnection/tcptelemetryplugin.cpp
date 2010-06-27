@@ -36,14 +36,16 @@
 #include <QtCore/QtPlugin>
 #include <QtGui/QMainWindow>
 #include <QtGui/QMessageBox>
+#include <QtNetwork/QAbstractSocket>
 #include <QtNetwork/QTcpSocket>
+#include <QtNetwork/QUdpSocket>
 
 #include <QDebug>
 
 TCPtelemetryConnection::TCPtelemetryConnection()
 {
     //create all our objects
-    m_config = new TCPtelemetryConfiguration("TCP Connection", NULL, this);
+    m_config = new TCPtelemetryConfiguration("IP Network Telemetry", NULL, this);
     m_config->restoresettings();
 
     m_optionspage = new TCPtelemetryOptionsPage(m_config,this);
@@ -87,7 +89,11 @@ QIODevice *TCPtelemetryConnection::openDevice(const QString &deviceName)
             int Port;
             QMessageBox msgBox;
 
-            tcpSocket = new QTcpSocket(this);
+            if (m_config->UseTCP()) {
+                tcpSocket = new QTcpSocket(this);
+            } else {
+                tcpSocket = new QUdpSocket(this);
+            }
 
             //get the configuration info
             HostName = m_config->HostName();
@@ -111,7 +117,10 @@ QIODevice *TCPtelemetryConnection::openDevice(const QString &deviceName)
                 msgBox.setText((const QString )tcpSocket->errorString ());
                 msgBox.exec();
             }
-    return NULL;
+/* BUGBUG TODO - returning null here leads to segfault because some caller still calls disconnect without checking our return value properly
+ * someone needs to debug this, I got lost in the calling chain.*/
+    //return NULL;
+    return tcpSocket;
 }
 
 void TCPtelemetryConnection::closeDevice(const QString &deviceName)
@@ -119,18 +128,24 @@ void TCPtelemetryConnection::closeDevice(const QString &deviceName)
     //still having problems with the app crashing when we reference the tcpsocket outside the openDevice function...
     //tcpSocket->close ();
     //delete(tcpSocket);
+    // Note: CorvusCorax thinks its because the socket got deleted by the caller before this close() is even called
+    // so we end up with a dangling reference! Is this a bug?
 
 }
 
 
 QString TCPtelemetryConnection::connectionName()
 {//updated from serial plugin
-    return QString("TCP telemetry port");
+    return QString("Network telemetry port");
 }
 
 QString TCPtelemetryConnection::shortName()
 {//updated from serial plugin
-    return QString("TCP");
+    if (m_config->UseTCP()) {
+        return QString("TCP");
+    } else {
+        return QString("UDP");
+    }
 }
 
 

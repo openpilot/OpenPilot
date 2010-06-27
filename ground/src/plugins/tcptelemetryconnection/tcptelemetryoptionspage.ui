@@ -30,6 +30,20 @@
      </property>
     </spacer>
    </item>
+   <item row="2" column="2">
+    <widget class="QRadioButton" name="UseTCP">
+     <property name="text">
+      <string>TCP connection</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="QRadioButton" name="UseUDP">
+     <property name="text">
+      <string>UDP connection</string>
+     </property>
+    </widget>
+   </item>
    <item row="4" column="2">
     <widget class="QSpinBox" name="Port">
      <property name="minimum">

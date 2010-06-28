@@ -277,7 +277,8 @@ void demo_slam01_main(world_ptr_t *world) {
 					!= mmPoint->landmarkList().end(); lmkIter++) {
 				cout << (*lmkIter)->id() << " ";
 			}
-			// TODO-NMSD: MM::reparam+delete
+			// TODO foreach map {managemap();}
+			mmPoint->manageMap();
 
 		} // if had_data
 

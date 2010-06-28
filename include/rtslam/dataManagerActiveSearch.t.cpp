@@ -141,9 +141,7 @@ namespace jafar {
 								numObs++;
 								obsPtr->counters.nInlier++;
 								//								kernel::Chrono update_chrono;
-//								cout << "\n===== Rob before update :\n" << obsPtr->sensorPtr()->robotPtr()->state.P() << endl;
 								obsPtr->update();
-//								cout << "\n===== Rob after update :\n" << obsPtr->sensorPtr()->robotPtr()->state.P() << endl;
 								//								total_update_time += update_chrono.elapsedMicrosecond();
 								obsPtr->events.updated = true;
 							} // obsPtr->compatibilityTest(3.0)

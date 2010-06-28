@@ -50,21 +50,35 @@ namespace jafar {
 			return resObs;
 		}
 
+		void MapManagerAbstract::killLandmark(landmark_ptr_t lmkPtr){
+			// first unlink all observations
+			for (LandmarkAbstract::ObservationList::iterator obsIter =
+			    lmkPtr->observationList().begin(); obsIter != lmkPtr->observationList().end(); ++obsIter) {
+				observation_ptr_t obsPtr = *obsIter;
+				obsPtr->dataManagerPtr()->unregisterChild(obsPtr);
+			}
+			// liberate map space
+			mapPtr()->liberateStates(lmkPtr->state.ia());
+			// now unlink landmark
+			ParentOf<LandmarkAbstract>::unregisterChild(lmkPtr);
+		}
+
+
 		void MapManagerAbstract::manageMap(void) {
 			// foreach lmk
-			for (LandmarkList::iterator iterLmk = landmarkList().begin(); iterLmk
-			    != landmarkList().end(); ++iterLmk) {
-				landmark_ptr_t lmk = *iterLmk;
-				if (0)//TODO-NMSD lmk->needToDie() )
+			for (LandmarkList::iterator lmkIter = landmarkList().begin(); lmkIter
+			    != landmarkList().end(); ++lmkIter) {
+				landmark_ptr_t lmkPtr = *lmkIter;
+				if (lmkPtr->needToDie() )
 				{
-					iterLmk++;
-					killLandmark(lmk);
-					iterLmk--;
-				} else if (0)//TODO-NMSD  lmk->needToReparametrize() )
+					lmkIter++;
+					killLandmark(lmkPtr);
+					lmkIter--;
+				} else if (0)//TODO-NMSD  lmkPtr->needToReparametrize() )
 				{
-					iterLmk++;
-					reparametrizeLandmark(lmk);
-					iterLmk--;
+					lmkIter++;
+					reparametrizeLandmark(lmkPtr);
+					lmkIter--;
 				}
 			}
 		}

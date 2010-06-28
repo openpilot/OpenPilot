@@ -40,7 +40,7 @@ namespace jafar {
 		}
 
 		LandmarkAbstract::~LandmarkAbstract() {
-			cout << "Deleted landmark: " << id() << ": " << typeName() << endl;
+//			cout << "Deleted landmark: " << id() << ": " << typeName() << endl;
 		}
 
 		bool LandmarkAbstract::needToReparametrize(DecisionMethod repMet){

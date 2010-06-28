@@ -100,7 +100,7 @@ namespace jafar {
 		}
 
 		ObservationAbstract::~ObservationAbstract() {
-			cout << "Deleted observation: " << id() << ": " << typeName() << endl;
+//			cout << "Deleted observation: " << id() << ": " << typeName() << endl;
 		}
 
 
@@ -220,7 +220,7 @@ namespace jafar {
 			// kill big ellipses
 			int searchSize = 36*sqrt(expectation.P(0,0)*expectation.P(1,1));
 			if (searchSize > 30000) {
-//				cout << "Killed by size." << endl;
+				cout << "Killed by size." << endl;
 				return true;
 			}
 
@@ -230,7 +230,7 @@ namespace jafar {
 				double consistencyRatio = counters.nInlier / (double)counters.nMatch;
 
 				if (matchRatio < 0.7 || consistencyRatio < 0.7)	{
-//					cout << "Killed by unstability." << endl;
+					cout << "Killed by unstability." << endl;
 					return true;
 				}
 			}

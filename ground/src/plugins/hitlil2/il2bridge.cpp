@@ -32,7 +32,6 @@ Il2Bridge::Il2Bridge(QString il2HostName, int il2Port)
 {
     // Init fields
     il2Host = QHostAddress(il2HostName);
-    inPort = 0;
     outPort = il2Port;
     updatePeriod = 50;
     il2Timeout = 2000;
@@ -62,10 +61,9 @@ Il2Bridge::Il2Bridge(QString il2HostName, int il2Port)
     }
 
     // Setup local ports
-    inSocket = new QUdpSocket(this);
     outSocket = new QUdpSocket(this);
-    inSocket->bind(QHostAddress::Any, inPort);
-    connect(inSocket, SIGNAL(readyRead()), this, SLOT(receiveUpdate()));
+    outSocket->connectToHost((const QString )il2HostName,il2Port);
+    connect(outSocket, SIGNAL(readyRead()), this, SLOT(receiveUpdate()));
 
     // Setup transmit timer
     txTimer = new QTimer(this);
@@ -74,18 +72,17 @@ Il2Bridge::Il2Bridge(QString il2HostName, int il2Port)
     txTimer->start();
 
     // Setup FG connection timer
-    fgTimer = new QTimer(this);
-    connect(fgTimer, SIGNAL(timeout()), this, SLOT(onFGConnectionTimeout()));
+    il2Timer = new QTimer(this);
+    connect(il2Timer, SIGNAL(timeout()), this, SLOT(onIl2ConnectionTimeout()));
     fgTimer->setInterval(fgTimeout);
     fgTimer->start();
 }
 
 Il2Bridge::~Il2Bridge()
 {
-    delete inSocket;
     delete outSocket;
     delete txTimer;
-    delete fgTimer;
+    delete il2Timer;
 }
 
 bool Il2Bridge::isAutopilotConnected()
@@ -93,9 +90,9 @@ bool Il2Bridge::isAutopilotConnected()
     return autopilotConnectionStatus;
 }
 
-bool Il2Bridge::isFGConnected()
+bool Il2Bridge::isIl2Connected()
 {
-    return fgConnectionStatus;
+    return il2ConnectionStatus;
 }
 
 void Il2Bridge::transmitUpdate()
@@ -108,30 +105,32 @@ void Il2Bridge::transmitUpdate()
     float throttle = actData.Throttle;
 
     // Send update to Il2
+//    QString cmd;
+//    cmd = QString("%1,%2,%3,%4\n")
+//          .arg(ailerons)
+//          .arg(elevator)
+//          .arg(rudder)
+//          .arg(throttle);
     QString cmd;
-    cmd = QString("%1,%2,%3,%4\n")
-          .arg(ailerons)
-          .arg(elevator)
-          .arg(rudder)
-          .arg(throttle);
+    cmd=QString("R/30/32/34/40/42/46/48/64\\0/64\\1/74\\0/74\\1/164/");
     QByteArray data = cmd.toAscii();
-    outSocket->writeDatagram(data, fgHost, outPort);
+    outSocket->write(data);
 }
 
 void Il2Bridge::receiveUpdate()
 {
     // Update connection timer and status
-    fgTimer->setInterval(fgTimeout);
-    fgTimer->stop();
-    fgTimer->start();
-    if ( !fgConnectionStatus )
+    il2Timer->setInterval(il2Timeout);
+    il2Timer->stop();
+    il2Timer->start();
+    if ( !il2ConnectionStatus )
     {
-        fgConnectionStatus = true;
-        emit fgConnected();
+        il2ConnectionStatus = true;
+        emit il2Connected();
     }
 
     // Process data
-    while ( inSocket->bytesAvailable() > 0 )
+    while ( outSocket->bytesAvailable() > 0 )
     {
         // Receive datagram
         QByteArray datagram;
@@ -204,6 +203,7 @@ void Il2Bridge::onFGConnectionTimeout()
 
 void Il2Bridge::processUpdate(QString& data)
 {
+return;
     // Split
     QStringList fields = data.split(",");
     // Get xRate (deg/s)

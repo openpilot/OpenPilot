@@ -70,7 +70,6 @@ private:
     static const float KT2MPS = 0.514444444;
     static const float INHG2KPA = 3.386;
 
-    QUdpSocket* inSocket;
     QUdpSocket* outSocket;
     ActuatorDesired* actDesired;
     AltitudeActual* altActual;
@@ -78,11 +77,10 @@ private:
     PositionActual* posActual;
     GCSTelemetryStats* telStats;
     QHostAddress il2Host;
-    int inPort;
     int outPort;
     int updatePeriod;
     QTimer* txTimer;
-    QTimer* fgTimer;
+    QTimer* il2Timer;
     bool autopilotConnectionStatus;
     bool il2ConnectionStatus;
     int il2Timeout;

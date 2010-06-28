@@ -52,7 +52,7 @@ void LineardialGadget::loadConfiguration(IUAVGadgetConfiguration* config)
     m_widget->setGreenRange(m->getGreenMin(), m->getGreenMax());
     m_widget->setYellowRange(m->getYellowMin(), m->getYellowMax());
     m_widget->setRedRange(m->getRedMin(), m->getRedMax());
-    m_widget->connectInput(m->getSourceDataObject(), m->getSourceObjectField());
     m_widget->setDialFile(m->getDialFile()); // Triggers widget repaint
+    m_widget->connectInput(m->getSourceDataObject(), m->getSourceObjectField());
     m_widget->setDialFont(m->getFont());
 }

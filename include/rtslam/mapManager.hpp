@@ -70,7 +70,7 @@ namespace jafar {
 				}
 		                virtual size_t sizeComplement( void )
 		                {
-				  return LandmarkInit::size() - LandmarkAdvanced::size();
+				  return (LandmarkInit::size() - LandmarkAdvanced::size());
 				}
 			public:
 				virtual ~MapManager(void) {

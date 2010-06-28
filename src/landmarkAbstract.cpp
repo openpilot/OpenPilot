@@ -33,7 +33,7 @@ namespace jafar {
 			category = LANDMARK;
 		}
 	  LandmarkAbstract::LandmarkAbstract(const map_ptr_t & _mapPtr, const landmark_ptr_t & _prevLmk, const size_t _size,jblas::ind_array & _icomp ) :
-	    MapObject(_mapPtr,(const MapObject&)_prevLmk, _size, _icomp)
+	    MapObject(_mapPtr,*_prevLmk, _size, _icomp)
 		{
 			category = LANDMARK;
 		}

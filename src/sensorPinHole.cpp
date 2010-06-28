@@ -53,11 +53,13 @@ namespace jafar {
 			} else
 			{
 				if (rawPtr) lastTimestamp = rawPtr->timestamp;
-				jafarImage_ptr_t i(Image::loadImage("test_suite/imageSample.ppm",0));
+				static jafarImage_ptr_t i(Image::loadImage("test_suite/imageSample.ppm",0));
 				if (i->data() == NULL) throw "IMAGE_NOT_FOUND";
 				RawImage* imgRawPtr = new RawImage;
 				imgRawPtr->setJafarImage(i) ;
-
+				struct timeval tv; struct timezone tz; gettimeofday(&tv,&tz);
+				imgRawPtr->timestamp = tv.tv_sec + tv.tv_usec*1e-6; 
+				
 				rawPtr.reset(imgRawPtr);
 				rawCounter++;
 				return 0;

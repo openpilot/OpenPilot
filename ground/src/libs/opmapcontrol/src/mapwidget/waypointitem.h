@@ -44,6 +44,7 @@ namespace mapcontrol
 class WayPointItem:public QObject,public QGraphicsItem
 {
     Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
 public:
     enum { Type = UserType + 1 };
     /**
@@ -152,16 +153,19 @@ protected:
 private:
     QPixmap picture;
     internals::PointLatLng coord;//coordinates of this WayPoint
-    QString description;
     bool reached;
-    MapGraphicItem* map;
-    int number;
+    QString description;
     bool shownumber;
     bool isDragging;
+    int altitude;
+    MapGraphicItem* map;
+    int number;
+
+
     QGraphicsSimpleTextItem* text;
     QGraphicsSimpleTextItem* numberI;
     QTransform transf;
-    int altitude;
+
 public slots:
     /**
     * @brief Called when a WayPoint is deleted

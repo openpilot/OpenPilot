@@ -28,7 +28,7 @@
 #include "waypointitem.h"
 namespace mapcontrol
 {
-    WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitude, MapGraphicItem *map):coord(coord),reached(false),map(map),description(""),shownumber(true),isDragging(false),altitude(altitude)
+    WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitude, MapGraphicItem *map):coord(coord),reached(false),description(""),shownumber(true),isDragging(false),altitude(altitude),map(map)
     {
         text=0;
         numberI=0;
@@ -45,7 +45,7 @@ namespace mapcontrol
         RefreshPos();
 
     }
-    WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitude, const QString &description, MapGraphicItem *map):coord(coord),reached(false),map(map),description(description),shownumber(true),isDragging(false),altitude(altitude)
+    WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitude, const QString &description, MapGraphicItem *map):coord(coord),reached(false),description(description),shownumber(true),isDragging(false),altitude(altitude),map(map)
     {
         text=0;
         numberI=0;

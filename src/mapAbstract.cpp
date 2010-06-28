@@ -74,6 +74,26 @@ namespace jafar {
 			}
 		}
 
+	  jblas::ind_array MapAbstract::convertStates(const jblas::ind_array & _ia,const std::size_t N) {
+	    if( _ia.size()<N )
+	      {
+		std::cerr << __PRETTY_FUNCTION__ << "(#" << __LINE__ << "): initial size unsufficient." << std::endl;
+		throw "convertStates: size unsufficient.";
+	      }
+	    jblas::ind_array res(N);
+	    for( size_t i = 0; i <N;++i )
+	      {
+		res(i)=_ia(i);
+	      }
+	    for( size_t i = N+1; i <_ia.size();++i )
+	      {
+		if (used_states(i) == true) {
+		  used_states(i) = false;
+		  current_size += 1;
+		}
+	      }
+	    return res;
+	  }
 		void MapAbstract::liberateStates(const jblas::ind_array & _ia) {
 			for (size_t i = 0; i <_ia.size(); i++)
 			{

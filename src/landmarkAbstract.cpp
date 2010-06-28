@@ -32,6 +32,11 @@ namespace jafar {
 		{
 			category = LANDMARK;
 		}
+		LandmarkAbstract::LandmarkAbstract(const map_ptr_t & _mapPtr, const landmark_ptr_t & _prevLmk, const size_t _size) :
+		        MapObject(_mapPtr,(const MapObject&)_prevLmk, _size)
+		{
+			category = LANDMARK;
+		}
 
 		LandmarkAbstract::LandmarkAbstract(const simulation_t dummy, const map_ptr_t & _mapPtr, const size_t _size) :
 			MapObject(_mapPtr, _size, UNFILTERED)

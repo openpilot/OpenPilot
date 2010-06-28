@@ -43,6 +43,10 @@ namespace jafar {
 				 * Constructor for simulated landmark.
 				 */
 				LandmarkEuclideanPoint(const simulation_t dummy, const map_ptr_t & mapPtr);
+		                /**
+				 * Constructor by replacement: occupied the same filter state as a specified previous lmk.
+				 */
+		                LandmarkEuclideanPoint(const map_ptr_t & _mapPtr, const landmark_ptr_t _prevLmk);
 
 				virtual ~LandmarkEuclideanPoint() {
 					cout << "Deleted landmark: " << id() << ": " << typeName() << endl;

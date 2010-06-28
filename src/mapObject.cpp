@@ -42,6 +42,13 @@ namespace jafar {
 				category = MAPPABLE_OBJECT;
 		}
 
+		MapObject::MapObject(const map_ptr_t & _mapPtr, const MapObject & prevObj, const size_t _size) :
+			ObjectAbstract(),
+			state( Gaussian(_mapPtr->x(), _mapPtr->P(),
+					_mapPtr->convertStates(prevObj.state.ia(),_size)) )
+		{
+				category = MAPPABLE_OBJECT;
+		}
 
 	}
 }

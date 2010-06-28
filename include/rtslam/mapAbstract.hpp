@@ -141,9 +141,9 @@ namespace jafar {
 
  		                /**
 				 * From the already-reserved space _ia, keep the first N states in a new index that is returned,
-				 * and liberate all the other states.
+				 * and stored all the other states in _icomp for future liberation.
 				 */
-		                jblas::ind_array convertStates(const jblas::ind_array & _ia,const std::size_t N);
+		                jblas::ind_array convertStates(const jblas::ind_array & _ia,const std::size_t N,jblas::ind_array & _icomp);
 
 				/**
 				 * Liberate the space indicated.

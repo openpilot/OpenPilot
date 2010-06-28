@@ -42,10 +42,10 @@ namespace jafar {
 				category = MAPPABLE_OBJECT;
 		}
 
-		MapObject::MapObject(const map_ptr_t & _mapPtr, const MapObject & prevObj, const size_t _size) :
+		MapObject::MapObject(const map_ptr_t & _mapPtr, const MapObject & prevObj, const size_t _size,jblas::ind_array & _icomp) :
 			ObjectAbstract(),
 			state( Gaussian(_mapPtr->x(), _mapPtr->P(),
-					_mapPtr->convertStates(prevObj.state.ia(),_size)) )
+					_mapPtr->convertStates(prevObj.state.ia(),_size,_icomp)) )
 		{
 				category = MAPPABLE_OBJECT;
 		}

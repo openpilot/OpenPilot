@@ -58,8 +58,9 @@ namespace jafar {
 				 * \param _mapPtr pointer to map
 				 * \parem _previousObj the object to be replaced in the filter. Should by FILTERED
 				 * \param _size the new size of the state vector.
+				 * \param _icomp the complementary of the new state wrt the previous state, ie the memory to be release when relaxing the previous object.
 				 */
-		                MapObject(const map_ptr_t & _mapPtr, const MapObject & _previousObj, const size_t _size);
+		                MapObject(const map_ptr_t & _mapPtr, const MapObject & _previousObj, const size_t _size, jblas::ind_array & _icomp);
 
 				/**
 				 * Mandatory virtual destructor

@@ -74,11 +74,16 @@ namespace jafar {
 			}
 		}
 
-	  jblas::ind_array MapAbstract::convertStates(const jblas::ind_array & _ia,const std::size_t N) {
+	  jblas::ind_array MapAbstract::convertStates(const jblas::ind_array & _ia,const std::size_t N,jblas::ind_array & _icomp) {
 	    if( _ia.size()<N )
 	      {
 		std::cerr << __PRETTY_FUNCTION__ << "(#" << __LINE__ << "): initial size unsufficient." << std::endl;
 		throw "convertStates: size unsufficient.";
+	      }
+	    if( _icomp.size()+N!=_ia.size() )
+	      {
+		std::cerr << __PRETTY_FUNCTION__ << "(#" << __LINE__ << "): initial sizes not consistent." << std::endl;
+		throw "convertStates: sizes inconsistent.";
 	      }
 	    jblas::ind_array res(N);
 	    for( size_t i = 0; i <N;++i )
@@ -87,10 +92,7 @@ namespace jafar {
 	      }
 	    for( size_t i = N+1; i <_ia.size();++i )
 	      {
-		if (used_states(i) == true) {
-		  used_states(i) = false;
-		  current_size += 1;
-		}
+		_icomp(i-(N+1)) = _ia(i);
 	      }
 	    return res;
 	  }

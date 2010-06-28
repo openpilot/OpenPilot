@@ -28,8 +28,8 @@ namespace jafar {
 		/**
 		 * Constructor from a previous lmk
 		 */
- 	        LandmarkEuclideanPoint::LandmarkEuclideanPoint(const map_ptr_t & _mapPtr, const landmark_ptr_t prevlmk) :
-		        LandmarkAbstract(_mapPtr,prevlmk, 3) {
+ 	        LandmarkEuclideanPoint::LandmarkEuclideanPoint(const map_ptr_t & _mapPtr, const landmark_ptr_t prevlmk,jblas::ind_array & _icomp ) :
+		        LandmarkAbstract(_mapPtr,prevlmk,size(),_icomp) {
 			geomType = POINT,
 			type = PNT_EUC;
 		}

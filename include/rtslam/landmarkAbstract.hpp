@@ -75,6 +75,10 @@ namespace jafar {
 				 */
 			LandmarkAbstract(const map_ptr_t & _mapPtr, const size_t _size);
 			LandmarkAbstract(const simulation_t dummy, const map_ptr_t & _mapPtr, const size_t _size);
+		                /**
+				 * Constructor by replacement: occupied the same filter state as a specified previous lmk. _icomp is the complementary memory, to be relaxed by the user.
+				 */
+			LandmarkAbstract(const map_ptr_t & _mapPtr, const landmark_ptr_t & _prevLmk, const size_t _size,jblas::ind_array & _icomp);
 
 				/**
 				 * Mandatory virtual destructor.

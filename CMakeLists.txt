@@ -12,7 +12,7 @@ build_jafar_module(rtslam
   REQUIRED_MODULES kernel image jmath correl
   OPTIONAL_MODULES qdisplay
 
-  REQUIRED_EXTLIBS boost_thread
+  REQUIRED_EXTLIBS boost_thread boost_system boost_filesystem boost_regex
   OPTIONAL_EXTLIBS qt4 viam MTI
 
 #  CXXFLAGS -g -ggdb -O0 -Wall

@@ -16,6 +16,8 @@
 
 
 #include <boost/bind.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/regex.hpp>
 
 #include <image/Image.hpp>
 
@@ -47,8 +49,25 @@ namespace hardware {
 
 		if (mode == 1)
 		{
+			#if 0
+			// TODO test
+			boost::filesystem::path bdump_path(dump_path);
+			if (!exists(bdump_path) || !is_directory(bdump_path)) create_directory(bdump_path);
+			
+			boost::regex pattern1("*.pgm");
+			boost::regex pattern2("*.time");
+			for (boost::filesystem::recursive_directory_iterator it(bdump_path), end; it != end; ++it)
+			{
+				std::string name = it->path().leaf();
+				if (boost::regex_match(name, pattern1) || boost::regex_match(name, pattern2))
+					remove(it->path());
+			}
+			//remove(bdump_path / "*.pgm"); // FIXME possible ?
+			#else
 			std::ostringstream oss; oss << "mkdir -p " << dump_path << " ; rm -f " << dump_path << "/*.pgm ; rm -f " << dump_path << "/*.time" << std::endl;
-			system(oss.str().c_str());
+			int r = system(oss.str().c_str());
+			if (!r) {} // don't care
+			#endif
 		}
 
 		while(true)

@@ -6,9 +6,6 @@
  *
  * \ingroup rtslam
  */
-#include "rtslam/hardwareSensorCameraFirewire.hpp"
-
-#ifdef HAVE_VIAM
 
 #include <algorithm>
 #include <sstream>
@@ -19,12 +16,14 @@
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
 
+#include "rtslam/hardwareSensorCameraFirewire.hpp"
 #include <image/Image.hpp>
 
 namespace jafar {
 namespace rtslam {
 namespace hardware {
 
+#ifdef HAVE_VIAM
 	cv::Size HardwareSensorCameraFirewire::viamSize_to_size(viam_hwsize_t viamsize)
 	{
 		switch (viamsize)
@@ -40,6 +39,7 @@ namespace hardware {
 			default: return cv::Size(0,0);
 		}
 	}
+#endif
 
 	void HardwareSensorCameraFirewire::preloadTask(void)
 	{
@@ -90,8 +90,10 @@ namespace hardware {
 				} else continue;
 			} else
 			{
+#ifdef HAVE_VIAM
 				r = viam_oneshot(handle, bank, buffer+buff_write, &pts, 1);
 				bufferPtr[buff_write]->timestamp = ts.tv_sec + ts.tv_usec*1e-6;
+#endif
 			}
 			// update the buffer infos
 			boost::unique_lock<boost::mutex> l(mutex_data);
@@ -109,9 +111,31 @@ namespace hardware {
 		}
 	}
 
+	void HardwareSensorCameraFirewire::init(int mode, std::string dump_path, cv::Size imgSize)
+	{
+		this->mode = mode;
+		this->dump_path = dump_path;
 
-	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(const std::string &camera_id, viam_hwmode_t &hwmode, int mode, std::string dump_path):
-		mode(mode), dump_path(dump_path)
+		// configure data
+		for(int i = 0; i < 3; ++i)
+		{
+			buffer[i] = cvCreateImage(imgSize, 8, 1);
+			bufferPtr[i].reset(new RawImage()); bufferSpecPtr[i] = SPTR_CAST<RawImage>(bufferPtr[i]);
+			bufferSpecPtr[i]->setJafarImage(jafarImage_ptr_t(new image::Image(buffer[i])));
+		}
+		
+		buff_in_use = 0;
+		buff_write = 1;
+		buff_ready = 2;
+		image_count = 0;
+		index = 0;
+
+		// start acquire task
+		preloadTask_thread = new boost::thread(boost::bind(&HardwareSensorCameraFirewire::preloadTask,this));
+	}
+
+#ifdef HAVE_VIAM
+	void HardwareSensorCameraFirewire::init(const std::string &camera_id, viam_hwmode_t &hwmode, int mode, std::string dump_path)
 	{
 		// configure camera
 		if (mode != 2)
@@ -128,28 +152,26 @@ namespace hardware {
 			r = viam_datatransmit(handle, bank, VIAM_ON);
 		}
 
-		// configure data
-		for(int i = 0; i < 3; ++i)
-		{
-			buffer[i] = cvCreateImage(viamSize_to_size(hwmode.size), 8, 1);
-			bufferPtr[i].reset(new RawImage()); bufferSpecPtr[i] = SPTR_CAST<RawImage>(bufferPtr[i]);
-			bufferSpecPtr[i]->setJafarImage(jafarImage_ptr_t(new image::Image(buffer[i])));
-		}
-		
-		buff_in_use = 0;
-		buff_write = 1;
-		buff_ready = 2;
-		image_count = 0;
-		index = 0;
-
-		// start acquire task
-		preloadTask_thread = new boost::thread(boost::bind(&HardwareSensorCameraFirewire::preloadTask,this));
+		init(mode, dump_path, viamSize_to_size(hwmode.size));
 	}
 
+	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(const std::string &camera_id, viam_hwmode_t &hwmode, int mode, std::string dump_path)
+	{
+		init(camera_id, hwmode, mode, dump_path);
+	}
+#endif
+
+
+	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(cv::Size imgSize, std::string dump_path)
+	{
+		init(2, dump_path, imgSize);
+	}
 	
 	HardwareSensorCameraFirewire::~HardwareSensorCameraFirewire()
 	{
+#ifdef HAVE_VIAM
 		viam_release(handle);
+#endif
 	}
 	
 	
@@ -173,4 +195,3 @@ namespace hardware {
 
 }}}
 
-#endif // #ifdef HAVE_VIAM

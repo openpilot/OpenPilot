@@ -190,10 +190,17 @@ void demo_slam01_main(world_ptr_t *world) {
 	dmPt11->setAlgorithmParams(N_UPDATES);
 	dmPt11->setObservationFactory(obsFact);
 
+	#ifdef HAVE_VIAM
 	viam_hwmode_t hwmode = { VIAM_HWSZ_640x480, VIAM_HWFMT_MONO8, VIAM_HW_FIXED, VIAM_HWFPS_60, VIAM_HWTRIGGER_INTERNAL };
-//	 UNCOMMENT THESE TWO LINES TO ENABLE FIREWIRE CAMERA OPERATION
 	hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode, mode, dump_path));
 	senPtr11->setHardwareSensor(hardSen11);
+	#else
+	if (mode == 2)
+	{
+		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(dump_path, cv::Size(640,480)));
+		senPtr11->setHardwareSensor(hardSen11);
+	}
+	#endif
 
 	// Show empty map
 	cout << *mapPtr << endl;

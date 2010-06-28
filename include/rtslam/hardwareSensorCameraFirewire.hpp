@@ -12,11 +12,13 @@
 #ifndef HARDWARE_SENSOR_CAMERA_FIREWIRE_HPP_
 #define HARDWARE_SENSOR_CAMERA_FIREWIRE_HPP_
 
-#include "jafarConfig.h"
-#ifdef HAVE_VIAM
+#include <jafarConfig.h>
+#include <image/Image.hpp>
 
+#ifdef HAVE_VIAM
 #include <viam/viamlib.h>
 #include <viam/viamcv.h>
+#endif
 
 #include <boost/thread.hpp>
 #include <boost/thread/thread.hpp>
@@ -37,9 +39,10 @@ using triple-buffering.
 class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 {
 	private:
+#ifdef HAVE_VIAM
 		viam_bank_t bank;
 		viam_handle_t handle;
-		
+#endif
 		boost::mutex mutex_data;
 		
 		int buff_in_use;
@@ -57,10 +60,17 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 		boost::thread *preloadTask_thread;
 		void preloadTask(void);
 	
+#ifdef HAVE_VIAM
 		cv::Size viamSize_to_size(viam_hwsize_t viamsize);
+#endif
 	
+		void init(int mode, std::string dump_path, cv::Size imgSize);
+#ifdef HAVE_VIAM
+		void init(const std::string &camera_id, viam_hwmode_t &hwmode, int mode, std::string dump_path);
+#endif
 	public:
 		
+#ifdef HAVE_VIAM
 		/**
 		@param camera_id the Firewire camera id (0x....)
 		@param hwmode the hardware mode
@@ -68,6 +78,11 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 		@param dump_path the path where the images are saved/read... Use a ram disk !!!
 		*/
 		HardwareSensorCameraFirewire(const std::string &camera_id, viam_hwmode_t &hwmode, int mode = 0, std::string dump_path = ".");
+#endif
+		/**
+		Same as before but assumes that mode=2, and doesn't need a camera
+		*/
+		HardwareSensorCameraFirewire(cv::Size imgSize, std::string dump_path = ".");
 		
 		~HardwareSensorCameraFirewire();
 		
@@ -77,5 +92,4 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 
 }}}
 
-#endif // #ifdef HAVE_VIAM
 #endif

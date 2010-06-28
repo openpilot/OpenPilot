@@ -1,33 +1,51 @@
+/**
+******************************************************************************
+*
+* @file       opmapwidget.cpp
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+*             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
+* @brief      The Map Widget, this is the part exposed to the user
+* @see        The GNU Public License (GPL) Version 3
+* @defgroup   OPMapWidget
+* @{
+*
+*****************************************************************************/
+/*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful, but
+* WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+* or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+* for more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program; if not, write to the Free Software Foundation, Inc.,
+* 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+*/
+
 #include "opmapwidget.h"
 #include <QtGui>
 #include <QMetaObject>
+#include "waypointitem.h"
 namespace mapcontrol
 {
-//    OPMapWidget::OPMapWidget(QWidget *parent):QGraphicsView(parent),useOpenGL(false)
-//    {
-//        setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-//
-//        core=new internals::Core;
-//        map=new MapGraphicItem(core);
-//        //text.setZValue(20);
-//        //QGraphicsTextItem *t=new QGraphicsTextItem(map);
-//       // t->setPos(10,10);
-//        mscene.addItem(map);
-//        map->setZValue(-1);
-//        //t->setZValue(10);
-//        this->setScene(&mscene);
-//        this->adjustSize();
-//       // t->setFlag(QGraphicsItem::ItemIsMovable,true);
-//        connect(&mscene,SIGNAL(sceneRectChanged(QRectF)),map,SLOT(resize(QRectF)));
-//        connect(map,SIGNAL(zoomChanged(double)),this,SIGNAL(zoomChanged(double)));
-//    }
+
     OPMapWidget::OPMapWidget(QWidget *parent, Configuration *config):QGraphicsView(parent),configuration(config),followmouse(true)
     {
         setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         core=new internals::Core;
         map=new MapGraphicItem(core,config);
         mscene.addItem(map);
-        map->setZValue(-1);
+//        WayPointItem* item2=new WayPointItem(internals::PointLatLng(20,20),100,map);
+//        item2->setParentItem(map);
+//        item=new WayPointItem(internals::PointLatLng(30,30),30,"kkk",map);
+//        item->setParentItem(map);
+      //  item->setZValue(-2);
+
+      //  map->setZValue(-1);
         this->setScene(&mscene);
         this->adjustSize();
         connect(&mscene,SIGNAL(sceneRectChanged(QRectF)),map,SLOT(resize(QRectF)));
@@ -64,6 +82,10 @@ namespace mapcontrol
         delete map;
         delete core;
         delete configuration;
+        foreach(QGraphicsItem* i,this->items())
+        {
+           delete i;
+        }
     }
     void OPMapWidget::closeEvent(QCloseEvent *event)
     {
@@ -90,5 +112,107 @@ namespace mapcontrol
         p=map->mapFromParent(p);
         currentmouseposition=map->FromLocalToLatLng(p.x(),p.y());
     }
+    ////////////////WAYPOINT////////////////////////
+    WayPointItem* OPMapWidget::WPCreate()
+    {
+        WayPointItem* item=new WayPointItem(this->CurrentPosition(),0,map);
+        ConnectWP(item);
+        item->setParentItem(map);
+        return item;
+    }
+    void OPMapWidget::WPCreate(WayPointItem* item)
+    {
+        ConnectWP(item);
+        item->setParentItem(map);
+    }
+    WayPointItem* OPMapWidget::WPCreate(internals::PointLatLng const& coord,int const& altitude)
+    {
+        WayPointItem* item=new WayPointItem(coord,altitude,map);
+        ConnectWP(item);
+        item->setParentItem(map);
+        return item;
+    }
+    WayPointItem* OPMapWidget::WPCreate(internals::PointLatLng const& coord,int const& altitude, QString const& description)
+    {
+        WayPointItem* item=new WayPointItem(coord,altitude,description,map);
+        ConnectWP(item);
+        item->setParentItem(map);
+        return item;
+    }
+    WayPointItem* OPMapWidget::WPInsert(const int &position)
+    {
+        WayPointItem* item=new WayPointItem(this->CurrentPosition(),0,map);
+        item->SetNumber(position);
+        ConnectWP(item);
+        item->setParentItem(map);
+        emit WPInserted(position,item);
+        return item;
+    }
+    void OPMapWidget::WPInsert(WayPointItem* item,const int &position)
+    {
+        item->SetNumber(position);
+        ConnectWP(item);
+        item->setParentItem(map);
+        emit WPInserted(position,item);
+
+    }
+    WayPointItem* OPMapWidget::WPInsert(internals::PointLatLng const& coord,int const& altitude,const int &position)
+    {
+        WayPointItem* item=new WayPointItem(coord,altitude,map);
+        item->SetNumber(position);
+        ConnectWP(item);
+        item->setParentItem(map);
+        emit WPInserted(position,item);
+        return item;
+    }
+    WayPointItem* OPMapWidget::WPInsert(internals::PointLatLng const& coord,int const& altitude, QString const& description,const int &position)
+    {
+        WayPointItem* item=new WayPointItem(coord,altitude,description,map);
+        item->SetNumber(position);
+        ConnectWP(item);
+        item->setParentItem(map);
+        emit WPInserted(position,item);
+        return item;
+    }
+    void OPMapWidget::WPDelete(WayPointItem *item)
+    {
+        emit WPDeleted(item->Number());
+        delete item;
+    }
+    void OPMapWidget::WPDeleteAll()
+    {
+        foreach(QGraphicsItem* i,map->childItems())
+        {
+            WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);
+            if(w)
+                delete w;
+        }
+    }
+    QList<WayPointItem*> OPMapWidget::WPSelected()
+    {
+        QList<WayPointItem*> list;
+        foreach(QGraphicsItem* i,mscene.selectedItems())
+        {
+            WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);
+            if(w)
+                list.append(w);
+        }
+        return list;
+    }
+    void OPMapWidget::WPRenumber(WayPointItem *item, const int &newnumber)
+    {
+        item->SetNumber(newnumber);
+    }
+
+    void OPMapWidget::ConnectWP(WayPointItem *item)
+    {
+        connect(item,SIGNAL(WPNumberChanged(int,int,WayPointItem*)),this,SIGNAL(WPNumberChanged(int,int,WayPointItem*)));
+        connect(item,SIGNAL(WPValuesChanged(WayPointItem*)),this,SIGNAL(WPValuesChanged(WayPointItem*)));
+        connect(this,SIGNAL(WPInserted(int,WayPointItem*)),item,SLOT(WPInserted(int,WayPointItem*)));
+        connect(this,SIGNAL(WPNumberChanged(int,int,WayPointItem*)),item,SLOT(WPRenumbered(int,int,WayPointItem*)));
+        connect(this,SIGNAL(WPDeleted(int)),item,SLOT(WPDeleted(int)));
+}
+
+    //////////////////////////////////////////////
 
 }

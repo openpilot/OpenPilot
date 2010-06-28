@@ -134,7 +134,6 @@ namespace jafar {
 				bool isInFilter;
 				raw_ptr_t rawPtr;
 				unsigned rawCounter;
-				double lastTimestamp;
 
 			protected:
 				/**

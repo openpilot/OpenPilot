@@ -60,7 +60,6 @@ namespace jafar {
 			        : _robPtr->pose.ia()) {
 			category = SENSOR;
 			rawCounter = 0;
-			lastTimestamp = 0.;
 		}
 
 		SensorAbstract::SensorAbstract(const simulation_t dummy,

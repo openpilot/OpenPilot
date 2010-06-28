@@ -85,7 +85,8 @@ class SensorQt : public SensorDisplay
 		// buffered data
 		image::Image image;
 		int framenumber;
-		double dt;
+		double avg_framerate;
+		double t;
 		// graphical objects
 		qdisplay::Viewer *viewer_;
 		qdisplay::ImageView* view_;
@@ -99,7 +100,8 @@ class SensorQt : public SensorDisplay
 			viewer_->setImageView(view_, 0, 0);
 			viewer_->resize(660,500);
 			framenumber = 0;
-			dt = 0.;
+			t = 0.;
+			avg_framerate = 0.;
 			
 			framenumber_label = new QGraphicsTextItem(view_);
 			//framenumber_label->setFont(QFont( m_label->font().family(), m_fontSize));
@@ -114,11 +116,15 @@ class SensorQt : public SensorDisplay
 		}
 		void bufferize()
 		{
-			raw_ptr_t raw = slamSen_->getRaw();
-			framenumber = slamSen_->rawCounter;
-			dt = slamSen_->rawPtr->timestamp - slamSen_->lastTimestamp;
-			if (raw) image = static_cast<RawImage&>(*raw).img->clone();
-			// TODO set framenumber
+			if (slamSen_->rawCounter != framenumber)
+			{
+				avg_framerate = (slamSen_->rawPtr->timestamp-t)/(slamSen_->rawCounter-framenumber);
+				if (framenumber == 0) avg_framerate = 0.;
+				framenumber = slamSen_->rawCounter;
+				t = slamSen_->rawPtr->timestamp;
+				raw_ptr_t raw = slamSen_->getRaw();
+				if (raw) image = static_cast<RawImage&>(*raw).img->clone();
+			}
 		}
 		void render()
 		{
@@ -127,7 +133,7 @@ class SensorQt : public SensorDisplay
 				case SensorDisplay::stCameraPinhole:
 				case SensorDisplay::stCameraBarreto: {
 					view_->setImage(image);
-					std::ostringstream oss; oss << "#" << framenumber << " - " << std::setprecision(3) << dt*1000 << "ms";
+					std::ostringstream oss; oss << "#" << framenumber << "  |  " << std::setprecision(3) << avg_framerate*1000 << " ms";
 					framenumber_label->setPlainText(oss.str().c_str());
 					break; }
 				default:

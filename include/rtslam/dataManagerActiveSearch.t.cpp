@@ -158,6 +158,7 @@ namespace jafar {
 
 			} // foreach observation
 
+			obsListSorted.clear(); // clear the list now or it will prevent the observation to be destroyed until next frame, and will still be displayed
     }
 
 

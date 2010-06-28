@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>TCPtelemetryOptionsPage</class>
- <widget class="QWidget" name="TCPtelemetryOptionsPage">
+ <class>IPconnectionOptionsPage</class>
+ <widget class="QWidget" name="IPconnectionOptionsPage">
   <property name="geometry">
    <rect>
     <x>0</x>

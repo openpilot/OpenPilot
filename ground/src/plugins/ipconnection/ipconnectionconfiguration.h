@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       TCPtelemetryconfiguration.h
+ * @file       IPconnectionconfiguration.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief
  * @see        The GNU Public License (GPL) Version 3
@@ -25,8 +25,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef TCPtelemetryCONFIGURATION_H
-#define TCPtelemetryCONFIGURATION_H
+#ifndef IPconnectionCONFIGURATION_H
+#define IPconnectionCONFIGURATION_H
 
 #include <coreplugin/iuavgadgetconfiguration.h>
 #include <QtCore/QString>
@@ -34,7 +34,7 @@
 
 using namespace Core;
 
-class TCPtelemetryConfiguration : public IUAVGadgetConfiguration
+class IPconnectionConfiguration : public IUAVGadgetConfiguration
 {
 Q_OBJECT
 Q_PROPERTY(QString HostName READ HostName WRITE setHostName)
@@ -42,8 +42,8 @@ Q_PROPERTY(int Port READ Port WRITE setPort)
 Q_PROPERTY(int UseTCP READ UseTCP WRITE setUseTCP)
 
 public:
-    explicit TCPtelemetryConfiguration(QString classId, const QByteArray &state = 0, QObject *parent = 0);
-    virtual ~TCPtelemetryConfiguration();
+    explicit IPconnectionConfiguration(QString classId, const QByteArray &state = 0, QObject *parent = 0);
+    virtual ~IPconnectionConfiguration();
     QByteArray saveState() const;
     //void savesettings(QSettings* settings) const;
     //void restoresettings(QSettings* settings);
@@ -70,4 +70,4 @@ private:
 
 };
 
-#endif // TCPtelemetryCONFIGURATION_H
+#endif // IPconnectionCONFIGURATION_H

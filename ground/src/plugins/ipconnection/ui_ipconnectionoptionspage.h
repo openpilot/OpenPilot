@@ -1,5 +1,5 @@
 /********************************************************************************
-** Form generated from reading UI file 'TCPtelemetryoptionspage.ui'
+** Form generated from reading UI file 'IPconnectionoptionspage.ui'
 **
 ** Created: Sun Jun 27 12:45:24 2010
 **      by: Qt User Interface Compiler version 4.6.2
@@ -25,7 +25,7 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_TCPtelemetryOptionsPage
+class Ui_IPconnectionOptionsPage
 {
 public:
     QGridLayout *gridLayout;
@@ -37,69 +37,69 @@ public:
     QLineEdit *HostName;
     QLabel *label_2;
 
-    void setupUi(QWidget *TCPtelemetryOptionsPage)
+    void setupUi(QWidget *IPconnectionOptionsPage)
     {
-        if (TCPtelemetryOptionsPage->objectName().isEmpty())
-            TCPtelemetryOptionsPage->setObjectName(QString::fromUtf8("TCPtelemetryOptionsPage"));
-        TCPtelemetryOptionsPage->resize(388, 300);
-        gridLayout = new QGridLayout(TCPtelemetryOptionsPage);
+        if (IPconnectionOptionsPage->objectName().isEmpty())
+            IPconnectionOptionsPage->setObjectName(QString::fromUtf8("IPconnectionOptionsPage"));
+        IPconnectionOptionsPage->resize(388, 300);
+        gridLayout = new QGridLayout(IPconnectionOptionsPage);
         gridLayout->setContentsMargins(0, 0, 0, 0);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         gridLayout->addItem(horizontalSpacer, 0, 3, 1, 1);
 
-        UseTCP = new QRadioButton(TCPtelemetryOptionsPage);
+        UseTCP = new QRadioButton(IPconnectionOptionsPage);
         UseTCP->setObjectName(QString::fromUtf8("UseTCP"));
 
         gridLayout->addWidget(UseTCP, 2, 2, 1, 1);
 
-        UseUDP = new QRadioButton(TCPtelemetryOptionsPage);
+        UseUDP = new QRadioButton(IPconnectionOptionsPage);
         UseUDP->setObjectName(QString::fromUtf8("UseUDP"));
 
         gridLayout->addWidget(UseUDP, 3, 2, 1, 1);
 
-        Port = new QSpinBox(TCPtelemetryOptionsPage);
+        Port = new QSpinBox(IPconnectionOptionsPage);
         Port->setObjectName(QString::fromUtf8("Port"));
         Port->setMinimum(1);
         Port->setMaximum(999999);
 
         gridLayout->addWidget(Port, 4, 2, 1, 1);
 
-        label_3 = new QLabel(TCPtelemetryOptionsPage);
+        label_3 = new QLabel(IPconnectionOptionsPage);
         label_3->setObjectName(QString::fromUtf8("label_3"));
 
         gridLayout->addWidget(label_3, 4, 1, 1, 1);
 
-        HostName = new QLineEdit(TCPtelemetryOptionsPage);
+        HostName = new QLineEdit(IPconnectionOptionsPage);
         HostName->setObjectName(QString::fromUtf8("HostName"));
 
         gridLayout->addWidget(HostName, 0, 2, 1, 1);
 
-        label_2 = new QLabel(TCPtelemetryOptionsPage);
+        label_2 = new QLabel(IPconnectionOptionsPage);
         label_2->setObjectName(QString::fromUtf8("label_2"));
 
         gridLayout->addWidget(label_2, 0, 1, 1, 1);
 
 
-        retranslateUi(TCPtelemetryOptionsPage);
+        retranslateUi(IPconnectionOptionsPage);
 
-        QMetaObject::connectSlotsByName(TCPtelemetryOptionsPage);
+        QMetaObject::connectSlotsByName(IPconnectionOptionsPage);
     } // setupUi
 
-    void retranslateUi(QWidget *TCPtelemetryOptionsPage)
+    void retranslateUi(QWidget *IPconnectionOptionsPage)
     {
-        TCPtelemetryOptionsPage->setWindowTitle(QApplication::translate("TCPtelemetryOptionsPage", "Form", 0, QApplication::UnicodeUTF8));
-        UseTCP->setText(QApplication::translate("TCPtelemetryOptionsPage", "TCP connection", 0, QApplication::UnicodeUTF8));
-        UseUDP->setText(QApplication::translate("TCPtelemetryOptionsPage", "UDP connection", 0, QApplication::UnicodeUTF8));
-        label_3->setText(QApplication::translate("TCPtelemetryOptionsPage", "Port", 0, QApplication::UnicodeUTF8));
-        label_2->setText(QApplication::translate("TCPtelemetryOptionsPage", "Host Name/Number", 0, QApplication::UnicodeUTF8));
+        IPconnectionOptionsPage->setWindowTitle(QApplication::translate("IPconnectionOptionsPage", "Form", 0, QApplication::UnicodeUTF8));
+        UseTCP->setText(QApplication::translate("IPconnectionOptionsPage", "TCP connection", 0, QApplication::UnicodeUTF8));
+        UseUDP->setText(QApplication::translate("IPconnectionOptionsPage", "UDP connection", 0, QApplication::UnicodeUTF8));
+        label_3->setText(QApplication::translate("IPconnectionOptionsPage", "Port", 0, QApplication::UnicodeUTF8));
+        label_2->setText(QApplication::translate("IPconnectionOptionsPage", "Host Name/Number", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };
 
 namespace Ui {
-    class TCPtelemetryOptionsPage: public Ui_TCPtelemetryOptionsPage {};
+    class IPconnectionOptionsPage: public Ui_IPconnectionOptionsPage {};
 } // namespace Ui
 
 QT_END_NAMESPACE

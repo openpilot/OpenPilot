@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       TCPtelemetryoptionspage.cpp
+ * @file       IPconnectionoptionspage.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief
  * @see        The GNU Public License (GPL) Version 3
@@ -25,8 +25,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "tcptelemetryoptionspage.h"
-#include "tcptelemetryconfiguration.h"
+#include "ipconnectionoptionspage.h"
+#include "ipconnectionconfiguration.h"
 #include <QtGui/QLabel>
 #include <QtGui/QComboBox>
 #include <QtGui/QSpinBox>
@@ -35,22 +35,22 @@
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>
 
-#include "ui_tcptelemetryoptionspage.h"
+#include "ui_ipconnectionoptionspage.h"
 
 
-TCPtelemetryOptionsPage::TCPtelemetryOptionsPage(TCPtelemetryConfiguration *config, QObject *parent) :
+IPconnectionOptionsPage::IPconnectionOptionsPage(IPconnectionConfiguration *config, QObject *parent) :
     IOptionsPage(parent),
     m_config(config)
 {
 
 }
-TCPtelemetryOptionsPage::~TCPtelemetryOptionsPage()
+IPconnectionOptionsPage::~IPconnectionOptionsPage()
 {
 }
-QWidget *TCPtelemetryOptionsPage::createPage(QWidget *parent)
+QWidget *IPconnectionOptionsPage::createPage(QWidget *parent)
 {
 
-    m_page = new Ui::TCPtelemetryOptionsPage();
+    m_page = new Ui::IPconnectionOptionsPage();
     QWidget *w = new QWidget(parent);
     m_page->setupUi(w);
 
@@ -62,7 +62,7 @@ QWidget *TCPtelemetryOptionsPage::createPage(QWidget *parent)
     return w;
 }
 
-void TCPtelemetryOptionsPage::apply()
+void IPconnectionOptionsPage::apply()
 {
     m_config->setPort(m_page->Port->value());
     m_config->setHostName(m_page->HostName->text());
@@ -75,7 +75,7 @@ void TCPtelemetryOptionsPage::apply()
 
 }
 
-void TCPtelemetryOptionsPage::finish()
+void IPconnectionOptionsPage::finish()
 {
     delete m_page;
 }

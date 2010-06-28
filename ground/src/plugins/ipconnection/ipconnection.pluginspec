@@ -1,4 +1,4 @@
-<plugin name="TCPtelemetry" version="1.0.0" compatVersion="1.0.0">
+<plugin name="IPconnection" version="1.0.1" compatVersion="1.0.1">
 <vendor>The OpenPilot Project</vendor>
     <copyright>(C) 2010 OpenPilot Project</copyright>
     <license>GNU Public License (GPL) Version 3</license>

@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       TCPtelemetryplugin.h
+ * @file       IPconnectionplugin.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   TCPtelemetry_plugin
+ * @defgroup   IPconnection_plugin
  * @{
  *
  *****************************************************************************/
@@ -25,13 +25,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef TCPtelemetryPLUGIN_H
-#define TCPtelemetryPLUGIN_H
+#ifndef IPconnectionPLUGIN_H
+#define IPconnectionPLUGIN_H
 
-#include "tcptelemetry_global.h"
-#include "tcptelemetryoptionspage.h"
-#include "tcptelemetryconfiguration.h"
-//#include "tcptelemetryfactory.h"
+#include "ipconnection_global.h"
+#include "ipconnectionoptionspage.h"
+#include "ipconnectionconfiguration.h"
 #include "coreplugin/iconnection.h"
 #include <extensionsystem/iplugin.h>
 //#include <QtCore/QSettings>
@@ -47,13 +46,13 @@ class IConnection;
 *   Plugin will add a instance of this class to the pool,
 *   so the connection manager can use it.
 */
-class TCPtelemetry_EXPORT TCPtelemetryConnection
+class IPconnection_EXPORT IPconnectionConnection
     : public Core::IConnection
 {
     Q_OBJECT
 public:
-    TCPtelemetryConnection();
-    virtual ~TCPtelemetryConnection();
+    IPconnectionConnection();
+    virtual ~IPconnectionConnection();
 
     virtual QStringList availableDevices();
     virtual QIODevice *openDevice(const QString &deviceName);
@@ -62,8 +61,8 @@ public:
     virtual QString connectionName();
     virtual QString shortName();
 
-    TCPtelemetryConfiguration * Config() const { return m_config; }
-    TCPtelemetryOptionsPage * Optionspage() const { return m_optionspage; }
+    IPconnectionConfiguration * Config() const { return m_config; }
+    IPconnectionOptionsPage * Optionspage() const { return m_optionspage; }
 
 
 
@@ -71,29 +70,29 @@ protected slots:
     void onEnumerationChanged();
 private:
        QAbstractSocket *tcpSocket;
-       TCPtelemetryConfiguration *m_config;
-       TCPtelemetryOptionsPage *m_optionspage;
+       IPconnectionConfiguration *m_config;
+       IPconnectionOptionsPage *m_optionspage;
        //QSettings* settings;
 
 };
 
 
-class TCPtelemetry_EXPORT TCPtelemetryPlugin
+class IPconnection_EXPORT IPconnectionPlugin
     : public ExtensionSystem::IPlugin
 {
     Q_OBJECT
 
 public:
-    TCPtelemetryPlugin();
-    ~TCPtelemetryPlugin();
+    IPconnectionPlugin();
+    ~IPconnectionPlugin();
 
     virtual bool initialize(const QStringList &arguments, QString *error_message);
     virtual void extensionsInitialized();
 
 private:
-    TCPtelemetryConnection *m_connection;
+    IPconnectionConnection *m_connection;
 
 };
 
 
-#endif // TCPtelemetryPLUGIN_H
+#endif // IPconnectionPLUGIN_H

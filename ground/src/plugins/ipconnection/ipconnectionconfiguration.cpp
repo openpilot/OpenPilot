@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       TCPtelemetryconfiguration.cpp
+ * @file       IPconnectionconfiguration.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief
  * @see        The GNU Public License (GPL) Version 3
@@ -25,11 +25,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "tcptelemetryconfiguration.h"
+#include "ipconnectionconfiguration.h"
 #include <QtCore/QDataStream>
 #include <coreplugin/icore.h>
 
-TCPtelemetryConfiguration::TCPtelemetryConfiguration(QString classId, const QByteArray &state, QObject *parent) :
+IPconnectionConfiguration::IPconnectionConfiguration(QString classId, const QByteArray &state, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),
     m_HostName("127.0.0.1"),
     m_Port(1000),
@@ -37,19 +37,19 @@ TCPtelemetryConfiguration::TCPtelemetryConfiguration(QString classId, const QByt
 {
     settings = Core::ICore::instance()->settings();
 }
-TCPtelemetryConfiguration::~TCPtelemetryConfiguration()
+IPconnectionConfiguration::~IPconnectionConfiguration()
 {
 }
-IUAVGadgetConfiguration *TCPtelemetryConfiguration::clone()
+IUAVGadgetConfiguration *IPconnectionConfiguration::clone()
 {
-    TCPtelemetryConfiguration *m = new TCPtelemetryConfiguration(this->classId());
+    IPconnectionConfiguration *m = new IPconnectionConfiguration(this->classId());
     m->m_Port = m_Port;
     m->m_HostName = m_HostName;
     m->m_UseTCP = m_UseTCP;
     return m;
 }
 
-QByteArray TCPtelemetryConfiguration::saveState() const
+QByteArray IPconnectionConfiguration::saveState() const
 {
    QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::WriteOnly);
@@ -61,9 +61,9 @@ QByteArray TCPtelemetryConfiguration::saveState() const
 }
 
 
-void TCPtelemetryConfiguration::savesettings() const
+void IPconnectionConfiguration::savesettings() const
 {
-    settings->beginGroup(QLatin1String("TCPtelemetryconnection"));
+    settings->beginGroup(QLatin1String("IPconnection"));
 
         settings->beginWriteArray("Current");
         settings->setArrayIndex(0);
@@ -75,9 +75,9 @@ void TCPtelemetryConfiguration::savesettings() const
 }
 
 
-void TCPtelemetryConfiguration::restoresettings()
+void IPconnectionConfiguration::restoresettings()
 {
-    settings->beginGroup(QLatin1String("TCPtelemetryconnection"));
+    settings->beginGroup(QLatin1String("IPconnection"));
 
         settings->beginReadArray("Current");
         settings->setArrayIndex(0);

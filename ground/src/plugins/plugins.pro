@@ -129,7 +129,7 @@ plugin_pfd.depends = plugin_uavobjects
 SUBDIRS += plugin_pfd
 
 
-#TCPtelemetry connection plugin
-plugin_tcptelemetry.subdir = tcptelemetryconnection
-plugin_tcptelemetry.depends = plugin_coreplugin
-SUBDIRS += plugin_tcptelemetry
+#IP connection plugin
+plugin_ipconnection.subdir = ipconnection
+plugin_ipconnection.depends = plugin_coreplugin
+SUBDIRS += plugin_ipconnection

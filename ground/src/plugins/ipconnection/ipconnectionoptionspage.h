@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       TCPtelemetryoptionspage.h
+ * @file       IPconnectionoptionspage.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief
  * @see        The GNU Public License (GPL) Version 3
@@ -25,30 +25,29 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef TCPtelemetryOPTIONSPAGE_H
-#define TCPtelemetryOPTIONSPAGE_H
+#ifndef IPconnectionOPTIONSPAGE_H
+#define IPconnectionOPTIONSPAGE_H
 
 #include "coreplugin/dialogs/ioptionspage.h"
-//#include <QtCore/QSettings>
 
-class TCPtelemetryConfiguration;
+class IPconnectionConfiguration;
 
 namespace Core {
     class IUAVGadgetConfiguration;
 }
 
 namespace Ui {
-    class TCPtelemetryOptionsPage;
+    class IPconnectionOptionsPage;
 }
 
 using namespace Core;
 
-class TCPtelemetryOptionsPage : public IOptionsPage
+class IPconnectionOptionsPage : public IOptionsPage
 {
 Q_OBJECT
 public:
-    explicit TCPtelemetryOptionsPage(TCPtelemetryConfiguration *config, QObject *parent = 0);
-    virtual ~TCPtelemetryOptionsPage();
+    explicit IPconnectionOptionsPage(IPconnectionConfiguration *config, QObject *parent = 0);
+    virtual ~IPconnectionOptionsPage();
 
     QString id() const { return QLatin1String("settings"); }
     QString trName() const { return tr("settings"); }
@@ -64,10 +63,9 @@ signals:
 
 public slots:
 private:
-    TCPtelemetryConfiguration *m_config;
-    Ui::TCPtelemetryOptionsPage *m_page;
-    //QSettings* settings;
+    IPconnectionConfiguration *m_config;
+    Ui::IPconnectionOptionsPage *m_page;
 
 };
 
-#endif // TCPtelemetryOPTIONSPAGE_H
+#endif // IPconnectionOPTIONSPAGE_H

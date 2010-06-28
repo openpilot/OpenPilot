@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       TCPtelemetryplugin.cpp
+ * @file       IPconnectionplugin.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Register connection object for the core connection manager
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   TCPtelemetry_plugin
+ * @defgroup   IPconnection_plugin
  * @{
  *
  *****************************************************************************/
@@ -27,7 +27,7 @@
 
 //The core of this plugin has been directly copied from the serial plugin and converted to work over a TCP link instead of a direct serial link
 
-#include "tcptelemetryplugin.h"
+#include "ipconnectionplugin.h"
 
 
 #include <extensionsystem/pluginmanager.h>
@@ -42,13 +42,13 @@
 
 #include <QDebug>
 
-TCPtelemetryConnection::TCPtelemetryConnection()
+IPconnectionConnection::IPconnectionConnection()
 {
     //create all our objects
-    m_config = new TCPtelemetryConfiguration("IP Network Telemetry", NULL, this);
+    m_config = new IPconnectionConfiguration("IP Network Telemetry", NULL, this);
     m_config->restoresettings();
 
-    m_optionspage = new TCPtelemetryOptionsPage(m_config,this);
+    m_optionspage = new IPconnectionOptionsPage(m_config,this);
 
     //just signal whenever we have a device event...
     QMainWindow *mw = Core::ICore::instance()->mainWindow();
@@ -58,20 +58,20 @@ TCPtelemetryConnection::TCPtelemetryConnection()
                      this, SLOT(onEnumerationChanged()));
 }
 
-TCPtelemetryConnection::~TCPtelemetryConnection()
+IPconnectionConnection::~IPconnectionConnection()
 {
     //tcpSocket->close ();
     //delete(tcpSocket);
 }
 
-void TCPtelemetryConnection::onEnumerationChanged()
+void IPconnectionConnection::onEnumerationChanged()
 {//no change from serial plugin
     emit availableDevChanged(this);
 }
 
 
 
-QStringList TCPtelemetryConnection::availableDevices()
+QStringList IPconnectionConnection::availableDevices()
 {
     QStringList list;
 
@@ -81,7 +81,7 @@ QStringList TCPtelemetryConnection::availableDevices()
     return list;
 }
 
-QIODevice *TCPtelemetryConnection::openDevice(const QString &deviceName)
+QIODevice *IPconnectionConnection::openDevice(const QString &deviceName)
 {
            const int Timeout = 5 * 1000;
             int state;
@@ -123,7 +123,7 @@ QIODevice *TCPtelemetryConnection::openDevice(const QString &deviceName)
     return tcpSocket;
 }
 
-void TCPtelemetryConnection::closeDevice(const QString &deviceName)
+void IPconnectionConnection::closeDevice(const QString &deviceName)
 {
     //still having problems with the app crashing when we reference the tcpsocket outside the openDevice function...
     //tcpSocket->close ();
@@ -134,12 +134,12 @@ void TCPtelemetryConnection::closeDevice(const QString &deviceName)
 }
 
 
-QString TCPtelemetryConnection::connectionName()
+QString IPconnectionConnection::connectionName()
 {//updated from serial plugin
     return QString("Network telemetry port");
 }
 
-QString TCPtelemetryConnection::shortName()
+QString IPconnectionConnection::shortName()
 {//updated from serial plugin
     if (m_config->UseTCP()) {
         return QString("TCP");
@@ -149,25 +149,25 @@ QString TCPtelemetryConnection::shortName()
 }
 
 
-TCPtelemetryPlugin::TCPtelemetryPlugin()
+IPconnectionPlugin::IPconnectionPlugin()
 {//no change from serial plugin
 }
 
-TCPtelemetryPlugin::~TCPtelemetryPlugin()
+IPconnectionPlugin::~IPconnectionPlugin()
 {//manually remove the options page object
     removeObject(m_connection->Optionspage());
 }
 
-void TCPtelemetryPlugin::extensionsInitialized()
+void IPconnectionPlugin::extensionsInitialized()
 {
     addAutoReleasedObject(m_connection);
 }
 
-bool TCPtelemetryPlugin::initialize(const QStringList &arguments, QString *errorString)
+bool IPconnectionPlugin::initialize(const QStringList &arguments, QString *errorString)
 {
     Q_UNUSED(arguments);
     Q_UNUSED(errorString);
-    m_connection = new TCPtelemetryConnection();
+    m_connection = new IPconnectionConnection();
     //must manage this registration of child object ourselves
     //if we use an autorelease here it causes the GCS to crash
     //as it is deleting objects as the app closes...
@@ -176,4 +176,4 @@ bool TCPtelemetryPlugin::initialize(const QStringList &arguments, QString *error
     return true;
 }
 
-Q_EXPORT_PLUGIN(TCPtelemetryPlugin)
+Q_EXPORT_PLUGIN(IPconnectionPlugin)

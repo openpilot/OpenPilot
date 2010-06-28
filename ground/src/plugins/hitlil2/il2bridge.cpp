@@ -140,24 +140,18 @@ void Il2Bridge::transmitUpdate()
 {
     // Read ActuatorDesired from autopilot
     ActuatorDesired::DataFields actData = actDesired->getData();
-    float ailerons = actData.Roll;
-    float elevator = -actData.Pitch;
-    float rudder = actData.Yaw;
-    float throttle = actData.Throttle;
+    float ailerons = (actData.Roll/50.0)-1.0;
+    float elevator = (actData.Pitch/50.0)-1.0;
+    float rudder = (actData.Yaw/50.0)-1.0;
+    float throttle = (actData.Throttle/50.0)-1.0;
 
     // Send update to Il2
-//    QString cmd;
-//    cmd = QString("%1,%2,%3,%4\n")
-//          .arg(ailerons)
-//          .arg(elevator)
-//          .arg(rudder)
-//          .arg(throttle);
     QString cmd;
-    cmd=QString("R/30/32/38/40/42/46/48/81\\%1/85\\%2/87\\%3/89\\%4/")
-    	.arg(throttle*2.0-1.0)
-	.arg(ailerons)
-	.arg(elevator)
-	.arg(rudder);
+    cmd=QString("R/30/32/40/42/46/48/81\\%1/85\\%2/87\\%3/89\\%4/")
+    	.arg(throttle)
+    	.arg(ailerons)
+    	.arg(elevator)
+    	.arg(rudder);
     QByteArray data = cmd.toAscii();
     outSocket->write(data);
 }
@@ -173,9 +167,6 @@ void Il2Bridge::receiveUpdate()
         il2ConnectionStatus = true;
         emit il2Connected();
     }
-//QMessageBox msgBox;
-//msgBox.setText((const QString )"live!");
-//msgBox.exec();
     // Process data
     while ( outSocket->bytesAvailable() > 0 )
     {
@@ -248,76 +239,96 @@ void Il2Bridge::onIl2ConnectionTimeout()
     }
 }
 
+/**
+ * calculate air density from altitude
+ */
 float Il2Bridge::DENSITY(float alt) {
 	return (GROUNDDENSITY * pow(
-				(TEMP_GROUND+(TEMP_LAPSE_RATE*alt)/TEMP_GROUND),
+				((TEMP_GROUND+(TEMP_LAPSE_RATE*alt))/TEMP_GROUND),
 				((AIR_CONST_FACTOR/TEMP_LAPSE_RATE)-1) )
 				);
 }
 
+/**
+ * calculate air pressure from altitude
+ */
 float Il2Bridge::PRESSURE(float alt) {
-	return DENSITY(alt)*alt*TEMP_LAPSE_RATE*TEMP_GROUND*AIR_CONST;
+	return DENSITY(alt)*(TEMP_GROUND+(alt*TEMP_LAPSE_RATE))*AIR_CONST;
 	
 }
 
+/**
+ * calculate TAS from IAS and altitude
+ */
 float Il2Bridge::TAS(float IAS, float alt) {
 	return (IAS*sqrt(GROUNDDENSITY/DENSITY(alt)));
 }
 
+/**
+ * process data string from flight simulator
+ */
 void Il2Bridge::processUpdate(QString& data)
 {
-return;
+    // save old flight data to calculate delta's later
+    old=current;
+
     // Split
     QStringList fields = data.split("/");
 
-    old=current;
-
+    // split up response string
     int t;
     for (t=0; t<fields.length(); t++) {
     	QStringList values = fields[t].split("\\");
-	int id = values[0].toInt();
-	float value = values[1].toFloat();
-	switch (id) {
-	    case 30:
-	        current.ias=value * KMH2MPS;
-		break;
-	    case 32:
-	        current.dZ=value;
-		break;
-	    case 38:
-	        //angular_speed=value;
-		break;
-	    case 40:
-	        current.Z=value;
-		break;
-	    case 42:
-	        current.azimuth=value;
-		break;
-	    case 46:
-	        current.roll=value;
-		break;
-	    case 48:
-	        current.pitch=value;
-		break;
-        }
+	// parse values
+	if (values.length()>=2) {
+	    int id = values[0].toInt();
+	    float value = values[1].toFloat();
+	    switch (id) {
+	        case 30:
+		    current.ias=value * KMH2MPS;
+		    break;
+	        case 32:
+		    current.dZ=value;
+		    break;
+	        case 40:
+		    current.Z=value;
+		    break;
+	        case 42:
+		    current.azimuth=value;
+		    break;
+	        case 46:
+		    current.roll=value;
+		    break;
+	        case 48:
+		    current.pitch=value;
+		    break;
+	    }
+	}
     }
 
+    // measure time
     current.dT = ((float)time->restart()) / 1000.0;
     current.T = old.T+current.dT;
 
+    // calculate TAS from alt and IAS
     current.tas = TAS(current.ias,current.Z);
+
+    // assume the plane actually flies straight and no wind
+    // groundspeed is horizontal vector of TAS
     current.groundspeed = current.tas*cos(current.pitch*DEG2RAD);
+    // x and y vector components
     current.dX = current.groundspeed*sin(current.azimuth*DEG2RAD);
     current.dY = current.groundspeed*cos(current.azimuth*DEG2RAD);
 
-    current.X = old.X + (current.dX/current.dT);
-    current.Y = old.Y + (current.dY/current.dT);
+    // simple IMS - integration over time the easy way...
+    current.X = old.X + (current.dX*current.dT);
+    current.Y = old.Y + (current.dY*current.dT);
 
     // Update AltitudeActual object
     AltitudeActual::DataFields altActualData;
     altActualData.Altitude = current.Z;
-    altActualData.Temperature = (TEMP_GROUND * current.Z * TEMP_LAPSE_RATE)+273.0;
-    altActualData.Pressure = PRESSURE(current.Z)*1000.0; // kpa
+    altActualData.Temperature = TEMP_GROUND + (current.Z * TEMP_LAPSE_RATE) - 273.0;
+    altActualData.Pressure = PRESSURE(current.Z)/1000.0; // kpa
     altActual->setData(altActualData);
 
     // Update attActual object

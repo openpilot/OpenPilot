@@ -133,3 +133,11 @@ SUBDIRS += plugin_pfd
 plugin_ipconnection.subdir = ipconnection
 plugin_ipconnection.depends = plugin_coreplugin
 SUBDIRS += plugin_ipconnection
+
+#HITLIL2 Simulation Gadget
+plugin_hitlil2.subdir = hitlil2
+plugin_hitlil2.depends = plugin_coreplugin
+plugin_hitlil2.depends += plugin_uavobjects
+plugin_hitlil2.depends += plugin_uavtalk
+SUBDIRS += plugin_hitlil2
+

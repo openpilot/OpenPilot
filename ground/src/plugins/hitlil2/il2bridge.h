@@ -43,6 +43,9 @@
 #include "uavobjects/gcstelemetrystats.h"
 
 
+/**
+ * just imagine this was a class without methods and all public properties
+ */
 struct flightParams {
 
 	// time
@@ -107,8 +110,7 @@ private:
     static const float DEG2RAD = (M_PI/180.0);
     static const float M2DEG =  60.*1852.; // 60 miles per degree times 1852 meters per mile
     static const float DEG2M = (1.0/(60.*1852.));
-
-    static const float AIR_CONST = 8314.32; // N*m/(Kmol*K) 
+    static const float AIR_CONST = 287.058; // J/(kg*K)
     static const float GROUNDDENSITY = 1.225; // kg/m³ ;)
     static const float TEMP_GROUND = (15.0 + 273.0); // 15°C in Kelvin
     static const float TEMP_LAPSE_RATE = -0.0065; //degrees per meter

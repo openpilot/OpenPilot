@@ -65,22 +65,29 @@ std::string dump_path = ".";
 
 void demo_slam01_main(world_ptr_t *world) {
 
+	// time
+	const int N_FRAMES = 5000;
+//	const double FRAME_RATE = 60;
+
+	// map
 	const int MAP_SIZE = 250;
 
-	const int N_FRAMES = 5000;
-
+	// robot
 	const double UNCERT_VLIN = 0.1; // m/s
 	const double UNCERT_VANG = 0.1; // rad/s
 	const double PERT_VLIN = 1; // m/s per sqrt(s)
 	const double PERT_VANG = 1; // rad/s per sqrt(s)
 
-	const double FRAME_RATE = 60;
-
+	// pin-hole
 	const int IMG_WIDTH = 640;
 	const int IMG_HEIGHT = 480;
 	const double PIX_NOISE = 1.0;
-	const double D_MIN = 0.1;
 
+	// lmk
+	const double D_MIN = 0.1;
+	const double REPARAM_TH = 0.1;
+
+	// data manager
 	const int GRID_VCELLS = 4;
 	const int GRID_HCELLS = 4;
 	const int GRID_MARGIN = 10;
@@ -148,7 +155,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	robPtr1->linkToParentMap(mapPtr);
 	robPtr1->state.clear();
 	robPtr1->pose.x(quaternion::originFrame());
-	robPtr1->dt_or_dx = 1. / FRAME_RATE;
+//	robPtr1->dt_or_dx = 1. / FRAME_RATE;
 	double _v[6] = { PERT_VLIN, PERT_VLIN, PERT_VLIN, PERT_VANG, PERT_VANG, PERT_VANG };
 	robPtr1->perturbation.clear();
 	robPtr1->perturbation.set_std_continuous(createVector<6> (_v));

@@ -21,67 +21,55 @@
 #include "rtslam/dataManagerAbstract.hpp"
 
 namespace jafar {
-  namespace rtslam {
-    using namespace std;
+	namespace rtslam {
+		using namespace std;
 
+		observation_ptr_t MapManagerAbstract::createNewLandmark(
+		    data_manager_ptr_t dmaOrigin) {
+			landmark_ptr_t newLmk = createLandmarkInit();
+			newLmk->setId();
+			newLmk->linkToParentMapManager(shared_from_this());
+			observation_ptr_t resObs;
 
+			for (MapManagerAbstract::DataManagerList::iterator iterDMA =
+			    dataManagerList().begin(); iterDMA != dataManagerList().end(); ++iterDMA) {
+				data_manager_ptr_t dma = *iterDMA;
+				observation_ptr_t newObs =
+				    dma->observationFactory()->create(dma->sensorPtr(), newLmk);
 
-    observation_ptr_t MapManagerAbstract::
-    createNewLandmark( data_manager_ptr_t dmaOrigin )
-    {
-      landmark_ptr_t newLmk = createLandmarkInit();
-      newLmk->setId();
-      newLmk->linkToParentMapManager( shared_from_this() );
-      observation_ptr_t resObs;
+				/* Insert the observation in the graph. */
+				newObs->linkToParentDataManager(dma);
+				newObs->linkToParentLandmark(newLmk);
+				newObs->linkToSensor(dma->sensorPtr());
+				newObs->linkToSensorSpecific(dma->sensorPtr());
+				newObs->setId();
 
-      for( MapManagerAbstract::DataManagerList::iterator
-	     iterDMA = dataManagerList().begin();
-	   iterDMA!=dataManagerList().end();++iterDMA )
-	{
-	  data_manager_ptr_t dma = *iterDMA;
-	  observation_ptr_t newObs
-	    = dma->observationFactory()->create( dma->sensorPtr(),newLmk );
+				/* Store for the return the obs corresponding to the dma origin. */
+				if (dma == dmaOrigin) resObs = newObs;
+			}
+			return resObs;
+		}
 
-	  /* Insert the observation in the graph. */
-	  newObs->linkToParentDataManager( dma );
-	  newObs->linkToParentLandmark( newLmk );
-	  newObs->linkToSensor( dma->sensorPtr() );
-	  newObs->linkToSensorSpecific(dma->sensorPtr());
-	  newObs->setId();
+		void MapManagerAbstract::manageMap(void) {
+			// foreach lmk
+			for (LandmarkList::iterator iterLmk = landmarkList().begin(); iterLmk
+			    != landmarkList().end(); ++iterLmk) {
+				landmark_ptr_t lmk = *iterLmk;
+				if (0)//TODO-NMSD lmk->needToDie() )
+				{
+					iterLmk++;
+					killLandmark(lmk);
+					iterLmk--;
+				} else if (0)//TODO-NMSD  lmk->needToReparametrize() )
+				{
+					iterLmk++;
+					reparametrizeLandmark(lmk);
+					iterLmk--;
+				}
+			}
+		}
 
-
-
-
-	  /* Store for the return the obs corresponding to the dma origin. */
-	  if(dma == dmaOrigin) resObs = newObs;
 	}
-      return resObs;
-    }
-
-
-    void MapManagerAbstract::
-    manageMap( void )
-    {
-      // foreach lmk
-      for( LandmarkList::iterator iterLmk = landmarkList().begin();
-	   iterLmk!=landmarkList().end(); ++iterLmk )
-      {
-	landmark_ptr_t lmk = *iterLmk;
-	if(0)//TODO-NMSD lmk->needToDie() )
-	  {
-	    iterLmk++;
-	    killLandmark(lmk);
-	    iterLmk--;
-	  }
-	else if(0)//TODO-NMSD  lmk->needToReparametrize() )
-	  {
-	    iterLmk++;
-	    reparametrizeLandmark(lmk);
-	    iterLmk--;
-	  }
-      }
-    }
-
-
-  };
-};
+	;
+}
+;

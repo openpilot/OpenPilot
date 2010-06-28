@@ -124,7 +124,7 @@ namespace jafar {
 
 				// - call filter->reparametrize()
 					cout << __PRETTY_FUNCTION__ << "about to call filter->reparametrize()" << endl;
-					mapManagerPtr()->mapPtr()->filterPtr->reparametrize(mapPtr()->ia_used_states(), LMKNEW_lmk, this->state.ia(), lmkPtr->state.ia());
+					mapManagerPtr()->mapPtr()->filterPtr->reparametrize(mapManagerPtr()->mapPtr()->ia_used_states(), LMKNEW_lmk, this->state.ia(), lmkPtr->state.ia());
 
 				// - transfer info from the old lmk to the new one
 					landmark_ptr_t lmkPtrOld = this->shared_from_this();

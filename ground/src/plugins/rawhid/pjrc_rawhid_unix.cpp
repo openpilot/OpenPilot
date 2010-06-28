@@ -84,7 +84,7 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
     hid_t *hid;
 
     if (first_hid) free_all_hid();
-    printf("pjrc_rawhid_open, max=%d\n", max);
+    //printf("pjrc_rawhid_open, max=%d\n", max);
     if (max < 1) return 0;
     usb_init();
     usb_find_busses();

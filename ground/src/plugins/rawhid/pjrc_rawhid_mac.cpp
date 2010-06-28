@@ -96,7 +96,7 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
     int count=0;
 
     if (first_hid) free_all_hid();
-    printf("pjrc_rawhid_open, max=%d\n", max);
+    //printf("pjrc_rawhid_open, max=%d\n", max);
     if (max < 1) return 0;
     // Start the HID Manager
     // http://developer.apple.com/technotes/tn2007/tn2187.html

@@ -46,7 +46,7 @@ GLC_Shader::GLC_Shader()
 , m_ProgramShader(0)
 , m_Name("Empty Shader")
 {
-	qDebug() << "Create Shader";
+        //qDebug() << "Create Shader";
 }
 
 // Construct shader with specifie vertex and fragment
@@ -58,7 +58,7 @@ GLC_Shader::GLC_Shader(QFile& vertex, QFile& fragment)
 , m_ProgramShader(0)
 , m_Name()
 {
-	qDebug() << "Create Shader";
+        //qDebug() << "Create Shader";
 	setVertexAndFragmentShader(vertex, fragment);
 }
 
@@ -71,7 +71,7 @@ GLC_Shader::GLC_Shader(const GLC_Shader& shader)
 , m_ProgramShader(0)
 , m_Name(shader.m_Name)
 {
-	qDebug() << "Create Shader";
+        //qDebug() << "Create Shader";
 	if (0 != shader.m_ProgramShader)
 	{
 		createAndCompileProgrammShader();
@@ -80,7 +80,7 @@ GLC_Shader::GLC_Shader(const GLC_Shader& shader)
 
 GLC_Shader::~GLC_Shader()
 {
-	qDebug() << "GLC_Shader::~GLC_Shader";
+        //qDebug() << "GLC_Shader::~GLC_Shader";
 	deleteShader();
 }
 
@@ -214,7 +214,7 @@ void GLC_Shader::createAndLinkVertexShader()
 //Delete the shader
 void GLC_Shader::deleteShader()
 {
-	qDebug() << "delete Shader";
+        //qDebug() << "delete Shader";
 	if (m_ProgramShader != 0)
 	{
 		// Test if the shader is the current one

@@ -225,11 +225,11 @@ namespace jafar {
 			}
 
 			// kill unstable and inconsistent lmks
-			if (counters.nSearch > 10) {
+			if (counters.nSearch > 30) {
 				double matchRatio = counters.nMatch / (double) counters.nSearch;
 				double consistencyRatio = counters.nInlier / (double)counters.nMatch;
 
-				if (matchRatio < 0.7 || consistencyRatio < 0.7)	{
+				if (matchRatio < 0.5 || consistencyRatio < 0.5)	{
 //					cout << "Killed by unstability." << endl;
 					return true;
 				}

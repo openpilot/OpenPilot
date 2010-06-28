@@ -52,7 +52,7 @@ namespace jafar {
 				 * dmaOrigin. */
 				observation_ptr_t createNewLandmark(data_manager_ptr_t dmaOrigin);
 				void reparametrizeLandmark(landmark_ptr_t lmk);
-				void killLandmark(landmark_ptr_t lmk,
+				void unregisterLandmark(landmark_ptr_t lmk,
 						  bool liberateFilter=true);
 				void manage(void);
 				void manageMap(void);

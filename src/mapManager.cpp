@@ -50,7 +50,7 @@ namespace jafar {
 			return resObs;
 		}
 
-	  void MapManagerAbstract::killLandmark(landmark_ptr_t lmkPtr,bool liberateFilter){
+	  void MapManagerAbstract::unregisterLandmark(landmark_ptr_t lmkPtr,bool liberateFilter){
 			// first unlink all observations
 			for (LandmarkAbstract::ObservationList::iterator obsIter =
 			    lmkPtr->observationList().begin(); obsIter != lmkPtr->observationList().end(); ++obsIter) {
@@ -73,7 +73,7 @@ namespace jafar {
 				if (lmkPtr->needToDie() )
 				{
 					lmkIter++;
-					killLandmark(lmkPtr);
+					unregisterLandmark(lmkPtr);
 					lmkIter--;
 				} else if (lmkPtr->needToReparametrize() )
 				{
@@ -88,15 +88,21 @@ namespace jafar {
 
     void MapManagerAbstract::reparametrizeLandmark( landmark_ptr_t lmkinit )
     {
-cout<<__PRETTY_FUNCTION__<<"(#"<<__LINE__<<"): " <<"" << endl;
+//cout<<__PRETTY_FUNCTION__<<"(#"<<__LINE__<<"): " <<"" << endl;
 
-      // 1. Create a new landmark advanced instead of the previous init lmk.
+			// unregister lmk
+			unregisterLandmark( lmkinit,false );
+
+      // Create a new landmark advanced instead of the previous init lmk.
       jblas::ind_array idxComp( sizeComplement() );
        //cout << __PRETTY_FUNCTION__ << "about to create lmkcv." << endl;
      landmark_ptr_t lmkcv = createLandmarkConverged( lmkinit,idxComp );
 
-      // 2. Algebra: 2a. compute the jac and 2b. update the filter.
-      // 2a. Call reparametrize_func()
+     // link new landmark
+     lmkcv->linkToParentMapManager( shared_from_this() );
+
+      // Algebra: 2a. compute the jac and 2b. update the filter.
+      // a. Call reparametrize_func()
       const size_t ninit = lmkinit->mySize();
       const size_t ncv = lmkcv->mySize();
       mat SCV_sinit(ncv,ninit);
@@ -105,13 +111,17 @@ cout<<__PRETTY_FUNCTION__<<"(#"<<__LINE__<<"): " <<"" << endl;
       //cout << __PRETTY_FUNCTION__ << "about to call lmk->reparametrize_func()" << endl;
       lmkinit->reparametrize_func(sinit,scv,SCV_sinit);
 
-      // 2b. Call filter->reparametrize().
+      // b. Call filter->reparametrize().
       //cout << __PRETTY_FUNCTION__ << "about to call filter->reparametrize()" << endl;
+      lmkcv->state.x() = scv;
       mapPtr()->filterPtr->reparametrize(mapPtr()->ia_used_states(),SCV_sinit,
 					 lmkinit->state.ia(),lmkcv->state.ia());
-      lmkcv->state.x() = scv;
 
-      // 3a. Create the cv-lmk set of observations, one per sensor.
+      // Transfer info from the old lmk to the new one.
+      //cout << __PRETTY_FUNCTION__ << "about to transfer lmk info." << endl;
+      lmkcv->transferInfoLmk(lmkinit);
+
+      // Create the cv-lmk set of observations, one per sensor.
       for (LandmarkAbstract::ObservationList::iterator obsIter
 	     = lmkinit->observationList().begin();
 	   obsIter != lmkinit->observationList().end(); ++obsIter )
@@ -126,18 +136,12 @@ cout<<__PRETTY_FUNCTION__<<"(#"<<__LINE__<<"): " <<"" << endl;
 	  obscv->linkToParentLandmark(lmkcv);
 	  obscv->linkToSensor(sen);
 	  obscv->linkToSensorSpecific(sen);
+	  // transfer info to new obs
 	  obscv->transferInfoObs(obsinit);
 	}
 
-      // 4. Transfer info from the old lmk to the new one.
-      //cout << __PRETTY_FUNCTION__ << "about to transfer lmk info." << endl;
-      lmkcv->transferInfoLmk(lmkinit);
-
-      // 5. Kill old lmk and register new one.
-      //cout << __PRETTY_FUNCTION__ << "about to killkill." << endl;
-      killLandmark( lmkinit,false );
+      // liberate unused map space.
       mapPtr()->liberateStates(idxComp);
-      lmkcv->linkToParentMapManager( shared_from_this() );
 
     }
 

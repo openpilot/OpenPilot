@@ -105,7 +105,7 @@ namespace jafar {
 				int j = _ia(i);
 				if (used_states(j) == true) {
 					used_states(j) = false;
-					current_size += 1;
+					current_size -= 1;
 				}
 			}
 		}

@@ -176,7 +176,8 @@ class ObservationQt : public ObservationDisplay
 		// TODO grid
 		// graphical objects
 		qdisplay::ImageView* view_; // not owner
-		std::list<QGraphicsItemGroup*> items_;
+		typedef std::list<qdisplay::Shape*> ItemList;
+		ItemList items_;
 	public:
 		ObservationQt(rtslam::ObservationAbstract *_slamObs, SensorQt *_dispSen):
 			ObservationDisplay(_slamObs, _dispSen), view_(_dispSen->view_)
@@ -199,7 +200,7 @@ class ObservationQt : public ObservationDisplay
 		~ObservationQt()
 		{
 //JFR_DEBUG("deleting ObservationQt and all the graphics objects " << items_.size());
-			for(std::list<QGraphicsItemGroup*>::iterator it = items_.begin(); it != items_.end(); ++it)
+			for(ItemList::iterator it = items_.begin(); it != items_.end(); ++it)
 			{
 				//(*it)->setParentItem(NULL);
 				//viewer_->scene()->removeItem(*it);
@@ -217,6 +218,7 @@ class ObservationQt : public ObservationDisplay
 					matched_ = slamObs_->events.matched;
 					visible_ = slamObs_->events.visible;
 					updated_ = slamObs_->events.updated;
+					landmarkPhase_ = LandmarkDisplay::convertPhase(&*slamObs_->landmarkPtr());
 					id_ = slamObs_->landmarkPtr()->id();
 					if (visible_)
 					{
@@ -248,7 +250,6 @@ class ObservationQt : public ObservationDisplay
 			{
 				case LandmarkDisplay::ltPoint:
 				{
-					qdisplay::Shape *s;
 					// Build display objects if it is the first time they are displayed
 					if (items_.size() != 3)
 					{
@@ -264,80 +265,81 @@ class ObservationQt : public ObservationDisplay
 							measObs_.clear();
 						}
 						
-						colorRGB c ;
-						lmk_state lmkstate ;
-						lmk_state_advanced lmkstateadvanced = lmk_state_advanced_not_predicted ;
-						if (landmarkPhase_==LandmarkDisplay::init) {
-							lmkstate = lmk_state_init ;
-						}
-						if (landmarkPhase_==LandmarkDisplay::converged) {
-							lmkstate = lmk_state_converged ;
-						}
-						if (predicted_) {
-							lmkstateadvanced = lmk_state_advanced_predicted ;
-						}
-						if (matched_) {
-							lmkstateadvanced = lmk_state_advanced_matched ;
-						}
-						if (updated_) {
-						lmkstateadvanced = lmk_state_advanced_updated ;
-						}
-
-
+						qdisplay::Shape *s;
 
 						// prediction point
 						s = new qdisplay::Shape(qdisplay::Shape::ShapeCross, predObs_(0), predObs_(1), 3, 3);
-						c = getColorRGB(getColorObject_prediction(lmk_state_init,lmk_state_advanced_not_predicted)) ;
-						s->setColor(c.R,c.G,c.B); // yellow
+						s->setColor(0,0,0);
 						s->setFontSize(8);
-						s->setFontColor(c.R,c.G,c.B); // yellow
+						s->setFontColor(0,0,0);
+						s->setVisible(false);
 						items_.push_back(s);
 						view_->addShape(s);
 						
 						// prediction ellipse
-						c = getColorRGB(getColorObject_prediction(lmk_state_init,lmk_state_advanced_not_predicted)) ;
 						s = new qdisplay::Ellipsoid(predObs_, predObsCov_, 3.0);
-						s->setColor(c.R,c.G,c.B); // yellow
+						s->setColor(0,0,0);
+						s->setVisible(false);
 						items_.push_back(s);
 						view_->addShape(s);
 						
 						// measure point
-						c = getColorRGB(getColorObject_measure(lmk_state_init,lmk_state_advanced_not_predicted)) ;
 						s = new qdisplay::Shape(qdisplay::Shape::ShapeCross, measObs_(0), measObs_(1), 3, 3, 45);
-						s->setColor(c.R,c.G,c.B); // red
+						s->setColor(0,0,0);
+						s->setVisible(false);
 						items_.push_back(s);
 						view_->addShape(s);
 						
 					}
 					// Refresh the display objects every time
 					{
+						colorRGB c; c.set(255,255,255);
+						lmk_state lmkstate = lmk_state_init;
+						if (landmarkPhase_==LandmarkDisplay::init)      lmkstate = lmk_state_init ;
+						if (landmarkPhase_==LandmarkDisplay::converged) lmkstate = lmk_state_converged ;
+						lmk_state_advanced lmkstateadvanced = lmk_state_advanced_not_predicted ;
+						if (predicted_) lmkstateadvanced = lmk_state_advanced_predicted ;
+						if (matched_)   lmkstateadvanced = lmk_state_advanced_matched ;
+						if (updated_)   lmkstateadvanced = lmk_state_advanced_updated ;
+
+
 						bool dispPred = visible_ && predicted_;
 						bool dispMeas = visible_ && (matched_ || !predicted_);
+
 						// prediction point
-						std::list<QGraphicsItemGroup*>::iterator it = items_.begin();
-						s = static_cast<qdisplay::Shape*>(*it);
-						std::ostringstream oss; oss << id_; if (dispMeas) oss << " - " << int(match_score*100);
-						s->setLabel(oss.str().c_str());
-						(*it)->setVisible(dispPred);
+						ItemList::iterator it = items_.begin();
 						if (dispPred)
+						{
+							c = getColorRGB(getColorObject_prediction(lmkstate,lmkstateadvanced)) ;
+							(*it)->setColor(c.R,c.G,c.B); //
+							(*it)->setFontColor(c.R,c.G,c.B); //
+							std::ostringstream oss; oss << id_; if (dispMeas) oss << " - " << int(match_score*100);
+							(*it)->setLabel(oss.str().c_str());
 							(*it)->setPos(predObs_(0), predObs_(1));
+						}
+						(*it)->setVisible(dispPred);
 						
 						// prediction ellipse
 						++it;
-						(*it)->setVisible(dispPred);
 						if (dispPred)
 						{
+							(*it)->setColor(c.R,c.G,c.B); // yellow
 							qdisplay::Ellipsoid *ell = dynamic_cast<qdisplay::Ellipsoid*>(*it);
 							ell->set(predObs_, predObsCov_, 3.0);
 						}
+						(*it)->setVisible(dispPred);
 						
 						// measure point
 						++it;
 //std::cout << "display obs " << id_ << " with flags visible " << visible_ << " matched " << matched_
 //		<< " predicted " << predicted_ << " position " << measObs_ << std::endl;
-						(*it)->setVisible(dispMeas);
 						if (dispMeas)
+						{
+							c = getColorRGB(getColorObject_measure(lmkstate,lmkstateadvanced)) ;
+							(*it)->setColor(c.R,c.G,c.B); // red
 							(*it)->setPos(measObs_(0), measObs_(1));
+						}
+						(*it)->setVisible(dispMeas);
 
 #if EMBED_PREDICTED_APP
 						// display predicted appearance

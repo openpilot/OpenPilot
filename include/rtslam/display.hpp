@@ -378,12 +378,14 @@ namespace display {
 			lmk_state_init,
 			lmk_state_converged
 		} lmk_state ;
+
 		typedef enum lmk_state_advanced {
 			lmk_state_advanced_not_predicted,
 			lmk_state_advanced_predicted,
 			lmk_state_advanced_matched,
 			lmk_state_advanced_updated
 		} lmk_state_advanced ;
+
 		typedef enum color {
 			color_transparency,
 			color_yellow,
@@ -391,77 +393,65 @@ namespace display {
 			color_blue,
 			color_red,
 			color_cyan,
-			color_rose
+			color_rose,
+			color_orange
+
 		} color ;
+
 		typedef struct colorRGB  {
-				int R;
-				int G;
-				int B;
+				int R, G, B;
+				void set(int R_, int G_, int B_) { R=R_; G=G_; B=B_; }
 		} colorRGB ;
+
 		static color getColorObject_prediction(lmk_state lmk_state, lmk_state_advanced lmk_state_advanced) {
 
-			if (1==1)
-				return color_rose ;
-
 			if (lmk_state==lmk_state_init) {
 				switch (lmk_state_advanced) {
 					case lmk_state_advanced_not_predicted:
-						return color_yellow;
-						break;
+						return color_transparency;
 					case lmk_state_advanced_predicted:
 						return color_magenta;
-						break;
 					case lmk_state_advanced_matched:
 						return color_magenta;
-						break;
 					case lmk_state_advanced_updated:
 						return color_red;
-						break;
 					default:
+						std::cout << __FILE__ << ":" << __LINE__ << "Unknown lmk lmk_state_advanced " << lmk_state_advanced << std::endl;
 						break;
 				}
 			}
 			if (lmk_state==lmk_state_converged) {
 				switch (lmk_state_advanced) {
 					case lmk_state_advanced_not_predicted:
-						return color_red;
-						break;
+						return color_transparency;
 					case lmk_state_advanced_predicted:
 						return color_blue;
-						break;
 					case lmk_state_advanced_matched:
 						return color_blue;
-						break;
 					case lmk_state_advanced_updated:
 						return color_cyan;
-						break;
 					default:
+						std::cout << __FILE__ << ":" << __LINE__ << "Unknown lmk lmk_state_advanced " << lmk_state_advanced << std::endl;
 						break;
 				}
 			}
 			cout << "warning color undefined for object types in display" << endl ;
 			return color_transparency;
 		}
+
 		static color getColorObject_measure    (lmk_state lmk_state, lmk_state_advanced lmk_state_advanced) {
-
-			if (1==1)
-				return color_rose ;
-
 			if (lmk_state==lmk_state_init) {
 				switch (lmk_state_advanced) {
 					case lmk_state_advanced_not_predicted:
 						return color_yellow;
-						break;
 					case lmk_state_advanced_predicted:
-						return color_transparency;
-						break;
+						return color_orange;
 					case lmk_state_advanced_matched:
-						return color_red;
-						break;
+						return color_yellow;
 					case lmk_state_advanced_updated:
-						return color_red;
-						break;
+						return color_yellow;
 					default:
+						std::cout << __FILE__ << ":" << __LINE__ << " Unknown lmk lmk_state_advanced " << lmk_state_advanced << std::endl;
 						break;
 				}
 			}
@@ -469,55 +459,51 @@ namespace display {
 				switch (lmk_state_advanced) {
 					case lmk_state_advanced_not_predicted:
 						return color_transparency;
-						break;
 					case lmk_state_advanced_predicted:
-						return color_transparency;
-						break;
+						return color_orange;
 					case lmk_state_advanced_matched:
-						return color_cyan;
-						break;
+						return color_yellow;
 					case lmk_state_advanced_updated:
-						return color_cyan;
-						break;
+						return color_yellow;
 					default:
+						std::cout << __FILE__ << ":" << __LINE__ << " Unknown lmk lmk_state_advanced " << lmk_state_advanced << std::endl;
 						break;
 				}
 			}
 			cout << "warning color undefined for object types in display" << endl ;
 			return color_transparency;
 		}
-		colorRGB getColorRGB(color colorOrigin)  {
+
+		static colorRGB getColorRGB(color colorOrigin)  {
 			colorRGB result ;
-			result.R = 0 ;
-			result.G = 0 ;
-			result.B = 0 ;
+			result.set(0,0,0);
 			switch (colorOrigin) {
 				case color_blue:
-					result.B = 255 ;
+					result.set(0,0,255);
 					break;
 				case color_cyan:
-					result.G = 255 ;
-					result.B = 255 ;
+					result.set(0,255,255);
 					break;
 				case color_magenta:
-					result.R = 219 ;
-					result.B = 115 ;
+					result.set(255,0,255);
 					break;
 				case color_red:
-					result.R = 255 ;
+					result.set(255,0,0);
 					break;
 				case color_transparency:
+					result.set(255,255,255);
 					break;
 				case color_yellow:
-					result.R = 255 ;
-					result.G = 255 ;
+					result.set(255,255,0);
 					break;
 				case color_rose:
-					result.R = 253 ;
-					result.G = 103 ;
-					result.B = 223 ;
-					break;
+						result.set(253,103,223);
+						break;
+				case color_orange:
+						result.set(255,128,0);
+						break;
 				default:
+					//std::cout << __FILE__ << ":" << __LINE__ << " Unknown lmk lmk_state_advanced " << lmk_state_advanced << std::endl;
 					break;
 			}
 			return result ;

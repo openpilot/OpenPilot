@@ -311,7 +311,8 @@ namespace jafar {
 				inline storage_t                 storage() const       { return storage_;    }
 				inline size_t                    size() const          { return size_;       }
 				inline jblas::ind_array        & ia()                  { return ia_;         }
-				inline jblas::vec_indirect     & x()                   { return x_;          }
+				inline const jblas::ind_array  & ia() const            { return ia_;         }
+		                inline jblas::vec_indirect     & x()                   { return x_;          }
 				inline const jblas::vec_indirect & x() const           { return x_;          }
 				inline jblas::sym_mat_indirect & P()                   { return P_;          }
 				inline const jblas::sym_mat_indirect & P() const       { return P_;          }

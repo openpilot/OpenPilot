@@ -272,18 +272,24 @@ void demo_slam01_main(world_ptr_t *world) {
 			if (robPtr1->dt_or_dx > max_dt) max_dt = robPtr1->dt_or_dx;
 
 			// Output info
-			cout << endl;
-			cout << "dt: " << (int) (1000 * robPtr1->dt_or_dx) << "ms (match "
-			<< total_match_time/1000 << " ms, update " << total_update_time/1000 << "ms). Lmk: [";
-			cout << mmPoint->landmarkList().size() << "] ";
-			for (MapManagerAbstract::LandmarkList::iterator lmkIter =
-					mmPoint->landmarkList().begin(); lmkIter
-					!= mmPoint->landmarkList().end(); lmkIter++) {
-				cout << (*lmkIter)->id() << " ";
-			}
-			// TODO foreach mapMgr {manage();}
-			mmPoint->manage();
+			//			cout << endl;
+			//			cout << "dt: " << (int) (1000 * robPtr1->dt_or_dx) << "ms (match "
+			//			<< total_match_time/1000 << " ms, update " << total_update_time/1000 << "ms). Lmk: [";
+			//			cout << mmPoint->landmarkList().size() << "] ";
+			//			for (MapManagerAbstract::LandmarkList::iterator lmkIter =
+			//					mmPoint->landmarkList().begin(); lmkIter
+			//					!= mmPoint->landmarkList().end(); lmkIter++) {
+			//				cout << (*lmkIter)->id() << " ";
+			//			}
 
+
+
+			// TODO foreach mapMgr {manage();}
+			for (MapAbstract::MapManagerList::iterator mmIter = mapPtr->mapManagerList().begin(); mmIter
+	    != mapPtr->mapManagerList().end(); mmIter++){
+				map_manager_ptr_t mapMgr = *mmIter;
+				mapMgr->manage();
+			}
 		} // if had_data
 
 		worldPtr->display_mutex.unlock();

@@ -16,5 +16,5 @@ build_jafar_module(rtslam
   OPTIONAL_EXTLIBS qt4 viam MTI
 
 #  CXXFLAGS -g -ggdb -O0 -Wall
-  CXXFLAGS -O2 -g3 -DJFR_NDEBUG -DNDEBUG -DBOOST_UBLAS_NDEBUG -Wall -pthread
+  CXXFLAGS -O2 -g -DJFR_NDEBUG -DNDEBUG -DBOOST_UBLAS_NDEBUG -Wall -pthread
 )

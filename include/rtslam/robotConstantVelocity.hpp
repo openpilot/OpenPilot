@@ -107,10 +107,10 @@ namespace jafar {
 				virtual size_t mySize_perturbation() {return size_perturbation();}
 
 				void setVelocityStd(double velLinStd, double velAngStd){
-					for (int i = pose.size(); i < pose.size() + 3; i++){
+					for (size_t i = pose.size(); i < pose.size() + 3; i++){
 						state.P(i,i) = velLinStd*velLinStd;
 					}
-					for (int i = pose.size() + 3; i < pose.size() + 6; i++){
+					for (size_t i = pose.size() + 3; i < pose.size() + 6; i++){
 						state.P(i,i) = velAngStd*velAngStd;
 					}
 				}

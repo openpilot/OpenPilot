@@ -279,21 +279,21 @@ class ObservationQt : public ObservationDisplay
 					}
 					// Refresh the display objects every time
 					{
-						bool disp;
+						bool dispPred = visible_ && predicted_;
+						bool dispMeas = visible_ && (matched_ || !predicted_);
 						// prediction point
 						std::list<QGraphicsItemGroup*>::iterator it = items_.begin();
 						s = static_cast<qdisplay::Shape*>(*it);
-						std::ostringstream oss; oss << id_ << " - " << int(match_score*100);
+						std::ostringstream oss; oss << id_; if (dispMeas) oss << " - " << int(match_score*100);
 						s->setLabel(oss.str().c_str());
-						disp = visible_ && predicted_;
-						(*it)->setVisible(disp);
-						if (disp)
+						(*it)->setVisible(dispPred);
+						if (dispPred)
 							(*it)->setPos(predObs_(0), predObs_(1));
 						
 						// prediction ellipse
 						++it;
-						(*it)->setVisible(disp);
-						if (disp)
+						(*it)->setVisible(dispPred);
+						if (dispPred)
 						{
 							qdisplay::Ellipsoid *ell = dynamic_cast<qdisplay::Ellipsoid*>(*it);
 							ell->set(predObs_, predObsCov_, 3.0);
@@ -303,9 +303,8 @@ class ObservationQt : public ObservationDisplay
 						++it;
 //std::cout << "display obs " << id_ << " with flags visible " << visible_ << " matched " << matched_
 //		<< " predicted " << predicted_ << " position " << measObs_ << std::endl;
-						disp = visible_ && (matched_ || !predicted_);
-						(*it)->setVisible(disp);
-						if (disp)
+						(*it)->setVisible(dispMeas);
+						if (dispMeas)
 							(*it)->setPos(measObs_(0), measObs_(1));
 
 #if EMBED_PREDICTED_APP

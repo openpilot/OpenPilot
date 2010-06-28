@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       airspeedgadgetconfiguration.h
+ * @file       dialgadgetconfiguration.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Airspeed Plugin Gadget configuration
+ * @brief      Dial Plugin Gadget configuration
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   dialplugin
  * @{
@@ -25,8 +25,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef AIRSPEEDGADGETCONFIGURATION_H
-#define AIRSPEEDGADGETCONFIGURATION_H
+#ifndef DIALGADGETCONFIGURATION_H
+#define DIALGADGETCONFIGURATION_H
 
 #include <coreplugin/iuavgadgetconfiguration.h>
 
@@ -35,11 +35,11 @@ using namespace Core;
 /* Despite its name, this is actually a generic analog dial
    supporting up to two rotating "needle" indicators.
   */
-class AirspeedGadgetConfiguration : public IUAVGadgetConfiguration
+class DialGadgetConfiguration : public IUAVGadgetConfiguration
 {
 Q_OBJECT
 public:
-    explicit AirspeedGadgetConfiguration(QString classId, const QByteArray &state = 0, QObject *parent = 0);
+    explicit DialGadgetConfiguration(QString classId, const QByteArray &state = 0, QObject *parent = 0);
 
     //set dial configuration functions
     void setDialFile(QString dialFile){m_defaultDial=dialFile;}
@@ -134,4 +134,4 @@ private:
     QString needle3Move;
 };
 
-#endif // AIRSPEEDGADGETCONFIGURATION_H
+#endif // DIALGADGETCONFIGURATION_H

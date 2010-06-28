@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       airspeedgadgetoptionspage.h
+ * @file       dialgadgetoptionspage.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Airspeed Plugin Gadget options page
+ * @brief      Dial Plugin Gadget options page
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   dialplugin
  * @{
@@ -25,8 +25,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef AIRSPEEDGADGETOPTIONSPAGE_H
-#define AIRSPEEDGADGETOPTIONSPAGE_H
+#ifndef DIALGADGETOPTIONSPAGE_H
+#define DIALGADGETOPTIONSPAGE_H
 
 #include "coreplugin/dialogs/ioptionspage.h"
 #include "QString"
@@ -39,27 +39,27 @@ namespace Core {
 class IUAVGadgetConfiguration;
 }
 
-class AirspeedGadgetConfiguration;
+class DialGadgetConfiguration;
 
 namespace Ui {
-    class AirspeedGadgetOptionsPage;
+    class DialGadgetOptionsPage;
 }
 
 using namespace Core;
 
-class AirspeedGadgetOptionsPage : public IOptionsPage
+class DialGadgetOptionsPage : public IOptionsPage
 {
 Q_OBJECT
 public:
-    explicit AirspeedGadgetOptionsPage(AirspeedGadgetConfiguration *config, QObject *parent = 0);
+    explicit DialGadgetOptionsPage(DialGadgetConfiguration *config, QObject *parent = 0);
 
     QWidget *createPage(QWidget *parent);
     void apply();
     void finish();
 
 private:
-    Ui::AirspeedGadgetOptionsPage *options_page;
-    AirspeedGadgetConfiguration *m_config;
+    Ui::DialGadgetOptionsPage *options_page;
+    DialGadgetConfiguration *m_config;
     QFont font;
 
 private slots:
@@ -70,4 +70,4 @@ private slots:
     void on_uavObject3_currentIndexChanged(QString val);
 };
 
-#endif // AIRSPEEDGADGETOPTIONSPAGE_H
+#endif // DIALGADGETOPTIONSPAGE_H

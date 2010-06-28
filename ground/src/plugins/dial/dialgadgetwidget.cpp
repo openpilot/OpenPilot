@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       airspeedgadgetwidget.cpp
+ * @file       dialgadgetwidget.cpp
  * @author     Edouard Lafargue and David Carlson Copyright (C) 2010.
- * @brief
+ * @brief      The main widget, where most action takes place
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   dialplugin
  * @{
@@ -25,11 +25,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "airspeedgadgetwidget.h"
+#include "dialgadgetwidget.h"
 #include <iostream>
 #include <QDebug>
 
-AirspeedGadgetWidget::AirspeedGadgetWidget(QWidget *parent) : QGraphicsView(parent)
+DialGadgetWidget::DialGadgetWidget(QWidget *parent) : QGraphicsView(parent)
 {
     // TODO: create a proper "needle" object instead of hardcoding all this
     // which is ugly (but easy).
@@ -53,7 +53,7 @@ AirspeedGadgetWidget::AirspeedGadgetWidget(QWidget *parent) : QGraphicsView(pare
     connect(&dialTimer, SIGNAL(timeout()), this, SLOT(rotateNeedles()));
 }
 
-AirspeedGadgetWidget::~AirspeedGadgetWidget()
+DialGadgetWidget::~DialGadgetWidget()
 {
    // Do nothing
 }
@@ -61,7 +61,7 @@ AirspeedGadgetWidget::~AirspeedGadgetWidget()
 /*!
   \brief Connects the widget to the relevant UAVObjects
   */
-void AirspeedGadgetWidget::connectNeedles(QString object1, QString nfield1,
+void DialGadgetWidget::connectNeedles(QString object1, QString nfield1,
                                           QString object2, QString nfield2,
                                           QString object3, QString nfield3) {
     if (obj1 != NULL)
@@ -114,7 +114,7 @@ void AirspeedGadgetWidget::connectNeedles(QString object1, QString nfield1,
 /*!
   \brief Called by the UAVObject which got updated
   */
-void AirspeedGadgetWidget::updateNeedle1(UAVObject *object1) {
+void DialGadgetWidget::updateNeedle1(UAVObject *object1) {
     // Double check that the field exists:
     UAVObjectField* field = object1->getField(field1);
     if (field) {
@@ -127,7 +127,7 @@ void AirspeedGadgetWidget::updateNeedle1(UAVObject *object1) {
 /*!
   \brief Called by the UAVObject which got updated
   */
-void AirspeedGadgetWidget::updateNeedle2(UAVObject *object2) {
+void DialGadgetWidget::updateNeedle2(UAVObject *object2) {
     UAVObjectField* field = object2->getField(field2);
     if (field) {
         setNeedle2(field->getDouble());
@@ -139,7 +139,7 @@ void AirspeedGadgetWidget::updateNeedle2(UAVObject *object2) {
 /*!
   \brief Called by the UAVObject which got updated
   */
-void AirspeedGadgetWidget::updateNeedle3(UAVObject *object3) {
+void DialGadgetWidget::updateNeedle3(UAVObject *object3) {
     UAVObjectField* field = object3->getField(field3);
     if (field) {
         setNeedle3(field->getDouble());
@@ -152,7 +152,7 @@ void AirspeedGadgetWidget::updateNeedle3(UAVObject *object3) {
   Initializes the dial file, and does all the one-time calculations for
   display later. This is the method which really initializes the dial.
   */
-void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QString n1, QString n2,
+void DialGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QString n1, QString n2,
                                        QString n3, QString n1Move, QString n2Move, QString n3Move)
 {
    if (QFile::exists(dfn))
@@ -340,12 +340,12 @@ void AirspeedGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QStr
    { std::cout<<"no file: "<<std::endl; }
 }
 
-void AirspeedGadgetWidget::paint()
+void DialGadgetWidget::paint()
 {
     update();
 }
 
-void AirspeedGadgetWidget::paintEvent(QPaintEvent *event)
+void DialGadgetWidget::paintEvent(QPaintEvent *event)
 {
     // Skip painting until the dial file is loaded
     if (! m_renderer->isValid()) {
@@ -358,12 +358,12 @@ void AirspeedGadgetWidget::paintEvent(QPaintEvent *event)
 // This event enables the dial to be dynamically resized
 // whenever the gadget is resized, taking advantage of the vector
 // nature of SVG dials.
-void AirspeedGadgetWidget::resizeEvent(QResizeEvent *event)
+void DialGadgetWidget::resizeEvent(QResizeEvent *event)
 {
     fitInView(m_background, Qt::KeepAspectRatio );
 }
 
-void AirspeedGadgetWidget::setDialFont(QString fontProps)
+void DialGadgetWidget::setDialFont(QString fontProps)
 {
     QFont font = QFont("Arial",12);
     font.fromString(fontProps);
@@ -375,7 +375,7 @@ void AirspeedGadgetWidget::setDialFont(QString fontProps)
 
 // Converts the value into an angle:
 // this enables smooth rotation in rotateNeedles below
-void AirspeedGadgetWidget::setNeedle1(double value) {
+void DialGadgetWidget::setNeedle1(double value) {
     if (rotateN1) {
         needle1Target = 360*value*n1Factor/(n1MaxValue-n1MinValue);
     }
@@ -394,7 +394,7 @@ void AirspeedGadgetWidget::setNeedle1(double value) {
     }
 }
 
-void AirspeedGadgetWidget::setNeedle2(double value) {
+void DialGadgetWidget::setNeedle2(double value) {
     if (rotateN2) {
         needle2Target = 360*value*n2Factor/(n2MaxValue-n2MinValue);
     }
@@ -414,7 +414,7 @@ void AirspeedGadgetWidget::setNeedle2(double value) {
 
 }
 
-void AirspeedGadgetWidget::setNeedle3(double value) {
+void DialGadgetWidget::setNeedle3(double value) {
     if (rotateN3) {
         needle3Target = 360*value*n3Factor/(n3MaxValue-n3MinValue);
     }
@@ -440,7 +440,7 @@ void AirspeedGadgetWidget::setNeedle3(double value) {
 //
 // Note: this code is valid even if needle1 and needle2 point
 // to the same element.
-void AirspeedGadgetWidget::rotateNeedles()
+void DialGadgetWidget::rotateNeedles()
 {
     int dialRun = 3;
     if (n2enabled) {

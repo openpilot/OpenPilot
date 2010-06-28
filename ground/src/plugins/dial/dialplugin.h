@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       airspeedplugin.h
+ * @file       dialplugin.h
  * @author     Edouard Lafargue and David Carlson Copyright (C) 2010.
  * @brief
  * @see        The GNU Public License (GPL) Version 3
@@ -25,23 +25,23 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef AIRSPEEDPLUGIN_H_
-#define AIRSPEEDPLUGIN_H_
+#ifndef DIALPLUGIN_H_
+#define DIALPLUGIN_H_
 
 #include <extensionsystem/iplugin.h>
 
-class AirspeedGadgetFactory;
+class DialGadgetFactory;
 
-class AirspeedPlugin : public ExtensionSystem::IPlugin
+class DialPlugin : public ExtensionSystem::IPlugin
 {
 public:
-        AirspeedPlugin();
-   ~AirspeedPlugin();
+   DialPlugin();
+   ~DialPlugin();
 
    void extensionsInitialized();
    bool initialize(const QStringList & arguments, QString * errorString);
    void shutdown();
 private:
-   AirspeedGadgetFactory *mf;
+   DialGadgetFactory *mf;
 };
-#endif /* AIRSPEEDPLUGIN_H_ */
+#endif /* DIALPLUGIN_H_ */

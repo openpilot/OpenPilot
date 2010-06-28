@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       airspeedgadgetoptionspage.cpp
+ * @file       dialgadgetoptionspage.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Airspeed Plugin Gadget options page
  * @see        The GNU Public License (GPL) Version 3
@@ -25,9 +25,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "airspeedgadgetoptionspage.h"
-#include "airspeedgadgetconfiguration.h"
-#include "ui_airspeedgadgetoptionspage.h"
+#include "dialgadgetoptionspage.h"
+#include "dialgadgetconfiguration.h"
+#include "ui_dialgadgetoptionspage.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/uavdataobject.h"
@@ -37,17 +37,17 @@
 #include <QtAlgorithms>
 #include <QStringList>
 
-AirspeedGadgetOptionsPage::AirspeedGadgetOptionsPage(AirspeedGadgetConfiguration *config, QObject *parent) :
+DialGadgetOptionsPage::DialGadgetOptionsPage(DialGadgetConfiguration *config, QObject *parent) :
         IOptionsPage(parent),
         m_config(config)
 {
 }
 
 //creates options page widget (uses the UI file)
-QWidget *AirspeedGadgetOptionsPage::createPage(QWidget *parent)
+QWidget *DialGadgetOptionsPage::createPage(QWidget *parent)
 {
 
-    options_page = new Ui::AirspeedGadgetOptionsPage();
+    options_page = new Ui::DialGadgetOptionsPage();
     //main widget
     QWidget *optionsPageWidget = new QWidget;
     //main layout
@@ -154,7 +154,7 @@ QWidget *AirspeedGadgetOptionsPage::createPage(QWidget *parent)
  * Saves the current values
  *
  */
-void AirspeedGadgetOptionsPage::apply()
+void DialGadgetOptionsPage::apply()
 {
     m_config->setDialFile(options_page->svgSourceFile->text());
     m_config->setDialBackgroundID(options_page->backgroundID->text());
@@ -188,7 +188,7 @@ void AirspeedGadgetOptionsPage::apply()
  * Opens a font picker.
  *
  */
-void AirspeedGadgetOptionsPage::on_fontPicker_clicked()
+void DialGadgetOptionsPage::on_fontPicker_clicked()
 {
     bool ok;
      font = QFontDialog::getFont(&ok, QFont("Arial", 12), qobject_cast<QWidget*>(this));
@@ -199,7 +199,7 @@ void AirspeedGadgetOptionsPage::on_fontPicker_clicked()
   Fills in the field1 combo box when value is changed in the
   object1 field
 */
-void AirspeedGadgetOptionsPage::on_uavObject1_currentIndexChanged(QString val) {
+void DialGadgetOptionsPage::on_uavObject1_currentIndexChanged(QString val) {
     options_page->objectField1->clear();
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -214,7 +214,7 @@ void AirspeedGadgetOptionsPage::on_uavObject1_currentIndexChanged(QString val) {
   Fills in the field2 combo box when value is changed in the
   object2 field
 */
-void AirspeedGadgetOptionsPage::on_uavObject2_currentIndexChanged(QString val) {
+void DialGadgetOptionsPage::on_uavObject2_currentIndexChanged(QString val) {
     options_page->objectField2->clear();
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -229,7 +229,7 @@ void AirspeedGadgetOptionsPage::on_uavObject2_currentIndexChanged(QString val) {
   Fills in the field3 combo box when value is changed in the
   object3 field
 */
-void AirspeedGadgetOptionsPage::on_uavObject3_currentIndexChanged(QString val) {
+void DialGadgetOptionsPage::on_uavObject3_currentIndexChanged(QString val) {
     options_page->objectField3->clear();
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -245,7 +245,7 @@ void AirspeedGadgetOptionsPage::on_uavObject3_currentIndexChanged(QString val) {
 Opens an open file dialog.
 
 */
-void AirspeedGadgetOptionsPage::on_loadFile_clicked()
+void DialGadgetOptionsPage::on_loadFile_clicked()
 {
     QFileDialog::Options options;
     QString selectedFilter;
@@ -260,7 +260,7 @@ void AirspeedGadgetOptionsPage::on_loadFile_clicked()
 }
 
 
-void AirspeedGadgetOptionsPage::finish()
+void DialGadgetOptionsPage::finish()
 {
 
 }

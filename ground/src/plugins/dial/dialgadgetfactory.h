@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       airspeedgadget.h
+ * @file       dialgadgetfactory.h
  * @author     Edouard Lafargue and David Carlson Copyright (C) 2010.
  * @brief
  * @see        The GNU Public License (GPL) Version 3
@@ -25,32 +25,28 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef AIRSPEEDGADGET_H_
-#define AIRSPEEDGADGET_H_
+#ifndef DIALGADGETFACTORY_H_
+#define DIALGADGETFACTORY_H_
 
-#include <coreplugin/iuavgadget.h>
-#include "airspeedgadgetwidget.h"
+#include <coreplugin/iuavgadgetfactory.h>
 
+namespace Core {
 class IUAVGadget;
-class QWidget;
-class QString;
-class AirspeedGadgetWidget;
+class IUAVGadgetFactory;
+}
 
 using namespace Core;
 
-class AirspeedGadget : public Core::IUAVGadget
+class DialGadgetFactory : public IUAVGadgetFactory
 {
     Q_OBJECT
 public:
-    AirspeedGadget(QString classId, AirspeedGadgetWidget *widget, QWidget *parent = 0);
-    ~AirspeedGadget();
+    DialGadgetFactory(QObject *parent = 0);
+    ~DialGadgetFactory();
 
-    QWidget *widget() { return m_widget; }
-    void loadConfiguration(IUAVGadgetConfiguration* config);
-
-private:
-    AirspeedGadgetWidget *m_widget;
+    Core::IUAVGadget *createGadget(QWidget *parent);
+    IUAVGadgetConfiguration *createConfiguration(const QByteArray &state);
+    IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
 };
 
-
-#endif // AIRSPEEDGADGET_H_
+#endif // DIALGADGETFACTORY_H_

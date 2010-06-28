@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       airspeedgadgetfactory.cpp
+ * @file       dialgadgetfactory.cpp
  * @author     Edouard Lafargue and David Carlson Copyright (C) 2010.
  * @brief
  * @see        The GNU Public License (GPL) Version 3
@@ -24,37 +24,37 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include "airspeedgadgetfactory.h"
-#include "airspeedgadgetwidget.h"
-#include "airspeedgadget.h"
-#include "airspeedgadgetconfiguration.h"
-#include "airspeedgadgetoptionspage.h"
+#include "dialgadgetfactory.h"
+#include "dialgadgetwidget.h"
+#include "dialgadget.h"
+#include "dialgadgetconfiguration.h"
+#include "dialgadgetoptionspage.h"
 #include <coreplugin/iuavgadget.h>
 
-AirspeedGadgetFactory::AirspeedGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("AirspeedGadget"),
+DialGadgetFactory::DialGadgetFactory(QObject *parent) :
+        IUAVGadgetFactory(QString("DialGadget"),
                           tr("Analog Dial Gadget"),
                           parent)
 {
 }
 
-AirspeedGadgetFactory::~AirspeedGadgetFactory()
+DialGadgetFactory::~DialGadgetFactory()
 {
 }
 
-Core::IUAVGadget* AirspeedGadgetFactory::createGadget(QWidget *parent)
+Core::IUAVGadget* DialGadgetFactory::createGadget(QWidget *parent)
 {
-    AirspeedGadgetWidget* gadgetWidget = new AirspeedGadgetWidget(parent);
-    return new AirspeedGadget(QString("AirspeedGadget"), gadgetWidget, parent);
+    DialGadgetWidget* gadgetWidget = new DialGadgetWidget(parent);
+    return new DialGadget(QString("DialGadget"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *AirspeedGadgetFactory::createConfiguration(const QByteArray &state)
+IUAVGadgetConfiguration *DialGadgetFactory::createConfiguration(const QByteArray &state)
 {
-    return new AirspeedGadgetConfiguration(QString("AirspeedGadget"), state);
+    return new DialGadgetConfiguration(QString("DialGadget"), state);
 }
 
-IOptionsPage *AirspeedGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
+IOptionsPage *DialGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
-    return new AirspeedGadgetOptionsPage(qobject_cast<AirspeedGadgetConfiguration*>(config));
+    return new DialGadgetOptionsPage(qobject_cast<DialGadgetConfiguration*>(config));
 }
 

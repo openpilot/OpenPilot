@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       airspeedgadget.cpp
+ * @file       dialgadget.cpp
  * @author     Edouard Lafargue and David Carlson Copyright (C) 2010.
  * @brief
  * @see        The GNU Public License (GPL) Version 3
@@ -25,17 +25,17 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "airspeedgadget.h"
-#include "airspeedgadgetwidget.h"
-#include "airspeedgadgetconfiguration.h"
+#include "dialgadget.h"
+#include "dialgadgetwidget.h"
+#include "dialgadgetconfiguration.h"
 
-AirspeedGadget::AirspeedGadget(QString classId, AirspeedGadgetWidget *widget, QWidget *parent) :
+DialGadget::DialGadget(QString classId, DialGadgetWidget *widget, QWidget *parent) :
         IUAVGadget(classId, parent),
         m_widget(widget)
 {
 }
 
-AirspeedGadget::~AirspeedGadget()
+DialGadget::~DialGadget()
 {
 }
 
@@ -45,9 +45,9 @@ AirspeedGadget::~AirspeedGadget()
   first time, so you have to be careful not to assume all the plugin values are initialized
   the first time you use them
  */
-void AirspeedGadget::loadConfiguration(IUAVGadgetConfiguration* config)
+void DialGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 {
-    AirspeedGadgetConfiguration *m = qobject_cast<AirspeedGadgetConfiguration*>(config);
+    DialGadgetConfiguration *m = qobject_cast<DialGadgetConfiguration*>(config);
     m_widget->setDialFile(m->dialFile(), m->dialBackground(), m->dialForeground(), m->dialNeedle1(),
                           m->dialNeedle2(),m->dialNeedle3(),m->getN1Move(), m->getN2Move(),
                           m->getN3Move());

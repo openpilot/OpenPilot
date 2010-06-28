@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AirspeedGadgetOptionsPage</class>
- <widget class="QWidget" name="AirspeedGadgetOptionsPage">
+ <class>DialGadgetOptionsPage</class>
+ <widget class="QWidget" name="DialGadgetOptionsPage">
   <property name="geometry">
    <rect>
     <x>0</x>

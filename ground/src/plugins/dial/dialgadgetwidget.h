@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       airspeedgadgetwidget.h
+ * @file       dialgadgetwidget.h
  * @author     Edouard Lafargue and David Carlson Copyright (C) 2010.
  * @brief
  * @see        The GNU Public License (GPL) Version 3
@@ -25,10 +25,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef AIRSPEEDGADGETWIDGET_H_
-#define AIRSPEEDGADGETWIDGET_H_
+#ifndef DIALGADGETWIDGET_H_
+#define DIALGADGETWIDGET_H_
 
-#include "airspeedgadgetconfiguration.h"
+#include "dialgadgetconfiguration.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/uavobject.h"
@@ -39,13 +39,13 @@
 #include <QFile>
 #include <QTimer>
 
-class AirspeedGadgetWidget : public QGraphicsView
+class DialGadgetWidget : public QGraphicsView
 {
     Q_OBJECT
 
 public:
-    AirspeedGadgetWidget(QWidget *parent = 0);
-   ~AirspeedGadgetWidget();
+    DialGadgetWidget(QWidget *parent = 0);
+   ~DialGadgetWidget();
    void setDialFile(QString dfn, QString bg, QString fg, QString n1, QString n2, QString n3,
                     QString n1Move, QString n2Move, QString n3Move);
    void paint();
@@ -139,4 +139,4 @@ private:
    QTimer dialTimer;
 
 };
-#endif /* AIRSPEEDGADGETWIDGET_H_ */
+#endif /* DIALGADGETWIDGET_H_ */

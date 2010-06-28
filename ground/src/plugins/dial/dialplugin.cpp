@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       airspeedplugin.h
+ * @file       dialplugin.h
  * @author     Edouard Lafargue and David Carlson Copyright (C) 2010.
  * @brief
  * @see        The GNU Public License (GPL) Version 3
@@ -25,42 +25,42 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "airspeedplugin.h"
-#include "airspeedgadgetfactory.h"
+#include "dialplugin.h"
+#include "dialgadgetfactory.h"
 #include <QDebug>
 #include <QtPlugin>
 #include <QStringList>
 #include <extensionsystem/pluginmanager.h>
 
 
-AirspeedPlugin::AirspeedPlugin()
+DialPlugin::DialPlugin()
 {
    // Do nothing
 }
 
-AirspeedPlugin::~AirspeedPlugin()
+DialPlugin::~DialPlugin()
 {
    // Do nothing
 }
 
-bool AirspeedPlugin::initialize(const QStringList& args, QString *errMsg)
+bool DialPlugin::initialize(const QStringList& args, QString *errMsg)
 {
    Q_UNUSED(args);
    Q_UNUSED(errMsg);
-   mf = new AirspeedGadgetFactory(this);
+   mf = new DialGadgetFactory(this);
    addAutoReleasedObject(mf);
 
    return true;
 }
 
-void AirspeedPlugin::extensionsInitialized()
+void DialPlugin::extensionsInitialized()
 {
    // Do nothing
 }
 
-void AirspeedPlugin::shutdown()
+void DialPlugin::shutdown()
 {
    // Do nothing
 }
-Q_EXPORT_PLUGIN(AirspeedPlugin)
+Q_EXPORT_PLUGIN(DialPlugin)
 

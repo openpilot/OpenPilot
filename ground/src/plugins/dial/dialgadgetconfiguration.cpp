@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       airspeedgadgetconfiguration.cpp
+ * @file       dialgadgetconfiguration.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Airspeed Plugin Gadget configuration
+ * @brief      Dial Plugin Gadget configuration
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   dialplugin
  * @{
@@ -25,14 +25,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "airspeedgadgetconfiguration.h"
+#include "dialgadgetconfiguration.h"
 #include <QtCore/QDataStream>
 
 /**
  * Loads a saved configuration or defaults if non exist.
  *
  */
-AirspeedGadgetConfiguration::AirspeedGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
+DialGadgetConfiguration::DialGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),
     m_defaultDial("Unknown"),
     dialBackgroundID("background"),
@@ -90,9 +90,9 @@ AirspeedGadgetConfiguration::AirspeedGadgetConfiguration(QString classId, const 
  * Clones a configuration.
  *
  */
-IUAVGadgetConfiguration *AirspeedGadgetConfiguration::clone()
+IUAVGadgetConfiguration *DialGadgetConfiguration::clone()
 {
-    AirspeedGadgetConfiguration *m = new AirspeedGadgetConfiguration(this->classId());
+    DialGadgetConfiguration *m = new DialGadgetConfiguration(this->classId());
     m->m_defaultDial=m_defaultDial;
     return m;
 }
@@ -100,7 +100,7 @@ IUAVGadgetConfiguration *AirspeedGadgetConfiguration::clone()
  * Saves a configuration.
  *
  */
-QByteArray AirspeedGadgetConfiguration::saveState() const
+QByteArray DialGadgetConfiguration::saveState() const
 {
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::WriteOnly);

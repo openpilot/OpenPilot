@@ -258,6 +258,7 @@ class ObservationQt : public ObservationDisplay
 				{
 					bool dispPred = visible_ && predicted_;
 					bool dispMeas = visible_ && (matched_ || !predicted_);
+					bool dispInit = visible_ && !predicted_;
 
 					// Build display objects if it is the first time they are displayed
 					if (items_.size() != 3)
@@ -290,7 +291,8 @@ class ObservationQt : public ObservationDisplay
 						view_->addShape(s);
 						
 						// measure point
-						s = new qdisplay::Shape(qdisplay::Shape::ShapeCross, measObs_(0), measObs_(1), 3, 3, 45);
+						s = new qdisplay::Shape(qdisplay::Shape::ShapeCrossX, measObs_(0), measObs_(1), 3, 3);
+						s->setFontSize(8);
 						s->setVisible(false);
 						items_.push_back(s);
 						view_->addShape(s);
@@ -337,6 +339,14 @@ class ObservationQt : public ObservationDisplay
 						if (dispMeas)
 						{
 							c = getColorRGB(getColorObject_measure(lmkstate,lmkstateadvanced)) ;
+							if (dispInit)
+							{
+								(*it)->setFontColor(c.R,c.G,c.B); //
+								(*it)->setLabel(jmath::toStr(id_).c_str());
+							} else
+							{
+								(*it)->setLabel("");
+							}
 							(*it)->setColor(c.R,c.G,c.B); // red
 							(*it)->setPos(measObs_(0), measObs_(1));
 						}

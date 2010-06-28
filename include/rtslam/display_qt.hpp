@@ -159,6 +159,7 @@ class ObservationQt : public ObservationDisplay
 		bool visible_;
 		bool matched_;
 		bool predicted_;
+		bool updated_;
 		jblas::vec predObs_;
 		jblas::sym_mat predObsCov_;
 		jblas::vec measObs_;
@@ -210,6 +211,7 @@ class ObservationQt : public ObservationDisplay
 					predicted_ = slamObs_->events.predicted;
 					matched_ = slamObs_->events.matched;
 					visible_ = slamObs_->events.visible;
+					updated_ = slamObs_->events.updated;
 					id_ = slamObs_->landmarkPtr()->id();
 					if (visible_)
 					{
@@ -257,22 +259,46 @@ class ObservationQt : public ObservationDisplay
 							measObs_.clear();
 						}
 						
+						colorRGB c ;
+						lmk_state lmkstate ;
+						lmk_state_advanced lmkstateadvanced = lmk_state_advanced_not_predicted ;
+						if (landmarkPhase_==LandmarkDisplay::init) {
+							lmkstate = lmk_state_init ;
+						}
+						if (landmarkPhase_==LandmarkDisplay::converged) {
+							lmkstate = lmk_state_converged ;
+						}
+						if (predicted_) {
+							lmkstateadvanced = lmk_state_advanced_predicted ;
+						}
+						if (matched_) {
+							lmkstateadvanced = lmk_state_advanced_matched ;
+						}
+						if (updated_) {
+						lmkstateadvanced = lmk_state_advanced_updated ;
+						}
+
+
+
 						// prediction point
 						s = new qdisplay::Shape(qdisplay::Shape::ShapeCross, predObs_(0), predObs_(1), 3, 3);
-						s->setColor(255,255,0); // yellow
-						s->setFontColor(255,255,0); // yellow
+						c = getColorRGB(getColorObject_prediction(lmk_state_init,lmk_state_advanced_not_predicted)) ;
+						s->setColor(c.R,c.G,c.B); // yellow
+						s->setFontColor(c.R,c.G,c.B); // yellow
 						items_.push_back(s);
 						view_->addShape(s);
 						
 						// prediction ellipse
+						c = getColorRGB(getColorObject_prediction(lmk_state_init,lmk_state_advanced_not_predicted)) ;
 						s = new qdisplay::Ellipsoid(predObs_, predObsCov_, 3.0);
-						s->setColor(255,255,0); // yellow
+						s->setColor(c.R,c.G,c.B); // yellow
 						items_.push_back(s);
 						view_->addShape(s);
 						
 						// measure point
+						c = getColorRGB(getColorObject_measure(lmk_state_init,lmk_state_advanced_not_predicted)) ;
 						s = new qdisplay::Shape(qdisplay::Shape::ShapeCross, measObs_(0), measObs_(1), 3, 3, 45);
-						s->setColor(255, 0, 0); // red
+						s->setColor(c.R,c.G,c.B); // red
 						items_.push_back(s);
 						view_->addShape(s);
 						
@@ -334,6 +360,8 @@ class ObservationQt : public ObservationDisplay
 					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark: " << landmarkGeomType_);
 			}
 		}
+
+
 };
 
 

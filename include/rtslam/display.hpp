@@ -109,7 +109,9 @@ namespace display {
 			rtslam::LandmarkAbstract *slamLmk_;
 			MapDisplay *dispMap_;
 			enum Type { ltPoint };
-			Type type_;
+			enum Phase { init, converged };
+			Type  type_;
+			Phase phase_;
 			static Type convertType(rtslam::LandmarkAbstract *_slamLmk)
 			{
 				switch (_slamLmk->getGeomType())
@@ -118,6 +120,16 @@ namespace display {
 						return ltPoint;
 					default:
 						JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark" << _slamLmk->getGeomType());
+				}
+			}
+			static Phase convertPhase(rtslam::LandmarkAbstract *_slamLmk)
+			{
+				switch (_slamLmk->type)
+				{
+					case rtslam::LandmarkAbstract::PNT_EUC:
+						return converged;
+					default:
+						return init;
 				}
 			}
 			LandmarkDisplay(rtslam::LandmarkAbstract *_slamLmk, MapDisplay *_dispMap): 
@@ -136,7 +148,8 @@ namespace display {
 			rtslam::ObservationAbstract *slamObs_;
 			SensorDisplay *dispSen_;
 			SensorDisplay::Type sensorType_;
-			LandmarkDisplay::Type landmarkGeomType_;
+			LandmarkDisplay::Type  landmarkGeomType_;
+			LandmarkDisplay::Phase landmarkPhase_;
 			ObservationDisplay(rtslam::ObservationAbstract *_slamObs, SensorDisplay *_dispSen): 
 				slamObs_(_slamObs), dispSen_(_dispSen)
 			{
@@ -359,12 +372,157 @@ namespace display {
 				//clear(); // we're not in a hurry, it will be done at next render
 			}
 			
-			
-			
 	};
 
+		typedef enum lmk_state {
+			lmk_state_init,
+			lmk_state_converged
+		} lmk_state ;
+		typedef enum lmk_state_advanced {
+			lmk_state_advanced_not_predicted,
+			lmk_state_advanced_predicted,
+			lmk_state_advanced_matched,
+			lmk_state_advanced_updated
+		} lmk_state_advanced ;
+		typedef enum color {
+			color_transparency,
+			color_yellow,
+			color_magenta,
+			color_blue,
+			color_red,
+			color_cyan,
+			color_rose
+		} color ;
+		typedef struct colorRGB  {
+				int R;
+				int G;
+				int B;
+		} colorRGB ;
+		static color getColorObject_prediction(lmk_state lmk_state, lmk_state_advanced lmk_state_advanced) {
 
-	
+			if (1==1)
+				return color_rose ;
+
+			if (lmk_state==lmk_state_init) {
+				switch (lmk_state_advanced) {
+					case lmk_state_advanced_not_predicted:
+						return color_yellow;
+						break;
+					case lmk_state_advanced_predicted:
+						return color_magenta;
+						break;
+					case lmk_state_advanced_matched:
+						return color_magenta;
+						break;
+					case lmk_state_advanced_updated:
+						return color_red;
+						break;
+					default:
+						break;
+				}
+			}
+			if (lmk_state==lmk_state_converged) {
+				switch (lmk_state_advanced) {
+					case lmk_state_advanced_not_predicted:
+						return color_red;
+						break;
+					case lmk_state_advanced_predicted:
+						return color_blue;
+						break;
+					case lmk_state_advanced_matched:
+						return color_blue;
+						break;
+					case lmk_state_advanced_updated:
+						return color_cyan;
+						break;
+					default:
+						break;
+				}
+			}
+			cout << "warning color undefined for object types in display" << endl ;
+			return color_transparency;
+		}
+		static color getColorObject_measure    (lmk_state lmk_state, lmk_state_advanced lmk_state_advanced) {
+
+			if (1==1)
+				return color_rose ;
+
+			if (lmk_state==lmk_state_init) {
+				switch (lmk_state_advanced) {
+					case lmk_state_advanced_not_predicted:
+						return color_yellow;
+						break;
+					case lmk_state_advanced_predicted:
+						return color_transparency;
+						break;
+					case lmk_state_advanced_matched:
+						return color_red;
+						break;
+					case lmk_state_advanced_updated:
+						return color_red;
+						break;
+					default:
+						break;
+				}
+			}
+			if (lmk_state==lmk_state_converged) {
+				switch (lmk_state_advanced) {
+					case lmk_state_advanced_not_predicted:
+						return color_transparency;
+						break;
+					case lmk_state_advanced_predicted:
+						return color_transparency;
+						break;
+					case lmk_state_advanced_matched:
+						return color_cyan;
+						break;
+					case lmk_state_advanced_updated:
+						return color_cyan;
+						break;
+					default:
+						break;
+				}
+			}
+			cout << "warning color undefined for object types in display" << endl ;
+			return color_transparency;
+		}
+		colorRGB getColorRGB(color colorOrigin)  {
+			colorRGB result ;
+			result.R = 0 ;
+			result.G = 0 ;
+			result.B = 0 ;
+			switch (colorOrigin) {
+				case color_blue:
+					result.B = 255 ;
+					break;
+				case color_cyan:
+					result.G = 255 ;
+					result.B = 255 ;
+					break;
+				case color_magenta:
+					result.R = 219 ;
+					result.B = 115 ;
+					break;
+				case color_red:
+					result.R = 255 ;
+					break;
+				case color_transparency:
+					break;
+				case color_yellow:
+					result.R = 255 ;
+					result.G = 255 ;
+					break;
+				case color_rose:
+					result.R = 253 ;
+					result.G = 103 ;
+					result.B = 223 ;
+					break;
+				default:
+					break;
+			}
+			return result ;
+		}
+
 }}}
 
 

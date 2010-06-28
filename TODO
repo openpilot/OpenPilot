@@ -34,14 +34,15 @@ Organization
 Performance
 ------------------------------------
 - zncc optimizations :
-	- use integral images in explorer
-	- test when half of the correlation has been done if it is still possible to reach the goal score
-	- work first with half resolution images (small investment at first, but 16 times faster then)
-	- use a real ellipse roi (mahalanobis dist)
-	- progressively enable optimizations when search area are larger
-	- try to copy the search area in another image for a better use of cache
-	- try to use cpu vectorialization (compute 4 zncc at once)
-- check algorithm speed <- Good 30Hz. See issues with RT and OS
+	1. use integral images in explorer -> ok
+	2. test when partial correlation has been done if it is still possible to reach the goal score -> ok
+	3. work first with half resolution images (small investment at first, but 16 times faster then) -> ok
+	4. use a real ellipse roi (mahalanobis dist) -> ok
+	5. progressively enable optimizations when search area are larger -> ok
+	6. start testing with a roi shrinked by 2, then the rest, it should speed up the process because in general the result is close to the center and thanks to 2.
+	7. try to copy the search area in another image for a better use of cache
+	8. try to use cpu vectorialization (compute 4 zncc at once)
+- check algorithm speed <- Good 60Hz. See issues with RT and OS
 - find a more clever way to manipulate the map used space: ia_indirectArray() is possibly an expensive way to go.
 
 

@@ -32,6 +32,10 @@ void Shape::paint(QPainter *painter, const QStyleOptionGraphicsItem * opt, QWidg
       painter->drawLine(QPointF(m_boundingRect.left(), 0.), QPointF( m_boundingRect.right(), 0.));
       painter->drawLine(QPointF(0., m_boundingRect.top()), QPointF(0., m_boundingRect.bottom()));
       break;
+    case ShapeCrossX:
+      painter->drawLine(QPointF(m_boundingRect.left(), m_boundingRect.top()), QPointF( m_boundingRect.right(), m_boundingRect.bottom()));
+      painter->drawLine(QPointF(m_boundingRect.right(), m_boundingRect.top()), QPointF(m_boundingRect.left(), m_boundingRect.bottom()));
+      break;
     case ShapeEllipse:
       painter->drawEllipse(m_boundingRect);
       break;

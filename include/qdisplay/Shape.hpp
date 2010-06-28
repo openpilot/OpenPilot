@@ -17,6 +17,7 @@ class Shape : public QGraphicsItemGroup {
     enum ShapeType {
       ShapeRectangle,
       ShapeCross,
+      ShapeCrossX,
       ShapeEllipse
     };
     /**

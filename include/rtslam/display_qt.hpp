@@ -256,17 +256,20 @@ class ObservationQt : public ObservationDisplay
 			{
 				case LandmarkDisplay::ltPoint:
 				{
+					bool dispPred = visible_ && predicted_;
+					bool dispMeas = visible_ && (matched_ || !predicted_);
+
 					// Build display objects if it is the first time they are displayed
 					if (items_.size() != 3)
 					{
 						// clear
 						items_.clear();
-						if (!(visible_ && predicted_))
+						if (!dispPred)
 						{
 							predObs_.clear();
 							predObsCov_ = identity_mat(2);
 						}
-						if (!(visible_ && matched_))
+						if (!dispMeas)
 						{
 							measObs_.clear();
 						}
@@ -275,23 +278,19 @@ class ObservationQt : public ObservationDisplay
 
 						// prediction point
 						s = new qdisplay::Shape(qdisplay::Shape::ShapeCross, predObs_(0), predObs_(1), 3, 3);
-						s->setColor(0,0,0);
 						s->setFontSize(8);
-						s->setFontColor(0,0,0);
 						s->setVisible(false);
 						items_.push_back(s);
 						view_->addShape(s);
 						
 						// prediction ellipse
 						s = new qdisplay::Ellipsoid(predObs_, predObsCov_, 3.0);
-						s->setColor(0,0,0);
 						s->setVisible(false);
 						items_.push_back(s);
 						view_->addShape(s);
 						
 						// measure point
 						s = new qdisplay::Shape(qdisplay::Shape::ShapeCross, measObs_(0), measObs_(1), 3, 3, 45);
-						s->setColor(0,0,0);
 						s->setVisible(false);
 						items_.push_back(s);
 						view_->addShape(s);
@@ -307,10 +306,6 @@ class ObservationQt : public ObservationDisplay
 						if (predicted_) lmkstateadvanced = lmk_state_advanced_predicted ;
 						if (matched_)   lmkstateadvanced = lmk_state_advanced_matched ;
 						if (updated_)   lmkstateadvanced = lmk_state_advanced_updated ;
-
-
-						bool dispPred = visible_ && predicted_;
-						bool dispMeas = visible_ && (matched_ || !predicted_);
 
 						// prediction point
 						ItemList::iterator it = items_.begin();

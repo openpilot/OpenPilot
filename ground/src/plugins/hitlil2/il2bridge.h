@@ -5,7 +5,7 @@
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   hitlplugin
+ * @defgroup   hitlil2plugin
  * @{
  *
  *****************************************************************************/
@@ -25,12 +25,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef FLIGHTGEARBRIDGE_H
-#define FLIGHTGEARBRIDGE_H
+#ifndef IL2BRIDGE_H
+#define IL2BRIDGE_H
 
 #include <QObject>
 #include <QUdpSocket>
 #include <QTimer>
+#include <QMessageBox>
 #include <math.h>
 #include "uavtalk/telemetrymanager.h"
 #include "uavobjects/uavobjectmanager.h"
@@ -91,4 +92,4 @@ private:
     void setupObjects();
 };
 
-#endif // FLIGHTGEARBRIDGE_H
+#endif // IL2BRIDGE_H

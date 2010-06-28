@@ -50,7 +50,6 @@ public slots:
 private slots:
     void startButtonClicked();
     void stopButtonClicked();
-    void processReadyRead();
     void onAutopilotConnect();
     void onAutopilotDisconnect();
     void onIl2Connect();

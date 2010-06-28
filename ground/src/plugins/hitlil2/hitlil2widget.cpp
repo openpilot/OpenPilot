@@ -32,11 +32,12 @@
 
 HITLIL2Widget::HITLIL2Widget(QWidget *parent) : QWidget(parent)
 {
-    il2Process = NULL;
     widget = new Ui_HITLIL2Widget();
     widget->setupUi(this);
     connect(widget->startButton, SIGNAL(clicked()), this, SLOT(startButtonClicked()));
     connect(widget->stopButton, SIGNAL(clicked()), this, SLOT(stopButtonClicked()));
+    /* Note to myself: failure to initialize pointers can cause segfaults */
+    il2Bridge=NULL;
 }
 
 HITLIL2Widget::~HITLIL2Widget()
@@ -47,7 +48,7 @@ HITLIL2Widget::~HITLIL2Widget()
 void HITLIL2Widget::startButtonClicked()
 {
     // Stop running process if one is active
-    if (il2Process != NULL)
+    if (il2Bridge != NULL)
     {
         stopButtonClicked();
     }
@@ -57,11 +58,11 @@ void HITLIL2Widget::startButtonClicked()
 
     // Start bridge
     qxtLog->info("HITLIL2: Starting bridge, initializing IL2 and Autopilot connections");
-    il2Bridge = new IL2Bridge(il2HostName,il2Port);
+    il2Bridge = new Il2Bridge(il2HostName,il2Port);
     connect(il2Bridge, SIGNAL(autopilotConnected()), this, SLOT(onAutopilotConnect()));
     connect(il2Bridge, SIGNAL(autopilotDisconnected()), this, SLOT(onAutopilotDisconnect()));
-    connect(il2Bridge, SIGNAL(il2Connected()), this, SLOT(onFGConnect()));
-    connect(il2Bridge, SIGNAL(il2Disconnected()), this, SLOT(onFGDisconnect()));
+    connect(il2Bridge, SIGNAL(il2Connected()), this, SLOT(onIl2Connect()));
+    connect(il2Bridge, SIGNAL(il2Disconnected()), this, SLOT(onIl2Disconnect()));
 
     // Initialize connection status
     if ( il2Bridge->isAutopilotConnected() )
@@ -72,27 +73,23 @@ void HITLIL2Widget::startButtonClicked()
     {
         onAutopilotDisconnect();
     }
-    if ( il2Bridge->isFGConnected() )
+    if ( il2Bridge->isIl2Connected() )
     {
-        onFGConnect();
+        onIl2Connect();
     }
     else
     {
-        onFGDisconnect();
+        onIl2Disconnect();
     }
 }
 
 void HITLIL2Widget::stopButtonClicked()
 {
-    // NOTE: Does not currently work, may need to send control+c to through the terminal
-    if (il2Process != NULL)
+    if (il2Bridge != NULL)
     {
-        il2Process->disconnect(this);
-        il2Process->kill();
-        delete il2Process;
         il2Bridge->disconnect(this);
         delete il2Bridge;
-        il2Process = NULL;
+        il2Bridge = NULL;
     }
 }
 
@@ -106,19 +103,9 @@ void HITLIL2Widget::setIl2Port(int il2Port)
     this->il2Port = il2Port;
 }
 
-void HITLIL2Widget::setFGManualControl(bool val)
+void HITLIL2Widget::setIl2ManualControl(bool val)
 {
     this->il2ManualControl = val;
-}
-
-void HITLIL2Widget::processReadyRead()
-{
-    QByteArray bytes = il2Process->readAllStandardOutput();
-    QString str(bytes);
-    if ( !str.contains("Error reading data") ) // ignore error
-    {
-        widget->textBrowser->append(str);
-    }
 }
 
 void HITLIL2Widget::onAutopilotConnect()
@@ -151,7 +138,7 @@ void HITLIL2Widget::onIl2Connect()
     qxtLog->info("HITL-IL2: IL2 connected");
 }
 
-void HITLIL2Widget::onFGDisconnect()
+void HITLIL2Widget::onIl2Disconnect()
 {
     QPalette pal(widget->il2Label->palette());
     pal.setColor(QPalette::Window, Qt::red);

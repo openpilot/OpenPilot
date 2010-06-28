@@ -124,7 +124,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="fgLabel">
+      <widget class="QLabel" name="il2Label">
        <property name="text">
         <string>IL2 Disconnected</string>
        </property>

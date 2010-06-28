@@ -45,8 +45,8 @@ QWidget *HITLIL2OptionsPage::createPage(QWidget *parent)
 
 
     // Restore the contents from the settings:
-    m_optionsPage->Il2Port->setValue(m_config->Il2Port());
-    m_optionsPage->Il2HostName->setText(m_config->Il2HostName());
+    m_optionsPage->Il2Port->setValue(m_config->il2Port());
+    m_optionsPage->Il2HostName->setText(m_config->il2HostName());
     m_optionsPage->il2ManualControl->setChecked(m_config->il2ManualControl());
 
 

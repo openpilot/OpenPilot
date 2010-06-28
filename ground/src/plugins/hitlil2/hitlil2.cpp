@@ -42,7 +42,7 @@ HITLIL2::~HITLIL2()
 void HITLIL2::loadConfiguration(IUAVGadgetConfiguration* config)
 {
     HITLIL2Configuration *m = qobject_cast<HITLIL2Configuration*>(config);
-    m_widget->setIlHostName( m->il2HostName() );
+    m_widget->setIl2HostName( m->il2HostName() );
     m_widget->setIl2Port( m->il2Port() );
     m_widget->setIl2ManualControl( m->il2ManualControl() );
 }

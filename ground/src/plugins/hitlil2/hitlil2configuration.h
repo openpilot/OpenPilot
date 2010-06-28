@@ -54,7 +54,7 @@ public:
 signals:
 
 public slots:
-    void setIl2HostName(QString HostName) { m_il2HostName = iHostName; }
+    void setIl2HostName(QString HostName) { m_il2HostName = HostName; }
     void setIl2Port(int Port) { m_il2Port = Port; }
     void setIl2ManualControl(bool val) { m_il2ManualControl = val; }
 

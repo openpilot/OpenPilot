@@ -36,7 +36,7 @@ Il2Bridge::Il2Bridge(QString il2HostName, int il2Port)
     updatePeriod = 50;
     il2Timeout = 2000;
     autopilotConnectionStatus = false;
-    fgConnectionStatus = false;
+    il2ConnectionStatus = false;
 
     // Get required UAVObjects
     ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
@@ -74,8 +74,8 @@ Il2Bridge::Il2Bridge(QString il2HostName, int il2Port)
     // Setup FG connection timer
     il2Timer = new QTimer(this);
     connect(il2Timer, SIGNAL(timeout()), this, SLOT(onIl2ConnectionTimeout()));
-    fgTimer->setInterval(fgTimeout);
-    fgTimer->start();
+    il2Timer->setInterval(il2Timeout);
+    il2Timer->start();
 }
 
 Il2Bridge::~Il2Bridge()
@@ -128,16 +128,18 @@ void Il2Bridge::receiveUpdate()
         il2ConnectionStatus = true;
         emit il2Connected();
     }
-
+//QMessageBox msgBox;
+//msgBox.setText((const QString )"live!");
+//msgBox.exec();
     // Process data
     while ( outSocket->bytesAvailable() > 0 )
     {
         // Receive datagram
         QByteArray datagram;
-        datagram.resize(inSocket->pendingDatagramSize());
+        datagram.resize(outSocket->pendingDatagramSize());
         QHostAddress sender;
         quint16 senderPort;
-        inSocket->readDatagram(datagram.data(), datagram.size(),
+        outSocket->readDatagram(datagram.data(), datagram.size(),
                                &sender, &senderPort);
         QString datastr(datagram);
         // Process incomming data
@@ -192,12 +194,12 @@ void Il2Bridge::onAutopilotDisconnect()
     emit autopilotDisconnected();
 }
 
-void Il2Bridge::onFGConnectionTimeout()
+void Il2Bridge::onIl2ConnectionTimeout()
 {
-    if ( fgConnectionStatus )
+    if ( il2ConnectionStatus )
     {
-        fgConnectionStatus = false;
-        emit fgDisconnected();
+        il2ConnectionStatus = false;
+        emit il2Disconnected();
     }
 }
 

@@ -30,7 +30,7 @@
 
 HITLIL2Configuration::HITLIL2Configuration(QString classId, const QByteArray &state, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),
-    m_fgPathBin(""), m_fgPathData(""), m_fgManualControl(false)
+    m_il2HostName(""), m_il2Port(0), m_il2ManualControl(false)
 {
     if (state.count() > 0) {
         QDataStream stream(state);
@@ -42,7 +42,7 @@ HITLIL2Configuration::HITLIL2Configuration(QString classId, const QByteArray &st
         stream >> il2Port;
         m_il2Port = il2Port;
         stream >> il2ManualControl;
-        m_il2ManualControl = fgManualControl;
+        m_il2ManualControl = il2ManualControl;
     }
 }
 

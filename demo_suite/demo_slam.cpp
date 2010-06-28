@@ -84,9 +84,9 @@ void demo_slam01_main(world_ptr_t *world) {
 	const double DISTORTION[2] = { -0.23193,   0.11306 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
 	const double PIX_NOISE = 1.0;
 
-	// lmk
+	// lmk management
 	const double D_MIN = 0.1;
-	const double REPARAM_TH = 0.1;
+	const double REPARAM_TH = 0.2;
 
 	// data manager: quick Harris detector
 	const int HARRIS_CONV_SIZE = 5;
@@ -274,15 +274,15 @@ void demo_slam01_main(world_ptr_t *world) {
 			if (robPtr1->dt_or_dx > max_dt) max_dt = robPtr1->dt_or_dx;
 
 			// Output info
-			//			cout << endl;
-			//			cout << "dt: " << (int) (1000 * robPtr1->dt_or_dx) << "ms (match "
-			//			<< total_match_time/1000 << " ms, update " << total_update_time/1000 << "ms). Lmk: [";
-			//			cout << mmPoint->landmarkList().size() << "] ";
-			//			for (MapManagerAbstract::LandmarkList::iterator lmkIter =
-			//					mmPoint->landmarkList().begin(); lmkIter
-			//					!= mmPoint->landmarkList().end(); lmkIter++) {
-			//				cout << (*lmkIter)->id() << " ";
-			//			}
+						cout << endl;
+						cout << "dt: " << (int) (1000 * robPtr1->dt_or_dx) << "ms (match "
+						<< total_match_time/1000 << " ms, update " << total_update_time/1000 << "ms). Lmk: [";
+						cout << mmPoint->landmarkList().size() << "] ";
+						for (MapManagerAbstract::LandmarkList::iterator lmkIter =
+								mmPoint->landmarkList().begin(); lmkIter
+								!= mmPoint->landmarkList().end(); lmkIter++) {
+							cout << (*lmkIter)->id() << " ";
+						}
 
 
 

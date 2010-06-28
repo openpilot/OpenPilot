@@ -27,7 +27,6 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
-
 		// Serializer function very long: and defined at the end of file
 		// std::ostream& operator <<(std::ostream & s, jafar::rtslam::MapAbstract & map) {
 
@@ -41,11 +40,8 @@ namespace jafar {
 			filterPtr = filtPtr;
 		}
 		MapAbstract::MapAbstract(const ekfInd_ptr_t & ekfPtr) :
-			filterPtr(ekfPtr),
-			max_size(ekfPtr->size()),
-			current_size(0),
-			used_states(ekfPtr->size())
-		{
+			filterPtr(ekfPtr), max_size(ekfPtr->size()), current_size(0),
+			    used_states(ekfPtr->size()) {
 			used_states.clear();
 		}
 
@@ -67,41 +63,37 @@ namespace jafar {
 				jblas::ind_array res = jmath::ublasExtra::ia_pushfront(used_states, N);
 				current_size += N;
 				return res;
-			}
-			else {
+			} else {
 				jblas::ind_array res(0);
 				return res;
 			}
 		}
 
-	  jblas::ind_array MapAbstract::convertStates(const jblas::ind_array & _ia,const std::size_t N,jblas::ind_array & _icomp) {
-	    if( _ia.size()<N )
-	      {
-		std::cerr << __PRETTY_FUNCTION__ << "(#" << __LINE__
-			  << "): initial size unsufficient." << std::endl;
-		throw "convertStates: size unsufficient.";
-	      }
-	    if( _icomp.size()+N!=_ia.size() )
-	      {
-		std::cerr << __PRETTY_FUNCTION__ << "(#" << __LINE__
-			  << "): initial sizes not consistent ("
-			  <<_icomp.size()<<"+"<<N<<"!="<<_ia.size()<<")." << std::endl;
-		throw "convertStates: sizes inconsistent.";
-	      }
-	    jblas::ind_array res(N);
-	    for( size_t i = 0; i <N;++i )
-	      {
-		res(i)=_ia(i);
-	      }
-	    for( size_t i = N; i <_ia.size();++i )
-	      {
-		_icomp(i-N) = _ia(i);
-	      }
-	    return res;
-	  }
+		jblas::ind_array MapAbstract::convertStates(const jblas::ind_array & _ia,
+		    const std::size_t N, jblas::ind_array & _icomp) {
+			if (_ia.size() < N) {
+				std::cerr << __PRETTY_FUNCTION__ << "(#" << __LINE__
+				    << "): initial size unsufficient." << std::endl;
+				throw "convertStates: size unsufficient.";
+			}
+			if (_icomp.size() + N != _ia.size()) {
+				std::cerr << __PRETTY_FUNCTION__ << "(#" << __LINE__
+				    << "): initial sizes not consistent (" << _icomp.size() << "+" << N
+				    << "!=" << _ia.size() << ")." << std::endl;
+				throw "convertStates: sizes inconsistent.";
+			}
+			jblas::ind_array res(N);
+			for (size_t i = 0; i < N; ++i) {
+				res(i) = _ia(i);
+			}
+			for (size_t i = N; i < _ia.size(); ++i) {
+				_icomp(i - N) = _ia(i);
+			}
+			return res;
+		}
+
 		void MapAbstract::liberateStates(const jblas::ind_array & _ia) {
-			for (size_t i = 0; i <_ia.size(); i++)
-			{
+			for (size_t i = 0; i < _ia.size(); i++) {
 				int j = _ia(i);
 				if (used_states(j) == true) {
 					used_states(j) = false;
@@ -110,15 +102,20 @@ namespace jafar {
 			}
 		}
 
-		void MapAbstract::completeObservationsInGraph(const sensor_ptr_t & existingSenPtr, const landmark_ptr_t & lmkPtr) {
-			for (RobotList::iterator robIter = robotList().begin(); robIter != robotList().end(); robIter++) {
+		void MapAbstract::completeObservationsInGraph(
+		    const sensor_ptr_t & existingSenPtr, const landmark_ptr_t & lmkPtr) {
+			for (RobotList::iterator robIter = robotList().begin(); robIter
+			    != robotList().end(); robIter++) {
 				robot_ptr_t robPtr = *robIter;
-				for (RobotAbstract::SensorList::iterator senIter = robPtr->sensorList().begin(); senIter != robPtr->sensorList().end(); senIter++) {
+				for (RobotAbstract::SensorList::iterator senIter =
+				    robPtr->sensorList().begin(); senIter != robPtr->sensorList().end(); senIter++) {
 					sensor_ptr_t senPtr = *senIter;
-					if (senPtr != existingSenPtr){
+					if (senPtr != existingSenPtr) {
 						// FIXME dynamic creation
-						observation_ptr_t obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint(senPtr, lmkPtr));
-//						obsPtr->setup(senPtr, lmkPtr, width, height); //todo uncomment here
+						observation_ptr_t
+						    obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint(senPtr,
+						                                                          lmkPtr));
+						//						obsPtr->setup(senPtr, lmkPtr, width, height); //todo uncomment here
 					}
 				}
 			}
@@ -156,7 +153,6 @@ namespace jafar {
 			randMatrix(P());
 		}
 
-
 		/**
 		 * Serializer. Print all MAP data.
 		 *
@@ -166,33 +162,37 @@ namespace jafar {
 		 * - landmarks
 		 *   - observations of landmark from each sensor
 		 */
-		std::ostream& operator <<(std::ostream & s, const jafar::rtslam::MapAbstract & map) {
+		std::ostream& operator <<(std::ostream & s,
+		    const jafar::rtslam::MapAbstract & map) {
 
 			s << "\n% ROBOTS AND SENSORS \n%=========================" << endl;
-			for (MapAbstract::RobotList::const_iterator robIter = map.robotList().begin(); robIter != map.robotList().end(); robIter++) {
+			for (MapAbstract::RobotList::const_iterator robIter =
+			    map.robotList().begin(); robIter != map.robotList().end(); robIter++) {
 				robot_ptr_t robPtr = *robIter;
 				s << *robPtr << endl;
-				for (RobotAbstract::SensorList::const_iterator senIter = robPtr->sensorList().begin(); senIter
-				    != robPtr->sensorList().end(); senIter++) {
+				for (RobotAbstract::SensorList::const_iterator senIter =
+				    robPtr->sensorList().begin(); senIter != robPtr->sensorList().end(); senIter++) {
 					sensor_ptr_t senPtr = *senIter;
 					s << *senPtr << endl;
 				}
 			}
-			s << "\n% LANDMARKS AND OBSERVATIONS \n%==========================" << endl;
-			for( MapAbstract::MapManagerList::const_iterator mmIter = map.mapManagerList().begin(); mmIter!=map.mapManagerList().end();mmIter++ )
-			  {
-			    const map_manager_ptr_t mm = *mmIter;
-			    for (MapManagerAbstract::LandmarkList::const_iterator lmkIter = mm->landmarkList().begin(); lmkIter
-			    != mm->landmarkList().end(); lmkIter++) {
-				landmark_ptr_t lmkPtr = *lmkIter;
-				s << *lmkPtr << endl;
-				for (LandmarkAbstract::ObservationList::iterator obsIter = lmkPtr->observationList().begin();
-						obsIter != lmkPtr->observationList().end(); obsIter++) {
-					observation_ptr_t obsPtr = *obsIter;
-					s << *obsPtr << endl;
+			s << "\n% LANDMARKS AND OBSERVATIONS \n%=========================="
+			    << endl;
+			for (MapAbstract::MapManagerList::const_iterator mmIter =
+			    map.mapManagerList().begin(); mmIter != map.mapManagerList().end(); mmIter++) {
+				const map_manager_ptr_t mm = *mmIter;
+				for (MapManagerAbstract::LandmarkList::const_iterator lmkIter =
+				    mm->landmarkList().begin(); lmkIter != mm->landmarkList().end(); lmkIter++) {
+					landmark_ptr_t lmkPtr = *lmkIter;
+					s << *lmkPtr << endl;
+					for (LandmarkAbstract::ObservationList::iterator obsIter =
+					    lmkPtr->observationList().begin(); obsIter
+					    != lmkPtr->observationList().end(); obsIter++) {
+						observation_ptr_t obsPtr = *obsIter;
+						s << *obsPtr << endl;
+					}
 				}
 			}
-			  }
 			return s;
 		}
 

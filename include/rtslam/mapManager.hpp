@@ -38,10 +38,11 @@ namespace jafar {
 
 			protected:
 				virtual landmark_ptr_t createLandmarkInit(void) = 0;
-				virtual landmark_ptr_t createLandmarkConverged(landmark_ptr_t lmkinit, jblas::ind_array &_icomp) = 0;
- 		                /* Compute the size of the complement between init and
+				virtual landmark_ptr_t createLandmarkConverged(landmark_ptr_t lmkinit,
+				    jblas::ind_array &_icomp) = 0;
+				/* Compute the size of the complement between init and
 				 * converged lmk, ie the difference of the size of the states. */
-		                virtual size_t sizeComplement( void ) = 0;
+				virtual size_t sizeComplement(void) = 0;
 
 			public:
 				virtual ~MapManagerAbstract(void) {
@@ -52,8 +53,7 @@ namespace jafar {
 				 * dmaOrigin. */
 				observation_ptr_t createNewLandmark(data_manager_ptr_t dmaOrigin);
 				void reparametrizeLandmark(landmark_ptr_t lmk);
-				void unregisterLandmark(landmark_ptr_t lmk,
-						  bool liberateFilter=true);
+				void unregisterLandmark(landmark_ptr_t lmk, bool liberateFilter = true);
 				void manage(void);
 				void manageMap(void);
 		};
@@ -64,14 +64,16 @@ namespace jafar {
 				virtual landmark_ptr_t createLandmarkInit(void) {
 					return boost::shared_ptr<LandmarkInit>(new LandmarkInit(mapPtr()));
 				}
-		                virtual landmark_ptr_t createLandmarkConverged(landmark_ptr_t lmkinit, jblas::ind_array &_icomp) {
+				virtual landmark_ptr_t createLandmarkConverged(landmark_ptr_t lmkinit,
+				    jblas::ind_array &_icomp) {
 					return boost::shared_ptr<LandmarkAdvanced>(
 					                                           new LandmarkAdvanced(
-					                                                                mapPtr(),lmkinit,_icomp));
+					                                                                mapPtr(),
+					                                                                lmkinit,
+					                                                                _icomp));
 				}
-		                virtual size_t sizeComplement( void )
-		                {
-				  return (LandmarkInit::size() - LandmarkAdvanced::size());
+				virtual size_t sizeComplement(void) {
+					return (LandmarkInit::size() - LandmarkAdvanced::size());
 				}
 			public:
 				virtual ~MapManager(void) {

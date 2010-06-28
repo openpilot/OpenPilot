@@ -88,22 +88,24 @@ void demo_slam01_main(world_ptr_t *world) {
 	const double D_MIN = 0.1;
 	const double REPARAM_TH = 0.1;
 
-	// data manager
-	const int GRID_VCELLS = 3;
-	const int GRID_HCELLS = 4;
-	const int GRID_MARGIN = 20;
-	const int GRID_SEPAR = 20;
+	// data manager: quick Harris detector
+	const int HARRIS_CONV_SIZE = 5;
+	const double HARRIS_TH = 20.0;
+	const double HARRIS_EDDGE = 2.0;
+	const int PATCH_DESC = 45;
 
-	const int PATCH_SIZE = 15;
-	const double MATCH_TH = 0.95;
+	// data manager: zncc matcher
+	const int PATCH_SIZE = 11;
+	const double MATCH_TH = 0.9;
 	const double SEARCH_SIGMA = 2.5;
 	const double MAHALANOBIS_TH = 2.5;
 	const int N_UPDATES = 15;
 
-	const int HARRIS_CONV_SIZE = 5;
-	const double HARRIS_TH = 20.0;
-	const double HARRIS_EDDGE = 1.5;
-	const int PATCH_DESC = 3*PATCH_SIZE;
+	// data manager: active search
+	const int GRID_VCELLS = 3;
+	const int GRID_HCELLS = 4;
+	const int GRID_MARGIN = 11;
+	const int GRID_SEPAR = 20;
 
 //	const bool SHOW_PATCH = true;
 
@@ -294,7 +296,7 @@ void demo_slam01_main(world_ptr_t *world) {
 
 		worldPtr->display_mutex.unlock();
 		mutex_chrono.reset();
-
+getchar();
 	} // temporal loop
 
 //	cout << "time avg(max): " << total_chrono.elapsed()/N_FRAMES << "(" << (int)(1000*max_dt) <<") ms" << endl;

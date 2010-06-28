@@ -25,8 +25,43 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+/*
+ * Description of DeviceLink Protocol:
+ * A Request is initiated with R/ followed by id's of to be requested settings
+ * even id's indicate read only values, odd are write only
+ * (usually id =get value id+1= set - for same setting)
+ * id's are separated by /
+ * requests can contain values to set, or to select a subsystem
+ * values are separated by \
+ * example: R/30/48/64\0/64\1/
+ * request read only settings 30,48 and 64 with parameters 0 and 1
+ * the answer consists of an A followed by id value pairs in the same format
+ * example: A/30\0/48\0/64\0\22/64\1\102/
+ *
+ * A full protocol description as well as a list of ID's and their meanings
+ * can be found shipped with IL2 in the file DeviceLink.txt
+ *
+ * id's used in this file:
+ * 30: IAS in km/h (float)
+ * 32: vario in m/s (float)
+ * 38: angular speed °/s (float) (which direction? azimuth?)
+ * 40: barometric alt in m (float)
+ * 42: flight course in ° (0-360) (float)
+ * 46: roll angle in ° (-180 - 180) (floatniguration)
+ * 48: pitch angle in ° (-90 - 90) (float)
+ * 80/81: engine power  (-1.0 (0%) - 1.0 (100%)) (float)
+ * 84/85: aileron servo (-1.0 - 1.0) (float)
+ * 86/87: elevator servo (-1.0 - 1.0) (float)
+ * 88/89: rudder servo (-1.0 - 1.0) (float)
+ *
+ * IL2 currently offers no useful way of providing GPS data
+ * therefore fake GPS data will be calculated using IMS
+ *
+ * unfortunately angular acceleration provided is very limited, too
+ */
 #include "il2bridge.h"
 #include "extensionsystem/pluginmanager.h"
+#include <math.h>
 
 Il2Bridge::Il2Bridge(QString il2HostName, int il2Port)
 {
@@ -76,6 +111,12 @@ Il2Bridge::Il2Bridge(QString il2HostName, int il2Port)
     connect(il2Timer, SIGNAL(timeout()), this, SLOT(onIl2ConnectionTimeout()));
     il2Timer->setInterval(il2Timeout);
     il2Timer->start();
+
+    // setup time
+    time = new QTime();
+    time->start();
+
+    current.T=0;
 }
 
 Il2Bridge::~Il2Bridge()
@@ -112,7 +153,11 @@ void Il2Bridge::transmitUpdate()
 //          .arg(rudder)
 //          .arg(throttle);
     QString cmd;
-    cmd=QString("R/30/32/34/40/42/46/48/64\\0/64\\1/74\\0/74\\1/164/");
+    cmd=QString("R/30/32/38/40/42/46/48/81\\%1/85\\%2/87\\%3/89\\%4/")
+    	.arg(throttle*2.0-1.0)
+	.arg(ailerons)
+	.arg(elevator)
+	.arg(rudder);
     QByteArray data = cmd.toAscii();
     outSocket->write(data);
 }
@@ -203,66 +248,82 @@ void Il2Bridge::onIl2ConnectionTimeout()
     }
 }
 
+float Il2Bridge::DENSITY(float alt) {
+	return (GROUNDDENSITY * pow(
+				(TEMP_GROUND+(TEMP_LAPSE_RATE*alt)/TEMP_GROUND),
+				((AIR_CONST_FACTOR/TEMP_LAPSE_RATE)-1) )
+				);
+}
+
+float Il2Bridge::PRESSURE(float alt) {
+	return DENSITY(alt)*alt*TEMP_LAPSE_RATE*TEMP_GROUND*AIR_CONST;
+	
+}
+
+float Il2Bridge::TAS(float IAS, float alt) {
+	return (IAS*sqrt(GROUNDDENSITY/DENSITY(alt)));
+}
+
 void Il2Bridge::processUpdate(QString& data)
 {
 return;
     // Split
-    QStringList fields = data.split(",");
-    // Get xRate (deg/s)
-    float xRate = fields[0].toFloat() * 180.0/M_PI;
-    // Get yRate (deg/s)
-    float yRate = fields[1].toFloat() * 180.0/M_PI;
-    // Get zRate (deg/s)
-    float zRate = fields[2].toFloat() * 180.0/M_PI;
-    // Get xAccel (m/s^2)
-    float xAccel = fields[3].toFloat() * FT2M;
-    // Get yAccel (m/s^2)
-    float yAccel = fields[4].toFloat() * FT2M;
-    // Get xAccel (m/s^2)
-    float zAccel = fields[5].toFloat() * FT2M;
-    // Get pitch (deg)
-    float pitch = fields[6].toFloat();
-    // Get pitchRate (deg/s)
-    float pitchRate = fields[7].toFloat();
-    // Get roll (deg)
-    float roll = fields[8].toFloat();
-    // Get rollRate (deg/s)
-    float rollRate = fields[9].toFloat();
-    // Get yaw (deg)
-    float yaw = fields[10].toFloat();
-    // Get yawRate (deg/s)
-    float yawRate = fields[11].toFloat();
-    // Get latitude (deg)
-    float latitude = fields[12].toFloat();
-    // Get longitude (deg)
-    float longitude = fields[13].toFloat();
-    // Get heading (deg)
-    float heading = fields[14].toFloat();
-    // Get altitude (m)
-    float altitude = fields[15].toFloat() * FT2M;
-    // Get altitudeAGL (m)
-    float altitudeAGL = fields[16].toFloat() * FT2M;
-    // Get groundspeed (m/s)
-    float groundspeed = fields[17].toFloat() * KT2MPS;
-    // Get airspeed (m/s)
-    float airspeed = fields[18].toFloat() * KT2MPS;
-    // Get temperature (degC)
-    float temperature = fields[19].toFloat();
-    // Get pressure (kpa)
-    float pressure = fields[20].toFloat() * INHG2KPA;
+    QStringList fields = data.split("/");
+
+    old=current;
+
+    int t;
+    for (t=0; t<fields->length(); t++) {
+    	QStringList values = fields[t].split("\\");
+	int id = values[0].toInt();
+	float value = values[1].toFloat();
+	switch (id) {
+	    case 30:
+	        current.ias=value * KMH2MPS;
+		break;
+	    case 32:
+	        current.dZ=value;
+		break;
+	    case 38:
+	        //angular_speed=value;
+		break;
+	    case 40:
+	        current.Z=value;
+		break;
+	    case 42:
+	        current.azimuth=value;
+		break;
+	    case 46:
+	        current.roll=value;
+		break;
+	    case 48:
+	        current.pitch=value;
+		break;
+    }
+
+    current.dT = ((float)time->restart()) / 1000.0;
+    current.T = old.T+current.dT;
+
+    current.tas = TAS(current.ias,current.Z);
+    current.groundspeed = current.tas*cos(current.pitch*DEG2RAD);
+    current.dX = current.groundspeed*sin(current.azimuth*DEG2RAD);
+    current.dY = current.groundspeed*cos(current.azimuth*DEG2RAD);
+
+    current.X = old.X + (current.dX/current.dT);
+    current.Y = old.Y + (current.dY/current.dT);
 
     // Update AltitudeActual object
     AltitudeActual::DataFields altActualData;
-    altActualData.Altitude = altitudeAGL;
-    altActualData.Temperature = temperature;
-    altActualData.Pressure = pressure;
+    altActualData.Altitude = current.Z;
+    altActualData.Temperature = (TEMP_GROUND * current.Z * TEMP_LAPSE_RATE)+273.0;
+    altActualData.Pressure = PRESSURE(current.Z)*1000.0; // kpa
     altActual->setData(altActualData);
 
     // Update attActual object
     AttitudeActual::DataFields attActualData;
-    attActualData.Roll = roll;
-    attActualData.Pitch = pitch;
-    attActualData.Yaw = yaw;
+    attActualData.Roll = current.roll;
+    attActualData.Pitch = current.pitch;
+    attActualData.Yaw = current.yaw;
     attActualData.q1 = 0;
     attActualData.q2 = 0;
     attActualData.q3 = 0;
@@ -272,12 +333,12 @@ return;
 
     // Update gps objects
     PositionActual::DataFields gpsData;
-    gpsData.Altitude = altitude;
-    gpsData.Heading = heading;
-    gpsData.Groundspeed = groundspeed;
-    gpsData.Latitude = latitude;
-    gpsData.Longitude = longitude;
-    gpsData.Satellites = 10;
+    gpsData.Altitude = current.Z;
+    gpsData.Heading = current.azimuth;
+    gpsData.Groundspeed = current.groundspeed;
+    gpsData.Latitude = current.Y * DEG2M;
+    gpsData.Longitude = current.X * cos(gpsData.Latitude*DEG2RAD) * DEG2M;
+    gpsData.Satellites = 7;
     gpsData.Status = PositionActual::STATUS_FIX3D;
     posActual->setData(gpsData);
 }

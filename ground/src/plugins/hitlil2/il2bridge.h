@@ -31,6 +31,7 @@
 #include <QObject>
 #include <QUdpSocket>
 #include <QTimer>
+#include <QTime>
 #include <QMessageBox>
 #include <math.h>
 #include "uavtalk/telemetrymanager.h"
@@ -40,6 +41,36 @@
 #include "uavobjects/attitudeactual.h"
 #include "uavobjects/positionactual.h"
 #include "uavobjects/gcstelemetrystats.h"
+
+
+struct flightParams {
+
+	// time
+	float T;
+	float dT;
+
+	// speed (relative)
+	float ias;
+	float tas;
+	float groundspeed;
+
+	// position (absolute)
+	float X;
+	float Y;
+	float Z;
+
+	// speed (absolute)
+	float dX;
+	float dY;
+	float dZ;
+
+	//angle
+	float azimuth;
+	float pitch;
+	float roll;
+
+};
+
 
 class Il2Bridge: public QObject
 {
@@ -69,8 +100,22 @@ private slots:
 private:
     static const float FT2M = 0.3048;
     static const float KT2MPS = 0.514444444;
+    static const float MPS2KMH = 3.6;
+    static const float KMH2MPS = (1.0/MPS2KMH);
     static const float INHG2KPA = 3.386;
+    static const float RAD2DEG = (180.0/M_PI);
+    static const float DEG2RAD = (1.0/RAD2DEG);
+    static const float M2DEG =  60.*1852.; // 60 miles per degree times 1852 meters per mile
+    static const float DEG2M = (1.0/M2DEG);
 
+    static const float AIR_CONST = 8314.32; // N*m/(Kmol*K) 
+    static const float GROUNDDENSITY = 1.225; // kg/m³ ;)
+    static const float TEMP_GROUND = (15.0 + 273.0); // 15°C in Kelvin
+    static const float TEMP_LAPSE_RATE = -0.0065; //degrees per meter
+    static const float AIR_CONST_FACTOR = -0.0341631947363104; //several nature constants calculated into one
+
+    struct FlightParams current;
+    struct FlightParams old;
     QUdpSocket* outSocket;
     ActuatorDesired* actDesired;
     AltitudeActual* altActual;
@@ -82,6 +127,7 @@ private:
     int updatePeriod;
     QTimer* txTimer;
     QTimer* il2Timer;
+    QTime* time;
     bool autopilotConnectionStatus;
     bool il2ConnectionStatus;
     int il2Timeout;

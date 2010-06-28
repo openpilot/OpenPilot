@@ -136,12 +136,12 @@ namespace display {
 			rtslam::ObservationAbstract *slamObs_;
 			SensorDisplay *dispSen_;
 			SensorDisplay::Type sensorType_;
-			LandmarkDisplay::Type landmarkType_;
+			LandmarkDisplay::Type landmarkGeomType_;
 			ObservationDisplay(rtslam::ObservationAbstract *_slamObs, SensorDisplay *_dispSen): 
 				slamObs_(_slamObs), dispSen_(_dispSen)
 			{
 				sensorType_ = SensorDisplay::convertType(&*_slamObs->sensorPtr());
-				landmarkType_ = LandmarkDisplay::convertType(&*_slamObs->landmarkPtr());
+				landmarkGeomType_ = LandmarkDisplay::convertType(&*_slamObs->landmarkPtr());
 			}
 	};
 

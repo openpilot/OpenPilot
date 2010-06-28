@@ -67,20 +67,21 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	// time
 	const int N_FRAMES = 5000;
-//	const double FRAME_RATE = 60;
 
 	// map
 	const int MAP_SIZE = 250;
 
-	// robot
-	const double UNCERT_VLIN = 0.1; // m/s
-	const double UNCERT_VANG = 0.1; // rad/s
+	// robot uncertainties and perturbations
+	const double UNCERT_VLIN = .01; // m/s
+	const double UNCERT_VANG = .01; // rad/s
 	const double PERT_VLIN = 1; // m/s per sqrt(s)
 	const double PERT_VANG = 1; // rad/s per sqrt(s)
 
-	// pin-hole
+	// pin-hole:
 	const int IMG_WIDTH = 640;
 	const int IMG_HEIGHT = 480;
+	const double INTRINSIC[4] = { 301.27013,   266.86136,   497.28243,   496.81116 };
+	const double DISTORTION[2] = { -0.23193,   0.11306 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
 	const double PIX_NOISE = 1.0;
 
 	// lmk
@@ -88,18 +89,20 @@ void demo_slam01_main(world_ptr_t *world) {
 	const double REPARAM_TH = 0.1;
 
 	// data manager
-	const int GRID_VCELLS = 4;
+	const int GRID_VCELLS = 3;
 	const int GRID_HCELLS = 4;
-	const int GRID_MARGIN = 10;
-	const int GRID_SEPAR = 10;
+	const int GRID_MARGIN = 20;
+	const int GRID_SEPAR = 20;
 
-	const int PATCH_SIZE = 11;
-	const double MATCH_TH = 0.90;
-	const double SEARCH_SIGMA = 3.0;
+	const int PATCH_SIZE = 15;
+	const double MATCH_TH = 0.95;
+	const double SEARCH_SIGMA = 2.5;
+	const double MAHALANOBIS_TH = 2.5;
+	const int N_UPDATES = 15;
 
 	const int HARRIS_CONV_SIZE = 5;
-	const double HARRIS_TH = 15.0;
-	const double HARRIS_EDDGE = 2.0;
+	const double HARRIS_TH = 20.0;
+	const double HARRIS_EDDGE = 1.5;
 	const int PATCH_DESC = 3*PATCH_SIZE;
 
 //	const bool SHOW_PATCH = true;
@@ -119,16 +122,14 @@ void demo_slam01_main(world_ptr_t *world) {
 	srand(rseed);
 
 
-	double _d[2] = { -0.27572, 0.28827 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
-	//	double _d[0];
-	vec d = createVector<2> (_d);
-	double _k[4] = { 301.60376, 266.29546, 519.67406, 519.54656 };
-	//	double _k[4] = {320, 240, 320, 320};
-	vec k = createVector<4> (_k);
+	// pin-hole parameters in BOOST format
+	vec intrinsic = createVector<4> (INTRINSIC);
+	vec distortion = createVector<sizeof(DISTORTION)/sizeof(double)> (DISTORTION);
+	cout << "D: " << distortion << endl;
 
 	boost::shared_ptr<ObservationFactory> obsFact(new ObservationFactory());
 	obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeEucpObservationMaker(PATCH_SIZE, D_MIN)));
-	obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhpObservationMaker(PATCH_SIZE, D_MIN)));
+	obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhpObservationMaker(PATCH_SIZE, D_MIN, REPARAM_TH)));
 
 
 	// ---------------------------------------------------------------------------
@@ -155,7 +156,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	robPtr1->linkToParentMap(mapPtr);
 	robPtr1->state.clear();
 	robPtr1->pose.x(quaternion::originFrame());
-//	robPtr1->dt_or_dx = 1. / FRAME_RATE;
+
 	double _v[6] = { PERT_VLIN, PERT_VLIN, PERT_VLIN, PERT_VANG, PERT_VANG, PERT_VANG };
 	robPtr1->perturbation.clear();
 	robPtr1->perturbation.set_std_continuous(createVector<6> (_v));
@@ -169,7 +170,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	senPtr11->state.clear();
 	senPtr11->pose.x(quaternion::originFrame());
 	senPtr11->params.setImgSize(IMG_WIDTH, IMG_HEIGHT);
-	senPtr11->params.setIntrinsicCalibration(k, d, d.size());
+	senPtr11->params.setIntrinsicCalibration(intrinsic, distortion, distortion.size());
 	senPtr11->params.setMiscellaneous(1.0, 0.1);
 //	senPtr11->params.patchSize = -1; // FIXME: See how to propagate patch size properly (obs factory needs it to be in sensor)
 
@@ -183,7 +184,8 @@ void demo_slam01_main(world_ptr_t *world) {
 	dmPt11->linkToParentMapManager(mmPoint);
 	dmPt11->setActiveSearchGrid(asGrid);
 	dmPt11->setDetector(harrisDetector, PATCH_DESC, PIX_NOISE);
-	dmPt11->setMatcher(znccMatcher, PATCH_SIZE, SEARCH_SIGMA, MATCH_TH, PIX_NOISE);
+	dmPt11->setMatcher(znccMatcher, PATCH_SIZE, SEARCH_SIGMA, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE);
+	dmPt11->setAlgorithmParams(N_UPDATES);
 	dmPt11->setObservationFactory(obsFact);
 
 	viam_hwmode_t hwmode = { VIAM_HWSZ_640x480, VIAM_HWFMT_MONO8, VIAM_HW_FIXED, VIAM_HWFPS_60, VIAM_HWTRIGGER_INTERNAL };
@@ -222,6 +224,7 @@ void demo_slam01_main(world_ptr_t *world) {
 			int total_update_time = 0;
 
 
+			// FIRST LOOP FOR MEASUREMENT SPACES - ALL DM
 			// foreach robot
 			for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin(); robIter != mapPtr->robotList().end(); robIter++) {
 				robot_ptr_t robPtr = *robIter;
@@ -262,6 +265,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		} // for each robot
 
 
+			// NOW LOOP FOR STATE SPACE - ALL MM
 		if (had_data) {
 			t++;
 
@@ -277,8 +281,8 @@ void demo_slam01_main(world_ptr_t *world) {
 					!= mmPoint->landmarkList().end(); lmkIter++) {
 				cout << (*lmkIter)->id() << " ";
 			}
-			// TODO foreach map {managemap();}
-			mmPoint->manageMap();
+			// TODO foreach mapMgr {manage();}
+			mmPoint->manage();
 
 		} // if had_data
 

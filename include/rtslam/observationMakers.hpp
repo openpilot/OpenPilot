@@ -24,14 +24,16 @@ class ImagePointObservationMaker
 	private:
   	int patchSize;
   	double dmin;
+  	double reparamTh;
 	public:
-		ImagePointObservationMaker(int _patchSize, double _dmin):
-			ObservationMakerAbstract(SenTypeId, LmkTypeId), patchSize(_patchSize), dmin(_dmin) {}
+
+		ImagePointObservationMaker(int _patchSize, double _dmin = 0.0, double reparam_th = 0.0):
+			ObservationMakerAbstract(SenTypeId, LmkTypeId), patchSize(_patchSize), dmin(_dmin), reparamTh(reparam_th) {}
 
 		observation_ptr_t create(const sensor_ptr_t &senPtr, const landmark_ptr_t &lmkPtr)
 		{
 			boost::shared_ptr<ObsType> res(new ObsType(senPtr, lmkPtr));
-			res->setup(patchSize, dmin);
+			res->setup(patchSize, dmin, reparamTh);
 			return res;
 		}
 

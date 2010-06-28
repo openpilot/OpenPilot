@@ -118,17 +118,17 @@ namespace jafar {
 					mat LMKNEW_lmk(lmkPtr->mySize(),this->mySize());
 					vec lmk = this->state.x();
 					vec lmkNEW(lmkPtr->mySize());
-					cout << __PRETTY_FUNCTION__ << "about to call reparametrize_func()" << endl;
+//					cout << __PRETTY_FUNCTION__ << "about to call reparametrize_func()" << endl;
 					reparametrize_func(lmk,lmkNEW,LMKNEW_lmk);
 					lmkPtr->state.x(lmkNEW);
 
 				// - call filter->reparametrize()
-					cout << __PRETTY_FUNCTION__ << "about to call filter->reparametrize()" << endl;
+//					cout << __PRETTY_FUNCTION__ << "about to call filter->reparametrize()" << endl;
 					mapManagerPtr()->mapPtr()->filterPtr->reparametrize(mapManagerPtr()->mapPtr()->ia_used_states(), LMKNEW_lmk, this->state.ia(), lmkPtr->state.ia());
 
 				// - transfer info from the old lmk to the new one
 					landmark_ptr_t lmkPtrOld = this->shared_from_this();
-					cout << __PRETTY_FUNCTION__ << "about to transfer lmk info" << endl;
+//					cout << __PRETTY_FUNCTION__ << "about to transfer lmk info" << endl;
 					lmkPtr->transferInfoLmk(lmkPtrOld);
 
 //				// - delete old lmk <-- this will delete all old obs!
@@ -153,7 +153,7 @@ namespace jafar {
 						observation_ptr_t obsPtr = *obsIter;
 						// Drastic option: ANY vote for killing declares the need to die.
 						if (obsPtr->voteForKillingLandmark()) {
-							cout << __PRETTY_FUNCTION__ << ": obs will vote for killing lmk: " << id() << endl;
+//							cout << __PRETTY_FUNCTION__ << ": obs will vote for killing lmk: " << id() << endl;
 							return true;
 						}
 					}

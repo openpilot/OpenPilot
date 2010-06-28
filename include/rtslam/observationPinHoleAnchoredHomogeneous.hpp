@@ -78,7 +78,7 @@ namespace jafar {
 
 				ObservationPinHoleAnchoredHomogeneousPoint(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & ahpPtr);
 				~ObservationPinHoleAnchoredHomogeneousPoint(void) {
-					cout << "Deleted observation: " << id() << ": " << typeName() << endl;
+//					cout << "Deleted observation: " << id() << ": " << typeName() << endl;
 				}
 
 				virtual std::string typeName() {
@@ -86,7 +86,7 @@ namespace jafar {
 				}
 
 
-				void setup(int patchSize, double dmin);
+				void setup(int patchSize, double dmin, double _reparTh);
 
 //				void setup(double _pixNoise = 1.0);
 

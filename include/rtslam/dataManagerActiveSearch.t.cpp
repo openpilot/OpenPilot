@@ -74,7 +74,7 @@ namespace jafar {
 
 					obsPtr->events.visible = true;
 
-					if (numObs < N_UPDATES) {
+					if (numObs < algorithmParams_.n_updates) {
 
 
 						// update counter
@@ -90,16 +90,14 @@ namespace jafar {
 						// 1d. search appearence in raw
 						int xmin, xmax, ymin, ymax;
 						double dx, dy;
-						dx = 3.0 * sqrt(obsPtr->expectation.P(0, 0) + 1.0);
-						dy = 3.0 * sqrt(obsPtr->expectation.P(1, 1) + 1.0);
+						dx = matcherParams_.regionSigma * sqrt(obsPtr->expectation.P(0, 0) + matcherParams_.measVar);
+						dy = matcherParams_.regionSigma * sqrt(obsPtr->expectation.P(1, 1) + matcherParams_.measVar);
 						xmin = (int) (obsPtr->expectation.x(0) - dx);
 						xmax = (int) (obsPtr->expectation.x(0) + dx + 0.9999);
 						ymin = (int) (obsPtr->expectation.x(1) - dy);
 						ymax = (int) (obsPtr->expectation.x(1) + dy + 0.9999);
 
 						cv::Rect roi(xmin, ymin, xmax - xmin + 1, ymax - ymin + 1);
-
-//						cout << "roi: " << roi << endl;
 
 						//						kernel::Chrono match_chrono;
 						obsPtr->measurement.std(detectorParams_.measStd);
@@ -129,7 +127,7 @@ namespace jafar {
 */
 
 						// 1e. if feature is found
-						if (obsPtr->getMatchScore() > 0.90) {
+						if (obsPtr->getMatchScore() > matcherParams_.threshold) {
 							obsPtr->counters.nMatch++;
 							obsPtr->events.matched = true;
 							obsPtr->computeInnovation();
@@ -137,16 +135,16 @@ namespace jafar {
 
 
 							// 1f. if feature is inlier
-							if (obsPtr->compatibilityTest(3.0)) { // use 3.0 for 3-sigma or the 5% proba from the chi-square tables.
+							if (obsPtr->compatibilityTest(matcherParams_.mahalanobisTh)) { // use 3.0 for 3-sigma or the 5% proba from the chi-square tables.
 								numObs++;
 								obsPtr->counters.nInlier++;
 								//								kernel::Chrono update_chrono;
 								obsPtr->update();
 								//								total_update_time += update_chrono.elapsedMicrosecond();
 								obsPtr->events.updated = true;
-							} // obsPtr->compatibilityTest(3.0)
+							} // obsPtr->compatibilityTest(M_TH)
 
-						} // obsPtr->getScoreMatchInPercent()>80
+						} // obsPtr->getScoreMatchInPercent()>SC_TH
 
 //						cout << *obsPtr << endl;
 
@@ -232,6 +230,7 @@ namespace jafar {
 						vec pix = featPtr->measurement.x();
 			 			app_img_pnt_ptr_t appPtr = SPTR_CAST<AppearanceImagePoint>(featPtr->appearancePtr);
 
+			 			// FIXME see if we can use detectorParams_.patchSize instead.
 			 			cv::Size size = appPtr->patch.size();
 
 			 			int shift_x = (size.width-1)/2;

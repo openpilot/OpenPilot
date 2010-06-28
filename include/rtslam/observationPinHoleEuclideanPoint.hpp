@@ -72,10 +72,10 @@ namespace jafar {
 
 			ObservationPinHoleEuclideanPoint(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr);
 			~ObservationPinHoleEuclideanPoint(void){
-				cout << "Deleted observation: " << id() << ": " << typeName() << endl;
+//				cout << "Deleted observation: " << id() << ": " << typeName() << endl;
 					}
 
-			void setup(int patchSize, double dmin);
+			void setup(int patchSize, double dmin = 0.0, double reparamTh = 0.0);
 
 				virtual std::string typeName() {
 					return "Obs. Pinhole Euclidean point";

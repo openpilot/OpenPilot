@@ -147,6 +147,8 @@ namespace jafar {
 				// indirect arrays
 				ind_array ia_rsl; ///<    Ind. array of mapped indices of robot, sensor and landmark (ie, sensor might or might not be there).
 
+				double reparTh;
+
 			public:
 				// Jacobians
 				mat SG_rs; ///<						Jacobian of global sensor pose wrt. robot and sensor mapped states

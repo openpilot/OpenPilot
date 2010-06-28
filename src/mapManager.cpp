@@ -64,7 +64,7 @@ namespace jafar {
 		}
 
 
-		void MapManagerAbstract::manageMap(void) {
+		void MapManagerAbstract::manage(void) {
 			// foreach lmk
 			for (LandmarkList::iterator lmkIter = landmarkList().begin(); lmkIter
 			    != landmarkList().end(); ++lmkIter) {

@@ -139,7 +139,7 @@ class LandmarkQt : public LandmarkDisplay
 {
 	public:
 		// buffered data
-		//jmath::vec data_;
+		// jmath::vec data_;
 		// graphical objects
 	public:
 		LandmarkQt(rtslam::LandmarkAbstract *_slamLmk, MapDisplay *_dispMap):
@@ -178,7 +178,7 @@ class ObservationQt : public ObservationDisplay
 #if EMBED_PREDICTED_APP
 			predictedApp_ = NULL;
 #endif
-			switch (landmarkType_)
+			switch (landmarkGeomType_)
 			{
 				case LandmarkDisplay::ltPoint:
 					predObs_.resize(2);
@@ -186,7 +186,7 @@ class ObservationQt : public ObservationDisplay
 					measObs_.resize(2);
 					break;
 				default:
-					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark: " << landmarkType_);
+					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark: " << landmarkGeomType_);
 					break;
 			}
 		}
@@ -203,7 +203,7 @@ class ObservationQt : public ObservationDisplay
 		
 		void bufferize()
 		{
-			switch (landmarkType_)
+			switch (landmarkGeomType_)
 			{
 				case LandmarkDisplay::ltPoint:
 					//LandmarkEuclidean *lmk = static_cast<LandmarkEuclidean*>(slamObs_->landmarkPtr->convertToStandardParametrization());
@@ -231,13 +231,13 @@ class ObservationQt : public ObservationDisplay
 #endif
 					break;
 				default:
-					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark: " << landmarkType_);
+					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark: " << landmarkGeomType_);
 					break;
 			}
 		}
 		void render()
 		{
-			switch (landmarkType_)
+			switch (landmarkGeomType_)
 			{
 				case LandmarkDisplay::ltPoint:
 				{
@@ -259,7 +259,7 @@ class ObservationQt : public ObservationDisplay
 						
 						// prediction point
 						s = new qdisplay::Shape(qdisplay::Shape::ShapeCross, predObs_(0), predObs_(1), 3, 3);
-						s->setColor(255,255,0); // blue
+						s->setColor(255,255,0); // yellow
 						s->setFontColor(255,255,0); // yellow
 						items_.push_back(s);
 						view_->addShape(s);
@@ -331,7 +331,7 @@ class ObservationQt : public ObservationDisplay
 				}
 
 				default:
-					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark: " << landmarkType_);
+					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark: " << landmarkGeomType_);
 			}
 		}
 };

@@ -50,7 +50,7 @@ namespace jafar {
 				observation_ptr_t createNewLandmark(data_manager_ptr_t dmaOrigin);
 				void reparametrizeLandmark(landmark_ptr_t lmk);
 				void killLandmark(landmark_ptr_t lmk);
-				void manageMap(void);
+				void manage(void);
 		};
 
 		template<class LandmarkInit, class LandmarkAdvanced>
@@ -71,7 +71,6 @@ namespace jafar {
 				virtual bool mapSpaceForInit() {
 					return mapPtr()->unusedStates(LandmarkInit::size());
 				}
-
 		};
 
 	}

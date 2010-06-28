@@ -31,7 +31,7 @@ namespace jafar {
 			type = PNT_PH_AH;
 		}
 
-		void ObservationPinHoleAnchoredHomogeneousPoint::setup(int patchSize, double dmin)
+		void ObservationPinHoleAnchoredHomogeneousPoint::setup(int patchSize, double dmin, double _reparTh)
 		{
 			//ObservationAbstract::setup(_noiseStd, getPrior());
 			Gaussian prior(1);
@@ -45,6 +45,7 @@ namespace jafar {
 			//linkToParentAHP(ahpPtr);
 			predictedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
 			observedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
+			reparTh = _reparTh;
 		}
 
 
@@ -150,7 +151,7 @@ namespace jafar {
 		bool ObservationPinHoleAnchoredHomogeneousPoint::voteForReparametrizingLandmark(){
 			//TODO: use a parameter for the linearity test threshold.
 //			cout << "evaluating linearity for lmk: " << id() << endl;
-			return (lmkAHP::linearityScore(sensorPtr()->globalPose(), landmarkPtr()->state.x(), landmarkPtr()->state.P()) < 0.1);
+			return (lmkAHP::linearityScore(sensorPtr()->globalPose(), landmarkPtr()->state.x(), landmarkPtr()->state.P()) < reparTh);
 		}
 
 

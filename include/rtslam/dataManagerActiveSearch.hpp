@@ -27,10 +27,6 @@ namespace jafar {
       // Define the functions sensorSpec() and sensorSpecPtr().
       ENABLE_ACCESS_TO_SPECIFIC_PARENT(SensorSpec,sensorSpec);
 
-			//protected: // Parameters
-    public: // TODO? Should be protected?
-      static const int N_UPDATES = 1000;
-      static const int PATCH_SIZE = 7;
 
     protected:
 			boost::shared_ptr<Detector> detector;
@@ -47,8 +43,13 @@ namespace jafar {
       		int patchSize;
       		double regionSigma;
       		double threshold;
+      		double mahalanobisTh;
       		double measStd;
+      		double measVar;
       } matcherParams_;
+      struct alg_params_t {
+      		int n_updates;
+      } algorithmParams_;
     public:
       void setDetector(const boost::shared_ptr<Detector> & _detector, int patchSize, double _measStd){
       	detector = _detector;
@@ -56,17 +57,22 @@ namespace jafar {
       	detectorParams_.measStd = _measStd;
       }
       detector_params_t detectorParams(){return detectorParams_;}
-      void setMatcher(boost::shared_ptr<Matcher> & _matcher, int patchSize, double nSigma, double threshold, double _measStd){
+      void setMatcher(boost::shared_ptr<Matcher> & _matcher, int patchSize, double nSigma, double threshold, double mahalanobisTh, double _measStd){
       	matcher = _matcher;
       	matcherParams_.patchSize = patchSize;
       	matcherParams_.regionSigma = nSigma;
       	matcherParams_.threshold = threshold;
+      	matcherParams_.mahalanobisTh = mahalanobisTh;
       	matcherParams_.measStd = _measStd;
+      	matcherParams_.measVar = _measStd * _measStd;
       }
       matcher_params_t matcherParams(){return matcherParams_;}
       void setActiveSearchGrid( boost::shared_ptr<ActiveSearchGrid> arg ) { asGrid=arg; }
       boost::shared_ptr<ActiveSearchGrid> activeSearchGrid( void ) { return asGrid; }
-
+      void setAlgorithmParams(int n_updates){
+      	algorithmParams_.n_updates = n_updates;
+      }
+      alg_params_t algorithmParams(){return algorithmParams_;}
     protected:
       void detectNewData( boost::shared_ptr<RawSpec> data );
       bool match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, cv::Rect &roi, Measurement & measure, const appearance_ptr_t & app);

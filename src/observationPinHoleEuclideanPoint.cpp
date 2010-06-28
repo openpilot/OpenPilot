@@ -25,7 +25,7 @@ namespace jafar {
 			type = PNT_PH_EUC;
 		}
 
-		void ObservationPinHoleEuclideanPoint::setup(int patchSize, double dmin)
+		void ObservationPinHoleEuclideanPoint::setup(int patchSize, double dmin, double _reparTh)
 		{
 			//ObservationAbstract::setup(_noiseStd, getPrior());
 			Gaussian prior(1); // should never be used
@@ -37,6 +37,7 @@ namespace jafar {
 			//linkToParentEUC(eucPtr);
 			predictedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
 			observedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
+			reparTh = _reparTh;
 		}
 
 

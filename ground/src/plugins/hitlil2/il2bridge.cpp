@@ -273,7 +273,7 @@ return;
     old=current;
 
     int t;
-    for (t=0; t<fields->length(); t++) {
+    for (t=0; t<fields.length(); t++) {
     	QStringList values = fields[t].split("\\");
 	int id = values[0].toInt();
 	float value = values[1].toFloat();
@@ -299,6 +299,7 @@ return;
 	    case 48:
 	        current.pitch=value;
 		break;
+        }
     }
 
     current.dT = ((float)time->restart()) / 1000.0;
@@ -323,7 +324,7 @@ return;
     AttitudeActual::DataFields attActualData;
     attActualData.Roll = current.roll;
     attActualData.Pitch = current.pitch;
-    attActualData.Yaw = current.yaw;
+    attActualData.Yaw = current.azimuth;
     attActualData.q1 = 0;
     attActualData.q2 = 0;
     attActualData.q3 = 0;

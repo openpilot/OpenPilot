@@ -101,12 +101,12 @@ private:
     static const float FT2M = 0.3048;
     static const float KT2MPS = 0.514444444;
     static const float MPS2KMH = 3.6;
-    static const float KMH2MPS = (1.0/MPS2KMH);
+    static const float KMH2MPS = (1.0/3.6);
     static const float INHG2KPA = 3.386;
     static const float RAD2DEG = (180.0/M_PI);
-    static const float DEG2RAD = (1.0/RAD2DEG);
+    static const float DEG2RAD = (M_PI/180.0);
     static const float M2DEG =  60.*1852.; // 60 miles per degree times 1852 meters per mile
-    static const float DEG2M = (1.0/M2DEG);
+    static const float DEG2M = (1.0/(60.*1852.));
 
     static const float AIR_CONST = 8314.32; // N*m/(Kmol*K) 
     static const float GROUNDDENSITY = 1.225; // kg/m³ ;)
@@ -114,8 +114,8 @@ private:
     static const float TEMP_LAPSE_RATE = -0.0065; //degrees per meter
     static const float AIR_CONST_FACTOR = -0.0341631947363104; //several nature constants calculated into one
 
-    struct FlightParams current;
-    struct FlightParams old;
+    struct flightParams current;
+    struct flightParams old;
     QUdpSocket* outSocket;
     ActuatorDesired* actDesired;
     AltitudeActual* altActual;
@@ -132,6 +132,9 @@ private:
     bool il2ConnectionStatus;
     int il2Timeout;
 
+    float DENSITY(float pressure);
+    float PRESSURE(float alt);
+    float TAS(float ias,float alt);
     void processUpdate(QString& data);
     void setupOutputObject(UAVObject* obj, int updatePeriod);
     void setupInputObject(UAVObject* obj, int updatePeriod);

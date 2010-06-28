@@ -44,6 +44,8 @@ DialGadgetWidget::DialGadgetWidget(QWidget *parent) : QGraphicsView(parent)
     obj1 = NULL;
     obj2 = NULL;
     obj3 = NULL;
+    m_text1 = NULL; // Should be initialized to NULL otherwise the setFont method
+                    // might segfault upon initialization if called before SetDialFile
 
     needle1Target = 0;
     needle2Target = 0;
@@ -155,15 +157,15 @@ void DialGadgetWidget::updateNeedle3(UAVObject *object3) {
 void DialGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QString n1, QString n2,
                                        QString n3, QString n1Move, QString n2Move, QString n3Move)
 {
+   fgenabled = false;
+   n2enabled = false;
+   n3enabled = false;
+   QGraphicsScene *l_scene = scene();
    if (QFile::exists(dfn))
    {
       m_renderer->load(dfn);
       if(m_renderer->isValid())
       {
-         fgenabled = false;
-         n2enabled = false;
-         n3enabled = false;
-         QGraphicsScene *l_scene = scene();
          l_scene->clear(); // This also deletes all items contained in the scene.
          m_background = new QGraphicsSvgItem();
          // All other items will be clipped to the shape of the background
@@ -337,7 +339,15 @@ void DialGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QString 
      }
    }
    else
-   { std::cout<<"no file: "<<std::endl; }
+   {
+       std::cout<<"no file: "<<std::endl;
+       m_renderer->load(QString(":/dial/images/empty.svg"));
+       l_scene->clear(); // This also deletes all items contained in the scene.
+       m_background = new QGraphicsSvgItem();
+       m_background->setSharedRenderer(m_renderer);
+       m_background->setElementId(bg);
+       l_scene->addItem(m_background);
+   }
 }
 
 void DialGadgetWidget::paint()

@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/dial">
+        <file>images/empty.svg</file>
+    </qresource>
+</RCC>

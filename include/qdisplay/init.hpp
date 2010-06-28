@@ -35,14 +35,19 @@ class QtAppStart: public QObject
 		/**
 		If you want a single thread, only specify display, otherwise main and display will run
 		in parallel (they can create other threads), communicate data with sharedDataStructure
-		and must synchronize using a boost::shared_mutex (.lock_shared and .unlock_shared) in sharedDataStructure.
+		and must synchronize using a kernel::FifoMutex in sharedDataStructure.
 		
 		If you want the display task to be executed periodically, specify diplay_interval (ms),
 		otherwise it will be called only once, but the display task must execute
 		"QApplication::instance()->processEvents();" regularly so that the display is refreshed.
+		Moreover if you want to sleep or lock a mutex, you should use qtSleep and qtMutexLock
+		functions so that the display is refreshed.
 		
-		@param _display the function that does the display
-		@param _main the optional function that executes the main program in another thread
+		@param _display the function that does the display. Must return void and accept
+		one parameter which is a pointer, and must be cast to qdisplay::FUNC.
+		@param prioDisplay the priority of the display thread (unix process priority : -20 (most priority) to 20
+		@param _main the optional function that executes the main program in another thread (see _display)
+		@param prioMain the priority of the main thread (see prioDisplay)
 		@param display_interval the interval in ms at which the display function is called. 0 means only once.
 		@param _sharedDataStructure the data structure that is passed to _main and _display functions
 		*/
@@ -56,7 +61,9 @@ class QtAppStart: public QObject
 		
 };
 
-
+/**
+The function pointer type you must cast to the functions you give as a parameter to QtAppStart
+*/
 typedef void(*FUNC)(void*);
 
 /**

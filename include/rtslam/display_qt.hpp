@@ -85,6 +85,7 @@ class SensorQt : public SensorDisplay
 		// buffered data
 		image::Image image;
 		int framenumber;
+		double dt;
 		// graphical objects
 		qdisplay::Viewer *viewer_;
 		qdisplay::ImageView* view_;
@@ -98,10 +99,11 @@ class SensorQt : public SensorDisplay
 			viewer_->setImageView(view_, 0, 0);
 			viewer_->resize(660,500);
 			framenumber = 0;
+			dt = 0.;
 			
 			framenumber_label = new QGraphicsTextItem(view_);
 			//framenumber_label->setFont(QFont( m_label->font().family(), m_fontSize));
-			framenumber_label->setDefaultTextColor(QColor(0,0,0));
+			framenumber_label->setDefaultTextColor(QColor(0,192,0));
 			framenumber_label->translate(0,0);
 		}
 		~SensorQt()
@@ -113,6 +115,8 @@ class SensorQt : public SensorDisplay
 		void bufferize()
 		{
 			raw_ptr_t raw = slamSen_->getRaw();
+			framenumber = slamSen_->rawCounter;
+			dt = slamSen_->rawPtr->timestamp - slamSen_->lastTimestamp;
 			if (raw) image = static_cast<RawImage&>(*raw).img->clone();
 			// TODO set framenumber
 		}
@@ -121,10 +125,11 @@ class SensorQt : public SensorDisplay
 			switch (type_)
 			{
 				case SensorDisplay::stCameraPinhole:
-				case SensorDisplay::stCameraBarreto:
+				case SensorDisplay::stCameraBarreto: {
 					view_->setImage(image);
-					framenumber_label->setPlainText(jmath::toStr(framenumber).c_str());
-					break;
+					std::ostringstream oss; oss << "#" << framenumber << " - " << std::setprecision(3) << dt*1000 << "ms";
+					framenumber_label->setPlainText(oss.str().c_str());
+					break; }
 				default:
 					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_SENSOR_TYPE, "Don't know how to display this type of sensor" << type_);
 			}
@@ -260,6 +265,7 @@ class ObservationQt : public ObservationDisplay
 						// prediction point
 						s = new qdisplay::Shape(qdisplay::Shape::ShapeCross, predObs_(0), predObs_(1), 3, 3);
 						s->setColor(255,255,0); // yellow
+						s->setFontSize(8);
 						s->setFontColor(255,255,0); // yellow
 						items_.push_back(s);
 						view_->addShape(s);

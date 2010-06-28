@@ -46,15 +46,20 @@ namespace jafar {
 
 			if (hardwareSensorPtr)
 			{
-				return hardwareSensorPtr->acquireRaw(rawPtr);
+				if (rawPtr) lastTimestamp = rawPtr->timestamp;
+				int res = hardwareSensorPtr->acquireRaw(rawPtr);
+				if (res >= 0) rawCounter++;
+				return res;
 			} else
 			{
+				if (rawPtr) lastTimestamp = rawPtr->timestamp;
 				jafarImage_ptr_t i(Image::loadImage("test_suite/imageSample.ppm",0));
 				if (i->data() == NULL) throw "IMAGE_NOT_FOUND";
 				RawImage* imgRawPtr = new RawImage;
 				imgRawPtr->setJafarImage(i) ;
 
 				rawPtr.reset(imgRawPtr);
+				rawCounter++;
 				return 0;
 			}
 		}

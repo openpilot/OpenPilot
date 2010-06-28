@@ -221,7 +221,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	kernel::Chrono total_chrono;
 	kernel::Chrono mutex_chrono;
 	double max_dt = 0;
-	for (int t = 1; t <= N_FRAMES;) {
+	for (; (*world)->t <= N_FRAMES;) {
 		bool had_data = false;
 
 			worldPtr->display_mutex.lock();
@@ -276,7 +276,7 @@ void demo_slam01_main(world_ptr_t *world) {
 
 			// NOW LOOP FOR STATE SPACE - ALL MM
 		if (had_data) {
-			t++;
+			(*world)->t++;
 
 			if (robPtr1->dt_or_dx > max_dt) max_dt = robPtr1->dt_or_dx;
 
@@ -303,7 +303,7 @@ void demo_slam01_main(world_ptr_t *world) {
 
 		worldPtr->display_mutex.unlock();
 		mutex_chrono.reset();
-		if (mode == 2) getchar();
+		if (mode == 2 && had_data) getchar();
 	} // temporal loop
 
 //	cout << "time avg(max): " << total_chrono.elapsed()/N_FRAMES << "(" << (int)(1000*max_dt) <<") ms" << endl;
@@ -315,16 +315,24 @@ void demo_slam01_main(world_ptr_t *world) {
 
 void demo_slam01_display(world_ptr_t *world) {
 	//(*world)->display_mutex.lock();
+	static unsigned prev_t = 0;
 	qdisplay::qtMutexLock<kernel::FifoMutex>((*world)->display_mutex);
-	display::ViewerQt *viewerQt = static_cast<display::ViewerQt*> ((*world)->getDisplayViewer(display::ViewerQt::id()));
-	if (viewerQt == NULL) {
-		viewerQt = new display::ViewerQt();
-		(*world)->addDisplayViewer(viewerQt, display::ViewerQt::id());
+	if ((*world)->t != prev_t)
+	{
+		prev_t = (*world)->t;
+		display::ViewerQt *viewerQt = static_cast<display::ViewerQt*> ((*world)->getDisplayViewer(display::ViewerQt::id()));
+		if (viewerQt == NULL) {
+			viewerQt = new display::ViewerQt();
+			(*world)->addDisplayViewer(viewerQt, display::ViewerQt::id());
+		}
+		viewerQt->bufferize(*world);
+		(*world)->display_mutex.unlock();
+		
+		viewerQt->render();
+	} else
+	{
+		(*world)->display_mutex.unlock();
 	}
-	viewerQt->bufferize(*world);
-	(*world)->display_mutex.unlock();
-
-	viewerQt->render();
 }
 
 	void demo_slam01(bool display) {

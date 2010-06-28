@@ -47,7 +47,7 @@ namespace jafar {
 				/**
 				 * Constructor
 				 */
-				WorldAbstract() {}
+				WorldAbstract(): t(0) {}
 
 				/**
 				 * Mandatory virtual destructor - Map is used as-is, non-abstract by now
@@ -61,6 +61,7 @@ namespace jafar {
 				}
 				
 				kernel::FifoMutex display_mutex;
+				unsigned t;
 				void addDisplayViewer(display::ViewerAbstract *viewer, unsigned id);
 				display::ViewerAbstract* getDisplayViewer(unsigned id);
 		};

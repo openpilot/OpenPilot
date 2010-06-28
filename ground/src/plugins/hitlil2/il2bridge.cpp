@@ -140,10 +140,10 @@ void Il2Bridge::transmitUpdate()
 {
     // Read ActuatorDesired from autopilot
     ActuatorDesired::DataFields actData = actDesired->getData();
-    float ailerons = (actData.Roll/50.0)-1.0;
-    float elevator = (actData.Pitch/50.0)-1.0;
-    float rudder = (actData.Yaw/50.0)-1.0;
-    float throttle = (actData.Throttle/50.0)-1.0;
+    float ailerons = -actData.Roll;
+    float elevator = actData.Pitch;
+    float rudder = actData.Yaw;
+    float throttle = actData.Throttle*2-1.0;
 
     // Send update to Il2
     QString cmd;

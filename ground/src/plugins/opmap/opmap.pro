@@ -11,7 +11,8 @@ HEADERS += opmapplugin.h \
     opmapgadget.h \
     opmapgadgetwidget.h \
     opmap_waypointeditor_dialog.h \
-    opmap_mapoverlaywidget.h
+    opmap_mapoverlaywidget.h \
+    opmap_edit_waypoint_dialog.h
 SOURCES += opmapplugin.cpp \
     opmapgadgetwidget.cpp \
     opmapgadgetoptionspage.cpp \
@@ -19,10 +20,12 @@ SOURCES += opmapplugin.cpp \
     opmapgadgetconfiguration.cpp \
     opmapgadget.cpp \
     opmap_waypointeditor_dialog.cpp \
-    opmap_mapoverlaywidget.cpp
+    opmap_mapoverlaywidget.cpp \
+    opmap_edit_waypoint_dialog.cpp
 OTHER_FILES += OPMapGadget.pluginspec
 FORMS += opmapgadgetoptionspage.ui \
     opmap_widget.ui \
     opmap_waypointeditor_dialog.ui \
-    opmap_mapoverlaywidget.ui
+    opmap_mapoverlaywidget.ui \
+    opmap_edit_waypoint_dialog.ui
 RESOURCES += opmap.qrc

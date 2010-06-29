@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       opmap_mapoverlaywidget.h
+ * @file       opmap_edit_waypoint_dialog.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief
  * @see        The GNU Public License (GPL) Version 3
@@ -25,30 +25,34 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef OPMAP_MAPOVERLAYWIDGET_H
-#define OPMAP_MAPOVERLAYWIDGET_H
+#ifndef OPMAP_EDIT_WAYPOINT_DIALOG_H
+#define OPMAP_EDIT_WAYPOINT_DIALOG_H
 
-#include <QWidget>
+#include <QDialog>
 
 namespace Ui {
-    class OPMap_MapOverlayWidget;
+    class opmap_edit_waypoint_dialog;
 }
 
-class OPMap_MapOverlayWidget : public QWidget {
+class opmap_edit_waypoint_dialog : public QDialog {
     Q_OBJECT
 public:
-    OPMap_MapOverlayWidget(QWidget *parent = 0);
-    ~OPMap_MapOverlayWidget();
+    opmap_edit_waypoint_dialog(QWidget *parent = 0);
+    ~opmap_edit_waypoint_dialog();
 
 protected:
     void changeEvent(QEvent *e);
 
 private:
-    Ui::OPMap_MapOverlayWidget *ui;
+    Ui::opmap_edit_waypoint_dialog *ui;
 
 private slots:
-    void on_dial_sliderMoved(int position);
-    void on_verticalSlider_sliderMoved(int position);
+
+private slots:
+    void on_pushButtonCancel_clicked();
+    void on_pushButtonRevert_clicked();
+    void on_pushButtonApply_clicked();
+    void on_pushButtonOK_clicked();
 };
 
-#endif // OPMAP_MAPOVERLAYWIDGET_H
+#endif // OPMAP_EDIT_WAYPOINT_DIALOG_H

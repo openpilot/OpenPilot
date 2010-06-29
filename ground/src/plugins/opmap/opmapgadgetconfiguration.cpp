@@ -35,6 +35,8 @@ OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId, const QByteA
     m_defaultZoom(2),
     m_defaultLatitude(0),
     m_defaultLongitude(0),
+    m_useOpenGL(false),
+    m_showTileGridLines(false),
     m_accessMode("ServerAndCache"),
     m_useMemoryCache(true),
     m_cacheLocation(QDir::currentPath() + QDir::separator() + "mapscache" + QDir::separator())
@@ -43,26 +45,33 @@ OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId, const QByteA
     {
         QDataStream stream(state);
 
-        int zoom;
+	QString mapProvider;
+	int zoom;
         double latitude;
         double longitude;
-        QString mapProvider;
+	bool useOpenGL;
+	bool showTileGridLines;
 	QString accessMode;
 	bool useMemoryCache;
 	QString cacheLocation;
 
+	stream >> mapProvider;
 	stream >> zoom;
         stream >> latitude;
         stream >> longitude;
-        stream >> mapProvider;
+	stream >> useOpenGL;
+	stream >> showTileGridLines;
 	stream >> accessMode;
 	stream >> useMemoryCache;
 	stream >> cacheLocation;
 
+	if (!mapProvider.isEmpty()) m_mapProvider = mapProvider;
 	m_defaultZoom = zoom;
         m_defaultLatitude = latitude;
         m_defaultLongitude = longitude;
-	if (!mapProvider.isEmpty()) m_mapProvider = mapProvider;
+	m_useOpenGL = useOpenGL;
+	m_showTileGridLines = showTileGridLines;
+
 	if (!accessMode.isEmpty()) m_accessMode = accessMode;
 	m_useMemoryCache = useMemoryCache;
 	if (!cacheLocation.isEmpty()) m_cacheLocation = cacheLocation;
@@ -73,10 +82,12 @@ IUAVGadgetConfiguration * OPMapGadgetConfiguration::clone()
 {
     OPMapGadgetConfiguration *m = new OPMapGadgetConfiguration(this->classId());
 
+    m->m_mapProvider = m_mapProvider;
     m->m_defaultZoom = m_defaultZoom;
     m->m_defaultLatitude = m_defaultLatitude;
     m->m_defaultLongitude = m_defaultLongitude;
-    m->m_mapProvider = m_mapProvider;
+    m->m_useOpenGL = m_useOpenGL;
+    m->m_showTileGridLines = m_showTileGridLines;
     m->m_accessMode = m_accessMode;
     m->m_useMemoryCache = m_useMemoryCache;
     m->m_cacheLocation = m_cacheLocation;
@@ -89,10 +100,12 @@ QByteArray OPMapGadgetConfiguration::saveState() const
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::WriteOnly);
 
+    stream << m_mapProvider;
     stream << m_defaultZoom;
     stream << m_defaultLatitude;
     stream << m_defaultLongitude;
-    stream << m_mapProvider;
+    stream << m_useOpenGL;
+    stream << m_showTileGridLines;
     stream << m_accessMode;
     stream << m_useMemoryCache;
     stream << m_cacheLocation;

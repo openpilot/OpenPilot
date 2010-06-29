@@ -768,7 +768,7 @@ QTreeView::branch:open:has-children:!has-siblings, QTreeView::branch:open:has-ch
          </size>
         </property>
         <property name="mouseTracking">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="acceptDrops">
          <bool>true</bool>
@@ -872,6 +872,9 @@ border-radius: 2px;
        </property>
        <property name="mouseTracking">
         <bool>false</bool>
+       </property>
+       <property name="contextMenuPolicy">
+        <enum>Qt::NoContextMenu</enum>
        </property>
        <property name="styleSheet">
         <string notr="true">QWidget { /* all types of qwidget */
@@ -1142,6 +1145,9 @@ border-radius: 3px;
          <width>0</width>
          <height>0</height>
         </size>
+       </property>
+       <property name="contextMenuPolicy">
+        <enum>Qt::NoContextMenu</enum>
        </property>
        <property name="styleSheet">
         <string notr="true">QFrame{

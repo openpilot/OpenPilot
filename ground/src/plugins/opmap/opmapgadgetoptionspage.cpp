@@ -69,11 +69,14 @@ QWidget *OPMapGadgetOptionsPage::createPage(QWidget *parent)
     m_page->latitudeSpinBox->setValue(m_config->latitude());
     m_page->longitudeSpinBox->setValue(m_config->longitude());
 
+    m_page->checkBoxUseOpenGL->setChecked(m_config->useOpenGL());
+    m_page->checkBoxShowTileGridLines->setChecked(m_config->showTileGridLines());
+
     index = m_page->accessModeComboBox->findText(m_config->accessMode());
     index = (index >= 0) ? index : 0;
     m_page->accessModeComboBox->setCurrentIndex(index);
 
-    m_page->pushButtonUseMemoryCache->setChecked(m_config->useMemoryCache());
+    m_page->checkBoxUseMemoryCache->setChecked(m_config->useMemoryCache());
     m_page->lineEditCacheLocation->setText(m_config->cacheLocation());
 
     connect(m_page->pushButtonCacheLocation, SIGNAL(clicked()), this, SLOT(on_pushButtonCacheLocation_clicked()));
@@ -101,7 +104,7 @@ void OPMapGadgetOptionsPage::on_pushButtonCacheDefaults_clicked()
     index = (index >= 0) ? index : 0;
     m_page->accessModeComboBox->setCurrentIndex(index);
 
-    m_page->pushButtonUseMemoryCache->setChecked(true);
+    m_page->checkBoxUseMemoryCache->setChecked(true);
 
     m_page->lineEditCacheLocation->setText(QDir::currentPath() + QDir::separator() + "mapscache" + QDir::separator());
 }
@@ -112,8 +115,10 @@ void OPMapGadgetOptionsPage::apply()
     m_config->setZoom(m_page->zoomSpinBox->value());
     m_config->setLatitude(m_page->latitudeSpinBox->value());
     m_config->setLongitude(m_page->longitudeSpinBox->value());
+    m_config->setUseOpenGL(m_page->checkBoxUseOpenGL->isChecked());
+    m_config->setShowTileGridLines(m_page->checkBoxShowTileGridLines->isChecked());
     m_config->setAccessMode(m_page->accessModeComboBox->currentText());
-    m_config->setUseMemoryCache(m_page->pushButtonUseMemoryCache->isChecked());
+    m_config->setUseMemoryCache(m_page->checkBoxUseMemoryCache->isChecked());
     m_config->setCacheLocation(m_page->lineEditCacheLocation->text());
 }
 

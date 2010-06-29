@@ -45,6 +45,8 @@ void OPMapGadget::loadConfiguration(IUAVGadgetConfiguration *config)
     m_widget->setMapProvider(m->mapProvider());
     m_widget->setZoom(m->zoom());
     m_widget->setPosition(QPointF(m->longitude(), m->latitude()));
+    m_widget->setUseOpenGL(m->useOpenGL());
+    m_widget->setShowTileGridLines(m->showTileGridLines());
     m_widget->setAccessMode(m->accessMode());
     m_widget->setUseMemoryCache(m->useMemoryCache());
     m_widget->setCacheLocation(m->cacheLocation());

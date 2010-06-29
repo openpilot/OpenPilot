@@ -42,6 +42,7 @@
 
 #include "opmap_mapoverlaywidget.h"
 #include "opmap_waypointeditor_dialog.h"
+#include "opmap_edit_waypoint_dialog.h"
 
 namespace Ui
 {
@@ -70,10 +71,17 @@ public:
     OPMapGadgetWidget(QWidget *parent = 0);
    ~OPMapGadgetWidget();
 
-   void setZoom(int value);
-   void setPosition(QPointF pos);
-   void setMapProvider(QString provider);
-   void setAccessMode(QString accessMode);
+    /**
+    * @brief public functions
+    *
+    * @param
+    */
+    void setZoom(int value);
+    void setPosition(QPointF pos);
+    void setMapProvider(QString provider);
+    void setUseOpenGL(bool useOpenGL);
+    void setShowTileGridLines(bool showTileGridLines);
+    void setAccessMode(QString accessMode);
     void setUseMemoryCache(bool useMemoryCache);
     void setCacheLocation(QString cacheLocation);
 
@@ -152,10 +160,9 @@ private slots:
     void on_followUAVheadingAct_toggled(bool checked);
     void openWayPointEditor();
     void addWayPoint();
+    void editWayPoint();
     void deleteWayPoint();
     void clearWayPoints();
-    void gridLines();
-    void openGL();
     void zoom2() { setZoom(2); }
     void zoom3() { setZoom(3); }
     void zoom4() { setZoom(4); }
@@ -194,7 +201,9 @@ private:
 
     mapcontrol::OPMapWidget *m_map;
 
-    opmap_waypointeditor_dialog *waypoint_editor;
+    opmap_waypointeditor_dialog waypoint_editor_dialog;
+
+    opmap_edit_waypoint_dialog waypoint_edit_dialog;
 
     QGraphicsScene *m_map_graphics_scene;
     QGraphicsProxyWidget *m_map_scene_proxy;
@@ -219,10 +228,9 @@ private:
     QAction *followUAVheadingAct;
     QAction *wayPointEditorAct;
     QAction *addWayPointAct;
+    QAction *editWayPointAct;
     QAction *deleteWayPointAct;
     QAction *clearWayPointsAct;
-    QAction *gridLinesAct;
-    QAction *openGLAct;
 
     QActionGroup *zoomActGroup;
     QAction *zoom2Act;

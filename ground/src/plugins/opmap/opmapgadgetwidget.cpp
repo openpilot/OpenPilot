@@ -44,7 +44,6 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_widget = NULL;
     m_map = NULL;
-    waypoint_editor = NULL;
     wayPoint_treeView_model = NULL;
     findPlaceCompleter = NULL;
     m_map_graphics_scene = NULL;
@@ -164,15 +163,8 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 	m_map->SetMaxZoom(19);									    // increase the maximum zoom level
 	m_map->SetMouseWheelZoomType(internals::MouseWheelZoomType::MousePositionWithoutCenter);    // set how the mouse wheel zoom functions
 	m_map->SetFollowMouse(true);								    // we want a contiuous mouse position reading
-	m_map->SetUseOpenGL(openGLAct->isChecked());						    // enable/disable openGL
-	m_map->SetShowTileGridLines(gridLinesAct->isChecked());					    // map grid lines on/off
 	m_map->SetCurrentPosition(internals::PointLatLng(data.Latitude, data.Longitude));	    // set the default map position
     }
-
-    // **************
-    // create the waypoint editor dialog
-
-    waypoint_editor = new opmap_waypointeditor_dialog(this);
 
     // **************
 
@@ -259,9 +251,9 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 OPMapGadgetWidget::~OPMapGadgetWidget()
 {
     clearWayPoints();
-    if (m_map_overlay_widget) delete m_map_overlay_widget;
+
     if (wayPoint_treeView_model) delete wayPoint_treeView_model;
-    if (waypoint_editor) delete waypoint_editor;
+    if (m_map_overlay_widget) delete m_map_overlay_widget;
     if (m_map) delete m_map;
     if (m_widget) delete m_widget;
 }
@@ -356,13 +348,11 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     menu.addAction(wayPointEditorAct);
     menu.addAction(addWayPointAct);
+    menu.addAction(editWayPointAct);
     menu.addAction(deleteWayPointAct);
     menu.addAction(clearWayPointsAct);
 
     menu.addSeparator();
-
-//    menu.addAction(gridLinesAct);
-    menu.addAction(openGLAct);
 
     menu.exec(event->globalPos());
 
@@ -704,8 +694,7 @@ void OPMapGadgetWidget::on_toolButtonAddWaypoint_clicked()
 
 void OPMapGadgetWidget::on_toolButtonWaypointEditor_clicked()
 {
-    if (waypoint_editor)
-	waypoint_editor->show();
+    openWayPointEditor();
 }
 
 void OPMapGadgetWidget::on_treeViewWaypoints_clicked(QModelIndex index)
@@ -763,6 +752,18 @@ void OPMapGadgetWidget::setAccessMode(QString accessMode)
 {
     if (m_map)
 	m_map->configuration->SetAccessMode(mapcontrol::Helper::AccessModeFromString(accessMode));
+}
+
+void OPMapGadgetWidget::setUseOpenGL(bool useOpenGL)
+{
+    if (m_map)
+	m_map->SetUseOpenGL(useOpenGL);
+}
+
+void OPMapGadgetWidget::setShowTileGridLines(bool showTileGridLines)
+{
+    if (m_map)
+	m_map->SetShowTileGridLines(showTileGridLines);
 }
 
 void OPMapGadgetWidget::setUseMemoryCache(bool useMemoryCache)
@@ -866,6 +867,11 @@ void OPMapGadgetWidget::createActions()
     addWayPointAct->setStatusTip(tr("Add waypoint"));
     connect(addWayPointAct, SIGNAL(triggered()), this, SLOT(addWayPoint()));
 
+    editWayPointAct = new QAction(tr("&Edit waypoint"), this);
+    editWayPointAct->setShortcut(tr("Ctrl+E"));
+    editWayPointAct->setStatusTip(tr("Edit waypoint"));
+    connect(editWayPointAct, SIGNAL(triggered()), this, SLOT(editWayPoint()));
+
     deleteWayPointAct = new QAction(tr("&Delete waypoint"), this);
     deleteWayPointAct->setShortcut(tr("Ctrl+D"));
     deleteWayPointAct->setStatusTip(tr("Delete waypoint"));
@@ -875,20 +881,6 @@ void OPMapGadgetWidget::createActions()
     clearWayPointsAct->setShortcut(tr("Ctrl+C"));
     clearWayPointsAct->setStatusTip(tr("Clear waypoints"));
     connect(clearWayPointsAct, SIGNAL(triggered()), this, SLOT(clearWayPoints()));
-
-    gridLinesAct = new QAction(tr("Grid lines"), this);
-    gridLinesAct->setShortcut(tr("Ctrl+G"));
-    gridLinesAct->setStatusTip(tr("Show/Hide grid lines"));
-    gridLinesAct->setCheckable(true);
-    gridLinesAct->setChecked(false);
-    connect(gridLinesAct, SIGNAL(triggered()), this, SLOT(gridLines()));
-
-    openGLAct = new QAction(tr("Use OpenGL"), this);
-    openGLAct->setShortcut(tr("Ctrl+O"));
-    openGLAct->setStatusTip(tr("Enable/Disable OpenGL"));
-    openGLAct->setCheckable(true);
-    openGLAct->setChecked(false);
-    connect(openGLAct, SIGNAL(triggered()), this, SLOT(openGL()));
 
     zoom2Act = new QAction(tr("2"), this);
     zoom2Act->setCheckable(true);
@@ -1052,8 +1044,7 @@ void OPMapGadgetWidget::on_followUAVheadingAct_toggled(bool checked)
 
 void OPMapGadgetWidget::openWayPointEditor()
 {
-    if (waypoint_editor)
-	waypoint_editor->show();
+    waypoint_editor_dialog.show();
 }
 
 void OPMapGadgetWidget::addWayPoint()
@@ -1077,6 +1068,12 @@ void OPMapGadgetWidget::addWayPoint()
     // to do
 }
 
+void OPMapGadgetWidget::editWayPoint()
+{
+    // to do
+    waypoint_edit_dialog.show();
+}
+
 void OPMapGadgetWidget::deleteWayPoint()
 {
     // to do
@@ -1088,18 +1085,6 @@ void OPMapGadgetWidget::clearWayPoints()
 	if (m_map) m_map->WPDeleteAll();
 	m_waypoint_list.clear();
     m_waypoint_list_mutex.unlock();
-}
-
-void OPMapGadgetWidget::gridLines()
-{
-    if (m_map)
-	m_map->SetShowTileGridLines(gridLinesAct->isChecked());
-}
-
-void OPMapGadgetWidget::openGL()
-{
-    if (m_map)
-	m_map->SetUseOpenGL(openGLAct->isChecked());
 }
 
 // *************************************************************************************

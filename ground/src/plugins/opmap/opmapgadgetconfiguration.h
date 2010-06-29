@@ -41,6 +41,8 @@ Q_PROPERTY(QString mapProvider READ mapProvider WRITE setMapProvider)
 Q_PROPERTY(int zoommo READ zoom WRITE setZoom)
 Q_PROPERTY(double latitude READ latitude WRITE setLatitude)
 Q_PROPERTY(double longitude READ longitude WRITE setLongitude)
+Q_PROPERTY(bool useOpenGL READ useOpenGL WRITE setUseOpenGL)
+Q_PROPERTY(bool showTileGridLines READ showTileGridLines WRITE setShowTileGridLines)
 Q_PROPERTY(QString accessMode READ accessMode WRITE setAccessMode)
 Q_PROPERTY(bool useMemoryCache READ useMemoryCache WRITE setUseMemoryCache)
 Q_PROPERTY(QString cacheLocation READ cacheLocation WRITE setCacheLocation)
@@ -54,6 +56,8 @@ public:
     int zoom() const { return m_defaultZoom; }
     double latitude() const { return m_defaultLatitude; }
     double longitude() const { return m_defaultLongitude; }
+    bool useOpenGL() const { return m_useOpenGL; }
+    bool showTileGridLines() const { return m_showTileGridLines; }
     QString accessMode() const { return m_accessMode; }
     bool useMemoryCache() const { return m_useMemoryCache; }
     QString cacheLocation() const { return m_cacheLocation; }
@@ -63,6 +67,8 @@ public slots:
     void setZoom(int zoom) { m_defaultZoom = zoom; }
     void setLatitude(double latitude) { m_defaultLatitude = latitude; }
     void setLongitude(double longitude) { m_defaultLongitude = longitude; }
+    void setUseOpenGL(bool useOpenGL) { m_useOpenGL = useOpenGL; }
+    void setShowTileGridLines(bool showTileGridLines) { m_showTileGridLines = showTileGridLines; }
     void setAccessMode(QString accessMode) { m_accessMode = accessMode; }
     void setUseMemoryCache(bool useMemoryCache) { m_useMemoryCache = useMemoryCache; }
     void setCacheLocation(QString cacheLocation) { m_cacheLocation = cacheLocation; }
@@ -72,6 +78,8 @@ private:
     int m_defaultZoom;
     double m_defaultLatitude;
     double m_defaultLongitude;
+    bool m_useOpenGL;
+    bool m_showTileGridLines;
     QString m_accessMode;
     bool m_useMemoryCache;
     QString m_cacheLocation;

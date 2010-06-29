@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       opmap_mapoverlaywidget.h
+ * @file       opmap_edit_waypoint_dialog.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief
  * @see        The GNU Public License (GPL) Version 3
@@ -25,30 +25,52 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef OPMAP_MAPOVERLAYWIDGET_H
-#define OPMAP_MAPOVERLAYWIDGET_H
+#include "opmap_edit_waypoint_dialog.h"
+#include "ui_opmap_edit_waypoint_dialog.h"
 
-#include <QWidget>
-
-namespace Ui {
-    class OPMap_MapOverlayWidget;
+opmap_edit_waypoint_dialog::opmap_edit_waypoint_dialog(QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::opmap_edit_waypoint_dialog)
+{
+    ui->setupUi(this);
+    setWindowFlags(Qt::Dialog);
 }
 
-class OPMap_MapOverlayWidget : public QWidget {
-    Q_OBJECT
-public:
-    OPMap_MapOverlayWidget(QWidget *parent = 0);
-    ~OPMap_MapOverlayWidget();
+opmap_edit_waypoint_dialog::~opmap_edit_waypoint_dialog()
+{
+    delete ui;
+}
 
-protected:
-    void changeEvent(QEvent *e);
+void opmap_edit_waypoint_dialog::changeEvent(QEvent *e)
+{
+    QDialog::changeEvent(e);
+    switch (e->type()) {
+    case QEvent::LanguageChange:
+        ui->retranslateUi(this);
+        break;
+    default:
+        break;
+    }
+}
 
-private:
-    Ui::OPMap_MapOverlayWidget *ui;
+void opmap_edit_waypoint_dialog::on_pushButtonOK_clicked()
+{
+    // to do
 
-private slots:
-    void on_dial_sliderMoved(int position);
-    void on_verticalSlider_sliderMoved(int position);
-};
+    close();
+}
 
-#endif // OPMAP_MAPOVERLAYWIDGET_H
+void opmap_edit_waypoint_dialog::on_pushButtonApply_clicked()
+{
+    // to do
+}
+
+void opmap_edit_waypoint_dialog::on_pushButtonRevert_clicked()
+{
+    // to do
+}
+
+void opmap_edit_waypoint_dialog::on_pushButtonCancel_clicked()
+{
+    close();
+}

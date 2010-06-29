@@ -33,7 +33,6 @@ namespace mapcontrol
         text=0;
         numberI=0;
         picture.load(QString::fromUtf8(":/markers/images/marker.png"));
-        RefreshToolTip();
         number=WayPointItem::snumber;
         ++WayPointItem::snumber;
         this->setFlag(QGraphicsItem::ItemIsMovable,true);
@@ -42,6 +41,7 @@ namespace mapcontrol
        // transf.translate(picture.width()/2,picture.height());
        // this->setTransform(transf);
         SetShowNumber(shownumber);
+        RefreshToolTip();
         RefreshPos();
     }
     WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitude, const QString &description, MapGraphicItem *map):coord(coord),reached(false),description(description),shownumber(true),isDragging(false),altitude(altitude),map(map)
@@ -49,7 +49,6 @@ namespace mapcontrol
         text=0;
         numberI=0;
         picture.load(QString::fromUtf8(":/markers/images/marker.png"));
-        RefreshToolTip();
         number=WayPointItem::snumber;
         ++WayPointItem::snumber;
         this->setFlag(QGraphicsItem::ItemIsMovable,true);
@@ -58,6 +57,7 @@ namespace mapcontrol
        //transf.translate(picture.width()/2,picture.height());
        // this->setTransform(transf);
         SetShowNumber(shownumber);
+        RefreshToolTip();
         RefreshPos();
     }
 

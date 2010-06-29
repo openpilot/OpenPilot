@@ -33,7 +33,7 @@
 namespace mapcontrol
 {
 
-    OPMapWidget::OPMapWidget(QWidget *parent, Configuration *config):QGraphicsView(parent),configuration(config),followmouse(true)
+    OPMapWidget::OPMapWidget(QWidget *parent, Configuration *config):QGraphicsView(parent),configuration(config),followmouse(true),compass(0)
     {
         setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         core=new internals::Core;
@@ -52,6 +52,7 @@ namespace mapcontrol
         connect(map->core,SIGNAL(OnTileLoadStart()),this,SIGNAL(OnTileLoadStart()));
         connect(map->core,SIGNAL(OnTilesStillToLoad(int)),this,SIGNAL(OnTilesStillToLoad(int)));
         this->setMouseTracking(followmouse);
+        SetShowCompass(true);
     }
 
     void OPMapWidget::resizeEvent(QResizeEvent *event)
@@ -60,6 +61,9 @@ namespace mapcontrol
             scene()->setSceneRect(
                     QRect(QPoint(0, 0), event->size()));
         QGraphicsView::resizeEvent(event);
+        if(compass)
+            compass->setScale(0.1+0.05*(qreal)(event->size().width())/1000*(qreal)(event->size().height())/600);
+
     }
     QSize OPMapWidget::sizeHint() const
     {
@@ -204,8 +208,33 @@ namespace mapcontrol
         connect(this,SIGNAL(WPInserted(int,WayPointItem*)),item,SLOT(WPInserted(int,WayPointItem*)));
         connect(this,SIGNAL(WPNumberChanged(int,int,WayPointItem*)),item,SLOT(WPRenumbered(int,int,WayPointItem*)));
         connect(this,SIGNAL(WPDeleted(int)),item,SLOT(WPDeleted(int)));
-}
+    }
 
     //////////////////////////////////////////////
-
+    void OPMapWidget::SetShowCompass(const bool &value)
+    {
+        if(value)
+        {
+            compass=new QGraphicsSvgItem(QString::fromUtf8(":/markers/images/compas.svg"));
+            compass->setScale(0.1+0.05*(qreal)(this->size().width())/1000*(qreal)(this->size().height())/600);
+        //    compass->setTransformOriginPoint(compass->boundingRect().width(),compass->boundingRect().height());
+            compass->setFlag(QGraphicsItem::ItemIsMovable,true);
+            mscene.addItem(compass);
+            compass->setTransformOriginPoint(compass->boundingRect().width()/2,compass->boundingRect().height()/2);            
+            compass->setPos(55-compass->boundingRect().width()/2,55-compass->boundingRect().height()/2);
+            compass->setZValue(3);
+            compass->setOpacity(0.7);
+            
+        }
+        if(!value && compass)
+        {
+            delete compass;
+        }
+    }
+     void OPMapWidget::SetRotate(qreal const& value)
+     {
+         map->mapRotate(value);
+         if(compass)
+             compass->setRotation(value);
+     }
 }

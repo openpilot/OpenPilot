@@ -36,6 +36,7 @@
 #include <QObject>
 #include <QtOpenGL/QGLWidget>
 #include "waypointitem.h"
+#include "QtSvg/QGraphicsSvgItem"
 namespace mapcontrol
 {
     /**
@@ -191,7 +192,7 @@ namespace mapcontrol
         void SetZoom(double const& value){map->SetZoom(value);}
 
         qreal Rotate(){return map->rotation;}
-        void SetRotate(qreal const& value){map->mapRotate(value);}
+        void SetRotate(qreal const& value);
 
         void ReloadMap(){map->ReloadMap(); map->resize();}
 
@@ -301,6 +302,8 @@ namespace mapcontrol
         */
         void WPRenumber(WayPointItem* item,int const& newnumber);
 
+        void SetShowCompass(bool const& value);
+
     private:
         internals::Core *core;
         MapGraphicItem *map;
@@ -312,8 +315,8 @@ namespace mapcontrol
         internals::PointLatLng currentmouseposition;
         bool followmouse;
         void ConnectWP(WayPointItem* item);
-
-        WayPointItem* item;//apagar
+        QGraphicsSvgItem *compass;
+     //   WayPointItem* item;//apagar
     protected:
         void resizeEvent(QResizeEvent *event);
         void showEvent ( QShowEvent * event );

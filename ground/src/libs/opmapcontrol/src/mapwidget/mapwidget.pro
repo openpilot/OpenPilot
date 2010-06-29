@@ -19,4 +19,5 @@ HEADERS += mapgraphicitem.h \
 QT += opengl
 QT += network
 QT += sql
+QT += svg
 RESOURCES += mapresources.qrc

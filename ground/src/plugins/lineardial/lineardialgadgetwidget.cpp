@@ -79,6 +79,14 @@ void LineardialGadgetWidget::connectInput(QString object1, QString nfield1) {
             field1 = nfield1;
             if (fieldName)
                 fieldName->setPlainText(nfield1);
+            UAVObjectField* field = obj1->getField(nfield1);
+            double v = field->getDouble();
+            setIndex(v);
+            QString s;
+            s.sprintf("%.0f",v);
+            if (fieldValue)
+                fieldValue->setPlainText(s);
+
         } else {
             std::cout << "Error: Object is unknown (" << object1.toStdString() << ") this should not happen." << std::endl;
         }
@@ -95,7 +103,7 @@ void LineardialGadgetWidget::updateIndex(UAVObject *object1) {
         double v = field->getDouble();
         setIndex(v);
         QString s;
-        s.sprintf("%.2f",v);
+        s.sprintf("%.0f",v);
         if (fieldValue)
             fieldValue->setPlainText(s);
         if (index && !dialTimer.isActive())
@@ -124,23 +132,92 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
           background->setFlags(QGraphicsItem::ItemClipsChildrenToShape|
                                  QGraphicsItem::ItemClipsToShape);
           l_scene->addItem(background);
-          // Order is important: red, then yellow then green
-          // overlayed on top of each other
-          red = new QGraphicsSvgItem();
-          red->setSharedRenderer(m_renderer);
-          red->setElementId("red");
-          //l_scene->addItem(red);
-          red->setParentItem(background);
-          yellow = new QGraphicsSvgItem();
-          yellow->setSharedRenderer(m_renderer);
-          yellow->setElementId("yellow");
-          //l_scene->addItem(yellow);
-          yellow->setParentItem(background);
-          green = new QGraphicsSvgItem();
-          green->setSharedRenderer(m_renderer);
-          green->setElementId("green");
-          //l_scene->addItem(green);
-          green->setParentItem(background);
+
+          // The red/yellow/green zones are optional, we just
+          // test on the presence of "red"
+          if (m_renderer->elementExists("red")) {
+              // Order is important: red, then yellow then green
+              // overlayed on top of each other
+              red = new QGraphicsSvgItem();
+              red->setSharedRenderer(m_renderer);
+              red->setElementId("red");
+              //l_scene->addItem(red);
+              red->setParentItem(background);
+              yellow = new QGraphicsSvgItem();
+              yellow->setSharedRenderer(m_renderer);
+              yellow->setElementId("yellow");
+              //l_scene->addItem(yellow);
+              yellow->setParentItem(background);
+              green = new QGraphicsSvgItem();
+              green->setSharedRenderer(m_renderer);
+              green->setElementId("green");
+              //l_scene->addItem(green);
+              green->setParentItem(background);
+              // In order to properly render the Green/Yellow/Red graphs, we need to find out
+              // the starting location of the bargraph rendering area:
+              QMatrix textMatrix = m_renderer->matrixForElement("bargraph");
+              qreal bgX = textMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).x();
+              qreal bgY = textMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).y();
+              bargraphSize = textMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).width();
+              // Detect if the bargraph is vertical or horizontal.
+              qreal bargraphHeight = textMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).height();
+              if (bargraphHeight > bargraphSize) {
+                    verticalDial = true;
+                    bargraphSize = bargraphHeight;
+              } else {
+                    verticalDial = false;
+              }
+              // Now adjust the red/yellow/green zones:
+              double range = maxValue-minValue;
+
+              green->resetTransform();
+              double greenScale = (greenMax-greenMin)/range;
+              double greenStart = verticalDial ? (maxValue-greenMax)/range*green->boundingRect().height() :
+                                  (greenMin-minValue)/range*green->boundingRect().width();
+              QTransform matrix;
+              matrix.reset();
+              if (verticalDial) {
+                  matrix.scale(1,greenScale);
+                  matrix.translate(bgX,(greenStart+bgY)/greenScale);
+              } else {
+                  matrix.scale(greenScale,1);
+                  matrix.translate((greenStart+bgX)/greenScale,bgY);
+              }
+              green->setTransform(matrix,false);
+
+              yellow->resetTransform();
+              double yellowScale = (yellowMax-yellowMin)/range;
+              double yellowStart = verticalDial ? (maxValue-yellowMax)/range*yellow->boundingRect().height() :
+                                   (yellowMin-minValue)/range*yellow->boundingRect().width();
+              matrix.reset();
+              if (verticalDial) {
+                  matrix.scale(1,yellowScale);
+                  matrix.translate(bgX,(yellowStart+bgY)/yellowScale);
+              } else {
+                  matrix.scale(yellowScale,1);
+                  matrix.translate((yellowStart+bgX)/yellowScale,bgY);
+              }
+              yellow->setTransform(matrix,false);
+
+              red->resetTransform();
+              double redScale = (redMax-redMin)/range;
+              double redStart = verticalDial ? (maxValue-redMax)/range*red->boundingRect().height() :
+                                (redMin-minValue)/range*red->boundingRect().width();
+              matrix.reset();
+              if (verticalDial) {
+                  matrix.scale(1,redScale);
+                  matrix.translate(bgX,(redStart+bgY)/redScale);
+              } else {
+                  matrix.scale(redScale,1);
+                  matrix.translate((redStart+bgX)/redScale,bgY);
+              }
+              red->setTransform(matrix,false);
+
+          } else {
+            red = NULL;
+            yellow = NULL;
+            green = NULL;
+          }
 
           // Check whether the dial wants to display a moving index:
           if (m_renderer->elementExists("needle")) {
@@ -181,7 +258,7 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
               qreal startY = textMatrix.mapRect(m_renderer->boundsOnElement("value")).y();
               QTransform matrix;
               matrix.translate(startX,startY);
-              fieldValue = new QGraphicsTextItem("0.00");
+              fieldValue = new QGraphicsTextItem("00");
               fieldValue->setDefaultTextColor(QColor("White"));
               fieldValue->setTransform(matrix,false);
               //l_scene->addItem(fieldValue);
@@ -200,75 +277,12 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
         } else {
             fgenabled = false;
         }
-         //std::cout<<"Dial file loaded"<<std::endl;
-
-         // In order to properly render the Green/Yellow/Red graphs, we need to find out
-         // the starting location of the bargraph rendering area:
-         QMatrix textMatrix = m_renderer->matrixForElement("bargraph");
-         qreal bgX = textMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).x();
-         qreal bgY = textMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).y();
-         bargraphSize = textMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).width();
-         // Detect if the bargraph is vertical or horizontal.
-         qreal bargraphHeight = textMatrix.mapRect(m_renderer->boundsOnElement("bargraph")).height();
-         if (bargraphHeight > bargraphSize) {
-               verticalDial = true;
-               bargraphSize = bargraphHeight;
-           } else {
-               verticalDial = false;
-           }
-
-
-         // Now adjust the red/yellow/green zones:
-         double range = maxValue-minValue;
-
-         green->resetTransform();
-         double greenScale = (greenMax-greenMin)/range;
-         double greenStart = verticalDial ? (maxValue-greenMax)/range*green->boundingRect().height() :
-                             (greenMin-minValue)/range*green->boundingRect().width();
-         QTransform matrix;
-         matrix.reset();
-         if (verticalDial) {
-             matrix.scale(1,greenScale);
-             matrix.translate(bgX,(greenStart+bgY)/greenScale);
-         } else {
-             matrix.scale(greenScale,1);
-             matrix.translate((greenStart+bgX)/greenScale,bgY);
-         }
-         green->setTransform(matrix,false);
-
-         yellow->resetTransform();
-         double yellowScale = (yellowMax-yellowMin)/range;
-         double yellowStart = verticalDial ? (maxValue-yellowMax)/range*yellow->boundingRect().height() :
-                              (yellowMin-minValue)/range*yellow->boundingRect().width();
-         matrix.reset();
-         if (verticalDial) {
-             matrix.scale(1,yellowScale);
-             matrix.translate(bgX,(yellowStart+bgY)/yellowScale);
-         } else {
-             matrix.scale(yellowScale,1);
-             matrix.translate((yellowStart+bgX)/yellowScale,bgY);
-         }
-         yellow->setTransform(matrix,false);
-
-         red->resetTransform();
-         double redScale = (redMax-redMin)/range;
-         double redStart = verticalDial ? (maxValue-redMax)/range*red->boundingRect().height() :
-                           (redMin-minValue)/range*red->boundingRect().width();
-         matrix.reset();
-         if (verticalDial) {
-             matrix.scale(1,redScale);
-             matrix.translate(bgX,(redStart+bgY)/redScale);
-         } else {
-             matrix.scale(redScale,1);
-             matrix.translate((redStart+bgX)/redScale,bgY);
-         }
-         red->setTransform(matrix,false);
 
          l_scene->setSceneRect(background->boundingRect());
 
          // Reset the current index value:
          indexValue = 0;
-         if (!dialTimer.isActive())
+         if (!dialTimer.isActive() && index)
              dialTimer.start();
      }
    }
@@ -281,10 +295,10 @@ void LineardialGadgetWidget::setDialFont(QString fontProps)
 {
     QFont font = QFont("Arial",12);
     font.fromString(fontProps);
-    if (fieldName && fieldValue) {
+    if (fieldName)
         fieldName->setFont(font);
+    if (fieldValue)
         fieldValue->setFont(font);
-    }
 }
 
 

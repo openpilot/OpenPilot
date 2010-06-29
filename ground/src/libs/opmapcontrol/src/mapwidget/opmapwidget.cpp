@@ -39,13 +39,6 @@ namespace mapcontrol
         core=new internals::Core;
         map=new MapGraphicItem(core,config);
         mscene.addItem(map);
-//        WayPointItem* item2=new WayPointItem(internals::PointLatLng(20,20),100,map);
-//        item2->setParentItem(map);
-//        item=new WayPointItem(internals::PointLatLng(30,30),30,"kkk",map);
-//        item->setParentItem(map);
-      //  item->setZValue(-2);
-
-      //  map->setZValue(-1);
         this->setScene(&mscene);
         this->adjustSize();
         connect(&mscene,SIGNAL(sceneRectChanged(QRectF)),map,SLOT(resize(QRectF)));

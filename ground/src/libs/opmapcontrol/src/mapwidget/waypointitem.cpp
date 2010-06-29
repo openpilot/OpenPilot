@@ -39,11 +39,10 @@ namespace mapcontrol
         this->setFlag(QGraphicsItem::ItemIsMovable,true);
         this->setFlag(QGraphicsItem::ItemIgnoresTransformations,true);
         this->setFlag(QGraphicsItem::ItemIsSelectable,true);
-        transf.translate(picture.width()/2,picture.height());
-        this->setTransform(transf);
+       // transf.translate(picture.width()/2,picture.height());
+       // this->setTransform(transf);
         SetShowNumber(shownumber);
         RefreshPos();
-
     }
     WayPointItem::WayPointItem(const internals::PointLatLng &coord,int const& altitude, const QString &description, MapGraphicItem *map):coord(coord),reached(false),description(description),shownumber(true),isDragging(false),altitude(altitude),map(map)
     {
@@ -56,8 +55,8 @@ namespace mapcontrol
         this->setFlag(QGraphicsItem::ItemIsMovable,true);
         this->setFlag(QGraphicsItem::ItemIgnoresTransformations,true);
         this->setFlag(QGraphicsItem::ItemIsSelectable,true);
-        transf.translate(picture.width()/2,picture.height());
-        this->setTransform(transf);
+       //transf.translate(picture.width()/2,picture.height());
+       // this->setTransform(transf);
         SetShowNumber(shownumber);
         RefreshPos();
     }
@@ -65,15 +64,9 @@ namespace mapcontrol
     QRectF WayPointItem::boundingRect() const
     {
         return QRectF(-picture.width()/2,-picture.height(),picture.width(),picture.height());
-        //return QRectF(0,0,50,50);
     }
     void WayPointItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
     {
-//        if(!isDragging)
-//        {
-//            core::Point point=map->FromLatLngToLocal(coord);
-//            this->setPos(point.X(),point.Y());
-//        }
         painter->drawPixmap(-picture.width()/2,-picture.height(),picture);
         if(this->isSelected())
             painter->drawRect(QRectF(-picture.width()/2,-picture.height(),picture.width()-1,picture.height()-1));
@@ -83,8 +76,13 @@ namespace mapcontrol
         if(event->button()==Qt::LeftButton)
         {
             text=new QGraphicsSimpleTextItem(this);
+            textBG=new QGraphicsRectItem(this);
+            textBG->setBrush(Qt::white);
+            textBG->setOpacity(0.5);
             text->setPen(QPen(Qt::red));
             text->setPos(10,-picture.height());
+            textBG->setPos(10,-picture.height());
+            text->setZValue(3);
             RefreshToolTip();
             isDragging=true;
         }
@@ -95,6 +93,7 @@ namespace mapcontrol
         if(event->button()==Qt::LeftButton)
         {
             delete text;
+            delete textBG;
             coord=map->FromLocalToLatLng(this->pos().x(),this->pos().y());
             isDragging=false;
             RefreshToolTip();
@@ -109,6 +108,7 @@ namespace mapcontrol
             coord=map->FromLocalToLatLng(this->pos().x(),this->pos().y());
             QString coord_str = " " + QString::number(coord.Lat(), 'f', 6) + "   " + QString::number(coord.Lng(), 'f', 6);
             text->setText(coord_str);
+            textBG->setRect(text->boundingRect());
         }
             QGraphicsItem::mouseMoveEvent(event);
     }
@@ -141,6 +141,7 @@ namespace mapcontrol
         number=value;
         RefreshToolTip();
         numberI->setText(QString::number(number));
+        numberIBG->setRect(numberI->boundingRect().adjusted(-2,0,1,0));
         this->update();
     }
     void WayPointItem::SetReached(const bool &value)
@@ -160,13 +161,20 @@ namespace mapcontrol
         if((numberI==0) && value)
         {
             numberI=new QGraphicsSimpleTextItem(this);
+            numberIBG=new QGraphicsRectItem(this);
+            numberIBG->setBrush(Qt::white);
+            numberIBG->setOpacity(0.5);
+            numberI->setZValue(3);
             numberI->setPen(QPen(Qt::blue));
-            numberI->setPos(0,-10-picture.height());
+            numberI->setPos(0,-13-picture.height());
+            numberIBG->setPos(0,-13-picture.height());
             numberI->setText(QString::number(number));
+            numberIBG->setRect(numberI->boundingRect().adjusted(-2,0,1,0));
         }
         else if (!value && numberI)
         {
             delete numberI;
+            delete numberIBG;
         }
         this->update();
     }
@@ -174,6 +182,7 @@ namespace mapcontrol
     {
         if(number>onumber) --number;
         numberI->setText(QString::number(number));
+        numberIBG->setRect(numberI->boundingRect().adjusted(-2,0,1,0));
         RefreshToolTip();
         this->update();
     }
@@ -195,12 +204,14 @@ namespace mapcontrol
             {
                 ++number;
                 numberI->setText(QString::number(number));
+                numberIBG->setRect(numberI->boundingRect().adjusted(-2,0,1,0));
                 RefreshToolTip();
             }
             else if (((oldnumber<number) && (newnumber>number)))
             {
                 --number;
-                numberI->setText(number==0? "0":QString::number(number));
+                numberI->setText(QString::number(number));
+                numberIBG->setRect(numberI->boundingRect().adjusted(-2,0,1,0));
                 RefreshToolTip();
             }
             else if (newnumber==number)

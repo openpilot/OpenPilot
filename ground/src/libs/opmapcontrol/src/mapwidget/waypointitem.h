@@ -163,7 +163,9 @@ private:
 
 
     QGraphicsSimpleTextItem* text;
+    QGraphicsRectItem* textBG;
     QGraphicsSimpleTextItem* numberI;
+    QGraphicsRectItem* numberIBG;
     QTransform transf;
 
 public slots:

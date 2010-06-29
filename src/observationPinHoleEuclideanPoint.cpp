@@ -7,6 +7,7 @@
 
 #include "rtslam/observationPinHoleEuclideanPoint.hpp"
 #include "jmath/ublasExtra.hpp"
+#include "jmath/misc.hpp"
 #include "boost/shared_ptr.hpp"
 #include "rtslam/pinholeTools.hpp"
 #include "rtslam/landmarkEuclideanPoint.hpp"
@@ -50,7 +51,7 @@ namespace jafar {
 			// Some temps of known size
 			vec3 v;
 			v = quaternion::eucToFrame(sg, lmk);
-			dist(0) = v(2);
+			dist(0) = ublas::norm(v)*jmath::sign(v(2));
 
 			exp = pinhole::projectPoint(pinHolePtr()->params.intrinsic, pinHolePtr()->params.distortion, v);
 		}
@@ -68,7 +69,7 @@ namespace jafar {
 			mat23 EXP_v;
 
 			quaternion::eucToFrame(sg, lmk, v, V_sg, V_lmk);
-			dist(0) = v(2);
+			dist(0) = ublas::norm(v)*jmath::sign(v(2));
 
 			pinhole::projectPoint(pinHolePtr()->params.intrinsic, pinHolePtr()->params.distortion,
 			                      v, exp, EXP_v);

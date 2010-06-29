@@ -87,7 +87,7 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	// lmk management
 	const double D_MIN = 0.1;
-	const double REPARAM_TH = 0.2;
+	const double REPARAM_TH = 0.1;
 
 	// data manager: quick Harris detector
 	const int HARRIS_CONV_SIZE = 5;
@@ -96,11 +96,11 @@ void demo_slam01_main(world_ptr_t *world) {
 	const int PATCH_DESC = 45;
 
 	// data manager: zncc matcher
-	const int PATCH_SIZE = 11;
+	const int PATCH_SIZE = 15;
 	const double MATCH_TH = 0.90;
 	const double SEARCH_SIGMA = 2.5;
 	const double MAHALANOBIS_TH = 2.5;
-	const int N_UPDATES = 15;
+	const int N_UPDATES = 20;
 
 	// data manager: active search
 	const int GRID_VCELLS = 3;

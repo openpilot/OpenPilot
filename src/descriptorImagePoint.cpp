@@ -18,7 +18,8 @@ namespace jafar {
 		using namespace quaternion;
 
 		DescriptorImagePoint::DescriptorImagePoint(const feat_img_pnt_ptr_t & featImgPntPtr_, const vec7 & senPoseInit_, const observation_ptr_t & obsInitPtr_):
-			DescriptorAbstract(), senPoseInit(senPoseInit_), obsInitPtr(obsInitPtr_), featImgPntPtr(featImgPntPtr_)
+			DescriptorAbstract(), senPoseInit(senPoseInit_), /*obsInitPtr(obsInitPtr_),*/ featImgPntPtr(featImgPntPtr_)
+			// FIXME is obsInit useful, if it is how to copy the descriptor while letting obsInit die
 		{
 			// TODO Auto-generated constructor stub
 		}

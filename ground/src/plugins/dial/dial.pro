@@ -18,5 +18,4 @@ SOURCES += dialgadgetconfiguration.cpp
 SOURCES += dialgadgetoptionspage.cpp
 OTHER_FILES += DialGadget.pluginspec
 FORMS += dialgadgetoptionspage.ui
-RESOURCES += dial.qrc \
-    dial.qrc
+RESOURCES += dial.qrc

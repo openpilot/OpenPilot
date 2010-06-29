@@ -72,6 +72,8 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 	m_map->setFrameStyle(QFrame::NoFrame);
 
 	m_map->configuration->DragButton = Qt::LeftButton;  // use the left mouse button for map dragging
+
+	m_map->setStyleSheet("	QToolTip { background-color: white; color: black; border: 1px solid black; padding: 5px; border-radius: 2px; /* opacity: 170; */ } ");
     }
 
     // **************
@@ -154,6 +156,10 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 	connect(m_map, SIGNAL(OnMapTypeChanged(MapType::Types)), this, SLOT(OnMapTypeChanged(MapType::Types)));		// map type changed
 	connect(m_map, SIGNAL(OnEmptyTileError(int, core::Point)), this, SLOT(OnEmptyTileError(int, core::Point)));	// tile error
 	connect(m_map, SIGNAL(OnTilesStillToLoad(int)), this, SLOT(OnTilesStillToLoad(int)));				// tile loading signals
+	connect(m_map, SIGNAL(WPNumberChanged(int const&,int const&,WayPointItem*)), this, SLOT(WPNumberChanged(int const&,int const&,WayPointItem*)));
+    	connect(m_map, SIGNAL(WPValuesChanged(WayPointItem*)), this, SLOT(WPValuesChanged(WayPointItem*)));
+    	connect(m_map, SIGNAL(WPInserted(int const&, WayPointItem*)), this, SLOT(WPInserted(int const&, WayPointItem*)));
+    	connect(m_map, SIGNAL(WPDeleted(int const&)), this, SLOT(WPDeleted(int const&)));
 
 	m_map->SetMaxZoom(19);									    // increase the maximum zoom level
 	m_map->SetMouseWheelZoomType(internals::MouseWheelZoomType::MousePositionWithoutCenter);    // set how the mouse wheel zoom functions
@@ -252,6 +258,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
 OPMapGadgetWidget::~OPMapGadgetWidget()
 {
+    clearWayPoints();
     if (m_map_overlay_widget) delete m_map_overlay_widget;
     if (wayPoint_treeView_model) delete wayPoint_treeView_model;
     if (waypoint_editor) delete waypoint_editor;
@@ -538,14 +545,37 @@ void OPMapGadgetWidget::OnTileLoadComplete()
 
 void OPMapGadgetWidget::OnMapZoomChanged()
 {
+    // to do
 }
 
 void OPMapGadgetWidget::OnMapTypeChanged(MapType::Types type)
 {
+    // to do
 }
 
 void OPMapGadgetWidget::OnEmptyTileError(int zoom, core::Point pos)
 {
+    // to do
+}
+
+void OPMapGadgetWidget::WPNumberChanged(int const& oldnumber, int const& newnumber, WayPointItem* waypoint)
+{
+    // to do
+}
+
+void OPMapGadgetWidget::WPValuesChanged(WayPointItem* waypoint)
+{
+    // to do
+}
+
+void OPMapGadgetWidget::WPInserted(int const& number, WayPointItem* waypoint)
+{
+    // to do
+}
+
+void OPMapGadgetWidget::WPDeleted(int const& number)
+{
+    // to do
 }
 
 // *************************************************************************************
@@ -643,14 +673,33 @@ void OPMapGadgetWidget::on_horizontalSliderZoom_sliderMoved(int position)
 
 void OPMapGadgetWidget::on_toolButtonHome_clicked()
 {
+    // to do
+}
+
+
+void OPMapGadgetWidget::on_toolButtonPrevWaypoint_clicked()
+{
+    // to do
+}
+
+void OPMapGadgetWidget::on_toolButtonNextWaypoint_clicked()
+{
+    // to do
 }
 
 void OPMapGadgetWidget::on_toolButtonHoldPosition_clicked()
 {
+    // to do
 }
 
 void OPMapGadgetWidget::on_toolButtonGo_clicked()
 {
+    // to do
+}
+
+void OPMapGadgetWidget::on_toolButtonAddWaypoint_clicked()
+{
+    addWayPoint();
 }
 
 void OPMapGadgetWidget::on_toolButtonWaypointEditor_clicked()
@@ -1009,6 +1058,22 @@ void OPMapGadgetWidget::openWayPointEditor()
 
 void OPMapGadgetWidget::addWayPoint()
 {
+    if (m_map)
+    {
+	m_waypoint_list_mutex.lock();
+
+	    // create a waypoint
+	    t_waypoint waypoint;
+	    waypoint.item = m_map->WPCreate();
+	    waypoint.time_seconds = 0;
+	    waypoint.hold_time_seconds = 0;
+
+	    // and remember it
+	    m_waypoint_list.append(waypoint);
+
+	m_waypoint_list_mutex.unlock();
+    }
+
     // to do
 }
 
@@ -1019,7 +1084,10 @@ void OPMapGadgetWidget::deleteWayPoint()
 
 void OPMapGadgetWidget::clearWayPoints()
 {
-    // to do
+    m_waypoint_list_mutex.lock();
+	if (m_map) m_map->WPDeleteAll();
+	m_waypoint_list.clear();
+    m_waypoint_list_mutex.unlock();
 }
 
 void OPMapGadgetWidget::gridLines()

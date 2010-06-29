@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>704</width>
-    <height>327</height>
+    <height>422</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -534,6 +534,9 @@ p, li { white-space: pre-wrap; }
               <height>16777215</height>
              </size>
             </property>
+            <property name="cursor">
+             <cursorShape>OpenHandCursor</cursorShape>
+            </property>
             <property name="toolTip">
              <string>Zoom level</string>
             </property>
@@ -655,8 +658,18 @@ color: rgb(255, 255, 255);</string>
      <item>
       <widget class="QSplitter" name="splitter">
        <property name="styleSheet">
-        <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(71, 71, 71, 255), stop:1 rgba(110, 110, 110, 255));
-</string>
+        <string notr="true">QSplitter::handle {
+/*	image: url(images/splitter.png); */
+	background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255, 255, 255, 48), stop:1 rgba(0, 0, 0, 48));
+}
+
+QSplitter::handle:horizontal {
+	height: 5px;
+}
+
+QSplitter::handle:vertical {
+	width: 5px;
+}</string>
        </property>
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
@@ -670,8 +683,11 @@ color: rgb(255, 255, 255);</string>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
+       <property name="opaqueResize">
+        <bool>true</bool>
+       </property>
        <property name="handleWidth">
-        <number>7</number>
+        <number>5</number>
        </property>
        <property name="childrenCollapsible">
         <bool>false</bool>
@@ -844,13 +860,13 @@ border-radius: 2px;
        </property>
        <property name="minimumSize">
         <size>
-         <width>48</width>
+         <width>60</width>
          <height>50</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>70</width>
+         <width>60</width>
          <height>16777215</height>
         </size>
        </property>
@@ -870,11 +886,11 @@ color: rgb(255, 255, 255);
 border: 0px; 
 }
 QToolButton:hover {
-background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(128, 128, 128, 255), stop:1 rgba(64, 64, 64, 255));
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(180, 180, 180, 255), stop:1 rgba(48, 48, 48, 255));
 color: rgb(255, 255, 255);
 }
 QToolButton:pressed {
-background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(180, 180, 180, 255));
 color: rgb(255, 255, 255);
 }
 
@@ -898,6 +914,44 @@ border-radius: 3px;
         <property name="margin">
          <number>0</number>
         </property>
+        <item>
+         <widget class="QToolButton" name="toolButtonHoldPosition">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>48</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>UAV hold position</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="opmap.qrc">
+            <normaloff>:/opmap/images/hold.png</normaloff>:/opmap/images/hold.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>60</width>
+            <height>60</height>
+           </size>
+          </property>
+          <property name="autoRaise">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
         <item>
          <widget class="QToolButton" name="toolButtonHome">
           <property name="enabled">
@@ -933,8 +987,8 @@ border-radius: 3px;
           </property>
           <property name="iconSize">
            <size>
-            <width>70</width>
-            <height>70</height>
+            <width>60</width>
+            <height>60</height>
            </size>
           </property>
           <property name="toolButtonStyle">
@@ -974,8 +1028,8 @@ border-radius: 3px;
           </property>
           <property name="iconSize">
            <size>
-            <width>70</width>
-            <height>70</height>
+            <width>60</width>
+            <height>60</height>
            </size>
           </property>
           <property name="autoRaise">
@@ -1012,46 +1066,8 @@ border-radius: 3px;
           </property>
           <property name="iconSize">
            <size>
-            <width>70</width>
-            <height>70</height>
-           </size>
-          </property>
-          <property name="autoRaise">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QToolButton" name="toolButtonHoldPosition">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>48</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>UAV hold position</string>
-          </property>
-          <property name="styleSheet">
-           <string notr="true"/>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset resource="opmap.qrc">
-            <normaloff>:/opmap/images/hold.png</normaloff>:/opmap/images/hold.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>70</width>
-            <height>70</height>
+            <width>60</width>
+            <height>60</height>
            </size>
           </property>
           <property name="autoRaise">
@@ -1088,8 +1104,8 @@ border-radius: 3px;
           </property>
           <property name="iconSize">
            <size>
-            <width>70</width>
-            <height>70</height>
+            <width>60</width>
+            <height>60</height>
            </size>
           </property>
           <property name="autoRaise">
@@ -1135,7 +1151,7 @@ color: rgba(255, 255, 255, 70);
 
 QLabel { /* all label types */
 /* background-color: rgba(255, 255, 255, 0); */
-background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(64, 64, 64, 128), stop:1 rgba(128, 128, 128, 128));
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 128), stop:1 rgba(128, 128, 128, 128));
 color: rgb(255, 255, 255);
 /*border: 1px solid black;*/
 border: none;

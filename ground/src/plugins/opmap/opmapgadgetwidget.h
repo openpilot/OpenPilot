@@ -34,6 +34,8 @@
 #include <QtGui/QMenu>
 #include <QStringList>
 #include <QStandardItemModel>
+#include <QList>
+#include <QMutex>
 
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/positionactual.h"
@@ -47,6 +49,18 @@ namespace Ui
 }
 
 using namespace mapcontrol;
+
+// ******************************************************
+
+// waypoint structure
+typedef struct t_waypoint
+{
+    mapcontrol::WayPointItem *item;
+    int time_seconds;
+    int hold_time_seconds;
+} t_waypoint;
+
+// ******************************************************
 
 class OPMapGadgetWidget : public QWidget
 {
@@ -79,7 +93,11 @@ private slots:
     void zoomIn();
     void zoomOut();
 
-    // user control signals
+    /**
+    * @brief signals received from the various map plug-in widget user controls
+    *
+    * @param
+    */
     void on_toolButtonReload_clicked();
     void on_comboBoxFindPlace_returnPressed();
     void on_toolButtonFindPlace_clicked();
@@ -90,15 +108,20 @@ private slots:
     void on_toolButtonMapHome_clicked();
     void on_toolButtonMapUAV_clicked();
     void on_horizontalSliderZoom_sliderMoved(int position);
+    void on_toolButtonAddWaypoint_clicked();
     void on_toolButtonWaypointEditor_clicked();
-
     void on_treeViewWaypoints_clicked(QModelIndex index);
-
     void on_toolButtonHome_clicked();
+    void on_toolButtonNextWaypoint_clicked();
+    void on_toolButtonPrevWaypoint_clicked();
     void on_toolButtonHoldPosition_clicked();
     void on_toolButtonGo_clicked();
 
-    // map signals
+    /**
+    * @brief signals received from the map object
+    *
+    * @param
+    */
     void zoomChanged(double zoom);
     void OnCurrentPositionChanged(internals::PointLatLng point);
     void OnTileLoadComplete();
@@ -108,8 +131,16 @@ private slots:
     void OnMapTypeChanged(MapType::Types type);
     void OnEmptyTileError(int zoom, core::Point pos);
     void OnTilesStillToLoad(int number);
+    void WPNumberChanged(int const& oldnumber,int const& newnumber, WayPointItem* waypoint);
+    void WPValuesChanged(WayPointItem* waypoint);
+    void WPInserted(int const& number, WayPointItem* waypoint);
+    void WPDeleted(int const& number);
 
-    // context menu signals
+    /**
+    * @brief mouse right click context menu signals
+    *
+    * @param
+    */
     void reload();
     void findPlace();
     void goZoomIn();
@@ -170,6 +201,9 @@ private:
     OPMap_MapOverlayWidget *m_map_overlay_widget;
 
     QStandardItemModel *wayPoint_treeView_model;
+
+    QList<t_waypoint> m_waypoint_list;
+    QMutex m_waypoint_list_mutex;
 
     void createActions();
 

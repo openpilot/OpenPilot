@@ -37,6 +37,20 @@
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="QSplitter" name="splitter">
+       <property name="styleSheet">
+        <string notr="true">QSplitter::handle {
+/*	image: url(images/splitter.png); */
+	background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(255, 255, 255, 80), stop:1 rgba(0, 0, 0, 80));
+}
+
+QSplitter::handle:horizontal {
+	height: 5px;
+}
+
+QSplitter::handle:vertical {
+	width: 5px;
+}</string>
+       </property>
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
        </property>
@@ -45,6 +59,9 @@
        </property>
        <property name="opaqueResize">
         <bool>true</bool>
+       </property>
+       <property name="handleWidth">
+        <number>5</number>
        </property>
        <property name="childrenCollapsible">
         <bool>false</bool>

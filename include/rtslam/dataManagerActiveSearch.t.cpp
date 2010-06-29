@@ -76,6 +76,7 @@ namespace jafar {
 
 					if (numObs < algorithmParams_.n_updates) {
 
+						obsPtr->events.measured = true;
 
 						// update counter
 						obsPtr->counters.nSearch++;

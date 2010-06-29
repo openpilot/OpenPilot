@@ -219,8 +219,8 @@ namespace jafar {
 		bool ObservationAbstract::voteForKillingLandmark(){
 			// kill big ellipses
 			int searchSize = 36*sqrt(expectation.P(0,0)*expectation.P(1,1));
-			if (searchSize > 30000) {
-//				cout << "Killed by size." << endl;
+			if (searchSize > 50000) {
+				cout << "Obs " << id() << " Killed by size (size " << searchSize << ")" << endl;
 				return true;
 			}
 
@@ -230,7 +230,7 @@ namespace jafar {
 				double consistencyRatio = counters.nInlier / (double)counters.nMatch;
 
 				if (matchRatio < 0.5 || consistencyRatio < 0.5)	{
-//					cout << "Killed by unstability." << endl;
+					cout << "Obs " << id() << " Killed by unstability (match " << matchRatio << " ; consistency " << consistencyRatio << ")"<< endl;
 					return true;
 				}
 			}

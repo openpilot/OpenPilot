@@ -62,9 +62,10 @@ typedef ImagePointObservationMaker<ObservationPinHoleAnchoredHomogeneousPoint, S
 
 int mode = 0;
 std::string dump_path = ".";
+time_t rseed;
 
 void demo_slam01_main(world_ptr_t *world) {
-
+	std::cout << rand() << "," << rand() << "," << rand() << "," << rand() << "," << rand() << std::endl;
 	// time
 	const int N_FRAMES = 5000;
 
@@ -96,7 +97,7 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	// data manager: zncc matcher
 	const int PATCH_SIZE = 11;
-	const double MATCH_TH = 0.9;
+	const double MATCH_TH = 0.90;
 	const double SEARCH_SIGMA = 2.5;
 	const double MAHALANOBIS_TH = 2.5;
 	const int N_UPDATES = 15;
@@ -108,20 +109,6 @@ void demo_slam01_main(world_ptr_t *world) {
 	const int GRID_SEPAR = 20;
 
 //	const bool SHOW_PATCH = true;
-
-	time_t rseed = time(NULL);
-	if (mode == 1) {
-		std::fstream f((dump_path + std::string("/rseed.log")).c_str(), std::ios_base::out);
-		f << rseed << std::endl;
-		f.close();
-	}
-	else if (mode == 2) {
-		std::fstream f((dump_path + std::string("/rseed.log")).c_str(), std::ios_base::in);
-		f >> rseed;
-		f.close();
-	}
-	std::cout << "rseed " << rseed << std::endl;
-	srand(rseed);
 
 
 	// pin-hole parameters in BOOST format
@@ -307,8 +294,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	} // temporal loop
 
 //	cout << "time avg(max): " << total_chrono.elapsed()/N_FRAMES << "(" << (int)(1000*max_dt) <<") ms" << endl;
-	std::cout << "\nFINISHED !" << std::endl;
-
+	std::cout << "\nFINISHED ! Press a key to terminate." << std::endl;
 	getchar();
 } // demo_slam01_main
 
@@ -337,6 +323,21 @@ void demo_slam01_display(world_ptr_t *world) {
 
 	void demo_slam01(bool display) {
 		world_ptr_t worldPtr(new WorldAbstract());
+
+		rseed = time(NULL);
+		if (mode == 1) {
+			std::fstream f((dump_path + std::string("/rseed.log")).c_str(), std::ios_base::out);
+			f << rseed << std::endl;
+			f.close();
+		}
+		else if (mode == 2) {
+			std::fstream f((dump_path + std::string("/rseed.log")).c_str(), std::ios_base::in);
+			f >> rseed;
+			f.close();
+		}
+		std::cout << __FILE__ << ":" << __LINE__ << " rseed " << rseed << std::endl;
+		srand(rseed); // FIXME does not work in multithread...
+
 
 		// to start with qt display
 		const int slam_priority = -20; // needs to be started as root to be < 0

@@ -167,9 +167,10 @@ class ObservationQt : public ObservationDisplay
 {
 	public:
 		// buffered data
-		bool visible_;
-		bool matched_;
 		bool predicted_;
+		bool visible_;
+		bool measured_;
+		bool matched_;
 		bool updated_;
 		jblas::vec predObs_;
 		jblas::sym_mat predObsCov_;
@@ -221,8 +222,9 @@ class ObservationQt : public ObservationDisplay
 				case LandmarkDisplay::ltPoint:
 					//LandmarkEuclidean *lmk = static_cast<LandmarkEuclidean*>(slamObs_->landmarkPtr->convertToStandardParametrization());
 					predicted_ = slamObs_->events.predicted;
-					matched_ = slamObs_->events.matched;
 					visible_ = slamObs_->events.visible;
+					measured_ = slamObs_->events.measured;
+					matched_ = slamObs_->events.matched;
 					updated_ = slamObs_->events.updated;
 					landmarkPhase_ = LandmarkDisplay::convertPhase(&*slamObs_->landmarkPtr());
 					id_ = slamObs_->landmarkPtr()->id();
@@ -234,7 +236,7 @@ class ObservationQt : public ObservationDisplay
 							predObsCov_ = slamObs_->innovation.P();
 //							cout << "display: noise/exp/inn:  " << slamObs_->measurement.P() << " / " << slamObs_->expectation.P() << " / " << slamObs_->innovation.P() << " / " << endl;
 						}
-						if (matched_ || !predicted_)
+						if (measured_ || matched_ || !predicted_)
 						{
 							measObs_ = slamObs_->measurement.x();
 							match_score = slamObs_->getMatchScore();
@@ -257,7 +259,7 @@ class ObservationQt : public ObservationDisplay
 				case LandmarkDisplay::ltPoint:
 				{
 					bool dispPred = visible_ && predicted_;
-					bool dispMeas = visible_ && (matched_ || !predicted_);
+					bool dispMeas = visible_ && (measured_ || matched_ || !predicted_);
 					bool dispInit = visible_ && !predicted_;
 
 					// Build display objects if it is the first time they are displayed

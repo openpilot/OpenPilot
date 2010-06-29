@@ -4,24 +4,13 @@ Features
 ------------------------------------
 - segments
 - multimap
-- True Active Search: search depending on ellipse area.
-- feature appearance prediction <- DONE
 - Adapt ActiveSearchGrid and QuickHarrisDetector to the new ROI specifications in module image
 
-- factories 		<- DONE FOR OBS ONLY
-- sensors hardware 	<- DONE FOR PIN-HOLE firewire 1394
 - estimation hardware <- IN PROGRESS FOR MTI
 
 - Map management:
-	- use a loop
-	- Lmk reparametrization:
-		- linearity test in OBS.
-		- heuristic for lmk reparametrization in Lmk
 	- Lmk deletion :
 		- non-reparametrized die when out of view in initializer sensor. 
-		- events already collected in Obs.
-		- heuristic for feature deletion in Lmk
-		- deletion in Map, of Lmk and Obs.
 
 Organization
 ------------------------------------
@@ -49,6 +38,7 @@ Performance
 
 Precision
 ------------------------------------
+- test predicted patch variance: if too low, discard exploration and declare not matched.
 - when a point is detected, do a matching with itself with interpolation to find subpixel position
 - when a point is matched, try to estimate if there is a possible ambiguity with another point in the ellipse 
 - Implement one point Ransac to avoid outliers !!!

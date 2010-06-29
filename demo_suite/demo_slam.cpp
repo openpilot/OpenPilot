@@ -75,23 +75,23 @@ void demo_slam01_main(world_ptr_t *world) {
 	// robot uncertainties and perturbations
 	const double UNCERT_VLIN = .01; // m/s
 	const double UNCERT_VANG = .01; // rad/s
-	const double PERT_VLIN = 1; // m/s per sqrt(s)
-	const double PERT_VANG = 1; // rad/s per sqrt(s)
+	const double PERT_VLIN = .2; // m/s per sqrt(s)
+	const double PERT_VANG = .5; // rad/s per sqrt(s)
 
 	// pin-hole:
 	const int IMG_WIDTH = 640;
 	const int IMG_HEIGHT = 480;
 	const double INTRINSIC[4] = { 301.27013,   266.86136,   497.28243,   496.81116 };
 	const double DISTORTION[2] = { -0.23193,   0.11306 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
-	const double PIX_NOISE = 1.0;
+	const double PIX_NOISE = 0.5;
 
 	// lmk management
 	const double D_MIN = 0.1;
 	const double REPARAM_TH = 0.1;
 
 	// data manager: quick Harris detector
-	const int HARRIS_CONV_SIZE = 5;
-	const double HARRIS_TH = 20.0;
+	const int HARRIS_CONV_SIZE = 3;
+	const double HARRIS_TH = 10.0;
 	const double HARRIS_EDDGE = 2.0;
 	const int PATCH_DESC = 45;
 

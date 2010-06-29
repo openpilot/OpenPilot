@@ -50,6 +50,8 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_map_scene_proxy = NULL;
     m_map_overlay_widget = NULL;
 
+    m_mouse_waypoint = NULL;
+
     prev_tile_number = 0;
 
     // **************
@@ -71,8 +73,6 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 	m_map->setFrameStyle(QFrame::NoFrame);
 
 	m_map->configuration->DragButton = Qt::LeftButton;  // use the left mouse button for map dragging
-
-	m_map->setStyleSheet("	QToolTip { background-color: white; color: black; border: 1px solid black; padding: 5px; border-radius: 2px; /* opacity: 170; */ } ");
     }
 
     // **************
@@ -94,7 +94,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_map_graphics_scene = m_map->scene();
     m_map_scene_proxy = m_map_graphics_scene->addWidget(m_map_overlay_widget);
 
-    m_map_overlay_widget->setGeometry(m_map->geometry());
+    m_map_overlay_widget->setGeometry(m_widget->mapWidget->geometry());
 */
     // **************
     // Get required UAVObjects
@@ -291,7 +291,23 @@ void OPMapGadgetWidget::mouseMoveEvent(QMouseEvent *event)
 
 void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 {
+    if (!m_map)
+	return;	// we don't appear to have a map to work with!
+
+    if (event->reason() != QContextMenuEvent::Mouse)
+	return;	// not a mouse click event
+
+    QPoint p = m_map->mapFromGlobal(QCursor::pos());
+
+    if (!m_map->contentsRect().contains(p))
+	return;	// the mouse click was not on the map
+
+    // find out if we have a waypoint under the mouse cursor
+    QGraphicsItem *item = m_map->itemAt(p);
+    m_mouse_waypoint = qgraphicsitem_cast<mapcontrol::WayPointItem *>(item);
+
     // ****************
+    // create the popup menu
 
     QMenu zoomMenu(tr("&Zoom ") + "(" + QString::number(m_map->Zoom()) + ")", this);
     zoomMenu.addAction(zoom2Act);
@@ -348,11 +364,18 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     menu.addAction(wayPointEditorAct);
     menu.addAction(addWayPointAct);
-    menu.addAction(editWayPointAct);
-    menu.addAction(deleteWayPointAct);
-    menu.addAction(clearWayPointsAct);
+    if (m_mouse_waypoint)
+    {	// we have a waypoint under the mouse
+	menu.addAction(editWayPointAct);
+	menu.addAction(deleteWayPointAct);
+    }
 
-    menu.addSeparator();
+    m_waypoint_list_mutex.lock();
+	if (m_waypoint_list.count() > 0)
+	    menu.addAction(clearWayPointsAct);	// we have waypoints
+    m_waypoint_list_mutex.unlock();
+
+//    menu.addSeparator();
 
     menu.exec(event->globalPos());
 
@@ -1070,12 +1093,17 @@ void OPMapGadgetWidget::addWayPoint()
 
 void OPMapGadgetWidget::editWayPoint()
 {
+    if (!m_mouse_waypoint) return;
+
     // to do
+
     waypoint_edit_dialog.show();
 }
 
 void OPMapGadgetWidget::deleteWayPoint()
 {
+    if (!m_mouse_waypoint) return;
+
     // to do
 }
 

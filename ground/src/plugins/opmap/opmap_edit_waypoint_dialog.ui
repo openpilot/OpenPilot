@@ -181,7 +181,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Height </string>
+        <string>Altitude</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -189,7 +189,7 @@
       </widget>
      </item>
      <item row="3" column="2">
-      <widget class="QLineEdit" name="lineEditHeight">
+      <widget class="QLineEdit" name="lineEditAltitude">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>

@@ -126,7 +126,7 @@ QSplitter::handle:vertical {
            </column>
            <column>
             <property name="text">
-             <string>Height</string>
+             <string>Altitude</string>
             </property>
            </column>
            <column>

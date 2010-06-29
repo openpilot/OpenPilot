@@ -211,6 +211,8 @@ private:
 
     QStandardItemModel *wayPoint_treeView_model;
 
+    mapcontrol::WayPointItem *m_mouse_waypoint;
+
     QList<t_waypoint> m_waypoint_list;
     QMutex m_waypoint_list_mutex;
 

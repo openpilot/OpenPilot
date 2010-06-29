@@ -24,7 +24,7 @@
     <number>5</number>
    </property>
    <item row="1" column="0">
-    <layout class="QGridLayout" name="gridLayout_3">
+    <layout class="QGridLayout" name="gridLayout_3" rowstretch="0,0,0,0,0,0,0">
      <item row="4" column="2">
       <widget class="QLabel" name="label_4">
        <property name="text">
@@ -37,6 +37,15 @@
      </item>
      <item row="4" column="3">
       <widget class="QDoubleSpinBox" name="longitudeSpinBox">
+       <property name="minimumSize">
+        <size>
+         <width>120</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="frame">
+        <bool>true</bool>
+       </property>
        <property name="decimals">
         <number>8</number>
        </property>
@@ -63,6 +72,15 @@
      </item>
      <item row="2" column="3">
       <widget class="QDoubleSpinBox" name="latitudeSpinBox">
+       <property name="minimumSize">
+        <size>
+         <width>120</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="frame">
+        <bool>true</bool>
+       </property>
        <property name="decimals">
         <number>8</number>
        </property>
@@ -86,6 +104,18 @@
      </item>
      <item row="1" column="3">
       <widget class="QSpinBox" name="zoomSpinBox">
+       <property name="maximumSize">
+        <size>
+         <width>50</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="frame">
+        <bool>true</bool>
+       </property>
+       <property name="minimum">
+        <number>2</number>
+       </property>
        <property name="maximum">
         <number>18</number>
        </property>
@@ -105,6 +135,12 @@
       <widget class="QComboBox" name="providerComboBox">
        <property name="cursor">
         <cursorShape>OpenHandCursor</cursorShape>
+       </property>
+       <property name="maxVisibleItems">
+        <number>15</number>
+       </property>
+       <property name="frame">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -133,6 +169,19 @@
         <string>Show Tile Grid Lines</string>
        </property>
       </widget>
+     </item>
+     <item row="2" column="0">
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>
@@ -260,6 +309,9 @@
        <property name="cursor">
         <cursorShape>OpenHandCursor</cursorShape>
        </property>
+       <property name="frame">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
     </layout>
@@ -277,6 +329,9 @@
       <widget class="QLineEdit" name="lineEditCacheLocation">
        <property name="autoFillBackground">
         <bool>false</bool>
+       </property>
+       <property name="maxLength">
+        <number>512</number>
        </property>
       </widget>
      </item>

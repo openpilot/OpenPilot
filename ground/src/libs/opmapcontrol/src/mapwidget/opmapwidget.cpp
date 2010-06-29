@@ -213,7 +213,7 @@ namespace mapcontrol
     //////////////////////////////////////////////
     void OPMapWidget::SetShowCompass(const bool &value)
     {
-        if(value)
+        if(value && !compass)
         {
             compass=new QGraphicsSvgItem(QString::fromUtf8(":/markers/images/compas.svg"));
             compass->setScale(0.1+0.05*(qreal)(this->size().width())/1000*(qreal)(this->size().height())/600);
@@ -229,6 +229,7 @@ namespace mapcontrol
         if(!value && compass)
         {
             delete compass;
+            compass=0;
         }
     }
      void OPMapWidget::SetRotate(qreal const& value)

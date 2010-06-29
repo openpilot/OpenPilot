@@ -87,10 +87,12 @@ class SensorQt : public SensorDisplay
 		int framenumber;
 		double avg_framerate;
 		double t;
+		vec7 pose;
 		// graphical objects
 		qdisplay::Viewer *viewer_;
 		qdisplay::ImageView* view_;
 		QGraphicsTextItem* framenumber_label;
+		QGraphicsTextItem* sensorpose_label;
 	public:
 		SensorQt(rtslam::SensorAbstract *_slamSen, RobotDisplay *_dispRob): 
 			SensorDisplay(_slamSen, _dispRob)
@@ -105,8 +107,15 @@ class SensorQt : public SensorDisplay
 			
 			framenumber_label = new QGraphicsTextItem(view_);
 			//framenumber_label->setFont(QFont( m_label->font().family(), m_fontSize));
+			framenumber_label->setFont(QFont("monospace", 10, QFont::Bold));
 			framenumber_label->setDefaultTextColor(QColor(0,192,0));
-			framenumber_label->translate(0,0);
+			framenumber_label->translate(0,12);
+			
+			sensorpose_label = new QGraphicsTextItem(view_);
+			//sensorpose_label->setFont(QFont( m_label->font().family(), m_fontSize));
+			sensorpose_label->setFont(QFont("monospace", 10, QFont::Bold));
+			sensorpose_label->setDefaultTextColor(QColor(0,192,0));
+			sensorpose_label->translate(0,-2);
 		}
 		~SensorQt()
 		{
@@ -124,6 +133,8 @@ class SensorQt : public SensorDisplay
 				t = slamSen_->rawPtr->timestamp;
 				raw_ptr_t raw = slamSen_->getRaw();
 				if (raw) image = static_cast<RawImage&>(*raw).img->clone();
+				pose = slamSen_->robotPtr()->pose.x();
+				
 			}
 		}
 		void render()
@@ -135,6 +146,15 @@ class SensorQt : public SensorDisplay
 					view_->setImage(image);
 					std::ostringstream oss; oss << "#" << framenumber << "  |  " << std::setprecision(3) << avg_framerate*1000 << " ms";
 					framenumber_label->setPlainText(oss.str().c_str());
+					
+					vec3 position = ublas::subrange(pose,0,3) * 100.0;
+					vec3 euler = quaternion::q2e(ublas::subrange(pose,3,7)) * 180./M_PI;
+					oss.str("");
+//std::cout << pose << " ; " << position << " ; " << euler << std::endl;
+					oss << "[" <<  std::setfill(' ') << std::setw(4) << (int)position(0) << ", " <<  
+						std::setw(4) << (int)position(1) << ", " <<  std::setw(4) << (int)position(2) << "] cm ; ["
+						<< std::setw(4) << (int)euler(0) << ", " <<  std::setw(4) << (int)euler(1) << ", " <<  std::setw(4) << (int)euler(2) << "] deg";
+					sensorpose_label->setPlainText(oss.str().c_str());
 					break; }
 				default:
 					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_SENSOR_TYPE, "Don't know how to display this type of sensor" << type_);

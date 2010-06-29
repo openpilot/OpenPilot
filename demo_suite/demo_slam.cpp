@@ -67,7 +67,7 @@ time_t rseed;
 void demo_slam01_main(world_ptr_t *world) {
 	std::cout << rand() << "," << rand() << "," << rand() << "," << rand() << "," << rand() << std::endl;
 	// time
-	const int N_FRAMES = 5000;
+	const int N_FRAMES = 500000;
 
 	// map
 	const int MAP_SIZE = 250;

@@ -53,6 +53,8 @@ QWidget *ModelViewGadgetOptionsPage::createPage(QWidget *parent)
 
     m_page->modelPathChooser->setPath(m_config->acFilename());
     m_page->backgroundPathChooser->setPath(m_config->bgFilename());
+    m_page->enableVbo->setChecked(m_config->vboEnabled());
+
 
     return w;
 }

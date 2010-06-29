@@ -155,6 +155,14 @@ class SensorQt : public SensorDisplay
 						std::setw(4) << (int)position(1) << ", " <<  std::setw(4) << (int)position(2) << "] cm ; ["
 						<< std::setw(4) << (int)euler(0) << ", " <<  std::setw(4) << (int)euler(1) << ", " <<  std::setw(4) << (int)euler(2) << "] deg";
 					sensorpose_label->setPlainText(oss.str().c_str());
+
+//					// save image
+//					char filename[50];
+//					sprintf(filename, "/mnt/ram/rtslam/rendered-%04d.png", framenumber);
+//					cout << (string)filename << endl;
+//					view_->exportView((string)filename);
+
+
 					break; }
 				default:
 					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_SENSOR_TYPE, "Don't know how to display this type of sensor" << type_);

@@ -44,9 +44,9 @@ namespace jafar {
 			if (sen.name().size() > 0) s << sen.name() << ", ";
 			s << "of type " << sen.typeName() << std::endl;
 			s << ".pose :  " << sen.pose << endl;
-			s << ".robot: [ " << sen.robot().id() << " ]";
 			if (sen.state.storage() == Gaussian::REMOTE) s << endl << ".ia_rs: "
 			    << sen.ia_globalPose;
+			s << ".in robot: " << sen.robot().id();
 			return s;
 		}
 

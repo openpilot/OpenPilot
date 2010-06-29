@@ -67,20 +67,20 @@ time_t rseed;
 void demo_slam01_main(world_ptr_t *world) {
 	std::cout << rand() << "," << rand() << "," << rand() << "," << rand() << "," << rand() << std::endl;
 	// time
-	const int N_FRAMES = 500000;
+	const unsigned N_FRAMES = 500000;
 
 	// map
-	const int MAP_SIZE = 250;
+	const unsigned MAP_SIZE = 250;
 
 	// robot uncertainties and perturbations
 	const double UNCERT_VLIN = .01; // m/s
 	const double UNCERT_VANG = .01; // rad/s
 	const double PERT_VLIN = .2; // m/s per sqrt(s)
-	const double PERT_VANG = .5; // rad/s per sqrt(s)
+	const double PERT_VANG = 1; // rad/s per sqrt(s)
 
 	// pin-hole:
-	const int IMG_WIDTH = 640;
-	const int IMG_HEIGHT = 480;
+	const unsigned IMG_WIDTH = 640;
+	const unsigned IMG_HEIGHT = 480;
 	const double INTRINSIC[4] = { 301.27013,   266.86136,   497.28243,   496.81116 };
 	const double DISTORTION[2] = { -0.23193,   0.11306 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
 	const double PIX_NOISE = 0.5;
@@ -90,23 +90,23 @@ void demo_slam01_main(world_ptr_t *world) {
 	const double REPARAM_TH = 0.1;
 
 	// data manager: quick Harris detector
-	const int HARRIS_CONV_SIZE = 3;
+	const unsigned HARRIS_CONV_SIZE = 3;
 	const double HARRIS_TH = 10.0;
-	const double HARRIS_EDDGE = 2.0;
-	const int PATCH_DESC = 45;
+	const double HARRIS_EDDGE = 3.0;
+	const unsigned PATCH_DESC = 45;
 
 	// data manager: zncc matcher
-	const int PATCH_SIZE = 15;
-	const double MATCH_TH = 0.90;
+	const unsigned PATCH_SIZE = 15;
+	const double MATCH_TH = 0.95;
 	const double SEARCH_SIGMA = 2.5;
 	const double MAHALANOBIS_TH = 2.5;
-	const int N_UPDATES = 20;
+	const unsigned N_UPDATES = 20;
 
 	// data manager: active search
-	const int GRID_VCELLS = 3;
-	const int GRID_HCELLS = 4;
-	const int GRID_MARGIN = 11;
-	const int GRID_SEPAR = 20;
+	const unsigned GRID_VCELLS = 3;
+	const unsigned GRID_HCELLS = 4;
+	const unsigned GRID_MARGIN = 11;
+	const unsigned GRID_SEPAR = 20;
 
 //	const bool SHOW_PATCH = true;
 

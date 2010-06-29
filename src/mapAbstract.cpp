@@ -169,11 +169,11 @@ namespace jafar {
 			for (MapAbstract::RobotList::const_iterator robIter =
 			    map.robotList().begin(); robIter != map.robotList().end(); robIter++) {
 				robot_ptr_t robPtr = *robIter;
-				s << *robPtr << endl;
+				s << *robPtr << endl << endl;
 				for (RobotAbstract::SensorList::const_iterator senIter =
 				    robPtr->sensorList().begin(); senIter != robPtr->sensorList().end(); senIter++) {
 					sensor_ptr_t senPtr = *senIter;
-					s << *senPtr << endl;
+					s << *senPtr << endl << endl;;
 				}
 			}
 			s << "\n% LANDMARKS AND OBSERVATIONS \n%=========================="

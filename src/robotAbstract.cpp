@@ -34,7 +34,7 @@ namespace jafar {
 			s << ".state:  " << rob.state << endl;
 //			s << ".pose :  " << rob.pose << endl;
 			s << ".st.pert:   " << rob.Q << endl;
-			s << ".sens : [";
+			s << ".sensor list : [";
 			for (RobotAbstract::SensorList::const_iterator senIter = rob.sensorList().begin();
 						senIter != rob.sensorList().end(); senIter++)
 				s << " " << (*senIter)->id() << " "; // Print the address of the sensor.

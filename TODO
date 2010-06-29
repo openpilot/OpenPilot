@@ -51,3 +51,4 @@ Precision
 ------------------------------------
 - when a point is detected, do a matching with itself with interpolation to find subpixel position
 - when a point is matched, try to estimate if there is a possible ambiguity with another point in the ellipse 
+- Implement one point Ransac to avoid outliers !!!

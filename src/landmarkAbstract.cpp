@@ -36,6 +36,7 @@ namespace jafar {
 	    MapObject(_mapPtr,*_prevLmk, _size, _icomp)
 		{
 			category = LANDMARK;
+			descriptorPtr = _prevLmk->descriptorPtr;
 		}
 
 		LandmarkAbstract::LandmarkAbstract(const simulation_t dummy, const map_ptr_t & _mapPtr, const size_t _size) :
@@ -192,6 +193,13 @@ namespace jafar {
 				}
 			}
 			return false;
+		}
+
+		void LandmarkAbstract::destroyDisplay()
+		{
+			ObjectAbstract::destroyDisplay();
+			for (ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end(); obsIter++)
+				(*obsIter)->destroyDisplay();
 		}
 
 		void LandmarkAbstract::suicide(){

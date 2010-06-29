@@ -87,6 +87,7 @@ namespace jafar {
 					id(_id);
 					name(_name);
 				}
+				virtual void destroyDisplay();
 				std::vector<display::DisplayDataAbstract*> displayData;
 		};
 	}

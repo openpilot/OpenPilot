@@ -35,9 +35,14 @@ namespace jafar {
 			id_(0), category(OBJECT) {
 		}
 		
-		ObjectAbstract::~ObjectAbstract() {
+		void ObjectAbstract::destroyDisplay()
+		{
 			for(std::vector<display::DisplayDataAbstract*>::iterator it = displayData.begin(); it != displayData.end(); ++it)
-				delete *it;
+				{ delete *it; *it = NULL; }
+		}
+		
+		ObjectAbstract::~ObjectAbstract() {
+			destroyDisplay();
 		}
 		
 

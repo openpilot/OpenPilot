@@ -159,6 +159,10 @@ namespace jafar {
 				bool needToDie(DecisionMethod dieMet = ANY);
 
 				/**
+				destroy the display data of itself and its children
+				*/
+				void destroyDisplay();
+				/**
 				 * Suicide
 				 *
 				 * We cut the linik to parent and the object naturally dies.

@@ -91,6 +91,7 @@ namespace jafar {
 
 			// unregister lmk
 			unregisterLandmark(lmkinit, false);
+			lmkinit->destroyDisplay();
 
 			// Create a new landmark advanced instead of the previous init lmk.
 			jblas::ind_array idxComp(sizeComplement());

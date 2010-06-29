@@ -70,6 +70,8 @@ QLabel { /* all label types */
 /* background-color: rgba(255, 255, 255, 0); */
 background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(64, 64, 64, 255), stop:1 rgba(128, 128, 128, 255));
 color: rgb(255, 255, 255);
+border: 0px; 
+border-radius: 3px;
 }
 
 QToolButton {	/* all types of tool button */ 
@@ -77,19 +79,26 @@ background-color: rgba(255, 255, 255, 0);
 color: rgb(255, 255, 255);
 /*border-style: none;*/
 border: 0px; 
+border-radius: 3px;
 }
 QToolButton:hover {
-background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(255, 160, 0, 255), stop:1 rgba(160, 100, 0, 255));
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(255, 255, 255, 200), stop:1 rgba(180, 180, 180, 200));
 color: rgb(255, 255, 255);
+border: 0px; 
+border-radius: 3px;
 }
 QToolButton:pressed {
 background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
 color: rgb(255, 255, 255);
+border: 0px; 
+border-radius: 3px;
 }
 
 QToolButton:checked {
 background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
 color: rgb(255, 255, 255);
+border: 0px; 
+border-radius: 3px;
 }
 
 QSlider::groove:horizontal {
@@ -110,17 +119,18 @@ QComboBox {
 background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
 color: rgb(255, 255, 255);
 }
-QComboBox:hover {
+QComboBox::down-arrow:on {
 background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
-	background-color: rgb(197, 138, 0);
+top: 1px; left: 1px;	/* shift the arrow when popup is open */
 }
 QComboBox::down-arrow {
      image: url(:/opmap/images/combobox_down_arrow.png);
 }
 QComboBox:drop-down {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(110, 110, 110, 255), stop:1 rgba(71, 71, 71, 255));
      subcontrol-origin: padding;
      subcontrol-position: top right;
-     border-left-style: 1px solid black;
+     border-left-style: 1px solid white;
      border-top-right-radius: 1px;
      border-bottom-right-radius: 1px;
 }
@@ -129,6 +139,7 @@ background-color: rgb(255, 255, 255);
 color: rgb(0, 0, 0);
 border: 2px solid darkgray;
 selection-background-color: lightgray;
+border-radius: 3px;
 }
 
 QToolTip {
@@ -136,7 +147,7 @@ background-color: white;
 color: black;
 border: 1px solid black;
 padding: 5px;
-border-radius: 2px;
+border-radius: 3px;
 /* opacity: 170; */ 
 }
 </string>
@@ -194,6 +205,12 @@ border-radius: 2px;
             <property name="icon">
              <iconset resource="../coreplugin/core.qrc">
               <normaloff>:/core/images/prev.png</normaloff>:/core/images/prev.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
             </property>
             <property name="autoRaise">
              <bool>false</bool>
@@ -282,8 +299,8 @@ border-radius: 2px;
             </property>
             <property name="iconSize">
              <size>
-              <width>16</width>
-              <height>16</height>
+              <width>20</width>
+              <height>20</height>
              </size>
             </property>
             <property name="autoRaise">
@@ -327,8 +344,8 @@ border-radius: 2px;
             </property>
             <property name="iconSize">
              <size>
-              <width>16</width>
-              <height>16</height>
+              <width>20</width>
+              <height>20</height>
              </size>
             </property>
             <property name="autoRepeat">
@@ -356,8 +373,8 @@ border-radius: 2px;
             </property>
             <property name="iconSize">
              <size>
-              <width>16</width>
-              <height>16</height>
+              <width>20</width>
+              <height>20</height>
              </size>
             </property>
             <property name="checkable">
@@ -404,8 +421,8 @@ border-radius: 2px;
             </property>
             <property name="iconSize">
              <size>
-              <width>16</width>
-              <height>16</height>
+              <width>20</width>
+              <height>20</height>
              </size>
             </property>
             <property name="autoRepeat">
@@ -433,8 +450,8 @@ border-radius: 2px;
             </property>
             <property name="iconSize">
              <size>
-              <width>16</width>
-              <height>16</height>
+              <width>20</width>
+              <height>20</height>
              </size>
             </property>
             <property name="autoRepeat">
@@ -475,8 +492,8 @@ border-radius: 2px;
             </property>
             <property name="iconSize">
              <size>
-              <width>16</width>
-              <height>16</height>
+              <width>20</width>
+              <height>20</height>
              </size>
             </property>
             <property name="autoRaise">
@@ -505,8 +522,8 @@ p, li { white-space: pre-wrap; }
             </property>
             <property name="iconSize">
              <size>
-              <width>16</width>
-              <height>16</height>
+              <width>20</width>
+              <height>20</height>
              </size>
             </property>
             <property name="autoRaise">
@@ -544,8 +561,7 @@ p, li { white-space: pre-wrap; }
              <bool>false</bool>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgba(255, 255, 255, 0);
-color: rgb(255, 255, 255);</string>
+             <string notr="true"/>
             </property>
             <property name="minimum">
              <number>2</number>
@@ -605,8 +621,8 @@ color: rgb(255, 255, 255);</string>
             </property>
             <property name="iconSize">
              <size>
-              <width>16</width>
-              <height>16</height>
+              <width>20</width>
+              <height>20</height>
              </size>
             </property>
             <property name="autoRaise">
@@ -637,6 +653,12 @@ color: rgb(255, 255, 255);</string>
             <property name="icon">
              <iconset resource="../coreplugin/core.qrc">
               <normaloff>:/core/images/next.png</normaloff>:/core/images/next.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
             </property>
             <property name="autoRaise">
              <bool>false</bool>
@@ -1161,6 +1183,7 @@ background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0
 color: rgb(255, 255, 255);
 /*border: 1px solid black;*/
 border: none;
+border-radius: 3px;
 }
 
 QToolTip {
@@ -1369,7 +1392,7 @@ border-radius: 3px;
             <property name="maximumSize">
              <size>
               <width>100</width>
-              <height>12</height>
+              <height>20</height>
              </size>
             </property>
             <property name="autoFillBackground">
@@ -1377,14 +1400,17 @@ border-radius: 3px;
             </property>
             <property name="styleSheet">
              <string notr="true">QProgressBar {
-border: nonei;
-padding: 1px;
+border: none;
+border-radius: 5px;
+padding: 3px;
 background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
 color: rgb(255, 255, 255);
 }
 QProgressBar::chunk {
-	background-color: rgb(85, 85, 255);
+background-color: rgb(85, 85, 255);
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(160, 160, 255, 255), stop:1 rgba(80, 80, 160, 255));
 border: none;
+border-radius: 3px;
 }</string>
             </property>
             <property name="value">

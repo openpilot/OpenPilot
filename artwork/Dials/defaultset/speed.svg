@@ -196,11 +196,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.98994949"
-     inkscape:cx="-55.197873"
-     inkscape:cy="116.44881"
+     inkscape:zoom="1.4"
+     inkscape:cx="137.33411"
+     inkscape:cy="142.1631"
      inkscape:document-units="px"
-     inkscape:current-layer="g2932"
+     inkscape:current-layer="background"
      showgrid="false"
      inkscape:window-width="1280"
      inkscape:window-height="744"
@@ -685,23 +685,23 @@
          inkscape:transform-center-y="-56.72097" />
       <g
          id="text4741"
-         style="font-size:42.15462494px;font-style:normal;font-weight:normal;fill:#ece1e1;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         style="font-size:42.15462493999999800px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
          transform="matrix(0.99703401,0.0051681,0.0051681,1.0030016,0,0)">
         <path
            id="path4046"
-           style="font-size:25px;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ece1e1;fill-opacity:1;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           style="font-size:25px;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;font-family:Arial;-inkscape-font-specification:Arial Bold"
            d="m 353.51828,545.27728 0,-17.89551 3.43018,0 0,9.49708 4.01611,-4.56543 4.22363,0 -4.43115,4.73632 4.74853,8.22754 -3.69873,0 -3.25927,-5.82275 -1.59912,1.67236 0,4.15039 z" />
         <path
            id="path4048"
-           style="font-size:25px;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ece1e1;fill-opacity:1;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           style="font-size:25px;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;font-family:Arial;-inkscape-font-specification:Arial Bold"
            d="m 367.30002,532.31342 3.16162,0 0,1.77002 c 1.13118,-1.37532 2.47802,-2.06298 4.04053,-2.06299 0.83007,10e-6 1.55028,0.17091 2.16064,0.51269 0.61034,0.34181 1.11083,0.85858 1.50147,1.5503 0.56964,-0.69172 1.18406,-1.20849 1.84326,-1.5503 0.65916,-0.34178 1.3631,-0.51268 2.11181,-0.51269 0.95214,10e-6 1.7578,0.19329 2.417,0.57983 0.65916,0.38657 1.15151,0.9542 1.47705,1.70288 0.23598,0.5534 0.35398,1.44858 0.354,2.68555 l 0,8.28857 -3.43017,0 0,-7.40967 c -2e-5,-1.28579 -0.11802,-2.11587 -0.35401,-2.49023 -0.3174,-0.48827 -0.80568,-0.73241 -1.46484,-0.73242 -0.48016,10e-6 -0.93182,0.14649 -1.35498,0.43945 -0.42319,0.29298 -0.72837,0.72226 -0.91553,1.28784 -0.18719,0.5656 -0.28077,1.45875 -0.28076,2.67945 l 0,6.22558 -3.43018,0 0,-7.10449 c -1e-5,-1.26138 -0.061,-2.07519 -0.1831,-2.44141 -0.12208,-0.3662 -0.31129,-0.63882 -0.56763,-0.81787 -0.25636,-0.17902 -0.60426,-0.26854 -1.0437,-0.26855 -0.52898,10e-6 -1.00505,0.14242 -1.42822,0.42724 -0.42319,0.28485 -0.72633,0.69581 -0.90943,1.23291 -0.18311,0.53712 -0.27466,1.42823 -0.27466,2.67334 l 0,6.29883 -3.43017,0 z" />
         <path
            id="path4050"
-           style="font-size:25px;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ece1e1;fill-opacity:1;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           style="font-size:25px;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;font-family:Arial;-inkscape-font-specification:Arial Bold"
            d="m 387.94211,545.58246 4.43115,-18.50586 2.57568,0 -4.47998,18.50586 z" />
         <path
            id="path4052"
-           style="font-size:25px;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ece1e1;fill-opacity:1;font-family:Arial;-inkscape-font-specification:Arial Bold"
+           style="font-size:25px;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;font-family:Arial;-inkscape-font-specification:Arial Bold"
            d="m 400.12473,527.38177 0,6.57959 c 1.10676,-1.29393 2.42919,-1.9409 3.96728,-1.94091 0.78938,10e-6 1.50145,0.14649 2.13623,0.43945 0.63475,0.29298 1.11286,0.66733 1.43433,1.12305 0.32144,0.45574 0.54116,0.96029 0.65918,1.51367 0.11798,0.55339 0.17699,1.41195 0.177,2.57568 l 0,7.60498 -3.43018,0 0,-6.84814 c -1e-5,-1.35904 -0.0651,-2.22167 -0.19531,-2.58789 -0.13022,-0.3662 -0.36012,-0.65714 -0.6897,-0.87281 -0.3296,-0.21564 -0.7426,-0.32347 -1.23901,-0.32348 -0.56967,10e-6 -1.0783,0.13836 -1.52588,0.41504 -0.4476,0.2767 -0.77515,0.69377 -0.98267,1.25122 -0.20752,0.55746 -0.31128,1.38143 -0.31127,2.47192 l 0,6.49414 -3.43018,0 0,-17.89551 z" />
       </g>
     </g>

@@ -232,11 +232,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="16.246188"
-     inkscape:cy="181.15104"
+     inkscape:zoom="3.959798"
+     inkscape:cx="31.903552"
+     inkscape:cy="291.76274"
      inkscape:document-units="px"
-     inkscape:current-layer="background"
+     inkscape:current-layer="layer6"
      showgrid="false"
      inkscape:window-width="1280"
      inkscape:window-height="744"
@@ -393,7 +393,7 @@
      transform="translate(-129.62194,129.52019)">
     <path
        style="fill:#ffffff;fill-opacity:1;stroke:#c2bfbf;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 143.75986,-109.1656 0,14.268407 12,-7.134207 -12,-7.1342 z"
+       d="m 149.75986,-113.1656 0,14.26841 12,-7.13421 -12,-7.1342 z"
        id="needle"
        sodipodi:nodetypes="cccc"
        inkscape:label="#path5747" />

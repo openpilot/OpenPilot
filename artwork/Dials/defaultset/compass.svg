@@ -229,15 +229,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
-     inkscape:cx="51.602069"
-     inkscape:cy="144.9366"
+     inkscape:cx="159.10207"
+     inkscape:cy="146.00803"
      inkscape:document-units="px"
-     inkscape:current-layer="background"
+     inkscape:current-layer="foreground"
      showgrid="false"
      inkscape:window-width="1280"
      inkscape:window-height="744"
      inkscape:window-x="-4"
-     inkscape:window-y="1020"
+     inkscape:window-y="-4"
      inkscape:window-maximized="1"
      inkscape:object-paths="true"
      showguides="true"
@@ -289,7 +289,7 @@
          sodipodi:cy="850.33167"
          sodipodi:rx="137.38075"
          sodipodi:ry="137.38075"
-         d="m 371.73615,850.33167 c 0,75.87329 -61.50746,137.38075 -137.38076,137.38075 -75.87329,0 -137.38075,-61.50746 -137.38075,-137.38075 0,-75.8733 61.50746,-137.38076 137.38075,-137.38076 75.8733,0 137.38076,61.50746 137.38076,137.38076 z"
+         d="m 371.73615,850.33167 a 137.38075,137.38075 0 1 1 -274.76151,0 137.38075,137.38075 0 1 1 274.76151,0 z"
          transform="translate(146.21603,-338.54092)"
          inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
          inkscape:export-xdpi="88.809998"
@@ -852,7 +852,7 @@
          height="285.67435"
          width="299.81647"
          id="rect2963"
-         style="fill:none;stroke:none;stroke-opacity:1" />
+         style="fill:none;stroke:none" />
     </g>
   </g>
   <g
@@ -875,11 +875,11 @@
          inkscape:export-ydpi="88.809998"
          inkscape:export-xdpi="88.809998"
          inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
-         ry="21.08169"
-         y="368.95358"
-         x="230.66319"
-         height="285.67435"
-         width="299.81647"
+         ry="21.345247"
+         y="366.81073"
+         x="228.52034"
+         height="289.24576"
+         width="304.10217"
          id="rect3853"
          style="fill:none;stroke:none" />
     </g>

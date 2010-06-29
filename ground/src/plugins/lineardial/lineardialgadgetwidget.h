@@ -77,6 +77,7 @@ private:
    QGraphicsSvgItem *green;
    QGraphicsSvgItem *yellow;
    QGraphicsSvgItem *red;
+   QGraphicsSvgItem *fieldSymbol;
 
    QGraphicsTextItem *fieldName;
    QGraphicsTextItem *fieldValue;

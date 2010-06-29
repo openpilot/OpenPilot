@@ -79,13 +79,7 @@ void LineardialGadgetWidget::connectInput(QString object1, QString nfield1) {
             field1 = nfield1;
             if (fieldName)
                 fieldName->setPlainText(nfield1);
-            UAVObjectField* field = obj1->getField(nfield1);
-            double v = field->getDouble();
-            setIndex(v);
-            QString s;
-            s.sprintf("%.0f",v);
-            if (fieldValue)
-                fieldValue->setPlainText(s);
+            updateIndex(obj1);
 
         } else {
             std::cout << "Error: Object is unknown (" << object1.toStdString() << ") this should not happen." << std::endl;
@@ -95,17 +89,34 @@ void LineardialGadgetWidget::connectInput(QString object1, QString nfield1) {
 
 /*!
   \brief Called by the UAVObject which got updated
+
+  Updates the numeric value and/or the icon if the dial wants this.
   */
 void LineardialGadgetWidget::updateIndex(UAVObject *object1) {
     // Double check that the field exists:
     UAVObjectField* field = object1->getField(field1);
     if (field) {
-        double v = field->getDouble();
-        setIndex(v);
         QString s;
-        s.sprintf("%.0f",v);
+        if (field->isNumeric()) {
+            double v = field->getDouble();
+            setIndex(v);
+            s.sprintf("%.0f",v);
+        }
+        if (field->isText()) {
+            s = field->getValue().toString();
+            if (fieldSymbol) {
+                // If we defined a symbol, we will look for a matching
+                // SVG element to display:
+                if (m_renderer->elementExists("symbol-" + s)) {
+                    fieldSymbol->setElementId("symbol-" + s);
+                } else {
+                    fieldSymbol->setElementId("symbol");
+                }
+            }
+        }
         if (fieldValue)
             fieldValue->setPlainText(s);
+
         if (index && !dialTimer.isActive())
             dialTimer.start();
     } else {
@@ -113,8 +124,11 @@ void LineardialGadgetWidget::updateIndex(UAVObject *object1) {
     }
 }
 
-/*
-  * Should be called after the min/max ranges have been set
+/*!
+  \brief Setup dial using its master SVG template.
+
+  Should only be called after the min/max ranges have been set.
+
   */
 void LineardialGadgetWidget::setDialFile(QString dfn)
 {
@@ -141,17 +155,14 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
               red = new QGraphicsSvgItem();
               red->setSharedRenderer(m_renderer);
               red->setElementId("red");
-              //l_scene->addItem(red);
               red->setParentItem(background);
               yellow = new QGraphicsSvgItem();
               yellow->setSharedRenderer(m_renderer);
               yellow->setElementId("yellow");
-              //l_scene->addItem(yellow);
               yellow->setParentItem(background);
               green = new QGraphicsSvgItem();
               green->setSharedRenderer(m_renderer);
               green->setElementId("green");
-              //l_scene->addItem(green);
               green->setParentItem(background);
               // In order to properly render the Green/Yellow/Red graphs, we need to find out
               // the starting location of the bargraph rendering area:
@@ -230,13 +241,12 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
               index->setSharedRenderer(m_renderer);
               index->setElementId("needle");
               index->setTransform(matrix,false);
-              //l_scene->addItem(index);
               index->setParentItem(background);
           } else {
               index = NULL;
           }
 
-          // Check whether the dial wants display field name:
+          // Check whether the dial wants display its field name:
           if (m_renderer->elementExists("field")) {
               QMatrix textMatrix = m_renderer->matrixForElement("field");
               qreal startX = textMatrix.mapRect(m_renderer->boundsOnElement("field")).x();
@@ -246,11 +256,11 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
               fieldName = new QGraphicsTextItem("0.00");
               fieldName->setDefaultTextColor(QColor("White"));
               fieldName->setTransform(matrix,false);
-              //l_scene->addItem(fieldName);
               fieldName->setParentItem(background);
           } else {
               fieldName = NULL;
           }
+
           // Check whether the dial wants display the numeric value:
           if (m_renderer->elementExists("value")) {
               QMatrix textMatrix = m_renderer->matrixForElement("value");
@@ -261,10 +271,26 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
               fieldValue = new QGraphicsTextItem("00");
               fieldValue->setDefaultTextColor(QColor("White"));
               fieldValue->setTransform(matrix,false);
-              //l_scene->addItem(fieldValue);
               fieldValue->setParentItem(background);
           } else {
               fieldValue = NULL;
+          }
+
+          // Check whether the dial wants to display the value as a
+          // symbol (only works for text values):
+          if (m_renderer->elementExists("symbol")) {
+              QMatrix textMatrix = m_renderer->matrixForElement("symbol");
+              qreal startX = textMatrix.mapRect(m_renderer->boundsOnElement("symbol")).x();
+              qreal startY = textMatrix.mapRect(m_renderer->boundsOnElement("symbol")).y();
+              QTransform matrix;
+              matrix.translate(startX,startY);
+              fieldSymbol = new QGraphicsSvgItem();
+              fieldSymbol->setElementId("symbol");
+              fieldSymbol->setSharedRenderer(m_renderer);
+              fieldSymbol->setTransform(matrix,false);
+              fieldSymbol->setParentItem(background);
+          } else {
+              fieldSymbol = NULL;
           }
 
          if (m_renderer->elementExists("foreground")) {
@@ -340,6 +366,10 @@ void LineardialGadgetWidget::setIndex(double value) {
 // approaching the target.
 void LineardialGadgetWidget::moveIndex()
 {
+    if (!index) { // Safeguard
+        dialTimer.stop();
+        return;
+    }
     if ((abs((indexValue-indexTarget)*10) > 3)) {
         indexValue += (indexTarget - indexValue)/5;
     } else {

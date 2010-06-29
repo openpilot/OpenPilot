@@ -29,7 +29,8 @@
 #include <iostream>
 
 ModelViewGadgetWidget::ModelViewGadgetWidget(QWidget *parent) 
-: QGLWidget(parent)
+    : QGLWidget(QGLFormat(QGL::SampleBuffers),parent)
+//    : QGLWidget(parent)
 , m_pFactory(GLC_Factory::instance(this->context()))
 , m_Light()
 , m_World()
@@ -88,6 +89,8 @@ void ModelViewGadgetWidget::initializeGL()
     // Calculate camera depth of view
     m_GlView.setDistMinAndMax(m_World.boundingBox());
     glEnable(GL_NORMALIZE);
+    // Enable antialiasing
+    glEnable(GL_MULTISAMPLE);
 
     m_MotionTimer.start(100);
 }
@@ -104,6 +107,9 @@ void ModelViewGadgetWidget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Load identity matrix
     glLoadIdentity();
+
+    // Enable antialiasing
+    glEnable(GL_MULTISAMPLE);
 
     // define the light
     m_Light.enable();

@@ -50,7 +50,7 @@ namespace jafar {
 		}; // class Explorer
 		
 
-		//std::cout << xx << "," << yy << ":" << score << std::endl; \
+		//std::cout << xx << "," << yy << ":" << score << std::endl;
 
 		#define RESULTS(y,x) results[((y)-(ymin-1))*sa_w+((x)-(xmin-1))]
 		#define DO_CORRELATION(im1, im2, weightMatrix, xx, yy, score, best_score, bestx, besty, roi) \
@@ -76,6 +76,7 @@ namespace jafar {
 			if (ymin < 0) ymin = 0; if (ymax >= im2.height()) ymax = im2.height()-1;
 			
 			int sa_w = (xmax-xmin+1), sa_h = (ymax-ymin+1); // search area
+			if (sa_w < 5) xstep = 1; if (sa_h < 5) ystep = 1;
 			int nresults = (sa_w+2)*(sa_h+2);
 			double *results = new double[nresults]; // add 1 border for interpolation
 			for(int i = 0; i < nresults; i++) results[i] = -1e6;

@@ -117,7 +117,7 @@ namespace correl {
 		}
 		
 		if (useBornes) if (zncc_count / zncc_total < 0.5)
-			{ /*std::cout << "zncc failed: " << zncc_count << "," << zncc_total << std::endl; return 0;*/ }
+			{ /*std::cout << "zncc failed: " << zncc_count << "," << zncc_total << std::endl;*/ return -1; }
 		
 		// finish
 		mean1 /= zncc_count;

@@ -107,20 +107,15 @@ void ImageView::setImage(const jafar::image::Image& jfrimg)
   {
     m_image = QImage(width, height, QImage::Format_Indexed8);
     lutGrayscale();
-    for(int x = 0; x < width; x++)
-    {
-      for(int y = 0; y < height; y++)
-      {
-        const uchar* v = jfrimg.data( y) + x;
-        m_image.setPixel(x, y, *v);
-      }
-    }
+    for(int y = 0; y < height; y++)
+      memcpy(m_image.scanLine(y), jfrimg.data(y), jfrimg.width());
+
   } else if(jfrimg.channels() == 3) {
     m_image = QImage(width, height, QImage::Format_RGB32);
     bool swapped = jfrimg.colorSpace() == JfrImage_CS_BGR;
-    for(int x = 0; x < width; x++)
+    for(int y = 0; y < height; y++)
     {
-      for(int y = 0; y < height; y++)
+      for(int x = 0; x < width; x++)
       {
         const uchar* v = jfrimg.data( y) + 3*x;
         if(swapped)

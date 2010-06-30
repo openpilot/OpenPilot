@@ -444,15 +444,15 @@ void OPMapGadgetWidget::updatePosition()
     PositionActual::DataFields data = m_positionActual->getData();				// get current UAV data
     internals::PointLatLng uav_pos = internals::PointLatLng(data.Latitude, data.Longitude);	// current UAV position
     double uav_heading = data.Heading;								// current UAV heading
-    double uav_height_feet = data.Altitude * 3.2808399;						// current UAV height
-    double uav_ground_speed = data.Groundspeed;							// current UAV ground speed
+    double uav_height_meters = data.Altitude;							// current UAV height
+    double uav_ground_speed_meters_per_second = data.Groundspeed;				// current UAV ground speed
 
     // display the UAV lat/lon position
-    QString str =   " lat:" + QString::number(uav_pos.Lat(), 'f', 7) +
-		    "   lon:" + QString::number(uav_pos.Lng(), 'f', 7) +
+    QString str =   " lat: " + QString::number(uav_pos.Lat(), 'f', 7) +
+		    "   lon: " + QString::number(uav_pos.Lng(), 'f', 7) +
 		    "   " + QString::number(uav_heading, 'f', 1) + "deg" +
-		    "   " + QString::number(uav_height_feet, 'f', 1) + "feet" +
-		    "   " + QString::number(uav_ground_speed, 'f', 1) + "mph";
+		    "   " + QString::number(uav_height_meters, 'f', 1) + "meters" +
+		    "   " + QString::number(uav_ground_speed_meters_per_second, 'f', 1) + "meters/second";
     if (m_widget) m_widget->labelUAVPos->setText(str);
 
     if (m_map && followUAVpositionAct && followUAVheadingAct)

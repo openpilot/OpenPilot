@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="mouseTracking">
-   <bool>true</bool>
+   <bool>false</bool>
   </property>
   <property name="windowTitle">
    <string>Form</string>
@@ -140,7 +140,7 @@ QComboBox QAbstractItemView { /* the drop down list */
 background-color: rgb(255, 255, 255);
 color: rgb(0, 0, 0);
 border: 1px solid black;
-selection-background-color: rgb(128, 128, 128);
+selection-background-color: rgb(160, 160, 255);
 border-radius: 2px;
 }
 </string>
@@ -596,37 +596,6 @@ p, li { white-space: pre-wrap; }
            </spacer>
           </item>
           <item>
-           <widget class="QToolButton" name="toolButtonReload">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="toolTip">
-             <string>Reload map</string>
-            </property>
-            <property name="styleSheet">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string>Reload</string>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>20</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="autoRaise">
-             <bool>false</bool>
-            </property>
-            <property name="arrowType">
-             <enum>Qt::NoArrow</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QToolButton" name="toolButtonFlightControlsShowHide">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -762,6 +731,9 @@ QTreeView::branch:open:has-children:!has-siblings, QTreeView::branch:open:has-ch
         <property name="tabKeyNavigation">
          <bool>true</bool>
         </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectItems</enum>
+        </property>
         <property name="animated">
          <bool>true</bool>
         </property>
@@ -783,7 +755,7 @@ QTreeView::branch:open:has-children:!has-siblings, QTreeView::branch:open:has-ch
          </size>
         </property>
         <property name="mouseTracking">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="acceptDrops">
          <bool>true</bool>

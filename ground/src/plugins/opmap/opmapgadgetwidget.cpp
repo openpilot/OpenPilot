@@ -167,12 +167,15 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     }
 
     // **************
+    // init the waypoint tree
 
+    wayPoint_treeView_model = new QStandardItemModel();
+    m_widget->treeViewWaypoints->setModel(wayPoint_treeView_model);
 
 
 /*
     // test
-    wayPoint_treeView_model = new QStandardItemModel(5, 2);
+//    wayPoint_treeView_model = new QStandardItemModel(5, 2);
     for (int r = 0; r < 5; r++)
     {
 	for (int c = 0; c < 2; c++)
@@ -195,30 +198,36 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     wayPoint_treeView_model->setHorizontalHeaderItem(0, new QStandardItem("Foo"));
     wayPoint_treeView_model->setHorizontalHeaderItem(1, new QStandardItem("Bar-Baz"));
 
-    m_widget->treeViewWaypoints->setModel(wayPoint_treeView_model);
+//    m_widget->treeViewWaypoints->setModel(wayPoint_treeView_model);
 */
 
-    // test
-    wayPoint_treeView_model = new QStandardItemModel();
-    for (int r = 0; r < 5; r++)
-    {
-	// waypoint group
-	QStandardItem *item = new QStandardItem(QString("UK waypoint group %0").arg(r));
 
-	// add the way points
-	for (int i = 1; i < 5; i++)
-	{
-	    QStandardItem *child = new QStandardItem(QIcon(QString::fromUtf8(":/opmap/images/waypoint.png")), QString("Waypoint %0").arg(i));
-	    child->setEditable(false);
-	    item->appendRow(child);
-	}
 
-	wayPoint_treeView_model->appendRow(item);
+
+
+    // test only
+
+    // create a waypoint group
+    QStandardItem *item = new QStandardItem(tr("Camera shoot at the town hall"));
+    for (int i = 1; i < 5; i++)
+    {   // add some way points
+	QStandardItem *child = new QStandardItem(QIcon(QString::fromUtf8(":/opmap/images/waypoint.png")), QString("Waypoint %0").arg(i));
+	child->setEditable(true);
+	item->appendRow(child);
     }
-//    wayPoint_treeView_model->setHorizontalHeaderItem(0, new QStandardItem("Waypoint list"));
+    wayPoint_treeView_model->appendRow(item);
 
-    m_widget->treeViewWaypoints->setModel(wayPoint_treeView_model);
 
+
+    // create another waypoint group
+    item = new QStandardItem(tr("Flight path 62"));
+    for (int i = 1; i < 8; i++)
+    {   // add some way points
+	QStandardItem *child = new QStandardItem(QIcon(QString::fromUtf8(":/opmap/images/waypoint.png")), QString("Waypoint %0").arg(i));
+	child->setEditable(true);
+	item->appendRow(child);
+    }
+    wayPoint_treeView_model->appendRow(item);
 
 
 
@@ -276,7 +285,7 @@ void OPMapGadgetWidget::mouseMoveEvent(QMouseEvent *event)
 //	{	// the mouse has moved
 //	    mouse_lat_lon = lat_lon;
 //
-//	    QString coord_str = " " + QString::number(mouse_lat_lon.Lat(), 'f', 6) + "   " + QString::number(mouse_lat_lon.Lng(), 'f', 6) + " ";
+//	    QString coord_str = " " + QString::number(mouse_lat_lon.Lat(), 'f', 7) + "   " + QString::number(mouse_lat_lon.Lng(), 'f', 7) + " ";
 //
 //	    statusLabel.setText(coord_str);
 //	    widget->labelStatus->setText(coord_str);
@@ -309,6 +318,8 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
     // ****************
     // create the popup menu
 
+    QMenu menu(this);
+
     QMenu zoomMenu(tr("&Zoom ") + "(" + QString::number(m_map->Zoom()) + ")", this);
     zoomMenu.addAction(zoom2Act);
     zoomMenu.addAction(zoom3Act);
@@ -329,10 +340,6 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
     zoomMenu.addAction(zoom18Act);
     zoomMenu.addAction(zoom19Act);
 
-    // ****************
-
-    QMenu menu(this);
-
     menu.addAction(closeAct);
 
     menu.addSeparator();
@@ -342,6 +349,10 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
     menu.addSeparator();
 
     menu.addAction(findPlaceAct);
+
+    menu.addSeparator();
+
+    menu.addAction(showCompassAct);
 
     menu.addSeparator()->setText(tr("Zoom"));
 
@@ -437,8 +448,8 @@ void OPMapGadgetWidget::updatePosition()
     double uav_ground_speed = data.Groundspeed;							// current UAV ground speed
 
     // display the UAV lat/lon position
-    QString str =   " lat:" + QString::number(uav_pos.Lat(), 'f', 6) +
-		    "   lon:" + QString::number(uav_pos.Lng(), 'f', 6) +
+    QString str =   " lat:" + QString::number(uav_pos.Lat(), 'f', 7) +
+		    "   lon:" + QString::number(uav_pos.Lng(), 'f', 7) +
 		    "   " + QString::number(uav_heading, 'f', 1) + "deg" +
 		    "   " + QString::number(uav_height_feet, 'f', 1) + "feet" +
 		    "   " + QString::number(uav_ground_speed, 'f', 1) + "mph";
@@ -473,7 +484,7 @@ void OPMapGadgetWidget::updateMousePos()
     {	// the mouse has moved
 	mouse_lat_lon = lat_lon;
 
-	QString str = " " + QString::number(mouse_lat_lon.Lat(), 'f', 6) + "   " + QString::number(mouse_lat_lon.Lng(), 'f', 6);
+	QString str = " " + QString::number(mouse_lat_lon.Lat(), 'f', 7) + "   " + QString::number(mouse_lat_lon.Lng(), 'f', 7);
 	if (m_widget) m_widget->labelMousePos->setText(str);
     }
 }
@@ -523,7 +534,7 @@ void OPMapGadgetWidget::OnCurrentPositionChanged(internals::PointLatLng point)
 {
     if (m_widget)
     {
-	QString coord_str = " " + QString::number(point.Lat(), 'f', 6) + "   " + QString::number(point.Lng(), 'f', 6) + " ";
+	QString coord_str = " " + QString::number(point.Lat(), 'f', 7) + "   " + QString::number(point.Lng(), 'f', 7) + " ";
 	m_widget->labelMapPos->setText(coord_str);
     }
 }
@@ -548,12 +559,14 @@ void OPMapGadgetWidget::OnTilesStillToLoad(int number)
 
 void OPMapGadgetWidget::OnTileLoadStart()
 {
-    if (m_widget) m_widget->progressBarMap->setVisible(true);
+    if (m_widget)
+	m_widget->progressBarMap->setVisible(true);
 }
 
 void OPMapGadgetWidget::OnTileLoadComplete()
 {
-    if (m_widget) m_widget->progressBarMap->setVisible(false);
+    if (m_widget)
+	m_widget->progressBarMap->setVisible(false);
 }
 
 void OPMapGadgetWidget::OnMapZoomChanged()
@@ -571,34 +584,28 @@ void OPMapGadgetWidget::OnEmptyTileError(int zoom, core::Point pos)
     // to do
 }
 
-void OPMapGadgetWidget::WPNumberChanged(int const& oldnumber, int const& newnumber, WayPointItem* waypoint)
+void OPMapGadgetWidget::WPNumberChanged(int const &oldnumber, int const &newnumber, WayPointItem *waypoint)
 {
     // to do
 }
 
-void OPMapGadgetWidget::WPValuesChanged(WayPointItem* waypoint)
+void OPMapGadgetWidget::WPValuesChanged(WayPointItem *waypoint)
 {
     // to do
 }
 
-void OPMapGadgetWidget::WPInserted(int const& number, WayPointItem* waypoint)
+void OPMapGadgetWidget::WPInserted(int const &number, WayPointItem *waypoint)
 {
     // to do
 }
 
-void OPMapGadgetWidget::WPDeleted(int const& number)
+void OPMapGadgetWidget::WPDeleted(int const &number)
 {
     // to do
 }
 
 // *************************************************************************************
 // user control signals
-
-void OPMapGadgetWidget::on_toolButtonReload_clicked()
-{
-    if (m_map)
-	m_map->ReloadMap();
-}
 
 void OPMapGadgetWidget::on_comboBoxFindPlace_returnPressed()
 {
@@ -727,7 +734,7 @@ void OPMapGadgetWidget::on_treeViewWaypoints_clicked(QModelIndex index)
     QStandardItem *item = wayPoint_treeView_model->itemFromIndex(index);
     if (!item) return;
 
-    // Do something with the item ...
+    // to do
 }
 
 // *************************************************************************************
@@ -767,8 +774,7 @@ void OPMapGadgetWidget::setPosition(QPointF pos)
 void OPMapGadgetWidget::setMapProvider(QString provider)
 {
     if (m_map)
-	if (m_map->isStarted())
-	    m_map->SetMapType(mapcontrol::Helper::MapTypeFromString(provider));
+	m_map->SetMapType(mapcontrol::Helper::MapTypeFromString(provider));
 }
 
 void OPMapGadgetWidget::setAccessMode(QString accessMode)
@@ -841,6 +847,13 @@ void OPMapGadgetWidget::createActions()
     findPlaceAct->setShortcut(tr("Ctrl+F"));
     findPlaceAct->setStatusTip(tr("Find a location"));
     connect(findPlaceAct, SIGNAL(triggered()), this, SLOT(findPlace()));
+
+    showCompassAct = new QAction(tr("Show compass"), this);
+//    showCompassAct->setShortcut(tr("Ctrl+M"));
+    showCompassAct->setStatusTip(tr("Show/Hide the map compass"));
+    showCompassAct->setCheckable(true);
+    showCompassAct->setChecked(true);
+    connect(showCompassAct, SIGNAL(toggled(bool)), this, SLOT(on_showCompassAct_toggled(bool)));
 
     zoomInAct = new QAction(tr("Zoom &In"), this);
     zoomInAct->setShortcut(Qt::Key_PageUp);
@@ -1010,6 +1023,12 @@ void OPMapGadgetWidget::findPlace()
 
     QMessageBox::information(this, tr("OpenPilot GCS"), returned_text, QMessageBox::Ok);
 */
+}
+
+void OPMapGadgetWidget::on_showCompassAct_toggled(bool show_compass)
+{
+    if (m_map)
+	m_map->SetShowCompass(show_compass);
 }
 
 void OPMapGadgetWidget::goZoomIn()

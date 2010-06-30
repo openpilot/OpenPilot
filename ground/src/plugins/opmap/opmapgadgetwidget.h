@@ -106,7 +106,6 @@ private slots:
     *
     * @param
     */
-    void on_toolButtonReload_clicked();
     void on_comboBoxFindPlace_returnPressed();
     void on_toolButtonFindPlace_clicked();
     void on_toolButtonZoomM_clicked();
@@ -151,6 +150,7 @@ private slots:
     */
     void reload();
     void findPlace();
+    void on_showCompassAct_toggled(bool show_compass);
     void goZoomIn();
     void goZoomOut();
     void goMouseClick();
@@ -221,6 +221,7 @@ private:
     QAction *closeAct;
     QAction *reloadAct;
     QAction *findPlaceAct;
+    QAction *showCompassAct;
     QAction *zoomInAct;
     QAction *zoomOutAct;
     QAction *goMouseClickAct;

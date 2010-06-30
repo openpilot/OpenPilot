@@ -234,7 +234,7 @@ namespace mapcontrol
                     internals::Tile* t = core->Matrix.TileAt(core->GettilePoint());
                     //qDebug()<<"OPMapControl::DrawMap2D tile:"<<t->GetPos().ToString()<<" as "<<t->Overlays.count()<<" overlays";
                     //Tile t = core->Matrix[tileToDraw];
-                    if(t!=0)
+                    if(true)
                     {
                         //qDebug()<< "opmapcontrol:draw2d TileHasValue:"<<t->GetPos().ToString();
                         core->tileRect.SetX(core->GettilePoint().X()*core->tileRect.Width());
@@ -247,6 +247,7 @@ namespace mapcontrol
 
                             // render tile
                             //lock(t.Overlays)
+                            if(t!=0)
                             {
                                 foreach(QByteArray img,t->Overlays)
                                 {

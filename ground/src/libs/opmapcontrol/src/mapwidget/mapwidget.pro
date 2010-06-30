@@ -7,7 +7,8 @@ include(../../../../openpilotgcslibrary.pri)
 SOURCES += mapgraphicitem.cpp \
     opmapwidget.cpp \
     configuration.cpp \
-    waypointitem.cpp
+    waypointitem.cpp \
+    uavitem.cpp
 LIBS += -L../build \
     -lcore \
     -linternals \
@@ -15,7 +16,8 @@ LIBS += -L../build \
 HEADERS += mapgraphicitem.h \
     opmapwidget.h \
     configuration.h \
-    waypointitem.h
+    waypointitem.h \
+    uavitem.h
 QT += opengl
 QT += network
 QT += sql

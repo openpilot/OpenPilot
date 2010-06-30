@@ -236,6 +236,16 @@
      <item row="4" column="2" colspan="4">
       <widget class="QLineEdit" name="lineEditDescription"/>
      </item>
+     <item row="0" column="5">
+      <widget class="QCheckBox" name="checkBoxLocked">
+       <property name="layoutDirection">
+        <enum>Qt::RightToLeft</enum>
+       </property>
+       <property name="text">
+        <string>Locked</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>

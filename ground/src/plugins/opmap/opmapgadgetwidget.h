@@ -53,7 +53,7 @@ using namespace mapcontrol;
 
 // ******************************************************
 
-// waypoint structure
+// local waypoint list item structure
 typedef struct t_waypoint
 {
     mapcontrol::WayPointItem *item;
@@ -148,39 +148,23 @@ private slots:
     *
     * @param
     */
-    void reload();
-    void findPlace();
+    void on_reloadAct_triggered();
+    void on_findPlaceAct_triggered();
     void on_showCompassAct_toggled(bool show_compass);
-    void goZoomIn();
-    void goZoomOut();
-    void goMouseClick();
-    void goHome();
-    void goUAV();
+    void on_goZoomInAct_triggered();
+    void on_goZoomOutAct_triggered();
+    void on_goMouseClickAct_triggered();
+    void on_goHomeAct_triggered();
+    void on_goUAVAct_triggered();
     void on_followUAVpositionAct_toggled(bool checked);
     void on_followUAVheadingAct_toggled(bool checked);
-    void openWayPointEditor();
-    void addWayPoint();
-    void editWayPoint();
-    void deleteWayPoint();
-    void clearWayPoints();
-    void zoom2() { setZoom(2); }
-    void zoom3() { setZoom(3); }
-    void zoom4() { setZoom(4); }
-    void zoom5() { setZoom(5); }
-    void zoom6() { setZoom(6); }
-    void zoom7() { setZoom(7); }
-    void zoom8() { setZoom(8); }
-    void zoom9() { setZoom(9); }
-    void zoom10() { setZoom(10); }
-    void zoom11() { setZoom(11); }
-    void zoom12() { setZoom(12); }
-    void zoom13() { setZoom(13); }
-    void zoom14() { setZoom(14); }
-    void zoom15() { setZoom(15); }
-    void zoom16() { setZoom(16); }
-    void zoom17() { setZoom(17); }
-    void zoom18() { setZoom(18); }
-    void zoom19() { setZoom(19); }
+    void on_openWayPointEditorAct_triggered();
+    void on_addWayPointAct_triggered();
+    void on_editWayPointAct_triggered();
+    void on_lockWayPointAct_triggered();
+    void on_deleteWayPointAct_triggered();
+    void on_clearWayPointsAct_triggered();
+    void on_zoomActGroup_triggered(QAction *action);
 
 private:
     double m_heading;	// uav heading
@@ -192,10 +176,10 @@ private:
     QStringList findPlaceWordList;
     QCompleter *findPlaceCompleter;
 
-   QTimer *m_updateTimer;
-   QTimer *m_statusUpdateTimer;
+    QTimer *m_updateTimer;
+    QTimer *m_statusUpdateTimer;
 
-   PositionActual *m_positionActual;
+    PositionActual *m_positionActual;
 
     Ui::OPMap_Widget *m_widget;
 
@@ -232,28 +216,12 @@ private:
     QAction *wayPointEditorAct;
     QAction *addWayPointAct;
     QAction *editWayPointAct;
+    QAction *lockWayPointAct;
     QAction *deleteWayPointAct;
     QAction *clearWayPointsAct;
 
     QActionGroup *zoomActGroup;
-    QAction *zoom2Act;
-    QAction *zoom3Act;
-    QAction *zoom4Act;
-    QAction *zoom5Act;
-    QAction *zoom6Act;
-    QAction *zoom7Act;
-    QAction *zoom8Act;
-    QAction *zoom9Act;
-    QAction *zoom10Act;
-    QAction *zoom11Act;
-    QAction *zoom12Act;
-    QAction *zoom13Act;
-    QAction *zoom14Act;
-    QAction *zoom15Act;
-    QAction *zoom16Act;
-    QAction *zoom17Act;
-    QAction *zoom18Act;
-    QAction *zoom19Act;
+    QList<QAction *> zoomAct;
 };
 
 #endif /* OPMAP_GADGETWIDGET_H_ */

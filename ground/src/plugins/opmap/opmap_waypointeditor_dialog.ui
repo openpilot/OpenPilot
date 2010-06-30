@@ -116,6 +116,11 @@ QSplitter::handle:vertical {
            </column>
            <column>
             <property name="text">
+             <string>Locked</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
              <string>Latitude</string>
             </property>
            </column>
@@ -136,7 +141,7 @@ QSplitter::handle:vertical {
            </column>
            <column>
             <property name="text">
-             <string>Pause Time</string>
+             <string>Hold Time</string>
             </property>
            </column>
           </widget>

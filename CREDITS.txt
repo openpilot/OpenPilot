@@ -1,4 +1,5 @@
-This is a credits file of people that are or have been key contributors to the OpenPilot project. Without the work of the people in this file OpenPilot would not be what it is today. 
+This is a credits file of people that are or have been key contributors to the OpenPilot project. 
+Without the work of the people in this file OpenPilot would not be what it is today. 
 
 It is sorted alphabetically by name and formatted so that it allows for easy grepping and beautification by scripts.  
 
@@ -57,7 +58,8 @@ D: Embedded STM32 infrastructure
 
 N: Edouard Lafargue 
 E: edouard (at) lafargue (dot) name
-D: GCS Dial Plugins, Artwork including Display Dials
+D: GCS Dial Plugins, GCS PFD Plugin
+D: Artwork including display dials
 
 N: Ken Northup
 E: helos360 (at) bellsouth (dot) net
@@ -65,7 +67,7 @@ D: 3D Modelling for the GCS
 
 N: Guy McCaldin 
 E: guymcc (at) gmail (dot) com
-D: Artwork and design work
+D: Artwork and design lead
 
 N: Cathy Moss
 E: cmoss296 (at) blueyonder (dot) co (dot) uk
@@ -81,6 +83,11 @@ N: Richard Querin
 E: rfquerin (plus) openpilot (at) gmail (dot) com
 D: Graphic Design, OpenPilot Logo
 
+N: Laurent Ribon
+E: ribon (dot) l (at) club-internet (dot) fr
+D: The GLC_lib as used in the ModelView Plugin
+D: See: http://www.glc-lib.net/
+
 N: Julien Rouviere
 E: julien.rouviere (plus) openpilot (at) gmail (dot) com
 D: GCS Core Developer
@@ -89,6 +96,7 @@ D: GCS Framework and Plugins for the GCS
 N: Zik Saleeba
 E: zik (at) zikzak (dot) net
 D: Initial schematic based on Zik's Flying Fox schematic     
+D: Picoc creator as used in the flight
 
 N: Stacey Sheldon
 E: stac (at) solidgoldbomb (dot) org

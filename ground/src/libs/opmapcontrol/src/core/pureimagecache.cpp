@@ -242,7 +242,11 @@ QByteArray PureImageCache::GetImageFromCache(MapType::Types type, Point pos, int
                     QSqlQuery query(cn);
                     query.exec(QString("SELECT Tile FROM TilesData WHERE id = (SELECT id FROM Tiles WHERE X=%1 AND Y=%2 AND Zoom=%3 AND Type=%4)").arg(pos.X()).arg(pos.Y()).arg(zoom).arg((int) type));
                     query.next();
-                    ar=query.value(0).toByteArray();
+                    if(query.isValid())
+                    {
+
+                        ar=query.value(0).toByteArray();
+                    }
                 }
 
                 cn.close();

@@ -193,15 +193,15 @@ namespace core {
                 qDebug()<<"Starting get response ";//<<pos.X()+","+pos.Y();
 #endif //DEBUG_GMAPS
                 QTime time;
-                time.start();
-                while( !(reply->isFinished() || (time.elapsed()>(6*Timeout))) ){QCoreApplication::processEvents(QEventLoop::AllEvents);}
+                time.restart();
+                while( !(reply->isFinished() || (time.elapsed()>(Timeout))) ){QCoreApplication::processEvents(QEventLoop::AllEvents);}
 #ifdef DEBUG_TIMINGS
                 qDebug()<<"Network time:"<<time.elapsed();
 #endif
 #ifdef DEBUG_GMAPS
-                qDebug()<<"Finished?"<<reply->error()<<" abort?"<<(time.elapsed()>Timeout*6);
+                qDebug()<<"Finished?"<<reply->error()<<" abort?"<<(time.elapsed()>Timeout);
 #endif //DEBUG_GMAPS
-                if( (reply->error()!=QNetworkReply::NoError) || (time.elapsed()>Timeout*6))
+                if( (reply->error()!=QNetworkReply::NoError) || (time.elapsed()>Timeout))
                 {
 #ifdef DEBUG_GMAPS
                     qDebug()<<"Request timed out ";//<<pos.x+","+pos.y;

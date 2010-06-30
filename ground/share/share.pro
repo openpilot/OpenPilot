@@ -1,7 +1,7 @@
 TEMPLATE = subdirs
 SUBDIRS = openpilotgcs/translations
 SUBDIRS += openpilotgcs/sounds
-SUBDIRS += openpilotgcs/gauges
+SUBDIRS += openpilotgcs/dials
 SUBDIRS += openpilotgcs/models
 SUBDIRS += openpilotgcs/pfd
 

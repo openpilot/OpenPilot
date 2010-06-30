@@ -146,7 +146,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 */
     m_widget->comboBoxFindPlace->setAutoCompletion(true);
 
-    connect( m_widget->comboBoxFindPlace->lineEdit(), SIGNAL(returnPressed()), this, SLOT(on_comboBoxFindPlace_returnPressed()));
+    connect( m_widget->comboBoxFindPlace->lineEdit(), SIGNAL(returnPressed()), this, SLOT(comboBoxFindPlace_returnPressed()));
 
     // **************
     // map stuff
@@ -269,7 +269,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
 OPMapGadgetWidget::~OPMapGadgetWidget()
 {
-    on_clearWayPointsAct_triggered();
+    clearWayPointsAct_triggered();
 
     if (wayPoint_treeView_model) delete wayPoint_treeView_model;
     if (m_map_overlay_widget) delete m_map_overlay_widget;
@@ -609,7 +609,7 @@ void OPMapGadgetWidget::WPDeleted(int const &number)
 // *************************************************************************************
 // user control signals
 
-void OPMapGadgetWidget::on_comboBoxFindPlace_returnPressed()
+void OPMapGadgetWidget::comboBoxFindPlace_returnPressed()
 {
     QString place = m_widget->comboBoxFindPlace->currentText().simplified();
     if (place.isNull() || place.isEmpty()) return;
@@ -645,7 +645,7 @@ void OPMapGadgetWidget::on_comboBoxFindPlace_returnPressed()
 void OPMapGadgetWidget::on_toolButtonFindPlace_clicked()
 {
     m_widget->comboBoxFindPlace->setFocus();
-    on_comboBoxFindPlace_returnPressed();
+    comboBoxFindPlace_returnPressed();
 }
 
 void OPMapGadgetWidget::on_toolButtonZoomP_clicked()
@@ -862,91 +862,91 @@ void OPMapGadgetWidget::createActions()
     reloadAct = new QAction(tr("&Reload map"), this);
     reloadAct->setShortcut(tr("F5"));
     reloadAct->setStatusTip(tr("Reload the map tiles"));
-    connect(reloadAct, SIGNAL(triggered()), this, SLOT(on_reloadAct_triggered()));
+    connect(reloadAct, SIGNAL(triggered()), this, SLOT(reloadAct_triggered()));
 
     findPlaceAct = new QAction(tr("&Find place"), this);
     findPlaceAct->setShortcut(tr("Ctrl+F"));
     findPlaceAct->setStatusTip(tr("Find a location"));
-    connect(findPlaceAct, SIGNAL(triggered()), this, SLOT(on_findPlaceAct_triggered()));
+    connect(findPlaceAct, SIGNAL(triggered()), this, SLOT(findPlaceAct_triggered()));
 
     showCompassAct = new QAction(tr("Show compass"), this);
 //    showCompassAct->setShortcut(tr("Ctrl+M"));
     showCompassAct->setStatusTip(tr("Show/Hide the map compass"));
     showCompassAct->setCheckable(true);
     showCompassAct->setChecked(true);
-    connect(showCompassAct, SIGNAL(toggled(bool)), this, SLOT(on_showCompassAct_toggled(bool)));
+    connect(showCompassAct, SIGNAL(toggled(bool)), this, SLOT(showCompassAct_toggled(bool)));
 
     zoomInAct = new QAction(tr("Zoom &In"), this);
     zoomInAct->setShortcut(Qt::Key_PageUp);
     zoomInAct->setStatusTip(tr("Zoom the map in"));
-    connect(zoomInAct, SIGNAL(triggered()), this, SLOT(on_goZoomInAct_triggered()));
+    connect(zoomInAct, SIGNAL(triggered()), this, SLOT(goZoomInAct_triggered()));
 
     zoomOutAct = new QAction(tr("Zoom &Out"), this);
     zoomOutAct->setShortcut(Qt::Key_PageDown);
     zoomOutAct->setStatusTip(tr("Zoom the map out"));
-    connect(zoomOutAct, SIGNAL(triggered()), this, SLOT(on_goZoomOutAct_triggered()));
+    connect(zoomOutAct, SIGNAL(triggered()), this, SLOT(goZoomOutAct_triggered()));
 
     goMouseClickAct = new QAction(tr("Go to where you right clicked the mouse"), this);
     goMouseClickAct->setStatusTip(tr("Center the map onto where you right clicked the mouse"));
-    connect(goMouseClickAct, SIGNAL(triggered()), this, SLOT(on_goMouseClickAct_triggered()));
+    connect(goMouseClickAct, SIGNAL(triggered()), this, SLOT(goMouseClickAct_triggered()));
 
     goHomeAct = new QAction(tr("Go to &Home location"), this);
     goHomeAct->setShortcut(tr("Ctrl+H"));
     goHomeAct->setStatusTip(tr("Center the map onto the home location"));
-    connect(goHomeAct, SIGNAL(triggered()), this, SLOT(on_goHomeAct_triggered()));
+    connect(goHomeAct, SIGNAL(triggered()), this, SLOT(goHomeAct_triggered()));
 
     goUAVAct = new QAction(tr("Go to &UAV location"), this);
     goUAVAct->setShortcut(tr("Ctrl+U"));
     goUAVAct->setStatusTip(tr("Center the map onto the UAV location"));
-    connect(goUAVAct, SIGNAL(triggered()), this, SLOT(on_goUAVAct_triggered()));
+    connect(goUAVAct, SIGNAL(triggered()), this, SLOT(goUAVAct_triggered()));
 
     followUAVpositionAct = new QAction(tr("Follow UAV position"), this);
     followUAVpositionAct->setShortcut(tr("Ctrl+F"));
     followUAVpositionAct->setStatusTip(tr("Keep the map centered onto the UAV"));
     followUAVpositionAct->setCheckable(true);
     followUAVpositionAct->setChecked(false);
-    connect(followUAVpositionAct, SIGNAL(toggled(bool)), this, SLOT(on_followUAVpositionAct_toggled(bool)));
+    connect(followUAVpositionAct, SIGNAL(toggled(bool)), this, SLOT(followUAVpositionAct_toggled(bool)));
 
     followUAVheadingAct = new QAction(tr("Follow UAV heading"), this);
     followUAVheadingAct->setShortcut(tr("Ctrl+F"));
     followUAVheadingAct->setStatusTip(tr("Keep the map rotation to the UAV heading"));
     followUAVheadingAct->setCheckable(true);
     followUAVheadingAct->setChecked(true);
-    connect(followUAVheadingAct, SIGNAL(toggled(bool)), this, SLOT(on_followUAVheadingAct_toggled(bool)));
+    connect(followUAVheadingAct, SIGNAL(toggled(bool)), this, SLOT(followUAVheadingAct_toggled(bool)));
 
     wayPointEditorAct = new QAction(tr("&Waypoint editor"), this);
     wayPointEditorAct->setShortcut(tr("Ctrl+W"));
     wayPointEditorAct->setStatusTip(tr("Open the waypoint editor"));
-    connect(wayPointEditorAct, SIGNAL(triggered()), this, SLOT(on_openWayPointEditorAct_triggered()));
+    connect(wayPointEditorAct, SIGNAL(triggered()), this, SLOT(openWayPointEditorAct_triggered()));
 
     addWayPointAct = new QAction(tr("&Add waypoint"), this);
     addWayPointAct->setShortcut(tr("Ctrl+A"));
     addWayPointAct->setStatusTip(tr("Add waypoint"));
-    connect(addWayPointAct, SIGNAL(triggered()), this, SLOT(on_addWayPointAct_triggered()));
+    connect(addWayPointAct, SIGNAL(triggered()), this, SLOT(addWayPointAct_triggered()));
 
     editWayPointAct = new QAction(tr("&Edit waypoint"), this);
     editWayPointAct->setShortcut(tr("Ctrl+E"));
     editWayPointAct->setStatusTip(tr("Edit waypoint"));
-    connect(editWayPointAct, SIGNAL(triggered()), this, SLOT(on_editWayPointAct_triggered()));
+    connect(editWayPointAct, SIGNAL(triggered()), this, SLOT(editWayPointAct_triggered()));
 
     lockWayPointAct = new QAction(tr("&Lock waypoint"), this);
     lockWayPointAct->setStatusTip(tr("Lock/Unlock a waypoint"));
     lockWayPointAct->setCheckable(true);
     lockWayPointAct->setChecked(false);
-    connect(lockWayPointAct, SIGNAL(triggered()), this, SLOT(on_lockWayPointAct_triggered()));
+    connect(lockWayPointAct, SIGNAL(triggered()), this, SLOT(lockWayPointAct_triggered()));
 
     deleteWayPointAct = new QAction(tr("&Delete waypoint"), this);
     deleteWayPointAct->setShortcut(tr("Ctrl+D"));
     deleteWayPointAct->setStatusTip(tr("Delete waypoint"));
-    connect(deleteWayPointAct, SIGNAL(triggered()), this, SLOT(on_deleteWayPointAct_triggered()));
+    connect(deleteWayPointAct, SIGNAL(triggered()), this, SLOT(deleteWayPointAct_triggered()));
 
     clearWayPointsAct = new QAction(tr("&Clear waypoints"), this);
     clearWayPointsAct->setShortcut(tr("Ctrl+C"));
     clearWayPointsAct->setStatusTip(tr("Clear waypoints"));
-    connect(clearWayPointsAct, SIGNAL(triggered()), this, SLOT(on_clearWayPointsAct_triggered()));
+    connect(clearWayPointsAct, SIGNAL(triggered()), this, SLOT(clearWayPointsAct_triggered()));
 
     zoomActGroup = new QActionGroup(this);
-    connect(zoomActGroup, SIGNAL(triggered(QAction *)), this, SLOT(on_zoomActGroup_triggered(QAction *)));
+    connect(zoomActGroup, SIGNAL(triggered(QAction *)), this, SLOT(zoomActGroup_triggered(QAction *)));
     zoomAct.clear();
     for (int i = 2; i <= 19; i++)
     {
@@ -959,13 +959,13 @@ void OPMapGadgetWidget::createActions()
     // ***********************
 }
 
-void OPMapGadgetWidget::on_reloadAct_triggered()
+void OPMapGadgetWidget::reloadAct_triggered()
 {
     if (m_map)
 	m_map->ReloadMap();
 }
 
-void OPMapGadgetWidget::on_findPlaceAct_triggered()
+void OPMapGadgetWidget::findPlaceAct_triggered()
 {
     m_widget->comboBoxFindPlace->setFocus();	// move focus to the 'find place' text box
 
@@ -989,25 +989,25 @@ void OPMapGadgetWidget::on_findPlaceAct_triggered()
 */
 }
 
-void OPMapGadgetWidget::on_showCompassAct_toggled(bool show_compass)
+void OPMapGadgetWidget::showCompassAct_toggled(bool show_compass)
 {
     if (m_map)
 	m_map->SetShowCompass(show_compass);
 }
 
-void OPMapGadgetWidget::on_goZoomInAct_triggered()
+void OPMapGadgetWidget::goZoomInAct_triggered()
 {
     if (m_map)
 	setZoom(m_map->Zoom() + 1);
 }
 
-void OPMapGadgetWidget::on_goZoomOutAct_triggered()
+void OPMapGadgetWidget::goZoomOutAct_triggered()
 {
     if (m_map)
 	setZoom(m_map->Zoom() - 1);
 }
 
-void OPMapGadgetWidget::on_zoomActGroup_triggered(QAction *action)
+void OPMapGadgetWidget::zoomActGroup_triggered(QAction *action)
 {
     if (!action) return;
 
@@ -1017,18 +1017,18 @@ void OPMapGadgetWidget::on_zoomActGroup_triggered(QAction *action)
     setZoom(zoom);
 }
 
-void OPMapGadgetWidget::on_goMouseClickAct_triggered()
+void OPMapGadgetWidget::goMouseClickAct_triggered()
 {
     if (m_map)
 	m_map->SetCurrentPosition(m_map->currentMousePosition());   // center the map onto the mouse position
 }
 
-void OPMapGadgetWidget::on_goHomeAct_triggered()
+void OPMapGadgetWidget::goHomeAct_triggered()
 {
     followUAVpositionAct->setChecked(false);
 }
 
-void OPMapGadgetWidget::on_goUAVAct_triggered()
+void OPMapGadgetWidget::goUAVAct_triggered()
 {
     PositionActual::DataFields data = m_positionActual->getData();				// get current UAV data
 
@@ -1040,7 +1040,7 @@ void OPMapGadgetWidget::on_goUAVAct_triggered()
     }
 }
 
-void OPMapGadgetWidget::on_followUAVpositionAct_toggled(bool checked)
+void OPMapGadgetWidget::followUAVpositionAct_toggled(bool checked)
 {
     if (m_widget)
     {
@@ -1052,18 +1052,18 @@ void OPMapGadgetWidget::on_followUAVpositionAct_toggled(bool checked)
     }
 }
 
-void OPMapGadgetWidget::on_followUAVheadingAct_toggled(bool checked)
+void OPMapGadgetWidget::followUAVheadingAct_toggled(bool checked)
 {
     if (!checked && m_map)
 	m_map->SetRotate(0);									// reset the rotation to '0'
 }
 
-void OPMapGadgetWidget::on_openWayPointEditorAct_triggered()
+void OPMapGadgetWidget::openWayPointEditorAct_triggered()
 {
     waypoint_editor_dialog.show();
 }
 
-void OPMapGadgetWidget::on_addWayPointAct_triggered()
+void OPMapGadgetWidget::addWayPointAct_triggered()
 {
     if (!m_map) return;
 
@@ -1081,7 +1081,7 @@ void OPMapGadgetWidget::on_addWayPointAct_triggered()
     m_waypoint_list_mutex.unlock();
 }
 
-void OPMapGadgetWidget::on_editWayPointAct_triggered()
+void OPMapGadgetWidget::editWayPointAct_triggered()
 {
     if (!m_mouse_waypoint) return;
 
@@ -1092,7 +1092,7 @@ void OPMapGadgetWidget::on_editWayPointAct_triggered()
     m_mouse_waypoint = NULL;
 }
 
-void OPMapGadgetWidget::on_lockWayPointAct_triggered()
+void OPMapGadgetWidget::lockWayPointAct_triggered()
 {
     if (!m_mouse_waypoint) return;
 
@@ -1102,7 +1102,7 @@ void OPMapGadgetWidget::on_lockWayPointAct_triggered()
     m_mouse_waypoint = NULL;
 }
 
-void OPMapGadgetWidget::on_deleteWayPointAct_triggered()
+void OPMapGadgetWidget::deleteWayPointAct_triggered()
 {
     if (!m_mouse_waypoint) return;
 
@@ -1131,7 +1131,7 @@ void OPMapGadgetWidget::on_deleteWayPointAct_triggered()
     m_mouse_waypoint = NULL;
 }
 
-void OPMapGadgetWidget::on_clearWayPointsAct_triggered()
+void OPMapGadgetWidget::clearWayPointsAct_triggered()
 {
     m_waypoint_list_mutex.lock();
 	if (m_map) m_map->WPDeleteAll();

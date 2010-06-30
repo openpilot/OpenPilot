@@ -16,5 +16,7 @@
         <file>images/hold.png</file>
         <file>images/go.png</file>
         <file>images/combobox_down_arrow.png</file>
+        <file>images/waypoint_marker2.png</file>
+        <file>images/waypoint_marker1.png</file>
     </qresource>
 </RCC>

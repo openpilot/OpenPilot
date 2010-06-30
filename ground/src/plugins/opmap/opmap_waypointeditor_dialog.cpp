@@ -48,26 +48,37 @@ WaypointItem::WaypointItem(QString name, double latitude, double longitude, doub
     setFlag(QGraphicsItem::ItemIsMovable, true);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemSendsScenePositionChanges, true);
+
+    pixmap.load(QString::fromUtf8(":/opmap/images/waypoint_marker1.png"));
 }
 
 QRectF WaypointItem::boundingRect() const
 {
-    return QRectF(-6, -10, 12, 20);
+//  return QRectF(-6, -10, 12, 20);
+    return QRectF(-pixmap.width() / 2, -pixmap.height(), pixmap.width(), pixmap.height());
 }
-
+/*
 QPainterPath WaypointItem::shape() const
 {
     QPainterPath path;
-    path.addEllipse(QPointF(0, 0), 6, 10);
+//    path.addEllipse(QPointF(0, 0), 6, 10);
+    path.addRect(pixmap.rect());
     return path;
 }
-
+*/
  void WaypointItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-    painter->setPen(Qt::black);
-    painter->setBrush(QColor(255, 0, 0, 128));
-    painter->drawEllipse(QPointF(0, 0), 6, 10);
- }
+//  painter->setPen(Qt::black);
+//  painter->setBrush(QColor(255, 0, 0, 128));
+//  painter->drawEllipse(QPointF(0, 0), 6, 10);
+
+    painter->drawPixmap(-pixmap.width() / 2, -pixmap.height(), pixmap);
+}
+
+void WaypointItem::setPixmap(QPixmap pixmap)
+{
+    this->pixmap = pixmap.copy(pixmap.rect());
+}
 
 // ***************************************************************
 // Scene object
@@ -119,8 +130,11 @@ opmap_waypointeditor_dialog::opmap_waypointeditor_dialog(QWidget *parent) :
     view = ui->graphicsViewWaypointHeightAndTimeline;
 
     scene = new OurScene();
-    scene->setSceneRect(QRect(0, 0, 1800, 500));
+    scene->setSceneRect(QRect(0, 0, 500, 500));
     view->setScene(scene);
+
+    waypoint_pixmap1.load(QString::fromUtf8(":/opmap/images/waypoint_marker1.png"));
+    waypoint_pixmap2.load(QString::fromUtf8(":/opmap/images/waypoint_marker2.png"));
 
     undoStack = new QUndoStack();
 
@@ -138,6 +152,7 @@ opmap_waypointeditor_dialog::opmap_waypointeditor_dialog(QWidget *parent) :
     scene->addItem(waypoint2);
 
     WaypointItem *waypoint3 = new WaypointItem(tr("Waypoint 3"), 0, 0, 100, 8, 5);
+    waypoint3->setPixmap(waypoint_pixmap2);
     waypoint3->setPos(scene->width() / 2 + 60, scene->height() / 2);
     scene->addItem(waypoint3);
 

@@ -34,6 +34,7 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QGraphicsItem>
+#include <QPixmap>
 #include <QUndoStack>
 
 #include "uavobjects/uavobjectmanager.h"
@@ -54,6 +55,8 @@ class WaypointItem : public QObject, public QGraphicsItem
  public:
     WaypointItem(QString name = "", double latitude = 0, double longitude = 0, double height_feet = 0, int time_seconds = 0, int hold_seconds = 0);
 
+    void setPixmap(QPixmap pixmap);
+
     QString waypoint_name;
     double latitude_degress;
     double longitude_degress;
@@ -61,11 +64,12 @@ class WaypointItem : public QObject, public QGraphicsItem
     int time_seconds;
     int hold_seconds;
 
-    QRectF boundingRect() const;
-    QPainterPath shape() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    QPixmap pixmap;
 
  protected:
+    QRectF boundingRect() const;
+//    QPainterPath shape() const;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 //    void timerEvent(QTimerEvent *event);
 
  private:
@@ -110,6 +114,9 @@ protected:
     void changeEvent(QEvent *e);
 
 private:
+    QPixmap waypoint_pixmap1;
+    QPixmap waypoint_pixmap2;
+
     QGraphicsView *view;
     QGraphicsScene *scene;
 

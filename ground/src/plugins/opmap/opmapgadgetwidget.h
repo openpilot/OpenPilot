@@ -109,7 +109,7 @@ private slots:
     *
     * @param
     */
-    void on_comboBoxFindPlace_returnPressed();
+    void comboBoxFindPlace_returnPressed();
     void on_toolButtonFindPlace_clicked();
     void on_toolButtonZoomM_clicked();
     void on_toolButtonZoomP_clicked();
@@ -151,23 +151,23 @@ private slots:
     *
     * @param
     */
-    void on_reloadAct_triggered();
-    void on_findPlaceAct_triggered();
-    void on_showCompassAct_toggled(bool show_compass);
-    void on_goZoomInAct_triggered();
-    void on_goZoomOutAct_triggered();
-    void on_goMouseClickAct_triggered();
-    void on_goHomeAct_triggered();
-    void on_goUAVAct_triggered();
-    void on_followUAVpositionAct_toggled(bool checked);
-    void on_followUAVheadingAct_toggled(bool checked);
-    void on_openWayPointEditorAct_triggered();
-    void on_addWayPointAct_triggered();
-    void on_editWayPointAct_triggered();
-    void on_lockWayPointAct_triggered();
-    void on_deleteWayPointAct_triggered();
-    void on_clearWayPointsAct_triggered();
-    void on_zoomActGroup_triggered(QAction *action);
+    void reloadAct_triggered();
+    void findPlaceAct_triggered();
+    void showCompassAct_toggled(bool show_compass);
+    void goZoomInAct_triggered();
+    void goZoomOutAct_triggered();
+    void goMouseClickAct_triggered();
+    void goHomeAct_triggered();
+    void goUAVAct_triggered();
+    void followUAVpositionAct_toggled(bool checked);
+    void followUAVheadingAct_toggled(bool checked);
+    void openWayPointEditorAct_triggered();
+    void addWayPointAct_triggered();
+    void editWayPointAct_triggered();
+    void lockWayPointAct_triggered();
+    void deleteWayPointAct_triggered();
+    void clearWayPointsAct_triggered();
+    void zoomActGroup_triggered(QAction *action);
 
 private:
     double m_heading;	// uav heading

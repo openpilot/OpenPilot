@@ -32,8 +32,7 @@
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>
 #include <QDir>
-
-#include "extensionsystem/pluginmanager.h"
+#include <QFile>
 
 // *************************************************************************************
 // constructor
@@ -49,6 +48,10 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_map_graphics_scene = NULL;
     m_map_scene_proxy = NULL;
     m_map_overlay_widget = NULL;
+
+    pm = NULL;
+    objManager = NULL;
+    m_positionActual = NULL;
 
     m_mouse_waypoint = NULL;
 
@@ -99,8 +102,9 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     // **************
     // Get required UAVObjects
 
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    pm = ExtensionSystem::PluginManager::instance();
+    objManager = pm->getObject<UAVObjectManager>();
+
     m_positionActual = PositionActual::GetInstance(objManager);
 
     // **************
@@ -123,6 +127,13 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_widget->treeViewWaypoints->setVisible(false);
     m_widget->toolButtonWaypointsTreeViewShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/next.png")));
 
+    #if defined(Q_OS_MAC)
+    #elif defined(Q_OS_WIN)
+	m_widget->comboBoxFindPlace->clear();
+	loadComboBoxLines(m_widget->comboBoxFindPlace, QCoreApplication::applicationDirPath() + "/opmap_find_place_history.txt");
+	m_widget->comboBoxFindPlace->setCurrentIndex(-1);
+    #else
+    #endif
 
     // **************
     // add an auto-completer to the find-place line edit box
@@ -270,6 +281,15 @@ OPMapGadgetWidget::~OPMapGadgetWidget()
 // *************************************************************************************
 // widget signals
 
+void OPMapGadgetWidget::closeEvent(QCloseEvent *event)
+{
+//    #if defined(Q_OS_MAC)
+//    #elif defined(Q_OS_WIN)
+//	saveComboBoxLines(m_widget->comboBoxFindPlace, QCoreApplication::applicationDirPath() + "/opmap_find_place_history.txt");
+//    #else
+//    #endif
+}
+
 void OPMapGadgetWidget::resizeEvent(QResizeEvent *event)
 {
 //    update();
@@ -296,6 +316,8 @@ void OPMapGadgetWidget::mouseMoveEvent(QMouseEvent *event)
     {
 	 QPoint pos = event->pos();
     }
+
+    QWidget::mouseMoveEvent(event);
 }
 
 void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
@@ -314,6 +336,11 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
     // find out if we have a waypoint under the mouse cursor
     QGraphicsItem *item = m_map->itemAt(p);
     m_mouse_waypoint = qgraphicsitem_cast<mapcontrol::WayPointItem *>(item);
+
+    // find out if the waypoint is locked (or not)
+    bool waypoint_locked = false;
+    if (m_mouse_waypoint)
+	waypoint_locked = (m_mouse_waypoint->flags() & QGraphicsItem::ItemIsMovable) == 0;
 
     // ****************
     // create the popup menu
@@ -359,16 +386,15 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     menu.addAction(wayPointEditorAct);
     menu.addAction(addWayPointAct);
+
     if (m_mouse_waypoint)
     {	// we have a waypoint under the mouse
 	menu.addAction(editWayPointAct);
 
-	bool locked = (m_mouse_waypoint->flags() & QGraphicsItem::ItemIsMovable) == 0;
-
-	lockWayPointAct->setChecked(locked);
+	lockWayPointAct->setChecked(waypoint_locked);
 	menu.addAction(lockWayPointAct);
 
-	if (!locked)
+	if (!waypoint_locked)
 	    menu.addAction(deleteWayPointAct);
     }
 
@@ -597,6 +623,12 @@ void OPMapGadgetWidget::on_comboBoxFindPlace_returnPressed()
 	findPlaceCompleter->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
 	m_widget->comboBoxFindPlace->setCompleter(findPlaceCompleter);
 */
+
+	#if defined(Q_OS_MAC)
+	#elif defined(Q_OS_WIN)
+	    saveComboBoxLines(m_widget->comboBoxFindPlace, QCoreApplication::applicationDirPath() + "/opmap_find_place_history.txt");
+	#else
+	#endif
     }
 
     if (!m_map) return;
@@ -1092,6 +1124,47 @@ void OPMapGadgetWidget::on_clearWayPointsAct_triggered()
 	if (m_map) m_map->WPDeleteAll();
 	m_waypoint_list.clear();
     m_waypoint_list_mutex.unlock();
+}
+
+// *************************************************************************************
+
+// load the contents of a simple text file into a combobox
+void OPMapGadgetWidget::loadComboBoxLines(QComboBox *comboBox, QString filename)
+{
+    if (!comboBox) return;
+    if (filename.isNull() || filename.isEmpty()) return;
+
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+	return;
+
+    QTextStream in(&file);
+
+    while (!in.atEnd())
+    {
+	QString line = in.readLine().simplified();
+	comboBox->addItem(line);
+    }
+
+    file.close();
+}
+
+// save a combobox text contents to a simple text file
+void OPMapGadgetWidget::saveComboBoxLines(QComboBox *comboBox, QString filename)
+{
+    if (!comboBox) return;
+    if (filename.isNull() || filename.isEmpty()) return;
+
+    QFile file(filename);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+	return;
+
+    QTextStream out(&file);
+
+    for (int i = 0; i < comboBox->count(); i++)
+	out << comboBox->itemText(i).simplified() << "\n";
+
+    file.close();
 }
 
 // *************************************************************************************

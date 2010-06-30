@@ -44,6 +44,8 @@
 #include "opmap_waypointeditor_dialog.h"
 #include "opmap_edit_waypoint_dialog.h"
 
+#include "extensionsystem/pluginmanager.h"
+
 namespace Ui
 {
     class OPMap_Widget;
@@ -88,6 +90,7 @@ public:
 public slots:
 
 protected:
+    void closeEvent(QCloseEvent *event);
     void resizeEvent(QResizeEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void contextMenuEvent(QContextMenuEvent *event);
@@ -179,6 +182,8 @@ private:
     QTimer *m_updateTimer;
     QTimer *m_statusUpdateTimer;
 
+    ExtensionSystem::PluginManager *pm;
+    UAVObjectManager *objManager;
     PositionActual *m_positionActual;
 
     Ui::OPMap_Widget *m_widget;
@@ -222,6 +227,9 @@ private:
 
     QActionGroup *zoomActGroup;
     QList<QAction *> zoomAct;
+
+    void loadComboBoxLines(QComboBox *comboBox, QString filename);
+    void saveComboBoxLines(QComboBox *comboBox, QString filename);
 };
 
 #endif /* OPMAP_GADGETWIDGET_H_ */

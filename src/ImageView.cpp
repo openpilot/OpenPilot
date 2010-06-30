@@ -228,9 +228,9 @@ void ImageView::exportView( const std::string& _fileName )
     this->scene()->render(&painter);
   } else if ( extension == "png" or extension == "tiff" )
   {
-    QImage img( scene()->sceneRect().size().toSize() , QImage::Format_RGB32);
+    QImage img(m_image.size(), QImage::Format_RGB32);
     QPainter painter(&img);
-    this->scene()->render(&painter);
+    this->scene()->render(&painter, m_image.rect(), m_image.rect(), Qt::KeepAspectRatio);
     if( extension == "png")
     {
         img.save(fileName, "PNG");

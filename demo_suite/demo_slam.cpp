@@ -184,7 +184,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	#else
 	if (mode == 2)
 	{
-		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(dump_path, cv::Size(640,480)));
+		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(cv::Size(640,480),dump_path));
 		senPtr11->setHardwareSensor(hardSen11);
 	}
 	#endif

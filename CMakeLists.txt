@@ -10,7 +10,7 @@ build_jafar_module(qdisplay
   REVISION 1 
   REQUIRED_MODULES kernel image jmath
   #OPTIONAL_MODULES 
-  REQUIRED_EXTLIBS qt4 boost_thread
+  REQUIRED_EXTLIBS qt4 boost_thread boost_sandbox
   #OPTIONAL_EXTLIBS 
   #CXXFLAGS
   #CPPFLAGS

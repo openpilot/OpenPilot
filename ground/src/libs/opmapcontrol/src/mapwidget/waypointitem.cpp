@@ -75,17 +75,21 @@ namespace mapcontrol
     {
         if(event->button()==Qt::LeftButton)
         {
-            text=new QGraphicsSimpleTextItem(this);
+	    text=new QGraphicsSimpleTextItem(this);
             textBG=new QGraphicsRectItem(this);
-            textBG->setBrush(Qt::white);
-            textBG->setOpacity(0.5);
-            text->setPen(QPen(Qt::red));
-            text->setPos(10,-picture.height());
-            textBG->setPos(10,-picture.height());
-            text->setZValue(3);
-            RefreshToolTip();
-            isDragging=true;
-        }
+
+//	    textBG->setBrush(Qt::white);
+//	    textBG->setOpacity(0.5);
+
+	    textBG->setBrush(QColor(255, 255, 255, 128));
+
+	    text->setPen(QPen(Qt::red));
+	    text->setPos(10,-picture.height());
+	    textBG->setPos(10,-picture.height());
+	    text->setZValue(3);
+	    RefreshToolTip();
+	    isDragging=true;
+	}
         QGraphicsItem::mousePressEvent(event);
     }
     void WayPointItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)

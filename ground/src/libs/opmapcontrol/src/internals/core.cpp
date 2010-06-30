@@ -148,7 +148,7 @@ namespace internals {
                                         QWaitCondition wait;
                                         QMutex m;
                                         m.lock();
-                                        wait.wait(&m,1111);
+                                        wait.wait(&m,500);
                                     }
                                 }
                             }
@@ -171,6 +171,7 @@ namespace internals {
 
                             delete t;
                             t = 0;
+                            emit OnNeedInvalidation();
                         }
 
                         // layers = null;

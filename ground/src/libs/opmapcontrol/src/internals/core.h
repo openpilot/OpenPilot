@@ -189,7 +189,7 @@ public:
 
 
 signals:
-    void OnCurrentPositionChanged(PointLatLng point);
+    void OnCurrentPositionChanged(internals::PointLatLng point);
     void OnTileLoadComplete();
     void OnTilesStillToLoad(int number);
     void OnTileLoadStart();

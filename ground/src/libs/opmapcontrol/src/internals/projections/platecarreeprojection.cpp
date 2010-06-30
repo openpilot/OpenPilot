@@ -43,7 +43,7 @@ Point PlateCarreeProjection::FromLatLngToPixel(double lat, double lng, const int
 
     Size s = GetTileMatrixSizePixel(zoom);
     double mapSizeX = s.Width();
-    double mapSizeY = s.Height();
+    //double mapSizeY = s.Height();
 
     double scale = 360.0 / mapSizeX;
 
@@ -59,7 +59,7 @@ internals::PointLatLng PlateCarreeProjection::FromPixelToLatLng(const int &x, co
 
     Size s = GetTileMatrixSizePixel(zoom);
     double mapSizeX = s.Width();
-    double mapSizeY = s.Height();
+    //double mapSizeY = s.Height();
 
     double scale = 360.0 / mapSizeX;
 

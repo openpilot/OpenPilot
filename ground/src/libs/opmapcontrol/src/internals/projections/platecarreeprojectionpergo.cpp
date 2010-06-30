@@ -42,7 +42,7 @@ Point PlateCarreeProjectionPergo::FromLatLngToPixel(double lat, double lng, cons
 
     Size s = GetTileMatrixSizePixel(zoom);
     double mapSizeX = s.Width();
-    double mapSizeY = s.Height();
+    //double mapSizeY = s.Height();
 
     double scale = 360.0 / mapSizeX;
 
@@ -57,7 +57,7 @@ internals::PointLatLng PlateCarreeProjectionPergo::FromPixelToLatLng(const int &
 
     Size s = GetTileMatrixSizePixel(zoom);
     double mapSizeX = s.Width();
-    double mapSizeY = s.Height();
+    //double mapSizeY = s.Height();
 
     double scale = 360.0 / mapSizeX;
 

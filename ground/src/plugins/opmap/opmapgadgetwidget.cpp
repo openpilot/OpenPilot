@@ -104,7 +104,6 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     pm = ExtensionSystem::PluginManager::instance();
     objManager = pm->getObject<UAVObjectManager>();
-
     m_positionActual = PositionActual::GetInstance(objManager);
 
     // **************
@@ -221,7 +220,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     // create a waypoint group
     QStandardItem *item = new QStandardItem(tr("Camera shoot at the town hall"));
     for (int i = 1; i < 5; i++)
-    {   // add some way points
+    {   // add some waypoints
 	QStandardItem *child = new QStandardItem(QIcon(QString::fromUtf8(":/opmap/images/waypoint.png")), QString("Waypoint %0").arg(i));
 	child->setEditable(true);
 	item->appendRow(child);
@@ -233,7 +232,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     // create another waypoint group
     item = new QStandardItem(tr("Flight path 62"));
     for (int i = 1; i < 8; i++)
-    {   // add some way points
+    {   // add some waypoints
 	QStandardItem *child = new QStandardItem(QIcon(QString::fromUtf8(":/opmap/images/waypoint.png")), QString("Waypoint %0").arg(i));
 	child->setEditable(true);
 	item->appendRow(child);
@@ -322,16 +321,20 @@ void OPMapGadgetWidget::mouseMoveEvent(QMouseEvent *event)
 
 void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 {
-    if (!m_map)
-	return;	// we don't appear to have a map to work with!
-
     if (event->reason() != QContextMenuEvent::Mouse)
 	return;	// not a mouse click event
 
+    if (!m_map)
+	return;	// we don't appear to have a map to work with!
+
+    // current mouse position
     QPoint p = m_map->mapFromGlobal(QCursor::pos());
 
+    // save the current lat/lon mouse position
+    mouse_lat_lon = m_map->currentMousePosition();
+
     if (!m_map->contentsRect().contains(p))
-	return;	// the mouse click was not on the map
+	return;					    // the mouse click was not on the map
 
     // find out if we have a waypoint under the mouse cursor
     QGraphicsItem *item = m_map->itemAt(p);
@@ -724,7 +727,20 @@ void OPMapGadgetWidget::on_toolButtonGo_clicked()
 
 void OPMapGadgetWidget::on_toolButtonAddWaypoint_clicked()
 {
-    addWayPointAct->trigger();
+    if (!m_map) return;
+
+    m_waypoint_list_mutex.lock();
+
+	// create a waypoint at the center of the map
+	t_waypoint waypoint;
+	waypoint.item = m_map->WPCreate(m_map->CurrentPosition(), 0);
+	waypoint.time_seconds = 0;
+	waypoint.hold_time_seconds = 0;
+
+	// and remember it in our own local waypoint list
+	m_waypoint_list.append(waypoint);
+
+    m_waypoint_list_mutex.unlock();
 }
 
 void OPMapGadgetWidget::on_toolButtonWaypointEditor_clicked()
@@ -898,9 +914,9 @@ void OPMapGadgetWidget::createActions()
     followUAVheadingAct->setChecked(true);
     connect(followUAVheadingAct, SIGNAL(toggled(bool)), this, SLOT(on_followUAVheadingAct_toggled(bool)));
 
-    wayPointEditorAct = new QAction(tr("&Way point editor"), this);
+    wayPointEditorAct = new QAction(tr("&Waypoint editor"), this);
     wayPointEditorAct->setShortcut(tr("Ctrl+W"));
-    wayPointEditorAct->setStatusTip(tr("Open the way-point editor"));
+    wayPointEditorAct->setStatusTip(tr("Open the waypoint editor"));
     connect(wayPointEditorAct, SIGNAL(triggered()), this, SLOT(on_openWayPointEditorAct_triggered()));
 
     addWayPointAct = new QAction(tr("&Add waypoint"), this);
@@ -1049,23 +1065,20 @@ void OPMapGadgetWidget::on_openWayPointEditorAct_triggered()
 
 void OPMapGadgetWidget::on_addWayPointAct_triggered()
 {
-    if (m_map)
-    {
-	m_waypoint_list_mutex.lock();
+    if (!m_map) return;
 
-	    // create a waypoint
-	    t_waypoint waypoint;
-	    waypoint.item = m_map->WPCreate();
-	    waypoint.time_seconds = 0;
-	    waypoint.hold_time_seconds = 0;
+    m_waypoint_list_mutex.lock();
 
-	    // and remember it
-	    m_waypoint_list.append(waypoint);
+	// create a waypoint on the map at the last known mouse position
+	t_waypoint waypoint;
+	waypoint.item = m_map->WPCreate(mouse_lat_lon, 0);
+	waypoint.time_seconds = 0;
+	waypoint.hold_time_seconds = 0;
 
-	m_waypoint_list_mutex.unlock();
-    }
+	// and remember it in our own local waypoint list
+	m_waypoint_list.append(waypoint);
 
-    // to do
+    m_waypoint_list_mutex.unlock();
 }
 
 void OPMapGadgetWidget::on_editWayPointAct_triggered()
@@ -1143,6 +1156,7 @@ void OPMapGadgetWidget::loadComboBoxLines(QComboBox *comboBox, QString filename)
     while (!in.atEnd())
     {
 	QString line = in.readLine().simplified();
+	if (line.isNull() || line.isEmpty()) continue;
 	comboBox->addItem(line);
     }
 
@@ -1162,7 +1176,11 @@ void OPMapGadgetWidget::saveComboBoxLines(QComboBox *comboBox, QString filename)
     QTextStream out(&file);
 
     for (int i = 0; i < comboBox->count(); i++)
-	out << comboBox->itemText(i).simplified() << "\n";
+    {
+	QString line = comboBox->itemText(i).simplified();
+	if (line.isNull() || line.isEmpty()) continue;
+	out << line << "\n";
+    }
 
     file.close();
 }

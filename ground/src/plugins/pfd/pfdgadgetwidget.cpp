@@ -28,6 +28,7 @@
 #include "pfdgadgetwidget.h"
 #include <iostream>
 #include <QDebug>
+#include <cmath>
 
 PFDGadgetWidget::PFDGadgetWidget(QWidget *parent) : QGraphicsView(parent)
 {
@@ -89,7 +90,6 @@ void PFDGadgetWidget::connectNeedles() {
         std::cout << "Error: Object is unknown (PositionActual)." << std::endl;
    }
 
-
 }
 
 /*!
@@ -116,7 +116,11 @@ void PFDGadgetWidget::updateAttitude(UAVObject *object1) {
 }
 
 /*!
-  \brief Called by the UAVObject which got updated
+  \brief Updates the compass reading and speed dial.
+
+    Note: the speed dial shows the ground speed at the moment, because
+        there is no airspeed by default. Should become configurable in a future
+        gadget release (TODO)
   */
 void PFDGadgetWidget::updateHeading(UAVObject *object1) {
     // Double check that the field exists:
@@ -127,12 +131,18 @@ void PFDGadgetWidget::updateHeading(UAVObject *object1) {
         // - Heading value in degrees
         // - Scale is 540 degrees large
         headingTarget = field->getDouble()*compassBandWidth/(-540);
-
-        if (!dialTimer.isActive())
-            dialTimer.start(); // Rearm the dial Timer which might be stopped.
     } else {
         std::cout << "UpdateHeading: Wrong field, maybe an issue with object disconnection ?" << std::endl;
     }
+    heading = QString("Groundspeed");
+    field = object1->getField(heading);
+    if (field) {
+        // The speed scale represents 30km/h (6 * 5)
+        groundspeedTarget = field->getDouble()*speedScaleHeight/(-30);
+    }
+    if (!dialTimer.isActive())
+        dialTimer.start(); // Rearm the dial Timer which might be stopped.
+
 }
 
 /*!
@@ -155,9 +165,10 @@ void PFDGadgetWidget::updateBattery(UAVObject *object3) {
 }
 
 
-/*
-  Initializes the dial file, and does all the one-time calculations for
-  display later.
+/*!
+  \brief Sets up the PFD from the SVG master file.
+
+  Initializes the display, and does all the one-time calculations.
   */
 void PFDGadgetWidget::setDialFile(QString dfn)
 {
@@ -177,6 +188,9 @@ void PFDGadgetWidget::setDialFile(QString dfn)
      - Next point: nextwaypoint
      - Home point bearing: homewaypoint-bearing
      - Next point bearing: nextwaypoint-bearing
+     - Speed rectangle (left side): speed-bg (part of FOREGROUND)
+     - Speed scale: speed-scale.
+     - Black speed window: speed-window.
  */
          QGraphicsScene *l_scene = scene();
          l_scene->clear(); // Deletes all items contained in the scene as well.
@@ -249,6 +263,51 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          // includes half the width of the letters, which causes errors:
          compassBandWidth = m_renderer->boundsOnElement("compass-scale").width();
 
+         // Speedometer on the left hand:
+         compassMatrix = m_renderer->matrixForElement("speed-bg");
+         startX = compassMatrix.mapRect(m_renderer->boundsOnElement("speed-bg")).x();
+         startY = compassMatrix.mapRect(m_renderer->boundsOnElement("speed-bg")).y();
+         m_speedbg = new QGraphicsSvgItem();
+         m_speedbg->setSharedRenderer(m_renderer);
+         m_speedbg->setElementId("speed-bg");
+         m_speedbg->setFlags(QGraphicsItem::ItemClipsChildrenToShape|
+                             QGraphicsItem::ItemClipsToShape);
+         l_scene->addItem(m_speedbg);
+         matrix.reset();
+         matrix.translate(startX,startY);
+         m_speedbg->setTransform(matrix,false);
+
+         // Note: speed-scale should contain exactly 6 major ticks
+         // for 30km/h
+         m_speedscale = new QGraphicsSvgItem();
+         m_speedscale->setSharedRenderer(m_renderer);
+         m_speedscale->setElementId("speed-scale");
+         speedScaleHeight = compassMatrix.mapRect(m_renderer->boundsOnElement("speed-scale")).height();
+         startX = compassMatrix.mapRect(m_renderer->boundsOnElement("speed-bg")).width();
+         startX -= m_renderer->matrixForElement("speed-scale").mapRect((
+                        m_renderer->boundsOnElement("speed-scale"))).width();
+         m_speedscale->setParentItem(m_speedbg);
+         matrix.reset();
+         matrix.translate(startX,0);
+         m_speedscale->setTransform(matrix,false);
+
+         //// WORK IN PROGRESS
+
+         // Add the scale text elements:
+         QGraphicsTextItem *speed0 = new QGraphicsTextItem("000");
+         matrix.reset();
+         matrix.translate(compassMatrix.mapRect(m_renderer->boundsOnElement("speed-bg")).width()/10,0);
+         speed0->setTransform(matrix,false);
+         speed0->setParentItem(m_speedbg);
+
+         for (int i=0; i<6;i++) {
+             speed0 = new QGraphicsTextItem("000");
+             speed0->setPlainText(QString().setNum(i*5));
+             matrix.translate(0,speedScaleHeight/6);
+             speed0->setTransform(matrix,false);
+             speed0->setParentItem(m_speedbg);
+         }
+
         l_scene->setSceneRect(m_background->boundingRect());
 
         // Now Initialize the center for all transforms of the relevant elements to the
@@ -278,6 +337,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
         rollValue = 0;
         pitchValue = 0;
         headingValue = 0;
+        groundspeedValue = 0;
         if (!dialTimer.isActive())
             dialTimer.start(); // Rearm the dial Timer which might be stopped.
      }
@@ -316,9 +376,14 @@ void PFDGadgetWidget::resizeEvent(QResizeEvent *event)
 //
 void PFDGadgetWidget::rotateNeedles()
 {
-    int dialCount = 3; // Gets decreased by one for each element
+    int dialCount = 4; // Gets decreased by one for each element
                        // which has finished moving
 
+    /// TODO: optimize!!!
+
+    //////
+    // Roll
+    //////
     double rollDiff;
     if ((abs((rollValue-rollTarget)*10) > 5)) {
         rollDiff =(rollTarget - rollValue)/5;
@@ -330,6 +395,9 @@ void PFDGadgetWidget::rotateNeedles()
     m_rollscale->setRotation(m_rollscale->rotation()+rollDiff);
     rollValue += rollDiff;
 
+    //////
+    // Pitch
+    //////
     double pitchDiff;
     if ((abs((pitchValue-pitchTarget)*10) > 5)) {
         pitchDiff = (pitchTarget - pitchValue)/5;
@@ -343,6 +411,9 @@ void PFDGadgetWidget::rotateNeedles()
     m_world->setTransformOriginPoint((oop.x()-opd.x()),(oop.y()-opd.y()));
     pitchValue += pitchDiff;
 
+    //////
+    // Heading
+    //////
     double headingOffset = 0;
     double headingDiff;
     if ((abs((headingValue-headingTarget)*10) > 5)) {
@@ -364,6 +435,26 @@ void PFDGadgetWidget::rotateNeedles()
     opd = QPointF(headingDiff+headingOffset,0);
     m_compassband->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), true);
     headingValue += headingDiff;
+
+    //////
+    // Speed
+    //
+    // TODO: find a way to move the speed scale faster if we are far
+    // from the target, maybe a separate timer would be useful there?
+    //////
+    if ((abs((groundspeedValue-groundspeedTarget)*10) > 5)) {
+        if (groundspeedValue>groundspeedTarget) {
+            groundspeedValue -= speedScaleHeight/60;
+        } else {
+            groundspeedValue += speedScaleHeight/60;
+        }
+    } else {
+        groundspeedValue = groundspeedTarget;
+        dialCount--;
+    }
+    qreal x = m_speedscale->transform().dx();
+    opd = QPointF(x,fmod(groundspeedValue,speedScaleHeight/6));
+    m_speedscale->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), false);
 
    //update();
    if (!dialCount)

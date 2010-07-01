@@ -80,6 +80,40 @@ namespace mapcontrol
                 w->RefreshPos();
         }
     }
+    void MapGraphicItem::ConstructLastImage()
+    {
+        QSize size=boundingRect().size().toSize();
+        size.setWidth(size.width()*2);
+        size.setHeight(size.height()*2);
+        lastimage=QImage(size,
+                               QImage::Format_ARGB32_Premultiplied);
+        lastimage.fill(0);
+        QPainter* imagePainter=new QPainter(&lastimage);
+        imagePainter->translate(-boundingRect().topLeft());
+        imagePainter->scale(2,2);
+        paintImage(imagePainter);
+        imagePainter->end();
+        lastimagepoint=Point(core->GetrenderOffset().X()*2,core->GetrenderOffset().Y()*2);
+    }
+    void MapGraphicItem::paintImage(QPainter *painter)
+    {
+
+        if(MapRenderTransform!=1)
+        {
+            QTransform transform;
+            transform.scale(MapRenderTransform,MapRenderTransform);
+            painter->setWorldTransform(transform);
+            {
+                DrawMap2D(painter,true);
+            }
+            painter->resetTransform();
+        }
+        else
+        {
+            DrawMap2D(painter,true);
+        }
+        //painter->drawRect(maprect);
+    }
     void MapGraphicItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
     {
 
@@ -89,15 +123,15 @@ namespace mapcontrol
             transform.scale(MapRenderTransform,MapRenderTransform);
             painter->setWorldTransform(transform);
             {
-                DrawMap2D(painter);
+                DrawMap2D(painter,false);
             }
             painter->resetTransform();
         }
         else
         {
-            DrawMap2D(painter);
+            DrawMap2D(painter,false);
         }
-        painter->drawRect(maprect);
+     //   painter->drawRect(maprect);
     }
     void MapGraphicItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     {
@@ -217,10 +251,14 @@ namespace mapcontrol
             core->MouseWheelZooming = false;
         }
     }
-    void MapGraphicItem::DrawMap2D(QPainter *painter)
+    void MapGraphicItem::DrawMap2D(QPainter *painter,bool ToImage)
     {
         // qDebug()<<core->Matrix.count();
         // painter.drawText(10,10,"TESTE");
+        //painter->drawImage(0,0,lastimage);
+        if(!ToImage && !lastimage.isNull())
+            painter->drawImage(core->GetrenderOffset().X()-lastimagepoint.X(),core->GetrenderOffset().Y()-lastimagepoint.Y(),lastimage);
+
         for(int i = -core->GetsizeOfMapArea().Width(); i <= core->GetsizeOfMapArea().Width(); i++)
         {
             for(int j = -core->GetsizeOfMapArea().Height(); j <= core->GetsizeOfMapArea().Height(); j++)
@@ -240,6 +278,7 @@ namespace mapcontrol
                         core->tileRect.SetX(core->GettilePoint().X()*core->tileRect.Width());
                         core->tileRect.SetY(core->GettilePoint().Y()*core->tileRect.Height());
                         core->tileRect.Offset(core->GetrenderOffset());
+                        qDebug()<<core->GetrenderOffset().ToString();
 
                         if(core->GetCurrentRegion().IntersectsWith(core->tileRect))
                         {
@@ -276,7 +315,7 @@ namespace mapcontrol
                             }
 
                             // add text if tile is missing
-                            if(!found)
+                            if(false)
                             {
 
                                 painter->fillRect(QRectF(core->tileRect.X(), core->tileRect.Y(), core->tileRect.Width(), core->tileRect.Height()),config->EmptytileBrush);
@@ -296,6 +335,7 @@ namespace mapcontrol
                 }
             }
         }
+        // painter->drawRect(core->GetrenderOffset().X()-lastimagepoint.X()-3,core->GetrenderOffset().Y()-lastimagepoint.Y()-3,lastimage.width(),lastimage.height());
     }
     core::Point MapGraphicItem::FromLatLngToLocal(internals::PointLatLng const& point)
     {
@@ -369,6 +409,10 @@ namespace mapcontrol
     }
     void MapGraphicItem::SetZoomStep(int const& value)
     {
+        if(value-core->Zoom()==1 && value<= MaxZoom())
+            ConstructLastImage();
+        else
+            lastimage=QImage();
         if(value > MaxZoom())
         {
             core->SetZoom(MaxZoom());

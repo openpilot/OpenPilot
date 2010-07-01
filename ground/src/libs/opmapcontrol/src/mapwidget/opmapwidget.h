@@ -202,7 +202,7 @@ namespace mapcontrol
         void SetUseOpenGL(bool const& value);
 
         MapType::Types GetMapType(){return map->core->GetMapType();}
-        void SetMapType(MapType::Types const& value){map->core->SetMapType(value);}
+        void SetMapType(MapType::Types const& value){map->lastimage=QImage(); map->core->SetMapType(value);}
 
         bool isStarted(){return map->core->isStarted();}
 
@@ -303,6 +303,8 @@ namespace mapcontrol
         void WPRenumber(WayPointItem* item,int const& newnumber);
 
         void SetShowCompass(bool const& value);
+
+        QImage X(){map->ConstructLastImage(); return map->lastimage;}
 
     private:
         internals::Core *core;

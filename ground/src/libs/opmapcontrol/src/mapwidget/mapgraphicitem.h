@@ -91,6 +91,10 @@ namespace mapcontrol
         */
         bool IsDragging()const{return core->IsDragging();}
 
+        QImage lastimage;
+        core::Point lastimagepoint;
+        void paintImage(QPainter* painter);
+        void ConstructLastImage();
     protected:
         void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );
         void mousePressEvent ( QGraphicsSceneMouseEvent * event );
@@ -111,13 +115,15 @@ namespace mapcontrol
         */
         void SetZoomStep(int const& value);
 
+
+
     private:
 
         internals::Core *core;
         Configuration *config;
         bool showTileGridLines;
         qreal MapRenderTransform;
-        void DrawMap2D(QPainter *painter);
+        void DrawMap2D(QPainter *painter,bool ToImage);
 
         /**
         * @brief Maximum possible zoom

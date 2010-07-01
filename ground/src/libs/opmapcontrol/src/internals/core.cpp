@@ -46,6 +46,11 @@ namespace internals {
         CanDragMap=true;
         tilesToload=0;
     }
+    Core::~Core()
+    {
+        ProcessLoadTaskCallback.waitForDone();
+    }
+
     void Core::run()
     {
 #ifdef DEBUG_CORE
@@ -214,6 +219,7 @@ namespace internals {
     }
     void Core::SetZoom(const int &value)
     {
+        bool grow=false;
         if (zoom!=value && !isDragging)
         {
             zoom=value;

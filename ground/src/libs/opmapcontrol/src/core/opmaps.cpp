@@ -49,7 +49,7 @@ namespace core {
 
     OPMaps::~OPMaps()
     {
-        //delete Proxy;
+        TileDBcacheQueue.wait();
     }
 
 
@@ -114,7 +114,8 @@ namespace core {
                 QString url=MakeImageUrl(type,pos,zoom,LanguageStr);
 #ifdef DEBUG_TIMINGS
                 qDebug()<<"opmaps after make image url"<<time.elapsed();
-#endif
+#endif		//url	"http://vec02.maps.yandex.ru/tiles?l=map&v=2.10.2&x=7&y=5&z=3"	string
+//"http://map3.pergo.com.tr/tile/02/000/000/007/000/000/002.png"
                 qheader.setUrl(QUrl(url));
                 qheader.setRawHeader("User-Agent",UserAgent);
                 qheader.setRawHeader("Accept","*/*");

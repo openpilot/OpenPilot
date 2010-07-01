@@ -35,6 +35,10 @@ TileCacheQueue::TileCacheQueue()
 {
 
 }
+TileCacheQueue::~TileCacheQueue()
+{
+   // QThread::wait(10000);
+}
 
 void TileCacheQueue::EnqueueCacheTask(CacheItemQueue *task)
 {
@@ -54,7 +58,7 @@ void TileCacheQueue::EnqueueCacheTask(CacheItemQueue *task)
 #ifdef DEBUG_TILECACHEQUEUE
             qDebug()<<"Wake Thread";
 #endif //DEBUG_TILECACHEQUEUE
-            wait.wakeOne();
+            waitc.wakeOne();
         }
         else
         {
@@ -93,7 +97,7 @@ void TileCacheQueue::run()
         else
         {
             waitmutex.lock();
-            if(!wait.wait(&waitmutex,4444))
+            if(!waitc.wait(&waitmutex,4444))
 
             {
 #ifdef DEBUG_TILECACHEQUEUE

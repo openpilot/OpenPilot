@@ -72,6 +72,7 @@ class Core:public QObject,public QRunnable
     friend class mapcontrol::MapGraphicItem;
 public:
     Core();
+    ~Core();
     void run();
     PointLatLng CurrentPosition()const{return currentPosition;};
     void SetCurrentPosition(const PointLatLng &value);

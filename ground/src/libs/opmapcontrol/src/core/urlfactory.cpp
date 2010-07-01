@@ -515,12 +515,12 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type,const Point &pos,con
 
             //               string x = pos.X().ToString("000000000").Insert(3, "/").Insert(7, "/"); // - 000/000/001
             //               string y = pos.Y().ToString("000000000").Insert(3, "/").Insert(7, "/"); // - 000/000/000
-            QString x=QString("%1").arg(pos.X(),9,(QChar)'0');
+            QString x=QString("%1").arg(QString::number(pos.X()),9,(QChar)'0');
             x.insert(3,"/").insert(7,"/");
-            QString y=QString("%1").arg(pos.X(),9,(QChar)'0');
+            QString y=QString("%1").arg(QString::number(pos.Y()),9,(QChar)'0');
             y.insert(3,"/").insert(7,"/");
-
-            return QString("http://map%1.pergo.com.tr/tile/%2/%3/%4.png").arg(GetServerNum(pos, 4),2,10,(QChar)'0').arg(zoom).arg(x).arg(y);
+//"http://map03.pergo.com.tr/tile/2/000/000/003/000/000/002.png"
+            return QString("http://map%1.pergo.com.tr/tile/%2/%3/%4.png").arg(GetServerNum(pos, 4)).arg(zoom,2,10,(QChar)'0').arg(x).arg(y);
         }
         break;
     case MapType::SigPacSpainMap:
@@ -535,7 +535,7 @@ QString UrlFactory::MakeImageUrl(const MapType::Types &type,const Point &pos,con
 
             //http://vec01.maps.yandex.ru/tiles?l=map&v=2.10.2&x=1494&y=650&z=11
 
-            return QString("http://%10%2.maps.yandex.ru/tiles?l=map&v=%3&x=%4&y=%5&z=%6").arg(server).arg(GetServerNum(pos, 4)+1).arg(VersionYandexMap).arg(pos.X()).arg(pos.Y()).arg(zoom);
+            return QString("http://%1").arg(server)+QString("0%2.maps.yandex.ru/tiles?l=map&v=%3&x=%4&y=%5&z=%6").arg(GetServerNum(pos, 4)+1).arg(VersionYandexMap).arg(pos.X()).arg(pos.Y()).arg(zoom);
         }
         break;
     default:

@@ -33,6 +33,7 @@
 #include <QList>
 #include "../core/point.h"
 #include "debugheader.h"
+#include <QBuffer>
 namespace internals {
 class TileMatrix
 {
@@ -43,6 +44,7 @@ public:
     Tile* TileAt(const core::Point &p);
     void SetTileAt(const core::Point &p,Tile* tile);
     int count()const{return matrix.count();}
+   // void RebuildToUpperZoom();
 protected:
     QHash<core::Point,Tile*> matrix;
     QList<core::Point> removals;

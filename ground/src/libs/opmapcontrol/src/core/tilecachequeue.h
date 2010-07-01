@@ -45,7 +45,7 @@ namespace core {
         Q_OBJECT
     public:
         TileCacheQueue();
-
+        ~TileCacheQueue();
         void EnqueueCacheTask(CacheItemQueue *task);
 
     protected:
@@ -54,7 +54,7 @@ namespace core {
         void run();
         QMutex mutex;
         QMutex waitmutex;
-        QWaitCondition wait;
+        QWaitCondition waitc;
     };
 }
 #endif // TILECACHEQUEUE_H

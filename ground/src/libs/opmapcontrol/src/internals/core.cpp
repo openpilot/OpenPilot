@@ -219,7 +219,6 @@ namespace internals {
     }
     void Core::SetZoom(const int &value)
     {
-        bool grow=false;
         if (zoom!=value && !isDragging)
         {
             zoom=value;

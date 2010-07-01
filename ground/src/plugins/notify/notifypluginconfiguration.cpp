@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       NotifyPluginConfiguration.cpp
+ * @file       notifyPluginConfiguration.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Airspeed Plugin Gadget configuration
+ * @brief      Notify Plugin configuration
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   Airspeed
+ * @defgroup   notifyplugin
  * @{
  *
  *****************************************************************************/
@@ -39,7 +39,8 @@ NotifyPluginConfiguration::NotifyPluginConfiguration(QObject *parent) :
 	sound1(""),
 	sound2(""),
 	sayOrder("Never"),
-	spinBoxValue(0)
+	spinBoxValue(0),
+	repeatString("Continue")
 {
 
 }
@@ -56,7 +57,7 @@ void NotifyPluginConfiguration::saveState(QSettings* settings) const
 	settings->setValue(QLatin1String("Sound1"), getSound1());
 	settings->setValue(QLatin1String("Sound2"), getSound2());
 	settings->setValue(QLatin1String("SayOrder"), getSayOrder());
-
+	settings->setValue(QLatin1String("Repeat"), getRepeatFlag());
 }
 
 void NotifyPluginConfiguration::restoreState(QSettings* settings)
@@ -71,6 +72,7 @@ void NotifyPluginConfiguration::restoreState(QSettings* settings)
 	setSound2(settings->value(QLatin1String("Sound2"), tr("")).toString());
 	setSayOrder(settings->value(QLatin1String("SayOrder"), tr("")).toString());
 	setSpinBoxValue(settings->value(QLatin1String("ValueSpinBox"), tr("")).toDouble());
+	setRepeatFlag(settings->value(QLatin1String("Repeat"), tr("")).toString());
 }
 
 
@@ -136,11 +138,11 @@ QString NotifyPluginConfiguration::parseNotifyMessage()
 
 		if((numberParts.at(0).size()==1) || (numberParts.at(0).toInt()<20))
 		{
-			if(numberParts.at(0)!="0")
+			//if(numberParts.at(0)!="0")
 				numberFiles.append(numberParts.at(0));
 		} else {
 			int i=0;
-			if(numberParts.at(0).right(2).toInt()<20) {
+			if(numberParts.at(0).right(2).toInt()<20 && numberParts.at(0).right(2).toInt()!=0) {
 				if(numberParts.at(0).right(2).toInt()<10)
 					numberFiles.append(numberParts.at(0).right(1));
 				else
@@ -165,10 +167,13 @@ QString NotifyPluginConfiguration::parseNotifyMessage()
 
 		if(numberParts.size()>1) {
 			numberFiles.append("point");
-			if((numberParts.at(1).size()==1)  || (numberParts.at(1).toInt()<20))
+			if((numberParts.at(1).size()==1)  /*|| (numberParts.at(1).toInt()<20)*/)
 				numberFiles.append(numberParts.at(1));
 			else {
-				numberFiles.append(numberParts.at(1).left(1)+'0');
+				if(numberParts.at(1).left(1)=="0")
+					numberFiles.append(numberParts.at(1).left(1));
+				else
+					numberFiles.append(numberParts.at(1).left(1)+'0');
 				numberFiles.append(numberParts.at(1).right(1));
 			}
 		}

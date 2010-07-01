@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       NotifyPlugingadget.h
- * @author     David "Buzz" Carlson Copyright (C) 2010.
+ * @file       notifyplugingadget.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   NotifyPlugin
+ * @defgroup   notifyplugin
  * @{
  *
  *****************************************************************************/

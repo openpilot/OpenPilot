@@ -2,10 +2,10 @@
  ******************************************************************************
  *
  * @file       notifypluginfactory.cpp
- * @author     David "Buzz" Carlson Copyright (C) 2010.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   airspeed
+ * @defgroup   notifyplugin
  * @{
  *
  *****************************************************************************/

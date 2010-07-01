@@ -1,12 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       donothingplugin.cpp
+ * @file       notifyplugin.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
  * @brief      
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   donothingplugin
+ * @defgroup   notifyplugin
  * @{
  * 
  *****************************************************************************/
@@ -67,9 +66,9 @@ void SoundNotifyPlugin::extensionsInitialized()
 	int size = settings->beginReadArray("listNotifies");
 	for (int i = 0; i < size; ++i) {
 		 settings->setArrayIndex(i);
-		 notify = new NotifyPluginConfiguration;
-		 notify->restoreState(settings);
-		 lstNotifications.append(notify);
+		 NotifyPluginConfiguration* notification = new NotifyPluginConfiguration;
+		 notification->restoreState(settings);
+		 lstNotifications.append(notification);
 	}
 	settings->endArray();
 	setEnableSound(settings->value(QLatin1String("EnableSound"),0).toBool());
@@ -95,28 +94,41 @@ void SoundNotifyPlugin::connectNotifications()
 	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 	UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
-	QList<Phonon::MediaObject*> deleteList = mapMediaObjects.values();
-	if(!deleteList.isEmpty())
-		foreach(Phonon::MediaObject* mediaObj,deleteList)
-			delete mediaObj;
+	lstNotifiedUAVObjects.clear();
+
+//	QList<Phonon::MediaObject*> deleteList = mapMediaObjects.values();
+//	if(!deleteList.isEmpty())
+//		foreach(Phonon::MediaObject* mediaObj,deleteList)
+//			delete mediaObj;
 
 	// Check validity of arguments first, reject empty args and unknown fields.
 	foreach(NotifyPluginConfiguration* notify,lstNotifications) {
 		UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(notify->getDataObject()) );
 		if (obj != NULL ) {
-			std::cout << "Connected Object (" << notify->getDataObject().toStdString() << ")." << std::endl;
-			connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(playNotification(UAVObject*)));
-			lstNotifiedUAVObjects.append(obj);
-			notify->parseNotifyMessage();
-			mediaSource = notify->getNotifyMessageList();
-			lstMediaSource.append(new QList<Phonon::MediaSource>);
-			foreach(QString item, mediaSource)
-					lstMediaSource.last()->append(Phonon::MediaSource(item));
+			if(!lstNotifiedUAVObjects.contains(obj))
+			{
+				lstNotifiedUAVObjects.append(obj);
+				connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(playNotification(UAVObject*)));
+			}
+			//lstMediaSource.append(new QList<Phonon::MediaSource>);
 
-			// set notification message to current event
-			mapMediaObjects[obj->getName()] = new Phonon::MediaObject;
-			mapMediaObjects[obj->getName()] = Phonon::createPlayer(Phonon::NotificationCategory);
-			mapMediaObjects[obj->getName()]->setQueue(*lstMediaSource.last());
+			QMap<QString, PhononObject>::const_iterator iter = mapMediaObjects.find(obj->getName());
+			if(iter==mapMediaObjects.end()) {
+				// set notification message to current event
+				mapMediaObjects[obj->getName()].mo = new Phonon::MediaObject;
+				mapMediaObjects[obj->getName()].mo = Phonon::createPlayer(Phonon::NotificationCategory);
+				mapMediaObjects[obj->getName()].ms = new QList<Phonon::MediaSource>;
+				mapMediaObjects[obj->getName()].mo->clear();
+			}
+
+//			notify->parseNotifyMessage();
+//			foreach(QString item, notify->getNotifyMessageList())
+//			{
+//				mapMediaObjects[obj->getName()].ms->clear();
+//				mapMediaObjects[obj->getName()].ms->append(Phonon::MediaSource(item));
+//			}
+
+			//mapMediaObjects[obj->getName()].ms = lstMediaSource.last();
 		} else {
 			std::cout << "Error: Object is unknown (" << notify->getDataObject().toStdString() << ")." << std::endl;
 		}
@@ -128,42 +140,56 @@ void SoundNotifyPlugin::playNotification(UAVObject *object)
 	UAVObjectField* field;
 	double threshold;
 	QString direction;
+	QString fieldName;
 	bool play = false;
+	NotifyPluginConfiguration* notification;
 
-	foreach(NotifyPluginConfiguration* notify, lstNotifications) {
-		if(object->getName()==notify->getDataObject()) {
-			QString fld = notify->getObjectField();
-			field = object->getField(fld);
-			threshold = notify->getSpinBoxValue();
-			direction = notify->getValue();
-		}
-	}
-
-	if (field) {
-		switch(direction[0].toAscii())
-		{
-		case 'E':
-			if(field->getDouble()==threshold)
-				play = true;
-			break;
-		case 'G':
-			if(field->getDouble()>threshold)
-				play = true;
-			break;
-		case 'L':
-			if(field->getDouble()<threshold)
-				play = true;
-			break;
+	foreach(notification, lstNotifications) {
+		if(object->getName()==notification->getDataObject()) {
+			fieldName = notification->getObjectField();
+			field = object->getField(fieldName);
+			threshold = notification->getSpinBoxValue();
+			direction = notification->getValue();
 		}
 
-		if(play)
-		{
-			if((mapMediaObjects[object->getName()]->state()==Phonon::PausedState) ||
-			   (mapMediaObjects[object->getName()]->state()==Phonon::StoppedState))
+		if (field) {
+			double value = field->getDouble();
+			//qDebug() << fieldName << " - value - " << value;
+
+			switch(direction[0].toAscii())
 			{
-				mapMediaObjects[object->getName()]->clear();
-				mapMediaObjects[object->getName()]->setQueue(*lstMediaSource.last());
-				mapMediaObjects[object->getName()]->play();
+			case 'E':
+				if(value==threshold)
+					play = true;
+				break;
+			case 'G':
+				if(value>threshold)
+					play = true;
+				break;
+			case 'L':
+				if(value<threshold)
+					play = true;
+				break;
+			}
+
+			if(play)
+			{
+				play = false;
+				if((mapMediaObjects[object->getName()].mo->state()==Phonon::PausedState) ||
+				   (mapMediaObjects[object->getName()].mo->state()==Phonon::StoppedState))
+				{
+					qDebug() << fieldName << " - value - " << value;
+					mapMediaObjects[object->getName()].mo->clear();
+					mapMediaObjects[object->getName()].ms->clear();
+					notification->parseNotifyMessage();
+					foreach(QString item, notification->getNotifyMessageList())
+						mapMediaObjects[object->getName()].ms->append(Phonon::MediaSource(item));
+					mapMediaObjects[object->getName()].mo->setQueue(*mapMediaObjects[object->getName()].ms);
+					mapMediaObjects[object->getName()].mo->play();
+					if(notification->getRepeatFlag()=="Once")
+						lstNotifications.removeOne(notification);
+					break;
+				}
 			}
 		}
 	}

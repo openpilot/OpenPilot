@@ -44,6 +44,10 @@
       <property name="text">
        <string>Play</string>
       </property>
+      <property name="icon">
+       <iconset resource="res.qrc">
+        <normaloff>:/notify/images/play.png</normaloff>:/notify/images/play.png</iconset>
+      </property>
      </widget>
     </item>
     <item row="2" column="12">
@@ -161,6 +165,10 @@
      <widget class="QPushButton" name="buttonTestSound1">
       <property name="text">
        <string>Play</string>
+      </property>
+      <property name="icon">
+       <iconset resource="res.qrc">
+        <normaloff>:/notify/images/play.png</normaloff>:/notify/images/play.png</iconset>
       </property>
      </widget>
     </item>
@@ -288,22 +296,22 @@ p, li { white-space: pre-wrap; }
      </size>
     </property>
     <property name="editTriggers">
-     <set>QAbstractItemView::NoEditTriggers</set>
+     <set>QAbstractItemView::DoubleClicked</set>
     </property>
     <property name="selectionBehavior">
      <enum>QAbstractItemView::SelectRows</enum>
     </property>
     <property name="columnCount">
-     <number>1</number>
+     <number>2</number>
     </property>
     <attribute name="horizontalHeaderVisible">
-     <bool>false</bool>
+     <bool>true</bool>
     </attribute>
     <attribute name="horizontalHeaderDefaultSectionSize">
-     <number>300</number>
+     <number>200</number>
     </attribute>
     <attribute name="horizontalHeaderMinimumSectionSize">
-     <number>200</number>
+     <number>100</number>
     </attribute>
     <attribute name="verticalHeaderVisible">
      <bool>true</bool>
@@ -315,6 +323,7 @@ p, li { white-space: pre-wrap; }
      <bool>true</bool>
     </attribute>
     <column/>
+    <column/>
    </widget>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
@@ -322,7 +331,7 @@ p, li { white-space: pre-wrap; }
       <x>10</x>
       <y>180</y>
       <width>481</width>
-      <height>25</height>
+      <height>26</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -350,6 +359,10 @@ p, li { white-space: pre-wrap; }
       <widget class="QPushButton" name="buttonPlayNotification">
        <property name="text">
         <string>Play</string>
+       </property>
+       <property name="icon">
+        <iconset resource="res.qrc">
+         <normaloff>:/notify/images/play.png</normaloff>:/notify/images/play.png</iconset>
        </property>
       </widget>
      </item>
@@ -384,6 +397,10 @@ p, li { white-space: pre-wrap; }
        <property name="text">
         <string>Add</string>
        </property>
+       <property name="icon">
+        <iconset resource="res.qrc">
+         <normaloff>:/notify/images/add.png</normaloff>:/notify/images/add.png</iconset>
+       </property>
       </widget>
      </item>
      <item>
@@ -391,12 +408,20 @@ p, li { white-space: pre-wrap; }
        <property name="text">
         <string>Modify</string>
        </property>
+       <property name="icon">
+        <iconset resource="res.qrc">
+         <normaloff>:/notify/images/modify.png</normaloff>:/notify/images/modify.png</iconset>
+       </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="buttonDelete">
        <property name="text">
         <string>Delete</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../libs/utils/utils.qrc">
+         <normaloff>:/utils/images/removesubmitfield.png</normaloff>:/utils/images/removesubmitfield.png</iconset>
        </property>
       </widget>
      </item>
@@ -471,7 +496,10 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../libs/utils/utils.qrc"/>
+  <include location="res.qrc"/>
+ </resources>
  <connections/>
  <slots>
   <slot>addNewNotification()</slot>

@@ -3,9 +3,9 @@
  *
  * @file       notifypluginoptionspage.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Sound Notify Plugin options page
+ * @brief      Notify Plugin options page
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   Airspeed
+ * @defgroup   notifyplugin
  * @{
  *
  *****************************************************************************/
@@ -40,7 +40,7 @@
 #include <QBuffer>
 
 #include "notifyplugin.h"
-
+#include "notifyitemdelegate.h"
 
 NotifyPluginOptionsPage::NotifyPluginOptionsPage(/*NotifyPluginConfiguration *config,*/ QObject *parent) :
 		IOptionsPage(parent),
@@ -61,37 +61,34 @@ QWidget *NotifyPluginOptionsPage::createPage(QWidget *parent)
 	QWidget *optionsPageWidget = new QWidget;
 	//main layout
 	options_page->setupUi(optionsPageWidget);
+	delegateItems.clear();
+	delegateItems << "Continue" << "Once";
 
 	options_page->chkEnableSound->setChecked(owner->getEnableSound());
 	options_page->SoundDirectoryPathChooser->setExpectedKind(Utils::PathChooser::Directory);
 	options_page->SoundDirectoryPathChooser->setPromptDialogTitle(tr("Choose sound collection directory"));
+//	connect(options_page->tableNotifications->model(),SIGNAL(rowsInserted ( const QModelIndex & , int , int )),this,
+//			SLOT(showPersistentComboBox ( const QModelIndex & , int , int )));
+//	connect(options_page->tableNotifications->model(),SIGNAL(dataChanged ( const QModelIndex & , const QModelIndex & )),this,
+//			SLOT(showPersistentComboBox2( const QModelIndex & , const QModelIndex & )));
+
+
 	options_page->tableNotifications->setRowCount(0);
+	options_page->tableNotifications->setItemDelegate(new NotifyItemDelegate(delegateItems,options_page->tableNotifications));
+
+	QStringList labels;
+	labels << "Name" << "Repeats";
+	options_page->tableNotifications->setHorizontalHeaderLabels(labels);
 	privListNotifications.clear();
 	listSoundFiles.clear();
 
 	settings = Core::ICore::instance()->settings();
 	settings->beginGroup(QLatin1String("NotifyPlugin"));
 
-	int size = settings->beginReadArray("listNotifies");
-	for (int i = 0; i < size; ++i) {
-		 settings->setArrayIndex(i);
-		 notify = new NotifyPluginConfiguration;
-		 notify->restoreState(settings);
-		 privListNotifications.append(notify);
-	}
-	settings->endArray();
-
-	settings->beginReadArray("Current");
-	settings->setArrayIndex(0);
-	notify = new NotifyPluginConfiguration;
-	notify->restoreState(settings);
-	settings->endArray();
-	options_page->chkEnableSound->setChecked(settings->value(QLatin1String("EnableSound"),0).toBool());
-	settings->endGroup();
-
-	// Fills the combo boxes for the UAVObjects
 	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 	objManager = pm->getObject<UAVObjectManager>();
+
+	// Fills the combo boxes for the UAVObjects
 	QList< QList<UAVDataObject*> > objList = objManager->getDataObjects();
 	foreach (QList<UAVDataObject*> list, objList) {
 		foreach (UAVDataObject* obj, list) {
@@ -112,9 +109,23 @@ QWidget *NotifyPluginOptionsPage::createPage(QWidget *parent)
 	connect(options_page->UAVObject, SIGNAL(currentIndexChanged(QString)), this, SLOT(on_UAVObject_indexChanged(QString)));
 	connect(this, SIGNAL(updateNotifications()), owner, SLOT(connectNotifications()));
 
-	//connect(options_page->chkEnableSound, SIGNAL(stateChanged(int)), this, SLOT(enableSound(int)));
+	int size = settings->beginReadArray("listNotifies");
+	for (int i = 0; i < size; ++i) {
+		 settings->setArrayIndex(i);
+		 NotifyPluginConfiguration* notification = new NotifyPluginConfiguration;
+		 notification->restoreState(settings);
+		 privListNotifications.append(notification);
+	}
+	settings->endArray();
 
-	updateConfigView(notify);
+	settings->beginReadArray("Current");
+	settings->setArrayIndex(0);
+	NotifyPluginConfiguration notification;
+	notification.restoreState(settings);
+	updateConfigView(&notification);
+	settings->endArray();
+	options_page->chkEnableSound->setChecked(settings->value(QLatin1String("EnableSound"),0).toBool());
+	settings->endGroup();
 
 	foreach(NotifyPluginConfiguration* notification,privListNotifications)
 	{
@@ -122,7 +133,13 @@ QWidget *NotifyPluginOptionsPage::createPage(QWidget *parent)
 		options_page->tableNotifications->setItem (options_page->tableNotifications->rowCount()-1,0,
 											   new QTableWidgetItem(notification->parseNotifyMessage()));
 
+		QString str = notification->getRepeatFlag();
+		options_page->tableNotifications->setItem (options_page->tableNotifications->rowCount()-1,1,
+											   new QTableWidgetItem(str));
+
+
 	}
+
 	options_page->buttonModify->setEnabled(false);
 	options_page->buttonDelete->setEnabled(false);
 	options_page->buttonPlayNotification->setEnabled(false);
@@ -143,17 +160,38 @@ QWidget *NotifyPluginOptionsPage::createPage(QWidget *parent)
 	return optionsPageWidget;
 }
 
-void NotifyPluginOptionsPage::getOptionsPageValues()
+void NotifyPluginOptionsPage::showPersistentComboBox( const QModelIndex & parent, int start, int end )
 {
-	notify->setSoundCollectionPath(options_page->SoundDirectoryPathChooser->path());
-	notify->setCurrentLanguage(options_page->SoundCollectionList->currentText());
-	notify->setDataObject(options_page->UAVObject->currentText());
-	notify->setObjectField(options_page->UAVObjectField->currentText());
-	notify->setSound1(options_page->Sound1->currentText());
-	notify->setSound2(options_page->Sound2->currentText());
-	notify->setSayOrder(options_page->SayOrder->currentText());
-	notify->setValue(options_page->Value->currentText());
-	notify->setSpinBoxValue(options_page->ValueSpinBox->value());
+//	for (int i=start; i<end+1; i++) {
+//		options_page->tableNotifications->openPersistentEditor(options_page->tableNotifications->item(i,1));
+//	}
+}
+
+void NotifyPluginOptionsPage::showPersistentComboBox2( const QModelIndex & topLeft, const QModelIndex & bottomRight )
+{
+	//for (QModelIndex i=topLeft; i<bottomRight+1; i++)
+	{
+		options_page->tableNotifications->openPersistentEditor(options_page->tableNotifications->item(options_page->tableNotifications->currentRow(),1));
+	}
+}
+
+
+void NotifyPluginOptionsPage::getOptionsPageValues(NotifyPluginConfiguration* notification)
+{
+	notification->setSoundCollectionPath(options_page->SoundDirectoryPathChooser->path());
+	notification->setCurrentLanguage(options_page->SoundCollectionList->currentText());
+	notification->setDataObject(options_page->UAVObject->currentText());
+	notification->setObjectField(options_page->UAVObjectField->currentText());
+	notification->setSound1(options_page->Sound1->currentText());
+	notification->setSound2(options_page->Sound2->currentText());
+	notification->setSayOrder(options_page->SayOrder->currentText());
+	notification->setValue(options_page->Value->currentText());
+	notification->setSpinBoxValue(options_page->ValueSpinBox->value());
+	if(options_page->tableNotifications->currentRow()>-1)
+	{
+		qDebug() << "delegate value:" << options_page->tableNotifications->item(options_page->tableNotifications->currentRow(),1)->data(Qt::EditRole);
+		notification->setRepeatFlag(options_page->tableNotifications->item(options_page->tableNotifications->currentRow(),1)->data(Qt::EditRole).toString());
+	}
 }
 
 ////////////////////////////////////////////
@@ -164,13 +202,15 @@ void NotifyPluginOptionsPage::getOptionsPageValues()
 ////////////////////////////////////////////
 void NotifyPluginOptionsPage::apply()
 {
+	NotifyPluginConfiguration notification;
+
 	settings->beginGroup(QLatin1String("NotifyPlugin"));
 
-	getOptionsPageValues();
+	getOptionsPageValues(&notification);
 
 	settings->beginWriteArray("Current");
 	settings->setArrayIndex(0);
-	notify->saveState(settings);
+	notification.saveState(settings);
 	settings->endArray();
 
 	//settings->remove("listNotifies");
@@ -184,13 +224,13 @@ void NotifyPluginOptionsPage::apply()
 		settings->setArrayIndex(i);
 		privListNotifications.at(i)->saveState(settings);
 	}
-	owner->setListNotifications(privListNotifications);
 	settings->endArray();
-	owner->setEnableSound(options_page->chkEnableSound->isChecked());
 	settings->setValue(QLatin1String("EnableSound"), options_page->chkEnableSound->isChecked());
 	settings->endGroup();
 
-	//emit updateNotifications();
+	owner->setEnableSound(options_page->chkEnableSound->isChecked());
+	owner->setListNotifications(privListNotifications);
+	emit updateNotifications();
 }
 
 void NotifyPluginOptionsPage::finish()
@@ -252,31 +292,43 @@ void  NotifyPluginOptionsPage::changeButtonText(Phonon::State newstate, Phonon::
 {
 	if(sender()==sound1)
 	{
-		if(newstate  == Phonon::PausedState)
+		if(newstate  == Phonon::PausedState) {
 			options_page->buttonTestSound1->setText("Play");
+			options_page->buttonTestSound1->setIcon(QPixmap(":/notify/images/play.png"));
+		}
 		else
-			if(newstate  == Phonon::PlayingState)
+			if(newstate  == Phonon::PlayingState) {
 				options_page->buttonTestSound1->setText("Stop");
+				options_page->buttonTestSound1->setIcon(QPixmap(":/notify/images/stop.png"));
+			}
 	}
 	else
 	{
 		if(sender()==sound2)
 		{
-			if(newstate  == Phonon::PausedState)
+			if(newstate  == Phonon::PausedState) {
 				options_page->buttonTestSound2->setText("Play");
+				options_page->buttonTestSound2->setIcon(QPixmap(":/notify/images/play.png"));
+			}
 			else
-				if(newstate  == Phonon::PlayingState)
+				if(newstate  == Phonon::PlayingState) {
 					options_page->buttonTestSound2->setText("Stop");
+					options_page->buttonTestSound2->setIcon(QPixmap(":/notify/images/stop.png"));
+				}
 		}
 		else
 		{
 			if(sender()==notifySound)
 			{
-				if(newstate  == Phonon::PausedState)
+				if(newstate  == Phonon::PausedState){
 					options_page->buttonPlayNotification->setText("Play");
+					options_page->buttonPlayNotification->setIcon(QPixmap(":/notify/images/play.png"));
+				}
 				else
-					if(newstate  == Phonon::PlayingState)
+					if(newstate  == Phonon::PlayingState) {
 						options_page->buttonPlayNotification->setText("Stop");
+						options_page->buttonPlayNotification->setIcon(QPixmap(":/notify/images/stop.png"));
+					}
 			}
 		}
 	}
@@ -318,11 +370,12 @@ void NotifyPluginOptionsPage::on_buttonTestSound2_clicked()
 void NotifyPluginOptionsPage::on_buttonTestSoundNotification_clicked()
 {
 	QList <Phonon::MediaSource> messageNotify;
+	NotifyPluginConfiguration* notification = new NotifyPluginConfiguration;
 	//getOptionsPageValues();
 	if(options_page->tableNotifications->currentRow()==-1) return;
-	notify = privListNotifications.at(options_page->tableNotifications->currentRow());
-	notify->parseNotifyMessage();
-	QStringList stringList = notify->getNotifyMessageList();
+	notification = privListNotifications.at(options_page->tableNotifications->currentRow());
+	notification->parseNotifyMessage();
+	QStringList stringList = notification->getNotifyMessageList();
 	foreach(QString item, stringList)
 		messageNotify.append(Phonon::MediaSource(item));
 	notifySound->clear();
@@ -352,8 +405,14 @@ void NotifyPluginOptionsPage::on_chkEnableSound_toggled(bool state)
 
 void NotifyPluginOptionsPage::updateConfigView(NotifyPluginConfiguration* notification)
 {
-
-	options_page->SoundDirectoryPathChooser->setPath(notification->getSoundCollectionPath());
+	QString path = notification->getSoundCollectionPath();
+	if(path=="")
+	{
+		//QDir dir = QDir::currentPath();
+		//path = QDir::currentPath().left(QDir::currentPath().indexOf("OpenPilot",0,Qt::CaseSensitive))+"../share/sounds";
+		path = "../share/sounds";
+	}
+	options_page->SoundDirectoryPathChooser->setPath(path);
 
 	if(options_page->SoundCollectionList->findText(notification->getCurrentLanguage())!=-1){
 		options_page->SoundCollectionList->setCurrentIndex(options_page->SoundCollectionList->findText(notification->getCurrentLanguage()));
@@ -368,7 +427,8 @@ void NotifyPluginOptionsPage::updateConfigView(NotifyPluginConfiguration* notifi
 
 	// Now load the object field values:
 	options_page->UAVObjectField->clear();
-	UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(notification->getDataObject()/*objList.at(0).at(0)->getName()*/) );
+	QString uavDataObject = notification->getDataObject();
+	UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(uavDataObject/*objList.at(0).at(0)->getName()*/) );
 	if (obj != NULL ) {
 		QList<UAVObjectField*> fieldList = obj->getFields();
 		foreach (UAVObjectField* field, fieldList) {
@@ -393,7 +453,7 @@ void NotifyPluginOptionsPage::updateConfigView(NotifyPluginConfiguration* notifi
 		//options_page->Sound1->setCurrentIndex(-1);
 	}
 
-	if(options_page->Sound2->findText(notification->getSound2())!=-1){
+	if(options_page->Sound2->findText(notification->getSound2())!=-1) {
 		options_page->Sound2->setCurrentIndex(options_page->Sound2->findText(notification->getSound2()));
 	}
 	else
@@ -405,11 +465,12 @@ void NotifyPluginOptionsPage::updateConfigView(NotifyPluginConfiguration* notifi
 		// don't show item if it wasn't find in stored location
 		//options_page->Sound2->setCurrentIndex(-1);
 	}
-	if(options_page->Value->findText(notification->getValue())!=-1){
+
+	if(options_page->Value->findText(notification->getValue())!=-1) {
 		options_page->Value->setCurrentIndex(options_page->Value->findText(notification->getValue()));
 	}
 
-	if(options_page->SayOrder->findText(notification->getSayOrder())!=-1){
+	if(options_page->SayOrder->findText(notification->getSayOrder())!=-1) {
 		options_page->SayOrder->setCurrentIndex(options_page->SayOrder->findText(notification->getSayOrder()));
 	}
 	options_page->ValueSpinBox->setValue(notification->getSpinBoxValue());
@@ -417,12 +478,10 @@ void NotifyPluginOptionsPage::updateConfigView(NotifyPluginConfiguration* notifi
 
 void NotifyPluginOptionsPage::on_tableNotification_changeSelection()
 {
-	QTableWidgetItem * item = options_page->tableNotifications->currentItem();
-	//qDebug()
+	QTableWidgetItem * item = options_page->tableNotifications->item(options_page->tableNotifications->currentRow(),0);
+
 	if(!item) return;
-//	if(notify)
-//		delete notify;
-	//notify = );
+
 	updateConfigView(privListNotifications.at(item->row()));
 	options_page->buttonModify->setEnabled(item->isSelected());
 	options_page->buttonDelete->setEnabled(item->isSelected());
@@ -431,6 +490,8 @@ void NotifyPluginOptionsPage::on_tableNotification_changeSelection()
 
 void NotifyPluginOptionsPage::on_buttonAddNotification_clicked()
 {
+	NotifyPluginConfiguration* notification = new NotifyPluginConfiguration;
+
 	if(options_page->SoundDirectoryPathChooser->path()=="")
 	{
 		QPalette textPalette=options_page->SoundDirectoryPathChooser->palette();
@@ -440,31 +501,31 @@ void NotifyPluginOptionsPage::on_buttonAddNotification_clicked()
 		return;
 	}
 
-	notify->setSoundCollectionPath(options_page->SoundDirectoryPathChooser->path());
-	notify->setCurrentLanguage(options_page->SoundCollectionList->currentText());
-	notify->setDataObject(options_page->UAVObject->currentText());
-	notify->setObjectField(options_page->UAVObjectField->currentText());
-	notify->setValue(options_page->Value->currentText());
-	notify->setSpinBoxValue(options_page->ValueSpinBox->value());
+	notification->setSoundCollectionPath(options_page->SoundDirectoryPathChooser->path());
+	notification->setCurrentLanguage(options_page->SoundCollectionList->currentText());
+	notification->setDataObject(options_page->UAVObject->currentText());
+	notification->setObjectField(options_page->UAVObjectField->currentText());
+	notification->setValue(options_page->Value->currentText());
+	notification->setSpinBoxValue(options_page->ValueSpinBox->value());
 
 	if(options_page->Sound1->currentText()!="")
-		notify->setSound1(options_page->Sound1->currentText());
+		notification->setSound1(options_page->Sound1->currentText());
 
-	notify->setSound2(options_page->Sound2->currentText());
+	notification->setSound2(options_page->Sound2->currentText());
 
 	if((options_page->Sound2->currentText()=="")&&(options_page->SayOrder->currentText()=="After second"))
 		return;
 	else
-		notify->setSayOrder(options_page->SayOrder->currentText());
+		notification->setSayOrder(options_page->SayOrder->currentText());
 
 	int row = options_page->tableNotifications->rowCount();
 	options_page->tableNotifications->setRowCount(row+1);
 	row = options_page->tableNotifications->rowCount();
-	options_page->tableNotifications->setItem (row-1,0,
-											   new QTableWidgetItem(notify->parseNotifyMessage()));
+	options_page->tableNotifications->setItem (row-1,0,new QTableWidgetItem(notification->parseNotifyMessage()));
+	options_page->tableNotifications->setItem (row-1,1,new QTableWidgetItem(delegateItems.first()));
+	//options_page->tableNotifications->openPersistentEditor(options_page->tableNotifications->item(row-1,1));
 
-	privListNotifications.append(notify);
-	notify = new NotifyPluginConfiguration;
+	privListNotifications.append(notification);
 }
 
 
@@ -495,10 +556,14 @@ void NotifyPluginOptionsPage::on_buttonDeleteNotification_clicked()
 
 void NotifyPluginOptionsPage::on_buttonModifyNotification_clicked()
 {
-	QTableWidgetItem * item = options_page->tableNotifications->currentItem();
+	NotifyPluginConfiguration* notification = new NotifyPluginConfiguration;
+	//NotifyPluginConfiguration notification;
+
+	QTableWidgetItem * item = options_page->tableNotifications->item(options_page->tableNotifications->currentRow(),0);
 	if(!item) return;
-	notify = privListNotifications.at(item->row());
-	getOptionsPageValues();
-	item->setText(notify->parseNotifyMessage());
+	//notify = privListNotifications.at(item->row()); // ???
+	getOptionsPageValues(notification);
+	privListNotifications.replace(item->row(),notification);
+	item->setText(notification->parseNotifyMessage());
 }
 

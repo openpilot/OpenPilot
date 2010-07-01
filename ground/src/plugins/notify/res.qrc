@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/notify">
+        <file>images/modify.png</file>
+        <file>images/play.png</file>
+        <file>images/play2.png</file>
+        <file>images/add.png</file>
+        <file>images/delete.png</file>
+        <file>images/stop.png</file>
+    </qresource>
+</RCC>

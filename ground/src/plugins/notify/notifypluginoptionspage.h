@@ -3,9 +3,9 @@
  *
  * @file       notifypluginoptionspage.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Airspeed Plugin Gadget options page
+ * @brief      Notify Plugin options page header
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   SoundNotify
+ * @defgroup   notify
  * @{
  *
  *****************************************************************************/
@@ -68,7 +68,7 @@ public:
 	void restoreFromSettings();
 
 	void updateConfigView(NotifyPluginConfiguration* notification);
-	void getOptionsPageValues();
+	void getOptionsPageValues(NotifyPluginConfiguration* notification);
 
 private:
 	UAVObjectManager *objManager;
@@ -82,16 +82,20 @@ private:
 	Phonon::MediaObject *sound2;
 	Phonon::MediaObject *notifySound;
 	Phonon::AudioOutput *audioOutput;
+	QStringList delegateItems;
 
 	QList<NotifyPluginConfiguration*> privListNotifications;
 
 	Ui::NotifyPluginOptionsPage *options_page;
-	NotifyPluginConfiguration *notify;
+	//NotifyPluginConfiguration *notify;
 
 signals:
 	void updateNotifications();
 
 private slots:
+	void showPersistentComboBox( const QModelIndex & parent, int start, int end );
+	void showPersistentComboBox2 ( const QModelIndex & topLeft, const QModelIndex & bottomRight );
+
 	void on_buttonTestSound1_clicked();
 	void on_buttonTestSound2_clicked();
 	void on_buttonTestSoundNotification_clicked();

@@ -1,12 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       donothingplugin.h
+ * @file       notifyplugin.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
  * @brief      
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   donothingplugin
+ * @defgroup   notifyplugin
  * @{
  * 
  *****************************************************************************/
@@ -37,6 +36,11 @@
 class NotifyPluginOptionsPage;
 class NotifyPluginConfiguration;
 
+typedef struct {
+	Phonon::MediaObject* mo;
+	QList<Phonon::MediaSource>* ms;
+} PhononObject, *pPhononObject;
+
 class SoundNotifyPlugin : public ExtensionSystem::IPlugin
 { 
 	Q_OBJECT
@@ -60,7 +64,9 @@ private:
    bool enableSound;
    QList< QList<Phonon::MediaSource>* > lstMediaSource;
    QStringList mediaSource;
-   QMap<QString, Phonon::MediaObject*> mapMediaObjects;
+   //QMap<QString, Phonon::MediaObject*> mapMediaObjects;
+   QMap<QString, PhononObject> mapMediaObjects;
+
    QSettings* settings;
 
    QList<UAVDataObject*> lstNotifiedUAVObjects;
@@ -68,7 +74,7 @@ private:
    QList<NotifyPluginConfiguration*> lstNotifications;
    QString m_field;
 
-   NotifyPluginConfiguration *notify;
+
    NotifyPluginOptionsPage *mop;
 
 private slots:

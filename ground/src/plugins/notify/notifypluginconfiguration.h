@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       NotifyPluginConfiguration.h
+ * @file       notifypluginconfiguration.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Airspeed Plugin Gadget configuration
+ * @brief      Notify Plugin configuration header
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   Airspeed
+ * @defgroup   notifyplugin
  * @{
  *
  *****************************************************************************/
@@ -71,6 +71,8 @@ public:
 	QStringList getNotifyMessageList() const { return notifyMessageList; }
 	void setNotifyMessageList(QStringList text) { notifyMessageList = text; }
 
+	QString getRepeatFlag() const { return repeatString; }
+	void setRepeatFlag(QString value) { repeatString = value; }
 
 	void saveState(QSettings* settings) const;
 	void restoreState(QSettings* settings);
@@ -88,6 +90,7 @@ private:
 	QString sound2;
 	QString sayOrder;
 	double spinBoxValue;
+	QString repeatString;
 
 };
 

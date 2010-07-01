@@ -1,4 +1,4 @@
-<plugin name="NotifyPlugin" version="0.0.1" compatVersion="1.0.0">
+<plugin name="NotifyPlugin" version="1.0.0" compatVersion="1.0.0">
     <vendor>The OpenPilot Project</vendor>
     <copyright>(C) 2010 Daniel Godin</copyright>
     <license>The GNU Public License (GPL) Version 3</license>

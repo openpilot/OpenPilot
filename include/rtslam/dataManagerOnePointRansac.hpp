@@ -38,8 +38,8 @@ namespace jafar {
 				boost::shared_ptr<Detector> detector;
 				boost::shared_ptr<Matcher> matcher;
 				boost::shared_ptr<ActiveSearchGrid> asGrid;
-				// the list of observations sorted by information gain
-				typedef list<double, observation_ptr_t> ObservationListVisible;
+				// the list of visible observations to handle
+				typedef vector<observation_ptr_t> ObservationListVisible;
 				ObservationListVisible obsListVisible;
 				struct RansacSet {
 						observation_ptr_t obsBasePtr;

@@ -9,6 +9,7 @@
 #include "jmath/randomIntTmplt.hpp"
 
 #include "rtslam/dataManagerOnePointRansac.hpp"
+#include "rtslam/kalmanTools.hpp"
 
 #include "rtslam/observationAbstract.hpp"
 #include "rtslam/rawImage.hpp"
@@ -19,12 +20,12 @@ namespace jafar {
   namespace rtslam {
 
     template<class RawSpec,class SensorSpec, class Detector, class Matcher >
-    void DataManagerActiveSearch<RawSpec,SensorSpec, Detector, Matcher >::
+    void DataManagerOnePointRansac< RawSpec, SensorSpec, Detector, Matcher >::
     processKnownObs( boost::shared_ptr<RawSpec> rawData )
     {
 			int numObs = 0;
 			asGrid->renew();
-			obsListSorted.clear();
+			obsListVisible.clear();
 
 			// loop all observations
 			for (ObservationList::iterator obsIter = observationList().begin(); obsIter
@@ -34,50 +35,70 @@ namespace jafar {
 				obsPtr->clearEvents();
 				obsPtr->measurement.matchScore = 0;
 
-
 				// 1a. project
 				obsPtr->project();
+				obsPtr->events.predicted = true;
 
 				// 1b. check visibility
 				obsPtr->predictVisibility();
 
 				if (obsPtr->isVisible()) {
-
+					obsPtr->events.visible = true;
 
 					// Add to tesselation grid for active search
 					asGrid->addPixel(obsPtr->expectation.x());
 
-
-					// predict information gain
-					obsPtr->predictInfoGain();
-
-
-
-
-					// add to sorted list of observations
-					obsListSorted[obsPtr->expectation.infoGain] = obsPtr;
+					// add to list of visible observations
+					obsListVisible.push_back(obsPtr);
 
 				} // visible obs
 			} // for each obs
 
-			jmath::RandomIntVectTmplt randomizer(algorithmParams_.n_tries, 0, obsListSorted.size());
-
-			vecb matchedObs(obsListSorted.size()); // we store here the obs that have been matched (as inlier or outlier) so far.
-			matchedObs.clear();
-
+			// Select N visible observations for RANSAC tries:
+			jmath::RandomIntVectTmplt randomizer(algorithmParams_.n_tries, 0, obsListVisible.size());
 			tries = randomizer.getDifferent(); // Get n_tries indices to selected obs.
 
-			for (size_t i = 0; i << algorithmParams_.n_tries; i++){
+			// we store here the obs that have been matched (as inlier or outlier) so far.
+			vecb matchedObs(obsListVisible.size());
+			matchedObs.clear();
+
+			// go for the n_tries ransac tries
+			for (size_t i = 0; i << matchedObs.size(); i++){
+
+				// get base observation
+				observation_ptr_t obsPtr = obsListVisible[matchedObs(i)];
+
 				// 1. match the hypothesis
 				if (!matchedObs(i)) // 1a. not matched yet: match!
 				{
 					// i.  predict this obs' visibility
+					obsListVisible(i)->predictVisibility();
+
 					// ii. match this obs
+					cv::Rect roi = gauss2rect(obsPtr->expectation.x(), obsPtr->expectation.P() + matcherParams_.measVar*identity_mat(2), matcherParams_.regionSigma);
+					obsPtr->predictAppearance();
+
+					// 1d. match predicted feature in search area
+					obsPtr->measurement.std(detectorParams_.measStd);
+					boost::shared_ptr<RawSpec> rawSpecPtr = SPTR_CAST<RawSpec>(sensorPtr()->getRaw());
+
+					match(rawSpecPtr, obsPtr->predictedAppearance, roi, obsPtr->measurement,
+							obsPtr->observedAppearance);
+					if (obsPtr->getMatchScore() > matcherParams_.threshold) {
+						obsPtr->counters.nMatch++;
+						obsPtr->events.matched = true;
+					}
+
 				}
 
 				{ // 1b. already matched
 
 					// compute Kalman gain
+					obsPtr->computeInnovation();
+					mat K(mapManagerPtr()->mapPtr()->ia_used_states().size(), obsPtr->innovation.size());
+					mapManagerPtr()->mapPtr()->filterPtr->computeKalmanGain(mapManagerPtr()->mapPtr()->ia_used_states(),obsPtr->innovation, obsPtr->INN_rsl, obsPtr->ia_rsl);
+					kalman::computeKalmanGain(mapManager().map().P(),mapManager().map().ia_used_states(), obsPtr->innovation, obsPtr->INN_rsl,obsPtr->ia_rsl, K);
+
 					// perform state update
 					// for each other obs
 					{
@@ -105,8 +126,8 @@ namespace jafar {
 			//
 
 			// loop only the N_UPDATES most interesting obs, from largest info gain to smallest
-			for (ObservationListSorted::reverse_iterator obsIter = obsListSorted.rbegin(); obsIter
-					!= obsListSorted.rend(); obsIter++) {
+			for (ObservationListSorted::reverse_iterator obsIter = obsListVisible.rbegin(); obsIter
+					!= obsListVisible.rend(); obsIter++) {
 				observation_ptr_t obsPtr = obsIter->second;
 
 
@@ -212,12 +233,12 @@ namespace jafar {
 			// ... TO HERE, OLD CODE FROM ACTIVE SEARCH
 			/////////////////////////////////////////////////
 
-			obsListSorted.clear(); // clear the list now or it will prevent the observation to be destroyed until next frame, and will still be displayed
+			obsListVisible.clear(); // clear the list now or it will prevent the observation to be destroyed until next frame, and will still be displayed
     }
 
 
     template<>
-    bool DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> >::
+    bool DataManagerOnePointRansac<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> >::
 		match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, cv::Rect &roi, Measurement & measure, const appearance_ptr_t & app)
     {
 					app_img_pnt_ptr_t targetAppImg = SPTR_CAST<AppearanceImagePoint>(targetApp);
@@ -242,7 +263,7 @@ namespace jafar {
     //void DataManagerActiveSearch<RawImage,SensorSpec>::
     // FIXME make this more abstract...
     template<>
-    void DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> >::detectNewObs( boost::shared_ptr<RawImage> rawData )
+    void DataManagerOnePointRansac<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> >::detectNewObs( boost::shared_ptr<RawImage> rawData )
     {
     	if (mapManagerPtr()->mapSpaceForInit()) {
     		//boost::shared_ptr<RawImage> rawDataSpec = SPTR_CAST<RawImage>(rawData);
@@ -314,7 +335,7 @@ namespace jafar {
     } // detect()
 
     template<class RawSpec,class SensorSpec, class Detector, class Matcher>
-    void DataManagerActiveSearch<RawSpec,SensorSpec,Detector,Matcher>::
+    void DataManagerOnePointRansac<RawSpec,SensorSpec,Detector,Matcher>::
     process( boost::shared_ptr<RawAbstract> data )
     {
     	boost::shared_ptr<RawImage> dataSpec = SPTR_CAST<RawImage>(data);

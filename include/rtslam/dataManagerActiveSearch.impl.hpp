@@ -85,7 +85,7 @@ namespace jafar {
 
 
 						// 1c. predict search area and appearance
-						cv::Rect roi = cov2rect(obsPtr->expectation.x(), obsPtr->expectation.P() + matcherParams_.measVar*identity_mat(2), matcherParams_.regionSigma);
+						cv::Rect roi = gauss2rect(obsPtr->expectation.x(), obsPtr->expectation.P() + matcherParams_.measVar*identity_mat(2), matcherParams_.regionSigma);
 						obsPtr->predictAppearance();
 
 						// 1d. match predicted feature in search area

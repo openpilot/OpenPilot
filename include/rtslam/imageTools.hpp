@@ -30,7 +30,7 @@ namespace jafar {
 		}
 
 		cv::Rect gauss2rect(const rtslam::Gaussian & g, double sigma = 3.0){
-			return cov2rect(g.x(), g.P(), sigma);
+			return gauss2rect(g.x(), g.P(), sigma);
 		}
 
 		/**

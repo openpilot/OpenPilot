@@ -128,8 +128,8 @@ void PFDGadgetWidget::updateAttitude(UAVObject *object1) {
   */
 void PFDGadgetWidget::updateHeading(UAVObject *object1) {
     // Double check that the field exists:
-    QString heading = QString("Heading");
-    UAVObjectField* field = object1->getField(heading);
+    QString fieldname = QString("Heading");
+    UAVObjectField* field = object1->getField(fieldname);
     if (field) {
         // These factors assume some things about the PFD SVG, namely:
         // - Heading value in degrees
@@ -138,13 +138,20 @@ void PFDGadgetWidget::updateHeading(UAVObject *object1) {
     } else {
         std::cout << "UpdateHeading: Wrong field, maybe an issue with object disconnection ?" << std::endl;
     }
-    heading = QString("Groundspeed");
-    field = object1->getField(heading);
+    fieldname = QString("Groundspeed");
+    field = object1->getField(fieldname);
     if (field) {
         // The speed scale represents 30km/h (6 * 5)
         // 3.6 : convert m/s to km/h
-        groundspeedTarget = 3.6*field->getDouble()*speedScaleHeight/(-30);
+        groundspeedTarget = 3.6*field->getDouble()*speedScaleHeight/(30);
     }
+    fieldname = QString("Altitude");
+    field = object1->getField(fieldname);
+    if (field) {
+        // The altitude scale represents 30 meters
+        altitudeTarget = field->getDouble()*altitudeScaleHeight/(30);
+    }
+
     if (!dialTimer.isActive())
         dialTimer.start(); // Rearm the dial Timer which might be stopped.
 
@@ -196,6 +203,9 @@ void PFDGadgetWidget::setDialFile(QString dfn)
      - Speed rectangle (left side): speed-bg
      - Speed scale: speed-scale.
      - Black speed window: speed-window.
+     - Altitude rectangle (right site): altitude-bg.
+     - Altitude scale: altitude-scale.
+     - Black altitude window: altitude-window.
  */
          QGraphicsScene *l_scene = scene();
          l_scene->clear(); // Deletes all items contained in the scene as well.
@@ -234,7 +244,9 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          m_foreground->setElementId("foreground");
          l_scene->addItem(m_foreground);
 
-         // Compass:
+         ////////////////////
+         // Compass
+         ////////////////////
          // Get the default location of the Compass:
          QMatrix compassMatrix = m_renderer->matrixForElement("compass");
          qreal startX = compassMatrix.mapRect(m_renderer->boundsOnElement("compass")).x();
@@ -268,24 +280,27 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          // includes half the width of the letters, which causes errors:
          compassBandWidth = m_renderer->boundsOnElement("compass-scale").width();
 
+         ////////////////////
+         // Speed
+         ////////////////////
          // Speedometer on the left hand:
          compassMatrix = m_renderer->matrixForElement("speed-bg");
          startX = compassMatrix.mapRect(m_renderer->boundsOnElement("speed-bg")).x();
          startY = compassMatrix.mapRect(m_renderer->boundsOnElement("speed-bg")).y();
-         m_speedbg = new QGraphicsSvgItem();
-         m_speedbg->setSharedRenderer(m_renderer);
-         m_speedbg->setElementId("speed-bg");
-         m_speedbg->setFlags(QGraphicsItem::ItemClipsChildrenToShape|
+         QGraphicsSvgItem *verticalbg = new QGraphicsSvgItem();
+         verticalbg->setSharedRenderer(m_renderer);
+         verticalbg->setElementId("speed-bg");
+         verticalbg->setFlags(QGraphicsItem::ItemClipsChildrenToShape|
                              QGraphicsItem::ItemClipsToShape);
-         l_scene->addItem(m_speedbg);
+         l_scene->addItem(verticalbg);
          matrix.reset();
          matrix.translate(startX,startY);
-         m_speedbg->setTransform(matrix,false);
+         verticalbg->setTransform(matrix,false);
 
          // Note: speed-scale should contain exactly 6 major ticks
          // for 30km/h
          m_speedscale = new QGraphicsItemGroup();
-         m_speedscale->setParentItem(m_speedbg);
+         m_speedscale->setParentItem(verticalbg);
 
          QGraphicsSvgItem *speedscalelines = new QGraphicsSvgItem();
          speedscalelines->setSharedRenderer(m_renderer);
@@ -295,12 +310,12 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          startX = compassMatrix.mapRect(m_renderer->boundsOnElement("speed-bg")).width();
          startX -= m_renderer->matrixForElement("speed-scale").mapRect(
                         m_renderer->boundsOnElement("speed-scale")).width();
-         //speedscalelines->setParentItem(m_speedbg);
+         //speedscalelines->setParentItem(verticalbg);
          matrix.reset();
          matrix.translate(startX,0);
          speedscalelines->setTransform(matrix,false);
          // Quick way to reposition the item before putting it in the group:
-         speedscalelines->setParentItem(m_speedbg);
+         speedscalelines->setParentItem(verticalbg);
          m_speedscale->addToGroup(speedscalelines); // (reparents the item)
 
          // Add the scale text elements:
@@ -310,7 +325,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          matrix.reset();
          matrix.translate(compassMatrix.mapRect(m_renderer->boundsOnElement("speed-bg")).width()/10,-speedScaleHeight/30);
          speed0->setTransform(matrix,false);
-         speed0->setParentItem(m_speedbg);
+         speed0->setParentItem(verticalbg);
          m_speedscale->addToGroup(speed0);
          for (int i=0; i<6;i++) {
              speed0 = new QGraphicsTextItem("");
@@ -319,13 +334,69 @@ void PFDGadgetWidget::setDialFile(QString dfn)
              speed0->setPlainText(QString().setNum(i*5+1));
              matrix.translate(0,speedScaleHeight/6);
              speed0->setTransform(matrix,false);
-             speed0->setParentItem(m_speedbg);
+             speed0->setParentItem(verticalbg);
              m_speedscale->addToGroup(speed0);    
          }
          // Now vertically center the speed scale on the speed background
-         QRectF rectB = m_speedbg->boundingRect();
+         QRectF rectB = verticalbg->boundingRect();
          QRectF rectN = speedscalelines->boundingRect();
-         m_speedscale->setPos(0,rectB.height()/2-rectN.height()/2);
+         m_speedscale->setPos(0,rectB.height()/2-rectN.height()/2-rectN.height()/6);
+
+         ////////////////////
+         // Altitude
+         ////////////////////
+         // Right hand, very similar to speed
+         compassMatrix = m_renderer->matrixForElement("altitude-bg");
+         startX = compassMatrix.mapRect(m_renderer->boundsOnElement("altitude-bg")).x();
+         startY = compassMatrix.mapRect(m_renderer->boundsOnElement("altitude-bg")).y();
+         verticalbg = new QGraphicsSvgItem();
+         verticalbg->setSharedRenderer(m_renderer);
+         verticalbg->setElementId("altitude-bg");
+         verticalbg->setFlags(QGraphicsItem::ItemClipsChildrenToShape|
+                             QGraphicsItem::ItemClipsToShape);
+         l_scene->addItem(verticalbg);
+         matrix.reset();
+         matrix.translate(startX,startY);
+         verticalbg->setTransform(matrix,false);
+
+         // Note: altitude-scale should contain exactly 6 major ticks
+         // for 30 meters
+         m_altitudescale = new QGraphicsItemGroup();
+         m_altitudescale->setParentItem(verticalbg);
+
+         QGraphicsSvgItem *altitudescalelines = new QGraphicsSvgItem();
+         altitudescalelines->setSharedRenderer(m_renderer);
+         altitudescalelines->setElementId("altitude-scale");
+         altitudeScaleHeight = m_renderer->matrixForElement("altitude-scale").mapRect(
+                        m_renderer->boundsOnElement("altitude-scale")).height();
+         // Quick way to reposition the item before putting it in the group:
+         altitudescalelines->setParentItem(verticalbg);
+         m_altitudescale->addToGroup(altitudescalelines); // (reparents the item)
+
+         // Add the scale text elements:
+         speed0 = new QGraphicsTextItem("XXXX");
+         speed0->setDefaultTextColor(QColor("White"));
+         speed0->setFont(QFont("Arial",(int) altitudeScaleHeight/30));
+         matrix.reset();
+         matrix.translate(m_renderer->matrixForElement("altitude-scale").mapRect(m_renderer->boundsOnElement("altitude-scale")).width()
+                          + m_renderer->matrixForElement("altitude-bg").mapRect(m_renderer->boundsOnElement("altitude-bg")).width()/10,-altitudeScaleHeight/30);
+         speed0->setTransform(matrix,false);
+         speed0->setParentItem(verticalbg);
+         m_altitudescale->addToGroup(speed0);
+         for (int i=0; i<6;i++) {
+             speed0 = new QGraphicsTextItem("XXXX");
+             speed0->setDefaultTextColor(QColor("White"));
+             speed0->setFont(QFont("Arial",(int) altitudeScaleHeight/30));
+             speed0->setPlainText(QString().setNum(i*5+1));
+             matrix.translate(0,altitudeScaleHeight/6);
+             speed0->setTransform(matrix,false);
+             speed0->setParentItem(verticalbg);
+             m_altitudescale->addToGroup(speed0);
+         }
+         // Now vertically center the speed scale on the speed background
+         rectB = verticalbg->boundingRect();
+         rectN = altitudescalelines->boundingRect();
+         m_altitudescale->setPos(0,rectB.height()/2-rectN.height()/2-rectN.height()/6);
 
         l_scene->setSceneRect(m_background->boundingRect());
 
@@ -357,6 +428,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
         pitchValue = 0;
         headingValue = 0;
         groundspeedValue = 0;
+        altitudeValue = 0;
         if (!dialTimer.isActive())
             dialTimer.start(); // Rearm the dial Timer which might be stopped.
      }
@@ -402,7 +474,7 @@ void PFDGadgetWidget::moveVerticalScales() {
 //
 void PFDGadgetWidget::moveNeedles()
 {
-    int dialCount = 4; // Gets decreased by one for each element
+    int dialCount = 5; // Gets decreased by one for each element
                        // which has finished moving
 
     /// TODO: optimize!!!
@@ -464,31 +536,57 @@ void PFDGadgetWidget::moveNeedles()
 
     //////
     // Speed
-    //
-    // TODO: find a way to move the speed scale faster if we are far
-    // from the target, maybe a separate timer would be useful there?
-    // What is the consequence on CPU usage?
     //////
-    if ((abs((groundspeedValue-groundspeedTarget)*10) > 5)) {
+    if (abs(groundspeedValue-groundspeedTarget) > speedScaleHeight/120) {
         groundspeedValue += (groundspeedTarget-groundspeedValue)/5;
     } else {
         groundspeedValue = groundspeedTarget;
         dialCount--;
     }
     qreal x = m_speedscale->transform().dx();
-    opd = QPointF(x,fmod(groundspeedValue,speedScaleHeight/6));
+    //opd = QPointF(x,fmod(groundspeedValue,speedScaleHeight/6));
+    // fmod does rounding errors!! the formula below works better:
+    opd = QPointF(x,groundspeedValue-floor(groundspeedValue/speedScaleHeight*6)*speedScaleHeight/6);
     m_speedscale->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), false);
     // TODO: optimize this by skipping if not necessary...
     // Now update the text elements inside the scale:
     // (Qt documentation states that the list has the same order
     // as the item add order in the QGraphicsItemGroup)
     QList <QGraphicsItem *> textList = m_speedscale->childItems();
-    qreal val = -5*ceil(groundspeedValue/speedScaleHeight*6)-15;
+    qreal val = 5*floor(groundspeedValue/speedScaleHeight*6)+20;
     foreach( QGraphicsItem * item, textList) {
         if (QGraphicsTextItem *text = qgraphicsitem_cast<QGraphicsTextItem *>(item)) {
             QString s = (val<0) ? QString() : QString().sprintf("%.0f",val);
             text->setPlainText(s);
-            val += 5;
+            val -= 5;
+        }
+    }
+
+    //////
+    // Altitude
+    //////
+    if (abs(altitudeValue-altitudeTarget) > altitudeScaleHeight/120) {
+        altitudeValue += (altitudeTarget-altitudeValue)/5;
+    } else {
+        altitudeValue = altitudeTarget;
+        dialCount--;
+    }
+    x = m_altitudescale->transform().dx();
+    //opd = QPointF(x,fmod(altitudeValue,altitudeScaleHeight/6));
+    // fmod does rounding errors!! the formula below works better:
+    opd = QPointF(x,altitudeValue-floor(altitudeValue/altitudeScaleHeight*6)*altitudeScaleHeight/6);
+    m_altitudescale->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), false);
+    // TODO: optimize this by skipping if not necessary...
+    // Now update the text elements inside the scale:
+    // (Qt documentation states that the list has the same order
+    // as the item add order in the QGraphicsItemGroup)
+    textList = m_altitudescale->childItems();
+    val = 5*floor(altitudeValue/altitudeScaleHeight*6)+20;
+    foreach( QGraphicsItem * item, textList) {
+        if (QGraphicsTextItem *text = qgraphicsitem_cast<QGraphicsTextItem *>(item)) {
+            QString s = (val<0) ? QString() : QString().sprintf("%.0f",val);
+            text->setPlainText(s);
+            val -= 5;
         }
     }
 

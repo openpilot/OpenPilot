@@ -96,14 +96,10 @@ private:
    QGraphicsSvgItem *m_homepointbearing;
    // Next point bearing:
    QGraphicsSvgItem *m_nextpointbearing;
-   // Vertical speed frame:
-   QGraphicsSvgItem *m_speedbg;
    // Vertical Speed scale:
    QGraphicsItemGroup *m_speedscale;
-   // Vertical altitude frame:
-   QGraphicsSvgItem *m_altitudebg;
    // Vertical altitude scale:
-   QGraphicsSvgItem *m_altitudescale;
+   QGraphicsItemGroup *m_altitudescale;
 
    double n1MinValue;
    double n1MaxValue;
@@ -130,6 +126,7 @@ private:
 
    qreal compassBandWidth;
    qreal speedScaleHeight;
+   qreal altitudeScaleHeight;
 
    // Name of the fields to read when an update is received:
    UAVDataObject* attitudeObj;

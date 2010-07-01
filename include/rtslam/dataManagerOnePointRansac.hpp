@@ -9,6 +9,11 @@
 #ifndef DATAMANAGERONEPOINTRANSAC_HPP_
 #define DATAMANAGERONEPOINTRANSAC_HPP_
 
+#include <vector>
+#include <list>
+
+#include "rtslam/dataManagerAbstract.hpp"
+#include "rtslam/activeSearch.hpp"
 #include "rtslam/rtSlam.hpp"
 #include "rtslam/parents.hpp"
 
@@ -29,24 +34,24 @@ namespace jafar {
 				;
 
 			public:
+			DataManagerOnePointRansac(int n_tries);
 				virtual ~DataManagerOnePointRansac() {
 				}
-				void process(boost::shared_ptr<RawAbstract> data) {
-				}
+				void process(boost::shared_ptr<RawAbstract> data) ;
 
 			protected:
 				boost::shared_ptr<Detector> detector;
 				boost::shared_ptr<Matcher> matcher;
 				boost::shared_ptr<ActiveSearchGrid> asGrid;
 				// the list of visible observations to handle
-				typedef vector<observation_ptr_t> ObservationListVisible;
+				typedef std::vector<observation_ptr_t> ObservationListVisible;
 				ObservationListVisible obsListVisible;
 				struct RansacSet {
 						observation_ptr_t obsBasePtr;
-						list<observation_ptr_t> inlierObs;
-						list<observation_ptr_t> pendingObs;
+						std::list<observation_ptr_t> inlierObs;
+						std::list<observation_ptr_t> pendingObs;
 				};
-				list<RansacSet> ransacSetList;
+				std::vector<RansacSet> ransacSetList;
 
 			protected:
 				jblas::veci tries;
@@ -111,8 +116,8 @@ namespace jafar {
 				}
 
 			protected:
-				void processKnownObs();
-				void detectNewObs();
+				void processKnownObs(boost::shared_ptr<RawSpec> rawData);
+				void detectNewObs(boost::shared_ptr<RawSpec> rawData);
 
 		};
 

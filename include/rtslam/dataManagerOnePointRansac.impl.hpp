@@ -8,6 +8,8 @@
 
 #include "jmath/randomIntTmplt.hpp"
 
+#include "correl/explorer.hpp"
+
 #include "rtslam/dataManagerOnePointRansac.hpp"
 #include "rtslam/kalmanTools.hpp"
 
@@ -55,7 +57,7 @@ namespace jafar {
 			} // for each obs
 
 			// Select N visible observations for RANSAC tries:
-			jmath::RandomIntVectTmplt randomizer(algorithmParams_.n_tries, 0, obsListVisible.size());
+			jmath::RandomIntVectTmplt<int> randomizer(algorithmParams_.n_tries, 0, obsListVisible.size());
 			tries = randomizer.getDifferent(); // Get n_tries indices to selected obs.
 
 			// we store here the obs that have been matched (as inlier or outlier) so far.
@@ -66,7 +68,11 @@ namespace jafar {
 			for (size_t i = 0; i << matchedObs.size(); i++){
 
 				// get base observation
-				observation_ptr_t obsPtr = obsListVisible[matchedObs(i)];
+				observation_ptr_t obsBasePtr = obsListVisible[matchedObs(i)];
+
+				// get map things
+				vec x = mapManagerPtr()->mapPtr()->x();
+				ind_array ia_x = mapManagerPtr()->mapPtr()->ia_used_states();
 
 				// 1. match the hypothesis
 				if (!matchedObs(i)) // 1a. not matched yet: match!
@@ -75,43 +81,71 @@ namespace jafar {
 					obsListVisible(i)->predictVisibility();
 
 					// ii. match this obs
-					cv::Rect roi = gauss2rect(obsPtr->expectation.x(), obsPtr->expectation.P() + matcherParams_.measVar*identity_mat(2), matcherParams_.regionSigma);
-					obsPtr->predictAppearance();
+					cv::Rect roi = gauss2rect(obsBasePtr->expectation.x(), obsBasePtr->expectation.P() + matcherParams_.measVar*identity_mat(2), matcherParams_.regionSigma);
+					obsBasePtr->predictAppearance();
 
 					// 1d. match predicted feature in search area
-					obsPtr->measurement.std(detectorParams_.measStd);
+					obsBasePtr->measurement.std(detectorParams_.measStd);
 					boost::shared_ptr<RawSpec> rawSpecPtr = SPTR_CAST<RawSpec>(sensorPtr()->getRaw());
 
-					match(rawSpecPtr, obsPtr->predictedAppearance, roi, obsPtr->measurement,
-							obsPtr->observedAppearance);
-					if (obsPtr->getMatchScore() > matcherParams_.threshold) {
-						obsPtr->counters.nMatch++;
-						obsPtr->events.matched = true;
+					match(rawSpecPtr, obsBasePtr->predictedAppearance, roi, obsBasePtr->measurement,
+							obsBasePtr->observedAppearance);
+					if (obsBasePtr->getMatchScore() > matcherParams_.threshold) {
+						obsBasePtr->counters.nMatch++;
+						obsBasePtr->events.matched = true;
 					}
 
 				}
 
 				{ // 1b. already matched
 
-					// compute Kalman gain
-					obsPtr->computeInnovation();
-					mat K(mapManagerPtr()->mapPtr()->ia_used_states().size(), obsPtr->innovation.size());
-					mapManagerPtr()->mapPtr()->filterPtr->computeKalmanGain(mapManagerPtr()->mapPtr()->ia_used_states(),obsPtr->innovation, obsPtr->INN_rsl, obsPtr->ia_rsl);
-					kalman::computeKalmanGain(mapManager().map().P(),mapManager().map().ia_used_states(), obsPtr->innovation, obsPtr->INN_rsl,obsPtr->ia_rsl, K);
+					vec x_tmp = x;
 
-					// perform state update
+					// compute Kalman gain
+					obsBasePtr->computeInnovation();
+					mat K(mapManagerPtr()->mapPtr()->ia_used_states().size(), obsBasePtr->innovation.size());
+					mapManagerPtr()->mapPtr()->filterPtr->computeKalmanGain(ia_x,obsBasePtr->innovation, obsBasePtr->INN_rsl, obsBasePtr->ia_rsl);
+					kalman::computeKalmanGain(mapManager().map().P(),ia_x, obsBasePtr->innovation, obsBasePtr->INN_rsl,obsBasePtr->ia_rsl, K);
+
+					// perform state update to the mean, get temporary copy
+					ublas::project(x_tmp, ia_x) += ublas::prod(K , obsBasePtr->innovation.x());
+
 					// for each other obs
+					for(ObservationListVisible::iterator obsIter = obsListVisible.begin(); obsIter != obsListVisible.end(); obsIter++)
 					{
+						observation_ptr_t obsCurrentPtr = *obsIter;
+						if (obsCurrentPtr == obsBasePtr) continue; // ignore the tested observation
+
+						// get obs things
+						jblas::vec lmk = obsCurrentPtr->landmarkPtr()->state.x();
+						vec pix(2);
+						vec nobs(1);
+
 						// project
-						// predictAppearance
-						// match
-					  if (1 /* match */ )
+						obsCurrentPtr->project_func(obsCurrentPtr->sensorPtr()->globalPose(), lmk, pix, nobs);
+
+						// set low-innovation ROI
+						cv::Rect roi(pix(0) - 1, pix(1) -1, 3, 3);
+
+						if(1 /* not matched yet */){
+							// predictAppearance
+							obsBasePtr->predictAppearance();
+
+							// match
+							obsCurrentPtr->measurement.std(detectorParams_.measStd);
+							boost::shared_ptr<RawSpec> rawSpecPtr = SPTR_CAST<RawSpec>(sensorPtr()->getRaw());
+
+							match(rawSpecPtr, obsCurrentPtr->predictedAppearance, roi, obsCurrentPtr->measurement,
+									obsCurrentPtr->observedAppearance);
+						}
+						if ( obsCurrentPtr->getMatchScore() > matcherParams_.threshold )
 					  {
-					  	if (1 /* inlier */ ){
-					  		// ransacSetList(i).inlierList.add(obs);
-					  	}else{
-					  			// ransacSetList(i).pendingObs.add(obs)
-					  	}
+
+					  }if(1/* inside ROI */){
+					  	ransacSetList;
+					  }else{
+					  	// ransacSetList(i).pendingObs.add(obs)
+
 					  } // if match
 
 					} // for each other obs
@@ -126,9 +160,9 @@ namespace jafar {
 			//
 
 			// loop only the N_UPDATES most interesting obs, from largest info gain to smallest
-			for (ObservationListSorted::reverse_iterator obsIter = obsListVisible.rbegin(); obsIter
+			for (ObservationListVisible::reverse_iterator obsIter = obsListVisible.rbegin(); obsIter
 					!= obsListVisible.rend(); obsIter++) {
-				observation_ptr_t obsPtr = obsIter->second;
+				observation_ptr_t obsPtr = *obsIter;
 
 
 				// 1a. re-project to get up-to-date means and Jacobians
@@ -237,25 +271,25 @@ namespace jafar {
     }
 
 
-    template<>
-    bool DataManagerOnePointRansac<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> >::
-		match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, cv::Rect &roi, Measurement & measure, const appearance_ptr_t & app)
-    {
-					app_img_pnt_ptr_t targetAppImg = SPTR_CAST<AppearanceImagePoint>(targetApp);
-					app_img_pnt_ptr_t appImg = SPTR_CAST<AppearanceImagePoint>(app);
-
-					measure.matchScore = correl::Explorer<correl::Zncc>::exploreTranslation(
-							targetAppImg->patch, *(rawPtr->img), roi.x, roi.x+roi.width-1, 2, roi.y, roi.y+roi.height-1, 2,
-							measure.x()(0), measure.x()(1));
-
-					// set appearance
-					// FIXME reenable this when Image::robustCopy will be fixed
-//					rawPtr->img->robustCopy(appImg->patch, (int)(measure.x()(0)-0.5)-appImg->patch.width()/2,
-//             (int)(measure.x()(1)-0.5)-appImg->patch.height()/2, 0, 0, appImg->patch.width(), appImg->patch.height());
-
-					return true;
-
-    }
+//    template<>
+//    bool DataManagerOnePointRansac<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> >::
+//		match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, cv::Rect &roi, Measurement & measure, const appearance_ptr_t & app)
+//    {
+//					app_img_pnt_ptr_t targetAppImg = SPTR_CAST<AppearanceImagePoint>(targetApp);
+//					app_img_pnt_ptr_t appImg = SPTR_CAST<AppearanceImagePoint>(app);
+//
+//					measure.matchScore = correl::Explorer<correl::Zncc>::exploreTranslation(
+//							targetAppImg->patch, *(rawPtr->img), roi.x, roi.x+roi.width-1, 2, roi.y, roi.y+roi.height-1, 2,
+//							measure.x()(0), measure.x()(1));
+//
+//					// set appearance
+//					// FIXME reenable this when Image::robustCopy will be fixed
+////					rawPtr->img->robustCopy(appImg->patch, (int)(measure.x()(0)-0.5)-appImg->patch.width()/2,
+////             (int)(measure.x()(1)-0.5)-appImg->patch.height()/2, 0, 0, appImg->patch.width(), appImg->patch.height());
+//
+//					return true;
+//
+//    }
 
 
 
@@ -263,7 +297,8 @@ namespace jafar {
     //void DataManagerActiveSearch<RawImage,SensorSpec>::
     // FIXME make this more abstract...
     template<>
-    void DataManagerOnePointRansac<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> >::detectNewObs( boost::shared_ptr<RawImage> rawData )
+    void DataManagerOnePointRansac<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> >::
+    detectNewObs( boost::shared_ptr<RawImage> rawData )
     {
     	if (mapManagerPtr()->mapSpaceForInit()) {
     		//boost::shared_ptr<RawImage> rawDataSpec = SPTR_CAST<RawImage>(rawData);
@@ -340,9 +375,9 @@ namespace jafar {
     {
     	boost::shared_ptr<RawImage> dataSpec = SPTR_CAST<RawImage>(data);
       // 1. Observe known landmarks.
-      processData(dataSpec); // process known landmarks
+    	processKnownObs(dataSpec); // process known landmarks
       // 2. Initialize new landmark.
-      detectNewData(dataSpec);
+    	detectNewObs(dataSpec);
     }
 
   }  // namespace ::rtslam

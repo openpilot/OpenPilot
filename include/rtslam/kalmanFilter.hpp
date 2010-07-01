@@ -67,7 +67,8 @@ namespace jafar {
 				 * The covariances matrix is also indexed by an indirect array \a iax containing the used states of the filter.
 				 * It incorporates the process noise \a U via a second Jacobian \a F_u, mapping it to the state space via \a iav (the same as F_v).
 				 * The formula is:
-				 * - [Pvv, Pvm; Pmv, Pmm] = [F_v*Pvv*F_v'+F_u*U*F_u' ,  F_v*Pvm ; Pmv*F_v' ,  Pmm]
+				 * - [Pvv, Pvm  = [F_v*Pvv*F_v' + F_u*U*F_u' ,  F_v*Pvm
+				 *    Pmv, Pmm]   		 Pmv*F_v'              ,      Pmm ]
 				 *
 				 * \param iax the ind_array of all used states in the map.
 				 * \param F_v the Jacobian of the process model.
@@ -93,26 +94,6 @@ namespace jafar {
 				 * \param Q the covariances matrix of the perturbation in state-space.
 				 */
 				void predict(const ind_array & iax, const mat & F_v, const ind_array & iav, const sym_mat & Q);
-
-				/**
-				 * EKF correction.
-				 * This function uses the Innovation class to extract all useful chunks necessary for EKF correction.
-				 * In partucular, the following info is recovered from Innovation:
-				 * - {z, Z} = {inn.x, inn.P}, mean and conv. matrices.
-				 *
-				 * Also, the Jacobian and indirect-array associated to the innovation:
-				 * - INN_rsl: the Jacobian wrt the states that contributed to the innovation
-				 * - ia_rsl: the indices to these states
-				 *
-				 * The EKF update is then the following (see Sola etal., IROS 2009):
-				 * - K  = -P * trans(INN_rsl) * inv(Z)
-				 * - x <-- x + K * z
-				 * - P <-- P + K * INN_rsl * P
-				 *
-				 * \param iax the indirect array of used indices in the map.
-				 * \param inn the Innovation.
-				 */
-				void correct(const ind_array & iax, Innovation & inn, const mat & INN_rsl, const ind_array & ia_rsl);
 
 				/**
 				 * EKF initialization from fully observable info.
@@ -149,6 +130,39 @@ namespace jafar {
 				 * \param ia_new indices to new landmark parameters
 				 */
 				void reparametrize(const ind_array & iax, const mat & J_l, const ind_array & ia_old, const ind_array & ia_new);
+
+				/**
+				 * Compute Kalman gain.
+				 *
+				 * The result is in the class members \a K and \a PJt_tmp.
+				 * \param ia_x ind. array to all states used in the map.
+				 * \param inn innovation.
+				 * \param INN_rsl innovation Jacobian.
+				 * \param ia_rsl ind. array to states in the innovation function.
+				 */
+				void computeKalmanGain(const ind_array & ia_x, Innovation & inn, const mat & INN_rsl, const ind_array & ia_rsl);
+
+				/**
+				 * EKF correction.
+				 * This function uses the Innovation class to extract all useful chunks necessary for EKF correction.
+				 * In partucular, the following info is recovered from Innovation:
+				 * - {z, Z} = {inn.x, inn.P}, mean and conv. matrices.
+				 *
+				 * Also, the Jacobian and indirect-array associated to the innovation:
+				 * - INN_rsl: the Jacobian wrt the states that contributed to the innovation
+				 * - ia_rsl: the indices to these states
+				 *
+				 * The EKF update is then the following (see Sola etal., IROS 2009):
+				 * - K  = -P * trans(INN_rsl) * inv(Z)
+				 * - x <-- x + K * z
+				 * - P <-- P + K * INN_rsl * P
+				 *
+				 * \param ia_x the indirect array of used indices in the map.
+				 * \param inn the Innovation.
+				 * \param INN_rsl: the Jacobian wrt the states that contributed to the innovation
+				 * \param ia_rsl: the indices to these states
+				 */
+				void correct(const ind_array & iax, Innovation & inn, const mat & INN_rsl, const ind_array & ia_rsl);
 
 				// \todo: define API for all these functions.
 				void stackCorrection();

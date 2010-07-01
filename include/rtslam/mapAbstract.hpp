@@ -168,25 +168,6 @@ namespace jafar {
 			private:
 
 
-				/**
-				 * Create new observation.
-				 * Creates a new observation from a sensor and a landmark.
-				 * \todo see if this can go to class Observation, or Landmark!, possibly with a dedicated constructor.
-				 */
-				observation_ptr_t newObservation(const sensor_ptr_t & senPtr, const landmark_ptr_t & lmkPtr);
-
-				//				void removeRobot(RobotAbstract& _rob);
-				//				void removeLandmark(LandmarkAbstract& _lmk);
-
-				//				/**
-				//				 * Full map operations
-				//				 */
-				//				void predictMotion(RobotAbstract & _rob);
-				//				void stackOneLmkCorrection(LandmarkAbstract & _lmk, ObservationAbstract & _obs);
-				//				void correctStackedLmks();
-				//				void correctOneLmk(LandmarkAbstract & _lmk, ObservationAbstract & _obs);
-				//				void reparametrizeLmk(LandmarkAbstract & _lmk);
-				//				void initializeLmk(ObservationAbstract & _obs);
 		};
 
 	}

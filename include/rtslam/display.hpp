@@ -84,18 +84,9 @@ namespace display {
 		public:
 			rtslam::SensorAbstract *slamSen_;
 			RobotDisplay *dispRobot_;
-			enum Type { stCameraPinhole, stCameraBarreto };
-			Type type_;
-			static Type convertType(rtslam::SensorAbstract *_slamSen)
-			{
-				// FIXME SensorAbstract should provide a type enum to avoid these dynamic casts
-				if (dynamic_cast<SensorPinHole*>(_slamSen))
-					return stCameraPinhole;
-				else
-					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_SENSOR_TYPE, "Don't know how to display this type of sensor");
-			}
+			SensorAbstract::type_enum type_;
 			SensorDisplay(rtslam::SensorAbstract *_slamSen, RobotDisplay *_dispRobot): 
-				slamSen_(_slamSen), dispRobot_(_dispRobot), type_(convertType(_slamSen)) {}
+				slamSen_(_slamSen), dispRobot_(_dispRobot), type_(_slamSen->type) {}
 	};
 
 	/** **************************************************************************
@@ -147,13 +138,13 @@ namespace display {
 		public:
 			rtslam::ObservationAbstract *slamObs_;
 			SensorDisplay *dispSen_;
-			SensorDisplay::Type sensorType_;
+			SensorAbstract::type_enum sensorType_;
 			LandmarkDisplay::Type  landmarkGeomType_;
 			LandmarkDisplay::Phase landmarkPhase_;
 			ObservationDisplay(rtslam::ObservationAbstract *_slamObs, SensorDisplay *_dispSen): 
 				slamObs_(_slamObs), dispSen_(_dispSen)
 			{
-				sensorType_ = SensorDisplay::convertType(&*_slamObs->sensorPtr());
+				sensorType_ = _slamObs->sensorPtr()->type;
 				landmarkGeomType_ = LandmarkDisplay::convertType(&*_slamObs->landmarkPtr());
 			}
 	};
@@ -393,7 +384,7 @@ namespace display {
 			color_blue,
 			color_red,
 			color_cyan,
-			color_rose,
+			color_pink,
 			color_orange
 
 		} color ;
@@ -496,7 +487,7 @@ namespace display {
 				case color_yellow:
 					result.set(255,255,0);
 					break;
-				case color_rose:
+				case color_pink:
 						result.set(253,103,223);
 						break;
 				case color_orange:

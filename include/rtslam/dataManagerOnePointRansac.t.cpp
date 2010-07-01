@@ -1,18 +1,19 @@
 /*
- * \file dataManagerActiveSearch.t.cpp
+ * dataManagerOnePointRansac.t.cpp
  *
- *  Created on: June 22, 2010
- *      Author: nmansard
- *      \ingroup rtslam
+ *     Project: jafar
+ *  Created on: Jun 30, 2010
+ *      Author: jsola
  */
 
-#include "rtslam/dataManagerActiveSearch.hpp"
+#include "jmath/randomIntTmplt.hpp"
+
+#include "rtslam/dataManagerOnePointRansac.hpp"
+
 #include "rtslam/observationAbstract.hpp"
 #include "rtslam/rawImage.hpp"
 #include "rtslam/sensorPinHole.hpp"
 #include "rtslam/descriptorImagePoint.hpp"
-
-#include "rtslam/imageTools.hpp"
 
 namespace jafar {
   namespace rtslam {
@@ -51,12 +52,57 @@ namespace jafar {
 					obsPtr->predictInfoGain();
 
 
+
+
 					// add to sorted list of observations
 					obsListSorted[obsPtr->expectation.infoGain] = obsPtr;
 
 				} // visible obs
 			} // for each obs
 
+			jmath::RandomIntVectTmplt randomizer(algorithmParams_.n_tries, 0, obsListSorted.size());
+
+			vecb matchedObs(obsListSorted.size()); // we store here the obs that have been matched (as inlier or outlier) so far.
+			matchedObs.clear();
+
+			tries = randomizer.getDifferent(); // Get n_tries indices to selected obs.
+
+			for (size_t i = 0; i << algorithmParams_.n_tries; i++){
+				// 1. match the hypothesis
+				if (!matchedObs(i)) // 1a. not matched yet: match!
+				{
+					// i.  predict this obs' visibility
+					// ii. match this obs
+				}
+
+				{ // 1b. already matched
+
+					// compute Kalman gain
+					// perform state update
+					// for each other obs
+					{
+						// project
+						// predictAppearance
+						// match
+					  if (1 /* match */ )
+					  {
+					  	if (1 /* inlier */ ){
+					  		// ransacSetList(i).inlierList.add(obs);
+					  	}else{
+					  			// ransacSetList(i).pendingObs.add(obs)
+					  	}
+					  } // if match
+
+					} // for each other obs
+
+				} // already matched obs
+
+			} // for i = 0:n_tries
+
+			//////////////////////////////////////////////////
+			// FROM HERE, OLD CODE FROM ACTIVE SEARCH
+			//
+			//
 
 			// loop only the N_UPDATES most interesting obs, from largest info gain to smallest
 			for (ObservationListSorted::reverse_iterator obsIter = obsListSorted.rbegin(); obsIter
@@ -84,11 +130,24 @@ namespace jafar {
 						obsPtr->counters.nSearch++;
 
 
-						// 1c. predict search area and appearance
-						cv::Rect roi = cov2rect(obsPtr->expectation.x(), obsPtr->expectation.P() + matcherParams_.measVar*identity_mat(2), matcherParams_.regionSigma);
+						// 1c. predict appearance
 						obsPtr->predictAppearance();
 
-						// 1d. match predicted feature in search area
+
+						//						senPtr->dataManager.match(rawPtr, obsPtr);
+
+						// 1d. search appearence in raw
+						int xmin, xmax, ymin, ymax;
+						double dx, dy;
+						dx = matcherParams_.regionSigma * sqrt(obsPtr->expectation.P(0, 0) + matcherParams_.measVar);
+						dy = matcherParams_.regionSigma * sqrt(obsPtr->expectation.P(1, 1) + matcherParams_.measVar);
+						xmin = (int) (obsPtr->expectation.x(0) - dx);
+						xmax = (int) (obsPtr->expectation.x(0) + dx + 0.9999);
+						ymin = (int) (obsPtr->expectation.x(1) - dy);
+						ymax = (int) (obsPtr->expectation.x(1) + dy + 0.9999);
+
+						cv::Rect roi(xmin, ymin, xmax - xmin + 1, ymax - ymin + 1);
+
 						//						kernel::Chrono match_chrono;
 						obsPtr->measurement.std(detectorParams_.measStd);
 						boost::shared_ptr<RawSpec> rawSpecPtr = SPTR_CAST<RawSpec>(sensorPtr()->getRaw());
@@ -148,6 +207,11 @@ namespace jafar {
 
 			} // foreach observation
 
+			//
+			//
+			// ... TO HERE, OLD CODE FROM ACTIVE SEARCH
+			/////////////////////////////////////////////////
+
 			obsListSorted.clear(); // clear the list now or it will prevent the observation to be destroyed until next frame, and will still be displayed
     }
 
@@ -172,42 +236,13 @@ namespace jafar {
 
     }
 
-//    template<>
-//    bool DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> >::
-//		detect(const boost::shared_ptr<RawImage> & rawPtr, cv::Rect &roi)
-//    {
-//			feat_img_pnt_ptr_t featPtr(new FeatureImagePoint(detectorParams_.patchSize,
-//			                                                 detectorParams_.patchSize,
-//			                                                 CV_8U));
-//
-//			featPtr->measurement.std(detectorParams_.measStd);
-//			if (detector->detectIn(*(rawData->img.get()), featPtr, &roi)) {
-//				vec pix = featPtr->measurement.x();
-//				extractAppearance(pix, featPtr->appearancePtr);
-//
-//  			app_img_pnt_ptr_t app = SPTR_CAST<AppearanceImagePoint>(appPtr);
-//  			cv::Size size = app->patch.size();
-//  			int shift_x = (size.width-1)/2;
-//  			int shift_y = (size.height-1)/2;
-//  			int x_src = pix(0)-shift_x;
-//  			int y_src = pix(1)-shift_y;
-//  			img->copy(app->patch, x_src, y_src, 0, 0, size.width, size.height);
-//
-//
-//((AppearanceImagePoint*)(featPtr->appearancePtr.get()))->patch.save("detected_feature.png");
-//((AppearanceImagePoint*)(featPtr->appearancePtr.get()))->patch.save("detected_feature.png");
-//				cout << "Detected pix: " << featPtr->measurement << endl;
-//
-//				return true;
-//
-//    }
+
 
     //template<class SensorSpec>
     //void DataManagerActiveSearch<RawImage,SensorSpec>::
     // FIXME make this more abstract...
     template<>
-    void DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> >::
-    detectNewObs( boost::shared_ptr<RawImage> rawData )
+    void DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> >::detectNewObs( boost::shared_ptr<RawImage> rawData )
     {
     	if (mapManagerPtr()->mapSpaceForInit()) {
     		//boost::shared_ptr<RawImage> rawDataSpec = SPTR_CAST<RawImage>(rawData);
@@ -284,9 +319,9 @@ namespace jafar {
     {
     	boost::shared_ptr<RawImage> dataSpec = SPTR_CAST<RawImage>(data);
       // 1. Observe known landmarks.
-      processKnownObs(dataSpec); // process known landmarks
+      processData(dataSpec); // process known landmarks
       // 2. Initialize new landmark.
-      detectNewObs(dataSpec);
+      detectNewData(dataSpec);
     }
 
   }  // namespace ::rtslam

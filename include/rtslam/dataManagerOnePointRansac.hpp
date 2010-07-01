@@ -1,7 +1,6 @@
 /*
  * \file dataManagerOnePointRansac.hpp
  *
- *     Project: jafar
  *  \date: Jun 30, 2010
  *      \author: jsola
  *      \ingroup rtslam
@@ -16,9 +15,6 @@
 namespace jafar {
 	namespace rtslam {
 
-		//		class DataManagerOnePointRansac;
-		//		boost::shared_ptr<DataManagerOnePointRansac> one_pnt_ransac_ptr_t;
-
 		template<class RawSpec, class SensorSpec, class Detector, class Matcher>
 		class DataManagerOnePointRansac: public DataManagerAbstract,
 		    public SpecificChildOf<SensorSpec> {
@@ -26,14 +22,16 @@ namespace jafar {
 			public:
 				// Define the function linkToParentSensorSpec.
 			ENABLE_LINK_TO_SPECIFIC_PARENT(SensorAbstract,SensorSpec,
-					SensorSpec,DataManagerAbstract);
+					SensorSpec,DataManagerAbstract)
+				;
 				// Define the functions sensorSpec() and sensorSpecPtr().
-			ENABLE_ACCESS_TO_SPECIFIC_PARENT(SensorSpec,sensorSpec);
+			ENABLE_ACCESS_TO_SPECIFIC_PARENT(SensorSpec,sensorSpec)
+				;
 
 			public:
-				DataManagerOnePointRansac() {
-				}
 				virtual ~DataManagerOnePointRansac() {
+				}
+				void process(boost::shared_ptr<RawAbstract> data) {
 				}
 
 			protected:
@@ -41,13 +39,86 @@ namespace jafar {
 				boost::shared_ptr<Matcher> matcher;
 				boost::shared_ptr<ActiveSearchGrid> asGrid;
 				// the list of observations sorted by information gain
-				typedef map<double, observation_ptr_t> ObservationListSorted;
-				ObservationListSorted obsListSorted;
+				typedef list<double, observation_ptr_t> ObservationListVisible;
+				ObservationListVisible obsListVisible;
+				struct RansacSet {
+						observation_ptr_t obsBasePtr;
+						list<observation_ptr_t> inlierObs;
+						list<observation_ptr_t> pendingObs;
+				};
+				list<RansacSet> ransacSetList;
+
+			protected:
+				jblas::veci tries;
+
+			protected:
+				struct detector_params_t {
+						int patchSize; ///<       descriptor patch size
+						double measStd; ///<       measurement noise std deviation
+						double measVar; ///<       measurement noise variance
+				} detectorParams_;
+				struct matcher_params_t {
+						int patchSize;
+						double regionPix; ///<     search region radius for first RANSAC consensus
+						double regionSigma; ///<   search region n_sigma for expectation-based search
+						double threshold; ///<     matching threshold
+						double mahalanobisTh; ///< Mahalanobis distance for outlier rejection <-- TODO: remove?
+						double measStd; ///<       measurement noise std deviation
+						double measVar; ///<       measurement noise variance
+				} matcherParams_;
+				struct alg_params_t {
+						int n_updates; ///<        maximum number of updates
+						int n_tries; ///<          number of RANSAC consensus tries
+				} algorithmParams_;
 			public:
-				void process(){}
+				void setDetector(const boost::shared_ptr<Detector> & _detector,
+				    int patchSize, double _measStd) {
+					detector = _detector;
+					detectorParams_.patchSize = patchSize;
+					detectorParams_.measStd = _measStd;
+					detectorParams_.measVar = _measStd * _measStd;
+				}
+				detector_params_t detectorParams() {
+					return detectorParams_;
+				}
+				void setMatcher(boost::shared_ptr<Matcher> & _matcher, int patchSize,
+				    double nPix, double nSigma, double threshold, double mahalanobisTh,
+				    double _measStd) {
+					matcher = _matcher;
+					matcherParams_.patchSize = patchSize;
+					matcherParams_.regionPix = nPix;
+					matcherParams_.regionSigma = nSigma;
+					matcherParams_.threshold = threshold;
+					matcherParams_.mahalanobisTh = mahalanobisTh;
+					matcherParams_.measStd = _measStd;
+					matcherParams_.measVar = _measStd * _measStd;
+				}
+				matcher_params_t matcherParams() {
+					return matcherParams_;
+				}
+				void setActiveSearchGrid(boost::shared_ptr<ActiveSearchGrid> arg) {
+					asGrid = arg;
+				}
+				boost::shared_ptr<ActiveSearchGrid> activeSearchGrid(void) {
+					return asGrid;
+				}
+				void setAlgorithmParams(int n_updates, int n_tries) {
+					algorithmParams_.n_updates = n_updates;
+					algorithmParams_.n_tries = n_tries;
+				}
+				alg_params_t algorithmParams() {
+					return algorithmParams_;
+				}
+
+			protected:
+				void processKnownObs();
+				void detectNewObs();
+
 		};
 
 	}
 }
+
+#include "rtslam/dataManagerOnePointRansac.t.cpp"
 
 #endif /* DATAMANAGERONEPOINTRANSAC_HPP_ */

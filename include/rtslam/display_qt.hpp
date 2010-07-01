@@ -141,8 +141,8 @@ class SensorQt : public SensorDisplay
 		{
 			switch (type_)
 			{
-				case SensorDisplay::stCameraPinhole:
-				case SensorDisplay::stCameraBarreto: {
+				case SensorAbstract::PINHOLE:
+				case SensorAbstract::BARRETO: {
 					view_->setImage(image);
 					std::ostringstream oss; oss << "#" << framenumber << "  |  " << std::setprecision(3) << avg_framerate*1000 << " ms";
 					framenumber_label->setPlainText(oss.str().c_str());

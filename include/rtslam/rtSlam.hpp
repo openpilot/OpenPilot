@@ -59,10 +59,10 @@ namespace jafar {
 		typedef boost::shared_ptr<MapAbstract>         										map_ptr_t;
 		typedef boost::shared_ptr<RobotAbstract>       										robot_ptr_t;
 		typedef boost::shared_ptr<SensorAbstract>      										sensor_ptr_t;
-		typedef boost::shared_ptr<DataManagerAbstract>      										data_manager_ptr_t;
+		typedef boost::shared_ptr<DataManagerAbstract>      							data_manager_ptr_t;
 		typedef boost::shared_ptr<LandmarkAbstract>    										landmark_ptr_t;
 		typedef boost::shared_ptr<ObservationAbstract> 										observation_ptr_t;
-		typedef boost::shared_ptr<MapManagerAbstract>    										map_manager_ptr_t;
+		typedef boost::shared_ptr<MapManagerAbstract>    									map_manager_ptr_t;
 
 		typedef boost::shared_ptr<RawAbstract>         										raw_ptr_t;
 		typedef boost::shared_ptr<AppearanceAbstract>  										appearance_ptr_t;

@@ -29,7 +29,6 @@ namespace jafar {
 				DescriptorAbstract();
 				virtual ~DescriptorAbstract();
 
-				//FIXME See the stuff on using DescAbs::predApp... ask Nico.
 				bool predictAppearance(observation_ptr_t & obsPtr) {
 					cout << __FILE__ << ":" << __LINE__ << endl;
 					return false;}

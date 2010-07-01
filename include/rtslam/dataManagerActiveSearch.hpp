@@ -36,33 +36,35 @@ namespace jafar {
       typedef map<double, observation_ptr_t> ObservationListSorted;
       ObservationListSorted obsListSorted;
       struct detector_params_t {
-      		int patchSize;
-      		double measStd;
+      		int patchSize;  ///<       descriptor patch size
+      		double measStd; ///<       measurement noise std deviation
+      		double measVar; ///<       measurement noise variance
       } detectorParams_;
       struct matcher_params_t {
-      		int patchSize;
-      		double regionSigma;
-      		double threshold;
-      		double mahalanobisTh;
-      		double measStd;
-      		double measVar;
+      		int patchSize; ///<        correlation patch size
+      		double regionSigma; ///<   search region n_sigma for expectation-based search
+      		double threshold; ///<     matching threshold
+      		double mahalanobisTh; ///< Mahalanobis distance for outlier rejection <-- TODO: remove?
+      		double measStd; ///<       measurement noise std deviation
+      		double measVar; ///<       measurement noise variance
       } matcherParams_;
       struct alg_params_t {
-      		int n_updates;
+      		int n_updates; ///<        maximum number of updates
       } algorithmParams_;
     public:
-      void setDetector(const boost::shared_ptr<Detector> & _detector, int patchSize, double _measStd){
+      void setDetector(const boost::shared_ptr<Detector> & _detector, int _patchSize, double _measStd){
       	detector = _detector;
-      	detectorParams_.patchSize = patchSize;
+      	detectorParams_.patchSize = _patchSize;
       	detectorParams_.measStd = _measStd;
+      	detectorParams_.measVar = _measStd * _measStd;
       }
       detector_params_t detectorParams(){return detectorParams_;}
-      void setMatcher(boost::shared_ptr<Matcher> & _matcher, int patchSize, double nSigma, double threshold, double mahalanobisTh, double _measStd){
+      void setMatcher(boost::shared_ptr<Matcher> & _matcher, int _patchSize, double _nSigma, double _threshold, double _mahalanobisTh, double _measStd){
       	matcher = _matcher;
-      	matcherParams_.patchSize = patchSize;
-      	matcherParams_.regionSigma = nSigma;
-      	matcherParams_.threshold = threshold;
-      	matcherParams_.mahalanobisTh = mahalanobisTh;
+      	matcherParams_.patchSize = _patchSize;
+      	matcherParams_.regionSigma = _nSigma;
+      	matcherParams_.threshold = _threshold;
+      	matcherParams_.mahalanobisTh = _mahalanobisTh;
       	matcherParams_.measStd = _measStd;
       	matcherParams_.measVar = _measStd * _measStd;
       }
@@ -74,9 +76,9 @@ namespace jafar {
       }
       alg_params_t algorithmParams(){return algorithmParams_;}
     protected:
-      void detectNewData( boost::shared_ptr<RawSpec> data );
+      void detectNewObs( boost::shared_ptr<RawSpec> data );
       bool match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, cv::Rect &roi, Measurement & measure, const appearance_ptr_t & app);
-      void processData( boost::shared_ptr<RawSpec> data );
+      void processKnownObs( boost::shared_ptr<RawSpec> data );
 
     public:
       virtual ~DataManagerActiveSearch( void ) {}

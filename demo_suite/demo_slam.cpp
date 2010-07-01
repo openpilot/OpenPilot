@@ -70,7 +70,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	const unsigned N_FRAMES = 500000;
 
 	// map
-	const unsigned MAP_SIZE = 250;
+	const unsigned MAP_SIZE = 313;
 
 	// robot uncertainties and perturbations
 	const double UNCERT_VLIN = .01; // m/s
@@ -161,7 +161,6 @@ void demo_slam01_main(world_ptr_t *world) {
 	senPtr11->params.setImgSize(IMG_WIDTH, IMG_HEIGHT);
 	senPtr11->params.setIntrinsicCalibration(intrinsic, distortion, distortion.size());
 	senPtr11->params.setMiscellaneous(1.0, 0.1);
-//	senPtr11->params.patchSize = -1; // FIXME: See how to propagate patch size properly (obs factory needs it to be in sensor)
 
 	// 3b. Create data manager.
 	boost::shared_ptr<ActiveSearchGrid> asGrid(new ActiveSearchGrid(IMG_WIDTH, IMG_HEIGHT, GRID_HCELLS, GRID_VCELLS, GRID_MARGIN, GRID_SEPAR));
@@ -205,8 +204,6 @@ void demo_slam01_main(world_ptr_t *world) {
 	// Temporal loop
 
 	kernel::Chrono chrono;
-	kernel::Chrono total_chrono;
-	kernel::Chrono mutex_chrono;
 	double max_dt = 0;
 	for (; (*world)->t <= N_FRAMES;) {
 		bool had_data = false;
@@ -214,10 +211,7 @@ void demo_slam01_main(world_ptr_t *world) {
 			worldPtr->display_mutex.lock();
 			// cout << "\n************************************************** " << endl;
 			// cout << "\n                 FRAME : " << t << " (blocked "
-			//      << mutex_chrono.elapsedMicrosecond() << " us)" << endl;
 			chrono.reset();
-			int total_match_time = 0;
-			int total_update_time = 0;
 
 
 			// FIRST LOOP FOR MEASUREMENT SPACES - ALL DM
@@ -241,14 +235,11 @@ void demo_slam01_main(world_ptr_t *world) {
 					if (senPtr->acquireRaw() < 0)
 						continue;
 					else had_data=true;
-					//std::cout << chronototal.elapsed() << " has acquired" << std::endl;
-//cout << "\nNEW FRAME\n" << endl;
+
 					// move the filter time to the data raw.
 					vec u(robPtr->mySize_control()); // TODO put some real values in u.
 					fillVector(u, 0.0);
 					robPtr->move(u, senPtr->getRaw()->timestamp);
-
-//					cout << *robPtr << endl;
 
 					// foreach dataManager
 					for (SensorAbstract::DataManagerList::iterator dmaIter = senPtr->dataManagerList().begin(); dmaIter
@@ -280,7 +271,6 @@ void demo_slam01_main(world_ptr_t *world) {
 
 
 
-			// TODO foreach mapMgr {manage();}
 			for (MapAbstract::MapManagerList::iterator mmIter = mapPtr->mapManagerList().begin(); mmIter
 	    != mapPtr->mapManagerList().end(); mmIter++){
 				map_manager_ptr_t mapMgr = *mmIter;
@@ -289,11 +279,9 @@ void demo_slam01_main(world_ptr_t *world) {
 		} // if had_data
 
 		worldPtr->display_mutex.unlock();
-		mutex_chrono.reset();
-		if (mode == 2 && had_data) getchar();
+		if (mode == 2 && had_data) getchar(); // wait for key in replay mode
 	} // temporal loop
 
-//	cout << "time avg(max): " << total_chrono.elapsed()/N_FRAMES << "(" << (int)(1000*max_dt) <<") ms" << endl;
 	std::cout << "\nFINISHED ! Press a key to terminate." << std::endl;
 	getchar();
 } // demo_slam01_main
@@ -365,10 +353,10 @@ void demo_slam01_display(world_ptr_t *world) {
 		 * If you want to dump images, pass a second argument to the executable DUMP="1" and a path where
 		 * you want the processed images be saved. If you want to replay the last execution, change 1 to 2
 		 *
-		 * Example 1: demo_slam 1 1 /home/you/rtslam dumps images to /home/you/rtslam
-		 * example 2: demo_slam 1 2 /home/you/rtslam replays the saved sequence
-		 * example 3: demo_slam 1 0 /anything does not dump
-		 * example 4: demo_slam 0 any /anything does not display nor dump.
+		 * Example 1: demo_slam 1 1 /mnt/ram/rtslam : dumps images to /mnt/ram/rtslam
+		 * example 2: demo_slam 1 2 /mnt/ram/rtslam : replays the saved sequence
+		 * example 3: demo_slam 1 0 /anything        : does not dump
+		 * example 4: demo_slam 0 any /anything      : does not display nor dump.
 		 */
 		int main(int argc, const char* argv[])
 		{

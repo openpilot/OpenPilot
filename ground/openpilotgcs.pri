@@ -15,6 +15,10 @@ defineReplace(targetPath) {
     return($$replace(1, /, $$QMAKE_DIR_SEP))
 }
 
+defineReplace(addNewline) { 
+    return($$escape_expand(\n\t)) 
+}
+
 # For use in custom compilers which just copy files
 win32:i_flag = i
 defineReplace(stripSrcDir) {
@@ -72,8 +76,8 @@ macx {
     GCS_LIBRARY_PATH = $$GCS_BUILD_TREE/$$GCS_LIBRARY_BASENAME/openpilotgcs
     GCS_PLUGIN_PATH  = $$GCS_LIBRARY_PATH/plugins
     GCS_LIBEXEC_PATH = $$GCS_APP_PATH # FIXME
-    GCS_DATA_PATH    = $$GCS_BUILD_TREE/share/openpilotgcs
-    GCS_DOC_PATH     = $$GCS_BUILD_TREE/share/doc/openpilotgcs
+    GCS_DATA_PATH    = $$GCS_BUILD_TREE/share
+    GCS_DOC_PATH     = $$GCS_BUILD_TREE/share/doc
     !isEqual(GCS_SOURCE_TREE, $$GCS_BUILD_TREE):copydata = 1
 }
 

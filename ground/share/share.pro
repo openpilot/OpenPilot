@@ -1,11 +1,18 @@
+include(../openpilotgcs.pri)
+
 TEMPLATE = subdirs
 SUBDIRS = openpilotgcs/translations
-SUBDIRS += openpilotgcs/sounds
-SUBDIRS += openpilotgcs/dials
-SUBDIRS += openpilotgcs/models
-SUBDIRS += openpilotgcs/pfd
 
+DATACOLLECTIONS = dials models pfd sounds
 
-
+equals(copydata, 1) {
+    for(dir, DATACOLLECTIONS) {
+        exists(openpilotgcs/$$dir) {
+            data_copy.commands += $(COPY_DIR) $$targetPath($$GCS_SOURCE_TREE/share/openpilotgcs/$$dir) $$targetPath($$GCS_DATA_PATH/$$dir) $$addNewline()
+        }
+    }
+    data_copy.target = FORCE
+    QMAKE_EXTRA_TARGETS += data_copy                   
+}
 
 

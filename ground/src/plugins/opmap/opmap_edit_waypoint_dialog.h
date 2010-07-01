@@ -30,21 +30,41 @@
 
 #include <QDialog>
 
+#include "opmapcontrol/opmapcontrol.h"
+
 namespace Ui {
     class opmap_edit_waypoint_dialog;
 }
 
-class opmap_edit_waypoint_dialog : public QDialog {
+class opmap_edit_waypoint_dialog : public QDialog
+{
     Q_OBJECT
 public:
     opmap_edit_waypoint_dialog(QWidget *parent = 0);
     ~opmap_edit_waypoint_dialog();
+
+    /**
+    * @brief public functions
+    *
+    * @param
+    */
+    void editWaypoint(mapcontrol::WayPointItem *waypoint_item);
 
 protected:
     void changeEvent(QEvent *e);
 
 private:
     Ui::opmap_edit_waypoint_dialog *ui;
+
+    int original_number;
+    bool original_locked;
+    internals::PointLatLng original_coord;
+    double original_altitude;
+    QString original_description;
+
+    mapcontrol::WayPointItem *waypoint_item;
+
+    int saveSettings();
 
 private slots:
 

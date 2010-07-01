@@ -28,8 +28,6 @@
 #ifndef OPMAP_GADGETWIDGET_H_
 #define OPMAP_GADGETWIDGET_H_
 
-#include "opmapcontrol/opmapcontrol.h"
-
 #include <QtGui/QWidget>
 #include <QtGui/QMenu>
 #include <QStringList>
@@ -37,14 +35,15 @@
 #include <QList>
 #include <QMutex>
 
+#include "opmapcontrol/opmapcontrol.h"
+
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/positionactual.h"
+#include "extensionsystem/pluginmanager.h"
 
 #include "opmap_mapoverlaywidget.h"
 #include "opmap_waypointeditor_dialog.h"
 #include "opmap_edit_waypoint_dialog.h"
-
-#include "extensionsystem/pluginmanager.h"
 
 namespace Ui
 {
@@ -90,7 +89,6 @@ public:
 public slots:
 
 protected:
-    void closeEvent(QCloseEvent *event);
     void resizeEvent(QResizeEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void contextMenuEvent(QContextMenuEvent *event);
@@ -151,23 +149,26 @@ private slots:
     *
     * @param
     */
-    void reloadAct_triggered();
-    void findPlaceAct_triggered();
-    void showCompassAct_toggled(bool show_compass);
-    void goZoomInAct_triggered();
-    void goZoomOutAct_triggered();
-    void goMouseClickAct_triggered();
-    void goHomeAct_triggered();
-    void goUAVAct_triggered();
-    void followUAVpositionAct_toggled(bool checked);
-    void followUAVheadingAct_toggled(bool checked);
-    void openWayPointEditorAct_triggered();
-    void addWayPointAct_triggered();
-    void editWayPointAct_triggered();
-    void lockWayPointAct_triggered();
-    void deleteWayPointAct_triggered();
-    void clearWayPointsAct_triggered();
-    void zoomActGroup_triggered(QAction *action);
+    void onReloadAct_triggered();
+    void onCopyMouseLatLonToClipAct_triggered();
+    void onCopyMouseLatToClipAct_triggered();
+    void onCopyMouseLonToClipAct_triggered();
+    void onFindPlaceAct_triggered();
+    void onShowCompassAct_toggled(bool show_compass);
+    void onGoZoomInAct_triggered();
+    void onGoZoomOutAct_triggered();
+    void onGoMouseClickAct_triggered();
+    void onGoHomeAct_triggered();
+    void onGoUAVAct_triggered();
+    void onFollowUAVpositionAct_toggled(bool checked);
+    void onFollowUAVheadingAct_toggled(bool checked);
+    void onOpenWayPointEditorAct_triggered();
+    void onAddWayPointAct_triggered();
+    void onEditWayPointAct_triggered();
+    void onLockWayPointAct_triggered();
+    void onDeleteWayPointAct_triggered();
+    void onClearWayPointsAct_triggered();
+    void onZoomActGroup_triggered(QAction *action);
 
 private:
     double m_heading;	// uav heading
@@ -182,8 +183,8 @@ private:
     QTimer *m_updateTimer;
     QTimer *m_statusUpdateTimer;
 
-    ExtensionSystem::PluginManager *pm;
-    UAVObjectManager *objManager;
+    ExtensionSystem::PluginManager *m_plugin_manager;
+    UAVObjectManager *m_objManager;
     PositionActual *m_positionActual;
 
     Ui::OPMap_Widget *m_widget;
@@ -198,7 +199,7 @@ private:
     QGraphicsProxyWidget *m_map_scene_proxy;
     OPMap_MapOverlayWidget *m_map_overlay_widget;
 
-    QStandardItemModel *wayPoint_treeView_model;
+    QStandardItemModel wayPoint_treeView_model;
 
     mapcontrol::WayPointItem *m_mouse_waypoint;
 
@@ -209,6 +210,9 @@ private:
 
     QAction *closeAct;
     QAction *reloadAct;
+    QAction *copyMouseLatLonToClipAct;
+    QAction *copyMouseLatToClipAct;
+    QAction *copyMouseLonToClipAct;
     QAction *findPlaceAct;
     QAction *showCompassAct;
     QAction *zoomInAct;

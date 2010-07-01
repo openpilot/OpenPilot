@@ -28,34 +28,46 @@
 #include "opmapgadgetwidget.h"
 #include "ui_opmap_widget.h"
 
-#include <QStringList>
+#include <QtGui/QApplication>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>
+#include <QtGui/QClipboard>
+#include <QtGui/QMenu>
+#include <QStringList>
 #include <QDir>
 #include <QFile>
 
 // *************************************************************************************
-// constructor
 
+// constructor
 OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 {
     // **************
 
     m_widget = NULL;
     m_map = NULL;
-    wayPoint_treeView_model = NULL;
     findPlaceCompleter = NULL;
     m_map_graphics_scene = NULL;
     m_map_scene_proxy = NULL;
     m_map_overlay_widget = NULL;
 
-    pm = NULL;
-    objManager = NULL;
+    m_plugin_manager = NULL;
+    m_objManager = NULL;
     m_positionActual = NULL;
 
     m_mouse_waypoint = NULL;
 
     prev_tile_number = 0;
+
+    // **************
+    // fetch required UAVObjects
+
+    m_plugin_manager = ExtensionSystem::PluginManager::instance();
+    m_objManager = m_plugin_manager->getObject<UAVObjectManager>();
+    m_positionActual = PositionActual::GetInstance(m_objManager);
+
+    // get current UAV data
+    PositionActual::DataFields data = m_positionActual->getData();
 
     // **************
     // create the widget that holds the user controls and the map
@@ -64,19 +76,20 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_widget->setupUi(this);
 
     // **************
-    // create the map widget
+    // create the central map widget
 
     m_map = new mapcontrol::OPMapWidget();
 
-    if (m_map)
-    {
-	m_map->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-	m_map->setMinimumSize(64, 64);
+    //  m_map->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    m_map->setMinimumSize(64, 64);
 
-	m_map->setFrameStyle(QFrame::NoFrame);
+    m_map->setFrameStyle(QFrame::NoFrame);
 
-	m_map->configuration->DragButton = Qt::LeftButton;  // use the left mouse button for map dragging
-    }
+    m_map->configuration->DragButton = Qt::LeftButton;					    // use the left mouse button for map dragging
+    m_map->SetMinZoom(2);
+    m_map->SetMaxZoom(19);
+    m_map->SetMouseWheelZoomType(internals::MouseWheelZoomType::MousePositionWithoutCenter);    // set how the mouse wheel zoom functions
+    m_map->SetFollowMouse(true);								    // we want a contiuous mouse position reading
 
     // **************
 
@@ -100,18 +113,6 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_map_overlay_widget->setGeometry(m_widget->mapWidget->geometry());
 */
     // **************
-    // Get required UAVObjects
-
-    pm = ExtensionSystem::PluginManager::instance();
-    objManager = pm->getObject<UAVObjectManager>();
-    m_positionActual = PositionActual::GetInstance(objManager);
-
-    // **************
-    // create various context (mouse right click) menu actions
-
-    createActions();
-
-    // **************
     // set the user control options
 
     m_widget->labelUAVPos->setText("---");
@@ -125,7 +126,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_widget->treeViewWaypoints->setVisible(false);
     m_widget->toolButtonWaypointsTreeViewShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/next.png")));
-
+/*
     #if defined(Q_OS_MAC)
     #elif defined(Q_OS_WIN)
 	m_widget->comboBoxFindPlace->clear();
@@ -133,7 +134,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 	m_widget->comboBoxFindPlace->setCurrentIndex(-1);
     #else
     #endif
-
+*/
     // **************
     // add an auto-completer to the find-place line edit box
 /*
@@ -149,38 +150,9 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     connect( m_widget->comboBoxFindPlace->lineEdit(), SIGNAL(returnPressed()), this, SLOT(comboBoxFindPlace_returnPressed()));
 
     // **************
-    // map stuff
+    // init the waypoint tree (shown on the left on the map plugin GUI)
 
-    // get current UAV data
-    PositionActual::DataFields data = m_positionActual->getData();
-
-    if (m_map)
-    {
-	connect(m_map, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));					// map zoom change signals
-	connect(m_map, SIGNAL(OnCurrentPositionChanged(internals::PointLatLng)), this, SLOT(OnCurrentPositionChanged(internals::PointLatLng)));    // map poisition change signals
-	connect(m_map, SIGNAL(OnTileLoadComplete()), this, SLOT(OnTileLoadComplete()));					// tile loading stop signals
-	connect(m_map, SIGNAL(OnTileLoadStart()), this, SLOT(OnTileLoadStart()));					// tile loading start signals
-	connect(m_map, SIGNAL(OnMapDrag()), this, SLOT(OnMapDrag()));							// map drag signals
-	connect(m_map, SIGNAL(OnMapZoomChanged()), this, SLOT(OnMapZoomChanged()));					// map zoom changed
-	connect(m_map, SIGNAL(OnMapTypeChanged(MapType::Types)), this, SLOT(OnMapTypeChanged(MapType::Types)));		// map type changed
-	connect(m_map, SIGNAL(OnEmptyTileError(int, core::Point)), this, SLOT(OnEmptyTileError(int, core::Point)));	// tile error
-	connect(m_map, SIGNAL(OnTilesStillToLoad(int)), this, SLOT(OnTilesStillToLoad(int)));				// tile loading signals
-	connect(m_map, SIGNAL(WPNumberChanged(int const&,int const&,WayPointItem*)), this, SLOT(WPNumberChanged(int const&,int const&,WayPointItem*)));
-    	connect(m_map, SIGNAL(WPValuesChanged(WayPointItem*)), this, SLOT(WPValuesChanged(WayPointItem*)));
-    	connect(m_map, SIGNAL(WPInserted(int const&, WayPointItem*)), this, SLOT(WPInserted(int const&, WayPointItem*)));
-    	connect(m_map, SIGNAL(WPDeleted(int const&)), this, SLOT(WPDeleted(int const&)));
-
-	m_map->SetMaxZoom(19);									    // increase the maximum zoom level
-	m_map->SetMouseWheelZoomType(internals::MouseWheelZoomType::MousePositionWithoutCenter);    // set how the mouse wheel zoom functions
-	m_map->SetFollowMouse(true);								    // we want a contiuous mouse position reading
-	m_map->SetCurrentPosition(internals::PointLatLng(data.Latitude, data.Longitude));	    // set the default map position
-    }
-
-    // **************
-    // init the waypoint tree
-
-    wayPoint_treeView_model = new QStandardItemModel();
-    m_widget->treeViewWaypoints->setModel(wayPoint_treeView_model);
+    m_widget->treeViewWaypoints->setModel(&wayPoint_treeView_model);
 
 
 /*
@@ -219,15 +191,28 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     // create a waypoint group
     QStandardItem *item = new QStandardItem(tr("Camera shoot at the town hall"));
-    for (int i = 1; i < 5; i++)
-    {   // add some waypoints
-	QStandardItem *child = new QStandardItem(QIcon(QString::fromUtf8(":/opmap/images/waypoint.png")), QString("Waypoint %0").arg(i));
+    // add some waypoints
+    {
+	QStandardItem *child = new QStandardItem(QIcon(QString::fromUtf8(":/opmap/images/waypoint.png")), "North side window view");
 	child->setEditable(true);
 	item->appendRow(child);
     }
-    wayPoint_treeView_model->appendRow(item);
-
-
+    {
+	QStandardItem *child = new QStandardItem(QIcon(QString::fromUtf8(":/opmap/images/waypoint.png")), "East side window view");
+	child->setEditable(true);
+	item->appendRow(child);
+    }
+    {
+	QStandardItem *child = new QStandardItem(QIcon(QString::fromUtf8(":/opmap/images/waypoint.png")), "South side window view");
+	child->setEditable(true);
+	item->appendRow(child);
+    }
+    {
+	QStandardItem *child = new QStandardItem(QIcon(QString::fromUtf8(":/opmap/images/waypoint.png")), "West side window view");
+	child->setEditable(true);
+	item->appendRow(child);
+    }
+    wayPoint_treeView_model.appendRow(item);
 
     // create another waypoint group
     item = new QStandardItem(tr("Flight path 62"));
@@ -237,7 +222,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 	child->setEditable(true);
 	item->appendRow(child);
     }
-    wayPoint_treeView_model->appendRow(item);
+    wayPoint_treeView_model.appendRow(item);
 
 
 
@@ -249,14 +234,40 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
 
     // **************
+    // map stuff
+
+    connect(m_map, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));					// map zoom change signals
+    connect(m_map, SIGNAL(OnCurrentPositionChanged(internals::PointLatLng)), this, SLOT(OnCurrentPositionChanged(internals::PointLatLng)));    // map poisition change signals
+    connect(m_map, SIGNAL(OnTileLoadComplete()), this, SLOT(OnTileLoadComplete()));					// tile loading stop signals
+    connect(m_map, SIGNAL(OnTileLoadStart()), this, SLOT(OnTileLoadStart()));					// tile loading start signals
+    connect(m_map, SIGNAL(OnMapDrag()), this, SLOT(OnMapDrag()));							// map drag signals
+    connect(m_map, SIGNAL(OnMapZoomChanged()), this, SLOT(OnMapZoomChanged()));					// map zoom changed
+    connect(m_map, SIGNAL(OnMapTypeChanged(MapType::Types)), this, SLOT(OnMapTypeChanged(MapType::Types)));		// map type changed
+    connect(m_map, SIGNAL(OnEmptyTileError(int, core::Point)), this, SLOT(OnEmptyTileError(int, core::Point)));	// tile error
+    connect(m_map, SIGNAL(OnTilesStillToLoad(int)), this, SLOT(OnTilesStillToLoad(int)));				// tile loading signals
+    connect(m_map, SIGNAL(WPNumberChanged(int const&,int const&,WayPointItem*)), this, SLOT(WPNumberChanged(int const&,int const&,WayPointItem*)));
+    connect(m_map, SIGNAL(WPValuesChanged(WayPointItem*)), this, SLOT(WPValuesChanged(WayPointItem*)));
+    connect(m_map, SIGNAL(WPInserted(int const&, WayPointItem*)), this, SLOT(WPInserted(int const&, WayPointItem*)));
+    connect(m_map, SIGNAL(WPDeleted(int const&)), this, SLOT(WPDeleted(int const&)));
+
+    m_map->SetCurrentPosition(internals::PointLatLng(data.Latitude, data.Longitude));	    // set the default map position
+
+    // **************
+    // create various context menu (mouse right click menu) actions
+
+    createActions();
+
+    // **************
     // create the desired timers
 
-    m_updateTimer = new QTimer(this);
+    // Pip .. I don't like polling, I prefer an efficient event driven system (signal/slot) but this will do for now
+
+    m_updateTimer = new QTimer();
     m_updateTimer->setInterval(200);
     connect(m_updateTimer, SIGNAL(timeout()), this, SLOT(updatePosition()));
     m_updateTimer->start();
 
-    m_statusUpdateTimer = new QTimer(this);
+    m_statusUpdateTimer = new QTimer();
     m_statusUpdateTimer->setInterval(200);
     connect(m_statusUpdateTimer, SIGNAL(timeout()), this, SLOT(updateMousePos()));
     m_statusUpdateTimer->start();
@@ -264,14 +275,24 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     // **************
 }
 
-// *************************************************************************************
 // destructor
-
 OPMapGadgetWidget::~OPMapGadgetWidget()
 {
-    clearWayPointsAct_triggered();
 
-    if (wayPoint_treeView_model) delete wayPoint_treeView_model;
+
+    // this destructor doesn't appear to be called at shutdown???
+
+
+
+
+//    #if defined(Q_OS_MAC)
+//    #elif defined(Q_OS_WIN)
+//	saveComboBoxLines(m_widget->comboBoxFindPlace, QCoreApplication::applicationDirPath() + "/opmap_find_place_history.txt");
+//    #else
+//    #endif
+
+    onClearWayPointsAct_triggered();
+
     if (m_map_overlay_widget) delete m_map_overlay_widget;
     if (m_map) delete m_map;
     if (m_widget) delete m_widget;
@@ -279,15 +300,6 @@ OPMapGadgetWidget::~OPMapGadgetWidget()
 
 // *************************************************************************************
 // widget signals
-
-void OPMapGadgetWidget::closeEvent(QCloseEvent *event)
-{
-//    #if defined(Q_OS_MAC)
-//    #elif defined(Q_OS_WIN)
-//	saveComboBoxLines(m_widget->comboBoxFindPlace, QCoreApplication::applicationDirPath() + "/opmap_find_place_history.txt");
-//    #else
-//    #endif
-}
 
 void OPMapGadgetWidget::resizeEvent(QResizeEvent *event)
 {
@@ -346,19 +358,23 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 	waypoint_locked = (m_mouse_waypoint->flags() & QGraphicsItem::ItemIsMovable) == 0;
 
     // ****************
-    // create the popup menu
+    // Dynamically create the popup menu
 
     QMenu menu(this);
-
-    QMenu zoomMenu(tr("&Zoom ") + "(" + QString::number(m_map->Zoom()) + ")", this);
-    for (int i = 0; i < zoomAct.count(); i++)
-	zoomMenu.addAction(zoomAct.at(i));
 
     menu.addAction(closeAct);
 
     menu.addSeparator();
 
     menu.addAction(reloadAct);
+
+    menu.addSeparator();
+
+    QMenu copySubMenu(tr("Copy"), this);
+    copySubMenu.addAction(copyMouseLatLonToClipAct);
+    copySubMenu.addAction(copyMouseLatToClipAct);
+    copySubMenu.addAction(copyMouseLonToClipAct);
+    menu.addMenu(&copySubMenu);
 
     menu.addSeparator();
 
@@ -372,7 +388,11 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     menu.addAction(zoomInAct);
     menu.addAction(zoomOutAct);
-    menu.addMenu(&zoomMenu);
+
+    QMenu zoomSubMenu(tr("&Zoom ") + "(" + QString::number(m_map->Zoom()) + ")", this);
+    for (int i = 0; i < zoomAct.count(); i++)
+	zoomSubMenu.addAction(zoomAct.at(i));
+    menu.addMenu(&zoomSubMenu);
 
     menu.addSeparator()->setText(tr("Position"));
 
@@ -626,12 +646,13 @@ void OPMapGadgetWidget::comboBoxFindPlace_returnPressed()
 	findPlaceCompleter->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
 	m_widget->comboBoxFindPlace->setCompleter(findPlaceCompleter);
 */
-
+/*
 	#if defined(Q_OS_MAC)
 	#elif defined(Q_OS_WIN)
 	    saveComboBoxLines(m_widget->comboBoxFindPlace, QCoreApplication::applicationDirPath() + "/opmap_find_place_history.txt");
 	#else
 	#endif
+*/
     }
 
     if (!m_map) return;
@@ -750,9 +771,7 @@ void OPMapGadgetWidget::on_toolButtonWaypointEditor_clicked()
 
 void OPMapGadgetWidget::on_treeViewWaypoints_clicked(QModelIndex index)
 {
-    if (!wayPoint_treeView_model) return;
-
-    QStandardItem *item = wayPoint_treeView_model->itemFromIndex(index);
+    QStandardItem *item = wayPoint_treeView_model.itemFromIndex(index);
     if (!item) return;
 
     // to do
@@ -841,7 +860,7 @@ void OPMapGadgetWidget::setCacheLocation(QString cacheLocation)
 	if (!dir.mkpath(cacheLocation))
 	    return;
 
-    qDebug() << "map cache dir: " << cacheLocation;
+//    qDebug() << "map cache dir: " << cacheLocation;
 
     if (m_map)
 	m_map->configuration->SetCacheLocation(cacheLocation);
@@ -862,91 +881,103 @@ void OPMapGadgetWidget::createActions()
     reloadAct = new QAction(tr("&Reload map"), this);
     reloadAct->setShortcut(tr("F5"));
     reloadAct->setStatusTip(tr("Reload the map tiles"));
-    connect(reloadAct, SIGNAL(triggered()), this, SLOT(reloadAct_triggered()));
+    connect(reloadAct, SIGNAL(triggered()), this, SLOT(onReloadAct_triggered()));
+
+    copyMouseLatLonToClipAct = new QAction(tr("Mouse latitude and longitude"), this);
+    copyMouseLatLonToClipAct->setStatusTip(tr("Copy the mouse latitude and longitude to the clipboard"));
+    connect(copyMouseLatLonToClipAct, SIGNAL(triggered()), this, SLOT(onCopyMouseLatLonToClipAct_triggered()));
+
+    copyMouseLatToClipAct = new QAction(tr("Mouse latitude"), this);
+    copyMouseLatToClipAct->setStatusTip(tr("Copy the mouse latitude to the clipboard"));
+    connect(copyMouseLatToClipAct, SIGNAL(triggered()), this, SLOT(onCopyMouseLatToClipAct_triggered()));
+
+    copyMouseLonToClipAct = new QAction(tr("Mouse longitude"), this);
+    copyMouseLonToClipAct->setStatusTip(tr("Copy the mouse longitude to the clipboard"));
+    connect(copyMouseLonToClipAct, SIGNAL(triggered()), this, SLOT(onCopyMouseLonToClipAct_triggered()));
 
     findPlaceAct = new QAction(tr("&Find place"), this);
     findPlaceAct->setShortcut(tr("Ctrl+F"));
     findPlaceAct->setStatusTip(tr("Find a location"));
-    connect(findPlaceAct, SIGNAL(triggered()), this, SLOT(findPlaceAct_triggered()));
+    connect(findPlaceAct, SIGNAL(triggered()), this, SLOT(onFindPlaceAct_triggered()));
 
     showCompassAct = new QAction(tr("Show compass"), this);
 //    showCompassAct->setShortcut(tr("Ctrl+M"));
     showCompassAct->setStatusTip(tr("Show/Hide the map compass"));
     showCompassAct->setCheckable(true);
     showCompassAct->setChecked(true);
-    connect(showCompassAct, SIGNAL(toggled(bool)), this, SLOT(showCompassAct_toggled(bool)));
+    connect(showCompassAct, SIGNAL(toggled(bool)), this, SLOT(onShowCompassAct_toggled(bool)));
 
     zoomInAct = new QAction(tr("Zoom &In"), this);
     zoomInAct->setShortcut(Qt::Key_PageUp);
     zoomInAct->setStatusTip(tr("Zoom the map in"));
-    connect(zoomInAct, SIGNAL(triggered()), this, SLOT(goZoomInAct_triggered()));
+    connect(zoomInAct, SIGNAL(triggered()), this, SLOT(onGoZoomInAct_triggered()));
 
     zoomOutAct = new QAction(tr("Zoom &Out"), this);
     zoomOutAct->setShortcut(Qt::Key_PageDown);
     zoomOutAct->setStatusTip(tr("Zoom the map out"));
-    connect(zoomOutAct, SIGNAL(triggered()), this, SLOT(goZoomOutAct_triggered()));
+    connect(zoomOutAct, SIGNAL(triggered()), this, SLOT(onGoZoomOutAct_triggered()));
 
     goMouseClickAct = new QAction(tr("Go to where you right clicked the mouse"), this);
     goMouseClickAct->setStatusTip(tr("Center the map onto where you right clicked the mouse"));
-    connect(goMouseClickAct, SIGNAL(triggered()), this, SLOT(goMouseClickAct_triggered()));
+    connect(goMouseClickAct, SIGNAL(triggered()), this, SLOT(onGoMouseClickAct_triggered()));
 
     goHomeAct = new QAction(tr("Go to &Home location"), this);
     goHomeAct->setShortcut(tr("Ctrl+H"));
     goHomeAct->setStatusTip(tr("Center the map onto the home location"));
-    connect(goHomeAct, SIGNAL(triggered()), this, SLOT(goHomeAct_triggered()));
+    connect(goHomeAct, SIGNAL(triggered()), this, SLOT(onGoHomeAct_triggered()));
 
     goUAVAct = new QAction(tr("Go to &UAV location"), this);
     goUAVAct->setShortcut(tr("Ctrl+U"));
     goUAVAct->setStatusTip(tr("Center the map onto the UAV location"));
-    connect(goUAVAct, SIGNAL(triggered()), this, SLOT(goUAVAct_triggered()));
+    connect(goUAVAct, SIGNAL(triggered()), this, SLOT(onGoUAVAct_triggered()));
 
     followUAVpositionAct = new QAction(tr("Follow UAV position"), this);
     followUAVpositionAct->setShortcut(tr("Ctrl+F"));
     followUAVpositionAct->setStatusTip(tr("Keep the map centered onto the UAV"));
     followUAVpositionAct->setCheckable(true);
     followUAVpositionAct->setChecked(false);
-    connect(followUAVpositionAct, SIGNAL(toggled(bool)), this, SLOT(followUAVpositionAct_toggled(bool)));
+    connect(followUAVpositionAct, SIGNAL(toggled(bool)), this, SLOT(onFollowUAVpositionAct_toggled(bool)));
 
     followUAVheadingAct = new QAction(tr("Follow UAV heading"), this);
     followUAVheadingAct->setShortcut(tr("Ctrl+F"));
     followUAVheadingAct->setStatusTip(tr("Keep the map rotation to the UAV heading"));
     followUAVheadingAct->setCheckable(true);
     followUAVheadingAct->setChecked(true);
-    connect(followUAVheadingAct, SIGNAL(toggled(bool)), this, SLOT(followUAVheadingAct_toggled(bool)));
+    connect(followUAVheadingAct, SIGNAL(toggled(bool)), this, SLOT(onFollowUAVheadingAct_toggled(bool)));
 
     wayPointEditorAct = new QAction(tr("&Waypoint editor"), this);
     wayPointEditorAct->setShortcut(tr("Ctrl+W"));
     wayPointEditorAct->setStatusTip(tr("Open the waypoint editor"));
-    connect(wayPointEditorAct, SIGNAL(triggered()), this, SLOT(openWayPointEditorAct_triggered()));
+    connect(wayPointEditorAct, SIGNAL(triggered()), this, SLOT(onOpenWayPointEditorAct_triggered()));
 
     addWayPointAct = new QAction(tr("&Add waypoint"), this);
     addWayPointAct->setShortcut(tr("Ctrl+A"));
     addWayPointAct->setStatusTip(tr("Add waypoint"));
-    connect(addWayPointAct, SIGNAL(triggered()), this, SLOT(addWayPointAct_triggered()));
+    connect(addWayPointAct, SIGNAL(triggered()), this, SLOT(onAddWayPointAct_triggered()));
 
     editWayPointAct = new QAction(tr("&Edit waypoint"), this);
     editWayPointAct->setShortcut(tr("Ctrl+E"));
     editWayPointAct->setStatusTip(tr("Edit waypoint"));
-    connect(editWayPointAct, SIGNAL(triggered()), this, SLOT(editWayPointAct_triggered()));
+    connect(editWayPointAct, SIGNAL(triggered()), this, SLOT(onEditWayPointAct_triggered()));
 
     lockWayPointAct = new QAction(tr("&Lock waypoint"), this);
     lockWayPointAct->setStatusTip(tr("Lock/Unlock a waypoint"));
     lockWayPointAct->setCheckable(true);
     lockWayPointAct->setChecked(false);
-    connect(lockWayPointAct, SIGNAL(triggered()), this, SLOT(lockWayPointAct_triggered()));
+    connect(lockWayPointAct, SIGNAL(triggered()), this, SLOT(onLockWayPointAct_triggered()));
 
     deleteWayPointAct = new QAction(tr("&Delete waypoint"), this);
     deleteWayPointAct->setShortcut(tr("Ctrl+D"));
     deleteWayPointAct->setStatusTip(tr("Delete waypoint"));
-    connect(deleteWayPointAct, SIGNAL(triggered()), this, SLOT(deleteWayPointAct_triggered()));
+    connect(deleteWayPointAct, SIGNAL(triggered()), this, SLOT(onDeleteWayPointAct_triggered()));
 
     clearWayPointsAct = new QAction(tr("&Clear waypoints"), this);
     clearWayPointsAct->setShortcut(tr("Ctrl+C"));
     clearWayPointsAct->setStatusTip(tr("Clear waypoints"));
-    connect(clearWayPointsAct, SIGNAL(triggered()), this, SLOT(clearWayPointsAct_triggered()));
+    connect(clearWayPointsAct, SIGNAL(triggered()), this, SLOT(onClearWayPointsAct_triggered()));
 
     zoomActGroup = new QActionGroup(this);
-    connect(zoomActGroup, SIGNAL(triggered(QAction *)), this, SLOT(zoomActGroup_triggered(QAction *)));
+    connect(zoomActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onZoomActGroup_triggered(QAction *)));
     zoomAct.clear();
     for (int i = 2; i <= 19; i++)
     {
@@ -959,13 +990,34 @@ void OPMapGadgetWidget::createActions()
     // ***********************
 }
 
-void OPMapGadgetWidget::reloadAct_triggered()
+void OPMapGadgetWidget::onReloadAct_triggered()
 {
     if (m_map)
 	m_map->ReloadMap();
 }
 
-void OPMapGadgetWidget::findPlaceAct_triggered()
+void OPMapGadgetWidget::onCopyMouseLatLonToClipAct_triggered()
+{
+//    QClipboard *clipboard = qApp->clipboard();
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(QString::number(mouse_lat_lon.Lat(), 'f', 7) + ", " + QString::number(mouse_lat_lon.Lng(), 'f', 7), QClipboard::Clipboard);
+}
+
+void OPMapGadgetWidget::onCopyMouseLatToClipAct_triggered()
+{
+//    QClipboard *clipboard = qApp->clipboard();
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(QString::number(mouse_lat_lon.Lat(), 'f', 7), QClipboard::Clipboard);
+}
+
+void OPMapGadgetWidget::onCopyMouseLonToClipAct_triggered()
+{
+//    QClipboard *clipboard = qApp->clipboard();
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(QString::number(mouse_lat_lon.Lng(), 'f', 7), QClipboard::Clipboard);
+}
+
+void OPMapGadgetWidget::onFindPlaceAct_triggered()
 {
     m_widget->comboBoxFindPlace->setFocus();	// move focus to the 'find place' text box
 
@@ -989,25 +1041,25 @@ void OPMapGadgetWidget::findPlaceAct_triggered()
 */
 }
 
-void OPMapGadgetWidget::showCompassAct_toggled(bool show_compass)
+void OPMapGadgetWidget::onShowCompassAct_toggled(bool show_compass)
 {
     if (m_map)
 	m_map->SetShowCompass(show_compass);
 }
 
-void OPMapGadgetWidget::goZoomInAct_triggered()
+void OPMapGadgetWidget::onGoZoomInAct_triggered()
 {
     if (m_map)
 	setZoom(m_map->Zoom() + 1);
 }
 
-void OPMapGadgetWidget::goZoomOutAct_triggered()
+void OPMapGadgetWidget::onGoZoomOutAct_triggered()
 {
     if (m_map)
 	setZoom(m_map->Zoom() - 1);
 }
 
-void OPMapGadgetWidget::zoomActGroup_triggered(QAction *action)
+void OPMapGadgetWidget::onZoomActGroup_triggered(QAction *action)
 {
     if (!action) return;
 
@@ -1017,18 +1069,18 @@ void OPMapGadgetWidget::zoomActGroup_triggered(QAction *action)
     setZoom(zoom);
 }
 
-void OPMapGadgetWidget::goMouseClickAct_triggered()
+void OPMapGadgetWidget::onGoMouseClickAct_triggered()
 {
     if (m_map)
 	m_map->SetCurrentPosition(m_map->currentMousePosition());   // center the map onto the mouse position
 }
 
-void OPMapGadgetWidget::goHomeAct_triggered()
+void OPMapGadgetWidget::onGoHomeAct_triggered()
 {
     followUAVpositionAct->setChecked(false);
 }
 
-void OPMapGadgetWidget::goUAVAct_triggered()
+void OPMapGadgetWidget::onGoUAVAct_triggered()
 {
     PositionActual::DataFields data = m_positionActual->getData();				// get current UAV data
 
@@ -1040,7 +1092,7 @@ void OPMapGadgetWidget::goUAVAct_triggered()
     }
 }
 
-void OPMapGadgetWidget::followUAVpositionAct_toggled(bool checked)
+void OPMapGadgetWidget::onFollowUAVpositionAct_toggled(bool checked)
 {
     if (m_widget)
     {
@@ -1052,18 +1104,18 @@ void OPMapGadgetWidget::followUAVpositionAct_toggled(bool checked)
     }
 }
 
-void OPMapGadgetWidget::followUAVheadingAct_toggled(bool checked)
+void OPMapGadgetWidget::onFollowUAVheadingAct_toggled(bool checked)
 {
     if (!checked && m_map)
 	m_map->SetRotate(0);									// reset the rotation to '0'
 }
 
-void OPMapGadgetWidget::openWayPointEditorAct_triggered()
+void OPMapGadgetWidget::onOpenWayPointEditorAct_triggered()
 {
     waypoint_editor_dialog.show();
 }
 
-void OPMapGadgetWidget::addWayPointAct_triggered()
+void OPMapGadgetWidget::onAddWayPointAct_triggered()
 {
     if (!m_map) return;
 
@@ -1081,18 +1133,16 @@ void OPMapGadgetWidget::addWayPointAct_triggered()
     m_waypoint_list_mutex.unlock();
 }
 
-void OPMapGadgetWidget::editWayPointAct_triggered()
+void OPMapGadgetWidget::onEditWayPointAct_triggered()
 {
     if (!m_mouse_waypoint) return;
 
-    // to do
-
-    waypoint_edit_dialog.show();
+    waypoint_edit_dialog.editWaypoint(m_mouse_waypoint);
 
     m_mouse_waypoint = NULL;
 }
 
-void OPMapGadgetWidget::lockWayPointAct_triggered()
+void OPMapGadgetWidget::onLockWayPointAct_triggered()
 {
     if (!m_mouse_waypoint) return;
 
@@ -1102,7 +1152,7 @@ void OPMapGadgetWidget::lockWayPointAct_triggered()
     m_mouse_waypoint = NULL;
 }
 
-void OPMapGadgetWidget::deleteWayPointAct_triggered()
+void OPMapGadgetWidget::onDeleteWayPointAct_triggered()
 {
     if (!m_mouse_waypoint) return;
 
@@ -1131,7 +1181,7 @@ void OPMapGadgetWidget::deleteWayPointAct_triggered()
     m_mouse_waypoint = NULL;
 }
 
-void OPMapGadgetWidget::clearWayPointsAct_triggered()
+void OPMapGadgetWidget::onClearWayPointsAct_triggered()
 {
     m_waypoint_list_mutex.lock();
 	if (m_map) m_map->WPDeleteAll();
@@ -1140,6 +1190,7 @@ void OPMapGadgetWidget::clearWayPointsAct_triggered()
 }
 
 // *************************************************************************************
+// temporary until an object is created for managing the save/restore
 
 // load the contents of a simple text file into a combobox
 void OPMapGadgetWidget::loadComboBoxLines(QComboBox *comboBox, QString filename)

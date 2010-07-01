@@ -28,18 +28,25 @@
 #include "opmap_edit_waypoint_dialog.h"
 #include "ui_opmap_edit_waypoint_dialog.h"
 
+// *********************************************************************
+
+// constructor
 opmap_edit_waypoint_dialog::opmap_edit_waypoint_dialog(QWidget *parent) :
-    QDialog(parent),
+    QDialog(parent, Qt::Dialog),
     ui(new Ui::opmap_edit_waypoint_dialog)
 {
     ui->setupUi(this);
-    setWindowFlags(Qt::Dialog);
+
+    waypoint_item = NULL;
 }
 
+// destrutor
 opmap_edit_waypoint_dialog::~opmap_edit_waypoint_dialog()
 {
     delete ui;
 }
+
+// *********************************************************************
 
 void opmap_edit_waypoint_dialog::changeEvent(QEvent *e)
 {
@@ -55,22 +62,96 @@ void opmap_edit_waypoint_dialog::changeEvent(QEvent *e)
 
 void opmap_edit_waypoint_dialog::on_pushButtonOK_clicked()
 {
-    // to do
+    int res = saveSettings();
+    if (res < 0) return;
+
+    waypoint_item = NULL;
 
     close();
 }
 
 void opmap_edit_waypoint_dialog::on_pushButtonApply_clicked()
 {
-    // to do
+    saveSettings();
 }
 
 void opmap_edit_waypoint_dialog::on_pushButtonRevert_clicked()
 {
-    // to do
+    ui->checkBoxLocked->setChecked(original_locked);
+    ui->spinBoxNumber->setValue(original_number);
+    ui->doubleSpinBoxLatitude->setValue(original_coord.Lat());
+    ui->doubleSpinBoxLongitude->setValue(original_coord.Lng());
+    ui->doubleSpinBoxAltitude->setValue(original_altitude);
+    ui->lineEditDescription->setText(original_description);
+
+    saveSettings();
 }
 
 void opmap_edit_waypoint_dialog::on_pushButtonCancel_clicked()
 {
+    waypoint_item = NULL;
     close();
 }
+
+// *********************************************************************
+
+int opmap_edit_waypoint_dialog::saveSettings()
+{
+    // ********************
+    // fetch the various ui item values
+
+    bool locked = ui->checkBoxLocked->isChecked();
+
+    int number = ui->spinBoxNumber->value();
+    if (number < 0)
+    {
+	return -1;
+    }
+
+    double latitude = ui->doubleSpinBoxLatitude->value();
+    double longitude = ui->doubleSpinBoxLongitude->value();
+
+    double altitude = ui->doubleSpinBoxAltitude->value();
+
+    QString description = ui->lineEditDescription->displayText().simplified();
+
+    // ********************
+    // transfer the settings to the actual waypoint
+
+    waypoint_item->SetNumber(number);
+    waypoint_item->SetCoord(internals::PointLatLng(latitude, longitude));
+    waypoint_item->SetAltitude(altitude);
+    waypoint_item->SetDescription(description);
+    waypoint_item->setFlag(QGraphicsItem::ItemIsMovable, !locked);
+
+    // ********************
+
+    return 0;	// all ok
+}
+
+// *********************************************************************
+// public functions
+
+void opmap_edit_waypoint_dialog::editWaypoint(mapcontrol::WayPointItem *waypoint_item)
+{
+    if (!waypoint_item) return;
+
+    this->waypoint_item = waypoint_item;
+
+    original_number = this->waypoint_item->Number();
+    original_locked = (this->waypoint_item->flags() & QGraphicsItem::ItemIsMovable) == 0;
+    original_coord = this->waypoint_item->Coord();
+    original_altitude = this->waypoint_item->Altitude();
+    original_description = this->waypoint_item->Description().simplified();
+
+    ui->checkBoxLocked->setChecked(original_locked);
+    ui->spinBoxNumber->setValue(original_number);
+    ui->doubleSpinBoxLatitude->setValue(original_coord.Lat());
+    ui->doubleSpinBoxLongitude->setValue(original_coord.Lng());
+    ui->doubleSpinBoxAltitude->setValue(original_altitude);
+    ui->lineEditDescription->setText(original_description);
+
+    show();
+}
+
+// *********************************************************************

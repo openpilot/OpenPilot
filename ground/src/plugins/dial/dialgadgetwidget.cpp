@@ -44,7 +44,9 @@ DialGadgetWidget::DialGadgetWidget(QWidget *parent) : QGraphicsView(parent)
     obj1 = NULL;
     obj2 = NULL;
     obj3 = NULL;
-    m_text1 = NULL; // Should be initialized to NULL otherwise the setFont method
+    m_text1 = NULL;
+    m_text2 = NULL;
+    m_text3 = NULL; // Should be initialized to NULL otherwise the setFont method
                     // might segfault upon initialization if called before SetDialFile
 
     needle1Target = 0;
@@ -161,182 +163,179 @@ void DialGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QString 
    n2enabled = false;
    n3enabled = false;
    QGraphicsScene *l_scene = scene();
-   if (QFile::exists(dfn))
+   if (QFile::exists(dfn) && m_renderer->load(dfn) && m_renderer->isValid())
    {
-      m_renderer->load(dfn);
-      if(m_renderer->isValid())
-      {
-         l_scene->clear(); // This also deletes all items contained in the scene.
-         m_background = new QGraphicsSvgItem();
-         // All other items will be clipped to the shape of the background
-         m_background->setFlags(QGraphicsItem::ItemClipsChildrenToShape|
-                                QGraphicsItem::ItemClipsToShape);
-         m_foreground = new QGraphicsSvgItem();
-         m_needle1 = new QGraphicsSvgItem();
-         m_needle2 = new QGraphicsSvgItem();
-         m_needle3 = new QGraphicsSvgItem();
-         m_needle1->setParentItem(m_background);
-         m_needle2->setParentItem(m_background);
-         m_needle3->setParentItem(m_background);
-         m_foreground->setParentItem(m_background);
+     l_scene->clear(); // This also deletes all items contained in the scene.
+     m_background = new QGraphicsSvgItem();
+     // All other items will be clipped to the shape of the background
+     m_background->setFlags(QGraphicsItem::ItemClipsChildrenToShape|
+                            QGraphicsItem::ItemClipsToShape);
+     m_foreground = new QGraphicsSvgItem();
+     m_needle1 = new QGraphicsSvgItem();
+     m_needle2 = new QGraphicsSvgItem();
+     m_needle3 = new QGraphicsSvgItem();
+     m_needle1->setParentItem(m_background);
+     m_needle2->setParentItem(m_background);
+     m_needle3->setParentItem(m_background);
+     m_foreground->setParentItem(m_background);
 
-         // We assume the dial contains at least the background
-         // and needle1
-         m_background->setSharedRenderer(m_renderer);
-         m_background->setElementId(bg);
-         l_scene->addItem(m_background);
+     // We assume the dial contains at least the background
+     // and needle1
+     m_background->setSharedRenderer(m_renderer);
+     m_background->setElementId(bg);
+     l_scene->addItem(m_background);
 
-         m_needle1->setSharedRenderer(m_renderer);
-         m_needle1->setElementId(n1);
-         // Note: no need to add the item explicitely because it
-         // is done automatically since it's a child item of the
-         // background.
-         //l_scene->addItem(m_needle1);
+     m_needle1->setSharedRenderer(m_renderer);
+     m_needle1->setElementId(n1);
+     // Note: no need to add the item explicitely because it
+     // is done automatically since it's a child item of the
+     // background.
+     //l_scene->addItem(m_needle1);
 
-        // The dial gadget allows Needle1 and Needle2 to be
-        // the same element, for combined movement. Needle3
-        // is always independent.
-        if (n1 == n2) {
-            m_needle2 = m_needle1;
-            n2enabled = true;
-        } else {
-         if (m_renderer->elementExists(n2)) {
-             m_needle2->setSharedRenderer(m_renderer);
-             m_needle2->setElementId(n2);
-             //l_scene->addItem(m_needle2);
-             n2enabled = true;
-            }
-         }
-
-        if (m_renderer->elementExists(n3)) {
-            m_needle3->setSharedRenderer(m_renderer);
-            m_needle3->setElementId(n3);
-            //l_scene->addItem(m_needle3);
-            n3enabled = true;
-           }
-
-        if (m_renderer->elementExists(fg)) {
-            m_foreground->setSharedRenderer(m_renderer);
-            m_foreground->setElementId(fg);
-            //l_scene->addItem(m_foreground);
-            fgenabled = true;
+    // The dial gadget allows Needle1 and Needle2 to be
+    // the same element, for combined movement. Needle3
+    // is always independent.
+    if (n1 == n2) {
+        m_needle2 = m_needle1;
+        n2enabled = true;
+    } else {
+     if (m_renderer->elementExists(n2)) {
+         m_needle2->setSharedRenderer(m_renderer);
+         m_needle2->setElementId(n2);
+         //l_scene->addItem(m_needle2);
+         n2enabled = true;
         }
+     }
 
-        rotateN1 = false;
-        horizN1 =  false;
-        vertN1 = false;
-        rotateN2 = false;
-        horizN2 = false;
-        vertN2 = false;
-        rotateN3 = false;
-        horizN3 = false;
-        vertN3 = false;
+    if (m_renderer->elementExists(n3)) {
+        m_needle3->setSharedRenderer(m_renderer);
+        m_needle3->setElementId(n3);
+        //l_scene->addItem(m_needle3);
+        n3enabled = true;
+       }
 
-        // Now setup the rotation/translation settings:
-        // this is UGLY UGLY UGLY, sorry...
-        if (n1Move.contains("Rotate")) {
-            rotateN1 = true;
-        } else if (n1Move.contains("Horizontal")) {
-            horizN1 = true;
-        } else if (n1Move.contains("Vertical")) {
-            vertN1 = true;
-        }
+    if (m_renderer->elementExists(fg)) {
+        m_foreground->setSharedRenderer(m_renderer);
+        m_foreground->setElementId(fg);
+        //l_scene->addItem(m_foreground);
+        fgenabled = true;
+    }
 
-        if (n2Move.contains("Rotate")) {
-            rotateN2 = true;
-        } else if (n2Move.contains("Horizontal")) {
-            horizN2 = true;
-        } else if (n2Move.contains("Vertical")) {
-            vertN2 = true;
-        }
+    rotateN1 = false;
+    horizN1 =  false;
+    vertN1 = false;
+    rotateN2 = false;
+    horizN2 = false;
+    vertN2 = false;
+    rotateN3 = false;
+    horizN3 = false;
+    vertN3 = false;
 
-        if (n3Move.contains("Rotate")) {
-            rotateN3 = true;
-        } else if (n3Move.contains("Horizontal")) {
-            horizN3 = true;
-        } else if (n3Move.contains("Vertical")) {
-            vertN3 = true;
-        }
+    // Now setup the rotation/translation settings:
+    // this is UGLY UGLY UGLY, sorry...
+    if (n1Move.contains("Rotate")) {
+        rotateN1 = true;
+    } else if (n1Move.contains("Horizontal")) {
+        horizN1 = true;
+    } else if (n1Move.contains("Vertical")) {
+        vertN1 = true;
+    }
 
-        l_scene->setSceneRect(m_background->boundingRect());
+    if (n2Move.contains("Rotate")) {
+        rotateN2 = true;
+    } else if (n2Move.contains("Horizontal")) {
+        horizN2 = true;
+    } else if (n2Move.contains("Vertical")) {
+        vertN2 = true;
+    }
 
-        // Now Initialize the center for all transforms of the dial needles to the
-        // center of the background:
-        // - Move the center of the needle to the center of the background.
-        QRectF rectB = m_background->boundingRect();
-        QRectF rectN = m_needle1->boundingRect();
-        m_needle1->setPos(rectB.width()/2-rectN.width()/2,rectB.height()/2-rectN.height()/2);
-        // - Put the transform origin point of the needle at its center.
-        m_needle1->setTransformOriginPoint(rectN.width()/2,rectN.height()/2);
+    if (n3Move.contains("Rotate")) {
+        rotateN3 = true;
+    } else if (n3Move.contains("Horizontal")) {
+        horizN3 = true;
+    } else if (n3Move.contains("Vertical")) {
+        vertN3 = true;
+    }
 
+    l_scene->setSceneRect(m_background->boundingRect());
+
+    // Now Initialize the center for all transforms of the dial needles to the
+    // center of the background:
+    // - Move the center of the needle to the center of the background.
+    QRectF rectB = m_background->boundingRect();
+    QRectF rectN = m_needle1->boundingRect();
+    m_needle1->setPos(rectB.width()/2-rectN.width()/2,rectB.height()/2-rectN.height()/2);
+    // - Put the transform origin point of the needle at its center.
+    m_needle1->setTransformOriginPoint(rectN.width()/2,rectN.height()/2);
+
+    // Check whether the dial also wants display the numeric value:
+    if (m_renderer->elementExists(n1+"-text")) {
+        QMatrix textMatrix = m_renderer->matrixForElement(n1+"-text");
+        qreal startX = textMatrix.mapRect(m_renderer->boundsOnElement(n1+"-text")).x();
+        qreal startY = textMatrix.mapRect(m_renderer->boundsOnElement(n1+"-text")).y();
+        QTransform matrix;
+        matrix.translate(startX,startY);
+        m_text1 = new QGraphicsTextItem("0.00");
+        m_text1->setDefaultTextColor(QColor("White"));
+        m_text1->setTransform(matrix,false);
+        l_scene->addItem(m_text1);
+    } else {
+        m_text1 = NULL;
+    }
+
+
+    if ((n1 != n2) && n2enabled) {
+        // Only do it for needle2 if it is not the same as n1
+        rectN = m_needle2->boundingRect();
+        m_needle2->setPos(rectB.width()/2-rectN.width()/2,rectB.height()/2-rectN.height()/2);
+        m_needle2->setTransformOriginPoint(rectN.width()/2,rectN.height()/2);
         // Check whether the dial also wants display the numeric value:
-        if (m_renderer->elementExists(n1+"-text")) {
-            QMatrix textMatrix = m_renderer->matrixForElement(n1+"-text");
-            qreal startX = textMatrix.mapRect(m_renderer->boundsOnElement(n1+"-text")).x();
-            qreal startY = textMatrix.mapRect(m_renderer->boundsOnElement(n1+"-text")).y();
+        if (m_renderer->elementExists(n2+"-text")) {
+            QMatrix textMatrix = m_renderer->matrixForElement(n2+"-text");
+            qreal startX = textMatrix.mapRect(m_renderer->boundsOnElement(n2+"-text")).x();
+            qreal startY = textMatrix.mapRect(m_renderer->boundsOnElement(n2+"-text")).y();
             QTransform matrix;
             matrix.translate(startX,startY);
-            m_text1 = new QGraphicsTextItem("0.00");
-            m_text1->setDefaultTextColor(QColor("White"));
-            m_text1->setTransform(matrix,false);
-            l_scene->addItem(m_text1);
+            m_text2 = new QGraphicsTextItem("0.00");
+            m_text2->setDefaultTextColor(QColor("White"));
+            m_text2->setTransform(matrix,false);
+            l_scene->addItem(m_text2);
         } else {
-            m_text1 = NULL;
+            m_text2 = NULL;
         }
 
-
-        if ((n1 != n2) && n2enabled) {
-            // Only do it for needle2 if it is not the same as n1
-            rectN = m_needle2->boundingRect();
-            m_needle2->setPos(rectB.width()/2-rectN.width()/2,rectB.height()/2-rectN.height()/2);
-            m_needle2->setTransformOriginPoint(rectN.width()/2,rectN.height()/2);
-            // Check whether the dial also wants display the numeric value:
-            if (m_renderer->elementExists(n2+"-text")) {
-                QMatrix textMatrix = m_renderer->matrixForElement(n2+"-text");
-                qreal startX = textMatrix.mapRect(m_renderer->boundsOnElement(n2+"-text")).x();
-                qreal startY = textMatrix.mapRect(m_renderer->boundsOnElement(n2+"-text")).y();
-                QTransform matrix;
-                matrix.translate(startX,startY);
-                m_text2 = new QGraphicsTextItem("0.00");
-                m_text2->setDefaultTextColor(QColor("White"));
-                m_text2->setTransform(matrix,false);
-                l_scene->addItem(m_text2);
-            } else {
-                m_text2 = NULL;
-            }
-
-        }
-        if (n3enabled) {
-            rectN = m_needle3->boundingRect();
-            m_needle3->setPos(rectB.width()/2-rectN.width()/2,rectB.height()/2-rectN.height()/2);
-            m_needle3->setTransformOriginPoint(rectN.width()/2,rectN.height()/2);
-            // Check whether the dial also wants display the numeric value:
-            if (m_renderer->elementExists(n3+"-text")) {
-                QMatrix textMatrix = m_renderer->matrixForElement(n3+"-text");
-                qreal startX = textMatrix.mapRect(m_renderer->boundsOnElement(n3+"-text")).x();
-                qreal startY = textMatrix.mapRect(m_renderer->boundsOnElement(n3+"-text")).y();
-                QTransform matrix;
-                matrix.translate(startX,startY);
-                m_text3 = new QGraphicsTextItem("0.00");
-                m_text3->setDefaultTextColor(QColor("White"));
-                m_text3->setTransform(matrix,false);
-                l_scene->addItem(m_text3);
-            } else {
-                m_text3 = NULL;
-            }
-
+    }
+    if (n3enabled) {
+        rectN = m_needle3->boundingRect();
+        m_needle3->setPos(rectB.width()/2-rectN.width()/2,rectB.height()/2-rectN.height()/2);
+        m_needle3->setTransformOriginPoint(rectN.width()/2,rectN.height()/2);
+        // Check whether the dial also wants display the numeric value:
+        if (m_renderer->elementExists(n3+"-text")) {
+            QMatrix textMatrix = m_renderer->matrixForElement(n3+"-text");
+            qreal startX = textMatrix.mapRect(m_renderer->boundsOnElement(n3+"-text")).x();
+            qreal startY = textMatrix.mapRect(m_renderer->boundsOnElement(n3+"-text")).y();
+            QTransform matrix;
+            matrix.translate(startX,startY);
+            m_text3 = new QGraphicsTextItem("0.00");
+            m_text3->setDefaultTextColor(QColor("White"));
+            m_text3->setTransform(matrix,false);
+            l_scene->addItem(m_text3);
+        } else {
+            m_text3 = NULL;
         }
 
-        // Last: we just loaded the dial file which is by default positioned on a "zero" value
-        // of the needles, so we have to reset the needle values too upon dial file loading, otherwise
-        // we would end up with an offset whenever we change a dial file and the needle value
-        // is not zero at that time.
-        needle1Value = 0;
-        needle2Value = 0;
-        needle3Value = 0;
-        if (!dialTimer.isActive())
-            dialTimer.start();
-     }
+    }
+
+    // Last: we just loaded the dial file which is by default positioned on a "zero" value
+    // of the needles, so we have to reset the needle values too upon dial file loading, otherwise
+    // we would end up with an offset whenever we change a dial file and the needle value
+    // is not zero at that time.
+    needle1Value = 0;
+    needle2Value = 0;
+    needle3Value = 0;
+    if (!dialTimer.isActive())
+        dialTimer.start();
+    dialError = false;
    }
    else
    {
@@ -347,6 +346,13 @@ void DialGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QString 
        m_background->setSharedRenderer(m_renderer);
        m_background->setElementId(bg);
        l_scene->addItem(m_background);
+       m_text1 = NULL;
+       m_text2 = NULL;
+       m_text3 = NULL;
+       m_needle1 = NULL;
+       m_needle2 = NULL;
+       m_needle3 = NULL;
+       dialError = true;
    }
 }
 
@@ -452,6 +458,11 @@ void DialGadgetWidget::setNeedle3(double value) {
 // to the same element.
 void DialGadgetWidget::rotateNeedles()
 {
+    if (dialError) {
+        // We get there in case the dial file is missing or corrupt.
+        dialTimer.stop();
+        return;
+    }
     int dialRun = 3;
     if (n2enabled) {
         double needle2Diff;

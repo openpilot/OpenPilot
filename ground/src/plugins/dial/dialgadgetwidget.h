@@ -96,6 +96,7 @@ private:
    bool n3enabled;
    bool n2enabled; // Simple flag to skip rendering if the
    bool fgenabled; // layer does not exist.
+   bool dialError ;
 
    // Settings concerning move of the dials
    bool rotateN1;

@@ -46,13 +46,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <math.h>
-
-#if defined(PIOS_INCLUDE_SDCARD)
-
-/* minIni Includes */
-#include <minIni.h>
-
-#endif
+#include <unistd.h>
 
 /* PIOS Board Specific Device Configuration */
 #include "pios_board_x86.h"

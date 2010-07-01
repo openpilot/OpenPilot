@@ -44,6 +44,10 @@
 #include <QTime>
 #include <QVector>
 
+/*!
+  \brief This class is used to render the time values on the horizontal axis for the
+  ChronoPlot.
+  */
 class TimeScaleDraw : public QwtScaleDraw
 {
 public:
@@ -58,6 +62,9 @@ private:
     double baseTime;
 };
 
+/*!
+  \brief This class is used to inject UAVTalk messages for testing.
+  */
 class TestDataGen : QObject
 {
     Q_OBJECT
@@ -87,6 +94,21 @@ public:
     ScopeGadgetWidget(QWidget *parent = 0);
     ~ScopeGadgetWidget();
 
+    void setupSequencialPlot();
+    void setupChronoPlot();
+    void setupUAVObjectPlot();
+    PlotType plotType(){return m_plotType;}
+
+    void setXWindowSize(double xWindowSize){m_xWindowSize = xWindowSize;}
+    double xWindowSize(){return m_xWindowSize;}
+    void setRefreshInterval(double refreshInterval){m_refreshInterval = refreshInterval;}
+    int refreshInterval(){return m_refreshInterval;}
+
+
+    void addCurvePlot(QString uavObject, QString uavField, int scaleOrderFactor = 0, QPen pen = QPen(Qt::black));
+    void removeCurvePlot(QString uavObject, QString uavField);
+    void clearCurvePlots();
+
 
 private slots:
     void uavObjectReceived(UAVObject*);
@@ -96,18 +118,12 @@ private:
 
     void preparePlot(PlotType plotType);
     void setupExamplePlot();
-    void setupSequencialPlot();
-    void setupChronoPlot();
-    void setupUAVObjectPlot();
-
-    void addCurvePlot(QString uavObject, QString uavField, int scaleOrderFactor = 0, QPen pen = QPen(Qt::black));
-    void removeCurvePlot(QString uavObject, QString uavField);
-    void clearCurvePlots();
 
     PlotType m_plotType;
 
     double m_xWindowSize;
-    QVector<QString> m_connectedUAVObjects;
+    int m_refreshInterval;
+    QList<QString> m_connectedUAVObjects;
     QMap<QString, PlotData*> m_curvesData;
 
     static TestDataGen* testDataGen;

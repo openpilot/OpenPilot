@@ -29,7 +29,7 @@
 #define SCOPEGADGETOPTIONSPAGE_H
 
 #include "coreplugin/dialogs/ioptionspage.h"
-#include "QString"
+#include <QString>
 #include <QStringList>
 #include <QDebug>
 
@@ -61,6 +61,16 @@ private:
     Ui::ScopeGadgetOptionsPage *options_page;
     ScopeGadgetConfiguration *m_config;
 
+    void addPlotCurveConfig(QString uavObject, QString uavField, int scale, QVariant varColor);
+    void setYAxisWidgetFromPlotCurve();
+
+
+
+private slots:
+    void on_lstCurves_currentRowChanged(int currentRow);
+    void on_btnRemoveCurve_clicked();
+    void on_btnAddCurve_clicked();
+    void on_cmbUAVObjects_currentIndexChanged(QString val);
 };
 
 #endif // SCOPEGADGETOPTIONSPAGE_H

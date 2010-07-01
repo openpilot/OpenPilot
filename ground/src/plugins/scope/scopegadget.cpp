@@ -26,12 +26,39 @@
  */
 
 #include "scopegadget.h"
+#include "scopegadgetconfiguration.h"
 #include "scopegadgetwidget.h"
 
 ScopeGadget::ScopeGadget(QString classId, ScopeGadgetWidget *widget, QWidget *parent) :
         IUAVGadget(classId, parent),
         m_widget(widget)
 {
+}
+
+void ScopeGadget::loadConfiguration(IUAVGadgetConfiguration* config)
+{
+    ScopeGadgetConfiguration *sgConfig = qobject_cast<ScopeGadgetConfiguration*>(config);
+    ScopeGadgetWidget* widget = qobject_cast<ScopeGadgetWidget*>(m_widget);
+
+    widget->setXWindowSize(sgConfig->dataSize());
+    widget->setRefreshInterval(sgConfig->refreshInterval());
+
+    if(sgConfig->plotType() == SequencialPlot )
+        widget->setupSequencialPlot();
+    else if(sgConfig->plotType() == ChronoPlot)
+        widget->setupChronoPlot();
+    //    else if(sgConfig->plotType() == UAVObjectPlot)
+    //        widget->setupUAVObjectPlot();
+
+    foreach (PlotCurveConfiguration* plotCurveConfig,  sgConfig->plotCurveConfigs()) {
+
+        QString uavObject = plotCurveConfig->uavObject;
+        QString uavField = plotCurveConfig->uavField;
+        int scale = plotCurveConfig->yScalePower;
+        QRgb color = plotCurveConfig->color;
+
+        widget->addCurvePlot(uavObject,uavField,scale,QPen(QColor(color)));
+    }   
 }
 
 ScopeGadget::~ScopeGadget()

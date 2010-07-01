@@ -36,18 +36,7 @@
       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
      </property>
      <item row="1" column="1">
-      <widget class="QComboBox" name="comboBox">
-       <item>
-        <property name="text">
-         <string>Chronological Plot</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Sequencial Plot</string>
-        </property>
-       </item>
-      </widget>
+      <widget class="QComboBox" name="cmbPlotType"/>
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="label">
@@ -57,7 +46,7 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QSpinBox" name="spinBox">
+      <widget class="QSpinBox" name="spnDataSize">
        <property name="suffix">
         <string> seconds</string>
        </property>
@@ -65,7 +54,7 @@
         <number>5000</number>
        </property>
        <property name="singleStep">
-        <number>10</number>
+        <number>30</number>
        </property>
        <property name="value">
         <number>300</number>
@@ -80,7 +69,7 @@
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QSpinBox" name="spinBox_2">
+      <widget class="QSpinBox" name="spnRefreshInterval">
        <property name="suffix">
         <string> seconds</string>
        </property>
@@ -98,7 +87,7 @@
      <item row="3" column="0">
       <widget class="QLabel" name="label_7">
        <property name="text">
-        <string>Refresh Time:</string>
+        <string>Data Timeout:</string>
        </property>
       </widget>
      </item>
@@ -110,10 +99,13 @@
       <x>0</x>
       <y>160</y>
       <width>481</width>
-      <height>131</height>
+      <height>102</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetDefaultConstraint</enum>
+     </property>
      <item>
       <layout class="QFormLayout" name="formLayout">
        <item row="0" column="0">
@@ -124,7 +116,7 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QComboBox" name="comboBox_2"/>
+        <widget class="QComboBox" name="cmbUAVObjects"/>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_3">
@@ -134,7 +126,7 @@
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QComboBox" name="comboBox_4"/>
+        <widget class="QComboBox" name="cmbColor"/>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_4">
@@ -144,7 +136,7 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QComboBox" name="comboBox_3"/>
+        <widget class="QComboBox" name="cmbUAVField"/>
        </item>
        <item row="3" column="0">
         <widget class="QLabel" name="label_6">
@@ -154,7 +146,11 @@
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QComboBox" name="comboBox_5"/>
+        <widget class="QComboBox" name="cmbScale">
+         <property name="editable">
+          <bool>false</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -164,14 +160,14 @@
         <enum>QLayout::SetFixedSize</enum>
        </property>
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="btnAddCurve">
          <property name="text">
           <string>&gt;&gt;</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_2">
+        <widget class="QPushButton" name="btnRemoveCurve">
          <property name="text">
           <string>&lt;&lt;</string>
          </property>
@@ -182,7 +178,10 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QListView" name="listView">
+        <widget class="QListWidget" name="lstCurves">
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectItems</enum>
+         </property>
          <property name="batchSize">
           <number>100</number>
          </property>

@@ -46,6 +46,8 @@ public:
     ScopeGadget(QString classId, ScopeGadgetWidget *widget, QWidget *parent = 0);
     ~ScopeGadget();
 
+    void loadConfiguration(IUAVGadgetConfiguration* config);
+
     QList<int> context() const {
         return m_context;
     }

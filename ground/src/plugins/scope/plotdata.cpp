@@ -29,10 +29,10 @@
 #include "plotdata.h"
 #include <math.h>
 
-PlotData::PlotData(QString* p_uavObject, QString* p_uavField)
+PlotData::PlotData(QString p_uavObject, QString p_uavField)
 {
-    uavObject = new QString(*p_uavObject);
-    uavField =  new QString(*p_uavField);
+    uavObject = p_uavObject;
+    uavField =  p_uavField;
 
     xData = new QVector<double>();
     yData = new QVector<double>();
@@ -47,8 +47,6 @@ PlotData::PlotData(QString* p_uavObject, QString* p_uavField)
 
 PlotData::~PlotData()
 {
-    delete uavObject;
-    delete uavField;
     delete xData;
     delete yData;
 }
@@ -56,22 +54,19 @@ PlotData::~PlotData()
 
 bool SequencialPlotData::append(UAVObject* obj)
 {
-    if (*uavObject == obj->getName()) {
+    if (uavObject == obj->getName()) {
         //Get the field of interest
-        UAVObjectField* field =  obj->getField(*uavField);
+        UAVObjectField* field =  obj->getField(uavField);
 
         if (field) {
             //Shift data forward and put the new value at the front
             yData->append(field->getDouble() * pow(10, scalePower));
             if (yData->size() > m_xWindowSize) {
                 yData->pop_front();
-
-                //Make the x-axis values scroll...
-                //xData->append( xData->last() + 1 );
-                //xData->pop_front();
             } else
                 xData->insert(xData->size(), xData->size());
 
+            //notify the gui of changes in the data
             dataChanged();
             return true;
         }
@@ -82,9 +77,9 @@ bool SequencialPlotData::append(UAVObject* obj)
 
 bool ChronoPlotData::append(UAVObject* obj)
 {
-    if (*uavObject == obj->getName()) {
+    if (uavObject == obj->getName()) {
         //Get the field of interest
-        UAVObjectField* field =  obj->getField(*uavField);
+        UAVObjectField* field =  obj->getField(uavField);
 
         if (field) {
             //Put the new value at the front
@@ -97,6 +92,7 @@ bool ChronoPlotData::append(UAVObject* obj)
             //Remove stale data
             removeStaleData();
 
+            //notify the gui of chages in the data
             dataChanged();
             return true;
         }
@@ -135,4 +131,3 @@ bool UAVObjectPlotData::append(UAVObject* obj)
 {
     return false;
 }
-

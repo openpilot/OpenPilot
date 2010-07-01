@@ -28,12 +28,8 @@
 
 #include "uavobjects/uavobjectmanager.h"
 #include "extensionsystem/pluginmanager.h"
-//#include "uavobjects/uavobject.h"
-//#include "uavobjects/uavdataobject.h"
-//#include "uavobjects/uavobjectfield.h"
-//#include "uavobjects/uavmetaobject.h"
-
 #include "scopegadgetwidget.h"
+
 #include "qwt/src/qwt_plot_curve.h"
 #include "qwt/src/qwt_legend.h"
 
@@ -50,15 +46,8 @@ TestDataGen* ScopeGadgetWidget::testDataGen;
 
 ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent)
 {
-    //setupExamplePlot();
-    //Setup defaults
-    //setupSequencialPlot();
-    setupChronoPlot();
-    addCurvePlot(QString("AltitudeActual"), QString("Altitude"), -1, QPen(Qt::blue));
-    addCurvePlot(QString("AltitudeActual"), QString("Temperature"), 0, QPen(Qt::red));
-
-    //if(testDataGen == 0)
-    //    testDataGen = new TestDataGen();
+//    if(testDataGen == 0)
+//        testDataGen = new TestDataGen();
 }
 
 void ScopeGadgetWidget::preparePlot(PlotType plotType)
@@ -82,20 +71,17 @@ void ScopeGadgetWidget::preparePlot(PlotType plotType)
 
 void ScopeGadgetWidget::setupSequencialPlot()
 {
-    //setAutoReplot(true);
-    m_xWindowSize = 100;
     preparePlot(SequencialPlot);
 
     setAxisTitle(QwtPlot::xBottom, "Index");
+    setAxisScaleDraw(QwtPlot::xBottom, new QwtScaleDraw());
     setAxisScale(QwtPlot::xBottom, 0, m_xWindowSize);
-    //setAxisLabelRotation(QwtPlot::xBottom, -50.0);
+    setAxisLabelRotation(QwtPlot::xBottom, 0.0);
     setAxisLabelAlignment(QwtPlot::xBottom, Qt::AlignLeft | Qt::AlignBottom);
 }
 
 void ScopeGadgetWidget::setupChronoPlot()
 {
-    //setAutoReplot(true);
-    m_xWindowSize = 100;
     preparePlot(ChronoPlot);
 
     setAxisTitle(QwtPlot::xBottom, "Time [h:m:s]");
@@ -124,11 +110,11 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavField, int sc
     PlotData* plotData;
 
     if (m_plotType == SequencialPlot)
-        plotData = new SequencialPlotData(&uavObject, &uavField);
+        plotData = new SequencialPlotData(uavObject, uavField);
     else if (m_plotType == ChronoPlot)
-        plotData = new ChronoPlotData(&uavObject, &uavField);
-    else if (m_plotType == UAVObjectPlot)
-        plotData = new UAVObjectPlotData(&uavObject, &uavField);
+        plotData = new ChronoPlotData(uavObject, uavField, m_refreshInterval);
+    //else if (m_plotType == UAVObjectPlot)
+    //    plotData = new UAVObjectPlotData(uavObject, uavField);
 
     plotData->m_xWindowSize = m_xWindowSize;
     plotData->scalePower = scaleOrderFactor;
@@ -138,7 +124,7 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavField, int sc
         setAxisScale(QwtPlot::yLeft, plotData->yMinimum, plotData->yMaximum);
 
     //Create the curve
-    QString curveName = *(plotData->uavObject) + "." + *(plotData->uavField);
+    QString curveName = (plotData->uavObject) + "." + (plotData->uavField);
     QwtPlotCurve* plotCurve = new QwtPlotCurve(curveName);
     plotCurve->setPen(pen);
     plotCurve->setData(*plotData->xData, *plotData->yData);
@@ -151,7 +137,7 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavField, int sc
     //Get the object to monitor
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(*(plotData->uavObject)));
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject((plotData->uavObject)));
 
     //Link to the signal of new data only if this UAVObject has not been to connected yet
     if (!m_connectedUAVObjects.contains(obj->getName())) {
@@ -170,6 +156,7 @@ void ScopeGadgetWidget::removeCurvePlot(QString uavObject, QString uavField)
     m_curvesData.remove(curveName);
     plotData->curve->detach();
 
+    delete plotData->curve;
     delete plotData;
 }
 
@@ -258,8 +245,8 @@ void ScopeGadgetWidget::clearCurvePlots()
 {
     foreach(PlotData* plotData, m_curvesData.values()) {
         plotData->curve->detach();
-        delete plotData->curve;
 
+        delete plotData->curve;
         delete plotData;
     }
 
@@ -278,7 +265,7 @@ TestDataGen::TestDataGen()
     //Setup timer
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(genTestData()));
-    timer->start(100);
+    timer->start(5000);
 }
 
 void TestDataGen::genTestData()
@@ -311,5 +298,3 @@ TestDataGen::~TestDataGen()
 
     delete timer;
 }
-
-

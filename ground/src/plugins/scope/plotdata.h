@@ -43,6 +43,9 @@
 #include <QTime>
 #include <QVector>
 
+/*!
+\brief Defines the different type of plots.
+  */
 enum PlotType {
     SequencialPlot,
     ChronoPlot,
@@ -51,25 +54,26 @@ enum PlotType {
     NPlotTypes
 };
 
-
+/*!
+  \brief Base class that keeps the data for each curve in the plot.
+  */
 class PlotData : public QObject
 {
     Q_OBJECT
 
 public:
-    PlotData(QString* uavObject, QString* uavField);
+    PlotData(QString uavObject, QString uavField);
     ~PlotData();
 
-    QString* uavObject;
-    QString* uavField;
+    QString uavObject;
+    QString uavField;
+    int scalePower; //This is the power to which each value must be raised
+    double yMinimum;
+    double yMaximum;
+    double m_xWindowSize;
     QwtPlotCurve* curve;
     QVector<double>* xData;
     QVector<double>* yData;
-    int scalePower; //This is the power to wich each value must be raised
-    double yMinimum;
-    double yMaximum;
-
-    double m_xWindowSize;
 
     virtual bool append(UAVObject* obj) = 0;
     virtual PlotType plotType() = 0;
@@ -78,32 +82,45 @@ signals:
     void dataChanged();
 };
 
+/*!
+  \brief The sequencial plot have a fixed size buffer of data. All the curves in one plot
+  have the same size buffer.
+  */
 class SequencialPlotData : public PlotData
 {
     Q_OBJECT
 public:
-    SequencialPlotData(QString* uavObject, QString* uavField)
+    SequencialPlotData(QString uavObject, QString uavField)
             : PlotData(uavObject, uavField) {}
     ~SequencialPlotData() {}
 
+    /*!
+      \brief Append new data to the plot
+      */
     bool append(UAVObject* obj);
 
+    /*!
+      \brief The type of plot
+      */
     virtual PlotType plotType() {
         return SequencialPlot;
     }
 };
 
+/*!
+  \brief The chrono plot have a variable sized buffer of data, where the data is for a specified time period.
+  */
 class ChronoPlotData : public PlotData
 {
     Q_OBJECT
 public:
-    ChronoPlotData(QString* uavObject, QString* uavField)
+    ChronoPlotData(QString uavObject, QString uavField, double refreshInterval)
             : PlotData(uavObject, uavField) {
         scalePower = 1;
-        //Setup timer
+        //Setup timer that removes stale data
         timer = new QTimer();
         connect(timer, SIGNAL(timeout()), this, SLOT(removeStaleDataTimeout()));
-        timer->start(100);
+        timer->start(refreshInterval * 1000);
     }
     ~ChronoPlotData() {
         delete timer;
@@ -115,7 +132,6 @@ public:
         return ChronoPlot;
     }
 private:
-    //QDateTime m_epoch;
     void removeStaleData();
 
     QTimer *timer;
@@ -124,11 +140,15 @@ private slots:
     void removeStaleDataTimeout();
 };
 
+/*!
+  \brief UAVObject plot use a fixed size buffer of data, where the horizontal axis values come from
+  a UAVObject field.
+  */
 class UAVObjectPlotData : public PlotData
 {
     Q_OBJECT
 public:
-    UAVObjectPlotData(QString* uavObject, QString* uavField)
+    UAVObjectPlotData(QString uavObject, QString uavField)
             : PlotData(uavObject, uavField) {}
     ~UAVObjectPlotData() {}
 

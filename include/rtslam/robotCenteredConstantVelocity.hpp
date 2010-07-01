@@ -3,54 +3,36 @@
  *
  * Header file for the robot with constant velocity motion model.
  *
- * \date 14/02/2010
- * \author jsola@laas.fr
+ * \date 1/07/2010
+ * \author jmcodol@laas.fr
  *
  * \ingroup rtslam
  */
 
-#ifndef ROBOTCONSTANTVELOCITY_HPP_
-#define ROBOTCONSTANTVELOCITY_HPP_
+#ifndef ROBOTCENTEREDCONSTANTVELOCITY_HPP_
+#define ROBOTCENTEREDCONSTANTVELOCITY_HPP_
 
 #include "rtslam/robotAbstract.hpp"
 
 namespace jafar {
 	namespace rtslam {
 
-		class RobotConstantVelocity;
-		typedef boost::shared_ptr<RobotConstantVelocity> robconstvel_ptr_t;
+		class RobotCenteredConstantVelocity;
+		typedef boost::shared_ptr<RobotCenteredConstantVelocity> robcenteredconstvel_ptr_t;
 
 
 		/**
-		 * Constant velocity model robot class.
+		 * RobotCentric Constant velocity model robot class.
 		 *
-		 * \author jsola@laas.fr
+		 * \author jmcodol@laas.fr
 		 *
-		 * This class implements a rigid frame in 3D moving with a constant velocity motion model. This model is the following:\n
-		 * - p += v*dt <-- position\n
-		 * - q = q**(w*dt) <-- orientation quaternion\n
-		 * - v += vi <-- linear velocity\n
-		 * - w += wi <-- angular velocity
+		 * This class implements a rigid frame in 3D moving with a constant velocity motion model.\n
 		 *
-		 * where \a vi and \a wi are linear and angular velocity random impulses,
-		 * and ** is the quaternion product.
-		 *
-		 * This model is embedded into the system variables as follows:
-		 * - the prediction function is x+ = f(x,u), implemented with method move().
-		 * - the state vector is x = state.x = [p q v w]
-		 * - the state covariance is in the map, P = state.P = (map.filter).P(state.ia, state.ia)
-		 * - the control vector is u = control.x = [vi wi]
-		 * - the control covariances matrix is U = control.P
-		 * - the Jacobians of f(x,u) provided by move() are XNEW_x and XNEW_control.
-		 * - the perturbation covariance is obtained with the method computeStatePerturbation(), as follows:
-		 * 		- Q = XNEW_control * control.P * XNEW_control'\n
-		 * .
-		 *
-		 * \sa Explore the comments in file robotConstantVelocity.cpp for full algebraic details.
+		 * From [Bounding Uncertaincy in EKF-SLAM. The Robocentric Local Approach], Ruben Martinez-Cantin, Jose A. Castellanos
 		 *
 		 * \ingroup rtslam
 		 */
-		class RobotConstantVelocity: public RobotAbstract {
+		class RobotCenteredConstantVelocity: public RobotAbstract {
 			public:
 
 
@@ -58,19 +40,19 @@ namespace jafar {
 				 * Remote constructor from remote map.
 				 * \param _map the remote map
 				 */
-				RobotConstantVelocity(const map_ptr_t & _mapPtr);
+				RobotCenteredConstantVelocity(const map_ptr_t & _mapPtr);
 				/**
 				 * Remote constructor from map, for simulation.
 				 * \param dummy flag for simulation. Give value FOR_SIMULATION.
 				 * \param _map the map
 				 */
-				RobotConstantVelocity(const simulation_t dummy, const map_ptr_t & _mapPtr);
+				RobotCenteredConstantVelocity(const simulation_t dummy, const map_ptr_t & _mapPtr);
 
-				~RobotConstantVelocity(void) {
+				~RobotCenteredConstantVelocity(void) {
 				}
 
 				virtual std::string typeName() {
-					return "Constant-velocity";
+					return "Centered-Constant-velocity";
 				}
 
 
@@ -92,8 +74,27 @@ namespace jafar {
 
 				void computePertJacobian();
 
+				/**
+				 * The size of the robot in map.
+				 *
+				 * Warning, there is no respect to the article, in the sense that :
+				 * in the article we have :
+				 * x = [  x_B^Rk-1  ] = [ R1 ] We are, in our case, using : R = [ R2 ] = [  x_Rk^Rk-1 ]
+				 *     [  x_F^Rk-1  ]   [ L  ]                                  [ R1 ]   [  x_B^Rk-1  ]
+				 *     [  x_Rk^Rk-1 ]   [ R2 ]                              L = [ L  ] = [  x_F^Rk-1  ]
+				 * the robot contains :
+				 * - R2 = x_Rk_Rkm1 : the pose/speed/... of the robot at time k, with respect to the frame of the robot at time k-1
+				 * - R1 = x_B_Rkm1 : the pose of the Base Frame B, with respect to the frame of the robot at time k-1.
+				 *
+				 * X = [ x_Rk_Rkm1 ;
+				 *       x_B_Rkm1  ] ;
+				 *
+				 * (see eq. 7) in article
+				 */
 				static size_t size() {
-					return 13;
+					int size_x_Rk_Rkm1 = 13 ; // P,Q,V,W
+					int size_x_B_Rkm1  = 7  ; // P,Q
+					return size_x_Rk_Rkm1 + size_x_B_Rkm1  ;
 				}
 				static size_t size_control() {
 					return 0;
@@ -106,6 +107,12 @@ namespace jafar {
 				virtual size_t mySize_control() {return size_control();}
 				virtual size_t mySize_perturbation() {return size_perturbation();}
 
+				/**
+				 * we have :
+				 * robot state = r = [ R2 ] = [  x_Rk^Rk-1 ] = [  pose ]
+				 *                   [ R1 ]   [  x_B^Rk-1  ]   [ -base ]
+				 *
+				 */
 				void setVelocityStd(double velLinStd, double velAngStd){
 					for (size_t i = pose.size(); i < pose.size() + 3; i++){
 						state.P(i,i) = velLinStd*velLinStd;
@@ -134,6 +141,28 @@ namespace jafar {
 					w = ublas::subrange(x, 10, 13);
 				}
 
+				/**
+				 * Split state vector.
+				 *
+				 * Extracts \a p, \a q, \a v \a w \a pBase and \a qBase from the state vector, \a x = [\a p, \a q, \a v, \a w, \a pBase, \a qBase].
+				 * \param x the state vector
+				 * \param p the position
+				 * \param q the quaternion
+				 * \param v the linear velocity
+				 * \param w the angular velocity
+				 * \param pBase the position of the base frame in the current frame
+				 * \param qBase the quaternion of the base frame in the current frame
+				 */
+				template<class Vx, class Vp, class Vq, class Vv, class Vw>
+				inline void splitState(const Vx x, Vp & p, Vq & q, Vv & v, Vw & w, Vw & pBase, Vw & qBase) {
+					p     = ublas::subrange(x,  0,  3);
+					q     = ublas::subrange(x,  3,  7);
+					v     = ublas::subrange(x,  7, 10);
+					w     = ublas::subrange(x, 10, 13);
+					pBase = ublas::subrange(x, 13, 16);
+					qBase = ublas::subrange(x, 16, 20);
+				}
+
 
 				/**
 				 * Compose state vector.
@@ -151,6 +180,28 @@ namespace jafar {
 					ublas::subrange(x, 3, 7) = q;
 					ublas::subrange(x, 7, 10) = v;
 					ublas::subrange(x, 10, 13) = w;
+				}
+
+				/**
+				 * Compose state vector.
+				 *
+				 * Composes the state vector with \a p, \a q, \a v \a w, \a pBase and \a qBase, \a x = [\a p, \a q, \a v, \a w, \a pBase, \a qBase].
+				 * \param p the position
+				 * \param q the quaternion
+				 * \param v the linear velocity
+				 * \param w the angular velocity
+				 * \param x the state vector
+			   * \param pBase the position of the base frame in the current frame
+				 * \param qBase the quaternion of the base frame in the current frame
+				 */
+				template<class Vp, class Vq, class Vv, class Vw, class Vx>
+				inline void unsplitState(const Vp & p, const Vq & q, const Vv & v, const Vw & w, const Vw & pBase, const Vw & qBase, Vx & x) {
+					ublas::subrange(x, 0, 3)   = p    ;
+					ublas::subrange(x, 3, 7)   = q    ;
+					ublas::subrange(x, 7, 10)  = v    ;
+					ublas::subrange(x, 10, 13) = w    ;
+					ublas::subrange(x, 13, 16) = pBase;
+					ublas::subrange(x, 16, 20) = qBase;
 				}
 
 
@@ -179,4 +230,4 @@ namespace jafar {
 	}
 }
 
-#endif /* ROBOTCONSTANTVELOCITY_HPP_ */
+#endif /* ROBOTCENTEREDCONSTANTVELOCITY_HPP_ */

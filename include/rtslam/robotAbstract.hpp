@@ -67,7 +67,7 @@ namespace jafar {
 			public:
 
 				enum type_enum {
-					ODOMETRY, CONSTANT_VELOCITY, INERTIAL
+					ODOMETRY, CONSTANT_VELOCITY, INERTIAL, CENTERED_CONSTANT_VELOCITY
 				};
 				type_enum type;
 

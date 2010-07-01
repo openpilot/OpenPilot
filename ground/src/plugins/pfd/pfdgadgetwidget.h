@@ -70,7 +70,8 @@ protected:
 
 
 private slots:
-   void rotateNeedles();
+   void moveNeedles();
+   void moveVerticalScales();
 
 private:
    QSvgRenderer *m_renderer;
@@ -98,7 +99,7 @@ private:
    // Vertical speed frame:
    QGraphicsSvgItem *m_speedbg;
    // Vertical Speed scale:
-   QGraphicsSvgItem *m_speedscale;
+   QGraphicsItemGroup *m_speedscale;
    // Vertical altitude frame:
    QGraphicsSvgItem *m_altitudebg;
    // Vertical altitude scale:
@@ -136,6 +137,7 @@ private:
 
    // Rotation timer
    QTimer dialTimer;
+   QTimer dialTimer2;
 
 };
 #endif /* PFDGADGETWIDGET_H_ */

@@ -50,8 +50,12 @@ PFDGadgetWidget::PFDGadgetWidget(QWidget *parent) : QGraphicsView(parent)
     obj3 = NULL;
 */
     // This timer mechanism makes needles rotate smoothly
-    connect(&dialTimer, SIGNAL(timeout()), this, SLOT(rotateNeedles()));
+    connect(&dialTimer, SIGNAL(timeout()), this, SLOT(moveNeedles()));
     dialTimer.start(20);
+/*
+    connect(&dialTimer2,SIGNAL(timeout()), this, SLOT(moveVerticalScales()));
+    dialTimer2.start(20);
+    */
 
 }
 
@@ -138,7 +142,8 @@ void PFDGadgetWidget::updateHeading(UAVObject *object1) {
     field = object1->getField(heading);
     if (field) {
         // The speed scale represents 30km/h (6 * 5)
-        groundspeedTarget = field->getDouble()*speedScaleHeight/(-30);
+        // 3.6 : convert m/s to km/h
+        groundspeedTarget = 3.6*field->getDouble()*speedScaleHeight/(-30);
     }
     if (!dialTimer.isActive())
         dialTimer.start(); // Rearm the dial Timer which might be stopped.
@@ -188,7 +193,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
      - Next point: nextwaypoint
      - Home point bearing: homewaypoint-bearing
      - Next point bearing: nextwaypoint-bearing
-     - Speed rectangle (left side): speed-bg (part of FOREGROUND)
+     - Speed rectangle (left side): speed-bg
      - Speed scale: speed-scale.
      - Black speed window: speed-window.
  */
@@ -279,34 +284,48 @@ void PFDGadgetWidget::setDialFile(QString dfn)
 
          // Note: speed-scale should contain exactly 6 major ticks
          // for 30km/h
-         m_speedscale = new QGraphicsSvgItem();
-         m_speedscale->setSharedRenderer(m_renderer);
-         m_speedscale->setElementId("speed-scale");
-         speedScaleHeight = compassMatrix.mapRect(m_renderer->boundsOnElement("speed-scale")).height();
-         startX = compassMatrix.mapRect(m_renderer->boundsOnElement("speed-bg")).width();
-         startX -= m_renderer->matrixForElement("speed-scale").mapRect((
-                        m_renderer->boundsOnElement("speed-scale"))).width();
+         m_speedscale = new QGraphicsItemGroup();
          m_speedscale->setParentItem(m_speedbg);
+
+         QGraphicsSvgItem *speedscalelines = new QGraphicsSvgItem();
+         speedscalelines->setSharedRenderer(m_renderer);
+         speedscalelines->setElementId("speed-scale");
+         speedScaleHeight = m_renderer->matrixForElement("speed-scale").mapRect(
+                        m_renderer->boundsOnElement("speed-scale")).height();
+         startX = compassMatrix.mapRect(m_renderer->boundsOnElement("speed-bg")).width();
+         startX -= m_renderer->matrixForElement("speed-scale").mapRect(
+                        m_renderer->boundsOnElement("speed-scale")).width();
+         //speedscalelines->setParentItem(m_speedbg);
          matrix.reset();
          matrix.translate(startX,0);
-         m_speedscale->setTransform(matrix,false);
-
-         //// WORK IN PROGRESS
+         speedscalelines->setTransform(matrix,false);
+         // Quick way to reposition the item before putting it in the group:
+         speedscalelines->setParentItem(m_speedbg);
+         m_speedscale->addToGroup(speedscalelines); // (reparents the item)
 
          // Add the scale text elements:
-         QGraphicsTextItem *speed0 = new QGraphicsTextItem("000");
+         QGraphicsTextItem *speed0 = new QGraphicsTextItem("0");
+         speed0->setDefaultTextColor(QColor("White"));
+         speed0->setFont(QFont("Arial",(int) speedScaleHeight/30));
          matrix.reset();
-         matrix.translate(compassMatrix.mapRect(m_renderer->boundsOnElement("speed-bg")).width()/10,0);
+         matrix.translate(compassMatrix.mapRect(m_renderer->boundsOnElement("speed-bg")).width()/10,-speedScaleHeight/30);
          speed0->setTransform(matrix,false);
          speed0->setParentItem(m_speedbg);
-
+         m_speedscale->addToGroup(speed0);
          for (int i=0; i<6;i++) {
-             speed0 = new QGraphicsTextItem("000");
-             speed0->setPlainText(QString().setNum(i*5));
+             speed0 = new QGraphicsTextItem("");
+             speed0->setDefaultTextColor(QColor("White"));
+             speed0->setFont(QFont("Arial",(int) speedScaleHeight/30));
+             speed0->setPlainText(QString().setNum(i*5+1));
              matrix.translate(0,speedScaleHeight/6);
              speed0->setTransform(matrix,false);
              speed0->setParentItem(m_speedbg);
+             m_speedscale->addToGroup(speed0);    
          }
+         // Now vertically center the speed scale on the speed background
+         QRectF rectB = m_speedbg->boundingRect();
+         QRectF rectN = speedscalelines->boundingRect();
+         m_speedscale->setPos(0,rectB.height()/2-rectN.height()/2);
 
         l_scene->setSceneRect(m_background->boundingRect());
 
@@ -314,8 +333,8 @@ void PFDGadgetWidget::setDialFile(QString dfn)
         // center of the background:
 
         // 1) Move the center of the needle to the center of the background.
-        QRectF rectB = m_background->boundingRect();
-        QRectF rectN = m_world->boundingRect();
+        rectB = m_background->boundingRect();
+        rectN = m_world->boundingRect();
         m_world->setPos(rectB.width()/2-rectN.width()/2,rectB.height()/2-rectN.height()/2);
         // 2) Put the transform origin point of the needle at its center.
         m_world->setTransformOriginPoint(rectN.width()/2,rectN.height()/2);
@@ -370,11 +389,18 @@ void PFDGadgetWidget::resizeEvent(QResizeEvent *event)
 }
 
 
+/*!
+  \brief Update method for the vertical scales
+  */
+void PFDGadgetWidget::moveVerticalScales() {
+
+}
+
 // Take an input value and move the elements accordingly.
 // Movement is smooth, starts fast and slows down when
 // approaching the target.
 //
-void PFDGadgetWidget::rotateNeedles()
+void PFDGadgetWidget::moveNeedles()
 {
     int dialCount = 4; // Gets decreased by one for each element
                        // which has finished moving
@@ -441,13 +467,10 @@ void PFDGadgetWidget::rotateNeedles()
     //
     // TODO: find a way to move the speed scale faster if we are far
     // from the target, maybe a separate timer would be useful there?
+    // What is the consequence on CPU usage?
     //////
     if ((abs((groundspeedValue-groundspeedTarget)*10) > 5)) {
-        if (groundspeedValue>groundspeedTarget) {
-            groundspeedValue -= speedScaleHeight/60;
-        } else {
-            groundspeedValue += speedScaleHeight/60;
-        }
+        groundspeedValue += (groundspeedTarget-groundspeedValue)/5;
     } else {
         groundspeedValue = groundspeedTarget;
         dialCount--;
@@ -455,6 +478,19 @@ void PFDGadgetWidget::rotateNeedles()
     qreal x = m_speedscale->transform().dx();
     opd = QPointF(x,fmod(groundspeedValue,speedScaleHeight/6));
     m_speedscale->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), false);
+    // TODO: optimize this by skipping if not necessary...
+    // Now update the text elements inside the scale:
+    // (Qt documentation states that the list has the same order
+    // as the item add order in the QGraphicsItemGroup)
+    QList <QGraphicsItem *> textList = m_speedscale->childItems();
+    qreal val = -5*ceil(groundspeedValue/speedScaleHeight*6)-15;
+    foreach( QGraphicsItem * item, textList) {
+        if (QGraphicsTextItem *text = qgraphicsitem_cast<QGraphicsTextItem *>(item)) {
+            QString s = (val<0) ? QString() : QString().sprintf("%.0f",val);
+            text->setPlainText(s);
+            val += 5;
+        }
+    }
 
    //update();
    if (!dialCount)

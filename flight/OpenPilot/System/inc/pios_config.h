@@ -59,10 +59,6 @@
 #define LOG_FILENAME 			"PIOS.LOG"
 #define STARTUP_LOG_ENABLED		1
 
-
-/* Defaults for MinIni */
-#define SETTINGS_FILE			"SETTINGS.INI"
-
 /* COM Module */
 #define GPS_BAUDRATE			19200
 #define TELEM_BAUDRATE			19200

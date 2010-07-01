@@ -28,10 +28,4 @@
 #ifndef OP_CONFIG_H
 #define OP_CONFIG_H
 
-/* Compile Time Macros */ 
-
-
-/* Defaults for MinIni */
-
-
 #endif /* OP_CONFIG_H */

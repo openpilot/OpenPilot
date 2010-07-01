@@ -16,6 +16,7 @@
 #include "rtslam/activeSearch.hpp"
 #include "rtslam/rtSlam.hpp"
 #include "rtslam/parents.hpp"
+#include "boost/shared_ptr.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -34,7 +35,7 @@ namespace jafar {
 				;
 
 			public:
-			DataManagerOnePointRansac(int n_tries);
+			DataManagerOnePointRansac();
 				virtual ~DataManagerOnePointRansac() {
 				}
 				void process(boost::shared_ptr<RawAbstract> data) ;
@@ -44,14 +45,17 @@ namespace jafar {
 				boost::shared_ptr<Matcher> matcher;
 				boost::shared_ptr<ActiveSearchGrid> asGrid;
 				// the list of visible observations to handle
-				typedef std::vector<observation_ptr_t> ObservationListVisible;
-				ObservationListVisible obsListVisible;
+				typedef std::list<observation_ptr_t> ObservationVisibleList;
+				ObservationVisibleList obsVisibleList;
 				struct RansacSet {
 						observation_ptr_t obsBasePtr;
 						std::list<observation_ptr_t> inlierObs;
 						std::list<observation_ptr_t> pendingObs;
+						size_t size(){return inlierObs.size();}
 				};
-				std::vector<RansacSet> ransacSetList;
+				typedef std::list<RansacSet> RansacSetList;
+//				RansacSetList::iterator ransacIter;
+				RansacSetList ransacSetList;
 
 			protected:
 				jblas::veci tries;

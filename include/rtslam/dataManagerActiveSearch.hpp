@@ -102,6 +102,6 @@ namespace jafar {
 }//namespace jafar::rtslam
 
 
-#include "rtslam/dataManagerActiveSearch.t.cpp"
+#include "rtslam/dataManagerActiveSearch.impl.hpp"
 
 #endif /* DATAMANAGERACTIVESEARCH_HPP_ */

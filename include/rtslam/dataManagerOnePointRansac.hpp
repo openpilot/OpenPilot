@@ -119,6 +119,6 @@ namespace jafar {
 	}
 }
 
-#include "rtslam/dataManagerOnePointRansac.t.cpp"
+#include "rtslam/dataManagerOnePointRansac.impl.hpp"
 
 #endif /* DATAMANAGERONEPOINTRANSAC_HPP_ */

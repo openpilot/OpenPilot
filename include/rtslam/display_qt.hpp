@@ -101,6 +101,7 @@ class SensorQt : public SensorDisplay
 			view_ = new qdisplay::ImageView();
 			viewer_->setImageView(view_, 0, 0);
 			viewer_->resize(660,500);
+			viewer_->setSceneRect(0,0,640,480);
 			framenumber = 0;
 			t = 0.;
 			avg_framerate = 0.;
@@ -109,13 +110,13 @@ class SensorQt : public SensorDisplay
 			//framenumber_label->setFont(QFont( m_label->font().family(), m_fontSize));
 			framenumber_label->setFont(QFont("monospace", 10, QFont::Bold));
 			framenumber_label->setDefaultTextColor(QColor(0,192,0));
-			framenumber_label->translate(0,12);
+			framenumber_label->translate(0,15);
 			
 			sensorpose_label = new QGraphicsTextItem(view_);
 			//sensorpose_label->setFont(QFont( m_label->font().family(), m_fontSize));
 			sensorpose_label->setFont(QFont("monospace", 10, QFont::Bold));
 			sensorpose_label->setDefaultTextColor(QColor(0,192,0));
-			sensorpose_label->translate(0,-2);
+			sensorpose_label->translate(0,0);
 		}
 		~SensorQt()
 		{
@@ -156,13 +157,21 @@ class SensorQt : public SensorDisplay
 						<< std::setw(4) << (int)euler(0) << ", " <<  std::setw(4) << (int)euler(1) << ", " <<  std::setw(4) << (int)euler(2) << "] deg";
 					sensorpose_label->setPlainText(oss.str().c_str());
 
-//					// save image
-//					char filename[50];
-//					sprintf(filename, "/mnt/ram/rtslam/rendered-%04d.png", framenumber);
-//					cout << (string)filename << endl;
-//					view_->exportView((string)filename);
-
-
+					// save image
+					#if 0
+ 					char filename[50];
+ 					sprintf(filename, "/mnt/ram/rtslam/rendered-%04d.png", framenumber);
+ 					cout << (string)filename << endl;
+					// FIXME make it clean in qdisplay
+// 					view_->exportView((string)filename);
+					QSizeF size(640,480);//view_->img.size().toSize()
+					QImage img(size.toSize(), QImage::Format_RGB32);
+					QPainter painter(&img);
+					QRectF rect(0,0,640,480);
+					view_->scene()->render(&painter, rect,rect, Qt::KeepAspectRatio);
+					img.save(filename, "PNG");
+					#endif
+					
 					break; }
 				default:
 					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_SENSOR_TYPE, "Don't know how to display this type of sensor" << type_);

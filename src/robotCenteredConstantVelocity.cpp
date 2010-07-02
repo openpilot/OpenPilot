@@ -1,8 +1,8 @@
 /**
  * robotCenteredConstantVelocity.cpp
  *
- * \date 07/03/2010
- * \author jsola@laas.fr
+ * \date 2/07/2010
+ * \author jmcodol@laas.fr
  *
  *  \file robotConstantVelocity.cpp
  *
@@ -61,35 +61,62 @@ namespace jafar {
 			using namespace ublas;
 
 			/*
-			 * This motion model is defined by:
+       *
 			 * The state vector, x = [p q v w pBase qBase] = [x y z, qw qx qy qz, vx vy vz, wx wy wz, xb yb zb, qwb qxb qyb qzb], of size 20.
 			 * The transition equation x+ = move(x,i), with i = [vi wi] the control impulse, decomposed as:
-			 * - p = v*dt
-			 * - q = w2q(w*dt)    <-- w2q : 3 angles to quaternion
-			 * - v = v + vi       <-- vi  : impulse in linear velocity  - vi = [vix viy viz]
-			 * - w = w + wi       <-- wi  : impulse in angular velocity - wi = [wix wiy wiz]
-			 * - pBase = pBase + v*dt
-			 * - qBase = qBase**(w*dt)    <-- ** : quaternion product
+       *
+			 * This motion model is defined by 2 steps :
+			 * -----------------------------------------
+			 *  1) We perform a frame transform of all the map :
+			 *   -a) The Landmarks
+			 *         From frame F0 to frame [p,q]
+			 *   -b) The Base frame
+			 *         From frame F0 to frame [p,q]
+			 *   -c) The Current robot pose become (we don't have to code this part because we will update the pose in step 2)
+			 *         p=0
+			 *         q=[1,0,0,0]'
+			 *         v=v
+			 *         w=w
+			 *
+			 *  2) We update the current pose with a constant velocity model :
+			 *   * p = v*dt
+			 *   * q = w2q(w*dt) <-- w2q : 3 angles to quaternion
+			 *   * v = v + vi    <-- vi  : impulse in linear velocity  - vi = [vix viy viz]
+			 *   * w = w + wi    <-- wi  : impulse in angular velocity - wi = [wix wiy wiz]
+			 *
 			 * -----------------------------------------------------------------------------
 			 *
+			 * We have some jacobians :
 			 * The Jacobian XNEW_x is built with
-			 * 						 p     q      v      w      |
-			 *						 0     3      7      10     |
-			 *      	--------------------------------+------
-			 * XNEW_x = [ I_3         PNEW_v        ] | 0  p
-			 *       		[      QNEW_q        QNEW_w ] | 3  q
-			 *       		[              I_3          ] | 7  v
-			 *       		[                      I_3  ] | 10 w
+			 *
+			 *              _______________________ROBOT STATE______________________________
+			 *             /                                                                \
+			 * 						    p             q       v     w         pBase          qBase             lold        |
+			 *						    0             3       7     10        13             16                20          |
+			 *      	-------------------------------------------------------------------------------------------+------
+       *             ____________________________________________________________________
+			 *  XNEW_x = [ |                      PNEW_v                                      |                ] |  0  p     \|
+			 *           [ |                           QNEW_w                                 |                ] |  3  q      |
+			 *           [ |                      I_3                                         |                ] |  7  v      | Robot State
+			 *           [ |                            I_3                                   |                ] |  10 w      |
+			 *           [ | [-----PBASENEW_f----]              PBASENEW_pbase                |                ] |  13 pBase  |
+			 *           [ |            QBASENEW_q                             QBASENEW_qbase |                ] |  16 qBase /|
+			 *           [ |__________________________________________________________________|                ] |
+			 *           [  LNEW_p     LNEW_q                                                     LNEW_lold    ] |  20 lnew
+			 *
 			 * -----------------------------------------------------------------------------
 			 *
 			 * The Jacobian XNEW_pert is built with
 			 *          			 vi     wi   |
 			 *                 0      3    |
 			 *       			-----------------+------
-			 * XNEW_pert = 	[            ] | 0  p
-			 * 					   	[            ] | 3  q
-			 * 							[ I_3        ] | 7  v
-			 * 							[        I_3 ] | 10 w
+			 * XNEW_pert = 	[            ] | 0  p     \|
+			 * 					   	[            ] | 3  q      |
+			 * 							[ I_3        ] | 7  v      | Robot State
+			 * 							[        I_3 ] | 10 w      |
+			 * 							[            ] | 7  pBase  |
+			 * 							[            ] | 10 qBase /|
+			 * 							[            ] | 7  lnew
 			 * this Jacobian is however constant and is computed once at Construction time.
 			 *
 			 * NOTE: The also constant perturbation matrix:
@@ -99,39 +126,53 @@ namespace jafar {
 			 * -----------------------------------------------------------------------------
 			 */
 
+			// vars
+			// 1- robot at t
+			vec3 p, v, w, pbase;
+			vec4 q, qbase;
+			vec7 F; // F contains [p,q]'
+			// 2- robot at t+1
+			vec3 pnew, vnew, wnew, pbasenew;
+			vec4 qnew, qbasenew;
+			// 3- jacobians
+			mat   PBASENEW_f(3, 7);
+			mat33 PBASENEW_pbase ;
+			mat44 QBASENEW_q, QBASENEW_qbase;
+			identity_mat I_3(3);
+
 			// split robot state vector
-			vec3 p, v, w;
-			vec4 q;
-			splitState(_x, p, q, v, w);
+			splitState(_x, p, q, v, w, pbase, qbase);
+			F = ublas::subrange(_x, 0, 7) ;
 
 			// split perturbation vector
 			vec3 vi, wi;
 			splitControl(_n, vi, wi);
 
-			// Non-trivial Jacobian blocks
-			identity_mat I_3(3);
-
-			vec3 pnew, vnew, wnew;
-			vec4 qnew;
-
 			// predict each part of the state, give or build non-trivial Jacobians
-			pnew = p + v * _dt;
-			PNEW_v = I_3 * _dt;
-			vec4 qwdt;
-			quaternion::v2q(w * _dt, qwdt, QWDT_wdt);
-			quaternion::qProd(q, qwdt, qnew, QNEW_q, QNEW_qwdt);
-			QNEW_wdt = prod(QNEW_qwdt, QWDT_wdt);
-			vnew = v + vi;
-			wnew = w + wi;
+			// 1- PQVW at t+1
+			pnew      = v   * _dt;
+			PNEW_v    = I_3 * _dt;
+			quaternion::v2q(w * _dt, qnew, QNEW_wdt); // FiXME _w or _wdt
+			vnew      = v + vi;
+			wnew      = w + wi;
+			// 2- PQ-of-Base at t+1 (reframe)
+			quaternion::eucToFrame(F,pbase,pbasenew,PBASENEW_f,PBASENEW_pbase) ; // pbase
+			quaternion::qProd(qbase, q, qbasenew, QBASENEW_qbase, QBASENEW_q)  ; // qbase
 
-			// Compose state - this is the output state.
-			unsplitState(pnew, qnew, vnew, wnew, _xnew);
+			// Re-compose state - this is the output state.
+			unsplitState(pnew, qnew, vnew, wnew, pbasenew, qbasenew, _xnew); // Robot state
 
 			// Build transition Jacobian matrix XNEW_x
-			_XNEW_x.assign(identity_mat(state.size()));
-			project(_XNEW_x, range(0, 3), range(7, 10)) = PNEW_v;
-			project(_XNEW_x, range(3, 7), range(3, 7)) = QNEW_q;
-			project(_XNEW_x, range(3, 7), range(10, 13)) = QNEW_wdt * _dt;
+			_XNEW_x.clear() ;
+			project(_XNEW_x, range(0 , 3 ), range(7 , 10)) = PNEW_v        ;
+			project(_XNEW_x, range(3 , 7 ), range(10, 13)) = QNEW_wdt      ; // FiXME _w or _wdt
+			project(_XNEW_x, range(7 , 10), range(7 , 10)) = I_3           ;
+			project(_XNEW_x, range(10, 13), range(10, 13)) = I_3           ;
+			project(_XNEW_x, range(13, 16), range(0 , 7 )) = PBASENEW_f    ;
+			project(_XNEW_x, range(13, 16), range(13, 16)) = PBASENEW_pbase;
+			project(_XNEW_x, range(16, 20), range(3 , 7 )) = QBASENEW_q    ;
+			project(_XNEW_x, range(16, 20), range(16, 20)) = QBASENEW_qbase;
+
 
 			/*
 			 * We are normally supposed here to build the perturbation Jacobian matrix XNEW_pert.
@@ -145,15 +186,16 @@ namespace jafar {
 		/*
 		 * Build perturbation Jacobian matrix XNEW_pert.
 		 *
-		 * The perturbation Jacobian is
-		 *
-		 * var    |  vi  wi
-		 *    pos |  0   3
-		 * -------+--------
-		 *  p  0  |  0   0
-		 *  q  3  |  0   0
-		 *  v  7  |  I   0
-		 *  w  10 |  0   I
+		 * The Jacobian XNEW_pert is built with
+		 *          			 vi     wi   |
+		 *                 0      3    |
+		 *       			-----------------+------
+		 * XNEW_pert = 	[            ] | 0  p     \|
+		 * 					   	[            ] | 3  q      |
+		 * 							[ I_3        ] | 7  v      | Robot State
+		 * 							[        I_3 ] | 10 w      |
+		 * 							[            ] | 7  pBase  |
+		 * 							[            ] | 10 qBase /|
 		 *
 		 * NOTE: These lines below just for reference:
 		 */

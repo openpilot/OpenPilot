@@ -1,7 +1,7 @@
 /*
  * \file robotCenteredConstantVelocity.hpp
  *
- * Header file for the robot with constant velocity motion model.
+ * Header file for the robot with robot centered constant velocity motion model.
  *
  * \date 1/07/2010
  * \author jmcodol@laas.fr
@@ -123,23 +123,23 @@ namespace jafar {
 				}
 
 			protected:
-				/**
-				 * Split state vector.
-				 *
-				 * Extracts \a p, \a q, \a v and \a w from the state vector, \a x = [\a p, \a q, \a v, \a w].
-				 * \param x the state vector
-				 * \param p the position
-				 * \param q the quaternion
-				 * \param v the linear velocity
-				 * \param w the angular velocity
-				 */
-				template<class Vx, class Vp, class Vq, class Vv, class Vw>
-				inline void splitState(const Vx x, Vp & p, Vq & q, Vv & v, Vw & w) {
-					p = ublas::subrange(x, 0, 3);
-					q = ublas::subrange(x, 3, 7);
-					v = ublas::subrange(x, 7, 10);
-					w = ublas::subrange(x, 10, 13);
-				}
+//				/**
+//				 * Split state vector.
+//				 *
+//				 * Extracts \a p, \a q, \a v and \a w from the state vector, \a x = [\a p, \a q, \a v, \a w].
+//				 * \param x the state vector
+//				 * \param p the position
+//				 * \param q the quaternion
+//				 * \param v the linear velocity
+//				 * \param w the angular velocity
+//				 */
+//				template<class Vx, class Vp, class Vq, class Vv, class Vw>
+//				inline void splitState(const Vx x, Vp & p, Vq & q, Vv & v, Vw & w) {
+//					p = ublas::subrange(x, 0, 3);
+//					q = ublas::subrange(x, 3, 7);
+//					v = ublas::subrange(x, 7, 10);
+//					w = ublas::subrange(x, 10, 13);
+//				}
 
 				/**
 				 * Split state vector.
@@ -154,7 +154,7 @@ namespace jafar {
 				 * \param qBase the quaternion of the base frame in the current frame
 				 */
 				template<class Vx, class Vp, class Vq, class Vv, class Vw>
-				inline void splitState(const Vx x, Vp & p, Vq & q, Vv & v, Vw & w, Vw & pBase, Vw & qBase) {
+				inline void splitState(const Vx x, Vp & p, Vq & q, Vv & v, Vw & w, Vp & pBase, Vq & qBase) {
 					p     = ublas::subrange(x,  0,  3);
 					q     = ublas::subrange(x,  3,  7);
 					v     = ublas::subrange(x,  7, 10);
@@ -164,23 +164,23 @@ namespace jafar {
 				}
 
 
-				/**
-				 * Compose state vector.
-				 *
-				 * Composes the state vector with \a p, \a q, \a v and \a w, \a x = [\a p, \a q, \a v, \a w].
-				 * \param p the position
-				 * \param q the quaternion
-				 * \param v the linear velocity
-				 * \param w the angular velocity
-				 * \param x the state vector
-				 */
-				template<class Vp, class Vq, class Vv, class Vw, class Vx>
-				inline void unsplitState(const Vp & p, const Vq & q, const Vv & v, const Vw & w, Vx & x) {
-					ublas::subrange(x, 0, 3) = p;
-					ublas::subrange(x, 3, 7) = q;
-					ublas::subrange(x, 7, 10) = v;
-					ublas::subrange(x, 10, 13) = w;
-				}
+//				/**
+//				 * Compose state vector.
+//				 *
+//				 * Composes the state vector with \a p, \a q, \a v and \a w, \a x = [\a p, \a q, \a v, \a w].
+//				 * \param p the position
+//				 * \param q the quaternion
+//				 * \param v the linear velocity
+//				 * \param w the angular velocity
+//				 * \param x the state vector
+//				 */
+//				template<class Vp, class Vq, class Vv, class Vw, class Vx>
+//				inline void unsplitState(const Vp & p, const Vq & q, const Vv & v, const Vw & w, Vx & x) {
+//					ublas::subrange(x, 0, 3) = p;
+//					ublas::subrange(x, 3, 7) = q;
+//					ublas::subrange(x, 7, 10) = v;
+//					ublas::subrange(x, 10, 13) = w;
+//				}
 
 				/**
 				 * Compose state vector.
@@ -195,7 +195,7 @@ namespace jafar {
 				 * \param qBase the quaternion of the base frame in the current frame
 				 */
 				template<class Vp, class Vq, class Vv, class Vw, class Vx>
-				inline void unsplitState(const Vp & p, const Vq & q, const Vv & v, const Vw & w, const Vw & pBase, const Vw & qBase, Vx & x) {
+				inline void unsplitState(const Vp & p, const Vq & q, const Vv & v, const Vw & w, const Vp & pBase, const Vq & qBase, Vx & x) {
 					ublas::subrange(x, 0, 3)   = p    ;
 					ublas::subrange(x, 3, 7)   = q    ;
 					ublas::subrange(x, 7, 10)  = v    ;
@@ -221,10 +221,12 @@ namespace jafar {
 			private:
 				// temporary matrices to speed up Jacobian computation
 				mat33 PNEW_v; ///<      Temporary Jacobian matrix
-				mat43 QWDT_wdt; ///< Temporary Jacobian matrix
-				mat44 QNEW_qwdt; ///<   Temporary Jacobian matrix
-				mat43 QNEW_wdt; ///<    Temporary Jacobian matrix
-				mat44 QNEW_q; ///<      Temporary Jacobian matrix
+				mat43 QNEW_wdt; ///<   Temporary Jacobian matrix
+//				mat43 PBASENEW_p; ///<    Temporary Jacobian matrix
+//				mat44 PBASENEW_q; ///<    Temporary Jacobian matrix
+//				mat43 QBASENEW_p; ///<    Temporary Jacobian matrix
+//				mat44 QBASENEW_q; ///<    Temporary Jacobian matrix
+//				mat44 QNEW_q; ///<      Temporary Jacobian matrix
 
 		};
 	}

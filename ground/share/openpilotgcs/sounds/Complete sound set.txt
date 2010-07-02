@@ -15,14 +15,12 @@ Spoken Collections (sorted alphabetically):
 
 aborted
 active
-alarm
 alert
 altitude
 amps
 aquired
 autonomous flight
 battery
-battery critical
 camera
 cancelled
 changed
@@ -32,6 +30,7 @@ complete
 connected
 connection
 control
+critical battery
 disabled
 disconnected
 feet
@@ -121,3 +120,7 @@ hundread
 thousand
 
 
+New:
+OpenPilot ready for flight
+low gps quality
+alert critical battery

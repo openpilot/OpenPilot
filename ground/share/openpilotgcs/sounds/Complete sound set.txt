@@ -1,5 +1,7 @@
 Sounds for the notifaction plugin
 
+All files should be normalized using http://normalize.nongnu.org/ with no options. 
+
 Work in progress, any ideas PM me - dankers.
 
 Noises:

@@ -146,7 +146,7 @@ border-radius: 2px;
 </string>
        </property>
        <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
+        <enum>QFrame::NoFrame</enum>
        </property>
        <property name="frameShadow">
         <enum>QFrame::Plain</enum>
@@ -642,8 +642,9 @@ border-radius: 2px;
       <widget class="QSplitter" name="splitter">
        <property name="styleSheet">
         <string notr="true">QSplitter::handle {
-/*	image: url(images/splitter.png); */
-	background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255, 255, 255, 48), stop:1 rgba(0, 0, 0, 48));
+/*	image: url(opmap/images/splitter.png); */
+/*background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255, 255, 255, 48), stop:1 rgba(0, 0, 0, 48));*/
+	background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(71, 71, 71, 255), stop:0.514124 rgba(200, 200, 200, 255), stop:1 rgba(110, 110, 110, 255));
 }
 
 QSplitter::handle:horizontal {
@@ -837,13 +838,13 @@ QComboBox:drop-down {
        </property>
        <property name="minimumSize">
         <size>
-         <width>60</width>
+         <width>80</width>
          <height>50</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>60</width>
+         <width>80</width>
          <height>16777215</height>
         </size>
        </property>
@@ -866,7 +867,7 @@ color: rgb(255, 255, 255);
 border: 0px; 
 }
 QToolButton:hover {
-background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(180, 180, 180, 255), stop:1 rgba(48, 48, 48, 255));
+background-color: qlineargradient(spread:pad, x1:1, y1:0.5, x2:0, y2:0.5, stop:0 rgba(71, 71, 71, 0), stop:0.5 rgba(150, 150, 150, 255), stop:1 rgba(71, 71, 71, 0));
 color: rgb(255, 255, 255);
 }
 QToolButton:pressed {
@@ -906,7 +907,7 @@ color: rgb(255, 255, 255);
            <string notr="true"/>
           </property>
           <property name="text">
-           <string/>
+           <string>Hold</string>
           </property>
           <property name="icon">
            <iconset resource="opmap.qrc">
@@ -914,9 +915,12 @@ color: rgb(255, 255, 255);
           </property>
           <property name="iconSize">
            <size>
-            <width>60</width>
-            <height>60</height>
+            <width>80</width>
+            <height>40</height>
            </size>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonTextUnderIcon</enum>
           </property>
           <property name="autoRaise">
            <bool>false</bool>
@@ -950,7 +954,7 @@ color: rgb(255, 255, 255);
            <string notr="true"/>
           </property>
           <property name="text">
-           <string/>
+           <string>Home</string>
           </property>
           <property name="icon">
            <iconset resource="opmap.qrc">
@@ -958,12 +962,12 @@ color: rgb(255, 255, 255);
           </property>
           <property name="iconSize">
            <size>
-            <width>60</width>
-            <height>60</height>
+            <width>80</width>
+            <height>40</height>
            </size>
           </property>
           <property name="toolButtonStyle">
-           <enum>Qt::ToolButtonIconOnly</enum>
+           <enum>Qt::ToolButtonTextUnderIcon</enum>
           </property>
           <property name="autoRaise">
            <bool>false</bool>
@@ -991,7 +995,7 @@ color: rgb(255, 255, 255);
            <string notr="true"/>
           </property>
           <property name="text">
-           <string/>
+           <string>Previous WP</string>
           </property>
           <property name="icon">
            <iconset resource="opmap.qrc">
@@ -999,9 +1003,12 @@ color: rgb(255, 255, 255);
           </property>
           <property name="iconSize">
            <size>
-            <width>60</width>
-            <height>60</height>
+            <width>80</width>
+            <height>40</height>
            </size>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonTextUnderIcon</enum>
           </property>
           <property name="autoRaise">
            <bool>false</bool>
@@ -1029,7 +1036,7 @@ color: rgb(255, 255, 255);
            <string notr="true"/>
           </property>
           <property name="text">
-           <string/>
+           <string>Next WP</string>
           </property>
           <property name="icon">
            <iconset resource="opmap.qrc">
@@ -1037,9 +1044,12 @@ color: rgb(255, 255, 255);
           </property>
           <property name="iconSize">
            <size>
-            <width>60</width>
-            <height>60</height>
+            <width>80</width>
+            <height>40</height>
            </size>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonTextUnderIcon</enum>
           </property>
           <property name="autoRaise">
            <bool>false</bool>
@@ -1067,7 +1077,7 @@ color: rgb(255, 255, 255);
            <string notr="true"/>
           </property>
           <property name="text">
-           <string/>
+           <string>Go</string>
           </property>
           <property name="icon">
            <iconset resource="opmap.qrc">
@@ -1075,9 +1085,12 @@ color: rgb(255, 255, 255);
           </property>
           <property name="iconSize">
            <size>
-            <width>60</width>
-            <height>60</height>
+            <width>80</width>
+            <height>40</height>
            </size>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonTextUnderIcon</enum>
           </property>
           <property name="autoRaise">
            <bool>false</bool>
@@ -1134,7 +1147,7 @@ border-radius: 3px;
 </string>
        </property>
        <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
+        <enum>QFrame::NoFrame</enum>
        </property>
        <property name="frameShadow">
         <enum>QFrame::Plain</enum>

@@ -55,6 +55,7 @@ namespace jafar {
 					return "Centered-Constant-velocity";
 				}
 
+				void getFrameForReframing(vec7 & frame) ;
 
 				/**
 				 * Move one step ahead.
@@ -220,6 +221,7 @@ namespace jafar {
 
 			private:
 				// temporary matrices to speed up Jacobian computation
+				vec7 lastJump; // F contains [p,q]' of the last reframe prediction.
 				mat33 PNEW_v; ///<      Temporary Jacobian matrix
 				mat43 QNEW_wdt; ///<   Temporary Jacobian matrix
 //				mat43 PBASENEW_p; ///<    Temporary Jacobian matrix

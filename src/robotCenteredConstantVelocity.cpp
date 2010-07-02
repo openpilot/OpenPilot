@@ -51,6 +51,11 @@ namespace jafar {
 			type = CENTERED_CONSTANT_VELOCITY;
 		}
 
+
+		void RobotCenteredConstantVelocity::getFrameForReframing(vec7 & frame) {
+			frame = ublas::subrange(state.x(), 0, 7) ;
+		}
+
 		void RobotCenteredConstantVelocity::move_func(
 				const vec & _x, const vec & _u,
 		    const vec & _n, const double _dt,
@@ -110,13 +115,14 @@ namespace jafar {
 			 *          			 vi     wi   |
 			 *                 0      3    |
 			 *       			-----------------+------
-			 * XNEW_pert = 	[            ] | 0  p     \|
-			 * 					   	[            ] | 3  q      |
-			 * 							[ I_3        ] | 7  v      | Robot State
-			 * 							[        I_3 ] | 10 w      |
-			 * 							[            ] | 7  pBase  |
-			 * 							[            ] | 10 qBase /|
-			 * 							[            ] | 7  lnew
+			 *                ____________
+			 * XNEW_pert = 	[|            |] | 0  p     \|
+			 * 					   	[|            |] | 3  q      |
+			 * 							[| I_3        |] | 7  v      | Robot State
+			 * 							[|        I_3 |] | 10 w      |
+			 * 							[|            |] | 7  pBase  |
+			 * 							[|____________|] | 10 qBase /|
+			 * 							[              ] | 7  lnew
 			 * this Jacobian is however constant and is computed once at Construction time.
 			 *
 			 * NOTE: The also constant perturbation matrix:
@@ -126,23 +132,29 @@ namespace jafar {
 			 * -----------------------------------------------------------------------------
 			 */
 
-			// vars
-			// 1- robot at t
+			lastJump = ublas::subrange(_x, 0, 7) ; // will be used in the reframe process of : the robot, the landmarks.
+
+
+			// TODO the internals jacobians (of fix size)
+			//  can be defined in the class definition,
+			//  or the RobotAbstract class.
+
+			// used variables :
+			// 1- robot at time t
 			vec3 p, v, w, pbase;
 			vec4 q, qbase;
-			vec7 F; // F contains [p,q]'
-			// 2- robot at t+1
+			// 2- robot at time t+1
 			vec3 pnew, vnew, wnew, pbasenew;
 			vec4 qnew, qbasenew;
-			// 3- jacobians
+			// 3- jacobians from t to t+1
 			mat   PBASENEW_f(3, 7);
 			mat33 PBASENEW_pbase ;
 			mat44 QBASENEW_q, QBASENEW_qbase;
 			identity_mat I_3(3);
 
-			// split robot state vector
+			// split robot state vector (F is the reference frame change between t and t+1)
 			splitState(_x, p, q, v, w, pbase, qbase);
-			F = ublas::subrange(_x, 0, 7) ;
+			lastJump = ublas::subrange(_x, 0, 7) ;
 
 			// split perturbation vector
 			vec3 vi, wi;
@@ -150,14 +162,14 @@ namespace jafar {
 
 			// predict each part of the state, give or build non-trivial Jacobians
 			// 1- PQVW at t+1
-			pnew      = v   * _dt;
+			pnew      = v   * _dt; // FIXME reframe the new position and quaternion (position R_t relative to frame R_t-1)
 			PNEW_v    = I_3 * _dt;
 			quaternion::v2q(w * _dt, qnew, QNEW_wdt); // FiXME _w or _wdt
 			vnew      = v + vi;
 			wnew      = w + wi;
-			// 2- PQ-of-Base at t+1 (reframe)
-			quaternion::eucToFrame(F,pbase,pbasenew,PBASENEW_f,PBASENEW_pbase) ; // pbase
-			quaternion::qProd(qbase, q, qbasenew, QBASENEW_qbase, QBASENEW_q)  ; // qbase
+			// 2- PQ-of-Base at t+1 (reframe the base frame)
+			quaternion::eucToFrame(lastJump, pbase, pbasenew, PBASENEW_f, PBASENEW_pbase) ; // pbase
+			quaternion::qProd(qbase, q, qbasenew, QBASENEW_qbase, QBASENEW_q)      ; // qbase
 
 			// Re-compose state - this is the output state.
 			unsplitState(pnew, qnew, vnew, wnew, pbasenew, qbasenew, _xnew); // Robot state
@@ -165,13 +177,16 @@ namespace jafar {
 			// Build transition Jacobian matrix XNEW_x
 			_XNEW_x.clear() ;
 			project(_XNEW_x, range(0 , 3 ), range(7 , 10)) = PNEW_v        ;
-			project(_XNEW_x, range(3 , 7 ), range(10, 13)) = QNEW_wdt      ; // FiXME _w or _wdt
+			project(_XNEW_x, range(3 , 7 ), range(10, 13)) = QNEW_wdt      ; // FIXME jacobian wrt w or wdt
 			project(_XNEW_x, range(7 , 10), range(7 , 10)) = I_3           ;
 			project(_XNEW_x, range(10, 13), range(10, 13)) = I_3           ;
 			project(_XNEW_x, range(13, 16), range(0 , 7 )) = PBASENEW_f    ;
 			project(_XNEW_x, range(13, 16), range(13, 16)) = PBASENEW_pbase;
 			project(_XNEW_x, range(16, 20), range(3 , 7 )) = QBASENEW_q    ;
 			project(_XNEW_x, range(16, 20), range(16, 20)) = QBASENEW_qbase;
+
+			// NOW the landmarks are defined in the frame F = [{0,0,0, 1,0,0,0} - lastJump],
+			// so we will reframe all the landmarks.
 
 
 			/*

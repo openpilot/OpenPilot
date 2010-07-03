@@ -53,6 +53,7 @@
 
 
 #include <stdio.h>
+#include <time.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -1826,6 +1827,13 @@ static portTASK_FUNCTION( prvIdleTask, pvParameters )
 			vApplicationIdleHook();
 		}
 		#endif
+		// call nanosleep for smalles sleep time possible
+		// (depending on kernel settings - around 100 microseconds)
+		// decreases idle thread CPU load from 100 to practically 0
+		struct timespec x;
+		x.tv_sec=0;
+		x.tv_nsec=0;
+		nanosleep(&x,NULL);
 	}
 } /*lint !e715 pvParameters is not accessed but all task functions require the same prototype. */
 

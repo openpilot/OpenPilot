@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       x86.h  
+ * @file       posix.h  
  * @author     Corvus Corax Copyright (C) 2010.
- * @brief      Definitions to run PiOS on x86
+ * @brief      Definitions to run PiOS on posix
  * @see        The GNU Public License (GPL) Version 2
  *
  *****************************************************************************/
@@ -23,8 +23,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_X86_H
-#define PIOS_X86_H
+#ifndef PIOS_POSIX_H
+#define PIOS_POSIX_H
 
 #include <bits/types.h>
 

@@ -29,8 +29,8 @@
 #define PIOS_H
 
 /* PIOS Feature Selection */
-#include "pios_config.h"
-#include <pios_x86.h>
+#include "pios_config_posix.h"
+#include <pios_posix.h>
 
 #if defined(PIOS_INCLUDE_FREERTOS)
 /* FreeRTOS Includes */
@@ -49,9 +49,9 @@
 #include <unistd.h>
 
 /* PIOS Board Specific Device Configuration */
-#include "pios_board_x86.h"
+#include "pios_board_posix.h"
 
-/* PIOS Hardware Includes (x86) */
+/* PIOS Hardware Includes (posix) */
 #include <pios_sys.h>
 #include <pios_delay.h>
 #include <pios_led.h>

@@ -17,7 +17,9 @@ HEADERS += mapgraphicitem.h \
     opmapwidget.h \
     configuration.h \
     waypointitem.h \
-    uavitem.h
+    uavitem.h \
+    uavmapfollowtype.h \
+    uavtrailtype.h
 QT += opengl
 QT += network
 QT += sql

@@ -33,24 +33,32 @@
 #include <QLabel>
 #include "../internals/pointlatlng.h"
 #include "mapgraphicitem.h"
+#include "waypointitem.h"
 #include <QObject>
+#include "uavmapfollowtype.h"
+#include "uavtrailtype.h"
 namespace mapcontrol
 {
-/**
-* @brief A QGraphicsItem representing a WayPoint
+    /**
+* @brief A QGraphicsItem representing the UAV
 *
-* @class WayPointItem waypointitem.h "waypointitem.h"
+* @class UAVItem uavitem.h "mapwidget/uavitem.h"
 */
-class UAVItem:public QObject,public QGraphicsItem
-{
-    Q_OBJECT
-    Q_INTERFACES(QGraphicsItem)
-public:
-    enum { Type = UserType + 2 };
+    class UAVItem:public QObject,public QGraphicsItem
+    {
+        Q_OBJECT
+        Q_INTERFACES(QGraphicsItem)
+    public:
+                enum { Type = UserType + 2 };
 
-public slots:
+    private:
+        int trailtime;
+        int traildistance;
+    public slots:
 
-
-};
+    signals:
+        void UAVReachedWayPoint(int const& waypointnumber,WayPointItem* waypoint);
+        void UAVLeftSafetyBouble(internals::PointLatLng const& position);
+    };
 }
 #endif // UAVITEM_H

@@ -304,7 +304,7 @@ namespace mapcontrol
 
         void SetShowCompass(bool const& value);
 
-        QImage X(){map->ConstructLastImage(); return map->lastimage;}
+        QImage X(){return map->lastimage;}
 
     private:
         internals::Core *core;

@@ -80,20 +80,22 @@ namespace mapcontrol
                 w->RefreshPos();
         }
     }
-    void MapGraphicItem::ConstructLastImage()
+    void MapGraphicItem::ConstructLastImage(int const& zoomdiff)
     {
+        QImage temp;
         QSize size=boundingRect().size().toSize();
-        size.setWidth(size.width()*2);
-        size.setHeight(size.height()*2);
-        lastimage=QImage(size,
+        size.setWidth(size.width()*2*zoomdiff);
+        size.setHeight(size.height()*2*zoomdiff);
+        temp=QImage(size,
                                QImage::Format_ARGB32_Premultiplied);
-        lastimage.fill(0);
-        QPainter* imagePainter=new QPainter(&lastimage);
-        imagePainter->translate(-boundingRect().topLeft());
-        imagePainter->scale(2,2);
-        paintImage(imagePainter);
-        imagePainter->end();
-        lastimagepoint=Point(core->GetrenderOffset().X()*2,core->GetrenderOffset().Y()*2);
+        temp.fill(0);
+        QPainter imagePainter(&temp);
+        imagePainter.translate(-boundingRect().topLeft());
+        imagePainter.scale(2*zoomdiff,2*zoomdiff);
+        paintImage(&imagePainter);
+        imagePainter.end();
+        lastimagepoint=Point(core->GetrenderOffset().X()*2*zoomdiff,core->GetrenderOffset().Y()*2*zoomdiff);
+        lastimage=temp;
     }
     void MapGraphicItem::paintImage(QPainter *painter)
     {
@@ -104,13 +106,13 @@ namespace mapcontrol
             transform.scale(MapRenderTransform,MapRenderTransform);
             painter->setWorldTransform(transform);
             {
-                DrawMap2D(painter,true);
+                DrawMap2D(painter);
             }
             painter->resetTransform();
         }
         else
         {
-            DrawMap2D(painter,true);
+            DrawMap2D(painter);
         }
         //painter->drawRect(maprect);
     }
@@ -123,15 +125,14 @@ namespace mapcontrol
             transform.scale(MapRenderTransform,MapRenderTransform);
             painter->setWorldTransform(transform);
             {
-                DrawMap2D(painter,false);
+                DrawMap2D(painter);
             }
             painter->resetTransform();
         }
         else
         {
-            DrawMap2D(painter,false);
+            DrawMap2D(painter);
         }
-     //   painter->drawRect(maprect);
     }
     void MapGraphicItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     {
@@ -251,12 +252,10 @@ namespace mapcontrol
             core->MouseWheelZooming = false;
         }
     }
-    void MapGraphicItem::DrawMap2D(QPainter *painter,bool ToImage)
+    void MapGraphicItem::DrawMap2D(QPainter *painter)
     {
-        // qDebug()<<core->Matrix.count();
-        // painter.drawText(10,10,"TESTE");
-        //painter->drawImage(0,0,lastimage);
-        if(!ToImage && !lastimage.isNull())
+
+        if(!lastimage.isNull())
             painter->drawImage(core->GetrenderOffset().X()-lastimagepoint.X(),core->GetrenderOffset().Y()-lastimagepoint.Y(),lastimage);
 
         for(int i = -core->GetsizeOfMapArea().Width(); i <= core->GetsizeOfMapArea().Width(); i++)
@@ -337,6 +336,8 @@ namespace mapcontrol
         }
         // painter->drawRect(core->GetrenderOffset().X()-lastimagepoint.X()-3,core->GetrenderOffset().Y()-lastimagepoint.Y()-3,lastimage.width(),lastimage.height());
     }
+
+
     core::Point MapGraphicItem::FromLatLngToLocal(internals::PointLatLng const& point)
     {
         core::Point ret = core->FromLatLngToLocal(point);
@@ -409,8 +410,8 @@ namespace mapcontrol
     }
     void MapGraphicItem::SetZoomStep(int const& value)
     {
-        if(value-core->Zoom()==1 && value<= MaxZoom())
-            ConstructLastImage();
+        if(value-core->Zoom()>0 && value<= MaxZoom())
+            ConstructLastImage(value-core->Zoom());
         else
             lastimage=QImage();
         if(value > MaxZoom())

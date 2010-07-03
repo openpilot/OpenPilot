@@ -871,7 +871,7 @@ background-color: qlineargradient(spread:pad, x1:1, y1:0.5, x2:0, y2:0.5, stop:0
 color: rgb(255, 255, 255);
 }
 QToolButton:pressed {
-background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(180, 180, 180, 255));
+background-color: qlineargradient(spread:pad, x1:1, y1:0.5, x2:0, y2:0.5, stop:0 rgba(71, 71, 71, 0), stop:0.5 rgba(48, 48, 48, 255), stop:1 rgba(71, 71, 71, 0));
 color: rgb(255, 255, 255);
 }
 </string>

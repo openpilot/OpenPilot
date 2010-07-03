@@ -1097,18 +1097,23 @@ void OPMapGadgetWidget::onFollowUAVpositionAct_toggled(bool checked)
 {
     if (m_widget)
     {
-	if (m_widget->toolButtonMapUAV->isChecked() != followUAVpositionAct->isChecked())
-	    m_widget->toolButtonMapUAV->setChecked(followUAVpositionAct->isChecked());
+	if (m_widget->toolButtonMapUAV->isChecked() != checked)
+	    m_widget->toolButtonMapUAV->setChecked(checked);
 
 	if (m_map)
-	    m_map->SetRotate(0);				    				// reset the rotation to '0'
+	{
+	    m_map->SetCanDragMap(!checked);							// allow/disallow manual map dragging
+	    if (!checked) m_map->SetRotate(0);			    				// reset map rotation to 0deg
+	}
     }
 }
 
 void OPMapGadgetWidget::onFollowUAVheadingAct_toggled(bool checked)
 {
-    if (!checked && m_map)
-	m_map->SetRotate(0);									// reset the rotation to '0'
+    if (m_map)
+    {
+	if (!checked) m_map->SetRotate(0);							// reset map rotation to 0deg
+    }
 }
 
 void OPMapGadgetWidget::onOpenWayPointEditorAct_triggered()

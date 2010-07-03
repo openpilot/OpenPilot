@@ -30,16 +30,22 @@
 
 HITLIL2Configuration::HITLIL2Configuration(QString classId, const QByteArray &state, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),
-    m_il2HostName(""), m_il2Port(0), m_il2ManualControl(false)
+    m_il2Latitude(""), m_il2Longitude(""), m_il2HostName(""), m_il2Port(0), m_il2ManualControl(false)
 {
     if (state.count() > 0) {
         QDataStream stream(state);
+        QString il2Latitude;
+        QString il2Longitude;
         QString il2HostName;
         int il2Port;
         bool il2ManualControl;
         stream >> il2HostName;
         m_il2HostName = il2HostName;
+        stream >> il2Latitude;
+        m_il2Latitude = il2Latitude;
         stream >> il2Port;
+        stream >> il2Longitude;
+        m_il2Longitude = il2Longitude;
         m_il2Port = il2Port;
         stream >> il2ManualControl;
         m_il2ManualControl = il2ManualControl;
@@ -50,6 +56,8 @@ IUAVGadgetConfiguration *HITLIL2Configuration::clone()
 {
     HITLIL2Configuration *m = new HITLIL2Configuration(this->classId());
     m->m_il2HostName = m_il2HostName;
+    m->m_il2Latitude = m_il2Latitude;
+    m->m_il2Longitude = m_il2Longitude;
     m->m_il2Port = m_il2Port;
     m->m_il2ManualControl = m_il2ManualControl;
     return m;
@@ -60,6 +68,8 @@ QByteArray HITLIL2Configuration::saveState() const
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::WriteOnly);
     stream << m_il2HostName;
+    stream << m_il2Latitude;
+    stream << m_il2Longitude;
     stream << m_il2Port;
     stream << m_il2ManualControl;
     return bytes;

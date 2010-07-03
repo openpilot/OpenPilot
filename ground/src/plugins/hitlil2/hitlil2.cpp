@@ -43,6 +43,8 @@ void HITLIL2::loadConfiguration(IUAVGadgetConfiguration* config)
 {
     HITLIL2Configuration *m = qobject_cast<HITLIL2Configuration*>(config);
     m_widget->setIl2HostName( m->il2HostName() );
+    m_widget->setIl2Latitude( m->il2Latitude() );
+    m_widget->setIl2Longitude( m->il2Longitude() );
     m_widget->setIl2Port( m->il2Port() );
     m_widget->setIl2ManualControl( m->il2ManualControl() );
 }

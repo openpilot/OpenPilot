@@ -80,7 +80,7 @@ class Il2Bridge: public QObject
     Q_OBJECT
 
 public:
-    Il2Bridge(QString il2HostName, int il2Port);
+    Il2Bridge(QString il2HostName, int il2Port, QString il2Latitude, QString il2Longitude);
     ~Il2Bridge();
 
     bool isAutopilotConnected();
@@ -125,6 +125,8 @@ private:
     PositionActual* posActual;
     GCSTelemetryStats* telStats;
     QHostAddress il2Host;
+    float latitude;
+    float longitude;
     int outPort;
     int updatePeriod;
     QTimer* txTimer;

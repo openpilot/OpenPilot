@@ -63,7 +63,7 @@
 #include "extensionsystem/pluginmanager.h"
 #include <math.h>
 
-Il2Bridge::Il2Bridge(QString il2HostName, int il2Port)
+Il2Bridge::Il2Bridge(QString il2HostName, int il2Port, QString il2Latitude, QString il2Longitude)
 {
     // Init fields
     il2Host = QHostAddress(il2HostName);
@@ -72,6 +72,8 @@ Il2Bridge::Il2Bridge(QString il2HostName, int il2Port)
     il2Timeout = 2000;
     autopilotConnectionStatus = false;
     il2ConnectionStatus = false;
+    latitude=il2Latitude.toFloat();
+    longitude=il2Longitude.toFloat();
 
     // Get required UAVObjects
     ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
@@ -348,8 +350,8 @@ void Il2Bridge::processUpdate(QString& data)
     gpsData.Altitude = current.Z;
     gpsData.Heading = current.azimuth;
     gpsData.Groundspeed = current.groundspeed;
-    gpsData.Latitude = current.Y * DEG2M;
-    gpsData.Longitude = current.X * cos(gpsData.Latitude*DEG2RAD) * DEG2M;
+    gpsData.Latitude = latitude + current.Y * DEG2M;
+    gpsData.Longitude = longitude + current.X * cos(gpsData.Latitude*DEG2RAD) * DEG2M;
     gpsData.Satellites = 7;
     gpsData.Status = PositionActual::STATUS_FIX3D;
     posActual->setData(gpsData);

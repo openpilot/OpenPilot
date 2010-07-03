@@ -42,6 +42,8 @@ public:
     ~HITLIL2Widget();
 
     void setIl2HostName(QString il2HostName);
+    void setIl2Latitude(QString il2Latitude);
+    void setIl2Longitude(QString il2Longitude);
     void setIl2Port(int il2Port);
     void setIl2ManualControl(bool val);
 
@@ -59,6 +61,8 @@ private:
     Ui_HITLIL2Widget* widget;
     Il2Bridge* il2Bridge;
     QString il2HostName;
+    QString il2Latitude;
+    QString il2Longitude;
     int il2Port;
     bool il2ManualControl;
 };

@@ -63,13 +63,33 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="2">
+   <item row="2" column="2">
     <widget class="QLineEdit" name="Il2HostName"/>
    </item>
-   <item row="0" column="1">
+   <item row="2" column="1">
     <widget class="QLabel" name="label_2">
      <property name="text">
       <string>IL2 Host Name/Number</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QLineEdit" name="Il2Longitude"/>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLabel" name="label_1">
+     <property name="text">
+      <string>Longitude offset (in degrees)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QLineEdit" name="Il2Latitude"/>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="label_0">
+     <property name="text">
+      <string>Latitude offset (in degrees)</string>
      </property>
     </widget>
    </item>

@@ -58,7 +58,7 @@ void HITLIL2Widget::startButtonClicked()
 
     // Start bridge
     qxtLog->info("HITLIL2: Starting bridge, initializing IL2 and Autopilot connections");
-    il2Bridge = new Il2Bridge(il2HostName,il2Port);
+    il2Bridge = new Il2Bridge(il2HostName,il2Port,il2Latitude,il2Longitude);
     connect(il2Bridge, SIGNAL(autopilotConnected()), this, SLOT(onAutopilotConnect()));
     connect(il2Bridge, SIGNAL(autopilotDisconnected()), this, SLOT(onAutopilotDisconnect()));
     connect(il2Bridge, SIGNAL(il2Connected()), this, SLOT(onIl2Connect()));
@@ -96,6 +96,16 @@ void HITLIL2Widget::stopButtonClicked()
 void HITLIL2Widget::setIl2HostName(QString il2HostName)
 {
     this->il2HostName = il2HostName;
+}
+
+void HITLIL2Widget::setIl2Latitude(QString il2Latitude)
+{
+    this->il2Latitude = il2Latitude;
+}
+
+void HITLIL2Widget::setIl2Longitude(QString il2Longitude)
+{
+    this->il2Longitude = il2Longitude;
 }
 
 void HITLIL2Widget::setIl2Port(int il2Port)

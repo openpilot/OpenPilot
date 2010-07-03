@@ -39,6 +39,8 @@ class HITLIL2Configuration : public IUAVGadgetConfiguration
 
 Q_OBJECT
 Q_PROPERTY(QString m_il2HostName READ il2HostName WRITE setIl2HostName)
+Q_PROPERTY(QString m_il2Latitude READ il2Latitude WRITE setIl2Latitude)
+Q_PROPERTY(QString m_il2Longitude READ il2Longitude WRITE setIl2Longitude)
 Q_PROPERTY(int m_il2Port READ il2Port WRITE setIl2Port)
 Q_PROPERTY(bool m_il2ManualControl READ il2ManualControl WRITE setIl2ManualControl)
 
@@ -48,6 +50,8 @@ public:
     IUAVGadgetConfiguration *clone();
 
     QString il2HostName() const { return m_il2HostName; }
+    QString il2Latitude() const { return m_il2Latitude; }
+    QString il2Longitude() const { return m_il2Longitude; }
     int il2Port() const { return m_il2Port; }
     bool il2ManualControl() const { return m_il2ManualControl; }
 
@@ -55,11 +59,15 @@ signals:
 
 public slots:
     void setIl2HostName(QString HostName) { m_il2HostName = HostName; }
+    void setIl2Latitude(QString Latitude) { m_il2Latitude = Latitude; }
+    void setIl2Longitude(QString Longitude) { m_il2Longitude = Longitude; }
     void setIl2Port(int Port) { m_il2Port = Port; }
     void setIl2ManualControl(bool val) { m_il2ManualControl = val; }
 
 private:
     QString m_il2HostName;
+    QString m_il2Latitude;
+    QString m_il2Longitude;
     int m_il2Port;
     bool m_il2ManualControl;
 

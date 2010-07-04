@@ -45,13 +45,17 @@
  */
 
 #include "ahrs_comms.h"
-#include "attitudeactual.h" // object that will be updated by the module
-#include "attitudesettings.h" // object holding module settings
+#include "attitudeactual.h"
+#include "attitudesettings.h"
+#include "headingactual.h"
+#include "ahrsstatus.h"
+#include "alarms.h"
 
 #include "pios_opahrs.h" // library for OpenPilot AHRS access functions
+#include "pios_opahrs_proto.h"
 
 // Private constants
-#define STACK_SIZE 200
+#define STACK_SIZE 400
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
 
 // Private types
@@ -61,6 +65,9 @@ static xTaskHandle taskHandle;
 
 // Private functions
 static void ahrscommsTask(void* parameters);
+static void update_attitude_actual(struct opahrs_msg_v1_rsp_attitude * attitude);
+static void update_heading_actual(struct opahrs_msg_v1_rsp_heading * heading);
+static void update_ahrs_status(struct opahrs_msg_v1_rsp_serial * serial);
 
 /**
  * Initialise the module, called on startup
@@ -68,10 +75,12 @@ static void ahrscommsTask(void* parameters);
  */
 int32_t AHRSCommsInitialize(void)
 {
-	// Start main task
-	xTaskCreate(ahrscommsTask, (signed char*)"AHRSComms", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
+  PIOS_OPAHRS_Init();
 
-	return 0;
+  // Start main task
+  xTaskCreate(ahrscommsTask, (signed char*)"AHRSComms", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
+
+  return 0;
 }
 
 /**
@@ -79,42 +88,95 @@ int32_t AHRSCommsInitialize(void)
  */
 static void ahrscommsTask(void* parameters)
 {
-	AttitudeSettingsData settings;
-	AttitudeActualData data;
+  // Main task loop
+  while (1) {
+    struct opahrs_msg_v1 rsp;
 
-	// Main task loop
-	while (1)
-	{
-		// Update settings with latest value
-		AttitudeSettingsGet(&settings);
+    AlarmsSet(SYSTEMALARMS_ALARM_AHRSCOMMS, SYSTEMALARMS_ALARM_CRITICAL);
 
-		// Get the current object data
-		AttitudeActualGet(&data);
+    /* Spin here until we're in sync */
+    while (PIOS_OPAHRS_resync() != OPAHRS_RESULT_OK) {
+      vTaskDelay(100 / portTICK_RATE_MS);
+    }
+      
+    /* Give the other side a chance to keep up */
+    //vTaskDelay(100 / portTICK_RATE_MS);
 
-		// Query the latest attitude solution from the AHRS
-		PIOS_OPAHRS_ReadAttitude();
+    if (PIOS_OPAHRS_GetSerial(&rsp) == OPAHRS_RESULT_OK) {
+      update_ahrs_status(&(rsp.payload.user.v.rsp.serial));
+    } else {
+      /* Comms error */
+      continue;
+    }
 
-		// Update the data
-		data.q1 += 0.111;
-		data.q2 += 1.1;
-		data.q3 += 7.0;
-		data.q4 -= 2.321;
+    AlarmsClear(SYSTEMALARMS_ALARM_AHRSCOMMS);
 
-		data.Roll += 0.01;
-		data.Pitch -= 0.03;
-		data.Yaw += 0.05;
+    /* We're in sync with the AHRS, spin here until an error occurs */
+    while (1) {
+      AttitudeSettingsData settings;
 
-		// Update the ExampleObject, after this function is called
-		// notifications to any other modules listening to that object
-		// will be sent and the GCS object will be updated through the
-		// telemetry link. All operations will take place asynchronously
-		// and the following call will return immediately.
-		AttitudeActualSet(&data);
+      /* Update settings with latest value */
+      AttitudeSettingsGet(&settings);
+  
+      if (PIOS_OPAHRS_GetAttitude(&rsp) == OPAHRS_RESULT_OK) {
+	update_attitude_actual(&(rsp.payload.user.v.rsp.attitude));
+      } else {
+	/* Comms error */
+	break;
+      }
 
-		// Since this module executes at fixed time intervals, we need to
-		// block the task until it is time for the next update.
-		// The settings field is in ms, to convert to RTOS ticks we need
-		// to divide by portTICK_RATE_MS.
-		vTaskDelay( settings.UpdatePeriod / portTICK_RATE_MS );
-	}
+      if (PIOS_OPAHRS_GetHeading(&rsp) == OPAHRS_RESULT_OK) {
+	update_heading_actual(&(rsp.payload.user.v.rsp.heading));
+      } else {
+	/* Comms error */
+	break;
+      }
+    
+      /* Wait for the next update interval */
+      vTaskDelay( settings.UpdatePeriod / portTICK_RATE_MS );
+    }
+  }
+}
+
+static void update_attitude_actual(struct opahrs_msg_v1_rsp_attitude * attitude)
+{
+  AttitudeActualData   data;
+
+  data.q1 = attitude->quaternion.q1;
+  data.q2 = attitude->quaternion.q2;
+  data.q3 = attitude->quaternion.q3;
+  data.q4 = attitude->quaternion.q4;
+  
+  data.Roll  = attitude->euler.roll;
+  data.Pitch = attitude->euler.pitch;
+  data.Yaw   = attitude->euler.yaw;
+  
+  AttitudeActualSet(&data);
+}
+
+static void update_heading_actual(struct opahrs_msg_v1_rsp_heading * heading)
+{
+  HeadingActualData    data;
+
+  data.raw[HEADINGACTUAL_RAW_X] = heading->raw_mag.x;
+  data.raw[HEADINGACTUAL_RAW_Y] = heading->raw_mag.y;
+  data.raw[HEADINGACTUAL_RAW_Z] = heading->raw_mag.z;
+  
+  data.heading                  = heading->heading;
+  
+  HeadingActualSet(&data);
+}
+
+static void update_ahrs_status(struct opahrs_msg_v1_rsp_serial * serial)
+{
+  AhrsStatusData       data;
+
+  // Get the current object data
+  AhrsStatusGet(&data);
+
+  for (uint8_t i = 0; i < sizeof(serial->serial_bcd); i++) {
+    data.SerialNumber[i] = serial->serial_bcd[i];
+  }
+
+  AhrsStatusSet(&data);
 }

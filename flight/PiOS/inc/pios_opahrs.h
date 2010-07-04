@@ -26,19 +26,19 @@
 #ifndef PIOS_OPAHRS_H
 #define PIOS_OPAHRS_H
 
-/* Local Types */
+#include "pios_opahrs_proto.h"	/* opahrs message structs */
 
-/* Global Variables */
-#if defined(PIOS_INCLUDE_FREERTOS)
-extern xSemaphoreHandle PIOS_OPAHRS_EOT;
-#else
-extern int32_t PIOS_OPAHRS_EOT;
-#endif
+enum opahrs_result {
+  OPAHRS_RESULT_OK = 0,
+  OPAHRS_RESULT_TIMEOUT,
+  OPAHRS_RESULT_FAILED,
+};
 
-/* Public Functions */
 extern void PIOS_OPAHRS_Init(void);
-extern void PIOS_OPAHRS_ReadAttitude(void);
-extern int32_t PIOS_OPAHRS_Read(uint8_t address, uint8_t *buffer, uint8_t len);
-extern int32_t PIOS_OPAHRS_Write(uint8_t address, uint8_t buffer);
+extern enum opahrs_result PIOS_OPAHRS_Sync(struct opahrs_msg_v1 *rsp);
+extern enum opahrs_result PIOS_OPAHRS_GetSerial(struct opahrs_msg_v1 *rsp);
+extern enum opahrs_result PIOS_OPAHRS_GetAttitude(struct opahrs_msg_v1 *rsp);
+extern enum opahrs_result PIOS_OPAHRS_GetHeading(struct opahrs_msg_v1 *rsp);
+extern enum opahrs_result PIOS_OPAHRS_resync(void);
 
 #endif /* PIOS_OPAHRS_H */

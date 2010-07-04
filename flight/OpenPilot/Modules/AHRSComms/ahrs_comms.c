@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       attitude.c
+ * @file       ahrs_comms.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Module to read the attitude solution from the AHRS on a periodic basis.
+ * @brief      Module to handle all comms to the AHRS on a periodic basis.
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -44,7 +44,7 @@
  *
  */
 
-#include "attitude.h"
+#include "ahrs_comms.h"
 #include "attitudeactual.h" // object that will be updated by the module
 #include "attitudesettings.h" // object holding module settings
 
@@ -60,16 +60,16 @@
 static xTaskHandle taskHandle;
 
 // Private functions
-static void attitudeTask(void* parameters);
+static void ahrscommsTask(void* parameters);
 
 /**
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-int32_t AttitudeInitialize(void)
+int32_t AHRSCommsInitialize(void)
 {
 	// Start main task
-	xTaskCreate(attitudeTask, (signed char*)"Attitude", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
+	xTaskCreate(ahrscommsTask, (signed char*)"AHRSComms", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
 
 	return 0;
 }
@@ -77,7 +77,7 @@ int32_t AttitudeInitialize(void)
 /**
  * Module thread, should not return.
  */
-static void attitudeTask(void* parameters)
+static void ahrscommsTask(void* parameters)
 {
 	AttitudeSettingsData settings;
 	AttitudeActualData data;

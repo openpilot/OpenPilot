@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       attitude.h
+ * @file       ahrs_comms.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Module to read the attitude solution from the AHRS on a periodic basis.
+ * @brief      Module to handle all comms to the AHRS on a periodic basis.
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -23,12 +23,12 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef ATTITUDE_H
-#define ATTITUDE_H
+#ifndef AHRS_COMMS_H
+#define AHRS_COMMS_H
 
 #include "openpilot.h"
 
-int32_t AttitudeInitialize(void);
+int32_t AHRSCommsInitialize(void);
 
-#endif // ATTITUDE_H
+#endif // AHRS_COMMS_H
 

@@ -30,10 +30,12 @@
 
 /* MicroSD Interface
  * 
- * NOTE: Leave this declared as const static data so that it ends up in the 
+ * NOTE: Leave this declared as const data so that it ends up in the 
  * .rodata section (ie. Flash) rather than in the .bss section (RAM).
  */
 void PIOS_SPI_sdcard_irq_handler(void);
+void DMA1_Channel2_IRQHandler() __attribute__ ((alias ("PIOS_SPI_sdcard_irq_handler")));
+void DMA1_Channel3_IRQHandler() __attribute__ ((alias ("PIOS_SPI_sdcard_irq_handler")));
 const struct pios_spi_cfg pios_spi_sdcard_cfg = {
   .regs   = SPI1,
   .init   = {
@@ -126,10 +128,12 @@ const struct pios_spi_cfg pios_spi_sdcard_cfg = {
 
 /* AHRS Interface
  * 
- * NOTE: Leave this declared as const static data so that it ends up in the 
+ * NOTE: Leave this declared as const data so that it ends up in the 
  * .rodata section (ie. Flash) rather than in the .bss section (RAM).
  */
 void PIOS_SPI_ahrs_irq_handler(void);
+void DMA1_Channel4_IRQHandler() __attribute__ ((alias ("PIOS_SPI_ahrs_irq_handler")));
+void DMA1_Channel5_IRQHandler() __attribute__ ((alias ("PIOS_SPI_ahrs_irq_handler")));
 const struct pios_spi_cfg pios_spi_ahrs_cfg = {
   .regs   = SPI2,
   .init   = {

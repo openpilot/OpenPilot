@@ -31,10 +31,12 @@
 
 /* OP Interface
  * 
- * NOTE: Leave this declared as const static data so that it ends up in the 
+ * NOTE: Leave this declared as const data so that it ends up in the 
  * .rodata section (ie. Flash) rather than in the .bss section (RAM).
  */
 void PIOS_SPI_op_irq_handler(void);
+void DMA1_Channel5_IRQHandler() __attribute__ ((alias ("PIOS_SPI_op_irq_handler")));
+void DMA1_Channel4_IRQHandler() __attribute__ ((alias ("PIOS_SPI_op_irq_handler")));
 static const struct pios_spi_cfg pios_spi_op_cfg = {
   .regs   = SPI2,
   .init   = {

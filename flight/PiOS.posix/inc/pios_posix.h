@@ -26,20 +26,9 @@
 #ifndef PIOS_POSIX_H
 #define PIOS_POSIX_H
 
-#include <sys/types.h>
-
-typedef __uint16_t uint16_t;
-typedef __uint32_t uint32_t;
-typedef __uint32_t u32;
-typedef __uint8_t uint8_t;
-
-typedef __int16_t int16_t;
-typedef __int32_t int32_t;
-typedef __int8_t int8_t;
+#include <stdint.h>
 
 #define FILEINFO FILE*
-
-
 
 #endif
 

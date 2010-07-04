@@ -148,7 +148,7 @@ void UAVObjClearStats()
  * \param[in] isSettings Is this a settings object
  * \param[in] numBytes Number of bytes of object data (for one instance)
  * \param[in] initCb Default field and metadata initialization function
- * \return Object handle, or 0 if failure.
+ * \return Object handle, or NULL if failure.
  * \return
  */
 UAVObjHandle UAVObjRegister(uint32_t id, const char* name, const char* metaName, int32_t isMetaobject,
@@ -168,7 +168,7 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char* name, const char* metaName,
 		{
 			// Already registered, ignore
 			xSemaphoreGiveRecursive(mutex);
-			return -1;
+			return NULL;
 		}
 	}
 
@@ -177,7 +177,7 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char* name, const char* metaName,
 	if (objEntry == NULL)
 	{
 		xSemaphoreGiveRecursive(mutex);
-		return 0;
+		return NULL;
 	}
 	objEntry->id = id;
 	objEntry->name = name;
@@ -197,7 +197,7 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char* name, const char* metaName,
 	if ( instEntry == NULL )
 	{
 		xSemaphoreGiveRecursive(mutex);
-		return 0;
+		return NULL;
 	}
 
 	// Create metaobject and update linkedObj
@@ -240,7 +240,7 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char* name, const char* metaName,
 /**
  * Retrieve an object from the list given its id
  * \param[in] The object ID
- * \return The object or 0 if not found.
+ * \return The object or NULL if not found.
  */
 UAVObjHandle UAVObjGetByID(uint32_t id)
 {
@@ -263,13 +263,13 @@ UAVObjHandle UAVObjGetByID(uint32_t id)
 
 	// Object not found, release lock and return error
 	xSemaphoreGiveRecursive(mutex);
-	return 0;
+	return NULL;
 }
 
 /**
  * Retrieve an object from the list given its name
  * \param[in] name The name of the object
- * \return The object or 0 if not found.
+ * \return The object or NULL if not found.
  */
 UAVObjHandle UAVObjGetByName(char* name)
 {
@@ -292,7 +292,7 @@ UAVObjHandle UAVObjGetByName(char* name)
 
 	// Object not found, release lock and return error
 	xSemaphoreGiveRecursive(mutex);
-	return 0;
+	return NULL;
 }
 
 /**
@@ -529,12 +529,12 @@ int32_t UAVObjSaveToFile(UAVObjHandle obj, uint16_t instId, FILEINFO* file)
 	}
 
 	// Write the object ID
-	PIOS_FWRITE(file,&objEntry->id,4,&bytesWritten);
+	PIOS_FWRITE(file,&objEntry->id,sizeof(objEntry->id),&bytesWritten);
 
 	// Write the instance ID
 	if (!objEntry->isSingleInstance)
 	{
-		PIOS_FWRITE(file,&instEntry->instId,2,&bytesWritten);
+		PIOS_FWRITE(file,&instEntry->instId,sizeof(instEntry->instId),&bytesWritten);
 	}
 
 	// Write the data and check that the write was successful
@@ -605,7 +605,7 @@ int32_t UAVObjSave(UAVObjHandle obj, uint16_t instId)
 /**
  * Load an object from the file system (SD card).
  * @param[in] file File to read from
- * @return The handle of the object loaded or 0 if a failure
+ * @return The handle of the object loaded or NULL if a failure
  */
 UAVObjHandle UAVObjLoadFromFile(FILEINFO* file)
 {
@@ -619,17 +619,17 @@ UAVObjHandle UAVObjLoadFromFile(FILEINFO* file)
 	// Check for file system availability
 	if ( POIS_SDCARD_IsMounted() == 0 )
 	{
-		return -1;
+		return NULL;
 	}
 
 	// Lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
 	// Read the object ID
-	if ( PIOS_FREAD(file,&objId,4,&bytesRead) )
+	if ( PIOS_FREAD(file,&objId,sizeof(objId),&bytesRead) )
 	{
 		xSemaphoreGiveRecursive(mutex);
-		return 0;
+		return NULL;
 	}
 
 	// Get the object
@@ -637,7 +637,7 @@ UAVObjHandle UAVObjLoadFromFile(FILEINFO* file)
 	if ( obj == 0 )
 	{
 		xSemaphoreGiveRecursive(mutex);
-		return 0;
+		return NULL;
 	}
 	objEntry = (ObjectList*)obj;
 
@@ -645,10 +645,10 @@ UAVObjHandle UAVObjLoadFromFile(FILEINFO* file)
 	instId = 0;
 	if ( !objEntry->isSingleInstance )
 	{
-		if ( PIOS_FREAD(file,&instId,2,&bytesRead) )
+		if ( PIOS_FREAD(file,&instId,sizeof(instId),&bytesRead) )
 		{
 			xSemaphoreGiveRecursive(mutex);
-			return 0;
+			return NULL;
 		}
 	}
 
@@ -663,7 +663,7 @@ UAVObjHandle UAVObjLoadFromFile(FILEINFO* file)
 		{
 			// Error, unlock and return
 			xSemaphoreGiveRecursive(mutex);
-			return 0;
+			return NULL;
 		}
 	}
 
@@ -671,7 +671,7 @@ UAVObjHandle UAVObjLoadFromFile(FILEINFO* file)
 	if ( PIOS_FREAD(file,instEntry->data,objEntry->numBytes,&bytesRead) )
 	{
 		xSemaphoreGiveRecursive(mutex);
-		return 0;
+		return NULL;
 	}
 
 	// Fire event

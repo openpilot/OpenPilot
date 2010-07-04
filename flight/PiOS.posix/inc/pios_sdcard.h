@@ -76,7 +76,7 @@ typedef struct {
   uint16_t OEM_AppliID;				/* OEM/Application ID */
   char ProdName[6];					/* Product Name */
   uint8_t  ProdRev;					/* Product Revision */
-  u32 ProdSN;						/* Product Serial Number */
+  uint32_t ProdSN;						/* Product Serial Number */
   uint8_t  Reserved1;				/* Reserved1 */
   uint16_t ManufactDate;			/* Manufacturing Date */
   uint8_t  msd_CRC;					/* CRC */

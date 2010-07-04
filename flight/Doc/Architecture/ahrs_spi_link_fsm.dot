@@ -1,0 +1,90 @@
+// Regenerate using graphviz/dotty with this command
+//   dot -Tjpg ./flight/Doc/Architecture/ahrs_spi_link_fsm.dot > ./flight/Doc/Architecture/ahrs_spi_link_fsm.jpg
+
+digraph ahrs_spi_protocol {
+  label="AHRS SPI Link State Machine"
+  labelloc=t
+  labeljust = l
+
+  // Stopped -- Undefined Wire State
+  {
+    node [ style=filled,color=lightgray ]
+
+    stopped [ shape="doublecircle" ]
+    stopping
+  }
+
+  // Wire State Inactive
+  {
+    node [ style=filled,color=lightblue ]
+
+    inactive
+  }
+
+  // Wire State Busy
+  {
+    node [ style=filled,color=red ]
+
+    user_busy
+    user_busy_tx_pending
+    user_busy_rx_pending
+    user_busy_rxtx_pending
+  }
+  {
+    node [ style=filled,color=yellow ]
+
+    user_tx_pending
+    user_rx_pending
+    user_rxtx_pending
+  }
+
+  // Wire State Ready
+  {
+    node [ style=filled,color=green ]
+
+    user_rx_active
+    user_tx_active
+    user_rxtx_active
+  }
+
+  //
+  // State transitions driven by the user
+  //
+  stopped                -> inactive               [ label="init link" ]
+
+  inactive               -> stopping               [ label="stop" ]
+  inactive               -> user_busy_rx_pending   [ label="user set rx" ]
+  inactive               -> user_busy_tx_pending   [ label="user set tx" ]
+
+  user_busy              -> user_busy_tx_pending   [ label="user set tx" ]
+  user_busy              -> user_busy_rx_pending   [ label="user set rx" ]
+  user_busy              -> inactive               [ label="user done" ]
+  user_busy              -> stopping               [ label="stop" ]
+
+  user_busy_tx_pending   -> user_busy_rxtx_pending [ label="user set rx" ]
+  user_busy_tx_pending   -> user_tx_pending        [ label="user done" ]
+
+  user_busy_rx_pending   -> user_busy_rxtx_pending [ label="user set tx" ]
+  user_busy_rx_pending   -> user_rx_pending        [ label="user done" ]
+
+  user_busy_rxtx_pending -> user_rxtx_pending      [ label="user done" ]
+
+  // 
+  // State transitions driven by messaging from the OP board
+  //
+  stopping               -> stopped                [ label="rx any" ]
+
+  user_tx_pending        -> user_tx_active         [ label="rx any" ]
+  user_rx_pending        -> user_rx_active         [ label="rx any" ]
+
+  user_rxtx_pending      -> user_rxtx_active       [ label="rx any" ]
+
+  // Active -> Busy
+  user_rx_active         -> user_busy              [ label="rx user" ]
+
+  user_tx_active         -> inactive               [ label="rx any" ]
+
+  user_rxtx_active       -> user_busy              [ label="rx user" ]
+  user_rxtx_active       -> user_rx_active         [ label="rx link" ]
+  user_rxtx_active       -> user_rx_active         [ label="rx unknown" ]
+}

@@ -120,7 +120,7 @@ TIM8  |           |           |           |
 //
 // See also pios_board.c
 //-------------------------
-#define PIOS_OP_SPI				0
+#define PIOS_SPI_OP				0
 
 //-------------------------
 // PIOS_USART

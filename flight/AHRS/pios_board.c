@@ -140,7 +140,7 @@ uint8_t pios_spi_num_devices = NELEMENTS(pios_spi_devs);
 void PIOS_SPI_op_irq_handler(void)
 {
   /* Call into the generic code to handle the IRQ for this specific device */
-  PIOS_SPI_IRQ_Handler(PIOS_OP_SPI);
+  PIOS_SPI_IRQ_Handler(PIOS_SPI_OP);
 }
 
 #endif /* PIOS_INCLUDE_SPI */

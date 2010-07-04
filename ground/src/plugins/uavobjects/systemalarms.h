@@ -41,7 +41,7 @@ class UAVOBJECTS_EXPORT SystemAlarms: public UAVDataObject
 public:
     // Field structure
     typedef struct {
-        quint8 Alarm[9];
+        quint8 Alarm[10];
 
     } __attribute__((packed)) DataFields;
 
@@ -50,13 +50,13 @@ public:
     /* Enumeration options for field Alarm */
     typedef enum { ALARM_OK=0, ALARM_WARNING=1, ALARM_ERROR=2, ALARM_CRITICAL=3,  } AlarmOptions;
     /* Array element names for field Alarm */
-    typedef enum { ALARM_OUTOFMEMORY=0, ALARM_STACKOVERFLOW=1, ALARM_CPUOVERLOAD=2, ALARM_EVENTSYSTEM=3, ALARM_SDCARD=4, ALARM_TELEMETRY=5, ALARM_MANUALCONTROL=6, ALARM_ACTUATOR=7, ALARM_STABILIZATION=8,  } AlarmElem;
+    typedef enum { ALARM_OUTOFMEMORY=0, ALARM_STACKOVERFLOW=1, ALARM_CPUOVERLOAD=2, ALARM_EVENTSYSTEM=3, ALARM_SDCARD=4, ALARM_TELEMETRY=5, ALARM_MANUALCONTROL=6, ALARM_ACTUATOR=7, ALARM_STABILIZATION=8, ALARM_AHRSCOMMS=9,  } AlarmElem;
     /* Number of elements for field Alarm */
-    static const quint32 ALARM_NUMELEM = 9;
+    static const quint32 ALARM_NUMELEM = 10;
 
   
     // Constants
-    static const quint32 OBJID = 2311311520U;
+    static const quint32 OBJID = 2311311584U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

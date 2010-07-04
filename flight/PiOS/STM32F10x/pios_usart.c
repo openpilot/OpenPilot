@@ -385,7 +385,7 @@ int32_t PIOS_USART_TxBufferGet(uint8_t usart)
 * \return -3 if USART not supported by USARTTxBufferPut Routine
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_USART_TxBufferPutMoreNonBlocking(uint8_t usart, uint8_t *buffer, uint16_t len)
+int32_t PIOS_USART_TxBufferPutMoreNonBlocking(uint8_t usart, const uint8_t *buffer, uint16_t len)
 {
   struct pios_usart_dev * usart_dev;
 
@@ -437,7 +437,7 @@ int32_t PIOS_USART_TxBufferPutMoreNonBlocking(uint8_t usart, uint8_t *buffer, ui
 * \return -3 if USART not supported by USARTTxBufferPut Routine
 * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_USART_TxBufferPutMore(uint8_t usart, uint8_t *buffer, uint16_t len)
+int32_t PIOS_USART_TxBufferPutMore(uint8_t usart, const uint8_t *buffer, uint16_t len)
 {
   int32_t rc;
 

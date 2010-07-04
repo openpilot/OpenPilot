@@ -146,7 +146,7 @@ int32_t PIOS_USB_HID_CheckAvailable(uint8_t id)
 * \return -1 if too many bytes to be send
 * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, uint8_t *buffer, uint16_t len)
+int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t *buffer, uint16_t len)
 {
 	if(len > PIOS_USB_HID_DATA_LENGTH) {
 		/* Cannot send all requested bytes */
@@ -173,7 +173,7 @@ int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, uint8_t *buffer, uin
 * \return -1 if too many bytes to be send
 * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_USB_HID_TxBufferPutMore(uint8_t id, uint8_t *buffer, uint16_t len)
+int32_t PIOS_USB_HID_TxBufferPutMore(uint8_t id, const uint8_t *buffer, uint16_t len)
 {
   int32_t error;
 

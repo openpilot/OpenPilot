@@ -102,7 +102,7 @@ int32_t PIOS_COM_ChangeBaud(uint8_t port, uint32_t baud)
 *            caller should retry until buffer is free again
 * \return 0 on success
 */
-int32_t PIOS_COM_SendBufferNonBlocking(uint8_t port, uint8_t *buffer, uint16_t len)
+int32_t PIOS_COM_SendBufferNonBlocking(uint8_t port, const uint8_t *buffer, uint16_t len)
 {
   struct pios_com_dev * com_dev;
 
@@ -130,7 +130,7 @@ int32_t PIOS_COM_SendBufferNonBlocking(uint8_t port, uint8_t *buffer, uint16_t l
 * \return -1 if port not available
 * \return 0 on success
 */
-int32_t PIOS_COM_SendBuffer(uint8_t port, uint8_t *buffer, uint16_t len)
+int32_t PIOS_COM_SendBuffer(uint8_t port, const uint8_t *buffer, uint16_t len)
 {
   struct pios_com_dev * com_dev;
 
@@ -185,7 +185,7 @@ int32_t PIOS_COM_SendChar(uint8_t port, char c)
 *         caller should retry until buffer is free again
 * \return 0 on success
 */
-int32_t PIOS_COM_SendStringNonBlocking(uint8_t port, char *str)
+int32_t PIOS_COM_SendStringNonBlocking(uint8_t port, const char *str)
 {
 	return PIOS_COM_SendBufferNonBlocking(port, (uint8_t *)str, (uint16_t)strlen(str));
 }
@@ -198,7 +198,7 @@ int32_t PIOS_COM_SendStringNonBlocking(uint8_t port, char *str)
 * \return -1 if port not available
 * \return 0 on success
 */
-int32_t PIOS_COM_SendString(uint8_t port, char *str)
+int32_t PIOS_COM_SendString(uint8_t port, const char *str)
 {
 	return PIOS_COM_SendBuffer(port, (uint8_t *)str, strlen(str));
 }
@@ -213,7 +213,7 @@ int32_t PIOS_COM_SendString(uint8_t port, char *str)
 *         caller should retry until buffer is free again
 * \return 0 on success
 */
-int32_t PIOS_COM_SendFormattedStringNonBlocking(uint8_t port, char *format, ...)
+int32_t PIOS_COM_SendFormattedStringNonBlocking(uint8_t port, const char *format, ...)
 {
 	uint8_t buffer[128]; // TODO: tmp!!! Provide a streamed COM method later!
 
@@ -233,7 +233,7 @@ int32_t PIOS_COM_SendFormattedStringNonBlocking(uint8_t port, char *format, ...)
 * \return -1 if port not available
 * \return 0 on success
 */
-int32_t PIOS_COM_SendFormattedString(uint8_t port, char *format, ...)
+int32_t PIOS_COM_SendFormattedString(uint8_t port, const char *format, ...)
 {
 	uint8_t buffer[128]; // TODO: tmp!!! Provide a streamed COM method later!
 	va_list args;

@@ -229,10 +229,6 @@ int32_t PIOS_SPI_RC_PinSet(uint8_t spi, uint8_t pin_value)
 * Transfers a byte to SPI output and reads back the return value from SPI input
 * \param[in] spi SPI number (0 or 1)
 * \param[in] b the byte which should be transfered
-* \return >= 0: the read byte
-* \return -1 if disabled SPI port selected
-* \return -2 if unsupported SPI port selected
-* \return -3 if unsupported SPI mode configured via PIOS_SPI_TransferModeInit()
 */
 int32_t PIOS_SPI_TransferByte(uint8_t spi, uint8_t b)
 {
@@ -242,11 +238,7 @@ int32_t PIOS_SPI_TransferByte(uint8_t spi, uint8_t b)
 
   /* Get a handle for the device configuration */
   spi_dev = find_spi_dev_by_id(spi);
-
-  if (!spi_dev) {
-    /* Undefined SPI port for this board (see pios_board.c) */
-    return -2;
-  }
+  PIOS_DEBUG_Assert(spi_dev);
 
   /* 
    * Procedure taken from STM32F10xxx Reference Manual section 23.3.5

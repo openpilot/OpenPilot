@@ -365,7 +365,7 @@ int32_t PIOS_SDCARD_SendSDCCmd(uint8_t cmd, uint32_t addr, uint8_t crc)
 	} else {
 		/* Wait for standard R1 response */
 		for(i = 0; i < 8; ++i) {
-			if((ret = PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff)) != 0xff ) {
+		  if(!((ret = PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff)) & 0x80) ) {
 				break;
 			}
 		}

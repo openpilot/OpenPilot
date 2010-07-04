@@ -8,12 +8,6 @@
  * @see        The GNU Public License (GPL) Version 3
  * @defgroup   PIOS_SPI SPI Functions
  * @notes
- * J19 provides two SSEL (alias Chip Select) lines.<BR>
- * It's a software emulated SPI, therefore the selected spi_prescaler has no
- * effect! Bytes are transfered so fast as possible. The usage of
- * PIOS_SPI_PIN_DRIVER_STRONG is strongly recommended ;)<BR>
- * DMA transfers are not supported by the emulation, so that
- * PIOS_SPI_TransferBlock() will consume CPU time (but the callback handling does work).
  *
  * Note that additional chip select lines can be easily added by using
  * the remaining free GPIOs of the core module. Shared SPI ports should be
@@ -90,7 +84,8 @@ int32_t PIOS_SPI_Init(void)
 	    }
 	    break;
 	  case SPI_NSS_Hard:
-	      GPIO_Init(spi_dev->cfg->ssel.gpio, &(spi_dev->cfg->ssel.init));
+	    /* FIXME: Should this also call SPI_SSOutputCmd()? */
+	    GPIO_Init(spi_dev->cfg->ssel.gpio, &(spi_dev->cfg->ssel.init));
 	    break;
 	  default:
 	    PIOS_DEBUG_Assert(0);
@@ -130,6 +125,13 @@ int32_t PIOS_SPI_Init(void)
 
 	  /* Initialize the SPI block */
 	  SPI_Init(spi_dev->cfg->regs, &(spi_dev->cfg->init));
+
+	  /* Configure CRC calculation */
+	  if (spi_dev->cfg->use_crc) {
+	    SPI_CalculateCRC(spi_dev->cfg->regs, ENABLE);
+	  } else {
+	    SPI_CalculateCRC(spi_dev->cfg->regs, DISABLE);
+	  }
 
 	  /* Enable SPI */
 	  SPI_Cmd(spi_dev->cfg->regs, ENABLE);
@@ -299,15 +301,23 @@ int32_t PIOS_SPI_TransferBlock(uint8_t spi, const uint8_t *send_buffer, uint8_t 
 
 
   /* Exit if ongoing transfer */
-  if(spi_dev->cfg->dma.rx.channel->CNDTR) {
+  if (DMA_GetCurrDataCounter(spi_dev->cfg->dma.rx.channel)) {
     return -3;
   }
+
+  /* Disable the SPI peripheral */
+  SPI_Cmd(spi_dev->cfg->regs, DISABLE);
+
+  /* Disable the DMA channels */
+  DMA_Cmd(spi_dev->cfg->dma.rx.channel, DISABLE);
+  DMA_Cmd(spi_dev->cfg->dma.tx.channel, DISABLE);
 
   /* Set callback function */
   spi_dev->callback = callback;
 
-  /* Configure Rx channel */
-  DMA_Cmd(spi_dev->cfg->dma.rx.channel, DISABLE);
+  /* 
+   * Configure Rx channel 
+   */
 
   /* Start with the default configuration for this peripheral */
   dma_init = spi_dev->cfg->dma.rx.init;
@@ -318,16 +328,21 @@ int32_t PIOS_SPI_TransferBlock(uint8_t spi, const uint8_t *send_buffer, uint8_t 
     dma_init.DMA_MemoryInc      = DMA_MemoryInc_Enable;
   } else {
     /* Disable memory addr. increment - bytes written into dummy buffer */
-    spi_dev->rx_dummy_byte = 0xff;
+    spi_dev->rx_dummy_byte = 0xFF;
     dma_init.DMA_MemoryBaseAddr = (uint32_t)&spi_dev->rx_dummy_byte;
     dma_init.DMA_MemoryInc      = DMA_MemoryInc_Disable;
   }
+  if (spi_dev->cfg->use_crc) {
+    /* Make sure the CRC error flag is cleared before we start */
+    SPI_I2S_ClearFlag(spi_dev->cfg->regs, SPI_FLAG_CRCERR);
+  }
+
   dma_init.DMA_BufferSize = len;
   DMA_Init(spi_dev->cfg->dma.rx.channel, &(dma_init));
-  DMA_Cmd(spi_dev->cfg->dma.rx.channel, ENABLE);
 
-  /* Configure Tx channel */
-  DMA_Cmd(spi_dev->cfg->dma.tx.channel, DISABLE);
+  /* 
+   * Configure Tx channel 
+   */
 
   /* Start with the default configuration for this peripheral */
   dma_init = spi_dev->cfg->dma.tx.init;
@@ -338,21 +353,64 @@ int32_t PIOS_SPI_TransferBlock(uint8_t spi, const uint8_t *send_buffer, uint8_t 
     dma_init.DMA_MemoryInc      = DMA_MemoryInc_Enable;
   } else {
     /* Disable memory addr. increment - bytes written into dummy buffer */
-    spi_dev->tx_dummy_byte = 0xff;
+    spi_dev->tx_dummy_byte = 0xFF;
     dma_init.DMA_MemoryBaseAddr = (uint32_t)&spi_dev->tx_dummy_byte;
     dma_init.DMA_MemoryInc      = DMA_MemoryInc_Disable;
   }
-  dma_init.DMA_BufferSize = len;
+
+  if (spi_dev->cfg->use_crc) {
+    /* The last byte of the payload will be replaced with the CRC8 */
+    dma_init.DMA_BufferSize = len - 1;
+  } else {
+    dma_init.DMA_BufferSize = len;
+  }
+
   DMA_Init(spi_dev->cfg->dma.tx.channel, &(dma_init));
 
   /* Enable DMA interrupt if callback function active */
   DMA_ITConfig(spi_dev->cfg->dma.rx.channel, DMA_IT_TC, (callback != NULL) ? ENABLE : DISABLE);
 
-  /* Start DMA Tx transfer */
+  /* Flush out the CRC registers */
+  SPI_CalculateCRC(spi_dev->cfg->regs, DISABLE);
+  (void) SPI_GetCRC(spi_dev->cfg->regs, SPI_CRC_Rx);
+  SPI_I2S_ClearFlag(spi_dev->cfg->regs, SPI_FLAG_CRCERR);
+
+  /* Make sure to flush out the receive buffer */
+  (void) SPI_I2S_ReceiveData(spi_dev->cfg->regs);
+
+  if (spi_dev->cfg->use_crc) {
+    /* Need a 0->1 transition to reset the CRC logic */
+    SPI_CalculateCRC(spi_dev->cfg->regs, ENABLE);
+  }
+
+  /* Start DMA transfers */
+  DMA_Cmd(spi_dev->cfg->dma.rx.channel, ENABLE);
   DMA_Cmd(spi_dev->cfg->dma.tx.channel, ENABLE);
 
+  /* Reenable the SPI device */
+  SPI_Cmd(spi_dev->cfg->regs, ENABLE);
+
+  if (callback) {
+    /* User has requested a callback, don't wait for the transfer to complete. */
+    return 0;
+  }
+
   /* Wait until all bytes have been transmitted/received */
-  while(DMA_GetCurrDataCounter(spi_dev->cfg->dma.tx.channel));
+  while(DMA_GetCurrDataCounter(spi_dev->cfg->dma.rx.channel));
+
+  /* Wait for the final bytes of the transfer to complete, including CRC byte(s). */
+  while(!(SPI_I2S_GetFlagStatus(spi_dev->cfg->regs, SPI_I2S_FLAG_TXE)));
+
+  /* Wait for the final bytes of the transfer to complete, including CRC byte(s). */
+  while(SPI_I2S_GetFlagStatus(spi_dev->cfg->regs, SPI_I2S_FLAG_BSY));
+
+  /* Check the CRC on the transfer if enabled. */
+  if (spi_dev->cfg->use_crc) {
+    /* Check the SPI CRC error flag */
+    if (SPI_I2S_GetFlagStatus(spi_dev->cfg->regs, SPI_FLAG_CRCERR)) {
+      return -4;
+    }
+  }
 
   /* No error */
   return 0;
@@ -367,8 +425,22 @@ void PIOS_SPI_IRQ_Handler(uint8_t spi)
 
   DMA_ClearFlag(spi_dev->cfg->dma.irq.flags);
 
+  /* Wait for the final bytes of the transfer to complete, including CRC byte(s). */
+  while(!(SPI_I2S_GetFlagStatus(spi_dev->cfg->regs, SPI_I2S_FLAG_TXE)));
+
+  /* Wait for the final bytes of the transfer to complete, including CRC byte(s). */
+  while(SPI_I2S_GetFlagStatus(spi_dev->cfg->regs, SPI_I2S_FLAG_BSY));
+
   if(spi_dev->callback != NULL) {
-    spi_dev->callback();
+    bool crc_ok = TRUE;
+    uint8_t crc_val;
+
+    if (SPI_I2S_GetFlagStatus(spi_dev->cfg->regs, SPI_FLAG_CRCERR)) {
+      crc_ok = FALSE;
+      SPI_I2S_ClearFlag(spi_dev->cfg->regs, SPI_FLAG_CRCERR);
+    }
+    crc_val = SPI_GetCRC(spi_dev->cfg->regs, SPI_CRC_Rx);
+    spi_dev->callback(crc_ok, crc_val);
   }
 }
 

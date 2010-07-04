@@ -33,7 +33,7 @@
 struct pios_spi_cfg {
   SPI_TypeDef           * regs;
   SPI_InitTypeDef         init;
-  bool                  * master;
+  bool                    use_crc;
   struct stm32_dma        dma;
   struct stm32_gpio       ssel;
   struct stm32_gpio       sclk;
@@ -43,7 +43,7 @@ struct pios_spi_cfg {
 
 struct pios_spi_dev {
   const struct pios_spi_cfg * const cfg;
-  void                        (*callback)(void);
+  void                        (*callback)(uint8_t, uint8_t);
   uint8_t                     tx_dummy_byte;
   uint8_t                     rx_dummy_byte;
 };

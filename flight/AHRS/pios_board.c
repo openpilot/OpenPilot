@@ -49,6 +49,7 @@ static const struct pios_spi_cfg pios_spi_op_cfg = {
     .SPI_CPOL              = SPI_CPOL_High,
     .SPI_CPHA              = SPI_CPHA_2Edge,
   },
+  .use_crc = TRUE,
   .dma = {
     .ahb_clk  = RCC_AHBPeriph_DMA1,
     

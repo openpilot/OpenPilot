@@ -147,6 +147,7 @@ const struct pios_spi_cfg pios_spi_ahrs_cfg = {
     .SPI_CPHA              = SPI_CPHA_2Edge,
     .SPI_BaudRatePrescaler = 7 << 3, /* Maximum divider (ie. slowest clock rate) */
   },
+  .use_crc = TRUE,
   .dma = {
     .ahb_clk  = RCC_AHBPeriph_DMA1,
     

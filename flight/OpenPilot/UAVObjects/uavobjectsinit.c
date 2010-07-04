@@ -41,6 +41,7 @@
 #include "flightbatterystate.h"
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
+#include "headingactual.h"
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
 #include "objectpersistence.h"
@@ -71,6 +72,7 @@ void UAVObjectsInitializeAll()
     FlightBatteryStateInitialize();
     FlightTelemetryStatsInitialize();
     GCSTelemetryStatsInitialize();
+    HeadingActualInitialize();
     ManualControlCommandInitialize();
     ManualControlSettingsInitialize();
     ObjectPersistenceInitialize();

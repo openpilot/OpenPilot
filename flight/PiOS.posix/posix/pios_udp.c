@@ -163,7 +163,7 @@ void PIOS_UDP_RECV(uint8_t udp) {
 			(PIOS_UDP_RX_BUFFER_SIZE - udp_dev->rx.size),
 			0,
 			(struct sockaddr *) &udp_dev->client,
-			&udp_dev->clientLength)) < 0) {
+			(socklen_t*)&udp_dev->clientLength)) < 0) {
 
     return;
   }
@@ -379,7 +379,7 @@ int32_t PIOS_UDP_TxBufferPutMoreNonBlocking(uint8_t udp, uint8_t *buffer, uint16
   fcntl(udp_dev->socket, F_SETFL, flags | O_NONBLOCK);
   sendto(udp_dev->socket, buffer, len, 0,
                          (struct sockaddr *) &udp_dev->client,
-                         sizeof(udp_dev->client));
+                         (socklen_t)sizeof(udp_dev->client));
 
 
   /* No error */

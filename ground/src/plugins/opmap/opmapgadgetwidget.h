@@ -41,7 +41,9 @@
 #include "uavobjects/positionactual.h"
 #include "extensionsystem/pluginmanager.h"
 
-#include "opmap_mapoverlaywidget.h"
+#include "opmap_overlay_widget.h"
+#include "opmap_zoom_slider_widget.h"
+#include "opmap_statusbar_widget.h"
 #include "opmap_waypointeditor_dialog.h"
 #include "opmap_edit_waypoint_dialog.h"
 
@@ -195,9 +197,12 @@ private:
 
     opmap_edit_waypoint_dialog waypoint_edit_dialog;
 
+    opmap_overlay_widget *m_overlay_widget;
+
     QGraphicsScene *m_map_graphics_scene;
     QGraphicsProxyWidget *m_map_scene_proxy;
-    OPMap_MapOverlayWidget *m_map_overlay_widget;
+    opmap_zoom_slider_widget *m_zoom_slider_widget;
+    opmap_statusbar_widget *m_statusbar_widget;
 
     QStandardItemModel wayPoint_treeView_model;
 

@@ -47,9 +47,13 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_widget = NULL;
     m_map = NULL;
     findPlaceCompleter = NULL;
+    m_overlay_widget = NULL;
+
     m_map_graphics_scene = NULL;
     m_map_scene_proxy = NULL;
-    m_map_overlay_widget = NULL;
+    m_zoom_slider_widget = NULL;
+    m_statusbar_widget = NULL;
+
 
     m_plugin_manager = NULL;
     m_objManager = NULL;
@@ -100,18 +104,32 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_map);
-//    layout->addChildWidget();
     m_widget->mapWidget->setLayout(layout);
 
     // **************
     // create the user controls overlayed onto the map
+
+    // doing this makes the map VERY slow :(
+
 /*
-    m_map_overlay_widget = new OPMap_MapOverlayWidget();
+    m_zoom_slider_widget = new opmap_zoom_slider_widget();
+    m_statusbar_widget = new opmap_statusbar_widget();
 
     m_map_graphics_scene = m_map->scene();
-    m_map_scene_proxy = m_map_graphics_scene->addWidget(m_map_overlay_widget);
 
-    m_map_overlay_widget->setGeometry(m_widget->mapWidget->geometry());
+    m_map_scene_proxy = m_map_graphics_scene->addWidget(m_zoom_slider_widget);
+    m_map_scene_proxy = m_map_graphics_scene->addWidget(m_statusbar_widget);
+
+    m_zoom_slider_widget->move(m_map->width() - 20 - m_zoom_slider_widget->width(), 20);
+    m_statusbar_widget->move(0, m_map->height() - m_statusbar_widget->height());
+*/
+/*
+    m_overlay_widget = new opmap_overlay_widget(m_map);
+    QVBoxLayout *layout2 = new QVBoxLayout;
+    layout2->setSpacing(0);
+    layout2->setContentsMargins(0, 0, 0, 0);
+    layout2->addWidget(m_overlay_widget);
+    m_map->setLayout(layout2);
 */
     // **************
     // set the user control options
@@ -294,7 +312,8 @@ OPMapGadgetWidget::~OPMapGadgetWidget()
 
     onClearWayPointsAct_triggered();
 
-    if (m_map_overlay_widget) delete m_map_overlay_widget;
+    if (m_zoom_slider_widget) delete m_zoom_slider_widget;
+    if (m_statusbar_widget) delete m_statusbar_widget;
     if (m_map) delete m_map;
     if (m_widget) delete m_widget;
 }
@@ -767,7 +786,8 @@ void OPMapGadgetWidget::on_toolButtonAddWaypoint_clicked()
 
 void OPMapGadgetWidget::on_toolButtonWaypointEditor_clicked()
 {
-    wayPointEditorAct->trigger();
+    if (wayPointEditorAct->isEnabled())
+	wayPointEditorAct->trigger();
 }
 
 void OPMapGadgetWidget::on_treeViewWaypoints_clicked(QModelIndex index)
@@ -949,6 +969,7 @@ void OPMapGadgetWidget::createActions()
     wayPointEditorAct = new QAction(tr("&Waypoint editor"), this);
     wayPointEditorAct->setShortcut(tr("Ctrl+W"));
     wayPointEditorAct->setStatusTip(tr("Open the waypoint editor"));
+    wayPointEditorAct->setEnabled(false);   // temporary
     connect(wayPointEditorAct, SIGNAL(triggered()), this, SLOT(onOpenWayPointEditorAct_triggered()));
 
     addWayPointAct = new QAction(tr("&Add waypoint"), this);
@@ -1102,7 +1123,7 @@ void OPMapGadgetWidget::onFollowUAVpositionAct_toggled(bool checked)
 
 	if (m_map)
 	{
-	    m_map->SetCanDragMap(!checked);							// allow/disallow manual map dragging
+//	    m_map->SetCanDragMap(!checked);							// allow/disallow manual map dragging
 	    if (!checked) m_map->SetRotate(0);			    				// reset map rotation to 0deg
 	}
     }

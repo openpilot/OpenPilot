@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>OPMap_MapOverlayWidget</class>
- <widget class="QWidget" name="OPMap_MapOverlayWidget">
+ <class>opmap_overlay_widget</class>
+ <widget class="QWidget" name="opmap_overlay_widget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>476</width>
-    <height>289</height>
+    <width>336</width>
+    <height>300</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -16,96 +16,22 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="windowTitle">
-   <string/>
+  <property name="mouseTracking">
+   <bool>true</bool>
   </property>
-  <property name="autoFillBackground">
-   <bool>false</bool>
+  <property name="windowTitle">
+   <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">/*background-color: rgba(0, 0, 0, 0);*/
-background-color: transparent;
-
-QFrame {
-background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(110, 110, 110, 255), stop:1 rgba(71, 71, 71, 255));
-color: rgba(255, 255, 255, 70);
-}
-
-QLabel { /* all label types */
-/* background-color: rgba(255, 255, 255, 0); */
-background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(64, 64, 64, 255), stop:1 rgba(128, 128, 128, 255));
-color: rgb(255, 255, 255);
-}
-
-QToolButton {	/* all types of tool button */ 
-background-color: rgba(255, 255, 255, 0);
-color: rgb(255, 255, 255);
-/*border-style: none;*/
-border: 0px; 
-}
-QToolButton:hover {
-background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(255, 160, 0, 255), stop:1 rgba(160, 100, 0, 255));
-color: rgb(255, 255, 255);
-}
-QToolButton:pressed {
-background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
-color: rgb(255, 255, 255);
-}
-
-QToolButton:checked {
-background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
-color: rgb(255, 255, 255);
-}
-
-QSlider::groove:horizontal {
-border: none;
-height: 4px;
-background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(80, 80, 80, 255));
-margin: 2px 0;
-}
-QSlider::handle:horizontal {
-border: 1px solid #5c5c5c;
-background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(255, 255, 255, 255), stop:1 rgba(128, 128, 128, 255));
-width: 24px;
-margin: -2px 0;
-border-radius: 3px;
-}
-
-QComboBox {
-background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
-color: rgb(255, 255, 255);
-}
-QComboBox:hover {
-background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
-	background-color: rgb(197, 138, 0);
-}
-QComboBox::down-arrow {
-     image: url(:/opmap/images/combobox_down_arrow.png);
-}
-QComboBox:drop-down {
-     subcontrol-origin: padding;
-     subcontrol-position: top right;
-     border-left-style: none;
-     border-top-right-radius: 1px;
-     border-bottom-right-radius: 1px;
-}
-
-QToolTip {
-background-color: white;
-color: black;
-border: 1px solid black;
-padding: 5px;
-border-radius: 5px;
-/* opacity: 170; */ 
-}
-</string>
+   <string notr="true">background-color: transparent;
+border: none;</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="spacing">
-    <number>0</number>
-   </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="leftMargin">
     <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>20</number>
    </property>
    <property name="rightMargin">
     <number>0</number>
@@ -131,22 +57,10 @@ border-radius: 5px;
      <item>
       <widget class="QFrame" name="frame_2">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>27</width>
-         <height>170</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>27</width>
-         <height>170</height>
-        </size>
        </property>
        <property name="styleSheet">
         <string notr="true">background-color: rgba(0, 0, 0, 100);
@@ -154,12 +68,12 @@ border: none;
 border-radius: 12px;</string>
        </property>
        <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
+        <enum>QFrame::StyledPanel</enum>
        </property>
        <property name="frameShadow">
         <enum>QFrame::Raised</enum>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
+       <layout class="QVBoxLayout" name="verticalLayout">
         <property name="spacing">
          <number>3</number>
         </property>
@@ -175,13 +89,32 @@ border-radius: 12px;</string>
            </sizepolicy>
           </property>
           <property name="styleSheet">
-           <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+           <string notr="true">QToolButton {	/* all types of tool button */ 
+background-color: rgba(255, 255, 255, 0);
+color: rgb(255, 255, 255);
+/*border-style: none;*/
+border: 0px; 
+}
+QToolButton:hover {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(255, 160, 0, 255), stop:1 rgba(160, 100, 0, 255));
+color: rgb(255, 255, 255);
+}
+QToolButton:pressed {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
+color: rgb(255, 255, 255);
+}
+
+QToolButton:checked {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
+color: rgb(255, 255, 255);
+}
+</string>
           </property>
           <property name="text">
            <string/>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="opmap.qrc">
             <normaloff>:/opmap/images/plus.png</normaloff>:/opmap/images/plus.png</iconset>
           </property>
           <property name="autoRaise">
@@ -192,36 +125,30 @@ border-radius: 12px;</string>
         <item>
          <widget class="QSlider" name="verticalSlider">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>120</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>120</height>
-           </size>
-          </property>
           <property name="styleSheet">
            <string notr="true">QSlider {
+background-color: rgba(0, 0, 0, 0);
 }
-background-color: rgba(255, 255, 255, 0);
-QSlider::handle:vertical {
+
+QSlider::groove:horizontal {
+border: none;
+height: 4px;
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(80, 80, 80, 255));
+margin: 2px 0;
+}
+
+QSlider::handle:horizontal {
 border: 1px solid #5c5c5c;
-background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(128, 128, 128, 255), stop:1 rgba(255, 255, 255, 255));
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(255, 255, 255, 255), stop:1 rgba(128, 128, 128, 255));
 width: 24px;
-height: 20px;
 margin: -2px 0;
 border-radius: 3px;
 }
-
 </string>
           </property>
           <property name="minimum">
@@ -233,17 +160,8 @@ border-radius: 3px;
           <property name="pageStep">
            <number>1</number>
           </property>
-          <property name="tracking">
-           <bool>true</bool>
-          </property>
           <property name="orientation">
            <enum>Qt::Vertical</enum>
-          </property>
-          <property name="invertedAppearance">
-           <bool>false</bool>
-          </property>
-          <property name="invertedControls">
-           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -256,13 +174,32 @@ border-radius: 3px;
            </sizepolicy>
           </property>
           <property name="styleSheet">
-           <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+           <string notr="true">QToolButton {	/* all types of tool button */ 
+background-color: rgba(255, 255, 255, 0);
+color: rgb(255, 255, 255);
+/*border-style: none;*/
+border: 0px; 
+}
+QToolButton:hover {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(255, 160, 0, 255), stop:1 rgba(160, 100, 0, 255));
+color: rgb(255, 255, 255);
+}
+QToolButton:pressed {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
+color: rgb(255, 255, 255);
+}
+
+QToolButton:checked {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
+color: rgb(255, 255, 255);
+}
+</string>
           </property>
           <property name="text">
            <string/>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="opmap.qrc">
             <normaloff>:/opmap/images/minus.png</normaloff>:/opmap/images/minus.png</iconset>
           </property>
           <property name="autoRaise">
@@ -274,7 +211,7 @@ border-radius: 3px;
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer_5">
+      <spacer name="horizontalSpacer_2">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -307,7 +244,7 @@ border-radius: 3px;
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <spacer name="horizontalSpacer_4">
+      <spacer name="horizontalSpacer_5">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -324,6 +261,12 @@ border-radius: 3px;
      </item>
      <item>
       <widget class="QFrame" name="frame">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="styleSheet">
         <string notr="true">background-color: rgba(0, 0, 0, 100);
 border: none;
@@ -398,7 +341,7 @@ border-radius: 10px;
           <property name="maximumSize">
            <size>
             <width>100</width>
-            <height>14</height>
+            <height>16</height>
            </size>
           </property>
           <property name="styleSheet">
@@ -431,7 +374,7 @@ border-radius: 3px;
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer_2">
+      <spacer name="horizontalSpacer_4">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -450,6 +393,8 @@ border-radius: 3px;
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="opmap.qrc"/>
+ </resources>
  <connections/>
 </ui>

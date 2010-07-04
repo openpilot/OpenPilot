@@ -64,7 +64,7 @@ int main()
 	HMC5843_InitStructure.M_ODR = PIOS_HMC5843_ODR_10;
 	HMC5843_InitStructure.Meas_Conf = PIOS_HMC5843_MEASCONF_NORMAL;
 	HMC5843_InitStructure.Gain = PIOS_HMC5843_GAIN_2;
-	HMC5843_InitStructure.Mode = PIOS_HMC5843_MODE_CONTINUOS;
+	HMC5843_InitStructure.Mode = PIOS_HMC5843_MODE_CONTINUOUS;
 	PIOS_HMC5843_Config(&HMC5843_InitStructure);
 
 	uint8_t id[4] = {0};

@@ -124,7 +124,7 @@ void PIOS_HMC5843_Config(PIOS_HMC5843_ConfigTypeDef *HMC5843_Config_Struct)
 /**
 * Read the magnetic readings from the sensor
 */
-void PIOS_HMC5843_ReadMag(int16_t *out)
+void PIOS_HMC5843_ReadMag(int16_t out[3])
 {
 	uint8_t buffer[6];
 	uint8_t crtlB;
@@ -187,9 +187,10 @@ void PIOS_HMC5843_ReadMag(int16_t *out)
 /**
 * Read the identification bytes from the sensor
 */
-void PIOS_HMC5843_ReadID(uint8_t *out)
+void PIOS_HMC5843_ReadID(uint8_t out[4])
 {
 	PIOS_HMC5843_Read(PIOS_HMC5843_DATAOUT_IDA_REG, out, 3);
+	out[3] = '\0';
 }
 
 /**

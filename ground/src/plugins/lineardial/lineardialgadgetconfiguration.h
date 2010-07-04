@@ -50,6 +50,9 @@ public:
 
     void setFont(QString text) { font = text; }
 
+    void setFactor(double val) { factor = val; }
+    void setDecimalPlaces (int val) { decimalPlaces = val; }
+
     void setSourceDataObject(QString text) {sourceDataObject = text; }
     void setSourceObjField(QString text) { sourceObjectField = text; }
 
@@ -66,6 +69,8 @@ public:
     QString getSourceDataObject() { return sourceDataObject;}
     QString getSourceObjectField() { return sourceObjectField;}
     QString getFont() { return font;}
+    int getDecimalPlaces() { return decimalPlaces; }
+    double getFactor() { return factor; }
 
     QByteArray saveState() const;
     IUAVGadgetConfiguration *clone();
@@ -91,6 +96,9 @@ private:
     double yellowMax;
     double greenMin;
     double greenMax;
+    double factor;
+
+    int decimalPlaces;
 };
 
 #endif // LINEARDIALGADGETCONFIGURATION_H

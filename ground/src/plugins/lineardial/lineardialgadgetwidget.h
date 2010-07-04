@@ -55,6 +55,8 @@ public:
    void connectInput(QString obj, QString field);
    void setIndex(double val);
    void setDialFont(QString fontProps);
+   void setFactor (double val) { factor = val;}
+   void setDecimalPlaces(int val) { places = val;}
 
 public slots:
     void updateIndex(UAVObject *object1);
@@ -92,8 +94,6 @@ private:
    qreal indexHeight;
    qreal indexWidth;
 
-   double testVal;
-
    double minValue;
    double maxValue;
    double greenMin;
@@ -102,6 +102,8 @@ private:
    double yellowMax;
    double redMin;
    double redMax;
+   double factor;
+   int places;
 
    // The Value and target variables
    // are expressed in degrees

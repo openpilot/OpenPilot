@@ -64,6 +64,8 @@ QWidget *LineardialGadgetOptionsPage::createPage(QWidget *parent)
     options_page->yellowMax->setValue(m_config->getYellowMax());
     options_page->redMin->setValue(m_config->getRedMin());
     options_page->redMax->setValue(m_config->getRedMax());
+    options_page->factor->setValue(m_config->getFactor());
+    options_page->decPlaces->setValue(m_config->getDecimalPlaces());
     font.fromString(m_config->getFont());
 
     // Fills the combo boxes for the UAVObjects
@@ -113,6 +115,8 @@ void LineardialGadgetOptionsPage::apply()
     m_config->setSourceDataObject(options_page->objectName->currentText());
     m_config->setSourceObjField(options_page->objectField->currentText());
     m_config->setFont(font.toString());
+    m_config->setDecimalPlaces(options_page->decPlaces->value());
+    m_config->setFactor(options_page->factor->value());
 }
 
 /**
@@ -122,7 +126,7 @@ void LineardialGadgetOptionsPage::apply()
 void LineardialGadgetOptionsPage::on_fontPicker_clicked()
 {
     bool ok;
-     font = QFontDialog::getFont(&ok, QFont("Arial", 12), qobject_cast<QWidget*>(this));
+    font = QFontDialog::getFont(&ok, font , qobject_cast<QWidget*>(this));
 }
 
 

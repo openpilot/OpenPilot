@@ -44,7 +44,9 @@ LineardialGadgetConfiguration::LineardialGadgetConfiguration(QString classId, co
     yellowMin(33),
     yellowMax(66),
     greenMin(66),
-    greenMax(100)
+    greenMax(100),
+    factor(1.00),
+    decimalPlaces(0)
 {
     //if a saved configuration exists load it
     if (state.count() > 0) {
@@ -61,6 +63,8 @@ LineardialGadgetConfiguration::LineardialGadgetConfiguration(QString classId, co
         stream >> greenMin;
         stream >> greenMax;
         stream >> font;
+        stream >> decimalPlaces;
+        stream >> factor;
     }
 }
 /**
@@ -93,6 +97,8 @@ QByteArray LineardialGadgetConfiguration::saveState() const
     stream << greenMin;
     stream << greenMax;
     stream << font;
+    stream << decimalPlaces;
+    stream << factor;
 
     return bytes;
 }

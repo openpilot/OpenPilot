@@ -47,6 +47,8 @@ LineardialGadgetWidget::LineardialGadgetWidget(QWidget *parent) : QGraphicsView(
     fieldValue = NULL;
     indexTarget = 0;
     indexValue = 0;
+    places = 0;
+    factor = 1;
 
     // This timer mechanism makes the index rotate smoothly
     connect(&dialTimer, SIGNAL(timeout()), this, SLOT(moveIndex()));
@@ -98,9 +100,9 @@ void LineardialGadgetWidget::updateIndex(UAVObject *object1) {
     if (field) {
         QString s;
         if (field->isNumeric()) {
-            double v = field->getDouble();
+            double v = field->getDouble()*factor;
             setIndex(v);
-            s.sprintf("%.0f",v);
+            s.sprintf("%.*f",places,v);
         }
         if (field->isText()) {
             s = field->getValue().toString();
@@ -233,8 +235,11 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
           // Check whether the dial wants to display a moving index:
           if (m_renderer->elementExists("needle")) {
               QMatrix textMatrix = m_renderer->matrixForElement("needle");
-              startX = textMatrix.mapRect(m_renderer->boundsOnElement("needle")).x();
-              startY = textMatrix.mapRect(m_renderer->boundsOnElement("needle")).y();
+              QRectF nRect = textMatrix.mapRect(m_renderer->boundsOnElement("needle"));
+              startX = nRect.x();
+              startY = nRect.y();
+              //indexWidth = nRect.width();
+              //indexHeight = nRect.height();
               QTransform matrix;
               matrix.translate(startX,startY);
               index = new QGraphicsSvgItem();
@@ -378,12 +383,15 @@ void LineardialGadgetWidget::moveIndex()
     }
     QTransform matrix;
     index->resetTransform();
-    qreal factor = indexValue*bargraphSize/100;
+    qreal trans = indexValue*bargraphSize/100;
     if (verticalDial) {
-        matrix.translate(startX-indexWidth/2,factor+startY-indexHeight/2);
+        //matrix.translate(startX-indexWidth/2,trans+startY-indexHeight/2);
+        matrix.translate(startX,trans+startY);
     } else {
-        matrix.translate(factor+startX-indexWidth/2,startY-indexHeight/2);
+        //matrix.translate(trans+startX-indexWidth/2,startY-indexHeight/2);
+        matrix.translate(trans+startX,startY);
     }
     index->setTransform(matrix,false);
+    
     update();
 }

@@ -122,6 +122,8 @@ void PFDGadgetWidget::updateAttitude(UAVObject *object1) {
 /*!
   \brief Updates the compass reading and speed dial.
 
+  This also updates speed & altitude according to GPS data.
+
     Note: the speed dial shows the ground speed at the moment, because
         there is no airspeed by default. Should become configurable in a future
         gadget release (TODO)
@@ -143,7 +145,8 @@ void PFDGadgetWidget::updateHeading(UAVObject *object1) {
     if (field) {
         // The speed scale represents 30km/h (6 * 5)
         // 3.6 : convert m/s to km/h
-        groundspeedTarget = 3.6*field->getDouble()*speedScaleHeight/(30);
+        double val = field->getDouble();
+        groundspeedTarget = 3.6*val*speedScaleHeight/(30);
     }
     fieldname = QString("Altitude");
     field = object1->getField(fieldname);
@@ -205,7 +208,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
      - Black speed window: speed-window.
      - Altitude rectangle (right site): altitude-bg.
      - Altitude scale: altitude-scale.
-     - Black altitude window: altitude-window.
+     - Black altitude window: altitude-window.     
  */
          QGraphicsScene *l_scene = scene();
          l_scene->clear(); // Deletes all items contained in the scene as well.
@@ -238,7 +241,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          // Next point bearing:
          m_nextpointbearing = new QGraphicsSvgItem();
 
-         m_foreground = new QGraphicsSvgItem();
+         QGraphicsSvgItem *m_foreground = new QGraphicsSvgItem();
          m_foreground->setParentItem(m_background);
          m_foreground->setSharedRenderer(m_renderer);
          m_foreground->setElementId("foreground");
@@ -284,6 +287,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          // Speed
          ////////////////////
          // Speedometer on the left hand:
+         //
          compassMatrix = m_renderer->matrixForElement("speed-bg");
          startX = compassMatrix.mapRect(m_renderer->boundsOnElement("speed-bg")).x();
          startY = compassMatrix.mapRect(m_renderer->boundsOnElement("speed-bg")).y();
@@ -342,6 +346,29 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          QRectF rectN = speedscalelines->boundingRect();
          m_speedscale->setPos(0,rectB.height()/2-rectN.height()/2-rectN.height()/6);
 
+         // Isolate the speed window and put it above the speed scale
+         compassMatrix = m_renderer->matrixForElement("speed-window");
+         startX = compassMatrix.mapRect(m_renderer->boundsOnElement("speed-window")).x();
+         startY = compassMatrix.mapRect(m_renderer->boundsOnElement("speed-window")).y();
+         qreal speedWindowHeight = compassMatrix.mapRect(m_renderer->boundsOnElement("speed-window")).height();
+         QGraphicsSvgItem *speedwindow = new QGraphicsSvgItem();
+         speedwindow->setSharedRenderer(m_renderer);
+         speedwindow->setElementId("speed-window");
+         speedwindow->setFlags(QGraphicsItem::ItemClipsChildrenToShape|
+                             QGraphicsItem::ItemClipsToShape);
+         l_scene->addItem(speedwindow);
+         matrix.reset();
+         matrix.translate(startX,startY);
+         speedwindow->setTransform(matrix,false);
+
+         // Last create a Text Item at the location of the speed window
+         // and save it for future updates:
+         m_speedtext = new QGraphicsTextItem("0000");
+         m_speedtext->setDefaultTextColor(QColor("White"));
+         m_speedtext->setFont(QFont("Arial",(int) speedWindowHeight/2));
+         matrix.reset();
+         m_speedtext->setParentItem(speedwindow);
+
          ////////////////////
          // Altitude
          ////////////////////
@@ -397,6 +424,33 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          rectB = verticalbg->boundingRect();
          rectN = altitudescalelines->boundingRect();
          m_altitudescale->setPos(0,rectB.height()/2-rectN.height()/2-rectN.height()/6);
+
+         // Isolate the Altitude window and put it above the altitude scale
+         compassMatrix = m_renderer->matrixForElement("altitude-window");
+         startX = compassMatrix.mapRect(m_renderer->boundsOnElement("altitude-window")).x();
+         startY = compassMatrix.mapRect(m_renderer->boundsOnElement("altitude-window")).y();
+         qreal altitudeWindowHeight = compassMatrix.mapRect(m_renderer->boundsOnElement("altitude-window")).height();
+         QGraphicsSvgItem *altitudewindow = new QGraphicsSvgItem();
+         altitudewindow->setSharedRenderer(m_renderer);
+         altitudewindow->setElementId("altitude-window");
+         altitudewindow->setFlags(QGraphicsItem::ItemClipsChildrenToShape|
+                             QGraphicsItem::ItemClipsToShape);
+         l_scene->addItem(altitudewindow);
+         matrix.reset();
+         matrix.translate(startX,startY);
+         altitudewindow->setTransform(matrix,false);
+
+         // Last create a Text Item at the location of the speed window
+         // and save it for future updates:
+         m_altitudetext = new QGraphicsTextItem("0000");
+         m_altitudetext->setDefaultTextColor(QColor("White"));
+         m_altitudetext->setFont(QFont("Arial",(int) altitudeWindowHeight/2));
+         m_altitudetext->setParentItem(altitudewindow);
+         startX = compassMatrix.mapRect(m_renderer->boundsOnElement("altitude-window")).width()/10;
+         matrix.reset();
+         matrix.translate(startX,0);
+         m_altitudetext->setTransform(matrix,false);
+
 
         l_scene->setSceneRect(m_background->boundingRect());
 
@@ -548,6 +602,11 @@ void PFDGadgetWidget::moveNeedles()
     // fmod does rounding errors!! the formula below works better:
     opd = QPointF(x,groundspeedValue-floor(groundspeedValue/speedScaleHeight*6)*speedScaleHeight/6);
     m_speedscale->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), false);
+
+    double speedText = groundspeedValue/speedScaleHeight*30;
+    QString s = QString().sprintf("%.0f",speedText);
+    m_speedtext->setPlainText(s);
+
     // TODO: optimize this by skipping if not necessary...
     // Now update the text elements inside the scale:
     // (Qt documentation states that the list has the same order
@@ -576,6 +635,10 @@ void PFDGadgetWidget::moveNeedles()
     // fmod does rounding errors!! the formula below works better:
     opd = QPointF(x,altitudeValue-floor(altitudeValue/altitudeScaleHeight*6)*altitudeScaleHeight/6);
     m_altitudescale->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), false);
+    double altitudeText = altitudeValue/altitudeScaleHeight*30;
+    s = QString().sprintf("%.0f",altitudeText);
+    m_altitudetext->setPlainText(s);
+
     // TODO: optimize this by skipping if not necessary...
     // Now update the text elements inside the scale:
     // (Qt documentation states that the list has the same order

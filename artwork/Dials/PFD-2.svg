@@ -169,6 +169,13 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4644"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -178,10 +185,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.7"
-     inkscape:cx="501.01579"
-     inkscape:cy="324.15029"
+     inkscape:cx="586.12631"
+     inkscape:cy="354.15029"
      inkscape:document-units="px"
-     inkscape:current-layer="foreground"
+     inkscape:current-layer="svg2"
      showgrid="false"
      inkscape:window-width="1280"
      inkscape:window-height="744"
@@ -505,7 +512,7 @@
            height="450"
            width="110.05586"
            id="rect6300"
-           style="fill:#ffffff;fill-opacity:0.36363639;stroke:none;display:inline" />
+           style="fill:#ffffff;fill-opacity:0.14285714999999999;stroke:#ffffff;display:inline;stroke-opacity:1" />
         <path
            sodipodi:nodetypes="cccccccc"
            id="speed-window"
@@ -519,18 +526,12 @@
          style="display:inline"
          transform="matrix(-1,0,0,1,562.96105,-9.5367432e-7)">
         <rect
-           style="fill:#ffffff;fill-opacity:0.36363639;stroke:none;display:inline"
+           style="fill:#ffffff;fill-opacity:0.14117647999999999;stroke:#ffffff;display:inline;stroke-opacity:1"
            id="rect5640"
            width="110.05586"
            height="450"
            x="-163.69627"
            y="131.33096" />
-        <path
-           inkscape:label="#rect6927"
-           style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;display:inline"
-           d="m -162.85715,337.78541 78.912165,0 0,9.3094 10.606602,9.3094 -10.606602,9.3094 0.08512,9.3094 -78.997285,0 0,-37.2376 z"
-           id="altitude-window"
-           sodipodi:nodetypes="cccccccc" />
       </g>
       <rect
          style="opacity:0.5;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:2.42740273;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;display:inline"
@@ -636,6 +637,12 @@
            id="tspan4328"
            sodipodi:role="line">GPS</tspan></text>
     </g>
+    <path
+       inkscape:label="#rect6927"
+       style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;display:inline"
+       d="m 725.81867,337.78498 -78.91217,0 0,9.3094 -10.6066,9.3094 10.6066,9.3094 -0.0851,9.3094 78.99729,0 0,-37.2376 z"
+       id="altitude-window"
+       sodipodi:nodetypes="cccccccc" />
   </g>
   <g
      inkscape:groupmode="layer"

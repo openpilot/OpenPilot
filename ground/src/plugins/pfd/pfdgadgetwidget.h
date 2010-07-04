@@ -78,8 +78,6 @@ private:
 
    // Background: background
    QGraphicsSvgItem *m_background;
-   // Foreground: foreground (contains all fixed elements, including plane)
-   QGraphicsSvgItem *m_foreground;
    // earth/sky : world
    QGraphicsSvgItem *m_world;
    // Roll scale: rollscale
@@ -96,10 +94,14 @@ private:
    QGraphicsSvgItem *m_homepointbearing;
    // Next point bearing:
    QGraphicsSvgItem *m_nextpointbearing;
-   // Vertical Speed scale:
+   // Speed scale:
    QGraphicsItemGroup *m_speedscale;
+   // Speed indicator text:
+   QGraphicsTextItem *m_speedtext;
    // Vertical altitude scale:
    QGraphicsItemGroup *m_altitudescale;
+   // Altitude indicator text:
+   QGraphicsTextItem *m_altitudetext;
 
    double n1MinValue;
    double n1MaxValue;

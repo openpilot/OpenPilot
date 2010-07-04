@@ -33,7 +33,7 @@
 #define ATTITUDEACTUAL_H
 
 // Object constants
-#define ATTITUDEACTUAL_OBJID 1730350400U
+#define ATTITUDEACTUAL_OBJID 4233858292U
 #define ATTITUDEACTUAL_NAME "AttitudeActual"
 #define ATTITUDEACTUAL_METANAME "AttitudeActualMeta"
 #define ATTITUDEACTUAL_ISSINGLEINST 1
@@ -57,7 +57,6 @@
 
 // Object data
 typedef struct {
-    uint32_t seq;
     float q1;
     float q2;
     float q3;
@@ -69,7 +68,6 @@ typedef struct {
 } __attribute__((packed)) AttitudeActualData;
 
 // Field information
-// Field seq information
 // Field q1 information
 // Field q2 information
 // Field q3 information

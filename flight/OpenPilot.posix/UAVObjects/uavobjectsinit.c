@@ -31,6 +31,7 @@
 #include "actuatorcommand.h"
 #include "actuatordesired.h"
 #include "actuatorsettings.h"
+#include "ahrsstatus.h"
 #include "altitudeactual.h"
 #include "attitudeactual.h"
 #include "attitudedesired.h"
@@ -41,6 +42,7 @@
 #include "flightbatterystate.h"
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
+#include "headingactual.h"
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
 #include "objectpersistence.h"
@@ -61,6 +63,7 @@ void UAVObjectsInitializeAll()
     ActuatorCommandInitialize();
     ActuatorDesiredInitialize();
     ActuatorSettingsInitialize();
+    AhrsStatusInitialize();
     AltitudeActualInitialize();
     AttitudeActualInitialize();
     AttitudeDesiredInitialize();
@@ -71,6 +74,7 @@ void UAVObjectsInitializeAll()
     FlightBatteryStateInitialize();
     FlightTelemetryStatsInitialize();
     GCSTelemetryStatsInitialize();
+    HeadingActualInitialize();
     ManualControlCommandInitialize();
     ManualControlSettingsInitialize();
     ObjectPersistenceInitialize();

@@ -76,10 +76,12 @@ void PIOS_Board_Init(void) {
 
 /* MicroSD Interface
  * 
- * NOTE: Leave this declared as const static data so that it ends up in the 
+ * NOTE: Leave this declared as const data so that it ends up in the 
  * .rodata section (ie. Flash) rather than in the .bss section (RAM).
  */
 void PIOS_SPI_sdcard_irq_handler(void);
+void DMA1_Channel2_IRQHandler() __attribute__ ((alias ("PIOS_SPI_sdcard_irq_handler")));
+void DMA1_Channel3_IRQHandler() __attribute__ ((alias ("PIOS_SPI_sdcard_irq_handler")));
 const struct pios_spi_cfg pios_spi_sdcard_cfg = {
   .regs   = SPI1,
   .init   = {
@@ -172,10 +174,12 @@ const struct pios_spi_cfg pios_spi_sdcard_cfg = {
 
 /* AHRS Interface
  * 
- * NOTE: Leave this declared as const static data so that it ends up in the 
+ * NOTE: Leave this declared as const data so that it ends up in the 
  * .rodata section (ie. Flash) rather than in the .bss section (RAM).
  */
 void PIOS_SPI_ahrs_irq_handler(void);
+void DMA1_Channel4_IRQHandler() __attribute__ ((alias ("PIOS_SPI_ahrs_irq_handler")));
+void DMA1_Channel5_IRQHandler() __attribute__ ((alias ("PIOS_SPI_ahrs_irq_handler")));
 const struct pios_spi_cfg pios_spi_ahrs_cfg = {
   .regs   = SPI2,
   .init   = {
@@ -189,6 +193,7 @@ const struct pios_spi_cfg pios_spi_ahrs_cfg = {
     .SPI_CPHA              = SPI_CPHA_2Edge,
     .SPI_BaudRatePrescaler = 7 << 3, /* Maximum divider (ie. slowest clock rate) */
   },
+  .use_crc = TRUE,
   .dma = {
     .ahb_clk  = RCC_AHBPeriph_DMA1,
     
@@ -253,7 +258,7 @@ const struct pios_spi_cfg pios_spi_ahrs_cfg = {
     .init = {
       .GPIO_Pin   = GPIO_Pin_14,
       .GPIO_Speed = GPIO_Speed_50MHz,
-      .GPIO_Mode  = GPIO_Mode_IPU,
+      .GPIO_Mode  = GPIO_Mode_IN_FLOATING,
     },
   },
   .mosi = {

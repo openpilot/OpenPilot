@@ -57,7 +57,7 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES =  Telemetry GPS ManualControl Actuator Altitude Attitude Stabilization
+MODULES =  Telemetry GPS ManualControl Actuator Altitude AHRSComms Stabilization
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
 
@@ -159,10 +159,12 @@ SRC += $(OPUAVOBJ)/manualcontrolcommand.c
 SRC += $(OPUAVOBJ)/manualcontrolsettings.c
 SRC += $(OPUAVOBJ)/attitudedesired.c
 SRC += $(OPUAVOBJ)/stabilizationsettings.c
+SRC += $(OPUAVOBJ)/ahrsstatus.c
 SRC += $(OPUAVOBJ)/altitudeactual.c
 SRC += $(OPUAVOBJ)/attitudeactual.c
 SRC += $(OPUAVOBJ)/attitudesettings.c
 SRC += $(OPUAVOBJ)/flightbatterystate.c
+SRC += $(OPUAVOBJ)/headingactual.c
 endif
 
 ## PIOS Hardware (STM32F10x)
@@ -189,6 +191,7 @@ SRC += $(PIOSCOMMON)/pios_sdcard.c
 SRC += $(PIOSCOMMON)/pios_com.c
 SRC += $(PIOSCOMMON)/pios_bmp085.c
 SRC += $(PIOSCOMMON)/pios_opahrs.c
+SRC += $(PIOSCOMMON)/pios_opahrs_proto.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 
 ## CMSIS for STM32
@@ -275,21 +278,6 @@ EXTRAINCDIRS  += $(OPUAVTALK)
 EXTRAINCDIRS  += $(OPUAVTALKINC)
 EXTRAINCDIRS  += $(OPUAVOBJ)
 EXTRAINCDIRS  += $(OPUAVOBJINC)
-EXTRAINCDIRS  += $(MODEXAMPLE)
-EXTRAINCDIRS  += $(MODEXAMPLEINC)
-EXTRAINCDIRS  += $(MODSYSTEMINC)
-EXTRAINCDIRS  += $(MODTELEMETRY)
-EXTRAINCDIRS  += $(MODTELEMETRYINC)
-EXTRAINCDIRS  += $(MODGPS)
-EXTRAINCDIRS  += $(MODGPSINC)
-EXTRAINCDIRS  += $(MODMANUALCONTROL)
-EXTRAINCDIRS  += $(MODMANUALCONTROLINC)
-EXTRAINCDIRS  += $(MODACTUATOR)
-EXTRAINCDIRS  += $(MODACTUATORINC)
-EXTRAINCDIRS  += $(MODALTITUDE)
-EXTRAINCDIRS  += $(MODALTITUDEINC)
-EXTRAINCDIRS  += $(MODATTITUDE)
-EXTRAINCDIRS  += $(MODATTITUDEINC)
 EXTRAINCDIRS  += $(PIOS)
 EXTRAINCDIRS  += $(PIOSINC)
 EXTRAINCDIRS  += $(PIOSSTM32F10X)

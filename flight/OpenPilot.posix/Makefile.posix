@@ -62,7 +62,7 @@ MODULES =  Telemetry Stabilization
 
 
 # MCU name, submodel and board
-# - MCU used for compiler-option (-mcpu)
+# - MCU used for compiler-option (-mtune)
 # - MODEL used for linker-script name (-T) and passed as define
 # - BOARD just passed as define (optional)
 MCU      = i686
@@ -283,7 +283,7 @@ endif
 
 CFLAGS += -DARCH_POSIX
 CFLAGS += -O$(OPT)
-CFLAGS += -mcpu=$(MCU)
+CFLAGS += -mtune=$(MCU)
 CFLAGS += $(CDEFS)
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
 
@@ -304,7 +304,7 @@ CONLYFLAGS += $(CSTANDARD)
 # Assembler flags.
 #  -Wa,...:    tell GCC to pass this to the assembler.
 #  -ahlns:     create listing
-ASFLAGS  = -mcpu=$(MCU) -I. -x assembler-with-cpp
+ASFLAGS  = -mtune=$(MCU) -I. -x assembler-with-cpp
 ASFLAGS += $(ADEFS)
 ASFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))
 ASFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))

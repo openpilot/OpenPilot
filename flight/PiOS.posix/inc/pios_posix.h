@@ -26,7 +26,7 @@
 #ifndef PIOS_POSIX_H
 #define PIOS_POSIX_H
 
-#include <bits/types.h>
+#include <sys/types.h>
 
 typedef __uint16_t uint16_t;
 typedef __uint32_t uint32_t;

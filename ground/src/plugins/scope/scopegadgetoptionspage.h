@@ -29,9 +29,11 @@
 #define SCOPEGADGETOPTIONSPAGE_H
 
 #include "coreplugin/dialogs/ioptionspage.h"
+
 #include <QString>
 #include <QStringList>
 #include <QDebug>
+#include <QtGui/QColorDialog>
 
 namespace Core
 {
@@ -63,14 +65,15 @@ private:
 
     void addPlotCurveConfig(QString uavObject, QString uavField, int scale, QVariant varColor);
     void setYAxisWidgetFromPlotCurve();
-
+    void setButtonColor(const QColor &color);
 
 
 private slots:
     void on_lstCurves_currentRowChanged(int currentRow);
     void on_btnRemoveCurve_clicked();
     void on_btnAddCurve_clicked();
-    void on_cmbUAVObjects_currentIndexChanged(QString val);
+    void on_cmbUAVObjects_currentIndexChanged(QString val);    
+    void on_btnColor_clicked();
 };
 
 #endif // SCOPEGADGETOPTIONSPAGE_H

@@ -70,11 +70,6 @@ QWidget* ScopeGadgetOptionsPage::createPage(QWidget *parent)
     if(options_page->cmbUAVObjects->currentIndex() >= 0)
         on_cmbUAVObjects_currentIndexChanged(options_page->cmbUAVObjects->currentText());
 
-    options_page->cmbColor->addItem("Black", QVariant(qRgb(0,0,0)));
-    options_page->cmbColor->addItem("Red",  QVariant(qRgb(255,0,0)));
-    options_page->cmbColor->addItem("Green", QVariant(qRgb(0,255,0)));
-    options_page->cmbColor->addItem("Blue", QVariant(qRgb(0,0,255)));
-
     options_page->cmbScale->addItem("E-9", -9);
     options_page->cmbScale->addItem("E-6", -6);
     options_page->cmbScale->addItem("E-5",-5);
@@ -109,15 +104,26 @@ QWidget* ScopeGadgetOptionsPage::createPage(QWidget *parent)
         addPlotCurveConfig(uavObject,uavField,scale,varColor);
     }
 
+    if(m_config->plotCurveConfigs().count() > 0)
+        options_page->lstCurves->setCurrentRow(0, QItemSelectionModel::ClearAndSelect);
 
     connect(options_page->btnAddCurve, SIGNAL(clicked()), this, SLOT(on_btnAddCurve_clicked()));
     connect(options_page->btnRemoveCurve, SIGNAL(clicked()), this, SLOT(on_btnRemoveCurve_clicked()));
     connect(options_page->lstCurves, SIGNAL(currentRowChanged(int)), this, SLOT(on_lstCurves_currentRowChanged(int)));
+    connect(options_page->btnColor, SIGNAL(clicked()), this, SLOT(on_btnColor_clicked()));
 
     setYAxisWidgetFromPlotCurve();
 
     return optionsPageWidget;
 }
+
+void ScopeGadgetOptionsPage::on_btnColor_clicked()
+ {
+     QColor color = QColorDialog::getColor( QColor(options_page->btnColor->text()), options_page->widget);
+     if (color.isValid()) {
+         setButtonColor(color);
+     }
+ }
 
 /*!
   \brief Populate the widgets that containts the configs for the Y-Axis from
@@ -125,6 +131,7 @@ QWidget* ScopeGadgetOptionsPage::createPage(QWidget *parent)
   */
 void ScopeGadgetOptionsPage::setYAxisWidgetFromPlotCurve()
 {
+    bool parseOK = false;
     QListWidgetItem* listItem = options_page->lstCurves->currentItem();
 
     if(listItem == 0)
@@ -139,8 +146,17 @@ void ScopeGadgetOptionsPage::setYAxisWidgetFromPlotCurve()
     currentIndex = options_page->cmbScale->findData( listItem->data(Qt::UserRole + 2), Qt::UserRole, Qt::MatchExactly);
     options_page->cmbScale->setCurrentIndex(currentIndex);
 
-    currentIndex = options_page->cmbColor->findData( listItem->data(Qt::UserRole + 3), Qt::UserRole, Qt::MatchExactly);
-    options_page->cmbColor->setCurrentIndex(currentIndex);
+    QVariant varColor  = listItem->data(Qt::UserRole + 3);
+    int rgb = varColor.toInt(&parseOK);
+
+    setButtonColor(QColor((QRgb)rgb));
+}
+
+void ScopeGadgetOptionsPage::setButtonColor(const QColor &color)
+{
+    options_page->btnColor->setText(color.name());
+    options_page->btnColor->setPalette(QPalette(color));
+    options_page->btnColor->setAutoFillBackground(true);
 }
 
 /*!
@@ -168,7 +184,6 @@ void ScopeGadgetOptionsPage::on_cmbUAVObjects_currentIndexChanged(QString val)
  */
 void ScopeGadgetOptionsPage::apply()
 {
-
     bool parseOK = false;
 
     //Apply configuration changes
@@ -216,7 +231,7 @@ void ScopeGadgetOptionsPage::on_btnAddCurve_clicked()
     //TODO: Find an existing plot curve config based on the uavobject and uav field. If it
     //exists, update it, else add a new one.
 
-    QVariant varColor = options_page->cmbColor->itemData(options_page->cmbColor->currentIndex());
+    QVariant varColor = (int)QColor(options_page->btnColor->text()).rgb();
 
     addPlotCurveConfig(uavObject,uavField,scale,varColor);
 
@@ -233,7 +248,8 @@ void ScopeGadgetOptionsPage::addPlotCurveConfig(QString uavObject, QString uavFi
     QListWidgetItem *listWidgetItem = options_page->lstCurves->item(options_page->lstCurves->count() - 1);
 
     //Set the properties of the newly added list item
-    QColor color = QColor( (QRgb)varColor.toInt(&parseOK) );
+    QRgb rgbColor = (QRgb)varColor.toInt(&parseOK);
+    QColor color = QColor( rgbColor );
     listWidgetItem->setText(listItemDisplayText);
     listWidgetItem->setTextColor( color );
 

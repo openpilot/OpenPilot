@@ -284,7 +284,7 @@ int32_t PIOS_SPI_TransferByte(uint8_t spi, uint8_t b)
 * \return -2 if unsupported SPI port selected
 * \return -3 if function has been called during an ongoing DMA transfer
 */
-int32_t PIOS_SPI_TransferBlock(uint8_t spi, uint8_t *send_buffer, uint8_t *receive_buffer, uint16_t len, void *callback)
+int32_t PIOS_SPI_TransferBlock(uint8_t spi, const uint8_t *send_buffer, uint8_t *receive_buffer, uint16_t len, void *callback)
 {
   struct pios_spi_dev * spi_dev;
   DMA_InitTypeDef       dma_init;

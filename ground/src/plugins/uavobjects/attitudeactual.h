@@ -41,7 +41,6 @@ class UAVOBJECTS_EXPORT AttitudeActual: public UAVDataObject
 public:
     // Field structure
     typedef struct {
-        quint32 seq;
         float q1;
         float q2;
         float q3;
@@ -53,7 +52,6 @@ public:
     } __attribute__((packed)) DataFields;
 
     // Field information
-    // Field seq information
     // Field q1 information
     // Field q2 information
     // Field q3 information
@@ -64,7 +62,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 1730350400U;
+    static const quint32 OBJID = 4233858292U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

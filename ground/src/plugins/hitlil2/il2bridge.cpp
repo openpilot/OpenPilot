@@ -342,7 +342,6 @@ void Il2Bridge::processUpdate(QString& data)
     attActualData.q2 = 0;
     attActualData.q3 = 0;
     attActualData.q4 = 0;
-    attActualData.seq = 0;
     attActual->setData(attActualData);
 
     // Update gps objects

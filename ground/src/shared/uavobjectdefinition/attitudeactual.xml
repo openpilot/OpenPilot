@@ -1,6 +1,5 @@
 <xml>
 	<object name="AttitudeActual" singleinstance="true" settings="false">
-		<field name="seq" units="none" type="uint32" elements="1"/>
 		<field name="q1" units="none" type="float" elements="1"/>
 		<field name="q2" units="none" type="float" elements="1"/>
 		<field name="q3" units="none" type="float" elements="1"/>

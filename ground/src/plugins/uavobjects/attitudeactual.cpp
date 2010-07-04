@@ -40,9 +40,6 @@ AttitudeActual::AttitudeActual(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS,
 {
     // Create fields
     QList<UAVObjectField*> fields;
-    QStringList seqElemNames;
-    seqElemNames.append("0");
-    fields.append( new UAVObjectField(QString("seq"), QString("none"), UAVObjectField::UINT32, seqElemNames, QStringList()) );
     QStringList q1ElemNames;
     q1ElemNames.append("0");
     fields.append( new UAVObjectField(QString("q1"), QString("none"), UAVObjectField::FLOAT32, q1ElemNames, QStringList()) );

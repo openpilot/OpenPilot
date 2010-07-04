@@ -95,7 +95,6 @@ static void attitudeTask(void* parameters)
 		PIOS_OPAHRS_ReadAttitude();
 
 		// Update the data
-		data.seq++;
 		data.q1 += 0.111;
 		data.q2 += 1.1;
 		data.q3 += 7.0;

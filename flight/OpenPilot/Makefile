@@ -159,6 +159,7 @@ SRC += $(OPUAVOBJ)/manualcontrolcommand.c
 SRC += $(OPUAVOBJ)/manualcontrolsettings.c
 SRC += $(OPUAVOBJ)/attitudedesired.c
 SRC += $(OPUAVOBJ)/stabilizationsettings.c
+SRC += $(OPUAVOBJ)/ahrsstatus.c
 SRC += $(OPUAVOBJ)/altitudeactual.c
 SRC += $(OPUAVOBJ)/attitudeactual.c
 SRC += $(OPUAVOBJ)/attitudesettings.c

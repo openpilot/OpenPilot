@@ -1,0 +1,9 @@
+<xml>
+        <object name="AhrsStatus" singleinstance="true" settings="false">
+            <field name="SerialNumber" units="n/a" type="uint8" elements="25"/>
+            <access gcs="readwrite" flight="readwrite"/>
+            <telemetrygcs acked="false" updatemode="manual" period="0"/>
+            <telemetryflight acked="false" updatemode="periodic" period="1000"/>
+            <logging updatemode="periodic" period="1000"/>
+        </object>
+</xml>

@@ -32,6 +32,7 @@
 #include "actuatorcommand.h"
 #include "actuatordesired.h"
 #include "actuatorsettings.h"
+#include "ahrsstatus.h"
 #include "altitudeactual.h"
 #include "attitudeactual.h"
 #include "attitudedesired.h"
@@ -63,6 +64,7 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new ActuatorCommand() );
     objMngr->registerObject( new ActuatorDesired() );
     objMngr->registerObject( new ActuatorSettings() );
+    objMngr->registerObject( new AhrsStatus() );
     objMngr->registerObject( new AltitudeActual() );
     objMngr->registerObject( new AttitudeActual() );
     objMngr->registerObject( new AttitudeDesired() );

@@ -31,6 +31,7 @@
 #include "actuatorcommand.h"
 #include "actuatordesired.h"
 #include "actuatorsettings.h"
+#include "ahrsstatus.h"
 #include "altitudeactual.h"
 #include "attitudeactual.h"
 #include "attitudedesired.h"
@@ -62,6 +63,7 @@ void UAVObjectsInitializeAll()
     ActuatorCommandInitialize();
     ActuatorDesiredInitialize();
     ActuatorSettingsInitialize();
+    AhrsStatusInitialize();
     AltitudeActualInitialize();
     AttitudeActualInitialize();
     AttitudeDesiredInitialize();

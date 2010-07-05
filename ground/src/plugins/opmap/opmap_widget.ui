@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>704</width>
-    <height>422</height>
+    <width>713</width>
+    <height>363</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -40,10 +40,10 @@
 	background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(71, 71, 71, 255), stop:0.5 rgba(200, 200, 200, 255), stop:1 rgba(110, 110, 110, 255));
 }
 QSplitter::handle:horizontal {
-height: 5px;
+/* height: 5px; */
 }
 QSplitter::handle:vertical {
-width: 5px;
+/* width: 5px; */
 }
 </string>
      </property>
@@ -73,41 +73,41 @@ width: 5px;
        </size>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(71, 71, 71, 255), stop:1 rgba(110, 110, 110, 255));
-</string>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <widget class="QComboBox" name="comboBoxFindPlace">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Enter a place here that you want to find, then press either return or the find button to the right.</string>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">
-QComboBox {
+       <string notr="true">QFrame {
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(71, 71, 71, 255), stop:1 rgba(110, 110, 110, 255));
+/* color: rgba(0, 0, 0, 48); */
+}
+
+QToolButton {	/* all types of tool button */ 
+background-color: transparent;
+color: rgb(255, 255, 255);
+border: 0px;
+border-radius: 3px;
+}
+QToolButton:hover {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(255, 255, 255, 200), stop:1 rgba(180, 180, 180, 200));
+color: rgb(255, 255, 255);
+border: 0px; 
+border-radius: 3px;
+}
+QToolButton:pressed {
 background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
 color: rgb(255, 255, 255);
-border: 1px solid black; 
+border: 0px; 
+border-radius: 3px;
+}
+
+QToolButton:checked {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
+color: rgb(255, 255, 255);
+border: 0px; 
+border-radius: 3px;
+}
+
+QComboBox {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
+color: rgba(255, 255, 255, 255);
+border: 1px solid rgba(0, 0, 0, 128); 
 border-radius: 0px;
 }
 QComboBox::down-arrow:on {
@@ -119,20 +119,52 @@ QComboBox::down-arrow {
 }
 QComboBox:drop-down {
 background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(110, 110, 110, 255), stop:1 rgba(71, 71, 71, 255));
+border-left: 1px solid rgba(0, 0, 0, 128);
 /*     subcontrol-origin: padding;
      subcontrol-position: top right;
-     border-left-style: 1px solid white;
      border-top-right-radius: 1px;
      border-bottom-right-radius: 1px; */
 }
 QComboBox QAbstractItemView { /* the drop down list */
 background-color: rgb(255, 255, 255);
 color: rgb(0, 0, 0);
-border: 1px solid black;
+border: 1px solid rgba(0, 0, 0, 128);
 selection-background-color: rgb(160, 160, 255);
 border-radius: 2px;
 }
 </string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QComboBox" name="comboBoxFindPlace">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Enter place to find</string>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
            </property>
            <property name="editable">
             <bool>true</bool>
@@ -172,11 +204,13 @@ border-radius: 2px;
             <string>Find place</string>
            </property>
            <property name="styleSheet">
-            <string notr="true">QToolButton {	/* all types of tool button */ 
-background-color: rgba(255, 255, 255, 0);
+            <string notr="true">QToolButton {
+}
+
+QToolButton {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(110, 110, 110, 255), stop:1 rgba(71, 71, 71, 255));
 color: rgb(255, 255, 255);
-/*border-style: none;*/
-border: 0px; 
+border: 1px solid black; 
 border-radius: 3px;
 }
 QToolButton:hover {
@@ -198,6 +232,7 @@ color: rgb(255, 255, 255);
 border: 0px; 
 border-radius: 3px;
 }
+
 </string>
            </property>
            <property name="text">
@@ -224,38 +259,300 @@ border-radius: 3px;
         </layout>
        </item>
        <item>
-        <widget class="Line" name="line">
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
-         </property>
-         <property name="lineWidth">
-          <number>2</number>
-         </property>
+        <spacer name="verticalSpacer">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Vertical</enum>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QTreeView" name="treeViewWaypoints">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
          </property>
-         <property name="minimumSize">
+         <property name="sizeHint" stdset="0">
           <size>
-           <width>100</width>
-           <height>0</height>
+           <width>20</width>
+           <height>6</height>
           </size>
          </property>
-         <property name="contextMenuPolicy">
-          <enum>Qt::NoContextMenu</enum>
-         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QTabWidget" name="tabWidget">
          <property name="styleSheet">
-          <string notr="true">background-color: rgba(255, 255, 255, 0);
+          <string notr="true">QTabWidget::pane {
+/* The tab widget frame */
+border-top: 1px solid rgba(255, 255, 255, 80);
+margin: 0px,1px,1px,1px; 
+}
+QTabWidget::tab-bar {
+left: 5px; /* move to the right by 5px */
+}
+ /* Style the tab using the tab sub-control. Note that it reads QTabBar _not_ QTabWidget */
+QTabBar::tab {
+background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #B1B1B1, stop: 0.4 #ADADAD, stop: 0.5 #A8A8A8, stop: 1.0 #A3A3A3);
+border: 1px solid #C4C4C3;
+border-bottom-color: #C2C7CB; /* same as the pane color */
+border-top-left-radius: 4px;
+border-top-right-radius: 4px;
+min-width: 8ex;
+padding: 1px;
+}
+QTabBar::tab:selected, QTabBar::tab:hover {
+background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #fafafa, stop: 0.4 #f4f4f4, stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);
+}
+QTabBar::tab:selected {
+border-color: #9B9B9B;
+border-bottom-color: #C2C7CB; /* same as pane color */
+}
+QTabBar::tab:!selected {
+margin-top: 2px; /* make non-selected tabs look smaller */
+}
+/* make use of negative margins for overlapping tabs */
+QTabBar::tab:selected {
+/* expand/overlap to the left and right by 4px */
+margin-left: -4px; margin-right: -4px;
+}
+QTabBar::tab:first:selected {
+margin-left: 0; /* the first selected tab has nothing to overlap with on the left */
+}
+QTabBar::tab:last:selected {
+margin-right: 0; /* the last selected tab has nothing to overlap with on the right */
+}
+QTabBar::tab:only-one {
+margin: 0; /* if there is only one tab, we don't want overlapping margins */
+}
+</string>
+         </property>
+         <property name="tabPosition">
+          <enum>QTabWidget::North</enum>
+         </property>
+         <property name="tabShape">
+          <enum>QTabWidget::Rounded</enum>
+         </property>
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <property name="elideMode">
+          <enum>Qt::ElideNone</enum>
+         </property>
+         <property name="documentMode">
+          <bool>false</bool>
+         </property>
+         <property name="tabsClosable">
+          <bool>false</bool>
+         </property>
+         <property name="movable">
+          <bool>false</bool>
+         </property>
+         <widget class="QWidget" name="tabPlaces">
+          <attribute name="title">
+           <string> Places </string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <item>
+            <widget class="QListWidget" name="listWidget">
+             <property name="styleSheet">
+              <string notr="true">color: rgb(255, 255, 255);</string>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
+             </property>
+             <item>
+              <property name="text">
+               <string>New Item</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>New Item</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tabWaypoints">
+          <attribute name="title">
+           <string> Waypoints </string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <property name="spacing">
+              <number>5</number>
+             </property>
+             <property name="leftMargin">
+              <number>3</number>
+             </property>
+             <property name="rightMargin">
+              <number>3</number>
+             </property>
+             <item>
+              <widget class="QToolButton" name="toolButtonNewWaypoints">
+               <property name="toolTip">
+                <string>New waypoints</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string>New</string>
+               </property>
+               <property name="icon">
+                <iconset resource="../coreplugin/core.qrc">
+                 <normaloff>:/core/images/filenew.png</normaloff>:/core/images/filenew.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+               <property name="autoRepeat">
+                <bool>true</bool>
+               </property>
+               <property name="toolButtonStyle">
+                <enum>Qt::ToolButtonTextUnderIcon</enum>
+               </property>
+               <property name="autoRaise">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="toolButtonOpenWaypoints">
+               <property name="focusPolicy">
+                <enum>Qt::TabFocus</enum>
+               </property>
+               <property name="toolTip">
+                <string>Open waypoints</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string>Open</string>
+               </property>
+               <property name="icon">
+                <iconset resource="../coreplugin/core.qrc">
+                 <normaloff>:/core/images/fileopen.png</normaloff>:/core/images/fileopen.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+               <property name="autoRepeat">
+                <bool>true</bool>
+               </property>
+               <property name="toolButtonStyle">
+                <enum>Qt::ToolButtonTextUnderIcon</enum>
+               </property>
+               <property name="autoRaise">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="toolButtonSaveWaypoints">
+               <property name="toolTip">
+                <string>Save waypoints</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string>Save</string>
+               </property>
+               <property name="icon">
+                <iconset resource="../coreplugin/core.qrc">
+                 <normaloff>:/core/images/filesave.png</normaloff>:/core/images/filesave.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+               <property name="autoRepeat">
+                <bool>true</bool>
+               </property>
+               <property name="toolButtonStyle">
+                <enum>Qt::ToolButtonTextUnderIcon</enum>
+               </property>
+               <property name="autoRaise">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QToolButton" name="toolButtonAddWaypoint">
+               <property name="toolTip">
+                <string>Add a waypoint</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string>Add</string>
+               </property>
+               <property name="icon">
+                <iconset resource="opmap.qrc">
+                 <normaloff>:/opmap/images/waypoint.png</normaloff>:/opmap/images/waypoint.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+               <property name="autoRepeat">
+                <bool>true</bool>
+               </property>
+               <property name="toolButtonStyle">
+                <enum>Qt::ToolButtonTextUnderIcon</enum>
+               </property>
+               <property name="autoRaise">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QTreeView" name="treeViewWaypoints">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="contextMenuPolicy">
+              <enum>Qt::DefaultContextMenu</enum>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">/* background-color: transparent; */
+/* background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 64), stop:1 rgba(0, 0, 0, 32)); */
 color: rgb(255, 255, 255);
+border: 0px;
 /*
 QTreeView::item {
 border: 1px solid #d9d9d9;
@@ -276,25 +573,29 @@ QTreeView::branch:open:has-children:!has-siblings, QTreeView::branch:open:has-ch
  border-image: none;
  image: url(branch-open.png);
 }</string>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
-         </property>
-         <property name="tabKeyNavigation">
-          <bool>true</bool>
-         </property>
-         <property name="selectionBehavior">
-          <enum>QAbstractItemView::SelectItems</enum>
-         </property>
-         <property name="animated">
-          <bool>true</bool>
-         </property>
-         <property name="headerHidden">
-          <bool>true</bool>
-         </property>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Plain</enum>
+             </property>
+             <property name="tabKeyNavigation">
+              <bool>true</bool>
+             </property>
+             <property name="selectionBehavior">
+              <enum>QAbstractItemView::SelectItems</enum>
+             </property>
+             <property name="animated">
+              <bool>true</bool>
+             </property>
+             <property name="headerHidden">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </widget>
        </item>
       </layout>
@@ -455,7 +756,7 @@ border-radius: 3px;
            <number>0</number>
           </property>
           <item>
-           <widget class="QFrame" name="frame">
+           <widget class="QFrame" name="frameMapControls">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -463,16 +764,17 @@ border-radius: 3px;
              </sizepolicy>
             </property>
             <property name="styleSheet">
-             <string notr="true">
-QFrame {
+             <string notr="true">QFrame {
 background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(71, 71, 71, 255), stop:1 rgba(110, 110, 110, 255));
+color: rgba(0, 0, 0, 48);
 }
 
 QToolButton {	/* all types of tool button */ 
-background-color: rgba(255, 255, 255, 0);
+background-color: transparent;
 color: rgb(255, 255, 255);
 /*border-style: none;*/
-border: 0px; 
+/* border: 1px solid rgba(0, 0, 0, 64);  */
+/* border: 0px; */
 border-radius: 3px;
 }
 QToolButton:hover {
@@ -514,7 +816,7 @@ border-radius: 3px;
 </string>
             </property>
             <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
+             <enum>QFrame::NoFrame</enum>
             </property>
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
@@ -536,67 +838,6 @@ border-radius: 3px;
               <number>0</number>
              </property>
              <item>
-              <widget class="QToolButton" name="toolButtonMapHome">
-               <property name="toolTip">
-                <string>Center map over home position</string>
-               </property>
-               <property name="styleSheet">
-                <string notr="true"/>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="opmap.qrc">
-                 <normaloff>:/opmap/images/gcs.png</normaloff>:/opmap/images/gcs.png</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>20</width>
-                 <height>20</height>
-                </size>
-               </property>
-               <property name="autoRepeat">
-                <bool>true</bool>
-               </property>
-               <property name="autoRaise">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="toolButtonMapUAV">
-               <property name="toolTip">
-                <string>Center map over UAV position</string>
-               </property>
-               <property name="styleSheet">
-                <string notr="true"/>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="opmap.qrc">
-                 <normaloff>:/opmap/images/uav.png</normaloff>:/opmap/images/uav.png</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>20</width>
-                 <height>20</height>
-                </size>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-               <property name="autoRepeat">
-                <bool>true</bool>
-               </property>
-               <property name="autoRaise">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
               <spacer name="verticalSpacer_3">
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
@@ -607,52 +848,7 @@ border-radius: 3px;
                <property name="sizeHint" stdset="0">
                 <size>
                  <width>20</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QToolButton" name="toolButtonAddWaypoint">
-               <property name="toolTip">
-                <string>Add a waypoint</string>
-               </property>
-               <property name="styleSheet">
-                <string notr="true"/>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="opmap.qrc">
-                 <normaloff>:/opmap/images/waypoint.png</normaloff>:/opmap/images/waypoint.png</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>20</width>
-                 <height>20</height>
-                </size>
-               </property>
-               <property name="autoRepeat">
-                <bool>true</bool>
-               </property>
-               <property name="autoRaise">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="verticalSpacer_4">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>20</height>
+                 <height>30</height>
                 </size>
                </property>
               </spacer>
@@ -765,6 +961,115 @@ border-radius: 3px;
               </widget>
              </item>
              <item>
+              <spacer name="verticalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>30</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QToolButton" name="toolButtonMapHome">
+               <property name="toolTip">
+                <string>Center map over home position</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="opmap.qrc">
+                 <normaloff>:/opmap/images/gcs.png</normaloff>:/opmap/images/gcs.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+               <property name="autoRepeat">
+                <bool>true</bool>
+               </property>
+               <property name="autoRaise">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="toolButtonMapUAV">
+               <property name="toolTip">
+                <string>Center map over UAV position</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="opmap.qrc">
+                 <normaloff>:/opmap/images/uav.png</normaloff>:/opmap/images/uav.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+               <property name="autoRepeat">
+                <bool>true</bool>
+               </property>
+               <property name="autoRaise">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="toolButtonMapUAVheading">
+               <property name="toolTip">
+                <string>Map rotation follows UAV heading</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="opmap.qrc">
+                 <normaloff>:/opmap/images/uav_heading.png</normaloff>:/opmap/images/uav_heading.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+               <property name="autoRepeat">
+                <bool>true</bool>
+               </property>
+               <property name="autoRaise">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
               <spacer name="verticalSpacer_2">
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
@@ -811,13 +1116,13 @@ border-radius: 3px;
        <enum>Qt::NoContextMenu</enum>
       </property>
       <property name="styleSheet">
-       <string notr="true">QWidget { /* all types of qwidget */
+       <string notr="true">QFrame {
 background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(71, 71, 71, 255), stop:1 rgba(110, 110, 110, 255));
 color: rgb(255, 255, 255);
 }
 
-QToolButton {	/* all types of tool button */ 
-background-color: rgba(255, 255, 255, 0);
+QToolButton {
+background-color: transparent;
 color: rgb(255, 255, 255);
 /*border-style: none;*/
 border: 0px; 
@@ -872,7 +1177,7 @@ color: rgb(255, 255, 255);
          <property name="iconSize">
           <size>
            <width>80</width>
-           <height>40</height>
+           <height>35</height>
           </size>
          </property>
          <property name="toolButtonStyle">
@@ -919,7 +1224,7 @@ color: rgb(255, 255, 255);
          <property name="iconSize">
           <size>
            <width>80</width>
-           <height>40</height>
+           <height>35</height>
           </size>
          </property>
          <property name="toolButtonStyle">
@@ -960,7 +1265,7 @@ color: rgb(255, 255, 255);
          <property name="iconSize">
           <size>
            <width>80</width>
-           <height>40</height>
+           <height>35</height>
           </size>
          </property>
          <property name="toolButtonStyle">
@@ -1001,7 +1306,7 @@ color: rgb(255, 255, 255);
          <property name="iconSize">
           <size>
            <width>80</width>
-           <height>40</height>
+           <height>35</height>
           </size>
          </property>
          <property name="toolButtonStyle">
@@ -1042,7 +1347,7 @@ color: rgb(255, 255, 255);
          <property name="iconSize">
           <size>
            <width>80</width>
-           <height>40</height>
+           <height>35</height>
           </size>
          </property>
          <property name="toolButtonStyle">
@@ -1060,7 +1365,7 @@ color: rgb(255, 255, 255);
    <item>
     <widget class="QFrame" name="frameStatusBar">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -1074,7 +1379,7 @@ color: rgb(255, 255, 255);
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>30</height>
+       <height>25</height>
       </size>
      </property>
      <property name="contextMenuPolicy">
@@ -1083,12 +1388,12 @@ color: rgb(255, 255, 255);
      <property name="styleSheet">
       <string notr="true">QFrame{
 background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(110, 110, 110, 255), stop:1 rgba(71, 71, 71, 255));
-color: rgba(255, 255, 255, 70);
+color: rgba(0, 0, 0, 128);
 }
 
-QLabel { /* all label types */
-/* background-color: rgba(255, 255, 255, 0); */
-background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 128), stop:1 rgba(128, 128, 128, 128));
+QLabel {
+background-color: transparent;
+/* background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(0, 0, 0, 80), stop:1 rgba(0, 0, 0, 80)); */
 color: rgb(255, 255, 255);
 /*border: 1px solid black;*/
 border: none;
@@ -1139,7 +1444,7 @@ border-radius: 2px;
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>20</width>
+            <width>10</width>
             <height>20</height>
            </size>
           </property>
@@ -1181,7 +1486,20 @@ border-radius: 2px;
            <set>Qt::AlignCenter</set>
           </property>
           <property name="margin">
-           <number>2</number>
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Line" name="line_3">
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="lineWidth">
+           <number>1</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
           </property>
          </widget>
         </item>
@@ -1218,7 +1536,17 @@ border-radius: 2px;
            <set>Qt::AlignCenter</set>
           </property>
           <property name="margin">
-           <number>2</number>
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Line" name="line_4">
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
           </property>
          </widget>
         </item>
@@ -1261,7 +1589,17 @@ border-radius: 2px;
            <set>Qt::AlignCenter</set>
           </property>
           <property name="margin">
-           <number>2</number>
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Line" name="line">
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
           </property>
          </widget>
         </item>
@@ -1295,7 +1633,7 @@ border-radius: 2px;
           <property name="maximumSize">
            <size>
             <width>100</width>
-            <height>18</height>
+            <height>16777215</height>
            </size>
           </property>
           <property name="autoFillBackground">

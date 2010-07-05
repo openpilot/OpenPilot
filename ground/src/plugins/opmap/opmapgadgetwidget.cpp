@@ -173,7 +173,6 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_widget->treeViewWaypoints->setModel(&wayPoint_treeView_model);
 
-
 /*
     // test
 //    wayPoint_treeView_model = new QStandardItemModel(5, 2);
@@ -207,7 +206,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
 
     // test only
-
+/*
     // create a waypoint group
     QStandardItem *item = new QStandardItem(tr("Camera shoot at the town hall"));
     // add some waypoints
@@ -232,9 +231,9 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 	item->appendRow(child);
     }
     wayPoint_treeView_model.appendRow(item);
-
+*/
     // create another waypoint group
-    item = new QStandardItem(tr("Flight path 62"));
+    QStandardItem *item = new QStandardItem(tr("Flight path 62"));
     for (int i = 1; i < 8; i++)
     {   // add some waypoints
 	QStandardItem *child = new QStandardItem(QIcon(QString::fromUtf8(":/opmap/images/waypoint.png")), QString("Waypoint %0").arg(i));
@@ -709,6 +708,11 @@ void OPMapGadgetWidget::on_toolButtonMapUAV_clicked()
     followUAVpositionAct->toggle();
 }
 
+void OPMapGadgetWidget::on_toolButtonMapUAVheading_clicked()
+{
+    followUAVheadingAct->toggle();
+}
+
 void OPMapGadgetWidget::on_horizontalSliderZoom_sliderMoved(int position)
 {
     setZoom(position);
@@ -931,7 +935,7 @@ void OPMapGadgetWidget::createActions()
     followUAVheadingAct->setShortcut(tr("Ctrl+F"));
     followUAVheadingAct->setStatusTip(tr("Keep the map rotation to the UAV heading"));
     followUAVheadingAct->setCheckable(true);
-    followUAVheadingAct->setChecked(true);
+    followUAVheadingAct->setChecked(false);
     connect(followUAVheadingAct, SIGNAL(toggled(bool)), this, SLOT(onFollowUAVheadingAct_toggled(bool)));
 
     wayPointEditorAct = new QAction(tr("&Waypoint editor"), this);
@@ -1099,9 +1103,15 @@ void OPMapGadgetWidget::onFollowUAVpositionAct_toggled(bool checked)
 
 void OPMapGadgetWidget::onFollowUAVheadingAct_toggled(bool checked)
 {
-    if (m_map)
+    if (m_widget)
     {
-	if (!checked) m_map->SetRotate(0);							// reset map rotation to 0deg
+	if (m_widget->toolButtonMapUAVheading->isChecked() != checked)
+	    m_widget->toolButtonMapUAVheading->setChecked(checked);
+
+	if (m_map)
+	{
+	    if (!checked) m_map->SetRotate(0);							// reset map rotation to 0deg
+	}
     }
 }
 

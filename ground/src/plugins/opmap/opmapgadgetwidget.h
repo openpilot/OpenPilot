@@ -115,6 +115,7 @@ private slots:
     void on_toolButtonZoomP_clicked();
     void on_toolButtonMapHome_clicked();
     void on_toolButtonMapUAV_clicked();
+    void on_toolButtonMapUAVheading_clicked();
     void on_horizontalSliderZoom_sliderMoved(int position);
     void on_toolButtonAddWaypoint_clicked();
     void on_treeViewWaypoints_clicked(QModelIndex index);

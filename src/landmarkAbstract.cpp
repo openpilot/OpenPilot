@@ -91,7 +91,6 @@ namespace jafar {
 		}
 
 
-
 		void LandmarkAbstract::reparametrize(const landmark_ptr_t & lmkPtr) {
 //
 //			// - create a new STD landmark.
@@ -142,6 +141,17 @@ namespace jafar {
 //					this->suicide();
 //				}
 		}
+
+		void LandmarkAbstract::reparametrize(int size, vec &xNew, sym_mat &pNew) {
+			mat XNEW_xold(size,this->mySize());
+			xNew.resize(size, false);
+			vec xOld = this->state.x();
+			sym_mat pOld = sym_adapt(this->state.P()); // sym_mat should not be necessary as P is sym, but it sometimes fails at typecheck...
+			reparametrize_func(xOld,xNew,XNEW_xold);
+			mat tmp = ublas::prod(XNEW_xold, pOld);
+			pNew = ublas::prod(tmp, ublas::trans(XNEW_xold));
+		}
+
 
 		void LandmarkAbstract::transferInfoLmk(landmark_ptr_t & lmkSourcePtr){
 

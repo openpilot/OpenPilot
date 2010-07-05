@@ -34,13 +34,13 @@ namespace jafar {
 		 * Constructor
 		 */
 		MapAbstract::MapAbstract(size_t _max_size) :
-			max_size(_max_size), current_size(0), used_states(max_size) {
+			state(7), max_size(_max_size), current_size(0), used_states(max_size) {
 			used_states.clear();
 			ekfInd_ptr_t filtPtr(new ExtendedKalmanFilterIndirect(_max_size));
 			filterPtr = filtPtr;
 		}
 		MapAbstract::MapAbstract(const ekfInd_ptr_t & ekfPtr) :
-			filterPtr(ekfPtr), max_size(ekfPtr->size()), current_size(0),
+			state(7), filterPtr(ekfPtr), max_size(ekfPtr->size()), current_size(0),
 			    used_states(ekfPtr->size()) {
 			used_states.clear();
 		}

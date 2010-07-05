@@ -81,7 +81,7 @@ namespace jafar {
 					return "MAP";
 				}
 
-
+				Gaussian state;
 
 				/**
 				 * EKF engine

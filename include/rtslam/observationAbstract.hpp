@@ -167,7 +167,7 @@ namespace jafar {
 				/**
 				 * Counters
 				 */
-				struct counters {
+				struct Counters {
 						int nSearch; ///< 		Number of searches
 						int nMatch; ///< 			Number of matches
 						int nInlier; ///< 		Number of times declared inlier
@@ -176,7 +176,7 @@ namespace jafar {
 				/**
 				 * Events
 				 */
-				struct events {
+				struct Events {
 						bool predicted; ///<	Landmark is not new and has been predicted
 						bool visible; ///< 		Landmark is visible
 						bool measured; ///< 	Feature is measured

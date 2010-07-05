@@ -114,7 +114,20 @@ namespace jafar {
 				return R;
 			}
 
-
+			/**
+			 * Quaternion from rotation matrix
+			 */
+			template<class MatR>
+			vec4 R2q(const MatR & R) {
+				vec4 q;
+				q(0) = sqrt(R(0,0)+R(1,1)+R(2,2)+1) / 2.;
+				double d1 = 4*q(0);
+				q(1) = (R(2,1) - R(1,2)) / d1;
+				q(2) = (R(0,2) - R(2,0)) / d1;
+				q(3) = (R(1,0) - R(0,1)) / d1;
+				return q;
+			}
+			
 			/**
 			 * The transposed rotation matrix from a quaternion.
 			 * \param q the quaternion [qw, qx, qy, qz].

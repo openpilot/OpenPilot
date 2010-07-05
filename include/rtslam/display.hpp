@@ -22,6 +22,8 @@ namespace jafar {
 namespace rtslam {
 namespace display {
 
+	class ViewerAbstract;
+	
 	/** **************************************************************************
 	This is the base class for objects that will store display data for a viewer
 	\ingroup rtslam
@@ -31,7 +33,9 @@ namespace display {
 		// bufferized slam object data
 		// +
 		// display objects
+			ViewerAbstract *viewer;
 		public:
+			DisplayDataAbstract(ViewerAbstract *viewer_): viewer(viewer_) {}
 			virtual ~DisplayDataAbstract() {}
 			//virtual void bufferize() = 0; // not virtual, we want to allow inlining, and we are using templates
 			//virtual void render() = 0; 
@@ -44,8 +48,8 @@ namespace display {
 	{
 		public:
 			rtslam::WorldAbstract *slamWor_; // cannot use shared_ptr or it will never be freed
-			WorldDisplay(rtslam::WorldAbstract *_slamWor, WorldDisplay *_garbage):
-				slamWor_(_slamWor) {}
+			WorldDisplay(ViewerAbstract *viewer_, rtslam::WorldAbstract *_slamWor, WorldDisplay *_garbage):
+				DisplayDataAbstract(viewer_), slamWor_(_slamWor) {}
 	};
 	
 	/** **************************************************************************
@@ -56,8 +60,8 @@ namespace display {
 		public:
 			rtslam::MapAbstract *slamMap_;
 			WorldDisplay *dispWorld_;
-			MapDisplay(rtslam::MapAbstract *_slamMap, WorldDisplay *_dispWorld): 
-				slamMap_(_slamMap), dispWorld_(_dispWorld) {}
+			MapDisplay(ViewerAbstract *viewer_, rtslam::MapAbstract *_slamMap, WorldDisplay *_dispWorld): 
+				DisplayDataAbstract(viewer_), slamMap_(_slamMap), dispWorld_(_dispWorld) {}
 	};
 
 	/** **************************************************************************
@@ -70,8 +74,8 @@ namespace display {
 		public:
 			rtslam::RobotAbstract *slamRob_;
 			MapDisplay *dispMap_;
-			RobotDisplay(rtslam::RobotAbstract *_slamRob, MapDisplay *_dispMap): 
-				slamRob_(_slamRob), dispMap_(_dispMap) {}
+			RobotDisplay(ViewerAbstract *viewer_, rtslam::RobotAbstract *_slamRob, MapDisplay *_dispMap): 
+				DisplayDataAbstract(viewer_), slamRob_(_slamRob), dispMap_(_dispMap) {}
 	};
 
 	/** **************************************************************************
@@ -85,8 +89,8 @@ namespace display {
 			rtslam::SensorAbstract *slamSen_;
 			RobotDisplay *dispRobot_;
 			SensorAbstract::type_enum type_;
-			SensorDisplay(rtslam::SensorAbstract *_slamSen, RobotDisplay *_dispRobot): 
-				slamSen_(_slamSen), dispRobot_(_dispRobot), type_(_slamSen->type) {}
+			SensorDisplay(ViewerAbstract *viewer_, rtslam::SensorAbstract *_slamSen, RobotDisplay *_dispRobot): 
+				DisplayDataAbstract(viewer_), slamSen_(_slamSen), dispRobot_(_dispRobot), type_(_slamSen->type) {}
 	};
 
 	/** **************************************************************************
@@ -123,8 +127,9 @@ namespace display {
 						return init;
 				}
 			}
-			LandmarkDisplay(rtslam::LandmarkAbstract *_slamLmk, MapDisplay *_dispMap): 
-				slamLmk_(_slamLmk), dispMap_(_dispMap), type_(convertType(_slamLmk)) {}
+			LandmarkDisplay(ViewerAbstract *viewer_, rtslam::LandmarkAbstract *_slamLmk, MapDisplay *_dispMap): 
+				DisplayDataAbstract(viewer_), slamLmk_(_slamLmk), dispMap_(_dispMap),
+				type_(convertType(_slamLmk)), phase_(convertPhase(_slamLmk)) {}
 	};
 
 
@@ -141,11 +146,12 @@ namespace display {
 			SensorAbstract::type_enum sensorType_;
 			LandmarkDisplay::Type  landmarkGeomType_;
 			LandmarkDisplay::Phase landmarkPhase_;
-			ObservationDisplay(rtslam::ObservationAbstract *_slamObs, SensorDisplay *_dispSen): 
-				slamObs_(_slamObs), dispSen_(_dispSen)
+			ObservationDisplay(ViewerAbstract *viewer_, rtslam::ObservationAbstract *_slamObs, SensorDisplay *_dispSen): 
+				DisplayDataAbstract(viewer_), slamObs_(_slamObs), dispSen_(_dispSen)
 			{
 				sensorType_ = _slamObs->sensorPtr()->type;
 				landmarkGeomType_ = LandmarkDisplay::convertType(&*_slamObs->landmarkPtr());
+				landmarkPhase_ = LandmarkDisplay::convertPhase(&*_slamObs->landmarkPtr());
 			}
 	};
 
@@ -186,12 +192,12 @@ namespace display {
 						if (parentSlam->displayData.size() <= id) 
 							parentDisp = NULL;
 						else
-							parentDisp = static_cast<ParentDisplayType*>(parentSlam->displayData[id]);
+							parentDisp = PTR_CAST<ParentDisplayType*>(parentSlam->displayData[id]);
 					}
-					slamObject->displayData[id] = new DisplayType(&*slamObject, parentDisp);
+					slamObject->displayData[id] = new DisplayType(this, &*slamObject, parentDisp);
 				}
 				// bufferize the object
-				DisplayType *objDisp = static_cast<DisplayType*>(slamObject->displayData[id]);
+				DisplayType *objDisp = PTR_CAST<DisplayType*>(slamObject->displayData[id]);
 				objDisp->bufferize();
 			}
 			
@@ -235,37 +241,37 @@ namespace display {
 					
 					void operator()(rtslam::world_ptr_t const &wor) const {
 						if (!boost::is_same<WorldDisplayType,WorldDisplay>::value) {
-							WorldDisplayType &worDisp = *static_cast<WorldDisplayType*>(wor->displayData[MyViewer::id()]);
+							WorldDisplayType &worDisp = *PTR_CAST<WorldDisplayType*>(wor->displayData[MyViewer::id()]);
 							worDisp.render();
 						}
 					}
 					void operator()(rtslam::map_ptr_t const &map) const {
 						if (!boost::is_same<MapDisplayType,MapDisplay>::value) {
-							RobotDisplayType &mapDisp = *static_cast<RobotDisplayType*>(map->displayData[MyViewer::id()]);
+							MapDisplayType &mapDisp = *PTR_CAST<MapDisplayType*>(map->displayData[MyViewer::id()]);
 							mapDisp.render();
 						}
 					}
 					void operator()(rtslam::robot_ptr_t const &rob) const {
 						if (!boost::is_same<RobotDisplayType,RobotDisplay>::value) {
-							RobotDisplayType &robDisp = *static_cast<RobotDisplayType*>(rob->displayData[MyViewer::id()]);
+							RobotDisplayType &robDisp = *PTR_CAST<RobotDisplayType*>(rob->displayData[MyViewer::id()]);
 							robDisp.render();
 						}
 					}
 					void operator()(rtslam::sensor_ptr_t const &sen) const {
 						if (!boost::is_same<SensorDisplayType,SensorDisplay>::value) {
-							SensorDisplayType &senDisp = *static_cast<SensorDisplayType*>(sen->displayData[MyViewer::id()]);
+							SensorDisplayType &senDisp = *PTR_CAST<SensorDisplayType*>(sen->displayData[MyViewer::id()]);
 							senDisp.render();
 						}
 					}
 					void operator()(rtslam::landmark_ptr_t const &lmk) const {
 						if (!boost::is_same<LandmarkDisplayType,LandmarkDisplay>::value) {
-							LandmarkDisplayType &lmkDisp = *static_cast<LandmarkDisplayType*>(lmk->displayData[MyViewer::id()]);
+							LandmarkDisplayType &lmkDisp = *PTR_CAST<LandmarkDisplayType*>(lmk->displayData[MyViewer::id()]);
 							lmkDisp.render();
 						}
 					}
 					void operator()(rtslam::observation_ptr_t const &obs) const {
 						if (!boost::is_same<ObservationDisplayType,ObservationDisplay>::value) {
-							ObservationDisplayType &obsDisp = *static_cast<ObservationDisplayType*>(obs->displayData[MyViewer::id()]);
+							ObservationDisplayType &obsDisp = *PTR_CAST<ObservationDisplayType*>(obs->displayData[MyViewer::id()]);
 							obsDisp.render();
 						}
 					}
@@ -319,7 +325,7 @@ namespace display {
 			{
 				// bufferize robot
 				if (!boost::is_same<RobotDisplayType,RobotDisplay>::value)
-					bufferizeObject<RobotDisplayType, MapDisplay, robot_ptr_t, map_ptr_t>(rob, map, id());
+					bufferizeObject<RobotDisplayType, MapDisplayType, robot_ptr_t, map_ptr_t>(rob, map, id());
 				// bufferize sensors
 				for(RobotAbstract::SensorList::iterator sen = rob->sensorList().begin(); sen != rob->sensorList().end(); ++sen)
 					bufferize(*sen,rob);
@@ -338,7 +344,7 @@ namespace display {
 
 			inline void bufferize(rtslam::observation_ptr_t obs, rtslam::sensor_ptr_t sen)
 			{
-				// bufferize observation
+				// bufferize observationbufferizeObject
 				if (!boost::is_same<ObservationDisplayType,ObservationDisplay>::value) // bufferize observation
 					bufferizeObject<ObservationDisplayType, SensorDisplayType, observation_ptr_t, sensor_ptr_t>(obs, sen, id());
 			}
@@ -347,7 +353,7 @@ namespace display {
 			{
 				// bufferize landmark
 				if (!boost::is_same<LandmarkDisplayType,LandmarkDisplay>::value) // bufferize landmark
-					bufferizeObject<LandmarkDisplayType, MapDisplay, landmark_ptr_t, map_ptr_t>(lmk, map, id());
+					bufferizeObject<LandmarkDisplayType, MapDisplayType, landmark_ptr_t, map_ptr_t>(lmk, map, id());
 			}
 			
 			
@@ -359,24 +365,27 @@ namespace display {
 			inline void render()
 			{
 				for(SlamObjectsList::iterator it = slamObjects_.begin(); it != slamObjects_.end(); ++it)
+				{
 					boost::apply_visitor(Render(), *it);
+				}
 				//clear(); // we're not in a hurry, it will be done at next render
 			}
 			
 	};
 
+	/*
 		typedef enum lmk_state {
 			lmk_state_init,
 			lmk_state_converged
 		} lmk_state ;
 
-		typedef enum lmk_state_advanced {
-			lmk_state_advanced_not_predicted,
-			lmk_state_advanced_predicted,
-			lmk_state_advanced_matched,
-			lmk_state_advanced_updated
-		} lmk_state_advanced ;
-
+		typedef enum lmk_events {
+			lmk_events_not_predicted,
+			lmk_events_predicted,
+			lmk_events_matched,
+			lmk_events_updated
+		} lmk_events ;
+*/
 		typedef enum color {
 			color_transparency,
 			color_yellow,
@@ -394,35 +403,85 @@ namespace display {
 				void set(int R_, int G_, int B_) { R=R_; G=G_; B=B_; }
 		} colorRGB ;
 
-		static color getColorObject_prediction(lmk_state lmk_state, lmk_state_advanced lmk_state_advanced) {
+		class ColorManager
+		{
+			public:
+				
+				static color getColorObject_prediction(LandmarkDisplay::Phase lmk_phase, ObservationAbstract::Events &events)
+				{
+					switch(lmk_phase)
+					{
+						case LandmarkDisplay::init: {
+							if (events.updated) return color_red;
+							if (events.matched) return color_magenta;
+							if (events.predicted) return color_magenta;
+							return color_yellow;
+						}
+						case LandmarkDisplay::converged: {
+							if (events.updated) return color_cyan;
+							if (events.matched) return color_blue;
+							if (events.predicted) return color_blue;
+							return color_transparency;
+						}
+						default:
+							std::cout << "getColorObject_prediction: Warning: undefined phase " << lmk_phase << std::endl ;
+							return color_transparency;
+					}
+				}
+				
+				static color getColorObject_measure(LandmarkDisplay::Phase lmk_phase, ObservationAbstract::Events &events)
+				{
+					switch(lmk_phase)
+					{
+						case LandmarkDisplay::init: {
+							if (events.updated) return color_yellow;
+							if (events.matched) return color_yellow;
+							if (events.predicted) return color_orange;
+							return color_yellow;
+						}
+						case LandmarkDisplay::converged: {
+							if (events.updated) return color_yellow;
+							if (events.matched) return color_yellow;
+							if (events.predicted) return color_orange;
+							return color_transparency;
+						}
+						default:
+							std::cout << "getColorObject_measure: Warning: undefined phase " << lmk_phase << std::endl ;
+							return color_transparency;
+					}
+				}
+			};
+
+		/*
+		static color getColorObject_prediction(lmk_state lmk_state, lmk_events lmk_events) {
 
 			if (lmk_state==lmk_state_init) {
-				switch (lmk_state_advanced) {
-					case lmk_state_advanced_not_predicted:
+				switch (lmk_events) {
+					case lmk_events_not_predicted:
 						return color_transparency;
-					case lmk_state_advanced_predicted:
+					case lmk_events_predicted:
 						return color_magenta;
-					case lmk_state_advanced_matched:
+					case lmk_events_matched:
 						return color_magenta;
-					case lmk_state_advanced_updated:
+					case lmk_events_updated:
 						return color_red;
 					default:
-						std::cout << __FILE__ << ":" << __LINE__ << "Unknown lmk lmk_state_advanced " << lmk_state_advanced << std::endl;
+						std::cout << __FILE__ << ":" << __LINE__ << "Unknown lmk lmk_events " << lmk_events << std::endl;
 						break;
 				}
 			}
 			if (lmk_state==lmk_state_converged) {
-				switch (lmk_state_advanced) {
-					case lmk_state_advanced_not_predicted:
+				switch (lmk_events) {
+					case lmk_events_not_predicted:
 						return color_transparency;
-					case lmk_state_advanced_predicted:
+					case lmk_events_predicted:
 						return color_blue;
-					case lmk_state_advanced_matched:
+					case lmk_events_matched:
 						return color_blue;
-					case lmk_state_advanced_updated:
+					case lmk_events_updated:
 						return color_cyan;
 					default:
-						std::cout << __FILE__ << ":" << __LINE__ << "Unknown lmk lmk_state_advanced " << lmk_state_advanced << std::endl;
+						std::cout << __FILE__ << ":" << __LINE__ << "Unknown lmk lmk_events " << lmk_events << std::endl;
 						break;
 				}
 			}
@@ -430,41 +489,41 @@ namespace display {
 			return color_transparency;
 		}
 
-		static color getColorObject_measure    (lmk_state lmk_state, lmk_state_advanced lmk_state_advanced) {
+		static color getColorObject_measure    (lmk_state lmk_state, lmk_events lmk_events) {
 			if (lmk_state==lmk_state_init) {
-				switch (lmk_state_advanced) {
-					case lmk_state_advanced_not_predicted:
+				switch (lmk_events) {
+					case lmk_events_not_predicted:
 						return color_yellow;
-					case lmk_state_advanced_predicted:
+					case lmk_events_predicted:
 						return color_orange;
-					case lmk_state_advanced_matched:
+					case lmk_events_matched:
 						return color_yellow;
-					case lmk_state_advanced_updated:
+					case lmk_events_updated:
 						return color_yellow;
 					default:
-						std::cout << __FILE__ << ":" << __LINE__ << " Unknown lmk lmk_state_advanced " << lmk_state_advanced << std::endl;
+						std::cout << __FILE__ << ":" << __LINE__ << " Unknown lmk lmk_events " << lmk_events << std::endl;
 						break;
 				}
 			}
 			if (lmk_state==lmk_state_converged) {
-				switch (lmk_state_advanced) {
-					case lmk_state_advanced_not_predicted:
+				switch (lmk_events) {
+					case lmk_events_not_predicted:
 						return color_transparency;
-					case lmk_state_advanced_predicted:
+					case lmk_events_predicted:
 						return color_orange;
-					case lmk_state_advanced_matched:
+					case lmk_events_matched:
 						return color_yellow;
-					case lmk_state_advanced_updated:
+					case lmk_events_updated:
 						return color_yellow;
 					default:
-						std::cout << __FILE__ << ":" << __LINE__ << " Unknown lmk lmk_state_advanced " << lmk_state_advanced << std::endl;
+						std::cout << __FILE__ << ":" << __LINE__ << " Unknown lmk lmk_events " << lmk_events << std::endl;
 						break;
 				}
 			}
 			cout << "warning color undefined for object types in display" << endl ;
 			return color_transparency;
 		}
-
+*/
 		static colorRGB getColorRGB(color colorOrigin)  {
 			colorRGB result ;
 			result.set(0,0,0);
@@ -494,7 +553,7 @@ namespace display {
 						result.set(255,128,0);
 						break;
 				default:
-					//std::cout << __FILE__ << ":" << __LINE__ << " Unknown lmk lmk_state_advanced " << lmk_state_advanced << std::endl;
+					//std::cout << __FILE__ << ":" << __LINE__ << " Unknown lmk lmk_events " << lmk_events << std::endl;
 					break;
 			}
 			return result ;

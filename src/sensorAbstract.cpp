@@ -60,6 +60,7 @@ namespace jafar {
 			        : _robPtr->pose.ia()) {
 			category = SENSOR;
 			rawCounter = 0;
+			isInFilter = (inFilter == FILTERED);
 		}
 
 		SensorAbstract::SensorAbstract(const simulation_t dummy,
@@ -68,6 +69,7 @@ namespace jafar {
 			    pose(state, Gaussian::REMOTE),
 			    ia_globalPose(ublasExtra::ia_set(0, 0)) {
 			category = SENSOR;
+			isInFilter = false;
 		}
 
 		void SensorAbstract::setPose(double x, double y, double z, double rollDeg,

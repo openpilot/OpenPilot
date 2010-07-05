@@ -8,9 +8,6 @@ Features
 
 - estimation hardware <- IN PROGRESS FOR MTI
 
-- Map management:
-	- Lmk deletion :
-		- non-reparametrized die when out of view in initializer sensor. 
 
 Organization
 ------------------------------------
@@ -32,13 +29,14 @@ Performance
 	7. try to copy the search area in another image for a better use of cache
 	8. try to use cpu vectorialization (compute 4 zncc at once)
 - check algorithm speed <- Good 60Hz. See issues with RT and OS -> reboot and stop the most possible programs and services
-- find a more clever way to manipulate the map used space: ia_indirectArray() is possibly an expensive way to go.
+- find a more clever way to manipulate the map used space: ia_indirectArray() is possibly an expensive way to go, or maybe use eigen2 instead of ublas...
 
 
 
 Precision
 ------------------------------------
-- Implement one point Ransac to avoid outliers !!!
+- Finish implementing 1 point Ransac to avoid outliers
+- Finish implementing RobotCentric Kalman
 - test predicted patch variance: if too low, discard exploration and declare not matched.
 - when a point is detected, do a matching with itself with interpolation to find subpixel position
 - when a point is matched, try to estimate if there is a possible ambiguity with another point in the ellipse 
@@ -48,5 +46,6 @@ Display
 
 - 3D display with GDHE
 - Allow configurations of viewers: font size, dump, ...
+- Allow exhaustive rendering when offline, for videos
 - Catch keyboard and mouse events in the windows, in order to allow to play/pause/next...
 - Implement double color labels for better visibility on light and dark backgrounds

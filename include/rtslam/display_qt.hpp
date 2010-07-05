@@ -8,6 +8,7 @@
 
 #ifndef DISPLAY_QT__HPP_
 #define DISPLAY_QT__HPP_
+#ifdef HAVE_MODULE_QDISPLAY
 
 #include "qdisplay/ImageView.hpp"
 #include "qdisplay/Viewer.hpp"
@@ -30,6 +31,34 @@ namespace rtslam {
 namespace display {
 
 //******************************************************************************
+// Viewer
+
+class WorldQt;
+class MapQt;
+class RobotQt;
+class SensorQt;
+class LandmarkQt;
+class ObservationQt;
+
+#if DEFINE_USELESS_OBJECTS
+class ViewerQt: public Viewer<WorldQt,MapQt,RobotQt,SensorQt,LandmarkQt,ObservationQt>
+{
+	public:
+		int fontSize;
+		double ellipsesScale;
+		bool dump;
+		std::string dump_path;
+	public:
+		ViewerQt(int _fontSize = 8, double _ellipsesScale = 3.0, bool _dump = false, std::string _dump_path = "/mnt/ram/rtslam"): 
+			fontSize(_fontSize), ellipsesScale(_ellipsesScale), dump(_dump), dump_path(_dump_path) {}
+};
+#else
+#error "does not work"
+//typedef Viewer<WorldDisplay,MapDisplay,RobotDisplay,SensorQt,LandmarkDisplay,ObservationQt> ViewerQt;
+#endif
+
+
+//******************************************************************************
 // Objects
 
 #if DEFINE_USELESS_OBJECTS
@@ -39,9 +68,9 @@ namespace display {
 */
 class WorldQt : public WorldDisplay
 {
+		ViewerQt *viewerQt;
 	public:
-		WorldQt(rtslam::WorldAbstract *_slamWor, WorldDisplay *garbage):
-			WorldDisplay(_slamWor, garbage) {}
+		WorldQt(ViewerAbstract *_viewer, rtslam::WorldAbstract *_slamWor, WorldDisplay *garbage);
 		void bufferize() {}
 		void render() {}
 };
@@ -51,9 +80,9 @@ class WorldQt : public WorldDisplay
 */
 class MapQt : public MapDisplay
 {
+		ViewerQt *viewerQt;
 	public:
-		MapQt(rtslam::MapAbstract *_slamMap, WorldDisplay *_dispWorld):
-			MapDisplay(_slamMap, _dispWorld) {}
+		MapQt(ViewerAbstract *_viewer, rtslam::MapAbstract *_slamMap, WorldQt *_dispWorld);
 		void bufferize() {}
 		void render() {}
 };
@@ -63,14 +92,14 @@ class MapQt : public MapDisplay
 */
 class RobotQt : public RobotDisplay
 {
+		ViewerQt *viewerQt;
 	public:
 		// buffered data
 		//Gaussian pose_;
 		//std::string model3d_;
 		// graphical objects
 	public:
-		RobotQt(rtslam::RobotAbstract *_slamRob, MapDisplay *_dispMap):
-			RobotDisplay(_slamRob, _dispMap) {}
+		RobotQt(ViewerAbstract *_viewer, rtslam::RobotAbstract *_slamRob, MapQt *_dispMap);
 		void bufferize() {}
 		void render() {}
 };
@@ -81,10 +110,11 @@ class RobotQt : public RobotDisplay
 */
 class SensorQt : public SensorDisplay
 {
+		ViewerQt *viewerQt;
 	public:
 		// buffered data
 		image::Image image;
-		int framenumber;
+		unsigned framenumber;
 		double avg_framerate;
 		double t;
 		vec7 pose;
@@ -94,89 +124,10 @@ class SensorQt : public SensorDisplay
 		QGraphicsTextItem* framenumber_label;
 		QGraphicsTextItem* sensorpose_label;
 	public:
-		SensorQt(rtslam::SensorAbstract *_slamSen, RobotDisplay *_dispRob): 
-			SensorDisplay(_slamSen, _dispRob)
-		{
-			viewer_ = new qdisplay::Viewer();
-			view_ = new qdisplay::ImageView();
-			viewer_->setImageView(view_, 0, 0);
-			viewer_->resize(660,500);
-			viewer_->setSceneRect(0,0,640,480);
-			framenumber = 0;
-			t = 0.;
-			avg_framerate = 0.;
-			
-			framenumber_label = new QGraphicsTextItem(view_);
-			//framenumber_label->setFont(QFont( m_label->font().family(), m_fontSize));
-			framenumber_label->setFont(QFont("monospace", 10, QFont::Bold));
-			framenumber_label->setDefaultTextColor(QColor(0,192,0));
-			framenumber_label->translate(0,15);
-			
-			sensorpose_label = new QGraphicsTextItem(view_);
-			//sensorpose_label->setFont(QFont( m_label->font().family(), m_fontSize));
-			sensorpose_label->setFont(QFont("monospace", 10, QFont::Bold));
-			sensorpose_label->setDefaultTextColor(QColor(0,192,0));
-			sensorpose_label->translate(0,0);
-		}
-		~SensorQt()
-		{
-			delete view_;
-			delete viewer_;
-			delete framenumber_label;
-		}
-		void bufferize()
-		{
-			if (slamSen_->rawCounter != framenumber)
-			{
-				avg_framerate = (slamSen_->rawPtr->timestamp-t)/(slamSen_->rawCounter-framenumber);
-				if (framenumber == 0) avg_framerate = 0.;
-				framenumber = slamSen_->rawCounter;
-				t = slamSen_->rawPtr->timestamp;
-				raw_ptr_t raw = slamSen_->getRaw();
-				if (raw) image = static_cast<RawImage&>(*raw).img->clone();
-				pose = slamSen_->robotPtr()->pose.x();
-				
-			}
-		}
-		void render()
-		{
-			switch (type_)
-			{
-				case SensorAbstract::PINHOLE:
-				case SensorAbstract::BARRETO: {
-					view_->setImage(image);
-					std::ostringstream oss; oss << "#" << framenumber << "  |  " << std::setprecision(3) << avg_framerate*1000 << " ms";
-					framenumber_label->setPlainText(oss.str().c_str());
-					
-					vec3 position = ublas::subrange(pose,0,3) * 100.0;
-					vec3 euler = quaternion::q2e(ublas::subrange(pose,3,7)) * 180./M_PI;
-					oss.str("");
-//std::cout << pose << " ; " << position << " ; " << euler << std::endl;
-					oss << "[" <<  std::setfill(' ') << std::setw(4) << (int)position(0) << ", " <<  
-						std::setw(4) << (int)position(1) << ", " <<  std::setw(4) << (int)position(2) << "] cm ; ["
-						<< std::setw(4) << (int)euler(0) << ", " <<  std::setw(4) << (int)euler(1) << ", " <<  std::setw(4) << (int)euler(2) << "] deg";
-					sensorpose_label->setPlainText(oss.str().c_str());
-
-					// save image
-					#if 0
- 					char filename[50];
- 					sprintf(filename, "/mnt/ram/rtslam/rendered-%04d.png", framenumber);
- 					cout << (string)filename << endl;
-					// FIXME make it clean in qdisplay
-// 					view_->exportView((string)filename);
-					QSizeF size(640,480);//view_->img.size().toSize()
-					QImage img(size.toSize(), QImage::Format_RGB32);
-					QPainter painter(&img);
-					QRectF rect(0,0,640,480);
-					view_->scene()->render(&painter, rect,rect, Qt::KeepAspectRatio);
-					img.save(filename, "PNG");
-					#endif
-					
-					break; }
-				default:
-					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_SENSOR_TYPE, "Don't know how to display this type of sensor" << type_);
-			}
-		}
+		SensorQt(ViewerAbstract *_viewer, rtslam::SensorAbstract *_slamSen, RobotQt *_dispRob);
+		~SensorQt();
+		void bufferize();
+		void render();
 };
 
 #if DEFINE_USELESS_OBJECTS
@@ -185,13 +136,13 @@ class SensorQt : public SensorDisplay
 */
 class LandmarkQt : public LandmarkDisplay
 {
+		ViewerQt *viewerQt;
 	public:
 		// buffered data
 		// jmath::vec data_;
 		// graphical objects
 	public:
-		LandmarkQt(rtslam::LandmarkAbstract *_slamLmk, MapDisplay *_dispMap):
-			LandmarkDisplay(_slamLmk, _dispMap) {}
+		LandmarkQt(ViewerAbstract *_viewer, rtslam::LandmarkAbstract *_slamLmk, MapQt *_dispMap);
 		void bufferize() {}
 		void render() {}
 };
@@ -202,13 +153,15 @@ class LandmarkQt : public LandmarkDisplay
 */
 class ObservationQt : public ObservationDisplay
 {
+		ViewerQt *viewerQt;
 	public:
 		// buffered data
-		bool predicted_;
+		ObservationAbstract::Events events_;
+/*		bool predicted_;
 		bool visible_;
 		bool measured_;
 		bool matched_;
-		bool updated_;
+		bool updated_;*/
 		jblas::vec predObs_;
 		jblas::sym_mat predObsCov_;
 		jblas::vec measObs_;
@@ -223,219 +176,17 @@ class ObservationQt : public ObservationDisplay
 		typedef std::list<qdisplay::Shape*> ItemList;
 		ItemList items_;
 	public:
-		ObservationQt(rtslam::ObservationAbstract *_slamObs, SensorQt *_dispSen):
-			ObservationDisplay(_slamObs, _dispSen), view_(_dispSen->view_)
-		{
-#if EMBED_PREDICTED_APP
-			predictedApp_ = NULL;
-#endif
-			switch (landmarkGeomType_)
-			{
-				case LandmarkDisplay::ltPoint:
-					predObs_.resize(2);
-					predObsCov_.resize(2);
-					measObs_.resize(2);
-					break;
-				default:
-					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark: " << landmarkGeomType_);
-					break;
-			}
-		}
-		~ObservationQt()
-		{
-//JFR_DEBUG("deleting ObservationQt and all the graphics objects " << items_.size());
-			for(ItemList::iterator it = items_.begin(); it != items_.end(); ++it)
-			{
-				//(*it)->setParentItem(NULL);
-				//viewer_->scene()->removeItem(*it);
-				delete *it;
-			}
-		}
-		
-		void bufferize()
-		{
-			switch (landmarkGeomType_)
-			{
-				case LandmarkDisplay::ltPoint:
-					//LandmarkEuclidean *lmk = static_cast<LandmarkEuclidean*>(slamObs_->landmarkPtr->convertToStandardParametrization());
-					predicted_ = slamObs_->events.predicted;
-					visible_ = slamObs_->events.visible;
-					measured_ = slamObs_->events.measured;
-					matched_ = slamObs_->events.matched;
-					updated_ = slamObs_->events.updated;
-					landmarkPhase_ = LandmarkDisplay::convertPhase(&*slamObs_->landmarkPtr());
-					id_ = slamObs_->landmarkPtr()->id();
-					if (visible_)
-					{
-						if (predicted_)
-						{
-							predObs_ = slamObs_->expectation.x();
-							predObsCov_ = slamObs_->innovation.P();
-//							cout << "display: noise/exp/inn:  " << slamObs_->measurement.P() << " / " << slamObs_->expectation.P() << " / " << slamObs_->innovation.P() << " / " << endl;
-						}
-						if (measured_ || matched_ || !predicted_)
-						{
-							measObs_ = slamObs_->measurement.x();
-							match_score = slamObs_->getMatchScore();
-						}
-					}
-#if EMBED_PREDICTED_APP
-					delete predictedApp_;
-					predictedApp_ = slamObs_->predictedAppearance->clone();
-#endif
-					break;
-				default:
-					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark: " << landmarkGeomType_);
-					break;
-			}
-		}
-		void render()
-		{
-			switch (landmarkGeomType_)
-			{
-				case LandmarkDisplay::ltPoint:
-				{
-					bool dispPred = visible_ && predicted_;
-					bool dispMeas = visible_ && (measured_ || matched_ || !predicted_);
-					bool dispInit = visible_ && !predicted_;
-
-					// Build display objects if it is the first time they are displayed
-					if (items_.size() != 3)
-					{
-						// clear
-						items_.clear();
-						if (!dispPred)
-						{
-							predObs_.clear();
-							predObsCov_ = identity_mat(2);
-						}
-						if (!dispMeas)
-						{
-							measObs_.clear();
-						}
-						
-						qdisplay::Shape *s;
-
-						// prediction point
-						s = new qdisplay::Shape(qdisplay::Shape::ShapeCross, predObs_(0), predObs_(1), 3, 3);
-						s->setFontSize(8);
-						s->setVisible(false);
-						items_.push_back(s);
-						view_->addShape(s);
-						
-						// prediction ellipse
-						s = new qdisplay::Ellipsoid(predObs_, predObsCov_, 3.0);
-						s->setVisible(false);
-						items_.push_back(s);
-						view_->addShape(s);
-						
-						// measure point
-						s = new qdisplay::Shape(qdisplay::Shape::ShapeCrossX, measObs_(0), measObs_(1), 3, 3);
-						s->setFontSize(8);
-						s->setVisible(false);
-						items_.push_back(s);
-						view_->addShape(s);
-						
-					}
-					// Refresh the display objects every time
-					{
-						colorRGB c; c.set(255,255,255);
-						lmk_state lmkstate = lmk_state_init;
-						if (landmarkPhase_==LandmarkDisplay::init)      lmkstate = lmk_state_init ;
-						if (landmarkPhase_==LandmarkDisplay::converged) lmkstate = lmk_state_converged ;
-						lmk_state_advanced lmkstateadvanced = lmk_state_advanced_not_predicted ;
-						if (predicted_) lmkstateadvanced = lmk_state_advanced_predicted ;
-						if (matched_)   lmkstateadvanced = lmk_state_advanced_matched ;
-						if (updated_)   lmkstateadvanced = lmk_state_advanced_updated ;
-
-						// prediction point
-						ItemList::iterator it = items_.begin();
-						if (dispPred)
-						{
-							c = getColorRGB(getColorObject_prediction(lmkstate,lmkstateadvanced)) ;
-							(*it)->setColor(c.R,c.G,c.B); //
-							(*it)->setFontColor(c.R,c.G,c.B); //
-							std::ostringstream oss; oss << id_; if (dispMeas) oss << " - " << int(match_score*100);
-							(*it)->setLabel(oss.str().c_str());
-							(*it)->setPos(predObs_(0), predObs_(1));
-						}
-						(*it)->setVisible(dispPred);
-						
-						// prediction ellipse
-						++it;
-						if (dispPred)
-						{
-							(*it)->setColor(c.R,c.G,c.B); // yellow
-							qdisplay::Ellipsoid *ell = dynamic_cast<qdisplay::Ellipsoid*>(*it);
-							ell->set(predObs_, predObsCov_, 3.0);
-						}
-						(*it)->setVisible(dispPred);
-						
-						// measure point
-						++it;
-//std::cout << "display obs " << id_ << " with flags visible " << visible_ << " matched " << matched_
-//		<< " predicted " << predicted_ << " position " << measObs_ << std::endl;
-						if (dispMeas)
-						{
-							c = getColorRGB(getColorObject_measure(lmkstate,lmkstateadvanced)) ;
-							if (dispInit)
-							{
-								(*it)->setFontColor(c.R,c.G,c.B); //
-								(*it)->setLabel(jmath::toStr(id_).c_str());
-							} else
-							{
-								(*it)->setLabel("");
-							}
-							(*it)->setColor(c.R,c.G,c.B); // red
-							(*it)->setPos(measObs_(0), measObs_(1));
-						}
-						(*it)->setVisible(dispMeas);
-
-#if EMBED_PREDICTED_APP
-						// display predicted appearance
-						switch (slamObs_->sensorPtr()->type)
-						{
-							case SensorAbstract::PINHOLE: case SensorAbstract::BARRETO:
-							{
-								AppearanceImagePoint* appImgPtr = PTR_CAST<AppearanceImagePoint*>(slamObs_->predictedAppearance.get());
-								jblas::veci shift(2); shift(0) = (appImgPtr->patch.width()-1)/2; shift(1) = (appImgPtr->patch.height()-1)/2;
-								appImgPtr->patch.robustCopy(PTR_CAST<SensorQt*>(dispSen_)->image, 0, 0, predObs_(0)-shift(0), predObs_(1)-shift(1));
-							}
-							default:
-							{
-
-							}
-
-						}
-#endif
-
-					}
-					break;
-				}
-
-				default:
-					JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark: " << landmarkGeomType_);
-			}
-		}
-
-
+		ObservationQt(ViewerAbstract *_viewer, rtslam::ObservationAbstract *_slamObs, SensorQt *_dispSen);
+		~ObservationQt();
+		void bufferize();
+		void render();
 };
 
-
-
-//******************************************************************************
-// Viewer
-
-#if DEFINE_USELESS_OBJECTS
-typedef Viewer<WorldQt,MapQt,RobotQt,SensorQt,LandmarkQt,ObservationQt> ViewerQt;
-#else
-#error "does not work"
-typedef Viewer<WorldDisplay,MapDisplay,RobotDisplay,SensorQt,LandmarkDisplay,ObservationQt> ViewerQt;
-#endif
 
 
 
 }}}
 
+#endif
 #endif
 

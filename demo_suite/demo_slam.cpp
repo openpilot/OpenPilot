@@ -47,6 +47,7 @@
 //#include "rtslam/hardwareEstimatorMti.hpp"
 
 #include "rtslam/display_qt.hpp"
+#include "rtslam/display_gdhe.hpp"
 
 using namespace jblas;
 using namespace jafar;
@@ -60,9 +61,15 @@ typedef ImagePointObservationMaker<ObservationPinHoleEuclideanPoint, SensorPinHo
 typedef ImagePointObservationMaker<ObservationPinHoleAnchoredHomogeneousPoint, SensorPinHole,
     LandmarkAnchoredHomogeneousPoint, SensorAbstract::PINHOLE, LandmarkAbstract::PNT_AH> PinholeAhpObservationMaker;
 
+int dodisplay = 1;
 int mode = 0;
 std::string dump_path = ".";
 time_t rseed;
+
+const int slam_priority = -20; // needs to be started as root to be < 0
+const int display_priority = 10;
+const int display_period = 100; // ms
+
 
 void demo_slam01_main(world_ptr_t *world) {
 	std::cout << rand() << "," << rand() << "," << rand() << "," << rand() << "," << rand() << std::endl;
@@ -157,7 +164,8 @@ void demo_slam01_main(world_ptr_t *world) {
 	senPtr11->setId();
 	senPtr11->linkToParentRobot(robPtr1);
 	senPtr11->state.clear();
-	senPtr11->pose.x(quaternion::originFrame());
+	senPtr11->setPose(0,0,0,-90,0,-90);
+	//senPtr11->pose.x(quaternion::originFrame());
 	senPtr11->params.setImgSize(IMG_WIDTH, IMG_HEIGHT);
 	senPtr11->params.setIntrinsicCalibration(intrinsic, distortion, distortion.size());
 	senPtr11->params.setMiscellaneous(1.0, 0.1);
@@ -280,6 +288,7 @@ void demo_slam01_main(world_ptr_t *world) {
 
 		worldPtr->display_mutex.unlock();
 		if (mode == 2 && had_data) getchar(); // wait for key in replay mode
+//std::cout << "one frame " << (*world)->t << " : " << mode << " " << had_data << std::endl;
 	} // temporal loop
 
 	std::cout << "\nFINISHED ! Press a key to terminate." << std::endl;
@@ -288,28 +297,74 @@ void demo_slam01_main(world_ptr_t *world) {
 
 
 void demo_slam01_display(world_ptr_t *world) {
-	//(*world)->display_mutex.lock();
 	static unsigned prev_t = 0;
-	qdisplay::qtMutexLock<kernel::FifoMutex>((*world)->display_mutex);
-	if ((*world)->t != prev_t)
+	kernel::Timer timer(display_period*1000);
+	while(true)
 	{
-		prev_t = (*world)->t;
-		display::ViewerQt *viewerQt = static_cast<display::ViewerQt*> ((*world)->getDisplayViewer(display::ViewerQt::id()));
-		if (viewerQt == NULL) {
-			viewerQt = new display::ViewerQt();
-			(*world)->addDisplayViewer(viewerQt, display::ViewerQt::id());
+		if (dodisplay & 1)
+		{
+			#ifdef HAVE_MODULE_QDISPLAY
+			qdisplay::qtMutexLock<kernel::FifoMutex>((*world)->display_mutex);
+			#endif
 		}
-		viewerQt->bufferize(*world);
-		(*world)->display_mutex.unlock();
+		else
+		{
+			(*world)->display_mutex.lock();
+		}
+
+		if ((*world)->t != prev_t)
+		{
+			prev_t = (*world)->t;
+			#ifdef HAVE_MODULE_QDISPLAY
+			display::ViewerQt *viewerQt = NULL;
+			if (dodisplay & 1)
+			{
+				viewerQt = PTR_CAST<display::ViewerQt*> ((*world)->getDisplayViewer(display::ViewerQt::id()));
+				if (viewerQt == NULL) {
+					viewerQt = new display::ViewerQt(8, 3.0, false, "/mnt/ram/rtslam");
+					(*world)->addDisplayViewer(viewerQt, display::ViewerQt::id());
+				}
+			}
+			#endif
+			#ifdef HAVE_MODULE_GDHE
+			display::ViewerGdhe *viewerGdhe = NULL;
+			if (dodisplay & 2)
+			{
+				viewerGdhe = PTR_CAST<display::ViewerGdhe*> ((*world)->getDisplayViewer(display::ViewerGdhe::id()));
+				if (viewerGdhe == NULL) {
+					viewerGdhe = new display::ViewerGdhe("camera", 3.0, "localhost");
+					(*world)->addDisplayViewer(viewerGdhe, display::ViewerGdhe::id());
+				}
+			}
+			#endif
+			
+			#ifdef HAVE_MODULE_QDISPLAY
+			if (dodisplay & 1) viewerQt->bufferize(*world);
+			#endif
+			#ifdef HAVE_MODULE_GDHE
+			if (dodisplay & 2) viewerGdhe->bufferize(*world);
+			#endif
+			
+			(*world)->display_mutex.unlock();
+				
+			#ifdef HAVE_MODULE_QDISPLAY
+			if (dodisplay & 1) viewerQt->render();
+			#endif
+			#ifdef HAVE_MODULE_GDHE
+			if (dodisplay & 2) viewerGdhe->render();
+			#endif
+			
+		} else
+		{
+			(*world)->display_mutex.unlock();
+		}
 		
-		viewerQt->render();
-	} else
-	{
-		(*world)->display_mutex.unlock();
+		if (dodisplay & 1) break;
+		              else timer.wait();
 	}
 }
 
-	void demo_slam01(bool display) {
+	void demo_slam01() {
 		world_ptr_t worldPtr(new WorldAbstract());
 
 		rseed = time(NULL);
@@ -328,14 +383,25 @@ void demo_slam01_display(world_ptr_t *world) {
 
 
 		// to start with qt display
-		const int slam_priority = -20; // needs to be started as root to be < 0
-		const int display_priority = 10;
-		const int display_period = 100; // ms
-		if (display)
+		if (dodisplay & 1) // at least 2d
 		{
+			#ifdef HAVE_MODULE_QDISPLAY
 			qdisplay::QtAppStart((qdisplay::FUNC)&demo_slam01_display,display_priority,(qdisplay::FUNC)&demo_slam01_main,slam_priority,display_period,&worldPtr);
-		}
-		else
+			#else
+			std::cout << "Please install qdisplay module if you want 2D display" << std::endl;
+			#endif
+		} else
+		if (dodisplay & 2) // only 3d
+		{
+			#ifdef HAVE_MODULE_GDHE
+			kernel::setCurrentThreadPriority(display_priority);
+			boost::thread *thread_disp = new boost::thread(boost::bind(demo_slam01_display,&worldPtr));
+			kernel::setCurrentThreadPriority(slam_priority);
+			demo_slam01_main(&worldPtr);
+			#else
+			std::cout << "Please install gdhe module if you want 3D display" << std::endl;
+			#endif
+		} else // none
 		{
 			kernel::setCurrentThreadPriority(slam_priority);
 			demo_slam01_main(&worldPtr);
@@ -360,15 +426,14 @@ void demo_slam01_display(world_ptr_t *world) {
 		 */
 		int main(int argc, const char* argv[])
 		{
-			bool display = 1;
 			if (argc == 4)
 			{
-				display = atoi(argv[1]);
+				dodisplay = atoi(argv[1]);
 				mode = atoi(argv[2]);
 				dump_path = argv[3];
 			}
 			else if (argc != 0)
 			std::cout << "Usage: demo_slam <display-enabled=1> <image-mode=0> <dump-path=.>" << std::endl;
 
-			demo_slam01(display);
+			demo_slam01();
 		}

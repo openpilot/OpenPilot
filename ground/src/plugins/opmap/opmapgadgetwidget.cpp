@@ -84,9 +84,6 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_map = new mapcontrol::OPMapWidget();
 
-    //  m_map->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-    m_map->setMinimumSize(64, 64);
-
     m_map->setFrameStyle(QFrame::NoFrame);							    // no border frame
     m_map->setBackgroundBrush(Qt::black);							    // black background
 
@@ -138,13 +135,16 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_widget->labelMapPos->setText("---");
     m_widget->labelMousePos->setText("---");
 
+    m_widget->splitter->setCollapsible(1, false);
+
+    // set the size of the collapsable widgets
+    QList<int> m_SizeList;
+//    m_SizeList << m_widget->splitter->sizes();
+    m_SizeList << 0 << 0 << 0;
+    m_widget->splitter->setSizes(m_SizeList);
+
     m_widget->progressBarMap->setMaximum(1);
 
-    m_widget->frameFlightControls->setVisible(false);
-    m_widget->toolButtonFlightControlsShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/prev.png")));
-
-    m_widget->treeViewWaypoints->setVisible(false);
-    m_widget->toolButtonWaypointsTreeViewShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/next.png")));
 /*
     #if defined(Q_OS_MAC)
     #elif defined(Q_OS_WIN)
@@ -699,32 +699,6 @@ void OPMapGadgetWidget::on_toolButtonZoomM_clicked()
     zoomOut();
 }
 
-void OPMapGadgetWidget::on_toolButtonWaypointsTreeViewShowHide_clicked()
-{
-    if (m_widget)
-    {
-	m_widget->treeViewWaypoints->setVisible(!m_widget->treeViewWaypoints->isVisible());
-
-	if (m_widget->treeViewWaypoints->isVisible())
-	    m_widget->toolButtonWaypointsTreeViewShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/prev.png")));
-	else
-	    m_widget->toolButtonWaypointsTreeViewShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/next.png")));
-    }
-}
-
-void OPMapGadgetWidget::on_toolButtonFlightControlsShowHide_clicked()
-{
-    if (m_widget)
-    {
-	m_widget->frameFlightControls->setVisible(!m_widget->frameFlightControls->isVisible());
-
-	if (m_widget->frameFlightControls->isVisible())
-	    m_widget->toolButtonFlightControlsShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/next.png")));
-	else
-	    m_widget->toolButtonFlightControlsShowHide->setIcon(QIcon(QString::fromUtf8(":/core/images/prev.png")));
-    }
-}
-
 void OPMapGadgetWidget::on_toolButtonMapHome_clicked()
 {
     followUAVpositionAct->setChecked(false);
@@ -782,12 +756,6 @@ void OPMapGadgetWidget::on_toolButtonAddWaypoint_clicked()
 	m_waypoint_list.append(waypoint);
 
     m_waypoint_list_mutex.unlock();
-}
-
-void OPMapGadgetWidget::on_toolButtonWaypointEditor_clicked()
-{
-    if (wayPointEditorAct->isEnabled())
-	wayPointEditorAct->trigger();
 }
 
 void OPMapGadgetWidget::on_treeViewWaypoints_clicked(QModelIndex index)

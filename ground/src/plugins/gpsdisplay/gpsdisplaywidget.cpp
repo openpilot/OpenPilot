@@ -45,6 +45,22 @@ GpsDisplayWidget::GpsDisplayWidget(QWidget *parent) : QWidget(parent)
     widget = new Ui_GpsDisplayWidget();
     widget->setupUi(this);
 
+    QGraphicsScene *scene = new QGraphicsScene(this);
+    QSvgRenderer *renderer = new QSvgRenderer();
+    QGraphicsSvgItem *world = new QGraphicsSvgItem();
+    renderer->load(QString(":/gpsgadget/images/gpsEarth.svg"));
+    world->setSharedRenderer(renderer);
+    world->setElementId("map");
+    scene->addItem(world);
+    scene->setSceneRect(world->boundingRect());
+    widget->gpsWorld->setScene(scene);
+    // Somehow fitInView does not work there at all? Makes
+    // the 'world' element tiny tiny tiny. anyone knows why??
+    //widget->gpsWorld->fitInView(world,Qt::KeepAspectRatio);
+    qreal factor = widget->gpsWorld->size().height()/world->boundingRect().height();
+    widget->gpsWorld->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+    world->setScale(factor);
+
 }
 
 GpsDisplayWidget::~GpsDisplayWidget()

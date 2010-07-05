@@ -20,3 +20,4 @@ SOURCES += gpsdisplaygadgetoptionspage.cpp
 OTHER_FILES += GpsDisplayGadget.pluginspec
 FORMS += gpsdisplaygadgetoptionspage.ui \
     gpsdisplaywidget.ui
+RESOURCES += widgetresources.qrc

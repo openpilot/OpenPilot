@@ -65,8 +65,8 @@ namespace core {
         void setUseMemoryCache(const bool& value){useMemoryCache=value;}
         void setLanguage(const LanguageType::Types& language){Language=language;}//TODO
         LanguageType::Types GetLanguage(){return Language;}//TODO
-        AccessMode::Types GetAccessMode()const{return accessmode;};
-        void setAccessMode(const AccessMode::Types& mode){accessmode=mode;};
+        AccessMode::Types GetAccessMode()const{return accessmode;}
+        void setAccessMode(const AccessMode::Types& mode){accessmode=mode;}
         int MaxZoom;
         int RetryLoadTile;
     private:
@@ -77,7 +77,7 @@ namespace core {
         TileCacheQueue TileDBcacheQueue;
         OPMaps();
 
-        OPMaps(OPMaps const&){};
+        OPMaps(OPMaps const&){}
         OPMaps& operator=(OPMaps const&){ return *this; }
         static OPMaps* m_pInstance;
 

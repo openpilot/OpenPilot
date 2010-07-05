@@ -178,7 +178,7 @@ Point PureProjection::FromLatLngToPixel(const PointLatLng::PointLatLng &p,const 
       }
 
 
-      void PureProjection::FromGeodeticToCartesian(double Lat,double Lng,const double &Height,  double &X,  double &Y,  double &Z)
+      void PureProjection::FromGeodeticToCartesian(double Lat,double Lng,double Height,  double &X,  double &Y,  double &Z)
       {
          Lat = (PI / 180) * Lat;
          Lng = (PI / 180) * Lng;
@@ -205,4 +205,18 @@ Point PureProjection::FromLatLngToPixel(const PointLatLng::PointLatLng &p,const 
          Lat /= (PI / 180);
          Lng /= (PI / 180);
       }
+    double PureProjection::DistanceBetweenLatLng(PointLatLng const& p1,PointLatLng const& p2)
+    {
+         double R = 6371; // km
+         double lat1=p1.Lat();
+         double lat2=p2.Lat();
+         double lon1=p1.Lng();
+         double lon2=p2.Lng();
+         double dLat = (lat2-lat1)* (PI / 180);
+         double dLon = (lon2-lon1)* (PI / 180);
+         double a = sin(dLat/2) * sin(dLat/2) + cos(lat1* (PI / 180)) * cos(lat2* (PI / 180)) * sin(dLon/2) * sin(dLon/2);
+         double c = 2 * atan2(sqrt(a), sqrt(1-a));
+         double d = R * c;
+         return d;
+    }
 }

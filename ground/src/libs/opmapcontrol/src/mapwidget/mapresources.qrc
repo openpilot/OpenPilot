@@ -3,5 +3,6 @@
         <file>images/bigMarkerGreen.png</file>
         <file>images/marker.png</file>
         <file>images/compas.svg</file>
+        <file>images/airplane.svg</file>
     </qresource>
 </RCC>

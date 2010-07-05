@@ -37,8 +37,13 @@
 #include <QObject>
 #include "uavmapfollowtype.h"
 #include "uavtrailtype.h"
+#include <QtSvg/QSvgRenderer>
+#include "opmapwidget.h"
+#include "trailitem.h"
 namespace mapcontrol
 {
+    class WayPointItem;
+    class OPMapWidget;
     /**
 * @brief A QGraphicsItem representing the UAV
 *
@@ -50,10 +55,47 @@ namespace mapcontrol
         Q_INTERFACES(QGraphicsItem)
     public:
                 enum { Type = UserType + 2 };
+        UAVItem(MapGraphicItem* map,OPMapWidget* parent);
+        ~UAVItem();
+        void SetUAVPos(internals::PointLatLng const& position,int const& altitude);
+        void SetUAVHeading(qreal const& value);
+        internals::PointLatLng UAVPos()const{return coord;}
+        void SetMapFollowType(UAVMapFollowType::Types const& value){mapfollowtype=value;}
+        void SetTrailType(UAVTrailType::Types const& value);
+        UAVMapFollowType::Types GetMapFollowType()const{return mapfollowtype;}
+        UAVTrailType::Types GetTrailType()const{return trailtype;}
 
+        void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+                    QWidget *widget);
+        void RefreshPos();
+        QRectF boundingRect() const;
+        void SetTrailTime(int const& seconds){trailtime=seconds;}
+        int TrailTime()const{return trailtime;}
+        void SetTrailDistance(int const& distance){traildistance=distance;}
+        int TrailDistance()const{return traildistance;}
+        bool ShowTrail()const{return showtrail;}
+        void SetShowTrail(bool const& value);
+        void DeleteTrail()const;
+
+        int type() const;
     private:
+        MapGraphicItem* map;
+
+        int altitude;
+        UAVMapFollowType::Types mapfollowtype;
+        UAVTrailType::Types trailtype;
+        internals::PointLatLng coord;
+        internals::PointLatLng lastcoord;
+        QPixmap pic;
+        core::Point localposition;
+        OPMapWidget* mapwidget;
+        QGraphicsItemGroup* trail;
+        QTime timer;
+        bool showtrail;
         int trailtime;
         int traildistance;
+      //  QRectF rect;
+
     public slots:
 
     signals:

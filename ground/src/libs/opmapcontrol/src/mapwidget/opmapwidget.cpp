@@ -30,16 +30,19 @@
 #include <QtGui>
 #include <QMetaObject>
 #include "waypointitem.h"
+
 namespace mapcontrol
 {
 
-    OPMapWidget::OPMapWidget(QWidget *parent, Configuration *config):QGraphicsView(parent),configuration(config),followmouse(true),compass(0)
+    OPMapWidget::OPMapWidget(QWidget *parent, Configuration *config):QGraphicsView(parent),configuration(config),UAV(0),followmouse(true),compass(0),showuav(false)
     {
         setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         core=new internals::Core;
         map=new MapGraphicItem(core,config);
         mscene.addItem(map);
         this->setScene(&mscene);
+
+//        uav->setPos(30,30);
         this->adjustSize();
         connect(&mscene,SIGNAL(sceneRectChanged(QRectF)),map,SLOT(resize(QRectF)));
         connect(map,SIGNAL(zoomChanged(double)),this,SIGNAL(zoomChanged(double)));
@@ -53,6 +56,25 @@ namespace mapcontrol
         connect(map->core,SIGNAL(OnTilesStillToLoad(int)),this,SIGNAL(OnTilesStillToLoad(int)));
         this->setMouseTracking(followmouse);
         SetShowCompass(true);
+
+    }
+
+    void OPMapWidget::SetShowUAV(const bool &value)
+    {
+        if(value && UAV==0)
+        {
+            UAV=new UAVItem(map,this);
+            UAV->setParentItem(map);
+        }
+        else if(!value)
+        {
+            if(UAV!=0)
+            {
+                delete UAV;
+                UAV=0;
+            }
+
+        }
     }
 
     void OPMapWidget::resizeEvent(QResizeEvent *event)
@@ -76,6 +98,7 @@ namespace mapcontrol
     }
     OPMapWidget::~OPMapWidget()
     {
+        delete UAV;
         delete map;
         delete core;
         delete configuration;

@@ -78,8 +78,9 @@ public:
     {
         return (R2D * rad);
     }
-    void FromGeodeticToCartesian(double Lat,double Lng,const double &Height,  double &X,  double &Y,  double &Z);
+    void FromGeodeticToCartesian(double Lat,double Lng,double Height,  double &X,  double &Y,  double &Z);
     void FromCartesianTGeodetic(const double &X,const double &Y,const double &Z,  double &Lat,  double &Lng);
+    static double DistanceBetweenLatLng(PointLatLng const& p1,PointLatLng const& p2);
 
 protected:
    

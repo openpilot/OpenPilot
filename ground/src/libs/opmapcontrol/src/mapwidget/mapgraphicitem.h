@@ -40,6 +40,7 @@
 #include <QFont>
 #include <QObject>
 #include "waypointitem.h"
+//#include "uavitem.h"
 namespace mapcontrol
 {
     class OPMapWidget;

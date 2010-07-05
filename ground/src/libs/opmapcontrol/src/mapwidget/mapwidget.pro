@@ -8,7 +8,8 @@ SOURCES += mapgraphicitem.cpp \
     opmapwidget.cpp \
     configuration.cpp \
     waypointitem.cpp \
-    uavitem.cpp
+    uavitem.cpp \
+    trailitem.cpp
 LIBS += -L../build \
     -lcore \
     -linternals \
@@ -19,7 +20,8 @@ HEADERS += mapgraphicitem.h \
     waypointitem.h \
     uavitem.h \
     uavmapfollowtype.h \
-    uavtrailtype.h
+    uavtrailtype.h \
+    trailitem.h
 QT += opengl
 QT += network
 QT += sql

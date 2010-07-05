@@ -37,8 +37,10 @@
 #include <QtOpenGL/QGLWidget>
 #include "waypointitem.h"
 #include "QtSvg/QGraphicsSvgItem"
+#include "uavitem.h"
 namespace mapcontrol
 {
+    class UAVItem;
     /**
     * @brief Collection of static functions to help dealing with various enums used
     *       Contains functions for enumToString conversio, StringToEnum, QStringList of enum values...
@@ -113,6 +115,31 @@ namespace mapcontrol
         * @brief Returns QStringList with string representing all the enum values
         */
         static QStringList AccessModeTypes(){return core::AccessMode::TypesList();}
+
+       /**
+        * @brief Converts from String to Type
+        */
+        static UAVMapFollowType::Types UAVMapFollowFromString(QString const& value){return UAVMapFollowType::TypeByStr(value);}
+        /**
+        * @brief Converts from Type to String
+        */
+        static QString StrFromUAVMapFollow(UAVMapFollowType::Types const& value){return UAVMapFollowType::StrByType(value);}
+        /**
+        * @brief Returns QStringList with string representing all the enum values
+        */
+        static QStringList UAVMapFollowTypes(){return UAVMapFollowType::TypesList();}
+        /**
+         * @brief Converts from String to Type
+         */
+         static UAVTrailType::Types UAVTrailTypeFromString(QString const& value){return UAVTrailType::TypeByStr(value);}
+         /**
+         * @brief Converts from Type to String
+         */
+         static QString StrFromUAVTrailType(UAVTrailType::Types const& value){return UAVTrailType::StrByType(value);}
+         /**
+         * @brief Returns QStringList with string representing all the enum values
+         */
+         static QStringList UAVTrailTypes(){return UAVTrailType::TypesList();}
     };
 
     class OPMapWidget:public QGraphicsView
@@ -304,7 +331,10 @@ namespace mapcontrol
 
         void SetShowCompass(bool const& value);
 
-        QImage X(){return map->lastimage;}
+        UAVItem* UAV;
+
+        void SetShowUAV(bool const& value);
+        bool ShowUAV()const{return showuav;}
 
     private:
         internals::Core *core;
@@ -318,6 +348,7 @@ namespace mapcontrol
         bool followmouse;
         void ConnectWP(WayPointItem* item);
         QGraphicsSvgItem *compass;
+        bool showuav;
      //   WayPointItem* item;//apagar
     protected:
         void resizeEvent(QResizeEvent *event);

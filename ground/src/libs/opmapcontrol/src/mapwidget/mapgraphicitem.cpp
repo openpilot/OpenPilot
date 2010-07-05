@@ -25,7 +25,9 @@
 * with this program; if not, write to the Free Software Foundation, Inc.,
 * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
+#include "uavitem.h"
 #include "mapgraphicitem.h"
+
 namespace mapcontrol
 {
     MapGraphicItem::MapGraphicItem(internals::Core *core, Configuration *configuration):core(core),config(configuration),MapRenderTransform(1), maxZoom(17),minZoom(2),zoomReal(0),isSelected(false),rotation(0)
@@ -78,6 +80,10 @@ namespace mapcontrol
             WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);
             if(w)
                 w->RefreshPos();
+            UAVItem* ww=qgraphicsitem_cast<UAVItem*>(i);
+            if(ww)
+                ww->RefreshPos();
+
         }
     }
     void MapGraphicItem::ConstructLastImage(int const& zoomdiff)

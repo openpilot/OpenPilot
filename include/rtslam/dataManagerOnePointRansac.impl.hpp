@@ -42,7 +42,6 @@ namespace jafar {
 					observation_ptr_t obsBasePtr;
 					getOneMatchedBaseObs(obsBasePtr, rawData);
 
-
 					{// 1b. base obs is now matched
 
 						ransac_set_ptr_t ransacSetPtr(new RansacSet);

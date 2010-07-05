@@ -72,7 +72,6 @@ const int display_period = 100; // ms
 
 
 void demo_slam01_main(world_ptr_t *world) {
-	std::cout << rand() << "," << rand() << "," << rand() << "," << rand() << "," << rand() << std::endl;
 	// time
 	const unsigned N_FRAMES = 500000;
 
@@ -379,7 +378,7 @@ void demo_slam01_display(world_ptr_t *world) {
 			f.close();
 		}
 		std::cout << __FILE__ << ":" << __LINE__ << " rseed " << rseed << std::endl;
-		srand(rseed); // FIXME does not work in multithread...
+		rtslam::srand(rseed); // FIXME does not work in multithread...
 
 
 		// to start with qt display

@@ -37,6 +37,9 @@ namespace jafar {
 
 	namespace rtslam {
 
+		static unsigned int rand_state;
+		inline void srand(unsigned int seed) { rand_state = seed; }
+		inline int rand() { return rand_r(&rand_state); }
 
 		// forward declarations
 		class WorldAbstract;

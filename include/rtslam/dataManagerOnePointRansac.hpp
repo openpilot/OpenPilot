@@ -11,19 +11,29 @@
 
 #include <vector>
 #include <list>
+#include "boost/shared_ptr.hpp"
 
 #include "rtslam/dataManagerAbstract.hpp"
 #include "rtslam/activeSearch.hpp"
-#include "rtslam/rtSlam.hpp"
-#include "rtslam/parents.hpp"
-#include "boost/shared_ptr.hpp"
 
 namespace jafar {
 	namespace rtslam {
 
+		typedef std::vector<observation_ptr_t> ObsList;
+		struct RansacSet {
+				observation_ptr_t obsBasePtr;
+				ObsList inlierObs;
+				ObsList pendingObs;
+				size_t size() {
+					return inlierObs.size();
+				}
+		};
+		typedef boost::shared_ptr<RansacSet> ransac_set_ptr_t;
+		typedef std::list<ransac_set_ptr_t> RansacSetList;
+
+
 		template<class RawSpec, class SensorSpec, class Detector, class Matcher>
-		class DataManagerOnePointRansac: public DataManagerAbstract,
-		    public SpecificChildOf<SensorSpec> {
+		class DataManagerOnePointRansac: public DataManagerAbstract, public SpecificChildOf<SensorSpec> {
 
 			public:
 				// Define the function linkToParentSensorSpec.
@@ -34,33 +44,23 @@ namespace jafar {
 			ENABLE_ACCESS_TO_SPECIFIC_PARENT(SensorSpec,sensorSpec)
 				;
 
-			public:
-			DataManagerOnePointRansac();
+			public: // public interface
+				DataManagerOnePointRansac();
 				virtual ~DataManagerOnePointRansac() {
 				}
-				void process(boost::shared_ptr<RawAbstract> data) ;
+				void process(boost::shared_ptr<RawAbstract> data);
 
-			protected:
+			protected: // main data members
 				boost::shared_ptr<Detector> detector;
 				boost::shared_ptr<Matcher> matcher;
 				boost::shared_ptr<ActiveSearchGrid> asGrid;
 				// the list of visible observations to handle
-				typedef std::list<observation_ptr_t> ObservationVisibleList;
-				ObservationVisibleList obsVisibleList;
-				struct RansacSet {
-						observation_ptr_t obsBasePtr;
-						std::list<observation_ptr_t> inlierObs;
-						std::list<observation_ptr_t> pendingObs;
-						size_t size(){return inlierObs.size();}
-				};
-				typedef std::list<RansacSet> RansacSetList;
-//				RansacSetList::iterator ransacIter;
+				ObsList obsVisibleList;
+				ObsList obsBaseList;
+				ObsList obsFailedList;
 				RansacSetList ransacSetList;
 
-			protected:
-				jblas::veci tries;
-
-			protected:
+			protected: // parameters
 				struct detector_params_t {
 						int patchSize; ///<       descriptor patch size
 						double measStd; ///<       measurement noise std deviation
@@ -79,9 +79,9 @@ namespace jafar {
 						int n_updates; ///<        maximum number of updates
 						int n_tries; ///<          number of RANSAC consensus tries
 				} algorithmParams_;
-			public:
-				void setDetector(const boost::shared_ptr<Detector> & _detector,
-				    int patchSize, double _measStd) {
+
+			public: // getters ans setters
+				void setDetector(const boost::shared_ptr<Detector> & _detector, int patchSize, double _measStd) {
 					detector = _detector;
 					detectorParams_.patchSize = patchSize;
 					detectorParams_.measStd = _measStd;
@@ -90,9 +90,8 @@ namespace jafar {
 				detector_params_t detectorParams() {
 					return detectorParams_;
 				}
-				void setMatcher(boost::shared_ptr<Matcher> & _matcher, int patchSize,
-				    double nPix, double nSigma, double threshold, double mahalanobisTh,
-				    double _measStd) {
+				void setMatcher(boost::shared_ptr<Matcher> & _matcher, int patchSize, double nPix, double nSigma,
+				                double threshold, double mahalanobisTh, double _measStd) {
 					matcher = _matcher;
 					matcherParams_.patchSize = patchSize;
 					matcherParams_.regionPix = nPix;
@@ -119,9 +118,20 @@ namespace jafar {
 					return algorithmParams_;
 				}
 
-			protected:
+			protected: // particular processing
 				void processKnownObs(boost::shared_ptr<RawSpec> rawData);
 				void detectNewObs(boost::shared_ptr<RawSpec> rawData);
+
+			protected: // helper functions
+				void projectAndCollectVisibleObs();
+				void getOneMatchedBaseObs(observation_ptr_t & obsBasePtr, boost::shared_ptr<RawSpec> rawData);
+				observation_ptr_t selectOneRandomObs();
+				vec updateMean(const observation_ptr_t & obsPtr);
+				void projectFromMean( observation_ptr_t & obsPtr, const vec & x);
+				bool isLowInnovationInlier(const observation_ptr_t & obsPtr, double lowInnTh);
+				bool isExpectedInnovationInlier( observation_ptr_t & obsPtr, double highInnTh);
+				bool matchWithLowInnovation(const observation_ptr_t obsPtr, double lowInnTh); // TODO
+				bool matchWithExpectedInnovation(boost::shared_ptr<RawSpec> rawData,  observation_ptr_t obsPtr);
 
 		};
 

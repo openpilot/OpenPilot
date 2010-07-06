@@ -315,26 +315,10 @@ void demo_slam01_display(world_ptr_t *world) {
 		{
 			prev_t = (*world)->t;
 			#ifdef HAVE_MODULE_QDISPLAY
-			display::ViewerQt *viewerQt = NULL;
-			if (dodisplay & 1)
-			{
-				viewerQt = PTR_CAST<display::ViewerQt*> ((*world)->getDisplayViewer(display::ViewerQt::id()));
-				if (viewerQt == NULL) {
-					viewerQt = new display::ViewerQt(8, 3.0, false, "/mnt/ram/rtslam");
-					(*world)->addDisplayViewer(viewerQt, display::ViewerQt::id());
-				}
-			}
+			display::ViewerQt *viewerQt = PTR_CAST<display::ViewerQt*> ((*world)->getDisplayViewer(display::ViewerQt::id()));
 			#endif
 			#ifdef HAVE_MODULE_GDHE
-			display::ViewerGdhe *viewerGdhe = NULL;
-			if (dodisplay & 2)
-			{
-				viewerGdhe = PTR_CAST<display::ViewerGdhe*> ((*world)->getDisplayViewer(display::ViewerGdhe::id()));
-				if (viewerGdhe == NULL) {
-					viewerGdhe = new display::ViewerGdhe("camera", 3.0, "localhost");
-					(*world)->addDisplayViewer(viewerGdhe, display::ViewerGdhe::id());
-				}
-			}
+			display::ViewerGdhe *viewerGdhe = PTR_CAST<display::ViewerGdhe*> ((*world)->getDisplayViewer(display::ViewerGdhe::id()));
 			#endif
 			
 			#ifdef HAVE_MODULE_QDISPLAY
@@ -380,6 +364,20 @@ void demo_slam01_display(world_ptr_t *world) {
 		std::cout << __FILE__ << ":" << __LINE__ << " rseed " << rseed << std::endl;
 		rtslam::srand(rseed); // FIXME does not work in multithread...
 
+		#ifdef HAVE_MODULE_QDISPLAY
+		if (dodisplay & 1)
+		{
+			display::ViewerQt *viewerQt = new display::ViewerQt(8, 3.0, false, "/mnt/ram/rtslam");
+			worldPtr->addDisplayViewer(viewerQt, display::ViewerQt::id());
+		}
+		#endif
+		#ifdef HAVE_MODULE_GDHE
+		if (dodisplay & 2)
+		{
+			display::ViewerGdhe *viewerGdhe = new display::ViewerGdhe("camera", 3.0, "localhost");
+			worldPtr->addDisplayViewer(viewerGdhe, display::ViewerGdhe::id());
+		}
+		#endif
 
 		// to start with qt display
 		if (dodisplay & 1) // at least 2d

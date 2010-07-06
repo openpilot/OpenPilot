@@ -27,7 +27,7 @@ namespace display {
 	MapGdhe::MapGdhe(ViewerAbstract *_viewer, rtslam::MapAbstract *_slamMap, WorldGdhe *_dispWorld):
 		MapDisplay(_viewer, _slamMap, _dispWorld), viewerGdhe(PTR_CAST<ViewerGdhe*>(_viewer)), frame(1)
 	{
-		frame.setColor(128,128,128);
+		frame.setColor(216,216,216);
 		viewerGdhe->client.addObject(&frame, true);
 	}
 		

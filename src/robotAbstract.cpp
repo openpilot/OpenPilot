@@ -75,24 +75,6 @@ namespace jafar {
 		}
 
 
-				void RobotAbstract::move() {
-					vec x = state.x();
-					vec n = perturbation.x();
-					vec xnew(x.size());
-
-					move_func(x, control, n, dt_or_dx, xnew, XNEW_x, XNEW_pert);
-					state.x() = xnew;
-
-					if (mapPtr()->filterPtr){
-
-						if (!constantPerturbation)
-							computeStatePerturbation();
-
-						mapPtr()->filterPtr->predict(mapPtr()->ia_used_states(), XNEW_x, state.ia(), Q); // P = F*P*F' + Q
-					}
-				}
-
-
 		void RobotAbstract::computeStatePerturbation() {
 			Q = jmath::ublasExtra::prod_JPJt(perturbation.P(), XNEW_pert);
 		}

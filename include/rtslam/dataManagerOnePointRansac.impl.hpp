@@ -81,11 +81,14 @@ namespace jafar {
 									obsCurrentPtr->events.matched = true;
 								}
 
-							}if(1/* inside ROI */)
+							}
+
+							if(1/* is inside low-innovation region */)
 							{
+								// declare inlier
 							}
 							else{
-								// ransacSetList(i).pendingObs.add(obs)
+								// ransacSetList(i).pendingObs.push_back(obsCurrentPtr)
 
 							} // if match
 
@@ -94,6 +97,21 @@ namespace jafar {
 					} // base obs is matched
 
 				} // for i = 0:n_tries
+
+				{
+					// 1. select ransacSet.inliers.size() max
+					// 2. for each obs in inliers
+					// 2a. add obs to buffer for EKF update
+					// 3. perform buffered update
+					// 4. for each obs in pending: retake algorithm from active search. Briefly:
+					// 4a. project()
+					// 4b. sort ellipses sizes <--- predictInfoGain()
+					// for each obs in descending ellipse size
+					// 4c. try to match
+					// 4d. if matched
+					// 4di. check compatibility <--- obsPtr->compatibilityTest(matcherParams_.mahalanobisTh)
+					// 4dii. if compatible make EKF update
+				}
 
 				// clear all sets to liberate shared pointers
 				ransacSetList.clear();

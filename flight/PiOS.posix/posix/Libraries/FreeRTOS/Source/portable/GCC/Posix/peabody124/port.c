@@ -104,6 +104,7 @@ static pthread_t hMainThread = ( pthread_t )NULL;
 /*-----------------------------------------------------------*/
 
 static volatile portBASE_TYPE xSentinel = 0;
+static volatile portBASE_TYPE xHandover = 0;
 static volatile portBASE_TYPE xSchedulerEnd = pdFALSE;
 static volatile portBASE_TYPE xInterruptsEnabled = pdTRUE;
 static volatile portBASE_TYPE xInterruptsCurrent = pdTRUE;
@@ -154,28 +155,29 @@ void vPortSystemTickHandler( int sig );
 	):0 ):0 )
 
 	#define debug_error debug_printf
+
+	int real_pthread_mutex_lock(pthread_mutex_t* mutex) {
+		return pthread_mutex_lock(mutex);
+	}
+	int real_pthread_mutex_unlock(pthread_mutex_t* mutex) {
+		return pthread_mutex_unlock(mutex);
+	}
+	#define pthread_mutex_lock(...) ( (debug_printf(" -!- pthread_mutex_lock(%s)\n",#__VA_ARGS__)|1)?pthread_mutex_lock(__VA_ARGS__):0 )
+	#define pthread_mutex_unlock(...) ( (debug_printf(" -=- pthread_mutex_unlock(%s)\n",#__VA_ARGS__)|1)?pthread_mutex_unlock(__VA_ARGS__):0 )
+	#define pthread_kill(thread,signal) ( (debug_printf("Sending signal %i to thread %li!\n",(int)signal,(long)thread)|1)?pthread_kill(thread,signal):0 )
 #else
-	#define debug_error(...) ( (real_pthread_mutex_lock( &xPrintfMutex )|1)?( \
+	#define debug_error(...) ( (pthread_mutex_lock( &xPrintfMutex )|1)?( \
 	(  \
 	(NULL != (debug_task_handle = prvGetTaskHandle(pthread_self())) )? \
 	(fprintf( stderr, "%20s(%li)\t%20s\t%i: ",debug_task_handle->pcTaskName,(long)pthread_self(),__func__,__LINE__)): \
 	(fprintf( stderr, "%20s(%li)\t%20s\t%i: ","__unknown__",(long)pthread_self(),__func__,__LINE__)) \
 	|1)?( \
-	((fprintf( stderr, __VA_ARGS__ )|1)?real_pthread_mutex_unlock( &xPrintfMutex ):0) \
+	((fprintf( stderr, __VA_ARGS__ )|1)?pthread_mutex_unlock( &xPrintfMutex ):0) \
 	):0 ):0 )
 
 	#define debug_printf(...) 
 #endif
 
-int real_pthread_mutex_lock(pthread_mutex_t* mutex) {
-	return 0; //pthread_mutex_lock(mutex);
-}
-int real_pthread_mutex_unlock(pthread_mutex_t* mutex) {
-	return 0; //pthread_mutex_unlock(mutex);
-}
-//#define pthread_mutex_lock(...) ( (debug_printf(" -!- pthread_mutex_lock(%s)\n",#__VA_ARGS__)|1)?pthread_mutex_lock(__VA_ARGS__):0 )
-//#define pthread_mutex_unlock(...) ( (debug_printf(" -=- pthread_mutex_unlock(%s)\n",#__VA_ARGS__)|1)?pthread_mutex_unlock(__VA_ARGS__):0 )
-//#define pthread_kill(thread,signal) ( (debug_printf("Sending signal %i to thread %li!\n",(int)signal,(long)thread)|1)?pthread_kill(thread,signal):0 )
 
 
 
@@ -678,30 +680,29 @@ pdTASK_CODE pvCode = pxParams->pxCode;
 void * pParams = pxParams->pvParams;
 	vPortFree( pvParams );
 
-	DB_P("prvWaitForStart\r\n");
-
 	pthread_cleanup_push( prvDeleteThread, (void *)pthread_self() );
 
-		int sig;
+	int sig;
 		
-		xSentinel = 1; // tell creating block to resume
+	xSentinel = 1; // tell creating block to resume
 		
-		// want to block both resume events and timer handler for most threads
-		sigset_t xSignals;
-		sigaddset( &xSignals, SIG_RESUME );
-		sigaddset( &xSignals, SIG_TICK );
-		pthread_sigmask( SIG_BLOCK, &xSignals, NULL );
+	// want to block both resume events and timer handler for most threads
+	sigset_t xSignals;
+	sigemptyset( &xSignals );
+	sigaddset( &xSignals, SIG_RESUME );
+	sigaddset( &xSignals, SIG_TICK );
+	assert( pthread_sigmask( SIG_BLOCK, &xSignals, NULL ) == 0);
 		
-		// wait for resume signal
-		debug_printf("Pausing newly created thread for SIG_RESUME\r\n");		
-		sigdelset( &xSignals, SIG_TICK );
-		sigwait( &xSignals, &sig );
+	// wait for resume signal
+	debug_printf("Pausing newly created thread for SIG_RESUME\r\n");		
+	sigdelset( &xSignals, SIG_TICK );
+	assert( sigwait( &xSignals, &sig ) == 0 );
 		
-		// no longer want to block any signals
-		sigemptyset( &xSignals );
-		pthread_sigmask( SIG_SETMASK, &xSignals, NULL );
-		debug_printf("Starting first run\r\n");
-		//prvSuspendThread( pthread_self() );
+	xHandover = 1;
+	// no longer want to block any signals
+	sigemptyset( &xSignals );
+	assert( pthread_sigmask( SIG_SETMASK, &xSignals, NULL ) == 0);
+	debug_printf("Starting first run\r\n");
 
 	if ( 0 != pthread_mutex_lock( &xSingleThreadMutex ) ) 
 	{
@@ -734,34 +735,24 @@ int shouldResume = 0;
 	sigemptyset( &xWaitSignals );
 	sigaddset( &xWaitSignals, SIG_RESUME );
 
-	if ( pthread_self() == prvGetThreadHandle(xTaskGetCurrentTaskHandle() ) ) 
-	{
-		debug_printf ("The task about to suspend is meant to be running.  Exiting handler\r\n");
-		while(1);
-		return;
-	}							  
+	assert( pthread_self() != prvGetThreadHandle(xTaskGetCurrentTaskHandle() ) ); 
 	
 	/* Wait on the resume signal. Make sure don't wake for timer though */ 
-	pthread_sigmask( SIG_BLOCK, &xBlockSignals, NULL );
+	assert( pthread_sigmask( SIG_BLOCK, &xBlockSignals, NULL ) == 0);
 
 	xSentinel = 1;
-	pthread_kill( prvGetThreadHandle( xTaskGetCurrentTaskHandle() ), SIG_RESUME );	
+	xHandover = 0;
+	assert( pthread_kill( prvGetThreadHandle( xTaskGetCurrentTaskHandle() ), SIG_RESUME ) == 0);	
 	
+	while( !xHandover );
+
 	/* Unlock the Single thread mutex to allow the resumed task to continue. */
-	if ( 0 != pthread_mutex_unlock( &xSingleThreadMutex ) )
-	{
-		debug_error( "Releasing someone else's lock.  Reflects a bad state.  Ignoring now\n" );
-		kill( getpid(), SIGKILL );
-	}
+	assert ( 0 == pthread_mutex_unlock( &xSingleThreadMutex ) );
 	
 	while( !shouldResume  ) 
 	{
 		debug_printf( "Blocking for signal %i\r\n", SIG_RESUME );
-
-		if ( 0 != sigwait( &xWaitSignals, &sig ) )
-		{
-			debug_error( "Error on sigwait\r\n" );
-		}	
+		assert( sigwait( &xWaitSignals, &sig ) == 0 );
 		debug_printf("Sigwait received %i\r\n", sig );
 		
 		if( pthread_self() != prvGetThreadHandle( xTaskGetCurrentTaskHandle() ) ) {	
@@ -780,12 +771,9 @@ int shouldResume = 0;
 		}
 	}
 	
-	if ( 0 != pthread_mutex_lock( &xSingleThreadMutex ) )
-	{
-		debug_printf( "Could not get SingleThreadMutex\r\n" );
-		kill( getpid(), SIGKILL );
-	}
-	
+	xHandover = 1;
+
+	assert( 0 == pthread_mutex_lock( &xSingleThreadMutex ) );
 
 	/* Unblock tick so event can be preempted.  Unblock resume so false resumes cause a crash and are debugged */
 	sigemptyset( &xBlockSignals );
@@ -810,36 +798,19 @@ int shouldResume = 0;
 
 void prvSuspendThread( pthread_t xThreadId )
 {
-portBASE_TYPE xResult = pthread_mutex_lock( &xSuspendResumeThreadMutex );
+	debug_printf( "Suspending %li\r\n", (long int) xThreadId);
+	/* Set-up for the Suspend Signal handler? */
+	xSentinel = 0;
+	
+	debug_printf( "About to kill %li\r\n", (long int) xThreadId );
+	assert( pthread_kill( xThreadId, SIG_SUSPEND ) == 0);
+	debug_printf( "Killed %li\r\n", (long int) xThreadId );
 
-	DB_P("prvSuspendThread\r\n");
-
-	if ( 0 == xResult )
+	while ( ( xSentinel == 0 ) && ( pdTRUE != xServicingTick ) )
 	{
-		debug_printf( "Suspending %li\r\n", (long int) xThreadId);
-		/* Set-up for the Suspend Signal handler? */
-		xSentinel = 0;
-		xResult = pthread_mutex_unlock( &xSuspendResumeThreadMutex );
-		if ( xResult ) {
-			debug_printf( "Could not unlock xSuspendResumeThreadMutex %li\r\n", xResult );
-		}
-		debug_printf( "About to kill %li\r\n", (long int) xThreadId );
-		xResult = pthread_kill( xThreadId, SIG_SUSPEND );
-		debug_printf( "Killed %li\r\n", (long int) xThreadId );
-		if ( xResult ) {
-			debug_printf( "prvSuspendThread: error sending suspend signal %li\r\n", xResult );
-		}
-
-		while ( ( xSentinel == 0 ) && ( pdTRUE != xServicingTick ) )
-		{
-			debug_printf( "sched_yield()\r\n" );
-			sched_yield();
-		} 
-	}
-	else {
-		printf("Error getting lock to suspend thread\r\n");
-	}
-
+		debug_printf( "sched_yield()\r\n" );
+		sched_yield();
+	} 
 }
 /*-----------------------------------------------------------*/
 

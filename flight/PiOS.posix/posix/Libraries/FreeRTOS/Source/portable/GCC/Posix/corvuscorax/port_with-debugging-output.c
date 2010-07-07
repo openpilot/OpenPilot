@@ -642,12 +642,14 @@ struct timespec timeout;
 				/* Suspend the current task. */
 				hRequestedThread = 0;	
 				prvSuspendThread( xTaskToSuspend );
-				timeout.tv_sec=0;
-				timeout.tv_nsec=10000;
-				while ( 0 != pthread_mutex_timedlock( &xRunningThreadMutex,&timeout ) ) {
+				//timeout.tv_sec=0;
+				//timeout.tv_nsec=10000;
+				sched_yield();
+				while ( 0 != pthread_mutex_trylock( &xRunningThreadMutex) ) {
 					prvSuspendThread( xTaskToSuspend );
 					timeout.tv_sec=0;
-					timeout.tv_nsec=10000;
+					timeout.tv_nsec=1;
+					nanosleep(&timeout,0);
 				}
 				//if ( 0 == pthread_mutex_lock( &xRunningThreadMutex) ) {
 				/* Remember and switch the critical nesting. */
@@ -801,11 +803,12 @@ sigset_t xSignals;
 	while (hRequestedThread != pthread_self()) {
 		if ( 0 != sigwait( &xSignals, &sig ) )
 		{
-			printf( "SSH: Sw %d\n", sig );
+			//printf( "SSH: Sw %d\n", sig );
 			/* tricky one - shouldn't ever happen - trying to resolve situation as graceful as possible */
 			debug_printf("ALERT AAAAH PANIC! - sigwait failed.....\n\n\n");
 			/* Signal main thread something just went HORRIBLY wrong */
 			xGeneralFuckedUpIndicator = 2;
+			sched_yield();
 			//(void)pthread_mutex_lock( &xRunningThreadMutex );
 			//(void)pthread_kill( pthread_self(), SIG_SUSPEND );
 			//return;
@@ -1070,12 +1073,14 @@ pthread_t xTaskToResume;
 	printf("\nsending sig_suspend to thread that is supposed to be dead...\n");
 	prvSuspendThread(hActiveThread);
 	printf("\nacquire running lock...\n");
-	timeout.tv_sec=0;
-	timeout.tv_nsec=10000;
-	while ( 0 != pthread_mutex_timedlock( &xRunningThreadMutex,&timeout ) ) {
+	//timeout.tv_sec=0;
+	//timeout.tv_nsec=100;
+	sched_yield();
+	while ( 0 != pthread_mutex_trylock( &xRunningThreadMutex) ) {
 		prvSuspendThread(hActiveThread);
 		timeout.tv_sec=0;
-		timeout.tv_nsec=10000;
+		timeout.tv_nsec=1;
+		nanosleep(&timeout,NULL);
 	}
 	printf("\nsending sig_resume to thread that is supposed to be running...\n");
 	prvResumeThread(xTaskToResume);

@@ -1,0 +1,1072 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXFileReference section */
+		65A2C6FB11E2A33C00D0391E /* 1 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = 1; path = ../../OpenPilot.posix/1; sourceTree = SOURCE_ROOT; };
+		65A2C6FC11E2A33C00D0391E /* 3B09C28C.obj */ = {isa = PBXFileReference; lastKnownFileType = file; name = 3B09C28C.obj; path = ../../OpenPilot.posix/3B09C28C.obj; sourceTree = SOURCE_ROOT; };
+		65A2C6FE11E2A33C00D0391E /* actuatorcommand.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = actuatorcommand.o; path = ../../OpenPilot.posix/Build/actuatorcommand.o; sourceTree = SOURCE_ROOT; };
+		65A2C6FF11E2A33C00D0391E /* actuatordesired.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = actuatordesired.o; path = ../../OpenPilot.posix/Build/actuatordesired.o; sourceTree = SOURCE_ROOT; };
+		65A2C70011E2A33C00D0391E /* actuatorsettings.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = actuatorsettings.o; path = ../../OpenPilot.posix/Build/actuatorsettings.o; sourceTree = SOURCE_ROOT; };
+		65A2C70111E2A33C00D0391E /* ahrsstatus.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = ahrsstatus.o; path = ../../OpenPilot.posix/Build/ahrsstatus.o; sourceTree = SOURCE_ROOT; };
+		65A2C70211E2A33C00D0391E /* alarms.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = alarms.o; path = ../../OpenPilot.posix/Build/alarms.o; sourceTree = SOURCE_ROOT; };
+		65A2C70311E2A33C00D0391E /* altitudeactual.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = altitudeactual.o; path = ../../OpenPilot.posix/Build/altitudeactual.o; sourceTree = SOURCE_ROOT; };
+		65A2C70411E2A33C00D0391E /* attitudeactual.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = attitudeactual.o; path = ../../OpenPilot.posix/Build/attitudeactual.o; sourceTree = SOURCE_ROOT; };
+		65A2C70511E2A33C00D0391E /* attitudedesired.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = attitudedesired.o; path = ../../OpenPilot.posix/Build/attitudedesired.o; sourceTree = SOURCE_ROOT; };
+		65A2C70611E2A33C00D0391E /* attitudesettings.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = attitudesettings.o; path = ../../OpenPilot.posix/Build/attitudesettings.o; sourceTree = SOURCE_ROOT; };
+		65A2C70811E2A33C00D0391E /* actuatorcommand.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = actuatorcommand.o.d; path = ../../OpenPilot.posix/Build/dep/actuatorcommand.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C70911E2A33C00D0391E /* actuatordesired.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = actuatordesired.o.d; path = ../../OpenPilot.posix/Build/dep/actuatordesired.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C70A11E2A33C00D0391E /* actuatorsettings.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = actuatorsettings.o.d; path = ../../OpenPilot.posix/Build/dep/actuatorsettings.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C70B11E2A33C00D0391E /* ahrsstatus.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = ahrsstatus.o.d; path = ../../OpenPilot.posix/Build/dep/ahrsstatus.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C70C11E2A33C00D0391E /* alarms.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = alarms.o.d; path = ../../OpenPilot.posix/Build/dep/alarms.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C70D11E2A33C00D0391E /* altitudeactual.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = altitudeactual.o.d; path = ../../OpenPilot.posix/Build/dep/altitudeactual.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C70E11E2A33C00D0391E /* attitudeactual.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = attitudeactual.o.d; path = ../../OpenPilot.posix/Build/dep/attitudeactual.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C70F11E2A33C00D0391E /* attitudedesired.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = attitudedesired.o.d; path = ../../OpenPilot.posix/Build/dep/attitudedesired.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C71011E2A33C00D0391E /* attitudesettings.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = attitudesettings.o.d; path = ../../OpenPilot.posix/Build/dep/attitudesettings.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C71111E2A33C00D0391E /* eventdispatcher.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = eventdispatcher.o.d; path = ../../OpenPilot.posix/Build/dep/eventdispatcher.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C71211E2A33C00D0391E /* exampleobject1.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = exampleobject1.o.d; path = ../../OpenPilot.posix/Build/dep/exampleobject1.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C71311E2A33C00D0391E /* exampleobject2.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = exampleobject2.o.d; path = ../../OpenPilot.posix/Build/dep/exampleobject2.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C71411E2A33C00D0391E /* examplesettings.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = examplesettings.o.d; path = ../../OpenPilot.posix/Build/dep/examplesettings.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C71511E2A33C00D0391E /* flightbatterystate.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = flightbatterystate.o.d; path = ../../OpenPilot.posix/Build/dep/flightbatterystate.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C71611E2A33C00D0391E /* flighttelemetrystats.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = flighttelemetrystats.o.d; path = ../../OpenPilot.posix/Build/dep/flighttelemetrystats.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C71711E2A33C00D0391E /* gcstelemetrystats.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = gcstelemetrystats.o.d; path = ../../OpenPilot.posix/Build/dep/gcstelemetrystats.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C71811E2A33C00D0391E /* headingactual.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = headingactual.o.d; path = ../../OpenPilot.posix/Build/dep/headingactual.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C71911E2A33C00D0391E /* heap_3.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = heap_3.o.d; path = ../../OpenPilot.posix/Build/dep/heap_3.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C71A11E2A33C00D0391E /* InitMods.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = InitMods.o.d; path = ../../OpenPilot.posix/Build/dep/InitMods.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C71B11E2A33C00D0391E /* list.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = list.o.d; path = ../../OpenPilot.posix/Build/dep/list.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C71C11E2A33C00D0391E /* manualcontrolcommand.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = manualcontrolcommand.o.d; path = ../../OpenPilot.posix/Build/dep/manualcontrolcommand.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C71D11E2A33C00D0391E /* manualcontrolsettings.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = manualcontrolsettings.o.d; path = ../../OpenPilot.posix/Build/dep/manualcontrolsettings.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C71E11E2A33C00D0391E /* objectpersistence.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = objectpersistence.o.d; path = ../../OpenPilot.posix/Build/dep/objectpersistence.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C71F11E2A33C00D0391E /* openpilot.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = openpilot.o.d; path = ../../OpenPilot.posix/Build/dep/openpilot.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C72011E2A33C00D0391E /* pios_board_posix.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = pios_board_posix.o.d; path = ../../OpenPilot.posix/Build/dep/pios_board_posix.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C72111E2A33C00D0391E /* pios_com.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = pios_com.o.d; path = ../../OpenPilot.posix/Build/dep/pios_com.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C72211E2A33C00D0391E /* pios_delay.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = pios_delay.o.d; path = ../../OpenPilot.posix/Build/dep/pios_delay.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C72311E2A33C00D0391E /* pios_led.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = pios_led.o.d; path = ../../OpenPilot.posix/Build/dep/pios_led.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C72411E2A33C00D0391E /* pios_sdcard.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = pios_sdcard.o.d; path = ../../OpenPilot.posix/Build/dep/pios_sdcard.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C72511E2A33C00D0391E /* pios_sys.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = pios_sys.o.d; path = ../../OpenPilot.posix/Build/dep/pios_sys.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C72611E2A33C00D0391E /* pios_udp.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = pios_udp.o.d; path = ../../OpenPilot.posix/Build/dep/pios_udp.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C72711E2A33C00D0391E /* port.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = port.o.d; path = ../../OpenPilot.posix/Build/dep/port.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C72811E2A33C00D0391E /* positionactual.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = positionactual.o.d; path = ../../OpenPilot.posix/Build/dep/positionactual.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C72911E2A33C00D0391E /* queue.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = queue.o.d; path = ../../OpenPilot.posix/Build/dep/queue.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C72A11E2A33C00D0391E /* stabilization.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = stabilization.o.d; path = ../../OpenPilot.posix/Build/dep/stabilization.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C72B11E2A33C00D0391E /* stabilizationsettings.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = stabilizationsettings.o.d; path = ../../OpenPilot.posix/Build/dep/stabilizationsettings.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C72C11E2A33C00D0391E /* systemalarms.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = systemalarms.o.d; path = ../../OpenPilot.posix/Build/dep/systemalarms.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C72D11E2A33C00D0391E /* systemmod.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = systemmod.o.d; path = ../../OpenPilot.posix/Build/dep/systemmod.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C72E11E2A33C00D0391E /* systemsettings.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = systemsettings.o.d; path = ../../OpenPilot.posix/Build/dep/systemsettings.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C72F11E2A33C00D0391E /* systemstats.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = systemstats.o.d; path = ../../OpenPilot.posix/Build/dep/systemstats.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C73011E2A33C00D0391E /* tasks.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = tasks.o.d; path = ../../OpenPilot.posix/Build/dep/tasks.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C73111E2A33C00D0391E /* telemetry.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = telemetry.o.d; path = ../../OpenPilot.posix/Build/dep/telemetry.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C73211E2A33C00D0391E /* telemetrysettings.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = telemetrysettings.o.d; path = ../../OpenPilot.posix/Build/dep/telemetrysettings.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C73311E2A33C00D0391E /* uavobjectmanager.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = uavobjectmanager.o.d; path = ../../OpenPilot.posix/Build/dep/uavobjectmanager.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C73411E2A33C00D0391E /* uavobjectsinit.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = uavobjectsinit.o.d; path = ../../OpenPilot.posix/Build/dep/uavobjectsinit.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C73511E2A33C00D0391E /* uavtalk.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = uavtalk.o.d; path = ../../OpenPilot.posix/Build/dep/uavtalk.o.d; sourceTree = SOURCE_ROOT; };
+		65A2C73611E2A33C00D0391E /* eventdispatcher.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = eventdispatcher.o; path = ../../OpenPilot.posix/Build/eventdispatcher.o; sourceTree = SOURCE_ROOT; };
+		65A2C73711E2A33C00D0391E /* exampleobject1.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = exampleobject1.o; path = ../../OpenPilot.posix/Build/exampleobject1.o; sourceTree = SOURCE_ROOT; };
+		65A2C73811E2A33C00D0391E /* exampleobject2.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = exampleobject2.o; path = ../../OpenPilot.posix/Build/exampleobject2.o; sourceTree = SOURCE_ROOT; };
+		65A2C73911E2A33C00D0391E /* examplesettings.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = examplesettings.o; path = ../../OpenPilot.posix/Build/examplesettings.o; sourceTree = SOURCE_ROOT; };
+		65A2C73A11E2A33C00D0391E /* flightbatterystate.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = flightbatterystate.o; path = ../../OpenPilot.posix/Build/flightbatterystate.o; sourceTree = SOURCE_ROOT; };
+		65A2C73B11E2A33C00D0391E /* flighttelemetrystats.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = flighttelemetrystats.o; path = ../../OpenPilot.posix/Build/flighttelemetrystats.o; sourceTree = SOURCE_ROOT; };
+		65A2C73C11E2A33C00D0391E /* gcstelemetrystats.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = gcstelemetrystats.o; path = ../../OpenPilot.posix/Build/gcstelemetrystats.o; sourceTree = SOURCE_ROOT; };
+		65A2C73D11E2A33C00D0391E /* headingactual.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = headingactual.o; path = ../../OpenPilot.posix/Build/headingactual.o; sourceTree = SOURCE_ROOT; };
+		65A2C73E11E2A33C00D0391E /* heap_3.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = heap_3.o; path = ../../OpenPilot.posix/Build/heap_3.o; sourceTree = SOURCE_ROOT; };
+		65A2C73F11E2A33C00D0391E /* InitMods.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = InitMods.c; path = ../../OpenPilot.posix/Build/InitMods.c; sourceTree = SOURCE_ROOT; };
+		65A2C74011E2A33C00D0391E /* InitMods.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = InitMods.o; path = ../../OpenPilot.posix/Build/InitMods.o; sourceTree = SOURCE_ROOT; };
+		65A2C74111E2A33C00D0391E /* list.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = list.o; path = ../../OpenPilot.posix/Build/list.o; sourceTree = SOURCE_ROOT; };
+		65A2C74211E2A33C00D0391E /* manualcontrolcommand.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = manualcontrolcommand.o; path = ../../OpenPilot.posix/Build/manualcontrolcommand.o; sourceTree = SOURCE_ROOT; };
+		65A2C74311E2A33C00D0391E /* manualcontrolsettings.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = manualcontrolsettings.o; path = ../../OpenPilot.posix/Build/manualcontrolsettings.o; sourceTree = SOURCE_ROOT; };
+		65A2C74411E2A33C00D0391E /* objectpersistence.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = objectpersistence.o; path = ../../OpenPilot.posix/Build/objectpersistence.o; sourceTree = SOURCE_ROOT; };
+		65A2C74511E2A33C00D0391E /* OpenPilot.elf */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = OpenPilot.elf; path = ../../OpenPilot.posix/Build/OpenPilot.elf; sourceTree = SOURCE_ROOT; };
+		65A2C74611E2A33C00D0391E /* openpilot.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = openpilot.o; path = ../../OpenPilot.posix/Build/openpilot.o; sourceTree = SOURCE_ROOT; };
+		65A2C74711E2A33C00D0391E /* pios_board_posix.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = pios_board_posix.o; path = ../../OpenPilot.posix/Build/pios_board_posix.o; sourceTree = SOURCE_ROOT; };
+		65A2C74811E2A33C00D0391E /* pios_com.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = pios_com.o; path = ../../OpenPilot.posix/Build/pios_com.o; sourceTree = SOURCE_ROOT; };
+		65A2C74911E2A33C00D0391E /* pios_delay.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = pios_delay.o; path = ../../OpenPilot.posix/Build/pios_delay.o; sourceTree = SOURCE_ROOT; };
+		65A2C74A11E2A33C00D0391E /* pios_led.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = pios_led.o; path = ../../OpenPilot.posix/Build/pios_led.o; sourceTree = SOURCE_ROOT; };
+		65A2C74B11E2A33C00D0391E /* pios_sdcard.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = pios_sdcard.o; path = ../../OpenPilot.posix/Build/pios_sdcard.o; sourceTree = SOURCE_ROOT; };
+		65A2C74C11E2A33C00D0391E /* pios_sys.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = pios_sys.o; path = ../../OpenPilot.posix/Build/pios_sys.o; sourceTree = SOURCE_ROOT; };
+		65A2C74D11E2A33C00D0391E /* pios_udp.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = pios_udp.o; path = ../../OpenPilot.posix/Build/pios_udp.o; sourceTree = SOURCE_ROOT; };
+		65A2C74E11E2A33C00D0391E /* port.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = port.o; path = ../../OpenPilot.posix/Build/port.o; sourceTree = SOURCE_ROOT; };
+		65A2C74F11E2A33C00D0391E /* positionactual.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = positionactual.o; path = ../../OpenPilot.posix/Build/positionactual.o; sourceTree = SOURCE_ROOT; };
+		65A2C75011E2A33C00D0391E /* queue.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = queue.o; path = ../../OpenPilot.posix/Build/queue.o; sourceTree = SOURCE_ROOT; };
+		65A2C75111E2A33C00D0391E /* stabilization.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = stabilization.o; path = ../../OpenPilot.posix/Build/stabilization.o; sourceTree = SOURCE_ROOT; };
+		65A2C75211E2A33C00D0391E /* stabilizationsettings.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = stabilizationsettings.o; path = ../../OpenPilot.posix/Build/stabilizationsettings.o; sourceTree = SOURCE_ROOT; };
+		65A2C75311E2A33C00D0391E /* systemalarms.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = systemalarms.o; path = ../../OpenPilot.posix/Build/systemalarms.o; sourceTree = SOURCE_ROOT; };
+		65A2C75411E2A33C00D0391E /* systemmod.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = systemmod.o; path = ../../OpenPilot.posix/Build/systemmod.o; sourceTree = SOURCE_ROOT; };
+		65A2C75511E2A33C00D0391E /* systemsettings.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = systemsettings.o; path = ../../OpenPilot.posix/Build/systemsettings.o; sourceTree = SOURCE_ROOT; };
+		65A2C75611E2A33C00D0391E /* systemstats.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = systemstats.o; path = ../../OpenPilot.posix/Build/systemstats.o; sourceTree = SOURCE_ROOT; };
+		65A2C75711E2A33C00D0391E /* tasks.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = tasks.o; path = ../../OpenPilot.posix/Build/tasks.o; sourceTree = SOURCE_ROOT; };
+		65A2C75811E2A33C00D0391E /* telemetry.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = telemetry.o; path = ../../OpenPilot.posix/Build/telemetry.o; sourceTree = SOURCE_ROOT; };
+		65A2C75911E2A33C00D0391E /* telemetrysettings.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = telemetrysettings.o; path = ../../OpenPilot.posix/Build/telemetrysettings.o; sourceTree = SOURCE_ROOT; };
+		65A2C75A11E2A33C00D0391E /* uavobjectmanager.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = uavobjectmanager.o; path = ../../OpenPilot.posix/Build/uavobjectmanager.o; sourceTree = SOURCE_ROOT; };
+		65A2C75B11E2A33C00D0391E /* uavobjectsinit.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = uavobjectsinit.o; path = ../../OpenPilot.posix/Build/uavobjectsinit.o; sourceTree = SOURCE_ROOT; };
+		65A2C75C11E2A33C00D0391E /* uavtalk.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; name = uavtalk.o; path = ../../OpenPilot.posix/Build/uavtalk.o; sourceTree = SOURCE_ROOT; };
+		65A2C75D11E2A33C00D0391E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../OpenPilot.posix/Makefile; sourceTree = SOURCE_ROOT; };
+		65A2C75E11E2A33C00D0391E /* Makefile.posix */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.posix; path = ../../OpenPilot.posix/Makefile.posix; sourceTree = SOURCE_ROOT; };
+		65A2C76111E2A33C00D0391E /* actuator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = actuator.c; path = ../../OpenPilot.posix/Modules/Actuator/actuator.c; sourceTree = SOURCE_ROOT; };
+		65A2C76311E2A33C00D0391E /* actuator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = actuator.h; path = ../../OpenPilot.posix/Modules/Actuator/inc/actuator.h; sourceTree = SOURCE_ROOT; };
+		65A2C76511E2A33C00D0391E /* ahrs_comms.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ahrs_comms.c; path = ../../OpenPilot.posix/Modules/AHRSComms/ahrs_comms.c; sourceTree = SOURCE_ROOT; };
+		65A2C76711E2A33C00D0391E /* ahrs_comms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ahrs_comms.h; path = ../../OpenPilot.posix/Modules/AHRSComms/inc/ahrs_comms.h; sourceTree = SOURCE_ROOT; };
+		65A2C76911E2A33C00D0391E /* altitude.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = altitude.c; path = ../../OpenPilot.posix/Modules/Altitude/altitude.c; sourceTree = SOURCE_ROOT; };
+		65A2C76B11E2A33C00D0391E /* altitude.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = altitude.h; path = ../../OpenPilot.posix/Modules/Altitude/inc/altitude.h; sourceTree = SOURCE_ROOT; };
+		65A2C76F11E2A33C00D0391E /* battery.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = battery.c; path = ../../OpenPilot.posix/Modules/Battery/battery.c; sourceTree = SOURCE_ROOT; };
+		65A2C77111E2A33C00D0391E /* battery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = battery.h; path = ../../OpenPilot.posix/Modules/Battery/inc/battery.h; sourceTree = SOURCE_ROOT; };
+		65A2C77311E2A33C00D0391E /* example.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = example.c; path = ../../OpenPilot.posix/Modules/Example/example.c; sourceTree = SOURCE_ROOT; };
+		65A2C77411E2A33C00D0391E /* examplemodevent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = examplemodevent.c; path = ../../OpenPilot.posix/Modules/Example/examplemodevent.c; sourceTree = SOURCE_ROOT; };
+		65A2C77511E2A33C00D0391E /* examplemodperiodic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = examplemodperiodic.c; path = ../../OpenPilot.posix/Modules/Example/examplemodperiodic.c; sourceTree = SOURCE_ROOT; };
+		65A2C77611E2A33C00D0391E /* examplemodthread.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = examplemodthread.c; path = ../../OpenPilot.posix/Modules/Example/examplemodthread.c; sourceTree = SOURCE_ROOT; };
+		65A2C77811E2A33C00D0391E /* examplemodevent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = examplemodevent.h; path = ../../OpenPilot.posix/Modules/Example/inc/examplemodevent.h; sourceTree = SOURCE_ROOT; };
+		65A2C77911E2A33C00D0391E /* examplemodperiodic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = examplemodperiodic.h; path = ../../OpenPilot.posix/Modules/Example/inc/examplemodperiodic.h; sourceTree = SOURCE_ROOT; };
+		65A2C77A11E2A33C00D0391E /* examplemodthread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = examplemodthread.h; path = ../../OpenPilot.posix/Modules/Example/inc/examplemodthread.h; sourceTree = SOURCE_ROOT; };
+		65A2C77C11E2A33C00D0391E /* buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = buffer.c; path = ../../OpenPilot.posix/Modules/GPS/buffer.c; sourceTree = SOURCE_ROOT; };
+		65A2C77D11E2A33C00D0391E /* GPS.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = GPS.c; path = ../../OpenPilot.posix/Modules/GPS/GPS.c; sourceTree = SOURCE_ROOT; };
+		65A2C77F11E2A33C00D0391E /* buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = buffer.h; path = ../../OpenPilot.posix/Modules/GPS/inc/buffer.h; sourceTree = SOURCE_ROOT; };
+		65A2C78011E2A33C00D0391E /* GPS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GPS.h; path = ../../OpenPilot.posix/Modules/GPS/inc/GPS.h; sourceTree = SOURCE_ROOT; };
+		65A2C78311E2A33C00D0391E /* manualcontrol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = manualcontrol.h; path = ../../OpenPilot.posix/Modules/ManualControl/inc/manualcontrol.h; sourceTree = SOURCE_ROOT; };
+		65A2C78411E2A33C00D0391E /* manualcontrol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = manualcontrol.c; path = ../../OpenPilot.posix/Modules/ManualControl/manualcontrol.c; sourceTree = SOURCE_ROOT; };
+		65A2C78811E2A33C00D0391E /* MkSerial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MkSerial.h; path = ../../OpenPilot.posix/Modules/MK/MKSerial/inc/MkSerial.h; sourceTree = SOURCE_ROOT; };
+		65A2C78911E2A33C00D0391E /* MKSerial.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MKSerial.c; path = ../../OpenPilot.posix/Modules/MK/MKSerial/MKSerial.c; sourceTree = SOURCE_ROOT; };
+		65A2C78C11E2A33C00D0391E /* OsdEtStd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = OsdEtStd.c; path = ../../OpenPilot.posix/Modules/Osd/OsdEtStd/OsdEtStd.c; sourceTree = SOURCE_ROOT; };
+		65A2C78F11E2A33D00D0391E /* stabilization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stabilization.h; path = ../../OpenPilot.posix/Modules/Stabilization/inc/stabilization.h; sourceTree = SOURCE_ROOT; };
+		65A2C79011E2A33D00D0391E /* stabilization.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stabilization.c; path = ../../OpenPilot.posix/Modules/Stabilization/stabilization.c; sourceTree = SOURCE_ROOT; };
+		65A2C79311E2A33D00D0391E /* systemmod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = systemmod.h; path = ../../OpenPilot.posix/Modules/System/inc/systemmod.h; sourceTree = SOURCE_ROOT; };
+		65A2C79411E2A33D00D0391E /* systemmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = systemmod.c; path = ../../OpenPilot.posix/Modules/System/systemmod.c; sourceTree = SOURCE_ROOT; };
+		65A2C79711E2A33D00D0391E /* telemetry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = telemetry.h; path = ../../OpenPilot.posix/Modules/Telemetry/inc/telemetry.h; sourceTree = SOURCE_ROOT; };
+		65A2C79811E2A33D00D0391E /* telemetry.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = telemetry.c; path = ../../OpenPilot.posix/Modules/Telemetry/telemetry.c; sourceTree = SOURCE_ROOT; };
+		65A2C79A11E2A33D00D0391E /* alarms.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = alarms.c; path = ../../OpenPilot.posix/System/alarms.c; sourceTree = SOURCE_ROOT; };
+		65A2C79C11E2A33D00D0391E /* alarms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = alarms.h; path = ../../OpenPilot.posix/System/inc/alarms.h; sourceTree = SOURCE_ROOT; };
+		65A2C79D11E2A33D00D0391E /* op_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = op_config.h; path = ../../OpenPilot.posix/System/inc/op_config.h; sourceTree = SOURCE_ROOT; };
+		65A2C79E11E2A33D00D0391E /* openpilot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = openpilot.h; path = ../../OpenPilot.posix/System/inc/openpilot.h; sourceTree = SOURCE_ROOT; };
+		65A2C79F11E2A33D00D0391E /* pios_board.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_board.h; path = ../../OpenPilot.posix/System/inc/pios_board.h; sourceTree = SOURCE_ROOT; };
+		65A2C7A011E2A33D00D0391E /* pios_board_posix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_board_posix.h; path = ../../OpenPilot.posix/System/inc/pios_board_posix.h; sourceTree = SOURCE_ROOT; };
+		65A2C7A111E2A33D00D0391E /* pios_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_config.h; path = ../../OpenPilot.posix/System/inc/pios_config.h; sourceTree = SOURCE_ROOT; };
+		65A2C7A211E2A33D00D0391E /* pios_config_posix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_config_posix.h; path = ../../OpenPilot.posix/System/inc/pios_config_posix.h; sourceTree = SOURCE_ROOT; };
+		65A2C7A311E2A33D00D0391E /* openpilot.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = openpilot.c; path = ../../OpenPilot.posix/System/openpilot.c; sourceTree = SOURCE_ROOT; };
+		65A2C7A411E2A33D00D0391E /* pios_board.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_board.c; path = ../../OpenPilot.posix/System/pios_board.c; sourceTree = SOURCE_ROOT; };
+		65A2C7A511E2A33D00D0391E /* pios_board_posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_board_posix.c; path = ../../OpenPilot.posix/System/pios_board_posix.c; sourceTree = SOURCE_ROOT; };
+		65A2C7A711E2A33D00D0391E /* test_BMP085.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = test_BMP085.c; path = ../../OpenPilot.posix/Tests/test_BMP085.c; sourceTree = SOURCE_ROOT; };
+		65A2C7A811E2A33D00D0391E /* test_common.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = test_common.c; path = ../../OpenPilot.posix/Tests/test_common.c; sourceTree = SOURCE_ROOT; };
+		65A2C7A911E2A33D00D0391E /* test_cpuload.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = test_cpuload.c; path = ../../OpenPilot.posix/Tests/test_cpuload.c; sourceTree = SOURCE_ROOT; };
+		65A2C7AA11E2A33D00D0391E /* test_i2c_PCF8570.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = test_i2c_PCF8570.c; path = ../../OpenPilot.posix/Tests/test_i2c_PCF8570.c; sourceTree = SOURCE_ROOT; };
+		65A2C7AB11E2A33D00D0391E /* test_uavobjects.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = test_uavobjects.c; path = ../../OpenPilot.posix/Tests/test_uavobjects.c; sourceTree = SOURCE_ROOT; };
+		65A2C7AD11E2A33D00D0391E /* actuatorcommand.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = actuatorcommand.c; path = ../../OpenPilot.posix/UAVObjects/actuatorcommand.c; sourceTree = SOURCE_ROOT; };
+		65A2C7AE11E2A33D00D0391E /* actuatordesired.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = actuatordesired.c; path = ../../OpenPilot.posix/UAVObjects/actuatordesired.c; sourceTree = SOURCE_ROOT; };
+		65A2C7AF11E2A33D00D0391E /* actuatorsettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = actuatorsettings.c; path = ../../OpenPilot.posix/UAVObjects/actuatorsettings.c; sourceTree = SOURCE_ROOT; };
+		65A2C7B011E2A33D00D0391E /* ahrsstatus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ahrsstatus.c; path = ../../OpenPilot.posix/UAVObjects/ahrsstatus.c; sourceTree = SOURCE_ROOT; };
+		65A2C7B111E2A33D00D0391E /* altitudeactual.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = altitudeactual.c; path = ../../OpenPilot.posix/UAVObjects/altitudeactual.c; sourceTree = SOURCE_ROOT; };
+		65A2C7B211E2A33D00D0391E /* attitudeactual.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = attitudeactual.c; path = ../../OpenPilot.posix/UAVObjects/attitudeactual.c; sourceTree = SOURCE_ROOT; };
+		65A2C7B311E2A33D00D0391E /* attitudedesired.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = attitudedesired.c; path = ../../OpenPilot.posix/UAVObjects/attitudedesired.c; sourceTree = SOURCE_ROOT; };
+		65A2C7B411E2A33D00D0391E /* attitudesettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = attitudesettings.c; path = ../../OpenPilot.posix/UAVObjects/attitudesettings.c; sourceTree = SOURCE_ROOT; };
+		65A2C7B511E2A33D00D0391E /* attitudesettings.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = attitudesettings.py; path = ../../OpenPilot.posix/UAVObjects/attitudesettings.py; sourceTree = SOURCE_ROOT; };
+		65A2C7B611E2A33D00D0391E /* eventdispatcher.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = eventdispatcher.c; path = ../../OpenPilot.posix/UAVObjects/eventdispatcher.c; sourceTree = SOURCE_ROOT; };
+		65A2C7B711E2A33D00D0391E /* exampleobject1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = exampleobject1.c; path = ../../OpenPilot.posix/UAVObjects/exampleobject1.c; sourceTree = SOURCE_ROOT; };
+		65A2C7B811E2A33D00D0391E /* exampleobject2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = exampleobject2.c; path = ../../OpenPilot.posix/UAVObjects/exampleobject2.c; sourceTree = SOURCE_ROOT; };
+		65A2C7B911E2A33D00D0391E /* examplesettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = examplesettings.c; path = ../../OpenPilot.posix/UAVObjects/examplesettings.c; sourceTree = SOURCE_ROOT; };
+		65A2C7BA11E2A33D00D0391E /* flightbatterystate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = flightbatterystate.c; path = ../../OpenPilot.posix/UAVObjects/flightbatterystate.c; sourceTree = SOURCE_ROOT; };
+		65A2C7BB11E2A33D00D0391E /* flighttelemetrystats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = flighttelemetrystats.c; path = ../../OpenPilot.posix/UAVObjects/flighttelemetrystats.c; sourceTree = SOURCE_ROOT; };
+		65A2C7BC11E2A33D00D0391E /* gcstelemetrystats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gcstelemetrystats.c; path = ../../OpenPilot.posix/UAVObjects/gcstelemetrystats.c; sourceTree = SOURCE_ROOT; };
+		65A2C7BD11E2A33D00D0391E /* headingactual.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = headingactual.c; path = ../../OpenPilot.posix/UAVObjects/headingactual.c; sourceTree = SOURCE_ROOT; };
+		65A2C7BF11E2A33D00D0391E /* actuatorcommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = actuatorcommand.h; path = ../../OpenPilot.posix/UAVObjects/inc/actuatorcommand.h; sourceTree = SOURCE_ROOT; };
+		65A2C7C011E2A33D00D0391E /* actuatordesired.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = actuatordesired.h; path = ../../OpenPilot.posix/UAVObjects/inc/actuatordesired.h; sourceTree = SOURCE_ROOT; };
+		65A2C7C111E2A33D00D0391E /* actuatorsettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = actuatorsettings.h; path = ../../OpenPilot.posix/UAVObjects/inc/actuatorsettings.h; sourceTree = SOURCE_ROOT; };
+		65A2C7C211E2A33D00D0391E /* ahrsstatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ahrsstatus.h; path = ../../OpenPilot.posix/UAVObjects/inc/ahrsstatus.h; sourceTree = SOURCE_ROOT; };
+		65A2C7C311E2A33D00D0391E /* altitudeactual.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = altitudeactual.h; path = ../../OpenPilot.posix/UAVObjects/inc/altitudeactual.h; sourceTree = SOURCE_ROOT; };
+		65A2C7C411E2A33D00D0391E /* attitudeactual.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = attitudeactual.h; path = ../../OpenPilot.posix/UAVObjects/inc/attitudeactual.h; sourceTree = SOURCE_ROOT; };
+		65A2C7C511E2A33D00D0391E /* attitudedesired.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = attitudedesired.h; path = ../../OpenPilot.posix/UAVObjects/inc/attitudedesired.h; sourceTree = SOURCE_ROOT; };
+		65A2C7C611E2A33D00D0391E /* attitudesettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = attitudesettings.h; path = ../../OpenPilot.posix/UAVObjects/inc/attitudesettings.h; sourceTree = SOURCE_ROOT; };
+		65A2C7C711E2A33D00D0391E /* eventdispatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = eventdispatcher.h; path = ../../OpenPilot.posix/UAVObjects/inc/eventdispatcher.h; sourceTree = SOURCE_ROOT; };
+		65A2C7C811E2A33D00D0391E /* exampleobject1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = exampleobject1.h; path = ../../OpenPilot.posix/UAVObjects/inc/exampleobject1.h; sourceTree = SOURCE_ROOT; };
+		65A2C7C911E2A33D00D0391E /* exampleobject2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = exampleobject2.h; path = ../../OpenPilot.posix/UAVObjects/inc/exampleobject2.h; sourceTree = SOURCE_ROOT; };
+		65A2C7CA11E2A33D00D0391E /* examplesettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = examplesettings.h; path = ../../OpenPilot.posix/UAVObjects/inc/examplesettings.h; sourceTree = SOURCE_ROOT; };
+		65A2C7CB11E2A33D00D0391E /* flightbatterystate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = flightbatterystate.h; path = ../../OpenPilot.posix/UAVObjects/inc/flightbatterystate.h; sourceTree = SOURCE_ROOT; };
+		65A2C7CC11E2A33D00D0391E /* flighttelemetrystats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = flighttelemetrystats.h; path = ../../OpenPilot.posix/UAVObjects/inc/flighttelemetrystats.h; sourceTree = SOURCE_ROOT; };
+		65A2C7CD11E2A33D00D0391E /* gcstelemetrystats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gcstelemetrystats.h; path = ../../OpenPilot.posix/UAVObjects/inc/gcstelemetrystats.h; sourceTree = SOURCE_ROOT; };
+		65A2C7CE11E2A33D00D0391E /* headingactual.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = headingactual.h; path = ../../OpenPilot.posix/UAVObjects/inc/headingactual.h; sourceTree = SOURCE_ROOT; };
+		65A2C7CF11E2A33D00D0391E /* manualcontrolcommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = manualcontrolcommand.h; path = ../../OpenPilot.posix/UAVObjects/inc/manualcontrolcommand.h; sourceTree = SOURCE_ROOT; };
+		65A2C7D011E2A33D00D0391E /* manualcontrolsettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = manualcontrolsettings.h; path = ../../OpenPilot.posix/UAVObjects/inc/manualcontrolsettings.h; sourceTree = SOURCE_ROOT; };
+		65A2C7D111E2A33D00D0391E /* objectpersistence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = objectpersistence.h; path = ../../OpenPilot.posix/UAVObjects/inc/objectpersistence.h; sourceTree = SOURCE_ROOT; };
+		65A2C7D211E2A33D00D0391E /* positionactual.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = positionactual.h; path = ../../OpenPilot.posix/UAVObjects/inc/positionactual.h; sourceTree = SOURCE_ROOT; };
+		65A2C7D311E2A33D00D0391E /* stabilizationsettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stabilizationsettings.h; path = ../../OpenPilot.posix/UAVObjects/inc/stabilizationsettings.h; sourceTree = SOURCE_ROOT; };
+		65A2C7D411E2A33D00D0391E /* systemalarms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = systemalarms.h; path = ../../OpenPilot.posix/UAVObjects/inc/systemalarms.h; sourceTree = SOURCE_ROOT; };
+		65A2C7D511E2A33D00D0391E /* systemsettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = systemsettings.h; path = ../../OpenPilot.posix/UAVObjects/inc/systemsettings.h; sourceTree = SOURCE_ROOT; };
+		65A2C7D611E2A33D00D0391E /* systemstats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = systemstats.h; path = ../../OpenPilot.posix/UAVObjects/inc/systemstats.h; sourceTree = SOURCE_ROOT; };
+		65A2C7D711E2A33D00D0391E /* telemetrysettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = telemetrysettings.h; path = ../../OpenPilot.posix/UAVObjects/inc/telemetrysettings.h; sourceTree = SOURCE_ROOT; };
+		65A2C7D811E2A33D00D0391E /* uavobjectmanager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uavobjectmanager.h; path = ../../OpenPilot.posix/UAVObjects/inc/uavobjectmanager.h; sourceTree = SOURCE_ROOT; };
+		65A2C7D911E2A33D00D0391E /* uavobjectsinit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uavobjectsinit.h; path = ../../OpenPilot.posix/UAVObjects/inc/uavobjectsinit.h; sourceTree = SOURCE_ROOT; };
+		65A2C7DA11E2A33D00D0391E /* uavobjecttemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uavobjecttemplate.h; path = ../../OpenPilot.posix/UAVObjects/inc/uavobjecttemplate.h; sourceTree = SOURCE_ROOT; };
+		65A2C7DB11E2A33D00D0391E /* utlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utlist.h; path = ../../OpenPilot.posix/UAVObjects/inc/utlist.h; sourceTree = SOURCE_ROOT; };
+		65A2C7DC11E2A33D00D0391E /* manualcontrolcommand.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = manualcontrolcommand.c; path = ../../OpenPilot.posix/UAVObjects/manualcontrolcommand.c; sourceTree = SOURCE_ROOT; };
+		65A2C7DD11E2A33D00D0391E /* manualcontrolsettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = manualcontrolsettings.c; path = ../../OpenPilot.posix/UAVObjects/manualcontrolsettings.c; sourceTree = SOURCE_ROOT; };
+		65A2C7DE11E2A33D00D0391E /* objectpersistence.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = objectpersistence.c; path = ../../OpenPilot.posix/UAVObjects/objectpersistence.c; sourceTree = SOURCE_ROOT; };
+		65A2C7DF11E2A33D00D0391E /* positionactual.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = positionactual.c; path = ../../OpenPilot.posix/UAVObjects/positionactual.c; sourceTree = SOURCE_ROOT; };
+		65A2C7E011E2A33D00D0391E /* stabilizationsettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stabilizationsettings.c; path = ../../OpenPilot.posix/UAVObjects/stabilizationsettings.c; sourceTree = SOURCE_ROOT; };
+		65A2C7E111E2A33D00D0391E /* systemalarms.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = systemalarms.c; path = ../../OpenPilot.posix/UAVObjects/systemalarms.c; sourceTree = SOURCE_ROOT; };
+		65A2C7E211E2A33D00D0391E /* systemsettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = systemsettings.c; path = ../../OpenPilot.posix/UAVObjects/systemsettings.c; sourceTree = SOURCE_ROOT; };
+		65A2C7E311E2A33D00D0391E /* systemstats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = systemstats.c; path = ../../OpenPilot.posix/UAVObjects/systemstats.c; sourceTree = SOURCE_ROOT; };
+		65A2C7E411E2A33D00D0391E /* telemetrysettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = telemetrysettings.c; path = ../../OpenPilot.posix/UAVObjects/telemetrysettings.c; sourceTree = SOURCE_ROOT; };
+		65A2C7E511E2A33D00D0391E /* uavobjectmanager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = uavobjectmanager.c; path = ../../OpenPilot.posix/UAVObjects/uavobjectmanager.c; sourceTree = SOURCE_ROOT; };
+		65A2C7E611E2A33D00D0391E /* uavobjectsinit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = uavobjectsinit.c; path = ../../OpenPilot.posix/UAVObjects/uavobjectsinit.c; sourceTree = SOURCE_ROOT; };
+		65A2C7E711E2A33D00D0391E /* uavobjectsinittemplate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = uavobjectsinittemplate.c; path = ../../OpenPilot.posix/UAVObjects/uavobjectsinittemplate.c; sourceTree = SOURCE_ROOT; };
+		65A2C7E811E2A33D00D0391E /* uavobjecttemplate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = uavobjecttemplate.c; path = ../../OpenPilot.posix/UAVObjects/uavobjecttemplate.c; sourceTree = SOURCE_ROOT; };
+		65A2C7EB11E2A33D00D0391E /* uavtalk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uavtalk.h; path = ../../OpenPilot.posix/UAVTalk/inc/uavtalk.h; sourceTree = SOURCE_ROOT; };
+		65A2C7EC11E2A33D00D0391E /* uavtalk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = uavtalk.c; path = ../../OpenPilot.posix/UAVTalk/uavtalk.c; sourceTree = SOURCE_ROOT; };
+		65A2C7EF11E2A33D00D0391E /* FreeRTOSConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FreeRTOSConfig.h; path = ../../PiOS.posix/inc/FreeRTOSConfig.h; sourceTree = SOURCE_ROOT; };
+		65A2C7F011E2A33D00D0391E /* pios_com.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_com.h; path = ../../PiOS.posix/inc/pios_com.h; sourceTree = SOURCE_ROOT; };
+		65A2C7F111E2A33D00D0391E /* pios_com_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_com_priv.h; path = ../../PiOS.posix/inc/pios_com_priv.h; sourceTree = SOURCE_ROOT; };
+		65A2C7F211E2A33D00D0391E /* pios_delay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_delay.h; path = ../../PiOS.posix/inc/pios_delay.h; sourceTree = SOURCE_ROOT; };
+		65A2C7F311E2A33D00D0391E /* pios_led.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_led.h; path = ../../PiOS.posix/inc/pios_led.h; sourceTree = SOURCE_ROOT; };
+		65A2C7F411E2A33D00D0391E /* pios_posix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_posix.h; path = ../../PiOS.posix/inc/pios_posix.h; sourceTree = SOURCE_ROOT; };
+		65A2C7F511E2A33D00D0391E /* pios_sdcard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_sdcard.h; path = ../../PiOS.posix/inc/pios_sdcard.h; sourceTree = SOURCE_ROOT; };
+		65A2C7F611E2A33D00D0391E /* pios_sys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_sys.h; path = ../../PiOS.posix/inc/pios_sys.h; sourceTree = SOURCE_ROOT; };
+		65A2C7F711E2A33D00D0391E /* pios_udp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_udp.h; path = ../../PiOS.posix/inc/pios_udp.h; sourceTree = SOURCE_ROOT; };
+		65A2C7F811E2A33D00D0391E /* pios_udp_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_udp_priv.h; path = ../../PiOS.posix/inc/pios_udp_priv.h; sourceTree = SOURCE_ROOT; };
+		65A2C7F911E2A33D00D0391E /* pios.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios.h; path = ../../PiOS.posix/pios.h; sourceTree = SOURCE_ROOT; };
+		65A2C7FE11E2A33D00D0391E /* croutine.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = croutine.c; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/croutine.c; sourceTree = SOURCE_ROOT; };
+		65A2C80011E2A33D00D0391E /* croutine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = croutine.h; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/include/croutine.h; sourceTree = SOURCE_ROOT; };
+		65A2C80111E2A33D00D0391E /* FreeRTOS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FreeRTOS.h; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/include/FreeRTOS.h; sourceTree = SOURCE_ROOT; };
+		65A2C80211E2A33D00D0391E /* list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = list.h; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/include/list.h; sourceTree = SOURCE_ROOT; };
+		65A2C80311E2A33D00D0391E /* mpu_wrappers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mpu_wrappers.h; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/include/mpu_wrappers.h; sourceTree = SOURCE_ROOT; };
+		65A2C80411E2A33D00D0391E /* portable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = portable.h; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/include/portable.h; sourceTree = SOURCE_ROOT; };
+		65A2C80511E2A33D00D0391E /* projdefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = projdefs.h; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/include/projdefs.h; sourceTree = SOURCE_ROOT; };
+		65A2C80611E2A33D00D0391E /* queue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = queue.h; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/include/queue.h; sourceTree = SOURCE_ROOT; };
+		65A2C80711E2A33D00D0391E /* semphr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = semphr.h; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/include/semphr.h; sourceTree = SOURCE_ROOT; };
+		65A2C80811E2A33D00D0391E /* StackMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StackMacros.h; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/include/StackMacros.h; sourceTree = SOURCE_ROOT; };
+		65A2C80911E2A33D00D0391E /* task.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = task.h; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/include/task.h; sourceTree = SOURCE_ROOT; };
+		65A2C80A11E2A33D00D0391E /* list.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = list.c; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/list.c; sourceTree = SOURCE_ROOT; };
+		65A2C80E11E2A33D00D0391E /* .port.c.swp */ = {isa = PBXFileReference; lastKnownFileType = file; name = .port.c.swp; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/portable/GCC/Posix/.port.c.swp; sourceTree = SOURCE_ROOT; };
+		65A2C80F11E2A33D00D0391E /* port.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = port.c; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/portable/GCC/Posix/port.c; sourceTree = SOURCE_ROOT; };
+		65A2C81011E2A33D00D0391E /* portmacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = portmacro.h; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/portable/GCC/Posix/portmacro.h; sourceTree = SOURCE_ROOT; };
+		65A2C81211E2A33D00D0391E /* heap_3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = heap_3.c; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/portable/MemMang/heap_3.c; sourceTree = SOURCE_ROOT; };
+		65A2C81311E2A33D00D0391E /* readme.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = readme.txt; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/portable/readme.txt; sourceTree = SOURCE_ROOT; };
+		65A2C81411E2A33D00D0391E /* queue.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = queue.c; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/queue.c; sourceTree = SOURCE_ROOT; };
+		65A2C81511E2A33D00D0391E /* readme.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = readme.txt; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/readme.txt; sourceTree = SOURCE_ROOT; };
+		65A2C81611E2A33D00D0391E /* tasks.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tasks.c; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/tasks.c; sourceTree = SOURCE_ROOT; };
+		65A2C81711E2A33D00D0391E /* pios_com.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_com.c; path = ../../PiOS.posix/posix/pios_com.c; sourceTree = SOURCE_ROOT; };
+		65A2C81811E2A33D00D0391E /* pios_com.c.old */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = pios_com.c.old; path = ../../PiOS.posix/posix/pios_com.c.old; sourceTree = SOURCE_ROOT; };
+		65A2C81911E2A33D00D0391E /* pios_delay.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_delay.c; path = ../../PiOS.posix/posix/pios_delay.c; sourceTree = SOURCE_ROOT; };
+		65A2C81A11E2A33D00D0391E /* pios_led.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_led.c; path = ../../PiOS.posix/posix/pios_led.c; sourceTree = SOURCE_ROOT; };
+		65A2C81B11E2A33D00D0391E /* pios_sdcard.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_sdcard.c; path = ../../PiOS.posix/posix/pios_sdcard.c; sourceTree = SOURCE_ROOT; };
+		65A2C81C11E2A33D00D0391E /* pios_sys.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_sys.c; path = ../../PiOS.posix/posix/pios_sys.c; sourceTree = SOURCE_ROOT; };
+		65A2C81D11E2A33D00D0391E /* pios_udp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_udp.c; path = ../../PiOS.posix/posix/pios_udp.c; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		08FB7794FE84155DC02AAC07 /* OpenPilotOSX */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C6FA11E2A33C00D0391E /* OpenPilot.posix */,
+				65A2C7ED11E2A33D00D0391E /* PiOS.posix */,
+				C6A0FF2B0290797F04C91782 /* Documentation */,
+				1AB674ADFE9D54B511CA2CBB /* Products */,
+			);
+			name = OpenPilotOSX;
+			sourceTree = "<group>";
+		};
+		1AB674ADFE9D54B511CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		65A2C6FA11E2A33C00D0391E /* OpenPilot.posix */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C6FB11E2A33C00D0391E /* 1 */,
+				65A2C6FC11E2A33C00D0391E /* 3B09C28C.obj */,
+				65A2C6FD11E2A33C00D0391E /* Build */,
+				65A2C75D11E2A33C00D0391E /* Makefile */,
+				65A2C75E11E2A33C00D0391E /* Makefile.posix */,
+				65A2C75F11E2A33C00D0391E /* Modules */,
+				65A2C79911E2A33D00D0391E /* System */,
+				65A2C7A611E2A33D00D0391E /* Tests */,
+				65A2C7AC11E2A33D00D0391E /* UAVObjects */,
+				65A2C7E911E2A33D00D0391E /* UAVTalk */,
+			);
+			name = OpenPilot.posix;
+			path = ../../OpenPilot.posix;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C6FD11E2A33C00D0391E /* Build */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C6FE11E2A33C00D0391E /* actuatorcommand.o */,
+				65A2C6FF11E2A33C00D0391E /* actuatordesired.o */,
+				65A2C70011E2A33C00D0391E /* actuatorsettings.o */,
+				65A2C70111E2A33C00D0391E /* ahrsstatus.o */,
+				65A2C70211E2A33C00D0391E /* alarms.o */,
+				65A2C70311E2A33C00D0391E /* altitudeactual.o */,
+				65A2C70411E2A33C00D0391E /* attitudeactual.o */,
+				65A2C70511E2A33C00D0391E /* attitudedesired.o */,
+				65A2C70611E2A33C00D0391E /* attitudesettings.o */,
+				65A2C70711E2A33C00D0391E /* dep */,
+				65A2C73611E2A33C00D0391E /* eventdispatcher.o */,
+				65A2C73711E2A33C00D0391E /* exampleobject1.o */,
+				65A2C73811E2A33C00D0391E /* exampleobject2.o */,
+				65A2C73911E2A33C00D0391E /* examplesettings.o */,
+				65A2C73A11E2A33C00D0391E /* flightbatterystate.o */,
+				65A2C73B11E2A33C00D0391E /* flighttelemetrystats.o */,
+				65A2C73C11E2A33C00D0391E /* gcstelemetrystats.o */,
+				65A2C73D11E2A33C00D0391E /* headingactual.o */,
+				65A2C73E11E2A33C00D0391E /* heap_3.o */,
+				65A2C73F11E2A33C00D0391E /* InitMods.c */,
+				65A2C74011E2A33C00D0391E /* InitMods.o */,
+				65A2C74111E2A33C00D0391E /* list.o */,
+				65A2C74211E2A33C00D0391E /* manualcontrolcommand.o */,
+				65A2C74311E2A33C00D0391E /* manualcontrolsettings.o */,
+				65A2C74411E2A33C00D0391E /* objectpersistence.o */,
+				65A2C74511E2A33C00D0391E /* OpenPilot.elf */,
+				65A2C74611E2A33C00D0391E /* openpilot.o */,
+				65A2C74711E2A33C00D0391E /* pios_board_posix.o */,
+				65A2C74811E2A33C00D0391E /* pios_com.o */,
+				65A2C74911E2A33C00D0391E /* pios_delay.o */,
+				65A2C74A11E2A33C00D0391E /* pios_led.o */,
+				65A2C74B11E2A33C00D0391E /* pios_sdcard.o */,
+				65A2C74C11E2A33C00D0391E /* pios_sys.o */,
+				65A2C74D11E2A33C00D0391E /* pios_udp.o */,
+				65A2C74E11E2A33C00D0391E /* port.o */,
+				65A2C74F11E2A33C00D0391E /* positionactual.o */,
+				65A2C75011E2A33C00D0391E /* queue.o */,
+				65A2C75111E2A33C00D0391E /* stabilization.o */,
+				65A2C75211E2A33C00D0391E /* stabilizationsettings.o */,
+				65A2C75311E2A33C00D0391E /* systemalarms.o */,
+				65A2C75411E2A33C00D0391E /* systemmod.o */,
+				65A2C75511E2A33C00D0391E /* systemsettings.o */,
+				65A2C75611E2A33C00D0391E /* systemstats.o */,
+				65A2C75711E2A33C00D0391E /* tasks.o */,
+				65A2C75811E2A33C00D0391E /* telemetry.o */,
+				65A2C75911E2A33C00D0391E /* telemetrysettings.o */,
+				65A2C75A11E2A33C00D0391E /* uavobjectmanager.o */,
+				65A2C75B11E2A33C00D0391E /* uavobjectsinit.o */,
+				65A2C75C11E2A33C00D0391E /* uavtalk.o */,
+			);
+			name = Build;
+			path = ../../OpenPilot.posix/Build;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C70711E2A33C00D0391E /* dep */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C70811E2A33C00D0391E /* actuatorcommand.o.d */,
+				65A2C70911E2A33C00D0391E /* actuatordesired.o.d */,
+				65A2C70A11E2A33C00D0391E /* actuatorsettings.o.d */,
+				65A2C70B11E2A33C00D0391E /* ahrsstatus.o.d */,
+				65A2C70C11E2A33C00D0391E /* alarms.o.d */,
+				65A2C70D11E2A33C00D0391E /* altitudeactual.o.d */,
+				65A2C70E11E2A33C00D0391E /* attitudeactual.o.d */,
+				65A2C70F11E2A33C00D0391E /* attitudedesired.o.d */,
+				65A2C71011E2A33C00D0391E /* attitudesettings.o.d */,
+				65A2C71111E2A33C00D0391E /* eventdispatcher.o.d */,
+				65A2C71211E2A33C00D0391E /* exampleobject1.o.d */,
+				65A2C71311E2A33C00D0391E /* exampleobject2.o.d */,
+				65A2C71411E2A33C00D0391E /* examplesettings.o.d */,
+				65A2C71511E2A33C00D0391E /* flightbatterystate.o.d */,
+				65A2C71611E2A33C00D0391E /* flighttelemetrystats.o.d */,
+				65A2C71711E2A33C00D0391E /* gcstelemetrystats.o.d */,
+				65A2C71811E2A33C00D0391E /* headingactual.o.d */,
+				65A2C71911E2A33C00D0391E /* heap_3.o.d */,
+				65A2C71A11E2A33C00D0391E /* InitMods.o.d */,
+				65A2C71B11E2A33C00D0391E /* list.o.d */,
+				65A2C71C11E2A33C00D0391E /* manualcontrolcommand.o.d */,
+				65A2C71D11E2A33C00D0391E /* manualcontrolsettings.o.d */,
+				65A2C71E11E2A33C00D0391E /* objectpersistence.o.d */,
+				65A2C71F11E2A33C00D0391E /* openpilot.o.d */,
+				65A2C72011E2A33C00D0391E /* pios_board_posix.o.d */,
+				65A2C72111E2A33C00D0391E /* pios_com.o.d */,
+				65A2C72211E2A33C00D0391E /* pios_delay.o.d */,
+				65A2C72311E2A33C00D0391E /* pios_led.o.d */,
+				65A2C72411E2A33C00D0391E /* pios_sdcard.o.d */,
+				65A2C72511E2A33C00D0391E /* pios_sys.o.d */,
+				65A2C72611E2A33C00D0391E /* pios_udp.o.d */,
+				65A2C72711E2A33C00D0391E /* port.o.d */,
+				65A2C72811E2A33C00D0391E /* positionactual.o.d */,
+				65A2C72911E2A33C00D0391E /* queue.o.d */,
+				65A2C72A11E2A33C00D0391E /* stabilization.o.d */,
+				65A2C72B11E2A33C00D0391E /* stabilizationsettings.o.d */,
+				65A2C72C11E2A33C00D0391E /* systemalarms.o.d */,
+				65A2C72D11E2A33C00D0391E /* systemmod.o.d */,
+				65A2C72E11E2A33C00D0391E /* systemsettings.o.d */,
+				65A2C72F11E2A33C00D0391E /* systemstats.o.d */,
+				65A2C73011E2A33C00D0391E /* tasks.o.d */,
+				65A2C73111E2A33C00D0391E /* telemetry.o.d */,
+				65A2C73211E2A33C00D0391E /* telemetrysettings.o.d */,
+				65A2C73311E2A33C00D0391E /* uavobjectmanager.o.d */,
+				65A2C73411E2A33C00D0391E /* uavobjectsinit.o.d */,
+				65A2C73511E2A33C00D0391E /* uavtalk.o.d */,
+			);
+			name = dep;
+			path = ../../OpenPilot.posix/Build/dep;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C75F11E2A33C00D0391E /* Modules */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C76011E2A33C00D0391E /* Actuator */,
+				65A2C76411E2A33C00D0391E /* AHRSComms */,
+				65A2C76811E2A33C00D0391E /* Altitude */,
+				65A2C76C11E2A33C00D0391E /* Attitude */,
+				65A2C76E11E2A33C00D0391E /* Battery */,
+				65A2C77211E2A33C00D0391E /* Example */,
+				65A2C77B11E2A33C00D0391E /* GPS */,
+				65A2C78111E2A33C00D0391E /* ManualControl */,
+				65A2C78511E2A33C00D0391E /* MK */,
+				65A2C78A11E2A33C00D0391E /* Osd */,
+				65A2C78D11E2A33C00D0391E /* Stabilization */,
+				65A2C79111E2A33D00D0391E /* System */,
+				65A2C79511E2A33D00D0391E /* Telemetry */,
+			);
+			name = Modules;
+			path = ../../OpenPilot.posix/Modules;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C76011E2A33C00D0391E /* Actuator */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C76111E2A33C00D0391E /* actuator.c */,
+				65A2C76211E2A33C00D0391E /* inc */,
+			);
+			name = Actuator;
+			path = ../../OpenPilot.posix/Modules/Actuator;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C76211E2A33C00D0391E /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C76311E2A33C00D0391E /* actuator.h */,
+			);
+			name = inc;
+			path = ../../OpenPilot.posix/Modules/Actuator/inc;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C76411E2A33C00D0391E /* AHRSComms */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C76511E2A33C00D0391E /* ahrs_comms.c */,
+				65A2C76611E2A33C00D0391E /* inc */,
+			);
+			name = AHRSComms;
+			path = ../../OpenPilot.posix/Modules/AHRSComms;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C76611E2A33C00D0391E /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C76711E2A33C00D0391E /* ahrs_comms.h */,
+			);
+			name = inc;
+			path = ../../OpenPilot.posix/Modules/AHRSComms/inc;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C76811E2A33C00D0391E /* Altitude */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C76911E2A33C00D0391E /* altitude.c */,
+				65A2C76A11E2A33C00D0391E /* inc */,
+			);
+			name = Altitude;
+			path = ../../OpenPilot.posix/Modules/Altitude;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C76A11E2A33C00D0391E /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C76B11E2A33C00D0391E /* altitude.h */,
+			);
+			name = inc;
+			path = ../../OpenPilot.posix/Modules/Altitude/inc;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C76C11E2A33C00D0391E /* Attitude */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C76D11E2A33C00D0391E /* inc */,
+			);
+			name = Attitude;
+			path = ../../OpenPilot.posix/Modules/Attitude;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C76D11E2A33C00D0391E /* inc */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = inc;
+			path = ../../OpenPilot.posix/Modules/Attitude/inc;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C76E11E2A33C00D0391E /* Battery */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C76F11E2A33C00D0391E /* battery.c */,
+				65A2C77011E2A33C00D0391E /* inc */,
+			);
+			name = Battery;
+			path = ../../OpenPilot.posix/Modules/Battery;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C77011E2A33C00D0391E /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C77111E2A33C00D0391E /* battery.h */,
+			);
+			name = inc;
+			path = ../../OpenPilot.posix/Modules/Battery/inc;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C77211E2A33C00D0391E /* Example */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C77311E2A33C00D0391E /* example.c */,
+				65A2C77411E2A33C00D0391E /* examplemodevent.c */,
+				65A2C77511E2A33C00D0391E /* examplemodperiodic.c */,
+				65A2C77611E2A33C00D0391E /* examplemodthread.c */,
+				65A2C77711E2A33C00D0391E /* inc */,
+			);
+			name = Example;
+			path = ../../OpenPilot.posix/Modules/Example;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C77711E2A33C00D0391E /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C77811E2A33C00D0391E /* examplemodevent.h */,
+				65A2C77911E2A33C00D0391E /* examplemodperiodic.h */,
+				65A2C77A11E2A33C00D0391E /* examplemodthread.h */,
+			);
+			name = inc;
+			path = ../../OpenPilot.posix/Modules/Example/inc;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C77B11E2A33C00D0391E /* GPS */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C77C11E2A33C00D0391E /* buffer.c */,
+				65A2C77D11E2A33C00D0391E /* GPS.c */,
+				65A2C77E11E2A33C00D0391E /* inc */,
+			);
+			name = GPS;
+			path = ../../OpenPilot.posix/Modules/GPS;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C77E11E2A33C00D0391E /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C77F11E2A33C00D0391E /* buffer.h */,
+				65A2C78011E2A33C00D0391E /* GPS.h */,
+			);
+			name = inc;
+			path = ../../OpenPilot.posix/Modules/GPS/inc;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C78111E2A33C00D0391E /* ManualControl */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C78211E2A33C00D0391E /* inc */,
+				65A2C78411E2A33C00D0391E /* manualcontrol.c */,
+			);
+			name = ManualControl;
+			path = ../../OpenPilot.posix/Modules/ManualControl;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C78211E2A33C00D0391E /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C78311E2A33C00D0391E /* manualcontrol.h */,
+			);
+			name = inc;
+			path = ../../OpenPilot.posix/Modules/ManualControl/inc;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C78511E2A33C00D0391E /* MK */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C78611E2A33C00D0391E /* MKSerial */,
+			);
+			name = MK;
+			path = ../../OpenPilot.posix/Modules/MK;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C78611E2A33C00D0391E /* MKSerial */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C78711E2A33C00D0391E /* inc */,
+				65A2C78911E2A33C00D0391E /* MKSerial.c */,
+			);
+			name = MKSerial;
+			path = ../../OpenPilot.posix/Modules/MK/MKSerial;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C78711E2A33C00D0391E /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C78811E2A33C00D0391E /* MkSerial.h */,
+			);
+			name = inc;
+			path = ../../OpenPilot.posix/Modules/MK/MKSerial/inc;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C78A11E2A33C00D0391E /* Osd */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C78B11E2A33C00D0391E /* OsdEtStd */,
+			);
+			name = Osd;
+			path = ../../OpenPilot.posix/Modules/Osd;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C78B11E2A33C00D0391E /* OsdEtStd */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C78C11E2A33C00D0391E /* OsdEtStd.c */,
+			);
+			name = OsdEtStd;
+			path = ../../OpenPilot.posix/Modules/Osd/OsdEtStd;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C78D11E2A33C00D0391E /* Stabilization */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C78E11E2A33C00D0391E /* inc */,
+				65A2C79011E2A33D00D0391E /* stabilization.c */,
+			);
+			name = Stabilization;
+			path = ../../OpenPilot.posix/Modules/Stabilization;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C78E11E2A33C00D0391E /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C78F11E2A33D00D0391E /* stabilization.h */,
+			);
+			name = inc;
+			path = ../../OpenPilot.posix/Modules/Stabilization/inc;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C79111E2A33D00D0391E /* System */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C79211E2A33D00D0391E /* inc */,
+				65A2C79411E2A33D00D0391E /* systemmod.c */,
+			);
+			name = System;
+			path = ../../OpenPilot.posix/Modules/System;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C79211E2A33D00D0391E /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C79311E2A33D00D0391E /* systemmod.h */,
+			);
+			name = inc;
+			path = ../../OpenPilot.posix/Modules/System/inc;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C79511E2A33D00D0391E /* Telemetry */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C79611E2A33D00D0391E /* inc */,
+				65A2C79811E2A33D00D0391E /* telemetry.c */,
+			);
+			name = Telemetry;
+			path = ../../OpenPilot.posix/Modules/Telemetry;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C79611E2A33D00D0391E /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C79711E2A33D00D0391E /* telemetry.h */,
+			);
+			name = inc;
+			path = ../../OpenPilot.posix/Modules/Telemetry/inc;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C79911E2A33D00D0391E /* System */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C79A11E2A33D00D0391E /* alarms.c */,
+				65A2C79B11E2A33D00D0391E /* inc */,
+				65A2C7A311E2A33D00D0391E /* openpilot.c */,
+				65A2C7A411E2A33D00D0391E /* pios_board.c */,
+				65A2C7A511E2A33D00D0391E /* pios_board_posix.c */,
+			);
+			name = System;
+			path = ../../OpenPilot.posix/System;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C79B11E2A33D00D0391E /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C79C11E2A33D00D0391E /* alarms.h */,
+				65A2C79D11E2A33D00D0391E /* op_config.h */,
+				65A2C79E11E2A33D00D0391E /* openpilot.h */,
+				65A2C79F11E2A33D00D0391E /* pios_board.h */,
+				65A2C7A011E2A33D00D0391E /* pios_board_posix.h */,
+				65A2C7A111E2A33D00D0391E /* pios_config.h */,
+				65A2C7A211E2A33D00D0391E /* pios_config_posix.h */,
+			);
+			name = inc;
+			path = ../../OpenPilot.posix/System/inc;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C7A611E2A33D00D0391E /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C7A711E2A33D00D0391E /* test_BMP085.c */,
+				65A2C7A811E2A33D00D0391E /* test_common.c */,
+				65A2C7A911E2A33D00D0391E /* test_cpuload.c */,
+				65A2C7AA11E2A33D00D0391E /* test_i2c_PCF8570.c */,
+				65A2C7AB11E2A33D00D0391E /* test_uavobjects.c */,
+			);
+			name = Tests;
+			path = ../../OpenPilot.posix/Tests;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C7AC11E2A33D00D0391E /* UAVObjects */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C7AD11E2A33D00D0391E /* actuatorcommand.c */,
+				65A2C7AE11E2A33D00D0391E /* actuatordesired.c */,
+				65A2C7AF11E2A33D00D0391E /* actuatorsettings.c */,
+				65A2C7B011E2A33D00D0391E /* ahrsstatus.c */,
+				65A2C7B111E2A33D00D0391E /* altitudeactual.c */,
+				65A2C7B211E2A33D00D0391E /* attitudeactual.c */,
+				65A2C7B311E2A33D00D0391E /* attitudedesired.c */,
+				65A2C7B411E2A33D00D0391E /* attitudesettings.c */,
+				65A2C7B511E2A33D00D0391E /* attitudesettings.py */,
+				65A2C7B611E2A33D00D0391E /* eventdispatcher.c */,
+				65A2C7B711E2A33D00D0391E /* exampleobject1.c */,
+				65A2C7B811E2A33D00D0391E /* exampleobject2.c */,
+				65A2C7B911E2A33D00D0391E /* examplesettings.c */,
+				65A2C7BA11E2A33D00D0391E /* flightbatterystate.c */,
+				65A2C7BB11E2A33D00D0391E /* flighttelemetrystats.c */,
+				65A2C7BC11E2A33D00D0391E /* gcstelemetrystats.c */,
+				65A2C7BD11E2A33D00D0391E /* headingactual.c */,
+				65A2C7BE11E2A33D00D0391E /* inc */,
+				65A2C7DC11E2A33D00D0391E /* manualcontrolcommand.c */,
+				65A2C7DD11E2A33D00D0391E /* manualcontrolsettings.c */,
+				65A2C7DE11E2A33D00D0391E /* objectpersistence.c */,
+				65A2C7DF11E2A33D00D0391E /* positionactual.c */,
+				65A2C7E011E2A33D00D0391E /* stabilizationsettings.c */,
+				65A2C7E111E2A33D00D0391E /* systemalarms.c */,
+				65A2C7E211E2A33D00D0391E /* systemsettings.c */,
+				65A2C7E311E2A33D00D0391E /* systemstats.c */,
+				65A2C7E411E2A33D00D0391E /* telemetrysettings.c */,
+				65A2C7E511E2A33D00D0391E /* uavobjectmanager.c */,
+				65A2C7E611E2A33D00D0391E /* uavobjectsinit.c */,
+				65A2C7E711E2A33D00D0391E /* uavobjectsinittemplate.c */,
+				65A2C7E811E2A33D00D0391E /* uavobjecttemplate.c */,
+			);
+			name = UAVObjects;
+			path = ../../OpenPilot.posix/UAVObjects;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C7BE11E2A33D00D0391E /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C7BF11E2A33D00D0391E /* actuatorcommand.h */,
+				65A2C7C011E2A33D00D0391E /* actuatordesired.h */,
+				65A2C7C111E2A33D00D0391E /* actuatorsettings.h */,
+				65A2C7C211E2A33D00D0391E /* ahrsstatus.h */,
+				65A2C7C311E2A33D00D0391E /* altitudeactual.h */,
+				65A2C7C411E2A33D00D0391E /* attitudeactual.h */,
+				65A2C7C511E2A33D00D0391E /* attitudedesired.h */,
+				65A2C7C611E2A33D00D0391E /* attitudesettings.h */,
+				65A2C7C711E2A33D00D0391E /* eventdispatcher.h */,
+				65A2C7C811E2A33D00D0391E /* exampleobject1.h */,
+				65A2C7C911E2A33D00D0391E /* exampleobject2.h */,
+				65A2C7CA11E2A33D00D0391E /* examplesettings.h */,
+				65A2C7CB11E2A33D00D0391E /* flightbatterystate.h */,
+				65A2C7CC11E2A33D00D0391E /* flighttelemetrystats.h */,
+				65A2C7CD11E2A33D00D0391E /* gcstelemetrystats.h */,
+				65A2C7CE11E2A33D00D0391E /* headingactual.h */,
+				65A2C7CF11E2A33D00D0391E /* manualcontrolcommand.h */,
+				65A2C7D011E2A33D00D0391E /* manualcontrolsettings.h */,
+				65A2C7D111E2A33D00D0391E /* objectpersistence.h */,
+				65A2C7D211E2A33D00D0391E /* positionactual.h */,
+				65A2C7D311E2A33D00D0391E /* stabilizationsettings.h */,
+				65A2C7D411E2A33D00D0391E /* systemalarms.h */,
+				65A2C7D511E2A33D00D0391E /* systemsettings.h */,
+				65A2C7D611E2A33D00D0391E /* systemstats.h */,
+				65A2C7D711E2A33D00D0391E /* telemetrysettings.h */,
+				65A2C7D811E2A33D00D0391E /* uavobjectmanager.h */,
+				65A2C7D911E2A33D00D0391E /* uavobjectsinit.h */,
+				65A2C7DA11E2A33D00D0391E /* uavobjecttemplate.h */,
+				65A2C7DB11E2A33D00D0391E /* utlist.h */,
+			);
+			name = inc;
+			path = ../../OpenPilot.posix/UAVObjects/inc;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C7E911E2A33D00D0391E /* UAVTalk */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C7EA11E2A33D00D0391E /* inc */,
+				65A2C7EC11E2A33D00D0391E /* uavtalk.c */,
+			);
+			name = UAVTalk;
+			path = ../../OpenPilot.posix/UAVTalk;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C7EA11E2A33D00D0391E /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C7EB11E2A33D00D0391E /* uavtalk.h */,
+			);
+			name = inc;
+			path = ../../OpenPilot.posix/UAVTalk/inc;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C7ED11E2A33D00D0391E /* PiOS.posix */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C7EE11E2A33D00D0391E /* inc */,
+				65A2C7F911E2A33D00D0391E /* pios.h */,
+				65A2C7FA11E2A33D00D0391E /* posix */,
+			);
+			name = PiOS.posix;
+			path = ../../PiOS.posix;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C7EE11E2A33D00D0391E /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C7EF11E2A33D00D0391E /* FreeRTOSConfig.h */,
+				65A2C7F011E2A33D00D0391E /* pios_com.h */,
+				65A2C7F111E2A33D00D0391E /* pios_com_priv.h */,
+				65A2C7F211E2A33D00D0391E /* pios_delay.h */,
+				65A2C7F311E2A33D00D0391E /* pios_led.h */,
+				65A2C7F411E2A33D00D0391E /* pios_posix.h */,
+				65A2C7F511E2A33D00D0391E /* pios_sdcard.h */,
+				65A2C7F611E2A33D00D0391E /* pios_sys.h */,
+				65A2C7F711E2A33D00D0391E /* pios_udp.h */,
+				65A2C7F811E2A33D00D0391E /* pios_udp_priv.h */,
+			);
+			name = inc;
+			path = ../../PiOS.posix/inc;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C7FA11E2A33D00D0391E /* posix */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C7FB11E2A33D00D0391E /* Libraries */,
+				65A2C81711E2A33D00D0391E /* pios_com.c */,
+				65A2C81811E2A33D00D0391E /* pios_com.c.old */,
+				65A2C81911E2A33D00D0391E /* pios_delay.c */,
+				65A2C81A11E2A33D00D0391E /* pios_led.c */,
+				65A2C81B11E2A33D00D0391E /* pios_sdcard.c */,
+				65A2C81C11E2A33D00D0391E /* pios_sys.c */,
+				65A2C81D11E2A33D00D0391E /* pios_udp.c */,
+			);
+			name = posix;
+			path = ../../PiOS.posix/posix;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C7FB11E2A33D00D0391E /* Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C7FC11E2A33D00D0391E /* FreeRTOS */,
+			);
+			name = Libraries;
+			path = ../../PiOS.posix/posix/Libraries;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C7FC11E2A33D00D0391E /* FreeRTOS */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C7FD11E2A33D00D0391E /* Source */,
+			);
+			name = FreeRTOS;
+			path = ../../PiOS.posix/posix/Libraries/FreeRTOS;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C7FD11E2A33D00D0391E /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C7FE11E2A33D00D0391E /* croutine.c */,
+				65A2C7FF11E2A33D00D0391E /* include */,
+				65A2C80A11E2A33D00D0391E /* list.c */,
+				65A2C80B11E2A33D00D0391E /* portable */,
+				65A2C81411E2A33D00D0391E /* queue.c */,
+				65A2C81511E2A33D00D0391E /* readme.txt */,
+				65A2C81611E2A33D00D0391E /* tasks.c */,
+			);
+			name = Source;
+			path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C7FF11E2A33D00D0391E /* include */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C80011E2A33D00D0391E /* croutine.h */,
+				65A2C80111E2A33D00D0391E /* FreeRTOS.h */,
+				65A2C80211E2A33D00D0391E /* list.h */,
+				65A2C80311E2A33D00D0391E /* mpu_wrappers.h */,
+				65A2C80411E2A33D00D0391E /* portable.h */,
+				65A2C80511E2A33D00D0391E /* projdefs.h */,
+				65A2C80611E2A33D00D0391E /* queue.h */,
+				65A2C80711E2A33D00D0391E /* semphr.h */,
+				65A2C80811E2A33D00D0391E /* StackMacros.h */,
+				65A2C80911E2A33D00D0391E /* task.h */,
+			);
+			name = include;
+			path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/include;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C80B11E2A33D00D0391E /* portable */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C80C11E2A33D00D0391E /* GCC */,
+				65A2C81111E2A33D00D0391E /* MemMang */,
+				65A2C81311E2A33D00D0391E /* readme.txt */,
+			);
+			name = portable;
+			path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/portable;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C80C11E2A33D00D0391E /* GCC */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C80D11E2A33D00D0391E /* Posix */,
+			);
+			name = GCC;
+			path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/portable/GCC;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C80D11E2A33D00D0391E /* Posix */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C80E11E2A33D00D0391E /* .port.c.swp */,
+				65A2C80F11E2A33D00D0391E /* port.c */,
+				65A2C81011E2A33D00D0391E /* portmacro.h */,
+			);
+			name = Posix;
+			path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/portable/GCC/Posix;
+			sourceTree = SOURCE_ROOT;
+		};
+		65A2C81111E2A33D00D0391E /* MemMang */ = {
+			isa = PBXGroup;
+			children = (
+				65A2C81211E2A33D00D0391E /* heap_3.c */,
+			);
+			name = MemMang;
+			path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/portable/MemMang;
+			sourceTree = SOURCE_ROOT;
+		};
+		C6A0FF2B0290797F04C91782 /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Documentation;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		6581071511DE809D0049FB12 /* OpenPilotOSX */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION) -f Makefile.posix";
+			buildConfigurationList = 6581071A11DE80A30049FB12 /* Build configuration list for PBXLegacyTarget "OpenPilotOSX" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = ../../OpenPilot.posix;
+			dependencies = (
+			);
+			name = OpenPilotOSX;
+			passBuildSettingsInEnvironment = 1;
+			productName = OpenPilotOSX;
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				ORGANIZATIONNAME = OpenPilot;
+			};
+			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "OpenPilotOSX" */;
+			compatibilityVersion = "Xcode 3.1";
+			hasScannedForEncodings = 1;
+			mainGroup = 08FB7794FE84155DC02AAC07 /* OpenPilotOSX */;
+			projectDirPath = "";
+			projectRoot = ../../..;
+			targets = (
+				6581071511DE809D0049FB12 /* OpenPilotOSX */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB928A08733DD80010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx10.6;
+			};
+			name = Debug;
+		};
+		1DEB928B08733DD80010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx10.6;
+			};
+			name = Release;
+		};
+		6581071611DE809D0049FB12 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = OpenPilotOSX;
+			};
+			name = Debug;
+		};
+		6581071711DE809D0049FB12 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = OpenPilotOSX;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "OpenPilotOSX" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB928A08733DD80010E9CD /* Debug */,
+				1DEB928B08733DD80010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6581071A11DE80A30049FB12 /* Build configuration list for PBXLegacyTarget "OpenPilotOSX" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6581071611DE809D0049FB12 /* Debug */,
+				6581071711DE809D0049FB12 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}

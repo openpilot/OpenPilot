@@ -21,6 +21,22 @@ namespace gdhe {
 	
 	
 	/** *************************************************************************/
+	/// Colors Management
+	/// Will be moved in image, and used in display.hpp
+	/** *************************************************************************/
+	
+	struct ColorRGB
+	{
+		unsigned char R, G, B;
+		ColorRGB(unsigned char R_, unsigned char G_, unsigned char B_): R(R_), G(G_), B(B_) {}
+		ColorRGB(): R(0), G(0), B(0) {}
+	};
+
+	extern const ColorRGB colorRed;
+	extern const ColorRGB colorGreen;
+	extern const ColorRGB colorBlue;
+
+	/** *************************************************************************/
 	/// Client
 	/** *************************************************************************/
 	
@@ -35,6 +51,7 @@ namespace gdhe {
 		protected:
 			MyIdFactory idFactory;
 			std::string host;
+			ColorRGB backgroundColor;
 		protected:
 			void init();
 		public:
@@ -74,22 +91,6 @@ namespace gdhe {
 	
 	
 	
-	/** *************************************************************************/
-	/// Colors Management
-	/// Will be moved in image, and used in display.hpp
-	/** *************************************************************************/
-	
-	struct ColorRGB
-	{
-		unsigned char R, G, B;
-		ColorRGB(unsigned char R_, unsigned char G_, unsigned char B_): R(R_), G(G_), B(B_) {}
-		ColorRGB(): R(0), G(0), B(0) {}
-	};
-
-	extern const ColorRGB colorRed;
-	extern const ColorRGB colorGreen;
-	extern const ColorRGB colorBlue;
-
 	/** *************************************************************************/
 	/// Abstract objects definitions 
 	/** *************************************************************************/
@@ -382,7 +383,7 @@ namespace gdhe {
 	// TODO need to write a real object type Trajectory that optimizes refreshing
 	//typedef Polyline Trajectory;
 	
-	// TODO maybe compress a little bit, we'll lose detail but it's really big à 60Hz...
+	// TODO maybe compress a little bit, we'll lose detail but it's really big at 60Hz...
 	class Trajectory: public Object
 	{
 		protected:
@@ -390,7 +391,7 @@ namespace gdhe {
 			int poly_size;
 			Polyline *last_poly;
 		public:
-			Trajectory(): Object(), poly_size(200), last_poly(NULL) {}
+			Trajectory(): Object(), poly_size(20), last_poly(NULL) {}
 			~Trajectory()
 			{
 				for(std::vector<Polyline*>::iterator it = traj.begin(); it != traj.end(); ++it)

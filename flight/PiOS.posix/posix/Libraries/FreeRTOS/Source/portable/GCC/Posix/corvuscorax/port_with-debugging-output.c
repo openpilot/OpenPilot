@@ -207,6 +207,7 @@ int real_pthread_mutex_unlock(pthread_mutex_t* mutex) {
 }
 #define pthread_mutex_lock(...) ( (debug_printf(" -!- pthread_mutex_lock(%s)\n",#__VA_ARGS__)|1)?pthread_mutex_lock(__VA_ARGS__):0 )
 #define pthread_mutex_unlock(...) ( (debug_printf(" -=- pthread_mutex_unlock(%s)\n",#__VA_ARGS__)|1)?pthread_mutex_unlock(__VA_ARGS__):0 )
+#define pthread_mutex_trylock(...) ( pthread_mutex_trylock(__VA_ARGS__)==0?((debug_printf(" -:)- pthread_mutex_trylock(%s) success\n",#__VA_ARGS__)|1)?0:0):-1)
 #define pthread_kill(thread,signal) ( (debug_printf(" sending signal %i to thread %li!\n",(int)signal,(long)thread)|1)?pthread_kill(thread,signal):0 )
 #define vTaskSwitchContext() ( (debug_printf("SWITCHCONTEXT!\n")|1)?vTaskSwitchContext():vTaskSwitchContext() )
 /*-----------------------------------------------------------*/
@@ -494,42 +495,46 @@ pthread_t xTaskToResume;
 	/**
 	 * Sentinel - do not change context while the running task is not equal the task supposed to run
 	 */
-	if ( 0 == pthread_mutex_lock( &xSuspendResumeThreadMutex ) )
-	{
-		/**
-		 * Make sure we don't create outdated resume signals
-		 */
-		while (hActiveThread!=hRequestedThread) {
-			(void)pthread_mutex_unlock( &xSuspendResumeThreadMutex );
+//	if ( 0 == pthread_mutex_lock( &xSuspendResumeThreadMutex ) )
+	while ( 0 != pthread_mutex_trylock ( &xSuspendResumeThreadMutex ) ) {
+		sched_yield();
+	}
+		
+	/**
+	 * Make sure we don't create outdated resume signals
+	 */
+	while (hActiveThread!=hRequestedThread) {
+		(void)pthread_mutex_unlock( &xSuspendResumeThreadMutex );
+		sched_yield();
+		while (0 != pthread_mutex_trylock( &xSuspendResumeThreadMutex )) {
 			sched_yield();
-			(void)pthread_mutex_lock( &xSuspendResumeThreadMutex );
 		}
-		xTaskToSuspend = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
+	}
+	xTaskToSuspend = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
 
-		vTaskSwitchContext();
+	vTaskSwitchContext();
 
-		xTaskToResume = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
-		if ( xTaskToSuspend != xTaskToResume )
-		{
-			/* Remember and switch the critical nesting. */
-			prvSetTaskCriticalNesting( xTaskToSuspend, uxCriticalNesting );
-			uxCriticalNesting = prvGetTaskCriticalNesting( xTaskToResume );
-			/* Switch tasks. */
-			hRequestedThread = xTaskToResume;	
-			prvResumeThread( xTaskToResume );
-			//prvSuspendThread( xTaskToSuspend );
+	xTaskToResume = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
+	if ( xTaskToSuspend != xTaskToResume )
+	{
+		/* Remember and switch the critical nesting. */
+		prvSetTaskCriticalNesting( xTaskToSuspend, uxCriticalNesting );
+		uxCriticalNesting = prvGetTaskCriticalNesting( xTaskToResume );
+		/* Switch tasks. */
+		hRequestedThread = xTaskToResume;	
+		prvResumeThread( xTaskToResume );
+		//prvSuspendThread( xTaskToSuspend );
 if (prvGetThreadHandle(xTaskGetCurrentTaskHandle())!=xTaskToResume) {
-	debug_printf("\n     what the fuck???? someone else did a switchcontext?!?\n");
+debug_printf("\n     what the fuck???? someone else did a switchcontext?!?\n");
 }
-			(void)pthread_mutex_unlock( &xSuspendResumeThreadMutex );
-			prvSuspendSignalHandler(SIG_SUSPEND);
-			return;
-		}
-		else
-		{
-			/* Yielding to self */
-			(void)pthread_mutex_unlock( &xSuspendResumeThreadMutex );
-		}
+		(void)pthread_mutex_unlock( &xSuspendResumeThreadMutex );
+		prvSuspendSignalHandler(SIG_SUSPEND);
+		return;
+	}
+	else
+	{
+		/* Yielding to self */
+		(void)pthread_mutex_unlock( &xSuspendResumeThreadMutex );
 	}
 }
 /*-----------------------------------------------------------*/
@@ -644,8 +649,8 @@ struct timespec timeout;
 				prvSuspendThread( xTaskToSuspend );
 				//timeout.tv_sec=0;
 				//timeout.tv_nsec=10000;
-				sched_yield();
-				while ( 0 != pthread_mutex_trylock( &xRunningThreadMutex) ) {
+				//sched_yield();
+				while ( 0 != pthread_mutex_lock( &xRunningThreadMutex) ) {
 					prvSuspendThread( xTaskToSuspend );
 					timeout.tv_sec=0;
 					timeout.tv_nsec=1;

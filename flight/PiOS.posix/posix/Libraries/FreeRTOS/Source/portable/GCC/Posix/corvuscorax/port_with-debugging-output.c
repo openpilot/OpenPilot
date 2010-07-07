@@ -400,7 +400,7 @@ portLONG lIndex;
 		 * (needed for cygwin - but should work on all)
 		 */
 		if (iSignal==SIG_TICK) {
-			if (xGeneralFuckedUpIndicator!=0) {
+			if (xGeneralFuckedUpIndicator!=0 && hActiveThread!=hRequestedThread) {
 				fuckedUpCount++;
 				if (fuckedUpCount>10) {
 					fuckedUpCount=0;
@@ -1051,16 +1051,22 @@ struct tms xTimes;
 void prvResolveFuckup( void )
 {
 
-	printf("Scheduler fucked up again - lets try to fix it...\n");
-	printf("sending sig_suspend to thread that is supposed to be dead...\n");
+	(void)pthread_mutex_lock ( &xSuspendResumeThreadMutex);
+	if (hActiveThread == hRequestedThread) {
+		debug_printf("emergency handler started - but not needed - returning\n");
+		return;
+	}
+	printf("\nScheduler fucked up again - lets try to fix it...\n");
+	printf("\nsending sig_suspend to thread that is supposed to be dead...\n");
 	prvSuspendThread(hActiveThread);
-	printf("acquire running lock...");
+	printf("\nacquire running lock...\n");
 	if ( 0 == pthread_mutex_lock( &xRunningThreadMutex) ) {
-		printf("sending sig_resume to thread that is supposed to be running...\n");
+		printf("\nsending sig_resume to thread that is supposed to be running...\n");
 		prvResumeThread(hRequestedThread);
-		printf("giving up mutex...\n");
+		printf("\ngiving up mutex...\n");
 		(void)pthread_mutex_unlock(&xRunningThreadMutex); 
 	}
+	(void)pthread_mutex_unlock ( &xSuspendResumeThreadMutex);
 
 }
 /*-----------------------------------------------------------*/

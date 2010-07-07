@@ -289,15 +289,15 @@ xParams *pxThisThreadParams = pvPortMalloc( sizeof( xParams ) );
 	lIndexOfLastAddedTask = prvGetFreeThreadState();
 
 	/* Create a condition signal for this thread */
-	pthread_condattr_t   condAttr;
+/*	pthread_condattr_t   condAttr;
 	assert( 0 == pthread_condattr_init(&condAttr) );
-	assert( 0 == pthread_cond_init( &( pxThreads[ lIndexOfLastAddedTask ].hCond ), &condAttr ) );
+	assert( 0 == pthread_cond_init( &( pxThreads[ lIndexOfLastAddedTask ].hCond ), &condAttr ) ); */
 	
 	/* Create a condition mutex for this thread */
-	pthread_mutexattr_t mutexAttr;
+/*	pthread_mutexattr_t mutexAttr;
 	assert( 0 == pthread_mutexattr_init( &mutexAttr ) );
 	assert( 0 == pthread_mutexattr_settype( &mutexAttr, PTHREAD_MUTEX_ERRORCHECK ) );
-	assert( 0 == pthread_mutex_init( &( pxThreads[ lIndexOfLastAddedTask ].hMutex ), &mutexAttr ) );	
+	assert( 0 == pthread_mutex_init( &( pxThreads[ lIndexOfLastAddedTask ].hMutex ), &mutexAttr ) );*/ 	
 	
 	/* Create a thread and store it's handle number */
 	xSentinel = 0;
@@ -465,38 +465,43 @@ void vPortYield( void )
 pthread_t xTaskToSuspend;
 pthread_t xTaskToResume;
 tskTCB * oldTask, * newTask;
-sigset_t xSignals;	
-	
-	sigemptyset( &xSignals );
-	sigaddset( &xSignals, SIG_TICK ); 
-	pthread_sigmask( SIG_BLOCK, &xSignals, NULL );
 	
 	oldTask = xTaskGetCurrentTaskHandle();
 	xTaskToSuspend = prvGetThreadHandle( oldTask ); //xTaskGetCurrentTaskHandle() );
 	if(xTaskToSuspend != pthread_self() ) {
-		printf( "Called from different thread (%li) than what it will suspend (%li(%s)).  Probably reflects bad state\r\n", (long int) pthread_self(), (long int) xTaskToSuspend, oldTask->pcTaskName );
-		kill(getpid(), SIGKILL );
+		debug_printf( "The current task isn't even us, suspending and letting that task start\r\n" );
+		pauseThread();
+		return;
 	}
+
+	assert( pthread_mutex_lock( &xSingleThreadMutex ) == 0);	
 
 	vTaskSwitchContext();
 
-		
 	newTask = xTaskGetCurrentTaskHandle();
 	xTaskToResume = prvGetThreadHandle( newTask ) ; //xTaskGetCurrentTaskHandle() );
 
-	if ( xTaskToSuspend != xTaskToResume )
+	if ( prvGetThreadTask( pthread_self() ) != xTaskToResume )
 	{
 		/* Remember and switch the critical nesting. */
 		prvSetTaskCriticalNesting( xTaskToSuspend, uxCriticalNesting );
 		uxCriticalNesting = prvGetTaskCriticalNesting( xTaskToResume );
-		
+
+		assert( pthread_mutex_unlock( &xSingleThreadMutex ) == 0);
+
+		/* pausing self if switching tasks, can now rely on other thread waking itself up */
+		pauseThread();				
+
 		/* Switch tasks. */
-		debug_printf( "Yielding %li: From %li(%s) to %li(%s)\r\n",(long int) pthread_self(), (long int) xTaskToSuspend, oldTask->pcTaskName, (long int) xTaskToResume, newTask->pcTaskName);
+/*		debug_printf( "Yielding %li: From %li(%s) to %li(%s)\r\n",(long int) pthread_self(), (long int) xTaskToSuspend, oldTask->pcTaskName, (long int) xTaskToResume, newTask->pcTaskName);
 		prvSuspendThread( xTaskToSuspend );
-		debug_printf( "Yielded %li: From %li(%s) to %li(%s)\r\n",(long int) pthread_self(), (long int) xTaskToSuspend, oldTask->pcTaskName, (long int) xTaskToResume, newTask->pcTaskName);
+		debug_printf( "Yielded %li: From %li(%s) to %li(%s)\r\n",(long int) pthread_self(), (long int) xTaskToSuspend, oldTask->pcTaskName, (long int) xTaskToResume, newTask->pcTaskName); */
 	}
-	
-	pthread_sigmask( SIG_UNBLOCK, &xSignals, NULL );
+	else 
+	{
+
+		assert( pthread_mutex_unlock( &xSingleThreadMutex ) == 0);
+	}
 }
 /*-----------------------------------------------------------*/
 
@@ -545,10 +550,10 @@ int lockResult;
 	debug_printf( "(xInterruptsEnabled = %i, xServicingTick = %i)\r\n", (int) xInterruptValue != 0, (int) xServicingTick != 0);
 	if ( ( pdTRUE == xInterruptValue ) && ( pdTRUE != xServicingTick ) )
 	{
-//		debug_printf( "Checking for lock ...\r\n" );
-//		lockResult = pthread_mutex_trylock( &xSingleThreadMutex );
-		lockResult = 0;
-//		debug_printf( "Done\r\n" );
+		debug_printf( "Checking for lock ...\r\n" );
+		lockResult = pthread_mutex_trylock( &xSingleThreadMutex );
+//		lockResult = 0;
+		debug_printf( "Done\r\n" );
 		if ( 0 ==  lockResult)
 		{
 			debug_printf( "Handling\r\n");
@@ -562,7 +567,7 @@ int lockResult;
 #if ( configUSE_PREEMPTION == 1 )
 			vTaskSwitchContext();
 #endif
-			
+
 			newTask = xTaskGetCurrentTaskHandle();			
 			xTaskToResume = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
 
@@ -574,23 +579,18 @@ int lockResult;
 				uxCriticalNesting = prvGetTaskCriticalNesting( xTaskToResume );
 				
 				debug_printf( "Swapping From %li(%s) to %li(%s)\r\n", (long int) xTaskToSuspend, oldTask->pcTaskName, (long int) xTaskToResume, newTask->pcTaskName);				
-//				prvResumeThread( xTaskToResume );				/* Resume next task. */
 				prvSuspendThread( xTaskToSuspend );				/* Suspend the current task. */
 				debug_printf( "Swapped From %li(%s) to %li(%s)\r\n", (long int) xTaskToSuspend, oldTask->pcTaskName, (long int) xTaskToResume, newTask->pcTaskName);
 			}
-			else
-			{			
-				debug_printf( "Resuming previous task\r\n" );
-				/* Release the lock as we are Resuming. */
-//				(void)pthread_mutex_unlock( &xSingleThreadMutex );
-			}
 			xServicingTick = pdFALSE;
+			(void)pthread_mutex_unlock( &xSingleThreadMutex );
 		}
 		else
 		{
 			debug_printf( "Pending yield here (portYield has lock - hopefully)\r\n" );
 			xPendYield = pdTRUE;
 		}
+
 	}
 	else
 	{
@@ -701,6 +701,10 @@ void pauseThread()
 		if( pthread_self() == prvGetThreadHandle(xTaskGetCurrentTaskHandle() ) )
 			return;
 		else {
+			struct timespec x;
+			x.tv_sec=0;
+			x.tv_nsec=10000;
+			nanosleep(&x,NULL);
 			sched_yield();
 		}
 
@@ -730,11 +734,17 @@ sigset_t xBlockSignals;
 	//assert ( 0 == pthread_mutex_unlock( &xSingleThreadMutex ) );
 
 	// Set resume condition for specific thread
-	pthread_cond_t hCond = prvGetThreadCondition( xTaskGetCurrentTaskHandle() );
-	assert( pthread_cond_signal( &hCond ) == 0 );
+/*	pthread_cond_t hCond = prvGetThreadCondition( xTaskGetCurrentTaskHandle() );
+	assert( pthread_cond_signal( &hCond ) == 0 ); */
 
 	pauseThread(); 
 	
+	while( pthread_self() != prvGetThreadHandle( xTaskGetCurrentTaskHandle() ) )
+	{
+		debug_printf( "Incorrectly woke up.  Repausing\r\n" );
+		pauseThread();
+	}
+
 	/* Make sure the right thread is resuming */
 	assert( pthread_self() == prvGetThreadHandle(xTaskGetCurrentTaskHandle() ) ); 
 	

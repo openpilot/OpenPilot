@@ -509,13 +509,13 @@ pthread_t xTaskToResume;
 		vTaskSwitchContext();
 
 		xTaskToResume = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
-		hRequestedThread = xTaskToResume;	
 		if ( xTaskToSuspend != xTaskToResume )
 		{
 			/* Remember and switch the critical nesting. */
 			prvSetTaskCriticalNesting( xTaskToSuspend, uxCriticalNesting );
 			uxCriticalNesting = prvGetTaskCriticalNesting( xTaskToResume );
 			/* Switch tasks. */
+			hRequestedThread = xTaskToResume;	
 			prvResumeThread( xTaskToResume );
 			//prvSuspendThread( xTaskToSuspend );
 if (prvGetThreadHandle(xTaskGetCurrentTaskHandle())!=xTaskToResume) {
@@ -634,31 +634,32 @@ struct timespec timeout;
 			vTaskSwitchContext();
 #endif
 			xTaskToResume = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
-			hRequestedThread = xTaskToResume;	
+			//hRequestedThread = xTaskToResume;	
 
 			/* The only thread that can process this tick is the running thread. */
 			if ( xTaskToSuspend != xTaskToResume )
 			{
 				/* Suspend the current task. */
+				hRequestedThread = 0;	
 				prvSuspendThread( xTaskToSuspend );
 				timeout.tv_sec=0;
 				timeout.tv_nsec=10000;
-				//if ( 0 == pthread_mutex_timedlock( &xRunningThreadMutex,&timeout ) ) {
-				if ( 0 == pthread_mutex_lock( &xRunningThreadMutex) ) {
-					/* Remember and switch the critical nesting. */
-					prvSetTaskCriticalNesting( xTaskToSuspend, uxCriticalNesting );
-					uxCriticalNesting = prvGetTaskCriticalNesting( xTaskToResume );
-					/* Resume next task. */
-					prvResumeThread( xTaskToResume );
-if (prvGetThreadHandle(xTaskGetCurrentTaskHandle())!=xTaskToResume) {
-	debug_printf("\n     what the fuck???? someone else did a switchcontext?!?\n");
-}
-					(void)pthread_mutex_unlock( &xRunningThreadMutex );
-				} else {
-					debug_printf("Oh dear - tick handler could not acquire lock!\n\n");
-					//prvResumeThread( xTaskToSuspend );
-					xGeneralFuckedUpIndicator=3;
+				while ( 0 != pthread_mutex_timedlock( &xRunningThreadMutex,&timeout ) ) {
+					prvSuspendThread( xTaskToSuspend );
+					timeout.tv_sec=0;
+					timeout.tv_nsec=10000;
 				}
+				//if ( 0 == pthread_mutex_lock( &xRunningThreadMutex) ) {
+				/* Remember and switch the critical nesting. */
+				prvSetTaskCriticalNesting( xTaskToSuspend, uxCriticalNesting );
+				uxCriticalNesting = prvGetTaskCriticalNesting( xTaskToResume );
+				/* Resume next task. */
+				hRequestedThread = xTaskToResume;	
+				prvResumeThread( xTaskToResume );
+if (prvGetThreadHandle(xTaskGetCurrentTaskHandle())!=xTaskToResume) {
+debug_printf("\n     what the fuck???? someone else did a switchcontext?!?\n");
+}
+				(void)pthread_mutex_unlock( &xRunningThreadMutex );
 			}
 			else
 			{
@@ -1050,6 +1051,8 @@ struct tms xTimes;
  */
 void prvResolveFuckup( void )
 {
+struct timespec timeout;
+pthread_t xTaskToResume;
 
 	(void)pthread_mutex_lock ( &xSuspendResumeThreadMutex);
 	if (hActiveThread == hRequestedThread) {
@@ -1057,15 +1060,27 @@ void prvResolveFuckup( void )
 		return;
 	}
 	printf("\nScheduler fucked up again - lets try to fix it...\n");
+	if (hRequestedThread==0) {
+		printf("\nno supposedly active thread - fixing\n");
+		xTaskToResume = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
+
+	} else {
+		xTaskToResume = hRequestedThread;
+	}
 	printf("\nsending sig_suspend to thread that is supposed to be dead...\n");
 	prvSuspendThread(hActiveThread);
 	printf("\nacquire running lock...\n");
-	if ( 0 == pthread_mutex_lock( &xRunningThreadMutex) ) {
-		printf("\nsending sig_resume to thread that is supposed to be running...\n");
-		prvResumeThread(hRequestedThread);
-		printf("\ngiving up mutex...\n");
-		(void)pthread_mutex_unlock(&xRunningThreadMutex); 
+	timeout.tv_sec=0;
+	timeout.tv_nsec=10000;
+	while ( 0 != pthread_mutex_timedlock( &xRunningThreadMutex,&timeout ) ) {
+		prvSuspendThread(hActiveThread);
+		timeout.tv_sec=0;
+		timeout.tv_nsec=10000;
 	}
+	printf("\nsending sig_resume to thread that is supposed to be running...\n");
+	prvResumeThread(xTaskToResume);
+	printf("\ngiving up mutex...\n");
+	(void)pthread_mutex_unlock(&xRunningThreadMutex); 
 	(void)pthread_mutex_unlock ( &xSuspendResumeThreadMutex);
 
 }

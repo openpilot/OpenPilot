@@ -55,8 +55,8 @@ namespace gdhe {
 		protected:
 			void init();
 		public:
-			Client(): idFactory(), host("localhost") {}
-			Client(std::string host_): idFactory(), host(host_) {}
+			Client(): idFactory(), host("localhost"), backgroundColor(194,184,176) {}
+			Client(std::string host_): idFactory(), host(host_), backgroundColor(194,184,176) {}
 			void setHost(std::string host_) { host = host_; }
 			int connect(bool wait = true);
 			int disconnect() { return ::disconnect(); }
@@ -70,6 +70,11 @@ namespace gdhe {
 			int launch_server() { return system("gdhe&"); }
 			int dump(std::string const& filename) { return 0;/* TODO */ }
 			void redraw() { eval("redrawAllWindows"); }
+			
+			void setBackgroundColor(ColorRGB &_color) 
+				{ backgroundColor = _color; }
+			void setBackgroundColor(unsigned char _R, unsigned char _G, unsigned char _B) 
+				{ backgroundColor.R = _R; backgroundColor.G = _G; backgroundColor.B = _B; }
 			
 			void addObject(Object *object, bool visible = true);
 			void addSubObject(Object *object, Object *parent, std::string suffix, bool visible = true);
@@ -380,9 +385,6 @@ namespace gdhe {
 			}
 	};
 	
-	// TODO need to write a real object type Trajectory that optimizes refreshing
-	//typedef Polyline Trajectory;
-	
 	// TODO maybe compress a little bit, we'll lose detail but it's really big at 60Hz...
 	class Trajectory: public Object
 	{
@@ -407,6 +409,7 @@ namespace gdhe {
 					last_poly->setColor(color);
 					std::ostringstream oss; oss << "-" << traj.size();
 					client->addSubObject(last_poly, this, oss.str(), false);
+					poseModified = true;
 					if (prev_last_poly)
 						last_poly->addPoint(prev_last_poly->back());
 				}

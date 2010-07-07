@@ -67,9 +67,12 @@ namespace gdhe {
 				//JFR_DEBUG("evaluated [" << r << "] '" << exp << "'");
 				return r;
 			}
-			int launch_server() { return system("gdhe&"); }
-			int dump(std::string const& filename) { return 0;/* TODO */ }
-			void redraw() { eval("redrawAllWindows"); }
+			int launch_server()
+				{ return system("gdhe&"); }
+			int dump(std::string const& filename)
+				{ std::ostringstream oss; oss << "$gdheBase.gdhe.ogl dumpPpm -color " << filename; return eval(oss.str()); }
+			void redraw()
+				{ eval("redrawAllWindows"); }
 			
 			void setBackgroundColor(ColorRGB &_color) 
 				{ backgroundColor = _color; }

@@ -79,8 +79,8 @@ namespace gdhe {
 		oss << "clearColor " << (int)backgroundColor.R << " " << (int)backgroundColor.G << " " << (int)backgroundColor.B;
 		eval(oss.str());
 		// FIXME this should apparently be done before gdhe loading, no effect afterwards, but not very important since improvement of mouse gestures
-		eval("set xmin -10 ; set xmax 10 ; set ymin -10 ; set ymax 10 ; set zmin -2 ; set zmax 5");
-		eval("set obsX 0.0 ; set obsY 0.0 ; set obsZ 0.0 ; set obsElev 45 ; set obsAzi 90 ; set obsDist 2.0 ; set envDefined 1");
+		//eval("set xmin -10 ; set xmax 10 ; set ymin -10 ; set ymax 10 ; set zmin -2 ; set zmax 5");
+		eval("set obsX 0.0 ; set obsY 0.0 ; set obsZ 0.0 ; set obsElev 45 ; set obsAzi 90 ; set obsDist 4.0 ; set envDefined 1");
 		eval("source $env(JAFAR_DIR)/modules/gdhe/data/camera.tcl");
 		eval("source $env(JAFAR_DIR)/modules/gdhe/data/setup.tcl");
 	}

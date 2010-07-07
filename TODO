@@ -44,8 +44,6 @@ Precision
 Display
 ------------------------------------
 
-- 3D display with GDHE
-- Allow configurations of viewers: font size, dump, ...
 - Allow exhaustive rendering when offline, for videos
 - Catch keyboard and mouse events in the windows, in order to allow to play/pause/next...
 - Implement double color labels for better visibility on light and dark backgrounds

@@ -19,6 +19,9 @@
 #include "rtslam/sensorPinHole.hpp"
 #include "rtslam/descriptorImagePoint.hpp"
 
+// TODO it should be possible to disable one point ransac in order to do
+// basic active search with this same class, to avoid code duplication
+
 namespace jafar {
 	namespace rtslam {
 
@@ -26,7 +29,7 @@ namespace jafar {
 		void
 		DataManagerOnePointRansac<RawSpec, SensorSpec, Detector, Matcher>::
 		processKnownObs( boost::shared_ptr<RawSpec> rawData)
-				{
+			{
 				int numObs = 0;
 				asGrid->renew();
 
@@ -45,6 +48,7 @@ namespace jafar {
 					{// 1b. base obs is now matched
 
 						ransac_set_ptr_t ransacSetPtr(new RansacSet);
+						ransacSetList.push_back(ransacSetPtr);
 						ransacSetPtr->obsBasePtr = obsBasePtr;
 
 						current_try ++;
@@ -69,7 +73,8 @@ namespace jafar {
 
 							if(!obsCurrentPtr->events.matched){
 								// try to match
-
+								
+								// FIXME only repredict if never done before
 								obsBasePtr->predictAppearance();
 
 								obsCurrentPtr->measurement.std(detectorParams_.measStd);
@@ -83,14 +88,15 @@ namespace jafar {
 
 							}
 
-							if(1/* is inside low-innovation region */)
+							if(obsCurrentPtr->events.matched)
 							{
 								// declare inlier
+								ransacSetPtr->inlierObs.push_back(obsCurrentPtr);
 							}
 							else{
-								// ransacSetList(i).pendingObs.push_back(obsCurrentPtr)
-
-							} // if match
+								// declare pending
+								ransacSetPtr->pendingObs.push_back(obsCurrentPtr);
+							}
 
 						} // for each other obs
 
@@ -100,24 +106,139 @@ namespace jafar {
 
 				{
 					// 1. select ransacSet.inliers.size() max
+					ransac_set_ptr_t best_set;
+					for(RansacSetList::iterator rsIter = ransacSetList.begin(); rsIter != ransacSetList.end(); ++rsIter)
+						if (!best_set || (*rsIter)->size() > best_set->size()) best_set = *rsIter;
 					// 2. for each obs in inliers
-					// 2a. add obs to buffer for EKF update
+					for(ObsList::iterator obsIter = best_set->inlierObs.begin(); obsIter != best_set->inlierObs.end(); ++obsIter)
+					{
+						observation_ptr_t obsPtr = *obsIter;
+						// Add to tesselation grid for active search
+						asGrid->addPixel(obsPtr->expectation.x());
+						
+						// 2a. add obs to buffer for EKF update
+						// TODO
+						
+					}
 					// 3. perform buffered update
-					// 4. for each obs in pending: retake algorithm from active search. Briefly:
-					// 4a. project()
-					// 4b. sort ellipses sizes <--- predictInfoGain()
-					// for each obs in descending ellipse size
-					// 4c. try to match
-					// 4d. if matched
-					// 4di. check compatibility <--- obsPtr->compatibilityTest(matcherParams_.mahalanobisTh)
-					// 4dii. if compatible make EKF update
+					// TODO
+					// 4. for each obs in pending: retake algorithm from active search
+					obsListSorted.clear();
+					for(ObsList::iterator obsIter = best_set->pendingObs.begin(); obsIter != best_set->pendingObs.end(); ++obsIter)
+					{
+						observation_ptr_t obsPtr = *obsIter;
+						obsPtr->clearEvents();
+						obsPtr->measurement.matchScore = 0;
+
+						// 1a. project
+						obsPtr->project();
+
+						// 1b. check visibility
+						obsPtr->predictVisibility();
+
+						if (obsPtr->isVisible()) {
+
+							// Add to tesselation grid for active search
+							asGrid->addPixel(obsPtr->expectation.x());
+
+							// predict information gain
+							obsPtr->predictInfoGain();
+
+							// add to sorted list of observations
+							obsListSorted[obsPtr->expectation.infoGain] = obsPtr;
+
+						} // visible obs
+					} // for each obs
+
+					// loop only the N_UPDATES most interesting obs, from largest info gain to smallest
+					for (ObservationListSorted::reverse_iterator obsIter = obsListSorted.rbegin(); obsIter
+							!= obsListSorted.rend(); obsIter++) {
+						observation_ptr_t obsPtr = obsIter->second;
+
+						// 1a. re-project to get up-to-date means and Jacobians
+						obsPtr->project();
+
+						obsPtr->events.predicted = true;
+
+						// 1b. re-check visibility, just in case re-projection caused this obs to be invisible
+						obsPtr->predictVisibility();
+
+						if (obsPtr->isVisible()) {
+
+							obsPtr->events.visible = true;
+
+							if (numObs < algorithmParams_.n_updates) {
+
+								obsPtr->events.measured = true;
+
+								// update counter
+								obsPtr->counters.nSearch++;
+
+								// 1c. predict search area and appearance
+								cv::Rect roi = gauss2rect(obsPtr->expectation.x(), obsPtr->expectation.P() + matcherParams_.measVar*identity_mat(2), matcherParams_.regionSigma);
+								obsPtr->predictAppearance();
+
+								// 1d. match predicted feature in search area
+								//						kernel::Chrono match_chrono;
+								obsPtr->measurement.std(detectorParams_.measStd);
+								boost::shared_ptr<RawSpec> rawSpecPtr = SPTR_CAST<RawSpec>(sensorPtr()->getRaw());
+
+								match(rawSpecPtr, obsPtr->predictedAppearance, roi, obsPtr->measurement,
+																				obsPtr->observedAppearance);
+								//						total_match_time += match_chrono.elapsedMicrosecond();
+
+		/*
+									// DEBUG: save some appearances to file
+									((AppearanceImagePoint*)(((DescriptorImagePoint*)(obsPtr->landmark().descriptorPtr.get()))->featImgPntPtr->appearancePtr.get()))->patch.save("descriptor_app.png");
+									((AppearanceImagePoint*)(obsPtr->predictedAppearance.get()))->patch.save("predicted_app.png");
+									((AppearanceImagePoint*)(obsPtr->observedAppearance.get()))->patch.save("matched_app.png");
+		*/
+								// DEBUG: display predicted appearances on image, disable it when operating normally because can have side effects
+		/*
+								if (SHOW_PATCH) {
+									AppearanceImagePoint * appImgPtr =
+											PTR_CAST<AppearanceImagePoint*> (obsPtr->predictedAppearance.get());
+									jblas::veci shift(2);
+									shift(0) = (appImgPtr->patch.width() - 1) / 2;
+									shift(1) = (appImgPtr->patch.height() - 1) / 2;
+									appImgPtr->patch.robustCopy(*PTR_CAST<RawImage*> (senPtr->getRaw().get())->img, 0, 0,
+																							obsPtr->expectation.x(0) - shift(0), obsPtr->expectation.x(1) - shift(1));
+								}
+		*/
+
+								// 1e. if feature is found
+								if (obsPtr->getMatchScore() > matcherParams_.threshold) {
+									obsPtr->counters.nMatch++;
+									obsPtr->events.matched = true;
+									obsPtr->computeInnovation();
+
+									// 1f. if feature is inlier
+									if (obsPtr->compatibilityTest(matcherParams_.mahalanobisTh)) { // use 3.0 for 3-sigma or the 5% proba from the chi-square tables.
+										numObs++;
+										obsPtr->counters.nInlier++;
+										//								kernel::Chrono update_chrono;
+										obsPtr->update();
+										//								total_update_time += update_chrono.elapsedMicrosecond();
+										obsPtr->events.updated = true;
+									} // obsPtr->compatibilityTest(M_TH)
+								} // obsPtr->getScoreMatchInPercent()>SC_TH
+
+		//						cout << *obsPtr << endl;
+							} // number of observations
+						} // obsPtr->isVisible()
+
+						// cout << "\n-------------------------------------------------- " << endl;
+						// cout << *obsPtr << endl;
+
+					} // foreach observation
+
+					obsListSorted.clear(); // clear the list now or it will prevent the observation to be destroyed until next frame, and will still be displayed
 				}
 
 				// clear all sets to liberate shared pointers
 				ransacSetList.clear();
 				obsVisibleList.clear();
-
-				}
+			}
 
 		//    template<>
 		//    bool DataManagerOnePointRansac<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> >::

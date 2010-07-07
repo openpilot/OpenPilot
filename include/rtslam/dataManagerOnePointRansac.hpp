@@ -54,6 +54,9 @@ namespace jafar {
 				boost::shared_ptr<Detector> detector;
 				boost::shared_ptr<Matcher> matcher;
 				boost::shared_ptr<ActiveSearchGrid> asGrid;
+				// the list of observations sorted by information gain
+				typedef map<double, observation_ptr_t> ObservationListSorted;
+				ObservationListSorted obsListSorted;
 				// the list of visible observations to handle
 				ObsList obsVisibleList;
 				ObsList obsBaseList;

@@ -281,36 +281,52 @@ xParams *pxThisThreadParams = pvPortMalloc( sizeof( xParams ) );
 	pxThisThreadParams->pvParams = pvParameters;
 
 	vPortEnterCritical();
-
-	lIndexOfLastAddedTask = prvGetFreeThreadState();
-
-	/* Create the new pThread. */
-	/* On creation of the very first thread, RunningThreadMutex is not claimed yet
-	 * by the master thread - do that! */
-	if (xVeryFirstTask==1) {
-		debug_printf("Seting up very first task (main) - MAIN is ACTIVE TASK\n");
-		if (0 == pthread_mutex_lock( &xRunningThreadMutex)) {
-			xVeryFirstTask=0;
-		} else {
-			printf("Failed to acquire lock for first task");
-			exit(1);
+	if ( 0 == pthread_mutex_lock( &xSuspendResumeThreadMutex ) ) {
+		while (hActiveThread!=hRequestedThread && !xVeryFirstTask) {
+			(void)pthread_mutex_unlock( &xSuspendResumeThreadMutex );
+			sched_yield();
+			(void)pthread_mutex_lock( &xSuspendResumeThreadMutex );
 		}
 
-	}
 
-	if ( 0 != pthread_create( &( pxThreads[ lIndexOfLastAddedTask ].hThread ), &xThreadAttributes, prvWaitForStart, (void *)pxThisThreadParams ) )
-	{
-		/* Thread create failed, signal the failure */
-		pxTopOfStack = 0;
-	}
+		lIndexOfLastAddedTask = prvGetFreeThreadState();
 
-	/* Wait until the task suspends. */
-	xSentinel=0;
-	(void)pthread_mutex_unlock( &xRunningThreadMutex );
-	while ( xSentinel == 0 ) {
-		sched_yield();
+		/* Create the new pThread. */
+		/* On creation of the very first thread, RunningThreadMutex is not claimed yet
+		 * by the master thread - do that! */
+		if (xVeryFirstTask==1) {
+			debug_printf("Seting up very first task (main) - MAIN is ACTIVE TASK\n");
+			if (0 == pthread_mutex_lock( &xRunningThreadMutex)) {
+				xVeryFirstTask=0;
+				hActiveThread=pthread_self();
+				hRequestedThread=hActiveThread;
+			} else {
+				printf("Failed to acquire lock for first task");
+				exit(1);
+			}
+
+		}
+
+		if ( 0 != pthread_create( &( pxThreads[ lIndexOfLastAddedTask ].hThread ), &xThreadAttributes, prvWaitForStart, (void *)pxThisThreadParams ) )
+		{
+			/* Thread create failed, signal the failure */
+			pxTopOfStack = 0;
+		}
+
+		/* Wait until the task suspends. */
+		xSentinel=0;
+		(void)pthread_mutex_unlock( &xRunningThreadMutex );
+		while ( xSentinel == 0 ) {
+			sched_yield();
+		}
+		(void)pthread_mutex_lock( &xRunningThreadMutex );
+		hActiveThread=pthread_self();
+		debug_printf("ACTIVE THREAD RECLAIMED!\n");
+		(void)pthread_mutex_unlock( &xSuspendResumeThreadMutex );
+	} else {
+		debug_printf("mutex locking failed\n");
+		exit(1);
 	}
-	(void)pthread_mutex_lock( &xRunningThreadMutex );
 	vPortExitCritical();
 
 	return pxTopOfStack;
@@ -484,7 +500,9 @@ pthread_t xTaskToResume;
 		 * Make sure we don't create outdated resume signals
 		 */
 		while (hActiveThread!=hRequestedThread) {
+			(void)pthread_mutex_unlock( &xSuspendResumeThreadMutex );
 			sched_yield();
+			(void)pthread_mutex_lock( &xSuspendResumeThreadMutex );
 		}
 		xTaskToSuspend = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
 
@@ -591,17 +609,20 @@ struct timespec timeout;
 	 */
 	if ( ( pdTRUE == xInterruptsEnabled ) && ( pdTRUE != xServicingTick ) && ( hRequestedThread == hActiveThread ) )
 	{
+		xServicingTick = pdTRUE;
 		if ( 0 == pthread_mutex_trylock( &xSuspendResumeThreadMutex ) )
 		{
 			debug_printf("does handle tick\n");
-			xServicingTick = pdTRUE;
 			
 			/**
 			 * this shouldn't ever happen - but WELL...
 			 * Make sure we don't create outdated resume signals
 			 */
-			while (hActiveThread!=hRequestedThread) {
-				sched_yield();
+			if (hActiveThread!=hRequestedThread) {
+				xServicingTick = pdFALSE;
+				xPendYield = pdTRUE;
+				(void)pthread_mutex_unlock( &xSuspendResumeThreadMutex );
+				return;
 			}
 
 			xTaskToSuspend = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
@@ -644,13 +665,13 @@ if (prvGetThreadHandle(xTaskGetCurrentTaskHandle())!=xTaskToResume) {
 				/* Release the lock as we are Resuming. */
 		//		(void)pthread_mutex_unlock( &xSingleThreadMutex );
 			}
-			xServicingTick = pdFALSE;
 		}
 		else
 		{
 			xPendYield = pdTRUE;
 		}
 		(void)pthread_mutex_unlock( &xSuspendResumeThreadMutex );
+		xServicingTick = pdFALSE;
 	}
 	else
 	{
@@ -679,7 +700,9 @@ portBASE_TYPE xResult;
 				 * Make sure we don't create outdated resume signals
 				 */
 				while (hActiveThread!=hRequestedThread) {
+					(void)pthread_mutex_unlock( &xSuspendResumeThreadMutex );
 					sched_yield();
+					(void)pthread_mutex_lock( &xSuspendResumeThreadMutex );
 				}
 				/* This is a suicidal thread, need to select a different task to run. */
 				vTaskSwitchContext();
@@ -687,7 +710,7 @@ portBASE_TYPE xResult;
 				hRequestedThread = xTaskToResume;
 				(void)pthread_mutex_unlock( &xSuspendResumeThreadMutex );
 			} else {
-				debug_printf("THIS was never meant to happen\n");
+				debug_printf("mutex lock failed!\n");
 				exit(1);
 			}
 		}
@@ -734,6 +757,8 @@ sigset_t xSignals;
 	if ( 0 == pthread_mutex_lock( &xRunningThreadMutex ) )
 	{
 		xSentinel=1;
+		hActiveThread=pthread_self();
+		debug_printf("temporarily made ACTIVE THREAD!\n");
 
 		sigemptyset( &xSignals );
 		sigaddset( &xSignals, SIG_RESUME );

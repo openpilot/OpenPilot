@@ -98,6 +98,7 @@ typedef struct THREAD_SUSPENSIONS
 static xThreadState *pxThreads;
 static pthread_once_t hSigSetupThread = PTHREAD_ONCE_INIT;
 static pthread_attr_t xThreadAttributes;
+static pthread_mutex_t xRunningThreadMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t xSuspendResumeThreadMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t xSingleThreadMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_t hMainThread = ( pthread_t )NULL;

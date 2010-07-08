@@ -100,6 +100,7 @@ typedef struct THREAD_SUSPENSIONS
 static xThreadState *pxThreads;
 static pthread_once_t hSigSetupThread = PTHREAD_ONCE_INIT;
 static pthread_attr_t xThreadAttributes;
+static pthread_mutex_t xRunningThread = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t xSuspendResumeThreadMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t xSingleThreadMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_t hMainThread = ( pthread_t )NULL;
@@ -379,6 +380,7 @@ portLONG lIndex;
 		x.tv_sec=0;
 		x.tv_nsec=1000000;
 		nanosleep(&x,NULL);
+		printf("."); fflush(stdout);
 		vPortSystemTickHandler(SIG_TICK);		
 	}
 	
@@ -464,44 +466,49 @@ void vPortYield( void )
 {
 pthread_t xTaskToSuspend;
 pthread_t xTaskToResume;
-tskTCB * oldTask, * newTask;
+sigset_t xSignals;
 	
-	oldTask = xTaskGetCurrentTaskHandle();
-	xTaskToSuspend = prvGetThreadHandle( oldTask ); //xTaskGetCurrentTaskHandle() );
-	if(xTaskToSuspend != pthread_self() ) {
-		debug_printf( "The current task isn't even us, suspending and letting that task start\r\n" );
-		pauseThread();
-		return;
-	}
+	/* We must mask the suspend signal here, because otherwise there can be an */
+	/* interrupt while in pthread_mutex_lock and that will cause the next thread */
+	/* to deadlock when it tries to get this mutex */	
+
+	sigemptyset( &xSignals );
+	sigaddset( &xSignals, SIG_SUSPEND );
+	pthread_sigmask( SIG_SETMASK, &xSignals, NULL );
 
 	assert( pthread_mutex_lock( &xSingleThreadMutex ) == 0);	
 
+	xTaskToSuspend = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
+	if(xTaskToSuspend != pthread_self() ) {
+		/* This means between masking the interrupt and getting the lock, there was an interrupt */
+		/* and this task should suspend.  Release the lock, then unmask interrupts to go ahead and */ 
+		/* service the signal */
+		assert( 0 == pthread_mutex_unlock( &xSingleThreadMutex ) );
+		debug_printf( "The current task isn't even us, letting interrupt happen\r\n" );
+		/* Now we are resuming, want to be able to catch this interrupt again */
+		sigemptyset( &xSignals );
+		pthread_sigmask( SIG_SETMASK, &xSignals, NULL);
+		return;
+	}
+
+	/* Get new task then release the task switching mutex */
 	vTaskSwitchContext();
+	xTaskToResume = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
+	assert( pthread_mutex_unlock( &xSingleThreadMutex ) == 0);
 
-	newTask = xTaskGetCurrentTaskHandle();
-	xTaskToResume = prvGetThreadHandle( newTask ) ; //xTaskGetCurrentTaskHandle() );
-
-	if ( prvGetThreadTask( pthread_self() ) != xTaskToResume )
+	if ( pthread_self() != xTaskToResume )
 	{
 		/* Remember and switch the critical nesting. */
 		prvSetTaskCriticalNesting( xTaskToSuspend, uxCriticalNesting );
 		uxCriticalNesting = prvGetTaskCriticalNesting( xTaskToResume );
 
-		assert( pthread_mutex_unlock( &xSingleThreadMutex ) == 0);
-
 		/* pausing self if switching tasks, can now rely on other thread waking itself up */
 		pauseThread();				
-
-		/* Switch tasks. */
-/*		debug_printf( "Yielding %li: From %li(%s) to %li(%s)\r\n",(long int) pthread_self(), (long int) xTaskToSuspend, oldTask->pcTaskName, (long int) xTaskToResume, newTask->pcTaskName);
-		prvSuspendThread( xTaskToSuspend );
-		debug_printf( "Yielded %li: From %li(%s) to %li(%s)\r\n",(long int) pthread_self(), (long int) xTaskToSuspend, oldTask->pcTaskName, (long int) xTaskToResume, newTask->pcTaskName); */
 	}
-	else 
-	{
 
-		assert( pthread_mutex_unlock( &xSingleThreadMutex ) == 0);
-	}
+	/* Now we are resuming, want to be able to catch this interrupt again */
+	sigemptyset( &xSignals );
+	pthread_sigmask( SIG_SETMASK, &xSignals, NULL);
 }
 /*-----------------------------------------------------------*/
 
@@ -676,8 +683,25 @@ void * pParams = pxParams->pvParams;
 	
 	// wait for resume signal
 	debug_printf("Pausing newly created thread\r\n");		
-	pauseThread();
+//	pthread_mutex_lock( &xRunningThread );
+//	pauseThread();
 		
+	while (1) {
+		if( pthread_self() == prvGetThreadHandle(xTaskGetCurrentTaskHandle() ) )
+		{
+	//		assert( 0 == pthread_mutex_lock( &xRunningThread ) );
+			break;
+		}
+		else {
+			struct timespec x;
+			x.tv_sec=0;
+			x.tv_nsec=100000;
+			nanosleep(&x,NULL);
+			sched_yield();
+		}
+
+	}
+
 	// no longer want to block any signals
 	sigemptyset( &xSignals );
 	assert( pthread_sigmask( SIG_SETMASK, &xSignals, NULL ) == 0);
@@ -697,13 +721,17 @@ void pauseThread()
 {
 	debug_printf("\r\n");
 	
+//	assert( 0 == pthread_mutex_unlock( &xRunningThread ) );
 	while (1) {
 		if( pthread_self() == prvGetThreadHandle(xTaskGetCurrentTaskHandle() ) )
+		{
+//			assert( 0 == pthread_mutex_lock( &xRunningThread ) );
 			return;
+		}
 		else {
 			struct timespec x;
 			x.tv_sec=0;
-			x.tv_nsec=10000;
+			x.tv_nsec=100000;
 			nanosleep(&x,NULL);
 			sched_yield();
 		}
@@ -714,6 +742,7 @@ void pauseThread()
 		pthread_mutex_t hMutex = prvGetThreadMutex( hTask );
 	//	while( !shouldResume ) {
 	pthread_cond_wait( &hCond, &hMutex );
+			assert( 0 == pthread_mutex_lock( &xRunningThread ) );
 	//	}
 }
 
@@ -724,6 +753,7 @@ sigset_t xBlockSignals;
 	debug_printf( "Caught signal %i\r\n", sig );
 	/* Check that we aren't suspending when we should be running.  This bug would need tracking down */
 	//assert( pthread_self() != prvGetThreadHandle(xTaskGetCurrentTaskHandle() ) ); 
+	if( pthread_self() == prvGetThreadHandle( xTaskGetCurrentTaskHandle() ) ) return;
 
 	/* Block further suspend signals.  They need to go to their thread */
 	sigemptyset( &xBlockSignals );

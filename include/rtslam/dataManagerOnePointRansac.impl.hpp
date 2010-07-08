@@ -21,6 +21,7 @@
 
 // TODO it should be possible to disable one point ransac in order to do
 // basic active search with this same class, to avoid code duplication
+// do it with n_tries = 0
 
 namespace jafar {
 	namespace rtslam {
@@ -30,6 +31,7 @@ namespace jafar {
 		DataManagerOnePointRansac<RawSpec, SensorSpec, Detector, Matcher>::
 		processKnownObs( boost::shared_ptr<RawSpec> rawData)
 			{
+std::cout << std::endl << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl << std::endl;
 				map_ptr_t mapPtr = sensorPtr()->robotPtr()->mapPtr();
 				int numObs = 0;
 				asGrid->renew();
@@ -38,14 +40,19 @@ namespace jafar {
 
 				// Project and isolate visible observations
 				projectAndCollectVisibleObs();
+JFR_DEBUG("######## Found " << obsVisibleList.size() << " visible obs");
+				
+				int n_tries = algorithmParams_.n_tries;
+				if (obsVisibleList.size() < n_tries) n_tries = obsVisibleList.size();
+JFR_DEBUG("will try Ransac " << n_tries << " times");
 
 				int current_try = 0;
-				while (current_try < algorithmParams_.n_tries){
-
+				while (current_try < n_tries){
+JFR_DEBUG("#### go ransac try #" << current_try);
 					// select random obs and match it
 					observation_ptr_t obsBasePtr;
 					getOneMatchedBaseObs(obsBasePtr, rawData);
-
+JFR_DEBUG("chose matched obs " << obsBasePtr->id() << " as base");
 					{// 1b. base obs is now matched
 
 						ransac_set_ptr_t ransacSetPtr(new RansacSet);
@@ -54,12 +61,14 @@ namespace jafar {
 
 						current_try ++;
 						vec x_copy = updateMean(obsBasePtr);
+JFR_DEBUG("updated mean");
 
 						// for each other obs
 						for(ObsList::iterator obsIter = obsVisibleList.begin(); obsIter != obsVisibleList.end(); obsIter++)
 						{
 							observation_ptr_t obsCurrentPtr = *obsIter;
 							if (obsCurrentPtr == obsBasePtr) continue; // ignore the tested observation
+JFR_DEBUG("## testing obs " << obsCurrentPtr->id());
 
 							// get obs things
 							jblas::vec lmk = obsCurrentPtr->landmarkPtr()->state.x();
@@ -68,13 +77,15 @@ namespace jafar {
 
 							// project
 							obsCurrentPtr->project_func(obsCurrentPtr->sensorPtr()->globalPose(), lmk, pix, nobs);
+JFR_DEBUG("predicted at " << pix);
 
 							// set low-innovation ROI
 							cv::Rect roi(pix(0)-matcherParams_.regionPix/2, pix(1)-matcherParams_.regionPix/2, matcherParams_.regionPix, matcherParams_.regionPix);
 
 							if(!obsCurrentPtr->events.matched){
 								// try to match
-								
+JFR_DEBUG("not yet matched, trying with lowInnov");
+
 								// FIXME only repredict if never done before
 								obsBasePtr->predictAppearance();
 
@@ -86,17 +97,19 @@ namespace jafar {
 								if ( obsCurrentPtr->getMatchScore() > matcherParams_.threshold ) {
 									obsCurrentPtr->events.matched = true;
 								}
-
+JFR_DEBUG("matched: " << obsCurrentPtr->events.matched << " with score " << obsCurrentPtr->getMatchScore());
 							}
 
 							if(obsCurrentPtr->events.matched)
 							{
 								// declare inlier
 								ransacSetPtr->inlierObs.push_back(obsCurrentPtr);
+JFR_DEBUG("push in inliers");
 							}
 							else{
 								// declare pending
 								ransacSetPtr->pendingObs.push_back(obsCurrentPtr);
+JFR_DEBUG("push in pendings");
 							}
 
 						} // for each other obs
@@ -106,26 +119,37 @@ namespace jafar {
 				} // for i = 0:n_tries
 
 				{
-					// 1. select ransacSet.inliers.size() max
+JFR_DEBUG("######## Find best ransac set (among " << ransacSetList.size() << ")");
 					ransac_set_ptr_t best_set;
-					for(RansacSetList::iterator rsIter = ransacSetList.begin(); rsIter != ransacSetList.end(); ++rsIter)
-						if (!best_set || (*rsIter)->size() > best_set->size()) best_set = *rsIter;
-					// 2. for each obs in inliers
-					for(ObsList::iterator obsIter = best_set->inlierObs.begin(); obsIter != best_set->inlierObs.end(); ++obsIter)
+					if (ransacSetList.size() != 0)
 					{
-						observation_ptr_t obsPtr = *obsIter;
-						// Add to tesselation grid for active search
-						asGrid->addPixel(obsPtr->expectation.x());
-						
-						// 2a. add obs to buffer for EKF update
-						mapPtr->filterPtr->stackCorrection(obsPtr->innovation, obsPtr->INN_rsl, obsPtr->ia_rsl);
-						
+						// 1. select ransacSet.inliers.size() max
+						for(RansacSetList::iterator rsIter = ransacSetList.begin(); rsIter != ransacSetList.end(); ++rsIter)
+							if (!best_set || (*rsIter)->size() > best_set->size()) best_set = *rsIter;
+JFR_DEBUG("best set is " << best_set->obsBasePtr->id());
+						// 2. for each obs in inliers
+						for(ObsList::iterator obsIter = best_set->inlierObs.begin(); obsIter != best_set->inlierObs.end(); ++obsIter)
+						{
+							observation_ptr_t obsPtr = *obsIter;
+							// Add to tesselation grid for active search
+							asGrid->addPixel(obsPtr->expectation.x());
+							
+							// 2a. add obs to buffer for EKF update
+							mapPtr->filterPtr->stackCorrection(obsPtr->innovation, obsPtr->INN_rsl, obsPtr->ia_rsl);
+JFR_DEBUG("stacked correction for inlier " << obsPtr->id());
+						}
+						// 3. perform buffered update
+						mapPtr->filterPtr->correctAllStacked(mapPtr->ia_used_states());
+JFR_DEBUG("corrected all stacked observations");
 					}
-					// 3. perform buffered update
-					mapPtr->filterPtr->correctAllStacked(mapPtr->ia_used_states());
+					
+					ObsList &activeSearchList = (ransacSetList.size() == 0 ? obsVisibleList : best_set->pendingObs);
+					
 					// 4. for each obs in pending: retake algorithm from active search
 					obsListSorted.clear();
-					for(ObsList::iterator obsIter = best_set->pendingObs.begin(); obsIter != best_set->pendingObs.end(); ++obsIter)
+					
+JFR_DEBUG("######## Starting classic active search for the remaining");
+					for(ObsList::iterator obsIter = activeSearchList.begin(); obsIter != activeSearchList.end(); ++obsIter)
 					{
 						observation_ptr_t obsPtr = *obsIter;
 						obsPtr->clearEvents();
@@ -137,6 +161,7 @@ namespace jafar {
 						// 1b. check visibility
 						obsPtr->predictVisibility();
 
+JFR_DEBUG("obs " << obsPtr->id() << " visible: " << obsPtr->isVisible());
 						if (obsPtr->isVisible()) {
 
 							// Add to tesselation grid for active search
@@ -147,10 +172,11 @@ namespace jafar {
 
 							// add to sorted list of observations
 							obsListSorted[obsPtr->expectation.infoGain] = obsPtr;
-
+JFR_DEBUG("obs " << obsPtr->id() << " info gain " << obsPtr->expectation.infoGain);
 						} // visible obs
 					} // for each obs
 
+JFR_DEBUG("#### starting remaining corrections");
 					// loop only the N_UPDATES most interesting obs, from largest info gain to smallest
 					for (ObservationListSorted::reverse_iterator obsIter = obsListSorted.rbegin(); obsIter
 							!= obsListSorted.rend(); obsIter++) {
@@ -163,7 +189,7 @@ namespace jafar {
 
 						// 1b. re-check visibility, just in case re-projection caused this obs to be invisible
 						obsPtr->predictVisibility();
-
+JFR_DEBUG("obs " << obsPtr->id() << " visible : " << obsPtr->isVisible());
 						if (obsPtr->isVisible()) {
 
 							obsPtr->events.visible = true;
@@ -178,6 +204,7 @@ namespace jafar {
 								// 1c. predict search area and appearance
 								cv::Rect roi = gauss2rect(obsPtr->expectation.x(), obsPtr->expectation.P() + matcherParams_.measVar*identity_mat(2), matcherParams_.regionSigma);
 								obsPtr->predictAppearance();
+JFR_DEBUG("obs " << obsPtr->id() << " measured in " << roi);
 
 								// 1d. match predicted feature in search area
 								//						kernel::Chrono match_chrono;
@@ -206,7 +233,7 @@ namespace jafar {
 																							obsPtr->expectation.x(0) - shift(0), obsPtr->expectation.x(1) - shift(1));
 								}
 		*/
-
+JFR_DEBUG("obs " << obsPtr->id() << " got match score " << obsPtr->getMatchScore());
 								// 1e. if feature is found
 								if (obsPtr->getMatchScore() > matcherParams_.threshold) {
 									obsPtr->counters.nMatch++;
@@ -221,6 +248,7 @@ namespace jafar {
 										obsPtr->update();
 										//								total_update_time += update_chrono.elapsedMicrosecond();
 										obsPtr->events.updated = true;
+JFR_DEBUG("obs " << obsPtr->id() << " passed compatibility test");
 									} // obsPtr->compatibilityTest(M_TH)
 								} // obsPtr->getScoreMatchInPercent()>SC_TH
 
@@ -232,7 +260,7 @@ namespace jafar {
 						// cout << *obsPtr << endl;
 
 					} // foreach observation
-
+JFR_DEBUG("finished for this sensor !");
 					obsListSorted.clear(); // clear the list now or it will prevent the observation to be destroyed until next frame, and will still be displayed
 				}
 

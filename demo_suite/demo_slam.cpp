@@ -210,7 +210,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode, mode, dump_path));
 	senPtr11->setHardwareSensor(hardSen11);
 	#else
-	if (mode == 2)
+	if (mode == 2 || mode == 3)
 	{
 		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(cv::Size(640,480),dump_path));
 		senPtr11->setHardwareSensor(hardSen11);
@@ -234,55 +234,60 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	kernel::Chrono chrono;
 	double max_dt = 0;
-	for (; (*world)->t <= N_FRAMES;) {
+	for (; (*world)->t <= N_FRAMES;)
+	{
 		bool had_data = false;
 
-			worldPtr->display_mutex.lock();
-			// cout << "\n************************************************** " << endl;
-			// cout << "\n                 FRAME : " << t << " (blocked "
-			chrono.reset();
+		worldPtr->display_mutex.lock();
+		if (mode == 3 && worldPtr->display_rendered != (*world)->t)
+			{ worldPtr->display_mutex.unlock(); boost::this_thread::yield(); continue; }
+		// cout << "\n************************************************** " << endl;
+		// cout << "\n                 FRAME : " << t << " (blocked "
+		chrono.reset();
 
+		// FIXME if mode == 3, manage multisensors : ensure that only 1 sensor is processed, save its time to log it, and ensure that next time next sensor will be tried first
+		// FIRST LOOP FOR MEASUREMENT SPACES - ALL DM
+		// foreach robot
+		for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin();
+			robIter != mapPtr->robotList().end(); ++robIter)
+		{
+			robot_ptr_t robPtr = *robIter;
+			// cout << "\n================================================== " << endl;
+			// cout << *robPtr << endl;
 
-			// FIRST LOOP FOR MEASUREMENT SPACES - ALL DM
-			// foreach robot
-			for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin(); robIter != mapPtr->robotList().end(); robIter++) {
-				robot_ptr_t robPtr = *robIter;
+			// foreach sensor
+			for (RobotAbstract::SensorList::iterator senIter = robPtr->sensorList().begin();
+				senIter != robPtr->sensorList().end(); ++senIter)
+			{
+				sensor_ptr_t senPtr = *senIter;
+				//					cout << "\n________________________________________________ " << endl;
+				//					cout << *senPtr << endl;
 
+				// get raw-data
+				if (senPtr->acquireRaw() < 0)
+					continue;
+				else had_data=true;
 
-				// cout << "\n================================================== " << endl;
-				// cout << *robPtr << endl;
+				// move the filter time to the data raw.
+				vec u(robPtr->mySize_control()); // TODO put some real values in u.
+				fillVector(u, 0.0);
+				robPtr->move(u, senPtr->getRaw()->timestamp);
 
-				// foreach sensor
-				for (RobotAbstract::SensorList::iterator senIter = robPtr->sensorList().begin(); senIter
-				    != robPtr->sensorList().end(); senIter++) {
-					sensor_ptr_t senPtr = *senIter;
-					//					cout << "\n________________________________________________ " << endl;
-					//					cout << *senPtr << endl;
-
-
-					// get raw-data
-					if (senPtr->acquireRaw() < 0)
-						continue;
-					else had_data=true;
-
-					// move the filter time to the data raw.
-					vec u(robPtr->mySize_control()); // TODO put some real values in u.
-					fillVector(u, 0.0);
-					robPtr->move(u, senPtr->getRaw()->timestamp);
-
-					// foreach dataManager
-					for (SensorAbstract::DataManagerList::iterator dmaIter = senPtr->dataManagerList().begin(); dmaIter
-					    != senPtr->dataManagerList().end(); dmaIter++) {
-						data_manager_ptr_t dmaPtr = *dmaIter;
-						dmaPtr->process(senPtr->getRaw());
-					} // foreach dataManager
+				// foreach dataManager
+				for (SensorAbstract::DataManagerList::iterator dmaIter = senPtr->dataManagerList().begin();
+					dmaIter != senPtr->dataManagerList().end(); ++dmaIter)
+				{
+					data_manager_ptr_t dmaPtr = *dmaIter;
+					dmaPtr->process(senPtr->getRaw());
+				} // foreach dataManager
 
 			} // for each sensor
 		} // for each robot
 
 
-			// NOW LOOP FOR STATE SPACE - ALL MM
-		if (had_data) {
+		// NOW LOOP FOR STATE SPACE - ALL MM
+		if (had_data)
+		{
 			(*world)->t++;
 
 			if (robPtr1->dt_or_dx > max_dt) max_dt = robPtr1->dt_or_dx;
@@ -298,10 +303,9 @@ void demo_slam01_main(world_ptr_t *world) {
 //							cout << (*lmkIter)->id() << " ";
 //						}
 
-
-
-			for (MapAbstract::MapManagerList::iterator mmIter = mapPtr->mapManagerList().begin(); mmIter
-	    != mapPtr->mapManagerList().end(); mmIter++){
+			for (MapAbstract::MapManagerList::iterator mmIter = mapPtr->mapManagerList().begin(); 
+				mmIter != mapPtr->mapManagerList().end(); ++mmIter)
+			{
 				map_manager_ptr_t mapMgr = *mmIter;
 				mapMgr->manage();
 			}
@@ -336,11 +340,15 @@ void demo_slam01_display(world_ptr_t *world) {
 		if ((*world)->t != prev_t)
 		{
 			prev_t = (*world)->t;
+			(*world)->display_rendered = (*world)->t;
+			
 			#ifdef HAVE_MODULE_QDISPLAY
-			display::ViewerQt *viewerQt = PTR_CAST<display::ViewerQt*> ((*world)->getDisplayViewer(display::ViewerQt::id()));
+			display::ViewerQt *viewerQt = NULL;
+			if (dodisplay & 1) viewerQt = PTR_CAST<display::ViewerQt*> ((*world)->getDisplayViewer(display::ViewerQt::id()));
 			#endif
 			#ifdef HAVE_MODULE_GDHE
-			display::ViewerGdhe *viewerGdhe = PTR_CAST<display::ViewerGdhe*> ((*world)->getDisplayViewer(display::ViewerGdhe::id()));
+			display::ViewerGdhe *viewerGdhe = NULL;
+			if (dodisplay & 2) viewerGdhe = PTR_CAST<display::ViewerGdhe*> ((*world)->getDisplayViewer(display::ViewerGdhe::id()));
 			#endif
 			
 			#ifdef HAVE_MODULE_QDISPLAY
@@ -350,7 +358,8 @@ void demo_slam01_display(world_ptr_t *world) {
 			if (dodisplay & 2) viewerGdhe->bufferize(*world);
 			#endif
 			
-			(*world)->display_mutex.unlock();
+			if (mode != 3) // strange: if we always unlock here, qt.dump takes much more time...
+				(*world)->display_mutex.unlock();
 				
 			#ifdef HAVE_MODULE_QDISPLAY
 			if (dodisplay & 1) viewerQt->render();
@@ -359,9 +368,24 @@ void demo_slam01_display(world_ptr_t *world) {
 			if (dodisplay & 2) viewerGdhe->render();
 			#endif
 			
+			if (mode == 3)
+			{
+				if (dodisplay & 1)
+				{
+					std::ostringstream oss; oss << dump_path << "/rendered-2D_%d-" << std::setw(6) << std::setfill('0') << prev_t-1 << ".png";
+					viewerQt->dump(oss.str());
+				}
+				if (dodisplay & 2)
+				{
+					std::ostringstream oss; oss << dump_path << "/rendered-3D_" << std::setw(6) << std::setfill('0') << prev_t-1 << ".ppm";
+					viewerGdhe->dump(oss.str());
+				}
+				(*world)->display_mutex.unlock();
+			}
 		} else
 		{
 			(*world)->display_mutex.unlock();
+			boost::this_thread::yield();
 		}
 		
 		if (dodisplay & 1) break;
@@ -372,24 +396,25 @@ void demo_slam01_display(world_ptr_t *world) {
 	void demo_slam01() {
 		world_ptr_t worldPtr(new WorldAbstract());
 
+		// deal with the random seed
 		rseed = time(NULL);
 		if (mode == 1) {
 			std::fstream f((dump_path + std::string("/rseed.log")).c_str(), std::ios_base::out);
 			f << rseed << std::endl;
 			f.close();
 		}
-		else if (mode == 2) {
+		else if (mode == 2 || mode == 3) {
 			std::fstream f((dump_path + std::string("/rseed.log")).c_str(), std::ios_base::in);
 			f >> rseed;
 			f.close();
 		}
 		std::cout << __FILE__ << ":" << __LINE__ << " rseed " << rseed << std::endl;
-		rtslam::srand(rseed); // FIXME does not work in multithread...
+		rtslam::srand(rseed);
 
 		#ifdef HAVE_MODULE_QDISPLAY
 		if (dodisplay & 1)
 		{
-			display::ViewerQt *viewerQt = new display::ViewerQt(8, MAHALANOBIS_TH, false, "/mnt/ram/rtslam");
+			display::ViewerQt *viewerQt = new display::ViewerQt(8, MAHALANOBIS_TH, false, "data/rendered2D_%02d-%06d.png");
 			worldPtr->addDisplayViewer(viewerQt, display::ViewerQt::id());
 		}
 		#endif

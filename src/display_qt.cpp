@@ -13,6 +13,15 @@ namespace jafar {
 namespace rtslam {
 namespace display {
 
+	void ViewerQt::dump(std::string filepattern) // pattern with %d for sensor id
+	{
+		char filename[256];
+		for(std::map<int,SensorQt*>::iterator it = sensorsList.begin(); it != sensorsList.end(); ++it)
+		{
+			snprintf(filename, 256, filepattern.c_str(), it->first);
+			it->second->dump(filename);
+		}
+	}
 
 	WorldQt::WorldQt(ViewerAbstract *_viewer, rtslam::WorldAbstract *_slamWor, WorldDisplay *garbage):
 		WorldDisplay(_viewer, _slamWor, garbage), viewerQt(PTR_CAST<ViewerQt*>(_viewer)) {}
@@ -39,6 +48,7 @@ namespace display {
 		viewer_->setTitle(oss.str());
 		framenumber = 0;
 		t = 0.;
+		id_ = slamSen_->id();
 		avg_framerate = 0.;
 		
 		framenumber_label = new QGraphicsTextItem(view_);
@@ -94,21 +104,32 @@ namespace display {
 					std::setw(4) << (int)position(1) << ", " <<  std::setw(4) << (int)position(2) << "] cm ; ["
 					<< std::setw(4) << (int)euler(0) << ", " <<  std::setw(4) << (int)euler(1) << ", " <<  std::setw(4) << (int)euler(2) << "] deg";
 				sensorpose_label->setPlainText(oss.str().c_str());
-
-				// save image
-				if (viewerQt->dump)
-				{
-					std::ostringstream oss; oss << viewerQt->dump_path << "/rendered_" << std::setw(4) << std::setfill('0') << framenumber;
-					view_->exportView(oss.str());
-				}
 				
 				break; }
 			default:
 				JFR_ERROR(RtslamException, RtslamException::UNKNOWN_SENSOR_TYPE, "Don't know how to display this type of sensor" << type_);
 		}
+		
+		// save image
+		if (viewerQt->doDump)
+		{
+			char filename[256];
+			snprintf(filename, 256, viewerQt->dump_pattern.c_str(), id_, framenumber);
+			dump(filename);
+		}
+		viewerQt->sensorsList[id_] = this;
 	}
 
-
+	void SensorQt::dump(std::string filename)
+	{
+		switch (type_)
+		{
+			case SensorAbstract::PINHOLE:
+			case SensorAbstract::BARRETO: {
+				view_->exportView(filename);
+			}
+		}
+	}
 
 	/** **************************************************************************
 	

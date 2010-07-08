@@ -16,8 +16,10 @@
 /*
 TODO:
 - correctly setup scene size
+- setup window size
 - compression of small movements for trajectories
 - set robot ellipse
+- draw a cross at target position
 
 ---------------------
 - scale ahp spheres to section of ellipses -> ok
@@ -55,7 +57,13 @@ namespace display {
 			{
 				client.launch_server();
 				client.connect();
+				client.setCameraTarget(0.04,0,0.15);
+				client.setCameraPos(80, 20, 0.5);
 			}
+		void dump(std::string filename)
+		{
+			client.dump(filename);
+		}
 	};
 
 

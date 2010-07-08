@@ -78,7 +78,7 @@ namespace display {
 		for(int i = 3; i < 6; ++i) poseEuler(i) = jmath::radToDeg(poseEuler(i));
 		std::swap(poseEuler(3), poseEuler(5)); // FIXME the common convention is yaw pitch roll, not roll pitch yaw...
 		robot.setPose(poseEuler);
-		viewerGdhe->client.setCameraTarget(poseEuler(0), poseEuler(1), poseEuler(2));
+		//viewerGdhe->client.setCameraTarget(poseEuler(0), poseEuler(1), poseEuler(2));
 		robot.refresh();
 		
 		// trajectory

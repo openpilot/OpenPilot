@@ -46,11 +46,13 @@ class ViewerQt: public Viewer<WorldQt,MapQt,RobotQt,SensorQt,LandmarkQt,Observat
 	public:
 		int fontSize;
 		double ellipsesScale;
-		bool dump;
-		std::string dump_path;
+		bool doDump;
+		std::string dump_pattern; // pattern with %d for sensor id and frame id
+		std::map<int,SensorQt*> sensorsList;
 	public:
-		ViewerQt(int _fontSize = 8, double _ellipsesScale = 3.0, bool _dump = false, std::string _dump_path = "/mnt/ram/rtslam"): 
-			fontSize(_fontSize), ellipsesScale(_ellipsesScale), dump(_dump), dump_path(_dump_path) {}
+		ViewerQt(int _fontSize = 8, double _ellipsesScale = 3.0, bool _dump = false, std::string _dump_pattern = "data/rendered2D_%02d-%06d.png"): 
+			fontSize(_fontSize), ellipsesScale(_ellipsesScale), doDump(_dump), dump_pattern(_dump_pattern) {}
+		void dump(std::string filepattern); // pattern with %d for sensor id
 };
 #else
 #error "does not work"
@@ -118,6 +120,7 @@ class SensorQt : public SensorDisplay
 		double avg_framerate;
 		double t;
 		vec7 pose;
+		unsigned int id_;
 		// graphical objects
 		qdisplay::Viewer *viewer_;
 		qdisplay::ImageView* view_;
@@ -128,6 +131,7 @@ class SensorQt : public SensorDisplay
 		~SensorQt();
 		void bufferize();
 		void render();
+		void dump(std::string filename);
 };
 
 #if DEFINE_USELESS_OBJECTS

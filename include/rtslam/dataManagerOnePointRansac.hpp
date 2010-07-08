@@ -16,6 +16,9 @@
 #include "rtslam/dataManagerAbstract.hpp"
 #include "rtslam/activeSearch.hpp"
 
+#include "rtslam/rawImage.hpp"
+#include "rtslam/sensorPinHole.hpp"
+
 namespace jafar {
 	namespace rtslam {
 
@@ -45,7 +48,7 @@ namespace jafar {
 				;
 
 			public: // public interface
-				DataManagerOnePointRansac();
+				//DataManagerOnePointRansac();
 				virtual ~DataManagerOnePointRansac() {
 				}
 				void process(boost::shared_ptr<RawAbstract> data);
@@ -133,6 +136,7 @@ namespace jafar {
 				void projectFromMean( observation_ptr_t & obsPtr, const vec & x);
 				bool isLowInnovationInlier(const observation_ptr_t & obsPtr, double lowInnTh);
 				bool isExpectedInnovationInlier( observation_ptr_t & obsPtr, double highInnTh);
+				bool match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, cv::Rect &roi, Measurement & measure, const appearance_ptr_t & app);
 				bool matchWithLowInnovation(const observation_ptr_t obsPtr, double lowInnTh); // TODO
 				bool matchWithExpectedInnovation(boost::shared_ptr<RawSpec> rawData,  observation_ptr_t obsPtr);
 
@@ -140,6 +144,7 @@ namespace jafar {
 
 	}
 }
+
 
 #include "rtslam/dataManagerOnePointRansac.impl.hpp"
 

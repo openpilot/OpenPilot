@@ -164,9 +164,37 @@ namespace jafar {
 				 */
 				void correct(const ind_array & iax, Innovation & inn, const mat & INN_rsl, const ind_array & ia_rsl);
 
-				// \todo: define API for all these functions.
-				void stackCorrection();
-				void correctAllStacked();
+				
+			protected:
+				
+				vec stackedInnovation_x;
+				sym_mat stackedInnovation_P;
+				sym_mat stackedInnovation_iP;
+
+				struct StackedCorrection
+				{
+					StackedCorrection(Innovation & inn, const mat & INN_rsl, const ind_array & ia_rsl):
+						inn(inn), INN_rsl(INN_rsl), ia_rsl(ia_rsl) {}
+					Innovation inn;
+					mat INN_rsl;
+					ind_array ia_rsl;
+				};
+
+				typedef std::list<StackedCorrection> CorrectionList;
+
+				struct CorrectionStack
+				{
+					CorrectionList stack;
+					size_t inn_size;
+					
+					CorrectionStack() { clear(); }
+					void clear() { inn_size = 0; stack.clear(); }
+				};
+				CorrectionStack corrStack;
+				
+			public:
+				void stackCorrection(Innovation & inn, const mat & INN_rsl, const ind_array & ia_rsl);
+				void correctAllStacked(const ind_array & iax);
 
 		};
 

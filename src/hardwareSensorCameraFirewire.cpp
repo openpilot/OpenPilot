@@ -12,9 +12,12 @@
 #include <fstream>
 
 
+#if 0
+// creates conflict with boost sandbox with boost 1.42 in debug
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
+#endif
 
 #include "rtslam/hardwareSensorCameraFirewire.hpp"
 #include <image/Image.hpp>

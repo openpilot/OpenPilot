@@ -37,6 +37,8 @@ Precision
 ------------------------------------
 - Finish implementing 1 point Ransac to avoid outliers
 - Finish implementing RobotCentric Kalman
+- To investigate : predict, compute jacobians, correct mean offline, recompute jacobians, correct online = better consistence but how much more computations ?
+
 - test predicted patch variance: if too low, discard exploration and declare not matched.
 - when a point is detected, do a matching with itself with interpolation to find subpixel position
 - when a point is matched, try to estimate if there is a possible ambiguity with another point in the ellipse 

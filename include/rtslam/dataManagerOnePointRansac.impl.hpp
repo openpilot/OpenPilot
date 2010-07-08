@@ -30,6 +30,7 @@ namespace jafar {
 		DataManagerOnePointRansac<RawSpec, SensorSpec, Detector, Matcher>::
 		processKnownObs( boost::shared_ptr<RawSpec> rawData)
 			{
+				map_ptr_t mapPtr = sensorPtr()->robotPtr()->mapPtr();
 				int numObs = 0;
 				asGrid->renew();
 
@@ -69,7 +70,7 @@ namespace jafar {
 							obsCurrentPtr->project_func(obsCurrentPtr->sensorPtr()->globalPose(), lmk, pix, nobs);
 
 							// set low-innovation ROI
-							cv::Rect roi(pix(0) - 1, pix(1) -1, 3, 3);
+							cv::Rect roi(pix(0)-matcherParams_.regionPix/2, pix(1)-matcherParams_.regionPix/2, matcherParams_.regionPix, matcherParams_.regionPix);
 
 							if(!obsCurrentPtr->events.matched){
 								// try to match
@@ -117,11 +118,11 @@ namespace jafar {
 						asGrid->addPixel(obsPtr->expectation.x());
 						
 						// 2a. add obs to buffer for EKF update
-						// TODO
+						mapPtr->filterPtr->stackCorrection(obsPtr->innovation, obsPtr->INN_rsl, obsPtr->ia_rsl);
 						
 					}
 					// 3. perform buffered update
-					// TODO
+					mapPtr->filterPtr->correctAllStacked(mapPtr->ia_used_states());
 					// 4. for each obs in pending: retake algorithm from active search
 					obsListSorted.clear();
 					for(ObsList::iterator obsIter = best_set->pendingObs.begin(); obsIter != best_set->pendingObs.end(); ++obsIter)
@@ -239,27 +240,6 @@ namespace jafar {
 				ransacSetList.clear();
 				obsVisibleList.clear();
 			}
-
-		//    template<>
-		//    bool DataManagerOnePointRansac<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> >::
-		//		match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, cv::Rect &roi, Measurement & measure, const appearance_ptr_t & app)
-		//    {
-		//					app_img_pnt_ptr_t targetAppImg = SPTR_CAST<AppearanceImagePoint>(targetApp);
-		//					app_img_pnt_ptr_t appImg = SPTR_CAST<AppearanceImagePoint>(app);
-		//
-		//					measure.matchScore = correl::Explorer<correl::Zncc>::exploreTranslation(
-		//							targetAppImg->patch, *(rawPtr->img), roi.x, roi.x+roi.width-1, 2, roi.y, roi.y+roi.height-1, 2,
-		//							measure.x()(0), measure.x()(1));
-		//
-		//					// set appearance
-		//					// FIXME reenable this when Image::robustCopy will be fixed
-		////					rawPtr->img->robustCopy(appImg->patch, (int)(measure.x()(0)-0.5)-appImg->patch.width()/2,
-		////             (int)(measure.x()(1)-0.5)-appImg->patch.height()/2, 0, 0, appImg->patch.width(), appImg->patch.height());
-		//
-		//					return true;
-		//
-		//    }
-
 
 		template<>
 		void
@@ -503,6 +483,24 @@ namespace jafar {
 
 		}
 
+		template<>
+		bool DataManagerOnePointRansac<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> >::
+		match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, cv::Rect &roi, Measurement & measure, const appearance_ptr_t & app)
+    {
+			app_img_pnt_ptr_t targetAppImg = SPTR_CAST<AppearanceImagePoint>(targetApp);
+			app_img_pnt_ptr_t appImg = SPTR_CAST<AppearanceImagePoint>(app);
+
+			measure.matchScore = correl::Explorer<correl::Zncc>::exploreTranslation(
+					targetAppImg->patch, *(rawPtr->img), roi.x, roi.x+roi.width-1, 2, roi.y, roi.y+roi.height-1, 2,
+					measure.x()(0), measure.x()(1));
+
+			// set appearance
+			// FIXME reenable this when Image::robustCopy will be fixed
+//					rawPtr->img->robustCopy(appImg->patch, (int)(measure.x()(0)-0.5)-appImg->patch.width()/2,
+//             (int)(measure.x()(1)-0.5)-appImg->patch.height()/2, 0, 0, appImg->patch.width(), appImg->patch.height());
+
+			return true;
+		}
 
 
 	} // namespace ::rtslam

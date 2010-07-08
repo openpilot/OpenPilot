@@ -42,6 +42,7 @@
 #include "rtslam/rawImage.hpp"
 #include "rtslam/descriptorImagePoint.hpp"
 #include "rtslam/dataManagerActiveSearch.hpp"
+#include "rtslam/dataManagerOnePointRansac.hpp"
 
 #include "rtslam/hardwareSensorCameraFirewire.hpp"
 //#include "rtslam/hardwareEstimatorMti.hpp"
@@ -61,6 +62,11 @@ typedef ImagePointObservationMaker<ObservationPinHoleEuclideanPoint, SensorPinHo
 typedef ImagePointObservationMaker<ObservationPinHoleAnchoredHomogeneousPoint, SensorPinHole,
     LandmarkAnchoredHomogeneousPoint, SensorAbstract::PINHOLE, LandmarkAbstract::PNT_AH> PinholeAhpObservationMaker;
 
+typedef DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> > DataManagerAS;
+typedef DataManagerOnePointRansac<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> > DataManagerOPR;
+
+#define RANSAC 0
+		
 int dodisplay = 1;
 int mode = 0;
 std::string dump_path = ".";
@@ -107,6 +113,8 @@ void demo_slam01_main(world_ptr_t *world) {
 	const double SEARCH_SIGMA = 2.5;
 	const double MAHALANOBIS_TH = 2.5;
 	const unsigned N_UPDATES = 20;
+	const unsigned RANSAC_REGION_SIZE = 3;
+	const unsigned RANSAC_NTRIES = 6;
 
 	// data manager: active search
 	const unsigned GRID_VCELLS = 3;
@@ -173,14 +181,21 @@ void demo_slam01_main(world_ptr_t *world) {
 	boost::shared_ptr<ActiveSearchGrid> asGrid(new ActiveSearchGrid(IMG_WIDTH, IMG_HEIGHT, GRID_HCELLS, GRID_VCELLS, GRID_MARGIN, GRID_SEPAR));
 	boost::shared_ptr<QuickHarrisDetector> harrisDetector(new QuickHarrisDetector(HARRIS_CONV_SIZE, HARRIS_TH, HARRIS_EDDGE));
 	boost::shared_ptr<correl::Explorer<correl::Zncc> > znccMatcher(new correl::Explorer<correl::Zncc>());
-	boost::shared_ptr<DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> > > dmPt11(new DataManagerActiveSearch<RawImage,
-			SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> > ());
+	
+	#if RANSAC
+	boost::shared_ptr<DataManagerOPR> dmPt11(new DataManagerOPR());
+	dmPt11->setMatcher(znccMatcher, PATCH_SIZE, RANSAC_REGION_SIZE, SEARCH_SIGMA, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE);
+	dmPt11->setAlgorithmParams(N_UPDATES, RANSAC_NTRIES);
+	#else
+	boost::shared_ptr<DataManagerAS> dmPt11(new DataManagerAS());
+	dmPt11->setMatcher(znccMatcher, PATCH_SIZE, SEARCH_SIGMA, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE);
+	dmPt11->setAlgorithmParams(N_UPDATES);
+	#endif
+	
 	dmPt11->linkToParentSensorSpec(senPtr11);
 	dmPt11->linkToParentMapManager(mmPoint);
 	dmPt11->setActiveSearchGrid(asGrid);
 	dmPt11->setDetector(harrisDetector, PATCH_DESC, PIX_NOISE);
-	dmPt11->setMatcher(znccMatcher, PATCH_SIZE, SEARCH_SIGMA, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE);
-	dmPt11->setAlgorithmParams(N_UPDATES);
 	dmPt11->setObservationFactory(obsFact);
 
 	#ifdef HAVE_VIAM

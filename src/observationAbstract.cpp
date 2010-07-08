@@ -212,7 +212,7 @@ namespace jafar {
 		void ObservationAbstract::update() {
 			map_ptr_t mapPtr = sensorPtr()->robotPtr()->mapPtr();
 			ind_array ia_x = mapPtr->ia_used_states();
-			sensorPtr()->robotPtr()->mapPtr()->filterPtr->correct(ia_x,innovation,INN_rsl,ia_rsl) ;
+			mapPtr->filterPtr->correct(ia_x,innovation,INN_rsl,ia_rsl) ;
 		}
 
 

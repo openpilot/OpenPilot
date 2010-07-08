@@ -61,7 +61,7 @@ namespace jafar {
 		}
 
 		void ExtendedKalmanFilterIndirect::computeKalmanGain(const ind_array & ia_x, Innovation & inn, const mat & INN_rsl, const ind_array & ia_rsl){
-			PJt_tmp.resize(ia_x.size(),INN_rsl.size1());
+			PJt_tmp.resize(ia_x.size(),inn.size());
 			PJt_tmp = prod(project(P_, ia_x, ia_rsl), trans(INN_rsl));
 			inn.invertCov();
 			K = - prod(PJt_tmp, inn.iP_);
@@ -75,6 +75,62 @@ namespace jafar {
 			// mean and covariances update:
 			ublas::project(x_, ia_x) += prod(K, inn.x());
 			ublas::project(P_, ia_x, ia_x) += prod<sym_mat> (K, trans(PJt_tmp));
+		}
+
+
+
+
+		void ExtendedKalmanFilterIndirect::stackCorrection(Innovation & inn, const mat & INN_rsl, const ind_array & ia_rsl)
+		{
+			corrStack.stack.push_back(StackedCorrection(inn, INN_rsl, ia_rsl));
+			corrStack.inn_size += inn.size();
+		}
+		
+		void ExtendedKalmanFilterIndirect::correctAllStacked(const ind_array & ia_x)
+		{
+			PJt_tmp.resize(ia_x.size(), corrStack.inn_size);
+			stackedInnovation_x.resize(corrStack.inn_size);
+			stackedInnovation_P.resize(corrStack.inn_size);
+			stackedInnovation_iP.resize(corrStack.inn_size);
+			
+			// 1 build PJt_tmp and stackedInnovation
+			int col1 = 0;
+			for(CorrectionList::iterator corrIter1 = corrStack.stack.begin(); corrIter1 != corrStack.stack.end(); ++corrIter1)
+			{
+				int nextcol1 = col1 + corrIter1->inn.size();
+				
+				// 1a update PJt_tmp
+				ublas::subrange(PJt_tmp, 0, ia_x.size(), col1, nextcol1) =
+					ublas::prod(ublas::project(P_, ia_x, corrIter1->ia_rsl), trans(corrIter1->INN_rsl));
+				
+				// 1b update diagonal of stackedInnovation
+				ublas::subrange(stackedInnovation_x, col1, nextcol1) = corrIter1->inn.x();
+				ublas::subrange(stackedInnovation_P, col1, nextcol1, col1, nextcol1) = corrIter1->inn.P();
+				
+				int col2 = nextcol1;
+				CorrectionList::iterator corrIter2 = corrIter1; ++corrIter1;
+				for(; corrIter2 != corrStack.stack.end(); ++corrIter2)
+				{
+					int nextcol2 = col2 + corrIter2->inn.size();
+					
+					// update off diagonal stackedInnovation
+					mat m = ublas::prod(corrIter1->INN_rsl, ublas::project(P_, corrIter1->ia_rsl, corrIter2->ia_rsl));
+					ublas::subrange(stackedInnovation_P, col1, nextcol1, col2, nextcol2) = ublas::prod(m, trans(corrIter2->INN_rsl));
+					col2 = nextcol2;
+				}
+				
+				col1 = nextcol1;
+			}
+			
+			// 2 compute Kalman gain
+			ublasExtra::lu_inv(stackedInnovation_P, stackedInnovation_iP);
+			K = - prod(PJt_tmp, stackedInnovation_iP);
+			
+			// 3 correct
+			ublas::project(x_, ia_x) += prod(K, stackedInnovation_x);
+			ublas::project(P_, ia_x, ia_x) += prod<sym_mat>(K, trans(PJt_tmp));
+			
+			corrStack.clear();
 		}
 
 

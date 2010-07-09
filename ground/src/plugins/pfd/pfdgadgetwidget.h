@@ -105,6 +105,7 @@ private:
    QGraphicsTextItem *m_altitudetext;
    // GCS link status Arrow
    QGraphicsSvgItem *gcsTelemetryArrow;
+   QGraphicsTextItem *gcsTelemetryStats;
 
    double n1MinValue;
    double n1MaxValue;

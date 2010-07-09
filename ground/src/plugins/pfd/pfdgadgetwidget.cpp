@@ -115,12 +115,16 @@ void PFDGadgetWidget::updateLinkStatus(UAVObject *object1) {
     UAVObjectField* field2 = object1->getField(tdr);
     UAVObjectField* field3 = object1->getField(rdr);
     if (field && field2 && field3) {
-        QString s = field->getValue().toString();
+    	QString s = field->getValue().toString();
         if (m_renderer->elementExists("gcstelemetry-" + s)) {
                 gcsTelemetryArrow->setElementId("gcstelemetry-" + s);
             } else { // Safeguard
                 gcsTelemetryArrow->setElementId("gcstelemetry-Disconnected");
             }
+        double v1 = field2->getDouble();
+        double v2 = field3->getDouble();
+        s.sprintf("%.0f/%.0f",v1,v2);
+        gcsTelemetryStats->setPlainText(s);
     } else {
         std::cout << "UpdateLinkStatus: Wrong field, maybe an issue with object disconnection ?" << std::endl;
     }
@@ -495,6 +499,18 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          matrix.reset();
          matrix.translate(startX,startY);
          gcsTelemetryArrow->setTransform(matrix,false);
+
+         compassMatrix = m_renderer->matrixForElement("linkrate");
+         startX = compassMatrix.mapRect(m_renderer->boundsOnElement("linkrate")).x();
+         startY = compassMatrix.mapRect(m_renderer->boundsOnElement("linkrate")).y();
+         qreal linkRateHeight = compassMatrix.mapRect(m_renderer->boundsOnElement("linkrate")).height();
+         gcsTelemetryStats = new QGraphicsTextItem();
+         gcsTelemetryStats->setDefaultTextColor(QColor("White"));
+         gcsTelemetryStats->setFont(QFont("Arial",(int) linkRateHeight));
+         l_scene->addItem(gcsTelemetryStats);
+         matrix.reset();
+         matrix.translate(startX,startY-linkRateHeight/2);
+         gcsTelemetryStats->setTransform(matrix,false);
 
         l_scene->setSceneRect(m_background->boundingRect());
 

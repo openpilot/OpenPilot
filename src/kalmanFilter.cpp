@@ -107,16 +107,14 @@ namespace jafar {
 				ublas::subrange(stackedInnovation_x, col1, nextcol1) = corrIter1->inn.x();
 				ublas::subrange(stackedInnovation_P, col1, nextcol1, col1, nextcol1) = corrIter1->inn.P();
 				
-				int col2 = nextcol1;
-				CorrectionList::iterator corrIter2 = corrIter1; ++corrIter1;
-				for(; corrIter2 != corrStack.stack.end(); ++corrIter2)
+				int col2 = 0;
+				for(CorrectionList::iterator corrIter2 = corrStack.stack.begin(); corrIter2 != corrIter1; ++corrIter2)
 				{
 					int nextcol2 = col2 + corrIter2->inn.size();
 					
 					// update off diagonal stackedInnovation
-JFR_DEBUG("correctAllStacked: " << col1 << "," << nextcol1 << ";" << col2 << "," << nextcol2 << " / rsl1 " << corrIter1->ia_rsl << ", rsl2 " << corrIter2->ia_rsl << ", INN_rsl1.size " << corrIter1->INN_rsl.size1() << "," << corrIter1->INN_rsl.size2() <<  ", INN_rsl2.size " << corrIter2->INN_rsl.size1() << "," << corrIter2->INN_rsl.size2());
+//JFR_DEBUG("correctAllStacked: " << col1 << "," << nextcol1 << ";" << col2 << "," << nextcol2 << " / rsl1 " << corrIter1->ia_rsl << ", rsl2 " << corrIter2->ia_rsl << ", INN_rsl1.size " << corrIter1->INN_rsl.size1() << "," << corrIter1->INN_rsl.size2() <<  ", INN_rsl2.size " << corrIter2->INN_rsl.size1() << "," << corrIter2->INN_rsl.size2());
 					mat m = ublas::prod(corrIter1->INN_rsl, ublas::project(P_, corrIter1->ia_rsl, corrIter2->ia_rsl));
-JFR_DEBUG("m " << m << "trans(corrIter2->INN_rsl) " << trans(corrIter2->INN_rsl));
 					ublas::subrange(stackedInnovation_P, col1, nextcol1, col2, nextcol2) = ublas::prod(m, trans(corrIter2->INN_rsl));
 					col2 = nextcol2;
 				}
@@ -125,6 +123,7 @@ JFR_DEBUG("m " << m << "trans(corrIter2->INN_rsl) " << trans(corrIter2->INN_rsl)
 			}
 			
 			// 2 compute Kalman gain
+JFR_DEBUG("correctAllStacked: stackedInnovation_P " << stackedInnovation_P << ", PJt_tmp " << PJt_tmp << ", stackedInnovation_x " << stackedInnovation_x);
 			ublasExtra::lu_inv(stackedInnovation_P, stackedInnovation_iP);
 			K = - prod(PJt_tmp, stackedInnovation_iP);
 			

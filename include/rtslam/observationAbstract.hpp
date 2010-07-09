@@ -305,7 +305,7 @@ namespace jafar {
 				 * 20   |  7.434     9.591     25.038  28.412  31.410  34.170  35.020  37.566  39.997  43.072  45.315
 				 * \endcode
 				 */
-				virtual bool compatibilityTest(const double MahaDistSquare);
+				virtual bool compatibilityTest(const double mahaDist);
 
 				/**
 				 * Clear all event flags
@@ -332,7 +332,7 @@ namespace jafar {
 				{
 					if (force || !events.predictedApp)
 					{
-JFR_DEBUG("predictAppearance");
+//JFR_DEBUG("predictAppearance");
 						predictAppearance_func();
 						events.predictedApp = true;
 					}

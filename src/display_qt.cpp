@@ -151,7 +151,9 @@ namespace display {
 			if (events_.predicted)
 			{
 				predObs_ = slamObs_->expectation.x();
-				predObsCov_ = slamObs_->innovation.P();
+				if (events_.matched)
+					predObsCov_ = slamObs_->innovation.P(); else
+					predObsCov_ = slamObs_->expectation.P();
 //							cout << "display: noise/exp/inn:  " << slamObs_->measurement.P() << " / " << slamObs_->expectation.P() << " / " << slamObs_->innovation.P() << " / " << endl;
 			}
 			if (events_.measured || events_.matched || !events_.predicted)
@@ -257,9 +259,10 @@ namespace display {
 					{
 						(*it)->setColor(c.R,c.G,c.B); // yellow
 						qdisplay::Ellipsoid *ell = PTR_CAST<qdisplay::Ellipsoid*>(*it);
-						ell->set(predObs_, predObsCov_, 3.0);
+						ell->set(predObs_, predObsCov_, viewerQt->ellipsesScale);
 					}
 					(*it)->setVisible(dispPred);
+//JFR_DEBUG("drawn ellipse for obs " << id_ << " at " << predObs_ << " with size " << predObsCov_ << ", scale " << viewerQt->ellipsesScale << " and visibility " << dispPred);
 					
 					// measure point
 					++it;

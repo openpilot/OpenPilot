@@ -196,8 +196,9 @@ namespace jafar {
 			expectation.infoGain = ublasExtra::det(expectation.P());
 		}
 
-		bool ObservationAbstract::compatibilityTest(const double MahaDistSquare){
-			return (innovation.mahalanobis() < MahaDistSquare);
+		bool ObservationAbstract::compatibilityTest(const double mahaDist){
+//JFR_DEBUG("obs " << id() << " passing compatibilityTest with " << mahaDist);
+			return (innovation.mahalanobis() < mahaDist*mahaDist);
 		}
 
 		void ObservationAbstract::clearEvents(){
@@ -221,10 +222,16 @@ namespace jafar {
 
 		bool ObservationAbstract::voteForKillingLandmark(){
 			// kill big ellipses
-			int searchSize = 36*sqrt(expectation.P(0,0)*expectation.P(1,1));
-			if (searchSize > 50000) {
-				cout << "Obs " << id() << " Killed by size (size " << searchSize << ")" << endl;
-				return true;
+			// FIXME this is ok for 1 sensor, but not for more, because it won't work with policy ALL
+			// probably wee need to fix the policy, and chose a different policy according to the criteria
+			// (size = ANY, matchRatio = ALL, consistencyRatio = ...)
+			if (events.visible)
+			{
+				int searchSize = 36*sqrt(expectation.P(0,0)*expectation.P(1,1));
+				if (searchSize > 50000) {
+					cout << "Obs " << id() << " Killed by size (size " << searchSize << ")" << endl;
+					return true;
+				}
 			}
 
 			// kill unstable and inconsistent lmks

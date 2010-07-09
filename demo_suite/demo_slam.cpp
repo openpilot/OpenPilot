@@ -65,8 +65,10 @@ typedef ImagePointObservationMaker<ObservationPinHoleAnchoredHomogeneousPoint, S
 typedef DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> > DataManagerAS;
 typedef DataManagerOnePointRansac<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> > DataManagerOPR;
 
+///##############################################
+
 #define RANSAC 0
-		
+
 int dodisplay = 1;
 int mode = 0;
 std::string dump_path = ".";
@@ -76,8 +78,8 @@ const int slam_priority = -20; // needs to be started as root to be < 0
 const int display_priority = 10;
 const int display_period = 100; // ms
 
+///##############################################
 
-void demo_slam01_main(world_ptr_t *world) {
 	// time
 	const unsigned N_FRAMES = 500000;
 
@@ -87,8 +89,8 @@ void demo_slam01_main(world_ptr_t *world) {
 	// robot uncertainties and perturbations
 	const double UNCERT_VLIN = .01; // m/s
 	const double UNCERT_VANG = .01; // rad/s
-	const double PERT_VLIN = .2; // m/s per sqrt(s)
-	const double PERT_VANG = 1; // rad/s per sqrt(s)
+	const double PERT_VLIN = 0.5; // m/s per sqrt(s)
+	const double PERT_VANG = 3; // rad/s per sqrt(s)
 
 	// pin-hole:
 	const unsigned IMG_WIDTH = 640;
@@ -121,6 +123,11 @@ void demo_slam01_main(world_ptr_t *world) {
 	const unsigned GRID_HCELLS = 4;
 	const unsigned GRID_MARGIN = 11;
 	const unsigned GRID_SEPAR = 20;
+
+
+///##############################################
+
+void demo_slam01_main(world_ptr_t *world) {
 
 //	const bool SHOW_PATCH = true;
 
@@ -382,14 +389,14 @@ void demo_slam01_display(world_ptr_t *world) {
 		#ifdef HAVE_MODULE_QDISPLAY
 		if (dodisplay & 1)
 		{
-			display::ViewerQt *viewerQt = new display::ViewerQt(8, 3.0, false, "/mnt/ram/rtslam");
+			display::ViewerQt *viewerQt = new display::ViewerQt(8, MAHALANOBIS_TH, false, "/mnt/ram/rtslam");
 			worldPtr->addDisplayViewer(viewerQt, display::ViewerQt::id());
 		}
 		#endif
 		#ifdef HAVE_MODULE_GDHE
 		if (dodisplay & 2)
 		{
-			display::ViewerGdhe *viewerGdhe = new display::ViewerGdhe("camera", 3.0, "localhost");
+			display::ViewerGdhe *viewerGdhe = new display::ViewerGdhe("camera", MAHALANOBIS_TH, "localhost");
 			worldPtr->addDisplayViewer(viewerGdhe, display::ViewerGdhe::id());
 		}
 		#endif

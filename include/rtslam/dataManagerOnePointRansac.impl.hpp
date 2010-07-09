@@ -47,7 +47,7 @@ JFR_DEBUG("######## Found " << obsVisibleList.size() << " visible obs");
 JFR_DEBUG("will try Ransac " << n_tries << " times");
 
 				int current_try = 0;
-				if (n_tries >= 3)
+				if (n_tries >= 2)
 				while (current_try < n_tries){
 JFR_DEBUG("#### go ransac try #" << current_try);
 					// select random obs and match it
@@ -130,12 +130,16 @@ JFR_DEBUG("######## Find best ransac set (among " << ransacSetList.size() << ")"
 JFR_DEBUG("best set is " << best_set->obsBasePtr->id() << " with size " << best_set->size());
 						if (best_set->size() > 1)
 						{
+							// compute innovaton for inliers that never have been base. FIXME maybe check if it is really an inlier to optimize
+							for(int i = 0; i < remainingObsCount; ++i) obsVisibleList[i]->computeInnovation();
 							// 2. for each obs in inliers
 							for(ObsList::iterator obsIter = best_set->inlierObs.begin(); obsIter != best_set->inlierObs.end(); ++obsIter)
 							{
 								observation_ptr_t obsPtr = *obsIter;
 								// Add to tesselation grid for active search
 								asGrid->addPixel(obsPtr->expectation.x());
+								obsPtr->events.updated = true;
+								obsPtr->counters.nInlier++;
 								
 								// 2a. add obs to buffer for EKF update
 								mapPtr->filterPtr->stackCorrection(obsPtr->innovation, obsPtr->INN_rsl, obsPtr->ia_rsl);
@@ -156,6 +160,7 @@ JFR_DEBUG("######## Starting classic active search for the remaining");
 					for(ObsList::iterator obsIter = activeSearchList.begin(); obsIter != activeSearchList.end(); ++obsIter)
 					{
 						observation_ptr_t obsPtr = *obsIter;
+// FIXME maybe don't clear events and don't rematch if already did, especially if didn't reestimate
 						obsPtr->clearEvents();
 						obsPtr->measurement.matchScore = 0;
 
@@ -271,6 +276,8 @@ JFR_DEBUG("finished for this sensor !");
 				// clear all sets to liberate shared pointers
 				ransacSetList.clear();
 				obsVisibleList.clear();
+				obsBaseList.clear();
+				obsFailedList.clear();
 			}
 
 		template<>

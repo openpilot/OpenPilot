@@ -62,6 +62,7 @@ namespace jafar {
 				ObservationListSorted obsListSorted;
 				// the list of visible observations to handle
 				ObsList obsVisibleList;
+				unsigned remainingObsCount;
 				ObsList obsBaseList;
 				ObsList obsFailedList;
 				RansacSetList ransacSetList;
@@ -133,8 +134,8 @@ namespace jafar {
 				void getOneMatchedBaseObs(observation_ptr_t & obsBasePtr, boost::shared_ptr<RawSpec> rawData);
 				observation_ptr_t selectOneRandomObs();
 				vec updateMean(const observation_ptr_t & obsPtr);
-				void projectFromMean( observation_ptr_t & obsPtr, const vec & x);
-				bool isLowInnovationInlier(const observation_ptr_t & obsPtr, double lowInnTh);
+				void projectFromMean(vec & exp, const observation_ptr_t & obsPtr, const vec & x);
+				bool isLowInnovationInlier(const observation_ptr_t & obsPtr, const vec & exp, double lowInnTh);
 				bool isExpectedInnovationInlier( observation_ptr_t & obsPtr, double highInnTh);
 				bool match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, cv::Rect &roi, Measurement & measure, const appearance_ptr_t & app);
 				bool matchWithLowInnovation(const observation_ptr_t obsPtr, double lowInnTh); // TODO

@@ -129,7 +129,7 @@ namespace jafar {
 			return events.visible;
 		}
 
-		void ObservationPinHoleEuclideanPoint::predictAppearance() {
+		void ObservationPinHoleEuclideanPoint::predictAppearance_func() {
 			desc_img_pnt_ptr_t descPtr = boost::static_pointer_cast<DescriptorImagePoint>(landmarkPtr()->descriptorPtr);
 			obs_ph_euc_ptr_t _this = boost::static_pointer_cast<ObservationPinHoleEuclideanPoint>(shared_from_this());
 			descPtr->predictAppearance(_this);

@@ -187,6 +187,11 @@ namespace jafar {
 			INN_rsl = -EXP_rsl;
 		}
 
+		void ObservationAbstract::computeInnovationMean(vec &inn, const vec &meas, const vec &exp) const
+		{
+			inn = meas - exp;
+		}
+
 		void ObservationAbstract::predictInfoGain() {
 			expectation.infoGain = ublasExtra::det(expectation.P());
 		}
@@ -196,17 +201,15 @@ namespace jafar {
 		}
 
 		void ObservationAbstract::clearEvents(){
-			events.predicted = false;
-			events.matched = false;
-			events.measured = false;
-			events.updated = false;
-			events.visible = false;
+			int size = sizeof(Events)/sizeof(bool);
+			for (int i = 0; i < size; ++i)
+				((bool*)&events)[i] = false;
 		}
 
 		void ObservationAbstract::clearCounters(){
-			counters.nSearch = 0;
-			counters.nMatch = 0;
-			counters.nInlier = 0;
+			int size = sizeof(Counters)/sizeof(int);
+			for (int i = 0; i < size; ++i)
+				((int*)&counters)[i] = 0;
 		}
 
 		void ObservationAbstract::update() {

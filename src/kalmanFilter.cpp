@@ -114,7 +114,9 @@ namespace jafar {
 					int nextcol2 = col2 + corrIter2->inn.size();
 					
 					// update off diagonal stackedInnovation
+JFR_DEBUG("correctAllStacked: " << col1 << "," << nextcol1 << ";" << col2 << "," << nextcol2 << " / rsl1 " << corrIter1->ia_rsl << ", rsl2 " << corrIter2->ia_rsl << ", INN_rsl1.size " << corrIter1->INN_rsl.size1() << "," << corrIter1->INN_rsl.size2() <<  ", INN_rsl2.size " << corrIter2->INN_rsl.size1() << "," << corrIter2->INN_rsl.size2());
 					mat m = ublas::prod(corrIter1->INN_rsl, ublas::project(P_, corrIter1->ia_rsl, corrIter2->ia_rsl));
+JFR_DEBUG("m " << m << "trans(corrIter2->INN_rsl) " << trans(corrIter2->INN_rsl));
 					ublas::subrange(stackedInnovation_P, col1, nextcol1, col2, nextcol2) = ublas::prod(m, trans(corrIter2->INN_rsl));
 					col2 = nextcol2;
 				}

@@ -179,6 +179,7 @@ namespace jafar {
 				struct Events {
 						bool predicted; ///<	Landmark is not new and has been predicted
 						bool visible; ///< 		Landmark is visible
+						bool predictedApp; ///< Appearance has been predicted for predicted pos
 						bool measured; ///< 	Feature is measured
 						bool matched; ///< 		Feature is matched
 						bool updated; ///< 		Landmark is updated
@@ -261,6 +262,7 @@ namespace jafar {
 				 * Derive the class and overload this method to use other, non-trivial innovation functions.
 				 */
 				virtual void computeInnovation();
+				virtual void computeInnovationMean(vec &inn, const vec &meas, const vec &exp) const;
 
 				/**
 				 * Predict information gain.
@@ -326,7 +328,16 @@ namespace jafar {
 				/**
 				 * Predict appearance
 				 */
-				virtual void predictAppearance() = 0;
+				virtual void predictAppearance(bool force = false)
+				{
+					if (force || !events.predictedApp)
+					{
+JFR_DEBUG("predictAppearance");
+						predictAppearance_func();
+						events.predictedApp = true;
+					}
+				}
+				virtual void predictAppearance_func() = 0;
 
 				virtual double getMatchScore() = 0;
 

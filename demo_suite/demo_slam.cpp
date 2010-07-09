@@ -113,7 +113,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	const double SEARCH_SIGMA = 2.5;
 	const double MAHALANOBIS_TH = 2.5;
 	const unsigned N_UPDATES = 20;
-	const unsigned RANSAC_REGION_SIZE = 3;
+	const unsigned RANSAC_REGION_SIZE = 5;
 	const unsigned RANSAC_NTRIES = 6;
 
 	// data manager: active search

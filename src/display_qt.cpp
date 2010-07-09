@@ -35,6 +35,8 @@ namespace display {
 		viewer_->setImageView(view_, 0, 0);
 		viewer_->resize(660,500);
 		viewer_->setSceneRect(0,0,640,480);
+		std::ostringstream oss; oss << "Sensor " << slamSen_->id();
+		viewer_->setTitle(oss.str());
 		framenumber = 0;
 		t = 0.;
 		avg_framerate = 0.;

@@ -94,6 +94,36 @@ void PFDGadgetWidget::connectNeedles() {
         std::cout << "Error: Object is unknown (PositionActual)." << std::endl;
    }
 
+   gcsTelemetryObj = dynamic_cast<UAVDataObject*>(objManager->getObject("GCSTelemetryStats"));
+   if (gcsTelemetryObj != NULL ) {
+       connect(gcsTelemetryObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateLinkStatus(UAVObject*)));
+   } else {
+        std::cout << "Error: Object is unknown (GCSTelemetryStats)." << std::endl;
+   }
+
+}
+
+/*!
+ \brief Updates the link stats
+ */
+void PFDGadgetWidget::updateLinkStatus(UAVObject *object1) {
+    // Double check that the field exists:
+    QString st = QString("Status");
+    QString tdr = QString("TxDataRate");
+    QString rdr = QString("RxDataRate");
+    UAVObjectField* field = object1->getField(st);
+    UAVObjectField* field2 = object1->getField(tdr);
+    UAVObjectField* field3 = object1->getField(rdr);
+    if (field && field2 && field3) {
+        QString s = field->getValue().toString();
+        if (m_renderer->elementExists("gcstelemetry-" + s)) {
+                gcsTelemetryArrow->setElementId("gcstelemetry-" + s);
+            } else { // Safeguard
+                gcsTelemetryArrow->setElementId("gcstelemetry-Disconnected");
+            }
+    } else {
+        std::cout << "UpdateLinkStatus: Wrong field, maybe an issue with object disconnection ?" << std::endl;
+    }
 }
 
 /*!
@@ -208,7 +238,8 @@ void PFDGadgetWidget::setDialFile(QString dfn)
      - Black speed window: speed-window.
      - Altitude rectangle (right site): altitude-bg.
      - Altitude scale: altitude-scale.
-     - Black altitude window: altitude-window.     
+     - Black altitude window: altitude-window.
+     - GCS Telemetry status arrow: gcstelemetry-XXXX
  */
          QGraphicsScene *l_scene = scene();
          l_scene->clear(); // Deletes all items contained in the scene as well.
@@ -451,8 +482,25 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          matrix.translate(startX,0);
          m_altitudetext->setTransform(matrix,false);
 
+         ////////////////
+         // GCS Telemetry Indicator
+         ////////////////
+         compassMatrix = m_renderer->matrixForElement("gcstelemetry-Disconnected");
+         startX = compassMatrix.mapRect(m_renderer->boundsOnElement("gcstelemetry-Disconnected")).x();
+         startY = compassMatrix.mapRect(m_renderer->boundsOnElement("gcstelemetry-Disconnected")).y();
+         gcsTelemetryArrow = new QGraphicsSvgItem();
+         gcsTelemetryArrow->setSharedRenderer(m_renderer);
+         gcsTelemetryArrow->setElementId("gcstelemetry-Disconnected");
+         l_scene->addItem(gcsTelemetryArrow);
+         matrix.reset();
+         matrix.translate(startX,startY);
+         gcsTelemetryArrow->setTransform(matrix,false);
 
         l_scene->setSceneRect(m_background->boundingRect());
+
+        /////////////////
+        // Item placement
+        /////////////////
 
         // Now Initialize the center for all transforms of the relevant elements to the
         // center of the background:
@@ -578,10 +626,10 @@ void PFDGadgetWidget::moveNeedles()
     // Note: rendering can jump oh so very slightly when crossing the 180 degree
     // boundary, should not impact actual useability of the display.
     if ((headingValue < threshold) && ((headingValue+headingDiff)>=threshold)) {
-        // We went over 180°: activate a -360 degree offset
+        // We went over 180ï¿½: activate a -360 degree offset
         headingOffset = 2*threshold;
     } else if ((headingValue >= threshold) && ((headingValue+headingDiff)<threshold)) {
-        // We went under 180°: remove the -360 degree offset
+        // We went under 180ï¿½: remove the -360 degree offset
         headingOffset = -2*threshold;
     }
     opd = QPointF(headingDiff+headingOffset,0);

@@ -63,6 +63,7 @@ public slots:
    void updateAirspeed(UAVObject *object1);
    void updateAltitude(UAVObject *object1);
    void updateBattery(UAVObject *object1);
+   void updateLinkStatus(UAVObject *object1);
 
 protected:
    void paintEvent(QPaintEvent *event);
@@ -102,6 +103,8 @@ private:
    QGraphicsItemGroup *m_altitudescale;
    // Altitude indicator text:
    QGraphicsTextItem *m_altitudetext;
+   // GCS link status Arrow
+   QGraphicsSvgItem *gcsTelemetryArrow;
 
    double n1MinValue;
    double n1MaxValue;
@@ -133,6 +136,7 @@ private:
    // Name of the fields to read when an update is received:
    UAVDataObject* attitudeObj;
    UAVDataObject* headingObj;
+   UAVDataObject* gcsTelemetryObj;
 
    // Rotation timer
    QTimer dialTimer;

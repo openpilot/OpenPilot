@@ -77,6 +77,7 @@ class Viewer : public QGraphicsView {
      */
     void close();
     void setTitle(const std::string& _title );
+		std::string const& getTitle() { return title; }
   public slots:
     void exportView();
   public:
@@ -96,6 +97,7 @@ class Viewer : public QGraphicsView {
 		int m_windowWidth, m_windowHeight;			// added
     double m_currentZ;
     QAction *m_exportView;
+		std::string title;
 };
 
 }

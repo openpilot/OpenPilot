@@ -314,6 +314,22 @@ void ImageView::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
   QGraphicsItemGroup::mouseReleaseEvent(event);
 }
 
+void ImageView::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
+{
+std::cout << "m_lastViewer " << m_lastViewer << std::endl;
+	if (m_lastViewer)
+	{
+		QPointF pos = event->pos();
+		std::ostringstream oss;
+		oss.precision(2);
+		oss.setf(std::ios::fixed, std::ios::floatfield);
+		oss << m_lastViewer->getTitle() << " - " << pos.x() << ", " << pos.y();
+std::cout << oss.str() << std::endl;
+		m_lastViewer->setWindowTitle(oss.str().c_str());
+	}
+}
+
+
 int ImageView::imageWidth() const
 {
   return m_image.width();

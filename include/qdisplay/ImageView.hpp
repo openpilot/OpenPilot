@@ -68,6 +68,7 @@ class ImageView : public QObject, public QGraphicsItemGroup {
     void splitVertical();
     void splitHorizontal();
     void addShape();
+		void mouseMoveEvent(QGraphicsSceneMouseEvent * event);
   protected:
     void contextMenuEvent ( QGraphicsSceneContextMenuEvent * event );
   public:

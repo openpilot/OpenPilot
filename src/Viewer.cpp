@@ -292,7 +292,8 @@ void Viewer::exportView( const std::string& _fileName )
 
 void Viewer::setTitle(const std::string& _title )
 {
-  setWindowTitle(_title.c_str());
+	title = _title;
+	setWindowTitle(_title.c_str());
 }
 
 #include "Viewer.moc"

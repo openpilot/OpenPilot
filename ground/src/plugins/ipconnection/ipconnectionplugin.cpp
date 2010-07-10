@@ -44,6 +44,7 @@
 
 IPconnectionConnection::IPconnectionConnection()
 {
+    ipSocket = NULL;
     //create all our objects
     m_config = new IPconnectionConfiguration("IP Network Telemetry", NULL, this);
     m_config->restoresettings();
@@ -59,9 +60,11 @@ IPconnectionConnection::IPconnectionConnection()
 }
 
 IPconnectionConnection::~IPconnectionConnection()
-{
-    //tcpSocket->close ();
-    //delete(tcpSocket);
+{//clean up out resources...
+    if (ipSocket){
+        ipSocket->close ();
+        delete(ipSocket);
+    }
 }
 
 void IPconnectionConnection::onEnumerationChanged()
@@ -89,10 +92,17 @@ QIODevice *IPconnectionConnection::openDevice(const QString &deviceName)
             int Port;
             QMessageBox msgBox;
 
+            if (ipSocket){
+                //Andrew: close any existing socket... this should never occur
+                ipSocket->close ();
+                delete(ipSocket);
+                ipSocket = NULL;
+            }
+
             if (m_config->UseTCP()) {
-                tcpSocket = new QTcpSocket(this);
+                ipSocket = new QTcpSocket(this);
             } else {
-                tcpSocket = new QUdpSocket(this);
+                ipSocket = new QUdpSocket(this);
             }
 
             //get the configuration info
@@ -107,30 +117,29 @@ QIODevice *IPconnectionConnection::openDevice(const QString &deviceName)
             }
             else {
                 //try to connect...
-                tcpSocket->connectToHost((const QString )HostName, Port);
+                ipSocket->connectToHost((const QString )HostName, Port);
 
                 //in blocking mode so we wait for the connection to succeed
-                if (tcpSocket->waitForConnected(Timeout)) {
-                    return tcpSocket;
+                if (ipSocket->waitForConnected(Timeout)) {
+                    return ipSocket;
                 }
                 //tell user something went wrong
-                msgBox.setText((const QString )tcpSocket->errorString ());
+                msgBox.setText((const QString )ipSocket->errorString ());
                 msgBox.exec();
             }
 /* BUGBUG TODO - returning null here leads to segfault because some caller still calls disconnect without checking our return value properly
  * someone needs to debug this, I got lost in the calling chain.*/
-    //return NULL;
-    return tcpSocket;
+    ipSocket = NULL;
+    return ipSocket;
 }
 
 void IPconnectionConnection::closeDevice(const QString &deviceName)
 {
-    //still having problems with the app crashing when we reference the tcpsocket outside the openDevice function...
-    //tcpSocket->close ();
-    //delete(tcpSocket);
-    // Note: CorvusCorax thinks its because the socket got deleted by the caller before this close() is even called
-    // so we end up with a dangling reference! Is this a bug?
-
+    if (ipSocket){
+        ipSocket->close ();
+        delete(ipSocket);
+        ipSocket = NULL;
+    }
 }
 
 

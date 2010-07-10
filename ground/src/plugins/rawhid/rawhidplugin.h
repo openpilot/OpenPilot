@@ -29,6 +29,7 @@
 #define RAWHIDPLUGIN_H
 
 #include "rawhid_global.h"
+#include "rawhid.h"
 
 #include "coreplugin/iconnection.h"
 #include <extensionsystem/iplugin.h>
@@ -87,6 +88,9 @@ public:
 
 protected slots:
     void onEnumerationChanged();
+
+private:
+    RawHID *RawHidHandle;
 
 protected:
     QMutex m_enumMutex;

@@ -37,6 +37,7 @@
 
 SerialConnection::SerialConnection()
 {
+    serialHandle = NULL;
     //I'm cheating a little bit here:
     //Knowing if the device enumeration really changed is a bit complicated
     //so I just signal it whenever we have a device event...
@@ -74,6 +75,9 @@ QStringList SerialConnection::availableDevices()
 
 QIODevice *SerialConnection::openDevice(const QString &deviceName)
 {
+    if (serialHandle){
+        closeDevice(deviceName);
+    }
     QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
     foreach( QextPortInfo port, ports ) {
            if(port.friendName == deviceName)
@@ -87,10 +91,11 @@ QIODevice *SerialConnection::openDevice(const QString &deviceName)
             set.FlowControl = FLOW_OFF;
             set.Timeout_Millisec = 500;
 #ifdef Q_OS_WIN
-            return new QextSerialPort(port.portName, set);
+            serialHandle = new QextSerialPort(port.portName, set);
 #else
-            return new QextSerialPort(port.physName, set);
+            serialHandle = new QextSerialPort(port.physName, set);
 #endif
+            return serialHandle;
         }
     }
     return NULL;
@@ -98,7 +103,12 @@ QIODevice *SerialConnection::openDevice(const QString &deviceName)
 
 void SerialConnection::closeDevice(const QString &deviceName)
 {
-    //nothing to do here
+    //we have to delete the serial connection we created
+    if (serialHandle){
+        serialHandle->close ();
+        delete(serialHandle);
+        serialHandle = NULL;
+    }
 }
 
 

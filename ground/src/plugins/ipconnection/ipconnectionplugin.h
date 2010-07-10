@@ -69,7 +69,7 @@ public:
 protected slots:
     void onEnumerationChanged();
 private:
-       QAbstractSocket *tcpSocket;
+       QAbstractSocket *ipSocket;
        IPconnectionConfiguration *m_config;
        IPconnectionOptionsPage *m_optionspage;
        //QSettings* settings;

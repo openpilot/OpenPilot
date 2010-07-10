@@ -151,18 +151,28 @@ void ConnectionManager::onConnectPressed()
             else
             {
                 m_connectionDevice.connection = NULL;
+                m_ioDev = NULL;
             }
         }
     }
+    else {
+        //only do this if we are disconnecting
+        //signal interested plugins that user is disconnecting his device
+        emit deviceDisconnected();
+        if(m_connectionDevice.connection){
+            m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
+            m_ioDev = NULL;
+            m_connectionDevice.connection = NULL;
+        }
+    }
+
 
     //both in case of error and disconnection, we fall back here
     m_connectBtn->setText("Connect");
     m_availableDevList->setEnabled(true);
 
-    //signal interested plugins that user is disconnecting his device
-    emit deviceDisconnected();
 
-    //close the device
+    /*//close the device
     if(m_ioDev)
     {
         m_ioDev->close();
@@ -171,11 +181,9 @@ void ConnectionManager::onConnectPressed()
         delete m_ioDev;
         m_ioDev = NULL;
     }
+    */
 
-    if(m_connectionDevice.connection)
-        m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
 
-    m_connectionDevice.connection = NULL;
 }
 
 /**

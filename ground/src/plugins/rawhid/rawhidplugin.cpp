@@ -75,6 +75,10 @@ void RawHIDEnumerationThread::run()
 RawHIDConnection::RawHIDConnection()
     : m_enumerateThread(this)
 {
+    //added by andrew
+    RawHidHandle = NULL;
+
+
     QObject::connect(&m_enumerateThread, SIGNAL(enumerationChanged()),
                      this, SLOT(onEnumerationChanged()));
     m_enumerateThread.start();
@@ -112,12 +116,27 @@ QStringList RawHIDConnection::availableDevices()
 
 QIODevice *RawHIDConnection::openDevice(const QString &deviceName)
 {
+    //added by andrew
+    if (RawHidHandle){
+        closeDevice(deviceName);
+    }
+    //end added by andrew
     m_deviceOpened = true;
-    return new RawHID(deviceName);
+    //return new RawHID(deviceName);
+    RawHidHandle = new RawHID(deviceName);
+    return RawHidHandle;
 }
 
 void RawHIDConnection::closeDevice(const QString &deviceName)
 {
+    //added by andrew...
+    if (RawHidHandle){
+        RawHidHandle->close();
+        delete(RawHidHandle);
+        RawHidHandle=NULL;
+    }
+    //end added by andrew
+
     m_deviceOpened = false;
 }
 

@@ -57,6 +57,9 @@ public:
     virtual QString connectionName();
     virtual QString shortName();
 
+private:
+    QextSerialPort*  serialHandle;
+
 protected slots:
     void onEnumerationChanged();
 };

@@ -308,7 +308,7 @@ static void telemetryRxTask(void* parameters)
 	{
 #if ALLOW_HID_TELEMETRY
 		// Determine input port (USB takes priority over telemetry port)
-		if(PIOS_USB_HID_CheckAvailable())
+		if(PIOS_USB_HID_CheckAvailable(0))
 		{
 			inputPort = PIOS_COM_TELEM_USB;
 		}
@@ -343,9 +343,9 @@ static int32_t transmitData(uint8_t* data, int32_t length)
 
 	// Determine input port (USB takes priority over telemetry port)
 #if ALLOW_HID_TELEMETRY
-	if(PIOS_USB_HID_CheckAvailable())
+	if(PIOS_USB_HID_CheckAvailable(0))
 	{
-		outputPort = COM_USB_HID;
+		outputPort = PIOS_COM_TELEM_USB;
 	}
 	else
 #endif /* ALLOW_HID_TELEMETRY */

@@ -13,6 +13,7 @@
 namespace jafar {
 namespace gdhe {
 
+	Client::SendToServer Client::sendToServer;
 
 	const ColorRGB colorRed(255,0,0);
 	const ColorRGB colorGreen(0,255,0);
@@ -37,7 +38,7 @@ namespace gdhe {
 	{
 		if (!client) JFR_ERROR(GdheException, GdheException::NOT_ADDED_TO_CLIENT, "This object was not added to a client");
 		std::ostringstream oss;
-		if (attributesModified) oss << construct_string() << " ; ";
+		if (attributesModified) oss << construct_string();
 		if (poseModified) oss << move_string();
 		if (attributesModified || poseModified) client->eval(oss.str());
 		attributesModified = false;
@@ -75,9 +76,7 @@ namespace gdhe {
 
 	void Client::init()
 	{
-		std::ostringstream oss;
-		oss << "clearColor " << (int)backgroundColor.R << " " << (int)backgroundColor.G << " " << (int)backgroundColor.B;
-		eval(oss.str());
+		*this << "clearColor " << backgroundColor << ";" << sendToServer;
 		// FIXME this should apparently be done before gdhe loading, no effect afterwards, but not very important since improvement of mouse gestures
 		//eval("set xmin -10 ; set xmax 10 ; set ymin -10 ; set ymax 10 ; set zmin -2 ; set zmax 5");
 		eval("set obsX 0.0 ; set obsY 0.0 ; set obsZ 0.0 ; set obsElev 45 ; set obsAzi 90 ; set obsDist 4.0 ; set envDefined 1");
@@ -109,7 +108,7 @@ namespace gdhe {
 	void Client::setCameraTarget(double _x, double _y, double _z)
 	{
 		std::ostringstream oss;
-		oss << "set obsX " << _x << " ; set obsY " << _y << " ; set obsZ " << _z;
+		oss << "set obsX " << _x << ";set obsY " << _y << ";set obsZ " << _z << ";";
 		eval(oss.str());
 	}
 	
@@ -121,7 +120,7 @@ namespace gdhe {
 	void Client::setCameraPos(double _yaw, double _pitch, double _dist)
 	{
 		std::ostringstream oss;
-		oss << "set obsElev " << _pitch << " ; set obsAzi " << _yaw << " ; set obsDist " << _dist;
+		oss << "set obsElev " << _pitch << ";set obsAzi " << _yaw << ";set obsDist " << _dist << ";";
 		eval(oss.str());
 	}
 

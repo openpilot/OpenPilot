@@ -13,12 +13,18 @@
 
 #include "gdhe/gdheException.hpp"
 
-#define ENABLE_STREAM 0
 #define ENABLE_CHILDREN 0
 
 namespace jafar {
 namespace gdhe {
 	
+	/**
+	TODO:
+	- manage generic children !
+	- prendre un client dans le constructeur de objet
+	- surcharger << dans color pour les exports -> ok
+	- faire les eval dans client avec Client& operator<<(Client&, T);
+	*/
 	
 	/** *************************************************************************/
 	/// Colors Management
@@ -30,8 +36,13 @@ namespace gdhe {
 		unsigned char R, G, B;
 		ColorRGB(unsigned char R_, unsigned char G_, unsigned char B_): R(R_), G(G_), B(B_) {}
 		ColorRGB(): R(0), G(0), B(0) {}
+//		std::ostream& operator<<(std::ostream& os)
+//			{ os << (int)R << " " << (int)G << " " << (int)B; return os; }
 	};
 
+	std::ostream& operator<<(std::ostream& os, const ColorRGB & c)
+		{ os << (int)c.R << " " << (int)c.G << " " << (int)c.B; return os; }
+	
 	extern const ColorRGB colorRed;
 	extern const ColorRGB colorGreen;
 	extern const ColorRGB colorBlue;
@@ -85,19 +96,19 @@ namespace gdhe {
 			void setCameraTarget(double _x, double _y, double _z);
 			void setCameraPos(double _yaw, double _pitch, double _dist);
 			
-			#if ENABLE_STREAM
-			/*
-			Hum... not sure it is possible
-			*/
+		protected:
+		public:
 			struct SendToServer {};
-			template<typename T> std::ostream& operator<<(std::ostream& os, T element)
-				{ os << element; return os; }
-			template<> std::ostream& operator<<(std::ostream& os, SendToServer element)
-				{ std::ostringstream oss; oss << os; eval(oss.str()); return os; }
-			#endif
+			static SendToServer sendToServer;
+			std::ostringstream oss;
+//			friend template<typename T> Client& operator<<(Client& oc, const T & element);
+//			friend template<> Client& operator<<(Client& oc, Client::SendToServer element);
 	};
 	
-	
+	template<typename T> Client& operator<<(Client& oc, const T & element)
+		{ oc.oss << element; return oc; }
+	template<> Client& operator<<(Client& oc, const Client::SendToServer & element)
+		{ oc.eval(oc.oss.str()); oc.oss.str(""); return oc; }
 	
 	/** *************************************************************************/
 	/// Abstract objects definitions 
@@ -155,14 +166,24 @@ namespace gdhe {
 			virtual const std::string move_string() const
 			{
 				std::ostringstream oss;
-				oss << "set pos(" << ids << ") {" << yaw << " " << pitch << " " << roll << " " << x << " " << y << " " << z << "}";
+				oss << "set pos(" << ids << ") {" << yaw << " " << pitch << " " << roll << " " << x << " " << y << " " << z << "};";
 				return oss.str();
 			}
 			virtual const std::string remove_string() const
 			{
 				std::ostringstream oss;
-				oss << "unset robots(" << ids << ");unset pos(" << ids << ")";
+				oss << "unset robots(" << ids << ");unset pos(" << ids << ");";
 				return oss.str();
+			}
+			virtual void move_command(bool send = false) const
+			{
+				*client << "set pos(" << ids << ") {" << yaw << " " << pitch << " " << roll << " " << x << " " << y << " " << z << "};";
+				if (send) *client << Client::sendToServer;
+			}
+			virtual void remove_command(bool send = false) const
+			{
+				*client << "unset robots(" << ids << ");unset pos(" << ids << ");";
+				if (send) *client << Client::sendToServer;
 			}
 			
 			/**
@@ -179,7 +200,7 @@ namespace gdhe {
 			void hide()
 			{
 				if (!client) JFR_ERROR(GdheException, GdheException::NOT_ADDED_TO_CLIENT, "This object was not added to a client");
-				std::ostringstream oss; oss << "unset pos(" << ids << ")"; client->eval(oss.str());
+				std::ostringstream oss; oss << "unset pos(" << ids << ");"; client->eval(oss.str());
 				poseModified = true;
 			}
 			/**
@@ -238,8 +259,8 @@ namespace gdhe {
 			{
 				std::ostringstream oss;
 				oss << "set robots(" << ids << ") {";
-				oss << "color " << (int)color.R << " " << (int)color.G << " " << (int)color.B << " ; ";
-				oss << "drawString " << shiftX << " " << shiftY << " " << shiftZ << " \"" << text << "\"}";
+				oss << "color " << color << ";";
+				oss << "drawString " << shiftX << " " << shiftY << " " << shiftZ << " \"" << text << "\"};";
 				return oss.str();
 			}
 	};
@@ -260,7 +281,7 @@ namespace gdhe {
 			virtual const std::string construct_string() const
 			{
 				std::ostringstream oss;
-				oss << "set robots(" << ids << ") {" << model << "}";
+				oss << "set robots(" << ids << ") {" << model << "};";
 				return oss.str();
 			}
 			
@@ -285,8 +306,8 @@ namespace gdhe {
 			{
 				std::ostringstream oss;
 				oss << "set robots(" << ids << ") {";
-				oss << "color " << (int)color.R << " " << (int)color.G << " " << (int)color.B << " ; ";
-				oss << "sphere " << 0 << " " << 0 << " " << 0 << " " << radius << " " << facets << "}";
+				oss << "color " << color << ";";
+				oss << "sphere " << 0 << " " << 0 << " " << 0 << " " << radius << " " << facets << "};";
 				return oss.str();
 			}
 	};
@@ -320,8 +341,8 @@ namespace gdhe {
 			{
 				std::ostringstream oss;
 				oss << "set robots(" << ids << ") {";
-				oss << "color " << (int)color.R << " " << (int)color.G << " " << (int)color.B << " ; ";
-				oss << "ellipsoid " << 0 << " " << 0 << " " << 0 << " " << dx << " " << dy << " " << dz << " " << facets << "}";
+				oss << "color " << color << ";";
+				oss << "ellipsoid " << 0 << " " << 0 << " " << 0 << " " << dx << " " << dy << " " << dz << " " << facets << "};";
 				return oss.str();
 			}
 	};
@@ -342,8 +363,8 @@ namespace gdhe {
 			{
 				std::ostringstream oss;
 				oss << "set robots(" << ids << ") {";
-				oss << "color " << (int)color.R << " " << (int)color.G << " " << (int)color.B << " ; ";
-				oss << "grille " << -extent << " " << -extent << " " << extent << " " << extent << " " << size << "}";
+				oss << "color " << color << ";";
+				oss << "grille " << -extent << " " << -extent << " " << extent << " " << extent << " " << size << "};";
 				return oss.str();
 			}
 	};
@@ -379,11 +400,11 @@ namespace gdhe {
 			{
 				std::ostringstream oss;
 				oss << "set robots(" << ids << ") {";
-				oss << "color " << (int)color.R << " " << (int)color.G << " " << (int)color.B << " ; ";
+				oss << "color " << color << ";";
 				oss << "polyline " << line.size();
 				for(std::vector<Point3D>::const_iterator it = line.begin(); it != line.end(); ++it)
 					oss << " " << it->x << " " << it->y << " " << it->z;
-				oss << "}";
+				oss << "};";
 				return oss.str();
 			}
 	};
@@ -445,8 +466,8 @@ namespace gdhe {
 			{
 				std::ostringstream oss;
 				oss << "set robots(" << ids << ") {";
-				oss << "color " << (int)color.R << " " << (int)color.G << " " << (int)color.B << " ; ";
-				oss << "repere " << length << "}";
+				oss << "color " << color << ";";
+				oss << "repere " << length << "};";
 				return oss.str();
 			}
 	};

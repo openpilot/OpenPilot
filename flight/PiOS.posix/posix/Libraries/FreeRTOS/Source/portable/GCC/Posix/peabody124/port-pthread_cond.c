@@ -76,9 +76,11 @@
 #define MAX_NUMBER_OF_TASKS 		( _POSIX_THREAD_THREADS_MAX )
 /*-----------------------------------------------------------*/
 
-//#define COND_SIGNALING 
-#define CHECK_TASK_RESUMES
-//#define RUNNING_THREAD_MUTEX
+#ifndef __CYGWIN__ 
+	#define COND_SIGNALING 
+	#define CHECK_TASK_RESUMES
+	#define RUNNING_THREAD_MUTEX
+#endif
 
 /* Parameters to pass to the newly created pthread. */
 typedef struct XPARAMS
@@ -147,9 +149,6 @@ static void prvDeleteThread( void *xThreadId );
  */
 void vPortYield( void );
 void vPortSystemTickHandler( int sig );
-
-#define THREAD_STATE_PAUSED		0
-#define THREAD_STATE_PAUSE		1
 
 #define THREAD_PAUSE_CREATED	0
 #define THREAD_PAUSE_YIELD		1
@@ -285,20 +284,22 @@ xParams *pxThisThreadParams = pvPortMalloc( sizeof( xParams ) );
 
 	debug_printf( "Got index for new task %i\r\n", lIndexOfLastAddedTask );
 	
+#ifdef COND_SIGNALING 
 	/* Create a condition signal for this thread */
-	pthread_condattr_t   condAttr;
-	assert( 0 == pthread_condattr_init( &condAttr ) );
+//	pthread_condattr_t   condAttr;
+//	assert( 0 == pthread_condattr_init( &condAttr ) );
 	pxThreads[ lIndexOfLastAddedTask ].hCond = ( pthread_cond_t *) malloc( sizeof( pthread_cond_t ) );
-	assert( 0 == pthread_cond_init(  pxThreads[ lIndexOfLastAddedTask ].hCond , &condAttr ) ); 
+	assert( 0 == pthread_cond_init(  pxThreads[ lIndexOfLastAddedTask ].hCond , NULL ) ); //&condAttr ) ); 
 	debug_printf("Cond: %li\r\n", *( (long int *) &pxThreads[ lIndexOfLastAddedTask ].hCond) );
 	
 	/* Create a condition mutex for this thread */
-	pthread_mutexattr_t mutexAttr;
-	assert( 0 == pthread_mutexattr_init( &mutexAttr ) );
-	assert( 0 == pthread_mutexattr_settype( &mutexAttr, PTHREAD_MUTEX_ERRORCHECK ) );
+//	pthread_mutexattr_t mutexAttr;
+//	assert( 0 == pthread_mutexattr_init( &mutexAttr ) );
+//	assert( 0 == pthread_mutexattr_settype( &mutexAttr, PTHREAD_MUTEX_ERRORCHECK ) );
 	pxThreads[ lIndexOfLastAddedTask ].hMutex = ( pthread_mutex_t *) malloc( sizeof( pthread_mutex_t ) );	
-	assert( 0 == pthread_mutex_init( pxThreads[ lIndexOfLastAddedTask ].hMutex, &mutexAttr ) );
+	assert( 0 == pthread_mutex_init( pxThreads[ lIndexOfLastAddedTask ].hMutex, NULL ) ); //&mutexAttr ) );
 	debug_printf("Mutex: %li\r\n", *( (long int *) &pxThreads[ lIndexOfLastAddedTask ].hMutex) );
+#endif
 		
 	/* Create a thread and store it's handle number */
 	xSentinel = 0;

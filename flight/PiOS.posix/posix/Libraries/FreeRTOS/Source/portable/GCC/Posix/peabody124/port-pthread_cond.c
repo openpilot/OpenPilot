@@ -465,6 +465,7 @@ tskTCB * oldTask, * newTask;
 		/* This means between masking the interrupt and getting the lock, there was an interrupt */
 		/* and this task should suspend.  Release the lock, then unmask interrupts to go ahead and */ 
 		/* service the signal */
+
 		assert( 0 == pthread_mutex_unlock( &xSwappingThreadMutex ) );
 		debug_printf( "The current task isn't even us, letting interrupt happen.  Watch for swap.\r\n" );
 		/* Now we are resuming, want to be able to catch this interrupt again */
@@ -815,7 +816,7 @@ sigset_t xBlockSignals;
 	
 	pauseThread( THREAD_PAUSE_INTERRUPT ); 
 	
-	assert( pthread_self() == prvGetThreadHandle( xTaskGetCurrentTaskHandle() ) );
+//	assert( pthread_self() == prvGetThreadHandle( xTaskGetCurrentTaskHandle() ) );
 	while( pthread_self() != prvGetThreadHandle( xTaskGetCurrentTaskHandle() ) )
 	{
 		debug_printf( "Incorrectly woke up.  Repausing\r\n" );

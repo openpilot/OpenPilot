@@ -45,6 +45,7 @@ public:
         float Latitude;
         float Longitude;
         float Altitude;
+        float GeoidSeparation;
         float Heading;
         float Groundspeed;
         qint8 Satellites;
@@ -61,6 +62,7 @@ public:
     // Field Latitude information
     // Field Longitude information
     // Field Altitude information
+    // Field GeoidSeparation information
     // Field Heading information
     // Field Groundspeed information
     // Field Satellites information
@@ -70,7 +72,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 981132812U;
+    static const quint32 OBJID = 1265479538U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

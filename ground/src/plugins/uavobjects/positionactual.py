@@ -82,6 +82,16 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
+		'GeoidSeparation',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
 		'Heading',
 		'f',
 		1,
@@ -146,7 +156,7 @@ _fields = [ \
 
 class PositionActual(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 981132812
+    OBJID        = 1265479538
     NAME         = "PositionActual"
     METANAME     = "PositionActualMeta"
     ISSINGLEINST = 1

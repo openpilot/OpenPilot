@@ -57,6 +57,9 @@ PositionActual::PositionActual(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS,
     QStringList AltitudeElemNames;
     AltitudeElemNames.append("0");
     fields.append( new UAVObjectField(QString("Altitude"), QString("meters"), UAVObjectField::FLOAT32, AltitudeElemNames, QStringList()) );
+    QStringList GeoidSeparationElemNames;
+    GeoidSeparationElemNames.append("0");
+    fields.append( new UAVObjectField(QString("GeoidSeparation"), QString("meters"), UAVObjectField::FLOAT32, GeoidSeparationElemNames, QStringList()) );
     QStringList HeadingElemNames;
     HeadingElemNames.append("0");
     fields.append( new UAVObjectField(QString("Heading"), QString("degrees"), UAVObjectField::FLOAT32, HeadingElemNames, QStringList()) );

@@ -4,6 +4,7 @@
             <field name="Latitude" units="degrees" type="float" elements="1"/>
             <field name="Longitude" units="degrees" type="float" elements="1"/>
             <field name="Altitude" units="meters" type="float" elements="1"/>
+            <field name="GeoidSeparation" units="meters" type="float" elements="1"/>
             <field name="Heading" units="degrees" type="float" elements="1"/>
             <field name="Groundspeed" units="m/s" type="float" elements="1"/>
             <field name="Satellites" units="" type="int8" elements="1"/>

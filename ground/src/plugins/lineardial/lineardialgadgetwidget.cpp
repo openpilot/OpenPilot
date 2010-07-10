@@ -71,7 +71,7 @@ void LineardialGadgetWidget::connectInput(QString object1, QString nfield1) {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
-    std::cout << "Lineadial Connect needles - " << object1.toStdString() << "-"<< nfield1.toStdString() << std::endl;
+    qDebug() << "Lineardial Connect needles - " << object1 << "-"<< nfield1;
 
     // Check validity of arguments first, reject empty args and unknown fields.
     if (!(object1.isEmpty() || nfield1.isEmpty())) {
@@ -84,7 +84,7 @@ void LineardialGadgetWidget::connectInput(QString object1, QString nfield1) {
             updateIndex(obj1);
 
         } else {
-            std::cout << "Error: Object is unknown (" << object1.toStdString() << ") this should not happen." << std::endl;
+            qDebug() << "Error: Object is unknown (" << object1 << ") this should not happen.";
         }
     }
 }
@@ -122,7 +122,7 @@ void LineardialGadgetWidget::updateIndex(UAVObject *object1) {
         if (index && !dialTimer.isActive())
             dialTimer.start();
     } else {
-        std::cout << "Wrong field, maybe an issue with object disconnection ?" << std::endl;
+        qDebug() << "Wrong field, maybe an issue with object disconnection ?";
     }
 }
 
@@ -318,7 +318,7 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
      }
    }
    else
-   { std::cout<<"no file: "<<std::endl; }
+   { qDebug()<<"no file "; }
 }
 
 
@@ -342,7 +342,7 @@ void LineardialGadgetWidget::paintEvent(QPaintEvent *event)
 {
     // Skip painting until the dial file is loaded
     if (! m_renderer->isValid()) {
-        std::cout<<"Dial file not loaded, not rendering"<<std::endl;
+        qDebug()<<"Dial file not loaded, not rendering";
         return;
     }
    QGraphicsView::paintEvent(event);

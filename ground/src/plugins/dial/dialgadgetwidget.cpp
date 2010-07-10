@@ -82,11 +82,11 @@ void DialGadgetWidget::connectNeedles(QString object1, QString nfield1,
     if (!(object1.isEmpty() || nfield1.isEmpty())) {
         obj1 = dynamic_cast<UAVDataObject*>( objManager->getObject(object1) );
         if (obj1 != NULL ) {
-            std::cout << "Connected Object 1 (" << object1.toStdString() << ")." << std::endl;
+            qDebug() << "Connected Object 1 (" << object1 << ").";
             connect(obj1, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateNeedle1(UAVObject*)));
             field1 = nfield1;
         } else {
-            std::cout << "Error: Object is unknown (" << object1.toStdString() << ")." << std::endl;
+            qDebug() << "Error: Object is unknown (" << object1 << ").";
         }
     }
 
@@ -94,11 +94,11 @@ void DialGadgetWidget::connectNeedles(QString object1, QString nfield1,
     if (!(object2.isEmpty() || nfield2.isEmpty())) {
         obj2 = dynamic_cast<UAVDataObject*>( objManager->getObject(object2) );
         if (obj2 != NULL ) {
-            std::cout << "Connected Object 2 (" << object2.toStdString() << ")." << std::endl;
+            qDebug() << "Connected Object 2 (" << object2 << ").";
             connect(obj2, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateNeedle2(UAVObject*)));
             field2 = nfield2;
         } else {
-            std::cout << "Error: Object is unknown (" << object2.toStdString() << ")." << std::endl;
+            qDebug() << "Error: Object is unknown (" << object2 << ").";
         }
     }
 
@@ -106,11 +106,11 @@ void DialGadgetWidget::connectNeedles(QString object1, QString nfield1,
     if (!(object3.isEmpty() || nfield3.isEmpty())) {
         obj3 = dynamic_cast<UAVDataObject*>( objManager->getObject(object3) );
         if (obj3 != NULL ) {
-            std::cout << "Connected Object 3 (" << object3.toStdString() << ")." << std::endl;
+            qDebug() << "Connected Object 3 (" << object3 << ").";
             connect(obj3, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateNeedle3(UAVObject*)));
             field3 = nfield3;
         } else {
-            std::cout << "Error: Object is unknown (" << object3.toStdString() << ")." << std::endl;
+            qDebug() << "Error: Object is unknown (" << object3 << ").";
         }
     }
 }
@@ -124,7 +124,7 @@ void DialGadgetWidget::updateNeedle1(UAVObject *object1) {
     if (field) {
         setNeedle1(field->getDouble());
     } else {
-        std::cout << "Wrong field, maybe an issue with object disconnection ?" << std::endl;
+        qDebug() << "Wrong field, maybe an issue with object disconnection ?";
     }
 }
 
@@ -136,7 +136,7 @@ void DialGadgetWidget::updateNeedle2(UAVObject *object2) {
     if (field) {
         setNeedle2(field->getDouble());
     } else {
-        std::cout << "Wrong field, maybe an issue with object disconnection ?" << std::endl;
+        qDebug() << "Wrong field, maybe an issue with object disconnection ?";
     }
 }
 
@@ -148,7 +148,7 @@ void DialGadgetWidget::updateNeedle3(UAVObject *object3) {
     if (field) {
         setNeedle3(field->getDouble());
     } else {
-        std::cout << "Wrong field, maybe an issue with object disconnection ?" << std::endl;
+        qDebug() << "Wrong field, maybe an issue with object disconnection ?";
     }
 }
 
@@ -339,7 +339,7 @@ void DialGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QString 
    }
    else
    {
-       std::cout<<"no file: "<<std::endl;
+       qDebug()<<"no file: display default background.";
        m_renderer->load(QString(":/dial/images/empty.svg"));
        l_scene->clear(); // This also deletes all items contained in the scene.
        m_background = new QGraphicsSvgItem();
@@ -365,7 +365,7 @@ void DialGadgetWidget::paintEvent(QPaintEvent *event)
 {
     // Skip painting until the dial file is loaded
     if (! m_renderer->isValid()) {
-        std::cout<<"Dial file not loaded, not rendering"<<std::endl;
+        qDebug()<<"Dial file not loaded, not rendering";
         return;
     }
    QGraphicsView::paintEvent(event);

@@ -84,21 +84,21 @@ void PFDGadgetWidget::connectNeedles() {
    if (attitudeObj != NULL ) {
        connect(attitudeObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateAttitude(UAVObject*)));
    } else {
-        std::cout << "Error: Object is unknown (AttitudeActual)." << std::endl;
+        qDebug() << "Error: Object is unknown (AttitudeActual).";
    }
 
    headingObj = dynamic_cast<UAVDataObject*>(objManager->getObject("PositionActual"));
    if (headingObj != NULL ) {
        connect(headingObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateHeading(UAVObject*)));
    } else {
-        std::cout << "Error: Object is unknown (PositionActual)." << std::endl;
+        qDebug() << "Error: Object is unknown (PositionActual).";
    }
 
    gcsTelemetryObj = dynamic_cast<UAVDataObject*>(objManager->getObject("GCSTelemetryStats"));
    if (gcsTelemetryObj != NULL ) {
        connect(gcsTelemetryObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateLinkStatus(UAVObject*)));
    } else {
-        std::cout << "Error: Object is unknown (GCSTelemetryStats)." << std::endl;
+        qDebug() << "Error: Object is unknown (GCSTelemetryStats).";
    }
 
 }
@@ -126,7 +126,7 @@ void PFDGadgetWidget::updateLinkStatus(UAVObject *object1) {
         s.sprintf("%.0f/%.0f",v1,v2);
         gcsTelemetryStats->setPlainText(s);
     } else {
-        std::cout << "UpdateLinkStatus: Wrong field, maybe an issue with object disconnection ?" << std::endl;
+        qDebug() << "UpdateLinkStatus: Wrong field, maybe an issue with object disconnection ?";
     }
 }
 
@@ -149,7 +149,7 @@ void PFDGadgetWidget::updateAttitude(UAVObject *object1) {
         if (!dialTimer.isActive())
             dialTimer.start(); // Rearm the dial Timer which might be stopped.
     } else {
-        std::cout << "UpdateAttitude: Wrong field, maybe an issue with object disconnection ?" << std::endl;
+        qDebug() << "UpdateAttitude: Wrong field, maybe an issue with object disconnection ?";
     }
 }
 
@@ -172,7 +172,7 @@ void PFDGadgetWidget::updateHeading(UAVObject *object1) {
         // - Scale is 540 degrees large
         headingTarget = field->getDouble()*compassBandWidth/(-540);
     } else {
-        std::cout << "UpdateHeading: Wrong field, maybe an issue with object disconnection ?" << std::endl;
+        qDebug() << "UpdateHeading: Wrong field, maybe an issue with object disconnection ?";
     }
     fieldname = QString("Groundspeed");
     field = object1->getField(fieldname);
@@ -552,7 +552,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
      }
    }
    else
-   { std::cout<<"no file: "<<std::endl; }
+   { qDebug()<<"no file."; }
 }
 
 void PFDGadgetWidget::paint()
@@ -564,7 +564,7 @@ void PFDGadgetWidget::paintEvent(QPaintEvent *event)
 {
     // Skip painting until the dial file is loaded
     if (! m_renderer->isValid()) {
-        std::cout<<"Dial file not loaded, not rendering"<<std::endl;
+        qDebug() << "Dial file not loaded, not rendering";
         return;
     }
    QGraphicsView::paintEvent(event);

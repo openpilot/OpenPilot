@@ -147,7 +147,7 @@ static void actuatorTask(void* parameters)
 		// Update servo outputs
 		for (int n = 0; n < ACTUATORCOMMAND_CHANNEL_NUMELEM; ++n)
 		{
-			PIOS_Servo_Set( n+1, cmd.Channel[n] );
+			PIOS_Servo_Set( n, cmd.Channel[n] );
 		}
 
 		// Update output object
@@ -269,7 +269,7 @@ static void setFailsafe()
 	// Update servo outputs
 	for (int n = 0; n < ACTUATORCOMMAND_CHANNEL_NUMELEM; ++n)
 	{
-		PIOS_Servo_Set( n+1, cmd.Channel[n] );
+		PIOS_Servo_Set( n, cmd.Channel[n] );
 	}
 
 	// Update output object

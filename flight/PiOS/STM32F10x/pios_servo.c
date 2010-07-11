@@ -150,42 +150,42 @@ void PIOS_Servo_SetHz(uint16_t onetofour, uint16_t fivetoeight)
 
 /**
 * Set servo position
-* \param[in] Servo Servo number (1-8)
+* \param[in] Servo Servo number (0-7)
 * \param[in] Position Servo position in milliseconds
 */
 void PIOS_Servo_Set(uint8_t Servo, uint16_t Position)
 {
 #ifndef PIOS_ENABLE_DEBUG_PINS
 	/* Make sure servo exists */
-	if (Servo <= PIOS_SERVO_NUM_OUTPUTS && Servo > 0)
+	if (Servo < PIOS_SERVO_NUM_OUTPUTS && Servo >= 0)
 	{
 		/* Update the position */
 		ServoPosition[Servo] = Position;
 
 		switch(Servo)
 		{
-			case 1:
+			case 0:
 				TIM_SetCompare1(TIM4, Position);
 				break;
-			case 2:
+			case 1:
 				TIM_SetCompare2(TIM4, Position);
 				break;
-			case 3:
+			case 2:
 				TIM_SetCompare3(TIM4, Position);
 				break;
-			case 4:
+			case 3:
 				TIM_SetCompare4(TIM4, Position);
 				break;
-			case 5:
+			case 4:
 				TIM_SetCompare1(TIM8, Position);
 				break;
-			case 6:
+			case 5:
 				TIM_SetCompare2(TIM8, Position);
 				break;
-			case 7:
+			case 6:
 				TIM_SetCompare3(TIM8, Position);
 				break;
-			case 8:
+			case 7:
 				TIM_SetCompare4(TIM8, Position);
 				break;
 		}

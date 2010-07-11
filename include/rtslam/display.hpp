@@ -368,7 +368,6 @@ namespace display {
 				{
 					boost::apply_visitor(Render(), *it);
 				}
-				//clear(); // we're not in a hurry, it will be done at next render
 			}
 			
 	};

@@ -11,7 +11,6 @@
 #include <sstream>
 #include <fstream>
 
-
 #if 0
 // creates conflict with boost sandbox with boost 1.42 in debug
 #include <boost/bind.hpp>
@@ -76,10 +75,11 @@ namespace hardware {
 		while(true)
 		{
 			// acquire the image
-			if (mode == 2)
+			if (mode == 2 || mode == 3)
 			{
 				if (index != last_processed_index)
 				{
+					// FIXME manage multisensors : put sensor id in filename
 					std::ostringstream oss; oss << dump_path << "/image_" << std::setw(4) << std::setfill('0') << index;
 					bufferSpecPtr[buff_write]->img->load(oss.str() + std::string(".pgm"));
 					if (bufferSpecPtr[buff_write]->img->data() == NULL)
@@ -141,7 +141,7 @@ namespace hardware {
 	void HardwareSensorCameraFirewire::init(const std::string &camera_id, viam_hwmode_t &hwmode, int mode, std::string dump_path)
 	{
 		// configure camera
-		if (mode != 2)
+		if (mode == 0 || mode == 1)
 		{
 			int r;
 			handle = viam_init();

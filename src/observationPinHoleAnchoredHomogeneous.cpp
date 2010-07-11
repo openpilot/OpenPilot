@@ -142,7 +142,7 @@ namespace jafar {
 			return events.visible;
 		}
 
-		void ObservationPinHoleAnchoredHomogeneousPoint::predictAppearance() {
+		void ObservationPinHoleAnchoredHomogeneousPoint::predictAppearance_func() {
 			desc_img_pnt_ptr_t descPtr = SPTR_CAST<DescriptorImagePoint>(landmarkPtr()->descriptorPtr);
 			obs_ph_ahp_ptr_t _this = SPTR_CAST<ObservationPinHoleAnchoredHomogeneousPoint>(shared_from_this());
 			descPtr->predictAppearance(_this);

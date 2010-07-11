@@ -120,7 +120,7 @@ namespace jafar {
 				/**
 				 * Predict appearance
 				 */
-				virtual void predictAppearance();
+				virtual void predictAppearance_func();
 
 				virtual double getMatchScore(){
 					return measurement.matchScore;

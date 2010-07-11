@@ -76,18 +76,19 @@
 #define MAX_NUMBER_OF_TASKS 		( _POSIX_THREAD_THREADS_MAX )
 /*-----------------------------------------------------------*/
 
-#ifndef __DARWIN__ 
+#ifdef __DARWIN__ 
 	#define COND_SIGNALING  
 	#define CHECK_TASK_RESUMES
 	#define RUNNING_THREAD_MUTEX
 	#define TICK_SIGNAL 
+	#error Here
 #endif
 #ifdef __CYGWIN__
 	#define COND_SIGNALING  
 	#define CHECK_TASK_RESUMES
+	#error Here too
 #endif
-#ifdef linux
-	#define COND_SIGNALING  
+#ifdef __linux__
 	#define CHECK_TASK_RESUMES
 	#define RUNNING_THREAD_MUTEX
 #endif

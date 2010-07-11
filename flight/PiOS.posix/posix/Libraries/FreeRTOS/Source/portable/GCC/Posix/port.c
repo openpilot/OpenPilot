@@ -81,12 +81,10 @@
 	#define CHECK_TASK_RESUMES
 	#define RUNNING_THREAD_MUTEX
 	#define TICK_SIGNAL 
-	#error Here
 #endif
 #ifdef __CYGWIN__
 	#define COND_SIGNALING  
 	#define CHECK_TASK_RESUMES
-	#error Here too
 #endif
 #ifdef __linux__
 	#define CHECK_TASK_RESUMES
@@ -536,6 +534,7 @@ tskTCB * oldTask, * newTask;
 			pthread_sigmask( SIG_SETMASK, &xSignals, NULL);
 			return;
 		}
+		sched_yield();
 		retVal = pthread_mutex_trylock( &xSwappingThreadMutex );
 	}
 

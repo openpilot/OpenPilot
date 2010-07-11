@@ -15,7 +15,10 @@
 #include <iostream>
 #include "jmath/matlab.hpp"
 #include "jmath/random.hpp"
+
 #include "rtslam/landmarkEuclideanPoint.hpp"
+#include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
+#include "rtslam/mapManager.hpp"
 
 using namespace std;
 using namespace jafar;
@@ -34,8 +37,11 @@ void test_euc01(void) {
 	mat33 EUC_euc;
 
 	map_ptr_t mapPtr(new MapAbstract(100));
+	boost::shared_ptr<MapManager<LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint> > mmPoint(new MapManager<
+	    LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint> ());
+	mmPoint->linkToParentMap(mapPtr);
 	eucp_ptr_t eucPtr(new LandmarkEuclideanPoint(mapPtr));
-  eucPtr->linkToParentMap(mapPtr);
+	eucPtr->linkToParentMapManager(mmPoint);
 
 	cout << "\n% BIGGINING TEST_ENCLIDEAN \n%============" << endl;
 	for (size_t i = 0; i < 3; i++)

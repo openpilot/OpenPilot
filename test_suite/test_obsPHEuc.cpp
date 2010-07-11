@@ -62,7 +62,9 @@ void test_obsPHEuc01() {
 
 	//rtslam stuff
 	eucp_ptr_t lmkPtr(new LandmarkEuclideanPoint(mapPtr));
-	lmkPtr->linkToParentMap(mapPtr);
+	boost::shared_ptr<MapManager<LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint> > mmPoint(new MapManager<
+	    LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint> ());
+	lmkPtr->linkToParentMapManager(mmPoint);
 
 	//		ahp_ptr_t lmkPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr));
 	//		lmkPtr->linkToParentMap(mapPtr);

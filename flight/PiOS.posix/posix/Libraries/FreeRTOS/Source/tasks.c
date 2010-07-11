@@ -56,6 +56,8 @@
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
+#include <pthread.h>
 
 /* Defining MPU_WRAPPERS_INCLUDED_FROM_API_FILE prevents task.h from redefining
 all the API functions to use the MPU wrappers.  That should only be done when
@@ -1830,10 +1832,17 @@ static portTASK_FUNCTION( prvIdleTask, pvParameters )
 		// call nanosleep for smalles sleep time possible
 		// (depending on kernel settings - around 100 microseconds)
 		// decreases idle thread CPU load from 100 to practically 0
+#ifndef __CYGWIN__
+		sigset_t xSignals;
+		sigfillset( &xSignals );
+		pthread_sigmask( SIG_SETMASK, &xSignals, NULL );
 		struct timespec x;
 		x.tv_sec=0;
-		x.tv_nsec=0;
+		x.tv_nsec=10000;
 		nanosleep(&x,NULL);
+		sigemptyset( &xSignals );
+		pthread_sigmask( SIG_SETMASK, &xSignals, NULL );
+#endif
 	}
 } /*lint !e715 pvParameters is not accessed but all task functions require the same prototype. */
 

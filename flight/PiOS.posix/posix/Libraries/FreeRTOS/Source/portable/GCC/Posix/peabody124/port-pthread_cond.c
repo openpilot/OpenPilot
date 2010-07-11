@@ -76,10 +76,15 @@
 #define MAX_NUMBER_OF_TASKS 		( _POSIX_THREAD_THREADS_MAX )
 /*-----------------------------------------------------------*/
 
-#ifndef __CYGWIN__ 
-	#define COND_SIGNALING 
+#ifndef __DARWIN__ 
+	#define COND_SIGNALING  
 	#define CHECK_TASK_RESUMES
 	#define RUNNING_THREAD_MUTEX
+	#define TICK_SIGNAL 
+#endif
+#ifdef __CYGWIN__
+	#define COND_SIGNALING  
+	#define CHECK_TASK_RESUMES
 #endif
 
 /* Parameters to pass to the newly created pthread. */
@@ -177,6 +182,7 @@ void vPortSystemTickHandler( int sig );
 	int real_pthread_mutex_unlock(pthread_mutex_t* mutex) {
 		return pthread_mutex_unlock(mutex);
 	}
+	#define pthread_mutex_trylock(...) ( (debug_printf(" -!- pthread_mutex_trylock(%s)\n",#__VA_ARGS__)|1)?pthread_mutex_trylock(__VA_ARGS__):0 )
 	#define pthread_mutex_lock(...) ( (debug_printf(" -!- pthread_mutex_lock(%s)\n",#__VA_ARGS__)|1)?pthread_mutex_lock(__VA_ARGS__):0 )
 	#define pthread_mutex_unlock(...) ( (debug_printf(" -=- pthread_mutex_unlock(%s)\n",#__VA_ARGS__)|1)?pthread_mutex_unlock(__VA_ARGS__):0 )
 	#define pthread_kill(thread,signal) ( (debug_printf("Sending signal %i to thread %li!\n",(int)signal,(long)thread)|1)?pthread_kill(thread,signal):0 )
@@ -344,10 +350,8 @@ portLONG lIndex;
 	debug_printf( "xPortStartScheduler\r\n" );
 
 	/* Establish the signals to block before they are needed. */
-	sigfillset( &xSignalToBlock );
+	sigemptyset( &xSignalToBlock );
 	sigaddset( &xSignalToBlock, SIG_SUSPEND );
-
-	/* Block until the end */
 	(void)pthread_sigmask( SIG_SETMASK, &xSignalToBlock, NULL );
 
 	for ( lIndex = 0; lIndex < MAX_NUMBER_OF_TASKS; lIndex++ )
@@ -358,16 +362,57 @@ portLONG lIndex;
 	/* Start the first task. Will not return unless all threads are killed. */
 	vPortStartFirstTask();
 
-	struct timespec x;
+	/* Unfortunately things are stable if we start ticking during setup.  This need to be */
+	/* checked careful in startup on hardware */
 	usleep(1000000);
+
+#ifdef TICK_SIGNAL
+	struct itimerval itimer;
+	portTickType xMicroSeconds = portTICK_RATE_MICROSECONDS;
+	
+	debug_printf("init %li microseconds\n",(long)xMicroSeconds);
+	/* Initialise the structure with the current timer information. */
+	assert ( 0 == getitimer( TIMER_TYPE, &itimer  ) );
+		
+	/* Set the interval between timer events. */
+	itimer.it_interval.tv_sec = 0;
+	itimer.it_interval.tv_usec = xMicroSeconds;
+		
+	/* Set the current count-down. */
+	itimer.it_value.tv_sec = 0;
+	itimer.it_value.tv_usec = xMicroSeconds;
+		
+	struct sigaction sigtick;	
+	sigtick.sa_flags = 0;
+	sigtick.sa_handler = vPortSystemTickHandler;
+	sigemptyset( &sigtick.sa_mask );	
+	assert ( 0 == sigaction( SIG_TICK, &sigtick, NULL ) );
+	
+	/* Set-up the timer interrupt. */
+	assert ( 0 == setitimer( TIMER_TYPE, &itimer, NULL  ) );
+
+	sigemptyset( &xSignalToBlock );
+	sigaddset( &xSignalToBlock, SIG_SUSPEND );
+	(void)pthread_sigmask( SIG_SETMASK, &xSignalToBlock, NULL );
+	
+	while(1) 
+	{
+		usleep(1000);
+		sched_yield();
+	}		
+#else
+	
+	struct timespec x;
 	while( pdTRUE != xSchedulerEnd ) {
 		x.tv_sec=0;
 		x.tv_nsec=portTICK_RATE_MICROSECONDS * 1000;
 		nanosleep(&x,NULL);
-		//printf("."); fflush(stdout);
+//		printf("."); fflush(stdout);
 		vPortSystemTickHandler(SIG_TICK);		
+//		printf("*"); fflush(stdout);
 	}
 	
+#endif
 	debug_printf( "Cleaning Up, Exiting.\n" );
 	/* Cleanup the mutexes */
 	xResult = pthread_mutex_destroy( &xSuspendResumeThreadMutex );
@@ -445,6 +490,7 @@ void vPortYield( void )
 pthread_t xTaskToSuspend;
 pthread_t xTaskToResume;
 sigset_t xSignals;
+int retVal;
 tskTCB * oldTask, * newTask;
 	
 	/* We must mask the suspend signal here, because otherwise there can be an */
@@ -455,24 +501,53 @@ tskTCB * oldTask, * newTask;
 	
 	sigemptyset( &xSignals );
 	sigaddset( &xSignals, SIG_SUSPEND );
+	sigaddset( &xSignals, SIG_TICK );
 	pthread_sigmask( SIG_SETMASK, &xSignals, NULL );
-
-	assert( pthread_mutex_lock( &xSwappingThreadMutex ) == 0);	
 
 	oldTask = xTaskGetCurrentTaskHandle();
 	xTaskToSuspend = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
-	if(xTaskToSuspend != pthread_self() ) {
-		/* This means between masking the interrupt and getting the lock, there was an interrupt */
-		/* and this task should suspend.  Release the lock, then unmask interrupts to go ahead and */ 
-		/* service the signal */
 
-		assert( 0 == pthread_mutex_unlock( &xSwappingThreadMutex ) );
+	retVal = pthread_mutex_trylock( &xSwappingThreadMutex );
+	while( retVal != 0 ) {
+		
+		assert( retVal == EBUSY );
+		
+		/* If we can't get the mutex, that means an interrupt is running and we */
+		/* should keep an eye out if this task should suspend so the interrupt  */
+		/* routine doesn't stall waiting for this task to pause                 */		
+		debug_printf( "Waiting to get swapping mutex from ISR\r\n" );
+		
+		xTaskToSuspend = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
+
+		if( prvGetThreadHandle( xTaskGetCurrentTaskHandle() ) != pthread_self() ) {
+			debug_printf( "The current task isn't even us.  Pausing now, deal with possible interrupt later.\r\n" );								
+			pauseThread( THREAD_PAUSE_YIELD );
+			
+			/* Now we are resuming, want to be able to catch this interrupt again */
+			sigemptyset( &xSignals );
+			sigaddset( &xSignals, SIG_TICK );
+			pthread_sigmask( SIG_SETMASK, &xSignals, NULL);
+			return;
+		}
+		retVal = pthread_mutex_trylock( &xSwappingThreadMutex );
+	}
+
+	/* At this point we have the lock, active task shouldn't change */
+	if(xTaskToSuspend != pthread_self() ) {
 		debug_printf( "The current task isn't even us, letting interrupt happen.  Watch for swap.\r\n" );
+
+		assert( pthread_mutex_unlock( &xSwappingThreadMutex ) == 0);
+				
+		pauseThread( THREAD_PAUSE_YIELD );
+		
 		/* Now we are resuming, want to be able to catch this interrupt again */
 		sigemptyset( &xSignals );
+		sigaddset( &xSignals, SIG_TICK );
 		pthread_sigmask( SIG_SETMASK, &xSignals, NULL);
 		return;
 	}
+	
+	assert( xTaskToSuspend == pthread_self() ); // race condition I didn't account for
 
 	xStarted = pdFALSE;
 	
@@ -511,6 +586,7 @@ tskTCB * oldTask, * newTask;
 
 	/* Now we are resuming, want to be able to catch this interrupt again */
 	sigemptyset( &xSignals );
+	sigaddset( &xSignals, SIG_TICK );	
 	pthread_sigmask( SIG_SETMASK, &xSignals, NULL);
 }
 /*-----------------------------------------------------------*/
@@ -564,7 +640,12 @@ tskTCB * oldTask, * newTask;
 			
 			oldTask = xTaskGetCurrentTaskHandle();
 			xTaskToSuspend = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
-			
+
+			/* Need to set this before updating the task in case it notices before the */
+			/* interrupt is set */
+			xSuspended = pdFALSE;
+			xStarted = pdFALSE;
+						
 			/* Tick Increment. */
 			vTaskIncrementTick();
 
@@ -580,14 +661,13 @@ tskTCB * oldTask, * newTask;
 			/* The only thread that can process this tick is the running thread. */
 			if ( xTaskToSuspend != xTaskToResume )
 			{
-				xSuspended = pdFALSE;
-				xStarted = pdFALSE;
-				
 				/* Remember and switch the critical nesting. */
 				prvSetTaskCriticalNesting( xTaskToSuspend, uxCriticalNesting );
 				uxCriticalNesting = prvGetTaskCriticalNesting( xTaskToResume );
 
 				debug_printf( "Swapping From %li(%s) to %li(%s)\r\n", (long int) xTaskToSuspend, oldTask->pcTaskName, (long int) xTaskToResume, newTask->pcTaskName);		
+
+				assert( pthread_kill( xTaskToSuspend, SIG_SUSPEND ) == 0);
 
 #ifdef CHECK_TASK_RESUMES
 				/* It shouldn't be possible for a second task swap to happen while waiting for this because */
@@ -595,21 +675,22 @@ tskTCB * oldTask, * newTask;
 				while( xSuspended == pdFALSE ) 
 #endif
 				{
-					assert( pthread_kill( xTaskToSuspend, SIG_SUSPEND ) == 0);
+					debug_printf( "Waiting for old task to suspend\r\n" );
+					debug_printf( "Sent signal\r\n" );
 					sched_yield();
 				}
+				debug_printf( "Suspended\r\n" );
 				
 #ifdef CHECK_TASK_RESUMES				
 				while( xStarted == pdFALSE) 					
 #endif					
 				{
-					
+					debug_printf( "Waiting for new task to resume\r\n" );					
 #ifdef COND_SIGNALING
 					// Set resume condition for specific thread
 					pthread_cond_t * hCond = prvGetConditionHandle( xTaskGetCurrentTaskHandle() );
 					assert( pthread_cond_signal( hCond ) == 0 ); 
 #endif
-					assert( pthread_kill( xTaskToSuspend, SIG_SUSPEND ) == 0);
 
 					sched_yield();
 				}
@@ -634,6 +715,7 @@ tskTCB * oldTask, * newTask;
 		debug_printf( "Pending yield or here\r\n");
 		xPendYield = pdTRUE;
 	}
+	debug_printf("Exiting\r\n");
 }
 /*-----------------------------------------------------------*/
 
@@ -701,7 +783,8 @@ void * pParams = pxParams->pvParams;
 	sigset_t xSignals;
 	sigemptyset( &xSignals );
 	sigaddset( &xSignals, SIG_SUSPEND );
-	assert( pthread_sigmask( SIG_BLOCK, &xSignals, NULL ) == 0);
+	sigaddset( &xSignals, SIG_TICK );
+	assert( pthread_sigmask( SIG_SETMASK, &xSignals, NULL ) == 0);
 
 	/* Because the FreeRTOS creates the TCB stack, which in this implementation   */
 	/* creates a thread, we need to wait until the task handle is added before    */
@@ -724,6 +807,7 @@ void * pParams = pxParams->pvParams;
 	debug_printf("Starting first run\r\n");
 
 	sigemptyset( &xSignals );
+	sigaddset( &xSignals, SIG_TICK );
 	assert( pthread_sigmask( SIG_SETMASK, &xSignals, NULL ) == 0);
 
 	pvCode( pParams );
@@ -735,7 +819,8 @@ void * pParams = pxParams->pvParams;
 
 void pauseThread( portBASE_TYPE pauseMode ) 
 {
-	debug_printf( "Pausing thread %li.  Set xSuspended false\r\n", (long int) pthread_self() );
+	debug_printf( "Pausing thread %li.  Set xSuspended true\r\n", (long int) pthread_self() );
+	xSuspended = pdTRUE;
 	
 #ifdef RUNNING_THREAD_MUTEX
 	if( pauseMode != THREAD_PAUSE_CREATED ) 
@@ -755,8 +840,6 @@ void pauseThread( portBASE_TYPE pauseMode )
 	gettimeofday( &tv, NULL );
 	ts.tv_sec = tv.tv_sec + 0;
 #endif	
-
-	xSuspended = pdTRUE;
 
 	while (1) {
 		if( pthread_self() == prvGetThreadHandle(xTaskGetCurrentTaskHandle() ) && xRunning )
@@ -783,7 +866,7 @@ void pauseThread( portBASE_TYPE pauseMode )
 			/* and there may be a sleep in the main code (this can be called from an ISR) we must */
 			/* check this */
 			if( pauseMode != THREAD_PAUSE_INTERRUPT )
-				usleep(100);
+				usleep(1000);
 			sched_yield();
 			
 #endif
@@ -801,30 +884,32 @@ sigset_t xBlockSignals;
 	/* which means if there were a swap it should result in a suspend interrupt */
 	
 	debug_error( "Caught signal %i\r\n", sig );
-	/* Check that we aren't suspending when we should be running.  This bug would need tracking down */
-	//assert( pthread_self() != prvGetThreadHandle(xTaskGetCurrentTaskHandle() ) ); 
-	if( pthread_self() == prvGetThreadHandle( xTaskGetCurrentTaskHandle() ) ) 
-	{
-		debug_printf( "Suspend ISR called while this thread still marked active.  Reflects buggy behavior in scheduler\r\n" );
+
+#ifdef CHECK_TASK_RESUMES
+	/* This would seem like a major bug, but can happen because now we send extra suspend signals */
+	/* if they aren't caught */
+	if( pthread_self() == prvGetThreadHandle( xTaskGetCurrentTaskHandle() ) ) {
+		debug_printf( "Marked as current task, resuming\r\n" );
 		return;
 	}
+#endif
+
+	/* Check that we aren't suspending when we should be running.  This bug would need tracking down */
+//	assert( pthread_self() != prvGetThreadHandle(xTaskGetCurrentTaskHandle() ) ); 
 
 	/* Block further suspend signals.  They need to go to their thread */
 	sigemptyset( &xBlockSignals );
 	sigaddset( &xBlockSignals, SIG_SUSPEND );
-	assert( pthread_sigmask( SIG_BLOCK, &xBlockSignals, NULL ) == 0);
+	sigaddset( &xBlockSignals, SIG_TICK );
+	assert( pthread_sigmask( SIG_SETMASK, &xBlockSignals, NULL ) == 0);
 	
-	pauseThread( THREAD_PAUSE_INTERRUPT ); 
-	
-//	assert( pthread_self() == prvGetThreadHandle( xTaskGetCurrentTaskHandle() ) );
 	while( pthread_self() != prvGetThreadHandle( xTaskGetCurrentTaskHandle() ) )
 	{
 		debug_printf( "Incorrectly woke up.  Repausing\r\n" );
 		pauseThread( THREAD_PAUSE_INTERRUPT );
 	}
-
-	/* Make sure the right thread is resuming */
-	assert( pthread_self() == prvGetThreadHandle(xTaskGetCurrentTaskHandle() ) ); 
+	
+	assert( pthread_self() == prvGetThreadHandle( xTaskGetCurrentTaskHandle() ) );
 	
 	/* Old synchronization code, may still be required 
 	while( !xHandover );
@@ -832,7 +917,8 @@ sigset_t xBlockSignals;
 
 	/* Respond to signals again */
 	sigemptyset( &xBlockSignals );
-	pthread_sigmask( SIG_SETMASK, &xBlockSignals, NULL );
+	sigaddset( &xBlockSignals, SIG_TICK );
+	assert( 0 == pthread_sigmask( SIG_SETMASK, &xBlockSignals, NULL ) );
 	
 	debug_printf( "Resuming %li from signal %i\r\n", (long int) pthread_self(), sig );	
 
@@ -878,7 +964,7 @@ portLONG lIndex;
 	
 	sigsuspendself.sa_flags = 0;
 	sigsuspendself.sa_handler = prvSuspendSignalHandler;
-	sigfillset( &sigsuspendself.sa_mask );
+	sigemptyset( &sigsuspendself.sa_mask );
 
 	assert ( 0 == sigaction( SIG_SUSPEND, &sigsuspendself, NULL ) );
 }

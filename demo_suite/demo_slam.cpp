@@ -15,6 +15,7 @@
 #include <boost/shared_ptr.hpp>
 #include <time.h>
 #include <map>
+#include <getopt.h>
 
 // jafar debug include
 #include "kernel/jafarDebug.hpp"
@@ -69,9 +70,7 @@ typedef DataManagerOnePointRansac<RawImage, SensorPinHole, QuickHarrisDetector, 
 
 #define RANSAC 1
 
-int dodisplay = 1;
 int mode = 0;
-std::string dump_path = ".";
 time_t rseed;
 
 const int slam_priority = -20; // needs to be started as root to be < 0
@@ -80,48 +79,79 @@ const int display_period = 100; // ms
 
 ///##############################################
 
-	// time
-	const unsigned N_FRAMES = 500000;
+const int nIntOpts = 9;
+int intOpts[nIntOpts] = {0};
+enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iKeepSeed, iPause, iLog, iVerbose };
 
-	// map
-	const unsigned MAP_SIZE = 313;
+const int nStrOpts = 2;
+std::string strOpts[nStrOpts];
+enum { iSlamConfig = 0, iDataPath };
 
-	// robot uncertainties and perturbations
-	const double UNCERT_VLIN = .01; // m/s
-	const double UNCERT_VANG = .01; // rad/s
-	const double PERT_VLIN = 0.5; // m/s per sqrt(s)
-	const double PERT_VANG = 3; // rad/s per sqrt(s)
+//strOpts[iDataPath] = ".";
 
-	// pin-hole:
-	const unsigned IMG_WIDTH = 640;
-	const unsigned IMG_HEIGHT = 480;
-	const double INTRINSIC[4] = { 301.27013,   266.86136,   497.28243,   496.81116 };
-	const double DISTORTION[2] = { -0.23193,   0.11306 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
-	const double PIX_NOISE = 0.5;
+struct option long_options[] = {
+	// int options
+	{"disp-2d", 2, 0, 0},
+	{"disp-3d", 2, 0, 0},
+	{"render-all", 2, 0, 0},
+	{"replay", 2, 0, 0},
+	{"dump", 2, 0, 0},
+	{"keep-seed", 2, 0, 0},
+	{"pause", 2, 0, 0},
+	{"log", 2, 0, 0},
+	{"verbose", 2, 0, 0},
+	// string options
+	{"slam-config", 1, 0, 0},
+	{"data-path", 1, 0, 0},
+	// breaking options
+	{"help",0,0,0},
+	{"usage",0,0,0},
+};
 
-	// lmk management
-	const double D_MIN = 0.1;
-	const double REPARAM_TH = 0.1;
+///##############################################
 
-	// data manager: quick Harris detector
-	const unsigned HARRIS_CONV_SIZE = 3;
-	const double HARRIS_TH = 10.0;
-	const double HARRIS_EDDGE = 3.0;
-	const unsigned PATCH_DESC = 45;
+// time
+const unsigned N_FRAMES = 500000;
 
-	// data manager: zncc matcher
-	const unsigned PATCH_SIZE = 15;
-	const double MATCH_TH = 0.95;
-	const double MAHALANOBIS_TH = 2.5; // in n_sigmas
-	const unsigned N_UPDATES = 20;
-	const double RANSAC_LOW_INNOV = 2.0; // in pixels
-	const unsigned RANSAC_NTRIES = 0;
+// map
+const unsigned MAP_SIZE = 313;
 
-	// data manager: active search
-	const unsigned GRID_VCELLS = 3;
-	const unsigned GRID_HCELLS = 4;
-	const unsigned GRID_MARGIN = 11;
-	const unsigned GRID_SEPAR = 20;
+// robot uncertainties and perturbations
+const double UNCERT_VLIN = .01; // m/s
+const double UNCERT_VANG = .01; // rad/s
+const double PERT_VLIN = 0.5; // m/s per sqrt(s)
+const double PERT_VANG = 3; // rad/s per sqrt(s)
+
+// pin-hole:
+const unsigned IMG_WIDTH = 640;
+const unsigned IMG_HEIGHT = 480;
+const double INTRINSIC[4] = { 301.27013,   266.86136,   497.28243,   496.81116 };
+const double DISTORTION[2] = { -0.23193,   0.11306 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
+const double PIX_NOISE = 0.5;
+
+// lmk management
+const double D_MIN = 0.1;
+const double REPARAM_TH = 0.1;
+
+// data manager: quick Harris detector
+const unsigned HARRIS_CONV_SIZE = 3;
+const double HARRIS_TH = 10.0;
+const double HARRIS_EDDGE = 3.0;
+const unsigned PATCH_DESC = 45;
+
+// data manager: zncc matcher
+const unsigned PATCH_SIZE = 15;
+const double MATCH_TH = 0.95;
+const double MAHALANOBIS_TH = 2.5; // in n_sigmas
+const unsigned N_UPDATES = 20;
+const double RANSAC_LOW_INNOV = 2.0; // in pixels
+const unsigned RANSAC_NTRIES = 0;
+
+// data manager: active search
+const unsigned GRID_VCELLS = 3;
+const unsigned GRID_HCELLS = 4;
+const unsigned GRID_MARGIN = 11;
+const unsigned GRID_SEPAR = 20;
 
 
 ///##############################################
@@ -206,12 +236,12 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	#ifdef HAVE_VIAM
 	viam_hwmode_t hwmode = { VIAM_HWSZ_640x480, VIAM_HWFMT_MONO8, VIAM_HW_FIXED, VIAM_HWFPS_60, VIAM_HWTRIGGER_INTERNAL };
-	hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode, mode, dump_path));
+	hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode, mode, strOpts[iDataPath]));
 	senPtr11->setHardwareSensor(hardSen11);
 	#else
-	if (mode == 2 || mode == 3)
+	if (intOpts[iReplay])
 	{
-		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(cv::Size(640,480),dump_path));
+		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(cv::Size(640,480),strOpts[iDataPath]));
 		senPtr11->setHardwareSensor(hardSen11);
 	}
 	#endif
@@ -238,13 +268,13 @@ void demo_slam01_main(world_ptr_t *world) {
 		bool had_data = false;
 
 		worldPtr->display_mutex.lock();
-		if (mode == 3 && worldPtr->display_rendered != (*world)->t)
+		if (intOpts[iRenderAll] && worldPtr->display_rendered != (*world)->t)
 			{ worldPtr->display_mutex.unlock(); boost::this_thread::yield(); continue; }
 		// cout << "\n************************************************** " << endl;
 		// cout << "\n                 FRAME : " << t << " (blocked "
 		chrono.reset();
 
-		// FIXME if mode == 3, manage multisensors : ensure that only 1 sensor is processed, save its time to log it, and ensure that next time next sensor will be tried first
+		// FIXME if intOpts[iRenderAll], manage multisensors : ensure that only 1 sensor is processed, save its time to log it, and ensure that next time next sensor will be tried first
 		// FIRST LOOP FOR MEASUREMENT SPACES - ALL DM
 		// foreach robot
 		for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin();
@@ -311,7 +341,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		} // if had_data
 
 		worldPtr->display_mutex.unlock();
-		if (mode == 2 && had_data) getchar(); // wait for key in replay mode
+		if (intOpts[iPause] && had_data) getchar(); // wait for key in replay mode
 //std::cout << "one frame " << (*world)->t << " : " << mode << " " << had_data << std::endl;
 	} // temporal loop
 
@@ -325,7 +355,7 @@ void demo_slam01_display(world_ptr_t *world) {
 	kernel::Timer timer(display_period*1000);
 	while(true)
 	{
-		if (dodisplay & 1)
+		if (intOpts[iDispQt])
 		{
 			#ifdef HAVE_MODULE_QDISPLAY
 			qdisplay::qtMutexLock<kernel::FifoMutex>((*world)->display_mutex);
@@ -343,43 +373,44 @@ void demo_slam01_display(world_ptr_t *world) {
 			
 			#ifdef HAVE_MODULE_QDISPLAY
 			display::ViewerQt *viewerQt = NULL;
-			if (dodisplay & 1) viewerQt = PTR_CAST<display::ViewerQt*> ((*world)->getDisplayViewer(display::ViewerQt::id()));
+			if (intOpts[iDispQt]) viewerQt = PTR_CAST<display::ViewerQt*> ((*world)->getDisplayViewer(display::ViewerQt::id()));
 			#endif
 			#ifdef HAVE_MODULE_GDHE
 			display::ViewerGdhe *viewerGdhe = NULL;
-			if (dodisplay & 2) viewerGdhe = PTR_CAST<display::ViewerGdhe*> ((*world)->getDisplayViewer(display::ViewerGdhe::id()));
+			if (intOpts[iDispGdhe]) viewerGdhe = PTR_CAST<display::ViewerGdhe*> ((*world)->getDisplayViewer(display::ViewerGdhe::id()));
 			#endif
 			
 			#ifdef HAVE_MODULE_QDISPLAY
-			if (dodisplay & 1) viewerQt->bufferize(*world);
+			if (intOpts[iDispQt]) viewerQt->bufferize(*world);
 			#endif
 			#ifdef HAVE_MODULE_GDHE
-			if (dodisplay & 2) viewerGdhe->bufferize(*world);
+			if (intOpts[iDispGdhe]) viewerGdhe->bufferize(*world);
 			#endif
 			
-			if (mode != 3) // strange: if we always unlock here, qt.dump takes much more time...
+			if (!intOpts[iRenderAll]) // strange: if we always unlock here, qt.dump takes much more time...
 				(*world)->display_mutex.unlock();
 				
 			#ifdef HAVE_MODULE_QDISPLAY
-			if (dodisplay & 1) viewerQt->render();
+			if (intOpts[iDispQt]) viewerQt->render();
 			#endif
 			#ifdef HAVE_MODULE_GDHE
-			if (dodisplay & 2) viewerGdhe->render();
+			if (intOpts[iDispGdhe]) viewerGdhe->render();
 			#endif
 			
-			if (mode == 3)
+			if (intOpts[iReplay] && intOpts[iDump])
 			{
-				if (dodisplay & 1)
+				if (intOpts[iDispQt])
 				{
-					std::ostringstream oss; oss << dump_path << "/rendered-2D_%d-" << std::setw(6) << std::setfill('0') << prev_t-1 << ".png";
+					std::ostringstream oss; oss << strOpts[iDataPath] << "/rendered-2D_%d-" << std::setw(6) << std::setfill('0') << prev_t-1 << ".png";
 					viewerQt->dump(oss.str());
 				}
-				if (dodisplay & 2)
+				if (intOpts[iDispGdhe])
 				{
-					std::ostringstream oss; oss << dump_path << "/rendered-3D_" << std::setw(6) << std::setfill('0') << prev_t-1 << ".ppm";
+					std::ostringstream oss; oss << strOpts[iDataPath] << "/rendered-3D_" << std::setw(6) << std::setfill('0') << prev_t-1 << ".ppm";
 					viewerGdhe->dump(oss.str());
 				}
-				(*world)->display_mutex.unlock();
+				if (intOpts[iRenderAll])
+					(*world)->display_mutex.unlock();
 			}
 		} else
 		{
@@ -387,7 +418,7 @@ void demo_slam01_display(world_ptr_t *world) {
 			boost::this_thread::yield();
 		}
 		
-		if (dodisplay & 1) break;
+		if (intOpts[iDispQt]) break;
 		              else timer.wait();
 	}
 }
@@ -397,13 +428,13 @@ void demo_slam01_display(world_ptr_t *world) {
 
 		// deal with the random seed
 		rseed = time(NULL);
-		if (mode == 1) {
-			std::fstream f((dump_path + std::string("/rseed.log")).c_str(), std::ios_base::out);
+		if (!intOpts[iReplay] && intOpts[iDump]) {
+			std::fstream f((strOpts[iDataPath] + std::string("/rseed.log")).c_str(), std::ios_base::out);
 			f << rseed << std::endl;
 			f.close();
 		}
-		else if (mode == 2 || mode == 3) {
-			std::fstream f((dump_path + std::string("/rseed.log")).c_str(), std::ios_base::in);
+		else if (intOpts[iReplay] && intOpts[iKeepSeed]) {
+			std::fstream f((strOpts[iDataPath] + std::string("/rseed.log")).c_str(), std::ios_base::in);
 			f >> rseed;
 			f.close();
 		}
@@ -411,14 +442,14 @@ void demo_slam01_display(world_ptr_t *world) {
 		rtslam::srand(rseed);
 
 		#ifdef HAVE_MODULE_QDISPLAY
-		if (dodisplay & 1)
+		if (intOpts[iDispQt])
 		{
 			display::ViewerQt *viewerQt = new display::ViewerQt(8, MAHALANOBIS_TH, false, "data/rendered2D_%02d-%06d.png");
 			worldPtr->addDisplayViewer(viewerQt, display::ViewerQt::id());
 		}
 		#endif
 		#ifdef HAVE_MODULE_GDHE
-		if (dodisplay & 2)
+		if (intOpts[iDispGdhe])
 		{
 			display::ViewerGdhe *viewerGdhe = new display::ViewerGdhe("camera", MAHALANOBIS_TH, "localhost");
 			worldPtr->addDisplayViewer(viewerGdhe, display::ViewerGdhe::id());
@@ -426,7 +457,7 @@ void demo_slam01_display(world_ptr_t *world) {
 		#endif
 
 		// to start with qt display
-		if (dodisplay & 1) // at least 2d
+		if (intOpts[iDispQt]) // at least 2d
 		{
 			#ifdef HAVE_MODULE_QDISPLAY
 			qdisplay::QtAppStart((qdisplay::FUNC)&demo_slam01_display,display_priority,(qdisplay::FUNC)&demo_slam01_main,slam_priority,display_period,&worldPtr);
@@ -434,7 +465,7 @@ void demo_slam01_display(world_ptr_t *world) {
 			std::cout << "Please install qdisplay module if you want 2D display" << std::endl;
 			#endif
 		} else
-		if (dodisplay & 2) // only 3d
+		if (intOpts[iDispGdhe]) // only 3d
 		{
 			#ifdef HAVE_MODULE_GDHE
 			kernel::setCurrentThreadPriority(display_priority);
@@ -453,30 +484,77 @@ void demo_slam01_display(world_ptr_t *world) {
 		JFR_DEBUG("Terminated");
 	}
 
-		/**
-		 * Function call usage:
-		 *
-		 * 	demo_slam DISP DUMP PATH
-		 *
-		 * If you want display, pass a first argument DISP="1" to the executable, otherwise "0".
-		 * If you want to dump images, pass a second argument to the executable DUMP="1" and a path where
-		 * you want the processed images be saved. If you want to replay the last execution, change 1 to 2
-		 *
-		 * Example 1: demo_slam 1 1 /mnt/ram/rtslam : dumps images to /mnt/ram/rtslam
-		 * example 2: demo_slam 1 2 /mnt/ram/rtslam : replays the saved sequence
-		 * example 3: demo_slam 1 0 /anything        : does not dump
-		 * example 4: demo_slam 0 any /anything      : does not display nor dump.
-		 */
-		int main(int argc, const char* argv[])
-		{
-			if (argc == 4)
-			{
-				dodisplay = atoi(argv[1]);
-				mode = atoi(argv[2]);
-				dump_path = argv[3];
-			}
-			else if (argc != 0)
-			std::cout << "Usage: demo_slam <display-enabled=1> <image-mode=0> <dump-path=.>" << std::endl;
 
+
+
+		/**
+		 * Program options:
+		 * --disp-2d=0/1
+		 * --disp-3d=0/1
+		 * --render-all=0/1 (needs --replay 1)
+		 * --replay=0/1 (needs --data-path)
+		 * --dump=0/1  (needs --data-path)
+		 * --keep-seed=0/1 (needs --data-path)
+		 * --pause=0/1 (needs --replay 1)
+		 * #--log=0/1 -> not implemented yet
+		 * #--verbose=0/1/2 -> not implemented yet
+		 * --data-path=/mnt/ram/rtslam
+		 * #--slam-config=data/config1.xml -> not implemented yet
+		 * --help
+		 * --usage
+		 *
+		 * You can use the following examples and only change values:
+		 * online test (old mode=0):
+		 *   demo_slam --disp-2d=1 --disp-3d=1 --render-all=0 --replay=0 --dump=0 --keep-seed=0 --pause=0 --data-path=data/rtslam01
+		 *   demo_slam --disp-2d=1 --disp-3d=1
+		 * online with dump (old mode=1):
+		 *   demo_slam --disp-2d=1 --disp-3d=1 --render-all=0 --replay=0 --dump=1 --keep-seed=0 --pause=0 --data-path=data/rtslam01
+		 *   demo_slam --disp-2d=1 --disp-3d=1 --dump=1 --data-path=data/rtslam01
+		 * replay with pause  (old mode=2):
+		 *   demo_slam --disp-2d=1 --disp-3d=1 --render-all=1 --replay=1 --dump=0 --keep-seed=1 --pause=1 --data-path=data/rtslam01
+		 * replay with dump  (old mode=3):
+		 *   demo_slam --disp-2d=1 --disp-3d=1 --render-all=1 --replay=1 --dump=1 --keep-seed=1 --pause=0 --data-path=data/rtslam01
+		 */
+		int main(int argc, char* const* argv)
+		{
+			while (1)
+			{
+				int c, option_index = 0;
+				c = getopt_long_only(argc, argv, "", long_options, &option_index);
+				if (c == -1) break;
+				if (c == 0)
+				{
+					if (option_index < nIntOpts)
+					{
+						intOpts[option_index] = 1;
+						if (optarg) intOpts[option_index] = atoi(optarg);
+					} else
+					if (option_index < nIntOpts+nStrOpts)
+					{
+						if (optarg) strOpts[option_index-nIntOpts] = optarg;
+					} else
+					{
+						std::cout << "Integer options:" << std::endl;
+						for(int i = 0; i < nIntOpts; ++i)
+							std::cout << "\t--" << long_options[i].name << std::endl;
+						
+						std::cout << "String options:" << std::endl;
+						for(int i = 0; i < nStrOpts; ++i)
+							std::cout << "\t--" << long_options[i+nIntOpts].name << std::endl;
+						
+						std::cout << "Breaking options:" << std::endl;
+						for(int i = 0; i < 2; ++i)
+							std::cout << "\t--" << long_options[i+nIntOpts+nStrOpts].name << std::endl;
+					}
+				} else
+				{
+					std::cerr << "Unknown option " << c << std::endl;
+				}
+			}
+			
+			if (intOpts[iReplay]) mode = 2; else 
+				if (intOpts[iDump]) mode = 1; else
+					mode = 0;
+			
 			demo_slam01();
 		}

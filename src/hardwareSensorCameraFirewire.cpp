@@ -75,7 +75,7 @@ namespace hardware {
 		while(true)
 		{
 			// acquire the image
-			if (mode == 2 || mode == 3)
+			if (mode == 2)
 			{
 				if (index != last_processed_index)
 				{

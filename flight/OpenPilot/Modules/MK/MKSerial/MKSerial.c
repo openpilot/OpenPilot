@@ -470,7 +470,6 @@ static void DoConnectedToFC(void)
 
 			DEBUG_MSG("Att: Nick=%5d Roll=%5d\n\r", nick, roll);
 
-			attitudeData.seq++;
 			attitudeData.Pitch = -(float)nick/10;
 			attitudeData.Roll = -(float)roll/10;
 			AttitudeActualSet(&attitudeData);
@@ -517,7 +516,6 @@ static void DoConnectedToNC(void)
 #else
 			DEBUG_MSG(".");
 #endif
-			attitudeData.seq++;
 			attitudeData.Pitch = -Par2Int8(&msg, OSD_MSG_NICK_IDX);
 			attitudeData.Roll = -Par2Int8(&msg, OSD_MSG_ROLL_IDX);
 			AttitudeActualSet(&attitudeData);

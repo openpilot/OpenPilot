@@ -41,7 +41,7 @@ namespace display {
 			ViewerEx *viewerEx;
 		public:
 			WorldEx(ViewerAbstract *_viewer, rtslam::WorldAbstract *_slamWor, WorldDisplay *garbage): 
-				WorldDisplay(_viewer, _slamWor, garbage), viewerEx(PTR_CAST<ViewerEx*>(viewer_)) {}
+				WorldDisplay(_viewer, _slamWor, garbage), viewerEx(PTR_CAST<ViewerEx*>(_viewer)) {}
 			void bufferize() {}
 			void render() {}
 	};
@@ -51,7 +51,7 @@ namespace display {
 			ViewerEx *viewerEx;
 		public:
 			MapEx(ViewerAbstract *_viewer, rtslam::MapAbstract *_slamMap, WorldEx *_dispWorld): 
-				MapDisplay(_viewer, _slamMap, _dispWorld), viewerEx(PTR_CAST<ViewerEx*>(viewer_)) {}
+				MapDisplay(_viewer, _slamMap, _dispWorld), viewerEx(PTR_CAST<ViewerEx*>(_viewer)) {}
 			void bufferize() {}
 			void render() {}
 	};
@@ -61,7 +61,7 @@ namespace display {
 			ViewerEx *viewerEx;
 		public:
 			RobotEx(ViewerAbstract *_viewer, rtslam::RobotAbstract *_slamRob, MapEx *_dispMap): 
-				RobotDisplay(_viewer, _slamRob, _dispMap), viewerEx(PTR_CAST<ViewerEx*>(viewer_)) {}
+				RobotDisplay(_viewer, _slamRob, _dispMap), viewerEx(PTR_CAST<ViewerEx*>(_viewer)) {}
 			void bufferize() {}
 			void render() {}
 	};
@@ -71,7 +71,7 @@ namespace display {
 			ViewerEx *viewerEx;
 		public:
 			SensorEx(ViewerAbstract *_viewer, rtslam::SensorAbstract *_slamSen, RobotEx *_dispRob): 
-				SensorDisplay(_viewer, _slamSen, _dispRob), viewerEx(PTR_CAST<ViewerEx*>(viewer_)) {}
+				SensorDisplay(_viewer, _slamSen, _dispRob), viewerEx(PTR_CAST<ViewerEx*>(_viewer)) {}
 			void bufferize() {}
 			void render() {}
 	};
@@ -81,7 +81,7 @@ namespace display {
 			ViewerEx *viewerEx;
 		public:
 			LandmarkEx(ViewerAbstract *_viewer, rtslam::LandmarkAbstract *_slamLmk, MapEx *_dispMap): 
-				LandmarkDisplay(_viewer, _slamLmk, _dispMap), viewerEx(PTR_CAST<ViewerEx*>(viewer_)) {}
+				LandmarkDisplay(_viewer, _slamLmk, _dispMap), viewerEx(PTR_CAST<ViewerEx*>(_viewer)) {}
 			void bufferize() {}
 			void render() {}
 	};
@@ -91,7 +91,7 @@ namespace display {
 			ViewerEx *viewerEx;
 		public:
 			ObservationEx(ViewerAbstract *_viewer, rtslam::ObservationAbstract *_slamObs, SensorEx *_dispSen): 
-				ObservationDisplay(_viewer, _slamObs, _dispSen), viewerEx(PTR_CAST<ViewerEx*>(viewer_)) {}
+				ObservationDisplay(_viewer, _slamObs, _dispSen), viewerEx(PTR_CAST<ViewerEx*>(_viewer)) {}
 			void bufferize() {}
 			void render() {}
 	};

@@ -34,16 +34,7 @@
  */
 PFDGadgetConfiguration::PFDGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),
-    m_defaultDial("Unknown"),
-    needle1MinValue(0),
-    needle1MaxValue(100),
-    needle2MinValue(0),
-    needle2MaxValue(100),
-    needle3MinValue(0),
-    needle3MaxValue(100),
-    needle1Factor(1),
-    needle2Factor(1),
-    needle3Factor(1)
+    m_defaultDial("Unknown")
 {
     //if a saved configuration exists load it
     if (state.count() > 0) {
@@ -51,16 +42,6 @@ PFDGadgetConfiguration::PFDGadgetConfiguration(QString classId, const QByteArray
         QString dialFile;
         stream >> dialFile;
         m_defaultDial=dialFile;
-        stream >> needle2MinValue;
-        stream >> needle2MaxValue;
-        stream >> needle3MinValue;
-        stream >> needle3MaxValue;
-        stream >> needle2DataObject;
-        stream >> needle2ObjectField;
-        stream >> needle3DataObject;
-        stream >> needle3ObjectField;
-        stream >> needle2Factor;
-        stream >> needle3Factor;
     }
 }
 /**
@@ -82,16 +63,6 @@ QByteArray PFDGadgetConfiguration::saveState() const
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::WriteOnly);
     stream << m_defaultDial;
-    stream << needle2MinValue;
-    stream << needle2MaxValue;
-    stream << needle3MinValue;
-    stream << needle3MaxValue;
-    stream << needle2DataObject;
-    stream << needle2ObjectField;
-    stream << needle3DataObject;
-    stream << needle3ObjectField;
-    stream << needle2Factor;
-    stream << needle3Factor;
 
     return bytes;
 }

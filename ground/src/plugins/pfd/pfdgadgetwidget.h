@@ -48,12 +48,6 @@ public:
    ~PFDGadgetWidget();
    void setDialFile(QString dfn);
    void paint();
-   void setN2Min(double value) {n2MinValue = value;}
-   void setN2Max(double value) {n2MaxValue = value;}
-   void setN2Factor(double value) {n2Factor = value;}
-   void setN3Min(double value) {n3MinValue = value;}
-   void setN3Max(double value) {n3MaxValue = value;}
-   void setN3Factor(double value) {n3Factor = value;}
    // Sets up needle/UAVObject connections:
    void connectNeedles();
 
@@ -106,16 +100,7 @@ private:
    // GCS link status Arrow
    QGraphicsSvgItem *gcsTelemetryArrow;
    QGraphicsTextItem *gcsTelemetryStats;
-
-   double n1MinValue;
-   double n1MaxValue;
-   double n1Factor;
-   double n2MinValue;
-   double n2MaxValue;
-   double n2Factor;
-   double n3MinValue;
-   double n3MaxValue;
-   double n3Factor;
+   QGraphicsTextItem *gcsBatteryStats;
 
    // The Value and target variables
    // are expressed in degrees
@@ -138,6 +123,7 @@ private:
    UAVDataObject* attitudeObj;
    UAVDataObject* headingObj;
    UAVDataObject* gcsTelemetryObj;
+   UAVDataObject* gcsBatteryObj;
 
    // Rotation timer
    QTimer dialTimer;

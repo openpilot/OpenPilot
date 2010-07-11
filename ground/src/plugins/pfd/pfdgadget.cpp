@@ -50,11 +50,5 @@ void PFDGadget::loadConfiguration(IUAVGadgetConfiguration* config)
     PFDGadgetConfiguration *m = qobject_cast<PFDGadgetConfiguration*>(config);
     m_widget->setDialFile(m->dialFile());
 
-    m_widget->setN2Min(m->getN2Min());
-    m_widget->setN2Max(m->getN2Max());
-    m_widget->setN2Factor(m->getN2Factor());
-    m_widget->setN3Min(m->getN3Min());
-    m_widget->setN3Max(m->getN3Max());
-    m_widget->setN3Factor(m->getN3Factor());
-    m_widget->connectNeedles();
+      m_widget->connectNeedles();
 }

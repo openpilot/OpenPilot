@@ -77,6 +77,9 @@ void PFDGadgetWidget::connectNeedles() {
     if (headingObj != NULL)
         disconnect(headingObj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(updateHeading(UAVObject*)));
 
+    if (gcsBatteryObj != NULL)
+    	disconnect(gcsBatteryObj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(updateBattery(UAVObject*)));
+
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
@@ -99,6 +102,13 @@ void PFDGadgetWidget::connectNeedles() {
        connect(gcsTelemetryObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateLinkStatus(UAVObject*)));
    } else {
         qDebug() << "Error: Object is unknown (GCSTelemetryStats).";
+   }
+
+   gcsBatteryObj = dynamic_cast<UAVDataObject*>(objManager->getObject("FlightBatteryState"));
+   if (gcsBatteryObj != NULL ) {
+       connect(gcsBatteryObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateBattery(UAVObject*)));
+   } else {
+        qDebug() << "Error: Object is unknown (FlightBatteryState).";
    }
 
 }
@@ -210,7 +220,25 @@ void PFDGadgetWidget::updateAltitude(UAVObject *object3) {
 /*!
   \brief Called by the UAVObject which got updated
   */
-void PFDGadgetWidget::updateBattery(UAVObject *object3) {
+void PFDGadgetWidget::updateBattery(UAVObject *object1) {
+    // Double check that the field exists:
+    QString voltage = QString("Voltage");
+    QString current = QString("Current");
+    QString energy = QString("ConsumedEnergy");
+    UAVObjectField* field = object1->getField(voltage);
+    UAVObjectField* field2 = object1->getField(current);
+    UAVObjectField* field3 = object1->getField(energy);
+    if (field && field2 && field3) {
+    	QString s = QString();
+    	double v0 = field->getDouble();
+        double v1 = field2->getDouble();
+        double v2 = field3->getDouble();
+        s.sprintf("%.2fV\n%.2fA\n%.0fmAh",v0,v1,v2);
+        gcsBatteryStats->setPlainText(s);
+    } else {
+        qDebug() << "UpdateBattery: Wrong field, maybe an issue with object disconnection ?";
+    }
+
 }
 
 
@@ -244,6 +272,9 @@ void PFDGadgetWidget::setDialFile(QString dfn)
      - Altitude scale: altitude-scale.
      - Black altitude window: altitude-window.
      - GCS Telemetry status arrow: gcstelemetry-XXXX
+     - Telemetry link rate: linkrate
+     - GPS status text: gps-txt
+     - Battery stats: battery-txt
  */
          QGraphicsScene *l_scene = scene();
          l_scene->clear(); // Deletes all items contained in the scene as well.
@@ -511,6 +542,36 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          matrix.reset();
          matrix.translate(startX,startY-linkRateHeight/2);
          gcsTelemetryStats->setTransform(matrix,false);
+
+         ////////////////
+         // GCS Battery Indicator
+         ////////////////
+         /*
+         compassMatrix = m_renderer->matrixForElement("gcstelemetry-Disconnected");
+         startX = compassMatrix.mapRect(m_renderer->boundsOnElement("gcstelemetry-Disconnected")).x();
+         startY = compassMatrix.mapRect(m_renderer->boundsOnElement("gcstelemetry-Disconnected")).y();
+         gcsTelemetryArrow = new QGraphicsSvgItem();
+         gcsTelemetryArrow->setSharedRenderer(m_renderer);
+         gcsTelemetryArrow->setElementId("gcstelemetry-Disconnected");
+         l_scene->addItem(gcsTelemetryArrow);
+         matrix.reset();
+         matrix.translate(startX,startY);
+         gcsTelemetryArrow->setTransform(matrix,false);
+         */
+
+         compassMatrix = m_renderer->matrixForElement("battery-txt");
+         startX = compassMatrix.mapRect(m_renderer->boundsOnElement("battery-txt")).x();
+         startY = compassMatrix.mapRect(m_renderer->boundsOnElement("battery-txt")).y();
+         qreal batStatHeight = compassMatrix.mapRect(m_renderer->boundsOnElement("battery-txt")).height();
+         gcsBatteryStats = new QGraphicsTextItem();
+         gcsBatteryStats->setDefaultTextColor(QColor("White"));
+         gcsBatteryStats->setFont(QFont("Arial",(int) batStatHeight));
+         l_scene->addItem(gcsBatteryStats);
+         matrix.reset();
+         matrix.translate(startX,startY-batStatHeight/2);
+         gcsBatteryStats->setTransform(matrix,false);
+
+
 
         l_scene->setSceneRect(m_background->boundingRect());
 

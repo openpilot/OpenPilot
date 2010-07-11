@@ -87,8 +87,10 @@
 	#define CHECK_TASK_RESUMES
 #endif
 #ifdef __linux__
-	#define CHECK_TASK_RESUMES
+//	#define COND_SIGNALING
+//	#define CHECK_TASK_RESUMES
 	#define RUNNING_THREAD_MUTEX
+	#define TICK_SIGNAL
 #endif
 
 
@@ -390,7 +392,7 @@ portLONG lIndex;
 	struct sigaction sigtick;	
 	sigtick.sa_flags = 0;
 	sigtick.sa_handler = vPortSystemTickHandler;
-	sigemptyset( &sigtick.sa_mask );	
+	sigfillset( &sigtick.sa_mask );	
 	assert ( 0 == sigaction( SIG_TICK, &sigtick, NULL ) );
 	
 	/* Set-up the timer interrupt. */

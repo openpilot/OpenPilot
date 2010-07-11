@@ -425,16 +425,25 @@ void nmeaProcessGPGGA(char* packet)
 	// get altitude (in meters mm.m)
 	tokens = strsep(&packet, delimiter);
 	//reuse variables for alt
-	deg=strtol (tokens,&pEnd,10); // always 0.1m resolution?
+	deg=strtol (tokens,&pEnd,10); // always 0.1m resolution? No
 	desim=strtol (pEnd+1,NULL,10);
-	if(1) // OPGPS 3 desimal
+	if(1) // OPGPS 3 decimal
 		GpsData.Altitude=deg+desim/1000.0;
 	else
 		GpsData.Altitude=deg+desim/10.0;
 
 	// next field: altitude units, always 'M'
-	// next field: geoid seperation
-	// next field: seperation units
+	tokens = strsep(&packet, delimiter);
+	// next field: geoid separation
+	tokens = strsep(&packet, delimiter);
+	//reuse variables for geoid separation
+	deg=strtol (tokens,&pEnd,10); // always 0.1m resolution? No
+	desim=strtol (pEnd+1,NULL,10);
+	if(1) // OPGPS 3 decimal
+		GpsData.GeoidSeparation=deg+desim/1000.0;
+	else
+		GpsData.GeoidSeparation=deg+desim/10.0;
+	// next field: separation units
 	// next field: DGPS age
 	// next field: DGPS station ID
 	// next field: checksum

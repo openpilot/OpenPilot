@@ -221,6 +221,8 @@ static void TaskServos(void *pvParameters)
 	/* Used to test servos, cycles all servos from one side to the other */
 	for(;;) {
 		/*xDelay = 250 / portTICK_RATE_MS;
+		PIOS_Servo_Set(0, 2000);
+		vTaskDelay(xDelay);
 		PIOS_Servo_Set(1, 2000);
 		vTaskDelay(xDelay);
 		PIOS_Servo_Set(2, 2000);
@@ -235,11 +237,7 @@ static void TaskServos(void *pvParameters)
 		vTaskDelay(xDelay);
 		PIOS_Servo_Set(7, 2000);
 		vTaskDelay(xDelay);
-		PIOS_Servo_Set(8, 2000);
-		vTaskDelay(xDelay);
 
-		PIOS_Servo_Set(8, 1000);
-		vTaskDelay(xDelay);
 		PIOS_Servo_Set(7, 1000);
 		vTaskDelay(xDelay);
 		PIOS_Servo_Set(6, 1000);
@@ -253,10 +251,13 @@ static void TaskServos(void *pvParameters)
 		PIOS_Servo_Set(2, 1000);
 		vTaskDelay(xDelay);
 		PIOS_Servo_Set(1, 1000);
+		vTaskDelay(xDelay);
+		PIOS_Servo_Set(0, 1000);
 		vTaskDelay(xDelay);*/
 
 		xDelay = 1 / portTICK_RATE_MS;
 		for(int i = 1000; i < 2000; i++) {
+			PIOS_Servo_Set(0, i);
 			PIOS_Servo_Set(1, i);
 			PIOS_Servo_Set(2, i);
 			PIOS_Servo_Set(3, i);
@@ -264,10 +265,10 @@ static void TaskServos(void *pvParameters)
 			PIOS_Servo_Set(5, i);
 			PIOS_Servo_Set(6, i);
 			PIOS_Servo_Set(7, i);
-			PIOS_Servo_Set(8, i);
 			vTaskDelay(xDelay);
 		}
 		for(int i = 2000; i > 1000; i--) {
+			PIOS_Servo_Set(0, i);
 			PIOS_Servo_Set(1, i);
 			PIOS_Servo_Set(2, i);
 			PIOS_Servo_Set(3, i);
@@ -275,7 +276,6 @@ static void TaskServos(void *pvParameters)
 			PIOS_Servo_Set(5, i);
 			PIOS_Servo_Set(6, i);
 			PIOS_Servo_Set(7, i);
-			PIOS_Servo_Set(8, i);
 			vTaskDelay(xDelay);
 		}
 	}

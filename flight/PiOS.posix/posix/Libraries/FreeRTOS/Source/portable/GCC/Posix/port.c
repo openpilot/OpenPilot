@@ -87,7 +87,7 @@
 	#define CHECK_TASK_RESUMES
 #endif
 #ifdef __linux__
-//	#define COND_SIGNALING
+	#define COND_SIGNALING
 //	#define CHECK_TASK_RESUMES
 	#define RUNNING_THREAD_MUTEX
 	#define TICK_SIGNAL

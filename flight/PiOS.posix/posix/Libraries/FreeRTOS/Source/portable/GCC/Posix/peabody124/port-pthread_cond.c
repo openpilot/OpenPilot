@@ -76,7 +76,7 @@
 #define MAX_NUMBER_OF_TASKS 		( _POSIX_THREAD_THREADS_MAX )
 /*-----------------------------------------------------------*/
 
-#ifndef __DARWIN__ 
+#ifdef __APPLE__ 
 	#define COND_SIGNALING  
 	#define CHECK_TASK_RESUMES
 	#define RUNNING_THREAD_MUTEX
@@ -86,6 +86,13 @@
 	#define COND_SIGNALING  
 	#define CHECK_TASK_RESUMES
 #endif
+#ifdef __linux__
+	#define COND_SIGNALING
+//	#define CHECK_TASK_RESUMES
+	#define RUNNING_THREAD_MUTEX
+	#define TICK_SIGNAL
+#endif
+
 
 /* Parameters to pass to the newly created pthread. */
 typedef struct XPARAMS
@@ -385,7 +392,7 @@ portLONG lIndex;
 	struct sigaction sigtick;	
 	sigtick.sa_flags = 0;
 	sigtick.sa_handler = vPortSystemTickHandler;
-	sigemptyset( &sigtick.sa_mask );	
+	sigfillset( &sigtick.sa_mask );	
 	assert ( 0 == sigaction( SIG_TICK, &sigtick, NULL ) );
 	
 	/* Set-up the timer interrupt. */
@@ -529,6 +536,7 @@ tskTCB * oldTask, * newTask;
 			pthread_sigmask( SIG_SETMASK, &xSignals, NULL);
 			return;
 		}
+		sched_yield();
 		retVal = pthread_mutex_trylock( &xSwappingThreadMutex );
 	}
 

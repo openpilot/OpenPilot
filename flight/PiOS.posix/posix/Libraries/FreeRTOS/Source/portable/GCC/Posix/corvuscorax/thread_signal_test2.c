@@ -2,6 +2,7 @@
  * small etst program whether signals between threads work as they should
  */
 
+#include <stdio.h>
 #include <unistd.h>
 #include <time.h>
 #include <pthread.h>
@@ -20,30 +21,30 @@ void print_char(int fh, char *c) {
 }
 
 /* create a dezimal string from an integer */
-int int2char(char* x,long i) {
-	if (i<0) {
-		x[0]='-';
-		return (int2char(&x[1],-i)+1);
-	}
+int int2char(char* x,unsigned long i) {
 	if (i==0) {
-		x[0]=0;
 		return 0;
 	}
-	int k=int2char(x,i/10);
+	int k=int2char(&x[0],i/10);
 	x[k]='0'+(i%10);
+	x[k+1]=0;
 	return k+1;
 }
 /* print a number*/
 void print_number(int fh, long i) {
 	char buffer[39]; // 39 characters are enough to store a 128 bit integer in dezimal notation (~~3.4* 10^38)
-	char* number=buffer;
 	
 	if (i==0) {
-		number="0";
+		print_char(fh,"0");
 	} else {
-		int2char(number,i);
+		if (i<0) {
+			buffer[0]='-';
+			int2char(&buffer[1],-i);
+		} else {
+			int2char(buffer,i);
+		}
+		print_char(fh,buffer);
 	}
-	print_char(fh,number);
 }
 
 /**
@@ -92,7 +93,18 @@ int main(char** argc, int argv) {
 	pthread_t testthread1;	
 	pthread_t testthread2;	
 	struct sigaction action;
-	print_char(2,"thread test program\n");
+	print_char(2,"thread test program\n\n");
+
+	print_char(2,"demonstrate print function\n");
+	long t=1;
+	while (t!=0) {
+		print_number(2,t);
+		print_char(2," >> ");
+		t=(t>0)?t*2:t/2;
+	}
+	print_number(2,t);
+	print_char(2,"\ndone\n\n");
+
 	print_char(2,"installing signal handler\n");
 	action.sa_handler=sighandler;
 	action.sa_flags=0;

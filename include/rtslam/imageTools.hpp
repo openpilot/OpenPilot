@@ -16,10 +16,8 @@
 namespace jafar {
 	namespace image {
 
-		template<class Vec, class Sym_mat>
-		cv::Rect gauss2rect(const Vec & x, const Sym_mat & P, double n_sigmas = 3.0){
-				double dx = n_sigmas * sqrt(P(0,0));
-				double dy = n_sigmas * sqrt(P(1,1));
+		template<class Vec>
+		cv::Rect gauss2rect(const Vec & x, double dx, double dy){
 				double xmin = (int) (x(0) - dx);
 				double xmax = (int) (x(0) + dx + 0.9999);
 				double ymin = (int) (x(1) - dy);
@@ -27,6 +25,14 @@ namespace jafar {
 
 				cv::Rect rect(xmin, ymin, xmax - xmin + 1, ymax - ymin + 1);
 				return rect;
+		}
+
+		
+		template<class Vec, class Sym_mat>
+		cv::Rect gauss2rect(const Vec & x, const Sym_mat & P, double n_sigmas = 3.0){
+				double dx = n_sigmas * sqrt(P(0,0));
+				double dy = n_sigmas * sqrt(P(1,1));
+				return gauss2rect(x, dx, dy);
 		}
 
 		cv::Rect gauss2rect(const rtslam::Gaussian & g, double sigma = 3.0){

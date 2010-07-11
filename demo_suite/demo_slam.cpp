@@ -67,7 +67,7 @@ typedef DataManagerOnePointRansac<RawImage, SensorPinHole, QuickHarrisDetector, 
 
 ///##############################################
 
-#define RANSAC 0
+#define RANSAC 1
 
 int dodisplay = 1;
 int mode = 0;
@@ -112,11 +112,10 @@ const int display_period = 100; // ms
 	// data manager: zncc matcher
 	const unsigned PATCH_SIZE = 15;
 	const double MATCH_TH = 0.95;
-	const double SEARCH_SIGMA = 2.5;
-	const double MAHALANOBIS_TH = 2.5;
+	const double MAHALANOBIS_TH = 2.5; // in n_sigmas
 	const unsigned N_UPDATES = 20;
-	const unsigned RANSAC_REGION_SIZE = 5;
-	const unsigned RANSAC_NTRIES = 6;
+	const double RANSAC_LOW_INNOV = 2.0; // in pixels
+	const unsigned RANSAC_NTRIES = 0;
 
 	// data manager: active search
 	const unsigned GRID_VCELLS = 3;
@@ -191,11 +190,11 @@ void demo_slam01_main(world_ptr_t *world) {
 	
 	#if RANSAC
 	boost::shared_ptr<DataManagerOPR> dmPt11(new DataManagerOPR());
-	dmPt11->setMatcher(znccMatcher, PATCH_SIZE, RANSAC_REGION_SIZE, SEARCH_SIGMA, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE);
+	dmPt11->setMatcher(znccMatcher, PATCH_SIZE, RANSAC_LOW_INNOV, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE);
 	dmPt11->setAlgorithmParams(N_UPDATES, RANSAC_NTRIES);
 	#else
 	boost::shared_ptr<DataManagerAS> dmPt11(new DataManagerAS());
-	dmPt11->setMatcher(znccMatcher, PATCH_SIZE, SEARCH_SIGMA, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE);
+	dmPt11->setMatcher(znccMatcher, PATCH_SIZE, MAHALANOBIS_TH, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE);
 	dmPt11->setAlgorithmParams(N_UPDATES);
 	#endif
 	

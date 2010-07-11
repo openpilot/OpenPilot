@@ -75,10 +75,9 @@ namespace jafar {
 				} detectorParams_;
 				struct matcher_params_t {
 						int patchSize;
-						double regionPix; ///<     search region radius for first RANSAC consensus
-						double regionSigma; ///<   search region n_sigma for expectation-based search
+						double lowInnov; ///<     search region radius for first RANSAC consensus
 						double threshold; ///<     matching threshold
-						double mahalanobisTh; ///< Mahalanobis distance for outlier rejection <-- TODO: remove?
+						double mahalanobisTh; ///< Mahalanobis distance for outlier rejection
 						double measStd; ///<       measurement noise std deviation
 						double measVar; ///<       measurement noise variance
 				} matcherParams_;
@@ -97,12 +96,11 @@ namespace jafar {
 				detector_params_t detectorParams() {
 					return detectorParams_;
 				}
-				void setMatcher(boost::shared_ptr<Matcher> & _matcher, int patchSize, double nPix, double nSigma,
+				void setMatcher(boost::shared_ptr<Matcher> & _matcher, int patchSize, double lowInnov,
 				                double threshold, double mahalanobisTh, double _measStd) {
 					matcher = _matcher;
 					matcherParams_.patchSize = patchSize;
-					matcherParams_.regionPix = nPix;
-					matcherParams_.regionSigma = nSigma;
+					matcherParams_.lowInnov = lowInnov;
 					matcherParams_.threshold = threshold;
 					matcherParams_.mahalanobisTh = mahalanobisTh;
 					matcherParams_.measStd = _measStd;

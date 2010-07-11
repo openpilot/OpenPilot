@@ -23,6 +23,8 @@
 // basic active search with this same class, to avoid code duplication
 // do it with n_tries = 0
 
+#define BUFFERED_UPDATE 1
+
 namespace jafar {
 	namespace rtslam {
 
@@ -40,118 +42,137 @@ std::cout << std::endl << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 				// Project and isolate visible observations
 				projectAndCollectVisibleObs();
-JFR_DEBUG("######## Found " << obsVisibleList.size() << " visible obs");
-				
+JFR_DEBUG_BEGIN(); JFR_DEBUG_SEND("######## Visible obs [" << obsVisibleList.size() << "]:");
+for(ObsList::iterator it = obsVisibleList.begin(); it != obsVisibleList.end(); ++it)
+	JFR_DEBUG_SEND(" " << (*it)->id());
+JFR_DEBUG_END();
+
 				int n_tries = algorithmParams_.n_tries;
 				if (obsVisibleList.size() < n_tries) n_tries = obsVisibleList.size();
-JFR_DEBUG("will try Ransac " << n_tries << " times");
+// JFR_DEBUG("will try Ransac " << n_tries << " times");
 
 				int current_try = 0;
 				if (n_tries >= 2)
-				while (current_try < n_tries){
-JFR_DEBUG("#### go ransac try #" << current_try);
+				while (current_try < n_tries)
+				{
+// JFR_DEBUG("#### go ransac try #" << current_try);
 					// select random obs and match it
 					observation_ptr_t obsBasePtr;
 					getOneMatchedBaseObs(obsBasePtr, rawData);
 					if (!obsBasePtr) break; // no more available matched obs
-JFR_DEBUG("chose matched obs " << obsBasePtr->id() << " as base");
+// JFR_DEBUG("chose matched obs " << obsBasePtr->id() << " as base");
 
-					{// 1b. base obs is now matched
+					// 1b. base obs is now matched
 
-						ransac_set_ptr_t ransacSetPtr(new RansacSet);
-						ransacSetList.push_back(ransacSetPtr);
-						ransacSetPtr->obsBasePtr = obsBasePtr;
-						ransacSetPtr->inlierObs.push_back(obsBasePtr);
+					ransac_set_ptr_t ransacSetPtr(new RansacSet);
+					ransacSetList.push_back(ransacSetPtr);
+					ransacSetPtr->obsBasePtr = obsBasePtr;
+					ransacSetPtr->inlierObs.push_back(obsBasePtr);
 
-						current_try ++;
+					current_try ++;
 //JFR_DEBUG("old mean : " << mapManagerPtr()->mapPtr()->x());
-						vec x_copy = updateMean(obsBasePtr);
-JFR_DEBUG("updated mean");//: " << x_copy);
+					vec x_copy = updateMean(obsBasePtr);
+// JFR_DEBUG("updated mean");//: " << x_copy);
 
-						// for each other obs
-						for(ObsList::iterator obsIter = obsVisibleList.begin(); obsIter != obsVisibleList.end(); obsIter++)
-						{
-							observation_ptr_t obsCurrentPtr = *obsIter;
-							if (obsCurrentPtr == obsBasePtr) continue; // ignore the tested observation
+					// for each other obs
+					for(ObsList::iterator obsIter = obsVisibleList.begin(); obsIter != obsVisibleList.end(); obsIter++)
+					{
+						observation_ptr_t obsCurrentPtr = *obsIter;
+						if (obsCurrentPtr == obsBasePtr) continue; // ignore the tested observation
 JFR_DEBUG("## testing obs " << obsCurrentPtr->id());
 
-							// get obs things
-							jblas::vec lmk = obsCurrentPtr->landmarkPtr()->state.x();
-							vec pix(2);
-							vec nobs(1);
+						// get obs things
+						jblas::vec lmk = obsCurrentPtr->landmarkPtr()->state.x();
+						vec pix(2);
+						vec nobs(1);
 
-							// project
-							projectFromMean(pix, obsCurrentPtr, x_copy);
+						// project
+						projectFromMean(pix, obsCurrentPtr, x_copy);
 JFR_DEBUG("was predicted at " << obsCurrentPtr->expectation.x() << ", now predicted at " << pix);
 
 
-							if(!obsCurrentPtr->events.matched){
-								// try to match with low innovation
-								obsCurrentPtr->predictAppearance();
-								obsCurrentPtr->measurement.std(detectorParams_.measStd);
-								cv::Rect roi(pix(0)-matcherParams_.regionPix/2, pix(1)-matcherParams_.regionPix/2, matcherParams_.regionPix, matcherParams_.regionPix);
-								
-JFR_DEBUG("not yet matched, trying with lowInnov in roi " << roi);
-								match(rawSpecPtr, obsCurrentPtr->predictedAppearance, roi, obsCurrentPtr->measurement,
-										obsCurrentPtr->observedAppearance);
-
-								if ( obsCurrentPtr->getMatchScore() > matcherParams_.threshold ) {
-									obsCurrentPtr->events.matched = true;
-								}
-							}
+						if(!obsCurrentPtr->events.matched){
+							// try to match with low innovation
+							obsCurrentPtr->predictAppearance();
+							obsCurrentPtr->measurement.std(detectorParams_.measStd);
+							cv::Rect roi = gauss2rect(pix, matcherParams_.lowInnov, matcherParams_.lowInnov);
 							
-JFR_DEBUG("matched: " << obsCurrentPtr->events.matched << " with score " << obsCurrentPtr->getMatchScore() << " at " << obsCurrentPtr->measurement.x());
-							if(obsCurrentPtr->events.matched && isLowInnovationInlier(obsCurrentPtr, pix, matcherParams_.regionPix/2))
+JFR_DEBUG("not yet matched, trying with lowInnov in roi " << roi);
+							match(rawData, obsCurrentPtr->predictedAppearance, roi, obsCurrentPtr->measurement,
+									obsCurrentPtr->observedAppearance);
+
+							if (obsCurrentPtr->getMatchScore() > matcherParams_.threshold && 
+							    isExpectedInnovationInlier(obsCurrentPtr, matcherParams_.mahalanobisTh))
 							{
-								// declare inlier
-								ransacSetPtr->inlierObs.push_back(obsCurrentPtr);
+								obsCurrentPtr->events.matched = true;
+							}
+						}
+						
+JFR_DEBUG("matched: " << obsCurrentPtr->events.matched << " with score " << obsCurrentPtr->getMatchScore() << " at " << obsCurrentPtr->measurement.x());
+						
+						if(obsCurrentPtr->events.matched && isLowInnovationInlier(obsCurrentPtr, pix, matcherParams_.lowInnov))
+						{
+							// declare inlier
+							ransacSetPtr->inlierObs.push_back(obsCurrentPtr);
 JFR_DEBUG("push in inliers");
-							}
-							else{
-								// declare pending
-								ransacSetPtr->pendingObs.push_back(obsCurrentPtr);
+						}
+						else{
+							// declare pending
+							ransacSetPtr->pendingObs.push_back(obsCurrentPtr);
 JFR_DEBUG("push in pendings");
-							}
+						}
 
-						} // for each other obs
+					} // for each other obs
 
-					} // base obs is matched
+JFR_DEBUG_BEGIN(); JFR_DEBUG_SEND("#### Ransac set with base " << ransacSetPtr->obsBasePtr->id() << ":");
+for(ObsList::iterator it = ransacSetPtr->inlierObs.begin(); it != ransacSetPtr->inlierObs.end(); ++it)
+	JFR_DEBUG_SEND(" " << (*it)->id());
+JFR_DEBUG_END();
 
 				} // for i = 0:n_tries
 
 				{
-JFR_DEBUG("######## Find best ransac set (among " << ransacSetList.size() << ")");
+// JFR_DEBUG("######## Find best ransac set (among " << ransacSetList.size() << ")");
 					ransac_set_ptr_t best_set;
 					if (ransacSetList.size() != 0)
 					{
 						// 1. select ransacSet.inliers.size() max
 						for(RansacSetList::iterator rsIter = ransacSetList.begin(); rsIter != ransacSetList.end(); ++rsIter)
 							if (!best_set || (*rsIter)->size() > best_set->size()) best_set = *rsIter;
-JFR_DEBUG("best set is " << best_set->obsBasePtr->id() << " with size " << best_set->size());
+// JFR_DEBUG("best set is " << best_set->obsBasePtr->id() << " with size " << best_set->size());
 						if (best_set->size() > 1)
 						{
-							// compute innovaton for inliers that never have been base. FIXME maybe check if it is really an inlier to optimize
-							for(int i = 0; i < remainingObsCount; ++i) obsVisibleList[i]->computeInnovation();
 							// 2. for each obs in inliers
 							for(ObsList::iterator obsIter = best_set->inlierObs.begin(); obsIter != best_set->inlierObs.end(); ++obsIter)
 							{
 								observation_ptr_t obsPtr = *obsIter;
 								// Add to tesselation grid for active search
-								asGrid->addPixel(obsPtr->expectation.x());
+								//asGrid->addPixel(obsPtr->expectation.x());
 								obsPtr->events.updated = true;
 								obsPtr->counters.nInlier++;
+								numObs++;
 								
+								#if BUFFERED_UPDATE
 								// 2a. add obs to buffer for EKF update
 								mapPtr->filterPtr->stackCorrection(obsPtr->innovation, obsPtr->INN_rsl, obsPtr->ia_rsl);
 	JFR_DEBUG("stacked correction for inlier " << obsPtr->id());
+								#else
+								obsPtr->project();
+								obsPtr->computeInnovation();
+								obsPtr->update();
+	JFR_DEBUG("corrected inlier " << obsPtr->id());
+								#endif
 							}
+							#if BUFFERED_UPDATE
 							// 3. perform buffered update
 							mapPtr->filterPtr->correctAllStacked(mapPtr->ia_used_states());
 	JFR_DEBUG("corrected all stacked observations");
+							#endif
 						}
 					}
 					
 					ObsList &activeSearchList = ((ransacSetList.size() == 0) || (best_set->size() <= 1) ? obsVisibleList : best_set->pendingObs);
+					// FIXME don't search again landmarks that failed as base
 					
 					// 4. for each obs in pending: retake algorithm from active search
 					obsListSorted.clear();
@@ -170,22 +191,22 @@ JFR_DEBUG("######## Starting classic active search for the remaining");
 						// 1b. check visibility
 						obsPtr->predictVisibility();
 
-JFR_DEBUG("obs " << obsPtr->id() << " visible: " << obsPtr->isVisible());
+// JFR_DEBUG("obs " << obsPtr->id() << " visible: " << obsPtr->isVisible());
 						if (obsPtr->isVisible()) {
 
 							// Add to tesselation grid for active search
-							asGrid->addPixel(obsPtr->expectation.x());
+							//asGrid->addPixel(obsPtr->expectation.x());
 
 							// predict information gain
 							obsPtr->predictInfoGain();
 
 							// add to sorted list of observations
 							obsListSorted[obsPtr->expectation.infoGain] = obsPtr;
-JFR_DEBUG("obs " << obsPtr->id() << " info gain " << obsPtr->expectation.infoGain);
+// JFR_DEBUG("obs " << obsPtr->id() << " info gain " << obsPtr->expectation.infoGain);
 						} // visible obs
 					} // for each obs
 
-JFR_DEBUG("#### starting remaining corrections");
+// JFR_DEBUG("#### starting remaining corrections");
 					// loop only the N_UPDATES most interesting obs, from largest info gain to smallest
 					for (ObservationListSorted::reverse_iterator obsIter = obsListSorted.rbegin(); obsIter
 							!= obsListSorted.rend(); obsIter++) {
@@ -194,11 +215,9 @@ JFR_DEBUG("#### starting remaining corrections");
 						// 1a. re-project to get up-to-date means and Jacobians
 						obsPtr->project();
 
-						obsPtr->events.predicted = true;
-
 						// 1b. re-check visibility, just in case re-projection caused this obs to be invisible
 						obsPtr->predictVisibility();
-JFR_DEBUG("obs " << obsPtr->id() << " visible : " << obsPtr->isVisible());
+// JFR_DEBUG("obs " << obsPtr->id() << " visible : " << obsPtr->isVisible());
 						if (obsPtr->isVisible()) {
 
 							obsPtr->events.visible = true;
@@ -211,16 +230,15 @@ JFR_DEBUG("obs " << obsPtr->id() << " visible : " << obsPtr->isVisible());
 								obsPtr->counters.nSearch++;
 
 								// 1c. predict search area and appearance
-								cv::Rect roi = gauss2rect(obsPtr->expectation.x(), obsPtr->expectation.P() + matcherParams_.measVar*identity_mat(2), matcherParams_.regionSigma);
+								cv::Rect roi = gauss2rect(obsPtr->expectation.x(), obsPtr->expectation.P() + matcherParams_.measVar*identity_mat(2), matcherParams_.mahalanobisTh);
 								obsPtr->predictAppearance();
-JFR_DEBUG("obs " << obsPtr->id() << " measured in " << roi);
+// JFR_DEBUG("obs " << obsPtr->id() << " measured in " << roi);
 
 								// 1d. match predicted feature in search area
 								//						kernel::Chrono match_chrono;
 								obsPtr->measurement.std(detectorParams_.measStd);
-								boost::shared_ptr<RawSpec> rawSpecPtr = SPTR_CAST<RawSpec>(sensorPtr()->getRaw());
 
-								match(rawSpecPtr, obsPtr->predictedAppearance, roi, obsPtr->measurement,
+								match(rawData, obsPtr->predictedAppearance, roi, obsPtr->measurement,
 																				obsPtr->observedAppearance);
 								//						total_match_time += match_chrono.elapsedMicrosecond();
 
@@ -242,7 +260,7 @@ JFR_DEBUG("obs " << obsPtr->id() << " measured in " << roi);
 																							obsPtr->expectation.x(0) - shift(0), obsPtr->expectation.x(1) - shift(1));
 								}
 		*/
-JFR_DEBUG("obs " << obsPtr->id() << " got match score " << obsPtr->getMatchScore());
+// JFR_DEBUG("obs " << obsPtr->id() << " got match score " << obsPtr->getMatchScore());
 								// 1e. if feature is found
 								if (obsPtr->getMatchScore() > matcherParams_.threshold) {
 									obsPtr->counters.nMatch++;
@@ -257,7 +275,7 @@ JFR_DEBUG("obs " << obsPtr->id() << " got match score " << obsPtr->getMatchScore
 										obsPtr->update();
 										//								total_update_time += update_chrono.elapsedMicrosecond();
 										obsPtr->events.updated = true;
-JFR_DEBUG("obs " << obsPtr->id() << " passed compatibility test");
+JFR_DEBUG("corrected " << obsPtr->id());
 									} // obsPtr->compatibilityTest(M_TH)
 								} // obsPtr->getScoreMatchInPercent()>SC_TH
 
@@ -269,7 +287,7 @@ JFR_DEBUG("obs " << obsPtr->id() << " passed compatibility test");
 						// cout << *obsPtr << endl;
 
 					} // foreach observation
-JFR_DEBUG("finished for this sensor !");
+// JFR_DEBUG("finished for this sensor !");
 					obsListSorted.clear(); // clear the list now or it will prevent the observation to be destroyed until next frame, and will still be displayed
 				}
 
@@ -347,11 +365,10 @@ JFR_DEBUG("finished for this sensor !");
 		} // detect()
 
 		template<class RawSpec,class SensorSpec, class Detector, class Matcher>
-		void
-		DataManagerOnePointRansac<RawSpec,SensorSpec,Detector,Matcher>::
+		void DataManagerOnePointRansac<RawSpec,SensorSpec,Detector,Matcher>::
 		process( boost::shared_ptr<RawAbstract> data )
 		{
-				boost::shared_ptr<RawImage> dataSpec = SPTR_CAST<RawImage>(data);
+				boost::shared_ptr<RawImage> dataSpec = SPTR_CAST<RawSpec>(data);
 				// 1. Observe known landmarks.
 				processKnownObs(dataSpec); // process known landmarks
 				// 2. Initialize new landmark.
@@ -362,24 +379,24 @@ JFR_DEBUG("finished for this sensor !");
 		template<class RawSpec, class SensorSpec, class Detector, class Matcher>
 		void
 		DataManagerOnePointRansac<RawSpec, SensorSpec, Detector, Matcher>::
-		projectAndCollectVisibleObs() {
+		projectAndCollectVisibleObs()
+		{
 			obsVisibleList.clear();
 
-			for(ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end();obsIter++) {
-
+			for(ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end();obsIter++)
+			{
 				observation_ptr_t obsPtr = *obsIter;
 
 				obsPtr->clearEvents();
 				obsPtr->measurement.matchScore = 0;
 
 				obsPtr->project();
-				obsPtr->events.predicted = true;
-
 				obsPtr->predictVisibility();
-				if (obsPtr->isVisible()) {
+				
+				if (obsPtr->isVisible())
+				{
 					obsPtr->events.visible = true;
 					asGrid->addPixel(obsPtr->expectation.x());
-					// 1c. add to visible list
 					obsVisibleList.push_back(obsPtr);
 				} // visible obs
 			} // for each obs
@@ -401,16 +418,16 @@ JFR_DEBUG("getOneMatchedBaseObs: trying obs " << obsBasePtr->id() << " already m
 				// try to match (if not yet matched)
 				if (!obsBasePtr->events.matched)
 				{
+					obsBasePtr->events.measured = true;
 					obsBasePtr->counters.nSearch++;
 
 					if (matchWithExpectedInnovation(rawData, obsBasePtr)){
 						obsBasePtr->events.matched = true;
 						obsBasePtr->counters.nMatch++;
-JFR_DEBUG("getOneMatchedBaseObs: obs " << obsBasePtr->id() << " now matched at " << obsBasePtr->measurement.x() << " predicted at " << obsBasePtr->expectation.x());
 					} else {
 						obsFailedList.push_back(obsBasePtr);
-JFR_DEBUG("getOneMatchedBaseObs: obs " << obsBasePtr->id() << " match failed");
 					}
+JFR_DEBUG("getOneMatchedBaseObs: obs " << obsBasePtr->id() << " matched " << obsBasePtr->events.matched << " at " << obsBasePtr->measurement.x() << " predicted at " << obsBasePtr->expectation.x() << " with score " << obsBasePtr->getMatchScore());
 				}
 				if (obsBasePtr->events.matched)
 				{
@@ -435,7 +452,6 @@ JFR_DEBUG("getOneMatchedBaseObs: obs " << obsBasePtr->id() << " match failed");
 			sym_mat &P = mapManagerPtr()->mapPtr()->P();
 
 			// compute Kalman gain
-			obsPtr->computeInnovation();
 			mat K(ia_x.size(), obsPtr->innovation.size());
 			kalman::computeKalmanGain(P, ia_x, obsPtr->innovation, obsPtr->INN_rsl, obsPtr->ia_rsl, K);
 
@@ -501,7 +517,7 @@ JFR_DEBUG("getOneMatchedBaseObs: obs " << obsBasePtr->id() << " match failed");
 			cv::Rect roi = gauss2rect(
 					obsPtr->expectation.x(),
 			    obsPtr->expectation.P() + obsPtr->measurement.P(),
-			    matcherParams_.regionSigma);
+			    matcherParams_.mahalanobisTh);
 			match(
 					rawData,
 					obsPtr->predictedAppearance,
@@ -509,7 +525,7 @@ JFR_DEBUG("getOneMatchedBaseObs: obs " << obsBasePtr->id() << " match failed");
 					obsPtr->measurement,
 					obsPtr->observedAppearance);
 
-			return (obsPtr->getMatchScore() > matcherParams_.threshold);
+			return (obsPtr->getMatchScore() > matcherParams_.threshold && isExpectedInnovationInlier(obsPtr, matcherParams_.mahalanobisTh));
 
 		}
 

@@ -37,9 +37,19 @@ namespace jafar {
 
 	namespace rtslam {
 
-		static unsigned int rand_state;
-		inline void srand(unsigned int seed) { rand_state = seed; }
-		inline int rand() { return rand_r(&rand_state); }
+		extern unsigned int rand_state;
+		inline void srand(unsigned int seed)
+		{
+//			std::cout << "!rand: seed " << seed << std::endl;
+			rand_state = seed;
+		}
+		inline int rand()
+		{
+//			std::cout << "!rand: state " << rand_state;
+			int r = rand_r(&rand_state);
+//			std::cout << " value " << r << " state " << rand_state << std::endl;
+			return r;
+		}
 
 		// forward declarations
 		class WorldAbstract;

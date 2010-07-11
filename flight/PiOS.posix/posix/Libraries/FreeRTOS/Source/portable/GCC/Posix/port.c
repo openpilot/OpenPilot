@@ -76,7 +76,7 @@
 #define MAX_NUMBER_OF_TASKS 		( _POSIX_THREAD_THREADS_MAX )
 /*-----------------------------------------------------------*/
 
-#ifdef __DARWIN__ 
+#ifdef __APPLE__ 
 	#define COND_SIGNALING  
 	#define CHECK_TASK_RESUMES
 	#define RUNNING_THREAD_MUTEX

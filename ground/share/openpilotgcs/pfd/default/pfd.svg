@@ -15,7 +15,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="PFD-2.svg"
+   sodipodi:docname="pfd.svg"
    style="display:inline"
    inkscape:export-filename="H:\Documents\Hobbies\OpenPilot\SVN\artwork\PFD-2.png"
    inkscape:export-xdpi="269.53"
@@ -3663,13 +3663,13 @@
        inkscape:label="#rect7029" />
     <rect
        inkscape:label="#rect7029"
-       ry="2.5164356"
-       y="629.06805"
-       x="704.36194"
-       height="20.561829"
-       width="56.990395"
+       ry="2.389617"
+       y="629.58618"
+       x="698.88007"
+       height="19.525591"
+       width="105.95415"
        id="gps-txt"
-       style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:3.15245819;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
+       style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:4.18869495;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
   </g>
   <g
      inkscape:groupmode="layer"

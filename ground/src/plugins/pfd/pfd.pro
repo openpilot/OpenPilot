@@ -18,3 +18,4 @@ SOURCES += pfdgadgetconfiguration.cpp
 SOURCES += pfdgadgetoptionspage.cpp
 OTHER_FILES += PFDGadget.pluginspec
 FORMS += pfdgadgetoptionspage.ui
+RESOURCES += pfd.qrc

@@ -38,12 +38,14 @@ PFDGadgetWidget::PFDGadgetWidget(QWidget *parent) : QGraphicsView(parent)
     setMinimumSize(64,64);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setScene(new QGraphicsScene(this));
-    setRenderHints(QPainter::Antialiasing);
+    //setRenderHints(QPainter::Antialiasing || QPainter::TextAntialiasing);
+    setRenderHints(QPainter::TextAntialiasing);
 
     m_renderer = new QSvgRenderer();
 
     attitudeObj = NULL;
     headingObj = NULL;
+    gcsBatteryObj = NULL;
     compassBandWidth = 0;
 /*
     obj2 = NULL;
@@ -80,6 +82,9 @@ void PFDGadgetWidget::connectNeedles() {
     if (gcsBatteryObj != NULL)
     	disconnect(gcsBatteryObj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(updateBattery(UAVObject*)));
 
+    // Safeguard: if artwork did not load properly, don't go further
+    if (pfdError)
+    	return;
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
@@ -199,6 +204,14 @@ void PFDGadgetWidget::updateHeading(UAVObject *object1) {
         altitudeTarget = field->getDouble()*altitudeScaleHeight/(30);
     }
 
+    // GPS Stats
+    fieldname = QString("Satellites");
+    field = object1->getField(fieldname);
+    if (field) {
+        QString s = QString("GPS: ") + field->getValue().toString();
+        gcsGPSStats->setPlainText(s);
+    }
+
     if (!dialTimer.isActive())
         dialTimer.start(); // Rearm the dial Timer which might be stopped.
 
@@ -249,11 +262,9 @@ void PFDGadgetWidget::updateBattery(UAVObject *object1) {
   */
 void PFDGadgetWidget::setDialFile(QString dfn)
 {
-   if (QFile::exists(dfn))
+   QGraphicsScene *l_scene = scene();
+   if (QFile::exists(dfn) && m_renderer->load(dfn) && m_renderer->isValid())
    {
-      m_renderer->load(dfn);
-      if(m_renderer->isValid())
-      {
 /* The PFD element IDs are fixed, not like with the analog dial.
      - Background: background
      - Foreground: foreground (contains all fixed elements, including plane)
@@ -276,7 +287,6 @@ void PFDGadgetWidget::setDialFile(QString dfn)
      - GPS status text: gps-txt
      - Battery stats: battery-txt
  */
-         QGraphicsScene *l_scene = scene();
          l_scene->clear(); // Deletes all items contained in the scene as well.
          m_background = new QGraphicsSvgItem();
          // All other items will be clipped to the shape of the background
@@ -546,7 +556,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          ////////////////
          // GCS Battery Indicator
          ////////////////
-         /*
+         /* (to be used the day I add a green/yellow/red indicator)
          compassMatrix = m_renderer->matrixForElement("gcstelemetry-Disconnected");
          startX = compassMatrix.mapRect(m_renderer->boundsOnElement("gcstelemetry-Disconnected")).x();
          startY = compassMatrix.mapRect(m_renderer->boundsOnElement("gcstelemetry-Disconnected")).y();
@@ -570,6 +580,34 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          matrix.reset();
          matrix.translate(startX,startY-batStatHeight/2);
          gcsBatteryStats->setTransform(matrix,false);
+
+         ////////////////
+         // GCS GPS Indicator
+         ////////////////
+         /* (to be used the day I add a green/yellow/red indicator)
+         compassMatrix = m_renderer->matrixForElement("gcstelemetry-Disconnected");
+         startX = compassMatrix.mapRect(m_renderer->boundsOnElement("gcstelemetry-Disconnected")).x();
+         startY = compassMatrix.mapRect(m_renderer->boundsOnElement("gcstelemetry-Disconnected")).y();
+         gcsTelemetryArrow = new QGraphicsSvgItem();
+         gcsTelemetryArrow->setSharedRenderer(m_renderer);
+         gcsTelemetryArrow->setElementId("gcstelemetry-Disconnected");
+         l_scene->addItem(gcsTelemetryArrow);
+         matrix.reset();
+         matrix.translate(startX,startY);
+         gcsTelemetryArrow->setTransform(matrix,false);
+         */
+
+         compassMatrix = m_renderer->matrixForElement("gps-txt");
+         startX = compassMatrix.mapRect(m_renderer->boundsOnElement("gps-txt")).x();
+         startY = compassMatrix.mapRect(m_renderer->boundsOnElement("gps-txt")).y();
+         qreal gpsStatHeight = compassMatrix.mapRect(m_renderer->boundsOnElement("gps-txt")).height();
+         gcsGPSStats = new QGraphicsTextItem();
+         gcsGPSStats->setDefaultTextColor(QColor("White"));
+         gcsGPSStats->setFont(QFont("Arial",(int) gpsStatHeight));
+         l_scene->addItem(gcsGPSStats);
+         matrix.reset();
+         matrix.translate(startX,startY-gpsStatHeight/2);
+         gcsGPSStats->setTransform(matrix,false);
 
 
 
@@ -608,12 +646,19 @@ void PFDGadgetWidget::setDialFile(QString dfn)
         headingValue = 0;
         groundspeedValue = 0;
         altitudeValue = 0;
+        pfdError = false;
         if (!dialTimer.isActive())
             dialTimer.start(); // Rearm the dial Timer which might be stopped.
-     }
    }
    else
-   { qDebug()<<"no file."; }
+   { qDebug()<<"Error on PFD artwork file.";
+       m_renderer->load(QString(":/pfd/images/pfd-default.svg"));
+       l_scene->clear(); // This also deletes all items contained in the scene.
+       m_background = new QGraphicsSvgItem();
+       m_background->setSharedRenderer(m_renderer);
+       l_scene->addItem(m_background);
+       pfdError = true;
+   }
 }
 
 void PFDGadgetWidget::paint()
@@ -657,6 +702,11 @@ void PFDGadgetWidget::moveNeedles()
                        // which has finished moving
 
     /// TODO: optimize!!!
+
+    if (pfdError) {
+    	dialTimer.stop();
+    	return;
+    }
 
     //////
     // Roll

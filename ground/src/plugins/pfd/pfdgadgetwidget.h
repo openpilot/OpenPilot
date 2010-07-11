@@ -101,6 +101,7 @@ private:
    QGraphicsSvgItem *gcsTelemetryArrow;
    QGraphicsTextItem *gcsTelemetryStats;
    QGraphicsTextItem *gcsBatteryStats;
+   QGraphicsTextItem *gcsGPSStats;
 
    // The Value and target variables
    // are expressed in degrees
@@ -127,7 +128,9 @@ private:
 
    // Rotation timer
    QTimer dialTimer;
-   QTimer dialTimer2;
+
+   // Flag to check for pfd Error
+   bool pfdError;
 
 };
 #endif /* PFDGADGETWIDGET_H_ */

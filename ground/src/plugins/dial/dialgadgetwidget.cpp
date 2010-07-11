@@ -344,7 +344,6 @@ void DialGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QString 
        l_scene->clear(); // This also deletes all items contained in the scene.
        m_background = new QGraphicsSvgItem();
        m_background->setSharedRenderer(m_renderer);
-       m_background->setElementId(bg);
        l_scene->addItem(m_background);
        m_text1 = NULL;
        m_text2 = NULL;

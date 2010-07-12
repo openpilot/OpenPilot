@@ -5,7 +5,7 @@
 #include <cstdio>
 #include <sstream>
 
-#include <gdhe/GDHE.h>
+#include <GDHE_client_prot.h>
 
 #include "kernel/IdFactory.hpp"
 #include "jmath/misc.hpp"

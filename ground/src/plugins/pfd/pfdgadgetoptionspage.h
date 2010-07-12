@@ -61,8 +61,6 @@ private:
 
 private slots:
     void on_loadFile_clicked();
-    void on_uavObject2_currentIndexChanged(QString val);
-    void on_uavObject3_currentIndexChanged(QString val);
 };
 
 #endif // PFDGADGETOPTIONSPAGE_H

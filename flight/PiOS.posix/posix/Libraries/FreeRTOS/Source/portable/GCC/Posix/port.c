@@ -340,6 +340,7 @@ void vPortStartFirstTask( void )
 	/* Start the first task. */
 #ifdef COND_SIGNALING
 	pthread_cond_t * hCond = prvGetConditionHandle( xTaskGetCurrentTaskHandle() );
+// careful! race condition? if u mutex lock here, could  u start the tick handler more early?
 	assert( pthread_cond_signal( hCond ) == 0 ); 		
 #endif
 }
@@ -414,6 +415,9 @@ portLONG lIndex;
 		x.tv_sec=0;
 		x.tv_nsec=portTICK_RATE_MICROSECONDS * 1000;
 		nanosleep(&x,NULL);
+// careful - on some systems a signal to ANY thread in the process will
+// end nanosleeps immediately - better sleep with pselect() and set the
+// wakeup sigmask to all blocked (see test_case_x_pselect.c)
 //		printf("."); fflush(stdout);
 		vPortSystemTickHandler(SIG_TICK);		
 //		printf("*"); fflush(stdout);
@@ -475,6 +479,7 @@ void vPortExitCritical( void )
 	/* Check for unmatched exits. */
 	if ( uxCriticalNesting > 0 )
 	{
+// careful - race condition possible?
 		uxCriticalNesting--;
 	}
 
@@ -513,6 +518,7 @@ tskTCB * oldTask, * newTask;
 
 	oldTask = xTaskGetCurrentTaskHandle();
 	xTaskToSuspend = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
+// careful! race condition!!!! unprotected by mutex
 
 	retVal = pthread_mutex_trylock( &xSwappingThreadMutex );
 	while( retVal != 0 ) {
@@ -525,8 +531,10 @@ tskTCB * oldTask, * newTask;
 		debug_printf( "Waiting to get swapping mutex from ISR\r\n" );
 		
 		xTaskToSuspend = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
+// careful! race condition!!!! unprotected by mutex
 
 		if( prvGetThreadHandle( xTaskGetCurrentTaskHandle() ) != pthread_self() ) {
+// careful! race condition!!!! unprotected by mutex
 			debug_printf( "The current task isn't even us.  Pausing now, deal with possible interrupt later.\r\n" );								
 			pauseThread( THREAD_PAUSE_YIELD );
 			
@@ -580,6 +588,7 @@ tskTCB * oldTask, * newTask;
 #ifdef CHECK_TASK_RESUMES
 		while( xStarted == pdFALSE )
 			debug_printf( "Waiting for task to resume\r\n" );
+// careful! needs sched_yield()!!!
 #endif
 
 		debug_printf( "Detected task resuming.  Pausing this task\r\n" );
@@ -737,6 +746,9 @@ portBASE_TYPE xResult;
 	printf("vPortForciblyEndThread\r\n");
 
 	if ( 0 == pthread_mutex_lock( &xSwappingThreadMutex ) )
+// careful! windows bug - this thread won't be suspendable while waiting for mutex!
+// so tick handler will wait forever for this thread to go to sleep
+// might want to put a try_lock() - sched_yield() loop when on cygwin!
 	{
 		xTaskToDelete = prvGetThreadHandle( hTaskToDelete );
 		xTaskToResume = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
@@ -765,6 +777,8 @@ portBASE_TYPE xResult;
 			/* Resume the other thread. */
 			/* Assert zero - I never fixed this functionality */
 			assert( 0 );
+// careful! will be hit every time a thread exits itself gracefully - better fix this, we might need
+// it
 			
 			/* Pthread Clean-up function will note the cancellation. */
 			/* Release the execution. */
@@ -851,6 +865,7 @@ void pauseThread( portBASE_TYPE pauseMode )
 
 	while (1) {
 		if( pthread_self() == prvGetThreadHandle(xTaskGetCurrentTaskHandle() ) && xRunning )
+// careful! race condition!!!! possibly unprotected by mutex when CHECK_TASK_RESUMES is not set?
 		{
 			
 			xStarted = pdTRUE;
@@ -897,6 +912,7 @@ sigset_t xBlockSignals;
 	/* This would seem like a major bug, but can happen because now we send extra suspend signals */
 	/* if they aren't caught */
 	if( pthread_self() == prvGetThreadHandle( xTaskGetCurrentTaskHandle() ) ) {
+// careful! race condition? Or does the tick handler wait for us to sleep before unlocking?
 		debug_printf( "Marked as current task, resuming\r\n" );
 		return;
 	}
@@ -912,6 +928,7 @@ sigset_t xBlockSignals;
 	assert( pthread_sigmask( SIG_SETMASK, &xBlockSignals, NULL ) == 0);
 	
 	while( pthread_self() != prvGetThreadHandle( xTaskGetCurrentTaskHandle() ) )
+// careful! race condition? could a port_yield mess with this?
 	{
 		debug_printf( "Incorrectly woke up.  Repausing\r\n" );
 		pauseThread( THREAD_PAUSE_INTERRUPT );

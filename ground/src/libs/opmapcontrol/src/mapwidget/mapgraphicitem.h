@@ -97,6 +97,8 @@ namespace mapcontrol
         core::Point lastimagepoint;
         void paintImage(QPainter* painter);
         void ConstructLastImage(int const& zoomdiff);
+        internals::PureProjection* Projection()const{return core->Projection();}
+        double Zoom();
     protected:
         void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );
         void mousePressEvent ( QGraphicsSceneMouseEvent * event );
@@ -116,7 +118,6 @@ namespace mapcontrol
         * @param value zoom value
         */
         void SetZoomStep(int const& value);
-
 
 
     private:
@@ -175,7 +176,7 @@ namespace mapcontrol
         void Offset(int const& x, int const& y);
         bool CanDragMap()const{return core->CanDragMap;}
         void SetCanDragMap(bool const& value){core->CanDragMap = value;}
-        double Zoom();
+
         void SetZoom(double const& value);
         void mapRotate ( qreal angle );
         void start();
@@ -186,6 +187,7 @@ namespace mapcontrol
 
     private slots:
         void Core_OnNeedInvalidation();
+        void ChildPosRefresh();
     public slots:
         /**
         * @brief To be called when the scene size changes

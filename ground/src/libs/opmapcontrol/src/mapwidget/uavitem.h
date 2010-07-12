@@ -76,6 +76,10 @@ namespace mapcontrol
         bool ShowTrail()const{return showtrail;}
         void SetShowTrail(bool const& value);
         void DeleteTrail()const;
+        bool AutoSetReached()const{return autosetreached;}
+        void SetAutoSetReached(bool const& value){autosetreached=value;}
+        double AutoSetDistance()const{return autosetdistance;}
+        void SetAutoSetDistance(double const& value){autosetdistance=value;}
 
         int type() const;
     private:
@@ -94,6 +98,9 @@ namespace mapcontrol
         bool showtrail;
         int trailtime;
         int traildistance;
+        bool autosetreached;
+        double Distance3D(internals::PointLatLng const& coord, int const& altitude);
+        double autosetdistance;
       //  QRectF rect;
 
     public slots:

@@ -38,9 +38,11 @@
 #include "waypointitem.h"
 #include "QtSvg/QGraphicsSvgItem"
 #include "uavitem.h"
+#include "homeitem.h"
 namespace mapcontrol
 {
     class UAVItem;
+    class HomeItem;
     /**
     * @brief Collection of static functions to help dealing with various enums used
     *       Contains functions for enumToString conversio, StringToEnum, QStringList of enum values...
@@ -332,10 +334,11 @@ namespace mapcontrol
         void SetShowCompass(bool const& value);
 
         UAVItem* UAV;
-
+        HomeItem* Home;
         void SetShowUAV(bool const& value);
         bool ShowUAV()const{return showuav;}
-
+        void SetShowHome(bool const& value);
+        bool ShowHome()const{return showhome;}
     private:
         internals::Core *core;
         MapGraphicItem *map;
@@ -349,6 +352,7 @@ namespace mapcontrol
         void ConnectWP(WayPointItem* item);
         QGraphicsSvgItem *compass;
         bool showuav;
+        bool showhome;
      //   WayPointItem* item;//apagar
     protected:
         void resizeEvent(QResizeEvent *event);

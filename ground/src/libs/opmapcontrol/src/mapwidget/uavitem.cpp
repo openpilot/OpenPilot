@@ -29,10 +29,11 @@
 #include "uavitem.h"
 namespace mapcontrol
 {
-    UAVItem::UAVItem(MapGraphicItem* map,OPMapWidget* parent):map(map),mapwidget(parent),showtrail(true),trailtime(5),traildistance(100)
+    UAVItem::UAVItem(MapGraphicItem* map,OPMapWidget* parent):map(map),mapwidget(parent),showtrail(true),trailtime(5),traildistance(100),autosetreached(true)
+    ,autosetdistance(100)
     {
-        pic.load(QString::fromUtf8(":/markers/images/airplane.svg"));
-        pic=pic.scaled(30,30,Qt::IgnoreAspectRatio);
+        pic.load(QString::fromUtf8(":/markers/images/airplanepip.png"));
+        pic=pic.scaled(45,45,Qt::IgnoreAspectRatio);
         localposition=map->FromLatLngToLocal(mapwidget->CurrentPosition());
         this->setPos(localposition.X(),localposition.Y());
         this->setZValue(4);
@@ -55,13 +56,13 @@ namespace mapcontrol
 
     void UAVItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
     {
-        painter->rotate(-90);
+       // painter->rotate(-90);
         painter->drawPixmap(-pic.width()/2,-pic.height()/2,pic);
        //   painter->drawRect(QRectF(-pic.width()/2,-pic.height()/2,pic.width()-1,pic.height()-1));
     }
     QRectF UAVItem::boundingRect()const
     {
-        return QRectF(-pic.width()/2,-pic.height()/2,pic.width(),pic.height());;
+        return QRectF(-pic.width()/2,-pic.height()/2,pic.width(),pic.height());
     }
     void UAVItem::SetUAVPos(const internals::PointLatLng &position, const int &altitude)
     {
@@ -95,6 +96,42 @@ namespace mapcontrol
                 mapwidget->SetCurrentPosition(coord);
             }
             this->update();
+            if(autosetreached)
+            {
+                foreach(QGraphicsItem* i,map->childItems())
+                {
+                    WayPointItem* wp=qgraphicsitem_cast<WayPointItem*>(i);
+                    if(wp)
+                    {
+                        if(Distance3D(wp->Coord(),wp->Altitude())<autosetdistance)
+                        {
+                            wp->SetReached(true);
+                            emit UAVReachedWayPoint(wp->Number(),wp);
+                        }
+                    }
+                }
+            }
+            if(mapwidget->Home!=0)
+            {
+                if(Distance3D(mapwidget->Home->Coord(),mapwidget->Home->Altitude())>mapwidget->Home->SafeArea())
+                {
+                    if(mapwidget->Home->safe!=false);
+                    {
+                        mapwidget->Home->safe=false;
+                        mapwidget->Home->update();
+                        emit UAVLeftSafetyBouble(this->coord);
+                    }
+                }
+                else
+                {
+                    if(mapwidget->Home->safe!=true);
+                    {
+                        mapwidget->Home->safe=true;
+                        mapwidget->Home->update();
+                    }
+                }
+
+            }
         }
     }
     void UAVItem::SetUAVHeading(const qreal &value)
@@ -121,6 +158,7 @@ namespace mapcontrol
                 w->setPos(map->FromLatLngToLocal(w->coord).X(),map->FromLatLngToLocal(w->coord).Y());
             //this->update();
         }
+
     }
     void UAVItem::SetTrailType(const UAVTrailType::Types &value)
     {
@@ -137,5 +175,11 @@ namespace mapcontrol
     {
         foreach(QGraphicsItem* i,trail->childItems())
             delete i;
+    }
+    double UAVItem::Distance3D(const internals::PointLatLng &coord, const int &altitude)
+    {
+       return sqrt(pow(internals::PureProjection::DistanceBetweenLatLng(this->coord,coord)*1000,2)+
+       pow(this->altitude-altitude,2));
+
     }
 }

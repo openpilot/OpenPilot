@@ -26,6 +26,7 @@
 * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 #include "uavitem.h"
+#include "homeitem.h"
 #include "mapgraphicitem.h"
 
 namespace mapcontrol
@@ -40,7 +41,8 @@ namespace mapcontrol
         core->SetMapType(MapType::GoogleHybrid);
         this->SetZoom(2);
         connect(core,SIGNAL(OnNeedInvalidation()),this,SLOT(Core_OnNeedInvalidation()));
-
+        connect(core,SIGNAL(OnMapDrag()),this,SLOT(ChildPosRefresh()));
+        connect(core,SIGNAL(OnMapZoomChanged()),this,SLOT(ChildPosRefresh()));
         //resize();
     }
     void MapGraphicItem::start()
@@ -83,7 +85,25 @@ namespace mapcontrol
             UAVItem* ww=qgraphicsitem_cast<UAVItem*>(i);
             if(ww)
                 ww->RefreshPos();
+            HomeItem* www=qgraphicsitem_cast<HomeItem*>(i);
+            if(www)
+                www->RefreshPos();
 
+        }
+    }
+    void MapGraphicItem::ChildPosRefresh()
+    {
+        foreach(QGraphicsItem* i,this->childItems())
+        {
+            WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);
+            if(w)
+                w->RefreshPos();
+            UAVItem* ww=qgraphicsitem_cast<UAVItem*>(i);
+            if(ww)
+                ww->RefreshPos();
+            HomeItem* www=qgraphicsitem_cast<HomeItem*>(i);
+            if(www)
+                www->RefreshPos();
         }
     }
     void MapGraphicItem::ConstructLastImage(int const& zoomdiff)
@@ -283,7 +303,7 @@ namespace mapcontrol
                         core->tileRect.SetX(core->GettilePoint().X()*core->tileRect.Width());
                         core->tileRect.SetY(core->GettilePoint().Y()*core->tileRect.Height());
                         core->tileRect.Offset(core->GetrenderOffset());
-                        qDebug()<<core->GetrenderOffset().ToString();
+                        //qDebug()<<core->GetrenderOffset().ToString();
 
                         if(core->GetCurrentRegion().IntersectsWith(core->tileRect))
                         {

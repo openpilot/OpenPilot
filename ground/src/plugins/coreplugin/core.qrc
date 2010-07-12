@@ -44,5 +44,9 @@
         <file>images/unlocked.png</file>
         <file>images/extension.png</file>
         <file>images/darkclosebutton.png</file>
+        <file>images/infoicon.png</file>
+        <file>images/exiticon.png</file>
+        <file>images/optionsicon.png</file>
+        <file>images/helpicon.png</file>
     </qresource>
 </RCC>

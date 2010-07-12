@@ -126,7 +126,7 @@ SUBDIRS += plugin_gpsdisplay
 plugin_pfd.subdir = pfd
 plugin_pfd.depends = plugin_coreplugin
 plugin_pfd.depends = plugin_uavobjects
-SUBDIRS += plugin_pfd
+#SUBDIRS += plugin_pfd
 
 
 #IP connection plugin

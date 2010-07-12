@@ -532,7 +532,7 @@ void MainWindow::registerDefaultActions()
     connect(m_saveAllAction, SIGNAL(triggered()), this, SLOT(saveAll()));
 
     // Exit Action
-    m_exitAction = new QAction(tr("E&xit"), this);
+    m_exitAction = new QAction(QIcon(Constants::ICON_EXIT), tr("E&xit"), this);
     cmd = am->registerAction(m_exitAction, Constants::EXIT, m_globalContext);
     cmd->setDefaultKeySequence(QKeySequence(tr("Ctrl+Q")));
     mfile->addAction(cmd, Constants::G_FILE_OTHER);
@@ -585,7 +585,7 @@ void MainWindow::registerDefaultActions()
     tmpaction->setEnabled(false);
 
     // Options Action
-    m_optionsAction = new QAction(tr("&Options..."), this);
+    m_optionsAction = new QAction(QIcon(Constants::ICON_OPTIONS), tr("&Options..."), this);
     cmd = am->registerAction(m_optionsAction, Constants::OPTIONS, m_globalContext);
 #ifdef Q_WS_MAC
     cmd->setDefaultKeySequence(QKeySequence("Ctrl+,"));
@@ -623,11 +623,11 @@ void MainWindow::registerDefaultActions()
     connect(m_toggleFullScreenAction, SIGNAL(triggered(bool)), this, SLOT(setFullScreen(bool)));
 #endif
 
-    // About IDE Action
+    // About GCS Action
 #ifdef Q_WS_MAC
-    tmpaction = new QAction(tr("About &OpenPilot GCS"), this); // it's convention not to add dots to the about menu
+    tmpaction = new QAction(QIcon(Constants::ICON_INFO), tr("About &OpenPilot GCS"), this); // it's convention not to add dots to the about menu
 #else
-    tmpaction = new QAction(tr("About &OpenPilot GCS..."), this);
+    tmpaction = new QAction(QIcon(Constants::ICON_INFO), tr("About &OpenPilot GCS..."), this);
 #endif
     cmd = am->registerAction(tmpaction, Constants::ABOUT_OPENPILOTGCS, m_globalContext);
     mhelp->addAction(cmd, Constants::G_HELP_ABOUT);
@@ -638,7 +638,7 @@ void MainWindow::registerDefaultActions()
     connect(tmpaction, SIGNAL(triggered()), this,  SLOT(aboutOpenPilogGCS()));
 
     //About Plugins Action
-    tmpaction = new QAction(tr("About &Plugins..."), this);
+    tmpaction = new QAction(QIcon(Constants::ICON_INFO), tr("About &Plugins..."), this);
     cmd = am->registerAction(tmpaction, Constants::ABOUT_PLUGINS, m_globalContext);
     mhelp->addAction(cmd, Constants::G_HELP_ABOUT);
     tmpaction->setEnabled(true);

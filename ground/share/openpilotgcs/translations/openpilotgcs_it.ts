@@ -20,7 +20,7 @@
     </message>
     <message>
         <location line="+36"/>
-        <source>Qt Creator - Plugin loader messages</source>
+        <source>OpenPilot GCS - Plugin loader messages</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -51,71 +51,56 @@
     </message>
     <message>
         <location filename="../../../src/plugins/coreplugin/generalsettings.ui"/>
-        <location filename="../../../src/plugins/coreplugin/ui_generalsettings.h" line="+189"/>
         <source>General settings</source>
         <translation>Impostazioni Generali</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_generalsettings.h" line="+6"/>
-        <location line="+4"/>
-        <location line="+5"/>
         <source>Reset to default</source>
         <translation>Ripristina predefinito</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_generalsettings.h" line="-7"/>
-        <location line="+4"/>
-        <location line="+5"/>
         <source>R</source>
         <translation>R</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_generalsettings.h" line="-16"/>
         <source>Terminal:</source>
         <translation>Terminale:</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_generalsettings.h" line="+1"/>
         <source>External editor:</source>
         <translation>Editor esterno:</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_generalsettings.h" line="+11"/>
         <source>?</source>
         <translation>?</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_generalsettings.h" line="-10"/>
         <source>When files are externally modified:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_generalsettings.h" line="+17"/>
         <source>Always ask</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_generalsettings.h" line="+1"/>
         <source>Reload all modified files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_generalsettings.h" line="+1"/>
         <source>Ignore modifications</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_generalsettings.h" line="-18"/>
         <source>User interface color:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -523,43 +508,36 @@
     <name>Utils::NewClassWidget</name>
     <message>
         <location filename="../../../src/libs/utils/newclasswidget.ui"/>
-        <location filename="../../../src/libs/utils/ui_newclasswidget.h" line="+163"/>
         <source>Class name:</source>
         <translation>Nome classe:</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/utils/ui_newclasswidget.h" line="+1"/>
         <source>Base class:</source>
         <translation>Classe Base:</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/utils/ui_newclasswidget.h" line="+8"/>
         <source>Header file:</source>
         <translation>File Header:</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/utils/ui_newclasswidget.h" line="+1"/>
         <source>Source file:</source>
         <translation>File Sorgente:</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/utils/ui_newclasswidget.h" line="+1"/>
         <source>Generate form:</source>
         <translation>Genera form:</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/utils/ui_newclasswidget.h" line="+2"/>
         <source>Form file:</source>
         <translation>File form:</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/utils/ui_newclasswidget.h" line="+1"/>
         <source>Path:</source>
         <translation>Percorso:</translation>
     </message>
@@ -585,25 +563,21 @@
     </message>
     <message>
         <location filename="../../../src/libs/utils/newclasswidget.ui"/>
-        <location filename="../../../src/libs/utils/ui_newclasswidget.h" line="-12"/>
         <source>Type information:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/utils/ui_newclasswidget.h" line="+3"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/utils/ui_newclasswidget.h" line="+1"/>
         <source>Inherits QObject</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/utils/ui_newclasswidget.h" line="+1"/>
         <source>Inherits QWidget</source>
         <translation type="unfinished"></translation>
     </message>
@@ -688,19 +662,16 @@
     <name>Utils::ProjectIntroPage</name>
     <message>
         <location filename="../../../src/libs/utils/projectintropage.ui"/>
-        <location filename="../../../src/libs/utils/ui_projectintropage.h" line="+116"/>
         <source>Introduction and project location</source>
         <translation>Introduzione e posizione del progetto</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/utils/ui_projectintropage.h" line="+1"/>
         <source>Name:</source>
         <translation>Nome:</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/utils/ui_projectintropage.h" line="+1"/>
         <source>Create in:</source>
         <translation>Crea in:</translation>
     </message>
@@ -732,19 +703,16 @@
     <name>Utils::SubmitEditorWidget</name>
     <message>
         <location filename="../../../src/libs/utils/submiteditorwidget.ui"/>
-        <location filename="../../../src/libs/utils/ui_submiteditorwidget.h" line="+92"/>
         <source>Subversion Submit</source>
         <translation>Invio Subversion</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/utils/ui_submiteditorwidget.h" line="+1"/>
         <source>Des&amp;cription</source>
         <translation>Des&amp;crizione</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/utils/ui_submiteditorwidget.h" line="+1"/>
         <source>F&amp;iles</source>
         <translation>F&amp;ile</translation>
     </message>
@@ -753,19 +721,16 @@
     <name>Utils::WizardPage</name>
     <message>
         <location filename="../../../src/libs/utils/filewizardpage.ui"/>
-        <location filename="../../../src/libs/utils/ui_filewizardpage.h" line="+70"/>
         <source>Choose the location</source>
         <translation>Scegli la posizione</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/utils/ui_filewizardpage.h" line="+1"/>
         <source>Name:</source>
         <translation>Nome:</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/utils/ui_filewizardpage.h" line="+1"/>
         <source>Path:</source>
         <translation>Percorso:</translation>
     </message>
@@ -792,61 +757,51 @@
     <name>ExtensionSystem::Internal::PluginDetailsView</name>
     <message>
         <location filename="../../../src/libs/extensionsystem/plugindetailsview.ui"/>
-        <location filename="../../../src/libs/extensionsystem/ui_plugindetailsview.h" line="+219"/>
         <source>Name:</source>
         <translation>Nome:</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/extensionsystem/ui_plugindetailsview.h" line="+1"/>
         <source>Version:</source>
         <translation>Versione:</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/extensionsystem/ui_plugindetailsview.h" line="+1"/>
         <source>Compatibility Version:</source>
         <translation>Versione di Compatibilità:</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/extensionsystem/ui_plugindetailsview.h" line="+2"/>
         <source>Url:</source>
         <translation>Url:</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/extensionsystem/ui_plugindetailsview.h" line="+1"/>
         <source>Location:</source>
         <translation>Posizione:</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/extensionsystem/ui_plugindetailsview.h" line="+1"/>
         <source>Description:</source>
         <translation>Descrizione:</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/extensionsystem/ui_plugindetailsview.h" line="+1"/>
         <source>Copyright:</source>
         <translation>Copyright:</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/extensionsystem/ui_plugindetailsview.h" line="+1"/>
         <source>License:</source>
         <translation>Licenza:</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/extensionsystem/ui_plugindetailsview.h" line="+1"/>
         <source>Dependencies:</source>
         <translation>Dipendenze:</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/extensionsystem/ui_plugindetailsview.h" line="-6"/>
         <source>Developer:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -855,13 +810,11 @@
     <name>ExtensionSystem::Internal::PluginErrorView</name>
     <message>
         <location filename="../../../src/libs/extensionsystem/pluginerrorview.ui"/>
-        <location filename="../../../src/libs/extensionsystem/ui_pluginerrorview.h" line="+88"/>
         <source>State:</source>
         <translation>Stato:</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/extensionsystem/ui_pluginerrorview.h" line="+1"/>
         <source>Error Message:</source>
         <translation>Messaggio d&apos;Errore:</translation>
     </message>
@@ -888,31 +841,26 @@
     <name>ExtensionSystem::Internal::PluginView</name>
     <message>
         <location filename="../../../src/libs/extensionsystem/pluginview.ui"/>
-        <location filename="../../../src/libs/extensionsystem/ui_pluginview.h" line="+64"/>
         <source>State</source>
         <translation>Stato</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/extensionsystem/ui_pluginview.h" line="-1"/>
         <source>Name</source>
         <translation>Nome</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/extensionsystem/ui_pluginview.h" line="-1"/>
         <source>Version</source>
         <translation>Versione</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/extensionsystem/ui_pluginview.h" line="-2"/>
         <source>Location</source>
         <translation>Posizione</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/extensionsystem/ui_pluginview.h" line="+1"/>
         <source>Developer</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1003,7 +951,7 @@
 <context>
     <name>ExtensionSystem::PluginManager</name>
     <message>
-        <location filename="../../../src/libs/extensionsystem/pluginmanager.cpp" line="+645"/>
+        <location filename="../../../src/libs/extensionsystem/pluginmanager.cpp" line="+617"/>
         <source>Circular dependency detected:
 </source>
         <translation>Rilevata una dipendenza circolare:</translation>
@@ -1434,13 +1382,11 @@ Causa: %3</translation>
     <name>SettingsDialog</name>
     <message>
         <location filename="../../../src/plugins/coreplugin/dialogs/settingsdialog.ui"/>
-        <location filename="../../../src/plugins/coreplugin/ui_settingsdialog.h" line="+109"/>
         <source>Options</source>
         <translation>Opzioni</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_settingsdialog.h" line="+2"/>
         <source>0</source>
         <translation>0</translation>
     </message>
@@ -1449,73 +1395,61 @@ Causa: %3</translation>
     <name>ShortcutSettings</name>
     <message>
         <location filename="../../../src/plugins/coreplugin/dialogs/shortcutsettings.ui"/>
-        <location filename="../../../src/plugins/coreplugin/ui_shortcutsettings.h" line="+169"/>
         <source>Keyboard Shortcuts</source>
         <translation>Scorciatoie della Tastiera</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_shortcutsettings.h" line="+1"/>
         <source>Filter:</source>
         <translation>Filtro:</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_shortcutsettings.h" line="+4"/>
         <source>Command</source>
         <translation>Comando</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_shortcutsettings.h" line="-1"/>
         <source>Label</source>
         <translation>Etichetta</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_shortcutsettings.h" line="-1"/>
         <source>Shortcut</source>
         <translation>Scorciatoia</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_shortcutsettings.h" line="+3"/>
         <source>Defaults</source>
         <translation>Predefiniti</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_shortcutsettings.h" line="+1"/>
         <source>Import...</source>
         <translation>Importa...</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_shortcutsettings.h" line="+1"/>
         <source>Export...</source>
         <translation>Esporta...</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_shortcutsettings.h" line="+1"/>
         <source>Key Sequence</source>
         <translation>Sequenza di Tasti</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_shortcutsettings.h" line="+1"/>
         <source>Shortcut:</source>
         <translation>Scorciatoia:</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_shortcutsettings.h" line="+2"/>
         <source>Reset</source>
         <translation>Ripristina</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_shortcutsettings.h" line="+4"/>
         <source>Remove</source>
         <translation>Rimuovi</translation>
     </message>
@@ -1552,19 +1486,16 @@ Causa: %3</translation>
     <name>Utils::CheckableMessageBox</name>
     <message>
         <location filename="../../../src/libs/utils/checkablemessagebox.ui"/>
-        <location filename="../../../src/libs/utils/ui_checkablemessagebox.h" line="+115"/>
         <source>Dialog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/utils/ui_checkablemessagebox.h" line="+1"/>
         <source>TextLabel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/libs/utils/ui_checkablemessagebox.h" line="+1"/>
         <source>CheckBox</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1573,7 +1504,6 @@ Causa: %3</translation>
     <name>Welcome::Internal::CommunityWelcomePageWidget</name>
     <message>
         <location filename="../../../src/plugins/welcome/communitywelcomepagewidget.ui"/>
-        <location filename="../../../src/plugins/welcome/ui_communitywelcomepagewidget.h" line="+143"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1623,7 +1553,6 @@ Causa: %3</translation>
     <name>Welcome::WelcomeMode</name>
     <message>
         <location filename="../../../src/plugins/welcome/welcomemode.ui"/>
-        <location filename="../../../src/plugins/welcome/ui_welcomemode.h" line="+284"/>
         <source>#gradientWidget {
   background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(247, 247, 247, 255), stop:1 rgba(215, 215, 215, 255));
 }</source>
@@ -1633,7 +1562,6 @@ Causa: %3</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/welcome/ui_welcomemode.h" line="+3"/>
         <source>#headerFrame {
     border-image: url(:/welcome/images/center_frame_header.png) 0;
     border-width: 0;
@@ -1643,7 +1571,6 @@ Causa: %3</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/welcome/ui_welcomemode.h" line="+6"/>
         <source>Feedback</source>
         <translation type="unfinished">Commenti</translation>
     </message>
@@ -1654,7 +1581,6 @@ Causa: %3</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/welcome/welcomemode.ui"/>
-        <location filename="../../../src/plugins/welcome/ui_welcomemode.h" line="-1"/>
         <source>Help us make OpenPilot even better</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1702,136 +1628,14 @@ Causa: %3</translation>
     </message>
 </context>
 <context>
-    <name>AirspeedGadgetOptionsPage</name>
-    <message>
-        <location filename="../../../src/plugins/airspeed/airspeedgadgetoptionspage.ui"/>
-        <location filename="../../../src/plugins/airspeed/ui_airspeedgadgetoptionspage.h" line="+624"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/airspeed/ui_airspeedgadgetoptionspage.h" line="+1"/>
-        <source>Dial SVG: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/airspeed/ui_airspeedgadgetoptionspage.h" line="+1"/>
-        <source>Load file...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/airspeed/ui_airspeedgadgetoptionspage.h" line="+1"/>
-        <source>BackgroundID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/airspeed/ui_airspeedgadgetoptionspage.h" line="+1"/>
-        <source>ForegroundID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/airspeed/ui_airspeedgadgetoptionspage.h" line="+1"/>
-        <location line="+8"/>
-        <source>Indicator 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/airspeed/ui_airspeedgadgetoptionspage.h" line="-7"/>
-        <location line="+9"/>
-        <location line="+9"/>
-        <source>Movement:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/airspeed/ui_airspeedgadgetoptionspage.h" line="-17"/>
-        <location line="+9"/>
-        <location line="+9"/>
-        <source>ID:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/airspeed/ui_airspeedgadgetoptionspage.h" line="-17"/>
-        <location line="+9"/>
-        <location line="+9"/>
-        <source>Min:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/airspeed/ui_airspeedgadgetoptionspage.h" line="-17"/>
-        <location line="+9"/>
-        <location line="+9"/>
-        <source>Max:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/airspeed/ui_airspeedgadgetoptionspage.h" line="-17"/>
-        <location line="+9"/>
-        <location line="+9"/>
-        <source>Factor:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/airspeed/ui_airspeedgadgetoptionspage.h" line="-17"/>
-        <location line="+9"/>
-        <location line="+9"/>
-        <source>DataObject</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/airspeed/ui_airspeedgadgetoptionspage.h" line="-17"/>
-        <location line="+9"/>
-        <location line="+9"/>
-        <source>ObjectField</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/airspeed/ui_airspeedgadgetoptionspage.h" line="-16"/>
-        <location line="+8"/>
-        <source>Indicator 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/airspeed/ui_airspeedgadgetoptionspage.h" line="+1"/>
-        <location line="+8"/>
-        <source>Indicator 3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/airspeed/airspeedgadgetoptionspage.cpp" line="+238"/>
-        <source>QFileDialog::getOpenFileName()</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>All Files (*);;SVG Files (*.svg)</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ConfigGadget</name>
     <message>
         <location filename="../../../src/plugins/config/configgadget.ui"/>
-        <location filename="../../../src/plugins/config/ui_configgadget.h" line="+84"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/config/ui_configgadget.h" line="+1"/>
         <source>Send</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1840,31 +1644,26 @@ Causa: %3</translation>
     <name>TopOptionsPage</name>
     <message>
         <location filename="../../../src/plugins/coreplugin/uavgadgetoptionspage.ui"/>
-        <location filename="../../../src/plugins/coreplugin/ui_uavgadgetoptionspage.h" line="+126"/>
         <source>Configuration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_uavgadgetoptionspage.h" line="+2"/>
         <source>Clone</source>
         <translation type="unfinished">Clona</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_uavgadgetoptionspage.h" line="+1"/>
         <source>Delete</source>
         <translation type="unfinished">Elimina</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_uavgadgetoptionspage.h" line="+1"/>
         <source>Lock</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_uavgadgetoptionspage.h" line="+1"/>
         <source>Settings</source>
         <translation type="unfinished">Impostazioni</translation>
     </message>
@@ -1873,51 +1672,42 @@ Causa: %3</translation>
     <name>Core::Internal::WorkspaceSettings</name>
     <message>
         <location filename="../../../src/plugins/coreplugin/workspacesettings.ui"/>
-        <location filename="../../../src/plugins/coreplugin/ui_workspacesettings.h" line="+157"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_workspacesettings.h" line="+1"/>
         <location filename="../../../src/plugins/coreplugin/workspacesettings.cpp" line="+60"/>
         <source>Workspaces</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_workspacesettings.h" line="+1"/>
         <source>Number of workspaces:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_workspacesettings.h" line="+1"/>
         <source>Change details of workspace:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_workspacesettings.h" line="+1"/>
         <source>Details</source>
         <translation type="unfinished">Dettagli</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_workspacesettings.h" line="+1"/>
         <source>Icon:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_workspacesettings.h" line="+1"/>
         <source>Name:</source>
         <translation type="unfinished">Nome:</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/coreplugin/ui_workspacesettings.h" line="+2"/>
-        <location line="+6"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -1945,26 +1735,21 @@ p, li { white-space: pre-wrap; }
     <name>HITLOptionsPage</name>
     <message>
         <location filename="../../../src/plugins/hitl/hitloptionspage.ui"/>
-        <location filename="../../../src/plugins/hitl/ui_hitloptionspage.h" line="+102"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitl/ui_hitloptionspage.h" line="+1"/>
         <source>FlightGear executable:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitl/ui_hitloptionspage.h" line="+1"/>
         <source>FlightGear data directory:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitl/ui_hitloptionspage.h" line="+2"/>
-        <location line="+2"/>
         <source>Manual aircraft control (can be used when hardware is not available)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1983,43 +1768,36 @@ p, li { white-space: pre-wrap; }
     <name>HITLWidget</name>
     <message>
         <location filename="../../../src/plugins/hitl/hitlwidget.ui"/>
-        <location filename="../../../src/plugins/hitl/ui_hitlwidget.h" line="+146"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitl/ui_hitlwidget.h" line="+2"/>
         <source>Request update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitl/ui_hitlwidget.h" line="+2"/>
         <source>Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitl/ui_hitlwidget.h" line="+2"/>
         <source>Send update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitl/ui_hitlwidget.h" line="+2"/>
         <source>Stop</source>
         <translation type="unfinished">Ferma</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitl/ui_hitlwidget.h" line="+1"/>
         <source>AutoPilot Disconnected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitl/ui_hitlwidget.h" line="+1"/>
         <source>FlighGear Disconnected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2028,96 +1806,76 @@ p, li { white-space: pre-wrap; }
     <name>LineardialGadgetOptionsPage</name>
     <message>
         <location filename="../../../src/plugins/lineardial/lineardialgadgetoptionspage.ui"/>
-        <location filename="../../../src/plugins/lineardial/ui_lineardialgadgetoptionspage.h" line="+390"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/lineardial/ui_lineardialgadgetoptionspage.h" line="+1"/>
         <source>Dial SVG: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/lineardial/ui_lineardialgadgetoptionspage.h" line="+1"/>
         <source>Load file...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/lineardial/ui_lineardialgadgetoptionspage.h" line="+1"/>
         <source>Whole range:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/lineardial/ui_lineardialgadgetoptionspage.h" line="+1"/>
-        <location line="+3"/>
-        <location line="+3"/>
-        <location line="+3"/>
         <source>Min:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/lineardial/ui_lineardialgadgetoptionspage.h" line="-8"/>
-        <location line="+3"/>
-        <location line="+3"/>
-        <location line="+3"/>
         <source>Max:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/lineardial/ui_lineardialgadgetoptionspage.h" line="-8"/>
         <source>Green:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/lineardial/ui_lineardialgadgetoptionspage.h" line="+3"/>
         <source>Yellow:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/lineardial/ui_lineardialgadgetoptionspage.h" line="+3"/>
         <source>Red:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/lineardial/ui_lineardialgadgetoptionspage.h" line="+3"/>
         <source>Input:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/lineardial/ui_lineardialgadgetoptionspage.h" line="+1"/>
         <source>ObjectName</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/lineardial/ui_lineardialgadgetoptionspage.h" line="+1"/>
         <source>ObjectField</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/lineardial/ui_lineardialgadgetoptionspage.h" line="+1"/>
         <source>Dial font:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/lineardial/ui_lineardialgadgetoptionspage.h" line="+1"/>
         <source>Select...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/lineardial/lineardialgadgetoptionspage.cpp" line="+139"/>
+        <location filename="../../../src/plugins/lineardial/lineardialgadgetoptionspage.cpp" line="+143"/>
         <source>QFileDialog::getOpenFileName()</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2126,54 +1884,56 @@ p, li { white-space: pre-wrap; }
         <source>All Files (*);;SVG Files (*.svg)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../../../src/plugins/lineardial/lineardialgadgetoptionspage.ui"/>
+        <source>Decimal places:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Factor:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MapGadgetOptionsPage</name>
     <message>
         <location filename="../../../src/plugins/map/mapgadgetoptionspage.ui"/>
-        <location filename="../../../src/plugins/map/ui_mapgadgetoptionspage.h" line="+114"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/map/ui_mapgadgetoptionspage.h" line="+1"/>
         <source>Map provider:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/map/ui_mapgadgetoptionspage.h" line="+3"/>
         <source>OpenStreetMap</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/map/ui_mapgadgetoptionspage.h" line="+1"/>
         <source>Google</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/map/ui_mapgadgetoptionspage.h" line="+1"/>
         <source>Google Sat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/map/ui_mapgadgetoptionspage.h" line="+2"/>
         <source>Default zoom:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/map/ui_mapgadgetoptionspage.h" line="+1"/>
         <source>Default latitude:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/map/ui_mapgadgetoptionspage.h" line="+1"/>
         <source>Default longitude:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2182,31 +1942,26 @@ p, li { white-space: pre-wrap; }
     <name>ModelViewOptionsPage</name>
     <message>
         <location filename="../../../src/plugins/modelview/modelviewoptionspage.ui"/>
-        <location filename="../../../src/plugins/modelview/ui_modelviewoptionspage.h" line="+89"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/modelview/ui_modelviewoptionspage.h" line="+1"/>
         <source>3D model:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/modelview/ui_modelviewoptionspage.h" line="+1"/>
         <source>Background image:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/modelview/ui_modelviewoptionspage.h" line="+2"/>
         <source>VBO allow for performance gains for GPUs that support it (most cards).  This may cause cards with faulty drivers to crash.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/modelview/ui_modelviewoptionspage.h" line="+3"/>
         <source>Enable VBOs:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2214,251 +1969,110 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>NotifyGadgetOptionsPage</name>
     <message>
-        <location filename="../../../src/plugins/notify/notifygadgetoptionspage.ui"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Current Notifications</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Segoe UI&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Lists the notifactions already configured. Clicking on an item enables it to be modified. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enable Sounds</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Delete</source>
-        <translation type="unfinished">Elimina</translation>
+        <translation type="obsolete">Elimina</translation>
     </message>
     <message>
-        <location/>
-        <source>Sound Collection: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Select the sound collection&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Locate the base directory of the Sound Collections&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Locate...</source>
-        <translation type="unfinished">Trova...</translation>
+        <translation type="obsolete">Trova...</translation>
     </message>
     <message>
-        <location/>
-        <source>Object:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Field:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Value is:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Equal to</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Greater than</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Less than</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Sound 1:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Test</source>
-        <translation type="unfinished">Prova</translation>
+        <translation type="obsolete">Prova</translation>
     </message>
     <message>
-        <location/>
-        <source>Sound 2:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Say Value: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select if the value of the object should be spoken and if so, either before the configured sound or after it.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Never</source>
-        <translation type="unfinished">Mai</translation>
+        <translation type="obsolete">Mai</translation>
     </message>
     <message>
-        <location/>
-        <source>Before Snd 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>After Snd 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>After Snd 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Modify</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Add</source>
-        <translation type="unfinished">Aggiungi</translation>
+        <translation type="obsolete">Aggiungi</translation>
     </message>
 </context>
 <context>
     <name>NotifyPluginOptionsPage</name>
     <message>
         <location filename="../../../src/plugins/notify/notifypluginoptionspage.ui"/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="+305"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="+1"/>
-        <location line="+20"/>
-        <location line="+13"/>
         <source>Play</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="-30"/>
         <source>Equal to</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="+1"/>
         <source>Greater than</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="+1"/>
         <source>Less than</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="+2"/>
         <source>Sound1:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="+9"/>
         <source>Select if the value of the object should be spoken and if so, either before the configured sound or after it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="-6"/>
         <source>Never</source>
         <translation type="unfinished">Mai</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="+1"/>
         <source>Before first</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="+1"/>
         <source>After first</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="+1"/>
         <source>After second</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="+5"/>
         <source>Value is</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="+1"/>
         <source>Say Order</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="+2"/>
         <source>Sound2:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="+1"/>
         <source>Sound Collection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="+1"/>
         <source>Language</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="+2"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -2468,48 +2082,41 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="+6"/>
         <source>Sound Notifcations</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="+1"/>
         <source>Enable Sounds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="+2"/>
         <source>Add</source>
         <translation type="unfinished">Aggiungi</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="+1"/>
         <source>Modify</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="+1"/>
         <source>Delete</source>
         <translation type="unfinished">Elimina</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="+1"/>
         <source>DataObject</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/notify/ui_notifypluginoptionspage.h" line="+1"/>
         <source>ObjectField</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/notify/notifypluginoptionspage.cpp" line="+67"/>
+        <location filename="../../../src/plugins/notify/notifypluginoptionspage.cpp" line="+69"/>
         <source>Choose sound collection directory</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2525,122 +2132,205 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
-    <name>OPMapControlPanel</name>
-    <message>
-        <location filename="../../../src/plugins/opmap/opmap_controlpanel.ui"/>
-        <location filename="../../../src/plugins/opmap/ui_opmap_controlpanel.h" line="+162"/>
-        <source>OPMap Control Panel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmap_controlpanel.h" line="+1"/>
-        <source>Home Geo Fence Distance</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmap_controlpanel.h" line="+1"/>
-        <source>Meters</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>OPMap_Widget</name>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_widget.ui"/>
-        <location filename="../../../src/plugins/opmap/ui_opmap_widget.h" line="+363"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmap_widget.h" line="+2"/>
-        <source>Reload map</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmap_widget.h" line="+2"/>
-        <source>Reload</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmap_widget.h" line="+2"/>
         <source>Find place</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmap_widget.h" line="+4"/>
         <source>Zoom out</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmap_widget.h" line="+4"/>
         <source>Zoom in</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmap_widget.h" line="+4"/>
         <source>Zoom level</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmap_widget.h" line="+3"/>
-        <source>Rotate anticlockwise</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmap_widget.h" line="+4"/>
-        <source>Reset rotation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmap_widget.h" line="+4"/>
-        <source>Rotate clockwise</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmap_widget.h" line="+3"/>
-        <source>Rotate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmap_widget.h" line="+2"/>
         <source>Map position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmap_widget.h" line="+2"/>
         <source>labelMapPos</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmap_widget.h" line="+2"/>
         <source>Mouse position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmap_widget.h" line="+2"/>
         <source>labelMousePos</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmap_widget.h" line="+1"/>
         <source>%v</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Enter place to find</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>london</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>new york</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>paris</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source> Places </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>New Item</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source> Waypoints </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>New waypoints</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Open waypoints</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Open</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save waypoints</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save</source>
+        <translation type="unfinished">Salva</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Add a waypoint</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Add</source>
+        <translation type="unfinished">Aggiungi</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Center map over home position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Center map over UAV position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Map rotation follows UAV heading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>UAV hold position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Hold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>UAV go home</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Home</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Move UAV to previous waypoint</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Previous WP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Move UAV to next waypoint</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Next WP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>UAV go!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Go</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>UAV position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>labelUAVPos</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2648,55 +2338,72 @@ p, li { white-space: pre-wrap; }
     <name>OPMapGadgetOptionsPage</name>
     <message>
         <location filename="../../../src/plugins/opmap/opmapgadgetoptionspage.ui"/>
-        <location filename="../../../src/plugins/opmap/ui_opmapgadgetoptionspage.h" line="+224"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmapgadgetoptionspage.h" line="+1"/>
         <source> Default </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmapgadgetoptionspage.h" line="+1"/>
-        <source>  Use Memory Cache  </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmapgadgetoptionspage.h" line="+1"/>
-        <source>Map provider</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmapgadgetoptionspage.h" line="+1"/>
-        <source>Default zoom</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmapgadgetoptionspage.h" line="+1"/>
-        <source>Default latitude</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmapgadgetoptionspage.h" line="+1"/>
-        <source>Default longitude</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/opmap/ui_opmapgadgetoptionspage.h" line="+1"/>
-        <source>Cache location:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/opmap/opmapgadgetoptionspage.cpp" line="+84"/>
+        <location filename="../../../src/plugins/opmap/opmapgadgetoptionspage.cpp" line="+97"/>
         <source>Choose a cache directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/opmap/opmapgadgetoptionspage.ui"/>
+        <source>Default longitude </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Use OpenGL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Default latitude </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Default zoom </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Map type </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show Tile Grid Lines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Server and Cache</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Restore default server and cache settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Access mode </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Cache location </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Use Memory Cache</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2704,93 +2411,72 @@ p, li { white-space: pre-wrap; }
     <name>ScopeGadgetOptionsPage</name>
     <message>
         <location filename="../../../src/plugins/scope/scopegadgetoptionspage.ui"/>
-        <location filename="../../../src/plugins/scope/ui_scopegadgetoptionspage.h" line="+210"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/scope/ui_scopegadgetoptionspage.h" line="+3"/>
-        <source>Chronological Plot</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/scope/ui_scopegadgetoptionspage.h" line="+1"/>
-        <source>Sequencial Plot</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/scope/ui_scopegadgetoptionspage.h" line="+2"/>
         <source>Plot Type:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/scope/ui_scopegadgetoptionspage.h" line="+1"/>
-        <location line="+2"/>
         <source> seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/scope/ui_scopegadgetoptionspage.h" line="-1"/>
         <source>Data Size:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/scope/ui_scopegadgetoptionspage.h" line="+2"/>
-        <source>Refresh Time:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/scope/ui_scopegadgetoptionspage.h" line="+1"/>
         <source>UAVObject:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/scope/ui_scopegadgetoptionspage.h" line="+1"/>
         <source>Color:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/scope/ui_scopegadgetoptionspage.h" line="+1"/>
         <source>UAVField:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/scope/ui_scopegadgetoptionspage.h" line="+1"/>
         <source>Scale:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/scope/ui_scopegadgetoptionspage.h" line="+1"/>
         <source>&gt;&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/scope/ui_scopegadgetoptionspage.h" line="+1"/>
         <source>&lt;&lt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/scope/ui_scopegadgetoptionspage.h" line="+1"/>
         <source>Plot curves</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/scope/ui_scopegadgetoptionspage.h" line="+1"/>
         <source>X-Axis</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Data Timeout:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Choose</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2798,13 +2484,11 @@ p, li { white-space: pre-wrap; }
     <name>SystemHealthGadgetOptionsPage</name>
     <message>
         <location filename="../../../src/plugins/systemhealth/systemhealthgadgetoptionspage.ui"/>
-        <location filename="../../../src/plugins/systemhealth/ui_systemhealthgadgetoptionspage.h" line="+69"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/systemhealth/ui_systemhealthgadgetoptionspage.h" line="+1"/>
         <source>Subsystem SVG:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2823,74 +2507,61 @@ p, li { white-space: pre-wrap; }
     <name>UAVObjectBrowser</name>
     <message>
         <location filename="../../../src/plugins/uavobjectbrowser/uavobjectbrowser.ui"/>
-        <location filename="../../../src/plugins/uavobjectbrowser/ui_uavobjectbrowser.h" line="+153"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/uavobjectbrowser/ui_uavobjectbrowser.h" line="+2"/>
         <source>Request update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/uavobjectbrowser/ui_uavobjectbrowser.h" line="+2"/>
         <source>Request</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/uavobjectbrowser/ui_uavobjectbrowser.h" line="+2"/>
         <source>Send update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/uavobjectbrowser/ui_uavobjectbrowser.h" line="+2"/>
         <source>Send</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/uavobjectbrowser/ui_uavobjectbrowser.h" line="+2"/>
         <source>Save to SD Card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/uavobjectbrowser/ui_uavobjectbrowser.h" line="+2"/>
         <source>Save</source>
         <translation type="unfinished">Salva</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/uavobjectbrowser/ui_uavobjectbrowser.h" line="+2"/>
         <source>Load from SD Card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/uavobjectbrowser/ui_uavobjectbrowser.h" line="+2"/>
         <source>Load</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/uavobjectbrowser/ui_uavobjectbrowser.h" line="+2"/>
         <source>Erase from SD card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/uavobjectbrowser/ui_uavobjectbrowser.h" line="+2"/>
         <source>Erase</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/uavobjectbrowser/ui_uavobjectbrowser.h" line="+2"/>
-        <location line="+2"/>
         <source>Show Meta Data</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2899,25 +2570,21 @@ p, li { white-space: pre-wrap; }
     <name>UAVObjectBrowserOptionsPage</name>
     <message>
         <location filename="../../../src/plugins/uavobjectbrowser/uavobjectbrowseroptionspage.ui"/>
-        <location filename="../../../src/plugins/uavobjectbrowser/ui_uavobjectbrowseroptionspage.h" line="+109"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/uavobjectbrowser/ui_uavobjectbrowseroptionspage.h" line="+1"/>
         <source>Recently updated color:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/uavobjectbrowser/ui_uavobjectbrowseroptionspage.h" line="+1"/>
         <source>Manually changed color:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/uavobjectbrowser/ui_uavobjectbrowseroptionspage.h" line="+1"/>
         <source>Recently updated timeout (ms):</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6131,31 +5798,10 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
-    <name>AirspeedGadgetFactory</name>
-    <message>
-        <location filename="../../../src/plugins/airspeed/airspeedgadgetfactory.cpp" line="+36"/>
-        <source>Analog Dial Gadget</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ConfigGadgetFactory</name>
     <message>
         <location filename="../../../src/plugins/config/configgadgetfactory.cpp" line="+35"/>
         <source>Config Gadget</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ConfigGadgetWidget</name>
-    <message>
-        <location filename="../../../src/plugins/config/ui_configgadgetwidget.h" line="+84"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Send</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6432,37 +6078,42 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>OPMapGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/opmap/opmapgadgetwidget.cpp" line="+196"/>
+        <location filename="../../../src/plugins/opmap/opmapgadgetwidget.cpp" line="+411"/>
         <source>&amp;Zoom </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+34"/>
+        <location line="-5"/>
         <source>Zoom</source>
         <translation type="unfinished">Zoom</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="-170"/>
+        <source>Flight path 62</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+156"/>
+        <source>Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+24"/>
         <source>Position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+6"/>
+        <source>Follow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
         <source>Waypoints</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+376"/>
-        <source>Zoom out</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+12"/>
-        <source>Zoom in</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+50"/>
+        <location line="+443"/>
         <source>&amp;Close menu</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6488,22 +6139,63 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location line="+3"/>
+        <source>Mouse latitude and longitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Copy the mouse latitude and longitude to the clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Mouse latitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Copy the mouse latitude to the clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Mouse longitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Copy the mouse longitude to the clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>&amp;Find place</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+29"/>
+        <location line="+36"/>
+        <location line="+7"/>
         <source>Ctrl+F</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-28"/>
+        <location line="-42"/>
         <source>Find a location</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
+        <source>Show compass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Show/Hide the map compass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
         <source>Zoom &amp;In</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6524,21 +6216,51 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location line="+3"/>
-        <source>Go too where you right clicked the mouse</source>
+        <source>Go to where you right clicked the mouse</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+4"/>
+        <source>Go to &amp;Home location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Go to &amp;UAV location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Follow UAV position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Follow UAV heading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Keep the map rotation to the UAV heading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>&amp;Waypoint editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Open the waypoint editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-29"/>
         <source>Center the map onto where you right clicked the mouse</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Go too &amp;Home location</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+4"/>
         <source>Ctrl+H</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6548,12 +6270,7 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Go too &amp;UAV location</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+4"/>
         <source>Ctrl+U</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6563,32 +6280,17 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Follow UAV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
+        <location line="+5"/>
         <source>Keep the map centered onto the UAV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>&amp;Way point editor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+13"/>
         <source>Ctrl+W</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Open the way-point editor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="+5"/>
         <source>&amp;Add waypoint</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6604,6 +6306,31 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location line="+3"/>
+        <source>&amp;Edit waypoint</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Ctrl+E</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Edit waypoint</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>&amp;Lock waypoint</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Lock/Unlock a waypoint</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
         <source>&amp;Delete waypoint</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6633,134 +6360,80 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Grid lines</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Ctrl+G</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Show/Hide grid lines</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Use OpenGL</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Ctrl+O</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Enable/Disable OpenGL</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+5"/>
         <source>2</source>
-        <translation type="unfinished">2</translation>
+        <translation type="obsolete">2</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>3</source>
-        <translation type="unfinished">3</translation>
+        <translation type="obsolete">3</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>4</source>
-        <translation type="unfinished">4</translation>
+        <translation type="obsolete">4</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>5</source>
-        <translation type="unfinished">5</translation>
+        <translation type="obsolete">5</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>6</source>
-        <translation type="unfinished">6</translation>
+        <translation type="obsolete">6</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>7</source>
-        <translation type="unfinished">7</translation>
+        <translation type="obsolete">7</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>8</source>
-        <translation type="unfinished">8</translation>
+        <translation type="obsolete">8</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>9</source>
-        <translation type="unfinished">9</translation>
+        <translation type="obsolete">9</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>10</source>
-        <translation type="unfinished">10</translation>
+        <translation type="obsolete">10</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>11</source>
-        <translation type="unfinished">11</translation>
+        <translation type="obsolete">11</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>12</source>
-        <translation type="unfinished">12</translation>
+        <translation type="obsolete">12</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>13</source>
-        <translation type="unfinished">13</translation>
+        <translation type="obsolete">13</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>14</source>
-        <translation type="unfinished">14</translation>
+        <translation type="obsolete">14</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>15</source>
-        <translation type="unfinished">15</translation>
+        <translation type="obsolete">15</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>16</source>
-        <translation type="unfinished">16</translation>
+        <translation type="obsolete">16</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>17</source>
-        <translation type="unfinished">17</translation>
+        <translation type="obsolete">17</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>18</source>
-        <translation type="unfinished">18</translation>
+        <translation type="obsolete">18</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>19</source>
-        <translation type="unfinished">19</translation>
+        <translation type="obsolete">19</translation>
     </message>
     <message>
-        <location line="+35"/>
-        <location line="+8"/>
+        <location line="-288"/>
         <source>OpenPilot GCS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-8"/>
-        <source>Find place</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6829,7 +6502,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>UAVMetaObject</name>
     <message>
-        <location filename="../../../src/plugins/uavobjects/uavmetaobject.cpp" line="+51"/>
+        <location filename="../../../src/plugins/uavobjects/uavmetaobject.cpp" line="+50"/>
         <source>False</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6922,7 +6595,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>Telemetry</name>
     <message>
-        <location filename="../../../src/plugins/uavtalk/telemetry.cpp" line="+304"/>
+        <location filename="../../../src/plugins/uavtalk/telemetry.cpp" line="+303"/>
         <source>Telemetry: priority event queue is full, event lost (%1)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6930,7 +6603,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>TelemetryMonitor</name>
     <message>
-        <location filename="../../../src/plugins/uavtalk/telemetrymonitor.cpp" line="+96"/>
+        <location filename="../../../src/plugins/uavtalk/telemetrymonitor.cpp" line="+95"/>
         <source>Starting to retrieve meta and settings objects from the autopilot (%1 objects)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6953,6 +6626,562 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+2"/>
         <source>All Files (*);;Text Files (*.bin)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DialGadgetOptionsPage</name>
+    <message>
+        <location filename="../../../src/plugins/dial/dialgadgetoptionspage.ui"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Dial SVG: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Load file...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>BackgroundID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>ForegroundID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Dial font:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Indicator 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Movement:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>ID:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Min:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Factor:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>DataObject</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>ObjectField</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Indicator 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Indicator 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/dial/dialgadgetoptionspage.cpp" line="+253"/>
+        <source>QFileDialog::getOpenFileName()</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>All Files (*);;SVG Files (*.svg)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GpsDisplayGadgetOptionsPage</name>
+    <message>
+        <location filename="../../../src/plugins/gpsdisplay/gpsdisplaygadgetoptionspage.ui"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Port:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Port Speed:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Flow Control:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Bit format:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Timeout:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/gpsdisplay/gpsdisplaygadgetoptionspage.cpp" line="+177"/>
+        <source>SVG image (*.svg)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Choose SVG image</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GpsDisplayWidget</name>
+    <message>
+        <location filename="../../../src/plugins/gpsdisplay/gpsdisplaywidget.ui"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Position:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Fix:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Bearing:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Speed:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>HDOP:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Connect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disconnect</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>HITLIL2OptionsPage</name>
+    <message>
+        <location filename="../../../src/plugins/hitlil2/hitlil2optionspage.ui"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Manual aircraft control (can be used when hardware is not available)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>IL2 DeviceLink Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>IL2 Host Name/Number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Longitude offset (in degrees)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Latitude offset (in degrees)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>HITLIL2Widget</name>
+    <message>
+        <location filename="../../../src/plugins/hitlil2/hitlil2widget.ui"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Request update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Stop</source>
+        <translation type="unfinished">Ferma</translation>
+    </message>
+    <message>
+        <location/>
+        <source>AutoPilot Disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>IL2 Disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>IPconnectionOptionsPage</name>
+    <message>
+        <location filename="../../../src/plugins/ipconnection/ipconnectionoptionspage.ui"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>TCP connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>UDP connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Host Name/Number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/ipconnection/ipconnectionoptionspage.h" line="+53"/>
+        <source>settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>opmap_edit_waypoint_dialog</name>
+    <message>
+        <location filename="../../../src/plugins/opmap/opmap_edit_waypoint_dialog.ui"/>
+        <source>OpenPilot GCS Edit Waypoint</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Number </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Latitude </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Longitude </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Altitude </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>meters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Description </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Locked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>degrees</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Revert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Cancel</source>
+        <translation type="unfinished">Annulla</translation>
+    </message>
+</context>
+<context>
+    <name>opmap_overlay_widget</name>
+    <message>
+        <location filename="../../../src/plugins/opmap/opmap_overlay_widget.ui"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>labelStatus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>%v</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>opmap_statusbar_widget</name>
+    <message>
+        <location filename="../../../src/plugins/opmap/opmap_statusbar_widget.ui"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>labelStatus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>%v</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>opmap_waypointeditor_dialog</name>
+    <message>
+        <location filename="../../../src/plugins/opmap/opmap_waypointeditor_dialog.ui"/>
+        <source>OpenPilot GCS Waypoint Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Waypoints</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Num</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Locked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Latitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Longitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Altitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Hold Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Height and Timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/opmap/opmap_waypointeditor_dialog.cpp" line="+146"/>
+        <source>Waypoint 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Waypoint 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Waypoint 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>opmap_zoom_slider_widget</name>
+    <message>
+        <location filename="../../../src/plugins/opmap/opmap_zoom_slider_widget.ui"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PFDGadgetOptionsPage</name>
+    <message>
+        <location filename="../../../src/plugins/pfd/pfdgadgetoptionspage.ui"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>PFD SVG: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Load file...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/pfd/pfdgadgetoptionspage.cpp" line="+86"/>
+        <source>QFileDialog::getOpenFileName()</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>All Files (*);;SVG Files (*.svg)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>mapcontrol::TrailItem</name>
+    <message>
+        <location filename="../../../src/libs/opmapcontrol/src/mapwidget/trailitem.cpp" line="+36"/>
+        <source>Position:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Altitude:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DialGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/dial/dialgadgetfactory.cpp" line="+36"/>
+        <source>Analog Dial Gadget</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GpsDisplayGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/gpsdisplay/gpsdisplaygadgetfactory.cpp" line="+36"/>
+        <source>GPS Display Gadget</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>HITLIL2Factory</name>
+    <message>
+        <location filename="../../../src/plugins/hitlil2/hitlil2factory.cpp" line="+35"/>
+        <source>HITL Simulation with IL2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PFDGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/pfd/pfdgadgetfactory.cpp" line="+36"/>
+        <source>Primary Flight Display Gadget</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -14,7 +14,7 @@ LRELEASE = $$targetPath($$[QT_INSTALL_BINS]/lrelease)
 
 TRANSLATIONS = $$prependAll(LANGUAGES, $$PWD/openpilotgcs_,.ts)
 
-MIME_TR_H = $$GCS_DATA_PATH/translations/mime_tr.h
+MIME_TR_H = $$PWD/mime_tr.h
 
 contains(QT_VERSION, ^4\.[0-5]\..*) {
     ts.commands = @echo This Qt version is too old for the ts target. Need Qt 4.6+.
@@ -25,7 +25,7 @@ contains(QT_VERSION, ^4\.[0-5]\..*) {
     ts.commands += \
         $$XMLPATTERNS -output $$MIME_TR_H $$PWD/extract-mimetypes.xq && \
         (cd $$GCS_SOURCE_TREE && $$LUPDATE src $$MIME_TR_H -ts $$TRANSLATIONS) && \
-        $$QMAKE_DEL_FILE $$MIME_TR_H
+        $$QMAKE_DEL_FILE $$targetPath($$MIME_TR_H)
 }
 QMAKE_EXTRA_TARGETS += ts
 

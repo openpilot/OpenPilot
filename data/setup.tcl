@@ -403,7 +403,7 @@ proc motion_event_b2 { w maxdist width height dx dy } {
 	# FIXME use variables for resolution 0.1 (with setup())
 	if {![info exists realObsDist]} { set realObsDist $obsDist } else {
 	if { abs($realObsDist - $obsDist) > 0.1 } { set realObsDist $obsDist } }
-    set realObsDist [expr $realObsDist * 1.01**$dy ]
+    set realObsDist [expr $realObsDist * pow(1.01,$dy) ]
 	#>>>
     if { $realObsDist > $maxdist } { set realObsDist $maxdist }
     if { $realObsDist < 1e-3 } { set realObsDist 1e-3 }

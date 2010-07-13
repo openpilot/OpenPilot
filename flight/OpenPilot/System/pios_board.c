@@ -27,6 +27,52 @@
 #include <pios_spi_priv.h>
 #include <pios_usart_priv.h>
 #include <pios_com_priv.h>
+#include <openpilot.h>
+#include <uavobjectsinit.h>
+
+/**
+ * PIOS_Board_Init()
+ * initializes all the core subsystems on this specific hardware
+ * called from System/openpilot.c
+ */
+void PIOS_Board_Init(void) {
+
+	/* Delay system */
+	PIOS_DELAY_Init();
+
+	/* SPI Init */
+	PIOS_SPI_Init();
+
+	/* Enable and mount the SDCard */
+	PIOS_SDCARD_Init();
+	PIOS_SDCARD_MountFS(0);
+
+	/* Initialize UAVObject libraries */
+	EventDispatcherInitialize();
+	UAVObjInitialize();
+	UAVObjectsInitializeAll();
+
+	/* Initialize the alarms library */
+	AlarmsInitialize();
+
+	/* Initialize the PiOS library */
+	PIOS_COM_Init();
+	PIOS_Servo_Init();
+	PIOS_ADC_Init();
+	PIOS_GPIO_Init();
+#if defined(PIOS_INCLUDE_SPEKTRUM)
+	PIOS_SPEKTRUM_Init();
+#endif
+#if defined(PIOS_INCLUDE_PWM)
+	PIOS_PWM_Init();
+#endif
+#if defined(PIOS_INCLUDE_PPM)
+	PIOS_PPM_Init();
+#endif
+	PIOS_USB_Init(0);
+	PIOS_I2C_Init();
+
+}
 
 /* MicroSD Interface
  * 

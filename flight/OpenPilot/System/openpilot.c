@@ -58,6 +58,9 @@ void OP_ADC_NotifyChange(uint32_t pin, uint32_t pin_value);
 /* Prototype of generated InitModules() function */
 extern void InitModules(void);
 
+/* Prototype of PIOS_Board_Init() function */
+extern void PIOS_Board_Init(void);
+
 /**
 * OpenPilot Main function
 */
@@ -93,40 +96,12 @@ int main()
  */
 void OpenPilotInit()
 {
-	/* Delay system */
-	PIOS_DELAY_Init();
 
-	/* SPI Init */
-	PIOS_SPI_Init();
-
-	/* Enable and mount the SDCard */
-	PIOS_SDCARD_Init();
-	PIOS_SDCARD_MountFS(0);
-
-	/* Initialize UAVObject libraries */
-	EventDispatcherInitialize();
-	UAVObjInitialize();
-	UAVObjectsInitializeAll();
-
-	/* Initialize the alarms library */
-	AlarmsInitialize();
-
-	/* Initialize the PiOS library */
-	PIOS_COM_Init();
-	PIOS_Servo_Init();
-	PIOS_ADC_Init();
-	PIOS_GPIO_Init();
-#if defined(PIOS_INCLUDE_SPEKTRUM)
-	PIOS_SPEKTRUM_Init();
-#endif
-#if defined(PIOS_INCLUDE_PWM)
-	PIOS_PWM_Init();
-#endif
-#if defined(PIOS_INCLUDE_PPM)
-	PIOS_PPM_Init();
-#endif
-	PIOS_USB_Init(0);
-	PIOS_I2C_Init();
+	/* Architecture dependant Hardware and
+	 * core subsystem initialisation
+	 * (see pios_board.c for your arch)
+	 * */
+	PIOS_Board_Init();
 
 	/* Initialize modules */
 	InitModules();

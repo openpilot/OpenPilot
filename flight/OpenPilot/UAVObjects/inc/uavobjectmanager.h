@@ -29,7 +29,7 @@
 #define UAVOBJ_ALL_INSTANCES 0xFFFF
 #define UAVOBJ_MAX_INSTANCES 1000
 
-typedef uint32_t UAVObjHandle;
+typedef void* UAVObjHandle;
 
 /**
  * Object update mode, used by multiple modules (e.g. telemetry and logger)

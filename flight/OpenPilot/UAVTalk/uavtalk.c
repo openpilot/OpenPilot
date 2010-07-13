@@ -76,7 +76,7 @@ static UAVTalkStats stats;
 
 // Private functions
 static uint8_t updateCRC(uint8_t crc, const uint8_t* data, int32_t length);
-static int32_t objectTransaction(uint32_t objectId, uint16_t instId, uint8_t type, int32_t timeout);
+static int32_t objectTransaction(UAVObjHandle objectId, uint16_t instId, uint8_t type, int32_t timeout);
 static int32_t sendObject(UAVObjHandle obj, uint16_t instId, uint8_t type);
 static int32_t sendSingleObject(UAVObjHandle obj, uint16_t instId, uint8_t type);
 static int32_t receiveObject(uint8_t type, UAVObjHandle obj, uint16_t instId, uint8_t* data, int32_t length);

@@ -208,7 +208,12 @@ static void updateStats()
 	// Get stats and update
 	SystemStatsGet(&stats);
 	stats.FlightTime = xTaskGetTickCount()*portTICK_RATE_MS;
+#ifdef ARCH_POSIX
+	// POSIX port of FreeRTOS doesn't have xPortGetFreeHeapSize()
+	stats.HeapRemaining = 10240;
+#else
 	stats.HeapRemaining = xPortGetFreeHeapSize();
+#endif
 	stats.CPULoad = 100 - (uint8_t)round(100.0*((float)idleCounter/(float)(SYSTEM_UPDATE_PERIOD_MS/1000))/(float)IDLE_COUNTS_PER_SEC_AT_NO_LOAD);
 	idleCounterClear = 1;
 	SystemStatsSet(&stats);

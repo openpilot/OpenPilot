@@ -1841,6 +1841,7 @@ static portTASK_FUNCTION( prvIdleTask, pvParameters )
 		x.tv_nsec=10000;
 		nanosleep(&x,NULL);
 		sigemptyset( &xSignals );
+		sigaddset( &xSignals, SIG_TICK );
 		pthread_sigmask( SIG_SETMASK, &xSignals, NULL );
 #endif
 	}

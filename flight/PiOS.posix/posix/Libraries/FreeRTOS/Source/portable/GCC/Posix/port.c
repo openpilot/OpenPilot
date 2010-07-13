@@ -80,17 +80,22 @@
 	#define COND_SIGNALING  
 	#define CHECK_TASK_RESUMES
 	#define RUNNING_THREAD_MUTEX
-	#define TICK_SIGNAL 
+//	#define TICK_SIGNAL 
+	#define TICK_SIGWAIT
 #endif
 #ifdef __CYGWIN__
 	#define COND_SIGNALING  
 	#define CHECK_TASK_RESUMES
+//	#define RUNNING_THREAD_MUTEX
+//	#define TICK_SIGNAL
+	#define TICK_SIGWAIT
 #endif
 #ifdef __linux__
 	#define COND_SIGNALING
-//	#define CHECK_TASK_RESUMES
+	#define CHECK_TASK_RESUMES
 	#define RUNNING_THREAD_MUTEX
-	#define TICK_SIGNAL
+//	#define TICK_SIGNAL
+	#define TICK_SIGWAIT
 #endif
 
 
@@ -124,11 +129,8 @@ static pthread_mutex_t xSwappingThreadMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_t hMainThread = ( pthread_t )NULL;
 /*-----------------------------------------------------------*/
 
-static volatile portBASE_TYPE xSentinel = 0;
+static volatile portBASE_TYPE xSentinel = pdFALSE;
 static volatile portBASE_TYPE xRunning = pdFALSE;
-static volatile portBASE_TYPE xSuspended = pdFALSE;
-static volatile portBASE_TYPE xStarted = pdFALSE;
-static volatile portBASE_TYPE xHandover = 0;
 static volatile portBASE_TYPE xSchedulerEnd = pdFALSE;
 static volatile portBASE_TYPE xInterruptsEnabled = pdTRUE;
 static volatile portBASE_TYPE xServicingTick = pdFALSE;
@@ -149,6 +151,10 @@ static pthread_t prvGetThreadHandle( xTaskHandle hTask );
 static pthread_cond_t * prvGetConditionHandle( xTaskHandle hTask );
 static pthread_mutex_t * prvGetMutexHandle( xTaskHandle hTask );
 #endif
+#ifdef CHECK_TASK_RESUMES
+static portBASE_TYPE prvGetTaskState( xTaskHandle hTask );
+#endif
+static void prvSetTaskState( xTaskHandle hTask, portBASE_TYPE state );
 static xTaskHandle prvGetTaskHandle( pthread_t hThread );
 static portLONG prvGetFreeThreadState( void );
 static void prvSetTaskCriticalNesting( pthread_t xThreadId, unsigned portBASE_TYPE uxNesting );
@@ -166,6 +172,9 @@ void vPortSystemTickHandler( int sig );
 #define THREAD_PAUSE_YIELD		1
 #define THREAD_PAUSE_INTERRUPT	2
  
+#define THREAD_STATE_PAUSE		1
+#define THREAD_STATE_RUNNING	2
+
 //#define DEBUG_OUTPUT
 //#define ERROR_OUTPUT
 #ifdef DEBUG_OUTPUT
@@ -360,6 +369,7 @@ portLONG lIndex;
 	/* Establish the signals to block before they are needed. */
 	sigemptyset( &xSignalToBlock );
 	sigaddset( &xSignalToBlock, SIG_SUSPEND );
+	sigaddset( &xSignalToBlock, SIG_TICK );
 	(void)pthread_sigmask( SIG_SETMASK, &xSignalToBlock, NULL );
 
 	for ( lIndex = 0; lIndex < MAX_NUMBER_OF_TASKS; lIndex++ )
@@ -374,7 +384,8 @@ portLONG lIndex;
 	/* checked careful in startup on hardware */
 	usleep(1000000);
 
-#ifdef TICK_SIGNAL
+#if defined(TICK_SIGNAL) || defined(TICK_SIGWAIT)
+		
 	struct itimerval itimer;
 	portTickType xMicroSeconds = portTICK_RATE_MICROSECONDS;
 	
@@ -390,6 +401,9 @@ portLONG lIndex;
 	itimer.it_value.tv_sec = 0;
 	itimer.it_value.tv_usec = xMicroSeconds;
 		
+#endif
+	
+#ifdef TICK_SIGNAL
 	struct sigaction sigtick;	
 	sigtick.sa_flags = 0;
 	sigtick.sa_handler = vPortSystemTickHandler;
@@ -408,7 +422,26 @@ portLONG lIndex;
 		usleep(1000);
 		sched_yield();
 	}		
-#else
+#endif
+	
+#ifdef TICK_SIGWAIT
+	/* Tick signal already blocked */
+	sigset_t xSignalsToWait;
+	sigemptyset( &xSignalsToWait );
+	sigaddset( &xSignalsToWait, SIG_TICK );
+
+	/* Set-up the timer interrupt. */
+	assert ( 0 == setitimer( TIMER_TYPE, &itimer, NULL  ) );
+	
+	while( pdTRUE != xSchedulerEnd ) {
+		int xResult;
+		assert( 0 == sigwait( &xSignalsToWait, &xResult ) );
+//		assert( xResult == SIG_TICK );
+		vPortSystemTickHandler(SIG_TICK);
+	}
+#endif	
+
+#if !defined(TICK_SIGNAL) && !defined(TICK_SIGWAIT)
 	
 	struct timespec x;
 	while( pdTRUE != xSchedulerEnd ) {
@@ -564,8 +597,6 @@ tskTCB * oldTask, * newTask;
 	}
 	
 	assert( xTaskToSuspend == pthread_self() ); // race condition I didn't account for
-
-	xStarted = pdFALSE;
 	
 	/* Get new task then release the task switching mutex */
 	vTaskSwitchContext();
@@ -586,9 +617,12 @@ tskTCB * oldTask, * newTask;
 		assert( pthread_cond_signal( hCond ) == 0 ); 
 #endif
 #ifdef CHECK_TASK_RESUMES
-		while( xStarted == pdFALSE )
+		while( prvGetTaskState( oldTask ) != THREAD_STATE_RUNNING )
+		{
+			usleep(100);
+			sched_yield();
 			debug_printf( "Waiting for task to resume\r\n" );
-// careful! needs sched_yield()!!!
+		}
 #endif
 
 		debug_printf( "Detected task resuming.  Pausing this task\r\n" );
@@ -645,6 +679,9 @@ pthread_t xTaskToSuspend;
 pthread_t xTaskToResume;
 tskTCB * oldTask, * newTask;
 	
+	assert( SIG_TICK == sig );
+	assert( pthread_self() != prvGetThreadHandle( xTaskGetCurrentTaskHandle() ) );
+	
 	debug_printf( "\r\n\r\n" );
 	debug_printf( "(xInterruptsEnabled = %i, xServicingTick = %i)\r\n", (int) xInterruptsEnabled != 0, (int) xServicingTick != 0);
 	if ( ( pdTRUE == xInterruptsEnabled ) && ( pdTRUE != xServicingTick ) )
@@ -657,11 +694,6 @@ tskTCB * oldTask, * newTask;
 			
 			oldTask = xTaskGetCurrentTaskHandle();
 			xTaskToSuspend = prvGetThreadHandle( xTaskGetCurrentTaskHandle() );
-
-			/* Need to set this before updating the task in case it notices before the */
-			/* interrupt is set */
-			xSuspended = pdFALSE;
-			xStarted = pdFALSE;
 						
 			/* Tick Increment. */
 			vTaskIncrementTick();
@@ -689,9 +721,10 @@ tskTCB * oldTask, * newTask;
 #ifdef CHECK_TASK_RESUMES
 				/* It shouldn't be possible for a second task swap to happen while waiting for this because */
 				/* they can't get the xSwappingThreadMutex */
-				while( xSuspended == pdFALSE ) 
+				while( prvGetTaskState( oldTask ) != THREAD_STATE_PAUSE ) 					
 #endif
 				{
+					usleep(100);
 					debug_printf( "Waiting for old task to suspend\r\n" );
 					debug_printf( "Sent signal\r\n" );
 					sched_yield();
@@ -699,7 +732,7 @@ tskTCB * oldTask, * newTask;
 				debug_printf( "Suspended\r\n" );
 				
 #ifdef CHECK_TASK_RESUMES				
-				while( xStarted == pdFALSE) 					
+				while( prvGetTaskState( newTask ) != THREAD_STATE_RUNNING ) 					
 #endif					
 				{
 					debug_printf( "Waiting for new task to resume\r\n" );					
@@ -811,18 +844,16 @@ void * pParams = pxParams->pvParams;
 	/* Because the FreeRTOS creates the TCB stack, which in this implementation   */
 	/* creates a thread, we need to wait until the task handle is added before    */
 	/* trying to pause.  Must set xSentinel high so the creating task knows we're */
-	/* here */
-
-	debug_printf("Thread started, waiting till handle is added\r\n");
-
+	/* here.  Order is strange but because of how this is hacked onto the trace   */
+	/*handling code in tasks.c */
 	xSentinel = 1;
-
+	
 	while( prvGetTaskHandle( pthread_self() ) == NULL ){
 		sched_yield();
 	}
 
 	debug_printf("Handle added, pausing\r\n");
-	
+
 	/* Want to delay briefly until we have explicit resume signal as otherwise the */
 	/* current task variable might be in the wrong state */	
 	pauseThread( THREAD_PAUSE_CREATED );	
@@ -841,8 +872,10 @@ void * pParams = pxParams->pvParams;
 
 void pauseThread( portBASE_TYPE pauseMode ) 
 {
-	debug_printf( "Pausing thread %li.  Set xSuspended true\r\n", (long int) pthread_self() );
-	xSuspended = pdTRUE;
+	xTaskHandle hTask = prvGetTaskHandle( pthread_self() );
+	
+	debug_printf( "Pausing thread %li.  Set state to suspended\r\n", (long int) pthread_self() );
+	prvSetTaskState( hTask, THREAD_STATE_PAUSE );
 	
 #ifdef RUNNING_THREAD_MUTEX
 	if( pauseMode != THREAD_PAUSE_CREATED ) 
@@ -851,7 +884,6 @@ void pauseThread( portBASE_TYPE pauseMode )
 
 #ifdef COND_SIGNALING
 	int xResult;
-	xTaskHandle hTask = prvGetTaskHandle( pthread_self() );
 	pthread_cond_t * hCond = prvGetConditionHandle( hTask );
 	pthread_mutex_t * hMutex = prvGetMutexHandle( hTask );		
 	debug_printf("Cond: %li\r\n", *( (long int *) hCond) );
@@ -868,7 +900,9 @@ void pauseThread( portBASE_TYPE pauseMode )
 // careful! race condition!!!! possibly unprotected by mutex when CHECK_TASK_RESUMES is not set?
 		{
 			
-			xStarted = pdTRUE;
+			/* Must do this before trying to lock the mutex, because if CHECK_TASK_RESUMES */
+			/* is defined then the mutex not unlocked until this is changed */
+			prvSetTaskState( hTask, THREAD_STATE_RUNNING );
 			
 #ifdef RUNNING_THREAD_MUTEX
 			assert( 0 == pthread_mutex_lock( &xRunningThread ) );
@@ -985,6 +1019,7 @@ portLONG lIndex;
 		pxThreads[ lIndex ].hThread = ( pthread_t )NULL;
 		pxThreads[ lIndex ].hTask = ( xTaskHandle )NULL;
 		pxThreads[ lIndex ].uxCriticalNesting = 0;
+		pxThreads[ lIndex ].xThreadState = 0;
 	}
 	
 	sigsuspendself.sa_flags = 0;
@@ -1014,37 +1049,40 @@ portLONG lIndex;
 /*-----------------------------------------------------------*/
 xTaskHandle prvGetTaskHandle( pthread_t hThread ) 
 {
-xTaskHandle hTask = NULL;
 portLONG lIndex;
 	
 	/* If not initialized yet */
 	if( pxThreads  == NULL ) return NULL;
-	
+	assert( hThread != (pthread_t) NULL );
 	for ( lIndex = 0; lIndex < MAX_NUMBER_OF_TASKS; lIndex++ )
 	{
 		if ( pxThreads[ lIndex ].hThread == hThread )
 		{
-			hTask = pxThreads[ lIndex ].hTask;
-			break;
+			return pxThreads[ lIndex ].hTask;
 		}
 	}
-	return hTask;
+//	assert( 0 );
+	return NULL;
 } 
 
 /*-----------------------------------------------------------*/
 pthread_cond_t * prvGetConditionHandle( xTaskHandle hTask )
 {
-pthread_cond_t * hCond;
+pthread_cond_t * hCond = NULL;
 portLONG lIndex;
+	
+	assert( hTask != NULL );
 	for ( lIndex = 0; lIndex < MAX_NUMBER_OF_TASKS; lIndex++ )
 	{
 		if ( pxThreads[ lIndex ].hTask == hTask )
 		{
 			debug_printf( "Found condition on %i task\r\n", lIndex );
-			return pxThreads[ lIndex ].hCond;
+			hCond = pxThreads[ lIndex ].hCond;
 			break;
 		}
 	}
+	assert( hCond != NULL );
+	return hCond;
 	printf( "Failed to get handle, pausing then recursing\r\n" );
 	usleep(1000); 
 	return prvGetConditionHandle( hTask );
@@ -1053,10 +1091,48 @@ portLONG lIndex;
 }
 
 /*-----------------------------------------------------------*/
+#ifdef CHECK_TASK_RESUMES
+static portBASE_TYPE prvGetTaskState( xTaskHandle hTask )
+{
+portLONG lIndex;	
+	assert( hTask != NULL );
+	for ( lIndex = 0; lIndex < MAX_NUMBER_OF_TASKS; lIndex++ )
+	{
+		if ( pxThreads[ lIndex ].hTask == hTask )
+		{
+			debug_printf( "Found state (%li) on %i task\r\n",pxThreads[ lIndex ].xThreadState,  lIndex );
+			return pxThreads[ lIndex ].xThreadState;
+		}
+	}	
+	assert(0);
+	return 0;
+}
+#endif
+
+void prvSetTaskState( xTaskHandle hTask, portBASE_TYPE state )
+{
+portLONG lIndex;	
+	assert( hTask != NULL );
+	for ( lIndex = 0; lIndex < MAX_NUMBER_OF_TASKS; lIndex++ )
+	{
+		if ( pxThreads[ lIndex ].hTask == hTask )
+		{
+			pxThreads[ lIndex ].xThreadState = state;
+			return;
+		}
+	}	
+	assert(0);
+	return;
+}
+
+
+/*-----------------------------------------------------------*/
 pthread_t prvGetThreadHandle( xTaskHandle hTask )
 {
 	pthread_t hThread = ( pthread_t )NULL;
 	portLONG lIndex;
+	
+	assert( hTask != NULL );
 	
 	for ( lIndex = 0; lIndex < MAX_NUMBER_OF_TASKS; lIndex++ )
 	{
@@ -1066,6 +1142,8 @@ pthread_t prvGetThreadHandle( xTaskHandle hTask )
 			break;
 		}
 	}
+	
+	assert( hThread != (pthread_t) NULL );
 	return hThread;
 }
 /*-----------------------------------------------------------*/

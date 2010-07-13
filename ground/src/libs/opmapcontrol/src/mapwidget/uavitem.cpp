@@ -3,7 +3,6 @@
 *
 * @file       uavitem.cpp
 * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
-*             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
 * @brief      A graphicsItem representing a UAV
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget
@@ -29,11 +28,11 @@
 #include "uavitem.h"
 namespace mapcontrol
 {
-    UAVItem::UAVItem(MapGraphicItem* map,OPMapWidget* parent):map(map),mapwidget(parent),showtrail(true),trailtime(5),traildistance(100),autosetreached(true)
+    UAVItem::UAVItem(MapGraphicItem* map,OPMapWidget* parent):map(map),mapwidget(parent),showtrail(true),trailtime(5),traildistance(50),autosetreached(true)
     ,autosetdistance(100)
     {
-        pic.load(QString::fromUtf8(":/markers/images/airplanepip.png"));
-        pic=pic.scaled(45,45,Qt::IgnoreAspectRatio);
+        pic.load(QString::fromUtf8(":/markers/images/EasystarBlue.png"));
+        pic=pic.scaled(50,33,Qt::IgnoreAspectRatio);
         localposition=map->FromLatLngToLocal(mapwidget->CurrentPosition());
         this->setPos(localposition.X(),localposition.Y());
         this->setZValue(4);

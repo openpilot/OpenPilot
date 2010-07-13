@@ -92,6 +92,13 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_map->SetMaxZoom(19);
     m_map->SetMouseWheelZoomType(internals::MouseWheelZoomType::MousePositionWithoutCenter);	    // set how the mouse wheel zoom functions
     m_map->SetFollowMouse(true);								    // we want a contiuous mouse position reading
+    m_map->SetShowUAV(true);									    // display the UAV position on the map
+
+//  m_map->UAV->SetTrailTime(1);								    // seconds
+//  m_map->UAV->SetTrailDistance(0.1);								    // kilometers
+
+    m_map->UAV->SetTrailType(UAVTrailType::ByTimeElapsed);
+//  m_map->UAV->SetTrailType(UAVTrailType::ByDistance);
 
     // **************
 
@@ -144,6 +151,8 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_widget->splitter->setSizes(m_SizeList);
 
     m_widget->progressBarMap->setMaximum(1);
+
+    m_widget->toolButtonShowUAVtrail->setChecked(true);
 
 /*
     #if defined(Q_OS_MAC)
@@ -419,8 +428,10 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
     menu.addAction(goHomeAct);
     menu.addAction(goUAVAct);
 
-    menu.addSeparator()->setText(tr("Follow"));
+    menu.addSeparator()->setText(tr("UAV"));
 
+    menu.addAction(showUAVAct);
+    menu.addAction(showUAVtrailAct);
     menu.addAction(followUAVpositionAct);
     menu.addAction(followUAVheadingAct);
 
@@ -501,36 +512,26 @@ void OPMapGadgetWidget::keyPressEvent(QKeyEvent* event)
 void OPMapGadgetWidget::updatePosition()
 {
     PositionActual::DataFields data = m_positionActual->getData();				// get current UAV data
+
     internals::PointLatLng uav_pos = internals::PointLatLng(data.Latitude, data.Longitude);	// current UAV position
-    double uav_heading = data.Heading;								// current UAV heading
-    double uav_height_meters = data.Altitude;							// current UAV height
-    double uav_ground_speed_meters_per_second = data.Groundspeed;				// current UAV ground speed
+    float uav_heading = data.Heading;								// current UAV heading
+    float uav_altitude_meters = data.Altitude;							// current UAV height
+    float uav_ground_speed_meters_per_second = data.Groundspeed;				// current UAV ground speed
 
     // display the UAV lat/lon position
     QString str =   " lat: " + QString::number(uav_pos.Lat(), 'f', 7) +
 		    "   lon: " + QString::number(uav_pos.Lng(), 'f', 7) +
 		    "   " + QString::number(uav_heading, 'f', 1) + "deg" +
-		    "   " + QString::number(uav_height_meters, 'f', 1) + "m" +
+		    "   " + QString::number(uav_altitude_meters, 'f', 1) + "m" +
 		    "   " + QString::number(uav_ground_speed_meters_per_second, 'f', 1) + "m/s";
     if (m_widget) m_widget->labelUAVPos->setText(str);
 
-    if (m_map && followUAVpositionAct && followUAVheadingAct)
+    if (m_map)
     {
-	if (followUAVpositionAct->isChecked())
+//	if (m_map->ShowUAV())
 	{
-	    internals::PointLatLng map_pos = m_map->CurrentPosition();					// current MAP position
-	    double map_heading = m_map->Rotate();
-
-	    if (map_pos != uav_pos || map_heading != uav_heading)
-	    {
-		m_map->SetCurrentPosition(uav_pos);							// keep the map centered on the UAV
-
-		if (followUAVheadingAct->isChecked())
-		    m_map->SetRotate(-uav_heading);							// rotate the map to match the uav heading
-		else
-		if (m_map->Rotate() != 0)
-		    m_map->SetRotate(0);								// reset the rotation to '0'
-	    }
+	    m_map->UAV->SetUAVPos(uav_pos, uav_altitude_meters);					// set the maps UAV position
+	    m_map->UAV->SetUAVHeading(uav_heading);							// set the maps UAV heading
 	}
     }
 }
@@ -711,6 +712,16 @@ void OPMapGadgetWidget::on_toolButtonMapUAV_clicked()
 void OPMapGadgetWidget::on_toolButtonMapUAVheading_clicked()
 {
     followUAVheadingAct->toggle();
+}
+
+void OPMapGadgetWidget::on_toolButtonShowUAVtrail_clicked()
+{
+    showUAVtrailAct->toggle();
+}
+
+void OPMapGadgetWidget::on_toolButtonClearUAVtrail_clicked()
+{
+    clearUAVtrailAct->trigger();
 }
 
 void OPMapGadgetWidget::on_horizontalSliderZoom_sliderMoved(int position)
@@ -894,11 +905,17 @@ void OPMapGadgetWidget::createActions()
     connect(findPlaceAct, SIGNAL(triggered()), this, SLOT(onFindPlaceAct_triggered()));
 
     showCompassAct = new QAction(tr("Show compass"), this);
-//    showCompassAct->setShortcut(tr("Ctrl+M"));
-    showCompassAct->setStatusTip(tr("Show/Hide the map compass"));
+    showCompassAct->setStatusTip(tr("Show/Hide the compass"));
     showCompassAct->setCheckable(true);
     showCompassAct->setChecked(true);
     connect(showCompassAct, SIGNAL(toggled(bool)), this, SLOT(onShowCompassAct_toggled(bool)));
+
+    showUAVAct = new QAction(tr("Show UAV"), this);
+    showUAVAct->setStatusTip(tr("Show/Hide the UAV"));
+    showUAVAct->setCheckable(true);
+    showUAVAct->setChecked(m_map->ShowUAV());
+    showUAVAct->setEnabled(false);		// temporary
+    connect(showUAVAct, SIGNAL(toggled(bool)), this, SLOT(onShowUAVAct_toggled(bool)));
 
     zoomInAct = new QAction(tr("Zoom &In"), this);
     zoomInAct->setShortcut(Qt::Key_PageUp);
@@ -937,6 +954,16 @@ void OPMapGadgetWidget::createActions()
     followUAVheadingAct->setCheckable(true);
     followUAVheadingAct->setChecked(false);
     connect(followUAVheadingAct, SIGNAL(toggled(bool)), this, SLOT(onFollowUAVheadingAct_toggled(bool)));
+
+    showUAVtrailAct = new QAction(tr("Show UAV trail"), this);
+    showUAVtrailAct->setStatusTip(tr("Show/Hide the UAV trail"));
+    showUAVtrailAct->setCheckable(true);
+    showUAVtrailAct->setChecked(true);
+    connect(showUAVtrailAct, SIGNAL(toggled(bool)), this, SLOT(onShowUAVtrailAct_toggled(bool)));
+
+    clearUAVtrailAct = new QAction(tr("Clear UAV trail"), this);
+    clearUAVtrailAct->setStatusTip(tr("Clear the UAV trail"));
+    connect(clearUAVtrailAct, SIGNAL(triggered()), this, SLOT(onClearUAVtrailAct_triggered()));
 
     wayPointEditorAct = new QAction(tr("&Waypoint editor"), this);
     wayPointEditorAct->setShortcut(tr("Ctrl+W"));
@@ -1035,10 +1062,16 @@ void OPMapGadgetWidget::onFindPlaceAct_triggered()
 */
 }
 
-void OPMapGadgetWidget::onShowCompassAct_toggled(bool show_compass)
+void OPMapGadgetWidget::onShowCompassAct_toggled(bool show)
 {
     if (m_map)
-	m_map->SetShowCompass(show_compass);
+	m_map->SetShowCompass(show);
+}
+
+void OPMapGadgetWidget::onShowUAVAct_toggled(bool show)
+{
+    if (m_map)
+	m_map->SetShowUAV(show);    // this can cause a rather big crash
 }
 
 void OPMapGadgetWidget::onGoZoomInAct_triggered()
@@ -1093,11 +1126,7 @@ void OPMapGadgetWidget::onFollowUAVpositionAct_toggled(bool checked)
 	if (m_widget->toolButtonMapUAV->isChecked() != checked)
 	    m_widget->toolButtonMapUAV->setChecked(checked);
 
-	if (m_map)
-	{
-//	    m_map->SetCanDragMap(!checked);							// allow/disallow manual map dragging
-	    if (!checked) m_map->SetRotate(0);			    				// reset map rotation to 0deg
-	}
+	setMapFollowingmode();
     }
 }
 
@@ -1108,11 +1137,26 @@ void OPMapGadgetWidget::onFollowUAVheadingAct_toggled(bool checked)
 	if (m_widget->toolButtonMapUAVheading->isChecked() != checked)
 	    m_widget->toolButtonMapUAVheading->setChecked(checked);
 
-	if (m_map)
-	{
-	    if (!checked) m_map->SetRotate(0);							// reset map rotation to 0deg
-	}
+	setMapFollowingmode();
     }
+}
+
+void OPMapGadgetWidget::onShowUAVtrailAct_toggled(bool checked)
+{
+    if (m_widget)
+    {
+	if (m_widget->toolButtonShowUAVtrail->isChecked() != checked)
+	    m_widget->toolButtonShowUAVtrail->setChecked(checked);
+
+	if (m_map)
+	    m_map->UAV->SetShowTrail(checked);
+    }
+}
+
+void OPMapGadgetWidget::onClearUAVtrailAct_triggered()
+{
+    if (m_map)
+	m_map->UAV->DeleteTrail();
 }
 
 void OPMapGadgetWidget::onOpenWayPointEditorAct_triggered()
@@ -1239,6 +1283,33 @@ void OPMapGadgetWidget::saveComboBoxLines(QComboBox *comboBox, QString filename)
     }
 
     file.close();
+}
+
+// *************************************************************************************
+
+void OPMapGadgetWidget::setMapFollowingmode()
+{
+    if (!m_map) return;
+
+    if (!followUAVpositionAct->isChecked())
+    {
+	m_map->UAV->SetMapFollowType(UAVMapFollowType::None);
+	m_map->SetRotate(0);								// reset map rotation to 0deg
+    }
+    else
+    if (!followUAVheadingAct->isChecked())
+    {
+	m_map->UAV->SetMapFollowType(UAVMapFollowType::CenterMap);
+	m_map->SetRotate(0);								// reset map rotation to 0deg
+    }
+    else
+    {
+	m_map->UAV->SetMapFollowType(UAVMapFollowType::CenterMap);			// the map library won't let you reset the uav rotation if it's already in rotate mode
+
+//	if (m_map->ShowUAV())
+	    m_map->UAV->SetUAVHeading(0);						// reset the UAV heading to 0deg
+	m_map->UAV->SetMapFollowType(UAVMapFollowType::CenterAndRotateMap);
+    }
 }
 
 // *************************************************************************************

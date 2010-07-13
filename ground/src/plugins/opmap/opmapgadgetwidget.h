@@ -116,6 +116,8 @@ private slots:
     void on_toolButtonMapHome_clicked();
     void on_toolButtonMapUAV_clicked();
     void on_toolButtonMapUAVheading_clicked();
+    void on_toolButtonShowUAVtrail_clicked();
+    void on_toolButtonClearUAVtrail_clicked();
     void on_horizontalSliderZoom_sliderMoved(int position);
     void on_toolButtonAddWaypoint_clicked();
     void on_treeViewWaypoints_clicked(QModelIndex index);
@@ -154,7 +156,8 @@ private slots:
     void onCopyMouseLatToClipAct_triggered();
     void onCopyMouseLonToClipAct_triggered();
     void onFindPlaceAct_triggered();
-    void onShowCompassAct_toggled(bool show_compass);
+    void onShowCompassAct_toggled(bool show);
+    void onShowUAVAct_toggled(bool show);
     void onGoZoomInAct_triggered();
     void onGoZoomOutAct_triggered();
     void onGoMouseClickAct_triggered();
@@ -162,6 +165,8 @@ private slots:
     void onGoUAVAct_triggered();
     void onFollowUAVpositionAct_toggled(bool checked);
     void onFollowUAVheadingAct_toggled(bool checked);
+    void onShowUAVtrailAct_toggled(bool checked);
+    void onClearUAVtrailAct_triggered();
     void onOpenWayPointEditorAct_triggered();
     void onAddWayPointAct_triggered();
     void onEditWayPointAct_triggered();
@@ -218,6 +223,7 @@ private:
     QAction *copyMouseLonToClipAct;
     QAction *findPlaceAct;
     QAction *showCompassAct;
+    QAction *showUAVAct;
     QAction *zoomInAct;
     QAction *zoomOutAct;
     QAction *goMouseClickAct;
@@ -225,6 +231,8 @@ private:
     QAction *goUAVAct;
     QAction *followUAVpositionAct;
     QAction *followUAVheadingAct;
+    QAction *showUAVtrailAct;
+    QAction *clearUAVtrailAct;
     QAction *wayPointEditorAct;
     QAction *addWayPointAct;
     QAction *editWayPointAct;
@@ -237,6 +245,8 @@ private:
 
     void loadComboBoxLines(QComboBox *comboBox, QString filename);
     void saveComboBoxLines(QComboBox *comboBox, QString filename);
+
+    void setMapFollowingmode();
 };
 
 #endif /* OPMAP_GADGETWIDGET_H_ */

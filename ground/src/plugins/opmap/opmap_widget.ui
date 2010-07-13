@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>713</width>
-    <height>363</height>
+    <width>548</width>
+    <height>416</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -874,6 +874,15 @@ border-radius: 3px;
                  <height>20</height>
                 </size>
                </property>
+               <property name="autoRepeat">
+                <bool>true</bool>
+               </property>
+               <property name="autoRepeatDelay">
+                <number>500</number>
+               </property>
+               <property name="autoRepeatInterval">
+                <number>500</number>
+               </property>
                <property name="autoRaise">
                 <bool>false</bool>
                </property>
@@ -955,6 +964,15 @@ border-radius: 3px;
                  <height>20</height>
                 </size>
                </property>
+               <property name="autoRepeat">
+                <bool>true</bool>
+               </property>
+               <property name="autoRepeatDelay">
+                <number>500</number>
+               </property>
+               <property name="autoRepeatInterval">
+                <number>500</number>
+               </property>
                <property name="autoRaise">
                 <bool>false</bool>
                </property>
@@ -998,7 +1016,7 @@ border-radius: 3px;
                 </size>
                </property>
                <property name="autoRepeat">
-                <bool>true</bool>
+                <bool>false</bool>
                </property>
                <property name="autoRaise">
                 <bool>false</bool>
@@ -1030,7 +1048,7 @@ border-radius: 3px;
                 <bool>true</bool>
                </property>
                <property name="autoRepeat">
-                <bool>true</bool>
+                <bool>false</bool>
                </property>
                <property name="autoRaise">
                 <bool>false</bool>
@@ -1062,7 +1080,71 @@ border-radius: 3px;
                 <bool>true</bool>
                </property>
                <property name="autoRepeat">
+                <bool>false</bool>
+               </property>
+               <property name="autoRaise">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="toolButtonShowUAVtrail">
+               <property name="toolTip">
+                <string>Show/Hide the UAV trail</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="opmap.qrc">
+                 <normaloff>:/opmap/images/uav_trail.png</normaloff>:/opmap/images/uav_trail.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+               <property name="checkable">
                 <bool>true</bool>
+               </property>
+               <property name="autoRepeat">
+                <bool>false</bool>
+               </property>
+               <property name="autoRaise">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="toolButtonClearUAVtrail">
+               <property name="toolTip">
+                <string>Clear the UAV trail</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="opmap.qrc">
+                 <normaloff>:/opmap/images/uav_trail_clear.png</normaloff>:/opmap/images/uav_trail_clear.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+               <property name="checkable">
+                <bool>false</bool>
+               </property>
+               <property name="autoRepeat">
+                <bool>false</bool>
                </property>
                <property name="autoRaise">
                 <bool>false</bool>

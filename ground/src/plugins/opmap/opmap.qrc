@@ -19,5 +19,7 @@
         <file>images/waypoint_marker2.png</file>
         <file>images/waypoint_marker1.png</file>
         <file>images/uav_heading.png</file>
+        <file>images/uav_trail.png</file>
+        <file>images/uav_trail_clear.png</file>
     </qresource>
 </RCC>

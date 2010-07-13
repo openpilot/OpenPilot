@@ -577,7 +577,7 @@ internals::PointLatLng UrlFactory::GetLatLngFromGeocoderUrl(const QString &url, 
 #endif //DEBUG_URLFACTORY
     status = GeoCoderStatusCode::Unknow;
     internals::PointLatLng ret(0,0);
-    QString urlEnd = url.right(url.indexOf("geo?q="));
+    QString urlEnd = url.mid(url.indexOf("geo?q=")+6);
     urlEnd.replace( QRegExp(
             "[^"
             "A-Z,a-z,0-9,"

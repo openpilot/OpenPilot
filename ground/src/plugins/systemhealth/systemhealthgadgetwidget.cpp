@@ -56,10 +56,6 @@ SystemHealthGadgetWidget::SystemHealthGadgetWidget(QWidget *parent) : QGraphicsV
     SystemAlarms* obj = dynamic_cast<SystemAlarms*>(objManager->getObject(QString("SystemAlarms")));
     connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateAlarms(UAVObject*)));
 
-    // Test code for timer to move the index
-    testValue=0;
-    connect(&m_testTimer, SIGNAL(timeout()), this, SLOT(testRotate()));
-    m_testTimer.start(1000);
 }
 
 void SystemHealthGadgetWidget::updateAlarms(UAVObject* systemAlarm)
@@ -69,10 +65,10 @@ void SystemHealthGadgetWidget::updateAlarms(UAVObject* systemAlarm)
     // name, so it's just as simple to reset the scene:
     // And add the one with the right name.
     QGraphicsScene *m_scene = scene();
-    foreach ( QGraphicsItem* item , m_scene->items()){
+    foreach ( QGraphicsItem* item ,background->childItems()){
         m_scene->removeItem(item);
+        delete item; // removeItem does _not_ delete the item.
     }
-    m_scene->addItem(background);
 
     QString alarm = systemAlarm->getName();
     foreach (UAVObjectField *field, systemAlarm->getFields()) {
@@ -88,19 +84,18 @@ void SystemHealthGadgetWidget::updateAlarms(UAVObject* systemAlarm)
                     QGraphicsSvgItem *ind = new QGraphicsSvgItem();
                     ind->setSharedRenderer(m_renderer);
                     ind->setElementId(element2);
+                    ind->setParentItem(background);
                     QTransform matrix;
                     matrix.translate(startX,startY);
                     ind->setTransform(matrix,false);
-                    m_scene->addItem(ind);
                 } else {
-                    std::cout << "Warning: element " << element2.toStdString() << " not found in SVG."<<std::endl;
+                    qDebug() << "Warning: element " << element2 << " not found in SVG.";
                 }
             } else {
-                std::cout << "Warning: Element " << element.toStdString() << " not found in SVG." << std::endl;
+                qDebug() << "Warning: Element " << element << " not found in SVG.";
             }
         }
     }
-    m_scene->addItem(foreground);
 }
 
 SystemHealthGadgetWidget::~SystemHealthGadgetWidget()
@@ -134,7 +129,7 @@ void SystemHealthGadgetWidget::setSystemFile(QString dfn)
      }
    }
    else
-   { std::cout<<"no file: "<<std::endl; }
+   { qDebug() <<"SystemHealthGadget: no file"; }
 }
 
 void SystemHealthGadgetWidget::paint()
@@ -150,7 +145,7 @@ void SystemHealthGadgetWidget::paintEvent(QPaintEvent *event)
 {
     // Skip painting until the dial file is loaded
     if (! m_renderer->isValid()) {
-        std::cout<<"System file not loaded, not rendering"<<std::endl;
+        qDebug() <<"SystemHealthGadget: System file not loaded, not rendering";
         return;
     }
    QGraphicsView::paintEvent(event);
@@ -162,12 +157,4 @@ void SystemHealthGadgetWidget::paintEvent(QPaintEvent *event)
 void SystemHealthGadgetWidget::resizeEvent(QResizeEvent *event)
 {
     fitInView(background, Qt::KeepAspectRatio );
-}
-
-
-// Test function for timer to rotate needles
-void SystemHealthGadgetWidget::test()
-{
-    testValue=0;
-
 }

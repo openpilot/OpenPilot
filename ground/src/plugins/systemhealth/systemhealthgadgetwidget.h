@@ -53,8 +53,6 @@ protected:
    void resizeEvent(QResizeEvent *event);
 
 private slots:
-   // Test function
-   void test();
    void updateAlarms(UAVObject *systemAlarm); // Called by the systemalarms UAVObject
 
 private:
@@ -65,10 +63,5 @@ private:
                    // Simple flag to skip rendering if the
    bool fgenabled; // layer does not exist.
 
-
-   // Test variables
-   double testValue;
-   QTimer m_testTimer;
-   // End test variables
 };
 #endif /* SYSTEMHEALTHGADGETWIDGET_H_ */

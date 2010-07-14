@@ -29,6 +29,11 @@ areyousureyoushouldberunningthis:
 	@echo "     ahrs              - Build firmware for the AHRS board"
 	@echo "     ahrs_clean        - Delete all build output for the AHRS firmware"
 	@echo
+	@echo "   [Simulation]"
+	@echo "     sim_posix         - Build OpenPilot simulation firmware for"
+	@echo "                         a POSIX compatible system (Linux, Mac OS X, ...)"
+	@echo "     sim_posix_clean   - Delete all build output for the POSIX simulation"
+	@echo
 	@echo "   [GCS and UAVObjects]"
 	@echo "     gcs               - Build the Ground Control System application"
 	@echo "     uavobjects        - Generate the gcs and openpilot source files from the UAVObject definition XML files"
@@ -222,5 +227,12 @@ ahrs_%:
 	mkdir -p $(BUILD_DIR)/ahrs
 	make OUTDIR="$(BUILD_DIR)/ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/AHRS $*
 
+.PHONY: sim_posix
+sim_posix: sim_posix_elf
 
+# Note: sim_* should depend on uavobjects directly - same reasons as above.
+
+sim_posix_%: #uavobjects
+	mkdir -p $(BUILD_DIR)/simulation
+	make OUTDIR="$(BUILD_DIR)/simulation" -C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.posix $*
 

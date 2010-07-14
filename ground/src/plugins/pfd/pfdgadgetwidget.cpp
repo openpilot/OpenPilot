@@ -47,17 +47,22 @@ PFDGadgetWidget::PFDGadgetWidget(QWidget *parent) : QGraphicsView(parent)
     headingObj = NULL;
     gcsBatteryObj = NULL;
     compassBandWidth = 0;
-/*
-    obj2 = NULL;
-    obj3 = NULL;
-*/
+    pfdError = true;
+    rollTarget = 0;
+    rollValue = 0;
+    pitchTarget = 0;
+    pitchValue = 0;
+    headingTarget = 0;
+    headingValue = 0;
+    groundspeedTarget = 0;
+    groundspeedValue = 0;
+    altitudeTarget = 0;
+    altitudeValue = 0;
+
+
     // This timer mechanism makes needles rotate smoothly
     connect(&dialTimer, SIGNAL(timeout()), this, SLOT(moveNeedles()));
     dialTimer.start(20);
-/*
-    connect(&dialTimer2,SIGNAL(timeout()), this, SLOT(moveVerticalScales()));
-    dialTimer2.start(20);
-    */
 
 }
 
@@ -69,7 +74,8 @@ PFDGadgetWidget::~PFDGadgetWidget()
 /*!
   \brief Connects the widget to the relevant UAVObjects
 
-  We want: AttitudeActual, FlightBattery, Location
+  Should only be called after the PFD artwork is loaded.
+  We want: AttitudeActual, FlightBattery, Location.
 
   */
 void PFDGadgetWidget::connectNeedles() {
@@ -102,18 +108,23 @@ void PFDGadgetWidget::connectNeedles() {
         qDebug() << "Error: Object is unknown (PositionActual).";
    }
 
-   gcsTelemetryObj = dynamic_cast<UAVDataObject*>(objManager->getObject("GCSTelemetryStats"));
-   if (gcsTelemetryObj != NULL ) {
-       connect(gcsTelemetryObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateLinkStatus(UAVObject*)));
-   } else {
-        qDebug() << "Error: Object is unknown (GCSTelemetryStats).";
-   }
+   if (gcsTelemetryArrow || gcsTelemetryStats ) {
+       // Only register if the PFD wants link stats/status
+      gcsTelemetryObj = dynamic_cast<UAVDataObject*>(objManager->getObject("GCSTelemetryStats"));
+      if (gcsTelemetryObj != NULL ) {
+          connect(gcsTelemetryObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateLinkStatus(UAVObject*)));
+      } else {
+           qDebug() << "Error: Object is unknown (GCSTelemetryStats).";
+      }
+    }
 
-   gcsBatteryObj = dynamic_cast<UAVDataObject*>(objManager->getObject("FlightBatteryState"));
-   if (gcsBatteryObj != NULL ) {
-       connect(gcsBatteryObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateBattery(UAVObject*)));
-   } else {
-        qDebug() << "Error: Object is unknown (FlightBatteryState).";
+   if (gcsBatteryStats) {  // Only register if the PFD wants battery display
+       gcsBatteryObj = dynamic_cast<UAVDataObject*>(objManager->getObject("FlightBatteryState"));
+       if (gcsBatteryObj != NULL ) {
+           connect(gcsBatteryObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateBattery(UAVObject*)));
+       } else {
+            qDebug() << "Error: Object is unknown (FlightBatteryState).";
+       }
    }
 
 }
@@ -131,7 +142,7 @@ void PFDGadgetWidget::updateLinkStatus(UAVObject *object1) {
     UAVObjectField* field3 = object1->getField(rdr);
     if (field && field2 && field3) {
     	QString s = field->getValue().toString();
-        if (m_renderer->elementExists("gcstelemetry-" + s)) {
+        if (m_renderer->elementExists("gcstelemetry-" + s) && gcsTelemetryArrow) {
                 gcsTelemetryArrow->setElementId("gcstelemetry-" + s);
             } else { // Safeguard
                 gcsTelemetryArrow->setElementId("gcstelemetry-Disconnected");
@@ -139,7 +150,7 @@ void PFDGadgetWidget::updateLinkStatus(UAVObject *object1) {
         double v1 = field2->getDouble();
         double v2 = field3->getDouble();
         s.sprintf("%.0f/%.0f",v1,v2);
-        gcsTelemetryStats->setPlainText(s);
+        if (gcsTelemetryStats) gcsTelemetryStats->setPlainText(s);
     } else {
         qDebug() << "UpdateLinkStatus: Wrong field, maybe an issue with object disconnection ?";
     }
@@ -159,6 +170,8 @@ void PFDGadgetWidget::updateAttitude(UAVObject *object1) {
         // - Roll value in degrees
         // - Pitch lines are 300px high for a +20/-20 range, which means
         //   7.5 pixels per pitch degree.
+    	// TODO: loosen this constraint and only require a +/- 20 deg range,
+    	//       and compute the height from the SVG element.
         rollTarget = field->getDouble()*(-1);
         pitchTarget = field2->getDouble()*7.5;
         if (!dialTimer.isActive())
@@ -205,16 +218,20 @@ void PFDGadgetWidget::updateHeading(UAVObject *object1) {
     }
 
     // GPS Stats
-    fieldname = QString("Satellites");
-    field = object1->getField(fieldname);
-    if (field) {
-        QString s = QString("GPS: ") + field->getValue().toString();
-        gcsGPSStats->setPlainText(s);
+    if (gcsGPSStats) {
+        fieldname = QString("Satellites");
+        field = object1->getField(fieldname);
+        fieldname = QString("HDOP");
+        UAVObjectField* field1 = object1->getField(fieldname);
+        if (field && field1) {
+            QString s = QString("GPS: ") + field->getValue().toString() + "\nHDP: "
+                        + field1->getValue().toString();
+            gcsGPSStats->setPlainText(s);
+        }
     }
 
     if (!dialTimer.isActive())
         dialTimer.start(); // Rearm the dial Timer which might be stopped.
-
 }
 
 /*!
@@ -530,28 +547,37 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          ////////////////
          // GCS Telemetry Indicator
          ////////////////
-         compassMatrix = m_renderer->matrixForElement("gcstelemetry-Disconnected");
-         startX = compassMatrix.mapRect(m_renderer->boundsOnElement("gcstelemetry-Disconnected")).x();
-         startY = compassMatrix.mapRect(m_renderer->boundsOnElement("gcstelemetry-Disconnected")).y();
-         gcsTelemetryArrow = new QGraphicsSvgItem();
-         gcsTelemetryArrow->setSharedRenderer(m_renderer);
-         gcsTelemetryArrow->setElementId("gcstelemetry-Disconnected");
-         l_scene->addItem(gcsTelemetryArrow);
-         matrix.reset();
-         matrix.translate(startX,startY);
-         gcsTelemetryArrow->setTransform(matrix,false);
+         if (m_renderer->elementExists("gcstelemetry-Disconnected")) {
+             compassMatrix = m_renderer->matrixForElement("gcstelemetry-Disconnected");
+             startX = compassMatrix.mapRect(m_renderer->boundsOnElement("gcstelemetry-Disconnected")).x();
+             startY = compassMatrix.mapRect(m_renderer->boundsOnElement("gcstelemetry-Disconnected")).y();
+             gcsTelemetryArrow = new QGraphicsSvgItem();
+             gcsTelemetryArrow->setSharedRenderer(m_renderer);
+             gcsTelemetryArrow->setElementId("gcstelemetry-Disconnected");
+             l_scene->addItem(gcsTelemetryArrow);
+             matrix.reset();
+             matrix.translate(startX,startY);
+             gcsTelemetryArrow->setTransform(matrix,false);
+         } else {
+             gcsTelemetryArrow = NULL;
+         }
 
-         compassMatrix = m_renderer->matrixForElement("linkrate");
-         startX = compassMatrix.mapRect(m_renderer->boundsOnElement("linkrate")).x();
-         startY = compassMatrix.mapRect(m_renderer->boundsOnElement("linkrate")).y();
-         qreal linkRateHeight = compassMatrix.mapRect(m_renderer->boundsOnElement("linkrate")).height();
-         gcsTelemetryStats = new QGraphicsTextItem();
-         gcsTelemetryStats->setDefaultTextColor(QColor("White"));
-         gcsTelemetryStats->setFont(QFont("Arial",(int) linkRateHeight));
-         l_scene->addItem(gcsTelemetryStats);
-         matrix.reset();
-         matrix.translate(startX,startY-linkRateHeight/2);
-         gcsTelemetryStats->setTransform(matrix,false);
+         if (m_renderer->elementExists("linkrate")) {
+             compassMatrix = m_renderer->matrixForElement("linkrate");
+             startX = compassMatrix.mapRect(m_renderer->boundsOnElement("linkrate")).x();
+             startY = compassMatrix.mapRect(m_renderer->boundsOnElement("linkrate")).y();
+             qreal linkRateHeight = compassMatrix.mapRect(m_renderer->boundsOnElement("linkrate")).height();
+             gcsTelemetryStats = new QGraphicsTextItem();
+             gcsTelemetryStats->setDefaultTextColor(QColor("White"));
+             gcsTelemetryStats->setFont(QFont("Arial",(int) linkRateHeight));
+             l_scene->addItem(gcsTelemetryStats);
+             matrix.reset();
+             matrix.translate(startX,startY-linkRateHeight/2);
+             gcsTelemetryStats->setTransform(matrix,false);
+         } else {
+             gcsTelemetryStats = NULL;
+         }
+
 
          ////////////////
          // GCS Battery Indicator
@@ -569,17 +595,21 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          gcsTelemetryArrow->setTransform(matrix,false);
          */
 
-         compassMatrix = m_renderer->matrixForElement("battery-txt");
-         startX = compassMatrix.mapRect(m_renderer->boundsOnElement("battery-txt")).x();
-         startY = compassMatrix.mapRect(m_renderer->boundsOnElement("battery-txt")).y();
-         qreal batStatHeight = compassMatrix.mapRect(m_renderer->boundsOnElement("battery-txt")).height();
-         gcsBatteryStats = new QGraphicsTextItem();
-         gcsBatteryStats->setDefaultTextColor(QColor("White"));
-         gcsBatteryStats->setFont(QFont("Arial",(int) batStatHeight));
-         l_scene->addItem(gcsBatteryStats);
-         matrix.reset();
-         matrix.translate(startX,startY-batStatHeight/2);
-         gcsBatteryStats->setTransform(matrix,false);
+         if (m_renderer->elementExists("battery-txt")) {
+             compassMatrix = m_renderer->matrixForElement("battery-txt");
+             startX = compassMatrix.mapRect(m_renderer->boundsOnElement("battery-txt")).x();
+             startY = compassMatrix.mapRect(m_renderer->boundsOnElement("battery-txt")).y();
+             qreal batStatHeight = compassMatrix.mapRect(m_renderer->boundsOnElement("battery-txt")).height();
+             gcsBatteryStats = new QGraphicsTextItem();
+             gcsBatteryStats->setDefaultTextColor(QColor("White"));
+             gcsBatteryStats->setFont(QFont("Arial",(int) batStatHeight));
+             l_scene->addItem(gcsBatteryStats);
+             matrix.reset();
+             matrix.translate(startX,startY-batStatHeight/2);
+             gcsBatteryStats->setTransform(matrix,false);
+         } else {
+             gcsBatteryStats = NULL;
+         }
 
          ////////////////
          // GCS GPS Indicator
@@ -597,19 +627,21 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          gcsTelemetryArrow->setTransform(matrix,false);
          */
 
-         compassMatrix = m_renderer->matrixForElement("gps-txt");
-         startX = compassMatrix.mapRect(m_renderer->boundsOnElement("gps-txt")).x();
-         startY = compassMatrix.mapRect(m_renderer->boundsOnElement("gps-txt")).y();
-         qreal gpsStatHeight = compassMatrix.mapRect(m_renderer->boundsOnElement("gps-txt")).height();
-         gcsGPSStats = new QGraphicsTextItem();
-         gcsGPSStats->setDefaultTextColor(QColor("White"));
-         gcsGPSStats->setFont(QFont("Arial",(int) gpsStatHeight));
-         l_scene->addItem(gcsGPSStats);
-         matrix.reset();
-         matrix.translate(startX,startY-gpsStatHeight/2);
-         gcsGPSStats->setTransform(matrix,false);
-
-
+         if (m_renderer->elementExists("gps-txt")) {
+             compassMatrix = m_renderer->matrixForElement("gps-txt");
+             startX = compassMatrix.mapRect(m_renderer->boundsOnElement("gps-txt")).x();
+             startY = compassMatrix.mapRect(m_renderer->boundsOnElement("gps-txt")).y();
+             qreal gpsStatHeight = compassMatrix.mapRect(m_renderer->boundsOnElement("gps-txt")).height();
+             gcsGPSStats = new QGraphicsTextItem();
+             gcsGPSStats->setDefaultTextColor(QColor("White"));
+             gcsGPSStats->setFont(QFont("Arial",(int) gpsStatHeight));
+             l_scene->addItem(gcsGPSStats);
+             matrix.reset();
+             matrix.translate(startX,startY-gpsStatHeight/2);
+             gcsGPSStats->setTransform(matrix,false);
+         } else {
+             gcsGPSStats = NULL;
+         }
 
         l_scene->setSceneRect(m_background->boundingRect());
 

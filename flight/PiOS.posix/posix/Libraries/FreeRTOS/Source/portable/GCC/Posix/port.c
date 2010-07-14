@@ -656,9 +656,9 @@ pthread_t xTaskToSuspend;
 pthread_t xTaskToResume;
 tskTCB * oldTask, * newTask;
 	
-	assert( SIG_TICK == sig );
+/*	assert( SIG_TICK == sig );
 	assert( prvGetThreadHandle( xTaskGetCurrentTaskHandle() ) != NULL );
-	assert( pthread_self() != prvGetThreadHandle( xTaskGetCurrentTaskHandle() ) );
+	assert( pthread_self() != prvGetThreadHandle( xTaskGetCurrentTaskHandle() ) );  */
 	
 	debug_printf( "\r\n\r\n" );
 	debug_printf( "(xInterruptsEnabled = %i, xServicingTick = %i)\r\n", (int) xInterruptsEnabled != 0, (int) xServicingTick != 0);

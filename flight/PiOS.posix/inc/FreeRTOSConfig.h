@@ -44,7 +44,7 @@
 	#define CHECK_TASK_RESUMES
 	#define RUNNING_THREAD_MUTEX
 //	#define TICK_SIGNAL
-	#define TICK_SIGWAIT
+//	#define TICK_SIGWAIT
 	#define IDLE_SLEEPS
 
 	#define configUSE_PREEMPTION		1

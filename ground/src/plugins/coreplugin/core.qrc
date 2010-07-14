@@ -48,5 +48,6 @@
         <file>images/exiticon.png</file>
         <file>images/optionsicon.png</file>
         <file>images/helpicon.png</file>
+        <file>images/openpiloticon.png</file>
     </qresource>
 </RCC>

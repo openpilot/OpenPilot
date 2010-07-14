@@ -472,6 +472,9 @@ void MainWindow::registerDefaultActions()
     cmd = createSeparator(am, this, QLatin1String("QtCreator.Tools.Sep.Options"), m_globalContext);
     mtools->addAction(cmd, Constants::G_DEFAULT_THREE);
 
+    // Help menu separators
+
+
     // Return to editor shortcut: Note this requires Qt to fix up
     // handling of shortcut overrides in menus, item views, combos....
     m_focusToEditor = new QShortcut(this);
@@ -623,24 +626,10 @@ void MainWindow::registerDefaultActions()
     connect(m_toggleFullScreenAction, SIGNAL(triggered(bool)), this, SLOT(setFullScreen(bool)));
 #endif
 
-    // About GCS Action
-#ifdef Q_WS_MAC
-    tmpaction = new QAction(QIcon(Constants::ICON_INFO), tr("About &OpenPilot GCS"), this); // it's convention not to add dots to the about menu
-#else
-    tmpaction = new QAction(QIcon(Constants::ICON_INFO), tr("About &OpenPilot GCS..."), this);
-#endif
-    cmd = am->registerAction(tmpaction, Constants::ABOUT_OPENPILOTGCS, m_globalContext);
-    mhelp->addAction(cmd, Constants::G_HELP_ABOUT);
-    tmpaction->setEnabled(true);
-#ifdef Q_WS_MAC
-    cmd->action()->setMenuRole(QAction::ApplicationSpecificRole);
-#endif
-    connect(tmpaction, SIGNAL(triggered()), this,  SLOT(aboutOpenPilogGCS()));
-
-    //About Plugins Action
-    tmpaction = new QAction(QIcon(Constants::ICON_INFO), tr("About &Plugins..."), this);
-    cmd = am->registerAction(tmpaction, Constants::ABOUT_PLUGINS, m_globalContext);
-    mhelp->addAction(cmd, Constants::G_HELP_ABOUT);
+    //Help Action
+    tmpaction = new QAction(QIcon(Constants::ICON_HELP), tr("&Help..."), this);
+    cmd = am->registerAction(tmpaction, Constants::G_HELP_HELP, m_globalContext);
+    mhelp->addAction(cmd, Constants::G_HELP_HELP);
     tmpaction->setEnabled(true);
 #ifdef Q_WS_MAC
     cmd->action()->setMenuRole(QAction::ApplicationSpecificRole);
@@ -654,6 +643,32 @@ void MainWindow::registerDefaultActions()
     cmd = am->registerAction(tmpaction, QLatin1String("QtCreator.Help.Sep.About"), m_globalContext);
     mhelp->addAction(cmd, Constants::G_HELP_ABOUT);
 #endif
+
+    //About Plugins Action
+    tmpaction = new QAction(QIcon(Constants::ICON_INFO), tr("About &Plugins..."), this);
+    cmd = am->registerAction(tmpaction, Constants::ABOUT_PLUGINS, m_globalContext);
+    mhelp->addAction(cmd, Constants::G_HELP_ABOUT);
+    tmpaction->setEnabled(true);
+#ifdef Q_WS_MAC
+    cmd->action()->setMenuRole(QAction::ApplicationSpecificRole);
+#endif
+    connect(tmpaction, SIGNAL(triggered()), this,  SLOT(aboutPlugins()));
+
+    // About GCS Action
+#ifdef Q_WS_MAC
+    tmpaction = new QAction(QIcon(Constants::ICON_OPENPILOT), tr("About &OpenPilot GCS"), this); // it's convention not to add dots to the about menu
+#else
+    tmpaction = new QAction(QIcon(Constants::ICON_OPENPILOT), tr("About &OpenPilot GCS..."), this);
+#endif
+    cmd = am->registerAction(tmpaction, Constants::ABOUT_OPENPILOTGCS, m_globalContext);
+    mhelp->addAction(cmd, Constants::G_HELP_ABOUT);
+    tmpaction->setEnabled(true);
+#ifdef Q_WS_MAC
+    cmd->action()->setMenuRole(QAction::ApplicationSpecificRole);
+#endif
+    connect(tmpaction, SIGNAL(triggered()), this,  SLOT(aboutOpenPilogGCS()));
+
+
 }
 
 void MainWindow::newFile()

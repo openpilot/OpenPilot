@@ -76,7 +76,7 @@ MODEL    = HD_NB
 endif
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-OUTDIR = Build
+OUTDIR = Build.posix
 
 # Target file name (without extension).
 TARGET = OpenPilot

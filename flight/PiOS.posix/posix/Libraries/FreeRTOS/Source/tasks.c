@@ -1832,7 +1832,7 @@ static portTASK_FUNCTION( prvIdleTask, pvParameters )
 		// call nanosleep for smalles sleep time possible
 		// (depending on kernel settings - around 100 microseconds)
 		// decreases idle thread CPU load from 100 to practically 0
-#ifndef __CYGWIN__
+#ifdef IDLE_SLEEPS
 		sigset_t xSignals;
 		sigfillset( &xSignals );
 		pthread_sigmask( SIG_SETMASK, &xSignals, NULL );

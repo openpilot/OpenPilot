@@ -391,12 +391,15 @@ void Viewer::mouseMoveEvent( QMouseEvent* event )
 //------------------------------------- Displaying messages in the status bar
 void Viewer::setStatusMessage(QString& infoString, int timeout)
 {/*{{{*/
-	statusBar->showMessage( infoString, timeout);
+	if (statusBar != NULL)
+	{
+		statusBar->showMessage(infoString, timeout);
+	}
 } /*}}}*/
 
 void Viewer::setStatusMessage(const char* infoString, int timeout)
 {/*{{{*/
-	statusBar->showMessage(QString(infoString), timeout);
+	setStatusMessage(QString(infoString), timeout);
 } /*}}}*/
 
 //------------------------------------- Exporting the view

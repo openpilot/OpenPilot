@@ -66,7 +66,6 @@ Viewer::Viewer(int mosaicWidth, int mosaicHeight, QGraphicsScene* scene ) : m_sc
 	// Status bar style as Cascading Style Sheet
 	statusBar->setStyleSheet(QString("background-color: transparent; color: blue;"));
 	
-		setGeometry(0,0, 200, 400);
 	// Set current widget and all its children to be Visible 
 	show();
 

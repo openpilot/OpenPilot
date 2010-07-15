@@ -13,6 +13,13 @@ class ImageView;
 class Shape;
 class Line;
 class PolyLine;
+
+class MouseGraphicsScene: public QGraphicsScene
+{
+	public:
+		void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );
+};
+
 /**
  * @ingroup qdisplay
  * This is the viewer, you can add ImageView to display on it, or overlay using Shape.

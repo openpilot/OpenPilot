@@ -1,6 +1,7 @@
 #include "qdisplay/Viewer.hpp"
 
 #include <QGraphicsScene>
+#include <QGraphicsSceneMouseEvent>
 #include <QKeyEvent>
 #include <QSplitter>
 #include <QWheelEvent>
@@ -29,7 +30,8 @@
 #include <QSplitter>
 
 using namespace jafar::qdisplay;
-  
+
+
 Viewer::Viewer(int mosaicWidth, int mosaicHeight, QGraphicsScene* scene ) : m_scene(scene), m_mosaicWidth(mosaicWidth), m_mosaicHeight(mosaicHeight), m_currentZ(0.)
 {
 	m_windowWidth = -1;	// norman
@@ -37,7 +39,7 @@ Viewer::Viewer(int mosaicWidth, int mosaicHeight, QGraphicsScene* scene ) : m_sc
 	
 	//--- Setting up the scene
 	if(not m_scene) {
-		m_scene = new QGraphicsScene();
+		m_scene = new MouseGraphicsScene();
 	}
 	m_scene->setBackgroundBrush( Qt::white );
 	setDragMode(QGraphicsView::ScrollHandDrag);
@@ -374,6 +376,7 @@ void Viewer::mouseReleaseEvent( QMouseEvent* event )
 //------------------------------- Mouse Move Events 
 void Viewer::mouseMoveEvent( QMouseEvent* event )
 {/*{{{*/
+//JFR_DEBUG("Viewer::mouseMoveEvent");
 	QGraphicsView::mouseMoveEvent( event );
 	QPointF cursorPosition = event->posF();
 
@@ -387,6 +390,29 @@ void Viewer::mouseMoveEvent( QMouseEvent* event )
 	// Updating status message
 	setStatusMessage( infoString);
 }/*}}}*/
+
+
+
+void MouseGraphicsScene::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
+{
+//JFR_DEBUG("MouseGraphicsScene::mouseMoveEvent pos " << event->pos().x() << "," << event->pos().y() << ", scenePos " << event->scenePos().x() << "," << event->scenePos().y());
+	QPointF pos = event->scenePos();
+	// another possibility is to register the Viewer when it is added to
+	QList<QGraphicsView *> const &views_ = views();
+	for(QList<QGraphicsView *>::const_iterator it = views_.begin(); it != views_.end(); ++it)
+	{
+		qdisplay::Viewer *viewer = dynamic_cast<qdisplay::Viewer*>(*it);
+		if (viewer)
+		{
+			std::ostringstream oss;
+			oss.precision(2); oss.setf(std::ios::fixed, std::ios::floatfield);
+			oss << viewer->getTitle() << "  |  " << pos.x() << "  " << pos.y();
+			viewer->setWindowTitle(oss.str().c_str());
+		}
+	}
+	QGraphicsScene::mouseMoveEvent(event);
+}
+
 
 //------------------------------------- Displaying messages in the status bar
 void Viewer::setStatusMessage(QString& infoString, int timeout)

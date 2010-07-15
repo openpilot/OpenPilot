@@ -317,6 +317,7 @@ QRectF ImageView::boundingRect () const
 
 void ImageView::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
 {
+//JFR_DEBUG("ImageView::hoverMoveEvent");
 	QPointF pos = event->pos();
 	// another possibility is to register the Viewer when it is added to
 	QList<QGraphicsView *> const &views = scene()->views();

@@ -125,7 +125,8 @@ void Viewer::createCursor()
 	cursorDataAlpha[12] = ' ';
 
 	int cursorHotSpot  = cursorSquareSize/2;
-	unsigned char cursorColor = 255;
+	unsigned char cursorColor1 = 200;
+	unsigned char cursorColor2 = 30;
 	for (int j=0; j<cursorSquareSize; j++)
 	{
 		for (int i=0; i<cursorSquareSize; i++)
@@ -134,9 +135,9 @@ void Viewer::createCursor()
 			if( !(i==(cursorSquareSize-1) || j==(cursorSquareSize-1))
 				&& !( (cursorHotSpot-2) < i && i < (cursorHotSpot+2) && (cursorHotSpot-2) < j && j < (cursorHotSpot+2) ))
 			{
-				cursorDataAlpha[offset+j*cursorSquareSize*3+i*3] = cursorColor;
-				cursorDataAlpha[offset+j*cursorSquareSize*3+i*3+1] = cursorColor;
-				cursorDataAlpha[offset+j*cursorSquareSize*3+i*3+2] = cursorColor;
+				cursorDataAlpha[offset+j*cursorSquareSize*3+i*3] = 255;
+				cursorDataAlpha[offset+j*cursorSquareSize*3+i*3+1] = 255;
+				cursorDataAlpha[offset+j*cursorSquareSize*3+i*3+2] = 255;
 			} else {
 				cursorDataAlpha[offset+j*cursorSquareSize*3+i*3] = 0;
 				cursorDataAlpha[offset+j*cursorSquareSize*3+i*3+1] = 0;
@@ -146,13 +147,20 @@ void Viewer::createCursor()
 			// Drawing the cross
 			if ( (i==cursorHotSpot) || (j ==cursorHotSpot) )
 			{
-				cursorData[offset+j*cursorSquareSize*3+i*3] = 0;
-				cursorData[offset+j*cursorSquareSize*3+i*3+1] = 0;
-				cursorData[offset+j*cursorSquareSize*3+i*3+2] = 0;
+				if ((i >= cursorHotSpot) && (j >= cursorHotSpot))
+				{
+					cursorData[offset+j*cursorSquareSize*3+i*3] = cursorColor1;
+					cursorData[offset+j*cursorSquareSize*3+i*3+1] = cursorColor1;
+					cursorData[offset+j*cursorSquareSize*3+i*3+2] = cursorColor1;
+				} else {
+					cursorData[offset+j*cursorSquareSize*3+i*3] = cursorColor2;
+					cursorData[offset+j*cursorSquareSize*3+i*3+1] = cursorColor2;
+					cursorData[offset+j*cursorSquareSize*3+i*3+2] = cursorColor2;
+				}
 			} else {
-				cursorData[offset+j*cursorSquareSize*3+i*3] = cursorColor;
-				cursorData[offset+j*cursorSquareSize*3+i*3+1] = cursorColor;
-				cursorData[offset+j*cursorSquareSize*3+i*3+2] = cursorColor;
+				cursorData[offset+j*cursorSquareSize*3+i*3] = 255;
+				cursorData[offset+j*cursorSquareSize*3+i*3+1] = 255;
+				cursorData[offset+j*cursorSquareSize*3+i*3+2] = 255;
 				cursorDataAlpha[offset+j*cursorSquareSize*3+i*3] = 0;
 				cursorDataAlpha[offset+j*cursorSquareSize*3+i*3+1] = 0;
 				cursorDataAlpha[offset+j*cursorSquareSize*3+i*3+2] = 0;

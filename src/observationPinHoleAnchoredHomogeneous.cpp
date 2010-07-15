@@ -38,11 +38,6 @@ namespace jafar {
 			prior.x(0) = 1/(3*dmin);
 			prior.P(0,0) = prior.x(0)*prior.x(0);
 			setPrior(prior);
-			//			id() = landmarkPtr()->id();
-			// TODO: is this cast necessary? Change the arg of the setup if not.
-			//linkToPinHole(boost::dynamic_pointer_cast<SensorPinHole>
-			//	      (pinholePtr));
-			//linkToParentAHP(ahpPtr);
 			predictedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
 			observedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
 			reparTh = _reparTh;

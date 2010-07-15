@@ -32,5 +32,11 @@ namespace jafar {
 			type = PNT_AH;
 		}
 
+		bool LandmarkAnchoredHomogeneousPoint::needToDie(DecisionMethod dieMet){
+			double rho = state.x(6);
+			if (rho < 0) return true;
+			return LandmarkAbstract::needToDie(dieMet);
+		}
+
 	} // namespace rtslam
 } // namespace jafar

@@ -157,7 +157,7 @@ namespace jafar {
 				 * \param dieMet the method defining the heuristic: ANY, ALL or MAJORITY
 				 * \return \a true if the landmark should die.
 				 */
-				bool needToDie(DecisionMethod dieMet = ANY);
+				virtual bool needToDie(DecisionMethod dieMet = ANY);
 
 				/**
 				destroy the display data of itself and its children

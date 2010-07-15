@@ -164,32 +164,31 @@ namespace jafar {
 		bool LandmarkAbstract::needToDie(DecisionMethod dieMet){
 			switch (dieMet) {
 				case ANY : {
+					// Drastic option: ANY vote for killing declares the need to die.
 					for (ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end(); obsIter++)
 					{
 						observation_ptr_t obsPtr = *obsIter;
-						// Drastic option: ANY vote for killing declares the need to die.
 						if (obsPtr->voteForKillingLandmark()) {
-//							cout << __PRETTY_FUNCTION__ << ": obs will vote for killing lmk: " << id() << endl;
 							return true;
 						}
 					}
 					return false;
 				}
 				case ALL : {
+					// Magnanimous option: ALL votes for killing are necessary to declare the need to die.
 					for (ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end(); obsIter++)
 					{
 						observation_ptr_t obsPtr = *obsIter;
-						// Magnanimous option: ALL votes for killing necessary to declare the need to die.
 						if (!obsPtr->voteForKillingLandmark()) return false;
 					}
 					return true;
 				}
 				case MAJORITY : {
-					int nDie = 0, nSurvive = 0;
+					// Democratic option: MAJORITY of votes determines the need to die.
+					unsigned int nDie = 0, nSurvive = 0;
 					for (ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end(); obsIter++)
 					{
 						observation_ptr_t obsPtr = *obsIter;
-						// Democratic option: MAJORITY votes declares the need to die.
 						if (obsPtr->voteForKillingLandmark()) nDie++;
 						else nSurvive++;
 					}

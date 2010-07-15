@@ -68,7 +68,7 @@ typedef DataManagerOnePointRansac<RawImage, SensorPinHole, QuickHarrisDetector, 
 
 ///##############################################
 
-#define RANSAC 1
+#define RANSAC 0
 
 int mode = 0;
 time_t rseed;
@@ -117,39 +117,39 @@ const unsigned N_FRAMES = 500000;
 const unsigned MAP_SIZE = 313;
 
 // robot uncertainties and perturbations
-const double UNCERT_VLIN = .01; // m/s
-const double UNCERT_VANG = .01; // rad/s
-const double PERT_VLIN = 0.5; // m/s per sqrt(s)
-const double PERT_VANG = 3; // rad/s per sqrt(s)
+const double UNCERT_VLIN = .1; // m/s
+const double UNCERT_VANG = .1; // rad/s
+const double PERT_VLIN = 1; // m/s per sqrt(s)
+const double PERT_VANG = 1; // rad/s per sqrt(s)
 
 // pin-hole:
 const unsigned IMG_WIDTH = 640;
 const unsigned IMG_HEIGHT = 480;
 const double INTRINSIC[4] = { 301.27013,   266.86136,   497.28243,   496.81116 };
 const double DISTORTION[2] = { -0.23193,   0.11306 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
-const double PIX_NOISE = 0.5;
+const double PIX_NOISE = .5;
 
 // lmk management
-const double D_MIN = 0.1;
+const double D_MIN = 1;
 const double REPARAM_TH = 0.1;
 
 // data manager: quick Harris detector
-const unsigned HARRIS_CONV_SIZE = 3;
-const double HARRIS_TH = 10.0;
+const unsigned HARRIS_CONV_SIZE = 5;
+const double HARRIS_TH = 7.0;
 const double HARRIS_EDDGE = 3.0;
 const unsigned PATCH_DESC = 45;
 
-// data manager: zncc matcher
-const unsigned PATCH_SIZE = 15;
+// data manager: zncc matcher and one-point-ransac
+const unsigned PATCH_SIZE = 15; // in pixels
 const double MATCH_TH = 0.95;
-const double MAHALANOBIS_TH = 2.5; // in n_sigmas
-const unsigned N_UPDATES = 20;
+const double MAHALANOBIS_TH = 3; // in n_sigmas
+const unsigned N_UPDATES = 25;
 const double RANSAC_LOW_INNOV = 2.0; // in pixels
-const unsigned RANSAC_NTRIES = 0;
+const unsigned RANSAC_NTRIES = 6;
 
-// data manager: active search
-const unsigned GRID_VCELLS = 3;
-const unsigned GRID_HCELLS = 4;
+// data manager: active search tesselation grid
+const unsigned GRID_VCELLS = 4;
+const unsigned GRID_HCELLS = 5;
 const unsigned GRID_MARGIN = 11;
 const unsigned GRID_SEPAR = 20;
 
@@ -158,13 +158,10 @@ const unsigned GRID_SEPAR = 20;
 
 void demo_slam01_main(world_ptr_t *world) {
 
-//	const bool SHOW_PATCH = true;
-
 
 	// pin-hole parameters in BOOST format
 	vec intrinsic = createVector<4> (INTRINSIC);
 	vec distortion = createVector<sizeof(DISTORTION)/sizeof(double)> (DISTORTION);
-	cout << "D: " << distortion << endl;
 
 	boost::shared_ptr<ObservationFactory> obsFact(new ObservationFactory());
 	obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeEucpObservationMaker(PATCH_SIZE, D_MIN)));
@@ -228,12 +225,14 @@ void demo_slam01_main(world_ptr_t *world) {
 	dmPt11->setAlgorithmParams(N_UPDATES);
 	#endif
 	
+
 	dmPt11->linkToParentSensorSpec(senPtr11);
 	dmPt11->linkToParentMapManager(mmPoint);
 	dmPt11->setActiveSearchGrid(asGrid);
 	dmPt11->setDetector(harrisDetector, PATCH_DESC, PIX_NOISE);
 	dmPt11->setObservationFactory(obsFact);
 
+	
 	#ifdef HAVE_VIAM
 	viam_hwmode_t hwmode = { VIAM_HWSZ_640x480, VIAM_HWFMT_MONO8, VIAM_HW_FIXED, VIAM_HWFPS_60, VIAM_HWTRIGGER_INTERNAL };
 	hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode, mode, strOpts[iDataPath]));
@@ -245,6 +244,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		senPtr11->setHardwareSensor(hardSen11);
 	}
 	#endif
+	
 
 	// Show empty map
 	cout << *mapPtr << endl;

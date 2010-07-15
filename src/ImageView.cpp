@@ -29,9 +29,10 @@ ImageView::ImageView() :
     m_currentZ(0.),
     m_eventHandler(0)
 {
-  m_pixmapItem->setZValue(m_currentZ++);
-  addToGroup(m_pixmapItem);
-  connectEvents();
+	m_pixmapItem->setZValue(m_currentZ++);
+	addToGroup(m_pixmapItem);
+	setAcceptHoverEvents(true);
+	connectEvents();
 }
 
 
@@ -304,6 +305,34 @@ void ImageView::contextMenuEvent ( QGraphicsSceneContextMenuEvent * event )
   menu.exec(event->screenPos());
 }
 
+QRectF ImageView::boundingRect () const
+{ // reimplement to ensure that it covers the whole image
+	QRectF currentBR = QGraphicsItemGroup::boundingRect();
+	if (currentBR.x() > 0) currentBR.setX(0);
+	if (currentBR.y() > 0) currentBR.setY(0);
+	if (currentBR.right() < m_image.width()) currentBR.setRight(m_image.width());
+	if (currentBR.bottom() < m_image.height()) currentBR.setBottom(m_image.height());
+	return currentBR;
+}
+
+void ImageView::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
+{
+	QPointF pos = event->pos();
+	// another possibility is to register the Viewer when it is added to
+	QList<QGraphicsView *> const &views = scene()->views();
+	for(QList<QGraphicsView *>::const_iterator it = views.begin(); it != views.end(); ++it)
+	{
+		qdisplay::Viewer *viewer = dynamic_cast<qdisplay::Viewer*>(*it);
+		if (viewer)
+		{
+			std::ostringstream oss;
+			oss.precision(2); oss.setf(std::ios::fixed, std::ios::floatfield);
+			oss << viewer->getTitle() << "  |  " << pos.x() << "  " << pos.y();
+			viewer->setWindowTitle(oss.str().c_str());
+		}
+	}
+}
+
 void ImageView::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
 {
 //   JFR_DEBUG( event->pos().x() << " " << event->pos().y() );
@@ -312,21 +341,6 @@ void ImageView::mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
     m_eventHandler->mouseReleaseEvent( event->button(), event->pos().x(), event->pos().y() );
   }
   QGraphicsItemGroup::mouseReleaseEvent(event);
-}
-
-void ImageView::mouseMoveEvent(QGraphicsSceneMouseEvent * event)
-{
-std::cout << "m_lastViewer " << m_lastViewer << std::endl;
-	if (m_lastViewer)
-	{
-		QPointF pos = event->pos();
-		std::ostringstream oss;
-		oss.precision(2);
-		oss.setf(std::ios::fixed, std::ios::floatfield);
-		oss << m_lastViewer->getTitle() << " - " << pos.x() << ", " << pos.y();
-std::cout << oss.str() << std::endl;
-		m_lastViewer->setWindowTitle(oss.str().c_str());
-	}
 }
 
 

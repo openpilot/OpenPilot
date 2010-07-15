@@ -68,11 +68,12 @@ class ImageView : public QObject, public QGraphicsItemGroup {
     void splitVertical();
     void splitHorizontal();
     void addShape();
-		void mouseMoveEvent(QGraphicsSceneMouseEvent * event);
   protected:
     void contextMenuEvent ( QGraphicsSceneContextMenuEvent * event );
   public:
-    void mouseReleaseEvent ( QGraphicsSceneMouseEvent * event );
+		QRectF boundingRect () const;
+		void hoverMoveEvent ( QGraphicsSceneHoverEvent * event );
+		void mouseReleaseEvent ( QGraphicsSceneMouseEvent * event );
   private:
     QAction *m_lutRandomizeAction, *m_lutGrayscaleAction, *m_lutInvertGrayscaleAction, *m_lutRedHotAction, *m_exportView, * m_splitVerticalAction,*m_splitHorizontalAction,*m_addShapeAction;
     QImage m_image;

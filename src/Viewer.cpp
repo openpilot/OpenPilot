@@ -399,7 +399,8 @@ void Viewer::setStatusMessage(QString& infoString, int timeout)
 
 void Viewer::setStatusMessage(const char* infoString, int timeout)
 {/*{{{*/
-	setStatusMessage(QString(infoString), timeout);
+	QString msg = QString(infoString);
+	setStatusMessage(msg, timeout);
 } /*}}}*/
 
 //------------------------------------- Exporting the view

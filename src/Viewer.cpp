@@ -11,6 +11,9 @@
 #include <QPainter>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QCursor>
+#include <QString>
+#include <QLabel>
 
 
 // #include <QtOpenGL/QGLWidget>
@@ -32,22 +35,45 @@ Viewer::Viewer(int mosaicWidth, int mosaicHeight, QGraphicsScene* scene ) : m_sc
 	m_windowWidth = -1;	// norman
 	m_windowHeight = -1;	// norman
 	
-  if(not m_scene) {
-    m_scene = new QGraphicsScene();
-  }
-  m_scene->setBackgroundBrush( Qt::white );
+	//--- Setting up the scene
+	if(not m_scene) {
+		m_scene = new QGraphicsScene();
+	}
+	m_scene->setBackgroundBrush( Qt::white );
 	setDragMode(QGraphicsView::ScrollHandDrag);
 	setTransformationAnchor(QGraphicsView::AnchorUnderMouse); 
+
+	// Creating a custom cursor for precise pointing
+	createCursor();
+	// The cursor type is defined by the viewport displaying the scene.
+	// So to have an effective change of the cursor type we must set the cursor on the viewport itself.
+	viewport()->unsetCursor();
+	viewport()->setCursor(*crossCursor);
+
 	// added by norman
 	if ((m_windowHeight > 0) and (m_windowWidth > 0))
 	{
 		setGeometry(0,0,m_windowWidth,m_windowHeight);
 	}
-  show();
-  setScene(m_scene);
-  ViewerManager::registerViewer( this );
-  m_exportView = new QAction("Export the view", (QObject*)this);
-  connect(m_exportView, SIGNAL(triggered()), this, SLOT(exportView()));
+	setScene(m_scene);
+
+	// Creating a Status bar for the viewer. It is a widget with slot showMessage(QString&).
+	statusBar = new QStatusBar(this);
+	// Setting position and initial geometry. Status bar is on top to avoid repositionning issues.
+	statusBar->setGeometry(0, 2, width(), 15);
+	// Make the geometry dynamic so the bottrom right corner sticks to the parent right border
+	statusBar->setSizeGripEnabled(true);
+	// Status bar style as Cascading Style Sheet
+	statusBar->setStyleSheet(QString("background-color: transparent; color: blue;"));
+	
+		setGeometry(0,0, 200, 400);
+	// Set current widget and all its children to be Visible 
+	show();
+
+	// Register and GO for actions !
+	ViewerManager::registerViewer( this );
+	m_exportView = new QAction("Export the view", (QObject*)this);
+	connect(m_exportView, SIGNAL(triggered()), this, SLOT(exportView()));
 }
 
 Viewer::~Viewer()
@@ -62,6 +88,93 @@ void Viewer::setWindowSize( int width, int height )
 	m_windowHeight = height;
 }
 
+void Viewer::createCursor()
+{
+	// Creating a custom cursor 32x32 px. Drawing a simple cross
+	// on 31x31 pixels and setting the hotspot in this 31x31 center
+	int cursorSquareSize = 32;
+	// Preparing a PNM P6 format
+	int offset = 13;
+	unsigned char cursorData[offset+cursorSquareSize*cursorSquareSize*cursorSquareSize];
+	cursorData[0] = 'P';
+	cursorData[1] = '6';
+	cursorData[2] = ' ';
+	cursorData[3] = '3'; // Shoud be Dependant to cursorSquareSize
+	cursorData[4] = '2'; // Shoud be Dependant to cursorSquareSize
+	cursorData[5] = ' ';
+	cursorData[6] = '3'; // Shoud be Dependant to cursorSquareSize
+	cursorData[7] = '2'; // Shoud be Dependant to cursorSquareSize
+	cursorData[8] = ' ';
+	cursorData[9] = '2';
+	cursorData[10] = '5';
+	cursorData[11] = '5';
+	cursorData[12] = ' ';
+
+	unsigned char cursorDataAlpha[offset+cursorSquareSize*cursorSquareSize*cursorSquareSize];
+	cursorDataAlpha[0] = 'P';
+	cursorDataAlpha[1] = '6';
+	cursorDataAlpha[2] = ' ';
+	cursorDataAlpha[3] = '3'; // Shoud be Dependant to cursorSquareSize
+	cursorDataAlpha[4] = '2'; // Shoud be Dependant to cursorSquareSize
+	cursorDataAlpha[5] = ' ';
+	cursorDataAlpha[6] = '3'; // Shoud be Dependant to cursorSquareSize
+	cursorDataAlpha[7] = '2'; // Shoud be Dependant to cursorSquareSize
+	cursorDataAlpha[8] = ' ';
+	cursorDataAlpha[9] = '2';
+	cursorDataAlpha[10] = '5';
+	cursorDataAlpha[11] = '5';
+	cursorDataAlpha[12] = ' ';
+
+	int cursorHotSpot  = cursorSquareSize/2;
+	unsigned char cursorColor = 255;
+	for (int j=0; j<cursorSquareSize; j++)
+	{
+		for (int i=0; i<cursorSquareSize; i++)
+		{
+			// Preparing the Alpha mask
+			if( !(i==(cursorSquareSize-1) || j==(cursorSquareSize-1))
+				&& !( (cursorHotSpot-2) < i && i < (cursorHotSpot+2) && (cursorHotSpot-2) < j && j < (cursorHotSpot+2) ))
+			{
+				cursorDataAlpha[offset+j*cursorSquareSize*3+i*3] = cursorColor;
+				cursorDataAlpha[offset+j*cursorSquareSize*3+i*3+1] = cursorColor;
+				cursorDataAlpha[offset+j*cursorSquareSize*3+i*3+2] = cursorColor;
+			} else {
+				cursorDataAlpha[offset+j*cursorSquareSize*3+i*3] = 0;
+				cursorDataAlpha[offset+j*cursorSquareSize*3+i*3+1] = 0;
+				cursorDataAlpha[offset+j*cursorSquareSize*3+i*3+2] = 0;
+			}
+
+			// Drawing the cross
+			if ( (i==cursorHotSpot) || (j ==cursorHotSpot) )
+			{
+				cursorData[offset+j*cursorSquareSize*3+i*3] = 0;
+				cursorData[offset+j*cursorSquareSize*3+i*3+1] = 0;
+				cursorData[offset+j*cursorSquareSize*3+i*3+2] = 0;
+			} else {
+				cursorData[offset+j*cursorSquareSize*3+i*3] = cursorColor;
+				cursorData[offset+j*cursorSquareSize*3+i*3+1] = cursorColor;
+				cursorData[offset+j*cursorSquareSize*3+i*3+2] = cursorColor;
+				cursorDataAlpha[offset+j*cursorSquareSize*3+i*3] = 0;
+				cursorDataAlpha[offset+j*cursorSquareSize*3+i*3+1] = 0;
+				cursorDataAlpha[offset+j*cursorSquareSize*3+i*3+2] = 0;
+			}
+		}
+	}
+
+	// Creating the cursor image pixmap with its drawing+alpha
+	QPixmap cursorDraw(cursorSquareSize, cursorSquareSize);
+	QPixmap cursorDrawAlpha(cursorSquareSize, cursorSquareSize);
+
+	// Creating our custom QCursor
+	if ( cursorDraw.loadFromData(cursorData, offset+cursorSquareSize*cursorSquareSize*cursorSquareSize) 
+		&& cursorDrawAlpha.loadFromData(cursorDataAlpha, offset+cursorSquareSize*cursorSquareSize*cursorSquareSize) )
+	{
+		cursorDraw.setAlphaChannel(cursorDrawAlpha);
+		crossCursor = new QCursor(cursorDraw, cursorHotSpot, cursorHotSpot);
+	} else {
+		crossCursor = new QCursor(Qt::CrossCursor);
+	}
+}
 void Viewer::addShape(qdisplay::Shape* si) {
   scene()->addItem(si);
   si->setZValue(m_currentZ++);
@@ -208,15 +321,21 @@ void Viewer::contextMenuEvent( QContextMenuEvent * event )
   }
 }
 
-// WORKAROUND Qt4.4 regression where mouseReleaseEvent are not forwarded to QGraphicsItem
-// is this problem still there with Qt4.6 ? Disabling it because it is messing with
-// DragMode ScrollHandDrag (not releasing the drag)
-#include <QGraphicsSceneMouseEvent>
-#include <QApplication>
-#if 0
+void Viewer::resizeEvent(QResizeEvent  * event)
+{/*{{{*/
+	QGraphicsView::resizeEvent(event);
+	//statusBar->setWidth(event->size()->width());
+}/*}}}*/
+
+//#include <QGraphicsSceneMouseEvent>
+//#include <QApplication>
 void Viewer::mouseReleaseEvent( QMouseEvent* event )
 {
   
+// WORKAROUND Qt4.4 regression where mouseReleaseEvent are not forwarded to QGraphicsItem
+// is this problem still there with Qt4.6 ? Disabling it because it is messing with
+// DragMode ScrollHandDrag (not releasing the drag)
+#if 0
   if( QGraphicsItem* qgi = itemAt(event->pos() ) )
   {
     ImageView* iv = dynamic_cast<ImageView*>( qgi->group() );
@@ -238,10 +357,42 @@ void Viewer::mouseReleaseEvent( QMouseEvent* event )
       return;
     }
   }
-  QGraphicsView::mouseReleaseEvent( event );
-}
 #endif
 
+	QGraphicsView::mouseReleaseEvent( event );
+	viewport()->unsetCursor();
+	viewport()->setCursor(*(this->crossCursor));
+}
+
+//------------------------------- Mouse Move Events 
+void Viewer::mouseMoveEvent( QMouseEvent* event )
+{/*{{{*/
+	QGraphicsView::mouseMoveEvent( event );
+	QPointF cursorPosition = event->posF();
+
+	// Left aligned text for x position. Precision of 3 digits on a raw number (no scientific style)
+	QString infoString = QString("Cursor position : %1").arg((double)(cursorPosition.x()), -10, 'f', 5);
+	// Right aligned text for y position. Precision of 3 digits on a raw number (no scientific style)
+	QString yposString = QString(", %1").arg((double)(cursorPosition.y()), -10, 'f', 5);
+	// Composition the string to display
+	infoString.append(yposString);
+
+	// Updating status message
+	setStatusMessage( infoString);
+}/*}}}*/
+
+//------------------------------------- Displaying messages in the status bar
+void Viewer::setStatusMessage(QString& infoString, int timeout)
+{/*{{{*/
+	statusBar->showMessage( infoString, timeout);
+} /*}}}*/
+
+void Viewer::setStatusMessage(const char* infoString, int timeout)
+{/*{{{*/
+	statusBar->showMessage(QString(infoString), timeout);
+} /*}}}*/
+
+//------------------------------------- Exporting the view
 void Viewer::exportView()
 {
   QString fileName = QFileDialog::getSaveFileName ( 0, "Export viewer content", "", "PDF Document (*.pdf);;Postscript (*.ps);;PNG Image (*.png);;Tiff Image (*.tiff);;Scalable Vector Graphics (*.svg)" );

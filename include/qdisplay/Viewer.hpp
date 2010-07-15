@@ -2,6 +2,7 @@
 #define _QDISPLAY_VIEWER_H_
 
 #include <QGraphicsView>
+#include <QStatusBar>
 
 #include <QMap>
 
@@ -76,20 +77,35 @@ class Viewer : public QGraphicsView {
      * Close the view
      */
     void close();
+
     void setTitle(const std::string& _title );
 		std::string const& getTitle() { return title; }
-  public slots:
-    void exportView();
-  public:
+
+	/** Set the status message appearing in the status bar
+	 * @param infoString QString(const char*) object. String object to display
+	 * @param timeout Milliseconds before the message disappears (same effect as statusBar->clearMessage())
+	 */
+	void setStatusMessage(QString& infoString, int timeout=0);
+
+	/** Overloading of function setStatusMessage(QString&, int)
+	 * @param infoString String to display
+	 * @param timeout Milliseconds before the message disappears (same effect as statusBar->clearMessage())
+	 */
+	void setStatusMessage(const char* infoString, int timeout=0);
+
     /**
      * Export the view to the given file name.
      */
     void exportView( const std::string& fileName );
+  public slots:
+    void exportView();
   protected:
     virtual void contextMenuEvent ( QContextMenuEvent * event );
-    //virtual void mouseReleaseEvent ( QMouseEvent * event );
     virtual void keyPressEvent ( QKeyEvent * event );
     virtual void wheelEvent(QWheelEvent *event);
+	virtual void resizeEvent(QResizeEvent  * event);
+    virtual void mouseReleaseEvent ( QMouseEvent * event );
+    virtual void mouseMoveEvent ( QMouseEvent * event );
   private:
     QGraphicsScene* m_scene;
     QMap< int, QMap< int, ImageView* > > m_imageMosaic;
@@ -98,6 +114,19 @@ class Viewer : public QGraphicsView {
     double m_currentZ;
     QAction *m_exportView;
 		std::string title;
+	/** This cursor is a custom cursor created in the Viewer constructor to
+	 * provide a precise cross cursor similar to the crossHair cursor without
+	 * double bars
+	 */
+	QCursor* crossCursor;
+	/** Draw the custom cursor crossCursor by build our own QPixmap and
+	 * adjusting the perfect hostpot for precise pointing 
+	 */
+	void createCursor();
+
+	/** Status bar to display information  statusBar->showMessage( QString) */
+	QStatusBar *statusBar;
+
 };
 
 }

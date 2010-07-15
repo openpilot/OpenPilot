@@ -50,7 +50,9 @@ class ImageView : public QObject, public QGraphicsItemGroup {
      * @param li a Line to display on the scene.
      */
     void addLine(Line* li);
+
     void addPolyLine(qdisplay::PolyLine* pl);
+
     /**
      * Define the event handler for this view
      * @param eh the event handler
@@ -58,7 +60,10 @@ class ImageView : public QObject, public QGraphicsItemGroup {
      * this view is deleted
      */
     inline void setEventHandler(AbstractEventHandler* eh) { m_eventHandler = eh; }
+
+	/** Exports the view to different image format */
     void exportView( const std::string& _fileName );
+
   public slots:
     void lutRandomize();
     void lutGrayscale();

@@ -63,7 +63,7 @@ D: Artwork including display dials
 
 N: Ken Northup
 E: helos360 (at) bellsouth (dot) net
-D: 3D Modelling for the GCS  
+D: Test 3D Modelling, unused in production.  
 
 N: Guy McCaldin 
 E: guymcc (at) gmail (dot) com

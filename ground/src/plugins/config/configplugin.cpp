@@ -3,11 +3,11 @@
  *
  * @file       configplugin.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief
- * @see        The GNU Public License (GPL) Version 3
- * @defgroup   configplugin
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- *
+ * @addtogroup ConfigPlugin Config Plugin
+ * @{
+ * @brief The Configuration Gadget used to update settings in the firmware
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify

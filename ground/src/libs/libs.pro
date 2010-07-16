@@ -5,13 +5,10 @@ SUBDIRS   = \
     qtconcurrent \
     aggregation \
     extensionsystem \
-    qmapcontrol \
     opmapcontrol \
     qwt \
     qextserialport \
     utils \
     glc_lib\
     qymodem \
-    libqxt# \
-   # opmapcontrol
-
+    libqxt

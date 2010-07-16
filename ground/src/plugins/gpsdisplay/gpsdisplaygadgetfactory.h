@@ -3,11 +3,11 @@
  *
  * @file       gpsdisplaygadgetfactory.h
  * @author     Edouard Lafargue Copyright (C) 2010.
- * @brief
- * @see        The GNU Public License (GPL) Version 3
- * @defgroup   gpsdisplayplugin
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- *
+ * @addtogroup GPSGadgetPlugin GPS Gadget Plugin
+ * @{
+ * @brief A gadget that displays GPS status and enables basic configuration 
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify

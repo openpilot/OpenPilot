@@ -4,13 +4,13 @@
  * @file       texteditloggerengine.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Qxt Foundation http://www.libqxt.org Copyright (C)
- * @brief      
- * @see        The GNU Public License (GPL) Version 3
- * @defgroup   consoleplugin
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- * 
+ * @addtogroup ConsolePlugin Console Plugin
+ * @{
+ * @brief The Console Gadget impliments a console view 
  *****************************************************************************/
-/* 
+/*
  * This program is free software; you can redistribute it and/or modify 
  * it under the terms of the GNU General Public License as published by 
  * the Free Software Foundation; either version 3 of the License, or 

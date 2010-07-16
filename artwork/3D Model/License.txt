@@ -1,2 +1,0 @@
-The files in collada format (.dae) are Copyright Ken Northup and were created for OpenPilot, these models are freely distributed.
-

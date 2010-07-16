@@ -1,7 +1,0 @@
-<RCC>
-    <qresource prefix="/map">
-        <file>images/uav.png</file>
-        <file>images/gcs.png</file>
-        <file>images/waypoint.png</file>
-    </qresource>
-</RCC>

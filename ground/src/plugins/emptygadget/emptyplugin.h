@@ -3,11 +3,11 @@
  *
  * @file       emptyplugin.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief
- * @see        The GNU Public License (GPL) Version 3
- * @defgroup   emptyplugin
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- *
+ * @addtogroup EmptyGadgetPlugin Empty Gadget Plugin
+ * @{
+ * @brief A place holder gadget plugin 
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify

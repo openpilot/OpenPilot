@@ -3,11 +3,11 @@
  *
  * @file       lineardialgadgetwidget.cpp
  * @author     Edouard Lafargue Copyright (C) 2010.
- * @brief
- * @see        The GNU Public License (GPL) Version 3
- * @defgroup   lineardialplugin
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- *
+ * @addtogroup LinearDialPlugin Linear Dial Plugin
+ * @{
+ * @brief Impliments a gadget that displays linear gauges 
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify

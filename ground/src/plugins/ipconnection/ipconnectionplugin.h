@@ -3,11 +3,11 @@
  *
  * @file       IPconnectionplugin.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief
- * @see        The GNU Public License (GPL) Version 3
- * @defgroup   IPconnectionplugin
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- *
+ * @addtogroup IPConnPlugin IP Telemetry Plugin
+ * @{
+ * @brief IP Connection Plugin impliment telemetry over TCP/IP and UDP/IP
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify

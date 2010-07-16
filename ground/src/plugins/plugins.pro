@@ -45,12 +45,6 @@ plugin_uavtalk.subdir = uavtalk
 plugin_uavtalk.depends = plugin_uavobjects
 plugin_uavtalk.depends += plugin_coreplugin
 
-# Map UAVGadget
-plugin_map.subdir = map
-plugin_map.depends = plugin_coreplugin
-plugin_map.depends = plugin_uavobjects
-SUBDIRS += plugin_map
-
 # OPMap UAVGadget
 plugin_opmap.subdir = opmap
 plugin_opmap.depends = plugin_coreplugin

@@ -3,11 +3,11 @@
  *
  * @file       lineardialgadgetoptionspage.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Linear Dial Plugin Gadget options page
- * @see        The GNU Public License (GPL) Version 3
- * @defgroup   lineardialplugin
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- *
+ * @addtogroup LinearDialPlugin Linear Dial Plugin
+ * @{
+ * @brief Impliments a gadget that displays linear gauges 
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify

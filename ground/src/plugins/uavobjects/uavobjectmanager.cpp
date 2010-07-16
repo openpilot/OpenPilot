@@ -1,14 +1,14 @@
 /**
  ******************************************************************************
  *
+ * @file       uavobjectmanager.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup UAVObjectsPlugin UAVObjects Plugin
  * @{
- * @brief The UAVUObjects GCS plugin
- * @file       uavobjectmanager.cpp
+ * @brief      The UAVUObjects GCS plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify 

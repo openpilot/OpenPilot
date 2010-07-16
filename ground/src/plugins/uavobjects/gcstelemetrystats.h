@@ -1,19 +1,19 @@
 /**
  ******************************************************************************
  *
+ * @file       gcstelemetrystats.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup UAVObjectsPlugin UAVObjects Plugin
  * @{
- * @brief      The UAVUObjects GCS plugin 
  *   
  * @note       Object definition file: gcstelemetrystats.xml. 
  *             This is an automatically generated file.
  *             DO NOT modify manually.
  *
- * @file       gcstelemetrystats.h
+ * @brief      The UAVUObjects GCS plugin 
  *****************************************************************************/
 /* 
  * This program is free software; you can redistribute it and/or modify 

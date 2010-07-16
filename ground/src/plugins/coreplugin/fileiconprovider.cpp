@@ -4,13 +4,13 @@
  * @file       fileiconprovider.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
- * @see        The GNU Public License (GPL) Version 3
- * @defgroup   coreplugin
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- * 
+ * @addtogroup CorePlugin Core Plugin
+ * @{
+ * @brief The Core GCS plugin
  *****************************************************************************/
-/* 
+/*
  * This program is free software; you can redistribute it and/or modify 
  * it under the terms of the GNU General Public License as published by 
  * the Free Software Foundation; either version 3 of the License, or 

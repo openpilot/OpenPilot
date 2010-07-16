@@ -2,12 +2,12 @@
  ******************************************************************************
  *
  * @file       dialgadgetfactory.cpp
- * @author     Edouard Lafargue and David Carlson Copyright (C) 2010.
- * @brief
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   dialplugin 
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- *
+ * @addtogroup DialPlugin Dial Plugin
+ * @brief 
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify

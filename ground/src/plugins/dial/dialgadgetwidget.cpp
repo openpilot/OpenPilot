@@ -2,12 +2,12 @@
  ******************************************************************************
  *
  * @file       dialgadgetwidget.cpp
- * @author     Edouard Lafargue and David Carlson Copyright (C) 2010.
- * @brief      The main widget, where most action takes place
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   dialplugin
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- *
+ * @addtogroup DialPlugin Dial Plugin
+ * @brief The main widget, where most action takes place
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify

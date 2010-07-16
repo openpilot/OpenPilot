@@ -3,11 +3,11 @@
  *
  * @file       dialgadgetoptionspage.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Airspeed Plugin Gadget options page
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   dialplugin
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- *
+ * @addtogroup DialPlugin Dial Plugin
+ * @brief Dial Plugin Gadget configuration
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify

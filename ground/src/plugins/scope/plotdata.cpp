@@ -3,11 +3,11 @@
  *
  * @file       plotdata.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Implementation of plotdata.
- * @see        The GNU Public License (GPL) Version 3
- * @defgroup   scopeplugin
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- *
+ * @addtogroup ScopePlugin Scope Gadget Plugin
+ * @{
+ * @brief The scope Gadget, graphically plots the states of UAVObjects
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify

@@ -3,11 +3,11 @@
  *
  * @file       pfdgadgetfactory.h
  * @author     Edouard Lafargue Copyright (C) 2010.
- * @brief
- * @see        The GNU Public License (GPL) Version 3
- * @defgroup   pfdplugin
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- *
+ * @addtogroup OPMapPlugin Primary Flight Display Plugin
+ * @{
+ * @brief The Primary Flight Display Gadget 
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify

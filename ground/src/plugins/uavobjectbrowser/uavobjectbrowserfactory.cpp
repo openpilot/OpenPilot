@@ -3,11 +3,11 @@
  *
  * @file       uavobjectbrowserfactory.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief
- * @see        The GNU Public License (GPL) Version 3
- * @defgroup   uavobjectbrowserplugin
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- *
+ * @addtogroup UAVObjectBrowserPlugin UAVObject Browser Plugin
+ * @{
+ * @brief The UAVObject Browser gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify

@@ -3,11 +3,11 @@
  *
  * @file       systemhealthgadgetwidget.cpp
  * @author     Edouard Lafargue Copyright (C) 2010.
- * @brief      System Health widget, does the actual drawing
- * @see        The GNU Public License (GPL) Version 3
- * @defgroup   systemhealthplugin
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- *
+ * @addtogroup SystemHealthPlugin System Health Plugin
+ * @{
+ * @brief The System Health gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify

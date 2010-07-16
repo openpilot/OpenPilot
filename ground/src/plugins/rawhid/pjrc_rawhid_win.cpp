@@ -1,3 +1,11 @@
+/* @file pjrc_rawhid_windows.cpp
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup RawHIDPlugin Raw HID Plugin
+ * @{
+ * @brief Impliments a HID USB connection to the flight hardware as a QIODevice
+ *****************************************************************************/
+
 /* Simple Raw HID functions for Windows - for use with Teensy RawHID example
  * http://www.pjrc.com/teensy/rawhid.html
  * Copyright (c) 2009 PJRC.COM, LLC

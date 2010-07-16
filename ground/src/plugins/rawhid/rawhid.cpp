@@ -3,11 +3,11 @@
  *
  * @file       rawhid.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      QIODevice interface for USB RawHID
- * @see        The GNU Public License (GPL) Version 3
- * @defgroup   rawhidplugin
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- *
+ * @addtogroup RawHIDPlugin Raw HID Plugin
+ * @{
+ * @brief Impliments a HID USB connection to the flight hardware as a QIODevice
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify

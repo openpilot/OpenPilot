@@ -3,11 +3,11 @@
  *
  * @file       systemhealthgadgetconfiguration.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      System Health Plugin Gadget configuration
- * @see        The GNU Public License (GPL) Version 3
- * @defgroup   systemhealthplugin
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- *
+ * @addtogroup SystemHealthPlugin System Health Plugin
+ * @{
+ * @brief The System Health gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify

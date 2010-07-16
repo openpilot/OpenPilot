@@ -3,13 +3,13 @@
  *
  * @file       serialplugin.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Register connection object for the core connection manager
- * @see        The GNU Public License (GPL) Version 3
- * @defgroup   serialplugin
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- * 
+ * @addtogroup SerialPlugin Serial Connection Plugin
+ * @{
+ * @brief Impliments serial connection to the flight hardware for Telemetry
  *****************************************************************************/
-/* 
+/*
  * This program is free software; you can redistribute it and/or modify 
  * it under the terms of the GNU General Public License as published by 
  * the Free Software Foundation; either version 3 of the License, or 

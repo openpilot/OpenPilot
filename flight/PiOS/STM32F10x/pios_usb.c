@@ -6,7 +6,10 @@
  * 		Parts by Thorsten Klose (tk@midibox.org)
  * @brief      USB functions
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   PIOS_USB USB Functions
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup   PIOS_USB USB Functions
+ * @brief STM32 Hardware USB functions
  * @{
  *
  *****************************************************************************/

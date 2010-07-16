@@ -5,6 +5,9 @@
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      External Interrupt Handlers
  * @see        The GNU Public License (GPL) Version 3
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_EXTI External Interrupt Handlers
  * @{
  *
  *****************************************************************************/
@@ -68,3 +71,8 @@ void EXTI4_IRQHandler(void)
 }
 #endif
 #endif
+
+/**
+  * @}
+  * @}
+  */

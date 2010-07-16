@@ -7,7 +7,10 @@
  * @brief      Delay Functions 
  *                 - Provides a micro-second granular delay using a TIM 
  * @see        The GNU Public License (GPL) Version 3
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
  * @defgroup   PIOS_DELAY Delay Functions
+ * @brief PiOS Delay functionality
  * @{
  *
  *****************************************************************************/

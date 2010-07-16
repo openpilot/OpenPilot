@@ -14,6 +14,13 @@
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
 
+/**
+  * @addtogroup PIOS PIOS
+  * @{
+  * @addtogroup FreeRTOS FreeRTOS
+  * @{
+  */
+
 /* Notes: We use 5 task priorities */  
 
 #define configUSE_PREEMPTION		1
@@ -68,6 +75,10 @@ priority values, 0 to 15.  This must correspond to the
 configKERNEL_INTERRUPT_PRIORITY setting.  Here 15 corresponds to the lowest
 NVIC value of 255. */
 #define configLIBRARY_KERNEL_INTERRUPT_PRIORITY	15
+
+/**
+  * @}
+  */
 
 #endif /* FREERTOS_CONFIG_H */
 

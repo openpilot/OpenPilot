@@ -3,9 +3,12 @@
  *
  * @file       pios_opahrs.c  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      IRQ Enable/Disable routines
+ * @brief      Hardware commands to communicate with the AHRS
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   PIOS_OPAHRS OPAHRS Functions
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_OPAHRS OPAHRS Functions
+ * @brief STM32 Hardware code to interface to the OpenPilot AHRS module
  * @{
  * 
  *****************************************************************************/
@@ -265,3 +268,8 @@ enum opahrs_result PIOS_OPAHRS_GetAttitude(struct opahrs_msg_v1 *rsp)
 }
 
 #endif /* PIOS_INCLUDE_OPAHRS */
+
+/**
+ * @}
+ * @}
+ */

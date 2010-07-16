@@ -56,6 +56,13 @@
 	#error "#include FreeRTOS.h" must appear in source files before "#include task.h"
 #endif
 
+/**
+ * @author FreeRTOS
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup FreeRTOS FreeRTOS Operating system
+ * @{
+ */
 
 
 #ifndef TASK_H

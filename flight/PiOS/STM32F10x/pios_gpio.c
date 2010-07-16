@@ -5,7 +5,10 @@
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      GPIO functions, init, toggle, on & off.
  * @see        The GNU Public License (GPL) Version 3
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
  * @defgroup   PIOS_GPIO GPIO Functions
+ * @brief GPIO hardware code for STM32
  * @{
  *
  *****************************************************************************/
@@ -94,3 +97,8 @@ void PIOS_GPIO_Toggle(uint8_t Pin)
 }
 
 #endif
+
+/**
+  * @}
+  * @}
+  */

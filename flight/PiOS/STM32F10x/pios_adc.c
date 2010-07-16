@@ -6,9 +6,11 @@
  * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
  * @brief      Analog to Digital converstion routines
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   PIOS_ADC ADC Functions
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * 
+ * @addtogroup   PIOS_ADC ADC Functions
+ * @brief Analog to Digital PIOS interface
+ * @{
  *****************************************************************************/
 /* 
  * This program is free software; you can redistribute it and/or modify 
@@ -204,5 +206,10 @@ void DMA1_Channel1_IRQHandler(void)
 	/* Request next conversion */
 	ADC_SoftwareStartConvCmd(ADC1, ENABLE);
 }
+
+/** 
+  * @}
+  * @}
+  */
 
 #endif

@@ -6,7 +6,10 @@
  * 	       Parts by Thorsten Klose (tk@midibox.org)
  * @brief      Sets up basic system hardware, functions are called from Main.
  * @see        The GNU Public License (GPL) Version 3
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
  * @defgroup   PIOS_SDCARD SDCard Functions
+ * @brief STM32 Hardware code to deal with writing to flash
  * @{
  *
  *****************************************************************************/
@@ -1008,3 +1011,8 @@ int32_t PIOS_SDCARD_FileDelete(char *Filename)
 }
 
 #endif
+
+/**
+  * @}
+  * @}
+  */

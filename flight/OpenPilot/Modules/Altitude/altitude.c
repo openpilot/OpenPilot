@@ -7,6 +7,12 @@
  *
  * @see        The GNU Public License (GPL) Version 3
  *
+ /**
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ * @addtogroup AltitudeModule Altitude Module
+ * @brief Communicate with BMP085 and update @ref AltitudeActual "AltitudeActual UAV Object"
+ * @{ 
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -33,17 +39,6 @@
 
 #include "openpilot.h"
 #include "altitudeactual.h" // object that will be updated by the module
-
-/**
- * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
- */
-
-/**
- * @addtogroup AltitudeModule Altitude Module
- * @brief Communicate with BMP085 and update AltitudeActual
- * @{ 
- */
 
 // Private constants
 #define STACK_SIZE configMINIMAL_STACK_SIZE

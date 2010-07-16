@@ -6,7 +6,10 @@
  * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
  * @brief      USART commands. Inits USARTs, controls USARTs & Interrupt handlers.
  * @see        The GNU Public License (GPL) Version 3
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
  * @defgroup   PIOS_SPEKTRUM USART Functions
+ * @brief STM32 Hardware code to read Spektrum input
  * @{
  *
  *****************************************************************************/
@@ -235,3 +238,8 @@ PIOS_USART3_IRQHANDLER_FUNC
 }
 
 #endif
+
+/** 
+  * @}
+  * @}
+  */

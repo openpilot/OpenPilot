@@ -6,7 +6,10 @@
  * 		Parts by Thorsten Klose (tk@midibox.org)
  * @brief      USB HID functions
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   PIOS_USB_HID USB HID Functions
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup   PIOS_USB_HID USB HID Functions
+ * @brief STM32 Hardware HID functions
  * @notes      This implements a very simple HID device with a simple data in
  * and data out endpoints.
  * @{

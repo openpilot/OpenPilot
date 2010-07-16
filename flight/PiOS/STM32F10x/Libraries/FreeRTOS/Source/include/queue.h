@@ -56,7 +56,14 @@
 #endif
 
 
-
+/**
+ * @file queue.h
+ * @author FreeRTOS
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup FreeRTOS FreeRTOS Operating system
+ * @{
+ */
 
 #ifndef QUEUE_H
 #define QUEUE_H

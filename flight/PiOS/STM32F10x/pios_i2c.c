@@ -6,6 +6,8 @@
  * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
  * @brief      I2C Enable/Disable routines
  * @see        The GNU Public License (GPL) Version 3
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
  * @defgroup   PIOS_I2C I2C Functions
  * @{
  * 
@@ -665,3 +667,8 @@ PIOS_I2C_IRQ_ER_HANDLER
 }
 
 #endif
+
+/**
+  * @}
+  * @}
+  */

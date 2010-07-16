@@ -36,11 +36,10 @@
 /**
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{ 
- */
-
-/**
  * @addtogroup StabilizationModule Stabilization Module
  * @brief Stabilization PID loops in an airframe type independent manner
+ * @note This object updates the @ref ActuatorDesired "Actuator Desired" based on the 
+ * PID loops on the @ref AttitudeDesired "Attitude Desired" and @ref AttitudeActual "Attitude Actual"
  * @{ 
  */
 

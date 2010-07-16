@@ -6,9 +6,13 @@
  * 	       Parts by Thorsten Klose (tk@midibox.org)
  * @brief      COM layer functions
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   PIOS_COM COM layer functions
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * 
+ * @addtogroup PIOS_COM COM layer functions
+ * @brief Hardware communication layer
+ * @{
+ */
+* 
  *****************************************************************************/
 /* 
  * This program is free software; you can redistribute it and/or modify 
@@ -24,7 +28,7 @@
  * You should have received a copy of the GNU General Public License along 
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- */
+ */		
 
 
 /* Project Includes */
@@ -46,10 +50,10 @@ static struct pios_com_dev * find_com_dev_by_id (uint8_t port)
 }
 
 /**
-* Initialises COM layer
-* \param[in] mode currently only mode 0 supported
-* \return < 0 if initialisation failed
-*/
+  * Initialises COM layer
+  * \param[in] mode currently only mode 0 supported
+  * \return < 0 if initialisation failed
+  */
 int32_t PIOS_COM_Init(void)
 {
 	int32_t ret = 0;
@@ -283,3 +287,8 @@ int32_t PIOS_COM_ReceiveBufferUsed(uint8_t port)
 }
 
 #endif
+
+/**
+ * @}
+ * @}
+ */

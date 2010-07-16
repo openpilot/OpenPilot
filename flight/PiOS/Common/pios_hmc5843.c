@@ -5,10 +5,15 @@
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      HMC5843 Magnetic Sensor Functions
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   PIOS_HMC5843 HMC5843 Functions
+ *
+ /**
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * 
- *****************************************************************************/
+ * @addtogroup PIOS_HMC5843 HMC5843 Functions
+ * @brief Deals with the hardware interface to the magnetometers
+ * @{
+ ******************************************************************************
+ */
 /* 
  * This program is free software; you can redistribute it and/or modify 
  * it under the terms of the GNU General Public License as published by 
@@ -36,8 +41,8 @@
 /* Local Variables */
 
 /**
-* Initialise the HMC5843 sensor
-*/
+  * @brieft Initialise the HMC5843 sensor
+  */
 void PIOS_HMC5843_Init(void)
 {
 	// Nothing to do here
@@ -240,3 +245,8 @@ int32_t PIOS_HMC5843_Write(uint8_t address, uint8_t buffer)
 }
 
 #endif
+
+/**
+ * @}
+ * @}
+ */

@@ -1,11 +1,14 @@
 /**
  ******************************************************************************
  *
- * @file       pios_sys.c
+ * @file       pios_usb_com.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.
  * @brief      Sets up basic system hardware, functions are called from Main.
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   PIOS_SYS System Functions
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_SYS System Functions
+ * @brief STM32 Hardware USB communication code
  * @{
  *
  *****************************************************************************/
@@ -500,3 +503,8 @@ s32 PIOS_USB_COM_CB_NoData_Setup(u8 RequestNo)
 }
 
 #endif
+
+/**
+  * @}
+  * @}
+  */

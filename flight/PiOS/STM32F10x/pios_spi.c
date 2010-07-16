@@ -6,7 +6,10 @@
  * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
  * @brief      Hardware Abstraction Layer for SPI ports of STM32
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   PIOS_SPI SPI Functions
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup   PIOS_SPI SPI Functions
+ * @brief STM32 Hardware SPI code
  * @notes
  *
  * Note that additional chip select lines can be easily added by using
@@ -445,3 +448,8 @@ void PIOS_SPI_IRQ_Handler(uint8_t spi)
 }
 
 #endif
+
+/**
+  * @}
+  * @}
+  */

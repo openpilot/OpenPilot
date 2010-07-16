@@ -51,6 +51,15 @@
     licensing and training services.
 */
 
+/**
+ * @file port.c
+ * @author FreeRTOS
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup FreeRTOS FreeRTOS Operating system
+ * @{
+ */
+
 /*-----------------------------------------------------------
  * Implementation of functions defined in portable.h for the ARM CM3 port.
  *----------------------------------------------------------*/

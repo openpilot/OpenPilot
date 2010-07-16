@@ -5,7 +5,10 @@
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      RC Servo routines
  * @see        The GNU Public License (GPL) Version 3
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
  * @defgroup   PIOS_SERVO RC Servo Functions
+ * @brief STM32 Hardware code to do RC servo output
  * @{
  * 
  *****************************************************************************/

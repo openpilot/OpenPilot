@@ -5,7 +5,10 @@
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      PWM Input functions
  * @see        The GNU Public License (GPL) Version 3
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
  * @defgroup   PIOS_PWM PWM Input Functions
+ * @brief STM32 Hardware code to deal with PWM input
  * @{
  *
  *****************************************************************************/
@@ -404,3 +407,8 @@ PIOS_PWM_SUPV_IRQ_FUNC
 }
 
 #endif
+
+/** 
+  * @}
+  * @}
+  */

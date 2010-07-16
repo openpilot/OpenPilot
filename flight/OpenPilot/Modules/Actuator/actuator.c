@@ -27,13 +27,10 @@
 /**
   * @addtogroup OpenPilotModules OpenPilot Modules
   * @{ 
+  * @addtogroup ActuatorModule Actuator Module
+  * @brief Compute servo/motor settings based on @ref ActuatorDesired "desired actuator positions" and aircraft type
+  * @{ 
   */
-
-/**
- * @addtogroup ActuatorModule Actuator Module
- * @brief Compute servo/motor settings based on desired actuator positions and aircraft type
- * @{ 
- */
 
 #include "openpilot.h"
 #include "actuator.h"

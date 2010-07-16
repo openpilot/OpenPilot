@@ -55,7 +55,14 @@
 	#error "#include FreeRTOS.h" must appear in source files before "#include croutine.h"
 #endif
 
-
+/**
+ * @file croutine.h
+ * @author FreeRTOS
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup FreeRTOS FreeRTOS Operating system
+ * @{
+ */
 
 
 #ifndef CO_ROUTINE_H

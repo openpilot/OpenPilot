@@ -55,6 +55,15 @@
 #include "task.h"
 #include "croutine.h"
 
+/**
+ * @file croutine.c
+ * @author FreeRTOS
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup FreeRTOS FreeRTOS Operating system
+ * @{
+ */
+
 /*
  * Some kernel aware debuggers require data to be viewed to be global, rather
  * than file scope.

@@ -6,7 +6,10 @@
  * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
  * @brief      Sets up basic system hardware, functions are called from Main.
  * @see        The GNU Public License (GPL) Version 3
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
  * @defgroup   PIOS_SYS System Functions
+ * @brief Initialization code for STM32
  * @{
  *
  *****************************************************************************/
@@ -192,3 +195,8 @@ void assert_failed(uint8_t* file, uint32_t line)
 #endif
 
 #endif
+
+/**
+  * @}
+  * @}
+  */

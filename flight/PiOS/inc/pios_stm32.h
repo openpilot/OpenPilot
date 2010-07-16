@@ -5,6 +5,10 @@
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Types that are specific to the STM32 peripherals
  * @see        The GNU Public License (GPL) Version 3
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_STM32 STM32 HAL
+ * @{
  *
  *****************************************************************************/
 /* 
@@ -48,5 +52,10 @@ struct stm32_gpio {
   GPIO_TypeDef          * gpio;
   GPIO_InitTypeDef        init;
 };
+
+/**
+  * @}
+  * @}
+  */
 
 #endif /* PIOS_STM32_H */

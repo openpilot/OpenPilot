@@ -51,6 +51,14 @@
     licensing and training services.
 */
 
+/**
+ * @file list.c
+ * @author FreeRTOS
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup FreeRTOS FreeRTOS Operating system
+ * @{
+ */
 
 #include <stdlib.h>
 #include "FreeRTOS.h"

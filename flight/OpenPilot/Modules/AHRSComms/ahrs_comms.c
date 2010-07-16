@@ -7,7 +7,15 @@
  *
  * @see        The GNU Public License (GPL) Version 3
  *
- *****************************************************************************/
+ *
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ * @addtogroup AHRSCommsModule AHRSComms Module
+ * @brief Handles communication with AHRS and updating position
+ * Specifically updates the the @ref AttitudeActual "AttitudeActual" and @ref HeadingActual "HeadingActual" settings objects
+ * @{ 
+ *
+ ******************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,18 +61,6 @@
 
 #include "pios_opahrs.h" // library for OpenPilot AHRS access functions
 #include "pios_opahrs_proto.h"
-
-/**
- * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
- */
-
-/**
- * @addtogroup AHRSCommsModule AHRSComms Module
- * @brief Handles communication with AHRS and updating position
- * Specifically updates the the AttitudeActual and HeadingActual settings objects
- * @{ 
- */
 
 // Private constants
 #define STACK_SIZE 400
@@ -192,3 +188,8 @@ static void update_ahrs_status(struct opahrs_msg_v1_rsp_serial * serial)
 
   AhrsStatusSet(&data);
 }
+
+/**
+  * @}
+  * @}
+  */

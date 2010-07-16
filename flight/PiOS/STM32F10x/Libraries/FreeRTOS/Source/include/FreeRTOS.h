@@ -54,6 +54,14 @@
 #ifndef INC_FREERTOS_H
 #define INC_FREERTOS_H
 
+/**
+ * @file FreeRTOS.h
+ * @author FreeRTOS
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup FreeRTOS FreeRTOS Operating system
+ * @{
+ */
 
 /*
  * Include the generic headers required for the FreeRTOS port being used.

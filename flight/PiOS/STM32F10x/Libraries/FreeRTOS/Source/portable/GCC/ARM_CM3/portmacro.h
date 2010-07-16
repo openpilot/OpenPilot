@@ -55,6 +55,15 @@
 #ifndef PORTMACRO_H
 #define PORTMACRO_H
 
+/**
+ * @file portmacro.h
+ * @author FreeRTOS
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup FreeRTOS FreeRTOS Operating system
+ * @{
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

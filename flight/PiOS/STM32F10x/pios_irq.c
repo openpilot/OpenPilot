@@ -6,7 +6,10 @@
  * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
  * @brief      IRQ Enable/Disable routines
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   PIOS_IRQ IRQ Setup Functions
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @defgroup PIOS_IRQ IRQ Setup Functions
+ * @brief STM32 Hardware code to enable and disable interrupts
  * @{
  * 
  *****************************************************************************/
@@ -101,3 +104,8 @@ int32_t PIOS_IRQ_Enable(void)
 }
 
 #endif
+
+/**
+  * @}
+  * @}
+  */

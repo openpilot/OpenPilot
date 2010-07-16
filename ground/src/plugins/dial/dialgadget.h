@@ -5,8 +5,8 @@
  * @author     Edouard Lafargue and David Carlson Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
  * @addtogroup GCSPlugins GCS Plugins
- * @{
  * @addtogroup DialPlugin Dial Plugin
+ * @{
  * @brief
  *****************************************************************************/
 /*

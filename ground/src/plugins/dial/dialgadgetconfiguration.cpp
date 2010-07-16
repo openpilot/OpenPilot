@@ -5,8 +5,8 @@
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
  * @addtogroup GCSPlugins GCS Plugins
- * @{
  * @addtogroup DialPlugin Dial Plugin
+ * @{
  * @brief Dial Plugin Gadget configuration
  *****************************************************************************/
 /*

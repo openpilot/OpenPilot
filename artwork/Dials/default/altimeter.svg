@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+<!-- Copyright 2010 Edouard Lafargue (edouard@lafargue.name). -->
+<!-- Licence: CC-BY-SA -->
 
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -721,7 +723,7 @@
      transform="translate(-228.56377,-366.85416)"
      style="display:inline"
      inkscape:label="Altimeter small needle (rotating)"
-     id="needle"
+     id="needle2"
      inkscape:groupmode="layer"
      sodipodi:insensitive="true">
     <g
@@ -763,7 +765,7 @@
      transform="translate(-228.56377,-366.85416)"
      style="display:inline"
      inkscape:label="Altimeter large needle (rotating)"
-     id="needle2"
+     id="needle"
      inkscape:groupmode="layer">
     <g
        id="g4454"

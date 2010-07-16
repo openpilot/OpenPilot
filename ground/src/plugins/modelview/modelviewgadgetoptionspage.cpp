@@ -3,13 +3,13 @@
  *
  * @file       modelviewgadgetoptionspage.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      
- * @see        The GNU Public License (GPL) Version 3
- * @defgroup   modelviewplugin
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- * 
+ * @addtogroup ModelViewPlugin ModelView Plugin
+ * @{
+ * @brief A gadget that displays a 3D representation of the UAV 
  *****************************************************************************/
-/* 
+/*
  * This program is free software; you can redistribute it and/or modify 
  * it under the terms of the GNU General Public License as published by 
  * the Free Software Foundation; either version 3 of the License, or 

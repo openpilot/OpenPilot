@@ -3,11 +3,11 @@
  *
  * @file       opmapgadgetoptionspage.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief
- * @see        The GNU Public License (GPL) Version 3
- * @defgroup   opmap
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- *
+ * @addtogroup OPMapPlugin OpenPilot Map Plugin
+ * @{
+ * @brief The OpenPilot Map plugin 
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify

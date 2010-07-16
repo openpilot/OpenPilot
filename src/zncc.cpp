@@ -17,12 +17,10 @@ namespace correl {
 		JFR_PRECOND( im1_.channels() == im2_.channels(), "The channels number of both images are different" );
 		JFR_PRECOND( !useWeightMatrix || weightMatrix, "Template parameter tells to use weightMatrix but no one is given" );
 		
+		// adjust ROIs to match size, assuming that it is reduced when set out of the image
+		// FIXME weightMatrix should be a cv::Mat in order to have a ROI too, and to adjust it
 		cv::Size size1; cv::Rect roi1 = im1_.getROI(size1);
 		cv::Size size2; cv::Rect roi2 = im2_.getROI(size2);
-//		JFR_PRECOND( roi1.width  == roi2.width , "The width of both images or roi are different" );
-//		JFR_PRECOND( roi1.height == roi2.height, "The height of both images or roi are different" );
-
-		// FIXME weightMatrix should be a cv::Mat in order to have a ROI too, and to adjust it
 		int dw = roi1.width - roi2.width, dh = roi1.height - roi2.height;
 		if (dw != 0)
 		{
@@ -38,32 +36,15 @@ namespace correl {
 			if (roiA.y == 0) { roiB.y += dh; roiB.height -= dh; } else
 			if (roiA.y+roiA.height == sizeA.height) { roiB.height -= dh; }
 		}
-//		image::Image im1(im1_, cv::Rect(0,0,im1_.width(),im1_.height())); im1.setROI(roi1);
-//		image::Image im2(im2_, cv::Rect(0,0,im2_.width(),im2_.height())); im2.setROI(roi2);
 		image::Image im1(im1_); im1.setROI(roi1);
 		image::Image im2(im2_); im2.setROI(roi2);
-		JFR_PRECOND( im1.size()  == im2.size() , "The size of images or roi are different (" << im1.width() << "," << im1.height() << " != " << im2.width() << "," << im2.height() << ")" );
+
+		// some variables initialization
 		int height = im1.height();
 		int width = im1.width();
-		int step1 = im1.step()/sizeof(worktype) - width;
-		int step2 = im2.step()/sizeof(worktype) - width;
+		int step1 = im1.step1() - width;
+		int step2 = im2.step1() - width;
 		
-		// reduce rois if a part is outside of the image
-/*		int delta;
-		if (roi1.x < 0) { roi2.x -= roi1.x; roi2.width += roi1.x; roi1.width = roi2.width; roi1.x = 0; }
-		if (roi2.x < 0) { roi1.x -= roi2.x; roi1.width += roi2.x; roi2.width = roi1.width; roi2.x = 0; }
-		if (roi1.y < 0) { roi2.y -= roi1.y; roi2.height += roi1.y; roi1.height = roi2.height; roi1.y = 0; }
-		if (roi2.y < 0) { roi1.y -= roi2.y; roi1.height += roi2.y; roi2.height = roi1.height; roi2.y = 0; }
-		delta = im1.width()-(roi1.x+roi1.width); if (delta < 0) { roi1.width += delta; roi2.width = roi1.width; }
-		delta = im2.width()-(roi2.x+roi2.width); if (delta < 0) { roi2.width += delta; roi1.width = roi2.width; }
-		delta = im1.height()-(roi1.y+roi1.height); if (delta < 0) { roi1.height += delta; roi2.height = roi1.height; }
-		delta = im2.height()-(roi2.y+roi2.height); if (delta < 0) { roi2.height += delta; roi1.height = roi2.height; }
-*/
-		// some variables initialization
-/*		unsigned roi1_step, roi2_step;
-		roi1_step = im1.step() - roi1.width;
-		roi2_step = im2.step() - roi2.width;
-*/		
 		double mean1 = 0., mean2 = 0.;
 		double sigma1 = 0., sigma2 = 0.;
 		double zncc_sum = 0.;
@@ -72,8 +53,7 @@ namespace correl {
 		
 		worktype const* im1ptr = reinterpret_cast<worktype const*>(im1.data());
 		worktype const* im2ptr = reinterpret_cast<worktype const*>(im2.data());
-//		im1ptr += roi1.y*im1.step()+roi1.x;
-//		im2ptr += roi2.y*im2.step()+roi2.x;
+		
 		float const* wptr = weightMatrix;
 		double w;
 		
@@ -117,13 +97,14 @@ namespace correl {
 		}
 		
 		if (useBornes) if (zncc_count / zncc_total < 0.5)
-			{ /*std::cout << "zncc failed: " << zncc_count << "," << zncc_total << std::endl;*/ return -1; }
+			{ /*std::cout << "zncc failed: " << zncc_count << "," << zncc_total << std::endl;*/ return -3; }
 		
 		// finish
 		mean1 /= zncc_count;
 		mean2 /= zncc_count;
 		sigma1 = sqrt(sigma1/zncc_count - mean1*mean1);
 		sigma2 = sqrt(sigma2/zncc_count - mean2*mean2);
+// std::cout << "normal: zncc_sum " << zncc_sum << ", count " << zncc_count << ", mean12 " << mean1*mean2 << ", sigma12 " << sigma1*sigma2 << std::endl;
 		zncc_sum = (zncc_sum/zncc_count - mean1*mean2) / (sigma1*sigma2);
 		
 		return zncc_sum;
@@ -165,6 +146,11 @@ namespace correl {
 					return computeTpl<CV_32F, float,bool, 0,0,false,false>(im1,im2);
 				else
 					return computeTpl<CV_32F, float,bool, 0,0,false,true>(im1,im2,weightMatrix);
+			case CV_64F:
+				if (weightMatrix == NULL) // bool and no borne because cannot use a float as a template parameter, and anyway would be useless here
+					return computeTpl<CV_64F, double,bool, 0,0,false,false>(im1,im2);
+				else
+					return computeTpl<CV_64F, double,bool, 0,0,false,true>(im1,im2,weightMatrix);
 			default:
 				JFR_PRECOND(false, "Unknown image depth");
 				return FP_NAN;
@@ -275,5 +261,4 @@ namespace correl {
 
 
 
-}
-}
+}}

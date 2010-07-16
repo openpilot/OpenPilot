@@ -85,7 +85,8 @@ namespace jafar {
 
 
 						// 1c. predict search area and appearance
-						cv::Rect roi = gauss2rect(obsPtr->expectation.x(), obsPtr->expectation.P() + matcherParams_.measVar*identity_mat(2), matcherParams_.regionSigma);
+						//cv::Rect roi = gauss2rect(obsPtr->expectation.x(), obsPtr->expectation.P() + matcherParams_.measVar*identity_mat(2), matcherParams_.regionSigma);
+						image::ConvexRoi roi(obsPtr->expectation.x(), obsPtr->expectation.P() + matcherParams_.measVar*identity_mat(2), matcherParams_.regionSigma);
 						obsPtr->predictAppearance();
 
 						// 1d. match predicted feature in search area
@@ -153,16 +154,19 @@ namespace jafar {
 
 
     template<>
-    bool DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> >::
-		match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, cv::Rect &roi, Measurement & measure, const appearance_ptr_t & app)
+    bool DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::FastTranslationMatcherZncc>::
+		match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, image::ConvexRoi &roi, Measurement & measure, const appearance_ptr_t & app)
     {
 					app_img_pnt_ptr_t targetAppImg = SPTR_CAST<AppearanceImagePoint>(targetApp);
 					app_img_pnt_ptr_t appImg = SPTR_CAST<AppearanceImagePoint>(app);
 
+					measure.matchScore = matcher->match(targetAppImg->patch, *(rawPtr->img),
+						roi, measure.x()(0), measure.x()(1));
+/*
 					measure.matchScore = correl::Explorer<correl::Zncc>::exploreTranslation(
 							targetAppImg->patch, *(rawPtr->img), roi.x, roi.x+roi.width-1, 2, roi.y, roi.y+roi.height-1, 2,
 							measure.x()(0), measure.x()(1));
-
+*/
 					// set appearance
 					// FIXME reenable this when Image::robustCopy will be fixed
 //					rawPtr->img->robustCopy(appImg->patch, (int)(measure.x()(0)-0.5)-appImg->patch.width()/2,
@@ -206,7 +210,7 @@ namespace jafar {
     //void DataManagerActiveSearch<RawImage,SensorSpec>::
     // FIXME make this more abstract...
     template<>
-    void DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> >::
+    void DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::FastTranslationMatcherZncc>::
     detectNewObs( boost::shared_ptr<RawImage> rawData )
     {
     	if (mapManagerPtr()->mapSpaceForInit()) {

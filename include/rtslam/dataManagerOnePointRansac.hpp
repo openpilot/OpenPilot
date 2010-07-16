@@ -135,7 +135,7 @@ namespace jafar {
 				void projectFromMean(vec & exp, const observation_ptr_t & obsPtr, const vec & x);
 				bool isLowInnovationInlier(const observation_ptr_t & obsPtr, const vec & exp, double lowInnTh);
 				bool isExpectedInnovationInlier( observation_ptr_t & obsPtr, double highInnTh);
-				bool match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, cv::Rect &roi, Measurement & measure, const appearance_ptr_t & app);
+				bool match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, image::ConvexRoi &roi, Measurement & measure, const appearance_ptr_t & app);
 				bool matchWithLowInnovation(const observation_ptr_t obsPtr, double lowInnTh); // TODO
 				bool matchWithExpectedInnovation(boost::shared_ptr<RawSpec> rawData,  observation_ptr_t obsPtr);
 

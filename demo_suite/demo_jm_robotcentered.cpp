@@ -165,9 +165,9 @@ void demo_slam01_main(world_ptr_t *world) {
 	// 3b. Create data manager.
 	boost::shared_ptr<ActiveSearchGrid> asGrid(new ActiveSearchGrid(IMG_WIDTH, IMG_HEIGHT, GRID_HCELLS, GRID_VCELLS, GRID_MARGIN, GRID_SEPAR));
 	boost::shared_ptr<QuickHarrisDetector> harrisDetector(new QuickHarrisDetector(HARRIS_CONV_SIZE, HARRIS_TH, HARRIS_EDDGE));
-	boost::shared_ptr<correl::Explorer<correl::Zncc> > znccMatcher(new correl::Explorer<correl::Zncc>());
-	boost::shared_ptr<DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> > > dmPt11(new DataManagerActiveSearch<RawImage,
-			SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> > ());
+	boost::shared_ptr<correl::FastTranslationMatcherZncc> znccMatcher(new correl::FastTranslationMatcherZncc(0.8,0.25));
+	boost::shared_ptr<DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::FastTranslationMatcherZncc> > dmPt11(new DataManagerActiveSearch<RawImage,
+			SensorPinHole, QuickHarrisDetector, correl::FastTranslationMatcherZncc> ());
 	dmPt11->linkToParentSensorSpec(senPtr11);
 	dmPt11->linkToParentMapManager(mmPoint);
 	dmPt11->setActiveSearchGrid(asGrid);

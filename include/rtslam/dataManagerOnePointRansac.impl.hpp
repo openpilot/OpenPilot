@@ -95,7 +95,8 @@ JFR_DEBUG("was predicted at " << obsCurrentPtr->expectation.x() << ", now predic
 							// try to match with low innovation
 							obsCurrentPtr->predictAppearance();
 							obsCurrentPtr->measurement.std(detectorParams_.measStd);
-							cv::Rect roi = gauss2rect(pix, matcherParams_.lowInnov, matcherParams_.lowInnov);
+							cv::Rect rroi = gauss2rect(pix, matcherParams_.lowInnov, matcherParams_.lowInnov);
+							image::ConvexRoi roi(rroi);
 							
 JFR_DEBUG("not yet matched, trying with lowInnov in roi " << roi);
 							match(rawData, obsCurrentPtr->predictedAppearance, roi, obsCurrentPtr->measurement,
@@ -230,7 +231,8 @@ JFR_DEBUG("######## Starting classic active search for the remaining");
 								obsPtr->counters.nSearch++;
 
 								// 1c. predict search area and appearance
-								cv::Rect roi = gauss2rect(obsPtr->expectation.x(), obsPtr->expectation.P() + matcherParams_.measVar*identity_mat(2), matcherParams_.mahalanobisTh);
+								//cv::Rect roi = gauss2rect(obsPtr->expectation.x(), obsPtr->expectation.P() + matcherParams_.measVar*identity_mat(2), matcherParams_.mahalanobisTh);
+								image::ConvexRoi roi(obsPtr->expectation.x(), obsPtr->expectation.P() + matcherParams_.measVar*identity_mat(2), matcherParams_.mahalanobisTh);
 								obsPtr->predictAppearance();
 // JFR_DEBUG("obs " << obsPtr->id() << " measured in " << roi);
 
@@ -300,7 +302,7 @@ JFR_DEBUG("corrected " << obsPtr->id());
 
 		template<>
 		void
-		DataManagerOnePointRansac<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> >::
+		DataManagerOnePointRansac<RawImage, SensorPinHole, QuickHarrisDetector, correl::FastTranslationMatcherZncc>::
 		detectNewObs( boost::shared_ptr<RawImage> rawData )
 		{
 			if (mapManagerPtr()->mapSpaceForInit()) {
@@ -514,10 +516,8 @@ JFR_DEBUG("getOneMatchedBaseObs: obs " << obsBasePtr->id() << " matched " << obs
 		{
 			obsPtr->predictAppearance();
 			obsPtr->measurement.std(detectorParams_.measStd);
-			cv::Rect roi = gauss2rect(
-					obsPtr->expectation.x(),
-			    obsPtr->expectation.P() + obsPtr->measurement.P(),
-			    matcherParams_.mahalanobisTh);
+			//cv::Rect roi = gauss2rect(obsPtr->expectation.x(), obsPtr->expectation.P() + obsPtr->measurement.P(), matcherParams_.mahalanobisTh);
+			image::ConvexRoi roi(obsPtr->expectation.x(), obsPtr->expectation.P() + obsPtr->measurement.P(), matcherParams_.mahalanobisTh);
 			match(
 					rawData,
 					obsPtr->predictedAppearance,
@@ -530,16 +530,19 @@ JFR_DEBUG("getOneMatchedBaseObs: obs " << obsBasePtr->id() << " matched " << obs
 		}
 
 		template<>
-		bool DataManagerOnePointRansac<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> >::
-		match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, cv::Rect &roi, Measurement & measure, const appearance_ptr_t & app)
+		bool DataManagerOnePointRansac<RawImage, SensorPinHole, QuickHarrisDetector, correl::FastTranslationMatcherZncc>::
+		match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, image::ConvexRoi &roi, Measurement & measure, const appearance_ptr_t & app)
     {
 			app_img_pnt_ptr_t targetAppImg = SPTR_CAST<AppearanceImagePoint>(targetApp);
 			app_img_pnt_ptr_t appImg = SPTR_CAST<AppearanceImagePoint>(app);
 
+			measure.matchScore = matcher->match(targetAppImg->patch, *(rawPtr->img),
+					roi, measure.x()(0), measure.x()(1));
+			/*
 			measure.matchScore = correl::Explorer<correl::Zncc>::exploreTranslation(
 					targetAppImg->patch, *(rawPtr->img), roi.x, roi.x+roi.width-1, 2, roi.y, roi.y+roi.height-1, 2,
 					measure.x()(0), measure.x()(1));
-
+			*/
 			// set appearance
 			// FIXME reenable this when Image::robustCopy will be fixed
 //					rawPtr->img->robustCopy(appImg->patch, (int)(measure.x()(0)-0.5)-appImg->patch.width()/2,

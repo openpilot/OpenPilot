@@ -77,7 +77,7 @@ namespace jafar {
       alg_params_t algorithmParams(){return algorithmParams_;}
     protected:
       void detectNewObs( boost::shared_ptr<RawSpec> data );
-      bool match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, cv::Rect &roi, Measurement & measure, const appearance_ptr_t & app);
+      bool match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, image::ConvexRoi &roi, Measurement & measure, const appearance_ptr_t & app);
       void processKnownObs( boost::shared_ptr<RawSpec> data );
 
     public:

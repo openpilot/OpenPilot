@@ -63,12 +63,12 @@ typedef ImagePointObservationMaker<ObservationPinHoleEuclideanPoint, SensorPinHo
 typedef ImagePointObservationMaker<ObservationPinHoleAnchoredHomogeneousPoint, SensorPinHole,
     LandmarkAnchoredHomogeneousPoint, SensorAbstract::PINHOLE, LandmarkAbstract::PNT_AH> PinholeAhpObservationMaker;
 
-typedef DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> > DataManagerAS;
-typedef DataManagerOnePointRansac<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> > DataManagerOPR;
+typedef DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::FastTranslationMatcherZncc > DataManagerAS;
+typedef DataManagerOnePointRansac<RawImage, SensorPinHole, QuickHarrisDetector, correl::FastTranslationMatcherZncc > DataManagerOPR;
 
 ///##############################################
 
-#define RANSAC 0
+#define RANSAC 1
 
 int mode = 0;
 time_t rseed;
@@ -213,7 +213,8 @@ void demo_slam01_main(world_ptr_t *world) {
 	// 3b. Create data manager.
 	boost::shared_ptr<ActiveSearchGrid> asGrid(new ActiveSearchGrid(IMG_WIDTH, IMG_HEIGHT, GRID_HCELLS, GRID_VCELLS, GRID_MARGIN, GRID_SEPAR));
 	boost::shared_ptr<QuickHarrisDetector> harrisDetector(new QuickHarrisDetector(HARRIS_CONV_SIZE, HARRIS_TH, HARRIS_EDDGE));
-	boost::shared_ptr<correl::Explorer<correl::Zncc> > znccMatcher(new correl::Explorer<correl::Zncc>());
+//	boost::shared_ptr<correl::Explorer<correl::Zncc> > znccMatcher(new correl::Explorer<correl::Zncc>());
+	boost::shared_ptr<correl::FastTranslationMatcherZncc> znccMatcher(new correl::FastTranslationMatcherZncc(0.8,0.25));
 	
 	#if RANSAC
 	boost::shared_ptr<DataManagerOPR> dmPt11(new DataManagerOPR());
@@ -545,6 +546,8 @@ void demo_slam01_display(world_ptr_t *world) {
 						std::cout << "Breaking options:" << std::endl;
 						for(int i = 0; i < 2; ++i)
 							std::cout << "\t--" << long_options[i+nIntOpts+nStrOpts].name << std::endl;
+						
+						return 0;
 					}
 				} else
 				{

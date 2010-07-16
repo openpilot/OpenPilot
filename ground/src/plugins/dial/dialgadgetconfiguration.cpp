@@ -95,6 +95,31 @@ IUAVGadgetConfiguration *DialGadgetConfiguration::clone()
 {
     DialGadgetConfiguration *m = new DialGadgetConfiguration(this->classId());
     m->m_defaultDial=m_defaultDial;
+    m->setDialBackgroundID(dialBackgroundID);
+    m->setDialForegroundID(dialForegroundID);
+    m->setDialNeedleID1(dialNeedleID1);
+    m->setDialNeedleID2(dialNeedleID2);
+    m->setDialNeedleID3(dialNeedleID3);
+    m->setN1Min(needle1MinValue);
+    m->setN1Max(needle1MaxValue);
+    m->setN2Min(needle2MinValue);
+    m->setN2Max(needle2MaxValue);
+    m->setN3Min(needle3MinValue);
+    m->setN3Max(needle3MaxValue);
+    m->setN1DataObject(needle1DataObject);
+    m->setN1ObjField(needle1ObjectField);
+    m->setN2DataObject(needle2DataObject);
+    m->setN2ObjField(needle2ObjectField);
+    m->setN3DataObject(needle3DataObject);
+    m->setN3ObjField(needle3ObjectField);
+    m->setN1Factor(needle1Factor);
+    m->setN2Factor(needle2Factor);
+    m->setN3Factor(needle3Factor);
+    m->setN1Move(needle1Move);
+    m->setN2Move(needle2Move);
+    m->setN3Move(needle3Move);
+    m->setFont(font);
+
     return m;
 }
 /**

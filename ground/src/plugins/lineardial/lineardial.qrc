@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/lineardial">
+        <file>images/empty.svg</file>
+    </qresource>
+</RCC>

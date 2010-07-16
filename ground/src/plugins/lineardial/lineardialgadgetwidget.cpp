@@ -134,12 +134,9 @@ void LineardialGadgetWidget::updateIndex(UAVObject *object1) {
   */
 void LineardialGadgetWidget::setDialFile(QString dfn)
 {
-   if (QFile::exists(dfn))
+    QGraphicsScene *l_scene = scene();
+   if (QFile::exists(dfn) && m_renderer->load(dfn) && m_renderer->isValid() )
    {
-      QGraphicsScene *l_scene = scene();
-      m_renderer->load(dfn);
-      if(m_renderer->isValid())
-      {
           l_scene->clear(); // Beware: clear also deletes all objects
                             // which are currently in the scene
           background = new QGraphicsSvgItem();
@@ -316,9 +313,18 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
          if (!dialTimer.isActive() && index)
              dialTimer.start();
      }
-   }
    else
-   { qDebug()<<"no file "; }
+   {
+       qDebug() << "no file ";
+       m_renderer->load(QString(":/lineardial/images/empty.svg"));
+       l_scene->clear(); // This also deletes all items contained in the scene.
+       background = new QGraphicsSvgItem();
+       background->setSharedRenderer(m_renderer);
+       l_scene->addItem(background);
+       fieldName = NULL;
+       fieldValue = NULL;
+       index = NULL;
+   }
 }
 
 

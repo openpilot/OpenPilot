@@ -75,6 +75,20 @@ IUAVGadgetConfiguration *LineardialGadgetConfiguration::clone()
 {
     LineardialGadgetConfiguration *m = new LineardialGadgetConfiguration(this->classId());
     m->dialFile=dialFile;
+    m->sourceDataObject = sourceDataObject;
+    m->sourceObjectField = sourceObjectField;
+    m->minValue = minValue;
+    m->maxValue = maxValue;
+    m->redMin = redMin;
+    m->redMax = redMax;
+    m->yellowMin = yellowMin;
+    m->yellowMax = yellowMax;
+    m->greenMin = greenMin;
+    m->greenMax = greenMax;
+    m->font = font;
+    m->decimalPlaces = decimalPlaces;
+    m->factor = factor;
+
     return m;
 }
 /**

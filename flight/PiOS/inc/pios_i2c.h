@@ -1,5 +1,9 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup   PIOS_I2C I2C Functions
+ * @{
  *
  * @file       pios_i2c.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -61,3 +65,8 @@ extern void PIOS_I2C_UnlockDevice(void);
 #endif // PIOS_INCLUDE_FREERTOS
 
 #endif /* PIOS_I2C_H */
+
+/**
+  * @}
+  * @}
+  */

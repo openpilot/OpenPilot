@@ -1,17 +1,16 @@
 /**
  ******************************************************************************
- *
- * @file       pios_hmc5843.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      HMC5843 Magnetic Sensor Functions
- * @see        The GNU Public License (GPL) Version 3
- *
- /**
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
  * @addtogroup PIOS_HMC5843 HMC5843 Functions
  * @brief Deals with the hardware interface to the magnetometers
  * @{
+ *
+ * @file       pios_hmc5843.c
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @brief      HMC5843 Magnetic Sensor Functions from AHRS
+ * @see        The GNU Public License (GPL) Version 3
+ *
  ******************************************************************************
  */
 /* 

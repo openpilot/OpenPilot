@@ -1,5 +1,14 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ * @addtogroup ManualControlModule Manual Control Module
+ * @brief Provide manual control or allow it alter flight mode.
+ * @{
+ *
+ * Reads in the ManualControlCommand FlightMode setting from receiver then either 
+ * pass the settings straght to ActuatorDesired object (manual mode) or to
+ * AttitudeDesired object (stabilized mode)
  *
  * @file       manualcontrol.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -31,21 +40,6 @@
 #include "manualcontrolcommand.h"
 #include "actuatordesired.h"
 #include "attitudedesired.h"
-
-/**
- * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
- */
-
-/**
- * @addtogroup ManualControlModule Manual Control Module
- * @brief Provide manual control or allow it alter flight mode
- *
- * Reads in the ManualControlCommand FlightMode setting from receiver then either 
- * pass the settings straght to ActuatorDesired object (manual mode) or to
- * AttitudeDesired object (stabilized mode)
- * @{ 
- */
 
 
 // Private constants
@@ -241,3 +235,8 @@ static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutr
 	}
 	return valueScaled;
 }
+
+/**
+  * @}
+  * @}
+  */

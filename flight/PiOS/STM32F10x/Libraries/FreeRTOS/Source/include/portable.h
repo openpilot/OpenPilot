@@ -1,3 +1,12 @@
+/**
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup FreeRTOS FreeRTOS Operating system
+ * @{
+ * @file portable.h
+ * @author FreeRTOS
+ */
+
 /*
     FreeRTOS V6.0.0 - Copyright (C) 2009 Real Time Engineers Ltd.
 
@@ -58,14 +67,6 @@
 #ifndef PORTABLE_H
 #define PORTABLE_H
 
-/**
- * @file portable.h
- * @author FreeRTOS
- * @addtogroup PIOS PIOS Core hardware abstraction layer
- * @{
- * @addtogroup FreeRTOS FreeRTOS Operating system
- * @{
- */
 
 /* Include the macro file relevant to the port being used. */
 

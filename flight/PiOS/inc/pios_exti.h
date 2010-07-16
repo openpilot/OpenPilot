@@ -1,6 +1,11 @@
 /**
  ******************************************************************************
  *
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_EXTI External Interrupt Handlers
+ * @{
+ *
  * @file       pios_exti.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      External Interrupts Handlers header.
@@ -30,3 +35,8 @@
 
 
 #endif /* PIOS_EXTI_H */
+
+/**
+  * @}
+  * @}
+  */

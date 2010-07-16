@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_COM COM layer functions
+ * @brief Hardware communication layer
+ * @{
  *
  * @file       pios_com.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -53,3 +58,8 @@ struct pios_com_driver {
 };
 
 #endif /* PIOS_COM_H */
+
+/**
+  * @}
+  * @}
+  */

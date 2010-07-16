@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ * @addtogroup OSDModule OSD Module
+ * @brief On screen display support
+ * @{ 
  *
  * @file       MKSerial.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -27,17 +32,6 @@
 
 #include "flightbatterystate.h"
 #include "positionactual.h"
-
-/**
- * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
- */
-
-/**
- * @addtogroup OSDModule OSD Module
- * @brief On screen display support
- * @{ 
- */
 
 
 

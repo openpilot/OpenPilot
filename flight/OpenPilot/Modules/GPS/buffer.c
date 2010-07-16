@@ -1,9 +1,15 @@
 /**
  ******************************************************************************
  *
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ * @addtogroup GSPModule GPS Module
+ * @brief Process GPS information
+ * @{ 
+ *
  * @file       buffer.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      see below
+ * @brief      
  * 	       As with all modules only the initialize function is exposed all other
  * 	       interactions with the module take place through the event queue and
  *             objects.
@@ -27,7 +33,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/*! \file buffer.c \brief Multipurpose byte buffer structure and methods. */
 //*****************************************************************************
 //
 // File Name	: 'buffer.c'
@@ -45,17 +50,6 @@
 //*****************************************************************************
 
 #include "buffer.h"
-
-/**
- * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
- */
-
-/**
- * @addtogroup GSPModule GPS Module
- * @brief Process GPS information
- * @{ 
- */
 
 // global variables
 
@@ -150,8 +144,5 @@ void bufferFlush(cBuffer* buffer)
 
 /** 
   * @}
-  */
-
-/**
   * @}
   */

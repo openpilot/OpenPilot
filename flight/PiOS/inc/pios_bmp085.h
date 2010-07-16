@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_BMP085 BMP085 Functions
+ * @brief Hardware functions to deal with the altitude pressure sensor
+ * @{
  *
  * @file       pios_bmp085.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -74,3 +79,8 @@ extern int32_t PIOS_BMP085_Read(uint8_t address, uint8_t *buffer, uint8_t len);
 extern int32_t PIOS_BMP085_Write(uint8_t address, uint8_t buffer);
 
 #endif /* PIOS_BMP085_H */
+
+/** 
+  * @}
+  * @}
+  */

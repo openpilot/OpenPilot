@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup   PIOS_USART USART Functions
+ * @brief PIOS interface for USART port
+ * @{
  *
  * @file       pios_usart.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -49,3 +54,8 @@ extern int32_t PIOS_USART_TxBufferPut(uint8_t usart, uint8_t b);
 
 extern void PIOS_USART_IRQ_Handler(uint8_t usart);
 #endif /* PIOS_USART_H */
+
+/**
+  * @}
+  * @}
+  */

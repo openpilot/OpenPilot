@@ -1,5 +1,9 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup   PIOS_SPI SPI Functions
+ * @{
  *
  * @file       pios_spi.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -48,3 +52,8 @@ extern int32_t PIOS_SPI_TransferBlock(uint8_t spi, const uint8_t *send_buffer, u
 extern void    PIOS_SPI_IRQ_Handler(uint8_t spi);
 
 #endif /* PIOS_SPI_H */
+
+/**
+ * @}
+ * @}
+ */

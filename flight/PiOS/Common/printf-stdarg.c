@@ -1,5 +1,7 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
  *
  * @file       printf-stdarg.c   
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -232,3 +234,7 @@ int snprintf( char *buf, size_t count, const char *format, ... )
         va_start( args, format );
         return print( &buf, format, args );
 }
+
+/**
+  * @}
+  */

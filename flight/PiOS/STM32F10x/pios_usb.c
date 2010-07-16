@@ -1,16 +1,16 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup   PIOS_USB USB Functions
+ * @brief PIOS USB interface code
+ * @{
  *
  * @file       pios_usb.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * 		Parts by Thorsten Klose (tk@midibox.org)
- * @brief      USB functions
+ * @brief      USB functions (STM32 dependent)
  * @see        The GNU Public License (GPL) Version 3
- * @addtogroup PIOS PIOS Core hardware abstraction layer
- * @{
- * @addtogroup   PIOS_USB USB Functions
- * @brief STM32 Hardware USB functions
- * @{
  *
  *****************************************************************************/
 /*

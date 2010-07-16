@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ * @addtogroup MKSerialModule MK Serial Control Module
+ * @brief Connect to MK module
+ * @{ 
  *
  * @file       GPS.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -32,3 +37,8 @@
 int32_t MKSerialInitialize(void);
 
 #endif // MK_SER_INPUT_H
+
+/** 
+  * @}
+  * @}
+  */

@@ -1,5 +1,9 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ * @addtogroup AHRSCommsModule AHRSComms Module
+ * @{ 
  *
  * @file       ahrs_comms.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.

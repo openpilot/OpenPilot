@@ -1,5 +1,9 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup   PIOS_USB_HID USB HID Functions
+ * @{
  *
  * @file       pios_usb_hid.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -49,3 +53,8 @@ extern int32_t PIOS_USB_HID_CB_NoData_Setup(uint8_t RequestNo);
 extern void PIOS_USB_HID_EP1_OUT_Callback(void);
 
 #endif /* PIOS_USB_HID_H */
+
+/**
+  * @}
+  * @}
+  */

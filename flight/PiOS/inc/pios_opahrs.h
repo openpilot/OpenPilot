@@ -1,5 +1,9 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_OPAHRS OPAHRS Functions
+ * @{
  *
  * @file       pios_opahrs.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -42,3 +46,8 @@ extern enum opahrs_result PIOS_OPAHRS_GetHeading(struct opahrs_msg_v1 *rsp);
 extern enum opahrs_result PIOS_OPAHRS_resync(void);
 
 #endif /* PIOS_OPAHRS_H */
+
+/**
+  * @}
+  * @}
+  */

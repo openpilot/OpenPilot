@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ * @addtogroup GSPModule GPS Module
+ * @brief Process GPS information
+ * @{ 
  *
  * @file       GPS.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -27,17 +32,6 @@
 #include "buffer.h"
 #include "GPS.h"
 #include "positionactual.h"
-
-/**
- * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
- */
-
-/**
- * @addtogroup GSPModule GPS Module
- * @brief Process GPS information
- * @{ 
- */
 
 // constants/macros/typdefs
 #define NMEA_BUFFERSIZE		128
@@ -725,8 +719,5 @@ void nmeaProcessGPGSA(char* packet)
 
 /** 
   * @}
-  */
-
-/**
   * @}
   */

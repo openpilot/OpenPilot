@@ -1,5 +1,11 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ * @addtogroup BatteryModule Battery Module
+ * @brief Measures battery voltage and current
+ * Updates the FlightBatteryState object
+ * @{ 
  *
  * @file       attitude.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -42,19 +48,6 @@
 #include "openpilot.h"
 
 #include "flightbatterystate.h"
-
-
-/**
- * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
- */
-
-/**
- * @addtogroup BatteryModule Battery Module
- * @brief Measures battery voltage and current
- * Updates the FlightBatteryState object
- * @{ 
- */
 
 //
 // Configuration

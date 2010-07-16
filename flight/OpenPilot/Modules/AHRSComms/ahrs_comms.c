@@ -1,19 +1,17 @@
 /**
  ******************************************************************************
- *
- * @file       ahrs_comms.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Module to handle all comms to the AHRS on a periodic basis.
- *
- * @see        The GNU Public License (GPL) Version 3
- *
- *
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{ 
  * @addtogroup AHRSCommsModule AHRSComms Module
  * @brief Handles communication with AHRS and updating position
  * Specifically updates the the @ref AttitudeActual "AttitudeActual" and @ref HeadingActual "HeadingActual" settings objects
  * @{ 
+ *
+ * @file       ahrs_comms.c
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @brief      Module to handle all comms to the AHRS on a periodic basis.
+ *
+ * @see        The GNU Public License (GPL) Version 3
  *
  ******************************************************************************/
 /*

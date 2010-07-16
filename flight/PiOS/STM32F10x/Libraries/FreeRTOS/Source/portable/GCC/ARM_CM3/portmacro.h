@@ -1,3 +1,13 @@
+/**
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup FreeRTOS FreeRTOS Operating system
+ * @{
+ * @file portmacro.h
+ * @author FreeRTOS
+ */
+
+
 /*
     FreeRTOS V6.0.0 - Copyright (C) 2009 Real Time Engineers Ltd.
 
@@ -55,14 +65,6 @@
 #ifndef PORTMACRO_H
 #define PORTMACRO_H
 
-/**
- * @file portmacro.h
- * @author FreeRTOS
- * @addtogroup PIOS PIOS Core hardware abstraction layer
- * @{
- * @addtogroup FreeRTOS FreeRTOS Operating system
- * @{
- */
 
 #ifdef __cplusplus
 extern "C" {

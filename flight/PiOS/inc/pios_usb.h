@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup   PIOS_USB USB Functions
+ * @brief PIOS USB interface code
+ * @{
  *
  * @file       pios_usb.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -74,3 +79,8 @@ extern int32_t PIOS_USB_IsInitialized(void);
 extern int32_t PIOS_USB_CableConnected(void);
 
 #endif /* PIOS_USB_H */
+
+/**
+  * @}
+  * @}
+  */

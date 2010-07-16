@@ -1,15 +1,15 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup   PIOS_PPM PPM Input Functions
+ * @brief Code to measure PPM input and seperate into channels
+ * @{
  *
  * @file       pios_ppm.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      PPM Input functions
+ * @brief      PPM Input functions (STM32 dependent)
  * @see        The GNU Public License (GPL) Version 3
- * @addtogroup PIOS PIOS Core hardware abstraction layer
- * @{
- * @defgroup   PIOS_PPM PPM Input Functions
- * @brief STM32 Hardware code to deal with PPM input
- * @{
  *
  *****************************************************************************/
 /*

@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup   PIOS_ADC ADC Functions
+ * @brief STM32 ADC PIOS interface
+ * @{
  *
  * @file       pios_adc.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -32,3 +37,8 @@ extern void PIOS_ADC_Init(void);
 extern int32_t PIOS_ADC_PinGet(uint32_t pin);
 
 #endif /* PIOS_ADC_H */
+
+/**
+  * @}
+  * @}
+  */

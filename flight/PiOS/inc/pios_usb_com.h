@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_SYS System Functions
+ * @brief PIOS USB communication code
+ * @{
  *
  * @file       pios_usb_com.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.
@@ -71,3 +76,8 @@ extern s32 PIOS_USB_COM_TxBufferPutMore_NonBlocking(u8 usb_com, u8 *buffer, u16 
 extern s32 PIOS_USB_COM_TxBufferPutMore(u8 usb_com, u8 *buffer, u16 len);
 
 #endif /* PIOS_USB_COM_H */
+
+/**
+  * @}
+  * @}
+  */

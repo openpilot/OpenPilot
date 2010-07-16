@@ -1,16 +1,16 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_SDCARD SDCard Functions
+ * @brief Code to deal with reading and writing to flash cards
+ * @{
  *
  * @file       pios_sdcard.c  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * 	       Parts by Thorsten Klose (tk@midibox.org)
  * @brief      Sets up basic system hardware, functions are called from Main.
  * @see        The GNU Public License (GPL) Version 3
- * @addtogroup PIOS PIOS Core hardware abstraction layer
- * @{
- * @defgroup   PIOS_SDCARD SDCard Functions
- * @brief STM32 Hardware code to deal with writing to flash
- * @{
  *
  *****************************************************************************/
 /* 

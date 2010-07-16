@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ * @addtogroup MKSerialModule MK Serial Control Module
+ * @brief Connect to MK module
+ * @{ 
  *
  * @file       MKSerial.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -29,18 +34,6 @@
 #include "attitudeactual.h" // object that will be updated by the module
 #include "positionactual.h"
 #include "flightbatterystate.h"
-
-
-/**
- * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
- */
-
-/**
- * @addtogroup MKSerialModule MK Serial Control Module
- * @brief Connect to MK module
- * @{ 
- */
 
 
 //
@@ -626,8 +619,5 @@ int32_t MKSerialInitialize(void)
 
 /** 
   * @}
-  */
-
-/** 
  * @}
  */

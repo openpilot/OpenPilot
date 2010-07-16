@@ -1,3 +1,16 @@
+/**
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_OPAHRS OPAHRS Functions
+ * @{
+ *
+ * @file       pios_opahrs_proto.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @brief      PPM Input functions
+ * @see        The GNU Public License (GPL) Version 3
+ * 
+ */
+
 #ifndef PIOS_OPAHRS_PROTO_H
 #define PIOS_OPAHRS_PROTO_H
 
@@ -271,3 +284,8 @@ extern void opahrs_msg_v1_init_user_tx (struct opahrs_msg_v1 * msg, enum opahrs_
 extern void opahrs_msg_v1_init_link_tx (struct opahrs_msg_v1 * msg, enum opahrs_msg_link_tag tag);
 
 #endif /* PIOS_OPAHRS_PROTO_H */
+
+/**
+  * @}
+  * @}
+  */

@@ -1,5 +1,12 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ * @addtogroup TelemetryModule Telemetry Module
+ * @brief Main telemetry module
+ * Starts three tasks (RX, TX, and priority TX) that watch event queues
+ * and handle all the telemetry of the UAVobjects
+ * @{ 
  *
  * @file       telemetry.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -32,3 +39,8 @@
 int32_t TelemetryInitialize(void);
 
 #endif // TELEMETRY_H
+
+/**
+  * @}
+  * @}
+  */

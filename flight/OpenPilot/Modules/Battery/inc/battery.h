@@ -1,5 +1,9 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ * @addtogroup BatteryModule Battery Module
+ * @{ 
  *
  * @file       attitude.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -32,3 +36,7 @@ int32_t BatteryInitialize(void);
 
 #endif // BATTERY_H
 
+/**
+  * @}
+  * @}
+  */

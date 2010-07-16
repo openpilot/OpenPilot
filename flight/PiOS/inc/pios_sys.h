@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_SYS System Functions
+ * @brief PIOS System Initialization code
+ * @{
  *
  * @file       pios_sys.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -33,3 +38,8 @@ extern int32_t PIOS_SYS_Reset(void);
 extern int32_t PIOS_SYS_SerialNumberGet(char *str);
 
 #endif /* PIOS_SYS_H */
+
+/**
+  * @}
+  * @}
+  */

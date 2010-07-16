@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ * @addtogroup AltitudeModule Altitude Module
+ * @brief Communicate with BMP085 and update @ref AltitudeActual "AltitudeActual UAV Object"
+ * @{ 
  *
  * @file       altitude.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -7,12 +12,6 @@
  *
  * @see        The GNU Public License (GPL) Version 3
  *
- /**
- * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
- * @addtogroup AltitudeModule Altitude Module
- * @brief Communicate with BMP085 and update @ref AltitudeActual "AltitudeActual UAV Object"
- * @{ 
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -114,8 +113,5 @@ static void altitudeTask(void* parameters)
 
 /**
   * @}
-  */
-
-/**
  * @}
  */

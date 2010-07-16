@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ * @addtogroup GSPModule GPS Module
+ * @brief Process GPS information
+ * @{ 
  *
  * @file       GPS.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -32,3 +37,8 @@
 int32_t GPSInitialize(void);
 
 #endif // GPS_H
+
+/**
+  * @}
+  * @}
+  */

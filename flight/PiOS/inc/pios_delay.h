@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_DELAY Delay Functions
+ * @brief PiOS Delay functionality
+ * @{
  *
  * @file       pios_settings.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -35,3 +40,8 @@ extern int32_t PIOS_DELAY_WaitmS(uint16_t mS);
 
 
 #endif /* PIOS_DELAY_H */
+
+/**
+  * @}
+  * @}
+  */

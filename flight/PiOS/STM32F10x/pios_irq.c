@@ -1,16 +1,16 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_IRQ IRQ Setup Functions
+ * @brief STM32 Hardware code to enable and disable interrupts
+ * @{
  *
  * @file       pios_irq.c  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
  * @brief      IRQ Enable/Disable routines
  * @see        The GNU Public License (GPL) Version 3
- * @addtogroup PIOS PIOS Core hardware abstraction layer
- * @{
- * @defgroup PIOS_IRQ IRQ Setup Functions
- * @brief STM32 Hardware code to enable and disable interrupts
- * @{
  * 
  *****************************************************************************/
 /* 

@@ -1,15 +1,15 @@
 /**
   ******************************************************************************
-  *
-  * @file       pios_bmp085.c  
-  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
-  * @brief      BMP085 Pressure Sensor Routines
-  * @see        The GNU Public License (GPL) Version 3
   * @addtogroup PIOS PIOS Core hardware abstraction layer
   * @{
   * @addtogroup PIOS_BMP085 BMP085 Functions
   * @brief Hardware functions to deal with the altitude pressure sensor
   * @{
+  *
+  * @file       pios_bmp085.c  
+  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+  * @brief      BMP085 Pressure Sensor Routines
+  * @see        The GNU Public License (GPL) Version 3
   *
   ******************************************************************************/
 /* 

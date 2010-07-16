@@ -1,15 +1,15 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_OPAHRS OPAHRS Functions
+ * @brief HAL code to interface to the OpenPilot AHRS module
+ * @{
  *
  * @file       pios_opahrs.c  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Hardware commands to communicate with the AHRS
  * @see        The GNU Public License (GPL) Version 3
- * @addtogroup PIOS PIOS Core hardware abstraction layer
- * @{
- * @addtogroup PIOS_OPAHRS OPAHRS Functions
- * @brief STM32 Hardware code to interface to the OpenPilot AHRS module
- * @{
  * 
  *****************************************************************************/
 /* 

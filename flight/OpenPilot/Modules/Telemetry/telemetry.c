@@ -1,5 +1,12 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ * @addtogroup TelemetryModule Telemetry Module
+ * @brief Main telemetry module
+ * Starts three tasks (RX, TX, and priority TX) that watch event queues
+ * and handle all the telemetry of the UAVobjects
+ * @{ 
  *
  * @file       telemetry.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -27,20 +34,6 @@
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
 #include "telemetrysettings.h"
-
-
-/**
- * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
- */
-
-/**
- * @addtogroup TelemetryModule Telemetry Module
- * @brief Main telemetry module
- * Starts three tasks (RX, TX, and priority TX) that watch event queues
- * and handle all the telemetry of the UAVobjects
- * @{ 
- */
 
 // Set this to 1 to enable telemetry via the USB HID interface
 #define ALLOW_HID_TELEMETRY 0
@@ -567,8 +560,5 @@ static void updateSettings()
 
 /**
   * @}
-  */
-
-/**
   * @}
   */

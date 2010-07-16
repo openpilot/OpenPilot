@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_HMC5843 HMC5843 Functions
+ * @brief Deals with the hardware interface to the magnetometers
+ * @{
  *
  * @file       pios_hmc5843.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -102,3 +107,8 @@ extern int32_t PIOS_HMC5843_Read(uint8_t address, uint8_t *buffer, uint8_t len);
 extern int32_t PIOS_HMC5843_Write(uint8_t address, uint8_t buffer);
 
 #endif /* PIOS_HMC5843_H */
+
+/** 
+  * @}
+  * @}
+  */

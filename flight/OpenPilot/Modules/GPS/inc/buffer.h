@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ * @addtogroup GSPModule GPS Module
+ * @brief Process GPS information
+ * @{ 
  *
  * @file       buffer.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -11,7 +16,6 @@
  *
  *****************************************************************************/
 
-/*! \file buffer.h \brief Multipurpose byte buffer structure and methods. */
 //*****************************************************************************
 //
 // File Name	: 'buffer.h'
@@ -23,8 +27,6 @@
 // Target MCU	: any
 // Editor Tabs	: 4
 //
-///	\ingroup general
-/// \defgroup buffer Circular Byte-Buffer Structure and Function Library (buffer.c)
 /// \code #include "buffer.h" \endcode
 /// \par Overview
 ///		This byte-buffer structure provides an easy and efficient way to store
@@ -84,4 +86,7 @@ unsigned char	bufferIsNotFull(cBuffer* buffer);
 void			bufferFlush(cBuffer* buffer);
 
 #endif
-//@}
+
+/**
+  * @}
+  */

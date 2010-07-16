@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup   PIOS_USART USART Functions
+ * @brief PIOS interface for USART port
+ * @{
  *
  * @file       pios_usart_priv.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -56,3 +61,8 @@ extern struct pios_usart_dev pios_usart_devs[];
 extern uint8_t             pios_usart_num_devices;
 
 #endif /* PIOS_USART_PRIV_H */
+
+/**
+  * @}
+  * @}
+  */

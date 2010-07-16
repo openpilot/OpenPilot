@@ -1,3 +1,12 @@
+/**
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup FreeRTOS FreeRTOS Operating system
+ * @{
+ * @file queue.h
+ * @author FreeRTOS
+ */
+
 /*
     FreeRTOS V6.0.0 - Copyright (C) 2009 Real Time Engineers Ltd.
 
@@ -55,15 +64,6 @@
 	#error "#include FreeRTOS.h" must appear in source files before "#include queue.h"
 #endif
 
-
-/**
- * @file queue.h
- * @author FreeRTOS
- * @addtogroup PIOS PIOS Core hardware abstraction layer
- * @{
- * @addtogroup FreeRTOS FreeRTOS Operating system
- * @{
- */
 
 #ifndef QUEUE_H
 #define QUEUE_H

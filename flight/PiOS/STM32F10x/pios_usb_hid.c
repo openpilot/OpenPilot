@@ -1,18 +1,18 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup   PIOS_USB_HID USB HID Functions
+ * @brief PIOS USB HID implementation
+ * @notes      This implements a very simple HID device with a simple data in
+ * and data out endpoints.
+ * @{
  *
  * @file       pios_usb_hid.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * 		Parts by Thorsten Klose (tk@midibox.org)
- * @brief      USB HID functions
+ * @brief      USB HID functions (STM32 dependent code)
  * @see        The GNU Public License (GPL) Version 3
- * @addtogroup PIOS PIOS Core hardware abstraction layer
- * @{
- * @addtogroup   PIOS_USB_HID USB HID Functions
- * @brief STM32 Hardware HID functions
- * @notes      This implements a very simple HID device with a simple data in
- * and data out endpoints.
- * @{
  *
  *****************************************************************************/
 /*
@@ -319,3 +319,8 @@ void PIOS_USB_HID_EP1_OUT_Callback(void)
 }
 
 #endif
+
+/**
+  * @}
+  * @}
+  */

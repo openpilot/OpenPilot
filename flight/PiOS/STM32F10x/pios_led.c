@@ -1,15 +1,15 @@
 /**
  ******************************************************************************
- *
- * @file       pios_led.c   
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      LED functions, init, toggle, on & off.
- * @see        The GNU Public License (GPL) Version 3
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
  * @addtogroup PIOS_LED LED Functions
  * @brief STM32 Hardware LED handling code
  * @{
+ *
+ * @file       pios_led.c   
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @brief      LED functions, init, toggle, on & off.
+ * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
 /* 

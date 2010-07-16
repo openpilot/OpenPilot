@@ -1,16 +1,16 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_SPEKTRUM Spektrum receiver functions
+ * @brief Code to read Spektrum input
+ * @{
  *
  * @file       pios_spektrum.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
- * @brief      USART commands. Inits USARTs, controls USARTs & Interrupt handlers.
+ * @brief      USART commands. Inits USARTs, controls USARTs & Interrupt handlers. (STM32 dependent)
  * @see        The GNU Public License (GPL) Version 3
- * @addtogroup PIOS PIOS Core hardware abstraction layer
- * @{
- * @defgroup   PIOS_SPEKTRUM USART Functions
- * @brief STM32 Hardware code to read Spektrum input
- * @{
  *
  *****************************************************************************/
 /* 

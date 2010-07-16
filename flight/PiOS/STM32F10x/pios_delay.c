@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_DELAY Delay Functions
+ * @brief PiOS Delay functionality
+ * @{
  *
  * @file       pios_delay.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -7,11 +12,6 @@
  * @brief      Delay Functions 
  *                 - Provides a micro-second granular delay using a TIM 
  * @see        The GNU Public License (GPL) Version 3
- * @addtogroup PIOS PIOS Core hardware abstraction layer
- * @{
- * @defgroup   PIOS_DELAY Delay Functions
- * @brief PiOS Delay functionality
- * @{
  *
  *****************************************************************************/
 /* 
@@ -108,3 +108,8 @@ int32_t PIOS_DELAY_WaitmS(uint16_t mS)
 }
 
 #endif
+
+/**
+  * @}
+  * @}
+  */

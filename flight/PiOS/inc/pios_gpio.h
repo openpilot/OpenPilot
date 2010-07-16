@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @defgroup   PIOS_GPIO GPIO Functions
+ * @brief GPIO hardware code for STM32
+ * @{
  *
  * @file       pios_gpio.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -35,3 +40,8 @@ extern void PIOS_GPIO_Off(uint8_t Pin);
 extern void PIOS_GPIO_Toggle(uint8_t Pin);
 
 #endif /* PIOS_GPIO_H */
+
+/**
+  * @}
+  * @}
+  */

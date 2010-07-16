@@ -1,16 +1,16 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_SYS System Functions
+ * @brief PIOS System Initialization code
+ * @{
  *
  * @file       pios_sys.c  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
- * @brief      Sets up basic system hardware, functions are called from Main.
+ * @brief      Sets up basic STM32 system hardware, functions are called from Main.
  * @see        The GNU Public License (GPL) Version 3
- * @addtogroup PIOS PIOS Core hardware abstraction layer
- * @{
- * @defgroup   PIOS_SYS System Functions
- * @brief Initialization code for STM32
- * @{
  *
  *****************************************************************************/
 /* 

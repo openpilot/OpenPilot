@@ -1,5 +1,9 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_IRQ IRQ Setup Functions
+ * @{
  *
  * @file       pios_irq.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.

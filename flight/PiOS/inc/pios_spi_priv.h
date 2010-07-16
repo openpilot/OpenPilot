@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup   PIOS_SPI SPI Functions
+ * @brief PIOS interface to read and write from SPI ports
+ * @{
  *
  * @file       pios_spi_priv.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -52,3 +57,8 @@ extern struct pios_spi_dev pios_spi_devs[];
 extern uint8_t             pios_spi_num_devices;
 
 #endif /* PIOS_SPI_PRIV_H */
+
+/**
+  * @}
+  * @}
+  */

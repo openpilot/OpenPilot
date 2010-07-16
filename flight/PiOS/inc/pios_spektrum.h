@@ -1,5 +1,9 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup   PIOS_SPEKTRUM Spektrum receiver functions
+ * @{
  *
  * @file       pios_spektrum.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -37,3 +41,8 @@ extern int32_t PIOS_SPEKTRUM_Decode(uint8_t b);
 extern int16_t PIOS_SPEKTRUM_Get(int8_t Channel);
 
 #endif /* PIOS_SPEKTRUM_H */
+
+/**
+  * @}
+  * @}
+  */

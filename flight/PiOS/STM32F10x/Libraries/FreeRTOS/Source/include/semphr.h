@@ -1,3 +1,12 @@
+/**
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup FreeRTOS FreeRTOS Operating system
+ * @{
+ * @file tasks.c
+ * @author FreeRTOS
+ */
+
 /*
     FreeRTOS V6.0.0 - Copyright (C) 2009 Real Time Engineers Ltd.
 
@@ -58,14 +67,7 @@
 #ifndef SEMAPHORE_H
 #define SEMAPHORE_H
 
-/**
- * @file tasks.c
- * @author FreeRTOS
- * @addtogroup PIOS PIOS Core hardware abstraction layer
- * @{
- * @addtogroup FreeRTOS FreeRTOS Operating system
- * @{
- */
+
 
 #include "queue.h"
 
@@ -718,3 +720,7 @@ typedef xQueueHandle xSemaphoreHandle;
 #endif /* SEMAPHORE_H */
 
 
+/**
+  * @}
+  * @}
+  */

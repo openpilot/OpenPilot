@@ -1,5 +1,11 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ * @addtogroup ActuatorModule Actuator Module
+ * @brief Compute servo/motor settings based on @ref ActuatorDesired "desired actuator positions" and aircraft type.
+ * This is where all the mixing of channels is computed.
+ * @{ 
  *
  * @file       actuator.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -23,14 +29,6 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-/**
-  * @addtogroup OpenPilotModules OpenPilot Modules
-  * @{ 
-  * @addtogroup ActuatorModule Actuator Module
-  * @brief Compute servo/motor settings based on @ref ActuatorDesired "desired actuator positions" and aircraft type
-  * @{ 
-  */
 
 #include "openpilot.h"
 #include "actuator.h"
@@ -287,8 +285,5 @@ static void setFailsafe()
 
 /** 
  * @}
- */
-
-/** 
   * @}
   */

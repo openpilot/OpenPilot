@@ -1,5 +1,19 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @brief The OpenPilot Modules do the majority of the control in OpenPilot.  The 
+ * @ref SystemModule "System Module" starts all the other modules that then take care
+ * of all the telemetry and control algorithms and such.  This is done through the @ref PIOS 
+ * "PIOS Hardware abstraction layer" which then contains hardware specific implementations
+ * (currently only STM32 supported)
+ *
+ * @{ 
+ * @addtogroup SystemModule System Module
+ * @brief Initializes PIOS and other modules runs monitoring
+ * After initializing all the modules (currently selected by Makefile but in
+ * future controlled by configuration on SD card) runs basic monitoring and
+ * alarms.
+ * @{ 
  *
  * @file       systemmod.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -29,20 +43,6 @@
 #include "objectpersistence.h"
 #include "systemstats.h"
 
-
-/**
- * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
- */
-
-/**
- * @addtogroup SystemModule Main System Module
- * @brief Initializes PIOS and other modules runs monitoring
- * After initializing all the modules (currently selected by Makefile but in
- * future controlled by configuration on SD card) runs basic monitoring and
- * alarms.
- * @{ 
- */
 
 // Private constants
 #define SYSTEM_UPDATE_PERIOD_MS 1000
@@ -334,8 +334,5 @@ void vApplicationStackOverflowHook( xTaskHandle *pxTask, signed portCHAR *pcTask
 
 /**
   * @}
-  */
-
-/**
   * @}
   */

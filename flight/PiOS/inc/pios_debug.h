@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @defgroup   PIOS_DEBUG Debugging Functions
+ * @brief Debugging functionality
+ * @{
  *
  * @file       pios_i2c.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -40,3 +45,8 @@ void PIOS_DEBUG_Panic(const char* msg);
 #endif
 
 #endif /* PIOS_DEBUG_H */
+
+/**
+  * @}
+  * @}
+  */

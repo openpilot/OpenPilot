@@ -1,6 +1,10 @@
 /**
  ******************************************************************************
- *
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_SDCARD SDCard Functions
+ * @{
+ * 
  * @file       pios_sdcard.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * 	       Parts by Thorsten Klose (tk@midibox.org)

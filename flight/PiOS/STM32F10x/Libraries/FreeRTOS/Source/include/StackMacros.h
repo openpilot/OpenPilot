@@ -1,3 +1,12 @@
+/**
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup FreeRTOS FreeRTOS Operating system
+ * @{
+ * @file StackMacros.h
+ * @author FreeRTOS
+ */
+
 /*
     FreeRTOS V6.0.0 - Copyright (C) 2009 Real Time Engineers Ltd.
 

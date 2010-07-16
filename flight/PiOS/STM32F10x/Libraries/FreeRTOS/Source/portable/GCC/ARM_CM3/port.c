@@ -1,3 +1,13 @@
+/**
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup FreeRTOS FreeRTOS Operating system
+ * @{
+ *
+ * @file port.c
+ * @author FreeRTOS
+ */
+
 /*
     FreeRTOS V6.0.0 - Copyright (C) 2009 Real Time Engineers Ltd.
 
@@ -50,15 +60,6 @@
     http://www.OpenRTOS.com - Commercial support, development, porting,
     licensing and training services.
 */
-
-/**
- * @file port.c
- * @author FreeRTOS
- * @addtogroup PIOS PIOS Core hardware abstraction layer
- * @{
- * @addtogroup FreeRTOS FreeRTOS Operating system
- * @{
- */
 
 /*-----------------------------------------------------------
  * Implementation of functions defined in portable.h for the ARM CM3 port.

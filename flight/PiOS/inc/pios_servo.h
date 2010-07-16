@@ -1,5 +1,9 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup   PIOS_SERVO RC Servo Functions
+ * @{
  *
  * @file       pios_servo.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -32,3 +36,8 @@ extern void PIOS_Servo_SetHz(uint16_t onetofour, uint16_t fivetoeight);
 extern void PIOS_Servo_Set(uint8_t Servo, uint16_t Position);
 
 #endif /* PIOS_SERVO_H */
+
+/**
+  * @}
+  * @}
+  */

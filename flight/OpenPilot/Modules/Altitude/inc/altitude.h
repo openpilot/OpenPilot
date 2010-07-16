@@ -26,7 +26,27 @@
 #ifndef ALTITUDE_H
 #define ALTITUDE_H
 
+/**
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ */
+
+/**
+ * @addtogroup AltitudeModule Altitude Module
+ * @brief Communicate with BMP085 and update AltitudeActual
+ * @{ 
+ */
+
 int32_t AltitudeInitialize();
+
+
+/**
+ * @}
+ */
+
+/**
+ * @}
+ */
 
 #endif // ALTITUDE_H
 

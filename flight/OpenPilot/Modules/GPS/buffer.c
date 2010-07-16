@@ -46,6 +46,17 @@
 
 #include "buffer.h"
 
+/**
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ */
+
+/**
+ * @addtogroup GSPModule GPS Module
+ * @brief Process GPS information
+ * @{ 
+ */
+
 // global variables
 
 // initialization
@@ -137,3 +148,10 @@ void bufferFlush(cBuffer* buffer)
 	buffer->datalength = 0;
 }
 
+/** 
+  * @}
+  */
+
+/**
+  * @}
+  */

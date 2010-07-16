@@ -33,6 +33,18 @@
 #include "manualcontrolcommand.h"
 #include "systemsettings.h"
 
+/**
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ */
+
+/**
+ * @addtogroup StabilizationModule Stabilization Module
+ * @brief Stabilization PID loops in an airframe type independent manner
+ * @{ 
+ */
+
+
 // Private constants
 #define STACK_SIZE configMINIMAL_STACK_SIZE
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
@@ -178,3 +190,11 @@ static float bound(float val, float min, float max)
 	}
 	return val;
 }
+
+/** 
+  * @}
+  */
+
+/** 
+ * @}
+ */

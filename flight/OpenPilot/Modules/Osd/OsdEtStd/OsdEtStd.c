@@ -28,6 +28,17 @@
 #include "flightbatterystate.h"
 #include "positionactual.h"
 
+/**
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ */
+
+/**
+ * @addtogroup OSDModule OSD Module
+ * @brief On screen display support
+ * @{ 
+ */
+
 
 
 //

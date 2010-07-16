@@ -31,6 +31,17 @@
 #include "flightbatterystate.h"
 
 
+/**
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ */
+
+/**
+ * @addtogroup MKSerialModule MK Serial Control Module
+ * @brief Connect to MK module
+ * @{ 
+ */
+
 
 //
 // Configuration
@@ -612,3 +623,11 @@ int32_t MKSerialInitialize(void)
 
 	return 0;
 }
+
+/** 
+  * @}
+  */
+
+/** 
+ * @}
+ */

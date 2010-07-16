@@ -43,6 +43,19 @@
 
 #include "flightbatterystate.h"
 
+
+/**
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ */
+
+/**
+ * @addtogroup BatteryModule Battery Module
+ * @brief Measures battery voltage and current
+ * Updates the FlightBatteryState object
+ * @{ 
+ */
+
 //
 // Configuration
 //
@@ -116,3 +129,11 @@ static void task(void* parameters)
 		vTaskDelayUntil(&lastSysTime, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
 	}
 }
+
+/**
+  * @}
+  */
+
+/**
+ * @}
+ */

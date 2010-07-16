@@ -29,6 +29,21 @@
 #include "objectpersistence.h"
 #include "systemstats.h"
 
+
+/**
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ */
+
+/**
+ * @addtogroup SystemModule Main System Module
+ * @brief Initializes PIOS and other modules runs monitoring
+ * After initializing all the modules (currently selected by Makefile but in
+ * future controlled by configuration on SD card) runs basic monitoring and
+ * alarms.
+ * @{ 
+ */
+
 // Private constants
 #define SYSTEM_UPDATE_PERIOD_MS 1000
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 995998 // calibrated by running tests/test_cpuload.c
@@ -317,3 +332,10 @@ void vApplicationStackOverflowHook( xTaskHandle *pxTask, signed portCHAR *pcTask
 	stackOverflow = 1;
 }
 
+/**
+  * @}
+  */
+
+/**
+  * @}
+  */

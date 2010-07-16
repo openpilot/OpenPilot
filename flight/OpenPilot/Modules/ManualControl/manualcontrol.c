@@ -32,6 +32,22 @@
 #include "actuatordesired.h"
 #include "attitudedesired.h"
 
+/**
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ */
+
+/**
+ * @addtogroup ManualControlModule Manual Control Module
+ * @brief Provide manual control or allow it alter flight mode
+ *
+ * Reads in the ManualControlCommand FlightMode setting from receiver then either 
+ * pass the settings straght to ActuatorDesired object (manual mode) or to
+ * AttitudeDesired object (stabilized mode)
+ * @{ 
+ */
+
+
 // Private constants
 #define STACK_SIZE configMINIMAL_STACK_SIZE
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)

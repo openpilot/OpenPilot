@@ -24,6 +24,17 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+/**
+  * @addtogroup OpenPilotModules OpenPilot Modules
+  * @{ 
+  */
+
+/**
+ * @addtogroup ActuatorModule Actuator Module
+ * @brief Compute servo/motor settings based on desired actuator positions and aircraft type
+ * @{ 
+ */
+
 #include "openpilot.h"
 #include "actuator.h"
 #include "actuatorsettings.h"
@@ -52,7 +63,8 @@ static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutr
 static void setFailsafe();
 
 /**
- * Module initialization
+ * @brief Module initialization
+ * @return 0
  */
 int32_t ActuatorInitialize()
 {
@@ -69,7 +81,7 @@ int32_t ActuatorInitialize()
 }
 
 /**
- * Main module task
+ * @brief Main module task
  */
 static void actuatorTask(void* parameters)
 {
@@ -275,3 +287,11 @@ static void setFailsafe()
 	// Update output object
 	ActuatorCommandSet(&cmd);
 }
+
+/** 
+ * @}
+ */
+
+/** 
+  * @}
+  */

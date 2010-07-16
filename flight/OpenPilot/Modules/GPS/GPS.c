@@ -28,6 +28,17 @@
 #include "GPS.h"
 #include "positionactual.h"
 
+/**
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ */
+
+/**
+ * @addtogroup GSPModule GPS Module
+ * @brief Process GPS information
+ * @{ 
+ */
+
 // constants/macros/typdefs
 #define NMEA_BUFFERSIZE		128
 
@@ -712,4 +723,10 @@ void nmeaProcessGPGSA(char* packet)
 
 }
 
+/** 
+  * @}
+  */
 
+/**
+  * @}
+  */

@@ -54,6 +54,18 @@
 #include "pios_opahrs.h" // library for OpenPilot AHRS access functions
 #include "pios_opahrs_proto.h"
 
+/**
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{ 
+ */
+
+/**
+ * @addtogroup AHRSCommsModule AHRSComms Module
+ * @brief Handles communication with AHRS and updating position
+ * Specifically updates the the AttitudeActual and HeadingActual settings objects
+ * @{ 
+ */
+
 // Private constants
 #define STACK_SIZE 400
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)

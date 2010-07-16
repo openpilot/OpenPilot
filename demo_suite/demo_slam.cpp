@@ -81,7 +81,7 @@ const int display_period = 100; // ms
 
 const int nIntOpts = 9;
 int intOpts[nIntOpts] = {0};
-enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iKeepSeed, iPause, iLog, iVerbose };
+enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iLog, iVerbose };
 
 const int nStrOpts = 2;
 std::string strOpts[nStrOpts];
@@ -96,7 +96,7 @@ struct option long_options[] = {
 	{"render-all", 2, 0, 0},
 	{"replay", 2, 0, 0},
 	{"dump", 2, 0, 0},
-	{"keep-seed", 2, 0, 0},
+	{"rand-seed", 2, 0, 0},
 	{"pause", 2, 0, 0},
 	{"log", 2, 0, 0},
 	{"verbose", 2, 0, 0},
@@ -429,12 +429,14 @@ void demo_slam01_display(world_ptr_t *world) {
 
 		// deal with the random seed
 		rseed = time(NULL);
+		if (intOpts[iRandSeed] != 0 && intOpts[iRandSeed] != 1)
+			rseed = intOpts[iRandSeed];
 		if (!intOpts[iReplay] && intOpts[iDump]) {
 			std::fstream f((strOpts[iDataPath] + std::string("/rseed.log")).c_str(), std::ios_base::out);
 			f << rseed << std::endl;
 			f.close();
 		}
-		else if (intOpts[iReplay] && intOpts[iKeepSeed]) {
+		else if (intOpts[iReplay] && intOpts[iRandSeed] == 1) {
 			std::fstream f((strOpts[iDataPath] + std::string("/rseed.log")).c_str(), std::ios_base::in);
 			f >> rseed;
 			f.close();
@@ -495,7 +497,7 @@ void demo_slam01_display(world_ptr_t *world) {
 		 * --render-all=0/1 (needs --replay 1)
 		 * --replay=0/1 (needs --data-path)
 		 * --dump=0/1  (needs --data-path)
-		 * --keep-seed=0/1 (needs --data-path)
+		 * --rand-seed=n, 0=generate new one, 1=in replay use the saved one
 		 * --pause=0/1 (needs --replay 1)
 		 * #--log=0/1 -> not implemented yet
 		 * #--verbose=0/1/2 -> not implemented yet
@@ -506,15 +508,15 @@ void demo_slam01_display(world_ptr_t *world) {
 		 *
 		 * You can use the following examples and only change values:
 		 * online test (old mode=0):
-		 *   demo_slam --disp-2d=1 --disp-3d=1 --render-all=0 --replay=0 --dump=0 --keep-seed=0 --pause=0 --data-path=data/rtslam01
+		 *   demo_slam --disp-2d=1 --disp-3d=1 --render-all=0 --replay=0 --dump=0 --rand-seed=0 --pause=0 --data-path=data/rtslam01
 		 *   demo_slam --disp-2d=1 --disp-3d=1
 		 * online with dump (old mode=1):
-		 *   demo_slam --disp-2d=1 --disp-3d=1 --render-all=0 --replay=0 --dump=1 --keep-seed=0 --pause=0 --data-path=data/rtslam01
+		 *   demo_slam --disp-2d=1 --disp-3d=1 --render-all=0 --replay=0 --dump=1 --rand-seed=0 --pause=0 --data-path=data/rtslam01
 		 *   demo_slam --disp-2d=1 --disp-3d=1 --dump=1 --data-path=data/rtslam01
 		 * replay with pause  (old mode=2):
-		 *   demo_slam --disp-2d=1 --disp-3d=1 --render-all=1 --replay=1 --dump=0 --keep-seed=1 --pause=1 --data-path=data/rtslam01
+		 *   demo_slam --disp-2d=1 --disp-3d=1 --render-all=1 --replay=1 --dump=0 --rand-seed=1 --pause=1 --data-path=data/rtslam01
 		 * replay with dump  (old mode=3):
-		 *   demo_slam --disp-2d=1 --disp-3d=1 --render-all=1 --replay=1 --dump=1 --keep-seed=1 --pause=0 --data-path=data/rtslam01
+		 *   demo_slam --disp-2d=1 --disp-3d=1 --render-all=1 --replay=1 --dump=1 --rand-seed=1 --pause=0 --data-path=data/rtslam01
 		 */
 		int main(int argc, char* const* argv)
 		{

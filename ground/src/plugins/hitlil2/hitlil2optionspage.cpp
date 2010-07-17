@@ -45,10 +45,10 @@ QWidget *HITLIL2OptionsPage::createPage(QWidget *parent)
 
 
     // Restore the contents from the settings:
-    m_optionsPage->Il2Port->setValue(m_config->il2Port());
     m_optionsPage->Il2HostName->setText(m_config->il2HostName());
     m_optionsPage->Il2Latitude->setText(m_config->il2Latitude());
     m_optionsPage->Il2Longitude->setText(m_config->il2Longitude());
+    m_optionsPage->Il2Port->setValue(m_config->il2Port());
     m_optionsPage->il2ManualControl->setChecked(m_config->il2ManualControl());
 
 
@@ -57,10 +57,10 @@ QWidget *HITLIL2OptionsPage::createPage(QWidget *parent)
 
 void HITLIL2OptionsPage::apply()
 {
-    m_config->setIl2Port( m_optionsPage->Il2Port->value());
     m_config->setIl2HostName( m_optionsPage->Il2HostName->text());
     m_config->setIl2Latitude( m_optionsPage->Il2Latitude->text());
     m_config->setIl2Longitude( m_optionsPage->Il2Longitude->text());
+    m_config->setIl2Port( m_optionsPage->Il2Port->value());
     m_config->setIl2ManualControl( m_optionsPage->il2ManualControl->isChecked());
 }
 

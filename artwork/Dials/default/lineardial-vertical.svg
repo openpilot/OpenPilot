@@ -10,12 +10,12 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="306.25623"
-   height="47.114098"
+   width="47.012333"
+   height="322.58304"
    id="svg10068"
    version="1.1"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="dials-master-linear.svg"
+   sodipodi:docname="dials-master-linear-vertical.svg"
    inkscape:export-filename="H:\Documents\Hobbies\W433\My Gauges\vbat-001.png"
    inkscape:export-xdpi="103.61"
    inkscape:export-ydpi="103.61"
@@ -224,6 +224,13 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective2864"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -232,16 +239,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.8"
-     inkscape:cx="150.43919"
-     inkscape:cy="20.867055"
+     inkscape:zoom="1.4"
+     inkscape:cx="-2.9467106"
+     inkscape:cy="214.52047"
      inkscape:document-units="px"
-     inkscape:current-layer="background"
+     inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1280"
-     inkscape:window-height="744"
-     inkscape:window-x="-4"
-     inkscape:window-y="1020"
+     inkscape:window-height="949"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
      inkscape:window-maximized="1"
      inkscape:object-paths="true"
      showguides="true"
@@ -271,18 +278,19 @@
      inkscape:label="Dark background"
      id="g2932"
      inkscape:groupmode="layer"
-     transform="translate(-227.44331,-365.7337)">
+     transform="translate(-357.06525,-236.21351)">
     <g
        id="background"
-       inkscape:label="#g8543">
+       inkscape:label="#g8543"
+       transform="matrix(0,-1,1,0,-8.719326,769.86218)">
       <rect
          style="fill:#453e3e;fill-opacity:1;stroke:#000000;stroke-width:4;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
          id="rect2936"
-         width="302.25623"
-         height="43.114098"
-         x="229.44331"
-         y="367.7337"
-         ry="3.1816578"
+         width="318.58304"
+         height="43.012333"
+         x="213.06563"
+         y="367.78458"
+         ry="3.1741481"
          inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
          inkscape:export-xdpi="88.809998"
          inkscape:export-ydpi="88.809998" />
@@ -310,105 +318,77 @@
          inkscape:export-xdpi="88.809998"
          inkscape:export-ydpi="88.809998"
          inkscape:label="#rect4388" />
-      <path
-         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 249.16159,372.07875 1.13642,0.12627"
-         id="field"
-         sodipodi:nodetypes="cc"
-         inkscape:label="#path2930" />
-      <path
-         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
-         d="m 451.7298,372.12602 1.13642,0.12627"
-         id="value"
-         sodipodi:nodetypes="cc"
-         inkscape:label="#path2930" />
     </g>
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer5"
      inkscape:label="Green Zone"
-     style="display:inline">
+     style="display:inline"
+     transform="translate(-129.62194,129.52019)">
     <rect
        inkscape:label="#rect5741"
        style="fill:#04b629;fill-opacity:1;stroke:none;display:inline"
        id="green"
        width="260.53882"
        height="9.2538376"
-       x="22.858707"
-       y="29.431705"
+       x="-153.97397"
+       y="158.98152"
        ry="0.68289828"
        inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
        inkscape:export-xdpi="88.809998"
-       inkscape:export-ydpi="88.809998" />
+       inkscape:export-ydpi="88.809998"
+       transform="matrix(0,-1,1,0,0,0)" />
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer4"
      inkscape:label="Yellow Zone"
-     style="display:inline">
-    <g
-       id="g3793">
-      <rect
-         transform="translate(-227.44331,-365.7337)"
-         inkscape:export-ydpi="88.809998"
-         inkscape:export-xdpi="88.809998"
-         inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
-         ry="0.68289828"
-         y="395.16541"
-         x="250.30202"
-         height="9.2538376"
-         width="260.53882"
-         id="rect3773"
-         style="fill:#f1b907;fill-opacity:1;stroke:none;display:inline"
-         inkscape:label="#rect5741" />
-      <rect
-         y="0.0040975953"
-         x="0"
-         height="47.110001"
-         width="306.26001"
-         id="rect3786"
-         style="fill:none;stroke:none" />
-    </g>
+     style="display:inline"
+     transform="translate(-129.62194,129.52019)">
     <rect
        inkscape:export-ydpi="88.809998"
        inkscape:export-xdpi="88.809998"
        inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
        ry="0.68289828"
-       y="29.431705"
-       x="22.858707"
+       y="158.98152"
+       x="-153.97397"
        height="9.2538376"
        width="260.53882"
        id="yellow"
        style="fill:#f1b907;fill-opacity:1;stroke:none;display:inline"
-       inkscape:label="#rect5741" />
+       inkscape:label="#rect5741"
+       transform="matrix(0,-1,1,0,0,0)" />
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer3"
      inkscape:label="Red zone"
-     style="display:inline">
+     style="display:inline"
+     transform="translate(-129.62194,129.52019)">
     <rect
        inkscape:label="#rect5741"
        style="fill:#cf0e0e;fill-opacity:1;stroke:none;display:inline"
        id="red"
        width="260.53882"
        height="9.2538376"
-       x="22.858707"
-       y="29.431705"
+       x="-154.0755"
+       y="158.96294"
        ry="0.68289828"
        inkscape:export-filename="H:\Documents\Hobbies\W433\g9905.png"
        inkscape:export-xdpi="88.809998"
-       inkscape:export-ydpi="88.809998" />
+       inkscape:export-ydpi="88.809998"
+       transform="matrix(0,-1,1,0,0,0)" />
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer6"
      inkscape:label="Indicator"
-     style="display:inline">
+     style="display:inline"
+     transform="translate(-129.62194,129.52019)">
     <path
        style="fill:#ffffff;fill-opacity:1;stroke:#c2bfbf;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 29.39406,23.75432 -14.268403,0 7.134202,12 7.134201,-12 z"
+       d="m 149.75986,-113.1656 0,14.26841 12,-7.13421 -12,-7.1342 z"
        id="needle"
        sodipodi:nodetypes="cccc"
        inkscape:label="#path5747" />
@@ -417,30 +397,24 @@
      inkscape:groupmode="layer"
      id="layer1"
      inkscape:label="Text"
-     style="display:inline">
-    <text
-       xml:space="preserve"
-       style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Vera Sans"
-       x="22.203053"
-       y="20.345066"
-       id="bb"
-       inkscape:label="#text4390"><tspan
-         sodipodi:role="line"
-         id="tspan4392"
-         x="22.203053"
-         y="20.345066"
-         style="font-size:18px;fill:#ffffff;fill-opacity:1">Vbat</tspan></text>
-    <text
-       transform="translate(-227.44331,-365.7337)"
-       xml:space="preserve"
-       style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Vera Sans"
-       x="449.35425"
-       y="385.8497"
-       id="text4390-1"><tspan
-         sodipodi:role="line"
-         id="tspan4392-7"
-         x="449.35425"
-         y="385.8497"
-         style="font-size:18px;fill:#ffffff;fill-opacity:1">11.32V</tspan></text>
+     style="display:inline"
+     transform="translate(-129.62194,129.52019)">
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:4;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="field"
+       width="36.996838"
+       height="12.626906"
+       x="4.9244938"
+       y="285.58621"
+       transform="translate(129.62194,-129.52019)"
+       inkscape:label="#rect2878" />
+    <rect
+       inkscape:label="#rect2878"
+       y="170.06602"
+       x="134.54643"
+       height="12.626906"
+       width="36.996838"
+       id="value"
+       style="fill:#ffffff;fill-opacity:1;stroke:none" />
   </g>
 </svg>

@@ -15,7 +15,7 @@
    id="svg10068"
    version="1.1"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="gps-horizontal.svg"
+   sodipodi:docname="gps-signal.svg"
    inkscape:export-filename="H:\Documents\Hobbies\W433\My Gauges\vbat-001.png"
    inkscape:export-xdpi="103.61"
    inkscape:export-ydpi="103.61"
@@ -416,16 +416,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="107.45414"
+     inkscape:zoom="3.959798"
+     inkscape:cx="62.249814"
      inkscape:cy="43.870219"
      inkscape:document-units="px"
      inkscape:current-layer="svg10068"
      showgrid="false"
      inkscape:window-width="1280"
-     inkscape:window-height="744"
-     inkscape:window-x="-4"
-     inkscape:window-y="1020"
+     inkscape:window-height="725"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
      inkscape:window-maximized="1"
      inkscape:object-paths="true"
      showguides="true"
@@ -443,7 +443,7 @@
        id="guide2927" />
     <sodipodi:guide
        orientation="1,0"
-       position="14.107143,32.678571"
+       position="10.85914,54.548237"
        id="guide2929" />
   </sodipodi:namedview>
   <metadata
@@ -703,17 +703,12 @@
          ry="2.2728431" />
     </g>
   </g>
-  <g
-     style="font-size:40px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+  <rect
+     style="fill:#ff0606;fill-opacity:1;stroke:none"
      id="value"
-     inkscape:label="#text3709">
-    <path
-       d="m 25.549556,67.431915 -3.515625,0 0,-22.402343 c -0.846365,0.807313 -1.95639,1.614604 -3.330078,2.421875 -1.373705,0.80731 -2.607428,1.412779 -3.701172,1.816406 l 0,-3.398438 c 1.966139,-0.924456 3.684888,-2.044247 5.15625,-3.359375 1.471343,-1.315078 2.513009,-2.591118 3.125,-3.828125 l 2.265625,0 z"
-       style="fill:#ffffff;fill-opacity:1"
-       id="path3714" />
-    <path
-       d="m 53.049556,64.053009 0,3.378906 -18.925781,0 c -0.02604,-0.846353 0.110675,-1.660154 0.410156,-2.441406 0.481769,-1.289059 1.253252,-2.558589 2.314453,-3.808594 1.061193,-1.249992 2.594394,-2.695303 4.599609,-4.335937 3.111968,-2.55207 5.21483,-4.573553 6.308594,-6.064453 1.093734,-1.490868 1.640609,-2.900371 1.640625,-4.228516 -1.6e-5,-1.393207 -0.498063,-2.568336 -1.494141,-3.525391 -0.996107,-0.957005 -2.294934,-1.435521 -3.896484,-1.435546 -1.692718,2.5e-5 -3.046883,0.507837 -4.0625,1.523437 -1.015631,1.015648 -1.529953,2.421897 -1.542969,4.21875 l -3.613281,-0.371094 c 0.247394,-2.695289 1.178382,-4.749323 2.792969,-6.162109 1.614577,-1.412732 3.782543,-2.119112 6.503906,-2.119141 2.747382,2.9e-5 4.921859,0.761747 6.523438,2.285157 1.601543,1.523462 2.402323,3.411481 2.402343,5.664062 -2e-5,1.145853 -0.234395,2.272154 -0.703125,3.378906 -0.468769,1.106787 -1.246763,2.272151 -2.333984,3.496094 -1.087256,1.223971 -2.893894,2.903657 -5.419922,5.039063 -2.109385,1.77084 -3.46355,2.972011 -4.0625,3.603515 -0.598965,0.631515 -1.093756,1.26628 -1.484375,1.904297 z"
-       style="fill:#ffffff;fill-opacity:1"
-       id="path3716" />
-  </g>
+     width="47.775032"
+     height="25.001274"
+     x="11.616754"
+     y="43.612305"
+     inkscape:label="#rect4044" />
 </svg>

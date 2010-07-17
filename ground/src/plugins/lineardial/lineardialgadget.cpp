@@ -48,7 +48,6 @@ LineardialGadget::~LineardialGadget()
 void LineardialGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 {
     LineardialGadgetConfiguration *m = qobject_cast<LineardialGadgetConfiguration*>(config);
-    m_widget->setDialFont(m->getFont());
     m_widget->setFactor(m->getFactor());
     m_widget->setDecimalPlaces(m->getDecimalPlaces());
     m_widget->setRange(m->getMin(),m->getMax());
@@ -56,5 +55,6 @@ void LineardialGadget::loadConfiguration(IUAVGadgetConfiguration* config)
     m_widget->setYellowRange(m->getYellowMin(), m->getYellowMax());
     m_widget->setRedRange(m->getRedMin(), m->getRedMax());
     m_widget->setDialFile(m->getDialFile()); // Triggers widget repaint
+    m_widget->setDialFont(m->getFont());
     m_widget->connectInput(m->getSourceDataObject(), m->getSourceObjectField());
 }

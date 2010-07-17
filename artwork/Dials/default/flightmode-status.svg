@@ -958,22 +958,22 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.979899"
-     inkscape:cx="119.57837"
+     inkscape:cx="56.191298"
      inkscape:cy="90.710362"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1280"
-     inkscape:window-height="744"
-     inkscape:window-x="-4"
-     inkscape:window-y="1020"
+     inkscape:window-height="725"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
      inkscape:window-maximized="1"
      inkscape:object-paths="true"
      showguides="true"
      inkscape:guide-bbox="true"
      inkscape:snap-to-guides="true"
      inkscape:snap-grids="false"
-     inkscape:snap-global="true" />
+     inkscape:snap-global="false" />
   <metadata
      id="metadata10073">
     <rdf:RDF>
@@ -982,7 +982,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
         <dc:creator>
           <cc:Agent>
             <dc:title>Edouard Lafargue</dc:title>
@@ -1090,9 +1090,9 @@
        style="opacity:0.98000004;fill:#ffffff;fill-opacity:1;stroke:#e31717;stroke-width:3.18836617;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="value"
        width="132.66878"
-       height="47.668777"
-       x="17.951326"
-       y="15.92205"
+       height="20.899738"
+       x="15.425945"
+       y="29.964067"
        ry="5.4077783"
        inkscape:label="#rect2989" />
     <g

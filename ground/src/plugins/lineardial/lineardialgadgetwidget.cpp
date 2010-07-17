@@ -7,7 +7,7 @@
  * @{
  * @addtogroup LinearDialPlugin Linear Dial Plugin
  * @{
- * @brief Impliments a gadget that displays linear gauges 
+ * @brief Implements a gadget that displays linear gauges and generic indicators
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -235,8 +235,6 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
               QRectF nRect = textMatrix.mapRect(m_renderer->boundsOnElement("needle"));
               startX = nRect.x();
               startY = nRect.y();
-              //indexWidth = nRect.width();
-              //indexHeight = nRect.height();
               QTransform matrix;
               matrix.translate(startX,startY);
               index = new QGraphicsSvgItem();
@@ -251,11 +249,14 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
           // Check whether the dial wants display its field name:
           if (m_renderer->elementExists("field")) {
               QMatrix textMatrix = m_renderer->matrixForElement("field");
-              qreal startX = textMatrix.mapRect(m_renderer->boundsOnElement("field")).x();
-              qreal startY = textMatrix.mapRect(m_renderer->boundsOnElement("field")).y();
+              QRectF rect = textMatrix.mapRect(m_renderer->boundsOnElement("field"));
+              qreal startX = rect.x();
+              qreal startY = rect.y();
+              qreal elHeight = rect.height();
               QTransform matrix;
-              matrix.translate(startX,startY);
-              fieldName = new QGraphicsTextItem("0.00");
+              matrix.translate(startX,startY-elHeight/2);
+              fieldName = new QGraphicsTextItem("field");
+              fieldName->setFont(QFont("Arial",(int)elHeight));
               fieldName->setDefaultTextColor(QColor("White"));
               fieldName->setTransform(matrix,false);
               fieldName->setParentItem(background);
@@ -266,11 +267,14 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
           // Check whether the dial wants display the numeric value:
           if (m_renderer->elementExists("value")) {
               QMatrix textMatrix = m_renderer->matrixForElement("value");
-              qreal startX = textMatrix.mapRect(m_renderer->boundsOnElement("value")).x();
-              qreal startY = textMatrix.mapRect(m_renderer->boundsOnElement("value")).y();
+              QRectF nRect = textMatrix.mapRect(m_renderer->boundsOnElement("value"));
+              qreal startX = nRect.x();
+              qreal startY = nRect.y();
+              qreal elHeight = nRect.height();
               QTransform matrix;
-              matrix.translate(startX,startY);
-              fieldValue = new QGraphicsTextItem("00");
+              matrix.translate(startX,startY-elHeight/2);
+              fieldValue = new QGraphicsTextItem("0.00");
+              fieldValue->setFont(QFont("Arial",(int)elHeight));
               fieldValue->setDefaultTextColor(QColor("White"));
               fieldValue->setTransform(matrix,false);
               fieldValue->setParentItem(background);
@@ -299,7 +303,6 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
             foreground = new QGraphicsSvgItem();
             foreground->setSharedRenderer(m_renderer);
             foreground->setElementId("foreground");
-            //l_scene->addItem(foreground);
             foreground->setParentItem(background);
             fgenabled = true;
         } else {
@@ -330,12 +333,20 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
 
 void LineardialGadgetWidget::setDialFont(QString fontProps)
 {
+    // Note: a bit of juggling to preserve the automatic
+    // font size which was calculated upon dial initialization.
     QFont font = QFont("Arial",12);
     font.fromString(fontProps);
-    if (fieldName)
+    if (fieldName) {
+        int fieldSize = fieldName->font().pointSize();
+        font.setPointSize(fieldSize);
         fieldName->setFont(font);
-    if (fieldValue)
-        fieldValue->setFont(font);
+    }
+    if (fieldValue) {
+       int fieldSize = fieldValue->font().pointSize();
+       font.setPointSize(fieldSize);
+       fieldValue->setFont(font);
+   }
 }
 
 
@@ -391,10 +402,8 @@ void LineardialGadgetWidget::moveIndex()
     index->resetTransform();
     qreal trans = indexValue*bargraphSize/100;
     if (verticalDial) {
-        //matrix.translate(startX-indexWidth/2,trans+startY-indexHeight/2);
         matrix.translate(startX,trans+startY);
     } else {
-        //matrix.translate(trans+startX-indexWidth/2,startY-indexHeight/2);
         matrix.translate(trans+startX,startY);
     }
     index->setTransform(matrix,false);

@@ -142,7 +142,7 @@ void Il2Bridge::transmitUpdate()
 {
     // Read ActuatorDesired from autopilot
     ActuatorDesired::DataFields actData = actDesired->getData();
-    float ailerons = -actData.Roll;
+    float ailerons = actData.Roll;
     float elevator = actData.Pitch;
     float rudder = actData.Yaw;
     float throttle = actData.Throttle*2-1.0;
@@ -299,7 +299,7 @@ void Il2Bridge::processUpdate(QString& data)
 		    current.azimuth=value;
 		    break;
 	        case 46:
-		    current.roll=value;
+		    current.roll=-value;
 		    break;
 	        case 48:
 		    current.pitch=value;

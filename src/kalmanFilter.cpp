@@ -123,7 +123,7 @@ namespace jafar {
 			}
 			
 			// 2 compute Kalman gain
-JFR_DEBUG("correctAllStacked: stackedInnovation_P " << stackedInnovation_P << ", PJt_tmp " << PJt_tmp << ", stackedInnovation_x " << stackedInnovation_x);
+// JFR_DEBUG("correctAllStacked: stackedInnovation_P " << stackedInnovation_P << ", PJt_tmp " << PJt_tmp << ", stackedInnovation_x " << stackedInnovation_x);
 			ublasExtra::lu_inv(stackedInnovation_P, stackedInnovation_iP);
 			K = - prod(PJt_tmp, stackedInnovation_iP);
 			

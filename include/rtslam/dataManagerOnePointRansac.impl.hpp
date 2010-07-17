@@ -33,7 +33,7 @@ namespace jafar {
 		DataManagerOnePointRansac<RawSpec, SensorSpec, Detector, Matcher>::
 		processKnownObs( boost::shared_ptr<RawSpec> rawData)
 			{
-std::cout << std::endl << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl << std::endl;
+JFR_DEBUG("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
 				map_ptr_t mapPtr = sensorPtr()->robotPtr()->mapPtr();
 				int numObs = 0;
 				asGrid->renew();

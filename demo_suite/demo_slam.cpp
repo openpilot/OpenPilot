@@ -120,7 +120,7 @@ const unsigned MAP_SIZE = 313;
 const double UNCERT_VLIN = .1; // m/s
 const double UNCERT_VANG = .1; // rad/s
 const double PERT_VLIN = 1; // m/s per sqrt(s)
-const double PERT_VANG = 1; // rad/s per sqrt(s)
+const double PERT_VANG = 3; // rad/s per sqrt(s)
 
 // pin-hole:
 const unsigned IMG_WIDTH = 640;

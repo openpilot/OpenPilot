@@ -27,6 +27,7 @@
  */
 
 #include "dialgadgetwidget.h"
+#include <utils/stylehelper.h>
 #include <iostream>
 #include <QDebug>
 
@@ -164,6 +165,7 @@ void DialGadgetWidget::setDialFile(QString dfn, QString bg, QString fg, QString 
    n2enabled = false;
    n3enabled = false;
    QGraphicsScene *l_scene = scene();
+   setBackgroundBrush(QBrush(Utils::StyleHelper::baseColor()));
    if (QFile::exists(dfn) && m_renderer->load(dfn) && m_renderer->isValid())
    {
      l_scene->clear(); // This also deletes all items contained in the scene.

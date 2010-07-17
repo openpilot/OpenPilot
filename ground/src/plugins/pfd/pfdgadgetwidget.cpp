@@ -26,6 +26,7 @@
  */
 
 #include "pfdgadgetwidget.h"
+#include <utils/stylehelper.h>
 #include <iostream>
 #include <QDebug>
 #include <cmath>
@@ -280,6 +281,7 @@ void PFDGadgetWidget::updateBattery(UAVObject *object1) {
 void PFDGadgetWidget::setDialFile(QString dfn)
 {
    QGraphicsScene *l_scene = scene();
+   setBackgroundBrush(QBrush(Utils::StyleHelper::baseColor()));
    if (QFile::exists(dfn) && m_renderer->load(dfn) && m_renderer->isValid())
    {
 /* The PFD element IDs are fixed, not like with the analog dial.

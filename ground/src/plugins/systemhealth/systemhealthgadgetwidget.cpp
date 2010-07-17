@@ -26,6 +26,7 @@
  */
 
 #include "systemhealthgadgetwidget.h"
+#include "utils/stylehelper.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/systemalarms.h"
@@ -42,6 +43,7 @@ SystemHealthGadgetWidget::SystemHealthGadgetWidget(QWidget *parent) : QGraphicsV
     setMinimumSize(128,128);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setScene(new QGraphicsScene(this));
+
  
     m_renderer = new QSvgRenderer();
     background = new QGraphicsSvgItem();
@@ -106,6 +108,7 @@ SystemHealthGadgetWidget::~SystemHealthGadgetWidget()
 
 void SystemHealthGadgetWidget::setSystemFile(QString dfn)
 {
+    setBackgroundBrush(QBrush(Utils::StyleHelper::baseColor()));
    if (QFile::exists(dfn))
    {
       m_renderer->load(dfn);

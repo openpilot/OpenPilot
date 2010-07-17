@@ -341,8 +341,9 @@ void demo_slam01_main(world_ptr_t *world) {
 			}
 		} // if had_data
 
+		int t = (*world)->t;
 		worldPtr->display_mutex.unlock();
-		if (intOpts[iPause] && had_data) getchar(); // wait for key in replay mode
+		if (intOpts[iPause] != 0 && t >= intOpts[iPause] && had_data) getchar(); // wait for key in replay mode
 //std::cout << "one frame " << (*world)->t << " : " << mode << " " << had_data << std::endl;
 	} // temporal loop
 
@@ -497,8 +498,8 @@ void demo_slam01_display(world_ptr_t *world) {
 		 * --render-all=0/1 (needs --replay 1)
 		 * --replay=0/1 (needs --data-path)
 		 * --dump=0/1  (needs --data-path)
-		 * --rand-seed=n, 0=generate new one, 1=in replay use the saved one
-		 * --pause=0/1 (needs --replay 1)
+		 * --rand-seed=0/1/n, 0=generate new one, 1=in replay use the saved one
+		 * --pause=0/n 0=don't, n=pause for frames>n (needs --replay 1)
 		 * #--log=0/1 -> not implemented yet
 		 * #--verbose=0/1/2 -> not implemented yet
 		 * --data-path=/mnt/ram/rtslam

@@ -19,184 +19,6 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>150</y>
-     <width>501</width>
-     <height>71</height>
-    </rect>
-   </property>
-   <layout class="QGridLayout" name="gridLayout_2">
-    <item row="2" column="2" colspan="7">
-     <widget class="QComboBox" name="Sound1">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="13">
-     <widget class="QPushButton" name="buttonTestSound2">
-      <property name="text">
-       <string>Play</string>
-      </property>
-      <property name="icon">
-       <iconset resource="res.qrc">
-        <normaloff>:/notify/images/play.png</normaloff>:/notify/images/play.png</iconset>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="12">
-     <widget class="QComboBox" name="Sound2">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="7" colspan="3">
-     <widget class="QDoubleSpinBox" name="ValueSpinBox">
-      <property name="decimals">
-       <number>2</number>
-      </property>
-      <property name="maximum">
-       <double>9999.899999999999636</double>
-      </property>
-      <property name="singleStep">
-       <double>1.000000000000000</double>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="2" colspan="5">
-     <widget class="QComboBox" name="Value">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <item>
-       <property name="text">
-        <string>Equal to</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Greater than</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Less than</string>
-       </property>
-      </item>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QLabel" name="labelSound1">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>Sound1:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="12" colspan="2">
-     <widget class="QComboBox" name="SayOrder">
-      <property name="toolTip">
-       <string>Select if the value of the object should be spoken and if so, either before the configured sound or after it.</string>
-      </property>
-      <item>
-       <property name="text">
-        <string>Never</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Before first</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>After first</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>After second</string>
-       </property>
-      </item>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QLabel" name="labelValue">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>Value is</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="11">
-     <widget class="QLabel" name="labelSayOrder">
-      <property name="text">
-       <string>Say Order</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="9">
-     <widget class="QPushButton" name="buttonTestSound1">
-      <property name="text">
-       <string>Play</string>
-      </property>
-      <property name="icon">
-       <iconset resource="res.qrc">
-        <normaloff>:/notify/images/play.png</normaloff>:/notify/images/play.png</iconset>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="10">
-     <spacer name="horizontalSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeType">
-       <enum>QSizePolicy::Maximum</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="2" column="11">
-     <widget class="QLabel" name="labelSound2">
-      <property name="text">
-       <string>Sound2:</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
     <rect>
@@ -274,57 +96,6 @@ p, li { white-space: pre-wrap; }
    <property name="title">
     <string>Sound Notifcations</string>
    </property>
-   <widget class="QTableWidget" name="tableNotifications">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>481</width>
-      <height>151</height>
-     </rect>
-    </property>
-    <property name="minimumSize">
-     <size>
-      <width>0</width>
-      <height>0</height>
-     </size>
-    </property>
-    <property name="maximumSize">
-     <size>
-      <width>600</width>
-      <height>16777215</height>
-     </size>
-    </property>
-    <property name="editTriggers">
-     <set>QAbstractItemView::DoubleClicked</set>
-    </property>
-    <property name="selectionBehavior">
-     <enum>QAbstractItemView::SelectRows</enum>
-    </property>
-    <property name="columnCount">
-     <number>2</number>
-    </property>
-    <attribute name="horizontalHeaderVisible">
-     <bool>true</bool>
-    </attribute>
-    <attribute name="horizontalHeaderDefaultSectionSize">
-     <number>200</number>
-    </attribute>
-    <attribute name="horizontalHeaderMinimumSectionSize">
-     <number>100</number>
-    </attribute>
-    <attribute name="verticalHeaderVisible">
-     <bool>true</bool>
-    </attribute>
-    <attribute name="verticalHeaderDefaultSectionSize">
-     <number>20</number>
-    </attribute>
-    <attribute name="verticalHeaderHighlightSections">
-     <bool>true</bool>
-    </attribute>
-    <column/>
-    <column/>
-   </widget>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
@@ -427,6 +198,28 @@ p, li { white-space: pre-wrap; }
      </item>
     </layout>
    </widget>
+   <widget class="QTableView" name="notifyRulesView">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>481</width>
+      <height>151</height>
+     </rect>
+    </property>
+    <property name="selectionMode">
+     <enum>QAbstractItemView::SingleSelection</enum>
+    </property>
+    <property name="selectionBehavior">
+     <enum>QAbstractItemView::SelectRows</enum>
+    </property>
+    <attribute name="verticalHeaderDefaultSectionSize">
+     <number>22</number>
+    </attribute>
+    <attribute name="verticalHeaderMinimumSectionSize">
+     <number>22</number>
+    </attribute>
+   </widget>
   </widget>
   <widget class="QWidget" name="horizontalLayoutWidget">
    <property name="geometry">
@@ -486,6 +279,270 @@ p, li { white-space: pre-wrap; }
    <property name="orientation">
     <enum>Qt::Horizontal</enum>
    </property>
+  </widget>
+  <widget class="QWidget" name="horizontalLayoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>180</y>
+     <width>501</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <item>
+     <widget class="QLabel" name="labelSound1">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Sound1:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QComboBox" name="Sound1">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>110</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777215</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="labelSound2">
+      <property name="text">
+       <string>Sound2:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QComboBox" name="Sound2">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>110</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777215</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="labelSound3">
+      <property name="text">
+       <string>Sound3:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QComboBox" name="Sound3">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>110</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777215</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="horizontalLayoutWidget_3">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>150</y>
+     <width>501</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_5">
+    <item>
+     <widget class="QLabel" name="labelValue">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>40</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>Value is</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QComboBox" name="Value">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>110</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <item>
+       <property name="text">
+        <string>Equal to</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Greater than</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Less than</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item>
+     <widget class="QDoubleSpinBox" name="ValueSpinBox">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>170</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="decimals">
+       <number>2</number>
+      </property>
+      <property name="maximum">
+       <double>9999.899999999999636</double>
+      </property>
+      <property name="singleStep">
+       <double>1.000000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="labelSayOrder">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Say Order</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QComboBox" name="SayOrder">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>110</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Select if the value of the object should be spoken and if so, either before the configured sound or after it.</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>Never</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Before first</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>After first</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>After second</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>After third</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <customwidgets>

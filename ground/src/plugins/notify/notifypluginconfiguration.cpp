@@ -31,6 +31,8 @@
 
 
 NotifyPluginConfiguration::NotifyPluginConfiguration(QObject *parent) :
+	isNowPlaying(0),
+	firstStart(1),
 	soundCollectionPath(""),
 	currentLanguage("default"),
 	dataObject(""),
@@ -38,11 +40,16 @@ NotifyPluginConfiguration::NotifyPluginConfiguration(QObject *parent) :
 	value("Equal to"),
 	sound1(""),
 	sound2(""),
+	sound3(""),
 	sayOrder("Never"),
 	spinBoxValue(0),
-	repeatString("Continue")
-{
+	repeatString("Repeat Instantly"),
+	repeatTimeout(true),
+	expireTimeout(15)
 
+{
+	timer = NULL;
+	expireTimer = NULL;
 }
 
 
@@ -56,8 +63,10 @@ void NotifyPluginConfiguration::saveState(QSettings* settings) const
 	settings->setValue(QLatin1String("ValueSpinBox"), getSpinBoxValue());
 	settings->setValue(QLatin1String("Sound1"), getSound1());
 	settings->setValue(QLatin1String("Sound2"), getSound2());
+	settings->setValue(QLatin1String("Sound3"), getSound3());
 	settings->setValue(QLatin1String("SayOrder"), getSayOrder());
 	settings->setValue(QLatin1String("Repeat"), getRepeatFlag());
+	settings->setValue(QLatin1String("ExpireTimeout"), getExpireTimeout());
 }
 
 void NotifyPluginConfiguration::restoreState(QSettings* settings)
@@ -70,9 +79,11 @@ void NotifyPluginConfiguration::restoreState(QSettings* settings)
 	setValue(settings->value(QLatin1String("Value"), tr("")).toString());
 	setSound1(settings->value(QLatin1String("Sound1"), tr("")).toString());
 	setSound2(settings->value(QLatin1String("Sound2"), tr("")).toString());
+	setSound3(settings->value(QLatin1String("Sound3"), tr("")).toString());
 	setSayOrder(settings->value(QLatin1String("SayOrder"), tr("")).toString());
 	setSpinBoxValue(settings->value(QLatin1String("ValueSpinBox"), tr("")).toDouble());
 	setRepeatFlag(settings->value(QLatin1String("Repeat"), tr("")).toString());
+	setExpireTimeout(settings->value(QLatin1String("ExpireTimeout"), tr("")).toInt());
 }
 
 
@@ -104,28 +115,41 @@ QString NotifyPluginConfiguration::parseNotifyMessage()
 				notifyMessageList.append(getSoundCollectionPath()+"\\default\\"+getSound2()+".wav");
 	}
 
+	if(getSound3()!="")
+	{
+		if(QFile::exists(getSoundCollectionPath()+"\\"+getCurrentLanguage()+"\\"+getSound3()+".wav"))
+			notifyMessageList.append(getSoundCollectionPath()+"\\"+getCurrentLanguage()+"\\"+getSound3()+".wav");
+		else
+			if(QFile::exists(getSoundCollectionPath()+"\\"+"\\default\\"+"\\"+getSound3()+".wav"))
+				notifyMessageList.append(getSoundCollectionPath()+"\\default\\"+getSound3()+".wav");
+	}
+
 	switch(str1.at(0).toAscii())
 	{
 		case 'N'://NEVER:
-		   str = getSound1()+" "+getSound2();
+		   str = getSound1()+" "+getSound2()+" "+getSound3();
 		   position = 0xFF;
 		   break;
 
 		case 'B'://BEFORE:
-		   str = QString("%L1 ").arg(getSpinBoxValue())+getSound1()+" "+getSound2();
+		   str = QString("%L1 ").arg(getSpinBoxValue())+getSound1()+" "+getSound2()+" "+getSound3();
 		   position = 0;
 		   break;
 
-		case 'A'://AFTER1:
+		case 'A'://AFTER:
 			switch(str1.at(6).toAscii())
 			{
 			case 'f':
-				str = getSound1()+QString(" %L1 ").arg(getSpinBoxValue())+getSound2();
+				str = getSound1()+QString(" %L1 ").arg(getSpinBoxValue())+getSound2()+" "+getSound3();
 				position = 1;
 				break;
 			case 's':
-				str = getSound1()+" "+getSound2()+QString(" %L1").arg(getSpinBoxValue());
+				str = getSound1()+" "+getSound2()+QString(" %L1").arg(getSpinBoxValue())+" "+getSound3();
 				position = 2;
+				break;
+			case 't':
+				str = getSound1()+" "+getSound2()+" "+getSound3()+QString(" %L1").arg(getSpinBoxValue());
+				position = 3;
 				break;
 			}
 			break;

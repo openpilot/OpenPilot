@@ -28,72 +28,6 @@
 #include "notifyitemdelegate.h"
 #include <QtGui>
 
-//RepeatCounterDelegate::RepeatCounterDelegate(QObject *parent)
-//		 : QItemDelegate(parent) {}
-
-// QWidget* RepeatCounterDelegate::createEditor(QWidget *parent,
-//										   const QStyleOptionViewItem &,
-//										   const QModelIndex &index) const
-// {
-//	 if (index.row() == 2) {
-//		 QSpinBox *editor = new QSpinBox(parent);
-//		 editor->setMinimum(0);
-//		 editor->setMaximum(100);
-//		 return editor;
-//	 }
-
-//	 QLabel *editor = new QLabel(parent);
-
-//	 connect(editor, SIGNAL(editingFinished()),
-//		 this, SLOT(commitAndCloseEditor()));
-//	 return editor;
-// }
-
-// void RepeatCounterDelegate::commitAndCloseEditor()
-// {
-//	 QLabel* editor = qobject_cast<QLabel*>(sender());
-//	 emit commitData(editor);
-//	 emit closeEditor(editor);
-// }
-
-// void RepeatCounterDelegate::setEditorData(QWidget *editor,
-//	 const QModelIndex &index) const
-// {
-//	 QLabel* edit = qobject_cast<QLabel*>(editor);
-//	 if (edit) {
-//		 edit->setText(index.model()->data(index, Qt::EditRole).toString());
-//	 } else {
-//		 QSpinBox* spinBox = static_cast<QSpinBox*>(editor);
-//		 if (spinBox)
-//		 {
-//			 int value = index.model()->data(index, Qt::EditRole).toInt();
-//			 spinBox->setValue(value);
-
-//			 //repeatEditor->setCurrentIndex(repeatEditor->findText(index.model()->data(index, Qt::EditRole).toString()));
-////			 repeatEditor->setDate(QDate::fromString(
-////			 index.model()->data(index, Qt::EditRole).toString(),
-////			 "d/M/yyyy"));
-//		 }
-//	 }
-// }
-
-// void RepeatCounterDelegate::setModelData(QWidget *editor,
-//	 QAbstractItemModel *model, const QModelIndex &index) const
-// {
-//	 QLabel* edit = qobject_cast<QLabel*>(editor);
-//	 if (edit) {
-//		 model->setData(index, edit->text());
-//	 } else {
-//		 QSpinBox* spinBox = static_cast<QSpinBox*>(editor);
-//		 if (spinBox) {
-//			 spinBox->interpretText();
-//			 int value = spinBox->value();
-//			 model->setData(index, value, Qt::EditRole);
-//		 }
-//	 }
-// }
-
-//////////////////////////////////////////////////////////////////////////
 
  NotifyItemDelegate::NotifyItemDelegate(QStringList items,QObject *parent)
 		 : QItemDelegate(parent),
@@ -116,16 +50,23 @@
 		 //connect(repeatEditor,SIGNAL(activated (const QString& )),this,SLOT(selectRow(const QString& )));
 		 //QTableWidgetItem* item = qobject_cast<QTableWidgetItem *>(parent);
 		 //((QTableWidgetItem*)parent)->setSelected(true);
-		 connect(editor, SIGNAL(editingFinished()),
-				 this, SLOT(commitAndCloseEditor()));
+//		 connect(editor, SIGNAL(editingFinished()),
+//				 this, SLOT(commitAndCloseEditor()));
 		  return editor;
+	 } else
+	 {
+		 if(index.column() == 2)
+		 {
+			 QSpinBox* editor = new QSpinBox(parent);
+			 connect(editor, SIGNAL(editingFinished()),
+					  this, SLOT(commitAndCloseEditor()));
+			 return editor;
+		 }
+
 	 }
 	 QLineEdit *editor = new QLineEdit(parent);
-
-
-
-	 connect(editor, SIGNAL(editingFinished()),
-		 this, SLOT(commitAndCloseEditor()));
+//	 connect(editor, SIGNAL(editingFinished()),
+//		 this, SLOT(commitAndCloseEditor()));
 	 return editor;
  }
 
@@ -136,16 +77,22 @@
 	 {
 		 emit commitData(editor);
 		 emit closeEditor(editor);
-	 }
-	 else
-	 {
+
+	 } else {
 		 QComboBox* editor = qobject_cast<QComboBox*>(sender());
-		  if (editor)
+		 if (editor)
 		 {
-			  emit commitData(editor);
-			  emit closeEditor(editor);
-		  }
-	  }
+			 emit commitData(editor);
+			 emit closeEditor(editor);
+		 } else {
+			 QSpinBox* editor = qobject_cast<QSpinBox*>(sender());
+			 if (editor)
+			 {
+				 emit commitData(editor);
+				 emit closeEditor(editor);
+			 }
+		 }
+	 }
  }
 
  void NotifyItemDelegate::setEditorData(QWidget *editor,
@@ -158,9 +105,12 @@
 		 QComboBox * repeatEditor = qobject_cast<QComboBox *>(editor);
 		 if (repeatEditor)
 			 repeatEditor->setCurrentIndex(repeatEditor->findText(index.model()->data(index, Qt::EditRole).toString()));
-//		 QTableWidgetItem* item = ((QTableWidget*)m_parent)->item(index.row(),1);
-//		 item->setSelected(true);
+		 else {
+			 QSpinBox * expireEditor = qobject_cast<QSpinBox *>(editor);
+			 if (expireEditor)
+				 expireEditor->setValue(index.model()->data(index, Qt::EditRole).toInt());
 		 }
+	 }
  }
 
  void NotifyItemDelegate::setModelData(QWidget *editor,
@@ -173,11 +123,17 @@
 		 QComboBox * repeatEditor = qobject_cast<QComboBox *>(editor);
 		 if (repeatEditor) {
 			 model->setData(index, repeatEditor->currentText());
-//			 emit commitData(repeatEditor);
-//			 emit closeEditor(repeatEditor);
+
+		 } else {
+			QSpinBox * expireEditor = qobject_cast<QSpinBox *>(editor);
+			if (expireEditor) {
+				//expireEditor->interpretText();
+				model->setData(index, expireEditor->value(), Qt::EditRole);
+			}
 		 }
 	 }
  }
+
 
 void NotifyItemDelegate::selectRow(const QString & text)
 {
@@ -194,13 +150,11 @@ void NotifyItemDelegate::selectRow(const QString & text)
 	//item->setSelected(true);
 }
 
-// bool NotifyItemDelegate::editorEvent(QEvent * event, QAbstractItemModel * model,
-//					 const QStyleOptionViewItem & option, const QModelIndex & index )
-// {
-//	 if(event->type()==QEvent::EnabledChange)
-//	 {
-//		 QTableWidgetItem* item = ((QTableWidget*)parent())->item(index.row(),index.column());
-//		 item->setSelected(true);
-//	 }
-//	 return false;
-// }
+QSize  NotifyItemDelegate::sizeHint ( const QStyleOptionViewItem  & option,
+									  const QModelIndex & index ) const
+{
+	QSize s = QItemDelegate::sizeHint(option, index);
+	s.setHeight(10);
+
+	return s;
+}

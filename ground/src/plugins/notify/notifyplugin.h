@@ -28,8 +28,10 @@
 #define SOUNDNOTIFYPLUGIN_H
 
 #include <extensionsystem/iplugin.h> 
+#include "uavtalk/telemetrymanager.h"
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/uavobject.h"
+
 #include <QSettings>
 #include <phonon>
 
@@ -39,6 +41,7 @@ class NotifyPluginConfiguration;
 typedef struct {
 	Phonon::MediaObject* mo;
 	QList<Phonon::MediaSource>* ms;
+	NotifyPluginConfiguration* notify;
 } PhononObject, *pPhononObject;
 
 class SoundNotifyPlugin : public ExtensionSystem::IPlugin
@@ -54,10 +57,11 @@ public:
 
 
    QList<NotifyPluginConfiguration*> getListNotifications() { return lstNotifications; }
-   void setListNotifications(QList<NotifyPluginConfiguration*>& list_notify) { lstNotifications=list_notify; }
+   //void setListNotifications(QList<NotifyPluginConfiguration*>& list_notify) {  }
 
-	bool getEnableSound() const { return enableSound; }
-	void setEnableSound(bool value) {enableSound = value; }
+   bool getEnableSound() const { return enableSound; }
+   void setEnableSound(bool value) {enableSound = value; }
+
 
 
 private:
@@ -65,21 +69,36 @@ private:
    QList< QList<Phonon::MediaSource>* > lstMediaSource;
    QStringList mediaSource;
    //QMap<QString, Phonon::MediaObject*> mapMediaObjects;
-   QMap<QString, PhononObject> mapMediaObjects;
+   QMultiMap<QString, PhononObject> mapMediaObjects;
 
    QSettings* settings;
 
    QList<UAVDataObject*> lstNotifiedUAVObjects;
 
    QList<NotifyPluginConfiguration*> lstNotifications;
+   QList<NotifyPluginConfiguration*> pendingNotifications;
+   QList<NotifyPluginConfiguration*> removedNotifies;
+
+   NotifyPluginConfiguration* nowPlayingConfiguration;
+
    QString m_field;
-
-
+   PhononObject phonon;
    NotifyPluginOptionsPage *mop;
+   TelemetryManager* telMngr;
+
+   bool playNotification(NotifyPluginConfiguration* notification);
+   void checkNotificationRule(NotifyPluginConfiguration* notification, UAVObject* object);
 
 private slots:
+   void onTelemetryManagerAdded(QObject* obj);
+   void onAutopilotDisconnect();
    void connectNotifications();
-   void playNotification(UAVObject *object);
+   void updateNotificationList(QList<NotifyPluginConfiguration*> list);
+   void resetNotification(void);
+   void appendNotification(UAVObject *object);
+   void repeatTimerHandler(void);
+   void expireTimerHandler(void);
+   void stateChanged(Phonon::State newstate, Phonon::State oldstate);
 }; 
 
 #endif // SOUNDNOTIFYPLUGIN_H

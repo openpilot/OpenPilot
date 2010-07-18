@@ -35,9 +35,12 @@
 
 #include "QString"
 #include <QStringList>
+#include <QItemSelectionModel>
 #include <QDebug>
 #include <QtCore/QSettings>
 #include <phonon>
+
+class NotifyTableModel;
 
 class NotifyPluginConfiguration;
 class SoundNotifyPlugin;
@@ -83,27 +86,32 @@ private:
 	Phonon::MediaObject *notifySound;
 	Phonon::AudioOutput *audioOutput;
 	QStringList delegateItems;
-
+	NotifyTableModel* notifyRulesModel;
+	QItemSelectionModel *notifyRulesSelection;
 	QList<NotifyPluginConfiguration*> privListNotifications;
 
 	Ui::NotifyPluginOptionsPage *options_page;
 	//NotifyPluginConfiguration *notify;
 
 signals:
-	void updateNotifications();
+	void updateNotifications(QList<NotifyPluginConfiguration*> list);
+	void resetNotification(void);
+	void entryUpdated(int index);
+	void entryAdded(int position);
+
 
 private slots:
 	void showPersistentComboBox( const QModelIndex & parent, int start, int end );
 	void showPersistentComboBox2 ( const QModelIndex & topLeft, const QModelIndex & bottomRight );
 
-	void on_buttonTestSound1_clicked();
-	void on_buttonTestSound2_clicked();
+//	void on_buttonTestSound1_clicked();
+//	void on_buttonTestSound2_clicked();
 	void on_buttonTestSoundNotification_clicked();
 
 	void on_buttonAddNotification_clicked();
 	void on_buttonDeleteNotification_clicked();
 	void on_buttonModifyNotification_clicked();
-	void on_tableNotification_changeSelection();
+	void on_tableNotification_changeSelection( const QItemSelection & selected, const QItemSelection & deselected );
 	void on_soundLanguage_indexChanged(int index);
 	void on_buttonSoundFolder_clicked(const QString& path);
 	void on_UAVObject_indexChanged(QString val);

@@ -60,6 +60,8 @@ public:
 					  const QModelIndex &index) const;
 //	bool editorEvent(QEvent * event, QAbstractItemModel * model,
 //					 const QStyleOptionViewItem & option, const QModelIndex & index );
+	QSize  sizeHint ( const QStyleOptionViewItem  & option, const QModelIndex & index ) const;
+
 private:
 	QObject* m_parent;
 	QStringList m_items;

@@ -31,6 +31,7 @@
 #include <coreplugin/iuavgadgetconfiguration.h>
 #include "qsettings.h"
 #include <qstringlist.h>
+#include <qtimer>
 
 using namespace Core;
 
@@ -40,11 +41,19 @@ class NotifyPluginConfiguration : public QObject
 public:
 	explicit NotifyPluginConfiguration(QObject *parent = 0);
 
+	QTimer* timer;
+	QTimer* expireTimer;
+	bool isNowPlaying; //
+	bool firstStart;
+
 	QString getSound1() const { return sound1; }
 	void setSound1(QString text) {sound1 = text; }
 
 	QString getSound2() const { return sound2; }
 	void setSound2(QString text) {sound2 = text; }
+
+	QString getSound3() const { return sound3; }
+	void setSound3(QString text) {sound3 = text; }
 
 	QString getValue() const { return value; }
 	void setValue(QString text) {value = text; }
@@ -74,6 +83,14 @@ public:
 	QString getRepeatFlag() const { return repeatString; }
 	void setRepeatFlag(QString value) { repeatString = value; }
 
+	bool getRepeatTimeout() const { return repeatTimeout; }
+	void setRepeatTimeout(bool value) { repeatTimeout = value; }
+
+	int getExpireTimeout() const { return expireTimeout; }
+	void setExpireTimeout(int value) { expireTimeout = value; }
+
+
+
 	void saveState(QSettings* settings) const;
 	void restoreState(QSettings* settings);
 	QString parseNotifyMessage();
@@ -88,12 +105,16 @@ private:
 	QString value;
 	QString sound1;
 	QString sound2;
+	QString sound3;
 	QString sayOrder;
 	double spinBoxValue;
 	QString repeatString;
+	bool repeatTimeout;
+	int repeatTimerValue;
+	int expireTimeout;
 
 };
 
-
+Q_DECLARE_METATYPE(NotifyPluginConfiguration*)
 
 #endif // NOTIFYPLUGINCONFIGURATION_H

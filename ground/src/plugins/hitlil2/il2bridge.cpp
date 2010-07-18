@@ -350,7 +350,14 @@ void Il2Bridge::processUpdate(QString& data)
     gpsData.Heading = current.azimuth;
     gpsData.Groundspeed = current.groundspeed;
     gpsData.Latitude = latitude + current.Y * DEG2M;
-    gpsData.Longitude = longitude + current.X * cos(gpsData.Latitude*DEG2RAD) * DEG2M;
+    if (gpsData.Latitude<-89.0 or gpsData.Latitude>89.0) {
+    	// oops - this is rare enough to just prevent overflow here...
+	// IL2 has no north pole map anyway
+	gpsData.Latitude=0.0;
+    }
+    gpsData.Longitude = longitude + current.X * (1.0/cos(gpsData.Latitude*DEG2RAD)) * DEG2M;
+    while (gpsData.Longitude<-180.0) gpsData.Longitude+=360.0;
+    while (gpsData.Longitude>180.0) gpsData.Longitude-=360.0;
     gpsData.Satellites = 7;
     gpsData.Status = PositionActual::STATUS_FIX3D;
     posActual->setData(gpsData);

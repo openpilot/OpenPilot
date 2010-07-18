@@ -24,6 +24,7 @@
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/robotOdometry.hpp"
 #include "rtslam/sensorPinHole.hpp"
+#include "rtslam/landmarkEuclideanPoint.hpp"
 #include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
 #include "rtslam/observationPinHoleAnchoredHomogeneous.hpp"
 
@@ -89,8 +90,11 @@ void test_obsap01(void) {
 	pinholePtr->params.setIntrinsicCalibration(k, d, d.size());
 	c = pinholePtr->params.correction;
 	
+	boost::shared_ptr<MapManager<LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint> > 
+		mmPoint(new MapManager<LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint>());
+	mmPoint->linkToParentMap(mapPtr);
 	ahp_ptr_t ahpPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr));
-	ahpPtr->linkToParentMap(mapPtr);
+	ahpPtr->linkToParentMapManager(mmPoint);
 	obs_ph_ahp_ptr_t obspaPtr(new ObservationPinHoleAnchoredHomogeneousPoint(pinholePtr, ahpPtr));
 	obspaPtr->linkToParentAHP(ahpPtr);
 	obspaPtr->linkToPinHole(pinholePtr);

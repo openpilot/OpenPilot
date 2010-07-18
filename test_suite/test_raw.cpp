@@ -30,12 +30,14 @@ using namespace jafar::rtslam;
 using namespace std;
 using namespace jafar;
 
+qdisplay::Viewer *viewer;
+
 void test_raw01_display(void*)
 {
 		image::Image img;
-		img.load("doc/images/slam.png");
+		img.load("data/imageSample.ppm");
 		qdisplay::ImageView *view = new qdisplay::ImageView;
-		qdisplay::Viewer *viewer = new qdisplay::Viewer;
+		viewer = new qdisplay::Viewer;
 		viewer->setImageView(view, 0, 0);
 		
 		qdisplay::Shape *s = new qdisplay::Shape(qdisplay::Shape::ShapeRectangle, 23,24 ,10,15);
@@ -47,12 +49,18 @@ void test_raw01_display(void*)
 		viewer->resize(400,300);
 }
 
+void test_raw01_main(void*)
+{
+	sleep(2);
+	delete viewer;
+}
+
 void test_raw01(void) {
 	cout << "\n% TEST OF RAW STRUCTURE\n% ==============" << endl;
 	RawImage    imgSimu  ;
 	cout << imgSimu << endl ;
 
-	qdisplay::QtAppStart((qdisplay::FUNC)&test_raw01_display,0,NULL,0,0,NULL);
+	qdisplay::QtAppStart((qdisplay::FUNC)&test_raw01_display,0,(qdisplay::FUNC)&test_raw01_main,0,0,NULL);
 
 
 }

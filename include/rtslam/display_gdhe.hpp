@@ -52,7 +52,7 @@ namespace display {
 			gdhe::Client client;
 			double extent;
 		public:
-			ViewerGdhe(std::string _robot_model, double _ellipsesScale = 3.0, std::string _host="localhost"):
+			ViewerGdhe(std::string _robot_model = "", double _ellipsesScale = 3.0, std::string _host="localhost"):
 				ellipsesScale(_ellipsesScale), robot_model(_robot_model), client(_host)
 			{
 				client.launch_server();

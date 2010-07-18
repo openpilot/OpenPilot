@@ -98,6 +98,8 @@ JFR_DEBUG("was predicted at " << obsCurrentPtr->expectation.x() << ", now predic
 							cv::Rect rroi = gauss2rect(pix, matcherParams_.lowInnov, matcherParams_.lowInnov);
 							image::ConvexRoi roi(rroi);
 							
+							obsCurrentPtr->events.measured = true;
+							
 JFR_DEBUG("not yet matched, trying with lowInnov in roi " << roi);
 							match(rawData, obsCurrentPtr->predictedAppearance, roi, obsCurrentPtr->measurement,
 									obsCurrentPtr->observedAppearance);
@@ -291,6 +293,11 @@ JFR_DEBUG("corrected " << obsPtr->id());
 				for(ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end();obsIter++)
 				{
 					observation_ptr_t obs = *obsIter;
+					if (obs->events.visible) JFR_ASSERT(obs->events.predicted, "obs visible without previous steps");
+					if (obs->events.measured) JFR_ASSERT(obs->events.visible && obs->events.predicted, "obs measured without previous steps");
+					if (obs->events.matched) JFR_ASSERT(obs->events.measured && obs->events.visible && obs->events.predicted, "obs matched without previous steps");
+					if (obs->events.updated) JFR_ASSERT(obs->events.matched && obs->events.measured && obs->events.visible && obs->events.predicted, "obs updated without previous steps");
+					
 					if (obs->events.measured) obs->counters.nSearch++;
 					if (obs->events.matched) obs->counters.nMatch++;
 					if (obs->events.updated) obs->counters.nInlier++;

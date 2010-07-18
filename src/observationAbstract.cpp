@@ -235,6 +235,8 @@ namespace jafar {
 			}
 
 			// kill unstable and inconsistent lmks
+			JFR_ASSERT(counters.nMatch <= counters.nSearch, "counters.nMatch " << counters.nMatch << " > counters.nSearch " << counters.nSearch);
+			JFR_ASSERT(counters.nInlier <= counters.nMatch, "counters.nInlier " << counters.nInlier << " > counters.nMatch " << counters.nMatch);
 			if (counters.nSearch > 30) {
 				double matchRatio = counters.nMatch / (double) counters.nSearch;
 				double consistencyRatio = counters.nInlier / (double)counters.nMatch;

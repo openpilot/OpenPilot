@@ -150,7 +150,6 @@ JFR_DEBUG_END();
 								// Add to tesselation grid for active search
 								//asGrid->addPixel(obsPtr->expectation.x());
 								obsPtr->events.updated = true;
-								obsPtr->counters.nInlier++;
 								numObs++;
 								
 								#if BUFFERED_UPDATE
@@ -227,9 +226,6 @@ JFR_DEBUG("######## Starting classic active search for the remaining");
 
 								obsPtr->events.measured = true;
 
-								// update counter
-								obsPtr->counters.nSearch++;
-
 								// 1c. predict search area and appearance
 								//cv::Rect roi = gauss2rect(obsPtr->expectation.x(), obsPtr->expectation.P() + matcherParams_.measVar*identity_mat(2), matcherParams_.mahalanobisTh);
 								image::ConvexRoi roi(obsPtr->expectation.x(), obsPtr->expectation.P() + matcherParams_.measVar*identity_mat(2), matcherParams_.mahalanobisTh);
@@ -265,14 +261,12 @@ JFR_DEBUG("######## Starting classic active search for the remaining");
 // JFR_DEBUG("obs " << obsPtr->id() << " got match score " << obsPtr->getMatchScore());
 								// 1e. if feature is found
 								if (obsPtr->getMatchScore() > matcherParams_.threshold) {
-									obsPtr->counters.nMatch++;
 									obsPtr->events.matched = true;
 									obsPtr->computeInnovation();
 
 									// 1f. if feature is inlier
 									if (obsPtr->compatibilityTest(matcherParams_.mahalanobisTh)) { // use 3.0 for 3-sigma or the 5% proba from the chi-square tables.
 										numObs++;
-										obsPtr->counters.nInlier++;
 										//								kernel::Chrono update_chrono;
 										obsPtr->update();
 										//								total_update_time += update_chrono.elapsedMicrosecond();
@@ -293,6 +287,15 @@ JFR_DEBUG("corrected " << obsPtr->id());
 					obsListSorted.clear(); // clear the list now or it will prevent the observation to be destroyed until next frame, and will still be displayed
 				}
 
+				// update obs counters
+				for(ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end();obsIter++)
+				{
+					observation_ptr_t obs = *obsIter;
+					if (obs->events.measured) obs->counters.nSearch++;
+					if (obs->events.matched) obs->counters.nMatch++;
+					if (obs->events.updated) obs->counters.nInlier++;
+				}
+	
 				// clear all sets to liberate shared pointers
 				ransacSetList.clear();
 				obsVisibleList.clear();
@@ -421,11 +424,9 @@ JFR_DEBUG("getOneMatchedBaseObs: trying obs " << obsBasePtr->id() << " already m
 				if (!obsBasePtr->events.matched)
 				{
 					obsBasePtr->events.measured = true;
-					obsBasePtr->counters.nSearch++;
 
 					if (matchWithExpectedInnovation(rawData, obsBasePtr)){
 						obsBasePtr->events.matched = true;
-						obsBasePtr->counters.nMatch++;
 					} else {
 						obsFailedList.push_back(obsBasePtr);
 					}

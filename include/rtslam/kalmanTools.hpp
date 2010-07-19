@@ -22,7 +22,7 @@ namespace jafar {
 
 			template<class SM, class MJ, class MK>
 			void computeKalmanGain(const SM & P, const ind_array & ia_x, Innovation & inn, const MJ & INN_x1, const ind_array & ia_x1, MK & K){
-					JFR_ASSERT(P.size1() > ia_x.size(), "indirect indexing too large for matrix P");
+					JFR_ASSERT(P.size1() >= ia_x.size(), "indirect indexing too large for matrix P");
 					JFR_ASSERT(INN_x1.size1() == inn.size(), "sizes mismatch: INN_x1 and inn");
 					JFR_ASSERT(INN_x1.size2() == ia_x1.size(), "sizes mismatch: INN_x1 and ia_x1");
 					JFR_ASSERT(K.size1() == ia_x.size(), "sizes mismatch: K and ia_x");

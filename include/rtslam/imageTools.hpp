@@ -19,9 +19,9 @@ namespace jafar {
 		template<class Vec>
 		cv::Rect gauss2rect(const Vec & x, double dx, double dy){
 				double xmin = (int) (x(0) - dx);
-				double xmax = (int) (x(0) + dx + 0.9999);
+				double xmax = (int) (x(0) + dx);
 				double ymin = (int) (x(1) - dy);
-				double ymax = (int) (x(1) + dy + 0.9999);
+				double ymax = (int) (x(1) + dy);
 
 				cv::Rect rect(xmin, ymin, xmax - xmin + 1, ymax - ymin + 1);
 				return rect;

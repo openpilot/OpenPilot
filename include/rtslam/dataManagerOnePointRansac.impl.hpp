@@ -111,7 +111,7 @@ JFR_DEBUG("not yet matched, trying with lowInnov in roi " << roi);
 							}
 						}
 						
-JFR_DEBUG("matched: " << obsCurrentPtr->events.matched << " with score " << obsCurrentPtr->getMatchScore() << " at " << obsCurrentPtr->measurement.x());
+JFR_DEBUG("matched: " << obsCurrentPtr->events.matched << " (measured " << obsCurrentPtr->events.measured << ") with score " << obsCurrentPtr->getMatchScore() << " at " << obsCurrentPtr->measurement.x());
 						
 						if(obsCurrentPtr->events.matched && isLowInnovationInlier(obsCurrentPtr, pix, matcherParams_.lowInnov))
 						{

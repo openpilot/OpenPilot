@@ -13,11 +13,14 @@
 #ifndef RTSLAM_HPP_
 #define RTSLAM_HPP_
 
-#include "kernel/IdFactory.hpp"
-#include "boost/shared_ptr.hpp"
-#include "boost/weak_ptr.hpp"
 #include <map>
 #include <list>
+
+#include "boost/shared_ptr.hpp"
+#include "boost/weak_ptr.hpp"
+
+#include "kernel/IdFactory.hpp"
+#include "kernel/jafarMacro.hpp"
 
 #ifdef JFR_NDEBUG
 	#define PTR_CAST static_cast
@@ -40,14 +43,14 @@ namespace jafar {
 		extern unsigned int rand_state;
 		inline void srand(unsigned int seed)
 		{
-//			std::cout << "!rand: seed " << seed << std::endl;
+// 			JFR_DEBUG("!rand: seed " << seed);
 			rand_state = seed;
 		}
 		inline int rand()
 		{
-//			std::cout << "!rand: state " << rand_state;
+// 			JFR_DEBUG_BEGIN(); JFR_DEBUG_SEND("!rand: state " << rand_state);
 			int r = rand_r(&rand_state);
-//			std::cout << " value " << r << " state " << rand_state << std::endl;
+// 			JFR_DEBUG_SEND(" value " << r << " state " << rand_state); JFR_DEBUG_END();
 			return r;
 		}
 

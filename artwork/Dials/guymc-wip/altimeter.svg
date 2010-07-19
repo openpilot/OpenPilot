@@ -86,17 +86,17 @@
    guidetolerance="10"
    inkscape:pageopacity="0"
    inkscape:pageshadow="2"
-   inkscape:window-width="1049"
-   inkscape:window-height="646"
+   inkscape:window-width="1440"
+   inkscape:window-height="838"
    id="namedview5630"
    showgrid="false"
-   inkscape:zoom="1.1551359"
-   inkscape:cx="51.034074"
+   inkscape:zoom="1"
+   inkscape:cx="-63.965926"
    inkscape:cy="168.08734"
-   inkscape:window-x="318"
-   inkscape:window-y="90"
+   inkscape:window-x="-8"
+   inkscape:window-y="-8"
    inkscape:window-maximized="1"
-   inkscape:current-layer="background" />
+   inkscape:current-layer="layer2" />
 <font
    horiz-adv-x="2048"
    id="font4747">
@@ -1344,14 +1344,16 @@
 	<path
    d="m 311.81,297.638 c 0,7.826 -6.346,14.172 -14.173,14.172 H 14.174 C 6.346,311.81 0,305.464 0,297.638 V 14.174 C 0,6.347 6.346,0.001 14.174,0.001 h 283.463 c 7.827,0 14.173,6.346 14.173,14.173 v 283.464 z"
    id="path5246"
-   style="fill:url(#SVGID_1_)" />
+   style="fill:url(#SVGID_1_)"
+   inkscape:connector-curvature="0" />
 	<g
    id="g5248">
 		<path
    enable-background="new    "
    d="m 308.977,295.063 c 0,7.682 -6.232,13.914 -13.914,13.914 H 16.749 c -7.685,0 -13.915,-6.232 -13.915,-13.914 V 16.75 c 0,-7.685 6.23,-13.916 13.915,-13.916 h 278.313 c 7.682,0 13.914,6.23 13.914,13.916 v 278.313 z"
    id="path5250"
-   style="fill:#333333" />
+   style="fill:#333333"
+   inkscape:connector-curvature="0" />
 		<linearGradient
    id="SVGID_2_"
    gradientUnits="userSpaceOnUse"
@@ -1371,7 +1373,8 @@
 		<path
    d="m 308.977,295.063 c 0,7.682 -6.232,13.914 -13.914,13.914 H 16.749 c -7.685,0 -13.915,-6.232 -13.915,-13.914 V 16.75 c 0,-7.685 6.23,-13.916 13.915,-13.916 h 278.313 c 7.682,0 13.914,6.23 13.914,13.916 v 278.313 z"
    id="path5257"
-   style="opacity:0.2;fill:url(#SVGID_2_)" />
+   style="opacity:0.2;fill:url(#SVGID_2_)"
+   inkscape:connector-curvature="0" />
 	</g>
 	<g
    id="g5259">
@@ -1479,11 +1482,11 @@
    id="stop5290" />
 				</linearGradient>
 				<polygon
-   points="13.626,17.006 15.317,14.078 18.698,14.078 20.389,17.006 18.698,19.935 15.317,19.935 "
+   points="20.389,17.006 18.698,19.935 15.317,19.935 13.626,17.006 15.317,14.078 18.698,14.078 "
    id="polygon5292"
    style="fill:url(#SVGID_5_)" />
 				<polygon
-   points="13.897,17.006 15.452,14.312 18.563,14.312 20.119,17.006 18.563,19.701 15.452,19.701 "
+   points="20.119,17.006 18.563,19.701 15.452,19.701 13.897,17.006 15.452,14.312 18.563,14.312 "
    id="polygon5294" />
 			</g>
 		</g>
@@ -1594,11 +1597,11 @@
    id="stop5327" />
 				</linearGradient>
 				<polygon
-   points="291.422,17.006 293.113,14.078 296.494,14.078 298.186,17.006 296.494,19.935 293.113,19.935 "
+   points="298.186,17.006 296.494,19.935 293.113,19.935 291.422,17.006 293.113,14.078 296.494,14.078 "
    id="polygon5329"
    style="fill:url(#SVGID_8_)" />
 				<polygon
-   points="291.693,17.006 293.248,14.312 296.359,14.312 297.914,17.006 296.359,19.701 293.248,19.701 "
+   points="297.914,17.006 296.359,19.701 293.248,19.701 291.693,17.006 293.248,14.312 296.359,14.312 "
    id="polygon5331" />
 			</g>
 		</g>
@@ -1709,11 +1712,11 @@
    id="stop5364" />
 				</linearGradient>
 				<polygon
-   points="291.421,294.803 293.112,291.874 296.493,291.874 298.185,294.803 296.493,297.73 293.112,297.73 "
+   points="298.185,294.803 296.493,297.73 293.112,297.73 291.421,294.803 293.112,291.874 296.493,291.874 "
    id="polygon5366"
    style="fill:url(#SVGID_11_)" />
 				<polygon
-   points="291.692,294.803 293.247,292.107 296.358,292.107 297.913,294.803 296.358,297.496 293.247,297.496 "
+   points="297.913,294.803 296.358,297.496 293.247,297.496 291.692,294.803 293.247,292.107 296.358,292.107 "
    id="polygon5368" />
 			</g>
 		</g>
@@ -1824,11 +1827,11 @@
    id="stop5401" />
 				</linearGradient>
 				<polygon
-   points="13.626,294.803 15.318,291.874 18.699,291.874 20.39,294.803 18.699,297.73 15.318,297.73 "
+   points="20.39,294.803 18.699,297.73 15.318,297.73 13.626,294.803 15.318,291.874 18.699,291.874 "
    id="polygon5403"
    style="fill:url(#SVGID_14_)" />
 				<polygon
-   points="13.898,294.803 15.453,292.107 18.564,292.107 20.119,294.803 18.564,297.496 15.453,297.496 "
+   points="20.119,294.803 18.564,297.496 15.453,297.496 13.898,294.803 15.453,292.107 18.564,292.107 "
    id="polygon5405" />
 			</g>
 		</g>
@@ -1942,7 +1945,7 @@
    sodipodi:cy="155.905"
    sodipodi:rx="143.149"
    sodipodi:ry="143.149"
-   style="fill:url(#radialGradient10167);fill-opacity:1.0"
+   style="fill:url(#radialGradient10167);fill-opacity:1"
    d="m 299.054,155.905 c 0,79.05901 -64.08999,143.149 -143.149,143.149 -79.059012,0 -143.149003,-64.08999 -143.149003,-143.149 0,-79.059012 64.089991,-143.149003 143.149003,-143.149003 79.05901,0 143.149,64.089991 143.149,143.149003 z" />
 	</g>
 	<line
@@ -2362,7 +2365,8 @@
    transform="translate(149.8091,57.1641)"
    font-size="22"
    id="text5556"
-   style="font-size:22px;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">0</text>
+   style="font-size:22px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic">0</text>
+
 
 
 
@@ -2371,7 +2375,8 @@
    transform="translate(212.1729,83.1484)"
    font-size="22"
    id="text5558"
-   style="font-size:22px;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">1</text>
+   style="font-size:22px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic">1</text>
+
 
 
 
@@ -2380,7 +2385,8 @@
    transform="translate(253.7461,129.9199)"
    font-size="22"
    id="text5560"
-   style="font-size:22px;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">2</text>
+   style="font-size:22px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic">2</text>
+
 
 
 
@@ -2395,11 +2401,13 @@
 
 
 
+
 	<text
    transform="translate(144.1807,209.7617)"
    font-size="25"
    id="text5564"
-   style="font-size:25px;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">m</text>
+   style="font-size:25px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic">m</text>
+
 
 
 
@@ -2408,7 +2416,8 @@
    transform="translate(253.7461,197.4785)"
    font-size="22"
    id="text5566"
-   style="font-size:22px;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">3</text>
+   style="font-size:22px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic">3</text>
+
 
 
 
@@ -2417,7 +2426,8 @@
    transform="translate(212.1719,244.25)"
    font-size="22"
    id="text5568"
-   style="font-size:22px;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">4</text>
+   style="font-size:22px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic">4</text>
+
 
 
 
@@ -2426,7 +2436,8 @@
    transform="translate(149.8091,270.2344)"
    font-size="22"
    id="text5570"
-   style="font-size:22px;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">5</text>
+   style="font-size:22px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic">5</text>
+
 
 
 
@@ -2435,7 +2446,8 @@
    transform="translate(87.4473,249.4482)"
    font-size="22"
    id="text5572"
-   style="font-size:22px;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">6</text>
+   style="font-size:22px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic">6</text>
+
 
 
 
@@ -2444,7 +2456,8 @@
    transform="translate(45.8726,197.4785)"
    font-size="22"
    id="text5574"
-   style="font-size:22px;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">7</text>
+   style="font-size:22px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic">7</text>
+
 
 
 
@@ -2453,7 +2466,8 @@
    transform="translate(45.8726,135.1162)"
    font-size="22"
    id="text5576"
-   style="font-size:22px;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">8</text>
+   style="font-size:22px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic">8</text>
+
 
 
 
@@ -2462,7 +2476,8 @@
    transform="translate(87.4473,77.9517)"
    font-size="22"
    id="text5578"
-   style="font-size:22px;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">9</text>
+   style="font-size:22px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic">9</text>
+
 
 
 
@@ -2470,7 +2485,7 @@
 </g></g><g
    inkscape:groupmode="layer"
    id="layer2"
-   inkscape:label="Needle1"
+   inkscape:label="Altimeter large needle"
    style="display:inline"><g
      id="needle"
      inkscape:label="#g11543"><g
@@ -2487,7 +2502,7 @@
            style="opacity:0.6;overflow:visible" /><g
            id="g11192"><polygon
              id="polygon11194"
-             points="158.254,155.655 153.557,155.655 153.557,36.376 155.904,27.013 158.262,36.437 "
+             points="153.557,36.376 155.904,27.013 158.262,36.437 158.254,155.655 153.557,155.655 "
              style="fill:#ffffff" /><path
              id="path11196"
              d="m 155.905,28.045 2.099,8.393 v 118.967 h -4.197 V 36.438 l 2.098,-8.393 m 0,-2.062 -2.598,10.393 v 119.528 h 5.197 V 36.376 l -2.599,-10.393 0,0 z"
@@ -2735,7 +2750,7 @@
 </g></g></g><g
    inkscape:groupmode="layer"
    id="layer3"
-   inkscape:label="Needle2"
+   inkscape:label="Altimeter small needle"
    style="display:inline"><g
      id="needle2"
      inkscape:label="#g11471"><g
@@ -2872,10 +2887,10 @@
            style="opacity:0.6;overflow:visible" /><g
            id="g11181"><polygon
              id="polygon11183"
-             points="150.708,77.951 155.906,67.558 161.103,77.951 161.103,155.904 150.708,155.904 "
+             points="155.906,67.558 161.103,77.951 161.103,155.904 150.708,155.904 150.708,77.951 "
              style="fill:#ffffff" /><polygon
              id="polygon11185"
-             points="150.708,77.951 155.906,67.558 161.103,77.951 161.103,155.904 150.708,155.904 "
+             points="155.906,67.558 161.103,77.951 161.103,155.904 150.708,155.904 150.708,77.951 "
              style="fill:none;stroke:#231f20;stroke-width:0.5" /></g></g></g><g
        style="stroke:#3b3131;stroke-width:2;stroke-miterlimit:4;stroke-opacity:0;stroke-dasharray:none;display:inline"
        inkscape:label="#Background"
@@ -2922,140 +2937,6 @@
    id="stop11417"
    style="stop-color:#9FA0A4"
    offset="1" />
-	</linearGradient>
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-</g></g></g><g
-   inkscape:groupmode="layer"
-   id="layer4"
-   inkscape:label="Needle3"
-   style="display:inline"><g
-     id="needle3"
-     inkscape:label="#g11451"><g
-       id="Needle3"
-       transform="translate(-0.00100586,-7.9368166)"><line
-         id="line11199"
-         y2="25.983"
-         x2="155.90601"
-         y1="155.90401"
-         x1="155.90601"
-         style="fill:none;stroke:#00adee;stroke-width:2" /></g><g
-       id="g11379"
-       inkscape:label="#Background"
-       style="stroke:none;display:inline">
-	<linearGradient
-   id="linearGradient11381"
-   gradientUnits="userSpaceOnUse"
-   x1="259.7959"
-   y1="335.85159"
-   x2="52.012199"
-   y2="-24.0403">
-		<stop
-   offset="0"
-   style="stop-color:#404041"
-   id="stop11383" />
-		<stop
-   offset="1"
-   style="stop-color:#9FA0A4"
-   id="stop11385" />
-	</linearGradient>
-	<path
-   d="m 311.81,297.638 c 0,7.826 -6.346,14.172 -14.173,14.172 H 14.174 C 6.346,311.81 0,305.464 0,297.638 V 14.174 C 0,6.347 6.346,0.001 14.174,0.001 h 283.463 c 7.827,0 14.173,6.346 14.173,14.173 v 283.464 z"
-   id="path11387"
-   style="fill:none;stroke:none"
-   inkscape:connector-curvature="0" />
-	
-	
-	
-	
-	
-	
-	<linearGradient
-   id="linearGradient11389"
-   gradientUnits="userSpaceOnUse"
-   x1="83.609398"
-   y1="30.684601"
-   x2="228.2007"
-   y2="281.12411">
-		<stop
-   offset="0"
-   style="stop-color:#404041"
-   id="stop11391" />
-		<stop
-   offset="1"
-   style="stop-color:#9FA0A4"
-   id="stop11393" />
 	</linearGradient>
 	
 	

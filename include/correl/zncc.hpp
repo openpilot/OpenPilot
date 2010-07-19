@@ -148,6 +148,7 @@ namespace jafar {
 ////JFR_ASSERT(best_score2 <= 1+1e-6, "score2 est greater than 1");
 
 
+			JFR_ASSERT(score >= -1.01, "");
 			return score;
 		}
 

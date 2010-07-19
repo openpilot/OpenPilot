@@ -107,6 +107,7 @@ namespace correl {
 // std::cout << "normal: zncc_sum " << zncc_sum << ", count " << zncc_count << ", mean12 " << mean1*mean2 << ", sigma12 " << sigma1*sigma2 << std::endl;
 		zncc_sum = (zncc_sum/zncc_count - mean1*mean2) / (sigma1*sigma2);
 		
+		JFR_ASSERT(zncc_sum >= -1.01, "");
 		return zncc_sum;
 	}
 

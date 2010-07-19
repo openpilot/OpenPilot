@@ -130,6 +130,7 @@ void Il2Bridge::run() {
 Il2Bridge::~Il2Bridge()
 {
     quit();
+    wait();
     delete outSocket;
     delete txTimer;
     delete il2Timer;

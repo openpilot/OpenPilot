@@ -30,19 +30,36 @@
 
 TelemetryManager::TelemetryManager()
 {
+	QThread::start(QThread::TimeCriticalPriority);
+	moveToThread(this);
+}
+
+void TelemetryManager::run() {
     // Get UAVObjectManager instance
     ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
     objMngr = pm->getObject<UAVObjectManager>();
+
+    // connect to start stop signals
+    connect(this, SIGNAL(myStart()), this, SLOT(onStart()),Qt::QueuedConnection);
+    connect(this, SIGNAL(myStop()), this, SLOT(onStop()),Qt::QueuedConnection);
+    exec();
 }
 
 TelemetryManager::~TelemetryManager()
 {
-
+	quit();
+	wait();
 }
 
 void TelemetryManager::start(QIODevice *dev)
 {
-    utalk = new UAVTalk(dev, objMngr);
+    device=dev;
+    emit myStart();
+}
+
+void TelemetryManager::onStart()
+{
+    utalk = new UAVTalk(device, objMngr);
     telemetry = new Telemetry(utalk, objMngr);
     telemetryMon = new TelemetryMonitor(objMngr, telemetry);
     connect(telemetryMon, SIGNAL(connected()), this, SLOT(onConnect()));
@@ -50,6 +67,11 @@ void TelemetryManager::start(QIODevice *dev)
 }
 
 void TelemetryManager::stop()
+{
+    emit myStop();
+}
+
+void TelemetryManager::onStop()
 {
     telemetryMon->disconnect(this);
     delete telemetryMon;

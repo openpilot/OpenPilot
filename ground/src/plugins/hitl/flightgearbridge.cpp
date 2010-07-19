@@ -30,6 +30,13 @@
 
 FlightGearBridge::FlightGearBridge()
 {
+    // start thread
+    start(QThread::TimeCriticalPriority);
+}
+
+void FlightGearBridge::run()
+{
+
     // Init fields
     fgHost = QHostAddress("127.0.0.1");
     inPort = 5500;
@@ -62,26 +69,30 @@ FlightGearBridge::FlightGearBridge()
     }
 
     // Setup local ports
-    inSocket = new QUdpSocket(this);
-    outSocket = new QUdpSocket(this);
+    inSocket = new QUdpSocket();
+    outSocket = new QUdpSocket();
     inSocket->bind(QHostAddress::Any, inPort);
-    connect(inSocket, SIGNAL(readyRead()), this, SLOT(receiveUpdate()));
+    connect(inSocket, SIGNAL(readyRead()), this, SLOT(receiveUpdate()),Qt::DirectConnection);
 
     // Setup transmit timer
-    txTimer = new QTimer(this);
-    connect(txTimer, SIGNAL(timeout()), this, SLOT(transmitUpdate()));
+    txTimer = new QTimer();
+    connect(txTimer, SIGNAL(timeout()), this, SLOT(transmitUpdate()),Qt::DirectConnection);
     txTimer->setInterval(updatePeriod);
     txTimer->start();
 
     // Setup FG connection timer
-    fgTimer = new QTimer(this);
-    connect(fgTimer, SIGNAL(timeout()), this, SLOT(onFGConnectionTimeout()));
+    fgTimer = new QTimer();
+    connect(fgTimer, SIGNAL(timeout()), this, SLOT(onFGConnectionTimeout()),Qt::DirectConnection);
     fgTimer->setInterval(fgTimeout);
     fgTimer->start();
+
+    exec();
 }
 
 FlightGearBridge::~FlightGearBridge()
 {
+    quit();
+    wait();
     delete inSocket;
     delete outSocket;
     delete txTimer;

@@ -35,8 +35,9 @@
 #include "uavobjects/uavobjectmanager.h"
 #include <QIODevice>
 #include <QObject>
+#include <QThread>
 
-class UAVTALK_EXPORT TelemetryManager: public QObject
+class UAVTALK_EXPORT TelemetryManager: public QThread
 {
     Q_OBJECT
 
@@ -46,20 +47,26 @@ public:
 
     void start(QIODevice *dev);
     void stop();
+    void run();
 
 signals:
     void connected();
     void disconnected();
+    void myStart();
+    void myStop();
 
 private slots:
     void onConnect();
     void onDisconnect();
+    void onStart();
+    void onStop();
 
 private:
     UAVObjectManager* objMngr;
     UAVTalk* utalk;
     Telemetry* telemetry;
     TelemetryMonitor* telemetryMon;
+    QIODevice *device;
 };
 
 #endif // TELEMETRYMANAGER_H

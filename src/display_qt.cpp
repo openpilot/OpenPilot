@@ -102,7 +102,7 @@ namespace display {
 //std::cout << pose << " ; " << position << " ; " << euler << std::endl;
 				oss << "[" <<  std::setfill(' ') << std::setw(4) << (int)position(0) << ", " <<  
 					std::setw(4) << (int)position(1) << ", " <<  std::setw(4) << (int)position(2) << "] cm ; ["
-					<< std::setw(4) << (int)euler(0) << ", " <<  std::setw(4) << (int)euler(1) << ", " <<  std::setw(4) << (int)euler(2) << "] deg";
+					<< std::setw(4) << (int)euler(2) << ", " <<  std::setw(4) << (int)euler(1) << ", " <<  std::setw(4) << (int)euler(0) << "] deg";
 				sensorpose_label->setPlainText(oss.str().c_str());
 				
 				break; }

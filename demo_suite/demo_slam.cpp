@@ -196,6 +196,8 @@ void demo_slam01_main(world_ptr_t *world) {
 	double _v[6] = { PERT_VLIN, PERT_VLIN, PERT_VLIN, PERT_VANG, PERT_VANG, PERT_VANG };
 	robPtr1->perturbation.clear();
 	robPtr1->perturbation.set_std_continuous(createVector<6> (_v));
+	jblas::zero_vec perturbation_x(6); // FIXME what value should we put here ?
+	robPtr1->perturbation.set_x_continuous(perturbation_x);
 	robPtr1->setVelocityStd(UNCERT_VLIN,UNCERT_VANG);
 	robPtr1->constantPerturbation = false;
 

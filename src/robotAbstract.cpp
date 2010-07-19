@@ -58,6 +58,7 @@ namespace jafar {
 			constantPerturbation = false;
 			category = ROBOT;
 			self_time = 0.;
+			Q.clear();
 		}
 
 		RobotAbstract::RobotAbstract(const simulation_t dummy, const map_ptr_t & _mapPtr, const size_t _size_state, const size_t _size_control, const size_t _size_pert) :

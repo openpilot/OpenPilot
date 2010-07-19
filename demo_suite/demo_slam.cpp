@@ -42,7 +42,7 @@
 #include "rtslam/featureAbstract.hpp"
 #include "rtslam/rawImage.hpp"
 #include "rtslam/descriptorImagePoint.hpp"
-#include "rtslam/dataManagerActiveSearch.hpp"
+// #include "rtslam/dataManagerActiveSearch.hpp"
 #include "rtslam/dataManagerOnePointRansac.hpp"
 
 #include "rtslam/hardwareSensorCameraFirewire.hpp"
@@ -63,7 +63,7 @@ typedef ImagePointObservationMaker<ObservationPinHoleEuclideanPoint, SensorPinHo
 typedef ImagePointObservationMaker<ObservationPinHoleAnchoredHomogeneousPoint, SensorPinHole,
     LandmarkAnchoredHomogeneousPoint, SensorAbstract::PINHOLE, LandmarkAbstract::PNT_AH> PinholeAhpObservationMaker;
 
-typedef DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::FastTranslationMatcherZncc > DataManagerAS;
+// typedef DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::FastTranslationMatcherZncc > DataManagerAS;
 typedef DataManagerOnePointRansac<RawImage, SensorPinHole, QuickHarrisDetector, correl::FastTranslationMatcherZncc > DataManagerOPR;
 
 ///##############################################
@@ -145,7 +145,11 @@ const double MATCH_TH = 0.95;
 const double MAHALANOBIS_TH = 3; // in n_sigmas
 const unsigned N_UPDATES = 25;
 const double RANSAC_LOW_INNOV = 2.0; // in pixels
+#if RANSAC
 const unsigned RANSAC_NTRIES = 6;
+#else
+const unsigned RANSAC_NTRIES = 0;
+#endif
 
 // data manager: active search tesselation grid
 const unsigned GRID_VCELLS = 4;
@@ -218,15 +222,15 @@ void demo_slam01_main(world_ptr_t *world) {
 //	boost::shared_ptr<correl::Explorer<correl::Zncc> > znccMatcher(new correl::Explorer<correl::Zncc>());
 	boost::shared_ptr<correl::FastTranslationMatcherZncc> znccMatcher(new correl::FastTranslationMatcherZncc(0.8,0.25));
 	
-	#if RANSAC
+// 	#if RANSAC
 	boost::shared_ptr<DataManagerOPR> dmPt11(new DataManagerOPR());
 	dmPt11->setMatcher(znccMatcher, PATCH_SIZE, RANSAC_LOW_INNOV, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE);
 	dmPt11->setAlgorithmParams(N_UPDATES, RANSAC_NTRIES);
-	#else
-	boost::shared_ptr<DataManagerAS> dmPt11(new DataManagerAS());
-	dmPt11->setMatcher(znccMatcher, PATCH_SIZE, MAHALANOBIS_TH, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE);
-	dmPt11->setAlgorithmParams(N_UPDATES);
-	#endif
+// 	#else
+// 	boost::shared_ptr<DataManagerAS> dmPt11(new DataManagerAS());
+// 	dmPt11->setMatcher(znccMatcher, PATCH_SIZE, MAHALANOBIS_TH, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE);
+// 	dmPt11->setAlgorithmParams(N_UPDATES);
+// 	#endif
 	
 
 	dmPt11->linkToParentSensorSpec(senPtr11);

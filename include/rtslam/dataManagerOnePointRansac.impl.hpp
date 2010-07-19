@@ -19,9 +19,7 @@
 #include "rtslam/sensorPinHole.hpp"
 #include "rtslam/descriptorImagePoint.hpp"
 
-// TODO it should be possible to disable one point ransac in order to do
-// basic active search with this same class, to avoid code duplication
-// do it with n_tries = 0
+#include "rtslam/imageTools.hpp"
 
 #define BUFFERED_UPDATE 1
 

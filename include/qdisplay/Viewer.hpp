@@ -89,6 +89,9 @@ class Viewer : public QGraphicsView {
 		std::string const& getTitle() { return title; }
 
 	/** Set the status message appearing in the status bar
+	 *
+	 * Shadow text will also be set.
+	 *
 	 * @param infoString QString(const char*) object. String object to display
 	 * @param timeout Milliseconds before the message disappears (same effect as statusBar->clearMessage())
 	 */
@@ -106,6 +109,7 @@ class Viewer : public QGraphicsView {
     void exportView( const std::string& fileName );
   public slots:
     void exportView();
+	//void updateSceneRect();
   protected:
     virtual void contextMenuEvent ( QContextMenuEvent * event );
     virtual void keyPressEvent ( QKeyEvent * event );
@@ -131,8 +135,12 @@ class Viewer : public QGraphicsView {
 	 */
 	void createCursor();
 
-	/** Status bar to display information  statusBar->showMessage( QString) */
+	/** Status bar to display information  statusBar->showMessage( QString) 
+	 *
+	 * @see setStatusMessage
+	 */
 	QStatusBar *statusBar;
+	QStatusBar *statusBarShadow;
 
 };
 

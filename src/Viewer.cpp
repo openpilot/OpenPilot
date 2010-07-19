@@ -62,25 +62,36 @@ Viewer::Viewer(int mosaicWidth, int mosaicHeight, QGraphicsScene* scene ) : m_sc
 	// Creating a Status bar for the viewer. It is a widget with slot showMessage(QString&).
 	statusBar = new QStatusBar(this);
 	// Setting position and initial geometry. Status bar is on top to avoid repositionning issues.
-	statusBar->setGeometry(0, 2, width(), 15);
+	statusBar->setGeometry(3, 2, width(), 15);
 	// Make the geometry dynamic so the bottrom right corner sticks to the parent right border
 	statusBar->setSizeGripEnabled(true);
 	// Status bar style as Cascading Style Sheet
 	statusBar->setStyleSheet(QString("background-color: transparent; color: blue;"));
 	
+	// Creating private shadow statusBar
+	statusBarShadow =  new QStatusBar(statusBar);
+	statusBarShadow->setGeometry(1, 1, statusBar->width(), statusBar->height());
+	statusBarShadow->setStyleSheet(QString("background-color: transparent; color: #BBBBBB;"));
+	
 	// Set current widget and all its children to be Visible 
 	show();
 
-	// Register and GO for actions !
-	ViewerManager::registerViewer( this );
 	m_exportView = new QAction("Export the view", (QObject*)this);
 	connect(m_exportView, SIGNAL(triggered()), this, SLOT(exportView()));
+	//connect(m_scene, SIGNAL(changed  ( const QList<QRectF> &)), this, SLOT(updateSceneRect()));
+	// Register and GO for actions !
+	ViewerManager::registerViewer( this );
 }
 
 Viewer::~Viewer()
 {
   ViewerManager::unregisterViewer( this );
 }
+
+//void Viewer::updateSceneRect()
+//{/*{{{*/
+//	std::cout << "Viewer::updateSceneRect(): Hello" << std::endl;
+//}/*}}}*/
 
 // added by norman
 void Viewer::setWindowSize( int width, int height )
@@ -90,7 +101,7 @@ void Viewer::setWindowSize( int width, int height )
 }
 
 void Viewer::createCursor()
-{
+{ /*{{{*/
 	// Creating a custom cursor 32x32 px. Drawing a simple cross
 	// on 31x31 pixels and setting the hotspot in this 31x31 center
 	int cursorSquareSize = 32;
@@ -183,7 +194,8 @@ void Viewer::createCursor()
 	} else {
 		crossCursor = new QCursor(Qt::CrossCursor);
 	}
-}
+} /*}}}*/
+
 void Viewer::addShape(qdisplay::Shape* si) {
   scene()->addItem(si);
   si->setZValue(m_currentZ++);
@@ -381,9 +393,9 @@ void Viewer::mouseMoveEvent( QMouseEvent* event )
 	QPointF cursorPosition = event->posF();
 
 	// Left aligned text for x position. Precision of 3 digits on a raw number (no scientific style)
-	QString infoString = QString("Cursor position : %1").arg((double)(cursorPosition.x()), -10, 'f', 5);
+	QString infoString = QString("Cursor position (%1").arg((double)(cursorPosition.x()), -10, 'f', 5);
 	// Right aligned text for y position. Precision of 3 digits on a raw number (no scientific style)
-	QString yposString = QString(", %1").arg((double)(cursorPosition.y()), -10, 'f', 5);
+	QString yposString = QString(", %1)").arg((double)(cursorPosition.y()), -10, 'f', 5);
 	// Composition the string to display
 	infoString.append(yposString);
 
@@ -420,6 +432,10 @@ void Viewer::setStatusMessage(QString& infoString, int timeout)
 	if (statusBar != NULL)
 	{
 		statusBar->showMessage(infoString, timeout);
+		if (statusBarShadow != NULL)
+		{
+			statusBarShadow->showMessage(infoString, timeout);
+		}
 	}
 } /*}}}*/
 

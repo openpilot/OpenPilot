@@ -74,7 +74,12 @@ Il2Bridge::Il2Bridge(QString il2HostName, int il2Port, QString il2Latitude, QStr
     il2ConnectionStatus = false;
     latitude=il2Latitude.toFloat();
     longitude=il2Longitude.toFloat();
+    // start thread
+    start(QThread::TimeCriticalPriority);
 
+}
+
+void Il2Bridge::run() {
     // Get required UAVObjects
     ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
@@ -98,19 +103,19 @@ Il2Bridge::Il2Bridge(QString il2HostName, int il2Port, QString il2Latitude, QStr
     }
 
     // Setup local ports
-    outSocket = new QUdpSocket(this);
-    outSocket->connectToHost((const QString )il2HostName,il2Port);
-    connect(outSocket, SIGNAL(readyRead()), this, SLOT(receiveUpdate()));
+    outSocket = new QUdpSocket();
+    outSocket->connectToHost(il2Host,outPort);
+    connect(outSocket, SIGNAL(readyRead()), this, SLOT(receiveUpdate()),Qt::DirectConnection);
 
     // Setup transmit timer
-    txTimer = new QTimer(this);
-    connect(txTimer, SIGNAL(timeout()), this, SLOT(transmitUpdate()));
+    txTimer = new QTimer();
+    connect(txTimer, SIGNAL(timeout()), this, SLOT(transmitUpdate()),Qt::DirectConnection);
     txTimer->setInterval(updatePeriod);
     txTimer->start();
 
     // Setup FG connection timer
-    il2Timer = new QTimer(this);
-    connect(il2Timer, SIGNAL(timeout()), this, SLOT(onIl2ConnectionTimeout()));
+    il2Timer = new QTimer();
+    connect(il2Timer, SIGNAL(timeout()), this, SLOT(onIl2ConnectionTimeout()),Qt::DirectConnection);
     il2Timer->setInterval(il2Timeout);
     il2Timer->start();
 
@@ -119,10 +124,12 @@ Il2Bridge::Il2Bridge(QString il2HostName, int il2Port, QString il2Latitude, QStr
     time->start();
 
     current.T=0;
+    exec();
 }
 
 Il2Bridge::~Il2Bridge()
 {
+    quit();
     delete outSocket;
     delete txTimer;
     delete il2Timer;
@@ -361,6 +368,11 @@ void Il2Bridge::processUpdate(QString& data)
     gpsData.Satellites = 7;
     gpsData.Status = PositionActual::STATUS_FIX3D;
     posActual->setData(gpsData);
+
+    // issue manual update
+    attActual->updated();
+    altActual->updated();
+    posActual->updated();
 }
 
 void Il2Bridge::telStatsUpdated(UAVObject* obj)

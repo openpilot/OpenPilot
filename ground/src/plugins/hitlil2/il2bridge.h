@@ -29,6 +29,7 @@
 #define IL2BRIDGE_H
 
 #include <QObject>
+#include <QThread>
 #include <QUdpSocket>
 #include <QTimer>
 #include <QTime>
@@ -75,7 +76,7 @@ struct flightParams {
 };
 
 
-class Il2Bridge: public QObject
+class Il2Bridge: public QThread
 {
     Q_OBJECT
 
@@ -85,6 +86,7 @@ public:
 
     bool isAutopilotConnected();
     bool isIl2Connected();
+    void run();
 
 signals:
     void autopilotConnected();

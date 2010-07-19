@@ -43,7 +43,16 @@ GCSControlGadgetWidget::GCSControlGadgetWidget(QWidget *parent) : QLabel(parent)
 {
     m_gcscontrol = new Ui_GCSControl();
     m_gcscontrol->setupUi(this);
-    connect(m_gcscontrol->pushButton, SIGNAL(clicked()), this, SLOT(buttonPressed()));
+
+    // Set up the drop down box for the flightmode
+    m_gcscontrol->comboBoxFlightMode->addItem(QString("Manual"));
+    m_gcscontrol->comboBoxFlightMode->addItem(QString("Stabilized"));
+    m_gcscontrol->comboBoxFlightMode->addItem(QString("Auto"));
+
+    // Set up slots and signals
+    connect(m_gcscontrol->checkBoxGcsControl, SIGNAL(stateChanged(int)), this, SLOT(gcsControlToggle(int)));
+    connect(m_gcscontrol->comboBoxFlightMode, SIGNAL(currentIndexChanged(int)), this, SLOT(flightModeChanged(int)));
+
 }
 
 GCSControlGadgetWidget::~GCSControlGadgetWidget()
@@ -51,31 +60,55 @@ GCSControlGadgetWidget::~GCSControlGadgetWidget()
    // Do nothing
 }
 
-void GCSControlGadgetWidget::buttonPressed()
+/*!
+  \brief Returns the ManualControlCommand UAVObject
+  */
+
+ManualControlCommand* GCSControlGadgetWidget::getMCC()
 {
-    // Get access to the ManualControlObject
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     ManualControlCommand* obj = dynamic_cast<ManualControlCommand*>( objManager->getObject(QString("ManualControlCommand")) );
-
-    // Need to set the metadata to let GCS override OpenPilot
-    UAVObject::Metadata mdata = obj->getMetadata();
-    mdata.gcsAccess = UAVObject::ACCESS_READWRITE;
-    mdata.flightAccess = UAVObject::ACCESS_READONLY;
-    obj->setMetadata(mdata);
-
-    // Set values to some constants for now
-    ManualControlCommand::DataFields data = obj->getData();
-    data.FlightMode = ManualControlCommand::FLIGHTMODE_STABILIZED;
-    data.Pitch = .5;
-    data.Roll = .3;
-    data.Throttle = .2;
-    data.Yaw = .3;
-    obj->setData(data);
-
-    // Visual confirmation
-    m_gcscontrol->pushButton->setText(obj->toString());
-
-    //Q_ASSERT( 0 );
+    return obj;
 }
+
+/*!
+  \brief Called when the gcs control is toggled and enabled or disables flight write access to manual control command
+  */
+
+void GCSControlGadgetWidget::gcsControlToggle(int state)
+{
+    UAVObject::Metadata mdata = getMCC()->getMetadata();
+    if (state)
+    {
+        mdata.flightAccess = UAVObject::ACCESS_READONLY;
+    }
+    else
+    {
+        mdata.flightAccess = UAVObject::ACCESS_READWRITE;
+    }
+    getMCC()->setMetadata(mdata);
+}
+
+/*!
+  \brief Called when the flight mode drop down is changed and sets the ManualControlCommand->FlightMode accordingly
+  */
+void GCSControlGadgetWidget::flightModeChanged(int state)
+{
+    ManualControlCommand::DataFields data = getMCC()->getData();
+    if( state == 0 )
+    {
+        data.FlightMode = ManualControlCommand::FLIGHTMODE_MANUAL;
+    }
+    else if ( state == 1 )
+    {
+        data.FlightMode = ManualControlCommand::FLIGHTMODE_STABILIZED;
+    }
+    else if ( state == 2 )
+    {
+        data.FlightMode = ManualControlCommand::FLIGHTMODE_AUTO;
+    }
+    getMCC()->setData(data);
+}
+
 

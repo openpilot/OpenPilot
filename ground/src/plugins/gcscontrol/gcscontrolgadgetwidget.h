@@ -29,6 +29,7 @@
 #define GCSControlGADGETWIDGET_H_
 
 #include <QtGui/QLabel>
+#include "uavobjects/manualcontrolcommand.h"
 
 class Ui_GCSControl;
 
@@ -41,10 +42,12 @@ public:
    ~GCSControlGadgetWidget();
 
 private slots:
-   void buttonPressed();
+   void gcsControlToggle(int state);
+   void flightModeChanged(int state);
 
 private:
        Ui_GCSControl *m_gcscontrol;
+       ManualControlCommand* getMCC();
 };
 
 #endif /* GCSControlGADGETWIDGET_H_ */

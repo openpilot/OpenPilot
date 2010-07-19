@@ -106,7 +106,7 @@ public:
     QMutex* getMutex();
     qint32 getNumFields();
     QList<UAVObjectField*> getFields();
-    UAVObjectField* getField(QString& name);
+    UAVObjectField* getField(const QString& name);
     QString toString();
     QString toStringBrief();
     QString toStringData();

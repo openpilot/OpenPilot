@@ -194,7 +194,7 @@ QList<UAVObjectField*> UAVObject::getFields()
  * Get a specific field
  * @returns The field or NULL if not found
  */
-UAVObjectField* UAVObject::getField(QString& name)
+UAVObjectField* UAVObject::getField(const QString& name)
 {
     QMutexLocker locker(mutex);
     // Look for field

@@ -31,7 +31,7 @@
 
 #include <QAbstractTableModel>
 #include <QList>
-#include "NotifyPluginConfiguration.h"
+#include "notifypluginconfiguration.h"
 
 class NotifyTableModel : public QAbstractTableModel
 {

@@ -31,7 +31,7 @@
 #include <coreplugin/iuavgadgetconfiguration.h>
 #include "qsettings.h"
 #include <qstringlist.h>
-#include <qtimer>
+#include <QTimer>
 
 using namespace Core;
 

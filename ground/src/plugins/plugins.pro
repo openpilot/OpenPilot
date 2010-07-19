@@ -135,3 +135,9 @@ plugin_hitlil2.depends += plugin_uavobjects
 plugin_hitlil2.depends += plugin_uavtalk
 SUBDIRS += plugin_hitlil2
 
+#GCS Control of UAV Gadget
+plugin_gcscontrol.subdir = gcscontrol
+plugin_gcscontrol.depends = plugin_coreplugin
+plugin_gcscontrol.depends += plugin_uavobjects
+plugin_gcscontrol.depends += plugin_uavtalk
+SUBDIRS += plugin_gcscontrol

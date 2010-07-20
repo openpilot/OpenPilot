@@ -63,7 +63,6 @@ GCSControlGadgetWidget::~GCSControlGadgetWidget()
 /*!
   \brief Returns the ManualControlCommand UAVObject
   */
-
 ManualControlCommand* GCSControlGadgetWidget::getMCC()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -75,7 +74,6 @@ ManualControlCommand* GCSControlGadgetWidget::getMCC()
 /*!
   \brief Called when the gcs control is toggled and enabled or disables flight write access to manual control command
   */
-
 void GCSControlGadgetWidget::gcsControlToggle(int state)
 {
     UAVObject::Metadata mdata = getMCC()->getMetadata();
@@ -111,4 +109,7 @@ void GCSControlGadgetWidget::flightModeChanged(int state)
     getMCC()->setData(data);
 }
 
-
+/**
+  * @}
+  * @}
+  */

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   width="64"
+   height="64"
+   id="svg2"
+   inkscape:version="0.47+devel r9530"
+   sodipodi:docname="joystickBackground.svg">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="870"
+     inkscape:window-height="739"
+     id="namedview7"
+     showgrid="false"
+     inkscape:zoom="18.25"
+     inkscape:cx="32"
+     inkscape:cy="32"
+     inkscape:window-x="0"
+     inkscape:window-y="22"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg2" />
+  <defs
+     id="defs4" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="matrix(1.1638314,0,0,-1.1066141,-5.6432489,1159.6292)"
+     id="background"
+     inkscape:label="#layer1">
+    <rect
+       width="54.725903"
+       height="57.437641"
+       rx="0.09363886"
+       ry="28.718821"
+       x="5.0757694"
+       y="990.19446"
+       id="rect2985"
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.10537914;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+  </g>
+  <path
+     sodipodi:type="arc"
+     style="fill:#ffffff;fill-opacity:1;stroke:#998ad7;stroke-width:0.4;stroke-miterlimit:4;stroke-opacity:0.59336102000000002;stroke-dasharray:none"
+     id="joystickEnd"
+     sodipodi:cx="25.013699"
+     sodipodi:cy="28.684931"
+     sodipodi:rx="1.0136986"
+     sodipodi:ry="1.0136986"
+     d="m 26.027397,28.684931 a 1.0136986,1.0136986 0 1 1 -2.027397,0 1.0136986,1.0136986 0 1 1 2.027397,0 z"
+     inkscape:label="#path3034" />
+</svg>

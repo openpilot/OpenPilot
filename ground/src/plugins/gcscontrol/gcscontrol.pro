@@ -22,5 +22,4 @@ OTHER_FILES += GCSControl.pluginspec
 
 FORMS += gcscontrol.ui
 
-RESOURCES += \
-    gcscontrol.qrc
+RESOURCES += gcscontrol.qrc

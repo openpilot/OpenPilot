@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/gsccontrol">
+    <qresource prefix="/gcscontrol">
         <file>images/joystickBackground.svg</file>
     </qresource>
 </RCC>

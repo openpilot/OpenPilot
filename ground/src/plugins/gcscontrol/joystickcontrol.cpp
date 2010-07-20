@@ -1,5 +1,4 @@
 #include "joystickcontrol.h"
-#include "ui_joystickcontrol.h"
 #include "extensionsystem/pluginmanager.h"
 #include <QDebug>
 #include <QStringList>
@@ -9,6 +8,7 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QMessageBox>
 #include <QMouseEvent>
+#include <QtGlobal>
 
 JoystickControl::JoystickControl(QWidget *parent) :
     QGraphicsView(parent)
@@ -19,14 +19,15 @@ JoystickControl::JoystickControl(QWidget *parent) :
     setRenderHints(QPainter::Antialiasing);
 
     m_renderer = new QSvgRenderer();
-    m_renderer->load(QString(":/gcscontrol/images/joystickBackground.svg"));
-    m_background = new QGraphicsSvgItem();
+    Q_ASSERT( m_renderer->load(QString(":/gcscontrol/images/joystickBackground.svg")) );
+
+    m_background = new QGraphicsSvgItem(QString(":/gcscontrol/images/joystickBackground.svg"));
     m_background->setSharedRenderer(m_renderer);
 
     QGraphicsScene *l_scene = scene();
     l_scene->clear(); // This also deletes all items contained in the scene.
     l_scene->addItem(m_background);
-
+    l_scene->setSceneRect(m_background->boundingRect());
 }
 
 JoystickControl::~JoystickControl()
@@ -47,6 +48,7 @@ void JoystickControl::mousePressEvent(QMouseEvent *event)
     Qt::MouseButton button = event->button();
     QPoint point = event->pos();
     QSize widgetSize = this->size();
+
     double x = 2 * ( ((double)point.x()) / ((double)widgetSize.width()) - .5 );
     double y = 2 * ( ((double)point.y()) / ((double)widgetSize.height()) - .5);
 
@@ -81,7 +83,8 @@ void JoystickControl::paintEvent(QPaintEvent *event)
         qDebug()<<"Dial file not loaded, not rendering";
 //        return;
     }
-   QGraphicsView::paintEvent(event);
+
+    QGraphicsView::paintEvent(event);
 }
 
 void JoystickControl::resizeEvent(QResizeEvent *event)

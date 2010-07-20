@@ -15,28 +15,30 @@ Organization
 - move QuickHarrisDetector to fdetect: attention to the prototype of detectIn() !!!
 - move ExtendedKalmanFilterIndirect to filter
 - move Gaussian to jmath
+- move dma branch to master
 
 
 
 Performance
 ------------------------------------
 - zncc optimizations :
-	1. use integral images in explorer -> ok
-	2. test when partial correlation has been done if it is still possible to reach the goal score -> ok
-	3. work first with half resolution images (small investment at first, but 16 times faster then) -> ok
-	4. use a real ellipse roi (mahalanobis dist) -> ok
-	5. progressively enable optimizations when search area are larger -> ok
+	1. [ok] use integral images in explorer
+	2. [ok] test when partial correlation has been done if it is still possible to reach the goal score
+	3. [ok] work first with half resolution images (small investment at first, but 16 times faster then)
+	4. [ok] use a real ellipse roi (mahalanobis dist)
+	5. [ok] progressively enable optimizations when search area are larger
 	6. start testing with a roi shrinked by 2, then the rest, it should speed up the process because in general the result is close to the center and thanks to 2.
-	7. try to copy the search area in another image for a better use of cache
-	8. try to use cpu vectorialization (compute 4 zncc at once)
-- check algorithm speed <- Good 60Hz. See issues with RT and OS -> reboot and stop the most possible programs and services
+	7. to do in slam : if the search area is really to big, reduce n_sigmas to 2 or 1, if it is found it's nice, if it isn't it is not important
+	8. [ok] try to copy the search area in another image for a better use of cpu cache -> we already do it when doing half res search, that is when the search area is large enough, so it should be ok
+	9. try to use cpu vectorialization (compute 4 zncc at once)
+- [ok] check algorithm speed <- Good 60Hz. See issues with RT and OS -> reboot and stop the most possible programs and services
 - find a more clever way to manipulate the map used space: ia_indirectArray() is possibly an expensive way to go, or maybe use eigen2 instead of ublas...
 
 
 
 Precision
 ------------------------------------
-- Finish implementing 1 point Ransac to avoid outliers
+- [ok] Finish implementing 1 point Ransac to avoid outliers
 - Finish implementing RobotCentric Kalman
 - To investigate : predict, compute jacobians, correct mean offline, recompute jacobians, correct online = better consistence but how much more computations ?
 
@@ -47,7 +49,7 @@ Precision
 Display
 ------------------------------------
 
-- Allow exhaustive rendering when offline, for videos
+- [ok] Allow exhaustive rendering when offline, for videos
 - Always do only 1 sensor update by loop, in order to associate a precise timestamp with time step, and correctly manage in display which elements have been modified in order to only refresh them (maps, landmarks of the map, sensors, observations...)
 - Catch keyboard and mouse events in the windows, in order to allow to play/pause/next...
-- Implement double color labels for better visibility on light and dark backgrounds
+- Implement double color labels for better visibility on light and dark backgrounds -> need to use Viewer::setStatusMessage

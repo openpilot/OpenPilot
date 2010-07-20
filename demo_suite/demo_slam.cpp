@@ -183,7 +183,6 @@ void demo_slam01_main(world_ptr_t *world) {
 	// 1. Create maps.
 	map_ptr_t mapPtr(new MapAbstract(MAP_SIZE));
 	worldPtr->addMap(mapPtr);
-	mapPtr->clear();
 	// 1b. Create map manager.
 	boost::shared_ptr<MapManager<LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint> > mmPoint(new MapManager<
 	    LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint> ());
@@ -194,14 +193,10 @@ void demo_slam01_main(world_ptr_t *world) {
 	robconstvel_ptr_t robPtr1(new RobotConstantVelocity(mapPtr));
 	robPtr1->setId();
 	robPtr1->linkToParentMap(mapPtr);
-	robPtr1->state.clear();
 	robPtr1->pose.x(quaternion::originFrame());
 
 	double _v[6] = { PERT_VLIN, PERT_VLIN, PERT_VLIN, PERT_VANG, PERT_VANG, PERT_VANG };
-	robPtr1->perturbation.clear();
 	robPtr1->perturbation.set_std_continuous(createVector<6> (_v));
-	jblas::zero_vec perturbation_x(6); // FIXME what value should we put here ?
-	robPtr1->perturbation.set_x_continuous(perturbation_x);
 	robPtr1->setVelocityStd(UNCERT_VLIN,UNCERT_VANG);
 	robPtr1->constantPerturbation = false;
 
@@ -209,7 +204,6 @@ void demo_slam01_main(world_ptr_t *world) {
 	pinhole_ptr_t senPtr11(new SensorPinHole(robPtr1, MapObject::UNFILTERED));
 	senPtr11->setId();
 	senPtr11->linkToParentRobot(robPtr1);
-	senPtr11->state.clear();
 	senPtr11->setPose(0,0,0,-90,0,-90);
 	//senPtr11->pose.x(quaternion::originFrame());
 	senPtr11->params.setImgSize(IMG_WIDTH, IMG_HEIGHT);

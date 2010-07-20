@@ -804,7 +804,6 @@ void PFDGadgetWidget::moveNeedles()
     // to it. That way you always get the "shorter difference" to turn in.
     //////
     if (headingValue != headingTarget) {
-        double headingOffset = 0;
         double headingDiff;
         if ((abs((headingValue-headingTarget)*10) > 5)) {
             headingDiff = (headingTarget - headingValue)/5;
@@ -812,17 +811,19 @@ void PFDGadgetWidget::moveNeedles()
             headingDiff = headingTarget-headingValue;
             dialCount--;
         }
-        double threshold = -180*compassBandWidth/540;
+        double threshold = 180*compassBandWidth/540;
         // Note: rendering can jump oh so very slightly when crossing the 180 degree
         // boundary, should not impact actual useability of the display.
-        if ((headingValue < threshold) && ((headingValue+headingDiff)>=threshold)) {
-            // We went over 180Â°: activate a -360 degree offset
-            headingOffset = 2*threshold;
-        } else if ((headingValue >= threshold) && ((headingValue+headingDiff)<threshold)) {
-            // We went under 180Â°: remove the -360 degree offset
-            headingOffset = -2*threshold;
+        if ((headingValue+headingDiff)>=threshold) {
+            // We went over 180°: activate a -360 degree offset
+            headingDiff -= 2*threshold;
+            headingTarget -= 2*threshold;
+        } else if ((headingValue+headingDiff)<-threshold) {
+            // We went under -180°: remove the -360 degree offset
+            headingDiff += 2*threshold;
+            headingTarget += 2*threshold;
         }
-        QPointF opd = QPointF(headingDiff+headingOffset,0);
+        QPointF opd = QPointF(headingDiff,0);
         m_compassband->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), true);
         headingValue += headingDiff;
     }  else {

@@ -313,10 +313,12 @@ namespace jafar {
 		DataManagerOnePointRansac<RawImage, SensorPinHole, QuickHarrisDetector, correl::FastTranslationMatcherZncc>::
 		detectNewObs( boost::shared_ptr<RawImage> rawData )
 		{
+			for(int i = 0; i < 5; ++i)
 			if (mapManagerPtr()->mapSpaceForInit()) {
 				//boost::shared_ptr<RawImage> rawDataSpec = SPTR_CAST<RawImage>(rawData);
 				ROI roi;
 				if (asGrid->getROI(roi)) {
+					// FIXME if we already have searched some part of this roi without finding anything, we should not search again
 					feat_img_pnt_ptr_t featPtr(new FeatureImagePoint(detectorParams_.patchSize,
 							detectorParams_.patchSize,
 							CV_8U));
@@ -369,9 +371,10 @@ namespace jafar {
 								obsPtr));
 						obsPtr->landmarkPtr()->setDescriptor(descPtr);
 
+						asGrid->addPixel(obsPtr->measurement.x());
 					} // create&init
-				} // getROI()
-			} // if space in map
+				} else break; // getROI()
+			} else break; // if space in map
 		} // detect()
 
 		template<class RawSpec,class SensorSpec, class Detector, class Matcher>

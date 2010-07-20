@@ -107,9 +107,9 @@ void ImageView::setImage(const jafar::image::Image& jfrimg)
   if(jfrimg.channels() == 1)
   {
     m_image = QImage(width, height, QImage::Format_Indexed8);
-    lutGrayscale();
     for(int y = 0; y < height; y++)
       memcpy(m_image.scanLine(y), jfrimg.data(y), jfrimg.width());
+    lutGrayscale();
 
   } else if(jfrimg.channels() == 3) {
     m_image = QImage(width, height, QImage::Format_RGB32);

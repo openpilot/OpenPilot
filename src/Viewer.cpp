@@ -66,12 +66,12 @@ Viewer::Viewer(int mosaicWidth, int mosaicHeight, QGraphicsScene* scene ) : m_sc
 	// Make the geometry dynamic so the bottrom right corner sticks to the parent right border
 	statusBar->setSizeGripEnabled(true);
 	// Status bar style as Cascading Style Sheet
-	statusBar->setStyleSheet(QString("background-color: transparent; color: blue;"));
+	statusBar->setStyleSheet(QString("background-color: transparent; color: #BBBBBB;"));
 	
 	// Creating private shadow statusBar
 	statusBarShadow =  new QStatusBar(statusBar);
-	statusBarShadow->setGeometry(1, 1, statusBar->width(), statusBar->height());
-	statusBarShadow->setStyleSheet(QString("background-color: transparent; color: #BBBBBB;"));
+	statusBarShadow->setGeometry(-1, -1, statusBar->width(), statusBar->height());
+	statusBarShadow->setStyleSheet(QString("background-color: transparent; color: blue;"));
 	
 	// Set current widget and all its children to be Visible 
 	show();
@@ -105,37 +105,13 @@ void Viewer::createCursor()
 	// Creating a custom cursor 32x32 px. Drawing a simple cross
 	// on 31x31 pixels and setting the hotspot in this 31x31 center
 	int cursorSquareSize = 32;
-	// Preparing a PNM P6 format
+	// Preparing a PPM P6 format
 	int offset = 13;
-	unsigned char cursorData[offset+cursorSquareSize*cursorSquareSize*cursorSquareSize];
-	cursorData[0] = 'P';
-	cursorData[1] = '6';
-	cursorData[2] = ' ';
-	cursorData[3] = '3'; // Shoud be Dependant to cursorSquareSize
-	cursorData[4] = '2'; // Shoud be Dependant to cursorSquareSize
-	cursorData[5] = ' ';
-	cursorData[6] = '3'; // Shoud be Dependant to cursorSquareSize
-	cursorData[7] = '2'; // Shoud be Dependant to cursorSquareSize
-	cursorData[8] = ' ';
-	cursorData[9] = '2';
-	cursorData[10] = '5';
-	cursorData[11] = '5';
-	cursorData[12] = ' ';
+	unsigned char cursorData[offset+cursorSquareSize*cursorSquareSize*3];
+	snprintf((char*)cursorData, offset, "P6 %d %d 255\n", cursorSquareSize, cursorSquareSize);
 
-	unsigned char cursorDataAlpha[offset+cursorSquareSize*cursorSquareSize*cursorSquareSize];
-	cursorDataAlpha[0] = 'P';
-	cursorDataAlpha[1] = '6';
-	cursorDataAlpha[2] = ' ';
-	cursorDataAlpha[3] = '3'; // Shoud be Dependant to cursorSquareSize
-	cursorDataAlpha[4] = '2'; // Shoud be Dependant to cursorSquareSize
-	cursorDataAlpha[5] = ' ';
-	cursorDataAlpha[6] = '3'; // Shoud be Dependant to cursorSquareSize
-	cursorDataAlpha[7] = '2'; // Shoud be Dependant to cursorSquareSize
-	cursorDataAlpha[8] = ' ';
-	cursorDataAlpha[9] = '2';
-	cursorDataAlpha[10] = '5';
-	cursorDataAlpha[11] = '5';
-	cursorDataAlpha[12] = ' ';
+	unsigned char cursorDataAlpha[offset+cursorSquareSize*cursorSquareSize*3];
+	snprintf((char*)cursorDataAlpha, offset, "P6 %d %d 255\n", cursorSquareSize, cursorSquareSize);
 
 	int cursorHotSpot  = cursorSquareSize/2;
 	unsigned char cursorColor1 = 200;
@@ -186,8 +162,8 @@ void Viewer::createCursor()
 	QPixmap cursorDrawAlpha(cursorSquareSize, cursorSquareSize);
 
 	// Creating our custom QCursor
-	if ( cursorDraw.loadFromData(cursorData, offset+cursorSquareSize*cursorSquareSize*cursorSquareSize) 
-		&& cursorDrawAlpha.loadFromData(cursorDataAlpha, offset+cursorSquareSize*cursorSquareSize*cursorSquareSize) )
+	if ( cursorDraw.loadFromData(cursorData, offset+cursorSquareSize*cursorSquareSize*3) 
+		&& cursorDrawAlpha.loadFromData(cursorDataAlpha, offset+cursorSquareSize*cursorSquareSize*3) )
 	{
 		cursorDraw.setAlphaChannel(cursorDrawAlpha);
 		crossCursor = new QCursor(cursorDraw, cursorHotSpot, cursorHotSpot);

@@ -91,12 +91,12 @@
    id="namedview5630"
    showgrid="false"
    inkscape:zoom="1"
-   inkscape:cx="-63.965926"
-   inkscape:cy="168.08734"
+   inkscape:cx="-148.17092"
+   inkscape:cy="149.59251"
    inkscape:window-x="-8"
    inkscape:window-y="-8"
    inkscape:window-maximized="1"
-   inkscape:current-layer="layer2" />
+   inkscape:current-layer="layer3" />
 <font
    horiz-adv-x="2048"
    id="font4747">
@@ -1482,11 +1482,11 @@
    id="stop5290" />
 				</linearGradient>
 				<polygon
-   points="20.389,17.006 18.698,19.935 15.317,19.935 13.626,17.006 15.317,14.078 18.698,14.078 "
+   points="15.317,19.935 13.626,17.006 15.317,14.078 18.698,14.078 20.389,17.006 18.698,19.935 "
    id="polygon5292"
    style="fill:url(#SVGID_5_)" />
 				<polygon
-   points="20.119,17.006 18.563,19.701 15.452,19.701 13.897,17.006 15.452,14.312 18.563,14.312 "
+   points="15.452,19.701 13.897,17.006 15.452,14.312 18.563,14.312 20.119,17.006 18.563,19.701 "
    id="polygon5294" />
 			</g>
 		</g>
@@ -1597,11 +1597,11 @@
    id="stop5327" />
 				</linearGradient>
 				<polygon
-   points="298.186,17.006 296.494,19.935 293.113,19.935 291.422,17.006 293.113,14.078 296.494,14.078 "
+   points="293.113,19.935 291.422,17.006 293.113,14.078 296.494,14.078 298.186,17.006 296.494,19.935 "
    id="polygon5329"
    style="fill:url(#SVGID_8_)" />
 				<polygon
-   points="297.914,17.006 296.359,19.701 293.248,19.701 291.693,17.006 293.248,14.312 296.359,14.312 "
+   points="293.248,19.701 291.693,17.006 293.248,14.312 296.359,14.312 297.914,17.006 296.359,19.701 "
    id="polygon5331" />
 			</g>
 		</g>
@@ -1712,11 +1712,11 @@
    id="stop5364" />
 				</linearGradient>
 				<polygon
-   points="298.185,294.803 296.493,297.73 293.112,297.73 291.421,294.803 293.112,291.874 296.493,291.874 "
+   points="293.112,297.73 291.421,294.803 293.112,291.874 296.493,291.874 298.185,294.803 296.493,297.73 "
    id="polygon5366"
    style="fill:url(#SVGID_11_)" />
 				<polygon
-   points="297.913,294.803 296.358,297.496 293.247,297.496 291.692,294.803 293.247,292.107 296.358,292.107 "
+   points="293.247,297.496 291.692,294.803 293.247,292.107 296.358,292.107 297.913,294.803 296.358,297.496 "
    id="polygon5368" />
 			</g>
 		</g>
@@ -1827,11 +1827,11 @@
    id="stop5401" />
 				</linearGradient>
 				<polygon
-   points="20.39,294.803 18.699,297.73 15.318,297.73 13.626,294.803 15.318,291.874 18.699,291.874 "
+   points="15.318,297.73 13.626,294.803 15.318,291.874 18.699,291.874 20.39,294.803 18.699,297.73 "
    id="polygon5403"
    style="fill:url(#SVGID_14_)" />
 				<polygon
-   points="20.119,294.803 18.564,297.496 15.453,297.496 13.898,294.803 15.453,292.107 18.564,292.107 "
+   points="15.453,297.496 13.898,294.803 15.453,292.107 18.564,292.107 20.119,294.803 18.564,297.496 "
    id="polygon5405" />
 			</g>
 		</g>
@@ -2371,6 +2371,7 @@
 
 
 
+
 	<text
    transform="translate(212.1729,83.1484)"
    font-size="22"
@@ -2381,11 +2382,13 @@
 
 
 
+
 	<text
    transform="translate(253.7461,129.9199)"
    font-size="22"
    id="text5560"
    style="font-size:22px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic">2</text>
+
 
 
 
@@ -2402,11 +2405,13 @@
 
 
 
+
 	<text
    transform="translate(144.1807,209.7617)"
    font-size="25"
    id="text5564"
    style="font-size:25px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic">m</text>
+
 
 
 
@@ -2422,11 +2427,13 @@
 
 
 
+
 	<text
    transform="translate(212.1719,244.25)"
    font-size="22"
    id="text5568"
    style="font-size:22px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic">4</text>
+
 
 
 
@@ -2442,11 +2449,13 @@
 
 
 
+
 	<text
    transform="translate(87.4473,249.4482)"
    font-size="22"
    id="text5572"
    style="font-size:22px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic">6</text>
+
 
 
 
@@ -2462,11 +2471,13 @@
 
 
 
+
 	<text
    transform="translate(45.8726,135.1162)"
    font-size="22"
    id="text5576"
    style="font-size:22px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Century Gothic;-inkscape-font-specification:Century Gothic">8</text>
+
 
 
 
@@ -2482,15 +2493,17 @@
 
 
 
+
 </g></g><g
    inkscape:groupmode="layer"
    id="layer2"
    inkscape:label="Altimeter large needle"
    style="display:inline"><g
      id="needle"
-     inkscape:label="#g11543"><g
+     inkscape:label="#g4034"
+     transform="matrix(0.99999422,0.00339874,-0.00339874,0.99999422,0.53078339,-0.52898073)"><g
        id="Needle2"
-       transform="translate(-0.9608,-15.410816)"
+       transform="matrix(1.4677193,0.00636311,-0.01011245,0.93624504,-72.892116,-5.4867066)"
        style="display:inline"><g
          id="g11188"><image
            id="image11190"
@@ -2502,12 +2515,13 @@
            style="opacity:0.6;overflow:visible" /><g
            id="g11192"><polygon
              id="polygon11194"
-             points="153.557,36.376 155.904,27.013 158.262,36.437 158.254,155.655 153.557,155.655 "
+             points="158.254,155.655 153.557,155.655 153.557,36.376 155.904,27.013 158.262,36.437 "
              style="fill:#ffffff" /><path
              id="path11196"
              d="m 155.905,28.045 2.099,8.393 v 118.967 h -4.197 V 36.438 l 2.098,-8.393 m 0,-2.062 -2.598,10.393 v 119.528 h 5.197 V 36.376 l -2.599,-10.393 0,0 z"
              style="fill:#231f20"
              inkscape:connector-curvature="0" /></g></g></g><g
+       transform="matrix(0.92987211,0.00636311,-0.00640673,0.93624504,11.932132,8.9477071)"
        id="g11495"
        inkscape:label="#Background"
        style="stroke:#3b3131;stroke-width:2;stroke-miterlimit:4;stroke-opacity:0;stroke-dasharray:none;display:inline">
@@ -2628,6 +2642,7 @@
 	
 	
 </g><g
+       transform="matrix(0.92987211,0.00636311,-0.00640673,0.93624504,11.932132,8.9477071)"
        style="stroke:#3b3131;stroke-width:2;stroke-miterlimit:4;stroke-opacity:0;stroke-dasharray:none;display:inline"
        inkscape:label="#Background"
        id="g11511">
@@ -2753,7 +2768,8 @@
    inkscape:label="Altimeter small needle"
    style="display:inline"><g
      id="needle2"
-     inkscape:label="#g11471"><g
+     inkscape:label="#g11471"
+     transform="matrix(0.99997995,0.00633279,-0.00633279,0.99997995,0.99044377,-0.98418808)"><g
        id="g11427"
        inkscape:label="#Background"
        style="stroke:#3b3131;stroke-width:2;stroke-miterlimit:4;stroke-opacity:0;stroke-dasharray:none;display:inline">
@@ -2887,10 +2903,10 @@
            style="opacity:0.6;overflow:visible" /><g
            id="g11181"><polygon
              id="polygon11183"
-             points="155.906,67.558 161.103,77.951 161.103,155.904 150.708,155.904 150.708,77.951 "
+             points="161.103,77.951 161.103,155.904 150.708,155.904 150.708,77.951 155.906,67.558 "
              style="fill:#ffffff" /><polygon
              id="polygon11185"
-             points="155.906,67.558 161.103,77.951 161.103,155.904 150.708,155.904 150.708,77.951 "
+             points="161.103,77.951 161.103,155.904 150.708,155.904 150.708,77.951 155.906,67.558 "
              style="fill:none;stroke:#231f20;stroke-width:0.5" /></g></g></g><g
        style="stroke:#3b3131;stroke-width:2;stroke-miterlimit:4;stroke-opacity:0;stroke-dasharray:none;display:inline"
        inkscape:label="#Background"

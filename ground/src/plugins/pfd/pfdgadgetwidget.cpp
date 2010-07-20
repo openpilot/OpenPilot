@@ -33,14 +33,12 @@
 
 PFDGadgetWidget::PFDGadgetWidget(QWidget *parent) : QGraphicsView(parent)
 {
-    // TODO: create a proper "needle" object instead of hardcoding all this
-    // which is ugly (but easy).
 
     setMinimumSize(64,64);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setScene(new QGraphicsScene(this));
     //setRenderHints(QPainter::Antialiasing || QPainter::TextAntialiasing);
-    setRenderHints(QPainter::TextAntialiasing);
+    //setRenderHints(QPainter::TextAntialiasing);
 
     m_renderer = new QSvgRenderer();
 
@@ -59,7 +57,6 @@ PFDGadgetWidget::PFDGadgetWidget(QWidget *parent) : QGraphicsView(parent)
     groundspeedValue = 0;
     altitudeTarget = 0;
     altitudeValue = 0;
-
 
     // This timer mechanism makes needles rotate smoothly
     connect(&dialTimer, SIGNAL(timeout()), this, SLOT(moveNeedles()));
@@ -134,6 +131,8 @@ void PFDGadgetWidget::connectNeedles() {
  \brief Updates the link stats
  */
 void PFDGadgetWidget::updateLinkStatus(UAVObject *object1) {
+    // TODO: find a way to avoid updating the graphics if the value
+    //       has not changed since the last update
     // Double check that the field exists:
     QString st = QString("Status");
     QString tdr = QString("TxDataRate");
@@ -199,7 +198,17 @@ void PFDGadgetWidget::updateHeading(UAVObject *object1) {
         // These factors assume some things about the PFD SVG, namely:
         // - Heading value in degrees
         // - Scale is 540 degrees large
-        headingTarget = field->getDouble()*compassBandWidth/(-540);
+
+        // Corvus Corax: "If you want a smooth transition between two angles, It is usually solved that by substracting
+        // one from another, and if the result is >180 or <-180 I substract (respectively add) 360 degrees
+        // to it. That way you always get the "shorter difference" to turn in."
+        double fac = compassBandWidth/540;
+        headingTarget = field->getDouble()*(-fac);
+        if ((headingValue - headingTarget)/fac > 180) {
+            headingTarget += 360*fac;
+        } else if (((headingValue - headingTarget)/fac < -180)) {
+            headingTarget -= 360*fac;
+        }
     } else {
         qDebug() << "UpdateHeading: Wrong field, maybe an issue with object disconnection ?";
     }
@@ -239,12 +248,15 @@ void PFDGadgetWidget::updateHeading(UAVObject *object1) {
   \brief Called by the UAVObject which got updated
   */
 void PFDGadgetWidget::updateAirspeed(UAVObject *object3) {
+    Q_UNUSED(object3);
+
 }
 
 /*!
   \brief Called by the UAVObject which got updated
   */
 void PFDGadgetWidget::updateAltitude(UAVObject *object3) {
+    Q_UNUSED(object3);
 }
 
 
@@ -252,6 +264,8 @@ void PFDGadgetWidget::updateAltitude(UAVObject *object3) {
   \brief Called by the UAVObject which got updated
   */
 void PFDGadgetWidget::updateBattery(UAVObject *object1) {
+    // TODO: find a way to avoid updating the graphics if the value
+    //       has not changed since the last update
     // Double check that the field exists:
     QString voltage = QString("Voltage");
     QString current = QString("Current");
@@ -702,6 +716,7 @@ void PFDGadgetWidget::paint()
 
 void PFDGadgetWidget::paintEvent(QPaintEvent *event)
 {
+    Q_UNUSED(event);
     // Skip painting until the dial file is loaded
     if (! m_renderer->isValid()) {
         qDebug() << "Dial file not loaded, not rendering";
@@ -715,6 +730,7 @@ void PFDGadgetWidget::paintEvent(QPaintEvent *event)
 // nature of SVG dials.
 void PFDGadgetWidget::resizeEvent(QResizeEvent *event)
 {
+    Q_UNUSED(event);
     fitInView(m_background, Qt::KeepAspectRatio );
 }
 
@@ -745,124 +761,147 @@ void PFDGadgetWidget::moveNeedles()
     //////
     // Roll
     //////
-    double rollDiff;
-    if ((abs((rollValue-rollTarget)*10) > 5)) {
-        rollDiff =(rollTarget - rollValue)/5;
+    if (rollValue != rollTarget) {
+        double rollDiff;
+        if ((abs((rollValue-rollTarget)*10) > 5)) {
+            rollDiff =(rollTarget - rollValue)/5;
+        } else {
+            rollDiff = rollTarget - rollValue;
+            dialCount--;
+        }
+        m_world->setRotation(m_world->rotation()+rollDiff);
+        m_rollscale->setRotation(m_rollscale->rotation()+rollDiff);
+        rollValue += rollDiff;
     } else {
-        rollDiff = rollTarget - rollValue;
         dialCount--;
     }
-    m_world->setRotation(m_world->rotation()+rollDiff);
-    m_rollscale->setRotation(m_rollscale->rotation()+rollDiff);
-    rollValue += rollDiff;
 
     //////
     // Pitch
     //////
-    double pitchDiff;
-    if ((abs((pitchValue-pitchTarget)*10) > 5)) {
-        pitchDiff = (pitchTarget - pitchValue)/5;
+    if (pitchValue != pitchTarget) {
+        double pitchDiff;
+        if ((abs((pitchValue-pitchTarget)*10) > 5)) {
+            pitchDiff = (pitchTarget - pitchValue)/5;
+        } else {
+            pitchDiff = pitchTarget - pitchValue;
+            dialCount--;
+        }
+        QPointF opd = QPointF(0,pitchDiff);
+        m_world->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), true);
+        QPointF oop = m_world->transformOriginPoint();
+        m_world->setTransformOriginPoint((oop.x()-opd.x()),(oop.y()-opd.y()));
+        pitchValue += pitchDiff;
     } else {
-        pitchDiff = pitchTarget - pitchValue;
         dialCount--;
     }
-    QPointF opd = QPointF(0,pitchDiff);
-    m_world->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), true);
-    QPointF oop = m_world->transformOriginPoint();
-    m_world->setTransformOriginPoint((oop.x()-opd.x()),(oop.y()-opd.y()));
-    pitchValue += pitchDiff;
 
     //////
     // Heading
+    //
+    // If you want a smooth transition between two angles, It is usually solved that by substracting
+    // one from another, and if the result is >180 or <-180 I substract (respectively add) 360 degrees
+    // to it. That way you always get the "shorter difference" to turn in.
     //////
-    double headingOffset = 0;
-    double headingDiff;
-    if ((abs((headingValue-headingTarget)*10) > 5)) {
-        headingDiff = (headingTarget - headingValue)/5;
-    } else {
-        headingDiff = headingTarget-headingValue;
+    if (headingValue != headingTarget) {
+        double headingOffset = 0;
+        double headingDiff;
+        if ((abs((headingValue-headingTarget)*10) > 5)) {
+            headingDiff = (headingTarget - headingValue)/5;
+        } else {
+            headingDiff = headingTarget-headingValue;
+            dialCount--;
+        }
+        double threshold = -180*compassBandWidth/540;
+        // Note: rendering can jump oh so very slightly when crossing the 180 degree
+        // boundary, should not impact actual useability of the display.
+        if ((headingValue < threshold) && ((headingValue+headingDiff)>=threshold)) {
+            // We went over 180°: activate a -360 degree offset
+            headingOffset = 2*threshold;
+        } else if ((headingValue >= threshold) && ((headingValue+headingDiff)<threshold)) {
+            // We went under 180°: remove the -360 degree offset
+            headingOffset = -2*threshold;
+        }
+        QPointF opd = QPointF(headingDiff+headingOffset,0);
+        m_compassband->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), true);
+        headingValue += headingDiff;
+    }  else {
         dialCount--;
     }
-    double threshold = -180*compassBandWidth/540;
-    // Note: rendering can jump oh so very slightly when crossing the 180 degree
-    // boundary, should not impact actual useability of the display.
-    if ((headingValue < threshold) && ((headingValue+headingDiff)>=threshold)) {
-        // We went over 180�: activate a -360 degree offset
-        headingOffset = 2*threshold;
-    } else if ((headingValue >= threshold) && ((headingValue+headingDiff)<threshold)) {
-        // We went under 180�: remove the -360 degree offset
-        headingOffset = -2*threshold;
-    }
-    opd = QPointF(headingDiff+headingOffset,0);
-    m_compassband->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), true);
-    headingValue += headingDiff;
 
     //////
     // Speed
     //////
-    if (abs(groundspeedValue-groundspeedTarget) > speedScaleHeight/120) {
-        groundspeedValue += (groundspeedTarget-groundspeedValue)/5;
-    } else {
-        groundspeedValue = groundspeedTarget;
-        dialCount--;
-    }
-    qreal x = m_speedscale->transform().dx();
-    //opd = QPointF(x,fmod(groundspeedValue,speedScaleHeight/6));
-    // fmod does rounding errors!! the formula below works better:
-    opd = QPointF(x,groundspeedValue-floor(groundspeedValue/speedScaleHeight*6)*speedScaleHeight/6);
-    m_speedscale->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), false);
-
-    double speedText = groundspeedValue/speedScaleHeight*30;
-    QString s = QString().sprintf("%.0f",speedText);
-    m_speedtext->setPlainText(s);
-
-    // TODO: optimize this by skipping if not necessary...
-    // Now update the text elements inside the scale:
-    // (Qt documentation states that the list has the same order
-    // as the item add order in the QGraphicsItemGroup)
-    QList <QGraphicsItem *> textList = m_speedscale->childItems();
-    qreal val = 5*floor(groundspeedValue/speedScaleHeight*6)+20;
-    foreach( QGraphicsItem * item, textList) {
-        if (QGraphicsTextItem *text = qgraphicsitem_cast<QGraphicsTextItem *>(item)) {
-            QString s = (val<0) ? QString() : QString().sprintf("%.0f",val);
-            text->setPlainText(s);
-            val -= 5;
+    if (groundspeedValue != groundspeedTarget) {
+        if (abs(groundspeedValue-groundspeedTarget) > speedScaleHeight/120) {
+            groundspeedValue += (groundspeedTarget-groundspeedValue)/5;
+        } else {
+            groundspeedValue = groundspeedTarget;
+            dialCount--;
         }
+        qreal x = m_speedscale->transform().dx();
+        //opd = QPointF(x,fmod(groundspeedValue,speedScaleHeight/6));
+        // fmod does rounding errors!! the formula below works better:
+        QPointF opd = QPointF(x,groundspeedValue-floor(groundspeedValue/speedScaleHeight*6)*speedScaleHeight/6);
+        m_speedscale->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), false);
+
+        double speedText = groundspeedValue/speedScaleHeight*30;
+        QString s = QString().sprintf("%.0f",speedText);
+        m_speedtext->setPlainText(s);
+
+        // TODO: optimize this by skipping if not necessary...
+        // Now update the text elements inside the scale:
+        // (Qt documentation states that the list has the same order
+        // as the item add order in the QGraphicsItemGroup)
+        QList <QGraphicsItem *> textList = m_speedscale->childItems();
+        qreal val = 5*floor(groundspeedValue/speedScaleHeight*6)+20;
+        foreach( QGraphicsItem * item, textList) {
+            if (QGraphicsTextItem *text = qgraphicsitem_cast<QGraphicsTextItem *>(item)) {
+                QString s = (val<0) ? QString() : QString().sprintf("%.0f",val);
+                text->setPlainText(s);
+                val -= 5;
+            }
+        }
+    } else {
+        dialCount--;
     }
 
     //////
     // Altitude
     //////
-    if (abs(altitudeValue-altitudeTarget) > altitudeScaleHeight/120) {
-        altitudeValue += (altitudeTarget-altitudeValue)/5;
+    if (altitudeValue != altitudeTarget) {
+        if (abs(altitudeValue-altitudeTarget) > altitudeScaleHeight/120) {
+            altitudeValue += (altitudeTarget-altitudeValue)/5;
+        } else {
+            altitudeValue = altitudeTarget;
+            dialCount--;
+        }
+        qreal x = m_altitudescale->transform().dx();
+        //opd = QPointF(x,fmod(altitudeValue,altitudeScaleHeight/6));
+        // fmod does rounding errors!! the formula below works better:
+        QPointF opd = QPointF(x,altitudeValue-floor(altitudeValue/altitudeScaleHeight*6)*altitudeScaleHeight/6);
+        m_altitudescale->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), false);
+        double altitudeText = altitudeValue/altitudeScaleHeight*30;
+        QString s = QString().sprintf("%.0f",altitudeText);
+        m_altitudetext->setPlainText(s);
+
+        // TODO: optimize this by skipping if not necessary...
+        // Now update the text elements inside the scale:
+        // (Qt documentation states that the list has the same order
+        // as the item add order in the QGraphicsItemGroup)
+        QList <QGraphicsItem *> textList = m_altitudescale->childItems();
+        qreal val = 5*floor(altitudeValue/altitudeScaleHeight*6)+20;
+        foreach( QGraphicsItem * item, textList) {
+            if (QGraphicsTextItem *text = qgraphicsitem_cast<QGraphicsTextItem *>(item)) {
+                QString s = (val<0) ? QString() : QString().sprintf("%.0f",val);
+                text->setPlainText(s);
+                val -= 5;
+            }
+        }
     } else {
-        altitudeValue = altitudeTarget;
         dialCount--;
     }
-    x = m_altitudescale->transform().dx();
-    //opd = QPointF(x,fmod(altitudeValue,altitudeScaleHeight/6));
-    // fmod does rounding errors!! the formula below works better:
-    opd = QPointF(x,altitudeValue-floor(altitudeValue/altitudeScaleHeight*6)*altitudeScaleHeight/6);
-    m_altitudescale->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), false);
-    double altitudeText = altitudeValue/altitudeScaleHeight*30;
-    s = QString().sprintf("%.0f",altitudeText);
-    m_altitudetext->setPlainText(s);
 
-    // TODO: optimize this by skipping if not necessary...
-    // Now update the text elements inside the scale:
-    // (Qt documentation states that the list has the same order
-    // as the item add order in the QGraphicsItemGroup)
-    textList = m_altitudescale->childItems();
-    val = 5*floor(altitudeValue/altitudeScaleHeight*6)+20;
-    foreach( QGraphicsItem * item, textList) {
-        if (QGraphicsTextItem *text = qgraphicsitem_cast<QGraphicsTextItem *>(item)) {
-            QString s = (val<0) ? QString() : QString().sprintf("%.0f",val);
-            text->setPlainText(s);
-            val -= 5;
-        }
-    }
-
-   //update();
    if (!dialCount)
        dialTimer.stop();
 }

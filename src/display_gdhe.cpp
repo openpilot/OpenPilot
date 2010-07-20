@@ -103,11 +103,19 @@ namespace display {
 
 		// convert pose from quat to euler degrees
 		jblas::vec poseEuler(6);
+		jblas::vec angleEuler(3);
+		jblas::sym_mat uncertEuler(3);
 		ublas::subrange(poseEuler,0,3) = ublas::subrange(poseQuat,0,3);
-		ublas::subrange(poseEuler,3,6) = quaternion::q2e(ublas::subrange(poseQuat,3,7));
+		quaternion::q2e(ublas::subrange(poseQuat,3,7), ublas::project(poseQuatUncert,ublas::range(3,7),ublas::range(3,7)), angleEuler, uncertEuler);
+		ublas::subrange(poseEuler,3,6) = angleEuler;
+		//ublas::subrange(poseEuler,3,6) = quaternion::q2e(ublas::subrange(poseQuat,3,7));
 		for(int i = 3; i < 6; ++i) poseEuler(i) = jmath::radToDeg(poseEuler(i));
 		std::swap(poseEuler(3), poseEuler(5)); // FIXME the common convention is yaw pitch roll, not roll pitch yaw...
 		robot->setPose(poseEuler);
+/*JFR_DEBUG("robot pos  : " << ublas::subrange(poseQuat,0,3));
+JFR_DEBUG("robot euler: " << angleEuler);
+JFR_DEBUG("robot POS  : " << ublas::project(poseQuatUncert,ublas::range(0,3),ublas::range(0,3)));
+JFR_DEBUG("robot EULER: " << uncertEuler);*/
 		// uncertainty
 		uncertEll->set(ublas::subrange(poseQuat,0,3), ublas::project(poseQuatUncert,ublas::range(0,3),ublas::range(0,3)), viewerGdhe->ellipsesScale);
 		uncertEll->refresh();
@@ -278,7 +286,7 @@ namespace display {
 					double id_std = sqrt(cov_(6,6))*viewerGdhe->ellipsesScale;
 					jblas::vec3 position = lmkAHP::ahp2euc(state_);
 					jblas::vec7 state = state_; 
-					state(6) = state_(6) - id_std; if (state(6) < 1e-2) state(6) = 1e-2;
+					state(6) = state_(6) - id_std; if (state(6) < 1e-4) state(6) = 1e-4;
 					jblas::vec3 positionExt = lmkAHP::ahp2euc(state);
 					seg->addPoint(positionExt(0)-position(0), positionExt(1)-position(1), positionExt(2)-position(2));
 					state(6) = state_(6) + id_std;

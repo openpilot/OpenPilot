@@ -281,7 +281,9 @@ namespace gdhe {
 			virtual const std::string construct_string() const
 			{
 				std::ostringstream oss;
-				oss << "set robots(" << ids << ") {" << model << "};";
+				oss << "set robots(" << ids << ") {";
+				if (model != "") oss << model; else oss << "color 255 255 255;sphere 0.001 12";
+				oss << "};";
 				return oss.str();
 			}
 			
@@ -344,6 +346,33 @@ namespace gdhe {
 				oss << "color " << color << ";";
 				oss << "ellipsoid " << 0 << " " << 0 << " " << 0 << " " << dx << " " << dy << " " << dz << " " << facets << "};";
 				return oss.str();
+			}
+	};
+
+	class EllipsoidWire: public Ellipsoid
+	{
+		public:
+			EllipsoidWire(double facets_ = 12): Ellipsoid(facets_) {}
+			EllipsoidWire(double _dx, double _dy, double _dz, double facets_ = 12): Ellipsoid(_dx,_dy,_dz, facets_) {}
+			EllipsoidWire(double x0_, double y0_, double z0_, double _dx, double _dy, double _dz, unsigned char R_, unsigned char G_, unsigned char B_, double facets_ = 12): Ellipsoid(x0_, y0_, z0_, _dx, _dy, _dz, R_, G_, B_, facets_) {}
+			EllipsoidWire(jblas::vec3 _x, jblas::sym_mat33 _xCov, double _scale = 1): Ellipsoid(_x, _xCov, _scale) {}
+			
+			const std::string construct_string() const
+			{
+				std::ostringstream oss;
+				oss << "set robots(" << ids << ") {";
+				oss << "color " << color << ";";
+				#if 0
+				oss << "ellipse " << 0 << " " << 0 << " " << 0 << " z " << 2*dx << " " << 2*dy << " " << facets << ";";
+				oss << "ellipse " << 0 << " " << 0 << " " << 0 << " y " << 2*dx << " " << 2*dz << " " << facets << ";";
+				oss << "ellipse " << 0 << " " << 0 << " " << 0 << " x " << 2*dy << " " << 2*dz << " " << facets << ";";
+				#endif
+				oss << "polyline 2 " << -dx << " " <<  0  << " " <<  0  << " " << +dx << " " <<  0  << " " <<  0  << ";";
+				oss << "polyline 2 " <<  0  << " " << -dy << " " <<  0  << " " <<  0  << " " << +dy << " " <<  0  << ";";
+				oss << "polyline 2 " <<  0  << " " <<  0  << " " << -dz << " " <<  0  << " " <<  0  << " " << +dz << "};";
+				return oss.str();
+				// TODO also draw the angle uncertainty with an ellipsoidic cone (an ellipse which is the intersection
+				// of an axis when the rotation around the two other axes vary, and 4 segments which are this axis at extrema)
 			}
 	};
 

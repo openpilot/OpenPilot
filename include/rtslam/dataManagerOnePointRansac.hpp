@@ -14,10 +14,7 @@
 #include "boost/shared_ptr.hpp"
 
 #include "rtslam/dataManagerAbstract.hpp"
-#include "rtslam/activeSearch.hpp"
-
-#include "rtslam/rawImage.hpp"
-#include "rtslam/sensorPinHole.hpp"
+#include "rtslam/quatTools.hpp"
 
 namespace jafar {
 	namespace rtslam {
@@ -35,28 +32,37 @@ namespace jafar {
 		typedef std::list<ransac_set_ptr_t> RansacSetList;
 
 
-		template<class RawSpec, class SensorSpec, class Detector, class Matcher>
+		// TODO extend to n-point ransac ?
+		/**
+		This class implements the one-point-Ransac ActiveSearch strategy
+		
+		@ingroup rtslam
+		*/
+		template<class RawSpec,class SensorSpec, class FeatureSpec, class RoiSpec, class FeatureManagerSpec, class DetectorSpec, class MatcherSpec>
 		class DataManagerOnePointRansac: public DataManagerAbstract, public SpecificChildOf<SensorSpec> {
 
 			public:
 				// Define the function linkToParentSensorSpec.
-			ENABLE_LINK_TO_SPECIFIC_PARENT(SensorAbstract,SensorSpec,
-					SensorSpec,DataManagerAbstract)
-				;
+				ENABLE_LINK_TO_SPECIFIC_PARENT(SensorAbstract, SensorSpec, SensorSpec, DataManagerAbstract);
 				// Define the functions sensorSpec() and sensorSpecPtr().
-			ENABLE_ACCESS_TO_SPECIFIC_PARENT(SensorSpec,sensorSpec)
-				;
+				ENABLE_ACCESS_TO_SPECIFIC_PARENT(SensorSpec, sensorSpec);
 
 			public: // public interface
-				//DataManagerOnePointRansac();
+				DataManagerOnePointRansac(const boost::shared_ptr<DetectorSpec> & _detector, const boost::shared_ptr<MatcherSpec> & _matcher, const boost::shared_ptr<FeatureManagerSpec> _featMan, int n_updates, int n_tries, int n_init):
+					detector(_detector), matcher(_matcher), featMan(_featMan)
+				{
+					algorithmParams.n_updates = n_updates;
+					algorithmParams.n_tries = n_tries;
+					algorithmParams.n_init = n_init;
+				}
 				virtual ~DataManagerOnePointRansac() {
 				}
 				void process(boost::shared_ptr<RawAbstract> data);
 
 			protected: // main data members
-				boost::shared_ptr<Detector> detector;
-				boost::shared_ptr<Matcher> matcher;
-				boost::shared_ptr<ActiveSearchGrid> asGrid;
+				boost::shared_ptr<DetectorSpec> detector;
+				boost::shared_ptr<MatcherSpec> matcher;
+				boost::shared_ptr<FeatureManagerSpec> featMan;
 				// the list of observations sorted by information gain
 				typedef map<double, observation_ptr_t> ObservationListSorted;
 				ObservationListSorted obsListSorted;
@@ -68,60 +74,23 @@ namespace jafar {
 				RansacSetList ransacSetList;
 
 			protected: // parameters
-				struct detector_params_t {
-						int patchSize; ///<       descriptor patch size
-						double measStd; ///<       measurement noise std deviation
-						double measVar; ///<       measurement noise variance
-				} detectorParams_;
-				struct matcher_params_t {
-						int patchSize;
-						double lowInnov; ///<     search region radius for first RANSAC consensus
-						double threshold; ///<     matching threshold
-						double mahalanobisTh; ///< Mahalanobis distance for outlier rejection
-						double measStd; ///<       measurement noise std deviation
-						double measVar; ///<       measurement noise variance
-				} matcherParams_;
 				struct alg_params_t {
-						int n_updates; ///<        maximum number of updates
-						int n_tries; ///<          number of RANSAC consensus tries
-				} algorithmParams_;
+						int n_updates; ///< maximum number of updates
+						int n_tries;   ///< number of RANSAC consensus tries
+						int n_init;    ///< number of feature initialization
+				} algorithmParams;
 
 			public: // getters ans setters
-				void setDetector(const boost::shared_ptr<Detector> & _detector, int patchSize, double _measStd) {
-					detector = _detector;
-					detectorParams_.patchSize = patchSize;
-					detectorParams_.measStd = _measStd;
-					detectorParams_.measVar = _measStd * _measStd;
-				}
-				detector_params_t detectorParams() {
-					return detectorParams_;
-				}
-				void setMatcher(boost::shared_ptr<Matcher> & _matcher, int patchSize, double lowInnov,
-				                double threshold, double mahalanobisTh, double _measStd) {
-					matcher = _matcher;
-					matcherParams_.patchSize = patchSize;
-					matcherParams_.lowInnov = lowInnov;
-					matcherParams_.threshold = threshold;
-					matcherParams_.mahalanobisTh = mahalanobisTh;
-					matcherParams_.measStd = _measStd;
-					matcherParams_.measVar = _measStd * _measStd;
-				}
-				matcher_params_t matcherParams() {
-					return matcherParams_;
-				}
-				void setActiveSearchGrid(boost::shared_ptr<ActiveSearchGrid> arg) {
-					asGrid = arg;
-				}
-				boost::shared_ptr<ActiveSearchGrid> activeSearchGrid(void) {
-					return asGrid;
-				}
-				void setAlgorithmParams(int n_updates, int n_tries) {
-					algorithmParams_.n_updates = n_updates;
-					algorithmParams_.n_tries = n_tries;
-				}
-				alg_params_t algorithmParams() {
-					return algorithmParams_;
-				}
+/*				boost::shared_ptr<FeatureManagerSpec> featureManager(void) {
+					return featMan;
+				}*/
+// 				void setAlgorithmParams(int n_updates, int n_tries) {
+// 					algorithmParams_.n_updates = n_updates;
+// 					algorithmParams_.n_tries = n_tries;
+// 				}
+// 				alg_params_t algorithmParams() {
+// 					return algorithmParams_;
+// 				}
 
 			protected: // particular processing
 				void processKnownObs(boost::shared_ptr<RawSpec> rawData);
@@ -135,8 +104,8 @@ namespace jafar {
 				void projectFromMean(vec & exp, const observation_ptr_t & obsPtr, const vec & x);
 				bool isLowInnovationInlier(const observation_ptr_t & obsPtr, const vec & exp, double lowInnTh);
 				bool isExpectedInnovationInlier( observation_ptr_t & obsPtr, double highInnTh);
-				bool match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, image::ConvexRoi &roi, Measurement & measure, const appearance_ptr_t & app);
-				bool matchWithLowInnovation(const observation_ptr_t obsPtr, double lowInnTh); // TODO
+// 				bool match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, image::ConvexRoi &roi, Measurement & measure, const appearance_ptr_t & app);
+				bool matchWithLowInnovation(const observation_ptr_t obsPtr, double lowInnTh);
 				bool matchWithExpectedInnovation(boost::shared_ptr<RawSpec> rawData,  observation_ptr_t obsPtr);
 
 		};

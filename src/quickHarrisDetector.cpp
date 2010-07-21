@@ -21,17 +21,12 @@ namespace jafar {
 			    m_threshold(threshold), m_edge(edge) {
 		}
 
-		bool jafar::rtslam::QuickHarrisDetector::detectIn(
-		    const jafar::image::Image & image, feat_img_pnt_ptr_t featPtr,
-		    jafar::image::ROI *roiPtr) {
+		bool QuickHarrisDetector::detectIn(const jafar::image::Image & image, feat_img_pnt_ptr_t featPtr, const image::ConvexRoi *roiPtr) {
 			//	JFR_PRED_ERROR( image.colorSpace() == JfrImage_CS_GRAY, FdetectException, FdetectException::INVALID_COLORSPACE,"QuickHarrisDetector::detectIn image must be of the same colorspace and in Greyscale");
-			ROI localRoi;
+			image::ConvexRoi localRoi;
 
 			if (roiPtr == 0) {
-				localRoi.x = 0;
-				localRoi.y = 0;
-				localRoi.width = image.width();
-				localRoi.height = image.height();
+				localRoi.init(cv::Rect(0,0,image.width(),image.height()));
 			} else {
 				localRoi = *roiPtr;
 			}
@@ -39,7 +34,7 @@ namespace jafar {
 			int pixBest[2];
 			float scoreBest;
 
-			m_quickData = new HQuickData[localRoi.width * localRoi.height]; // processing data structure with integral convolution images
+			m_quickData = new HQuickData[localRoi.w() * localRoi.h()]; // processing data structure with integral convolution images
 
 			quickDerivatives(image, localRoi);
 			bool success =
@@ -56,7 +51,7 @@ namespace jafar {
 		}
 
 		void jafar::rtslam::QuickHarrisDetector::quickDerivatives(
-		    const jafar::image::Image & image, jafar::image::ROI & roi) {
+		    const jafar::image::Image & image, image::ConvexRoi & roi) {
 			const uchar* pix_center;
 			const uchar* pix_right;
 			const uchar* pix_left;
@@ -72,15 +67,17 @@ namespace jafar {
 			int shift_derv = 1; // = (3-1)/2
 
 			// i: vert; j: horz  image coordinates
-			int iMin = roi.y + shift_derv;
-			int iMax = roi.y + roi.height - shift_derv;
-			int jMin = roi.x + shift_derv;
-			int jMax = roi.x + roi.width - shift_derv;
+			int iMin = roi.y() + shift_derv;
+			int iMax = roi.y() + roi.h() - shift_derv;
+			
+			// FIXME take into account possible convex part of roi x(i) and w(i) by moving this into the loop
+			int jMin = roi.x() + shift_derv;
+			int jMax = roi.x() + roi.w() - shift_derv;
 
 			int i, j; // i, j: image coordinates
 			int ri; // ri: vertical roi coordinate
 			for (i = iMin; i < iMax; i++) {
-				ri = i - roi.y;
+				ri = i - roi.y();
 
 				pix_center = image.data() + (i * image.step()) + jMin;
 				pix_right = pix_center + 1;
@@ -88,8 +85,8 @@ namespace jafar {
 				pix_down = pix_center + image.step();
 				pix_up = pix_center - image.step();
 
-				int_center = m_quickData + (ri * roi.width) + shift_derv;
-				int_up = int_center - roi.width;
+				int_center = m_quickData + (ri * roi.w()) + shift_derv;
+				int_up = int_center - roi.w();
 				int_upLeft = int_up - 1;
 				int_left = int_center - 1;
 
@@ -140,7 +137,7 @@ namespace jafar {
 		}
 
 		bool jafar::rtslam::QuickHarrisDetector::quickConvolutionWithBestPoint(
-		    const jafar::image::ROI & roi, int pixMax[2], float & scoreMax) {
+		    const image::ConvexRoi & roi, int pixMax[2], float & scoreMax) {
 			// margins
 			int shift_conv = (m_convolutionSize - 1) / 2;
 			int shift_derv = 1;
@@ -148,9 +145,9 @@ namespace jafar {
 
 			// bounds
 			int riMin = shift_derv_conv;
-			int riMax = roi.height - shift_derv_conv;
+			int riMax = roi.h() - shift_derv_conv;
 			int rjMin = shift_derv_conv;
-			int rjMax = roi.width - shift_derv_conv;
+			int rjMax = roi.w() - shift_derv_conv;
 
 			// data structure pointers
 			HQuickData* int_center;
@@ -167,12 +164,12 @@ namespace jafar {
 
 			for (ri = riMin; ri < riMax; ri++) {
 
-				int_center = m_quickData + (ri * roi.width) + rjMin;
+				int_center = m_quickData + (ri * roi.w()) + rjMin;
 
-				int_upLeft = int_center - (shift_conv * roi.width) - shift_conv;
-				int_upRight = int_center - (shift_conv * roi.width) + shift_conv;
-				int_downLeft = int_center + (shift_conv * roi.width) - shift_conv;
-				int_downRight = int_center + (shift_conv * roi.width) + shift_conv;
+				int_upLeft = int_center - (shift_conv * roi.w()) - shift_conv;
+				int_upRight = int_center - (shift_conv * roi.w()) + shift_conv;
+				int_downLeft = int_center + (shift_conv * roi.w()) - shift_conv;
+				int_downRight = int_center + (shift_conv * roi.w()) + shift_conv;
 
 				for (rj = rjMin; rj < rjMax; rj++) {
 
@@ -199,8 +196,8 @@ namespace jafar {
 					if (corner_ratio < m_edge) {
 						if (int_center->im_low_curv > im_low_curv_max) {
 							im_low_curv_max = int_center->im_low_curv;
-							pixMax[0] = roi.x + rj;
-							pixMax[1] = roi.y + ri;
+							pixMax[0] = roi.x() + rj;
+							pixMax[1] = roi.y() + ri;
 						}
 					}
 
@@ -220,8 +217,7 @@ namespace jafar {
 
 		}
 
-		void jafar::rtslam::QuickHarrisDetector::writeHarrisImagesAsPPM(
-		    jafar::image::ROI & roi) {
+		void jafar::rtslam::QuickHarrisDetector::writeHarrisImagesAsPPM(image::ConvexRoi & roi) {
 			FILE *pFile_x = fopen("/home/jsola/im_x.ppm", "w");
 			FILE *pFile_y = fopen("/home/jsola/im_y.ppm", "w");
 			FILE *pFile_xx = fopen("/home/jsola/im_xx.ppm", "w");
@@ -231,14 +227,14 @@ namespace jafar {
 			FILE *pFile_max = fopen("/home/jsola/im_max.ppm", "w");
 			HQuickData * ptr = m_quickData;
 			if (pFile_x != NULL) {
-				fprintf(pFile_x, "P2\n%d %d\n255\n", roi.width, roi.height);
-				fprintf(pFile_y, "P2\n%d %d\n255\n", roi.width, roi.height);
-				fprintf(pFile_xx, "P2\n%d %d\n255\n", roi.width, roi.height);
-				fprintf(pFile_xy, "P2\n%d %d\n255\n", roi.width, roi.height);
-				fprintf(pFile_yy, "P2\n%d %d\n255\n", roi.width, roi.height);
-				fprintf(pFile_min, "P2\n%d %d\n255\n", roi.width, roi.height);
-				fprintf(pFile_max, "P2\n%d %d\n255\n", roi.width, roi.height);
-				for (int i = 0; i < (roi.height * roi.width); i++) {
+				fprintf(pFile_x, "P2\n%d %d\n255\n", roi.w(), roi.h());
+				fprintf(pFile_y, "P2\n%d %d\n255\n", roi.w(), roi.h());
+				fprintf(pFile_xx, "P2\n%d %d\n255\n", roi.w(), roi.h());
+				fprintf(pFile_xy, "P2\n%d %d\n255\n", roi.w(), roi.h());
+				fprintf(pFile_yy, "P2\n%d %d\n255\n", roi.w(), roi.h());
+				fprintf(pFile_min, "P2\n%d %d\n255\n", roi.w(), roi.h());
+				fprintf(pFile_max, "P2\n%d %d\n255\n", roi.w(), roi.h());
+				for (int i = 0; i < (roi.h() * roi.w()); i++) {
 					fprintf(pFile_x, "%d ", 128 + (ptr->im_x) / 2);
 					fprintf(pFile_y, "%d ", 128 + (ptr->im_y) / 2);
 					fprintf(pFile_xx, "%d ", 128 + (ptr->im_conv_xx) / 2048);

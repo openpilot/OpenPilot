@@ -33,13 +33,14 @@ void test_acsearch01() {
 	cout << "\n% ACTIVE SEARCH GRID \n%======================\n" << endl;
 	ActiveSearchGrid grid(640, 480, 5, 5, 10);
 	vec2 pix;
-	ROI roi;
+	image::ConvexRoi roi;
 	int i = 0;
 	while (true) {
-		if (grid.getROI(roi)) {
+		if (grid.getRoi(roi)) {
 			cout << roi << endl;
-			pix = (roi.upleft() + roi.downright()) / 2;
-			grid.addPixel(pix);
+			pix(0) = roi.x()+roi.w()/2;
+			pix(1) = roi.y()+roi.h()/2;
+			grid.addObs(pix);
 			cout << "pix{" << i << "}: " << pix << " , " << grid << endl;
 			i ++;
 		}
@@ -50,9 +51,10 @@ void test_acsearch01() {
 	grid.renew();
 	i = 0;
 	while (true) {
-		if (grid.getROI(roi)) {
-			pix = (roi.upleft() + roi.downright()) / 2;
-			grid.addPixel(pix);
+		if (grid.getRoi(roi)) {
+			pix(0) = roi.x()+roi.w()/2;
+			pix(1) = roi.y()+roi.h()/2;
+			grid.addObs(pix);
 			cout << "pix{" << i << "}: " << pix << " , " << grid << endl;
 			i ++;
 		}

@@ -11,6 +11,9 @@
  * \ingroup rtslam
  */
 
+#if 0
+// TODO should be included in demo_slam
+
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 #include <time.h>
@@ -383,3 +386,11 @@ void demo_slam01_display(world_ptr_t *world) {
 
 			demo_slam01(display);
 		}
+		
+#else
+int main()
+{
+	return 0;
+}
+
+#endif

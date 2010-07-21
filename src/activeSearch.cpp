@@ -47,7 +47,7 @@ namespace jafar {
 
 
 		// Functions to fill in cells
-		void ActiveSearchGrid::addPixel(const vec2 & p) {
+		void ActiveSearchGrid::addObs(const vec2 & p) {
 			veci2 cell = pix2cell(p);
 			addToCell(cell);
 		}
@@ -115,22 +115,21 @@ namespace jafar {
 			return cellOrigin(cell) + cellSize / 2;
 		}
 
-		void ActiveSearchGrid::cell2roi(const veci2 & cell, ROI & roi) {
+		void ActiveSearchGrid::cell2roi(const veci2 & cell, image::ConvexRoi & roi) {
 			veci2 ul = cellOrigin(cell);
 			ul(0) += separation;
 			ul(1) += separation;
-			roi.upleft(ul);
 			veci2 s = cellSize;
 			s(0) -= 2 * separation;
 			s(1) -= 2 * separation;
-			roi.size(s);
+			roi.init(cv::Rect(ul(0),ul(1),s(0),s(1)));
 		}
 
 
 		/**
 		 * Get ROI of one random empty cell
 		 */
-		bool ActiveSearchGrid::getROI(ROI & roi) {
+		bool ActiveSearchGrid::getRoi(image::ConvexRoi & roi) {
 			veci2 cell;
 			if (pickEmptyCell(cell)) {
 				cell2roi(cell, roi);
@@ -173,7 +172,7 @@ namespace jafar {
 			vec7 senPose = obsPtr->sensorPtr()->globalPose();
 		}
 
-		void ActiveSearch::scanObs(const observation_ptr_t & obsPtr, const ROI & roi) {
+		void ActiveSearch::scanObs(const observation_ptr_t & obsPtr, const image::ConvexRoi & roi) {
 		}
 
 	}

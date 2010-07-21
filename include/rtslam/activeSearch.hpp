@@ -67,17 +67,17 @@ namespace jafar {
 		 * - The grid is offset by a fraction of a cell size.
 		 * 		- use renew() at each frame to clear the grid and set a new offset.
 		 * - Projected landmarks are represented by red dots.
-		 * 		- After projection, use addPixel() to add a new dot to the grid.
+		 * 		- After projection, use addObs() to add a new dot to the grid.
 		 * - Cells with projected landmarks inside are 'occupied'.
 		 * - Only the inner cells (thick blue rectangle) are considered for Region of Interest (ROI) extraction.
 		 * - One cell is chosen randomly among those that are empty.
 		 * - The ROI is smaller than the cell to guarantee a minimum feature separation.
 		 * 		- Use the optional 'separation' parameter at construction time to control this separation.
-		 * 		- Use getROI() to obtain an empty ROI for initialization.
+		 * 		- Use getRoi() to obtain an empty ROI for initialization.
 		 * - A new feature is to be be searched inside this ROI.
 		 * - If you need to search more than one feature per frame, proceed like this:
-		 * 		- At successful detection, add the detected pixel with addPixel().
-		 * 		- Call getROI() again.
+		 * 		- At successful detection, add the detected pixel with addObs().
+		 * 		- Call getRoi() again.
 		 * 		- Repeat these two steps for each feature to be searched.
 		 *
 		 * We include here a schematic active-search pseudo-code algorithm to illustrate its operation:
@@ -91,7 +91,7 @@ namespace jafar {
 		 * {
 		 *   obs->project();
 		 *   if (obs->isVisible())
-		 *     grid.addPixel(obs->expectation.x());   // add only visible landmarks
+		 *     grid.addObs(obs->expectation.x());   // add only visible landmarks
 		 * }
 		 *
 		 * // Then we process the selected observations
@@ -100,7 +100,7 @@ namespace jafar {
 		 *   obs.process();                           // process observation
 		 *
 		 * // Now we go to initialization
-		 * grid.getROI(roi);                          // roi is now region of interest
+		 * grid.getRoi(roi);                          // roi is now region of interest
 		 * if (detectFeature(roi))                    // detect inside ROI
 		 *   initLandmark();                          // initialize only if successful detection
 		 * \endcode
@@ -149,14 +149,14 @@ namespace jafar {
 				 * Add a projected pixel to the grid.
 				 * \param pix the pixel to add.
 				 */
-				void addPixel(const vec2 & pix);
+				void addObs(const vec2 & pix);
 
 				/**
 				 * Get ROI of a random empty cell.
 				 * \param roi the resulting ROI
 				 * \return true if ROI exists.
 				 */
-				bool getROI(jafar::image::ROI & roi);
+				bool getRoi(image::ConvexRoi & roi);
 
 			private:
 				/**
@@ -198,7 +198,7 @@ namespace jafar {
 				/**
 				 * Get the region of interest, reduced by a margin.
 				 */
-				void cell2roi(const veci2 & cell, jafar::image::ROI & roi);
+				void cell2roi(const veci2 & cell, image::ConvexRoi & roi);
 
 		};
 
@@ -236,7 +236,7 @@ namespace jafar {
 				/**
 				 * Scan search region for match.
 				 */
-				void scanObs(const observation_ptr_t & obsPtr, const jafar::image::ROI & roi);
+				void scanObs(const observation_ptr_t & obsPtr, const image::ConvexRoi & roi);
 		};
 
 	}

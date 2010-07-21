@@ -113,10 +113,10 @@ struct option long_options[] = {
 // time
 const unsigned N_FRAMES = 500000;
 
-// map
+// map size in # of states : 13 for robot plus 100 3D-landmarks
 const unsigned MAP_SIZE = 313;
 
-// robot uncertainties and perturbations
+// robot initial uncertainties and per-step perturbations
 const double UNCERT_VLIN = .1; // m/s
 const double UNCERT_VANG = .1; // rad/s
 const double PERT_VLIN = 1; // m/s per sqrt(s)
@@ -127,7 +127,7 @@ const unsigned IMG_WIDTH = 640;
 const unsigned IMG_HEIGHT = 480;
 const double INTRINSIC[4] = { 301.27013,   266.86136,   497.28243,   496.81116 };
 const double DISTORTION[2] = { -0.23193,   0.11306 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
-const double PIX_NOISE = .5;
+const double PIX_NOISE = .4;
 
 // lmk management
 const double D_MIN = 1;
@@ -141,10 +141,10 @@ const unsigned PATCH_DESC = 45;
 
 // data manager: zncc matcher and one-point-ransac
 const unsigned PATCH_SIZE = 15; // in pixels
-const double MATCH_TH = 0.95;
+const double MATCH_TH = 0.90;
 const double MAHALANOBIS_TH = 3; // in n_sigmas
 const unsigned N_UPDATES = 25;
-const double RANSAC_LOW_INNOV = 2.0; // in pixels
+const double RANSAC_LOW_INNOV = 1.0; // in pixels
 #if RANSAC
 const unsigned RANSAC_NTRIES = 6;
 #else

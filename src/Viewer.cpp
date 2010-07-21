@@ -190,6 +190,7 @@ void Viewer::addPolyLine(qdisplay::PolyLine* pl)
 
 void Viewer::setImageView(ImageView* ii, int row, int col)
 {
+	// In case the ImageView is NULL
 	if (ii == NULL)
 	{
 		if (m_imageMosaic[row][col])
@@ -199,9 +200,13 @@ void Viewer::setImageView(ImageView* ii, int row, int col)
 			m_imageMosaic[row][col] = NULL;
 		}
 		return;
-	}
-	
-  if(scene()->items().contains(ii)) return;
+	}	
+
+	// In case the ImageView is already in the scene
+	if(scene()->items().contains(ii)) return;
+
+	// In case the ImageView is not in the scene. We add it
+	// and we update the QMap m_imageMosaic
   scene()->addItem(ii);
   if(m_imageMosaic[row][col])
   {
@@ -216,6 +221,8 @@ void Viewer::setImageView(ImageView* ii, int row, int col)
     m_mosaicHeight = imageArea.height() + 5;
     resize( m_mosaicWidth, m_mosaicHeight );
   }
+
+  	// Position Image View
   ii->setPos( row * m_mosaicWidth, col*m_mosaicHeight);
 	
 	// added by norman
@@ -362,10 +369,14 @@ void Viewer::mouseReleaseEvent( QMouseEvent* event )
 }
 
 //------------------------------- Mouse Move Events 
+// QGraphicsView mouse event
 void Viewer::mouseMoveEvent( QMouseEvent* event )
 {/*{{{*/
 //JFR_DEBUG("Viewer::mouseMoveEvent");
 	QGraphicsView::mouseMoveEvent( event );
+
+	/*
+	  // Get pointer position in the QGraphicsView and display it in the status
 	QPointF cursorPosition = event->posF();
 
 	// Left aligned text for x position. Precision of 3 digits on a raw number (no scientific style)
@@ -377,10 +388,11 @@ void Viewer::mouseMoveEvent( QMouseEvent* event )
 
 	// Updating status message
 	setStatusMessage( infoString);
+	*/
 }/*}}}*/
 
 
-
+// QGraphicsScene mouse events
 void MouseGraphicsScene::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 {
 //JFR_DEBUG("MouseGraphicsScene::mouseMoveEvent pos " << event->pos().x() << "," << event->pos().y() << ", scenePos " << event->scenePos().x() << "," << event->scenePos().y());
@@ -394,7 +406,12 @@ void MouseGraphicsScene::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 		{
 			std::ostringstream oss;
 			oss.precision(2); oss.setf(std::ios::fixed, std::ios::floatfield);
-			oss << viewer->getTitle() << "  |  " << pos.x() << "  " << pos.y();
+			if ( (viewer->getTitle()).length() > 0)
+			{
+				oss << viewer->getTitle() << "   |   (" << pos.x() << "  " << pos.y() << ")";
+			} else {
+				oss << " (" << pos.x() << "  " << pos.y() << ") ";
+			}
 			viewer->setWindowTitle(oss.str().c_str());
 		}
 	}

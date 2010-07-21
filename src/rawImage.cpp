@@ -61,7 +61,7 @@ namespace jafar {
 			int y_src = pos(1)-shift_y;
 			img->copy(app->patch, x_src, y_src, 0, 0, size.width, size.height);
 		}
-
+/*
 		bool RawImage::detect(const detect_method met, const feature_ptr_t & featPtr,
 		    ROI* roiPtr) {
 
@@ -113,6 +113,7 @@ namespace jafar {
 					return false;
 			}
 		}
+		*/
 
 	} // namespace rtslam
 } // namespace jafar

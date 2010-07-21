@@ -25,10 +25,12 @@ namespace display {
 	}
 	
 	MapGdhe::MapGdhe(ViewerAbstract *_viewer, rtslam::MapAbstract *_slamMap, WorldGdhe *_dispWorld):
-		MapDisplay(_viewer, _slamMap, _dispWorld), viewerGdhe(PTR_CAST<ViewerGdhe*>(_viewer)), frame(1)
+		MapDisplay(_viewer, _slamMap, _dispWorld), viewerGdhe(PTR_CAST<ViewerGdhe*>(_viewer)), frame(NULL)
+	{ }
+	
+	MapGdhe::~MapGdhe()
 	{
-		frame.setColor(216,216,216);
-		viewerGdhe->client.addObject(&frame, true);
+		delete frame;
 	}
 		
 	void MapGdhe::bufferize()
@@ -48,42 +50,82 @@ namespace display {
 		frame.setPose(poseEuler);
 		frame.refresh();
 		#endif
+		
+		if (frame == NULL)
+		{
+			frame = new gdhe::Frame(1);
+			frame->setColor(216,216,216);
+			viewerGdhe->client.addObject(frame, true);
+		}
 	}
 	
 	
+	
+	
 	RobotGdhe::RobotGdhe(ViewerAbstract *_viewer, rtslam::RobotAbstract *_slamRob, MapGdhe *_dispMap):
-		RobotDisplay(_viewer, _slamRob, _dispMap), viewerGdhe(PTR_CAST<ViewerGdhe*>(_viewer)), robot(viewerGdhe->robot_model), traj()
+		RobotDisplay(_viewer, _slamRob, _dispMap), viewerGdhe(PTR_CAST<ViewerGdhe*>(_viewer)), robot(NULL), uncertEll(NULL), traj(NULL)
 	{
-		traj.setColor(0,255,0);
-		viewerGdhe->client.addObject(&robot, false);
-		viewerGdhe->client.addObject(&traj, false);
 	}
 	
 	RobotGdhe::~RobotGdhe()
 	{
+		delete robot;
+		delete uncertEll;
+		delete traj;
 	}
 	
 	void RobotGdhe::bufferize()
 	{
 		poseQuat = slamRob_->pose.x();
+		poseQuatUncert = slamRob_->pose.P();
 	}
 	
 	void RobotGdhe::render()
 	{
 //std::cout << "#### New FRAME" << std::endl;
-		// robot : convert pose from quat to euler degrees
+		if (robot == NULL)
+		{
+			robot = new gdhe::Robot(viewerGdhe->robot_model);
+			viewerGdhe->client.addObject(robot, false);
+		}
+		if (uncertEll == NULL)
+		{
+			uncertEll = new gdhe::EllipsoidWire();
+			uncertEll->setColor(255,255,0);
+			viewerGdhe->client.addObject(uncertEll, false);
+		}
+		if (traj == NULL)
+		{
+			traj = new gdhe::Trajectory();
+			traj->setColor(0,255,0);
+			viewerGdhe->client.addObject(traj, false);
+		}
+
+		// convert pose from quat to euler degrees
 		jblas::vec poseEuler(6);
+		jblas::vec angleEuler(3);
+		jblas::sym_mat uncertEuler(3);
 		ublas::subrange(poseEuler,0,3) = ublas::subrange(poseQuat,0,3);
-		ublas::subrange(poseEuler,3,6) = quaternion::q2e(ublas::subrange(poseQuat,3,7));
+		quaternion::q2e(ublas::subrange(poseQuat,3,7), ublas::project(poseQuatUncert,ublas::range(3,7),ublas::range(3,7)), angleEuler, uncertEuler);
+		ublas::subrange(poseEuler,3,6) = angleEuler;
+		//ublas::subrange(poseEuler,3,6) = quaternion::q2e(ublas::subrange(poseQuat,3,7));
 		for(int i = 3; i < 6; ++i) poseEuler(i) = jmath::radToDeg(poseEuler(i));
 		std::swap(poseEuler(3), poseEuler(5)); // FIXME the common convention is yaw pitch roll, not roll pitch yaw...
-		robot.setPose(poseEuler);
+		robot->setPose(poseEuler);
+/*JFR_DEBUG("robot pos  : " << ublas::subrange(poseQuat,0,3));
+JFR_DEBUG("robot euler: " << angleEuler);
+JFR_DEBUG("robot POS  : " << ublas::project(poseQuatUncert,ublas::range(0,3),ublas::range(0,3)));
+JFR_DEBUG("robot EULER: " << uncertEuler);*/
+		// uncertainty
+		uncertEll->set(ublas::subrange(poseQuat,0,3), ublas::project(poseQuatUncert,ublas::range(0,3),ublas::range(0,3)), viewerGdhe->ellipsesScale);
+		uncertEll->refresh();
+		// camera target
 		//viewerGdhe->client.setCameraTarget(poseEuler(0), poseEuler(1), poseEuler(2));
-		robot.refresh();
+		robot->refresh();
 		
 		// trajectory
-		traj.addPoint(poseQuat(0),poseQuat(1),poseQuat(2));
-		traj.refresh();
+		traj->addPoint(poseQuat(0),poseQuat(1),poseQuat(2));
+		traj->refresh();
 	}
 	
 	SensorGdhe::SensorGdhe(ViewerAbstract *_viewer, rtslam::SensorAbstract *_slamRob, RobotGdhe *_dispMap):
@@ -244,7 +286,7 @@ namespace display {
 					double id_std = sqrt(cov_(6,6))*viewerGdhe->ellipsesScale;
 					jblas::vec3 position = lmkAHP::ahp2euc(state_);
 					jblas::vec7 state = state_; 
-					state(6) = state_(6) - id_std; if (state(6) < 1e-2) state(6) = 1e-2;
+					state(6) = state_(6) - id_std; if (state(6) < 1e-4) state(6) = 1e-4;
 					jblas::vec3 positionExt = lmkAHP::ahp2euc(state);
 					seg->addPoint(positionExt(0)-position(0), positionExt(1)-position(1), positionExt(2)-position(2));
 					state(6) = state_(6) + id_std;

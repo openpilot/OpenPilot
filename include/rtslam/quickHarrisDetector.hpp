@@ -40,12 +40,12 @@ namespace jafar{
 		class QuickHarrisDetector {
       public:
         QuickHarrisDetector(int convolutionBoxSize = 5, float threshold = 15.0, float edge = 2.0);
-        virtual bool detectIn(jafar::image::Image const& image, feat_img_pnt_ptr_t featPtr, jafar::image::ROI * roiPtr = 0 );
+        virtual bool detectIn(image::Image const& image, feat_img_pnt_ptr_t featPtr, const image::ConvexRoi * roiPtr = 0 );
       private:
-        void quickDerivatives(const jafar::image::Image & image, jafar::image::ROI & roi);
-        bool quickConvolutionWithBestPoint(const jafar::image::ROI & roi, int pixMax[2], float & scoreMax);
+        void quickDerivatives(const image::Image & image, image::ConvexRoi & roi);
+        bool quickConvolutionWithBestPoint(const image::ConvexRoi & roi, int pixMax[2], float & scoreMax);
 
-        void writeHarrisImagesAsPPM(jafar::image::ROI & roi);
+        void writeHarrisImagesAsPPM(image::ConvexRoi & roi);
 
       private:
         int m_derivationSize, m_convolutionSize;

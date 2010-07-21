@@ -46,12 +46,18 @@ namespace jafar {
 			public:
 				Perturbation(const size_t _size) :
 					Gaussian(_size), x_ct(_size), P_ct(_size) {
+					x_ct.clear();
+					P_ct.clear();
 				}
 				Perturbation(const vec & p, const sym_mat & P) :
 					Gaussian(p, P), x_ct(p.size()), P_ct(p.size()) {
+					x_ct.clear();
+					P_ct.clear();
 				}
 				Perturbation(const vec & p, const vec & _std) :
 					Gaussian(p.size()), x_ct(p.size()), P_ct(p.size()) {
+					x_ct.clear();
+					P_ct.clear();
 					this->x(p);
 					this->std(_std);
 				}
@@ -73,7 +79,17 @@ namespace jafar {
 
 				Perturbation(const Gaussian & p) :
 					Gaussian(p), x_ct(p.size()), P_ct(p.size()) {
+					x_ct.clear();
+					P_ct.clear();
 				}
+				
+				void clear()
+				{
+					Gaussian::clear();
+					x_ct.clear();
+					P_ct.clear();
+				}
+				
 				template<class SymMat>
 				void set_P_continuous(SymMat & _P_ct) {
 					JFR_ASSERT(_P_ct.size1() == size(), "Matrix sizes mismatch.");

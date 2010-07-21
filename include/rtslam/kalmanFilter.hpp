@@ -176,7 +176,7 @@ namespace jafar {
 					StackedCorrection(Innovation & inn, const mat & INN_rsl, const ind_array & ia_rsl):
 						inn(inn), INN_rsl(INN_rsl), ia_rsl(ia_rsl)
 					{
-JFR_DEBUG("StackedCorrection " << this->INN_rsl << " " << INN_rsl);
+// JFR_DEBUG("StackedCorrection " << this->INN_rsl << " " << INN_rsl);
 					}
 					Innovation inn;
 					mat INN_rsl;

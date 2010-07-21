@@ -34,7 +34,11 @@ namespace jafar {
 
 		bool LandmarkAnchoredHomogeneousPoint::needToDie(DecisionMethod dieMet){
 			double rho = state.x(6);
-			if (rho < 0) return true;
+			if (rho < 0)
+			{
+				cout << "Lmk AHP " << id() << " Killed by negative depth (" << rho << ")"<< endl;
+				return true;
+			}
 			return LandmarkAbstract::needToDie(dieMet);
 		}
 

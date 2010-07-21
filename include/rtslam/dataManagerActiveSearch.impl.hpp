@@ -44,7 +44,7 @@ namespace jafar {
 
 
 					// Add to tesselation grid for active search
-					asGrid->addPixel(obsPtr->expectation.x());
+					asGrid->addObs(obsPtr->expectation.x());
 
 
 					// predict information gain
@@ -216,7 +216,7 @@ namespace jafar {
     	if (mapManagerPtr()->mapSpaceForInit()) {
     		//boost::shared_ptr<RawImage> rawDataSpec = SPTR_CAST<RawImage>(rawData);
 				ROI roi;
-				if (asGrid->getROI(roi)) {
+				if (asGrid->getRoi(roi)) {
 					feat_img_pnt_ptr_t featPtr(new FeatureImagePoint(detectorParams_.patchSize,
 					                                                 detectorParams_.patchSize,
 					                                                 CV_8U));
@@ -278,7 +278,7 @@ namespace jafar {
 						obsPtr->landmarkPtr()->setDescriptor(descPtr);
 
 					} // create&init
-				} // getROI()
+				} // getRoi()
 			} // if space in map
     } // detect()
 

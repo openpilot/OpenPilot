@@ -379,7 +379,7 @@ namespace jafar {
 				 * Clear data, keep sizes and ranges.
 				 * Clears the data of \a x_ and \a P_.
 				 */
-				inline void clear(void) {
+				virtual void clear(void) {
 					x_.assign(jblas::zero_vec(size_));
 					P_.assign(jblas::zero_mat(size_, size_));
 				}

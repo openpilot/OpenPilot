@@ -23,13 +23,10 @@
 #include "kernel/timingTools.hpp"
 #include "jmath/random.hpp"
 #include "jmath/matlab.hpp"
-
-#include "correl/explorer.hpp"
-#include "rtslam/quickHarrisDetector.hpp"
-
 #include "jmath/ublasExtra.hpp"
 
 #include "rtslam/rtSlam.hpp"
+#include "rtslam/rawProcessors.hpp"
 //#include "rtslam/robotOdometry.hpp"
 #include "rtslam/robotConstantVelocity.hpp"
 //#include "rtslam/robotInertial.hpp"
@@ -42,7 +39,6 @@
 #include "rtslam/featureAbstract.hpp"
 #include "rtslam/rawImage.hpp"
 #include "rtslam/descriptorImagePoint.hpp"
-// #include "rtslam/dataManagerActiveSearch.hpp"
 #include "rtslam/dataManagerOnePointRansac.hpp"
 
 #include "rtslam/hardwareSensorCameraFirewire.hpp"
@@ -63,8 +59,7 @@ typedef ImagePointObservationMaker<ObservationPinHoleEuclideanPoint, SensorPinHo
 typedef ImagePointObservationMaker<ObservationPinHoleAnchoredHomogeneousPoint, SensorPinHole,
     LandmarkAnchoredHomogeneousPoint, SensorAbstract::PINHOLE, LandmarkAbstract::PNT_AH> PinholeAhpObservationMaker;
 
-// typedef DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::FastTranslationMatcherZncc > DataManagerAS;
-typedef DataManagerOnePointRansac<RawImage, SensorPinHole, QuickHarrisDetector, correl::FastTranslationMatcherZncc > DataManagerOPR;
+typedef DataManagerOnePointRansac<RawImage, SensorPinHole, FeatureImagePoint, image::ConvexRoi, ActiveSearchGrid, ImagePointHarrisDetector, ImagePointZnccMatcher> DataManager_ImagePoint_Ransac;
 
 ///##############################################
 
@@ -144,12 +139,16 @@ const unsigned PATCH_SIZE = 15; // in pixels
 const double MATCH_TH = 0.90;
 const double MAHALANOBIS_TH = 3; // in n_sigmas
 const unsigned N_UPDATES = 25;
+const unsigned N_INIT = 10;
 const double RANSAC_LOW_INNOV = 1.0; // in pixels
+
 #if RANSAC
 const unsigned RANSAC_NTRIES = 6;
 #else
 const unsigned RANSAC_NTRIES = 0;
 #endif
+const double MIN_SCORE = 0.8;
+const double PARTIAL_POSITION = 0.25;
 
 // data manager: active search tesselation grid
 const unsigned GRID_VCELLS = 4;
@@ -183,7 +182,6 @@ void demo_slam01_main(world_ptr_t *world) {
 	// 1. Create maps.
 	map_ptr_t mapPtr(new MapAbstract(MAP_SIZE));
 	worldPtr->addMap(mapPtr);
-	mapPtr->clear();
 	// 1b. Create map manager.
 	boost::shared_ptr<MapManager<LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint> > mmPoint(new MapManager<
 	    LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint> ());
@@ -194,14 +192,10 @@ void demo_slam01_main(world_ptr_t *world) {
 	robconstvel_ptr_t robPtr1(new RobotConstantVelocity(mapPtr));
 	robPtr1->setId();
 	robPtr1->linkToParentMap(mapPtr);
-	robPtr1->state.clear();
 	robPtr1->pose.x(quaternion::originFrame());
 
 	double _v[6] = { PERT_VLIN, PERT_VLIN, PERT_VLIN, PERT_VANG, PERT_VANG, PERT_VANG };
-	robPtr1->perturbation.clear();
 	robPtr1->perturbation.set_std_continuous(createVector<6> (_v));
-	jblas::zero_vec perturbation_x(6); // FIXME what value should we put here ?
-	robPtr1->perturbation.set_x_continuous(perturbation_x);
 	robPtr1->setVelocityStd(UNCERT_VLIN,UNCERT_VANG);
 	robPtr1->constantPerturbation = false;
 
@@ -209,7 +203,6 @@ void demo_slam01_main(world_ptr_t *world) {
 	pinhole_ptr_t senPtr11(new SensorPinHole(robPtr1, MapObject::UNFILTERED));
 	senPtr11->setId();
 	senPtr11->linkToParentRobot(robPtr1);
-	senPtr11->state.clear();
 	senPtr11->setPose(0,0,0,-90,0,-90);
 	//senPtr11->pose.x(quaternion::originFrame());
 	senPtr11->params.setImgSize(IMG_WIDTH, IMG_HEIGHT);
@@ -218,25 +211,15 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	// 3b. Create data manager.
 	boost::shared_ptr<ActiveSearchGrid> asGrid(new ActiveSearchGrid(IMG_WIDTH, IMG_HEIGHT, GRID_HCELLS, GRID_VCELLS, GRID_MARGIN, GRID_SEPAR));
-	boost::shared_ptr<QuickHarrisDetector> harrisDetector(new QuickHarrisDetector(HARRIS_CONV_SIZE, HARRIS_TH, HARRIS_EDDGE));
+	boost::shared_ptr<ImagePointHarrisDetector> harrisDetector(new ImagePointHarrisDetector(HARRIS_CONV_SIZE, HARRIS_TH, HARRIS_EDDGE, PATCH_DESC, PIX_NOISE));
 //	boost::shared_ptr<correl::Explorer<correl::Zncc> > znccMatcher(new correl::Explorer<correl::Zncc>());
-	boost::shared_ptr<correl::FastTranslationMatcherZncc> znccMatcher(new correl::FastTranslationMatcherZncc(0.8,0.25));
+	boost::shared_ptr<ImagePointZnccMatcher> znccMatcher(new ImagePointZnccMatcher(MIN_SCORE, PARTIAL_POSITION, PATCH_SIZE, RANSAC_LOW_INNOV, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE));
 	
-// 	#if RANSAC
-	boost::shared_ptr<DataManagerOPR> dmPt11(new DataManagerOPR());
-	dmPt11->setMatcher(znccMatcher, PATCH_SIZE, RANSAC_LOW_INNOV, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE);
-	dmPt11->setAlgorithmParams(N_UPDATES, RANSAC_NTRIES);
-// 	#else
-// 	boost::shared_ptr<DataManagerAS> dmPt11(new DataManagerAS());
-// 	dmPt11->setMatcher(znccMatcher, PATCH_SIZE, MAHALANOBIS_TH, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE);
-// 	dmPt11->setAlgorithmParams(N_UPDATES);
-// 	#endif
+	boost::shared_ptr<DataManager_ImagePoint_Ransac> dmPt11(new DataManager_ImagePoint_Ransac(harrisDetector, znccMatcher, asGrid, N_UPDATES, RANSAC_NTRIES, N_INIT));
 	
 
 	dmPt11->linkToParentSensorSpec(senPtr11);
 	dmPt11->linkToParentMapManager(mmPoint);
-	dmPt11->setActiveSearchGrid(asGrid);
-	dmPt11->setDetector(harrisDetector, PATCH_DESC, PIX_NOISE);
 	dmPt11->setObservationFactory(obsFact);
 
 	

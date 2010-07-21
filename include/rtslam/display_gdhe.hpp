@@ -82,9 +82,10 @@ namespace display {
 			jblas::vec poseQuat;
 			// gdhe objects
 			ViewerGdhe *viewerGdhe;
-			gdhe::Frame frame;
+			gdhe::Frame *frame;
 		public:
 			MapGdhe(ViewerAbstract *viewer_, rtslam::MapAbstract *_slamMap, WorldGdhe *_dispWorld);
+			~MapGdhe();
 			void bufferize();
 			void render();
 	};
@@ -93,10 +94,12 @@ namespace display {
 	{
 			// bufferized data
 			jblas::vec poseQuat;
+			jblas::sym_mat poseQuatUncert;
 			// gdhe objects
 			ViewerGdhe *viewerGdhe;
-			gdhe::Robot robot;
-			gdhe::Trajectory traj;
+			gdhe::Robot *robot;
+			gdhe::EllipsoidWire *uncertEll;
+			gdhe::Trajectory *traj;
 		public:
 			RobotGdhe(ViewerAbstract *viewer_, rtslam::RobotAbstract *_slamRob, MapGdhe *_dispMap);
 			~RobotGdhe();

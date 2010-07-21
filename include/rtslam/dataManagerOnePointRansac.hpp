@@ -48,10 +48,11 @@ namespace jafar {
 				ENABLE_ACCESS_TO_SPECIFIC_PARENT(SensorSpec, sensorSpec);
 
 			public: // public interface
-				DataManagerOnePointRansac(const boost::shared_ptr<DetectorSpec> & _detector, const boost::shared_ptr<MatcherSpec> & _matcher, const boost::shared_ptr<FeatureManagerSpec> _featMan, int n_updates, int n_tries, int n_init):
+				DataManagerOnePointRansac(const boost::shared_ptr<DetectorSpec> & _detector, const boost::shared_ptr<MatcherSpec> & _matcher, const boost::shared_ptr<FeatureManagerSpec> _featMan, int n_updates_total, int n_updates_ransac, int n_tries, int n_init):
 					detector(_detector), matcher(_matcher), featMan(_featMan)
 				{
-					algorithmParams.n_updates = n_updates;
+					algorithmParams.n_updates_total = n_updates_total;
+					algorithmParams.n_updates_ransac = n_updates_ransac;
 					algorithmParams.n_tries = n_tries;
 					algorithmParams.n_init = n_init;
 				}
@@ -75,7 +76,8 @@ namespace jafar {
 
 			protected: // parameters
 				struct alg_params_t {
-						int n_updates; ///< maximum number of updates
+						int n_updates_total;  ///< maximum number of updates
+						int n_updates_ransac; ///< maximum number of updates for ransac
 						int n_tries;   ///< number of RANSAC consensus tries
 						int n_init;    ///< number of feature initialization
 				} algorithmParams;

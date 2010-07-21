@@ -60,7 +60,7 @@ namespace hardware {
 		// number of clock ticks @ 33.9ns to offset pin action from sensor sampling
 		config.syncOutOffset = 0; // no offset
 		// number of clock ticks @ 33.9ns to define pulse width
-		config.syncOutPulseWidth = 29498; // 1 ms pulse
+		config.syncOutPulseWidth = 58996; // 2 ms pulse
 		// Set SyncOut settings
 		mti.set_syncOut(config.syncOutMode, config.syncOutPulsePolarity,
 			config.syncOutSkipFactor, config.syncOutOffset,

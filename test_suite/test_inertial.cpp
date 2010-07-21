@@ -41,7 +41,7 @@ using namespace boost;
 void test_inertial01() {
 
 	map_ptr_t mapPtr(new MapAbstract(100));
-	inertial_ptr_t robPtr(new RobotInertial(mapPtr));
+	robinertial_ptr_t robPtr(new RobotInertial(mapPtr));
 	robPtr->linkToParentMap(mapPtr);
 //	robPtr->linkToMap(mapPtr);
 

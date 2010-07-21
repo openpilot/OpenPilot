@@ -132,6 +132,17 @@ namespace jafar {
 					for(RansacSetList::iterator rsIter = ransacSetList.begin(); rsIter != ransacSetList.end(); ++rsIter)
 						if (!best_set || (*rsIter)->size() > best_set->size()) best_set = *rsIter;
 // JFR_DEBUG("best set is " << best_set->obsBasePtr->id() << " with size " << best_set->size());
+
+					// if there are too much updates to do bufferized, randomly move out some of them
+					// to pending, they may be processed in active search if necessary
+					while (best_set->size() > algorithmParams.n_updates_ransac)
+					{
+						int n = (rand() % (best_set->size() - 1)) + 1; // keep the first one which is the base obs
+						best_set->pendingObs.push_back(best_set->inlierObs[n]);
+						best_set->inlierObs[n] = best_set->inlierObs[best_set->inlierObs.size()-1];
+						best_set->inlierObs.pop_back();
+					}
+
 					if (best_set->size() > 1)
 					{
 						// 2. for each obs in inliers
@@ -199,6 +210,7 @@ namespace jafar {
 
 // JFR_DEBUG("#### starting remaining corrections");
 				// loop only the N_UPDATES most interesting obs, from largest info gain to smallest
+				// FIXME shouldn't we recompute info gains after each update ?
 				for (ObservationListSorted::reverse_iterator obsIter = obsListSorted.rbegin(); obsIter
 						!= obsListSorted.rend(); obsIter++) {
 					observation_ptr_t obsPtr = obsIter->second;
@@ -213,7 +225,7 @@ namespace jafar {
 
 						obsPtr->events.visible = true;
 
-						if (numObs < algorithmParams.n_updates) {
+						if (numObs < algorithmParams.n_updates_total) {
 
 							obsPtr->events.measured = true;
 
@@ -225,8 +237,6 @@ namespace jafar {
 
 							// 1d. match predicted feature in search area
 							//						kernel::Chrono match_chrono;
-							obsPtr->measurement.std(matcher->params.measStd);
-
 							matcher->match(rawData, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
 							//						total_match_time += match_chrono.elapsedMicrosecond();
 

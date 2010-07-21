@@ -29,7 +29,7 @@
 #include "rtslam/rawProcessors.hpp"
 //#include "rtslam/robotOdometry.hpp"
 #include "rtslam/robotConstantVelocity.hpp"
-//#include "rtslam/robotInertial.hpp"
+#include "rtslam/robotInertial.hpp"
 #include "rtslam/sensorPinHole.hpp"
 #include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
 //#include "rtslam/landmarkEuclideanPoint.hpp"
@@ -42,7 +42,7 @@
 #include "rtslam/dataManagerOnePointRansac.hpp"
 
 #include "rtslam/hardwareSensorCameraFirewire.hpp"
-//#include "rtslam/hardwareEstimatorMti.hpp"
+#include "rtslam/hardwareEstimatorMti.hpp"
 
 #include "rtslam/display_qt.hpp"
 #include "rtslam/display_gdhe.hpp"
@@ -74,9 +74,9 @@ const int display_period = 100; // ms
 
 ///##############################################
 
-const int nIntOpts = 9;
+const int nIntOpts = 10;
 int intOpts[nIntOpts] = {0};
-enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iLog, iVerbose };
+enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iLog, iVerbose, iRobot };
 
 const int nStrOpts = 2;
 std::string strOpts[nStrOpts];
@@ -95,6 +95,7 @@ struct option long_options[] = {
 	{"pause", 2, 0, 0},
 	{"log", 2, 0, 0},
 	{"verbose", 2, 0, 0},
+	{"robot", 2, 0, 0},
 	// string options
 	{"slam-config", 1, 0, 0},
 	{"data-path", 1, 0, 0},
@@ -138,10 +139,14 @@ const unsigned PATCH_DESC = 45;
 const unsigned PATCH_SIZE = 15; // in pixels
 const double MATCH_TH = 0.90;
 const double MAHALANOBIS_TH = 3; // in n_sigmas
-const unsigned N_UPDATES = 25;
+const unsigned N_UPDATES_TOTAL = 25;
+const unsigned N_UPDATES_RANSAC = 20;
 const unsigned N_INIT = 10;
 const double RANSAC_LOW_INNOV = 1.0; // in pixels
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2a1195cd496c74b0cd431a0a3f850f44f76e92ed
 #if RANSAC
 const unsigned RANSAC_NTRIES = 6;
 #else
@@ -189,14 +194,28 @@ void demo_slam01_main(world_ptr_t *world) {
 
 
 	// 2. Create robots.
-	robconstvel_ptr_t robPtr1(new RobotConstantVelocity(mapPtr));
+	robot_ptr_t robPtr1;
+	if (intOpts[iRobot] == 0)
+	{
+		robconstvel_ptr_t robPtr1_(new RobotConstantVelocity(mapPtr));
+		robPtr1_->setVelocityStd(UNCERT_VLIN,UNCERT_VANG);
+		
+		robPtr1 = robPtr1_;
+	} else
+	if (intOpts[iRobot] == 1)
+	{
+		robinertial_ptr_t robPtr1_(new RobotInertial(mapPtr));
+		
+		robPtr1 = robPtr1_;
+		hardware::hardware_estimator_ptr_t hardEst1(new hardware::HardwareEstimatorMti("/dev/ttyS1", 256));
+		robPtr1->setHardwareEstimator(hardEst1);
+	}
 	robPtr1->setId();
 	robPtr1->linkToParentMap(mapPtr);
 	robPtr1->pose.x(quaternion::originFrame());
 
 	double _v[6] = { PERT_VLIN, PERT_VLIN, PERT_VLIN, PERT_VANG, PERT_VANG, PERT_VANG };
 	robPtr1->perturbation.set_std_continuous(createVector<6> (_v));
-	robPtr1->setVelocityStd(UNCERT_VLIN,UNCERT_VANG);
 	robPtr1->constantPerturbation = false;
 
 	// 3. Create sensors.
@@ -215,7 +234,7 @@ void demo_slam01_main(world_ptr_t *world) {
 //	boost::shared_ptr<correl::Explorer<correl::Zncc> > znccMatcher(new correl::Explorer<correl::Zncc>());
 	boost::shared_ptr<ImagePointZnccMatcher> znccMatcher(new ImagePointZnccMatcher(MIN_SCORE, PARTIAL_POSITION, PATCH_SIZE, RANSAC_LOW_INNOV, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE));
 	
-	boost::shared_ptr<DataManager_ImagePoint_Ransac> dmPt11(new DataManager_ImagePoint_Ransac(harrisDetector, znccMatcher, asGrid, N_UPDATES, RANSAC_NTRIES, N_INIT));
+	boost::shared_ptr<DataManager_ImagePoint_Ransac> dmPt11(new DataManager_ImagePoint_Ransac(harrisDetector, znccMatcher, asGrid, N_UPDATES_TOTAL, N_UPDATES_RANSAC, RANSAC_NTRIES, N_INIT));
 	
 
 	dmPt11->linkToParentSensorSpec(senPtr11);
@@ -288,9 +307,7 @@ void demo_slam01_main(world_ptr_t *world) {
 				else had_data=true;
 
 				// move the filter time to the data raw.
-				vec u(robPtr->mySize_control()); // TODO put some real values in u.
-				fillVector(u, 0.0);
-				robPtr->move(u, senPtr->getRaw()->timestamp);
+				robPtr->move(senPtr->getRaw()->timestamp);
 
 				// foreach dataManager
 				for (SensorAbstract::DataManagerList::iterator dmaIter = senPtr->dataManagerList().begin();

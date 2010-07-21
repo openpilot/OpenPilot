@@ -22,7 +22,7 @@ namespace jafar {
 		using namespace std;
 
 		class RobotInertial;
-		typedef boost::shared_ptr<RobotInertial> inertial_ptr_t;
+		typedef boost::shared_ptr<RobotInertial> robinertial_ptr_t;
 
 
 		/**

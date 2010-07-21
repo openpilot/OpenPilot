@@ -46,6 +46,8 @@
 #include "rtslam/mapObject.hpp"
 #include "rtslam/parents.hpp"
 
+#include "rtslam/hardwareEstimatorAbstract.hpp"
+
 namespace jafar {
 	namespace rtslam {
 		using namespace std;
@@ -81,7 +83,7 @@ namespace jafar {
 				// define the type SensorList, and the function sensorList().
 				ENABLE_ACCESS_TO_CHILDREN(SensorAbstract,Sensor,sensor);
 
-
+				hardware::hardware_estimator_ptr_t hardwareEstimatorPtr;
 
 				/**
 				 * Remote constructor from remote map and size of state and control vectors.
@@ -159,6 +161,11 @@ namespace jafar {
 					perturbation = _pert;
 				}
 
+				void setHardwareEstimator(hardware::hardware_estimator_ptr_t hardwareEstimatorPtr_)
+				{
+					hardwareEstimatorPtr = hardwareEstimatorPtr_;
+				}
+
 
 				/**
 				 * Move one step ahead, affect SLAM filter.
@@ -188,16 +195,32 @@ namespace jafar {
 				 */
 				//template<class V>
 				inline void move(const vec & _u) {
-					JFR_ASSERT(_u.size() == control.size(), "robotAbstract.hpp: move: wrong control size.");
-					control = _u;
+					JFR_ASSERT(_u.size() >= control.size(), "robotAbstract.hpp: move: wrong control size.");
+					control = ublas::subrange(_u, 0, control.size());
 					move();
 				}
 
 				void move(double time){
-					if (self_time < 1.) dt_or_dx = 0;
-					else dt_or_dx = time - self_time;
-					perturbation.set_from_continuous(dt_or_dx);
-					move();
+					if (self_time < 1.) self_time = time;
+					if (hardwareEstimatorPtr)
+					{
+						jblas::mat_range readings = hardwareEstimatorPtr->acquireReadings(self_time, time);
+						double cur_time = self_time;
+						jblas::vec u;
+						for(int i = 0; i < readings.size1(); i++)
+						{
+							dt_or_dx = readings(i, 0) - cur_time;
+							u = ublas::subrange(ublas::matrix_row<mat_range>(readings, i),1,readings.size2());
+							move(u);
+							cur_time = readings(i, 0);
+						}
+					} else
+					{
+						dt_or_dx = time - self_time;
+						perturbation.set_from_continuous(dt_or_dx);
+						control.clear();
+						move();
+					}
 					self_time = time;
 				}
 

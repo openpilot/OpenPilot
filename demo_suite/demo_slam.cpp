@@ -29,7 +29,7 @@
 #include "rtslam/rawProcessors.hpp"
 //#include "rtslam/robotOdometry.hpp"
 #include "rtslam/robotConstantVelocity.hpp"
-//#include "rtslam/robotInertial.hpp"
+#include "rtslam/robotInertial.hpp"
 #include "rtslam/sensorPinHole.hpp"
 #include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
 //#include "rtslam/landmarkEuclideanPoint.hpp"
@@ -42,7 +42,7 @@
 #include "rtslam/dataManagerOnePointRansac.hpp"
 
 #include "rtslam/hardwareSensorCameraFirewire.hpp"
-//#include "rtslam/hardwareEstimatorMti.hpp"
+#include "rtslam/hardwareEstimatorMti.hpp"
 
 #include "rtslam/display_qt.hpp"
 #include "rtslam/display_gdhe.hpp"
@@ -74,9 +74,9 @@ const int display_period = 100; // ms
 
 ///##############################################
 
-const int nIntOpts = 9;
+const int nIntOpts = 10;
 int intOpts[nIntOpts] = {0};
-enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iLog, iVerbose };
+enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iLog, iVerbose, iRobot };
 
 const int nStrOpts = 2;
 std::string strOpts[nStrOpts];
@@ -95,6 +95,7 @@ struct option long_options[] = {
 	{"pause", 2, 0, 0},
 	{"log", 2, 0, 0},
 	{"verbose", 2, 0, 0},
+	{"robot", 2, 0, 0},
 	// string options
 	{"slam-config", 1, 0, 0},
 	{"data-path", 1, 0, 0},
@@ -189,14 +190,28 @@ void demo_slam01_main(world_ptr_t *world) {
 
 
 	// 2. Create robots.
-	robconstvel_ptr_t robPtr1(new RobotConstantVelocity(mapPtr));
+	robot_ptr_t robPtr1;
+	if (intOpts[iRobot] == 0)
+	{
+		robconstvel_ptr_t robPtr1_(new RobotConstantVelocity(mapPtr));
+		robPtr1_->setVelocityStd(UNCERT_VLIN,UNCERT_VANG);
+		
+		robPtr1 = robPtr1_;
+	} else
+	if (intOpts[iRobot] == 1)
+	{
+		robinertial_ptr_t robPtr1_(new RobotInertial(mapPtr));
+		
+		robPtr1 = robPtr1_;
+		hardware::hardware_estimator_ptr_t hardEst1(new hardware::HardwareEstimatorMti("/dev/ttyS1", 256));
+		robPtr1->setHardwareEstimator(hardEst1);
+	}
 	robPtr1->setId();
 	robPtr1->linkToParentMap(mapPtr);
 	robPtr1->pose.x(quaternion::originFrame());
 
 	double _v[6] = { PERT_VLIN, PERT_VLIN, PERT_VLIN, PERT_VANG, PERT_VANG, PERT_VANG };
 	robPtr1->perturbation.set_std_continuous(createVector<6> (_v));
-	robPtr1->setVelocityStd(UNCERT_VLIN,UNCERT_VANG);
 	robPtr1->constantPerturbation = false;
 
 	// 3. Create sensors.
@@ -288,9 +303,7 @@ void demo_slam01_main(world_ptr_t *world) {
 				else had_data=true;
 
 				// move the filter time to the data raw.
-				vec u(robPtr->mySize_control()); // TODO put some real values in u.
-				fillVector(u, 0.0);
-				robPtr->move(u, senPtr->getRaw()->timestamp);
+				robPtr->move(senPtr->getRaw()->timestamp);
 
 				// foreach dataManager
 				for (SensorAbstract::DataManagerList::iterator dmaIter = senPtr->dataManagerList().begin();

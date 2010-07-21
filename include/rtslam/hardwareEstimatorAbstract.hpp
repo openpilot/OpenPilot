@@ -23,8 +23,10 @@ namespace hardware {
 	class HardwareEstimatorAbstract
 	{
 		public:
-			
-			virtual void acquireReadings(double t1, double t2, jblas::mat &readings) = 0;
+			/**
+			each line is one reading, first command is timestamp (double seconds), the rest is the command
+			*/
+			virtual jblas::mat_range acquireReadings(double t1, double t2) = 0;
 	};
 
 }}}

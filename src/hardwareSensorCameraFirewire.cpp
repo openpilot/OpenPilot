@@ -26,9 +26,9 @@ namespace rtslam {
 namespace hardware {
 
 #ifdef HAVE_VIAM
-	cv::Size HardwareSensorCameraFirewire::viamSize_to_size(viam_hwsize_t viamsize)
+	cv::Size HardwareSensorCameraFirewire::viamSize_to_size(viam_hwsize_t hwsize)
 	{
-		switch (viamsize)
+		switch (hwsize)
 		{
 			case VIAM_HWSZ_160x120: return cv::Size(160,120);
 			case VIAM_HWSZ_320x240: return cv::Size(320,240);
@@ -41,6 +41,95 @@ namespace hardware {
 			default: return cv::Size(0,0);
 		}
 	}
+	
+	double HardwareSensorCameraFirewire::viamFreq_to_freq(viam_hwfps_t hwfreq)
+	{
+		switch (hwfreq)
+		{
+			case VIAM_HWFPS_1_875: return 1.875;
+			case VIAM_HWFPS_3_75: return 3.75;
+			case VIAM_HWFPS_7_5: return 7.5;
+			case VIAM_HWFPS_15: return 15.;
+			case VIAM_HWFPS_30: return 30.;
+			case VIAM_HWFPS_60: return 60.;
+			case VIAM_HWFPS_120: return 120.;
+			case VIAM_HWFPS_240: return 240;;
+			default: return 0.;
+		}
+	}
+	
+	viam_hwsize_t HardwareSensorCameraFirewire::size_to_viamSize(cv::Size size)
+	{
+		viam_hwsize_t hwsize;
+		switch (size.width)
+		{
+			case 160: if (size.height == 120) hwsize = VIAM_HWSZ_160x120; else hwsize = VIAM_HWSZ_INVALID; break;
+			case 320: if (size.height == 240) hwsize = VIAM_HWSZ_320x240; else hwsize = VIAM_HWSZ_INVALID; break;
+			case 512: if (size.height == 384) hwsize = VIAM_HWSZ_512x384; else hwsize = VIAM_HWSZ_INVALID; break;
+			case 640: if (size.height == 480) hwsize = VIAM_HWSZ_640x480; else hwsize = VIAM_HWSZ_INVALID; break;
+			case 800: if (size.height == 600) hwsize = VIAM_HWSZ_800x600; else hwsize = VIAM_HWSZ_INVALID; break;
+			case 1024: if (size.height == 768) hwsize = VIAM_HWSZ_1024x768; else hwsize = VIAM_HWSZ_INVALID; break;
+			case 1280: if (size.height == 960) hwsize = VIAM_HWSZ_1280x960; else hwsize = VIAM_HWSZ_INVALID; break;
+			case 1600: if (size.height == 1200) hwsize = VIAM_HWSZ_1600x1200; else hwsize = VIAM_HWSZ_INVALID; break;
+			default: hwsize = VIAM_HWSZ_INVALID;
+		}
+		return hwsize;
+	}
+
+	viam_hwfps_t HardwareSensorCameraFirewire::freq_to_viamFreq(double freq)
+	{
+		viam_hwfps_t hwfreq;
+		if (freq < (1.875+3.75)/2) hwfreq = VIAM_HWFPS_1_875; else
+		if (freq < (3.75+7.5)/2) hwfreq = VIAM_HWFPS_3_75; else
+		if (freq < (7.5+15)/2) hwfreq = VIAM_HWFPS_7_5; else
+		if (freq < (15+30)/2) hwfreq = VIAM_HWFPS_15; else
+		if (freq < (30+60)/2) hwfreq = VIAM_HWFPS_30; else
+		if (freq < (60+120)/2) hwfreq = VIAM_HWFPS_60; else
+		if (freq < (120+240)/2) hwfreq = VIAM_HWFPS_120; else
+			hwfreq = VIAM_HWFPS_240;
+		return hwfreq;
+	}
+	
+	viam_hwformat_t HardwareSensorCameraFirewire::format_to_viamFormat(int format, int depth)
+	{
+		viam_hwformat_t hwformat;
+		switch (format)
+		{
+			case 0: { // MONO
+				switch (depth) {
+					case 8: hwformat = VIAM_HWFMT_MONO8; break;
+					case 16: hwformat = VIAM_HWFMT_MONO16; break;
+					default: hwformat = VIAM_HWFMT_INVALID;
+				}
+				break;
+			}
+			case 1: { // YUV
+				switch (depth) {
+					case 6: hwformat = VIAM_HWFMT_YUV411; break;
+					case 8: hwformat = VIAM_HWFMT_YUV422; break;
+					case 12: hwformat = VIAM_HWFMT_YUV444; break;
+					default: hwformat = VIAM_HWFMT_INVALID;
+				}
+				break;
+			}
+			case 2: { // RGB
+				if (depth == 24) hwformat = VIAM_HWFMT_RGB888;
+				else hwformat = VIAM_HWFMT_INVALID;
+				break;
+			}
+			default: hwformat = VIAM_HWFMT_INVALID;
+		}
+		return hwformat;
+	}
+
+	viam_hwtrigger_t HardwareSensorCameraFirewire::trigger_to_viamTrigger(bool trigger)
+	{
+		viam_hwtrigger_t hwtrigger;
+		if (trigger) hwtrigger = VIAM_HWTRIGGER_INTERNAL;
+		else hwtrigger = VIAM_HWTRIGGER_MODE1_HIGH;
+		return hwtrigger;
+	}
+
 #endif
 
 	void HardwareSensorCameraFirewire::preloadTask(void)
@@ -136,6 +225,12 @@ namespace hardware {
 		// start acquire task
 		preloadTask_thread = new boost::thread(boost::bind(&HardwareSensorCameraFirewire::preloadTask,this));
 	}
+	
+	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(cv::Size imgSize, std::string dump_path)
+	{
+		init(2, dump_path, imgSize);
+	}
+	
 
 #ifdef HAVE_VIAM
 	void HardwareSensorCameraFirewire::init(const std::string &camera_id, viam_hwmode_t &hwmode, int mode, std::string dump_path)
@@ -158,18 +253,19 @@ namespace hardware {
 		init(mode, dump_path, viamSize_to_size(hwmode.size));
 	}
 
-	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(const std::string &camera_id, viam_hwmode_t &hwmode, int mode, std::string dump_path)
+	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(const std::string &camera_id, cv::Size size, int format, int depth, double freq, bool trigger, int mode, std::string dump_path)
 	{
+		viam_hwmode_t hwmode = { size_to_viamSize(size), format_to_viamFormat(format, depth), VIAM_HW_FIXED, freq_to_viamFreq(freq), trigger_to_viamTrigger(trigger) };
+		if (trigger == 0)
+		{
+			double realfreq = viamFreq_to_freq(hwmode.fps);
+			std::cout << "Camera set to freq " << realfreq << " Hz" << std::endl;
+		}
 		init(camera_id, hwmode, mode, dump_path);
 	}
 #endif
 
 
-	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(cv::Size imgSize, std::string dump_path)
-	{
-		init(2, dump_path, imgSize);
-	}
-	
 	HardwareSensorCameraFirewire::~HardwareSensorCameraFirewire()
 	{
 #ifdef HAVE_VIAM
@@ -192,8 +288,6 @@ namespace hardware {
 		l.unlock();
 		return missed_count;
 	}
-	
-	
 
 
 }}}

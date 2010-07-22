@@ -14,6 +14,8 @@
 #include <sys/time.h>
 #include <boost/bind.hpp>
 
+#include "jmath/misc.hpp"
+
 namespace jafar {
 namespace rtslam {
 namespace hardware {
@@ -47,20 +49,25 @@ namespace hardware {
 		}
 	}
 
-	HardwareEstimatorMti::HardwareEstimatorMti(std::string device, int bufferSize_):
+	HardwareEstimatorMti::HardwareEstimatorMti(std::string device, double freq, double shutter, int bufferSize_):
 		mti(device.c_str(), MTI_OPMODE_BOTH, MTI_OPFORMAT_EULER),
 		buffer(bufferSize_, 10), published(bufferSize_, 10), bufferSize(bufferSize_), position(0)
 	{
 		INERTIAL_CONFIG config;
 		// default syncout pin modes and settings
-		config.syncOutMode          = MTI_SYNCOUTMODE_DISABLED;
+		config.syncOutMode          = MTI_SYNCOUTMODE_PULSE;
 		config.syncOutPulsePolarity = MTI_SYNCOUTPULSE_POS;
 		// number of acquisitions to skip before syncOut pin actuates
-		config.syncOutSkipFactor = 0; // mark all acquisitions
+		
+		const double period = 10e-3; // 10ms = 100Hz
+		double syncOutSkipFactor = 1. / freq / period;
+		config.syncOutSkipFactor = jmath::round(syncOutSkipFactor); // mark all acquisitions
+		double realfreq = 1. / (period * config.syncOutSkipFactor);
+		std::cout << "MTI trigger set to freq " << realfreq << " Hz" << std::endl;
 		// number of clock ticks @ 33.9ns to offset pin action from sensor sampling
 		config.syncOutOffset = 0; // no offset
 		// number of clock ticks @ 33.9ns to define pulse width
-		config.syncOutPulseWidth = 58996; // 2 ms pulse
+		config.syncOutPulseWidth = shutter/33.9e-9;
 		// Set SyncOut settings
 		mti.set_syncOut(config.syncOutMode, config.syncOutPulsePolarity,
 			config.syncOutSkipFactor, config.syncOutOffset,

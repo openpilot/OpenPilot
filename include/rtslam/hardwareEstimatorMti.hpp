@@ -47,7 +47,7 @@ namespace hardware {
 		
 		public:
 			
-			HardwareEstimatorMti(std::string device, int bufferSize_);
+			HardwareEstimatorMti(std::string device, double freq, double shutter, int bufferSize_);
 			
 			jblas::mat_range acquireReadings(double t1, double t2);
 

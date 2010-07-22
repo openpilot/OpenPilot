@@ -68,21 +68,14 @@ typedef DataManagerOnePointRansac<RawImage, SensorPinHole, FeatureImagePoint, im
 int mode = 0;
 time_t rseed;
 
-const int slam_priority = -20; // needs to be started as root to be < 0
-const int display_priority = 10;
-const int display_period = 100; // ms
-
 ///##############################################
 
-const int nIntOpts = 10;
+enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iLog, iVerbose, iRobot, iTrigger, iFreq, iShutter, nIntOpts };
 int intOpts[nIntOpts] = {0};
-enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iLog, iVerbose, iRobot };
 
-const int nStrOpts = 2;
+enum { sSlamConfig = 0, sDataPath, nStrOpts };
 std::string strOpts[nStrOpts];
-enum { iSlamConfig = 0, iDataPath };
 
-//strOpts[iDataPath] = ".";
 
 struct option long_options[] = {
 	// int options
@@ -95,7 +88,11 @@ struct option long_options[] = {
 	{"pause", 2, 0, 0},
 	{"log", 2, 0, 0},
 	{"verbose", 2, 0, 0},
+	//starting from there these options will be removed when config files will be available
 	{"robot", 2, 0, 0},
+	{"trigger", 2, 0, 0},
+	{"freq", 2, 0, 0},
+	{"shutter", 2, 0, 0},
 	// string options
 	{"slam-config", 1, 0, 0},
 	{"data-path", 1, 0, 0},
@@ -103,6 +100,12 @@ struct option long_options[] = {
 	{"help",0,0,0},
 	{"usage",0,0,0},
 };
+
+///##############################################
+
+const int slam_priority = -20; // needs to be started as root to be < 0
+const int display_priority = 10;
+const int display_period = 100; // ms
 
 ///##############################################
 
@@ -142,6 +145,7 @@ const double MAHALANOBIS_TH = 3; // in n_sigmas
 const unsigned N_UPDATES_TOTAL = 25;
 const unsigned N_UPDATES_RANSAC = 20;
 const unsigned N_INIT = 10;
+const unsigned N_RECOMP_GAINS = 3;
 const double RANSAC_LOW_INNOV = 1.0; // in pixels
 <<<<<<< HEAD
 
@@ -207,7 +211,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		robinertial_ptr_t robPtr1_(new RobotInertial(mapPtr));
 		
 		robPtr1 = robPtr1_;
-		hardware::hardware_estimator_ptr_t hardEst1(new hardware::HardwareEstimatorMti("/dev/ttyS1", 256));
+		hardware::hardware_estimator_ptr_t hardEst1(new hardware::HardwareEstimatorMti("/dev/ttyS1", intOpts[iFreq], 2e-3, 256));
 		robPtr1->setHardwareEstimator(hardEst1);
 	}
 	robPtr1->setId();
@@ -234,7 +238,7 @@ void demo_slam01_main(world_ptr_t *world) {
 //	boost::shared_ptr<correl::Explorer<correl::Zncc> > znccMatcher(new correl::Explorer<correl::Zncc>());
 	boost::shared_ptr<ImagePointZnccMatcher> znccMatcher(new ImagePointZnccMatcher(MIN_SCORE, PARTIAL_POSITION, PATCH_SIZE, RANSAC_LOW_INNOV, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE));
 	
-	boost::shared_ptr<DataManager_ImagePoint_Ransac> dmPt11(new DataManager_ImagePoint_Ransac(harrisDetector, znccMatcher, asGrid, N_UPDATES_TOTAL, N_UPDATES_RANSAC, RANSAC_NTRIES, N_INIT));
+	boost::shared_ptr<DataManager_ImagePoint_Ransac> dmPt11(new DataManager_ImagePoint_Ransac(harrisDetector, znccMatcher, asGrid, N_UPDATES_TOTAL, N_UPDATES_RANSAC, RANSAC_NTRIES, N_INIT, N_RECOMP_GAINS));
 	
 
 	dmPt11->linkToParentSensorSpec(senPtr11);
@@ -243,13 +247,13 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	
 	#ifdef HAVE_VIAM
-	viam_hwmode_t hwmode = { VIAM_HWSZ_640x480, VIAM_HWFMT_MONO8, VIAM_HW_FIXED, VIAM_HWFPS_60, VIAM_HWTRIGGER_INTERNAL };
-	hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire("0x00b09d01006fb38f", hwmode, mode, strOpts[iDataPath]));
+	hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(
+		"0x00b09d01006fb38f", cv::Size(640,480), 0, 8, intOpts[iFreq], intOpts[iTrigger], mode, strOpts[sDataPath]));
 	senPtr11->setHardwareSensor(hardSen11);
 	#else
 	if (intOpts[iReplay])
 	{
-		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(cv::Size(640,480),strOpts[iDataPath]));
+		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(cv::Size(640,480),strOpts[sDataPath]));
 		senPtr11->setHardwareSensor(hardSen11);
 	}
 	#endif
@@ -409,12 +413,12 @@ void demo_slam01_display(world_ptr_t *world) {
 			{
 				if (intOpts[iDispQt])
 				{
-					std::ostringstream oss; oss << strOpts[iDataPath] << "/rendered-2D_%d-" << std::setw(6) << std::setfill('0') << prev_t-1 << ".png";
+					std::ostringstream oss; oss << strOpts[sDataPath] << "/rendered-2D_%d-" << std::setw(6) << std::setfill('0') << prev_t-1 << ".png";
 					viewerQt->dump(oss.str());
 				}
 				if (intOpts[iDispGdhe])
 				{
-					std::ostringstream oss; oss << strOpts[iDataPath] << "/rendered-3D_" << std::setw(6) << std::setfill('0') << prev_t-1 << ".ppm";
+					std::ostringstream oss; oss << strOpts[sDataPath] << "/rendered-3D_" << std::setw(6) << std::setfill('0') << prev_t-1 << ".ppm";
 					viewerGdhe->dump(oss.str());
 				}
 				if (intOpts[iRenderAll])
@@ -439,12 +443,12 @@ void demo_slam01_display(world_ptr_t *world) {
 		if (intOpts[iRandSeed] != 0 && intOpts[iRandSeed] != 1)
 			rseed = intOpts[iRandSeed];
 		if (!intOpts[iReplay] && intOpts[iDump]) {
-			std::fstream f((strOpts[iDataPath] + std::string("/rseed.log")).c_str(), std::ios_base::out);
+			std::fstream f((strOpts[sDataPath] + std::string("/rseed.log")).c_str(), std::ios_base::out);
 			f << rseed << std::endl;
 			f.close();
 		}
 		else if (intOpts[iReplay] && intOpts[iRandSeed] == 1) {
-			std::fstream f((strOpts[iDataPath] + std::string("/rseed.log")).c_str(), std::ios_base::in);
+			std::fstream f((strOpts[sDataPath] + std::string("/rseed.log")).c_str(), std::ios_base::in);
 			f >> rseed;
 			f.close();
 		}
@@ -527,6 +531,10 @@ void demo_slam01_display(world_ptr_t *world) {
 		 */
 		int main(int argc, char* const* argv)
 		{
+			intOpts[iFreq] = 60;
+			intOpts[iShutter] = 2000;
+			strOpts[sDataPath] = ".";
+			
 			while (1)
 			{
 				int c, option_index = 0;

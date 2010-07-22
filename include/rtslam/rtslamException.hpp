@@ -25,7 +25,8 @@ namespace jafar {
 					UNKNOWN_SENSOR_TYPE,
 					UNKNOWN_DETECTION_METHOD,
 					UNKNOWN_MATCHING_METHOD,
-					UNKNOWN_TYPES_FOR_FACTORY
+					UNKNOWN_TYPES_FOR_FACTORY,
+					BUFFER_OVERFLOW
 				//        MY_ERROR /**< my error */
 				};
 

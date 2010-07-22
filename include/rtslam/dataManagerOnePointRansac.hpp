@@ -48,13 +48,14 @@ namespace jafar {
 				ENABLE_ACCESS_TO_SPECIFIC_PARENT(SensorSpec, sensorSpec);
 
 			public: // public interface
-				DataManagerOnePointRansac(const boost::shared_ptr<DetectorSpec> & _detector, const boost::shared_ptr<MatcherSpec> & _matcher, const boost::shared_ptr<FeatureManagerSpec> _featMan, int n_updates_total, int n_updates_ransac, int n_tries, int n_init):
+				DataManagerOnePointRansac(const boost::shared_ptr<DetectorSpec> & _detector, const boost::shared_ptr<MatcherSpec> & _matcher, const boost::shared_ptr<FeatureManagerSpec> _featMan, int n_updates_total, int n_updates_ransac, int n_tries, int n_init, int n_recomp_gains):
 					detector(_detector), matcher(_matcher), featMan(_featMan)
 				{
 					algorithmParams.n_updates_total = n_updates_total;
 					algorithmParams.n_updates_ransac = n_updates_ransac;
 					algorithmParams.n_tries = n_tries;
 					algorithmParams.n_init = n_init;
+					algorithmParams.n_recomp_gains = n_recomp_gains;
 				}
 				virtual ~DataManagerOnePointRansac() {
 				}
@@ -65,7 +66,7 @@ namespace jafar {
 				boost::shared_ptr<MatcherSpec> matcher;
 				boost::shared_ptr<FeatureManagerSpec> featMan;
 				// the list of observations sorted by information gain
-				typedef map<double, observation_ptr_t> ObservationListSorted;
+				typedef map<double, ObsList::iterator> ObservationListSorted;
 				ObservationListSorted obsListSorted;
 				// the list of visible observations to handle
 				ObsList obsVisibleList;
@@ -80,6 +81,7 @@ namespace jafar {
 						int n_updates_ransac; ///< maximum number of updates for ransac
 						int n_tries;   ///< number of RANSAC consensus tries
 						int n_init;    ///< number of feature initialization
+						int n_recomp_gains; ///< number of update after which infoGains are completely recomputed
 				} algorithmParams;
 
 			public: // getters ans setters

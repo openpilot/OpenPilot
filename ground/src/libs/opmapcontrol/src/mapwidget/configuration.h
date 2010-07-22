@@ -133,6 +133,21 @@ public:
     bool UseMemoryCache(){return core::OPMaps::Instance()->UseMemoryCache();}
 
     /**
+    * @brief  Returns the currently used memory for tiles
+    *
+    * @return
+    */
+    double TileMemoryUsed()const{return core::OPMaps::Instance()->TilesInMemory.MemoryCacheSize();}
+
+    /**
+    * @brief  Sets the size of the memory for tiles
+    *
+    * @param  value size in Mb to use for tiles
+    * @return
+    */
+    void SetTileMemorySize(int const& value){core::OPMaps::Instance()->TilesInMemory.setMemoryCacheCapacity(value);}
+
+    /**
     * @brief Sets the location for the SQLite Database used for caching and the geocoding cache files
     *
     * @param dir The path location for the cache file-IMPORTANT Must end with closing slash "/"
@@ -142,12 +157,31 @@ public:
         core::Cache::Instance()->setCacheLocation(dir);
 
     }
+
+    /**
+    * @brief  Deletes tiles in DataBase older than "days" days
+    *
+    * @param days
+    * @return
+    */
+    void DeleteTilesOlderThan(int const& days){core::Cache::Instance()->ImageCache.deleteOlderTiles(days);}
+
+    /**
+    * @brief  Exports tiles from one DB to another. Only new tiles are added.
+    *
+    * @param sourceDB the source DB
+    * @param destDB the destination DB. If it doesnt exhist it will be created.
+    * @return
+    */
+    void ExportMapDataToDB(QString const& sourceDB, QString const& destDB)const{core::PureImageCache::ExportMapDataToDB(sourceDB,destDB);}
     /**
     * @brief Returns the location for the SQLite Database used for caching and the geocoding cache files
     *
     * @return
     */
     QString CacheLocation(){return core::Cache::Instance()->CacheLocation();}
+
+
 };
 }
 #endif // CONFIGURATION_H

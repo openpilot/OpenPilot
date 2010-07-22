@@ -26,7 +26,7 @@
 * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 #include "pureimagecache.h"
-
+#include <QDateTime>
  
 namespace core {
 qlonglong PureImageCache::ConnCounter=0;
@@ -83,7 +83,7 @@ bool PureImageCache::CreateEmptyDB(const QString &file)
         return false;
     }
     QSqlQuery query(db);
-    query.exec("CREATE TABLE IF NOT EXISTS Tiles (id INTEGER NOT NULL PRIMARY KEY, X INTEGER NOT NULL, Y INTEGER NOT NULL, Zoom INTEGER NOT NULL, Type INTEGER NOT NULL)");
+    query.exec("CREATE TABLE IF NOT EXISTS Tiles (id INTEGER NOT NULL PRIMARY KEY, X INTEGER NOT NULL, Y INTEGER NOT NULL, Zoom INTEGER NOT NULL, Type INTEGER NOT NULL,Date TEXT)");
     if(query.numRowsAffected()==-1)
     {
 #ifdef DEBUG_PUREIMAGECACHE
@@ -146,6 +146,7 @@ bool PureImageCache::CreateEmptyDB(const QString &file)
         return false;
     }
     db.close();
+    QSqlDatabase::removeDatabase(QLatin1String("CreateConn"));
     return true;
 }
 bool PureImageCache::PutImageToCache(const QByteArray &tile, const MapType::Types &type,const Point &pos,const int &zoom)
@@ -189,11 +190,13 @@ bool PureImageCache::PutImageToCache(const QByteArray &tile, const MapType::Type
             {
                 {
                     QSqlQuery query(cn);
-                    query.prepare("INSERT INTO Tiles(X, Y, Zoom, Type) VALUES(?, ?, ?, ?)");
+                    query.prepare("INSERT INTO Tiles(X, Y, Zoom, Type,Date) VALUES(?, ?, ?, ?,?)");
                     query.addBindValue(pos.X());
                     query.addBindValue(pos.Y());
                     query.addBindValue(zoom);
+
                     query.addBindValue((int)type);
+                    query.addBindValue(QDateTime::currentDateTime().toString());
                     query.exec();
                 }
                 {
@@ -203,6 +206,7 @@ bool PureImageCache::PutImageToCache(const QByteArray &tile, const MapType::Type
                     query.exec();
                 }
                 cn.close();
+                QSqlDatabase::removeDatabase(QString::number(id));
             }
             else return false;
         }
@@ -251,9 +255,52 @@ QByteArray PureImageCache::GetImageFromCache(MapType::Types type, Point pos, int
 
                 cn.close();
             }
+            QSqlDatabase::removeDatabase(QString::number(id));
         }
     }
     return ar;
+}
+void PureImageCache::deleteOlderTiles(int const& days)
+{
+    QList<long> add;
+    bool ret=true;
+    QString dir=gtilecache;
+#ifdef DEBUG_PUREIMAGECACHE
+    qDebug()<<"Cache dir="<<dir<<" Try to GET:"<<pos.X()+","+pos.Y();
+#endif //DEBUG_PUREIMAGECACHE
+
+    {
+        QString db=dir+"Data.qmdb";
+        ret=QFileInfo(db).exists();
+        if(ret)
+        {
+            QSqlDatabase cn;
+            Mcounter.lock();
+            qlonglong id=++ConnCounter;
+            Mcounter.unlock();
+            cn = QSqlDatabase::addDatabase("QSQLITE",QString::number(id));
+            cn.setDatabaseName(db);
+            if(cn.open())
+            {
+                {
+                    QSqlQuery query(cn);
+                    query.exec(QString("SELECT id, X, Y, Zoom, Type, Date FROM Tiles"));
+                    while(query.next())
+                    {
+                        if(QDateTime::fromString(query.value(5).toString()).daysTo(QDateTime::currentDateTime())>days)
+                            add.append(query.value(0).toLongLong());
+                    }
+                    foreach(long i,add)
+                    {
+                        query.exec(QString("DELETE FROM Tiles WHERE id = %1;").arg(i));
+                    }
+                }
+
+                cn.close();
+            }
+            QSqlDatabase::removeDatabase(QString::number(id));
+        }
+    }
 }
 // PureImageCache::ExportMapDataToDB("C:/Users/Xapo/Documents/mapcontrol/debug/mapscache/data.qmdb","C:/Users/Xapo/Documents/mapcontrol/debug/mapscache/data2.qmdb");
 bool PureImageCache::ExportMapDataToDB(QString sourceFile, QString destFile)
@@ -280,7 +327,7 @@ bool PureImageCache::ExportMapDataToDB(QString sourceFile, QString destFile)
             QSqlQuery queryb(cb);
             queryb.exec(QString("ATTACH DATABASE \"%1\" AS Source").arg(sourceFile));
             QSqlQuery querya(ca);
-            querya.exec("SELECT id, X, Y, Zoom, Type FROM Tiles");
+            querya.exec("SELECT id, X, Y, Zoom, Type, Date FROM Tiles");
             while(querya.next())
             {
                 long id=querya.value(0).toLongLong();
@@ -294,7 +341,7 @@ bool PureImageCache::ExportMapDataToDB(QString sourceFile, QString destFile)
             long f;
             foreach(f,add)
             {
-                queryb.exec(QString("INSERT INTO Tiles(X, Y, Zoom, Type) SELECT X, Y, Zoom, Type FROM Source.Tiles WHERE id=%1").arg(f));
+                queryb.exec(QString("INSERT INTO Tiles(X, Y, Zoom, Type, Date) SELECT X, Y, Zoom, Type, Date FROM Source.Tiles WHERE id=%1").arg(f));
                 queryb.exec(QString("INSERT INTO TilesData(id, Tile) Values((SELECT last_insert_rowid()), (SELECT Tile FROM Source.TilesData WHERE id=%1))").arg(f));
             }
             add.clear();
@@ -305,7 +352,8 @@ bool PureImageCache::ExportMapDataToDB(QString sourceFile, QString destFile)
         else return false;
     }
     else return false;
-
+    QSqlDatabase::removeDatabase("ca");
+    QSqlDatabase::removeDatabase("cb");
     return true;
 
 }

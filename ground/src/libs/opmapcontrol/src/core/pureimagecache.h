@@ -55,10 +55,12 @@ namespace core {
         QString GtileCache();
         void setGtileCache(const QString &value);
         static bool ExportMapDataToDB(QString sourceFile, QString destFile);
+        void deleteOlderTiles(int const& days);
     private:
         QString gtilecache;
         QMutex Mcounter;
         static qlonglong ConnCounter;
+
     };
 
 }

@@ -50,8 +50,8 @@ namespace core {
 
     private:
         Cache();
-        Cache(Cache const&){};
-        Cache& operator=(Cache const&){ return *this; };
+        Cache(Cache const&){}
+        Cache& operator=(Cache const&){ return *this; }
         static Cache* m_pInstance;
         QString cache;
         QString routeCache;

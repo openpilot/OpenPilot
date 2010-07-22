@@ -45,6 +45,7 @@ namespace internals {
         dragPoint=Point(0,0);
         CanDragMap=true;
         tilesToload=0;
+        OPMaps::Instance();
     }
     Core::~Core()
     {

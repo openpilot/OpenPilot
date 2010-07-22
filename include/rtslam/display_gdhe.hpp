@@ -57,6 +57,7 @@ namespace display {
 			{
 				client.launch_server();
 				client.connect();
+				client.clear();
 				client.setCameraTarget(0.04,0,0.15);
 				client.setCameraPos(80, 20, 0.5);
 			}

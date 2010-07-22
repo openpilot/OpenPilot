@@ -41,6 +41,7 @@ Precision
 - [ok] Finish implementing 1 point Ransac to avoid outliers
 - [ok] limit n_updates of ransac, and ensure that some active search is done after ransac.
 - extend to n-point ransac and reduce the lowInnov ?
+- if no feature is found, try with larger ellipse, because there is little chance you find them back later (except if this one image is bad), if you never find them back you'll be for sure inconsistent, and if you try later the ellipses will be greater and greater.
 - recompute all infoGains for a few first updates in active search
 - Finish implementing RobotCentric Kalman
 - To investigate : predict, compute jacobians, correct mean offline, recompute jacobians, correct online = better consistence but how much more computations ?

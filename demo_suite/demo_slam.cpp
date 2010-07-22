@@ -142,6 +142,7 @@ const double MAHALANOBIS_TH = 3; // in n_sigmas
 const unsigned N_UPDATES_TOTAL = 25;
 const unsigned N_UPDATES_RANSAC = 20;
 const unsigned N_INIT = 10;
+const unsigned N_RECOMP_GAINS = 3;
 const double RANSAC_LOW_INNOV = 1.0; // in pixels
 #if RANSAC
 const unsigned RANSAC_NTRIES = 6;
@@ -230,7 +231,7 @@ void demo_slam01_main(world_ptr_t *world) {
 //	boost::shared_ptr<correl::Explorer<correl::Zncc> > znccMatcher(new correl::Explorer<correl::Zncc>());
 	boost::shared_ptr<ImagePointZnccMatcher> znccMatcher(new ImagePointZnccMatcher(MIN_SCORE, PARTIAL_POSITION, PATCH_SIZE, RANSAC_LOW_INNOV, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE));
 	
-	boost::shared_ptr<DataManager_ImagePoint_Ransac> dmPt11(new DataManager_ImagePoint_Ransac(harrisDetector, znccMatcher, asGrid, N_UPDATES_TOTAL, N_UPDATES_RANSAC, RANSAC_NTRIES, N_INIT));
+	boost::shared_ptr<DataManager_ImagePoint_Ransac> dmPt11(new DataManager_ImagePoint_Ransac(harrisDetector, znccMatcher, asGrid, N_UPDATES_TOTAL, N_UPDATES_RANSAC, RANSAC_NTRIES, N_INIT, N_RECOMP_GAINS));
 	
 
 	dmPt11->linkToParentSensorSpec(senPtr11);

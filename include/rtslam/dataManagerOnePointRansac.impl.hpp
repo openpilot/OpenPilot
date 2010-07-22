@@ -5,6 +5,7 @@
  *  Created on: Jun 30, 2010
  *      Author: jsola
  */
+#include "kernel/misc.hpp"
 
 #include "jmath/randomIntTmplt.hpp"
 #include "jmath/misc.hpp"
@@ -81,7 +82,7 @@ namespace jafar {
 					projectFromMean(exp, obsCurrentPtr, x_copy);
 // JFR_DEBUG("was predicted at " << obsCurrentPtr->expectation.x() << ", now predicted at " << exp);
 
-
+					// FIXME rematch if isLowInnovationInlier is false
 					if(!obsCurrentPtr->events.matched){
 						// try to match with low innovation
 						obsCurrentPtr->predictAppearance();
@@ -123,67 +124,66 @@ namespace jafar {
 
 			} // for i = 0:n_tries
 
-			{
 // JFR_DEBUG("######## Find best ransac set (among " << ransacSetList.size() << ")");
-				ransac_set_ptr_t best_set;
-				if (ransacSetList.size() != 0)
-				{
-					// 1. select ransacSet.inliers.size() max
-					for(RansacSetList::iterator rsIter = ransacSetList.begin(); rsIter != ransacSetList.end(); ++rsIter)
-						if (!best_set || (*rsIter)->size() > best_set->size()) best_set = *rsIter;
+			ransac_set_ptr_t best_set;
+			if (ransacSetList.size() != 0)
+			{
+				// 1. select ransacSet.inliers.size() max
+				for(RansacSetList::iterator rsIter = ransacSetList.begin(); rsIter != ransacSetList.end(); ++rsIter)
+					if (!best_set || (*rsIter)->size() > best_set->size()) best_set = *rsIter;
 // JFR_DEBUG("best set is " << best_set->obsBasePtr->id() << " with size " << best_set->size());
 
-					// if there are too much updates to do bufferized, randomly move out some of them
-					// to pending, they may be processed in active search if necessary
-					while (best_set->size() > algorithmParams.n_updates_ransac)
-					{
-						int n = (rand() % (best_set->size() - 1)) + 1; // keep the first one which is the base obs
-						best_set->pendingObs.push_back(best_set->inlierObs[n]);
-						best_set->inlierObs[n] = best_set->inlierObs[best_set->inlierObs.size()-1];
-						best_set->inlierObs.pop_back();
-					}
+				// if there are too much updates to do bufferized, randomly move out some of them
+				// to pending, they may be processed in active search if necessary
+				while (best_set->size() > algorithmParams.n_updates_ransac)
+				{
+					int n = (rand() % (best_set->size() - 1)) + 1; // keep the first one which is the base obs
+					best_set->pendingObs.push_back(best_set->inlierObs[n]);
+					kernel::fastErase(best_set->inlierObs, n);
+				}
 
-					if (best_set->size() > 1)
+				if (best_set->size() > 1)
+				{
+					// 2. for each obs in inliers
+					for(ObsList::iterator obsIter = best_set->inlierObs.begin(); obsIter != best_set->inlierObs.end(); ++obsIter)
 					{
-						// 2. for each obs in inliers
-						for(ObsList::iterator obsIter = best_set->inlierObs.begin(); obsIter != best_set->inlierObs.end(); ++obsIter)
-						{
-							observation_ptr_t obsPtr = *obsIter;
-							// Add to tesselation grid for active search
-							//featMan->addObs(obsPtr->expectation.x());
-							obsPtr->events.updated = true;
-							numObs++;
-							
-							#if BUFFERED_UPDATE
-							// 2a. add obs to buffer for EKF update
-							mapPtr->filterPtr->stackCorrection(obsPtr->innovation, obsPtr->INN_rsl, obsPtr->ia_rsl);
-// 	JFR_DEBUG("stacked correction for inlier " << obsPtr->id());
-							#else
-							obsPtr->project();
-							obsPtr->computeInnovation();
-							obsPtr->update();
-// 	JFR_DEBUG("corrected inlier " << obsPtr->id());
-							#endif
-						}
+						observation_ptr_t obsPtr = *obsIter;
+						// Add to tesselation grid for active search
+						//featMan->addObs(obsPtr->expectation.x());
+						obsPtr->events.updated = true;
+						numObs++;
+						
 						#if BUFFERED_UPDATE
-						// 3. perform buffered update
-						mapPtr->filterPtr->correctAllStacked(mapPtr->ia_used_states());
-// 	JFR_DEBUG("corrected all stacked observations");
+						// 2a. add obs to buffer for EKF update
+						mapPtr->filterPtr->stackCorrection(obsPtr->innovation, obsPtr->INN_rsl, obsPtr->ia_rsl);
+// 	JFR_DEBUG("stacked correction for inlier " << obsPtr->id());
+						#else
+						obsPtr->project();
+						obsPtr->computeInnovation();
+						obsPtr->update();
+// 	JFR_DEBUG("corrected inlier " << obsPtr->id());
 						#endif
 					}
+					#if BUFFERED_UPDATE
+					// 3. perform buffered update
+					mapPtr->filterPtr->correctAllStacked(mapPtr->ia_used_states());
+// 	JFR_DEBUG("corrected all stacked observations");
+					#endif
 				}
-				
-				ObsList &activeSearchList = ((ransacSetList.size() == 0) || (best_set->size() <= 1) ? obsVisibleList : best_set->pendingObs);
-				// FIXME don't search again landmarks that failed as base
-				
+			}
+			
+			ObsList &activeSearchList = ((ransacSetList.size() == 0) || (best_set->size() <= 1) ? obsVisibleList : best_set->pendingObs);
+			// FIXME don't search again landmarks that failed as base
+			
+			for (int i = 0; i < algorithmParams.n_recomp_gains; ++i)
+			{
 				// 4. for each obs in pending: retake algorithm from active search
-				obsListSorted.clear();
 				
 // JFR_DEBUG("######## Starting classic active search for the remaining");
 				for(ObsList::iterator obsIter = activeSearchList.begin(); obsIter != activeSearchList.end(); ++obsIter)
 				{
 					observation_ptr_t obsPtr = *obsIter;
-// FIXME maybe don't clear events and don't rematch if already did, especially if didn't reestimate
+	// FIXME maybe don't clear events and don't rematch if already did, especially if didn't reestimate
 					obsPtr->clearEvents();
 					obsPtr->measurement.matchScore = 0;
 
@@ -203,7 +203,7 @@ namespace jafar {
 						obsPtr->predictInfoGain();
 
 						// add to sorted list of observations
-						obsListSorted[obsPtr->expectation.infoGain] = obsPtr;
+						obsListSorted[obsPtr->expectation.infoGain] = obsIter;
 // JFR_DEBUG("obs " << obsPtr->id() << " info gain " << obsPtr->expectation.infoGain);
 					} // visible obs
 				} // for each obs
@@ -211,9 +211,11 @@ namespace jafar {
 // JFR_DEBUG("#### starting remaining corrections");
 				// loop only the N_UPDATES most interesting obs, from largest info gain to smallest
 				// FIXME shouldn't we recompute info gains after each update ?
-				for (ObservationListSorted::reverse_iterator obsIter = obsListSorted.rbegin(); obsIter
-						!= obsListSorted.rend(); obsIter++) {
-					observation_ptr_t obsPtr = obsIter->second;
+				for (ObservationListSorted::reverse_iterator obsIter = obsListSorted.rbegin();
+					obsIter != obsListSorted.rend(); ++obsIter)
+				{
+					if (i != algorithmParams.n_recomp_gains-1 && obsIter != obsListSorted.rbegin()) break;
+					observation_ptr_t obsPtr = *(obsIter->second);
 
 					// 1a. re-project to get up-to-date means and Jacobians
 					obsPtr->project();
@@ -284,6 +286,8 @@ namespace jafar {
 
 				} // foreach observation
 // JFR_DEBUG("finished for this sensor !");
+				if (i != algorithmParams.n_recomp_gains-1 && obsListSorted.rbegin() != obsListSorted.rend())
+					kernel::fastErase(activeSearchList, obsListSorted.rbegin()->second);
 				obsListSorted.clear(); // clear the list now or it will prevent the observation to be destroyed until next frame, and will still be displayed
 			}
 

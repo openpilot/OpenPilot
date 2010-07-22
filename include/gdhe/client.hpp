@@ -22,7 +22,7 @@ namespace gdhe {
 	TODO:
 	- manage generic children !
 	- prendre un client dans le constructeur de objet
-	- surcharger << dans color pour les exports -> ok
+	- [ok] surcharger << dans color pour les exports
 	- faire les eval dans client avec Client& operator<<(Client&, T);
 	*/
 	
@@ -84,6 +84,8 @@ namespace gdhe {
 				{ std::ostringstream oss; oss << "$gdheBase.gdhe.ogl dumpPpm -color " << filename; return eval(oss.str()); }
 			void redraw()
 				{ eval("redrawAllWindows"); }
+			void clear() /// only use it at the beginning of the program, because automatic destruction of objects afterwards will fail
+				{ eval("set robots(test) {sphere 0 0 0 0};unset robots;set pos(test) {0 0 0 0 0 0};unset pos;"); }
 			
 			void setBackgroundColor(ColorRGB &_color) 
 				{ backgroundColor = _color; }
@@ -362,7 +364,7 @@ namespace gdhe {
 				std::ostringstream oss;
 				oss << "set robots(" << ids << ") {";
 				oss << "color " << color << ";";
-				#if 0
+				#if 0 // waiting approval of a commit in gdhe
 				oss << "ellipse " << 0 << " " << 0 << " " << 0 << " z " << 2*dx << " " << 2*dy << " " << facets << ";";
 				oss << "ellipse " << 0 << " " << 0 << " " << 0 << " y " << 2*dx << " " << 2*dz << " " << facets << ";";
 				oss << "ellipse " << 0 << " " << 0 << " " << 0 << " x " << 2*dy << " " << 2*dz << " " << facets << ";";

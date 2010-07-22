@@ -125,8 +125,8 @@ namespace hardware {
 	viam_hwtrigger_t HardwareSensorCameraFirewire::trigger_to_viamTrigger(bool trigger)
 	{
 		viam_hwtrigger_t hwtrigger;
-		if (trigger) hwtrigger = VIAM_HWTRIGGER_INTERNAL;
-		else hwtrigger = VIAM_HWTRIGGER_MODE1_HIGH;
+		if (trigger) hwtrigger = VIAM_HWTRIGGER_MODE1_HIGH;
+		else hwtrigger = VIAM_HWTRIGGER_INTERNAL;
 		return hwtrigger;
 	}
 

@@ -14,7 +14,11 @@
 #include <sys/time.h>
 #include <boost/bind.hpp>
 
+#include "kernel/jafarMacro.hpp"
 #include "jmath/misc.hpp"
+#include "jmath/indirectArray.hpp"
+
+#include "rtslam/rtslamException.hpp"
 
 namespace jafar {
 namespace rtslam {
@@ -33,6 +37,7 @@ namespace hardware {
 			// TODO compute delay between now and the real date of the reading
 			// TODO implement a precise timestamp in viam-libs
 			boost::unique_lock<boost::mutex> l(mutex_data);
+			if (position == reading_pos) JFR_ERROR(RtslamException, RtslamException::BUFFER_OVERFLOW, "Data not released: Increase MTI buffer size !");
 			buffer(position,0) = tv.tv_sec + tv.tv_usec*1e-6;
 			buffer(position,1) = data.ACC[0];
 			buffer(position,2) = data.ACC[1];
@@ -51,7 +56,7 @@ namespace hardware {
 
 	HardwareEstimatorMti::HardwareEstimatorMti(std::string device, double freq, double shutter, int bufferSize_):
 		mti(device.c_str(), MTI_OPMODE_BOTH, MTI_OPFORMAT_EULER),
-		buffer(bufferSize_, 10), published(bufferSize_, 10), bufferSize(bufferSize_), position(0)
+		buffer(bufferSize_, 10), bufferSize(bufferSize_), position(0), reading_pos(-1)
 	{
 		INERTIAL_CONFIG config;
 		// default syncout pin modes and settings
@@ -79,40 +84,51 @@ namespace hardware {
 	}
 	
 	
-	jblas::mat_range HardwareEstimatorMti::acquireReadings(double t1, double t2)
+	jblas::mat_indirect HardwareEstimatorMti::acquireReadings(double t1, double t2)
 	{
+		JFR_ASSERT(t1 <= t2, "");
 		// find indexes
 		boost::unique_lock<boost::mutex> l(mutex_data);
 		int i1, i2, n;
 		int i, j;
-		for(i = position+1, j = 0; j < bufferSize; ++j, ++i)
+		for(i = position, j = 0; j < bufferSize; ++j, ++i)
 		{
 			if (i >= bufferSize) i = 0;
-			i1 = i;
 			if (buffer(i,0) >= t1) break;
 		}
-		i2 = i; n = 0;
-		for(; j < bufferSize; ++j, ++i, ++n)
+		i1 = (i == 0 ? bufferSize-1 : i-1);
+		if (j == bufferSize && buffer(i1,0) < 1.0)  // no data at all
+			return ublas::project(buffer, jmath::ublasExtra::ia_set(ublas::range(0,0)), jmath::ublasExtra::ia_set(ublas::range(0, buffer.size2())));
+		if (j == 0) JFR_ERROR(RtslamException, RtslamException::BUFFER_OVERFLOW, "Missing data: increase MTI buffer size !");
+			
+		for(n = 0; j < bufferSize; ++j, ++i, ++n)
 		{
 			if (i >= bufferSize) i = 0;
-			i2 = i;
 			if (buffer(i,0) >= t2) break;
 		}
-			
-		// copy from buffer to published
-		if (n == 0) {}
-		else if (i1 < i2)
+		i2 = i;
+		
+		// return mat_indirect
+		reading_pos = i1;
+		if (i1 < i2)
 		{
-			ublas::project(published, ublas::range(0,n), ublas::range(0,published.size2())) = 
-				ublas::project(buffer, ublas::range(i1,i2), ublas::range(0,published.size2()));
+			return ublas::project(buffer, 
+				jmath::ublasExtra::ia_set(ublas::range(i1,i2)),
+				jmath::ublasExtra::ia_set(ublas::range(0,buffer.size2())));
+// 			ublas::project(published, ublas::range(0,n), ublas::range(0,published.size2())) = 
+// 				ublas::project(buffer, ublas::range(i1,i2), ublas::range(0,published.size2()));
 		} else
 		{
-			ublas::project(published, ublas::range(0,published.size1()-i1), ublas::range(0,published.size2())) = 
-				ublas::project(buffer, ublas::range(i1,published.size1()), ublas::range(0,published.size2()));
-			ublas::project(published, ublas::range(published.size1()-i1,n), ublas::range(0,published.size2())) = 
-				ublas::project(buffer, ublas::range(0,i2), ublas::range(0,published.size2()));
+			return ublas::project(buffer, 
+				jmath::ublasExtra::ia_union(jmath::ublasExtra::ia_set(ublas::range(i1,buffer.size1())),
+				                            jmath::ublasExtra::ia_set(ublas::range(0,i2))),
+				jmath::ublasExtra::ia_set(ublas::range(0,buffer.size2())));
+			
+// 			ublas::project(published, ublas::range(0,published.size1()-i1), ublas::range(0,published.size2())) = 
+// 				ublas::project(buffer, ublas::range(i1,published.size1()), ublas::range(0,published.size2())); 
+// 			ublas::project(published, ublas::range(published.size1()-i1,n), ublas::range(0,published.size2())) = 
+// 				ublas::project(buffer, ublas::range(0,i2), ublas::range(0,published.size2()));
 		}
-		return jblas::mat_range(published, ublas::range(0,n), ublas::range(0,published.size2()));
 	}
 
 

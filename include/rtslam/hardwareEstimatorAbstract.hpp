@@ -24,9 +24,14 @@ namespace hardware {
 	{
 		public:
 			/**
-			each line is one reading, first command is timestamp (double seconds), the rest is the command
+			Returns all reading between t1 and t2, plus the last before t1 and the first after t2.
+			Each line is one reading, first element is timestamp (double seconds), the rest is the command.
 			*/
-			virtual jblas::mat_range acquireReadings(double t1, double t2) = 0;
+			virtual jblas::mat_indirect acquireReadings(double t1, double t2) = 0;
+			/**
+			
+			*/
+			virtual void releaseReadings() = 0;
 	};
 
 }}}

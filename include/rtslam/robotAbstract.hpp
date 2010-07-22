@@ -204,15 +204,20 @@ namespace jafar {
 					if (self_time < 1.) self_time = time;
 					if (hardwareEstimatorPtr)
 					{
-						jblas::mat_range readings = hardwareEstimatorPtr->acquireReadings(self_time, time);
+						jblas::mat_indirect readings = hardwareEstimatorPtr->acquireReadings(self_time, time);
 						double cur_time = self_time;
 						jblas::vec u;
 						for(int i = 0; i < readings.size1(); i++)
 						{
-							dt_or_dx = readings(i, 0) - cur_time;
-							u = ublas::subrange(ublas::matrix_row<mat_range>(readings, i),1,readings.size2());
+							double next_time = readings(i, 0);
+							if (next_time > time) next_time = time;
+							if (i == readings.size1()-1) next_time = time;
+							
+							dt_or_dx = next_time - cur_time;
+							if (dt_or_dx <= 0) continue;
+							u = ublas::subrange(ublas::matrix_row<mat_indirect>(readings, i),1,mySize_control());
 							move(u);
-							cur_time = readings(i, 0);
+							cur_time = next_time;
 						}
 					} else
 					{

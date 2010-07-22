@@ -112,7 +112,7 @@ const unsigned N_FRAMES = 500000;
 // map
 const unsigned MAP_SIZE = 313;
 
-// robot uncertainties and perturbations
+// constant velocity robot uncertainties and perturbations
 const double UNCERT_VLIN = .1; // m/s
 const double UNCERT_VANG = .1; // rad/s
 const double PERT_VLIN = 1; // m/s per sqrt(s)
@@ -126,12 +126,12 @@ const double DISTORTION[2] = { -0.23193,   0.11306 }; //{-0.27965, 0.20059, -0.1
 const double PIX_NOISE = .5;
 
 // lmk management
-const double D_MIN = 1;
+const double D_MIN = .5;
 const double REPARAM_TH = 0.1;
 
 // data manager: quick Harris detector
 const unsigned HARRIS_CONV_SIZE = 5;
-const double HARRIS_TH = 7.0;
+const double HARRIS_TH = 20.0;
 const double HARRIS_EDDGE = 3.0;
 const unsigned PATCH_DESC = 45;
 
@@ -501,7 +501,7 @@ void demo_slam01_display(world_ptr_t *world) {
 		 * --render-all=0/1 (needs --replay 1)
 		 * --replay=0/1 (needs --data-path)
 		 * --dump=0/1  (needs --data-path)
-		 * --rand-seed=0/1/n, 0=generate new one, 1=in replay use the saved one
+		 * --rand-seed=0/1/n, 0=generate new one, 1=in replay use the saved one, n=use seed n
 		 * --pause=0/n 0=don't, n=pause for frames>n (needs --replay 1)
 		 * #--log=0/1 -> not implemented yet
 		 * #--verbose=0/1/2 -> not implemented yet

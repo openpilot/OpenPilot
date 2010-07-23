@@ -388,9 +388,5 @@ void demo_slam01_display(world_ptr_t *world) {
 		}
 		
 #else
-int main()
-{
-	return 0;
-}
 
 #endif

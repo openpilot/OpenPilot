@@ -38,19 +38,23 @@ namespace hardware {
 			
 			boost::mutex mutex_data;
 			jblas::mat buffer;
-			jblas::mat published;
 			int bufferSize;
-			int position;
+			int position; // next position
+			int reading_pos;
+			int read_pos;
+			
+			int mode;
+			std::string dump_path;
 
 			boost::thread *preloadTask_thread;
 			void preloadTask(void);
 		
 		public:
 			
-			HardwareEstimatorMti(std::string device, double freq, double shutter, int bufferSize_);
+			HardwareEstimatorMti(std::string device, double freq, double shutter, int bufferSize_, int mode = 0, std::string dump_path = ".");
 			
-			jblas::mat_range acquireReadings(double t1, double t2);
-
+			jblas::mat_indirect acquireReadings(double t1, double t2);
+			void releaseReadings() { reading_pos = -1; }
 	};
 
 }}}

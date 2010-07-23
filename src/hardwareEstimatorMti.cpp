@@ -14,7 +14,11 @@
 #include <sys/time.h>
 #include <boost/bind.hpp>
 
+#include "kernel/jafarMacro.hpp"
 #include "jmath/misc.hpp"
+#include "jmath/indirectArray.hpp"
+
+#include "rtslam/rtslamException.hpp"
 
 namespace jafar {
 namespace rtslam {
@@ -26,32 +30,63 @@ namespace hardware {
 		struct timeval tv;
 		struct timezone tz;
 		
+		jblas::vec row(10);
+		std::fstream f;
+		if (mode == 1 || mode == 2)
+		{
+			std::ostringstream oss; oss << dump_path << "/MTI.log";
+			f.open(oss.str().c_str(), (mode == 1 ? std::ios_base::out : std::ios_base::in));
+		}
+		
 		while (true)
 		{
-			if (!mti.read(&data)) continue;
-			gettimeofday(&tv, &tz);
-			// TODO compute delay between now and the real date of the reading
-			// TODO implement a precise timestamp in viam-libs
-			boost::unique_lock<boost::mutex> l(mutex_data);
-			buffer(position,0) = tv.tv_sec + tv.tv_usec*1e-6;
-			buffer(position,1) = data.ACC[0];
-			buffer(position,2) = data.ACC[1];
-			buffer(position,3) = data.ACC[2];
-			buffer(position,4) = data.GYR[0];
-			buffer(position,5) = data.GYR[1];
-			buffer(position,6) = data.GYR[2];
-			buffer(position,7) = data.MAG[0];
-			buffer(position,8) = data.MAG[1];
-			buffer(position,9) = data.MAG[2];
+			if (mode == 2)
+			{
+				boost::unique_lock<boost::mutex> l(mutex_data);
+				if (position == reading_pos) { boost::this_thread::yield(); continue; }
+				if (position == read_pos) { boost::this_thread::yield(); continue; }
+				l.unlock();
+				f >> row;
+				ublas::matrix_row<jblas::mat>(buffer, position) = row;
+			} else
+			{
+				if (!mti.read(&data)) continue;
+				gettimeofday(&tv, &tz);
+				// TODO compute delay between now and the real date of the reading
+				// TODO implement a precise timestamp in viam-libs
+				boost::unique_lock<boost::mutex> l(mutex_data);
+				if (position == reading_pos) JFR_ERROR(RtslamException, RtslamException::BUFFER_OVERFLOW, "Data not released: Increase MTI buffer size !");
+				if (position == read_pos) JFR_ERROR(RtslamException, RtslamException::BUFFER_OVERFLOW, "Data not read: Increase MTI buffer size !");
+				l.unlock();
+				buffer(position,0) = tv.tv_sec + tv.tv_usec*1e-6;
+				buffer(position,1) = data.ACC[0];
+				buffer(position,2) = data.ACC[1];
+				buffer(position,3) = data.ACC[2];
+				buffer(position,4) = data.GYR[0];
+				buffer(position,5) = data.GYR[1];
+				buffer(position,6) = data.GYR[2];
+				buffer(position,7) = data.MAG[0];
+				buffer(position,8) = data.MAG[1];
+				buffer(position,9) = data.MAG[2];
+			}
+			
+			if (mode == 1)
+			{
+				
+				f << ublas::matrix_row<jblas::mat>(buffer, position);
+			}
+			
 			++position;
 			if (position >= bufferSize) position = 0;
-			l.unlock();
 		}
+		
+		if (mode == 1 || mode == 2)
+			f.close();
 	}
 
-	HardwareEstimatorMti::HardwareEstimatorMti(std::string device, double freq, double shutter, int bufferSize_):
+	HardwareEstimatorMti::HardwareEstimatorMti(std::string device, double freq, double shutter, int bufferSize_, int mode, std::string dump_path):
 		mti(device.c_str(), MTI_OPMODE_BOTH, MTI_OPFORMAT_EULER),
-		buffer(bufferSize_, 10), published(bufferSize_, 10), bufferSize(bufferSize_), position(0)
+		buffer(bufferSize_, 10), bufferSize(bufferSize_), position(0), reading_pos(-1), read_pos(bufferSize_-1), mode(mode), dump_path(dump_path)
 	{
 		INERTIAL_CONFIG config;
 		// default syncout pin modes and settings
@@ -78,40 +113,45 @@ namespace hardware {
 	}
 	
 	
-	jblas::mat_range HardwareEstimatorMti::acquireReadings(double t1, double t2)
+	jblas::mat_indirect HardwareEstimatorMti::acquireReadings(double t1, double t2)
 	{
+		JFR_ASSERT(t1 <= t2, "");
 		// find indexes
 		boost::unique_lock<boost::mutex> l(mutex_data);
 		int i1, i2, n;
 		int i, j;
-		for(i = position+1, j = 0; j < bufferSize; ++j, ++i)
+		for(i = position, j = 0; j < bufferSize; ++j, ++i)
 		{
 			if (i >= bufferSize) i = 0;
-			i1 = i;
 			if (buffer(i,0) >= t1) break;
 		}
-		i2 = i; n = 0;
-		for(; j < bufferSize; ++j, ++i, ++n)
+		i1 = (i == 0 ? bufferSize-1 : i-1);
+		if (j == bufferSize && buffer(i1,0) < 1.0)  // no data at all
+			return ublas::project(buffer, jmath::ublasExtra::ia_set(ublas::range(0,0)), jmath::ublasExtra::ia_set(ublas::range(0, buffer.size2())));
+		if (j == 0) JFR_ERROR(RtslamException, RtslamException::BUFFER_OVERFLOW, "Missing data: increase MTI buffer size !");
+			
+		for(n = 0; j < bufferSize; ++j, ++i, ++n)
 		{
 			if (i >= bufferSize) i = 0;
-			i2 = i;
 			if (buffer(i,0) >= t2) break;
 		}
-			
-		// copy from buffer to published
-		if (n == 0) {}
-		else if (i1 < i2)
+		i2 = i;
+		
+		// return mat_indirect
+		reading_pos = i1;
+		read_pos = i2;
+		if (i1 < i2)
 		{
-			ublas::project(published, ublas::range(0,n), ublas::range(0,published.size2())) = 
-				ublas::project(buffer, ublas::range(i1,i2), ublas::range(0,published.size2()));
+			return ublas::project(buffer, 
+				jmath::ublasExtra::ia_set(ublas::range(i1,i2)),
+				jmath::ublasExtra::ia_set(ublas::range(0,buffer.size2())));
 		} else
 		{
-			ublas::project(published, ublas::range(0,published.size1()-i1), ublas::range(0,published.size2())) = 
-				ublas::project(buffer, ublas::range(i1,published.size1()), ublas::range(0,published.size2()));
-			ublas::project(published, ublas::range(published.size1()-i1,n), ublas::range(0,published.size2())) = 
-				ublas::project(buffer, ublas::range(0,i2), ublas::range(0,published.size2()));
+			return ublas::project(buffer, 
+				jmath::ublasExtra::ia_union(jmath::ublasExtra::ia_set(ublas::range(i1,buffer.size1())),
+				                            jmath::ublasExtra::ia_set(ublas::range(0,i2))),
+				jmath::ublasExtra::ia_set(ublas::range(0,buffer.size2())));
 		}
-		return jblas::mat_range(published, ublas::range(0,n), ublas::range(0,published.size2()));
 	}
 
 

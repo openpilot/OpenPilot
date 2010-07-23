@@ -231,7 +231,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		robPtr1->perturbation.set_std_continuous(pertStd);
 		robPtr1->constantPerturbation = false;
 
-		hardware::hardware_estimator_ptr_t hardEst1(new hardware::HardwareEstimatorMti("/dev/ttyS0", intOpts[iFreq], 2e-3, 256));
+		hardware::hardware_estimator_ptr_t hardEst1(new hardware::HardwareEstimatorMti("/dev/ttyS0", intOpts[iFreq], 2e-3, 1024, mode, strOpts[sDataPath]));
 		robPtr1->setHardwareEstimator(hardEst1);
 	}
 	robPtr1->setId();
@@ -323,7 +323,7 @@ void demo_slam01_main(world_ptr_t *world) {
 
 				// get raw-data
 				if (senPtr->acquireRaw() < 0)
-					continue;
+					{ boost::this_thread::yield(); continue; }
 				else had_data=true;
 				cout << "Robot: " << *robPtr << endl;
 //				cout << "Robot state: " << robPtr->state.x() << endl;

@@ -60,9 +60,8 @@ namespace hardware {
 		// number of acquisitions to skip before syncOut pin actuates
 		
 		const double period = 10e-3; // 10ms = 100Hz
-		double syncOutSkipFactor = 1. / freq / period;
-		config.syncOutSkipFactor = jmath::round(syncOutSkipFactor); // mark all acquisitions
-		double realfreq = 1. / (period * config.syncOutSkipFactor);
+		config.syncOutSkipFactor = jmath::round(1. / freq / period) - 1; // mark all acquisitions
+		double realfreq = 1. / (period * (config.syncOutSkipFactor + 1) );
 		std::cout << "MTI trigger set to freq " << realfreq << " Hz" << std::endl;
 		// number of clock ticks @ 33.9ns to offset pin action from sensor sampling
 		config.syncOutOffset = 0; // no offset

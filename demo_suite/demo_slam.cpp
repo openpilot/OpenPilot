@@ -121,6 +121,14 @@ const double UNCERT_VANG = .1; // rad/s
 const double PERT_VLIN = 1; // m/s per sqrt(s)
 const double PERT_VANG = 3; // rad/s per sqrt(s)
 
+// inertial robot initial uncertainties and perturbations
+//if (intOpts[iRobot] == 1) // == robot inertial
+const double UNCERT_GRAVITY = 10; // m/s^2
+const double PERT_AERR = .032; // m/s per sqrt(s), IMU acc error (MTI = 0.05*sqrt(40Hz/100Hz))
+const double PERT_WERR = .0018; // rad per sqrt(s), IMU gyro error (MTI = 0.001*sqrt(30Hz/100Hz))
+const double PERT_RANWALKACC = 0; // m/s^2 per sqrt(s), IMU a_bias random walk
+const double PERT_RANWALKGYRO = 0; // rad/s^2 per sqrt(s), IMU w_bias random walk
+
 // pin-hole:
 const unsigned IMG_WIDTH = 640;
 const unsigned IMG_HEIGHT = 480;
@@ -156,8 +164,8 @@ const double MIN_SCORE = 0.8;
 const double PARTIAL_POSITION = 0.25;
 
 // data manager: active search tesselation grid
-const unsigned GRID_VCELLS = 4;
-const unsigned GRID_HCELLS = 5;
+const unsigned GRID_VCELLS = 3;
+const unsigned GRID_HCELLS = 4;
 const unsigned GRID_MARGIN = 11;
 const unsigned GRID_SEPAR = 20;
 
@@ -199,30 +207,42 @@ void demo_slam01_main(world_ptr_t *world) {
 	{
 		robconstvel_ptr_t robPtr1_(new RobotConstantVelocity(mapPtr));
 		robPtr1_->setVelocityStd(UNCERT_VLIN,UNCERT_VANG);
-		
+		double _v[6] = {
+				PERT_VLIN, PERT_VLIN, PERT_VLIN,
+				PERT_VANG, PERT_VANG, PERT_VANG };
+		vec pertStd = createVector<6>(_v);
+
 		robPtr1 = robPtr1_;
+		robPtr1->perturbation.set_std_continuous(pertStd);
+		robPtr1->constantPerturbation = false;
 	} else
 	if (intOpts[iRobot] == 1)
 	{
 		robinertial_ptr_t robPtr1_(new RobotInertial(mapPtr));
-		
+		robPtr1_->setInitialStd(UNCERT_VLIN, UNCERT_GRAVITY);
+		double _v[12] = {
+				PERT_AERR, PERT_AERR, PERT_AERR,
+				PERT_WERR, PERT_WERR, PERT_WERR,
+				PERT_RANWALKACC, PERT_RANWALKACC, PERT_RANWALKACC,
+				PERT_RANWALKGYRO, PERT_RANWALKGYRO, PERT_RANWALKGYRO};
+		vec pertStd = createVector<12>(_v);
+
 		robPtr1 = robPtr1_;
-		hardware::hardware_estimator_ptr_t hardEst1(new hardware::HardwareEstimatorMti("/dev/ttyS1", intOpts[iFreq], 2e-3, 256));
+		robPtr1->perturbation.set_std_continuous(pertStd);
+		robPtr1->constantPerturbation = false;
+
+		hardware::hardware_estimator_ptr_t hardEst1(new hardware::HardwareEstimatorMti("/dev/ttyS0", intOpts[iFreq], 2e-3, 256));
 		robPtr1->setHardwareEstimator(hardEst1);
 	}
 	robPtr1->setId();
 	robPtr1->linkToParentMap(mapPtr);
 	robPtr1->pose.x(quaternion::originFrame());
 
-	double _v[6] = { PERT_VLIN, PERT_VLIN, PERT_VLIN, PERT_VANG, PERT_VANG, PERT_VANG };
-	robPtr1->perturbation.set_std_continuous(createVector<6> (_v));
-	robPtr1->constantPerturbation = false;
-
 	// 3. Create sensors.
 	pinhole_ptr_t senPtr11(new SensorPinHole(robPtr1, MapObject::UNFILTERED));
 	senPtr11->setId();
 	senPtr11->linkToParentRobot(robPtr1);
-	senPtr11->setPose(0,0,0,-90,0,-90);
+	senPtr11->setPose(0,0,0,-90,0,90);
 	//senPtr11->pose.x(quaternion::originFrame());
 	senPtr11->params.setImgSize(IMG_WIDTH, IMG_HEIGHT);
 	senPtr11->params.setIntrinsicCalibration(intrinsic, distortion, distortion.size());
@@ -305,6 +325,8 @@ void demo_slam01_main(world_ptr_t *world) {
 				if (senPtr->acquireRaw() < 0)
 					continue;
 				else had_data=true;
+				cout << "Robot: " << *robPtr << endl;
+//				cout << "Robot state: " << robPtr->state.x() << endl;
 
 				// move the filter time to the data raw.
 				robPtr->move(senPtr->getRaw()->timestamp);

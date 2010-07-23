@@ -53,11 +53,11 @@ namespace jafar {
 		 *
 		 * the transition equation f() is decomposed as:
 		 * - p+  = p + v*dt
-		 * - v+  = v + R(q)*(am - ab) + g     <-- am and wm: IMU measurements
-		 * - q+  = q**((wm - wb)*dt)          <-- ** : quaternion product
-		 * - ab+ = ab + ar                    <-- ar : random walk in acc bias with ar perturbation
-		 * - wb+ = wb + wr                    <-- wr : random walk of gyro bias with wr perturbation
-		 * - g+  = g                          <-- g  : gravity vector, constant but unknown
+		 * - v+  = v + (R(q)*(am - ab) + g)*dt + vi <-- am and wm: IMU measurements
+		 * - q+  = q**((wm - wb)*dt + wi)           <-- ** : quaternion product
+		 * - ab+ = ab + ar                          <-- ar : random walk in acc bias with ar perturbation
+		 * - wb+ = wb + wr                          <-- wr : random walk of gyro bias with wr perturbation
+		 * - g+  = g                                <-- g  : gravity vector, constant but unknown
 		 * -----------------------------------------------------------------------------
 		 *
 		 * The Jacobian XNEW_x is built with
@@ -76,9 +76,9 @@ namespace jafar {
 		 *   var    |  an    wn    ar    wr
 		 *      pos |  0     3     6     9
 		 *   -------+----------------------
-		 *   r   0  |  0     0     0     0
-		 *   q   3  |  I     0     0     0
-		 *   v   7  |  0   VNEW_wn 0     0
+		 *   p   0  |  0     0     0     0
+		 *   q   3  |  0  QNEW_wn  0     0
+		 *   v   7  |  I     0     0     0
 		 *   ab  10 |  0     0     I     0
 		 *   wb  13 |  0     0     0     I
 		 *   g   16 |  0     0     0     0
@@ -190,7 +190,7 @@ namespace jafar {
 			//    pos |  0     3     6     9
 			// -------+----------------------
 			// r   0  |  0     0     0     0
-			// q   3  |  0   VNEW_wn 0     0
+			// q   3  |  0   QNEW_wn 0     0
 			// v   7  |  I     0     0     0
 			// ab  10 |  0     0     I     0
 			// wb  13 |  0     0     0     I

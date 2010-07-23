@@ -118,11 +118,17 @@ namespace jafar {
 				virtual size_t mySize_perturbation() {return size_perturbation();}
 
 				// Set initial uncertainties on linear velocity and gravity.
-				void setInitialStd(double velLinStd, double gravStd){
-					for (size_t i = pose.size(); i < pose.size() + 3; i++){
+				void setInitialStd(double velLinStd, double aBiasStd, double wBiasStd, double gravStd){
+					for (size_t i = pose.size() + 0; i < pose.size() + 3; i++){
 						state.P(i,i) = velLinStd*velLinStd;
 					}
-					for (size_t i = state.size() - 3; i < state.size(); i++){
+					for (size_t i = pose.size() + 3; i < pose.size() + 6; i++){
+						state.P(i,i) = aBiasStd*aBiasStd;
+					}
+					for (size_t i = pose.size() + 6; i < pose.size() + 9; i++){
+						state.P(i,i) = wBiasStd*wBiasStd;
+					}
+					for (size_t i = pose.size() + 9; i < pose.size() + 12; i++){
 						state.P(i,i) = gravStd*gravStd;
 					}
 				}

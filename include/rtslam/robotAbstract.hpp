@@ -200,34 +200,7 @@ namespace jafar {
 					move();
 				}
 
-				void move(double time){
-					if (self_time < 1.) self_time = time;
-					if (hardwareEstimatorPtr)
-					{
-						jblas::mat_indirect readings = hardwareEstimatorPtr->acquireReadings(self_time, time);
-						double cur_time = self_time;
-						jblas::vec u;
-						for(int i = 0; i < readings.size1(); i++)
-						{
-							double next_time = readings(i, 0);
-							if (next_time > time) next_time = time;
-							if (i == readings.size1()-1) next_time = time;
-							
-							dt_or_dx = next_time - cur_time;
-							if (dt_or_dx <= 0) continue;
-							u = ublas::subrange(ublas::matrix_row<mat_indirect>(readings, i),1,mySize_control());
-							move(u);
-							cur_time = next_time;
-						}
-					} else
-					{
-						dt_or_dx = time - self_time;
-						perturbation.set_from_continuous(dt_or_dx);
-						control.clear();
-						move();
-					}
-					self_time = time;
-				}
+				void move(double time);
 
 				void move(const vec & u, double time){
 					if (self_time < 1.) dt_or_dx = 0;

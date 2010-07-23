@@ -24,6 +24,7 @@
 #include "jmath/random.hpp"
 #include "jmath/matlab.hpp"
 #include "jmath/ublasExtra.hpp"
+#include "jmath/angle.hpp"
 
 #include "rtslam/rtSlam.hpp"
 #include "rtslam/rawProcessors.hpp"
@@ -70,8 +71,11 @@ time_t rseed;
 
 ///##############################################
 
-enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iLog, iVerbose, iRobot, iTrigger, iFreq, iShutter, nIntOpts };
+enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iLog, iVerbose, iRobot, iTrigger, nIntOpts };
 int intOpts[nIntOpts] = {0};
+
+enum { fFreq = 0, fShutter, nFloatOpts };
+double floatOpts[nFloatOpts] = {0.0};
 
 enum { sSlamConfig = 0, sDataPath, nStrOpts };
 std::string strOpts[nStrOpts];
@@ -88,11 +92,11 @@ struct option long_options[] = {
 	{"pause", 2, 0, 0},
 	{"log", 2, 0, 0},
 	{"verbose", 2, 0, 0},
-	//starting from there these options will be removed when config files will be available
-	{"robot", 2, 0, 0},
-	{"trigger", 2, 0, 0},
-	{"freq", 2, 0, 0},
-	{"shutter", 2, 0, 0},
+	{"robot", 2, 0, 0}, // should be in config file
+	{"trigger", 2, 0, 0}, // should be in config file
+	// double options
+	{"freq", 2, 0, 0}, // should be in config file
+	{"shutter", 2, 0, 0}, // should be in config file
 	// string options
 	{"slam-config", 1, 0, 0},
 	{"data-path", 1, 0, 0},
@@ -123,9 +127,11 @@ const double PERT_VANG = 3; // rad/s per sqrt(s)
 
 // inertial robot initial uncertainties and perturbations
 //if (intOpts[iRobot] == 1) // == robot inertial
-const double UNCERT_GRAVITY = 10; // m/s^2
-const double PERT_AERR = .032; // m/s per sqrt(s), IMU acc error (MTI = 0.05*sqrt(40Hz/100Hz))
-const double PERT_WERR = .0018; // rad per sqrt(s), IMU gyro error (MTI = 0.001*sqrt(30Hz/100Hz))
+const double UNCERT_GRAVITY = 10.0; // m/s^2
+const double UNCERT_ABIAS = 0.05*17.0;
+const double UNCERT_WBIAS = 0.05*jmath::degToRad(300.0);
+const double PERT_AERR = 0.2*0.001*sqrt(30.0/100.0); // m/s per sqrt(s), IMU acc error (MTI = 0.001*sqrt(40Hz/100Hz))
+const double PERT_WERR = 0.2*jmath::degToRad(0.05)*sqrt(40.0/100.0); // rad per sqrt(s), IMU gyro error (MTI = 0.05*sqrt(30Hz/100Hz))
 const double PERT_RANWALKACC = 0; // m/s^2 per sqrt(s), IMU a_bias random walk
 const double PERT_RANWALKGYRO = 0; // rad/s^2 per sqrt(s), IMU w_bias random walk
 
@@ -206,34 +212,38 @@ void demo_slam01_main(world_ptr_t *world) {
 	if (intOpts[iRobot] == 0)
 	{
 		robconstvel_ptr_t robPtr1_(new RobotConstantVelocity(mapPtr));
-		robPtr1_->setVelocityStd(UNCERT_VLIN,UNCERT_VANG);
+		robPtr1_->setVelocityStd(UNCERT_VLIN, UNCERT_VANG);
+
 		double _v[6] = {
 				PERT_VLIN, PERT_VLIN, PERT_VLIN,
 				PERT_VANG, PERT_VANG, PERT_VANG };
 		vec pertStd = createVector<6>(_v);
+		robPtr1_->perturbation.set_std_continuous(pertStd);
+		robPtr1_->constantPerturbation = false;
 
 		robPtr1 = robPtr1_;
-		robPtr1->perturbation.set_std_continuous(pertStd);
-		robPtr1->constantPerturbation = false;
 	} else
 	if (intOpts[iRobot] == 1)
 	{
 		robinertial_ptr_t robPtr1_(new RobotInertial(mapPtr));
-		robPtr1_->setInitialStd(UNCERT_VLIN, UNCERT_GRAVITY);
+		robPtr1_->setInitialStd(UNCERT_VLIN, UNCERT_ABIAS, UNCERT_WBIAS, UNCERT_GRAVITY);
+
 		double _v[12] = {
 				PERT_AERR, PERT_AERR, PERT_AERR,
 				PERT_WERR, PERT_WERR, PERT_WERR,
 				PERT_RANWALKACC, PERT_RANWALKACC, PERT_RANWALKACC,
 				PERT_RANWALKGYRO, PERT_RANWALKGYRO, PERT_RANWALKGYRO};
 		vec pertStd = createVector<12>(_v);
+		robPtr1_->perturbation.set_std_continuous(pertStd);
+		robPtr1_->constantPerturbation = false;
+
+		boost::shared_ptr<hardware::HardwareEstimatorMti> hardEst1(new hardware::HardwareEstimatorMti("/dev/ttyS0", floatOpts[fFreq], floatOpts[fShutter], 1024, mode, strOpts[sDataPath]));
+		if (intOpts[iTrigger]) floatOpts[fFreq] = hardEst1->getFreq();
+		robPtr1_->setHardwareEstimator(hardEst1);
 
 		robPtr1 = robPtr1_;
-		robPtr1->perturbation.set_std_continuous(pertStd);
-		robPtr1->constantPerturbation = false;
-
-		hardware::hardware_estimator_ptr_t hardEst1(new hardware::HardwareEstimatorMti("/dev/ttyS0", intOpts[iFreq], 2e-3, 1024, mode, strOpts[sDataPath]));
-		robPtr1->setHardwareEstimator(hardEst1);
 	}
+
 	robPtr1->setId();
 	robPtr1->linkToParentMap(mapPtr);
 	robPtr1->pose.x(quaternion::originFrame());
@@ -242,7 +252,13 @@ void demo_slam01_main(world_ptr_t *world) {
 	pinhole_ptr_t senPtr11(new SensorPinHole(robPtr1, MapObject::UNFILTERED));
 	senPtr11->setId();
 	senPtr11->linkToParentRobot(robPtr1);
-	senPtr11->setPose(0,0,0,-90,0,90);
+	if (intOpts[iRobot] == 1)
+	{
+		senPtr11->setPose(0,0,0,90,0,90);
+	} else
+	{
+		senPtr11->setPose(0,0,0,-90,0,-90);
+	}
 	//senPtr11->pose.x(quaternion::originFrame());
 	senPtr11->params.setImgSize(IMG_WIDTH, IMG_HEIGHT);
 	senPtr11->params.setIntrinsicCalibration(intrinsic, distortion, distortion.size());
@@ -264,12 +280,12 @@ void demo_slam01_main(world_ptr_t *world) {
 	
 	#ifdef HAVE_VIAM
 	hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(
-		"0x00b09d01006fb38f", cv::Size(640,480), 0, 8, intOpts[iFreq], intOpts[iTrigger], mode, strOpts[sDataPath]));
+		"0x00b09d01006fb38f", cv::Size(IMG_WIDTH,IMG_HEIGHT), 0, 8, floatOpts[fFreq], intOpts[iTrigger], mode, strOpts[sDataPath]));
 	senPtr11->setHardwareSensor(hardSen11);
 	#else
 	if (intOpts[iReplay])
 	{
-		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(cv::Size(640,480),strOpts[sDataPath]));
+		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(cv::Size(IMG_WIDTH,IMG_HEIGHT),strOpts[sDataPath]));
 		senPtr11->setHardwareSensor(hardSen11);
 	}
 	#endif
@@ -299,8 +315,6 @@ void demo_slam01_main(world_ptr_t *world) {
 		worldPtr->display_mutex.lock();
 		if (intOpts[iRenderAll] && worldPtr->display_rendered != (*world)->t)
 			{ worldPtr->display_mutex.unlock(); boost::this_thread::yield(); continue; }
-		// cout << "\n************************************************** " << endl;
-		// cout << "\n                 FRAME : " << t << " (blocked "
 		chrono.reset();
 
 		// FIXME if intOpts[iRenderAll], manage multisensors : ensure that only 1 sensor is processed, save its time to log it, and ensure that next time next sensor will be tried first
@@ -325,7 +339,10 @@ void demo_slam01_main(world_ptr_t *world) {
 				if (senPtr->acquireRaw() < 0)
 					{ boost::this_thread::yield(); continue; }
 				else had_data=true;
-				cout << "Robot: " << *robPtr << endl;
+// cout << "\n************************************************** " << endl;
+cout << "                 FRAME : " << (*world)->t << endl;
+//				cout << "Robot: " << *robPtr << endl;
+//				cout << "Pert: " << robPtr->perturbation.P() << "\nPert Jac: " << robPtr->XNEW_pert << "\nState pert: " << robPtr->Q << endl;
 //				cout << "Robot state: " << robPtr->state.x() << endl;
 
 				// move the filter time to the data raw.
@@ -549,8 +566,8 @@ void demo_slam01_display(world_ptr_t *world) {
 		 */
 		int main(int argc, char* const* argv)
 		{
-			intOpts[iFreq] = 60;
-			intOpts[iShutter] = 2000;
+			floatOpts[fFreq] = 60.0;
+			floatOpts[fShutter] = 2e-3;
 			strOpts[sDataPath] = ".";
 			
 			while (1)
@@ -565,22 +582,30 @@ void demo_slam01_display(world_ptr_t *world) {
 						intOpts[option_index] = 1;
 						if (optarg) intOpts[option_index] = atoi(optarg);
 					} else
-					if (option_index < nIntOpts+nStrOpts)
+					if (option_index < nIntOpts+nFloatOpts)
 					{
-						if (optarg) strOpts[option_index-nIntOpts] = optarg;
+						if (optarg) floatOpts[option_index-nIntOpts] = atof(optarg);
+					} else
+					if (option_index < nIntOpts+nFloatOpts+nStrOpts)
+					{
+						if (optarg) strOpts[option_index-nIntOpts-nFloatOpts] = optarg;
 					} else
 					{
 						std::cout << "Integer options:" << std::endl;
 						for(int i = 0; i < nIntOpts; ++i)
 							std::cout << "\t--" << long_options[i].name << std::endl;
 						
+						std::cout << "Float options:" << std::endl;
+						for(int i = 0; i < nFloatOpts; ++i)
+							std::cout << "\t--" << long_options[i+nIntOpts].name << std::endl;
+
 						std::cout << "String options:" << std::endl;
 						for(int i = 0; i < nStrOpts; ++i)
-							std::cout << "\t--" << long_options[i+nIntOpts].name << std::endl;
+							std::cout << "\t--" << long_options[i+nIntOpts+nFloatOpts].name << std::endl;
 						
 						std::cout << "Breaking options:" << std::endl;
 						for(int i = 0; i < 2; ++i)
-							std::cout << "\t--" << long_options[i+nIntOpts+nStrOpts].name << std::endl;
+							std::cout << "\t--" << long_options[i+nIntOpts+nFloatOpts+nStrOpts].name << std::endl;
 						
 						return 0;
 					}
@@ -590,7 +615,7 @@ void demo_slam01_display(world_ptr_t *world) {
 				}
 			}
 			
-			if (intOpts[iReplay]) mode = 2; else 
+		if (intOpts[iReplay]) mode = 2; else
 				if (intOpts[iDump]) mode = 1; else
 					mode = 0;
 			

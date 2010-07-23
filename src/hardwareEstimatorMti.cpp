@@ -85,7 +85,7 @@ namespace hardware {
 	}
 
 	HardwareEstimatorMti::HardwareEstimatorMti(std::string device, double freq, double shutter, int bufferSize_, int mode, std::string dump_path):
-		mti(device.c_str(), MTI_OPMODE_BOTH, MTI_OPFORMAT_EULER),
+		mti(device.c_str(), MTI_OPMODE_BOTH, MTI_OPFORMAT_MAT),
 		buffer(bufferSize_, 10), bufferSize(bufferSize_), position(0), reading_pos(-1), read_pos(bufferSize_-1), mode(mode), dump_path(dump_path)
 	{
 		INERTIAL_CONFIG config;
@@ -95,18 +95,19 @@ namespace hardware {
 		// number of acquisitions to skip before syncOut pin actuates
 		
 		const double period = 10e-3; // 10ms = 100Hz
-		config.syncOutSkipFactor = jmath::round(1. / freq / period) - 1; // mark all acquisitions
-		double realfreq = 1. / (period * (config.syncOutSkipFactor + 1) );
-		std::cout << "MTI trigger set to freq " << realfreq << " Hz" << std::endl;
+		config.syncOutSkipFactor = std::floor(1. / freq / period + 0.001) - 1; // mark all acquisitions
+		realFreq = 1. / (period * (config.syncOutSkipFactor + 1) );
+		std::cout << "MTI trigger set to freq " << realFreq << " Hz" << std::endl;
 		// number of clock ticks @ 33.9ns to offset pin action from sensor sampling
 		config.syncOutOffset = 0; // no offset
 		// number of clock ticks @ 33.9ns to define pulse width
 		config.syncOutPulseWidth = shutter/33.9e-9;
+
 		// Set SyncOut settings
-		mti.set_syncOut(config.syncOutMode, config.syncOutPulsePolarity,
+		if (!mti.set_syncOut(config.syncOutMode, config.syncOutPulsePolarity,
 			config.syncOutSkipFactor, config.syncOutOffset,
-			config.syncOutPulseWidth);
-	
+			config.syncOutPulseWidth))
+			std::cout << "mti.set_syncOut failed" << std::endl;
 		for(int i = 0; i < bufferSize; ++i) buffer(i,0) = 0.;
 		// start acquire task
 		preloadTask_thread = new boost::thread(boost::bind(&HardwareEstimatorMti::preloadTask,this));

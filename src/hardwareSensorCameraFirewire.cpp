@@ -75,7 +75,7 @@ namespace hardware {
 		}
 		return hwsize;
 	}
-
+/*
 	viam_hwfps_t HardwareSensorCameraFirewire::freq_to_viamFreq(double freq)
 	{
 		viam_hwfps_t hwfreq;
@@ -89,6 +89,22 @@ namespace hardware {
 			hwfreq = VIAM_HWFPS_240;
 		return hwfreq;
 	}
+*/
+	viam_hwfps_t HardwareSensorCameraFirewire::freq_to_viamFreq(double freq)
+	{
+		freq -= 0.1;
+		viam_hwfps_t hwfreq;
+		if (freq <= 1.875) hwfreq = VIAM_HWFPS_1_875; else
+		if (freq <= 3.75) hwfreq = VIAM_HWFPS_3_75; else
+		if (freq <= 7.5) hwfreq = VIAM_HWFPS_7_5; else
+		if (freq <= 15) hwfreq = VIAM_HWFPS_15; else
+		if (freq <= 30) hwfreq = VIAM_HWFPS_30; else
+		if (freq <= 60) hwfreq = VIAM_HWFPS_60; else
+		if (freq <= 120) hwfreq = VIAM_HWFPS_120; else
+			hwfreq = VIAM_HWFPS_240;
+		return hwfreq;
+	}
+
 	
 	viam_hwformat_t HardwareSensorCameraFirewire::format_to_viamFormat(int format, int depth)
 	{
@@ -256,11 +272,8 @@ namespace hardware {
 	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(const std::string &camera_id, cv::Size size, int format, int depth, double freq, bool trigger, int mode, std::string dump_path)
 	{
 		viam_hwmode_t hwmode = { size_to_viamSize(size), format_to_viamFormat(format, depth), VIAM_HW_FIXED, freq_to_viamFreq(freq), trigger_to_viamTrigger(trigger) };
-		if (trigger == 0)
-		{
-			double realfreq = viamFreq_to_freq(hwmode.fps);
-			std::cout << "Camera set to freq " << realfreq << " Hz" << std::endl;
-		}
+		realFreq = viamFreq_to_freq(hwmode.fps);
+		std::cout << "Camera set to freq " << realFreq << " Hz (external trigger " << trigger << ")" << std::endl;
 		init(camera_id, hwmode, mode, dump_path);
 	}
 #endif

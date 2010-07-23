@@ -179,7 +179,7 @@ namespace hardware {
 					std::fstream f((oss.str() + std::string(".time")).c_str(), std::ios_base::in);
 					f >> bufferPtr[buff_write]->timestamp; f.close();
 					last_processed_index = index;
-				} else continue;
+				} else  { boost::this_thread::yield(); continue; }
 			} else
 			{
 #ifdef HAVE_VIAM

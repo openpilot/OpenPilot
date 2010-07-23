@@ -207,7 +207,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		robinertial_ptr_t robPtr1_(new RobotInertial(mapPtr));
 		
 		robPtr1 = robPtr1_;
-		hardware::hardware_estimator_ptr_t hardEst1(new hardware::HardwareEstimatorMti("/dev/ttyS1", intOpts[iFreq], 2e-3, 256));
+		hardware::hardware_estimator_ptr_t hardEst1(new hardware::HardwareEstimatorMti("/dev/ttyS1", intOpts[iFreq], 2e-3, 1024, mode, strOpts[sDataPath]));
 		robPtr1->setHardwareEstimator(hardEst1);
 	}
 	robPtr1->setId();
@@ -303,7 +303,7 @@ void demo_slam01_main(world_ptr_t *world) {
 
 				// get raw-data
 				if (senPtr->acquireRaw() < 0)
-					continue;
+					{ boost::this_thread::yield(); continue; }
 				else had_data=true;
 
 				// move the filter time to the data raw.

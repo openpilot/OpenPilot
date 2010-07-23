@@ -118,15 +118,15 @@ const unsigned MAP_SIZE = 313;
 // robot initial uncertainties and per-step perturbations
 const double UNCERT_VLIN = .1; // m/s
 const double UNCERT_VANG = .1; // rad/s
-const double PERT_VLIN = 1; // m/s per sqrt(s)
-const double PERT_VANG = 3; // rad/s per sqrt(s)
+const double PERT_VLIN = 2; // m/s per sqrt(s)
+const double PERT_VANG = 2; // rad/s per sqrt(s)
 
 // pin-hole:
 const unsigned IMG_WIDTH = 640;
 const unsigned IMG_HEIGHT = 480;
 const double INTRINSIC[4] = { 301.27013,   266.86136,   497.28243,   496.81116 };
 const double DISTORTION[2] = { -0.23193,   0.11306 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
-const double PIX_NOISE = .4;
+const double PIX_NOISE = .5;
 
 // lmk management
 const double D_MIN = 1;
@@ -134,12 +134,12 @@ const double REPARAM_TH = 0.1;
 
 // data manager: quick Harris detector
 const unsigned HARRIS_CONV_SIZE = 5;
-const double HARRIS_TH = 7.0;
+const double HARRIS_TH = 15.0;
 const double HARRIS_EDDGE = 3.0;
 const unsigned PATCH_DESC = 45;
 
 // data manager: zncc matcher and one-point-ransac
-const unsigned PATCH_SIZE = 15; // in pixels
+const unsigned PATCH_SIZE = 13; // in pixels
 const double MATCH_TH = 0.90;
 const double MAHALANOBIS_TH = 3; // in n_sigmas
 const unsigned N_UPDATES_TOTAL = 25;
@@ -147,10 +147,7 @@ const unsigned N_UPDATES_RANSAC = 20;
 const unsigned N_INIT = 10;
 const unsigned N_RECOMP_GAINS = 3;
 const double RANSAC_LOW_INNOV = 1.0; // in pixels
-<<<<<<< HEAD
 
-=======
->>>>>>> 2a1195cd496c74b0cd431a0a3f850f44f76e92ed
 #if RANSAC
 const unsigned RANSAC_NTRIES = 6;
 #else
@@ -160,8 +157,8 @@ const double MIN_SCORE = 0.8;
 const double PARTIAL_POSITION = 0.25;
 
 // data manager: active search tesselation grid
-const unsigned GRID_VCELLS = 4;
-const unsigned GRID_HCELLS = 5;
+const unsigned GRID_VCELLS = 3;
+const unsigned GRID_HCELLS = 4;
 const unsigned GRID_MARGIN = 11;
 const unsigned GRID_SEPAR = 20;
 

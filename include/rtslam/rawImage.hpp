@@ -39,15 +39,8 @@ namespace jafar {
 
 
 				jafarImage_ptr_t img;
-				QuickHarrisDetector quickHarrisDetector;
 
 				void setJafarImage(jafarImage_ptr_t img) ;
-
-//				virtual bool detect(const detect_method met, const feature_ptr_t & featPtr, ROI* roiPtr = 0) ;
-//				virtual bool match(const match_method met, const appearance_ptr_t & targetApp, cv::Rect &roi, Measurement & measure, const appearance_ptr_t & app);
-				
-				void extractAppearance(const jblas::veci & pos, appearance_ptr_t & appPtr);
-				private:
 
 		};
 	}

@@ -29,7 +29,7 @@ namespace jafar {
 				DescriptorAbstract();
 				virtual ~DescriptorAbstract();
 
-				bool predictAppearance(observation_ptr_t & obsPtr) {
+				virtual bool predictAppearance(observation_ptr_t & obsPtr) {
 					cout << __FILE__ << ":" << __LINE__ << endl;
 					return false;}
 

@@ -48,6 +48,9 @@
 #include "rtslam/display_qt.hpp"
 #include "rtslam/display_gdhe.hpp"
 
+#include "rtslam/simuData.hpp"
+#include "rtslam/simuRawProcessors.hpp"
+
 using namespace jblas;
 using namespace jafar;
 using namespace jafar::jmath;
@@ -61,6 +64,7 @@ typedef ImagePointObservationMaker<ObservationPinHoleAnchoredHomogeneousPoint, S
     LandmarkAnchoredHomogeneousPoint, SensorAbstract::PINHOLE, LandmarkAbstract::PNT_AH> PinholeAhpObservationMaker;
 
 typedef DataManagerOnePointRansac<RawImage, SensorPinHole, FeatureImagePoint, image::ConvexRoi, ActiveSearchGrid, ImagePointHarrisDetector, ImagePointZnccMatcher> DataManager_ImagePoint_Ransac;
+typedef DataManagerOnePointRansac<simu::RawSimu, SensorPinHole, simu::FeatureSimu, image::ConvexRoi, ActiveSearchGrid, simu::DetectorSimu<image::ConvexRoi>, simu::MatcherSimu<image::ConvexRoi> > DataManager_ImagePoint_Ransac_Simu;
 
 ///##############################################
 
@@ -71,7 +75,7 @@ time_t rseed;
 
 ///##############################################
 
-enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iLog, iVerbose, iRobot, iTrigger, nIntOpts };
+enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iLog, iVerbose, iRobot, iTrigger, iSimu, nIntOpts };
 int intOpts[nIntOpts] = {0};
 
 enum { fFreq = 0, fShutter, nFloatOpts };
@@ -94,6 +98,7 @@ struct option long_options[] = {
 	{"verbose", 2, 0, 0},
 	{"robot", 2, 0, 0}, // should be in config file
 	{"trigger", 2, 0, 0}, // should be in config file
+	{"simu", 2, 0, 0},
 	// double options
 	{"freq", 2, 0, 0}, // should be in config file
 	{"shutter", 2, 0, 0}, // should be in config file
@@ -141,6 +146,7 @@ const unsigned IMG_HEIGHT = 480;
 const double INTRINSIC[4] = { 301.27013,   266.86136,   497.28243,   496.81116 };
 const double DISTORTION[2] = { -0.23193,   0.11306 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
 const double PIX_NOISE = .5;
+const double SIMU_PIX_NOISE = .5;
 
 // lmk management
 const double D_MIN = .5;
@@ -237,8 +243,20 @@ void demo_slam01_main(world_ptr_t *world) {
 		robPtr1_->perturbation.set_std_continuous(pertStd);
 		robPtr1_->constantPerturbation = false;
 
-		boost::shared_ptr<hardware::HardwareEstimatorMti> hardEst1(new hardware::HardwareEstimatorMti("/dev/ttyS0", floatOpts[fFreq], floatOpts[fShutter], 1024, mode, strOpts[sDataPath]));
-		if (intOpts[iTrigger]) floatOpts[fFreq] = hardEst1->getFreq();
+		hardware::hardware_estimator_ptr_t hardEst1;
+		if (intOpts[iSimu] == 1)
+		{
+			// TODO
+			//boost::shared_ptr<hardware::HardwareEstimatorSimu> hardEst1_(new hardware::HardwareEstimatorSimu(
+			//	"/dev/ttyS0", floatOpts[fFreq], floatOpts[fShutter], 1024, mode, strOpts[sDataPath]));
+			//hardEst1 = hardEst1_;
+		} else
+		{
+			boost::shared_ptr<hardware::HardwareEstimatorMti> hardEst1_(new hardware::HardwareEstimatorMti(
+				"/dev/ttyS0", floatOpts[fFreq], floatOpts[fShutter], 1024, mode, strOpts[sDataPath]));
+			if (intOpts[iTrigger]) floatOpts[fFreq] = hardEst1_->getFreq();
+			hardEst1 = hardEst1_;
+		}
 		robPtr1_->setHardwareEstimator(hardEst1);
 
 		robPtr1 = robPtr1_;
@@ -266,29 +284,46 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	// 3b. Create data manager.
 	boost::shared_ptr<ActiveSearchGrid> asGrid(new ActiveSearchGrid(IMG_WIDTH, IMG_HEIGHT, GRID_HCELLS, GRID_VCELLS, GRID_MARGIN, GRID_SEPAR));
-	boost::shared_ptr<ImagePointHarrisDetector> harrisDetector(new ImagePointHarrisDetector(HARRIS_CONV_SIZE, HARRIS_TH, HARRIS_EDDGE, PATCH_DESC, PIX_NOISE));
-//	boost::shared_ptr<correl::Explorer<correl::Zncc> > znccMatcher(new correl::Explorer<correl::Zncc>());
-	boost::shared_ptr<ImagePointZnccMatcher> znccMatcher(new ImagePointZnccMatcher(MIN_SCORE, PARTIAL_POSITION, PATCH_SIZE, RANSAC_LOW_INNOV, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE));
 	
-	boost::shared_ptr<DataManager_ImagePoint_Ransac> dmPt11(new DataManager_ImagePoint_Ransac(harrisDetector, znccMatcher, asGrid, N_UPDATES_TOTAL, N_UPDATES_RANSAC, RANSAC_NTRIES, N_INIT, N_RECOMP_GAINS));
-	
-
-	dmPt11->linkToParentSensorSpec(senPtr11);
-	dmPt11->linkToParentMapManager(mmPoint);
-	dmPt11->setObservationFactory(obsFact);
-
-	
-	#ifdef HAVE_VIAM
-	hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(
-		"0x00b09d01006fb38f", cv::Size(IMG_WIDTH,IMG_HEIGHT), 0, 8, floatOpts[fFreq], intOpts[iTrigger], mode, strOpts[sDataPath]));
-	senPtr11->setHardwareSensor(hardSen11);
-	#else
-	if (intOpts[iReplay])
+	if (intOpts[iSimu] == 1)
 	{
-		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(cv::Size(IMG_WIDTH,IMG_HEIGHT),strOpts[sDataPath]));
+		boost::shared_ptr<simu::DetectorSimu<image::ConvexRoi> > detector(new simu::DetectorSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, PATCH_DESC, PIX_NOISE, SIMU_PIX_NOISE));
+		boost::shared_ptr<simu::MatcherSimu<image::ConvexRoi> > matcher(new simu::MatcherSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, PATCH_SIZE, RANSAC_LOW_INNOV, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE, SIMU_PIX_NOISE));
+		
+		boost::shared_ptr<DataManager_ImagePoint_Ransac_Simu> dmPt11(new DataManager_ImagePoint_Ransac_Simu(detector, matcher, asGrid, N_UPDATES_TOTAL, N_UPDATES_RANSAC, RANSAC_NTRIES, N_INIT, N_RECOMP_GAINS));
+
+		dmPt11->linkToParentSensorSpec(senPtr11);
+		dmPt11->linkToParentMapManager(mmPoint);
+		dmPt11->setObservationFactory(obsFact);
+		
+		// TODO
+		//hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorAdhocSimulator());
+		//senPtr11->setHardwareSensor(hardSen11);
+	} else
+	{
+		boost::shared_ptr<ImagePointHarrisDetector> harrisDetector(new ImagePointHarrisDetector(HARRIS_CONV_SIZE, HARRIS_TH, HARRIS_EDDGE, PATCH_DESC, PIX_NOISE));
+	//	boost::shared_ptr<correl::Explorer<correl::Zncc> > znccMatcher(new correl::Explorer<correl::Zncc>());
+		boost::shared_ptr<ImagePointZnccMatcher> znccMatcher(new ImagePointZnccMatcher(MIN_SCORE, PARTIAL_POSITION, PATCH_SIZE, RANSAC_LOW_INNOV, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE));
+		
+		boost::shared_ptr<DataManager_ImagePoint_Ransac> dmPt11(new DataManager_ImagePoint_Ransac(harrisDetector, znccMatcher, asGrid, N_UPDATES_TOTAL, N_UPDATES_RANSAC, RANSAC_NTRIES, N_INIT, N_RECOMP_GAINS));
+
+		dmPt11->linkToParentSensorSpec(senPtr11);
+		dmPt11->linkToParentMapManager(mmPoint);
+		dmPt11->setObservationFactory(obsFact);
+
+		
+		#ifdef HAVE_VIAM
+		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(
+			"0x00b09d01006fb38f", cv::Size(IMG_WIDTH,IMG_HEIGHT), 0, 8, floatOpts[fFreq], intOpts[iTrigger], mode, strOpts[sDataPath]));
 		senPtr11->setHardwareSensor(hardSen11);
+		#else
+		if (intOpts[iReplay])
+		{
+			hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(cv::Size(IMG_WIDTH,IMG_HEIGHT),strOpts[sDataPath]));
+			senPtr11->setHardwareSensor(hardSen11);
+		}
+		#endif
 	}
-	#endif
 	
 
 	// Show empty map

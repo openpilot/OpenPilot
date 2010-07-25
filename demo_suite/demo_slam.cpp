@@ -48,8 +48,8 @@
 #include "rtslam/display_qt.hpp"
 #include "rtslam/display_gdhe.hpp"
 
-#include "rtslam/simuData.hpp"
 #include "rtslam/simuRawProcessors.hpp"
+#include "rtslam/hardwareSensorAdhocSimulator.hpp"
 
 using namespace jblas;
 using namespace jafar;
@@ -146,7 +146,7 @@ const unsigned IMG_HEIGHT = 480;
 const double INTRINSIC[4] = { 301.27013,   266.86136,   497.28243,   496.81116 };
 const double DISTORTION[2] = { -0.23193,   0.11306 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
 const double PIX_NOISE = .5;
-const double SIMU_PIX_NOISE = .5;
+const double PIX_NOISE_SIMUFACTOR = 1.0;
 
 // lmk management
 const double D_MIN = .5;
@@ -212,6 +212,20 @@ void demo_slam01_main(world_ptr_t *world) {
 	    LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint> ());
 	mmPoint->linkToParentMap(mapPtr);
 
+	boost::shared_ptr<simu::AdhocSimulator> simulator;
+	if (intOpts[iSimu] == 1)
+	{
+		simulator.reset(new simu::AdhocSimulator());
+		jblas::vec3 pose;
+		for(int i = -6; i <= 6; ++i)
+			for(int j = -3; j <= 7; ++j)
+			{
+				pose(0) = i*1.0; pose(1) = j*1.0; pose(2) = 0.0;
+				simu::Landmark *lmk = new simu::Landmark(LandmarkAbstract::POINT, pose);
+				simulator->addLandmark(lmk);
+			}
+	}
+
 
 	// 2. Create robots.
 	robot_ptr_t robPtr1;
@@ -266,13 +280,28 @@ void demo_slam01_main(world_ptr_t *world) {
 	robPtr1->linkToParentMap(mapPtr);
 	robPtr1->pose.x(quaternion::originFrame());
 
+	if (intOpts[iSimu] == 1)
+	{
+		simu::Robot *rob = new simu::Robot(robPtr1->id(), 6);
+		double VEL = 0.5;
+		rob->addWaypoint(0,0,0, 0,0,0, 0,0,0, 0,0,0);
+		rob->addWaypoint(1,0,0, 0,0,0, VEL,0,0, 0,0,0);
+		rob->addWaypoint(3,2,0, 0,0,0, 0,VEL,0, 0,0,0);
+		rob->addWaypoint(1,4,0, 0,0,0, -VEL,0,0, 0,0,0);
+		rob->addWaypoint(-1,4,0, 0,0,0, -VEL,0,0, 0,0,0);
+		rob->addWaypoint(-3,2,0, 0,0,0, 0,-VEL,0, 0,0,0);
+		rob->addWaypoint(-1,0,0, 0,0,0, VEL,0,0, 0,0,0);
+		rob->addWaypoint(0,0,0, 0,0,0, 0,0,0, 0,0,0);
+	}
+	
+	
 	// 3. Create sensors.
 	pinhole_ptr_t senPtr11(new SensorPinHole(robPtr1, MapObject::UNFILTERED));
 	senPtr11->setId();
 	senPtr11->linkToParentRobot(robPtr1);
 	if (intOpts[iRobot] == 1)
 	{
-		senPtr11->setPose(0,0,0,90,0,90);
+		senPtr11->setPose(0,0,0,90,0,90); // x,y,z,roll,pitch,yaw
 	} else
 	{
 		senPtr11->setPose(0,0,0,-90,0,-90);
@@ -282,13 +311,24 @@ void demo_slam01_main(world_ptr_t *world) {
 	senPtr11->params.setIntrinsicCalibration(intrinsic, distortion, distortion.size());
 	senPtr11->params.setMiscellaneous(1.0, 0.1);
 
+	if (intOpts[iSimu] == 1)
+	{
+		jblas::vec6 pose;
+		subrange(pose, 0, 3) = subrange(senPtr11->pose.x(), 0, 3);
+		subrange(pose, 3, 6) = quaternion::q2e(subrange(senPtr11->pose.x(), 3, 7));
+		std::swap(pose(3), pose(5)); // FIXME-EULER-CONVENTION
+		simu::Sensor *sen = new simu::Sensor(senPtr11->id(), pose, senPtr11);
+		simulator->addSensor(robPtr1->id(), sen);
+		// FIXME simulator->addObservationModel(senPtr11->type, LandmarkAbstract::POINT, new ObservationPinHoleEuclideanPoint());
+	}
+	
 	// 3b. Create data manager.
 	boost::shared_ptr<ActiveSearchGrid> asGrid(new ActiveSearchGrid(IMG_WIDTH, IMG_HEIGHT, GRID_HCELLS, GRID_VCELLS, GRID_MARGIN, GRID_SEPAR));
 	
 	if (intOpts[iSimu] == 1)
 	{
-		boost::shared_ptr<simu::DetectorSimu<image::ConvexRoi> > detector(new simu::DetectorSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, PATCH_DESC, PIX_NOISE, SIMU_PIX_NOISE));
-		boost::shared_ptr<simu::MatcherSimu<image::ConvexRoi> > matcher(new simu::MatcherSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, PATCH_SIZE, RANSAC_LOW_INNOV, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE, SIMU_PIX_NOISE));
+		boost::shared_ptr<simu::DetectorSimu<image::ConvexRoi> > detector(new simu::DetectorSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, PATCH_DESC, PIX_NOISE, PIX_NOISE*PIX_NOISE_SIMUFACTOR));
+		boost::shared_ptr<simu::MatcherSimu<image::ConvexRoi> > matcher(new simu::MatcherSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, PATCH_SIZE, RANSAC_LOW_INNOV, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE, PIX_NOISE*PIX_NOISE_SIMUFACTOR));
 		
 		boost::shared_ptr<DataManager_ImagePoint_Ransac_Simu> dmPt11(new DataManager_ImagePoint_Ransac_Simu(detector, matcher, asGrid, N_UPDATES_TOTAL, N_UPDATES_RANSAC, RANSAC_NTRIES, N_INIT, N_RECOMP_GAINS));
 
@@ -296,9 +336,8 @@ void demo_slam01_main(world_ptr_t *world) {
 		dmPt11->linkToParentMapManager(mmPoint);
 		dmPt11->setObservationFactory(obsFact);
 		
-		// TODO
-		//hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorAdhocSimulator());
-		//senPtr11->setHardwareSensor(hardSen11);
+		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorAdhocSimulator(floatOpts[fFreq], simulator, senPtr11->id(), robPtr1->id()));
+		senPtr11->setHardwareSensor(hardSen11);
 	} else
 	{
 		boost::shared_ptr<ImagePointHarrisDetector> harrisDetector(new ImagePointHarrisDetector(HARRIS_CONV_SIZE, HARRIS_TH, HARRIS_EDDGE, PATCH_DESC, PIX_NOISE));

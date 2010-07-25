@@ -26,6 +26,8 @@ namespace simu {
 			LandmarkAbstract::geometry_t type;
 			size_t id;
 		public:
+			AppearanceSimu() {}
+			AppearanceSimu(LandmarkAbstract::geometry_t type, size_t id): type(type), id(id) {}
 			AppearanceAbstract* clone() { return new AppearanceSimu(*this); }
 			
 		
@@ -34,6 +36,9 @@ namespace simu {
 	class FeatureSimu: public rtslam::FeatureAbstract
 	{
 		public:
+			FeatureSimu() {}
+			FeatureSimu(jblas::vec meas, LandmarkAbstract::geometry_t type, size_t id):
+				FeatureAbstract(meas.size(), appearance_ptr_t(new AppearanceSimu(type, id))) { measurement.x() = meas; }
 			FeatureSimu(int size): FeatureAbstract(size, appearance_ptr_t(new AppearanceSimu())) {}
 	};
 	
@@ -59,10 +64,6 @@ namespace simu {
 		public:
 			typedef std::map<size_t,FeatureSimu> ObsList;
 			ObsList obs;
-			
-			void extractAppearance(const jblas::veci & pos, appearance_ptr_t & appPtr);
-			private:
-
 	};
 	
 	

@@ -52,6 +52,7 @@ namespace jafar {
 				appearance_ptr_t appearancePtr;
 				Measurement measurement;
 
+				FeatureAbstract(): measurement(0) {}
 				FeatureAbstract(size_t size, appearance_ptr_t appearancePtr_) : 
 					appearancePtr(appearancePtr_), measurement(size)
 				{

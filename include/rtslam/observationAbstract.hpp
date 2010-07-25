@@ -51,6 +51,8 @@ namespace jafar {
 		using namespace std;
 		using namespace jblas;
 
+		class ObservationAbstract;
+		typedef ObservationAbstract ObservationModelAbstract;
 
 
 		/**

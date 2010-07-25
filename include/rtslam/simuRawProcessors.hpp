@@ -15,6 +15,7 @@
 
 #include "jmath/random.hpp"
 #include "rtslam/landmarkAbstract.hpp"
+#include "rtslam/simuData.hpp"
 
 namespace jafar {
 namespace rtslam {

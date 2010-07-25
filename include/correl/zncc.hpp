@@ -139,7 +139,7 @@ namespace jafar {
 			
 			// finish
 // std::cout << "fast: zncc_sum " << zncc_sum << ", count " << count << ", mean12 " << mean12 << ", sigma12 " << sigma12 << std::endl;
-			double score = (zncc_sum - count*mean12) / (sigma12);
+			double score = (sigma12 < 1e-6 ? -1 : (zncc_sum - count*mean12) / (sigma12));
 			
 //std::cout << im2.getROI() << ": score " << score << ", estimated at " << partialLine << ": " << best_score1 << " / " << best_score2 << std::endl;
 //JFR_ASSERT(score <= best_score1+1e-6, "score1 est not upper bound");

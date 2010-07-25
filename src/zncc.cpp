@@ -46,7 +46,7 @@ namespace correl {
 		int step2 = im2.step1() - width;
 		
 		double mean1 = 0., mean2 = 0.;
-		double sigma1 = 0., sigma2 = 0.;
+		double sigma1 = 0., sigma2 = 0., sigma12 = 0.;
 		double zncc_sum = 0.;
 		double zncc_count = 0.;
 		double zncc_total = 0.;
@@ -104,8 +104,9 @@ namespace correl {
 		mean2 /= zncc_count;
 		sigma1 = sqrt(sigma1/zncc_count - mean1*mean1);
 		sigma2 = sqrt(sigma2/zncc_count - mean2*mean2);
+		sigma12 = sigma1*sigma2;
 // std::cout << "normal: zncc_sum " << zncc_sum << ", count " << zncc_count << ", mean12 " << mean1*mean2 << ", sigma12 " << sigma1*sigma2 << std::endl;
-		zncc_sum = (zncc_sum/zncc_count - mean1*mean2) / (sigma1*sigma2);
+		zncc_sum = (sigma12 < 1e-6 ? -1 : (zncc_sum/zncc_count - mean1*mean2) / sigma12);
 		
 		JFR_ASSERT(zncc_sum >= -1.01, "");
 		return zncc_sum;

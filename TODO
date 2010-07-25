@@ -8,7 +8,10 @@ Features
 
 - estimation hardware <- IN PROGRESS FOR MTI
 - make rtslam Loggable with DataLogger
-- set up simulation, and see if we can use ORS
+- set up simulation
+- config files:
+  * slam-config: description of robots, sensors, hardware, calib, with uncertainties and their simu-factor
+  * env-config: a simulated environment with description of landmarks, robots and sensors trajectories
 
 Organization
 ------------------------------------

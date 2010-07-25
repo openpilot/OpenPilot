@@ -81,7 +81,7 @@ namespace display {
 			framenumber = slamSen_->rawCounter;
 			t = slamSen_->rawPtr->timestamp;
 			raw_ptr_t raw = slamSen_->getRaw();
-			if (raw) image = static_cast<RawImage&>(*raw).img->clone();
+			if (raw) image = PTR_CAST<RawImage&>(*raw).img->clone();
 			pose = slamSen_->robotPtr()->pose.x();
 			
 		}
@@ -99,11 +99,12 @@ namespace display {
 				
 				vec3 position = ublas::subrange(pose,0,3) * 100.0;
 				vec3 euler = quaternion::q2e(ublas::subrange(pose,3,7)) * 180./M_PI;
+				std::swap(euler(0), euler(2)); // FIXME-EULER-CONVENTION
 				oss.str("");
 //std::cout << pose << " ; " << position << " ; " << euler << std::endl;
 				oss << "[" <<  std::setfill(' ') << std::setw(4) << (int)position(0) << ", " <<  
 					std::setw(4) << (int)position(1) << ", " <<  std::setw(4) << (int)position(2) << "] cm ; ["
-					<< std::setw(4) << (int)euler(2) << ", " <<  std::setw(4) << (int)euler(1) << ", " <<  std::setw(4) << (int)euler(0) << "] deg";
+					<< std::setw(4) << (int)euler(0) << ", " <<  std::setw(4) << (int)euler(1) << ", " <<  std::setw(4) << (int)euler(2) << "] deg";
 				sensorpose_label->setPlainText(oss.str().c_str());
 				
 				break; }

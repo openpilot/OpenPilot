@@ -33,7 +33,7 @@ namespace jafar {
 			setPrior(prior);
 //			id() = landmarkPtr()->id();
 			// TODO: is this cast necessary? Change the arg of the setup if not.
-			//linkToPinHole(boost::dynamic_pointer_cast<SensorPinHole>
+			//linkToPinHole(SPTR_CAST<SensorPinHole>
 			//	      (pinholePtr));
 			//linkToParentEUC(eucPtr);
 			predictedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
@@ -128,8 +128,8 @@ namespace jafar {
 		
 
 		void ObservationPinHoleEuclideanPoint::predictAppearance_func() {
-			desc_img_pnt_ptr_t descPtr = boost::static_pointer_cast<DescriptorImagePoint>(landmarkPtr()->descriptorPtr);
-			obs_ph_euc_ptr_t _this = boost::static_pointer_cast<ObservationPinHoleEuclideanPoint>(shared_from_this());
+			desc_img_pnt_ptr_t descPtr = SPTR_CAST<DescriptorImagePoint>(landmarkPtr()->descriptorPtr);
+			obs_ph_euc_ptr_t _this = SPTR_CAST<ObservationPinHoleEuclideanPoint>(shared_from_this());
 			descPtr->predictAppearance(_this);
 		}
 

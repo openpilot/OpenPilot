@@ -133,7 +133,7 @@ namespace jafar {
 			// project lmk
 			vec lmk = landmarkPtr()->state.x();
 			vec exp, nobs;
-			project_func(sg, lmk, exp, nobs, EXP_sg, EXP_l);
+			model->project_func(sg, lmk, exp, nobs, EXP_sg, EXP_l);
 
 			// chain rule for Jacobians
 			mat EXP_rs = prod(EXP_sg, SG_rs);
@@ -162,7 +162,7 @@ namespace jafar {
 			vec pix = measurement.x();
 			vec invDist = prior.x();
 			vec lmk(landmarkPtr()->mySize());
-			backProject_func(sg, pix, invDist, lmk, LMK_sg, LMK_meas, LMK_prior);
+			model->backProject_func(sg, pix, invDist, lmk, LMK_sg, LMK_meas, LMK_prior);
 
 			landmarkPtr()->state.x(lmk);
 

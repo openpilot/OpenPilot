@@ -319,7 +319,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		std::swap(pose(3), pose(5)); // FIXME-EULER-CONVENTION
 		simu::Sensor *sen = new simu::Sensor(senPtr11->id(), pose, senPtr11);
 		simulator->addSensor(robPtr1->id(), sen);
-		// FIXME simulator->addObservationModel(senPtr11->type, LandmarkAbstract::POINT, new ObservationPinHoleEuclideanPoint());
+		simulator->addObservationModel(robPtr1->id(), senPtr11->id(), LandmarkAbstract::POINT, new ObservationModelPinHoleEuclideanPoint(senPtr11));
 	}
 	
 	// 3b. Create data manager.

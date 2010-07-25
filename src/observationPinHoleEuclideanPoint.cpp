@@ -20,9 +20,18 @@ namespace jafar {
 		using namespace jblas;
 		using namespace ublas;
 
+		ObservationModelPinHoleEuclideanPoint::ObservationModelPinHoleEuclideanPoint(
+		    const sensor_ptr_t & pinholePtr)
+		{
+			init_sizes();
+			linkToSensorSpecific(pinholePtr);
+		}
+
 		ObservationPinHoleEuclideanPoint::ObservationPinHoleEuclideanPoint(
 		    const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr) :
 			ObservationAbstract(pinholePtr, eucPtr, 2, 1) {
+			modelSpec.reset(new ObservationModelPinHoleEuclideanPoint());
+			model = modelSpec;
 			type = PNT_PH_EUC;
 		}
 
@@ -42,11 +51,11 @@ namespace jafar {
 		}
 
 
-		void ObservationPinHoleEuclideanPoint::project_func(const vec7 & sg,
+		void ObservationModelPinHoleEuclideanPoint::project_func(const vec7 & sg,
 		    const vec & lmk, vec & exp, vec & dist) {
 			// resize input vectors
-			exp.resize(expectation.size());
-			dist.resize(prior.size());
+			exp.resize(exp_size);
+			dist.resize(prior_size);
 
 			// Some temps of known size
 			vec3 v;
@@ -56,11 +65,11 @@ namespace jafar {
 			exp = pinhole::projectPoint(pinHolePtr()->params.intrinsic, pinHolePtr()->params.distortion, v);
 		}
 
-		void ObservationPinHoleEuclideanPoint::project_func(const vec7 & sg,
+		void ObservationModelPinHoleEuclideanPoint::project_func(const vec7 & sg,
 		    const vec & lmk, vec & exp, vec & dist, mat & EXP_sg, mat & EXP_lmk) {
 			// resize input vectors
-			exp.resize(expectation.size());
-			dist.resize(prior.size());
+			exp.resize(exp_size);
+			dist.resize(prior_size);
 
 			// Some temps of known size
 			vec3 v;
@@ -79,7 +88,7 @@ namespace jafar {
 			EXP_lmk = prod(EXP_v, V_lmk);
 		}
 
-		void ObservationPinHoleEuclideanPoint::backProject_func(const vec7 & sg,
+		void ObservationModelPinHoleEuclideanPoint::backProject_func(const vec7 & sg,
 		    const vec & meas, const vec & nobs, vec & euc) {
 
 			vec3 v;
@@ -91,7 +100,7 @@ namespace jafar {
 			euc = quaternion::eucFromFrame(sg, v);
 		}
 
-		void ObservationPinHoleEuclideanPoint::backProject_func(const vec7 & sg,
+		void ObservationModelPinHoleEuclideanPoint::backProject_func(const vec7 & sg,
 		    const vec & meas, const vec & nobs, vec & euc, mat & EUC_sg,
 		    mat & EUC_meas, mat & EUC_nobs) {
 
@@ -118,10 +127,9 @@ namespace jafar {
 
 		}
 
-		bool ObservationPinHoleEuclideanPoint::predictVisibility_func(sensor_ptr_t sensorPtr, jblas::vec x, jblas::vec nobs)
+		bool ObservationModelPinHoleEuclideanPoint::predictVisibility_func(jblas::vec x, jblas::vec nobs)
 		{
-			boost::shared_ptr<SensorPinHole> pinHolePtr = SPTR_CAST<SensorPinHole>(sensorPtr);
-			bool inimg = pinhole::isInImage(x, pinHolePtr->params.width, pinHolePtr->params.height);
+			bool inimg = pinhole::isInImage(x, pinHolePtr()->params.width, pinHolePtr()->params.height);
 			bool infront = (nobs(0) > 0.0);
 			return inimg && infront;
 		}

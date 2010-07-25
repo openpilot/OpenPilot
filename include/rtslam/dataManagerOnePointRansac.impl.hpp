@@ -541,7 +541,7 @@ namespace jafar {
 //JFR_DEBUG("lmk " << lmk << " was " << obsPtr->landmarkPtr()->state.x());
 //(dbg)			obsPtr->project_func(obsPtr->sensorPtr()->globalPose(), obsPtr->landmarkPtr()->state.x(), exp, nobs);
 //JFR_DEBUG("exp online " << exp);
-			obsPtr->project_func(senGlobPose, lmk, exp, nobs);
+			obsPtr->model->project_func(senGlobPose, lmk, exp, nobs);
 //JFR_DEBUG("exp offline " << exp);
 
 			// Assignments: 

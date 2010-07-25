@@ -51,8 +51,74 @@ namespace jafar {
 		using namespace std;
 		using namespace jblas;
 
-		class ObservationAbstract;
-		typedef ObservationAbstract ObservationModelAbstract;
+		/**
+		An observation model only contains pseudo-static functions
+		A reference to the sensor is kepts because it has a lot of parameters that
+		cannot easily be abstracted, and to avoid to cast an abstract sensor object every time.
+		*/
+		class ObservationModelAbstract
+		{
+			public:
+				typedef boost::weak_ptr<SensorAbstract> sensor_wptr_t;
+			protected:
+				sensor_wptr_t sensorWPtr;
+			public:
+				void linkToSensor( sensor_ptr_t ptr )
+				{
+					sensorWPtr = ptr;
+				}
+				sensor_ptr_t sensorPtr( void )
+				{
+					sensor_ptr_t sptr = sensorWPtr.lock();
+					if (!sptr) {
+						std::cerr << __FILE__ << ":" << __LINE__ << " ObsSpec::sensor threw weak" << std::endl;
+						throw "WEAK";
+					}
+					return sptr;
+				}
+				// Cast to specific sensor type in the specialized task.
+				virtual void linkToSensorSpecific( sensor_ptr_t ptr ) = 0;
+			public:
+				/**
+				 * Project.
+				 *
+				 * This projects the landmark into the sensor space.
+				 * \param sg global sensor pose
+				 * \param lmk landmark state vector
+				 * \param exp expectation vector
+				 * \param nobs non-observable vector
+				 */
+				virtual void
+				project_func(const vec7 & sg, const vec & lmk, vec & meas, vec & nobs) = 0;
+
+				/**
+				 * Project and get Jacobians.
+				 *
+				 * This projects the landmark into the sensor space, and gives the Jacobians of this projection
+				 * wrt. the global sensor pose and the landmark.
+				 * \param sg global sensor pose
+				 * \param lmk landmark state vector
+				 * \param exp expectation vector
+				 * \param nobs non-observable vector
+				 * \param EXP_sg Jacobian of \a exp wrt \a sg
+				 * \param EXP_lmk Jacobian of \a exp wrt \a lmk
+				 */
+				virtual void
+				project_func(const vec7 & sg, const vec & lmk, vec & exp, vec & nobs, mat & EXP_sg, mat & EXP_lmk) = 0;
+			
+				/**
+				 * Back-project function
+				 */
+				virtual void backProject_func(const vec7 & sg, const vec & meas, const vec & nobs, vec & lmk) = 0;
+
+				/**
+				 * Back-project function
+				 */
+				virtual void backProject_func(const vec7 & sg, const vec & meas, const vec & nobs, vec & lmk, mat & LMK_sg,
+				                              mat & LMK_meas, mat & LMK_nobs) = 0;
+
+				virtual bool predictVisibility_func(jblas::vec x, jblas::vec nobs) = 0;
+		};
 
 
 		/**
@@ -78,46 +144,30 @@ namespace jafar {
 				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObservationAbstract & obs);
 
 				// define the function linkToParentLandmark().
-			ENABLE_LINK_TO_PARENT(LandmarkAbstract,Landmark,ObservationAbstract)
+				ENABLE_LINK_TO_PARENT(LandmarkAbstract,Landmark,ObservationAbstract)
 				;
 				// define the functions landmarkPtr() and landmark().
-			ENABLE_ACCESS_TO_PARENT(LandmarkAbstract,landmark)
+				ENABLE_ACCESS_TO_PARENT(LandmarkAbstract,landmark)
 				;
 				// define the function linkToParentDataManager().
-			ENABLE_LINK_TO_PARENT(DataManagerAbstract,DataManager,ObservationAbstract)
+				ENABLE_LINK_TO_PARENT(DataManagerAbstract,DataManager,ObservationAbstract)
 				;
 				// define the functions dataManagerPtr() and dataManager().
-			ENABLE_ACCESS_TO_PARENT(DataManagerAbstract,dataManager)
+				ENABLE_ACCESS_TO_PARENT(DataManagerAbstract,dataManager)
 				;
 
-		public:
-		  typedef boost::weak_ptr<SensorAbstract> sensor_wptr_t;
-		protected:
-		  sensor_wptr_t sensorWPtr;
-		public:
-		  void linkToSensor( sensor_ptr_t ptr )
-		  {
-		    sensorWPtr = ptr;
-		  }
-		  sensor_ptr_t sensorPtr( void )
-		  {
-		    sensor_ptr_t sptr = sensorWPtr.lock();
-		    if (!sptr) {
-		      std::cerr << __FILE__ << ":" << __LINE__
-				<< " ObsSpec::sensor threw weak" << std::endl;
-		      throw "WEAK";
-		    }
-		    return sptr;
-		  }
-			// Cast to specific sensor type in the specialized task.
-			virtual void linkToSensorSpecific( sensor_ptr_t ptr ) = 0;
+				void linkToSensor( sensor_ptr_t ptr ) { model->linkToSensor(ptr); }
+				sensor_ptr_t sensorPtr( void ) { return model->sensorPtr(); }
+				void linkToSensorSpecific( sensor_ptr_t ptr ) { model->linkToSensorSpecific(ptr); }
 
 			public:
 
-			enum type_enum {
-				PNT_PH_EUC, ///< Pin hole Euclidean point
-				PNT_PH_AH ///< Pin hole Anchored homogeneous point
-			};
+				boost::shared_ptr<ObservationModelAbstract> model;
+				
+				enum type_enum {
+					PNT_PH_EUC, ///< Pin hole Euclidean point
+					PNT_PH_AH ///< Pin hole Anchored homogeneous point
+				};
 
 
 				/**
@@ -199,34 +249,6 @@ namespace jafar {
 				}
 
 
-
-				/**
-				 * Project.
-				 *
-				 * This projects the landmark into the sensor space.
-				 * \param sg global sensor pose
-				 * \param lmk landmark state vector
-				 * \param exp expectation vector
-				 * \param nobs non-observable vector
-				 */
-				virtual void
-				project_func(const vec7 & sg, const vec & lmk, vec & meas, vec & nobs) = 0;
-
-				/**
-				 * Project and get Jacobians.
-				 *
-				 * This projects the landmark into the sensor space, and gives the Jacobians of this projection
-				 * wrt. the global sensor pose and the landmark.
-				 * \param sg global sensor pose
-				 * \param lmk landmark state vector
-				 * \param exp expectation vector
-				 * \param nobs non-observable vector
-				 * \param EXP_sg Jacobian of \a exp wrt \a sg
-				 * \param EXP_lmk Jacobian of \a exp wrt \a lmk
-				 */
-				virtual void
-				project_func(const vec7 & sg, const vec & lmk, vec & exp, vec & nobs, mat & EXP_sg, mat & EXP_lmk) = 0;
-
 				/**
 				 * Project and get expectation covariances
 				 */
@@ -245,17 +267,6 @@ namespace jafar {
 				 * Back-project
 				 */
 				void backProject();
-
-				/**
-				 * Back-project function
-				 */
-				virtual void backProject_func(const vec7 & sg, const vec & meas, const vec & nobs, vec & lmk) = 0;
-
-				/**
-				 * Back-project function
-				 */
-				virtual void backProject_func(const vec7 & sg, const vec & meas, const vec & nobs, vec & lmk, mat & LMK_sg,
-				                              mat & LMK_meas, mat & LMK_nobs) = 0;
 
 				/**
 				 * Compute innovation from measurement and expectation.
@@ -327,10 +338,9 @@ namespace jafar {
 				 */
 				virtual bool predictVisibility()
 				{
-					events.visible = predictVisibility_func(sensorPtr(), expectation.x(), expectation.nonObs);
+					events.visible = model->predictVisibility_func(expectation.x(), expectation.nonObs);
 					return events.visible;
 				}
-				virtual bool predictVisibility_func(sensor_ptr_t sensorPtr, jblas::vec x, jblas::vec nobs) = 0;
 				
 				
 				/**
@@ -345,6 +355,7 @@ namespace jafar {
 						events.predictedApp = true;
 					}
 				}
+
 				virtual void predictAppearance_func() = 0;
 
 				virtual double getMatchScore() = 0;

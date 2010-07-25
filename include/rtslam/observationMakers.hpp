@@ -12,11 +12,12 @@
 #include "rtslam/observationFactory.hpp"
 #include "rtslam/featurePoint.hpp"
 #include "rtslam/descriptorImagePoint.hpp"
+#include "rtslam/simuData.hpp"
 
 namespace jafar {
 namespace rtslam {
 
-template<class ObsType, class SenType, class LmkType,
+template<class ObsType, class SenType, class LmkType, class AppType,
 	 SensorAbstract::type_enum SenTypeId, LandmarkAbstract::type_enum LmkTypeId>
 class ImagePointObservationMaker
   : public ObservationMakerAbstract
@@ -33,6 +34,16 @@ class ImagePointObservationMaker
 		observation_ptr_t create(const sensor_ptr_t &senPtr, const landmark_ptr_t &lmkPtr)
 		{
 			boost::shared_ptr<ObsType> res(new ObsType(senPtr, lmkPtr));
+			if (boost::is_same<AppType,AppearanceImagePoint>::value)
+			{
+				res->predictedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
+				res->observedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
+			} else
+			if (boost::is_same<AppType,simu::AppearanceSimu>::value)
+			{
+				res->predictedAppearance.reset(new simu::AppearanceSimu());
+				res->observedAppearance.reset(new simu::AppearanceSimu());
+			}
 			res->setup(patchSize, dmin, reparamTh);
 			return res;
 		}

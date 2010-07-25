@@ -52,7 +52,7 @@ namespace simu {
 		public:
 			DescriptorSimu(const boost::shared_ptr<FeatureSimu> & featPtr): featPtr(featPtr) {}
 			
-			bool predictAppearance(observation_ptr_t & obsPtr)
+			bool predictAppearance(const observation_ptr_t & obsPtr)
 			{
 				boost::shared_ptr<AppearanceSimu> app_dst = SPTR_CAST<AppearanceSimu>(obsPtr->predictedAppearance);
 				boost::shared_ptr<AppearanceSimu> app_src = SPTR_CAST<AppearanceSimu>(featPtr->appearancePtr);

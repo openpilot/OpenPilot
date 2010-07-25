@@ -51,7 +51,7 @@ namespace simu {
 	{
 		private:
 			Trajectory traj;
-			void getWaypointsIndexes(double t, int &i_before, int &i_after)
+			void getWaypointsIndexes(double t, int &i_before, int &i_after) const
 			{
 				int n = traj.size();
 				if (n == 0) JFR_ERROR(RtslamException, RtslamException::SIMU_ERROR, "simu trajectory is empty");
@@ -110,7 +110,7 @@ namespace simu {
 				return true;
 			}
 			
-			jblas::vec getPose(double t)
+			jblas::vec getPose(double t) const
 			{
 				int a, b;
 				getWaypointsIndexes(t,a,b);
@@ -120,9 +120,10 @@ namespace simu {
 				jblas::vec v1 = ublas::subrange(traj[a].pose,6,12);
 				jblas::vec v2 = ublas::subrange(traj[b].pose,6,12);
 				double t1 = traj[a].t, t2 = traj[b].t;
-				return p1 + (t2*v1-t1*v2)*((t-t1)/(t2-t1)) + 0.5*(v2-v1)*((t2-t1)/(t*t-t1*t1));
+//JFR_DEBUG("robot " << id << " getPose: a/b " << a << "/" << b << ", t1/t2 " << t1 << "/" << t2 << ", p1 " << p1 << ", v1 " << v1 << ", v2 " << v2);
+				return p1 + (t2*v1-t1*v2)*((t-t1)/(t2-t1)) + 0.5*(v2-v1)*((t*t-t1*t1)/(t2-t1));
 			}
-			jblas::vec getSpeed(double t)
+			jblas::vec getSpeed(double t) const
 			{
 				int a, b;
 				getWaypointsIndexes(t,a,b);
@@ -131,7 +132,7 @@ namespace simu {
 				double tp = (t - traj[a].t) / (traj[b].t - traj[a].t);
 				return (1-tp) * ublas::subrange(traj[a].pose,6,12) + tp * ublas::subrange(traj[b].pose,6,12);
 			}
-			jblas::vec getAcc(double t)
+			jblas::vec getAcc(double t) const
 			{
 				int a, b;
 				getWaypointsIndexes(t,a,b);
@@ -161,7 +162,7 @@ namespace simu {
 			
 			void addObservationModel(LandmarkAbstract::geometry_t lmkType, ObservationModelAbstract *obsModel)
 				{ obsModels[lmkType] = obsModel; }
-			jblas::vec getPose(double t) { return pose; }
+			jblas::vec getPose(double t) const { return pose; }
 			
 			friend class AdhocSimulator;
 	};
@@ -194,7 +195,7 @@ namespace simu {
 			LandmarkAbstract::geometry_t type;
 		public:
 			Landmark(LandmarkAbstract::geometry_t type, jblas::vec pose): MapObject(pose.size()), pose(pose),type(type) {}
-			jblas::vec getPose(double t) { return pose; }
+			jblas::vec getPose(double t) const { return pose; }
 			
 	};
 	

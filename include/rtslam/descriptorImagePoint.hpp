@@ -47,10 +47,11 @@ namespace jafar {
 				 * Predict appearance.
 				 * \param obsPtrNew pointer to the new observation model
 				 */
-				bool predictAppearance(const obs_ph_euc_ptr_t & obsPtrNew);
-				bool predictAppearance(const obs_ph_ahp_ptr_t & obsPtrNew);
+				bool predictAppearance(const observation_ptr_t & obsPtrNew);
+				//bool predictAppearance(const obs_ph_euc_ptr_t & obsPtrNew);
+				//bool predictAppearance(const obs_ph_ahp_ptr_t & obsPtrNew);
 			protected:
-				bool predictAppearance_img_pt(const observation_ptr_t & obsPtrNew);
+				//bool predictAppearance_img_pt(const observation_ptr_t & obsPtrNew);
 
 		};
 	}

@@ -47,8 +47,6 @@ namespace jafar {
 			prior.x(0) = 1/(3*dmin);
 			prior.P(0,0) = prior.x(0)*prior.x(0);
 			setPrior(prior);
-			predictedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
-			observedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
 			reparTh = _reparTh;
 		}
 
@@ -146,9 +144,11 @@ namespace jafar {
 		
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::predictAppearance_func() {
-			desc_img_pnt_ptr_t descPtr = SPTR_CAST<DescriptorImagePoint>(landmarkPtr()->descriptorPtr);
-			obs_ph_ahp_ptr_t _this = SPTR_CAST<ObservationPinHoleAnchoredHomogeneousPoint>(shared_from_this());
-			descPtr->predictAppearance(_this);
+			//desc_img_pnt_ptr_t descPtr = SPTR_CAST<DescriptorImagePoint>(landmarkPtr()->descriptorPtr);
+			//obs_ph_ahp_ptr_t _this = SPTR_CAST<ObservationPinHoleAnchoredHomogeneousPoint>(shared_from_this());
+			//descPtr->predictAppearance(_this);
+			observation_ptr_t _this = shared_from_this();
+			landmarkPtr()->descriptorPtr->predictAppearance(_this);
 		}
 
 		bool ObservationPinHoleAnchoredHomogeneousPoint::voteForReparametrizingLandmark(){

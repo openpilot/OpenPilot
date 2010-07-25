@@ -45,8 +45,6 @@ namespace jafar {
 			//linkToPinHole(SPTR_CAST<SensorPinHole>
 			//	      (pinholePtr));
 			//linkToParentEUC(eucPtr);
-			predictedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
-			observedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
 			reparTh = _reparTh;
 		}
 
@@ -136,9 +134,11 @@ namespace jafar {
 		
 
 		void ObservationPinHoleEuclideanPoint::predictAppearance_func() {
-			desc_img_pnt_ptr_t descPtr = SPTR_CAST<DescriptorImagePoint>(landmarkPtr()->descriptorPtr);
-			obs_ph_euc_ptr_t _this = SPTR_CAST<ObservationPinHoleEuclideanPoint>(shared_from_this());
-			descPtr->predictAppearance(_this);
+			//desc_img_pnt_ptr_t descPtr = SPTR_CAST<DescriptorImagePoint>(landmarkPtr()->descriptorPtr);
+			//obs_ph_euc_ptr_t _this = SPTR_CAST<ObservationPinHoleEuclideanPoint>(shared_from_this());
+			//descPtr->predictAppearance(_this);
+			observation_ptr_t _this = shared_from_this();
+			landmarkPtr()->descriptorPtr->predictAppearance(_this);
 		}
 
 	}

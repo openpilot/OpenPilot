@@ -112,11 +112,15 @@ class AdhocSimulator
 			jblas::vec lmkPose = itLmk->second->getPose(t);
 			jblas::vec nobs;
 			itMod->second->project_func(senGlobPose, lmkPose, obsPose, nobs);
-			return itMod->second->predictVisibility_func(obsPose, nobs);
+			bool r = itMod->second->predictVisibility_func(obsPose, nobs);
+//JFR_DEBUG("robot pose " << robpose_e << ", sensor pose " << senpose_e << ", sensor global pose q " << senGlobPose << ", landmark " << lmkId << "/" << itLmk->second->id << " pose " << lmkPose << ", observation pose " << obsPose << "(nobs " << nobs << "), visibility " << r);
+			return r;
 		}
 		
-		raw_ptr_t getRaw(size_t robId, size_t senId, double t) const
+		
+		raw_ptr_t getRaw(size_t robId, size_t senId, double t) //const
 		{
+			// TODO optimize avoiding to repeat computation of sensor pose
 			boost::shared_ptr<simu::RawSimu> raw(new simu::RawSimu());
 			raw->timestamp = t;
 			jblas::vec pose;
@@ -126,7 +130,7 @@ class AdhocSimulator
 				if (getObservationPose(pose, robId, senId, lmkId, t))
 					raw->obs[lmkId] = featuresimu_ptr_t(new FeatureSimu(pose, it->second->type, lmkId));
 			}
-JFR_DEBUG("simulation has generated a raw with " << raw->obs.size() << " obs");
+JFR_DEBUG("simulation has generated a raw at time " << t << " with " << raw->obs.size() << " obs ; robot pose " << robots[1]->getPose(t));
 			return raw;
 		}
 };

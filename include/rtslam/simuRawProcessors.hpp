@@ -73,7 +73,7 @@ namespace simu {
 				if (it != rawPtr->obs.end())
 				{
 					measure.matchScore = 1.0;
-					measure.x() = it->second.measurement.x() + noise->get(); // simulation noise
+					measure.x() = it->second->measurement.x() + noise->get(); // simulation noise
 					return roi.isIn(measure.x());
 				} else
 				{
@@ -119,26 +119,26 @@ namespace simu {
 					noise = new MultiDimNormalDistribution(x, P, rtslam::rand());
 				}
 				
-				featPtr.reset(new FeatureSimu(size));
-				featPtr->measurement.std(params.measStd);
-				std::vector<FeatureSimu> roiObs;
+				std::vector<featuresimu_ptr_t> roiObs;
 				
 				for (RawSimu::ObsList::iterator it = rawData->obs.begin(); it != rawData->obs.end(); ++it)
 				{
-					boost::shared_ptr<AppearanceSimu> app = SPTR_CAST<AppearanceSimu>(featPtr->appearancePtr);
-					if (app->type == type && roi.isIn(it->second.measurement.x()))
+					boost::shared_ptr<AppearanceSimu> app = SPTR_CAST<AppearanceSimu>(it->second->appearancePtr);
+					if (app->type == type && roi.isIn(it->second->measurement.x()))
 						roiObs.push_back(it->second);
 				}
 				
 				if (roiObs.size() > 0)
 				{
 					int n = rtslam::rand()%roiObs.size();
-					*featPtr = roiObs[n];
+					featPtr = roiObs[n];
 					featPtr->measurement.matchScore = 1.0;
 					featPtr->measurement.x() += noise->get(); // simulation noise
+					featPtr->measurement.std(params.measStd);
 					return true;
 				} else
 				{
+					featPtr.reset(new FeatureSimu(size));
 					featPtr->measurement.matchScore = 0.0;
 					return false;
 				}

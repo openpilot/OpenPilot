@@ -50,13 +50,23 @@ class AdhocSimulator
 			if (it != robots.end()) return it->second->addSensor(sensor);
 		}
 		void addLandmark(simu::Landmark *landmark) { landmark->id = lmkIdFactory.getId(); landmarks[landmark->id] = landmark; }
-		void addObservationModel(size_t robId, size_t senId, LandmarkAbstract::geometry_t lmkType, ObservationModelAbstract *obsModel)
+		bool addObservationModel(size_t robId, size_t senId, LandmarkAbstract::geometry_t lmkType, ObservationModelAbstract *obsModel)
 		{
 			std::map<size_t,simu::Robot*>::iterator itRob = robots.find(robId);
-			if (itRob == robots.end()) return;
+			if (itRob == robots.end()) return false;
 			std::map<size_t,simu::Sensor*>::const_iterator itSen = itRob->second->sensors.find(senId);
-			if (itSen == itRob->second->sensors.end()) return;
+			if (itSen == itRob->second->sensors.end()) return false;
 			itSen->second->addObservationModel(lmkType, obsModel);
+			return true;
+		}
+		
+		bool hasEnded(size_t robId, size_t senId, double t) const
+		{
+			std::map<size_t,simu::Robot*>::const_iterator itRob = robots.find(robId);
+			if (itRob == robots.end()) return true;
+			std::map<size_t,simu::Sensor*>::const_iterator itSen = itRob->second->sensors.find(senId);
+			if (itSen == itRob->second->sensors.end()) return true;
+			return (itRob->second->hasEnded(t) && itSen->second->hasEnded(t));
 		}
 		
 		jblas::vec getRobotPose(size_t id, double t) const
@@ -95,9 +105,9 @@ class AdhocSimulator
 			if (itMod == itSen->second->obsModels.end()) return false;
 			
 			jblas::vec6 robpose_e = itRob->second->getPose(t); std::swap(robpose_e(3), robpose_e(5)); // FIXME-EULER-CONVENTION
-			jblas::vec7 robpose_q = quaternion::e2q(robpose_e);
+			jblas::vec7 robpose_q = quaternion::e2q_frame(robpose_e);
 			jblas::vec6 senpose_e = itSen->second->getPose(t); std::swap(senpose_e(3), senpose_e(5)); // FIXME-EULER-CONVENTION
-			jblas::vec7 senpose_q = quaternion::e2q(senpose_e);
+			jblas::vec7 senpose_q = quaternion::e2q_frame(senpose_e);
 			jblas::vec7 senGlobPose = quaternion::composeFrames(robpose_q, senpose_q);
 			jblas::vec lmkPose = itLmk->second->getPose(t);
 			jblas::vec nobs;
@@ -108,13 +118,15 @@ class AdhocSimulator
 		raw_ptr_t getRaw(size_t robId, size_t senId, double t) const
 		{
 			boost::shared_ptr<simu::RawSimu> raw(new simu::RawSimu());
+			raw->timestamp = t;
 			jblas::vec pose;
 			for(std::map<size_t,simu::Landmark*>::const_iterator it = landmarks.begin(); it != landmarks.end(); ++it)
 			{
 				size_t lmkId = it->second->id;
 				if (getObservationPose(pose, robId, senId, lmkId, t))
-					raw->obs[lmkId] = FeatureSimu(pose, it->second->type, lmkId);
+					raw->obs[lmkId] = featuresimu_ptr_t(new FeatureSimu(pose, it->second->type, lmkId));
 			}
+JFR_DEBUG("simulation has generated a raw with " << raw->obs.size() << " obs");
 			return raw;
 		}
 };

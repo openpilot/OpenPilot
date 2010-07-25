@@ -146,7 +146,7 @@ const unsigned IMG_HEIGHT = 480;
 const double INTRINSIC[4] = { 301.27013,   266.86136,   497.28243,   496.81116 };
 const double DISTORTION[2] = { -0.23193,   0.11306 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
 const double PIX_NOISE = .5;
-const double PIX_NOISE_SIMUFACTOR = 1.0;
+const double PIX_NOISE_SIMUFACTOR = 0.0;
 
 // lmk management
 const double D_MIN = .5;
@@ -292,6 +292,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		rob->addWaypoint(-3,2,0, 0,0,0, 0,-VEL,0, 0,0,0);
 		rob->addWaypoint(-1,0,0, 0,0,0, VEL,0,0, 0,0,0);
 		rob->addWaypoint(0,0,0, 0,0,0, 0,0,0, 0,0,0);
+		simulator->addRobot(rob);
 	}
 	
 	

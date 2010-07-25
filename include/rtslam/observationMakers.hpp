@@ -36,7 +36,7 @@ class ImagePointObservationMaker
 			res->setup(patchSize, dmin, reparamTh);
 			return res;
 		}
-
+/*
 		feature_ptr_t createFeat(const sensor_ptr_t &senPtr, const landmark_ptr_t &lmkPtr)
 		{
 			feature_ptr_t res(new FeatureImagePoint(patchSize, patchSize, CV_8U));
@@ -49,6 +49,7 @@ class ImagePointObservationMaker
 			descriptor_ptr_t res(new DescriptorImagePoint(featSpecPtr, senPoseInit, obsInitPtr));
 			return res;
 		}
+		*/
 };
 
 }} // namespace jafar::rtslam

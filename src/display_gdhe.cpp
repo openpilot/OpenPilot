@@ -41,9 +41,7 @@ namespace display {
 	void MapGdhe::render()
 	{
 		#if 0
-		jblas::vec poseEuler(6);
-		ublas::subrange(poseEuler,0,3) = ublas::subrange(poseQuat,0,3);
-		ublas::subrange(poseEuler,3,6) = quaternion::q2e(ublas::subrange(poseQuat,3,7));
+		jblas::vec poseEuler = quaternion::q2e_frame(poseQuat);
 		for(int i = 3; i < 6; ++i) poseEuler(i) = jmath::radToDeg(poseEuler(i));
 		std::swap(poseEuler(3), poseEuler(5)); // FIXME-EULER-CONVENTION
 		

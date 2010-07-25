@@ -42,6 +42,8 @@ namespace simu {
 			FeatureSimu(int size): FeatureAbstract(size, appearance_ptr_t(new AppearanceSimu())) {}
 	};
 	
+	typedef boost::shared_ptr<FeatureSimu> featuresimu_ptr_t;
+	
 	class DescriptorSimu: public rtslam::DescriptorAbstract
 	{
 		private:
@@ -62,7 +64,7 @@ namespace simu {
 	
 	class RawSimu: public rtslam::RawAbstract {
 		public:
-			typedef std::map<size_t,FeatureSimu> ObsList;
+			typedef std::map<size_t,featuresimu_ptr_t> ObsList;
 			ObsList obs;
 	};
 	

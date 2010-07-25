@@ -34,7 +34,8 @@ namespace simu {
 			size_t size;
 		public:
 			MapObject(size_t size): size(size) {}
-			virtual jblas::vec getPose(double t) = 0;
+			virtual jblas::vec getPose(double t) const = 0;
+			virtual bool hasEnded(double t) const { return true; }
 //			jblas::vec pose;
 	};
 	
@@ -75,6 +76,7 @@ namespace simu {
 			@warning a waypoint must be consistent, meaning that the time necessary to change state for each component must be the same
 			@return whether the point was coherent and was accepted
 			*/
+			bool hasEnded(double t) const { if (traj.size() == 0) return false; return (t > traj.back().t); }
 			bool addWaypoint(double x, double y, double z, double yaw, double pitch, double roll,
 			                 double vx, double vy, double vz, double vyaw, double vpitch, double vroll)
 			{

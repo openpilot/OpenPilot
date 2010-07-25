@@ -69,6 +69,7 @@ namespace display {
 		delete view_;
 		delete viewer_;
 		delete framenumber_label;
+		delete sensorpose_label;
 	}
 	
 	void SensorQt::bufferize()

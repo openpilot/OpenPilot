@@ -45,6 +45,7 @@ namespace hardware {
 			
 			int mode;
 			std::string dump_path;
+			double realFreq;
 
 			boost::thread *preloadTask_thread;
 			void preloadTask(void);
@@ -55,6 +56,8 @@ namespace hardware {
 			
 			jblas::mat_indirect acquireReadings(double t1, double t2);
 			void releaseReadings() { reading_pos = -1; }
+
+			double getFreq() { return realFreq; }
 	};
 
 }}}

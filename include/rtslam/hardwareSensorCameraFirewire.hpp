@@ -52,6 +52,7 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 		IplImage* buffer[3];
 		raw_ptr_t bufferPtr[3];
 		rawimage_ptr_t bufferSpecPtr[3];
+		double realFreq;
 		
 		int mode;
 		int index;
@@ -93,6 +94,8 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 		~HardwareSensorCameraFirewire();
 		
 		virtual int acquireRaw(raw_ptr_t &rawPtr);
+
+		double getFreq() { return realFreq; }
 };
 
 

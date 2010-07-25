@@ -47,11 +47,11 @@ namespace jafar {
 		 *
 		 * The motion model equation x+ = f(x,u) is decomposed as:
 		 * - p+  = p + v*dt
-		 * - v+  = v + R(q)*(am - ab) + g     <-- am and wm: IMU measurements
-		 * - q+  = q**((wm - wb)*dt)          <-- ** : quaternion product
-		 * - ab+ = ab + ar                    <-- ar : random walk in acc bias with ar perturbation
-		 * - wb+ = wb + wr                    <-- wr : random walk of gyro bias with wr perturbation
-		 * - g+  = g                          <-- g  : gravity vector, constant but unknown
+		 * - v+  = v + (R(q)*(am - ab) + g)*dt <-- am and wm: IMU measurements
+		 * - q+  = q**((wm - wb)*dt)           <-- ** : quaternion product
+		 * - ab+ = ab + ar                     <-- ar : random walk in acc bias with ar perturbation
+		 * - wb+ = wb + wr                     <-- wr : random walk of gyro bias with wr perturbation
+		 * - g+  = g                           <-- g  : gravity vector, constant but unknown
 		 *
 		 * \sa See the extense comments on move_func() in file robotInertial.cpp for algebraic details.
 		 */
@@ -82,11 +82,11 @@ namespace jafar {
 				 *
 				 * - The transition equation x+ = move(x,u), with u = [am, wm, ar, wr] the control impulse, is decomposed as:
 				 * - p+  = p + v*dt
-				 * - v+  = v + R(q)*(am - ab) + g     <-- am and wm: IMU measurements
-				 * - q+  = q**((wm - wb)*dt)          <-- ** : quaternion product
-				 * - ab+ = ab + ar                    <-- ar : random walk in acc bias with ar perturbation
-				 * - wb+ = wb + wr                    <-- wr : random walk of gyro bias with wr perturbation
-				 * - g+  = g                          <-- g  : gravity vector, constant but unknown
+				 * - v+  = v + (R(q)*(am - ab) + g)*dt <-- am and wm: IMU measurements
+				 * - q+  = q**((wm - wb)*dt)           <-- ** : quaternion product
+				 * - ab+ = ab + ar                     <-- ar : random walk in acc bias with ar perturbation
+				 * - wb+ = wb + wr                     <-- wr : random walk of gyro bias with wr perturbation
+				 * - g+  = g                           <-- g  : gravity vector, constant but unknown
 				 *
 				 * \sa See the extense comments on move_func() in file robotInertial.cpp for algebraic details.
 				 */
@@ -116,6 +116,22 @@ namespace jafar {
 				virtual size_t mySize() {return size();}
 				virtual size_t mySize_control() {return size_control();}
 				virtual size_t mySize_perturbation() {return size_perturbation();}
+
+				// Set initial uncertainties on linear velocity and gravity.
+				void setInitialStd(double velLinStd, double aBiasStd, double wBiasStd, double gravStd){
+					for (size_t i = pose.size() + 0; i < pose.size() + 3; i++){
+						state.P(i,i) = velLinStd*velLinStd;
+					}
+					for (size_t i = pose.size() + 3; i < pose.size() + 6; i++){
+						state.P(i,i) = aBiasStd*aBiasStd;
+					}
+					for (size_t i = pose.size() + 6; i < pose.size() + 9; i++){
+						state.P(i,i) = wBiasStd*wBiasStd;
+					}
+					for (size_t i = pose.size() + 9; i < pose.size() + 12; i++){
+						state.P(i,i) = gravStd*gravStd;
+					}
+				}
 
 
 			protected:

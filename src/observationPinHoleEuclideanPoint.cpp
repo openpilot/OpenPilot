@@ -118,16 +118,14 @@ namespace jafar {
 
 		}
 
-
-
-		bool ObservationPinHoleEuclideanPoint::predictVisibility() {
-			bool inimg = pinhole::isInImage(expectation.x(),
-			                                pinHolePtr()->params.width,
-			                                pinHolePtr()->params.height);
-			bool infront = (expectation.nonObs(0) > 0.0);
-			events.visible = inimg && infront;
-			return events.visible;
+		bool ObservationPinHoleEuclideanPoint::predictVisibility_func(sensor_ptr_t sensorPtr, jblas::vec x, jblas::vec nobs)
+		{
+			boost::shared_ptr<SensorPinHole> pinHolePtr = SPTR_CAST<SensorPinHole>(sensorPtr);
+			bool inimg = pinhole::isInImage(x, pinHolePtr->params.width, pinHolePtr->params.height);
+			bool infront = (nobs(0) > 0.0);
+			return inimg && infront;
 		}
+		
 
 		void ObservationPinHoleEuclideanPoint::predictAppearance_func() {
 			desc_img_pnt_ptr_t descPtr = boost::static_pointer_cast<DescriptorImagePoint>(landmarkPtr()->descriptorPtr);

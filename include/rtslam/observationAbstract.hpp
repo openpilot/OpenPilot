@@ -323,8 +323,14 @@ namespace jafar {
 				 *
 				 * \return true if landmark is predicted visible.
 				 */
-				virtual bool predictVisibility() = 0;
-
+				virtual bool predictVisibility()
+				{
+					events.visible = predictVisibility_func(sensorPtr(), expectation.x(), expectation.nonObs);
+					return events.visible;
+				}
+				virtual bool predictVisibility_func(sensor_ptr_t sensorPtr, jblas::vec x, jblas::vec nobs) = 0;
+				
+				
 				/**
 				 * Predict appearance
 				 */

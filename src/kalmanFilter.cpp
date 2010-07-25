@@ -102,6 +102,7 @@ namespace jafar {
 				// 1a update PJt_tmp
 				ublas::subrange(PJt_tmp, 0, ia_x.size(), col1, nextcol1) =
 					ublas::prod(ublas::project(P_, ia_x, corrIter1->ia_rsl), trans(corrIter1->INN_rsl));
+// JFR_DEBUG("correctAllStacked: corrIter1->INN_rsl " << corrIter1->INN_rsl);
 				
 				// 1b update diagonal of stackedInnovation
 				ublas::subrange(stackedInnovation_x, col1, nextcol1) = corrIter1->inn.x();
@@ -113,7 +114,7 @@ namespace jafar {
 					int nextcol2 = col2 + corrIter2->inn.size();
 					
 					// update off diagonal stackedInnovation
-//JFR_DEBUG("correctAllStacked: " << col1 << "," << nextcol1 << ";" << col2 << "," << nextcol2 << " / rsl1 " << corrIter1->ia_rsl << ", rsl2 " << corrIter2->ia_rsl << ", INN_rsl1.size " << corrIter1->INN_rsl.size1() << "," << corrIter1->INN_rsl.size2() <<  ", INN_rsl2.size " << corrIter2->INN_rsl.size1() << "," << corrIter2->INN_rsl.size2());
+// JFR_DEBUG("correctAllStacked: " << col1 << "," << nextcol1 << ";" << col2 << "," << nextcol2 << " / rsl1 " << corrIter1->ia_rsl << ", rsl2 " << corrIter2->ia_rsl << ", INN_rsl1.size " << corrIter1->INN_rsl.size1() << "," << corrIter1->INN_rsl.size2() <<  ", INN_rsl2.size " << corrIter2->INN_rsl.size1() << "," << corrIter2->INN_rsl.size2());
 					mat m = ublas::prod(corrIter1->INN_rsl, ublas::project(P_, corrIter1->ia_rsl, corrIter2->ia_rsl));
 					ublas::subrange(stackedInnovation_P, col1, nextcol1, col2, nextcol2) = ublas::prod(m, trans(corrIter2->INN_rsl));
 					col2 = nextcol2;
@@ -123,10 +124,14 @@ namespace jafar {
 			}
 			
 			// 2 compute Kalman gain
-// JFR_DEBUG("correctAllStacked: stackedInnovation_P " << stackedInnovation_P << ", PJt_tmp " << PJt_tmp << ", stackedInnovation_x " << stackedInnovation_x);
 			ublasExtra::lu_inv(stackedInnovation_P, stackedInnovation_iP);
+// JFR_DEBUG("correctAllStacked: stackedInnovation_P " << stackedInnovation_P);
+// JFR_DEBUG("correctAllStacked: stackedInnovation_iP " << stackedInnovation_iP);
+// JFR_DEBUG("correctAllStacked: PJt_tmp " << PJt_tmp);
+// JFR_DEBUG("stackedInnovation_x " << stackedInnovation_x);
 			K = - prod(PJt_tmp, stackedInnovation_iP);
-			
+// JFR_DEBUG("correctAllStacked: K " << K);
+// JFR_DEBUG("correctAllStacked: dx " << prod(K, stackedInnovation_x));
 			// 3 correct
 			ublas::project(x_, ia_x) += prod(K, stackedInnovation_x);
 			ublas::project(P_, ia_x, ia_x) += prod<sym_mat>(K, trans(PJt_tmp));

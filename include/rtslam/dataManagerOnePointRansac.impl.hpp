@@ -62,7 +62,7 @@ namespace jafar {
 				ransacSetPtr->inlierObs.push_back(obsBasePtr);
 
 				current_try ++;
-//JFR_DEBUG("old mean : " << mapManagerPtr()->mapPtr()->x());
+// JFR_DEBUG("old mean : " << mapManagerPtr()->mapPtr()->x());
 				vec x_copy = updateMean(obsBasePtr);
 // JFR_DEBUG("updated mean");//: " << x_copy);
 
@@ -118,9 +118,10 @@ namespace jafar {
 				} // for each other obs
 
 // JFR_DEBUG_BEGIN(); JFR_DEBUG_SEND("#### Ransac set with base " << ransacSetPtr->obsBasePtr->id() << ":");
+// int n = 0;
 // for(ObsList::iterator it = ransacSetPtr->inlierObs.begin(); it != ransacSetPtr->inlierObs.end(); ++it)
-// 	JFR_DEBUG_SEND(" " << (*it)->id());
-// JFR_DEBUG_END();
+// 	{ JFR_DEBUG_SEND(" " << (*it)->id()); ++n; }
+// JFR_DEBUG_SEND(" [" << n << "]"); JFR_DEBUG_END();
 
 			} // for i = 0:n_tries
 
@@ -166,7 +167,9 @@ namespace jafar {
 					}
 					#if BUFFERED_UPDATE
 					// 3. perform buffered update
+// JFR_DEBUG("map before correction : " << mapManagerPtr()->mapPtr()->x() << " " << mapManagerPtr()->mapPtr()->P());
 					mapPtr->filterPtr->correctAllStacked(mapPtr->ia_used_states());
+// JFR_DEBUG("map after correction : " << mapManagerPtr()->mapPtr()->x() << " " << mapManagerPtr()->mapPtr()->P());
 // 	JFR_DEBUG("corrected all stacked observations");
 					#endif
 				}

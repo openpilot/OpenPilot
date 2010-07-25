@@ -132,6 +132,7 @@ namespace simu {
 				{
 					int n = rtslam::rand()%roiObs.size();
 					featPtr = roiObs[n];
+JFR_DEBUG("detecting feature " << SPTR_CAST<AppearanceSimu>(featPtr->appearancePtr)->id << " in " << roi.x() << " " << roi.y() << " " << roi.w() << " " << roi.h());
 					featPtr->measurement.matchScore = 1.0;
 					featPtr->measurement.x() += noise->get(); // simulation noise
 					featPtr->measurement.std(params.measStd);

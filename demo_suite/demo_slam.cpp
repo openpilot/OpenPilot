@@ -426,7 +426,7 @@ void demo_slam01_main(world_ptr_t *world) {
 					{ boost::this_thread::yield(); continue; }
 				else had_data=true;
 // cout << "\n************************************************** " << endl;
-cout << "                 FRAME : " << (*world)->t << endl;
+JFR_DEBUG("                 FRAME : " << (*world)->t << ", robot estimated state " << robPtr->state.x());
 //				cout << "Robot: " << *robPtr << endl;
 //				cout << "Pert: " << robPtr->perturbation.P() << "\nPert Jac: " << robPtr->XNEW_pert << "\nState pert: " << robPtr->Q << endl;
 //				cout << "Robot state: " << robPtr->state.x() << endl;

@@ -130,7 +130,7 @@ class AdhocSimulator
 				if (getObservationPose(pose, robId, senId, lmkId, t))
 					raw->obs[lmkId] = featuresimu_ptr_t(new FeatureSimu(pose, it->second->type, lmkId));
 			}
-JFR_DEBUG("simulation has generated a raw at time " << t << " with " << raw->obs.size() << " obs ; robot pose " << robots[1]->getPose(t));
+std::cout << "simulation has generated a raw at time " << t << " with " << raw->obs.size() << " obs ; robot pose " << robots[1]->getPose(t) << std::endl;
 			return raw;
 		}
 };

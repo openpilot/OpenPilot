@@ -129,6 +129,7 @@ namespace jafar {
 		{
 			bool inimg = pinhole::isInImage(x, pinHolePtr()->params.width, pinHolePtr()->params.height);
 			bool infront = (nobs(0) > 0.0);
+// JFR_DEBUG("ObservationModelPHAHP::predictVisibility_func x " << x << " nobs " << nobs << " inimg/infront " << inimg << "/" << infront);
 			return inimg && infront;
 		}
 		

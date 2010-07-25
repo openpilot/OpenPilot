@@ -328,7 +328,12 @@ void ImageView::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
 		{
 			std::ostringstream oss;
 			oss.precision(2); oss.setf(std::ios::fixed, std::ios::floatfield);
-			oss << viewer->getTitle() << "  |  " << pos.x() << "  " << pos.y();
+			if ( (viewer->getTitle()).length() > 0)
+			{
+				oss << viewer->getTitle() << "   |   (" << pos.x() << "  " << pos.y() << ")";
+			} else {
+				oss << " (" << pos.x() << "  " << pos.y() << ") ";
+			}
 			viewer->setWindowTitle(oss.str().c_str());
 		}
 	}

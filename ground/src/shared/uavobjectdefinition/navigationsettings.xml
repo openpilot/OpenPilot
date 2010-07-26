@@ -1,0 +1,16 @@
+<xml>
+        <object name="NavigationSettings" singleinstance="true" settings="true">
+            <field name="UpdatePeriod" units="ms" type="uint16" elements="1" defaultvalue="100"/>
+            <field name="AccelerationMax" units="m/s²" type="float" elements="1" defaultvalue="35"/>
+            <field name="SpeedMax" units="m/s" type="float" elements="1" defaultvalue="300"/>
+            <field name="SpeedSafe" units="m/s" type="float" elements="1" defaultvalue="100"/>
+            <field name="SpeedMin" units="m/s" type="float" elements="1" defaultvalue="70"/>
+            <field name="SettleTime" units="seconds" type="float" elements="1" defaultvalue="12"/>
+            <field name="TurnSpeedFactor" units="" type="float" elements="1" defaultvalue="0.1"/>
+            <field name="StabilizationForceFactor" units="" type="float" elements="1" defaultvalue="4.0"/>
+            <access gcs="readwrite" flight="readwrite"/>
+            <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+            <telemetryflight acked="true" updatemode="onchange" period="0"/>
+            <logging updatemode="never" period="0"/>
+	</object>
+</xml>

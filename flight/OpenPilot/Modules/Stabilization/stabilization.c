@@ -47,6 +47,7 @@
 #define PITCH_INTEGRAL_LIMIT 0.5
 #define ROLL_INTEGRAL_LIMIT 0.5
 #define YAW_INTEGRAL_LIMIT 0.5
+#define DEG2RAD ( M_PI / 180.0 )
 
 // Private types
 
@@ -56,6 +57,7 @@ static xTaskHandle taskHandle;
 // Private functions
 static void stabilizationTask(void* parameters);
 static float bound(float val, float min, float max);
+static float angleDifference(float val);
 
 /**
  * Module initialization
@@ -82,23 +84,25 @@ static void stabilizationTask(void* parameters)
 	ManualControlCommandData manualControl;
 	SystemSettingsData systemSettings;
 	portTickType lastSysTime;
+	float pitchErrorGlobal, pitchErrorLastGlobal;
+	float yawErrorGlobal, yawErrorLastGlobal;
 	float pitchError, pitchErrorLast;
-	float rollError, rollErrorLast;
 	float yawError, yawErrorLast;
+	float rollError, rollErrorLast;
 	float pitchDerivative;
-	float rollDerivative;
 	float yawDerivative;
+	float rollDerivative;
 	float pitchIntegral, pitchIntegralLimit;
-	float rollIntegral, rollIntegralLimit;
 	float yawIntegral, yawIntegralLimit;
+	float rollIntegral, rollIntegralLimit;
 
 	// Initialize
 	pitchIntegral = 0.0;
-	rollIntegral = 0.0;
 	yawIntegral = 0.0;
-	pitchErrorLast = 0.0;
+	rollIntegral = 0.0;
+	pitchErrorLastGlobal = 0.0;
+	yawErrorLastGlobal = 0.0;
 	rollErrorLast = 0.0;
-	yawErrorLast = 0.0;
 
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
@@ -111,17 +115,70 @@ static void stabilizationTask(void* parameters)
 		AttitudeDesiredGet(&attitudeDesired);
 		AttitudeActualGet(&attitudeActual);
 
-		// Pitch stabilization control loop
-		pitchError = bound(attitudeDesired.Pitch, -stabSettings.PitchMax, stabSettings.PitchMax) - attitudeActual.Pitch;
+		// For all three axis, calculate Error and ErrorLast - translating from global to local reference frame.
+
+		// global pitch error
+		if ( manualControl.FlightMode != MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO )
+		{
+			pitchErrorGlobal = angleDifference(
+					bound(attitudeDesired.Pitch, -stabSettings.PitchMax, stabSettings.PitchMax) - attitudeActual.Pitch
+				);
+		} 
+		else
+		{
+			// in AUTO mode, Stabilization is used to steer the plane freely,
+			// while Navigation dictates the flight path, including maneuvers outside stable limits.
+			pitchErrorGlobal = angleDifference(attitudeDesired.Pitch - attitudeActual.Pitch);
+		}
+
+		// global yaw error
+		if ( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_VTOL || manualControl.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO )
+		{
+			// VTOLS consider yaw. AUTO mode considers YAW, too.
+			yawErrorGlobal = angleDifference(attitudeDesired.Yaw - attitudeActual.Yaw);
+		} else {
+			// FIXED WING STABILIZATION however does not.
+			yawErrorGlobal = 0;
+		}
+	
+		// local pitch error
+		pitchError = cos(DEG2RAD * attitudeActual.Roll) * pitchErrorGlobal + sin(DEG2RAD * attitudeActual.Roll) * yawErrorGlobal;
+		// local roll error (no translation needed - always local)
+		if ( manualControl.FlightMode != MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO )
+		{
+			rollError = angleDifference(
+					bound(attitudeDesired.Roll, -stabSettings.RollMax, stabSettings.RollMax) - attitudeActual.Roll
+				);
+		}
+		else
+		{
+			// in AUTO mode, Stabilization is used to steer the plane freely,
+			// while Navigation dictates the flight path, including maneuvers outside stable limits.
+			rollError = angleDifference(attitudeDesired.Roll - attitudeActual.Roll);
+		}
+		// local yaw error
+		yawError = cos(DEG2RAD * attitudeActual.Roll) * yawErrorGlobal + sin(DEG2RAD * attitudeActual.Roll) * pitchErrorGlobal;
+		
+		// for the derivative, the local last errors are needed. Therefore global lasts are translated into local lasts
+
+		// pitch last
+		pitchErrorLast = cos(DEG2RAD * attitudeActual.Roll) * pitchErrorLastGlobal + sin(DEG2RAD * attitudeActual.Roll) * yawErrorLastGlobal;
+
+		// yaw last
+		yawErrorLast = cos(DEG2RAD * attitudeActual.Roll) * yawErrorLastGlobal + sin(DEG2RAD * attitudeActual.Roll) * pitchErrorLastGlobal;
+		
+		// global last variables are no longer needed 
+		pitchErrorLastGlobal = pitchErrorGlobal;
+		yawErrorLastGlobal = yawErrorGlobal;
+		
+		// local Pitch stabilization control loop
 		pitchDerivative = pitchError - pitchErrorLast;
 		pitchIntegralLimit = PITCH_INTEGRAL_LIMIT / stabSettings.PitchKi;
 		pitchIntegral = bound(pitchIntegral+pitchError*stabSettings.UpdatePeriod, -pitchIntegralLimit, pitchIntegralLimit);
 		actuatorDesired.Pitch = stabSettings.PitchKp*pitchError + stabSettings.PitchKi*pitchIntegral + stabSettings.PitchKd*pitchDerivative;
 		actuatorDesired.Pitch = bound(actuatorDesired.Pitch, -1.0, 1.0);
-		pitchErrorLast = pitchError;
 
-		// Roll stabilization control loop
-		rollError = bound(attitudeDesired.Roll, -stabSettings.RollMax, stabSettings.RollMax) - attitudeActual.Roll;
+		// local Roll stabilization control loop
 		rollDerivative = rollError - rollErrorLast;
 		rollIntegralLimit = ROLL_INTEGRAL_LIMIT / stabSettings.RollKi;
 		rollIntegral = bound(rollIntegral+rollError*stabSettings.UpdatePeriod, -rollIntegralLimit, rollIntegralLimit);
@@ -129,21 +186,21 @@ static void stabilizationTask(void* parameters)
 		actuatorDesired.Roll = bound(actuatorDesired.Roll, -1.0, 1.0);
 		rollErrorLast = rollError;
 
-		// Yaw stabilization control loop (only enabled on VTOL airframes)
+
+		// local Yaw stabilization control loop (only enabled on VTOL airframes)
 		if ( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_VTOL )
 		{
-			yawError = attitudeDesired.Yaw - attitudeActual.Yaw;
 			yawDerivative = yawError - yawErrorLast;
 			yawIntegralLimit = YAW_INTEGRAL_LIMIT / stabSettings.YawKi;
 			yawIntegral = bound(yawIntegral+yawError*stabSettings.UpdatePeriod, -yawIntegralLimit, yawIntegralLimit);
 			actuatorDesired.Yaw = stabSettings.YawKp*yawError + stabSettings.YawKi*yawIntegral + stabSettings.YawKd*yawDerivative;;
 			actuatorDesired.Yaw = bound(actuatorDesired.Yaw, -1.0, 1.0);
-			yawErrorLast = yawError;
 		}
 		else
 		{
 			actuatorDesired.Yaw = 0.0;
 		}
+
 
 		// Setup throttle
 		actuatorDesired.Throttle = bound(attitudeDesired.Throttle, 0.0, stabSettings.ThrottleMax);
@@ -156,11 +213,11 @@ static void stabilizationTask(void* parameters)
 		else
 		{
 			pitchIntegral = 0.0;
-			rollIntegral = 0.0;
 			yawIntegral = 0.0;
-			pitchErrorLast = 0.0;
+			rollIntegral = 0.0;
+			pitchErrorLastGlobal = 0.0;
+			yawErrorLastGlobal = 0.0;
 			rollErrorLast = 0.0;
-			yawErrorLast = 0.0;
 		}
 
 		// Clear alarms
@@ -183,6 +240,22 @@ static float bound(float val, float min, float max)
 	else if ( val > max )
 	{
 		val = max;
+	}
+	return val;
+}
+
+/**
+ * Fix result of angular differences
+ */
+static float angleDifference(float val)
+{
+	while ( val < -180.0 )
+	{
+		val += 360.0;
+	}
+	while ( val > 180.0 )
+	{
+		val -= 360.0;
 	}
 	return val;
 }

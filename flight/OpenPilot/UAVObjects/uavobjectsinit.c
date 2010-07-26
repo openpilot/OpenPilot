@@ -40,11 +40,14 @@
 #include "exampleobject2.h"
 #include "examplesettings.h"
 #include "flightbatterystate.h"
+#include "flightsituationactual.h"
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
 #include "headingactual.h"
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
+#include "navigationdesired.h"
+#include "navigationsettings.h"
 #include "objectpersistence.h"
 #include "positionactual.h"
 #include "stabilizationsettings.h"
@@ -72,11 +75,14 @@ void UAVObjectsInitializeAll()
     ExampleObject2Initialize();
     ExampleSettingsInitialize();
     FlightBatteryStateInitialize();
+    FlightSituationActualInitialize();
     FlightTelemetryStatsInitialize();
     GCSTelemetryStatsInitialize();
     HeadingActualInitialize();
     ManualControlCommandInitialize();
     ManualControlSettingsInitialize();
+    NavigationDesiredInitialize();
+    NavigationSettingsInitialize();
     ObjectPersistenceInitialize();
     PositionActualInitialize();
     StabilizationSettingsInitialize();

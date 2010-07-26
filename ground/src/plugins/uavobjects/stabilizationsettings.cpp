@@ -124,9 +124,9 @@ void StabilizationSettings::setDefaultFieldValues()
     data.RollKp = 0.02;
     data.RollKi = 4e-06;
     data.RollKd = 0.01;
-    data.YawKp = 1;
-    data.YawKi = 0;
-    data.YawKd = 0;
+    data.YawKp = 0.04;
+    data.YawKi = 4e-06;
+    data.YawKd = 0.01;
 
 }
 

@@ -42,11 +42,14 @@
 #include "exampleobject2.h"
 #include "examplesettings.h"
 #include "flightbatterystate.h"
+#include "flightsituationactual.h"
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
 #include "headingactual.h"
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
+#include "navigationdesired.h"
+#include "navigationsettings.h"
 #include "objectpersistence.h"
 #include "positionactual.h"
 #include "stabilizationsettings.h"
@@ -74,11 +77,14 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new ExampleObject2() );
     objMngr->registerObject( new ExampleSettings() );
     objMngr->registerObject( new FlightBatteryState() );
+    objMngr->registerObject( new FlightSituationActual() );
     objMngr->registerObject( new FlightTelemetryStats() );
     objMngr->registerObject( new GCSTelemetryStats() );
     objMngr->registerObject( new HeadingActual() );
     objMngr->registerObject( new ManualControlCommand() );
     objMngr->registerObject( new ManualControlSettings() );
+    objMngr->registerObject( new NavigationDesired() );
+    objMngr->registerObject( new NavigationSettings() );
     objMngr->registerObject( new ObjectPersistence() );
     objMngr->registerObject( new PositionActual() );
     objMngr->registerObject( new StabilizationSettings() );

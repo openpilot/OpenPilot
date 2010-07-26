@@ -27,12 +27,15 @@ HEADERS += uavobjects_global.h \
     telemetrysettings.h \
     systemsettings.h \
     stabilizationsettings.h \
+    flightsituationactual.h \
     manualcontrolsettings.h \
     manualcontrolcommand.h \
     attitudedesired.h \
     actuatorsettings.h \
     actuatordesired.h \
     actuatorcommand.h \
+    navigationsettings.h \
+    navigationdesired.h \
     positionactual.h \
     flightbatterystate.h
 SOURCES += uavobject.cpp \
@@ -58,12 +61,15 @@ SOURCES += uavobject.cpp \
     telemetrysettings.cpp \
     systemsettings.cpp \
     stabilizationsettings.cpp \
+    flightsituationactual.cpp \
     manualcontrolsettings.cpp \
     manualcontrolcommand.cpp \
     attitudedesired.cpp \
     actuatorsettings.cpp \
     actuatordesired.cpp \
     actuatorcommand.cpp \
+    navigationsettings.cpp \
+    navigationdesired.cpp \
     positionactual.cpp \
     flightbatterystate.cpp
 OTHER_FILES += UAVObjects.pluginspec

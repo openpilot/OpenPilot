@@ -163,6 +163,9 @@ SRC += $(OPUAVOBJ)/ahrsstatus.c
 SRC += $(OPUAVOBJ)/altitudeactual.c
 SRC += $(OPUAVOBJ)/attitudeactual.c
 SRC += $(OPUAVOBJ)/attitudesettings.c
+SRC += $(OPUAVOBJ)/flightsituationactual.c
+SRC += $(OPUAVOBJ)/navigationsettings.c
+SRC += $(OPUAVOBJ)/navigationdesired.c
 SRC += $(OPUAVOBJ)/flightbatterystate.c
 SRC += $(OPUAVOBJ)/headingactual.c
 endif

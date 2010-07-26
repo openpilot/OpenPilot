@@ -15,7 +15,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="pfd.svg"
+   sodipodi:docname="PFD-2.svg"
    style="display:inline"
    inkscape:export-filename="H:\Documents\Hobbies\OpenPilot\SVN\artwork\PFD-2.png"
    inkscape:export-xdpi="269.53"
@@ -1549,13 +1549,6 @@
        sodipodi:type="inkscape:persp3d" />
     <inkscape:perspective
        id="perspective5396"
-       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
-       inkscape:vp_z="1 : 0.5 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_x="0 : 0.5 : 1"
-       sodipodi:type="inkscape:persp3d" />
-    <inkscape:perspective
-       id="perspective3595"
        inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
        inkscape:vp_z="1 : 0.5 : 1"
        inkscape:vp_y="0 : 1000 : 0"
@@ -3571,6 +3564,55 @@
      id="layer6"
      inkscape:label="Bottom area"
      style="display:inline">
+    <text
+       xml:space="preserve"
+       style="font-size:51.81152344px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Vera Sans"
+       x="698.77234"
+       y="645.48114"
+       id="text5070"><tspan
+         sodipodi:role="line"
+         id="tspan5072"
+         x="698.77234"
+         y="645.48114"
+         style="font-size:25.90576172px;fill:#ffffff;fill-opacity:1;font-family:Arial Black;-inkscape-font-specification:Arial Black">GPS: 12</tspan><tspan
+         sodipodi:role="line"
+         x="698.77234"
+         y="677.86334"
+         style="font-size:25.90576172px;fill:#ffffff;fill-opacity:1;font-family:Arial Black;-inkscape-font-specification:Arial Black"
+         id="tspan10177">HDP: 0.7</tspan></text>
+    <text
+       id="text5074"
+       y="643.18158"
+       x="232.39679"
+       style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         style="font-size:20px;fill:#ffffff;fill-opacity:1;font-family:Arial Black;-inkscape-font-specification:Arial Black"
+         y="643.18158"
+         x="232.39679"
+         id="tspan5076"
+         sodipodi:role="line">2300 mAh</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Vera Sans"
+       x="232.39679"
+       y="661.18158"
+       id="text4374"><tspan
+         sodipodi:role="line"
+         id="tspan4376"
+         x="232.39679"
+         y="661.18158"
+         style="font-size:20px;fill:#ffffff;fill-opacity:1;font-family:Arial Black;-inkscape-font-specification:Arial Black">11231 mV</tspan></text>
+    <text
+       id="text4378"
+       y="679.18158"
+       x="232.39679"
+       style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         style="font-size:20px;fill:#ffffff;fill-opacity:1;font-family:Arial Black;-inkscape-font-specification:Arial Black"
+         y="679.18158"
+         x="232.39679"
+         id="tspan4380"
+         sodipodi:role="line">3.43 A</tspan></text>
     <g
        style="display:inline"
        transform="translate(395.4171,-213.55826)"
@@ -3644,32 +3686,14 @@
        id="gcstelemetry-Disconnected"
        sodipodi:nodetypes="cccccccccc" />
     <rect
-       style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:2.6691606;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:3;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="linkrate"
-       width="57.473694"
-       height="14.616554"
-       x="478.54886"
-       y="653.54071"
-       ry="1.7888302"
+       width="57.142857"
+       height="18.571428"
+       x="490.71429"
+       y="653.27753"
+       ry="2.2728431"
        inkscape:label="#rect7029" />
-    <rect
-       style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:2.2920568;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
-       id="battery-txt"
-       width="57.8508"
-       height="10.707944"
-       x="230.36032"
-       y="624.63788"
-       ry="1.3104794"
-       inkscape:label="#rect7029" />
-    <rect
-       inkscape:label="#rect7029"
-       ry="2.389617"
-       y="625.30048"
-       x="664.88007"
-       height="19.525591"
-       width="105.95415"
-       id="gps-txt"
-       style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:4.18869495;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
   </g>
   <g
      inkscape:groupmode="layer"

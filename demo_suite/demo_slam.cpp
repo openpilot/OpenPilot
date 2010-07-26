@@ -131,8 +131,8 @@ const unsigned MAP_SIZE = 313;
 // constant velocity robot uncertainties and perturbations
 const double UNCERT_VLIN = .1; // m/s
 const double UNCERT_VANG = .1; // rad/s
-const double PERT_VLIN = 1; // m/s per sqrt(s)
-const double PERT_VANG = 3; // rad/s per sqrt(s)
+const double PERT_VLIN = 2; // m/s per sqrt(s)
+const double PERT_VANG = 6; // rad/s per sqrt(s)
 
 // inertial robot initial uncertainties and perturbations
 //if (intOpts[iRobot] == 1) // == robot inertial

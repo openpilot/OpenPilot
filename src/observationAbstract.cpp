@@ -149,6 +149,7 @@ namespace jafar {
 
 			// Events
 			events.predicted = true;
+// JFR_DEBUG("projected obs " << id() << ": expectation " << expectation.x() << " " << expectation.P());
 		}
 
 		void ObservationAbstract::backProject(){

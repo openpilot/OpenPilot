@@ -146,6 +146,7 @@ namespace jafar {
 				if (best_set->size() > 1)
 				{
 					// 2. for each obs in inliers
+JFR_DEBUG_BEGIN(); JFR_DEBUG_SEND("Updating with Ransac:");
 					for(ObsList::iterator obsIter = best_set->inlierObs.begin(); obsIter != best_set->inlierObs.end(); ++obsIter)
 					{
 						observation_ptr_t obsPtr = *obsIter;
@@ -154,6 +155,7 @@ namespace jafar {
 						obsPtr->events.updated = true;
 						numObs++;
 						
+JFR_DEBUG_SEND(" " << obsPtr->id());
 						#if BUFFERED_UPDATE
 						// 2a. add obs to buffer for EKF update
 						mapPtr->filterPtr->stackCorrection(obsPtr->innovation, obsPtr->INN_rsl, obsPtr->ia_rsl);
@@ -172,12 +174,14 @@ namespace jafar {
 // JFR_DEBUG("map after correction : " << mapManagerPtr()->mapPtr()->x() << " " << mapManagerPtr()->mapPtr()->P());
 // 	JFR_DEBUG("corrected all stacked observations");
 					#endif
+JFR_DEBUG_END();
 				}
 			}
 			
 			ObsList &activeSearchList = ((ransacSetList.size() == 0) || (best_set->size() <= 1) ? obsVisibleList : best_set->pendingObs);
 			// FIXME don't search again landmarks that failed as base
 			
+JFR_DEBUG_BEGIN(); JFR_DEBUG_SEND("Updating with ActiveSearch:");
 			for (int i = 0; i < algorithmParams.n_recomp_gains; ++i)
 			{
 				// 4. for each obs in pending: retake algorithm from active search
@@ -275,6 +279,7 @@ namespace jafar {
 								if (obsPtr->compatibilityTest(matcher->params.mahalanobisTh)) { // use 3.0 for 3-sigma or the 5% proba from the chi-square tables.
 									numObs++;
 									//								kernel::Chrono update_chrono;
+JFR_DEBUG_SEND(" " << obsPtr->id());
 									obsPtr->update();
 									//								total_update_time += update_chrono.elapsedMicrosecond();
 									obsPtr->events.updated = true;
@@ -295,6 +300,7 @@ namespace jafar {
 					kernel::fastErase(activeSearchList, obsListSorted.rbegin()->second);
 				obsListSorted.clear(); // clear the list now or it will prevent the observation to be destroyed until next frame, and will still be displayed
 			}
+JFR_DEBUG_END();
 
 			// update obs counters
 			for(ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end();obsIter++)

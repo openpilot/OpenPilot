@@ -27,6 +27,7 @@ namespace simu {
 		public:
 			struct matcher_params_t {
 				int patchSize;
+				int maxSearchSize;
 				double lowInnov;      ///<     search region radius for first RANSAC consensus
 				double threshold;     ///<     matching threshold
 				double mahalanobisTh; ///< Mahalanobis distance for outlier rejection
@@ -39,10 +40,11 @@ namespace simu {
 			MultiDimNormalDistribution *noise;
 
 		public:
-			MatcherSimu(LandmarkAbstract::geometry_t type, size_t size, int patchSize, double lowInnov, double threshold, double mahalanobisTh, double measStd, double simuMeasStd):
+			MatcherSimu(LandmarkAbstract::geometry_t type, size_t size, int patchSize, int maxSearchSize, double lowInnov, double threshold, double mahalanobisTh, double measStd, double simuMeasStd):
 				type(type), size(size), noise(NULL)
 			{
 				params.patchSize = patchSize;
+				params.maxSearchSize = maxSearchSize;
 				params.lowInnov = lowInnov;
 				params.threshold = threshold;
 				params.mahalanobisTh = mahalanobisTh;

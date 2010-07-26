@@ -125,7 +125,6 @@ namespace jafar {
 				}
 
 		void ObservationAbstract::project() {
-
 			// Get global sensor pose
 			vec7 sg;
 			sensorPtr()->globalPose(sg, SG_rs);
@@ -225,10 +224,10 @@ namespace jafar {
 			// FIXME this is ok for 1 sensor, but not for more, because it won't work with policy ALL
 			// probably wee need to fix the policy, and chose a different policy according to the criteria
 			// (size = ANY, matchRatio = ALL, consistencyRatio = ...)
-			if (events.visible)
+			// FIXME get these hard coded parameters out
+			if (events.measured && !events.updated)
 			{
-				int searchSize = 36*sqrt(expectation.P(0,0)*expectation.P(1,1));
-				if (searchSize > 50000) {
+				if (searchSize > 100000) {
 					cout << "Obs " << id() << " Killed by size (size " << searchSize << ")" << endl;
 					return true;
 				}

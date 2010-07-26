@@ -236,7 +236,9 @@ namespace jafar {
 
 							// 1c. predict search area and appearance
 							//cv::Rect roi = gauss2rect(obsPtr->expectation.x(), obsPtr->expectation.P() + matcherParams_.measVar*identity_mat(2), matcherParams_.mahalanobisTh);
-							image::ConvexRoi roi(obsPtr->expectation.x(), obsPtr->expectation.P() + matcher->params.measVar*identity_mat(2), matcher->params.mahalanobisTh);
+							RoiSpec roi(obsPtr->expectation.x(), obsPtr->expectation.P() + matcher->params.measVar*identity_mat(2), matcher->params.mahalanobisTh);
+							obsPtr->searchSize = roi.count();
+							if (obsPtr->searchSize > matcher->params.maxSearchSize) roi.scale(sqrt(matcher->params.maxSearchSize/(double)obsPtr->searchSize));
 							obsPtr->predictAppearance();
 // JFR_DEBUG("obs " << obsPtr->id() << " measured in " << roi);
 
@@ -575,7 +577,9 @@ namespace jafar {
 		matchWithExpectedInnovation(boost::shared_ptr<RawSpec> rawData,  observation_ptr_t obsPtr)
 		{
 			obsPtr->predictAppearance();
-			image::ConvexRoi roi(obsPtr->expectation.x(), obsPtr->expectation.P() + obsPtr->measurement.P(), matcher->params.mahalanobisTh);
+			RoiSpec roi(obsPtr->expectation.x(), obsPtr->expectation.P() + matcher->params.measVar*identity_mat(2), matcher->params.mahalanobisTh);
+			obsPtr->searchSize = roi.count();
+			if (obsPtr->searchSize > matcher->params.maxSearchSize) roi.scale(sqrt(matcher->params.maxSearchSize/(double)obsPtr->searchSize));
 			matcher->match(rawData, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
 
 			return (obsPtr->getMatchScore() > matcher->params.threshold && isExpectedInnovationInlier(obsPtr, matcher->params.mahalanobisTh));

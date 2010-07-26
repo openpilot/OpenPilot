@@ -236,6 +236,8 @@ namespace jafar {
 						bool matched; ///< 		Feature is matched
 						bool updated; ///< 		Landmark is updated
 				} events;
+				
+				int searchSize;
 
 				type_enum type;
 

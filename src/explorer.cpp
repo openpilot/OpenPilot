@@ -189,7 +189,7 @@ namespace correl {
 			// global vars
 			image::Image im2(im2_);
 			int bestx = -1, besty = -1;
-			double best_score = -1.;
+			double best_score = -4.;
 			
 			///-- for dangerous areas, call the classical robust explorer and reduce the roi
 			// this will be one line with GeneralRoi... (non convex)
@@ -264,7 +264,7 @@ namespace correl {
 				nroi2_in_im2.scaleTo(nrect2_in_im2);
 				
 				int nbestx = -1, nbesty = -1;
-				double nbest_score = -1;
+				double nbest_score = -4;
 				
 				im2.setROI(int_in_im2);
 				image::Image imB(nint_in_im2.width, nint_in_im2.height, CV_8U, JfrImage_CS_GRAY);
@@ -282,11 +282,14 @@ namespace correl {
 // std::cout << "half search took " << chrono.elapsed() << std::endl;
 				
 // JFR_DEBUG("### do refine search (" << nbestx << "," << nbesty << "," << nbest_score << ")");
-				const int refineDist = 1;
-				image::ConvexRoi rroi2_in_im2(jmath::round((nbestx-nrect2_in_imB.x)/fw) + rect2_in_im2.x - refineDist,
-				                              jmath::round((nbesty-nrect2_in_imB.y)/fh) + rect2_in_im2.y - refineDist,
-				                              2*refineDist+1, 2*refineDist+1); // refine roi
-				rawExploreTranslationRobust(im1, im2, rroi2_in_im2, bestx, besty, best_score, result_in_im2, results);
+				if (nbestx != -1 && nbesty != -1)
+				{
+					const int refineDist = 1;
+					image::ConvexRoi rroi2_in_im2(jmath::round((nbestx-nrect2_in_imB.x)/fw) + rect2_in_im2.x - refineDist,
+																				jmath::round((nbesty-nrect2_in_imB.y)/fh) + rect2_in_im2.y - refineDist,
+																				2*refineDist+1, 2*refineDist+1); // refine roi
+					rawExploreTranslationRobust(im1, im2, rroi2_in_im2, bestx, besty, best_score, result_in_im2, results);
+				}
 				
 				im2.resetROI();
 				delete nresults;

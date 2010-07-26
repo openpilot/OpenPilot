@@ -219,16 +219,14 @@ namespace jafar {
 			mapPtr->filterPtr->correct(ia_x,innovation,INN_rsl,ia_rsl) ;
 		}
 
-
 		bool ObservationAbstract::voteForKillingLandmark(){
 			// kill big ellipses
 			// FIXME this is ok for 1 sensor, but not for more, because it won't work with policy ALL
 			// probably wee need to fix the policy, and chose a different policy according to the criteria
 			// (size = ANY, matchRatio = ALL, consistencyRatio = ...)
-			// FIXME get these hard coded parameters out
 			if (events.measured && !events.updated)
 			{
-				if (searchSize > 100000) {
+				if (searchSize > killSizeTh) {
 					cout << "Obs " << id() << " Killed by size (size " << searchSize << ")" << endl;
 					return true;
 				}
@@ -237,11 +235,11 @@ namespace jafar {
 			// kill unstable and inconsistent lmks
 			JFR_ASSERT(counters.nMatch <= counters.nSearch, "counters.nMatch " << counters.nMatch << " > counters.nSearch " << counters.nSearch);
 			JFR_ASSERT(counters.nInlier <= counters.nMatch, "counters.nInlier " << counters.nInlier << " > counters.nMatch " << counters.nMatch);
-			if (counters.nSearch > 30) {
+			if (counters.nSearch > killSearchTh) {
 				double matchRatio = counters.nMatch / (double) counters.nSearch;
 				double consistencyRatio = counters.nInlier / (double)counters.nMatch;
 
-				if (matchRatio < 0.5 || consistencyRatio < 0.5)	{
+				if (matchRatio < killMatchTh || consistencyRatio < killConsistencyTh)	{
 					cout << "Obs " << id() << " Killed by unstability (match " << matchRatio << " ; consistency " << consistencyRatio << ")"<< endl;
 					return true;
 				}

@@ -40,14 +40,14 @@ namespace jafar {
 			type = PNT_PH_AH;
 		}
 
-		void ObservationPinHoleAnchoredHomogeneousPoint::setup(int patchSize, double dmin, double _reparTh)
+		void ObservationPinHoleAnchoredHomogeneousPoint::setup(double reparTh, int killSizeTh, int killSearchTh, double killMatchTh, double killConsistencyTh, double dmin)
 		{
+			ObservationAbstract::setup(reparTh, killSizeTh, killSearchTh, killMatchTh, killConsistencyTh);
 			//ObservationAbstract::setup(_noiseStd, getPrior());
 			Gaussian prior(1);
 			prior.x(0) = 1/(3*dmin);
 			prior.P(0,0) = prior.x(0)*prior.x(0);
 			setPrior(prior);
-			reparTh = _reparTh;
 		}
 
 

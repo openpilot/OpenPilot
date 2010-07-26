@@ -200,7 +200,11 @@ namespace jafar {
 				ind_array ia_rsl; ///<    Ind. array of mapped indices of robot, sensor and landmark (ie, sensor might or might not be there).
 
 				double reparTh;
-
+				int killSizeTh;
+				int killSearchTh;
+				double killMatchTh;
+				double killConsistencyTh;
+				
 			public:
 				// Jacobians
 				mat SG_rs; ///<						Jacobian of global sensor pose wrt. robot and sensor mapped states
@@ -250,6 +254,14 @@ namespace jafar {
 					return "OBSERVATION";
 				}
 
+				void setup(double reparTh_, int killSizeTh_, int killSearchTh_, double killMatchTh_, double killConsistencyTh_)
+				{
+					reparTh = reparTh_;
+					killSizeTh = killSizeTh_;
+					killSearchTh = killSearchTh_;
+					killMatchTh = killMatchTh_;
+					killConsistencyTh = killConsistencyTh_;
+				}
 
 				/**
 				 * Project and get expectation covariances

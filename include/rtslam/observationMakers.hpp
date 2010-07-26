@@ -23,13 +23,18 @@ class ImagePointObservationMaker
   : public ObservationMakerAbstract
 {
 	private:
-  	int patchSize;
-  	double dmin;
-  	double reparamTh;
+		double reparTh;
+		int killSizeTh;
+		int killSearchTh;
+		double killMatchTh;
+		double killConsistencyTh;
+		double dmin;
+		int patchSize;
 	public:
 
-		ImagePointObservationMaker(int _patchSize, double _dmin = 0.0, double reparam_th = 0.0):
-			ObservationMakerAbstract(SenTypeId, LmkTypeId), patchSize(_patchSize), dmin(_dmin), reparamTh(reparam_th) {}
+		ImagePointObservationMaker(double _reparTh, int _killSizeTh, int _killSearchTh, double _killMatchTh, double _killConsistencyTh, double _dmin, int _patchSize):
+			ObservationMakerAbstract(SenTypeId, LmkTypeId), reparTh(_reparTh), killSizeTh(_killSizeTh), killSearchTh(_killSearchTh), 
+			killMatchTh(_killMatchTh), killConsistencyTh(_killConsistencyTh), dmin(_dmin), patchSize(_patchSize) {}
 
 		observation_ptr_t create(const sensor_ptr_t &senPtr, const landmark_ptr_t &lmkPtr)
 		{
@@ -44,7 +49,7 @@ class ImagePointObservationMaker
 				res->predictedAppearance.reset(new simu::AppearanceSimu());
 				res->observedAppearance.reset(new simu::AppearanceSimu());
 			}
-			res->setup(patchSize, dmin, reparamTh);
+			res->setup(reparTh, killSizeTh, killSearchTh, killMatchTh, killConsistencyTh, dmin);
 			return res;
 		}
 /*

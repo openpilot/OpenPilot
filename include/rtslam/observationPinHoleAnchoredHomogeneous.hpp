@@ -129,7 +129,7 @@ namespace jafar {
 				}
 
 
-				void setup(int patchSize, double dmin, double _reparTh);
+				void setup(double reparTh, int killSizeTh, int killSearchTh, double killMatchTh, double killConsistencyTh, double dmin);
 
 //				void setup(double _pixNoise = 1.0);
 

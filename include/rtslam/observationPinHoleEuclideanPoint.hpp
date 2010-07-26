@@ -117,7 +117,7 @@ namespace jafar {
 //				cout << "Deleted observation: " << id() << ": " << typeName() << endl;
 					}
 
-			void setup(int patchSize, double dmin = 0.0, double reparamTh = 0.0);
+			void setup(double reparTh, int killSizeTh, int killSearchTh, double killMatchTh, double killConsistencyTh, double dmin);
 
 				virtual std::string typeName() {
 					return "Obs. Pinhole Euclidean point";

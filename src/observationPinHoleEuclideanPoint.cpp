@@ -35,8 +35,9 @@ namespace jafar {
 			type = PNT_PH_EUC;
 		}
 
-		void ObservationPinHoleEuclideanPoint::setup(int patchSize, double dmin, double _reparTh)
+		void ObservationPinHoleEuclideanPoint::setup(double reparTh, int killSizeTh, int killSearchTh, double killMatchTh, double killConsistencyTh, double dmin)
 		{
+			ObservationAbstract::setup(reparTh, killSizeTh, killSearchTh, killMatchTh, killConsistencyTh);
 			//ObservationAbstract::setup(_noiseStd, getPrior());
 			Gaussian prior(1); // should never be used
 			setPrior(prior);
@@ -45,7 +46,6 @@ namespace jafar {
 			//linkToPinHole(SPTR_CAST<SensorPinHole>
 			//	      (pinholePtr));
 			//linkToParentEUC(eucPtr);
-			reparTh = _reparTh;
 		}
 
 

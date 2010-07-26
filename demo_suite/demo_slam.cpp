@@ -165,6 +165,7 @@ const unsigned PATCH_DESC = 45;
 // data manager: zncc matcher and one-point-ransac
 const unsigned PATCH_SIZE = 15; // in pixels
 const unsigned MAX_SEARCH_SIZE = 50000;
+const unsigned KILL_SEARCH_SIZE = 100000;
 const double MATCH_TH = 0.90;
 const double MAHALANOBIS_TH = 3; // in n_sigmas
 const unsigned N_UPDATES_TOTAL = 25;
@@ -199,12 +200,12 @@ void demo_slam01_main(world_ptr_t *world) {
 	boost::shared_ptr<ObservationFactory> obsFact(new ObservationFactory());
 	if (intOpts[iSimu] == 1)
 	{
-		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeEucpSimuObservationMaker(PATCH_SIZE, D_MIN)));
-		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhpSimuObservationMaker(PATCH_SIZE, D_MIN, REPARAM_TH)));
+		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeEucpSimuObservationMaker(REPARAM_TH, KILL_SEARCH_SIZE, 30, 0.5, 0.5, D_MIN, PATCH_SIZE)));
+		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhpSimuObservationMaker(REPARAM_TH, KILL_SEARCH_SIZE, 30, 0.5, 0.5, D_MIN, PATCH_SIZE)));
 	} else
 	{
-		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeEucpObservationMaker(PATCH_SIZE, D_MIN)));
-		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhpObservationMaker(PATCH_SIZE, D_MIN, REPARAM_TH)));
+		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeEucpObservationMaker(REPARAM_TH, KILL_SEARCH_SIZE, 30, 0.5, 0.5, D_MIN, PATCH_SIZE)));
+		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhpObservationMaker(REPARAM_TH, KILL_SEARCH_SIZE, 30, 0.5, 0.5, D_MIN, PATCH_SIZE)));
 	}
 
 

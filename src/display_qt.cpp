@@ -37,36 +37,18 @@ namespace display {
 	
 	*/
 	SensorQt::SensorQt(ViewerAbstract *_viewer, rtslam::SensorAbstract *_slamSen, RobotQt *_dispRob): 
-		SensorDisplay(_viewer, _slamSen, _dispRob), viewerQt(PTR_CAST<ViewerQt*>(_viewer))
+		SensorDisplay(_viewer, _slamSen, _dispRob), viewerQt(PTR_CAST<ViewerQt*>(_viewer)), 
+		viewer_(NULL), view_private(NULL), framenumber_label(NULL), sensorpose_label(NULL)
 	{
-		viewer_ = new qdisplay::Viewer();
-		view_ = new qdisplay::ImageView();
-		viewer_->setImageView(view_, 0, 0);
-		viewer_->resize(660,500);
-		viewer_->setSceneRect(0,0,640,480);
-		std::ostringstream oss; oss << "Sensor " << slamSen_->id();
-		viewer_->setTitle(oss.str());
 		framenumber = 0;
 		t = 0.;
 		id_ = slamSen_->id();
 		avg_framerate = 0.;
-		
-		framenumber_label = new QGraphicsTextItem(view_);
-		//framenumber_label->setFont(QFont( m_label->font().family(), m_fontSize));
-		framenumber_label->setFont(QFont("monospace", 10, QFont::Bold));
-		framenumber_label->setDefaultTextColor(QColor(0,192,0));
-		framenumber_label->translate(0,15);
-		
-		sensorpose_label = new QGraphicsTextItem(view_);
-		//sensorpose_label->setFont(QFont( m_label->font().family(), m_fontSize));
-		sensorpose_label->setFont(QFont("monospace", 10, QFont::Bold));
-		sensorpose_label->setDefaultTextColor(QColor(0,192,0));
-		sensorpose_label->translate(0,0);
 	}
 	
 	SensorQt::~SensorQt()
 	{
-		delete view_;
+		delete view_private;
 		delete viewer_;
 		delete framenumber_label;
 		delete sensorpose_label;
@@ -87,13 +69,40 @@ namespace display {
 		}
 	}
 	
+	qdisplay::ImageView* SensorQt::view()
+	{
+		if (view_private == NULL)
+		{
+			viewer_ = new qdisplay::Viewer();
+			view_private = new qdisplay::ImageView();
+			viewer_->setImageView(view_private, 0, 0);
+			viewer_->resize(660,500);
+			viewer_->setSceneRect(0,0,640,480);
+			std::ostringstream oss; oss << "Sensor " << slamSen_->id();
+			viewer_->setTitle(oss.str());
+			
+			framenumber_label = new QGraphicsTextItem(view_private);
+			//framenumber_label->setFont(QFont( m_label->font().family(), m_fontSize));
+			framenumber_label->setFont(QFont("monospace", 10, QFont::Bold));
+			framenumber_label->setDefaultTextColor(QColor(0,192,0));
+			framenumber_label->translate(0,15);
+			
+			sensorpose_label = new QGraphicsTextItem(view_private);
+			//sensorpose_label->setFont(QFont( m_label->font().family(), m_fontSize));
+			sensorpose_label->setFont(QFont("monospace", 10, QFont::Bold));
+			sensorpose_label->setDefaultTextColor(QColor(0,192,0));
+			sensorpose_label->translate(0,0);
+		}
+		return view_private;
+	}
+	
 	void SensorQt::render()
 	{
 		switch (type_)
 		{
 			case SensorAbstract::PINHOLE:
 			case SensorAbstract::BARRETO: {
-				view_->setImage(image);
+				view()->setImage(image);
 				std::ostringstream oss; oss << "#" << framenumber << "  |  " << std::setprecision(3) << avg_framerate*1000 << " ms";
 				framenumber_label->setPlainText(oss.str().c_str());
 				
@@ -128,7 +137,7 @@ namespace display {
 		{
 			case SensorAbstract::PINHOLE:
 			case SensorAbstract::BARRETO: {
-				view_->exportView(filename);
+				view()->exportView(filename);
 			}
 		}
 	}
@@ -137,7 +146,7 @@ namespace display {
 	
 	*/
 	ObservationQt::ObservationQt(ViewerAbstract *_viewer, rtslam::ObservationAbstract *_slamObs, SensorQt *_dispSen):
-		ObservationDisplay(_viewer, _slamObs, _dispSen), viewerQt(PTR_CAST<ViewerQt*>(_viewer)), view_(_dispSen->view_)
+		ObservationDisplay(_viewer, _slamObs, _dispSen), viewerQt(PTR_CAST<ViewerQt*>(_viewer)), dispSen_(_dispSen)
 	{
 #if EMBED_PREDICTED_APP
 		predictedApp_ = NULL;
@@ -233,20 +242,20 @@ namespace display {
 					s->setFontSize(viewerQt->fontSize);
 					s->setVisible(false);
 					items_.push_back(s);
-					view_->addShape(s);
+					dispSen_->view()->addShape(s);
 					
 					// prediction ellipse
 					s = new qdisplay::Ellipsoid(predObs_, predObsCov_, viewerQt->ellipsesScale);
 					s->setVisible(false);
 					items_.push_back(s);
-					view_->addShape(s);
+					dispSen_->view()->addShape(s);
 					
 					// measure point
 					s = new qdisplay::Shape(qdisplay::Shape::ShapeCrossX, measObs_(0), measObs_(1), 3, 3);
 					s->setFontSize(viewerQt->fontSize);
 					s->setVisible(false);
 					items_.push_back(s);
-					view_->addShape(s);
+					dispSen_->view()->addShape(s);
 					
 				}
 				// Refresh the display objects every time

@@ -123,9 +123,10 @@ class SensorQt : public SensorDisplay
 		unsigned int id_;
 		// graphical objects
 		qdisplay::Viewer *viewer_;
-		qdisplay::ImageView* view_;
+		qdisplay::ImageView* view_private;
 		QGraphicsTextItem* framenumber_label;
 		QGraphicsTextItem* sensorpose_label;
+		qdisplay::ImageView* view();
 	public:
 		SensorQt(ViewerAbstract *_viewer, rtslam::SensorAbstract *_slamSen, RobotQt *_dispRob);
 		~SensorQt();
@@ -176,7 +177,7 @@ class ObservationQt : public ObservationDisplay
 		double match_score;
 		// TODO grid
 		// graphical objects
-		qdisplay::ImageView* view_; // not owner
+		SensorQt *dispSen_; // not owner
 		typedef std::list<qdisplay::Shape*> ItemList;
 		ItemList items_;
 	public:

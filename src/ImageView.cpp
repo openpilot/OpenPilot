@@ -339,18 +339,7 @@ void ImageView::hoverMoveEvent ( QGraphicsSceneHoverEvent * event )
 	for(QList<QGraphicsView *>::const_iterator it = views.begin(); it != views.end(); ++it)
 	{
 		qdisplay::Viewer *viewer = dynamic_cast<qdisplay::Viewer*>(*it);
-		if (viewer)
-		{
-			std::ostringstream oss;
-			oss.precision(2); oss.setf(std::ios::fixed, std::ios::floatfield);
-			if ( (viewer->getTitle()).length() > 0)
-			{
-				oss << viewer->getTitle() << "   |   (" << pos.x() << "  " << pos.y() << ")";
-			} else {
-				oss << " (" << pos.x() << "  " << pos.y() << ") ";
-			}
-			viewer->setWindowTitle(oss.str().c_str());
-		}
+		if (viewer) viewer->setTitleWithMouseCoordinates(pos.x(), pos.y());
 	}
 }
 

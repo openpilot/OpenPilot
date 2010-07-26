@@ -392,6 +392,7 @@ void Viewer::mouseMoveEvent( QMouseEvent* event )
 }/*}}}*/
 
 
+
 // QGraphicsScene mouse events
 void MouseGraphicsScene::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 {
@@ -402,18 +403,7 @@ void MouseGraphicsScene::mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
 	for(QList<QGraphicsView *>::const_iterator it = views_.begin(); it != views_.end(); ++it)
 	{
 		qdisplay::Viewer *viewer = dynamic_cast<qdisplay::Viewer*>(*it);
-		if (viewer)
-		{
-			std::ostringstream oss;
-			oss.precision(2); oss.setf(std::ios::fixed, std::ios::floatfield);
-			if ( (viewer->getTitle()).length() > 0)
-			{
-				oss << viewer->getTitle() << "   |   (" << pos.x() << "  " << pos.y() << ")";
-			} else {
-				oss << " (" << pos.x() << "  " << pos.y() << ") ";
-			}
-			viewer->setWindowTitle(oss.str().c_str());
-		}
+		if (viewer) viewer->setTitleWithMouseCoordinates(pos.x(), pos.y());
 	}
 	QGraphicsScene::mouseMoveEvent(event);
 }
@@ -490,7 +480,18 @@ void Viewer::exportView( const std::string& _fileName )
 void Viewer::setTitle(const std::string& _title )
 {
 	title = _title;
-	setWindowTitle(_title.c_str());
+	setWindowTitle(title.c_str());
 }
+
+
+void Viewer::setTitleWithMouseCoordinates(double x, double y)
+{
+	std::ostringstream oss;
+	oss.precision(2); oss.setf(std::ios::fixed, std::ios::floatfield);
+	if (title.length() > 0) oss << title << "   |   ";
+	oss << "(" << x << "  " << y << ")";
+	setWindowTitle(oss.str().c_str());
+}
+
 
 #include "Viewer.moc"

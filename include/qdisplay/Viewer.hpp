@@ -85,7 +85,8 @@ class Viewer : public QGraphicsView {
      */
     void close();
 
-    void setTitle(const std::string& _title );
+		void setTitle(const std::string& _title );
+		void setTitleWithMouseCoordinates(double x, double y);
 		std::string const& getTitle() { return title; }
 
 	/** Set the status message appearing in the status bar

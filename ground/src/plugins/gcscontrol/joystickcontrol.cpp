@@ -91,7 +91,7 @@ void JoystickControl::mccChanged(UAVObject*)
         ManualControlCommand::DataFields data = getMCC()->getData();
         double x = (data.Yaw + 1) / 2 * scene()->sceneRect().width();
         double y = (data.Pitch + 1) / 2 * scene()->sceneRect().height();
-        m_joystickEnd->setPos(x,y);
+        m_joystickEnd->setPos(x-m_joystickEnd->boundingRect().width()/2,y-m_joystickEnd->boundingRect().height()/2);
     }
     else if( this->objectName() == QString("widgetRightStick"))
     {
@@ -99,7 +99,7 @@ void JoystickControl::mccChanged(UAVObject*)
         double x = (data.Roll + 1) / 2 * scene()->sceneRect().width();
         double y = (data.Throttle + 1) / 2 * scene()->sceneRect().height();
 
-        m_joystickEnd->setPos(x,y);
+        m_joystickEnd->setPos(x-m_joystickEnd->boundingRect().width()/2,y-m_joystickEnd->boundingRect().height()/2);
     }
 
 }

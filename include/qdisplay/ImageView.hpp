@@ -5,6 +5,7 @@
 #include <QGraphicsItemGroup>
 
 #include <image/Image.hpp>
+#include <string>
 
 class QAction;
 
@@ -30,8 +31,16 @@ class ImageView : public QObject, public QGraphicsItemGroup {
      * @param img the jafar image to display
      */
     ImageView(const jafar::image::Image& img);
-    void connectEvents();
+
+	/** Create an ImageView from a file
+	 * @param filename Path to an image file. its format should be readable by jafar::image module (OpenCV)
+	 */
+	ImageView(const std::string& filename);
+
+	/** Destructor */
     ~ImageView();
+
+    void connectEvents();
     int imageWidth() const;
     int imageHeight() const;
     /**

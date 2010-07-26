@@ -24,6 +24,7 @@
 
 using namespace jafar::qdisplay;
 
+//----------- Default constructor
 ImageView::ImageView() :
     m_pixmapItem(new QGraphicsPixmapItem()),
     m_currentZ(0.),
@@ -35,7 +36,7 @@ ImageView::ImageView() :
 	connectEvents();
 }
 
-
+//----------- Constructor from a Jafar Image
 ImageView::ImageView(const jafar::image::Image& img) :
     m_pixmapItem(new QGraphicsPixmapItem()),
     m_currentZ(0.),
@@ -45,6 +46,20 @@ ImageView::ImageView(const jafar::image::Image& img) :
   m_pixmapItem->setZValue(m_currentZ++);
   addToGroup(m_pixmapItem);
   connectEvents();
+}
+
+//----------- Constructor from a file name
+ImageView::ImageView(const std::string& filename) :
+    m_pixmapItem(new QGraphicsPixmapItem()),
+    m_currentZ(0.),
+    m_eventHandler(0)
+{
+	jafar::image::Image img;
+	img.load(filename);
+	setImage(img);
+	m_pixmapItem->setZValue(m_currentZ++);
+	addToGroup(m_pixmapItem);
+	connectEvents();
 }
 
 void ImageView::connectEvents()

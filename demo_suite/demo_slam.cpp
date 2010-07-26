@@ -242,7 +242,9 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	// 2. Create robots.
 	robot_ptr_t robPtr1;
+#ifdef HAVE_MTI
 	if (intOpts[iRobot] == 0)
+#endif
 	{
 		robconstvel_ptr_t robPtr1_(new RobotConstantVelocity(mapPtr));
 		robPtr1_->setVelocityStd(UNCERT_VLIN, UNCERT_VANG);
@@ -255,7 +257,9 @@ void demo_slam01_main(world_ptr_t *world) {
 		robPtr1_->constantPerturbation = false;
 
 		robPtr1 = robPtr1_;
-	} else
+	}
+#ifdef HAVE_MTI
+	else
 	if (intOpts[iRobot] == 1)
 	{
 		robinertial_ptr_t robPtr1_(new RobotInertial(mapPtr));
@@ -288,6 +292,7 @@ void demo_slam01_main(world_ptr_t *world) {
 
 		robPtr1 = robPtr1_;
 	}
+#endif
 
 	robPtr1->setId();
 	robPtr1->linkToParentMap(mapPtr);

@@ -143,7 +143,10 @@ void RawHIDReadThread::run()
         if(ret > 0) //read some data
         {
             m_readBufMtx.lock();
-            m_readBuffer.append(buffer, ret);
+            /* First byte is report ID, can be ignored */
+            /* Second byte is the number of valid bytes */
+            m_readBuffer.append(&buffer[2], buffer[1]);
+            // m_readBuffer.append(buffer, ret);
             m_readBufMtx.unlock();
 
             emit m_hid->readyRead();
@@ -238,7 +241,7 @@ void RawHIDWriteThread::run()
 
 int RawHIDWriteThread::pushDataToWrite(const char *data, int size)
 {
-    QMutexLocker lock(&m_writeBufMtx);
+    //QMutexLocker lock(&m_writeBufMtx);
 
     m_writeBuffer.append(data, size);
     m_newDataToWrite.wakeOne(); //signal that new data arrived
@@ -247,7 +250,7 @@ int RawHIDWriteThread::pushDataToWrite(const char *data, int size)
 
 qint64 RawHIDWriteThread::getBytesToWrite()
 {
-    QMutexLocker lock(&m_writeBufMtx);
+    // QMutexLocker lock(&m_writeBufMtx);
     return m_writeBuffer.size();
 }
 

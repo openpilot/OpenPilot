@@ -107,7 +107,8 @@ QStringList RawHIDConnection::availableDevices()
     {
         char serial[256];
         dev.getserial(i, serial);
-        devices.append(QString::fromAscii(serial, DEV_SERIAL_LEN));
+        QString sn = QString::fromAscii(serial, DEV_SERIAL_LEN);
+        devices.append(sn);
         dev.close(i);
     }
 

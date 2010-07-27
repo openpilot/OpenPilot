@@ -119,30 +119,30 @@ const uint8_t PIOS_HID_ConfigDescriptor[PIOS_HID_SIZ_CONFIG_DESC] =
   ; /* CustomHID_ConfigDescriptor */
 const uint8_t PIOS_HID_ReportDescriptor[PIOS_HID_SIZ_REPORT_DESC] =
   {                    
-    0x06, 0xFF, 0x00,      /* USAGE_PAGE (Vendor Page: 0xFF00) */                       
+    0x06, 0x9c, 0xff,      /* USAGE_PAGE (Vendor Page: 0xFF00) */                       
     0x09, 0x01,            /* USAGE (Demo Kit)               */    
     0xa1, 0x01,            /* COLLECTION (Application)       */            
     /* 6 */
     
     /* Data 1 */        
     0x85, 0x01,            /*     REPORT_ID (1)		     */
-    0x09, 0x01,            /*     USAGE (LED 1)	             */
+    0x09, 0x02,            /*     USAGE (LED 1)	             */
     0x15, 0x00,            /*     LOGICAL_MINIMUM (0)        */          
     0x25, 0xff,            /*     LOGICAL_MAXIMUM (255)      */           
     0x75, 0x08,            /*     REPORT_SIZE (8)            */        
     0x95, PIOS_USB_HID_DATA_LENGTH+1,            /*     REPORT_COUNT (1)           */       
-	0x81, 0x83,            /*     INPUT (Const,Var,Array)          */                    
-	/* 20 */	  
+    0x81, 0x83,            /*     INPUT (Const,Var,Array)          */                    
+    /* 20 */	  
 	  
-	/* Data 1 */        
-	0x85, 0x02,            /*     REPORT_ID (2)		     */
-	0x09, 0x01,            /*     USAGE (LED 1)	             */
-	0x15, 0x00,            /*     LOGICAL_MINIMUM (0)        */          
-	0x25, 0xff,            /*     LOGICAL_MAXIMUM (255)      */           
-	0x75, 0x08,            /*     REPORT_SIZE (8)            */        
-	0x95, PIOS_USB_HID_DATA_LENGTH+1,            /*     REPORT_COUNT (1)           */       
-	0x91, 0x82,            /*     OUTPUT (Data,Var,Abs,Vol)  */  
-	/* 34 */	  
+    /* Data 1 */        
+    0x85, 0x02,            /*     REPORT_ID (2)		     */
+    0x09, 0x03,            /*     USAGE (LED 1)	             */
+    0x15, 0x00,            /*     LOGICAL_MINIMUM (0)        */          
+    0x25, 0xff,            /*     LOGICAL_MAXIMUM (255)      */           
+    0x75, 0x08,            /*     REPORT_SIZE (8)            */        
+    0x95, PIOS_USB_HID_DATA_LENGTH+1,            /*     REPORT_COUNT (1)           */       
+    0x91, 0x82,            /*     OUTPUT (Data,Var,Abs,Vol)  */  
+    /* 34 */	  
 	  
     0xc0 	          /*     END_COLLECTION	             */
   }; /* CustomHID_ReportDescriptor */
@@ -178,7 +178,7 @@ uint8_t PIOS_HID_StringSerial[PIOS_HID_SIZ_STRING_SERIAL] =
   {
     PIOS_HID_SIZ_STRING_SERIAL,           /* bLength */
     USB_STRING_DESCRIPTOR_TYPE,        /* bDescriptorType */
-    'S', 0, 'T', 0, 'M', 0,'3', 0,'2', 0, '1', 0, '0', 0
+    'S', 0, 'T', 0, 'M', 0,'3', 0,'2', 0, '1', 0, '\0', 0
   };
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/

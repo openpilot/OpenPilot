@@ -48,7 +48,7 @@
 #define BUFFER_SIZE 64
 
 #define printf qDebug
-#define printf
+//#define printf
 
 typedef struct hid_struct hid_t;
 typedef struct buffer_struct buffer_t;
@@ -154,6 +154,7 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
     IOHIDManagerRegisterDeviceRemovalCallback(hid_manager, detach_callback, NULL);
     ret = IOHIDManagerOpen(hid_manager, kIOHIDOptionsTypeNone);
     if (ret != kIOReturnSuccess) {
+        printf("Could not start IOHIDManager");
         IOHIDManagerUnscheduleFromRunLoop(hid_manager,
                                           CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
         CFRelease(hid_manager);
@@ -239,7 +240,11 @@ int pjrc_rawhid::send(int num, void *buf, int len, int timeout)
     if (!hid || !hid->open) return -1;
 #if 1
 #warning "Send timeout not implemented on MACOSX"
-    IOReturn ret = IOHIDDeviceSetReport(hid->ref, kIOHIDReportTypeOutput, 0, (uint8_t *)buf, len);
+    uint8_t *report_buf = (uint8_t *) malloc(BUFFER_SIZE);
+    memcpy(&report_buf[2], buf,len);
+    report_buf[1] = len;
+    report_buf[0] = 2; // report ID
+    IOReturn ret = IOHIDDeviceSetReport(hid->ref, kIOHIDReportTypeOutput, 0, (uint8_t *)report_buf, BUFFER_SIZE);
     result = (ret == kIOReturnSuccess) ? len : -1;
 #endif
 #if 0
@@ -276,11 +281,11 @@ int pjrc_rawhid::getserial(int num, char *buf) {
     if (!hid || !hid->open) return -1;
 
     CFTypeRef serialnum = IOHIDDeviceGetProperty(hid->ref, CFSTR(kIOHIDSerialNumberKey));
-    if(CFGetTypeID(serialnum) == CFStringGetTypeID())
+    if(serialnum && CFGetTypeID(serialnum) == CFStringGetTypeID())
     {
         /* For some reason the first 8 bytes of 'serialnum' are useless (a struct?) */
         char *strptr = (char *)serialnum;
-        for(int i = 9; i < 33; i++) {
+        for(int i = 0; i < 24; i++) {
             *(buf++) = strptr[i];
         }
         return 0;
@@ -316,14 +321,16 @@ static void input_callback(void *context, IOReturn ret, void *sender, IOHIDRepor
     buffer_t *n;
     hid_t *hid;
 
-    printf("input_callback\n");
+    printf("input_callback, report id: %i buf: %x %x\n", id, data[0], data[1]);
     if (ret != kIOReturnSuccess || len < 1) return;
     hid = (hid_t*)context;
     if (!hid || hid->ref != sender) return;
     n = (buffer_t *)malloc(sizeof(buffer_t));
     if (!n) return;
     if (len > BUFFER_SIZE) len = BUFFER_SIZE;
-    memcpy(n->buf, data, len);
+    /* Real data starts at third byte, second byte is valid data size */
+    //len = data[1];
+    memcpy(n->buf, &data[0], len);
     n->len = len;
     n->next = NULL;
     if (!hid->first_buffer || !hid->last_buffer) {

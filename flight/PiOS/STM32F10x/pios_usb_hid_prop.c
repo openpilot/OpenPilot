@@ -337,23 +337,6 @@ uint8_t *CustomHID_GetStringDescriptor(uint16_t Length)
   {
     return NULL;
   }
-  else if (wValue0 == 3){ /* Need to get this string from hardware on the fly */
-	  uint8_t serial_number_str[40];
-	  uint8_t buffer[200];
-	  uint8_t len = 0;;
-	  if(PIOS_SYS_SerialNumberGet((char *) serial_number_str) >= 0) {
-		  for(uint8_t i = 0, len = 2; serial_number_str[i] != '\0' && len < 200; ++i) {
-			  buffer[len++] = serial_number_str[i];
-			  buffer[len++] = 0;
-		  }
-	  }
-	  else
-		  return NULL;
-	  buffer[0] = len; /* Descriptor Length */
-	  buffer[1] = USB_STRING_DESCRIPTOR_TYPE; /* Descriptor Type */
-	  ONE_DESCRIPTOR desc = {(uint8_t *) buffer, len};
-	  return Standard_GetDescriptorData(Length, &desc);		  
-  }	
   else 
   {
     return Standard_GetDescriptorData(Length, &String_Descriptor[wValue0]);

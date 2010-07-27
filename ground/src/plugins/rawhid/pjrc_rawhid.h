@@ -42,7 +42,7 @@ public:
     void close(int num);
     int send(int num, void *buf, int len, int timeout);
     int getserial(int num, char *buf);
-
+    void mytest(int num);
 private:
 
 };

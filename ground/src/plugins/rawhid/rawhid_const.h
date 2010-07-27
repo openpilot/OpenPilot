@@ -37,6 +37,6 @@ static const int PID            = 0x4117;
 static const int USAGE_PAGE     = 0xFF9C;
 static const int USAGE          = 0x0001;
 
-static const int DEV_SERIAL_LEN = 24;
+static const int DEV_SERIAL_LEN = 4;
 
 #endif // RAWHID_CONST_H

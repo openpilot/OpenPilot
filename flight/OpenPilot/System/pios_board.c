@@ -38,8 +38,8 @@
 void PIOS_Board_Init(void) {
 
 	/* Delay system */
-	PIOS_DELAY_Init();
-
+	PIOS_DELAY_Init();	
+	
 	/* SPI Init */
 	PIOS_SPI_Init();
 
@@ -69,8 +69,10 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_PPM)
 	PIOS_PPM_Init();
 #endif
-	PIOS_USB_Init(0);
-	PIOS_I2C_Init();
+#if defined(PIOS_INCLUDE_USB_HID)
+	PIOS_USB_HID_Init(0);
+#endif
+	//PIOS_I2C_Init();
 
 }
 
@@ -485,10 +487,12 @@ struct pios_com_dev pios_com_devs[] = {
     .id     = PIOS_USART_GPS,
     .driver = &pios_usart_com_driver,
   },
+#ifdef PIOS_INCLUDE_USB_HID
   {
     .id     = 0,
     .driver = &pios_usb_com_driver,
   },
+#endif
 #ifdef PIOS_COM_AUX
   {
     .id     = PIOS_USART_AUX,

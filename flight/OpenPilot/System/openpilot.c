@@ -28,7 +28,7 @@
 #include "openpilot.h"
 #include "uavobjectsinit.h"
 #include "systemmod.h"
-
+#include "stm32f10x.h"
 
 /* Task Priorities */
 #define PRIORITY_TASK_HOOKS             (tskIDLE_PRIORITY + 3)
@@ -71,7 +71,10 @@ int main()
 
 	/* Brings up System using CMSIS functions, enables the LEDs. */
 	PIOS_SYS_Init();
-
+	
+	WWDG_SetPrescaler(WWDG_Prescaler_8);
+	WWDG_SetWindowValue(0xff);
+	
 	/* Initialize the system thread */
 	SystemModInitialize();
 
@@ -101,6 +104,7 @@ void OpenPilotInit()
 	 * core subsystem initialisation
 	 * (see pios_board.c for your arch)
 	 * */
+	
 	PIOS_Board_Init();
 
 	/* Initialize modules */

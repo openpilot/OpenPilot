@@ -70,7 +70,6 @@ void USB_LP_CAN1_RX0_IRQHandler(void) //USB_Istr(void)
 #if (IMR_MSK & ISTR_CTR)
   if (wIstr & ISTR_CTR & wInterrupt_Mask)
   {
-    PIOS_LED_Toggle(LED2);
     /* servicing of the endpoint correct transfer interrupt */
     /* clear of the CTR flag into the sub */
     CTR_LP();

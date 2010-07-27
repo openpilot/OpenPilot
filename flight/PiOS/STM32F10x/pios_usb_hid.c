@@ -261,7 +261,6 @@ void PIOS_USB_HID_EP1_OUT_Callback(void)
 	/* We now have data waiting */
 	rx_buffer_new_data_ctr = rx_buffer[1];
 	SetEPRxStatus(ENDP1, EP_RX_VALID);
-	PIOS_LED_Toggle(LED2);
 }
 
 #endif

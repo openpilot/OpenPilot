@@ -37,7 +37,7 @@
  */
 
 
-
+#include <QDebug>
 #include "pjrc_rawhid.h"
 
 #include <unistd.h>
@@ -48,7 +48,7 @@
 #define BUFFER_SIZE 64
 
 #define printf qDebug
-//#define printf
+#define printf
 
 typedef struct hid_struct hid_t;
 typedef struct buffer_struct buffer_t;
@@ -285,7 +285,7 @@ int pjrc_rawhid::getserial(int num, char *buf) {
     {
         /* For some reason the first 8 bytes of 'serialnum' are useless (a struct?) */
         char *strptr = (char *)serialnum;
-        for(int i = 0; i < 24; i++) {
+        for(int i = 8; i < 33; i++) {
             *(buf++) = strptr[i];
         }
         return 0;

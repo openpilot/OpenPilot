@@ -88,6 +88,7 @@ namespace jafar {
 						obsCurrentPtr->predictAppearance();
 						jblas::sym_mat P = jblas::identity_mat(obsCurrentPtr->expectation.size())*jmath::sqr(matcher->params.lowInnov);
 						RoiSpec roi(exp, P, 1.0);
+						obsCurrentPtr->searchSize = roi.count();
 						
 						obsCurrentPtr->events.measured = true;
 						

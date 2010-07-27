@@ -44,6 +44,7 @@ namespace display {
 		t = 0.;
 		id_ = slamSen_->id();
 		avg_framerate = 0.;
+		pose.clear(); pose(3) = 1.0;
 	}
 	
 	SensorQt::~SensorQt()

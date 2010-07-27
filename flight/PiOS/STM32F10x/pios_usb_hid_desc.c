@@ -100,7 +100,7 @@ const uint8_t PIOS_HID_ConfigDescriptor[PIOS_HID_SIZ_CONFIG_DESC] =
 
     0x81,          /* bEndpointAddress: Endpoint Address (IN) */
     0x03,          /* bmAttributes: Interrupt endpoint */
-    0x02,          /* wMaxPacketSize: 2 Bytes max */
+    0x40,          /* wMaxPacketSize: 2 Bytes max */
     0x00,
     0x20,          /* bInterval: Polling Interval (32 ms) */
     /* 34 */
@@ -111,7 +111,7 @@ const uint8_t PIOS_HID_ConfigDescriptor[PIOS_HID_SIZ_CONFIG_DESC] =
     0x01,	/* bEndpointAddress: */
 			/*	Endpoint Address (OUT) */
     0x03,	/* bmAttributes: Interrupt endpoint */
-    0x02,	/* wMaxPacketSize: 2 Bytes max  */
+    0x40,	/* wMaxPacketSize: 2 Bytes max  */
     0x00,
     0x20,	/* bInterval: Polling Interval (20 ms) */
     /* 41 */
@@ -140,7 +140,7 @@ const uint8_t PIOS_HID_ReportDescriptor[PIOS_HID_SIZ_REPORT_DESC] =
 	0x15, 0x00,            /*     LOGICAL_MINIMUM (0)        */          
 	0x25, 0xff,            /*     LOGICAL_MAXIMUM (255)      */           
 	0x75, 0x08,            /*     REPORT_SIZE (8)            */        
-	0x95, 0x01,            /*     REPORT_COUNT (1)           */       
+	0x95, PIOS_USB_HID_DATA_LENGTH+1,            /*     REPORT_COUNT (1)           */       
 	0x91, 0x82,            /*     OUTPUT (Data,Var,Abs,Vol)  */  
 	/* 34 */	  
 	  

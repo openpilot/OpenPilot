@@ -49,7 +49,7 @@ const struct pios_com_driver pios_usb_com_driver = {
 static volatile uint8_t rx_buffer_new_data_ctr = 0;
 static volatile uint8_t rx_buffer_ix;
 static uint8_t transfer_possible = 0;
-static uint8_t rx_buffer[PIOS_USB_HID_DATA_LENGTH] = {0};
+static uint8_t rx_buffer[PIOS_USB_HID_DATA_LENGTH+2] = {0};
 
 static uint8_t transmit_remaining;
 static uint8_t *p_tx_buffer;
@@ -164,7 +164,7 @@ int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t *buffe
 	tx_buffer[0] = 1; /* report ID */
 	tx_buffer[1] = len; /* valid data length */
 	UserToPMABufferCopy((uint8_t*) tx_buffer, GetEPTxAddr(EP1_IN & 0x7F), len+2);
-//	SetEPTxCount((EP1_IN & 0x7F), 10);
+	SetEPTxCount((EP1_IN & 0x7F), PIOS_USB_HID_DATA_LENGTH+2);
 	
 	/* Send Buffer */
 	SetEPTxValid(ENDP1);
@@ -206,7 +206,7 @@ int32_t PIOS_USB_HID_RxBufferGet(uint8_t id)
 	/* There is still data in the buffer */
 	uint8_t b = rx_buffer[rx_buffer_ix++];
 	if(--rx_buffer_new_data_ctr == 0) {
-		rx_buffer_ix = 0;
+		rx_buffer_ix = 2; //the two bytes are report ID and valid data length respectively
 	}
 
 	/* Return received byte */
@@ -239,7 +239,7 @@ void PIOS_USB_HID_EP1_OUT_Callback(void)
 	PMAToUserBufferCopy((uint8_t *) rx_buffer, GetEPRxAddr(ENDP1 & 0x7F), DataLength);
 
 	/* We now have data waiting */
-	rx_buffer_new_data_ctr = DataLength;
+	rx_buffer_new_data_ctr = rx_buffer[1];
 	SetEPRxStatus(ENDP1, EP_RX_VALID);
 	PIOS_LED_Toggle(LED2);
 }

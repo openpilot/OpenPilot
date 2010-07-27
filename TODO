@@ -1,14 +1,24 @@
 
+Bugs
+------------------------------------
+- sticky landmarks !
+- trajectories are not repeatable and not always right
 
 Features
 ------------------------------------
 - segments
 - multimap
-- Adapt ActiveSearchGrid and QuickHarrisDetector to the new ROI specifications in module image
+- inertial slam <- in progress
 
 - estimation hardware <- IN PROGRESS FOR MTI
 - make rtslam Loggable with DataLogger
-- set up simulation, and see if we can use ORS
+- set up simulation
+- config files:
+  * slam-config: description of robots, sensors, hardware, calib, with uncertainties and their simu-factor
+  * env-config: a simulated environment with description of landmarks, robots and sensors trajectories
+  * [or] a file defines preset trajectories, and we make reference to them in env-config
+  * display-config: colors...
+- when doing replay, allow to have a sequence without missing images and simulate "real-time" (ignoring image loading of course)
 
 Organization
 ------------------------------------
@@ -16,21 +26,22 @@ Organization
 - move ExtendedKalmanFilterIndirect to filter
 - move Gaussian to jmath
 - move dma branch to master
+- is it possible to set up subdirectories with jafar/cmake ?
 
 
 
 Performance
 ------------------------------------
 - zncc optimizations :
+	6. start testing with a roi shrinked by 2, then the rest, it should speed up the process because in general the result is close to the center and thanks to 2.
+	7. to do in slam : if the search area is really to big, reduce n_sigmas to 2 or 1, if it is found it's nice, if it isn't it is not important
+	9. try to use cpu vectorialization (compute 4 zncc at once)
 	1. [ok] use integral images in explorer
 	2. [ok] test when partial correlation has been done if it is still possible to reach the goal score
 	3. [ok] work first with half resolution images (small investment at first, but 16 times faster then)
 	4. [ok] use a real ellipse roi (mahalanobis dist)
 	5. [ok] progressively enable optimizations when search area are larger
-	6. start testing with a roi shrinked by 2, then the rest, it should speed up the process because in general the result is close to the center and thanks to 2.
-	7. to do in slam : if the search area is really to big, reduce n_sigmas to 2 or 1, if it is found it's nice, if it isn't it is not important
 	8. [ok] try to copy the search area in another image for a better use of cpu cache -> we already do it when doing half res search, that is when the search area is large enough, so it should be ok
-	9. try to use cpu vectorialization (compute 4 zncc at once)
 - [ok] check algorithm speed <- Good 60Hz. See issues with RT and OS -> reboot and stop the most possible programs and services
 - find a more clever way to manipulate the map used space: ia_indirectArray() is possibly an expensive way to go, or maybe use eigen2 instead of ublas...
 
@@ -38,23 +49,32 @@ Performance
 
 Precision
 ------------------------------------
-- [ok] Finish implementing 1 point Ransac to avoid outliers
-- [ok] limit n_updates of ransac, and ensure that some active search is done after ransac.
+- define and implement measure->P in matcher
 - extend to n-point ransac and reduce the lowInnov ?
 - if no feature is found, try with larger ellipse, because there is little chance you find them back later (except if this one image is bad), if you never find them back you'll be for sure inconsistent, and if you try later the ellipses will be greater and greater.
-- recompute all infoGains for a few first updates in active search
 - Finish implementing RobotCentric Kalman
 - To investigate : predict, compute jacobians, correct mean offline, recompute jacobians, correct online = better consistence but how much more computations ?
 
-- test predicted patch variance: if too low, discard exploration and declare not matched.
+- test predicted patch variance: if too low, discard exploration and declare not matched. Or rather test the variance of where you search, we can add an option minSigma to explorer that don't do correlation if sigma too low.
 - when a point is detected, do a matching with itself with interpolation to find subpixel position
 - when a point is matched, try to estimate if there is a possible ambiguity with another point in the ellipse 
+
+- [ok] recompute all infoGains for a few first updates in active search
+- [ok] Finish implementing 1 point Ransac to avoid outliers
+- [ok] limit n_updates of ransac, and ensure that some active search is done after ransac.
+- [ok] when all the ellipses are too large (because we lost a lot of frames), before deleting all of them try to match with subregions, and maybe limit ransac number of tries... and don't delete obs once they have been updated! it's too late!
+- [ok] there are still some 'display library' objects construction in display objects constructors, which are possibly time consuming, they should be moved in render with '== NULL' test. Maybe this is why quite often there is a gap in the few first frames.
+
 
 Display
 ------------------------------------
 
-- [ok] Allow exhaustive rendering when offline, for videos
+- set up display for simulation ! all the landmarks of the environment should be displayed (in a light color), landmarks in the map with a different color, as well as the robot's frame. It should be set up in the more general framework of "ground truth", eg if we get ground truth for the robot with gps, or offline bundle adjustment.
+- display the robot frame in addition to its 3d model and its uncertainty ellipse
+- display max frame rate in addition to average frame rate, as well as raw processing time and filter time
 - Always do only 1 sensor update by loop, in order to associate a precise timestamp with time step, and correctly manage in display which elements have been modified in order to only refresh them (maps, landmarks of the map, sensors, observations...)
 - Catch keyboard and mouse events in the windows, in order to allow to play/pause/next, and to display infos about an obs and its lmk when it clicked on...
-- Implement double color labels for better visibility on light and dark backgrounds -> need to use Viewer::setStatusMessage
+- Implement double color labels for better visibility on light and dark backgrounds -> need to use Viewer::setStatusMessage, or not, because it won't be in the dumps...
 - do not use so much cpu when waiting
+
+- [ok] Allow exhaustive rendering when offline, for videos

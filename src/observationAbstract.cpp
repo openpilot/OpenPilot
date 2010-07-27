@@ -125,7 +125,6 @@ namespace jafar {
 				}
 
 		void ObservationAbstract::project() {
-
 			// Get global sensor pose
 			vec7 sg;
 			sensorPtr()->globalPose(sg, SG_rs);
@@ -133,7 +132,7 @@ namespace jafar {
 			// project lmk
 			vec lmk = landmarkPtr()->state.x();
 			vec exp, nobs;
-			project_func(sg, lmk, exp, nobs, EXP_sg, EXP_l);
+			model->project_func(sg, lmk, exp, nobs, EXP_sg, EXP_l);
 
 			// chain rule for Jacobians
 			mat EXP_rs = prod(EXP_sg, SG_rs);
@@ -150,6 +149,7 @@ namespace jafar {
 
 			// Events
 			events.predicted = true;
+// JFR_DEBUG("projected obs " << id() << ": expectation " << expectation.x() << " " << expectation.P());
 		}
 
 		void ObservationAbstract::backProject(){
@@ -162,7 +162,7 @@ namespace jafar {
 			vec pix = measurement.x();
 			vec invDist = prior.x();
 			vec lmk(landmarkPtr()->mySize());
-			backProject_func(sg, pix, invDist, lmk, LMK_sg, LMK_meas, LMK_prior);
+			model->backProject_func(sg, pix, invDist, lmk, LMK_sg, LMK_meas, LMK_prior);
 
 			landmarkPtr()->state.x(lmk);
 
@@ -219,16 +219,14 @@ namespace jafar {
 			mapPtr->filterPtr->correct(ia_x,innovation,INN_rsl,ia_rsl) ;
 		}
 
-
 		bool ObservationAbstract::voteForKillingLandmark(){
 			// kill big ellipses
 			// FIXME this is ok for 1 sensor, but not for more, because it won't work with policy ALL
 			// probably wee need to fix the policy, and chose a different policy according to the criteria
 			// (size = ANY, matchRatio = ALL, consistencyRatio = ...)
-			if (events.visible)
+			if (events.measured && !events.updated)
 			{
-				int searchSize = 36*sqrt(expectation.P(0,0)*expectation.P(1,1));
-				if (searchSize > 50000) {
+				if (searchSize > killSizeTh) {
 					cout << "Obs " << id() << " Killed by size (size " << searchSize << ")" << endl;
 					return true;
 				}
@@ -237,11 +235,11 @@ namespace jafar {
 			// kill unstable and inconsistent lmks
 			JFR_ASSERT(counters.nMatch <= counters.nSearch, "counters.nMatch " << counters.nMatch << " > counters.nSearch " << counters.nSearch);
 			JFR_ASSERT(counters.nInlier <= counters.nMatch, "counters.nInlier " << counters.nInlier << " > counters.nMatch " << counters.nMatch);
-			if (counters.nSearch > 30) {
+			if (counters.nSearch > killSearchTh) {
 				double matchRatio = counters.nMatch / (double) counters.nSearch;
 				double consistencyRatio = counters.nInlier / (double)counters.nMatch;
 
-				if (matchRatio < 0.5 || consistencyRatio < 0.5)	{
+				if (matchRatio < killMatchTh || consistencyRatio < killConsistencyTh)	{
 					cout << "Obs " << id() << " Killed by unstability (match " << matchRatio << " ; consistency " << consistencyRatio << ")"<< endl;
 					return true;
 				}

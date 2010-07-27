@@ -18,18 +18,18 @@ TODO:
 - correctly setup scene size
 - setup window size
 - compression of small movements for trajectories
-- set robot ellipse
 - draw a cross at target position
 
 ---------------------
-- scale ahp spheres to section of ellipses -> ok
-- set label shift for ellipses -> ok, difficult to improve in 3d...
-- remove ahp landmark after reparam -> ok
-- remove lost landmarks... -> ok
-- init is white, not yellow -> ok
-- add ellipses and segments for ahp -> ok
-- add id -> ok
-- find why some euclidean ellipses are not toward the camera... -> ok
+- [ok] scale ahp spheres to section of ellipses
+- [ok] set label shift for ellipses -> difficult to improve in 3d...
+- [ok] remove ahp landmark after reparam
+- [ok] remove lost landmarks...
+- [ok] init is white, not yellow
+- [ok] add ellipses and segments for ahp
+- [ok] add id
+- [ok] find why some euclidean ellipses are not toward the camera...
+- [ok] set robot ellipse
 */
 
 

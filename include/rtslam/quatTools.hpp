@@ -537,6 +537,13 @@ namespace jafar {
 				return q;
 			}
 
+			template<class VecE>
+			vec7 e2q_frame(const VecE & e) {
+				vec7 q;
+				subrange(q,0,3) = subrange(e,0,3);
+				subrange(q,3,7) = e2q(subrange(e,3,6));
+				return q;
+			}
 
 			/**
 			 * Jacobian of quaternion wrt Euler angles.
@@ -599,6 +606,15 @@ namespace jafar {
 				e(2) = atan2(y3, x3);
 				return e;
 			}
+			
+			template<class VecQ>
+			vec6 q2e_frame(const VecQ & q) {
+				vec6 e;
+				subrange(e,0,3) = subrange(q,0,3);
+				subrange(e,3,6) = q2e(subrange(q,3,7));
+				return e;
+			}
+
 
 
 			/**

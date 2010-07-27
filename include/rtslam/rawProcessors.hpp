@@ -36,6 +36,7 @@ namespace rtslam {
 		public:
 			struct matcher_params_t {
 				int patchSize;
+				int maxSearchSize;
 				double lowInnov;      ///<     search region radius for first RANSAC consensus
 				double threshold;     ///<     matching threshold
 				double mahalanobisTh; ///< Mahalanobis distance for outlier rejection
@@ -44,10 +45,11 @@ namespace rtslam {
 			} params;
 
 		public:
-			ImagePointZnccMatcher(double minScore, double partialPosition, int patchSize, double lowInnov, double threshold, double mahalanobisTh, double measStd):
+			ImagePointZnccMatcher(double minScore, double partialPosition, int patchSize, int maxSearchSize, double lowInnov, double threshold, double mahalanobisTh, double measStd):
 				matcher(minScore, partialPosition)
 			{
 				params.patchSize = patchSize;
+				params.maxSearchSize = maxSearchSize;
 				params.lowInnov = lowInnov;
 				params.threshold = threshold;
 				params.mahalanobisTh = mahalanobisTh;

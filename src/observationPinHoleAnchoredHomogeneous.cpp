@@ -25,31 +25,38 @@ namespace jafar {
 		using namespace jblas;
 		using namespace ublas;
 
+		ObservationModelPinHoleAnchoredHomogeneousPoint::ObservationModelPinHoleAnchoredHomogeneousPoint(
+			const sensor_ptr_t & pinholePtr)
+		{
+			init_sizes();
+			linkToSensorSpecific(pinholePtr);
+		}
+		
 		ObservationPinHoleAnchoredHomogeneousPoint::ObservationPinHoleAnchoredHomogeneousPoint(
 		    const sensor_ptr_t & pinholePtr, const landmark_ptr_t & ahpPtr) :
 			ObservationAbstract(pinholePtr, ahpPtr, 2, 1) {
+			modelSpec.reset(new ObservationModelPinHoleAnchoredHomogeneousPoint());
+			model = modelSpec;
 			type = PNT_PH_AH;
 		}
 
-		void ObservationPinHoleAnchoredHomogeneousPoint::setup(int patchSize, double dmin, double _reparTh)
+		void ObservationPinHoleAnchoredHomogeneousPoint::setup(double reparTh, int killSizeTh, int killSearchTh, double killMatchTh, double killConsistencyTh, double dmin)
 		{
+			ObservationAbstract::setup(reparTh, killSizeTh, killSearchTh, killMatchTh, killConsistencyTh);
 			//ObservationAbstract::setup(_noiseStd, getPrior());
 			Gaussian prior(1);
 			prior.x(0) = 1/(3*dmin);
 			prior.P(0,0) = prior.x(0)*prior.x(0);
 			setPrior(prior);
-			predictedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
-			observedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
-			reparTh = _reparTh;
 		}
 
 
-		void ObservationPinHoleAnchoredHomogeneousPoint::project_func(
+		void ObservationModelPinHoleAnchoredHomogeneousPoint::project_func(
 		    const vec7 & sg, const vec & lmk, vec & exp, vec & dist) {
 			// OK JS 12/6/2010
 			// resize input vectors
-			exp.resize(expectation.size());
-			dist.resize(prior.size());
+			exp.resize(exp_size);
+			dist.resize(prior_size);
 
 			// Some temps of known size
 			vec3 v;
@@ -60,13 +67,13 @@ namespace jafar {
 			exp = pinhole::projectPoint(k, d, v);
 		}
 
-		void ObservationPinHoleAnchoredHomogeneousPoint::project_func(
+		void ObservationModelPinHoleAnchoredHomogeneousPoint::project_func(
 		    const vec7 & sg, const vec & lmk, vec & exp, vec & dist, mat & EXP_sg,
 		    mat & EXP_lmk) {
 			// OK JS 12/6/2010
 			// resize input vectors
-			exp.resize(expectation.size());
-			dist.resize(prior.size());
+			exp.resize(exp_size);
+			dist.resize(prior_size);
 
 			// Some temps of known size
 			vec3 v;
@@ -90,7 +97,7 @@ namespace jafar {
 			EXP_lmk = prod(EXP_v, V_lmk);
 		}
 
-		void ObservationPinHoleAnchoredHomogeneousPoint::backProject_func(
+		void ObservationModelPinHoleAnchoredHomogeneousPoint::backProject_func(
 		    const vec7 & sg, const vec & pix, const vec & invDist, vec & ahp) {
 			// OK JS 12/6/2010
 			vec3 v;
@@ -99,7 +106,7 @@ namespace jafar {
 			ahp = lmkAHP::fromBearingOnlyFrame(sg, v, invDist(0));
 		}
 
-		void ObservationPinHoleAnchoredHomogeneousPoint::backProject_func(
+		void ObservationModelPinHoleAnchoredHomogeneousPoint::backProject_func(
 		    const vec7 & sg, const vec & pix, const vec & invDist, vec & ahp,
 		    mat & AHP_sg, mat & AHP_pix, mat & AHP_invDist) {
 
@@ -128,23 +135,24 @@ namespace jafar {
 
 		}
 
-		bool ObservationPinHoleAnchoredHomogeneousPoint::predictVisibility() {
-			bool inimg = pinhole::isInImage(expectation.x(),
-			                                pinHolePtr()->params.width,
-			                                pinHolePtr()->params.height);
-			bool infront = (expectation.nonObs(0) > 0.0);
-			events.visible = inimg && infront;
-			return events.visible;
+		bool ObservationModelPinHoleAnchoredHomogeneousPoint::predictVisibility_func(jblas::vec x, jblas::vec nobs)
+		{
+			bool inimg = pinhole::isInImage(x, pinHolePtr()->params.width, pinHolePtr()->params.height);
+			bool infront = (nobs(0) > 0.0);
+// JFR_DEBUG("ObservationModelPHAHP::predictVisibility_func x " << x << " nobs " << nobs << " inimg/infront " << inimg << "/" << infront);
+			return inimg && infront;
 		}
+		
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::predictAppearance_func() {
-			desc_img_pnt_ptr_t descPtr = SPTR_CAST<DescriptorImagePoint>(landmarkPtr()->descriptorPtr);
-			obs_ph_ahp_ptr_t _this = SPTR_CAST<ObservationPinHoleAnchoredHomogeneousPoint>(shared_from_this());
-			descPtr->predictAppearance(_this);
+			//desc_img_pnt_ptr_t descPtr = SPTR_CAST<DescriptorImagePoint>(landmarkPtr()->descriptorPtr);
+			//obs_ph_ahp_ptr_t _this = SPTR_CAST<ObservationPinHoleAnchoredHomogeneousPoint>(shared_from_this());
+			//descPtr->predictAppearance(_this);
+			observation_ptr_t _this = shared_from_this();
+			landmarkPtr()->descriptorPtr->predictAppearance(_this);
 		}
 
 		bool ObservationPinHoleAnchoredHomogeneousPoint::voteForReparametrizingLandmark(){
-			//TODO: use a parameter for the linearity test threshold.
 //			cout << "evaluating linearity for lmk: " << id() << endl;
 			return (lmkAHP::linearityScore(sensorPtr()->globalPose(), landmarkPtr()->state.x(), landmarkPtr()->state.P()) < reparTh);
 		}

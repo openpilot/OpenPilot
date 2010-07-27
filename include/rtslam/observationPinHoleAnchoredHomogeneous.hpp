@@ -24,72 +24,48 @@ namespace jafar {
 		class ObservationPinHoleAnchoredHomogeneousPoint;
 		typedef boost::shared_ptr<ObservationPinHoleAnchoredHomogeneousPoint> obs_ph_ahp_ptr_t;
 
-
-		/**
-		 * Class for Pin-Hole observations of Anchored Homogeneous 3D points.
-		 * \author jsola@laas.fr
-		 * \ingroup rtslam
-		 */
-		class ObservationPinHoleAnchoredHomogeneousPoint: public ObservationAbstract,
- 	    public SpecificChildOf<LandmarkAnchoredHomogeneousPoint>
+		
+		class ObservationModelPinHoleAnchoredHomogeneousPoint: public ObservationModelAbstract
 		{
 			public:
-			// Define the function linkToParentAHP.
-			ENABLE_LINK_TO_SPECIFIC_PARENT(LandmarkAbstract,LandmarkAnchoredHomogeneousPoint,AHP,ObservationAbstract)
-				;
-				// Define the functions ahp() and ahpPtr().
-			ENABLE_ACCESS_TO_SPECIFIC_PARENT(LandmarkAnchoredHomogeneousPoint,ahp)
-				;
-
-		public:
-		  typedef SensorPinHole sensor_spec_t;
-		  typedef boost::shared_ptr<sensor_spec_t> sensor_spec_ptr_t;
-		  typedef boost::weak_ptr<sensor_spec_t> sensor_spec_wptr_t;
-		protected:
-		  sensor_spec_wptr_t sensorSpecWPtr;
-		public:
-		  void linkToPinHole( sensor_spec_ptr_t ptr )
-		  {
-		    sensorSpecWPtr = ptr;
-		    ObservationAbstract::linkToSensor(ptr);
-		  }
-		  sensor_spec_ptr_t pinHolePtr( void )
-		  {
-		    sensor_spec_ptr_t sptr = sensorSpecWPtr.lock();
-		    if (!sptr) {
-		      std::cerr << __FILE__ << ":" << __LINE__
-				<< " ObsSpec::sensor threw weak" << std::endl;
-		      throw "WEAK";
-		    }
-		    return sptr;
-		  }
-		  virtual void linkToSensorSpecific( sensor_ptr_t ptr )
-		  {
-		    boost::shared_ptr<SensorPinHole> sptr = SPTR_CAST<SensorPinHole>( ptr );
-		    if( sptr==NULL )
-		      {
-			std::cerr << __FILE__ << ":" << __LINE__ << " : cast unfair." << std::endl;
-			throw "CAST";
-		      }
-		    linkToPinHole( sptr );
-		  }
-
-		public:
-
-				ObservationPinHoleAnchoredHomogeneousPoint(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & ahpPtr);
-				~ObservationPinHoleAnchoredHomogeneousPoint(void) {
-//					cout << "Deleted observation: " << id() << ": " << typeName() << endl;
+				typedef SensorPinHole sensor_spec_t;
+				typedef boost::shared_ptr<sensor_spec_t> sensor_spec_ptr_t;
+				typedef boost::weak_ptr<sensor_spec_t> sensor_spec_wptr_t;
+			protected:
+				sensor_spec_wptr_t sensorSpecWPtr;
+			public:
+				void linkToPinHole( sensor_spec_ptr_t ptr )
+				{
+					sensorSpecWPtr = ptr;
+					ObservationModelAbstract::linkToSensor(ptr);
 				}
-
-				virtual std::string typeName() {
-					return "Obs. Pinhole Anc. homog. point";
+				sensor_spec_ptr_t pinHolePtr( void )
+				{
+					sensor_spec_ptr_t sptr = sensorSpecWPtr.lock();
+					if (!sptr) {
+						std::cerr << __FILE__ << ":" << __LINE__ << " ObsSpec::sensor threw weak" << std::endl;
+						throw "WEAK";
+					}
+					return sptr;
 				}
-
-
-				void setup(int patchSize, double dmin, double _reparTh);
-
-//				void setup(double _pixNoise = 1.0);
-
+				virtual void linkToSensorSpecific( sensor_ptr_t ptr )
+				{
+					boost::shared_ptr<SensorPinHole> sptr = SPTR_CAST<SensorPinHole>( ptr );
+					if( sptr==NULL )
+					{
+						std::cerr << __FILE__ << ":" << __LINE__ << " : cast unfair." << std::endl;
+						throw "CAST";
+					}
+					linkToPinHole( sptr );
+				}
+			protected:
+				size_t exp_size, prior_size;
+				void init_sizes() { exp_size = 2; prior_size = 1; }
+			public:
+				
+				ObservationModelPinHoleAnchoredHomogeneousPoint() { init_sizes(); }
+				ObservationModelPinHoleAnchoredHomogeneousPoint(const sensor_ptr_t & pinholePtr);
+			
 				/**
 				 * Projection function, with Jacobians and non-observable part.
 				 */
@@ -115,12 +91,53 @@ namespace jafar {
 				 *
 				 * \return true if landmark is predicted visible.
 				 */
-				bool predictVisibility();
+				virtual bool predictVisibility_func(jblas::vec x, jblas::vec nobs);
+
+		};
+		
+
+		/**
+		 * Class for Pin-Hole observations of Anchored Homogeneous 3D points.
+		 * \author jsola@laas.fr
+		 * \ingroup rtslam
+		 */
+		class ObservationPinHoleAnchoredHomogeneousPoint: public ObservationAbstract,
+ 	    public SpecificChildOf<LandmarkAnchoredHomogeneousPoint>
+		{
+			public:
+			// Define the function linkToParentAHP.
+			ENABLE_LINK_TO_SPECIFIC_PARENT(LandmarkAbstract,LandmarkAnchoredHomogeneousPoint,AHP,ObservationAbstract)
+				;
+				// Define the functions ahp() and ahpPtr().
+			ENABLE_ACCESS_TO_SPECIFIC_PARENT(LandmarkAnchoredHomogeneousPoint,ahp)
+				;
+
+			boost::shared_ptr<ObservationModelPinHoleAnchoredHomogeneousPoint> modelSpec;
+			void linkToPinHole( ObservationModelPinHoleAnchoredHomogeneousPoint::sensor_spec_ptr_t ptr ) { modelSpec->linkToPinHole(ptr); }
+			ObservationModelPinHoleAnchoredHomogeneousPoint::sensor_spec_ptr_t pinHolePtr( void )  { return modelSpec->pinHolePtr(); }
+			void linkToSensorSpecific( sensor_ptr_t ptr ) { modelSpec->linkToSensorSpecific(ptr); }
+		
+		public:
+
+				ObservationPinHoleAnchoredHomogeneousPoint(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & ahpPtr);
+				~ObservationPinHoleAnchoredHomogeneousPoint(void) {
+//					cout << "Deleted observation: " << id() << ": " << typeName() << endl;
+				}
+
+				virtual std::string typeName() {
+					return "Obs. Pinhole Anc. homog. point";
+				}
+
+
+				void setup(double reparTh, int killSizeTh, int killSearchTh, double killMatchTh, double killConsistencyTh, double dmin);
+
+//				void setup(double _pixNoise = 1.0);
 
 				/**
 				 * Predict appearance
 				 */
 				virtual void predictAppearance_func();
+			
 
 				virtual double getMatchScore(){
 					return measurement.matchScore;

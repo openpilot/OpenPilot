@@ -62,7 +62,7 @@ namespace jafar {
 				ransacSetPtr->inlierObs.push_back(obsBasePtr);
 
 				current_try ++;
-//JFR_DEBUG("old mean : " << mapManagerPtr()->mapPtr()->x());
+// JFR_DEBUG("old mean : " << mapManagerPtr()->mapPtr()->x());
 				vec x_copy = updateMean(obsBasePtr);
 // JFR_DEBUG("updated mean");//: " << x_copy);
 
@@ -118,9 +118,10 @@ namespace jafar {
 				} // for each other obs
 
 // JFR_DEBUG_BEGIN(); JFR_DEBUG_SEND("#### Ransac set with base " << ransacSetPtr->obsBasePtr->id() << ":");
+// int n = 0;
 // for(ObsList::iterator it = ransacSetPtr->inlierObs.begin(); it != ransacSetPtr->inlierObs.end(); ++it)
-// 	JFR_DEBUG_SEND(" " << (*it)->id());
-// JFR_DEBUG_END();
+// 	{ JFR_DEBUG_SEND(" " << (*it)->id()); ++n; }
+// JFR_DEBUG_SEND(" [" << n << "]"); JFR_DEBUG_END();
 
 			} // for i = 0:n_tries
 
@@ -145,6 +146,7 @@ namespace jafar {
 				if (best_set->size() > 1)
 				{
 					// 2. for each obs in inliers
+JFR_DEBUG_BEGIN(); JFR_DEBUG_SEND("Updating with Ransac:");
 					for(ObsList::iterator obsIter = best_set->inlierObs.begin(); obsIter != best_set->inlierObs.end(); ++obsIter)
 					{
 						observation_ptr_t obsPtr = *obsIter;
@@ -153,6 +155,7 @@ namespace jafar {
 						obsPtr->events.updated = true;
 						numObs++;
 						
+JFR_DEBUG_SEND(" " << obsPtr->id());
 						#if BUFFERED_UPDATE
 						// 2a. add obs to buffer for EKF update
 						mapPtr->filterPtr->stackCorrection(obsPtr->innovation, obsPtr->INN_rsl, obsPtr->ia_rsl);
@@ -166,15 +169,19 @@ namespace jafar {
 					}
 					#if BUFFERED_UPDATE
 					// 3. perform buffered update
+// JFR_DEBUG("map before correction : " << mapManagerPtr()->mapPtr()->x() << " " << mapManagerPtr()->mapPtr()->P());
 					mapPtr->filterPtr->correctAllStacked(mapPtr->ia_used_states());
+// JFR_DEBUG("map after correction : " << mapManagerPtr()->mapPtr()->x() << " " << mapManagerPtr()->mapPtr()->P());
 // 	JFR_DEBUG("corrected all stacked observations");
 					#endif
+JFR_DEBUG_END();
 				}
 			}
 			
 			ObsList &activeSearchList = ((ransacSetList.size() == 0) || (best_set->size() <= 1) ? obsVisibleList : best_set->pendingObs);
 			// FIXME don't search again landmarks that failed as base
 			
+JFR_DEBUG_BEGIN(); JFR_DEBUG_SEND("Updating with ActiveSearch:");
 			for (int i = 0; i < algorithmParams.n_recomp_gains; ++i)
 			{
 				// 4. for each obs in pending: retake algorithm from active search
@@ -233,7 +240,9 @@ namespace jafar {
 
 							// 1c. predict search area and appearance
 							//cv::Rect roi = gauss2rect(obsPtr->expectation.x(), obsPtr->expectation.P() + matcherParams_.measVar*identity_mat(2), matcherParams_.mahalanobisTh);
-							image::ConvexRoi roi(obsPtr->expectation.x(), obsPtr->expectation.P() + matcher->params.measVar*identity_mat(2), matcher->params.mahalanobisTh);
+							RoiSpec roi(obsPtr->expectation.x(), obsPtr->expectation.P() + matcher->params.measVar*identity_mat(2), matcher->params.mahalanobisTh);
+							obsPtr->searchSize = roi.count();
+							if (obsPtr->searchSize > matcher->params.maxSearchSize) roi.scale(sqrt(matcher->params.maxSearchSize/(double)obsPtr->searchSize));
 							obsPtr->predictAppearance();
 // JFR_DEBUG("obs " << obsPtr->id() << " measured in " << roi);
 
@@ -270,6 +279,7 @@ namespace jafar {
 								if (obsPtr->compatibilityTest(matcher->params.mahalanobisTh)) { // use 3.0 for 3-sigma or the 5% proba from the chi-square tables.
 									numObs++;
 									//								kernel::Chrono update_chrono;
+JFR_DEBUG_SEND(" " << obsPtr->id());
 									obsPtr->update();
 									//								total_update_time += update_chrono.elapsedMicrosecond();
 									obsPtr->events.updated = true;
@@ -290,6 +300,7 @@ namespace jafar {
 					kernel::fastErase(activeSearchList, obsListSorted.rbegin()->second);
 				obsListSorted.clear(); // clear the list now or it will prevent the observation to be destroyed until next frame, and will still be displayed
 			}
+JFR_DEBUG_END();
 
 			// update obs counters
 			for(ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end();obsIter++)
@@ -541,7 +552,7 @@ namespace jafar {
 //JFR_DEBUG("lmk " << lmk << " was " << obsPtr->landmarkPtr()->state.x());
 //(dbg)			obsPtr->project_func(obsPtr->sensorPtr()->globalPose(), obsPtr->landmarkPtr()->state.x(), exp, nobs);
 //JFR_DEBUG("exp online " << exp);
-			obsPtr->project_func(senGlobPose, lmk, exp, nobs);
+			obsPtr->model->project_func(senGlobPose, lmk, exp, nobs);
 //JFR_DEBUG("exp offline " << exp);
 
 			// Assignments: 
@@ -572,7 +583,9 @@ namespace jafar {
 		matchWithExpectedInnovation(boost::shared_ptr<RawSpec> rawData,  observation_ptr_t obsPtr)
 		{
 			obsPtr->predictAppearance();
-			image::ConvexRoi roi(obsPtr->expectation.x(), obsPtr->expectation.P() + obsPtr->measurement.P(), matcher->params.mahalanobisTh);
+			RoiSpec roi(obsPtr->expectation.x(), obsPtr->expectation.P() + matcher->params.measVar*identity_mat(2), matcher->params.mahalanobisTh);
+			obsPtr->searchSize = roi.count();
+			if (obsPtr->searchSize > matcher->params.maxSearchSize) roi.scale(sqrt(matcher->params.maxSearchSize/(double)obsPtr->searchSize));
 			matcher->match(rawData, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
 
 			return (obsPtr->getMatchScore() > matcher->params.threshold && isExpectedInnovationInlier(obsPtr, matcher->params.mahalanobisTh));

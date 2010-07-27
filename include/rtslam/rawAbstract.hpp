@@ -55,12 +55,6 @@ namespace jafar {
 				friend ostream& operator <<(ostream & s, jafar::rtslam::RawAbstract & rawA);
 
 			public:
-				enum detect_method {
-					HARRIS ///< Harris corner detector.
-				};
-				enum match_method {
-					ZNCC ///< Zncc matching algorithm
-				};
 
 				double timestamp;
 				
@@ -69,14 +63,6 @@ namespace jafar {
 				virtual std::string categoryName() {
 					return "RAW";
 				}
-
-
-//				virtual bool detect(const detect_method met, const feature_ptr_t & featPtr, jafar::image::ROI* roiPtr = 0) = 0;
-//				virtual bool match(const match_method met, const appearance_ptr_t & targetApp, cv::Rect &roi, Measurement & measure, const appearance_ptr_t & app) = 0;
-
-				virtual void extractAppearance(const jblas::veci & pos, appearance_ptr_t & appPtr) = 0;
-
-				//				virtual bool match(observation_ptr_t & obsPtr) = 0;
 
 		};
 	}

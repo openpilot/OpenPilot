@@ -20,33 +20,40 @@ namespace jafar {
 		using namespace jblas;
 		using namespace ublas;
 
+		ObservationModelPinHoleEuclideanPoint::ObservationModelPinHoleEuclideanPoint(
+		    const sensor_ptr_t & pinholePtr)
+		{
+			init_sizes();
+			linkToSensorSpecific(pinholePtr);
+		}
+
 		ObservationPinHoleEuclideanPoint::ObservationPinHoleEuclideanPoint(
 		    const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr) :
 			ObservationAbstract(pinholePtr, eucPtr, 2, 1) {
+			modelSpec.reset(new ObservationModelPinHoleEuclideanPoint());
+			model = modelSpec;
 			type = PNT_PH_EUC;
 		}
 
-		void ObservationPinHoleEuclideanPoint::setup(int patchSize, double dmin, double _reparTh)
+		void ObservationPinHoleEuclideanPoint::setup(double reparTh, int killSizeTh, int killSearchTh, double killMatchTh, double killConsistencyTh, double dmin)
 		{
+			ObservationAbstract::setup(reparTh, killSizeTh, killSearchTh, killMatchTh, killConsistencyTh);
 			//ObservationAbstract::setup(_noiseStd, getPrior());
 			Gaussian prior(1); // should never be used
 			setPrior(prior);
 //			id() = landmarkPtr()->id();
 			// TODO: is this cast necessary? Change the arg of the setup if not.
-			//linkToPinHole(boost::dynamic_pointer_cast<SensorPinHole>
+			//linkToPinHole(SPTR_CAST<SensorPinHole>
 			//	      (pinholePtr));
 			//linkToParentEUC(eucPtr);
-			predictedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
-			observedAppearance.reset(new AppearanceImagePoint(patchSize, patchSize, CV_8U));
-			reparTh = _reparTh;
 		}
 
 
-		void ObservationPinHoleEuclideanPoint::project_func(const vec7 & sg,
+		void ObservationModelPinHoleEuclideanPoint::project_func(const vec7 & sg,
 		    const vec & lmk, vec & exp, vec & dist) {
 			// resize input vectors
-			exp.resize(expectation.size());
-			dist.resize(prior.size());
+			exp.resize(exp_size);
+			dist.resize(prior_size);
 
 			// Some temps of known size
 			vec3 v;
@@ -56,11 +63,11 @@ namespace jafar {
 			exp = pinhole::projectPoint(pinHolePtr()->params.intrinsic, pinHolePtr()->params.distortion, v);
 		}
 
-		void ObservationPinHoleEuclideanPoint::project_func(const vec7 & sg,
+		void ObservationModelPinHoleEuclideanPoint::project_func(const vec7 & sg,
 		    const vec & lmk, vec & exp, vec & dist, mat & EXP_sg, mat & EXP_lmk) {
 			// resize input vectors
-			exp.resize(expectation.size());
-			dist.resize(prior.size());
+			exp.resize(exp_size);
+			dist.resize(prior_size);
 
 			// Some temps of known size
 			vec3 v;
@@ -79,7 +86,7 @@ namespace jafar {
 			EXP_lmk = prod(EXP_v, V_lmk);
 		}
 
-		void ObservationPinHoleEuclideanPoint::backProject_func(const vec7 & sg,
+		void ObservationModelPinHoleEuclideanPoint::backProject_func(const vec7 & sg,
 		    const vec & meas, const vec & nobs, vec & euc) {
 
 			vec3 v;
@@ -91,7 +98,7 @@ namespace jafar {
 			euc = quaternion::eucFromFrame(sg, v);
 		}
 
-		void ObservationPinHoleEuclideanPoint::backProject_func(const vec7 & sg,
+		void ObservationModelPinHoleEuclideanPoint::backProject_func(const vec7 & sg,
 		    const vec & meas, const vec & nobs, vec & euc, mat & EUC_sg,
 		    mat & EUC_meas, mat & EUC_nobs) {
 
@@ -118,21 +125,21 @@ namespace jafar {
 
 		}
 
-
-
-		bool ObservationPinHoleEuclideanPoint::predictVisibility() {
-			bool inimg = pinhole::isInImage(expectation.x(),
-			                                pinHolePtr()->params.width,
-			                                pinHolePtr()->params.height);
-			bool infront = (expectation.nonObs(0) > 0.0);
-			events.visible = inimg && infront;
-			return events.visible;
+		bool ObservationModelPinHoleEuclideanPoint::predictVisibility_func(jblas::vec x, jblas::vec nobs)
+		{
+			bool inimg = pinhole::isInImage(x, pinHolePtr()->params.width, pinHolePtr()->params.height);
+			bool infront = (nobs(0) > 0.0);
+// JFR_DEBUG("ObservationModelPHAHP::predictVisibility_func x " << x << " nobs " << nobs << " inimg/infront " << inimg << "/" << infront);
+			return inimg && infront;
 		}
+		
 
 		void ObservationPinHoleEuclideanPoint::predictAppearance_func() {
-			desc_img_pnt_ptr_t descPtr = boost::static_pointer_cast<DescriptorImagePoint>(landmarkPtr()->descriptorPtr);
-			obs_ph_euc_ptr_t _this = boost::static_pointer_cast<ObservationPinHoleEuclideanPoint>(shared_from_this());
-			descPtr->predictAppearance(_this);
+			//desc_img_pnt_ptr_t descPtr = SPTR_CAST<DescriptorImagePoint>(landmarkPtr()->descriptorPtr);
+			//obs_ph_euc_ptr_t _this = SPTR_CAST<ObservationPinHoleEuclideanPoint>(shared_from_this());
+			//descPtr->predictAppearance(_this);
+			observation_ptr_t _this = shared_from_this();
+			landmarkPtr()->descriptorPtr->predictAppearance(_this);
 		}
 
 	}

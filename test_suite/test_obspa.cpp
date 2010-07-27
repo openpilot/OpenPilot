@@ -118,10 +118,10 @@ void test_obsap01(void) {
 	cout << "r = " << (MATLAB)r << endl;
 
 	// no jac
-	obspaPtr->backProject_func(senFrame, u, r, ahp);
+	obspaPtr->model->backProject_func(senFrame, u, r, ahp);
 	cout << "ahp = " << (MATLAB) ahp << endl;
 	// jac
-	obspaPtr->backProject_func(senFrame, u, r, ahp, AHP_s, AHP_u, AHP_r);
+	obspaPtr->model->backProject_func(senFrame, u, r, ahp, AHP_s, AHP_u, AHP_r);
 	cout << "[ahp_mat, AHP_rob_mat, AHP_s_mat, AHP_k_mat, AHP_c_mat, AHP_u_mat, AHP_r_mat] = retroProjAhmPntFromPinHoleOnRob(R, S, k, c, u, r);" << endl;
 	cout << "ahp = " << (MATLAB) ahp << endl;
 	cout << "ahp_mat" << endl;
@@ -141,11 +141,11 @@ void test_obsap01(void) {
 	cout << "ahp = " << (MATLAB) ahp << endl;
 
 	// no jac
-	obspaPtr->project_func(senFrame, ahp, u2, r2);
+	obspaPtr->model->project_func(senFrame, ahp, u2, r2);
 	cout << "u2 = " << (MATLAB) u2 << endl;
 	cout << "r2 = " << (MATLAB) r2 << endl;
 	// jac
-	obspaPtr->project_func(senFrame, ahp, u2, r2, U_s, U_ahp);
+	obspaPtr->model->project_func(senFrame, ahp, u2, r2, U_s, U_ahp);
 	cout << "[u2_mat, r2_mat, U2_rob_mat, U2_s_mat, U2_k_mat, U2_d_mat, U2_ahp_mat] = projAhmPntIntoPinHoleOnRob(R, S, k, d, ahp);" << endl;
 	cout << "r2 = " << (MATLAB) r2 << endl;
 	cout << "u2 = " << (MATLAB) u2 << endl;

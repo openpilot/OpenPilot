@@ -28,7 +28,7 @@ namespace jafar {
 			// TODO Auto-generated destructor stub
 		}
 
-
+/*
 		bool DescriptorImagePoint::predictAppearance(const obs_ph_euc_ptr_t & obsPtrNew)
 		{
 			return predictAppearance_img_pt(obsPtrNew);
@@ -39,6 +39,8 @@ namespace jafar {
 		}
 		
 		bool DescriptorImagePoint::predictAppearance_img_pt(const observation_ptr_t & obsPtrNew) {
+	*/
+		bool DescriptorImagePoint::predictAppearance(const observation_ptr_t & obsPtrNew) {
 
 			double zoom, rotation;
 			landmark_ptr_t lmkPtr = obsPtrNew->landmarkPtr();

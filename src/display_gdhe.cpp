@@ -41,11 +41,9 @@ namespace display {
 	void MapGdhe::render()
 	{
 		#if 0
-		jblas::vec poseEuler(6);
-		ublas::subrange(poseEuler,0,3) = ublas::subrange(poseQuat,0,3);
-		ublas::subrange(poseEuler,3,6) = quaternion::q2e(ublas::subrange(poseQuat,3,7));
+		jblas::vec poseEuler = quaternion::q2e_frame(poseQuat);
 		for(int i = 3; i < 6; ++i) poseEuler(i) = jmath::radToDeg(poseEuler(i));
-		std::swap(poseEuler(3), poseEuler(5)); // FIXME the common convention is yaw pitch roll, not roll pitch yaw...
+		std::swap(poseEuler(3), poseEuler(5)); // FIXME-EULER-CONVENTION
 		
 		frame.setPose(poseEuler);
 		frame.refresh();
@@ -110,7 +108,7 @@ namespace display {
 		ublas::subrange(poseEuler,3,6) = angleEuler;
 		//ublas::subrange(poseEuler,3,6) = quaternion::q2e(ublas::subrange(poseQuat,3,7));
 		for(int i = 3; i < 6; ++i) poseEuler(i) = jmath::radToDeg(poseEuler(i));
-		std::swap(poseEuler(3), poseEuler(5)); // FIXME the common convention is yaw pitch roll, not roll pitch yaw...
+		std::swap(poseEuler(3), poseEuler(5)); // FIXME-EULER-CONVENTION
 		robot->setPose(poseEuler);
 /*JFR_DEBUG("robot pos  : " << ublas::subrange(poseQuat,0,3));
 JFR_DEBUG("robot euler: " << angleEuler);

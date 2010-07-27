@@ -41,8 +41,9 @@ class ObservationMakerAbstract
 			type(sensor_type, landmark_type) {}
 
 		virtual observation_ptr_t create(const sensor_ptr_t &senPtr, const landmark_ptr_t &lmkPtr) = 0;
-		virtual feature_ptr_t createFeat(const sensor_ptr_t &senPtr, const landmark_ptr_t &lmkPtr) = 0;
+/*		virtual feature_ptr_t createFeat(const sensor_ptr_t &senPtr, const landmark_ptr_t &lmkPtr) = 0;
 		virtual descriptor_ptr_t createDesc(const sensor_ptr_t &senPtr, const landmark_ptr_t &lmkPtr, const feature_ptr_t &featPtr, const jblas::vec7 &senPoseInit, const observation_ptr_t &obsInitPtr) = 0;
+		*/
 };
 
 typedef boost::shared_ptr<ObservationMakerAbstract> observation_maker_ptr_t;
@@ -77,7 +78,7 @@ class ObservationFactory
 			observation_maker_ptr_t maker = getMaker(SenLmk(senPtr->type,lmkPtr->type));
 			return maker->create(senPtr, lmkPtr);
 		}
-		
+		/*
 		feature_ptr_t createFeat(const sensor_ptr_t &senPtr, const landmark_ptr_t &lmkPtr)
 		{
 			observation_maker_ptr_t maker = getMaker(SenLmk(senPtr->type,lmkPtr->type));
@@ -89,6 +90,7 @@ class ObservationFactory
 			observation_maker_ptr_t maker = getMaker(SenLmk(senPtr->type,lmkPtr->type));
 			return maker->createDesc(senPtr, lmkPtr, featPtr, senPoseInit, obsInitPtr);
 		}
+		*/
 };
 
 

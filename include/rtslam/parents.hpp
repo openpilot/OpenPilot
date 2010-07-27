@@ -14,6 +14,8 @@
 #include <boost/smart_ptr.hpp>
 #include <boost/bind.hpp>
 
+#include "rtslam/rtSlam.hpp"
+
 
 namespace jafar {
 	/**
@@ -220,7 +222,7 @@ public:
 	template<class ParentAbstract>
 	void linkToParentSpecific(const boost::shared_ptr<ParentAbstract> & ptr) {
 		boost::shared_ptr<Parent> spec_ptr =
-				boost::dynamic_pointer_cast<Parent>(ptr);
+				SPTR_CAST<Parent>(ptr);
 		parent_wptr = spec_ptr;
 	}
 
@@ -550,7 +552,7 @@ public:
   {									    \
     ChildOf<ParentSpec>::linkToParent(ptr);                                 \
     ptr->WeakParentOf<ChildSpec>::registerChild                             \
-         (boost::static_pointer_cast<ChildSpec>(shared_from_this()));	    \
+         (SPTR_CAST<ChildSpec>(shared_from_this()));	    \
     ChildOf<ParentAbs>::linkToParent(ptr);                                  \
     ptr->WeakParentOf<ChildAbs>::registerChild(shared_from_this());         \
   }

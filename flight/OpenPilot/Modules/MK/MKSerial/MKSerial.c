@@ -70,6 +70,7 @@
 #define OSD_MSG_CURRPOS_IDX		1
 #define OSD_MSG_NB_SATS_IDX 	50
 #define OSD_MSG_BATT_IDX		57
+#define OSD_MSG_GNDSPEED_IDX    58
 #define OSD_MSG_COMPHEADING_IDX	62
 #define OSD_MSG_NICK_IDX		64
 #define OSD_MSG_ROLL_IDX		65
@@ -529,6 +530,7 @@ static void DoConnectedToNC(void)
 			positionData.Altitude = pos.altitude;
 			positionData.Satellites = msg.pars[OSD_MSG_NB_SATS_IDX];
 			positionData.Heading = Par2Int16(&msg, OSD_MSG_COMPHEADING_IDX);
+			positionData.Groundspeed = ((float)Par2Int16(&msg, OSD_MSG_GNDSPEED_IDX))/100 /* cm/s => m/s */;
 			if (positionData.Satellites<5)
 			{
 				positionData.Status = POSITIONACTUAL_STATUS_NOFIX;

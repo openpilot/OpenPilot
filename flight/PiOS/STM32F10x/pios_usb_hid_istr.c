@@ -15,8 +15,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usb_lib.h"
-#include "pios_usb_pwr.h"
-#include "pios_usb_istr.h"
+#include "pios_usb_hid_pwr.h"
+#include "pios_usb_hid_istr.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/

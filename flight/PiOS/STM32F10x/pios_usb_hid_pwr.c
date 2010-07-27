@@ -17,7 +17,7 @@
 #include "stm32f10x.h"
 #include "usb_lib.h"
 #include "usb_conf.h"
-#include "pios_usb_pwr.h"
+#include "pios_usb_hid_pwr.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/

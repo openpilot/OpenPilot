@@ -17,9 +17,9 @@
 #include "stm32f10x.h"
 #include "usb_lib.h"
 #include "usb_conf.h"
-#include "pios_usb_prop.h"
-#include "pios_usb_desc.h"
-#include "pios_usb_pwr.h"
+#include "pios_usb_hid_prop.h"
+#include "pios_usb_hid_desc.h"
+#include "pios_usb_hid_pwr.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -68,34 +68,34 @@ USER_STANDARD_REQUESTS User_Standard_Requests =
 
 ONE_DESCRIPTOR Device_Descriptor =
   {
-    (uint8_t*)CustomHID_DeviceDescriptor,
-    CUSTOMHID_SIZ_DEVICE_DESC
+    (uint8_t*)PIOS_HID_DeviceDescriptor,
+    PIOS_HID_SIZ_DEVICE_DESC
   };
 
 ONE_DESCRIPTOR Config_Descriptor =
   {
-    (uint8_t*)CustomHID_ConfigDescriptor,
-    CUSTOMHID_SIZ_CONFIG_DESC
+    (uint8_t*)PIOS_HID_ConfigDescriptor,
+    PIOS_HID_SIZ_CONFIG_DESC
   };
 
-ONE_DESCRIPTOR CustomHID_Report_Descriptor =
+ONE_DESCRIPTOR PIOS_HID_Report_Descriptor =
   {
-    (uint8_t *)CustomHID_ReportDescriptor,
-    CUSTOMHID_SIZ_REPORT_DESC
+    (uint8_t *)PIOS_HID_ReportDescriptor,
+    PIOS_HID_SIZ_REPORT_DESC
   };
 
-ONE_DESCRIPTOR CustomHID_Hid_Descriptor =
+ONE_DESCRIPTOR PIOS_HID_Hid_Descriptor =
   {
-    (uint8_t*)CustomHID_ConfigDescriptor + CUSTOMHID_OFF_HID_DESC,
-    CUSTOMHID_SIZ_HID_DESC
+    (uint8_t*)PIOS_HID_ConfigDescriptor + PIOS_HID_OFF_HID_DESC,
+    PIOS_HID_SIZ_HID_DESC
   };
 
 ONE_DESCRIPTOR String_Descriptor[4] =
   {
-    {(uint8_t*)CustomHID_StringLangID, CUSTOMHID_SIZ_STRING_LANGID},
-    {(uint8_t*)CustomHID_StringVendor, CUSTOMHID_SIZ_STRING_VENDOR},
-    {(uint8_t*)CustomHID_StringProduct, CUSTOMHID_SIZ_STRING_PRODUCT},
-    {(uint8_t*)CustomHID_StringSerial, CUSTOMHID_SIZ_STRING_SERIAL}
+    {(uint8_t*)PIOS_HID_StringLangID, PIOS_HID_SIZ_STRING_LANGID},
+    {(uint8_t*)PIOS_HID_StringVendor, PIOS_HID_SIZ_STRING_VENDOR},
+    {(uint8_t*)PIOS_HID_StringProduct, PIOS_HID_SIZ_STRING_PRODUCT},
+    {(uint8_t*)PIOS_HID_StringSerial, PIOS_HID_SIZ_STRING_SERIAL}
   };
 
 /* Extern variables ----------------------------------------------------------*/
@@ -140,7 +140,7 @@ void CustomHID_Reset(void)
   pInformation->Current_Interface = 0;/*the default Interface*/
   
   /* Current Feature initialization */
-  pInformation->Current_Feature = CustomHID_ConfigDescriptor[7];
+  pInformation->Current_Feature = PIOS_HID_ConfigDescriptor[7];
   
 #ifdef STM32F10X_CL   
   /* EP0 is already configured in DFU_Init() by USB_SIL_Init() function */
@@ -350,7 +350,7 @@ uint8_t *CustomHID_GetStringDescriptor(uint16_t Length)
 *******************************************************************************/
 uint8_t *CustomHID_GetReportDescriptor(uint16_t Length)
 {
-  return Standard_GetDescriptorData(Length, &CustomHID_Report_Descriptor);
+  return Standard_GetDescriptorData(Length, &PIOS_HID_Report_Descriptor);
 }
 
 /*******************************************************************************
@@ -362,7 +362,7 @@ uint8_t *CustomHID_GetReportDescriptor(uint16_t Length)
 *******************************************************************************/
 uint8_t *CustomHID_GetHIDDescriptor(uint16_t Length)
 {
-  return Standard_GetDescriptorData(Length, &CustomHID_Hid_Descriptor);
+  return Standard_GetDescriptorData(Length, &PIOS_HID_Hid_Descriptor);
 }
 
 /*******************************************************************************

@@ -15,7 +15,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usb_lib.h"
-#include "pios_usb_desc.h"
+#include "pios_usb.h"
+#include "pios_usb_hid_desc.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -26,7 +27,7 @@
 /* Private functions ---------------------------------------------------------*/
 
 /* USB Standard Device Descriptor */
-const uint8_t CustomHID_DeviceDescriptor[CUSTOMHID_SIZ_DEVICE_DESC] =
+const uint8_t PIOS_HID_DeviceDescriptor[PIOS_HID_SIZ_DEVICE_DESC] =
   {
     0x12,                       /*bLength */
     USB_DEVICE_DESCRIPTOR_TYPE, /*bDescriptorType*/
@@ -36,17 +37,17 @@ const uint8_t CustomHID_DeviceDescriptor[CUSTOMHID_SIZ_DEVICE_DESC] =
     0x00,                       /*bDeviceSubClass*/
     0x00,                       /*bDeviceProtocol*/
     0x40,                       /*bMaxPacketSize40*/
-    0x83,                       /*idVendor (0x0483)*/
-    0x04,
-    0x50,                       /*idProduct = 0x5750*/
-    0x57,
-    0x00,                       /*bcdDevice rel. 2.00*/
-    0x02,
-    1,                          /*Index of string descriptor describing
+    (uint8_t)((PIOS_USB_VENDOR_ID) & 0xff),   /*idVendor */
+    (uint8_t)((PIOS_USB_VENDOR_ID) >> 8),
+    (uint8_t)((PIOS_USB_PRODUCT_ID) & 0xff),  /*idProduct */
+    (uint8_t)((PIOS_USB_PRODUCT_ID) >> 8),
+    (uint8_t)((PIOS_USB_VERSION_ID) & 0xff),  /*bcdDevice */
+    (uint8_t)((PIOS_USB_VERSION_ID) >> 8),
+    0x01,                        /*Index of string descriptor describing
                                               manufacturer */
-    2,                          /*Index of string descriptor describing
+    0x02,                        /*Index of string descriptor describing
                                              product*/
-    3,                          /*Index of string descriptor describing the
+    0x03,                        /*Index of string descriptor describing the
                                              device serial number */
     0x01                        /*bNumConfigurations*/
   }
@@ -55,11 +56,11 @@ const uint8_t CustomHID_DeviceDescriptor[CUSTOMHID_SIZ_DEVICE_DESC] =
 
 /* USB Configuration Descriptor */
 /*   All Descriptors (Configuration, Interface, Endpoint, Class, Vendor */
-const uint8_t CustomHID_ConfigDescriptor[CUSTOMHID_SIZ_CONFIG_DESC] =
+const uint8_t PIOS_HID_ConfigDescriptor[PIOS_HID_SIZ_CONFIG_DESC] =
   {
     0x09, /* bLength: Configuation Descriptor size */
     USB_CONFIGURATION_DESCRIPTOR_TYPE, /* bDescriptorType: Configuration */
-    CUSTOMHID_SIZ_CONFIG_DESC,
+    PIOS_HID_SIZ_CONFIG_DESC,
     /* wTotalLength: Bytes returned */
     0x00,
     0x01,         /* bNumInterfaces: 1 interface */
@@ -89,7 +90,7 @@ const uint8_t CustomHID_ConfigDescriptor[CUSTOMHID_SIZ_CONFIG_DESC] =
     0x00,         /* bCountryCode: Hardware target country */
     0x01,         /* bNumDescriptors: Number of HID class descriptors to follow */
     0x22,         /* bDescriptorType */
-    CUSTOMHID_SIZ_REPORT_DESC,/* wItemLength: Total length of Report descriptor */
+    PIOS_HID_SIZ_REPORT_DESC,/* wItemLength: Total length of Report descriptor */
     0x00,
     /******************** Descriptor of Custom HID endpoints ******************/
     /* 27 */
@@ -115,7 +116,7 @@ const uint8_t CustomHID_ConfigDescriptor[CUSTOMHID_SIZ_CONFIG_DESC] =
     /* 41 */
   }
   ; /* CustomHID_ConfigDescriptor */
-const uint8_t CustomHID_ReportDescriptor[CUSTOMHID_SIZ_REPORT_DESC] =
+const uint8_t PIOS_HID_ReportDescriptor[PIOS_HID_SIZ_REPORT_DESC] =
   {                    
     0x06, 0xFF, 0x00,      /* USAGE_PAGE (Vendor Page: 0xFF00) */                       
     0x09, 0x01,            /* USAGE (Demo Kit)               */    
@@ -234,36 +235,35 @@ const uint8_t CustomHID_ReportDescriptor[CUSTOMHID_SIZ_REPORT_DESC] =
   }; /* CustomHID_ReportDescriptor */
 
 /* USB String Descriptors (optional) */
-const uint8_t CustomHID_StringLangID[CUSTOMHID_SIZ_STRING_LANGID] =
+const uint8_t PIOS_HID_StringLangID[PIOS_HID_SIZ_STRING_LANGID] =
   {
-    CUSTOMHID_SIZ_STRING_LANGID,
+    PIOS_HID_SIZ_STRING_LANGID,
     USB_STRING_DESCRIPTOR_TYPE,
     0x09,
     0x04
   }
   ; /* LangID = 0x0409: U.S. English */
 
-const uint8_t CustomHID_StringVendor[CUSTOMHID_SIZ_STRING_VENDOR] =
+const uint8_t PIOS_HID_StringVendor[PIOS_HID_SIZ_STRING_VENDOR] =
   {
-    CUSTOMHID_SIZ_STRING_VENDOR, /* Size of Vendor string */
+    PIOS_HID_SIZ_STRING_VENDOR, /* Size of Vendor string */
     USB_STRING_DESCRIPTOR_TYPE,  /* bDescriptorType*/
     /* Manufacturer: "STMicroelectronics" */
-    'S', 0, 'T', 0, 'M', 0, 'i', 0, 'c', 0, 'r', 0, 'o', 0, 'e', 0,
-    'l', 0, 'e', 0, 'c', 0, 't', 0, 'r', 0, 'o', 0, 'n', 0, 'i', 0,
-    'c', 0, 's', 0
+    'o', 0, 'p', 0, 'e', 0, 'n', 0, 'p', 0, 'i', 0, 'l', 0, 'o', 0,
+    't', 0, '.', 0, 'o', 0, 'r', 0, 'g', 0
   };
 
-const uint8_t CustomHID_StringProduct[CUSTOMHID_SIZ_STRING_PRODUCT] =
+const uint8_t PIOS_HID_StringProduct[PIOS_HID_SIZ_STRING_PRODUCT] =
   {
-    CUSTOMHID_SIZ_STRING_PRODUCT,          /* bLength */
+    PIOS_HID_SIZ_STRING_PRODUCT,          /* bLength */
     USB_STRING_DESCRIPTOR_TYPE,        /* bDescriptorType */
-    'A', 0, 'T', 0, 'M', 0, '3', 0, '2', 0, ' ', 0, 'C', 0,
-    'u', 0, 's', 0, 't', 0, 'm', 0, ' ', 0, 'H', 0, 'I', 0,
-    'D', 0
+    'O', 0, 'p', 0, 'e', 0, 'n', 0, 'P', 0, 'i', 0, 'l', 0,
+    'o', 0, 't', 0
   };
-uint8_t CustomHID_StringSerial[CUSTOMHID_SIZ_STRING_SERIAL] =
+
+uint8_t PIOS_HID_StringSerial[PIOS_HID_SIZ_STRING_SERIAL] =
   {
-    CUSTOMHID_SIZ_STRING_SERIAL,           /* bLength */
+    PIOS_HID_SIZ_STRING_SERIAL,           /* bLength */
     USB_STRING_DESCRIPTOR_TYPE,        /* bDescriptorType */
     'S', 0, 'T', 0, 'M', 0,'3', 0,'2', 0, '1', 0, '0', 0
   };

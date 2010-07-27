@@ -51,6 +51,10 @@ static volatile uint8_t rx_buffer_ix;
 static uint8_t transfer_possible = 0;
 static uint8_t rx_buffer[PIOS_USB_HID_DATA_LENGTH] = {0};
 
+static uint8_t transmit_remaining;
+static uint8_t *p_tx_buffer;
+static uint8_t tx_buffer[PIOS_USB_HID_DATA_LENGTH] = {0};
+
 /**
 * Initialises USB COM layer
 * \param[in] mode currently only mode 0 supported
@@ -83,7 +87,7 @@ int32_t PIOS_USB_HID_Init(uint32_t mode)
 	
 	USB_Init();
 	PIOS_LED_On(LED2);	
-
+	
 	return 0; /* No error */
 }
 
@@ -118,6 +122,28 @@ int32_t PIOS_USB_HID_CheckAvailable(uint8_t id)
 }
 
 /**
+  * Transmits the next byte in the buffer in report 1
+  */
+void PIOS_USB_HID_TxNextByte()
+{
+	uint8_t buf[2];
+	if( transmit_remaining > 0 ) {
+		transmit_remaining--;
+		buf[0] = 1; // report ID 1
+		buf[1] = *p_tx_buffer;
+		p_tx_buffer++;
+		
+		UserToPMABufferCopy((uint8_t*) buf, GetEPTxAddr(EP1_IN & 0x7F), 2);
+		SetEPTxCount((EP1_IN & 0x7F), 2);
+		
+		/* Send Buffer */
+		SetEPTxValid(ENDP1);
+		
+		PIOS_LED_Toggle( LED2 );
+	}			
+}
+
+/**
 * Puts more than one byte onto the transmit buffer (used for atomic sends)
 * \param[in] *buffer pointer to buffer which should be transmitted
 * \param[in] len number of bytes which should be transmitted
@@ -130,18 +156,14 @@ int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t *buffe
 	if(len > PIOS_USB_HID_DATA_LENGTH) {
 		/* Cannot send all requested bytes */
 		return -1;
-	}
-
-	/* Copy bytes to be transmitted into transmit buffer */
-	UserToPMABufferCopy((uint8_t*) buffer, GetEPTxAddr(EP1_IN & 0x7F), len);
-	SetEPTxCount((EP1_IN & 0x7F), len);
-
-	/* Send Buffer */
-	SetEPTxValid(ENDP1);
-
-	PIOS_LED_Toggle( LED2 );
+	}	
 	
-	/* No error */
+	memcpy(&tx_buffer[0], buffer, len);
+	transmit_remaining = len;
+	p_tx_buffer = tx_buffer;
+	
+	PIOS_USB_HID_TxNextByte();
+	
 	return 0;
 }
 

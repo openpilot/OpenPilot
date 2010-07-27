@@ -32,7 +32,7 @@ __IO uint8_t bIntPackSOF = 0;  /* SOFs received between 2 consecutive packets */
 /* function pointers to non-control endpoints service routines */
 void (*pEpInt_IN[7])(void) =
   {
-    EP1_IN_Callback,
+	PIOS_USB_HID_TxNextByte,
     EP2_IN_Callback,
     EP3_IN_Callback,
     EP4_IN_Callback,

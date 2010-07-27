@@ -18,6 +18,7 @@
 #include "usb_lib.h"
 #include "usb_conf.h"
 #include "pios_usb_hid_pwr.h"
+#include "pios_usb_hid.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -46,7 +47,7 @@ struct
  *******************************************************************************/
 void USB_Cable_Config (FunctionalState NewState)
 { 
-	
+	PIOS_USB_HID_ChangeConnectionState(NewState);
 }
 
 /*******************************************************************************

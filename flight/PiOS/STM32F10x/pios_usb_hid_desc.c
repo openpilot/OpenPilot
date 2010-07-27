@@ -16,6 +16,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "usb_lib.h"
 #include "pios_usb.h"
+#include "pios_usb_hid.h"
 #include "pios_usb_hid_desc.h"
 
 /* Private typedef -----------------------------------------------------------*/
@@ -129,11 +130,20 @@ const uint8_t PIOS_HID_ReportDescriptor[PIOS_HID_SIZ_REPORT_DESC] =
     0x15, 0x00,            /*     LOGICAL_MINIMUM (0)        */          
     0x25, 0xff,            /*     LOGICAL_MAXIMUM (255)      */           
     0x75, 0x08,            /*     REPORT_SIZE (8)            */        
-    0x95, 0x01,            /*     REPORT_COUNT (1)           */       
-	0x81, 0x83,            /*     INPUT (Cnst,Var,Abs,Vol)   */                    
-    0x91, 0x82,            /*     OUTPUT (Data,Var,Abs,Vol)  */  
-	/* 22 */	  
-
+    0x95, PIOS_USB_HID_DATA_LENGTH+1,            /*     REPORT_COUNT (1)           */       
+	0x81, 0x83,            /*     INPUT (Const,Var,Array)          */                    
+	/* 20 */	  
+	  
+	/* Data 1 */        
+	0x85, 0x02,            /*     REPORT_ID (2)		     */
+	0x09, 0x01,            /*     USAGE (LED 1)	             */
+	0x15, 0x00,            /*     LOGICAL_MINIMUM (0)        */          
+	0x25, 0xff,            /*     LOGICAL_MAXIMUM (255)      */           
+	0x75, 0x08,            /*     REPORT_SIZE (8)            */        
+	0x95, 0x01,            /*     REPORT_COUNT (1)           */       
+	0x91, 0x82,            /*     OUTPUT (Data,Var,Abs,Vol)  */  
+	/* 34 */	  
+	  
     0xc0 	          /*     END_COLLECTION	             */
   }; /* CustomHID_ReportDescriptor */
 

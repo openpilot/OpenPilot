@@ -38,8 +38,7 @@
 #define PIOS_USB_HID_OFF_HID_DESC		0x12
 #define PIOS_USB_HID_SIZ_HID_DESC		0x09
 
-#define PIOS_USB_HID_DATA_LENGTH		63
-//63
+#define PIOS_USB_HID_DATA_LENGTH		62
 
 /* Global functions */
 extern int32_t PIOS_USB_HID_Init(uint32_t mode);

@@ -1,8 +1,8 @@
-/******************** (C) COPYRIGHT 2009 STMicroelectronics ********************
+/******************** (C) COPYRIGHT 2010 STMicroelectronics ********************
 * File Name          : usb_int.c
 * Author             : MCD Application Team
-* Version            : V3.1.0
-* Date               : 10/30/2009
+* Version            : V3.2.1
+* Date               : 07/05/2010
 * Description        : Endpoint CTR (Low and High) interrupt's service routines
 ********************************************************************************
 * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
@@ -41,7 +41,6 @@ extern void (*pEpInt_OUT[7])(void);   /*  Handles OUT interrupts   */
 *******************************************************************************/
 void CTR_LP(void)
 {
-  uint16_t wIstr;
   __IO uint16_t wEPVal = 0;
   /* stay in loop while pending ints */
   while (((wIstr = _GetISTR()) & ISTR_CTR) != 0)
@@ -152,7 +151,6 @@ void CTR_LP(void)
 *******************************************************************************/
 void CTR_HP(void)
 {
-  uint16_t wIstr;
   uint32_t wEPVal = 0;
 
   while (((wIstr = _GetISTR()) & ISTR_CTR) != 0)
@@ -187,4 +185,4 @@ void CTR_HP(void)
 
 #endif  /* STM32F10X_CL */
 
-/******************* (C) COPYRIGHT 2009 STMicroelectronics *****END OF FILE****/
+/******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/

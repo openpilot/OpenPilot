@@ -35,9 +35,6 @@
 #include "gcstelemetrystats.h"
 #include "telemetrysettings.h"
 
-// Set this to 1 to enable telemetry via the USB HID interface
-#define ALLOW_HID_TELEMETRY 0
-
 // Private constants
 #define MAX_QUEUE_SIZE 20
 #define STACK_SIZE configMINIMAL_STACK_SIZE
@@ -313,7 +310,7 @@ static void telemetryRxTask(void* parameters)
 	// Task loop
 	while (1)
 	{
-#if ALLOW_HID_TELEMETRY
+#if defined(PIOS_INCLUDE_USB_HID)
 		// Determine input port (USB takes priority over telemetry port)
 		if(PIOS_USB_HID_CheckAvailable(0))
 		{
@@ -349,7 +346,7 @@ static int32_t transmitData(uint8_t* data, int32_t length)
 	uint8_t outputPort;
 
 	// Determine input port (USB takes priority over telemetry port)
-#if ALLOW_HID_TELEMETRY
+#if defined(PIOS_INCLUDE_USB_HID)
 	if(PIOS_USB_HID_CheckAvailable(0))
 	{
 		outputPort = PIOS_COM_TELEM_USB;

@@ -1,8 +1,8 @@
-/******************** (C) COPYRIGHT 2009 STMicroelectronics ********************
+/******************** (C) COPYRIGHT 2010 STMicroelectronics ********************
 * File Name          : usb_regs.c
 * Author             : MCD Application Team
-* Version            : V3.1.0
-* Date               : 10/30/2009
+* Version            : V3.2.1
+* Date               : 07/05/2010
 * Description        : Interface functions to USB cell registers
 ********************************************************************************
 * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
@@ -747,4 +747,4 @@ uint16_t ByteSwap(uint16_t wSwW)
 }
 
 #endif /* STM32F10X_CL */
-/******************* (C) COPYRIGHT 2009 STMicroelectronics *****END OF FILE****/
+/******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/

@@ -38,7 +38,7 @@ USE_BOOTLOADER ?= NO
 
 
 # Set to YES when using Code Sourcery toolchain
-CODE_SOURCERY ?= YES
+CODE_SOURCERY ?= NO
 
 # Toolchain prefix (i.e arm-elf- -> arm-elf-gcc.exe)
 TCHAIN_PREFIX ?= arm-none-eabi-
@@ -57,7 +57,7 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES =  Telemetry GPS ManualControl Actuator Altitude AHRSComms Stabilization
+#MODULES =  Telemetry GPS ManualControl Actuator Altitude AHRSComms Stabilization
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
 
@@ -183,11 +183,19 @@ SRC += $(PIOSSTM32F10X)/pios_spi.c
 SRC += $(PIOSSTM32F10X)/pios_ppm.c
 SRC += $(PIOSSTM32F10X)/pios_pwm.c
 SRC += $(PIOSSTM32F10X)/pios_spektrum.c
-SRC += $(PIOSSTM32F10X)/pios_usb.c
-SRC += $(PIOSSTM32F10X)/pios_usb_hid.c
 SRC += $(PIOSSTM32F10X)/pios_debug.c
 SRC += $(PIOSSTM32F10X)/pios_gpio.c
 SRC += $(PIOSSTM32F10X)/pios_exti.c
+
+# PIOS USB related files (seperated to make code maintenance more easy)
+SRC += $(PIOSSTM32F10X)/pios_usb_hid.c
+SRC += $(PIOSSTM32F10X)/pios_usb_hid_desc.c
+SRC += $(PIOSSTM32F10X)/pios_usb_hid_endp.c
+SRC += $(PIOSSTM32F10X)/pios_usb_hid_istr.c
+SRC += $(PIOSSTM32F10X)/pios_usb_hid_prop.c
+SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
+
+
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_sdcard.c
@@ -225,6 +233,7 @@ SRC += $(STMUSBSRCDIR)/usb_init.c
 SRC += $(STMUSBSRCDIR)/usb_int.c
 SRC += $(STMUSBSRCDIR)/usb_mem.c
 SRC += $(STMUSBSRCDIR)/usb_regs.c
+SRC += $(STMUSBSRCDIR)/usb_sil.c
 
 ## RTOS
 SRC += $(RTOSSRCDIR)/list.c 
@@ -240,12 +249,12 @@ SRC += $(DOSFSDIR)/dosfs.c
 SRC += $(DOSFSDIR)/dfs_sdcard.c
 
 ## Mass Storage Device
-SRC += $(MSDDIR)/msd.c
-SRC += $(MSDDIR)/msd_bot.c
-SRC += $(MSDDIR)/msd_desc.c
-SRC += $(MSDDIR)/msd_memory.c
-SRC += $(MSDDIR)/msd_scsi.c
-SRC += $(MSDDIR)/msd_scsi_data.c
+#SRC += $(MSDDIR)/msd.c
+#SRC += $(MSDDIR)/msd_bot.c
+#SRC += $(MSDDIR)/msd_desc.c
+#SRC += $(MSDDIR)/msd_memory.c
+#SRC += $(MSDDIR)/msd_scsi.c
+#SRC += $(MSDDIR)/msd_scsi_data.c
 
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
 # use file-extension c for "c-only"-files
@@ -386,9 +395,7 @@ CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
 
 CFLAGS += -mapcs-frame 
 CFLAGS += -fomit-frame-pointer
-ifeq ($(CODE_SOURCERY), YES)
 CFLAGS += -fpromote-loop-indices
-endif
 
 CFLAGS += -Wall 
 CFLAGS += -Werror

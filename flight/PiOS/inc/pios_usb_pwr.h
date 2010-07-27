@@ -1,9 +1,9 @@
 /******************** (C) COPYRIGHT 2010 STMicroelectronics ********************
-* File Name          : usb_lib.h
+* File Name          : usb_pwr.h
 * Author             : MCD Application Team
 * Version            : V3.2.1
 * Date               : 07/05/2010
-* Description        : USB library include files
+* Description        : Connection/disconnection & power management header
 ********************************************************************************
 * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
 * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE TIME.
@@ -14,37 +14,45 @@
 *******************************************************************************/
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __USB_LIB_H
-#define __USB_LIB_H
+#ifndef __USB_PWR_H
+#define __USB_PWR_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f10x.h"
-#include "usb_type.h"
-#include "usb_regs.h"
-#include "usb_def.h"
-#include "usb_core.h"
-#include "usb_init.h"
-#ifndef STM32F10X_CL
- #include "usb_mem.h"
- #include "usb_int.h"
-#endif /* STM32F10X_CL */
-
-#include "usb_sil.h"
-
-#ifdef STM32F10X_CL
- #include "otgd_fs_cal.h"
- #include "otgd_fs_pcd.h"
- #include "otgd_fs_dev.h"
- #include "otgd_fs_int.h"
-#endif /* STM32F10X_CL */
-
-
 /* Exported types ------------------------------------------------------------*/
+typedef enum _RESUME_STATE
+{
+  RESUME_EXTERNAL,
+  RESUME_INTERNAL,
+  RESUME_LATER,
+  RESUME_WAIT,
+  RESUME_START,
+  RESUME_ON,
+  RESUME_OFF,
+  RESUME_ESOF
+} RESUME_STATE;
+
+typedef enum _DEVICE_STATE
+{
+  UNCONNECTED,
+  ATTACHED,
+  POWERED,
+  SUSPENDED,
+  ADDRESSED,
+  CONFIGURED
+} DEVICE_STATE;
+
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
+void Suspend(void);
+void Resume_Init(void);
+void Resume(RESUME_STATE eResumeSetVal);
+RESULT PowerOn(void);
+RESULT PowerOff(void);
 /* External variables --------------------------------------------------------*/
+extern  __IO uint32_t bDeviceState; /* USB device status */
+extern __IO bool fSuspendEnabled;  /* true when suspend is possible */
 
-#endif /* __USB_LIB_H */
+#endif  /*__USB_PWR_H*/
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/

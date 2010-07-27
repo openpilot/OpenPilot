@@ -1,8 +1,8 @@
-/******************** (C) COPYRIGHT 2009 STMicroelectronics ********************
+/******************** (C) COPYRIGHT 2010 STMicroelectronics ********************
 * File Name          : usb_type.h
 * Author             : MCD Application Team
-* Version            : V3.1.0
-* Date               : 10/30/2009
+* Version            : V3.2.1
+* Date               : 07/05/2010
 * Description        : Type definitions used by the USB Library
 ********************************************************************************
 * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
@@ -18,7 +18,7 @@
 #define __USB_TYPE_H
 
 /* Includes ------------------------------------------------------------------*/
-//#include "usb_conf.h"
+#include "usb_conf.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
@@ -71,4 +71,4 @@ typedef enum { ERROR = 0, SUCCESS  = !ERROR} ErrorStatus;
 
 #endif /* __USB_TYPE_H */
 
-/******************* (C) COPYRIGHT 2009 STMicroelectronics *****END OF FILE****/
+/******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/

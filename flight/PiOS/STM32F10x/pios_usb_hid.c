@@ -33,6 +33,8 @@
 
 /* Project Includes */
 #include "pios.h"
+#include "usb_lib.h"
+#include "stm32f10x.h"
 
 #if defined(PIOS_INCLUDE_USB_HID)
 
@@ -107,6 +109,29 @@ int32_t PIOS_USB_HID_Init(uint32_t mode)
 		/* Unsupported mode */
 		return -1;
 	}
+	
+		
+	/* Enable the USB Interrupts */
+	/* 2 bit for pre-emption priority, 2 bits for subpriority */
+	NVIC_InitTypeDef NVIC_InitStructure;
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);  
+	NVIC_InitStructure.NVIC_IRQChannel = USB_LP_CAN1_RX0_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
+	
+	/* Select USBCLK source */
+	RCC_USBCLKConfig(RCC_USBCLKSource_PLLCLK_1Div5);	
+	/* Enable the USB clock */
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USB, ENABLE);
+	
+	PIOS_LED_On(LED1);
+//	Set_System();
+//	USB_Interrupts_Config();
+//	Set_USBClock();
+	USB_Init();
+	PIOS_LED_On(LED2);	
 
 	return 0; /* No error */
 }
@@ -158,7 +183,7 @@ int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t *buffe
 
 	/* Copy bytes to be transmitted into transmit buffer */
 	UserToPMABufferCopy((uint8_t*) buffer, GetEPTxAddr(EP1_IN & 0x7F), len);
-	SetEPTxCount(ENDP1, len);
+	SetEPTxCount((EP1_IN & 0x7F), len);
 
 	/* Send Buffer */
 	SetEPTxValid(ENDP1);

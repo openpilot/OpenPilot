@@ -60,7 +60,7 @@ USE_THUMB_MODE = YES
 #MODULES =  Telemetry GPS ManualControl Actuator Altitude AHRSComms Stabilization
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
-MODULES = 
+MODULES = Telemetry 
 #MODULES += Osd/OsdEtStd
 
 
@@ -225,6 +225,7 @@ SRC += $(STMSPDSRCDIR)/stm32f10x_rtc.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_spi.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_tim.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_usart.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_wwdg.c
 SRC += $(STMSPDSRCDIR)/misc.c
 
 ## STM32 USB Library

@@ -149,7 +149,7 @@ const double REPARAM_TH = 0.1;
 // data manager: quick Harris detector
 const unsigned HARRIS_CONV_SIZE = 5;
 const double HARRIS_TH = 15.0;
-const double HARRIS_EDDGE = 3.0;
+const double HARRIS_EDDGE = 2.0;
 const unsigned PATCH_DESC = 45;
 
 // data manager: zncc matcher and one-point-ransac

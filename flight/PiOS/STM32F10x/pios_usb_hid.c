@@ -45,51 +45,6 @@ const struct pios_com_driver pios_usb_com_driver = {
   .rx_avail = PIOS_USB_HID_RxBufferUsed,
 };
 
-/* Local types */
-typedef enum _HID_REQUESTS {
-	GET_REPORT = 1,
-	GET_IDLE,
-	GET_PROTOCOL,
-	SET_REPORT = 9,
-	SET_IDLE,
-	SET_PROTOCOL
-} HID_REQUESTS;
-
-/* Global Variables */
-
-/* Local Variables */
-static uint32_t ProtocolValue;
-
-
-/* Local Functions */
-static uint8_t *PIOS_USB_HID_GetHIDDescriptor(uint16_t Length);
-static uint8_t *PIOS_USB_HID_GetReportDescriptor(uint16_t Length);
-static uint8_t *PIOS_USB_HID_GetProtocolValue(uint16_t Length);
-
-static const uint8_t PIOS_USB_HID_ReportDescriptor[PIOS_USB_HID_SIZ_REPORT_DESC] = {
-		0x06, 0x9c, 0xff,			/* Usage Page (Vendor Defined)                     */
-		0x09, 0x01,				/* Usage (Vendor Defined)                          */
-		0xa1, 0x01,				/* Collection (Vendor Defined)                     */
-
-		0x09, 0x02,				/*   Usage (Vendor Defined)                        */
-		0x75, 0x08,				/*   Report Size (8)                               */
-		0x95, (PIOS_USB_HID_DATA_LENGTH),	/*   Report Count (64)                             */
-		0x15, 0x00,				/*   Logical Minimum (0)                           */
-		0x25, 0xff,				/*   Logical Maximum (255)                         */
-		0x81, 0x02,				/*   Input (Data, Variable, Absolute)              */
-
-		0x09, 0x03,				/*   Usage (Vendor Defined)                        */
-		0x75, 0x08,				/*   Report Size (8)                               */
-		0x95, (PIOS_USB_HID_DATA_LENGTH),	/*   Report Count (64)                             */
-		0x15, 0x00,				/*   Logical Minimum (0)                           */
-		0x25, 0xff,				/*   Logical Maximum (255)                         */
-		0x91, 0x02,				/*   Output (Data, Variable, Absolute)             */
-
-		0xc0					/* End Collection                                  */
-		};
-static ONE_DESCRIPTOR PIOS_USB_HID_Report_Descriptor = {(uint8_t *) PIOS_USB_HID_ReportDescriptor, PIOS_USB_HID_SIZ_REPORT_DESC};
-static ONE_DESCRIPTOR PIOS_USB_HID_Hid_Descriptor = {(uint8_t*) PIOS_USB_HID_ReportDescriptor + PIOS_USB_HID_OFF_HID_DESC, PIOS_USB_HID_SIZ_HID_DESC};
-
 /* Rx/Tx status */
 static volatile uint8_t rx_buffer_new_data_ctr = 0;
 static volatile uint8_t rx_buffer_ix;
@@ -126,10 +81,6 @@ int32_t PIOS_USB_HID_Init(uint32_t mode)
 	/* Enable the USB clock */
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USB, ENABLE);
 	
-	PIOS_LED_On(LED1);
-//	Set_System();
-//	USB_Interrupts_Config();
-//	Set_USBClock();
 	USB_Init();
 	PIOS_LED_On(LED2);	
 
@@ -188,6 +139,8 @@ int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t *buffe
 	/* Send Buffer */
 	SetEPTxValid(ENDP1);
 
+	PIOS_LED_Toggle( LED2 );
+	
 	/* No error */
 	return 0;
 }
@@ -244,86 +197,6 @@ int32_t PIOS_USB_HID_RxBufferUsed(uint8_t id)
 	return rx_buffer_new_data_ctr;
 }
 
-int32_t PIOS_USB_HID_CB_Data_Setup(uint8_t RequestNo)
-{
-	uint8_t *(*CopyRoutine)( uint16_t) = NULL;
-
-	CopyRoutine = NULL;
-
-	/* GET_DESCRIPTOR */
-	if((RequestNo == GET_DESCRIPTOR) && (Type_Recipient == (STANDARD_REQUEST | INTERFACE_RECIPIENT)) && (pInformation->USBwIndex0 == 0)) {
-
-		if(pInformation->USBwValue1 == PIOS_USB_HID_REPORT_DESCRIPTOR) {
-			CopyRoutine = PIOS_USB_HID_GetReportDescriptor;
-		} else if(pInformation->USBwValue1 == PIOS_USB_HID_HID_DESCRIPTOR_TYPE) {
-			CopyRoutine = PIOS_USB_HID_GetHIDDescriptor;
-		}
-
-	}
-
-	/* GET_PROTOCOL */
-	else if((Type_Recipient == (CLASS_REQUEST | INTERFACE_RECIPIENT)) && RequestNo == GET_PROTOCOL) {
-		CopyRoutine = PIOS_USB_HID_GetProtocolValue;
-	}
-
-	if(CopyRoutine == NULL) {
-		return USB_UNSUPPORT;
-	}
-
-	pInformation->Ctrl_Info.CopyData = CopyRoutine;
-	pInformation->Ctrl_Info.Usb_wOffset = 0;
-	(*CopyRoutine)(0);
-
-	return USB_SUCCESS;
-}
-
-int32_t PIOS_USB_HID_CB_NoData_Setup(uint8_t RequestNo)
-{
-	if((Type_Recipient == (CLASS_REQUEST | INTERFACE_RECIPIENT)) && (RequestNo == SET_PROTOCOL)) {
-		uint8_t wValue0 = pInformation->USBwValue0;
-		ProtocolValue = wValue0;
-		return USB_SUCCESS;
-	}
-
-	else {
-		return USB_UNSUPPORT;
-	}
-}
-
-/**
-* Gets the HID descriptor.
-* \param[in] Length
-* \return The address of the configuration descriptor.
-*/
-static uint8_t *PIOS_USB_HID_GetHIDDescriptor(uint16_t Length)
-{
-	return Standard_GetDescriptorData(Length, &PIOS_USB_HID_Hid_Descriptor);
-}
-
-/**
-* Gets the HID report descriptor.
-* \param[in] Length
-* \return The address of the configuration descriptor.
-*/
-static uint8_t *PIOS_USB_HID_GetReportDescriptor(uint16_t Length)
-{
-	return Standard_GetDescriptorData(Length, &PIOS_USB_HID_Report_Descriptor);
-}
-
-/**
-* Gets the protocol value
-* \param[in] Length
-* \return address of the protocol value.
-*/
-static uint8_t *PIOS_USB_HID_GetProtocolValue(uint16_t Length)
-{
-	if(Length == 0) {
-		pInformation->Ctrl_Info.Usb_wLength = 1;
-		return NULL;
-	} else {
-		return (uint8_t *) (&ProtocolValue);
-	}
-}
 
 /**
 * EP1 OUT Callback Routine
@@ -341,6 +214,7 @@ void PIOS_USB_HID_EP1_OUT_Callback(void)
 	/* We now have data waiting */
 	rx_buffer_new_data_ctr = DataLength;
 	SetEPRxStatus(ENDP1, EP_RX_VALID);
+	PIOS_LED_Toggle(LED2);
 }
 
 #endif

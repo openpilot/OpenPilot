@@ -17,6 +17,7 @@
 #include "usb_lib.h"
 #include "pios_usb_hid_pwr.h"
 #include "pios_usb_hid_istr.h"
+#include "pios_usb_hid.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -42,7 +43,7 @@ void (*pEpInt_IN[7])(void) =
 
 void (*pEpInt_OUT[7])(void) =
   {
-    EP1_OUT_Callback,
+    PIOS_USB_HID_EP1_OUT_Callback,
     EP2_OUT_Callback,
     EP3_OUT_Callback,
     EP4_OUT_Callback,

@@ -60,7 +60,7 @@ USE_THUMB_MODE = YES
 #MODULES =  Telemetry GPS ManualControl Actuator Altitude AHRSComms Stabilization
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
-
+MODULES = 
 #MODULES += Osd/OsdEtStd
 
 
@@ -190,7 +190,7 @@ SRC += $(PIOSSTM32F10X)/pios_exti.c
 # PIOS USB related files (seperated to make code maintenance more easy)
 SRC += $(PIOSSTM32F10X)/pios_usb_hid.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_desc.c
-SRC += $(PIOSSTM32F10X)/pios_usb_hid_endp.c
+#SRC += $(PIOSSTM32F10X)/pios_usb_hid_endp.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_istr.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_prop.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c

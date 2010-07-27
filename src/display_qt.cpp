@@ -49,10 +49,10 @@ namespace display {
 	
 	SensorQt::~SensorQt()
 	{
-		delete view_private;
-		delete viewer_;
-		delete framenumber_label;
-		delete sensorpose_label;
+		viewerQt->release(view_private);
+		viewerQt->release(viewer_);
+		viewerQt->release(framenumber_label);
+		viewerQt->release(sensorpose_label);
 	}
 	
 	void SensorQt::bufferize()
@@ -79,7 +79,7 @@ namespace display {
 			viewer_->setImageView(view_private, 0, 0);
 			viewer_->resize(660,500);
 			viewer_->setSceneRect(0,0,640,480);
-			std::ostringstream oss; oss << "Sensor " << slamSen_->id();
+			std::ostringstream oss; oss << "Sensor " << id_;
 			viewer_->setTitle(oss.str());
 			
 			framenumber_label = new QGraphicsTextItem(view_private);
@@ -163,21 +163,16 @@ namespace display {
 //JFR_DEBUG("deleting ObservationQt and all the graphics objects " << items_.size());
 		for(ItemList::iterator it = items_.begin(); it != items_.end(); ++it)
 		{
-			//(*it)->setParentItem(NULL);
-			//viewer_->scene()->removeItem(*it);
-			delete *it;
+// 			(*it)->setParentItem(NULL);
+// 			dispSen_->viewer_->scene()->removeItem(*it);
+// 			delete *it;
+			viewerQt->release(*it);
 		}
 	}
 	
 	void ObservationQt::bufferize()
 	{
 		events_ = slamObs_->events;
-/*		events_.predicted = slamObs_->events.predicted;
-		events_.visible = slamObs_->events.visible;
-		events_.measured = slamObs_->events.measured;
-		events_.matched = slamObs_->events.matched;
-		updated_ = slamObs_->events.updated;
-*/		
 		
 		if (events_.visible)
 		{

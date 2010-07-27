@@ -223,13 +223,48 @@ namespace display {
 	};
 	
 	
+/**
+release and garbageCollect are thread safe
+but garbageCollect is not thread safe with itself, 
+but it is not useful (would need another mutex)
+*/
+template <typename T>
+class ThreadSafeGarbageCollector
+{
+	private:
+		int gcn;
+		std::vector<T> gc[2];
+		boost::mutex m;
+		struct Destroy : public boost::static_visitor<>
+			{ template<typename U> void operator()(U *item) const { delete item; } };
+	public:
+		ThreadSafeGarbageCollector(): gcn(0) {}
+		template<typename U> void release(U *item)
+		{
+			boost::unique_lock<boost::mutex> lock(m);
+			gc[gcn].push_back(item);
+		}
+		void garbageCollect()
+		{
+			boost::unique_lock<boost::mutex> lock(m);
+			std::vector<T> &mygc = gc[gcn];
+			gcn = 1-gcn;
+			lock.unlock();
+			
+			for(typename std::vector<T>::iterator it = mygc.begin(); it != mygc.end(); ++it)
+				boost::apply_visitor(Destroy(), *it);
+			mygc.clear();
+		}
+};
+
+	
 	/** **************************************************************************
 	This is the base class for a viewer that can render the scene.
 	When writing a new viewer, it must be inherited from this.
 	*/
 	template<class WorldDisplayType, class MapDisplayType, class RobotDisplayType, 
-		class SensorDisplayType, class LandmarkDisplayType, class ObservationDisplayType>
-	class Viewer : public ViewerAbstract
+		class SensorDisplayType, class LandmarkDisplayType, class ObservationDisplayType, class GarbageType>
+	class Viewer : public ViewerAbstract, public ThreadSafeGarbageCollector<GarbageType>
 	{
 		protected:
 			//template<class RobotDisplayType, class SensorDisplayType, class LandmarkDisplayType, class ObservationDisplayType>
@@ -237,7 +272,7 @@ namespace display {
 			{
 				public:
 					typedef Viewer<WorldDisplayType, MapDisplayType, RobotDisplayType, 
-						SensorDisplayType, LandmarkDisplayType, ObservationDisplayType> MyViewer;
+						SensorDisplayType, LandmarkDisplayType, ObservationDisplayType, GarbageType> MyViewer;
 					
 					void operator()(rtslam::world_ptr_t const &wor) const {
 						if (!boost::is_same<WorldDisplayType,WorldDisplay>::value) {
@@ -286,19 +321,19 @@ namespace display {
 			}
 			
 		public:
-			//ViewerRender(): ViewerAbstract() {}
+			~Viewer() { this->garbageCollect(); }
 			inline void clear()
 			{
 				slamObjects_.clear();
 			}
+			
+			//virtual void garbageCollect() = 0;
 			
 			/**
 			This function bufferizes all the objects
 			*/
 			inline void bufferize(rtslam::world_ptr_t wor)
 			{
-				// clear viewer
-				clear();
 				// bufferize world
 				if (!boost::is_same<WorldDisplayType,WorldDisplay>::value) // bufferize world
 					bufferizeObject<WorldDisplayType, WorldDisplayType, world_ptr_t, world_ptr_t>(wor, wor, id());
@@ -362,12 +397,26 @@ namespace display {
 			Render the scene.
 			@param _clear 
 			*/
-			inline void render()
+			void render()
 			{
+				/*
+				We need to clear at the end, because we must clear before bufferize, 
+				and bufferize is called by the slam thread so it cannot call it.
+				But then when if a landmark is destroyed, it is immediatly destroyed
+				as it is not retained by this list, so the display object is also destroyed,
+				and it is not thread safe. So when the display object is destroyed, display lib objects
+				are just moved to the garbage collector, and destroyed by this thread before the next rendering.
+				Anyway destroying the object can be long so it is better to do it here.
+				Maybe it is not neccessary anymore to have a vector of variants here, but just
+				a vector of display data.
+				*/
+				this->garbageCollect(); // strange, the "this" is necessary...
 				for(SlamObjectsList::iterator it = slamObjects_.begin(); it != slamObjects_.end(); ++it)
 				{
 					boost::apply_visitor(Render(), *it);
 				}
+				// clear viewer
+				clear();
 			}
 			
 	};

@@ -44,7 +44,8 @@ namespace display {
 	class LandmarkGdhe;
 	class ObservationGdhe;
 
-	class ViewerGdhe: public Viewer<WorldGdhe,MapGdhe,RobotGdhe,SensorGdhe,LandmarkGdhe,ObservationGdhe>
+	class ViewerGdhe: public Viewer<WorldGdhe,MapGdhe,RobotGdhe,SensorGdhe,LandmarkGdhe,ObservationGdhe,
+	                                boost::variant<gdhe::Object*> >
 	{
 		public:
 			double ellipsesScale;

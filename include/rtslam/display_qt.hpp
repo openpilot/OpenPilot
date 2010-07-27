@@ -40,8 +40,10 @@ class SensorQt;
 class LandmarkQt;
 class ObservationQt;
 
+
 #if DEFINE_USELESS_OBJECTS
-class ViewerQt: public Viewer<WorldQt,MapQt,RobotQt,SensorQt,LandmarkQt,ObservationQt>
+class ViewerQt: public Viewer<WorldQt,MapQt,RobotQt,SensorQt,LandmarkQt,ObservationQt,
+                              boost::variant<QGraphicsItem*, qdisplay::Viewer*, qdisplay::ImageView*> >
 {
 	public:
 		int fontSize;

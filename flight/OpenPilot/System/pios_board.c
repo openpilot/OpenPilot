@@ -510,4 +510,3 @@ const uint8_t pios_com_num_devices = NELEMENTS(pios_com_devs);
 /**
  * @}
  */
- */

@@ -57,7 +57,7 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-#MODULES =  Telemetry GPS ManualControl Actuator Altitude AHRSComms Stabilization
+#MODULES =  Telemetry GPS ManualControl Actuator Altitude AHRSComms Stabilization/simple/Stabilization
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
 MODULES = Telemetry 

@@ -73,6 +73,7 @@ typedef DataManagerOnePointRansac<simu::RawSimu, SensorPinHole, simu::FeatureSim
 ///##############################################
 
 #define RANSAC 1
+#define EVENT_BASED_RAW 1
 
 int mode = 0;
 time_t rseed;
@@ -188,11 +189,13 @@ const unsigned GRID_HCELLS = 4;
 const unsigned GRID_MARGIN = 11;
 const unsigned GRID_SEPAR = 20;
 
-boost::mutex data_mutex;
 ///##############################################
 
 void demo_slam01_main(world_ptr_t *world) {
 
+	boost::condition_variable rawdata_condition;
+	boost::mutex rawdata_mutex;
+	//boost::mutex rawdata_condmutex;
 
 	// pin-hole parameters in BOOST format
 	vec intrinsic = createVector<4> (INTRINSIC);
@@ -356,7 +359,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		dmPt11->linkToParentMapManager(mmPoint);
 		dmPt11->setObservationFactory(obsFact);
 		
-		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorAdhocSimulator(floatOpts[fFreq], simulator, senPtr11->id(), robPtr1->id()));
+		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorAdhocSimulator(rawdata_condition, rawdata_mutex, floatOpts[fFreq], simulator, senPtr11->id(), robPtr1->id()));
 		senPtr11->setHardwareSensor(hardSen11);
 	} else
 	{
@@ -372,13 +375,13 @@ void demo_slam01_main(world_ptr_t *world) {
 
 		
 		#ifdef HAVE_VIAM
-		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(
+		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, rawdata_mutex, 
 			"0x00b09d01006fb38f", cv::Size(IMG_WIDTH,IMG_HEIGHT), 0, 8, floatOpts[fFreq], intOpts[iTrigger], mode, strOpts[sDataPath]));
 		senPtr11->setHardwareSensor(hardSen11);
 		#else
 		if (intOpts[iReplay])
 		{
-			hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(cv::Size(IMG_WIDTH,IMG_HEIGHT),strOpts[sDataPath]));
+			hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, rawdata_mutex, cv::Size(IMG_WIDTH,IMG_HEIGHT),strOpts[sDataPath]));
 			senPtr11->setHardwareSensor(hardSen11);
 		}
 		#endif
@@ -433,6 +436,9 @@ void demo_slam01_main(world_ptr_t *world) {
 	double max_dt = 0;
 	for (; (*world)->t <= N_FRAMES;)
 	{
+#if EVENT_BASED_RAW
+		boost::unique_lock<boost::mutex> rawdata_lock(rawdata_mutex);
+#endif
 		bool had_data = false;
 		bool no_more_data = true;
 
@@ -462,8 +468,19 @@ void demo_slam01_main(world_ptr_t *world) {
 				// get raw-data
 				int r = senPtr->acquireRaw();
 				if (r != -2) no_more_data = false;
-				if (r < 0) { boost::this_thread::yield(); continue; }
-				      else had_data=true;
+				if (r < 0)
+				{
+#if !EVENT_BASED_RAW
+					boost::this_thread::yield();
+#endif
+					continue;
+				} else
+				{
+					had_data=true;
+#if EVENT_BASED_RAW
+					rawdata_lock.unlock();
+#endif
+				}
 // cout << "\n************************************************** " << endl;
 JFR_DEBUG("                 FRAME : " << (*world)->t << "\nRobot estimated state " << robPtr->state.x());
 //				cout << "Robot: " << *robPtr << endl;
@@ -483,8 +500,6 @@ JFR_DEBUG("                 FRAME : " << (*world)->t << "\nRobot estimated state
 
 			} // for each sensor
 		} // for each robot
-
-		if (no_more_data) break;
 
 		// NOW LOOP FOR STATE SPACE - ALL MM
 		if (had_data)
@@ -545,6 +560,17 @@ JFR_DEBUG("                 FRAME : " << (*world)->t << "\nRobot estimated state
 			} else
 			display_lock.unlock();
 		}
+		
+		if (no_more_data) break;
+
+#if EVENT_BASED_RAW
+		if (!had_data)
+		{
+			rawdata_condition.wait(rawdata_lock);
+			rawdata_lock.unlock();
+		}
+#endif
+		
 		
 //		int t = (*world)->t;
 //		worldPtr->display_mutex.unlock();

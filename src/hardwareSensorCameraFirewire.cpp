@@ -218,6 +218,9 @@ namespace hardware {
 				f << std::setprecision(20) << bufferPtr[buff_ready]->timestamp << std::endl; f.close();
 			}
 			l.unlock();
+			boost::unique_lock<boost::mutex> rawdata_lock(rawdata_mutex);
+			rawdata_condition.notify_all();
+			rawdata_lock.unlock();
 		}
 	}
 
@@ -244,7 +247,8 @@ namespace hardware {
 		preloadTask_thread = new boost::thread(boost::bind(&HardwareSensorCameraFirewire::preloadTask,this));
 	}
 	
-	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(cv::Size imgSize, std::string dump_path)
+	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(boost::condition_variable &rawdata_condition, boost::mutex &rawdata_mutex, cv::Size imgSize, std::string dump_path):
+		HardwareSensorAbstract(rawdata_condition, rawdata_mutex)
 	{
 		init(2, dump_path, imgSize);
 		no_more_data = false;
@@ -272,7 +276,8 @@ namespace hardware {
 		init(mode, dump_path, viamSize_to_size(hwmode.size));
 	}
 
-	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(const std::string &camera_id, cv::Size size, int format, int depth, double freq, bool trigger, int mode, std::string dump_path)
+	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(boost::condition_variable &rawdata_condition, boost::mutex &rawdata_mutex, const std::string &camera_id, cv::Size size, int format, int depth, double freq, bool trigger, int mode, std::string dump_path):
+		HardwareSensorAbstract(rawdata_condition, rawdata_mutex)
 	{
 		viam_hwmode_t hwmode = { size_to_viamSize(size), format_to_viamFormat(format, depth), VIAM_HW_FIXED, freq_to_viamFreq(freq), trigger_to_viamTrigger(trigger) };
 		realFreq = viamFreq_to_freq(hwmode.fps);

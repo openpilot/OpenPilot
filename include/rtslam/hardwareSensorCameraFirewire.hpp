@@ -53,6 +53,7 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 		raw_ptr_t bufferPtr[3];
 		rawimage_ptr_t bufferSpecPtr[3];
 		double realFreq;
+		bool no_more_data;
 		
 		int mode;
 		int index;

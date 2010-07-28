@@ -189,7 +189,9 @@ namespace hardware {
 					bufferSpecPtr[buff_write]->img->load(oss.str() + std::string(".pgm"));
 					if (bufferSpecPtr[buff_write]->img->data() == NULL)
 					{
-						std::cout << "No more images to read." << std::endl;
+						boost::unique_lock<boost::mutex> l(mutex_data);
+						no_more_data = true;
+						//std::cout << "No more images to read." << std::endl;
 						break;
 					}
 					std::fstream f((oss.str() + std::string(".time")).c_str(), std::ios_base::in);
@@ -245,6 +247,7 @@ namespace hardware {
 	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(cv::Size imgSize, std::string dump_path)
 	{
 		init(2, dump_path, imgSize);
+		no_more_data = false;
 	}
 	
 
@@ -275,6 +278,7 @@ namespace hardware {
 		realFreq = viamFreq_to_freq(hwmode.fps);
 		std::cout << "Camera set to freq " << realFreq << " Hz (external trigger " << trigger << ")" << std::endl;
 		init(camera_id, hwmode, mode, dump_path);
+		no_more_data = false;
 	}
 #endif
 
@@ -298,8 +302,7 @@ namespace hardware {
 			image_count = 0;
 			index++;
 		}
-		l.unlock();
-		return missed_count;
+		if (no_more_data && missed_count == -1) return -2; else return missed_count;
 	}
 
 

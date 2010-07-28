@@ -31,7 +31,7 @@ class HardwareSensorAbstract
 	public:
 		/**
 		@param rawPtr the latest raw available from the sensor
-		@return the number of missed raws, -1 if no raw is available since last call
+		@return the number of missed raws, -1 if no raw is available since last call, -2 if no raw will ever be available
 		@note must be non blocking
 		*/
 		virtual int acquireRaw(raw_ptr_t &rawPtr) = 0;

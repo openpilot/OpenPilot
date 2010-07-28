@@ -434,6 +434,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	for (; (*world)->t <= N_FRAMES;)
 	{
 		bool had_data = false;
+		bool no_more_data = true;
 
 		//worldPtr->display_mutex.lock();
 		//if (intOpts[iRenderAll] && worldPtr->display_rendered != (*world)->t)
@@ -459,9 +460,10 @@ void demo_slam01_main(world_ptr_t *world) {
 				//					cout << *senPtr << endl;
 
 				// get raw-data
-				if (senPtr->acquireRaw() < 0)
-					{ boost::this_thread::yield(); continue; }
-				else had_data=true;
+				int r = senPtr->acquireRaw();
+				if (r != -2) no_more_data = false;
+				if (r < 0) { boost::this_thread::yield(); continue; }
+				      else had_data=true;
 // cout << "\n************************************************** " << endl;
 JFR_DEBUG("                 FRAME : " << (*world)->t << "\nRobot estimated state " << robPtr->state.x());
 //				cout << "Robot: " << *robPtr << endl;
@@ -482,6 +484,7 @@ JFR_DEBUG("                 FRAME : " << (*world)->t << "\nRobot estimated state
 			} // for each sensor
 		} // for each robot
 
+		if (no_more_data) break;
 
 		// NOW LOOP FOR STATE SPACE - ALL MM
 		if (had_data)

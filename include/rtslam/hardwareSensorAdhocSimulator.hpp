@@ -30,7 +30,7 @@ namespace hardware {
 				dt(1./freq), t(0), simulator(simulator), robId(robId), senId(senId) {}
 			int acquireRaw(raw_ptr_t &rawPtr)
 			{
-				if (simulator->hasEnded(robId, senId, t)) return -1;
+				if (simulator->hasEnded(robId, senId, t)) return -2;
 				rawPtr = simulator->getRaw(robId, senId, t);
 				t += dt;
 				return 1;

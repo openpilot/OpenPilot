@@ -137,16 +137,20 @@ void RawHIDReadThread::run()
     {
         //here we use a temporary buffer so we don't need to lock
         //the mutex while we are reading from the device
+
+        // Want to read in regular chunks that match the packet size the device
+        // is using.  In this case it is 64 bytes (the interrupt packet limit)
+        // although it would be nice if the device had a different report to
+        // configure this
         char buffer[READ_SIZE] = {0};
         int ret = hiddev->receive(hidno, buffer, READ_SIZE, READ_TIMEOUT);
 
         if(ret > 0) //read some data
         {
             m_readBufMtx.lock();
-            /* First byte is report ID, can be ignored */
-            /* Second byte is the number of valid bytes */
+            // Note: Preprocess the USB packets in this OS independent code
+            // First byte is report ID, second byte is the number of valid bytes
             m_readBuffer.append(&buffer[2], buffer[1]);
-            // m_readBuffer.append(buffer, ret);
             m_readBufMtx.unlock();
 
             emit m_hid->readyRead();
@@ -210,15 +214,20 @@ void RawHIDWriteThread::run()
             if(!m_running)
                 return;
             else
-                size = qMin(WRITE_SIZE, m_writeBuffer.size());
+                size = qMin(WRITE_SIZE-2, m_writeBuffer.size());
+            //NOTE: data size is limited to 2 bytes less than the
+            //usb packet size (64 bytes for interrupt) to make room
+            //for the reportID and valid data length
         }
 
         //make a temporary copy so we don't need to lock the mutex
         //during actual device access
-        memcpy(buffer, m_writeBuffer.constData(), size);
+        memcpy(&buffer[2], m_writeBuffer.constData(), size);
+        buffer[1] = size; //valid data length
+        buffer[0] = 1;    //reportID
         m_writeBufMtx.unlock();
 
-        int ret = hiddev->send(hidno, buffer, size, WRITE_TIMEOUT);
+        int ret = hiddev->send(hidno, buffer, WRITE_SIZE, WRITE_TIMEOUT);
 
         if(ret > 0)
         {

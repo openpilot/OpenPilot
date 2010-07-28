@@ -46,14 +46,14 @@ const struct pios_com_driver pios_usb_com_driver = {
   .rx_avail = PIOS_USB_HID_RxBufferUsed,
 };
 
+// TODO: Eventually replace the transmit and receive buffers with bigger ring bufers
+// so there isn't hte 64 byte cap in place by the USB interrupt packet definition
+
 /* Rx/Tx status */
 static volatile uint8_t rx_buffer_new_data_ctr = 0;
 static volatile uint8_t rx_buffer_ix;
 static uint8_t transfer_possible = 0;
 static uint8_t rx_buffer[PIOS_USB_HID_DATA_LENGTH+2] = {0};
-
-static uint8_t transmit_remaining;
-static uint8_t *p_tx_buffer;
 static uint8_t tx_buffer[PIOS_USB_HID_DATA_LENGTH+2] = {0};
 
 /**
@@ -107,7 +107,6 @@ int32_t PIOS_USB_HID_Init(uint32_t mode)
   
 	USB_Init();
 	USB_SIL_Init();
-	PIOS_LED_On(LED2);	
 	
 	return 0; /* No error */
 }
@@ -140,29 +139,6 @@ int32_t PIOS_USB_HID_ChangeConnectionState(uint32_t Connected)
 int32_t PIOS_USB_HID_CheckAvailable(uint8_t id)
 {
   return transfer_possible ? 1 : 0;
-}
-
-/**
-  * Transmits the next byte in the buffer in report 1
-  */
-void PIOS_USB_HID_TxNextByte()
-{
-	uint8_t buf[3];
-	if( transmit_remaining > 0 ) {
-		transmit_remaining--;
-		buf[0] = 1; // report ID 1
-		buf[1] = 1; // *p_tx_buffer;
-		buf[2] = 1;
-		p_tx_buffer++;
-		
-		UserToPMABufferCopy((uint8_t*) buf, GetEPTxAddr(EP1_IN & 0x7F), 3);
-		SetEPTxCount((EP1_IN & 0x7F), 3);
-		
-		/* Send Buffer */
-		SetEPTxValid(ENDP1);
-		
-		PIOS_LED_Toggle( LED2 );
-	}			
 }
 
 /**

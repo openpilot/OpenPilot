@@ -47,7 +47,7 @@
 
 #define BUFFER_SIZE 64
 
-#define printf qDebug
+//#define printf qDebug
 #define printf
 
 typedef struct hid_struct hid_t;
@@ -240,11 +240,10 @@ int pjrc_rawhid::send(int num, void *buf, int len, int timeout)
     if (!hid || !hid->open) return -1;
 #if 1
 #warning "Send timeout not implemented on MACOSX"
-    uint8_t *report_buf = (uint8_t *) malloc(BUFFER_SIZE);
-    memcpy(&report_buf[2], buf,len);
-    report_buf[1] = len;
-    report_buf[0] = 2; // report ID
-    IOReturn ret = IOHIDDeviceSetReport(hid->ref, kIOHIDReportTypeOutput, 0, (uint8_t *)report_buf, BUFFER_SIZE);
+    uint8_t *report_buf = (uint8_t *) malloc(len);
+    memcpy(&report_buf[0], buf,len);
+    // Note: packet processing done in OS indepdent code
+    IOReturn ret = IOHIDDeviceSetReport(hid->ref, kIOHIDReportTypeOutput, 2, (uint8_t *)report_buf, len);
     result = (ret == kIOReturnSuccess) ? len : -1;
 #endif
 #if 0
@@ -321,15 +320,14 @@ static void input_callback(void *context, IOReturn ret, void *sender, IOHIDRepor
     buffer_t *n;
     hid_t *hid;
 
-    printf("input_callback, report id: %i buf: %x %x\n", id, data[0], data[1]);
+    printf("input_callback, report id: %i buf: %x %x, len: %d\n", id, data[0], data[1], len);
     if (ret != kIOReturnSuccess || len < 1) return;
     hid = (hid_t*)context;
     if (!hid || hid->ref != sender) return;
     n = (buffer_t *)malloc(sizeof(buffer_t));
     if (!n) return;
     if (len > BUFFER_SIZE) len = BUFFER_SIZE;
-    /* Real data starts at third byte, second byte is valid data size */
-    //len = data[1];
+    // Note: packet preprocessing done in OS independent code
     memcpy(n->buf, &data[0], len);
     n->len = len;
     n->next = NULL;

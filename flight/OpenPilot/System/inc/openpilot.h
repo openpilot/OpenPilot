@@ -1,6 +1,9 @@
 /**
  ******************************************************************************
- *
+ * @addtogroup OpenPilotSystem OpenPilot System
+ * @{
+ * @addtogroup OpenPilotCore OpenPilot Core
+ * @{
  * @file       openpilot.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Main OpenPilot header.
@@ -43,3 +46,7 @@
 void OpenPilotInit(void);
 
 #endif /* OPENPILOT_H */
+/**
+ * @}
+ * @}
+ */

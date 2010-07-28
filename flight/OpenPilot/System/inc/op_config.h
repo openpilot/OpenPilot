@@ -1,5 +1,9 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotSystem OpenPilot System
+ * @{
+ * @addtogroup OpenPilotCore OpenPilot Core
+ * @{
  *
  * @file       op_config.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -29,3 +33,7 @@
 #define OP_CONFIG_H
 
 #endif /* OP_CONFIG_H */
+/**
+ * @}
+ * @}
+ */

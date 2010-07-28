@@ -1,6 +1,14 @@
 /**
  ******************************************************************************
- *
+ * @addtogroup OpenPilotSystem OpenPilot System
+ * @brief These files are the core system files of OpenPilot.
+ * They are the ground layer just above PiOS. In practice, OpenPilot actually starts
+ * in the main() function of openpilot.c
+ * @{
+ * @addtogroup OpenPilotCore OpenPilot Core
+ * @brief This is where the OP firmware starts. Those files also define the compile-time
+ * options of the firmware.
+ * @{
  * @file       openpilot.c 
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Sets up and runs main OpenPilot tasks.
@@ -62,7 +70,13 @@ extern void InitModules(void);
 extern void PIOS_Board_Init(void);
 
 /**
-* OpenPilot Main function
+* OpenPilot Main function:
+*
+* Initialize PiOS<BR>
+* Create the "System" task (SystemModInitializein Modules/System/systemmod.c) <BR>
+* Start FreeRTOS Scheduler (vTaskStartScheduler)<BR>
+* If something goes wrong, blink LED1 and LED2 every 100ms
+*
 */
 int main()
 {
@@ -326,4 +340,8 @@ static void TaskSDCard(void *pvParameters)
 	}
 }
 #endif
+/**
+ * @}
+ * @}
+ */
 

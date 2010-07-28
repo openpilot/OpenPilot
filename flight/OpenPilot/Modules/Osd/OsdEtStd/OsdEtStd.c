@@ -6,9 +6,9 @@
  * @brief On screen display support
  * @{ 
  *
- * @file       MKSerial.c
+ * @file       OsdEtStd.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Interfacing with MK via serial port
+ * @brief      Interfacing with EagleTree OSD Std module
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/

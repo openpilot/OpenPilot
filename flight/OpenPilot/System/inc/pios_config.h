@@ -1,10 +1,16 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotSystem OpenPilot System
+ * @{
+ * @addtogroup OpenPilotCore OpenPilot Core
+ * @{
  *
  * @file       pios_config.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      PiOS configuration header. 
  *             Central compile time config for the project.
+ *             In particular, pios_config.h is where you define which PiOS libraries
+ *             and features are included in the firmware.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -69,3 +75,7 @@
 
 
 #endif /* PIOS_CONFIG_H */
+/**
+ * @}
+ * @}
+ */

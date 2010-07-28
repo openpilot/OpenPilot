@@ -1,6 +1,10 @@
 /**
  ******************************************************************************
- *
+ * @addtogroup OpenPilotSystem OpenPilot System
+ * @{
+ * @addtogroup OpenPilotLibraries OpenPilot System Libraries
+ * @brief OpenPilot System libraries are available to all OP modules.
+ * @{
  * @file       alarms.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Library for setting and clearing system alarms
@@ -178,3 +182,8 @@ static int32_t hasSeverity(SystemAlarmsAlarmOptions severity)
     xSemaphoreGiveRecursive(lock);
     return 0;
 }
+/**
+ * @}
+ * @}
+ */
+

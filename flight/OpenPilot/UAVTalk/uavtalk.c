@@ -1,5 +1,9 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotSystem OpenPilot System
+ * @{
+ * @addtogroup OpenPilotLibraries OpenPilot System Libraries
+ * @{
  *
  * @file       uavtalk.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -610,6 +614,7 @@ static uint8_t updateCRC(uint8_t crc, const uint8_t* data, int32_t length)
     return crc;
 }
 
-
-
-
+/**
+ * @}
+ * @}
+ */

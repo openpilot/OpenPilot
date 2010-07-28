@@ -1,6 +1,9 @@
 /**
  ******************************************************************************
- *
+ * @addtogroup OpenPilotSystem OpenPilot System
+ * @{
+ * @addtogroup OpenPilotLibraries OpenPilot System Libraries
+ * @{
  * @file       uavtalk.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Include file of the UAVTalk library
@@ -54,3 +57,7 @@ void UAVTalkGetStats(UAVTalkStats* stats);
 void UAVTalkResetStats();
 
 #endif // UAVTALK_H
+/**
+ * @}
+ * @}
+ */

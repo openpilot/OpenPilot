@@ -1,6 +1,9 @@
 ﻿/**
  ******************************************************************************
- *
+ * @addtogroup OpenPilotSystem OpenPilot System
+ * @{
+ * @addtogroup OpenPilotCore OpenPilot Core
+ * @{
  * @file       pios_board.h   
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Defines board hardware for the OpenPilot Version 1.1 hardware.
@@ -367,3 +370,7 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 
 
 #endif /* PIOS_BOARD_H */
+/**
+ * @}
+ * @}
+ */

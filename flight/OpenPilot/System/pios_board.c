@@ -1,5 +1,9 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotSystem OpenPilot System
+ * @{
+ * @addtogroup OpenPilotCore OpenPilot Core
+ * @{
  *
  * @file       pios_board.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -503,3 +507,7 @@ struct pios_com_dev pios_com_devs[] = {
 
 const uint8_t pios_com_num_devices = NELEMENTS(pios_com_devs);
 
+/**
+ * @}
+ */
+ */

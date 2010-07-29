@@ -226,15 +226,14 @@ int pjrc_rawhid::send(int num, void *buf, int len, int timeout)
         OVERLAPPED ov;
         DWORD n, r;
 
-        if (sizeof(tmpbuf) < (len + 1)) return -1;
+        if (sizeof(tmpbuf) < len) return -1;
         hid = get_hid(num);
         if (!hid || !hid->open) return -1;
         EnterCriticalSection(&tx_mutex);
         ResetEvent(&tx_event);
         memset(&ov, 0, sizeof(ov));
         ov.hEvent = tx_event;
-        tmpbuf[0] = 0;
-        memcpy(tmpbuf + 1, buf, len);
+        memcpy(tmpbuf, buf, len);
         if (!WriteFile(hid->handle, tmpbuf, 64, NULL, &ov)) {
                 if (GetLastError() != ERROR_IO_PENDING) goto return_error;
                 r = WaitForSingleObject(tx_event, timeout);

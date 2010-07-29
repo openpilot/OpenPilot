@@ -261,7 +261,8 @@ QString pjrc_rawhid::getserial(int num)
     char temp[126];
 
     hid = get_hid(num);
-    if (!hid || !hid->open) return -1;
+    if (!hid || !hid->open)
+        return "";
 
     /* Should we do some "critical section" stuff here?? */
     if(!HidD_GetSerialNumberString(hid->handle, temp, sizeof(temp))) {
@@ -269,7 +270,7 @@ QString pjrc_rawhid::getserial(int num)
         return QString("Error");
     }
 
-    return QString().fromUtf16(temp,-1);
+    return QString().fromUtf16((ushort*)temp,-1);
 }
 
 //  close - close a device

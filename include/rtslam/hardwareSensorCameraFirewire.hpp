@@ -14,6 +14,7 @@
 
 #include <jafarConfig.h>
 #include <image/Image.hpp>
+#include <kernel/threads.hpp>
 
 #ifdef HAVE_VIAM
 #include <viam/viamlib.h>
@@ -56,7 +57,7 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 		bool no_more_data;
 		
 		int mode;
-		int index;
+		kernel::VariableCondition<int> index;
 		std::string dump_path;
 		
 		boost::thread *preloadTask_thread;

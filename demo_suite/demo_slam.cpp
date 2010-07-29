@@ -436,12 +436,13 @@ void demo_slam01_main(world_ptr_t *world) {
 	double max_dt = 0;
 	for (; (*world)->t <= N_FRAMES;)
 	{
+		if ((*world)->exit()) break;
+		
 #if EVENT_BASED_RAW
 		boost::unique_lock<boost::mutex> rawdata_lock(rawdata_mutex);
 #endif
 		bool had_data = false;
 		bool no_more_data = true;
-
 		//worldPtr->display_mutex.lock();
 		//if (intOpts[iRenderAll] && worldPtr->display_rendered != (*world)->t)
 		//	{ worldPtr->display_mutex.unlock(); boost::this_thread::yield(); continue; }
@@ -528,12 +529,19 @@ JFR_DEBUG("                 FRAME : " << (*world)->t << "\nRobot estimated state
 			if (intOpts[iRenderAll])
 			{
 				boost::unique_lock<boost::mutex> display_lock((*world)->display_mutex);
-				while(!(*world)->display_rendered) (*world)->display_condition.wait(display_lock);
+				while(!(*world)->display_rendered && !(*world)->exit()) (*world)->display_condition.wait(display_lock);
 				display_lock.unlock();
 			}
 
 		} // if had_data
 
+/*		if (no_more_data) // we wait the display to ensure that the last frame is displayed
+		{
+			boost::unique_lock<boost::mutex> display_lock((*world)->display_mutex);
+			while(!(*world)->display_rendered) (*world)->display_condition.wait(display_lock);
+			display_lock.unlock();
+		}
+*/
 		int processed_t = (had_data ? (*world)->t : (*world)->t-1);
 		if ((*world)->display_t+1 < processed_t+1)
 		{
@@ -575,14 +583,20 @@ JFR_DEBUG("                 FRAME : " << (*world)->t << "\nRobot estimated state
 //		int t = (*world)->t;
 //		worldPtr->display_mutex.unlock();
 
-		if (intOpts[iPause] != 0 && (*world)->t >= intOpts[iPause] && had_data) getchar(); // wait for key in replay mode
+		if (intOpts[iPause] != 0 && (*world)->t >= intOpts[iPause] && had_data && !(*world)->exit())
+		{
+			(*world)->slam_blocked(true);
+			getchar(); // wait for key in replay mode
+			(*world)->slam_blocked(false);
+		}
 //std::cout << "one frame " << (*world)->t << " : " << mode << " " << had_data << std::endl;
 
 		if (had_data) (*world)->t++;
 	} // temporal loop
 
-	std::cout << "\nFINISHED ! Press a key to terminate." << std::endl;
-	getchar();
+	(*world)->slam_blocked(true);
+//	std::cout << "\nFINISHED ! Press a key to terminate." << std::endl;
+//	getchar();
 } // demo_slam01_main
 
 
@@ -603,6 +617,29 @@ void demo_slam01_display(world_ptr_t *world) {
 			(*world)->display_mutex.lock();
 		}
 		*/
+		// just to display the last frame if slam is blocked or has finished
+		boost::unique_lock<kernel::VariableMutex<bool> > blocked_lock((*world)->slam_blocked);
+		if ((*world)->slam_blocked.var)
+		{
+			if ((*world)->display_t+1 < (*world)->t+1 && (*world)->display_rendered)
+			{
+				#ifdef HAVE_MODULE_QDISPLAY
+				display::ViewerQt *viewerQt = NULL;
+				if (intOpts[iDispQt]) viewerQt = PTR_CAST<display::ViewerQt*> ((*world)->getDisplayViewer(display::ViewerQt::id()));
+				if (intOpts[iDispQt]) viewerQt->bufferize(*world);
+				#endif
+				#ifdef HAVE_MODULE_GDHE
+				display::ViewerGdhe *viewerGdhe = NULL;
+				if (intOpts[iDispGdhe]) viewerGdhe = PTR_CAST<display::ViewerGdhe*> ((*world)->getDisplayViewer(display::ViewerGdhe::id()));
+				if (intOpts[iDispGdhe]) viewerGdhe->bufferize(*world);
+				#endif
+				
+				(*world)->display_t = (*world)->t;
+				(*world)->display_rendered = false;
+			}
+		}
+		blocked_lock.unlock();
+		
 		// waiting that display is ready
 // cout << "DISPLAY: waiting for data" << endl;
 		boost::unique_lock<boost::mutex> display_lock((*world)->display_mutex);
@@ -616,7 +653,9 @@ void demo_slam01_display(world_ptr_t *world) {
 			for(int i = 0; (*world)->display_rendered && i < nwait; ++i)
 			{
 				(*world)->display_condition.timed_wait(display_lock, boost::posix_time::milliseconds(10));
+				display_lock.unlock();
 				QApplication::instance()->processEvents();
+				display_lock.lock();
 			}
 			if ((*world)->display_rendered) break;
 		}
@@ -674,6 +713,14 @@ void demo_slam01_display(world_ptr_t *world) {
 	}
 }
 
+void demo_slam01_exit(world_ptr_t *world, boost::thread *thread_main) {
+	(*world)->exit(true);
+	(*world)->display_condition.notify_all();
+// 	std::cout << "EXITING !!!" << std::endl;
+	thread_main->timed_join(boost::posix_time::milliseconds(1000));
+}
+
+
 	void demo_slam01() {
 		world_ptr_t worldPtr(new WorldAbstract());
 
@@ -713,7 +760,7 @@ void demo_slam01_display(world_ptr_t *world) {
 		if (intOpts[iDispQt]) // at least 2d
 		{
 			#ifdef HAVE_MODULE_QDISPLAY
-			qdisplay::QtAppStart((qdisplay::FUNC)&demo_slam01_display,display_priority,(qdisplay::FUNC)&demo_slam01_main,slam_priority,display_period,&worldPtr);
+			qdisplay::QtAppStart((qdisplay::FUNC)&demo_slam01_display,display_priority,(qdisplay::FUNC)&demo_slam01_main,slam_priority,display_period,&worldPtr,(qdisplay::EXIT)&demo_slam01_exit);
 			#else
 			std::cout << "Please install qdisplay module if you want 2D display" << std::endl;
 			#endif

@@ -152,7 +152,7 @@ namespace hardware {
 	{
 		struct timeval ts, *pts = &ts;
 		int r;
-		int last_processed_index = index-1;
+		int last_processed_index = index()-1;
 
 		if (mode == 1)
 		{
@@ -182,10 +182,11 @@ namespace hardware {
 			// acquire the image
 			if (mode == 2)
 			{
-				if (index != last_processed_index)
+				index.wait(last_processed_index, kernel::VariableCondition<int>::ne);
+				//if (index != last_processed_index)
 				{
 					// FIXME manage multisensors : put sensor id in filename
-					std::ostringstream oss; oss << dump_path << "/image_" << std::setw(4) << std::setfill('0') << index;
+					std::ostringstream oss; oss << dump_path << "/image_" << std::setw(4) << std::setfill('0') << index();
 					bufferSpecPtr[buff_write]->img->load(oss.str() + std::string(".pgm"));
 					if (bufferSpecPtr[buff_write]->img->data() == NULL)
 					{
@@ -196,8 +197,8 @@ namespace hardware {
 					}
 					std::fstream f((oss.str() + std::string(".time")).c_str(), std::ios_base::in);
 					f >> bufferPtr[buff_write]->timestamp; f.close();
-					last_processed_index = index;
-				} else  { boost::this_thread::yield(); continue; }
+					last_processed_index = index();
+				} //else  { boost::this_thread::yield(); continue; }
 			} else
 			{
 #ifdef HAVE_VIAM
@@ -212,7 +213,7 @@ namespace hardware {
 			// dump the images
 			if (mode == 1)
 			{
-				std::ostringstream oss; oss << dump_path << "/image_" << std::setw(4) << std::setfill('0') << index;
+				std::ostringstream oss; oss << dump_path << "/image_" << std::setw(4) << std::setfill('0') << index();
 				bufferSpecPtr[buff_ready]->img->save(oss.str() + std::string(".pgm"));
 				fstream f; f.open((oss.str() + std::string(".time")).c_str(), ios_base::out); 
 				f << std::setprecision(20) << bufferPtr[buff_ready]->timestamp << std::endl; f.close();
@@ -241,14 +242,14 @@ namespace hardware {
 		buff_write = 1;
 		buff_ready = 2;
 		image_count = 0;
-		index = 0;
+		//index = 0;
 
 		// start acquire task
 		preloadTask_thread = new boost::thread(boost::bind(&HardwareSensorCameraFirewire::preloadTask,this));
 	}
 	
 	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(boost::condition_variable &rawdata_condition, boost::mutex &rawdata_mutex, cv::Size imgSize, std::string dump_path):
-		HardwareSensorAbstract(rawdata_condition, rawdata_mutex)
+		HardwareSensorAbstract(rawdata_condition, rawdata_mutex),index(0)
 	{
 		init(2, dump_path, imgSize);
 		no_more_data = false;
@@ -277,7 +278,7 @@ namespace hardware {
 	}
 
 	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(boost::condition_variable &rawdata_condition, boost::mutex &rawdata_mutex, const std::string &camera_id, cv::Size size, int format, int depth, double freq, bool trigger, int mode, std::string dump_path):
-		HardwareSensorAbstract(rawdata_condition, rawdata_mutex)
+		HardwareSensorAbstract(rawdata_condition, rawdata_mutex), index(0)
 	{
 		viam_hwmode_t hwmode = { size_to_viamSize(size), format_to_viamFormat(format, depth), VIAM_HW_FIXED, freq_to_viamFreq(freq), trigger_to_viamTrigger(trigger) };
 		realFreq = viamFreq_to_freq(hwmode.fps);
@@ -291,7 +292,8 @@ namespace hardware {
 	HardwareSensorCameraFirewire::~HardwareSensorCameraFirewire()
 	{
 #ifdef HAVE_VIAM
-		viam_release(handle);
+		if (mode == 0 || mode == 1)
+			viam_release(handle);
 #endif
 	}
 	
@@ -305,7 +307,8 @@ namespace hardware {
 			std::swap(buff_in_use, buff_ready);
 			rawPtr = bufferPtr[buff_in_use];
 			image_count = 0;
-			index++;
+			index.setNotify(index()+1);
+			//index++;
 		}
 		if (no_more_data && missed_count == -1) return -2; else return missed_count;
 	}

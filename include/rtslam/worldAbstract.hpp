@@ -50,7 +50,7 @@ namespace jafar {
 				/**
 				 * Constructor
 				 */
-				WorldAbstract(): t(0), display_rendered(true), display_t(-1) {}
+				WorldAbstract(): t(0), display_rendered(true), display_t(-1), slam_blocked(false), exit(false) {}
 
 				/**
 				 * Mandatory virtual destructor - Map is used as-is, non-abstract by now
@@ -71,6 +71,9 @@ namespace jafar {
 				unsigned display_t;
 				boost::mutex display_mutex;
 				boost::condition_variable display_condition;
+
+				kernel::VariableMutex<bool> slam_blocked;
+				kernel::VariableMutex<bool> exit;
 				
 				void addDisplayViewer(display::ViewerAbstract *viewer, unsigned id);
 				display::ViewerAbstract* getDisplayViewer(unsigned id);

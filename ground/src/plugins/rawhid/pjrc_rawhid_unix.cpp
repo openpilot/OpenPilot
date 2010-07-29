@@ -39,6 +39,7 @@
 #include "pjrc_rawhid.h"
 #include <usb.h>
 #include <QDebug>
+#include <QString>
 
 typedef struct hid_struct hid_t;
 static hid_t *first_hid;
@@ -242,13 +243,14 @@ int pjrc_rawhid::send(int num, void *buf, int len, int timeout)
 //    Output
 //	number of bytes in found, or -1 on error
 //
-int pjrc_rawhid::getserial(int num, char *buf) {
+QString pjrc_rawhid::getserial(int num) {
     hid_t *hid;
-
+    char buf[128];
     hid = get_hid(num);
     if (!hid || !hid->open) return -1;
 
-    return usb_get_string_simple(hid->usb, 3, (char *)buf, 25);
+    int retlen = usb_get_string_simple(hid->usb, 3, buf, 128);
+    return QString().fromAscii(buf,-1);
 }
 
 //  close - close a device

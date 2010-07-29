@@ -105,10 +105,7 @@ QStringList RawHIDConnection::availableDevices()
     //for each devices found, get serial number and close it back
     for(int i=0; i<opened; i++)
     {
-        char serial[256];
-        dev.getserial(i, serial);
-        QString sn = QString::fromAscii(serial, DEV_SERIAL_LEN);
-        devices.append(sn);
+        devices.append(dev.getserial(i));
         dev.close(i);
     }
 

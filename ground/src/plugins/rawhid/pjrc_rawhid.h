@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <QDebug>
+#include <QString>
 
 class pjrc_rawhid
 {
@@ -41,7 +42,7 @@ public:
     int receive(int num, void *buf, int len, int timeout);
     void close(int num);
     int send(int num, void *buf, int len, int timeout);
-    int getserial(int num, char *buf);
+    QString getserial(int num);
     void mytest(int num);
 private:
 

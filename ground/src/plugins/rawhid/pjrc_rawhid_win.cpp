@@ -43,6 +43,7 @@
 #include <setupapi.h>
 #include <ddk/hidsdi.h>
 #include <ddk/hidclass.h>
+#include <QString>
 
 #define printf qDebug
 
@@ -254,12 +255,10 @@ return_error:
         return -1;
 }
 
-int pjrc_rawhid::getserial(int num, char *buf)
+QString pjrc_rawhid::getserial(int num)
 {
     hid_t *hid;
     char temp[126];
-    char buf2[24];
-    char *bufptr = (char *)buf;
 
     hid = get_hid(num);
     if (!hid || !hid->open) return -1;
@@ -267,19 +266,10 @@ int pjrc_rawhid::getserial(int num, char *buf)
     /* Should we do some "critical section" stuff here?? */
     if(!HidD_GetSerialNumberString(hid->handle, temp, sizeof(temp))) {
         print_win32_err();
-        return -1;
+        return QString("Error");
     }
 
-    /* Is there a better way to do this? */
-    /* Every second char in temp is a NULL */
-    for(int i = 0; i < 48; i++) {
-        char temp2 = temp[i++];
-        if(temp2 == 0) break;
-        buf2[i/2] = temp2;
-        *(bufptr++) = temp2;
-    }
-
-    return 0;
+    return QString().fromUtf16(temp,-1);
 }
 
 //  close - close a device

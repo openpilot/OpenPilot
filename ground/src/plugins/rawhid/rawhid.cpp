@@ -276,9 +276,7 @@ RawHID::RawHID(const QString &deviceName)
     //for each devices found, get serial number and close
     for(int i=0; i<opened; i++)
     {
-        char serial[256];
-        dev.getserial(i, serial);
-        if(deviceName == QString::fromAscii(serial, DEV_SERIAL_LEN))
+        if(deviceName == dev.getserial(i))
             m_deviceNo = i;
         else
             dev.close(i);

@@ -37,13 +37,12 @@
  */
 
 
-#include <QDebug>
 #include "pjrc_rawhid.h"
 
 #include <unistd.h>
 #include <IOKit/IOKitLib.h>
 #include <IOKit/hid/IOHIDLib.h>
-#include <QDebug>
+#include <QString>
 
 #define BUFFER_SIZE 64
 
@@ -273,24 +272,22 @@ int pjrc_rawhid::send(int num, void *buf, int len, int timeout)
     return result;
 }
 
-int pjrc_rawhid::getserial(int num, char *buf) {
+QString pjrc_rawhid::getserial(int num) {
     hid_t *hid;
+    char buf[128];
 
     hid = get_hid(num);
-    if (!hid || !hid->open) return -1;
+
+    if (!hid || !hid->open) return QString("Error");
 
     CFTypeRef serialnum = IOHIDDeviceGetProperty(hid->ref, CFSTR(kIOHIDSerialNumberKey));
     if(serialnum && CFGetTypeID(serialnum) == CFStringGetTypeID())
     {
-        /* For some reason the first 8 bytes of 'serialnum' are useless (a struct?) */
-        char *strptr = (char *)serialnum;
-        for(int i = 8; i < 33; i++) {
-            *(buf++) = strptr[i];
-        }
-        return 0;
+        /* For some reason the first 9 bytes of 'serialnum' are useless (a struct?) */
+        return QString().fromAscii((char *)serialnum+9);
     }
 
-    return -1;
+    return QString("Error");
 }
 
 //  close - close a device

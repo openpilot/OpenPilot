@@ -180,14 +180,14 @@ int pjrc_rawhid::receive(int num, void *buf, int len, int timeout)
         OVERLAPPED ov;
         DWORD n, r;
 
-        if (sizeof(tmpbuf) < len + 1) return -1;
+        if (sizeof(tmpbuf) < len) return -1;
         hid = get_hid(num);
         if (!hid || !hid->open) return -1;
         EnterCriticalSection(&rx_mutex);
         ResetEvent(&rx_event);
         memset(&ov, 0, sizeof(ov));
         ov.hEvent = rx_event;
-        if (!ReadFile(hid->handle, tmpbuf, len + 1, NULL, &ov)) {
+        if (!ReadFile(hid->handle, tmpbuf, len, NULL, &ov)) {
                 if (GetLastError() != ERROR_IO_PENDING) goto return_error;
                 r = WaitForSingleObject(rx_event, timeout);
                 if (r == WAIT_TIMEOUT) goto return_timeout;
@@ -198,7 +198,7 @@ int pjrc_rawhid::receive(int num, void *buf, int len, int timeout)
         if (n <= 0) return -1;
         n--;
         if (n > len) n = len;
-        memcpy(buf, tmpbuf + 1, n);
+        memcpy(buf, tmpbuf, n);
         return n;
 return_timeout:
         CancelIo(hid->handle);

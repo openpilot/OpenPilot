@@ -312,7 +312,7 @@ static void telemetryRxTask(void* parameters)
 	{
 #if defined(PIOS_INCLUDE_USB_HID)
 		// Determine input port (USB takes priority over telemetry port)
-		if(1) //if(PIOS_USB_HID_CheckAvailable(0))
+		if(PIOS_USB_HID_CheckAvailable(0))
 		{
 			inputPort = PIOS_COM_TELEM_USB;
 		}
@@ -327,7 +327,6 @@ static void telemetryRxTask(void* parameters)
 		len = PIOS_COM_ReceiveBufferUsed(inputPort);
 		for (int32_t n = 0; n < len; ++n)
 		{
-			//PIOS_LED_Toggle(LED1);
 			UAVTalkProcessInputStream(PIOS_COM_ReceiveBuffer(inputPort));
 		}
 		vTaskDelay(5); // <- remove when blocking calls are implemented
@@ -347,7 +346,7 @@ static int32_t transmitData(uint8_t* data, int32_t length)
 
 	// Determine input port (USB takes priority over telemetry port)
 #if defined(PIOS_INCLUDE_USB_HID)
-	if(1) //PIOS_USB_HID_CheckAvailable(0))
+	if(PIOS_USB_HID_CheckAvailable(0))
 	{
 		outputPort = PIOS_COM_TELEM_USB;
 	}

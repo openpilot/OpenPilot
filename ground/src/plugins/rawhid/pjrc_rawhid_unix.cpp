@@ -247,7 +247,7 @@ QString pjrc_rawhid::getserial(int num) {
     hid_t *hid;
     char buf[128];
     hid = get_hid(num);
-    if (!hid || !hid->open) return -1;
+    if (!hid || !hid->open) return QString("");
 
     int retlen = usb_get_string_simple(hid->usb, 3, buf, 128);
     return QString().fromAscii(buf,-1);

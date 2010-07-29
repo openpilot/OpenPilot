@@ -40,11 +40,12 @@ namespace display {
 		SensorDisplay(_viewer, _slamSen, _dispRob), viewerQt(PTR_CAST<ViewerQt*>(_viewer)), 
 		viewer_(NULL), view_private(NULL), framenumber_label(NULL), sensorpose_label(NULL)
 	{
-		framenumber = 0;
+		framenumber = -1;
 		t = 0.;
 		id_ = slamSen_->id();
 		avg_framerate = 0.;
-		pose.clear(); pose(3) = 1.0;
+		size = cv::Size(640,480);
+		isImage = 2; // unknown
 	}
 	
 	SensorQt::~SensorQt()
@@ -57,14 +58,27 @@ namespace display {
 	
 	void SensorQt::bufferize()
 	{
-		if (slamSen_->rawCounter != framenumber)
+		if (slamSen_->rawCounter != framenumber+1)
 		{
-			avg_framerate = (slamSen_->rawPtr->timestamp-t)/(slamSen_->rawCounter-framenumber);
-			if (framenumber == 0) avg_framerate = 0.;
-			framenumber = slamSen_->rawCounter;
+			if (framenumber <= 0) avg_framerate = 0.; else
+				avg_framerate = (slamSen_->rawPtr->timestamp-t)/(slamSen_->rawCounter-1-framenumber);
+			framenumber = slamSen_->rawCounter-1;
 			t = slamSen_->rawPtr->timestamp;
 			raw_ptr_t raw = slamSen_->getRaw();
-			if (raw) image = PTR_CAST<RawImage&>(*raw).img->clone();
+			if (raw)
+			{
+				RawImage *rawImg = NULL;
+				if (isImage == 2)
+				{
+					rawImg = dynamic_cast<RawImage*>(raw.get());
+					isImage = ((rawImg != NULL) ? 1 : 0);
+					if (isImage) size = image.size();
+				} else
+				if (isImage) rawImg = PTR_CAST<RawImage*>(raw.get());
+				// FIXME RawSimu should export a size somehow
+
+				if (rawImg) image = rawImg->img->clone();
+			}
 			pose = slamSen_->robotPtr()->pose.x();
 			
 		}
@@ -77,8 +91,9 @@ namespace display {
 			viewer_ = new qdisplay::Viewer();
 			view_private = new qdisplay::ImageView();
 			viewer_->setImageView(view_private, 0, 0);
-			viewer_->resize(660,500);
-			viewer_->setSceneRect(0,0,640,480);
+			viewer_->resize(size.width+20,size.height+20);
+			viewer_->scene()->setSceneRect(0,0,size.width,size.height);
+			viewer_->setBackgroundColor(0,0,0);
 			std::ostringstream oss; oss << "Sensor " << id_;
 			viewer_->setTitle(oss.str());
 			
@@ -138,7 +153,10 @@ namespace display {
 		{
 			case SensorAbstract::PINHOLE:
 			case SensorAbstract::BARRETO: {
-				view()->exportView(filename);
+				if (isImage == 1)
+					view()->exportView(filename);
+				else
+					viewer_->exportView(filename);
 			}
 		}
 	}

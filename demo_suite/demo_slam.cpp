@@ -234,13 +234,14 @@ void demo_slam01_main(world_ptr_t *world) {
 	{
 		simulator.reset(new simu::AdhocSimulator());
 		jblas::vec3 pose;
-		for(int i = -6; i <= 6; ++i)
-			for(int j = -3; j <= 7; ++j)
-			{
-				pose(0) = i*1.0; pose(1) = j*1.0; pose(2) = 0.0;
-				simu::Landmark *lmk = new simu::Landmark(LandmarkAbstract::POINT, pose);
-				simulator->addLandmark(lmk);
-			}
+		for(int z = -1; z <= 1; ++z)
+		for(int y = -3; y <= 7; ++y)
+		for(int x = -6; x <= 6; ++x)
+		{
+			pose(0) = x*1.0; pose(1) = y*1.0; pose(2) = z*1.0;
+			simu::Landmark *lmk = new simu::Landmark(LandmarkAbstract::POINT, pose);
+			simulator->addLandmark(lmk);
+		}
 	}
 
 
@@ -683,7 +684,7 @@ void demo_slam01_display(world_ptr_t *world) {
 			if (intOpts[iDispGdhe]) viewerGdhe->render();
 			#endif
 			
-			if (intOpts[iReplay] && intOpts[iDump])
+			if ((intOpts[iReplay] || intOpts[iSimu]) && intOpts[iDump] && (*world)->display_t+1 != 0)
 			{
 				if (intOpts[iDispQt])
 				{

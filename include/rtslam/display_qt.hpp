@@ -123,6 +123,8 @@ class SensorQt : public SensorDisplay
 		double t;
 		vec7 pose;
 		unsigned int id_;
+		cv::Size size;
+		char isImage;
 		// graphical objects
 		qdisplay::Viewer *viewer_;
 		qdisplay::ImageView* view_private;

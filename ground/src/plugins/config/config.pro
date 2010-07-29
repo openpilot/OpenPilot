@@ -2,6 +2,7 @@ TEMPLATE = lib
 TARGET = Config
 include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
+include(../../plugins/uavobjects/uavobjects.pri)
 OTHER_FILES += Config.pluginspec
 HEADERS += configplugin.h \
     configgadgetconfiguration.h \
@@ -15,4 +16,4 @@ SOURCES += configplugin.cpp \
     configgadgetfactory.cpp \
     configgadgetoptionspage.cpp \
     configgadget.cpp
-FORMS += configgadget.ui
+FORMS += settingswidget.ui

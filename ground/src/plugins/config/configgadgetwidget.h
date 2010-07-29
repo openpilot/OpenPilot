@@ -27,10 +27,14 @@
 #ifndef CONFIGGADGETWIDGET_H
 #define CONFIGGADGETWIDGET_H
 
-#include "ui_configgadget.h"
+#include "ui_settingswidget.h"
+#include "extensionsystem/pluginmanager.h"
+#include "uavobjects/uavobjectmanager.h"
+#include "uavobjects/uavobject.h"
 #include <QtGui/QWidget>
+#include <QList>
 
-class Ui_ConfigGadget;
+class Ui_SettingsWidget;
 
 class ConfigGadgetWidget: public QWidget
 {
@@ -44,7 +48,16 @@ protected:
         void resizeEvent(QResizeEvent * event);
 
 private:
-        Ui_ConfigGadget *m_config;
+        Ui_SettingsWidget *m_config;
+        QList<QSlider> sliders;
+        void updateChannelSlider(QSlider* slider, QLabel* min, QLabel* Max, QLabel* cur, QCheckBox* rev, int value);
+        int ch0Min;
+        int ch0Max;
+        int ch0Rev;
+        bool firstUpdate;
+
+    private slots:
+        void updateChannels(UAVObject* obj);
 
 };
 

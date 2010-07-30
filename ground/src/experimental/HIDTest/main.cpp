@@ -29,7 +29,7 @@ class MyThread : public QThread {
 
             int received = hidHandle.receive(0, buf, BUF_LEN, 3500);
 
-            qDebug() << received << " bytes received \"" << QString().toNum(buf[0]) << buf[1] << "\"";
+            qDebug("%u bytes received.  First value %x second %x", received,buf[0], buf[1]);
         }
 
     };

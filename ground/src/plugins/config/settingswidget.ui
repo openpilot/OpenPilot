@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>544</width>
-    <height>339</height>
+    <height>346</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <x>10</x>
      <y>20</y>
      <width>521</width>
-     <height>281</height>
+     <height>311</height>
     </rect>
    </property>
    <widget class="QWidget" name="tab">
@@ -210,14 +210,17 @@
       <string>2000</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="getCurrent">
+    <widget class="QPushButton" name="getRCInputCurrent">
      <property name="geometry">
       <rect>
        <x>190</x>
-       <y>210</y>
+       <y>240</y>
        <width>93</width>
        <height>27</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Retrieve settings from OpenPilot</string>
      </property>
      <property name="text">
       <string>Get Current</string>
@@ -350,14 +353,18 @@
       <string/>
      </property>
     </widget>
-    <widget class="QPushButton" name="saveToSD">
+    <widget class="QPushButton" name="saveRCInputToSD">
      <property name="geometry">
       <rect>
        <x>410</x>
-       <y>210</y>
+       <y>240</y>
        <width>93</width>
        <height>27</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Be sure to set the Neutral position on all sliders before sending!
+Applies and Saves all settings to SD</string>
      </property>
      <property name="text">
       <string>Save to SD</string>
@@ -414,14 +421,18 @@
       <enum>Qt::Vertical</enum>
      </property>
     </widget>
-    <widget class="QPushButton" name="saveToRAM">
+    <widget class="QPushButton" name="saveRCInputToRAM">
      <property name="geometry">
       <rect>
        <x>300</x>
-       <y>210</y>
+       <y>240</y>
        <width>93</width>
        <height>27</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Send to OpenPilot but don't write in SD.
+Be sure to set the Neutral position on all sliders before sending!</string>
      </property>
      <property name="text">
       <string>Save to RAM</string>
@@ -682,7 +693,7 @@
       </rect>
      </property>
      <property name="maximum">
-      <number>0</number>
+      <number>99</number>
      </property>
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -860,6 +871,36 @@
       </rect>
      </property>
     </widget>
+    <widget class="QCheckBox" name="doRCInputCalibration">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>210</y>
+       <width>131</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Start calibrating the RC Inputs.
+Uncheck/Check to restart calibration.</string>
+     </property>
+     <property name="text">
+      <string>Run Calibration</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="RCInputConnected">
+     <property name="geometry">
+      <rect>
+       <x>320</x>
+       <y>210</y>
+       <width>181</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>RC Receiver Not Connected</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
@@ -869,5 +910,262 @@
   </widget>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>ch2Slider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ch2Cur</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>161</x>
+     <y>120</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>179</x>
+     <y>221</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ch0Slider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ch0Cur</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>40</x>
+     <y>151</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>61</x>
+     <y>217</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ch1Slider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ch1Cur</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>101</x>
+     <y>140</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>116</x>
+     <y>216</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ch3Slider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ch3Cur</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>221</x>
+     <y>139</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>238</x>
+     <y>215</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ch4Slider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ch4Cur</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>287</x>
+     <y>131</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>300</x>
+     <y>220</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ch5Slider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ch5Cur</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>342</x>
+     <y>143</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>359</x>
+     <y>219</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ch6Slider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ch6Cur</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>404</x>
+     <y>133</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>419</x>
+     <y>218</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ch7Slider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ch7Cur</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>463</x>
+     <y>116</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>477</x>
+     <y>220</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doRCInputCalibration</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>ch0Slider</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>31</x>
+     <y>272</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>38</x>
+     <y>170</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doRCInputCalibration</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>ch1Slider</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>89</x>
+     <y>265</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>101</x>
+     <y>91</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doRCInputCalibration</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>ch2Slider</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>104</x>
+     <y>275</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>166</x>
+     <y>106</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doRCInputCalibration</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>ch3Slider</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>102</x>
+     <y>266</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>221</x>
+     <y>110</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doRCInputCalibration</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>ch4Slider</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>74</x>
+     <y>262</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>280</x>
+     <y>89</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doRCInputCalibration</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>ch5Slider</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>48</x>
+     <y>262</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>342</x>
+     <y>103</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doRCInputCalibration</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>ch6Slider</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>72</x>
+     <y>269</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>400</x>
+     <y>90</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doRCInputCalibration</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>ch7Slider</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>60</x>
+     <y>275</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>460</x>
+     <y>141</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

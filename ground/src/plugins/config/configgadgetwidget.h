@@ -31,6 +31,7 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/uavobject.h"
+#include "uavobjects/objectpersistence.h"
 #include <QtGui/QWidget>
 #include <QList>
 
@@ -50,14 +51,17 @@ protected:
 private:
         Ui_SettingsWidget *m_config;
         QList<QSlider> sliders;
-        void updateChannelSlider(QSlider* slider, QLabel* min, QLabel* Max, QLabel* cur, QCheckBox* rev, int value);
-        int ch0Min;
-        int ch0Max;
-        int ch0Rev;
+        void updateChannelSlider(QSlider* slider, QLabel* min, QLabel* Max,  QCheckBox* rev, int value);
+        void updateObjectPersistance(ObjectPersistence::OperationOptions op, UAVObject *obj);
+
         bool firstUpdate;
 
     private slots:
         void updateChannels(UAVObject* obj);
+        void requestRCInputUpdate();
+        void sendRCInputUpdate();
+        void saveRCInputObject();
+
 
 };
 

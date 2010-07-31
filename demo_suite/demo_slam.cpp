@@ -586,7 +586,10 @@ JFR_DEBUG("                 FRAME : " << (*world)->t << "\nRobot estimated state
 //		int t = (*world)->t;
 //		worldPtr->display_mutex.unlock();
 
-		if (intOpts[iPause] != 0 && (*world)->t >= intOpts[iPause] && had_data && !(*world)->exit())
+		bool doPause = (intOpts[iPause] != 0);
+		int pose_start = intOpts[iPause];
+		if (pose_start = 1) pose_start = 0;
+		if (doPause && (*world)->t >= pose_start && had_data && !(*world)->exit())
 		{
 			(*world)->slam_blocked(true);
 			getchar(); // wait for key in replay mode

@@ -34,6 +34,36 @@ class AdhocSimulator
 		std::map<size_t,simu::Landmark*> landmarks;
 		IdFactory lmkIdFactory;
 		
+		
+	protected:
+		bool getSenGlobPose(size_t robId, size_t senId, jblas::vec7 &senGlobPose, std::map<size_t,simu::Sensor*>::const_iterator &itSen, double t) const
+		{
+			std::map<size_t,simu::Robot*>::const_iterator itRob = robots.find(robId);
+			if (itRob == robots.end()) return false;
+			itSen = itRob->second->sensors.find(senId);
+			if (itSen == itRob->second->sensors.end()) return false;
+			
+			jblas::vec6 robpose_e = itRob->second->getPose(t); std::swap(robpose_e(3), robpose_e(5)); // FIXME-EULER-CONVENTION
+			jblas::vec7 robpose_q = quaternion::e2q_frame(robpose_e);
+			jblas::vec6 senpose_e = itSen->second->getPose(t); std::swap(senpose_e(3), senpose_e(5)); // FIXME-EULER-CONVENTION
+			jblas::vec7 senpose_q = quaternion::e2q_frame(senpose_e);
+			senGlobPose = quaternion::composeFrames(robpose_q, senpose_q);
+			return true;
+		}
+		
+		bool getObservationPose(jblas::vec &obsPose, const jblas::vec7 &senGlobPose, const std::map<size_t,simu::Sensor*>::const_iterator &itSen, size_t lmkId, double t) const
+		{
+			std::map<size_t,simu::Landmark*>::const_iterator itLmk = landmarks.find(lmkId);
+			if (itLmk == landmarks.end()) return false;
+			std::map<LandmarkAbstract::geometry_t, ObservationModelAbstract*>::const_iterator itMod = itSen->second->obsModels.find(itLmk->second->type);
+			if (itMod == itSen->second->obsModels.end()) return false;
+			
+			jblas::vec lmkPose = itLmk->second->getPose(t);
+			jblas::vec nobs;
+			itMod->second->project_func(senGlobPose, lmkPose, obsPose, nobs);
+			return itMod->second->predictVisibility_func(obsPose, nobs);
+		}
+	
 	public:
 		AdhocSimulator(const std::string & configFile);
 		AdhocSimulator() {}
@@ -93,41 +123,30 @@ class AdhocSimulator
 			if (it != landmarks.end()) return it->second->type; else return (LandmarkAbstract::geometry_t)-1;
 		}
 		
+		
 		bool getObservationPose(jblas::vec &obsPose, size_t robId, size_t senId, size_t lmkId, double t) const
 		{
-			std::map<size_t,simu::Robot*>::const_iterator itRob = robots.find(robId);
-			if (itRob == robots.end()) return false;
-			std::map<size_t,simu::Sensor*>::const_iterator itSen = itRob->second->sensors.find(senId);
-			if (itSen == itRob->second->sensors.end()) return false;
-			std::map<size_t,simu::Landmark*>::const_iterator itLmk = landmarks.find(lmkId);
-			if (itLmk == landmarks.end()) return false;
-			std::map<LandmarkAbstract::geometry_t, ObservationModelAbstract*>::const_iterator itMod = itSen->second->obsModels.find(itLmk->second->type);
-			if (itMod == itSen->second->obsModels.end()) return false;
-			
-			jblas::vec6 robpose_e = itRob->second->getPose(t); std::swap(robpose_e(3), robpose_e(5)); // FIXME-EULER-CONVENTION
-			jblas::vec7 robpose_q = quaternion::e2q_frame(robpose_e);
-			jblas::vec6 senpose_e = itSen->second->getPose(t); std::swap(senpose_e(3), senpose_e(5)); // FIXME-EULER-CONVENTION
-			jblas::vec7 senpose_q = quaternion::e2q_frame(senpose_e);
-			jblas::vec7 senGlobPose = quaternion::composeFrames(robpose_q, senpose_q);
-			jblas::vec lmkPose = itLmk->second->getPose(t);
-			jblas::vec nobs;
-			itMod->second->project_func(senGlobPose, lmkPose, obsPose, nobs);
-			bool r = itMod->second->predictVisibility_func(obsPose, nobs);
-//JFR_DEBUG("robot pose " << robpose_e << ", sensor pose " << senpose_e << ", sensor global pose q " << senGlobPose << ", landmark " << lmkId << "/" << itLmk->second->id << " pose " << lmkPose << ", observation pose " << obsPose << "(nobs " << nobs << "), visibility " << r);
-			return r;
+			std::map<size_t,simu::Sensor*>::const_iterator itSen;
+			jblas::vec7 senGlobPose;
+			if (!getSenGlobPose(robId, senId, senGlobPose, itSen, t)) return false;
+			return getObservationPose(obsPose, senGlobPose, itSen, lmkId, t);
 		}
 		
 		
 		raw_ptr_t getRaw(size_t robId, size_t senId, double t) //const
 		{
-			// TODO optimize avoiding to repeat computation of sensor pose
 			boost::shared_ptr<simu::RawSimu> raw(new simu::RawSimu());
 			raw->timestamp = t;
+			
+			std::map<size_t,simu::Sensor*>::const_iterator itSen;
+			jblas::vec7 senGlobPose;
+			if (!getSenGlobPose(robId, senId, senGlobPose, itSen, t)) return raw;
+			
 			jblas::vec pose;
 			for(std::map<size_t,simu::Landmark*>::const_iterator it = landmarks.begin(); it != landmarks.end(); ++it)
 			{
 				size_t lmkId = it->second->id;
-				if (getObservationPose(pose, robId, senId, lmkId, t))
+				if (getObservationPose(pose, senGlobPose, itSen, lmkId, t))
 					raw->obs[lmkId] = featuresimu_ptr_t(new FeatureSimu(pose, it->second->type, lmkId));
 			}
 std::cout << "simulation has generated a raw at time " << t << " with " << raw->obs.size() << " obs ; robot pose " << robots[1]->getPose(t) << std::endl;

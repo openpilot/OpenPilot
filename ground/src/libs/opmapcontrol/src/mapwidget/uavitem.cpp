@@ -31,8 +31,9 @@ namespace mapcontrol
     UAVItem::UAVItem(MapGraphicItem* map,OPMapWidget* parent):map(map),mapwidget(parent),showtrail(true),trailtime(5),traildistance(50),autosetreached(true)
     ,autosetdistance(100)
     {
-        pic.load(QString::fromUtf8(":/markers/images/EasystarBlue.png"));
-        pic=pic.scaled(50,33,Qt::IgnoreAspectRatio);
+        pic.load(QString::fromUtf8(":/markers/images/mapquad.png"));
+       // Don't scale but trust the image we are given
+       // pic=pic.scaled(50,33,Qt::IgnoreAspectRatio);
         localposition=map->FromLatLngToLocal(mapwidget->CurrentPosition());
         this->setPos(localposition.X(),localposition.Y());
         this->setZValue(4);

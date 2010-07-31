@@ -68,6 +68,7 @@ PluginDialog::PluginDialog(QWidget *parent)
 
     resize(650, 400);
     setWindowTitle(tr("Installed Plugins"));
+    setWindowIcon(QIcon(":/core/images/pluginicon.png"));
 
     connect(m_view, SIGNAL(currentPluginChanged(ExtensionSystem::PluginSpec*)),
             this, SLOT(updateButtons()));

@@ -9,8 +9,3 @@ OpenPilot wishes to thank Guitar Guy 1985 for his work on the alarms, 3 of his s
 alarmsound
 beepsound
 whoopsound
-
-  
-
-
- 

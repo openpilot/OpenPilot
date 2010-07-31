@@ -645,7 +645,7 @@ void MainWindow::registerDefaultActions()
 #endif
 
     //About Plugins Action
-    tmpaction = new QAction(QIcon(Constants::ICON_INFO), tr("About &Plugins..."), this);
+    tmpaction = new QAction(QIcon(Constants::ICON_PLUGIN), tr("About &Plugins..."), this);
     cmd = am->registerAction(tmpaction, Constants::ABOUT_PLUGINS, m_globalContext);
     mhelp->addAction(cmd, Constants::G_HELP_ABOUT);
     tmpaction->setEnabled(true);

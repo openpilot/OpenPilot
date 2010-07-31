@@ -32,9 +32,9 @@
 namespace Core {
 namespace Constants {
 
-#define GCS_VERSION_MAJOR 0
+#define GCS_VERSION_MAJOR 1
 #define GCS_VERSION_MINOR 0
-#define GCS_VERSION_RELEASE 1
+#define GCS_VERSION_RELEASE 0
 
 #define STRINGIFY_INTERNAL(x) #x
 #define STRINGIFY(x) STRINGIFY_INTERNAL(x)
@@ -212,7 +212,7 @@ const char * const ICON_REPLACE          = ":/core/images/replace.png";
 const char * const ICON_RESET            = ":/core/images/reset.png";
 const char * const ICON_MAGNIFIER        = ":/core/images/magnifier.png";
 const char * const ICON_TOGGLE_SIDEBAR   = ":/core/images/sidebaricon.png";
-const char * const ICON_INFO             = ":/core/images/infoicon.png";
+const char * const ICON_PLUGIN           = ":/core/images/pluginicon.png";
 const char * const ICON_EXIT             = ":/core/images/exiticon.png";
 const char * const ICON_OPTIONS          = ":/core/images/optionsicon.png";
 const char * const ICON_HELP             = ":/core/images/helpicon.png";

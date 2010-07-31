@@ -3,6 +3,7 @@
         <file>images/openpilot_logo_256.png</file>
         <file>images/openpilot_logo_128.png</file>
         <file>images/openpilot_logo_64.png</file>
+        <file>images/openpilot_logo_32.png</file>
         <file>images/clean_pane_small.png</file>
         <file>images/clear.png</file>
         <file>images/closebutton.png</file>
@@ -44,7 +45,7 @@
         <file>images/unlocked.png</file>
         <file>images/extension.png</file>
         <file>images/darkclosebutton.png</file>
-        <file>images/infoicon.png</file>
+        <file>images/pluginicon.png</file>
         <file>images/exiticon.png</file>
         <file>images/optionsicon.png</file>
         <file>images/helpicon.png</file>

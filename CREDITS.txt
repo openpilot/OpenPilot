@@ -30,6 +30,14 @@ N: David "Buzz" Carlson
 E: chebuzz (plus) openpilot (at) gmail (dot) com
 D: 3D ModelView GCS Plugin
 
+N: Corvus Corax
+E: corvus (dot) corax (at) cybertrench (dot) com
+D: IL2 HITL GCS Plugin, Posix OpenPilot, Advanced Stabalisation module
+
+N: James Cotton
+E: peabody124 (plus) openpilot (at) gmail (dot) com
+D: HID implimentation, GCS Joystick control, Posix OpenPilot work
+
 N: Frederic Goddeeris
 E: fredericgoddeeris (at) hotmail (dot) com
 D: I2C work and FreeRTOS work, MK intergration
@@ -63,15 +71,15 @@ D: Artwork including display dials
 
 N: Ken Northup
 E: helos360 (at) bellsouth (dot) net
-D: Test 3D Modelling, unused in production.  
+D: 3D Modelling, Easystar adaption from FMS  
 
 N: Guy McCaldin 
 E: guymcc (at) gmail (dot) com
-D: Artwork and design lead
+D: Artwork and design dials
 
 N: Cathy Moss
 E: cmoss296 (at) blueyonder (dot) co (dot) uk
-D: OP Map Plugin
+D: OP Map Plugin, PipBee Pro Modem 
 
 N: Angus Peart
 E: gussy (at) openpilot (dot) org
@@ -101,7 +109,11 @@ D: Picoc creator as used in the flight
 N: Stacey Sheldon
 E: stac (at) solidgoldbomb (dot) org
 D: Core embedded developer
-D: SPI protocol for AHRS, IRQ and HID stability fixes and core AHRS work.  
+D: SPI protocol for AHRS, I2C work and various core work  
+
+N: Erhard Siegl
+E: Erhard (dot) Siegl (at) zogazoga (dot) at
+D: Configuration engine for the GCS
 
 N: Pete Stapley
 E: pete (at) stapleylabs (dot) com
@@ -110,6 +122,10 @@ D: PPM inputs
 N: Rowan Taubitz
 E: rowan (at) zantek (dot) com (dot) au
 D: Hardware debugging and testing, creation of 2-layer Floss-JTAG board
+
+N: Andrew Thoms
+E: electronics (at) andrewspizza (dot) net
+D: IP Telemtry plugin for the GCS
 
 N: Vassilis Varveropoulos
 E: vassilis (at) openpilot (dot) org

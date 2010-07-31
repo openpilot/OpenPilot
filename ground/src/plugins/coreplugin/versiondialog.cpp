@@ -52,7 +52,7 @@ VersionDialog::VersionDialog(QWidget *parent)
 {
     // We need to set the window icon explicitly here since for some reason the
     // application icon isn't used when the size of the dialog is fixed (at least not on X11/GNOME)
-    setWindowIcon(QIcon(":/core/images/openpilot_logo_128.png"));
+    setWindowIcon(QIcon(":/core/images/openpilot_logo_32.png"));
 
     setWindowTitle(tr("About OpenPilot GCS"));
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);

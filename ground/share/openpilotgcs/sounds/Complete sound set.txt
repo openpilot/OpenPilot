@@ -1,6 +1,8 @@
-Sounds for the notifaction plugin
+Sounds for the notification plugin.
 
-All files should be normalized using http://normalize.nongnu.org/ with no options. 
+Before being included, all files should be normalized using http://normalize.nongnu.org/ with no options. 
+
+Do not however re-normalise the files already here.
 
 Work in progress, any ideas PM me - dankers.
 
@@ -11,7 +13,7 @@ beepsound
 whoopsound
 
 
-Spoken Collections (sorted alphabetically):
+Spoken Collection (sorted alphabetically):
 
 aborted
 active
@@ -30,7 +32,7 @@ complete
 connected
 connection
 control
-critical battery
+critical
 disabled
 disconnected
 feet
@@ -51,7 +53,6 @@ KPH
 landing
 launch
 left
-lock
 logging
 lost
 low altitude
@@ -119,4 +120,10 @@ eighty
 ninety
 hundread
 thousand
+
+
+Upto: OpenPilot
+critical
+battery
+point
 

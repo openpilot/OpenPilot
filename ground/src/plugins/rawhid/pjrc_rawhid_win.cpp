@@ -130,7 +130,15 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
             }
             h = CreateFile(details->DevicePath, GENERIC_READ|GENERIC_WRITE,
                     FILE_SHARE_READ|FILE_SHARE_WRITE, NULL,
-                    OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+                    OPEN_EXISTING,
+                    FILE_FLAG_OVERLAPPED,
+                    NULL);
+            if( GetLastError() != ERROR_SUCCESS )
+            {
+                qDebug("Problem openning handle");
+                print_win32_err();
+
+            }
             free(details);
             if (h == INVALID_HANDLE_VALUE) continue;
             attrib.Size = sizeof(HIDD_ATTRIBUTES);
@@ -155,6 +163,7 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
                     CloseHandle(h);
                     continue;
             }
+            qDebug("Open: Handle address: %li for num: %i", (long int) h, count);
             hid->handle = h;
             hid->open = 1;
             add_hid(hid);
@@ -176,29 +185,31 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
 int pjrc_rawhid::receive(int num, void *buf, int len, int timeout)
 {
         hid_t *hid;
-        unsigned char tmpbuf[516]={0};
         OVERLAPPED ov;
         DWORD n, r;
 
-        if (sizeof(tmpbuf) < len) return -1;
         hid = get_hid(num);
         if (!hid || !hid->open) return -1;
+
         EnterCriticalSection(&rx_mutex);
         ResetEvent(&rx_event);
         memset(&ov, 0, sizeof(ov));
         ov.hEvent = rx_event;
-        if (!ReadFile(hid->handle, tmpbuf, len, NULL, &ov)) {
+
+        if (!ReadFile(hid->handle, buf, len, NULL, &ov)) {
                 if (GetLastError() != ERROR_IO_PENDING) goto return_error;
                 r = WaitForSingleObject(rx_event, timeout);
                 if (r == WAIT_TIMEOUT) goto return_timeout;
                 if (r != WAIT_OBJECT_0) goto return_error;
         }
+
         if (!GetOverlappedResult(hid->handle, &ov, &n, FALSE)) goto return_error;
         LeaveCriticalSection(&rx_mutex);
         if (n <= 0) return -1;
-        n--;
+
+//        qDebug("Received %i bytes, first %x, second %x", len, *((char *) buf),*((char *)buf + 1));
+
         if (n > len) n = len;
-        memcpy(buf, tmpbuf, n);
         return n;
 return_timeout:
         CancelIo(hid->handle);
@@ -222,28 +233,47 @@ return_error:
 int pjrc_rawhid::send(int num, void *buf, int len, int timeout)
 {
         hid_t *hid;
-        unsigned char tmpbuf[64]={0};
         OVERLAPPED ov;
         DWORD n, r;
 
-        if (sizeof(tmpbuf) < len) return -1;
         hid = get_hid(num);
         if (!hid || !hid->open) return -1;
+
+//        qDebug("Send: Handle address: %li for num: %i", (long int) hid->handle, num);
+
         EnterCriticalSection(&tx_mutex);
         ResetEvent(&tx_event);
         memset(&ov, 0, sizeof(ov));
         ov.hEvent = tx_event;
-        memcpy(tmpbuf, buf, len);
-        if (!WriteFile(hid->handle, tmpbuf, 64, NULL, &ov)) {
-                if (GetLastError() != ERROR_IO_PENDING) goto return_error;
+
+//        qDebug("Trying to write %u bytes.  First %x second %x",len, *((char *) buf), *((char *)buf + 1));
+
+        if (!WriteFile(hid->handle, buf, len, NULL, &ov)) {
+            DWORD err = GetLastError();
+            if ( err == ERROR_SUCCESS || err == ERROR_IO_PENDING )
+            {
+//                qDebug("Waiting for write to finish");
                 r = WaitForSingleObject(tx_event, timeout);
                 if (r == WAIT_TIMEOUT) goto return_timeout;
                 if (r != WAIT_OBJECT_0) goto return_error;
+            }
+            else
+            {
+//                qDebug("Error writing to file");
+                print_win32_err();
+                LeaveCriticalSection(&tx_mutex);
+                return -1;
+            }
         }
-        if (!GetOverlappedResult(hid->handle, &ov, &n, FALSE)) goto return_error;
+
+        if (!GetOverlappedResult(hid->handle, &ov, &n, FALSE))
+        {
+            qDebug("Problem getting overlapped result");
+            print_win32_err();
+        }
         LeaveCriticalSection(&tx_mutex);
         if (n <= 0) return -1;
-        return n - 1;
+        return n;
 return_timeout:
         CancelIo(hid->handle);
         LeaveCriticalSection(&tx_mutex);

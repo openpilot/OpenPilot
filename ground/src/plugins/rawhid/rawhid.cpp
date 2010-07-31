@@ -204,6 +204,7 @@ void RawHIDWriteThread::run()
     while(m_running)
     {
         char buffer[WRITE_SIZE] = {0};
+
         m_writeBufMtx.lock();
         int size = qMin(WRITE_SIZE, m_writeBuffer.size());
         while(size <= 0)
@@ -224,7 +225,7 @@ void RawHIDWriteThread::run()
         //during actual device access
         memcpy(&buffer[2], m_writeBuffer.constData(), size);
         buffer[1] = size; //valid data length
-        buffer[0] = 1;    //reportID
+        buffer[0] = 2;    //reportID
         m_writeBufMtx.unlock();
 
         int ret = hiddev->send(hidno, buffer, WRITE_SIZE, WRITE_TIMEOUT);

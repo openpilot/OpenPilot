@@ -62,10 +62,11 @@ namespace display {
 				client.setCameraTarget(0.04,0,0.15);
 				client.setCameraPos(80, 20, 0.5);
 			}
-		void dump(std::string filename)
-		{
-			client.dump(filename);
-		}
+			void setConvertTempPath(std::string path) { client.setConvertTempPath(path); }
+			void dump(std::string filename)
+			{
+				client.dump(filename);
+			}
 	};
 
 

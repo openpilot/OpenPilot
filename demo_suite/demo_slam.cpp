@@ -13,6 +13,8 @@
 
 #include <iostream>
 #include <boost/shared_ptr.hpp>
+//#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem.hpp>
 #include <time.h>
 #include <map>
 #include <getopt.h>
@@ -693,7 +695,7 @@ void demo_slam01_display(world_ptr_t *world) {
 				}
 				if (intOpts[iDispGdhe])
 				{
-					std::ostringstream oss; oss << strOpts[sDataPath] << "/rendered-3D_" << std::setw(6) << std::setfill('0') << (*world)->display_t << ".ppm";
+					std::ostringstream oss; oss << strOpts[sDataPath] << "/rendered-3D_" << std::setw(6) << std::setfill('0') << (*world)->display_t << ".png";
 					viewerGdhe->dump(oss.str());
 				}
 //				if (intOpts[iRenderAll])
@@ -753,6 +755,9 @@ void demo_slam01_exit(world_ptr_t *world, boost::thread *thread_main) {
 		if (intOpts[iDispGdhe])
 		{
 			display::ViewerGdhe *viewerGdhe = new display::ViewerGdhe("camera", MAHALANOBIS_TH, "localhost");
+			boost::filesystem::path ram_path("/mnt/ram");
+			if (boost::filesystem::exists(ram_path) && boost::filesystem::is_directory(ram_path))
+				viewerGdhe->setConvertTempPath("/mnt/ram");
 			worldPtr->addDisplayViewer(viewerGdhe, display::ViewerGdhe::id());
 		}
 		#endif

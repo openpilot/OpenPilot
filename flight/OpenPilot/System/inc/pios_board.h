@@ -127,6 +127,10 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define PIOS_COM_DEBUG                          PIOS_COM_AUX
 #endif
 
+#ifdef PIOS_INCLUDE_SPEKTRUM
+#define PIOS_COM_SPEKTRUM                       3
+#endif
+
 //-------------------------
 // SPI
 //

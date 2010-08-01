@@ -83,7 +83,7 @@ static void TaskTesting(void *pvParameters)
 		temp = PIOS_BMP085_GetTemperature();
 		pressure = PIOS_BMP085_GetPressure();
 
-		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%3u,%4u\r", temp, pressure);
+		PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_TELEM_RF, "%3u,%4u\r", temp, pressure);
 
 		vTaskDelay(xDelay);
 	}

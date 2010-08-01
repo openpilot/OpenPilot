@@ -37,6 +37,9 @@
 #if defined(PIOS_INCLUDE_PWM)
 #error "Both PWM and SPEKTRUM input defined, choose only one"
 #endif
+#if defined(PIOS_COM_AUX)
+#error "AUX com cannot be used with SPEKTRUM"
+#endif
 
 /* Global Variables */
 
@@ -50,55 +53,11 @@ static uint16_t CaptureValue[12];
 */
 void PIOS_SPEKTRUM_Init(void)
 {
-	// need setting flag for bind on next powerup
-	if(1)
+	// TODO: need setting flag for bind on next powerup
+	if(0)
 	{
 		PIOS_SPEKTRUM_Bind();
 	}
-	/* Configure USART Pins */
-	GPIO_InitTypeDef GPIO_InitStructure;
-	GPIO_StructInit(&GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-
-	/* Configure and Init USARTs */
-	USART_InitTypeDef USART_InitStructure;
-	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-	USART_InitStructure.USART_StopBits = USART_StopBits_1;
-	USART_InitStructure.USART_Parity = USART_Parity_No;
-	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-	USART_InitStructure.USART_Mode = USART_Mode_Rx;
-
-	/* Configure the USART Interrupts */
-	NVIC_InitTypeDef NVIC_InitStructure;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-
-	/* Enable the USART Pins Software Remapping */
-	PIOS_USART3_REMAP_FUNC;
-
-	/* Configure and Init USART Rx input with internal pull-ups */
-	//GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-	GPIO_InitStructure.GPIO_Pin = PIOS_USART3_RX_PIN;
-	GPIO_Init(PIOS_USART3_GPIO_PORT, &GPIO_InitStructure);
-
-	/* Enable USART clock */
-	PIOS_USART3_CLK_FUNC;
-
-	/* Enable USART Receive interrupt */
-	USART_InitStructure.USART_BaudRate = 115200;
-	USART_Init(PIOS_USART3_USART, &USART_InitStructure);
-	USART_ITConfig(PIOS_USART3_USART, USART_IT_RXNE, ENABLE);
-	//USART_ITConfig(PIOS_USART3_USART, USART_IT_TXE, ENABLE);
-
-	/* Configure the USART Interrupts */
-	NVIC_InitStructure.NVIC_IRQChannel = PIOS_USART3_IRQ_CHANNEL;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_USART3_NVIC_PRIO;
-	NVIC_Init(&NVIC_InitStructure);
-	USART_ITConfig(PIOS_USART3_USART, USART_IT_RXNE, ENABLE);
-
-	/* Enable USART */
-	USART_Cmd(PIOS_USART3_USART, ENABLE);
 }
 
 
@@ -125,6 +84,9 @@ int16_t PIOS_SPEKTRUM_Get(int8_t Channel)
 */
 uint8_t PIOS_SPEKTRUM_Bind(void)
 {
+#define PIOS_USART3_GPIO_PORT			GPIOA
+#define PIOS_USART3_RX_PIN			GPIO_Pin_10
+
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_StructInit(&GPIO_InitStructure);
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
@@ -132,7 +94,7 @@ uint8_t PIOS_SPEKTRUM_Bind(void)
 	GPIO_InitStructure.GPIO_Pin = PIOS_USART3_RX_PIN;
 	GPIO_Init(PIOS_USART3_GPIO_PORT, &GPIO_InitStructure);
 	/* GPIO's Off */
-	/* powerup, RX line stay low for 75ms */
+	/* TODO: powerup, RX line stay low for 75ms */
 	/* system init takes longer!!! */
 	/* I have no idea how long the powerup init window for satellite is but works with this */
 	PIOS_USART3_GPIO_PORT->BRR = PIOS_USART3_RX_PIN;
@@ -211,7 +173,7 @@ int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 	}
 	if(bytecount==16)
 	{
-		//PIOS_COM_SendBufferNonBlocking(COM_DEBUG_USART,byte_array,16);
+		//PIOS_COM_SendBufferNonBlocking(PIOS_COM_TELEM_RF,byte_array,16);
 		bytecount=0;
 		sync=0;
 	}
@@ -220,20 +182,19 @@ int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 }
 
 /* Interrupt handler for USART3 */
-PIOS_USART3_IRQHANDLER_FUNC
+void SPEKTRUM_IRQHandler(void)
 {
 	/* check if RXNE flag is set */
-	if(PIOS_USART3_USART->SR & (1 << 5)) {
-		uint8_t b = PIOS_USART3_USART->DR;
-		
+	if(USART1->SR & (1 << 5)) {
+		uint8_t b = USART1->DR;
 		if(PIOS_SPEKTRUM_Decode(b) < 0) {
 			/* Here we could add some error handling */
 		}
 	}
 
-	if(PIOS_USART3_USART->SR & (1 << 7)) { // check if TXE flag is set
-			/* Disable TXE interrupt (TXEIE=0) */
-			PIOS_USART3_USART->CR1 &= ~(1 << 7);
+	if(USART1->SR & (1 << 7)) { // check if TXE flag is set
+		/* Disable TXE interrupt (TXEIE=0) */
+		USART1->CR1 &= ~(1 << 7);
 	}
 }
 

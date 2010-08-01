@@ -50,7 +50,10 @@ void PIOS_Board_Init(void) {
 	/* Enable and mount the SDCard */
 	PIOS_SDCARD_Init();
 	PIOS_SDCARD_MountFS(0);
-
+#if defined(PIOS_INCLUDE_SPEKTRUM)
+	/* SPEKTRUM init must come before comms */
+	PIOS_SPEKTRUM_Init();
+#endif
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();
 	UAVObjInitialize();
@@ -64,9 +67,7 @@ void PIOS_Board_Init(void) {
 	PIOS_Servo_Init();
 	PIOS_ADC_Init();
 	PIOS_GPIO_Init();
-#if defined(PIOS_INCLUDE_SPEKTRUM)
-	PIOS_SPEKTRUM_Init();
-#endif
+
 #if defined(PIOS_INCLUDE_PWM)
 	PIOS_PWM_Init();
 #endif
@@ -76,7 +77,7 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_USB_HID)
 	PIOS_USB_HID_Init(0);
 #endif
-	//PIOS_I2C_Init();
+	PIOS_I2C_Init();
 
 	WWDG_SetPrescaler(WWDG_Prescaler_8);
 	WWDG_SetWindowValue(0xff);
@@ -437,6 +438,50 @@ const struct pios_usart_cfg pios_usart_aux_cfg = {
 };
 #endif
 
+#ifdef PIOS_COM_SPEKTRUM
+/*
+ * SPEKTRUM USART
+ */
+void PIOS_USART_spektrum_irq_handler(void);
+void USART1_IRQHandler() __attribute__ ((alias ("PIOS_USART_spektrum_irq_handler")));
+const struct pios_usart_cfg pios_usart_spektrum_cfg = {
+  .regs = USART1,
+  .init = {
+    .USART_BaudRate            = 115200,
+    .USART_WordLength          = USART_WordLength_8b,
+    .USART_Parity              = USART_Parity_No,
+    .USART_StopBits            = USART_StopBits_1,
+    .USART_HardwareFlowControl = USART_HardwareFlowControl_None,
+    .USART_Mode                = USART_Mode_Rx,
+  },
+  .irq = {
+    .handler = PIOS_USART_spektrum_irq_handler,
+    .init    = {
+      .NVIC_IRQChannel                   = USART1_IRQn,
+      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+      .NVIC_IRQChannelSubPriority        = 0,
+      .NVIC_IRQChannelCmd                = ENABLE,
+    },
+  },
+  .rx   = {
+    .gpio = GPIOA,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_10,
+      .GPIO_Speed = GPIO_Speed_2MHz,
+      .GPIO_Mode  = GPIO_Mode_IPU,
+    },
+  },
+  .tx   = {
+    .gpio = GPIOA,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_9,
+      .GPIO_Speed = GPIO_Speed_2MHz,
+      .GPIO_Mode  = GPIO_Mode_IN_FLOATING,
+    },
+  },
+};
+#endif
+
 /*
  * Board specific number of devices.
  */
@@ -453,6 +498,12 @@ struct pios_usart_dev pios_usart_devs[] = {
 #define PIOS_USART_AUX    2
   {
     .cfg = &pios_usart_aux_cfg,
+  },
+#endif
+#ifdef PIOS_COM_SPEKTRUM
+#define PIOS_USART_AUX    2
+  {
+    .cfg = &pios_usart_spektrum_cfg,
   },
 #endif
 };
@@ -473,6 +524,13 @@ void PIOS_USART_gps_irq_handler(void)
 void PIOS_USART_aux_irq_handler(void)
 {
   PIOS_USART_IRQ_Handler(PIOS_USART_AUX);
+}
+#endif
+
+#ifdef PIOS_COM_SPEKTRUM
+void PIOS_USART_spektrum_irq_handler(void)
+{
+	SPEKTRUM_IRQHandler();
 }
 #endif
 
@@ -502,6 +560,12 @@ struct pios_com_dev pios_com_devs[] = {
   },
 #endif
 #ifdef PIOS_COM_AUX
+  {
+    .id     = PIOS_USART_AUX,
+    .driver = &pios_usart_com_driver,
+  },
+#endif
+#ifdef PIOS_COM_SPEKTRUM
   {
     .id     = PIOS_USART_AUX,
     .driver = &pios_usart_com_driver,

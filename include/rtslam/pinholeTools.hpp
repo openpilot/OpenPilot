@@ -528,7 +528,7 @@ namespace jafar {
 					double r_max = sqrt(k(0)*k(0) / (k(2)*k(2)) + k(1)*k(1) / (k(3)*k(3)));
 					double rd_max = 1.1 * r_max;
 
-					size_t N_samples = 100; // number of samples
+					size_t N_samples = 200; // number of samples
 					double iN_samples = 1 / (double) N_samples;
 					double rd_n, rc_2, rd_2;
 					vec rd(N_samples+1), rc(N_samples+1);

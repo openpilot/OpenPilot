@@ -152,6 +152,7 @@ const unsigned IMG_WIDTH = 640;
 const unsigned IMG_HEIGHT = 480;
 const double INTRINSIC[4] = { 301.27013,   266.86136,   497.28243,   496.81116 };
 const double DISTORTION[2] = { -0.23193,   0.11306 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
+const double CORRECTION_SIZE_FACTOR = 3;
 const double PIX_NOISE = .5;
 const double PIX_NOISE_SIMUFACTOR = 0.0;
 
@@ -334,7 +335,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	}
 	//senPtr11->pose.x(quaternion::originFrame());
 	senPtr11->params.setImgSize(IMG_WIDTH, IMG_HEIGHT);
-	senPtr11->params.setIntrinsicCalibration(intrinsic, distortion, distortion.size());
+	senPtr11->params.setIntrinsicCalibration(intrinsic, distortion, distortion.size()*CORRECTION_SIZE_FACTOR);
 	senPtr11->params.setMiscellaneous(1.0, 0.1);
 
 	if (intOpts[iSimu] == 1)

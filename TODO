@@ -4,6 +4,8 @@ Bugs
 - sticky landmarks !
 - trajectories are not repeatable and not always right
 
+- [ok] backproject-project is not identity !!! -> distortion correction was not precise enough
+
 Features
 ------------------------------------
 - segments
@@ -54,6 +56,7 @@ Precision
 - if no feature is found, try with larger ellipse, because there is little chance you find them back later (except if this one image is bad), if you never find them back you'll be for sure inconsistent, and if you try later the ellipses will be greater and greater.
 - Finish implementing RobotCentric Kalman
 - To investigate : predict, compute jacobians, correct mean offline, recompute jacobians, correct online = better consistence but how much more computations ?
+- to extract patch and match, compute an homography with the 4 corners, in order to take distortion a little bit into account
 
 - test predicted patch variance: if too low, discard exploration and declare not matched. Or rather test the variance of where you search, we can add an option minSigma to explorer that don't do correlation if sigma too low.
 - when a point is detected, do a matching with itself with interpolation to find subpixel position

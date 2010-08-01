@@ -92,6 +92,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_map->SetMaxZoom(19);
     m_map->SetMouseWheelZoomType(internals::MouseWheelZoomType::MousePositionWithoutCenter);	    // set how the mouse wheel zoom functions
     m_map->SetFollowMouse(true);								    // we want a contiuous mouse position reading
+    m_map->SetShowHome(true);									    // display the HOME position on the map
     m_map->SetShowUAV(true);									    // display the UAV position on the map
 
 //  m_map->UAV->SetTrailTime(1);								    // seconds
@@ -422,11 +423,15 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 	zoomSubMenu.addAction(zoomAct.at(i));
     menu.addMenu(&zoomSubMenu);
 
-    menu.addSeparator()->setText(tr("Position"));
+    menu.addSeparator();
 
     menu.addAction(goMouseClickAct);
+
+    menu.addSeparator()->setText(tr("HOME"));
+
+    menu.addAction(setHomePosAct);
+    menu.addAction(showHomeAct);
     menu.addAction(goHomeAct);
-    menu.addAction(goUAVAct);
 
     menu.addSeparator()->setText(tr("UAV"));
 
@@ -434,6 +439,7 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
     menu.addAction(showUAVtrailAct);
     menu.addAction(followUAVpositionAct);
     menu.addAction(followUAVheadingAct);
+    menu.addAction(goUAVAct);
 
     menu.addSeparator()->setText(tr("Waypoints"));
 
@@ -528,11 +534,8 @@ void OPMapGadgetWidget::updatePosition()
 
     if (m_map)
     {
-//	if (m_map->ShowUAV())
-	{
-	    m_map->UAV->SetUAVPos(uav_pos, uav_altitude_meters);					// set the maps UAV position
-	    m_map->UAV->SetUAVHeading(uav_heading);							// set the maps UAV heading
-	}
+	m_map->UAV->SetUAVPos(uav_pos, uav_altitude_meters);					// set the maps UAV position
+	m_map->UAV->SetUAVHeading(uav_heading);							// set the maps UAV heading
     }
 }
 
@@ -702,6 +705,12 @@ void OPMapGadgetWidget::on_toolButtonZoomM_clicked()
 void OPMapGadgetWidget::on_toolButtonMapHome_clicked()
 {
     followUAVpositionAct->setChecked(false);
+
+    if (m_map)
+    {
+	internals::PointLatLng home_pos = m_map->Home->Coord();	// get the home location
+	m_map->SetCurrentPosition(home_pos);			// center the map onto the home location
+    }
 }
 
 void OPMapGadgetWidget::on_toolButtonMapUAV_clicked()
@@ -851,13 +860,13 @@ void OPMapGadgetWidget::setCacheLocation(QString cacheLocation)
 
     if (cacheLocation.isEmpty()) return;
 
-    #if defined(Q_WS_WIN)
-	if (!cacheLocation.endsWith('/')) cacheLocation += '/';
-    #elif defined(Q_WS_X11)
+//    #if defined(Q_WS_WIN)
+//	if (!cacheLocation.endsWith('\\')) cacheLocation += '\\';
+//    #elif defined(Q_WS_X11)
 	if (!cacheLocation.endsWith(QDir::separator())) cacheLocation += QDir::separator();
-    #elif defined(Q_WS_MAC)
-	if (!cacheLocation.endsWith(QDir::separator())) cacheLocation += QDir::separator();
-    #endif
+//    #elif defined(Q_WS_MAC)
+//	if (!cacheLocation.endsWith(QDir::separator())) cacheLocation += QDir::separator();
+//    #endif
 
     QDir dir;
     if (!dir.exists(cacheLocation))
@@ -910,11 +919,16 @@ void OPMapGadgetWidget::createActions()
     showCompassAct->setChecked(true);
     connect(showCompassAct, SIGNAL(toggled(bool)), this, SLOT(onShowCompassAct_toggled(bool)));
 
+    showHomeAct = new QAction(tr("Show Home"), this);
+    showHomeAct->setStatusTip(tr("Show/Hide the Home location"));
+    showHomeAct->setCheckable(true);
+    showHomeAct->setChecked(true);
+    connect(showHomeAct, SIGNAL(toggled(bool)), this, SLOT(onShowHomeAct_toggled(bool)));
+
     showUAVAct = new QAction(tr("Show UAV"), this);
     showUAVAct->setStatusTip(tr("Show/Hide the UAV"));
     showUAVAct->setCheckable(true);
-    showUAVAct->setChecked(m_map->ShowUAV());
-    showUAVAct->setEnabled(false);		// temporary
+    showUAVAct->setChecked(true);
     connect(showUAVAct, SIGNAL(toggled(bool)), this, SLOT(onShowUAVAct_toggled(bool)));
 
     zoomInAct = new QAction(tr("Zoom &In"), this);
@@ -940,6 +954,10 @@ void OPMapGadgetWidget::createActions()
     goUAVAct->setShortcut(tr("Ctrl+U"));
     goUAVAct->setStatusTip(tr("Center the map onto the UAV location"));
     connect(goUAVAct, SIGNAL(triggered()), this, SLOT(onGoUAVAct_triggered()));
+
+    setHomePosAct = new QAction(tr("Set Home location"), this);
+    setHomePosAct->setStatusTip(tr("Set the current UAV location as the HOME location"));
+    connect(setHomePosAct, SIGNAL(triggered()), this, SLOT(onSetHomePosAct_triggered()));
 
     followUAVpositionAct = new QAction(tr("Follow UAV position"), this);
     followUAVpositionAct->setShortcut(tr("Ctrl+F"));
@@ -1068,10 +1086,18 @@ void OPMapGadgetWidget::onShowCompassAct_toggled(bool show)
 	m_map->SetShowCompass(show);
 }
 
+void OPMapGadgetWidget::onShowHomeAct_toggled(bool show)
+{
+    if (m_map)
+//	m_map->SetShowHome(show);    // this can cause a rather big crash
+	m_map->Home->setVisible(show);
+}
+
 void OPMapGadgetWidget::onShowUAVAct_toggled(bool show)
 {
     if (m_map)
-	m_map->SetShowUAV(show);    // this can cause a rather big crash
+//	m_map->SetShowUAV(show);    // this can cause a rather big crash
+	m_map->UAV->setVisible(show);
 }
 
 void OPMapGadgetWidget::onGoZoomInAct_triggered()
@@ -1116,6 +1142,18 @@ void OPMapGadgetWidget::onGoUAVAct_triggered()
 	internals::PointLatLng uav_pos = internals::PointLatLng(data.Latitude, data.Longitude);	// current UAV position
 	internals::PointLatLng map_pos = m_map->CurrentPosition();				// current MAP position
 	if (map_pos != uav_pos) m_map->SetCurrentPosition(uav_pos);				// center the map onto the UAV
+    }
+}
+
+void OPMapGadgetWidget::onSetHomePosAct_triggered()
+{
+    PositionActual::DataFields data = m_positionActual->getData();				// get current UAV data
+
+    if (m_map)
+    {
+	internals::PointLatLng uav_pos = internals::PointLatLng(data.Latitude, data.Longitude);	// current UAV position
+	m_map->Home->SetCoord(uav_pos);								// move the HOME location to match the current UAV location
+	m_map->Home->SetAltitude(data.Altitude);
     }
 }
 
@@ -1306,8 +1344,7 @@ void OPMapGadgetWidget::setMapFollowingmode()
     {
 	m_map->UAV->SetMapFollowType(UAVMapFollowType::CenterMap);			// the map library won't let you reset the uav rotation if it's already in rotate mode
 
-//	if (m_map->ShowUAV())
-	    m_map->UAV->SetUAVHeading(0);						// reset the UAV heading to 0deg
+	m_map->UAV->SetUAVHeading(0);							// reset the UAV heading to 0deg
 	m_map->UAV->SetMapFollowType(UAVMapFollowType::CenterAndRotateMap);
     }
 }

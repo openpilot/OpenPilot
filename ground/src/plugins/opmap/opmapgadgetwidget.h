@@ -158,11 +158,13 @@ private slots:
     void onFindPlaceAct_triggered();
     void onShowCompassAct_toggled(bool show);
     void onShowUAVAct_toggled(bool show);
+    void onShowHomeAct_toggled(bool show);
     void onGoZoomInAct_triggered();
     void onGoZoomOutAct_triggered();
     void onGoMouseClickAct_triggered();
     void onGoHomeAct_triggered();
     void onGoUAVAct_triggered();
+    void onSetHomePosAct_triggered();
     void onFollowUAVpositionAct_toggled(bool checked);
     void onFollowUAVheadingAct_toggled(bool checked);
     void onShowUAVtrailAct_toggled(bool checked);
@@ -223,12 +225,14 @@ private:
     QAction *copyMouseLonToClipAct;
     QAction *findPlaceAct;
     QAction *showCompassAct;
+    QAction *showHomeAct;
     QAction *showUAVAct;
     QAction *zoomInAct;
     QAction *zoomOutAct;
     QAction *goMouseClickAct;
     QAction *goHomeAct;
     QAction *goUAVAct;
+    QAction *setHomePosAct;
     QAction *followUAVpositionAct;
     QAction *followUAVheadingAct;
     QAction *showUAVtrailAct;

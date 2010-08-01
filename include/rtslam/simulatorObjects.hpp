@@ -120,7 +120,7 @@ namespace simu {
 				jblas::vec v1 = ublas::subrange(traj[a].pose,6,12);
 				jblas::vec v2 = ublas::subrange(traj[b].pose,6,12);
 				double t1 = traj[a].t, t2 = traj[b].t;
-JFR_DEBUG("robot " << id << " getPose: a/b " << a << "/" << b << ", t1/t2 " << t1 << "/" << t2 << ", p1 " << p1 << ", v1 " << v1 << ", v2 " << v2);
+// JFR_DEBUG("robot " << id << " getPose: a/b " << a << "/" << b << ", t1/t2 " << t1 << "/" << t2 << ", p1 " << p1 << ", v1 " << v1 << ", v2 " << v2);
 				return p1 + (t2*v1-t1*v2)*((t-t1)/(t2-t1)) + 0.5*(v2-v1)*((t*t-t1*t1)/(t2-t1));
 			}
 			jblas::vec getSpeed(double t) const

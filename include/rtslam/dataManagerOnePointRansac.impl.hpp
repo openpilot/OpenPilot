@@ -94,7 +94,7 @@ namespace jafar {
 						
 // JFR_DEBUG("not yet matched, trying with lowInnov in roi " << roi);
 						matcher->match(rawData, obsCurrentPtr->predictedAppearance, roi, obsCurrentPtr->measurement, obsCurrentPtr->observedAppearance);
-
+// JFR_DEBUG("obs " << obsCurrentPtr->id() << " expected at " << exp << " measured with innovation " << obsCurrentPtr->measurement.x()-exp);
 						if (obsCurrentPtr->getMatchScore() > matcher->params.threshold && 
 								isExpectedInnovationInlier(obsCurrentPtr, matcher->params.mahalanobisTh))
 						{
@@ -209,6 +209,9 @@ JFR_DEBUG_BEGIN(); JFR_DEBUG_SEND("Updating with ActiveSearch:");
 
 						// predict information gain
 						obsPtr->predictInfoGain();
+//TEST to change the update order:
+//obsPtr->expectation.infoGain = rand()/1000.;
+//obsPtr->expectation.infoGain = -obsPtr->expectation.infoGain;
 
 						// add to sorted list of observations
 						obsListSorted[obsPtr->expectation.infoGain] = obsIter;
@@ -218,7 +221,6 @@ JFR_DEBUG_BEGIN(); JFR_DEBUG_SEND("Updating with ActiveSearch:");
 
 // JFR_DEBUG("#### starting remaining corrections");
 				// loop only the N_UPDATES most interesting obs, from largest info gain to smallest
-				// FIXME shouldn't we recompute info gains after each update ?
 				for (ObservationListSorted::reverse_iterator obsIter = obsListSorted.rbegin();
 					obsIter != obsListSorted.rend(); ++obsIter)
 				{
@@ -250,6 +252,7 @@ JFR_DEBUG_BEGIN(); JFR_DEBUG_SEND("Updating with ActiveSearch:");
 							// 1d. match predicted feature in search area
 							//						kernel::Chrono match_chrono;
 							matcher->match(rawData, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
+// JFR_DEBUG("obs " << obsPtr->id() << " expected at " << obsPtr->expectation.x() << " measured with innovation " << obsPtr->measurement.x()-obsPtr->expectation.x());
 							//						total_match_time += match_chrono.elapsedMicrosecond();
 
 	/*
@@ -588,6 +591,7 @@ JFR_DEBUG_END();
 			obsPtr->searchSize = roi.count();
 			if (obsPtr->searchSize > matcher->params.maxSearchSize) roi.scale(sqrt(matcher->params.maxSearchSize/(double)obsPtr->searchSize));
 			matcher->match(rawData, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
+// JFR_DEBUG("obs " << obsPtr->id() << " expected at " << obsPtr->expectation.x() << " measured with innovation " << obsPtr->measurement.x()-obsPtr->expectation.x());
 
 			return (obsPtr->getMatchScore() > matcher->params.threshold && isExpectedInnovationInlier(obsPtr, matcher->params.mahalanobisTh));
 		}

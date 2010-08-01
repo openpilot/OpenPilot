@@ -84,7 +84,7 @@ namespace jafar {
 			if (self_time < 0.) self_time = time;
 			if (hardwareEstimatorPtr)
 			{
-//cout << "move from " << std::setprecision(7) << self_time-1279877097. << " to " << time-1279877097. << endl;
+// JFR_DEBUG("move from " << std::setprecision(7) << self_time-1279877097. << " to " << time-1279877097.);
 				jblas::mat_indirect readings = hardwareEstimatorPtr->acquireReadings(self_time, time);
 				double cur_time = self_time;
 				jblas::vec u;
@@ -97,7 +97,7 @@ namespace jafar {
 					dt_or_dx = next_time - cur_time;
 					if (dt_or_dx <= 0) continue;
 					u = ublas::subrange(ublas::matrix_row<mat_indirect>(readings, i),1,readings.size2());
-//cout << "read time: " << next_time-1279877097. << ", dt: " << dt_or_dx << ", u: " << u << endl;
+// JFR_DEBUG("read time: " << next_time-1279877097. << ", dt: " << dt_or_dx << ", u: " << u);
 					perturbation.set_from_continuous(dt_or_dx);
 					move(u);
 					cur_time = next_time;

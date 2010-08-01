@@ -487,13 +487,14 @@ void demo_slam01_main(world_ptr_t *world) {
 #endif
 				}
 // cout << "\n************************************************** " << endl;
-JFR_DEBUG("                 FRAME : " << (*world)->t << "\nRobot estimated state " << robPtr->state.x());
+JFR_DEBUG("                 FRAME : " << (*world)->t);
 //				cout << "Robot: " << *robPtr << endl;
 //				cout << "Pert: " << robPtr->perturbation.P() << "\nPert Jac: " << robPtr->XNEW_pert << "\nState pert: " << robPtr->Q << endl;
 //				cout << "Robot state: " << robPtr->state.x() << endl;
 
 				// move the filter time to the data raw.
 				robPtr->move(senPtr->getRaw()->timestamp);
+JFR_DEBUG("Robot state after move " << ublas::subrange(robPtr1->state.x(),0,3) << " " << ublas::subrange(robPtr1->state.x(),3,7) << " " << ublas::subrange(robPtr1->state.x(),7,10) << " " << ublas::subrange(robPtr1->state.x(),10,13));
 
 				// foreach dataManager
 				for (SensorAbstract::DataManagerList::iterator dmaIter = senPtr->dataManagerList().begin();
@@ -509,6 +510,7 @@ JFR_DEBUG("                 FRAME : " << (*world)->t << "\nRobot estimated state
 		// NOW LOOP FOR STATE SPACE - ALL MM
 		if (had_data)
 		{
+JFR_DEBUG("Robot state after corrections " << ublas::subrange(robPtr1->state.x(),0,3) << " " << ublas::subrange(robPtr1->state.x(),3,7) << " " << ublas::subrange(robPtr1->state.x(),7,10) << " " << ublas::subrange(robPtr1->state.x(),10,13));
 			if (robPtr1->dt_or_dx > max_dt) max_dt = robPtr1->dt_or_dx;
 
 			// Output info
@@ -724,7 +726,8 @@ void demo_slam01_exit(world_ptr_t *world, boost::thread *thread_main) {
 	(*world)->exit(true);
 	(*world)->display_condition.notify_all();
 // 	std::cout << "EXITING !!!" << std::endl;
-	thread_main->timed_join(boost::posix_time::milliseconds(1000));
+	//fputc('\n', stdin);
+	thread_main->timed_join(boost::posix_time::milliseconds(500));
 }
 
 

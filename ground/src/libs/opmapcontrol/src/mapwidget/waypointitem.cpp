@@ -3,7 +3,6 @@
 *
 * @file       waypointitem.cpp
 * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
-*             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
 * @brief      A graphicsItem representing a WayPoint
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget

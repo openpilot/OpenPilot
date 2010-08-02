@@ -3,7 +3,6 @@
 *
 * @file       opmapwidget.h
 * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
-*             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
 * @brief      The Map Widget, this is the part exposed to the user
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget

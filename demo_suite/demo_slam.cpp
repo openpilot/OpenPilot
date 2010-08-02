@@ -131,14 +131,14 @@ const unsigned MAP_SIZE = 313;
 // constant velocity robot uncertainties and perturbations
 const double UNCERT_VLIN = .1; // m/s
 const double UNCERT_VANG = .1; // rad/s
-const double PERT_VLIN = 2; // m/s per sqrt(s)
-const double PERT_VANG = 6; // rad/s per sqrt(s)
+const double PERT_VLIN = 1; // m/s per sqrt(s)
+const double PERT_VANG = 1; // rad/s per sqrt(s)
 
 // inertial robot initial uncertainties and perturbations
 //if (intOpts[iRobot] == 1) // == robot inertial
 const double UNCERT_GRAVITY = 10.0; // m/s^2
-const double UNCERT_ABIAS = 0.05*17.0;
-const double UNCERT_WBIAS = 0.05*jmath::degToRad(300.0);
+const double UNCERT_ABIAS = 0.05*17.0; // 5% of full scale
+const double UNCERT_WBIAS = 0.05*jmath::degToRad(300.0); // 5% of full scale
 const double PERT_AERR = 0.2*0.001*sqrt(30.0/100.0); // m/s per sqrt(s), IMU acc error (MTI = 0.001*sqrt(40Hz/100Hz))
 const double PERT_WERR = 0.2*jmath::degToRad(0.05)*sqrt(40.0/100.0); // rad per sqrt(s), IMU gyro error (MTI = 0.05*sqrt(30Hz/100Hz))
 const double PERT_RANWALKACC = 0; // m/s^2 per sqrt(s), IMU a_bias random walk
@@ -163,13 +163,9 @@ const double HARRIS_EDDGE = 2.0;
 const unsigned PATCH_DESC = 45;
 
 // data manager: zncc matcher and one-point-ransac
-<<<<<<< HEAD
 const unsigned PATCH_SIZE = 13; // in pixels
-=======
-const unsigned PATCH_SIZE = 15; // in pixels
 const unsigned MAX_SEARCH_SIZE = 50000;
 const unsigned KILL_SEARCH_SIZE = 100000;
->>>>>>> c4a5e8c334814504166928e94c0de1cc704b86ca
 const double MATCH_TH = 0.90;
 const double MAHALANOBIS_TH = 3; // in n_sigmas
 const unsigned N_UPDATES_TOTAL = 25;

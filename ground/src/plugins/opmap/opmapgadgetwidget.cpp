@@ -89,7 +89,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_map->configuration->DragButton = Qt::LeftButton;						    // use the left mouse button for map dragging
     m_map->SetMinZoom(2);
-    m_map->SetMaxZoom(19);
+   // m_map->SetMaxZoom(19);
     m_map->SetMouseWheelZoomType(internals::MouseWheelZoomType::MousePositionWithoutCenter);	    // set how the mouse wheel zoom functions
     m_map->SetFollowMouse(true);								    // we want a contiuous mouse position reading
     m_map->SetShowHome(true);									    // display the HOME position on the map

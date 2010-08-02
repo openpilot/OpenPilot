@@ -40,7 +40,6 @@ MainWindow::MainWindow(QWidget *parent) :
     license<<"*";
     license<<"* @file       %file";
     license<<"* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.";
-    license<<"*             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.";
     license<<"* @brief      ";
     license<<"* @see        The GNU Public License (GPL) Version 3";
     license<<"* @defgroup   %defgroup";

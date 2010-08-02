@@ -51,6 +51,7 @@
 
 #include "settingsdialog.h"
 #include "variablemanager.h"
+#include "threadmanager.h"
 #include "versiondialog.h"
 #include "viewmanager.h"
 #include "uniqueidmanager.h"
@@ -115,6 +116,7 @@ MainWindow::MainWindow() :
                                             this)),
     m_actionManager(new ActionManagerPrivate(this)),
     m_variableManager(new VariableManager(this)),
+    m_threadManager(new ThreadManager(this)),
     m_viewManager(0),
     m_modeManager(0),
     m_connectionManager(0),
@@ -769,6 +771,11 @@ MessageManager *MainWindow::messageManager() const
 VariableManager *MainWindow::variableManager() const
 {
      return m_variableManager;
+}
+
+ThreadManager *MainWindow::threadManager() const
+{
+     return m_threadManager;
 }
 
 ConnectionManager *MainWindow::connectionManager() const

@@ -50,6 +50,7 @@ class ModeManager;
 class SettingsDatabase;
 class UniqueIDManager;
 class VariableManager;
+class ThreadManager;
 class UAVGadgetManager;
 class UAVGadgetInstanceManager;
 
@@ -77,6 +78,7 @@ public:
     virtual UniqueIDManager *uniqueIDManager() const = 0;
     virtual MessageManager *messageManager() const = 0;
     virtual VariableManager *variableManager() const = 0;
+    virtual ThreadManager *threadManager() const = 0;
     virtual ModeManager *modeManager() const = 0;
     virtual ConnectionManager *connectionManager() const = 0;
     virtual UAVGadgetInstanceManager *uavGadgetInstanceManager() const = 0;

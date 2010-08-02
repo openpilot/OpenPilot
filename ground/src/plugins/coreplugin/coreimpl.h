@@ -58,6 +58,7 @@ public:
     ConnectionManager *connectionManager() const;
     UAVGadgetInstanceManager *uavGadgetInstanceManager() const;
     VariableManager *variableManager() const;
+    ThreadManager *threadManager() const;
     ModeManager *modeManager() const;
     MimeDatabase *mimeDatabase() const;
 

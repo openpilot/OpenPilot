@@ -57,6 +57,7 @@ class RightPaneWidget;
 class SettingsDatabase;
 class UniqueIDManager;
 class VariableManager;
+class ThreadManager;
 class ViewManagerInterface;
 class UAVGadgetManager;
 class UAVGadgetInstanceManager;
@@ -100,6 +101,7 @@ public:
     UAVGadgetInstanceManager *uavGadgetInstanceManager() const;
     Core::ConnectionManager *connectionManager() const;
     Core::VariableManager *variableManager() const;
+    Core::ThreadManager *threadManager() const;
     Core::ModeManager *modeManager() const;
     Core::MimeDatabase *mimeDatabase() const;
 
@@ -171,6 +173,7 @@ private:
     ActionManagerPrivate *m_actionManager;
     MessageManager *m_messageManager;
     VariableManager *m_variableManager;
+    ThreadManager *m_threadManager;
     ViewManager *m_viewManager;
     ModeManager *m_modeManager;
     QList<UAVGadgetManager*> m_uavGadgetManagers;

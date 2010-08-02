@@ -61,6 +61,8 @@
  */
 #include "il2bridge.h"
 #include "extensionsystem/pluginmanager.h"
+#include <coreplugin/icore.h>
+#include <coreplugin/threadmanager.h>
 #include <math.h>
 
 Il2Bridge::Il2Bridge(QString il2HostName, int il2Port, QString il2Latitude, QString il2Longitude)
@@ -74,12 +76,19 @@ Il2Bridge::Il2Bridge(QString il2HostName, int il2Port, QString il2Latitude, QStr
     il2ConnectionStatus = false;
     latitude=il2Latitude.toFloat();
     longitude=il2Longitude.toFloat();
-    // start thread
-    start(QThread::TimeCriticalPriority);
 
+    
+
+    // move to thread
+    moveToThread(Core::ICore::instance()->threadManager()->getRealTimeThread());
+
+    connect(this, SIGNAL(myStart()), this, SLOT(onStart()),Qt::QueuedConnection);
+    emit myStart();
 }
+    
+void Il2Bridge::onStart()
+{
 
-void Il2Bridge::run() {
     // Get required UAVObjects
     ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
@@ -124,13 +133,11 @@ void Il2Bridge::run() {
     time->start();
 
     current.T=0;
-    exec();
+
 }
 
 Il2Bridge::~Il2Bridge()
 {
-    quit();
-    wait();
     delete outSocket;
     delete txTimer;
     delete il2Timer;

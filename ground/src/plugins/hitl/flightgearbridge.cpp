@@ -27,14 +27,20 @@
 
 #include "flightgearbridge.h"
 #include "extensionsystem/pluginmanager.h"
+#include "coreplugin/icore.h"
+#include "coreplugin/threadmanager.h"
 
 FlightGearBridge::FlightGearBridge()
 {
-    // start thread
-    start(QThread::TimeCriticalPriority);
+    // move to thread
+    moveToThread(Core::ICore::instance()->threadManager()->getRealTimeThread());
+
+    connect(this, SIGNAL(myStart()), this, SLOT(onStart()),Qt::QueuedConnection);
+    emit myStart();
+
 }
 
-void FlightGearBridge::run()
+void FlightGearBridge::onStart()
 {
 
     // Init fields
@@ -86,13 +92,10 @@ void FlightGearBridge::run()
     fgTimer->setInterval(fgTimeout);
     fgTimer->start();
 
-    exec();
 }
 
 FlightGearBridge::~FlightGearBridge()
 {
-    quit();
-    wait();
     delete inSocket;
     delete outSocket;
     delete txTimer;

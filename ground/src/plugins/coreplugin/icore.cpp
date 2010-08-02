@@ -148,6 +148,15 @@
 */
 
 /*!
+    \fn ThreadManager *ICore::threadManager() const
+    \brief Returns the application's thread manager.
+
+    The thread manager is used to manage application wide QThread objects,
+    allowing certain critical objects to synchronize directly within the same
+    real time thread - anywhere in the application.
+*/
+
+/*!
     \fn ModeManager *ICore::modeManager() const
     \brief Returns the application's mode manager.
 

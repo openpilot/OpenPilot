@@ -29,7 +29,6 @@
 #define FLIGHTGEARBRIDGE_H
 
 #include <QObject>
-#include <QThread>
 #include <QUdpSocket>
 #include <QTimer>
 #include <math.h>
@@ -41,7 +40,7 @@
 #include "uavobjects/positionactual.h"
 #include "uavobjects/gcstelemetrystats.h"
 
-class FlightGearBridge: public QThread
+class FlightGearBridge: public QObject
 {
     Q_OBJECT
 
@@ -51,15 +50,16 @@ public:
 
     bool isAutopilotConnected();
     bool isFGConnected();
-    void run();
 
 signals:
+    void myStart();
     void autopilotConnected();
     void autopilotDisconnected();
     void fgConnected();
     void fgDisconnected();
 
 private slots:
+    void onStart();
     void transmitUpdate();
     void receiveUpdate();
     void onAutopilotConnect();

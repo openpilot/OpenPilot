@@ -27,14 +27,12 @@
 
 #include "telemetrymanager.h"
 #include <extensionsystem/pluginmanager.h>
+#include <coreplugin/icore.h>
+#include <coreplugin/threadmanager.h>
 
 TelemetryManager::TelemetryManager()
 {
-	QThread::start(QThread::TimeCriticalPriority);
-	moveToThread(this);
-}
-
-void TelemetryManager::run() {
+    moveToThread(Core::ICore::instance()->threadManager()->getRealTimeThread());
     // Get UAVObjectManager instance
     ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
     objMngr = pm->getObject<UAVObjectManager>();
@@ -42,13 +40,10 @@ void TelemetryManager::run() {
     // connect to start stop signals
     connect(this, SIGNAL(myStart()), this, SLOT(onStart()),Qt::QueuedConnection);
     connect(this, SIGNAL(myStop()), this, SLOT(onStop()),Qt::QueuedConnection);
-    exec();
 }
 
 TelemetryManager::~TelemetryManager()
 {
-	quit();
-	wait();
 }
 
 void TelemetryManager::start(QIODevice *dev)

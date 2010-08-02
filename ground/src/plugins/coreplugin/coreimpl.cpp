@@ -102,6 +102,11 @@ VariableManager *CoreImpl::variableManager() const
     return m_mainwindow->variableManager();
 }
 
+ThreadManager *CoreImpl::threadManager() const
+{
+    return m_mainwindow->threadManager();
+}
+
 ModeManager *CoreImpl::modeManager() const
 {
     return m_mainwindow->modeManager();

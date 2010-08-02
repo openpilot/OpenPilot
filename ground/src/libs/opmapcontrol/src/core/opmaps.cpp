@@ -36,7 +36,7 @@ namespace core {
             m_pInstance=new OPMaps;
         return m_pInstance;
     }
-    OPMaps::OPMaps():MaxZoom(19),RetryLoadTile(2),useMemoryCache(true)
+    OPMaps::OPMaps():RetryLoadTile(2),useMemoryCache(true)
     {
         accessmode=AccessMode::ServerAndCache;
         Language=LanguageType::PortuguesePortugal;

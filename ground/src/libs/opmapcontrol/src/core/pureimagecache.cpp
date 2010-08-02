@@ -27,6 +27,7 @@
 #include "pureimagecache.h"
 #include <QDateTime>
  
+//#define DEBUG_PUREIMAGECACHE
 namespace core {
 qlonglong PureImageCache::ConnCounter=0;
 
@@ -49,7 +50,7 @@ QString PureImageCache::GtileCache()
 bool PureImageCache::CreateEmptyDB(const QString &file)
 {
 #ifdef DEBUG_PUREIMAGECACHE
-    qDebug()<<"Create database at:"<<file;
+    qDebug()<<"Create database at!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!:"<<file;
 #endif //DEBUG_PUREIMAGECACHE
     QFileInfo File(file);
     QDir dir=File.absoluteDir();
@@ -156,6 +157,9 @@ bool PureImageCache::PutImageToCache(const QByteArray &tile, const MapType::Type
     bool ret=true;
     QDir d;
     QString dir=gtilecache;
+    Mcounter.lock();
+    qlonglong id=++ConnCounter;
+    Mcounter.unlock();
 #ifdef DEBUG_PUREIMAGECACHE
     qDebug()<<"PutImageToCache Cache dir="<<dir;
     qDebug()<<"PutImageToCache Cache dir="<<dir<<" Try to PUT:"<<pos.ToString();
@@ -179,9 +183,7 @@ bool PureImageCache::PutImageToCache(const QByteArray &tile, const MapType::Type
         if(ret)
         {
             QSqlDatabase cn;
-            Mcounter.lock();
-            qlonglong id=++ConnCounter;
-            Mcounter.unlock();
+
             cn = QSqlDatabase::addDatabase("QSQLITE",QString::number(id));
 
             cn.setDatabaseName(db);
@@ -205,7 +207,7 @@ bool PureImageCache::PutImageToCache(const QByteArray &tile, const MapType::Type
                     query.exec();
                 }
                 cn.close();
-                QSqlDatabase::removeDatabase(QString::number(id));
+
             }
             else return false;
         }
@@ -217,6 +219,7 @@ bool PureImageCache::PutImageToCache(const QByteArray &tile, const MapType::Type
             return false;
         }
     }
+    QSqlDatabase::removeDatabase(QString::number(id));
     return true;
 }
 QByteArray PureImageCache::GetImageFromCache(MapType::Types type, Point pos, int zoom)
@@ -224,8 +227,11 @@ QByteArray PureImageCache::GetImageFromCache(MapType::Types type, Point pos, int
     bool ret=true;
     QByteArray ar;
     QString dir=gtilecache;
+    Mcounter.lock();
+    qlonglong id=++ConnCounter;
+    Mcounter.unlock();
 #ifdef DEBUG_PUREIMAGECACHE
-    qDebug()<<"Cache dir="<<dir<<" Try to GET:"<<pos.X()+","+pos.Y();
+  //  qDebug()<<"Cache dir="<<dir<<" Try to GET:"<<pos.X()+","+pos.Y();
 #endif //DEBUG_PUREIMAGECACHE
 
     {
@@ -234,9 +240,7 @@ QByteArray PureImageCache::GetImageFromCache(MapType::Types type, Point pos, int
         if(ret)
         {
             QSqlDatabase cn;
-            Mcounter.lock();
-            qlonglong id=++ConnCounter;
-            Mcounter.unlock();
+
             cn = QSqlDatabase::addDatabase("QSQLITE",QString::number(id));
             cn.setDatabaseName(db);
             if(cn.open())
@@ -254,9 +258,11 @@ QByteArray PureImageCache::GetImageFromCache(MapType::Types type, Point pos, int
 
                 cn.close();
             }
-            QSqlDatabase::removeDatabase(QString::number(id));
+
+
         }
     }
+    QSqlDatabase::removeDatabase(QString::number(id));
     return ar;
 }
 void PureImageCache::deleteOlderTiles(int const& days)
@@ -264,9 +270,6 @@ void PureImageCache::deleteOlderTiles(int const& days)
     QList<long> add;
     bool ret=true;
     QString dir=gtilecache;
-#ifdef DEBUG_PUREIMAGECACHE
-    qDebug()<<"Cache dir="<<dir<<" Try to GET:"<<pos.X()+","+pos.Y();
-#endif //DEBUG_PUREIMAGECACHE
 
     {
         QString db=dir+"Data.qmdb";

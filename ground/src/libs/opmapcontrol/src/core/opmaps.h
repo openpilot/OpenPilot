@@ -39,6 +39,7 @@
 #include "pureimagecache.h"
 #include "alllayersoftype.h"
 #include "urlfactory.h"
+
 //#include "point.h"
 
 
@@ -66,7 +67,6 @@ namespace core {
         LanguageType::Types GetLanguage(){return Language;}//TODO
         AccessMode::Types GetAccessMode()const{return accessmode;}
         void setAccessMode(const AccessMode::Types& mode){accessmode=mode;}
-        int MaxZoom;
         int RetryLoadTile;
     private:
         bool useMemoryCache;

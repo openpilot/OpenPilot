@@ -6,3 +6,4 @@ objs/
 *.o
 *.lo
 *.dep
+/src/tcl/rtslam_wrap.cpp

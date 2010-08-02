@@ -689,16 +689,16 @@ namespace jafar {
 
 			/**
 			Converts a quaternion with its uncertainty to euler angles
-			@param x_q the quaternion
-			@param P_q the uncertainty of the quaternion
-			@param x_e the euler angles
-			@param P_e the uncertainty of the euler angles
+			@param q the quaternion
+			@param Q the covariance of the quaternion
+			@param e the euler angles
+			@param E the covariance of the euler angles
 			*/
 			template<class VecXQ, class MatPQ, class VecXE, class MatPE>
-			void q2e(const VecXQ & x_q, const MatPQ & P_q, VecXE & x_e, MatPE & P_e) {
+			void q2e(const VecXQ & q, const MatPQ & Q, VecXE & e, MatPE & E) {
 				jblas::mat E_q(3,4);
-				q2e(x_q, x_e, E_q);
-				P_e = ublas::prod<sym_mat>(E_q, ublas::prod<mat>(P_q, ublas::trans(E_q)));
+				q2e(q, e, E_q);
+				E = ublas::prod<sym_mat>(E_q, ublas::prod<mat>(Q, ublas::trans(E_q)));
 			}
 
 

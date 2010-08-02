@@ -120,7 +120,7 @@ namespace mapcontrol
 
 
     private:
-
+        bool SetZoomToFitRect(internals::RectLatLng const& rect);
         internals::Core *core;
         Configuration *config;
         bool showTileGridLines;
@@ -162,7 +162,7 @@ namespace mapcontrol
         *
         * @return int
         */
-        int MaxZoom()const{return maxZoom;}
+        int MaxZoom()const{return core->MaxZoom();}
         /**
         * @brief Returns the minimum allowed zoom
         *
@@ -171,6 +171,7 @@ namespace mapcontrol
         int MinZoom()const{return minZoom;}
         internals::MouseWheelZoomType::Types GetMouseWheelZoomType(){return core->GetMouseWheelZoomType();}
         void SetSelectedArea(internals::RectLatLng const& value){selectedArea = value;this->update();}
+        internals::RectLatLng SelectedArea()const{return selectedArea;}
         internals::RectLatLng BoundsOfMap;
         void Offset(int const& x, int const& y);
         bool CanDragMap()const{return core->CanDragMap;}
@@ -183,7 +184,6 @@ namespace mapcontrol
         GeoCoderStatusCode::Types SetCurrentPositionByKeywords(QString const& keys){return core->SetCurrentPositionByKeywords(keys);}
         MapType::Types GetMapType(){return core->GetMapType();}
         void SetMapType(MapType::Types const& value){core->SetMapType(value);}
-
     private slots:
         void Core_OnNeedInvalidation();
         void ChildPosRefresh();

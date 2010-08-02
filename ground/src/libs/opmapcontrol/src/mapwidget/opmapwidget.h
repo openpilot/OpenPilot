@@ -38,6 +38,7 @@
 #include "QtSvg/QGraphicsSvgItem"
 #include "uavitem.h"
 #include "homeitem.h"
+#include "mapripper.h"
 namespace mapcontrol
 {
     class UAVItem;
@@ -147,7 +148,7 @@ namespace mapcontrol
     {
         Q_OBJECT
 
-        Q_PROPERTY(int MaxZoom READ MaxZoom WRITE SetMaxZoom)
+       // Q_PROPERTY(int MaxZoom READ MaxZoom WRITE SetMaxZoom)
         Q_PROPERTY(int MinZoom READ MinZoom WRITE SetMinZoom)
         Q_PROPERTY(bool ShowTileGridLines READ ShowTileGridLines WRITE SetShowTileGridLines)
         Q_PROPERTY(double Zoom READ Zoom WRITE SetZoom)
@@ -186,9 +187,9 @@ namespace mapcontrol
         * @brief Returns the maximum zoom for the map
         *
         */
-        int MaxZoom()const{return map->maxZoom;}
+        int MaxZoom()const{return map->MaxZoom();}
 
-        void SetMaxZoom(int const& value){map->maxZoom = value;}
+      //  void SetMaxZoom(int const& value){map->maxZoom = value;}
 
         /**
         * @brief
@@ -433,7 +434,11 @@ namespace mapcontrol
         * @param number the number of tiles still in the queue
         */
         void OnTilesStillToLoad(int number);
-
+    public slots:
+        /**
+        * @brief Ripps the current selection to the DB
+        */
+        void RipMap();
 
     };
 }

@@ -34,7 +34,7 @@ using namespace projections;
 
 namespace internals {
     Core::Core():MouseWheelZooming(false),currentPosition(0,0),currentPositionPixel(0,0),LastLocationInBounds(-1,-1),sizeOfMapArea(0,0)
-            ,minOfTiles(0,0),maxOfTiles(0,0),zoom(0),isDragging(false),TooltipTextPadding(10,10),loaderLimit(5),started(false)
+            ,minOfTiles(0,0),maxOfTiles(0,0),zoom(0),isDragging(false),TooltipTextPadding(10,10),loaderLimit(5),maxzoom(17),started(false)
     {
         mousewheelzoomtype=MouseWheelZoomType::MousePositionAndCenter;
         SetProjection(new MercatorProjection());
@@ -286,6 +286,7 @@ namespace internals {
                     if(Projection()->Type()!="PlateCarreeProjection")
                     {
                         SetProjection(new PlateCarreeProjection());
+                        maxzoom=13;
                     }
                 }
                 break;
@@ -298,6 +299,7 @@ namespace internals {
                     if(Projection()->Type()!="LKS94Projection")
                     {
                         SetProjection(new LKS94Projection());
+                        maxzoom=11;
                     }
                 }
                 break;
@@ -307,6 +309,7 @@ namespace internals {
                     if(Projection()->Type()!="PlateCarreeProjectionPergo")
                     {
                         SetProjection(new PlateCarreeProjectionPergo());
+                        maxzoom=17;
                     }
                 }
                 break;
@@ -316,6 +319,7 @@ namespace internals {
                     if(Projection()->Type()!="MercatorProjectionYandex")
                     {
                         SetProjection(new MercatorProjectionYandex());
+                        maxzoom=13;
                     }
                 }
                 break;
@@ -325,6 +329,7 @@ namespace internals {
                     if(Projection()->Type()!="MercatorProjection")
                     {
                         SetProjection(new MercatorProjection());
+                        maxzoom=17;
                     }
                 }
                 break;
@@ -433,7 +438,7 @@ namespace internals {
     {
         int zoom = 0;
 
-        for(int i = 1; i <= OPMaps::Instance()->MaxZoom; i++)
+        for(int i = 1; i <= MaxZoom(); i++)
         {
             Point p1 = Projection()->FromLatLngToPixel(rect.LocationTopLeft(), i);
             Point p2 = Projection()->FromLatLngToPixel(rect.Bottom(), rect.Right(), i);

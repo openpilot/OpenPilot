@@ -171,32 +171,51 @@ namespace mapcontrol
             }
 
         }
+        else if(isSelected && !selectionStart.IsEmpty() && (event->modifiers() == Qt::AltModifier || event->modifiers() == Qt::ShiftModifier))
+        {
+            selectionEnd = FromLocalToLatLng(event->pos().x(), event->pos().y());
+            {
+                internals::PointLatLng p1 = selectionStart;
+                internals::PointLatLng p2 = selectionEnd;
+
+                double x1 = qMin(p1.Lng(), p2.Lng());
+                double y1 = qMax(p1.Lat(), p2.Lat());
+                double x2 = qMax(p1.Lng(), p2.Lng());
+                double y2 = qMin(p1.Lat(), p2.Lat());
+
+                SetSelectedArea(internals::RectLatLng(y1, x1, x2 - x1, y1 - y2));
+            }
+        }
         QGraphicsItem::mouseMoveEvent(event);
     }
     void MapGraphicItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     {
-        if(!IsMouseOverMarker())
-        {
-            if(event->button() == config->DragButton && CanDragMap())
+
+
+
+            if(!IsMouseOverMarker())
             {
-                core->mouseDown.SetX(event->pos().x());
-                core->mouseDown.SetY(event->pos().y());
+                if(event->button() == config->DragButton && CanDragMap()&& !((event->modifiers()==Qt::AltModifier)||(event->modifiers()==Qt::ShiftModifier)))
+                {
+                    core->mouseDown.SetX(event->pos().x());
+                    core->mouseDown.SetY(event->pos().y());
 
 
-                this->setCursor(Qt::SizeAllCursor);
+                    this->setCursor(Qt::SizeAllCursor);
 
-                core->BeginDrag(core->mouseDown);
-                this->update();
+                    core->BeginDrag(core->mouseDown);
+                    this->update();
 
+                }
+                else if(!isSelected && ((event->modifiers()==Qt::AltModifier)||(event->modifiers()==Qt::ShiftModifier)))
+                {
+                    isSelected = true;
+                    SetSelectedArea (internals::RectLatLng::Empty);
+                    selectionEnd = internals::PointLatLng::Empty;
+                    selectionStart = FromLocalToLatLng(event->pos().x(), event->pos().y());
+                }
             }
-            else if(!isSelected)
-            {
-                isSelected = true;
-                SetSelectedArea (internals::RectLatLng::Empty);
-                selectionEnd = internals::PointLatLng::Empty;
-                selectionStart = FromLocalToLatLng(event->pos().x(), event->pos().y());
-            }
-        }
+
     }
     void MapGraphicItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     {
@@ -224,12 +243,35 @@ namespace mapcontrol
             {
                 if(!selectedArea.IsEmpty() && event->modifiers() == Qt::ShiftModifier)
                 {
-                    //   SetZoomToFitRect(SelectedArea());TODO
+                       SetZoomToFitRect(SelectedArea());
                 }
             }
 
         }
     }
+    bool MapGraphicItem::SetZoomToFitRect(internals::RectLatLng const& rect)
+          {
+             int maxZoom = core->GetMaxZoomToFitRect(rect);
+             if(maxZoom > 0)
+             {
+                 internals::PointLatLng center=internals::PointLatLng(rect.Lat()-(rect.HeightLat()/2), rect.Lng()+(rect.WidthLng()/2));
+                 core->SetCurrentPosition(center);
+
+                if(maxZoom > MaxZoom())
+                {
+                   maxZoom = MaxZoom();
+                }
+
+                if((int) Zoom() != maxZoom)
+                {
+                   SetZoom(maxZoom);
+                }
+
+                return true;
+             }
+             return false;
+          }
+
     void MapGraphicItem::wheelEvent(QGraphicsSceneWheelEvent *event)
     {
         if(!IsMouseOverMarker() && !IsDragging())
@@ -353,6 +395,18 @@ namespace mapcontrol
 
                                 // raise error
 
+                            }
+                            if(!SelectedArea().IsEmpty())
+                            {
+                                core::Point p1 = FromLatLngToLocal(SelectedArea().LocationTopLeft());
+                                core::Point p2 = FromLatLngToLocal(SelectedArea().LocationRightBottom());
+                                int x1 = p1.X();
+                                int y1 = p1.Y();
+                                int x2 = p2.X();
+                                int y2 = p2.Y();
+                                painter->setPen(Qt::black);
+                                painter->setBrush(QBrush(QColor(50,50,100,20)));
+                                painter->drawRect(x1,y1,x2-x1,y2-y1);
                             }
                         }
                     }

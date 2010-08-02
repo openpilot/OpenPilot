@@ -73,35 +73,36 @@ public:
     Core();
     ~Core();
     void run();
-    PointLatLng CurrentPosition()const{return currentPosition;};
+    PointLatLng CurrentPosition()const{return currentPosition;}
+
     void SetCurrentPosition(const PointLatLng &value);
 
-    core::Point GetcurrentPositionGPixel(){return currentPositionPixel;};
-    void SetcurrentPositionGPixel(const core::Point &value){currentPositionPixel=value;};
+    core::Point GetcurrentPositionGPixel(){return currentPositionPixel;}
+    void SetcurrentPositionGPixel(const core::Point &value){currentPositionPixel=value;}
 
-    core::Point GetrenderOffset(){return renderOffset;};
-    void SetrenderOffset(const core::Point &value){renderOffset=value;};
+    core::Point GetrenderOffset(){return renderOffset;}
+    void SetrenderOffset(const core::Point &value){renderOffset=value;}
 
-    core::Point GetcenterTileXYLocation(){return centerTileXYLocation;};
-    void SetcenterTileXYLocation(const core::Point &value){centerTileXYLocation=value;};
+    core::Point GetcenterTileXYLocation(){return centerTileXYLocation;}
+    void SetcenterTileXYLocation(const core::Point &value){centerTileXYLocation=value;}
 
-    core::Point GetcenterTileXYLocationLast(){return centerTileXYLocationLast;};
-    void SetcenterTileXYLocationLast(const core::Point &value){centerTileXYLocationLast=value;};
+    core::Point GetcenterTileXYLocationLast(){return centerTileXYLocationLast;}
+    void SetcenterTileXYLocationLast(const core::Point &value){centerTileXYLocationLast=value;}
 
-    core::Point GetdragPoint(){return dragPoint;};
-    void SetdragPoint(const core::Point &value){dragPoint=value;};
+    core::Point GetdragPoint(){return dragPoint;}
+    void SetdragPoint(const core::Point &value){dragPoint=value;}
 
-    core::Point GetmouseDown(){return mouseDown;};
-    void SetmouseDown(const core::Point &value){mouseDown=value;};
+    core::Point GetmouseDown(){return mouseDown;}
+    void SetmouseDown(const core::Point &value){mouseDown=value;}
 
-    core::Point GetmouseCurrent(){return mouseCurrent;};
-    void SetmouseCurrent(const core::Point &value){mouseCurrent=value;};
+    core::Point GetmouseCurrent(){return mouseCurrent;}
+    void SetmouseCurrent(const core::Point &value){mouseCurrent=value;}
 
-    core::Point GetmouseLastZoom(){return mouseLastZoom;};
-    void SetmouseLastZoom(const core::Point &value){mouseLastZoom=value;};
+    core::Point GetmouseLastZoom(){return mouseLastZoom;}
+    void SetmouseLastZoom(const core::Point &value){mouseLastZoom=value;}
 
-    MouseWheelZoomType::Types GetMouseWheelZoomType(){return mousewheelzoomtype;};
-    void SetMouseWheelZoomType(const MouseWheelZoomType::Types &value){mousewheelzoomtype=value;};
+    MouseWheelZoomType::Types GetMouseWheelZoomType(){return mousewheelzoomtype;}
+    void SetMouseWheelZoomType(const MouseWheelZoomType::Types &value){mousewheelzoomtype=value;}
 
     PointLatLng GetLastLocationInBounds(){return LastLocationInBounds;}
     void SetLastLocationInBounds(const PointLatLng &value){LastLocationInBounds=value;}
@@ -139,6 +140,8 @@ public:
 
     int Zoom()const{return zoom;}
     void SetZoom(int const& value);
+
+    int MaxZoom()const{return maxzoom;}
 
     void UpdateBounds();
 
@@ -252,6 +255,8 @@ private:
     QThreadPool ProcessLoadTaskCallback;
     QMutex MtileToload;
     int tilesToload;
+
+    int maxzoom;
 
 protected:
     bool started;

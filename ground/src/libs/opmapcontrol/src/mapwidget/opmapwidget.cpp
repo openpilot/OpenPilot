@@ -277,4 +277,8 @@ namespace mapcontrol
          if(compass)
              compass->setRotation(value);
      }
+     void OPMapWidget::RipMap()
+     {
+         new MapRipper(core,map->SelectedArea());
+     }
 }

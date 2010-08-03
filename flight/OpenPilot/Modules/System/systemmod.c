@@ -223,7 +223,7 @@ static void updateStats()
 	// Get stats and update
 	SystemStatsGet(&stats);
 	stats.FlightTime = xTaskGetTickCount()*portTICK_RATE_MS;
-#ifdef ARCH_POSIX
+#if defined(ARCH_POSIX) || defined(ARCH_WIN32)
 	// POSIX port of FreeRTOS doesn't have xPortGetFreeHeapSize()
 	stats.HeapRemaining = 10240;
 #else

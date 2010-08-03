@@ -210,8 +210,8 @@ namespace jafar {
 			/**
 			 * Jacobian of normalize().
 			 */
-			template<class V>
-			void normalizeJac(V& v, jblas::mat& J) {
+			template<class V, class M>
+			void normalizeJac(V& v, M& J) {
 				JFR_NUMERIC(ublas::norm_2(v) > details::EPSILON,
 						"ublasExtra::normalizeJac: vector too small");
 				JFR_PRECOND(J.size1() == v.size() && J.size2() == v.size(),
@@ -265,13 +265,14 @@ namespace jafar {
 					}
 						return;
 					default: {
+						// We use the general formula:
+						// VN_v = d(vn)/d(v) = (I*norm(v)^2 - v*v') / norm(v)^3
 						double n2 = ublas::inner_prod(v, v); // norm square
 						double n = sqrt(n2); // norm
 						double n3 = n * n2; // norm cube
-						size_t s;
-						s = v.size();
-						jblas::identity_mat I(s);
-						jblas::mat vvt(v.size(), s);
+						jblas::identity_mat I(v.size());
+						jblas::mat vvt(v.size(), v.size());
+						vvt = ublas::outer_prod(v, v);
 						J = (n2 * I - vvt) / n3;
 						//						J = (n2 * ublas::identity_matrix(v.size()) - ublas::outer_prod(v, v)) / n3;
 						return;

@@ -101,24 +101,6 @@ namespace jafar {
 			}
 		}
 
-		void MapAbstract::completeObservationsInGraph(
-		    const sensor_ptr_t & existingSenPtr, const landmark_ptr_t & lmkPtr) {
-			for (RobotList::iterator robIter = robotList().begin(); robIter
-			    != robotList().end(); robIter++) {
-				robot_ptr_t robPtr = *robIter;
-				for (RobotAbstract::SensorList::iterator senIter =
-				    robPtr->sensorList().begin(); senIter != robPtr->sensorList().end(); senIter++) {
-					sensor_ptr_t senPtr = *senIter;
-					if (senPtr != existingSenPtr) {
-						// FIXME dynamic creation
-						observation_ptr_t
-						    obsPtr(new ObservationPinHoleAnchoredHomogeneousPoint(senPtr,
-						                                                          lmkPtr));
-						//						obsPtr->setup(senPtr, lmkPtr, width, height); //todo uncomment here
-					}
-				}
-			}
-		}
 
 		void MapAbstract::clear() {
 			x().clear();

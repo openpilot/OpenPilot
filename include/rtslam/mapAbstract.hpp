@@ -152,13 +152,6 @@ namespace jafar {
 				 */
 				void liberateStates(const jblas::ind_array & _ia);
 
-				/**
-				 * Add observations to landmark.
-				 * This requires traversing all the map tree and this is why this function goes here.
-				 * \param lmkPtr the pointer to the landmark to associate observations to.
-				 */
-				void completeObservationsInGraph(const sensor_ptr_t & senPtr, const landmark_ptr_t & lmkPtr);
-
 				void clear();
 				void fillSeq();
 				void fillDiag();

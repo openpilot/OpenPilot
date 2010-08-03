@@ -120,13 +120,18 @@ namespace jafar {
 			vnew = v + vi;
 			wnew = w + wi;
 
+			// normalize quaternion
+			ublasExtra::normalizeJac(qnew, QNORM_qnew);
+//			JFR_DEBUG("QN_q: " << QNORM_qnew)
+			ublasExtra::normalize(qnew);
+
 			// Compose state - this is the output state.
 			unsplitState(pnew, qnew, vnew, wnew, _xnew);
 
 			// Build transition Jacobian matrix XNEW_x
 			_XNEW_x.assign(identity_mat(state.size()));
 			project(_XNEW_x, range(0, 3), range(7, 10)) = PNEW_v;
-			project(_XNEW_x, range(3, 7), range(3, 7)) = QNEW_q;
+			project(_XNEW_x, range(3, 7), range(3, 7)) = prod(QNORM_qnew,QNEW_q);
 			project(_XNEW_x, range(3, 7), range(10, 13)) = QNEW_wdt * _dt;
 
 			/*

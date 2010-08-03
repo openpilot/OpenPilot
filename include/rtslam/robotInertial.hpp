@@ -220,6 +220,7 @@ namespace jafar {
 				mat43 QWDT_w; ///<    Temporary Jacobian matrix
 				mat43 QNEW_w; ///<    Temporary Jacobian matrix
 				mat34 VNEW_q; ///<    Temporary Jacobian matrix
+				mat44 QNORM_qnew; ///<	Temporary Jacobian matrix
 
 		};
 

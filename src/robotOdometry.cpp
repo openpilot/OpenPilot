@@ -106,13 +106,18 @@ namespace jafar {
 
 			quaternion::v2q(dv, qdv, QDV_dv); //vector orientation increment to quaternion with jacobians
 			quaternion::qProd(q, qdv, qnew, QNEW_q, QNEW_qdv);
+			
+			// normalize quaternion
+			ublasExtra::normalizeJac(qnew, QNORM_qnew);
+			ublasExtra::normalize(qnew);
+
 
 			QNEW_dv = prod(QNEW_qdv, QDV_dv);
 
 			unsplitState(pnew, qnew, _xnew);
 
 			_XNEW_x.clear();
-			subrange(_XNEW_x, 3, 7, 3, 7) = QNEW_q;
+			subrange(_XNEW_x, 3, 7, 3, 7) = prod(QNORM_qnew,QNEW_q);
 			subrange(_XNEW_x, 0, 3, 0, 7) = PNEW_x;
 
 			_XNEW_n.clear();

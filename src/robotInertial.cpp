@@ -127,6 +127,11 @@ namespace jafar {
 			abnew = ab + ar; //          acc bias
 			wbnew = wb + wr; //          gyro bias
 			gnew = g; //                 gravity does not change
+			
+			// normalize quaternion
+			ublasExtra::normalizeJac(qnew, QNORM_qnew);
+			ublasExtra::normalize(qnew);
+
 
 
 			// Put it all together - this is the output state
@@ -158,7 +163,7 @@ namespace jafar {
 			// Fill in QNEW_q
 			// qnew = qold ** qwdt  ( qnew = q1 ** q2 = qProd(q1, q2) in rtslam/quatTools.hpp )
 			qProd_by_dq1(qwdt, QNEW_q);
-			subrange(_XNEW_x, 3, 7, 3, 7) = QNEW_q;
+			subrange(_XNEW_x, 3, 7, 3, 7) = prod(QNORM_qnew, QNEW_q);
 
 
 			// Fill in QNEW_wb
@@ -168,8 +173,8 @@ namespace jafar {
 			qProd_by_dq2(q, QNEW_qwdt);
 			// Here we get the derivative of qwdt wrt wtrue, so we consider dt = 1 and call for the derivative of v2q() with v = w*dt
 			v2q_by_dv(wtrue, QWDT_w);
-			QNEW_w = prod<mat> (QNEW_qwdt, QWDT_w);
-			subrange(_XNEW_x, 3, 7, 13, 16) = -QNEW_w;
+			QNEW_w = prod ( QNEW_qwdt, QWDT_w);
+			subrange(_XNEW_x, 3, 7, 13, 16) = -prod(QNORM_qnew,QNEW_w);
 
 
 			// Fill VNEW_q
@@ -218,7 +223,7 @@ namespace jafar {
 			//	with: U_continuous_time expressed in ( rad / s / sqrt(s) )^2 = rad^2 / s^3 <-- yeah, it is confusing, but true.
 			//   (Use perturbation.set_P_from_continuous() helper if necessary.)
 			//
-			subrange(_XNEW_pert, 3, 7, 3, 6) = QNEW_w * (1 / _dt);
+			subrange(_XNEW_pert, 3, 7, 3, 6) = prod (QNORM_qnew, QNEW_w) * (1 / _dt);
 
 		}
 

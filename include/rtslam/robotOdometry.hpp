@@ -155,12 +155,13 @@ namespace jafar {
 
 			private:
 				// temporary matrices to speed up Jacobian computation
-								mat33 PNEW_dx; ///<      Temporary Jacobian matrix
+								mat33 PNEW_dx; ///<		Temporary Jacobian matrix
 								mat34 PNEW_q;
-								mat43 QDV_dv; ///< Temporary Jacobian matrix
-								mat44 QNEW_qdv; ///<   Temporary Jacobian matrix
-			  				mat43 QNEW_dv; ///<    Temporary Jacobian matrix
-								mat44 QNEW_q; ///<      Temporary Jacobian matrix
+								mat43 QDV_dv; ///< 		Temporary Jacobian matrix
+								mat44 QNEW_qdv; ///<	Temporary Jacobian matrix
+								mat43 QNEW_dv; ///<		Temporary Jacobian matrix
+								mat44 QNEW_q; ///<		Temporary Jacobian matrix
+								mat44 QNORM_qnew; ///<	Temporary Jacobian matrix
 
 		};
 	}

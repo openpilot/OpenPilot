@@ -227,7 +227,7 @@ namespace jafar {
 			if (events.measured && !events.updated)
 			{
 				if (searchSize > killSizeTh) {
-					cout << "Obs " << id() << " Killed by size (size " << searchSize << ")" << endl;
+					JFR_DEBUG( "Obs " << id() << " Killed by size (size " << searchSize << ")" );
 					return true;
 				}
 			}
@@ -240,7 +240,7 @@ namespace jafar {
 				double consistencyRatio = counters.nInlier / (double)counters.nMatch;
 
 				if (matchRatio < killMatchTh || consistencyRatio < killConsistencyTh)	{
-					cout << "Obs " << id() << " Killed by unstability (match " << matchRatio << " ; consistency " << consistencyRatio << ")"<< endl;
+					JFR_DEBUG( "Obs " << id() << " Killed by unstability (match " << matchRatio << " ; consistency " << consistencyRatio << ")" );
 					return true;
 				}
 			}

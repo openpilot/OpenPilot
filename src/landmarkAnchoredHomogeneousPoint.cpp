@@ -36,7 +36,7 @@ namespace jafar {
 			double rho = state.x(6);
 			if (rho < 0)
 			{
-				cout << "Lmk AHP " << id() << " Killed by negative depth (" << rho << ")"<< endl;
+				JFR_DEBUG( "Lmk AHP " << id() << " Killed by negative depth (" << rho << ")" );
 				return true;
 			}
 			return LandmarkAbstract::needToDie(dieMet);

@@ -23,8 +23,8 @@ namespace gdhe {
 	
 	Object::~Object()
 	{
-		delete label;
 		if (client) client->removeObject(this);
+		delete label;
 		#if ENABLE_CHILDREN
 		for(std::list<Object*>::iterator it = children.begin(); it != children.end(); ++it)
 		{

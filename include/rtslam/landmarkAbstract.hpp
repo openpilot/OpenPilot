@@ -112,12 +112,6 @@ namespace jafar {
 				geometry_t getGeomType(){return geomType;}
 				virtual std::string typeName() {return "Abstract";}
 
-				virtual landmark_ptr_t convertToStandardParametrization() = 0;
-				/* FIXME how to implement convertToStandardParametrization in concrete types ?
-				- for the standard type, if we return a shared_from_this, does it share the reference counter with the existing shared_ptr ?
-				- for the other types, we need to construct a new landmark, but without any map, is it possible ?
-				*/
-
 				descriptor_ptr_t descriptorPtr; ///< Landmark descriptor
 
 				jblas::mat LNEW_lmk; ///<Jacobian comming from reparametrisation of old lmk wrt. new lmk

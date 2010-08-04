@@ -13,6 +13,8 @@
 
 #include <iostream>
 #include <boost/shared_ptr.hpp>
+//#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem.hpp>
 #include <time.h>
 #include <map>
 #include <getopt.h>
@@ -73,6 +75,7 @@ typedef DataManagerOnePointRansac<simu::RawSimu, SensorPinHole, simu::FeatureSim
 ///##############################################
 
 #define RANSAC 1
+#define EVENT_BASED_RAW 1
 
 int mode = 0;
 time_t rseed;
@@ -149,6 +152,7 @@ const unsigned IMG_WIDTH = 640;
 const unsigned IMG_HEIGHT = 480;
 const double INTRINSIC[4] = { 301.27013,   266.86136,   497.28243,   496.81116 };
 const double DISTORTION[2] = { -0.23193,   0.11306 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
+const double CORRECTION_SIZE_FACTOR = 3;
 const double PIX_NOISE = .5;
 const double PIX_NOISE_SIMUFACTOR = 0.0;
 
@@ -188,11 +192,13 @@ const unsigned GRID_HCELLS = 4;
 const unsigned GRID_MARGIN = 11;
 const unsigned GRID_SEPAR = 20;
 
-
 ///##############################################
 
 void demo_slam01_main(world_ptr_t *world) {
 
+	boost::condition_variable rawdata_condition;
+	boost::mutex rawdata_mutex;
+	//boost::mutex rawdata_condmutex;
 
 	// pin-hole parameters in BOOST format
 	vec intrinsic = createVector<4> (INTRINSIC);
@@ -215,7 +221,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	// ---------------------------------------------------------------------------
 	// INIT : 1 map and map-manager, 2 robs, 3 sens and data-manager.
 	world_ptr_t worldPtr = *world;
-	worldPtr->display_mutex.lock();
+	//worldPtr->display_mutex.lock();
 
 
 	// 1. Create maps.
@@ -231,13 +237,14 @@ void demo_slam01_main(world_ptr_t *world) {
 	{
 		simulator.reset(new simu::AdhocSimulator());
 		jblas::vec3 pose;
-		for(int i = -6; i <= 6; ++i)
-			for(int j = -3; j <= 7; ++j)
-			{
-				pose(0) = i*1.0; pose(1) = j*1.0; pose(2) = 0.0;
-				simu::Landmark *lmk = new simu::Landmark(LandmarkAbstract::POINT, pose);
-				simulator->addLandmark(lmk);
-			}
+		for(int z = -1; z <= 1; ++z)
+		for(int y = -3; y <= 7; ++y)
+		for(int x = -6; x <= 6; ++x)
+		{
+			pose(0) = x*1.0; pose(1) = y*1.0; pose(2) = z*1.0;
+			simu::Landmark *lmk = new simu::Landmark(LandmarkAbstract::POINT, pose);
+			simulator->addLandmark(lmk);
+		}
 	}
 
 
@@ -328,7 +335,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	}
 	//senPtr11->pose.x(quaternion::originFrame());
 	senPtr11->params.setImgSize(IMG_WIDTH, IMG_HEIGHT);
-	senPtr11->params.setIntrinsicCalibration(intrinsic, distortion, distortion.size());
+	senPtr11->params.setIntrinsicCalibration(intrinsic, distortion, distortion.size()*CORRECTION_SIZE_FACTOR);
 	senPtr11->params.setMiscellaneous(1.0, 0.1);
 
 	if (intOpts[iSimu] == 1)
@@ -356,7 +363,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		dmPt11->linkToParentMapManager(mmPoint);
 		dmPt11->setObservationFactory(obsFact);
 		
-		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorAdhocSimulator(floatOpts[fFreq], simulator, senPtr11->id(), robPtr1->id()));
+		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorAdhocSimulator(rawdata_condition, rawdata_mutex, floatOpts[fFreq], simulator, senPtr11->id(), robPtr1->id()));
 		senPtr11->setHardwareSensor(hardSen11);
 	} else
 	{
@@ -372,24 +379,54 @@ void demo_slam01_main(world_ptr_t *world) {
 
 		
 		#ifdef HAVE_VIAM
-		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(
+		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, rawdata_mutex, 
 			"0x00b09d01006fb38f", cv::Size(IMG_WIDTH,IMG_HEIGHT), 0, 8, floatOpts[fFreq], intOpts[iTrigger], mode, strOpts[sDataPath]));
 		senPtr11->setHardwareSensor(hardSen11);
 		#else
 		if (intOpts[iReplay])
 		{
-			hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(cv::Size(IMG_WIDTH,IMG_HEIGHT),strOpts[sDataPath]));
+			hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, rawdata_mutex, cv::Size(IMG_WIDTH,IMG_HEIGHT),strOpts[sDataPath]));
 			senPtr11->setHardwareSensor(hardSen11);
 		}
 		#endif
 	}
 	
+	//--- force a first display with empty slam to ensure that all windows are loaded
+// cout << "SLAM: forcing first initialization display" << endl;
+	#ifdef HAVE_MODULE_QDISPLAY
+	display::ViewerQt *viewerQt = NULL;
+	if (intOpts[iDispQt])
+	{
+		viewerQt = PTR_CAST<display::ViewerQt*> ((*world)->getDisplayViewer(display::ViewerQt::id()));
+		viewerQt->bufferize(*world);
+	}
+	#endif
+	#ifdef HAVE_MODULE_GDHE
+	display::ViewerGdhe *viewerGdhe = NULL;
+	if (intOpts[iDispGdhe])
+	{
+		viewerGdhe = PTR_CAST<display::ViewerGdhe*> ((*world)->getDisplayViewer(display::ViewerGdhe::id()));
+		viewerGdhe->bufferize(*world);
+	}
+	#endif
+
+	{
+		boost::unique_lock<boost::mutex> display_lock((*world)->display_mutex);
+		(*world)->display_rendered = false;
+		display_lock.unlock();
+		(*world)->display_condition.notify_all();
+// cout << "SLAM: now waiting for this display to finish" << endl;
+		display_lock.lock();
+		while(!(*world)->display_rendered) (*world)->display_condition.wait(display_lock);
+		display_lock.unlock();
+	}
+
+// cout << "SLAM: starting slam" << endl;
 
 	// Show empty map
 	cout << *mapPtr << endl;
 
-	worldPtr->display_mutex.unlock();
-
+	//worldPtr->display_mutex.unlock();
 
 	// ---------------------------------------------------------------------------
 	// --- LOOP ------------------------------------------------------------------
@@ -399,16 +436,20 @@ void demo_slam01_main(world_ptr_t *world) {
 	// loop all lmks
 	// create sen--lmk observation
 	// Temporal loop
-
 	kernel::Chrono chrono;
 	double max_dt = 0;
 	for (; (*world)->t <= N_FRAMES;)
 	{
+		if ((*world)->exit()) break;
+		
+#if EVENT_BASED_RAW
+		boost::unique_lock<boost::mutex> rawdata_lock(rawdata_mutex);
+#endif
 		bool had_data = false;
-
-		worldPtr->display_mutex.lock();
-		if (intOpts[iRenderAll] && worldPtr->display_rendered != (*world)->t)
-			{ worldPtr->display_mutex.unlock(); boost::this_thread::yield(); continue; }
+		bool no_more_data = true;
+		//worldPtr->display_mutex.lock();
+		//if (intOpts[iRenderAll] && worldPtr->display_rendered != (*world)->t)
+		//	{ worldPtr->display_mutex.unlock(); boost::this_thread::yield(); continue; }
 		chrono.reset();
 
 		// FIXME if intOpts[iRenderAll], manage multisensors : ensure that only 1 sensor is processed, save its time to log it, and ensure that next time next sensor will be tried first
@@ -430,18 +471,30 @@ void demo_slam01_main(world_ptr_t *world) {
 				//					cout << *senPtr << endl;
 
 				// get raw-data
-				if (senPtr->acquireRaw() < 0)
-					{ boost::this_thread::yield(); continue; }
-				else had_data=true;
+				int r = senPtr->acquireRaw();
+				if (r != -2) no_more_data = false;
+				if (r < 0)
+				{
+#if !EVENT_BASED_RAW
+					boost::this_thread::yield();
+#endif
+					continue;
+				} else
+				{
+					had_data=true;
+#if EVENT_BASED_RAW
+					rawdata_lock.unlock();
+#endif
+				}
 // cout << "\n************************************************** " << endl;
 JFR_DEBUG("                 FRAME : " << (*world)->t);
-JFR_DEBUG("Robot estimated state " << robPtr->state.x());
 //				cout << "Robot: " << *robPtr << endl;
 //				cout << "Pert: " << robPtr->perturbation.P() << "\nPert Jac: " << robPtr->XNEW_pert << "\nState pert: " << robPtr->Q << endl;
 //				cout << "Robot state: " << robPtr->state.x() << endl;
 
 				// move the filter time to the data raw.
 				robPtr->move(senPtr->getRaw()->timestamp);
+JFR_DEBUG("Robot state after move " << ublas::subrange(robPtr1->state.x(),0,3) << " " << ublas::subrange(robPtr1->state.x(),3,7) << " " << ublas::subrange(robPtr1->state.x(),7,10) << " " << ublas::subrange(robPtr1->state.x(),10,13));
 
 				// foreach dataManager
 				for (SensorAbstract::DataManagerList::iterator dmaIter = senPtr->dataManagerList().begin();
@@ -454,12 +507,10 @@ JFR_DEBUG("Robot estimated state " << robPtr->state.x());
 			} // for each sensor
 		} // for each robot
 
-
 		// NOW LOOP FOR STATE SPACE - ALL MM
 		if (had_data)
 		{
-			(*world)->t++;
-
+JFR_DEBUG("Robot state after corrections " << ublas::subrange(robPtr1->state.x(),0,3) << " " << ublas::subrange(robPtr1->state.x(),3,7) << " " << ublas::subrange(robPtr1->state.x(),7,10) << " " << ublas::subrange(robPtr1->state.x(),10,13));
 			if (robPtr1->dt_or_dx > max_dt) max_dt = robPtr1->dt_or_dx;
 
 			// Output info
@@ -479,24 +530,91 @@ JFR_DEBUG("Robot estimated state " << robPtr->state.x());
 				map_manager_ptr_t mapMgr = *mmIter;
 				mapMgr->manage();
 			}
+// cout << "SLAM: processed a frame: t " << (*world)->t << " display_t " << (*world)->display_t << endl;
+
+			if (intOpts[iRenderAll])
+			{
+				boost::unique_lock<boost::mutex> display_lock((*world)->display_mutex);
+				while(!(*world)->display_rendered && !(*world)->exit()) (*world)->display_condition.wait(display_lock);
+				display_lock.unlock();
+			}
+
 		} // if had_data
 
-		int t = (*world)->t;
-		worldPtr->display_mutex.unlock();
-		if (intOpts[iPause] != 0 && t >= intOpts[iPause] && had_data) getchar(); // wait for key in replay mode
+/*		if (no_more_data) // we wait the display to ensure that the last frame is displayed
+		{
+			boost::unique_lock<boost::mutex> display_lock((*world)->display_mutex);
+			while(!(*world)->display_rendered) (*world)->display_condition.wait(display_lock);
+			display_lock.unlock();
+		}
+*/
+		int processed_t = (had_data ? (*world)->t : (*world)->t-1);
+		if ((*world)->display_t+1 < processed_t+1)
+		{
+//cout << "SLAM: checking if display has rendered" << endl;
+			boost::unique_lock<boost::mutex> display_lock((*world)->display_mutex);
+			if ((*world)->display_rendered)
+			{
+// cout << "SLAM: display has finished, let's bufferize this one" << endl;
+				#ifdef HAVE_MODULE_QDISPLAY
+				display::ViewerQt *viewerQt = NULL;
+				if (intOpts[iDispQt]) viewerQt = PTR_CAST<display::ViewerQt*> ((*world)->getDisplayViewer(display::ViewerQt::id()));
+				if (intOpts[iDispQt]) viewerQt->bufferize(*world);
+				#endif
+				#ifdef HAVE_MODULE_GDHE
+				display::ViewerGdhe *viewerGdhe = NULL;
+				if (intOpts[iDispGdhe]) viewerGdhe = PTR_CAST<display::ViewerGdhe*> ((*world)->getDisplayViewer(display::ViewerGdhe::id()));
+				if (intOpts[iDispGdhe]) viewerGdhe->bufferize(*world);
+				#endif
+				
+				(*world)->display_t = (*world)->t;
+				(*world)->display_rendered = false;
+				display_lock.unlock();
+				(*world)->display_condition.notify_all();
+			} else
+			display_lock.unlock();
+		}
+		
+		if (no_more_data) break;
+
+#if EVENT_BASED_RAW
+		if (!had_data)
+		{
+			rawdata_condition.wait(rawdata_lock);
+			rawdata_lock.unlock();
+		}
+#endif
+		
+		
+//		int t = (*world)->t;
+//		worldPtr->display_mutex.unlock();
+
+		bool doPause = (intOpts[iPause] != 0);
+		int pose_start = intOpts[iPause];
+		if (pose_start = 1) pose_start = 0;
+		if (doPause && (*world)->t >= pose_start && had_data && !(*world)->exit())
+		{
+			(*world)->slam_blocked(true);
+			getchar(); // wait for key in replay mode
+			(*world)->slam_blocked(false);
+		}
 //std::cout << "one frame " << (*world)->t << " : " << mode << " " << had_data << std::endl;
+
+		if (had_data) (*world)->t++;
 	} // temporal loop
 
-	std::cout << "\nFINISHED ! Press a key to terminate." << std::endl;
-	getchar();
+	(*world)->slam_blocked(true);
+//	std::cout << "\nFINISHED ! Press a key to terminate." << std::endl;
+//	getchar();
 } // demo_slam01_main
 
 
 void demo_slam01_display(world_ptr_t *world) {
-	static unsigned prev_t = 0;
+//	static unsigned prev_t = 0;
 	kernel::Timer timer(display_period*1000);
 	while(true)
 	{
+		/*
 		if (intOpts[iDispQt])
 		{
 			#ifdef HAVE_MODULE_QDISPLAY
@@ -507,63 +625,111 @@ void demo_slam01_display(world_ptr_t *world) {
 		{
 			(*world)->display_mutex.lock();
 		}
-
-		if ((*world)->t != prev_t)
+		*/
+		// just to display the last frame if slam is blocked or has finished
+		boost::unique_lock<kernel::VariableMutex<bool> > blocked_lock((*world)->slam_blocked);
+		if ((*world)->slam_blocked.var)
 		{
-			prev_t = (*world)->t;
-			(*world)->display_rendered = (*world)->t;
+			if ((*world)->display_t+1 < (*world)->t+1 && (*world)->display_rendered)
+			{
+				#ifdef HAVE_MODULE_QDISPLAY
+				display::ViewerQt *viewerQt = NULL;
+				if (intOpts[iDispQt]) viewerQt = PTR_CAST<display::ViewerQt*> ((*world)->getDisplayViewer(display::ViewerQt::id()));
+				if (intOpts[iDispQt]) viewerQt->bufferize(*world);
+				#endif
+				#ifdef HAVE_MODULE_GDHE
+				display::ViewerGdhe *viewerGdhe = NULL;
+				if (intOpts[iDispGdhe]) viewerGdhe = PTR_CAST<display::ViewerGdhe*> ((*world)->getDisplayViewer(display::ViewerGdhe::id()));
+				if (intOpts[iDispGdhe]) viewerGdhe->bufferize(*world);
+				#endif
+				
+				(*world)->display_t = (*world)->t;
+				(*world)->display_rendered = false;
+			}
+		}
+		blocked_lock.unlock();
+		
+		// waiting that display is ready
+// cout << "DISPLAY: waiting for data" << endl;
+		boost::unique_lock<boost::mutex> display_lock((*world)->display_mutex);
+		if (intOpts[iDispQt] == 0)
+		{
+			while((*world)->display_rendered)
+				(*world)->display_condition.wait(display_lock);
+		} else
+		{
+			int nwait = std::max(1,display_period/10-1);
+			for(int i = 0; (*world)->display_rendered && i < nwait; ++i)
+			{
+				(*world)->display_condition.timed_wait(display_lock, boost::posix_time::milliseconds(10));
+				display_lock.unlock();
+				QApplication::instance()->processEvents();
+				display_lock.lock();
+			}
+			if ((*world)->display_rendered) break;
+		}
+		display_lock.unlock();
+// cout << "DISPLAY: ok data here, let's start!" << endl;
+
+//		if ((*world)->t != prev_t)
+//		{
+//			prev_t = (*world)->t;
+//			(*world)->display_rendered = (*world)->t;
 			
+//		!bufferize!
+
+//			if (!intOpts[iRenderAll]) // strange: if we always unlock here, qt.dump takes much more time...
+//				(*world)->display_mutex.unlock();
+				
 			#ifdef HAVE_MODULE_QDISPLAY
 			display::ViewerQt *viewerQt = NULL;
 			if (intOpts[iDispQt]) viewerQt = PTR_CAST<display::ViewerQt*> ((*world)->getDisplayViewer(display::ViewerQt::id()));
+			if (intOpts[iDispQt]) viewerQt->render();
 			#endif
 			#ifdef HAVE_MODULE_GDHE
 			display::ViewerGdhe *viewerGdhe = NULL;
 			if (intOpts[iDispGdhe]) viewerGdhe = PTR_CAST<display::ViewerGdhe*> ((*world)->getDisplayViewer(display::ViewerGdhe::id()));
-			#endif
-			
-			#ifdef HAVE_MODULE_QDISPLAY
-			if (intOpts[iDispQt]) viewerQt->bufferize(*world);
-			#endif
-			#ifdef HAVE_MODULE_GDHE
-			if (intOpts[iDispGdhe]) viewerGdhe->bufferize(*world);
-			#endif
-			
-			if (!intOpts[iRenderAll]) // strange: if we always unlock here, qt.dump takes much more time...
-				(*world)->display_mutex.unlock();
-				
-			#ifdef HAVE_MODULE_QDISPLAY
-			if (intOpts[iDispQt]) viewerQt->render();
-			#endif
-			#ifdef HAVE_MODULE_GDHE
 			if (intOpts[iDispGdhe]) viewerGdhe->render();
 			#endif
 			
-			if (intOpts[iReplay] && intOpts[iDump])
+			if ((intOpts[iReplay] || intOpts[iSimu]) && intOpts[iDump] && (*world)->display_t+1 != 0)
 			{
 				if (intOpts[iDispQt])
 				{
-					std::ostringstream oss; oss << strOpts[sDataPath] << "/rendered-2D_%d-" << std::setw(6) << std::setfill('0') << prev_t-1 << ".png";
+					std::ostringstream oss; oss << strOpts[sDataPath] << "/rendered-2D_%d-" << std::setw(6) << std::setfill('0') << (*world)->display_t << ".png";
 					viewerQt->dump(oss.str());
 				}
 				if (intOpts[iDispGdhe])
 				{
-					std::ostringstream oss; oss << strOpts[sDataPath] << "/rendered-3D_" << std::setw(6) << std::setfill('0') << prev_t-1 << ".ppm";
+					std::ostringstream oss; oss << strOpts[sDataPath] << "/rendered-3D_" << std::setw(6) << std::setfill('0') << (*world)->display_t << ".png";
 					viewerGdhe->dump(oss.str());
 				}
-				if (intOpts[iRenderAll])
-					(*world)->display_mutex.unlock();
+//				if (intOpts[iRenderAll])
+//					(*world)->display_mutex.unlock();
 			}
-		} else
-		{
-			(*world)->display_mutex.unlock();
-			boost::this_thread::yield();
-		}
+//		} else
+//		{
+//			(*world)->display_mutex.unlock();
+//			boost::this_thread::yield();
+//		}
+// cout << "DISPLAY: finished display, marking rendered" << endl;
+		display_lock.lock();
+		(*world)->display_rendered = true;
+		display_lock.unlock();
+		(*world)->display_condition.notify_all();
 		
-		if (intOpts[iDispQt]) break;
-		              else timer.wait();
+		if (intOpts[iDispQt]) break; else timer.wait();
 	}
 }
+
+void demo_slam01_exit(world_ptr_t *world, boost::thread *thread_main) {
+	(*world)->exit(true);
+	(*world)->display_condition.notify_all();
+// 	std::cout << "EXITING !!!" << std::endl;
+	//fputc('\n', stdin);
+	thread_main->timed_join(boost::posix_time::milliseconds(500));
+}
+
 
 	void demo_slam01() {
 		world_ptr_t worldPtr(new WorldAbstract());
@@ -596,6 +762,9 @@ void demo_slam01_display(world_ptr_t *world) {
 		if (intOpts[iDispGdhe])
 		{
 			display::ViewerGdhe *viewerGdhe = new display::ViewerGdhe("camera", MAHALANOBIS_TH, "localhost");
+			boost::filesystem::path ram_path("/mnt/ram");
+			if (boost::filesystem::exists(ram_path) && boost::filesystem::is_directory(ram_path))
+				viewerGdhe->setConvertTempPath("/mnt/ram");
 			worldPtr->addDisplayViewer(viewerGdhe, display::ViewerGdhe::id());
 		}
 		#endif
@@ -604,7 +773,7 @@ void demo_slam01_display(world_ptr_t *world) {
 		if (intOpts[iDispQt]) // at least 2d
 		{
 			#ifdef HAVE_MODULE_QDISPLAY
-			qdisplay::QtAppStart((qdisplay::FUNC)&demo_slam01_display,display_priority,(qdisplay::FUNC)&demo_slam01_main,slam_priority,display_period,&worldPtr);
+			qdisplay::QtAppStart((qdisplay::FUNC)&demo_slam01_display,display_priority,(qdisplay::FUNC)&demo_slam01_main,slam_priority,display_period,&worldPtr,(qdisplay::EXIT)&demo_slam01_exit);
 			#else
 			std::cout << "Please install qdisplay module if you want 2D display" << std::endl;
 			#endif

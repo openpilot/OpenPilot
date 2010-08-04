@@ -14,6 +14,7 @@
 
 #include <jafarConfig.h>
 #include <image/Image.hpp>
+#include <kernel/threads.hpp>
 
 #ifdef HAVE_VIAM
 #include <viam/viamlib.h>
@@ -53,9 +54,10 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 		raw_ptr_t bufferPtr[3];
 		rawimage_ptr_t bufferSpecPtr[3];
 		double realFreq;
+		bool no_more_data;
 		
 		int mode;
-		int index;
+		kernel::VariableCondition<int> index;
 		std::string dump_path;
 		
 		boost::thread *preloadTask_thread;
@@ -84,12 +86,12 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 		@param mode 0 = normal, 1 = dump used images, 2 = from dumped images
 		@param dump_path the path where the images are saved/read... Use a ram disk !!!
 		*/
-		HardwareSensorCameraFirewire(const std::string &camera_id, cv::Size size, int format, int depth, double freq, bool trigger, int mode = 0, std::string dump_path = ".");
+		HardwareSensorCameraFirewire(boost::condition_variable &rawdata_condition, boost::mutex &rawdata_mutex, const std::string &camera_id, cv::Size size, int format, int depth, double freq, bool trigger, int mode = 0, std::string dump_path = ".");
 #endif
 		/**
 		Same as before but assumes that mode=2, and doesn't need a camera
 		*/
-		HardwareSensorCameraFirewire(cv::Size imgSize, std::string dump_path = ".");
+		HardwareSensorCameraFirewire(boost::condition_variable &rawdata_condition, boost::mutex &rawdata_mutex, cv::Size imgSize, std::string dump_path = ".");
 		
 		~HardwareSensorCameraFirewire();
 		

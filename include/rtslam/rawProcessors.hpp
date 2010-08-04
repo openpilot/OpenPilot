@@ -103,7 +103,7 @@ namespace rtslam {
 					// extract appearance
 					vec pix = featPtr->measurement.x();
 					boost::shared_ptr<AppearanceImagePoint> appPtr = SPTR_CAST<AppearanceImagePoint>(featPtr->appearancePtr);
-					appPtr->patch.resize(params.patchSize, params.patchSize);
+					//appPtr->patch.resize(params.patchSize, params.patchSize);
 					//cv::Size size = appPtr->patch.size();
 					cv::Size size(params.patchSize, params.patchSize);
 					

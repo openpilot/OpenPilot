@@ -134,9 +134,11 @@ namespace simu {
 				{
 					int n = rtslam::rand()%roiObs.size();
 					featPtr = roiObs[n];
-JFR_DEBUG("detecting feature " << SPTR_CAST<AppearanceSimu>(featPtr->appearancePtr)->id << " in " << roi.x() << " " << roi.y() << " " << roi.w() << " " << roi.h());
+// JFR_DEBUG("detecting feature " << SPTR_CAST<AppearanceSimu>(featPtr->appearancePtr)->id << " in " << roi.x() << " " << roi.y() << " " << roi.w() << " " << roi.h());
 					featPtr->measurement.matchScore = 1.0;
+// JFR_DEBUG_BEGIN(); JFR_DEBUG_SEND("simu detected feat at " << featPtr->measurement.x());
 					featPtr->measurement.x() += noise->get(); // simulation noise
+// JFR_DEBUG_SEND(" and with noise at " << featPtr->measurement.x()); JFR_DEBUG_END();
 					featPtr->measurement.std(params.measStd);
 					return true;
 				} else

@@ -26,11 +26,12 @@ namespace hardware {
 			boost::shared_ptr<simu::AdhocSimulator> simulator;
 			size_t robId, senId;
 		public:
-			HardwareSensorAdhocSimulator(double freq, boost::shared_ptr<simu::AdhocSimulator> simulator, size_t robId, size_t senId):
+			HardwareSensorAdhocSimulator(boost::condition_variable &rawdata_condition, boost::mutex &rawdata_mutex, double freq, boost::shared_ptr<simu::AdhocSimulator> simulator, size_t robId, size_t senId):
+				HardwareSensorAbstract(rawdata_condition, rawdata_mutex),
 				dt(1./freq), t(0), simulator(simulator), robId(robId), senId(senId) {}
 			int acquireRaw(raw_ptr_t &rawPtr)
 			{
-				if (simulator->hasEnded(robId, senId, t)) return -1;
+				if (simulator->hasEnded(robId, senId, t)) return -2;
 				rawPtr = simulator->getRaw(robId, senId, t);
 				t += dt;
 				return 1;

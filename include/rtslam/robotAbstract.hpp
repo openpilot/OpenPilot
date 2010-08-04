@@ -203,8 +203,8 @@ namespace jafar {
 				void move(double time);
 
 				void move(const vec & u, double time){
-					if (self_time < 1.) dt_or_dx = 0;
-					else dt_or_dx = time - self_time;
+					if (self_time < 0.) self_time = time;
+					dt_or_dx = time - self_time;
 					perturbation.set_from_continuous(dt_or_dx);
 					move(u);
 					self_time = time;

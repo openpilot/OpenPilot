@@ -71,6 +71,7 @@ namespace jafar {
 		{
 			clearCounters();
 			clearEvents();
+			searchSize = 0;
 		}
 
 		ObservationAbstract::ObservationAbstract(const sensor_ptr_t & _senPtr, const landmark_ptr_t & _lmkPtr,
@@ -97,6 +98,7 @@ namespace jafar {
 			id(_lmkPtr->id());
 			clearCounters();
 			clearEvents();
+			searchSize = 0;
 		}
 
 		ObservationAbstract::~ObservationAbstract() {
@@ -224,7 +226,7 @@ namespace jafar {
 			// FIXME this is ok for 1 sensor, but not for more, because it won't work with policy ALL
 			// probably wee need to fix the policy, and chose a different policy according to the criteria
 			// (size = ANY, matchRatio = ALL, consistencyRatio = ...)
-			if (events.measured && !events.updated)
+			if (events.predicted && events.measured && !events.updated)
 			{
 				if (searchSize > killSizeTh) {
 					JFR_DEBUG( "Obs " << id() << " Killed by size (size " << searchSize << ")" );
@@ -268,6 +270,7 @@ namespace jafar {
 
 			this->counters = obs->counters;
 			this->events = obs->events;
+			this->searchSize = obs->searchSize;
 		};
 
 	} // namespace rtslam

@@ -30,7 +30,7 @@ namespace display {
 	
 	MapGdhe::~MapGdhe()
 	{
-		delete frame;
+		viewerGdhe->release(frame);
 	}
 		
 	void MapGdhe::bufferize()
@@ -67,9 +67,9 @@ namespace display {
 	
 	RobotGdhe::~RobotGdhe()
 	{
-		delete robot;
-		delete uncertEll;
-		delete traj;
+		viewerGdhe->release(robot);
+		viewerGdhe->release(uncertEll);
+		viewerGdhe->release(traj);
 	}
 	
 	void RobotGdhe::bufferize()
@@ -141,7 +141,7 @@ JFR_DEBUG("robot EULER: " << uncertEuler);*/
 	LandmarkGdhe::~LandmarkGdhe()
 	{
 		for(ItemList::iterator it = items_.begin(); it != items_.end(); ++it)
-			delete *it;
+			viewerGdhe->release(*it);
 	}
 
 	

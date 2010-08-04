@@ -109,7 +109,6 @@ namespace jafar {
 		void ObservationModelPinHoleAnchoredHomogeneousPoint::backProject_func(
 		    const vec7 & sg, const vec & pix, const vec & invDist, vec & ahp,
 		    mat & AHP_sg, mat & AHP_pix, mat & AHP_invDist) {
-
 			// OK JS 12/6/2010
 			vec3 v, vn; // 3d vector and normalized vector
 			// temporal Jacobians:

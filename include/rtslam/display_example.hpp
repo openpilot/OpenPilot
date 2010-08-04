@@ -23,8 +23,8 @@ namespace display {
 	class SensorEx;
 	class LandmarkEx;
 	class ObservationEx;
-
-	class ViewerEx: public Viewer<WorldEx,MapEx,RobotEx,SensorEx,LandmarkEx,ObservationEx>
+	
+	class ViewerEx: public Viewer<WorldEx,MapEx,RobotEx,SensorEx,LandmarkEx,ObservationEx,boost::variant<int*> >
 	{
 		public:
 			// some configuration parameters

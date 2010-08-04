@@ -21,11 +21,9 @@ namespace jafar {
 			DescriptorAbstract(), senPoseInit(senPoseInit_), /*obsInitPtr(obsInitPtr_),*/ featImgPntPtr(featImgPntPtr_)
 			// FIXME is obsInit useful, if it is how to copy the descriptor while letting obsInit die
 		{
-			// TODO Auto-generated constructor stub
 		}
 
 		DescriptorImagePoint::~DescriptorImagePoint() {
-			// TODO Auto-generated destructor stub
 		}
 
 /*

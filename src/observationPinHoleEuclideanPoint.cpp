@@ -41,11 +41,6 @@ namespace jafar {
 			//ObservationAbstract::setup(_noiseStd, getPrior());
 			Gaussian prior(1); // should never be used
 			setPrior(prior);
-//			id() = landmarkPtr()->id();
-			// TODO: is this cast necessary? Change the arg of the setup if not.
-			//linkToPinHole(SPTR_CAST<SensorPinHole>
-			//	      (pinholePtr));
-			//linkToParentEUC(eucPtr);
 		}
 
 

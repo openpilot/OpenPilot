@@ -22,8 +22,6 @@
 #include "jmath/angle.hpp"
 #include <vector>
 
-// \todo this needs to go out of here - when we'll have factories
-#include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
 
 namespace jafar {
 	namespace rtslam {

@@ -30,6 +30,7 @@ class Shape : public QGraphicsItemGroup {
       * @param angle angle of the shape (degrees)
       */
     Shape(ShapeType shapeType, double x, double y, double w, double h, double angle = 0);
+    virtual ~Shape() { delete m_label; }
     virtual QRectF boundingRect () const { return m_boundingRect; } 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
     /**

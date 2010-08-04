@@ -21,6 +21,7 @@ namespace jafar {
          */
         Ellipsoid( const jblas::vec2& _x, const jblas::sym_mat22& _xCov, double _scale = 3.0 );
         Ellipsoid( double x, double y, double cov_x, double cov_y, double cov_xy, double _scale = 3.0 );
+        virtual ~Ellipsoid() {}
         void set( const jblas::vec2& _x, const jblas::sym_mat22& _xCov, double _scale = 3.0 );
     };
   }

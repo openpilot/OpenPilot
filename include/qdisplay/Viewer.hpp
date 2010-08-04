@@ -35,7 +35,7 @@ class Viewer : public QGraphicsView {
     Viewer(int mosaicWidth = 0, int mosaicHeight = 0, QGraphicsScene* scene = 0);
     
     ~Viewer();
-
+    void setBackgroundColor(int R, int G, int B);
     QGraphicsScene* scene() { return m_scene; }
     /**
      * @return the image item of cell (row,col)

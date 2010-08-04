@@ -182,7 +182,7 @@ namespace hardware {
 			// acquire the image
 			if (mode == 2)
 			{
-				index.wait(last_processed_index, kernel::VariableCondition<int>::ne);
+				index.wait(boost::lambda::_1 != last_processed_index);
 				//if (index != last_processed_index)
 				{
 					// FIXME manage multisensors : put sensor id in filename
@@ -307,7 +307,7 @@ namespace hardware {
 			std::swap(buff_in_use, buff_ready);
 			rawPtr = bufferPtr[buff_in_use];
 			image_count = 0;
-			index.setNotify(index()+1);
+			index.applyAndNotify(boost::lambda::_1++);
 			//index++;
 		}
 		if (no_more_data && missed_count == -1) return -2; else return missed_count;

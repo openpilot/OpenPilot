@@ -53,6 +53,7 @@ private:
         QList<QSlider> sliders;
         void updateChannelSlider(QSlider* slider, QLabel* min, QLabel* Max,  QCheckBox* rev, int value);
         void updateObjectPersistance(ObjectPersistence::OperationOptions op, UAVObject *obj);
+        void assignChannel(UAVDataObject *obj, UAVObjectField *field, QString str);
 
         bool firstUpdate;
 

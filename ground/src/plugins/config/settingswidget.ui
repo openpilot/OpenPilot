@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>544</width>
+    <width>617</width>
     <height>346</height>
    </rect>
   </property>
@@ -18,9 +18,12 @@
     <rect>
      <x>10</x>
      <y>20</y>
-     <width>521</width>
+     <width>601</width>
      <height>311</height>
     </rect>
+   </property>
+   <property name="currentIndex">
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -41,6 +44,13 @@
        <pointsize>8</pointsize>
       </font>
      </property>
+     <property name="toolTip">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'FreeSans'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Maximum channel value&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
       <string>2000</string>
      </property>
@@ -48,7 +58,7 @@
     <widget class="QCheckBox" name="ch2Rev">
      <property name="geometry">
       <rect>
-       <x>140</x>
+       <x>160</x>
        <y>140</y>
        <width>21</width>
        <height>22</height>
@@ -60,6 +70,13 @@
        <pointsize>8</pointsize>
       </font>
      </property>
+     <property name="toolTip">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'FreeSans'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Check to invert the channel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -67,11 +84,17 @@
     <widget class="QSlider" name="ch4Slider">
      <property name="geometry">
       <rect>
-       <x>260</x>
+       <x>300</x>
        <y>30</y>
        <width>18</width>
        <height>101</height>
       </rect>
+     </property>
+     <property name="minimum">
+      <number>1000</number>
+     </property>
+     <property name="maximum">
+      <number>2000</number>
      </property>
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -89,17 +112,24 @@
      <property name="font">
       <font>
        <family>FreeSans</family>
-       <pointsize>9</pointsize>
+       <pointsize>10</pointsize>
       </font>
      </property>
+     <property name="toolTip">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'FreeSans'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Current channel value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
-      <string>1500</string>
+      <string>1000</string>
      </property>
     </widget>
     <widget class="QLabel" name="ch1Min">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>90</x>
        <y>130</y>
        <width>31</width>
        <height>17</height>
@@ -112,13 +142,13 @@
       </font>
      </property>
      <property name="text">
-      <string>2000</string>
+      <string>1000</string>
      </property>
     </widget>
     <widget class="QCheckBox" name="ch7Rev">
      <property name="geometry">
       <rect>
-       <x>440</x>
+       <x>530</x>
        <y>140</y>
        <width>21</width>
        <height>22</height>
@@ -130,6 +160,13 @@
        <pointsize>8</pointsize>
       </font>
      </property>
+     <property name="toolTip">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'FreeSans'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Check to invert the channel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -137,7 +174,7 @@
     <widget class="QLabel" name="ch6Min">
      <property name="geometry">
       <rect>
-       <x>380</x>
+       <x>460</x>
        <y>130</y>
        <width>31</width>
        <height>17</height>
@@ -150,13 +187,13 @@
       </font>
      </property>
      <property name="text">
-      <string>2000</string>
+      <string>1000</string>
      </property>
     </widget>
     <widget class="QLabel" name="ch7Cur">
      <property name="geometry">
       <rect>
-       <x>440</x>
+       <x>520</x>
        <y>160</y>
        <width>31</width>
        <height>17</height>
@@ -165,17 +202,17 @@
      <property name="font">
       <font>
        <family>FreeSans</family>
-       <pointsize>9</pointsize>
+       <pointsize>10</pointsize>
       </font>
      </property>
      <property name="text">
-      <string>1500</string>
+      <string>1000</string>
      </property>
     </widget>
     <widget class="QLabel" name="ch4Max">
      <property name="geometry">
       <rect>
-       <x>260</x>
+       <x>300</x>
        <y>10</y>
        <width>31</width>
        <height>17</height>
@@ -194,7 +231,7 @@
     <widget class="QLabel" name="ch7Min">
      <property name="geometry">
       <rect>
-       <x>440</x>
+       <x>540</x>
        <y>130</y>
        <width>31</width>
        <height>17</height>
@@ -207,13 +244,13 @@
       </font>
      </property>
      <property name="text">
-      <string>2000</string>
+      <string>1000</string>
      </property>
     </widget>
     <widget class="QPushButton" name="getRCInputCurrent">
      <property name="geometry">
       <rect>
-       <x>190</x>
+       <x>270</x>
        <y>240</y>
        <width>93</width>
        <height>27</height>
@@ -229,11 +266,17 @@
     <widget class="QSlider" name="ch3Slider">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>230</x>
        <y>30</y>
        <width>18</width>
        <height>101</height>
       </rect>
+     </property>
+     <property name="minimum">
+      <number>1000</number>
+     </property>
+     <property name="maximum">
+      <number>2000</number>
      </property>
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -242,7 +285,7 @@
     <widget class="QLabel" name="ch2Min">
      <property name="geometry">
       <rect>
-       <x>140</x>
+       <x>160</x>
        <y>130</y>
        <width>31</width>
        <height>17</height>
@@ -255,13 +298,13 @@
       </font>
      </property>
      <property name="text">
-      <string>2000</string>
+      <string>1000</string>
      </property>
     </widget>
     <widget class="QLabel" name="ch6Max">
      <property name="geometry">
       <rect>
-       <x>380</x>
+       <x>460</x>
        <y>10</y>
        <width>31</width>
        <height>17</height>
@@ -292,6 +335,13 @@
        <pointsize>8</pointsize>
       </font>
      </property>
+     <property name="toolTip">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'FreeSans'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Check to invert the channel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -299,7 +349,7 @@
     <widget class="QLabel" name="ch5Max">
      <property name="geometry">
       <rect>
-       <x>320</x>
+       <x>370</x>
        <y>10</y>
        <width>31</width>
        <height>17</height>
@@ -318,7 +368,7 @@
     <widget class="QLabel" name="ch3Max">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>230</x>
        <y>10</y>
        <width>31</width>
        <height>17</height>
@@ -337,7 +387,7 @@
     <widget class="QCheckBox" name="ch1Rev">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>90</x>
        <y>140</y>
        <width>21</width>
        <height>22</height>
@@ -349,6 +399,13 @@
        <pointsize>8</pointsize>
       </font>
      </property>
+     <property name="toolTip">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'FreeSans'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Check to invert the channel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -356,7 +413,7 @@
     <widget class="QPushButton" name="saveRCInputToSD">
      <property name="geometry">
       <rect>
-       <x>410</x>
+       <x>490</x>
        <y>240</y>
        <width>93</width>
        <height>27</height>
@@ -373,7 +430,7 @@ Applies and Saves all settings to SD</string>
     <widget class="QLabel" name="ch4Cur">
      <property name="geometry">
       <rect>
-       <x>260</x>
+       <x>300</x>
        <y>160</y>
        <width>31</width>
        <height>17</height>
@@ -382,17 +439,17 @@ Applies and Saves all settings to SD</string>
      <property name="font">
       <font>
        <family>FreeSans</family>
-       <pointsize>9</pointsize>
+       <pointsize>10</pointsize>
       </font>
      </property>
      <property name="text">
-      <string>1500</string>
+      <string>1000</string>
      </property>
     </widget>
     <widget class="QLabel" name="ch4Min">
      <property name="geometry">
       <rect>
-       <x>260</x>
+       <x>300</x>
        <y>130</y>
        <width>31</width>
        <height>17</height>
@@ -405,17 +462,23 @@ Applies and Saves all settings to SD</string>
       </font>
      </property>
      <property name="text">
-      <string>2000</string>
+      <string>1000</string>
      </property>
     </widget>
     <widget class="QSlider" name="ch7Slider">
      <property name="geometry">
       <rect>
-       <x>440</x>
+       <x>540</x>
        <y>30</y>
        <width>18</width>
        <height>101</height>
       </rect>
+     </property>
+     <property name="minimum">
+      <number>1000</number>
+     </property>
+     <property name="maximum">
+      <number>2000</number>
      </property>
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -424,7 +487,7 @@ Applies and Saves all settings to SD</string>
     <widget class="QPushButton" name="saveRCInputToRAM">
      <property name="geometry">
       <rect>
-       <x>300</x>
+       <x>380</x>
        <y>240</y>
        <width>93</width>
        <height>27</height>
@@ -443,15 +506,30 @@ Be sure to set the Neutral position on all sliders before sending!</string>
       <rect>
        <x>10</x>
        <y>180</y>
-       <width>51</width>
+       <width>61</width>
        <height>21</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>DejaVu Sans</family>
+       <pointsize>7</pointsize>
+      </font>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>16</width>
+       <height>16</height>
+      </size>
+     </property>
+     <property name="frame">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QCheckBox" name="ch5Rev">
      <property name="geometry">
       <rect>
-       <x>320</x>
+       <x>370</x>
        <y>140</y>
        <width>21</width>
        <height>22</height>
@@ -462,6 +540,13 @@ Be sure to set the Neutral position on all sliders before sending!</string>
        <family>FreeSans</family>
        <pointsize>8</pointsize>
       </font>
+     </property>
+     <property name="toolTip">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'FreeSans'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Check to invert the channel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
       <string/>
@@ -470,11 +555,17 @@ Be sure to set the Neutral position on all sliders before sending!</string>
     <widget class="QSlider" name="ch1Slider">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>90</x>
        <y>30</y>
        <width>18</width>
        <height>101</height>
       </rect>
+     </property>
+     <property name="minimum">
+      <number>1000</number>
+     </property>
+     <property name="maximum">
+      <number>2000</number>
      </property>
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -483,7 +574,7 @@ Be sure to set the Neutral position on all sliders before sending!</string>
     <widget class="QCheckBox" name="ch6Rev">
      <property name="geometry">
       <rect>
-       <x>380</x>
+       <x>450</x>
        <y>140</y>
        <width>21</width>
        <height>22</height>
@@ -495,6 +586,13 @@ Be sure to set the Neutral position on all sliders before sending!</string>
        <pointsize>8</pointsize>
       </font>
      </property>
+     <property name="toolTip">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'FreeSans'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Check to invert the channel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -502,7 +600,7 @@ Be sure to set the Neutral position on all sliders before sending!</string>
     <widget class="QLabel" name="ch3Min">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>230</x>
        <y>130</y>
        <width>31</width>
        <height>17</height>
@@ -515,13 +613,13 @@ Be sure to set the Neutral position on all sliders before sending!</string>
       </font>
      </property>
      <property name="text">
-      <string>2000</string>
+      <string>1000</string>
      </property>
     </widget>
     <widget class="QLabel" name="ch7Max">
      <property name="geometry">
       <rect>
-       <x>440</x>
+       <x>540</x>
        <y>10</y>
        <width>31</width>
        <height>17</height>
@@ -540,7 +638,7 @@ Be sure to set the Neutral position on all sliders before sending!</string>
     <widget class="QLabel" name="ch2Cur">
      <property name="geometry">
       <rect>
-       <x>140</x>
+       <x>160</x>
        <y>160</y>
        <width>31</width>
        <height>17</height>
@@ -549,17 +647,17 @@ Be sure to set the Neutral position on all sliders before sending!</string>
      <property name="font">
       <font>
        <family>FreeSans</family>
-       <pointsize>9</pointsize>
+       <pointsize>10</pointsize>
       </font>
      </property>
      <property name="text">
-      <string>1500</string>
+      <string>1000</string>
      </property>
     </widget>
     <widget class="QLabel" name="ch5Cur">
      <property name="geometry">
       <rect>
-       <x>320</x>
+       <x>370</x>
        <y>160</y>
        <width>31</width>
        <height>17</height>
@@ -568,21 +666,27 @@ Be sure to set the Neutral position on all sliders before sending!</string>
      <property name="font">
       <font>
        <family>FreeSans</family>
-       <pointsize>9</pointsize>
+       <pointsize>10</pointsize>
       </font>
      </property>
      <property name="text">
-      <string>1500</string>
+      <string>1000</string>
      </property>
     </widget>
     <widget class="QSlider" name="ch2Slider">
      <property name="geometry">
       <rect>
-       <x>140</x>
+       <x>160</x>
        <y>30</y>
        <width>18</width>
        <height>101</height>
       </rect>
+     </property>
+     <property name="minimum">
+      <number>1000</number>
+     </property>
+     <property name="maximum">
+      <number>2000</number>
      </property>
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -591,7 +695,7 @@ Be sure to set the Neutral position on all sliders before sending!</string>
     <widget class="QLabel" name="ch5Min">
      <property name="geometry">
       <rect>
-       <x>320</x>
+       <x>370</x>
        <y>130</y>
        <width>31</width>
        <height>17</height>
@@ -604,13 +708,13 @@ Be sure to set the Neutral position on all sliders before sending!</string>
       </font>
      </property>
      <property name="text">
-      <string>2000</string>
+      <string>1000</string>
      </property>
     </widget>
     <widget class="QLabel" name="ch1Cur">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>90</x>
        <y>160</y>
        <width>31</width>
        <height>17</height>
@@ -619,17 +723,17 @@ Be sure to set the Neutral position on all sliders before sending!</string>
      <property name="font">
       <font>
        <family>FreeSans</family>
-       <pointsize>9</pointsize>
+       <pointsize>10</pointsize>
       </font>
      </property>
      <property name="text">
-      <string>1500</string>
+      <string>1000</string>
      </property>
     </widget>
     <widget class="QLabel" name="ch6Cur">
      <property name="geometry">
       <rect>
-       <x>380</x>
+       <x>450</x>
        <y>160</y>
        <width>31</width>
        <height>17</height>
@@ -638,17 +742,17 @@ Be sure to set the Neutral position on all sliders before sending!</string>
      <property name="font">
       <font>
        <family>FreeSans</family>
-       <pointsize>9</pointsize>
+       <pointsize>10</pointsize>
       </font>
      </property>
      <property name="text">
-      <string>1500</string>
+      <string>1000</string>
      </property>
     </widget>
     <widget class="QLabel" name="ch3Cur">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>230</x>
        <y>160</y>
        <width>31</width>
        <height>17</height>
@@ -657,17 +761,17 @@ Be sure to set the Neutral position on all sliders before sending!</string>
      <property name="font">
       <font>
        <family>FreeSans</family>
-       <pointsize>9</pointsize>
+       <pointsize>10</pointsize>
       </font>
      </property>
      <property name="text">
-      <string>1500</string>
+      <string>1000</string>
      </property>
     </widget>
     <widget class="QLabel" name="ch2Max">
      <property name="geometry">
       <rect>
-       <x>140</x>
+       <x>160</x>
        <y>10</y>
        <width>31</width>
        <height>17</height>
@@ -692,8 +796,11 @@ Be sure to set the Neutral position on all sliders before sending!</string>
        <height>101</height>
       </rect>
      </property>
+     <property name="minimum">
+      <number>1000</number>
+     </property>
      <property name="maximum">
-      <number>99</number>
+      <number>2000</number>
      </property>
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -702,7 +809,7 @@ Be sure to set the Neutral position on all sliders before sending!</string>
     <widget class="QLabel" name="ch1Max">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>90</x>
        <y>10</y>
        <width>31</width>
        <height>17</height>
@@ -721,7 +828,7 @@ Be sure to set the Neutral position on all sliders before sending!</string>
     <widget class="QCheckBox" name="ch4Rev">
      <property name="geometry">
       <rect>
-       <x>260</x>
+       <x>300</x>
        <y>140</y>
        <width>21</width>
        <height>22</height>
@@ -732,6 +839,13 @@ Be sure to set the Neutral position on all sliders before sending!</string>
        <family>FreeSans</family>
        <pointsize>8</pointsize>
       </font>
+     </property>
+     <property name="toolTip">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'FreeSans'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Check to invert the channel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
       <string/>
@@ -752,18 +866,31 @@ Be sure to set the Neutral position on all sliders before sending!</string>
        <pointsize>8</pointsize>
       </font>
      </property>
+     <property name="toolTip">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'FreeSans'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Minimum channel value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
-      <string>2000</string>
+      <string>1000</string>
      </property>
     </widget>
     <widget class="QSlider" name="ch5Slider">
      <property name="geometry">
       <rect>
-       <x>320</x>
+       <x>370</x>
        <y>30</y>
        <width>18</width>
        <height>101</height>
       </rect>
+     </property>
+     <property name="minimum">
+      <number>1000</number>
+     </property>
+     <property name="maximum">
+      <number>2000</number>
      </property>
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -772,11 +899,17 @@ Be sure to set the Neutral position on all sliders before sending!</string>
     <widget class="QSlider" name="ch6Slider">
      <property name="geometry">
       <rect>
-       <x>380</x>
+       <x>460</x>
        <y>30</y>
        <width>18</width>
        <height>101</height>
       </rect>
+     </property>
+     <property name="minimum">
+      <number>1000</number>
+     </property>
+     <property name="maximum">
+      <number>2000</number>
      </property>
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -785,7 +918,7 @@ Be sure to set the Neutral position on all sliders before sending!</string>
     <widget class="QCheckBox" name="ch3Rev">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>230</x>
        <y>140</y>
        <width>21</width>
        <height>22</height>
@@ -797,85 +930,134 @@ Be sure to set the Neutral position on all sliders before sending!</string>
        <pointsize>8</pointsize>
       </font>
      </property>
+     <property name="toolTip">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'FreeSans'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Check to invert the channel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
       <string/>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboBox_2">
+    <widget class="QComboBox" name="ch1Assign">
      <property name="geometry">
       <rect>
-       <x>70</x>
+       <x>80</x>
        <y>180</y>
-       <width>51</width>
+       <width>61</width>
        <height>21</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <family>DejaVu Sans</family>
+       <pointsize>7</pointsize>
+      </font>
+     </property>
     </widget>
-    <widget class="QComboBox" name="comboBox_3">
+    <widget class="QComboBox" name="ch2Assign">
      <property name="geometry">
       <rect>
-       <x>130</x>
+       <x>150</x>
        <y>180</y>
-       <width>51</width>
+       <width>61</width>
        <height>21</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <family>DejaVu Sans</family>
+       <pointsize>7</pointsize>
+      </font>
+     </property>
     </widget>
-    <widget class="QComboBox" name="comboBox_4">
+    <widget class="QComboBox" name="ch3Assign">
      <property name="geometry">
       <rect>
-       <x>190</x>
+       <x>220</x>
        <y>180</y>
-       <width>51</width>
+       <width>61</width>
        <height>21</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <family>DejaVu Sans</family>
+       <pointsize>7</pointsize>
+      </font>
+     </property>
     </widget>
-    <widget class="QComboBox" name="comboBox_5">
+    <widget class="QComboBox" name="ch4Assign">
      <property name="geometry">
       <rect>
-       <x>250</x>
+       <x>290</x>
        <y>180</y>
-       <width>51</width>
+       <width>61</width>
        <height>21</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <family>DejaVu Sans</family>
+       <pointsize>7</pointsize>
+      </font>
+     </property>
     </widget>
-    <widget class="QComboBox" name="comboBox_6">
+    <widget class="QComboBox" name="ch5Assign">
      <property name="geometry">
       <rect>
-       <x>310</x>
+       <x>360</x>
        <y>180</y>
-       <width>51</width>
+       <width>61</width>
        <height>21</height>
       </rect>
      </property>
-    </widget>
-    <widget class="QComboBox" name="comboBox_7">
-     <property name="geometry">
-      <rect>
-       <x>370</x>
-       <y>180</y>
-       <width>51</width>
-       <height>21</height>
-      </rect>
+     <property name="font">
+      <font>
+       <family>DejaVu Sans</family>
+       <pointsize>7</pointsize>
+      </font>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboBox_8">
+    <widget class="QComboBox" name="ch6Assign">
      <property name="geometry">
       <rect>
        <x>430</x>
        <y>180</y>
-       <width>51</width>
+       <width>61</width>
        <height>21</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>DejaVu Sans</family>
+       <pointsize>7</pointsize>
+      </font>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="ch7Assign">
+     <property name="geometry">
+      <rect>
+       <x>500</x>
+       <y>180</y>
+       <width>61</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>DejaVu Sans</family>
+       <pointsize>7</pointsize>
+      </font>
      </property>
     </widget>
     <widget class="QCheckBox" name="doRCInputCalibration">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>210</y>
+       <x>20</x>
+       <y>250</y>
        <width>131</width>
        <height>22</height>
       </rect>
@@ -897,15 +1079,83 @@ Uncheck/Check to restart calibration.</string>
        <height>20</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Indicates whether OpenPilot is getting a signal from the RC receiver.</string>
+     </property>
      <property name="text">
       <string>RC Receiver Not Connected</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="receiverType">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>210</y>
+       <width>89</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Select the receiver type here:
+- PWM is the most usual type
+- PPM is connected to input XXX 
+- Spektrum is used with Spektrum 'satellite' receivers</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>210</y>
+       <width>131</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>RC Receiver Type:</string>
      </property>
     </widget>
    </widget>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
-     <string>Tab 2</string>
+     <string>Servo Output</string>
     </attribute>
+    <widget class="QComboBox" name="comboBox">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>10</y>
+       <width>89</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Select aircraft type here</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>62</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Aircraft:</string>
+     </property>
+    </widget>
+    <widget class="QGraphicsView" name="graphicsView">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>60</y>
+       <width>256</width>
+       <height>192</height>
+      </rect>
+     </property>
+    </widget>
    </widget>
   </widget>
  </widget>

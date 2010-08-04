@@ -40,6 +40,18 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     m_config->setupUi(this);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
+    // Fill in the dropdown menus for the channel RC Input assignement.
+    QStringList channelsList;
+    channelsList << "None" << "Roll" << "Pitch" << "Yaw" << "Throttle" << "FlightMode";
+    m_config->ch0Assign->addItems(channelsList);
+    m_config->ch1Assign->addItems(channelsList);
+    m_config->ch2Assign->addItems(channelsList);
+    m_config->ch3Assign->addItems(channelsList);
+    m_config->ch4Assign->addItems(channelsList);
+    m_config->ch5Assign->addItems(channelsList);
+    m_config->ch6Assign->addItems(channelsList);
+    m_config->ch7Assign->addItems(channelsList);
+
     // Now connect the widget to the ManualControlCommand / Channel UAVObject
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -47,10 +59,19 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlCommand")));
     connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateChannels(UAVObject*)));
 
+    // Get the receiver types supported by OpenPilot and fill the corresponding
+    // dropdown menu:
+    obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlSettings")));
+    // Now update all the slider values:
+    QString fieldName = QString("InputMode");
+    UAVObjectField *field = obj->getField(fieldName);
+    m_config->receiverType->addItems(field->getOptions());
+
+    requestRCInputUpdate();
+
     connect(m_config->saveRCInputToSD, SIGNAL(clicked()), this, SLOT(saveRCInputObject()));
     connect(m_config->saveRCInputToRAM, SIGNAL(clicked()), this, SLOT(sendRCInputUpdate()));
     connect(m_config->getRCInputCurrent, SIGNAL(clicked()), this, SLOT(requestRCInputUpdate()));
-
 
     firstUpdate = true;
 
@@ -129,13 +150,34 @@ void ConfigGadgetWidget::requestRCInputUpdate()
     m_config->ch6Slider->setValue(field->getValue(6).toInt());
     m_config->ch7Slider->setValue(field->getValue(7).toInt());
 
+    // Update receiver type
+    fieldName = QString("InputMode");
+    field = obj->getField(fieldName);
+    m_config->receiverType->setCurrentIndex(m_config->receiverType->findText(field->getValue().toString()));
+
+    // Reset all channel assignement dropdowns:
+    m_config->ch0Assign->setCurrentIndex(0);
+    m_config->ch1Assign->setCurrentIndex(0);
+    m_config->ch2Assign->setCurrentIndex(0);
+    m_config->ch3Assign->setCurrentIndex(0);
+    m_config->ch4Assign->setCurrentIndex(0);
+    m_config->ch5Assign->setCurrentIndex(0);
+    m_config->ch6Assign->setCurrentIndex(0);
+    m_config->ch7Assign->setCurrentIndex(0);
+
+    // Update all channels assignements
+    assignChannel(obj, field, QString("Roll"));
+    assignChannel(obj, field, QString("Pitch"));
+    assignChannel(obj, field, QString("Yaw"));
+    assignChannel(obj, field, QString("Throttle"));
+    assignChannel(obj, field, QString("FlightMode"));
+
 }
 
 
 /**
   * Sends the config to the board, without saving to the SD card
   */
-
 void ConfigGadgetWidget::sendRCInputUpdate()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -176,6 +218,47 @@ void ConfigGadgetWidget::sendRCInputUpdate()
     field->setValue(m_config->ch6Slider->value(),6);
     field->setValue(m_config->ch7Slider->value(),7);
 
+    // Set RC Receiver type:
+    fieldName = QString("InputMode");
+    field = obj->getField(fieldName);
+    field->setValue(m_config->receiverType->currentText());
+
+    // Set Roll/Pitch/Yaw/Etc assignement:
+    // Rule: if two channels have the same setting (which is wrong!) the higher channel
+    // will get the setting.
+    if (m_config->ch0Assign->currentIndex() != 0) {
+        field = obj->getField(m_config->ch0Assign->currentText());
+        field->setValue(field->getOptions().at(0)); // -> This way we don't depend on channel naming convention
+    }
+    if (m_config->ch1Assign->currentIndex() != 0) {
+        field = obj->getField(m_config->ch1Assign->currentText());
+        field->setValue(field->getOptions().at(1));
+    }
+    if (m_config->ch2Assign->currentIndex() != 0) {
+        field = obj->getField(m_config->ch2Assign->currentText());
+        field->setValue(field->getOptions().at(2));
+    }
+    if (m_config->ch3Assign->currentIndex() != 0) {
+        field = obj->getField(m_config->ch3Assign->currentText());
+        field->setValue(field->getOptions().at(3));
+    }
+    if (m_config->ch4Assign->currentIndex() != 0) {
+        field = obj->getField(m_config->ch4Assign->currentText());
+        field->setValue(field->getOptions().at(4));
+    }
+    if (m_config->ch5Assign->currentIndex() != 0) {
+        field = obj->getField(m_config->ch5Assign->currentText());
+        field->setValue(field->getOptions().at(5));
+    }
+    if (m_config->ch6Assign->currentIndex() != 0) {
+        field = obj->getField(m_config->ch6Assign->currentText());
+        field->setValue(field->getOptions().at(6));
+    }
+    if (m_config->ch7Assign->currentIndex() != 0) {
+        field = obj->getField(m_config->ch7Assign->currentText());
+        field->setValue(field->getOptions().at(7));
+    }
+
     // ... and send to the OP Board
     obj->updated();
 
@@ -185,7 +268,6 @@ void ConfigGadgetWidget::sendRCInputUpdate()
 /**
   Sends the config to the board and request saving into the SD card
   */
-
 void ConfigGadgetWidget::saveRCInputObject()
 {
     // Send update so that the latest value is saved
@@ -195,7 +277,6 @@ void ConfigGadgetWidget::saveRCInputObject()
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlSettings")));
     Q_ASSERT(obj);
     updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
-
 }
 
 
@@ -213,6 +294,42 @@ void ConfigGadgetWidget::updateObjectPersistance(ObjectPersistence::OperationOpt
         data.InstanceID = obj->getInstID();
         objper->setData(data);
         objper->updated();
+    }
+}
+
+
+/**
+  * Set the dropdown option for a channel assignement
+  */
+void ConfigGadgetWidget::assignChannel(UAVDataObject *obj, UAVObjectField *field, QString str)
+{
+    field = obj->getField(str);
+    QStringList options = field->getOptions();
+    switch (options.indexOf(field->getValue().toString())) {
+    case 0:
+        m_config->ch0Assign->setCurrentIndex(m_config->ch0Assign->findText(str));
+        break;
+    case 1:
+        m_config->ch1Assign->setCurrentIndex(m_config->ch0Assign->findText(str));
+        break;
+    case 2:
+        m_config->ch2Assign->setCurrentIndex(m_config->ch0Assign->findText(str));
+        break;
+    case 3:
+        m_config->ch3Assign->setCurrentIndex(m_config->ch0Assign->findText(str));
+        break;
+    case 4:
+        m_config->ch4Assign->setCurrentIndex(m_config->ch0Assign->findText(str));
+        break;
+    case 5:
+        m_config->ch5Assign->setCurrentIndex(m_config->ch0Assign->findText(str));
+        break;
+    case 6:
+        m_config->ch6Assign->setCurrentIndex(m_config->ch0Assign->findText(str));
+        break;
+    case 7:
+        m_config->ch7Assign->setCurrentIndex(m_config->ch0Assign->findText(str));
+        break;
     }
 }
 
@@ -277,6 +394,8 @@ void ConfigGadgetWidget::updateChannels(UAVObject* controlCommand)
 void ConfigGadgetWidget::updateChannelSlider(QSlider* slider, QLabel* min, QLabel* max, QCheckBox* rev, int value) {
 
     if (firstUpdate) {
+        // Reset all the min/max values of the sliders since we are
+        // starting the calibration.
         slider->setMaximum(value);
         slider->setMinimum(value);
         slider->setValue(value);

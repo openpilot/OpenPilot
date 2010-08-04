@@ -19,9 +19,7 @@
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/robotAbstract.hpp"
 #include "rtslam/landmarkAbstract.hpp"
-
-// \todo this needs to go out of here - when we'll have factories
-#include "rtslam/observationPinHoleAnchoredHomogeneous.hpp"
+#include "rtslam/observationAbstract.hpp"
 
 namespace jafar {
 	namespace rtslam {

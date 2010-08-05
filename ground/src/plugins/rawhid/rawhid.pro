@@ -35,7 +35,11 @@ macx {
         -framework \
         CoreFoundation
 }
-linux-g++ { 
+linux-g++ {
+    SOURCES += pjrc_rawhid_unix.cpp
+    LIBS += -lusb
+}
+linux-g++-64 {
     SOURCES += pjrc_rawhid_unix.cpp
     LIBS += -lusb
 }

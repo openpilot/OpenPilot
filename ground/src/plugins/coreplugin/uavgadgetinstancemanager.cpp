@@ -9,7 +9,7 @@
  * @{
  * @brief The Core GCS plugin
  *****************************************************************************/
-/*
+/* 
  * This program is free software; you can redistribute it and/or modify 
  * it under the terms of the GNU General Public License as published by 
  * the Free Software Foundation; either version 3 of the License, or 
@@ -69,7 +69,11 @@ UAVGadgetInstanceManager::~UAVGadgetInstanceManager()
 
 void UAVGadgetInstanceManager::readConfigurations()
 {
-    QSettings *qs = Core::ICore::instance()->settings();
+    readConfigurations(Core::ICore::instance()->settings());
+}
+
+void UAVGadgetInstanceManager::readConfigurations(QSettings *qs)
+{
     qs->beginGroup("UAVGadgetConfigurations");
     foreach (QString classId, m_classIds.keys())
     {
@@ -85,11 +89,20 @@ void UAVGadgetInstanceManager::readConfigurations()
             QByteArray state;
             stream >> state;
             IUAVGadgetConfiguration *config = f->createConfiguration(state);
-            config->setName(configName);
-            config->setProvisionalName(configName);
-            config->setLocked(locked);
-            if (config)
-                m_configurations.append(config);
+            if (config){
+                config->setName(configName);
+                config->setProvisionalName(configName);
+                config->setLocked(locked);
+                int idx = indexForConfig(m_configurations, classId, configName);
+                if ( idx >= 0 ){
+                    // We should replace the config, but it might be used, so just
+                    // throw it out of the list. The GCS should be reinitialised soon.
+                    m_configurations[idx] = config;
+                }
+                else{
+                    m_configurations.append(config);
+                }
+            }
         }
 
         if (configs.count() == 0) {
@@ -110,7 +123,11 @@ void UAVGadgetInstanceManager::readConfigurations()
 
 void UAVGadgetInstanceManager::writeConfigurations()
 {
-    QSettings *qs = Core::ICore::instance()->settings();
+    writeConfigurations(Core::ICore::instance()->settings());
+}
+
+void UAVGadgetInstanceManager::writeConfigurations(QSettings *qs)
+{
     qs->beginGroup("UAVGadgetConfigurations");
     qs->remove(""); // Remove existing configurations
     foreach (IUAVGadgetConfiguration *config, m_configurations)
@@ -128,6 +145,13 @@ void UAVGadgetInstanceManager::writeConfigurations()
 
 void UAVGadgetInstanceManager::createOptionsPages()
 {
+    // In case there are pages (import a configuration), remove them.
+    // Maybe they should be deleted as well (memory-leak),
+    // but this might lead to NULL-pointers?
+    while (!m_optionsPages.isEmpty()){
+        m_pm->removeObject(m_optionsPages.takeLast());
+    }
+
     foreach (IUAVGadgetConfiguration *config, m_configurations)
     {
         IUAVGadgetFactory *f = factory(config->classId());
@@ -349,5 +373,13 @@ QList<IUAVGadgetConfiguration*> *UAVGadgetInstanceManager::configurations(QStrin
     return configs;
 }
 
-
-
+int UAVGadgetInstanceManager::indexForConfig(QList<IUAVGadgetConfiguration*> configurations,
+                   QString classId, QString configName)
+{
+    for ( int i=0; i<configurations.length(); ++i){
+        if ( configurations.at(i)->classId() == classId
+             && configurations.at(i)->name() == configName )
+            return i;
+    }
+    return -1;
+}

@@ -9,7 +9,7 @@
  * @{
  * @brief The Core GCS plugin
  *****************************************************************************/
-/*
+/* 
  * This program is free software; you can redistribute it and/or modify 
  * it under the terms of the GNU General Public License as published by 
  * the Free Software Foundation; either version 3 of the License, or 
@@ -29,8 +29,10 @@
 #define UAVGADGETINSTANCEMANAGER_H
 
 #include <QObject>
+#include <QSettings>
 #include <QtCore/QMap>
 #include <QtCore/QStringList>
+#include "core_global.h"
 
 namespace ExtensionSystem {
     class PluginManager;
@@ -48,14 +50,17 @@ class IUAVGadgetConfiguration;
 class IOptionsPage;
 class IUAVGadgetFactory;
 
-class UAVGadgetInstanceManager : public QObject
+class CORE_EXPORT UAVGadgetInstanceManager : public QObject
 {
+
 Q_OBJECT
 public:
     explicit UAVGadgetInstanceManager(QObject *parent = 0);
     ~UAVGadgetInstanceManager();
     void readConfigurations();
+    void readConfigurations(QSettings *qs);
     void writeConfigurations();
+    void writeConfigurations(QSettings *qs);
     IUAVGadget *createGadget(QString classId, QWidget *parent);
     void removeGadget(IUAVGadget *gadget);
     bool canDeleteConfiguration(IUAVGadgetConfiguration *config);
@@ -93,6 +98,8 @@ private:
     QList<IOptionsPage*> m_provisionalOptionsPages;
     Core::Internal::SettingsDialog *m_settingsDialog;
     ExtensionSystem::PluginManager *m_pm;
+    int indexForConfig(QList<IUAVGadgetConfiguration*> configurations,
+                       QString classId, QString configName);
 
 };
 

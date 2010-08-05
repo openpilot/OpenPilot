@@ -1,0 +1,56 @@
+/**
+ ******************************************************************************
+ *
+ * @file       importexportgadget.h
+ * @author     Edouard Lafargue Copyright (C) 2010.
+ * @brief      Bargraph gadget with red/yellow/green zones
+ * @see        The GNU Public License (GPL) Version 3
+ * @defgroup   importexportplugin
+ * @{
+ *
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
+#ifndef IMPORTEXPORTGADGET_H_
+#define IMPORTEXPORTGADGET_H_
+
+#include <coreplugin/iuavgadget.h>
+#include "importexportgadgetwidget.h"
+
+class IUAVGadget;
+class QWidget;
+class QString;
+class ImportExportGadgetWidget;
+
+using namespace Core;
+
+class IMPORTEXPORT_EXPORT ImportExportGadget : public Core::IUAVGadget
+{
+    Q_OBJECT
+public:
+    ImportExportGadget(QString classId, ImportExportGadgetWidget *widget, QWidget *parent = 0);
+    ~ImportExportGadget();
+
+    QWidget *widget() { return m_widget; }
+    void loadConfiguration(IUAVGadgetConfiguration* config);
+
+private:
+    ImportExportGadgetWidget *m_widget;
+};
+
+
+#endif // IMPORTEXPORTGADGET_H_

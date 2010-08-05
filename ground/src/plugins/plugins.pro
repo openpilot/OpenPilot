@@ -142,6 +142,11 @@ plugin_hitlil2.depends += plugin_uavobjects
 plugin_hitlil2.depends += plugin_uavtalk
 SUBDIRS += plugin_hitlil2
 
+# Export and Import GCS Configuration.
+plugin_importexport.subdir = importexport
+plugin_importexport.depends = plugin_coreplugin
+SUBDIRS += plugin_importexport
+
 #GCS Control of UAV Gadget
 plugin_gcscontrol.subdir = gcscontrol
 plugin_gcscontrol.depends = plugin_coreplugin

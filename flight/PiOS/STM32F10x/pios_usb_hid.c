@@ -138,7 +138,7 @@ int32_t PIOS_USB_HID_ChangeConnectionState(uint32_t Connected)
 */
 int32_t PIOS_USB_HID_CheckAvailable(uint8_t id)
 {
-  return transfer_possible ? 1 : 0;
+  return (PIOS_USB_DETECT_GPIO_PORT->IDR & PIOS_USB_DETECT_GPIO_PIN) != 0 && transfer_possible ?  1 : 0;
 }
 
 /**

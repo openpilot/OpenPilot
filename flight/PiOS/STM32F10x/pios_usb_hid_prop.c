@@ -42,30 +42,30 @@ DEVICE Device_Table =
 
 DEVICE_PROP Device_Property =
   {
-    CustomHID_init,
-    CustomHID_Reset,
-    CustomHID_Status_In,
-    CustomHID_Status_Out,
-    CustomHID_Data_Setup,
-    CustomHID_NoData_Setup,
-    CustomHID_Get_Interface_Setting,
-    CustomHID_GetDeviceDescriptor,
-    CustomHID_GetConfigDescriptor,
-    CustomHID_GetStringDescriptor,
+    PIOS_HID_init,
+    PIOS_HID_Reset,
+    PIOS_HID_Status_In,
+    PIOS_HID_Status_Out,
+    PIOS_HID_Data_Setup,
+    PIOS_HID_NoData_Setup,
+    PIOS_HID_Get_Interface_Setting,
+    PIOS_HID_GetDeviceDescriptor,
+    PIOS_HID_GetConfigDescriptor,
+    PIOS_HID_GetStringDescriptor,
     0,
     0x40 /*MAX PACKET SIZE*/
   };
 USER_STANDARD_REQUESTS User_Standard_Requests =
   {
-    CustomHID_GetConfiguration,
-    CustomHID_SetConfiguration,
-    CustomHID_GetInterface,
-    CustomHID_SetInterface,
-    CustomHID_GetStatus,
-    CustomHID_ClearFeature,
-    CustomHID_SetEndPointFeature,
-    CustomHID_SetDeviceFeature,
-    CustomHID_SetDeviceAddress
+    PIOS_HID_GetConfiguration,
+    PIOS_HID_SetConfiguration,
+    PIOS_HID_GetInterface,
+    PIOS_HID_SetInterface,
+    PIOS_HID_GetStatus,
+    PIOS_HID_ClearFeature,
+    PIOS_HID_SetEndPointFeature,
+    PIOS_HID_SetDeviceFeature,
+    PIOS_HID_SetDeviceAddress
   };
 
 ONE_DESCRIPTOR Device_Descriptor =
@@ -106,13 +106,13 @@ ONE_DESCRIPTOR String_Descriptor[4] =
 /* Private functions ---------------------------------------------------------*/
 
 /*******************************************************************************
-* Function Name  : CustomHID_init.
+* Function Name  : PIOS_HID_init.
 * Description    : Custom HID init routine.
 * Input          : None.
 * Output         : None.
 * Return         : None.
 *******************************************************************************/
-void CustomHID_init(void)
+void PIOS_HID_init(void)
 {
   /* Update the serial number string descriptor with the data from the unique 
   ID*/
@@ -129,13 +129,13 @@ void CustomHID_init(void)
 }
 
 /*******************************************************************************
-* Function Name  : CustomHID_Reset.
+* Function Name  : PIOS_HID_Reset.
 * Description    : Custom HID reset routine.
 * Input          : None.
 * Output         : None.
 * Return         : None.
 *******************************************************************************/
-void CustomHID_Reset(void)
+void PIOS_HID_Reset(void)
 {
   /* Set Joystick_DEVICE as not configured */
   pInformation->Current_Configuration = 0;
@@ -180,65 +180,65 @@ void CustomHID_Reset(void)
   bDeviceState = ATTACHED;
 }
 /*******************************************************************************
-* Function Name  : CustomHID_SetConfiguration.
+* Function Name  : PIOS_HID_SetConfiguration.
 * Description    : Udpade the device state to configured and command the ADC 
 *                  conversion.
 * Input          : None.
 * Output         : None.
 * Return         : None.
 *******************************************************************************/
-void CustomHID_SetConfiguration(void)
+void PIOS_HID_SetConfiguration(void)
 {
   if (pInformation->Current_Configuration != 0)
   {
     /* Device configured */
     bDeviceState = CONFIGURED;
-    
-    /* Start ADC1 Software Conversion */ 
-    ADC_SoftwareStartConvCmd(ADC1, ENABLE);
   }
+
+  /* Enable transfers */
+  PIOS_USB_HID_ChangeConnectionState(pInformation->Current_Configuration != 0);
 }
 /*******************************************************************************
-* Function Name  : CustomHID_SetConfiguration.
+* Function Name  : PIOS_HID_SetConfiguration.
 * Description    : Udpade the device state to addressed.
 * Input          : None.
 * Output         : None.
 * Return         : None.
 *******************************************************************************/
-void CustomHID_SetDeviceAddress (void)
+void PIOS_HID_SetDeviceAddress (void)
 {
   bDeviceState = ADDRESSED;
 }
 /*******************************************************************************
-* Function Name  : CustomHID_Status_In.
+* Function Name  : PIOS_HID_Status_In.
 * Description    : Joystick status IN routine.
 * Input          : None.
 * Output         : None.
 * Return         : None.
 *******************************************************************************/
-void CustomHID_Status_In(void)
+void PIOS_HID_Status_In(void)
 {
 }
 
 /*******************************************************************************
-* Function Name  : CustomHID_Status_Out
+* Function Name  : PIOS_HID_Status_Out
 * Description    : Joystick status OUT routine.
 * Input          : None.
 * Output         : None.
 * Return         : None.
 *******************************************************************************/
-void CustomHID_Status_Out (void)
+void PIOS_HID_Status_Out (void)
 {
 }
 
 /*******************************************************************************
-* Function Name  : CustomHID_Data_Setup
+* Function Name  : PIOS_HID_Data_Setup
 * Description    : Handle the data class specific requests.
 * Input          : Request Nb.
 * Output         : None.
 * Return         : USB_UNSUPPORT or USB_SUCCESS.
 *******************************************************************************/
-RESULT CustomHID_Data_Setup(uint8_t RequestNo)
+RESULT PIOS_HID_Data_Setup(uint8_t RequestNo)
 {
   uint8_t *(*CopyRoutine)(uint16_t);
 
@@ -251,11 +251,11 @@ RESULT CustomHID_Data_Setup(uint8_t RequestNo)
 
     if (pInformation->USBwValue1 == REPORT_DESCRIPTOR)
     {
-      CopyRoutine = CustomHID_GetReportDescriptor;
+      CopyRoutine = PIOS_HID_GetReportDescriptor;
     }
     else if (pInformation->USBwValue1 == HID_DESCRIPTOR_TYPE)
     {
-      CopyRoutine = CustomHID_GetHIDDescriptor;
+      CopyRoutine = PIOS_HID_GetHIDDescriptor;
     }
 
   } /* End of GET_DESCRIPTOR */
@@ -264,7 +264,7 @@ RESULT CustomHID_Data_Setup(uint8_t RequestNo)
   else if ((Type_Recipient == (CLASS_REQUEST | INTERFACE_RECIPIENT))
            && RequestNo == GET_PROTOCOL)
   {
-    CopyRoutine = CustomHID_GetProtocolValue;
+    CopyRoutine = PIOS_HID_GetProtocolValue;
   }
 
   if (CopyRoutine == NULL)
@@ -279,18 +279,18 @@ RESULT CustomHID_Data_Setup(uint8_t RequestNo)
 }
 
 /*******************************************************************************
-* Function Name  : CustomHID_NoData_Setup
+* Function Name  : PIOS_HID_NoData_Setup
 * Description    : handle the no data class specific requests
 * Input          : Request Nb.
 * Output         : None.
 * Return         : USB_UNSUPPORT or USB_SUCCESS.
 *******************************************************************************/
-RESULT CustomHID_NoData_Setup(uint8_t RequestNo)
+RESULT PIOS_HID_NoData_Setup(uint8_t RequestNo)
 {
   if ((Type_Recipient == (CLASS_REQUEST | INTERFACE_RECIPIENT))
       && (RequestNo == SET_PROTOCOL))
   {
-    return CustomHID_SetProtocol();
+    return PIOS_HID_SetProtocol();
   }
 
   else
@@ -300,37 +300,37 @@ RESULT CustomHID_NoData_Setup(uint8_t RequestNo)
 }
 
 /*******************************************************************************
-* Function Name  : CustomHID_GetDeviceDescriptor.
+* Function Name  : PIOS_HID_GetDeviceDescriptor.
 * Description    : Gets the device descriptor.
 * Input          : Length
 * Output         : None.
 * Return         : The address of the device descriptor.
 *******************************************************************************/
-uint8_t *CustomHID_GetDeviceDescriptor(uint16_t Length)
+uint8_t *PIOS_HID_GetDeviceDescriptor(uint16_t Length)
 {
   return Standard_GetDescriptorData(Length, &Device_Descriptor);
 }
 
 /*******************************************************************************
-* Function Name  : CustomHID_GetConfigDescriptor.
+* Function Name  : PIOS_HID_GetConfigDescriptor.
 * Description    : Gets the configuration descriptor.
 * Input          : Length
 * Output         : None.
 * Return         : The address of the configuration descriptor.
 *******************************************************************************/
-uint8_t *CustomHID_GetConfigDescriptor(uint16_t Length)
+uint8_t *PIOS_HID_GetConfigDescriptor(uint16_t Length)
 {
   return Standard_GetDescriptorData(Length, &Config_Descriptor);
 }
 
 /*******************************************************************************
-* Function Name  : CustomHID_GetStringDescriptor
+* Function Name  : PIOS_HID_GetStringDescriptor
 * Description    : Gets the string descriptors according to the needed index
 * Input          : Length
 * Output         : None.
 * Return         : The address of the string descriptors.
 *******************************************************************************/
-uint8_t *CustomHID_GetStringDescriptor(uint16_t Length)
+uint8_t *PIOS_HID_GetStringDescriptor(uint16_t Length)
 {
   uint8_t wValue0 = pInformation->USBwValue0;
   if (wValue0 > 4)
@@ -344,31 +344,31 @@ uint8_t *CustomHID_GetStringDescriptor(uint16_t Length)
 }
 
 /*******************************************************************************
-* Function Name  : CustomHID_GetReportDescriptor.
+* Function Name  : PIOS_HID_GetReportDescriptor.
 * Description    : Gets the HID report descriptor.
 * Input          : Length
 * Output         : None.
 * Return         : The address of the configuration descriptor.
 *******************************************************************************/
-uint8_t *CustomHID_GetReportDescriptor(uint16_t Length)
+uint8_t *PIOS_HID_GetReportDescriptor(uint16_t Length)
 {
   return Standard_GetDescriptorData(Length, &PIOS_HID_Report_Descriptor);
 }
 
 /*******************************************************************************
-* Function Name  : CustomHID_GetHIDDescriptor.
+* Function Name  : PIOS_HID_GetHIDDescriptor.
 * Description    : Gets the HID descriptor.
 * Input          : Length
 * Output         : None.
 * Return         : The address of the configuration descriptor.
 *******************************************************************************/
-uint8_t *CustomHID_GetHIDDescriptor(uint16_t Length)
+uint8_t *PIOS_HID_GetHIDDescriptor(uint16_t Length)
 {
   return Standard_GetDescriptorData(Length, &PIOS_HID_Hid_Descriptor);
 }
 
 /*******************************************************************************
-* Function Name  : CustomHID_Get_Interface_Setting.
+* Function Name  : PIOS_HID_Get_Interface_Setting.
 * Description    : tests the interface and the alternate setting according to the
 *                  supported one.
 * Input          : - Interface : interface number.
@@ -376,7 +376,7 @@ uint8_t *CustomHID_GetHIDDescriptor(uint16_t Length)
 * Output         : None.
 * Return         : USB_SUCCESS or USB_UNSUPPORT.
 *******************************************************************************/
-RESULT CustomHID_Get_Interface_Setting(uint8_t Interface, uint8_t AlternateSetting)
+RESULT PIOS_HID_Get_Interface_Setting(uint8_t Interface, uint8_t AlternateSetting)
 {
   if (AlternateSetting > 0)
   {
@@ -390,13 +390,13 @@ RESULT CustomHID_Get_Interface_Setting(uint8_t Interface, uint8_t AlternateSetti
 }
 
 /*******************************************************************************
-* Function Name  : CustomHID_SetProtocol
+* Function Name  : PIOS_HID_SetProtocol
 * Description    : Joystick Set Protocol request routine.
 * Input          : None.
 * Output         : None.
 * Return         : USB SUCCESS.
 *******************************************************************************/
-RESULT CustomHID_SetProtocol(void)
+RESULT PIOS_HID_SetProtocol(void)
 {
   uint8_t wValue0 = pInformation->USBwValue0;
   ProtocolValue = wValue0;
@@ -404,13 +404,13 @@ RESULT CustomHID_SetProtocol(void)
 }
 
 /*******************************************************************************
-* Function Name  : CustomHID_GetProtocolValue
+* Function Name  : PIOS_HID_GetProtocolValue
 * Description    : get the protocol value
 * Input          : Length.
 * Output         : None.
 * Return         : address of the protcol value.
 *******************************************************************************/
-uint8_t *CustomHID_GetProtocolValue(uint16_t Length)
+uint8_t *PIOS_HID_GetProtocolValue(uint16_t Length)
 {
   if (Length == 0)
   {

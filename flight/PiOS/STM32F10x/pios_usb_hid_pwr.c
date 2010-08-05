@@ -47,7 +47,6 @@ struct
  *******************************************************************************/
 void USB_Cable_Config (FunctionalState NewState)
 { 
-	PIOS_USB_HID_ChangeConnectionState(NewState);
 }
 
 /*******************************************************************************

@@ -33,35 +33,35 @@ typedef enum _HID_REQUESTS
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
-void CustomHID_init(void);
-void CustomHID_Reset(void);
-void CustomHID_SetConfiguration(void);
-void CustomHID_SetDeviceAddress (void);
-void CustomHID_Status_In (void);
-void CustomHID_Status_Out (void);
-RESULT CustomHID_Data_Setup(uint8_t);
-RESULT CustomHID_NoData_Setup(uint8_t);
-RESULT CustomHID_Get_Interface_Setting(uint8_t Interface, uint8_t AlternateSetting);
-uint8_t *CustomHID_GetDeviceDescriptor(uint16_t );
-uint8_t *CustomHID_GetConfigDescriptor(uint16_t);
-uint8_t *CustomHID_GetStringDescriptor(uint16_t);
-RESULT CustomHID_SetProtocol(void);
-uint8_t *CustomHID_GetProtocolValue(uint16_t Length);
-RESULT CustomHID_SetProtocol(void);
-uint8_t *CustomHID_GetReportDescriptor(uint16_t Length);
-uint8_t *CustomHID_GetHIDDescriptor(uint16_t Length);
+void PIOS_HID_init(void);
+void PIOS_HID_Reset(void);
+void PIOS_HID_SetConfiguration(void);
+void PIOS_HID_SetDeviceAddress (void);
+void PIOS_HID_Status_In (void);
+void PIOS_HID_Status_Out (void);
+RESULT PIOS_HID_Data_Setup(uint8_t);
+RESULT PIOS_HID_NoData_Setup(uint8_t);
+RESULT PIOS_HID_Get_Interface_Setting(uint8_t Interface, uint8_t AlternateSetting);
+uint8_t *PIOS_HID_GetDeviceDescriptor(uint16_t );
+uint8_t *PIOS_HID_GetConfigDescriptor(uint16_t);
+uint8_t *PIOS_HID_GetStringDescriptor(uint16_t);
+RESULT PIOS_HID_SetProtocol(void);
+uint8_t *PIOS_HID_GetProtocolValue(uint16_t Length);
+RESULT PIOS_HID_SetProtocol(void);
+uint8_t *PIOS_HID_GetReportDescriptor(uint16_t Length);
+uint8_t *PIOS_HID_GetHIDDescriptor(uint16_t Length);
 
 
 /* Exported define -----------------------------------------------------------*/
-#define CustomHID_GetConfiguration          NOP_Process
-//#define CustomHID_SetConfiguration          NOP_Process
-#define CustomHID_GetInterface              NOP_Process
-#define CustomHID_SetInterface              NOP_Process
-#define CustomHID_GetStatus                 NOP_Process
-#define CustomHID_ClearFeature              NOP_Process
-#define CustomHID_SetEndPointFeature        NOP_Process
-#define CustomHID_SetDeviceFeature          NOP_Process
-//#define CustomHID_SetDeviceAddress          NOP_Process
+#define PIOS_HID_GetConfiguration          NOP_Process
+//#define PIOS_HID_SetConfiguration          NOP_Process
+#define PIOS_HID_GetInterface              NOP_Process
+#define PIOS_HID_SetInterface              NOP_Process
+#define PIOS_HID_GetStatus                 NOP_Process
+#define PIOS_HID_ClearFeature              NOP_Process
+#define PIOS_HID_SetEndPointFeature        NOP_Process
+#define PIOS_HID_SetDeviceFeature          NOP_Process
+//#define PIOS_HID_SetDeviceAddress          NOP_Process
 
 #define REPORT_DESCRIPTOR                  0x22
 

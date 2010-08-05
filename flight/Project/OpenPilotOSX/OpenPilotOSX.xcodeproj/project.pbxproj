@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		651CF9E5120B5D8300EEFD70 /* pios_usb_hid_desc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_usb_hid_desc.c; sourceTree = "<group>"; };
+		651CF9E6120B5D8300EEFD70 /* pios_usb_hid_istr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_usb_hid_istr.c; sourceTree = "<group>"; };
+		651CF9E7120B5D8300EEFD70 /* pios_usb_hid_prop.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_usb_hid_prop.c; sourceTree = "<group>"; };
+		651CF9E8120B5D8300EEFD70 /* pios_usb_hid_pwr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_usb_hid_pwr.c; sourceTree = "<group>"; };
+		651CF9EF120B700D00EEFD70 /* pios_usb_hid_desc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_usb_hid_desc.h; sourceTree = "<group>"; };
+		651CF9F0120B700D00EEFD70 /* pios_usb_hid_istr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_usb_hid_istr.h; sourceTree = "<group>"; };
+		651CF9F1120B700D00EEFD70 /* pios_usb_hid_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_usb_hid_prop.h; sourceTree = "<group>"; };
+		651CF9F2120B700D00EEFD70 /* pios_usb_hid_pwr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_usb_hid_pwr.h; sourceTree = "<group>"; };
+		651CF9F3120B700D00EEFD70 /* usb_conf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = usb_conf.h; sourceTree = "<group>"; };
 		65A2C7EF11E2A33D00D0391E /* FreeRTOSConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FreeRTOSConfig.h; path = ../../PiOS.posix/inc/FreeRTOSConfig.h; sourceTree = SOURCE_ROOT; };
 		65A2C7F011E2A33D00D0391E /* pios_com.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_com.h; path = ../../PiOS.posix/inc/pios_com.h; sourceTree = SOURCE_ROOT; };
 		65A2C7F111E2A33D00D0391E /* pios_com_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_com_priv.h; path = ../../PiOS.posix/inc/pios_com_priv.h; sourceTree = SOURCE_ROOT; };
@@ -187,7 +196,6 @@
 		65E8F05111EFF25C00BBF654 /* pios_usart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_usart.h; path = ../../PiOS/inc/pios_usart.h; sourceTree = SOURCE_ROOT; };
 		65E8F05211EFF25C00BBF654 /* pios_usart_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_usart_priv.h; path = ../../PiOS/inc/pios_usart_priv.h; sourceTree = SOURCE_ROOT; };
 		65E8F05311EFF25C00BBF654 /* pios_usb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_usb.h; path = ../../PiOS/inc/pios_usb.h; sourceTree = SOURCE_ROOT; };
-		65E8F05411EFF25C00BBF654 /* pios_usb_com.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_usb_com.h; path = ../../PiOS/inc/pios_usb_com.h; sourceTree = SOURCE_ROOT; };
 		65E8F05511EFF25C00BBF654 /* pios_usb_hid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_usb_hid.h; path = ../../PiOS/inc/pios_usb_hid.h; sourceTree = SOURCE_ROOT; };
 		65E8F05611EFF25C00BBF654 /* stm32f10x_conf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stm32f10x_conf.h; path = ../../PiOS/inc/stm32f10x_conf.h; sourceTree = SOURCE_ROOT; };
 		65E8F05711EFF25C00BBF654 /* pios.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios.h; path = ../../PiOS/pios.h; sourceTree = SOURCE_ROOT; };
@@ -315,8 +323,6 @@
 		65E8F0E811EFF25C00BBF654 /* pios_spi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_spi.c; path = ../../PiOS/STM32F10x/pios_spi.c; sourceTree = SOURCE_ROOT; };
 		65E8F0E911EFF25C00BBF654 /* pios_sys.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_sys.c; path = ../../PiOS/STM32F10x/pios_sys.c; sourceTree = SOURCE_ROOT; };
 		65E8F0EA11EFF25C00BBF654 /* pios_usart.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_usart.c; path = ../../PiOS/STM32F10x/pios_usart.c; sourceTree = SOURCE_ROOT; };
-		65E8F0EB11EFF25C00BBF654 /* pios_usb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_usb.c; path = ../../PiOS/STM32F10x/pios_usb.c; sourceTree = SOURCE_ROOT; };
-		65E8F0EC11EFF25C00BBF654 /* pios_usb_com.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_usb_com.c; path = ../../PiOS/STM32F10x/pios_usb_com.c; sourceTree = SOURCE_ROOT; };
 		65E8F0ED11EFF25C00BBF654 /* pios_usb_hid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_usb_hid.c; path = ../../PiOS/STM32F10x/pios_usb_hid.c; sourceTree = SOURCE_ROOT; };
 		65E8F0EE11EFF25C00BBF654 /* startup_stm32f10x_HD.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = startup_stm32f10x_HD.S; path = ../../PiOS/STM32F10x/startup_stm32f10x_HD.S; sourceTree = SOURCE_ROOT; };
 		65E8F0EF11EFF25C00BBF654 /* startup_stm32f10x_HD_BL.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = startup_stm32f10x_HD_BL.S; path = ../../PiOS/STM32F10x/startup_stm32f10x_HD_BL.S; sourceTree = SOURCE_ROOT; };
@@ -941,6 +947,11 @@
 		65E8F03811EFF25C00BBF654 /* inc */ = {
 			isa = PBXGroup;
 			children = (
+				651CF9EF120B700D00EEFD70 /* pios_usb_hid_desc.h */,
+				651CF9F0120B700D00EEFD70 /* pios_usb_hid_istr.h */,
+				651CF9F1120B700D00EEFD70 /* pios_usb_hid_prop.h */,
+				651CF9F2120B700D00EEFD70 /* pios_usb_hid_pwr.h */,
+				651CF9F3120B700D00EEFD70 /* usb_conf.h */,
 				65E8F03911EFF25C00BBF654 /* FreeRTOSConfig.h */,
 				65E8F03A11EFF25C00BBF654 /* pios_adc.h */,
 				65E8F03B11EFF25C00BBF654 /* pios_bmp085.h */,
@@ -968,7 +979,6 @@
 				65E8F05111EFF25C00BBF654 /* pios_usart.h */,
 				65E8F05211EFF25C00BBF654 /* pios_usart_priv.h */,
 				65E8F05311EFF25C00BBF654 /* pios_usb.h */,
-				65E8F05411EFF25C00BBF654 /* pios_usb_com.h */,
 				65E8F05511EFF25C00BBF654 /* pios_usb_hid.h */,
 				65E8F05611EFF25C00BBF654 /* stm32f10x_conf.h */,
 			);
@@ -999,9 +1009,11 @@
 				65E8F0E811EFF25C00BBF654 /* pios_spi.c */,
 				65E8F0E911EFF25C00BBF654 /* pios_sys.c */,
 				65E8F0EA11EFF25C00BBF654 /* pios_usart.c */,
-				65E8F0EB11EFF25C00BBF654 /* pios_usb.c */,
-				65E8F0EC11EFF25C00BBF654 /* pios_usb_com.c */,
 				65E8F0ED11EFF25C00BBF654 /* pios_usb_hid.c */,
+				651CF9E5120B5D8300EEFD70 /* pios_usb_hid_desc.c */,
+				651CF9E6120B5D8300EEFD70 /* pios_usb_hid_istr.c */,
+				651CF9E7120B5D8300EEFD70 /* pios_usb_hid_prop.c */,
+				651CF9E8120B5D8300EEFD70 /* pios_usb_hid_pwr.c */,
 				65E8F0EE11EFF25C00BBF654 /* startup_stm32f10x_HD.S */,
 				65E8F0EF11EFF25C00BBF654 /* startup_stm32f10x_HD_BL.S */,
 				65E8F0F011EFF25C00BBF654 /* startup_stm32f10x_HD_NB.S */,

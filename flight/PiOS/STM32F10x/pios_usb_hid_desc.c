@@ -52,7 +52,7 @@ const uint8_t PIOS_HID_DeviceDescriptor[PIOS_HID_SIZ_DEVICE_DESC] =
                                              device serial number */
     0x01                        /*bNumConfigurations*/
   }
-  ; /* CustomHID_DeviceDescriptor */
+  ; /* PIOS_HID_DeviceDescriptor */
 
 
 /* USB Configuration Descriptor */
@@ -116,7 +116,7 @@ const uint8_t PIOS_HID_ConfigDescriptor[PIOS_HID_SIZ_CONFIG_DESC] =
     0x08,	/* bInterval: Polling Interval (20 ms) */
     /* 41 */
   }
-  ; /* CustomHID_ConfigDescriptor */
+  ; /* PIOS_HID_ConfigDescriptor */
 const uint8_t PIOS_HID_ReportDescriptor[PIOS_HID_SIZ_REPORT_DESC] =
   {                    
     0x06, 0x9c, 0xff,      /* USAGE_PAGE (Vendor Page: 0xFF00) */                       
@@ -145,7 +145,7 @@ const uint8_t PIOS_HID_ReportDescriptor[PIOS_HID_SIZ_REPORT_DESC] =
     /* 34 */	  
 	  
     0xc0 	          /*     END_COLLECTION	             */
-  }; /* CustomHID_ReportDescriptor */
+  }; /* PIOS_HID_ReportDescriptor */
 
 /* USB String Descriptors (optional) */
 const uint8_t PIOS_HID_StringLangID[PIOS_HID_SIZ_STRING_LANGID] =

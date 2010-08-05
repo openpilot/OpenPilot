@@ -3,7 +3,7 @@ include(../openpilotgcs.pri)
 TEMPLATE = subdirs
 SUBDIRS = openpilotgcs/translations
 
-DATACOLLECTIONS = dials models pfd sounds diagrams
+DATACOLLECTIONS = dials models pfd sounds diagrams mapicons
 
 equals(copydata, 1) {
     for(dir, DATACOLLECTIONS) {

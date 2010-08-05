@@ -33,6 +33,7 @@
 #include <iostream>
 #include <QtGui/QFileDialog>
 #include <QDebug>
+#include <QThread>
 
 
 class MyThread : public QThread

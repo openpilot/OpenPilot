@@ -47,6 +47,16 @@ GpsDisplayGadget::~GpsDisplayGadget()
  */
 void GpsDisplayGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 {
-    GpsDisplayGadgetConfiguration *m = qobject_cast<GpsDisplayGadgetConfiguration*>(config);
-    //m_widget->setSystemFile(m->getSystemFile()); // Triggers widget repaint
+    GpsDisplayGadgetConfiguration *m = qobject_cast< GpsDisplayGadgetConfiguration*>(config);
+    PortSettings portsettings;
+    portsettings.BaudRate=m->speed();
+    portsettings.DataBits=m->dataBits();
+    portsettings.FlowControl=m->flow();
+    portsettings.Parity=m->parity();
+    portsettings.StopBits=m->stopBits();
+    portsettings.Timeout_Millisec=m->timeOut();
+
+    //Creates new serial port with the user configuration and passes it to the widget
+    QextSerialPort *port=new QextSerialPort(m->port(),portsettings,QextSerialPort::Polling);
+    m_widget->setPort(port);
 }

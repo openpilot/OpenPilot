@@ -165,21 +165,72 @@ return s1.portName<s2.portName;
 //creates options page widget (uses the UI file)
 QWidget *GpsDisplayGadgetOptionsPage::createPage(QWidget *parent)
 {
-
     options_page = new Ui::GpsDisplayGadgetOptionsPage();
-    //main widget
     QWidget *optionsPageWidget = new QWidget;
-    //main layout
     options_page->setupUi(optionsPageWidget);
 
-    // Restore the contents from the settings:
-    options_page->svgFilePathChooser->setExpectedKind(Utils::PathChooser::File);
-    options_page->svgFilePathChooser->setPromptDialogFilter(tr("SVG image (*.svg)"));
-    options_page->svgFilePathChooser->setPromptDialogTitle(tr("Choose SVG image"));
-    options_page->svgFilePathChooser->setPath(m_config->getSystemFile());
+
+    // PORTS
+    QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
+    qSort(ports.begin(), ports.end(),sortPorts);
+    foreach( QextPortInfo port, ports ) {
+        qDebug() << "Adding port: " << port.friendName << " (" << port.portName << ")";
+        options_page->portComboBox->addItem(port.friendName, port.portName);
+    }
+
+    int portIndex = options_page->portComboBox->findData(m_config->port());
+    if(portIndex!=-1){
+        qDebug() << "createPage(): port is " << m_config->port();
+        options_page->portComboBox->setCurrentIndex(portIndex);
+    }
+
+    // BAUDRATES
+    options_page->portSpeedComboBox->addItems(BaudRateTypeString);
+
+    int portSpeedIndex = options_page->portSpeedComboBox->findText(BaudRateTypeStringALL.at((int)m_config->speed()));
+    if(portSpeedIndex != -1){
+       options_page->portSpeedComboBox->setCurrentIndex(portSpeedIndex);
+    }
+
+    // FLOW CONTROL
+    options_page->flowControlComboBox->addItems(FlowTypeString);
+
+    int flowControlIndex = options_page->flowControlComboBox->findText(FlowTypeString.at((int)m_config->flow()));
+    if(flowControlIndex != -1){
+       options_page->flowControlComboBox->setCurrentIndex(flowControlIndex);
+    }
+
+    // DATABITS
+    options_page->dataBitsComboBox->addItems(DataBitsTypeString);
+
+    int dataBitsIndex = options_page->dataBitsComboBox->findText(DataBitsTypeStringALL.at((int)m_config->dataBits()));
+    if(dataBitsIndex != -1){
+       options_page->dataBitsComboBox->setCurrentIndex(dataBitsIndex);
+    }
+
+    // STOPBITS
+    options_page->stopBitsComboBox->addItems(StopBitsTypeString);
+
+    int stopBitsIndex = options_page->stopBitsComboBox->findText(StopBitsTypeStringALL.at((int)m_config->stopBits()));
+    if(stopBitsIndex != -1){
+       options_page->stopBitsComboBox->setCurrentIndex(stopBitsIndex);
+    }
+
+    // PARITY
+    options_page->parityComboBox->addItems(ParityTypeString);
+
+    int parityIndex = options_page->parityComboBox->findText(ParityTypeStringALL.at((int)m_config->parity()));
+    if(parityIndex != -1){
+       options_page->parityComboBox->setCurrentIndex(parityIndex);
+    }
+
+    // TIMEOUT
+    options_page->timeoutSpinBox->setValue(m_config->timeOut());
+
 
     return optionsPageWidget;
 }
+
 /**
  * Called when the user presses apply or OK.
  *
@@ -188,9 +239,17 @@ QWidget *GpsDisplayGadgetOptionsPage::createPage(QWidget *parent)
  */
 void GpsDisplayGadgetOptionsPage::apply()
 {
-    m_config->setSystemFile(options_page->svgFilePathChooser->path());
-}
+    int portIndex = options_page->portComboBox->currentIndex();
+    m_config->setPort(options_page->portComboBox->itemData(portIndex).toString());
+    qDebug() << "apply(): port is " << m_config->port();
 
+    m_config->setSpeed((BaudRateType)BaudRateTypeStringALL.indexOf(options_page->portSpeedComboBox->currentText()));
+    m_config->setFlow((FlowType)FlowTypeString.indexOf(options_page->flowControlComboBox->currentText()));
+    m_config->setDataBits((DataBitsType)DataBitsTypeStringALL.indexOf(options_page->dataBitsComboBox->currentText()));
+    m_config->setStopBits((StopBitsType)StopBitsTypeStringALL.indexOf(options_page->stopBitsComboBox->currentText()));
+    m_config->setParity((ParityType)ParityTypeStringALL.indexOf(options_page->parityComboBox->currentText()));
+    m_config->setTimeOut( options_page->timeoutSpinBox->value());
+}
 
 void GpsDisplayGadgetOptionsPage::finish()
 {

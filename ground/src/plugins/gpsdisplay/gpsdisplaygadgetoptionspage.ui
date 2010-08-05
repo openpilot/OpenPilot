@@ -24,7 +24,7 @@
     <number>0</number>
    </property>
    <item row="0" column="0">
-    <widget class="Utils::PathChooser" name="svgFilePathChooser" native="true">
+    <widget class="QWidget" name="widget" native="true">
      <widget class="QLabel" name="label">
       <property name="geometry">
        <rect>
@@ -61,153 +61,99 @@
        <enum>Qt::Horizontal</enum>
       </property>
      </widget>
-     <widget class="QLabel" name="label_2">
+     <widget class="QWidget" name="formLayoutWidget">
       <property name="geometry">
        <rect>
-        <x>40</x>
-        <y>60</y>
-        <width>46</width>
-        <height>13</height>
+        <x>50</x>
+        <y>50</y>
+        <width>421</width>
+        <height>201</height>
        </rect>
       </property>
-      <property name="text">
-       <string>Port:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_3">
-      <property name="geometry">
-       <rect>
-        <x>160</x>
-        <y>60</y>
-        <width>61</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Port Speed:</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboBox_2">
-      <property name="geometry">
-       <rect>
-        <x>70</x>
-        <y>60</y>
-        <width>69</width>
-        <height>22</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboBox_3">
-      <property name="geometry">
-       <rect>
-        <x>230</x>
-        <y>60</y>
-        <width>69</width>
-        <height>22</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_4">
-      <property name="geometry">
-       <rect>
-        <x>320</x>
-        <y>60</y>
-        <width>71</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Flow Control:</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboBox_4">
-      <property name="geometry">
-       <rect>
-        <x>390</x>
-        <y>60</y>
-        <width>69</width>
-        <height>22</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_5">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>100</y>
-        <width>51</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Bit format:</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboBox_5">
-      <property name="geometry">
-       <rect>
-        <x>70</x>
-        <y>100</y>
-        <width>69</width>
-        <height>22</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboBox_6">
-      <property name="geometry">
-       <rect>
-        <x>150</x>
-        <y>100</y>
-        <width>69</width>
-        <height>22</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboBox_7">
-      <property name="geometry">
-       <rect>
-        <x>230</x>
-        <y>100</y>
-        <width>69</width>
-        <height>22</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboBox_8">
-      <property name="geometry">
-       <rect>
-        <x>70</x>
-        <y>140</y>
-        <width>69</width>
-        <height>22</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_6">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>140</y>
-        <width>46</width>
-        <height>13</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Timeout:</string>
-      </property>
+      <layout class="QFormLayout" name="formLayout">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+       </property>
+       <item row="1" column="0">
+        <widget class="QLabel" name="portLabel">
+         <property name="text">
+          <string>Port:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QComboBox" name="portComboBox"/>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="portSpeedLabel">
+         <property name="text">
+          <string>Port Speed:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QComboBox" name="portSpeedComboBox"/>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="flowControlLabel">
+         <property name="text">
+          <string>Flow Control:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QComboBox" name="flowControlComboBox"/>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="dataBitsLabel">
+         <property name="text">
+          <string>Data Bits:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QComboBox" name="dataBitsComboBox"/>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="stopBitsLabel">
+         <property name="text">
+          <string>Stop Bits:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QComboBox" name="stopBitsComboBox"/>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="parityLabel">
+         <property name="text">
+          <string>Parity:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="QComboBox" name="parityComboBox"/>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="timeoutLabel">
+         <property name="text">
+          <string>Timeout(ms):</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="QSpinBox" name="timeoutSpinBox">
+         <property name="maximum">
+          <number>100000</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>Utils::PathChooser</class>
-   <extends>QWidget</extends>
-   <header>utils/pathchooser.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -34,6 +34,17 @@
 #include <QtGui/QFileDialog>
 #include <QDebug>
 
+
+class MyThread : public QThread
+{
+public:
+    QextSerialPort *port;
+    void setPort(QextSerialPort* port);
+    void run();
+};
+
+
+
 /*
  * Initialize the widget
  */
@@ -61,6 +72,9 @@ GpsDisplayWidget::GpsDisplayWidget(QWidget *parent) : QWidget(parent)
     widget->gpsWorld->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
     world->setScale(factor);
 
+
+    connect(widget->connectButton, SIGNAL(clicked(bool)),
+            this,SLOT(connectButtonClicked()));
 }
 
 GpsDisplayWidget::~GpsDisplayWidget()
@@ -69,8 +83,44 @@ GpsDisplayWidget::~GpsDisplayWidget()
 }
 
 
-void GpsDisplayWidget::connectButtonClicked() {
+void GpsDisplayWidget::setPort(QextSerialPort* port)
+{
+
+    this->port=port;
 }
 
+void GpsDisplayWidget::connectButtonClicked() {
+    MyThread* myThread = new MyThread();
+    myThread->setPort(port);
+    myThread->start();
+}
+
+
+void MyThread::setPort(QextSerialPort* port)
+{
+
+    this->port=port;
+}
+
+void MyThread::run()
+{
+    qDebug() <<  "Opening.";
+
+    qDebug() <<  port->portName();
+
+    bool isOpen =  port->open(QIODevice::ReadWrite);
+    qDebug() <<  "Open: " << isOpen;
+
+    char buf[1024];
+    while(true) {
+        qDebug() <<  "Reading.";
+        qint64 bytesRead = port->readLine(buf, sizeof(buf));
+        qDebug() << "bytesRead: " << bytesRead;
+        if (bytesRead != -1) {
+            qDebug() <<  "Result: '" << buf << "'";
+        }
+        sleep(1);
+    }
+}
 
 

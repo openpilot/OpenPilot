@@ -29,30 +29,45 @@
 #define GPSDISPLAYGADGETCONFIGURATION_H
 
 #include <coreplugin/iuavgadgetconfiguration.h>
+#include <qextserialport/src/qextserialport.h>
 
 using namespace Core;
 
-/* This is a generic system health gadget displaying
-   system alarms for one or more components.
-  */
 class GpsDisplayGadgetConfiguration : public IUAVGadgetConfiguration
 {
-Q_OBJECT
-public:
-    explicit GpsDisplayGadgetConfiguration(QString classId, const QByteArray &state = 0, QObject *parent = 0);
+    Q_OBJECT
+    public:
+        explicit GpsDisplayGadgetConfiguration(QString classId, const QByteArray &state = 0, QObject *parent = 0);
 
-    //set gps display configuration functions
-    void setSystemFile(QString filename){systemFile=filename;}
+        //set port configuration functions
+        void setSpeed(BaudRateType speed) {m_defaultSpeed=speed;}
+        void setDataBits(DataBitsType databits) {m_defaultDataBits=databits;}
+        void setFlow(FlowType flow) {m_defaultFlow=flow;}
+        void setParity(ParityType parity) {m_defaultParity=parity;}
+        void setStopBits(StopBitsType stopbits) {m_defaultStopBits=stopbits;}
+        void setPort(QString port){m_defaultPort=port;}
+        void setTimeOut(long timeout){m_defaultTimeOut=timeout;}
 
-    //get dial configuration functions
-    QString getSystemFile() {return systemFile;}
+        //get port configuration functions
+        QString port(){return m_defaultPort;}
+        BaudRateType speed() {return m_defaultSpeed;}
+        FlowType flow() {return m_defaultFlow;}
+        DataBitsType dataBits() {return m_defaultDataBits;}
+        StopBitsType stopBits() {return m_defaultStopBits;}
+        ParityType parity() {return m_defaultParity;}
+        long timeOut(){return m_defaultTimeOut;}
 
-    QByteArray saveState() const;
-    IUAVGadgetConfiguration *clone();
+        QByteArray saveState() const;
+        IUAVGadgetConfiguration *clone();
 
-private:
-    // systemFile contains the source SVG:
-    QString systemFile;
+    private:
+        QString m_defaultPort;
+        BaudRateType m_defaultSpeed;
+        DataBitsType m_defaultDataBits;
+        FlowType m_defaultFlow;
+        ParityType m_defaultParity;
+        StopBitsType m_defaultStopBits;
+        long m_defaultTimeOut;
 
 };
 

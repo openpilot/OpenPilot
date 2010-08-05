@@ -48,6 +48,7 @@ public:
    ~GpsDisplayWidget();
 
 //   void setMode(QString mode);  // Either UAVTalk or serial port
+   void setPort(QextSerialPort* port);
 
 
 private slots:
@@ -55,6 +56,7 @@ private slots:
 
 private:
    Ui_GpsDisplayWidget* widget;
+   QextSerialPort *port;
    bool connected;
 
 };

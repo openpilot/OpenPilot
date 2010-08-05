@@ -41,6 +41,8 @@ PFDGadgetConfiguration::PFDGadgetConfiguration(QString classId, const QByteArray
         QDataStream stream(state);
         QString dialFile;
         stream >> dialFile;
+        stream >> useOpenGLFlag;
+        stream >> hqFonts;
         m_defaultDial=dialFile;
     }
 }
@@ -52,6 +54,8 @@ IUAVGadgetConfiguration *PFDGadgetConfiguration::clone()
 {
     PFDGadgetConfiguration *m = new PFDGadgetConfiguration(this->classId());
     m->m_defaultDial=m_defaultDial;
+    m->useOpenGLFlag = useOpenGLFlag;
+    m->hqFonts = hqFonts;
     return m;
 }
 /**
@@ -63,6 +67,8 @@ QByteArray PFDGadgetConfiguration::saveState() const
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::WriteOnly);
     stream << m_defaultDial;
+    stream << useOpenGLFlag;
+    stream << hqFonts;
 
     return bytes;
 }

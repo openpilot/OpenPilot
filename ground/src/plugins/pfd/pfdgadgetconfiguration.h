@@ -40,14 +40,20 @@ public:
 
     //set dial configuration functions
     void setDialFile(QString dialFile){m_defaultDial=dialFile;}
+    void setUseOpenGL(bool flag) { useOpenGLFlag = flag; }
+    void setHqFonts(bool flag) { hqFonts = flag; }
     //get dial configuration functions
     QString dialFile() {return m_defaultDial;}
+    bool useOpenGL() { return useOpenGLFlag; }
+    bool getHqFonts() { return hqFonts; }
 
     QByteArray saveState() const;
     IUAVGadgetConfiguration *clone();
 
 private:
     QString m_defaultDial; // The name of the dial's SVG source file
+    bool useOpenGLFlag;
+    bool hqFonts;
 };
 
 #endif // PFDGADGETCONFIGURATION_H

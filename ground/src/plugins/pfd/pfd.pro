@@ -1,6 +1,7 @@
 TEMPLATE = lib
 TARGET = PFDGadget
 QT += svg
+QT += opengl
 include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
 include(pfd_dependencies.pri)

@@ -29,6 +29,8 @@
 #include <utils/stylehelper.h>
 #include <iostream>
 #include <QDebug>
+#include <QPainter>
+#include <QtOpenGL/QGLWidget>
 #include <cmath>
 
 PFDGadgetWidget::PFDGadgetWidget(QWidget *parent) : QGraphicsView(parent)
@@ -37,8 +39,12 @@ PFDGadgetWidget::PFDGadgetWidget(QWidget *parent) : QGraphicsView(parent)
     setMinimumSize(64,64);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setScene(new QGraphicsScene(this));
-    //setRenderHints(QPainter::Antialiasing || QPainter::TextAntialiasing);
+//    setRenderHint(QPainter::SmoothPixmapTransform);
+
+    setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+    //setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
     //setRenderHints(QPainter::TextAntialiasing);
+    //setRenderHints(QPainter::HighQualityAntialiasing);
 
     m_renderer = new QSvgRenderer();
 
@@ -47,6 +53,7 @@ PFDGadgetWidget::PFDGadgetWidget(QWidget *parent) : QGraphicsView(parent)
     gcsBatteryObj = NULL;
     compassBandWidth = 0;
     pfdError = true;
+    hqFonts = false;
     rollTarget = 0;
     rollValue = 0;
     pitchTarget = 0;
@@ -60,13 +67,28 @@ PFDGadgetWidget::PFDGadgetWidget(QWidget *parent) : QGraphicsView(parent)
 
     // This timer mechanism makes needles rotate smoothly
     connect(&dialTimer, SIGNAL(timeout()), this, SLOT(moveNeedles()));
-    dialTimer.start(20);
+    dialTimer.start(30);
+
+    connect(&skyDialTimer, SIGNAL(timeout()), this, SLOT(moveSky()));
+    skyDialTimer.start(30);
 
 }
 
 PFDGadgetWidget::~PFDGadgetWidget()
 {
-   // Do nothing
+    skyDialTimer.stop();
+    dialTimer.stop();
+}
+
+/*!
+  \brief Enables/Disables OpenGL
+  */
+void PFDGadgetWidget::enableOpenGL(bool flag) {
+    if (flag) {
+        setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+    } else {
+        setViewport(new QWidget);
+    }
 }
 
 /*!
@@ -160,11 +182,10 @@ void PFDGadgetWidget::updateLinkStatus(UAVObject *object1) {
   \brief Reads the updated attitude and computes the new display position
   */
 void PFDGadgetWidget::updateAttitude(UAVObject *object1) {
+    //qDebug() << "UpdateAttitude -";
+    UAVObjectField* field = object1->getField(QString("Roll"));
+    UAVObjectField* field2 = object1->getField(QString("Pitch"));
     // Double check that the field exists:
-    QString roll = QString("Roll");
-    QString pitch = QString("Pitch");
-    UAVObjectField* field = object1->getField(roll);
-    UAVObjectField* field2 = object1->getField(pitch);
     if (field && field2) {
         // These factors assume some things about the PFD SVG, namely:
         // - Roll value in degrees
@@ -172,10 +193,11 @@ void PFDGadgetWidget::updateAttitude(UAVObject *object1) {
         //   7.5 pixels per pitch degree.
     	// TODO: loosen this constraint and only require a +/- 20 deg range,
     	//       and compute the height from the SVG element.
-        rollTarget = field->getDouble()*(-1);
-        pitchTarget = field2->getDouble()*7.5;
-        if (!dialTimer.isActive())
-            dialTimer.start(); // Rearm the dial Timer which might be stopped.
+        // Also: truncate to 2 decimals, to avoid unnecessary redraws
+        rollTarget = -floor(field->getDouble()*100)/100;
+        pitchTarget = floor(field2->getDouble()*750)/100;
+//        if (!skyDialTimer.isActive())
+//            skyDialTimer.start(); // Rearm the dial Timer which might be stopped.
     } else {
         qDebug() << "UpdateAttitude: Wrong field, maybe an issue with object disconnection ?";
     }
@@ -209,6 +231,7 @@ void PFDGadgetWidget::updateHeading(UAVObject *object1) {
         } else if (((headingValue - headingTarget)/fac < -180)) {
             headingTarget -= 360*fac;
         }
+        headingTarget = floor(headingTarget*10)/10; // Avoid stupid redraws
     } else {
         qDebug() << "UpdateHeading: Wrong field, maybe an issue with object disconnection ?";
     }
@@ -218,13 +241,13 @@ void PFDGadgetWidget::updateHeading(UAVObject *object1) {
         // The speed scale represents 30km/h (6 * 5)
         // 3.6 : convert m/s to km/h
         double val = field->getDouble();
-        groundspeedTarget = 3.6*val*speedScaleHeight/(30);
+        groundspeedTarget = floor(360*val*speedScaleHeight/(30))/100;
     }
     fieldname = QString("Altitude");
     field = object1->getField(fieldname);
     if (field) {
         // The altitude scale represents 30 meters
-        altitudeTarget = field->getDouble()*altitudeScaleHeight/(30);
+        altitudeTarget = floor(field->getDouble()*altitudeScaleHeight*3)/100;
     }
 
     // GPS Stats
@@ -236,7 +259,10 @@ void PFDGadgetWidget::updateHeading(UAVObject *object1) {
         if (field && field1) {
             QString s = QString("GPS: ") + field->getValue().toString() + "\nHDP: "
                         + field1->getValue().toString();
-            gcsGPSStats->setPlainText(s);
+            if (s != satString) {
+                gcsGPSStats->setPlainText(s);
+                satString = s;
+            }
         }
     }
 
@@ -279,7 +305,10 @@ void PFDGadgetWidget::updateBattery(UAVObject *object1) {
         double v1 = field2->getDouble();
         double v2 = field3->getDouble();
         s.sprintf("%.2fV\n%.2fA\n%.0fmAh",v0,v1,v2);
-        gcsBatteryStats->setPlainText(s);
+        if (s != batString) {
+            gcsBatteryStats->setPlainText(s);
+            batString = s;
+        }
     } else {
         qDebug() << "UpdateBattery: Wrong field, maybe an issue with object disconnection ?";
     }
@@ -423,7 +452,6 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          startX = compassMatrix.mapRect(m_renderer->boundsOnElement("speed-bg")).width();
          startX -= m_renderer->matrixForElement("speed-scale").mapRect(
                         m_renderer->boundsOnElement("speed-scale")).width();
-         //speedscalelines->setParentItem(verticalbg);
          matrix.reset();
          matrix.translate(startX,0);
          speedscalelines->setTransform(matrix,false);
@@ -435,6 +463,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          QGraphicsTextItem *speed0 = new QGraphicsTextItem("0");
          speed0->setDefaultTextColor(QColor("White"));
          speed0->setFont(QFont("Arial",(int) speedScaleHeight/30));
+         if (hqFonts) speed0->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
          matrix.reset();
          matrix.translate(compassMatrix.mapRect(m_renderer->boundsOnElement("speed-bg")).width()/10,-speedScaleHeight/30);
          speed0->setTransform(matrix,false);
@@ -445,6 +474,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
              speed0->setDefaultTextColor(QColor("White"));
              speed0->setFont(QFont("Arial",(int) speedScaleHeight/30));
              speed0->setPlainText(QString().setNum(i*5+1));
+             if (hqFonts) speed0->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
              matrix.translate(0,speedScaleHeight/6);
              speed0->setTransform(matrix,false);
              speed0->setParentItem(verticalbg);
@@ -475,7 +505,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          m_speedtext = new QGraphicsTextItem("0000");
          m_speedtext->setDefaultTextColor(QColor("White"));
          m_speedtext->setFont(QFont("Arial",(int) speedWindowHeight/2));
-         matrix.reset();
+         if (hqFonts)  m_speedtext->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
          m_speedtext->setParentItem(speedwindow);
 
          ////////////////////
@@ -513,6 +543,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          speed0 = new QGraphicsTextItem("XXXX");
          speed0->setDefaultTextColor(QColor("White"));
          speed0->setFont(QFont("Arial",(int) altitudeScaleHeight/30));
+         if (hqFonts) speed0->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
          matrix.reset();
          matrix.translate(m_renderer->matrixForElement("altitude-scale").mapRect(m_renderer->boundsOnElement("altitude-scale")).width()
                           + m_renderer->matrixForElement("altitude-bg").mapRect(m_renderer->boundsOnElement("altitude-bg")).width()/10,-altitudeScaleHeight/30);
@@ -524,6 +555,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
              speed0->setDefaultTextColor(QColor("White"));
              speed0->setFont(QFont("Arial",(int) altitudeScaleHeight/30));
              speed0->setPlainText(QString().setNum(i*5+1));
+             if (hqFonts) speed0->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
              matrix.translate(0,altitudeScaleHeight/6);
              speed0->setTransform(matrix,false);
              speed0->setParentItem(verticalbg);
@@ -554,6 +586,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
          m_altitudetext = new QGraphicsTextItem("0000");
          m_altitudetext->setDefaultTextColor(QColor("White"));
          m_altitudetext->setFont(QFont("Arial",(int) altitudeWindowHeight/2));
+         if (hqFonts)  m_altitudetext->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
          m_altitudetext->setParentItem(altitudewindow);
          startX = compassMatrix.mapRect(m_renderer->boundsOnElement("altitude-window")).width()/10;
          matrix.reset();
@@ -586,6 +619,7 @@ void PFDGadgetWidget::setDialFile(QString dfn)
              gcsTelemetryStats = new QGraphicsTextItem();
              gcsTelemetryStats->setDefaultTextColor(QColor("White"));
              gcsTelemetryStats->setFont(QFont("Arial",(int) linkRateHeight));
+             if (hqFonts)  gcsTelemetryStats->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
              l_scene->addItem(gcsTelemetryStats);
              matrix.reset();
              matrix.translate(startX,startY-linkRateHeight/2);
@@ -616,9 +650,10 @@ void PFDGadgetWidget::setDialFile(QString dfn)
              startX = compassMatrix.mapRect(m_renderer->boundsOnElement("battery-txt")).x();
              startY = compassMatrix.mapRect(m_renderer->boundsOnElement("battery-txt")).y();
              qreal batStatHeight = compassMatrix.mapRect(m_renderer->boundsOnElement("battery-txt")).height();
-             gcsBatteryStats = new QGraphicsTextItem();
+             gcsBatteryStats = new QGraphicsTextItem("Battery");
              gcsBatteryStats->setDefaultTextColor(QColor("White"));
              gcsBatteryStats->setFont(QFont("Arial",(int) batStatHeight));
+             if (hqFonts) gcsBatteryStats->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
              l_scene->addItem(gcsBatteryStats);
              matrix.reset();
              matrix.translate(startX,startY-batStatHeight/2);
@@ -648,9 +683,10 @@ void PFDGadgetWidget::setDialFile(QString dfn)
              startX = compassMatrix.mapRect(m_renderer->boundsOnElement("gps-txt")).x();
              startY = compassMatrix.mapRect(m_renderer->boundsOnElement("gps-txt")).y();
              qreal gpsStatHeight = compassMatrix.mapRect(m_renderer->boundsOnElement("gps-txt")).height();
-             gcsGPSStats = new QGraphicsTextItem();
+             gcsGPSStats = new QGraphicsTextItem("GPS");
              gcsGPSStats->setDefaultTextColor(QColor("White"));
              gcsGPSStats->setFont(QFont("Arial",(int) gpsStatHeight));
+             if (hqFonts) gcsGPSStats->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
              l_scene->addItem(gcsGPSStats);
              matrix.reset();
              matrix.translate(startX,startY-gpsStatHeight/2);
@@ -711,12 +747,11 @@ void PFDGadgetWidget::setDialFile(QString dfn)
 
 void PFDGadgetWidget::paint()
 {
-    update();
+   // update();
 }
 
 void PFDGadgetWidget::paintEvent(QPaintEvent *event)
 {
-    Q_UNUSED(event);
     // Skip painting until the dial file is loaded
     if (! m_renderer->isValid()) {
         qDebug() << "Dial file not loaded, not rendering";
@@ -742,20 +777,14 @@ void PFDGadgetWidget::moveVerticalScales() {
 
 }
 
-// Take an input value and move the elements accordingly.
-// Movement is smooth, starts fast and slows down when
-// approaching the target.
-//
-void PFDGadgetWidget::moveNeedles()
-{
-    int dialCount = 5; // Gets decreased by one for each element
+void PFDGadgetWidget::moveSky() {
+    int dialCount = 2; // Gets decreased by one for each element
                        // which has finished moving
-
+//    qDebug() << "MoveSky";
     /// TODO: optimize!!!
-
     if (pfdError) {
-    	dialTimer.stop();
-    	return;
+        //skyDialTimer.stop();
+        return;
     }
 
     //////
@@ -764,6 +793,7 @@ void PFDGadgetWidget::moveNeedles()
     if (rollValue != rollTarget) {
         double rollDiff;
         if ((abs((rollValue-rollTarget)*10) > 5)) {
+//        if (0) {
             rollDiff =(rollTarget - rollValue)/5;
         } else {
             rollDiff = rollTarget - rollValue;
@@ -782,6 +812,7 @@ void PFDGadgetWidget::moveNeedles()
     if (pitchValue != pitchTarget) {
         double pitchDiff;
         if ((abs((pitchValue-pitchTarget)*10) > 5)) {
+  //      if (0) {
             pitchDiff = (pitchTarget - pitchValue)/5;
         } else {
             pitchDiff = pitchTarget - pitchValue;
@@ -794,6 +825,31 @@ void PFDGadgetWidget::moveNeedles()
         pitchValue += pitchDiff;
     } else {
         dialCount--;
+    }
+
+    if (dialCount)
+        scene()->update(sceneRect());
+  //  if (!dialCount)
+  //      skyDialTimer.stop();
+
+}
+
+
+// Take an input value and move the elements accordingly.
+// Movement is smooth, starts fast and slows down when
+// approaching the target.
+//
+void PFDGadgetWidget::moveNeedles()
+{
+    int dialCount = 3; // Gets decreased by one for each element
+                       // which has finished moving
+
+//    qDebug() << "MoveNeedles";
+    /// TODO: optimize!!!
+
+    if (pfdError) {
+    	dialTimer.stop();
+    	return;
     }
 
     //////
@@ -905,4 +961,6 @@ void PFDGadgetWidget::moveNeedles()
 
    if (!dialCount)
        dialTimer.stop();
+   else
+       scene()->update(sceneRect());
 }

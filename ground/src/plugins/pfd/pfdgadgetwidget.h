@@ -50,6 +50,8 @@ public:
    void paint();
    // Sets up needle/UAVObject connections:
    void connectNeedles();
+   void enableOpenGL(bool flag);
+   void setHqFonts(bool flag) { hqFonts = flag; }
 
 public slots:
    void updateAttitude(UAVObject *object1);
@@ -67,6 +69,7 @@ protected:
 private slots:
    void moveNeedles();
    void moveVerticalScales();
+   void moveSky();
 
 private:
    QSvgRenderer *m_renderer;
@@ -128,9 +131,15 @@ private:
 
    // Rotation timer
    QTimer dialTimer;
+   QTimer skyDialTimer;
+
+   QString satString;
+   QString batString;
 
    // Flag to check for pfd Error
    bool pfdError;
+   // Flag to enable better rendering of fonts in OpenGL
+   bool hqFonts;
 
 };
 #endif /* PFDGADGETWIDGET_H_ */

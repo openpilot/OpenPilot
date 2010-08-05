@@ -57,6 +57,8 @@ QWidget *PFDGadgetOptionsPage::createPage(QWidget *parent)
 
     // Restore the contents from the settings:
     options_page->svgSourceFile->setText(m_config->dialFile());
+    options_page->useOpenGL->setChecked(m_config->useOpenGL());
+    options_page->hqText->setChecked(m_config->getHqFonts());
 
     connect(options_page->loadFile, SIGNAL(clicked()), this, SLOT(on_loadFile_clicked()));
     return optionsPageWidget;
@@ -71,6 +73,8 @@ QWidget *PFDGadgetOptionsPage::createPage(QWidget *parent)
 void PFDGadgetOptionsPage::apply()
 {
     m_config->setDialFile(options_page->svgSourceFile->text());
+    m_config->setUseOpenGL(options_page->useOpenGL->checkState());
+    m_config->setHqFonts(options_page->hqText->checkState());
 }
 
 

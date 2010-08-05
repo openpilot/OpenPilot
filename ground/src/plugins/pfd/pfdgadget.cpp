@@ -48,7 +48,8 @@ PFDGadget::~PFDGadget()
 void PFDGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 {
     PFDGadgetConfiguration *m = qobject_cast<PFDGadgetConfiguration*>(config);
+    m_widget->setHqFonts(m->getHqFonts());
     m_widget->setDialFile(m->dialFile());
-
-      m_widget->connectNeedles();
+    m_widget->enableOpenGL(m->useOpenGL());
+    m_widget->connectNeedles();
 }

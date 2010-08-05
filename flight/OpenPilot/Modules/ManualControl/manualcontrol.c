@@ -88,7 +88,7 @@ static void manualControlTask(void* parameters)
 	{
 		// Wait until next update
 		vTaskDelayUntil(&lastSysTime, UPDATE_PERIOD_MS / portTICK_RATE_MS );
-
+    
 		// Read settings
 		ManualControlSettingsGet(&settings);
 		StabilizationSettingsGet(&stabSettings);
@@ -174,6 +174,10 @@ static void manualControlTask(void* parameters)
 
 		// Update the ManualControlCommand object
 		ManualControlCommandSet(&cmd);
+    // This seems silly to set then get, but the reason is if the GCS is 
+    // the control input, the set command will be blocked by the read only
+    // setting and the get command will pull the right values from telemetry
+		ManualControlCommandGet(&cmd);
 
 		// Depending on the mode update the Stabilization or Actuator objects
 		if ( cmd.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL )

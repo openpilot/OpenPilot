@@ -36,6 +36,7 @@
 
 #include <QFile>
 #include <QTimer>
+#include "buffer.h"
 
 class Ui_GpsDisplayWidget;
 
@@ -49,7 +50,13 @@ public:
 
 //   void setMode(QString mode);  // Either UAVTalk or serial port
    void setPort(QextSerialPort* port);
-
+   char* nmeaGetPacketBuffer(void);
+   char nmeaChecksum(char* gps_buffer);
+   uint8_t nmeaProcess(cBuffer* rxBuffer);
+   void nmeaProcessGPGGA(char* packet);
+   void nmeaProcessGPRMC(char* packet);
+   void nmeaProcessGPVTG(char* packet);
+   void nmeaProcessGPGSA(char* packet);
 
 private slots:
    void connectButtonClicked();

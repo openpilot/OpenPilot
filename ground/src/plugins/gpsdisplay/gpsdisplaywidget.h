@@ -36,6 +36,7 @@
 
 #include <QFile>
 #include <QTimer>
+#include <stdint.h>
 #include "buffer.h"
 
 class Ui_GpsDisplayWidget;

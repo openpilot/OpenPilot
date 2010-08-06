@@ -38,7 +38,7 @@
 
 
 
-class MyThread : public QThread
+class GpsDisplayThread : public QThread
 {
 public:
     QextSerialPort *port;
@@ -95,19 +95,19 @@ void GpsDisplayWidget::setPort(QextSerialPort* port)
 }
 
 void GpsDisplayWidget::connectButtonClicked() {
-    MyThread* myThread = new MyThread();
-    myThread->setPort(port);
-    myThread->start();
+    GpsDisplayThread* gpsThread = new GpsDisplayThread();
+    gpsThread->setPort(port);
+    gpsThread->start();
 }
 
 
-void MyThread::setPort(QextSerialPort* port)
+void GpsDisplayThread::setPort(QextSerialPort* port)
 {
 
     this->port=port;
 }
 
-void MyThread::run()
+void GpsDisplayThread::run()
 {
     qDebug() <<  "Opening.";
 

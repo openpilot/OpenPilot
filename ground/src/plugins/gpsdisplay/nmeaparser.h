@@ -7,7 +7,7 @@
  * @{
  * @addtogroup GPSGadgetPlugin GPS Gadget Plugin
  * @{
- * @brief A gadget that displays GPS status and enables basic configuration 
+ * @brief A gadget that displays GPS status and enables basic configuration
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -25,38 +25,27 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef GPSDISPLAYWIDGET_H_
-#define GPSDISPLAYWIDGET_H_
+#ifndef NMEAPARSER_H
+#define NMEAPARSER_H
 
-#include "gpsdisplaygadgetconfiguration.h"
-#include "uavobjects/uavobject.h"
-#include <QGraphicsView>
-#include <QtSvg/QSvgRenderer>
-#include <QtSvg/QGraphicsSvgItem>
+#include <stdint.h>
+#include "buffer.h"
 
-#include <QFile>
-#include <QTimer>
 
-class Ui_GpsDisplayWidget;
-
-class GpsDisplayWidget : public QWidget
+class NMEAParser
 {
-    Q_OBJECT
-
 public:
-    GpsDisplayWidget(QWidget *parent = 0);
-   ~GpsDisplayWidget();
-
-//   void setMode(QString mode);  // Either UAVTalk or serial port
-   void setPort(QextSerialPort* port);
-
-private slots:
-   void connectButtonClicked();
-
-private:
-   Ui_GpsDisplayWidget* widget;
-   QextSerialPort *port;
-   bool connected;
+    NMEAParser();
+   ~NMEAParser();
+   void processInputStream(char c);
+   char* nmeaGetPacketBuffer(void);
+   char nmeaChecksum(char* gps_buffer);
+   uint8_t nmeaProcess(cBuffer* rxBuffer);
+   void nmeaProcessGPGGA(char* packet);
+   void nmeaProcessGPRMC(char* packet);
+   void nmeaProcessGPVTG(char* packet);
+   void nmeaProcessGPGSA(char* packet);
 
 };
-#endif /* GPSDISPLAYWIDGET_H_ */
+
+#endif // NMEAPARSER_H

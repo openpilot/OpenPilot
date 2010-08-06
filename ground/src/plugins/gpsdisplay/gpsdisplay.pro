@@ -6,14 +6,16 @@ include(../../plugins/coreplugin/coreplugin.pri)
 include(gpsdisplay_dependencies.pri)
 include(../../libs/qwt/qwt.pri)
 HEADERS += gpsdisplayplugin.h \
-    buffer.h
+    buffer.h \
+    nmeaparser.h
 HEADERS += gpsdisplaygadget.h
 HEADERS += gpsdisplaywidget.h
 HEADERS += gpsdisplaygadgetfactory.h
 HEADERS += gpsdisplaygadgetconfiguration.h
 HEADERS += gpsdisplaygadgetoptionspage.h
 SOURCES += gpsdisplayplugin.cpp \
-    buffer.cpp
+    buffer.cpp \
+    nmeaparser.cpp
 SOURCES += gpsdisplaygadget.cpp
 SOURCES += gpsdisplaygadgetfactory.cpp
 SOURCES += gpsdisplaywidget.cpp

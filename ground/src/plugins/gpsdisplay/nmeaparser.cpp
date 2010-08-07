@@ -1,8 +1,8 @@
 /**
  ******************************************************************************
  *
- * @file       gpsdisplaywidget.cpp
- * @author     Edouard Lafargue Copyright (C) 2010.
+ * @file       nmeaparser.cpp
+ * @author     Sami Korhonen Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup GPSGadgetPlugin GPS Gadget Plugin
@@ -27,18 +27,6 @@
 
 
 #include "nmeaparser.h"
-#include "ui_gpsdisplaywidget.h"
-#include "extensionsystem/pluginmanager.h"
-#include "uavobjects/uavobjectmanager.h"
-
-#include <iostream>
-#include <QtGui/QFileDialog>
-#include <QDebug>
-#include <QThread>
-
-
-// constants/macros/typdefs
-#define NMEA_BUFFERSIZE		128
 
 // Message Codes
 #define NMEA_NODATA		0	// No data. Packet not available, bad, or not decoded
@@ -55,6 +43,7 @@
 // Debugging
 
 //#define GPSDEBUG
+#define NMEA_DEBUG_PKT	///< define to enable debug of all NMEA messages
 
 #ifdef GPSDEBUG
         #define NMEA_DEBUG_PKT	///< define to enable debug of all NMEA messages
@@ -64,42 +53,13 @@
         #define NMEA_DEBUG_GSA	///< define to enable debug of GSA messages
 #endif
 
-// Private functions
-
-// Global variables
-
-// Private constants
-typedef struct struct_GpsData
-{
-        float Latitude;
-        float Longitude;
-        float Altitude;
-        float Groundspeed;
-        int SV;
-        uint8_t channel;
-        uint8_t value_h;
-        uint8_t value_l;
-        uint8_t sum;
-}GpsData_t;
-
-// Private types
-
-// Private variables
-cBuffer gpsRxBuffer;
-static char gpsRxData[512];
-char NmeaPacket[NMEA_BUFFERSIZE];
-static uint32_t numUpdates;
-static uint32_t numErrors;
-static uint32_t timeOfLastUpdateMs;
-static int32_t gpsRxOverflow=0;
-GpsData_t GpsData;
-
-/*
- * Initialize the widget
+/**
+ * Initialize the parser
  */
 NMEAParser::NMEAParser()
 {
     bufferInit(&gpsRxBuffer, (unsigned char *)gpsRxData, 512);
+    gpsRxOverflow=0;
 }
 
 /**
@@ -107,7 +67,6 @@ NMEAParser::NMEAParser()
  */
 void NMEAParser::processInputStream(char c)
 {
-        //quint8 tmp;
         if( !bufferAddToEnd(&gpsRxBuffer, c) )
         {
                 // no space in buffer
@@ -144,7 +103,6 @@ char NMEAParser::nmeaChecksum(char* gps_buffer)
                         checksum^=gps_buffer[x];
                 }
         }
-        //PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"$%d=%d\r\n",checksum_received,checksum);
         if(checksum == checksum_received)
         {
                 ++numUpdates;
@@ -297,123 +255,6 @@ void NMEAParser::nmeaProcessGPGGA(char* packet)
         GpsData.Longitude = tokenslist.at(4).toFloat();
         GpsData.Altitude = tokenslist.at(9).toFloat();
         GpsData.SV = tokenslist.at(7).toInt();
-
-/*
-        char *tokens;
-    char *delimiter = ",";
-    char *pEnd;
-    char token_length=0;
-
-    long deg,min,desim;
-
-        #ifdef NMEA_DEBUG_GGA
-                PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"$%s\r\n",packet);
-        #endif
-
-        // start parsing just after "GPGGA,"
-        // attempt to reject empty packets right away
-        if(packet[6]==',' && packet[7]==',')
-                return;
-
-        if(!nmeaChecksum(packet))
-        {
-                // checksum not valid
-                return;
-        }
-
-        // tokenizer for nmea sentence
-        //GPGGA header
-        tokens = strsep(&packet, delimiter);
-
-        // get UTC time [hhmmss.sss]
-        tokens = strsep(&packet, delimiter);
-        //strcpy(GpsInfo.TimeOfFix,tokens);
-
-        // next field: latitude
-    // get latitude [ddmm.mmmmm]
-        tokens = strsep(&packet, delimiter);
-        token_length=strlen(tokens);
-        deg=strtol (tokens,&pEnd,10);
-        min=deg%100;
-        deg=deg/100;
-        desim=strtol (pEnd+1,NULL,10);
-        if(token_length==10)// 5 desimal output
-        {
-                GpsData.Latitude=deg+(min+desim/100000.0)/60.0; // to desimal degrees
-        }
-        else if(token_length==9) // 4 desimal output
-        {
-                GpsData.Latitude=deg+(min+desim/10000.0)/60.0; // to desimal degrees
-        }
-        else if(token_length==11) // 6 desimal output OPGPS
-        {
-                GpsData.Latitude=deg+(min+desim/1000000.0)/60.0; // to desimal degrees
-        }
-
-    // next field: N/S indicator
-        // correct latitute for N/S
-        tokens = strsep(&packet, delimiter);
-        if(tokens[0] == 'S') GpsData.Latitude = -GpsData.Latitude;
-
-        // next field: longitude
-        // get longitude [dddmm.mmmmm]
-        tokens = strsep(&packet, delimiter);
-        token_length=strlen(tokens);
-        deg=strtol (tokens,&pEnd,10);
-        min=deg%100;
-        deg=deg/100;
-        desim=strtol (pEnd+1,NULL,10);
-        if(token_length==11)// 5 desimal output
-        {
-                GpsData.Longitude=deg+(min+desim/100000.0)/60.0; // to desimal degrees
-        }
-        else if(token_length==10) // 4 desimal output
-        {
-                GpsData.Longitude=deg+(min+desim/10000.0)/60.0; // to desimal degrees
-        }
-        else if(token_length==12) // 6 desimal output OPGPS
-        {
-                GpsData.Longitude=deg+(min+desim/1000000.0)/60.0; // to desimal degrees
-        }
-    // next field: E/W indicator
-        // correct latitute for E/W
-        tokens = strsep(&packet, delimiter);
-        if(tokens[0] == 'W') GpsData.Longitude = -GpsData.Longitude;
-
-    // next field: position fix status
-        // position fix status
-        // 0 = Invalid, 1 = Valid SPS, 2 = Valid DGPS, 3 = Valid PPS
-        // check for good position fix
-        tokens = strsep(&packet, delimiter);
-    //if((tokens[0] != '0') || (tokens[0] != 0))
-    //	GpsData.Updates++;
-
-    // next field: satellites used
-    // get number of satellites used in GPS solution
-    tokens = strsep(&packet, delimiter);
-        GpsData.Satellites=atoi(tokens);
-
-        // next field: HDOP (horizontal dilution of precision)
-        tokens = strsep(&packet, delimiter);
-
-        // next field: altitude
-        // get altitude (in meters mm.m)
-        tokens = strsep(&packet, delimiter);
-        //reuse variables for alt
-        deg=strtol (tokens,&pEnd,10); // always 0.1m resolution?
-        desim=strtol (pEnd+1,NULL,10);
-        if(1) // OPGPS 3 desimal
-                GpsData.Altitude=deg+desim/1000.0;
-        else
-                GpsData.Altitude=deg+desim/10.0;
-
-        // next field: altitude units, always 'M'
-        // next field: geoid seperation
-        // next field: seperation units
-        // next field: DGPS age
-        // next field: DGPS station ID
-        // next field: checksum
-        */
 }
 
 /**
@@ -435,115 +276,8 @@ void NMEAParser::nmeaProcessGPRMC(char* packet)
 
         QString* nmeaString = new QString( packet );
         QStringList tokenslist = nmeaString->split(",");
-        GpsData.Groundspeed = tokenslist.at(7).toFloat();//(deg+(desim/100.0))*0.51444; //OPGPS style to m/s
-        GpsData.Groundspeed = GpsData.Groundspeed*0.51444*3.6;
-
-/*
-        char *tokens;
-    char *delimiter = ",";
-    char *pEnd;
-    char token_length=0;
-
-    long deg,min,desim;
-
-        #ifdef NMEA_DEBUG_RMC
-                PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"$%s\r\n",packet);
-        #endif
-
-        // start parsing just after "GPRMC,"
-        // attempt to reject empty packets right away
-        if(packet[6]==',' && packet[7]==',')
-                return;
-
-        if(!nmeaChecksum(packet))
-        {
-                // checksum not valid
-                return;
-        }
-
-        // tokenizer for nmea sentence
-        //GPRMC header
-        tokens = strsep(&packet, delimiter);
-
-        // get UTC time [hhmmss.sss]
-        tokens = strsep(&packet, delimiter);
-        //strcpy(GpsInfo.TimeOfFix,tokens);
-        // next field: Navigation receiver warning A = OK, V = warning
-        tokens = strsep(&packet, delimiter);
-
-        // next field: latitude
-    // get latitude [ddmm.mmmmm]
-        tokens = strsep(&packet, delimiter);
-        token_length=strlen(tokens);
-        deg=strtol (tokens,&pEnd,10);
-        min=deg%100;
-        deg=deg/100;
-        desim=strtol (pEnd+1,NULL,10);
-        /*if(token_length==10)// 5 desimal output
-        {
-                GpsData.Latitude=deg+(min+desim/100000.0)/60.0; // to desimal degrees
-        }
-        else if(token_length==9) // 4 desimal output
-        {
-                GpsData.Latitude=deg+(min+desim/10000.0)/60.0; // to desimal degrees
-        }
-        else if(token_length==11) // 6 desimal output OPGPS
-        {
-                GpsData.Latitude=deg+(min+desim/1000000.0)/60.0; // to desimal degrees
-        }*
-
-    // next field: N/S indicator
-        // correct latitute for N/S
-        tokens = strsep(&packet, delimiter);
-        //if(tokens[0] == 'S') GpsData.Latitude = -GpsData.Latitude;
-
-        // next field: longitude
-        // get longitude [dddmm.mmmmm]
-        tokens = strsep(&packet, delimiter);
-        token_length=strlen(tokens);
-        deg=strtol (tokens,&pEnd,10);
-        min=deg%100;
-        deg=deg/100;
-        desim=strtol (pEnd+1,NULL,10);
-        /*if(token_length==11)// 5 desimal output
-        {
-                GpsData.Longitude=deg+(min+desim/100000.0)/60.0; // to desimal degrees
-        }
-        else if(token_length==10) // 4 desimal output
-        {
-                GpsData.Longitude=deg+(min+desim/10000.0)/60.0; // to desimal degrees
-        }
-        else if(token_length==12) // 6 desimal output OPGPS
-        {
-                GpsData.Longitude=deg+(min+desim/1000000.0)/60.0; // to desimal degrees
-        }*
-    // next field: E/W indicator
-        // correct latitute for E/W
-        tokens = strsep(&packet, delimiter);
-        //if(tokens[0] == 'W') GpsData.Longitude = -GpsData.Longitude;
-
-        // next field: speed (knots)
-        // get speed in knots
-        tokens = strsep(&packet, delimiter);
-        deg=strtol (tokens,&pEnd,10);
-        desim=strtol (pEnd+1,NULL,10);
-        GpsData.Groundspeed = (deg+(desim/100.0))*0.51444; //OPGPS style to m/s
-
-        // next field: True course
-        // get True course
-        tokens = strsep(&packet, delimiter);
-        deg=strtol (tokens,&pEnd,10);
-        desim=strtol (pEnd+1,NULL,10);
-        GpsData.Heading = deg+(desim/100.0); //OPGPS style
-
-        // next field: Date of fix
-        // get Date of fix
-        tokens = strsep(&packet, delimiter);
-
-        // next field: Magnetic variation
-        // next field: E or W
-        // next field: checksum
-        */
+        GpsData.Groundspeed = tokenslist.at(7).toFloat();
+        GpsData.Groundspeed = GpsData.Groundspeed*0.51444;
 }
 
 
@@ -563,52 +297,9 @@ void NMEAParser::nmeaProcessGPVTG(char* packet)
                 // checksum not valid
                 return;
         }
-/*
-        char *tokens;
-    char *delimiter = ",";
 
-        #ifdef NMEA_DEBUG_VTG
-                PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"$%s\r\n",packet);
-        #endif
-
-        // start parsing just after "GPVTG,"
-        // attempt to reject empty packets right away
-        if(packet[6]==',' && packet[7]==',')
-                return;
-
-        if(!nmeaChecksum(packet))
-        {
-                // checksum not valid
-                return;
-        }
-        // tokenizer for nmea sentence
-
-        //GPVTG header
-        tokens = strsep(&packet, delimiter);
-
-        // get course (true north ref) in degrees [ddd.dd]
-        tokens = strsep(&packet, delimiter);
-    // next field: 'T'
-        tokens = strsep(&packet, delimiter);
-
-    // next field: course (magnetic north)
-        // get course (magnetic north ref) in degrees [ddd.dd]
-        tokens = strsep(&packet, delimiter);
-        // next field: 'M'
-        tokens = strsep(&packet, delimiter);
-
-        // next field: speed (knots)
-        // get speed in knots
-        tokens = strsep(&packet, delimiter);
-        // next field: 'N'
-        tokens = strsep(&packet, delimiter);
-
-        // next field: speed (km/h)
-        // get speed in km/h
-        tokens = strsep(&packet, delimiter);
-        // next field: 'K'
-        // next field: checksum
-*/
+        QString* nmeaString = new QString( packet );
+        QStringList tokenslist = nmeaString->split(",");
 }
 
 /**
@@ -627,83 +318,9 @@ void NMEAParser::nmeaProcessGPGSA(char* packet)
                 // checksum not valid
                 return;
         }
-/*
-        char *tokens;
-    char *delimiter = ",";
-    char *pEnd;
-    long value,desim;
-    int mode;
 
-        #ifdef NMEA_DEBUG_GSA
-                PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"$%s\r\n",packet);
-        #endif
-
-        // start parsing just after "GPGSA,"
-        // attempt to reject empty packets right away
-        if(packet[6]==',' && packet[7]==',')
-                return;
-
-        if(!nmeaChecksum(packet))
-        {
-                // checksum not valid
-                return;
-        }
-        // tokenizer for nmea sentence
-
-        //GPGSA header
-        tokens = strsep(&packet, delimiter);
-
-    // next field: Mode
-        // Mode: M=Manual, forced to operate in 2D or 3D, A=Automatic, 3D/2D
-        tokens = strsep(&packet, delimiter);
-    // next field: Mode
-    // Mode: 1=Fix not available, 2=2D, 3=3D
-        tokens = strsep(&packet, delimiter);
-        mode = atoi(tokens);
-        if (mode == 1)
-        {
-                GpsData.Status = POSITIONACTUAL_STATUS_NOFIX;
-        }
-        else if (mode == 2)
-        {
-                GpsData.Status = POSITIONACTUAL_STATUS_FIX2D;
-        }
-        else if (mode == 3)
-        {
-                GpsData.Status = POSITIONACTUAL_STATUS_FIX3D;
-        }
-
-    // next field: 3-14 IDs of SVs used in position fix (null for unused fields)
-        tokens = strsep(&packet, delimiter);
-        tokens = strsep(&packet, delimiter);
-        tokens = strsep(&packet, delimiter);
-        tokens = strsep(&packet, delimiter);
-        tokens = strsep(&packet, delimiter);
-        tokens = strsep(&packet, delimiter);
-        tokens = strsep(&packet, delimiter);
-        tokens = strsep(&packet, delimiter);
-        tokens = strsep(&packet, delimiter);
-        tokens = strsep(&packet, delimiter);
-        tokens = strsep(&packet, delimiter);
-        tokens = strsep(&packet, delimiter);
-
-        // next field: PDOP
-        tokens = strsep(&packet, delimiter);
-        value=strtol (tokens,&pEnd,10);
-        desim=strtol (pEnd+1,NULL,10);
-        GpsData.PDOP=value+desim/100.0;
-        // next field: HDOP
-        tokens = strsep(&packet, delimiter);
-        value=strtol (tokens,&pEnd,10);
-        desim=strtol (pEnd+1,NULL,10);
-        GpsData.HDOP=value+desim/100.0;
-        // next field: VDOP
-        tokens = strsep(&packet, delimiter);
-        value=strtol (tokens,&pEnd,10);
-        desim=strtol (pEnd+1,NULL,10);
-        GpsData.VDOP=value+desim/100.0;
-        // next field: checksum
-*/
+        QString* nmeaString = new QString( packet );
+        QStringList tokenslist = nmeaString->split(",");
 }
 
 

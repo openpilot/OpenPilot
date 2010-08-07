@@ -54,6 +54,7 @@ private:
         void updateChannelSlider(QSlider* slider, QLabel* min, QLabel* Max,  QCheckBox* rev, int value);
         void updateObjectPersistance(ObjectPersistence::OperationOptions op, UAVObject *obj);
         void assignChannel(UAVDataObject *obj, UAVObjectField *field, QString str);
+        void assignOutputChannel(UAVDataObject *obj, UAVObjectField *field, QString str);
 
         bool firstUpdate;
 
@@ -62,7 +63,18 @@ private:
         void requestRCInputUpdate();
         void sendRCInputUpdate();
         void saveRCInputObject();
+        void requestRCOutputUpdate();
+        void sendRCOutputUpdate();
+        void saveRCOutputObject();
 
+        void setch0OutRange();
+        void setch1OutRange();
+        void setch2OutRange();
+        void setch3OutRange();
+        void setch4OutRange();
+        void setch5OutRange();
+        void setch6OutRange();
+        void setch7OutRange();
 
 };
 

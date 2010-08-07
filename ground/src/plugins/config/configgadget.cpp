@@ -41,6 +41,6 @@ ConfigGadget::~ConfigGadget()
 
 void ConfigGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 {
-
+   Q_UNUSED(config);
 }
 

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>617</width>
-    <height>349</height>
+    <width>664</width>
+    <height>409</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,12 +18,12 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>601</width>
-     <height>331</height>
+     <width>641</width>
+     <height>381</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -250,8 +250,8 @@ p, li { white-space: pre-wrap; }
     <widget class="QPushButton" name="getRCInputCurrent">
      <property name="geometry">
       <rect>
-       <x>270</x>
-       <y>240</y>
+       <x>310</x>
+       <y>310</y>
        <width>93</width>
        <height>27</height>
       </rect>
@@ -413,8 +413,8 @@ p, li { white-space: pre-wrap; }
     <widget class="QPushButton" name="saveRCInputToSD">
      <property name="geometry">
       <rect>
-       <x>490</x>
-       <y>240</y>
+       <x>530</x>
+       <y>310</y>
        <width>93</width>
        <height>27</height>
       </rect>
@@ -487,8 +487,8 @@ Applies and Saves all settings to SD</string>
     <widget class="QPushButton" name="saveRCInputToRAM">
      <property name="geometry">
       <rect>
-       <x>380</x>
-       <y>240</y>
+       <x>420</x>
+       <y>310</y>
        <width>93</width>
        <height>27</height>
       </rect>
@@ -1124,7 +1124,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>10</y>
+       <y>20</y>
        <width>121</width>
        <height>21</height>
       </rect>
@@ -1142,7 +1142,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>10</y>
+       <y>20</y>
        <width>91</width>
        <height>17</height>
       </rect>
@@ -1155,7 +1155,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>50</y>
+       <y>70</y>
        <width>71</width>
        <height>17</height>
       </rect>
@@ -1168,7 +1168,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>80</y>
+       <y>100</y>
        <width>71</width>
        <height>17</height>
       </rect>
@@ -1181,7 +1181,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>110</y>
+       <y>130</y>
        <width>71</width>
        <height>17</height>
       </rect>
@@ -1194,7 +1194,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>140</y>
+       <y>160</y>
        <width>71</width>
        <height>17</height>
       </rect>
@@ -1207,20 +1207,20 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>170</y>
+       <y>190</y>
        <width>71</width>
        <height>17</height>
       </rect>
      </property>
      <property name="text">
-      <string>Channe l4</string>
+      <string>Channel 4</string>
      </property>
     </widget>
     <widget class="QLabel" name="actuator5Label">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>200</y>
+       <y>220</y>
        <width>71</width>
        <height>17</height>
       </rect>
@@ -1236,10 +1236,13 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>300</x>
-       <y>50</y>
+       <y>70</y>
        <width>160</width>
        <height>18</height>
       </rect>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -1252,7 +1255,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>50</y>
+       <y>70</y>
        <width>121</width>
        <height>21</height>
       </rect>
@@ -1270,7 +1273,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>240</x>
-       <y>50</y>
+       <y>70</y>
        <width>55</width>
        <height>21</height>
       </rect>
@@ -1279,6 +1282,9 @@ Uncheck/Check to restart calibration.</string>
       <font>
        <pointsize>8</pointsize>
       </font>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
      </property>
     </widget>
     <widget class="QSpinBox" name="ch0OutMax">
@@ -1288,7 +1294,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>460</x>
-       <y>50</y>
+       <y>70</y>
        <width>55</width>
        <height>21</height>
       </rect>
@@ -1298,6 +1304,9 @@ Uncheck/Check to restart calibration.</string>
        <pointsize>8</pointsize>
       </font>
      </property>
+     <property name="maximum">
+      <number>9999</number>
+     </property>
     </widget>
     <widget class="QCheckBox" name="ch0OutTest">
      <property name="enabled">
@@ -1305,8 +1314,8 @@ Uncheck/Check to restart calibration.</string>
      </property>
      <property name="geometry">
       <rect>
-       <x>530</x>
-       <y>50</y>
+       <x>580</x>
+       <y>70</y>
        <width>61</width>
        <height>22</height>
       </rect>
@@ -1319,7 +1328,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>230</y>
+       <y>250</y>
        <width>71</width>
        <height>17</height>
       </rect>
@@ -1332,7 +1341,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>260</y>
+       <y>280</y>
        <width>71</width>
        <height>17</height>
       </rect>
@@ -1348,7 +1357,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>80</y>
+       <y>100</y>
        <width>121</width>
        <height>21</height>
       </rect>
@@ -1366,7 +1375,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>460</x>
-       <y>80</y>
+       <y>100</y>
        <width>55</width>
        <height>21</height>
       </rect>
@@ -1375,6 +1384,9 @@ Uncheck/Check to restart calibration.</string>
       <font>
        <pointsize>8</pointsize>
       </font>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
      </property>
     </widget>
     <widget class="QSpinBox" name="ch1OutMin">
@@ -1384,7 +1396,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>240</x>
-       <y>80</y>
+       <y>100</y>
        <width>55</width>
        <height>21</height>
       </rect>
@@ -1394,6 +1406,9 @@ Uncheck/Check to restart calibration.</string>
        <pointsize>8</pointsize>
       </font>
      </property>
+     <property name="maximum">
+      <number>9999</number>
+     </property>
     </widget>
     <widget class="QSlider" name="ch1OutSlider">
      <property name="enabled">
@@ -1402,10 +1417,13 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>300</x>
-       <y>80</y>
+       <y>100</y>
        <width>160</width>
        <height>18</height>
       </rect>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -1417,8 +1435,8 @@ Uncheck/Check to restart calibration.</string>
      </property>
      <property name="geometry">
       <rect>
-       <x>530</x>
-       <y>80</y>
+       <x>580</x>
+       <y>100</y>
        <width>61</width>
        <height>22</height>
       </rect>
@@ -1434,7 +1452,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>110</y>
+       <y>130</y>
        <width>121</width>
        <height>21</height>
       </rect>
@@ -1452,7 +1470,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>460</x>
-       <y>110</y>
+       <y>130</y>
        <width>55</width>
        <height>21</height>
       </rect>
@@ -1461,6 +1479,9 @@ Uncheck/Check to restart calibration.</string>
       <font>
        <pointsize>8</pointsize>
       </font>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
      </property>
     </widget>
     <widget class="QSpinBox" name="ch2OutMin">
@@ -1470,7 +1491,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>240</x>
-       <y>110</y>
+       <y>130</y>
        <width>55</width>
        <height>21</height>
       </rect>
@@ -1480,6 +1501,9 @@ Uncheck/Check to restart calibration.</string>
        <pointsize>8</pointsize>
       </font>
      </property>
+     <property name="maximum">
+      <number>9999</number>
+     </property>
     </widget>
     <widget class="QSlider" name="ch2OutSlider">
      <property name="enabled">
@@ -1488,10 +1512,13 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>300</x>
-       <y>110</y>
+       <y>130</y>
        <width>160</width>
        <height>18</height>
       </rect>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -1503,8 +1530,8 @@ Uncheck/Check to restart calibration.</string>
      </property>
      <property name="geometry">
       <rect>
-       <x>530</x>
-       <y>110</y>
+       <x>580</x>
+       <y>130</y>
        <width>61</width>
        <height>22</height>
       </rect>
@@ -1520,7 +1547,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>140</y>
+       <y>160</y>
        <width>121</width>
        <height>21</height>
       </rect>
@@ -1538,7 +1565,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>460</x>
-       <y>140</y>
+       <y>160</y>
        <width>55</width>
        <height>21</height>
       </rect>
@@ -1547,6 +1574,9 @@ Uncheck/Check to restart calibration.</string>
       <font>
        <pointsize>8</pointsize>
       </font>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
      </property>
     </widget>
     <widget class="QSpinBox" name="ch3OutMin">
@@ -1556,7 +1586,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>240</x>
-       <y>140</y>
+       <y>160</y>
        <width>55</width>
        <height>21</height>
       </rect>
@@ -1566,6 +1596,9 @@ Uncheck/Check to restart calibration.</string>
        <pointsize>8</pointsize>
       </font>
      </property>
+     <property name="maximum">
+      <number>9999</number>
+     </property>
     </widget>
     <widget class="QSlider" name="ch3OutSlider">
      <property name="enabled">
@@ -1574,10 +1607,13 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>300</x>
-       <y>140</y>
+       <y>160</y>
        <width>160</width>
        <height>18</height>
       </rect>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -1589,8 +1625,8 @@ Uncheck/Check to restart calibration.</string>
      </property>
      <property name="geometry">
       <rect>
-       <x>530</x>
-       <y>140</y>
+       <x>580</x>
+       <y>160</y>
        <width>61</width>
        <height>22</height>
       </rect>
@@ -1603,7 +1639,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>170</y>
+       <y>190</y>
        <width>121</width>
        <height>21</height>
       </rect>
@@ -1618,7 +1654,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>460</x>
-       <y>170</y>
+       <y>190</y>
        <width>55</width>
        <height>21</height>
       </rect>
@@ -1627,13 +1663,16 @@ Uncheck/Check to restart calibration.</string>
       <font>
        <pointsize>8</pointsize>
       </font>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
      </property>
     </widget>
     <widget class="QSpinBox" name="ch4OutMin">
      <property name="geometry">
       <rect>
        <x>240</x>
-       <y>170</y>
+       <y>190</y>
        <width>55</width>
        <height>21</height>
       </rect>
@@ -1643,15 +1682,21 @@ Uncheck/Check to restart calibration.</string>
        <pointsize>8</pointsize>
       </font>
      </property>
+     <property name="maximum">
+      <number>9999</number>
+     </property>
     </widget>
     <widget class="QSlider" name="ch4OutSlider">
      <property name="geometry">
       <rect>
        <x>300</x>
-       <y>170</y>
+       <y>190</y>
        <width>160</width>
        <height>18</height>
       </rect>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -1660,8 +1705,8 @@ Uncheck/Check to restart calibration.</string>
     <widget class="QCheckBox" name="ch4OutTest">
      <property name="geometry">
       <rect>
-       <x>530</x>
-       <y>170</y>
+       <x>580</x>
+       <y>190</y>
        <width>61</width>
        <height>22</height>
       </rect>
@@ -1674,7 +1719,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>200</y>
+       <y>220</y>
        <width>121</width>
        <height>21</height>
       </rect>
@@ -1689,7 +1734,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>460</x>
-       <y>200</y>
+       <y>220</y>
        <width>55</width>
        <height>21</height>
       </rect>
@@ -1698,13 +1743,16 @@ Uncheck/Check to restart calibration.</string>
       <font>
        <pointsize>8</pointsize>
       </font>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
      </property>
     </widget>
     <widget class="QSpinBox" name="ch5OutMin">
      <property name="geometry">
       <rect>
        <x>240</x>
-       <y>200</y>
+       <y>220</y>
        <width>55</width>
        <height>21</height>
       </rect>
@@ -1714,15 +1762,21 @@ Uncheck/Check to restart calibration.</string>
        <pointsize>8</pointsize>
       </font>
      </property>
+     <property name="maximum">
+      <number>9999</number>
+     </property>
     </widget>
     <widget class="QSlider" name="ch5OutSlider">
      <property name="geometry">
       <rect>
        <x>300</x>
-       <y>200</y>
+       <y>220</y>
        <width>160</width>
        <height>18</height>
       </rect>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -1731,8 +1785,8 @@ Uncheck/Check to restart calibration.</string>
     <widget class="QCheckBox" name="ch5OutTest">
      <property name="geometry">
       <rect>
-       <x>530</x>
-       <y>200</y>
+       <x>580</x>
+       <y>220</y>
        <width>61</width>
        <height>22</height>
       </rect>
@@ -1745,7 +1799,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>230</y>
+       <y>250</y>
        <width>121</width>
        <height>21</height>
       </rect>
@@ -1760,7 +1814,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>460</x>
-       <y>230</y>
+       <y>250</y>
        <width>55</width>
        <height>21</height>
       </rect>
@@ -1769,13 +1823,16 @@ Uncheck/Check to restart calibration.</string>
       <font>
        <pointsize>8</pointsize>
       </font>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
      </property>
     </widget>
     <widget class="QSpinBox" name="ch6OutMin">
      <property name="geometry">
       <rect>
        <x>240</x>
-       <y>230</y>
+       <y>250</y>
        <width>55</width>
        <height>21</height>
       </rect>
@@ -1785,15 +1842,21 @@ Uncheck/Check to restart calibration.</string>
        <pointsize>8</pointsize>
       </font>
      </property>
+     <property name="maximum">
+      <number>9999</number>
+     </property>
     </widget>
     <widget class="QSlider" name="ch6OutSlider">
      <property name="geometry">
       <rect>
        <x>300</x>
-       <y>230</y>
+       <y>250</y>
        <width>160</width>
        <height>18</height>
       </rect>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -1802,8 +1865,8 @@ Uncheck/Check to restart calibration.</string>
     <widget class="QCheckBox" name="ch6OutTest">
      <property name="geometry">
       <rect>
-       <x>530</x>
-       <y>230</y>
+       <x>580</x>
+       <y>250</y>
        <width>61</width>
        <height>22</height>
       </rect>
@@ -1816,7 +1879,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>260</y>
+       <y>280</y>
        <width>121</width>
        <height>21</height>
       </rect>
@@ -1831,7 +1894,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>460</x>
-       <y>260</y>
+       <y>280</y>
        <width>55</width>
        <height>21</height>
       </rect>
@@ -1840,13 +1903,16 @@ Uncheck/Check to restart calibration.</string>
       <font>
        <pointsize>8</pointsize>
       </font>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
      </property>
     </widget>
     <widget class="QSpinBox" name="ch7OutMin">
      <property name="geometry">
       <rect>
        <x>240</x>
-       <y>260</y>
+       <y>280</y>
        <width>55</width>
        <height>21</height>
       </rect>
@@ -1856,15 +1922,21 @@ Uncheck/Check to restart calibration.</string>
        <pointsize>8</pointsize>
       </font>
      </property>
+     <property name="maximum">
+      <number>9999</number>
+     </property>
     </widget>
-    <widget class="QSlider" name="ch7OutSLider">
+    <widget class="QSlider" name="ch7OutSlider">
      <property name="geometry">
       <rect>
        <x>300</x>
-       <y>260</y>
+       <y>280</y>
        <width>160</width>
        <height>18</height>
       </rect>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -1873,8 +1945,8 @@ Uncheck/Check to restart calibration.</string>
     <widget class="QCheckBox" name="ch7OutTest">
      <property name="geometry">
       <rect>
-       <x>530</x>
-       <y>260</y>
+       <x>580</x>
+       <y>280</y>
        <width>61</width>
        <height>22</height>
       </rect>
@@ -1886,8 +1958,8 @@ Uncheck/Check to restart calibration.</string>
     <widget class="QPushButton" name="saveRCOutputToSD">
      <property name="geometry">
       <rect>
-       <x>490</x>
-       <y>10</y>
+       <x>530</x>
+       <y>310</y>
        <width>93</width>
        <height>27</height>
       </rect>
@@ -1903,8 +1975,8 @@ Applies and Saves all settings to SD</string>
     <widget class="QPushButton" name="getRCOutputCurrent">
      <property name="geometry">
       <rect>
-       <x>270</x>
-       <y>10</y>
+       <x>310</x>
+       <y>310</y>
        <width>93</width>
        <height>27</height>
       </rect>
@@ -1919,8 +1991,8 @@ Applies and Saves all settings to SD</string>
     <widget class="QPushButton" name="saveRCOutputToRAM">
      <property name="geometry">
       <rect>
-       <x>380</x>
-       <y>10</y>
+       <x>420</x>
+       <y>310</y>
        <width>93</width>
        <height>27</height>
       </rect>
@@ -1931,6 +2003,191 @@ Be sure to set the Neutral position on all sliders before sending!</string>
      </property>
      <property name="text">
       <string>Save to RAM</string>
+     </property>
+    </widget>
+    <widget class="QFrame" name="frame">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>10</y>
+       <width>291</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <widget class="QSpinBox" name="outputRate2">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>20</y>
+        <width>55</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>9999</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>20</y>
+        <width>81</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Update rate:</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="outputRate1">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>20</y>
+        <width>55</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>9999</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_4">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>0</y>
+        <width>81</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Channel 0-3</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_5">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>0</y>
+        <width>81</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Channel 4-7</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QLabel" name="label_6">
+     <property name="geometry">
+      <rect>
+       <x>520</x>
+       <y>70</y>
+       <width>41</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>0000</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_7">
+     <property name="geometry">
+      <rect>
+       <x>520</x>
+       <y>100</y>
+       <width>41</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>0000</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_8">
+     <property name="geometry">
+      <rect>
+       <x>520</x>
+       <y>130</y>
+       <width>41</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>0000</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_9">
+     <property name="geometry">
+      <rect>
+       <x>520</x>
+       <y>160</y>
+       <width>41</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>0000</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_10">
+     <property name="geometry">
+      <rect>
+       <x>520</x>
+       <y>190</y>
+       <width>41</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>0000</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_11">
+     <property name="geometry">
+      <rect>
+       <x>520</x>
+       <y>220</y>
+       <width>41</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>0000</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_12">
+     <property name="geometry">
+      <rect>
+       <x>520</x>
+       <y>250</y>
+       <width>41</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>0000</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_13">
+     <property name="geometry">
+      <rect>
+       <x>520</x>
+       <y>280</y>
+       <width>41</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>0000</string>
      </property>
     </widget>
    </widget>
@@ -2041,8 +2298,8 @@ Be sure to set the Neutral position on all sliders before sending!</string>
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>472</x>
-     <y>154</y>
+     <x>469</x>
+     <y>171</y>
     </hint>
     <hint type="destinationlabel">
      <x>462</x>
@@ -2057,8 +2314,8 @@ Be sure to set the Neutral position on all sliders before sending!</string>
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>552</x>
-     <y>137</y>
+     <x>539</x>
+     <y>168</y>
     </hint>
     <hint type="destinationlabel">
      <x>532</x>
@@ -2173,8 +2430,8 @@ Be sure to set the Neutral position on all sliders before sending!</string>
      <y>291</y>
     </hint>
     <hint type="destinationlabel">
-     <x>472</x>
-     <y>111</y>
+     <x>469</x>
+     <y>142</y>
     </hint>
    </hints>
   </connection>
@@ -2189,8 +2446,136 @@ Be sure to set the Neutral position on all sliders before sending!</string>
      <y>296</y>
     </hint>
     <hint type="destinationlabel">
-     <x>552</x>
-     <y>162</y>
+     <x>539</x>
+     <y>171</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ch0OutSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_6</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>419</x>
+     <y>121</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>546</x>
+     <y>120</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ch1OutSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_7</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>377</x>
+     <y>151</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>535</x>
+     <y>148</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ch2OutSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_8</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>347</x>
+     <y>175</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>554</x>
+     <y>179</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ch3OutSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_9</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>348</x>
+     <y>207</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>543</x>
+     <y>208</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ch4OutSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_10</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>356</x>
+     <y>242</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>535</x>
+     <y>242</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ch5OutSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_11</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>318</x>
+     <y>275</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>546</x>
+     <y>271</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ch6OutSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_12</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>358</x>
+     <y>303</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>560</x>
+     <y>302</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ch7OutSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_13</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>368</x>
+     <y>325</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>560</x>
+     <y>327</y>
     </hint>
    </hints>
   </connection>

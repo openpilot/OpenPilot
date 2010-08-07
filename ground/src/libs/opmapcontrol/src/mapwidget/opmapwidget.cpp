@@ -64,6 +64,8 @@ namespace mapcontrol
         {
             UAV=new UAVItem(map,this);
             UAV->setParentItem(map);
+            connect(this,SIGNAL(UAVLeftSafetyBouble(internals::PointLatLng)),UAV,SIGNAL(UAVLeftSafetyBouble(internals::PointLatLng)));
+            connect(this,SIGNAL(UAVReachedWayPoint(int,WayPointItem*)),UAV,SIGNAL(UAVReachedWayPoint(int,WayPointItem*)));
         }
         else if(!value)
         {
@@ -115,6 +117,7 @@ namespace mapcontrol
     OPMapWidget::~OPMapWidget()
     {
         delete UAV;
+        delete Home;
         delete map;
         delete core;
         delete configuration;

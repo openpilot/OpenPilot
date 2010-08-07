@@ -382,6 +382,13 @@ namespace mapcontrol
         * @param number new WayPoint number
         * @param waypoint WayPoint inserted
         */
+        void WPReached(WayPointItem* waypoint);
+                /**
+               * @brief Fires when a new WayPoint is inserted
+               *
+               * @param number new WayPoint number
+               * @param waypoint WayPoint inserted
+               */
         void WPInserted(int const& number,WayPointItem* waypoint);
         /**
         * @brief Fires When a WayPoint is deleted
@@ -389,6 +396,19 @@ namespace mapcontrol
         * @param number number of the deleted WayPoint
         */
         void WPDeleted(int const& number);
+        /**
+        * @brief Fires When a WayPoint is Reached
+        *
+        * @param number number of the Reached WayPoint
+        */
+        void UAVReachedWayPoint(int const& waypointnumber,WayPointItem* waypoint);
+        /**
+        * @brief Fires When the UAV lives the safety bouble
+        *
+        * @param position the position of the UAV
+        */
+        void UAVLeftSafetyBouble(internals::PointLatLng const& position);
+
         /**
         * @brief Fires when map position changes
         *

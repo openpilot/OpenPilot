@@ -12,6 +12,9 @@ Description of work (D)
 
 ----------
 
+N: Connor Abbott
+E: connor (at) abbott (dot) cx
+D: Win32 OpenPilot port
 
 N: David Ankers
 E: david (at) openpilot (dot) org
@@ -75,11 +78,12 @@ D: 3D Modelling, Easystar adaption from FMS
 
 N: Guy McCaldin 
 E: guymcc (at) gmail (dot) com
-D: Artwork and design dials
+D: Artwork and design inc dial set
 
 N: Cathy Moss
 E: cmoss296 (at) blueyonder (dot) co (dot) uk
-D: OP Map Plugin, PipBee Pro Modem 
+D: Hardware design Lead: Gen 2 Mainboard, PipBee Pro, Current Sensor
+D: Lead dev PipBee Pro, creator OP Map Plugin
 
 N: Angus Peart
 E: gussy (at) openpilot (dot) org

@@ -62,10 +62,42 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     // Get the receiver types supported by OpenPilot and fill the corresponding
     // dropdown menu:
     obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlSettings")));
-    // Now update all the slider values:
     QString fieldName = QString("InputMode");
     UAVObjectField *field = obj->getField(fieldName);
     m_config->receiverType->addItems(field->getOptions());
+
+    // Same for the aircraft types:
+    obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("SystemSettings")));
+    fieldName = QString("AirframeType");
+    field = obj->getField(fieldName);
+    m_config->aircraftType->addItems(field->getOptions());
+
+    // And for the channel output assignement options
+    m_config->ch0Output->addItem("None");
+    m_config->ch1Output->addItem("None");
+    m_config->ch2Output->addItem("None");
+    m_config->ch3Output->addItem("None");
+    m_config->ch4Output->addItem("None");
+    m_config->ch5Output->addItem("None");
+    m_config->ch6Output->addItem("None");
+    m_config->ch7Output->addItem("None");
+
+    obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
+    QList<UAVObjectField*> fieldList = obj->getFields();
+    foreach (UAVObjectField* field, fieldList) {
+        // NOTE: we assume that all options in ActuatorSettings are a channel assignement
+        // except for the options called "ChannelXXX"
+        if (!field->getName().contains("Channel")) {
+            m_config->ch0Output->addItem(field->getName());
+            m_config->ch1Output->addItem(field->getName());
+            m_config->ch2Output->addItem(field->getName());
+            m_config->ch3Output->addItem(field->getName());
+            m_config->ch4Output->addItem(field->getName());
+            m_config->ch5Output->addItem(field->getName());
+            m_config->ch6Output->addItem(field->getName());
+            m_config->ch7Output->addItem(field->getName());
+        }
+    }
 
     requestRCInputUpdate();
 
@@ -87,6 +119,11 @@ void ConfigGadgetWidget::resizeEvent(QResizeEvent *event)
 
     QWidget::resizeEvent(event);
 }
+
+
+/**
+  Request the current config from the board (RC Output)
+  */
 
 
 /**

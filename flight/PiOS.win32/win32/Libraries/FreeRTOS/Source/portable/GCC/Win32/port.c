@@ -45,6 +45,52 @@ extern DWORD * pxCurrentTCB;
 #define NMI	(1<<CPU_INTR_SWI)
 
 /*
+ * Task control block.  A task control block (TCB) is allocated to each task,
+ * and stores the context of the task.
+ */
+typedef struct tskTaskControlBlock
+{
+	volatile portSTACK_TYPE	*pxTopOfStack;		/*< Points to the location of the last item placed on the tasks stack.  THIS MUST BE THE FIRST MEMBER OF THE STRUCT. */
+
+	#if ( portUSING_MPU_WRAPPERS == 1 )
+		xMPU_SETTINGS xMPUSettings;				/*< The MPU settings are defined as part of the port layer.  THIS MUST BE THE SECOND MEMBER OF THE STRUCT. */
+	#endif
+
+	xListItem				xGenericListItem;	/*< List item used to place the TCB in ready and blocked queues. */
+	xListItem				xEventListItem;		/*< List item used to place the TCB in event lists. */
+	unsigned portBASE_TYPE	uxPriority;			/*< The priority of the task where 0 is the lowest priority. */
+	portSTACK_TYPE			*pxStack;			/*< Points to the start of the stack. */
+	signed char				pcTaskName[ configMAX_TASK_NAME_LEN ];/*< Descriptive name given to the task when created.  Facilitates debugging only. */
+
+	#if ( portSTACK_GROWTH > 0 )
+		portSTACK_TYPE *pxEndOfStack;			/*< Used for stack overflow checking on architectures where the stack grows up from low memory. */
+	#endif
+
+	#if ( portCRITICAL_NESTING_IN_TCB == 1 )
+		unsigned portBASE_TYPE uxCriticalNesting;
+	#endif
+
+	#if ( configUSE_TRACE_FACILITY == 1 )
+		unsigned portBASE_TYPE	uxTCBNumber;	/*< This is used for tracing the scheduler and making debugging easier only. */
+	#endif
+
+	#if ( configUSE_MUTEXES == 1 )
+		unsigned portBASE_TYPE uxBasePriority;	/*< The priority last assigned to the task - used by the priority inheritance mechanism. */
+	#endif
+
+	#if ( configUSE_APPLICATION_TASK_TAG == 1 )
+		pdTASK_HOOK_CODE pxTaskTag;
+	#endif
+
+	#if ( configGENERATE_RUN_TIME_STATS == 1 )
+		unsigned long ulRunTimeCounter;		/*< Used for calculating how much CPU time each task is utilising. */
+	#endif
+
+} tskTCB;
+
+tskTCB *debug_task_handle;
+
+/*
 	Win32 simulator doesn't really use a stack. Instead It just
 	keep some task specific info in the pseudostack
 */
@@ -56,10 +102,44 @@ typedef struct
 	HANDLE hThread;						/* handle of thread associated with task */
 	HANDLE hSemaphore;					/* Semaphore thread (task) waits on at start and after yielding */
 	portSTACK_TYPE dwGlobalIsr;			/* mask used to enable/disable interrupts */
+	xTaskHandle hTask;					/* Task handle so we know the name of this task */
 	BOOL yielded;						/* Need to know how task went out of focus */
 }SSIM_T;
 
 #define portNO_CRITICAL_NESTING 		( ( unsigned portLONG ) 0 )
+
+#define DEBUG_OUTPUT
+//#define ERROR_OUTPUT
+
+#ifdef DEBUG_OUTPUT
+	#define debug_printf(...) ( (WaitForSingleObject(hPrintfMutex, INFINITE)|1)?( \
+	(  \
+	(NULL != (debug_task_handle = (tskTCB *) pxCurrentTCB ))? \
+	(fprintf( stderr, "%20s\t%20s\t%i: ",debug_task_handle->pcTaskName,__func__,__LINE__)): \
+	(fprintf( stderr, "%20s\t%20s\t%i: ","__unknown__",__func__,__LINE__)) \
+	|1)?( \
+	((fprintf( stderr, __VA_ARGS__ )|1)?ReleaseMutex( hPrintfMutex ):0) \
+	):0 ):0 )
+
+	#define debug_error debug_printf
+
+#else
+	#ifdef ERROR_OUTPUT
+		#define debug_error(...) ( (WaitForSingleObject(hPrintfMutex, INFINITE)|1)?( \
+		(  \
+		(NULL != (debug_task_handle = (tskTCB *) pxCurrentTCB ))? \
+        (fprintf( stderr, "%20s\t%20s\t%i: ",debug_task_handle->pcTaskName,__func__,__LINE__)): \
+        (fprintf( stderr, "%20s\t%20s\t%i: ","__unknown__",__func__,__LINE__)) \
+        |1)?( \
+        ((fprintf( stderr, __VA_ARGS__ )|1)?ReleaseMutex( hPrintfMutex ):0) \
+        ):0 ):0 )
+
+		#define debug_printf(...)
+	#else
+		#define debug_printf(...)
+		#define debug_error(...)
+	#endif
+#endif
 
 /******************************************************************************
 	National prototypes
@@ -70,6 +150,10 @@ typedef struct
 volatile DWORD dwPendingIsr;	// pending interrupts
 HANDLE hIsrInvoke;	// event to signal an interrupt
 HANDLE hIsrMutex;	// mutex to protect above 2
+#if defined(DEBUG_OUTPUT) || defined(ERROR_OUTPUT)
+HANDLE hPrintfMutex;// mutex for debug_printf() and debug_error()
+#endif
+SSIM_T *pxLastAddedTCB;
 
 /******************************************************************************
 	National variables
@@ -175,6 +259,9 @@ static void create_system_objects(void)
 	hIsrInvoke = CreateEvent(NULL, FALSE, FALSE, NULL);
 	hTickAck = CreateEvent(NULL, FALSE, FALSE, NULL);
 	hTermAck = CreateEvent(NULL, FALSE, FALSE, NULL);
+#if defined(DEBUG_OUTPUT) || defined(ERROR_OUTPUT)
+	hPrintfMutex = CreateMutex(NULL, FALSE, NULL);
+#endif
 
 	dwEnabledIsr |= (1<<CPU_INTR_TICK);
 
@@ -182,6 +269,10 @@ static void create_system_objects(void)
 	SetThreadPriority(CreateThread(NULL, 0, tick_generator, NULL, 0, NULL),
 		THREAD_PRIORITY_ABOVE_NORMAL);
 #endif
+	//printf("got here!\n");
+	//printf("%i\n", (int) pxCurrentTCB);
+	//debug_printf("created system objects\n");
+	//printf("got here again!\n");
 }
 
 /******************************************************************************
@@ -203,13 +294,14 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 	psSim->yielded = FALSE;
 	psSim->hThread = CreateThread(NULL, 0, TaskSimThread, psSim, CREATE_SUSPENDED, NULL);
 	ok=SetThreadPriority(psSim->hThread, THREAD_PRIORITY_IDLE);
+	pxLastAddedTCB = psSim;
 	return (portSTACK_TYPE *) psSim;
 }
 
 portBASE_TYPE xPortStartScheduler( void )
 {
 	BOOL bSwitch;
-	SSIM_T *psSim;
+	SSIM_T *psSim, *psSimOld;
 	DWORD dwIntr;
 	int i, iIsrCount;
 	HANDLE hObjList[2]; 
@@ -286,15 +378,26 @@ portBASE_TYPE xPortStartScheduler( void )
 
 		if(bSwitch)
 		{
+			psSimOld = psSim;
 			vTaskSwitchContext();
 			psSim=(SSIM_T *)*pxCurrentTCB;
-			ulCriticalNesting = psSim->ulCriticalNesting;
-			dwGlobalIsr = psSim->dwGlobalIsr;
+			if(psSimOld != psSim)
+			{
+				ulCriticalNesting = psSim->ulCriticalNesting;
+				dwGlobalIsr = psSim->dwGlobalIsr;
 			
-			if(psSim->yielded) {
-				psSim->yielded = FALSE;
-				ReleaseSemaphore(psSim->hSemaphore, 1, NULL);		// awake next task
-			} else {
+				if(psSim->yielded) {
+					psSim->yielded = FALSE;
+					ReleaseSemaphore(psSim->hSemaphore, 1, NULL);		// awake next task
+				} else {
+					ResumeThread(psSim->hThread);
+				}
+				//debug_printf("switched context\n");
+			}
+			else
+			{
+				//Oops, we just suspended the task that we want to resume!
+				//TODO: resolve this before it happens
 				ResumeThread(psSim->hThread);
 			}
 		}
@@ -476,4 +579,11 @@ void vPortExitCritical( void )
 			__enable_interrupt();
 		}
 	}
+}
+
+void vPortAddTaskHandle( void *pxTaskHandle )
+{
+	//printf("got here!\n");
+	//printf("%i\n", (int)pxLastAddedTCB);
+	pxLastAddedTCB->hTask = (xTaskHandle)pxTaskHandle;
 }

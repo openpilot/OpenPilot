@@ -496,7 +496,7 @@ tskTCB * pxNewTCB;
 			prvAddTaskToReadyQueue( pxNewTCB );
 
 			xReturn = pdPASS;
-			//traceTASK_CREATE( pxNewTCB );
+			traceTASK_CREATE( pxNewTCB );
 		}
 		portEXIT_CRITICAL();
 	}

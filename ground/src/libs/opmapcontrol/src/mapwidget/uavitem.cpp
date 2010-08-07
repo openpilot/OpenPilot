@@ -116,7 +116,7 @@ namespace mapcontrol
                 //verify if the UAV is inside the safety bouble
                 if(Distance3D(mapwidget->Home->Coord(),mapwidget->Home->Altitude())>mapwidget->Home->SafeArea())
                 {
-                    if(mapwidget->Home->safe!=false);
+                    if(mapwidget->Home->safe!=false)
                     {
                         mapwidget->Home->safe=false;
                         mapwidget->Home->update();

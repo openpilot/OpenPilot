@@ -49,7 +49,7 @@
 #include "MatVec.h"
 #ifdef _WIN32
 #include <float.h>
-#define isnan _isnan
+//#define isnan _isnan
 #endif
 
 //--------------------------------------------------------------------------

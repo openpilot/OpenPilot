@@ -132,9 +132,6 @@ void ConnectionManager::onConnectPressed()
     //or if we are disconnecting it
     if(!m_ioDev)
     {
-        m_connectBtn->setText("Disconnect");
-        m_availableDevList->setEnabled(false);
-
         m_connectionDevice = findDevice(m_availableDevList->currentText());
 
         if(m_connectionDevice.connection)
@@ -146,6 +143,8 @@ void ConnectionManager::onConnectPressed()
                 m_ioDev->open(QIODevice::ReadWrite);
                 //signal interested plugins that the user wants to connect to the device
                 emit deviceConnected(m_ioDev);
+                m_connectBtn->setText("Disconnect");
+                m_availableDevList->setEnabled(false);
                 return;
             }
             else
@@ -155,35 +154,21 @@ void ConnectionManager::onConnectPressed()
             }
         }
     }
-    else {
+    else
+    {
         //only do this if we are disconnecting
         //signal interested plugins that user is disconnecting his device
         emit deviceDisconnected();
-        if(m_connectionDevice.connection){
+        if(m_connectionDevice.connection)
+        {
             m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
             m_ioDev = NULL;
             m_connectionDevice.connection = NULL;
         }
+
+        m_connectBtn->setText("Connect");
+        m_availableDevList->setEnabled(true);
     }
-
-
-    //both in case of error and disconnection, we fall back here
-    m_connectBtn->setText("Connect");
-    m_availableDevList->setEnabled(true);
-
-
-    /*//close the device
-    if(m_ioDev)
-    {
-        m_ioDev->close();
-
-        //delete the object created by the IConnection class
-        delete m_ioDev;
-        m_ioDev = NULL;
-    }
-    */
-
-
 }
 
 /**

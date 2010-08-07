@@ -1407,7 +1407,7 @@ lib3ds_morph_track_read(Lib3dsMorphTrack *track, Lib3dsIo *io)
  * \ingroup tracks 
  */
 Lib3dsBool
-lib3ds_morph_track_write(Lib3dsMorphTrack *track, Lib3dsIo *io)
+lib3ds_morph_track_write(Lib3dsMorphTrack *track __attribute__((unused)), Lib3dsIo *io __attribute__((unused)))
 {
   /* FIXME: */
   ASSERT(0);

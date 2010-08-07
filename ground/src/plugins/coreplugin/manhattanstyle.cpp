@@ -623,10 +623,13 @@ void ManhattanStyle::drawPrimitive(PrimitiveElement element, const QStyleOption 
             int size = qMin(r.height(), r.width());
             QPixmap pixmap;
             QString pixmapName;
-            pixmapName.sprintf("%s-%s-%d-%d-%d-%lld",
-                               "$qt_ia", metaObject()->className(),
-                               uint(option->state), element,
-                               size, option->palette.cacheKey());
+            QTextStream(&pixmapName) << "$qt_ia" << "-" << metaObject()->className() <<
+                    "-" << uint(option->state) << "-" << element << "-" << size <<
+                    "-" << option->palette.cacheKey();
+//            pixmapName.sprintf("%s-%s-%d-%d-%d-%lld",
+//                               "$qt_ia", metaObject()->className(),
+//                               uint(option->state), element,
+//                               size, option->palette.cacheKey());
             if (!QPixmapCache::find(pixmapName, pixmap)) {
                 int border = size/5;
                 int sqsize = 2*(size/2);

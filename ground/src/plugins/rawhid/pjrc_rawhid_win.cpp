@@ -209,7 +209,7 @@ int pjrc_rawhid::receive(int num, void *buf, int len, int timeout)
 
 //        qDebug("Received %i bytes, first %x, second %x", len, *((char *) buf),*((char *)buf + 1));
 
-        if (n > len) n = len;
+        if ((int)n > len) n = len;
         return n;
 return_timeout:
         CancelIo(hid->handle);

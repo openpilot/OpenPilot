@@ -95,7 +95,7 @@ private:
     quint8 rxType;
     quint32 rxObjId;
     quint16 rxInstId;
-    quint8 rxLength;
+    quint16 rxLength;
     quint8 rxCSPacket, rxCS;
     qint32 rxCount;
     RxStateType rxState;

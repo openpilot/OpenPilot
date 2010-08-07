@@ -31,7 +31,7 @@
 #include "uavobjects/uavobjectmanager.h"
 
 #include <iostream>
-#include <QtGui/QFileDialog>
+#include <QtGui>
 #include <QDebug>
 #include <QThread>
 #include "nmeaparser.h"
@@ -44,11 +44,10 @@ public:
     QextSerialPort *port;
     NMEAParser *parser;
     void setPort(QextSerialPort* port);
+    void setParser(NMEAParser* parser);
     void processInputStream();
     void run();
 };
-
-
 
 /*
  * Initialize the widget
@@ -77,9 +76,12 @@ GpsDisplayWidget::GpsDisplayWidget(QWidget *parent) : QWidget(parent)
     widget->gpsWorld->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
     world->setScale(factor);
 
-
     connect(widget->connectButton, SIGNAL(clicked(bool)),
             this,SLOT(connectButtonClicked()));
+    parser=new NMEAParser();
+    connect(parser,SIGNAL(sv(int)),this,SLOT(setSVs(int)));
+    connect(parser,SIGNAL(position(double,double,double)),this,SLOT(setPosition(double,double,double)));
+
 }
 
 GpsDisplayWidget::~GpsDisplayWidget()
@@ -87,6 +89,24 @@ GpsDisplayWidget::~GpsDisplayWidget()
    delete widget;
 }
 
+void GpsDisplayWidget::setSVs(int sv)
+{
+    QString temp = "FIX: ";
+    temp.append(QString::number(sv));
+    widget->label_2->setText(temp);
+}
+
+void GpsDisplayWidget::setPosition(double lat, double lon, double alt)
+{
+    QString temp = "Position: ";
+    temp.append(QString::number(lat));
+    temp.append(" ");
+    temp.append(QString::number(lon));
+    temp.append(" ");
+    temp.append(QString::number(alt));
+    widget->label->setText(temp);
+    widget->textBrowser->append(temp);
+}
 
 void GpsDisplayWidget::setPort(QextSerialPort* port)
 {
@@ -96,9 +116,12 @@ void GpsDisplayWidget::setPort(QextSerialPort* port)
 
 void GpsDisplayWidget::connectButtonClicked() {
     GpsDisplayThread* gpsThread = new GpsDisplayThread();
+    widget->textBrowser->append(QString("Connecting to GPS ...\n"));
     gpsThread->setPort(port);
+    gpsThread->setParser(parser);
     gpsThread->start();
 }
+
 
 
 void GpsDisplayThread::setPort(QextSerialPort* port)
@@ -107,15 +130,21 @@ void GpsDisplayThread::setPort(QextSerialPort* port)
     this->port=port;
 }
 
+void GpsDisplayThread::setParser(NMEAParser* parser)
+{
+
+    this->parser=parser;
+}
+
 void GpsDisplayThread::run()
 {
+
     qDebug() <<  "Opening.";
 
     qDebug() <<  port->portName();
 
     bool isOpen =  port->open(QIODevice::ReadWrite);
     qDebug() <<  "Open: " << isOpen;
-    parser=new NMEAParser();
 
     char buf[1024];
     char c;

@@ -27,6 +27,13 @@
 
 
 #include "nmeaparser.h"
+#include <iostream>
+#include <math.h>
+#include <QDebug>
+#include <QStringList>
+#include <QtGui/QWidget>
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QPushButton>
 
 // Message Codes
 #define NMEA_NODATA		0	// No data. Packet not available, bad, or not decoded
@@ -56,10 +63,15 @@
 /**
  * Initialize the parser
  */
-NMEAParser::NMEAParser()
+NMEAParser::NMEAParser(QObject *parent):QObject(parent)
 {
     bufferInit(&gpsRxBuffer, (unsigned char *)gpsRxData, 512);
     gpsRxOverflow=0;
+}
+
+NMEAParser::~NMEAParser()
+{
+
 }
 
 /**
@@ -251,10 +263,12 @@ void NMEAParser::nmeaProcessGPGGA(char* packet)
 
         QString* nmeaString = new QString( packet );
         QStringList tokenslist = nmeaString->split(",");
-        GpsData.Latitude = tokenslist.at(2).toFloat();
-        GpsData.Longitude = tokenslist.at(4).toFloat();
-        GpsData.Altitude = tokenslist.at(9).toFloat();
+        GpsData.Latitude = tokenslist.at(2).toDouble();
+        GpsData.Longitude = tokenslist.at(4).toDouble();
+        GpsData.Altitude = tokenslist.at(9).toDouble();
         GpsData.SV = tokenslist.at(7).toInt();
+        emit position(GpsData.Latitude,GpsData.Longitude,GpsData.Altitude);
+        emit sv(GpsData.SV);
 }
 
 /**
@@ -276,7 +290,7 @@ void NMEAParser::nmeaProcessGPRMC(char* packet)
 
         QString* nmeaString = new QString( packet );
         QStringList tokenslist = nmeaString->split(",");
-        GpsData.Groundspeed = tokenslist.at(7).toFloat();
+        GpsData.Groundspeed = tokenslist.at(7).toDouble();
         GpsData.Groundspeed = GpsData.Groundspeed*0.51444;
 }
 

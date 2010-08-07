@@ -28,6 +28,7 @@
 #ifndef NMEAPARSER_H
 #define NMEAPARSER_H
 
+#include <QObject>
 #include <QtCore>
 #include <stdint.h>
 #include "buffer.h"
@@ -37,10 +38,10 @@
 
 typedef struct struct_GpsData
 {
-        float Latitude;
-        float Longitude;
-        float Altitude;
-        float Groundspeed;
+        double Latitude;
+        double Longitude;
+        double Altitude;
+        double Groundspeed;
         int SV;
         uint8_t channel;
         uint8_t value_h;
@@ -48,10 +49,12 @@ typedef struct struct_GpsData
         uint8_t sum;
 }GpsData_t;
 
-class NMEAParser
+class NMEAParser: public QObject
 {
+    Q_OBJECT
 public:
-   NMEAParser();
+   NMEAParser(QObject *parent = 0);
+   ~NMEAParser();
    void processInputStream(char c);
    char* nmeaGetPacketBuffer(void);
    char nmeaChecksum(char* gps_buffer);
@@ -67,6 +70,10 @@ public:
    uint32_t numUpdates;
    uint32_t numErrors;
    int32_t gpsRxOverflow;
+signals:
+   void sv(int);
+   void position(double,double,double);
+private slots:
 };
 
 #endif // NMEAPARSER_H

@@ -36,6 +36,7 @@
 
 #include <QFile>
 #include <QTimer>
+#include "nmeaparser.h"
 
 class Ui_GpsDisplayWidget;
 
@@ -49,13 +50,17 @@ public:
 
 //   void setMode(QString mode);  // Either UAVTalk or serial port
    void setPort(QextSerialPort* port);
+   void setParser(NMEAParser *parser);
 
 private slots:
    void connectButtonClicked();
+   void setSVs(int);
+   void setPosition(double, double, double);
 
 private:
    Ui_GpsDisplayWidget* widget;
    QextSerialPort *port;
+   NMEAParser *parser;
    bool connected;
 
 };

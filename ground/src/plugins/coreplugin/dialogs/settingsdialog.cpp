@@ -46,7 +46,7 @@ namespace {
     };
 }
 
-Q_DECLARE_METATYPE(::PageData);
+Q_DECLARE_METATYPE(::PageData)
 
 using namespace Core;
 using namespace Core::Internal;

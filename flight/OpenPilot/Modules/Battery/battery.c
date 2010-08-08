@@ -7,9 +7,9 @@
  * Updates the FlightBatteryState object
  * @{ 
  *
- * @file       attitude.c
+ * @file       battery.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Module to read the attitude solution from the AHRS on a periodic basis.
+ * @brief      Module to read the battery sensor periodically
  *
  * @see        The GNU Public License (GPL) Version 3
  *

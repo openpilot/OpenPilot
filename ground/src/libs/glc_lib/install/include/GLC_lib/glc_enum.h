@@ -49,7 +49,7 @@ namespace glc
 	extern QMutex iDMutex;
 	extern QMutex geomIdMutex;
 	extern QMutex userIdMutex;
-};
+}
 
 // GLC_Lib version
 

@@ -83,5 +83,5 @@ namespace glc
 
 	//! Load Point Sprite extension
 	bool loadPointSpriteExtension();
-};
+}
 #endif /*GLC_EXT_H_*/

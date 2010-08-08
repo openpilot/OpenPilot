@@ -137,7 +137,7 @@ protected:
     enum Error
     {
         ErrorTimeout					= -200,	/**< Timed out trying to communicate with other device */
-        ErrorBlockRetriesExceded		= -201,	/**< A block could not be sent */
+        ErrorBlockRetriesExceded		= -201	/**< A block could not be sent */
 
                                               };
 

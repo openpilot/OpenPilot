@@ -699,7 +699,8 @@ bool UAVObjectParser::generateFlightObject(int objIndex, const QString& template
             QStringList options = info->fields[n]->options;
             for (int m = 0; m < options.length(); ++m)
             {
-                enums.append( QString("%1_%2_%3=%4, ")
+                QString s = (m == (options.length()-1)) ? "%1_%2_%3=%4" : "%1_%2_%3=%4, ";
+                enums.append( s
                                 .arg( info->name.toUpper() )
                                 .arg( info->fields[n]->name.toUpper() )
                                 .arg( options[m].toUpper() )
@@ -719,7 +720,8 @@ bool UAVObjectParser::generateFlightObject(int objIndex, const QString& template
             QStringList elemNames = info->fields[n]->elementNames;
             for (int m = 0; m < elemNames.length(); ++m)
             {
-                enums.append( QString("%1_%2_%3=%4, ")
+                QString s = (m != (elemNames.length()-1)) ? "%1_%2_%3=%4, " : "%1_%2_%3=%4";
+                enums.append( s
                                 .arg( info->name.toUpper() )
                                 .arg( info->fields[n]->name.toUpper() )
                                 .arg( elemNames[m].toUpper() )
@@ -903,7 +905,8 @@ bool UAVObjectParser::generateGCSObject(int objIndex, const QString& templateInc
             QStringList options = info->fields[n]->options;
             for (int m = 0; m < options.length(); ++m)
             {
-                enums.append( QString("%1_%2=%3, ")
+                QString s = (m != (options.length()-1)) ? "%1_%2=%3, " : "%1_%2=%3";
+                enums.append( s
                                 .arg( info->fields[n]->name.toUpper() )
                                 .arg( options[m].toUpper() )
                                 .arg(m) );
@@ -921,7 +924,8 @@ bool UAVObjectParser::generateGCSObject(int objIndex, const QString& templateInc
             QStringList elemNames = info->fields[n]->elementNames;
             for (int m = 0; m < elemNames.length(); ++m)
             {
-                enums.append( QString("%1_%2=%3, ")
+                QString s = (m != (elemNames.length()-1)) ? "%1_%2=%3, " : "%1_%2=%3";
+                enums.append( s
                                 .arg( info->fields[n]->name.toUpper() )
                                 .arg( elemNames[m].toUpper() )
                                 .arg(m) );

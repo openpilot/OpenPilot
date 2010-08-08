@@ -28,6 +28,9 @@
 
  
 namespace core {
+
+const double UrlFactory::EarthRadiusKm = 6378.137; // WGS-84
+
 UrlFactory::UrlFactory()
 {
     /// <summary>

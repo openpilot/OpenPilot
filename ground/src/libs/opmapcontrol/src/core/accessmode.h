@@ -53,7 +53,7 @@ namespace core {
             /// <summary>
             /// access only cache
             /// </summary>
-            CacheOnly,
+            CacheOnly
         };
         static QString StrByType(Types const& value)
         {

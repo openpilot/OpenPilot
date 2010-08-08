@@ -83,15 +83,15 @@ public:
 
 protected:
    
-    static const double PI = M_PI;
-    static const double HALF_PI = (M_PI * 0.5);
-    static const double TWO_PI= (M_PI * 2.0);
-    static const double EPSLoN= 1.0e-10;
-    static const double MAX_VAL= 4;
-    static const double MAXLONG= 2147483647;
-    static const double DBLLONG= 4.61168601e18;
-    static const double R2D=180/M_PI;
-    static const double D2R=M_PI/180;
+    static const double PI;
+    static const double HALF_PI;
+    static const double TWO_PI;
+    static const double EPSLoN;
+    static const double MAX_VAL;
+    static const double MAXLONG;
+    static const double DBLLONG;
+    static const double R2D;
+    static const double D2R;
 
     static double Sign(const double &x);
 

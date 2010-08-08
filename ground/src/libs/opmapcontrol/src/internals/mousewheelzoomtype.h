@@ -53,7 +53,7 @@ namespace internals {
         /// <summary>
         /// zooms map to current view center
         /// </summary>
-        ViewCenter,
+        ViewCenter
     };
     static QString StrByType(Types const& value)
     {

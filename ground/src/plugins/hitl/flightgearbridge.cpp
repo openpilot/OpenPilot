@@ -30,6 +30,10 @@
 #include "coreplugin/icore.h"
 #include "coreplugin/threadmanager.h"
 
+const float FlightGearBridge::FT2M = 0.3048;
+const float FlightGearBridge::KT2MPS = 0.514444444;
+const float FlightGearBridge::INHG2KPA = 3.386;
+
 FlightGearBridge::FlightGearBridge()
 {
     // move to thread

@@ -65,6 +65,21 @@
 #include <coreplugin/threadmanager.h>
 #include <math.h>
 
+const float Il2Bridge::FT2M = 0.3048;
+const float Il2Bridge::KT2MPS = 0.514444444;
+const float Il2Bridge::MPS2KMH = 3.6;
+const float Il2Bridge::KMH2MPS = (1.0/3.6);
+const float Il2Bridge::INHG2KPA = 3.386;
+const float Il2Bridge::RAD2DEG = (180.0/M_PI);
+const float Il2Bridge::DEG2RAD = (M_PI/180.0);
+const float Il2Bridge::M2DEG =  60.*1852.; // 60 miles per degree times 1852 meters per mile
+const float Il2Bridge::DEG2M = (1.0/(60.*1852.));
+const float Il2Bridge::AIR_CONST = 287.058; // J/(kg*K)
+const float Il2Bridge::GROUNDDENSITY = 1.225; // kg/m³ ;)
+const float Il2Bridge::TEMP_GROUND = (15.0 + 273.0); // 15°C in Kelvin
+const float Il2Bridge::TEMP_LAPSE_RATE = -0.0065; //degrees per meter
+const float Il2Bridge::AIR_CONST_FACTOR = -0.0341631947363104; //several nature constants calculated into one
+
 Il2Bridge::Il2Bridge(QString il2HostName, int il2Port, QString il2Latitude, QString il2Longitude)
 {
     // Init fields

@@ -397,7 +397,7 @@ namespace glc
 	/*! \var Z_AXIS
 	 *  \brief Z axis Vector*/
 	const GLC_Vector4d Z_AXIS(0.0, 0.0, 1.0);
-};
+}
 
 //! Define GLC_Point4D
 typedef GLC_Vector4d GLC_Point4d;

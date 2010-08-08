@@ -68,9 +68,9 @@ private slots:
     void telStatsUpdated(UAVObject* obj);
 
 private:
-    static const float FT2M = 0.3048;
-    static const float KT2MPS = 0.514444444;
-    static const float INHG2KPA = 3.386;
+    static const float FT2M;
+    static const float KT2MPS;
+    static const float INHG2KPA;
 
     QUdpSocket* inSocket;
     QUdpSocket* outSocket;

@@ -56,7 +56,7 @@ public:
         Stop2 = 128,
         StopMask = 128
     };
-    Q_DECLARE_FLAGS(PortSettings, PortSetting);
+    Q_DECLARE_FLAGS(PortSettings, PortSetting)
 
     explicit QxtSerialDevice(const QString& device, QObject* parent = 0);
     QxtSerialDevice(QObject* parent = 0);
@@ -91,6 +91,6 @@ private:
     QXT_DECLARE_PRIVATE(QxtSerialDevice)
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QxtSerialDevice::PortSettings);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QxtSerialDevice::PortSettings)
 
 #endif

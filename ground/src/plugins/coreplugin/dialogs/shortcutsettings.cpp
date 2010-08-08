@@ -44,7 +44,7 @@
 #include <QtGui/QFileDialog>
 #include <QtDebug>
 
-Q_DECLARE_METATYPE(Core::Internal::ShortcutItem*);
+Q_DECLARE_METATYPE(Core::Internal::ShortcutItem*)
 
 using namespace Core;
 using namespace Core::Internal;

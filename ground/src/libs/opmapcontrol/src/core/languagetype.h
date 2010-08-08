@@ -94,7 +94,7 @@ namespace core {
             Ukrainian,
             Vietnamese,
             ChineseSimplified,
-            ChineseTraditional,
+            ChineseTraditional
         };
         
         static QString StrByType(Types const& value)

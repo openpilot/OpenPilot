@@ -264,9 +264,25 @@ void NMEAParser::nmeaProcessGPGGA(char* packet)
         QString* nmeaString = new QString( packet );
         QStringList tokenslist = nmeaString->split(",");
         GpsData.Latitude = tokenslist.at(2).toDouble();
+        int deg = (int)GpsData.Latitude/100;
+        double min = ((GpsData.Latitude)-(deg*100))/60.0;
+        GpsData.Latitude=deg+min;
+        // next field: N/S indicator
+        // correct latitute for N/S
+        if(tokenslist.at(3).contains("S")) GpsData.Latitude = -GpsData.Latitude;
+
         GpsData.Longitude = tokenslist.at(4).toDouble();
-        GpsData.Altitude = tokenslist.at(9).toDouble();
+        deg = (int)GpsData.Longitude/100;
+        min = ((GpsData.Longitude)-(deg*100))/60.0;
+        GpsData.Longitude=deg+min;
+        // next field: E/W indicator
+        // correct latitute for E/W
+        if(tokenslist.at(5).contains("W")) GpsData.Longitude = -GpsData.Longitude;
+
         GpsData.SV = tokenslist.at(7).toInt();
+
+        GpsData.Altitude = tokenslist.at(9).toDouble();
+        GpsData.GeoidSeparation = tokenslist.at(11).toDouble();
         emit position(GpsData.Latitude,GpsData.Longitude,GpsData.Altitude);
         emit sv(GpsData.SV);
 }
@@ -292,6 +308,7 @@ void NMEAParser::nmeaProcessGPRMC(char* packet)
         QStringList tokenslist = nmeaString->split(",");
         GpsData.Groundspeed = tokenslist.at(7).toDouble();
         GpsData.Groundspeed = GpsData.Groundspeed*0.51444;
+        GpsData.Heading = tokenslist.at(8).toDouble();
 }
 
 
@@ -335,6 +352,25 @@ void NMEAParser::nmeaProcessGPGSA(char* packet)
 
         QString* nmeaString = new QString( packet );
         QStringList tokenslist = nmeaString->split(",");
+        // next field: Mode
+        // Mode: 1=Fix not available, 2=2D, 3=3D
+        int mode = tokenslist.at(2).toInt();
+        /*if (mode == 1)
+        {
+                GpsData.Status = POSITIONACTUAL_STATUS_NOFIX;
+        }
+        else if (mode == 2)
+        {
+                GpsData.Status = POSITIONACTUAL_STATUS_FIX2D;
+        }
+        else if (mode == 3)
+        {
+                GpsData.Status = POSITIONACTUAL_STATUS_FIX3D;
+        }*/
+        GpsData.PDOP = tokenslist.at(15).toDouble();
+        GpsData.HDOP = tokenslist.at(16).toDouble();
+        GpsData.VDOP = tokenslist.at(17).toDouble();
+
 }
 
 

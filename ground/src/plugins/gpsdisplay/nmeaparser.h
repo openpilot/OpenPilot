@@ -42,11 +42,13 @@ typedef struct struct_GpsData
         double Longitude;
         double Altitude;
         double Groundspeed;
+        double Heading;
         int SV;
-        uint8_t channel;
-        uint8_t value_h;
-        uint8_t value_l;
-        uint8_t sum;
+        int Status;
+        double PDOP;
+        double HDOP;
+        double VDOP;
+        double GeoidSeparation;
 }GpsData_t;
 
 class NMEAParser: public QObject

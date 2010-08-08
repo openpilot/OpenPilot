@@ -392,13 +392,19 @@ portBASE_TYPE xPortStartScheduler( void )
 				} else {
 					ResumeThread(psSim->hThread);
 				}
-				//debug_printf("switched context\n");
+				debug_printf("switched context\n");
 			}
 			else
 			{
 				//Oops, we just suspended the task that we want to resume!
 				//TODO: resolve this before it happens
-				ResumeThread(psSim->hThread);
+				if(psSim->yielded) {
+					psSim->yielded = FALSE;
+					ReleaseSemaphore(psSim->hSemaphore, 1, NULL);		// awake next task
+				} else {
+					ResumeThread(psSim->hThread);
+				}
+				debug_printf("didn't switch context\n");
 			}
 		}
 

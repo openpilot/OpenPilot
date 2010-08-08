@@ -1,7 +1,7 @@
  /**
  ******************************************************************************
  *
- * @file       pios_board.h
+ * @file       ahrs_fsm.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief     
  * @see        The GNU Public License (GPL) Version 3
@@ -45,7 +45,7 @@ enum lfsm_state {
   LFSM_STATE_USER_TX_ACTIVE,
   LFSM_STATE_USER_RXTX_ACTIVE,
 
-  LFSM_STATE_NUM_STATES,	/* Must be last */
+  LFSM_STATE_NUM_STATES		/* Must be last */
 };
 
 enum lfsm_event {
@@ -58,7 +58,7 @@ enum lfsm_event {
   LFSM_EVENT_RX_USER,
   LFSM_EVENT_RX_UNKNOWN,
 
-  LFSM_EVENT_NUM_EVENTS,	/* Must be last */
+  LFSM_EVENT_NUM_EVENTS		/* Must be last */
 };
 
 struct lfsm_link_stats {

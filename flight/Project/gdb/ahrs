@@ -1,7 +1,9 @@
-target remote localhost:3334
-monitor reset halt
-monitor cortex_m3 vector_catch all
-file ./build/ahrs/AHRS.elf
+define connect
+	target remote localhost:3334
+	monitor cortex_m3 vector_catch all
+	file ./build/ahrs/AHRS.elf
+end
+#monitor reset halt
 
 define hook-step
 	monitor cortex_m3 maskisr on

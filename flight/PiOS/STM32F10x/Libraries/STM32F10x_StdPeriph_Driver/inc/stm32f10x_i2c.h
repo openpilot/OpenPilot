@@ -420,7 +420,7 @@ typedef struct
   */
 
 void I2C_DeInit(I2C_TypeDef* I2Cx);
-void I2C_Init(I2C_TypeDef* I2Cx, I2C_InitTypeDef* I2C_InitStruct);
+void I2C_Init(I2C_TypeDef* I2Cx, const I2C_InitTypeDef* I2C_InitStruct);
 void I2C_StructInit(I2C_InitTypeDef* I2C_InitStruct);
 void I2C_Cmd(I2C_TypeDef* I2Cx, FunctionalState NewState);
 void I2C_DMACmd(I2C_TypeDef* I2Cx, FunctionalState NewState);

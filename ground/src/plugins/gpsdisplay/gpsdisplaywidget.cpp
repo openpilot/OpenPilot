@@ -91,20 +91,22 @@ GpsDisplayWidget::~GpsDisplayWidget()
 
 void GpsDisplayWidget::setSVs(int sv)
 {
-    QString temp = "FIX: ";
+    QString temp = "Fix: Sats: ";
     temp.append(QString::number(sv));
     widget->label_2->setText(temp);
+    widget->label_2->adjustSize();
 }
 
 void GpsDisplayWidget::setPosition(double lat, double lon, double alt)
 {
     QString temp = "Position: ";
-    temp.append(QString::number(lat));
+    temp.append(QString::number(lat,'g',10));
     temp.append(" ");
-    temp.append(QString::number(lon));
+    temp.append(QString::number(lon,'g',10));
     temp.append(" ");
-    temp.append(QString::number(alt));
+    temp.append(QString::number(alt,'g',10));
     widget->label->setText(temp);
+    widget->label->adjustSize();
     widget->textBrowser->append(temp);
 }
 

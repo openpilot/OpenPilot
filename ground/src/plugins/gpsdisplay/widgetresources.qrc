@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/gpsgadget">
         <file>images/gpsEarth.svg</file>
+        <file>images/flatEarth.png</file>
     </qresource>
 </RCC>

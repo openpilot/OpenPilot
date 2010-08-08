@@ -76,6 +76,12 @@ GpsDisplayWidget::GpsDisplayWidget(QWidget *parent) : QWidget(parent)
     widget->gpsWorld->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
     world->setScale(factor);
 
+    //Not elegant, just load the image for now
+    QGraphicsScene *fescene = new QGraphicsScene(this);
+    QPixmap earthpix( ":/gpsgadget/images/flatEarth.png" );
+    fescene->addPixmap( earthpix );
+    widget->flatEarth->setScene(fescene);
+
     connect(widget->connectButton, SIGNAL(clicked(bool)),
             this,SLOT(connectButtonClicked()));
     parser=new NMEAParser();

@@ -31,6 +31,7 @@
 #include <pios_spi_priv.h>
 #include <pios_usart_priv.h>
 #include <pios_com_priv.h>
+#include <pios_i2c_priv.h>
 #include <openpilot.h>
 #include <uavobjectsinit.h>
 
@@ -327,7 +328,7 @@ const struct pios_usart_cfg pios_usart_telem_cfg = {
     .handler = PIOS_USART_telem_irq_handler,
     .init    = {
       .NVIC_IRQChannel                   = USART2_IRQn,
-      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGHEST,
+      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
       .NVIC_IRQChannelSubPriority        = 0,
       .NVIC_IRQChannelCmd                = ENABLE,
     },
@@ -574,6 +575,87 @@ struct pios_com_dev pios_com_devs[] = {
 };
 
 const uint8_t pios_com_num_devices = NELEMENTS(pios_com_devs);
+
+/*
+ * I2C Adapters
+ */
+
+void PIOS_I2C_main_adapter_ev_irq_handler(void);
+void PIOS_I2C_main_adapter_er_irq_handler(void);
+void I2C2_EV_IRQHandler() __attribute__ ((alias ("PIOS_I2C_main_adapter_ev_irq_handler")));
+void I2C2_ER_IRQHandler() __attribute__ ((alias ("PIOS_I2C_main_adapter_er_irq_handler")));
+
+const struct pios_i2c_adapter_cfg pios_i2c_main_adapter_cfg = {
+  .regs = I2C2,
+  .init = {
+    .I2C_Mode                = I2C_Mode_I2C,
+    .I2C_OwnAddress1         = 0,
+    .I2C_Ack                 = I2C_Ack_Enable,
+    .I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit,
+    .I2C_DutyCycle           = I2C_DutyCycle_2,
+    .I2C_ClockSpeed          = 400000,	/* bits/s */
+  },
+  .transfer_timeout_ms = 50,
+  .scl = {
+    .gpio = GPIOB,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_10,
+      .GPIO_Speed = GPIO_Speed_10MHz,
+      .GPIO_Mode  = GPIO_Mode_AF_OD,
+    },
+  },
+  .sda = {
+    .gpio = GPIOB,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_11,
+      .GPIO_Speed = GPIO_Speed_10MHz,
+      .GPIO_Mode  = GPIO_Mode_AF_OD,
+    },
+  },
+  .event = {
+    .handler = PIOS_I2C_main_adapter_ev_irq_handler,
+    .flags   = 0,		/* FIXME: check this */
+    .init = {
+      .NVIC_IRQChannel                   = I2C2_EV_IRQn,
+      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGHEST,
+      .NVIC_IRQChannelSubPriority        = 0,
+      .NVIC_IRQChannelCmd                = ENABLE,
+    },
+  },
+  .error = {
+    .handler = PIOS_I2C_main_adapter_er_irq_handler,
+    .flags   = 0,		/* FIXME: check this */
+    .init = {
+      .NVIC_IRQChannel                   = I2C2_ER_IRQn,
+      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGHEST,
+      .NVIC_IRQChannelSubPriority        = 0,
+      .NVIC_IRQChannelCmd                = ENABLE,
+    },
+  },
+};
+
+/*
+ * Board specific number of devices.
+ */
+struct pios_i2c_adapter pios_i2c_adapters[] = {
+  {
+    .cfg = &pios_i2c_main_adapter_cfg,
+  },
+};
+
+uint8_t pios_i2c_num_adapters = NELEMENTS(pios_i2c_adapters);
+
+void PIOS_I2C_main_adapter_ev_irq_handler(void)
+{
+  /* Call into the generic code to handle the IRQ for this specific device */
+  PIOS_I2C_EV_IRQ_Handler(PIOS_I2C_MAIN_ADAPTER);
+}
+
+void PIOS_I2C_main_adapter_er_irq_handler(void)
+{
+  /* Call into the generic code to handle the IRQ for this specific device */
+  PIOS_I2C_ER_IRQ_Handler(PIOS_I2C_MAIN_ADAPTER);
+}
 
 /**
  * @}

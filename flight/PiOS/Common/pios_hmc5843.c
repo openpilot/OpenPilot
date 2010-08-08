@@ -206,20 +206,28 @@ void PIOS_HMC5843_ReadID(uint8_t out[4])
 * \return -1 if error during I2C transfer
 * \return -4 if invalid length
 */
-int32_t PIOS_HMC5843_Read(uint8_t address, uint8_t *buffer, uint8_t len)
+bool PIOS_HMC5843_Read(uint8_t address, uint8_t *buffer, uint8_t len)
 {
-	/* Send I2C address and register address */
-	/* To avoid issues copy address into temporary buffer */
-	uint8_t addr_buffer[1] = {(uint8_t)address};
-	int32_t error = PIOS_I2C_Transfer(I2C_Write_WithoutStop, PIOS_HMC5843_I2C_ADDR, addr_buffer, 1);
+  uint8_t addr_buffer[] = {
+    address,
+  };
 
-	/* Now receive byte(s) */
-	if(!error) {
-		error = PIOS_I2C_Transfer(I2C_Read, PIOS_HMC5843_I2C_ADDR, buffer, len);
-	}
-	
-	/* Return error status */
-	return error < 0 ? -1 : 0;
+  const struct pios_i2c_txn txn_list[] = {
+    {
+      .addr = PIOS_HMC5843_I2C_ADDR,
+      .rw   = PIOS_I2C_TXN_WRITE,
+      .len  = sizeof(addr_buffer),
+      .buf  = addr_buffer,
+    },
+    {
+      .addr = PIOS_HMC5843_I2C_ADDR,
+      .rw   = PIOS_I2C_TXN_READ,
+      .len  = len,
+      .buf  = buffer,
+    }
+  };
+
+  return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
 }
 
 
@@ -230,17 +238,23 @@ int32_t PIOS_HMC5843_Read(uint8_t address, uint8_t *buffer, uint8_t len)
 * \return 0 if operation was successful
 * \return -1 if error during I2C transfer
 */
-int32_t PIOS_HMC5843_Write(uint8_t address, uint8_t buffer)
+bool PIOS_HMC5843_Write(uint8_t address, uint8_t buffer)
 {
-	/* Send I2C address and data */
-	uint8_t WriteBuffer[2];
-	WriteBuffer[0] = address;
-	WriteBuffer[1] = buffer;
-	
-	int32_t error = PIOS_I2C_Transfer(I2C_Write, PIOS_HMC5843_I2C_ADDR, WriteBuffer, 2);
-	
-	/* Return error status */
-	return error < 0 ? -1 : 0;
+  uint8_t data[] = {
+    address,
+    buffer,
+  };
+
+  const struct pios_i2c_txn txn_list[] = {
+    {
+      .addr = PIOS_HMC5843_I2C_ADDR,
+      .rw   = PIOS_I2C_TXN_WRITE,
+      .len  = sizeof(data),
+      .buf  = data,
+    },
+  };
+
+  return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
 }
 
 #endif

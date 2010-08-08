@@ -31,38 +31,24 @@
 #ifndef PIOS_I2C_H
 #define PIOS_I2C_H
 
-/* Local defines */
-#define I2C_ERROR_INVALID_PORT				-1
-#define I2C_ERROR_GENERAL				-2
-#define I2C_ERROR_UNSUPPORTED_TRANSFER_TYPE		-3
-#define I2C_ERROR_TIMEOUT				-4
-#define I2C_ERROR_ARBITRATION_LOST			-5
-#define I2C_ERROR_BUS					-6
-#define I2C_ERROR_SLAVE_NOT_CONNECTED			-7
-#define I2C_ERROR_UNEXPECTED_EVENT			-8
-#define I2C_ERROR_RX_BUFFER_OVERRUN			-9
-#define I2C_ERROR_BUSY					-10
-
-
 /* Global Types */
+enum pios_i2c_txn_direction {
+  PIOS_I2C_TXN_READ,
+  PIOS_I2C_TXN_WRITE
+};
 
-typedef enum {
-	I2C_Read,
-	I2C_Write,
-	I2C_Write_WithoutStop
-} I2CTransferTypeDef;
+struct pios_i2c_txn {
+  uint16_t                      addr;
+  enum pios_i2c_txn_direction   rw;
+  uint32_t                      len;
+  uint8_t                     * buf;
+};
 
 /* Public Functions */
 extern int32_t PIOS_I2C_Init(void);
-extern int32_t PIOS_I2C_TransferCheck(void);
-extern int32_t PIOS_I2C_TransferWait(void);
-extern int32_t PIOS_I2C_Transfer(I2CTransferTypeDef transfer, uint8_t address, uint8_t *buffer, uint16_t len);
-extern void PIOS_I2C_StartTransfer(I2CTransferTypeDef transfer, uint8_t address, uint8_t *buffer, uint16_t len);
-
-#ifdef PIOS_INCLUDE_FREERTOS
-extern bool PIOS_I2C_LockDevice(portTickType timeout);
-extern void PIOS_I2C_UnlockDevice(void);
-#endif // PIOS_INCLUDE_FREERTOS
+extern bool PIOS_I2C_Transfer(uint8_t i2c, const struct pios_i2c_txn txn_list[], uint32_t num_txns);
+extern void PIOS_I2C_EV_IRQ_Handler(uint8_t i2c);
+extern void PIOS_I2C_ER_IRQ_Handler(uint8_t i2c);
 
 #endif /* PIOS_I2C_H */
 

@@ -103,8 +103,8 @@ extern void PIOS_HMC5843_Init(void);
 extern void PIOS_HMC5843_Config(PIOS_HMC5843_ConfigTypeDef *HMC5843_Config_Struct);
 extern void PIOS_HMC5843_ReadMag(int16_t out[3]);
 extern void PIOS_HMC5843_ReadID(uint8_t out[4]);
-extern int32_t PIOS_HMC5843_Read(uint8_t address, uint8_t *buffer, uint8_t len);
-extern int32_t PIOS_HMC5843_Write(uint8_t address, uint8_t buffer);
+extern bool PIOS_HMC5843_Read(uint8_t address, uint8_t *buffer, uint8_t len);
+extern bool PIOS_HMC5843_Write(uint8_t address, uint8_t buffer);
 
 #endif /* PIOS_HMC5843_H */
 

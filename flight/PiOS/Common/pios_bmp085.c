@@ -145,7 +145,7 @@ void PIOS_BMP085_ReadADC(void)
 	/* Read and store the 16bit result */
 	if(CurrentRead == TemperatureConv) {
 		/* Read the temperature conversion */
-		PIOS_BMP085_Read(BMP085_ADC_MSB, Data, 2);
+		PIOS_BMP085_Read(BMP085_ADC_MSB, Data, 3); /* Read 3 since it is more reliable on i2c than the proper read of 2 bytes. */
 		RawTemperature = ((Data[0] << 8) | Data[1]);
 
 		X1 = (RawTemperature - CalibData.AC6) * CalibData.AC5 >> 15;
@@ -196,30 +196,28 @@ int32_t PIOS_BMP085_GetPressure(void)
 * \return -2 if BMP085 blocked by another task (retry it!)
 * \return -4 if invalid length
 */
-int32_t PIOS_BMP085_Read(uint8_t address, uint8_t *buffer, uint8_t len)
+bool PIOS_BMP085_Read(uint8_t address, uint8_t *buffer, uint8_t len)
 {
-	/* Try to get the I2C peripheral */
-	if(PIOS_I2C_LockDevice(0) == FALSE)
-	{
-		/* Request a retry */
-		return -2;
-	}
+  uint8_t addr_buffer[] = {
+    address,
+  };
 
-	/* Send I2C address and EEPROM address */
-	/* To avoid issues copy address into temporary buffer */
-	uint8_t addr_buffer[1] = {(uint8_t)address};
-	int32_t error = PIOS_I2C_Transfer(I2C_Write_WithoutStop, BMP085_I2C_ADDR, addr_buffer, 1);
+  const struct pios_i2c_txn txn_list[] = {
+    {
+      .addr = BMP085_I2C_ADDR,
+      .rw   = PIOS_I2C_TXN_WRITE,
+      .len  = sizeof(addr_buffer),
+      .buf  = addr_buffer,
+    },
+    {
+      .addr = BMP085_I2C_ADDR,
+      .rw   = PIOS_I2C_TXN_READ,
+      .len  = len,
+      .buf  = buffer,
+    }
+  };
 
-	/* Now receive byte(s) */
-	if(!error) {
-		error = PIOS_I2C_Transfer(I2C_Read, BMP085_I2C_ADDR, buffer, len);
-	}
-
-	/* Release I2C peripheral */
-	PIOS_I2C_UnlockDevice();
-	
-	/* Return error status */
-	return error < 0 ? -1 : 0;
+  return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
 }
 
 
@@ -231,27 +229,23 @@ int32_t PIOS_BMP085_Read(uint8_t address, uint8_t *buffer, uint8_t len)
 * \return -1 if error during I2C transfer
 * \return -2 if BMP085 blocked by another task (retry it!)
 */
-int32_t PIOS_BMP085_Write(uint8_t address, uint8_t buffer)
+bool PIOS_BMP085_Write(uint8_t address, uint8_t buffer)
 {
-	/* Try to get the IIC peripheral */
-	if(PIOS_I2C_LockDevice(0) == FALSE)
-	{
-		/* Request a retry */
-		return -2;
-	}
+  uint8_t data[] = {
+    address,
+    buffer,
+  };
 
-	/* Send I2C address and data */
-	uint8_t WriteBuffer[2];
-	WriteBuffer[0] = address;
-	WriteBuffer[1] = buffer;
-	
-	int32_t error = PIOS_I2C_Transfer(I2C_Write, BMP085_I2C_ADDR, WriteBuffer, 2);
-	
-	/* Release I2C peripheral */
-	PIOS_I2C_UnlockDevice();
-	
-	/* Return error status */
-	return error < 0 ? -1 : 0;
+  const struct pios_i2c_txn txn_list[] = {
+    {
+      .addr = BMP085_I2C_ADDR,
+      .rw   = PIOS_I2C_TXN_WRITE,
+      .len  = sizeof(data),
+      .buf  = data,
+    },
+  };
+
+  return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
 }
 
 

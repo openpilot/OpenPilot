@@ -25,6 +25,9 @@ void Shape::paint(QPainter *painter, const QStyleOptionGraphicsItem * opt, QWidg
   painter->setPen(m_color);
   switch(m_shapeType)
   {
+	case ShapeRectangleFilled:
+		// Setting a brush to fill the rectangle shape with chosen color m_color
+		painter->setBrush(QBrush(m_color, Qt::SolidPattern));
     case ShapeRectangle:
       painter->drawRect(m_boundingRect);
       break;
@@ -36,11 +39,18 @@ void Shape::paint(QPainter *painter, const QStyleOptionGraphicsItem * opt, QWidg
       painter->drawLine(QPointF(m_boundingRect.left(), m_boundingRect.top()), QPointF( m_boundingRect.right(), m_boundingRect.bottom()));
       painter->drawLine(QPointF(m_boundingRect.right(), m_boundingRect.top()), QPointF(m_boundingRect.left(), m_boundingRect.bottom()));
       break;
+	case ShapeEllipseFilled:
+		// Setting a brush to fill the ellipse shape with chosen color m_color
+		painter->setBrush(QBrush(m_color, Qt::SolidPattern));
     case ShapeEllipse:
       painter->drawEllipse(m_boundingRect);
       break;
   }
-  QGraphicsItemGroup::paint(painter, opt, wdg);
+
+	// Setting the painter brush to the default brush Qt:NoBrush
+	painter->setBrush(QBrush());
+
+	QGraphicsItemGroup::paint(painter, opt, wdg);
 }
 
 void Shape::setLabel(const char * text, double relX, double relY)

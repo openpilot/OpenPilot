@@ -18,7 +18,9 @@ class Shape : public QGraphicsItemGroup {
       ShapeRectangle,
       ShapeCross,
       ShapeCrossX,
-      ShapeEllipse
+      ShapeEllipse,
+      ShapeRectangleFilled,
+      ShapeEllipseFilled
     };
     /**
       * Create an Shape to use with a Viewer to display a basic shape.

@@ -134,11 +134,12 @@ const unsigned MAP_SIZE = 313;
 // constant velocity robot uncertainties and perturbations
 const double UNCERT_VLIN = .1; // m/s
 const double UNCERT_VANG = .1; // rad/s
-const double PERT_VLIN = 1; // m/s per sqrt(s)
-const double PERT_VANG = 1; // rad/s per sqrt(s)
+const double PERT_VLIN = 2; // m/s per sqrt(s)
+const double PERT_VANG = 2; // rad/s per sqrt(s)
 
 // inertial robot initial uncertainties and perturbations
 //if (intOpts[iRobot] == 1) // == robot inertial
+const std::string MTI_DEVICE = "/dev/ttyUSB0";
 const double UNCERT_GRAVITY = 10.0; // m/s^2
 const double UNCERT_ABIAS = 0.05*17.0; // 5% of full scale
 const double UNCERT_WBIAS = 0.05*jmath::degToRad(300.0); // 5% of full scale
@@ -194,8 +195,9 @@ const unsigned GRID_SEPAR = 20;
 
 ///##############################################
 
-void demo_slam01_main(world_ptr_t *world) {
 
+
+void demo_slam01_main(world_ptr_t *world) {
 	boost::condition_variable rawdata_condition;
 	boost::mutex rawdata_mutex;
 	//boost::mutex rawdata_condmutex;
@@ -265,6 +267,14 @@ void demo_slam01_main(world_ptr_t *world) {
 		robPtr1_->constantPerturbation = false;
 
 		robPtr1 = robPtr1_;
+		
+		if (intOpts[iTrigger] == 1)
+		{
+			// just to initialize the MTI as an external trigger controlling shutter time
+			hardware::HardwareEstimatorMti hardEst1(
+				MTI_DEVICE, floatOpts[fFreq], floatOpts[fShutter], 1, mode, strOpts[sDataPath], false);
+			floatOpts[fFreq] = hardEst1.getFreq();
+		}
 	}
 #ifdef HAVE_MTI
 	else
@@ -292,7 +302,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		} else
 		{
 			boost::shared_ptr<hardware::HardwareEstimatorMti> hardEst1_(new hardware::HardwareEstimatorMti(
-				"/dev/ttyS0", floatOpts[fFreq], floatOpts[fShutter], 1024, mode, strOpts[sDataPath]));
+				MTI_DEVICE, floatOpts[fFreq], floatOpts[fShutter], 1024, mode, strOpts[sDataPath], true));
 			if (intOpts[iTrigger]) floatOpts[fFreq] = hardEst1_->getFreq();
 			hardEst1 = hardEst1_;
 		}
@@ -815,6 +825,11 @@ void demo_slam01_exit(world_ptr_t *world, boost::thread *thread_main) {
 		 * #--slam-config=data/config1.xml -> not implemented yet
 		 * --help
 		 * --usage
+		 * --robot 0=constant vel, 1=inertial
+		 * --trigger 0=internal, 1=external with MTI control, 2=external without control
+		 * --simu 0/1
+		 * --freq camera frequency in double Hz (with trigger==0/1)
+		 * --shutter shutter time in double seconds (with trigger==1)
 		 *
 		 * You can use the following examples and only change values:
 		 * online test (old mode=0):

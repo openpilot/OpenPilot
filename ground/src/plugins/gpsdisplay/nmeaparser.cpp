@@ -263,6 +263,7 @@ void NMEAParser::nmeaProcessGPGGA(char* packet)
 
         QString* nmeaString = new QString( packet );
         QStringList tokenslist = nmeaString->split(",");
+        GpsData.GPStime = tokenslist.at(1).toDouble();
         GpsData.Latitude = tokenslist.at(2).toDouble();
         int deg = (int)GpsData.Latitude/100;
         double min = ((GpsData.Latitude)-(deg*100))/60.0;
@@ -285,6 +286,8 @@ void NMEAParser::nmeaProcessGPGGA(char* packet)
         GpsData.GeoidSeparation = tokenslist.at(11).toDouble();
         emit position(GpsData.Latitude,GpsData.Longitude,GpsData.Altitude);
         emit sv(GpsData.SV);
+        emit datetime(GpsData.GPSdate,GpsData.GPStime);
+
 }
 
 /**
@@ -306,9 +309,13 @@ void NMEAParser::nmeaProcessGPRMC(char* packet)
 
         QString* nmeaString = new QString( packet );
         QStringList tokenslist = nmeaString->split(",");
+        GpsData.GPStime = tokenslist.at(1).toDouble();
         GpsData.Groundspeed = tokenslist.at(7).toDouble();
         GpsData.Groundspeed = GpsData.Groundspeed*0.51444;
         GpsData.Heading = tokenslist.at(8).toDouble();
+        GpsData.GPSdate = tokenslist.at(9).toDouble();
+        emit datetime(GpsData.GPSdate,GpsData.GPStime);
+        emit speedheading(GpsData.Groundspeed,GpsData.Heading);
 }
 
 

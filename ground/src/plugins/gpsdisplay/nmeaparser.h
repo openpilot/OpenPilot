@@ -49,6 +49,9 @@ typedef struct struct_GpsData
         double HDOP;
         double VDOP;
         double GeoidSeparation;
+        double GPStime;
+        double GPSdate;
+
 }GpsData_t;
 
 class NMEAParser: public QObject
@@ -75,6 +78,8 @@ public:
 signals:
    void sv(int);
    void position(double,double,double);
+   void datetime(double,double);
+   void speedheading(double,double);
 private slots:
 };
 

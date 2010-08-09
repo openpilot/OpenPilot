@@ -87,12 +87,42 @@ GpsDisplayWidget::GpsDisplayWidget(QWidget *parent) : QWidget(parent)
     parser=new NMEAParser();
     connect(parser,SIGNAL(sv(int)),this,SLOT(setSVs(int)));
     connect(parser,SIGNAL(position(double,double,double)),this,SLOT(setPosition(double,double,double)));
+    connect(parser,SIGNAL(speedheading(double,double)),this,SLOT(setSpeedHeading(double,double)));
+    connect(parser,SIGNAL(datetime(double,double)),this,SLOT(setDateTime(double,double)));
 
 }
 
 GpsDisplayWidget::~GpsDisplayWidget()
 {
    delete widget;
+}
+
+void GpsDisplayWidget::setSpeedHeading(double speed, double heading)
+{
+    QString temp = "Speed: ";
+    temp.append(QString::number(speed,'g',10));
+    temp.append(" Heaging: ");
+    temp.append(QString::number(heading,'g',10));
+    widget->speed_label->setText(QString::number(speed,'g',10));
+    widget->speed_label->adjustSize();
+    widget->bear_label->setText(QString::number(heading,'g',10));
+    widget->bear_label->adjustSize();
+
+    widget->textBrowser->append(temp);
+}
+
+void GpsDisplayWidget::setDateTime(double date, double time)
+{
+    QString temp = "Date: ";
+    temp.append(QString::number(date,'g',10));
+    temp.append(" Time: ");
+    temp.append(QString::number(time,'g',10));
+    widget->gdate_label->setText(QString::number(date,'g',10));
+    widget->gdate_label->adjustSize();
+    widget->gtime_label->setText(QString::number(time,'g',10));
+    widget->gdate_label->adjustSize();
+
+    widget->textBrowser->append(temp);
 }
 
 void GpsDisplayWidget::setSVs(int sv)
@@ -111,8 +141,13 @@ void GpsDisplayWidget::setPosition(double lat, double lon, double alt)
     temp.append(QString::number(lon,'g',10));
     temp.append(" ");
     temp.append(QString::number(alt,'g',10));
-    widget->label->setText(temp);
-    widget->label->adjustSize();
+    widget->lat_label->setText(QString::number(lat,'g',10));
+    widget->lat_label->adjustSize();
+    widget->long_label->setText(QString::number(lon,'g',10));
+    widget->long_label->adjustSize();
+    //widget->alt_label->setText(QString::number(alt,'g',10));
+    //widget->alt_label->adjustSize();
+
     widget->textBrowser->append(temp);
 }
 

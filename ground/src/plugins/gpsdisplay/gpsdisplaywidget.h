@@ -56,6 +56,8 @@ private slots:
    void connectButtonClicked();
    void setSVs(int);
    void setPosition(double, double, double);
+   void setDateTime(double, double);
+   void setSpeedHeading(double, double);
 
 private:
    Ui_GpsDisplayWidget* widget;

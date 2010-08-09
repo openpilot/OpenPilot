@@ -326,6 +326,7 @@ void LineardialGadgetWidget::setDialFile(QString dfn)
        l_scene->addItem(background);
        fieldName = NULL;
        fieldValue = NULL;
+       fieldSymbol = NULL;
        index = NULL;
    }
 }

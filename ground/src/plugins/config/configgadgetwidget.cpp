@@ -44,6 +44,7 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
 {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     FancyTabWidget *ftw = new FancyTabWidget(this, true);
+    ftw->setIconSize(32);
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(ftw);
     setLayout(layout);
@@ -51,6 +52,8 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     m_config = new Ui_SettingsWidget();
     m_config->setupUi(qwd);
     ftw->insertTab(0, qwd,QIcon(":/core/images/pluginicon.png"),QString("RC Input/Output"));
+    qwd = new QWidget;
+    ftw->insertTab(1,qwd,QIcon(":/configgadget/images/XBee.svg"), QString("Telemetry"));
 
     // Fill in the dropdown menus for the channel RC Input assignement.
     QStringList channelsList;

@@ -17,3 +17,4 @@ SOURCES += configplugin.cpp \
     configgadgetoptionspage.cpp \
     configgadget.cpp
 FORMS += settingswidget.ui
+RESOURCES += configgadget.qrc

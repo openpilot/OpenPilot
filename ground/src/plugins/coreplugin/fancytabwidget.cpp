@@ -50,12 +50,18 @@ using namespace Internal;
 const int FancyTabBar::m_rounding = 22;
 const int FancyTabBar::m_textPadding = 4;
 
-FancyTabBar::FancyTabBar(QWidget *parent)
+FancyTabBar::FancyTabBar(QWidget *parent, bool isVertical)
     : QWidget(parent)
 {
+    verticalTabs = isVertical;
+    setIconSize(16);
     m_hoverIndex = -1;
     m_currentIndex = 0;
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    if (isVertical) {
+        setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+    } else {
+        setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    }
     setStyle(new QWindowsStyle);
     setMinimumWidth(qMax(2 * m_rounding, 40));
     setAttribute(Qt::WA_Hover, true);
@@ -81,7 +87,7 @@ QSize FancyTabBar::tabSizeHint(bool minimum) const
     int spacing = 6;
     int width = 90 + spacing + 2;
 
-    int iconHeight = minimum ? 0 : 16;
+    int iconHeight = minimum ? 0 : iconSize;
     return QSize(width, iconHeight + spacing + fm.height());
 }
 
@@ -171,18 +177,30 @@ void FancyTabBar::updateTabNameIcon(int index, const QIcon &icon, const QString 
 QSize FancyTabBar::sizeHint() const
 {
     QSize sh = tabSizeHint();
+    if (verticalTabs)
+        return QSize(sh.width(), sh.height() * m_tabs.count());
     return QSize(sh.width() * m_tabs.count(), sh.height());
 }
 
 QSize FancyTabBar::minimumSizeHint() const
 {
     QSize sh = tabSizeHint(true);
+    if (verticalTabs)
+        return QSize(sh.width(), sh.height() * m_tabs.count());
     return QSize(sh.width() * m_tabs.count(), sh.height());
 }
 
 QRect FancyTabBar::tabRect(int index) const
 {
     QSize sh = tabSizeHint();
+
+    if (verticalTabs) {
+        if (sh.height() * m_tabs.count() > height())
+            sh.setHeight(height() / m_tabs.count());
+
+        return QRect(0, index * sh.height(), sh.width(), sh.height());
+
+    }
 
     if(sh.width() * m_tabs.count() > width())
         sh.setWidth(width() / m_tabs.count());
@@ -303,7 +321,7 @@ private:
 FancyTabWidget::FancyTabWidget(QWidget *parent, bool isVertical)
     : QWidget(parent)
 {
-    m_tabBar = new FancyTabBar(this);
+    m_tabBar = new FancyTabBar(this, isVertical);
 
     m_selectionWidget = new QWidget(this);
     QBoxLayout *selectionLayout;

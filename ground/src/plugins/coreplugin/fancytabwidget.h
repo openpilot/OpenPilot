@@ -54,7 +54,7 @@ class FancyTabBar : public QWidget
     Q_OBJECT
 
 public:
-    FancyTabBar(QWidget *parent = 0);
+    FancyTabBar(QWidget *parent = 0, bool isVertical=false);
     ~FancyTabBar();
 
     bool event(QEvent *event);
@@ -85,6 +85,7 @@ public:
     void setTabToolTip(int index, QString toolTip) { m_tabs[index].toolTip = toolTip; }
     QString tabToolTip(int index) const { return m_tabs.at(index).toolTip; }
 
+    void setIconSize(int s) { iconSize = s; }
     QIcon tabIcon(int index) const {return m_tabs.at(index).icon; }
     QString tabText(int index) const { return m_tabs.at(index).text; }
     int count() const {return m_tabs.count(); }
@@ -104,7 +105,9 @@ private:
     QRect m_hoverRect;
     int m_hoverIndex;
     int m_currentIndex;
+    int iconSize;
     QList<FancyTab> m_tabs;
+    bool verticalTabs;
 
     QSize tabSizeHint(bool minimum = false) const;
 
@@ -125,6 +128,7 @@ public:
     int cornerWidgetCount() const;
     void setTabToolTip(int index, const QString &toolTip);
     void updateTabNameIcon(int index, const QIcon &icon, const QString &label);
+    void setIconSize(int s) { m_tabBar->setIconSize(s); }
 
     void paintEvent(QPaintEvent *event);
 

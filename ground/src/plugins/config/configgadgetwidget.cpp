@@ -27,6 +27,8 @@
 #include "configgadgetwidget.h"
 #include "ui_settingswidget.h"
 
+#include <coreplugin/fancytabwidget.h>
+
 #include <QDebug>
 #include <QStringList>
 #include <QtGui/QWidget>
@@ -34,11 +36,21 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
 
+using namespace Core;
+using namespace Core::Internal;
+
+
 ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
 {
-    m_config = new Ui_SettingsWidget();
-    m_config->setupUi(this);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    FancyTabWidget *ftw = new FancyTabWidget(this, true);
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(ftw);
+    setLayout(layout);
+    QWidget *qwd = new QWidget;
+    m_config = new Ui_SettingsWidget();
+    m_config->setupUi(qwd);
+    ftw->insertTab(0, qwd,QIcon(":/core/images/pluginicon.png"),QString("RC Input/Output"));
 
     // Fill in the dropdown menus for the channel RC Input assignement.
     QStringList channelsList;

@@ -300,18 +300,28 @@ private:
 // FancyTabWidget
 //////
 
-FancyTabWidget::FancyTabWidget(QWidget *parent)
+FancyTabWidget::FancyTabWidget(QWidget *parent, bool isVertical)
     : QWidget(parent)
 {
     m_tabBar = new FancyTabBar(this);
 
     m_selectionWidget = new QWidget(this);
-    QHBoxLayout *selectionLayout = new QHBoxLayout;
+    QBoxLayout *selectionLayout;
+    if (isVertical) {
+        selectionLayout = new QVBoxLayout;
+    } else {
+        selectionLayout = new QHBoxLayout;
+    }
     selectionLayout->setSpacing(0);
     selectionLayout->setMargin(0);
 
     Utils::StyledBar *bar = new Utils::StyledBar;
-    QVBoxLayout *layout = new QVBoxLayout(bar);
+    QBoxLayout *layout;
+    if (isVertical) {
+        layout = new QHBoxLayout(bar);
+    } else {
+        layout = new QVBoxLayout(bar);
+    }
     layout->setMargin(0);
     layout->setSpacing(0);
     layout->addWidget(new FancyColorButton(this));
@@ -319,13 +329,26 @@ FancyTabWidget::FancyTabWidget(QWidget *parent)
 
     selectionLayout->addWidget(m_tabBar, 1);
     m_selectionWidget->setLayout(selectionLayout);
-    m_selectionWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    if (isVertical) {
+        m_selectionWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+    } else {
+        m_selectionWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    }
 
     m_cornerWidgetContainer = new QWidget(this);
-    m_cornerWidgetContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+    if (isVertical) {
+        m_cornerWidgetContainer->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+    } else {
+        m_cornerWidgetContainer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+    }
     m_cornerWidgetContainer->setAutoFillBackground(false);
 
-    QHBoxLayout *cornerWidgetLayout = new QHBoxLayout;
+    QBoxLayout *cornerWidgetLayout;
+    if (isVertical) {
+        cornerWidgetLayout = new QVBoxLayout;
+    } else {
+        cornerWidgetLayout = new QHBoxLayout;
+    }
     cornerWidgetLayout->setSpacing(0);
     cornerWidgetLayout->setMargin(0);
     cornerWidgetLayout->addStretch();
@@ -341,12 +364,15 @@ FancyTabWidget::FancyTabWidget(QWidget *parent)
     vlayout->setMargin(0);
     vlayout->setSpacing(0);
     vlayout->addLayout(m_modesStack);
-    vlayout->addWidget(m_selectionWidget);
+    if (!isVertical)
+        vlayout->addWidget(m_selectionWidget);
 //    vlayout->addWidget(m_statusBar);  //status bar is not used for now
 
     QHBoxLayout *mainLayout = new QHBoxLayout;
     mainLayout->setMargin(0);
     mainLayout->setSpacing(1);
+    if (isVertical)
+        mainLayout->addWidget(m_selectionWidget);
     mainLayout->addLayout(vlayout);
     setLayout(mainLayout);
 

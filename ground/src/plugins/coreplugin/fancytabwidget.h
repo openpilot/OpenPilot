@@ -115,7 +115,7 @@ class FancyTabWidget : public QWidget
     Q_OBJECT
 
 public:
-    FancyTabWidget(QWidget *parent = 0);
+    FancyTabWidget(QWidget *parent = 0, bool isVertical = false);
 
     void insertTab(int index, QWidget *tab, const QIcon &icon, const QString &label);
     void removeTab(int index);

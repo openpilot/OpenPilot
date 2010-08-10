@@ -23,6 +23,7 @@
 #include <boost/thread/mutex.hpp>
 
 #include "jmath/jblas.hpp"
+#include "jmath/indirectArray.hpp"
 
 #include "rtslam/hardwareEstimatorAbstract.hpp"
 
@@ -65,6 +66,8 @@ namespace hardware {
 			
 			jblas::mat_indirect acquireReadings(double t1, double t2);
 			void releaseReadings() { reading_pos = -1; }
+			jblas::ind_array instantValues() { return jmath::ublasExtra::ia_set(1,10); }
+			jblas::ind_array incrementValues() { return jmath::ublasExtra::ia_set(1,1); }
 
 			double getFreq() { return realFreq; }
 	};

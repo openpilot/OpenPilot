@@ -118,12 +118,12 @@ namespace jafar {
 			vec3 pnew, vnew, abnew, wbnew, gnew;
 			vec4 qnew;
 
-			pnew = p + v * _dt; //     position
 			// qnew = q x q(w * dt)
 			// Keep qwt ( = q(w * dt)) for later use
 			vec4 qwdt = v2q(wtrue * _dt);
 			qnew = qProd(q, qwdt); //    orientation
 			vnew = v + atrue * _dt; //    velocity
+			pnew = p + (v+vnew)/2 * _dt; //     position
 			abnew = ab + ar; //          acc bias
 			wbnew = wb + wr; //          gyro bias
 			gnew = g; //                 gravity does not change

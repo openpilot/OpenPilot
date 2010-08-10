@@ -27,7 +27,7 @@
 #include "configgadgetwidget.h"
 #include "ui_settingswidget.h"
 
-#include <coreplugin/fancytabwidget.h>
+#include "fancytabwidget.h"
 
 #include <QDebug>
 #include <QStringList>
@@ -36,8 +36,6 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
 
-using namespace Core;
-using namespace Core::Internal;
 
 
 ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)

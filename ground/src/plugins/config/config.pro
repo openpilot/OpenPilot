@@ -9,12 +9,14 @@ HEADERS += configplugin.h \
     configgadgetwidget.h \
     configgadgetfactory.h \
     configgadgetoptionspage.h \
-    configgadget.h
+    configgadget.h \
+    fancytabwidget.h
 SOURCES += configplugin.cpp \
     configgadgetconfiguration.cpp \
     configgadgetwidget.cpp \
     configgadgetfactory.cpp \
     configgadgetoptionspage.cpp \
-    configgadget.cpp
+    configgadget.cpp \
+    fancytabwidget.cpp
 FORMS += settingswidget.ui
 RESOURCES += configgadget.qrc

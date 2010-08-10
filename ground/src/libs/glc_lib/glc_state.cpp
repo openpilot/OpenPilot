@@ -26,7 +26,7 @@
 
 #include "glc_state.h"
 #include "glc_ext.h"
-#include "../sceneGraph/glc_octree.h"
+#include "sceneGraph/glc_octree.h"
 
 #include <QGLFramebufferObject>
 

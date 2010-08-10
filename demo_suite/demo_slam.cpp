@@ -132,6 +132,9 @@ const int display_period = 100; // ms
 
 ///##############################################
 
+const std::string MTI_DEVICE = "/dev/ttyUSB0";
+const std::string CAMERA_DEVICE = "0x00b09d01006fb38f";
+
 // time
 const unsigned N_FRAMES = 500000;
 
@@ -141,12 +144,11 @@ const unsigned MAP_SIZE = 313;
 // constant velocity robot uncertainties and perturbations
 const double UNCERT_VLIN = .1; // m/s
 const double UNCERT_VANG = .1; // rad/s
-const double PERT_VLIN = 2; // m/s per sqrt(s)
-const double PERT_VANG = 2; // rad/s per sqrt(s)
+const double PERT_VLIN = 3; // m/s per sqrt(s)
+const double PERT_VANG = 3; // rad/s per sqrt(s)
 
 // inertial robot initial uncertainties and perturbations
 //if (intOpts[iRobot] == 1) // == robot inertial
-const std::string MTI_DEVICE = "/dev/ttyUSB0";
 const double UNCERT_GRAVITY = 10.0; // m/s^2
 const double UNCERT_ABIAS = 0.05*17.0; // 5% of full scale
 const double UNCERT_WBIAS = 0.05*jmath::degToRad(300.0); // 5% of full scale
@@ -161,7 +163,7 @@ const unsigned IMG_HEIGHT = 480;
 const double INTRINSIC[4] = { 301.27013,   266.86136,   497.28243,   496.81116 };
 const double DISTORTION[2] = { -0.23193,   0.11306 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
 const double CORRECTION_SIZE_FACTOR = 3;
-const double PIX_NOISE = .5;
+const double PIX_NOISE = 1.0;
 const double PIX_NOISE_SIMUFACTOR = 0.0;
 
 // lmk management
@@ -339,6 +341,7 @@ void demo_slam01_main(world_ptr_t *world) {
 			boost::shared_ptr<hardware::HardwareEstimatorMti> hardEst1_(new hardware::HardwareEstimatorMti(
 				MTI_DEVICE, floatOpts[fFreq], floatOpts[fShutter], 1024, mode, strOpts[sDataPath], true));
 			if (intOpts[iTrigger]) floatOpts[fFreq] = hardEst1_->getFreq();
+			hardEst1_->setSyncConfig(0.009);
 			hardEst1 = hardEst1_;
 		}
 		robPtr1_->setHardwareEstimator(hardEst1);
@@ -426,7 +429,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		
 		#ifdef HAVE_VIAM
 		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, rawdata_mutex, 
-			"0x00b09d01006fb38f", cv::Size(IMG_WIDTH,IMG_HEIGHT), 0, 8, floatOpts[fFreq], intOpts[iTrigger], mode, strOpts[sDataPath]));
+			CAMERA_DEVICE, cv::Size(IMG_WIDTH,IMG_HEIGHT), 0, 8, floatOpts[fFreq], intOpts[iTrigger], mode, strOpts[sDataPath]));
 		senPtr11->setHardwareSensor(hardSen11);
 		#else
 		if (intOpts[iReplay])
@@ -474,6 +477,10 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	//worldPtr->display_mutex.unlock();
 
+jblas::vec robot_prediction;
+double average_robot_innovation;
+int n_innovation = 0;
+	
 	// ---------------------------------------------------------------------------
 	// --- LOOP ------------------------------------------------------------------
 	// ---------------------------------------------------------------------------
@@ -541,7 +548,8 @@ JFR_DEBUG("                 FRAME : " << (*world)->t);
 
 				// move the filter time to the data raw.
 				robPtr->move(senPtr->getRaw()->timestamp);
-JFR_DEBUG("Robot state after move " << ublas::subrange(robPtr1->state.x(),0,3) << " " << ublas::subrange(robPtr1->state.x(),3,7) << " " << ublas::subrange(robPtr1->state.x(),7,10) << " " << ublas::subrange(robPtr1->state.x(),10,13));
+JFR_DEBUG("Robot state after move " << robPtr1->state.x());
+robot_prediction = robPtr->state.x();
 
 				// foreach dataManager
 				for (SensorAbstract::DataManagerList::iterator dmaIter = senPtr->dataManagerList().begin();
@@ -551,13 +559,16 @@ JFR_DEBUG("Robot state after move " << ublas::subrange(robPtr1->state.x(),0,3) <
 					dmaPtr->process(senPtr->getRaw());
 				} // foreach dataManager
 
+average_robot_innovation += ublas::norm_2(robPtr->state.x() - robot_prediction);
+n_innovation++;
+
 			} // for each sensor
 		} // for each robot
 
 		// NOW LOOP FOR STATE SPACE - ALL MM
 		if (had_data)
 		{
-JFR_DEBUG("Robot state after corrections " << ublas::subrange(robPtr1->state.x(),0,3) << " " << ublas::subrange(robPtr1->state.x(),3,7) << " " << ublas::subrange(robPtr1->state.x(),7,10) << " " << ublas::subrange(robPtr1->state.x(),10,13));
+JFR_DEBUG("Robot state after corrections " << robPtr1->state.x());
 			if (robPtr1->dt_or_dx > max_dt) max_dt = robPtr1->dt_or_dx;
 
 			// Output info
@@ -653,6 +664,9 @@ JFR_DEBUG("Robot state after corrections " << ublas::subrange(robPtr1->state.x()
 			if (dataLogger) dataLogger->log();
 		}
 	} // temporal loop
+
+average_robot_innovation /= n_innovation;
+std::cout << "average_robot_innovation " << average_robot_innovation << std::endl;
 
 	(*world)->slam_blocked(true);
 //	std::cout << "\nFINISHED ! Press a key to terminate." << std::endl;

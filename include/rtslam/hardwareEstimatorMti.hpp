@@ -37,7 +37,7 @@ namespace hardware {
 	{
 		private:
 #ifdef HAVE_MTI
-			MTI mti;
+			MTI *mti;
 #endif
 			
 			jblas::mat buffer;
@@ -51,6 +51,7 @@ namespace hardware {
 			
 			double timestamps_correction;
 //			bool tighly_synchronized;
+//			double tight_offset;
 			
 			int mode;
 			std::string dump_path;
@@ -62,7 +63,8 @@ namespace hardware {
 		public:
 			
 			HardwareEstimatorMti(std::string device, double trigger_freq, double trigger_shutter, int bufferSize_, int mode = 0, std::string dump_path = ".", bool start_reading = true);
-			bool setSyncConfig(double timestamps_correction = 0.0/*, bool tightly_synchronized = false*/);
+			~HardwareEstimatorMti();
+			void setSyncConfig(double timestamps_correction = 0.0/*, bool tightly_synchronized = false, double tight_offset*/);
 			
 			jblas::mat_indirect acquireReadings(double t1, double t2);
 			void releaseReadings() { reading_pos = -1; }

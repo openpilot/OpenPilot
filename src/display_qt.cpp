@@ -42,6 +42,7 @@ namespace display {
 	{
 		framenumber = -1;
 		t = 0.;
+		pose.clear();
 		id_ = slamSen_->id();
 		avg_framerate = 0.;
 		size = cv::Size(640,480);
@@ -58,10 +59,10 @@ namespace display {
 	
 	void SensorQt::bufferize()
 	{
+		if (framenumber+1 <= 0) avg_framerate = 0.;
 		if (slamSen_->rawCounter != framenumber+1)
 		{
-			if (framenumber < 0) avg_framerate = 0.; else
-				avg_framerate = (slamSen_->rawPtr->timestamp-t)/(slamSen_->rawCounter-1-framenumber);
+			if (framenumber+1 > 0) avg_framerate = (slamSen_->rawPtr->timestamp-t)/(slamSen_->rawCounter-1-framenumber);
 			framenumber = slamSen_->rawCounter-1;
 			t = slamSen_->rawPtr->timestamp;
 			raw_ptr_t raw = slamSen_->getRaw();

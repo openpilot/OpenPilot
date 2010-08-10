@@ -5,7 +5,7 @@ build_jafar_module(gdhe
   REVISION 1 
   REQUIRED_MODULES kernel jmath
   #OPTIONAL_MODULES 
-  REQUIRED_EXTLIBS gdhe boost_sandbox
+  REQUIRED_EXTLIBS gdhe boost_sandbox boost_system boost_thread boost_filesystem
   #OPTIONAL_EXTLIBS 
   #CXXFLAGS
   #CPPFLAGS_MODULE -Wno-long-long -pedantic -pedantic-errors

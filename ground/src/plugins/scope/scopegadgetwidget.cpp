@@ -32,10 +32,13 @@
 
 #include "qwt/src/qwt_plot_curve.h"
 #include "qwt/src/qwt_legend.h"
+#include "qwt/src/qwt_legend_item.h"
+#include "qwt/src/qwt_plot_grid.h"
 
 #include <iostream>
 #include <math.h>
 #include <QDebug>
+#include <QColor>
 #include <QStringList>
 #include <QtGui/QWidget>
 #include <QtGui/QVBoxLayout>
@@ -46,8 +49,15 @@ TestDataGen* ScopeGadgetWidget::testDataGen;
 
 ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent)
 {
-//    if(testDataGen == 0)
-//        testDataGen = new TestDataGen();
+  //  if(testDataGen == 0)
+  //      testDataGen = new TestDataGen();
+
+    setCanvasBackground(Qt::darkBlue);
+
+    QwtPlotGrid *grid = new QwtPlotGrid;
+    grid->setMajPen(QPen(Qt::gray, 0, Qt::DashLine));
+    grid->setMinPen(QPen(Qt::lightGray, 0 , Qt::DotLine));
+    grid->attach(this);
 }
 
 void ScopeGadgetWidget::preparePlot(PlotType plotType)
@@ -64,9 +74,22 @@ void ScopeGadgetWidget::preparePlot(PlotType plotType)
     // Show a legend at the bottom
     if (legend() == 0) {
         QwtLegend *legend = new QwtLegend();
+        legend->setItemMode(QwtLegend::CheckableItem);
         legend->setFrameStyle(QFrame::Box | QFrame::Sunken);
         insertLegend(legend, QwtPlot::BottomLegend);
     }
+
+    connect(this, SIGNAL(legendChecked(QwtPlotItem *, bool)),this, SLOT(showCurve(QwtPlotItem *, bool)));
+}
+
+void ScopeGadgetWidget::showCurve(QwtPlotItem *item, bool on)
+{
+    item->setVisible(!on);
+    QWidget *w = legend()->find(item);
+    if ( w && w->inherits("QwtLegendItem") )
+        ((QwtLegendItem *)w)->setChecked(on);
+
+    replot();
 }
 
 void ScopeGadgetWidget::setupSequencialPlot()
@@ -131,6 +154,7 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavField, int sc
     plotCurve->attach(this);
     plotData->curve = plotCurve;
 
+
     //Keep the curve details for later
     m_curvesData.insert(curveName, plotData);
 
@@ -146,6 +170,8 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavField, int sc
     }
 
     connect(plotData, SIGNAL(dataChanged()), this, SLOT(replotNewData()));
+
+    replot();
 }
 
 void ScopeGadgetWidget::removeCurvePlot(QString uavObject, QString uavField)
@@ -158,6 +184,8 @@ void ScopeGadgetWidget::removeCurvePlot(QString uavObject, QString uavField)
 
     delete plotData->curve;
     delete plotData;
+
+    replot();
 }
 
 void ScopeGadgetWidget::uavObjectReceived(UAVObject* obj)
@@ -265,7 +293,7 @@ TestDataGen::TestDataGen()
     //Setup timer
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(genTestData()));
-    timer->start(5000);
+    timer->start(2);
 }
 
 void TestDataGen::genTestData()
@@ -288,7 +316,7 @@ void TestDataGen::genTestData()
     gpsData.Satellites = 10;
     gps->setData(gpsData);
 
-    testTime++;
+    testTime += 0.02;
 }
 
 TestDataGen::~TestDataGen()

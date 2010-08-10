@@ -265,7 +265,7 @@ void ScopeGadgetOptionsPage::addPlotCurveConfig(QString uavObject, QString uavFi
   */
 void ScopeGadgetOptionsPage::on_btnRemoveCurve_clicked()
 {
-    options_page->lstCurves->takeItem(options_page->lstCurves->currentIndex().row());    
+    options_page->lstCurves->takeItem(options_page->lstCurves->currentIndex().row());
 }
 
 void ScopeGadgetOptionsPage::finish()

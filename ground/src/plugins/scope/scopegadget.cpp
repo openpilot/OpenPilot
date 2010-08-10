@@ -29,6 +29,8 @@
 #include "scopegadgetconfiguration.h"
 #include "scopegadgetwidget.h"
 
+#include <QtGui/qcolor.h>
+
 ScopeGadget::ScopeGadget(QString classId, ScopeGadgetWidget *widget, QWidget *parent) :
         IUAVGadget(classId, parent),
         m_widget(widget)
@@ -57,7 +59,17 @@ void ScopeGadget::loadConfiguration(IUAVGadgetConfiguration* config)
         int scale = plotCurveConfig->yScalePower;
         QRgb color = plotCurveConfig->color;
 
-        widget->addCurvePlot(uavObject,uavField,scale,QPen(QColor(color)));
+        widget->addCurvePlot(
+                uavObject,
+                uavField,
+                scale,
+                QPen(
+                        QBrush(QColor(color),Qt::SolidPattern),
+                        (qreal)2,
+                        Qt::SolidLine,
+                        Qt::SquareCap,
+                        Qt::BevelJoin)
+                );
     }   
 }
 

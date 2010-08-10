@@ -41,6 +41,7 @@ ModelViewGadgetWidget::ModelViewGadgetWidget(QWidget *parent)
 {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
+    CreateScene();
 
     m_Light.setPosition(4000.0, 40000.0, 80000.0);
     m_Light.setAmbientColor(Qt::lightGray);
@@ -59,7 +60,6 @@ ModelViewGadgetWidget::ModelViewGadgetWidget(QWidget *parent)
     attActual = AttitudeActual::GetInstance(objManager);
 
     // Create objects to display
-    CreateScene();
     connect(&m_MotionTimer, SIGNAL(timeout()), this, SLOT(updateAttitude()));
 }
 
@@ -119,7 +119,7 @@ void ModelViewGadgetWidget::paintGL()
     m_Light.glExecute();
 
     // Display the collection of GLC_Object
-    m_World.glExecute(0, false);
+    m_World.render(0, glc::ShadingFlag);
 
     // Display UI Info (orbit circle)
     m_MoverController.drawActiveMoverRep();
@@ -133,23 +133,30 @@ void ModelViewGadgetWidget::resizeGL(int width, int height)
 // Create GLC_Object to display
 void ModelViewGadgetWidget::CreateScene()
 {
-    if (QFile::exists(bgFilename))
+    try 
     {
         m_GlView.loadBackGroundImage(bgFilename);
     }
-    //else { std::cout << "File doesn't exist" << bgFilename.toStdString() << std::endl; }
-
-    if (QFile::exists(acFilename))
+    catch(GLC_Exception e)
     {
-        QFile aircraft(acFilename);
-
-        GLC_World* pWorld= m_pFactory->createWorld(aircraft);
-        m_World= *pWorld;
-        delete pWorld;
-
-        m_ModelBoundingBox= m_World.boundingBox();
+        qDebug("ModelView background image file loading failed.");
     }
-    //else { std::cout << "File doesn't exist" << acFilename.toStdString() << std::endl; }
+
+    try
+    {
+        if(QFile::exists(acFilename))
+	{
+	    QFile aircraft(acFilename);
+
+            m_World= GLC_Factory::instance()->createWorldFromFile(aircraft);
+
+            m_ModelBoundingBox= m_World.boundingBox();
+	}
+    }
+    catch(GLC_Exception e)
+    {
+	qDebug("ModelView aircraft texture file loading failed.");
+    }
 }
 
 void ModelViewGadgetWidget::mousePressEvent(QMouseEvent *e)
@@ -160,7 +167,7 @@ void ModelViewGadgetWidget::mousePressEvent(QMouseEvent *e)
         {
         case (Qt::LeftButton):
                 m_MotionTimer.stop();
-                m_MoverController.setActiveMover(GLC_MoverController::TurnTable, e->x(), e->y());
+                m_MoverController.setActiveMover(GLC_MoverController::TurnTable, e);
                 updateGL();
                 break;
         default:
@@ -171,7 +178,7 @@ void ModelViewGadgetWidget::mousePressEvent(QMouseEvent *e)
 void ModelViewGadgetWidget::mouseMoveEvent(QMouseEvent * e)
 {
         if (not m_MoverController.hasActiveMover()) return;
-        m_MoverController.move(e->x(), e->y());
+        m_MoverController.move(e);
         m_GlView.setDistMinAndMax(m_World.boundingBox());
         updateGL();
 }

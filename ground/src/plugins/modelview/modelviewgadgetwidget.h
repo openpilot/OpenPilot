@@ -36,6 +36,7 @@
 #include <GLC_MoverController>
 #include <GLC_Light>
 #include <GLC_World>
+#include <GLC_Exception>
 
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/attitudeactual.h"

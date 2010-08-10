@@ -30,7 +30,7 @@
 #include <QString>
 #include <QHash>
 #include <QTextStream>
-#include <../shading/glc_material.h>
+#include "../shading/glc_material.h"
 
 #include "../glc_config.h"
 

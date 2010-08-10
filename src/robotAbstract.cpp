@@ -113,5 +113,26 @@ namespace jafar {
 		}
 
 
+		void RobotAbstract::writeLogHeader(kernel::DataLogger& log) const
+		{
+			std::ostringstream oss; oss << "Robot " << id();
+			log.writeComment(oss.str());
+			log.writeLegendTokens("time");
+			for(int i = 0; i < state.x().size(); ++i)
+				{ oss.str(""); oss << "x" << i; log.writeLegend(oss.str()); }
+			for(int i = 0; i < state.x().size(); ++i)
+				{ oss.str(""); oss << "sig" << i; log.writeLegend(oss.str()); }
+		}
+		
+		void RobotAbstract::writeLogData(kernel::DataLogger& log) const
+		{
+			log.writeData(self_time);
+			for(int i = 0; i < state.x().size(); ++i)
+				log.writeData(state.x()(i));
+			for(int i = 0; i < state.x().size(); ++i)
+				log.writeData(sqrt(state.P()(i,i)));
+		}
+
+
 	}
 }

@@ -23,6 +23,7 @@
 #include "kernel/jafarDebug.hpp"
 #include "kernel/jafarTestMacro.hpp"
 #include "kernel/timingTools.hpp"
+#include "kernel/dataLog.hpp"
 #include "jmath/random.hpp"
 #include "jmath/matlab.hpp"
 #include "jmath/ublasExtra.hpp"
@@ -84,12 +85,18 @@ time_t rseed;
 
 enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iLog, iVerbose, iRobot, iTrigger, iSimu, nIntOpts };
 int intOpts[nIntOpts] = {0};
+const int nFirstIntOpt = 0, nLastIntOpt = nIntOpts-1;
 
 enum { fFreq = 0, fShutter, nFloatOpts };
 double floatOpts[nFloatOpts] = {0.0};
+const int nFirstFloatOpt = nIntOpts, nLastFloatOpt = nIntOpts+nFloatOpts-1;
 
 enum { sSlamConfig = 0, sDataPath, nStrOpts };
 std::string strOpts[nStrOpts];
+const int nFirstStrOpt = nIntOpts+nFloatOpts, nLastStrOpt = nIntOpts+nFloatOpts+nStrOpts-1;
+
+enum { bHelp = 0, bUsage, nBreakingOpts };
+const int nFirstBreakingOpt = nIntOpts+nFloatOpts+nStrOpts, nLastBreakingOpt = nIntOpts+nFloatOpts+nStrOpts+nBreakingOpts-1;
 
 
 struct option long_options[] = {
@@ -201,7 +208,35 @@ void demo_slam01_main(world_ptr_t *world) {
 	boost::condition_variable rawdata_condition;
 	boost::mutex rawdata_mutex;
 	//boost::mutex rawdata_condmutex;
+	boost::scoped_ptr<kernel::DataLogger> dataLogger;
+	if (intOpts[iLog])
+	{
+		dataLogger.reset(new kernel::DataLogger(strOpts[sDataPath] + "/rtslam.log"));
+		dataLogger->writeCurrentDate();
+		dataLogger->writeNewLine();
+		
+		// write options to log
+		std::ostringstream oss;
+		for(int i = 0; i < nIntOpts; ++i)
+			{ oss << long_options[i+nFirstIntOpt].name << " = " << intOpts[i]; dataLogger->writeComment(oss.str()); oss.str(""); }
+		for(int i = 0; i < nFloatOpts; ++i)
+			{ oss << long_options[i+nFirstFloatOpt].name << " = " << floatOpts[i]; dataLogger->writeComment(oss.str()); oss.str(""); }
+		for(int i = 0; i < nStrOpts; ++i)
+			{ oss << long_options[i+nFirstStrOpt].name << " = " << strOpts[i]; dataLogger->writeComment(oss.str()); oss.str(""); }
+		dataLogger->writeNewLine();
+	}
 
+	switch (intOpts[iVerbose])
+	{
+		case 0: debug::DebugStream::setLevel("rtslam", debug::DebugStream::Off); break;
+		case 1: debug::DebugStream::setLevel("rtslam", debug::DebugStream::Trace); break;
+		case 2: debug::DebugStream::setLevel("rtslam", debug::DebugStream::Warning); break;
+		case 3: debug::DebugStream::setLevel("rtslam", debug::DebugStream::Debug); break;
+		case 4: debug::DebugStream::setLevel("rtslam", debug::DebugStream::VerboseDebug); break;
+		default: debug::DebugStream::setLevel("rtslam", debug::DebugStream::VeryVerboseDebug); break;
+	}
+
+	
 	// pin-hole parameters in BOOST format
 	vec intrinsic = createVector<4> (INTRINSIC);
 	vec distortion = createVector<sizeof(DISTORTION)/sizeof(double)> (DISTORTION);
@@ -315,6 +350,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	robPtr1->setId();
 	robPtr1->linkToParentMap(mapPtr);
 	robPtr1->pose.x(quaternion::originFrame());
+	if (dataLogger) dataLogger->addLoggable(*robPtr1.get());
 
 	if (intOpts[iSimu] == 1)
 	{
@@ -446,6 +482,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	// loop all lmks
 	// create sen--lmk observation
 	// Temporal loop
+	if (dataLogger) dataLogger->log();
 	kernel::Chrono chrono;
 	double max_dt = 0;
 	for (; (*world)->t <= N_FRAMES;)
@@ -610,7 +647,11 @@ JFR_DEBUG("Robot state after corrections " << ublas::subrange(robPtr1->state.x()
 		}
 //std::cout << "one frame " << (*world)->t << " : " << mode << " " << had_data << std::endl;
 
-		if (had_data) (*world)->t++;
+		if (had_data)
+		{
+			(*world)->t++;
+			if (dataLogger) dataLogger->log();
+		}
 	} // temporal loop
 
 	(*world)->slam_blocked(true);
@@ -819,8 +860,8 @@ void demo_slam01_exit(world_ptr_t *world, boost::thread *thread_main) {
 		 * --dump=0/1  (needs --data-path)
 		 * --rand-seed=0/1/n, 0=generate new one, 1=in replay use the saved one, n=use seed n
 		 * --pause=0/n 0=don't, n=pause for frames>n (needs --replay 1)
-		 * #--log=0/1 -> not implemented yet
-		 * #--verbose=0/1/2 -> not implemented yet
+		 * --log=0/1 -> not implemented yet
+		 * --verbose=0/1/2/3/4/5 -> Off/Trace/Warning/Debug/VerboseDebug/VeryVerboseDebug
 		 * --data-path=/mnt/ram/rtslam
 		 * #--slam-config=data/config1.xml -> not implemented yet
 		 * --help
@@ -845,6 +886,7 @@ void demo_slam01_exit(world_ptr_t *world, boost::thread *thread_main) {
 		 */
 		int main(int argc, char* const* argv)
 		{
+			intOpts[iVerbose] = 5;
 			floatOpts[fFreq] = 60.0;
 			floatOpts[fShutter] = 2e-3;
 			strOpts[sDataPath] = ".";
@@ -856,35 +898,35 @@ void demo_slam01_exit(world_ptr_t *world, boost::thread *thread_main) {
 				if (c == -1) break;
 				if (c == 0)
 				{
-					if (option_index < nIntOpts)
+					if (option_index <= nLastIntOpt)
 					{
 						intOpts[option_index] = 1;
-						if (optarg) intOpts[option_index] = atoi(optarg);
+						if (optarg) intOpts[option_index-nFirstIntOpt] = atoi(optarg);
 					} else
-					if (option_index < nIntOpts+nFloatOpts)
+					if (option_index <= nLastFloatOpt)
 					{
-						if (optarg) floatOpts[option_index-nIntOpts] = atof(optarg);
+						if (optarg) floatOpts[option_index-nFirstFloatOpt] = atof(optarg);
 					} else
-					if (option_index < nIntOpts+nFloatOpts+nStrOpts)
+					if (option_index <= nLastStrOpt)
 					{
-						if (optarg) strOpts[option_index-nIntOpts-nFloatOpts] = optarg;
+						if (optarg) strOpts[option_index-nFirstStrOpt] = optarg;
 					} else
 					{
 						std::cout << "Integer options:" << std::endl;
 						for(int i = 0; i < nIntOpts; ++i)
-							std::cout << "\t--" << long_options[i].name << std::endl;
+							std::cout << "\t--" << long_options[i+nFirstIntOpt].name << std::endl;
 						
 						std::cout << "Float options:" << std::endl;
 						for(int i = 0; i < nFloatOpts; ++i)
-							std::cout << "\t--" << long_options[i+nIntOpts].name << std::endl;
+							std::cout << "\t--" << long_options[i+nFirstFloatOpt].name << std::endl;
 
 						std::cout << "String options:" << std::endl;
 						for(int i = 0; i < nStrOpts; ++i)
-							std::cout << "\t--" << long_options[i+nIntOpts+nFloatOpts].name << std::endl;
+							std::cout << "\t--" << long_options[i+nFirstStrOpt].name << std::endl;
 						
 						std::cout << "Breaking options:" << std::endl;
 						for(int i = 0; i < 2; ++i)
-							std::cout << "\t--" << long_options[i+nIntOpts+nFloatOpts+nStrOpts].name << std::endl;
+							std::cout << "\t--" << long_options[i+nFirstBreakingOpt].name << std::endl;
 						
 						return 0;
 					}

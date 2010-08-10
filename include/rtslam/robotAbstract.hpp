@@ -36,6 +36,8 @@
 #include <jmath/jblas.hpp>
 #include "kernel/jafarDebug.hpp"
 #include "kernel/IdFactory.hpp"
+#include "kernel/dataLog.hpp"
+#include "kernel/timingTools.hpp"
 
 #include "rtslam/rtSlam.hpp"
 #include "rtslam/gaussian.hpp"
@@ -62,7 +64,7 @@ namespace jafar {
 		 * \ingroup rtslam
 		 */
 		class RobotAbstract: public MapObject, public ChildOf<MapAbstract> , public boost::enable_shared_from_this<
-		    RobotAbstract>, public ParentOf<SensorAbstract> {
+		    RobotAbstract>, public ParentOf<SensorAbstract>, public kernel::DataLoggable {
 
 				friend ostream& operator <<(ostream & s, jafar::rtslam::RobotAbstract & rob);
 
@@ -137,7 +139,7 @@ namespace jafar {
 				 *   and perform all the above operations to obtain Q inside the constructor body.
 				 */
 				bool constantPerturbation;
-				double self_time; ///< 					Current estimation time
+				kernel::Timestamp self_time; ///< 					Current estimation time
 				double dt_or_dx; ///<           Sampling time or any other relevant increment (e.g. odometry is not time-driven but distance-driven)
 
 				jblas::mat XNEW_x; ///<         Jacobian wrt state
@@ -222,6 +224,9 @@ namespace jafar {
 				void computeStatePerturbation();
 
 
+				virtual void writeLogHeader(kernel::DataLogger& log) const;
+				virtual void writeLogData(kernel::DataLogger& log) const;
+
 			protected:
 
 
@@ -247,6 +252,7 @@ namespace jafar {
 				 */
 				virtual void move_func(const vec & _x, const vec & _u, const vec& _n, const double _dt, vec & _xnew,
 				                       mat & _XNEW_x, mat & _XNEW_pert) = 0;
+
 
 		};
 

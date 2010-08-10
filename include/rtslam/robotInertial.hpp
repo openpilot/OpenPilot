@@ -133,6 +133,8 @@ namespace jafar {
 					}
 				}
 
+				virtual void writeLogHeader(kernel::DataLogger& log) const;
+				virtual void writeLogData(kernel::DataLogger& log) const;
 
 			protected:
 				/**

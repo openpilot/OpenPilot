@@ -227,5 +227,50 @@ namespace jafar {
 
 		}
 
+		void RobotInertial::writeLogHeader(kernel::DataLogger& log) const
+		{
+			std::ostringstream oss; oss << "Robot " << id();
+			log.writeComment(oss.str());
+			log.writeLegendTokens("time");
+			
+			log.writeLegendTokens("x y z");
+			log.writeLegendTokens("qw qx qy qz");
+			log.writeLegendTokens("yaw pitch roll");
+			log.writeLegendTokens("vx vy vz");
+			log.writeLegendTokens("axb ayb azb");
+			log.writeLegendTokens("vyawb vpitchb vrollb");
+			log.writeLegendTokens("gx gy gz");
+			
+			log.writeLegendTokens("sig_x sig_y sig_z");
+			log.writeLegendTokens("sig_qw sig_qx sig_qy sig_qz");
+			log.writeLegendTokens("sig_yaw sig_pitch sig_roll");
+			log.writeLegendTokens("sig_vx sig_vy sig_vz");
+			log.writeLegendTokens("sig_axb sig_ayb sig_azb");
+			log.writeLegendTokens("sig_vyawb sig_vpitchb sig_vrollb");
+			log.writeLegendTokens("sig_gx sig_gy sig_gz");
+		}
+		
+		void RobotInertial::writeLogData(kernel::DataLogger& log) const
+		{
+			jblas::vec euler_x(3);
+			jblas::sym_mat euler_P(3,3);
+			quaternion::q2e(ublas::subrange(state.x(), 3, 7), ublas::project(state.P(), ublas::range(3, 7), ublas::range(3,7)), euler_x, euler_P);
+			
+			log.writeData(self_time);
+			for(int i = 0 ; i < 7 ; ++i) log.writeData(state.x()(i));
+			for(int i = 0 ; i < 3 ; ++i) log.writeData(euler_x(2-i));
+			for(int i = 7 ; i < 10; ++i) log.writeData(state.x()(i));
+			for(int i = 10; i < 13; ++i) log.writeData(state.x()(i));
+			for(int i = 13; i < 16; ++i) log.writeData(state.x()(2-(i-13)+13));
+			for(int i = 16; i < 19; ++i) log.writeData(state.x()(i));
+			
+			for(int i = 0 ; i < 7 ; ++i) log.writeData(sqrt(state.P()(i,i)));
+			for(int i = 0 ; i < 3 ; ++i) log.writeData(sqrt(euler_P(2-i,2-i)));
+			for(int i = 7 ; i < 10; ++i) log.writeData(sqrt(state.P()(i,i)));
+			for(int i = 10; i < 13; ++i) log.writeData(sqrt(state.P()(i,i)));
+			for(int i = 13; i < 16; ++i) log.writeData(sqrt(state.P()(2-(i-13)+13,2-(i-13)+13)));
+			for(int i = 16; i < 19; ++i) log.writeData(sqrt(state.P()(i,i)));
+		}
+
 	}
 }

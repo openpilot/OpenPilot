@@ -137,6 +137,12 @@ namespace jafar {
 			 */
 			jblas::ind_array ia_pushfront(jblas::vecb & vb, const size_t N);
 
+			/**
+			Add an integer to all indexes of the indirect array
+			*/
+			jblas::ind_array operator+(const jblas::ind_array &ia, int n);
+			inline jblas::ind_array operator-(const jblas::ind_array &ia, int n) { return ia+(-n); }
+			
 		}
 	}
 }

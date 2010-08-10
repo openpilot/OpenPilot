@@ -250,6 +250,14 @@ namespace jafar {
 					res(i) = begin + i;
 				return res;
 			}
+			
+			jblas::ind_array operator+(const jblas::ind_array &ia, int n)
+			{
+				jblas::ind_array res(ia.size());
+				for (size_t i = 0; i < ia.size(); i++)
+					res(i) = ia(i) + n;
+				return res;
+			}
 
 		} // namespace ublasExtra
 	} // namespace jmath

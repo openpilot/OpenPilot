@@ -31,12 +31,12 @@
 #include <QtOpenGL/QGLWidget>
 #include <QTimer>
 
-#include "GLC_Factory.h"
-#include "viewport/GLC_Viewport.h"
-#include "viewport/GLC_MoverController.h"
-#include "shading/GLC_Light.h"
-#include "sceneGraph/GLC_World.h"
-#include "GLC_Exception.h"
+#include "glc_factory.h"
+#include "viewport/glc_viewport.h"
+#include "viewport/glc_movercontroller.h"
+#include "shading/glc_light.h"
+#include "sceneGraph/glc_world.h"
+#include "glc_exception.h"
 
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/attitudeactual.h"

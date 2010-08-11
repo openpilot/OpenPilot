@@ -13,19 +13,6 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QPushButton" name="connectButton">
-   <property name="geometry">
-    <rect>
-     <x>483</x>
-     <y>220</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Connect</string>
-   </property>
-  </widget>
   <widget class="QGraphicsView" name="gpsWorld">
    <property name="geometry">
     <rect>
@@ -91,19 +78,6 @@
    </property>
    <property name="toolTip">
     <string extracomment="Individual satellite information"/>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pushButton_2">
-   <property name="geometry">
-    <rect>
-     <x>483</x>
-     <y>250</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Disconnect</string>
    </property>
   </widget>
   <widget class="QGroupBox" name="groupBox">
@@ -470,9 +444,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>190</y>
-     <width>461</width>
-     <height>101</height>
+     <y>180</y>
+     <width>551</width>
+     <height>111</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -487,14 +461,49 @@
    <widget class="QTextBrowser" name="textBrowser">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>441</width>
+      <x>0</x>
+      <y>40</y>
+      <width>551</width>
       <height>71</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
     <property name="verticalScrollBarPolicy">
      <enum>Qt::ScrollBarAlwaysOn</enum>
+    </property>
+    <property name="lineWrapMode">
+     <enum>QTextEdit::WidgetWidth</enum>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="connectButton">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>10</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Connect</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_2">
+    <property name="geometry">
+     <rect>
+      <x>450</x>
+      <y>10</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Disconnect</string>
     </property>
    </widget>
   </widget>

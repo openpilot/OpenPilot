@@ -175,7 +175,7 @@ QWidget *GpsDisplayGadgetOptionsPage::createPage(QWidget *parent)
     qSort(ports.begin(), ports.end(),sortPorts);
     foreach( QextPortInfo port, ports ) {
         qDebug() << "Adding port: " << port.friendName << " (" << port.portName << ")";
-        options_page->portComboBox->addItem(port.friendName, port.portName);
+        options_page->portComboBox->addItem(port.friendName, port.friendName);
     }
 
     int portIndex = options_page->portComboBox->findData(m_config->port());

@@ -80,6 +80,7 @@ signals:
    void position(double,double,double);
    void datetime(double,double);
    void speedheading(double,double);
+   void packet(char*);
 private slots:
 };
 

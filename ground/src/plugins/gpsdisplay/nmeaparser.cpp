@@ -195,6 +195,7 @@ uint8_t NMEAParser::nmeaProcess(cBuffer* rxBuffer)
                                 #ifdef NMEA_DEBUG_PKT
                                     qDebug() << NmeaPacket;
                                 #endif
+                                    emit packet(NmeaPacket);
                                 // found a packet
                                 // done with this processing session
                                 foundpacket = NMEA_UNKNOWN;

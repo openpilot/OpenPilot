@@ -28,6 +28,8 @@
 #ifndef GPSDISPLAYGADGET_H_
 #define GPSDISPLAYGADGET_H_
 
+#include <qextserialport/src/qextserialport.h>
+#include <qextserialport/src/qextserialenumerator.h>
 #include <coreplugin/iuavgadget.h>
 #include "gpsdisplaywidget.h"
 

@@ -58,6 +58,7 @@ private slots:
    void setPosition(double, double, double);
    void setDateTime(double, double);
    void setSpeedHeading(double, double);
+   void dumpPacket(char*);
 
 private:
    Ui_GpsDisplayWidget* widget;

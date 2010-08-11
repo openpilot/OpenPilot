@@ -89,7 +89,9 @@ GpsDisplayWidget::GpsDisplayWidget(QWidget *parent) : QWidget(parent)
     connect(parser,SIGNAL(position(double,double,double)),this,SLOT(setPosition(double,double,double)));
     connect(parser,SIGNAL(speedheading(double,double)),this,SLOT(setSpeedHeading(double,double)));
     connect(parser,SIGNAL(datetime(double,double)),this,SLOT(setDateTime(double,double)));
+    connect(parser,SIGNAL(packet(char*)), this, SLOT(dumpPacket(char*)));
 
+    port = NULL;
 }
 
 GpsDisplayWidget::~GpsDisplayWidget()
@@ -108,7 +110,7 @@ void GpsDisplayWidget::setSpeedHeading(double speed, double heading)
     widget->bear_label->setText(QString::number(heading,'g',10));
     widget->bear_label->adjustSize();
 
-    widget->textBrowser->append(temp);
+    // widget->textBrowser->append(temp);
 }
 
 void GpsDisplayWidget::setDateTime(double date, double time)
@@ -122,7 +124,12 @@ void GpsDisplayWidget::setDateTime(double date, double time)
     widget->gtime_label->setText(QString::number(time,'g',10));
     widget->gdate_label->adjustSize();
 
-    widget->textBrowser->append(temp);
+    //widget->textBrowser->append(temp);
+}
+
+void GpsDisplayWidget::dumpPacket(char *packet)
+{
+    widget->textBrowser->append(QString(packet));
 }
 
 void GpsDisplayWidget::setSVs(int sv)
@@ -148,7 +155,7 @@ void GpsDisplayWidget::setPosition(double lat, double lon, double alt)
     //widget->alt_label->setText(QString::number(alt,'g',10));
     //widget->alt_label->adjustSize();
 
-    widget->textBrowser->append(temp);
+    //widget->textBrowser->append(temp);
 }
 
 void GpsDisplayWidget::setPort(QextSerialPort* port)
@@ -164,7 +171,6 @@ void GpsDisplayWidget::connectButtonClicked() {
     gpsThread->setParser(parser);
     gpsThread->start();
 }
-
 
 
 void GpsDisplayThread::setPort(QextSerialPort* port)
@@ -184,26 +190,30 @@ void GpsDisplayThread::run()
 
     qDebug() <<  "Opening.";
 
-    qDebug() <<  port->portName();
+    if (port) {
+        qDebug() <<  port->portName();
 
-    bool isOpen =  port->open(QIODevice::ReadWrite);
-    qDebug() <<  "Open: " << isOpen;
+        bool isOpen =  port->open(QIODevice::ReadWrite);
+        qDebug() <<  "Open: " << isOpen;
 
-    char buf[1024];
-    char c;
-    while(true) {
-        qDebug() <<  "Reading.";
-        /*qint64 bytesRead = port->readLine(buf, sizeof(buf));
-        qDebug() << "bytesRead: " << bytesRead;
-        if (bytesRead != -1) {
-            qDebug() <<  "Result: '" << buf << "'";
-        }*/
-        while(port->bytesAvailable()>0)
-        {             
-                port->read(&c,1);
-                parser->processInputStream(c);
+        char buf[1024];
+        char c;
+        while(true) {
+            qDebug() <<  "Reading.";
+            /*qint64 bytesRead = port->readLine(buf, sizeof(buf));
+            qDebug() << "bytesRead: " << bytesRead;
+            if (bytesRead != -1) {
+                qDebug() <<  "Result: '" << buf << "'";
+            }*/
+            while(port->bytesAvailable()>0)
+            {
+                    port->read(&c,1);
+                    parser->processInputStream(c);
+            }
+            sleep(1);
         }
-        sleep(1);
+    } else {
+        qDebug() << "Port undefined or invalid.";
     }
 }
 

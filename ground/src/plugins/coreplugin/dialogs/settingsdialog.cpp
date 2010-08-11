@@ -31,6 +31,7 @@
 #include <extensionsystem/pluginmanager.h>
 #include "icore.h"
 #include "coreplugin/uavgadgetinstancemanager.h"
+#include "coreplugin/uavgadgetoptionspagedecorator.h"
 //#include "coreimpl.h"
 
 #include <QtCore/QDebug>
@@ -50,6 +51,27 @@ Q_DECLARE_METATYPE(::PageData)
 
 using namespace Core;
 using namespace Core::Internal;
+
+// Helpers to sort by category. id
+bool optionsPageLessThan(const IOptionsPage *p1, const IOptionsPage *p2)
+{
+    const UAVGadgetOptionsPageDecorator *gp1 = qobject_cast<const UAVGadgetOptionsPageDecorator*>(p1);
+    const UAVGadgetOptionsPageDecorator *gp2 = qobject_cast<const UAVGadgetOptionsPageDecorator*>(p2);
+    if (gp1 && (gp2 == NULL))
+        return false;
+    if (gp2 && (gp1 == NULL))
+        return true;
+    if (const int cc = QString::localeAwareCompare(p1->trCategory(), p2->trCategory()))
+        return cc < 0;
+    return QString::localeAwareCompare(p1->trName(), p2->trName()) < 0;
+}
+
+static inline QList<Core::IOptionsPage*> sortedOptionsPages()
+{
+    QList<Core::IOptionsPage*> rc = ExtensionSystem::PluginManager::instance()->getObjects<IOptionsPage>();
+    qStableSort(rc.begin(), rc.end(), optionsPageLessThan);
+    return rc;
+}
 
 SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId,
                                const QString &pageId)
@@ -93,8 +115,7 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId,
 
     QMap<QString, QTreeWidgetItem *> categories;
 
-    QList<IOptionsPage*> pages =
-        ExtensionSystem::PluginManager::instance()->getObjects<IOptionsPage>();
+    QList<IOptionsPage*> pages = sortedOptionsPages();
 
     int index = 0;
     foreach (IOptionsPage *page, pages) {

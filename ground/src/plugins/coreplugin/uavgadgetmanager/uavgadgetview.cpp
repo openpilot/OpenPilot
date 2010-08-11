@@ -86,13 +86,23 @@ UAVGadgetView::UAVGadgetView(Core::UAVGadgetManager *uavGadgetManager, IUAVGadge
         UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
         QStringList sl = im->classIds();
         int index = 0;
+        bool startFromOne = false;
         foreach(QString classId, sl)
         {
             if (classId == QString("EmptyGadget")) {
                 m_defaultIndex = 0;
+                startFromOne = true;
                 m_uavGadgetList->insertItem(0, im->gadgetName(classId), classId);
+                m_uavGadgetList->insertSeparator(1);
             } else {
-                m_uavGadgetList->addItem(im->gadgetName(classId), classId);
+
+                int i = startFromOne ? 1 : 0;
+                for ( ; i < m_uavGadgetList->count(); i++)
+                {
+                    if (QString::localeAwareCompare(m_uavGadgetList->itemText(i), im->gadgetName(classId)) > 0)
+                        break;
+                }
+                m_uavGadgetList->insertItem(i, im->gadgetName(classId), classId);
             }
             ++index;
         }

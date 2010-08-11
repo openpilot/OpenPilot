@@ -129,15 +129,15 @@ const int display_period = 100; // ms
 const unsigned N_FRAMES = 500000;
 
 // map size in # of states : 13 for robot plus 100 3D-landmarks
-const unsigned MAP_SIZE = 313;
+const unsigned MAP_SIZE = 500;
 
 // constant velocity robot uncertainties and perturbations
 const double UNCERT_VLIN = .1; // m/s
 const double UNCERT_VANG = .1; // rad/s
-const double PERT_VLIN = 1; // m/s per sqrt(s)
-const double PERT_VANG = 1; // rad/s per sqrt(s)
+const double PERT_VLIN = 2.0; // m/s per sqrt(s)
+const double PERT_VANG = 2.0; // rad/s per sqrt(s)
 
-// inertial robot initial uncertainties and perturbations
+// inertial robot initial uncertainties and perturbations - in addition to constant velocity option UNCERT_VLIN.
 //if (intOpts[iRobot] == 1) // == robot inertial
 const double UNCERT_GRAVITY = 10.0; // m/s^2
 const double UNCERT_ABIAS = 0.05*17.0; // 5% of full scale
@@ -152,9 +152,9 @@ const unsigned IMG_WIDTH = 640;
 const unsigned IMG_HEIGHT = 480;
 const double INTRINSIC[4] = { 301.27013,   266.86136,   497.28243,   496.81116 };
 const double DISTORTION[2] = { -0.23193,   0.11306 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
-const double CORRECTION_SIZE_FACTOR = 3;
-const double PIX_NOISE = .5;
-const double PIX_NOISE_SIMUFACTOR = 0.0;
+const unsigned CORRECTION_SIZE = 4;
+const double PIX_NOISE = .25;
+const double PIX_NOISE_SIMUFACTOR = 1.0;
 
 // lmk management
 const double D_MIN = .5;
@@ -168,7 +168,7 @@ const unsigned PATCH_DESC = 45;
 
 // data manager: zncc matcher and one-point-ransac
 const unsigned PATCH_SIZE = 13; // in pixels
-const unsigned MAX_SEARCH_SIZE = 50000;
+const unsigned MAX_SEARCH_SIZE = 50000; // TODO: In which units???
 const unsigned KILL_SEARCH_SIZE = 100000;
 const double MATCH_TH = 0.90;
 const double MAHALANOBIS_TH = 3; // in n_sigmas
@@ -186,8 +186,8 @@ const unsigned RANSAC_NTRIES = 0;
 const double MIN_SCORE = 0.8;
 const double PARTIAL_POSITION = 0.25;
 
-// data manager: active search tesselation grid
-const unsigned GRID_VCELLS = 3;
+// data manager: active search tesselation grid for new features detection
+const unsigned GRID_VCELLS = 4;
 const unsigned GRID_HCELLS = 4;
 const unsigned GRID_MARGIN = 11;
 const unsigned GRID_SEPAR = 20;
@@ -335,8 +335,8 @@ void demo_slam01_main(world_ptr_t *world) {
 	}
 	//senPtr11->pose.x(quaternion::originFrame());
 	senPtr11->params.setImgSize(IMG_WIDTH, IMG_HEIGHT);
-	senPtr11->params.setIntrinsicCalibration(intrinsic, distortion, distortion.size()*CORRECTION_SIZE_FACTOR);
-	senPtr11->params.setMiscellaneous(1.0, 0.1);
+	senPtr11->params.setIntrinsicCalibration(intrinsic, distortion, CORRECTION_SIZE);
+	senPtr11->params.setMiscellaneous(PIX_NOISE, D_MIN);
 
 	if (intOpts[iSimu] == 1)
 	{

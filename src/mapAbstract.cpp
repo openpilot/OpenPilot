@@ -175,5 +175,18 @@ namespace jafar {
 			return s;
 		}
 
+		void MapAbstract::writeLogHeader(kernel::DataLogger& log) const
+		{
+			//std::ostringstream oss; oss << "Map";
+			//log.writeComment(oss.str());
+			//log.writeLegend("time");
+		}
+		
+		void MapAbstract::writeLogData(kernel::DataLogger& log) const
+		{
+			//log.writeData(filterPtr);
+		}
+
+
 	}
 }

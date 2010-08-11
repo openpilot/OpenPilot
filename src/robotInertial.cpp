@@ -52,7 +52,7 @@ namespace jafar {
 		 *  and n = [an, wn, ar, wr] the perturbation impulse.
 		 *
 		 * the transition equation f() is decomposed as:
-		 * - p+  = p + v*dt
+		 * - p+  = p + (v + v+)/2*dt
 		 * - v+  = v + (R(q)*(am - ab) + g)*dt + vi <-- am and wm: IMU measurements
 		 * - q+  = q**((wm - wb)*dt + wi)           <-- ** : quaternion product
 		 * - ab+ = ab + ar                          <-- ar : random walk in acc bias with ar perturbation
@@ -61,15 +61,15 @@ namespace jafar {
 		 * -----------------------------------------------------------------------------
 		 *
 		 * The Jacobian XNEW_x is built with
-		 *   var    |  p       q       v       ab      wb      g
-		 *      pos |  0       3       7       10      13      16
-		 *   -------+---------------------------------------------
-		 *   p   0  |  I       0      I*dt     0       0       0
-		 *   q   3  |  0     QNEW_q    0       0     QNEW_wb   0
-		 *   v   7  |  0     VNEW_q    I     -R*dt     0      I*dt
-		 *   ab  10 |  0       0       0       I       0       0
-		 *   wb  13 |  0       0       0       0       I       0
-		 *   g   16 |  0       0       0       0       0       I
+		 *   var    |  p       q        v        ab       wb       g
+		 *      pos |  0       3        7        10       13       16
+		 *   -------+----------------------------------------------------
+		 *   p   0  |  I  VNEW_q*dt/2  I*dt -R*dt*dt/2    0     I*dt*dt/2
+		 *   q   3  |  0     QNEW_q     0        0      QNEW_wb    0
+		 *   v   7  |  0     VNEW_q     I      -R*dt      0       I*dt
+		 *   ab  10 |  0       0        0        I        0        0
+		 *   wb  13 |  0       0        0        0        I        0
+		 *   g   16 |  0       0        0        0        0        I
 		 * -----------------------------------------------------------------------------
 		 *
 		 * The Jacobian XNEW_pert is built with
@@ -118,12 +118,12 @@ namespace jafar {
 			vec3 pnew, vnew, abnew, wbnew, gnew;
 			vec4 qnew;
 
-			pnew = p + v * _dt; //     position
 			// qnew = q x q(w * dt)
 			// Keep qwt ( = q(w * dt)) for later use
 			vec4 qwdt = v2q(wtrue * _dt);
 			qnew = qProd(q, qwdt); //    orientation
 			vnew = v + atrue * _dt; //    velocity
+			pnew = p + (v+vnew)/2 * _dt; //     position
 			abnew = ab + ar; //          acc bias
 			wbnew = wb + wr; //          gyro bias
 			gnew = g; //                 gravity does not change
@@ -140,15 +140,15 @@ namespace jafar {
 
 			// Now on to the Jacobian...
 			// Identity is a good place to start since overall structure is like this
-			// var    |  p       q       v       ab      wb      g
-			//    pos |  0       3       7       10      13      16
-			// -------+---------------------------------------------
-			// p   0  |  I       0      I*dt     0       0       0
-			// q   3  |  0     QNEW_q    0       0     QNEW_wb   0
-			// v   7  |  0     VNEW_q    I     -R*dt     0      I*dt
-			// ab  10 |  0       0       0       I       0       0
-			// wb  13 |  0       0       0       0       I       0
-			// g   16 |  0       0       0       0       0       I
+			// var    |  p       q        v        ab       wb       g
+			//    pos |  0       3        7        10       13       16
+			// -------+----------------------------------------------------
+			// p   0  |  I  VNEW_q*dt/2  I*dt -R*dt*dt/2    0     I*dt*dt/2
+			// q   3  |  0     QNEW_q     0        0      QNEW_wb    0
+			// v   7  |  0     VNEW_q     I      -R*dt      0       I*dt
+			// ab  10 |  0       0        0        I        0        0
+			// wb  13 |  0       0        0        0        I        0
+			// g   16 |  0       0        0        0        0        I
 
 			_XNEW_x.assign(identity_mat(state.size()));
 
@@ -157,6 +157,7 @@ namespace jafar {
 			identity_mat I(3);
 			Idt = I * _dt;
 			subrange(_XNEW_x, 0, 3, 7, 10) = Idt;
+			subrange(_XNEW_x, 0, 3, 16, 19) = Idt*_dt/2;
 			subrange(_XNEW_x, 7, 10, 16, 19) = Idt;
 
 
@@ -181,10 +182,12 @@ namespace jafar {
 			// VNEW_q = d(R(q)*v) / dq
 			rotate_by_dq(q, v, VNEW_q);
 			subrange(_XNEW_x, 7, 10, 3, 7) = VNEW_q;
+			subrange(_XNEW_x, 0, 3, 3, 7) = VNEW_q*_dt/2;
 
 
 			// Fill in VNEW_ab
 			subrange(_XNEW_x, 7, 10, 10, 13) = -Rdt;
+			subrange(_XNEW_x, 0, 3, 10, 13) = -Rdt*_dt/2;
 
 
 			// Now on to the perturbation Jacobian XNEW_pert
@@ -225,6 +228,51 @@ namespace jafar {
 			//
 			subrange(_XNEW_pert, 3, 7, 3, 6) = prod (QNORM_qnew, QNEW_w) * (1 / _dt);
 
+		}
+
+		void RobotInertial::writeLogHeader(kernel::DataLogger& log) const
+		{
+			std::ostringstream oss; oss << "Robot " << id();
+			log.writeComment(oss.str());
+			log.writeLegendTokens("time");
+			
+			log.writeLegendTokens("x y z");
+			log.writeLegendTokens("qw qx qy qz");
+			log.writeLegendTokens("yaw pitch roll");
+			log.writeLegendTokens("vx vy vz");
+			log.writeLegendTokens("axb ayb azb");
+			log.writeLegendTokens("vyawb vpitchb vrollb");
+			log.writeLegendTokens("gx gy gz");
+			
+			log.writeLegendTokens("sig_x sig_y sig_z");
+			log.writeLegendTokens("sig_qw sig_qx sig_qy sig_qz");
+			log.writeLegendTokens("sig_yaw sig_pitch sig_roll");
+			log.writeLegendTokens("sig_vx sig_vy sig_vz");
+			log.writeLegendTokens("sig_axb sig_ayb sig_azb");
+			log.writeLegendTokens("sig_vyawb sig_vpitchb sig_vrollb");
+			log.writeLegendTokens("sig_gx sig_gy sig_gz");
+		}
+		
+		void RobotInertial::writeLogData(kernel::DataLogger& log) const
+		{
+			jblas::vec euler_x(3);
+			jblas::sym_mat euler_P(3,3);
+			quaternion::q2e(ublas::subrange(state.x(), 3, 7), ublas::project(state.P(), ublas::range(3, 7), ublas::range(3,7)), euler_x, euler_P);
+			
+			log.writeData(self_time);
+			for(int i = 0 ; i < 7 ; ++i) log.writeData(state.x()(i));
+			for(int i = 0 ; i < 3 ; ++i) log.writeData(euler_x(2-i));
+			for(int i = 7 ; i < 10; ++i) log.writeData(state.x()(i));
+			for(int i = 10; i < 13; ++i) log.writeData(state.x()(i));
+			for(int i = 13; i < 16; ++i) log.writeData(state.x()(2-(i-13)+13));
+			for(int i = 16; i < 19; ++i) log.writeData(state.x()(i));
+			
+			for(int i = 0 ; i < 7 ; ++i) log.writeData(sqrt(state.P()(i,i)));
+			for(int i = 0 ; i < 3 ; ++i) log.writeData(sqrt(euler_P(2-i,2-i)));
+			for(int i = 7 ; i < 10; ++i) log.writeData(sqrt(state.P()(i,i)));
+			for(int i = 10; i < 13; ++i) log.writeData(sqrt(state.P()(i,i)));
+			for(int i = 13; i < 16; ++i) log.writeData(sqrt(state.P()(2-(i-13)+13,2-(i-13)+13)));
+			for(int i = 16; i < 19; ++i) log.writeData(sqrt(state.P()(i,i)));
 		}
 
 	}

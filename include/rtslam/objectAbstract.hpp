@@ -65,16 +65,22 @@ namespace jafar {
 				inline void name(std::string _name) {
 					name_ = _name;
 				}
+				inline const std::size_t & id() const {
+					return id_;
+				}
 				inline std::size_t & id() {
 					return id_;
+				}
+				inline const std::string & name() const {
+					return name_;
 				}
 				inline std::string & name() {
 					return name_;
 				}
-				virtual std::string categoryName() {
+				virtual std::string categoryName() const {
 					return "OBJECT";
 				}
-				virtual std::string typeName() {
+				virtual std::string typeName() const {
 					return "Undefined";
 				}
 

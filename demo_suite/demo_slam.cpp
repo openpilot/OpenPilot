@@ -23,6 +23,7 @@
 #include "kernel/jafarDebug.hpp"
 #include "kernel/jafarTestMacro.hpp"
 #include "kernel/timingTools.hpp"
+#include "kernel/dataLog.hpp"
 #include "jmath/random.hpp"
 #include "jmath/matlab.hpp"
 #include "jmath/ublasExtra.hpp"
@@ -84,12 +85,18 @@ time_t rseed;
 
 enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iLog, iVerbose, iRobot, iTrigger, iSimu, nIntOpts };
 int intOpts[nIntOpts] = {0};
+const int nFirstIntOpt = 0, nLastIntOpt = nIntOpts-1;
 
 enum { fFreq = 0, fShutter, nFloatOpts };
 double floatOpts[nFloatOpts] = {0.0};
+const int nFirstFloatOpt = nIntOpts, nLastFloatOpt = nIntOpts+nFloatOpts-1;
 
 enum { sSlamConfig = 0, sDataPath, nStrOpts };
 std::string strOpts[nStrOpts];
+const int nFirstStrOpt = nIntOpts+nFloatOpts, nLastStrOpt = nIntOpts+nFloatOpts+nStrOpts-1;
+
+enum { bHelp = 0, bUsage, nBreakingOpts };
+const int nFirstBreakingOpt = nIntOpts+nFloatOpts+nStrOpts, nLastBreakingOpt = nIntOpts+nFloatOpts+nStrOpts+nBreakingOpts-1;
 
 
 struct option long_options[] = {
@@ -124,6 +131,9 @@ const int display_priority = 10;
 const int display_period = 100; // ms
 
 ///##############################################
+
+const std::string MTI_DEVICE = "/dev/ttyUSB0";
+const std::string CAMERA_DEVICE = "0x00b09d01006fb38f";
 
 // time
 const unsigned N_FRAMES = 500000;
@@ -194,12 +204,41 @@ const unsigned GRID_SEPAR = 20;
 
 ///##############################################
 
-void demo_slam01_main(world_ptr_t *world) {
 
+
+void demo_slam01_main(world_ptr_t *world) {
 	boost::condition_variable rawdata_condition;
 	boost::mutex rawdata_mutex;
 	//boost::mutex rawdata_condmutex;
+	boost::scoped_ptr<kernel::DataLogger> dataLogger;
+	if (intOpts[iLog])
+	{
+		dataLogger.reset(new kernel::DataLogger(strOpts[sDataPath] + "/rtslam.log"));
+		dataLogger->writeCurrentDate();
+		dataLogger->writeNewLine();
+		
+		// write options to log
+		std::ostringstream oss;
+		for(int i = 0; i < nIntOpts; ++i)
+			{ oss << long_options[i+nFirstIntOpt].name << " = " << intOpts[i]; dataLogger->writeComment(oss.str()); oss.str(""); }
+		for(int i = 0; i < nFloatOpts; ++i)
+			{ oss << long_options[i+nFirstFloatOpt].name << " = " << floatOpts[i]; dataLogger->writeComment(oss.str()); oss.str(""); }
+		for(int i = 0; i < nStrOpts; ++i)
+			{ oss << long_options[i+nFirstStrOpt].name << " = " << strOpts[i]; dataLogger->writeComment(oss.str()); oss.str(""); }
+		dataLogger->writeNewLine();
+	}
 
+	switch (intOpts[iVerbose])
+	{
+		case 0: debug::DebugStream::setLevel("rtslam", debug::DebugStream::Off); break;
+		case 1: debug::DebugStream::setLevel("rtslam", debug::DebugStream::Trace); break;
+		case 2: debug::DebugStream::setLevel("rtslam", debug::DebugStream::Warning); break;
+		case 3: debug::DebugStream::setLevel("rtslam", debug::DebugStream::Debug); break;
+		case 4: debug::DebugStream::setLevel("rtslam", debug::DebugStream::VerboseDebug); break;
+		default: debug::DebugStream::setLevel("rtslam", debug::DebugStream::VeryVerboseDebug); break;
+	}
+
+	
 	// pin-hole parameters in BOOST format
 	vec intrinsic = createVector<4> (INTRINSIC);
 	vec distortion = createVector<sizeof(DISTORTION)/sizeof(double)> (DISTORTION);
@@ -265,6 +304,14 @@ void demo_slam01_main(world_ptr_t *world) {
 		robPtr1_->constantPerturbation = false;
 
 		robPtr1 = robPtr1_;
+		
+		if (intOpts[iTrigger] == 1)
+		{
+			// just to initialize the MTI as an external trigger controlling shutter time
+			hardware::HardwareEstimatorMti hardEst1(
+				MTI_DEVICE, floatOpts[fFreq], floatOpts[fShutter], 1, mode, strOpts[sDataPath], false);
+			floatOpts[fFreq] = hardEst1.getFreq();
+		}
 	}
 #ifdef HAVE_MTI
 	else
@@ -292,8 +339,9 @@ void demo_slam01_main(world_ptr_t *world) {
 		} else
 		{
 			boost::shared_ptr<hardware::HardwareEstimatorMti> hardEst1_(new hardware::HardwareEstimatorMti(
-				"/dev/ttyS0", floatOpts[fFreq], floatOpts[fShutter], 1024, mode, strOpts[sDataPath]));
+				MTI_DEVICE, floatOpts[fFreq], floatOpts[fShutter], 1024, mode, strOpts[sDataPath], true));
 			if (intOpts[iTrigger]) floatOpts[fFreq] = hardEst1_->getFreq();
+			hardEst1_->setSyncConfig(0.009);
 			hardEst1 = hardEst1_;
 		}
 		robPtr1_->setHardwareEstimator(hardEst1);
@@ -305,6 +353,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	robPtr1->setId();
 	robPtr1->linkToParentMap(mapPtr);
 	robPtr1->pose.x(quaternion::originFrame());
+	if (dataLogger) dataLogger->addLoggable(*robPtr1.get());
 
 	if (intOpts[iSimu] == 1)
 	{
@@ -380,7 +429,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		
 		#ifdef HAVE_VIAM
 		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, rawdata_mutex, 
-			"0x00b09d01006fb38f", cv::Size(IMG_WIDTH,IMG_HEIGHT), 0, 8, floatOpts[fFreq], intOpts[iTrigger], mode, strOpts[sDataPath]));
+			CAMERA_DEVICE, cv::Size(IMG_WIDTH,IMG_HEIGHT), 0, 8, floatOpts[fFreq], intOpts[iTrigger], mode, strOpts[sDataPath]));
 		senPtr11->setHardwareSensor(hardSen11);
 		#else
 		if (intOpts[iReplay])
@@ -428,6 +477,10 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	//worldPtr->display_mutex.unlock();
 
+jblas::vec robot_prediction;
+double average_robot_innovation;
+int n_innovation = 0;
+	
 	// ---------------------------------------------------------------------------
 	// --- LOOP ------------------------------------------------------------------
 	// ---------------------------------------------------------------------------
@@ -436,6 +489,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	// loop all lmks
 	// create sen--lmk observation
 	// Temporal loop
+	if (dataLogger) dataLogger->log();
 	kernel::Chrono chrono;
 	double max_dt = 0;
 	for (; (*world)->t <= N_FRAMES;)
@@ -494,7 +548,8 @@ JFR_DEBUG("                 FRAME : " << (*world)->t);
 
 				// move the filter time to the data raw.
 				robPtr->move(senPtr->getRaw()->timestamp);
-JFR_DEBUG("Robot state after move " << ublas::subrange(robPtr1->state.x(),0,3) << " " << ublas::subrange(robPtr1->state.x(),3,7) << " " << ublas::subrange(robPtr1->state.x(),7,10) << " " << ublas::subrange(robPtr1->state.x(),10,13));
+JFR_DEBUG("Robot state after move " << robPtr1->state.x());
+robot_prediction = robPtr->state.x();
 
 				// foreach dataManager
 				for (SensorAbstract::DataManagerList::iterator dmaIter = senPtr->dataManagerList().begin();
@@ -504,13 +559,16 @@ JFR_DEBUG("Robot state after move " << ublas::subrange(robPtr1->state.x(),0,3) <
 					dmaPtr->process(senPtr->getRaw());
 				} // foreach dataManager
 
+average_robot_innovation += ublas::norm_2(robPtr->state.x() - robot_prediction);
+n_innovation++;
+
 			} // for each sensor
 		} // for each robot
 
 		// NOW LOOP FOR STATE SPACE - ALL MM
 		if (had_data)
 		{
-JFR_DEBUG("Robot state after corrections " << ublas::subrange(robPtr1->state.x(),0,3) << " " << ublas::subrange(robPtr1->state.x(),3,7) << " " << ublas::subrange(robPtr1->state.x(),7,10) << " " << ublas::subrange(robPtr1->state.x(),10,13));
+JFR_DEBUG("Robot state after corrections " << robPtr1->state.x());
 			if (robPtr1->dt_or_dx > max_dt) max_dt = robPtr1->dt_or_dx;
 
 			// Output info
@@ -600,8 +658,15 @@ JFR_DEBUG("Robot state after corrections " << ublas::subrange(robPtr1->state.x()
 		}
 //std::cout << "one frame " << (*world)->t << " : " << mode << " " << had_data << std::endl;
 
-		if (had_data) (*world)->t++;
+		if (had_data)
+		{
+			(*world)->t++;
+			if (dataLogger) dataLogger->log();
+		}
 	} // temporal loop
+
+average_robot_innovation /= n_innovation;
+std::cout << "average_robot_innovation " << average_robot_innovation << std::endl;
 
 	(*world)->slam_blocked(true);
 //	std::cout << "\nFINISHED ! Press a key to terminate." << std::endl;
@@ -809,12 +874,17 @@ void demo_slam01_exit(world_ptr_t *world, boost::thread *thread_main) {
 		 * --dump=0/1  (needs --data-path)
 		 * --rand-seed=0/1/n, 0=generate new one, 1=in replay use the saved one, n=use seed n
 		 * --pause=0/n 0=don't, n=pause for frames>n (needs --replay 1)
-		 * #--log=0/1 -> not implemented yet
-		 * #--verbose=0/1/2 -> not implemented yet
+		 * --log=0/1 -> not implemented yet
+		 * --verbose=0/1/2/3/4/5 -> Off/Trace/Warning/Debug/VerboseDebug/VeryVerboseDebug
 		 * --data-path=/mnt/ram/rtslam
 		 * #--slam-config=data/config1.xml -> not implemented yet
 		 * --help
 		 * --usage
+		 * --robot 0=constant vel, 1=inertial
+		 * --trigger 0=internal, 1=external with MTI control, 2=external without control
+		 * --simu 0/1
+		 * --freq camera frequency in double Hz (with trigger==0/1)
+		 * --shutter shutter time in double seconds (with trigger==1)
 		 *
 		 * You can use the following examples and only change values:
 		 * online test (old mode=0):
@@ -830,6 +900,7 @@ void demo_slam01_exit(world_ptr_t *world, boost::thread *thread_main) {
 		 */
 		int main(int argc, char* const* argv)
 		{
+			intOpts[iVerbose] = 5;
 			floatOpts[fFreq] = 60.0;
 			floatOpts[fShutter] = 2e-3;
 			strOpts[sDataPath] = ".";
@@ -841,35 +912,35 @@ void demo_slam01_exit(world_ptr_t *world, boost::thread *thread_main) {
 				if (c == -1) break;
 				if (c == 0)
 				{
-					if (option_index < nIntOpts)
+					if (option_index <= nLastIntOpt)
 					{
 						intOpts[option_index] = 1;
-						if (optarg) intOpts[option_index] = atoi(optarg);
+						if (optarg) intOpts[option_index-nFirstIntOpt] = atoi(optarg);
 					} else
-					if (option_index < nIntOpts+nFloatOpts)
+					if (option_index <= nLastFloatOpt)
 					{
-						if (optarg) floatOpts[option_index-nIntOpts] = atof(optarg);
+						if (optarg) floatOpts[option_index-nFirstFloatOpt] = atof(optarg);
 					} else
-					if (option_index < nIntOpts+nFloatOpts+nStrOpts)
+					if (option_index <= nLastStrOpt)
 					{
-						if (optarg) strOpts[option_index-nIntOpts-nFloatOpts] = optarg;
+						if (optarg) strOpts[option_index-nFirstStrOpt] = optarg;
 					} else
 					{
 						std::cout << "Integer options:" << std::endl;
 						for(int i = 0; i < nIntOpts; ++i)
-							std::cout << "\t--" << long_options[i].name << std::endl;
+							std::cout << "\t--" << long_options[i+nFirstIntOpt].name << std::endl;
 						
 						std::cout << "Float options:" << std::endl;
 						for(int i = 0; i < nFloatOpts; ++i)
-							std::cout << "\t--" << long_options[i+nIntOpts].name << std::endl;
+							std::cout << "\t--" << long_options[i+nFirstFloatOpt].name << std::endl;
 
 						std::cout << "String options:" << std::endl;
 						for(int i = 0; i < nStrOpts; ++i)
-							std::cout << "\t--" << long_options[i+nIntOpts+nFloatOpts].name << std::endl;
+							std::cout << "\t--" << long_options[i+nFirstStrOpt].name << std::endl;
 						
 						std::cout << "Breaking options:" << std::endl;
 						for(int i = 0; i < 2; ++i)
-							std::cout << "\t--" << long_options[i+nIntOpts+nFloatOpts+nStrOpts].name << std::endl;
+							std::cout << "\t--" << long_options[i+nFirstBreakingOpt].name << std::endl;
 						
 						return 0;
 					}

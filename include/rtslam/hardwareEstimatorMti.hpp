@@ -13,15 +13,17 @@
 #define HARDWARE_ESTIMATOR_MTI_HPP_
 
 #include "jafarConfig.h"
-#ifdef HAVE_MTI
 
+#ifdef HAVE_MTI
 #include <MTI-clients/MTI.h>
+#endif
 
 #include <boost/thread.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
 #include "jmath/jblas.hpp"
+#include "jmath/indirectArray.hpp"
 
 #include "rtslam/hardwareEstimatorAbstract.hpp"
 
@@ -34,14 +36,22 @@ namespace hardware {
 	class HardwareEstimatorMti: public HardwareEstimatorAbstract
 	{
 		private:
-			MTI mti;
+#ifdef HAVE_MTI
+			MTI *mti;
+#endif
 			
-			boost::mutex mutex_data;
 			jblas::mat buffer;
 			int bufferSize;
+			
+			boost::mutex mutex_data;
+			boost::condition_variable cond_data;
 			int position; // next position
 			int reading_pos;
 			int read_pos;
+			
+			double timestamps_correction;
+//			bool tighly_synchronized;
+//			double tight_offset;
 			
 			int mode;
 			std::string dump_path;
@@ -52,16 +62,19 @@ namespace hardware {
 		
 		public:
 			
-			HardwareEstimatorMti(std::string device, double freq, double shutter, int bufferSize_, int mode = 0, std::string dump_path = ".");
+			HardwareEstimatorMti(std::string device, double trigger_freq, double trigger_shutter, int bufferSize_, int mode = 0, std::string dump_path = ".", bool start_reading = true);
+			~HardwareEstimatorMti();
+			void setSyncConfig(double timestamps_correction = 0.0/*, bool tightly_synchronized = false, double tight_offset*/);
 			
 			jblas::mat_indirect acquireReadings(double t1, double t2);
 			void releaseReadings() { reading_pos = -1; }
+			jblas::ind_array instantValues() { return jmath::ublasExtra::ia_set(1,10); }
+			jblas::ind_array incrementValues() { return jmath::ublasExtra::ia_set(1,1); }
 
 			double getFreq() { return realFreq; }
 	};
 
 }}}
 
-#endif // #ifdef HAVE_MTI
 #endif
 

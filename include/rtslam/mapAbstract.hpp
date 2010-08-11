@@ -12,6 +12,7 @@
 #ifndef MAPABSTRACT_HPP_
 #define MAPABSTRACT_HPP_
 
+#include "kernel/dataLog.hpp"
 #include "jmath/jblas.hpp"
 #include "rtslam/rtSlam.hpp"
 
@@ -42,7 +43,7 @@ namespace jafar {
 		 */
 		class MapAbstract: public ObjectAbstract, public ChildOf<WorldAbstract>, 
 			public boost::enable_shared_from_this<MapAbstract>,
-			public ParentOf<RobotAbstract> , public ParentOf<MapManagerAbstract> {
+			public ParentOf<RobotAbstract> , public ParentOf<MapManagerAbstract>, public kernel::DataLoggable {
 
 			ENABLE_LINK_TO_PARENT(WorldAbstract,World,MapAbstract);
 			ENABLE_ACCESS_TO_PARENT(WorldAbstract,world);
@@ -158,6 +159,9 @@ namespace jafar {
 				void fillDiagSeq();
 				void fillRndm();
 
+				virtual void writeLogHeader(kernel::DataLogger& log) const;
+				virtual void writeLogData(kernel::DataLogger& log) const;
+				
 			private:
 
 

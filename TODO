@@ -3,6 +3,7 @@ Bugs
 ------------------------------------
 - sticky landmarks !
 - trajectories are not repeatable and not always right
+- debug inertial...
 
 - in simulation without noise, with a slow start going forward, most of the time it works perfectly, but depending on the random seed sometimes it goes frankly on the side (left/right and/or top/down, up to 45 deg). It is the same with ransac iterative and with active search, but they can behave differently with the same random seed...
 - [ok] backproject-project is not identity !!! -> distortion correction was not precise enough

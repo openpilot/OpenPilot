@@ -46,7 +46,7 @@ namespace jafar {
 		 * - \a wr: the gyrometer bias random walk noise
 		 *
 		 * The motion model equation x+ = f(x,u) is decomposed as:
-		 * - p+  = p + v*dt
+		 * - p+  = p + (v + v+)/2*dt
 		 * - v+  = v + (R(q)*(am - ab) + g)*dt <-- am and wm: IMU measurements
 		 * - q+  = q**((wm - wb)*dt)           <-- ** : quaternion product
 		 * - ab+ = ab + ar                     <-- ar : random walk in acc bias with ar perturbation
@@ -81,7 +81,7 @@ namespace jafar {
 				 * - The state vector, x = [p q v ab wb g] , of size 19.
 				 *
 				 * - The transition equation x+ = move(x,u), with u = [am, wm, ar, wr] the control impulse, is decomposed as:
-				 * - p+  = p + v*dt
+				 * - p+  = p + (v + v+)/2*dt
 				 * - v+  = v + (R(q)*(am - ab) + g)*dt <-- am and wm: IMU measurements
 				 * - q+  = q**((wm - wb)*dt)           <-- ** : quaternion product
 				 * - ab+ = ab + ar                     <-- ar : random walk in acc bias with ar perturbation

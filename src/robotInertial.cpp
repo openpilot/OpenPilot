@@ -52,7 +52,7 @@ namespace jafar {
 		 *  and n = [an, wn, ar, wr] the perturbation impulse.
 		 *
 		 * the transition equation f() is decomposed as:
-		 * - p+  = p + v*dt
+		 * - p+  = p + (v + v+)/2*dt
 		 * - v+  = v + (R(q)*(am - ab) + g)*dt + vi <-- am and wm: IMU measurements
 		 * - q+  = q**((wm - wb)*dt + wi)           <-- ** : quaternion product
 		 * - ab+ = ab + ar                          <-- ar : random walk in acc bias with ar perturbation
@@ -61,15 +61,15 @@ namespace jafar {
 		 * -----------------------------------------------------------------------------
 		 *
 		 * The Jacobian XNEW_x is built with
-		 *   var    |  p       q       v       ab      wb      g
-		 *      pos |  0       3       7       10      13      16
-		 *   -------+---------------------------------------------
-		 *   p   0  |  I       0      I*dt     0       0       0
-		 *   q   3  |  0     QNEW_q    0       0     QNEW_wb   0
-		 *   v   7  |  0     VNEW_q    I     -R*dt     0      I*dt
-		 *   ab  10 |  0       0       0       I       0       0
-		 *   wb  13 |  0       0       0       0       I       0
-		 *   g   16 |  0       0       0       0       0       I
+		 *   var    |  p       q        v        ab       wb       g
+		 *      pos |  0       3        7        10       13       16
+		 *   -------+----------------------------------------------------
+		 *   p   0  |  I  VNEW_q*dt/2  I*dt -R*dt*dt/2    0     I*dt*dt/2
+		 *   q   3  |  0     QNEW_q     0        0      QNEW_wb    0
+		 *   v   7  |  0     VNEW_q     I      -R*dt      0       I*dt
+		 *   ab  10 |  0       0        0        I        0        0
+		 *   wb  13 |  0       0        0        0        I        0
+		 *   g   16 |  0       0        0        0        0        I
 		 * -----------------------------------------------------------------------------
 		 *
 		 * The Jacobian XNEW_pert is built with
@@ -140,15 +140,15 @@ namespace jafar {
 
 			// Now on to the Jacobian...
 			// Identity is a good place to start since overall structure is like this
-			// var    |  p       q       v       ab      wb      g
-			//    pos |  0       3       7       10      13      16
-			// -------+---------------------------------------------
-			// p   0  |  I       0      I*dt     0       0       0
-			// q   3  |  0     QNEW_q    0       0     QNEW_wb   0
-			// v   7  |  0     VNEW_q    I     -R*dt     0      I*dt
-			// ab  10 |  0       0       0       I       0       0
-			// wb  13 |  0       0       0       0       I       0
-			// g   16 |  0       0       0       0       0       I
+			// var    |  p       q        v        ab       wb       g
+			//    pos |  0       3        7        10       13       16
+			// -------+----------------------------------------------------
+			// p   0  |  I  VNEW_q*dt/2  I*dt -R*dt*dt/2    0     I*dt*dt/2
+			// q   3  |  0     QNEW_q     0        0      QNEW_wb    0
+			// v   7  |  0     VNEW_q     I      -R*dt      0       I*dt
+			// ab  10 |  0       0        0        I        0        0
+			// wb  13 |  0       0        0        0        I        0
+			// g   16 |  0       0        0        0        0        I
 
 			_XNEW_x.assign(identity_mat(state.size()));
 
@@ -157,6 +157,7 @@ namespace jafar {
 			identity_mat I(3);
 			Idt = I * _dt;
 			subrange(_XNEW_x, 0, 3, 7, 10) = Idt;
+			subrange(_XNEW_x, 0, 3, 16, 19) = Idt*_dt/2;
 			subrange(_XNEW_x, 7, 10, 16, 19) = Idt;
 
 
@@ -181,10 +182,12 @@ namespace jafar {
 			// VNEW_q = d(R(q)*v) / dq
 			rotate_by_dq(q, v, VNEW_q);
 			subrange(_XNEW_x, 7, 10, 3, 7) = VNEW_q;
+			subrange(_XNEW_x, 0, 3, 3, 7) = VNEW_q*_dt/2;
 
 
 			// Fill in VNEW_ab
 			subrange(_XNEW_x, 7, 10, 10, 13) = -Rdt;
+			subrange(_XNEW_x, 0, 3, 10, 13) = -Rdt*_dt/2;
 
 
 			// Now on to the perturbation Jacobian XNEW_pert

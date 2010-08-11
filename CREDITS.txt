@@ -72,13 +72,17 @@ E: edouard (at) lafargue (dot) name
 D: GCS Dial Plugins, GCS PFD Plugin
 D: Artwork including display dials
 
+N: Matt Lipski
+E: mattlipski (plus) openpilot (at) gmail (dot) com
+D: Deluxe Dials Set artwork, (Artifical Horizon, Compass, turn indicator)  
+
 N: Ken Northup
 E: helos360 (at) bellsouth (dot) net
 D: 3D Modelling, Easystar adaption from FMS  
 
 N: Guy McCaldin 
 E: guymcc (at) gmail (dot) com
-D: Artwork and design inc dial set
+D: Artwork and design inc work on the Deluxe Dial Set
 
 N: Cathy Moss
 E: cmoss296 (at) blueyonder (dot) co (dot) uk

@@ -60,9 +60,9 @@ using namespace Core::Internal;
 void MiniSplitterHandle::resizeEvent(QResizeEvent *event)
 {
     if (orientation() == Qt::Horizontal)
-        setContentsMargins(2, 0, 2, 0);
+        setContentsMargins(6, 0, 6, 0);
     else
-        setContentsMargins(0, 2, 0, 2);
+        setContentsMargins(0, 6, 0, 6);
     setMask(QRegion(contentsRect()));
     QSplitterHandle::resizeEvent(event);
 }

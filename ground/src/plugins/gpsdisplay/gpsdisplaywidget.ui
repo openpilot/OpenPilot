@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>570</width>
-    <height>302</height>
+    <height>301</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -444,9 +444,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>180</y>
+     <y>190</y>
      <width>551</width>
-     <height>111</height>
+     <height>104</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -458,54 +458,50 @@
    <property name="title">
     <string>GPS Data Stream</string>
    </property>
-   <widget class="QTextBrowser" name="textBrowser">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>40</y>
-      <width>551</width>
-      <height>71</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Courier New</family>
-      <pointsize>8</pointsize>
-     </font>
-    </property>
-    <property name="verticalScrollBarPolicy">
-     <enum>Qt::ScrollBarAlwaysOn</enum>
-    </property>
-    <property name="lineWrapMode">
-     <enum>QTextEdit::WidgetWidth</enum>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="connectButton">
-    <property name="geometry">
-     <rect>
-      <x>360</x>
-      <y>10</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Connect</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_2">
-    <property name="geometry">
-     <rect>
-      <x>450</x>
-      <y>10</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Disconnect</string>
-    </property>
-   </widget>
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="0" rowspan="2">
+     <widget class="QTextBrowser" name="textBrowser">
+      <property name="font">
+       <font>
+        <family>Courier New</family>
+        <pointsize>8</pointsize>
+       </font>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
+      </property>
+      <property name="lineWrapMode">
+       <enum>QTextEdit::WidgetWidth</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QPushButton" name="connectButton">
+      <property name="maximumSize">
+       <size>
+        <width>60</width>
+        <height>23</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>Connect</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QPushButton" name="pushButton_2">
+      <property name="maximumSize">
+       <size>
+        <width>60</width>
+        <height>23</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>Disconnect</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QGraphicsView" name="flatEarth">
    <property name="geometry">

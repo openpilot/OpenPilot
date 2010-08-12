@@ -41,7 +41,7 @@ USE_BOOTLOADER ?= NO
 CODE_SOURCERY ?= NO
 
 # Toolchain prefix (i.e arm-elf- -> arm-elf-gcc.exe)
-TCHAIN_PREFIX ?= ""
+TCHAIN_PREFIX ?= mingw32-
 
 # Remove command is different for Code Sourcery on Windows
 REMOVE_CMD ?= rm
@@ -221,7 +221,7 @@ EXTRA_LIBDIRS =
 #    EXTRA_LIBS = xyz abc efsl
 # for newlib-lpc (file: libnewlibc-lpc.a):
 #    EXTRA_LIBS = newlib-lpc
-EXTRA_LIBS = WS2_32
+EXTRA_LIBS = WS2_32 Winmm
 
 # Path to Linker-Scripts
 LINKERSCRIPTPATH = $(PIOSSTM32F10X)
@@ -281,7 +281,7 @@ CSTANDARD = -std=gnu99
 # Flags for C and C++ (arm-elf-gcc/arm-elf-g++)
 
 ifeq ($(DEBUG),YES)
-CFLAGS = -g$(DEBUGF) -DDEBUG
+CFLAGS = -g
 endif
 
 CFLAGS += -DARCH_WIN32
@@ -331,11 +331,11 @@ LDFLAGS += -lgcc
 # Define programs and commands.
 CC      = $(TCHAIN_PREFIX)gcc
 CPP     = $(TCHAIN_PREFIX)g++
-AR      = $(TCHAIN_PREFIX)ar
-OBJCOPY = $(TCHAIN_PREFIX)objcopy
-OBJDUMP = $(TCHAIN_PREFIX)objdump
-SIZE    = $(TCHAIN_PREFIX)size
-NM      = $(TCHAIN_PREFIX)nm
+AR      = ar
+OBJCOPY = objcopy
+OBJDUMP = objdump
+SIZE    = size
+NM      = nm
 REMOVE  = $(REMOVE_CMD) -f
 ###SHELL   = sh
 ###COPY    = cp
@@ -383,11 +383,13 @@ lss: $(OUTDIR)/$(TARGET).lss
 sym: $(OUTDIR)/$(TARGET).sym
 hex: $(OUTDIR)/$(TARGET).hex
 bin: $(OUTDIR)/$(TARGET).bin
+exe: $(OUTDIR)/$(TARGET).exe
 
 # Default target.
 #all: begin gccversion sizebefore build sizeafter finished end
 #all: begin gccversion build sizeafter finished end
-all: elf
+#all: elf
+all: exe
 
 ifeq ($(LOADFORMAT),ihex)
 build: elf hex lss sym
@@ -489,9 +491,15 @@ endif
 # use $(CC) for C-only projects or $(CPP) for C++-projects:
 	$(CC) $(THUMB) $(CFLAGS) $(ALLOBJ) --output $@ $(LDFLAGS)
 #	$(CPP) $(THUMB) $(CFLAGS) $(ALLOBJ) --output $@ $(LDFLAGS)
-#create a windows-usable .exe file
-	$(OBJCOPY) $(OUTDIR)/$(TARGET).elf $(OUTDIR)/$(TARGET).exe
 
+# Link: create EXE output file from object files.
+.SECONDARY : $(TARGET).exe
+.PRECIOUS : $(ALLOBJ)
+%.exe:  $(ALLOBJ)
+	@echo $(MSG_LINKING) $@
+# use $(CC) for C-only projects or $(CPP) for C++-projects:
+	$(CC) $(THUMB) $(CFLAGS) $(ALLOBJ) --output $@ $(LDFLAGS)
+#	$(CPP) $(THUMB) $(CFLAGS) $(ALLOBJ) --output $@ $(LDFLAGS)
 
 # Assemble: create object files from assembler source files.
 define ASSEMBLE_TEMPLATE
@@ -576,6 +584,7 @@ clean_list :
 	$(REMOVE) $(OUTDIR)/$(TARGET).bin
 	$(REMOVE) $(OUTDIR)/$(TARGET).sym
 	$(REMOVE) $(OUTDIR)/$(TARGET).lss
+	$(REMOVE) $(OUTDIR)/$(TARGET).exe
 	$(REMOVE) $(ALLOBJ)
 	$(REMOVE) $(LSTFILES)
 	$(REMOVE) $(DEPFILES)
@@ -604,5 +613,5 @@ endif
 
 # Listing of phony targets.
 .PHONY : all begin finish end sizebefore sizeafter gccversion \
-build elf hex bin lss sym clean clean_list program
+build exe elf hex bin lss sym clean clean_list program
 

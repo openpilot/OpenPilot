@@ -90,6 +90,7 @@ typedef struct tskTaskControlBlock
 
 tskTCB *debug_task_handle;
 
+
 /*
 	Win32 simulator doesn't really use a stack. Instead It just
 	keep some task specific info in the pseudostack
@@ -102,37 +103,49 @@ typedef struct
 	HANDLE hThread;						/* handle of thread associated with task */
 	HANDLE hSemaphore;					/* Semaphore thread (task) waits on at start and after yielding */
 	portSTACK_TYPE dwGlobalIsr;			/* mask used to enable/disable interrupts */
-	xTaskHandle hTask;					/* Task handle so we know the name of this task */
 	BOOL yielded;						/* Need to know how task went out of focus */
 }SSIM_T;
 
 #define portNO_CRITICAL_NESTING 		( ( unsigned portLONG ) 0 )
 
-#define DEBUG_OUTPUT
+//#define DEBUG_OUTPUT
 //#define ERROR_OUTPUT
 
 #ifdef DEBUG_OUTPUT
-	#define debug_printf(...) ( (WaitForSingleObject(hPrintfMutex, INFINITE)|1)?( \
+/*	#define debug_printf(...) ( (WaitForSingleObject(hPrintfMutex, INFINITE)|1)?( \
 	(  \
 	(NULL != (debug_task_handle = (tskTCB *) pxCurrentTCB ))? \
 	(fprintf( stderr, "%20s\t%20s\t%i: ",debug_task_handle->pcTaskName,__func__,__LINE__)): \
 	(fprintf( stderr, "%20s\t%20s\t%i: ","__unknown__",__func__,__LINE__)) \
 	|1)?( \
 	((fprintf( stderr, __VA_ARGS__ )|1)?ReleaseMutex( hPrintfMutex ):0) \
-	):0 ):0 )
+	):0 ):0 ) */
+#define debug_printf(...) ( ( (NULL != (debug_task_handle = (tskTCB *) pxCurrentTCB ))? \
+		(fprintf( stderr, "%20s\t%20s\t%i: ",debug_task_handle->pcTaskName,__func__,__LINE__)): \
+		(fprintf( stderr, "%20s\t%20s\t%i: ","__unknown__",__func__,__LINE__)) \
+		|1)? \
+		fprintf( stderr, __VA_ARGS__ ) : 0 \
+		)
 
 	#define debug_error debug_printf
 
 #else
 	#ifdef ERROR_OUTPUT
-		#define debug_error(...) ( (WaitForSingleObject(hPrintfMutex, INFINITE)|1)?( \
+/*		#define debug_error(...) ( (WaitForSingleObject(hPrintfMutex, INFINITE)|1)?( \
 		(  \
 		(NULL != (debug_task_handle = (tskTCB *) pxCurrentTCB ))? \
         (fprintf( stderr, "%20s\t%20s\t%i: ",debug_task_handle->pcTaskName,__func__,__LINE__)): \
         (fprintf( stderr, "%20s\t%20s\t%i: ","__unknown__",__func__,__LINE__)) \
         |1)?( \
         ((fprintf( stderr, __VA_ARGS__ )|1)?ReleaseMutex( hPrintfMutex ):0) \
-        ):0 ):0 )
+        ):0 ):0 )*/
+
+#define debug_error(...) ( ( (NULL != (debug_task_handle = (tskTCB *) pxCurrentTCB ))? \
+		(fprintf( stderr, "%20s\t%20s\t%i: ",debug_task_handle->pcTaskName,__func__,__LINE__)): \
+		(fprintf( stderr, "%20s\t%20s\t%i: ","__unknown__",__func__,__LINE__)) \
+		|1)? \
+		fprintf( stderr, __VA_ARGS__ ) : 0 \
+		)
 
 		#define debug_printf(...)
 	#else
@@ -150,10 +163,6 @@ typedef struct
 volatile DWORD dwPendingIsr;	// pending interrupts
 HANDLE hIsrInvoke;	// event to signal an interrupt
 HANDLE hIsrMutex;	// mutex to protect above 2
-#if defined(DEBUG_OUTPUT) || defined(ERROR_OUTPUT)
-HANDLE hPrintfMutex;// mutex for debug_printf() and debug_error()
-#endif
-SSIM_T *pxLastAddedTCB;
 
 /******************************************************************************
 	National variables
@@ -175,6 +184,7 @@ ESWI_ID;
 
 unsigned portLONG ulCriticalNesting = ( unsigned portLONG ) 9999;
 void (*vIsrHandler[CPU_INTR_COUNT])(void);
+UINT msPerTick; //Returned from timeGetDevCaps()
 
 #if portDEBUG == 1
 
@@ -209,18 +219,26 @@ static DWORD WINAPI tick_generator(LPVOID lpParameter)
 	HANDLE hTimer;
 	LARGE_INTEGER liDueTime;
 	HANDLE hObjList[2];
+	float before, after;
 
 	hTimer = CreateWaitableTimer(NULL, TRUE, NULL);
-	liDueTime.QuadPart = -20000;	// 1ms interval
+	liDueTime.QuadPart = -(50000 - 10000*(int)msPerTick);	// 5ms -
+	//there is always another tick during WaitForMultipleObjects() while waiting
+	//for the mutex, so reduce the wait time by 1 tick
 
 	hObjList[0] = hIsrMutex;
 	hObjList[1] = hTimer;
 
 	for(;;)
 	{
+		before = (float)clock()/CLOCKS_PER_SEC;
+		debug_printf("tick before, %f\n", before);
 		SetWaitableTimer(hTimer, &liDueTime, 0, NULL, NULL, FALSE);
 		WaitForMultipleObjects(2, hObjList, TRUE, INFINITE);
-		
+		after = (float)clock()/CLOCKS_PER_SEC;
+		debug_printf("tick after, %f\n", after);
+		debug_printf("diff: %f\n", after - before);
+
 		// generate the tick interrupt
 		dwPendingIsr |= (1<<CPU_INTR_TICK);
 		SetEvent(hIsrInvoke);
@@ -229,7 +247,6 @@ static DWORD WINAPI tick_generator(LPVOID lpParameter)
 		// overruns).
 		SignalObjectAndWait(hIsrMutex, hTickAck, INFINITE, FALSE);
 	}
-return 0;
 }
 
 static DWORD WINAPI TaskSimThread( LPVOID lpParameter )
@@ -259,20 +276,26 @@ static void create_system_objects(void)
 	hIsrInvoke = CreateEvent(NULL, FALSE, FALSE, NULL);
 	hTickAck = CreateEvent(NULL, FALSE, FALSE, NULL);
 	hTermAck = CreateEvent(NULL, FALSE, FALSE, NULL);
-#if defined(DEBUG_OUTPUT) || defined(ERROR_OUTPUT)
-	hPrintfMutex = CreateMutex(NULL, FALSE, NULL);
-#endif
 
 	dwEnabledIsr |= (1<<CPU_INTR_TICK);
+
+	//Set timer
+
+	TIMECAPS tc;
+	timeGetDevCaps(&tc, sizeof(tc));
+	msPerTick = tc.wPeriodMin;
+	debug_printf("Ms per tick: %i\n", msPerTick);
+	if(msPerTick > 2)
+	{
+		printf("Warning: your system timer has a low resolution.\n");
+		printf("Either decrease the tick rate, or get a better PC!\n");
+	}
+	timeBeginPeriod(tc.wPeriodMin);
 
 #if configUSE_PREEMPTION != 0
 	SetThreadPriority(CreateThread(NULL, 0, tick_generator, NULL, 0, NULL),
 		THREAD_PRIORITY_ABOVE_NORMAL);
 #endif
-	//printf("got here!\n");
-	//printf("%i\n", (int) pxCurrentTCB);
-	//debug_printf("created system objects\n");
-	//printf("got here again!\n");
 }
 
 /******************************************************************************
@@ -294,14 +317,13 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 	psSim->yielded = FALSE;
 	psSim->hThread = CreateThread(NULL, 0, TaskSimThread, psSim, CREATE_SUSPENDED, NULL);
 	ok=SetThreadPriority(psSim->hThread, THREAD_PRIORITY_IDLE);
-	pxLastAddedTCB = psSim;
 	return (portSTACK_TYPE *) psSim;
 }
 
 portBASE_TYPE xPortStartScheduler( void )
 {
 	BOOL bSwitch;
-	SSIM_T *psSim, *psSimOld;
+	SSIM_T *psSim;
 	DWORD dwIntr;
 	int i, iIsrCount;
 	HANDLE hObjList[2]; 
@@ -363,6 +385,7 @@ portBASE_TYPE xPortStartScheduler( void )
 						SuspendThread(psSim->hThread);
 
 					vTaskIncrementTick();
+					debug_printf("Sending tick ack...\n");
 					SetEvent(hTickAck);
 					break;
 
@@ -378,33 +401,17 @@ portBASE_TYPE xPortStartScheduler( void )
 
 		if(bSwitch)
 		{
-			psSimOld = psSim;
 			vTaskSwitchContext();
+			debug_printf("switching context\n");
 			psSim=(SSIM_T *)*pxCurrentTCB;
-			if(psSimOld != psSim)
-			{
-				ulCriticalNesting = psSim->ulCriticalNesting;
-				dwGlobalIsr = psSim->dwGlobalIsr;
+			ulCriticalNesting = psSim->ulCriticalNesting;
+			dwGlobalIsr = psSim->dwGlobalIsr;
 			
-				if(psSim->yielded) {
-					psSim->yielded = FALSE;
-					ReleaseSemaphore(psSim->hSemaphore, 1, NULL);		// awake next task
-				} else {
-					ResumeThread(psSim->hThread);
-				}
-				debug_printf("switched context\n");
-			}
-			else
-			{
-				//Oops, we just suspended the task that we want to resume!
-				//TODO: resolve this before it happens
-				if(psSim->yielded) {
-					psSim->yielded = FALSE;
-					ReleaseSemaphore(psSim->hSemaphore, 1, NULL);		// awake next task
-				} else {
-					ResumeThread(psSim->hThread);
-				}
-				debug_printf("didn't switch context\n");
+			if(psSim->yielded) {
+				psSim->yielded = FALSE;
+				ReleaseSemaphore(psSim->hSemaphore, 1, NULL);		// awake next task
+			} else {
+				ResumeThread(psSim->hThread);
 			}
 		}
 
@@ -493,6 +500,8 @@ int iPortSetIsrHandler(int iNo, void (*handler)(void))
 {
 	if(iNo < CPU_INTR_COUNT) {
 		if(hIsrDispatcher) {
+			//SSIM_T *psSim=(SSIM_T *)*pxCurrentTCB;
+
 			WaitForSingleObject(hIsrMutex, INFINITE);
 			vIsrHandler[iNo]=handler;
 			ReleaseMutex(hIsrMutex);
@@ -585,11 +594,4 @@ void vPortExitCritical( void )
 			__enable_interrupt();
 		}
 	}
-}
-
-void vPortAddTaskHandle( void *pxTaskHandle )
-{
-	//printf("got here!\n");
-	//printf("%i\n", (int)pxLastAddedTCB);
-	pxLastAddedTCB->hTask = (xTaskHandle)pxTaskHandle;
 }

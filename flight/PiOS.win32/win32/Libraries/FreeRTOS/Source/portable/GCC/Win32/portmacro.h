@@ -56,6 +56,7 @@
 #include <windows.h>
 #include <tchar.h>
 #include <stdio.h>
+#include <time.h>
 #include "cpuemu.h"
 
 #ifdef __cplusplus
@@ -92,8 +93,8 @@ extern "C" {
 
 /* Hardware specifics. */
 #define portSTACK_GROWTH			( -1 )
-#define portTICK_RATE_MS			( 1) //( ( portTickType ) 1000 / 15625 )
-#define portMS_TO_TICKS(ms)			( ( portTickType ) (1000*(ms) + (15625)/2)/15625 )
+#define portTICK_RATE_MS				( ( portTickType ) 1000 / configTICK_RATE_HZ )
+#define portTICK_RATE_MICROSECONDS		( ( portTickType ) 1000000 / configTICK_RATE_HZ )
 #define portBYTE_ALIGNMENT			4
 
 #define portYIELD()			__swi();
@@ -126,8 +127,7 @@ extern void vTaskSwitchContext( void );				\
 extern void vPortForciblyEndThread( void *pxTaskToDelete );
 #define traceTASK_DELETE( pxTaskToDelete )		vPortForciblyEndThread( pxTaskToDelete )
 
-extern void vPortAddTaskHandle( void *pxTaskHandle );
-#define traceTASK_CREATE( pxNewTCB )			vPortAddTaskHandle( pxNewTCB )
+#define traceTASK_CREATE( pxNewTCB )
 
 /* Make use of times(man 2) to gather run-time statistics on the tasks. */
 extern void vPortFindTicksPerSecond( void );

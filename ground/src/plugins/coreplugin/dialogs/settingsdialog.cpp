@@ -118,6 +118,7 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId,
     QList<IOptionsPage*> pages = sortedOptionsPages();
 
     int index = 0;
+    bool firstUavGadgetOptionsPageFound = false;
     foreach (IOptionsPage *page, pages) {
         PageData pageData;
         pageData.index = index;
@@ -134,6 +135,17 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId,
 
         QTreeWidgetItem *treeitem;
         if (!categories.contains(currentCategory)) {
+            if (!firstUavGadgetOptionsPageFound)
+            {
+                UAVGadgetOptionsPageDecorator *pd = qobject_cast<UAVGadgetOptionsPageDecorator*>(page);
+                if (pd)
+                {
+                    firstUavGadgetOptionsPageFound = true;
+                    QTreeWidgetItem *separator = new QTreeWidgetItem(pageTree);
+                    separator->setFlags(item->flags() & ~Qt::ItemIsSelectable);
+                    separator->setText(0, QString(30, 0xB7));
+                }
+            }
             treeitem = new QTreeWidgetItem(pageTree);
             treeitem->setText(0, trCategories.at(0));
             treeitem->setData(0, Qt::UserRole, qVariantFromValue(pageData));

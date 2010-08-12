@@ -240,14 +240,14 @@ void PFDGadgetWidget::updateHeading(UAVObject *object1) {
     if (field) {
         // The speed scale represents 30km/h (6 * 5)
         // 3.6 : convert m/s to km/h
-        double val = field->getDouble();
-        groundspeedTarget = floor(360*val*speedScaleHeight/(30))/100;
+        double val = floor(field->getDouble()*100)/100;
+        groundspeedTarget = 3.6*val*speedScaleHeight/30;
     }
     fieldname = QString("Altitude");
     field = object1->getField(fieldname);
     if (field) {
         // The altitude scale represents 30 meters
-        altitudeTarget = floor(field->getDouble()*altitudeScaleHeight*3)/100;
+        altitudeTarget = floor(field->getDouble()*100)/100*altitudeScaleHeight/30;
     }
 
     // GPS Stats

@@ -80,10 +80,6 @@ void PIOS_Board_Init(void) {
 #endif
 	PIOS_I2C_Init();
 
-	WWDG_SetPrescaler(WWDG_Prescaler_8);
-	WWDG_SetWindowValue(0xff);
-
-
 }
 
 /* MicroSD Interface

@@ -1,13 +1,61 @@
-.metadata/
-flight/.cproject
-flight/.project
-flight/.settings/
-ground/openpilotgcs.pro.user
-ground/src/libs/uavobjgenerator/uavobjgenerator.pro.user
-tools/
-build/
-downloads/
-GPATH
-GRTAGS
-GSYMS
-GTAGS
+
+# /flight/
+/flight/*.pnproj
+/flight/*.pnps
+/flight/.cproject
+/flight/.metadata
+/flight/.project
+/flight/.settings
+/flight/Build
+
+# /flight/AHRS/
+/flight/AHRS/Build
+
+# /flight/Bootloaders/OpenPilot.old/
+/flight/Bootloaders/OpenPilot.old/Build
+
+# /flight/OpenPilot/
+/flight/OpenPilot/Build
+/flight/OpenPilot/Build.win32
+
+# /flight/PipBee/
+/flight/PipBee/Build
+
+# /ground/
+/ground/Build
+
+# /ground/share/openpilotgcs/models/Easystar/
+/ground/share/openpilotgcs/models/Easystar/Thumbs.db
+
+# /ground/share/openpilotgcs/sounds/
+/ground/share/openpilotgcs/sounds/normalize.exe
+
+# /ground/share/openpilotgcs/sounds/default/
+/ground/share/openpilotgcs/sounds/default/normalize.exe
+
+# /ground/share/openpilotgcs/translations/
+/ground/share/openpilotgcs/translations/extract-mimetypes.xq
+
+# /ground/src/experimental/OPMapWidget/core/
+/ground/src/experimental/OPMapWidget/core/header.h
+
+# /ground/src/experimental/tools/DocumentationHelper/
+/ground/src/experimental/tools/DocumentationHelper/ui_mainwindow.h
+
+# /ground/src/libs/qextserialport/
+/ground/src/libs/qextserialport/.hg
+/ground/src/libs/qextserialport/.hgtags
+
+# /ground/src/libs/qwt/
+/ground/src/libs/qwt/qwt.prf
+/ground/src/libs/qwt/designer
+
+# /ground/src/libs/uavobjgenerator/
+/ground/src/libs/uavobjgenerator/Makefile
+/ground/src/libs/uavobjgenerator/Makefile.Debug
+/ground/src/libs/uavobjgenerator/Makefile.Release
+/ground/src/libs/uavobjgenerator/debug
+/ground/src/libs/uavobjgenerator/release
+
+# /ground/src/plugins/ipconnection/
+/ground/src/plugins/ipconnection/ui_ipconnectionoptionspage.h

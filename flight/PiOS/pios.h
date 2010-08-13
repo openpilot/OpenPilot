@@ -81,6 +81,7 @@
 #if defined(PIOS_INCLUDE_EXTI)
 #include <pios_exti.h>
 #endif
+#include <pios_wdg.h>
 
 /* PIOS Hardware Includes (Common) */
 #include <pios_sdcard.h>

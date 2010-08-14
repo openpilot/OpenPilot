@@ -316,7 +316,7 @@ TestDataGen::TestDataGen()
     gps = PositionActual::GetInstance(objManager);
 
     //Setup timer
-    periodMs = 5;
+    periodMs = 4;
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(genTestData()));
     timer->start(periodMs);
@@ -347,7 +347,7 @@ void TestDataGen::genTestData()
     testTime += (periodMs / 1000.0);
 
     debugCounter++;
-    if (debugCounter % 100 == 0 )
+    if (debugCounter % (100/periodMs) == 0 )
         qDebug() << "Test Time = " << testTime;
 }
 

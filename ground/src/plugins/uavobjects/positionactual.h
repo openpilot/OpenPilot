@@ -60,7 +60,7 @@ public:
     // Field information
     // Field Status information
     /* Enumeration options for field Status */
-    typedef enum { STATUS_NOGPS=0, STATUS_NOFIX=1, STATUS_FIX2D=2, STATUS_FIX3D=3,  } StatusOptions;
+    typedef enum { STATUS_NOGPS=0, STATUS_NOFIX=1, STATUS_FIX2D=2, STATUS_FIX3D=3 } StatusOptions;
     // Field Latitude information
     // Field Longitude information
     // Field Altitude information

@@ -55,7 +55,7 @@ public:
     // Field information
     // Field Status information
     /* Enumeration options for field Status */
-    typedef enum { STATUS_DISCONNECTED=0, STATUS_HANDSHAKEREQ=1, STATUS_HANDSHAKEACK=2, STATUS_CONNECTED=3,  } StatusOptions;
+    typedef enum { STATUS_DISCONNECTED=0, STATUS_HANDSHAKEREQ=1, STATUS_HANDSHAKEACK=2, STATUS_CONNECTED=3 } StatusOptions;
     // Field TxDataRate information
     // Field RxDataRate information
     // Field TxFailures information

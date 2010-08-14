@@ -68,7 +68,7 @@ typedef struct {
 // Field StepSize information
 // Field StepDirection information
 /* Enumeration options for field StepDirection */
-typedef enum { EXAMPLESETTINGS_STEPDIRECTION_UP=0, EXAMPLESETTINGS_STEPDIRECTION_DOWN=1,  } ExampleSettingsStepDirectionOptions;
+typedef enum { EXAMPLESETTINGS_STEPDIRECTION_UP=0, EXAMPLESETTINGS_STEPDIRECTION_DOWN=1 } ExampleSettingsStepDirectionOptions;
 
 
 // Generic interface functions

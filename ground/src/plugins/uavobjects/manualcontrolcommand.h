@@ -56,14 +56,14 @@ public:
     // Field information
     // Field Connected information
     /* Enumeration options for field Connected */
-    typedef enum { CONNECTED_FALSE=0, CONNECTED_TRUE=1,  } ConnectedOptions;
+    typedef enum { CONNECTED_FALSE=0, CONNECTED_TRUE=1 } ConnectedOptions;
     // Field Roll information
     // Field Pitch information
     // Field Yaw information
     // Field Throttle information
     // Field FlightMode information
     /* Enumeration options for field FlightMode */
-    typedef enum { FLIGHTMODE_MANUAL=0, FLIGHTMODE_STABILIZED=1, FLIGHTMODE_AUTO=2,  } FlightModeOptions;
+    typedef enum { FLIGHTMODE_MANUAL=0, FLIGHTMODE_STABILIZED=1, FLIGHTMODE_AUTO=2 } FlightModeOptions;
     // Field Channel information
     /* Number of elements for field Channel */
     static const quint32 CHANNEL_NUMELEM = 8;

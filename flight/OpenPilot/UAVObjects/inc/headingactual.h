@@ -65,7 +65,7 @@ typedef struct {
 // Field information
 // Field raw information
 /* Array element names for field raw */
-typedef enum { HEADINGACTUAL_RAW_X=0, HEADINGACTUAL_RAW_Y=1, HEADINGACTUAL_RAW_Z=2,  } HeadingActualrawElem;
+typedef enum { HEADINGACTUAL_RAW_X=0, HEADINGACTUAL_RAW_Y=1, HEADINGACTUAL_RAW_Z=2 } HeadingActualrawElem;
 /* Number of elements for field raw */
 #define HEADINGACTUAL_RAW_NUMELEM 3
 // Field heading information

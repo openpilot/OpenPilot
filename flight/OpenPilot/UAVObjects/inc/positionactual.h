@@ -74,7 +74,7 @@ typedef struct {
 // Field information
 // Field Status information
 /* Enumeration options for field Status */
-typedef enum { POSITIONACTUAL_STATUS_NOGPS=0, POSITIONACTUAL_STATUS_NOFIX=1, POSITIONACTUAL_STATUS_FIX2D=2, POSITIONACTUAL_STATUS_FIX3D=3,  } PositionActualStatusOptions;
+typedef enum { POSITIONACTUAL_STATUS_NOGPS=0, POSITIONACTUAL_STATUS_NOFIX=1, POSITIONACTUAL_STATUS_FIX2D=2, POSITIONACTUAL_STATUS_FIX3D=3 } PositionActualStatusOptions;
 // Field Latitude information
 // Field Longitude information
 // Field Altitude information

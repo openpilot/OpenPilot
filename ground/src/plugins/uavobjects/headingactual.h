@@ -51,7 +51,7 @@ public:
     // Field information
     // Field raw information
     /* Array element names for field raw */
-    typedef enum { RAW_X=0, RAW_Y=1, RAW_Z=2,  } rawElem;
+    typedef enum { RAW_X=0, RAW_Y=1, RAW_Z=2 } rawElem;
     /* Number of elements for field raw */
     static const quint32 RAW_NUMELEM = 3;
     // Field heading information

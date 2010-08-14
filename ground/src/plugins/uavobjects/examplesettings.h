@@ -54,7 +54,7 @@ public:
     // Field StepSize information
     // Field StepDirection information
     /* Enumeration options for field StepDirection */
-    typedef enum { STEPDIRECTION_UP=0, STEPDIRECTION_DOWN=1,  } StepDirectionOptions;
+    typedef enum { STEPDIRECTION_UP=0, STEPDIRECTION_DOWN=1 } StepDirectionOptions;
 
   
     // Constants

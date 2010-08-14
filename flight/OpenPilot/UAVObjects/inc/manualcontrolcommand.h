@@ -70,14 +70,14 @@ typedef struct {
 // Field information
 // Field Connected information
 /* Enumeration options for field Connected */
-typedef enum { MANUALCONTROLCOMMAND_CONNECTED_FALSE=0, MANUALCONTROLCOMMAND_CONNECTED_TRUE=1,  } ManualControlCommandConnectedOptions;
+typedef enum { MANUALCONTROLCOMMAND_CONNECTED_FALSE=0, MANUALCONTROLCOMMAND_CONNECTED_TRUE=1 } ManualControlCommandConnectedOptions;
 // Field Roll information
 // Field Pitch information
 // Field Yaw information
 // Field Throttle information
 // Field FlightMode information
 /* Enumeration options for field FlightMode */
-typedef enum { MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL=0, MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED=1, MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO=2,  } ManualControlCommandFlightModeOptions;
+typedef enum { MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL=0, MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED=1, MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO=2 } ManualControlCommandFlightModeOptions;
 // Field Channel information
 /* Number of elements for field Channel */
 #define MANUALCONTROLCOMMAND_CHANNEL_NUMELEM 8

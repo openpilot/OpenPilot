@@ -80,7 +80,7 @@ typedef struct {
 // Field Field7 information
 // Field Field8 information
 /* Enumeration options for field Field8 */
-typedef enum { EXAMPLEOBJECT1_FIELD8_OPTION1=0, EXAMPLEOBJECT1_FIELD8_OPTION2=1,  } ExampleObject1Field8Options;
+typedef enum { EXAMPLEOBJECT1_FIELD8_OPTION1=0, EXAMPLEOBJECT1_FIELD8_OPTION2=1 } ExampleObject1Field8Options;
 
 
 // Generic interface functions

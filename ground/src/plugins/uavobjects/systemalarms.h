@@ -50,9 +50,9 @@ public:
     // Field information
     // Field Alarm information
     /* Enumeration options for field Alarm */
-    typedef enum { ALARM_OK=0, ALARM_WARNING=1, ALARM_ERROR=2, ALARM_CRITICAL=3,  } AlarmOptions;
+    typedef enum { ALARM_OK=0, ALARM_WARNING=1, ALARM_ERROR=2, ALARM_CRITICAL=3 } AlarmOptions;
     /* Array element names for field Alarm */
-    typedef enum { ALARM_OUTOFMEMORY=0, ALARM_STACKOVERFLOW=1, ALARM_CPUOVERLOAD=2, ALARM_EVENTSYSTEM=3, ALARM_SDCARD=4, ALARM_TELEMETRY=5, ALARM_MANUALCONTROL=6, ALARM_ACTUATOR=7, ALARM_STABILIZATION=8, ALARM_AHRSCOMMS=9,  } AlarmElem;
+    typedef enum { ALARM_OUTOFMEMORY=0, ALARM_STACKOVERFLOW=1, ALARM_CPUOVERLOAD=2, ALARM_EVENTSYSTEM=3, ALARM_SDCARD=4, ALARM_TELEMETRY=5, ALARM_MANUALCONTROL=6, ALARM_ACTUATOR=7, ALARM_STABILIZATION=8, ALARM_AHRSCOMMS=9 } AlarmElem;
     /* Number of elements for field Alarm */
     static const quint32 ALARM_NUMELEM = 10;
 

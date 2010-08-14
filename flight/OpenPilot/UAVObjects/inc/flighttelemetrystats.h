@@ -69,7 +69,7 @@ typedef struct {
 // Field information
 // Field Status information
 /* Enumeration options for field Status */
-typedef enum { FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED=0, FLIGHTTELEMETRYSTATS_STATUS_HANDSHAKEREQ=1, FLIGHTTELEMETRYSTATS_STATUS_HANDSHAKEACK=2, FLIGHTTELEMETRYSTATS_STATUS_CONNECTED=3,  } FlightTelemetryStatsStatusOptions;
+typedef enum { FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED=0, FLIGHTTELEMETRYSTATS_STATUS_HANDSHAKEREQ=1, FLIGHTTELEMETRYSTATS_STATUS_HANDSHAKEACK=2, FLIGHTTELEMETRYSTATS_STATUS_CONNECTED=3 } FlightTelemetryStatsStatusOptions;
 // Field TxDataRate information
 // Field RxDataRate information
 // Field TxFailures information

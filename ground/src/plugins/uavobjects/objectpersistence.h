@@ -53,10 +53,10 @@ public:
     // Field information
     // Field Operation information
     /* Enumeration options for field Operation */
-    typedef enum { OPERATION_LOAD=0, OPERATION_SAVE=1, OPERATION_DELETE=2,  } OperationOptions;
+    typedef enum { OPERATION_LOAD=0, OPERATION_SAVE=1, OPERATION_DELETE=2 } OperationOptions;
     // Field Selection information
     /* Enumeration options for field Selection */
-    typedef enum { SELECTION_SINGLEOBJECT=0, SELECTION_ALLSETTINGS=1, SELECTION_ALLMETAOBJECTS=2, SELECTION_ALLOBJECTS=3,  } SelectionOptions;
+    typedef enum { SELECTION_SINGLEOBJECT=0, SELECTION_ALLSETTINGS=1, SELECTION_ALLMETAOBJECTS=2, SELECTION_ALLOBJECTS=3 } SelectionOptions;
     // Field ObjectID information
     // Field InstanceID information
 

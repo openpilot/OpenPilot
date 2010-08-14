@@ -184,19 +184,19 @@ struct opahrs_msg_v1_req_reset {
 struct opahrs_msg_v1_req_serial {
 } __attribute__((__packed__));
 
-struct opahrs_msg_v1_req_heading {
+struct opahrs_msg_v1_req_attituderaw {
 } __attribute__((__packed__));
 
 struct opahrs_msg_v1_req_attitude {
 } __attribute__((__packed__));
 
 union opahrs_msg_v1_req {
-  struct opahrs_msg_v1_req_nop      nop;
-  struct opahrs_msg_v1_req_sync     sync;
-  struct opahrs_msg_v1_req_reset    reset;
-  struct opahrs_msg_v1_req_serial   serial;
-  struct opahrs_msg_v1_req_heading  heading;
-  struct opahrs_msg_v1_req_attitude attitude;
+  struct opahrs_msg_v1_req_nop          nop;
+  struct opahrs_msg_v1_req_sync         sync;
+  struct opahrs_msg_v1_req_reset        reset;
+  struct opahrs_msg_v1_req_serial       serial;
+  struct opahrs_msg_v1_req_attituderaw  attituderaw;
+  struct opahrs_msg_v1_req_attitude     attitude;
 } __attribute__((__packed__));
 
 struct opahrs_msg_v1_rsp_sync {
@@ -212,15 +212,24 @@ struct opahrs_msg_v1_rsp_serial {
   uint8_t  serial_bcd[25];
 } __attribute__((__packed__));
 
-struct opahrs_msg_v1_rsp_heading {
+struct opahrs_msg_v1_rsp_attituderaw {
   struct {
-    float   scale;
     int16_t x;
     int16_t y;
     int16_t z;
-  } raw_mag;
-
-  uint16_t heading;
+  } mags;
+  struct {
+    uint16_t x;
+    uint16_t y;
+    uint16_t z;
+    uint16_t xy_temp;
+    uint16_t z_temp;
+  } gyros;
+  struct {
+    uint16_t x;
+    uint16_t y;
+    uint16_t z;
+  } accels;
 } __attribute__((__packed__));
 
 struct opahrs_msg_v1_rsp_attitude {
@@ -238,10 +247,10 @@ struct opahrs_msg_v1_rsp_attitude {
 } __attribute__((__packed__));
 
 union opahrs_msg_v1_rsp {
-  struct opahrs_msg_v1_rsp_sync     sync;
-  struct opahrs_msg_v1_rsp_serial   serial;
-  struct opahrs_msg_v1_rsp_heading  heading;
-  struct opahrs_msg_v1_rsp_attitude attitude;
+  struct opahrs_msg_v1_rsp_sync         sync;
+  struct opahrs_msg_v1_rsp_serial       serial;
+  struct opahrs_msg_v1_rsp_attituderaw  attituderaw;
+  struct opahrs_msg_v1_rsp_attitude     attitude;
 } __attribute__((__packed__));
 
 enum opahrs_msg_v1_tag {
@@ -249,12 +258,12 @@ enum opahrs_msg_v1_tag {
   OPAHRS_MSG_V1_REQ_SYNC,
   OPAHRS_MSG_V1_REQ_RESET,
   OPAHRS_MSG_V1_REQ_SERIAL,
-  OPAHRS_MSG_V1_REQ_HEADING,
+  OPAHRS_MSG_V1_REQ_ATTITUDERAW,
   OPAHRS_MSG_V1_REQ_ATTITUDE,
 
   OPAHRS_MSG_V1_RSP_SYNC,
   OPAHRS_MSG_V1_RSP_SERIAL,
-  OPAHRS_MSG_V1_RSP_HEADING,
+  OPAHRS_MSG_V1_RSP_ATTITUDERAW,
   OPAHRS_MSG_V1_RSP_ATTITUDE,
 };
 

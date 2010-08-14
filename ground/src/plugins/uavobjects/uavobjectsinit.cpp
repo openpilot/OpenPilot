@@ -37,6 +37,7 @@
 #include "altitudeactual.h"
 #include "attitudeactual.h"
 #include "attitudedesired.h"
+#include "attituderaw.h"
 #include "attitudesettings.h"
 #include "exampleobject1.h"
 #include "exampleobject2.h"
@@ -45,7 +46,6 @@
 #include "flightsituationactual.h"
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
-#include "headingactual.h"
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
 #include "navigationdesired.h"
@@ -72,6 +72,7 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new AltitudeActual() );
     objMngr->registerObject( new AttitudeActual() );
     objMngr->registerObject( new AttitudeDesired() );
+    objMngr->registerObject( new AttitudeRaw() );
     objMngr->registerObject( new AttitudeSettings() );
     objMngr->registerObject( new ExampleObject1() );
     objMngr->registerObject( new ExampleObject2() );
@@ -80,7 +81,6 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new FlightSituationActual() );
     objMngr->registerObject( new FlightTelemetryStats() );
     objMngr->registerObject( new GCSTelemetryStats() );
-    objMngr->registerObject( new HeadingActual() );
     objMngr->registerObject( new ManualControlCommand() );
     objMngr->registerObject( new ManualControlSettings() );
     objMngr->registerObject( new NavigationDesired() );

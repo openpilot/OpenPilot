@@ -19,7 +19,7 @@ HEADERS += uavobjects_global.h \
     exampleobject2.h \
     exampleobject1.h \
     gcstelemetrystats.h \
-    headingactual.h \
+    attituderaw.h \
     flighttelemetrystats.h \
     systemstats.h \
     systemalarms.h \
@@ -53,7 +53,7 @@ SOURCES += uavobject.cpp \
     exampleobject2.cpp \
     exampleobject1.cpp \
     gcstelemetrystats.cpp \
-    headingactual.cpp \
+    attituderaw.cpp \
     flighttelemetrystats.cpp \
     systemstats.cpp \
     systemalarms.cpp \

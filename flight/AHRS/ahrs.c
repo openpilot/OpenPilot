@@ -36,7 +36,6 @@ struct mag_sensor {
   uint8_t id[4];
   struct {
     int16_t axis[3];
-    float   heading;
   } raw;
 };
 
@@ -46,6 +45,18 @@ struct accel_sensor {
     uint16_t y;
     uint16_t z;
   } raw;
+};
+
+struct gyro_sensor {
+  struct {
+    uint16_t x;
+    uint16_t y;
+    uint16_t z;
+  } raw;
+  struct {
+    uint16_t xy;
+    uint16_t z;
+  } temp;
 };
 
 struct attitude_solution {
@@ -65,6 +76,8 @@ struct attitude_solution {
 
 static struct mag_sensor        mag_data;
 static struct accel_sensor      accel_data;
+static struct gyro_sensor       gyro_data;
+
 static struct attitude_solution attitude_data = {
   .quaternion = {
     .q1 = 1.011,
@@ -137,14 +150,23 @@ int main()
     // Get magnetic readings
     PIOS_HMC5843_ReadMag(mag_data.raw.axis);
     
-    // Calculate the heading
-    mag_data.raw.heading = atan2((double)(mag_data.raw.axis[0]), (double)(-1 * mag_data.raw.axis[1])) * (180 / M_PI);
-    if(mag_data.raw.heading < 0) mag_data.raw.heading += 360;
-    
     // Test ADC
-    accel_data.raw.x = PIOS_ADC_PinGet(0);
+    accel_data.raw.x = PIOS_ADC_PinGet(2);
     accel_data.raw.y = PIOS_ADC_PinGet(1);
-    accel_data.raw.z = PIOS_ADC_PinGet(2);
+    accel_data.raw.z = PIOS_ADC_PinGet(0);
+
+    gyro_data.raw.x  = PIOS_ADC_PinGet(3);
+    gyro_data.raw.y  = PIOS_ADC_PinGet(4);
+    gyro_data.raw.z  = PIOS_ADC_PinGet(5);
+
+#if 0
+    /* Turn this on when the temperature ADCs are configured */
+    gyro_data.temp.xy = PIOS_ADC_PinGet(6);
+    gyro_data.temp.z  = PIOS_ADC_PinGet(7);
+#else
+    gyro_data.temp.xy = 0;
+    gyro_data.temp.z  = 0;
+#endif
     //PIOS_COM_SendFormattedString(PIOS_COM_AUX, "ADC Values: %d,%d,%d,%d,%d,%d\r\n", PIOS_ADC_PinGet(0), PIOS_ADC_PinGet(1), PIOS_ADC_PinGet(2), PIOS_ADC_PinGet(3), PIOS_ADC_PinGet(4), PIOS_ADC_PinGet(5));
 
 
@@ -243,13 +265,23 @@ void process_spi_request(void)
     dump_spi_message(PIOS_COM_AUX, "I", (uint8_t *)&user_tx_v1, sizeof(user_tx_v1));
     lfsm_user_set_tx_v1 (&user_tx_v1);
     break;
-  case OPAHRS_MSG_V1_REQ_HEADING:
-    opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_HEADING);
-    user_tx_v1.payload.user.v.rsp.heading.raw_mag.x     = mag_data.raw.axis[0];
-    user_tx_v1.payload.user.v.rsp.heading.raw_mag.y     = mag_data.raw.axis[1];
-    user_tx_v1.payload.user.v.rsp.heading.raw_mag.z     = mag_data.raw.axis[2];
-    user_tx_v1.payload.user.v.rsp.heading.heading       = mag_data.raw.heading;
-    dump_spi_message(PIOS_COM_AUX, "H", (uint8_t *)&user_tx_v1, sizeof(user_tx_v1));
+  case OPAHRS_MSG_V1_REQ_ATTITUDERAW:
+    opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_ATTITUDERAW);
+    user_tx_v1.payload.user.v.rsp.attituderaw.mags.x        = mag_data.raw.axis[0];
+    user_tx_v1.payload.user.v.rsp.attituderaw.mags.y        = mag_data.raw.axis[1];
+    user_tx_v1.payload.user.v.rsp.attituderaw.mags.z        = mag_data.raw.axis[2];
+
+    user_tx_v1.payload.user.v.rsp.attituderaw.gyros.x       = gyro_data.raw.x;
+    user_tx_v1.payload.user.v.rsp.attituderaw.gyros.y       = gyro_data.raw.y;
+    user_tx_v1.payload.user.v.rsp.attituderaw.gyros.z       = gyro_data.raw.z;
+    user_tx_v1.payload.user.v.rsp.attituderaw.gyros.xy_temp = gyro_data.temp.xy;
+    user_tx_v1.payload.user.v.rsp.attituderaw.gyros.z_temp  = gyro_data.temp.z;
+
+    user_tx_v1.payload.user.v.rsp.attituderaw.accels.x      = accel_data.raw.x;
+    user_tx_v1.payload.user.v.rsp.attituderaw.accels.y      = accel_data.raw.y;
+    user_tx_v1.payload.user.v.rsp.attituderaw.accels.z      = accel_data.raw.z;
+
+    dump_spi_message(PIOS_COM_AUX, "R", (uint8_t *)&user_tx_v1, sizeof(user_tx_v1));
     lfsm_user_set_tx_v1 (&user_tx_v1);
     break;
   case OPAHRS_MSG_V1_REQ_ATTITUDE:

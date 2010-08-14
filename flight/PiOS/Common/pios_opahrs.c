@@ -222,8 +222,7 @@ extern enum opahrs_result PIOS_OPAHRS_Sync(struct opahrs_msg_v1 *rsp)
   return opahrs_msg_v1_recv_rsp (OPAHRS_MSG_V1_RSP_SYNC, rsp);
 }
 
-
-enum opahrs_result PIOS_OPAHRS_GetHeading(struct opahrs_msg_v1 *rsp)
+enum opahrs_result PIOS_OPAHRS_GetAttitudeRaw(struct opahrs_msg_v1 *rsp)
 {
   struct opahrs_msg_v1 req;
   enum opahrs_result   rc;
@@ -232,8 +231,8 @@ enum opahrs_result PIOS_OPAHRS_GetHeading(struct opahrs_msg_v1 *rsp)
     return -1;
   }
 
-  /* Make up a serial number request */
-  opahrs_msg_v1_init_user_tx (&req, OPAHRS_MSG_V1_REQ_HEADING);
+  /* Make up an attituderaw request */
+  opahrs_msg_v1_init_user_tx (&req, OPAHRS_MSG_V1_REQ_ATTITUDERAW);
 
   /* Send the message until it is received */
   rc = opahrs_msg_v1_send_req (&req);
@@ -242,7 +241,7 @@ enum opahrs_result PIOS_OPAHRS_GetHeading(struct opahrs_msg_v1 *rsp)
     return rc;
   }
 
-  return opahrs_msg_v1_recv_rsp (OPAHRS_MSG_V1_RSP_HEADING, rsp);
+  return opahrs_msg_v1_recv_rsp (OPAHRS_MSG_V1_RSP_ATTITUDERAW, rsp);
 }
 
 enum opahrs_result PIOS_OPAHRS_GetAttitude(struct opahrs_msg_v1 *rsp)
@@ -254,7 +253,7 @@ enum opahrs_result PIOS_OPAHRS_GetAttitude(struct opahrs_msg_v1 *rsp)
     return -1;
   }
 
-  /* Make up a serial number request */
+  /* Make up an attitude solution request */
   opahrs_msg_v1_init_user_tx (&req, OPAHRS_MSG_V1_REQ_ATTITUDE);
 
   /* Send the message until it is received */

@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       headingactual.cpp
+ * @file       attituderaw.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
  * @addtogroup GCSPlugins GCS Plugins
@@ -9,7 +9,7 @@
  * @addtogroup UAVObjectsPlugin UAVObjects Plugin
  * @{
  *   
- * @note       Object definition file: headingactual.xml. 
+ * @note       Object definition file: attituderaw.xml. 
  *             This is an automatically generated file.
  *             DO NOT modify manually.
  *
@@ -30,26 +30,37 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include "headingactual.h"
+#include "attituderaw.h"
 #include "uavobjectfield.h"
 
-const QString HeadingActual::NAME = QString("HeadingActual");
+const QString AttitudeRaw::NAME = QString("AttitudeRaw");
 
 /**
  * Constructor
  */
-HeadingActual::HeadingActual(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
+AttitudeRaw::AttitudeRaw(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
 {
     // Create fields
     QList<UAVObjectField*> fields;
-    QStringList rawElemNames;
-    rawElemNames.append("X");
-    rawElemNames.append("Y");
-    rawElemNames.append("Z");
-    fields.append( new UAVObjectField(QString("raw"), QString("mGa"), UAVObjectField::INT16, rawElemNames, QStringList()) );
-    QStringList headingElemNames;
-    headingElemNames.append("0");
-    fields.append( new UAVObjectField(QString("heading"), QString("degrees"), UAVObjectField::FLOAT32, headingElemNames, QStringList()) );
+    QStringList magnetometersElemNames;
+    magnetometersElemNames.append("X");
+    magnetometersElemNames.append("Y");
+    magnetometersElemNames.append("Z");
+    fields.append( new UAVObjectField(QString("magnetometers"), QString("mGa"), UAVObjectField::INT16, magnetometersElemNames, QStringList()) );
+    QStringList gyrosElemNames;
+    gyrosElemNames.append("X");
+    gyrosElemNames.append("Y");
+    gyrosElemNames.append("Z");
+    fields.append( new UAVObjectField(QString("gyros"), QString("raw"), UAVObjectField::UINT16, gyrosElemNames, QStringList()) );
+    QStringList gyrotempElemNames;
+    gyrotempElemNames.append("XY");
+    gyrotempElemNames.append("Z");
+    fields.append( new UAVObjectField(QString("gyrotemp"), QString("raw"), UAVObjectField::UINT16, gyrotempElemNames, QStringList()) );
+    QStringList accelerometersElemNames;
+    accelerometersElemNames.append("X");
+    accelerometersElemNames.append("Y");
+    accelerometersElemNames.append("Z");
+    fields.append( new UAVObjectField(QString("accelerometers"), QString("raw"), UAVObjectField::UINT16, accelerometersElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
@@ -60,7 +71,7 @@ HeadingActual::HeadingActual(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, N
 /**
  * Get the default metadata for this object
  */
-UAVObject::Metadata HeadingActual::getDefaultMetadata()
+UAVObject::Metadata AttitudeRaw::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
     metadata.flightAccess = ACCESS_READWRITE;
@@ -70,7 +81,7 @@ UAVObject::Metadata HeadingActual::getDefaultMetadata()
     metadata.gcsTelemetryUpdatePeriod = 0;
     metadata.flightTelemetryAcked = 0;
     metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
-    metadata.flightTelemetryUpdatePeriod = 500;
+    metadata.flightTelemetryUpdatePeriod = 1000;
     metadata.loggingUpdateMode = UAVObject::UPDATEMODE_NEVER;
     metadata.loggingUpdatePeriod = 0;
     return metadata;
@@ -81,7 +92,7 @@ UAVObject::Metadata HeadingActual::getDefaultMetadata()
  * If a default value is not specified the object fields
  * will be initialized to zero.
  */
-void HeadingActual::setDefaultFieldValues()
+void AttitudeRaw::setDefaultFieldValues()
 {
 
 }
@@ -89,7 +100,7 @@ void HeadingActual::setDefaultFieldValues()
 /**
  * Get the object data fields
  */
-HeadingActual::DataFields HeadingActual::getData()
+AttitudeRaw::DataFields AttitudeRaw::getData()
 {
     QMutexLocker locker(mutex);
     return data;
@@ -98,7 +109,7 @@ HeadingActual::DataFields HeadingActual::getData()
 /**
  * Set the object data fields
  */
-void HeadingActual::setData(const DataFields& data)
+void AttitudeRaw::setData(const DataFields& data)
 {
     QMutexLocker locker(mutex);
     // Get metadata
@@ -117,9 +128,9 @@ void HeadingActual::setData(const DataFields& data)
  * Do not use this function directly to create new instances, the
  * UAVObjectManager should be used instead.
  */
-UAVDataObject* HeadingActual::clone(quint32 instID)
+UAVDataObject* AttitudeRaw::clone(quint32 instID)
 {
-    HeadingActual* obj = new HeadingActual();
+    AttitudeRaw* obj = new AttitudeRaw();
     obj->initialize(instID, this->getMetaObject());
     return obj;
 }
@@ -127,7 +138,7 @@ UAVDataObject* HeadingActual::clone(quint32 instID)
 /**
  * Static function to retrieve an instance of the object.
  */
-HeadingActual* HeadingActual::GetInstance(UAVObjectManager* objMngr, quint32 instID)
+AttitudeRaw* AttitudeRaw::GetInstance(UAVObjectManager* objMngr, quint32 instID)
 {
-    return dynamic_cast<HeadingActual*>(objMngr->getObject(HeadingActual::OBJID, instID));
+    return dynamic_cast<AttitudeRaw*>(objMngr->getObject(AttitudeRaw::OBJID, instID));
 }

@@ -35,6 +35,7 @@
 #include "altitudeactual.h"
 #include "attitudeactual.h"
 #include "attitudedesired.h"
+#include "attituderaw.h"
 #include "attitudesettings.h"
 #include "exampleobject1.h"
 #include "exampleobject2.h"
@@ -43,7 +44,6 @@
 #include "flightsituationactual.h"
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
-#include "headingactual.h"
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
 #include "navigationdesired.h"
@@ -70,6 +70,7 @@ void UAVObjectsInitializeAll()
     AltitudeActualInitialize();
     AttitudeActualInitialize();
     AttitudeDesiredInitialize();
+    AttitudeRawInitialize();
     AttitudeSettingsInitialize();
     ExampleObject1Initialize();
     ExampleObject2Initialize();
@@ -78,7 +79,6 @@ void UAVObjectsInitializeAll()
     FlightSituationActualInitialize();
     FlightTelemetryStatsInitialize();
     GCSTelemetryStatsInitialize();
-    HeadingActualInitialize();
     ManualControlCommandInitialize();
     ManualControlSettingsInitialize();
     NavigationDesiredInitialize();

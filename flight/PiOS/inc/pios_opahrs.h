@@ -42,7 +42,7 @@ extern void PIOS_OPAHRS_Init(void);
 extern enum opahrs_result PIOS_OPAHRS_Sync(struct opahrs_msg_v1 *rsp);
 extern enum opahrs_result PIOS_OPAHRS_GetSerial(struct opahrs_msg_v1 *rsp);
 extern enum opahrs_result PIOS_OPAHRS_GetAttitude(struct opahrs_msg_v1 *rsp);
-extern enum opahrs_result PIOS_OPAHRS_GetHeading(struct opahrs_msg_v1 *rsp);
+extern enum opahrs_result PIOS_OPAHRS_GetAttitudeRaw(struct opahrs_msg_v1 *rsp);
 extern enum opahrs_result PIOS_OPAHRS_resync(void);
 
 #endif /* PIOS_OPAHRS_H */

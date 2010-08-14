@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       headingactual.h
+ * @file       attituderaw.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
  * @addtogroup GCSPlugins GCS Plugins
@@ -9,7 +9,7 @@
  * @addtogroup UAVObjectsPlugin UAVObjects Plugin
  * @{
  *   
- * @note       Object definition file: headingactual.xml. 
+ * @note       Object definition file: attituderaw.xml. 
  *             This is an automatically generated file.
  *             DO NOT modify manually.
  *
@@ -30,49 +30,65 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef HEADINGACTUAL_H
-#define HEADINGACTUAL_H
+#ifndef ATTITUDERAW_H
+#define ATTITUDERAW_H
 
 #include "uavdataobject.h"
 #include "uavobjectmanager.h"
 
-class UAVOBJECTS_EXPORT HeadingActual: public UAVDataObject
+class UAVOBJECTS_EXPORT AttitudeRaw: public UAVDataObject
 {
     Q_OBJECT
 
 public:
     // Field structure
     typedef struct {
-        qint16 raw[3];
-        float heading;
+        qint16 magnetometers[3];
+        quint16 gyros[3];
+        quint16 gyrotemp[2];
+        quint16 accelerometers[3];
 
     } __attribute__((packed)) DataFields;
 
     // Field information
-    // Field raw information
-    /* Array element names for field raw */
-    typedef enum { RAW_X=0, RAW_Y=1, RAW_Z=2 } rawElem;
-    /* Number of elements for field raw */
-    static const quint32 RAW_NUMELEM = 3;
-    // Field heading information
+    // Field magnetometers information
+    /* Array element names for field magnetometers */
+    typedef enum { MAGNETOMETERS_X=0, MAGNETOMETERS_Y=1, MAGNETOMETERS_Z=2 } magnetometersElem;
+    /* Number of elements for field magnetometers */
+    static const quint32 MAGNETOMETERS_NUMELEM = 3;
+    // Field gyros information
+    /* Array element names for field gyros */
+    typedef enum { GYROS_X=0, GYROS_Y=1, GYROS_Z=2 } gyrosElem;
+    /* Number of elements for field gyros */
+    static const quint32 GYROS_NUMELEM = 3;
+    // Field gyrotemp information
+    /* Array element names for field gyrotemp */
+    typedef enum { GYROTEMP_XY=0, GYROTEMP_Z=1 } gyrotempElem;
+    /* Number of elements for field gyrotemp */
+    static const quint32 GYROTEMP_NUMELEM = 2;
+    // Field accelerometers information
+    /* Array element names for field accelerometers */
+    typedef enum { ACCELEROMETERS_X=0, ACCELEROMETERS_Y=1, ACCELEROMETERS_Z=2 } accelerometersElem;
+    /* Number of elements for field accelerometers */
+    static const quint32 ACCELEROMETERS_NUMELEM = 3;
 
   
     // Constants
-    static const quint32 OBJID = 2921442332U;
+    static const quint32 OBJID = 4179445416U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;
     static const quint32 NUMBYTES = sizeof(DataFields);
 
     // Functions
-    HeadingActual();
+    AttitudeRaw();
 
     DataFields getData();
     void setData(const DataFields& data);
     Metadata getDefaultMetadata();
     UAVDataObject* clone(quint32 instID);
 
-    static HeadingActual* GetInstance(UAVObjectManager* objMngr, quint32 instID = 0);
+    static AttitudeRaw* GetInstance(UAVObjectManager* objMngr, quint32 instID = 0);
 	
 private:
     DataFields data;
@@ -81,4 +97,4 @@ private:
 
 };
 
-#endif // HEADINGACTUAL_H
+#endif // ATTITUDERAW_H

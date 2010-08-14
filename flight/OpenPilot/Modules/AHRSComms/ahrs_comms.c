@@ -4,7 +4,7 @@
  * @{ 
  * @addtogroup AHRSCommsModule AHRSComms Module
  * @brief Handles communication with AHRS and updating position
- * Specifically updates the the @ref AttitudeActual "AttitudeActual" and @ref HeadingActual "HeadingActual" settings objects
+ * Specifically updates the the @ref AttitudeActual "AttitudeActual" and @ref AttitudeRaw "AttitudeRaw" settings objects
  * @{ 
  *
  * @file       ahrs_comms.c
@@ -53,7 +53,7 @@
 #include "ahrs_comms.h"
 #include "attitudeactual.h"
 #include "attitudesettings.h"
-#include "headingactual.h"
+#include "attituderaw.h"
 #include "ahrsstatus.h"
 #include "alarms.h"
 
@@ -72,7 +72,7 @@ static xTaskHandle taskHandle;
 // Private functions
 static void ahrscommsTask(void* parameters);
 static void update_attitude_actual(struct opahrs_msg_v1_rsp_attitude * attitude);
-static void update_heading_actual(struct opahrs_msg_v1_rsp_heading * heading);
+static void update_attitude_raw(struct opahrs_msg_v1_rsp_attituderaw * attituderaw);
 static void update_ahrs_status(struct opahrs_msg_v1_rsp_serial * serial);
 
 /**
@@ -131,8 +131,8 @@ static void ahrscommsTask(void* parameters)
 	break;
       }
 
-      if (PIOS_OPAHRS_GetHeading(&rsp) == OPAHRS_RESULT_OK) {
-	update_heading_actual(&(rsp.payload.user.v.rsp.heading));
+      if (PIOS_OPAHRS_GetAttitudeRaw(&rsp) == OPAHRS_RESULT_OK) {
+	update_attitude_raw(&(rsp.payload.user.v.rsp.attituderaw));
       } else {
 	/* Comms error */
 	break;
@@ -160,17 +160,26 @@ static void update_attitude_actual(struct opahrs_msg_v1_rsp_attitude * attitude)
   AttitudeActualSet(&data);
 }
 
-static void update_heading_actual(struct opahrs_msg_v1_rsp_heading * heading)
+static void update_attitude_raw(struct opahrs_msg_v1_rsp_attituderaw * attituderaw)
 {
-  HeadingActualData    data;
+  AttitudeRawData    data;
 
-  data.raw[HEADINGACTUAL_RAW_X] = heading->raw_mag.x;
-  data.raw[HEADINGACTUAL_RAW_Y] = heading->raw_mag.y;
-  data.raw[HEADINGACTUAL_RAW_Z] = heading->raw_mag.z;
+  data.magnetometers[ATTITUDERAW_MAGNETOMETERS_X] = attituderaw->mags.x;
+  data.magnetometers[ATTITUDERAW_MAGNETOMETERS_Y] = attituderaw->mags.y;
+  data.magnetometers[ATTITUDERAW_MAGNETOMETERS_Z] = attituderaw->mags.z;
+
+  data.gyros[ATTITUDERAW_GYROS_X] = attituderaw->gyros.x;
+  data.gyros[ATTITUDERAW_GYROS_Y] = attituderaw->gyros.y;
+  data.gyros[ATTITUDERAW_GYROS_Z] = attituderaw->gyros.z;
+
+  data.gyrotemp[ATTITUDERAW_GYROTEMP_XY] = attituderaw->gyros.xy_temp;
+  data.gyrotemp[ATTITUDERAW_GYROTEMP_Z] = attituderaw->gyros.z_temp;
+
+  data.accelerometers[ATTITUDERAW_ACCELEROMETERS_X] = attituderaw->accels.x;
+  data.accelerometers[ATTITUDERAW_ACCELEROMETERS_Y] = attituderaw->accels.y;
+  data.accelerometers[ATTITUDERAW_ACCELEROMETERS_Z] = attituderaw->accels.z;
   
-  data.heading                  = heading->heading;
-  
-  HeadingActualSet(&data);
+  AttitudeRawSet(&data);
 }
 
 static void update_ahrs_status(struct opahrs_msg_v1_rsp_serial * serial)

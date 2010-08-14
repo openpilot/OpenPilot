@@ -33,7 +33,7 @@ ScopeGadgetConfiguration::ScopeGadgetConfiguration(QString classId, const QByteA
         IUAVGadgetConfiguration(classId, parent),
         m_plotType((int)ChronoPlot),
         m_dataSize(60),
-        m_refreshInterval(1)
+        m_refreshInterval(1000)
 {
     uint currentStreamVersion = 0;
     int plotCurveCount = 0;
@@ -71,6 +71,9 @@ ScopeGadgetConfiguration::ScopeGadgetConfiguration(QString classId, const QByteA
             m_PlotCurveConfigs.append(plotCurveConf);
         }
 
+        //The value is converted to milliseconds, so if it is < 100, it is still seconds
+        if(m_refreshInterval < 100)
+            m_refreshInterval *= 1000;
     }
 }
 

@@ -61,6 +61,8 @@ public:
 private:
     QWidget *m_widget;
     QList<int> m_context;
+
+    bool configLoaded;
 };
 
 

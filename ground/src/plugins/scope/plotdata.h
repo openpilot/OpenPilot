@@ -77,6 +77,9 @@ public:
 
     virtual bool append(UAVObject* obj) = 0;
     virtual PlotType plotType() = 0;
+    virtual void removeStaleData() = 0;
+
+    void updatePlotCurveData();
 
 signals:
     void dataChanged();
@@ -105,6 +108,11 @@ public:
     virtual PlotType plotType() {
         return SequencialPlot;
     }
+
+    /*!
+      \brief Removes the old data from the buffer
+      */
+    virtual void removeStaleData(){}
 };
 
 /*!
@@ -114,16 +122,11 @@ class ChronoPlotData : public PlotData
 {
     Q_OBJECT
 public:
-    ChronoPlotData(QString uavObject, QString uavField, double refreshInterval)
+    ChronoPlotData(QString uavObject, QString uavField)
             : PlotData(uavObject, uavField) {
         scalePower = 1;
-        //Setup timer that removes stale data
-        timer = new QTimer();
-        connect(timer, SIGNAL(timeout()), this, SLOT(removeStaleDataTimeout()));
-        timer->start(refreshInterval * 1000);
     }
     ~ChronoPlotData() {
-        delete timer;
     }
 
     bool append(UAVObject* obj);
@@ -131,10 +134,10 @@ public:
     virtual PlotType plotType() {
         return ChronoPlot;
     }
-private:
-    void removeStaleData();
 
-    QTimer *timer;
+    virtual void removeStaleData();
+
+private:
 
 private slots:
     void removeStaleDataTimeout();
@@ -156,7 +159,9 @@ public:
 
     virtual PlotType plotType() {
         return UAVObjectPlot;
-    }
+    }    
+
+    virtual void removeStaleData(){}
 };
 
 #endif // PLOTDATA_H

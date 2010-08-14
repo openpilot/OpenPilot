@@ -49,15 +49,12 @@ TestDataGen* ScopeGadgetWidget::testDataGen;
 
 ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent)
 {
-  //  if(testDataGen == 0)
-  //      testDataGen = new TestDataGen();
+//    if(testDataGen == 0)
+//        testDataGen = new TestDataGen();
 
-    setCanvasBackground(Qt::darkBlue);
-
-    QwtPlotGrid *grid = new QwtPlotGrid;
-    grid->setMajPen(QPen(Qt::gray, 0, Qt::DashLine));
-    grid->setMinPen(QPen(Qt::lightGray, 0 , Qt::DotLine));
-    grid->attach(this);
+    //Setup the timer that replots data
+    replotTimer = new QTimer(this);
+    connect(replotTimer, SIGNAL(timeout()), this, SLOT(replotNewData()));
 }
 
 void ScopeGadgetWidget::preparePlot(PlotType plotType)
@@ -69,7 +66,15 @@ void ScopeGadgetWidget::preparePlot(PlotType plotType)
     setMinimumSize(64, 64);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     // Show a title
-    setTitle("Scope");
+    setTitle("Scope");    
+
+    setCanvasBackground(Qt::darkBlue);
+
+    //Add grid lines
+    QwtPlotGrid *grid = new QwtPlotGrid;
+    grid->setMajPen(QPen(Qt::gray, 0, Qt::DashLine));
+    grid->setMinPen(QPen(Qt::lightGray, 0 , Qt::DotLine));
+    grid->attach(this);
 
     // Show a legend at the bottom
     if (legend() == 0) {
@@ -80,6 +85,14 @@ void ScopeGadgetWidget::preparePlot(PlotType plotType)
     }
 
     connect(this, SIGNAL(legendChecked(QwtPlotItem *, bool)),this, SLOT(showCurve(QwtPlotItem *, bool)));
+
+    if(!replotTimer->isActive())
+        replotTimer->start(m_refreshInterval);
+    else
+    {
+        replotTimer->setInterval(m_refreshInterval);
+    }
+
 }
 
 void ScopeGadgetWidget::showCurve(QwtPlotItem *item, bool on)
@@ -110,8 +123,8 @@ void ScopeGadgetWidget::setupChronoPlot()
     setAxisTitle(QwtPlot::xBottom, "Time [h:m:s]");
     setAxisScaleDraw(QwtPlot::xBottom, new TimeScaleDraw());
     uint NOW = QDateTime::currentDateTime().toTime_t();
-    setAxisScale(QwtPlot::xBottom, NOW - m_xWindowSize, NOW);
-    setAxisLabelRotation(QwtPlot::xBottom, -50.0);
+    setAxisScale(QwtPlot::xBottom, NOW - m_xWindowSize / 1000, NOW);
+    setAxisLabelRotation(QwtPlot::xBottom, -15.0);
     setAxisLabelAlignment(QwtPlot::xBottom, Qt::AlignLeft | Qt::AlignBottom);
 
     /*
@@ -135,7 +148,7 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavField, int sc
     if (m_plotType == SequencialPlot)
         plotData = new SequencialPlotData(uavObject, uavField);
     else if (m_plotType == ChronoPlot)
-        plotData = new ChronoPlotData(uavObject, uavField, m_refreshInterval);
+        plotData = new ChronoPlotData(uavObject, uavField);
     //else if (m_plotType == UAVObjectPlot)
     //    plotData = new UAVObjectPlotData(uavObject, uavField);
 
@@ -169,8 +182,6 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavField, int sc
         connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(uavObjectReceived(UAVObject*)));
     }
 
-    connect(plotData, SIGNAL(dataChanged()), this, SLOT(replotNewData()));
-
     replot();
 }
 
@@ -192,16 +203,24 @@ void ScopeGadgetWidget::uavObjectReceived(UAVObject* obj)
 {
     foreach(PlotData* plotData, m_curvesData.values()) {
         plotData->append(obj);
-        plotData->curve->setData(*plotData->xData, *plotData->yData);
     }
 }
 
 void ScopeGadgetWidget::replotNewData()
 {
-    if (m_plotType == ChronoPlot) {
-        uint NOW = QDateTime::currentDateTime().toTime_t();
-        setAxisScale(QwtPlot::xBottom, NOW - m_xWindowSize, NOW);
+    foreach(PlotData* plotData, m_curvesData.values()) {
+        plotData->removeStaleData();
+        plotData->curve->setData(*plotData->xData, *plotData->yData);
     }
+
+    QDateTime NOW = QDateTime::currentDateTime();
+    double toTime = NOW.toTime_t();
+    toTime += NOW.time().msec() / 1000.0;
+    if (m_plotType == ChronoPlot) {
+        setAxisScale(QwtPlot::xBottom, toTime - m_xWindowSize, toTime);
+    }
+     //qDebug() << "replotNewData from " << NOW.addSecs(- m_xWindowSize) << " to " << NOW;
+
     replot();
 }
 
@@ -257,6 +276,11 @@ void ScopeGadgetWidget::setupExamplePlot()
 
 ScopeGadgetWidget::~ScopeGadgetWidget()
 {
+    if (replotTimer)
+        replotTimer->stop();
+    delete replotTimer;
+    replotTimer = 0;
+
     //Get the object to de-monitor
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -281,6 +305,7 @@ void ScopeGadgetWidget::clearCurvePlots()
     m_curvesData.clear();
 }
 
+
 TestDataGen::TestDataGen()
 {
     // Get required UAVObjects
@@ -291,17 +316,20 @@ TestDataGen::TestDataGen()
     gps = PositionActual::GetInstance(objManager);
 
     //Setup timer
+    periodMs = 5;
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(genTestData()));
-    timer->start(2);
+    timer->start(periodMs);
+
+    debugCounter = 0;
 }
 
 void TestDataGen::genTestData()
 {
     // Update AltitudeActual object
     AltitudeActual::DataFields altActualData;
-    altActualData.Altitude = 500 * sin(0.1 * testTime) + 200 * cos(0.4 * testTime) + 800;
-    altActualData.Temperature = 30 * sin(0.05 * testTime);
+    altActualData.Altitude = 500 * sin(1 * testTime) + 200 * cos(4 * testTime) + 800;
+    altActualData.Temperature = 30 * sin(0.5 * testTime);
     altActualData.Pressure = 100;
     altActual->setData(altActualData);
 
@@ -316,7 +344,11 @@ void TestDataGen::genTestData()
     gpsData.Satellites = 10;
     gps->setData(gpsData);
 
-    testTime += 0.02;
+    testTime += (periodMs / 1000.0);
+
+    debugCounter++;
+    if (debugCounter % 100 == 0 )
+        qDebug() << "Test Time = " << testTime;
 }
 
 TestDataGen::~TestDataGen()

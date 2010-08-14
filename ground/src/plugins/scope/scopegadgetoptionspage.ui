@@ -28,7 +28,7 @@
       <x>0</x>
       <y>0</y>
       <width>551</width>
-      <height>231</height>
+      <height>275</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -97,16 +97,19 @@
        <item row="3" column="1">
         <widget class="QSpinBox" name="spnRefreshInterval">
          <property name="suffix">
-          <string> seconds</string>
+          <string>ms</string>
          </property>
          <property name="minimum">
-          <number>1</number>
+          <number>100</number>
          </property>
          <property name="maximum">
-          <number>30</number>
+          <number>30000</number>
+         </property>
+         <property name="singleStep">
+          <number>500</number>
          </property>
          <property name="value">
-          <number>5</number>
+          <number>1000</number>
          </property>
         </widget>
        </item>

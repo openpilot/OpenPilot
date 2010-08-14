@@ -52,14 +52,17 @@ class TimeScaleDraw : public QwtScaleDraw
 {
 public:
     TimeScaleDraw() {
-        baseTime = QDateTime::currentDateTime().toTime_t();
+        //baseTime = QDateTime::currentDateTime().toTime_t();
     }
     virtual QwtText label(double v) const {
-        QDateTime upTime = QDateTime::fromTime_t((uint)v);
+        uint seconds = (uint)(v);
+        QDateTime upTime = QDateTime::fromTime_t(seconds);
+        QTime timePart = upTime.time().addMSecs((v - seconds )* 1000);
+        upTime.setTime(timePart);
         return upTime.toLocalTime().toString("hh:mm:ss");
     }
 private:
-    double baseTime;
+//    double baseTime;
 };
 
 /*!
@@ -80,6 +83,9 @@ private:
 
     QTimer *timer;
     double testTime;
+    int periodMs;
+
+    int debugCounter;
 
 private slots:
     void genTestData();
@@ -127,7 +133,9 @@ private:
     QList<QString> m_connectedUAVObjects;
     QMap<QString, PlotData*> m_curvesData;
 
-    static TestDataGen* testDataGen;
+    static TestDataGen* testDataGen;    
+
+    QTimer *replotTimer;
 };
 
 

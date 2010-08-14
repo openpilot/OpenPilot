@@ -28,6 +28,7 @@
 
 #include "plotdata.h"
 #include <math.h>
+#include <QDebug>
 
 PlotData::PlotData(QString p_uavObject, QString p_uavField)
 {
@@ -67,7 +68,7 @@ bool SequencialPlotData::append(UAVObject* obj)
                 xData->insert(xData->size(), xData->size());
 
             //notify the gui of changes in the data
-            dataChanged();
+            //dataChanged();
             return true;
         }
     }
@@ -93,7 +94,7 @@ bool ChronoPlotData::append(UAVObject* obj)
             removeStaleData();
 
             //notify the gui of chages in the data
-            dataChanged();
+            //dataChanged();
             return true;
         }
     }
@@ -119,12 +120,15 @@ void ChronoPlotData::removeStaleData()
         } else
             break;
     }
+
+    //qDebug() << "removeStaleData ";
 }
 
 void ChronoPlotData::removeStaleDataTimeout()
 {
     removeStaleData();
-    dataChanged();
+    //dataChanged();
+    //qDebug() << "removeStaleDataTimeout";
 }
 
 bool UAVObjectPlotData::append(UAVObject* obj)

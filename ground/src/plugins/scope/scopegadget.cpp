@@ -33,12 +33,14 @@
 
 ScopeGadget::ScopeGadget(QString classId, ScopeGadgetWidget *widget, QWidget *parent) :
         IUAVGadget(classId, parent),
-        m_widget(widget)
+        m_widget(widget),
+        configLoaded(false)
 {
 }
 
 void ScopeGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 {
+
     ScopeGadgetConfiguration *sgConfig = qobject_cast<ScopeGadgetConfiguration*>(config);
     ScopeGadgetWidget* widget = qobject_cast<ScopeGadgetWidget*>(m_widget);
 
@@ -63,12 +65,11 @@ void ScopeGadget::loadConfiguration(IUAVGadgetConfiguration* config)
                 uavObject,
                 uavField,
                 scale,
-                QPen(
-                        QBrush(QColor(color),Qt::SolidPattern),
-                        (qreal)2,
-                        Qt::SolidLine,
-                        Qt::SquareCap,
-                        Qt::BevelJoin)
+                QPen(  QBrush(QColor(color),Qt::SolidPattern),
+                       (qreal)2,
+                       Qt::SolidLine,
+                       Qt::SquareCap,
+                       Qt::BevelJoin)
                 );
     }   
 }

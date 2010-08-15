@@ -105,7 +105,7 @@ namespace glc
 	//! Return Archive entry filname from the given archive string
 	GLC_LIB_EXPORT QString archiveEntryFileName(const QString& archiveString);
 
-};
+}
 
 // Return the GLC_uint decoded ID from RGBA encoded ID
 GLC_uint glc::decodeRgbId(const GLubyte* pcolorId)

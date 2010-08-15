@@ -270,7 +270,7 @@ namespace glc
 	/*! \var Z_AXIS
 	 *  \brief Z axis Vector*/
 	const GLC_Vector3d Z_AXIS(0.0, 0.0, 1.0);
-};
+}
 
 //! Define GLC_Point3D
 typedef GLC_Vector3d GLC_Point3d;

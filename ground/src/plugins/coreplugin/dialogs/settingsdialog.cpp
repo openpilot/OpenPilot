@@ -142,7 +142,7 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId,
                 {
                     firstUavGadgetOptionsPageFound = true;
                     QTreeWidgetItem *separator = new QTreeWidgetItem(pageTree);
-                    separator->setFlags(item->flags() & ~Qt::ItemIsSelectable);
+                    separator->setFlags(item->flags() & ~Qt::ItemIsSelectable & ~Qt::ItemIsEnabled);
                     separator->setText(0, QString(30, 0xB7));
                 }
             }

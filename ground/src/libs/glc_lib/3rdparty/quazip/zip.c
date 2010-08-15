@@ -318,7 +318,7 @@ local void ziplocal_putValue_inmemory (dest, x, nbByte)
 
 local uLong ziplocal_TmzDateToDosDate(ptm,dosDate)
     const tm_zip* ptm;
-    uLong dosDate;
+    uLong dosDate __attribute((unused));
 {
     //(void) dosDate; /* avoid "unused parameter" warning */
     uLong year = (uLong)ptm->tm_year;

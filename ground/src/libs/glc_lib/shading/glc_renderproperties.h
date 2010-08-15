@@ -58,7 +58,7 @@ namespace glc
 		WireRenderFlag,
 		TransparentRenderFlag
 	};
-};
+}
 //////////////////////////////////////////////////////////////////////
 //! \class GLC_RenderProperties
 /*! \brief GLC_RenderProperties encapsulate the render properties

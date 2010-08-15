@@ -43,6 +43,6 @@ namespace glc
 	//! Convert the given degre angle in radian
 	inline double toRadian(double angle)
 	{return PI * angle / 180.0;}
-};
+}
 
 #endif /*GLC_UTILS_MATHS_H_*/

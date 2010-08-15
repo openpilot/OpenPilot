@@ -1407,7 +1407,7 @@ lib3ds_morph_track_read(Lib3dsMorphTrack *track, Lib3dsIo *io)
  * \ingroup tracks 
  */
 Lib3dsBool
-lib3ds_morph_track_write(Lib3dsMorphTrack *track, Lib3dsIo *io)
+lib3ds_morph_track_write(Lib3dsMorphTrack *track __attribute((unused)), Lib3dsIo *io __attribute((unused)))
 {
   /* FIXME: */
   ASSERT(0);
@@ -1547,6 +1547,8 @@ lib3ds_dump_tracks(Lib3dsNode *node)
     case LIB3DS_SPOT_NODE:
       printf("pos: ");
       lib3ds_lin3Track_dump(&node->data.spot.pos_track);
+      break;
+    case LIB3DS_UNKNOWN_NODE:
       break;
   }
 }

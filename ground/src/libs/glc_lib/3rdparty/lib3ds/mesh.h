@@ -70,7 +70,7 @@ typedef enum {
                                        /* Bit 11-12: Unused ? */
   LIB3DS_FACE_FLAG_SELECT_3 = (1<<13),   /*!< Bit 13: Selection of the face in selection 3*/
   LIB3DS_FACE_FLAG_SELECT_2 = (1<<14),   /*!< Bit 14: Selection of the face in selection 2*/
-  LIB3DS_FACE_FLAG_SELECT_1 = (1<<15),   /*!< Bit 15: Selection of the face in selection 1*/
+  LIB3DS_FACE_FLAG_SELECT_1 = (1<<15)   /*!< Bit 15: Selection of the face in selection 1*/
 } Lib3dsFaceFlag;
 
 /**

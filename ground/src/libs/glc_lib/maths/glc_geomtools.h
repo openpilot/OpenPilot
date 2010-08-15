@@ -103,6 +103,6 @@ namespace glc
 
 //@}
 
-};
+}
 
 #endif /*GLC_GEOMTOOLS_H_*/

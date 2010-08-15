@@ -37,7 +37,8 @@ GLC_MoverController::GLC_MoverController()
 
 // Copy constructor
 GLC_MoverController::GLC_MoverController(const GLC_MoverController& controller)
-: m_ActiveMoverId(controller.m_ActiveMoverId)
+: QObject()
+, m_ActiveMoverId(controller.m_ActiveMoverId)
 , m_MoverHash()
 {
 	MoverHash::const_iterator iMover= controller.m_MoverHash.constBegin();

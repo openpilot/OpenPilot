@@ -222,6 +222,12 @@ int main()
   
   lfsm_init();
   
+  ahrs_state = AHRS_IDLE;;
+  /* Use simple averaging filter for now */
+  for (int i = 0; i < ADC_OVERSAMPLE; i++)
+    fir_coeffs[i] = 1;
+  fir_coeffs[ADC_OVERSAMPLE] = ADC_OVERSAMPLE;
+  
   // Main loop
   while (1) {
     uint8_t loop_ctr;
@@ -257,6 +263,8 @@ int main()
     
     gyro_data.temp.xy = valid_data_buffer[6];
     gyro_data.temp.z = valid_data_buffer[7];    
+    
+    ahrs_state = AHRS_IDLE;
     
     /* Simulate a rotating airframe */
     attitude_data.quaternion.q1 += .001;

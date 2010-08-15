@@ -151,22 +151,18 @@ int main()
     PIOS_HMC5843_ReadMag(mag_data.raw.axis);
     
     // Test ADC
-    accel_data.raw.x = PIOS_ADC_PinGet(2);
-    accel_data.raw.y = PIOS_ADC_PinGet(1);
+    accel_data.raw.x = PIOS_ADC_PinGet(4);
+    accel_data.raw.y = PIOS_ADC_PinGet(2);
     accel_data.raw.z = PIOS_ADC_PinGet(0);
 
-    gyro_data.raw.x  = PIOS_ADC_PinGet(3);
-    gyro_data.raw.y  = PIOS_ADC_PinGet(4);
+    gyro_data.raw.x  = PIOS_ADC_PinGet(1);
+    gyro_data.raw.y  = PIOS_ADC_PinGet(3);
     gyro_data.raw.z  = PIOS_ADC_PinGet(5);
 
-#if 0
     /* Turn this on when the temperature ADCs are configured */
     gyro_data.temp.xy = PIOS_ADC_PinGet(6);
     gyro_data.temp.z  = PIOS_ADC_PinGet(7);
-#else
-    gyro_data.temp.xy = 0;
-    gyro_data.temp.z  = 0;
-#endif
+
     //PIOS_COM_SendFormattedString(PIOS_COM_AUX, "ADC Values: %d,%d,%d,%d,%d,%d\r\n", PIOS_ADC_PinGet(0), PIOS_ADC_PinGet(1), PIOS_ADC_PinGet(2), PIOS_ADC_PinGet(3), PIOS_ADC_PinGet(4), PIOS_ADC_PinGet(5));
 
 

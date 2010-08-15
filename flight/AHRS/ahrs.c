@@ -230,13 +230,9 @@ int main()
   
   // Main loop
   while (1) {
-    uint8_t loop_ctr;
 
     // Alive signal
-    if (loop_ctr++ > 100) {
-      PIOS_LED_Toggle(LED1);
-      loop_ctr = 0;
-    }
+    PIOS_LED_Toggle(LED1);
     
     // Get 3 ID bytes
     strcpy ((char *)mag_data.id, "ZZZ");
@@ -266,23 +262,27 @@ int main()
     
     ahrs_state = AHRS_IDLE;
     
-    /* Simulate a rotating airframe */
-    attitude_data.quaternion.q1 += .001;
-    attitude_data.quaternion.q2 += .002;
-    attitude_data.quaternion.q3 += .003;
-    attitude_data.quaternion.q4 += 1;
-
-    attitude_data.euler.roll  += .004;
-    if (attitude_data.euler.roll > 360.0) attitude_data.euler.roll -= 360.0;
-    attitude_data.euler.pitch += .005;
-    if (attitude_data.euler.pitch > 360.0) attitude_data.euler.pitch -= 360.0;
-    attitude_data.euler.yaw   += .006;
-    if (attitude_data.euler.yaw > 360.0) attitude_data.euler.yaw -= 360.0;
+    /* Very simple computation of the heading and attitude from accel. */
+    attitude_data.euler.yaw = atan2((mag_data.raw.axis[0]), (-1 * mag_data.raw.axis[1])) * 180 / M_PI;
+    attitude_data.euler.pitch = atan2(accel_data.filtered.y, accel_data.filtered.z) * 180 / M_PI;
+    attitude_data.euler.roll = -atan2(accel_data.filtered.x,accel_data.filtered.z) * 180 / M_PI;
+    if (attitude_data.euler.yaw < 0) attitude_data.euler.yaw += 360.0;
+    
+    float c1 = cos(attitude_data.euler.yaw/2);
+    float s1 = sin(attitude_data.euler.yaw/2);
+    float c2 = cos(attitude_data.euler.pitch/2);
+    float s2 = sin(attitude_data.euler.pitch/2);
+    float c3 = cos(attitude_data.euler.roll/2);
+    float s3 = sin(attitude_data.euler.roll/2);
+    float c1c2 = c1*c2;
+    float s1s2 = s1*s2;
+    attitude_data.quaternion.q1 = c1c2*c3 - s1s2*s3;
+    attitude_data.quaternion.q2 = c1c2*s3 + s1s2*c3;
+    attitude_data.quaternion.q3 = s1*c2*c3 + c1*s2*s3;
+    attitude_data.quaternion.q4 =c1*s2*c3 - s1*c2*s3;
     
     process_spi_request();
     
-    // Delay until next reading
-    //PIOS_DELAY_WaitmS(50);
   }
   
   return 0;

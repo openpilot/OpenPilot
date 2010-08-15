@@ -184,17 +184,25 @@ struct opahrs_msg_v1_req_reset {
 struct opahrs_msg_v1_req_serial {
 } __attribute__((__packed__));
 
+struct opahrs_msg_v1_req_altitude {
+  float altitude;
+  float pressure;
+  float temperature;
+} __attribute__((__packed__));
+
 struct opahrs_msg_v1_req_attituderaw {
 } __attribute__((__packed__));
 
 struct opahrs_msg_v1_req_attitude {
 } __attribute__((__packed__));
 
+
 union opahrs_msg_v1_req {
   struct opahrs_msg_v1_req_nop          nop;
   struct opahrs_msg_v1_req_sync         sync;
   struct opahrs_msg_v1_req_reset        reset;
   struct opahrs_msg_v1_req_serial       serial;
+  struct opahrs_msg_v1_req_altitude     altitude;
   struct opahrs_msg_v1_req_attituderaw  attituderaw;
   struct opahrs_msg_v1_req_attitude     attitude;
 } __attribute__((__packed__));
@@ -210,6 +218,9 @@ struct opahrs_msg_v1_rsp_sync {
 
 struct opahrs_msg_v1_rsp_serial {
   uint8_t  serial_bcd[25];
+} __attribute__((__packed__));
+
+struct opahrs_msg_v1_rsp_altitude {
 } __attribute__((__packed__));
 
 struct opahrs_msg_v1_rsp_attituderaw {
@@ -249,6 +260,7 @@ struct opahrs_msg_v1_rsp_attitude {
 union opahrs_msg_v1_rsp {
   struct opahrs_msg_v1_rsp_sync         sync;
   struct opahrs_msg_v1_rsp_serial       serial;
+  struct opahrs_msg_v1_rsp_altitude     altitude;
   struct opahrs_msg_v1_rsp_attituderaw  attituderaw;
   struct opahrs_msg_v1_rsp_attitude     attitude;
 } __attribute__((__packed__));
@@ -258,11 +270,13 @@ enum opahrs_msg_v1_tag {
   OPAHRS_MSG_V1_REQ_SYNC,
   OPAHRS_MSG_V1_REQ_RESET,
   OPAHRS_MSG_V1_REQ_SERIAL,
+  OPAHRS_MSG_V1_REQ_ALTITUDE,
   OPAHRS_MSG_V1_REQ_ATTITUDERAW,
   OPAHRS_MSG_V1_REQ_ATTITUDE,
 
   OPAHRS_MSG_V1_RSP_SYNC,
   OPAHRS_MSG_V1_RSP_SERIAL,
+  OPAHRS_MSG_V1_RSP_ALTITUDE,
   OPAHRS_MSG_V1_RSP_ATTITUDERAW,
   OPAHRS_MSG_V1_RSP_ATTITUDE,
 };

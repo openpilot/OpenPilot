@@ -56,6 +56,8 @@
 #include "attituderaw.h"
 #include "ahrsstatus.h"
 #include "alarms.h"
+#include "altitudeactual.h"
+#include "stdbool.h"
 
 #include "pios_opahrs.h" // library for OpenPilot AHRS access functions
 #include "pios_opahrs_proto.h"
@@ -71,9 +73,16 @@ static xTaskHandle taskHandle;
 
 // Private functions
 static void ahrscommsTask(void* parameters);
+static void load_altitude_actual(struct opahrs_msg_v1_req_altitude * altitude);
 static void update_attitude_actual(struct opahrs_msg_v1_rsp_attitude * attitude);
 static void update_attitude_raw(struct opahrs_msg_v1_rsp_attituderaw * attituderaw);
 static void update_ahrs_status(struct opahrs_msg_v1_rsp_serial * serial);
+
+static bool AltitudeActualIsUpdatedFlag = false;
+static void AltitudeActualUpdatedCb(UAVObjEvent * ev)
+{
+  AltitudeActualIsUpdatedFlag = true;
+}
 
 /**
  * Initialise the module, called on startup
@@ -81,6 +90,8 @@ static void update_ahrs_status(struct opahrs_msg_v1_rsp_serial * serial);
  */
 int32_t AHRSCommsInitialize(void)
 {
+  AltitudeActualConnectCallback(AltitudeActualUpdatedCb);
+
   PIOS_OPAHRS_Init();
 
   // Start main task
@@ -137,11 +148,33 @@ static void ahrscommsTask(void* parameters)
 	/* Comms error */
 	break;
       }
-    
+
+      if (AltitudeActualIsUpdatedFlag) {
+	struct opahrs_msg_v1 req;
+
+	load_altitude_actual(&(req.payload.user.v.req.altitude));
+	if (PIOS_OPAHRS_SetAltitudeActual(&req) == OPAHRS_RESULT_OK) {
+	  AltitudeActualIsUpdatedFlag = false;
+	} else {
+	  /* Comms error */
+	}
+      }
+
       /* Wait for the next update interval */
       vTaskDelay( settings.UpdatePeriod / portTICK_RATE_MS );
     }
   }
+}
+
+static void load_altitude_actual(struct opahrs_msg_v1_req_altitude * altitude)
+{
+  AltitudeActualData   data;
+
+  AltitudeActualGet(&data);
+
+  altitude->altitude    = data.Altitude;
+  altitude->pressure    = data.Pressure;
+  altitude->temperature = data.Temperature;
 }
 
 static void update_attitude_actual(struct opahrs_msg_v1_rsp_attitude * attitude)

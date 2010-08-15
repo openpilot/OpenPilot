@@ -134,9 +134,9 @@ TIM8  |           |           |           |
 #define PIOS_ADC_TEMP_SENSOR_ADC		ADC1
 #define PIOS_ADC_TEMP_SENSOR_ADC_CHANNEL	1
 
-#define PIOS_ADC_PIN1_GPIO_PORT			GPIOA			// PA0 (Accel Z)
-#define PIOS_ADC_PIN1_GPIO_PIN			GPIO_Pin_0		// ADC12_IN0
-#define PIOS_ADC_PIN1_GPIO_CHANNEL		ADC_Channel_0
+#define PIOS_ADC_PIN1_GPIO_PORT			GPIOA			// PA2 (Accel X)
+#define PIOS_ADC_PIN1_GPIO_PIN			GPIO_Pin_2		// ADC12_IN2
+#define PIOS_ADC_PIN1_GPIO_CHANNEL		ADC_Channel_2
 #define PIOS_ADC_PIN1_ADC			ADC1
 #define PIOS_ADC_PIN1_ADC_NUMBER		1
 
@@ -146,13 +146,17 @@ TIM8  |           |           |           |
 #define PIOS_ADC_PIN2_ADC			ADC1
 #define PIOS_ADC_PIN2_ADC_NUMBER		2
 
-#define PIOS_ADC_PIN3_GPIO_PORT			GPIOA			// PA1 (Accel X)
-#define PIOS_ADC_PIN3_GPIO_PIN			GPIO_Pin_2		// ADC12_IN2
-#define PIOS_ADC_PIN3_GPIO_CHANNEL		ADC_Channel_2
+#define PIOS_ADC_PIN3_GPIO_PORT			GPIOA			// PA0 (Accel Z)
+#define PIOS_ADC_PIN3_GPIO_PIN			GPIO_Pin_0		// ADC12_IN0
+#define PIOS_ADC_PIN3_GPIO_CHANNEL		ADC_Channel_0
 #define PIOS_ADC_PIN3_ADC			ADC1
 #define PIOS_ADC_PIN3_ADC_NUMBER		3
 
+<<<<<<< HEAD
 #define PIOS_ADC_PIN4_GPIO_PORT			GPIOA			// PA6 (XY Temp)
+=======
+#define PIOS_ADC_PIN4_GPIO_PORT			GPIOA			// PA6 (Temp_XY)
+>>>>>>> Adding ADC downsampling code
 #define PIOS_ADC_PIN4_GPIO_PIN			GPIO_Pin_6		// ADC12_IN6
 #define PIOS_ADC_PIN4_GPIO_CHANNEL		ADC_Channel_6
 #define PIOS_ADC_PIN4_ADC			ADC1
@@ -176,15 +180,24 @@ TIM8  |           |           |           |
 #define PIOS_ADC_PIN7_ADC			ADC2
 #define PIOS_ADC_PIN7_ADC_NUMBER		3
 
+<<<<<<< HEAD
 #define PIOS_ADC_PIN8_GPIO_PORT			GPIOB			// PA7 (Gyro Z)
 #define PIOS_ADC_PIN8_GPIO_PIN			GPIO_Pin_1		// ADC12_IN7
+=======
+#define PIOS_ADC_PIN8_GPIO_PORT			GPIOB			// PB1 (Z Temp)
+#define PIOS_ADC_PIN8_GPIO_PIN			GPIO_Pin_1		// ADC12_IN9
+>>>>>>> Adding ADC downsampling code
 #define PIOS_ADC_PIN8_GPIO_CHANNEL		ADC_Channel_9
 #define PIOS_ADC_PIN8_ADC			ADC2
 #define PIOS_ADC_PIN8_ADC_NUMBER		4
 
 #define PIOS_ADC_NUM_PINS			8
 
+<<<<<<< HEAD
 #define PIOS_ADC_PORTS				{ PIOS_ADC_PIN1_GPIO_PORT, PIOS_ADC_PIN2_GPIO_PORT, PIOS_ADC_PIN3_GPIO_PORT, PIOS_ADC_PIN4_GPIO_PORT, PIOS_ADC_PIN5_GPIO_PORT, PIOS_ADC_PIN6_GPIO_PORT, PIOS_ADC_PIN7_GPIO_PORT, PIOS_ADC_PIN7_GPIO_PORT }
+=======
+#define PIOS_ADC_PORTS				{ PIOS_ADC_PIN1_GPIO_PORT, PIOS_ADC_PIN2_GPIO_PORT, PIOS_ADC_PIN3_GPIO_PORT, PIOS_ADC_PIN4_GPIO_PORT, PIOS_ADC_PIN5_GPIO_PORT, PIOS_ADC_PIN6_GPIO_PORT, PIOS_ADC_PIN7_GPIO_PORT, PIOS_ADC_PIN8_GPIO_PORT }
+>>>>>>> Adding ADC downsampling code
 #define PIOS_ADC_PINS				{ PIOS_ADC_PIN1_GPIO_PIN, PIOS_ADC_PIN2_GPIO_PIN, PIOS_ADC_PIN3_GPIO_PIN, PIOS_ADC_PIN4_GPIO_PIN, PIOS_ADC_PIN5_GPIO_PIN, PIOS_ADC_PIN6_GPIO_PIN, PIOS_ADC_PIN7_GPIO_PIN, PIOS_ADC_PIN8_GPIO_PIN }
 #define PIOS_ADC_CHANNELS			{ PIOS_ADC_PIN1_GPIO_CHANNEL, PIOS_ADC_PIN2_GPIO_CHANNEL, PIOS_ADC_PIN3_GPIO_CHANNEL, PIOS_ADC_PIN4_GPIO_CHANNEL, PIOS_ADC_PIN5_GPIO_CHANNEL, PIOS_ADC_PIN6_GPIO_CHANNEL, PIOS_ADC_PIN7_GPIO_CHANNEL, PIOS_ADC_PIN8_GPIO_CHANNEL }
 #define PIOS_ADC_MAPPING			{ PIOS_ADC_PIN1_ADC, PIOS_ADC_PIN2_ADC, PIOS_ADC_PIN3_ADC, PIOS_ADC_PIN4_ADC, PIOS_ADC_PIN5_ADC, PIOS_ADC_PIN6_ADC, PIOS_ADC_PIN7_ADC, PIOS_ADC_PIN8_ADC }
@@ -194,16 +207,17 @@ TIM8  |           |           |           |
 #define PIOS_ADC_USE_ADC2			1
 #define PIOS_ADC_CLOCK_FUNCTION			RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 | RCC_APB2Periph_ADC2, ENABLE)
 #define PIOS_ADC_ADCCLK				RCC_PCLK2_Div8
-						/* RCC_PCLK2_Div2: ADC clock = PCLK2/2 */
-						/* RCC_PCLK2_Div4: ADC clock = PCLK2/4 */
-						/* RCC_PCLK2_Div6: ADC clock = PCLK2/6 */
-						/* RCC_PCLK2_Div8: ADC clock = PCLK2/8 */
+/* RCC_PCLK2_Div2: ADC clock = PCLK2/2 */
+/* RCC_PCLK2_Div4: ADC clock = PCLK2/4 */
+/* RCC_PCLK2_Div6: ADC clock = PCLK2/6 */
+/* RCC_PCLK2_Div8: ADC clock = PCLK2/8 */
 #define PIOS_ADC_SAMPLE_TIME			ADC_SampleTime_239Cycles5
-						/* Sample time: */
-						/* With an ADCCLK = 14 MHz and a sampling time of 293.5 cycles: */
-						/* Tconv = 239.5 + 12.5 = 252 cycles = 18�s */
-						/* (1 / (ADCCLK / CYCLES)) = Sample Time (�S) */
+/* Sample time: */
+/* With an ADCCLK = 14 MHz and a sampling time of 293.5 cycles: */
+/* Tconv = 239.5 + 12.5 = 252 cycles = 18�s */
+/* (1 / (ADCCLK / CYCLES)) = Sample Time (�S) */
 #define PIOS_ADC_IRQ_PRIO			PIOS_IRQ_PRIO_HIGH
+
 
 //-------------------------
 // GPIO

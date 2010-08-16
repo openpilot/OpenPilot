@@ -168,17 +168,35 @@ static struct attitude_solution attitude_data = {
 
 /* Function Prototypes */
 void process_spi_request(void);
-void downsample_data();
+void downsample_data(void);
+void calibrate_sensors(void);
 
 /**
  * @addtogroup AHRS_Global_Data AHRS Global Data
  * @{
  * Public data.  Used by both EKF and the sender
  */
-int16_t fir_coeffs[ADC_OVERSAMPLE+1];          // FIR filter coefficients
+//! Accelerometer variance after filter from OP or calibrate_sensors
+float accel_var[3];
+//! Gyro variance after filter from OP or calibrate sensors
+float gyro_var[3];
+//! Magnetometer variance from OP or calibrate sensors
+float mag_var[3];
+//! Accelerometer bias from OP or calibrate sensors
+float accel_bias[3];
+//! Gyroscope bias term from OP or calibrate sensors
+float gyro_bias[3];
+//! Magnetometer bias (direction) from OP or calibrate sensors
+float mag_bias[3];
+//! Filter coefficients used in decimation.  Limited order so filter can't run between samples
+int16_t fir_coeffs[ADC_OVERSAMPLE+1];          
+//! Raw buffer that DMA data is dumped into
 int16_t raw_data_buffer[ADC_CONTINUOUS_CHANNELS * ADC_OVERSAMPLE * 2];    // Double buffer that DMA just used
-int16_t * valid_data_buffer;      // Swapped by interrupt handler to achieve double buffering
+//! Swapped by interrupt handler to achieve double buffering
+int16_t * valid_data_buffer;      
+//! Counts how many times the EKF wasn't idle when DMA handler called
 uint32_t ekf_too_slow = 0;
+//! Total number of data blocks converted
 uint32_t total_conversion_blocks = 0;
 /**
  * @}
@@ -228,9 +246,7 @@ int main()
   PIOS_SPI_Init();
   
   lfsm_init();
-  
-  INSGPSInit();
-  
+    
   ahrs_state = AHRS_IDLE;;
   /* Use simple averaging filter for now */
   for (int i = 0; i < ADC_OVERSAMPLE; i++)
@@ -245,7 +261,23 @@ int main()
   vel[1] = 0;
   vel[2] = 0;  
   
-  // Main loop
+  /*******  Get initial estimate of gyro bias term *************/
+  // TODO: There needs to be a calibration mode, then this is received from the SD card
+  // otherwise if we reset in air during a snap, this will be all wrong
+  calibrate_sensors();
+  INSGPSInit();
+  INSSetGyroBias(gyro_bias);
+  INSSetAccelVar(accel_var);
+  INSSetGyroVar(gyro_var);
+  // INS algo wants noise on magnetometer in unit length variance
+  float scaled_mag_var[3];
+  float mag_length = mag_bias[0] * mag_bias[0] + mag_bias[1] * mag_bias[1] + mag_bias[2] * mag_bias[2];
+  scaled_mag_var[0] = mag_var[0] / mag_length;
+  scaled_mag_var[1] = mag_var[1] / mag_length;
+  scaled_mag_var[2] = mag_var[2] / mag_length;
+  INSSetMagVar(scaled_mag_var);  
+  
+  /******************* Main EKF loop ****************************/
   while (1) {
     // Alive signal
     PIOS_LED_Toggle(LED1);
@@ -259,7 +291,7 @@ int main()
 
     downsample_data();
 
-    /******************** INS ALGORITHM *************************/
+    /******************** INS ALGORITHM **************************/
     // format data for INS algo
     gyro[0] = gyro_data.filtered.x;
     gyro[1] = gyro_data.filtered.y;
@@ -386,13 +418,82 @@ void downsample_data()
   gyro_data.filtered.z = (float) gyro_raw[2] / (float) fir_coeffs[ADC_OVERSAMPLE] * GYRO_SCALE;
 }
 
+/**
+ * @brief Assumes board is not moving computes biases and variances of sensors
+ * @returns None
+ * 
+ * All data is stored in global structures.  This function should be called from OP when
+ * aircraft is in stable state and then the data stored to SD card.
+ */
+void calibrate_sensors() {
+  int i;
+  int16_t mag_raw[3];
+    
+  // run few loops to get mean
+  gyro_bias[0] = gyro_bias[1] = gyro_bias[2] = 0;
+  accel_bias[0] = accel_bias[1] = accel_bias[2] = 0;
+  mag_bias[0] = mag_bias[1] = mag_bias[2] = 0;
+  for(i = 0; i < 50; i++) {
+    while( ahrs_state != AHRS_DATA_READY );
+    ahrs_state = AHRS_PROCESSING;
+    downsample_data();
+    gyro_bias[0] += gyro_data.filtered.x;
+    gyro_bias[1] += gyro_data.filtered.y;
+    gyro_bias[2] += gyro_data.filtered.z;
+    accel_bias[0] += accel_data.filtered.x;
+    accel_bias[1] += accel_data.filtered.y;
+    accel_bias[2] += accel_data.filtered.z;
+    PIOS_HMC5843_ReadMag(mag_raw);
+    mag_bias[0] += mag_raw[0];
+    mag_bias[1] += mag_raw[1];
+    mag_bias[2] += mag_raw[2];
+    
+    ahrs_state = AHRS_IDLE;
+  }
+  gyro_bias[0] /= i;
+  gyro_bias[1] /= i;
+  gyro_bias[2] /= i;
+  accel_bias[0] /= i;
+  accel_bias[1] /= i;
+  accel_bias[2] /= i;
+  mag_bias[0] /= i;
+  mag_bias[1] /= i;
+  mag_bias[2] /= i;
+  
+  // more iterations for variance
+  accel_var[0] = accel_var[1] = accel_var[2] = 0;
+  gyro_var[0] = gyro_var[1] = gyro_var[2] = 0;
+  mag_var[0] = mag_var[1] = mag_var[2] = 0;
+  for(i = 0; i < 500; i++) 
+  {
+    while( ahrs_state != AHRS_DATA_READY );
+    ahrs_state = AHRS_PROCESSING;
+    downsample_data();
+    gyro_var[0] += (gyro_data.filtered.x - gyro_bias[0]) * (gyro_data.filtered.x - gyro_bias[0]);
+    gyro_var[1] += (gyro_data.filtered.y - gyro_bias[1]) * (gyro_data.filtered.y - gyro_bias[1]);
+    gyro_var[2] += (gyro_data.filtered.z - gyro_bias[2]) * (gyro_data.filtered.z - gyro_bias[2]);
+    accel_var[0] += (accel_data.filtered.x - accel_bias[0]) * (accel_data.filtered.x - accel_bias[0]);
+    accel_var[1] += (accel_data.filtered.y - accel_bias[1]) * (accel_data.filtered.y - accel_bias[1]);
+    accel_var[2] += (accel_data.filtered.z - accel_bias[2]) * (accel_data.filtered.z - accel_bias[2]);
+    PIOS_HMC5843_ReadMag(mag_raw);
+    mag_var[0] += (mag_raw[0] - mag_bias[0]) * (mag_raw[0] - mag_bias[0]);
+    mag_var[1] += (mag_raw[1] - mag_bias[1]) * (mag_raw[1] - mag_bias[1]);
+    mag_var[2] += (mag_raw[2] - mag_bias[2]) * (mag_raw[2] - mag_bias[2]);
+    ahrs_state = AHRS_IDLE;    
+  }
+  gyro_var[0] /= i;
+  gyro_var[1] /= i;
+  gyro_var[2] /= i;
+  accel_var[0] /= i;
+  accel_var[1] /= i;
+  accel_var[2] /= i;
+  mag_var[0] /= i;
+  mag_var[1] /= i;
+  mag_var[2] /= i;    
+}
 
 void dump_spi_message(uint8_t port, const char * prefix, uint8_t * data, uint32_t len)
 {
-
-
-
-
 }
 
 

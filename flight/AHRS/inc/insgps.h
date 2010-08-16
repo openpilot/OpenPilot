@@ -30,6 +30,10 @@
 	//  Exposed Function Prototypes
 	void INSGPSInit();
 	void INSPrediction(float gyro_data[3], float accel_data[3], float dT);
+  void INSSetGyroBias(float gyro_bias[3]);
+  void INSSetAccelVar(float accel_var[3]);
+  void INSSetGyroVar(float gyro_var[3]);
+  void INSSetMagVar(float scaled_mag_var[3]);
 	void MagCorrection(float mag_data[3]);
 	void FullCorrection(float mag_data[3], float Pos[3], float Vel[3], float BaroAlt);
 	void GndSpeedAndMagCorrection(float Speed, float Heading, float mag_data[3]);

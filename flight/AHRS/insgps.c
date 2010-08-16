@@ -61,7 +61,7 @@ void INSGPSInit()   //pretty much just a place holder for now
 	P[0][0]=P[1][1]=P[2][2]=25;             // initial position variance (m^2)
 	P[3][3]=P[4][4]=P[5][5]=5;              // initial velocity variance (m/s)^2
 	P[6][6]=P[7][7]=P[8][8]=P[9][9]=1e-5;   // initial quaternion variance
-	P[10][10]=P[11][11]=P[12][12]=1e-6;     // initial gyro bias variance (rad/s)^2
+	P[10][10]=P[11][11]=P[12][12]=1e-5;     // initial gyro bias variance (rad/s)^2
 
 	X[0]=X[1]=X[2]=X[3]=X[4]=X[5]=0;    // initial pos and vel (m)
 	X[6]=1; X[7]=X[8]=X[9]=0;           // initial quaternion (level and North) (m/s)
@@ -69,15 +69,44 @@ void INSGPSInit()   //pretty much just a place holder for now
 
 	Q[0]=Q[1]=Q[2]=50e-8;           // gyro noise variance (rad/s)^2
 	Q[3]=Q[4]=Q[5]=0.01;            // accelerometer noise variance (m/s^2)^2
-	Q[6]=Q[7]=Q[8]=2e-10;           // gyro bias random walk variance (rad/s^2)^2
+	Q[6]=Q[7]=Q[8]=2e-5;            // gyro bias random walk variance (rad/s^2)^2
 
 	R[0]=R[1]=0.004;       // High freq GPS horizontal position noise variance (m^2)
 	R[2]=0.036;            // High freq GPS vertical position noise variance (m^2)
 	R[3]=R[4]=0.004;       // High freq GPS horizontal velocity noise variance (m/s)^2
 	R[5]=0;                // High freq GPS vertical velocity noise variance (m/s)^2
 	R[6]=R[7]=R[8]=0.005;  // magnetometer unit vector noise variance
-	R[9]=1;               // High freq altimeter noise variance (m^2)
+	R[9]=1;                // High freq altimeter noise variance (m^2)
 }
+
+void INSSetGyroBias(float gyro_bias[3]) 
+{
+  X[10] = gyro_bias[0];
+  X[11] = gyro_bias[1];
+  X[12] = gyro_bias[2];
+}
+
+void INSSetAccelVar(float accel_var[3]) 
+{
+  Q[3] = accel_var[0];
+  Q[4] = accel_var[1];
+  Q[5] = accel_var[2];
+}
+
+void INSSetGyroVar(float gyro_var[3])
+{
+  Q[0] = gyro_var[0];
+  Q[1] = gyro_var[1];
+  Q[2] = gyro_var[2];
+}
+
+void INSSetMagVar(float scaled_mag_var[3]) 
+{
+  R[6] = scaled_mag_var[0];
+  R[7] = scaled_mag_var[1];
+  R[8] = scaled_mag_var[2];
+}
+
 
 void INSPrediction(float gyro_data[3], float accel_data[3], float dT)
 {

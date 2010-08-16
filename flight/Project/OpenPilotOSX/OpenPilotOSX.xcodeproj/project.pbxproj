@@ -21,6 +21,8 @@
 		651CF9F2120B700D00EEFD70 /* pios_usb_hid_pwr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_usb_hid_pwr.h; sourceTree = "<group>"; };
 		651CF9F3120B700D00EEFD70 /* usb_conf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = usb_conf.h; sourceTree = "<group>"; };
 		654330231218E9780063F913 /* insgps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = insgps.c; path = ../../AHRS/insgps.c; sourceTree = SOURCE_ROOT; };
+		6543304F121980300063F913 /* insgps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = insgps.h; sourceTree = "<group>"; };
+		6543305B1219868D0063F913 /* WorldMagModel.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = WorldMagModel.c; path = ../../AHRS/WorldMagModel.c; sourceTree = SOURCE_ROOT; };
 		65A2C7EF11E2A33D00D0391E /* FreeRTOSConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FreeRTOSConfig.h; path = ../../PiOS.posix/inc/FreeRTOSConfig.h; sourceTree = SOURCE_ROOT; };
 		65A2C7F011E2A33D00D0391E /* pios_com.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_com.h; path = ../../PiOS.posix/inc/pios_com.h; sourceTree = SOURCE_ROOT; };
 		65A2C7F111E2A33D00D0391E /* pios_com_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_com_priv.h; path = ../../PiOS.posix/inc/pios_com_priv.h; sourceTree = SOURCE_ROOT; };
@@ -519,6 +521,7 @@
 		65B7E6AC120DF1CD000C1123 /* AHRS */ = {
 			isa = PBXGroup;
 			children = (
+				6543305B1219868D0063F913 /* WorldMagModel.c */,
 				654330231218E9780063F913 /* insgps.c */,
 				65B7E6AD120DF1E2000C1123 /* ahrs_fsm.c */,
 				65B7E6AE120DF1E2000C1123 /* ahrs.c */,
@@ -532,6 +535,7 @@
 		65B7E6AF120DF1E2000C1123 /* inc */ = {
 			isa = PBXGroup;
 			children = (
+				6543304F121980300063F913 /* insgps.h */,
 				65B7E6B0120DF1E2000C1123 /* ahrs.h */,
 				65B7E6B1120DF1E2000C1123 /* ahrs_fsm.h */,
 				65B7E6B3120DF1E2000C1123 /* pios_board.h */,

@@ -36,6 +36,7 @@
 #include "ahrs.h"
 #include "pios_opahrs_proto.h"
 #include "ahrs_fsm.h"		/* lfsm_state */
+#include "insgps.h"
 
 /**
  * State of AHRS EKF
@@ -189,6 +190,8 @@ uint32_t total_conversion_blocks = 0;
 */
 int main()
 {
+  float gyro[3], accel[3], mag[3];
+  
   /* Brings up System using CMSIS functions, enables the LEDs. */
   PIOS_SYS_Init();
   
@@ -222,6 +225,8 @@ int main()
   
   lfsm_init();
   
+  INSGPSInit();
+  
   ahrs_state = AHRS_IDLE;;
   /* Use simple averaging filter for now */
   for (int i = 0; i < ADC_OVERSAMPLE; i++)
@@ -230,7 +235,6 @@ int main()
   
   // Main loop
   while (1) {
-
     // Alive signal
     PIOS_LED_Toggle(LED1);
     
@@ -246,6 +250,19 @@ int main()
     ahrs_state = AHRS_PROCESSING;
 
     downsample_data();
+    
+    gyro[0] = gyro_data.filtered.x;
+    gyro[1] = gyro_data.filtered.y;
+    gyro[2] = gyro_data.filtered.z;
+    accel[0] = accel_data.filtered.x,
+    accel[1] = accel_data.filtered.y,
+    accel[2] = accel_data.filtered.z,
+    mag[0] = mag_data.raw.axis[0];
+    mag[1] = mag_data.raw.axis[1];
+    mag[2] = mag_data.raw.axis[2];
+    
+    INSPrediction(gyro, accel, 1 / (double) EKF_RATE);
+    MagCorrection(mag);
     
     // Hacky - grab one sample from buffer to populate this.  Need to send back
     // all raw data if it's happening
@@ -531,7 +548,8 @@ void AHRS_ADC_Config(int32_t ekf_rate, int32_t adc_oversample)
 	ADC_ExternalTrigConvCmd(ADC2, ENABLE);
 #endif
   
-	//RCC_ADCCLKConfig(PIOS_ADC_ADCCLK);
+	RCC_ADCCLKConfig(PIOS_ADC_ADCCLK);
+  RCC_PCLK2Config(RCC_HCLK_Div16);
   
 	/* Enable ADC1->DMA request */
 	ADC_DMACmd(ADC1, ENABLE);

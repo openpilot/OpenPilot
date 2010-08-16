@@ -190,8 +190,8 @@ uint32_t total_conversion_blocks = 0;
 */
 int main()
 {
-  float gyro[3], accel[3], mag[3];
-  
+  float gyro[3] = {0,0,0}, accel[3] = {0,0,-9.81}, mag[3] = {100,0,0};
+  float pos[3] = {0,0,0}, vel[3] = {0,0,0}, BaroAlt = 0;
   /* Brings up System using CMSIS functions, enables the LEDs. */
   PIOS_SYS_Init();
   
@@ -218,7 +218,11 @@ int main()
   HMC5843_InitStructure.Meas_Conf = PIOS_HMC5843_MEASCONF_NORMAL;
   HMC5843_InitStructure.Gain = PIOS_HMC5843_GAIN_2;
   HMC5843_InitStructure.Mode = PIOS_HMC5843_MODE_CONTINUOUS;
-  PIOS_HMC5843_Config(&HMC5843_InitStructure);
+  PIOS_HMC5843_Config(&HMC5843_InitStructure); 
+ 
+  // Get 3 ID bytes
+  strcpy ((char *)mag_data.id, "ZZZ");
+  PIOS_HMC5843_ReadID(mag_data.id);
   
   /* SPI link to master */
   PIOS_SPI_Init();
@@ -233,14 +237,18 @@ int main()
     fir_coeffs[i] = 1;
   fir_coeffs[ADC_OVERSAMPLE] = ADC_OVERSAMPLE;
   
+  pos[0] = 0;
+  pos[1] = 0;
+  pos[2] = 0;
+  BaroAlt = 0;
+  vel[0] = 0;
+  vel[1] = 0;
+  vel[2] = 0;  
+  
   // Main loop
   while (1) {
     // Alive signal
     PIOS_LED_Toggle(LED1);
-    
-    // Get 3 ID bytes
-    strcpy ((char *)mag_data.id, "ZZZ");
-    PIOS_HMC5843_ReadID(mag_data.id);
     
     // Get magnetic readings
     PIOS_HMC5843_ReadMag(mag_data.raw.axis);
@@ -250,7 +258,9 @@ int main()
     ahrs_state = AHRS_PROCESSING;
 
     downsample_data();
-    
+
+    /******************** INS ALGORITHM *************************/
+    // format data for INS algo
     gyro[0] = gyro_data.filtered.x;
     gyro[1] = gyro_data.filtered.y;
     gyro[2] = gyro_data.filtered.z;
@@ -261,9 +271,26 @@ int main()
     mag[1] = mag_data.raw.axis[1];
     mag[2] = mag_data.raw.axis[2];
     
-    INSPrediction(gyro, accel, 1 / (double) EKF_RATE);
-    MagCorrection(mag);
+    INSPrediction(gyro, accel, 1 / (float) EKF_RATE);
+    if ( 0 )
+      MagCorrection(mag);
+    else 
+      FullCorrection(mag,pos,vel,BaroAlt);
     
+
+    
+    attitude_data.quaternion.q1 = Nav.q[0];
+    attitude_data.quaternion.q2 = Nav.q[1];
+    attitude_data.quaternion.q3 = Nav.q[2];
+    attitude_data.quaternion.q4 = Nav.q[3];
+    attitude_data.euler.roll    = atan2( (double) 2 * (Nav.q[0] * Nav.q[1] + Nav.q[2] * Nav.q[3]), 
+                                                                 (double) (1 - 2 * (Nav.q[1] * Nav.q[1] + Nav.q[2] * Nav.q[2])) ) * 180 / M_PI;
+    attitude_data.euler.pitch   = asin( (double) 2 * (Nav.q[0] * Nav.q[2] - Nav.q[3] * Nav.q[1] ) ) * 180 / M_PI;
+    attitude_data.euler.yaw     = atan2( (double) 2 * (Nav.q[0] * Nav.q[3] + Nav.q[1] * Nav.q[2]),
+                                                                 (double) (1 - 2 * (Nav.q[2] * Nav.q[2] + Nav.q[3] * Nav.q[3]) ) ) * 180 / M_PI;
+    if(attitude_data.euler.yaw < 0) attitude_data.euler.yaw += 360;
+    
+    /***************** SEND BACK SOME RAW DATA ************************/
     // Hacky - grab one sample from buffer to populate this.  Need to send back
     // all raw data if it's happening
     accel_data.raw.x = valid_data_buffer[0];
@@ -279,24 +306,27 @@ int main()
     
     ahrs_state = AHRS_IDLE;
     
-    /* Very simple computation of the heading and attitude from accel. */
-    attitude_data.euler.yaw = atan2((mag_data.raw.axis[0]), (-1 * mag_data.raw.axis[1])) * 180 / M_PI;
-    attitude_data.euler.pitch = atan2(accel_data.filtered.y, accel_data.filtered.z) * 180 / M_PI;
-    attitude_data.euler.roll = -atan2(accel_data.filtered.x,accel_data.filtered.z) * 180 / M_PI;
-    if (attitude_data.euler.yaw < 0) attitude_data.euler.yaw += 360.0;
-    
-    float c1 = cos(attitude_data.euler.yaw/2);
-    float s1 = sin(attitude_data.euler.yaw/2);
-    float c2 = cos(attitude_data.euler.pitch/2);
-    float s2 = sin(attitude_data.euler.pitch/2);
-    float c3 = cos(attitude_data.euler.roll/2);
-    float s3 = sin(attitude_data.euler.roll/2);
-    float c1c2 = c1*c2;
-    float s1s2 = s1*s2;
-    attitude_data.quaternion.q1 = c1c2*c3 - s1s2*s3;
-    attitude_data.quaternion.q2 = c1c2*s3 + s1s2*c3;
-    attitude_data.quaternion.q3 = s1*c2*c3 + c1*s2*s3;
-    attitude_data.quaternion.q4 =c1*s2*c3 - s1*c2*s3;
+    /***************** SIMPLE ATTITUDE FROM NORTH AND ACCEL ************/
+    if( 0 ) {
+      /* Very simple computation of the heading and attitude from accel. */
+      attitude_data.euler.yaw = atan2((mag_data.raw.axis[0]), (-1 * mag_data.raw.axis[1])) * 180 / M_PI;
+      attitude_data.euler.pitch = atan2(accel_data.filtered.y, accel_data.filtered.z) * 180 / M_PI;
+      attitude_data.euler.roll = -atan2(accel_data.filtered.x,accel_data.filtered.z) * 180 / M_PI;
+      if (attitude_data.euler.yaw < 0) attitude_data.euler.yaw += 360.0;
+      
+      float c1 = cos(attitude_data.euler.yaw/2);
+      float s1 = sin(attitude_data.euler.yaw/2);
+      float c2 = cos(attitude_data.euler.pitch/2);
+      float s2 = sin(attitude_data.euler.pitch/2);
+      float c3 = cos(attitude_data.euler.roll/2);
+      float s3 = sin(attitude_data.euler.roll/2);
+      float c1c2 = c1*c2;
+      float s1s2 = s1*s2;
+      attitude_data.quaternion.q1 = c1c2*c3 - s1s2*s3;
+      attitude_data.quaternion.q2 = c1c2*s3 + s1s2*c3;
+      attitude_data.quaternion.q3 = s1*c2*c3 + c1*s2*s3;
+      attitude_data.quaternion.q4 =c1*s2*c3 - s1*c2*s3;
+    }
     
     process_spi_request();
     
@@ -335,7 +365,7 @@ void downsample_data()
   accel_raw[2] = 0;  
   for( i = 0; i < ADC_OVERSAMPLE; i++ )      
     accel_raw[2] = accel_raw[2] + ( valid_data_buffer[4 + (i-1) * ADC_CONTINUOUS_CHANNELS] + ACCEL_OFFSET ) * fir_coeffs[i];
-  accel_data.filtered.z = (float) accel_raw[2] / (float) fir_coeffs[ADC_OVERSAMPLE]  * ACCEL_SCALE;
+  accel_data.filtered.z = -(float) accel_raw[2] / (float) fir_coeffs[ADC_OVERSAMPLE]  * ACCEL_SCALE;
   
   // Get the X gyro data.  Seventh byte in.  Convert to deg/s.
   gyro_raw[0] = 0;
@@ -618,7 +648,7 @@ void AHRS_ADC_DMA_Handler(void)
     if( DMA_GetFlagStatus( DMA1_IT_TC1 ) ) // whole double buffer filled
       valid_data_buffer = &raw_data_buffer[ ADC_CONTINUOUS_CHANNELS * ADC_OVERSAMPLE ];
     else if ( DMA_GetFlagStatus(DMA1_IT_HT1) )
-      valid_data_buffer = &raw_data_buffer[0];
+      valid_data_buffer = &raw_data_buffer[ ADC_CONTINUOUS_CHANNELS * ADC_OVERSAMPLE ];
     else {
       // lets cause a seg fault and catch whatever is going on
       valid_data_buffer = 0;

@@ -76,7 +76,7 @@ void INSGPSInit()   //pretty much just a place holder for now
 	R[3]=R[4]=0.004;       // High freq GPS horizontal velocity noise variance (m/s)^2
 	R[5]=0;                // High freq GPS vertical velocity noise variance (m/s)^2
 	R[6]=R[7]=R[8]=0.005;  // magnetometer unit vector noise variance
-	R[10]=1;               // High freq altimeter noise variance (m^2)
+	R[9]=1;               // High freq altimeter noise variance (m^2)
 }
 
 void INSPrediction(float gyro_data[3], float accel_data[3], float dT)
@@ -104,7 +104,7 @@ void INSPrediction(float gyro_data[3], float accel_data[3], float dT)
     // Update Nav solution structure
     Nav.Pos[0] = X[0];
     Nav.Pos[1] = X[1];
-    Nav.Pos[2] = X[3];
+    Nav.Pos[2] = X[2];
     Nav.Vel[0] = X[3];
     Nav.Vel[1] = X[4];
     Nav.Vel[2] = X[5];
@@ -135,7 +135,7 @@ void MagCorrection(float mag_data[3])
     // Update Nav solution structure
     Nav.Pos[0] = X[0];
     Nav.Pos[1] = X[1];
-    Nav.Pos[2] = X[3];
+    Nav.Pos[2] = X[2];
     Nav.Vel[0] = X[3];
     Nav.Vel[1] = X[4];
     Nav.Vel[2] = X[5];
@@ -179,7 +179,7 @@ void FullCorrection(float mag_data[3], float Pos[3], float Vel[3], float BaroAlt
     // Update Nav solution structure
     Nav.Pos[0] = X[0];
     Nav.Pos[1] = X[1];
-    Nav.Pos[2] = X[3];
+    Nav.Pos[2] = X[2];
     Nav.Vel[0] = X[3];
     Nav.Vel[1] = X[4];
     Nav.Vel[2] = X[5];
@@ -214,7 +214,7 @@ void GndSpeedAndMagCorrection(float Speed, float Heading, float mag_data[3])
     // Update Nav solution structure
     Nav.Pos[0] = X[0];
     Nav.Pos[1] = X[1];
-    Nav.Pos[2] = X[3];
+    Nav.Pos[2] = X[2];
     Nav.Vel[0] = X[3];
     Nav.Vel[1] = X[4];
     Nav.Vel[2] = X[5];

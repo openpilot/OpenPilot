@@ -45,6 +45,7 @@
  * @arg AHRS_PROCESSING - Performing update on the available data
  */
 enum {AHRS_IDLE, AHRS_DATA_READY, AHRS_PROCESSING} ahrs_state;
+enum {SIMPLE_Algo, INSGPS_Algo} ahrs_algorithm;
 
 /**
  * @addtogroup AHRS_ADC_Configuration ADC Configuration
@@ -67,7 +68,6 @@ void DMA1_Channel1_IRQHandler() __attribute__ ((alias ("AHRS_ADC_DMA_Handler")))
 #define ADC_CONTINUOUS_CHANNELS PIOS_ADC_NUM_PINS
 #define PREDICTION_COUNT        4
 
-// TODO: Define calibration procedure including changes over temperature
 #define VDD            3.3    /* supply voltage for ADC */
 #define FULL_RANGE     4096   /* 12 bit ADC */
 #define ACCEL_RANGE    2      /* adjustable by FS input */
@@ -80,6 +80,9 @@ void DMA1_Channel1_IRQHandler() __attribute__ ((alias ("AHRS_ADC_DMA_Handler")))
 #define RAD_PER_DEGREE     ( 3.14159 / 180 )
 #define GYRO_SCALE         ( (VDD / FULL_RANGE) / GYRO_SENSITIVITY * RAD_PER_DEGREE )
 #define GYRO_OFFSET       -1675 /* From data sheet, zero accel output is 1.35 v */
+/**
+ * @}
+ */
 
 /**
  * @addtogroup AHRS_Local Local Variables 
@@ -136,9 +139,6 @@ struct attitude_solution {
     float yaw;
   } euler;
 };
-/**
- * @}
- */
 
 struct altitude_sensor {
   float altitude;
@@ -149,9 +149,7 @@ struct altitude_sensor {
 static struct mag_sensor        mag_data;
 static struct accel_sensor      accel_data;
 static struct gyro_sensor       gyro_data;
-
 static struct altitude_sensor   altitude_data;
-
 static struct attitude_solution attitude_data = {
   .quaternion = {
     .q1 = 1.011,
@@ -165,6 +163,10 @@ static struct attitude_solution attitude_data = {
     .yaw   = 6.066,
   },
 };
+/**
+ * @}
+ */
+
 
 /* Function Prototypes */
 void process_spi_request(void);
@@ -210,6 +212,8 @@ int main()
 {
   float gyro[3] = {0,0,0}, accel[3] = {0,0,-9.81}, mag[3] = {100,0,0};
   float pos[3] = {0,0,0}, vel[3] = {0,0,0}, BaroAlt = 0;
+  ahrs_algorithm = INSGPS_Algo;
+  
   /* Brings up System using CMSIS functions, enables the LEDs. */
   PIOS_SYS_Init();
   
@@ -265,17 +269,19 @@ int main()
   // TODO: There needs to be a calibration mode, then this is received from the SD card
   // otherwise if we reset in air during a snap, this will be all wrong
   calibrate_sensors();
-  INSGPSInit();
-  INSSetGyroBias(gyro_bias);
-  INSSetAccelVar(accel_var);
-  INSSetGyroVar(gyro_var);
-  // INS algo wants noise on magnetometer in unit length variance
-  float scaled_mag_var[3];
-  float mag_length = mag_bias[0] * mag_bias[0] + mag_bias[1] * mag_bias[1] + mag_bias[2] * mag_bias[2];
-  scaled_mag_var[0] = mag_var[0] / mag_length;
-  scaled_mag_var[1] = mag_var[1] / mag_length;
-  scaled_mag_var[2] = mag_var[2] / mag_length;
-  INSSetMagVar(scaled_mag_var);  
+  if(ahrs_algorithm == INSGPS_Algo) {
+    INSGPSInit();
+    INSSetGyroBias(gyro_bias);
+    INSSetAccelVar(accel_var);
+    INSSetGyroVar(gyro_var);
+    // INS algo wants noise on magnetometer in unit length variance
+    float scaled_mag_var[3];
+    float mag_length = mag_bias[0] * mag_bias[0] + mag_bias[1] * mag_bias[1] + mag_bias[2] * mag_bias[2];
+    scaled_mag_var[0] = mag_var[0] / mag_length;
+    scaled_mag_var[1] = mag_var[1] / mag_length;
+    scaled_mag_var[2] = mag_var[2] / mag_length;
+    INSSetMagVar(scaled_mag_var);  
+  }
   
   /******************* Main EKF loop ****************************/
   while (1) {
@@ -290,37 +296,6 @@ int main()
     ahrs_state = AHRS_PROCESSING;
 
     downsample_data();
-
-    /******************** INS ALGORITHM **************************/
-    // format data for INS algo
-    gyro[0] = gyro_data.filtered.x;
-    gyro[1] = gyro_data.filtered.y;
-    gyro[2] = gyro_data.filtered.z;
-    accel[0] = accel_data.filtered.x,
-    accel[1] = accel_data.filtered.y,
-    accel[2] = accel_data.filtered.z,
-    mag[0] = mag_data.raw.axis[0];
-    mag[1] = mag_data.raw.axis[1];
-    mag[2] = mag_data.raw.axis[2];
-    
-    INSPrediction(gyro, accel, 1 / (float) EKF_RATE);
-    if ( 0 )
-      MagCorrection(mag);
-    else 
-      FullCorrection(mag,pos,vel,BaroAlt);
-    
-
-    
-    attitude_data.quaternion.q1 = Nav.q[0];
-    attitude_data.quaternion.q2 = Nav.q[1];
-    attitude_data.quaternion.q3 = Nav.q[2];
-    attitude_data.quaternion.q4 = Nav.q[3];
-    attitude_data.euler.roll    = atan2( (double) 2 * (Nav.q[0] * Nav.q[1] + Nav.q[2] * Nav.q[3]), 
-                                                                 (double) (1 - 2 * (Nav.q[1] * Nav.q[1] + Nav.q[2] * Nav.q[2])) ) * 180 / M_PI;
-    attitude_data.euler.pitch   = asin( (double) 2 * (Nav.q[0] * Nav.q[2] - Nav.q[3] * Nav.q[1] ) ) * 180 / M_PI;
-    attitude_data.euler.yaw     = atan2( (double) 2 * (Nav.q[0] * Nav.q[3] + Nav.q[1] * Nav.q[2]),
-                                                                 (double) (1 - 2 * (Nav.q[2] * Nav.q[2] + Nav.q[3] * Nav.q[3]) ) ) * 180 / M_PI;
-    if(attitude_data.euler.yaw < 0) attitude_data.euler.yaw += 360;
     
     /***************** SEND BACK SOME RAW DATA ************************/
     // Hacky - grab one sample from buffer to populate this.  Need to send back
@@ -334,12 +309,42 @@ int main()
     gyro_data.raw.z = valid_data_buffer[5];
     
     gyro_data.temp.xy = valid_data_buffer[6];
-    gyro_data.temp.z = valid_data_buffer[7];    
+    gyro_data.temp.z = valid_data_buffer[7];            
     
-    ahrs_state = AHRS_IDLE;
-    
-    /***************** SIMPLE ATTITUDE FROM NORTH AND ACCEL ************/
-    if( 0 ) {
+    if(ahrs_algorithm == INSGPS_Algo) 
+    {
+      /******************** INS ALGORITHM **************************/
+      // format data for INS algo
+      gyro[0] = gyro_data.filtered.x;
+      gyro[1] = gyro_data.filtered.y;
+      gyro[2] = gyro_data.filtered.z;
+      accel[0] = accel_data.filtered.x,
+      accel[1] = accel_data.filtered.y,
+      accel[2] = accel_data.filtered.z,
+      mag[0] = mag_data.raw.axis[0];
+      mag[1] = mag_data.raw.axis[1];
+      mag[2] = mag_data.raw.axis[2];
+      
+      INSPrediction(gyro, accel, 1 / (float) EKF_RATE);
+      if ( 0 )
+        MagCorrection(mag);
+      else 
+        FullCorrection(mag,pos,vel,BaroAlt);
+      
+      attitude_data.quaternion.q1 = Nav.q[0];
+      attitude_data.quaternion.q2 = Nav.q[1];
+      attitude_data.quaternion.q3 = Nav.q[2];
+      attitude_data.quaternion.q4 = Nav.q[3];
+      attitude_data.euler.roll    = atan2( (double) 2 * (Nav.q[0] * Nav.q[1] + Nav.q[2] * Nav.q[3]), 
+                                                                   (double) (1 - 2 * (Nav.q[1] * Nav.q[1] + Nav.q[2] * Nav.q[2])) ) * 180 / M_PI;
+      attitude_data.euler.pitch   = asin( (double) 2 * (Nav.q[0] * Nav.q[2] - Nav.q[3] * Nav.q[1] ) ) * 180 / M_PI;
+      attitude_data.euler.yaw     = atan2( (double) 2 * (Nav.q[0] * Nav.q[3] + Nav.q[1] * Nav.q[2]),
+                                                                   (double) (1 - 2 * (Nav.q[2] * Nav.q[2] + Nav.q[3] * Nav.q[3]) ) ) * 180 / M_PI;
+      if(attitude_data.euler.yaw < 0) attitude_data.euler.yaw += 360;
+    }
+    else if( ahrs_algorithm == SIMPLE_Algo )
+    {    
+      /***************** SIMPLE ATTITUDE FROM NORTH AND ACCEL ************/
       /* Very simple computation of the heading and attitude from accel. */
       attitude_data.euler.yaw = atan2((mag_data.raw.axis[0]), (-1 * mag_data.raw.axis[1])) * 180 / M_PI;
       attitude_data.euler.pitch = atan2(accel_data.filtered.y, accel_data.filtered.z) * 180 / M_PI;
@@ -359,6 +364,8 @@ int main()
       attitude_data.quaternion.q3 = s1*c2*c3 + c1*s2*s3;
       attitude_data.quaternion.q4 =c1*s2*c3 - s1*c2*s3;
     }
+    
+    ahrs_state = AHRS_IDLE;
     
     process_spi_request();
     
@@ -492,10 +499,23 @@ void calibrate_sensors() {
   mag_var[2] /= i;    
 }
 
+/**
+ * @addtogroup AHRS_SPI SPI Messaging 
+ * @{
+ * @brief SPI protocol handling requests for data from OP mainboard
+ */
+
+/**
+ * @brief What is this meant to do
+ * @param[in] port
+ * @param[in] prefix
+ * @param[in] data
+ * @param[in] len
+ * @return None
+ */
 void dump_spi_message(uint8_t port, const char * prefix, uint8_t * data, uint32_t len)
 {
 }
-
 
 static struct opahrs_msg_v1   link_tx_v1;
 static struct opahrs_msg_v1   link_rx_v1;
@@ -613,10 +633,10 @@ void process_spi_request(void)
   lfsm_user_set_rx_v1 (&user_rx_v1);
   lfsm_user_done ();
 }
-
 /**
- * ADC Configuration local variabels 
+ * @}
  */
+
 /* Local Variables */
 static GPIO_TypeDef* ADC_GPIO_PORT[PIOS_ADC_NUM_PINS] = PIOS_ADC_PORTS;
 static const uint32_t ADC_GPIO_PIN[PIOS_ADC_NUM_PINS] = PIOS_ADC_PINS;
@@ -627,8 +647,12 @@ static const uint32_t ADC_CHANNEL_MAPPING[PIOS_ADC_NUM_PINS] = PIOS_ADC_CHANNEL_
 
 
 /**
- * Initialise the ADC Peripheral
- * @params ekf_rate
+ * @brief Initialise the ADC Peripheral
+ * @param[in] ekf_rate
+ * @param[in] adc_oversample
+ * 
+ * Currently ignores rates and uses hardcoded values.  Need a little logic to
+ * map from sampling rates and such to ADC constants.
  */
 void AHRS_ADC_Config(int32_t ekf_rate, int32_t adc_oversample)
 {
@@ -740,6 +764,15 @@ void AHRS_ADC_Config(int32_t ekf_rate, int32_t adc_oversample)
 	ADC_SoftwareStartConvCmd(ADC1, ENABLE);
 }
 
+/**
+ * @brief Interrupt for half and full buffer transfer
+ * 
+ * This interrupt handler swaps between the two halfs of the double buffer to make
+ * sure the ahrs uses the most recent data.  Only swaps data when AHRS is idle, but
+ * really this is a pretense of a sanity check since the DMA engine is consantly 
+ * running in the background.  Keep an eye on the ekf_too_slow variable to make sure
+ * it's keeping up.
+ */
 void AHRS_ADC_DMA_Handler(void) 
 {
   if ( ahrs_state == AHRS_IDLE ) 
@@ -749,7 +782,7 @@ void AHRS_ADC_DMA_Handler(void)
     if( DMA_GetFlagStatus( DMA1_IT_TC1 ) ) // whole double buffer filled
       valid_data_buffer = &raw_data_buffer[ ADC_CONTINUOUS_CHANNELS * ADC_OVERSAMPLE ];
     else if ( DMA_GetFlagStatus(DMA1_IT_HT1) )
-      valid_data_buffer = &raw_data_buffer[ ADC_CONTINUOUS_CHANNELS * ADC_OVERSAMPLE ];
+      valid_data_buffer = &raw_data_buffer[ 0 * ADC_CONTINUOUS_CHANNELS * ADC_OVERSAMPLE ];
     else {
       // lets cause a seg fault and catch whatever is going on
       valid_data_buffer = 0;

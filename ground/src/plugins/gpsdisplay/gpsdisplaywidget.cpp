@@ -26,6 +26,7 @@
  */
 
 #include "gpsdisplaywidget.h"
+#include "gpsdisplaythread.h"
 #include "ui_gpsdisplaywidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjects/uavobjectmanager.h"
@@ -33,21 +34,9 @@
 #include <iostream>
 #include <QtGui>
 #include <QDebug>
-#include <QThread>
 #include "nmeaparser.h"
 
 
-
-class GpsDisplayThread : public QThread
-{
-public:
-    QextSerialPort *port;
-    NMEAParser *parser;
-    void setPort(QextSerialPort* port);
-    void setParser(NMEAParser* parser);
-    void processInputStream();
-    void run();
-};
 
 /*
  * Initialize the widget
@@ -171,50 +160,3 @@ void GpsDisplayWidget::connectButtonClicked() {
     gpsThread->setParser(parser);
     gpsThread->start();
 }
-
-
-void GpsDisplayThread::setPort(QextSerialPort* port)
-{
-
-    this->port=port;
-}
-
-void GpsDisplayThread::setParser(NMEAParser* parser)
-{
-
-    this->parser=parser;
-}
-
-void GpsDisplayThread::run()
-{
-
-    qDebug() <<  "Opening.";
-
-    if (port) {
-        qDebug() <<  port->portName();
-
-        bool isOpen =  port->open(QIODevice::ReadWrite);
-        qDebug() <<  "Open: " << isOpen;
-
-        char buf[1024];
-        char c;
-        while(true) {
-            qDebug() <<  "Reading.";
-            /*qint64 bytesRead = port->readLine(buf, sizeof(buf));
-            qDebug() << "bytesRead: " << bytesRead;
-            if (bytesRead != -1) {
-                qDebug() <<  "Result: '" << buf << "'";
-            }*/
-            while(port->bytesAvailable()>0)
-            {
-                    port->read(&c,1);
-                    parser->processInputStream(c);
-            }
-            sleep(1);
-        }
-    } else {
-        qDebug() << "Port undefined or invalid.";
-    }
-}
-
-

@@ -46,13 +46,13 @@ ModelViewGadgetWidget::ModelViewGadgetWidget(QWidget *parent)
     m_Light.setPosition(4000.0, 40000.0, 80000.0);
     m_Light.setAmbientColor(Qt::lightGray);
 
-    QColor repColor;
-    repColor.setRgbF(1.0, 0.11372, 0.11372, 0.0);
-    m_MoverController= m_pFactory->createDefaultMoverController(repColor, &m_GlView);
-
     m_GlView.cameraHandle()->setDefaultUpVector(glc::Y_AXIS);
     m_GlView.cameraHandle()->setRightView();
     //m_GlView.cameraHandle()->setIsoView();
+
+    QColor repColor;
+    repColor.setRgbF(1.0, 0.11372, 0.11372, 0.0);
+    m_MoverController= m_pFactory->createDefaultMoverController(repColor, &m_GlView);
 
     // Get required UAVObjects
     ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
@@ -82,7 +82,7 @@ void ModelViewGadgetWidget::initializeGL()
     if (!vboEnable) 
     {
 	GLC_State::setVboUsage(false); 
-	qDebug("VBOs disabled.  Enable for better performance if GPU supports it.");
+	qDebug("VBOs disabled.  Enable for better performance if GPU supports it. (Most do)");
     }
 
     m_GlView.reframe(m_ModelBoundingBox);
@@ -93,12 +93,6 @@ void ModelViewGadgetWidget::initializeGL()
     glEnable(GL_MULTISAMPLE);
 
     m_MotionTimer.start(100);
-}
-
-void ModelViewGadgetWidget::resizeEvent(QResizeEvent *event)
-{
-//   m_GlView.setWinGLSize(width(), height());
-   QWidget::resizeEvent(event);
 }
 
 void ModelViewGadgetWidget::paintGL()
@@ -157,6 +151,13 @@ void ModelViewGadgetWidget::CreateScene()
     {
 	qDebug("ModelView aircraft texture file loading failed.");
     }
+}
+
+void ModelViewGadgetWidget::wheelEvent(QWheelEvent * e)
+{
+        double delta = m_GlView.cameraHandle()->distEyeTarget() - (e->delta()/120) ;
+        m_GlView.cameraHandle()->setDistEyeTarget(delta);
+        m_GlView.setDistMinAndMax(m_World.boundingBox());
 }
 
 void ModelViewGadgetWidget::mousePressEvent(QMouseEvent *e)

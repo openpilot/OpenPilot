@@ -56,9 +56,6 @@ public:
    void reloadScene();
    void updateAttitude(int value);
 
-protected:
-   void resizeEvent(QResizeEvent *event);
-
 private:
    void initializeGL();
    void paintGL();
@@ -70,6 +67,7 @@ private:
    void mousePressEvent(QMouseEvent * e);
    void mouseMoveEvent(QMouseEvent * e);
    void mouseReleaseEvent(QMouseEvent * e);
+   void wheelEvent(QWheelEvent * e);
 
 //////////////////////////////////////////////////////////////////////
 // Private slots Functions
@@ -86,6 +84,7 @@ private:
     GLC_BoundingBox m_ModelBoundingBox;
     //! The timer used for motion
     QTimer m_MotionTimer;
+    int yMouseStart;
 
     QString acFilename;
     QString bgFilename;

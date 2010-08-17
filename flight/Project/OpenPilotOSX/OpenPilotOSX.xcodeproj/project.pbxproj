@@ -60,6 +60,8 @@
 		65A2C81B11E2A33D00D0391E /* pios_sdcard.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_sdcard.c; path = ../../PiOS.posix/posix/pios_sdcard.c; sourceTree = SOURCE_ROOT; };
 		65A2C81C11E2A33D00D0391E /* pios_sys.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_sys.c; path = ../../PiOS.posix/posix/pios_sys.c; sourceTree = SOURCE_ROOT; };
 		65A2C81D11E2A33D00D0391E /* pios_udp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_udp.c; path = ../../PiOS.posix/posix/pios_udp.c; sourceTree = SOURCE_ROOT; };
+		65B35CFA121A4540003EAD18 /* CoordinateConversions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = CoordinateConversions.c; path = ../../AHRS/CoordinateConversions.c; sourceTree = SOURCE_ROOT; };
+		65B35CFB121A45C6003EAD18 /* CoordinateConversions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoordinateConversions.h; sourceTree = "<group>"; };
 		65B7E6AD120DF1E2000C1123 /* ahrs_fsm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ahrs_fsm.c; path = ../../AHRS/ahrs_fsm.c; sourceTree = SOURCE_ROOT; };
 		65B7E6AE120DF1E2000C1123 /* ahrs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ahrs.c; path = ../../AHRS/ahrs.c; sourceTree = SOURCE_ROOT; };
 		65B7E6B0120DF1E2000C1123 /* ahrs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs.h; sourceTree = "<group>"; };
@@ -521,6 +523,7 @@
 		65B7E6AC120DF1CD000C1123 /* AHRS */ = {
 			isa = PBXGroup;
 			children = (
+				65B35CFA121A4540003EAD18 /* CoordinateConversions.c */,
 				6543305B1219868D0063F913 /* WorldMagModel.c */,
 				654330231218E9780063F913 /* insgps.c */,
 				65B7E6AD120DF1E2000C1123 /* ahrs_fsm.c */,
@@ -535,6 +538,7 @@
 		65B7E6AF120DF1E2000C1123 /* inc */ = {
 			isa = PBXGroup;
 			children = (
+				65B35CFB121A45C6003EAD18 /* CoordinateConversions.h */,
 				6543304F121980300063F913 /* insgps.h */,
 				65B7E6B0120DF1E2000C1123 /* ahrs.h */,
 				65B7E6B1120DF1E2000C1123 /* ahrs_fsm.h */,

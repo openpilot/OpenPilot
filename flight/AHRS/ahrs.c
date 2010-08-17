@@ -37,6 +37,8 @@
 #include "pios_opahrs_proto.h"
 #include "ahrs_fsm.h"		/* lfsm_state */
 #include "insgps.h"
+#include "CoordinateConversions.h"
+#include "WorldMagModel.h"
 
 /**
  * State of AHRS EKF
@@ -269,19 +271,29 @@ int main()
   // TODO: There needs to be a calibration mode, then this is received from the SD card
   // otherwise if we reset in air during a snap, this will be all wrong
   calibrate_sensors();
+  
   if(ahrs_algorithm == INSGPS_Algo) {
     INSGPSInit();
     INSSetGyroBias(gyro_bias);
     INSSetAccelVar(accel_var);
     INSSetGyroVar(gyro_var);
     // INS algo wants noise on magnetometer in unit length variance
-    float scaled_mag_var[3];
     float mag_length = mag_bias[0] * mag_bias[0] + mag_bias[1] * mag_bias[1] + mag_bias[2] * mag_bias[2];
-    scaled_mag_var[0] = mag_var[0] / mag_length;
-    scaled_mag_var[1] = mag_var[1] / mag_length;
-    scaled_mag_var[2] = mag_var[2] / mag_length;
-    INSSetMagVar(scaled_mag_var);  
+    float scaled_mag_var[3] = {mag_var[0] / mag_length, mag_var[1] / mag_length, mag_var[2] / mag_length};
+    INSSetMagVar(scaled_mag_var);     
   }
+  
+  /******************* World magnetic model *********************/
+  float MagNorth[3];
+  WMM_Initialize(); // Set default values and constants
+  WMM_GetMagVector(29, -95, 18, 8, 17, 2010, MagNorth);
+  // TODO: Get this from first GPS coordinate or whenever we initialize NED frame
+  if(ahrs_algorithm == INSGPS_Algo)
+  {
+    float MagNorthLen = sqrt(MagNorth[0] * MagNorth[0] + MagNorth[1] * MagNorth[1] + MagNorth[2] * MagNorth[2]);
+    float MagNorthScaled[3] = {MagNorth[0] / MagNorthLen, MagNorth[1] / MagNorthLen, MagNorth[2] / MagNorthLen};
+    INSSetMagNorth(MagNorthScaled);
+  }  
   
   /******************* Main EKF loop ****************************/
   while (1) {
@@ -314,6 +326,8 @@ int main()
     if(ahrs_algorithm == INSGPS_Algo) 
     {
       /******************** INS ALGORITHM **************************/
+      float rpy[3];
+      
       // format data for INS algo
       gyro[0] = gyro_data.filtered.x;
       gyro[1] = gyro_data.filtered.y;
@@ -323,46 +337,40 @@ int main()
       accel[2] = accel_data.filtered.z,
       mag[0] = mag_data.raw.axis[0];
       mag[1] = mag_data.raw.axis[1];
-      mag[2] = mag_data.raw.axis[2];
+      mag[2] = -mag_data.raw.axis[2];
       
       INSPrediction(gyro, accel, 1 / (float) EKF_RATE);
       if ( 0 )
         MagCorrection(mag);
       else 
-        FullCorrection(mag,pos,vel,BaroAlt);
+        FullCorrection(mag,pos,vel,BaroAlt); 
       
+      Quaternion2RPY(Nav.q,rpy);
       attitude_data.quaternion.q1 = Nav.q[0];
       attitude_data.quaternion.q2 = Nav.q[1];
       attitude_data.quaternion.q3 = Nav.q[2];
       attitude_data.quaternion.q4 = Nav.q[3];
-      attitude_data.euler.roll    = atan2( (double) 2 * (Nav.q[0] * Nav.q[1] + Nav.q[2] * Nav.q[3]), 
-                                                                   (double) (1 - 2 * (Nav.q[1] * Nav.q[1] + Nav.q[2] * Nav.q[2])) ) * 180 / M_PI;
-      attitude_data.euler.pitch   = asin( (double) 2 * (Nav.q[0] * Nav.q[2] - Nav.q[3] * Nav.q[1] ) ) * 180 / M_PI;
-      attitude_data.euler.yaw     = atan2( (double) 2 * (Nav.q[0] * Nav.q[3] + Nav.q[1] * Nav.q[2]),
-                                                                   (double) (1 - 2 * (Nav.q[2] * Nav.q[2] + Nav.q[3] * Nav.q[3]) ) ) * 180 / M_PI;
+      attitude_data.euler.roll    = rpy[0];
+      attitude_data.euler.pitch   = rpy[1];
+      attitude_data.euler.yaw     = rpy[2];
       if(attitude_data.euler.yaw < 0) attitude_data.euler.yaw += 360;
     }
     else if( ahrs_algorithm == SIMPLE_Algo )
     {    
+      float q[4];
+      float rpy[3];
       /***************** SIMPLE ATTITUDE FROM NORTH AND ACCEL ************/
       /* Very simple computation of the heading and attitude from accel. */
-      attitude_data.euler.yaw = atan2((mag_data.raw.axis[0]), (-1 * mag_data.raw.axis[1])) * 180 / M_PI;
-      attitude_data.euler.pitch = atan2(accel_data.filtered.y, accel_data.filtered.z) * 180 / M_PI;
-      attitude_data.euler.roll = -atan2(accel_data.filtered.x,accel_data.filtered.z) * 180 / M_PI;
+      rpy[2] = attitude_data.euler.yaw = atan2((mag_data.raw.axis[0]), (-1 * mag_data.raw.axis[1])) * 180 / M_PI;
+      rpy[1] = attitude_data.euler.pitch = atan2(accel_data.filtered.y, accel_data.filtered.z) * 180 / M_PI;
+      rpy[0] = attitude_data.euler.roll = -atan2(accel_data.filtered.x,accel_data.filtered.z) * 180 / M_PI;
       if (attitude_data.euler.yaw < 0) attitude_data.euler.yaw += 360.0;
       
-      float c1 = cos(attitude_data.euler.yaw/2);
-      float s1 = sin(attitude_data.euler.yaw/2);
-      float c2 = cos(attitude_data.euler.pitch/2);
-      float s2 = sin(attitude_data.euler.pitch/2);
-      float c3 = cos(attitude_data.euler.roll/2);
-      float s3 = sin(attitude_data.euler.roll/2);
-      float c1c2 = c1*c2;
-      float s1s2 = s1*s2;
-      attitude_data.quaternion.q1 = c1c2*c3 - s1s2*s3;
-      attitude_data.quaternion.q2 = c1c2*s3 + s1s2*c3;
-      attitude_data.quaternion.q3 = s1*c2*c3 + c1*s2*s3;
-      attitude_data.quaternion.q4 =c1*s2*c3 - s1*c2*s3;
+      RPY2Quaternion(rpy,q);
+      attitude_data.quaternion.q1 = q[0];
+      attitude_data.quaternion.q2 = q[1];
+      attitude_data.quaternion.q3 = q[2];
+      attitude_data.quaternion.q4 = q[3];
     }
     
     ahrs_state = AHRS_IDLE;
@@ -391,37 +399,37 @@ void downsample_data()
   // Get the X data.  Fifth byte in.  Convert to m/s
   accel_raw[0] = 0;  
   for( i = 0; i < ADC_OVERSAMPLE; i++ )      
-    accel_raw[0] = accel_raw[0] + ( valid_data_buffer[0 + (i-1) * ADC_CONTINUOUS_CHANNELS] + ACCEL_OFFSET ) * fir_coeffs[i];
+    accel_raw[0] += ( valid_data_buffer[0 + (i-1) * ADC_CONTINUOUS_CHANNELS] + ACCEL_OFFSET ) * fir_coeffs[i];
   accel_data.filtered.x = (float) accel_raw[0] / (float) fir_coeffs[ADC_OVERSAMPLE] * ACCEL_SCALE;
 
   // Get the Y data.  Third byte in.  Convert to m/s
   accel_raw[1] = 0;  
   for( i = 0; i < ADC_OVERSAMPLE; i++ )      
-    accel_raw[1] = accel_raw[1] + ( valid_data_buffer[2 + (i-1) * ADC_CONTINUOUS_CHANNELS] + ACCEL_OFFSET ) * fir_coeffs[i];
+    accel_raw[1] += ( valid_data_buffer[2 + (i-1) * ADC_CONTINUOUS_CHANNELS] + ACCEL_OFFSET ) * fir_coeffs[i];
   accel_data.filtered.y = (float) accel_raw[1] / (float) fir_coeffs[ADC_OVERSAMPLE]  * ACCEL_SCALE;
   
   // Get the Z data.  Third byte in.  Convert to m/s
   accel_raw[2] = 0;  
   for( i = 0; i < ADC_OVERSAMPLE; i++ )      
-    accel_raw[2] = accel_raw[2] + ( valid_data_buffer[4 + (i-1) * ADC_CONTINUOUS_CHANNELS] + ACCEL_OFFSET ) * fir_coeffs[i];
+    accel_raw[2] += ( valid_data_buffer[4 + (i-1) * ADC_CONTINUOUS_CHANNELS] + ACCEL_OFFSET ) * fir_coeffs[i];
   accel_data.filtered.z = -(float) accel_raw[2] / (float) fir_coeffs[ADC_OVERSAMPLE]  * ACCEL_SCALE;
   
   // Get the X gyro data.  Seventh byte in.  Convert to deg/s.
   gyro_raw[0] = 0;
   for( i = 0; i < ADC_OVERSAMPLE; i++ )
-    gyro_raw[0] += gyro_raw[0] + ( valid_data_buffer[1 + (i-1) * ADC_CONTINUOUS_CHANNELS] + GYRO_OFFSET ) * fir_coeffs[i];
+    gyro_raw[0] += ( valid_data_buffer[1 + (i-1) * ADC_CONTINUOUS_CHANNELS] + GYRO_OFFSET ) * fir_coeffs[i];
   gyro_data.filtered.x  = (float) gyro_raw[0] / (float) fir_coeffs[ADC_OVERSAMPLE] * GYRO_SCALE;
   
   // Get the Y gyro data.  Second byte in.  Convert to deg/s.
   gyro_raw[1] = 0;
   for( i = 0; i < ADC_OVERSAMPLE; i++ )
-    gyro_raw[1] += gyro_raw[1] + ( valid_data_buffer[3 + (i-1) * ADC_CONTINUOUS_CHANNELS] + GYRO_OFFSET ) * fir_coeffs[i];
+    gyro_raw[1] += ( valid_data_buffer[3 + (i-1) * ADC_CONTINUOUS_CHANNELS] + GYRO_OFFSET ) * fir_coeffs[i];
   gyro_data.filtered.y = (float) gyro_raw[1] / (float) fir_coeffs[ADC_OVERSAMPLE] * GYRO_SCALE;
   
   // Get the Z gyro data.  Fifth byte in.  Convert to deg/s.
   gyro_raw[2] = 0;
   for( i = 0; i < ADC_OVERSAMPLE; i++ )
-    gyro_raw[2] += gyro_raw[2] + ( valid_data_buffer[5 + (i-1) * ADC_CONTINUOUS_CHANNELS] + GYRO_OFFSET ) * fir_coeffs[i];
+    gyro_raw[2] += ( valid_data_buffer[5 + (i-1) * ADC_CONTINUOUS_CHANNELS] + GYRO_OFFSET ) * fir_coeffs[i];
   gyro_data.filtered.z = (float) gyro_raw[2] / (float) fir_coeffs[ADC_OVERSAMPLE] * GYRO_SCALE;
 }
 

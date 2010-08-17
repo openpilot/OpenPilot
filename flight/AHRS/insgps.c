@@ -107,6 +107,12 @@ void INSSetMagVar(float scaled_mag_var[3])
   R[8] = scaled_mag_var[2];
 }
 
+void INSSetMagNorth(float B[3])
+{
+  Be[0] = B[0];
+  Be[1] = B[1];
+  Be[2] = B[2];
+}
 
 void INSPrediction(float gyro_data[3], float accel_data[3], float dT)
 {

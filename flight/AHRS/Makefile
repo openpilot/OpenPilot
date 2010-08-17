@@ -90,6 +90,7 @@ SRC += pios_board.c
 SRC += ahrs_fsm.c
 SRC += insgps.c
 SRC += CoordinateConversions.c
+SRC += WorldMagModel.c
 
 ## PIOS Hardware (STM32F10x)
 SRC += $(PIOSSTM32F10X)/pios_sys.c

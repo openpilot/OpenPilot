@@ -48,7 +48,7 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     QWidget *qwd = new QWidget;
     m_config = new Ui_SettingsWidget();
     m_config->setupUi(qwd);
-    ftw->insertTab(0, qwd,QIcon(":/core/images/pluginicon.png"),QString("RC Input/Output"));
+    ftw->insertTab(0, qwd,QIcon(":/configgadget/images/Servo.png"),QString("RC Input/Output"));
     qwd = new QWidget;
     m_aircraft = new Ui_AircraftWidget();
     m_aircraft->setupUi(qwd);

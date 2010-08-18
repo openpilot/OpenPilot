@@ -2,5 +2,6 @@
     <qresource prefix="/configgadget">
         <file>images/XBee.svg</file>
         <file>images/Airframe.png</file>
+        <file>images/Servo.png</file>
     </qresource>
 </RCC>

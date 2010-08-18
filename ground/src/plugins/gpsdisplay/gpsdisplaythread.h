@@ -35,12 +35,16 @@
 
 class GpsDisplayThread : public QThread
 {
+    Q_OBJECT
+
 public:
+    GpsDisplayThread(QObject *parent = 0);
+    ~GpsDisplayThread();
+
     QextSerialPort *port;
     NMEAParser *parser;
     void setPort(QextSerialPort* port);
     void setParser(NMEAParser* parser);
-    void processInputStream();
     void run();
 };
 

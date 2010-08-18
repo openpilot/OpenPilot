@@ -153,6 +153,12 @@ void GpsDisplayWidget::setPort(QextSerialPort* port)
     this->port=port;
 }
 
+void GpsDisplayWidget::setParser(NMEAParser* parser)
+{
+
+    this->parser=parser;
+}
+
 void GpsDisplayWidget::connectButtonClicked() {
     GpsDisplayThread* gpsThread = new GpsDisplayThread();
     widget->textBrowser->append(QString("Connecting to GPS ...\n"));

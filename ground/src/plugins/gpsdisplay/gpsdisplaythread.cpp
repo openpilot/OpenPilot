@@ -30,6 +30,15 @@
 
 #include <QDebug>
 
+GpsDisplayThread::GpsDisplayThread(QObject *parent)
+    : QThread(parent)
+{
+}
+
+GpsDisplayThread::~GpsDisplayThread()
+{
+}
+
 void GpsDisplayThread::setPort(QextSerialPort* port)
 {
 

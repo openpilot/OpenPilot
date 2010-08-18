@@ -65,10 +65,11 @@ void DMA1_Channel1_IRQHandler() __attribute__ ((alias ("AHRS_ADC_DMA_Handler")))
  * @addtogroup AHRS_Definitions 
  * @{
  */
-#define EKF_RATE                50
-#define ADC_OVERSAMPLE          10
+// Currently analog acquistion hard coded at 480 Hz
+#define ADC_OVERSAMPLE          12
+#define EKF_RATE                ((float) 480 / ADC_OVERSAMPLE)
 #define ADC_CONTINUOUS_CHANNELS PIOS_ADC_NUM_PINS
-#define PREDICTION_COUNT        4
+#define CORRECTION_COUNT        4
 
 #define VDD            3.3    /* supply voltage for ADC */
 #define FULL_RANGE     4096   /* 12 bit ADC */
@@ -212,8 +213,9 @@ uint32_t total_conversion_blocks = 0;
 */
 int main()
 {
-  float gyro[3] = {0,0,0}, accel[3] = {0,0,-9.81}, mag[3] = {100,0,0};
+  float gyro[3], accel[3], mag[3];
   float pos[3] = {0,0,0}, vel[3] = {0,0,0}, BaroAlt = 0;
+  uint32_t update_ctr = 0;
   ahrs_algorithm = INSGPS_Algo;
   
   /* Brings up System using CMSIS functions, enables the LEDs. */
@@ -274,13 +276,32 @@ int main()
   
   if(ahrs_algorithm == INSGPS_Algo) {
     INSGPSInit();
-    INSSetGyroBias(gyro_bias);
-    INSSetAccelVar(accel_var);
-    INSSetGyroVar(gyro_var);
     // INS algo wants noise on magnetometer in unit length variance
     float mag_length = mag_bias[0] * mag_bias[0] + mag_bias[1] * mag_bias[1] + mag_bias[2] * mag_bias[2];
     float scaled_mag_var[3] = {mag_var[0] / mag_length, mag_var[1] / mag_length, mag_var[2] / mag_length};
     INSSetMagVar(scaled_mag_var);     
+    
+/*    // Initialize the algorithm assuming stationary    
+    float temp_var[3] = {10, 10, 10};
+    float temp_gyro[3] = {0, 0, 0};
+
+    INSSetGyroVar(temp_var); // ignore gyro's
+    for(int i = 0; i < 100; i++)
+    {
+      // Iteratively constrain pitch and roll while updating yaw to align magnetic axis.  
+      // This should be done directly but I'm too dumb.
+      float rpy[3];
+      Quaternion2RPY(Nav.q, rpy);
+      rpy[1] = attitude_data.euler.pitch = -atan2(accel_bias[0], accel_bias[2]) * 180 / M_PI;
+      rpy[0] = attitude_data.euler.roll = -atan2(accel_bias[1], accel_bias[2]) * 180 / M_PI;    
+      RPY2Quaternion(rpy,Nav.q);
+      INSPrediction( temp_gyro, accel_bias, 1 / (float) EKF_RATE );
+      FullCorrection(mag,pos,vel,BaroAlt); 
+    }    */
+
+    INSSetGyroBias(gyro_bias);
+    INSSetAccelVar(accel_var);
+    INSSetGyroVar(gyro_var);
   }
   
   /******************* World magnetic model *********************/
@@ -331,18 +352,22 @@ int main()
       // format data for INS algo
       gyro[0] = gyro_data.filtered.x;
       gyro[1] = gyro_data.filtered.y;
-      gyro[2] = gyro_data.filtered.z;
+      gyro[2] = -gyro_data.filtered.z;
       accel[0] = accel_data.filtered.x,
       accel[1] = accel_data.filtered.y,
       accel[2] = accel_data.filtered.z,
-      mag[0] = mag_data.raw.axis[0];
-      mag[1] = mag_data.raw.axis[1];
-      mag[2] = -mag_data.raw.axis[2];
       
+      // Note: The magnetometer driver returns registers X,Y,Z from the chip which are 
+      // (left, backward, up).  Remapping to (forward, right, down).
+      mag[0] = -mag_data.raw.axis[1];
+      mag[1] = -mag_data.raw.axis[0];
+      mag[2] = -mag_data.raw.axis[2];
+            
       INSPrediction(gyro, accel, 1 / (float) EKF_RATE);
+      update_ctr++;
       if ( 0 )
         MagCorrection(mag);
-      else 
+      else if ( 1 );
         FullCorrection(mag,pos,vel,BaroAlt); 
       
       Quaternion2RPY(Nav.q,rpy);
@@ -362,8 +387,8 @@ int main()
       /***************** SIMPLE ATTITUDE FROM NORTH AND ACCEL ************/
       /* Very simple computation of the heading and attitude from accel. */
       rpy[2] = attitude_data.euler.yaw = atan2((mag_data.raw.axis[0]), (-1 * mag_data.raw.axis[1])) * 180 / M_PI;
-      rpy[1] = attitude_data.euler.pitch = atan2(accel_data.filtered.y, accel_data.filtered.z) * 180 / M_PI;
-      rpy[0] = attitude_data.euler.roll = -atan2(accel_data.filtered.x,accel_data.filtered.z) * 180 / M_PI;
+      rpy[1] = attitude_data.euler.pitch = -atan2(accel_data.filtered.x, accel_data.filtered.z) * 180 / M_PI;
+      rpy[0] = attitude_data.euler.roll = -atan2(accel_data.filtered.y,accel_data.filtered.z) * 180 / M_PI;
       if (attitude_data.euler.yaw < 0) attitude_data.euler.yaw += 360.0;
       
       RPY2Quaternion(rpy,q);
@@ -390,46 +415,53 @@ int main()
  * for offset for each sample before the multiplication if filter not a boxcar.  Could
  * precompute fixed offset as sum[fir_coeffs[i]] * ACCEL_OFFSET.  Puts data into global
  * data structures @ref accel_data and @ref gyro_data.
+ * 
+ * The accel_data values are converted into a coordinate system where X is forwards along
+ * the fuselage, Y is along right the wing, and Z is down.
  */
 void downsample_data()
 {
+  int16_t temp;
   int32_t accel_raw[3], gyro_raw[3];  
   uint16_t i;
   
-  // Get the X data.  Fifth byte in.  Convert to m/s
+  // Get the Y data.  Third byte in.  Convert to m/s
   accel_raw[0] = 0;  
   for( i = 0; i < ADC_OVERSAMPLE; i++ )      
-    accel_raw[0] += ( valid_data_buffer[0 + (i-1) * ADC_CONTINUOUS_CHANNELS] + ACCEL_OFFSET ) * fir_coeffs[i];
-  accel_data.filtered.x = (float) accel_raw[0] / (float) fir_coeffs[ADC_OVERSAMPLE] * ACCEL_SCALE;
+  {
+    temp = ( valid_data_buffer[0 + i * ADC_CONTINUOUS_CHANNELS] + ACCEL_OFFSET ) * fir_coeffs[i];
+    accel_raw[0] += temp;
+  }
+  accel_data.filtered.y = (float) accel_raw[0] / (float) fir_coeffs[ADC_OVERSAMPLE] * ACCEL_SCALE;
 
-  // Get the Y data.  Third byte in.  Convert to m/s
+  // Get the X data which projects forward/backwards.  Fifth byte in.  Convert to m/s
   accel_raw[1] = 0;  
   for( i = 0; i < ADC_OVERSAMPLE; i++ )      
-    accel_raw[1] += ( valid_data_buffer[2 + (i-1) * ADC_CONTINUOUS_CHANNELS] + ACCEL_OFFSET ) * fir_coeffs[i];
-  accel_data.filtered.y = (float) accel_raw[1] / (float) fir_coeffs[ADC_OVERSAMPLE]  * ACCEL_SCALE;
+    accel_raw[1] += ( valid_data_buffer[2 + i * ADC_CONTINUOUS_CHANNELS] + ACCEL_OFFSET ) * fir_coeffs[i];
+  accel_data.filtered.x = (float) accel_raw[1] / (float) fir_coeffs[ADC_OVERSAMPLE]  * ACCEL_SCALE;
   
   // Get the Z data.  Third byte in.  Convert to m/s
   accel_raw[2] = 0;  
   for( i = 0; i < ADC_OVERSAMPLE; i++ )      
-    accel_raw[2] += ( valid_data_buffer[4 + (i-1) * ADC_CONTINUOUS_CHANNELS] + ACCEL_OFFSET ) * fir_coeffs[i];
+    accel_raw[2] += ( valid_data_buffer[4 + i * ADC_CONTINUOUS_CHANNELS] + ACCEL_OFFSET ) * fir_coeffs[i];
   accel_data.filtered.z = -(float) accel_raw[2] / (float) fir_coeffs[ADC_OVERSAMPLE]  * ACCEL_SCALE;
   
   // Get the X gyro data.  Seventh byte in.  Convert to deg/s.
   gyro_raw[0] = 0;
   for( i = 0; i < ADC_OVERSAMPLE; i++ )
-    gyro_raw[0] += ( valid_data_buffer[1 + (i-1) * ADC_CONTINUOUS_CHANNELS] + GYRO_OFFSET ) * fir_coeffs[i];
+    gyro_raw[0] += ( valid_data_buffer[1 + i * ADC_CONTINUOUS_CHANNELS] + GYRO_OFFSET ) * fir_coeffs[i];
   gyro_data.filtered.x  = (float) gyro_raw[0] / (float) fir_coeffs[ADC_OVERSAMPLE] * GYRO_SCALE;
   
   // Get the Y gyro data.  Second byte in.  Convert to deg/s.
   gyro_raw[1] = 0;
   for( i = 0; i < ADC_OVERSAMPLE; i++ )
-    gyro_raw[1] += ( valid_data_buffer[3 + (i-1) * ADC_CONTINUOUS_CHANNELS] + GYRO_OFFSET ) * fir_coeffs[i];
+    gyro_raw[1] += ( valid_data_buffer[3 + i * ADC_CONTINUOUS_CHANNELS] + GYRO_OFFSET ) * fir_coeffs[i];
   gyro_data.filtered.y = (float) gyro_raw[1] / (float) fir_coeffs[ADC_OVERSAMPLE] * GYRO_SCALE;
   
   // Get the Z gyro data.  Fifth byte in.  Convert to deg/s.
   gyro_raw[2] = 0;
   for( i = 0; i < ADC_OVERSAMPLE; i++ )
-    gyro_raw[2] += ( valid_data_buffer[5 + (i-1) * ADC_CONTINUOUS_CHANNELS] + GYRO_OFFSET ) * fir_coeffs[i];
+    gyro_raw[2] += ( valid_data_buffer[5 + i * ADC_CONTINUOUS_CHANNELS] + GYRO_OFFSET ) * fir_coeffs[i];
   gyro_data.filtered.z = (float) gyro_raw[2] / (float) fir_coeffs[ADC_OVERSAMPLE] * GYRO_SCALE;
 }
 
@@ -788,7 +820,7 @@ void AHRS_ADC_DMA_Handler(void)
     // Ideally this would have a mutex, but I think we can avoid it (and don't have RTOS features)
     
     if( DMA_GetFlagStatus( DMA1_IT_TC1 ) ) // whole double buffer filled
-      valid_data_buffer = &raw_data_buffer[ ADC_CONTINUOUS_CHANNELS * ADC_OVERSAMPLE ];
+      valid_data_buffer = &raw_data_buffer[ 1 * ADC_CONTINUOUS_CHANNELS * ADC_OVERSAMPLE ];
     else if ( DMA_GetFlagStatus(DMA1_IT_HT1) )
       valid_data_buffer = &raw_data_buffer[ 0 * ADC_CONTINUOUS_CHANNELS * ADC_OVERSAMPLE ];
     else {

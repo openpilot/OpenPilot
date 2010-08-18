@@ -28,6 +28,8 @@
 #define CONFIGGADGETWIDGET_H
 
 #include "ui_settingswidget.h"
+#include "ui_telemetry.h"
+#include "ui_airframe.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/uavobject.h"
@@ -50,6 +52,8 @@ protected:
 
 private:
         Ui_SettingsWidget *m_config;
+        Ui_TelemetryWidget *m_telemetry;
+        Ui_AircraftWidget *m_aircraft;
         QList<QSlider> sliders;
         void updateChannelSlider(QSlider* slider, QLabel* min, QLabel* Max,  QCheckBox* rev, int value);
         void updateObjectPersistance(ObjectPersistence::OperationOptions op, UAVObject *obj);
@@ -66,6 +70,12 @@ private:
         void requestRCOutputUpdate();
         void sendRCOutputUpdate();
         void saveRCOutputObject();
+        void requestAircraftUpdate();
+        void sendAircraftUpdate();
+        void saveAircraftUpdate();
+        void requestTelemetryUpdate();
+        void sendTelemetryUpdate();
+        void saveTelemetryUpdate();
 
         void setch0OutRange();
         void setch1OutRange();

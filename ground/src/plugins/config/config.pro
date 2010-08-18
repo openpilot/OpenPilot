@@ -18,5 +18,7 @@ SOURCES += configplugin.cpp \
     configgadgetoptionspage.cpp \
     configgadget.cpp \
     fancytabwidget.cpp
-FORMS += settingswidget.ui
+FORMS += settingswidget.ui \
+    airframe.ui \
+    telemetry.ui
 RESOURCES += configgadget.qrc

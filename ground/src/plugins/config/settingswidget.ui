@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>664</width>
-    <height>409</height>
+    <width>720</width>
+    <height>480</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -1120,35 +1120,17 @@ Uncheck/Check to restart calibration.</string>
     <attribute name="title">
      <string>Servo Output</string>
     </attribute>
-    <widget class="QComboBox" name="aircraftType">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>20</y>
-       <width>121</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-      </font>
-     </property>
-     <property name="toolTip">
-      <string>Select aircraft type here</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="aircraftType">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>20</y>
-       <width>91</width>
+       <width>221</width>
        <height>17</height>
       </rect>
      </property>
      <property name="text">
-      <string>Aircraft type:</string>
+      <string>Aircraft type: undefined</string>
      </property>
     </widget>
     <widget class="QLabel" name="actuator0Label">

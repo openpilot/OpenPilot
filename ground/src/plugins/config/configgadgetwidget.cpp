@@ -2,7 +2,7 @@
  ******************************************************************************
  *
  * @file       configgadgetwidget.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @author     E. Lafargue & The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
@@ -25,7 +25,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "configgadgetwidget.h"
-#include "ui_settingswidget.h"
 
 #include "fancytabwidget.h"
 
@@ -42,7 +41,7 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
 {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     FancyTabWidget *ftw = new FancyTabWidget(this, true);
-    ftw->setIconSize(32);
+    ftw->setIconSize(64);
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(ftw);
     setLayout(layout);
@@ -51,7 +50,13 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     m_config->setupUi(qwd);
     ftw->insertTab(0, qwd,QIcon(":/core/images/pluginicon.png"),QString("RC Input/Output"));
     qwd = new QWidget;
-    ftw->insertTab(1,qwd,QIcon(":/configgadget/images/XBee.svg"), QString("Telemetry"));
+    m_aircraft = new Ui_AircraftWidget();
+    m_aircraft->setupUi(qwd);
+    ftw->insertTab(1, qwd, QIcon(":/configgadget/images/Airframe.png"), QString("Aircraft"));
+    qwd = new QWidget;
+    m_telemetry = new Ui_TelemetryWidget();
+    m_telemetry->setupUi(qwd);
+    ftw->insertTab(2,qwd,QIcon(":/configgadget/images/XBee.svg"), QString("Telemetry"));
 
     // Fill in the dropdown menus for the channel RC Input assignement.
     QStringList channelsList;
@@ -79,11 +84,15 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     UAVObjectField *field = obj->getField(fieldName);
     m_config->receiverType->addItems(field->getOptions());
 
+    obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("TelemetrySettings")));
+    field = obj->getField(QString("Speed"));
+    m_telemetry->telemetrySpeed->addItems(field->getOptions());
+
     // Same for the aircraft types:
     obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("SystemSettings")));
     fieldName = QString("AirframeType");
     field = obj->getField(fieldName);
-    m_config->aircraftType->addItems(field->getOptions());
+    m_aircraft->aircraftType->addItems(field->getOptions());
 
     // And for the channel output assignement options
     m_config->ch0Output->addItem("None");
@@ -142,6 +151,15 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_config->saveRCOutputToRAM, SIGNAL(clicked()), this, SLOT(sendRCOutputUpdate()));
     connect(m_config->getRCOutputCurrent, SIGNAL(clicked()), this, SLOT(requestRCOutputUpdate()));
 
+    requestAircraftUpdate();
+    connect(m_aircraft->saveAircraftToSD, SIGNAL(clicked()), this, SLOT(saveAircraftUpdate()));
+    connect(m_aircraft->saveAircraftToRAM, SIGNAL(clicked()), this, SLOT(sendAircraftUpdate()));
+    connect(m_aircraft->getAircraftCurrent, SIGNAL(clicked()), this, SLOT(requestAircraftUpdate()));
+
+    requestTelemetryUpdate();
+    connect(m_telemetry->saveTelemetryToSD, SIGNAL(clicked()), this, SLOT(saveTelemetryUpdate()));
+    connect(m_telemetry->saveTelemetryToRAM, SIGNAL(clicked()), this, SLOT(sendTelemetryUpdate()));
+    connect(m_telemetry->getTelemetryCurrent, SIGNAL(clicked()), this, SLOT(requestTelemetryUpdate()));
 
 
     firstUpdate = true;
@@ -158,6 +176,104 @@ void ConfigGadgetWidget::resizeEvent(QResizeEvent *event)
 
     QWidget::resizeEvent(event);
 }
+
+/**************************
+  * Aircraft settings
+  **************************/
+/**
+  Request the current value of the SystemSettings which holds the aircraft type
+  */
+void ConfigGadgetWidget::requestAircraftUpdate()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+
+    // Get the Airframe type from the system settings:
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("SystemSettings")));
+    Q_ASSERT(obj);
+    obj->requestUpdate();
+    UAVObjectField *field = obj->getField(QString("AirframeType"));
+    m_config->aircraftType->setText(QString("Aircraft type: ") + field->getValue().toString());
+    m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText(field->getValue().toString()));
+
+}
+
+
+/**
+  Sends the config to the board (airframe type)
+  */
+void ConfigGadgetWidget::sendAircraftUpdate()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("SystemSettings")));
+    Q_ASSERT(obj);
+    UAVObjectField* field = obj->getField(QString("AirframeType"));
+    field->setValue(m_aircraft->aircraftType->currentText());
+    obj->updated();
+}
+
+/**
+  Send airframe type to the board and request saving to SD card
+  */
+void ConfigGadgetWidget::saveAircraftUpdate()
+{
+    // Send update so that the latest value is saved
+    sendAircraftUpdate();
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("SystemSettings")));
+    Q_ASSERT(obj);
+    updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
+}
+
+
+/*******************************
+ * Telemetry Settings
+ *****************************/
+
+/**
+  Request telemetry settings from the board
+  */
+void ConfigGadgetWidget::requestTelemetryUpdate()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("TelemetrySettings")));
+    Q_ASSERT(obj);
+    obj->requestUpdate();
+    UAVObjectField *field = obj->getField(QString("Speed"));
+    m_telemetry->telemetrySpeed->setCurrentIndex(m_telemetry->telemetrySpeed->findText(field->getValue().toString()));
+}
+
+/**
+  Send telemetry settings to the board
+  */
+void ConfigGadgetWidget::sendTelemetryUpdate()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("TelemetrySettings")));
+    Q_ASSERT(obj);
+    UAVObjectField* field = obj->getField(QString("Speed"));
+    field->setValue(m_telemetry->telemetrySpeed->currentText());
+    obj->updated();
+}
+
+/**
+  Send telemetry settings to the board and request saving to SD card
+  */
+void ConfigGadgetWidget::saveTelemetryUpdate()
+{
+    // Send update so that the latest value is saved
+    sendTelemetryUpdate();
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("TelemetrySettings")));
+    Q_ASSERT(obj);
+    updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
+}
+
 
 /********************************
   *  Output settings
@@ -177,7 +293,7 @@ void ConfigGadgetWidget::requestRCOutputUpdate()
     Q_ASSERT(obj);
     obj->requestUpdate();
     UAVObjectField *field = obj->getField(QString("AirframeType"));
-    m_config->aircraftType->setCurrentIndex(m_config->aircraftType->findText(field->getValue().toString()));
+    m_config->aircraftType->setText(QString("Aircraft type: ") + field->getValue().toString());
 
     // Reset all channel assignements:
     m_config->ch0Output->setCurrentIndex(0);
@@ -351,14 +467,6 @@ void ConfigGadgetWidget::sendRCOutputUpdate()
     obj->updated();
 
 
-    obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("SystemSettings")));
-    Q_ASSERT(obj);
-    field = obj->getField(QString("AirframeType"));
-    field->setValue(m_config->aircraftType->currentText());
-
-    // ... and send to the OP Board
-    obj->updated();
-
 }
 
 
@@ -375,9 +483,11 @@ void ConfigGadgetWidget::saveRCOutputObject()
     Q_ASSERT(obj);
     updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
 
-    obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("SystemSettings")));
-    Q_ASSERT(obj);
-    updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
+    /*
+    UAVDataObject* obj2 = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("SystemSettings")));
+    Q_ASSERT(obj2);
+    updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj2);
+    */
 }
 
 

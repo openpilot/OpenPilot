@@ -85,6 +85,10 @@ void GCSControlGadgetWidget::gcsControlToggle(int state)
     {
         mdata.flightAccess = UAVObject::ACCESS_READWRITE;
     }
+    mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
+    mdata.gcsTelemetryAcked = false;
+    mdata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
+    mdata.gcsTelemetryUpdatePeriod = 100;
     getMCC()->setMetadata(mdata);
 }
 

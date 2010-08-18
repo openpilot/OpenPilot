@@ -90,14 +90,14 @@ void JoystickControl::mccChanged(UAVObject*)
     {
         ManualControlCommand::DataFields data = getMCC()->getData();
         double x = (data.Yaw + 1) / 2 * scene()->sceneRect().width();
-        double y = (data.Pitch + 1) / 2 * scene()->sceneRect().height();
+        double y = (-data.Pitch + 1) / 2 * scene()->sceneRect().height();
         m_joystickEnd->setPos(x-m_joystickEnd->boundingRect().width()/2,y-m_joystickEnd->boundingRect().height()/2);
     }
     else if( this->objectName() == QString("widgetRightStick"))
     {
         ManualControlCommand::DataFields data = getMCC()->getData();
         double x = (data.Roll + 1) / 2 * scene()->sceneRect().width();
-        double y = (data.Throttle + 1) / 2 * scene()->sceneRect().height();
+        double y = (-data.Throttle + 1) / 2 * scene()->sceneRect().height();
 
         m_joystickEnd->setPos(x-m_joystickEnd->boundingRect().width()/2,y-m_joystickEnd->boundingRect().height()/2);
     }
@@ -161,8 +161,9 @@ void JoystickControl::updateMCC(QPointF point)
     QRectF sceneSize = scene()->sceneRect();
 
     double x = 2 * ( point.x() / sceneSize.width() - .5 );
-    double y = 2 * ( point.y() / sceneSize.height() - .5);
-
+    double y = -2 * ( point.y() / sceneSize.height() - .5);
+    x = qBound( (double) -1, x, (double) 1);
+    y = qBound( (double) -1, y, (double) 1);
     if( this->objectName() == QString("widgetLeftStick"))
     {
 

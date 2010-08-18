@@ -32,7 +32,7 @@
 #define PIOS_HMC5843_H
 
 /* BMP085 Addresses */
-#define PIOS_HMC5843_I2C_ADDR			0x3C
+#define PIOS_HMC5843_I2C_ADDR			0x1E
 #define PIOS_HMC5843_CONFIG_REG_A		(uint8_t)0x00
 #define PIOS_HMC5843_CONFIG_REG_B		(uint8_t)0x01
 #define PIOS_HMC5843_MODE_REG			(uint8_t)0x02

@@ -38,11 +38,11 @@
 //
 // Configuration
 //
-#define DEBUG_PORT		PIOS_COM_TELEM_RF
+#define DEBUG_PORT		PIOS_COM_GPS
 #define STACK_SIZE		1024
 #define TASK_PRIORITY	(tskIDLE_PRIORITY + 3)
 #define ENABLE_DEBUG_MSG
-#define DUMP_CONFIG		// Enable this do read and dump the OSD config
+//#define DUMP_CONFIG		// Enable this do read and dump the OSD config
 //#define WRITE_CONFIG		// Enable this do write and verify the OSD config
 //#define DO_PAR_SEEK		// Enable this to start a tool to find where parameters are encoded
 
@@ -959,13 +959,19 @@ static void Task(void* parameters)
 #endif
 
 		DEBUG_MSG("SendMsg .");
-		if (PIOS_I2C_LockDevice(5000 / portTICK_RATE_MS))
 		{
-			DEBUG_MSG(".");
-			PIOS_I2C_Transfer(I2C_Write, 0x30<<1, msg, sizeof(msg));
-			DEBUG_MSG(".");
-			PIOS_I2C_UnlockDevice();
+			const struct pios_i2c_txn txn_list[] = {
+				{
+				  .addr = 0x30<<1,
+				  .rw   = PIOS_I2C_TXN_WRITE,
+				  .len  = sizeof(msg),
+				  .buf  = msg,
+				},
+			  };
+
+			PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
 		}
+
 		DEBUG_MSG("\n\r");
 
 		cnt++;

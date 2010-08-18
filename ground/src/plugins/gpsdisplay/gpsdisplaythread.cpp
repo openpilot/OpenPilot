@@ -76,7 +76,7 @@ void GpsDisplayThread::run()
                     port->read(&c,1);
                     parser->processInputStream(c);
             }
-            sleep(1);
+            yieldCurrentThread();
         }
     } else {
         qDebug() << "Port undefined or invalid.";

@@ -205,12 +205,20 @@ static void update_attitude_raw(struct opahrs_msg_v1_rsp_attituderaw * attituder
   data.gyros[ATTITUDERAW_GYROS_Y] = attituderaw->gyros.y;
   data.gyros[ATTITUDERAW_GYROS_Z] = attituderaw->gyros.z;
 
+  data.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X] = attituderaw->gyros_filtered.x;
+  data.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y] = attituderaw->gyros_filtered.y;
+  data.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] = attituderaw->gyros_filtered.z;
+  
   data.gyrotemp[ATTITUDERAW_GYROTEMP_XY] = attituderaw->gyros.xy_temp;
   data.gyrotemp[ATTITUDERAW_GYROTEMP_Z] = attituderaw->gyros.z_temp;
 
-  data.accelerometers[ATTITUDERAW_ACCELEROMETERS_X] = attituderaw->accels.x;
-  data.accelerometers[ATTITUDERAW_ACCELEROMETERS_Y] = attituderaw->accels.y;
-  data.accelerometers[ATTITUDERAW_ACCELEROMETERS_Z] = attituderaw->accels.z;
+  data.accels[ATTITUDERAW_ACCELS_X] = attituderaw->accels.x;
+  data.accels[ATTITUDERAW_ACCELS_Y] = attituderaw->accels.y;
+  data.accels[ATTITUDERAW_ACCELS_Z] = attituderaw->accels.z;
+
+  data.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_X] = attituderaw->accels_filtered.x;
+  data.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Y] = attituderaw->accels_filtered.y;
+  data.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Z] = attituderaw->accels_filtered.z;
   
   AttitudeRawSet(&data);
 }

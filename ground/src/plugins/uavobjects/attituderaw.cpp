@@ -52,15 +52,25 @@ AttitudeRaw::AttitudeRaw(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
     gyrosElemNames.append("Y");
     gyrosElemNames.append("Z");
     fields.append( new UAVObjectField(QString("gyros"), QString("raw"), UAVObjectField::UINT16, gyrosElemNames, QStringList()) );
+    QStringList gyros_filteredElemNames;
+    gyros_filteredElemNames.append("X");
+    gyros_filteredElemNames.append("Y");
+    gyros_filteredElemNames.append("Z");
+    fields.append( new UAVObjectField(QString("gyros_filtered"), QString("deg/s"), UAVObjectField::FLOAT32, gyros_filteredElemNames, QStringList()) );
     QStringList gyrotempElemNames;
     gyrotempElemNames.append("XY");
     gyrotempElemNames.append("Z");
     fields.append( new UAVObjectField(QString("gyrotemp"), QString("raw"), UAVObjectField::UINT16, gyrotempElemNames, QStringList()) );
-    QStringList accelerometersElemNames;
-    accelerometersElemNames.append("X");
-    accelerometersElemNames.append("Y");
-    accelerometersElemNames.append("Z");
-    fields.append( new UAVObjectField(QString("accelerometers"), QString("raw"), UAVObjectField::UINT16, accelerometersElemNames, QStringList()) );
+    QStringList accelsElemNames;
+    accelsElemNames.append("X");
+    accelsElemNames.append("Y");
+    accelsElemNames.append("Z");
+    fields.append( new UAVObjectField(QString("accels"), QString("raw"), UAVObjectField::UINT16, accelsElemNames, QStringList()) );
+    QStringList accels_filteredElemNames;
+    accels_filteredElemNames.append("X");
+    accels_filteredElemNames.append("Y");
+    accels_filteredElemNames.append("Z");
+    fields.append( new UAVObjectField(QString("accels_filtered"), QString("m/s"), UAVObjectField::FLOAT32, accels_filteredElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

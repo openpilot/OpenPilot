@@ -45,8 +45,10 @@ public:
     typedef struct {
         qint16 magnetometers[3];
         quint16 gyros[3];
+        float gyros_filtered[3];
         quint16 gyrotemp[2];
-        quint16 accelerometers[3];
+        quint16 accels[3];
+        float accels_filtered[3];
 
     } __attribute__((packed)) DataFields;
 
@@ -61,20 +63,30 @@ public:
     typedef enum { GYROS_X=0, GYROS_Y=1, GYROS_Z=2 } gyrosElem;
     /* Number of elements for field gyros */
     static const quint32 GYROS_NUMELEM = 3;
+    // Field gyros_filtered information
+    /* Array element names for field gyros_filtered */
+    typedef enum { GYROS_FILTERED_X=0, GYROS_FILTERED_Y=1, GYROS_FILTERED_Z=2 } gyros_filteredElem;
+    /* Number of elements for field gyros_filtered */
+    static const quint32 GYROS_FILTERED_NUMELEM = 3;
     // Field gyrotemp information
     /* Array element names for field gyrotemp */
     typedef enum { GYROTEMP_XY=0, GYROTEMP_Z=1 } gyrotempElem;
     /* Number of elements for field gyrotemp */
     static const quint32 GYROTEMP_NUMELEM = 2;
-    // Field accelerometers information
-    /* Array element names for field accelerometers */
-    typedef enum { ACCELEROMETERS_X=0, ACCELEROMETERS_Y=1, ACCELEROMETERS_Z=2 } accelerometersElem;
-    /* Number of elements for field accelerometers */
-    static const quint32 ACCELEROMETERS_NUMELEM = 3;
+    // Field accels information
+    /* Array element names for field accels */
+    typedef enum { ACCELS_X=0, ACCELS_Y=1, ACCELS_Z=2 } accelsElem;
+    /* Number of elements for field accels */
+    static const quint32 ACCELS_NUMELEM = 3;
+    // Field accels_filtered information
+    /* Array element names for field accels_filtered */
+    typedef enum { ACCELS_FILTERED_X=0, ACCELS_FILTERED_Y=1, ACCELS_FILTERED_Z=2 } accels_filteredElem;
+    /* Number of elements for field accels_filtered */
+    static const quint32 ACCELS_FILTERED_NUMELEM = 3;
 
   
     // Constants
-    static const quint32 OBJID = 4179445416U;
+    static const quint32 OBJID = 1323193976U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

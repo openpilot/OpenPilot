@@ -33,7 +33,7 @@
 #define ATTITUDERAW_H
 
 // Object constants
-#define ATTITUDERAW_OBJID 4179445416U
+#define ATTITUDERAW_OBJID 1323193976U
 #define ATTITUDERAW_NAME "AttitudeRaw"
 #define ATTITUDERAW_METANAME "AttitudeRawMeta"
 #define ATTITUDERAW_ISSINGLEINST 1
@@ -59,8 +59,10 @@
 typedef struct {
     int16_t magnetometers[3];
     uint16_t gyros[3];
+    float gyros_filtered[3];
     uint16_t gyrotemp[2];
-    uint16_t accelerometers[3];
+    uint16_t accels[3];
+    float accels_filtered[3];
 
 } __attribute__((packed)) AttitudeRawData;
 
@@ -75,16 +77,26 @@ typedef enum { ATTITUDERAW_MAGNETOMETERS_X=0, ATTITUDERAW_MAGNETOMETERS_Y=1, ATT
 typedef enum { ATTITUDERAW_GYROS_X=0, ATTITUDERAW_GYROS_Y=1, ATTITUDERAW_GYROS_Z=2 } AttitudeRawgyrosElem;
 /* Number of elements for field gyros */
 #define ATTITUDERAW_GYROS_NUMELEM 3
+// Field gyros_filtered information
+/* Array element names for field gyros_filtered */
+typedef enum { ATTITUDERAW_GYROS_FILTERED_X=0, ATTITUDERAW_GYROS_FILTERED_Y=1, ATTITUDERAW_GYROS_FILTERED_Z=2 } AttitudeRawgyros_filteredElem;
+/* Number of elements for field gyros_filtered */
+#define ATTITUDERAW_GYROS_FILTERED_NUMELEM 3
 // Field gyrotemp information
 /* Array element names for field gyrotemp */
 typedef enum { ATTITUDERAW_GYROTEMP_XY=0, ATTITUDERAW_GYROTEMP_Z=1 } AttitudeRawgyrotempElem;
 /* Number of elements for field gyrotemp */
 #define ATTITUDERAW_GYROTEMP_NUMELEM 2
-// Field accelerometers information
-/* Array element names for field accelerometers */
-typedef enum { ATTITUDERAW_ACCELEROMETERS_X=0, ATTITUDERAW_ACCELEROMETERS_Y=1, ATTITUDERAW_ACCELEROMETERS_Z=2 } AttitudeRawaccelerometersElem;
-/* Number of elements for field accelerometers */
-#define ATTITUDERAW_ACCELEROMETERS_NUMELEM 3
+// Field accels information
+/* Array element names for field accels */
+typedef enum { ATTITUDERAW_ACCELS_X=0, ATTITUDERAW_ACCELS_Y=1, ATTITUDERAW_ACCELS_Z=2 } AttitudeRawaccelsElem;
+/* Number of elements for field accels */
+#define ATTITUDERAW_ACCELS_NUMELEM 3
+// Field accels_filtered information
+/* Array element names for field accels_filtered */
+typedef enum { ATTITUDERAW_ACCELS_FILTERED_X=0, ATTITUDERAW_ACCELS_FILTERED_Y=1, ATTITUDERAW_ACCELS_FILTERED_Z=2 } AttitudeRawaccels_filteredElem;
+/* Number of elements for field accels_filtered */
+#define ATTITUDERAW_ACCELS_FILTERED_NUMELEM 3
 
 
 // Generic interface functions

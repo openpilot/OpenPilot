@@ -638,6 +638,11 @@ void process_spi_request(void)
     user_tx_v1.payload.user.v.rsp.attituderaw.gyros.x       = gyro_data.raw.x;
     user_tx_v1.payload.user.v.rsp.attituderaw.gyros.y       = gyro_data.raw.y;
     user_tx_v1.payload.user.v.rsp.attituderaw.gyros.z       = gyro_data.raw.z;
+
+    user_tx_v1.payload.user.v.rsp.attituderaw.gyros_filtered.x       = gyro_data.filtered.x;
+    user_tx_v1.payload.user.v.rsp.attituderaw.gyros_filtered.y       = gyro_data.filtered.y;
+    user_tx_v1.payload.user.v.rsp.attituderaw.gyros_filtered.z       = gyro_data.filtered.z;
+    
     user_tx_v1.payload.user.v.rsp.attituderaw.gyros.xy_temp = gyro_data.temp.xy;
     user_tx_v1.payload.user.v.rsp.attituderaw.gyros.z_temp  = gyro_data.temp.z;
 
@@ -645,6 +650,10 @@ void process_spi_request(void)
     user_tx_v1.payload.user.v.rsp.attituderaw.accels.y      = accel_data.raw.y;
     user_tx_v1.payload.user.v.rsp.attituderaw.accels.z      = accel_data.raw.z;
 
+    user_tx_v1.payload.user.v.rsp.attituderaw.accels_filtered.x      = accel_data.filtered.x;
+    user_tx_v1.payload.user.v.rsp.attituderaw.accels_filtered.y      = accel_data.filtered.y;
+    user_tx_v1.payload.user.v.rsp.attituderaw.accels_filtered.z      = accel_data.filtered.z;
+      
     dump_spi_message(PIOS_COM_AUX, "R", (uint8_t *)&user_tx_v1, sizeof(user_tx_v1));
     lfsm_user_set_tx_v1 (&user_tx_v1);
     break;

@@ -62,6 +62,18 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
+		'gyros_filtered',
+		'f',
+		3,
+		[
+			'X',
+			'Y',
+			'Z',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
 		'gyrotemp',
 		'H',
 		2,
@@ -73,8 +85,20 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'accelerometers',
+		'accels',
 		'H',
+		3,
+		[
+			'X',
+			'Y',
+			'Z',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'accels_filtered',
+		'f',
 		3,
 		[
 			'X',
@@ -89,7 +113,7 @@ _fields = [ \
 
 class AttitudeRaw(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 4179445416
+    OBJID        = 1323193976
     NAME         = "AttitudeRaw"
     METANAME     = "AttitudeRawMeta"
     ISSINGLEINST = 1

@@ -237,10 +237,20 @@ struct opahrs_msg_v1_rsp_attituderaw {
     uint16_t z_temp;
   } gyros;
   struct {
+    float x;
+    float y; 
+    float z;
+  } gyros_filtered;
+  struct {
     uint16_t x;
     uint16_t y;
     uint16_t z;
   } accels;
+  struct {
+    float x;
+    float y; 
+    float z;
+  } accels_filtered;
 } __attribute__((__packed__));
 
 struct opahrs_msg_v1_rsp_attitude {

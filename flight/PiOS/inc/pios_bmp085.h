@@ -32,7 +32,7 @@
 #define PIOS_BMP085_H
 
 /* BMP085 Addresses */
-#define BMP085_I2C_ADDR			0xEE
+#define BMP085_I2C_ADDR			0x77
 #define BMP085_CALIB_ADDR		0xAA
 #define BMP085_CALIB_LEN		22
 #define BMP085_CTRL_ADDR		0xF4

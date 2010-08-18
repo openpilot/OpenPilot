@@ -962,7 +962,7 @@ static void Task(void* parameters)
 		{
 			const struct pios_i2c_txn txn_list[] = {
 				{
-				  .addr = 0x30<<1,
+				  .addr = 0x30,
 				  .rw   = PIOS_I2C_TXN_WRITE,
 				  .len  = sizeof(msg),
 				  .buf  = msg,

@@ -338,7 +338,7 @@ static void go_r_any_txn_addr (struct pios_i2c_adapter * i2c_adapter)
 
   PIOS_DEBUG_Assert(i2c_adapter->active_txn->rw == PIOS_I2C_TXN_READ);
 
-  I2C_Send7bitAddress(i2c_adapter->cfg->regs, i2c_adapter->active_txn->addr, I2C_Direction_Receiver);
+  I2C_Send7bitAddress(i2c_adapter->cfg->regs, (i2c_adapter->active_txn->addr)<<1, I2C_Direction_Receiver);
 }
 
 static void go_r_more_txn_pre_one (struct pios_i2c_adapter * i2c_adapter)
@@ -436,7 +436,7 @@ static void go_w_any_txn_addr (struct pios_i2c_adapter * i2c_adapter)
 
   PIOS_DEBUG_Assert(i2c_adapter->active_txn->rw == PIOS_I2C_TXN_WRITE);
 
-  I2C_Send7bitAddress(i2c_adapter->cfg->regs, i2c_adapter->active_txn->addr, I2C_Direction_Transmitter);
+  I2C_Send7bitAddress(i2c_adapter->cfg->regs, (i2c_adapter->active_txn->addr)<<1, I2C_Direction_Transmitter);
 }
 
 static void go_w_any_txn_middle (struct pios_i2c_adapter * i2c_adapter)

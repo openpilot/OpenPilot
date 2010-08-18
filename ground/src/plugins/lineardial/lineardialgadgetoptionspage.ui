@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>486</width>
-    <height>300</height>
+    <width>540</width>
+    <height>347</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -24,8 +24,8 @@
     <rect>
      <x>-1</x>
      <y>-1</y>
-     <width>481</width>
-     <height>339</height>
+     <width>491</width>
+     <height>321</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0,0,0,0,0,0">
@@ -470,6 +470,9 @@
       </item>
       <item>
        <widget class="QDoubleSpinBox" name="factor">
+        <property name="decimals">
+         <number>6</number>
+        </property>
         <property name="minimum">
          <double>-10000.000000000000000</double>
         </property>

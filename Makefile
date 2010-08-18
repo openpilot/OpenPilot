@@ -4,6 +4,16 @@ TOOLS_DIR=$(ROOT_DIR)/tools
 BUILD_DIR=$(ROOT_DIR)/build
 DL_DIR=$(ROOT_DIR)/downloads
 
+# We almost need to consider autoconf/automake instead of this
+# I don't know if windows supports uname :-(
+UNAME := $(shell uname)
+ifeq ($(UNAME), Linux)
+  QT_SPEC=linux-g++
+endif
+ifeq ($(UNAME), Darwin)
+  QT_SPEC=macx-g++
+endif
+
 # Set up misc host tools
 RM=rm
 
@@ -182,7 +192,7 @@ gcs: openpilotgcs
 openpilotgcs:  #uavobjects
 	mkdir -p $(BUILD_DIR)/$@
 	( cd $(BUILD_DIR)/$@ ; \
-	  $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs.pro -spec linux-g++ -r CONFIG+=debug ; \
+	  $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+=debug ; \
 	  make -w ; \
 	)
 
@@ -190,7 +200,7 @@ openpilotgcs:  #uavobjects
 uavobjgenerator:
 	mkdir -p $(BUILD_DIR)/$@
 	( cd $(BUILD_DIR)/$@ ; \
-	  $(QMAKE) $(ROOT_DIR)/ground/src/libs/uavobjgenerator/uavobjgenerator.pro -spec linux-g++ -r CONFIG+=debug ; \
+	  $(QMAKE) $(ROOT_DIR)/ground/src/libs/uavobjgenerator/uavobjgenerator.pro -spec $(QT_SPEC) -r CONFIG+=debug ; \
 	  make -w ; \
 	)
 

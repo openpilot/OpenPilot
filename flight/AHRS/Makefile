@@ -293,7 +293,12 @@ OOCD_EXE=openocd
 # debug level
 OOCD_CL=-d0
 # interface and board/target settings (using the OOCD target-library here)
-OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.ahrs.cfg -f ../Project/OpenOCD/stm32.cfg
+UNAME := $(shell uname)
+ifeq ($(UNAME), Darwin)
+  OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.ahrs.osx.cfg -f ../Project/OpenOCD/stm32.cfg
+else
+  OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.ahrs.cfg -f ../Project/OpenOCD/stm32.cfg
+endif
 # initialize
 OOCD_CL+=-c init
 # show the targets

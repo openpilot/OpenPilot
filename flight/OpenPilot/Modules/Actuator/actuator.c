@@ -151,14 +151,16 @@ static void actuatorTask(void* parameters)
 			}
 		}
 
+		// Update output object
+		ActuatorCommandSet(&cmd);
+		// Update in case read only (eg. during servo configuration)    
+		ActuatorCommandGet(&cmd);
+    
 		// Update servo outputs
 		for (int n = 0; n < ACTUATORCOMMAND_CHANNEL_NUMELEM; ++n)
 		{
 			PIOS_Servo_Set( n, cmd.Channel[n] );
 		}
-
-		// Update output object
-		ActuatorCommandSet(&cmd);
 	}
 }
 

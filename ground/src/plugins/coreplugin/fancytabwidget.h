@@ -77,6 +77,8 @@ public:
     }
     void removeTab(int index) {
         m_tabs.removeAt(index);
+        if ( m_currentIndex >= m_tabs.length() )
+            m_currentIndex = m_tabs.length() - 1;
     }
     void updateTabNameIcon(int index, const QIcon &icon, const QString &label);
     void setCurrentIndex(int index);

@@ -67,13 +67,11 @@ UAVGadgetInstanceManager::~UAVGadgetInstanceManager()
     }
 }
 
-void UAVGadgetInstanceManager::readConfigurations()
-{
-    readConfigurations(Core::ICore::instance()->settings());
-}
-
 void UAVGadgetInstanceManager::readConfigurations(QSettings *qs)
 {
+    while ( !m_configurations.isEmpty() ){
+       emit configurationToBeDeleted(m_configurations.takeLast());
+    }
     qs->beginGroup("UAVGadgetConfigurations");
     foreach (QString classId, m_classIds.keys())
     {
@@ -119,11 +117,6 @@ void UAVGadgetInstanceManager::readConfigurations(QSettings *qs)
     }
     qs->endGroup();
     createOptionsPages();
-}
-
-void UAVGadgetInstanceManager::writeConfigurations()
-{
-    writeConfigurations(Core::ICore::instance()->settings());
 }
 
 void UAVGadgetInstanceManager::writeConfigurations(QSettings *qs)

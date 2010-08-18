@@ -1,13 +1,12 @@
 /**
  ******************************************************************************
- *
- * @file       importexportgadgetconfiguration.h
+ * @file
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Airspeed Plugin Gadget configuration
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   importexportplugin
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- *
+ * @addtogroup importexportplugin
+ * @{
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -38,15 +37,19 @@ using namespace Core;
   */
 class IMPORTEXPORT_EXPORT ImportExportGadgetConfiguration : public IUAVGadgetConfiguration
 {
-Q_OBJECT
+    Q_OBJECT
 public:
     explicit ImportExportGadgetConfiguration(QString classId, const QByteArray &state = 0, QObject *parent = 0);
 
     //set dial configuration functions
-    void setDialFile(QString filename){dialFile=filename;}
+    void setDialFile(QString filename) {
+        dialFile = filename;
+    }
 
     //get dial configuration functions
-    QString getDialFile() {return dialFile;}
+    QString getDialFile() {
+        return dialFile;
+    }
 
     QByteArray saveState() const;
     IUAVGadgetConfiguration *clone();
@@ -56,3 +59,7 @@ private:
 };
 
 #endif // IMPORTEXPORTGADGETCONFIGURATION_H
+/**
+ * @}
+ * @}
+ */

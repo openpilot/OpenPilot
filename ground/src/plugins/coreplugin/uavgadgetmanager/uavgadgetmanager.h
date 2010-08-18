@@ -36,6 +36,7 @@
 #include <QtGui/QWidget>
 #include <QtCore/QList>
 #include <QtCore/QPointer>
+#include <QtCore/QSettings>
 
 QT_BEGIN_NAMESPACE
 class QSettings;
@@ -98,8 +99,8 @@ public:
     QByteArray saveState() const;
     bool restoreState(const QByteArray &state);
 
-    void saveSettings();
-    void readSettings();
+    void saveSettings(QSettings* qs);
+    void readSettings(QSettings* qs);
     bool toolbarsShown() { return m_showToolbars; }
 
 signals:

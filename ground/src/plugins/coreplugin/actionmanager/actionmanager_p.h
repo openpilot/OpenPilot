@@ -77,7 +77,7 @@ public:
     Command *command(int uid) const;
     ActionContainer *actionContainer(int uid) const;
 
-    void initialize();
+    void readSettings(QSettings *settings);
 
     //ActionManager Interface
     ActionContainer *createMenu(const QString &id);

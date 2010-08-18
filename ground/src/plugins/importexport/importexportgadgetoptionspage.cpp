@@ -3,9 +3,11 @@
  *
  * @file       importexportgadgetoptionspage.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Linear Dial Plugin Gadget options page
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   importexportplugin
+ * @brief      Option page for Import/Export Plugin
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup   importexportplugin
  * @{
  *
  *****************************************************************************/
@@ -70,4 +72,7 @@ void ImportExportGadgetOptionsPage::finish()
 {
 
 }
-
+/**
+ * @}
+ * @}
+ */

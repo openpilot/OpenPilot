@@ -1,3 +1,13 @@
+/**
+ ******************************************************************************
+ * @file
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @see        The GNU Public License (GPL) Version 3
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup importexportplugin
+ * @{
+ *****************************************************************************/
 #ifndef IMPORTEXPORTGADGETWIDGET_H
 #define IMPORTEXPORTGADGETWIDGET_H
 
@@ -5,11 +15,13 @@
 #include <QString>
 #include "importexport_global.h"
 
-namespace Ui {
-    class ImportExportGadgetWidget;
+namespace Ui
+{
+class ImportExportGadgetWidget;
 }
 
-class IMPORTEXPORT_EXPORT ImportExportGadgetWidget : public QWidget {
+class IMPORTEXPORT_EXPORT ImportExportGadgetWidget : public QWidget
+{
     Q_OBJECT
 public:
     ImportExportGadgetWidget(QWidget *parent = 0);
@@ -27,8 +39,13 @@ private:
     void importConfiguration(const QString& fileName);
 
 private slots:
+    void on_helpButton_clicked();
     void on_importButton_clicked();
     void on_exportButton_clicked();
 };
 
 #endif // IMPORTEXPORTGADGETWIDGET_H
+/**
+ * @}
+ * @}
+ */

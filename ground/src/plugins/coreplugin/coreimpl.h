@@ -64,6 +64,8 @@ public:
 
     QSettings *settings() const;
     SettingsDatabase *settingsDatabase() const;
+    void readMainSettings(QSettings* qs);
+    void saveMainSettings(QSettings* qs);
 
     QString resourcePath() const;
 

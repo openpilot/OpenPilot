@@ -97,9 +97,8 @@ void ViewManager::aboutToRemoveObject(QObject *obj)
     m_mainWnd->removeContextObject(view);
 }
 
-void ViewManager::extensionsInitalized()
+void ViewManager::readSettings(QSettings *settings)
 {
-    QSettings *settings = m_mainWnd->settings();
     m_mainWnd->restoreState(settings->value(QLatin1String("ViewGroup_Default"), QByteArray()).toByteArray());
 }
 

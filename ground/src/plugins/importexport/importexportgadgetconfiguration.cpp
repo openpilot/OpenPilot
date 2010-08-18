@@ -3,9 +3,11 @@
  *
  * @file       importexportgadgetconfiguration.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Linear dial Plugin Gadget configuration
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   importexportplugin
+ * @brief      Configuration for Import/Export Plugin
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup   importexportplugin
  * @{
  *
  *****************************************************************************/
@@ -33,8 +35,8 @@
  *
  */
 ImportExportGadgetConfiguration::ImportExportGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
-    IUAVGadgetConfiguration(classId, parent),
-    dialFile("gcs.ini")
+        IUAVGadgetConfiguration(classId, parent),
+        dialFile("gcs.ini")
 {
     //if a saved configuration exists load it
     if (state.count() > 0) {
@@ -49,7 +51,7 @@ ImportExportGadgetConfiguration::ImportExportGadgetConfiguration(QString classId
 IUAVGadgetConfiguration *ImportExportGadgetConfiguration::clone()
 {
     ImportExportGadgetConfiguration *m = new ImportExportGadgetConfiguration(this->classId());
-    m->dialFile=dialFile;
+    m->dialFile = dialFile;
     return m;
 }
 /**
@@ -63,3 +65,8 @@ QByteArray ImportExportGadgetConfiguration::saveState() const
     stream << dialFile;
     return bytes;
 }
+
+/**
+ * @}
+ * @}
+ */

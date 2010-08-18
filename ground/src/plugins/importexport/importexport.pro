@@ -3,7 +3,6 @@ TARGET = ImportExportGadget
 DEFINES += IMPORTEXPORT_LIBRARY
 QT += svg
 include(../../openpilotgcsplugin.pri)
-include(../../plugins/coreplugin/coreplugin.pri)
 include(importexport_dependencies.pri)
 HEADERS += importexportplugin.h \
     importexportgadgetwidget.h

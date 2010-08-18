@@ -1,13 +1,12 @@
 /**
  ******************************************************************************
- *
- * @file       importexportgadgetfactory.h
- * @author     Edouard Lafargue Copyright (C) 2010.
- * @brief
+ * @file
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   importexportplugin
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- *
+ * @addtogroup importexportplugin
+ * @{
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -31,7 +30,8 @@
 #include <coreplugin/iuavgadgetfactory.h>
 #include "importexport_global.h"
 
-namespace Core {
+namespace Core
+{
 class IUAVGadget;
 class IUAVGadgetFactory;
 }
@@ -51,3 +51,7 @@ public:
 };
 
 #endif // IMPORTEXPORTGADGETFACTORY_H_
+/**
+ * @}
+ * @}
+ */

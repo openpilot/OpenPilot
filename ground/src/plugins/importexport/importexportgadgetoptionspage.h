@@ -1,13 +1,12 @@
 /**
  ******************************************************************************
- *
- * @file       importexportgadgetoptionspage.h
+ * @file
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Linear Dial Plugin Gadget options page
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   importexportplugin
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- *
+ * @addtogroup importexportplugin
+ * @{
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -35,21 +34,23 @@
 #include <QStringList>
 #include <QDebug>
 
-namespace Core {
+namespace Core
+{
 class IUAVGadgetConfiguration;
 }
 
 class ImportExportGadgetConfiguration;
 
-namespace Ui {
-    class ImportExportGadgetOptionsPage;
+namespace Ui
+{
+class ImportExportGadgetOptionsPage;
 }
 
 using namespace Core;
 
 class IMPORTEXPORT_EXPORT ImportExportGadgetOptionsPage : public IOptionsPage
 {
-Q_OBJECT
+    Q_OBJECT
 public:
     explicit ImportExportGadgetOptionsPage(ImportExportGadgetConfiguration *config, QObject *parent = 0);
 
@@ -67,3 +68,7 @@ private slots:
 };
 
 #endif // IMPORTEXPORTGADGETOPTIONSPAGE_H
+/**
+ * @}
+ * @}
+ */

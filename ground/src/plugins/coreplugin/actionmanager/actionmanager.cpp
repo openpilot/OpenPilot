@@ -460,9 +460,8 @@ static const char *settingsGroup = "KeyBindings";
 static const char *idKey = "ID";
 static const char *sequenceKey = "Keysequence";
 
-void ActionManagerPrivate::initialize()
+void ActionManagerPrivate::readSettings(QSettings *settings)
 {
-    QSettings *settings = m_mainWnd->settings();
     const int shortcuts = settings->beginReadArray(QLatin1String(settingsGroup));
     for (int i=0; i<shortcuts; ++i) {
         settings->setArrayIndex(i);

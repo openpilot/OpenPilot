@@ -58,7 +58,7 @@ public:
     ~ViewManager();
 
     void init();
-    void extensionsInitalized();
+    void readSettings(QSettings *settings);
     void saveSettings(QSettings *settings);
 
     IView * view(const QString & id);

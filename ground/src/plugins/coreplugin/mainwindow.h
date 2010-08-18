@@ -91,7 +91,8 @@ public:
     void addContextObject(IContext *contex);
     void removeContextObject(IContext *contex);
     void resetContext();
-
+    void readSettings(QSettings* qs);
+    void saveSettings(QSettings* qs);
     void openFiles(const QStringList &fileNames);
 
     Core::ActionManager *actionManager() const;
@@ -162,7 +163,7 @@ private:
 
     void createWorkspaces();
     void readSettings();
-    void writeSettings();
+    void saveSettings();
 
     CoreImpl *m_coreImpl;
     UniqueIDManager *m_uniqueIDManager;

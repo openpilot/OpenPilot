@@ -60,6 +60,12 @@ public:
     QWidget *createPage(QWidget *parent);
     void apply();
     void finish();
+    void readSettings(QSettings* qs);
+    void saveSettings(QSettings* qs);
+    int numberOfWorkspaces() const { return m_numberOfWorkspaces;}
+    QString iconName(int i) const { return m_iconNames.at(i);}
+    QString name(int i) const { return m_names.at(i);}
+    QString modeName(int i) const { return QString("Mode")+ QString::number(i+1);}
 
 signals:
 
@@ -70,12 +76,12 @@ public slots:
     void iconChanged();
 private:
     Ui::WorkspaceSettings *m_page;
-    QSettings *m_settings;
-    ModeManager *m_modeManager;
     QStringList m_iconNames;
     QStringList m_names;
     int m_currentIndex;
+    int m_numberOfWorkspaces;
     static const int MAX_WORKSPACES;
+
 
 };
 

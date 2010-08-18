@@ -86,6 +86,8 @@ public:
 
     virtual QSettings *settings() const = 0;
     virtual SettingsDatabase *settingsDatabase() const = 0;
+    virtual void readMainSettings(QSettings* qs) = 0;
+    virtual void saveMainSettings(QSettings* qs) = 0;
 
     virtual QString resourcePath() const = 0;
 

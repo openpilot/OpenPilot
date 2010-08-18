@@ -52,7 +52,6 @@
 #include <QtCore/QMap>
 #include <QtCore/QProcess>
 #include <QtCore/QSet>
-#include <QtCore/QSettings>
 
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
@@ -466,12 +465,11 @@ bool UAVGadgetManager::restoreState(const QByteArray &state)
 }
 
 
-void UAVGadgetManager::saveSettings()
+void UAVGadgetManager::saveSettings(QSettings *qs)
 {
     QString defaultUAVGadgetManagerKey = QString("UAVGadgetManager/") + m_uavGadgetMode->uniqueModeName() + "/DefaultSettings";
     QString uavGadgetManagerKey = QString("UAVGadgetManager/") + m_uavGadgetMode->uniqueModeName() + "/Settings";
 
-    QSettings *qs = m_d->m_core->settings();
     // The idea is to have a default setting that is only written once
     if (!qs->contains(defaultUAVGadgetManagerKey))
         qs->setValue(defaultUAVGadgetManagerKey, saveState().toBase64());
@@ -479,12 +477,11 @@ void UAVGadgetManager::saveSettings()
         qs->setValue(uavGadgetManagerKey, saveState().toBase64());
 }
 
-void UAVGadgetManager::readSettings()
+void UAVGadgetManager::readSettings(QSettings *qs)
 {
     QString defaultUAVGadgetManagerKey = QString("UAVGadgetManager/") + m_uavGadgetMode->uniqueModeName() + "/DefaultSettings";
     QString uavGadgetManagerKey = QString("UAVGadgetManager/") + m_uavGadgetMode->uniqueModeName() + "/Settings";
 
-    QSettings *qs = m_d->m_core->settings();
     QString key("");
     if (qs->contains(uavGadgetManagerKey))
         key = uavGadgetManagerKey;

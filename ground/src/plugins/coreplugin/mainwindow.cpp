@@ -270,16 +270,11 @@ void MainWindow::extensionsInitialized()
 {
 
     m_uavGadgetInstanceManager = new UAVGadgetInstanceManager(this);
-    m_uavGadgetInstanceManager->readConfigurations();
-
-    createWorkspaces();
-
-    m_viewManager->extensionsInitalized();
+    m_uavGadgetInstanceManager->readConfigurations(m_settings);
 
     m_messageManager->init();
+    readSettings(m_settings);
 
-    m_actionManager->initialize();
-    readSettings();
     updateContext();
 
     emit m_coreImpl->coreAboutToOpen();
@@ -301,7 +296,10 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 
     emit m_coreImpl->coreAboutToClose();
-    writeSettings();
+    saveSettings(m_settings);
+
+    m_uavGadgetInstanceManager->writeConfigurations(m_settings);
+
     event->accept();
 }
 
@@ -916,32 +914,40 @@ void MainWindow::shutdown()
 }
 
 void MainWindow::createWorkspaces() {
+
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 
-    m_settings->beginGroup(QLatin1String("Workspace"));
-    const int numberOfWorkspaces = m_settings->value(QLatin1String("NumberOfWorkspaces"), 2).toInt();
-
     UAVGadgetMode *uavGadgetMode;
-    Core::UAVGadgetManager *m_uavGadgetManager;
-    for (int i = 1; i <= numberOfWorkspaces; ++i) {
+    Core::UAVGadgetManager *uavGadgetManager;
 
-        m_uavGadgetManager = new Core::UAVGadgetManager(CoreImpl::instance(), this);
-        m_uavGadgetManager->hide();
-        QString numberString = QString::number(i);
-        QString defaultName = "Workspace" + numberString;
-        QString defaultIconName = "Icon" + numberString;
-        const QString name = m_settings->value(defaultName, defaultName).toString();
-        const QString iconName = m_settings->value(defaultIconName, ":/core/images/openpilot_logo_64.png").toString();
+    while (!m_uavGadgetModes.isEmpty()){
+        pm->removeObject(m_uavGadgetModes.takeFirst());
+    }
+    while (!m_uavGadgetManagers.isEmpty()){
+        Core::UAVGadgetManager* uavGadgetManager = m_uavGadgetManagers.takeLast();
+        uavGadgetManager->removeAllSplits();
+        // TODO Fixthis: This only happens, when settings are reloaded.
+        //      then the old GadgetManagers should be deleted, but if
+        //      I delete them the GCS segfaults.
+        //delete uavGadgetManager;
+    }
+    m_uavGadgetManagers.clear();
+    m_uavGadgetModes.clear();
+    for (int i = 0; i < m_workspaceSettings->numberOfWorkspaces(); ++i) {
 
-        uavGadgetMode = new UAVGadgetMode(m_uavGadgetManager, name,
-                                          QIcon(iconName), 90-i, QString("Mode" + numberString));
-        m_uavGadgetManager->setUAVGadgetMode(uavGadgetMode);
+        uavGadgetManager = new Core::UAVGadgetManager(CoreImpl::instance(), this);
+        uavGadgetManager->hide();
+        const QString name     = m_workspaceSettings->name(i);
+        const QString iconName = m_workspaceSettings->iconName(i);
+        const QString modeName = m_workspaceSettings->modeName(i);
+
+        uavGadgetMode = new UAVGadgetMode(uavGadgetManager, name,
+                                          QIcon(iconName), 90-i+1, modeName);
+        uavGadgetManager->setUAVGadgetMode(uavGadgetMode);
         m_uavGadgetModes.append(uavGadgetMode);
         pm->addObject(uavGadgetMode);
-        addUAVGadgetManager(m_uavGadgetManager);
+        addUAVGadgetManager(uavGadgetManager);
     }
-
-    m_settings->endGroup();
 }
 
 static const char *settingsGroup = "MainWindow";
@@ -952,53 +958,73 @@ static const char *fullScreenKey = "FullScreen";
 
 void MainWindow::readSettings()
 {
-    m_settings->beginGroup(QLatin1String(settingsGroup));
+    readSettings(m_settings);
+}
 
-    Utils::StyleHelper::setBaseColor(m_settings->value(QLatin1String(colorKey)).value<QColor>());
+void MainWindow::readSettings(QSettings* qs)
+{
 
-    const QVariant geom = m_settings->value(QLatin1String(geometryKey));
+    m_actionManager->readSettings(qs);
+
+    qs->beginGroup(QLatin1String(settingsGroup));
+
+    Utils::StyleHelper::setBaseColor(qs->value(QLatin1String(colorKey)).value<QColor>());
+
+    const QVariant geom = qs->value(QLatin1String(geometryKey));
     if (geom.isValid()) {
         setGeometry(geom.toRect());
     } else {
         resize(750, 400);
     }
-    if (m_settings->value(QLatin1String(maxKey), false).toBool())
+    if (qs->value(QLatin1String(maxKey), false).toBool())
         setWindowState(Qt::WindowMaximized);
-    setFullScreen(m_settings->value(QLatin1String(fullScreenKey), false).toBool());
+    setFullScreen(qs->value(QLatin1String(fullScreenKey), false).toBool());
 
-    m_settings->endGroup();
+    qs->endGroup();
+
+    m_workspaceSettings->readSettings(qs);
+
+    createWorkspaces();
 
     foreach (UAVGadgetManager *manager, m_uavGadgetManagers) {
-        manager->readSettings();
+        manager->readSettings(qs);
     }
-    //    m_rightPaneWidget->readSettings(m_settings);
+
+    m_viewManager->readSettings(qs);
+
 }
 
-void MainWindow::writeSettings()
+void MainWindow::saveSettings()
 {
-    m_settings->beginGroup(QLatin1String(settingsGroup));
+    saveSettings(m_settings);
+}
 
-    m_settings->setValue(QLatin1String(colorKey), Utils::StyleHelper::baseColor());
+void MainWindow::saveSettings(QSettings* qs)
+{
+    m_workspaceSettings->saveSettings(qs);
+
+    qs->beginGroup(QLatin1String(settingsGroup));
+
+    qs->setValue(QLatin1String(colorKey), Utils::StyleHelper::baseColor());
 
     if (windowState() & (Qt::WindowMaximized | Qt::WindowFullScreen)) {
-        m_settings->setValue(QLatin1String(maxKey), (bool) (windowState() & Qt::WindowMaximized));
-        m_settings->setValue(QLatin1String(fullScreenKey), (bool) (windowState() & Qt::WindowFullScreen));
+        qs->setValue(QLatin1String(maxKey), (bool) (windowState() & Qt::WindowMaximized));
+        qs->setValue(QLatin1String(fullScreenKey), (bool) (windowState() & Qt::WindowFullScreen));
     } else {
-        m_settings->setValue(QLatin1String(maxKey), false);
-        m_settings->setValue(QLatin1String(fullScreenKey), false);
-        m_settings->setValue(QLatin1String(geometryKey), geometry());
+        qs->setValue(QLatin1String(maxKey), false);
+        qs->setValue(QLatin1String(fullScreenKey), false);
+        qs->setValue(QLatin1String(geometryKey), geometry());
     }
 
-    m_settings->endGroup();
-
-    m_viewManager->saveSettings(m_settings);
-    m_actionManager->saveSettings(m_settings);
-
-    m_uavGadgetInstanceManager->writeConfigurations();
+    qs->endGroup();
 
     foreach (UAVGadgetManager *manager, m_uavGadgetManagers) {
-        manager->saveSettings();
+        manager->saveSettings(qs);
     }
+
+    m_viewManager->saveSettings(qs);
+    m_actionManager->saveSettings(qs);
+
 }
 
 void MainWindow::addAdditionalContext(int context)

@@ -2,10 +2,12 @@
  ******************************************************************************
  *
  * @file       importexportgadgetfactory.cpp
- * @author     Edouard Lafargue Copyright (C) 2010.
- * @brief
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   importexportplugin
+ * @brief      Factory for Import/Export Plugin
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup   importexportplugin
  * @{
  *
  *****************************************************************************/
@@ -58,3 +60,7 @@ IOptionsPage *ImportExportGadgetFactory::createOptionsPage(IUAVGadgetConfigurati
     return new ImportExportGadgetOptionsPage(qobject_cast<ImportExportGadgetConfiguration*>(config));
 }
 
+/**
+ * @}
+ * @}
+ */

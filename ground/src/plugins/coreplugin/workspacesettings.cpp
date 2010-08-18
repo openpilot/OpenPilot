@@ -76,29 +76,16 @@ QWidget *WorkspaceSettings::createPage(QWidget *parent)
     QWidget *w = new QWidget(parent);
     m_page->setupUi(w);
 
-    // Read workspaces from settings
     m_page->numberOfWorkspacesSpinBox->setMaximum(MAX_WORKSPACES);
-    m_modeManager = Core::ICore::instance()->modeManager();
-    m_settings = Core::ICore::instance()->settings();
-    m_settings->beginGroup(QLatin1String("Workspace"));
-    const int numberOfWorkspaces = m_settings->value(QLatin1String("NumberOfWorkspaces"), 2).toInt();
-    m_page->numberOfWorkspacesSpinBox->setValue(numberOfWorkspaces);
-    for (int i = 1; i <= MAX_WORKSPACES; ++i) {
-        QString numberString = QString::number(i);
-        QString defaultName = "Workspace" + numberString;
-        QString defaultIconName = "Icon" + numberString;
-        const QString name = m_settings->value(defaultName, defaultName).toString();
-        const QString iconName = m_settings->value(defaultIconName, ":/core/images/openpilot_logo_64.png").toString();
-        m_iconNames.append(iconName);
-        m_names.append(name);
-        if (i <= numberOfWorkspaces)
-            m_page->workspaceComboBox->addItem(QIcon(iconName), name);
+    m_page->numberOfWorkspacesSpinBox->setValue(m_numberOfWorkspaces);
+    for (int i = 0; i < m_numberOfWorkspaces; ++i) {
+        m_page->workspaceComboBox->addItem(QIcon(m_iconNames.at(i)), m_names.at(i));
     }
+
     m_page->iconPathChooser->setExpectedKind(Utils::PathChooser::File);
     m_page->iconPathChooser->setPromptDialogFilter(tr("Images (*.png *.jpg *.bmp *.xpm)"));
     m_page->iconPathChooser->setPromptDialogTitle(tr("Choose icon"));
 
-    m_settings->endGroup();
 
     connect(m_page->workspaceComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(selectWorkspace(int)));
     connect(m_page->numberOfWorkspacesSpinBox, SIGNAL(valueChanged(int)), this, SLOT(numberOfWorkspacesChanged(int)));
@@ -111,25 +98,53 @@ QWidget *WorkspaceSettings::createPage(QWidget *parent)
     return w;
 }
 
-void WorkspaceSettings::apply()
+void WorkspaceSettings::readSettings(QSettings* qs)
 {
-    selectWorkspace(m_currentIndex, true);
+    m_iconNames.clear();
+    m_names.clear();
 
-    m_settings->beginGroup(QLatin1String("Workspace"));
-    m_settings->setValue(QLatin1String("NumberOfWorkspaces"), m_page->numberOfWorkspacesSpinBox->value());
+    qs->beginGroup(QLatin1String("Workspace"));
+    m_numberOfWorkspaces = qs->value(QLatin1String("NumberOfWorkspaces"), 2).toInt();
     for (int i = 1; i <= MAX_WORKSPACES; ++i) {
         QString numberString = QString::number(i);
         QString defaultName = "Workspace" + numberString;
         QString defaultIconName = "Icon" + numberString;
-        m_settings->setValue(defaultName, m_names.at(i-1));
-        m_settings->setValue(defaultIconName, m_iconNames.at(i-1));
-        QString modeName = "Mode" + numberString;
-        Core::Internal::UAVGadgetMode *mode = qobject_cast<Core::Internal::UAVGadgetMode*>(m_modeManager->mode(modeName));
+        const QString name = qs->value(defaultName, defaultName).toString();
+        const QString iconName = qs->value(defaultIconName, ":/core/images/openpilot_logo_64.png").toString();
+        m_iconNames.append(iconName);
+        m_names.append(name);
+    }
+    qs->endGroup();
+}
+
+void WorkspaceSettings::saveSettings(QSettings* qs)
+{
+    qs->beginGroup(QLatin1String("Workspace"));
+    qs->setValue(QLatin1String("NumberOfWorkspaces"), m_numberOfWorkspaces);
+    for (int i = 0; i < MAX_WORKSPACES; ++i) {
+        QString numberString = QString::number(i+1);
+        QString defaultName = "Workspace" + numberString;
+        QString defaultIconName = "Icon" + numberString;
+        qs->setValue(defaultName, m_names.at(i));
+        qs->setValue(defaultIconName, m_iconNames.at(i));
+    }
+    qs->endGroup();
+}
+
+void WorkspaceSettings::apply()
+{
+    selectWorkspace(m_currentIndex, true);
+
+    saveSettings(Core::ICore::instance()->settings());
+
+    ModeManager* modeManager = Core::ICore::instance()->modeManager();
+    for (int i = 0; i < MAX_WORKSPACES; ++i) {
+        Core::Internal::UAVGadgetMode *mode =
+                qobject_cast<Core::Internal::UAVGadgetMode*>(modeManager->mode(modeName(i)));
         if (mode) {
-            m_modeManager->updateModeNameIcon(mode, QIcon(m_iconNames.at(i-1)), m_names.at(i-1));
+            modeManager->updateModeNameIcon(mode, QIcon(iconName(i)), name(i));
         }
     }
-    m_settings->endGroup();
 
 }
 
@@ -151,6 +166,7 @@ void WorkspaceSettings::iconChanged()
 
 void WorkspaceSettings::numberOfWorkspacesChanged(int value)
 {
+    m_numberOfWorkspaces = value;
     int count = m_page->workspaceComboBox->count();
     if (value > count) {
         for (int i = count; i < value; ++i) {

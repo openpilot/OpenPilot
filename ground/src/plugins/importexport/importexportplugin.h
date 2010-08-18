@@ -1,13 +1,12 @@
 /**
  ******************************************************************************
- *
- * @file       importexportplugin.h
- * @author     Edouard Lafargue Copyright (C) 2010.
- * @brief
+ * @file
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   importexportplugin
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- *
+ * @addtogroup importexportplugin
+ * @{
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -36,13 +35,17 @@ class ImportExportGadgetFactory;
 class IMPORTEXPORT_EXPORT ImportExportPlugin : public ExtensionSystem::IPlugin
 {
 public:
-        ImportExportPlugin();
-        ~ImportExportPlugin();
+    ImportExportPlugin();
+    ~ImportExportPlugin();
 
-   void extensionsInitialized();
-   bool initialize(const QStringList & arguments, QString * errorString);
-   void shutdown();
+    void extensionsInitialized();
+    bool initialize(const QStringList & arguments, QString * errorString);
+    void shutdown();
 private:
-   ImportExportGadgetFactory *mf;
+    ImportExportGadgetFactory *mf;
 };
 #endif /* IMPORTEXPORTPLUGIN_H_ */
+/**
+ * @}
+ * @}
+ */

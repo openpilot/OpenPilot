@@ -1,10 +1,12 @@
 /**
  ******************************************************************************
  *
- * @file       importexportplugin.h
- * @author     Edouard Lafargue Copyright (C) 2010.
- * @brief
+ * @file       importexportplugin.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
+ * @brief      Import/Export Plugin
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
  * @defgroup   importexportplugin
  * @{
  *
@@ -35,32 +37,36 @@
 
 ImportExportPlugin::ImportExportPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
 ImportExportPlugin::~ImportExportPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
 bool ImportExportPlugin::initialize(const QStringList& args, QString *errMsg)
 {
-   Q_UNUSED(args);
-   Q_UNUSED(errMsg);
-   mf = new ImportExportGadgetFactory(this);
-   addAutoReleasedObject(mf);
+    Q_UNUSED(args);
+    Q_UNUSED(errMsg);
+    mf = new ImportExportGadgetFactory(this);
+    addAutoReleasedObject(mf);
 
-   return true;
+    return true;
 }
 
 void ImportExportPlugin::extensionsInitialized()
 {
-   // Do nothing
+    // Do nothing
 }
 
 void ImportExportPlugin::shutdown()
 {
-   // Do nothing
+    // Do nothing
 }
 Q_EXPORT_PLUGIN(ImportExportPlugin)
 
+/**
+ * @}
+ * @}
+ */

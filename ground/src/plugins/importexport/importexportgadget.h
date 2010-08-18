@@ -1,13 +1,12 @@
 /**
  ******************************************************************************
- *
- * @file       importexportgadget.h
- * @author     Edouard Lafargue Copyright (C) 2010.
- * @brief      Bargraph gadget with red/yellow/green zones
+ * @file
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   importexportplugin
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- *
+ * @addtogroup importexportplugin
+ * @{
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -45,7 +44,9 @@ public:
     ImportExportGadget(QString classId, ImportExportGadgetWidget *widget, QWidget *parent = 0);
     ~ImportExportGadget();
 
-    QWidget *widget() { return m_widget; }
+    QWidget *widget() {
+        return m_widget;
+    }
     void loadConfiguration(IUAVGadgetConfiguration* config);
 
 private:
@@ -54,3 +55,8 @@ private:
 
 
 #endif // IMPORTEXPORTGADGET_H_
+
+/**
+ * @}
+ * @}
+ */

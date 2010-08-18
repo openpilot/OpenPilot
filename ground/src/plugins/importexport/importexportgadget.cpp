@@ -2,10 +2,12 @@
  ******************************************************************************
  *
  * @file       importexportgadget.cpp
- * @author     Erhard Siegl Copyright (C) 2010.
- * @brief
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   importexportplugin
+ * @brief      Gadget for Import/Export Plugin
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup   importexportplugin
  * @{
  *
  *****************************************************************************/
@@ -50,3 +52,7 @@ void ImportExportGadget::loadConfiguration(IUAVGadgetConfiguration* config)
     ImportExportGadgetConfiguration *m = qobject_cast<ImportExportGadgetConfiguration*>(config);
     m_widget->setDialFile(m->getDialFile());
 }
+/**
+ * @}
+ * @}
+ */

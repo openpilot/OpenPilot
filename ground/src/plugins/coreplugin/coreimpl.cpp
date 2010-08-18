@@ -186,3 +186,13 @@ void CoreImpl::openFiles(const QStringList &arguments)
     //m_mainwindow->openFiles(arguments);
 }
 
+void CoreImpl::readMainSettings(QSettings* qs)
+{
+    m_mainwindow->readSettings(qs);
+}
+
+void CoreImpl::saveMainSettings(QSettings* qs)
+{
+    m_mainwindow->saveSettings(qs);
+}
+

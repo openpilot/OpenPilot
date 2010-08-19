@@ -43,8 +43,7 @@
 #define TASK_PRIORITY	(tskIDLE_PRIORITY + 3)
 #define ENABLE_DEBUG_MSG
 //#define DUMP_CONFIG		// Enable this do read and dump the OSD config
-//#define WRITE_CONFIG		// Enable this do write and verify the OSD config
-//#define DO_PAR_SEEK		// Enable this to start a tool to find where parameters are encoded
+
 
 
 //
@@ -60,6 +59,8 @@
 #define CONFIG_LENGTH 6726
 #define MIN(a,b) ((a)<(b)?(a):(b))
 
+#define OSD_ADDRESS         0x30
+
 #define OSDMSG_V_LS_IDX		10
 #define OSDMSG_A_LS_IDX		17
 #define OSDMSG_VA_MS_IDX	18
@@ -74,6 +75,10 @@
 #define OSDMSG_GPS_STAT_FIX		0x2B
 #define OSDMSG_GPS_STAT_HB_FLAG	0x10
 
+static const char* UpdateConfFilePath = "/etosd/update.ocf";
+#ifdef DUMP_CONFIG
+static const char* DumpConfFilePath = "/etosd/dump.ocf";
+#endif
 
 
 //
@@ -171,9 +176,232 @@ static void PositionActualUpdatedCb(UAVObjEvent* ev)
 	newPosData = TRUE;
 }
 
+
+static bool Read(uint32_t start, uint8_t length, uint8_t* buffer)
+{
+	uint8_t cmd[5];
+
+	const struct pios_i2c_txn txn_list[] =
+    {
+        {
+            .addr = OSD_ADDRESS,
+            .rw = PIOS_I2C_TXN_WRITE,
+            .len = sizeof(cmd),
+            .buf = cmd,
+        },
+        {
+            .addr = OSD_ADDRESS,
+            .rw = PIOS_I2C_TXN_READ,
+            .len = length,
+            .buf = buffer,
+        },
+    };
+
+	cmd[0] = 0x02;
+	cmd[1] = 0x05;
+	cmd[2] = (uint8_t)(start & 0xFF);
+	cmd[3] = (uint8_t)(start >> 8);
+	cmd[4] = length;
+
+	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
+}
+
+static bool Write(uint32_t start, uint8_t length, const uint8_t* buffer)
+{
+    uint8_t cmd[125];
+    uint8_t ack[3];
+
+    const struct pios_i2c_txn txn_list1[] =
+    {
+            {
+                    .addr = OSD_ADDRESS,
+                    .rw = PIOS_I2C_TXN_WRITE,
+                    .len = sizeof(cmd),
+                    .buf = cmd,
+            },
+            {
+                    .addr = OSD_ADDRESS,
+                    .rw = PIOS_I2C_TXN_READ,
+                    .len = sizeof(ack),
+                    .buf = ack,
+            },
+    };
+
+    if (length+5>sizeof(cmd))
+    {
+        // Too big
+        return FALSE;
+    }
+
+    cmd[0] = 0x01;
+    cmd[1] = 0x7D;
+    cmd[2] = (uint8_t)(start & 0xFF);
+    cmd[3] = (uint8_t)(start >> 8);
+    cmd[4] = length;
+    memcpy(&cmd[5], buffer, length);
+
+    ack[0] = 0;
+
+    if (PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list1, NELEMENTS(txn_list1)))
+    {
+        //DEBUG_MSG("ACK=%d ", ack[0]);
+        if (ack[0] == 49)
+        {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
+}
+
+static uint32_t ReadSwVersion(void)
+{
+    uint8_t buf[4];
+    uint32_t version = 0;
+
+    if (Read(0, 4, buf))
+    {
+        version =  (buf[0]-'0')*100;
+        version += (buf[2]-'0')*10;
+        version += (buf[3]-'0');
+    }
+
+    return version;
+}
+
+
+static void UpdateConfig(void)
+{
+    uint8_t buf[120];
+    uint32_t addr=0;
+    uint32_t n;
+    FILEINFO file;
+    uint32_t res;
+
+    // Try to open the file that contains a new config
+    res = DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t*)UpdateConfFilePath, DFS_READ, PIOS_SDCARD_Sector, &file);
+    if (res==DFS_OK)
+    {
+        uint32_t bytesRead;
+        bool ok = TRUE;
+
+        DEBUG_MSG("Updating Config ");
+
+        // Write the config-data in blocks to OSD
+        while (addr<CONFIG_LENGTH && ok)
+        {
+            n = MIN(CONFIG_LENGTH-addr, sizeof(buf));
+            res = DFS_ReadFile(&file, PIOS_SDCARD_Sector, buf, &bytesRead, n);
+            if (res==DFS_OK && bytesRead==n)
+            {
+                ok = Write(addr, n, buf);
+                if (ok)
+                {
+                    //DEBUG_MSG(" %d %d\n", addr, n);
+                    DEBUG_MSG(".");
+                    addr += n;
+                }
+            }
+        }
+
+      DEBUG_MSG(ok?" OK\n":"FAILURE\n");
+
+      // If writing is OK, read the data back and verify
+      if (ok)
+      {
+          DEBUG_MSG("Verify Config ");
+          DFS_Seek(&file, 0, PIOS_SDCARD_Sector);
+
+          addr = 0;
+          while (addr<CONFIG_LENGTH && ok)
+          {
+              // First half of the buffer is used to store the data read from the OSD, the second half will contain the data from the file
+              n = MIN(CONFIG_LENGTH-addr, sizeof(buf)/2);
+              ok = Read(addr, n, buf);
+              if (ok)
+              {
+                  uint32_t bytesRead;
+                  res = DFS_ReadFile(&file, PIOS_SDCARD_Sector, buf+sizeof(buf)/2, &bytesRead, n);
+                  if (res==DFS_OK && bytesRead==n)
+                  {
+                      DEBUG_MSG(".");
+                      addr += n;
+
+                      if (memcmp(buf, buf+sizeof(buf)/2, n)!=0)
+                      {
+                          DEBUG_MSG(" MISMATCH ");
+                          ok = FALSE;
+                      }
+                  }
+              }
+          }
+          DEBUG_MSG(ok?" OK\n":"FAILURE\n");
+      }
+
+      DFS_Close(&file);
+
+      // When the config was updated correctly, remove the config-file
+      if (ok)
+      {
+          DFS_UnlinkFile(&PIOS_SDCARD_VolInfo, (uint8_t*)UpdateConfFilePath, PIOS_SDCARD_Sector);
+      }
+
+    }
+}
+
+
+static void DumpConfig(void)
+{
+#ifdef DUMP_CONFIG
+    uint8_t buf[100];
+    uint32_t addr=0;
+    uint32_t n;
+    FILEINFO file;
+    uint32_t res;
+
+
+
+    DEBUG_MSG("Dumping Config ");
+
+    res = DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t*)DumpConfFilePath, DFS_WRITE, PIOS_SDCARD_Sector, &file);
+    if (res==DFS_OK)
+    {
+      uint32_t bytesWritten;
+      bool ok = TRUE;
+
+      while (addr<CONFIG_LENGTH && ok)
+      {
+          n = MIN(CONFIG_LENGTH-addr, sizeof(buf));
+          ok = Read(addr, n, buf);
+          if (ok)
+          {
+               res = DFS_WriteFile(&file, PIOS_SDCARD_Sector, buf, &bytesWritten, n);
+               if (res==DFS_OK && bytesWritten==n)
+               {
+                   //DEBUG_MSG(" %d %d\n", addr, n);
+                   DEBUG_MSG(".");
+                   addr += n;
+               }
+          }
+      }
+
+      DEBUG_MSG(ok?" OK\n":"FAILURE\n");
+
+      DFS_Close(&file);
+    }
+    else
+    {
+      DEBUG_MSG("Error Opening File %x\n", res);
+    }
+#endif
+}
+
+
+
 static void Task(void* parameters)
 {
 	uint32_t cnt = 0;
+	uint32_t version = 0;
 
 #ifdef ENABLE_DEBUG_MSG
 	PIOS_COM_ChangeBaud(DEBUG_PORT, 57600);
@@ -183,12 +411,22 @@ static void Task(void* parameters)
 	FlightBatteryStateConnectCallback(FlightBatteryStateUpdatedCb);
 
 
-	DEBUG_MSG("OSD ET Std Started\n");
-	vTaskDelay(2000 / portTICK_RATE_MS);
+	DEBUG_MSG("OSD ET Std\n");
+	version = ReadSwVersion();
+	DEBUG_MSG("SW: %d\n", version);
+
+	if (version != 115)
+	{
+	    DEBUG_MSG("INVALID SW VERSION\n");
+	    return;
+	}
+
+	UpdateConfig();
+	DumpConfig();
 
 	while (1)
 	{
-		DEBUG_MSG("%d\n\r", cnt);
+		//DEBUG_MSG("%d\n\r", cnt);
 #if 1
 		if ( newBattData )
 		{
@@ -196,7 +434,7 @@ static void Task(void* parameters)
 
 			FlightBatteryStateGet(&flightBatteryData);
 
-			DEBUG_MSG("%5d Batt: V=%dmV\n\r", cnt, (uint32_t)(flightBatteryData.Voltage*1000));
+			//DEBUG_MSG("%5d Batt: V=%dmV\n\r", cnt, (uint32_t)(flightBatteryData.Voltage*1000));
 
 			SetVoltage((uint32_t)(flightBatteryData.Voltage*1000));
 			SetCurrent((uint32_t)(flightBatteryData.Current*1000));
@@ -210,8 +448,8 @@ static void Task(void* parameters)
 
 			PositionActualGet(&positionData);
 
-			DEBUG_MSG("%5d Pos: #stat=%d #sats=%d alt=%d\n\r", cnt,
-					positionData.Status, positionData.Satellites, (uint32_t)positionData.Altitude);
+			//DEBUG_MSG("%5d Pos: #stat=%d #sats=%d alt=%d\n\r", cnt,
+			//		positionData.Status, positionData.Satellites, (uint32_t)positionData.Altitude);
 
 			// GPS Status
 			if (positionData.Status == POSITIONACTUAL_STATUS_FIX3D)
@@ -236,11 +474,11 @@ static void Task(void* parameters)
 		}
 #endif
 
-		DEBUG_MSG("SendMsg .");
+		//DEBUG_MSG("SendMsg .");
 		{
 			const struct pios_i2c_txn txn_list[] = {
 				{
-				  .addr = 0x30,
+				  .addr = OSD_ADDRESS,
 				  .rw   = PIOS_I2C_TXN_WRITE,
 				  .len  = sizeof(msg),
 				  .buf  = msg,
@@ -250,7 +488,7 @@ static void Task(void* parameters)
 			PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
 		}
 
-		DEBUG_MSG("\n\r");
+		//DEBUG_MSG("\n\r");
 
 		cnt++;
 

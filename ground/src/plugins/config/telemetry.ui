@@ -69,6 +69,9 @@ p, li { white-space: pre-wrap; }
       <height>31</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Select the speed here.</string>
+    </property>
    </widget>
    <widget class="QPushButton" name="saveTelemetryToRAM">
     <property name="geometry">
@@ -81,7 +84,7 @@ p, li { white-space: pre-wrap; }
     </property>
     <property name="toolTip">
      <string>Send to OpenPilot but don't write in SD.
-Be sure to set the Neutral position on all sliders before sending!</string>
+Beware of not locking yourself out!</string>
     </property>
     <property name="text">
      <string>Save to RAM</string>
@@ -113,8 +116,8 @@ Be sure to set the Neutral position on all sliders before sending!</string>
      </rect>
     </property>
     <property name="toolTip">
-     <string>Be sure to set the Neutral position on all sliders before sending!
-Applies and Saves all settings to SD</string>
+     <string>Applies and Saves all settings to SD.
+Beware of not locking yourself out!</string>
     </property>
     <property name="text">
      <string>Save to SD</string>

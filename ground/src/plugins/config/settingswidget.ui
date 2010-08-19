@@ -18,12 +18,12 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>641</width>
+     <width>601</width>
      <height>381</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -250,7 +250,7 @@ p, li { white-space: pre-wrap; }
     <widget class="QPushButton" name="getRCInputCurrent">
      <property name="geometry">
       <rect>
-       <x>310</x>
+       <x>270</x>
        <y>310</y>
        <width>93</width>
        <height>27</height>
@@ -413,7 +413,7 @@ p, li { white-space: pre-wrap; }
     <widget class="QPushButton" name="saveRCInputToSD">
      <property name="geometry">
       <rect>
-       <x>530</x>
+       <x>490</x>
        <y>310</y>
        <width>93</width>
        <height>27</height>
@@ -487,7 +487,7 @@ Applies and Saves all settings to SD</string>
     <widget class="QPushButton" name="saveRCInputToRAM">
      <property name="geometry">
       <rect>
-       <x>420</x>
+       <x>380</x>
        <y>310</y>
        <width>93</width>
        <height>27</height>
@@ -1124,7 +1124,7 @@ Uncheck/Check to restart calibration.</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>20</y>
+       <y>10</y>
        <width>221</width>
        <height>17</height>
       </rect>
@@ -1247,6 +1247,13 @@ Uncheck/Check to restart calibration.</string>
        <pointsize>8</pointsize>
       </font>
      </property>
+     <property name="toolTip">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Select the kind of actuator (servo) connected to this output channel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
     </widget>
     <widget class="QSpinBox" name="ch0OutMin">
      <property name="enabled">
@@ -1264,6 +1271,13 @@ Uncheck/Check to restart calibration.</string>
       <font>
        <pointsize>8</pointsize>
       </font>
+     </property>
+     <property name="toolTip">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Minimum PWM value, beware of not overdriving your servo.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="maximum">
       <number>9999</number>
@@ -1286,24 +1300,34 @@ Uncheck/Check to restart calibration.</string>
        <pointsize>8</pointsize>
       </font>
      </property>
+     <property name="toolTip">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Maximum PWM value, beware of not overdriving your servo.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="maximum">
       <number>9999</number>
      </property>
     </widget>
-    <widget class="QCheckBox" name="ch0OutTest">
+    <widget class="QCheckBox" name="channelOutTest">
      <property name="enabled">
       <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
-       <x>580</x>
-       <y>70</y>
-       <width>61</width>
+       <x>10</x>
+       <y>40</y>
+       <width>151</width>
        <height>22</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>If checked, moving the sliders below with also move the servos directly. Take extra care if the output is connected to an motor controller!</string>
+     </property>
      <property name="text">
-      <string>Test</string>
+      <string>Test outputs</string>
      </property>
     </widget>
     <widget class="QLabel" name="actuator6Label">
@@ -1411,22 +1435,6 @@ Uncheck/Check to restart calibration.</string>
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-    <widget class="QCheckBox" name="ch1OutTest">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>580</x>
-       <y>100</y>
-       <width>61</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Test</string>
-     </property>
-    </widget>
     <widget class="QComboBox" name="ch2Output">
      <property name="enabled">
       <bool>true</bool>
@@ -1504,22 +1512,6 @@ Uncheck/Check to restart calibration.</string>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="ch2OutTest">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>580</x>
-       <y>130</y>
-       <width>61</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Test</string>
      </property>
     </widget>
     <widget class="QComboBox" name="ch3Output">
@@ -1601,22 +1593,6 @@ Uncheck/Check to restart calibration.</string>
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-    <widget class="QCheckBox" name="ch3OutTest">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>580</x>
-       <y>160</y>
-       <width>61</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Test</string>
-     </property>
-    </widget>
     <widget class="QComboBox" name="ch4Output">
      <property name="geometry">
       <rect>
@@ -1682,19 +1658,6 @@ Uncheck/Check to restart calibration.</string>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="ch4OutTest">
-     <property name="geometry">
-      <rect>
-       <x>580</x>
-       <y>190</y>
-       <width>61</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Test</string>
      </property>
     </widget>
     <widget class="QComboBox" name="ch5Output">
@@ -1764,19 +1727,6 @@ Uncheck/Check to restart calibration.</string>
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-    <widget class="QCheckBox" name="ch5OutTest">
-     <property name="geometry">
-      <rect>
-       <x>580</x>
-       <y>220</y>
-       <width>61</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Test</string>
-     </property>
-    </widget>
     <widget class="QComboBox" name="ch6Output">
      <property name="geometry">
       <rect>
@@ -1842,19 +1792,6 @@ Uncheck/Check to restart calibration.</string>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="ch6OutTest">
-     <property name="geometry">
-      <rect>
-       <x>580</x>
-       <y>250</y>
-       <width>61</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Test</string>
      </property>
     </widget>
     <widget class="QComboBox" name="ch7Output">
@@ -1924,23 +1861,10 @@ Uncheck/Check to restart calibration.</string>
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-    <widget class="QCheckBox" name="ch7OutTest">
-     <property name="geometry">
-      <rect>
-       <x>580</x>
-       <y>280</y>
-       <width>61</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Test</string>
-     </property>
-    </widget>
     <widget class="QPushButton" name="saveRCOutputToSD">
      <property name="geometry">
       <rect>
-       <x>530</x>
+       <x>480</x>
        <y>310</y>
        <width>93</width>
        <height>27</height>
@@ -1957,7 +1881,7 @@ Applies and Saves all settings to SD</string>
     <widget class="QPushButton" name="getRCOutputCurrent">
      <property name="geometry">
       <rect>
-       <x>310</x>
+       <x>260</x>
        <y>310</y>
        <width>93</width>
        <height>27</height>
@@ -1973,7 +1897,7 @@ Applies and Saves all settings to SD</string>
     <widget class="QPushButton" name="saveRCOutputToRAM">
      <property name="geometry">
       <rect>
-       <x>420</x>
+       <x>370</x>
        <y>310</y>
        <width>93</width>
        <height>27</height>
@@ -2076,6 +2000,9 @@ Be sure to set the Neutral position on all sliders before sending!</string>
        <width>41</width>
        <height>17</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>Current value of slider.</string>
      </property>
      <property name="text">
       <string>0000</string>

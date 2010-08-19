@@ -59,6 +59,8 @@ private:
         void updateObjectPersistance(ObjectPersistence::OperationOptions op, UAVObject *obj);
         void assignChannel(UAVDataObject *obj, UAVObjectField *field, QString str);
         void assignOutputChannel(UAVDataObject *obj, UAVObjectField *field, QString str);
+        int mccDataRate;
+        UAVObject::Metadata accInitialData;
 
         bool firstUpdate;
 
@@ -76,6 +78,8 @@ private:
         void requestTelemetryUpdate();
         void sendTelemetryUpdate();
         void saveTelemetryUpdate();
+        void runChannelTests(bool state);
+        void sendChannelTest(int value);
 
         void setch0OutRange();
         void setch1OutRange();

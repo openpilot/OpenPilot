@@ -139,6 +139,7 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_config->ch6OutMax, SIGNAL(editingFinished()), this, SLOT(setch6OutRange()));
     connect(m_config->ch7OutMax, SIGNAL(editingFinished()), this, SLOT(setch7OutRange()));
 
+    connect(m_config->channelOutTest, SIGNAL(toggled(bool)), this, SLOT(runChannelTests(bool)));
 
     requestRCInputUpdate();
     requestRCOutputUpdate();
@@ -161,6 +162,8 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_telemetry->saveTelemetryToRAM, SIGNAL(clicked()), this, SLOT(sendTelemetryUpdate()));
     connect(m_telemetry->getTelemetryCurrent, SIGNAL(clicked()), this, SLOT(requestTelemetryUpdate()));
 
+    // Now connect the channel out sliders to our signal to send updates in test mode
+    connect(m_config->ch0OutSlider, SIGNAL(valueChanged(int)), this, SLOT(sendChannelTest(int)));
 
     firstUpdate = true;
 
@@ -175,6 +178,59 @@ void ConfigGadgetWidget::resizeEvent(QResizeEvent *event)
 {
 
     QWidget::resizeEvent(event);
+}
+
+/**
+  Sends the channel value to the UAV to move the servo.
+  Returns immediately if we are not in testing mode
+  */
+void ConfigGadgetWidget::sendChannelTest(int value)
+{
+    if (!m_config->channelOutTest->isChecked())
+        return;
+
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorCommand")));
+
+    QObject *ob = QObject::sender();
+    QStringList channelsList;
+    channelsList << "ch0OutSlider" << "ch1OutSlider" << "ch2OutSlider" << "ch3OutSlider" << "ch4OutSlider"
+            << "ch5OutSlider" << "ch6OutSlider" << "ch7OutSlider";
+    int idx = channelsList.indexOf(QRegExp(ob->objectName()));
+    UAVObjectField * channel = obj->getField("Channel");
+    channel->setValue(value,idx);
+    obj->updated();
+
+}
+
+/**
+  Toggles the channel testing mode by making the GCS take over
+  the ActuatorCommand objects
+  */
+void ConfigGadgetWidget::runChannelTests(bool state)
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorCommand")));
+    UAVObject::Metadata mdata = obj->getMetadata();
+    if (state)
+    {
+        accInitialData = mdata;
+        mdata.flightAccess = UAVObject::ACCESS_READONLY;
+        mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
+        mdata.gcsTelemetryAcked = false;
+        mdata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
+        mdata.gcsTelemetryUpdatePeriod = 100;
+    }
+    else
+    {
+        mdata = accInitialData; // Restore metadata
+    }
+    obj->setMetadata(mdata);
+
 }
 
 /**************************
@@ -483,57 +539,119 @@ void ConfigGadgetWidget::saveRCOutputObject()
     Q_ASSERT(obj);
     updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
 
-    /*
-    UAVDataObject* obj2 = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("SystemSettings")));
-    Q_ASSERT(obj2);
-    updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj2);
-    */
 }
 
 
 /**
-  Sets the minimum/maximem value of the channel 0 output slider.
-  Have to do it here because setMinimum is not a slot
+  Sets the minimum/maximem value of the channel 0 to seven output sliders.
+  Have to do it here because setMinimum is not a slot.
+
+  One added trik: if the slider is at either its max or its min when the value
+  is changed, then keep it on the max/min.
   */
 void ConfigGadgetWidget::setch0OutRange()
 {
-    m_config->ch0OutSlider->setRange(m_config->ch0OutMin->value(),
+    QSlider *slider = m_config->ch0OutSlider;
+    int oldMini = slider->minimum();
+    int oldMaxi = slider->maximum();
+    slider->setRange(m_config->ch0OutMin->value(),
                                      m_config->ch0OutMax->value());
+    if (slider->value()==oldMini)
+        slider->setValue(slider->minimum());
+
+    if (slider->value()==oldMaxi)
+        slider->setValue(slider->maximum());
 }
 void ConfigGadgetWidget::setch1OutRange()
 {
-    m_config->ch1OutSlider->setRange(m_config->ch1OutMin->value(),
+    QSlider *slider = m_config->ch1OutSlider;
+    int oldMini = slider->minimum();
+    int oldMaxi = slider->maximum();
+    slider->setRange(m_config->ch1OutMin->value(),
                                      m_config->ch1OutMax->value());
+    if (slider->value()==oldMini)
+        slider->setValue(slider->minimum());
+
+    if (slider->value()==oldMaxi)
+        slider->setValue(slider->maximum());
 }
 void ConfigGadgetWidget::setch2OutRange()
 {
-    m_config->ch2OutSlider->setRange(m_config->ch2OutMin->value(),
+    QSlider *slider = m_config->ch2OutSlider;
+    int oldMini = slider->minimum();
+    int oldMaxi = slider->maximum();
+    slider->setRange(m_config->ch2OutMin->value(),
                                      m_config->ch2OutMax->value());
+    if (slider->value()==oldMini)
+        slider->setValue(slider->minimum());
+
+    if (slider->value()==oldMaxi)
+        slider->setValue(slider->maximum());
 }
 void ConfigGadgetWidget::setch3OutRange()
 {
-    m_config->ch3OutSlider->setRange(m_config->ch3OutMin->value(),
+    QSlider *slider = m_config->ch3OutSlider;
+    int oldMini = slider->minimum();
+    int oldMaxi = slider->maximum();
+    slider->setRange(m_config->ch3OutMin->value(),
                                      m_config->ch3OutMax->value());
+    if (slider->value()==oldMini)
+        slider->setValue(slider->minimum());
+
+    if (slider->value()==oldMaxi)
+        slider->setValue(slider->maximum());
 }
 void ConfigGadgetWidget::setch4OutRange()
 {
-    m_config->ch4OutSlider->setRange(m_config->ch4OutMin->value(),
+    QSlider *slider = m_config->ch4OutSlider;
+    int oldMini = slider->minimum();
+    int oldMaxi = slider->maximum();
+    slider->setRange(m_config->ch4OutMin->value(),
                                      m_config->ch4OutMax->value());
+    if (slider->value()==oldMini)
+        slider->setValue(slider->minimum());
+
+    if (slider->value()==oldMaxi)
+        slider->setValue(slider->maximum());
 }
 void ConfigGadgetWidget::setch5OutRange()
 {
-    m_config->ch5OutSlider->setRange(m_config->ch5OutMin->value(),
+    QSlider *slider = m_config->ch5OutSlider;
+    int oldMini = slider->minimum();
+    int oldMaxi = slider->maximum();
+    slider->setRange(m_config->ch5OutMin->value(),
                                      m_config->ch5OutMax->value());
+    if (slider->value()==oldMini)
+        slider->setValue(slider->minimum());
+
+    if (slider->value()==oldMaxi)
+        slider->setValue(slider->maximum());
 }
 void ConfigGadgetWidget::setch6OutRange()
 {
-    m_config->ch6OutSlider->setRange(m_config->ch6OutMin->value(),
+    QSlider *slider = m_config->ch6OutSlider;
+    int oldMini = slider->minimum();
+    int oldMaxi = slider->maximum();
+    slider->setRange(m_config->ch6OutMin->value(),
                                      m_config->ch6OutMax->value());
+    if (slider->value()==oldMini)
+        slider->setValue(slider->minimum());
+
+    if (slider->value()==oldMaxi)
+        slider->setValue(slider->maximum());
 }
 void ConfigGadgetWidget::setch7OutRange()
 {
-    m_config->ch7OutSlider->setRange(m_config->ch7OutMin->value(),
+    QSlider *slider = m_config->ch7OutSlider;
+    int oldMini = slider->minimum();
+    int oldMaxi = slider->maximum();
+    slider->setRange(m_config->ch7OutMin->value(),
                                      m_config->ch7OutMax->value());
+    if (slider->value()==oldMini)
+        slider->setValue(slider->minimum());
+
+    if (slider->value()==oldMaxi)
+        slider->setValue(slider->maximum());
 }
 
 
@@ -851,6 +969,15 @@ void ConfigGadgetWidget::updateChannels(UAVObject* controlCommand)
         m_config->RCInputConnected->setText("RC Receiver Not Connected");
     }
     if (m_config->doRCInputCalibration->isChecked()) {
+        if (firstUpdate) {
+            // Increase the data rate from the board so that the sliders
+            // move faster
+            UAVObject::Metadata mdata = controlCommand->getMetadata();
+            mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+            mccDataRate = mdata.flightTelemetryUpdatePeriod;
+            mdata.flightTelemetryUpdatePeriod = 150;
+            controlCommand->setMetadata(mdata);
+        }
         fieldName = QString("Channel");
         field =  controlCommand->getField(fieldName);
         // Hey: if you find a nicer way of doing this, be my guest!
@@ -888,6 +1015,13 @@ void ConfigGadgetWidget::updateChannels(UAVObject* controlCommand)
                             &*m_config->ch7Rev,field->getValue(7).toInt());
         firstUpdate = false;
     } else  {
+        if (!firstUpdate) {
+            // Restore original data rate from the board:
+            UAVObject::Metadata mdata = controlCommand->getMetadata();
+            mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+            mdata.flightTelemetryUpdatePeriod = mccDataRate;
+            controlCommand->setMetadata(mdata);
+        }
         firstUpdate = true;
     }
 }

@@ -230,6 +230,24 @@ namespace jafar {
 
 		}
 
+		void RobotInertial::init_func(const vec & _x, const vec & _u, vec & _xnew) {
+			
+			// Separate things out to make it clearer
+			vec3 p, v, ab, wb, g;
+			vec4 q;
+			splitState(_x, p, q, v, ab, wb, g); // split state vector
+
+			// Split control vector into
+			// sensed acceleration and sensed angular rate
+			vec3 am, wm;
+			splitControl(_u, am, wm);
+			
+			g = -am;
+			
+			unsplitState(p, q, v, ab, wb, g, _xnew);
+		}
+		
+		
 		void RobotInertial::writeLogHeader(kernel::DataLogger& log) const
 		{
 			std::ostringstream oss; oss << "Robot " << id();

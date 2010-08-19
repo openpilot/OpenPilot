@@ -92,6 +92,11 @@ namespace jafar {
 				 */
 				void move_func(const vec & _x, const vec & _u, const vec & _n, double _dt, vec & _xnew,
 				    mat & _XNEW_x, mat & _XNEW_pert);
+				/**
+				 * Initialize the value of g with the average value of acceleration
+				 * in the past.
+				*/
+				void init_func(const vec & _x, const vec & _u, vec & _xnew);
 
 				virtual void move_func() {
 					vec x = state.x();

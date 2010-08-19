@@ -149,7 +149,7 @@ const double PERT_VANG = 2.0; // rad/s per sqrt(s)
 
 // inertial robot initial uncertainties and perturbations - in addition to constant velocity option UNCERT_VLIN.
 //if (intOpts[iRobot] == 1) // == robot inertial
-const double UNCERT_GRAVITY = 10.0; // m/s^2
+const double UNCERT_GRAVITY = 0.1; // m/s^2
 const double UNCERT_ABIAS = 0.05*17.0; // 5% of full scale
 const double UNCERT_WBIAS = 0.05*jmath::degToRad(300.0); // 5% of full scale
 const double PERT_AERR = 0.2*0.001*sqrt(30.0/100.0); // m/s per sqrt(s), IMU acc error (MTI = 0.001*sqrt(40Hz/100Hz))
@@ -549,6 +549,7 @@ JFR_DEBUG("                 FRAME : " << (*world)->t);
 				// move the filter time to the data raw.
 				robPtr->move(senPtr->getRaw()->timestamp);
 JFR_DEBUG("Robot state after move " << robPtr1->state.x());
+JFR_DEBUG("Robot state cov after move " << ublas::matrix_vector_range<jblas::sym_mat_indirect>(robPtr1->state.P(), ublas::range(0, robPtr1->state.P().size1()), ublas::range (0, robPtr1->state.P().size2())));
 robot_prediction = robPtr->state.x();
 
 				// foreach dataManager
@@ -569,6 +570,7 @@ n_innovation++;
 		if (had_data)
 		{
 JFR_DEBUG("Robot state after corrections " << robPtr1->state.x());
+JFR_DEBUG("Robot state cov after corrections " << ublas::matrix_vector_range<jblas::sym_mat_indirect>(robPtr1->state.P(), ublas::range(0, robPtr1->state.P().size1()), ublas::range (0, robPtr1->state.P().size2())));
 			if (robPtr1->dt_or_dx > max_dt) max_dt = robPtr1->dt_or_dx;
 
 			// Output info

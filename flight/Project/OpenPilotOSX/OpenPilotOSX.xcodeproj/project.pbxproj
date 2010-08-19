@@ -22,46 +22,16 @@
 		651CF9F3120B700D00EEFD70 /* usb_conf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = usb_conf.h; sourceTree = "<group>"; };
 		654330231218E9780063F913 /* insgps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = insgps.c; path = ../../AHRS/insgps.c; sourceTree = SOURCE_ROOT; };
 		6543304F121980300063F913 /* insgps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = insgps.h; sourceTree = "<group>"; };
-		6543305B1219868D0063F913 /* WorldMagModel.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = WorldMagModel.c; path = ../../AHRS/WorldMagModel.c; sourceTree = SOURCE_ROOT; };
-		65A2C7EF11E2A33D00D0391E /* FreeRTOSConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FreeRTOSConfig.h; path = ../../PiOS.posix/inc/FreeRTOSConfig.h; sourceTree = SOURCE_ROOT; };
-		65A2C7F011E2A33D00D0391E /* pios_com.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_com.h; path = ../../PiOS.posix/inc/pios_com.h; sourceTree = SOURCE_ROOT; };
-		65A2C7F111E2A33D00D0391E /* pios_com_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_com_priv.h; path = ../../PiOS.posix/inc/pios_com_priv.h; sourceTree = SOURCE_ROOT; };
-		65A2C7F211E2A33D00D0391E /* pios_delay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_delay.h; path = ../../PiOS.posix/inc/pios_delay.h; sourceTree = SOURCE_ROOT; };
-		65A2C7F311E2A33D00D0391E /* pios_led.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_led.h; path = ../../PiOS.posix/inc/pios_led.h; sourceTree = SOURCE_ROOT; };
-		65A2C7F411E2A33D00D0391E /* pios_posix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_posix.h; path = ../../PiOS.posix/inc/pios_posix.h; sourceTree = SOURCE_ROOT; };
-		65A2C7F511E2A33D00D0391E /* pios_sdcard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_sdcard.h; path = ../../PiOS.posix/inc/pios_sdcard.h; sourceTree = SOURCE_ROOT; };
-		65A2C7F611E2A33D00D0391E /* pios_sys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_sys.h; path = ../../PiOS.posix/inc/pios_sys.h; sourceTree = SOURCE_ROOT; };
-		65A2C7F711E2A33D00D0391E /* pios_udp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_udp.h; path = ../../PiOS.posix/inc/pios_udp.h; sourceTree = SOURCE_ROOT; };
-		65A2C7F811E2A33D00D0391E /* pios_udp_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_udp_priv.h; path = ../../PiOS.posix/inc/pios_udp_priv.h; sourceTree = SOURCE_ROOT; };
-		65A2C7F911E2A33D00D0391E /* pios.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios.h; path = ../../PiOS.posix/pios.h; sourceTree = SOURCE_ROOT; };
-		65A2C7FE11E2A33D00D0391E /* croutine.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = croutine.c; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/croutine.c; sourceTree = SOURCE_ROOT; };
-		65A2C80011E2A33D00D0391E /* croutine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = croutine.h; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/include/croutine.h; sourceTree = SOURCE_ROOT; };
-		65A2C80111E2A33D00D0391E /* FreeRTOS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FreeRTOS.h; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/include/FreeRTOS.h; sourceTree = SOURCE_ROOT; };
-		65A2C80211E2A33D00D0391E /* list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = list.h; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/include/list.h; sourceTree = SOURCE_ROOT; };
-		65A2C80311E2A33D00D0391E /* mpu_wrappers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mpu_wrappers.h; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/include/mpu_wrappers.h; sourceTree = SOURCE_ROOT; };
-		65A2C80411E2A33D00D0391E /* portable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = portable.h; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/include/portable.h; sourceTree = SOURCE_ROOT; };
-		65A2C80511E2A33D00D0391E /* projdefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = projdefs.h; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/include/projdefs.h; sourceTree = SOURCE_ROOT; };
-		65A2C80611E2A33D00D0391E /* queue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = queue.h; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/include/queue.h; sourceTree = SOURCE_ROOT; };
-		65A2C80711E2A33D00D0391E /* semphr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = semphr.h; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/include/semphr.h; sourceTree = SOURCE_ROOT; };
-		65A2C80811E2A33D00D0391E /* StackMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StackMacros.h; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/include/StackMacros.h; sourceTree = SOURCE_ROOT; };
-		65A2C80911E2A33D00D0391E /* task.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = task.h; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/include/task.h; sourceTree = SOURCE_ROOT; };
-		65A2C80A11E2A33D00D0391E /* list.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = list.c; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/list.c; sourceTree = SOURCE_ROOT; };
-		65A2C80F11E2A33D00D0391E /* port.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = port.c; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/portable/GCC/Posix/port.c; sourceTree = SOURCE_ROOT; };
-		65A2C81011E2A33D00D0391E /* portmacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = portmacro.h; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/portable/GCC/Posix/portmacro.h; sourceTree = SOURCE_ROOT; };
-		65A2C81211E2A33D00D0391E /* heap_3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = heap_3.c; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/portable/MemMang/heap_3.c; sourceTree = SOURCE_ROOT; };
-		65A2C81311E2A33D00D0391E /* readme.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = readme.txt; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/portable/readme.txt; sourceTree = SOURCE_ROOT; };
-		65A2C81411E2A33D00D0391E /* queue.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = queue.c; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/queue.c; sourceTree = SOURCE_ROOT; };
-		65A2C81511E2A33D00D0391E /* readme.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = readme.txt; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/readme.txt; sourceTree = SOURCE_ROOT; };
-		65A2C81611E2A33D00D0391E /* tasks.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tasks.c; path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/tasks.c; sourceTree = SOURCE_ROOT; };
-		65A2C81711E2A33D00D0391E /* pios_com.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_com.c; path = ../../PiOS.posix/posix/pios_com.c; sourceTree = SOURCE_ROOT; };
-		65A2C81811E2A33D00D0391E /* pios_com.c.old */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = pios_com.c.old; path = ../../PiOS.posix/posix/pios_com.c.old; sourceTree = SOURCE_ROOT; };
-		65A2C81911E2A33D00D0391E /* pios_delay.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_delay.c; path = ../../PiOS.posix/posix/pios_delay.c; sourceTree = SOURCE_ROOT; };
-		65A2C81A11E2A33D00D0391E /* pios_led.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_led.c; path = ../../PiOS.posix/posix/pios_led.c; sourceTree = SOURCE_ROOT; };
-		65A2C81B11E2A33D00D0391E /* pios_sdcard.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_sdcard.c; path = ../../PiOS.posix/posix/pios_sdcard.c; sourceTree = SOURCE_ROOT; };
-		65A2C81C11E2A33D00D0391E /* pios_sys.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_sys.c; path = ../../PiOS.posix/posix/pios_sys.c; sourceTree = SOURCE_ROOT; };
-		65A2C81D11E2A33D00D0391E /* pios_udp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_udp.c; path = ../../PiOS.posix/posix/pios_udp.c; sourceTree = SOURCE_ROOT; };
-		65B35CFA121A4540003EAD18 /* CoordinateConversions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = CoordinateConversions.c; path = ../../AHRS/CoordinateConversions.c; sourceTree = SOURCE_ROOT; };
-		65B35CFB121A45C6003EAD18 /* CoordinateConversions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoordinateConversions.h; sourceTree = "<group>"; };
+		657CEEAD121DB6C8007A1FBE /* homelocation.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = homelocation.xml; sourceTree = "<group>"; };
+		657CEEB7121DBC63007A1FBE /* CoordinateConversions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CoordinateConversions.c; sourceTree = "<group>"; };
+		657CEEB9121DBC63007A1FBE /* CoordinateConversions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoordinateConversions.h; sourceTree = "<group>"; };
+		657CEEBA121DBC63007A1FBE /* WorldMagModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WorldMagModel.h; sourceTree = "<group>"; };
+		657CEEBB121DBC63007A1FBE /* WorldMagModel.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = WorldMagModel.c; sourceTree = "<group>"; };
+		657CEEBF121DC054007A1FBE /* attituderaw.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = attituderaw.c; sourceTree = "<group>"; };
+		657CEEC0121DC054007A1FBE /* flightsituationactual.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = flightsituationactual.c; sourceTree = "<group>"; };
+		657CEEC1121DC054007A1FBE /* homelocation.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = homelocation.c; sourceTree = "<group>"; };
+		657CEEC2121DC054007A1FBE /* navigationdesired.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = navigationdesired.c; sourceTree = "<group>"; };
+		657CEEC3121DC054007A1FBE /* navigationsettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = navigationsettings.c; sourceTree = "<group>"; };
 		65B35D7F121C261E003EAD18 /* bin.pro */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bin.pro; sourceTree = "<group>"; };
 		65B35D80121C261E003EAD18 /* openpilotgcs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = openpilotgcs; sourceTree = "<group>"; };
 		65B35D81121C261E003EAD18 /* openpilotgcs.pri */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = openpilotgcs.pri; sourceTree = "<group>"; };
@@ -2670,7 +2640,6 @@
 		65E8EF7C11EEA61E00BBF654 /* flightbatterystate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = flightbatterystate.c; path = ../../OpenPilot/UAVObjects/flightbatterystate.c; sourceTree = SOURCE_ROOT; };
 		65E8EF7D11EEA61E00BBF654 /* flighttelemetrystats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = flighttelemetrystats.c; path = ../../OpenPilot/UAVObjects/flighttelemetrystats.c; sourceTree = SOURCE_ROOT; };
 		65E8EF7E11EEA61E00BBF654 /* gcstelemetrystats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gcstelemetrystats.c; path = ../../OpenPilot/UAVObjects/gcstelemetrystats.c; sourceTree = SOURCE_ROOT; };
-		65E8EF7F11EEA61E00BBF654 /* headingactual.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = headingactual.c; path = ../../OpenPilot/UAVObjects/headingactual.c; sourceTree = SOURCE_ROOT; };
 		65E8EF8111EEA61E00BBF654 /* actuatorcommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = actuatorcommand.h; path = ../../OpenPilot/UAVObjects/inc/actuatorcommand.h; sourceTree = SOURCE_ROOT; };
 		65E8EF8211EEA61E00BBF654 /* actuatordesired.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = actuatordesired.h; path = ../../OpenPilot/UAVObjects/inc/actuatordesired.h; sourceTree = SOURCE_ROOT; };
 		65E8EF8311EEA61E00BBF654 /* actuatorsettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = actuatorsettings.h; path = ../../OpenPilot/UAVObjects/inc/actuatorsettings.h; sourceTree = SOURCE_ROOT; };
@@ -2887,12 +2856,7 @@
 		08FB7794FE84155DC02AAC07 /* OpenPilotOSX */ = {
 			isa = PBXGroup;
 			children = (
-				65B7E6AC120DF1CD000C1123 /* AHRS */,
-				65E8EF1E11EEA61E00BBF654 /* OpenPilot */,
-				65E8F02F11EFF25C00BBF654 /* PiOS */,
-				65A2C7ED11E2A33D00D0391E /* PiOS.posix */,
-				C6A0FF2B0290797F04C91782 /* Documentation */,
-				1AB674ADFE9D54B511CA2CBB /* Products */,
+				657CEEB5121DBC49007A1FBE /* flight */,
 				65B35D7D121C261E003EAD18 /* ground */,
 			);
 			name = OpenPilotOSX;
@@ -2922,140 +2886,38 @@
 			path = inc;
 			sourceTree = "<group>";
 		};
-		65A2C7ED11E2A33D00D0391E /* PiOS.posix */ = {
+		657CEEB5121DBC49007A1FBE /* flight */ = {
 			isa = PBXGroup;
 			children = (
-				65A2C7EE11E2A33D00D0391E /* inc */,
-				65A2C7F911E2A33D00D0391E /* pios.h */,
-				65A2C7FA11E2A33D00D0391E /* posix */,
+				65B7E6AC120DF1CD000C1123 /* AHRS */,
+				657CEEB6121DBC63007A1FBE /* Libraries */,
+				65E8EF1E11EEA61E00BBF654 /* OpenPilot */,
+				65E8F02F11EFF25C00BBF654 /* PiOS */,
+				C6A0FF2B0290797F04C91782 /* Documentation */,
+				1AB674ADFE9D54B511CA2CBB /* Products */,
 			);
-			name = PiOS.posix;
-			path = ../../PiOS.posix;
-			sourceTree = SOURCE_ROOT;
+			name = flight;
+			sourceTree = "<group>";
 		};
-		65A2C7EE11E2A33D00D0391E /* inc */ = {
+		657CEEB6121DBC63007A1FBE /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				65A2C7EF11E2A33D00D0391E /* FreeRTOSConfig.h */,
-				65A2C7F011E2A33D00D0391E /* pios_com.h */,
-				65A2C7F111E2A33D00D0391E /* pios_com_priv.h */,
-				65A2C7F211E2A33D00D0391E /* pios_delay.h */,
-				65A2C7F311E2A33D00D0391E /* pios_led.h */,
-				65A2C7F411E2A33D00D0391E /* pios_posix.h */,
-				65A2C7F511E2A33D00D0391E /* pios_sdcard.h */,
-				65A2C7F611E2A33D00D0391E /* pios_sys.h */,
-				65A2C7F711E2A33D00D0391E /* pios_udp.h */,
-				65A2C7F811E2A33D00D0391E /* pios_udp_priv.h */,
-			);
-			name = inc;
-			path = ../../PiOS.posix/inc;
-			sourceTree = SOURCE_ROOT;
-		};
-		65A2C7FA11E2A33D00D0391E /* posix */ = {
-			isa = PBXGroup;
-			children = (
-				65A2C7FB11E2A33D00D0391E /* Libraries */,
-				65A2C81711E2A33D00D0391E /* pios_com.c */,
-				65A2C81811E2A33D00D0391E /* pios_com.c.old */,
-				65A2C81911E2A33D00D0391E /* pios_delay.c */,
-				65A2C81A11E2A33D00D0391E /* pios_led.c */,
-				65A2C81B11E2A33D00D0391E /* pios_sdcard.c */,
-				65A2C81C11E2A33D00D0391E /* pios_sys.c */,
-				65A2C81D11E2A33D00D0391E /* pios_udp.c */,
-			);
-			name = posix;
-			path = ../../PiOS.posix/posix;
-			sourceTree = SOURCE_ROOT;
-		};
-		65A2C7FB11E2A33D00D0391E /* Libraries */ = {
-			isa = PBXGroup;
-			children = (
-				65A2C7FC11E2A33D00D0391E /* FreeRTOS */,
+				657CEEB7121DBC63007A1FBE /* CoordinateConversions.c */,
+				657CEEB8121DBC63007A1FBE /* inc */,
+				657CEEBB121DBC63007A1FBE /* WorldMagModel.c */,
 			);
 			name = Libraries;
-			path = ../../PiOS.posix/posix/Libraries;
+			path = ../../Libraries;
 			sourceTree = SOURCE_ROOT;
 		};
-		65A2C7FC11E2A33D00D0391E /* FreeRTOS */ = {
+		657CEEB8121DBC63007A1FBE /* inc */ = {
 			isa = PBXGroup;
 			children = (
-				65A2C7FD11E2A33D00D0391E /* Source */,
+				657CEEB9121DBC63007A1FBE /* CoordinateConversions.h */,
+				657CEEBA121DBC63007A1FBE /* WorldMagModel.h */,
 			);
-			name = FreeRTOS;
-			path = ../../PiOS.posix/posix/Libraries/FreeRTOS;
-			sourceTree = SOURCE_ROOT;
-		};
-		65A2C7FD11E2A33D00D0391E /* Source */ = {
-			isa = PBXGroup;
-			children = (
-				65A2C7FE11E2A33D00D0391E /* croutine.c */,
-				65A2C7FF11E2A33D00D0391E /* include */,
-				65A2C80A11E2A33D00D0391E /* list.c */,
-				65A2C80B11E2A33D00D0391E /* portable */,
-				65A2C81411E2A33D00D0391E /* queue.c */,
-				65A2C81511E2A33D00D0391E /* readme.txt */,
-				65A2C81611E2A33D00D0391E /* tasks.c */,
-			);
-			name = Source;
-			path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source;
-			sourceTree = SOURCE_ROOT;
-		};
-		65A2C7FF11E2A33D00D0391E /* include */ = {
-			isa = PBXGroup;
-			children = (
-				65A2C80011E2A33D00D0391E /* croutine.h */,
-				65A2C80111E2A33D00D0391E /* FreeRTOS.h */,
-				65A2C80211E2A33D00D0391E /* list.h */,
-				65A2C80311E2A33D00D0391E /* mpu_wrappers.h */,
-				65A2C80411E2A33D00D0391E /* portable.h */,
-				65A2C80511E2A33D00D0391E /* projdefs.h */,
-				65A2C80611E2A33D00D0391E /* queue.h */,
-				65A2C80711E2A33D00D0391E /* semphr.h */,
-				65A2C80811E2A33D00D0391E /* StackMacros.h */,
-				65A2C80911E2A33D00D0391E /* task.h */,
-			);
-			name = include;
-			path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/include;
-			sourceTree = SOURCE_ROOT;
-		};
-		65A2C80B11E2A33D00D0391E /* portable */ = {
-			isa = PBXGroup;
-			children = (
-				65A2C80C11E2A33D00D0391E /* GCC */,
-				65A2C81111E2A33D00D0391E /* MemMang */,
-				65A2C81311E2A33D00D0391E /* readme.txt */,
-			);
-			name = portable;
-			path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/portable;
-			sourceTree = SOURCE_ROOT;
-		};
-		65A2C80C11E2A33D00D0391E /* GCC */ = {
-			isa = PBXGroup;
-			children = (
-				65A2C80D11E2A33D00D0391E /* Posix */,
-			);
-			name = GCC;
-			path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/portable/GCC;
-			sourceTree = SOURCE_ROOT;
-		};
-		65A2C80D11E2A33D00D0391E /* Posix */ = {
-			isa = PBXGroup;
-			children = (
-				65A2C80F11E2A33D00D0391E /* port.c */,
-				65A2C81011E2A33D00D0391E /* portmacro.h */,
-			);
-			name = Posix;
-			path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/portable/GCC/Posix;
-			sourceTree = SOURCE_ROOT;
-		};
-		65A2C81111E2A33D00D0391E /* MemMang */ = {
-			isa = PBXGroup;
-			children = (
-				65A2C81211E2A33D00D0391E /* heap_3.c */,
-			);
-			name = MemMang;
-			path = ../../PiOS.posix/posix/Libraries/FreeRTOS/Source/portable/MemMang;
-			sourceTree = SOURCE_ROOT;
+			path = inc;
+			sourceTree = "<group>";
 		};
 		65B35D7D121C261E003EAD18 /* ground */ = {
 			isa = PBXGroup;
@@ -6818,6 +6680,7 @@
 				65B367F1121C2620003EAD18 /* flightsituationactual.xml */,
 				65B367F2121C2620003EAD18 /* flighttelemetrystats.xml */,
 				65B367F3121C2620003EAD18 /* gcstelemetrystats.xml */,
+				657CEEAD121DB6C8007A1FBE /* homelocation.xml */,
 				65B367F4121C2620003EAD18 /* manualcontrolcommand.xml */,
 				65B367F5121C2620003EAD18 /* manualcontrolsettings.xml */,
 				65B367F6121C2620003EAD18 /* navigationdesired.xml */,
@@ -6836,8 +6699,6 @@
 		65B7E6AC120DF1CD000C1123 /* AHRS */ = {
 			isa = PBXGroup;
 			children = (
-				65B35CFA121A4540003EAD18 /* CoordinateConversions.c */,
-				6543305B1219868D0063F913 /* WorldMagModel.c */,
 				654330231218E9780063F913 /* insgps.c */,
 				65B7E6AD120DF1E2000C1123 /* ahrs_fsm.c */,
 				65B7E6AE120DF1E2000C1123 /* ahrs.c */,
@@ -6851,7 +6712,6 @@
 		65B7E6AF120DF1E2000C1123 /* inc */ = {
 			isa = PBXGroup;
 			children = (
-				65B35CFB121A45C6003EAD18 /* CoordinateConversions.h */,
 				6543304F121980300063F913 /* insgps.h */,
 				65B7E6B0120DF1E2000C1123 /* ahrs.h */,
 				65B7E6B1120DF1E2000C1123 /* ahrs_fsm.h */,
@@ -7203,6 +7063,11 @@
 		65E8EF6E11EEA61E00BBF654 /* UAVObjects */ = {
 			isa = PBXGroup;
 			children = (
+				657CEEBF121DC054007A1FBE /* attituderaw.c */,
+				657CEEC0121DC054007A1FBE /* flightsituationactual.c */,
+				657CEEC1121DC054007A1FBE /* homelocation.c */,
+				657CEEC2121DC054007A1FBE /* navigationdesired.c */,
+				657CEEC3121DC054007A1FBE /* navigationsettings.c */,
 				65E8EF6F11EEA61E00BBF654 /* actuatorcommand.c */,
 				65E8EF7011EEA61E00BBF654 /* actuatordesired.c */,
 				65E8EF7111EEA61E00BBF654 /* actuatorsettings.c */,
@@ -7219,7 +7084,6 @@
 				65E8EF7C11EEA61E00BBF654 /* flightbatterystate.c */,
 				65E8EF7D11EEA61E00BBF654 /* flighttelemetrystats.c */,
 				65E8EF7E11EEA61E00BBF654 /* gcstelemetrystats.c */,
-				65E8EF7F11EEA61E00BBF654 /* headingactual.c */,
 				65E8EF8011EEA61E00BBF654 /* inc */,
 				65E8EF9E11EEA61E00BBF654 /* manualcontrolcommand.c */,
 				65E8EF9F11EEA61E00BBF654 /* manualcontrolsettings.c */,

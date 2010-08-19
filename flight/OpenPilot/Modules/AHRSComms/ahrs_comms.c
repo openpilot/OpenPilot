@@ -59,6 +59,7 @@
 #include "altitudeactual.h"
 #include "stdbool.h"
 #include "positionactual.h"
+#include "homelocation.h"
 
 #include "pios_opahrs.h" // library for OpenPilot AHRS access functions
 #include "pios_opahrs_proto.h"
@@ -75,6 +76,7 @@ static xTaskHandle taskHandle;
 // Private functions
 static void ahrscommsTask(void* parameters);
 static void load_altitude_actual(struct opahrs_msg_v1_req_altitude * altitude);
+static void load_magnetic_north(struct opahrs_msg_v1_req_north * north);
 static void load_position_actual(struct opahrs_msg_v1_req_gps * gps);
 static void update_attitude_actual(struct opahrs_msg_v1_rsp_attitude * attitude);
 static void update_attitude_raw(struct opahrs_msg_v1_rsp_attituderaw * attituderaw);
@@ -92,6 +94,12 @@ static void PositionActualUpdatedCb(UAVObjEvent * ev)
 	PositionActualIsUpdatedFlag = true;
 }
 
+static bool HomeLocationIsUpdatedFlag = false;
+static void HomeLocationUpdatedCb(UAVObjEvent * ev)
+{
+	HomeLocationIsUpdatedFlag = true;
+}
+
 /**
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
@@ -100,6 +108,7 @@ int32_t AHRSCommsInitialize(void)
 {
   AltitudeActualConnectCallback(AltitudeActualUpdatedCb);
   PositionActualConnectCallback(PositionActualUpdatedCb);
+  HomeLocationConnectCallback(HomeLocationUpdatedCb);
 
   PIOS_OPAHRS_Init();
 
@@ -179,11 +188,32 @@ static void ahrscommsTask(void* parameters)
           /* Comms error */
         }
       }
+
+      if (HomeLocationIsUpdatedFlag) {
+        struct opahrs_msg_v1 req;
+        
+        load_magnetic_north(&(req.payload.user.v.req.north));
+        if (PIOS_OPAHRS_SetMagNorth(&req) == OPAHRS_RESULT_OK) {
+          HomeLocationIsUpdatedFlag = false;
+        } else {
+          /* Comms error */
+        }
+      }      
       
       /* Wait for the next update interval */
       vTaskDelay( settings.UpdatePeriod / portTICK_RATE_MS );
     }
   }
+}
+
+static void load_magnetic_north(struct opahrs_msg_v1_req_north * mag_north)
+{
+  HomeLocationData   data;
+  
+  HomeLocationGet(&data);
+  mag_north->Be[0] = data.Be[0];
+  mag_north->Be[1] = data.Be[1];
+  mag_north->Be[2] = data.Be[2];
 }
 
 static void load_altitude_actual(struct opahrs_msg_v1_req_altitude * altitude)

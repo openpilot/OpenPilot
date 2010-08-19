@@ -70,6 +70,8 @@ AHRS = ./
 AHRSINC = $(AHRS)/inc
 PIOS = ../PiOS
 PIOSINC = $(PIOS)/inc
+FLIGHTLIB = ../Libraries
+FLIGHTLIBINC = ../Libraries/inc
 PIOSSTM32F10X = $(PIOS)/STM32F10x
 PIOSCOMMON = $(PIOS)/Common
 APPLIBDIR = $(PIOSSTM32F10X)/Libraries
@@ -89,8 +91,7 @@ SRC = ahrs.c
 SRC += pios_board.c
 SRC += ahrs_fsm.c
 SRC += insgps.c
-SRC += CoordinateConversions.c
-SRC += WorldMagModel.c
+SRC += $(FLIGHTLIB)/CoordinateConversions.c
 
 ## PIOS Hardware (STM32F10x)
 SRC += $(PIOSSTM32F10X)/pios_sys.c
@@ -160,6 +161,7 @@ ASRCARM =
 #    Each directory must be seperated by a space.
 EXTRAINCDIRS  += $(PIOS)
 EXTRAINCDIRS  += $(PIOSINC)
+EXTRAINCDIRS  += $(FLIGHTLIBINC)
 EXTRAINCDIRS  += $(PIOSSTM32F10X)
 EXTRAINCDIRS  += $(PIOSCOMMON)
 EXTRAINCDIRS  += $(STMSPDINCDIR)

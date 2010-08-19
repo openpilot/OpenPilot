@@ -93,6 +93,8 @@ OPUAVOBJ = ./UAVObjects
 OPUAVOBJINC = $(OPUAVOBJ)/inc
 OPTESTS  = ./Tests
 OPMODULEDIR = ./Modules
+FLIGHTLIB = ../Libraries
+FLIGHTLIBINC = ../Libraries/inc
 PIOS = ../PiOS
 PIOSINC = $(PIOS)/inc
 PIOSSTM32F10X = $(PIOS)/STM32F10x
@@ -168,6 +170,7 @@ SRC += $(OPUAVOBJ)/navigationsettings.c
 SRC += $(OPUAVOBJ)/navigationdesired.c
 SRC += $(OPUAVOBJ)/flightbatterystate.c
 SRC += $(OPUAVOBJ)/attituderaw.c
+SRC += $(OPUAVOBJ)/homelocation.c
 endif
 
 ## PIOS Hardware (STM32F10x)
@@ -196,8 +199,6 @@ SRC += $(PIOSSTM32F10X)/pios_usb_hid_istr.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_prop.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
 
-
-
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_sdcard.c
 SRC += $(PIOSCOMMON)/pios_com.c
@@ -205,6 +206,10 @@ SRC += $(PIOSCOMMON)/pios_bmp085.c
 SRC += $(PIOSCOMMON)/pios_opahrs.c
 SRC += $(PIOSCOMMON)/pios_opahrs_proto.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
+
+## Libraries for flight calculations
+SRC += $(FLIGHTLIB)/WorldMagModel.c
+SRC += $(FLIGHTLIB)/CoordinateConversions.c
 
 ## CMSIS for STM32
 SRC += $(CMSISDIR)/core_cm3.c
@@ -294,6 +299,7 @@ EXTRAINCDIRS  += $(OPUAVOBJ)
 EXTRAINCDIRS  += $(OPUAVOBJINC)
 EXTRAINCDIRS  += $(PIOS)
 EXTRAINCDIRS  += $(PIOSINC)
+EXTRAINCDIRS  += $(FLIGHTLIBINC)
 EXTRAINCDIRS  += $(PIOSSTM32F10X)
 EXTRAINCDIRS  += $(PIOSCOMMON)
 EXTRAINCDIRS  += $(STMSPDINCDIR)

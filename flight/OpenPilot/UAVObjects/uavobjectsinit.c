@@ -44,6 +44,7 @@
 #include "flightsituationactual.h"
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
+#include "homelocation.h"
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
 #include "navigationdesired.h"
@@ -79,6 +80,7 @@ void UAVObjectsInitializeAll()
     FlightSituationActualInitialize();
     FlightTelemetryStatsInitialize();
     GCSTelemetryStatsInitialize();
+    HomeLocationInitialize();
     ManualControlCommandInitialize();
     ManualControlSettingsInitialize();
     NavigationDesiredInitialize();

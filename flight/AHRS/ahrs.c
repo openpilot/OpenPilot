@@ -38,7 +38,6 @@
 #include "ahrs_fsm.h"		/* lfsm_state */
 #include "insgps.h"
 #include "CoordinateConversions.h"
-#include "WorldMagModel.h"
 
 /**
  * State of AHRS EKF
@@ -313,19 +312,7 @@ int main()
     INSSetAccelVar(accel_var);
     INSSetGyroVar(gyro_var);
   }
-  
-  /******************* World magnetic model *********************/
-  float MagNorth[3];
-  WMM_Initialize(); // Set default values and constants
-  WMM_GetMagVector(29, -95, 18, 8, 17, 2010, MagNorth);
-  // TODO: Get this from first GPS coordinate or whenever we initialize NED frame
-  if(ahrs_algorithm == INSGPS_Algo)
-  {
-    float MagNorthLen = sqrt(MagNorth[0] * MagNorth[0] + MagNorth[1] * MagNorth[1] + MagNorth[2] * MagNorth[2]);
-    float MagNorthScaled[3] = {MagNorth[0] / MagNorthLen, MagNorth[1] / MagNorthLen, MagNorth[2] / MagNorthLen};
-    INSSetMagNorth(MagNorthScaled);
-  }  
-  
+    
   /******************* Main EKF loop ****************************/
   while (1) {
     // Alive signal
@@ -376,15 +363,6 @@ int main()
       mag[2] = -mag_data.raw.axis[2];
             
       INSPrediction(gyro, accel, 1 / (float) EKF_RATE);
-
-      if ( ((loop_ctr % 10000) == 0) && (gps_data.status > 0) )
-      {
-        // cheap logic instead of detecting the first update of gps data
-        WMM_GetMagVector(gps_data.latitude, gps_data.longitude, gps_data.altitude, 8, 17, 2010, MagNorth);
-        float MagNorthLen = sqrt(MagNorth[0] * MagNorth[0] + MagNorth[1] * MagNorth[1] + MagNorth[2] * MagNorth[2]);
-        float MagNorthScaled[3] = {MagNorth[0] / MagNorthLen, MagNorth[1] / MagNorthLen, MagNorth[2] / MagNorthLen};
-        INSSetMagNorth(MagNorthScaled);
-      }  
       
       if ( gps_updated ) 
       {
@@ -677,6 +655,12 @@ void process_spi_request(void)
     dump_spi_message(PIOS_COM_AUX, "V", (uint8_t *)&user_rx_v1, sizeof(user_rx_v1));
     lfsm_user_set_tx_v1 (&user_tx_v1);
     break;
+  case OPAHRS_MSG_V1_REQ_NORTH:
+    opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_ALTITUDE);
+    INSSetMagNorth(user_rx_v1.payload.user.v.req.north.Be);
+    dump_spi_message(PIOS_COM_AUX, "N", (uint8_t *)&user_rx_v1, sizeof(user_rx_v1));
+    lfsm_user_set_tx_v1 (&user_tx_v1);
+    break;
   case OPAHRS_MSG_V1_REQ_GPS:
     opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_GPS);
     gps_updated = TRUE;
@@ -686,7 +670,7 @@ void process_spi_request(void)
     gps_data.heading = user_rx_v1.payload.user.v.req.gps.heading;
     gps_data.groundspeed = user_rx_v1.payload.user.v.req.gps.groundspeed;
     gps_data.status = user_rx_v1.payload.user.v.req.gps.status;
-    dump_spi_message(PIOS_COM_AUX, "V", (uint8_t *)&user_rx_v1, sizeof(user_rx_v1));
+    dump_spi_message(PIOS_COM_AUX, "G", (uint8_t *)&user_rx_v1, sizeof(user_rx_v1));
     lfsm_user_set_tx_v1 (&user_tx_v1);
     break;
   case OPAHRS_MSG_V1_REQ_ATTITUDERAW:

@@ -58,6 +58,7 @@
 #include "alarms.h"
 #include "altitudeactual.h"
 #include "stdbool.h"
+#include "positionactual.h"
 
 #include "pios_opahrs.h" // library for OpenPilot AHRS access functions
 #include "pios_opahrs_proto.h"
@@ -74,6 +75,7 @@ static xTaskHandle taskHandle;
 // Private functions
 static void ahrscommsTask(void* parameters);
 static void load_altitude_actual(struct opahrs_msg_v1_req_altitude * altitude);
+static void load_position_actual(struct opahrs_msg_v1_req_gps * gps);
 static void update_attitude_actual(struct opahrs_msg_v1_rsp_attitude * attitude);
 static void update_attitude_raw(struct opahrs_msg_v1_rsp_attituderaw * attituderaw);
 static void update_ahrs_status(struct opahrs_msg_v1_rsp_serial * serial);
@@ -84,6 +86,12 @@ static void AltitudeActualUpdatedCb(UAVObjEvent * ev)
   AltitudeActualIsUpdatedFlag = true;
 }
 
+static bool PositionActualIsUpdatedFlag = false;
+static void PositionActualUpdatedCb(UAVObjEvent * ev)
+{
+	PositionActualIsUpdatedFlag = true;
+}
+
 /**
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
@@ -91,6 +99,7 @@ static void AltitudeActualUpdatedCb(UAVObjEvent * ev)
 int32_t AHRSCommsInitialize(void)
 {
   AltitudeActualConnectCallback(AltitudeActualUpdatedCb);
+  PositionActualConnectCallback(PositionActualUpdatedCb);
 
   PIOS_OPAHRS_Init();
 
@@ -136,30 +145,41 @@ static void ahrscommsTask(void* parameters)
       AttitudeSettingsGet(&settings);
   
       if (PIOS_OPAHRS_GetAttitude(&rsp) == OPAHRS_RESULT_OK) {
-	update_attitude_actual(&(rsp.payload.user.v.rsp.attitude));
+        update_attitude_actual(&(rsp.payload.user.v.rsp.attitude));
       } else {
-	/* Comms error */
-	break;
+        /* Comms error */
+        break;
       }
 
       if (PIOS_OPAHRS_GetAttitudeRaw(&rsp) == OPAHRS_RESULT_OK) {
-	update_attitude_raw(&(rsp.payload.user.v.rsp.attituderaw));
+	      update_attitude_raw(&(rsp.payload.user.v.rsp.attituderaw));
       } else {
-	/* Comms error */
-	break;
+        /* Comms error */
+        break;
       }
 
       if (AltitudeActualIsUpdatedFlag) {
-	struct opahrs_msg_v1 req;
+        struct opahrs_msg_v1 req;
 
-	load_altitude_actual(&(req.payload.user.v.req.altitude));
-	if (PIOS_OPAHRS_SetAltitudeActual(&req) == OPAHRS_RESULT_OK) {
-	  AltitudeActualIsUpdatedFlag = false;
-	} else {
-	  /* Comms error */
-	}
+        load_altitude_actual(&(req.payload.user.v.req.altitude));
+        if (PIOS_OPAHRS_SetAltitudeActual(&req) == OPAHRS_RESULT_OK) {
+          AltitudeActualIsUpdatedFlag = false;
+        } else {
+          /* Comms error */
+        }
       }
 
+      if (PositionActualIsUpdatedFlag) {
+        struct opahrs_msg_v1 req;
+        
+        load_position_actual(&(req.payload.user.v.req.gps));
+        if (PIOS_OPAHRS_SetPositionActual(&req) == OPAHRS_RESULT_OK) {
+          PositionActualIsUpdatedFlag = false;
+        } else {
+          /* Comms error */
+        }
+      }
+      
       /* Wait for the next update interval */
       vTaskDelay( settings.UpdatePeriod / portTICK_RATE_MS );
     }
@@ -175,6 +195,19 @@ static void load_altitude_actual(struct opahrs_msg_v1_req_altitude * altitude)
   altitude->altitude    = data.Altitude;
   altitude->pressure    = data.Pressure;
   altitude->temperature = data.Temperature;
+}
+
+static void load_position_actual(struct opahrs_msg_v1_req_gps * gps)
+{
+  PositionActualData data;
+  PositionActualGet(&data);
+  
+  gps->latitude = data.Latitude;
+	gps->longitude = data.Longitude;
+	gps->altitude = data.GeoidSeparation;
+  gps->heading = data.Heading;
+  gps->groundspeed = data.Groundspeed;
+  gps->status = data.Status;
 }
 
 static void update_attitude_actual(struct opahrs_msg_v1_rsp_attitude * attitude)

@@ -149,23 +149,22 @@ struct altitude_sensor {
   float temperature;
 };
 
+struct gps_sensor {
+  float latitude;
+  float longitude;
+  float altitude;
+  float heading;
+  float groundspeed;
+  float status;
+};
+
 static struct mag_sensor        mag_data;
 static struct accel_sensor      accel_data;
 static struct gyro_sensor       gyro_data;
 static struct altitude_sensor   altitude_data;
-static struct attitude_solution attitude_data = {
-  .quaternion = {
-    .q1 = 1.011,
-    .q2 = 2.022,
-    .q3 = 3.033,
-    .q4 = 0,
-  },
-  .euler = {
-    .roll  = 4.044,
-    .pitch = 5.055,
-    .yaw   = 6.066,
-  },
-};
+static struct gps_sensor        gps_data;
+static struct attitude_solution attitude_data;
+
 /**
  * @}
  */
@@ -175,6 +174,7 @@ static struct attitude_solution attitude_data = {
 void process_spi_request(void);
 void downsample_data(void);
 void calibrate_sensors(void);
+void initialize_location();
 
 /**
  * @addtogroup AHRS_Global_Data AHRS Global Data
@@ -203,6 +203,16 @@ int16_t * valid_data_buffer;
 uint32_t ekf_too_slow = 0;
 //! Total number of data blocks converted
 uint32_t total_conversion_blocks = 0;
+//! Flag to indicate new GPS data available
+uint8_t gps_updated = FALSE;
+//! Home location in ECEF coordinates
+double BaseECEF[3] = {0, 0, 0};
+//! Rotation matrix from LLA to Rne
+float Rne[3][3];
+//! Current location in NED coordinates relative to base
+float NED[3];
+//! Current location in NED coordinates relative to base
+
 /**
  * @}
  */
@@ -215,7 +225,7 @@ int main()
 {
   float gyro[3], accel[3], mag[3];
   float pos[3] = {0,0,0}, vel[3] = {0,0,0}, BaroAlt = 0;
-  uint32_t update_ctr = 0;
+  uint32_t loop_ctr = 0;
   ahrs_algorithm = INSGPS_Algo;
   
   /* Brings up System using CMSIS functions, enables the LEDs. */
@@ -281,7 +291,7 @@ int main()
     float scaled_mag_var[3] = {mag_var[0] / mag_length, mag_var[1] / mag_length, mag_var[2] / mag_length};
     INSSetMagVar(scaled_mag_var);     
     
-/*    // Initialize the algorithm assuming stationary    
+    // Initialize the algorithm assuming stationary    
     float temp_var[3] = {10, 10, 10};
     float temp_gyro[3] = {0, 0, 0};
 
@@ -297,7 +307,7 @@ int main()
       RPY2Quaternion(rpy,Nav.q);
       INSPrediction( temp_gyro, accel_bias, 1 / (float) EKF_RATE );
       FullCorrection(mag,pos,vel,BaroAlt); 
-    }    */
+    }    
 
     INSSetGyroBias(gyro_bias);
     INSSetAccelVar(accel_var);
@@ -320,6 +330,8 @@ int main()
   while (1) {
     // Alive signal
     PIOS_LED_Toggle(LED1);
+    
+    loop_ctr ++;
     
     // Get magnetic readings
     PIOS_HMC5843_ReadMag(mag_data.raw.axis);
@@ -364,11 +376,35 @@ int main()
       mag[2] = -mag_data.raw.axis[2];
             
       INSPrediction(gyro, accel, 1 / (float) EKF_RATE);
-      update_ctr++;
-      if ( 0 )
-        MagCorrection(mag);
-      else if ( 1 );
-        FullCorrection(mag,pos,vel,BaroAlt); 
+
+      if ( ((loop_ctr % 10000) == 0) && (gps_data.status > 0) )
+      {
+        // cheap logic instead of detecting the first update of gps data
+        WMM_GetMagVector(gps_data.latitude, gps_data.longitude, gps_data.altitude, 8, 17, 2010, MagNorth);
+        float MagNorthLen = sqrt(MagNorth[0] * MagNorth[0] + MagNorth[1] * MagNorth[1] + MagNorth[2] * MagNorth[2]);
+        float MagNorthScaled[3] = {MagNorth[0] / MagNorthLen, MagNorth[1] / MagNorthLen, MagNorth[2] / MagNorthLen};
+        INSSetMagNorth(MagNorthScaled);
+      }  
+      
+      if ( gps_updated ) 
+      {
+        if(BaseECEF[0] == 0 && BaseECEF[1] == 0 && BaseECEF[2] == 0)
+          initialize_location();
+        
+        // Convert to NED frame.  Probably this will be moved to OP mainboard
+        double LLA[3] = {gps_data.latitude, gps_data.longitude, gps_data.altitude};
+        LLA2Base(LLA, BaseECEF, Rne, NED);
+
+        // Compute velocity from Heading and groundspeed
+        vel[0] = gps_data.groundspeed * cos(gps_data.heading * M_PI / 180);        
+        vel[1] = gps_data.groundspeed * sin(gps_data.heading * M_PI / 180);
+        vel[2] = 0;
+        FullCorrection(mag, NED, vel, altitude_data.altitude);
+
+        gps_updated = FALSE;
+      }
+      else
+        MagCorrection(mag); 
       
       Quaternion2RPY(Nav.q,rpy);
       attitude_data.quaternion.q1 = Nav.q[0];
@@ -406,6 +442,18 @@ int main()
   
   return 0;
 }
+
+/**
+ * @brief Initialize a location as the home point and compute rotation matrix to
+ * get to NED coordinates
+ */
+void initialize_location() 
+{
+  double LLA[3] = {gps_data.latitude, gps_data.longitude, gps_data.altitude};
+  RneFromLLA(LLA, Rne);
+  LLA2ECEF(LLA ,BaseECEF);
+}
+
 
 /**
  * @brief Downsample the analog data
@@ -626,6 +674,18 @@ void process_spi_request(void)
     altitude_data.altitude    = user_rx_v1.payload.user.v.req.altitude.altitude;
     altitude_data.pressure    = user_rx_v1.payload.user.v.req.altitude.pressure;
     altitude_data.temperature = user_rx_v1.payload.user.v.req.altitude.temperature;
+    dump_spi_message(PIOS_COM_AUX, "V", (uint8_t *)&user_rx_v1, sizeof(user_rx_v1));
+    lfsm_user_set_tx_v1 (&user_tx_v1);
+    break;
+  case OPAHRS_MSG_V1_REQ_GPS:
+    opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_GPS);
+    gps_updated = TRUE;
+    gps_data.latitude    = user_rx_v1.payload.user.v.req.gps.latitude;
+    gps_data.longitude    = user_rx_v1.payload.user.v.req.gps.longitude;
+    gps_data.altitude = user_rx_v1.payload.user.v.req.gps.altitude;
+    gps_data.heading = user_rx_v1.payload.user.v.req.gps.heading;
+    gps_data.groundspeed = user_rx_v1.payload.user.v.req.gps.groundspeed;
+    gps_data.status = user_rx_v1.payload.user.v.req.gps.status;
     dump_spi_message(PIOS_COM_AUX, "V", (uint8_t *)&user_rx_v1, sizeof(user_rx_v1));
     lfsm_user_set_tx_v1 (&user_tx_v1);
     break;

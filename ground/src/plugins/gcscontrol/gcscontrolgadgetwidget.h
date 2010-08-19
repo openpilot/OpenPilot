@@ -48,6 +48,7 @@ private slots:
 private:
        Ui_GCSControl *m_gcscontrol;
        ManualControlCommand* getMCC();
+       UAVObject::Metadata mccInitialData;
 };
 
 #endif /* GCSControlGADGETWIDGET_H_ */

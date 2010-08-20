@@ -65,7 +65,7 @@
 
 // Private functions
 static void gpsTask(void* parameters);
-static void setHomeLocation(PositionActualData gpsData);
+static void setHomeLocation(PositionActualData * gpsData);
 
 // functions
 char* nmeaGetPacketBuffer(void);
@@ -120,6 +120,7 @@ int32_t GPSInitialize(void)
 	return 0;
 }
 
+static bool homeLocationSet = 0;
 
 /**
  * gps task. Processes input buffer. It does not return.
@@ -131,9 +132,9 @@ static void gpsTask(void* parameters)
 	portTickType xDelay = 100 / portTICK_RATE_MS;
 	PositionActualData GpsData;
 	uint32_t timeNowMs;
-  uint8_t homeLocationSet = 0;
 
-
+  homeLocationSet = 0;
+  
 	// Loop forever
 	while(1)
 	{
@@ -161,9 +162,9 @@ static void gpsTask(void* parameters)
     else {
       // Had an update
       PositionActualGet(&GpsData);
-      if(GpsData.Status == POSITIONACTUAL_STATUS_FIX3D && !homeLocationSet ) {
-        setHomeLocation(GpsData);
-        homeLocationSet = 1;
+      if(GpsData.Status == POSITIONACTUAL_STATUS_FIX3D && homeLocationSet == FALSE) {
+        setHomeLocation(&GpsData);
+        homeLocationSet = TRUE;
       }
     }
 
@@ -172,15 +173,15 @@ static void gpsTask(void* parameters)
 	}
 }
 
-static void setHomeLocation(PositionActualData gpsData) 
+static void setHomeLocation(PositionActualData * gpsData) 
 {
   HomeLocationData home;
   HomeLocationGet(&home);
   
   // Store LLA
-  home.Latitude = (int32_t) gpsData.Latitude * 10e6;
-  home.Longitude = (int32_t) gpsData.Longitude * 10e6;
-  home.Altitude = gpsData.GeoidSeparation;
+  home.Latitude = (int32_t) (gpsData->Latitude * 10e6);
+  home.Longitude = (int32_t) (gpsData->Longitude * 10e6);
+  home.Altitude = gpsData->GeoidSeparation;
   
   // Compute home ECEF coordinates and the rotation matrix into NED
   double LLA[3] = {(double) home.Latitude / 10e6, (double) home.Longitude / 10e6, (double) home.Altitude};
@@ -197,9 +198,9 @@ static void setHomeLocation(PositionActualData gpsData)
   memcpy(&home.RNE[0], &RNE[0][0], 9 * sizeof(RNE[0][0]));
   
   // Compute magnetic flux direction at home location
-  WMM_Initialize(); // Set default values and constants
+  //WMM_Initialize(); // Set default values and constants
   // TODO: Extract time/date from GPS to seed this
-  WMM_GetMagVector(LLA[0], LLA[1], LLA[2], 8, 17, 2010, home.Be);
+  //WMM_GetMagVector(LLA[0], LLA[1], LLA[2], 8, 17, 2010, home.Be);
   
   HomeLocationSet(&home);
 }

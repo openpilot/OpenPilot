@@ -100,6 +100,7 @@ static void HomeLocationUpdatedCb(UAVObjEvent * ev)
 	HomeLocationIsUpdatedFlag = true;
 }
 
+static bool AHRSKnowsHome = FALSE;
 /**
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
@@ -129,6 +130,9 @@ static void ahrscommsTask(void* parameters)
 
     AlarmsSet(SYSTEMALARMS_ALARM_AHRSCOMMS, SYSTEMALARMS_ALARM_CRITICAL);
 
+    /* Whenever resyncing, assume AHRS doesn't reset and doesn't know home */
+    AHRSKnowsHome = FALSE;
+    
     /* Spin here until we're in sync */
     while (PIOS_OPAHRS_resync() != OPAHRS_RESULT_OK) {
       vTaskDelay(100 / portTICK_RATE_MS);
@@ -175,6 +179,7 @@ static void ahrscommsTask(void* parameters)
           AltitudeActualIsUpdatedFlag = false;
         } else {
           /* Comms error */
+          break;
         }
       }
 
@@ -186,19 +191,22 @@ static void ahrscommsTask(void* parameters)
           PositionActualIsUpdatedFlag = false;
         } else {
           /* Comms error */
+          break;
         }
       }
 
-      if (HomeLocationIsUpdatedFlag) {
+      if (HomeLocationIsUpdatedFlag || !AHRSKnowsHome) {
         struct opahrs_msg_v1 req;
         
         load_magnetic_north(&(req.payload.user.v.req.north));
         if (PIOS_OPAHRS_SetMagNorth(&req) == OPAHRS_RESULT_OK) {
           HomeLocationIsUpdatedFlag = false;
+          AHRSKnowsHome = TRUE;
         } else {
           /* Comms error */
+          break;
         }
-      }      
+      }    
       
       /* Wait for the next update interval */
       vTaskDelay( settings.UpdatePeriod / portTICK_RATE_MS );

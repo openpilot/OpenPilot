@@ -5,7 +5,8 @@ include(ipconnection_dependencies.pri)
 HEADERS += ipconnectionplugin.h \
     ipconnection_global.h \
     ipconnectionconfiguration.h \
-    ipconnectionoptionspage.h
+    ipconnectionoptionspage.h \
+    ipconnection_internal.h
 SOURCES += ipconnectionplugin.cpp \
     ipconnectionconfiguration.cpp \
     ipconnectionoptionspage.cpp

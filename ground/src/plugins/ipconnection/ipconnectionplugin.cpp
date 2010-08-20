@@ -32,6 +32,7 @@
 
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/icore.h>
+#include "ipconnection_internal.h"
 
 #include <QtCore/QtPlugin>
 #include <QtGui/QMainWindow>
@@ -39,8 +40,76 @@
 #include <QtNetwork/QAbstractSocket>
 #include <QtNetwork/QTcpSocket>
 #include <QtNetwork/QUdpSocket>
+#include <QWaitCondition>
+#include <coreplugin/threadmanager.h>
 
 #include <QDebug>
+
+//Communication between IPconnectionConnection::OpenDevice() and IPConnection::onOpenDevice()
+QString errorMsg;
+QWaitCondition openDeviceWait;
+QReadWriteLock dummyLock;
+QAbstractSocket *ret;
+
+IPConnection::IPConnection(IPconnectionConnection *connection) : QObject()
+{
+    moveToThread(Core::ICore::instance()->threadManager()->getRealTimeThread());
+
+    QObject::connect(connection, SIGNAL(CreateSocket(QString,int,bool)),
+                     this, SLOT(onOpenDevice(QString,int,bool)));
+    QObject::connect(connection, SIGNAL(CloseSocket(QAbstractSocket*)),
+                     this, SLOT(onCloseDevice(QAbstractSocket*)));
+}
+
+/*IPConnection::~IPConnection()
+{
+
+}*/
+
+void IPConnection::onOpenDevice(QString HostName, int Port, bool UseTCP)
+{
+    QAbstractSocket *ipSocket;
+    const int Timeout = 5 * 1000;
+    int state;
+
+    if (UseTCP) {
+        ipSocket = new QTcpSocket(this);
+    } else {
+        ipSocket = new QUdpSocket(this);
+    }
+
+    //do sanity check on hostname and port...
+    if((HostName.length()==0)||(Port<1)){
+        errorMsg = "Please configure Host and Port options before opening the connection";
+
+    }
+    else {
+        //try to connect...
+        ipSocket->connectToHost(HostName, Port);
+
+        //in blocking mode so we wait for the connection to succeed
+        if (ipSocket->waitForConnected(Timeout)) {
+            ret = ipSocket;
+            openDeviceWait.wakeAll();
+            return;
+        }
+        //tell user something went wrong
+        errorMsg = ipSocket->errorString ();
+    }
+    /* BUGBUG TODO - returning null here leads to segfault because some caller still calls disconnect without checking our return value properly
+    * someone needs to debug this, I got lost in the calling chain.*/
+    ret = NULL;
+    openDeviceWait.wakeAll();
+}
+
+void IPConnection::onCloseDevice(QAbstractSocket *ipSocket)
+{
+    ipSocket->close ();
+    delete(ipSocket);
+}
+
+
+IPConnection * connection = 0;
 
 IPconnectionConnection::IPconnectionConnection()
 {
@@ -50,6 +119,9 @@ IPconnectionConnection::IPconnectionConnection()
     m_config->restoresettings();
 
     m_optionspage = new IPconnectionOptionsPage(m_config,this);
+
+    if(!connection)
+        connection = new IPConnection(this);
 
     //just signal whenever we have a device event...
     QMainWindow *mw = Core::ICore::instance()->mainWindow();
@@ -64,6 +136,11 @@ IPconnectionConnection::~IPconnectionConnection()
     if (ipSocket){
         ipSocket->close ();
         delete(ipSocket);
+    }
+    if(connection)
+    {
+        delete connection;
+        connection = NULL;
     }
 }
 
@@ -86,58 +163,38 @@ QStringList IPconnectionConnection::availableDevices()
 
 QIODevice *IPconnectionConnection::openDevice(const QString &deviceName)
 {
-           const int Timeout = 5 * 1000;
-            int state;
-            QString HostName;
-            int Port;
-            QMessageBox msgBox;
+    QString HostName;
+    int Port;
+    bool UseTCP;
+    QMessageBox msgBox;
 
-            if (ipSocket){
-                //Andrew: close any existing socket... this should never occur
-                ipSocket->close ();
-                delete(ipSocket);
-                ipSocket = NULL;
-            }
+    //get the configuration info
+    HostName = m_config->HostName();
+    Port = m_config->Port();
+    UseTCP = m_config->UseTCP();
 
-            if (m_config->UseTCP()) {
-                ipSocket = new QTcpSocket(this);
-            } else {
-                ipSocket = new QUdpSocket(this);
-            }
+    if (ipSocket){
+        //Andrew: close any existing socket... this should never occur
+        emit CloseSocket(ipSocket);
+        ipSocket = NULL;
+    }
 
-            //get the configuration info
-            HostName = m_config->HostName();
-            Port = m_config->Port();
-
-            //do sanity check on hostname and port...
-            if((HostName.length()==0)||(Port<1)){
-                msgBox.setText((const QString )"Please configure Host and Port options before opening the connection");
-                msgBox.exec();
-
-            }
-            else {
-                //try to connect...
-                ipSocket->connectToHost((const QString )HostName, Port);
-
-                //in blocking mode so we wait for the connection to succeed
-                if (ipSocket->waitForConnected(Timeout)) {
-                    return ipSocket;
-                }
-                //tell user something went wrong
-                msgBox.setText((const QString )ipSocket->errorString ());
-                msgBox.exec();
-            }
-/* BUGBUG TODO - returning null here leads to segfault because some caller still calls disconnect without checking our return value properly
- * someone needs to debug this, I got lost in the calling chain.*/
-    ipSocket = NULL;
+    dummyLock.lockForRead();
+    emit CreateSocket(HostName, Port, UseTCP);
+    openDeviceWait.wait(&dummyLock);
+    ipSocket = ret;
+    if(ipSocket == NULL)
+    {
+        msgBox.setText((const QString )errorMsg);
+        msgBox.exec();
+    }
     return ipSocket;
 }
 
 void IPconnectionConnection::closeDevice(const QString &deviceName)
 {
     if (ipSocket){
-        ipSocket->close ();
-        delete(ipSocket);
+        emit CloseSocket(ipSocket);
         ipSocket = NULL;
     }
 }

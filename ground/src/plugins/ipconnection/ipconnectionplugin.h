@@ -68,6 +68,11 @@ public:
 
 protected slots:
     void onEnumerationChanged();
+
+signals: //For the benefit of IPConnection
+    void CreateSocket(QString HostName, int Port, bool UseTCP);
+    void CloseSocket(QAbstractSocket *socket);
+
 private:
        QAbstractSocket *ipSocket;
        IPconnectionConfiguration *m_config;

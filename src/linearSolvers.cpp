@@ -139,7 +139,9 @@ namespace jafar {
       }
 
       int solve_Cholesky(jblas::mat_column_major A, jblas::vec b, jblas::vec& x){
-        JFR_PRECOND( ((A.size1() == A.size2()) && (A.size1() == b.size()) && (A.size2() == x.size())),
+        JFR_PRECOND( ((A.size1() == A.size2()) && 
+											(A.size1() == b.size()) && 
+											(A.size2() == x.size())),
                      "LinearSolver: invalid size. A is nxn, x is nx1 and b is nx1");
         jblas::mat_column_major B(b.size(),1); 
         jblas::mat X(x.size(),1);
@@ -151,7 +153,9 @@ namespace jafar {
       }
 
       int solve_LU(jblas::mat_column_major A, jblas::vec b, jblas::vec& x){
-        JFR_PRECOND( ((A.size1() == A.size2()) && (A.size1() == b.size()) && (A.size2() == x.size())),
+        JFR_PRECOND( ((A.size1() == A.size2()) && 
+											(A.size1() == b.size()) && 
+											(A.size2() == x.size())),
                     "LinearSolver: invalid size. A is "<<A.size1()<<"x"<<A.size2() << " and b is "<<b.size()<<"x1");
         size_t size = b.size();
         int error = 0;

@@ -285,7 +285,7 @@ enum opahrs_result PIOS_OPAHRS_SetMagNorth(struct opahrs_msg_v1 *req)
     return rc;
   }
   
-  return opahrs_msg_v1_recv_rsp (OPAHRS_MSG_V1_RSP_GPS, &rsp);
+  return opahrs_msg_v1_recv_rsp (OPAHRS_MSG_V1_RSP_NORTH, &rsp);
 }
 
 enum opahrs_result PIOS_OPAHRS_SetPositionActual(struct opahrs_msg_v1 *req)

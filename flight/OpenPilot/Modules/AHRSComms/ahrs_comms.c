@@ -124,6 +124,10 @@ int32_t AHRSCommsInitialize(void)
  */
 static void ahrscommsTask(void* parameters)
 {
+  enum opahrs_result result;
+  uint16_t attitude_errors = 0, attituderaw_errors = 0, 
+            position_errors = 0, home_errors = 0, altitude_errors = 0;
+  
   // Main task loop
   while (1) {
     struct opahrs_msg_v1 rsp;
@@ -157,17 +161,19 @@ static void ahrscommsTask(void* parameters)
       /* Update settings with latest value */
       AttitudeSettingsGet(&settings);
   
-      if (PIOS_OPAHRS_GetAttitude(&rsp) == OPAHRS_RESULT_OK) {
+      if ((result = PIOS_OPAHRS_GetAttitude(&rsp)) == OPAHRS_RESULT_OK) {
         update_attitude_actual(&(rsp.payload.user.v.rsp.attitude));
       } else {
         /* Comms error */
+        attitude_errors++;
         break;
       }
 
-      if (PIOS_OPAHRS_GetAttitudeRaw(&rsp) == OPAHRS_RESULT_OK) {
+      if ((result = PIOS_OPAHRS_GetAttitudeRaw(&rsp)) == OPAHRS_RESULT_OK) {
 	      update_attitude_raw(&(rsp.payload.user.v.rsp.attituderaw));
       } else {
         /* Comms error */
+        attituderaw_errors++;
         break;
       }
 
@@ -175,10 +181,11 @@ static void ahrscommsTask(void* parameters)
         struct opahrs_msg_v1 req;
 
         load_altitude_actual(&(req.payload.user.v.req.altitude));
-        if (PIOS_OPAHRS_SetAltitudeActual(&req) == OPAHRS_RESULT_OK) {
+        if ((result = PIOS_OPAHRS_SetAltitudeActual(&req)) == OPAHRS_RESULT_OK) {
           AltitudeActualIsUpdatedFlag = false;
         } else {
           /* Comms error */
+          altitude_errors++;
           break;
         }
       }
@@ -187,10 +194,11 @@ static void ahrscommsTask(void* parameters)
         struct opahrs_msg_v1 req;
         
         load_position_actual(&(req.payload.user.v.req.gps));
-        if (PIOS_OPAHRS_SetPositionActual(&req) == OPAHRS_RESULT_OK) {
+        if ((result = PIOS_OPAHRS_SetPositionActual(&req)) == OPAHRS_RESULT_OK) {
           PositionActualIsUpdatedFlag = false;
         } else {
           /* Comms error */
+          position_errors++;
           break;
         }
       }
@@ -199,11 +207,12 @@ static void ahrscommsTask(void* parameters)
         struct opahrs_msg_v1 req;
         
         load_magnetic_north(&(req.payload.user.v.req.north));
-        if (PIOS_OPAHRS_SetMagNorth(&req) == OPAHRS_RESULT_OK) {
+        if ((result = PIOS_OPAHRS_SetMagNorth(&req)) == OPAHRS_RESULT_OK) {
           HomeLocationIsUpdatedFlag = false;
           AHRSKnowsHome = TRUE;
         } else {
           /* Comms error */
+          home_errors++;
           break;
         }
       }    

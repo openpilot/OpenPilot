@@ -35,6 +35,7 @@
 
 #include "pios.h"
 #include "stm32f10x_iwdg.h"
+#include "stm32f10x_dbgmcu.h"
 
 /** 
  * @brief Initialize the watchdog timer for a specified timeout
@@ -59,6 +60,7 @@ uint8_t PIOS_WDG_Init( uint8_t delayMs )
   delay = 60 / 16 * delayMs;
   if( delay > 0xfff )
     delay = 0xfff;
+  DBGMCU_Config(DBGMCU_IWDG_STOP, ENABLE);  // make the watchdog stop counting in debug mode
   IWDG_WriteAccessCmd( IWDG_WriteAccess_Enable );
   IWDG_SetPrescaler( IWDG_Prescaler_16 );
   IWDG_SetReload( delay );

@@ -656,7 +656,7 @@ void process_spi_request(void)
     lfsm_user_set_tx_v1 (&user_tx_v1);
     break;
   case OPAHRS_MSG_V1_REQ_NORTH:
-    opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_ALTITUDE);
+    opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_NORTH);
     INSSetMagNorth(user_rx_v1.payload.user.v.req.north.Be);
     dump_spi_message(PIOS_COM_AUX, "N", (uint8_t *)&user_rx_v1, sizeof(user_rx_v1));
     lfsm_user_set_tx_v1 (&user_tx_v1);

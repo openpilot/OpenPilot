@@ -232,6 +232,7 @@ SRC += $(STMSPDSRCDIR)/stm32f10x_spi.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_tim.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_usart.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_iwdg.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_dbgmcu.c
 SRC += $(STMSPDSRCDIR)/misc.c
 
 ## STM32 USB Library

@@ -201,6 +201,10 @@ static void setHomeLocation(PositionActualData * gpsData)
   //WMM_Initialize(); // Set default values and constants
   // TODO: Extract time/date from GPS to seed this
   //WMM_GetMagVector(LLA[0], LLA[1], LLA[2], 8, 17, 2010, home.Be);
+  // Hard code flux until get this updated - will get wrong orientations
+  home.Be[0] = 1;
+  home.Be[1] = 0;
+  home.Be[2] = 0;
   
   HomeLocationSet(&home);
 }

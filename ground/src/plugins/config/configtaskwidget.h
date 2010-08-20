@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       configgadgetwidget.h
+ * @file       configtaskwidget.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
  * @{
- * @brief The Configuration Gadget used to update settings in the firmware
+ * @brief The Configuration Gadget used to update settings in the firmware (task widget)
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,8 +24,8 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CONFIGGADGETWIDGET_H
-#define CONFIGGADGETWIDGET_H
+#ifndef CONFIGTASKWIDGET_H
+#define CONFIGTASKWIDGET_H
 
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjects/uavobjectmanager.h"
@@ -35,17 +35,15 @@
 #include <QList>
 
 
-class ConfigGadgetWidget: public QWidget
+class ConfigTaskWidget: public QWidget
 {
     Q_OBJECT
 
 public:
-    ConfigGadgetWidget(QWidget *parent = 0);
-    ~ConfigGadgetWidget();
-
-protected:
-        void resizeEvent(QResizeEvent * event);
+    ConfigTaskWidget(QWidget *parent = 0);
+    ~ConfigTaskWidget();
+    void updateObjectPersistance(ObjectPersistence::OperationOptions op, UAVObject *obj);
 
 };
 
-#endif // CONFIGGADGETWIDGET_H
+#endif // CONFIGTASKWIDGET_H

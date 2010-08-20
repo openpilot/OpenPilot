@@ -10,14 +10,22 @@ HEADERS += configplugin.h \
     configgadgetfactory.h \
     configgadgetoptionspage.h \
     configgadget.h \
-    fancytabwidget.h
+    fancytabwidget.h \
+    configservowidget.h \
+    configtaskwidget.h \
+    configairframewidget.h \
+    configtelemetrywidget.h
 SOURCES += configplugin.cpp \
     configgadgetconfiguration.cpp \
     configgadgetwidget.cpp \
     configgadgetfactory.cpp \
     configgadgetoptionspage.cpp \
     configgadget.cpp \
-    fancytabwidget.cpp
+    fancytabwidget.cpp \
+    configtaskwidget.cpp \
+    configservowidget.cpp \
+    configairframewidget.cpp \
+    configtelemetrywidget.cpp
 FORMS += settingswidget.ui \
     airframe.ui \
     telemetry.ui

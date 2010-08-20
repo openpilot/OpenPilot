@@ -1,8 +1,8 @@
 /**
  ******************************************************************************
  *
- * @file       configgadgetwidget.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @file       configtaskwidget.cpp
+ * @author     E. Lafargue & The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
@@ -24,28 +24,40 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CONFIGGADGETWIDGET_H
-#define CONFIGGADGETWIDGET_H
+#include "configtaskwidget.h"
 
-#include "extensionsystem/pluginmanager.h"
-#include "uavobjects/uavobjectmanager.h"
-#include "uavobjects/uavobject.h"
-#include "uavobjects/objectpersistence.h"
 #include <QtGui/QWidget>
-#include <QList>
 
 
-class ConfigGadgetWidget: public QWidget
+ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent)
 {
-    Q_OBJECT
 
-public:
-    ConfigGadgetWidget(QWidget *parent = 0);
-    ~ConfigGadgetWidget();
+}
 
-protected:
-        void resizeEvent(QResizeEvent * event);
+ConfigTaskWidget::~ConfigTaskWidget()
+{
+   // Do nothing
+}
 
-};
 
-#endif // CONFIGGADGETWIDGET_H
+void ConfigTaskWidget::updateObjectPersistance(ObjectPersistence::OperationOptions op, UAVObject *obj)
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    ObjectPersistence* objper = dynamic_cast<ObjectPersistence*>( objManager->getObject(ObjectPersistence::NAME) );
+    if (obj != NULL)
+    {
+        ObjectPersistence::DataFields data;
+        data.Operation = op;
+        data.Selection = ObjectPersistence::SELECTION_SINGLEOBJECT;
+        data.ObjectID = obj->getObjID();
+        data.InstanceID = obj->getInstID();
+        objper->setData(data);
+        objper->updated();
+    }
+}
+
+/**
+  @}
+  @}
+  */

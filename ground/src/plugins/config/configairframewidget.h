@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       configgadgetwidget.h
+ * @file       configairframetwidget.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
  * @{
- * @brief The Configuration Gadget used to update settings in the firmware
+ * @brief Airframe configuration panel
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,28 +24,35 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CONFIGGADGETWIDGET_H
-#define CONFIGGADGETWIDGET_H
+#ifndef CONFIGAIRFRAMEWIDGET_H
+#define CONFIGAIRFRAMEWIDGET_H
 
+#include "ui_airframe.h"
+#include "configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/uavobject.h"
-#include "uavobjects/objectpersistence.h"
 #include <QtGui/QWidget>
 #include <QList>
 
+class Ui_Widget;
 
-class ConfigGadgetWidget: public QWidget
+class ConfigAirframeWidget: public ConfigTaskWidget
 {
     Q_OBJECT
 
 public:
-    ConfigGadgetWidget(QWidget *parent = 0);
-    ~ConfigGadgetWidget();
+    ConfigAirframeWidget(QWidget *parent = 0);
+    ~ConfigAirframeWidget();
 
-protected:
-        void resizeEvent(QResizeEvent * event);
+private:
+        Ui_AircraftWidget *m_aircraft;
+
+    private slots:
+        void requestAircraftUpdate();
+        void sendAircraftUpdate();
+        void saveAircraftUpdate();
 
 };
 
-#endif // CONFIGGADGETWIDGET_H
+#endif // CONFIGAIRFRAMEWIDGET_H

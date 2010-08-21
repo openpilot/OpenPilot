@@ -33,7 +33,7 @@
 #define AHRSSTATUS_H
 
 // Object constants
-#define AHRSSTATUS_OBJID 3344048156U
+#define AHRSSTATUS_OBJID 2618706832U
 #define AHRSSTATUS_NAME "AhrsStatus"
 #define AHRSSTATUS_METANAME "AhrsStatusMeta"
 #define AHRSSTATUS_ISSINGLEINST 1
@@ -58,6 +58,7 @@
 // Object data
 typedef struct {
     uint8_t SerialNumber[25];
+    uint8_t CommErrors[5];
 
 } __attribute__((packed)) AhrsStatusData;
 
@@ -65,6 +66,11 @@ typedef struct {
 // Field SerialNumber information
 /* Number of elements for field SerialNumber */
 #define AHRSSTATUS_SERIALNUMBER_NUMELEM 25
+// Field CommErrors information
+/* Array element names for field CommErrors */
+typedef enum { AHRSSTATUS_COMMERRORS_ATTITUDE=0, AHRSSTATUS_COMMERRORS_ATTITUDERAW=1, AHRSSTATUS_COMMERRORS_POSITIONACTUAL=2, AHRSSTATUS_COMMERRORS_HOMELOCATION=3, AHRSSTATUS_COMMERRORS_ALTITUDE=4 } AhrsStatusCommErrorsElem;
+/* Number of elements for field CommErrors */
+#define AHRSSTATUS_COMMERRORS_NUMELEM 5
 
 
 // Generic interface functions

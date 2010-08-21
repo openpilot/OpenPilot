@@ -119,14 +119,14 @@ int32_t AHRSCommsInitialize(void)
   return 0;
 }
 
+static   uint16_t attitude_errors = 0, attituderaw_errors = 0, position_errors = 0, home_errors = 0, altitude_errors = 0;
+
 /**
  * Module thread, should not return.
  */
 static void ahrscommsTask(void* parameters)
 {
   enum opahrs_result result;
-  uint16_t attitude_errors = 0, attituderaw_errors = 0, 
-            position_errors = 0, home_errors = 0, altitude_errors = 0;
   
   // Main task loop
   while (1) {
@@ -212,6 +212,7 @@ static void ahrscommsTask(void* parameters)
           AHRSKnowsHome = TRUE;
         } else {
           /* Comms error */
+          PIOS_LED_Off(LED2);
           home_errors++;
           break;
         }
@@ -231,6 +232,23 @@ static void load_magnetic_north(struct opahrs_msg_v1_req_north * mag_north)
   mag_north->Be[0] = data.Be[0];
   mag_north->Be[1] = data.Be[1];
   mag_north->Be[2] = data.Be[2];
+
+  if(data.Be[0] == 0 && data.Be[1] == 0 && data.Be[2] == 0)
+  {
+    // in case nothing has been set go to default to prevent NaN in attitude solution
+    mag_north->Be[0] = 1;  
+    mag_north->Be[1] = 0;
+    mag_north->Be[2] = 0;
+  }
+  else {
+    // normalize for unit length here
+    float len = sqrt(data.Be[0] * data.Be[0] + data.Be[1] * data.Be[1] + data.Be[2] * data.Be[2]);
+    mag_north->Be[0] = data.Be[0] / len;
+    mag_north->Be[1] = data.Be[1] / len;
+    mag_north->Be[2] = data.Be[2] / len;
+  }
+
+
 }
 
 static void load_altitude_actual(struct opahrs_msg_v1_req_altitude * altitude)
@@ -313,6 +331,12 @@ static void update_ahrs_status(struct opahrs_msg_v1_rsp_serial * serial)
   for (uint8_t i = 0; i < sizeof(serial->serial_bcd); i++) {
     data.SerialNumber[i] = serial->serial_bcd[i];
   }
+
+  data.CommErrors[AHRSSTATUS_COMMERRORS_ATTITUDE] = attitude_errors;
+  data.CommErrors[AHRSSTATUS_COMMERRORS_ATTITUDERAW] = attituderaw_errors;
+  data.CommErrors[AHRSSTATUS_COMMERRORS_POSITIONACTUAL] = position_errors;
+  data.CommErrors[AHRSSTATUS_COMMERRORS_HOMELOCATION] = home_errors;
+  data.CommErrors[AHRSSTATUS_COMMERRORS_ALTITUDE] = altitude_errors;
 
   AhrsStatusSet(&data);
 }

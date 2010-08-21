@@ -579,7 +579,45 @@ int32_t PIOS_I2C_Init(void)
     /* Initialize the state machine */
     i2c_adapter_fsm_init(i2c_adapter);
 
-    /* Initialize the GPIO pins */
+    /* Make sure the bus is free by clocking it until any slaves release the bus. */
+    GPIO_InitTypeDef scl_gpio_init;
+    scl_gpio_init           = i2c_adapter->cfg->scl.init;
+    scl_gpio_init.GPIO_Mode = GPIO_Mode_Out_OD;
+    GPIO_SetBits(i2c_adapter->cfg->scl.gpio, i2c_adapter->cfg->scl.init.GPIO_Pin);
+    GPIO_Init(i2c_adapter->cfg->scl.gpio, &scl_gpio_init);
+
+    GPIO_InitTypeDef sda_gpio_init;
+    sda_gpio_init           = i2c_adapter->cfg->sda.init;
+    sda_gpio_init.GPIO_Mode = GPIO_Mode_Out_OD;
+    GPIO_SetBits(i2c_adapter->cfg->sda.gpio, i2c_adapter->cfg->sda.init.GPIO_Pin);
+    GPIO_Init(i2c_adapter->cfg->sda.gpio, &sda_gpio_init);
+
+    i2c_adapter->bus_needed_reset = false;
+    for (uint8_t i = 0; i < 9; i++) {
+      /* Set clock high and wait for any clock stretching to finish. */
+      GPIO_SetBits(i2c_adapter->cfg->scl.gpio, i2c_adapter->cfg->scl.init.GPIO_Pin);
+      while (GPIO_ReadInputDataBit(i2c_adapter->cfg->scl.gpio, i2c_adapter->cfg->scl.init.GPIO_Pin) == Bit_RESET);
+      PIOS_DELAY_WaituS(2);
+
+      if (GPIO_ReadInputDataBit(i2c_adapter->cfg->sda.gpio, i2c_adapter->cfg->sda.init.GPIO_Pin) != Bit_SET) {
+	/* Note that the bus needed reset so we can tell this was useful */
+	i2c_adapter->bus_needed_reset = true;
+      }
+
+      /* Set clock low */
+      GPIO_ResetBits(i2c_adapter->cfg->scl.gpio, i2c_adapter->cfg->scl.init.GPIO_Pin);
+      PIOS_DELAY_WaituS(2);
+    }
+
+    /* Set data and clock high and wait for any clock stretching to finish. */
+    GPIO_SetBits(i2c_adapter->cfg->sda.gpio, i2c_adapter->cfg->sda.init.GPIO_Pin);
+    GPIO_SetBits(i2c_adapter->cfg->scl.gpio, i2c_adapter->cfg->scl.init.GPIO_Pin);
+    while (GPIO_ReadInputDataBit(i2c_adapter->cfg->scl.gpio, i2c_adapter->cfg->scl.init.GPIO_Pin) == Bit_RESET);
+    /* Wait for data to be high */
+    while (GPIO_ReadInputDataBit(i2c_adapter->cfg->sda.gpio, i2c_adapter->cfg->sda.init.GPIO_Pin) != Bit_SET);
+
+    /* Bus signals are guaranteed to be high (ie. free) after this point */
+    /* Initialize the GPIO pins to the peripheral function */
     GPIO_Init(i2c_adapter->cfg->scl.gpio, &(i2c_adapter->cfg->scl.init));
     GPIO_Init(i2c_adapter->cfg->sda.gpio, &(i2c_adapter->cfg->sda.init));
 
@@ -765,6 +803,7 @@ void PIOS_I2C_EV_IRQ_Handler(uint8_t i2c)
     break;
   case I2C_EVENT_MASTER_BYTE_TRANSMITTING: /* EV8 */
     /* Ignore this event and wait for TRANSMITTED in case we can't keep up */
+    goto skip_event;
     break;
   default:
     PIOS_DEBUG_Assert(0);
@@ -772,6 +811,9 @@ void PIOS_I2C_EV_IRQ_Handler(uint8_t i2c)
   }
 
   i2c_adapter_process_auto(i2c_adapter);
+
+skip_event:
+  ;
 }
 
 void PIOS_I2C_ER_IRQ_Handler(uint8_t i2c)

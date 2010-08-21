@@ -29,6 +29,7 @@
 
 #include <pios.h>
 #include <pios_stm32.h>
+#include <stdbool.h>
 
 struct pios_i2c_adapter_cfg {
   I2C_TypeDef           * regs;
@@ -80,6 +81,8 @@ struct pios_i2c_adapter {
   xSemaphoreHandle                    sem_busy;
   xSemaphoreHandle                    sem_ready;
 #endif
+
+  bool                                bus_needed_reset;
 
   enum i2c_adapter_state              curr_state;
   const struct pios_i2c_txn         * first_txn;

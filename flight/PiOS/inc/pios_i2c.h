@@ -31,6 +31,8 @@
 #ifndef PIOS_I2C_H
 #define PIOS_I2C_H
 
+#include <stdbool.h>
+
 /* Global Types */
 enum pios_i2c_txn_direction {
   PIOS_I2C_TXN_READ,

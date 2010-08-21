@@ -38,21 +38,21 @@ namespace core {
     ProviderStrings::ProviderStrings()
     {
         // Google version strings
-        VersionGoogleMap = "m@126";
-        VersionGoogleSatellite = "61";
-        VersionGoogleLabels = "h@126";
-        VersionGoogleTerrain = "t@125,r@126";
+        VersionGoogleMap = "m@130";
+        VersionGoogleSatellite = "66";
+        VersionGoogleLabels = "h@130";
+        VersionGoogleTerrain = "t@125,r@130";
         SecGoogleWord = "Galileo";
 
         // Google (China) version strings
-        VersionGoogleMapChina = "m@126";
-        VersionGoogleSatelliteChina = "s@61";
-        VersionGoogleLabelsChina = "h@126";
-        VersionGoogleTerrainChina = "t@125,r@126";
+        VersionGoogleMapChina = "m@130";
+        VersionGoogleSatelliteChina = "s@66";
+        VersionGoogleLabelsChina = "h@130";
+        VersionGoogleTerrainChina = "t@125,r@130";
 
         // Google (Korea) version strings
         VersionGoogleMapKorea = "kr1.12";
-        VersionGoogleSatelliteKorea = "61";
+        VersionGoogleSatelliteKorea = "66";
         VersionGoogleLabelsKorea = "kr1t.12";
 
         /// <summary>
@@ -67,10 +67,12 @@ namespace core {
         VersionYahooLabels = "4.3";
 
         // BingMaps
-        VersionBingMaps = "470";
+        VersionBingMaps = "517";
 
         // YandexMap
-        VersionYandexMap = "2.10.2";
+        VersionYandexMap = "2.15.0";
+        //VersionYandexSatellite = "1.18.0";
+        ////////////////////
 
         /// <summary>
         /// Bing Maps Customer Identification, more info here

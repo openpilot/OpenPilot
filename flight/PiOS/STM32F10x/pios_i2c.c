@@ -133,7 +133,7 @@ const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM
     .entry_fn = go_r_any_txn_addr,
     .next_state = {
       [I2C_EVENT_ADDR_SENT_LEN_EQ_1]     = I2C_STATE_R_MORE_TXN_PRE_ONE,
-      [I2C_EVENT_ADDR_SENT_LEN_EQ_2]     = I2C_STATE_R_MORE_TXN_PRE_LAST,
+      [I2C_EVENT_ADDR_SENT_LEN_EQ_2]     = I2C_STATE_R_MORE_TXN_PRE_FIRST,
       [I2C_EVENT_ADDR_SENT_LEN_GT_2]     = I2C_STATE_R_MORE_TXN_PRE_FIRST,
     },
   },

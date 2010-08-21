@@ -146,11 +146,8 @@ digraph stm32_i2c_fsm {
   r_last_txn_addr -> r_last_txn_pre_one [ label="ADDR\nlen==1" ]
   r_more_txn_addr -> r_more_txn_pre_one [ label="ADDR\nlen==1" ]
 
-  r_last_txn_addr -> r_last_txn_pre_last [ label="ADDR\nlen==2" ]
-  r_more_txn_addr -> r_more_txn_pre_last [ label="ADDR\nlen==2" ]
-
-  r_last_txn_addr -> r_last_txn_pre_first [ label="ADDR\nlen>2" ]
-  r_more_txn_addr -> r_more_txn_pre_first [ label="ADDR\nlen>2" ]
+  r_last_txn_addr -> r_last_txn_pre_first [ label="ADDR\nlen>=2" ]
+  r_more_txn_addr -> r_more_txn_pre_first [ label="ADDR\nlen>=2" ]
 
   r_last_txn_pre_one -> r_last_txn_post_last [ label="BTF\nlen==1" ]
   r_more_txn_pre_one -> r_more_txn_post_last [ label="BTF\nlen==1" ]

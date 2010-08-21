@@ -148,6 +148,7 @@ SRC += $(OPUAVOBJ)/exampleobject2.c
 SRC += $(OPUAVOBJ)/examplesettings.c
 SRC += $(OPUAVOBJ)/objectpersistence.c
 SRC += $(OPUAVOBJ)/positionactual.c
+SRC += $(OPUAVOBJ)/gpsposition.c
 SRC += $(OPUAVOBJ)/gcstelemetrystats.c
 SRC += $(OPUAVOBJ)/flighttelemetrystats.c
 SRC += $(OPUAVOBJ)/systemstats.c

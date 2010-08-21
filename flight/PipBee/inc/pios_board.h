@@ -80,10 +80,23 @@ TIM8  |           |           |           |
 #define PIOS_LED_LED4_GPIO_PIN			GPIO_Pin_7
 #define PIOS_LED_LED4_GPIO_CLK			RCC_APB2Periph_GPIOB
 
-#define PIOS_LED_NUM				4
-#define PIOS_LED_PORTS				{ PIOS_LED_LED1_GPIO_PORT, PIOS_LED_LED2_GPIO_PORT, PIOS_LED_LED3_GPIO_PORT, PIOS_LED_LED4_GPIO_PORT }
-#define PIOS_LED_PINS				{ PIOS_LED_LED1_GPIO_PIN,  PIOS_LED_LED2_GPIO_PIN,  PIOS_LED_LED3_GPIO_PIN,  PIOS_LED_LED4_GPIO_PIN }
-#define PIOS_LED_CLKS				{ PIOS_LED_LED1_GPIO_CLK,  PIOS_LED_LED2_GPIO_CLK,  PIOS_LED_LED3_GPIO_CLK,  PIOS_LED_LED4_GPIO_CLK }
+#define PIOS_LED_NUM					4
+#define PIOS_LED_PORTS					{ PIOS_LED_LED1_GPIO_PORT, PIOS_LED_LED2_GPIO_PORT, PIOS_LED_LED3_GPIO_PORT, PIOS_LED_LED4_GPIO_PORT }
+#define PIOS_LED_PINS					{ PIOS_LED_LED1_GPIO_PIN,  PIOS_LED_LED2_GPIO_PIN,  PIOS_LED_LED3_GPIO_PIN,  PIOS_LED_LED4_GPIO_PIN }
+#define PIOS_LED_CLKS					{ PIOS_LED_LED1_GPIO_CLK,  PIOS_LED_LED2_GPIO_CLK,  PIOS_LED_LED3_GPIO_CLK,  PIOS_LED_LED4_GPIO_CLK }
+
+#define USB_LED_ON						PIOS_LED_On(LED1);
+#define USB_LED_OFF						PIOS_LED_Off(LED1);
+#define USB_LED_TOGGLE					PIOS_LED_Toggle(LED1);
+#define LINK_LED_ON						PIOS_LED_On(LED2);
+#define LINK_LED_OFF					PIOS_LED_Off(LED2);
+#define LINK_LED_TOGGLE					PIOS_LED_Toggle(LED2);
+#define RX_LED_ON						PIOS_LED_On(LED3);
+#define RX_LED_OFF						PIOS_LED_Off(LED3);
+#define RX_LED_TOGGLE					PIOS_LED_Toggle(LED3);
+#define TX_LED_ON						PIOS_LED_On(LED4);
+#define TX_LED_OFF						PIOS_LED_Off(LED4);
+#define TX_LED_TOGGLE					PIOS_LED_Toggle(LED4);
 
 //-------------------------
 // Delay Timer
@@ -220,15 +233,18 @@ TIM8  |           |           |           |
 //-------------------------
 // GPIO
 //-------------------------
+
 #define PIOS_GPIO_1_PORT			GPIOB
-#define PIOS_GPIO_1_PIN				GPIO_Pin_9
-#define PIOS_GPIO_1_GPIO_CLK			RCC_APB2Periph_GPIOB
+#define PIOS_GPIO_1_PIN				GPIO_Pin_15
+#define PIOS_GPIO_1_GPIO_CLK		RCC_APB2Periph_GPIOB
 #define PIOS_GPIO_PORTS				{ PIOS_GPIO_1_PORT }
 #define PIOS_GPIO_PINS				{ PIOS_GPIO_1_PIN }
 #define PIOS_GPIO_CLKS				{ PIOS_GPIO_1_GPIO_CLK }
 #define PIOS_GPIO_NUM				1
 
-#define SET_ACCEL_2G PIOS_GPIO_On(0);
-#define SET_ACCEL_6G PIOS_GPIO_Off(0)
+#define SET_RTS						PIOS_GPIO_On(0);
+#define CLEAR_RTS					PIOS_GPIO_Off(0);
+
+//-------------------------
 
 #endif /* PIOS_BOARD_H */

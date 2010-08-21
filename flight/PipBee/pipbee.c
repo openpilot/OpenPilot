@@ -24,20 +24,33 @@
  */
 
 
-/* OpenPilot Includes */
+//*****************************************************************************
+// OpenPilot Includes
+
 #include "pipbee.h"
 
-/* Global Variables */
+//*****************************************************************************
+// Global Variables
 
-/* Local Variables */
 
-/* Function Prototypes */
 
-/**
-* PipBee Main function
-*/
+//*****************************************************************************
+// Local Variables
+
+
+
+//*****************************************************************************
+// Function Prototypes
+
+
+
+//*****************************************************************************
+// Main function
+
 int main()
 {
+	// *************
+
 	// Brings up System using CMSIS functions, enables the LEDs.
 	PIOS_SYS_Init();
   
@@ -53,29 +66,31 @@ int main()
 	// SPI link to master
 	PIOS_SPI_Init();
 
-	// *************
-	// LED test
+	CLEAR_RTS;
 
-	PIOS_LED_Off(LED1);
-	PIOS_LED_Off(LED2);
-	PIOS_LED_Off(LED3);
-	PIOS_LED_Off(LED4);
-/*
+	// *************
+	// do a simple visible LED flash sequence for the user
+
+	USB_LED_OFF;
+	LINK_LED_OFF;
+	RX_LED_OFF;
+	TX_LED_OFF;
+
 	for (int i = 0; i < 2; i++)
 	{
-		PIOS_LED_Toggle(LED1);
+		USB_LED_TOGGLE;
 		PIOS_DELAY_WaitmS(200);
-		PIOS_LED_Toggle(LED2);
+		LINK_LED_TOGGLE;
 		PIOS_DELAY_WaitmS(200);
-		PIOS_LED_Toggle(LED3);
+		RX_LED_TOGGLE;
 		PIOS_DELAY_WaitmS(200);
-		PIOS_LED_Toggle(LED4);
+		TX_LED_TOGGLE;
 		PIOS_DELAY_WaitmS(200);
 	}
-*/
-	// *************
 
-	// Main loop
+	// *************
+	// Main executive loop
+
 	while (1)
 	{
 /*		uint32_t loop_ctr;
@@ -88,15 +103,18 @@ int main()
 */
 
 		// just sequence the LED's for now
-		PIOS_LED_Toggle(LED1);
+		USB_LED_TOGGLE;
 		PIOS_DELAY_WaitmS(200);
-		PIOS_LED_Toggle(LED2);
+		LINK_LED_TOGGLE;
 		PIOS_DELAY_WaitmS(200);
-		PIOS_LED_Toggle(LED3);
+		RX_LED_TOGGLE;
 		PIOS_DELAY_WaitmS(200);
-		PIOS_LED_Toggle(LED4);
+		TX_LED_TOGGLE;
 		PIOS_DELAY_WaitmS(200);
+
 	}
   
 	return 0;
 }
+
+//*****************************************************************************

@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       altitudeactual.cpp
+ * @file       baroaltitude.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
  * @addtogroup GCSPlugins GCS Plugins
@@ -9,7 +9,7 @@
  * @addtogroup UAVObjectsPlugin UAVObjects Plugin
  * @{
  *   
- * @note       Object definition file: altitudeactual.xml. 
+ * @note       Object definition file: baroaltitude.xml. 
  *             This is an automatically generated file.
  *             DO NOT modify manually.
  *
@@ -30,15 +30,15 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include "altitudeactual.h"
+#include "baroaltitude.h"
 #include "uavobjectfield.h"
 
-const QString AltitudeActual::NAME = QString("AltitudeActual");
+const QString BaroAltitude::NAME = QString("BaroAltitude");
 
 /**
  * Constructor
  */
-AltitudeActual::AltitudeActual(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
+BaroAltitude::BaroAltitude(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
 {
     // Create fields
     QList<UAVObjectField*> fields;
@@ -61,7 +61,7 @@ AltitudeActual::AltitudeActual(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS,
 /**
  * Get the default metadata for this object
  */
-UAVObject::Metadata AltitudeActual::getDefaultMetadata()
+UAVObject::Metadata BaroAltitude::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
     metadata.flightAccess = ACCESS_READWRITE;
@@ -82,7 +82,7 @@ UAVObject::Metadata AltitudeActual::getDefaultMetadata()
  * If a default value is not specified the object fields
  * will be initialized to zero.
  */
-void AltitudeActual::setDefaultFieldValues()
+void BaroAltitude::setDefaultFieldValues()
 {
 
 }
@@ -90,7 +90,7 @@ void AltitudeActual::setDefaultFieldValues()
 /**
  * Get the object data fields
  */
-AltitudeActual::DataFields AltitudeActual::getData()
+BaroAltitude::DataFields BaroAltitude::getData()
 {
     QMutexLocker locker(mutex);
     return data;
@@ -99,7 +99,7 @@ AltitudeActual::DataFields AltitudeActual::getData()
 /**
  * Set the object data fields
  */
-void AltitudeActual::setData(const DataFields& data)
+void BaroAltitude::setData(const DataFields& data)
 {
     QMutexLocker locker(mutex);
     // Get metadata
@@ -118,9 +118,9 @@ void AltitudeActual::setData(const DataFields& data)
  * Do not use this function directly to create new instances, the
  * UAVObjectManager should be used instead.
  */
-UAVDataObject* AltitudeActual::clone(quint32 instID)
+UAVDataObject* BaroAltitude::clone(quint32 instID)
 {
-    AltitudeActual* obj = new AltitudeActual();
+    BaroAltitude* obj = new BaroAltitude();
     obj->initialize(instID, this->getMetaObject());
     return obj;
 }
@@ -128,7 +128,7 @@ UAVDataObject* AltitudeActual::clone(quint32 instID)
 /**
  * Static function to retrieve an instance of the object.
  */
-AltitudeActual* AltitudeActual::GetInstance(UAVObjectManager* objMngr, quint32 instID)
+BaroAltitude* BaroAltitude::GetInstance(UAVObjectManager* objMngr, quint32 instID)
 {
-    return dynamic_cast<AltitudeActual*>(objMngr->getObject(AltitudeActual::OBJID, instID));
+    return dynamic_cast<BaroAltitude*>(objMngr->getObject(BaroAltitude::OBJID, instID));
 }

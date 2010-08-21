@@ -30,7 +30,7 @@
 
 #include "plotdata.h"
 #include "uavobjects/uavobject.h"
-#include "uavobjects/altitudeactual.h"
+#include "uavobjects/baroaltitude.h"
 #include "uavobjects/positionactual.h"
 
 
@@ -78,7 +78,7 @@ public:
     ~TestDataGen();
 
 private:
-    AltitudeActual* altActual;
+    BaroAltitude* baroAltitude;
     PositionActual* gps;
 
     QTimer *timer;

@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       altitudeactual.h
+ * @file       baroaltitude.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
  * @addtogroup GCSPlugins GCS Plugins
@@ -9,7 +9,7 @@
  * @addtogroup UAVObjectsPlugin UAVObjects Plugin
  * @{
  *   
- * @note       Object definition file: altitudeactual.xml. 
+ * @note       Object definition file: baroaltitude.xml. 
  *             This is an automatically generated file.
  *             DO NOT modify manually.
  *
@@ -30,13 +30,13 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef ALTITUDEACTUAL_H
-#define ALTITUDEACTUAL_H
+#ifndef BAROALTITUDE_H
+#define BAROALTITUDE_H
 
 #include "uavdataobject.h"
 #include "uavobjectmanager.h"
 
-class UAVOBJECTS_EXPORT AltitudeActual: public UAVDataObject
+class UAVOBJECTS_EXPORT BaroAltitude: public UAVDataObject
 {
     Q_OBJECT
 
@@ -56,21 +56,21 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 2251817750U;
+    static const quint32 OBJID = 3980666102U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;
     static const quint32 NUMBYTES = sizeof(DataFields);
 
     // Functions
-    AltitudeActual();
+    BaroAltitude();
 
     DataFields getData();
     void setData(const DataFields& data);
     Metadata getDefaultMetadata();
     UAVDataObject* clone(quint32 instID);
 
-    static AltitudeActual* GetInstance(UAVObjectManager* objMngr, quint32 instID = 0);
+    static BaroAltitude* GetInstance(UAVObjectManager* objMngr, quint32 instID = 0);
 	
 private:
     DataFields data;
@@ -79,4 +79,4 @@ private:
 
 };
 
-#endif // ALTITUDEACTUAL_H
+#endif // BAROALTITUDE_H

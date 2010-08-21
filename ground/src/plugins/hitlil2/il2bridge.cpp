@@ -108,7 +108,7 @@ void Il2Bridge::onStart()
     ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
     actDesired = ActuatorDesired::GetInstance(objManager);
-    altActual = AltitudeActual::GetInstance(objManager);
+    baroAltitude = BaroAltitude::GetInstance(objManager);
     attActual = AttitudeActual::GetInstance(objManager);
     posActual = PositionActual::GetInstance(objManager);
     telStats = GCSTelemetryStats::GetInstance(objManager);
@@ -218,7 +218,7 @@ void Il2Bridge::receiveUpdate()
 void Il2Bridge::setupObjects()
 {
     setupInputObject(actDesired, 75);
-    setupOutputObject(altActual, 250);
+    setupOutputObject(baroAltitude, 250);
     setupOutputObject(attActual, 75);
     setupOutputObject(posActual, 250);
 }
@@ -356,12 +356,12 @@ void Il2Bridge::processUpdate(QString& data)
     current.X = old.X + (current.dX*current.dT);
     current.Y = old.Y + (current.dY*current.dT);
 
-    // Update AltitudeActual object
-    AltitudeActual::DataFields altActualData;
-    altActualData.Altitude = current.Z;
-    altActualData.Temperature = TEMP_GROUND + (current.Z * TEMP_LAPSE_RATE) - 273.0;
-    altActualData.Pressure = PRESSURE(current.Z)/1000.0; // kpa
-    altActual->setData(altActualData);
+    // Update BaroAltitude object
+    BaroAltitude::DataFields baroAltitudeData;
+    baroAltitudeData.Altitude = current.Z;
+    baroAltitudeData.Temperature = TEMP_GROUND + (current.Z * TEMP_LAPSE_RATE) - 273.0;
+    baroAltitudeData.Pressure = PRESSURE(current.Z)/1000.0; // kpa
+    baroAltitude->setData(baroAltitudeData);
 
     // Update attActual object
     AttitudeActual::DataFields attActualData;
@@ -394,7 +394,7 @@ void Il2Bridge::processUpdate(QString& data)
 
     // issue manual update
     attActual->updated();
-    altActual->updated();
+    baroAltitude->updated();
     posActual->updated();
 }
 

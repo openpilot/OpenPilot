@@ -13,7 +13,7 @@ HEADERS += uavobjects_global.h \
     uavobjectsplugin.h \
     examplesettings.h \
     ahrsstatus.h \
-    altitudeactual.h \
+    baroaltitude.h \
     attitudeactual.h \
     attitudesettings.h \
     exampleobject2.h \
@@ -47,7 +47,7 @@ SOURCES += uavobject.cpp \
     uavobjectsinit.cpp \
     uavobjectsplugin.cpp \
     ahrsstatus.cpp \
-    altitudeactual.cpp \
+    baroaltitude.cpp \
     attitudeactual.cpp \
     attitudesettings.cpp \
     examplesettings.cpp \

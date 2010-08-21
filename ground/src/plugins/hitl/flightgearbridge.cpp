@@ -60,7 +60,7 @@ void FlightGearBridge::onStart()
     ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
     actDesired = ActuatorDesired::GetInstance(objManager);
-    altActual = AltitudeActual::GetInstance(objManager);
+    baroAltitude = BaroAltitude::GetInstance(objManager);
     attActual = AttitudeActual::GetInstance(objManager);
     posActual = PositionActual::GetInstance(objManager);
     telStats = GCSTelemetryStats::GetInstance(objManager);
@@ -167,7 +167,7 @@ void FlightGearBridge::receiveUpdate()
 void FlightGearBridge::setupObjects()
 {
     setupInputObject(actDesired, 75);
-    setupOutputObject(altActual, 250);
+    setupOutputObject(baroAltitude, 250);
     setupOutputObject(attActual, 75);
     setupOutputObject(posActual, 250);
 }
@@ -267,12 +267,12 @@ void FlightGearBridge::processUpdate(QString& data)
     // Get pressure (kpa)
     float pressure = fields[20].toFloat() * INHG2KPA;
 
-    // Update AltitudeActual object
-    AltitudeActual::DataFields altActualData;
-    altActualData.Altitude = altitudeAGL;
-    altActualData.Temperature = temperature;
-    altActualData.Pressure = pressure;
-    altActual->setData(altActualData);
+    // Update BaroAltitude object
+    BaroAltitude::DataFields baroAltitudeData;
+    baroAltitudeData.Altitude = altitudeAGL;
+    baroAltitudeData.Temperature = temperature;
+    baroAltitudeData.Pressure = pressure;
+    baroAltitude->setData(baroAltitudeData);
 
     // Update attActual object
     AttitudeActual::DataFields attActualData;

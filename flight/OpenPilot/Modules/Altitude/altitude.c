@@ -3,7 +3,7 @@
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{ 
  * @addtogroup AltitudeModule Altitude Module
- * @brief Communicate with BMP085 and update @ref AltitudeActual "AltitudeActual UAV Object"
+ * @brief Communicate with BMP085 and update @ref BaroAltitude "BaroAltitude UAV Object"
  * @{ 
  *
  * @file       altitude.c
@@ -30,14 +30,14 @@
  */
 
 /**
- * Output object: AltitudeActual
+ * Output object: BaroAltitude
  *
- * This module will periodically update the value of the AltitudeActual object.
+ * This module will periodically update the value of the BaroAltitude object.
  *
  */
 
 #include "openpilot.h"
-#include "altitudeactual.h" // object that will be updated by the module
+#include "baroaltitude.h" // object that will be updated by the module
 
 // Private constants
 #define STACK_SIZE configMINIMAL_STACK_SIZE
@@ -69,7 +69,7 @@ int32_t AltitudeInitialize()
  */
 static void altitudeTask(void* parameters)
 {
-	AltitudeActualData data;
+	BaroAltitudeData data;
 	portTickType lastSysTime;
 
 	PIOS_BMP085_Init();
@@ -104,7 +104,7 @@ static void altitudeTask(void* parameters)
 		data.Altitude = 44330.0 * (1.0 - powf((data.Pressure/ (BMP085_P0 / 1000.0)), (1.0/5.255)));
 
 		// Update the AltitudeActual UAVObject
-		AltitudeActualSet(&data);
+		BaroAltitudeSet(&data);
 
 		// Delay until it is time to read the next sample
 		vTaskDelayUntil(&lastSysTime, UPDATE_PERIOD / portTICK_RATE_MS );

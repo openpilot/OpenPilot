@@ -56,7 +56,7 @@
 #include "attituderaw.h"
 #include "ahrsstatus.h"
 #include "alarms.h"
-#include "altitudeactual.h"
+#include "baroaltitude.h"
 #include "stdbool.h"
 #include "positionactual.h"
 #include "homelocation.h"
@@ -75,17 +75,17 @@ static xTaskHandle taskHandle;
 
 // Private functions
 static void ahrscommsTask(void* parameters);
-static void load_altitude_actual(struct opahrs_msg_v1_req_altitude * altitude);
+static void load_baro_altitude(struct opahrs_msg_v1_req_altitude * altitude);
 static void load_magnetic_north(struct opahrs_msg_v1_req_north * north);
 static void load_position_actual(struct opahrs_msg_v1_req_gps * gps);
 static void update_attitude_actual(struct opahrs_msg_v1_rsp_attitude * attitude);
 static void update_attitude_raw(struct opahrs_msg_v1_rsp_attituderaw * attituderaw);
 static void update_ahrs_status(struct opahrs_msg_v1_rsp_serial * serial);
 
-static bool AltitudeActualIsUpdatedFlag = false;
-static void AltitudeActualUpdatedCb(UAVObjEvent * ev)
+static bool BaroAltitudeIsUpdatedFlag = false;
+static void BaroAltitudeUpdatedCb(UAVObjEvent * ev)
 {
-  AltitudeActualIsUpdatedFlag = true;
+  BaroAltitudeIsUpdatedFlag = true;
 }
 
 static bool PositionActualIsUpdatedFlag = false;
@@ -107,7 +107,7 @@ static bool AHRSKnowsHome = FALSE;
  */
 int32_t AHRSCommsInitialize(void)
 {
-  AltitudeActualConnectCallback(AltitudeActualUpdatedCb);
+  BaroAltitudeConnectCallback(BaroAltitudeUpdatedCb);
   PositionActualConnectCallback(PositionActualUpdatedCb);
   HomeLocationConnectCallback(HomeLocationUpdatedCb);
 
@@ -177,17 +177,17 @@ static void ahrscommsTask(void* parameters)
         break;
       }
 
-      if (AltitudeActualIsUpdatedFlag) {
-        struct opahrs_msg_v1 req;
+      if (BaroAltitudeIsUpdatedFlag) {
+	struct opahrs_msg_v1 req;
 
-        load_altitude_actual(&(req.payload.user.v.req.altitude));
-        if ((result = PIOS_OPAHRS_SetAltitudeActual(&req)) == OPAHRS_RESULT_OK) {
-          AltitudeActualIsUpdatedFlag = false;
-        } else {
-          /* Comms error */
-          altitude_errors++;
-          break;
-        }
+	load_baro_altitude(&(req.payload.user.v.req.altitude));
+	if ((result = PIOS_OPAHRS_SetBaroAltitude(&req)) == OPAHRS_RESULT_OK) {
+	  BaroAltitudeIsUpdatedFlag = false;
+	} else {
+	  /* Comms error */
+      altitude_errors++;
+      break;
+	}
       }
 
       if (PositionActualIsUpdatedFlag) {
@@ -251,11 +251,11 @@ static void load_magnetic_north(struct opahrs_msg_v1_req_north * mag_north)
 
 }
 
-static void load_altitude_actual(struct opahrs_msg_v1_req_altitude * altitude)
+static void load_baro_altitude(struct opahrs_msg_v1_req_altitude * altitude)
 {
-  AltitudeActualData   data;
+  BaroAltitudeData   data;
 
-  AltitudeActualGet(&data);
+  BaroAltitudeGet(&data);
 
   altitude->altitude    = data.Altitude;
   altitude->pressure    = data.Pressure;

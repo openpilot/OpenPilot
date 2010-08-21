@@ -312,7 +312,7 @@ TestDataGen::TestDataGen()
     ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
 
-    altActual = AltitudeActual::GetInstance(objManager);
+    baroAltitude = BaroAltitude::GetInstance(objManager);
     gps = PositionActual::GetInstance(objManager);
 
     //Setup timer
@@ -326,12 +326,12 @@ TestDataGen::TestDataGen()
 
 void TestDataGen::genTestData()
 {
-    // Update AltitudeActual object
-    AltitudeActual::DataFields altActualData;
-    altActualData.Altitude = 500 * sin(1 * testTime) + 200 * cos(4 * testTime) + 800;
-    altActualData.Temperature = 30 * sin(0.5 * testTime);
-    altActualData.Pressure = 100;
-    altActual->setData(altActualData);
+    // Update BaroAltitude object
+    BaroAltitude::DataFields baroAltitudeData;
+    baroAltitudeData.Altitude = 500 * sin(1 * testTime) + 200 * cos(4 * testTime) + 800;
+    baroAltitudeData.Temperature = 30 * sin(0.5 * testTime);
+    baroAltitudeData.Pressure = 100;
+    baroAltitude->setData(baroAltitudeData);
 
 
     // Update gps objects

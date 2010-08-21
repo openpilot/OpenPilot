@@ -29,7 +29,7 @@
 #define PLOTDATA_H
 
 #include "uavobjects/uavobject.h"
-#include "uavobjects/altitudeactual.h"
+#include "uavobjects/baroaltitude.h"
 #include "uavobjects/positionactual.h"
 
 

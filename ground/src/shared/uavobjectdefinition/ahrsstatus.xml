@@ -1,6 +1,7 @@
 <xml>
         <object name="AhrsStatus" singleinstance="true" settings="false">
             <field name="SerialNumber" units="n/a" type="uint8" elements="25"/>
+            <field name="CommErrors" units="count" type="uint8" elementnames="Attitude,AttitudeRaw,PositionActual,HomeLocation,Altitude"/>
             <access gcs="readwrite" flight="readwrite"/>
             <telemetrygcs acked="false" updatemode="manual" period="0"/>
             <telemetryflight acked="false" updatemode="periodic" period="1000"/>

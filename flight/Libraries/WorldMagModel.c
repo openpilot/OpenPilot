@@ -32,6 +32,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+// I don't want this dependency, but currently using pvPortMalloc
+#include "openpilot.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -41,8 +44,8 @@
 #include "WorldMagModel.h"
 #include "WMMInternal.h"
 
-static WMMtype_Ellipsoid Ellip;
-static WMMtype_MagneticModel MagneticModel;
+static WMMtype_Ellipsoid * Ellip;
+static WMMtype_MagneticModel * MagneticModel;
 
 /**************************************************************************************
 *   Example use - very simple - only two exposed functions
@@ -58,24 +61,24 @@ static WMMtype_MagneticModel MagneticModel;
 int WMM_Initialize()
 //	Sets default values for WMM subroutines.
 //	UPDATES : Ellip and MagneticModel
-{
+{  
   // Sets WGS-84 parameters
-	Ellip.a =		6378.137;			// semi-major axis of the ellipsoid in km
-	Ellip.b =		6356.7523142;		// semi-minor axis of the ellipsoid in km
-	Ellip.fla =		1/298.257223563;	// flattening
-	Ellip.eps =		sqrt(1- (Ellip.b*Ellip.b)/(Ellip.a*Ellip.a ));  // first eccentricity
-	Ellip.epssq =	(Ellip.eps*Ellip.eps);			// first eccentricity squared
-	Ellip.re =		6371.2;							// Earth's radius in km
+	Ellip->a =		6378.137;			// semi-major axis of the ellipsoid in km
+	Ellip->b =		6356.7523142;		// semi-minor axis of the ellipsoid in km
+	Ellip->fla =		1/298.257223563;	// flattening
+	Ellip->eps =		sqrt(1- (Ellip->b*Ellip->b)/(Ellip->a*Ellip->a ));  // first eccentricity
+	Ellip->epssq =	(Ellip->eps*Ellip->eps);			// first eccentricity squared
+	Ellip->re =		6371.2;							// Earth's radius in km
 
 	// Sets Magnetic Model parameters
-	MagneticModel.nMax = WMM_MAX_MODEL_DEGREES;
-	MagneticModel.nMaxSecVar = WMM_MAX_SECULAR_VARIATION_MODEL_DEGREES;
-	MagneticModel.SecularVariationUsed = 0;
+	MagneticModel->nMax = WMM_MAX_MODEL_DEGREES;
+	MagneticModel->nMaxSecVar = WMM_MAX_SECULAR_VARIATION_MODEL_DEGREES;
+	MagneticModel->SecularVariationUsed = 0;
 
 	// Really, Really needs to be read from a file - out of date in 2015 at latest
-	MagneticModel.EditionDate = 5.7863328170559505e-307;
-	MagneticModel.epoch = 2010.0;
-	sprintf(MagneticModel.ModelName, "WMM-2010");
+	MagneticModel->EditionDate = 5.7863328170559505e-307;
+	MagneticModel->epoch = 2010.0;
+	sprintf(MagneticModel->ModelName, "WMM-2010");
 	WMM_Set_Coeff_Array();
   return 0;
 }
@@ -84,15 +87,20 @@ void WMM_GetMagVector(float Lat, float Lon, float AltEllipsoid, uint16_t Month, 
 {
   char Error_Message[255];
 
+  Ellip = (WMMtype_Ellipsoid *) pvPortMalloc(sizeof(WMMtype_Ellipsoid));
+  MagneticModel = (WMMtype_MagneticModel *) pvPortMalloc(sizeof(WMMtype_MagneticModel));
+  
 	WMMtype_CoordSpherical CoordSpherical;
 	WMMtype_CoordGeodetic CoordGeodetic;
 	WMMtype_Date Date;
 	WMMtype_GeoMagneticElements GeoMagneticElements;
 
+  WMM_Initialize();
+  
 	CoordGeodetic.lambda = Lon;
 	CoordGeodetic.phi = Lat;
 	CoordGeodetic.HeightAboveEllipsoid  = AltEllipsoid;
-	WMM_GeodeticToSpherical(Ellip, CoordGeodetic, &CoordSpherical);    /*Convert from geodeitic to Spherical Equations: 17-18, WMM Technical report*/
+	WMM_GeodeticToSpherical(&CoordGeodetic, &CoordSpherical);    /*Convert from geodeitic to Spherical Equations: 17-18, WMM Technical report*/
 	
 	Date.Month=Month;
 	Date.Day=Day;
@@ -101,6 +109,9 @@ void WMM_GetMagVector(float Lat, float Lon, float AltEllipsoid, uint16_t Month, 
 	WMM_TimelyModifyMagneticModel(Date);
 	WMM_Geomag(&CoordSpherical, &CoordGeodetic, &GeoMagneticElements);   /* Computes the geoMagnetic field elements and their time change*/
     
+  vPortFree(Ellip);
+  vPortFree(MagneticModel);
+  
 	B[0]=GeoMagneticElements.X;
 	B[1]=GeoMagneticElements.Y;
 	B[2]=GeoMagneticElements.Z;
@@ -136,8 +147,8 @@ uint16_t WMM_Geomag( WMMtype_CoordSpherical * CoordSpherical, WMMtype_CoordGeode
 	WMMtype_SphericalHarmonicVariables SphVariables;
 	WMMtype_MagneticResults MagneticResultsSph, MagneticResultsGeo, MagneticResultsSphVar, MagneticResultsGeoVar;
 
-	WMM_ComputeSphericalHarmonicVariables( CoordSpherical, MagneticModel.nMax, &SphVariables); /* Compute Spherical Harmonic variables  */
-	WMM_AssociatedLegendreFunction( CoordSpherical, MagneticModel.nMax, &LegendreFunction);  	/* Compute ALF  */
+	WMM_ComputeSphericalHarmonicVariables( CoordSpherical, MagneticModel->nMax, &SphVariables); /* Compute Spherical Harmonic variables  */
+	WMM_AssociatedLegendreFunction( CoordSpherical, MagneticModel->nMax, &LegendreFunction);  	/* Compute ALF  */
 	WMM_Summation(&LegendreFunction, &SphVariables, CoordSpherical, &MagneticResultsSph); /* Accumulate the spherical harmonic coefficients*/
 	WMM_SecVarSummation(&LegendreFunction, &SphVariables, CoordSpherical, &MagneticResultsSphVar); /*Sum the Secular Variation Coefficients  */
 	WMM_RotateMagneticVector(CoordSpherical, CoordGeodetic, &MagneticResultsSph, &MagneticResultsGeo); /* Map the computed Magnetic fields to Geodeitic coordinates  */
@@ -180,10 +191,10 @@ uint16_t WMM_ComputeSphericalHarmonicVariables(WMMtype_CoordSpherical *CoordSphe
 	sin_lambda = sin(DEG2RAD(CoordSpherical->lambda));
 	/* for n = 0 ... model_order, compute (Radius of Earth / Spherica radius r)^(n+2)
 	for n  1..nMax-1 (this is much faster than calling pow MAX_N+1 times).      */
-	SphVariables->RelativeRadiusPower[0] = (Ellip.re / CoordSpherical->r) * (Ellip.re / CoordSpherical->r);
+	SphVariables->RelativeRadiusPower[0] = (Ellip->re / CoordSpherical->r) * (Ellip->re / CoordSpherical->r);
 	for (n = 1; n <= nMax; n++)
 	{
-		SphVariables->RelativeRadiusPower[n] = SphVariables->RelativeRadiusPower[n-1] * (Ellip.re  / CoordSpherical->r);
+		SphVariables->RelativeRadiusPower[n] = SphVariables->RelativeRadiusPower[n-1] * (Ellip->re  / CoordSpherical->r);
 	}
 
   /*
@@ -270,7 +281,7 @@ uint16_t WMM_Summation(WMMtype_LegendreFunction *LegendreFunction, WMMtype_Spher
 	MagneticResults->Bz = 0.0;
 	MagneticResults->By = 0.0;
 	MagneticResults->Bx = 0.0;
-	for (n = 1; n <=  MagneticModel.nMax; n++)
+	for (n = 1; n <=  MagneticModel->nMax; n++)
 	{
 		for (m=0;m<=n;m++)
 		{
@@ -281,8 +292,8 @@ uint16_t WMM_Summation(WMMtype_LegendreFunction *LegendreFunction, WMMtype_Spher
 			n=1      	      m=0   n            n           n  */
 /* Equation 12 in the WMM Technical report.  Derivative with respect to radius.*/
 			MagneticResults->Bz -= 	SphVariables->RelativeRadiusPower[n] *
-					(	MagneticModel.Main_Field_Coeff_G[index]*SphVariables->cos_mlambda[m] +
-						MagneticModel.Main_Field_Coeff_H[index]*SphVariables->sin_mlambda[m]	)
+					(	MagneticModel->Main_Field_Coeff_G[index]*SphVariables->cos_mlambda[m] +
+						MagneticModel->Main_Field_Coeff_H[index]*SphVariables->sin_mlambda[m]	)
 						* (float) (n+1) * LegendreFunction-> Pcup[index];
 
 /*		  1 nMax  (n+2)    n     m            m           m
@@ -290,8 +301,8 @@ uint16_t WMM_Summation(WMMtype_LegendreFunction *LegendreFunction, WMMtype_Spher
 		   n=1             m=0   n            n           n  */
 /* Equation 11 in the WMM Technical report. Derivative with respect to longitude, divided by radius. */
 			MagneticResults->By += 	SphVariables->RelativeRadiusPower[n] *
-					(	MagneticModel.Main_Field_Coeff_G[index]*SphVariables->sin_mlambda[m] -
-						MagneticModel.Main_Field_Coeff_H[index]*SphVariables->cos_mlambda[m]  )
+					(	MagneticModel->Main_Field_Coeff_G[index]*SphVariables->sin_mlambda[m] -
+						MagneticModel->Main_Field_Coeff_H[index]*SphVariables->cos_mlambda[m]  )
 						* (float) (m) * LegendreFunction-> Pcup[index];
 /*		   nMax  (n+2) n     m            m           m
 	Bx = - SUM (a/r)   SUM  [g cos(m p) + h sin(m p)] dP (sin(phi))
@@ -299,8 +310,8 @@ uint16_t WMM_Summation(WMMtype_LegendreFunction *LegendreFunction, WMMtype_Spher
 /* Equation 10  in the WMM Technical report. Derivative with respect to latitude, divided by radius. */
 
 			MagneticResults->Bx -= 	SphVariables->RelativeRadiusPower[n] *
-					(	MagneticModel.Main_Field_Coeff_G[index]*SphVariables->cos_mlambda[m]  +
-						MagneticModel.Main_Field_Coeff_H[index]*SphVariables->sin_mlambda[m]  )
+					(	MagneticModel->Main_Field_Coeff_G[index]*SphVariables->cos_mlambda[m]  +
+						MagneticModel->Main_Field_Coeff_H[index]*SphVariables->sin_mlambda[m]  )
 						* LegendreFunction-> dPcup[index];
 
 
@@ -340,11 +351,11 @@ uint16_t WMM_SecVarSummation(WMMtype_LegendreFunction *LegendreFunction, WMMtype
 	*/
 	uint16_t m, n, index;
 	float cos_phi;
-	MagneticModel.SecularVariationUsed = TRUE;
+	MagneticModel->SecularVariationUsed = TRUE;
 	MagneticResults->Bz = 0.0;
 	MagneticResults->By = 0.0;
 	MagneticResults->Bx = 0.0;
-	for (n = 1; n <=  MagneticModel.nMaxSecVar; n++)
+	for (n = 1; n <=  MagneticModel->nMaxSecVar; n++)
 	{
 		for (m=0;m<=n;m++)
 		{
@@ -355,8 +366,8 @@ uint16_t WMM_SecVarSummation(WMMtype_LegendreFunction *LegendreFunction, WMMtype
 			n=1      	      m=0   n            n           n  */
 /*  Derivative with respect to radius.*/
 			MagneticResults->Bz -= 	SphVariables->RelativeRadiusPower[n] *
-					(	MagneticModel.Secular_Var_Coeff_G[index]*SphVariables->cos_mlambda[m] +
-						MagneticModel.Secular_Var_Coeff_H[index]*SphVariables->sin_mlambda[m]	)
+					(	MagneticModel->Secular_Var_Coeff_G[index]*SphVariables->cos_mlambda[m] +
+						MagneticModel->Secular_Var_Coeff_H[index]*SphVariables->sin_mlambda[m]	)
 						* (float) (n+1) * LegendreFunction-> Pcup[index];
 
 /*		  1 nMax  (n+2)    n     m            m           m
@@ -364,8 +375,8 @@ uint16_t WMM_SecVarSummation(WMMtype_LegendreFunction *LegendreFunction, WMMtype
 		   n=1             m=0   n            n           n  */
 /* Derivative with respect to longitude, divided by radius. */
 			MagneticResults->By += 	SphVariables->RelativeRadiusPower[n] *
-					(	MagneticModel.Secular_Var_Coeff_G[index]*SphVariables->sin_mlambda[m] -
-						MagneticModel.Secular_Var_Coeff_H[index]*SphVariables->cos_mlambda[m]  )
+					(	MagneticModel->Secular_Var_Coeff_G[index]*SphVariables->sin_mlambda[m] -
+						MagneticModel->Secular_Var_Coeff_H[index]*SphVariables->cos_mlambda[m]  )
 						* (float) (m) * LegendreFunction-> Pcup[index];
 /*		   nMax  (n+2) n     m            m           m
 	Bx = - SUM (a/r)   SUM  [g cos(m p) + h sin(m p)] dP (sin(phi))
@@ -373,8 +384,8 @@ uint16_t WMM_SecVarSummation(WMMtype_LegendreFunction *LegendreFunction, WMMtype
 /* Derivative with respect to latitude, divided by radius. */
 
 			MagneticResults->Bx -= 	SphVariables->RelativeRadiusPower[n] *
-					(	MagneticModel.Secular_Var_Coeff_G[index]*SphVariables->cos_mlambda[m]  +
-						MagneticModel.Secular_Var_Coeff_H[index]*SphVariables->sin_mlambda[m]  )
+					(	MagneticModel->Secular_Var_Coeff_G[index]*SphVariables->cos_mlambda[m]  +
+						MagneticModel->Secular_Var_Coeff_H[index]*SphVariables->sin_mlambda[m]  )
 						* LegendreFunction-> dPcup[index];
 		}
 	}
@@ -762,7 +773,7 @@ uint16_t WMM_SummationSpecial(WMMtype_SphericalHarmonicVariables * SphVariables,
 	MagneticResults->By = 0.0;
 	sin_phi = sin ( DEG2RAD ( CoordSpherical->phig ) );
 
-	for (n = 1; n <=  MagneticModel.nMax; n++)
+	for (n = 1; n <=  MagneticModel->nMax; n++)
 	{
 
 	/*Compute the ration between the Gauss-normalized associated Legendre
@@ -789,8 +800,8 @@ uint16_t WMM_SummationSpecial(WMMtype_SphericalHarmonicVariables * SphVariables,
 /* Equation 11 in the WMM Technical report. Derivative with respect to longitude, divided by radius. */
 
 		MagneticResults->By += 	SphVariables->RelativeRadiusPower[n] *
-					(	MagneticModel.Main_Field_Coeff_G[index]*SphVariables->sin_mlambda[1] -
-						MagneticModel.Main_Field_Coeff_H[index]*SphVariables->cos_mlambda[1]  )
+					(	MagneticModel->Main_Field_Coeff_G[index]*SphVariables->sin_mlambda[1] -
+						MagneticModel->Main_Field_Coeff_H[index]*SphVariables->cos_mlambda[1]  )
 						*  PcupS[n] * schmidtQuasiNorm3;
 	}
 
@@ -819,7 +830,7 @@ uint16_t WMM_SecVarSummationSpecial(WMMtype_SphericalHarmonicVariables * SphVari
 	MagneticResults->By = 0.0;
 	sin_phi = sin ( DEG2RAD ( CoordSpherical->phig ) );
 
-	for (n = 1; n <=  MagneticModel.nMaxSecVar; n++)
+	for (n = 1; n <=  MagneticModel->nMaxSecVar; n++)
 	{
 		index = (n * (n + 1) / 2 + 1);
 		schmidtQuasiNorm2 = schmidtQuasiNorm1 * (float) (2 * n - 1) / (float) n;
@@ -841,8 +852,8 @@ uint16_t WMM_SecVarSummationSpecial(WMMtype_SphericalHarmonicVariables * SphVari
 /* Derivative with respect to longitude, divided by radius. */
 
 		MagneticResults->By += 	SphVariables->RelativeRadiusPower[n] *
-					(	MagneticModel.Secular_Var_Coeff_G[index]*SphVariables->sin_mlambda[1] -
-						MagneticModel.Secular_Var_Coeff_H[index]*SphVariables->cos_mlambda[1]  )
+					(	MagneticModel->Secular_Var_Coeff_G[index]*SphVariables->sin_mlambda[1] -
+						MagneticModel->Secular_Var_Coeff_H[index]*SphVariables->cos_mlambda[1]  )
 						*  PcupS[n] * schmidtQuasiNorm3;
 	}
 
@@ -857,17 +868,17 @@ void WMM_TimelyModifyMagneticModel(WMMtype_Date UserDate)
 {
 	uint16_t n, m, index, a, b;
 	
-	a = MagneticModel.nMaxSecVar;
+	a = MagneticModel->nMaxSecVar;
 	b = (a * (a + 1) / 2 + a);
-	for (n = 1; n <=  MagneticModel.nMax; n++)
+	for (n = 1; n <=  MagneticModel->nMax; n++)
 	{
 		for (m=0;m<=n;m++)
 		{
 			index = (n * (n + 1) / 2 + m);
 			if(index <= b)
 			{
-				MagneticModel.Main_Field_Coeff_H[index]   +=  (UserDate.DecimalYear - MagneticModel.epoch) * MagneticModel.Secular_Var_Coeff_H[index];
-				MagneticModel.Main_Field_Coeff_G[index]   +=  (UserDate.DecimalYear - MagneticModel.epoch) * MagneticModel.Secular_Var_Coeff_G[index];
+				MagneticModel->Main_Field_Coeff_H[index]   +=  (UserDate.DecimalYear - MagneticModel->epoch) * MagneticModel->Secular_Var_Coeff_H[index];
+				MagneticModel->Main_Field_Coeff_G[index]   +=  (UserDate.DecimalYear - MagneticModel->epoch) * MagneticModel->Secular_Var_Coeff_G[index];
 			}
 		}
 	}
@@ -906,7 +917,7 @@ uint16_t WMM_DateToYear (WMMtype_Date *CalendarDate, char *Error)
 	return 1;
 }  /*WMM_DateToYear*/
 
-void WMM_GeodeticToSpherical(WMMtype_Ellipsoid Ellip, WMMtype_CoordGeodetic CoordGeodetic, WMMtype_CoordSpherical *CoordSpherical)
+void WMM_GeodeticToSpherical(WMMtype_CoordGeodetic *CoordGeodetic, WMMtype_CoordSpherical *CoordSpherical)
 // Converts Geodetic coordinates to Spherical coordinates
 // Convert geodetic coordinates, (defined by the WGS-84
 // reference ellipsoid), to Earth Centered Earth Fixed Cartesian
@@ -914,22 +925,22 @@ void WMM_GeodeticToSpherical(WMMtype_Ellipsoid Ellip, WMMtype_CoordGeodetic Coor
 {
 	float CosLat, SinLat, rc, xp, zp; // all local variables
 
-	CosLat = cos(DEG2RAD(CoordGeodetic.phi));
-	SinLat = sin(DEG2RAD(CoordGeodetic.phi));
+	CosLat = cos(DEG2RAD(CoordGeodetic->phi));
+	SinLat = sin(DEG2RAD(CoordGeodetic->phi));
 
 	// compute the local radius of curvature on the WGS-84 reference ellipsoid
-	rc = Ellip.a / sqrt(1.0 - Ellip.epssq * SinLat * SinLat);
+	rc = Ellip->a / sqrt(1.0 - Ellip->epssq * SinLat * SinLat);
 
 	// compute ECEF Cartesian coordinates of specified point (for longitude=0)
 
-	xp = (rc + CoordGeodetic.HeightAboveEllipsoid) * CosLat;
-	zp = (rc*(1.0 - Ellip.epssq) + CoordGeodetic.HeightAboveEllipsoid) * SinLat;
+	xp = (rc + CoordGeodetic->HeightAboveEllipsoid) * CosLat;
+	zp = (rc*(1.0 - Ellip->epssq) + CoordGeodetic->HeightAboveEllipsoid) * SinLat;
 
 	// compute spherical radius and angle lambda and phi of specified point
 
 	CoordSpherical->r = sqrt(xp * xp + zp * zp);
 	CoordSpherical->phig = RAD2DEG(asin(zp / CoordSpherical->r));    // geocentric latitude
-	CoordSpherical->lambda = CoordGeodetic.lambda;                   // longitude
+	CoordSpherical->lambda = CoordGeodetic->lambda;                   // longitude
 
 }// WMM_GeodeticToSpherical
 
@@ -1031,10 +1042,10 @@ void WMM_Set_Coeff_Array()
 
   // TODO: If this works here, delete first two columns to save space
 	for(uint16_t i=0; i<NUMTERMS; i++){
-    MagneticModel.Main_Field_Coeff_G[i]=CoeffFile[i][2];
-    MagneticModel.Main_Field_Coeff_H[i]=CoeffFile[i][3];
-    MagneticModel.Secular_Var_Coeff_G[i]=CoeffFile[i][4];
-    MagneticModel.Secular_Var_Coeff_H[i]=CoeffFile[i][5];
+    MagneticModel->Main_Field_Coeff_G[i]=CoeffFile[i][2];
+    MagneticModel->Main_Field_Coeff_H[i]=CoeffFile[i][3];
+    MagneticModel->Secular_Var_Coeff_G[i]=CoeffFile[i][4];
+    MagneticModel->Secular_Var_Coeff_H[i]=CoeffFile[i][5];
   }
   
 }

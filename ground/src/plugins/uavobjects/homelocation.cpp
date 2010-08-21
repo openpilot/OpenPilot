@@ -42,6 +42,12 @@ HomeLocation::HomeLocation(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAM
 {
     // Create fields
     QList<UAVObjectField*> fields;
+    QStringList SetElemNames;
+    SetElemNames.append("0");
+    QStringList SetEnumOptions;
+    SetEnumOptions.append("FALSE");
+    SetEnumOptions.append("TRUE");
+    fields.append( new UAVObjectField(QString("Set"), QString(""), UAVObjectField::ENUM, SetElemNames, SetEnumOptions) );
     QStringList LatitudeElemNames;
     LatitudeElemNames.append("0");
     fields.append( new UAVObjectField(QString("Latitude"), QString("deg * 10e6"), UAVObjectField::INT32, LatitudeElemNames, QStringList()) );

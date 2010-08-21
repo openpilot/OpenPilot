@@ -38,6 +38,18 @@ from collections import namedtuple
 # This is a list of instances of the data fields contained in this object
 _fields = [ \
 	uavobject.UAVObjectField(
+		'Set',
+		'b',
+		1,
+		[
+			'0',
+		],
+		{
+			'0' : 'FALSE',
+			'1' : 'TRUE',
+		}
+	),
+	uavobject.UAVObjectField(
 		'Latitude',
 		'i',
 		1,
@@ -114,7 +126,7 @@ _fields = [ \
 
 class HomeLocation(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 933172238
+    OBJID        = 576787928
     NAME         = "HomeLocation"
     METANAME     = "HomeLocationMeta"
     ISSINGLEINST = 1

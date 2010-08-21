@@ -79,7 +79,8 @@ void nmeaProcessGPGSA(char* packet);
 // Global variables
 
 // Private constants
-#define STACK_SIZE configMINIMAL_STACK_SIZE+5000
+// Unfortunately need a good size stack for the WMM calculation
+#define STACK_SIZE configMINIMAL_STACK_SIZE+3500
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 3)
 
 // Private types
@@ -120,8 +121,6 @@ int32_t GPSInitialize(void)
 	return 0;
 }
 
-static bool homeLocationSet = 0;
-
 /**
  * gps task. Processes input buffer. It does not return.
  */
@@ -132,8 +131,6 @@ static void gpsTask(void* parameters)
 	portTickType xDelay = 100 / portTICK_RATE_MS;
 	PositionActualData GpsData;
 	uint32_t timeNowMs;
-
-  homeLocationSet = 0;
   
 	// Loop forever
 	while(1)
@@ -161,13 +158,14 @@ static void gpsTask(void* parameters)
 		}
     else {
       // Had an update
+      HomeLocationData home;
+      HomeLocationGet(&home);
+      
       PositionActualGet(&GpsData);
-      if(homeLocationSet == FALSE) {
+      if( (GpsData.Status == POSITIONACTUAL_STATUS_FIX3D) && (home.Set == HOMELOCATION_SET_FALSE) ) {
         setHomeLocation(&GpsData);
-        homeLocationSet = TRUE;
       }
     }
-    setHomeLocation(&GpsData);
 
 		// Block task until next update
 		vTaskDelay(xDelay);
@@ -178,10 +176,6 @@ static void setHomeLocation(PositionActualData * gpsData)
 {
   HomeLocationData home;
   HomeLocationGet(&home);
-  
-  gpsData->Latitude = -29;
-  gpsData->Longitude = 93;
-  gpsData->Altitude = 30;
   
   // Store LLA
   home.Latitude = (int32_t) (gpsData->Latitude * 10e6);
@@ -203,10 +197,9 @@ static void setHomeLocation(PositionActualData * gpsData)
   memcpy(&home.RNE[0], &RNE[0][0], 9 * sizeof(RNE[0][0]));
   
   // Compute magnetic flux direction at home location
-  WMM_Initialize();
-  // TODO: Extract time/date from GPS to seed this
   WMM_GetMagVector(LLA[0], LLA[1], LLA[2], 8, 17, 2010, &home.Be[0]);
   
+  home.Set = HOMELOCATION_SET_TRUE;
   HomeLocationSet(&home);
 }
 

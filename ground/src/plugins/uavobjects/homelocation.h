@@ -43,6 +43,7 @@ class UAVOBJECTS_EXPORT HomeLocation: public UAVDataObject
 public:
     // Field structure
     typedef struct {
+        quint8 Set;
         qint32 Latitude;
         qint32 Longitude;
         float Altitude;
@@ -53,6 +54,9 @@ public:
     } __attribute__((packed)) DataFields;
 
     // Field information
+    // Field Set information
+    /* Enumeration options for field Set */
+    typedef enum { SET_FALSE=0, SET_TRUE=1 } SetOptions;
     // Field Latitude information
     // Field Longitude information
     // Field Altitude information
@@ -68,7 +72,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 933172238U;
+    static const quint32 OBJID = 576787928U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

@@ -22,6 +22,7 @@
 		651CF9F3120B700D00EEFD70 /* usb_conf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = usb_conf.h; sourceTree = "<group>"; };
 		654330231218E9780063F913 /* insgps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = insgps.c; path = ../../AHRS/insgps.c; sourceTree = SOURCE_ROOT; };
 		6543304F121980300063F913 /* insgps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = insgps.h; sourceTree = "<group>"; };
+		655268BC121FBD2900410C6E /* ahrscalibration.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ahrscalibration.xml; sourceTree = "<group>"; };
 		657CEEAD121DB6C8007A1FBE /* homelocation.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = homelocation.xml; sourceTree = "<group>"; };
 		657CEEB7121DBC63007A1FBE /* CoordinateConversions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CoordinateConversions.c; sourceTree = "<group>"; };
 		657CEEB9121DBC63007A1FBE /* CoordinateConversions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoordinateConversions.h; sourceTree = "<group>"; };
@@ -32,6 +33,7 @@
 		657CEEC1121DC054007A1FBE /* homelocation.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = homelocation.c; sourceTree = "<group>"; };
 		657CEEC2121DC054007A1FBE /* navigationdesired.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = navigationdesired.c; sourceTree = "<group>"; };
 		657CEEC3121DC054007A1FBE /* navigationsettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = navigationsettings.c; sourceTree = "<group>"; };
+		657CF024121F49CD007A1FBE /* WMMInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WMMInternal.h; sourceTree = "<group>"; };
 		65B35D7F121C261E003EAD18 /* bin.pro */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bin.pro; sourceTree = "<group>"; };
 		65B35D80121C261E003EAD18 /* openpilotgcs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = openpilotgcs; sourceTree = "<group>"; };
 		65B35D81121C261E003EAD18 /* openpilotgcs.pri */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = openpilotgcs.pri; sourceTree = "<group>"; };
@@ -2890,8 +2892,8 @@
 			isa = PBXGroup;
 			children = (
 				65B7E6AC120DF1CD000C1123 /* AHRS */,
-				657CEEB6121DBC63007A1FBE /* Libraries */,
 				65E8EF1E11EEA61E00BBF654 /* OpenPilot */,
+				657CEEB6121DBC63007A1FBE /* Libraries */,
 				65E8F02F11EFF25C00BBF654 /* PiOS */,
 				C6A0FF2B0290797F04C91782 /* Documentation */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
@@ -2913,6 +2915,7 @@
 		657CEEB8121DBC63007A1FBE /* inc */ = {
 			isa = PBXGroup;
 			children = (
+				657CF024121F49CD007A1FBE /* WMMInternal.h */,
 				657CEEB9121DBC63007A1FBE /* CoordinateConversions.h */,
 				657CEEBA121DBC63007A1FBE /* WorldMagModel.h */,
 			);
@@ -6664,6 +6667,7 @@
 		65B367E3121C2620003EAD18 /* uavobjectdefinition */ = {
 			isa = PBXGroup;
 			children = (
+				655268BC121FBD2900410C6E /* ahrscalibration.xml */,
 				65B367E4121C2620003EAD18 /* actuatorcommand.xml */,
 				65B367E5121C2620003EAD18 /* actuatordesired.xml */,
 				65B367E6121C2620003EAD18 /* actuatorsettings.xml */,

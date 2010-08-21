@@ -164,6 +164,7 @@ SRC += $(OPUAVOBJ)/attitudedesired.c
 SRC += $(OPUAVOBJ)/stabilizationsettings.c
 SRC += $(OPUAVOBJ)/ahrsstatus.c
 SRC += $(OPUAVOBJ)/baroaltitude.c
+SRC += $(OPUAVOBJ)/ahrscalibration.c
 SRC += $(OPUAVOBJ)/attitudeactual.c
 SRC += $(OPUAVOBJ)/attitudesettings.c
 SRC += $(OPUAVOBJ)/flightsituationactual.c

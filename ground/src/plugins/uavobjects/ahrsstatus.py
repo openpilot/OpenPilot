@@ -74,15 +74,40 @@ _fields = [ \
 	uavobject.UAVObjectField(
 		'CommErrors',
 		'B',
-		5,
+		6,
 		[
 			'Attitude',
 			'AttitudeRaw',
 			'PositionActual',
 			'HomeLocation',
 			'Altitude',
+			'Calibration',
 		],
 		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'HomeSet',
+		'b',
+		1,
+		[
+			'0',
+		],
+		{
+			'0' : 'FALSE',
+			'1' : 'TRUE',
+		}
+	),
+	uavobject.UAVObjectField(
+		'CalibrationSet',
+		'b',
+		1,
+		[
+			'0',
+		],
+		{
+			'0' : 'FALSE',
+			'1' : 'TRUE',
 		}
 	),
 ]
@@ -90,7 +115,7 @@ _fields = [ \
 
 class AhrsStatus(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 2618706832
+    OBJID        = 1556283776
     NAME         = "AhrsStatus"
     METANAME     = "AhrsStatusMeta"
     ISSINGLEINST = 1

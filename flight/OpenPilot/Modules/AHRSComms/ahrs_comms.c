@@ -60,6 +60,7 @@
 #include "stdbool.h"
 #include "positionactual.h"
 #include "homelocation.h"
+#include "ahrscalibration.h"
 
 #include "pios_opahrs.h" // library for OpenPilot AHRS access functions
 #include "pios_opahrs_proto.h"
@@ -78,9 +79,11 @@ static void ahrscommsTask(void* parameters);
 static void load_baro_altitude(struct opahrs_msg_v1_req_altitude * altitude);
 static void load_magnetic_north(struct opahrs_msg_v1_req_north * north);
 static void load_position_actual(struct opahrs_msg_v1_req_gps * gps);
+static void load_calibration(struct opahrs_msg_v1_req_calibration * calibration);
 static void update_attitude_actual(struct opahrs_msg_v1_rsp_attitude * attitude);
 static void update_attitude_raw(struct opahrs_msg_v1_rsp_attituderaw * attituderaw);
 static void update_ahrs_status(struct opahrs_msg_v1_rsp_serial * serial);
+static void update_calibration(struct opahrs_msg_v1_rsp_calibration * calibration);
 
 static bool BaroAltitudeIsUpdatedFlag = false;
 static void BaroAltitudeUpdatedCb(UAVObjEvent * ev)
@@ -100,7 +103,12 @@ static void HomeLocationUpdatedCb(UAVObjEvent * ev)
 	HomeLocationIsUpdatedFlag = true;
 }
 
-static bool AHRSKnowsHome = FALSE;
+static bool AHRSCalibrationIsUpdatedFlag = false;
+static void AHRSCalibrationUpdatedCb(UAVObjEvent * ev)
+{
+	AHRSCalibrationIsUpdatedFlag = true;
+}
+
 /**
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
@@ -110,6 +118,7 @@ int32_t AHRSCommsInitialize(void)
   BaroAltitudeConnectCallback(BaroAltitudeUpdatedCb);
   PositionActualConnectCallback(PositionActualUpdatedCb);
   HomeLocationConnectCallback(HomeLocationUpdatedCb);
+  AHRSCalibrationConnectCallback(AHRSCalibrationUpdatedCb);
 
   PIOS_OPAHRS_Init();
 
@@ -119,7 +128,8 @@ int32_t AHRSCommsInitialize(void)
   return 0;
 }
 
-static   uint16_t attitude_errors = 0, attituderaw_errors = 0, position_errors = 0, home_errors = 0, altitude_errors = 0;
+static   uint16_t attitude_errors = 0, attituderaw_errors = 0, position_errors = 0, 
+  home_errors = 0, altitude_errors = 0, calibration_errors;
 
 /**
  * Module thread, should not return.
@@ -131,11 +141,15 @@ static void ahrscommsTask(void* parameters)
   // Main task loop
   while (1) {
     struct opahrs_msg_v1 rsp;
+    AhrsStatusData data;
 
     AlarmsSet(SYSTEMALARMS_ALARM_AHRSCOMMS, SYSTEMALARMS_ALARM_CRITICAL);
 
     /* Whenever resyncing, assume AHRS doesn't reset and doesn't know home */
-    AHRSKnowsHome = FALSE;
+    AhrsStatusGet(&data);
+    data.HomeSet = AHRSSTATUS_HOMESET_FALSE;
+    data.CalibrationSet = AHRSSTATUS_CALIBRATIONSET_FALSE;
+    AhrsStatusSet(&data);
     
     /* Spin here until we're in sync */
     while (PIOS_OPAHRS_resync() != OPAHRS_RESULT_OK) {
@@ -178,16 +192,16 @@ static void ahrscommsTask(void* parameters)
       }
 
       if (BaroAltitudeIsUpdatedFlag) {
-	struct opahrs_msg_v1 req;
+        struct opahrs_msg_v1 req;
 
-	load_baro_altitude(&(req.payload.user.v.req.altitude));
-	if ((result = PIOS_OPAHRS_SetBaroAltitude(&req)) == OPAHRS_RESULT_OK) {
-	  BaroAltitudeIsUpdatedFlag = false;
-	} else {
-	  /* Comms error */
-      altitude_errors++;
-      break;
-	}
+        load_baro_altitude(&(req.payload.user.v.req.altitude));
+        if ((result = PIOS_OPAHRS_SetBaroAltitude(&req)) == OPAHRS_RESULT_OK) {
+          BaroAltitudeIsUpdatedFlag = false;
+        } else {
+          /* Comms error */
+          altitude_errors++;
+          break;
+        }
       }
 
       if (PositionActualIsUpdatedFlag) {
@@ -203,25 +217,100 @@ static void ahrscommsTask(void* parameters)
         }
       }
 
-      if (HomeLocationIsUpdatedFlag || !AHRSKnowsHome) {
+      AhrsStatusGet(&data);
+      if (HomeLocationIsUpdatedFlag || (data.HomeSet == AHRSSTATUS_HOMESET_FALSE)) {
         struct opahrs_msg_v1 req;
         
         load_magnetic_north(&(req.payload.user.v.req.north));
         if ((result = PIOS_OPAHRS_SetMagNorth(&req)) == OPAHRS_RESULT_OK) {
           HomeLocationIsUpdatedFlag = false;
-          AHRSKnowsHome = TRUE;
+          data.HomeSet = AHRSSTATUS_HOMESET_TRUE;
+          AhrsStatusSet(&data);
         } else {
           /* Comms error */
-          PIOS_LED_Off(LED2);
           home_errors++;
+          data.HomeSet = AHRSSTATUS_HOMESET_FALSE;
+          AhrsStatusSet(&data);
           break;
         }
       }    
+      
+      AhrsStatusGet(&data);
+      if (AHRSCalibrationIsUpdatedFlag || (data.CalibrationSet == AHRSSTATUS_CALIBRATIONSET_FALSE)) 
+      {
+        struct opahrs_msg_v1 req;
+        struct opahrs_msg_v1 rsp;
+        load_calibration(&(req.payload.user.v.req.calibration));
+        if(( result = PIOS_OPAHRS_SetGetCalibration(&req,&rsp) ) == OPAHRS_RESULT_OK ) {
+          update_calibration(&(rsp.payload.user.v.rsp.calibration));
+          AHRSCalibrationIsUpdatedFlag = false;
+          data.CalibrationSet = AHRSSTATUS_CALIBRATIONSET_TRUE;
+          AhrsStatusSet(&data);
+
+        } else {
+          /* Comms error */
+          data.CalibrationSet = AHRSSTATUS_CALIBRATIONSET_FALSE;
+          AhrsStatusSet(&data);
+          calibration_errors++;
+          break;
+        }
+      }
       
       /* Wait for the next update interval */
       vTaskDelay( settings.UpdatePeriod / portTICK_RATE_MS );
     }
   }
+}
+
+static void load_calibration(struct opahrs_msg_v1_req_calibration * calibration) 
+{
+  AHRSCalibrationData data;
+  AHRSCalibrationGet(&data);
+  
+  calibration->measure_var = data.measure_var;
+  calibration->accel_bias[0] = data.accel_bias[0];
+  calibration->accel_bias[1] = data.accel_bias[1];
+  calibration->accel_bias[2] = data.accel_bias[2];
+  calibration->accel_scale[0] = data.accel_scale[0];
+  calibration->accel_scale[1] = data.accel_scale[1];
+  calibration->accel_scale[2] = data.accel_scale[2];
+  calibration->accel_var[0] = data.accel_var[0];
+  calibration->accel_var[1] = data.accel_var[1];
+  calibration->accel_var[2] = data.accel_var[2];
+  calibration->gyro_bias[0] = data.gyro_bias[0];
+  calibration->gyro_bias[1] = data.gyro_bias[1];
+  calibration->gyro_bias[2] = data.gyro_bias[2];
+  calibration->gyro_scale[0] = data.gyro_scale[0];
+  calibration->gyro_scale[1] = data.gyro_scale[1];
+  calibration->gyro_scale[2] = data.gyro_scale[2];
+  calibration->gyro_var[0] = data.gyro_var[0];
+  calibration->gyro_var[1] = data.gyro_var[1];
+  calibration->gyro_var[2] = data.gyro_var[2];
+  calibration->mag_bias[0] = data.mag_bias[0];
+  calibration->mag_bias[1] = data.mag_bias[1];
+  calibration->mag_bias[2] = data.mag_bias[2];
+  calibration->mag_var[0] = data.mag_var[0];
+  calibration->mag_var[1] = data.mag_var[1];
+  calibration->mag_var[2] = data.mag_var[2];
+  
+}
+
+static void update_calibration(struct opahrs_msg_v1_rsp_calibration * calibration) 
+{
+  AHRSCalibrationData data;
+  AHRSCalibrationGet(&data);
+  
+  data.accel_var[0] = calibration->accel_var[0];
+  data.accel_var[1] = calibration->accel_var[1];
+  data.accel_var[2] = calibration->accel_var[2];
+  data.gyro_var[0] = calibration->gyro_var[0];
+  data.gyro_var[1] = calibration->gyro_var[1];
+  data.gyro_var[2] = calibration->gyro_var[2];
+  data.mag_var[0] = calibration->mag_var[0];
+  data.mag_var[1] = calibration->mag_var[1];
+  data.mag_var[2] = calibration->mag_var[2];  
+  AHRSCalibrationSet(&data);
+
 }
 
 static void load_magnetic_north(struct opahrs_msg_v1_req_north * mag_north)
@@ -337,6 +426,7 @@ static void update_ahrs_status(struct opahrs_msg_v1_rsp_serial * serial)
   data.CommErrors[AHRSSTATUS_COMMERRORS_POSITIONACTUAL] = position_errors;
   data.CommErrors[AHRSSTATUS_COMMERRORS_HOMELOCATION] = home_errors;
   data.CommErrors[AHRSSTATUS_COMMERRORS_ALTITUDE] = altitude_errors;
+  data.CommErrors[AHRSSTATUS_COMMERRORS_CALIBRATION] = calibration_errors;
 
   AhrsStatusSet(&data);
 }

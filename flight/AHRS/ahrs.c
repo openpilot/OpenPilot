@@ -174,6 +174,7 @@ void process_spi_request(void);
 void downsample_data(void);
 void calibrate_sensors(void);
 void initialize_location();
+void converge_insgps();
 
 /**
  * @addtogroup AHRS_Global_Data AHRS Global Data
@@ -181,17 +182,21 @@ void initialize_location();
  * Public data.  Used by both EKF and the sender
  */
 //! Accelerometer variance after filter from OP or calibrate_sensors
-float accel_var[3];
+float accel_var[3] = {1,1,1};
 //! Gyro variance after filter from OP or calibrate sensors
-float gyro_var[3];
+float gyro_var[3] = {1,1,1};
+//! Accelerometer scale after calibration
+float accel_scale[3] = {ACCEL_SCALE, ACCEL_SCALE, ACCEL_SCALE};
+//! Gyro scale after calibration
+float gyro_scale[3] = {GYRO_SCALE, GYRO_SCALE, GYRO_SCALE};
 //! Magnetometer variance from OP or calibrate sensors
-float mag_var[3];
+float mag_var[3] = {1,1,1};
 //! Accelerometer bias from OP or calibrate sensors
-float accel_bias[3];
+int16_t accel_bias[3] = {ACCEL_OFFSET, ACCEL_OFFSET, ACCEL_OFFSET};
 //! Gyroscope bias term from OP or calibrate sensors
-float gyro_bias[3];
+int16_t gyro_bias[3] = {0,0,0};
 //! Magnetometer bias (direction) from OP or calibrate sensors
-float mag_bias[3];
+int16_t mag_bias[3] = {0,0,0};
 //! Filter coefficients used in decimation.  Limited order so filter can't run between samples
 int16_t fir_coeffs[ADC_OVERSAMPLE+1];          
 //! Raw buffer that DMA data is dumped into
@@ -210,7 +215,8 @@ double BaseECEF[3] = {0, 0, 0};
 float Rne[3][3];
 //! Current location in NED coordinates relative to base
 float NED[3];
-//! Current location in NED coordinates relative to base
+//! Indicates the communications are requesting a calibration
+uint8_t calibration_pending = FALSE;
 
 /**
  * @}
@@ -223,10 +229,11 @@ float NED[3];
 int main()
 {
   float gyro[3], accel[3], mag[3];
-  float pos[3] = {0,0,0}, vel[3] = {0,0,0}, BaroAlt = 0;
+  float vel[3] = {0,0,0};
   uint32_t loop_ctr = 0;
-  ahrs_algorithm = INSGPS_Algo;
   
+  ahrs_algorithm = INSGPS_Algo;
+
   /* Brings up System using CMSIS functions, enables the LEDs. */
   PIOS_SYS_Init();
   
@@ -270,55 +277,24 @@ int main()
     fir_coeffs[i] = 1;
   fir_coeffs[ADC_OVERSAMPLE] = ADC_OVERSAMPLE;
   
-  pos[0] = 0;
-  pos[1] = 0;
-  pos[2] = 0;
-  BaroAlt = 0;
-  vel[0] = 0;
-  vel[1] = 0;
-  vel[2] = 0;  
-  
-  /*******  Get initial estimate of gyro bias term *************/
-  // TODO: There needs to be a calibration mode, then this is received from the SD card
-  // otherwise if we reset in air during a snap, this will be all wrong
-  calibrate_sensors();
-  
   if(ahrs_algorithm == INSGPS_Algo) {
-    INSGPSInit();
-    // INS algo wants noise on magnetometer in unit length variance
-    float mag_length = mag_bias[0] * mag_bias[0] + mag_bias[1] * mag_bias[1] + mag_bias[2] * mag_bias[2];
-    float scaled_mag_var[3] = {mag_var[0] / mag_length, mag_var[1] / mag_length, mag_var[2] / mag_length};
-    INSSetMagVar(scaled_mag_var);     
-    
-    // Initialize the algorithm assuming stationary    
-    float temp_var[3] = {10, 10, 10};
-    float temp_gyro[3] = {0, 0, 0};
-
-    INSSetGyroVar(temp_var); // ignore gyro's
-    for(int i = 0; i < 100; i++)
-    {
-      // Iteratively constrain pitch and roll while updating yaw to align magnetic axis.  
-      // This should be done directly but I'm too dumb.
-      float rpy[3];
-      Quaternion2RPY(Nav.q, rpy);
-      rpy[1] = attitude_data.euler.pitch = -atan2(accel_bias[0], accel_bias[2]) * 180 / M_PI;
-      rpy[0] = attitude_data.euler.roll = -atan2(accel_bias[1], accel_bias[2]) * 180 / M_PI;    
-      RPY2Quaternion(rpy,Nav.q);
-      INSPrediction( temp_gyro, accel_bias, 1 / (float) EKF_RATE );
-      FullCorrection(mag,pos,vel,BaroAlt); 
-    }    
-
-    INSSetGyroBias(gyro_bias);
-    INSSetAccelVar(accel_var);
-    INSSetGyroVar(gyro_var);
+    // compute a data point and initialize INS
+    downsample_data();
+    converge_insgps();
   }
-    
+  
   /******************* Main EKF loop ****************************/
   while (1) {
     // Alive signal
     PIOS_LED_Toggle(LED1);
     
     loop_ctr ++;
+    
+    if(calibration_pending)
+    {
+      calibrate_sensors();
+      calibration_pending = FALSE;
+    }
     
     // Get magnetic readings
     PIOS_HMC5843_ReadMag(mag_data.raw.axis);
@@ -413,7 +389,7 @@ int main()
     }
     
     ahrs_state = AHRS_IDLE;
-    
+
     process_spi_request();
     
   }
@@ -455,40 +431,40 @@ void downsample_data()
   accel_raw[0] = 0;  
   for( i = 0; i < ADC_OVERSAMPLE; i++ )      
   {
-    temp = ( valid_data_buffer[0 + i * ADC_CONTINUOUS_CHANNELS] + ACCEL_OFFSET ) * fir_coeffs[i];
+    temp = ( valid_data_buffer[0 + i * ADC_CONTINUOUS_CHANNELS] + accel_bias[1] ) * fir_coeffs[i];
     accel_raw[0] += temp;
   }
-  accel_data.filtered.y = (float) accel_raw[0] / (float) fir_coeffs[ADC_OVERSAMPLE] * ACCEL_SCALE;
+  accel_data.filtered.y = (float) accel_raw[0] / (float) fir_coeffs[ADC_OVERSAMPLE] * accel_scale[1];
 
   // Get the X data which projects forward/backwards.  Fifth byte in.  Convert to m/s
   accel_raw[1] = 0;  
   for( i = 0; i < ADC_OVERSAMPLE; i++ )      
-    accel_raw[1] += ( valid_data_buffer[2 + i * ADC_CONTINUOUS_CHANNELS] + ACCEL_OFFSET ) * fir_coeffs[i];
-  accel_data.filtered.x = (float) accel_raw[1] / (float) fir_coeffs[ADC_OVERSAMPLE]  * ACCEL_SCALE;
+    accel_raw[1] += ( valid_data_buffer[2 + i * ADC_CONTINUOUS_CHANNELS] + accel_bias[0] ) * fir_coeffs[i];
+  accel_data.filtered.x = (float) accel_raw[1] / (float) fir_coeffs[ADC_OVERSAMPLE]  * accel_scale[0];
   
   // Get the Z data.  Third byte in.  Convert to m/s
   accel_raw[2] = 0;  
   for( i = 0; i < ADC_OVERSAMPLE; i++ )      
-    accel_raw[2] += ( valid_data_buffer[4 + i * ADC_CONTINUOUS_CHANNELS] + ACCEL_OFFSET ) * fir_coeffs[i];
-  accel_data.filtered.z = -(float) accel_raw[2] / (float) fir_coeffs[ADC_OVERSAMPLE]  * ACCEL_SCALE;
+    accel_raw[2] += ( valid_data_buffer[4 + i * ADC_CONTINUOUS_CHANNELS] + accel_bias[2] ) * fir_coeffs[i];
+  accel_data.filtered.z = -(float) accel_raw[2] / (float) fir_coeffs[ADC_OVERSAMPLE]  * accel_scale[2];
   
   // Get the X gyro data.  Seventh byte in.  Convert to deg/s.
   gyro_raw[0] = 0;
   for( i = 0; i < ADC_OVERSAMPLE; i++ )
-    gyro_raw[0] += ( valid_data_buffer[1 + i * ADC_CONTINUOUS_CHANNELS] + GYRO_OFFSET ) * fir_coeffs[i];
-  gyro_data.filtered.x  = (float) gyro_raw[0] / (float) fir_coeffs[ADC_OVERSAMPLE] * GYRO_SCALE;
+    gyro_raw[0] += ( valid_data_buffer[1 + i * ADC_CONTINUOUS_CHANNELS] + gyro_bias[0] ) * fir_coeffs[i];
+  gyro_data.filtered.x  = (float) gyro_raw[0] / (float) fir_coeffs[ADC_OVERSAMPLE] * gyro_scale[0];
   
   // Get the Y gyro data.  Second byte in.  Convert to deg/s.
   gyro_raw[1] = 0;
   for( i = 0; i < ADC_OVERSAMPLE; i++ )
-    gyro_raw[1] += ( valid_data_buffer[3 + i * ADC_CONTINUOUS_CHANNELS] + GYRO_OFFSET ) * fir_coeffs[i];
-  gyro_data.filtered.y = (float) gyro_raw[1] / (float) fir_coeffs[ADC_OVERSAMPLE] * GYRO_SCALE;
+    gyro_raw[1] += ( valid_data_buffer[3 + i * ADC_CONTINUOUS_CHANNELS] + gyro_bias[1] ) * fir_coeffs[i];
+  gyro_data.filtered.y = (float) gyro_raw[1] / (float) fir_coeffs[ADC_OVERSAMPLE] * gyro_scale[1];
   
   // Get the Z gyro data.  Fifth byte in.  Convert to deg/s.
   gyro_raw[2] = 0;
   for( i = 0; i < ADC_OVERSAMPLE; i++ )
-    gyro_raw[2] += ( valid_data_buffer[5 + i * ADC_CONTINUOUS_CHANNELS] + GYRO_OFFSET ) * fir_coeffs[i];
-  gyro_data.filtered.z = (float) gyro_raw[2] / (float) fir_coeffs[ADC_OVERSAMPLE] * GYRO_SCALE;
+    gyro_raw[2] += ( valid_data_buffer[5 + i * ADC_CONTINUOUS_CHANNELS] + gyro_bias[2] ) * fir_coeffs[i];
+  gyro_data.filtered.z = (float) gyro_raw[2] / (float) fir_coeffs[ADC_OVERSAMPLE] * gyro_scale[2];
 }
 
 /**
@@ -501,7 +477,9 @@ void downsample_data()
 void calibrate_sensors() {
   int i;
   int16_t mag_raw[3];
-    
+  // local biases for noise analysis
+  float accel_bias[3], gyro_bias[3], mag_bias[3];
+
   // run few loops to get mean
   gyro_bias[0] = gyro_bias[1] = gyro_bias[2] = 0;
   accel_bias[0] = accel_bias[1] = accel_bias[2] = 0;
@@ -522,6 +500,7 @@ void calibrate_sensors() {
     mag_bias[2] += mag_raw[2];
     
     ahrs_state = AHRS_IDLE;
+    process_spi_request();
   }
   gyro_bias[0] /= i;
   gyro_bias[1] /= i;
@@ -553,6 +532,7 @@ void calibrate_sensors() {
     mag_var[1] += (mag_raw[1] - mag_bias[1]) * (mag_raw[1] - mag_bias[1]);
     mag_var[2] += (mag_raw[2] - mag_bias[2]) * (mag_raw[2] - mag_bias[2]);
     ahrs_state = AHRS_IDLE;    
+    process_spi_request();
   }
   gyro_var[0] /= i;
   gyro_var[1] /= i;
@@ -562,7 +542,61 @@ void calibrate_sensors() {
   accel_var[2] /= i;
   mag_var[0] /= i;
   mag_var[1] /= i;
-  mag_var[2] /= i;    
+  mag_var[2] /= i;   
+
+  float mag_length2 = mag_bias[0] * mag_bias[0] + mag_bias[1] * mag_bias[1] + mag_bias[2] * mag_bias[2];
+  mag_var[0] = mag_var[0] / mag_length2;
+  mag_var[1] = mag_var[1] / mag_length2;
+  mag_var[2] = mag_var[2] / mag_length2;
+    
+  if(ahrs_algorithm == INSGPS_Algo) 
+    converge_insgps();
+}
+
+/**
+ * @brief Quickly initialize INS assuming stationary and gravity is down
+ *
+ * Currently this is done iteratively but I'm sure it can be directly computed
+ * when I sit down and work it out
+ */
+void converge_insgps()
+{
+  float pos[3] = {0,0,0}, vel[3] = {0,0,0}, BaroAlt = 0, mag[3], accel[3], temp_gyro[3] = {0, 0, 0};
+  INSGPSInit();
+  INSSetAccelVar(accel_var);
+  INSSetGyroBias(temp_gyro); // set this to zero - crude bias corrected from downsample_data
+  INSSetGyroVar(gyro_var);
+  INSSetMagVar(mag_var);         
+    
+  float temp_var[3] = {10, 10, 10};
+  INSSetGyroVar(temp_var); // ignore gyro's
+
+  accel[0] = accel_data.filtered.x;
+  accel[1] = accel_data.filtered.y;
+  accel[2] = accel_data.filtered.z;
+  
+  // Iteratively constrain pitch and roll while updating yaw to align magnetic axis.  
+  for(int i = 0; i < 50; i++) 
+  {
+    // This should be done directly but I'm too dumb.
+    float rpy[3];
+    Quaternion2RPY(Nav.q, rpy);
+    rpy[1] = attitude_data.euler.pitch = -atan2(accel_data.filtered.x, accel_data.filtered.z) * 180 / M_PI;
+    rpy[0] = attitude_data.euler.roll = -atan2(accel_data.filtered.y, accel_data.filtered.z) * 180 / M_PI;    
+    // Get magnetic readings
+    PIOS_HMC5843_ReadMag(mag_data.raw.axis);
+    mag[0] = -mag_data.raw.axis[1];
+    mag[1] = -mag_data.raw.axis[0];
+    mag[2] = -mag_data.raw.axis[2];
+ 
+    RPY2Quaternion(rpy,Nav.q);
+    INSPrediction( temp_gyro, accel, 1 / (float) EKF_RATE );
+    FullCorrection(mag,pos,vel,BaroAlt); 
+    process_spi_request(); // again we must keep this hear to prevent SPI connection dropping
+  } 
+  
+  INSSetGyroVar(gyro_var);
+
 }
 
 /**
@@ -627,96 +661,149 @@ void process_spi_request(void)
   //dump_spi_message(PIOS_COM_AUX, "+", (uint8_t *)&user_rx_v1, sizeof(user_rx_v1));
 
   switch (user_rx_v1.payload.user.t) {
-  case OPAHRS_MSG_V1_REQ_SYNC:
-    opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_SYNC);
-    user_tx_v1.payload.user.v.rsp.sync.i_am_a_bootloader = FALSE;
-    user_tx_v1.payload.user.v.rsp.sync.hw_version = 1;
-    user_tx_v1.payload.user.v.rsp.sync.bl_version = 2;
-    user_tx_v1.payload.user.v.rsp.sync.fw_version = 3;
-    user_tx_v1.payload.user.v.rsp.sync.cookie     = user_rx_v1.payload.user.v.req.sync.cookie;
-    dump_spi_message(PIOS_COM_AUX, "S", (uint8_t *)&user_tx_v1, sizeof(user_tx_v1));
-    lfsm_user_set_tx_v1 (&user_tx_v1);
-    break;
-  case OPAHRS_MSG_V1_REQ_RESET:
-    PIOS_DELAY_WaitmS(user_rx_v1.payload.user.v.req.reset.reset_delay_in_ms);
-    PIOS_SYS_Reset();
-    break;
-  case OPAHRS_MSG_V1_REQ_SERIAL:
-    opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_SERIAL);
-    PIOS_SYS_SerialNumberGet((char *)&(user_tx_v1.payload.user.v.rsp.serial.serial_bcd));
-    dump_spi_message(PIOS_COM_AUX, "I", (uint8_t *)&user_tx_v1, sizeof(user_tx_v1));
-    lfsm_user_set_tx_v1 (&user_tx_v1);
-    break;
-  case OPAHRS_MSG_V1_REQ_ALTITUDE:
-    opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_ALTITUDE);
-    altitude_data.altitude    = user_rx_v1.payload.user.v.req.altitude.altitude;
-    altitude_data.pressure    = user_rx_v1.payload.user.v.req.altitude.pressure;
-    altitude_data.temperature = user_rx_v1.payload.user.v.req.altitude.temperature;
-    dump_spi_message(PIOS_COM_AUX, "V", (uint8_t *)&user_rx_v1, sizeof(user_rx_v1));
-    lfsm_user_set_tx_v1 (&user_tx_v1);
-    break;
-  case OPAHRS_MSG_V1_REQ_NORTH:
-    opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_NORTH);
-    INSSetMagNorth(user_rx_v1.payload.user.v.req.north.Be);
-    dump_spi_message(PIOS_COM_AUX, "N", (uint8_t *)&user_rx_v1, sizeof(user_rx_v1));
-    lfsm_user_set_tx_v1 (&user_tx_v1);
-    break;
-  case OPAHRS_MSG_V1_REQ_GPS:
-    opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_GPS);
-    gps_updated = TRUE;
-    gps_data.latitude    = user_rx_v1.payload.user.v.req.gps.latitude;
-    gps_data.longitude    = user_rx_v1.payload.user.v.req.gps.longitude;
-    gps_data.altitude = user_rx_v1.payload.user.v.req.gps.altitude;
-    gps_data.heading = user_rx_v1.payload.user.v.req.gps.heading;
-    gps_data.groundspeed = user_rx_v1.payload.user.v.req.gps.groundspeed;
-    gps_data.status = user_rx_v1.payload.user.v.req.gps.status;
-    dump_spi_message(PIOS_COM_AUX, "G", (uint8_t *)&user_rx_v1, sizeof(user_rx_v1));
-    lfsm_user_set_tx_v1 (&user_tx_v1);
-    break;
-  case OPAHRS_MSG_V1_REQ_ATTITUDERAW:
-    opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_ATTITUDERAW);
-    user_tx_v1.payload.user.v.rsp.attituderaw.mags.x        = mag_data.raw.axis[0];
-    user_tx_v1.payload.user.v.rsp.attituderaw.mags.y        = mag_data.raw.axis[1];
-    user_tx_v1.payload.user.v.rsp.attituderaw.mags.z        = mag_data.raw.axis[2];
-
-    user_tx_v1.payload.user.v.rsp.attituderaw.gyros.x       = gyro_data.raw.x;
-    user_tx_v1.payload.user.v.rsp.attituderaw.gyros.y       = gyro_data.raw.y;
-    user_tx_v1.payload.user.v.rsp.attituderaw.gyros.z       = gyro_data.raw.z;
-
-    user_tx_v1.payload.user.v.rsp.attituderaw.gyros_filtered.x       = gyro_data.filtered.x;
-    user_tx_v1.payload.user.v.rsp.attituderaw.gyros_filtered.y       = gyro_data.filtered.y;
-    user_tx_v1.payload.user.v.rsp.attituderaw.gyros_filtered.z       = gyro_data.filtered.z;
-    
-    user_tx_v1.payload.user.v.rsp.attituderaw.gyros.xy_temp = gyro_data.temp.xy;
-    user_tx_v1.payload.user.v.rsp.attituderaw.gyros.z_temp  = gyro_data.temp.z;
-
-    user_tx_v1.payload.user.v.rsp.attituderaw.accels.x      = accel_data.raw.x;
-    user_tx_v1.payload.user.v.rsp.attituderaw.accels.y      = accel_data.raw.y;
-    user_tx_v1.payload.user.v.rsp.attituderaw.accels.z      = accel_data.raw.z;
-
-    user_tx_v1.payload.user.v.rsp.attituderaw.accels_filtered.x      = accel_data.filtered.x;
-    user_tx_v1.payload.user.v.rsp.attituderaw.accels_filtered.y      = accel_data.filtered.y;
-    user_tx_v1.payload.user.v.rsp.attituderaw.accels_filtered.z      = accel_data.filtered.z;
+    case OPAHRS_MSG_V1_REQ_SYNC:
+      opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_SYNC);
+      user_tx_v1.payload.user.v.rsp.sync.i_am_a_bootloader = FALSE;
+      user_tx_v1.payload.user.v.rsp.sync.hw_version = 1;
+      user_tx_v1.payload.user.v.rsp.sync.bl_version = 2;
+      user_tx_v1.payload.user.v.rsp.sync.fw_version = 3;
+      user_tx_v1.payload.user.v.rsp.sync.cookie     = user_rx_v1.payload.user.v.req.sync.cookie;
+      dump_spi_message(PIOS_COM_AUX, "S", (uint8_t *)&user_tx_v1, sizeof(user_tx_v1));
+      lfsm_user_set_tx_v1 (&user_tx_v1);
+      break;
+    case OPAHRS_MSG_V1_REQ_RESET:
+      PIOS_DELAY_WaitmS(user_rx_v1.payload.user.v.req.reset.reset_delay_in_ms);
+      PIOS_SYS_Reset();
+      break;
+    case OPAHRS_MSG_V1_REQ_SERIAL:
+      opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_SERIAL);
+      PIOS_SYS_SerialNumberGet((char *)&(user_tx_v1.payload.user.v.rsp.serial.serial_bcd));
+      dump_spi_message(PIOS_COM_AUX, "I", (uint8_t *)&user_tx_v1, sizeof(user_tx_v1));
+      lfsm_user_set_tx_v1 (&user_tx_v1);
+      break;
+    case OPAHRS_MSG_V1_REQ_ALTITUDE:
+      opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_ALTITUDE);
+      altitude_data.altitude    = user_rx_v1.payload.user.v.req.altitude.altitude;
+      altitude_data.pressure    = user_rx_v1.payload.user.v.req.altitude.pressure;
+      altitude_data.temperature = user_rx_v1.payload.user.v.req.altitude.temperature;
+      dump_spi_message(PIOS_COM_AUX, "V", (uint8_t *)&user_rx_v1, sizeof(user_rx_v1));
+      lfsm_user_set_tx_v1 (&user_tx_v1);
+      break;
+    case OPAHRS_MSG_V1_REQ_NORTH:
+      opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_NORTH);
+      INSSetMagNorth(user_rx_v1.payload.user.v.req.north.Be);
+      dump_spi_message(PIOS_COM_AUX, "N", (uint8_t *)&user_rx_v1, sizeof(user_rx_v1));
+      lfsm_user_set_tx_v1 (&user_tx_v1);
+      break;
+    case OPAHRS_MSG_V1_REQ_CALIBRATION:
+      if(user_rx_v1.payload.user.v.req.calibration.measure_var)
+        calibration_pending = TRUE;
+      else {
+        accel_var[0] = user_rx_v1.payload.user.v.req.calibration.accel_var[0];
+        accel_var[1] = user_rx_v1.payload.user.v.req.calibration.accel_var[1];
+        accel_var[2] = user_rx_v1.payload.user.v.req.calibration.accel_var[2];
+        gyro_bias[0] = user_rx_v1.payload.user.v.req.calibration.gyro_bias[0];
+        gyro_bias[1] = user_rx_v1.payload.user.v.req.calibration.gyro_bias[1];
+        gyro_bias[2] = user_rx_v1.payload.user.v.req.calibration.gyro_bias[2];
+        gyro_var[0] = user_rx_v1.payload.user.v.req.calibration.gyro_var[0];
+        gyro_var[1] = user_rx_v1.payload.user.v.req.calibration.gyro_var[1];
+        gyro_var[2] = user_rx_v1.payload.user.v.req.calibration.gyro_var[2];
+        mag_var[0] = user_rx_v1.payload.user.v.req.calibration.mag_var[0];
+        mag_var[1] = user_rx_v1.payload.user.v.req.calibration.mag_var[1];
+        mag_var[2] = user_rx_v1.payload.user.v.req.calibration.mag_var[2];      
+        INSSetAccelVar(accel_var);
+        float gyro_bias_ins[3] = {0,0,0};
+        INSSetGyroBias(gyro_bias_ins);  //gyro bias corrects in preprocessing
+        INSSetGyroVar(gyro_var);
+        INSSetMagVar(mag_var);             
+      }      
+      accel_bias[0] = user_rx_v1.payload.user.v.req.calibration.accel_bias[0];
+      accel_bias[1] = user_rx_v1.payload.user.v.req.calibration.accel_bias[1];
+      accel_bias[2] = user_rx_v1.payload.user.v.req.calibration.accel_bias[2];
+      accel_scale[0] = user_rx_v1.payload.user.v.req.calibration.accel_scale[0];
+      accel_scale[1] = user_rx_v1.payload.user.v.req.calibration.accel_scale[1];
+      accel_scale[2] = user_rx_v1.payload.user.v.req.calibration.accel_scale[2];
+      gyro_scale[0] = user_rx_v1.payload.user.v.req.calibration.gyro_scale[0];
+      gyro_scale[1] = user_rx_v1.payload.user.v.req.calibration.gyro_scale[1];
+      gyro_scale[2] = user_rx_v1.payload.user.v.req.calibration.gyro_scale[2];
+      mag_bias[0] = user_rx_v1.payload.user.v.req.calibration.mag_bias[0];
+      mag_bias[1] = user_rx_v1.payload.user.v.req.calibration.mag_bias[1];
+      mag_bias[2] = user_rx_v1.payload.user.v.req.calibration.mag_bias[2];
       
-    dump_spi_message(PIOS_COM_AUX, "R", (uint8_t *)&user_tx_v1, sizeof(user_tx_v1));
-    lfsm_user_set_tx_v1 (&user_tx_v1);
-    break;
-  case OPAHRS_MSG_V1_REQ_ATTITUDE:
-    opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_ATTITUDE);
-    user_tx_v1.payload.user.v.rsp.attitude.quaternion.q1 = attitude_data.quaternion.q1;
-    user_tx_v1.payload.user.v.rsp.attitude.quaternion.q2 = attitude_data.quaternion.q2;
-    user_tx_v1.payload.user.v.rsp.attitude.quaternion.q3 = attitude_data.quaternion.q3;
-    user_tx_v1.payload.user.v.rsp.attitude.quaternion.q4 = attitude_data.quaternion.q4;
-    user_tx_v1.payload.user.v.rsp.attitude.euler.roll    = attitude_data.euler.roll;
-    user_tx_v1.payload.user.v.rsp.attitude.euler.pitch   = attitude_data.euler.pitch;
-    user_tx_v1.payload.user.v.rsp.attitude.euler.yaw     = attitude_data.euler.yaw;
-    dump_spi_message(PIOS_COM_AUX, "A", (uint8_t *)&user_tx_v1, sizeof(user_tx_v1));
-    lfsm_user_set_tx_v1 (&user_tx_v1);
-    break;
-  default:
-    break;
+      // echo back the values used
+      opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_CALIBRATION);    
+      user_tx_v1.payload.user.v.rsp.calibration.accel_var[0] = accel_var[0];
+      user_tx_v1.payload.user.v.rsp.calibration.accel_var[1] = accel_var[1];
+      user_tx_v1.payload.user.v.rsp.calibration.accel_var[2] = accel_var[2];
+      user_tx_v1.payload.user.v.rsp.calibration.gyro_bias[0] = gyro_bias[0];
+      user_tx_v1.payload.user.v.rsp.calibration.gyro_bias[1] = gyro_bias[1];
+      user_tx_v1.payload.user.v.rsp.calibration.gyro_bias[2] = gyro_bias[2];
+      user_tx_v1.payload.user.v.rsp.calibration.gyro_var[0] = gyro_var[0];
+      user_tx_v1.payload.user.v.rsp.calibration.gyro_var[1] = gyro_var[1];
+      user_tx_v1.payload.user.v.rsp.calibration.gyro_var[2] = gyro_var[2];
+      user_tx_v1.payload.user.v.rsp.calibration.mag_var[0] = mag_var[0];
+      user_tx_v1.payload.user.v.rsp.calibration.mag_var[1] = mag_var[1];
+      user_tx_v1.payload.user.v.rsp.calibration.mag_var[2] = mag_var[2];
+            
+      dump_spi_message(PIOS_COM_AUX, "C", (uint8_t *)&user_rx_v1, sizeof(user_rx_v1));
+      lfsm_user_set_tx_v1 (&user_tx_v1);
+      break;      
+    case OPAHRS_MSG_V1_REQ_GPS:
+      opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_GPS);
+      gps_updated = TRUE;
+      gps_data.latitude    = user_rx_v1.payload.user.v.req.gps.latitude;
+      gps_data.longitude    = user_rx_v1.payload.user.v.req.gps.longitude;
+      gps_data.altitude = user_rx_v1.payload.user.v.req.gps.altitude;
+      gps_data.heading = user_rx_v1.payload.user.v.req.gps.heading;
+      gps_data.groundspeed = user_rx_v1.payload.user.v.req.gps.groundspeed;
+      gps_data.status = user_rx_v1.payload.user.v.req.gps.status;
+      dump_spi_message(PIOS_COM_AUX, "G", (uint8_t *)&user_rx_v1, sizeof(user_rx_v1));
+      lfsm_user_set_tx_v1 (&user_tx_v1);
+      break;
+    case OPAHRS_MSG_V1_REQ_ATTITUDERAW:
+      opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_ATTITUDERAW);
+      user_tx_v1.payload.user.v.rsp.attituderaw.mags.x        = mag_data.raw.axis[0];
+      user_tx_v1.payload.user.v.rsp.attituderaw.mags.y        = mag_data.raw.axis[1];
+      user_tx_v1.payload.user.v.rsp.attituderaw.mags.z        = mag_data.raw.axis[2];
+      
+      user_tx_v1.payload.user.v.rsp.attituderaw.gyros.x       = gyro_data.raw.x;
+      user_tx_v1.payload.user.v.rsp.attituderaw.gyros.y       = gyro_data.raw.y;
+      user_tx_v1.payload.user.v.rsp.attituderaw.gyros.z       = gyro_data.raw.z;
+      
+      user_tx_v1.payload.user.v.rsp.attituderaw.gyros_filtered.x       = gyro_data.filtered.x;
+      user_tx_v1.payload.user.v.rsp.attituderaw.gyros_filtered.y       = gyro_data.filtered.y;
+      user_tx_v1.payload.user.v.rsp.attituderaw.gyros_filtered.z       = gyro_data.filtered.z;
+      
+      user_tx_v1.payload.user.v.rsp.attituderaw.gyros.xy_temp = gyro_data.temp.xy;
+      user_tx_v1.payload.user.v.rsp.attituderaw.gyros.z_temp  = gyro_data.temp.z;
+      
+      user_tx_v1.payload.user.v.rsp.attituderaw.accels.x      = accel_data.raw.x;
+      user_tx_v1.payload.user.v.rsp.attituderaw.accels.y      = accel_data.raw.y;
+      user_tx_v1.payload.user.v.rsp.attituderaw.accels.z      = accel_data.raw.z;
+      
+      user_tx_v1.payload.user.v.rsp.attituderaw.accels_filtered.x      = accel_data.filtered.x;
+      user_tx_v1.payload.user.v.rsp.attituderaw.accels_filtered.y      = accel_data.filtered.y;
+      user_tx_v1.payload.user.v.rsp.attituderaw.accels_filtered.z      = accel_data.filtered.z;
+      
+      dump_spi_message(PIOS_COM_AUX, "R", (uint8_t *)&user_tx_v1, sizeof(user_tx_v1));
+      lfsm_user_set_tx_v1 (&user_tx_v1);
+      break;
+    case OPAHRS_MSG_V1_REQ_ATTITUDE:
+      opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_ATTITUDE);
+      user_tx_v1.payload.user.v.rsp.attitude.quaternion.q1 = attitude_data.quaternion.q1;
+      user_tx_v1.payload.user.v.rsp.attitude.quaternion.q2 = attitude_data.quaternion.q2;
+      user_tx_v1.payload.user.v.rsp.attitude.quaternion.q3 = attitude_data.quaternion.q3;
+      user_tx_v1.payload.user.v.rsp.attitude.quaternion.q4 = attitude_data.quaternion.q4;
+      user_tx_v1.payload.user.v.rsp.attitude.euler.roll    = attitude_data.euler.roll;
+      user_tx_v1.payload.user.v.rsp.attitude.euler.pitch   = attitude_data.euler.pitch;
+      user_tx_v1.payload.user.v.rsp.attitude.euler.yaw     = attitude_data.euler.yaw;
+      dump_spi_message(PIOS_COM_AUX, "A", (uint8_t *)&user_tx_v1, sizeof(user_tx_v1));
+      lfsm_user_set_tx_v1 (&user_tx_v1);
+      break;
+    default:
+      break;
   }
-
+  
   /* Finished processing the received message, requeue it */
   memset(&user_rx_v1, 0xAA, sizeof(user_rx_v1));
   lfsm_user_set_rx_v1 (&user_rx_v1);

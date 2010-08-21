@@ -1,0 +1,17 @@
+<xml>
+	<object name="AHRSCalibration" singleinstance="true" settings="true">
+    <field name="measure_var" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
+    <field name="accel_bias" units="raw" type="int16" elementnames="X,Y,Z" defaultvalue="-2048"/>
+    <field name="accel_scale" units="m/s" type="float" elementnames="X,Y,Z" defaultvalue="0.012"/>
+    <field name="accel_var" units="m^2/s^s" type="float" elementnames="X,Y,Z" defaultvalue="1"/>
+    <field name="gyro_bias" units="raw" type="int16" elementnames="X,Y,Z" defaultvalue="-1675"/>
+    <field name="gyro_scale" units="deg/s" type="float" elementnames="X,Y,Z" defaultvalue="0.0070"/>
+    <field name="gyro_var" units="deg^s/s^2" type="float" elementnames="X,Y,Z" defaultvalue="1"/>
+    <field name="mag_bias" units="mGau" type="float" elementnames="X,Y,Z" defaultvalue="0"/>
+    <field name="mag_var" units="mGau^s" type="float" elementnames="X,Y,Z" defaultvalue="1"/>
+    <access gcs="readwrite" flight="readwrite"/>
+    <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+    <telemetryflight acked="true" updatemode="onchange" period="0"/>
+		<logging updatemode="never" period="0"/>
+	</object>
+</xml>

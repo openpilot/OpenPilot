@@ -93,12 +93,12 @@ UAVObject::Metadata HomeLocation::getDefaultMetadata()
     UAVObject::Metadata metadata;
     metadata.flightAccess = ACCESS_READWRITE;
     metadata.gcsAccess = ACCESS_READWRITE;
-    metadata.gcsTelemetryAcked = 0;
-    metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_MANUAL;
+    metadata.gcsTelemetryAcked = 1;
+    metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
     metadata.gcsTelemetryUpdatePeriod = 0;
-    metadata.flightTelemetryAcked = 0;
-    metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
-    metadata.flightTelemetryUpdatePeriod = 10000;
+    metadata.flightTelemetryAcked = 1;
+    metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
+    metadata.flightTelemetryUpdatePeriod = 0;
     metadata.loggingUpdateMode = UAVObject::UPDATEMODE_NEVER;
     metadata.loggingUpdatePeriod = 0;
     return metadata;
@@ -111,6 +111,25 @@ UAVObject::Metadata HomeLocation::getDefaultMetadata()
  */
 void HomeLocation::setDefaultFieldValues()
 {
+    data.Set = -1;
+    data.Latitude = 0;
+    data.Longitude = 0;
+    data.Altitude = 0;
+    data.ECEF[0] = 0;
+    data.ECEF[1] = 0;
+    data.ECEF[2] = 0;
+    data.RNE[0] = 0;
+    data.RNE[1] = 0;
+    data.RNE[2] = 0;
+    data.RNE[3] = 0;
+    data.RNE[4] = 0;
+    data.RNE[5] = 0;
+    data.RNE[6] = 0;
+    data.RNE[7] = 0;
+    data.RNE[8] = 0;
+    data.Be[0] = 0;
+    data.Be[1] = 0;
+    data.Be[2] = 0;
 
 }
 

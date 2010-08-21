@@ -209,6 +209,17 @@ struct opahrs_msg_v1_req_attituderaw {
 struct opahrs_msg_v1_req_attitude {
 } __attribute__((__packed__));
 
+struct opahrs_msg_v1_req_calibration {
+	uint8_t measure_var;
+	uint16_t accel_bias[3];
+  float accel_scale[3];
+  float accel_var[3];
+	uint16_t gyro_bias[3];
+  float gyro_scale[3];
+  float gyro_var[3];
+  uint16_t mag_bias[3];
+  float mag_var[3];
+} __attribute__((__packed__));
 
 union opahrs_msg_v1_req {
   struct opahrs_msg_v1_req_nop          nop;
@@ -216,10 +227,11 @@ union opahrs_msg_v1_req {
   struct opahrs_msg_v1_req_reset        reset;
   struct opahrs_msg_v1_req_serial       serial;
   struct opahrs_msg_v1_req_altitude     altitude;
-  struct opahrs_msg_v1_req_north       north;
+  struct opahrs_msg_v1_req_north        north;
   struct opahrs_msg_v1_req_gps          gps;
   struct opahrs_msg_v1_req_attituderaw  attituderaw;
   struct opahrs_msg_v1_req_attitude     attitude;
+  struct opahrs_msg_v1_req_calibration  calibration;
 } __attribute__((__packed__));
 
 struct opahrs_msg_v1_rsp_sync {
@@ -288,14 +300,23 @@ struct opahrs_msg_v1_rsp_attitude {
   } euler;
 } __attribute__((__packed__));
 
+struct opahrs_msg_v1_rsp_calibration {
+	uint8_t measure_var;
+  float accel_var[3];
+	uint16_t gyro_bias[3];
+  float gyro_var[3];
+  float mag_var[3];
+} __attribute__((__packed__));
+
 union opahrs_msg_v1_rsp {
   struct opahrs_msg_v1_rsp_sync         sync;
   struct opahrs_msg_v1_rsp_serial       serial;
   struct opahrs_msg_v1_rsp_altitude     altitude;
   struct opahrs_msg_v1_rsp_north        north;
+  struct opahrs_msg_v1_rsp_gps          gps;
   struct opahrs_msg_v1_rsp_attituderaw  attituderaw;
   struct opahrs_msg_v1_rsp_attitude     attitude;
-  struct opahrs_msg_v1_rsp_altitude     gps;
+  struct opahrs_msg_v1_rsp_calibration  calibration;
 } __attribute__((__packed__));
 
 enum opahrs_msg_v1_tag {
@@ -308,6 +329,7 @@ enum opahrs_msg_v1_tag {
   OPAHRS_MSG_V1_REQ_GPS,
   OPAHRS_MSG_V1_REQ_ATTITUDERAW,
   OPAHRS_MSG_V1_REQ_ATTITUDE,
+  OPAHRS_MSG_V1_REQ_CALIBRATION,
 
   OPAHRS_MSG_V1_RSP_SYNC,
   OPAHRS_MSG_V1_RSP_SERIAL,
@@ -316,6 +338,7 @@ enum opahrs_msg_v1_tag {
   OPAHRS_MSG_V1_RSP_GPS,
   OPAHRS_MSG_V1_RSP_ATTITUDERAW,
   OPAHRS_MSG_V1_RSP_ATTITUDE,
+  OPAHRS_MSG_V1_RSP_CALIBRATION,
 };
 
 struct opahrs_msg_v1_payload {

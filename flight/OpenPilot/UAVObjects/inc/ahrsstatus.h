@@ -33,7 +33,7 @@
 #define AHRSSTATUS_H
 
 // Object constants
-#define AHRSSTATUS_OBJID 2618706832U
+#define AHRSSTATUS_OBJID 1556283776U
 #define AHRSSTATUS_NAME "AhrsStatus"
 #define AHRSSTATUS_METANAME "AhrsStatusMeta"
 #define AHRSSTATUS_ISSINGLEINST 1
@@ -58,7 +58,9 @@
 // Object data
 typedef struct {
     uint8_t SerialNumber[25];
-    uint8_t CommErrors[5];
+    uint8_t CommErrors[6];
+    uint8_t HomeSet;
+    uint8_t CalibrationSet;
 
 } __attribute__((packed)) AhrsStatusData;
 
@@ -68,9 +70,15 @@ typedef struct {
 #define AHRSSTATUS_SERIALNUMBER_NUMELEM 25
 // Field CommErrors information
 /* Array element names for field CommErrors */
-typedef enum { AHRSSTATUS_COMMERRORS_ATTITUDE=0, AHRSSTATUS_COMMERRORS_ATTITUDERAW=1, AHRSSTATUS_COMMERRORS_POSITIONACTUAL=2, AHRSSTATUS_COMMERRORS_HOMELOCATION=3, AHRSSTATUS_COMMERRORS_ALTITUDE=4 } AhrsStatusCommErrorsElem;
+typedef enum { AHRSSTATUS_COMMERRORS_ATTITUDE=0, AHRSSTATUS_COMMERRORS_ATTITUDERAW=1, AHRSSTATUS_COMMERRORS_POSITIONACTUAL=2, AHRSSTATUS_COMMERRORS_HOMELOCATION=3, AHRSSTATUS_COMMERRORS_ALTITUDE=4, AHRSSTATUS_COMMERRORS_CALIBRATION=5 } AhrsStatusCommErrorsElem;
 /* Number of elements for field CommErrors */
-#define AHRSSTATUS_COMMERRORS_NUMELEM 5
+#define AHRSSTATUS_COMMERRORS_NUMELEM 6
+// Field HomeSet information
+/* Enumeration options for field HomeSet */
+typedef enum { AHRSSTATUS_HOMESET_FALSE=0, AHRSSTATUS_HOMESET_TRUE=1 } AhrsStatusHomeSetOptions;
+// Field CalibrationSet information
+/* Enumeration options for field CalibrationSet */
+typedef enum { AHRSSTATUS_CALIBRATIONSET_FALSE=0, AHRSSTATUS_CALIBRATIONSET_TRUE=1 } AhrsStatusCalibrationSetOptions;
 
 
 // Generic interface functions

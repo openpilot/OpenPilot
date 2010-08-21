@@ -31,6 +31,7 @@
 #include "actuatorcommand.h"
 #include "actuatordesired.h"
 #include "actuatorsettings.h"
+#include "ahrscalibration.h"
 #include "ahrsstatus.h"
 #include "attitudeactual.h"
 #include "attitudedesired.h"
@@ -68,6 +69,7 @@ void UAVObjectsInitializeAll()
     ActuatorCommandInitialize();
     ActuatorDesiredInitialize();
     ActuatorSettingsInitialize();
+    AHRSCalibrationInitialize();
     AhrsStatusInitialize();
     AttitudeActualInitialize();
     AttitudeDesiredInitialize();

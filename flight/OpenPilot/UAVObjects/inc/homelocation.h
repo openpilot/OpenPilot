@@ -33,11 +33,11 @@
 #define HOMELOCATION_H
 
 // Object constants
-#define HOMELOCATION_OBJID 576787928U
+#define HOMELOCATION_OBJID 4244719376U
 #define HOMELOCATION_NAME "HomeLocation"
 #define HOMELOCATION_METANAME "HomeLocationMeta"
 #define HOMELOCATION_ISSINGLEINST 1
-#define HOMELOCATION_ISSETTINGS 0
+#define HOMELOCATION_ISSETTINGS 1
 #define HOMELOCATION_NUMBYTES sizeof(HomeLocationData)
 
 // Object access macros

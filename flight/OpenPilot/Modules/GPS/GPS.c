@@ -79,7 +79,7 @@ void nmeaProcessGPGSA(char* packet);
 // Global variables
 
 // Private constants
-#define STACK_SIZE configMINIMAL_STACK_SIZE
+#define STACK_SIZE configMINIMAL_STACK_SIZE+5000
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 3)
 
 // Private types
@@ -162,11 +162,12 @@ static void gpsTask(void* parameters)
     else {
       // Had an update
       PositionActualGet(&GpsData);
-      if(GpsData.Status == POSITIONACTUAL_STATUS_FIX3D && homeLocationSet == FALSE) {
+      if(homeLocationSet == FALSE) {
         setHomeLocation(&GpsData);
         homeLocationSet = TRUE;
       }
     }
+    setHomeLocation(&GpsData);
 
 		// Block task until next update
 		vTaskDelay(xDelay);
@@ -177,6 +178,10 @@ static void setHomeLocation(PositionActualData * gpsData)
 {
   HomeLocationData home;
   HomeLocationGet(&home);
+  
+  gpsData->Latitude = -29;
+  gpsData->Longitude = 93;
+  gpsData->Altitude = 30;
   
   // Store LLA
   home.Latitude = (int32_t) (gpsData->Latitude * 10e6);
@@ -198,13 +203,9 @@ static void setHomeLocation(PositionActualData * gpsData)
   memcpy(&home.RNE[0], &RNE[0][0], 9 * sizeof(RNE[0][0]));
   
   // Compute magnetic flux direction at home location
-  //WMM_Initialize(); // Set default values and constants
+  WMM_Initialize();
   // TODO: Extract time/date from GPS to seed this
-  //WMM_GetMagVector(LLA[0], LLA[1], LLA[2], 8, 17, 2010, home.Be);
-  // Hard code flux until get this updated - will get wrong orientations
-  home.Be[0] = 1;
-  home.Be[1] = 0;
-  home.Be[2] = 0;
+  WMM_GetMagVector(LLA[0], LLA[1], LLA[2], 8, 17, 2010, &home.Be[0]);
   
   HomeLocationSet(&home);
 }

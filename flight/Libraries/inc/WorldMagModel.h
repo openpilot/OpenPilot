@@ -28,7 +28,7 @@
 #define WORLDMAGMODEL_H_
 
 	//  Exposed Function Prototypes
-	void WMM_Initialize();
+	int WMM_Initialize();
     void WMM_GetMagVector(float Lat, float Lon, float AltEllipsoid, uint16_t Month, uint16_t Day, uint16_t Year, float B[3]);
 
 #endif /* WORLDMAGMODEL_H_ */

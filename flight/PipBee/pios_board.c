@@ -34,27 +34,27 @@
  * NOTE: Leave this declared as const data so that it ends up in the 
  * .rodata section (ie. Flash) rather than in the .bss section (RAM).
  */
-void PIOS_SPI_op_irq_handler(void);
-void DMA1_Channel5_IRQHandler() __attribute__ ((alias ("PIOS_SPI_op_irq_handler")));
-void DMA1_Channel4_IRQHandler() __attribute__ ((alias ("PIOS_SPI_op_irq_handler")));
-static const struct pios_spi_cfg pios_spi_op_cfg = {
-  .regs   = SPI2,
+void PIOS_SPI_perif_irq_handler(void);
+void DMA1_Channel5_IRQHandler() __attribute__ ((alias ("PIOS_SPI_perif_irq_handler")));
+void DMA1_Channel4_IRQHandler() __attribute__ ((alias ("PIOS_SPI_perif_irq_handler")));
+static const struct pios_spi_cfg pios_spi_perif_cfg = {
+  .regs   = SPI1,
   .init   = {
-    .SPI_Mode              = SPI_Mode_Slave,
+    .SPI_Mode              = SPI_Mode_Master,
     .SPI_Direction         = SPI_Direction_2Lines_FullDuplex,
     .SPI_DataSize          = SPI_DataSize_8b,
-    .SPI_NSS               = SPI_NSS_Hard,
+    .SPI_NSS               = SPI_NSS_Soft,
     .SPI_FirstBit          = SPI_FirstBit_MSB,
     .SPI_CRCPolynomial     = 7,
     .SPI_CPOL              = SPI_CPOL_High,
     .SPI_CPHA              = SPI_CPHA_2Edge,
+    .SPI_BaudRatePrescaler = 7 << 3, /* Maximum divider (ie. slowest clock rate) */
   },
-  .use_crc = TRUE,
   .dma = {
     .ahb_clk  = RCC_AHBPeriph_DMA1,
     
     .irq = {
-      .handler = PIOS_SPI_op_irq_handler,
+      .handler = PIOS_SPI_perif_irq_handler,
       .flags   = (DMA1_FLAG_TC4 | DMA1_FLAG_TE4 | DMA1_FLAG_HT4 | DMA1_FLAG_GL4),
       .init    = {
 	.NVIC_IRQChannel                   = DMA1_Channel4_IRQn,
@@ -67,7 +67,7 @@ static const struct pios_spi_cfg pios_spi_op_cfg = {
     .rx = {
       .channel = DMA1_Channel4,
       .init    = {
-	.DMA_PeripheralBaseAddr = (uint32_t)&(SPI2->DR),
+	.DMA_PeripheralBaseAddr = (uint32_t)&(SPI1->DR),
 	.DMA_DIR                = DMA_DIR_PeripheralSRC,
 	.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
 	.DMA_MemoryInc          = DMA_MemoryInc_Enable,
@@ -81,7 +81,7 @@ static const struct pios_spi_cfg pios_spi_op_cfg = {
     .tx = {
       .channel = DMA1_Channel5,
       .init    = {
-	.DMA_PeripheralBaseAddr = (uint32_t)&(SPI2->DR),
+	.DMA_PeripheralBaseAddr = (uint32_t)&(SPI1->DR),
 	.DMA_DIR                = DMA_DIR_PeripheralDST,
 	.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
 	.DMA_MemoryInc          = DMA_MemoryInc_Enable,
@@ -94,34 +94,34 @@ static const struct pios_spi_cfg pios_spi_op_cfg = {
     },
   },
   .ssel = {
-    .gpio = GPIOB,
+    .gpio = GPIOA,
     .init = {
-      .GPIO_Pin   = GPIO_Pin_12,
-      .GPIO_Speed = GPIO_Speed_50MHz,
+      .GPIO_Pin   = GPIO_Pin_4,
+      .GPIO_Speed = GPIO_Speed_10MHz,
       .GPIO_Mode  = GPIO_Mode_IN_FLOATING,
     },
   },
   .sclk = {
-    .gpio = GPIOB,
+    .gpio = GPIOA,
     .init = {
-      .GPIO_Pin   = GPIO_Pin_13,
-      .GPIO_Speed = GPIO_Speed_50MHz,
+      .GPIO_Pin   = GPIO_Pin_5,
+      .GPIO_Speed = GPIO_Speed_10MHz,
       .GPIO_Mode  = GPIO_Mode_IN_FLOATING,
     },
   },
   .miso = {
-    .gpio = GPIOB,
+    .gpio = GPIOA,
     .init = {
-      .GPIO_Pin   = GPIO_Pin_14,
-      .GPIO_Speed = GPIO_Speed_50MHz,
+      .GPIO_Pin   = GPIO_Pin_6,
+      .GPIO_Speed = GPIO_Speed_10MHz,
       .GPIO_Mode  = GPIO_Mode_AF_PP,
     },
   },
   .mosi = {
-    .gpio = GPIOB,
+    .gpio = GPIOA,
     .init = {
-      .GPIO_Pin   = GPIO_Pin_15,
-      .GPIO_Speed = GPIO_Speed_50MHz,
+      .GPIO_Pin   = GPIO_Pin_7,
+      .GPIO_Speed = GPIO_Speed_10MHz,
       .GPIO_Mode  = GPIO_Mode_IN_FLOATING,
     },
   },
@@ -132,16 +132,16 @@ static const struct pios_spi_cfg pios_spi_op_cfg = {
  */
 struct pios_spi_dev pios_spi_devs[] = {
   {
-    .cfg = &pios_spi_op_cfg,
+    .cfg = &pios_spi_perif_cfg,
   },
 };
 
 uint8_t pios_spi_num_devices = NELEMENTS(pios_spi_devs);
 
-void PIOS_SPI_op_irq_handler(void)
+void PIOS_SPI_perif_irq_handler(void)
 {
   /* Call into the generic code to handle the IRQ for this specific device */
-  PIOS_SPI_IRQ_Handler(PIOS_SPI_OP);
+  PIOS_SPI_IRQ_Handler(PIOS_SPI_PERIF);
 }
 
 #endif /* PIOS_INCLUDE_SPI */
@@ -152,10 +152,10 @@ void PIOS_SPI_op_irq_handler(void)
 /*
  * AUX USART
  */
-void PIOS_USART_aux_irq_handler(void);
-void USART3_IRQHandler() __attribute__ ((alias ("PIOS_USART_aux_irq_handler")));
-const struct pios_usart_cfg pios_usart_aux_cfg = {
-  .regs = USART3,
+void PIOS_USART_com_irq_handler(void);
+void USART3_IRQHandler() __attribute__ ((alias ("PIOS_USART_com_irq_handler")));
+const struct pios_usart_cfg pios_usart_com_cfg = {
+  .regs = USART1,
   .init = {
     .USART_BaudRate            = 57600,
     .USART_WordLength          = USART_WordLength_8b,
@@ -165,26 +165,26 @@ const struct pios_usart_cfg pios_usart_aux_cfg = {
     .USART_Mode                = USART_Mode_Rx | USART_Mode_Tx,
   },
   .irq = {
-    .handler = PIOS_USART_aux_irq_handler,
+    .handler = PIOS_USART_com_irq_handler,
     .init    = {
-      .NVIC_IRQChannel                   = USART3_IRQn,
+      .NVIC_IRQChannel                   = USART1_IRQn,
       .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
       .NVIC_IRQChannelSubPriority        = 0,
       .NVIC_IRQChannelCmd                = ENABLE,
     },
   },
   .rx   = {
-    .gpio = GPIOB,
+    .gpio = GPIOA,
     .init = {
-      .GPIO_Pin   = GPIO_Pin_11,
+      .GPIO_Pin   = GPIO_Pin_10,
       .GPIO_Speed = GPIO_Speed_2MHz,
       .GPIO_Mode  = GPIO_Mode_IPU,
     },
   },
   .tx   = {
-    .gpio = GPIOB,
+    .gpio = GPIOA,
     .init = {
-      .GPIO_Pin   = GPIO_Pin_10,
+      .GPIO_Pin   = GPIO_Pin_9,
       .GPIO_Speed = GPIO_Speed_2MHz,
       .GPIO_Mode  = GPIO_Mode_AF_PP,
     },
@@ -195,17 +195,17 @@ const struct pios_usart_cfg pios_usart_aux_cfg = {
  * Board specific number of devices.
  */
 struct pios_usart_dev pios_usart_devs[] = {
-#define PIOS_USART_AUX    0
+#define PIOS_USART_COM    0
   {
-    .cfg = &pios_usart_aux_cfg,
+    .cfg = &pios_usart_com_cfg,
   },
 };
 
 uint8_t pios_usart_num_devices = NELEMENTS(pios_usart_devs);
 
-void PIOS_USART_aux_irq_handler(void)
+void PIOS_USART_com_irq_handler(void)
 {
-  PIOS_USART_IRQ_Handler(PIOS_USART_AUX);
+  PIOS_USART_IRQ_Handler(PIOS_USART_COM);
 }
 
 #endif /* PIOS_INCLUDE_USART */
@@ -224,7 +224,7 @@ extern const struct pios_com_driver pios_usart_com_driver;
 
 struct pios_com_dev pios_com_devs[] = {
   {
-    .id     = PIOS_USART_AUX,
+    .id     = PIOS_USART_COM,
     .driver = &pios_usart_com_driver,
   },
 };

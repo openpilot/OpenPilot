@@ -70,6 +70,8 @@ PIPBEE = ./
 PIPBEEINC = $(PIPBEE)/inc
 PIOS = ../PiOS
 PIOSINC = $(PIOS)/inc
+FLIGHTLIB = ../Libraries
+FLIGHTLIBINC = ../Libraries/inc
 PIOSSTM32F10X = $(PIOS)/STM32F10x
 PIOSCOMMON = $(PIOS)/Common
 APPLIBDIR = $(PIOSSTM32F10X)/Libraries
@@ -95,7 +97,6 @@ SRC += $(PIOSSTM32F10X)/pios_delay.c
 SRC += $(PIOSSTM32F10X)/pios_usart.c
 SRC += $(PIOSSTM32F10X)/pios_irq.c
 SRC += $(PIOSSTM32F10X)/pios_adc.c
-SRC += $(PIOSSTM32F10X)/pios_i2c.c
 SRC += $(PIOSSTM32F10X)/pios_gpio.c
 SRC += $(PIOSSTM32F10X)/pios_spi.c
 
@@ -116,7 +117,6 @@ SRC += $(STMSPDSRCDIR)/stm32f10x_dma.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_exti.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_flash.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_gpio.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_i2c.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_pwr.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_rcc.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_rtc.c
@@ -155,6 +155,7 @@ ASRCARM =
 #    Each directory must be seperated by a space.
 EXTRAINCDIRS  += $(PIOS)
 EXTRAINCDIRS  += $(PIOSINC)
+EXTRAINCDIRS  += $(FLIGHTLIBINC)
 EXTRAINCDIRS  += $(PIOSSTM32F10X)
 EXTRAINCDIRS  += $(PIOSCOMMON)
 EXTRAINCDIRS  += $(STMSPDINCDIR)
@@ -288,7 +289,7 @@ OOCD_EXE=openocd
 # debug level
 OOCD_CL=-d0
 # interface and board/target settings (using the OOCD target-library here)
-OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.openpilot.cfg -f ../Project/OpenOCD/stm32.cfg
+OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.ahrs.cfg -f ../Project/OpenOCD/stm32.cfg
 # initialize
 OOCD_CL+=-c init
 # show the targets

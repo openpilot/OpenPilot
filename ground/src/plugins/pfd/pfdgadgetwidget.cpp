@@ -180,9 +180,10 @@ void PFDGadgetWidget::updateLinkStatus(UAVObject *object1) {
 
 /*!
   \brief Reads the updated attitude and computes the new display position
+
+  Resolution is 1 degree roll & 1/7.5 degree pitch.
   */
 void PFDGadgetWidget::updateAttitude(UAVObject *object1) {
-    //qDebug() << "UpdateAttitude -";
     UAVObjectField* field = object1->getField(QString("Roll"));
     UAVObjectField* field2 = object1->getField(QString("Pitch"));
     // Double check that the field exists:
@@ -193,9 +194,14 @@ void PFDGadgetWidget::updateAttitude(UAVObject *object1) {
         //   7.5 pixels per pitch degree.
     	// TODO: loosen this constraint and only require a +/- 20 deg range,
     	//       and compute the height from the SVG element.
-        // Also: truncate to 2 decimals, to avoid unnecessary redraws
-        rollTarget = -floor(field->getDouble()*100)/100;
-        pitchTarget = floor(field2->getDouble()*750)/100;
+        // Also: keep the integer value only, to avoid unnecessary redraws
+        rollTarget = -floor(field->getDouble()*10)/10;
+        if ((rollTarget - rollValue) > 180) {
+            rollValue += 360;
+        } else if (((rollTarget - rollValue) < -180)) {
+            rollValue -= 360;
+        }
+        pitchTarget = floor(field2->getDouble()*7.5);
 //        if (!skyDialTimer.isActive())
 //            skyDialTimer.start(); // Rearm the dial Timer which might be stopped.
     } else {
@@ -219,7 +225,7 @@ void PFDGadgetWidget::updateHeading(UAVObject *object1) {
     if (field) {
         // These factors assume some things about the PFD SVG, namely:
         // - Heading value in degrees
-        // - Scale is 540 degrees large
+        // - "Scale" element is 540 degrees wide
 
         // Corvus Corax: "If you want a smooth transition between two angles, It is usually solved that by substracting
         // one from another, and if the result is >180 or <-180 I substract (respectively add) 360 degrees
@@ -240,22 +246,20 @@ void PFDGadgetWidget::updateHeading(UAVObject *object1) {
     if (field) {
         // The speed scale represents 30km/h (6 * 5)
         // 3.6 : convert m/s to km/h
-        double val = floor(field->getDouble()*100)/100;
+        double val = floor(field->getDouble()*10)/10;
         groundspeedTarget = 3.6*val*speedScaleHeight/30;
     }
     fieldname = QString("Altitude");
     field = object1->getField(fieldname);
     if (field) {
         // The altitude scale represents 30 meters
-        altitudeTarget = floor(field->getDouble()*100)/100*altitudeScaleHeight/30;
+        altitudeTarget = floor(field->getDouble()*10)/10*altitudeScaleHeight/30;
     }
 
     // GPS Stats
     if (gcsGPSStats) {
-        fieldname = QString("Satellites");
-        field = object1->getField(fieldname);
-        fieldname = QString("HDOP");
-        UAVObjectField* field1 = object1->getField(fieldname);
+        field = object1->getField(QString("Satellites"));
+        UAVObjectField* field1 = object1->getField(QString("HDOP"));
         if (field && field1) {
             QString s = QString("GPS: ") + field->getValue().toString() + "\nHDP: "
                         + field1->getValue().toString();
@@ -290,8 +294,6 @@ void PFDGadgetWidget::updateAltitude(UAVObject *object3) {
   \brief Called by the UAVObject which got updated
   */
 void PFDGadgetWidget::updateBattery(UAVObject *object1) {
-    // TODO: find a way to avoid updating the graphics if the value
-    //       has not changed since the last update
     // Double check that the field exists:
     QString voltage = QString("Voltage");
     QString current = QString("Current");
@@ -793,8 +795,7 @@ void PFDGadgetWidget::moveSky() {
     if (rollValue != rollTarget) {
         double rollDiff;
         if ((abs((rollValue-rollTarget)*10) > 5)) {
-//        if (0) {
-            rollDiff =(rollTarget - rollValue)/5;
+            rollDiff =(rollTarget - rollValue)/2;
         } else {
             rollDiff = rollTarget - rollValue;
             dialCount--;
@@ -813,7 +814,7 @@ void PFDGadgetWidget::moveSky() {
         double pitchDiff;
         if ((abs((pitchValue-pitchTarget)*10) > 5)) {
   //      if (0) {
-            pitchDiff = (pitchTarget - pitchValue)/5;
+            pitchDiff = (pitchTarget - pitchValue)/2;
         } else {
             pitchDiff = pitchTarget - pitchValue;
             dialCount--;
@@ -890,8 +891,8 @@ void PFDGadgetWidget::moveNeedles()
     // Speed
     //////
     if (groundspeedValue != groundspeedTarget) {
-        if (abs(groundspeedValue-groundspeedTarget) > speedScaleHeight/120) {
-            groundspeedValue += (groundspeedTarget-groundspeedValue)/5;
+        if (abs(groundspeedValue-groundspeedTarget) > speedScaleHeight/100) {
+            groundspeedValue += (groundspeedTarget-groundspeedValue)/2;
         } else {
             groundspeedValue = groundspeedTarget;
             dialCount--;
@@ -906,7 +907,6 @@ void PFDGadgetWidget::moveNeedles()
         QString s = QString().sprintf("%.0f",speedText);
         m_speedtext->setPlainText(s);
 
-        // TODO: optimize this by skipping if not necessary...
         // Now update the text elements inside the scale:
         // (Qt documentation states that the list has the same order
         // as the item add order in the QGraphicsItemGroup)
@@ -915,6 +915,9 @@ void PFDGadgetWidget::moveNeedles()
         foreach( QGraphicsItem * item, textList) {
             if (QGraphicsTextItem *text = qgraphicsitem_cast<QGraphicsTextItem *>(item)) {
                 QString s = (val<0) ? QString() : QString().sprintf("%.0f",val);
+                if (text->toPlainText() == s)
+                    break; // This should happen at element one if is has not changed, indicating
+                           // that it's not necessary to do the rest of the list
                 text->setPlainText(s);
                 val -= 5;
             }
@@ -927,8 +930,8 @@ void PFDGadgetWidget::moveNeedles()
     // Altitude
     //////
     if (altitudeValue != altitudeTarget) {
-        if (abs(altitudeValue-altitudeTarget) > altitudeScaleHeight/120) {
-            altitudeValue += (altitudeTarget-altitudeValue)/5;
+        if (abs(altitudeValue-altitudeTarget) > altitudeScaleHeight/100) {
+            altitudeValue += (altitudeTarget-altitudeValue)/2;
         } else {
             altitudeValue = altitudeTarget;
             dialCount--;
@@ -942,7 +945,6 @@ void PFDGadgetWidget::moveNeedles()
         QString s = QString().sprintf("%.0f",altitudeText);
         m_altitudetext->setPlainText(s);
 
-        // TODO: optimize this by skipping if not necessary...
         // Now update the text elements inside the scale:
         // (Qt documentation states that the list has the same order
         // as the item add order in the QGraphicsItemGroup)
@@ -951,6 +953,9 @@ void PFDGadgetWidget::moveNeedles()
         foreach( QGraphicsItem * item, textList) {
             if (QGraphicsTextItem *text = qgraphicsitem_cast<QGraphicsTextItem *>(item)) {
                 QString s = (val<0) ? QString() : QString().sprintf("%.0f",val);
+                if (text->toPlainText() == s)
+                    break; // This should happen at element one if is has not changed, indicating
+                           // that it's not necessary to do the rest of the list
                 text->setPlainText(s);
                 val -= 5;
             }
@@ -964,3 +969,8 @@ void PFDGadgetWidget::moveNeedles()
    else
        scene()->update(sceneRect());
 }
+
+/**
+  @}
+  @}
+  */

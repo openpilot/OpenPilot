@@ -711,10 +711,6 @@ void process_spi_request(void)
     user_tx_v1.payload.user.v.rsp.attitude.euler.pitch   = attitude_data.euler.pitch;
     user_tx_v1.payload.user.v.rsp.attitude.euler.yaw     = attitude_data.euler.yaw;
     dump_spi_message(PIOS_COM_AUX, "A", (uint8_t *)&user_tx_v1, sizeof(user_tx_v1));
-#if 1
-    /* DEBUG: Overload q4 as a cycle counter since last read. */
-    attitude_data.quaternion.q4 = 0;
-#endif
     lfsm_user_set_tx_v1 (&user_tx_v1);
     break;
   default:

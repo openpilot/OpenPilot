@@ -380,7 +380,7 @@ void nmeaProcessGPGGA(char* packet)
     char *pEnd;
     char token_length=0;
 
-    long deg,min,desim;
+    long deg,min,decim;
 
 	#ifdef NMEA_DEBUG_GGA
 		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"$%s\r\n",packet);
@@ -413,18 +413,18 @@ void nmeaProcessGPGGA(char* packet)
 	deg=strtol (tokens,&pEnd,10);
 	min=deg%100;
 	deg=deg/100;
-	desim=strtol (pEnd+1,NULL,10);
-	if(token_length==10)// 5 desimal output
+	decim=strtol (pEnd+1,NULL,10);
+	if(token_length==10)// 5 decimal output
 	{
-		GpsData.Latitude=deg+(min+desim/100000.0)/60.0; // to desimal degrees
+		GpsData.Latitude=deg+(min+decim/100000.0)/60.0; // to decimal degrees
 	}
-	else if(token_length==9) // 4 desimal output
+	else if(token_length==9) // 4 decimal output
 	{
-		GpsData.Latitude=deg+(min+desim/10000.0)/60.0; // to desimal degrees
+		GpsData.Latitude=deg+(min+decim/10000.0)/60.0; // to decimal degrees
 	}
-	else if(token_length==11) // 6 desimal output OPGPS
+	else if(token_length==11) // 6 decimal output OPGPS
 	{
-		GpsData.Latitude=deg+(min+desim/1000000.0)/60.0; // to desimal degrees
+		GpsData.Latitude=deg+(min+decim/1000000.0)/60.0; // to decimal degrees
 	}
 
     // next field: N/S indicator
@@ -439,18 +439,18 @@ void nmeaProcessGPGGA(char* packet)
 	deg=strtol (tokens,&pEnd,10);
 	min=deg%100;
 	deg=deg/100;
-	desim=strtol (pEnd+1,NULL,10);
-	if(token_length==11)// 5 desimal output
+	decim=strtol (pEnd+1,NULL,10);
+	if(token_length==11)// 5 decimal output
 	{
-		GpsData.Longitude=deg+(min+desim/100000.0)/60.0; // to desimal degrees
+		GpsData.Longitude=deg+(min+decim/100000.0)/60.0; // to decimal degrees
 	}
-	else if(token_length==10) // 4 desimal output
+	else if(token_length==10) // 4 decimal output
 	{
-		GpsData.Longitude=deg+(min+desim/10000.0)/60.0; // to desimal degrees
+		GpsData.Longitude=deg+(min+decim/10000.0)/60.0; // to decimal degrees
 	}
-	else if(token_length==12) // 6 desimal output OPGPS
+	else if(token_length==12) // 6 decimal output OPGPS
 	{
-		GpsData.Longitude=deg+(min+desim/1000000.0)/60.0; // to desimal degrees
+		GpsData.Longitude=deg+(min+decim/1000000.0)/60.0; // to decimal degrees
 	}
     // next field: E/W indicator
 	// correct latitute for E/W
@@ -478,11 +478,11 @@ void nmeaProcessGPGGA(char* packet)
 	tokens = strsep(&packet, delimiter);
 	//reuse variables for alt
 	deg=strtol (tokens,&pEnd,10); // always 0.1m resolution? No
-	desim=strtol (pEnd+1,NULL,10);
+	decim=strtol (pEnd+1,NULL,10);
 	if(1) // OPGPS 3 decimal
-		GpsData.Altitude=deg+desim/1000.0;
+		GpsData.Altitude=deg+decim/1000.0;
 	else
-		GpsData.Altitude=deg+desim/10.0;
+		GpsData.Altitude=deg+decim/10.0;
 
 	// next field: altitude units, always 'M'
 	tokens = strsep(&packet, delimiter);
@@ -490,11 +490,11 @@ void nmeaProcessGPGGA(char* packet)
 	tokens = strsep(&packet, delimiter);
 	//reuse variables for geoid separation
 	deg=strtol (tokens,&pEnd,10); // always 0.1m resolution? No
-	desim=strtol (pEnd+1,NULL,10);
+	decim=strtol (pEnd+1,NULL,10);
 	if(1) // OPGPS 3 decimal
-		GpsData.GeoidSeparation=deg+desim/1000.0;
+		GpsData.GeoidSeparation=deg+decim/1000.0;
 	else
-		GpsData.GeoidSeparation=deg+desim/10.0;
+		GpsData.GeoidSeparation=deg+decim/10.0;
 	// next field: separation units
 	// next field: DGPS age
 	// next field: DGPS station ID
@@ -515,7 +515,7 @@ void nmeaProcessGPRMC(char* packet)
     char *pEnd;
     char token_length=0;
 
-    long deg,min,desim;
+    long deg,min,decim;
 
 	#ifdef NMEA_DEBUG_RMC
 		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"$%s\r\n",packet);
@@ -550,18 +550,18 @@ void nmeaProcessGPRMC(char* packet)
 	deg=strtol (tokens,&pEnd,10);
 	min=deg%100;
 	deg=deg/100;
-	desim=strtol (pEnd+1,NULL,10);
-	/*if(token_length==10)// 5 desimal output
+	decim=strtol (pEnd+1,NULL,10);
+	/*if(token_length==10)// 5 decimal output
 	{
-		GpsData.Latitude=deg+(min+desim/100000.0)/60.0; // to desimal degrees
+		GpsData.Latitude=deg+(min+decim/100000.0)/60.0; // to decimal degrees
 	}
-	else if(token_length==9) // 4 desimal output
+	else if(token_length==9) // 4 decimal output
 	{
-		GpsData.Latitude=deg+(min+desim/10000.0)/60.0; // to desimal degrees
+		GpsData.Latitude=deg+(min+decim/10000.0)/60.0; // to decimal degrees
 	}
-	else if(token_length==11) // 6 desimal output OPGPS
+	else if(token_length==11) // 6 decimal output OPGPS
 	{
-		GpsData.Latitude=deg+(min+desim/1000000.0)/60.0; // to desimal degrees
+		GpsData.Latitude=deg+(min+decim/1000000.0)/60.0; // to decimal degrees
 	}*/
 
     // next field: N/S indicator
@@ -576,18 +576,18 @@ void nmeaProcessGPRMC(char* packet)
 	deg=strtol (tokens,&pEnd,10);
 	min=deg%100;
 	deg=deg/100;
-	desim=strtol (pEnd+1,NULL,10);
-	/*if(token_length==11)// 5 desimal output
+	decim=strtol (pEnd+1,NULL,10);
+	/*if(token_length==11)// 5 decimal output
 	{
-		GpsData.Longitude=deg+(min+desim/100000.0)/60.0; // to desimal degrees
+		GpsData.Longitude=deg+(min+decim/100000.0)/60.0; // to decimal degrees
 	}
-	else if(token_length==10) // 4 desimal output
+	else if(token_length==10) // 4 decimal output
 	{
-		GpsData.Longitude=deg+(min+desim/10000.0)/60.0; // to desimal degrees
+		GpsData.Longitude=deg+(min+decim/10000.0)/60.0; // to decimal degrees
 	}
-	else if(token_length==12) // 6 desimal output OPGPS
+	else if(token_length==12) // 6 decimal output OPGPS
 	{
-		GpsData.Longitude=deg+(min+desim/1000000.0)/60.0; // to desimal degrees
+		GpsData.Longitude=deg+(min+decim/1000000.0)/60.0; // to decimal degrees
 	}*/
     // next field: E/W indicator
 	// correct latitute for E/W
@@ -598,15 +598,15 @@ void nmeaProcessGPRMC(char* packet)
 	// get speed in knots
 	tokens = strsep(&packet, delimiter);
 	deg=strtol (tokens,&pEnd,10);
-	desim=strtol (pEnd+1,NULL,10);
-	GpsData.Groundspeed = (deg+(desim/100.0))*0.51444; //OPGPS style to m/s
+	decim=strtol (pEnd+1,NULL,10);
+	GpsData.Groundspeed = (deg+(decim/100.0))*0.51444; //OPGPS style to m/s
 
 	// next field: True course
 	// get True course
 	tokens = strsep(&packet, delimiter);
 	deg=strtol (tokens,&pEnd,10);
-	desim=strtol (pEnd+1,NULL,10);
-	GpsData.Heading = deg+(desim/100.0); //OPGPS style
+	decim=strtol (pEnd+1,NULL,10);
+	GpsData.Heading = deg+(decim/100.0); //OPGPS style
 
 	// next field: Date of fix
 	// get Date of fix
@@ -687,7 +687,7 @@ void nmeaProcessGPGSA(char* packet)
 	char *tokens;
     char *delimiter = ",";
     char *pEnd;
-    long value,desim;
+    long value,decim;
     int mode;
 
 	#ifdef NMEA_DEBUG_GSA
@@ -747,18 +747,18 @@ void nmeaProcessGPGSA(char* packet)
 	// next field: PDOP
 	tokens = strsep(&packet, delimiter);
 	value=strtol (tokens,&pEnd,10);
-	desim=strtol (pEnd+1,NULL,10);
-	GpsData.PDOP=value+desim/100.0;
+	decim=strtol (pEnd+1,NULL,10);
+	GpsData.PDOP=value+decim/100.0;
 	// next field: HDOP
 	tokens = strsep(&packet, delimiter);
 	value=strtol (tokens,&pEnd,10);
-	desim=strtol (pEnd+1,NULL,10);
-	GpsData.HDOP=value+desim/100.0;
+	decim=strtol (pEnd+1,NULL,10);
+	GpsData.HDOP=value+decim/100.0;
 	// next field: VDOP
 	tokens = strsep(&packet, delimiter);
 	value=strtol (tokens,&pEnd,10);
-	desim=strtol (pEnd+1,NULL,10);
-	GpsData.VDOP=value+desim/100.0;
+	decim=strtol (pEnd+1,NULL,10);
+	GpsData.VDOP=value+decim/100.0;
 	// next field: checksum
 	PositionActualSet(&GpsData);
 

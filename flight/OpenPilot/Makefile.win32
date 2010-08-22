@@ -53,7 +53,7 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES =  Telemetry Stabilization/experimental/Stabilization FlightSituation Navigation
+MODULES =  Telemetry Stabilization/experimental/Stabilization Navigation
 #MODULES =  Telemetry GPS ManualControl Actuator Altitude Attitude Stabilization
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
@@ -132,6 +132,7 @@ SRC += $(OPUAVOBJ)/exampleobject2.c
 SRC += $(OPUAVOBJ)/examplesettings.c
 SRC += $(OPUAVOBJ)/objectpersistence.c
 SRC += $(OPUAVOBJ)/positionactual.c
+SRC += $(OPUAVOBJ)/gpsposition.c
 SRC += $(OPUAVOBJ)/gcstelemetrystats.c
 SRC += $(OPUAVOBJ)/flighttelemetrystats.c
 SRC += $(OPUAVOBJ)/systemstats.c
@@ -146,14 +147,15 @@ SRC += $(OPUAVOBJ)/manualcontrolsettings.c
 SRC += $(OPUAVOBJ)/attitudedesired.c
 SRC += $(OPUAVOBJ)/stabilizationsettings.c
 SRC += $(OPUAVOBJ)/ahrsstatus.c
-SRC += $(OPUAVOBJ)/altitudeactual.c
+SRC += $(OPUAVOBJ)/baroaltitude.c
 SRC += $(OPUAVOBJ)/attitudeactual.c
 SRC += $(OPUAVOBJ)/attitudesettings.c
 SRC += $(OPUAVOBJ)/flightsituationactual.c
 SRC += $(OPUAVOBJ)/navigationsettings.c
 SRC += $(OPUAVOBJ)/navigationdesired.c
 SRC += $(OPUAVOBJ)/flightbatterystate.c
-SRC += $(OPUAVOBJ)/headingactual.c
+SRC += $(OPUAVOBJ)/attituderaw.c
+SRC += $(OPUAVOBJ)/homelocation.c
 endif
 
 ## PIOS Hardware (win32)

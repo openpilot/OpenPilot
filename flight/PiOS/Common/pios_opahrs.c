@@ -103,7 +103,7 @@ static enum opahrs_result opahrs_msg_v1_recv_rsp (enum opahrs_msg_v1_tag tag, st
   
   opahrs_msg_v1_init_link_tx(&link_tx, OPAHRS_MSG_LINK_TAG_NOP);
   
-  for (uint8_t retries = 0; retries < 20; retries++) {
+  for (uint8_t retries = 0; retries < 100; retries++) {
     if (opahrs_msg_txrx((const uint8_t *)&link_tx, (uint8_t *)rsp, sizeof(*rsp)) < 0) {
       return OPAHRS_RESULT_FAILED;
     }
@@ -119,7 +119,7 @@ static enum opahrs_result opahrs_msg_v1_recv_rsp (enum opahrs_msg_v1_tag tag, st
         switch (rsp->payload.link.state) {
           case OPAHRS_MSG_LINK_STATE_BUSY:
             /* Wait for a small delay and retry */
-            vTaskDelay(20 / portTICK_RATE_MS);
+            vTaskDelay(40 / portTICK_RATE_MS);
             continue;
           case OPAHRS_MSG_LINK_STATE_INACTIVE:
           case OPAHRS_MSG_LINK_STATE_READY:
@@ -245,28 +245,6 @@ enum opahrs_result PIOS_OPAHRS_GetAttitudeRaw(struct opahrs_msg_v1 *rsp)
   return opahrs_msg_v1_recv_rsp (OPAHRS_MSG_V1_RSP_ATTITUDERAW, rsp);
 }
 
-enum opahrs_result PIOS_OPAHRS_GetAttitude(struct opahrs_msg_v1 *rsp)
-{
-  struct opahrs_msg_v1 req;
-  enum opahrs_result   rc;
-  
-  if (!rsp) {
-    return -1;
-  }
-  
-  /* Make up an attitude solution request */
-  opahrs_msg_v1_init_user_tx (&req, OPAHRS_MSG_V1_REQ_ATTITUDE);
-  
-  /* Send the message until it is received */
-  rc = opahrs_msg_v1_send_req (&req);
-  if (rc != OPAHRS_RESULT_OK) {
-    /* Failed to send the request, bail out */
-    return rc;
-  }
-  
-  return opahrs_msg_v1_recv_rsp (OPAHRS_MSG_V1_RSP_ATTITUDE, rsp);
-}
-
 enum opahrs_result PIOS_OPAHRS_SetMagNorth(struct opahrs_msg_v1 *req)
 {
   struct opahrs_msg_v1 rsp;
@@ -289,9 +267,8 @@ enum opahrs_result PIOS_OPAHRS_SetMagNorth(struct opahrs_msg_v1 *req)
   return opahrs_msg_v1_recv_rsp (OPAHRS_MSG_V1_RSP_NORTH, &rsp);
 }
 
-enum opahrs_result PIOS_OPAHRS_SetPositionActual(struct opahrs_msg_v1 *req)
+extern enum opahrs_result PIOS_OPAHRS_SetGetUpdate(struct opahrs_msg_v1 *req, struct opahrs_msg_v1 *rsp)
 {
-  struct opahrs_msg_v1 rsp;
   enum opahrs_result   rc;
   
   if (!req) {
@@ -299,7 +276,7 @@ enum opahrs_result PIOS_OPAHRS_SetPositionActual(struct opahrs_msg_v1 *req)
   }
   
   /* Make up an attituderaw request */
-  opahrs_msg_v1_init_user_tx (req, OPAHRS_MSG_V1_REQ_GPS);
+  opahrs_msg_v1_init_user_tx (req, OPAHRS_MSG_V1_REQ_UPDATE);
   
   /* Send the message until it is received */
   rc = opahrs_msg_v1_send_req (req);
@@ -308,29 +285,7 @@ enum opahrs_result PIOS_OPAHRS_SetPositionActual(struct opahrs_msg_v1 *req)
     return rc;
   }
   
-  return opahrs_msg_v1_recv_rsp (OPAHRS_MSG_V1_RSP_GPS, &rsp);
-}
-
-enum opahrs_result PIOS_OPAHRS_SetBaroAltitude(struct opahrs_msg_v1 *req)
-{
-  struct opahrs_msg_v1 rsp;
-  enum opahrs_result   rc;
-  
-  if (!req) {
-    return -1;
-  }
-  
-  /* Make up an attituderaw request */
-  opahrs_msg_v1_init_user_tx (req, OPAHRS_MSG_V1_REQ_ALTITUDE);
-  
-  /* Send the message until it is received */
-  rc = opahrs_msg_v1_send_req (req);
-  if (rc != OPAHRS_RESULT_OK) {
-    /* Failed to send the request, bail out */
-    return rc;
-  }
-  
-  return opahrs_msg_v1_recv_rsp (OPAHRS_MSG_V1_RSP_ALTITUDE, &rsp);
+  return opahrs_msg_v1_recv_rsp (OPAHRS_MSG_V1_RSP_UPDATE, rsp);
 }
 
 enum opahrs_result PIOS_OPAHRS_SetGetCalibration(struct opahrs_msg_v1 *req, struct opahrs_msg_v1 *rsp)

@@ -1,5 +1,7 @@
 <xml>
 	<object name="AttitudeSettings" singleinstance="true" settings="true">
+    <field name="Algorithm" units="" type="enum" elements="1" options="INSGPS" defaultvalue="INSGPS"/>
+    <field name="UpdateRaw" units="raw" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
 		<field name="UpdatePeriod" units="ms" type="int32" elements="1" defaultvalue="500"/>
 		<access gcs="readwrite" flight="readwrite"/>
 		<telemetrygcs acked="true" updatemode="onchange" period="0"/>

@@ -44,7 +44,7 @@ public:
     // Field structure
     typedef struct {
         quint8 SerialNumber[25];
-        quint8 CommErrors[6];
+        quint8 CommErrors[4];
         quint8 HomeSet;
         quint8 CalibrationSet;
 
@@ -56,9 +56,9 @@ public:
     static const quint32 SERIALNUMBER_NUMELEM = 25;
     // Field CommErrors information
     /* Array element names for field CommErrors */
-    typedef enum { COMMERRORS_ATTITUDE=0, COMMERRORS_ATTITUDERAW=1, COMMERRORS_POSITIONACTUAL=2, COMMERRORS_HOMELOCATION=3, COMMERRORS_ALTITUDE=4, COMMERRORS_CALIBRATION=5 } CommErrorsElem;
+    typedef enum { COMMERRORS_UPDATE=0, COMMERRORS_ATTITUDERAW=1, COMMERRORS_HOMELOCATION=2, COMMERRORS_CALIBRATION=3 } CommErrorsElem;
     /* Number of elements for field CommErrors */
-    static const quint32 COMMERRORS_NUMELEM = 6;
+    static const quint32 COMMERRORS_NUMELEM = 4;
     // Field HomeSet information
     /* Enumeration options for field HomeSet */
     typedef enum { HOMESET_FALSE=0, HOMESET_TRUE=1 } HomeSetOptions;
@@ -68,7 +68,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 1556283776U;
+    static const quint32 OBJID = 1048419880U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

@@ -38,6 +38,29 @@ from collections import namedtuple
 # This is a list of instances of the data fields contained in this object
 _fields = [ \
 	uavobject.UAVObjectField(
+		'Algorithm',
+		'b',
+		1,
+		[
+			'0',
+		],
+		{
+			'0' : 'INSGPS',
+		}
+	),
+	uavobject.UAVObjectField(
+		'UpdateRaw',
+		'b',
+		1,
+		[
+			'0',
+		],
+		{
+			'0' : 'FALSE',
+			'1' : 'TRUE',
+		}
+	),
+	uavobject.UAVObjectField(
 		'UpdatePeriod',
 		'i',
 		1,
@@ -52,7 +75,7 @@ _fields = [ \
 
 class AttitudeSettings(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 3446368842
+    OBJID        = 2356162226
     NAME         = "AttitudeSettings"
     METANAME     = "AttitudeSettingsMeta"
     ISSINGLEINST = 1

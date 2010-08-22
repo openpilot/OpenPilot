@@ -70,11 +70,9 @@ AhrsStatus::AhrsStatus(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
     SerialNumberElemNames.append("24");
     fields.append( new UAVObjectField(QString("SerialNumber"), QString("n/a"), UAVObjectField::UINT8, SerialNumberElemNames, QStringList()) );
     QStringList CommErrorsElemNames;
-    CommErrorsElemNames.append("Attitude");
+    CommErrorsElemNames.append("Update");
     CommErrorsElemNames.append("AttitudeRaw");
-    CommErrorsElemNames.append("PositionActual");
     CommErrorsElemNames.append("HomeLocation");
-    CommErrorsElemNames.append("Altitude");
     CommErrorsElemNames.append("Calibration");
     fields.append( new UAVObjectField(QString("CommErrors"), QString("count"), UAVObjectField::UINT8, CommErrorsElemNames, QStringList()) );
     QStringList HomeSetElemNames;

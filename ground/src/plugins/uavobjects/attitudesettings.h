@@ -43,16 +43,24 @@ class UAVOBJECTS_EXPORT AttitudeSettings: public UAVDataObject
 public:
     // Field structure
     typedef struct {
+        quint8 Algorithm;
+        quint8 UpdateRaw;
         qint32 UpdatePeriod;
 
     } __attribute__((packed)) DataFields;
 
     // Field information
+    // Field Algorithm information
+    /* Enumeration options for field Algorithm */
+    typedef enum { ALGORITHM_INSGPS=0 } AlgorithmOptions;
+    // Field UpdateRaw information
+    /* Enumeration options for field UpdateRaw */
+    typedef enum { UPDATERAW_FALSE=0, UPDATERAW_TRUE=1 } UpdateRawOptions;
     // Field UpdatePeriod information
 
   
     // Constants
-    static const quint32 OBJID = 3446368842U;
+    static const quint32 OBJID = 2356162226U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

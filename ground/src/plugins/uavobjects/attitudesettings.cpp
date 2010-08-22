@@ -42,6 +42,17 @@ AttitudeSettings::AttitudeSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTI
 {
     // Create fields
     QList<UAVObjectField*> fields;
+    QStringList AlgorithmElemNames;
+    AlgorithmElemNames.append("0");
+    QStringList AlgorithmEnumOptions;
+    AlgorithmEnumOptions.append("INSGPS");
+    fields.append( new UAVObjectField(QString("Algorithm"), QString(""), UAVObjectField::ENUM, AlgorithmElemNames, AlgorithmEnumOptions) );
+    QStringList UpdateRawElemNames;
+    UpdateRawElemNames.append("0");
+    QStringList UpdateRawEnumOptions;
+    UpdateRawEnumOptions.append("FALSE");
+    UpdateRawEnumOptions.append("TRUE");
+    fields.append( new UAVObjectField(QString("UpdateRaw"), QString("raw"), UAVObjectField::ENUM, UpdateRawElemNames, UpdateRawEnumOptions) );
     QStringList UpdatePeriodElemNames;
     UpdatePeriodElemNames.append("0");
     fields.append( new UAVObjectField(QString("UpdatePeriod"), QString("ms"), UAVObjectField::INT32, UpdatePeriodElemNames, QStringList()) );
@@ -78,6 +89,8 @@ UAVObject::Metadata AttitudeSettings::getDefaultMetadata()
  */
 void AttitudeSettings::setDefaultFieldValues()
 {
+    data.Algorithm = 0;
+    data.UpdateRaw = 0;
     data.UpdatePeriod = 500;
 
 }

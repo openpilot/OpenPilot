@@ -184,29 +184,25 @@ struct opahrs_msg_v1_req_reset {
 struct opahrs_msg_v1_req_serial {
 } __attribute__((__packed__));
 
-struct opahrs_msg_v1_req_altitude {
-  float altitude;
-  float pressure;
-  float temperature;
-} __attribute__((__packed__));
-
 struct opahrs_msg_v1_req_north {
   float Be[3];
 } __attribute__((__packed__));
 
-struct opahrs_msg_v1_req_gps {
-	float latitude;
-	float longitude;
-	float altitude;
-	float heading;
-	float groundspeed;
-	uint8_t status;
+struct opahrs_msg_v1_req_update {
+  struct {
+    uint8_t updated;
+    float NED[3];
+    float groundspeed;
+    float heading;
+    float quality;
+  } gps;
+  struct {
+    uint8_t updated;
+    float altitude;
+  } barometer;
 } __attribute__((__packed__));
 
 struct opahrs_msg_v1_req_attituderaw {
-} __attribute__((__packed__));
-
-struct opahrs_msg_v1_req_attitude {
 } __attribute__((__packed__));
 
 struct opahrs_msg_v1_req_calibration {
@@ -226,11 +222,9 @@ union opahrs_msg_v1_req {
   struct opahrs_msg_v1_req_sync         sync;
   struct opahrs_msg_v1_req_reset        reset;
   struct opahrs_msg_v1_req_serial       serial;
-  struct opahrs_msg_v1_req_altitude     altitude;
+  struct opahrs_msg_v1_req_update       update;
   struct opahrs_msg_v1_req_north        north;
-  struct opahrs_msg_v1_req_gps          gps;
   struct opahrs_msg_v1_req_attituderaw  attituderaw;
-  struct opahrs_msg_v1_req_attitude     attitude;
   struct opahrs_msg_v1_req_calibration  calibration;
 } __attribute__((__packed__));
 
@@ -247,13 +241,7 @@ struct opahrs_msg_v1_rsp_serial {
   uint8_t  serial_bcd[25];
 } __attribute__((__packed__));
 
-struct opahrs_msg_v1_rsp_altitude {
-} __attribute__((__packed__));
-
 struct opahrs_msg_v1_rsp_north {
-} __attribute__((__packed__));
-
-struct opahrs_msg_v1_rsp_gps {
 } __attribute__((__packed__));
 
 struct opahrs_msg_v1_rsp_attituderaw {
@@ -286,7 +274,7 @@ struct opahrs_msg_v1_rsp_attituderaw {
   } accels_filtered;
 } __attribute__((__packed__));
 
-struct opahrs_msg_v1_rsp_attitude {
+struct opahrs_msg_v1_rsp_update {
   struct {
     float q1;
     float q2;
@@ -298,6 +286,8 @@ struct opahrs_msg_v1_rsp_attitude {
     float pitch;
     float yaw;
   } euler;
+  float NED[3];
+  float Vel[3];
 } __attribute__((__packed__));
 
 struct opahrs_msg_v1_rsp_calibration {
@@ -311,11 +301,9 @@ struct opahrs_msg_v1_rsp_calibration {
 union opahrs_msg_v1_rsp {
   struct opahrs_msg_v1_rsp_sync         sync;
   struct opahrs_msg_v1_rsp_serial       serial;
-  struct opahrs_msg_v1_rsp_altitude     altitude;
   struct opahrs_msg_v1_rsp_north        north;
-  struct opahrs_msg_v1_rsp_gps          gps;
   struct opahrs_msg_v1_rsp_attituderaw  attituderaw;
-  struct opahrs_msg_v1_rsp_attitude     attitude;
+  struct opahrs_msg_v1_rsp_update       update;
   struct opahrs_msg_v1_rsp_calibration  calibration;
 } __attribute__((__packed__));
 
@@ -324,20 +312,16 @@ enum opahrs_msg_v1_tag {
   OPAHRS_MSG_V1_REQ_SYNC,
   OPAHRS_MSG_V1_REQ_RESET,
   OPAHRS_MSG_V1_REQ_SERIAL,
-  OPAHRS_MSG_V1_REQ_ALTITUDE,
   OPAHRS_MSG_V1_REQ_NORTH,
-  OPAHRS_MSG_V1_REQ_GPS,
+  OPAHRS_MSG_V1_REQ_UPDATE,
   OPAHRS_MSG_V1_REQ_ATTITUDERAW,
-  OPAHRS_MSG_V1_REQ_ATTITUDE,
   OPAHRS_MSG_V1_REQ_CALIBRATION,
 
   OPAHRS_MSG_V1_RSP_SYNC,
   OPAHRS_MSG_V1_RSP_SERIAL,
-  OPAHRS_MSG_V1_RSP_ALTITUDE,
   OPAHRS_MSG_V1_RSP_NORTH,
-  OPAHRS_MSG_V1_RSP_GPS,
+  OPAHRS_MSG_V1_RSP_UPDATE,
   OPAHRS_MSG_V1_RSP_ATTITUDERAW,
-  OPAHRS_MSG_V1_RSP_ATTITUDE,
   OPAHRS_MSG_V1_RSP_CALIBRATION,
 };
 

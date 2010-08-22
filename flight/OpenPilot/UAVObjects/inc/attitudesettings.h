@@ -33,7 +33,7 @@
 #define ATTITUDESETTINGS_H
 
 // Object constants
-#define ATTITUDESETTINGS_OBJID 3446368842U
+#define ATTITUDESETTINGS_OBJID 2356162226U
 #define ATTITUDESETTINGS_NAME "AttitudeSettings"
 #define ATTITUDESETTINGS_METANAME "AttitudeSettingsMeta"
 #define ATTITUDESETTINGS_ISSINGLEINST 1
@@ -57,11 +57,19 @@
 
 // Object data
 typedef struct {
+    uint8_t Algorithm;
+    uint8_t UpdateRaw;
     int32_t UpdatePeriod;
 
 } __attribute__((packed)) AttitudeSettingsData;
 
 // Field information
+// Field Algorithm information
+/* Enumeration options for field Algorithm */
+typedef enum { ATTITUDESETTINGS_ALGORITHM_INSGPS=0 } AttitudeSettingsAlgorithmOptions;
+// Field UpdateRaw information
+/* Enumeration options for field UpdateRaw */
+typedef enum { ATTITUDESETTINGS_UPDATERAW_FALSE=0, ATTITUDESETTINGS_UPDATERAW_TRUE=1 } AttitudeSettingsUpdateRawOptions;
 // Field UpdatePeriod information
 
 

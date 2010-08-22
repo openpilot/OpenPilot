@@ -76,14 +76,14 @@ static xTaskHandle taskHandle;
 
 // Private functions
 static void ahrscommsTask(void* parameters);
-static void load_baro_altitude(struct opahrs_msg_v1_req_altitude * altitude);
+static void load_baro_altitude(struct opahrs_msg_v1_req_update * update);
+static void load_gps_position(struct opahrs_msg_v1_req_update * update);
 static void load_magnetic_north(struct opahrs_msg_v1_req_north * north);
-static void load_position_actual(struct opahrs_msg_v1_req_gps * gps);
 static void load_calibration(struct opahrs_msg_v1_req_calibration * calibration);
-static void update_attitude_actual(struct opahrs_msg_v1_rsp_attitude * attitude);
 static void update_attitude_raw(struct opahrs_msg_v1_rsp_attituderaw * attituderaw);
 static void update_ahrs_status(struct opahrs_msg_v1_rsp_serial * serial);
 static void update_calibration(struct opahrs_msg_v1_rsp_calibration * calibration);
+static void process_update(struct opahrs_msg_v1_rsp_update * update); // main information parser
 
 static bool BaroAltitudeIsUpdatedFlag = false;
 static void BaroAltitudeUpdatedCb(UAVObjEvent * ev)
@@ -91,10 +91,10 @@ static void BaroAltitudeUpdatedCb(UAVObjEvent * ev)
   BaroAltitudeIsUpdatedFlag = true;
 }
 
-static bool PositionActualIsUpdatedFlag = false;
-static void PositionActualUpdatedCb(UAVObjEvent * ev)
+static bool GPSPositionIsUpdatedFlag = false;
+static void GPSPositionUpdatedCb(UAVObjEvent * ev)
 {
-	PositionActualIsUpdatedFlag = true;
+	GPSPositionIsUpdatedFlag = true;
 }
 
 static bool HomeLocationIsUpdatedFlag = false;
@@ -116,7 +116,7 @@ static void AHRSCalibrationUpdatedCb(UAVObjEvent * ev)
 int32_t AHRSCommsInitialize(void)
 {
   BaroAltitudeConnectCallback(BaroAltitudeUpdatedCb);
-  PositionActualConnectCallback(PositionActualUpdatedCb);
+  PositionActualConnectCallback(GPSPositionUpdatedCb);
   HomeLocationConnectCallback(HomeLocationUpdatedCb);
   AHRSCalibrationConnectCallback(AHRSCalibrationUpdatedCb);
 
@@ -128,8 +128,8 @@ int32_t AHRSCommsInitialize(void)
   return 0;
 }
 
-static   uint16_t attitude_errors = 0, attituderaw_errors = 0, position_errors = 0, 
-  home_errors = 0, altitude_errors = 0, calibration_errors;
+static   uint16_t update_errors = 0, attituderaw_errors = 0,
+  home_errors = 0, calibration_errors;
 
 /**
  * Module thread, should not return.
@@ -175,48 +175,49 @@ static void ahrscommsTask(void* parameters)
       /* Update settings with latest value */
       AttitudeSettingsGet(&settings);
   
-      if ((result = PIOS_OPAHRS_GetAttitude(&rsp)) == OPAHRS_RESULT_OK) {
-        update_attitude_actual(&(rsp.payload.user.v.rsp.attitude));
-      } else {
-        /* Comms error */
-        attitude_errors++;
-        break;
+      // If settings indicate, grab the raw and filtered data instead of estimate
+      if (settings.UpdateRaw)
+      {
+        if( (result = PIOS_OPAHRS_GetAttitudeRaw(&rsp)) == OPAHRS_RESULT_OK) {
+          update_attitude_raw(&(rsp.payload.user.v.rsp.attituderaw));
+        } else {
+          /* Comms error */
+          attituderaw_errors++;
+          break;
+        }
+        continue;
       }
 
-      if ((result = PIOS_OPAHRS_GetAttitudeRaw(&rsp)) == OPAHRS_RESULT_OK) {
-	      update_attitude_raw(&(rsp.payload.user.v.rsp.attituderaw));
-      } else {
-        /* Comms error */
-        attituderaw_errors++;
-        break;
-      }
+      // Otherwise do standard technique
+      struct opahrs_msg_v1 req;
+      struct opahrs_msg_v1 rsp;
+      
+      // Load barometer if updated
+      if (BaroAltitudeIsUpdatedFlag)       
+        load_baro_altitude(&(req.payload.user.v.req.update));
+      else 
+        req.payload.user.v.req.update.barometer.updated = 0;
 
-      if (BaroAltitudeIsUpdatedFlag) {
-        struct opahrs_msg_v1 req;
+      // Load GPS if updated
+      if (GPSPositionIsUpdatedFlag) 
+        load_gps_position(&(req.payload.user.v.req.update));
+      else 
+        req.payload.user.v.req.update.gps.updated = 0;
 
-        load_baro_altitude(&(req.payload.user.v.req.altitude));
-        if ((result = PIOS_OPAHRS_SetBaroAltitude(&req)) == OPAHRS_RESULT_OK) {
+      // Transfer packet and process returned attitude
+      if ((result = PIOS_OPAHRS_SetGetUpdate(&req,&rsp)) == OPAHRS_RESULT_OK) {
+        if (req.payload.user.v.req.update.barometer.updated) 
           BaroAltitudeIsUpdatedFlag = false;
-        } else {
-          /* Comms error */
-          altitude_errors++;
-          break;
-        }
+        if (req.payload.user.v.req.update.gps.updated)
+          GPSPositionIsUpdatedFlag = false;        
+        process_update(&(rsp.payload.user.v.rsp.update));
+      } else {
+        /* Comms error */
+        update_errors++;
+        break;
       }
 
-      if (PositionActualIsUpdatedFlag) {
-        struct opahrs_msg_v1 req;
-        
-        load_position_actual(&(req.payload.user.v.req.gps));
-        if ((result = PIOS_OPAHRS_SetPositionActual(&req)) == OPAHRS_RESULT_OK) {
-          PositionActualIsUpdatedFlag = false;
-        } else {
-          /* Comms error */
-          position_errors++;
-          break;
-        }
-      }
-
+      // Update home coordinate if it hasn't been updated
       AhrsStatusGet(&data);
       if (HomeLocationIsUpdatedFlag || (data.HomeSet == AHRSSTATUS_HOMESET_FALSE)) {
         struct opahrs_msg_v1 req;
@@ -235,6 +236,7 @@ static void ahrscommsTask(void* parameters)
         }
       }    
       
+      // Update calibration if necessary
       AhrsStatusGet(&data);
       if (AHRSCalibrationIsUpdatedFlag || (data.CalibrationSet == AHRSSTATUS_CALIBRATIONSET_FALSE)) 
       {
@@ -340,44 +342,52 @@ static void load_magnetic_north(struct opahrs_msg_v1_req_north * mag_north)
 
 }
 
-static void load_baro_altitude(struct opahrs_msg_v1_req_altitude * altitude)
+static void load_baro_altitude(struct opahrs_msg_v1_req_update * update)
 {
   BaroAltitudeData   data;
 
   BaroAltitudeGet(&data);
 
-  altitude->altitude    = data.Altitude;
-  altitude->pressure    = data.Pressure;
-  altitude->temperature = data.Temperature;
+  update->barometer.altitude = data.Altitude;
+  update->barometer.updated = 1;
 }
 
-static void load_position_actual(struct opahrs_msg_v1_req_gps * gps)
+static void load_gps_position(struct opahrs_msg_v1_req_update * update)
 {
   PositionActualData data;
   PositionActualGet(&data);
+  HomeLocationData home;
+  HomeLocationGet(&home);
   
-  gps->latitude = data.Latitude;
-	gps->longitude = data.Longitude;
-	gps->altitude = data.GeoidSeparation;
-  gps->heading = data.Heading;
-  gps->groundspeed = data.Groundspeed;
-  gps->status = data.Status;
+  
+  update->gps.updated = 1;
+  update->gps.NED[0] = 0;
+  update->gps.NED[1] = 0;
+  update->gps.NED[2] = 0;
+  update->gps.groundspeed = 0;
+  update->gps.heading = 0;
+  update->gps.quality = 0;
 }
 
-static void update_attitude_actual(struct opahrs_msg_v1_rsp_attitude * attitude)
+static void process_update(struct opahrs_msg_v1_rsp_update * update)
 {
   AttitudeActualData   data;
 
-  data.q1 = attitude->quaternion.q1;
-  data.q2 = attitude->quaternion.q2;
-  data.q3 = attitude->quaternion.q3;
-  data.q4 = attitude->quaternion.q4;
+  data.q1 = update->quaternion.q1;
+  data.q2 = update->quaternion.q2;
+  data.q3 = update->quaternion.q3;
+  data.q4 = update->quaternion.q4;
   
-  data.Roll  = attitude->euler.roll;
-  data.Pitch = attitude->euler.pitch;
-  data.Yaw   = attitude->euler.yaw;
+  data.Roll  = update->euler.roll;
+  data.Pitch = update->euler.pitch;
+  data.Yaw   = update->euler.yaw;
   
   AttitudeActualSet(&data);
+  
+  /*
+   * update->NED[]
+   * update->Vel[]
+   */
 }
 
 static void update_attitude_raw(struct opahrs_msg_v1_rsp_attituderaw * attituderaw)
@@ -421,11 +431,9 @@ static void update_ahrs_status(struct opahrs_msg_v1_rsp_serial * serial)
     data.SerialNumber[i] = serial->serial_bcd[i];
   }
 
-  data.CommErrors[AHRSSTATUS_COMMERRORS_ATTITUDE] = attitude_errors;
+  data.CommErrors[AHRSSTATUS_COMMERRORS_UPDATE] = update_errors;
   data.CommErrors[AHRSSTATUS_COMMERRORS_ATTITUDERAW] = attituderaw_errors;
-  data.CommErrors[AHRSSTATUS_COMMERRORS_POSITIONACTUAL] = position_errors;
   data.CommErrors[AHRSSTATUS_COMMERRORS_HOMELOCATION] = home_errors;
-  data.CommErrors[AHRSSTATUS_COMMERRORS_ALTITUDE] = altitude_errors;
   data.CommErrors[AHRSSTATUS_COMMERRORS_CALIBRATION] = calibration_errors;
 
   AhrsStatusSet(&data);

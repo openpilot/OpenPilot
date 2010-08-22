@@ -1,7 +1,7 @@
 <xml>
         <object name="AhrsStatus" singleinstance="true" settings="false">
             <field name="SerialNumber" units="n/a" type="uint8" elements="25"/>
-            <field name="CommErrors" units="count" type="uint8" elementnames="Attitude,AttitudeRaw,PositionActual,HomeLocation,Altitude,Calibration"/>
+            <field name="CommErrors" units="count" type="uint8" elementnames="Update,AttitudeRaw,HomeLocation,Calibration"/>
             <field name="HomeSet" units="" type="enum" elements="1" options="FALSE,TRUE"/>
             <field name="CalibrationSet" units="" type="enum" elements="1" options="FALSE,TRUE"/>
             <access gcs="readwrite" flight="readwrite"/>

@@ -73,6 +73,8 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	// Initialize object fields to their default values
 	UAVObjGetInstanceData(obj, instId, &data);
 	memset(&data, 0, sizeof(AttitudeSettingsData));
+    data.Algorithm = 0;
+    data.UpdateRaw = 0;
     data.UpdatePeriod = 500;
 
 	UAVObjSetInstanceData(obj, instId, &data);

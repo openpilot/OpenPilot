@@ -20,6 +20,8 @@
 		651CF9F1120B700D00EEFD70 /* pios_usb_hid_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_usb_hid_prop.h; sourceTree = "<group>"; };
 		651CF9F2120B700D00EEFD70 /* pios_usb_hid_pwr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_usb_hid_pwr.h; sourceTree = "<group>"; };
 		651CF9F3120B700D00EEFD70 /* usb_conf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = usb_conf.h; sourceTree = "<group>"; };
+		65209A1812208B0600453371 /* baroaltitude.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = baroaltitude.xml; sourceTree = "<group>"; };
+		65209A1912208B0600453371 /* gpsposition.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = gpsposition.xml; sourceTree = "<group>"; };
 		654330231218E9780063F913 /* insgps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = insgps.c; path = ../../AHRS/insgps.c; sourceTree = SOURCE_ROOT; };
 		6543304F121980300063F913 /* insgps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = insgps.h; sourceTree = "<group>"; };
 		655268BC121FBD2900410C6E /* ahrscalibration.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ahrscalibration.xml; sourceTree = "<group>"; };
@@ -2546,7 +2548,6 @@
 		65B367E5121C2620003EAD18 /* actuatordesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = actuatordesired.xml; sourceTree = "<group>"; };
 		65B367E6121C2620003EAD18 /* actuatorsettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = actuatorsettings.xml; sourceTree = "<group>"; };
 		65B367E7121C2620003EAD18 /* ahrsstatus.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ahrsstatus.xml; sourceTree = "<group>"; };
-		65B367E8121C2620003EAD18 /* altitudeactual.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = altitudeactual.xml; sourceTree = "<group>"; };
 		65B367E9121C2620003EAD18 /* attitudeactual.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = attitudeactual.xml; sourceTree = "<group>"; };
 		65B367EA121C2620003EAD18 /* attitudedesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = attitudedesired.xml; sourceTree = "<group>"; };
 		65B367EB121C2620003EAD18 /* attituderaw.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = attituderaw.xml; sourceTree = "<group>"; };
@@ -6668,14 +6669,14 @@
 			isa = PBXGroup;
 			children = (
 				655268BC121FBD2900410C6E /* ahrscalibration.xml */,
+				65B367E7121C2620003EAD18 /* ahrsstatus.xml */,
 				65B367E4121C2620003EAD18 /* actuatorcommand.xml */,
 				65B367E5121C2620003EAD18 /* actuatordesired.xml */,
 				65B367E6121C2620003EAD18 /* actuatorsettings.xml */,
-				65B367E7121C2620003EAD18 /* ahrsstatus.xml */,
-				65B367E8121C2620003EAD18 /* altitudeactual.xml */,
 				65B367E9121C2620003EAD18 /* attitudeactual.xml */,
 				65B367EA121C2620003EAD18 /* attitudedesired.xml */,
 				65B367EB121C2620003EAD18 /* attituderaw.xml */,
+				65209A1812208B0600453371 /* baroaltitude.xml */,
 				65B367EC121C2620003EAD18 /* attitudesettings.xml */,
 				65B367ED121C2620003EAD18 /* exampleobject1.xml */,
 				65B367EE121C2620003EAD18 /* exampleobject2.xml */,
@@ -6684,6 +6685,7 @@
 				65B367F1121C2620003EAD18 /* flightsituationactual.xml */,
 				65B367F2121C2620003EAD18 /* flighttelemetrystats.xml */,
 				65B367F3121C2620003EAD18 /* gcstelemetrystats.xml */,
+				65209A1912208B0600453371 /* gpsposition.xml */,
 				657CEEAD121DB6C8007A1FBE /* homelocation.xml */,
 				65B367F4121C2620003EAD18 /* manualcontrolcommand.xml */,
 				65B367F5121C2620003EAD18 /* manualcontrolsettings.xml */,

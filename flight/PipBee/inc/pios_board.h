@@ -133,10 +133,15 @@ TIM8  |           |           |           |
 //-------------------------
 // PIOS_USART
 //-------------------------
-#define PIOS_USART_RX_BUFFER_SIZE	256
+
+#define PIOS_USART_RX_BUFFER_SIZE	512
 #define PIOS_USART_TX_BUFFER_SIZE	256
-#define PIOS_COM_COM				0
-#define PIOS_COM_DEBUG				PIOS_COM_COM
+
+#define PIOS_COM_SERIAL				0
+
+#define PIOS_COM_DEBUG				PIOS_COM_SERIAL
+
+//-------------------------
 
 #if 0
 //-------------------------

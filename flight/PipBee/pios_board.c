@@ -166,11 +166,12 @@ void PIOS_SPI_perif_irq_handler(void)
 #include <pios_usart_priv.h>
 
 /*
- * AUX USART
+ * SERIAL USART
  */
-void PIOS_USART_com_irq_handler(void);
-void USART3_IRQHandler() __attribute__ ((alias ("PIOS_USART_com_irq_handler")));
-const struct pios_usart_cfg pios_usart_com_cfg =
+void PIOS_USART_serial_irq_handler(void);
+void USART1_IRQHandler() __attribute__ ((alias ("PIOS_USART_serial_irq_handler")));
+
+const struct pios_usart_cfg pios_usart_serial_cfg =
 {
 	.regs = USART1,
 	.init =
@@ -184,7 +185,7 @@ const struct pios_usart_cfg pios_usart_com_cfg =
 	},
 	.irq =
 	{
-		.handler = PIOS_USART_com_irq_handler,
+		.handler = PIOS_USART_serial_irq_handler,
 		.init =
 		{
 			.NVIC_IRQChannel = USART1_IRQn,
@@ -220,17 +221,17 @@ const struct pios_usart_cfg pios_usart_com_cfg =
  */
 struct pios_usart_dev pios_usart_devs[] =
 {
-#define PIOS_USART_COM    0
+#define PIOS_USART_SERIAL    0
 	{
-		.cfg = &pios_usart_com_cfg,
+		.cfg = &pios_usart_serial_cfg,
 	},
 };
 
 uint8_t pios_usart_num_devices = NELEMENTS(pios_usart_devs);
 
-void PIOS_USART_com_irq_handler(void)
+void PIOS_USART_serial_irq_handler(void)
 {
-	PIOS_USART_IRQ_Handler(PIOS_USART_COM);
+	PIOS_USART_IRQ_Handler(PIOS_USART_SERIAL);
 }
 
 #endif /* PIOS_INCLUDE_USART */
@@ -250,7 +251,7 @@ extern const struct pios_com_driver pios_usart_com_driver;
 struct pios_com_dev pios_com_devs[] =
 {
 	{
-		.id = PIOS_USART_COM,
+		.id = PIOS_USART_SERIAL,
 		.driver = &pios_usart_com_driver,
 	},
 };

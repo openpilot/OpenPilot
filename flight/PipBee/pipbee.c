@@ -58,7 +58,7 @@ int main()
 	PIOS_DELAY_Init();
 
 	// UART communication system
-	//PIOS_COM_Init(); // TODO: Find problem when enabling this
+	PIOS_COM_Init();
 
 	// ADC system
 	PIOS_ADC_Init();

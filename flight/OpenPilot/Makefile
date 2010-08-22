@@ -34,7 +34,7 @@ ENABLE_DEBUG_PINS ?= NO
 ENABLE_AUX_UART ?= NO
 
 #
-USE_BOOTLOADER ?= NO
+USE_BOOTLOADER ?= YES
 
 
 # Set to YES when using Code Sourcery toolchain
@@ -71,11 +71,12 @@ MODULES =  Telemetry GPS ManualControl Actuator Altitude AHRSComms Stabilization
 MCU      = cortex-m3
 CHIP     = STM32F103RET
 BOARD    = STM3210E_OP
+MODEL	 = HD
 ifeq ($(USE_BOOTLOADER), YES)
-MODEL    = HD_BL
+BOOT_MODEL    = $(MODEL)_BL
 
 else
-MODEL    = HD_NB
+BOOT_MODEL    = $(MODEL)_NB
 endif
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
@@ -287,7 +288,7 @@ CPPSRCARM =
 # Even though the DOS/Win* filesystem matches both .s and .S the same,
 # it will preserve the spelling of the filenames, and gcc itself does
 # care about how the name is spelled on its command-line.
-ASRC = $(PIOSSTM32F10X)/startup_stm32f10x_$(MODEL).S
+ASRC = $(PIOSSTM32F10X)/startup_stm32f10x_$(MODEL)_OP.S
 
 # List Assembler source files here which must be assembled in ARM-Mode..
 ASRCARM = 
@@ -440,7 +441,7 @@ LDFLAGS += $(MATH_LIB)
 LDFLAGS += -lc -lgcc 
 
 # Set linker-script name depending on selected submodel name
-LDFLAGS +=-T$(LINKERSCRIPTPATH)/link_stm32f10x_$(MODEL).ld
+LDFLAGS +=-T$(LINKERSCRIPTPATH)/link_stm32f10x_$(BOOT_MODEL).ld
 
 # ---------------------------------------------------------------------------
 # Options for OpenOCD flash-programming

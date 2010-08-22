@@ -235,6 +235,13 @@ uint8_t NMEAParser::nmeaProcess(cBuffer* rxBuffer)
                         // report packet type
                         foundpacket = NMEA_GPRMC;
                 }
+                else if(!strncmp(NmeaPacket, "GPGSV", 5))
+                {
+                        // Process packet of this type
+                        nmeaProcessGPGSV(NmeaPacket);
+                        // rerpot packet type
+                        foundpacket = NMEA_GPGSV;
+                }
         }
         else if(rxBuffer->datalength >= rxBuffer->size)
         {
@@ -243,6 +250,15 @@ uint8_t NMEAParser::nmeaProcess(cBuffer* rxBuffer)
                 bufferFlush(rxBuffer);
         }
         return foundpacket;
+}
+
+/**
+  * Processes NMEA GSV sentences (satellites in view)
+  * \param[in] Buffer for parsed nmea GSV sentence
+  */
+void NMEAParser::nmeaProcessGPGSV(char *packet)
+{
+
 }
 
 /**

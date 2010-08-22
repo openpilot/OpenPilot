@@ -68,6 +68,7 @@ public:
    void nmeaProcessGPRMC(char* packet);
    void nmeaProcessGPVTG(char* packet);
    void nmeaProcessGPGSA(char* packet);
+   void nmeaProcessGPGSV(char* packet);
    GpsData_t GpsData;
    cBuffer gpsRxBuffer;
    char gpsRxData[512];

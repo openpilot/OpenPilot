@@ -61,6 +61,7 @@
 #include "positionactual.h"
 #include "homelocation.h"
 #include "ahrscalibration.h"
+#include "CoordinateConversions.h"
 
 #include "pios_opahrs.h" // library for OpenPilot AHRS access functions
 #include "pios_opahrs_proto.h"
@@ -363,15 +364,27 @@ static void load_gps_position(struct opahrs_msg_v1_req_update * update)
   PositionActualGet(&data);
   HomeLocationData home;
   HomeLocationGet(&home);
-  
-  
+
   update->gps.updated = 1;
-  update->gps.NED[0] = 0;
-  update->gps.NED[1] = 0;
-  update->gps.NED[2] = 0;
-  update->gps.groundspeed = 0;
-  update->gps.heading = 0;
-  update->gps.quality = 0;
+
+  if(home.RNE[0] == 0 && home.RNE[1] && home.RNE[2] == 0 && home.RNE[3] == 0)
+  {  
+    update->gps.NED[0] = 0;
+    update->gps.NED[1] = 0;
+    update->gps.NED[2] = 0;
+    update->gps.groundspeed = 0;
+    update->gps.heading = 0;
+    update->gps.quality = 0;
+  }
+  else {
+    update->gps.groundspeed = data.Groundspeed;
+    update->gps.heading = data.Heading;
+    update->gps.quality = 0;
+    double LLA[3] = {(double) data.Latitude, (double) data.Longitude, (double) data.Altitude};
+    double ECEF[3] = {(double) home.ECEF[0], (double) home.ECEF[1], (double) home.ECEF[2]};
+    LLA2Base(LLA, ECEF, (float (*)[3]) home.RNE, update->gps.NED);
+  }
+
 }
 
 static void process_update(struct opahrs_msg_v1_rsp_update * update)

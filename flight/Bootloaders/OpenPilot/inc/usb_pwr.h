@@ -12,9 +12,11 @@
 * CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE CODING
 * INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
 *******************************************************************************/
+
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __USB_PWR_H
 #define __USB_PWR_H
+
 /* Includes ------------------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
 typedef enum _RESUME_STATE
@@ -38,6 +40,7 @@ typedef enum _DEVICE_STATE
   ADDRESSED,
   CONFIGURED
 } DEVICE_STATE;
+
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
@@ -47,7 +50,7 @@ void Resume(RESUME_STATE eResumeSetVal);
 RESULT PowerOn(void);
 RESULT PowerOff(void);
 /* External variables --------------------------------------------------------*/
-extern  __IO uint32_t bDeviceState;             /* USB device status */
+extern  __IO uint32_t bDeviceState; /* USB device status */
 extern __IO bool fSuspendEnabled;  /* true when suspend is possible */
 
 #endif  /*__USB_PWR_H*/

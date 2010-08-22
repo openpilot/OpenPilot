@@ -1,9 +1,9 @@
 /******************** (C) COPYRIGHT 2010 STMicroelectronics ********************
-* File Name          : dfu_mal.h
+* File Name          : hw_config.h
 * Author             : MCD Application Team
 * Version            : V3.2.1
 * Date               : 07/05/2010
-* Description        : Header for dfu_mal.c file.
+* Description        : Hardware Configuration & Setup
 ********************************************************************************
 * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
 * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE TIME.
@@ -14,21 +14,28 @@
 *******************************************************************************/
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __SPI_IF_MAL_H
-#define __SPI_IF_MAL_H
+#ifndef __HW_CONFIG_H
+#define __HW_CONFIG_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f10x.h"
+#include "usb_type.h"
+
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
+/* Exported define -----------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
-
-uint16_t SPI_If_Init(void);
-uint16_t SPI_If_Erase (uint32_t SectorAddress);
-uint16_t SPI_If_Write (uint32_t SectorAddress, uint32_t DataLength);
-uint8_t *SPI_If_Read (uint32_t SectorAddress, uint32_t DataLength);
-
-#endif /* __SPI_IF_MAL_H */
+void Set_System(void);
+void Set_USBClock(void);
+void Enter_LowPowerMode(void);
+void Leave_LowPowerMode(void);
+void USB_Interrupts_Config(void);
+void USB_Cable_Config (FunctionalState NewState);
+void GPIO_Configuration(void);
+void EXTI_Configuration(void);
+void ADC_Configuration(void);
+void Get_SerialNum(void);
+void Reset_Device(void);
+#endif  /*__HW_CONFIG_H*/
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/

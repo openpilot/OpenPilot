@@ -84,7 +84,7 @@ void SOF_Callback(void);
 void ESOF_Callback(void);
 #endif
 
-#endif
+#else /* STM32F10X_CL */
 
 /* Interrupt subroutines user callbacks prototypes.
    These callbacks are called into the respective interrupt sunroutine functinos
@@ -113,7 +113,7 @@ void INTR_WKUPINTR_Callback(void);
 /* Isochronous data update */
 void INTR_RXSTSQLVL_ISODU_Callback(void); 
 
-
+#endif /* STM32F10X_CL */
 
 
 #endif /*__USB_ISTR_H*/

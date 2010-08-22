@@ -18,7 +18,6 @@
 #define __PLATFORM_CONFIG_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f10x.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
@@ -43,11 +42,16 @@
   #define RCC_APB2Periph_GPIO_DISCONNECT      RCC_APB2Periph_GPIOC
 
 #elif defined (USE_STM3210C_EVAL)
-  #define USB_DISCONNECT                      GPIOC
-  #define USB_DISCONNECT_PIN                  GPIO_Pin_4
-  #define RCC_APB2Periph_GPIO_DISCONNECT      RCC_APB2Periph_GPIOC
+  #define USB_DISCONNECT                      0  
+  #define USB_DISCONNECT_PIN                  0
+  #define RCC_APB2Periph_GPIO_DISCONNECT      0
 
 #endif /* USE_STM3210B_EVAL */
+
+  #define RCC_APB2Periph_GPIO_IOAIN           RCC_APB2Periph_GPIOC
+  #define GPIO_IOAIN                          GPIOC
+  #define GPIO_IOAIN_PIN                      GPIO_Pin_4   /* PC.04 */
+  #define ADC_AIN_CHANNEL                     ADC_Channel_14
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
@@ -55,3 +59,4 @@
 #endif /* __PLATFORM_CONFIG_H */
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/
+

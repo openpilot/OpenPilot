@@ -39,6 +39,10 @@ void SysTick_Handler(void);
 void USB_LP_CAN1_RX0_IRQHandler(void);
 #endif /* STM32F10X_CL */
 
+void DMA1_Channel1_IRQHandler(void);
+void EXTI9_5_IRQHandler(void);
+void EXTI15_10_IRQHandler(void);
+
 #ifdef STM32F10X_CL
 void OTG_FS_IRQHandler(void);
 #endif /* STM32F10X_CL */
@@ -46,4 +50,3 @@ void OTG_FS_IRQHandler(void);
 #endif /* __STM32F10x_IT_H */
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/
-

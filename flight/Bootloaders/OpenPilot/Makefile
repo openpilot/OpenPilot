@@ -27,15 +27,6 @@
 # Set to YES to compile for debugging
 DEBUG ?= YES
 
-# Set to YES to use the Servo output pins for debugging via scope or logic analyser
-ENABLE_DEBUG_PINS ?= NO
-
-# Set to Yes to enable the AUX UART which is mapped on the S1 (Tx) and S2 (Rx) servo outputs  
-ENABLE_AUX_UART ?= NO
-
-#
-USE_BOOTLOADER ?= NO
-
 
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY ?= NO
@@ -64,29 +55,17 @@ USE_THUMB_MODE = YES
 MCU      = cortex-m3
 CHIP     = STM32F103RET
 BOARD    = STM3210E_OP
-ifeq ($(USE_BOOTLOADER), YES)
-MODEL    = HD_BL
-
-else
 MODEL    = HD
-endif
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
 OUTDIR = Build
 
 # Target file name (without extension).
-TARGET = OpenPilot2_BL
+TARGET = bootloader
 
 # Paths
-
-OPSYSTEM = ./
-OPSYSTEMINC = $(OPSYSTEM)/inc
-OPUAVTALK = ./UAVTalk
-OPUAVTALKINC = $(OPUAVTALK)/inc
-OPUAVOBJ = ./UAVObjects
-OPUAVOBJINC = $(OPUAVOBJ)/inc
-OPTESTS  = ./Tests
-OPMODULEDIR = ./Modules
+HIDSYSTEM = .
+HIDSYSTEMINC = ./inc
 PIOS = ../../PiOS
 PIOSINC = $(PIOS)/inc
 PIOSSTM32F10X = $(PIOS)/STM32F10x
@@ -100,34 +79,19 @@ STMSPDINCDIR = $(STMSPDDIR)/inc
 STMUSBSRCDIR = $(STMUSBDIR)/src
 STMUSBINCDIR = $(STMUSBDIR)/inc
 CMSISDIR  = $(STMLIBDIR)/CMSIS/Core/CM3
-DOSFSDIR  = $(APPLIBDIR)/dosfs
-MSDDIR  = $(APPLIBDIR)/msd
-RTOSDIR = $(APPLIBDIR)/FreeRTOS
-RTOSSRCDIR = $(RTOSDIR)/Source
-RTOSINCDIR = $(RTOSSRCDIR)/include
-DOXYGENDIR = ../Doc/Doxygen
-
-# List C source files here. (C dependencies are automatically generated.)
-# use file-extension c for "c-only"-files
-
-MODNAMES = $(notdir ${MODULES})   
+DOXYGENDIR = .../Doc/Doxygen
 
 
 ## OPENPILOT CORE:
-SRC += $(OPSYSTEM)/dfu_mal.c
-SRC += $(OPSYSTEM)/flash_if.c
-SRC += $(OPSYSTEM)/stm32f10x_it.c
-SRC += $(OPSYSTEM)/fsmc_nor.c
-SRC += $(OPSYSTEM)/hw_config.c
-SRC += $(OPSYSTEM)/main.c
-SRC += $(OPSYSTEM)/nor_if.c
-SRC += $(OPSYSTEM)/spi_flash.c
-SRC += $(OPSYSTEM)/spi_if.c
-SRC += $(OPSYSTEM)/usb_desc.c
-#SRC += $(OPSYSTEM)/usb_endp.c
-SRC += $(OPSYSTEM)/usb_istr.c
-SRC += $(OPSYSTEM)/usb_prop.c
-SRC += $(OPSYSTEM)/usb_pwr.c
+SRC += $(HIDSYSTEM)/main.c
+SRC += $(HIDSYSTEM)/hw_config.c
+SRC += $(HIDSYSTEM)/stm32f10x_it.c
+SRC += $(HIDSYSTEM)/usb_desc.c
+SRC += $(HIDSYSTEM)/usb_endp.c
+SRC += $(HIDSYSTEM)/usb_istr.c
+SRC += $(HIDSYSTEM)/usb_prop.c
+SRC += $(HIDSYSTEM)/usb_pwr.c
+SRC += $(HIDSYSTEM)/stm3210e_eval.c
 
 
 ## CMSIS for STM32
@@ -135,24 +99,24 @@ SRC += $(CMSISDIR)/core_cm3.c
 SRC += $(CMSISDIR)/system_stm32f10x.c
 
 ## Used parts of the STM-Library
-SRC += $(STMSPDSRCDIR)/stm32f10x_adc.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_bkp.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_crc.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_dac.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_dma.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_exti.c
+#SRC += $(STMSPDSRCDIR)/stm32f10x_adc.c
+#SRC += $(STMSPDSRCDIR)/stm32f10x_bkp.c
+#SRC += $(STMSPDSRCDIR)/stm32f10x_crc.c
+#SRC += $(STMSPDSRCDIR)/stm32f10x_dac.c
+#SRC += $(STMSPDSRCDIR)/stm32f10x_dma.c
+#SRC += $(STMSPDSRCDIR)/stm32f10x_exti.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_flash.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_gpio.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_i2c.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_pwr.c
+#SRC += $(STMSPDSRCDIR)/stm32f10x_i2c.c
+#SRC += $(STMSPDSRCDIR)/stm32f10x_pwr.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_rcc.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_rtc.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_spi.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_tim.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_usart.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_wwdg.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_fsmc.c
+#SRC += $(STMSPDSRCDIR)/stm32f10x_rtc.c
+#SRC += $(STMSPDSRCDIR)/stm32f10x_spi.c
+#SRC += $(STMSPDSRCDIR)/stm32f10x_tim.c
+#SRC += $(STMSPDSRCDIR)/stm32f10x_usart.c
+#SRC += $(STMSPDSRCDIR)/stm32f10x_wwdg.c
 SRC += $(STMSPDSRCDIR)/misc.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_sdio.c
 
 ## STM32 USB Library
 SRC += $(STMUSBSRCDIR)/usb_core.c
@@ -191,17 +155,12 @@ ASRCARM =
 
 # List any extra directories to look for include files here.
 #    Each directory must be seperated by a space.
-EXTRAINCDIRS  =  $(OPSYSTEM)
-EXTRAINCDIRS  += $(OPSYSTEMINC)
-XTRAINCDIRS  += $(PIOSSTM32F10X)
+EXTRAINCDIRS  =  $(HIDSYSTEM)
+EXTRAINCDIRS  =  $(HIDSYSTEMINC)
 EXTRAINCDIRS  += $(STMSPDINCDIR)
 EXTRAINCDIRS  += $(STMUSBINCDIR)
 EXTRAINCDIRS  += $(CMSISDIR)
-
-EXTRAINCDIRS  += $(APPLIBDIR)
-
-EXTRAINCDIRS += ${foreach MOD, ${MODULES}, Modules/${MOD}/inc} ${OPMODULEDIR}/System/inc
-
+EXTRAINCDIRS  += $(CMSISCS)
 
 # List any extra directories to look for library files here.
 # Also add directories where the linker should search for
@@ -225,7 +184,7 @@ LINKERSCRIPTPATH = $(PIOSSTM32F10X)
 # (Note: 3 is not always the best optimization level. See avr-libc FAQ.)
 
 ifeq ($(DEBUG),YES)
-OPT = 0
+OPT = s
 else
 OPT = s
 endif
@@ -246,15 +205,7 @@ CDEFS = -DSTM32F10X_$(MODEL)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)
 CDEFS += -DUSE_STM3210E_EVAL
-ifeq ($(ENABLE_DEBUG_PINS), YES)
-CDEFS += -DPIOS_ENABLE_DEBUG_PINS
-endif
-ifeq ($(ENABLE_AUX_UART), YES)
-CDEFS += -DPIOS_ENABLE_AUX_UART
-endif
-ifeq ($(USE_BOOTLOADER), YES)
-CDEFS += -DUSE_BOOTLOADER
-endif
+
 
 
 # Place project-specific -D and/or -U options for 
@@ -333,7 +284,6 @@ LDFLAGS +=-T$(LINKERSCRIPTPATH)/link_stm32f10x_$(MODEL).ld
 # Options for OpenOCD flash-programming
 # see openocd.pdf/openocd.texi for further information
 #
-#OOCD_LOADFILE+=$(OUTDIR)/x.hex
 OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).elf
 # if OpenOCD is in the $PATH just set OOCD_EXE=openocd
 OOCD_EXE=openocd

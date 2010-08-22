@@ -3,7 +3,7 @@
 * Author             : MCD Application Team
 * Version            : V3.2.1
 * Date               : 07/05/2010
-* Description        : Device Firmware Upgrade(DFU) demo main file
+* Description        : Custom HID demo main file
 ********************************************************************************
 * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
 * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE TIME.
@@ -16,26 +16,25 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x.h"
 #include "usb_lib.h"
-#include "usb_conf.h"
-#include "usb_prop.h"
-#include "usb_pwr.h"
-#include "dfu_mal.h"
 #include "hw_config.h"
-#include "platform_config.h"
+#include "stm32_eval.h"
+#include "common.h"
+
+extern void FLASH_Download();
 
 /* Private typedef -----------------------------------------------------------*/
 typedef  void (*pFunction)(void);
-
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-/* Extern variables ----------------------------------------------------------*/
-uint8_t DeviceState;
-uint8_t DeviceStatus[6];
 pFunction Jump_To_Application;
 uint32_t JumpAddress;
-
+/* Extern variables ----------------------------------------------------------*/
+uint8_t DeviceState;
+uint8_t JumpToApp=0;
 /* Private function prototypes -----------------------------------------------*/
+void Delay(__IO uint32_t nCount);
+void DelayWithDown(__IO uint32_t nCount);
 /* Private functions ---------------------------------------------------------*/
 
 /*******************************************************************************
@@ -47,38 +46,77 @@ uint32_t JumpAddress;
 *******************************************************************************/
 int main(void)
 {
-  DFU_Button_Config();
+	if (((*(__IO uint32_t*)StartOfUserCode) & 0x2FFE0000 ) == 0x20000000)
+	     { /* Jump to user application */
 
-  /* Check if the Key push-button on STM3210x-EVAL Board is pressed */
-  if (DFU_Button_Read() != 0x00)
-  { /* Test if user code is programmed starting from address 0x8003000 */
-    if (((*(__IO uint32_t*)ApplicationAddress) & 0x2FFE0000 ) == 0x20000000)
-    { /* Jump to user application */
-
-      JumpAddress = *(__IO uint32_t*) (ApplicationAddress + 4);
-      Jump_To_Application = (pFunction) JumpAddress;
-      /* Initialize user application's Stack Pointer */
-      __set_MSP(*(__IO uint32_t*) ApplicationAddress);
-      Jump_To_Application();
-    }
-  } /* Otherwise enters DFU mode to allow user to program his application */
-
-  /* Enter DFU mode */
-  DeviceState = STATE_dfuERROR;
-  DeviceStatus[0] = STATUS_ERRFIRMWARE;
-  DeviceStatus[4] = DeviceState;
-
+	       JumpAddress = *(__IO uint32_t*) (StartOfUserCode + 4);
+	       Jump_To_Application = (pFunction) JumpAddress;
+	       /* Initialize user application's Stack Pointer */
+	       __set_MSP(*(__IO uint32_t*) StartOfUserCode);
+	       Jump_To_Application();
+	     }
   Set_System();
+
+  USB_Interrupts_Config();
+
   Set_USBClock();
+
   USB_Init();
 
-  /* Main loop */
-  while (1)
-  {}
+  DeviceState=idle;
+  while (JumpToApp==0)
+  {
+
+	  STM_EVAL_LEDToggle(LED1);
+	  DelayWithDown(10);//1000000);
+  }
+  if (((*(__IO uint32_t*)StartOfUserCode) & 0x2FFE0000 ) == 0x20000000)
+     { /* Jump to user application */
+
+       JumpAddress = *(__IO uint32_t*) (StartOfUserCode + 4);
+       Jump_To_Application = (pFunction) JumpAddress;
+       /* Initialize user application's Stack Pointer */
+       __set_MSP(*(__IO uint32_t*) StartOfUserCode);
+       Jump_To_Application();
+     }
+  while(1)
+  {
+	  STM_EVAL_LEDToggle(LED1);
+	  STM_EVAL_LEDToggle(LED2);
+	  Delay(1000000);
+  }
 }
 
+/*******************************************************************************
+* Function Name  : Delay
+* Description    : Inserts a delay time.
+* Input          : nCount: specifies the delay time length.
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void Delay(__IO uint32_t nCount)
+{
+  for(; nCount!= 0;nCount--)
+  {
 
-#ifdef USE_FULL_ASSERT
+  }
+}
+/*******************************************************************************
+* Function Name  : Delay
+* Description    : Inserts a delay time.
+* Input          : nCount: specifies the delay time length.
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void DelayWithDown(__IO uint32_t nCount)
+{
+  for(; nCount!= 0;nCount--)
+  {
+	  for(__IO uint32_t delay=DownloadDelay ; delay!=0 ; delay--){}
+	  FLASH_Download();
+  }
+}
+#ifdef  USE_FULL_ASSERT
 /*******************************************************************************
 * Function Name  : assert_failed
 * Description    : Reports the name of the source file and the source line number
@@ -89,13 +127,15 @@ int main(void)
 * Return         : None
 *******************************************************************************/
 void assert_failed(uint8_t* file, uint32_t line)
-{
+{ 
   /* User can add his own implementation to report the file name and line number,
      ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
 
   /* Infinite loop */
-  while (1)
-  {}
+  while(1)
+  {
+  }
 }
 #endif
+
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/

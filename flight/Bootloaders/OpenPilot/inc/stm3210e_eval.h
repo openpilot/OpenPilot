@@ -60,7 +60,15 @@
 /** @addtogroup STM3210E_EVAL_LOW_LEVEL_LED
   * @{
   */
+#define LEDn                             2
 
+#define LED1_PIN                         GPIO_Pin_12
+#define LED1_GPIO_PORT                   GPIOC
+#define LED1_GPIO_CLK                    RCC_APB2Periph_GPIOC
+
+#define LED2_PIN                         GPIO_Pin_13
+#define LED2_GPIO_PORT                   GPIOC
+#define LED2_GPIO_CLK                    RCC_APB2Periph_GPIOC
 
 /**
   * @}
@@ -276,7 +284,10 @@
 /** @defgroup STM3210E_EVAL_LOW_LEVEL_Exported_Functions
   * @{
   */ 
-
+void STM_EVAL_LEDInit(Led_TypeDef Led);
+void STM_EVAL_LEDOn(Led_TypeDef Led);
+void STM_EVAL_LEDOff(Led_TypeDef Led);
+void STM_EVAL_LEDToggle(Led_TypeDef Led);
 void STM_EVAL_PBInit(Button_TypeDef Button, ButtonMode_TypeDef Button_Mode);
 uint32_t STM_EVAL_PBGetState(Button_TypeDef Button);
 void STM_EVAL_COMInit(COM_TypeDef COM, USART_InitTypeDef* USART_InitStruct);

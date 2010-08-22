@@ -3,7 +3,7 @@
 * Author             : MCD Application Team
 * Version            : V3.2.1
 * Date               : 07/05/2010
-* Description        : Device Firmware Upgrade (DFU) configuration file
+* Description        : Custom HID demo configuration file
 ********************************************************************************
 * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
 * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE TIME.
@@ -27,7 +27,7 @@
 /* EP_NUM */
 /* defines how many endpoints are used by the device */
 /*-------------------------------------------------------------*/
-#define EP_NUM                          (1)
+#define EP_NUM     (2)
 
 #ifndef STM32F10X_CL
 /*-------------------------------------------------------------*/
@@ -37,11 +37,15 @@
 /* buffer table base address */
 #define BTABLE_ADDRESS      (0x00)
 
-/* EP0 */
+/* EP0  */
 /* rx/tx buffer base address */
-#define ENDP0_RXADDR        (0x10)
-#define ENDP0_TXADDR        (0x50)
+#define ENDP0_RXADDR        (0x18)
+#define ENDP0_TXADDR        (0x58)
 
+/* EP1  */
+/* tx buffer base address */
+#define ENDP1_TXADDR        (0x100)
+#define ENDP1_RXADDR        (0x124)
 
 /*-------------------------------------------------------------*/
 /* -------------------   ISTR events  -------------------------*/
@@ -49,18 +53,12 @@
 /* IMR_MSK */
 /* mask defining which events has to be handled */
 /* by the device application software */
-#define IMR_MSK (CNTR_CTRM  | \
-                 CNTR_WKUPM | \
-                 CNTR_SUSPM | \
-                 CNTR_ERRM  | \
-                 CNTR_SOFM  | \
-                 CNTR_ESOFM | \
-                 CNTR_RESETM  \
-                )
+#define IMR_MSK (CNTR_CTRM  | CNTR_WKUPM | CNTR_SUSPM | CNTR_ERRM  | CNTR_SOFM \
+                 | CNTR_ESOFM | CNTR_RESETM )
 #endif /* STM32F10X_CL */
 
-
 #ifdef STM32F10X_CL
+
 /*******************************************************************************
 *                              FIFO Size Configuration
 *  
@@ -107,7 +105,6 @@
 #define TX1_FIFO_SIZE                          64
 #define TX2_FIFO_SIZE                          16
 #define TX3_FIFO_SIZE                          16
-
 
 /* OTGD-FS-DEVICE IP interrupts Enable definitions */
 /* Uncomment the define to enable the selected interrupt */
@@ -164,6 +161,7 @@
 
 #endif /* STM32F10X_CL */
 
+
 /* CTR service routines */
 /* associated to defined endpoints */
 #define  EP1_IN_Callback   NOP_Process
@@ -174,8 +172,7 @@
 #define  EP6_IN_Callback   NOP_Process
 #define  EP7_IN_Callback   NOP_Process
 
-
-#define  EP1_OUT_Callback   NOP_Process
+//#define  EP1_OUT_Callback   NOP_Process
 #define  EP2_OUT_Callback   NOP_Process
 #define  EP3_OUT_Callback   NOP_Process
 #define  EP4_OUT_Callback   NOP_Process
@@ -186,7 +183,4 @@
 #endif /*__USB_CONF_H*/
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/
-
-
-
 

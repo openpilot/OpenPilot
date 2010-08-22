@@ -111,7 +111,7 @@ UAVObject::Metadata HomeLocation::getDefaultMetadata()
  */
 void HomeLocation::setDefaultFieldValues()
 {
-    data.Set = -1;
+    data.Set = 0;
     data.Latitude = 0;
     data.Longitude = 0;
     data.Altitude = 0;

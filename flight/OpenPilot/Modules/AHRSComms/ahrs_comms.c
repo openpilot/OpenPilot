@@ -100,13 +100,17 @@ static void GPSPositionUpdatedCb(UAVObjEvent * ev)
 static bool HomeLocationIsUpdatedFlag = false;
 static void HomeLocationUpdatedCb(UAVObjEvent * ev)
 {
-	HomeLocationIsUpdatedFlag = true;
+  HomeLocationIsUpdatedFlag = true;
 }
 
 static bool AHRSCalibrationIsUpdatedFlag = false;
+static bool AHRSCalibrationIsLocallyUpdateFlag = false;
 static void AHRSCalibrationUpdatedCb(UAVObjEvent * ev)
 {
-	AHRSCalibrationIsUpdatedFlag = true;
+  if(AHRSCalibrationIsLocallyUpdateFlag == true)
+    AHRSCalibrationIsLocallyUpdateFlag = false;
+  else
+    AHRSCalibrationIsUpdatedFlag = true;
 }
 
 /**
@@ -302,6 +306,7 @@ static void update_calibration(struct opahrs_msg_v1_rsp_calibration * calibratio
   AHRSCalibrationData data;
   AHRSCalibrationGet(&data);
   
+  AHRSCalibrationIsLocallyUpdateFlag = true;
   data.accel_var[0] = calibration->accel_var[0];
   data.accel_var[1] = calibration->accel_var[1];
   data.accel_var[2] = calibration->accel_var[2];

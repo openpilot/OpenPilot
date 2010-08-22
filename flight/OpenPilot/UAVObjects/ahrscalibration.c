@@ -73,31 +73,31 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	// Initialize object fields to their default values
 	UAVObjGetInstanceData(obj, instId, &data);
 	memset(&data, 0, sizeof(AHRSCalibrationData));
-    data.measure_var = 1;
+    data.measure_var = 0;
     data.accel_bias[0] = -2048;
     data.accel_bias[1] = -2048;
     data.accel_bias[2] = -2048;
     data.accel_scale[0] = 0.012;
     data.accel_scale[1] = 0.012;
     data.accel_scale[2] = 0.012;
-    data.accel_var[0] = 1;
-    data.accel_var[1] = 1;
-    data.accel_var[2] = 1;
+    data.accel_var[0] = 5e-05;
+    data.accel_var[1] = 5e-05;
+    data.accel_var[2] = 5e-05;
     data.gyro_bias[0] = -1675;
     data.gyro_bias[1] = -1675;
     data.gyro_bias[2] = -1675;
     data.gyro_scale[0] = 0.007;
     data.gyro_scale[1] = 0.007;
     data.gyro_scale[2] = 0.007;
-    data.gyro_var[0] = 1;
-    data.gyro_var[1] = 1;
-    data.gyro_var[2] = 1;
+    data.gyro_var[0] = 0.0001;
+    data.gyro_var[1] = 0.0001;
+    data.gyro_var[2] = 0.0001;
     data.mag_bias[0] = 0;
     data.mag_bias[1] = 0;
     data.mag_bias[2] = 0;
-    data.mag_var[0] = 1;
-    data.mag_var[1] = 1;
-    data.mag_var[2] = 1;
+    data.mag_var[0] = 0;
+    data.mag_var[1] = 0;
+    data.mag_var[2] = 0;
 
 	UAVObjSetInstanceData(obj, instId, &data);
 

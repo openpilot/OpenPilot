@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       link_stm32f10x_HD.ld   
+ * @file       link_stm32f10x_HD_NB.ld   
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
  * @brief      PiOS linker for the OpenPilot board
  * @see        The GNU Public License (GPL) Version 3

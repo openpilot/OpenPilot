@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       link_stm32f10x_HD.ld   
+ * @file       link_stm32f10x_HD_BL.ld   
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
  * @brief      PiOS linker for the OpenPilot board
  * @see        The GNU Public License (GPL) Version 3
@@ -36,33 +36,11 @@ MEMORY
   EXTMEMB3 (rx) : ORIGIN = 0x00000000, LENGTH = 0
 }
 
-/* higher address of the user mode stack */
-_estack = 0x20010000;
-
-/* default stack sizes. 
-
-These are used by the startup in order to allocate stacks for the different modes.
-
-Note: FreeRTOS gives each task an own stack
-*/
-
-__Stack_Size = 128 ;
-
-PROVIDE ( _Stack_Size = __Stack_Size ) ;
-
-__Stack_Init = _estack  - __Stack_Size ;
-
-/*"PROVIDE" allows to easily override these values from an object file or the commmand line.*/
-PROVIDE ( _Stack_Init = __Stack_Init ) ;
-
-/*
-There will be a link error if there is not this amount of RAM free at the end.
-*/
-_Minimum_Stack_Size = 0x100 ;
+/* This is the size of the stack for early init and for all FreeRTOS IRQs */
+_irq_stack_size = 0x400;
 
 /* Check valid alignment for VTOR */
 ASSERT(ORIGIN(FLASH) == ALIGN(ORIGIN(FLASH), 0x80), "Start of memory region flash not aligned for startup vector table");
-
 
 /*
 this sends all unreferenced IRQHandlers to reset
@@ -258,7 +236,24 @@ SECTIONS
          _sidata = _etext;
     } >FLASH
     
- 
+
+    /* 
+     * This stack is used both as the initial sp during early init as well as ultimately
+     * being used as the STM32's MSP (Main Stack Pointer) which is the same stack that
+     * is used for _all_ interrupt handlers.  The end of this stack should be placed
+     * against the lowest address in RAM so that a stack overrun results in a hard fault
+     * at the first access beyond the end of the stack.
+     */
+    .irq_stack :
+    {
+         . = ALIGN(4);
+         _irq_stack_end = . ;
+         . = . + _irq_stack_size ;
+         . = ALIGN(4);
+         _irq_stack_top = . - 4 ;
+         . = ALIGN(4);
+    } >RAM
+	
 
     /* This is the initialized data section
     The program executes knowing that the data is in the RAM
@@ -296,24 +291,7 @@ SECTIONS
     
     PROVIDE ( end = _ebss );
     PROVIDE ( _end = _ebss );
-    
-    /* This is the user stack section 
-    This is just to check that there is enough RAM left for the User mode stack
-    It should generate an error if it's full.
-     */
-    ._usrstack :
-    {
-            . = ALIGN(4);
-        _susrstack = . ;
-        
-        . = . + _Minimum_Stack_Size ;
-        
-            . = ALIGN(4);
-        _eusrstack = . ;
-    } >RAM
-    
 
-   
     /* this is the FLASH Bank1 */
     /* the C or assembly source must explicitly place the code or data there
     using the "section" attribute */

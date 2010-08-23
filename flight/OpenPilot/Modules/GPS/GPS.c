@@ -80,7 +80,7 @@ void nmeaProcessGPGSA(char* packet);
 
 // Private constants
 // Unfortunately need a good size stack for the WMM calculation
-#define STACK_SIZE configMINIMAL_STACK_SIZE+3500
+#define STACK_SIZE configMINIMAL_STACK_SIZE + 2000
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 3)
 
 // Private types

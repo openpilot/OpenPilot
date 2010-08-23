@@ -154,6 +154,13 @@ static void manualControlTask(void* parameters)
 			cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED;
 		}
 
+		// Update the ManualControlCommand object
+		ManualControlCommandSet(&cmd);
+    // This seems silly to set then get, but the reason is if the GCS is 
+    // the control input, the set command will be blocked by the read only
+    // setting and the get command will pull the right values from telemetry
+		ManualControlCommandGet(&cmd);
+
 		// Check for connection status (negative throttle values)
 		// The receiver failsafe for the throttle channel should be set to a value below the channel NEUTRAL
 		if ( cmd.Throttle < THROTTLE_FAILSAFE )
@@ -171,14 +178,7 @@ static void manualControlTask(void* parameters)
 				cmd.Throttle = 0;
 			}
 		}
-
-		// Update the ManualControlCommand object
-		ManualControlCommandSet(&cmd);
-    // This seems silly to set then get, but the reason is if the GCS is 
-    // the control input, the set command will be blocked by the read only
-    // setting and the get command will pull the right values from telemetry
-		ManualControlCommandGet(&cmd);
-
+    
 		// Depending on the mode update the Stabilization or Actuator objects
 		if ( cmd.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL )
 		{

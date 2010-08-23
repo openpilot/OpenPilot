@@ -78,8 +78,8 @@ void DMA1_Channel1_IRQHandler() __attribute__ ((alias ("AHRS_ADC_DMA_Handler")))
 #define ACCEL_SCALE    ( (VDD / FULL_RANGE) / ACCEL_SENSITIVITY * 2 / ACCEL_RANGE * ACCEL_GRAVITY )
 #define ACCEL_OFFSET  -2048  
 
-#define GYRO_SENSITIVITY   ( 2.0 / 1000 ) /* V sec deg^-1 */
-#define RAD_PER_DEGREE     ( 3.14159 / 180 )
+#define GYRO_SENSITIVITY   ( 2.0 / 1000 ) /* 2 mV / (deg s^-1) */
+#define RAD_PER_DEGREE     ( M_PI / 180 )
 #define GYRO_SCALE         ( (VDD / FULL_RANGE) / GYRO_SENSITIVITY * RAD_PER_DEGREE )
 #define GYRO_OFFSET       -1675 /* From data sheet, zero accel output is 1.35 v */
 /**
@@ -134,12 +134,6 @@ struct attitude_solution {
     float q3;
     float q4;
   } quaternion;
-
-  struct {
-    float roll;
-    float pitch;
-    float yaw;
-  } euler;
 };
 
 struct altitude_sensor {
@@ -317,7 +311,6 @@ int main()
     if(ahrs_algorithm == INSGPS_Algo) 
     {
       /******************** INS ALGORITHM **************************/
-      float rpy[3];
       
       // format data for INS algo
       gyro[0] = gyro_data.filtered.x;
@@ -348,15 +341,10 @@ int main()
       else
         MagCorrection(mag); 
       
-      Quaternion2RPY(Nav.q,rpy);
       attitude_data.quaternion.q1 = Nav.q[0];
       attitude_data.quaternion.q2 = Nav.q[1];
       attitude_data.quaternion.q3 = Nav.q[2];
       attitude_data.quaternion.q4 = Nav.q[3];
-      attitude_data.euler.roll    = rpy[0];
-      attitude_data.euler.pitch   = rpy[1];
-      attitude_data.euler.yaw     = rpy[2];
-      if(attitude_data.euler.yaw < 0) attitude_data.euler.yaw += 360;
     }
     else if( ahrs_algorithm == SIMPLE_Algo )
     {    
@@ -364,10 +352,9 @@ int main()
       float rpy[3];
       /***************** SIMPLE ATTITUDE FROM NORTH AND ACCEL ************/
       /* Very simple computation of the heading and attitude from accel. */
-      rpy[2] = attitude_data.euler.yaw = atan2((mag_data.raw.axis[0]), (-1 * mag_data.raw.axis[1])) * 180 / M_PI;
-      rpy[1] = attitude_data.euler.pitch = -atan2(accel_data.filtered.x, accel_data.filtered.z) * 180 / M_PI;
-      rpy[0] = attitude_data.euler.roll = -atan2(accel_data.filtered.y,accel_data.filtered.z) * 180 / M_PI;
-      if (attitude_data.euler.yaw < 0) attitude_data.euler.yaw += 360.0;
+      rpy[2] = atan2((mag_data.raw.axis[0]), (-1 * mag_data.raw.axis[1])) * 180 / M_PI;
+      rpy[1] = -atan2(accel_data.filtered.x, accel_data.filtered.z) * 180 / M_PI;
+      rpy[0] = -atan2(accel_data.filtered.y,accel_data.filtered.z) * 180 / M_PI;
       
       RPY2Quaternion(rpy,q);
       attitude_data.quaternion.q1 = q[0];
@@ -557,8 +544,8 @@ void converge_insgps()
     // This should be done directly but I'm too dumb.
     float rpy[3];
     Quaternion2RPY(Nav.q, rpy);
-    rpy[1] = attitude_data.euler.pitch = -atan2(accel_data.filtered.x, accel_data.filtered.z) * 180 / M_PI;
-    rpy[0] = attitude_data.euler.roll = -atan2(accel_data.filtered.y, accel_data.filtered.z) * 180 / M_PI;    
+    rpy[1] = -atan2(accel_data.filtered.x, accel_data.filtered.z) * 180 / M_PI;
+    rpy[0] = -atan2(accel_data.filtered.y, accel_data.filtered.z) * 180 / M_PI;    
     // Get magnetic readings
     PIOS_HMC5843_ReadMag(mag_data.raw.axis);
     mag[0] = -mag_data.raw.axis[1];
@@ -768,9 +755,6 @@ void process_spi_request(void)
       user_tx_v1.payload.user.v.rsp.update.quaternion.q2 = attitude_data.quaternion.q2;
       user_tx_v1.payload.user.v.rsp.update.quaternion.q3 = attitude_data.quaternion.q3;
       user_tx_v1.payload.user.v.rsp.update.quaternion.q4 = attitude_data.quaternion.q4;
-      user_tx_v1.payload.user.v.rsp.update.euler.roll    = attitude_data.euler.roll;
-      user_tx_v1.payload.user.v.rsp.update.euler.pitch   = attitude_data.euler.pitch;
-      user_tx_v1.payload.user.v.rsp.update.euler.yaw     = attitude_data.euler.yaw;
       
       // TODO: separate this from INSGPS
       user_tx_v1.payload.user.v.rsp.update.NED[0] = Nav.Pos[0];
@@ -783,9 +767,7 @@ void process_spi_request(void)
       user_tx_v1.payload.user.v.rsp.update.quaternion.q2 = attitude_data.quaternion.q2;
       user_tx_v1.payload.user.v.rsp.update.quaternion.q3 = attitude_data.quaternion.q3;
       user_tx_v1.payload.user.v.rsp.update.quaternion.q4 = attitude_data.quaternion.q4;
-      user_tx_v1.payload.user.v.rsp.update.euler.roll    = attitude_data.euler.roll;
-      user_tx_v1.payload.user.v.rsp.update.euler.pitch   = attitude_data.euler.pitch;
-      user_tx_v1.payload.user.v.rsp.update.euler.yaw     = attitude_data.euler.yaw;
+
       dump_spi_message(PIOS_COM_AUX, "U", (uint8_t *)&user_tx_v1, sizeof(user_tx_v1));
       lfsm_user_set_tx_v1 (&user_tx_v1);
       break;

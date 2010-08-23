@@ -396,10 +396,14 @@ static void process_update(struct opahrs_msg_v1_rsp_update * update)
   data.q3 = update->quaternion.q3;
   data.q4 = update->quaternion.q4;
   
-  data.Roll  = update->euler.roll;
-  data.Pitch = update->euler.pitch;
-  data.Yaw   = update->euler.yaw;
-  
+  float q[4] = {data.q1, data.q2, data.q3, data.q4};
+  float rpy[3];
+  Quaternion2RPY(q,rpy);
+  data.Roll    = rpy[0];
+  data.Pitch   = rpy[1];
+  data.Yaw     = rpy[2];
+  if(data.Yaw < 0) data.Yaw += 360;
+    
   AttitudeActualSet(&data);
   
   /*

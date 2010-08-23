@@ -281,11 +281,6 @@ struct opahrs_msg_v1_rsp_update {
     float q3;
     float q4;
   } quaternion;
-  struct {
-    float roll;
-    float pitch;
-    float yaw;
-  } euler;
   float NED[3];
   float Vel[3];
 } __attribute__((__packed__));

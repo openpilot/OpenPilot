@@ -61,7 +61,7 @@ HomeLocation::HomeLocation(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAM
     ECEFElemNames.append("0");
     ECEFElemNames.append("1");
     ECEFElemNames.append("2");
-    fields.append( new UAVObjectField(QString("ECEF"), QString("m"), UAVObjectField::FLOAT32, ECEFElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("ECEF"), QString("cm"), UAVObjectField::INT32, ECEFElemNames, QStringList()) );
     QStringList RNEElemNames;
     RNEElemNames.append("0");
     RNEElemNames.append("1");

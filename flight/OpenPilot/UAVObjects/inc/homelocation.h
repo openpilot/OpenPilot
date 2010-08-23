@@ -33,7 +33,7 @@
 #define HOMELOCATION_H
 
 // Object constants
-#define HOMELOCATION_OBJID 4244719376U
+#define HOMELOCATION_OBJID 3590360786U
 #define HOMELOCATION_NAME "HomeLocation"
 #define HOMELOCATION_METANAME "HomeLocationMeta"
 #define HOMELOCATION_ISSINGLEINST 1
@@ -61,7 +61,7 @@ typedef struct {
     int32_t Latitude;
     int32_t Longitude;
     float Altitude;
-    float ECEF[3];
+    int32_t ECEF[3];
     float RNE[9];
     float Be[3];
 

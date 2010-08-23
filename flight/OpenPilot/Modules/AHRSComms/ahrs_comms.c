@@ -380,8 +380,10 @@ static void load_gps_position(struct opahrs_msg_v1_req_update * update)
     update->gps.groundspeed = data.Groundspeed;
     update->gps.heading = data.Heading;
     update->gps.quality = 0;
-    double LLA[3] = {(double) data.Latitude, (double) data.Longitude, (double) data.Altitude};
-    double ECEF[3] = {(double) home.ECEF[0], (double) home.ECEF[1], (double) home.ECEF[2]};
+    // TODO: replace with conversion from degrees * 10e6 to degrees when the GPS format updated
+    double LLA[3] = {(double) data.Latitude, (double) data.Longitude, (double) data.Altitude};    
+    // convert from cm back to meters
+    double ECEF[3] = {(double) (home.ECEF[0] / 100), (double) (home.ECEF[1] / 100), (double) (home.ECEF[2] / 100)};
     LLA2Base(LLA, ECEF, (float (*)[3]) home.RNE, update->gps.NED);
   }
 

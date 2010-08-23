@@ -47,7 +47,7 @@ public:
         qint32 Latitude;
         qint32 Longitude;
         float Altitude;
-        float ECEF[3];
+        qint32 ECEF[3];
         float RNE[9];
         float Be[3];
 
@@ -72,7 +72,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 4244719376U;
+    static const quint32 OBJID = 3590360786U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

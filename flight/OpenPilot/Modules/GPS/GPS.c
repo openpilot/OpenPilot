@@ -189,9 +189,9 @@ static void setHomeLocation(PositionActualData * gpsData)
   LLA2ECEF(LLA, ECEF);
   // TODO: Currently UAVTalk only supports float but these conversions use double
   // need to find out if they require that precision and if so extend UAVTAlk
-  home.ECEF[0] = ECEF[0];
-  home.ECEF[1] = ECEF[1];
-  home.ECEF[2] = ECEF[2];
+  home.ECEF[0] = (int32_t) (ECEF[0] * 100);
+  home.ECEF[1] = (int32_t) (ECEF[1] * 100);
+  home.ECEF[2] = (int32_t) (ECEF[2] * 100);
   
   // Compute magnetic flux direction at home location
   WMM_GetMagVector(LLA[0], LLA[1], LLA[2], 8, 17, 2010, &home.Be[0]);

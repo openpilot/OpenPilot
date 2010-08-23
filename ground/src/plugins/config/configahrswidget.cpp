@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       configgadgetwidget.cpp
+ * @file       configahrswidget.h
  * @author     E. Lafargue & The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
@@ -24,12 +24,6 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include "configgadgetwidget.h"
-
-#include "fancytabwidget.h"
-#include "configservowidget.h"
-#include "configairframewidget.h"
-#include "configtelemetrywidget.h"
 #include "configahrswidget.h"
 
 #include <QDebug>
@@ -41,35 +35,18 @@
 
 
 
-ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
+ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
-    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-    FancyTabWidget *ftw = new FancyTabWidget(this, true);
-    ftw->setIconSize(64);
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->addWidget(ftw);
-    setLayout(layout);
-    QWidget *qwd = new ConfigServoWidget();
-    ftw->insertTab(0, qwd,QIcon(":/configgadget/images/Servo.png"),QString("RC Input/Output"));
-    qwd = new ConfigAirframeWidget();
-    ftw->insertTab(1, qwd, QIcon(":/configgadget/images/Airframe.png"), QString("Aircraft"));
-    qwd = new ConfigTelemetryWidget();
-    ftw->insertTab(2,qwd,QIcon(":/configgadget/images/XBee.svg"), QString("Telemetry"));
-    qwd = new ConfigAHRSWidget();
-    ftw->insertTab(3,qwd,QIcon(":/core/images/plugin.png"),QString("AHRS"));
+    m_ahrs = new Ui_AHRSWidget();
+    m_ahrs->setupUi(this);
 
 
 }
 
-ConfigGadgetWidget::~ConfigGadgetWidget()
+ConfigAHRSWidget::~ConfigAHRSWidget()
 {
    // Do nothing
 }
 
-void ConfigGadgetWidget::resizeEvent(QResizeEvent *event)
-{
-
-    QWidget::resizeEvent(event);
-}
 
 

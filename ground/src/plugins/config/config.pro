@@ -14,7 +14,8 @@ HEADERS += configplugin.h \
     configservowidget.h \
     configtaskwidget.h \
     configairframewidget.h \
-    configtelemetrywidget.h
+    configtelemetrywidget.h \
+    configahrswidget.h
 SOURCES += configplugin.cpp \
     configgadgetconfiguration.cpp \
     configgadgetwidget.cpp \
@@ -25,8 +26,10 @@ SOURCES += configplugin.cpp \
     configtaskwidget.cpp \
     configservowidget.cpp \
     configairframewidget.cpp \
-    configtelemetrywidget.cpp
+    configtelemetrywidget.cpp \
+    configahrswidget.cpp
 FORMS += settingswidget.ui \
     airframe.ui \
-    telemetry.ui
+    telemetry.ui \
+    ahrs.ui
 RESOURCES += configgadget.qrc

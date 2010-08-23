@@ -353,8 +353,8 @@ int main()
       /***************** SIMPLE ATTITUDE FROM NORTH AND ACCEL ************/
       /* Very simple computation of the heading and attitude from accel. */
       rpy[2] = atan2((mag_data.raw.axis[0]), (-1 * mag_data.raw.axis[1])) * 180 / M_PI;
-      rpy[1] = -atan2(accel_data.filtered.x, accel_data.filtered.z) * 180 / M_PI;
-      rpy[0] = -atan2(accel_data.filtered.y,accel_data.filtered.z) * 180 / M_PI;
+      rpy[1] = atan2(accel_data.filtered.x, accel_data.filtered.z) * 180 / M_PI;
+      rpy[0] = atan2(accel_data.filtered.y,accel_data.filtered.z) * 180 / M_PI;
       
       RPY2Quaternion(rpy,q);
       attitude_data.quaternion.q1 = q[0];

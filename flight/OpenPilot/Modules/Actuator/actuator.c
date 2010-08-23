@@ -223,8 +223,31 @@ static int32_t mixerFixedWing(const ActuatorSettingsData* settings, const Actuat
  */
 static int32_t mixerFixedWingElevon(const ActuatorSettingsData* settings, const ActuatorDesiredData* desired, ActuatorCommandData* cmd)
 {
-	// TODO: Implement elevon mixer
-	return -1;
+	// Check settings
+	if ( settings->FixedWingRoll1 == ACTUATORSETTINGS_FIXEDWINGROLL1_NONE ||
+      settings->FixedWingRoll2 == ACTUATORSETTINGS_FIXEDWINGROLL2_NONE ||
+      settings->FixedWingThrottle == ACTUATORSETTINGS_FIXEDWINGTHROTTLE_NONE )
+	{
+		return -1;
+	}
+  
+	// Set first elevon servo command
+	cmd->Channel[ settings->FixedWingRoll1 ] = scaleChannel(desired->Pitch + desired->Roll, settings->ChannelMax[ settings->FixedWingRoll1 ],
+                                                           settings->ChannelMin[ settings->FixedWingRoll1 ],
+                                                           settings->ChannelNeutral[ settings->FixedWingRoll1 ]);
+
+  // Set second elevon servo command
+  cmd->Channel[ settings->FixedWingRoll2 ] = scaleChannel(desired->Pitch - desired->Roll, settings->ChannelMax[ settings->FixedWingRoll2 ],
+                                                             settings->ChannelMin[ settings->FixedWingRoll2 ],
+                                                             settings->ChannelNeutral[ settings->FixedWingRoll2 ]);
+  
+	// Set throttle servo command
+	cmd->Channel[ settings->FixedWingThrottle ] = scaleChannel(desired->Throttle, settings->ChannelMax[ settings->FixedWingThrottle ],
+                                                             settings->ChannelMin[ settings->FixedWingThrottle ],
+                                                             settings->ChannelNeutral[ settings->FixedWingThrottle ]);
+  
+	// Done
+	return 0;
 }
 
 /**
@@ -252,6 +275,10 @@ static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutr
 	{
 		valueScaled = (int16_t)(value*((float)(neutral-min))) + neutral;
 	}
+  
+  if( valueScaled > max ) valueScaled = max;
+  if( valueScaled < min ) valueScaled = min;
+  
 	return valueScaled;
 }
 

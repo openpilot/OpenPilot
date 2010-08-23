@@ -110,14 +110,14 @@ bool QextSerialEnumerator::getServiceDetailsOSX( io_object_t service, QextPortIn
 
     io_string_t ioPathName;
     IORegistryEntryGetPath( service, kIOServicePlane, ioPathName );
-    portInfo->physName = ioPathName;
+    portInfo->portName = ioPathName;
 
     if( bsdPathAsCFString )
     {
         char path[MAXPATHLEN];
         if( CFStringGetCString((CFStringRef)bsdPathAsCFString, path,
                                PATH_MAX, kCFStringEncodingUTF8) )
-            portInfo->portName = path;
+            portInfo->physName = path;
         CFRelease(bsdPathAsCFString);
     }
 

@@ -34,11 +34,11 @@
 #include "actuatordesired.h"
 #include "actuatorsettings.h"
 #include "ahrscalibration.h"
+#include "ahrssettings.h"
 #include "ahrsstatus.h"
 #include "attitudeactual.h"
 #include "attitudedesired.h"
 #include "attituderaw.h"
-#include "attitudesettings.h"
 #include "baroaltitude.h"
 #include "exampleobject1.h"
 #include "exampleobject2.h"
@@ -72,11 +72,11 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new ActuatorDesired() );
     objMngr->registerObject( new ActuatorSettings() );
     objMngr->registerObject( new AHRSCalibration() );
+    objMngr->registerObject( new AHRSSettings() );
     objMngr->registerObject( new AhrsStatus() );
     objMngr->registerObject( new AttitudeActual() );
     objMngr->registerObject( new AttitudeDesired() );
     objMngr->registerObject( new AttitudeRaw() );
-    objMngr->registerObject( new AttitudeSettings() );
     objMngr->registerObject( new BaroAltitude() );
     objMngr->registerObject( new ExampleObject1() );
     objMngr->registerObject( new ExampleObject2() );

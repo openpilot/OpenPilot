@@ -52,7 +52,7 @@
 
 #include "ahrs_comms.h"
 #include "attitudeactual.h"
-#include "attitudesettings.h"
+#include "ahrssettings.h"
 #include "attituderaw.h"
 #include "ahrsstatus.h"
 #include "alarms.h"
@@ -85,6 +85,12 @@ static void update_attitude_raw(struct opahrs_msg_v1_rsp_attituderaw * attituder
 static void update_ahrs_status(struct opahrs_msg_v1_rsp_serial * serial);
 static void update_calibration(struct opahrs_msg_v1_rsp_calibration * calibration);
 static void process_update(struct opahrs_msg_v1_rsp_update * update); // main information parser
+
+static bool AHRSSettingsIsUpdatedFlag = false;
+static void AHRSSettingsUpdatedCb(UAVObjEvent * ev)
+{
+  AHRSSettingsIsUpdatedFlag = true;
+}
 
 static bool BaroAltitudeIsUpdatedFlag = false;
 static void BaroAltitudeUpdatedCb(UAVObjEvent * ev)
@@ -120,6 +126,7 @@ static void AHRSCalibrationUpdatedCb(UAVObjEvent * ev)
  */
 int32_t AHRSCommsInitialize(void)
 {
+  AHRSSettingsConnectCallback(AHRSSettingsUpdatedCb);
   BaroAltitudeConnectCallback(BaroAltitudeUpdatedCb);
   PositionActualConnectCallback(GPSPositionUpdatedCb);
   HomeLocationConnectCallback(HomeLocationUpdatedCb);
@@ -134,7 +141,7 @@ int32_t AHRSCommsInitialize(void)
 }
 
 static   uint16_t update_errors = 0, attituderaw_errors = 0,
-  home_errors = 0, calibration_errors;
+  home_errors = 0, calibration_errors = 0, algorithm_errors = 0;
 
 /**
  * Module thread, should not return.
@@ -154,6 +161,7 @@ static void ahrscommsTask(void* parameters)
     AhrsStatusGet(&data);
     data.HomeSet = AHRSSTATUS_HOMESET_FALSE;
     data.CalibrationSet = AHRSSTATUS_CALIBRATIONSET_FALSE;
+    data.AlgorithmSet = AHRSSTATUS_CALIBRATIONSET_FALSE;
     AhrsStatusSet(&data);
     
     /* Spin here until we're in sync */
@@ -175,52 +183,10 @@ static void ahrscommsTask(void* parameters)
 
     /* We're in sync with the AHRS, spin here until an error occurs */
     while (1) {
-      AttitudeSettingsData settings;
+      AHRSSettingsData settings;
 
       /* Update settings with latest value */
-      AttitudeSettingsGet(&settings);
-  
-      // If settings indicate, grab the raw and filtered data instead of estimate
-      if (settings.UpdateRaw)
-      {
-        if( (result = PIOS_OPAHRS_GetAttitudeRaw(&rsp)) == OPAHRS_RESULT_OK) {
-          update_attitude_raw(&(rsp.payload.user.v.rsp.attituderaw));
-        } else {
-          /* Comms error */
-          attituderaw_errors++;
-          break;
-        }
-        continue;
-      }
-
-      // Otherwise do standard technique
-      struct opahrs_msg_v1 req;
-      struct opahrs_msg_v1 rsp;
-      
-      // Load barometer if updated
-      if (BaroAltitudeIsUpdatedFlag)       
-        load_baro_altitude(&(req.payload.user.v.req.update));
-      else 
-        req.payload.user.v.req.update.barometer.updated = 0;
-
-      // Load GPS if updated
-      if (GPSPositionIsUpdatedFlag) 
-        load_gps_position(&(req.payload.user.v.req.update));
-      else 
-        req.payload.user.v.req.update.gps.updated = 0;
-
-      // Transfer packet and process returned attitude
-      if ((result = PIOS_OPAHRS_SetGetUpdate(&req,&rsp)) == OPAHRS_RESULT_OK) {
-        if (req.payload.user.v.req.update.barometer.updated) 
-          BaroAltitudeIsUpdatedFlag = false;
-        if (req.payload.user.v.req.update.gps.updated)
-          GPSPositionIsUpdatedFlag = false;        
-        process_update(&(rsp.payload.user.v.rsp.update));
-      } else {
-        /* Comms error */
-        update_errors++;
-        break;
-      }
+      AHRSSettingsGet(&settings);
 
       // Update home coordinate if it hasn't been updated
       AhrsStatusGet(&data);
@@ -253,7 +219,7 @@ static void ahrscommsTask(void* parameters)
           AHRSCalibrationIsUpdatedFlag = false;
           data.CalibrationSet = AHRSSTATUS_CALIBRATIONSET_TRUE;
           AhrsStatusSet(&data);
-
+          
         } else {
           /* Comms error */
           data.CalibrationSet = AHRSSTATUS_CALIBRATIONSET_FALSE;
@@ -262,7 +228,72 @@ static void ahrscommsTask(void* parameters)
           break;
         }
       }
+            
+      // Update algorithm
+      if (AHRSSettingsIsUpdatedFlag || (data.AlgorithmSet == AHRSSTATUS_ALGORITHMSET_FALSE)) 
+      {
+        struct opahrs_msg_v1 req;
+        
+        req.payload.user.v.req.algorithm.algorithm = settings.Algorithm;
+
+        if(( result = PIOS_OPAHRS_SetAlgorithm(&req) ) == OPAHRS_RESULT_OK ) {
+          data.AlgorithmSet = AHRSSTATUS_ALGORITHMSET_TRUE;
+          AhrsStatusSet(&data);          
+        } else {
+          /* Comms error */
+          data.AlgorithmSet = AHRSSTATUS_ALGORITHMSET_FALSE;
+          AhrsStatusSet(&data);
+          algorithm_errors++;
+          break;
+        }
+      }
       
+      
+
+      // If settings indicate, grab the raw and filtered data instead of estimate
+      if (settings.UpdateRaw)
+      {
+        if( (result = PIOS_OPAHRS_GetAttitudeRaw(&rsp)) == OPAHRS_RESULT_OK) {
+          update_attitude_raw(&(rsp.payload.user.v.rsp.attituderaw));
+        } else {
+          /* Comms error */
+          attituderaw_errors++;
+          break;
+        }
+      }
+
+      if (settings.UpdateFiltered)
+      {
+        // Otherwise do standard technique
+        struct opahrs_msg_v1 req;
+        struct opahrs_msg_v1 rsp;
+        
+        // Load barometer if updated
+        if (BaroAltitudeIsUpdatedFlag)       
+          load_baro_altitude(&(req.payload.user.v.req.update));
+        else 
+          req.payload.user.v.req.update.barometer.updated = 0;
+
+        // Load GPS if updated
+        if (GPSPositionIsUpdatedFlag) 
+          load_gps_position(&(req.payload.user.v.req.update));
+        else 
+          req.payload.user.v.req.update.gps.updated = 0;
+
+        // Transfer packet and process returned attitude
+        if ((result = PIOS_OPAHRS_SetGetUpdate(&req,&rsp)) == OPAHRS_RESULT_OK) {
+          if (req.payload.user.v.req.update.barometer.updated) 
+            BaroAltitudeIsUpdatedFlag = false;
+          if (req.payload.user.v.req.update.gps.updated)
+            GPSPositionIsUpdatedFlag = false;        
+          process_update(&(rsp.payload.user.v.rsp.update));
+        } else {
+          /* Comms error */
+          update_errors++;
+          break;
+        }
+      }
+
       /* Wait for the next update interval */
       vTaskDelay( settings.UpdatePeriod / portTICK_RATE_MS );
     }
@@ -459,6 +490,7 @@ static void update_ahrs_status(struct opahrs_msg_v1_rsp_serial * serial)
   data.CommErrors[AHRSSTATUS_COMMERRORS_ATTITUDERAW] = attituderaw_errors;
   data.CommErrors[AHRSSTATUS_COMMERRORS_HOMELOCATION] = home_errors;
   data.CommErrors[AHRSSTATUS_COMMERRORS_CALIBRATION] = calibration_errors;
+  data.CommErrors[AHRSSTATUS_COMMERRORS_ALGORITHM] = algorithm_errors;
 
   AhrsStatusSet(&data);
 }

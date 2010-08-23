@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       attitudesettings.cpp
+ * @file       ahrssettings.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
  * @addtogroup GCSPlugins GCS Plugins
@@ -9,7 +9,7 @@
  * @addtogroup UAVObjectsPlugin UAVObjects Plugin
  * @{
  *   
- * @note       Object definition file: attitudesettings.xml. 
+ * @note       Object definition file: ahrssettings.xml. 
  *             This is an automatically generated file.
  *             DO NOT modify manually.
  *
@@ -30,15 +30,15 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include "attitudesettings.h"
+#include "ahrssettings.h"
 #include "uavobjectfield.h"
 
-const QString AttitudeSettings::NAME = QString("AttitudeSettings");
+const QString AHRSSettings::NAME = QString("AHRSSettings");
 
 /**
  * Constructor
  */
-AttitudeSettings::AttitudeSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
+AHRSSettings::AHRSSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
 {
     // Create fields
     QList<UAVObjectField*> fields;
@@ -53,6 +53,12 @@ AttitudeSettings::AttitudeSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTI
     UpdateRawEnumOptions.append("FALSE");
     UpdateRawEnumOptions.append("TRUE");
     fields.append( new UAVObjectField(QString("UpdateRaw"), QString("raw"), UAVObjectField::ENUM, UpdateRawElemNames, UpdateRawEnumOptions) );
+    QStringList UpdateFilteredElemNames;
+    UpdateFilteredElemNames.append("0");
+    QStringList UpdateFilteredEnumOptions;
+    UpdateFilteredEnumOptions.append("FALSE");
+    UpdateFilteredEnumOptions.append("TRUE");
+    fields.append( new UAVObjectField(QString("UpdateFiltered"), QString("raw"), UAVObjectField::ENUM, UpdateFilteredElemNames, UpdateFilteredEnumOptions) );
     QStringList UpdatePeriodElemNames;
     UpdatePeriodElemNames.append("0");
     fields.append( new UAVObjectField(QString("UpdatePeriod"), QString("ms"), UAVObjectField::INT32, UpdatePeriodElemNames, QStringList()) );
@@ -66,7 +72,7 @@ AttitudeSettings::AttitudeSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTI
 /**
  * Get the default metadata for this object
  */
-UAVObject::Metadata AttitudeSettings::getDefaultMetadata()
+UAVObject::Metadata AHRSSettings::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
     metadata.flightAccess = ACCESS_READWRITE;
@@ -87,18 +93,19 @@ UAVObject::Metadata AttitudeSettings::getDefaultMetadata()
  * If a default value is not specified the object fields
  * will be initialized to zero.
  */
-void AttitudeSettings::setDefaultFieldValues()
+void AHRSSettings::setDefaultFieldValues()
 {
     data.Algorithm = 0;
     data.UpdateRaw = 0;
-    data.UpdatePeriod = 500;
+    data.UpdateFiltered = 1;
+    data.UpdatePeriod = 20;
 
 }
 
 /**
  * Get the object data fields
  */
-AttitudeSettings::DataFields AttitudeSettings::getData()
+AHRSSettings::DataFields AHRSSettings::getData()
 {
     QMutexLocker locker(mutex);
     return data;
@@ -107,7 +114,7 @@ AttitudeSettings::DataFields AttitudeSettings::getData()
 /**
  * Set the object data fields
  */
-void AttitudeSettings::setData(const DataFields& data)
+void AHRSSettings::setData(const DataFields& data)
 {
     QMutexLocker locker(mutex);
     // Get metadata
@@ -126,9 +133,9 @@ void AttitudeSettings::setData(const DataFields& data)
  * Do not use this function directly to create new instances, the
  * UAVObjectManager should be used instead.
  */
-UAVDataObject* AttitudeSettings::clone(quint32 instID)
+UAVDataObject* AHRSSettings::clone(quint32 instID)
 {
-    AttitudeSettings* obj = new AttitudeSettings();
+    AHRSSettings* obj = new AHRSSettings();
     obj->initialize(instID, this->getMetaObject());
     return obj;
 }
@@ -136,7 +143,7 @@ UAVDataObject* AttitudeSettings::clone(quint32 instID)
 /**
  * Static function to retrieve an instance of the object.
  */
-AttitudeSettings* AttitudeSettings::GetInstance(UAVObjectManager* objMngr, quint32 instID)
+AHRSSettings* AHRSSettings::GetInstance(UAVObjectManager* objMngr, quint32 instID)
 {
-    return dynamic_cast<AttitudeSettings*>(objMngr->getObject(AttitudeSettings::OBJID, instID));
+    return dynamic_cast<AHRSSettings*>(objMngr->getObject(AHRSSettings::OBJID, instID));
 }

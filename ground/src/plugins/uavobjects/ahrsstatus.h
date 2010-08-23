@@ -44,9 +44,10 @@ public:
     // Field structure
     typedef struct {
         quint8 SerialNumber[25];
-        quint8 CommErrors[4];
-        quint8 HomeSet;
+        quint8 CommErrors[5];
+        quint8 AlgorithmSet;
         quint8 CalibrationSet;
+        quint8 HomeSet;
 
     } __attribute__((packed)) DataFields;
 
@@ -56,19 +57,22 @@ public:
     static const quint32 SERIALNUMBER_NUMELEM = 25;
     // Field CommErrors information
     /* Array element names for field CommErrors */
-    typedef enum { COMMERRORS_UPDATE=0, COMMERRORS_ATTITUDERAW=1, COMMERRORS_HOMELOCATION=2, COMMERRORS_CALIBRATION=3 } CommErrorsElem;
+    typedef enum { COMMERRORS_ALGORITHM=0, COMMERRORS_UPDATE=1, COMMERRORS_ATTITUDERAW=2, COMMERRORS_HOMELOCATION=3, COMMERRORS_CALIBRATION=4 } CommErrorsElem;
     /* Number of elements for field CommErrors */
-    static const quint32 COMMERRORS_NUMELEM = 4;
-    // Field HomeSet information
-    /* Enumeration options for field HomeSet */
-    typedef enum { HOMESET_FALSE=0, HOMESET_TRUE=1 } HomeSetOptions;
+    static const quint32 COMMERRORS_NUMELEM = 5;
+    // Field AlgorithmSet information
+    /* Enumeration options for field AlgorithmSet */
+    typedef enum { ALGORITHMSET_FALSE=0, ALGORITHMSET_TRUE=1 } AlgorithmSetOptions;
     // Field CalibrationSet information
     /* Enumeration options for field CalibrationSet */
     typedef enum { CALIBRATIONSET_FALSE=0, CALIBRATIONSET_TRUE=1 } CalibrationSetOptions;
+    // Field HomeSet information
+    /* Enumeration options for field HomeSet */
+    typedef enum { HOMESET_FALSE=0, HOMESET_TRUE=1 } HomeSetOptions;
 
   
     // Constants
-    static const quint32 OBJID = 1048419880U;
+    static const quint32 OBJID = 842145078U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

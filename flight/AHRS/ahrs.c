@@ -46,7 +46,7 @@
  * @arg AHRS_PROCESSING - Performing update on the available data
  */
 enum {AHRS_IDLE, AHRS_DATA_READY, AHRS_PROCESSING} ahrs_state;
-enum {SIMPLE_Algo, INSGPS_Algo} ahrs_algorithm;
+enum algorithms ahrs_algorithm;
 
 /**
  * @addtogroup AHRS_ADC_Configuration ADC Configuration
@@ -642,6 +642,12 @@ void process_spi_request(void)
       opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_SERIAL);
       PIOS_SYS_SerialNumberGet((char *)&(user_tx_v1.payload.user.v.rsp.serial.serial_bcd));
       dump_spi_message(PIOS_COM_AUX, "I", (uint8_t *)&user_tx_v1, sizeof(user_tx_v1));
+      lfsm_user_set_tx_v1 (&user_tx_v1);
+      break;
+    case OPAHRS_MSG_V1_REQ_ALGORITHM:
+      opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_ALGORITHM);
+      ahrs_algorithm = user_rx_v1.payload.user.v.req.algorithm.algorithm;
+      dump_spi_message(PIOS_COM_AUX, "A", (uint8_t *)&user_rx_v1, sizeof(user_rx_v1));
       lfsm_user_set_tx_v1 (&user_tx_v1);
       break;
     case OPAHRS_MSG_V1_REQ_NORTH:

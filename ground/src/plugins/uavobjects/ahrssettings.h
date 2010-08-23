@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       attitudesettings.h
+ * @file       ahrssettings.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
  * @addtogroup GCSPlugins GCS Plugins
@@ -9,7 +9,7 @@
  * @addtogroup UAVObjectsPlugin UAVObjects Plugin
  * @{
  *   
- * @note       Object definition file: attitudesettings.xml. 
+ * @note       Object definition file: ahrssettings.xml. 
  *             This is an automatically generated file.
  *             DO NOT modify manually.
  *
@@ -30,13 +30,13 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef ATTITUDESETTINGS_H
-#define ATTITUDESETTINGS_H
+#ifndef AHRSSETTINGS_H
+#define AHRSSETTINGS_H
 
 #include "uavdataobject.h"
 #include "uavobjectmanager.h"
 
-class UAVOBJECTS_EXPORT AttitudeSettings: public UAVDataObject
+class UAVOBJECTS_EXPORT AHRSSettings: public UAVDataObject
 {
     Q_OBJECT
 
@@ -45,6 +45,7 @@ public:
     typedef struct {
         quint8 Algorithm;
         quint8 UpdateRaw;
+        quint8 UpdateFiltered;
         qint32 UpdatePeriod;
 
     } __attribute__((packed)) DataFields;
@@ -56,25 +57,28 @@ public:
     // Field UpdateRaw information
     /* Enumeration options for field UpdateRaw */
     typedef enum { UPDATERAW_FALSE=0, UPDATERAW_TRUE=1 } UpdateRawOptions;
+    // Field UpdateFiltered information
+    /* Enumeration options for field UpdateFiltered */
+    typedef enum { UPDATEFILTERED_FALSE=0, UPDATEFILTERED_TRUE=1 } UpdateFilteredOptions;
     // Field UpdatePeriod information
 
   
     // Constants
-    static const quint32 OBJID = 2356162226U;
+    static const quint32 OBJID = 1565605328U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;
     static const quint32 NUMBYTES = sizeof(DataFields);
 
     // Functions
-    AttitudeSettings();
+    AHRSSettings();
 
     DataFields getData();
     void setData(const DataFields& data);
     Metadata getDefaultMetadata();
     UAVDataObject* clone(quint32 instID);
 
-    static AttitudeSettings* GetInstance(UAVObjectManager* objMngr, quint32 instID = 0);
+    static AHRSSettings* GetInstance(UAVObjectManager* objMngr, quint32 instID = 0);
 	
 private:
     DataFields data;
@@ -83,4 +87,4 @@ private:
 
 };
 
-#endif // ATTITUDESETTINGS_H
+#endif // AHRSSETTINGS_H

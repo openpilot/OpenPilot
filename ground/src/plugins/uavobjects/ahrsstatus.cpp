@@ -70,23 +70,30 @@ AhrsStatus::AhrsStatus(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
     SerialNumberElemNames.append("24");
     fields.append( new UAVObjectField(QString("SerialNumber"), QString("n/a"), UAVObjectField::UINT8, SerialNumberElemNames, QStringList()) );
     QStringList CommErrorsElemNames;
+    CommErrorsElemNames.append("Algorithm");
     CommErrorsElemNames.append("Update");
     CommErrorsElemNames.append("AttitudeRaw");
     CommErrorsElemNames.append("HomeLocation");
     CommErrorsElemNames.append("Calibration");
     fields.append( new UAVObjectField(QString("CommErrors"), QString("count"), UAVObjectField::UINT8, CommErrorsElemNames, QStringList()) );
-    QStringList HomeSetElemNames;
-    HomeSetElemNames.append("0");
-    QStringList HomeSetEnumOptions;
-    HomeSetEnumOptions.append("FALSE");
-    HomeSetEnumOptions.append("TRUE");
-    fields.append( new UAVObjectField(QString("HomeSet"), QString(""), UAVObjectField::ENUM, HomeSetElemNames, HomeSetEnumOptions) );
+    QStringList AlgorithmSetElemNames;
+    AlgorithmSetElemNames.append("0");
+    QStringList AlgorithmSetEnumOptions;
+    AlgorithmSetEnumOptions.append("FALSE");
+    AlgorithmSetEnumOptions.append("TRUE");
+    fields.append( new UAVObjectField(QString("AlgorithmSet"), QString(""), UAVObjectField::ENUM, AlgorithmSetElemNames, AlgorithmSetEnumOptions) );
     QStringList CalibrationSetElemNames;
     CalibrationSetElemNames.append("0");
     QStringList CalibrationSetEnumOptions;
     CalibrationSetEnumOptions.append("FALSE");
     CalibrationSetEnumOptions.append("TRUE");
     fields.append( new UAVObjectField(QString("CalibrationSet"), QString(""), UAVObjectField::ENUM, CalibrationSetElemNames, CalibrationSetEnumOptions) );
+    QStringList HomeSetElemNames;
+    HomeSetElemNames.append("0");
+    QStringList HomeSetEnumOptions;
+    HomeSetEnumOptions.append("FALSE");
+    HomeSetEnumOptions.append("TRUE");
+    fields.append( new UAVObjectField(QString("HomeSet"), QString(""), UAVObjectField::ENUM, HomeSetElemNames, HomeSetEnumOptions) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

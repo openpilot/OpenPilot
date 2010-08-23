@@ -16,7 +16,7 @@ HEADERS += uavobjects_global.h \
     ahrscalibration.h \
     baroaltitude.h \
     attitudeactual.h \
-    attitudesettings.h \
+    ahrssettings.h \
     exampleobject2.h \
     exampleobject1.h \
     gcstelemetrystats.h \
@@ -52,7 +52,7 @@ SOURCES += uavobject.cpp \
     ahrscalibration.cpp \
     baroaltitude.cpp \
     attitudeactual.cpp \
-    attitudesettings.cpp \
+    ahrssettings.cpp \
     examplesettings.cpp \
     exampleobject2.cpp \
     exampleobject1.cpp \

@@ -74,8 +74,9 @@ _fields = [ \
 	uavobject.UAVObjectField(
 		'CommErrors',
 		'B',
-		4,
+		5,
 		[
+			'Algorithm',
 			'Update',
 			'AttitudeRaw',
 			'HomeLocation',
@@ -85,7 +86,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'HomeSet',
+		'AlgorithmSet',
 		'b',
 		1,
 		[
@@ -108,12 +109,24 @@ _fields = [ \
 			'1' : 'TRUE',
 		}
 	),
+	uavobject.UAVObjectField(
+		'HomeSet',
+		'b',
+		1,
+		[
+			'0',
+		],
+		{
+			'0' : 'FALSE',
+			'1' : 'TRUE',
+		}
+	),
 ]
 
 
 class AhrsStatus(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 1048419880
+    OBJID        = 842145078
     NAME         = "AhrsStatus"
     METANAME     = "AhrsStatusMeta"
     ISSINGLEINST = 1

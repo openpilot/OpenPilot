@@ -43,6 +43,7 @@ extern enum opahrs_result PIOS_OPAHRS_Sync(struct opahrs_msg_v1 *rsp);
 extern enum opahrs_result PIOS_OPAHRS_GetSerial(struct opahrs_msg_v1 *rsp);
 extern enum opahrs_result PIOS_OPAHRS_SetGetUpdate(struct opahrs_msg_v1 *rsp, struct opahrs_msg_v1 *req);
 extern enum opahrs_result PIOS_OPAHRS_GetAttitudeRaw(struct opahrs_msg_v1 *rsp);
+extern enum opahrs_result PIOS_OPAHRS_SetAlgorithm(struct opahrs_msg_v1 *req);
 extern enum opahrs_result PIOS_OPAHRS_SetMagNorth(struct opahrs_msg_v1 *req);
 extern enum opahrs_result PIOS_OPAHRS_SetGetCalibration(struct opahrs_msg_v1 *req, struct opahrs_msg_v1 *rsp);
 extern enum opahrs_result PIOS_OPAHRS_resync(void);

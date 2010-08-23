@@ -188,6 +188,12 @@ struct opahrs_msg_v1_req_north {
   float Be[3];
 } __attribute__((__packed__));
 
+enum algorithms {SIMPLE_Algo, INSGPS_Algo};
+
+struct opahrs_msg_v1_req_algorithm {
+  enum algorithms algorithm;
+} __attribute__((__packed__));
+
 struct opahrs_msg_v1_req_update {
   struct {
     uint8_t updated;
@@ -223,6 +229,7 @@ union opahrs_msg_v1_req {
   struct opahrs_msg_v1_req_reset        reset;
   struct opahrs_msg_v1_req_serial       serial;
   struct opahrs_msg_v1_req_update       update;
+  struct opahrs_msg_v1_req_algorithm    algorithm;
   struct opahrs_msg_v1_req_north        north;
   struct opahrs_msg_v1_req_attituderaw  attituderaw;
   struct opahrs_msg_v1_req_calibration  calibration;
@@ -242,6 +249,9 @@ struct opahrs_msg_v1_rsp_serial {
 } __attribute__((__packed__));
 
 struct opahrs_msg_v1_rsp_north {
+} __attribute__((__packed__));
+
+struct opahrs_msg_v1_rsp_algorithm {
 } __attribute__((__packed__));
 
 struct opahrs_msg_v1_rsp_attituderaw {
@@ -297,6 +307,7 @@ union opahrs_msg_v1_rsp {
   struct opahrs_msg_v1_rsp_sync         sync;
   struct opahrs_msg_v1_rsp_serial       serial;
   struct opahrs_msg_v1_rsp_north        north;
+  struct opahrs_msg_v1_rsp_algorithm    algorithm;
   struct opahrs_msg_v1_rsp_attituderaw  attituderaw;
   struct opahrs_msg_v1_rsp_update       update;
   struct opahrs_msg_v1_rsp_calibration  calibration;
@@ -308,6 +319,7 @@ enum opahrs_msg_v1_tag {
   OPAHRS_MSG_V1_REQ_RESET,
   OPAHRS_MSG_V1_REQ_SERIAL,
   OPAHRS_MSG_V1_REQ_NORTH,
+  OPAHRS_MSG_V1_REQ_ALGORITHM,
   OPAHRS_MSG_V1_REQ_UPDATE,
   OPAHRS_MSG_V1_REQ_ATTITUDERAW,
   OPAHRS_MSG_V1_REQ_CALIBRATION,
@@ -315,6 +327,7 @@ enum opahrs_msg_v1_tag {
   OPAHRS_MSG_V1_RSP_SYNC,
   OPAHRS_MSG_V1_RSP_SERIAL,
   OPAHRS_MSG_V1_RSP_NORTH,
+  OPAHRS_MSG_V1_RSP_ALGORITHM,
   OPAHRS_MSG_V1_RSP_UPDATE,
   OPAHRS_MSG_V1_RSP_ATTITUDERAW,
   OPAHRS_MSG_V1_RSP_CALIBRATION,

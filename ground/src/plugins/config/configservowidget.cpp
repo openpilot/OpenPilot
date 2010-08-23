@@ -126,6 +126,13 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     // Now connect the channel out sliders to our signal to send updates in test mode
     connect(m_config->ch0OutSlider, SIGNAL(valueChanged(int)), this, SLOT(sendChannelTest(int)));
+    connect(m_config->ch1OutSlider, SIGNAL(valueChanged(int)), this, SLOT(sendChannelTest(int)));
+    connect(m_config->ch2OutSlider, SIGNAL(valueChanged(int)), this, SLOT(sendChannelTest(int)));
+    connect(m_config->ch3OutSlider, SIGNAL(valueChanged(int)), this, SLOT(sendChannelTest(int)));
+    connect(m_config->ch4OutSlider, SIGNAL(valueChanged(int)), this, SLOT(sendChannelTest(int)));
+    connect(m_config->ch5OutSlider, SIGNAL(valueChanged(int)), this, SLOT(sendChannelTest(int)));
+    connect(m_config->ch6OutSlider, SIGNAL(valueChanged(int)), this, SLOT(sendChannelTest(int)));
+    connect(m_config->ch7OutSlider, SIGNAL(valueChanged(int)), this, SLOT(sendChannelTest(int)));
 
     firstUpdate = true;
 

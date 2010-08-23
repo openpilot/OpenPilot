@@ -1324,7 +1324,9 @@ p, li { white-space: pre-wrap; }
       </rect>
      </property>
      <property name="toolTip">
-      <string>If checked, moving the sliders below with also move the servos directly. Take extra care if the output is connected to an motor controller!</string>
+      <string>Move the servos using the sliders. Two important things:
+- Take extra care if the output is connected to an motor controller!
+- Will only work if the RC receiver is working (failsafe)</string>
      </property>
      <property name="text">
       <string>Test outputs</string>

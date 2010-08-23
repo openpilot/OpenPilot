@@ -27,35 +27,36 @@ namespace jafar {
     class VariableSizeLinearLeastSquares2 {
 
     private:
-
+			///model size
       std::size_t m_modelSize;
+			///size of data size
+			std::size_t m_dataSetSize;
+			///number of entries present in the system
       int m_countValues;
-
       /// design matrix
       jblas::mat_column_major m_A;
-
       /// rhs vector
       jblas::vec m_b;
-
       /// least squares solution
       jblas::vec m_x;
-
       /// least squares solution covariance
       jblas::sym_mat m_xCov;
 
     public:
       
 			VariableSizeLinearLeastSquares2(size_t _modelSize);
-      std::size_t modelSize() const {return m_modelSize;}
+			VariableSizeLinearLeastSquares2(size_t _modelSize, size_t _dataSetSize);
+      inline std::size_t modelSize() const { return m_modelSize; }
+			inline std::size_t dataSetSize() const { return m_dataSetSize; } 
 
-      jblas::mat_column_major const& A() const {return m_A;}
-      jblas::mat_column_major& A() {return m_A;}
+      inline jblas::mat_column_major const& A() const {return m_A;}
+      inline jblas::mat_column_major& A() {return m_A;}
 
-      jblas::vec const& b() const {return m_b;}
-      jblas::vec& b() {return m_b;}
+      inline jblas::vec const& b() const {return m_b;}
+      inline jblas::vec& b() {return m_b;}
 
-      jblas::vec const& x() const {return m_x;}
-      jblas::sym_mat const& xCov() const {return m_xCov;}
+      inline jblas::vec const& x() const {return m_x;}
+      inline jblas::sym_mat const& xCov() const {return m_xCov;}
 
       void setSize(std::size_t sizeModel, std::size_t sizeDataSet);
       void setDataSetSize(std::size_t sizeDataSet);

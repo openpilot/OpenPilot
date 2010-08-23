@@ -22,7 +22,8 @@ namespace jafar {
        * Jmath.
        */
       enum ExceptionId {
-	LAPACK_ERROR /**< Error reported by a lapack routine */
+				LAPACK_ERROR, /**< Error reported by a lapack routine */
+				SYSTEM_FULL  /**< System is already full of data */
       };
 
       /** Constructor. You should not use this constructor directly,

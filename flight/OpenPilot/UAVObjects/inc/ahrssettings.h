@@ -67,7 +67,7 @@ typedef struct {
 // Field information
 // Field Algorithm information
 /* Enumeration options for field Algorithm */
-typedef enum { AHRSSETTINGS_ALGORITHM_INSGPS=0 } AHRSSettingsAlgorithmOptions;
+typedef enum { AHRSSETTINGS_ALGORITHM_SIMPLE=0, AHRSSETTINGS_ALGORITHM_INSGPS=1 } AHRSSettingsAlgorithmOptions;
 // Field UpdateRaw information
 /* Enumeration options for field UpdateRaw */
 typedef enum { AHRSSETTINGS_UPDATERAW_FALSE=0, AHRSSETTINGS_UPDATERAW_TRUE=1 } AHRSSettingsUpdateRawOptions;

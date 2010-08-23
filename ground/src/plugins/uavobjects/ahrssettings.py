@@ -45,7 +45,8 @@ _fields = [ \
 			'0',
 		],
 		{
-			'0' : 'INSGPS',
+			'0' : 'SIMPLE',
+			'1' : 'INSGPS',
 		}
 	),
 	uavobject.UAVObjectField(

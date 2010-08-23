@@ -45,6 +45,7 @@ AHRSSettings::AHRSSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAM
     QStringList AlgorithmElemNames;
     AlgorithmElemNames.append("0");
     QStringList AlgorithmEnumOptions;
+    AlgorithmEnumOptions.append("SIMPLE");
     AlgorithmEnumOptions.append("INSGPS");
     fields.append( new UAVObjectField(QString("Algorithm"), QString(""), UAVObjectField::ENUM, AlgorithmElemNames, AlgorithmEnumOptions) );
     QStringList UpdateRawElemNames;
@@ -95,7 +96,7 @@ UAVObject::Metadata AHRSSettings::getDefaultMetadata()
  */
 void AHRSSettings::setDefaultFieldValues()
 {
-    data.Algorithm = 0;
+    data.Algorithm = 1;
     data.UpdateRaw = 0;
     data.UpdateFiltered = 1;
     data.UpdatePeriod = 20;

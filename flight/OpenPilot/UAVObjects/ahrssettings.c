@@ -73,7 +73,7 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	// Initialize object fields to their default values
 	UAVObjGetInstanceData(obj, instId, &data);
 	memset(&data, 0, sizeof(AHRSSettingsData));
-    data.Algorithm = 0;
+    data.Algorithm = 1;
     data.UpdateRaw = 0;
     data.UpdateFiltered = 1;
     data.UpdatePeriod = 20;

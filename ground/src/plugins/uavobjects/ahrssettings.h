@@ -53,7 +53,7 @@ public:
     // Field information
     // Field Algorithm information
     /* Enumeration options for field Algorithm */
-    typedef enum { ALGORITHM_INSGPS=0 } AlgorithmOptions;
+    typedef enum { ALGORITHM_SIMPLE=0, ALGORITHM_INSGPS=1 } AlgorithmOptions;
     // Field UpdateRaw information
     /* Enumeration options for field UpdateRaw */
     typedef enum { UPDATERAW_FALSE=0, UPDATERAW_TRUE=1 } UpdateRawOptions;

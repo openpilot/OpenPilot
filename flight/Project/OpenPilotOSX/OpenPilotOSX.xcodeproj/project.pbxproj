@@ -36,6 +36,7 @@
 		657CEEC2121DC054007A1FBE /* navigationdesired.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = navigationdesired.c; sourceTree = "<group>"; };
 		657CEEC3121DC054007A1FBE /* navigationsettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = navigationsettings.c; sourceTree = "<group>"; };
 		657CF024121F49CD007A1FBE /* WMMInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WMMInternal.h; sourceTree = "<group>"; };
+		659ED317122226B60011010E /* ahrssettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ahrssettings.xml; sourceTree = "<group>"; };
 		65B35D7F121C261E003EAD18 /* bin.pro */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bin.pro; sourceTree = "<group>"; };
 		65B35D80121C261E003EAD18 /* openpilotgcs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = openpilotgcs; sourceTree = "<group>"; };
 		65B35D81121C261E003EAD18 /* openpilotgcs.pri */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = openpilotgcs.pri; sourceTree = "<group>"; };
@@ -2551,7 +2552,6 @@
 		65B367E9121C2620003EAD18 /* attitudeactual.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = attitudeactual.xml; sourceTree = "<group>"; };
 		65B367EA121C2620003EAD18 /* attitudedesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = attitudedesired.xml; sourceTree = "<group>"; };
 		65B367EB121C2620003EAD18 /* attituderaw.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = attituderaw.xml; sourceTree = "<group>"; };
-		65B367EC121C2620003EAD18 /* attitudesettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = attitudesettings.xml; sourceTree = "<group>"; };
 		65B367ED121C2620003EAD18 /* exampleobject1.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = exampleobject1.xml; sourceTree = "<group>"; };
 		65B367EE121C2620003EAD18 /* exampleobject2.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = exampleobject2.xml; sourceTree = "<group>"; };
 		65B367EF121C2620003EAD18 /* examplesettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = examplesettings.xml; sourceTree = "<group>"; };
@@ -6669,6 +6669,7 @@
 			isa = PBXGroup;
 			children = (
 				655268BC121FBD2900410C6E /* ahrscalibration.xml */,
+				659ED317122226B60011010E /* ahrssettings.xml */,
 				65B367E7121C2620003EAD18 /* ahrsstatus.xml */,
 				65B367E4121C2620003EAD18 /* actuatorcommand.xml */,
 				65B367E5121C2620003EAD18 /* actuatordesired.xml */,
@@ -6676,7 +6677,6 @@
 				65B367E9121C2620003EAD18 /* attitudeactual.xml */,
 				65B367EA121C2620003EAD18 /* attitudedesired.xml */,
 				65B367EB121C2620003EAD18 /* attituderaw.xml */,
-				65B367EC121C2620003EAD18 /* attitudesettings.xml */,
 				65209A1812208B0600453371 /* baroaltitude.xml */,
 				65B367ED121C2620003EAD18 /* exampleobject1.xml */,
 				65B367EE121C2620003EAD18 /* exampleobject2.xml */,

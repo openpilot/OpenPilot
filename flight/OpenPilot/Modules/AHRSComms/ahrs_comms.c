@@ -234,7 +234,10 @@ static void ahrscommsTask(void* parameters)
       {
         struct opahrs_msg_v1 req;
         
-        req.payload.user.v.req.algorithm.algorithm = settings.Algorithm;
+        if(settings.Algorithm == AHRSSETTINGS_ALGORITHM_INSGPS)
+          req.payload.user.v.req.algorithm.algorithm = INSGPS_Algo;
+        if(settings.Algorithm == AHRSSETTINGS_ALGORITHM_SIMPLE)
+          req.payload.user.v.req.algorithm.algorithm = SIMPLE_Algo;
 
         if(( result = PIOS_OPAHRS_SetAlgorithm(&req) ) == OPAHRS_RESULT_OK ) {
           data.AlgorithmSet = AHRSSTATUS_ALGORITHMSET_TRUE;

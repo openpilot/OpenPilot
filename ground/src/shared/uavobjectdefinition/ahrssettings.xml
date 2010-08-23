@@ -1,6 +1,6 @@
 <xml>
 	<object name="AHRSSettings" singleinstance="true" settings="true">
-    <field name="Algorithm" units="" type="enum" elements="1" options="INSGPS" defaultvalue="INSGPS"/>
+    <field name="Algorithm" units="" type="enum" elements="1" options="SIMPLE,INSGPS" defaultvalue="INSGPS"/>
     <field name="UpdateRaw" units="raw" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
     <field name="UpdateFiltered" units="raw" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
 		<field name="UpdatePeriod" units="ms" type="int32" elements="1" defaultvalue="20"/>

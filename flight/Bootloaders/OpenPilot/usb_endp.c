@@ -27,14 +27,15 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-uint8_t Receive_Buffer[10];
-uint8_t Buffer[10];
+uint8_t Receive_Buffer[64];
+uint8_t Buffer[64];
 uint8_t Command=0;
 uint8_t EchoReqFlag=0;
 uint8_t EchoAnsFlag=0;
 uint8_t StartFlag=0;
 uint32_t Aditionals=0;
 uint32_t SizeOfTransfer=0;
+uint8_t SizeOfLastPacket=0;
 uint32_t Next_Packet=0;
 uint8_t TransferType;
 uint32_t Count=0;
@@ -43,7 +44,8 @@ uint8_t Data0;
 uint8_t Data1;
 uint8_t Data2;
 uint8_t Data3;
-
+uint8_t offset=0;
+uint32_t aux;
 //Download vars
 volatile uint32_t downPacketCurrent=0;
 uint32_t downPacketTotal=0;
@@ -74,7 +76,7 @@ void FLASH_Download() {
 		Buffer[7] = *FLASH_If_Read(MemLocations[downType] + 1+downPacketCurrent*4, 0);
 		Buffer[8] = *FLASH_If_Read(MemLocations[downType] + 2+downPacketCurrent*4, 0);
 		Buffer[9] = *FLASH_If_Read(MemLocations[downType] + 3+downPacketCurrent*4, 0);
-		USB_SIL_Write(EP1_IN, (uint8_t*) Buffer, 10);
+		USB_SIL_Write(EP1_IN, (uint8_t*) Buffer, 64);
 		downPacketCurrent=downPacketCurrent+1;
 		if(downPacketCurrent>downPacketTotal)
 		{
@@ -141,6 +143,7 @@ void EP1_OUT_Callback(void)
 			  SizeOfTransfer=Count;
 			  Next_Packet=1;
 			  DeviceState=uploading;
+			  SizeOfLastPacket=Data1;
 
 
 		  }
@@ -149,7 +152,21 @@ void EP1_OUT_Callback(void)
 			 // STM_EVAL_LEDOn(LED2);
 			  if(Count==Next_Packet-1)
 			  {
-				  FLASH_ProgramWord(MemLocations[TransferType]+Count*4,Data);
+				  uint8_t numberOfWords=14;
+				  if(Count==SizeOfTransfer)//is this the last packet?
+				  {
+					  numberOfWords=SizeOfLastPacket;
+				  }
+				  for(uint8_t x=0;x<numberOfWords;++x)
+				  {
+					  offset=4*x;
+					  Data=Receive_Buffer[6+offset]<<24;
+					  Data+=Receive_Buffer[7+offset]<<16;
+					  Data+=Receive_Buffer[8+offset]<<8;
+					  Data+=Receive_Buffer[9+offset];
+					  aux=MemLocations[TransferType]+(uint32_t)(Count*14*4+x*4);
+					  FLASH_ProgramWord(aux,Data);
+				  }
 				  ++Next_Packet;
 			  }
 			  else
@@ -236,7 +253,7 @@ void EP1_OUT_Callback(void)
 	  Buffer[8]=0;
 	  Buffer[9]=0;
 
-	  USB_SIL_Write(EP1_IN, (uint8_t*)Buffer,10);
+	  USB_SIL_Write(EP1_IN, (uint8_t*)Buffer,64);
 	  SetEPTxValid(ENDP1);
 	  if(DeviceState==Last_operation_Success)
 	  {

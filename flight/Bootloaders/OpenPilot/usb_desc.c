@@ -60,7 +60,7 @@ const uint8_t CustomHID_DeviceDescriptor[CUSTOMHID_SIZ_DEVICE_DESC] =
 /*   All Descriptors (Configuration, Interface, Endpoint, Class, Vendor */
 const uint8_t CustomHID_ConfigDescriptor[CUSTOMHID_SIZ_CONFIG_DESC] =
   {
-    0x09, /* bLength: Configuation Descriptor size */
+    0x09, /* bLength: Configuration Descriptor size */
     USB_CONFIGURATION_DESCRIPTOR_TYPE, /* bDescriptorType: Configuration */
     CUSTOMHID_SIZ_CONFIG_DESC,
     /* wTotalLength: Bytes returned */
@@ -131,16 +131,16 @@ const uint8_t CustomHID_ReportDescriptor[CUSTOMHID_SIZ_REPORT_DESC] =
     0x15, 0x00,            /*     LOGICAL_MINIMUM (0)        */          
     0x25, 0xff,            /*     LOGICAL_MAXIMUM (1)        */
     0x75, 0x08,            /*     REPORT_SIZE (8)            */        
-    0x95, 9,            /*     REPORT_COUNT (1)           */
+    0x95, 63,            /*     REPORT_COUNT (1)           */
     0x81, 0x83,             /*    FEATURE (Data,Var,Abs,Vol) */
-    
+
     /* Led 2 */
     0x85, 0x02,            /*     REPORT_ID 2		     */
     0x09, 0x03,            /*     USAGE (LED 2)	             */
     0x15, 0x00,            /*     LOGICAL_MINIMUM (0)        */          
     0x25, 0xff,            /*     LOGICAL_MAXIMUM (1)        */
     0x75, 0x08,            /*     REPORT_SIZE (8)            */        
-    0x95, 9,            /*     REPORT_COUNT (1)           */
+    0x95, 63,            /*     REPORT_COUNT (1)           */
     0x91, 0x82,             /*    FEATURE (Data,Var,Abs,Vol) */
 
 

@@ -33,6 +33,8 @@
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/uavobject.h"
 #include <QtGui/QWidget>
+#include <QtSvg/QSvgRenderer>
+#include <QtSvg/QGraphicsSvgItem>
 #include <QList>
 
 
@@ -46,8 +48,18 @@ public:
 
 private:
     Ui_AHRSWidget *m_ahrs;
+    QGraphicsSvgItem *ahrsbargraph;
+    QGraphicsSvgItem *accel_x;
+    QGraphicsSvgItem *accel_y;
+    QGraphicsSvgItem *accel_z;
 
 private slots:
+    void launchAHRSCalibration();
+    void calibPhase2();
+
+protected:
+   void showEvent(QShowEvent *event);
+
 
 };
 

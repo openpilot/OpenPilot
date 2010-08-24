@@ -3,5 +3,6 @@
         <file>images/XBee.svg</file>
         <file>images/Airframe.png</file>
         <file>images/Servo.png</file>
+        <file>images/ahrs-calib.svg</file>
     </qresource>
 </RCC>

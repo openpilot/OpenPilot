@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     //dfu.UploadDescription(1,"jose manuel");
     //QString str=dfu.DownloadDescription(1,12);
    // dfu.JumpToApp();
-   dfu.UploadFirmware("C:/OpenPilot.bin");
+  dfu.UploadFirmware("C:/OpenPilot.bin");
     //qDebug()<<"Description="<<str;
     return a.exec();
 }

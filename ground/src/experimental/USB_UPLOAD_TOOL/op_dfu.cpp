@@ -28,8 +28,20 @@ void OP_DFU::enterDFU(int devNumber)
 
     qDebug() << result << " bytes sent";
 }
-void OP_DFU::StartUpload(qint32 numberOfPackets, TransferTypes type)
+void OP_DFU::StartUpload(qint32 numberOfBytes, TransferTypes type)
 {
+    int lastPacketCount;
+    qint32 numberOfPackets=numberOfBytes/4/14;
+    int pad=(numberOfBytes-numberOfPackets*4*14)/4;
+    if(pad==0)
+    {
+        lastPacketCount=14;
+    }
+    else
+    {
+        ++numberOfPackets;
+        lastPacketCount=pad;
+    }
     char buf[BUF_LEN];
     buf[0] =0x02;//reportID
     buf[1] = setStartBit(OP_DFU::Upload);//DFU Command
@@ -38,7 +50,7 @@ void OP_DFU::StartUpload(qint32 numberOfPackets, TransferTypes type)
     buf[4] = numberOfPackets>>8;//DFU Count
     buf[5] = numberOfPackets;//DFU Count
     buf[6] = (int)type;//DFU Data0
-    buf[7] = 1;//DFU Data1
+    buf[7] = lastPacketCount;//DFU Data1
     buf[8] = 1;//DFU Data2
     buf[9] = 1;//DFU Data3
 
@@ -46,26 +58,49 @@ void OP_DFU::StartUpload(qint32 numberOfPackets, TransferTypes type)
 
     qDebug() << result << " bytes sent";
 }
-void OP_DFU::UploadData(qint32 numberOfPackets, QByteArray data)
+void OP_DFU::UploadData(qint32 numberOfBytes, QByteArray data)
 {
+    int lastPacketCount;
+    qint32 numberOfPackets=numberOfBytes/4/14;
+    int pad=(numberOfBytes-numberOfPackets*4*14)/4;
+    if(pad==0)
+    {
+        lastPacketCount=14;
+    }
+    else
+    {
+        ++numberOfPackets;
+        lastPacketCount=pad;
+    }
     qDebug()<<"Start Uploading:"<<numberOfPackets<<"4Bytes";
     char buf[BUF_LEN];
     buf[0] =0x02;//reportID
     buf[1] = OP_DFU::Upload;//DFU Command
+    int packetsize;
     for(qint32 packetcount=0;packetcount<numberOfPackets;++packetcount)
     {
-
+        if(packetcount==numberOfPackets)
+            packetsize=lastPacketCount;
+        else
+            packetsize=14;
         buf[2] = packetcount>>24;//DFU Count
         buf[3] = packetcount>>16;//DFU Count
         buf[4] = packetcount>>8;//DFU Count
         buf[5] = packetcount;//DFU Count
-        buf[6] = data[packetcount*4+3];//DFU Data0
-        buf[7] = data[packetcount*4+2];//DFU Data1
-        buf[8] = data[packetcount*4+1];//DFU Data2
-        buf[9] = data[packetcount*4];//DFU Data3
+        char *pointer=data.data();
+        pointer=pointer+4*14*packetcount;
+      //  qDebug()<<"Packet Number="<<packetcount<<"Data0="<<(int)data[0]<<" Data1="<<(int)data[1]<<" Data0="<<(int)data[2]<<" Data0="<<(int)data[3]<<" buf6="<<(int)buf[6]<<" buf7="<<(int)buf[7]<<" buf8="<<(int)buf[8]<<" buf9="<<(int)buf[9];
+        CopyWords(pointer,buf+6,packetsize*4);
+//        for (int y=0;y<packetsize*4;++y)
+//        {
 
+//                qDebug()<<y<<":"<<(int)data[packetcount*14*4+y]<<"---"<<(int)buf[6+y];
+
+
+//        }
+       // qDebug()<<" Data0="<<(int)data[0]<<" Data0="<<(int)data[1]<<" Data0="<<(int)data[2]<<" Data0="<<(int)data[3]<<" buf6="<<(int)buf[6]<<" buf7="<<(int)buf[7]<<" buf8="<<(int)buf[8]<<" buf9="<<(int)buf[9];
         int result = hidHandle.send(0,buf, BUF_LEN, 5000);
-        qDebug()<<packetcount;
+
       //  qDebug() << "UPLOAD:"<<"Data="<<(int)buf[6]<<(int)buf[7]<<(int)buf[8]<<(int)buf[9]<<";"<<result << " bytes sent";
     }
 }
@@ -117,7 +152,7 @@ QByteArray OP_DFU::StartDownload(qint32 numberOfPackets, TransferTypes type)
     qDebug() << "StartDownload:"<<result << " bytes sent";
     for(qint32 x=0;x<numberOfPackets;++x)
     {
-        result = hidHandle.receive(0,buf,10,5000);
+        result = hidHandle.receive(0,buf,BUF_LEN,5000);
         qDebug() << result << " bytes received"<<" Count="<<(int)buf[2]<<";"<<(int)buf[3]<<";"<<(int)buf[4]<<";"<<(int)buf[5]<<" Data="<<(int)buf[6]<<";"<<(int)buf[7]<<";"<<(int)buf[8]<<";"<<(int)buf[9];
         ret.append(buf+6,4);
     }
@@ -170,9 +205,9 @@ int OP_DFU::StatusRequest()
     buf[9] = 0;
 
     int result = hidHandle.send(0,buf, BUF_LEN, 500);
-    hidHandle.receive(0,buf,10,500);
+    hidHandle.receive(0,buf,BUF_LEN,500);
     qDebug() << result << " bytes sent";
-    result = hidHandle.receive(0,buf,10,500);
+    result = hidHandle.receive(0,buf,BUF_LEN,500);
     qDebug() << result << " bytes received";
     if(buf[1]==OP_DFU::Status_Rep)
     {
@@ -197,8 +232,8 @@ void OP_DFU::EndOperation()
     buf[8] = 0;
     buf[9] = 0;
 
-    int result = hidHandle.send(0,buf, BUF_LEN, 500);
-    hidHandle.receive(0,buf,10,500);
+    int result = hidHandle.send(0,buf, BUF_LEN, 5000);
+    hidHandle.receive(0,buf,BUF_LEN,5000);
     qDebug() << result << " bytes sent";
 }
 void OP_DFU::UploadFirmware(QString sfile)
@@ -220,10 +255,21 @@ void OP_DFU::UploadFirmware(QString sfile)
     pad=pad-arr.length();
     arr.append(QByteArray(pad,255));
 }
-    StartUpload(arr.length()/4,FW);
-    UploadData(arr.length()/4,arr);
+    StartUpload(arr.length(),FW);
+    UploadData(arr.length(),arr);
     EndOperation();
     int ret=StatusRequest();
     qDebug()<<"Status="<<ret;
 
+}
+void OP_DFU::CopyWords(char *source, char *destination, int count)
+{
+    for (int x=0;x<count;x=x+4)
+    {
+        //qDebug()<<(int)source[x*4+3]<<"xxx="<<4*x;
+        *(destination+x)=source[x+3];
+        *(destination+x+1)=source[x+2];
+        *(destination+x+2)=source[x+1];
+        *(destination+x+3)=source[x+0];
+    }
 }

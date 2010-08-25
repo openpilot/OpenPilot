@@ -205,8 +205,8 @@ void ModelViewGadgetWidget::updateAttitude()
     // Rotate to the actual angles (if a gimbal lock at yaw 90/270 deg, change sequence of rotations)
     AttitudeActual::DataFields data = attActual->getData();
     m_GlView.cameraHandle()->rotateAroundTarget(glc::Z_AXIS, data.Yaw*glc::PI/180.0);
-    m_GlView.cameraHandle()->rotateAroundTarget(glc::X_AXIS, data.Roll*glc::PI/180.0);
-    m_GlView.cameraHandle()->rotateAroundTarget(glc::Y_AXIS, -data.Pitch*glc::PI/180.0);
+    m_GlView.cameraHandle()->rotateAroundTarget(glc::Y_AXIS, data.Roll*glc::PI/180.0);
+    m_GlView.cameraHandle()->rotateAroundTarget(glc::X_AXIS, data.Pitch*glc::PI/180.0);
     updateGL();
 }
 

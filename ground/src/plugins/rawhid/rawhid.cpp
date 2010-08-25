@@ -234,13 +234,14 @@ void RawHIDWriteThread::run()
         {
             //only remove the size actually written to the device
             m_writeBufMtx.lock();
-            m_writeBuffer.remove(0, ret);
+            m_writeBuffer.remove(0, ret - 2);
             m_writeBufMtx.unlock();
 
-            emit m_hid->bytesWritten(ret);
+            emit m_hid->bytesWritten(ret - 2);
         }
         else if(ret < 0) // < 0 => error
         {
+            qDebug() << "Error writing to device";
         }
         else
         {

@@ -271,19 +271,7 @@ int32_t PIOS_USB_HID_TxBufferPutMore(uint8_t id, const uint8_t *buffer, uint16_t
 */
 int32_t PIOS_USB_HID_RxBufferGet(uint8_t id)
 {
-	if(rx_buffer_new_data_ctr == 0) {
-		/* Nothing new in buffer */
-		return -1;
-	}
-
-	/* There is still data in the buffer */
-	uint8_t b = rx_buffer[rx_buffer_ix++];
-	if(--rx_buffer_new_data_ctr == 0) {
-		rx_buffer_ix = 2; //the two bytes are report ID and valid data length respectively
-	}
-
-	/* Return received byte */
-	return b;
+    return bufferGetFromFront(&rxBuffer);
 }
 
 /**
@@ -294,7 +282,7 @@ int32_t PIOS_USB_HID_RxBufferGet(uint8_t id)
 */
 int32_t PIOS_USB_HID_RxBufferUsed(uint8_t id)
 {
-	return rx_buffer_new_data_ctr;
+	return bufferBufferedData(&rxBuffer);
 }
 
        
@@ -317,11 +305,13 @@ void PIOS_USB_HID_EP1_OUT_Callback(void)
 	/* Read received data (63 bytes) */
 	/* Get the number of received data on the selected Endpoint */
 	DataLength = GetEPRxCount(ENDP1 & 0x7F);
+    
 	/* Use the memory interface function to write to the selected endpoint */
 	PMAToUserBufferCopy((uint8_t *) rx_buffer, GetEPRxAddr(ENDP1 & 0x7F), DataLength);
 
-	/* We now have data waiting */
-	rx_buffer_new_data_ctr = rx_buffer[1];
+    /* The first byte is report ID (not checked), the second byte is the valid data length */
+    bufferAddChunkToEnd(&rxBuffer, &rx_buffer[2], rx_buffer[1]);
+
 	SetEPRxStatus(ENDP1, EP_RX_VALID);
 }
 

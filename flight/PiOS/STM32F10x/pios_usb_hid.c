@@ -36,6 +36,7 @@
 #include "usb_lib.h"
 #include "pios_usb_hid_desc.h"
 #include "stm32f10x.h"
+#include "buffer.h"
 
 #if defined(PIOS_INCLUDE_USB_HID)
 
@@ -56,6 +57,12 @@ static uint8_t transfer_possible = 0;
 static uint8_t rx_buffer[PIOS_USB_HID_DATA_LENGTH+2] = {0};
 static uint8_t tx_buffer[PIOS_USB_HID_DATA_LENGTH+2] = {0};
 
+#define TX_BUFFER_SIZE 128
+#define RX_BUFFER_SIZE 128
+cBuffer rxBuffer;
+cBuffer txBuffer;
+static uint8_t rxBufferSpace[TX_BUFFER_SIZE];
+static uint8_t txBufferSpace[RX_BUFFER_SIZE];
 /**
 * Initialises USB COM layer
 * \param[in] mode currently only mode 0 supported
@@ -69,8 +76,12 @@ int32_t PIOS_USB_HID_Init(uint32_t mode)
 		/* Unsupported mode */
 		return -1;
 	}
+    
+    bufferInit(&rxBuffer, &rxBufferSpace[0], RX_BUFFER_SIZE);
+    bufferInit(&txBuffer, &txBufferSpace[0], TX_BUFFER_SIZE);
 	
-		
+    PIOS_USB_HID_Reenumerate();
+    		
 	/* Enable the USB Interrupts */
 	/* 2 bit for pre-emption priority, 2 bits for subpriority */
 	NVIC_InitTypeDef NVIC_InitStructure;
@@ -86,25 +97,24 @@ int32_t PIOS_USB_HID_Init(uint32_t mode)
 	/* Enable the USB clock */
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USB, ENABLE);
 	
-  /* Update the USB serial number from the chip */
-  uint8_t sn[40];
-  PIOS_SYS_SerialNumberGet((char *) sn);
-/*    uint8_t len = 0;;
-  for(uint8_t i = 0, len = 2; sn[i] != '\0' && len < PIOS_HID_StringSerial[0]; ++i) 
-  {
-    PIOS_HID_StringSerial[len++] = sn[i];
-    PIOS_HID_StringSerial[len++] = 0;
-  }
-  while(len < PIOS_HID_StringSerial[0]) 
-  {
-    PIOS_HID_StringSerial[len++] = 0;
-  } */
-  for(uint8_t i = 0; i < 12; i++) 
-  {
-    PIOS_HID_StringSerial[2+i*2] = sn[i];
-  }
-  
-  
+    /* Update the USB serial number from the chip */
+    uint8_t sn[40];
+    PIOS_SYS_SerialNumberGet((char *) sn);
+    /*    uint8_t len = 0;;
+     for(uint8_t i = 0, len = 2; sn[i] != '\0' && len < PIOS_HID_StringSerial[0]; ++i) 
+     {
+     PIOS_HID_StringSerial[len++] = sn[i];
+     PIOS_HID_StringSerial[len++] = 0;
+     }
+     while(len < PIOS_HID_StringSerial[0]) 
+     {
+     PIOS_HID_StringSerial[len++] = 0;
+     } */
+    for(uint8_t i = 0; i < 12; i++) 
+    {
+        PIOS_HID_StringSerial[2+i*2] = sn[i];
+    }
+    
 	USB_Init();
 	USB_SIL_Init();
 	
@@ -130,6 +140,43 @@ int32_t PIOS_USB_HID_ChangeConnectionState(uint32_t Connected)
 	return 0;
 }
 
+
+int32_t PIOS_USB_HID_Reenumerate()
+{    
+    /* Force USB reset and power-down (this will also release the USB pins for direct GPIO control) */
+    _SetCNTR(CNTR_FRES | CNTR_PDWN);
+    
+    /* Using a "dirty" method to force a re-enumeration: */
+    /* Force DPM (Pin PA12) low for ca. 10 mS before USB Tranceiver will be enabled */
+    /* This overrules the external Pull-Up at PA12, and at least Windows & MacOS will enumerate again */
+    GPIO_InitTypeDef GPIO_InitStructure;
+    GPIO_StructInit(&GPIO_InitStructure);
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+    
+    PIOS_DELAY_WaitmS(50);
+    
+    /* Release power-down, still hold reset */
+    _SetCNTR(CNTR_PDWN);
+    PIOS_DELAY_WaituS(5);
+    
+    /* CNTR_FRES = 0 */
+    _SetCNTR(0);
+    
+    /* Clear pending interrupts */
+    _SetISTR(0);
+    
+    /* Configure USB clock */
+    /* USBCLK = PLLCLK / 1.5 */
+    RCC_USBCLKConfig(RCC_USBCLKSource_PLLCLK_1Div5);
+    /* Enable USB clock */
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USB, ENABLE);
+    
+    return 0;
+}
+
 /**
 * This function returns the connection status of the USB HID interface
 * \return 1: interface available
@@ -139,6 +186,31 @@ int32_t PIOS_USB_HID_ChangeConnectionState(uint32_t Connected)
 int32_t PIOS_USB_HID_CheckAvailable(uint8_t id)
 {
   return (PIOS_USB_DETECT_GPIO_PORT->IDR & PIOS_USB_DETECT_GPIO_PIN) != 0 && transfer_possible ?  1 : 0;
+}
+
+void sendChunk()
+{
+    uint32_t size = bufferBufferedData(&txBuffer);
+    if(size > 0)
+    {
+        if(size > PIOS_USB_HID_DATA_LENGTH)
+            size = PIOS_USB_HID_DATA_LENGTH;
+        
+        bufferGetChunkFromFront(&txBuffer, &tx_buffer[2], size);
+        tx_buffer[0] = 1; /* report ID */
+        tx_buffer[1] = size; /* valid data length */
+
+        /* Wait for any pending transmissions to complete */
+        while(GetEPTxStatus(ENDP1) == EP_TX_VALID) 
+            taskYIELD();         
+        
+        UserToPMABufferCopy((uint8_t*) tx_buffer, GetEPTxAddr(EP1_IN & 0x7F), size+2);
+        SetEPTxCount((EP1_IN & 0x7F), PIOS_USB_HID_DATA_LENGTH+2);
+        
+        /* Send Buffer */
+        SetEPTxValid(ENDP1);
+	}    
+    
 }
 
 /**
@@ -151,21 +223,21 @@ int32_t PIOS_USB_HID_CheckAvailable(uint8_t id)
 */
 int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t *buffer, uint16_t len)
 {
-	if(len > PIOS_USB_HID_DATA_LENGTH) {
-		/* Cannot send all requested bytes */
-		return -1;
-	}	
-	
-	memcpy(&tx_buffer[2], buffer, len);
-	tx_buffer[0] = 1; /* report ID */
-	tx_buffer[1] = len; /* valid data length */
-	UserToPMABufferCopy((uint8_t*) tx_buffer, GetEPTxAddr(EP1_IN & 0x7F), len+2);
-	SetEPTxCount((EP1_IN & 0x7F), PIOS_USB_HID_DATA_LENGTH+2);
-	
-	/* Send Buffer */
-	SetEPTxValid(ENDP1);
-	
-	return 0;
+    /*if( len > PIOS_USB_HID_DATA_LENGTH )
+        return - 1;*/
+	if(len > bufferRemainingSpace(&txBuffer)) 
+		return -1;		/* Cannot send all requested bytes */
+	    
+    if(bufferAddChunkToEnd(&txBuffer, buffer, len) == 0)
+        return -1;
+    
+    while(bufferBufferedData(&txBuffer))
+        sendChunk();
+    bufferFlush(&txBuffer);
+    
+    //PIOS_USB_HID_EP1_IN_Callback();
+    
+    return 0;    
 }
 
 /**
@@ -220,6 +292,15 @@ int32_t PIOS_USB_HID_RxBufferUsed(uint8_t id)
 	return rx_buffer_new_data_ctr;
 }
 
+       
+/**
+ * @brief Callback used to indicate a transmission from device INto host completed
+ * Checks if any data remains, pads it into HID packet and sends.
+ */
+void PIOS_USB_HID_EP1_IN_Callback(void)
+{
+    //sendChunk();
+}
 
 /**
 * EP1 OUT Callback Routine

@@ -50,6 +50,8 @@
 #ifndef BUFFER_H
 #define BUFFER_H
 
+#include "stdint.h"
+
 // structure/typdefs
 
 //! cBuffer structure
@@ -64,23 +66,35 @@ typedef struct struct_cBuffer
 // function prototypes
 
 //! initialize a buffer to start at a given address and have given size
-void			bufferInit(cBuffer* buffer, unsigned char *start, unsigned short size);
+void			bufferInit(cBuffer* buffer, uint8_t *start, uint32_t size);
+
+//! check free space in buffer
+uint32_t bufferRemainingSpace(cBuffer* buffer);
 
 //! get the first byte from the front of the buffer
-unsigned char	bufferGetFromFront(cBuffer* buffer);
+uint8_t	bufferGetFromFront(cBuffer* buffer);
+
+//! get the number of bytes buffered
+uint32_t bufferBufferedData(cBuffer* buffer);
+
+//! copy number of elements into another buffer
+uint8_t bufferGetChunkFromFront(cBuffer* buffer, uint8_t * dest, uint32_t size);
 
 //! dump (discard) the first numbytes from the front of the buffer
-void bufferDumpFromFront(cBuffer* buffer, unsigned short numbytes);
+void bufferDumpFromFront(cBuffer* buffer, uint32_t numbytes);
 
 //! get a byte at the specified index in the buffer (kind of like array access)
 // ** note: this does not remove the byte that was read from the buffer
-unsigned char	bufferGetAtIndex(cBuffer* buffer, unsigned short index);
+uint8_t	bufferGetAtIndex(cBuffer* buffer, uint32_t index);
 
 //! add a byte to the end of the buffer
-unsigned char	bufferAddToEnd(cBuffer* buffer, unsigned char data);
+uint8_t	bufferAddToEnd(cBuffer* buffer, uint8_t data);
+
+//! queue a block of character to end of buffer
+uint8_t bufferAddChunkToEnd(cBuffer* buffer, const uint8_t * data, uint32_t size); 
 
 //! check if the buffer is full/not full (returns non-zero value if not full)
-unsigned char	bufferIsNotFull(cBuffer* buffer);
+uint8_t	bufferIsNotFull(cBuffer* buffer);
 
 //! flush (clear) the contents of the buffer
 void			bufferFlush(cBuffer* buffer);

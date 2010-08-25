@@ -50,7 +50,7 @@ public:
     // Field information
     // Field AirframeType information
     /* Enumeration options for field AirframeType */
-    typedef enum { AIRFRAMETYPE_FIXEDWING=0, AIRFRAMETYPE_FIXEDWINGELEVON=1, AIRFRAMETYPE_VTOL=2 } AirframeTypeOptions;
+    typedef enum { AIRFRAMETYPE_FIXEDWING=0, AIRFRAMETYPE_FIXEDWINGELEVON=1, AIRFRAMETYPE_VTOL=2, AIRFRAMETYPE_HELICP=3 } AirframeTypeOptions;
 
   
     // Constants

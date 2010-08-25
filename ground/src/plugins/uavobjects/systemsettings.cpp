@@ -48,6 +48,7 @@ SystemSettings::SystemSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS,
     AirframeTypeEnumOptions.append("FixedWing");
     AirframeTypeEnumOptions.append("FixedWingElevon");
     AirframeTypeEnumOptions.append("VTOL");
+    AirframeTypeEnumOptions.append("HeliCP");
     fields.append( new UAVObjectField(QString("AirframeType"), QString(""), UAVObjectField::ENUM, AirframeTypeElemNames, AirframeTypeEnumOptions) );
 
     // Initialize object

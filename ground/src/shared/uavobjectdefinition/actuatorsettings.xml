@@ -14,6 +14,22 @@
             <field name="VTOLMotorSW" units="channel" type="enum" elements="1" options="Channel0,Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,None" defaultvalue="None"/>
             <field name="VTOLMotorW" units="channel" type="enum" elements="1" options="Channel0,Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,None" defaultvalue="None"/>
             <field name="VTOLMotorNW" units="channel" type="enum" elements="1" options="Channel0,Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,None" defaultvalue="None"/>
+            <field name="CCPMYawStabilizationInManualMode" units="" type="enum" elements="1" options="False,True" defaultvalue="False"/>
+            <field name="CCPMFlybarless" units="" type="enum" elements="1" options="False,True" defaultvalue="False"/>
+            <field name="CCPMThrottleCurve" units="percent" type="float" elements="5" defaultvalue="0.00"/>
+            <field name="CCPMPitchCurve" units="percent" type="float" elements="5" defaultvalue="0.00"/>
+            <field name="CCPMCollectiveConstant" units="multiplier (0.0 -> 1.0)" type="float" elements="1" defaultvalue="0.5"/>
+            <field name="CCPMCorrectionAngle" units="degrees" type="float" elements="1" defaultvalue="0"/>
+            <field name="CCPMAngleW" units="degrees" type="float" elements="1" defaultvalue="0"/>
+            <field name="CCPMAngleX" units="degrees" type="float" elements="1" defaultvalue="60"/>
+            <field name="CCPMAngleY" units="degrees" type="float" elements="1" defaultvalue="180"/>
+            <field name="CCPMAngleZ" units="degrees" type="float" elements="1" defaultvalue="300"/>
+            <field name="CCPMServoW" units="channel" type="enum" elements="1" options="Channel0,Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,None" defaultvalue="None"/>
+            <field name="CCPMServoX" units="channel" type="enum" elements="1" options="Channel0,Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,None" defaultvalue="None"/>
+            <field name="CCPMServoY" units="channel" type="enum" elements="1" options="Channel0,Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,None" defaultvalue="None"/>
+            <field name="CCPMServoZ" units="channel" type="enum" elements="1" options="Channel0,Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,None" defaultvalue="None"/>
+            <field name="CCPMThrottle" units="channel" type="enum" elements="1" options="Channel0,Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,None" defaultvalue="None"/>
+            <field name="CCPMTailRotor" units="channel" type="enum" elements="1" options="Channel0,Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,None" defaultvalue="None"/>
             <field name="ChannelUpdateFreq" units="Hz" type="int16" elements="2" defaultvalue="50"/>
             <field name="ChannelMax" units="us" type="int16" elements="8" defaultvalue="2000"/>
             <field name="ChannelNeutral" units="us" type="int16" elements="8" defaultvalue="1500"/>

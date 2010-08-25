@@ -64,7 +64,7 @@ typedef struct {
 // Field information
 // Field AirframeType information
 /* Enumeration options for field AirframeType */
-typedef enum { SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWING=0, SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWINGELEVON=1, SYSTEMSETTINGS_AIRFRAMETYPE_VTOL=2 } SystemSettingsAirframeTypeOptions;
+typedef enum { SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWING=0, SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWINGELEVON=1, SYSTEMSETTINGS_AIRFRAMETYPE_VTOL=2, SYSTEMSETTINGS_AIRFRAMETYPE_HELICP=3 } SystemSettingsAirframeTypeOptions;
 
 
 // Generic interface functions

@@ -57,6 +57,22 @@ public:
         quint8 VTOLMotorSW;
         quint8 VTOLMotorW;
         quint8 VTOLMotorNW;
+        quint8 CCPMYawStabilizationInManualMode;
+        quint8 CCPMFlybarless;
+        float CCPMThrottleCurve[5];
+        float CCPMPitchCurve[5];
+        float CCPMCollectiveConstant;
+        float CCPMCorrectionAngle;
+        float CCPMAngleW;
+        float CCPMAngleX;
+        float CCPMAngleY;
+        float CCPMAngleZ;
+        quint8 CCPMServoW;
+        quint8 CCPMServoX;
+        quint8 CCPMServoY;
+        quint8 CCPMServoZ;
+        quint8 CCPMThrottle;
+        quint8 CCPMTailRotor;
         qint16 ChannelUpdateFreq[2];
         qint16 ChannelMax[8];
         qint16 ChannelNeutral[8];
@@ -107,6 +123,42 @@ public:
     // Field VTOLMotorNW information
     /* Enumeration options for field VTOLMotorNW */
     typedef enum { VTOLMOTORNW_CHANNEL0=0, VTOLMOTORNW_CHANNEL1=1, VTOLMOTORNW_CHANNEL2=2, VTOLMOTORNW_CHANNEL3=3, VTOLMOTORNW_CHANNEL4=4, VTOLMOTORNW_CHANNEL5=5, VTOLMOTORNW_CHANNEL6=6, VTOLMOTORNW_CHANNEL7=7, VTOLMOTORNW_NONE=8 } VTOLMotorNWOptions;
+    // Field CCPMYawStabilizationInManualMode information
+    /* Enumeration options for field CCPMYawStabilizationInManualMode */
+    typedef enum { CCPMYAWSTABILIZATIONINMANUALMODE_FALSE=0, CCPMYAWSTABILIZATIONINMANUALMODE_TRUE=1 } CCPMYawStabilizationInManualModeOptions;
+    // Field CCPMFlybarless information
+    /* Enumeration options for field CCPMFlybarless */
+    typedef enum { CCPMFLYBARLESS_FALSE=0, CCPMFLYBARLESS_TRUE=1 } CCPMFlybarlessOptions;
+    // Field CCPMThrottleCurve information
+    /* Number of elements for field CCPMThrottleCurve */
+    static const quint32 CCPMTHROTTLECURVE_NUMELEM = 5;
+    // Field CCPMPitchCurve information
+    /* Number of elements for field CCPMPitchCurve */
+    static const quint32 CCPMPITCHCURVE_NUMELEM = 5;
+    // Field CCPMCollectiveConstant information
+    // Field CCPMCorrectionAngle information
+    // Field CCPMAngleW information
+    // Field CCPMAngleX information
+    // Field CCPMAngleY information
+    // Field CCPMAngleZ information
+    // Field CCPMServoW information
+    /* Enumeration options for field CCPMServoW */
+    typedef enum { CCPMSERVOW_CHANNEL0=0, CCPMSERVOW_CHANNEL1=1, CCPMSERVOW_CHANNEL2=2, CCPMSERVOW_CHANNEL3=3, CCPMSERVOW_CHANNEL4=4, CCPMSERVOW_CHANNEL5=5, CCPMSERVOW_CHANNEL6=6, CCPMSERVOW_CHANNEL7=7, CCPMSERVOW_NONE=8 } CCPMServoWOptions;
+    // Field CCPMServoX information
+    /* Enumeration options for field CCPMServoX */
+    typedef enum { CCPMSERVOX_CHANNEL0=0, CCPMSERVOX_CHANNEL1=1, CCPMSERVOX_CHANNEL2=2, CCPMSERVOX_CHANNEL3=3, CCPMSERVOX_CHANNEL4=4, CCPMSERVOX_CHANNEL5=5, CCPMSERVOX_CHANNEL6=6, CCPMSERVOX_CHANNEL7=7, CCPMSERVOX_NONE=8 } CCPMServoXOptions;
+    // Field CCPMServoY information
+    /* Enumeration options for field CCPMServoY */
+    typedef enum { CCPMSERVOY_CHANNEL0=0, CCPMSERVOY_CHANNEL1=1, CCPMSERVOY_CHANNEL2=2, CCPMSERVOY_CHANNEL3=3, CCPMSERVOY_CHANNEL4=4, CCPMSERVOY_CHANNEL5=5, CCPMSERVOY_CHANNEL6=6, CCPMSERVOY_CHANNEL7=7, CCPMSERVOY_NONE=8 } CCPMServoYOptions;
+    // Field CCPMServoZ information
+    /* Enumeration options for field CCPMServoZ */
+    typedef enum { CCPMSERVOZ_CHANNEL0=0, CCPMSERVOZ_CHANNEL1=1, CCPMSERVOZ_CHANNEL2=2, CCPMSERVOZ_CHANNEL3=3, CCPMSERVOZ_CHANNEL4=4, CCPMSERVOZ_CHANNEL5=5, CCPMSERVOZ_CHANNEL6=6, CCPMSERVOZ_CHANNEL7=7, CCPMSERVOZ_NONE=8 } CCPMServoZOptions;
+    // Field CCPMThrottle information
+    /* Enumeration options for field CCPMThrottle */
+    typedef enum { CCPMTHROTTLE_CHANNEL0=0, CCPMTHROTTLE_CHANNEL1=1, CCPMTHROTTLE_CHANNEL2=2, CCPMTHROTTLE_CHANNEL3=3, CCPMTHROTTLE_CHANNEL4=4, CCPMTHROTTLE_CHANNEL5=5, CCPMTHROTTLE_CHANNEL6=6, CCPMTHROTTLE_CHANNEL7=7, CCPMTHROTTLE_NONE=8 } CCPMThrottleOptions;
+    // Field CCPMTailRotor information
+    /* Enumeration options for field CCPMTailRotor */
+    typedef enum { CCPMTAILROTOR_CHANNEL0=0, CCPMTAILROTOR_CHANNEL1=1, CCPMTAILROTOR_CHANNEL2=2, CCPMTAILROTOR_CHANNEL3=3, CCPMTAILROTOR_CHANNEL4=4, CCPMTAILROTOR_CHANNEL5=5, CCPMTAILROTOR_CHANNEL6=6, CCPMTAILROTOR_CHANNEL7=7, CCPMTAILROTOR_NONE=8 } CCPMTailRotorOptions;
     // Field ChannelUpdateFreq information
     /* Number of elements for field ChannelUpdateFreq */
     static const quint32 CHANNELUPDATEFREQ_NUMELEM = 2;
@@ -122,7 +174,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 3054509114U;
+    static const quint32 OBJID = 3352303420U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

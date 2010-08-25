@@ -301,8 +301,7 @@ void GPIO_Configuration(void)
 {
   GPIO_InitTypeDef GPIO_InitStructure;
   
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIO_DISCONNECT | 
-                         RCC_APB2Periph_GPIO_IOAIN , ENABLE);   
+
   
 #ifndef USE_STM3210C_EVAL
   /* USB_DISCONNECT used as USB pull-up */
@@ -312,10 +311,7 @@ void GPIO_Configuration(void)
   GPIO_Init(USB_DISCONNECT, &GPIO_InitStructure);
 #endif /* USE_STM3210C_EVAL */ 
   
-  /* Configure Potentiometer IO as analog input */
-  GPIO_InitStructure.GPIO_Pin = GPIO_IOAIN_PIN;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
-  GPIO_Init(GPIO_IOAIN, &GPIO_InitStructure);
+
 }
 
 /*******************************************************************************

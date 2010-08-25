@@ -48,10 +48,7 @@
 
 #endif /* USE_STM3210B_EVAL */
 
-  #define RCC_APB2Periph_GPIO_IOAIN           RCC_APB2Periph_GPIOC
-  #define GPIO_IOAIN                          GPIOC
-  #define GPIO_IOAIN_PIN                      GPIO_Pin_4   /* PC.04 */
-  #define ADC_AIN_CHANNEL                     ADC_Channel_14
+
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */

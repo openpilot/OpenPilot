@@ -19,8 +19,10 @@
 #include "hw_config.h"
 #include "stm32_eval.h"
 #include "common.h"
-
+#include "platform_config.h"
+#include "stopwatch.h"
 extern void FLASH_Download();
+#define BSL_HOLD_STATE       ((USB_DISCONNECT->IDR & USB_DISCONNECT_PIN) ? 0 : 1)
 
 /* Private typedef -----------------------------------------------------------*/
 typedef void (*pFunction)(void);
@@ -29,6 +31,11 @@ typedef void (*pFunction)(void);
 /* Private variables ---------------------------------------------------------*/
 pFunction Jump_To_Application;
 uint32_t JumpAddress;
+
+uint32_t cnt;
+uint32_t pwm_period;
+uint32_t pwm_sweep_steps;
+
 /* Extern variables ----------------------------------------------------------*/
 uint8_t DeviceState;
 uint8_t JumpToApp = 0;
@@ -47,17 +54,38 @@ void DelayWithDown(__IO uint32_t nCount);
 int main(void) {
 
 	Set_System();
+	if (BSL_HOLD_STATE==0) {
 
-	USB_Interrupts_Config();
+		USB_Interrupts_Config();
+		Set_USBClock();
+		USB_Init();
+		DeviceState = idle;
+		STOPWATCH_Init(100);
+	}
+	else
+		JumpToApp = TRUE;
+	STOPWATCH_Reset();
 
-	Set_USBClock();
-
-	USB_Init();
-
-	DeviceState = idle;
 	while (JumpToApp == 0) {
-		STM_EVAL_LEDToggle(LED1);
-		DelayWithDown(10);//1000000);
+
+		cnt = STOPWATCH_ValueGet(); // the reference counter (incremented each 100 uS)
+		pwm_period = 50; // *100 uS -> 5 mS
+		pwm_sweep_steps =100; // * 5 mS -> 500 mS
+		uint32_t pwm_duty = ((cnt / pwm_period) % pwm_sweep_steps)
+				/ (pwm_sweep_steps / pwm_period);
+		if ((cnt % (2 * pwm_period * pwm_sweep_steps)) > pwm_period
+				* pwm_sweep_steps)
+			pwm_duty = pwm_period - pwm_duty; // negative direction each 50*100 ticks
+		uint32_t led_on = ((cnt % pwm_period) > pwm_duty) ? 1 : 0;
+		if(led_on==0)
+			STM_EVAL_LEDOn(LED1);
+		else
+			STM_EVAL_LEDOff(LED1);
+		if(STOPWATCH_ValueGet()>100*pwm_period*pwm_sweep_steps)
+			STOPWATCH_Reset();
+		if(STOPWATCH_ValueGet()>50000)
+			JumpToApp=TRUE;
+		//DelayWithDown(10);//1000000);
 	}
 	if (((*(__IO uint32_t*) StartOfUserCode) & 0x2FFE0000) == 0x20000000) { /* Jump to user application */
 		FLASH_Lock();
@@ -74,6 +102,7 @@ int main(void) {
 		__set_MSP(*(__IO uint32_t*) StartOfUserCode);
 		Jump_To_Application();
 	}
+
 	while (1) {
 		STM_EVAL_LEDToggle(LED1);
 		STM_EVAL_LEDToggle(LED2);

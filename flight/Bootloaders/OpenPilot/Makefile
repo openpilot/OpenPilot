@@ -92,7 +92,7 @@ SRC += $(HIDSYSTEM)/usb_istr.c
 SRC += $(HIDSYSTEM)/usb_prop.c
 SRC += $(HIDSYSTEM)/usb_pwr.c
 SRC += $(HIDSYSTEM)/stm3210e_eval.c
-
+SRC += $(HIDSYSTEM)/stopwatch.c
 
 ## CMSIS for STM32
 SRC += $(CMSISDIR)/core_cm3.c
@@ -112,7 +112,7 @@ SRC += $(STMSPDSRCDIR)/stm32f10x_gpio.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_rcc.c
 #SRC += $(STMSPDSRCDIR)/stm32f10x_rtc.c
 #SRC += $(STMSPDSRCDIR)/stm32f10x_spi.c
-#SRC += $(STMSPDSRCDIR)/stm32f10x_tim.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_tim.c
 #SRC += $(STMSPDSRCDIR)/stm32f10x_usart.c
 #SRC += $(STMSPDSRCDIR)/stm32f10x_wwdg.c
 SRC += $(STMSPDSRCDIR)/misc.c

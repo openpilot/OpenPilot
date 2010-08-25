@@ -81,7 +81,8 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
     foreach (UAVObjectField* field, fieldList) {
         // NOTE: we assume that all options in ActuatorSettings are a channel assignement
         // except for the options called "ChannelXXX"
-        if (!field->getName().contains("Channel")) {
+        if (field->getUnits().contains("channel")) {
+//        if (!field->getName().contains("Channel")) {
             m_config->ch0Output->addItem(field->getName());
             m_config->ch1Output->addItem(field->getName());
             m_config->ch2Output->addItem(field->getName());
@@ -348,7 +349,7 @@ void ConfigServoWidget::sendRCOutputUpdate()
     foreach (UAVObjectField* field, fieldList) {
         // NOTE: we assume that all options in ActuatorSettings are a channel assignement
         // except for the options called "ChannelXXX"
-        if (!field->getName().contains("Channel")) {
+        if (field->getUnits().contains("channel")) {
             field->setValue(field->getOptions().last());
         }
     }

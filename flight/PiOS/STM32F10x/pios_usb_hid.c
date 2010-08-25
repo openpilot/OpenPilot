@@ -190,16 +190,17 @@ int32_t PIOS_USB_HID_CheckAvailable(uint8_t id)
 
 void sendChunk()
 {
+    
     uint32_t size = bufferBufferedData(&txBuffer);
     if(size > 0)
     {
         if(size > PIOS_USB_HID_DATA_LENGTH)
             size = PIOS_USB_HID_DATA_LENGTH;
-        
+
         bufferGetChunkFromFront(&txBuffer, &tx_buffer[2], size);
         tx_buffer[0] = 1; /* report ID */
         tx_buffer[1] = size; /* valid data length */
-
+        
         /* Wait for any pending transmissions to complete */
         while(GetEPTxStatus(ENDP1) == EP_TX_VALID) 
             taskYIELD();         
@@ -225,17 +226,18 @@ int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t *buffe
 {
     /*if( len > PIOS_USB_HID_DATA_LENGTH )
         return - 1;*/
+    
+    uint8_t previous_data = bufferBufferedData(&txBuffer);
+    
 	if(len > bufferRemainingSpace(&txBuffer)) 
 		return -1;		/* Cannot send all requested bytes */
 	    
     if(bufferAddChunkToEnd(&txBuffer, buffer, len) == 0)
         return -1;
     
-    while(bufferBufferedData(&txBuffer))
+    /* If no previous data queued and not sending, then TX complete interrupt not likely so send manually */
+    if(previous_data == 0 && GetEPTxStatus(ENDP1) != EP_TX_VALID)
         sendChunk();
-    bufferFlush(&txBuffer);
-    
-    //PIOS_USB_HID_EP1_IN_Callback();
     
     return 0;    
 }
@@ -251,11 +253,14 @@ int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t *buffe
 */
 int32_t PIOS_USB_HID_TxBufferPutMore(uint8_t id, const uint8_t *buffer, uint16_t len)
 {
-  int32_t error;
-
-  while((error = PIOS_USB_HID_TxBufferPutMoreNonBlocking(id, buffer, len)) == -2);
-
-  return error;
+    uint32_t error;
+    if((error = PIOS_USB_HID_TxBufferPutMoreNonBlocking(id, buffer, len)) != 0)
+        return error;
+    
+    while( bufferBufferedData(&txBuffer) )
+        taskYIELD();
+    
+    return 0;
 }
 
 /**
@@ -299,7 +304,7 @@ int32_t PIOS_USB_HID_RxBufferUsed(uint8_t id)
  */
 void PIOS_USB_HID_EP1_IN_Callback(void)
 {
-    //sendChunk();
+    sendChunk();
 }
 
 /**

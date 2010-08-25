@@ -52,9 +52,19 @@ private:
     QGraphicsSvgItem *accel_x;
     QGraphicsSvgItem *accel_y;
     QGraphicsSvgItem *accel_z;
+    QGraphicsSvgItem *gyro_x;
+    QGraphicsSvgItem *gyro_y;
+    QGraphicsSvgItem *gyro_z;
+    QGraphicsSvgItem *mag_x;
+    QGraphicsSvgItem *mag_y;
+    QGraphicsSvgItem *mag_z;
+    double maxBarHeight;
+    int phaseCounter;
+    const static double maxVarValue = 0.1;
 
 private slots:
     void launchAHRSCalibration();
+    void saveAHRSCalibration();
     void calibPhase2();
 
 protected:

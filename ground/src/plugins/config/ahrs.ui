@@ -37,6 +37,11 @@
       <height>141</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>These are the sensor variance values computed by the AHRS.
+
+Tip: lower is better!</string>
+    </property>
     <property name="verticalScrollBarPolicy">
      <enum>Qt::ScrollBarAlwaysOff</enum>
     </property>
@@ -49,38 +54,30 @@
      <rect>
       <x>390</x>
       <y>90</y>
-      <width>301</width>
+      <width>231</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>Instructions......................</string>
+     <string>Press &quot;Start&quot; above to calibrate.</string>
     </property>
    </widget>
    <widget class="QPushButton" name="ahrsCalibStart">
     <property name="geometry">
      <rect>
-      <x>400</x>
-      <y>30</y>
+      <x>380</x>
+      <y>40</y>
       <width>93</width>
       <height>27</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Press to start a calibration procedure.
+
+Takes about 10 seconds.</string>
     </property>
     <property name="text">
      <string>Start</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_2">
-    <property name="geometry">
-     <rect>
-      <x>540</x>
-      <y>30</y>
-      <width>93</width>
-      <height>27</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Cancel</string>
     </property>
    </widget>
    <widget class="Line" name="line">
@@ -267,6 +264,35 @@
     </property>
     <property name="orientation">
      <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>380</x>
+      <y>10</y>
+      <width>151</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Sensors calibration</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ahrsCalibSave">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>40</y>
+      <width>93</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Save</string>
     </property>
    </widget>
   </widget>

@@ -26,6 +26,7 @@
  */
 #include "configahrswidget.h"
 
+#include "math.h"
 #include <QDebug>
 #include <QTimer>
 #include <QStringList>
@@ -56,8 +57,11 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
     // Initialize the 9 bargraph values:
 
     QMatrix lineMatrix = renderer->matrixForElement("accel_x");
-    qreal startX = lineMatrix.mapRect(renderer->boundsOnElement("accel_x")).x();
-    qreal startY = lineMatrix.mapRect(renderer->boundsOnElement("accel_x")).y();
+    QRectF rect = lineMatrix.mapRect(renderer->boundsOnElement("accel_x"));
+    qreal startX = rect.x();
+    qreal startY = rect.y()+ rect.height();
+    // maxBarHeight will be used for scaling it later.
+    maxBarHeight = rect.height();
     // Then once we have the initial location, we can put it
     // into a QGraphicsSvgItem which we will display at the same
     // place: we do this so that the heading scale can be clipped to
@@ -66,31 +70,97 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
     accel_x->setSharedRenderer(renderer);
     accel_x->setElementId("accel_x");
     m_ahrs->ahrsBargraph->scene()->addItem(accel_x);
-    QTransform matrix;
-    matrix.translate(startX,startY);
-    accel_x->setTransform(matrix,false);
+    accel_x->setPos(startX, startY);
+    accel_x->setTransform(QTransform::fromScale(1,0),true);
 
     lineMatrix = renderer->matrixForElement("accel_y");
-    startX = lineMatrix.mapRect(renderer->boundsOnElement("accel_y")).x();
-    startY = lineMatrix.mapRect(renderer->boundsOnElement("accel_y")).y();
+    rect = lineMatrix.mapRect(renderer->boundsOnElement("accel_y"));
+    startX = rect.x();
+    startY = rect.y()+ rect.height();
     accel_y = new QGraphicsSvgItem();
     accel_y->setSharedRenderer(renderer);
     accel_y->setElementId("accel_y");
     m_ahrs->ahrsBargraph->scene()->addItem(accel_y);
-    matrix.reset();
-    matrix.translate(startX,startY);
-    accel_y->setTransform(matrix,false);
+    accel_y->setPos(startX,startY);
+    accel_y->setTransform(QTransform::fromScale(1,0),true);
 
     lineMatrix = renderer->matrixForElement("accel_z");
-    startX = lineMatrix.mapRect(renderer->boundsOnElement("accel_z")).x();
-    startY = lineMatrix.mapRect(renderer->boundsOnElement("accel_z")).y();
+    rect = lineMatrix.mapRect(renderer->boundsOnElement("accel_z"));
+    startX = rect.x();
+    startY = rect.y()+ rect.height();
     accel_z = new QGraphicsSvgItem();
     accel_z->setSharedRenderer(renderer);
     accel_z->setElementId("accel_z");
     m_ahrs->ahrsBargraph->scene()->addItem(accel_z);
-    matrix.reset();
-    matrix.translate(startX,startY);
-    accel_z->setTransform(matrix,false);
+    accel_z->setPos(startX,startY);
+    accel_z->setTransform(QTransform::fromScale(1,0),true);
+
+    lineMatrix = renderer->matrixForElement("gyro_x");
+    rect = lineMatrix.mapRect(renderer->boundsOnElement("gyro_x"));
+    startX = rect.x();
+    startY = rect.y()+ rect.height();
+    gyro_x = new QGraphicsSvgItem();
+    gyro_x->setSharedRenderer(renderer);
+    gyro_x->setElementId("gyro_x");
+    m_ahrs->ahrsBargraph->scene()->addItem(gyro_x);
+    gyro_x->setPos(startX,startY);
+    gyro_x->setTransform(QTransform::fromScale(1,0),true);
+
+    lineMatrix = renderer->matrixForElement("gyro_y");
+    rect = lineMatrix.mapRect(renderer->boundsOnElement("gyro_y"));
+    startX = rect.x();
+    startY = rect.y()+ rect.height();
+    gyro_y = new QGraphicsSvgItem();
+    gyro_y->setSharedRenderer(renderer);
+    gyro_y->setElementId("gyro_y");
+    m_ahrs->ahrsBargraph->scene()->addItem(gyro_y);
+    gyro_y->setPos(startX,startY);
+    gyro_y->setTransform(QTransform::fromScale(1,0),true);
+
+
+    lineMatrix = renderer->matrixForElement("gyro_z");
+    rect = lineMatrix.mapRect(renderer->boundsOnElement("gyro_z"));
+    startX = rect.x();
+    startY = rect.y()+ rect.height();
+    gyro_z = new QGraphicsSvgItem();
+    gyro_z->setSharedRenderer(renderer);
+    gyro_z->setElementId("gyro_z");
+    m_ahrs->ahrsBargraph->scene()->addItem(gyro_z);
+    gyro_z->setPos(startX,startY);
+    gyro_z->setTransform(QTransform::fromScale(1,0),true);
+
+    lineMatrix = renderer->matrixForElement("mag_x");
+    rect = lineMatrix.mapRect(renderer->boundsOnElement("mag_x"));
+    startX = rect.x();
+    startY = rect.y()+ rect.height();
+    mag_x = new QGraphicsSvgItem();
+    mag_x->setSharedRenderer(renderer);
+    mag_x->setElementId("mag_x");
+    m_ahrs->ahrsBargraph->scene()->addItem(mag_x);
+    mag_x->setPos(startX,startY);
+    mag_x->setTransform(QTransform::fromScale(1,0),true);
+
+    lineMatrix = renderer->matrixForElement("mag_y");
+    rect = lineMatrix.mapRect(renderer->boundsOnElement("mag_y"));
+    startX = rect.x();
+    startY = rect.y()+ rect.height();
+    mag_y = new QGraphicsSvgItem();
+    mag_y->setSharedRenderer(renderer);
+    mag_y->setElementId("mag_y");
+    m_ahrs->ahrsBargraph->scene()->addItem(mag_y);
+    mag_y->setPos(startX,startY);
+    mag_y->setTransform(QTransform::fromScale(1,0),true);
+
+    lineMatrix = renderer->matrixForElement("mag_z");
+    rect = lineMatrix.mapRect(renderer->boundsOnElement("mag_z"));
+    startX = rect.x();
+    startY = rect.y()+ rect.height();
+    mag_z = new QGraphicsSvgItem();
+    mag_z->setSharedRenderer(renderer);
+    mag_z->setElementId("mag_z");
+    m_ahrs->ahrsBargraph->scene()->addItem(mag_z);
+    mag_z->setPos(startX,startY);
+    mag_z->setTransform(QTransform::fromScale(1,0),true);
 
 
 
@@ -105,6 +175,7 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     // Connect the signals
     connect(m_ahrs->ahrsCalibStart, SIGNAL(clicked()), this, SLOT(launchAHRSCalibration()));
+    connect(m_ahrs->ahrsCalibSave, SIGNAL(clicked()), this, SLOT(saveAHRSCalibration()));
 
 }
 
@@ -126,6 +197,7 @@ void ConfigAHRSWidget::launchAHRSCalibration()
 {
     m_ahrs->calibInstructions->setText("Calibration launched...");
     m_ahrs->ahrsCalibStart->setEnabled(false);
+    m_ahrs->ahrsCalibSave->setEnabled(false);
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
@@ -138,18 +210,90 @@ void ConfigAHRSWidget::launchAHRSCalibration()
     waitabit->setSingleShot(true);
     waitabit->start(15000);
     connect(waitabit, SIGNAL(timeout()), this, SLOT(calibPhase2()));
+    phaseCounter = 0;
 
 }
 
 
+/**
+  Callback after 15 seconds once calibration is done on the board.
+
+  Currently we don't have a way to tell if calibration is finished, so we
+  have to use a timer.
+
+  */
 void ConfigAHRSWidget::calibPhase2()
 {
-    m_ahrs->calibInstructions->setText("Confirming settings...");
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    UAVObject *obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("AHRSCalibration")));
 
-    // Now update size of all the graphs in log scale
-    // 'log(1/val)'
+    //  This is a bit weird, but it is because we are expecting an update from the
+    // OP board with the correct calibration values, and those only arrive on the object update
+    // which comes back from the board, and not the first object update signal which is in fast
+    // the object update we did ourselves... Clear ?
+    switch (phaseCounter) {
+    case 0:
+        phaseCounter++;
+        m_ahrs->calibInstructions->setText("Getting results...");
+        connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(calibPhase2()));
+        obj->updated();
+        break;
+    case 1:  // this is where we end up with the update just above
+        phaseCounter++;
+        break;
+    case 2: // This is the update with the right values
+        disconnect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(calibPhase2()));
+        // Now update size of all the graphs
+        // I have not found a way to do this elegantly...
+        UAVObjectField *field = obj->getField(QString("accel_var"));
+        // The expected range is from 1E-6 to 1E-1
+        double steps = 6; // 6 bars on the graph
+        float accel_x_var = -1/steps*(1+steps+log10(field->getValue(0).toFloat()));
+        accel_x->setTransform(QTransform::fromScale(1,accel_x_var),false);
+        float accel_y_var = -1/steps*(1+steps+log10(field->getValue(1).toFloat()));
+        accel_y->setTransform(QTransform::fromScale(1,accel_y_var),false);
+        float accel_z_var = -1/steps*(1+steps+log10(field->getValue(2).toFloat()));
+        accel_z->setTransform(QTransform::fromScale(1,accel_z_var),false);
 
-    m_ahrs->ahrsCalibStart->setEnabled(true);
+        field = obj->getField(QString("gyro_var"));
+        float gyro_x_var = -1/steps*(1+steps+log10(field->getValue(0).toFloat()));
+        gyro_x->setTransform(QTransform::fromScale(1,gyro_x_var),false);
+        float gyro_y_var = -1/steps*(1+steps+log10(field->getValue(1).toFloat()));
+        gyro_y->setTransform(QTransform::fromScale(1,gyro_y_var),false);
+        float gyro_z_var = -1/steps*(1+steps+log10(field->getValue(2).toFloat()));
+        gyro_z->setTransform(QTransform::fromScale(1,gyro_z_var),false);
+
+        field = obj->getField(QString("mag_var"));
+        float mag_x_var = -1/steps*(1+steps+log10(field->getValue(0).toFloat()));
+        mag_x->setTransform(QTransform::fromScale(1,mag_x_var),false);
+        float mag_y_var = -1/steps*(1+steps+log10(field->getValue(1).toFloat()));
+        mag_y->setTransform(QTransform::fromScale(1,mag_y_var),false);
+        float mag_z_var = -1/steps*(1+steps+log10(field->getValue(2).toFloat()));
+        mag_z->setTransform(QTransform::fromScale(1,mag_z_var),false);
+
+        m_ahrs->ahrsCalibStart->setEnabled(true);
+        m_ahrs->ahrsCalibSave->setEnabled(true);
+        break;
+    }
+
 }
+
+/**
+  Saves the AHRS sensors calibration
+  */
+void ConfigAHRSWidget::saveAHRSCalibration()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+
+    UAVObject *obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("AHRSCalibration")));
+    UAVObjectField *field = obj->getField(QString("measure_var"));
+    field->setValue("FALSE");
+    obj->updated();
+
+}
+
+
 
 

@@ -235,7 +235,7 @@ void ConfigServoWidget::requestRCOutputUpdate()
     obj->requestUpdate();
     QList<UAVObjectField*> fieldList = obj->getFields();
     foreach (UAVObjectField* field, fieldList) {
-        if (!field->getName().contains("Channel")) {
+        if (field->getUnits().contains("channel")) {
             assignOutputChannel(obj,field,field->getName());
         }
     }

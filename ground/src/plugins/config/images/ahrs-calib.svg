@@ -288,7 +288,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="0.98994949"
      inkscape:cx="334.4393"
-     inkscape:cy="152.4432"
+     inkscape:cy="117.47189"
      inkscape:document-units="px"
      inkscape:current-layer="background"
      showgrid="false"
@@ -333,7 +333,7 @@
       <rect
          style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:9.4025631;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
          id="rect6737"
-         width="687.74054"
+         width="683.69995"
          height="354.43222"
          x="187.97757"
          y="-563.36774"
@@ -353,28 +353,28 @@
          inkscape:export-ydpi="88.809998"
          rx="3.1741481" />
       <path
-         style="fill:none;stroke:#000000;stroke-width:1.17532039px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#Arrow1Lstart);marker-end:url(#Arrow1Lend)"
+         style="fill:none;stroke:#000000;stroke-width:1.17532039000000021px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:none;marker-end:none"
          d="m 537.38036,217.29216 -294.4803,0 0,614.17274"
          id="path5991" />
       <path
          style="fill:none;stroke:#000000;stroke-width:1.17532039;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1.17532035, 3.52596104;stroke-dashoffset:0"
-         d="m 281.83723,219.31246 0,602.05092"
+         d="m 285.2717,219.31246 0,602.05092"
          id="path6633" />
       <path
          id="path6635"
-         d="m 324.63724,219.31246 0,602.05092"
+         d="m 327.3848,219.31246 0,602.05092"
          style="fill:none;stroke:#000000;stroke-width:1.17532039;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1.17532035, 3.52596104;stroke-dashoffset:0" />
       <path
          style="fill:none;stroke:#000000;stroke-width:1.17532039;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1.17532035, 3.52596104;stroke-dashoffset:0"
-         d="m 367.43724,219.31246 0,602.05092"
+         d="m 369.49791,219.31246 0,602.05092"
          id="path6637" />
       <path
          id="path6639"
-         d="m 410.23724,219.31246 0,602.05092"
+         d="m 411.61102,219.31246 0,602.05092"
          style="fill:none;stroke:#000000;stroke-width:1.17532039;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1.17532035, 3.52596104;stroke-dashoffset:0" />
       <path
          style="fill:none;stroke:#000000;stroke-width:1.17532039;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1.17532035, 3.52596104;stroke-dashoffset:0"
-         d="m 453.03722,219.31246 0,602.05092"
+         d="m 453.72413,219.31246 0,602.05092"
          id="path6641" />
       <path
          id="path6643"
@@ -382,7 +382,7 @@
          style="fill:none;stroke:#000000;stroke-width:1.17532039;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1.17532035, 3.52596104;stroke-dashoffset:0" />
       <text
          xml:space="preserve"
-         style="font-size:21.98640251px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         style="font-size:21.98640251px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
          x="808.37286"
          y="-500.03018"
          id="text6659"
@@ -396,7 +396,7 @@
          id="text6667"
          y="-458.03018"
          x="808.37286"
-         style="font-size:21.98640251px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         style="font-size:21.98640251px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
          xml:space="preserve"><tspan
            id="tspan6669"
            y="-458.03018"
@@ -404,7 +404,7 @@
            sodipodi:role="line">1E-2</tspan></text>
       <text
          xml:space="preserve"
-         style="font-size:21.98640251px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         style="font-size:21.98640251px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
          x="808.37286"
          y="-418.03018"
          id="text6671"
@@ -418,7 +418,7 @@
          id="text6675"
          y="-374.03018"
          x="808.37286"
-         style="font-size:21.98640251px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         style="font-size:21.98640251px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
          xml:space="preserve"><tspan
            id="tspan6677"
            y="-374.03018"
@@ -426,7 +426,7 @@
            sodipodi:role="line">1E-4</tspan></text>
       <text
          xml:space="preserve"
-         style="font-size:21.98640251px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         style="font-size:21.98640251px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
          x="808.37286"
          y="-330.03018"
          id="text6679"
@@ -440,7 +440,7 @@
          id="text6683"
          y="-288.03018"
          x="808.37286"
-         style="font-size:21.98640251px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         style="font-size:21.98640251px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
          xml:space="preserve"><tspan
            id="tspan6685"
            y="-288.03018"
@@ -460,7 +460,7 @@
          id="path6707" />
       <text
          xml:space="preserve"
-         style="font-size:47.01281357px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Vera Sans"
+         style="font-size:47.01281356999999161px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Vera Sans"
          x="355.29535"
          y="-449.45621"
          id="text6755"
@@ -469,10 +469,10 @@
            id="tspan6757"
            x="355.29535"
            y="-449.45621"
-           style="font-size:23.50640678px">Accel</tspan></text>
+           style="font-size:23.50640677999999895px;fill:#ffffff;fill-opacity:1">Accel</tspan></text>
       <text
          xml:space="preserve"
-         style="font-size:47.01281357px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Vera Sans"
+         style="font-size:47.01281356999999161px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Vera Sans"
          x="573.94739"
          y="-451.94113"
          id="text6759"
@@ -481,10 +481,10 @@
            id="tspan6761"
            x="573.94739"
            y="-451.94113"
-           style="font-size:23.50640678px">Gyro</tspan></text>
+           style="font-size:23.50640677999999895px;fill:#ffffff;fill-opacity:1">Gyro</tspan></text>
       <text
          xml:space="preserve"
-         style="font-size:47.01281357px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Vera Sans"
+         style="font-size:47.01281356999999161px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Vera Sans"
          x="797.87463"
          y="-452.0961"
          id="text6763"
@@ -493,7 +493,7 @@
            id="tspan6765"
            x="797.87463"
            y="-452.0961"
-           style="font-size:23.50640678px">Mag</tspan></text>
+           style="font-size:23.50640677999999895px;fill:#ffffff;fill-opacity:1">Mag</tspan></text>
     </g>
   </g>
   <g

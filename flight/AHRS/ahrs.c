@@ -60,6 +60,9 @@ void DMA1_Channel1_IRQHandler() __attribute__ ((alias ("AHRS_ADC_DMA_Handler")))
  * @}
  */
 
+// For debugging the raw sensors
+//#define DUMP_RAW
+
 /**
  * @addtogroup AHRS_Definitions 
  * @{
@@ -271,6 +274,28 @@ int main()
     downsample_data();
     converge_insgps();
   }
+   
+#ifdef DUMP_RAW
+    while(1) {
+        int result;
+        uint8_t sync[4] = {7,7,7,7};
+        while( ahrs_state != AHRS_DATA_READY );
+        ahrs_state = AHRS_PROCESSING;
+        
+        downsample_data();
+        ahrs_state = AHRS_IDLE;;
+
+        // Dump raw buffer
+        result = PIOS_COM_SendBuffer(PIOS_COM_AUX, &sync[0], 4); // dump block number
+        result += PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &total_conversion_blocks, sizeof(total_conversion_blocks)); // dump block number
+        result += PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &valid_data_buffer[0], ADC_OVERSAMPLE * ADC_CONTINUOUS_CHANNELS * sizeof(valid_data_buffer[0]));
+        if(result == 0)
+            PIOS_LED_Off(LED1);
+        else {
+            PIOS_LED_On(LED1);
+        }
+    }
+#endif
   
   /******************* Main EKF loop ****************************/
   while (1) {

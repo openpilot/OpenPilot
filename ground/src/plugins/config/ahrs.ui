@@ -59,13 +59,16 @@ Tip: lower is better!</string>
      </rect>
     </property>
     <property name="text">
-     <string>Press &quot;Start&quot; above to calibrate.</string>
+     <string>Telemetry link not established.</string>
     </property>
    </widget>
    <widget class="QPushButton" name="ahrsCalibStart">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>380</x>
+      <x>440</x>
       <y>40</y>
       <width>93</width>
       <height>27</height>
@@ -115,6 +118,9 @@ Takes about 30 seconds max.</string>
       <height>31</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Select the sensor integration algorithm here.</string>
+    </property>
    </widget>
    <widget class="Line" name="line_2">
     <property name="geometry">
@@ -153,6 +159,9 @@ Takes about 30 seconds max.</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_4">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>230</x>
@@ -166,6 +175,9 @@ Takes about 30 seconds max.</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_5">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>230</x>
@@ -179,6 +191,9 @@ Takes about 30 seconds max.</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_6">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>230</x>
@@ -202,6 +217,9 @@ Takes about 30 seconds max.</string>
     </property>
    </widget>
    <widget class="QCheckBox" name="checkBox">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>290</x>
@@ -223,6 +241,12 @@ Takes about 30 seconds max.</string>
       <height>27</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Save settings to the OP board (RAM only).
+
+This does not save the calibration settings, this is done using the
+specific calibration button on top of the screen.</string>
+    </property>
     <property name="text">
      <string>Save to RAM</string>
     </property>
@@ -236,6 +260,9 @@ Takes about 30 seconds max.</string>
       <height>27</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Send settings to OP board, and save to the microSD card.</string>
+    </property>
     <property name="text">
      <string>Save to SD</string>
     </property>
@@ -248,6 +275,9 @@ Takes about 30 seconds max.</string>
       <width>93</width>
       <height>27</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Refresh this screen with current values from the board.</string>
     </property>
     <property name="text">
      <string>Request</string>
@@ -277,25 +307,6 @@ Takes about 30 seconds max.</string>
     </property>
     <property name="text">
      <string>Sensors calibration</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="ahrsCalibSave">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>500</x>
-      <y>40</y>
-      <width>93</width>
-      <height>27</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Save is only enabled once the calibration is done (&quot;Start&quot; on the left)</string>
-    </property>
-    <property name="text">
-     <string>Save</string>
     </property>
    </widget>
    <widget class="QProgressBar" name="calibProgress">

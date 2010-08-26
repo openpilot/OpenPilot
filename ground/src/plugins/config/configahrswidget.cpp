@@ -36,6 +36,7 @@
 #include <QtGui/QPushButton>
 
 const double ConfigAHRSWidget::maxVarValue = 0.1;
+const int ConfigAHRSWidget::calibrationDelay = 15; // Time to wait for the AHRS to do its calibration
 
 ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
@@ -172,7 +173,6 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     // Connect the signals
     connect(m_ahrs->ahrsCalibStart, SIGNAL(clicked()), this, SLOT(launchAHRSCalibration()));
-    connect(m_ahrs->ahrsCalibSave, SIGNAL(clicked()), this, SLOT(saveAHRSCalibration()));
     connect(m_ahrs->ahrsSettingsRequest, SIGNAL(clicked()), this, SLOT(ahrsSettingsRequest()));
 
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(ahrsSettingsRequest()));
@@ -202,14 +202,14 @@ void ConfigAHRSWidget::launchAHRSCalibration()
 {
     m_ahrs->calibInstructions->setText("Calibration launched...");
     m_ahrs->ahrsCalibStart->setEnabled(false);
-    m_ahrs->ahrsCalibSave->setEnabled(false);
 
     UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
     UAVObjectField *field = obj->getField(QString("measure_var"));
     field->setValue("TRUE");
     obj->updated();
 
-    QTimer::singleShot(15000, this, SLOT(calibPhase2()));
+    QTimer::singleShot(calibrationDelay*1000, this, SLOT(calibPhase2()));
+    m_ahrs->calibProgress->setRange(0,calibrationDelay);
     phaseCounter = 0;
     progressBarIndex = 0;
     connect(&progressBarTimer, SIGNAL(timeout()), this, SLOT(incrementProgress()));
@@ -262,17 +262,17 @@ void ConfigAHRSWidget::calibPhase2()
             drawVariancesGraph();
 
             // Now wait 15 more seconds before re-enabling the "Save" button
-            QTimer::singleShot(15000, this, SLOT(calibPhase2()));
-            m_ahrs->calibInstructions->setText(QString("Please review the results..."));
+            QTimer::singleShot(calibrationDelay*1000, this, SLOT(calibPhase2()));
+            m_ahrs->calibInstructions->setText(QString("Saving the results..."));
             progressBarIndex = 0;
             phaseCounter++;
         }
         break;
 
-    case 3:         // This step re-enables the "Save" button
-        m_ahrs->calibInstructions->setText(QString("Press \"Save\" if OK."));
+    case 3:         // This step saves the configuration.
+        saveAHRSCalibration();
+        m_ahrs->calibInstructions->setText(QString("Calibration saved."));
         m_ahrs->ahrsCalibStart->setEnabled(true);
-        m_ahrs->ahrsCalibSave->setEnabled(true);
         break;
 
     }
@@ -280,7 +280,7 @@ void ConfigAHRSWidget::calibPhase2()
 }
 
 /**
-  Saves the AHRS sensors calibration (to RAM only)
+  Saves the AHRS sensors calibration (to RAM and SD)
   */
 void ConfigAHRSWidget::saveAHRSCalibration()
 {
@@ -288,6 +288,7 @@ void ConfigAHRSWidget::saveAHRSCalibration()
     UAVObjectField *field = obj->getField(QString("measure_var"));
     field->setValue("FALSE");
     obj->updated();
+    updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
 
 }
 
@@ -337,6 +338,8 @@ void ConfigAHRSWidget::ahrsSettingsRequest()
     UAVObjectField *field = obj->getField(QString("Algorithm"));
     m_ahrs->algorithm->setCurrentIndex(m_ahrs->algorithm->findText(field->getValue().toString()));
     drawVariancesGraph();
+    m_ahrs->ahrsCalibStart->setEnabled(true);
+    m_ahrs->calibInstructions->setText(QString("Press \"Start\" above to calibrate."));
 }
 
 
@@ -345,6 +348,10 @@ void ConfigAHRSWidget::ahrsSettingsRequest()
   */
 void ConfigAHRSWidget::ahrsSettingsSaveRAM()
 {
+    UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
+    UAVObjectField *field = obj->getField(QString("Algorithm"));
+    field->setValue(m_ahrs->algorithm->currentText());
+    obj->updated();
 
 }
 
@@ -354,5 +361,12 @@ void ConfigAHRSWidget::ahrsSettingsSaveRAM()
   */
 void ConfigAHRSWidget::ahrsSettingsSaveSD()
 {
-
+    ahrsSettingsSaveRAM();
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
+    updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
 }
+
+/**
+  @}
+  @}
+  */

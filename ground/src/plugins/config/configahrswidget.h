@@ -64,6 +64,7 @@ private:
     int progressBarIndex;
     QTimer progressBarTimer;
     const static double maxVarValue;
+    const static int calibrationDelay;
 
 private slots:
     void launchAHRSCalibration();

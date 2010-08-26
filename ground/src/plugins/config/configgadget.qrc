@@ -4,5 +4,6 @@
         <file>images/Airframe.png</file>
         <file>images/Servo.png</file>
         <file>images/ahrs-calib.svg</file>
+        <file>images/AHRS-v1.3.png</file>
     </qresource>
 </RCC>

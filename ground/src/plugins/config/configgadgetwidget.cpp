@@ -56,7 +56,7 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     qwd = new ConfigTelemetryWidget(this);
     ftw->insertTab(2,qwd,QIcon(":/configgadget/images/XBee.svg"), QString("Telemetry"));
     qwd = new ConfigAHRSWidget(this);
-    ftw->insertTab(3,qwd,QIcon(":/core/images/plugin.png"),QString("AHRS"));
+    ftw->insertTab(3,qwd,QIcon(":/configgadget/images/AHRS-v1.3.png"),QString("AHRS"));
 
     // Listen to autopilot connection events
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();

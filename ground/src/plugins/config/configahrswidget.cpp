@@ -188,6 +188,10 @@ ConfigAHRSWidget::~ConfigAHRSWidget()
 
 void ConfigAHRSWidget::showEvent(QShowEvent *event)
 {
+    Q_UNUSED(event)
+    // Thit fitInView method should only be called now, once the
+    // widget is shown, otherwise it cannot compute its values and
+    // the result is usually a ahrsbargraph that is way too small.
     m_ahrs->ahrsBargraph->fitInView(ahrsbargraph, Qt::KeepAspectRatio);
 }
 
@@ -336,3 +340,19 @@ void ConfigAHRSWidget::ahrsSettingsRequest()
 }
 
 
+/**
+  Save current settings to RAM (besides the Calibration data)
+  */
+void ConfigAHRSWidget::ahrsSettingsSaveRAM()
+{
+
+}
+
+
+/**
+  Save current settings to SD (besides the Calibration data)
+  */
+void ConfigAHRSWidget::ahrsSettingsSaveSD()
+{
+
+}

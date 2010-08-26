@@ -83,7 +83,7 @@ int main(void) {
 			STM_EVAL_LEDOff(LED1);
 		if(STOPWATCH_ValueGet()>100*pwm_period*pwm_sweep_steps)
 			STOPWATCH_Reset();
-		if(STOPWATCH_ValueGet()>50000)
+		if(STOPWATCH_ValueGet()>50000 && DeviceState == idle)
 			JumpToApp=TRUE;
 		//DelayWithDown(10);//1000000);
 	}

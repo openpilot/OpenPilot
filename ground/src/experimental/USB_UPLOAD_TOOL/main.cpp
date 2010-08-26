@@ -7,10 +7,10 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
     QString filename;
-    if(argc < 1)
-        filename = QString("C:\\OpenPilot.bin");
+    if(argc < 2)
+        filename = QString("C:/OpenPilot.bin");
     else
-        filename = QString(argv[0]);
+        filename = QString(argv[1]);
 
     OP_DFU dfu;
 //    dfu.enterDFU(1);

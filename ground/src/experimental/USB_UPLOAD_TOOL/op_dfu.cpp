@@ -236,7 +236,7 @@ void OP_DFU::EndOperation()
     hidHandle.receive(0,buf,BUF_LEN,5000);
     qDebug() << result << " bytes sent";
 }
-void OP_DFU::UploadFirmware(QString sfile)
+void OP_DFU::UploadFirmware(const QString &sfile)
 {
     enterDFU(1);
     QFile file(sfile);
@@ -247,6 +247,7 @@ void OP_DFU::UploadFirmware(QString sfile)
              return;
                  }
     QByteArray arr=file.readAll();
+    qDebug()<<"Bytes Loaded="<<arr.length();
     if(arr.length()%4!=0)
     {
     int pad=arr.length()/4;

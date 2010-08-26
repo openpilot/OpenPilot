@@ -51,7 +51,7 @@ public:
     void StartUpload(qint32 numberOfBytes, TransferTypes type);
     void UploadData(qint32 numberOfPackets,QByteArray data);
     void UploadDescription(int devNumber, QString description);
-    void UploadFirmware(QString sfile);
+    void UploadFirmware(const QString &sfile);
     int StatusRequest();
     void EndOperation();
     QString DownloadDescription(int devNumber,int numberOfChars);

@@ -18,8 +18,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>591</width>
-     <height>261</height>
+     <width>601</width>
+     <height>341</height>
     </rect>
    </property>
    <widget class="QWidget" name="horizontalLayoutWidget">
@@ -27,8 +27,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>551</width>
-      <height>275</height>
+      <width>461</width>
+      <height>231</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -90,7 +90,7 @@
        <item row="3" column="0">
         <widget class="QLabel" name="label_7">
          <property name="text">
-          <string>Data Timeout:</string>
+          <string>Update Interval:</string>
          </property>
         </widget>
        </item>
@@ -190,7 +190,7 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>40</height>
+           <height>80</height>
           </size>
          </property>
         </spacer>
@@ -220,7 +220,7 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>50</height>
+           <height>30</height>
           </size>
          </property>
         </spacer>

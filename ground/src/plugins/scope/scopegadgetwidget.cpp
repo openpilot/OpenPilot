@@ -29,6 +29,7 @@
 #include "uavobjects/uavobjectmanager.h"
 #include "extensionsystem/pluginmanager.h"
 #include "scopegadgetwidget.h"
+#include "utils/stylehelper.h"
 
 #include "qwt/src/qwt_plot_curve.h"
 #include "qwt/src/qwt_legend.h"
@@ -68,7 +69,7 @@ void ScopeGadgetWidget::preparePlot(PlotType plotType)
     // Show a title
     setTitle("Scope");    
 
-    setCanvasBackground(Qt::darkBlue);
+    setCanvasBackground(Utils::StyleHelper::baseColor());
 
     //Add grid lines
     QwtPlotGrid *grid = new QwtPlotGrid;
@@ -346,9 +347,9 @@ void TestDataGen::genTestData()
 
     testTime += (periodMs / 1000.0);
 
-    debugCounter++;
-    if (debugCounter % (100/periodMs) == 0 )
-        qDebug() << "Test Time = " << testTime;
+//    debugCounter++;
+//    if (debugCounter % (100/periodMs) == 0 )
+//        qDebug() << "Test Time = " << testTime;
 }
 
 TestDataGen::~TestDataGen()

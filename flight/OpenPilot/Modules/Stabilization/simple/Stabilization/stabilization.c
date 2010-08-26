@@ -130,7 +130,7 @@ static void stabilizationTask(void* parameters)
 		rollErrorLast = rollError;
 
 		// Yaw stabilization control loop (only enabled on VTOL airframes)
-		if ( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_VTOL )
+		if (( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_VTOL )||( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_HELICP))
 		{
 			yawError = attitudeDesired.Yaw - attitudeActual.Yaw;
 			yawDerivative = yawError - yawErrorLast;

@@ -188,7 +188,7 @@ static void stabilizationTask(void* parameters)
 
 
 		// local Yaw stabilization control loop (only enabled on VTOL airframes)
-		if ( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_VTOL )
+		if (( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_VTOL )||( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_HELICP))
 		{
 			yawDerivative = yawError - yawErrorLast;
 			yawIntegralLimit = YAW_INTEGRAL_LIMIT / stabSettings.YawKi;

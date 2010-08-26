@@ -54,6 +54,8 @@ static void actuatorTask(void* parameters);
 static int32_t mixerFixedWing(const ActuatorSettingsData* settings, const ActuatorDesiredData* desired, ActuatorCommandData* cmd);
 static int32_t mixerFixedWingElevon(const ActuatorSettingsData* settings, const ActuatorDesiredData* desired, ActuatorCommandData* cmd);
 static int32_t mixerVTOL(const ActuatorSettingsData* settings, const ActuatorDesiredData* desired, ActuatorCommandData* cmd);
+static int32_t InterpolateCCPMCurve(float *Output, float input, const float *Curve);
+static int32_t mixerCCPM( ActuatorSettingsData* settings, const ActuatorDesiredData* desired, ActuatorCommandData* cmd);
 static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutral);
 static void setFailsafe();
 
@@ -142,6 +144,17 @@ static void actuatorTask(void* parameters)
 		else if ( sysSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_VTOL )
 		{
 			if ( mixerVTOL(&settings, &desired, &cmd) == -1 )
+			{
+				AlarmsSet(SYSTEMALARMS_ALARM_ACTUATOR, SYSTEMALARMS_ALARM_CRITICAL);
+			}
+			else
+			{
+				AlarmsClear(SYSTEMALARMS_ALARM_ACTUATOR);
+			}
+		}
+		else if ( sysSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_HELICP )
+		{
+			if ( mixerCCPM(&settings, &desired, &cmd) == -1 )
 			{
 				AlarmsSet(SYSTEMALARMS_ALARM_ACTUATOR, SYSTEMALARMS_ALARM_CRITICAL);
 			}
@@ -258,6 +271,165 @@ static int32_t mixerVTOL(const ActuatorSettingsData* settings, const ActuatorDes
 {
 	// TODO: Implement VTOL mixer
 	return -1;
+}
+
+static int32_t InterpolateCCPMCurve(float *output, float input, const float *curve)
+{
+	int8_t curvIndex;
+	float slope;
+	float offset;
+	float value;
+
+	//determine which section of the 5 point curve we are on
+	if (input <= .25)
+	{
+		curvIndex=0;
+		offset = 0;
+	}
+	else if (input <= .50)
+	{
+		curvIndex=1;
+		offset = 0.25;
+	}
+	else if (input <= .75)
+	{
+		curvIndex=2;
+		offset = 0.50;
+	}
+	else
+	{
+		curvIndex=3;
+		offset = 0.75;
+	}
+
+
+	//calculate the linear interpolation for the selected segment
+	slope = (curve[curvIndex+1]-curve[curvIndex])/0.25;
+	value=curve[curvIndex] + ((input-offset) * slope);
+
+	//bound the output to valid percentage values
+	if( value > 100.0 ) value = 100.0;
+	if( value < 0.0 ) value = 0.0;
+
+	*output=value;
+
+	return 0;
+
+}
+
+/**
+ * Mixer for CCPM (single rotor helicopters). Converts desired roll,pitch,yaw and throttle to servo outputs.
+ * @return -1 if error, 0 if success
+ */
+static int32_t mixerCCPM( ActuatorSettingsData* settings, const ActuatorDesiredData* desired, ActuatorCommandData* cmd)
+{
+#define degtorad  0.0174532925 //pi/180
+	// TODO: Implement CCPM mixers
+	int configOK;
+	float curveValue;
+	float throttle;
+	float bladePitch;
+	float CCPMCyclicConstant;
+	float servoW;
+	float servoX;
+	float servoY;
+	float servoZ;
+
+	configOK=0;
+
+	//calculate the throttle value based on the curve - scale to 0.0 -> +1.0
+	InterpolateCCPMCurve(&curveValue, desired->Throttle, settings->CCPMThrottleCurve);
+	throttle = curveValue/100.0;
+
+	//calculate the Blade Pitch value based on the curve - scale to -1.0 -> +1.0
+	InterpolateCCPMCurve(&curveValue, desired->Throttle, settings->CCPMPitchCurve);
+	bladePitch = (curveValue/50.0) -1.0;
+
+	//calculate how much Cyclic to apply to the mixing
+	CCPMCyclicConstant=1-settings->CCPMCollectiveConstant;
+
+	// Set ServoW servo command
+	if ( settings->CCPMServoW != ACTUATORSETTINGS_CCPMSERVOW_NONE )
+	{
+		servoW=(CCPMCyclicConstant * ((sin((settings->CCPMAngleW + settings->CCPMCorrectionAngle)*degtorad)*desired->Roll)
+										+(cos((settings->CCPMAngleW + settings->CCPMCorrectionAngle)*degtorad)*desired->Pitch)))
+										+ (settings->CCPMCollectiveConstant * bladePitch);
+
+		cmd->Channel[ settings->CCPMServoW ] = scaleChannel(servoW, settings->ChannelMax[ settings->CCPMServoW ],
+			                                                 settings->ChannelMin[ settings->CCPMServoW ],
+			                                                 settings->ChannelNeutral[ settings->CCPMServoW ]);
+		configOK++;
+	}
+	// Set ServoX servo command
+	if ( settings->CCPMServoX != ACTUATORSETTINGS_CCPMSERVOX_NONE )
+	{
+		servoX=(CCPMCyclicConstant * ((sin((settings->CCPMAngleX + settings->CCPMCorrectionAngle)*degtorad)*desired->Roll)
+										+(cos((settings->CCPMAngleX + settings->CCPMCorrectionAngle)*degtorad)*desired->Pitch)))
+										+ (settings->CCPMCollectiveConstant * bladePitch);
+
+		cmd->Channel[ settings->CCPMServoX ] = scaleChannel(servoX, settings->ChannelMax[ settings->CCPMServoX ],
+			                                                 settings->ChannelMin[ settings->CCPMServoX ],
+			                                                 settings->ChannelNeutral[ settings->CCPMServoX ]);
+		configOK++;
+	}
+	// Set ServoY servo command
+	if ( settings->CCPMServoY != ACTUATORSETTINGS_CCPMSERVOY_NONE )
+	{
+		servoY=(CCPMCyclicConstant * ((sin((settings->CCPMAngleY + settings->CCPMCorrectionAngle)*degtorad)*desired->Roll)
+										+(cos((settings->CCPMAngleY + settings->CCPMCorrectionAngle)*degtorad)*desired->Pitch)))
+										+ (settings->CCPMCollectiveConstant * bladePitch);
+
+		cmd->Channel[ settings->CCPMServoY ] = scaleChannel(servoY, settings->ChannelMax[ settings->CCPMServoY ],
+			                                                 settings->ChannelMin[ settings->CCPMServoY ],
+			                                                 settings->ChannelNeutral[ settings->CCPMServoY ]);
+		configOK++;
+	}
+	// Set ServoZ servo command
+	if ( settings->CCPMServoZ != ACTUATORSETTINGS_CCPMSERVOZ_NONE )
+	{
+		servoZ=(CCPMCyclicConstant * ((sin((settings->CCPMAngleZ + settings->CCPMCorrectionAngle)*degtorad)*desired->Roll)
+										+(cos((settings->CCPMAngleZ + settings->CCPMCorrectionAngle)*degtorad)*desired->Pitch)))
+										+ (settings->CCPMCollectiveConstant * bladePitch);
+
+		cmd->Channel[ settings->CCPMServoZ ] = scaleChannel(servoZ, settings->ChannelMax[ settings->CCPMServoZ ],
+			                                                 settings->ChannelMin[ settings->CCPMServoZ ],
+			                                                 settings->ChannelNeutral[ settings->CCPMServoZ ]);
+		configOK++;
+	}
+
+
+	// Set throttle servo command
+	if ( settings->CCPMThrottle != ACTUATORSETTINGS_CCPMTHROTTLE_NONE )
+	{
+	cmd->Channel[ settings->CCPMThrottle ] = scaleChannel(throttle, settings->ChannelMax[ settings->CCPMThrottle ],
+			                                                 settings->ChannelMin[ settings->CCPMThrottle ],
+			                                                 settings->ChannelNeutral[ settings->CCPMThrottle ]);
+	}
+	else
+	{
+		configOK=0;
+	}
+
+	// Set TailRotor servo command
+	if (settings->CCPMYawStabilizationInManualMode == ACTUATORSETTINGS_CCPMYAWSTABILIZATIONINMANUALMODE_FALSE)
+	{//update the servo as per the desired control mode (manual or stabalized)
+		if ( settings->CCPMTailRotor != ACTUATORSETTINGS_CCPMTAILROTOR_NONE )
+		{
+			cmd->Channel[ settings->CCPMTailRotor ] = scaleChannel(desired->Yaw, settings->ChannelMax[ settings->CCPMTailRotor ],
+																  settings->ChannelMin[ settings->CCPMTailRotor ],
+																  settings->ChannelNeutral[ settings->CCPMTailRotor ]);
+		}
+		else
+		{
+			configOK=0;
+		}
+	}
+	else
+	{//TODO need to implement the stabilization PID loop to provide heading hold gyro functionality in manual control mode
+
+	}
+	if (configOK<2)return -1;
+	return 0;
 }
 
 /**

@@ -789,6 +789,13 @@ void PFDGadgetWidget::moveSky() {
         return;
     }
 
+    // In some instances, it can happen that the rollValue & target are
+    // invalid inside the UAVObjects, and become a "nan" value, which freezes
+    // the PFD and the whole GCS: for this reason, we check this here.
+    // The strange check below works, it is a workaround because "isnan(double)"
+    // is not supported on every compiler.
+    if (rollTarget != rollTarget || pitchTarget != pitchTarget)
+        return;
     //////
     // Roll
     //////

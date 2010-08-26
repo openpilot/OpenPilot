@@ -49,15 +49,19 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(ftw);
     setLayout(layout);
-    QWidget *qwd = new ConfigServoWidget();
+    QWidget *qwd = new ConfigServoWidget(this);
     ftw->insertTab(0, qwd,QIcon(":/configgadget/images/Servo.png"),QString("RC Input/Output"));
-    qwd = new ConfigAirframeWidget();
+    qwd = new ConfigAirframeWidget(this);
     ftw->insertTab(1, qwd, QIcon(":/configgadget/images/Airframe.png"), QString("Aircraft"));
-    qwd = new ConfigTelemetryWidget();
+    qwd = new ConfigTelemetryWidget(this);
     ftw->insertTab(2,qwd,QIcon(":/configgadget/images/XBee.svg"), QString("Telemetry"));
-    qwd = new ConfigAHRSWidget();
+    qwd = new ConfigAHRSWidget(this);
     ftw->insertTab(3,qwd,QIcon(":/core/images/plugin.png"),QString("AHRS"));
 
+    // Listen to autopilot connection events
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    TelemetryManager* telMngr = pm->getObject<TelemetryManager>();
+    connect(telMngr, SIGNAL(connected()), this, SLOT(onAutopilotConnect()));
 
 }
 
@@ -72,4 +76,7 @@ void ConfigGadgetWidget::resizeEvent(QResizeEvent *event)
     QWidget::resizeEvent(event);
 }
 
+void ConfigGadgetWidget::onAutopilotConnect() {
+    emit autopilotConnected();
+}
 

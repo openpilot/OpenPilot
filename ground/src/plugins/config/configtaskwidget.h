@@ -43,6 +43,7 @@ public:
     ConfigTaskWidget(QWidget *parent = 0);
     ~ConfigTaskWidget();
     void updateObjectPersistance(ObjectPersistence::OperationOptions op, UAVObject *obj);
+    UAVObjectManager* getObjectManager();
 
 };
 

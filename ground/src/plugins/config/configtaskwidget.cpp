@@ -57,6 +57,11 @@ void ConfigTaskWidget::updateObjectPersistance(ObjectPersistence::OperationOptio
     }
 }
 
+UAVObjectManager* ConfigTaskWidget::getObjectManager() {
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    return pm->getObject<UAVObjectManager>();
+}
+
 /**
   @}
   @}

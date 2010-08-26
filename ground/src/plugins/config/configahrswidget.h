@@ -36,6 +36,7 @@
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
 #include <QList>
+#include <QTimer>
 
 
 class ConfigAHRSWidget: public ConfigTaskWidget
@@ -47,6 +48,7 @@ public:
     ~ConfigAHRSWidget();
 
 private:
+    void drawVariancesGraph();
     Ui_AHRSWidget *m_ahrs;
     QGraphicsSvgItem *ahrsbargraph;
     QGraphicsSvgItem *accel_x;
@@ -60,12 +62,18 @@ private:
     QGraphicsSvgItem *mag_z;
     double maxBarHeight;
     int phaseCounter;
+    int progressBarIndex;
+    QTimer progressBarTimer;
     const static double maxVarValue = 0.1;
 
 private slots:
     void launchAHRSCalibration();
     void saveAHRSCalibration();
     void calibPhase2();
+    void incrementProgress();
+    void ahrsSettingsRequest();
+    void ahrsSettingsSaveRAM();
+    void ahrsSettingsSaveSD();
 
 protected:
    void showEvent(QShowEvent *event);

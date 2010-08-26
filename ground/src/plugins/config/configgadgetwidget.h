@@ -27,6 +27,7 @@
 #ifndef CONFIGGADGETWIDGET_H
 #define CONFIGGADGETWIDGET_H
 
+#include "uavtalk/telemetrymanager.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/uavobject.h"
@@ -42,6 +43,12 @@ class ConfigGadgetWidget: public QWidget
 public:
     ConfigGadgetWidget(QWidget *parent = 0);
     ~ConfigGadgetWidget();
+
+public slots:
+    void onAutopilotConnect();
+
+signals:
+    void autopilotConnected();
 
 protected:
         void resizeEvent(QResizeEvent * event);

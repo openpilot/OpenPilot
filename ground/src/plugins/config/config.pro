@@ -2,6 +2,7 @@ TEMPLATE = lib
 TARGET = Config
 QT += svg
 include(../../openpilotgcsplugin.pri)
+include(../../plugins/uavtalk/uavtalk.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
 include(../../plugins/uavobjects/uavobjects.pri)
 OTHER_FILES += Config.pluginspec

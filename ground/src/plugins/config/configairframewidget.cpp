@@ -54,6 +54,8 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
     connect(m_aircraft->saveAircraftToRAM, SIGNAL(clicked()), this, SLOT(sendAircraftUpdate()));
     connect(m_aircraft->getAircraftCurrent, SIGNAL(clicked()), this, SLOT(requestAircraftUpdate()));
 
+    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestAircraftUpdate()));
+
 }
 
 ConfigAirframeWidget::~ConfigAirframeWidget()

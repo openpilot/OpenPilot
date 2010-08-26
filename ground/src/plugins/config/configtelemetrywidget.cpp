@@ -53,6 +53,8 @@ ConfigTelemetryWidget::ConfigTelemetryWidget(QWidget *parent) : ConfigTaskWidget
     connect(m_telemetry->saveTelemetryToRAM, SIGNAL(clicked()), this, SLOT(sendTelemetryUpdate()));
     connect(m_telemetry->getTelemetryCurrent, SIGNAL(clicked()), this, SLOT(requestTelemetryUpdate()));
 
+    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestTelemetryUpdate()));
+
 }
 
 ConfigTelemetryWidget::~ConfigTelemetryWidget()

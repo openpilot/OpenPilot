@@ -286,8 +286,8 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.98994949"
-     inkscape:cx="334.4393"
+     inkscape:zoom="2.8"
+     inkscape:cx="574.08216"
      inkscape:cy="117.47189"
      inkscape:document-units="px"
      inkscape:current-layer="background"
@@ -311,7 +311,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
         <dc:creator>
           <cc:Agent>
             <dc:title>Edouard Lafargue</dc:title>
@@ -330,16 +330,6 @@
        id="background"
        inkscape:label="#g8543"
        transform="matrix(0,-0.72391486,1,0,-8.719326,711.5901)">
-      <rect
-         style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:9.4025631;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-         id="rect6737"
-         width="683.69995"
-         height="354.43222"
-         x="187.97757"
-         y="-563.36774"
-         transform="matrix(0,1,-1,0,0,0)"
-         rx="3.1741481"
-         ry="6.0569253" />
       <rect
          style="fill:#453e3e;fill-opacity:1;stroke:#000000;stroke-width:4.70128155;stroke-miterlimit:10;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
          id="rect2936"

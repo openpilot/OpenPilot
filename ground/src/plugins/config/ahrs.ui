@@ -74,7 +74,7 @@ Tip: lower is better!</string>
     <property name="toolTip">
      <string>Press to start a calibration procedure.
 
-Takes about 10 seconds.</string>
+Takes about 30 seconds max.</string>
     </property>
     <property name="text">
      <string>Start</string>
@@ -214,7 +214,7 @@ Takes about 10 seconds.</string>
      <string>Save Home Location to SD</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_3">
+   <widget class="QPushButton" name="ahrsSettingsSaveRAM">
     <property name="geometry">
      <rect>
       <x>430</x>
@@ -227,7 +227,7 @@ Takes about 10 seconds.</string>
      <string>Save to RAM</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_7">
+   <widget class="QPushButton" name="ahrsSettingsSaveSD">
     <property name="geometry">
      <rect>
       <x>540</x>
@@ -240,7 +240,7 @@ Takes about 10 seconds.</string>
      <string>Save to SD</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_8">
+   <widget class="QPushButton" name="ahrsSettingsRequest">
     <property name="geometry">
      <rect>
       <x>320</x>
@@ -291,8 +291,33 @@ Takes about 10 seconds.</string>
       <height>27</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Save is only enabled once the calibration is done (&quot;Start&quot; on the left)</string>
+    </property>
     <property name="text">
      <string>Save</string>
+    </property>
+   </widget>
+   <widget class="QProgressBar" name="calibProgress">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>390</x>
+      <y>120</y>
+      <width>201</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>15</number>
+    </property>
+    <property name="value">
+     <number>0</number>
+    </property>
+    <property name="textVisible">
+     <bool>false</bool>
     </property>
    </widget>
   </widget>

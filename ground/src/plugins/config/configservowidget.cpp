@@ -135,6 +135,10 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_config->ch6OutSlider, SIGNAL(valueChanged(int)), this, SLOT(sendChannelTest(int)));
     connect(m_config->ch7OutSlider, SIGNAL(valueChanged(int)), this, SLOT(sendChannelTest(int)));
 
+
+    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestRCInputUpdate()));
+    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestRCOutputUpdate()));
+
     firstUpdate = true;
 
 }

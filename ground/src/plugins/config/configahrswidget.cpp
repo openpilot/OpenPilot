@@ -165,10 +165,7 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
 
     // Fill the dropdown menus:
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-
-    UAVObject *obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("AHRSSettings")));
+    UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
     UAVObjectField *field = obj->getField(QString("Algorithm"));
     m_ahrs->algorithm->addItems(field->getOptions());
 
@@ -176,6 +173,10 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
     // Connect the signals
     connect(m_ahrs->ahrsCalibStart, SIGNAL(clicked()), this, SLOT(launchAHRSCalibration()));
     connect(m_ahrs->ahrsCalibSave, SIGNAL(clicked()), this, SLOT(saveAHRSCalibration()));
+    connect(m_ahrs->ahrsSettingsRequest, SIGNAL(clicked()), this, SLOT(ahrsSettingsRequest()));
+
+    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(ahrsSettingsRequest()));
+
 
 }
 
@@ -198,35 +199,44 @@ void ConfigAHRSWidget::launchAHRSCalibration()
     m_ahrs->calibInstructions->setText("Calibration launched...");
     m_ahrs->ahrsCalibStart->setEnabled(false);
     m_ahrs->ahrsCalibSave->setEnabled(false);
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
-    UAVObject *obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("AHRSCalibration")));
+    UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
     UAVObjectField *field = obj->getField(QString("measure_var"));
     field->setValue("TRUE");
     obj->updated();
 
-    QTimer *waitabit = new QTimer();
-    waitabit->setSingleShot(true);
-    waitabit->start(15000);
-    connect(waitabit, SIGNAL(timeout()), this, SLOT(calibPhase2()));
+    QTimer::singleShot(15000, this, SLOT(calibPhase2()));
     phaseCounter = 0;
+    progressBarIndex = 0;
+    connect(&progressBarTimer, SIGNAL(timeout()), this, SLOT(incrementProgress()));
+    progressBarTimer.start(1000);
+}
 
+/**
+  Increment progress bar
+  */
+void ConfigAHRSWidget::incrementProgress()
+{
+    m_ahrs->calibProgress->setValue(progressBarIndex++);
+    if (progressBarIndex > m_ahrs->calibProgress->maximum()) {
+        progressBarTimer.stop();
+        progressBarIndex = 0;
+    }
 }
 
 
 /**
-  Callback after 15 seconds once calibration is done on the board.
+  Callback once calibration is done on the board.
 
   Currently we don't have a way to tell if calibration is finished, so we
   have to use a timer.
 
+  calibPhase2 is also connected to the AHRSCalibration object update signal.
+
   */
 void ConfigAHRSWidget::calibPhase2()
 {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVObject *obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("AHRSCalibration")));
+    UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
 
     //  This is a bit weird, but it is because we are expecting an update from the
     // OP board with the correct calibration values, and those only arrive on the object update
@@ -242,58 +252,87 @@ void ConfigAHRSWidget::calibPhase2()
     case 1:  // this is where we end up with the update just above
         phaseCounter++;
         break;
-    case 2: // This is the update with the right values
-        disconnect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(calibPhase2()));
-        // Now update size of all the graphs
-        // I have not found a way to do this elegantly...
-        UAVObjectField *field = obj->getField(QString("accel_var"));
-        // The expected range is from 1E-6 to 1E-1
-        double steps = 6; // 6 bars on the graph
-        float accel_x_var = -1/steps*(1+steps+log10(field->getValue(0).toFloat()));
-        accel_x->setTransform(QTransform::fromScale(1,accel_x_var),false);
-        float accel_y_var = -1/steps*(1+steps+log10(field->getValue(1).toFloat()));
-        accel_y->setTransform(QTransform::fromScale(1,accel_y_var),false);
-        float accel_z_var = -1/steps*(1+steps+log10(field->getValue(2).toFloat()));
-        accel_z->setTransform(QTransform::fromScale(1,accel_z_var),false);
+    case 2: { // This is the update with the right values (coming from the board)
+            disconnect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(calibPhase2()));
+            // Now update size of all the graphs
+            drawVariancesGraph();
 
-        field = obj->getField(QString("gyro_var"));
-        float gyro_x_var = -1/steps*(1+steps+log10(field->getValue(0).toFloat()));
-        gyro_x->setTransform(QTransform::fromScale(1,gyro_x_var),false);
-        float gyro_y_var = -1/steps*(1+steps+log10(field->getValue(1).toFloat()));
-        gyro_y->setTransform(QTransform::fromScale(1,gyro_y_var),false);
-        float gyro_z_var = -1/steps*(1+steps+log10(field->getValue(2).toFloat()));
-        gyro_z->setTransform(QTransform::fromScale(1,gyro_z_var),false);
+            // Now wait 15 more seconds before re-enabling the "Save" button
+            QTimer::singleShot(15000, this, SLOT(calibPhase2()));
+            m_ahrs->calibInstructions->setText(QString("Please review the results..."));
+            progressBarIndex = 0;
+            phaseCounter++;
+        }
+        break;
 
-        field = obj->getField(QString("mag_var"));
-        float mag_x_var = -1/steps*(1+steps+log10(field->getValue(0).toFloat()));
-        mag_x->setTransform(QTransform::fromScale(1,mag_x_var),false);
-        float mag_y_var = -1/steps*(1+steps+log10(field->getValue(1).toFloat()));
-        mag_y->setTransform(QTransform::fromScale(1,mag_y_var),false);
-        float mag_z_var = -1/steps*(1+steps+log10(field->getValue(2).toFloat()));
-        mag_z->setTransform(QTransform::fromScale(1,mag_z_var),false);
-
+    case 3:         // This step re-enables the "Save" button
+        m_ahrs->calibInstructions->setText(QString("Press \"Save\" if OK."));
         m_ahrs->ahrsCalibStart->setEnabled(true);
         m_ahrs->ahrsCalibSave->setEnabled(true);
         break;
+
     }
 
 }
 
 /**
-  Saves the AHRS sensors calibration
+  Saves the AHRS sensors calibration (to RAM only)
   */
 void ConfigAHRSWidget::saveAHRSCalibration()
 {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-
-    UAVObject *obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("AHRSCalibration")));
+    UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
     UAVObjectField *field = obj->getField(QString("measure_var"));
     field->setValue("FALSE");
     obj->updated();
 
 }
 
+/**
+  Draws the sensor variances bargraph
+  */
+void ConfigAHRSWidget::drawVariancesGraph()
+{
+    UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
+    // Now update size of all the graphs
+    // I have not found a way to do this elegantly...
+    UAVObjectField *field = obj->getField(QString("accel_var"));
+    // The expected range is from 1E-6 to 1E-1
+    double steps = 6; // 6 bars on the graph
+    float accel_x_var = -1/steps*(1+steps+log10(field->getValue(0).toFloat()));
+    accel_x->setTransform(QTransform::fromScale(1,accel_x_var),false);
+    float accel_y_var = -1/steps*(1+steps+log10(field->getValue(1).toFloat()));
+    accel_y->setTransform(QTransform::fromScale(1,accel_y_var),false);
+    float accel_z_var = -1/steps*(1+steps+log10(field->getValue(2).toFloat()));
+    accel_z->setTransform(QTransform::fromScale(1,accel_z_var),false);
 
+    field = obj->getField(QString("gyro_var"));
+    float gyro_x_var = -1/steps*(1+steps+log10(field->getValue(0).toFloat()));
+    gyro_x->setTransform(QTransform::fromScale(1,gyro_x_var),false);
+    float gyro_y_var = -1/steps*(1+steps+log10(field->getValue(1).toFloat()));
+    gyro_y->setTransform(QTransform::fromScale(1,gyro_y_var),false);
+    float gyro_z_var = -1/steps*(1+steps+log10(field->getValue(2).toFloat()));
+    gyro_z->setTransform(QTransform::fromScale(1,gyro_z_var),false);
+
+    field = obj->getField(QString("mag_var"));
+    float mag_x_var = -1/steps*(1+steps+log10(field->getValue(0).toFloat()));
+    mag_x->setTransform(QTransform::fromScale(1,mag_x_var),false);
+    float mag_y_var = -1/steps*(1+steps+log10(field->getValue(1).toFloat()));
+    mag_y->setTransform(QTransform::fromScale(1,mag_y_var),false);
+    float mag_z_var = -1/steps*(1+steps+log10(field->getValue(2).toFloat()));
+    mag_z->setTransform(QTransform::fromScale(1,mag_z_var),false);
+
+}
+
+/**
+  Request current settings from the AHRS
+  */
+void ConfigAHRSWidget::ahrsSettingsRequest()
+{
+    UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
+    obj->requestUpdate();
+    UAVObjectField *field = obj->getField(QString("Algorithm"));
+    m_ahrs->algorithm->setCurrentIndex(m_ahrs->algorithm->findText(field->getValue().toString()));
+    drawVariancesGraph();
+}
 
 

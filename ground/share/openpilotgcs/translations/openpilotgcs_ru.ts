@@ -168,27 +168,27 @@
     <message>
         <location filename="../../../src/libs/extensionsystem/pluginview.ui"/>
         <source>State</source>
-        <translation type="unfinished"></translation>
+        <translation>Состояние</translation>
     </message>
     <message>
         <location/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Название</translation>
     </message>
     <message>
         <location/>
         <source>Version</source>
-        <translation type="unfinished"></translation>
+        <translation>Версия</translation>
     </message>
     <message>
         <location/>
         <source>Developer</source>
-        <translation type="unfinished"></translation>
+        <translation>Разработчик</translation>
     </message>
     <message>
         <location/>
         <source>Location</source>
-        <translation type="unfinished"></translation>
+        <translation>Место</translation>
     </message>
 </context>
 <context>
@@ -211,7 +211,7 @@
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Отмена</translation>
     </message>
 </context>
 <context>
@@ -255,77 +255,77 @@
     <message>
         <location filename="../../../src/libs/utils/newclasswidget.ui"/>
         <source>Class name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя класса:</translation>
     </message>
     <message>
         <location/>
         <source>Base class:</source>
-        <translation type="unfinished"></translation>
+        <translation>Базовый класс:</translation>
     </message>
     <message>
         <location/>
         <source>Type information:</source>
-        <translation type="unfinished"></translation>
+        <translation>Информация о типе:</translation>
     </message>
     <message>
         <location/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Отсутствует</translation>
     </message>
     <message>
         <location/>
         <source>Inherits QObject</source>
-        <translation type="unfinished"></translation>
+        <translation>Наследует QObject</translation>
     </message>
     <message>
         <location/>
         <source>Inherits QWidget</source>
-        <translation type="unfinished"></translation>
+        <translation>Наследует QWidget</translation>
     </message>
     <message>
         <location/>
         <source>Header file:</source>
-        <translation type="unfinished"></translation>
+        <translation>Файл заголовка:</translation>
     </message>
     <message>
         <location/>
         <source>Source file:</source>
-        <translation type="unfinished"></translation>
+        <translation>Файл исходника:</translation>
     </message>
     <message>
         <location/>
         <source>Generate form:</source>
-        <translation type="unfinished"></translation>
+        <translation>Генерировать форму:</translation>
     </message>
     <message>
         <location/>
         <source>Form file:</source>
-        <translation type="unfinished"></translation>
+        <translation>Из файла:</translation>
     </message>
     <message>
         <location/>
         <source>Path:</source>
-        <translation type="unfinished"></translation>
+        <translation>Путь:</translation>
     </message>
     <message>
         <location filename="../../../src/libs/utils/newclasswidget.cpp" line="+416"/>
         <source>Invalid base class name</source>
-        <translation type="unfinished"></translation>
+        <translation>Неверное имя базового класса</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Invalid header file name: &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Неверное имя заголовочного файла: &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Invalid source file name: &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Неверное имя файла исходника: &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Invalid form file name: &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Неверное имя файла формы: &apos;%1&apos;</translation>
     </message>
 </context>
 <context>
@@ -384,47 +384,47 @@
     <message>
         <location filename="../../../src/plugins/config/airframe.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>Applies and Saves all settings to SD</source>
-        <translation type="unfinished"></translation>
+        <translation>Принять изменения и сохранить на SD</translation>
     </message>
     <message>
         <location/>
         <source>Save to SD</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить на  SD</translation>
     </message>
     <message>
         <location/>
         <source>Send to OpenPilot but don&apos;t write in SD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Передать в OpenPilot но не записывать на SD.</translation>
     </message>
     <message>
         <location/>
         <source>Save to RAM</source>
-        <translation type="unfinished"></translation>
+        <translation>Записать в RAM</translation>
     </message>
     <message>
         <location/>
         <source>Retrieve settings from OpenPilot</source>
-        <translation type="unfinished"></translation>
+        <translation>Получить настройки из OpenPilot</translation>
     </message>
     <message>
         <location/>
         <source>Get Current</source>
-        <translation type="unfinished"></translation>
+        <translation>Взять текущие</translation>
     </message>
     <message>
         <location/>
         <source>Select aircraft type here</source>
-        <translation type="unfinished"></translation>
+        <translation>Здесь выберите тип БПЛА </translation>
     </message>
     <message>
         <location/>
         <source>Aircraft type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Тип БПЛА:</translation>
     </message>
 </context>
 <context>
@@ -432,12 +432,12 @@
     <message>
         <location filename="../../../src/plugins/config/settingswidget.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>RC Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Вход с приемника</translation>
     </message>
     <message>
         <location/>
@@ -446,12 +446,16 @@
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;FreeSans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Maximum channel value&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;FreeSans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Максимальное значение&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>2000</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -460,7 +464,11 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;FreeSans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Check to invert the channel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;FreeSans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Выберите для инверсии канала.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -469,44 +477,50 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;FreeSans&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Current channel value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;FreeSans&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Текущее значение.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>1000</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Retrieve settings from OpenPilot</source>
-        <translation type="unfinished"></translation>
+        <translation>Получить настройки из OpenPilot</translation>
     </message>
     <message>
         <location/>
         <source>Get Current</source>
-        <translation type="unfinished"></translation>
+        <translation>Взять текущие</translation>
     </message>
     <message>
         <location/>
         <source>Be sure to set the Neutral position on all sliders before sending!
 Applies and Saves all settings to SD</source>
-        <translation type="unfinished"></translation>
+        <translation>Не забудьте установить все ползунки в нейтральное положение перед сохранением!
+Применяются все настройки и сохраняются на SD</translation>
     </message>
     <message>
         <location/>
         <source>Save to SD</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить на SD</translation>
     </message>
     <message>
         <location/>
         <source>Send to OpenPilot but don&apos;t write in SD.
 Be sure to set the Neutral position on all sliders before sending!</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки передаются в OpenPilot, но не сохраняются на SD
+Не забудьте установить все ползунки в нейтральное положение перед сохранением!</translation>
     </message>
     <message>
         <location/>
         <source>Save to RAM</source>
-        <translation type="unfinished"></translation>
+        <translation>Записать в RAM</translation>
     </message>
     <message>
         <location/>
@@ -515,28 +529,33 @@ Be sure to set the Neutral position on all sliders before sending!</source>
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;FreeSans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Minimum channel value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;FreeSans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Минимальное значение.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Start calibrating the RC Inputs.
 Uncheck/Check to restart calibration.</source>
-        <translation type="unfinished"></translation>
+        <translation>Старт процесса калибровки входных сигналов RC
+Снимите/Установите галку для рестарта процесса.</translation>
     </message>
     <message>
         <location/>
         <source>Run Calibration</source>
-        <translation type="unfinished"></translation>
+        <translation>Старт калибровки</translation>
     </message>
     <message>
         <location/>
         <source>Indicates whether OpenPilot is getting a signal from the RC receiver.</source>
-        <translation type="unfinished"></translation>
+        <translation>Показывает, получает ли OpenPilot сигнал от приемника.</translation>
     </message>
     <message>
         <location/>
         <source>RC Receiver Not Connected</source>
-        <translation type="unfinished"></translation>
+        <translation>Приёмник не подсоединен</translation>
     </message>
     <message>
         <location/>
@@ -544,52 +563,55 @@ Uncheck/Check to restart calibration.</source>
 - PWM is the most usual type
 - PPM is connected to input XXX 
 - Spektrum is used with Spektrum &apos;satellite&apos; receivers</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите тип приемника:
+- PWM самый обычный тип
+- PPM подключен к входу XXX 
+- Spektrum используется с сателитами Spektrum</translation>
     </message>
     <message>
         <location/>
         <source>RC Receiver Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Тип приёмника:</translation>
     </message>
     <message>
         <location/>
         <source>Servo Output</source>
-        <translation type="unfinished"></translation>
+        <translation>Выход на приводы</translation>
     </message>
     <message>
         <location/>
         <source>Aircraft type: undefined</source>
-        <translation type="unfinished"></translation>
+        <translation>Тип БПЛА: не определен</translation>
     </message>
     <message>
         <location/>
         <source>Channel 0</source>
-        <translation type="unfinished"></translation>
+        <translation>Канал 0</translation>
     </message>
     <message>
         <location/>
         <source>Channel 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Канал 1</translation>
     </message>
     <message>
         <location/>
         <source>Channel 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Канал 2</translation>
     </message>
     <message>
         <location/>
         <source>Channel 3</source>
-        <translation type="unfinished"></translation>
+        <translation>Канал 3</translation>
     </message>
     <message>
         <location/>
         <source>Channel 4</source>
-        <translation type="unfinished"></translation>
+        <translation>Канал 4</translation>
     </message>
     <message>
         <location/>
         <source>Channel 5</source>
-        <translation type="unfinished"></translation>
+        <translation>Канал 5</translation>
     </message>
     <message>
         <location/>
@@ -598,7 +620,11 @@ Uncheck/Check to restart calibration.</source>
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Select the kind of actuator (servo) connected to this output channel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Выберите тип привода, подключенного к данному каналу&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -607,7 +633,11 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Minimum PWM value, beware of not overdriving your servo.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Минимальное значение PWM. Не перегрузите сервомашинку.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -616,54 +646,60 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Maximum PWM value, beware of not overdriving your servo.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Максимальное значение PWM. Не перегрузите сервомашинку.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Move the servos using the sliders. Two important things:
 - Take extra care if the output is connected to an motor controller!
 - Will only work if the RC receiver is working (failsafe)</source>
-        <translation type="unfinished"></translation>
+        <translation>Управляйте приводами с помощью ползунков. Два важных замечания:
+- Будьте особенно осторожны, если выход подключен к контроллеру двигателя!
+- Будет работать, только если работает приёмник (failsafe)</translation>
     </message>
     <message>
         <location/>
         <source>Test outputs</source>
-        <translation type="unfinished"></translation>
+        <translation>Тест выходов</translation>
     </message>
     <message>
         <location/>
         <source>Channel 6</source>
-        <translation type="unfinished"></translation>
+        <translation>Канал 6</translation>
     </message>
     <message>
         <location/>
         <source>Channel 7</source>
-        <translation type="unfinished"></translation>
+        <translation>Канал 7</translation>
     </message>
     <message>
         <location/>
         <source>Update rate:</source>
-        <translation type="unfinished"></translation>
+        <translation>Частота обновления:</translation>
     </message>
     <message>
         <location/>
         <source>Channel 0-3</source>
-        <translation type="unfinished"></translation>
+        <translation>Каналы 0-3</translation>
     </message>
     <message>
         <location/>
         <source>Channel 4-7</source>
-        <translation type="unfinished"></translation>
+        <translation>Каналы 4-7</translation>
     </message>
     <message>
         <location/>
         <source>Current value of slider.</source>
-        <translation type="unfinished"></translation>
+        <translation>Текущее положение ползунка.</translation>
     </message>
     <message>
         <location/>
         <source>0000</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -671,7 +707,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/telemetry.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
@@ -687,44 +723,44 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Telemetry speed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Скорость обмена:</translation>
     </message>
     <message>
         <location/>
         <source>Select the speed here.</source>
-        <translation type="unfinished"></translation>
+        <translation>Укажите скорость.</translation>
     </message>
     <message>
         <location/>
         <source>Send to OpenPilot but don&apos;t write in SD.
 Beware of not locking yourself out!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Передать в OpenPilot но не записывать на SD.</translation>
     </message>
     <message>
         <location/>
         <source>Save to RAM</source>
-        <translation type="unfinished"></translation>
+        <translation>Записать в RAM</translation>
     </message>
     <message>
         <location/>
         <source>Retrieve settings from OpenPilot</source>
-        <translation type="unfinished"></translation>
+        <translation>Получить настройки из OpenPilot</translation>
     </message>
     <message>
         <location/>
         <source>Get Current</source>
-        <translation type="unfinished"></translation>
+        <translation>Взять текущие</translation>
     </message>
     <message>
         <location/>
         <source>Applies and Saves all settings to SD.
 Beware of not locking yourself out!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Принять изменения и сохранить на SD</translation>
     </message>
     <message>
         <location/>
         <source>Save to SD</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить на  SD</translation>
     </message>
 </context>
 <context>
@@ -2532,7 +2568,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/app/main.cpp" line="+128"/>
         <source>Failed to load core: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка загрузки ядра: %1</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -6287,7 +6323,7 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/config/configgadgetfactory.cpp" line="+35"/>
         <source>Config Gadget</source>
-        <translation>Настройка гаджета</translation>
+        <translation>Настройка аппаратуры</translation>
     </message>
 </context>
 <context>
@@ -6367,162 +6403,162 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/coreplugin/mainwindow.cpp" line="+143"/>
         <source>OpenPilot GCS</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenPilot НСУ (Наземная Система Управления)</translation>
     </message>
     <message>
         <location line="+241"/>
         <source>&amp;File</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Файл</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>&amp;Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Правка</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;Tools</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Инструменты</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Window</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Окно</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;Help</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Справка</translation>
     </message>
     <message>
         <location line="+62"/>
         <source>&amp;New File or Project...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Новый файл или проект...</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&amp;Open File or Project...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Открыть файл или проект...</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&amp;Open File With...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Открыть файл с...</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Recent Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Недавние файлы</translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+4"/>
         <source>&amp;Save</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Сохранить</translation>
     </message>
     <message>
         <location line="+4"/>
         <location line="+6"/>
         <source>Save &amp;As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить &amp;как...</translation>
     </message>
     <message>
         <location line="-3"/>
         <location line="+10"/>
         <source>Ctrl+Shift+S</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="-3"/>
         <source>Save A&amp;ll</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить в&amp;се</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>E&amp;xit</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Выход</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Ctrl+Q</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+5"/>
         <location line="+4"/>
         <source>&amp;Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>О&amp;тменить</translation>
     </message>
     <message>
         <location line="+5"/>
         <location line="+4"/>
         <source>&amp;Redo</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Повторить</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Cu&amp;t</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы&amp;резать</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&amp;Copy</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Копировать</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&amp;Paste</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Вставить</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&amp;Select All</source>
-        <translation type="unfinished"></translation>
+        <translation>В&amp;ыделить всё</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&amp;Options...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Параметры...</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Minimize</source>
-        <translation type="unfinished"></translation>
+        <translation>Свернуть</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Zoom</source>
-        <translation type="unfinished"></translation>
+        <translation>Масштабировать</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Full Screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Во весь экран</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>&amp;Help...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Справка...</translation>
     </message>
     <message>
         <location line="+18"/>
         <source>About &amp;Plugins...</source>
-        <translation type="unfinished"></translation>
+        <translation>О &amp;плагинах...</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>About &amp;OpenPilot GCS</source>
-        <translation type="unfinished"></translation>
+        <translation>О проекте &amp;OpenPilot</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>About &amp;OpenPilot GCS...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;О программе...</translation>
     </message>
     <message>
         <location line="+491"/>
         <source>Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки...</translation>
     </message>
 </context>
 <context>
@@ -6690,13 +6726,13 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/coreplugin/versiondialog.cpp" line="+57"/>
         <source>About OpenPilot GCS</source>
-        <translation type="unfinished"></translation>
+        <translation>О программе</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>From revision %1&lt;br/&gt;</source>
         <extracomment>This gets conditionally inserted as argument %8 into the description string.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Ревизия %1&lt;br/&gt;</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -6717,7 +6753,7 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/emptygadget/emptygadgetfactory.cpp" line="+34"/>
         <source>Choose Gadget...</source>
-        <translation>Выбрать гаджет...</translation>
+        <translation>Выбрать инструмент...</translation>
     </message>
 </context>
 <context>
@@ -6765,7 +6801,7 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/hitl/hitlfactory.cpp" line="+35"/>
         <source>HITL Simulation</source>
-        <translation>HITL Симулятор</translation>
+        <translation>HITL Симуляция с FlighGear</translation>
     </message>
 </context>
 <context>
@@ -6836,7 +6872,7 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/opmap/opmapgadgetfactory.cpp" line="+35"/>
         <source>OPMap Gadget</source>
-        <translation type="unfinished"></translation>
+        <translation>Карта местности</translation>
     </message>
 </context>
 <context>
@@ -7192,7 +7228,7 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/scope/scopegadgetfactory.cpp" line="+36"/>
         <source>Scope Gadget</source>
-        <translation type="unfinished"></translation>
+        <translation>График</translation>
     </message>
 </context>
 <context>
@@ -7200,7 +7236,7 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/systemhealth/systemhealthgadgetfactory.cpp" line="+36"/>
         <source>System Health Gadget</source>
-        <translation>Состояние системы</translation>
+        <translation>Монитор состояния системы</translation>
     </message>
 </context>
 <context>
@@ -7363,7 +7399,7 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/uploader/uploadergadgetfactory.cpp" line="+36"/>
         <source>Uploader Gadget</source>
-        <translation type="unfinished"></translation>
+        <translation>Выгрузка файла</translation>
     </message>
 </context>
 <context>

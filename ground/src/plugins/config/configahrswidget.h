@@ -38,7 +38,6 @@
 #include <QList>
 #include <QTimer>
 
-
 class ConfigAHRSWidget: public ConfigTaskWidget
 {
     Q_OBJECT
@@ -64,7 +63,7 @@ private:
     int phaseCounter;
     int progressBarIndex;
     QTimer progressBarTimer;
-    const static double maxVarValue = 0.1;
+    const static double maxVarValue;
 
 private slots:
     void launchAHRSCalibration();

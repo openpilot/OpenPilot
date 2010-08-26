@@ -35,7 +35,7 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
 
-
+const double ConfigAHRSWidget::maxVarValue = 0.1;
 
 ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {

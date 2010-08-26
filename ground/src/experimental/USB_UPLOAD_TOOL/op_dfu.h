@@ -61,7 +61,7 @@ public:
     OP_DFU();
 private:
     pjrc_rawhid hidHandle;
-    int setStartBit(int command){return command|0b00100000;}
+    int setStartBit(int command){return command|0x20;}
 };
 
 #endif // OP_DFU_H

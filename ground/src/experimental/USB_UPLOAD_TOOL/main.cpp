@@ -6,6 +6,12 @@
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
+    QString filename;
+    if(argc < 1)
+        filename = QString("C:\\OpenPilot.bin");
+    else
+        filename = QString(argv[0]);
+
     OP_DFU dfu;
 //    dfu.enterDFU(1);
 //    dfu.StartUpload(4,OP_DFU::Descript);
@@ -22,7 +28,7 @@ int main(int argc, char *argv[])
     //dfu.UploadDescription(1,"jose manuel");
     //QString str=dfu.DownloadDescription(1,12);
    // dfu.JumpToApp();
-  dfu.UploadFirmware("C:/OpenPilot.bin");
+  dfu.UploadFirmware(filename.toAscii());
     //qDebug()<<"Description="<<str;
     return a.exec();
 }

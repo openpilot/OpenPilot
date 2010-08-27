@@ -90,7 +90,8 @@ public:
         int gcsTelemetryUpdatePeriod; /** Update period used by the GCS (only if telemetry mode is PERIODIC) */
         UpdateMode loggingUpdateMode; /** Update mode used by the logging module (UpdateMode) */
         int loggingUpdatePeriod; /** Update period used by the logging module (only if logging mode is PERIODIC) */
-        QList<FieldInfo*> fields;
+        QList<FieldInfo*> fields; /** The data fields for the object **/
+        QString description; /** Description used for Doxygen **/
     } ObjectInfo;
 
     // Functions
@@ -122,6 +123,7 @@ private:
     QString processObjectAttributes(QDomNode& node, ObjectInfo* info);
     QString processObjectFields(QDomNode& childNode, ObjectInfo* info);
     QString processObjectAccess(QDomNode& childNode, ObjectInfo* info);
+    QString processObjectDescription(QDomNode& childNode, QString * description);
     QString processObjectMetadata(QDomNode& childNode, UpdateMode* mode, int* period, bool* acked);
     void calculateID(ObjectInfo* info);
     quint32 updateHash(quint32 value, quint32 hash);

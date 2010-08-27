@@ -1,12 +1,13 @@
 <xml>
-	<object name="AHRSSettings" singleinstance="true" settings="true">
-    <field name="Algorithm" units="" type="enum" elements="1" options="SIMPLE,INSGPS" defaultvalue="INSGPS"/>
-    <field name="UpdateRaw" units="raw" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
-    <field name="UpdateFiltered" units="raw" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
-		<field name="UpdatePeriod" units="ms" type="int32" elements="1" defaultvalue="20"/>
-		<access gcs="readwrite" flight="readwrite"/>
-		<telemetrygcs acked="true" updatemode="onchange" period="0"/>
-		<telemetryflight acked="true" updatemode="onchange" period="0"/>
-		<logging updatemode="never" period="0"/>
-	</object>
+    <object name="AHRSSettings" singleinstance="true" settings="true">
+        <description>Settings for the @ref AHRSCommsModule to control the algorithm and what is updated</description>
+        <field name="Algorithm" units="" type="enum" elements="1" options="SIMPLE,INSGPS" defaultvalue="INSGPS"/>
+        <field name="UpdateRaw" units="raw" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
+        <field name="UpdateFiltered" units="raw" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
+        <field name="UpdatePeriod" units="ms" type="int32" elements="1" defaultvalue="20"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <logging updatemode="never" period="0"/>
+    </object>
 </xml>

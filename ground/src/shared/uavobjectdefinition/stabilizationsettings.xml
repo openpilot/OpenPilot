@@ -1,21 +1,22 @@
 <xml>
-        <object name="StabilizationSettings" singleinstance="true" settings="true">
-            <field name="UpdatePeriod" units="ms" type="uint16" elements="1" defaultvalue="10"/>
-            <field name="RollMax" units="degrees" type="float" elements="1" defaultvalue="35"/>
-            <field name="PitchMax" units="degrees" type="float" elements="1" defaultvalue="35"/>
-            <field name="ThrottleMax" units="%" type="float" elements="1" defaultvalue="1.0"/>
-            <field name="PitchKp" units="" type="float" elements="1" defaultvalue="0.04"/>
-            <field name="PitchKi" units="" type="float" elements="1" defaultvalue="0.000004"/>
-            <field name="PitchKd" units="" type="float" elements="1" defaultvalue="0.01"/>
-            <field name="RollKp" units="" type="float" elements="1" defaultvalue="0.02"/>
-            <field name="RollKi" units="" type="float" elements="1" defaultvalue="0.000004"/>
-            <field name="RollKd" units="" type="float" elements="1" defaultvalue="0.01"/>
-            <field name="YawKp" units="" type="float" elements="1" defaultvalue="0.04"/>
-            <field name="YawKi" units="" type="float" elements="1" defaultvalue="0.000004"/>
-            <field name="YawKd" units="" type="float" elements="1" defaultvalue="0.01"/>
-            <access gcs="readwrite" flight="readwrite"/>
-            <telemetrygcs acked="true" updatemode="onchange" period="0"/>
-            <telemetryflight acked="true" updatemode="onchange" period="0"/>
-            <logging updatemode="never" period="0"/>
+    <object name="StabilizationSettings" singleinstance="true" settings="true">
+        <description>PID settings used by the Stabilization module to combine the @ref AttitudeActual and @ref AttitudeDesired to compute @ref ActuatorDesired</description>
+        <field name="UpdatePeriod" units="ms" type="uint16" elements="1" defaultvalue="10"/>
+        <field name="RollMax" units="degrees" type="float" elements="1" defaultvalue="35"/>
+        <field name="PitchMax" units="degrees" type="float" elements="1" defaultvalue="35"/>
+        <field name="ThrottleMax" units="%" type="float" elements="1" defaultvalue="1.0"/>
+        <field name="PitchKp" units="" type="float" elements="1" defaultvalue="0.04"/>
+        <field name="PitchKi" units="" type="float" elements="1" defaultvalue="0.000004"/>
+        <field name="PitchKd" units="" type="float" elements="1" defaultvalue="0.01"/>
+        <field name="RollKp" units="" type="float" elements="1" defaultvalue="0.02"/>
+        <field name="RollKi" units="" type="float" elements="1" defaultvalue="0.000004"/>
+        <field name="RollKd" units="" type="float" elements="1" defaultvalue="0.01"/>
+        <field name="YawKp" units="" type="float" elements="1" defaultvalue="0.04"/>
+        <field name="YawKi" units="" type="float" elements="1" defaultvalue="0.000004"/>
+        <field name="YawKd" units="" type="float" elements="1" defaultvalue="0.01"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <logging updatemode="never" period="0"/>
 	</object>
 </xml>

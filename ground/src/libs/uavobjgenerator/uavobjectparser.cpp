@@ -147,6 +147,7 @@ QString UAVObjectParser::parseXML(QString& xml, QString& filename)
         bool telGCSFound = false;
         bool telFlightFound = false;
         bool logFound = false;
+        bool descriptionFound = false;
         while ( !childNode.isNull() )
         {
             // Process element depending on its type
@@ -198,6 +199,15 @@ QString UAVObjectParser::parseXML(QString& xml, QString& filename)
                 }
                 logFound = true;
             }
+            else if ( childNode.nodeName().compare(QString("description")) == 0 )
+            {
+                QString status = processObjectDescription(childNode, &info->description);
+                if (!status.isNull())
+                {
+                    return status;
+                }
+                descriptionFound = true;
+            }
             else
             {
                 return QString("Unknown object element");
@@ -222,6 +232,12 @@ QString UAVObjectParser::parseXML(QString& xml, QString& filename)
         else if ( !logFound )
         {
             return QString("Object::logging element is missing");
+        }
+
+        // TODO: Make into error once all objects updated
+        if ( !descriptionFound )
+        {
+            return QString("Object::description element is missing");
         }
 
         // Calculate ID
@@ -581,6 +597,16 @@ QString UAVObjectParser::processObjectAttributes(QDomNode& node, ObjectInfo* inf
 }
 
 /**
+ * Process the description field from the XML file
+ */
+QString UAVObjectParser::processObjectDescription(QDomNode& childNode, QString * description)
+{
+    description->append(childNode.firstChild().nodeValue());
+    return QString();
+}
+
+
+/**
  * Replace all the common tags from the template file with actual object
  * information.
  */
@@ -593,6 +619,8 @@ void UAVObjectParser::replaceCommonTags(QString& out, ObjectInfo* info)
     out.replace(QString("$(NAME)"), info->name);
     // Replace $(NAMELC) tag
     out.replace(QString("$(NAMELC)"), info->name.toLower());
+    // Replace $(DESCRIPTION) tag
+    out.replace(QString("$(DESCRIPTION)"), info->description);
     // Replace $(NAMEUC) tag
     out.replace(QString("$(NAMEUC)"), info->name.toUpper());
     // Replace $(OBJID) tag

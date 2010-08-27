@@ -1,13 +1,12 @@
 <xml>
-        <object name="FlightBatteryState" singleinstance="true" settings="false">
-            
-            <field name="Voltage" units="V" type="float" elements="1"/>
-            <field name="Current" units="A" type="float" elements="1"/>
-            <field name="ConsumedEnergy" units="mAh" type="uint32" elements="1"/>
-             
-            <access gcs="readonly" flight="readwrite"/>
-            <telemetrygcs acked="false" updatemode="manual" period="0"/>
-            <telemetryflight acked="false" updatemode="periodic" period="1000"/>
-            <logging updatemode="never" period="0"/>
-        </object>
+    <object name="FlightBatteryState" singleinstance="true" settings="false">
+        <description>Battery status information.  Not currently updated.</description>        
+        <field name="Voltage" units="V" type="float" elements="1"/>
+        <field name="Current" units="A" type="float" elements="1"/>
+        <field name="ConsumedEnergy" units="mAh" type="uint32" elements="1"/>        
+        <access gcs="readonly" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="1000"/>
+        <logging updatemode="never" period="0"/>
+    </object>
 </xml>

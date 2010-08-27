@@ -1,9 +1,10 @@
 <xml>
-        <object name="TelemetrySettings" singleinstance="true" settings="true">
-            <field name="Speed" units="" type="enum" elements="1" options="9600,38400,57600" defaultvalue="57600"/>
-            <access gcs="readwrite" flight="readwrite"/>
-            <telemetrygcs acked="true" updatemode="onchange" period="0"/>
-            <telemetryflight acked="true" updatemode="onchange" period="0"/>
-            <logging updatemode="never" period="0"/>
+    <object name="TelemetrySettings" singleinstance="true" settings="true">
+        <description>Select baud rate of telemetry.  Warning - this must match your modem.</description>
+        <field name="Speed" units="" type="enum" elements="1" options="9600,38400,57600" defaultvalue="57600"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <logging updatemode="never" period="0"/>
 	</object>
 </xml>

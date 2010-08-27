@@ -103,7 +103,7 @@ static enum opahrs_result opahrs_msg_v1_recv_rsp (enum opahrs_msg_v1_tag tag, st
   
   opahrs_msg_v1_init_link_tx(&link_tx, OPAHRS_MSG_LINK_TAG_NOP);
   
-  for (uint8_t retries = 0; retries < 100; retries++) {
+  for (uint8_t retries = 0; retries < 20; retries++) {
     if (opahrs_msg_txrx((const uint8_t *)&link_tx, (uint8_t *)rsp, sizeof(*rsp)) < 0) {
       return OPAHRS_RESULT_FAILED;
     }
@@ -119,7 +119,7 @@ static enum opahrs_result opahrs_msg_v1_recv_rsp (enum opahrs_msg_v1_tag tag, st
         switch (rsp->payload.link.state) {
           case OPAHRS_MSG_LINK_STATE_BUSY:
             /* Wait for a small delay and retry */
-            vTaskDelay(40 / portTICK_RATE_MS);
+            vTaskDelay(20 / portTICK_RATE_MS);
             continue;
           case OPAHRS_MSG_LINK_STATE_INACTIVE:
           case OPAHRS_MSG_LINK_STATE_READY:

@@ -58,7 +58,7 @@
 #include "alarms.h"
 #include "baroaltitude.h"
 #include "stdbool.h"
-#include "positionactual.h"
+#include "gpsposition.h"
 #include "homelocation.h"
 #include "ahrscalibration.h"
 #include "CoordinateConversions.h"
@@ -128,7 +128,7 @@ int32_t AHRSCommsInitialize(void)
 {
   AHRSSettingsConnectCallback(AHRSSettingsUpdatedCb);
   BaroAltitudeConnectCallback(BaroAltitudeUpdatedCb);
-  PositionActualConnectCallback(GPSPositionUpdatedCb);
+  GPSPositionConnectCallback(GPSPositionUpdatedCb);
   HomeLocationConnectCallback(HomeLocationUpdatedCb);
   AHRSCalibrationConnectCallback(AHRSCalibrationUpdatedCb);
 
@@ -393,8 +393,8 @@ static void load_baro_altitude(struct opahrs_msg_v1_req_update * update)
 
 static void load_gps_position(struct opahrs_msg_v1_req_update * update)
 {
-  PositionActualData data;
-  PositionActualGet(&data);
+  GPSPositionData data;
+  GPSPositionGet(&data);
   HomeLocationData home;
   HomeLocationGet(&home);
 
@@ -411,8 +411,7 @@ static void load_gps_position(struct opahrs_msg_v1_req_update * update)
     update->gps.groundspeed = data.Groundspeed;
     update->gps.heading = data.Heading;
     update->gps.quality = 0;
-    // TODO: replace with conversion from degrees * 10e6 to degrees when the GPS format updated
-    double LLA[3] = {(double) data.Latitude, (double) data.Longitude, (double) data.Altitude};    
+    double LLA[3] = {(double) data.Latitude / 1e7, (double) data.Longitude / 1e7, (double) data.Altitude};
     // convert from cm back to meters
     double ECEF[3] = {(double) (home.ECEF[0] / 100), (double) (home.ECEF[1] / 100), (double) (home.ECEF[2] / 100)};
     LLA2Base(LLA, ECEF, (float (*)[3]) home.RNE, update->gps.NED);
@@ -462,7 +461,7 @@ static void update_attitude_raw(struct opahrs_msg_v1_rsp_attituderaw * attituder
   data.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] = attituderaw->gyros_filtered.z;
   
   data.gyrotemp[ATTITUDERAW_GYROTEMP_XY] = attituderaw->gyros.xy_temp;
-  data.gyrotemp[ATTITUDERAW_GYROTEMP_Z] = attituderaw->gyros.z_temp;
+  data.gyrotemp[ATTITUDERAW_GYROTEMP_Z]  = attituderaw->gyros.z_temp;
 
   data.accels[ATTITUDERAW_ACCELS_X] = attituderaw->accels.x;
   data.accels[ATTITUDERAW_ACCELS_Y] = attituderaw->accels.y;

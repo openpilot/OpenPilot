@@ -143,9 +143,9 @@ void AHRSCalibration::setDefaultFieldValues()
     data.mag_bias[0] = 0;
     data.mag_bias[1] = 0;
     data.mag_bias[2] = 0;
-    data.mag_var[0] = 0;
-    data.mag_var[1] = 0;
-    data.mag_var[2] = 0;
+    data.mag_var[0] = 5e-05;
+    data.mag_var[1] = 5e-05;
+    data.mag_var[2] = 5e-05;
 
 }
 

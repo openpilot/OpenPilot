@@ -40,10 +40,7 @@ namespace mapcontrol
         map=new MapGraphicItem(core,config);
         mscene.addItem(map);
         this->setScene(&mscene);
-
-//        uav->setPos(30,30);
         this->adjustSize();
-        connect(&mscene,SIGNAL(sceneRectChanged(QRectF)),map,SLOT(resize(QRectF)));
         connect(map,SIGNAL(zoomChanged(double)),this,SIGNAL(zoomChanged(double)));
         connect(map->core,SIGNAL(OnCurrentPositionChanged(internals::PointLatLng)),this,SIGNAL(OnCurrentPositionChanged(internals::PointLatLng)));
         connect(map->core,SIGNAL(OnEmptyTileError(int,core::Point)),this,SIGNAL(OnEmptyTileError(int,core::Point)));
@@ -111,6 +108,7 @@ namespace mapcontrol
     }
     void OPMapWidget::showEvent(QShowEvent *event)
     {
+        connect(&mscene,SIGNAL(sceneRectChanged(QRectF)),map,SLOT(resize(QRectF)));
         map->start();
         QGraphicsView::showEvent(event);
     }

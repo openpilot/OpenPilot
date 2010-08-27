@@ -67,7 +67,7 @@
 #define SystemAlarmsInstUpdated(instId) UAVObjUpdated(SystemAlarmsHandle(), instId)
 #define SystemAlarmsGetMetadata(dataOut) UAVObjGetMetadata(SystemAlarmsHandle(), dataOut)
 #define SystemAlarmsSetMetadata(dataIn) UAVObjSetMetadata(SystemAlarmsHandle(), dataIn)
-#define SystemAlarmsReadOnly(dataIn) UAVObjReadOnly(SystemAlarmsHandle(), dataIn)
+#define SystemAlarmsReadOnly(dataIn) UAVObjReadOnly(SystemAlarmsHandle())
 
 // Object data
 typedef struct {

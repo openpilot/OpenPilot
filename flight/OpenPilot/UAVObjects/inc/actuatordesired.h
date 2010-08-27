@@ -67,7 +67,7 @@
 #define ActuatorDesiredInstUpdated(instId) UAVObjUpdated(ActuatorDesiredHandle(), instId)
 #define ActuatorDesiredGetMetadata(dataOut) UAVObjGetMetadata(ActuatorDesiredHandle(), dataOut)
 #define ActuatorDesiredSetMetadata(dataIn) UAVObjSetMetadata(ActuatorDesiredHandle(), dataIn)
-#define ActuatorDesiredReadOnly(dataIn) UAVObjReadOnly(ActuatorDesiredHandle(), dataIn)
+#define ActuatorDesiredReadOnly(dataIn) UAVObjReadOnly(ActuatorDesiredHandle())
 
 // Object data
 typedef struct {

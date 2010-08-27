@@ -67,7 +67,7 @@
 #define BaroAltitudeInstUpdated(instId) UAVObjUpdated(BaroAltitudeHandle(), instId)
 #define BaroAltitudeGetMetadata(dataOut) UAVObjGetMetadata(BaroAltitudeHandle(), dataOut)
 #define BaroAltitudeSetMetadata(dataIn) UAVObjSetMetadata(BaroAltitudeHandle(), dataIn)
-#define BaroAltitudeReadOnly(dataIn) UAVObjReadOnly(BaroAltitudeHandle(), dataIn)
+#define BaroAltitudeReadOnly(dataIn) UAVObjReadOnly(BaroAltitudeHandle())
 
 // Object data
 typedef struct {

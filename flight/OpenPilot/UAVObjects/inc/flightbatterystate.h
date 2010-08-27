@@ -67,7 +67,7 @@
 #define FlightBatteryStateInstUpdated(instId) UAVObjUpdated(FlightBatteryStateHandle(), instId)
 #define FlightBatteryStateGetMetadata(dataOut) UAVObjGetMetadata(FlightBatteryStateHandle(), dataOut)
 #define FlightBatteryStateSetMetadata(dataIn) UAVObjSetMetadata(FlightBatteryStateHandle(), dataIn)
-#define FlightBatteryStateReadOnly(dataIn) UAVObjReadOnly(FlightBatteryStateHandle(), dataIn)
+#define FlightBatteryStateReadOnly(dataIn) UAVObjReadOnly(FlightBatteryStateHandle())
 
 // Object data
 typedef struct {

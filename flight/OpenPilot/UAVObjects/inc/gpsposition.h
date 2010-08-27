@@ -67,7 +67,7 @@
 #define GPSPositionInstUpdated(instId) UAVObjUpdated(GPSPositionHandle(), instId)
 #define GPSPositionGetMetadata(dataOut) UAVObjGetMetadata(GPSPositionHandle(), dataOut)
 #define GPSPositionSetMetadata(dataIn) UAVObjSetMetadata(GPSPositionHandle(), dataIn)
-#define GPSPositionReadOnly(dataIn) UAVObjReadOnly(GPSPositionHandle(), dataIn)
+#define GPSPositionReadOnly(dataIn) UAVObjReadOnly(GPSPositionHandle())
 
 // Object data
 typedef struct {

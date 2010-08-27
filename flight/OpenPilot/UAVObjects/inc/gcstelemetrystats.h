@@ -67,7 +67,7 @@
 #define GCSTelemetryStatsInstUpdated(instId) UAVObjUpdated(GCSTelemetryStatsHandle(), instId)
 #define GCSTelemetryStatsGetMetadata(dataOut) UAVObjGetMetadata(GCSTelemetryStatsHandle(), dataOut)
 #define GCSTelemetryStatsSetMetadata(dataIn) UAVObjSetMetadata(GCSTelemetryStatsHandle(), dataIn)
-#define GCSTelemetryStatsReadOnly(dataIn) UAVObjReadOnly(GCSTelemetryStatsHandle(), dataIn)
+#define GCSTelemetryStatsReadOnly(dataIn) UAVObjReadOnly(GCSTelemetryStatsHandle())
 
 // Object data
 typedef struct {

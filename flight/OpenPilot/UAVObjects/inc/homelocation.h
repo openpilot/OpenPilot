@@ -67,7 +67,7 @@
 #define HomeLocationInstUpdated(instId) UAVObjUpdated(HomeLocationHandle(), instId)
 #define HomeLocationGetMetadata(dataOut) UAVObjGetMetadata(HomeLocationHandle(), dataOut)
 #define HomeLocationSetMetadata(dataIn) UAVObjSetMetadata(HomeLocationHandle(), dataIn)
-#define HomeLocationReadOnly(dataIn) UAVObjReadOnly(HomeLocationHandle(), dataIn)
+#define HomeLocationReadOnly(dataIn) UAVObjReadOnly(HomeLocationHandle())
 
 // Object data
 typedef struct {

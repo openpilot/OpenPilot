@@ -67,7 +67,7 @@
 #define FlightTelemetryStatsInstUpdated(instId) UAVObjUpdated(FlightTelemetryStatsHandle(), instId)
 #define FlightTelemetryStatsGetMetadata(dataOut) UAVObjGetMetadata(FlightTelemetryStatsHandle(), dataOut)
 #define FlightTelemetryStatsSetMetadata(dataIn) UAVObjSetMetadata(FlightTelemetryStatsHandle(), dataIn)
-#define FlightTelemetryStatsReadOnly(dataIn) UAVObjReadOnly(FlightTelemetryStatsHandle(), dataIn)
+#define FlightTelemetryStatsReadOnly(dataIn) UAVObjReadOnly(FlightTelemetryStatsHandle())
 
 // Object data
 typedef struct {

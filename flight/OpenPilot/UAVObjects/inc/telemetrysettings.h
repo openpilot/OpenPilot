@@ -67,7 +67,7 @@
 #define TelemetrySettingsInstUpdated(instId) UAVObjUpdated(TelemetrySettingsHandle(), instId)
 #define TelemetrySettingsGetMetadata(dataOut) UAVObjGetMetadata(TelemetrySettingsHandle(), dataOut)
 #define TelemetrySettingsSetMetadata(dataIn) UAVObjSetMetadata(TelemetrySettingsHandle(), dataIn)
-#define TelemetrySettingsReadOnly(dataIn) UAVObjReadOnly(TelemetrySettingsHandle(), dataIn)
+#define TelemetrySettingsReadOnly(dataIn) UAVObjReadOnly(TelemetrySettingsHandle())
 
 // Object data
 typedef struct {

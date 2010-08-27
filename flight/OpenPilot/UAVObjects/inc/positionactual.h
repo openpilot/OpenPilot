@@ -67,7 +67,7 @@
 #define PositionActualInstUpdated(instId) UAVObjUpdated(PositionActualHandle(), instId)
 #define PositionActualGetMetadata(dataOut) UAVObjGetMetadata(PositionActualHandle(), dataOut)
 #define PositionActualSetMetadata(dataIn) UAVObjSetMetadata(PositionActualHandle(), dataIn)
-#define PositionActualReadOnly(dataIn) UAVObjReadOnly(PositionActualHandle(), dataIn)
+#define PositionActualReadOnly(dataIn) UAVObjReadOnly(PositionActualHandle())
 
 // Object data
 typedef struct {

@@ -67,7 +67,7 @@
 #define AttitudeDesiredInstUpdated(instId) UAVObjUpdated(AttitudeDesiredHandle(), instId)
 #define AttitudeDesiredGetMetadata(dataOut) UAVObjGetMetadata(AttitudeDesiredHandle(), dataOut)
 #define AttitudeDesiredSetMetadata(dataIn) UAVObjSetMetadata(AttitudeDesiredHandle(), dataIn)
-#define AttitudeDesiredReadOnly(dataIn) UAVObjReadOnly(AttitudeDesiredHandle(), dataIn)
+#define AttitudeDesiredReadOnly(dataIn) UAVObjReadOnly(AttitudeDesiredHandle())
 
 // Object data
 typedef struct {

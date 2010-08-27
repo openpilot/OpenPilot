@@ -67,7 +67,7 @@
 #define ExampleObject2InstUpdated(instId) UAVObjUpdated(ExampleObject2Handle(), instId)
 #define ExampleObject2GetMetadata(dataOut) UAVObjGetMetadata(ExampleObject2Handle(), dataOut)
 #define ExampleObject2SetMetadata(dataIn) UAVObjSetMetadata(ExampleObject2Handle(), dataIn)
-#define ExampleObject2ReadOnly(dataIn) UAVObjReadOnly(ExampleObject2Handle(), dataIn)
+#define ExampleObject2ReadOnly(dataIn) UAVObjReadOnly(ExampleObject2Handle())
 
 // Object data
 typedef struct {

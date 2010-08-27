@@ -93,73 +93,76 @@ static void manualControlTask(void* parameters)
 		ManualControlSettingsGet(&settings);
 		StabilizationSettingsGet(&stabSettings);
 
-		// Check settings, if error raise alarm
-		if ( settings.Roll >= MANUALCONTROLSETTINGS_ROLL_NONE ||
-		     settings.Pitch >= MANUALCONTROLSETTINGS_PITCH_NONE ||
-		     settings.Yaw >= MANUALCONTROLSETTINGS_YAW_NONE ||
-		     settings.Throttle >= MANUALCONTROLSETTINGS_THROTTLE_NONE ||
-		     settings.FlightMode >= MANUALCONTROLSETTINGS_FLIGHTMODE_NONE )
-		{
-			AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
-			cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO;
-			cmd.Connected = MANUALCONTROLCOMMAND_CONNECTED_FALSE;
-			ManualControlCommandSet(&cmd);
-			continue;
-		}
-
-		// Read channel values in us
-		// TODO: settings.InputMode is currently ignored because PIOS will not allow runtime
-		// selection of PWM and PPM. The configuration is currently done at compile time in
-		// the pios_config.h file.
-		for (int n = 0; n < MANUALCONTROLCOMMAND_CHANNEL_NUMELEM; ++n)
-		{
+        if(!ManualControlCommandReadOnly(&cmd))
+        {
+            // Check settings, if error raise alarm
+            if ( settings.Roll >= MANUALCONTROLSETTINGS_ROLL_NONE ||
+                settings.Pitch >= MANUALCONTROLSETTINGS_PITCH_NONE ||
+                settings.Yaw >= MANUALCONTROLSETTINGS_YAW_NONE ||
+                settings.Throttle >= MANUALCONTROLSETTINGS_THROTTLE_NONE ||
+                settings.FlightMode >= MANUALCONTROLSETTINGS_FLIGHTMODE_NONE )
+            {
+                AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
+                cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO;
+                cmd.Connected = MANUALCONTROLCOMMAND_CONNECTED_FALSE;
+                ManualControlCommandSet(&cmd);
+                continue;
+            }
+            
+            // Read channel values in us
+            // TODO: settings.InputMode is currently ignored because PIOS will not allow runtime
+            // selection of PWM and PPM. The configuration is currently done at compile time in
+            // the pios_config.h file.
+            for (int n = 0; n < MANUALCONTROLCOMMAND_CHANNEL_NUMELEM; ++n)
+            {
 #if defined(PIOS_INCLUDE_PWM)
-			cmd.Channel[n] = PIOS_PWM_Get(n);
+                cmd.Channel[n] = PIOS_PWM_Get(n);
 #elif defined(PIOS_INCLUDE_PPM)
-			cmd.Channel[n] = PIOS_PPM_Get(n);
+                cmd.Channel[n] = PIOS_PPM_Get(n);
 #elif defined(PIOS_INCLUDE_SPEKTRUM)
-			cmd.Channel[n] = PIOS_SPEKTRUM_Get(n);
+                cmd.Channel[n] = PIOS_SPEKTRUM_Get(n);
 #endif
-		}
-
-		// Calculate roll command in range +1 to -1
-		cmd.Roll = scaleChannel( cmd.Channel[settings.Roll], settings.ChannelMax[settings.Roll],
-				                 settings.ChannelMin[settings.Roll], settings.ChannelNeutral[settings.Roll] );
-
-		// Calculate pitch command in range +1 to -1
-		cmd.Pitch = scaleChannel( cmd.Channel[settings.Pitch], settings.ChannelMax[settings.Pitch],
-				                  settings.ChannelMin[settings.Pitch], settings.ChannelNeutral[settings.Pitch] );
-
-		// Calculate yaw command in range +1 to -1
-		cmd.Yaw = scaleChannel( cmd.Channel[settings.Yaw], settings.ChannelMax[settings.Yaw],
-				                  settings.ChannelMin[settings.Yaw], settings.ChannelNeutral[settings.Yaw] );
-
-		// Calculate throttle command in range +1 to -1
-		cmd.Throttle = scaleChannel( cmd.Channel[settings.Throttle], settings.ChannelMax[settings.Throttle],
-				                     settings.ChannelMin[settings.Throttle], settings.ChannelNeutral[settings.Throttle] );
-
-		// Update flight mode
-		flightMode = scaleChannel( cmd.Channel[settings.FlightMode], settings.ChannelMax[settings.FlightMode],
-				                   settings.ChannelMin[settings.FlightMode], settings.ChannelNeutral[settings.FlightMode] );
-		if (flightMode < -FLIGHT_MODE_LIMIT)
-		{
-			cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL;
-		}
-		else if (flightMode > FLIGHT_MODE_LIMIT)
-		{
-			cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO;
-		}
-		else
-		{
-			cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED;
-		}
-
-		// Update the ManualControlCommand object
-		ManualControlCommandSet(&cmd);
-    // This seems silly to set then get, but the reason is if the GCS is 
-    // the control input, the set command will be blocked by the read only
-    // setting and the get command will pull the right values from telemetry
-		ManualControlCommandGet(&cmd);
+            }
+            
+            // Calculate roll command in range +1 to -1
+            cmd.Roll = scaleChannel( cmd.Channel[settings.Roll], settings.ChannelMax[settings.Roll],
+                                    settings.ChannelMin[settings.Roll], settings.ChannelNeutral[settings.Roll] );
+            
+            // Calculate pitch command in range +1 to -1
+            cmd.Pitch = scaleChannel( cmd.Channel[settings.Pitch], settings.ChannelMax[settings.Pitch],
+                                     settings.ChannelMin[settings.Pitch], settings.ChannelNeutral[settings.Pitch] );
+            
+            // Calculate yaw command in range +1 to -1
+            cmd.Yaw = scaleChannel( cmd.Channel[settings.Yaw], settings.ChannelMax[settings.Yaw],
+                                   settings.ChannelMin[settings.Yaw], settings.ChannelNeutral[settings.Yaw] );
+            
+            // Calculate throttle command in range +1 to -1
+            cmd.Throttle = scaleChannel( cmd.Channel[settings.Throttle], settings.ChannelMax[settings.Throttle],
+                                        settings.ChannelMin[settings.Throttle], settings.ChannelNeutral[settings.Throttle] );
+            
+            // Update flight mode
+            flightMode = scaleChannel( cmd.Channel[settings.FlightMode], settings.ChannelMax[settings.FlightMode],
+                                      settings.ChannelMin[settings.FlightMode], settings.ChannelNeutral[settings.FlightMode] );
+            if (flightMode < -FLIGHT_MODE_LIMIT)
+            {
+                cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL;
+            }
+            else if (flightMode > FLIGHT_MODE_LIMIT)
+            {
+                cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO;
+            }
+            else
+            {
+                cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED;
+            }
+            // Update the ManualControlCommand object
+            ManualControlCommandSet(&cmd);
+            // This seems silly to set then get, but the reason is if the GCS is 
+            // the control input, the set command will be blocked by the read only
+            // setting and the get command will pull the right values from telemetry
+        }
+        else
+            ManualControlCommandGet(&cmd); /* Under GCS control */
 
 		// Check for connection status (negative throttle values)
 		// The receiver failsafe for the throttle channel should be set to a value below the channel NEUTRAL
@@ -168,6 +171,7 @@ static void manualControlTask(void* parameters)
 			cmd.Connected = MANUALCONTROLCOMMAND_CONNECTED_FALSE;
 			cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO;
 			AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
+            ManualControlCommandSet(&cmd);
 		}
 		else
 		{
@@ -177,6 +181,7 @@ static void manualControlTask(void* parameters)
 			{
 				cmd.Throttle = 0;
 			}
+            ManualControlCommandSet(&cmd);
 		}
     
 		// Depending on the mode update the Stabilization or Actuator objects

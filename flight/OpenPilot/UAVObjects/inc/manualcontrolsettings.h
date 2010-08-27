@@ -67,7 +67,7 @@
 #define ManualControlSettingsInstUpdated(instId) UAVObjUpdated(ManualControlSettingsHandle(), instId)
 #define ManualControlSettingsGetMetadata(dataOut) UAVObjGetMetadata(ManualControlSettingsHandle(), dataOut)
 #define ManualControlSettingsSetMetadata(dataIn) UAVObjSetMetadata(ManualControlSettingsHandle(), dataIn)
-#define ManualControlSettingsReadOnly(dataIn) UAVObjReadOnly(ManualControlSettingsHandle(), dataIn)
+#define ManualControlSettingsReadOnly(dataIn) UAVObjReadOnly(ManualControlSettingsHandle())
 
 // Object data
 typedef struct {

@@ -67,7 +67,7 @@
 #define ExampleSettingsInstUpdated(instId) UAVObjUpdated(ExampleSettingsHandle(), instId)
 #define ExampleSettingsGetMetadata(dataOut) UAVObjGetMetadata(ExampleSettingsHandle(), dataOut)
 #define ExampleSettingsSetMetadata(dataIn) UAVObjSetMetadata(ExampleSettingsHandle(), dataIn)
-#define ExampleSettingsReadOnly(dataIn) UAVObjReadOnly(ExampleSettingsHandle(), dataIn)
+#define ExampleSettingsReadOnly(dataIn) UAVObjReadOnly(ExampleSettingsHandle())
 
 // Object data
 typedef struct {

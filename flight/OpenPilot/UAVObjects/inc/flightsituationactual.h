@@ -67,7 +67,7 @@
 #define FlightSituationActualInstUpdated(instId) UAVObjUpdated(FlightSituationActualHandle(), instId)
 #define FlightSituationActualGetMetadata(dataOut) UAVObjGetMetadata(FlightSituationActualHandle(), dataOut)
 #define FlightSituationActualSetMetadata(dataIn) UAVObjSetMetadata(FlightSituationActualHandle(), dataIn)
-#define FlightSituationActualReadOnly(dataIn) UAVObjReadOnly(FlightSituationActualHandle(), dataIn)
+#define FlightSituationActualReadOnly(dataIn) UAVObjReadOnly(FlightSituationActualHandle())
 
 // Object data
 typedef struct {

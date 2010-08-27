@@ -67,7 +67,7 @@
 #define StabilizationSettingsInstUpdated(instId) UAVObjUpdated(StabilizationSettingsHandle(), instId)
 #define StabilizationSettingsGetMetadata(dataOut) UAVObjGetMetadata(StabilizationSettingsHandle(), dataOut)
 #define StabilizationSettingsSetMetadata(dataIn) UAVObjSetMetadata(StabilizationSettingsHandle(), dataIn)
-#define StabilizationSettingsReadOnly(dataIn) UAVObjReadOnly(StabilizationSettingsHandle(), dataIn)
+#define StabilizationSettingsReadOnly(dataIn) UAVObjReadOnly(StabilizationSettingsHandle())
 
 // Object data
 typedef struct {

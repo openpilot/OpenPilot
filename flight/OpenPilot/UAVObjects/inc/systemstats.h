@@ -67,7 +67,7 @@
 #define SystemStatsInstUpdated(instId) UAVObjUpdated(SystemStatsHandle(), instId)
 #define SystemStatsGetMetadata(dataOut) UAVObjGetMetadata(SystemStatsHandle(), dataOut)
 #define SystemStatsSetMetadata(dataIn) UAVObjSetMetadata(SystemStatsHandle(), dataIn)
-#define SystemStatsReadOnly(dataIn) UAVObjReadOnly(SystemStatsHandle(), dataIn)
+#define SystemStatsReadOnly(dataIn) UAVObjReadOnly(SystemStatsHandle())
 
 // Object data
 typedef struct {

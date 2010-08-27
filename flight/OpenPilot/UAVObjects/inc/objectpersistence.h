@@ -67,7 +67,7 @@
 #define ObjectPersistenceInstUpdated(instId) UAVObjUpdated(ObjectPersistenceHandle(), instId)
 #define ObjectPersistenceGetMetadata(dataOut) UAVObjGetMetadata(ObjectPersistenceHandle(), dataOut)
 #define ObjectPersistenceSetMetadata(dataIn) UAVObjSetMetadata(ObjectPersistenceHandle(), dataIn)
-#define ObjectPersistenceReadOnly(dataIn) UAVObjReadOnly(ObjectPersistenceHandle(), dataIn)
+#define ObjectPersistenceReadOnly(dataIn) UAVObjReadOnly(ObjectPersistenceHandle())
 
 // Object data
 typedef struct {

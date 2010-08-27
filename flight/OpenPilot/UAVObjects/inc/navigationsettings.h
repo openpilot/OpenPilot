@@ -67,7 +67,7 @@
 #define NavigationSettingsInstUpdated(instId) UAVObjUpdated(NavigationSettingsHandle(), instId)
 #define NavigationSettingsGetMetadata(dataOut) UAVObjGetMetadata(NavigationSettingsHandle(), dataOut)
 #define NavigationSettingsSetMetadata(dataIn) UAVObjSetMetadata(NavigationSettingsHandle(), dataIn)
-#define NavigationSettingsReadOnly(dataIn) UAVObjReadOnly(NavigationSettingsHandle(), dataIn)
+#define NavigationSettingsReadOnly(dataIn) UAVObjReadOnly(NavigationSettingsHandle())
 
 // Object data
 typedef struct {

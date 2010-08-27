@@ -67,7 +67,7 @@
 #define SystemSettingsInstUpdated(instId) UAVObjUpdated(SystemSettingsHandle(), instId)
 #define SystemSettingsGetMetadata(dataOut) UAVObjGetMetadata(SystemSettingsHandle(), dataOut)
 #define SystemSettingsSetMetadata(dataIn) UAVObjSetMetadata(SystemSettingsHandle(), dataIn)
-#define SystemSettingsReadOnly(dataIn) UAVObjReadOnly(SystemSettingsHandle(), dataIn)
+#define SystemSettingsReadOnly(dataIn) UAVObjReadOnly(SystemSettingsHandle())
 
 // Object data
 typedef struct {

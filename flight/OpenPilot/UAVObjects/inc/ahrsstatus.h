@@ -67,7 +67,7 @@
 #define AhrsStatusInstUpdated(instId) UAVObjUpdated(AhrsStatusHandle(), instId)
 #define AhrsStatusGetMetadata(dataOut) UAVObjGetMetadata(AhrsStatusHandle(), dataOut)
 #define AhrsStatusSetMetadata(dataIn) UAVObjSetMetadata(AhrsStatusHandle(), dataIn)
-#define AhrsStatusReadOnly(dataIn) UAVObjReadOnly(AhrsStatusHandle(), dataIn)
+#define AhrsStatusReadOnly(dataIn) UAVObjReadOnly(AhrsStatusHandle())
 
 // Object data
 typedef struct {

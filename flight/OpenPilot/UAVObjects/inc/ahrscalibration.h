@@ -67,7 +67,7 @@
 #define AHRSCalibrationInstUpdated(instId) UAVObjUpdated(AHRSCalibrationHandle(), instId)
 #define AHRSCalibrationGetMetadata(dataOut) UAVObjGetMetadata(AHRSCalibrationHandle(), dataOut)
 #define AHRSCalibrationSetMetadata(dataIn) UAVObjSetMetadata(AHRSCalibrationHandle(), dataIn)
-#define AHRSCalibrationReadOnly(dataIn) UAVObjReadOnly(AHRSCalibrationHandle(), dataIn)
+#define AHRSCalibrationReadOnly(dataIn) UAVObjReadOnly(AHRSCalibrationHandle())
 
 // Object data
 typedef struct {

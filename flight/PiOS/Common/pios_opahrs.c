@@ -200,7 +200,7 @@ enum opahrs_result PIOS_OPAHRS_resync(void)
   return rc;
 }
 
-extern enum opahrs_result PIOS_OPAHRS_Sync(struct opahrs_msg_v1 *rsp)
+enum opahrs_result PIOS_OPAHRS_Sync(struct opahrs_msg_v1 *rsp)
 {
   struct opahrs_msg_v1 req;
   enum opahrs_result   rc;
@@ -289,7 +289,7 @@ enum opahrs_result PIOS_OPAHRS_SetMagNorth(struct opahrs_msg_v1 *req)
   return opahrs_msg_v1_recv_rsp (OPAHRS_MSG_V1_RSP_NORTH, &rsp);
 }
 
-extern enum opahrs_result PIOS_OPAHRS_SetGetUpdate(struct opahrs_msg_v1 *req, struct opahrs_msg_v1 *rsp)
+enum opahrs_result PIOS_OPAHRS_SetGetUpdate(struct opahrs_msg_v1 *req, struct opahrs_msg_v1 *rsp)
 {
   enum opahrs_result   rc;
   

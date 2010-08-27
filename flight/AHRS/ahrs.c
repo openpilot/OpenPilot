@@ -141,7 +141,7 @@ struct attitude_solution {
 
 struct altitude_sensor {
   float altitude;
-  float updated;
+  bool  updated;
 };
 
 struct gps_sensor {
@@ -149,7 +149,7 @@ struct gps_sensor {
   float heading;
   float groundspeed;
   float quality;
-  float updated;
+  bool  updated;
 };
 
 static struct mag_sensor        mag_data;
@@ -201,8 +201,6 @@ int16_t * valid_data_buffer;
 uint32_t ekf_too_slow = 0;
 //! Total number of data blocks converted
 uint32_t total_conversion_blocks = 0;
-//! Flag to indicate new GPS data available
-uint8_t gps_updated = FALSE;
 //! Home location in ECEF coordinates
 double BaseECEF[3] = {0, 0, 0};
 //! Rotation matrix from LLA to Rne
@@ -361,7 +359,7 @@ int main()
         vel[2] = 0;
         
         FullCorrection(mag, gps_data.NED, vel, altitude_data.altitude);        
-        gps_data.updated = FALSE;
+        gps_data.updated = false;
       }
       else
         MagCorrection(mag); 
@@ -772,7 +770,7 @@ void process_spi_request(void)
       }
       if(user_rx_v1.payload.user.v.req.update.gps.updated)
       {
-        gps_data.updated = TRUE;
+        gps_data.updated = true;
         gps_data.NED[0] = user_rx_v1.payload.user.v.req.update.gps.NED[0];
         gps_data.NED[1] = user_rx_v1.payload.user.v.req.update.gps.NED[1];
         gps_data.NED[2] = user_rx_v1.payload.user.v.req.update.gps.NED[2];
@@ -794,10 +792,6 @@ void process_spi_request(void)
       user_tx_v1.payload.user.v.rsp.update.Vel[0] = Nav.Vel[0];
       user_tx_v1.payload.user.v.rsp.update.Vel[1] = Nav.Vel[1];
       user_tx_v1.payload.user.v.rsp.update.Vel[2] = Nav.Vel[2];
-
-      user_tx_v1.payload.user.v.rsp.update.quaternion.q2 = attitude_data.quaternion.q2;
-      user_tx_v1.payload.user.v.rsp.update.quaternion.q3 = attitude_data.quaternion.q3;
-      user_tx_v1.payload.user.v.rsp.update.quaternion.q4 = attitude_data.quaternion.q4;
 
       dump_spi_message(PIOS_COM_AUX, "U", (uint8_t *)&user_tx_v1, sizeof(user_tx_v1));
       lfsm_user_set_tx_v1 (&user_tx_v1);

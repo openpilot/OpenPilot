@@ -90,31 +90,35 @@ void WMM_GetMagVector(float Lat, float Lon, float AltEllipsoid, uint16_t Month, 
   Ellip = (WMMtype_Ellipsoid *) pvPortMalloc(sizeof(WMMtype_Ellipsoid));
   MagneticModel = (WMMtype_MagneticModel *) pvPortMalloc(sizeof(WMMtype_MagneticModel));
   
-	WMMtype_CoordSpherical CoordSpherical;
-	WMMtype_CoordGeodetic CoordGeodetic;
-	WMMtype_Date Date;
-	WMMtype_GeoMagneticElements GeoMagneticElements;
+	WMMtype_CoordSpherical * CoordSpherical = (WMMtype_CoordSpherical *) pvPortMalloc(sizeof(CoordSpherical));
+	WMMtype_CoordGeodetic * CoordGeodetic = (WMMtype_CoordGeodetic *) pvPortMalloc(sizeof(CoordGeodetic));
+	WMMtype_Date * Date = (WMMtype_Date *) pvPortMalloc(sizeof(WMMtype_Date));
+	WMMtype_GeoMagneticElements * GeoMagneticElements = (WMMtype_GeoMagneticElements *) pvPortMalloc(sizeof(GeoMagneticElements));
 
   WMM_Initialize();
   
-	CoordGeodetic.lambda = Lon;
-	CoordGeodetic.phi = Lat;
-	CoordGeodetic.HeightAboveEllipsoid  = AltEllipsoid;
-	WMM_GeodeticToSpherical(&CoordGeodetic, &CoordSpherical);    /*Convert from geodeitic to Spherical Equations: 17-18, WMM Technical report*/
+	CoordGeodetic->lambda = Lon;
+	CoordGeodetic->phi = Lat;
+	CoordGeodetic->HeightAboveEllipsoid  = AltEllipsoid;
+	WMM_GeodeticToSpherical(CoordGeodetic, CoordSpherical);    /*Convert from geodeitic to Spherical Equations: 17-18, WMM Technical report*/
 	
-	Date.Month=Month;
-	Date.Day=Day;
-	Date.Year=Year;
-  WMM_DateToYear (&Date, Error_Message);
+	Date->Month=Month;
+	Date->Day=Day;
+	Date->Year=Year;
+  WMM_DateToYear (Date, Error_Message);
 	WMM_TimelyModifyMagneticModel(Date);
-	WMM_Geomag(&CoordSpherical, &CoordGeodetic, &GeoMagneticElements);   /* Computes the geoMagnetic field elements and their time change*/
+	WMM_Geomag(CoordSpherical, CoordGeodetic, GeoMagneticElements);   /* Computes the geoMagnetic field elements and their time change*/
     
+	B[0]=GeoMagneticElements->X;
+	B[1]=GeoMagneticElements->Y;
+	B[2]=GeoMagneticElements->Z;
+
   vPortFree(Ellip);
   vPortFree(MagneticModel);
-  
-	B[0]=GeoMagneticElements.X;
-	B[1]=GeoMagneticElements.Y;
-	B[2]=GeoMagneticElements.Z;
+  vPortFree(CoordSpherical);
+  vPortFree(CoordGeodetic);
+  vPortFree(Date);
+  vPortFree(GeoMagneticElements);  
 }
 
 uint16_t WMM_Geomag( WMMtype_CoordSpherical * CoordSpherical, WMMtype_CoordGeodetic * CoordGeodetic,
@@ -861,7 +865,7 @@ uint16_t WMM_SecVarSummationSpecial(WMMtype_SphericalHarmonicVariables * SphVari
 }/*SecVarSummationSpecial*/
 
 
-void WMM_TimelyModifyMagneticModel(WMMtype_Date UserDate)
+void WMM_TimelyModifyMagneticModel(WMMtype_Date * UserDate)
 // Time change the Model coefficients from the base year of the model using secular variation coefficients.
 //
 // Modified to work on the global data structure to reduce memory footprint
@@ -877,8 +881,8 @@ void WMM_TimelyModifyMagneticModel(WMMtype_Date UserDate)
 			index = (n * (n + 1) / 2 + m);
 			if(index <= b)
 			{
-				MagneticModel->Main_Field_Coeff_H[index]   +=  (UserDate.DecimalYear - MagneticModel->epoch) * MagneticModel->Secular_Var_Coeff_H[index];
-				MagneticModel->Main_Field_Coeff_G[index]   +=  (UserDate.DecimalYear - MagneticModel->epoch) * MagneticModel->Secular_Var_Coeff_G[index];
+				MagneticModel->Main_Field_Coeff_H[index]   +=  (UserDate->DecimalYear - MagneticModel->epoch) * MagneticModel->Secular_Var_Coeff_H[index];
+				MagneticModel->Main_Field_Coeff_G[index]   +=  (UserDate->DecimalYear - MagneticModel->epoch) * MagneticModel->Secular_Var_Coeff_G[index];
 			}
 		}
 	}

@@ -122,7 +122,7 @@
 	void WMM_Set_Coeff_Array();
 	void WMM_GeodeticToSpherical(WMMtype_CoordGeodetic * CoordGeodetic, WMMtype_CoordSpherical *CoordSpherical);
 	uint16_t WMM_DateToYear (WMMtype_Date *CalendarDate, char *Error);
-  void WMM_TimelyModifyMagneticModel(WMMtype_Date UserDate);
+  void WMM_TimelyModifyMagneticModel(WMMtype_Date * UserDate);
 	uint16_t WMM_Geomag(WMMtype_CoordSpherical * CoordSpherical,
 					WMMtype_CoordGeodetic * CoordGeodetic,
 					WMMtype_GeoMagneticElements  *GeoMagneticElements);

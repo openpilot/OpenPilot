@@ -101,7 +101,7 @@ static void BaroAltitudeUpdatedCb(UAVObjEvent * ev)
 static bool GPSPositionIsUpdatedFlag = false;
 static void GPSPositionUpdatedCb(UAVObjEvent * ev)
 {
-	GPSPositionIsUpdatedFlag = true;
+  GPSPositionIsUpdatedFlag = true;
 }
 
 static bool HomeLocationIsUpdatedFlag = false;
@@ -140,8 +140,11 @@ int32_t AHRSCommsInitialize(void)
   return 0;
 }
 
-static   uint16_t update_errors = 0, attituderaw_errors = 0,
-  home_errors = 0, calibration_errors = 0, algorithm_errors = 0;
+static uint16_t update_errors      = 0;
+static uint16_t attituderaw_errors = 0;
+static uint16_t home_errors        = 0;
+static uint16_t calibration_errors = 0;
+static uint16_t algorithm_errors   = 0;
 
 /**
  * Module thread, should not return.
@@ -308,31 +311,31 @@ static void load_calibration(struct opahrs_msg_v1_req_calibration * calibration)
   AHRSCalibrationData data;
   AHRSCalibrationGet(&data);
   
-  calibration->measure_var = data.measure_var;
-  calibration->accel_bias[0] = data.accel_bias[0];
-  calibration->accel_bias[1] = data.accel_bias[1];
-  calibration->accel_bias[2] = data.accel_bias[2];
+  calibration->measure_var    = data.measure_var;
+  calibration->accel_bias[0]  = data.accel_bias[0];
+  calibration->accel_bias[1]  = data.accel_bias[1];
+  calibration->accel_bias[2]  = data.accel_bias[2];
   calibration->accel_scale[0] = data.accel_scale[0];
   calibration->accel_scale[1] = data.accel_scale[1];
   calibration->accel_scale[2] = data.accel_scale[2];
-  calibration->accel_var[0] = data.accel_var[0];
-  calibration->accel_var[1] = data.accel_var[1];
-  calibration->accel_var[2] = data.accel_var[2];
-  calibration->gyro_bias[0] = data.gyro_bias[0];
-  calibration->gyro_bias[1] = data.gyro_bias[1];
-  calibration->gyro_bias[2] = data.gyro_bias[2];
-  calibration->gyro_scale[0] = data.gyro_scale[0];
-  calibration->gyro_scale[1] = data.gyro_scale[1];
-  calibration->gyro_scale[2] = data.gyro_scale[2];
-  calibration->gyro_var[0] = data.gyro_var[0];
-  calibration->gyro_var[1] = data.gyro_var[1];
-  calibration->gyro_var[2] = data.gyro_var[2];
-  calibration->mag_bias[0] = data.mag_bias[0];
-  calibration->mag_bias[1] = data.mag_bias[1];
-  calibration->mag_bias[2] = data.mag_bias[2];
-  calibration->mag_var[0] = data.mag_var[0];
-  calibration->mag_var[1] = data.mag_var[1];
-  calibration->mag_var[2] = data.mag_var[2];
+  calibration->accel_var[0]   = data.accel_var[0];
+  calibration->accel_var[1]   = data.accel_var[1];
+  calibration->accel_var[2]   = data.accel_var[2];
+  calibration->gyro_bias[0]   = data.gyro_bias[0];
+  calibration->gyro_bias[1]   = data.gyro_bias[1];
+  calibration->gyro_bias[2]   = data.gyro_bias[2];
+  calibration->gyro_scale[0]  = data.gyro_scale[0];
+  calibration->gyro_scale[1]  = data.gyro_scale[1];
+  calibration->gyro_scale[2]  = data.gyro_scale[2];
+  calibration->gyro_var[0]    = data.gyro_var[0];
+  calibration->gyro_var[1]    = data.gyro_var[1];
+  calibration->gyro_var[2]    = data.gyro_var[2];
+  calibration->mag_bias[0]    = data.mag_bias[0];
+  calibration->mag_bias[1]    = data.mag_bias[1];
+  calibration->mag_bias[2]    = data.mag_bias[2];
+  calibration->mag_var[0]     = data.mag_var[0];
+  calibration->mag_var[1]     = data.mag_var[1];
+  calibration->mag_var[2]     = data.mag_var[2];
   
 }
 
@@ -345,12 +348,12 @@ static void update_calibration(struct opahrs_msg_v1_rsp_calibration * calibratio
   data.accel_var[0] = calibration->accel_var[0];
   data.accel_var[1] = calibration->accel_var[1];
   data.accel_var[2] = calibration->accel_var[2];
-  data.gyro_var[0] = calibration->gyro_var[0];
-  data.gyro_var[1] = calibration->gyro_var[1];
-  data.gyro_var[2] = calibration->gyro_var[2];
-  data.mag_var[0] = calibration->mag_var[0];
-  data.mag_var[1] = calibration->mag_var[1];
-  data.mag_var[2] = calibration->mag_var[2];  
+  data.gyro_var[0]  = calibration->gyro_var[0];
+  data.gyro_var[1]  = calibration->gyro_var[1];
+  data.gyro_var[2]  = calibration->gyro_var[2];
+  data.mag_var[0]   = calibration->mag_var[0];
+  data.mag_var[1]   = calibration->mag_var[1];
+  data.mag_var[2]   = calibration->mag_var[2];  
   AHRSCalibrationSet(&data);
 
 }
@@ -364,22 +367,18 @@ static void load_magnetic_north(struct opahrs_msg_v1_req_north * mag_north)
   mag_north->Be[1] = data.Be[1];
   mag_north->Be[2] = data.Be[2];
 
-  if(data.Be[0] == 0 && data.Be[1] == 0 && data.Be[2] == 0)
-  {
+  if(data.Be[0] == 0 && data.Be[1] == 0 && data.Be[2] == 0) {
     // in case nothing has been set go to default to prevent NaN in attitude solution
     mag_north->Be[0] = 1;  
     mag_north->Be[1] = 0;
     mag_north->Be[2] = 0;
-  }
-  else {
+  } else {
     // normalize for unit length here
     float len = sqrt(data.Be[0] * data.Be[0] + data.Be[1] * data.Be[1] + data.Be[2] * data.Be[2]);
     mag_north->Be[0] = data.Be[0] / len;
     mag_north->Be[1] = data.Be[1] / len;
     mag_north->Be[2] = data.Be[2] / len;
   }
-
-
 }
 
 static void load_baro_altitude(struct opahrs_msg_v1_req_update * update)
@@ -389,7 +388,7 @@ static void load_baro_altitude(struct opahrs_msg_v1_req_update * update)
   BaroAltitudeGet(&data);
 
   update->barometer.altitude = data.Altitude;
-  update->barometer.updated = 1;
+  update->barometer.updated = TRUE;
 }
 
 static void load_gps_position(struct opahrs_msg_v1_req_update * update)
@@ -399,18 +398,16 @@ static void load_gps_position(struct opahrs_msg_v1_req_update * update)
   HomeLocationData home;
   HomeLocationGet(&home);
 
-  update->gps.updated = 1;
+  update->gps.updated = TRUE;
 
-  if(home.RNE[0] == 0 && home.RNE[1] && home.RNE[2] == 0 && home.RNE[3] == 0)
-  {  
+  if(home.RNE[0] == 0 && home.RNE[1] && home.RNE[2] == 0 && home.RNE[3] == 0) {
     update->gps.NED[0] = 0;
     update->gps.NED[1] = 0;
     update->gps.NED[2] = 0;
     update->gps.groundspeed = 0;
     update->gps.heading = 0;
     update->gps.quality = 0;
-  }
-  else {
+  } else {
     update->gps.groundspeed = data.Groundspeed;
     update->gps.heading = data.Heading;
     update->gps.quality = 0;

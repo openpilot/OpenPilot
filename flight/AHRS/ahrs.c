@@ -680,54 +680,54 @@ void process_spi_request(void)
       lfsm_user_set_tx_v1 (&user_tx_v1);
       break;
     case OPAHRS_MSG_V1_REQ_CALIBRATION:
-      if(user_rx_v1.payload.user.v.req.calibration.measure_var)
+      if(user_rx_v1.payload.user.v.req.calibration.measure_var) {
         calibration_pending = TRUE;
-      else {
+      } else {
         accel_var[0] = user_rx_v1.payload.user.v.req.calibration.accel_var[0];
         accel_var[1] = user_rx_v1.payload.user.v.req.calibration.accel_var[1];
         accel_var[2] = user_rx_v1.payload.user.v.req.calibration.accel_var[2];
         gyro_bias[0] = user_rx_v1.payload.user.v.req.calibration.gyro_bias[0];
         gyro_bias[1] = user_rx_v1.payload.user.v.req.calibration.gyro_bias[1];
         gyro_bias[2] = user_rx_v1.payload.user.v.req.calibration.gyro_bias[2];
-        gyro_var[0] = user_rx_v1.payload.user.v.req.calibration.gyro_var[0];
-        gyro_var[1] = user_rx_v1.payload.user.v.req.calibration.gyro_var[1];
-        gyro_var[2] = user_rx_v1.payload.user.v.req.calibration.gyro_var[2];
-        mag_var[0] = user_rx_v1.payload.user.v.req.calibration.mag_var[0];
-        mag_var[1] = user_rx_v1.payload.user.v.req.calibration.mag_var[1];
-        mag_var[2] = user_rx_v1.payload.user.v.req.calibration.mag_var[2];      
+        gyro_var[0]  = user_rx_v1.payload.user.v.req.calibration.gyro_var[0];
+        gyro_var[1]  = user_rx_v1.payload.user.v.req.calibration.gyro_var[1];
+        gyro_var[2]  = user_rx_v1.payload.user.v.req.calibration.gyro_var[2];
+        mag_var[0]   = user_rx_v1.payload.user.v.req.calibration.mag_var[0];
+        mag_var[1]   = user_rx_v1.payload.user.v.req.calibration.mag_var[1];
+        mag_var[2]   = user_rx_v1.payload.user.v.req.calibration.mag_var[2];      
         INSSetAccelVar(accel_var);
         float gyro_bias_ins[3] = {0,0,0};
         INSSetGyroBias(gyro_bias_ins);  //gyro bias corrects in preprocessing
         INSSetGyroVar(gyro_var);
         INSSetMagVar(mag_var);             
       }      
-      accel_bias[0] = user_rx_v1.payload.user.v.req.calibration.accel_bias[0];
-      accel_bias[1] = user_rx_v1.payload.user.v.req.calibration.accel_bias[1];
-      accel_bias[2] = user_rx_v1.payload.user.v.req.calibration.accel_bias[2];
+      accel_bias[0]  = user_rx_v1.payload.user.v.req.calibration.accel_bias[0];
+      accel_bias[1]  = user_rx_v1.payload.user.v.req.calibration.accel_bias[1];
+      accel_bias[2]  = user_rx_v1.payload.user.v.req.calibration.accel_bias[2];
       accel_scale[0] = user_rx_v1.payload.user.v.req.calibration.accel_scale[0];
       accel_scale[1] = user_rx_v1.payload.user.v.req.calibration.accel_scale[1];
       accel_scale[2] = user_rx_v1.payload.user.v.req.calibration.accel_scale[2];
-      gyro_scale[0] = user_rx_v1.payload.user.v.req.calibration.gyro_scale[0];
-      gyro_scale[1] = user_rx_v1.payload.user.v.req.calibration.gyro_scale[1];
-      gyro_scale[2] = user_rx_v1.payload.user.v.req.calibration.gyro_scale[2];
-      mag_bias[0] = user_rx_v1.payload.user.v.req.calibration.mag_bias[0];
-      mag_bias[1] = user_rx_v1.payload.user.v.req.calibration.mag_bias[1];
-      mag_bias[2] = user_rx_v1.payload.user.v.req.calibration.mag_bias[2];
+      gyro_scale[0]  = user_rx_v1.payload.user.v.req.calibration.gyro_scale[0];
+      gyro_scale[1]  = user_rx_v1.payload.user.v.req.calibration.gyro_scale[1];
+      gyro_scale[2]  = user_rx_v1.payload.user.v.req.calibration.gyro_scale[2];
+      mag_bias[0]    = user_rx_v1.payload.user.v.req.calibration.mag_bias[0];
+      mag_bias[1]    = user_rx_v1.payload.user.v.req.calibration.mag_bias[1];
+      mag_bias[2]    = user_rx_v1.payload.user.v.req.calibration.mag_bias[2];
       
       // echo back the values used
-      opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_CALIBRATION);    
+      opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_CALIBRATION);
       user_tx_v1.payload.user.v.rsp.calibration.accel_var[0] = accel_var[0];
       user_tx_v1.payload.user.v.rsp.calibration.accel_var[1] = accel_var[1];
       user_tx_v1.payload.user.v.rsp.calibration.accel_var[2] = accel_var[2];
       user_tx_v1.payload.user.v.rsp.calibration.gyro_bias[0] = gyro_bias[0];
       user_tx_v1.payload.user.v.rsp.calibration.gyro_bias[1] = gyro_bias[1];
       user_tx_v1.payload.user.v.rsp.calibration.gyro_bias[2] = gyro_bias[2];
-      user_tx_v1.payload.user.v.rsp.calibration.gyro_var[0] = gyro_var[0];
-      user_tx_v1.payload.user.v.rsp.calibration.gyro_var[1] = gyro_var[1];
-      user_tx_v1.payload.user.v.rsp.calibration.gyro_var[2] = gyro_var[2];
-      user_tx_v1.payload.user.v.rsp.calibration.mag_var[0] = mag_var[0];
-      user_tx_v1.payload.user.v.rsp.calibration.mag_var[1] = mag_var[1];
-      user_tx_v1.payload.user.v.rsp.calibration.mag_var[2] = mag_var[2];
+      user_tx_v1.payload.user.v.rsp.calibration.gyro_var[0]  = gyro_var[0];
+      user_tx_v1.payload.user.v.rsp.calibration.gyro_var[1]  = gyro_var[1];
+      user_tx_v1.payload.user.v.rsp.calibration.gyro_var[2]  = gyro_var[2];
+      user_tx_v1.payload.user.v.rsp.calibration.mag_var[0]   = mag_var[0];
+      user_tx_v1.payload.user.v.rsp.calibration.mag_var[1]   = mag_var[1];
+      user_tx_v1.payload.user.v.rsp.calibration.mag_var[2]   = mag_var[2];
             
       dump_spi_message(PIOS_COM_AUX, "C", (uint8_t *)&user_rx_v1, sizeof(user_rx_v1));
       lfsm_user_set_tx_v1 (&user_tx_v1);
@@ -770,13 +770,13 @@ void process_spi_request(void)
       }
       if(user_rx_v1.payload.user.v.req.update.gps.updated)
       {
-        gps_data.updated = true;
-        gps_data.NED[0] = user_rx_v1.payload.user.v.req.update.gps.NED[0];
-        gps_data.NED[1] = user_rx_v1.payload.user.v.req.update.gps.NED[1];
-        gps_data.NED[2] = user_rx_v1.payload.user.v.req.update.gps.NED[2];
-        gps_data.heading = user_rx_v1.payload.user.v.req.update.gps.heading;
+        gps_data.updated     = true;
+        gps_data.NED[0]      = user_rx_v1.payload.user.v.req.update.gps.NED[0];
+        gps_data.NED[1]      = user_rx_v1.payload.user.v.req.update.gps.NED[1];
+        gps_data.NED[2]      = user_rx_v1.payload.user.v.req.update.gps.NED[2];
+        gps_data.heading     = user_rx_v1.payload.user.v.req.update.gps.heading;
         gps_data.groundspeed = user_rx_v1.payload.user.v.req.update.gps.groundspeed;
-        gps_data.quality = user_rx_v1.payload.user.v.req.update.gps.quality;
+        gps_data.quality     = user_rx_v1.payload.user.v.req.update.gps.quality;
       }
       
       // send out attitude/position estimate

@@ -212,15 +212,15 @@ struct opahrs_msg_v1_req_attituderaw {
 } __attribute__((__packed__));
 
 struct opahrs_msg_v1_req_calibration {
-	uint8_t measure_var;
-	uint16_t accel_bias[3];
-  float accel_scale[3];
-  float accel_var[3];
-	uint16_t gyro_bias[3];
-  float gyro_scale[3];
-  float gyro_var[3];
+  uint8_t  measure_var;
+  uint16_t accel_bias[3];
+  float    accel_scale[3];
+  float    accel_var[3];
+  uint16_t gyro_bias[3];
+  float    gyro_scale[3];
+  float    gyro_var[3];
   uint16_t mag_bias[3];
-  float mag_var[3];
+  float    mag_var[3];
 } __attribute__((__packed__));
 
 union opahrs_msg_v1_req {
@@ -296,11 +296,11 @@ struct opahrs_msg_v1_rsp_update {
 } __attribute__((__packed__));
 
 struct opahrs_msg_v1_rsp_calibration {
-	uint8_t measure_var;
-  float accel_var[3];
-	uint16_t gyro_bias[3];
-  float gyro_var[3];
-  float mag_var[3];
+  uint8_t  measure_var;
+  float    accel_var[3];
+  uint16_t gyro_bias[3];
+  float    gyro_var[3];
+  float    mag_var[3];
 } __attribute__((__packed__));
 
 union opahrs_msg_v1_rsp {

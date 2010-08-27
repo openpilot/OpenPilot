@@ -84,7 +84,7 @@
     <message>
         <location/>
         <source>N/A</source>
-        <translation type="unfinished"></translation>
+        <translation>Недоступно</translation>
     </message>
     <message>
         <location/>
@@ -102,52 +102,52 @@
     <message>
         <location filename="../../../src/libs/extensionsystem/plugindetailsview.ui"/>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Название:</translation>
     </message>
     <message>
         <location/>
         <source>Version:</source>
-        <translation type="unfinished"></translation>
+        <translation>Версия:</translation>
     </message>
     <message>
         <location/>
         <source>Compatibility Version:</source>
-        <translation type="unfinished"></translation>
+        <translation>Совместимая версия:</translation>
     </message>
     <message>
         <location/>
         <source>Developer:</source>
-        <translation type="unfinished"></translation>
+        <translation>Разработчик:</translation>
     </message>
     <message>
         <location/>
         <source>Url:</source>
-        <translation type="unfinished"></translation>
+        <translation>Адрес в интернете:</translation>
     </message>
     <message>
         <location/>
         <source>Location:</source>
-        <translation type="unfinished"></translation>
+        <translation>Местоположение:</translation>
     </message>
     <message>
         <location/>
         <source>Description:</source>
-        <translation type="unfinished"></translation>
+        <translation>Описание:</translation>
     </message>
     <message>
         <location/>
         <source>Copyright:</source>
-        <translation type="unfinished"></translation>
+        <translation>Авторское право:</translation>
     </message>
     <message>
         <location/>
         <source>License:</source>
-        <translation type="unfinished"></translation>
+        <translation>Лицензия:</translation>
     </message>
     <message>
         <location/>
         <source>Dependencies:</source>
-        <translation type="unfinished"></translation>
+        <translation>Зависимости:</translation>
     </message>
 </context>
 <context>
@@ -333,32 +333,32 @@
     <message>
         <location filename="../../../src/libs/utils/projectintropage.ui"/>
         <source>Introduction and project location</source>
-        <translation type="unfinished"></translation>
+        <translation>Введение и место расположения проекта</translation>
     </message>
     <message>
         <location/>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Название:</translation>
     </message>
     <message>
         <location/>
         <source>Create in:</source>
-        <translation type="unfinished"></translation>
+        <translation>Создать в:</translation>
     </message>
     <message>
         <location filename="../../../src/libs/utils/projectintropage.cpp" line="+64"/>
         <source>&lt;Enter_Name&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Введите_имя&gt;</translation>
     </message>
     <message>
         <location line="+97"/>
         <source>The project already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation>Проект уже существует.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>A file with that name already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation>Файл с таким именем уже существует.</translation>
     </message>
 </context>
 <context>
@@ -366,17 +366,17 @@
     <message>
         <location filename="../../../src/libs/utils/submiteditorwidget.ui"/>
         <source>Subversion Submit</source>
-        <translation type="unfinished"></translation>
+        <translation>Отправить</translation>
     </message>
     <message>
         <location/>
         <source>Des&amp;cription</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Описание</translation>
     </message>
     <message>
         <location/>
         <source>F&amp;iles</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Файлы</translation>
     </message>
 </context>
 <context>
@@ -545,7 +545,7 @@ Uncheck/Check to restart calibration.</source>
     <message>
         <location/>
         <source>Run Calibration</source>
-        <translation>Старт калибровки</translation>
+        <translation>Начать калибровку</translation>
     </message>
     <message>
         <location/>
@@ -718,7 +718,13 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Set the serial speed of your telemetry modem here. It is the speed between the OpenPilot board and the modem, and could be different from the radio link speed.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Beware of not locking yourself out! You should only modify this setting when the OpenPilot board is connected through the USB port.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Установите скорость серийного порта модема телеметрии.&lt;br&gt;Это скорость между платой автопилота и блоком телеметрии. И должна отличаться от скорости радиолинка.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Осторожно! Не отключите сами себя!&lt;br&gt;Вы должны изменять эту настройку, только если плата автопилота подключена через USB.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -734,7 +740,8 @@ p, li { white-space: pre-wrap; }
         <location/>
         <source>Send to OpenPilot but don&apos;t write in SD.
 Beware of not locking yourself out!</source>
-        <translation type="unfinished">Передать в OpenPilot но не записывать на SD.</translation>
+        <translation>Передать в автопилот, но не записывать на SD.
+Осторожно, не отключите сами себя!</translation>
     </message>
     <message>
         <location/>
@@ -755,7 +762,8 @@ Beware of not locking yourself out!</source>
         <location/>
         <source>Applies and Saves all settings to SD.
 Beware of not locking yourself out!</source>
-        <translation type="unfinished">Принять изменения и сохранить на SD</translation>
+        <translation>Принять изменения и сохранить на SD
+Осторожно, не отключите сами себя!</translation>
     </message>
     <message>
         <location/>
@@ -917,27 +925,27 @@ Beware of not locking yourself out!</source>
     <message>
         <location filename="../../../src/plugins/coreplugin/uavgadgetoptionspage.ui"/>
         <source>Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Конфигурация</translation>
     </message>
     <message>
         <location/>
         <source>Clone</source>
-        <translation type="unfinished"></translation>
+        <translation>Клонировать</translation>
     </message>
     <message>
         <location/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location/>
         <source>Lock</source>
-        <translation type="unfinished"></translation>
+        <translation>Блокировать</translation>
     </message>
     <message>
         <location/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки</translation>
     </message>
 </context>
 <context>
@@ -1106,17 +1114,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/gcscontrol/gcscontrol.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>GCS Control</source>
-        <translation type="unfinished"></translation>
+        <translation>GCS Управление</translation>
     </message>
     <message>
         <location/>
         <source>Flight Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Режим полета:</translation>
     </message>
 </context>
 <context>
@@ -1124,47 +1132,47 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/gpsdisplay/gpsdisplaygadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Режим:</translation>
     </message>
     <message>
         <location/>
         <source>Port:</source>
-        <translation type="unfinished"></translation>
+        <translation>Порт:</translation>
     </message>
     <message>
         <location/>
         <source>Port Speed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Скорость порта:</translation>
     </message>
     <message>
         <location/>
         <source>Flow Control:</source>
-        <translation type="unfinished"></translation>
+        <translation>Управление потоком:</translation>
     </message>
     <message>
         <location/>
         <source>Data Bits:</source>
-        <translation type="unfinished"></translation>
+        <translation>Бит данных:</translation>
     </message>
     <message>
         <location/>
         <source>Stop Bits:</source>
-        <translation type="unfinished"></translation>
+        <translation>Стоповых бит:</translation>
     </message>
     <message>
         <location/>
         <source>Parity:</source>
-        <translation type="unfinished"></translation>
+        <translation>Четность:</translation>
     </message>
     <message>
         <location/>
         <source>Timeout(ms):</source>
-        <translation type="unfinished"></translation>
+        <translation>Тайм-аут(мс):</translation>
     </message>
 </context>
 <context>
@@ -1172,77 +1180,77 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/gpsdisplay/gpsdisplaywidget.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>GPS Status</source>
-        <translation type="unfinished"></translation>
+        <translation>Статус GPS</translation>
     </message>
     <message>
         <location/>
         <source>Lattitude:</source>
-        <translation type="unfinished"></translation>
+        <translation>Широта:</translation>
     </message>
     <message>
         <location/>
         <source>TextLabel</source>
-        <translation type="unfinished"></translation>
+        <translation>---</translation>
     </message>
     <message>
         <location/>
         <source>Longitude:</source>
-        <translation type="unfinished"></translation>
+        <translation>Долгота:</translation>
     </message>
     <message>
         <location/>
         <source>Bearing:</source>
-        <translation type="unfinished"></translation>
+        <translation>Азимут:</translation>
     </message>
     <message>
         <location/>
         <source>Speed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Скорость:</translation>
     </message>
     <message>
         <location/>
         <source>Fix Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Тип Fix:</translation>
     </message>
     <message>
         <location/>
         <source>GPS Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>GPS Время:</translation>
     </message>
     <message>
         <location/>
         <source>GPS Date:</source>
-        <translation type="unfinished"></translation>
+        <translation>GPS Дата:</translation>
     </message>
     <message>
         <location/>
         <source>Status:</source>
-        <translation type="unfinished"></translation>
+        <translation>Статус:</translation>
     </message>
     <message>
         <location/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>не известен</translation>
     </message>
     <message>
         <location/>
         <source>GPS Data Stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Поток GPS данных</translation>
     </message>
     <message>
         <location/>
         <source>Connect</source>
-        <translation type="unfinished"></translation>
+        <translation>Соединить</translation>
     </message>
     <message>
         <location/>
         <source>Disconnect</source>
-        <translation type="unfinished"></translation>
+        <translation>Отсоединить</translation>
     </message>
 </context>
 <context>
@@ -1250,32 +1258,32 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/hitl/hitloptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>FlightGear executable:</source>
-        <translation type="unfinished"></translation>
+        <translation>исполняемый файл FlightGear:</translation>
     </message>
     <message>
         <location/>
         <source>FlightGear data directory:</source>
-        <translation type="unfinished"></translation>
+        <translation>Каталог FlightGear:</translation>
     </message>
     <message>
         <location/>
         <source>Manual aircraft control (can be used when hardware is not available)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ручное управление (может быть использовано, когда отсутствует оборудование)</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/hitl/hitloptionspage.cpp" line="+50"/>
         <source>Choose FlightGear executable</source>
-        <translation type="unfinished"></translation>
+        <translation>Erf;bnt исполняемый файл FlightGear</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Choose FlightGear data directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Укажите каталог FlightGear</translation>
     </message>
 </context>
 <context>
@@ -1283,37 +1291,37 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/hitl/hitlwidget.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>Request update</source>
-        <translation type="unfinished"></translation>
+        <translation>Запрос обновления</translation>
     </message>
     <message>
         <location/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Пуск</translation>
     </message>
     <message>
         <location/>
         <source>Send update</source>
-        <translation type="unfinished"></translation>
+        <translation>Отправить обновления</translation>
     </message>
     <message>
         <location/>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation>Стоп</translation>
     </message>
     <message>
         <location/>
         <source>AutoPilot Disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>Автопилот отсоединен</translation>
     </message>
     <message>
         <location/>
         <source>FlighGear Disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>FlighGear отсоединен</translation>
     </message>
 </context>
 <context>
@@ -1321,32 +1329,32 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/hitlil2/hitlil2optionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>Manual aircraft control (can be used when hardware is not available)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ручное управление (может быть использовано, когда отсутствует оборудование)</translation>
     </message>
     <message>
         <location/>
         <source>IL2 DeviceLink Port</source>
-        <translation type="unfinished"></translation>
+        <translation>Ил2 DeviceLink Port</translation>
     </message>
     <message>
         <location/>
         <source>IL2 Host Name/Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Ил2 Адрес (имя хоста или IP)</translation>
     </message>
     <message>
         <location/>
         <source>Longitude offset (in degrees)</source>
-        <translation type="unfinished"></translation>
+        <translation>Долгота смещение (в градусах)</translation>
     </message>
     <message>
         <location/>
         <source>Latitude offset (in degrees)</source>
-        <translation type="unfinished"></translation>
+        <translation>Широта смещение (в градусах)</translation>
     </message>
 </context>
 <context>
@@ -1354,37 +1362,37 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/hitlil2/hitlil2widget.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>Request update</source>
-        <translation type="unfinished"></translation>
+        <translation>Запрос обновления</translation>
     </message>
     <message>
         <location/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Пуск</translation>
     </message>
     <message>
         <location/>
         <source>Send update</source>
-        <translation type="unfinished"></translation>
+        <translation>Отправить обновления</translation>
     </message>
     <message>
         <location/>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation>Стоп</translation>
     </message>
     <message>
         <location/>
         <source>AutoPilot Disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>Автопилот отсоединен</translation>
     </message>
     <message>
         <location/>
         <source>IL2 Disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>Ил2 отсоединен</translation>
     </message>
 </context>
 <context>
@@ -1392,17 +1400,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/importexport/importexportgadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>Default Config File </source>
-        <translation type="unfinished"></translation>
+        <translation>Файл конфигурации по умолчанию</translation>
     </message>
     <message>
         <location/>
         <source>Load file...</source>
-        <translation type="unfinished"></translation>
+        <translation>Загрузить файл...</translation>
     </message>
 </context>
 <context>
@@ -1488,32 +1496,32 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/ipconnection/ipconnectionoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>TCP connection</source>
-        <translation type="unfinished"></translation>
+        <translation>TCP соединение</translation>
     </message>
     <message>
         <location/>
         <source>UDP connection</source>
-        <translation type="unfinished"></translation>
+        <translation>UDP соединение</translation>
     </message>
     <message>
         <location/>
         <source>Port</source>
-        <translation type="unfinished"></translation>
+        <translation>Порт</translation>
     </message>
     <message>
         <location/>
         <source>Host Name/Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Адрес (имя хоста или IP)</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/ipconnection/ipconnectionoptionspage.h" line="+53"/>
         <source>settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки</translation>
     </message>
 </context>
 <context>
@@ -1614,17 +1622,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/modelview/modelviewoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>3D model:</source>
-        <translation type="unfinished"></translation>
+        <translation>3D модель:</translation>
     </message>
     <message>
         <location/>
         <source>Background image:</source>
-        <translation type="unfinished"></translation>
+        <translation>Фоновое изображение:</translation>
     </message>
     <message>
         <location/>
@@ -1634,7 +1642,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Enable VBOs:</source>
-        <translation type="unfinished"></translation>
+        <translation>Разрешить VBOs:</translation>
     </message>
 </context>
 <context>
@@ -1642,17 +1650,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/notify/notifypluginoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>Sound Collection</source>
-        <translation type="unfinished"></translation>
+        <translation>Коллекция звуков</translation>
     </message>
     <message>
         <location/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Язык</translation>
     </message>
     <message>
         <location/>
@@ -1781,12 +1789,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/notify/notifypluginoptionspage.h" line="+62"/>
         <source>settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Notify Plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>Плагин уведомлений</translation>
     </message>
 </context>
 <context>
@@ -1862,17 +1870,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/opmap/opmap_overlay_widget.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>labelStatus</source>
-        <translation type="unfinished"></translation>
+        <translation>Статус</translation>
     </message>
     <message>
         <location/>
         <source>%v</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1880,17 +1888,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/opmap/opmap_statusbar_widget.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>labelStatus</source>
-        <translation type="unfinished"></translation>
+        <translation>Статус</translation>
     </message>
     <message>
         <location/>
         <source>%v</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2260,37 +2268,37 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/pfd/pfdgadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>PFD SVG: </source>
-        <translation type="unfinished"></translation>
+        <translation>Файл векторной графики (SVG): </translation>
     </message>
     <message>
         <location/>
         <source>Load file...</source>
-        <translation type="unfinished"></translation>
+        <translation>Загрузить файл...</translation>
     </message>
     <message>
         <location/>
         <source>Use OpenGL for rendering</source>
-        <translation type="unfinished"></translation>
+        <translation>Использовать OpenGL для рендеринга</translation>
     </message>
     <message>
         <location/>
         <source>High Quality text (OpenGL)</source>
-        <translation type="unfinished"></translation>
+        <translation>Высокое качество текста (OpenGL)</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/pfd/pfdgadgetoptionspage.cpp" line="+90"/>
         <source>QFileDialog::getOpenFileName()</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>All Files (*);;SVG Files (*.svg)</source>
-        <translation type="unfinished"></translation>
+        <translation>Все файлы (*);;SVG файлы (*.svg)</translation>
     </message>
 </context>
 <context>
@@ -2376,22 +2384,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/systemhealth/systemhealthgadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>Subsystem SVG:</source>
-        <translation type="unfinished"></translation>
+        <translation>Подсистема векторной графики:</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/systemhealth/systemhealthgadgetoptionspage.cpp" line="+54"/>
         <source>SVG image (*.svg)</source>
-        <translation type="unfinished"></translation>
+        <translation>SVG изображение (*.svg)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Choose SVG image</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите SVG изображение</translation>
     </message>
 </context>
 <context>
@@ -2462,22 +2470,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/uavobjectbrowser/uavobjectbrowseroptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>Recently updated color:</source>
-        <translation type="unfinished"></translation>
+        <translation>Недавно обновленный цвет:</translation>
     </message>
     <message>
         <location/>
         <source>Manually changed color:</source>
-        <translation type="unfinished"></translation>
+        <translation>Вручную изменённый цвет:</translation>
     </message>
     <message>
         <location/>
         <source>Recently updated timeout (ms):</source>
-        <translation type="unfinished"></translation>
+        <translation>Тайм-аут обновления (мс):</translation>
     </message>
 </context>
 <context>
@@ -2485,48 +2493,48 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/welcome/communitywelcomepagewidget.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/welcome/communitywelcomepagewidget.cpp" line="+46"/>
         <source>News From the OpenPilot Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Новости проекта</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>OpenPilot Websites</source>
-        <translation type="unfinished"></translation>
+        <translation>Страницы проекта</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>http://forums.openpilot.org/blog/rss/4-openpilot-development-blog</source>
         <extracomment>Add localized feed here only if one exists</extracomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>OpenPilot Home</source>
-        <translation type="unfinished"></translation>
+        <translation>Домашняя страница</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>OpenPilot Wiki</source>
-        <translation type="unfinished"></translation>
+        <translation>Вики</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>OpenPilot Store</source>
-        <translation type="unfinished"></translation>
+        <translation>Магазин</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>OpenPilot Forums</source>
-        <translation type="unfinished"></translation>
+        <translation>Форум</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>OpenPilot Bug Tracker</source>
-        <translation type="unfinished"></translation>
+        <translation>Система отслеживания ошибок</translation>
     </message>
 </context>
 <context>
@@ -2536,7 +2544,7 @@ p, li { white-space: pre-wrap; }
         <source>#gradientWidget {
   background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(247, 247, 247, 255), stop:1 rgba(215, 215, 215, 255));
 }</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -2545,22 +2553,22 @@ p, li { white-space: pre-wrap; }
     border-width: 0;
 }
 </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Help us make OpenPilot even better</source>
-        <translation type="unfinished"></translation>
+        <translation>Помогите нам сделать OpenPilot еще лучше</translation>
     </message>
     <message>
         <location/>
         <source>Feedback</source>
-        <translation type="unfinished"></translation>
+        <translation>Обратная связь</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/welcome/welcomemode.cpp" line="+115"/>
         <source>Welcome</source>
-        <translation type="unfinished"></translation>
+        <translation>Добро пожаловать</translation>
     </message>
 </context>
 <context>
@@ -2602,17 +2610,17 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/libs/extensionsystem/optionsparser.cpp" line="+105"/>
         <location line="+18"/>
         <source>The plugin &apos;%1&apos; does not exist.</source>
-        <translation type="unfinished"></translation>
+        <translation>Плагин &apos;%1&apos; не найден.</translation>
     </message>
     <message>
         <location line="+45"/>
         <source>Unknown option %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Неизвестный параметр %1</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>The option %1 requires an argument.</source>
-        <translation type="unfinished"></translation>
+        <translation>Параметр %1 требует аргумента.</translation>
     </message>
 </context>
 <context>
@@ -2704,30 +2712,31 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/libs/extensionsystem/pluginmanager.cpp" line="+617"/>
         <source>Circular dependency detected:
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Обнаружено зацикливание:</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>%1(%2) depends on
 </source>
-        <translation type="unfinished"></translation>
+        <translation>%1(%2) зависит от</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>%1(%2)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Cannot load plugin because dependencies are not resolved</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удается загрузить плагин, поскольку проблемы зависимости не решены</translation>
     </message>
     <message>
         <location line="+8"/>
         <location line="+29"/>
         <source>Cannot load plugin because dependency failed to load: %1(%2)
 Reason: %3</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удается загрузить плагин, поскольку не удалось загрузить другую часть, от которой он зависитd: %1(%2)
+Причина: %3</translation>
     </message>
 </context>
 <context>
@@ -2735,17 +2744,17 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/libs/extensionsystem/pluginspec.cpp" line="+414"/>
         <source>File does not exist: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Файл не существует: %1</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Could not open file for read: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось открыть файл для чтения: %1</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Error parsing file %1: %2, at line %3, column %4</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка при разборе файла %1: %2, в строке %3, столбец %4</translation>
     </message>
 </context>
 <context>
@@ -2831,27 +2840,27 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/libs/extensionsystem/test/manual/pluginview/plugindialog.cpp" line="+54"/>
         <source>Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Подробно</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Error Details</source>
-        <translation type="unfinished"></translation>
+        <translation>О ошибке</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Installed Plugins</source>
-        <translation type="unfinished"></translation>
+        <translation>Установленные плагины</translation>
     </message>
     <message>
         <location line="+33"/>
         <source>Plugin Details of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Подробная информация о плагине %1</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Plugin Errors of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибки плагина %1</translation>
     </message>
 </context>
 <context>
@@ -6067,17 +6076,17 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/libs/opmapcontrol/src/mapwidget/trailitem.cpp" line="+35"/>
         <source>Position:</source>
-        <translation type="unfinished"></translation>
+        <translation>Местоположение:</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Altitude:</source>
-        <translation type="unfinished"></translation>
+        <translation>Высота:</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Время:</translation>
     </message>
 </context>
 <context>
@@ -6085,17 +6094,17 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/libs/utils/classnamevalidatinglineedit.cpp" line="+83"/>
         <source>The class name must not contain namespace delimiters.</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя класса не должно содержать разделителей пространства имен.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Please enter a class name.</source>
-        <translation type="unfinished"></translation>
+        <translation>Пожалуйста, введите имя класса.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>The class name contains invalid characters.</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя класса содержит недопустимые символы.</translation>
     </message>
 </context>
 <context>
@@ -6197,22 +6206,28 @@ Reason: %3</source>
     <message numerus="yes">
         <location filename="../../../src/libs/utils/filesearch.cpp" line="+46"/>
         <source>%1: canceled. %n occurrences found in %2 files.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1: отменена. %n вхождений найдено в %2 файлах.</numerusform>
+            <numerusform>%1: отменена. %n вхождений найдено в %2 файлах.</numerusform>
+            <numerusform>%1: отменена. %n вхождений найдено в %2 файлах.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+8"/>
         <source>%1: %n occurrences found in %2 files.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1: %n вхождений найдено в %2 файлах.</numerusform>
+            <numerusform>%1: %n вхождений найдено в %2 файлах.</numerusform>
+            <numerusform>%1: %n вхождений найдено в %2 файлах.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+8"/>
         <source>%1: %n occurrences found in %2 of %3 files.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1: %n вхождений найдено в %2 из %3 файлах.</numerusform>
+            <numerusform>%1: %n вхождений найдено в %2 из %3 файлах.</numerusform>
+            <numerusform>%1: %n вхождений найдено в %2 из %3 файлах.</numerusform>
         </translation>
     </message>
 </context>
@@ -6221,47 +6236,47 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/libs/utils/pathchooser.cpp" line="+48"/>
         <source>Choose...</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбрать...</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Browse...</source>
-        <translation type="unfinished"></translation>
+        <translation>Обзор...</translation>
     </message>
     <message>
         <location line="+126"/>
         <source>Choose a directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбрать директорию</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Choose a file</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбрать файл</translation>
     </message>
     <message>
         <location line="+33"/>
         <source>The path must not be empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Путь не должен быть пустым.</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>The path &apos;%1&apos; does not exist.</source>
-        <translation type="unfinished"></translation>
+        <translation>Пути &quot;%1&quot; не существует.</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>The path &apos;%1&apos; is not a directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;%1&apos; не является каталогом.</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>The path &apos;%1&apos; is not a file.</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;%1&quot; не является файлом.</translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Path:</source>
-        <translation type="unfinished"></translation>
+        <translation>Путь:</translation>
     </message>
 </context>
 <context>
@@ -6269,27 +6284,27 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/libs/utils/pathlisteditor.cpp" line="+118"/>
         <source>Insert...</source>
-        <translation type="unfinished"></translation>
+        <translation>Вставить...</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Add...</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить...</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Delete line</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить строку</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Clear</source>
-        <translation type="unfinished"></translation>
+        <translation>Очистить</translation>
     </message>
     <message>
         <location line="+130"/>
         <source>From &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>из &quot;%1&quot;</translation>
     </message>
 </context>
 <context>
@@ -6305,7 +6320,7 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/libs/utils/reloadpromptutils.cpp" line="+41"/>
         <source>File Changed</source>
-        <translation type="unfinished"></translation>
+        <translation>Фал изменен</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -6365,28 +6380,28 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/coreplugin/dialogs/shortcutsettings.cpp" line="+70"/>
         <source>Keyboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Клавиатура</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Environment</source>
-        <translation type="unfinished"></translation>
+        <translation>Среда</translation>
     </message>
     <message>
         <location line="+157"/>
         <source>Import Keyboard Mapping Scheme</source>
-        <translation type="unfinished"></translation>
+        <translation>Импорт схемы мапинга клавиатуры</translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+33"/>
         <source>Keyboard Mapping Scheme (*.kms)</source>
-        <translation type="unfinished"></translation>
+        <translation>Схема мапинга клавиатуры (*.kms)</translation>
     </message>
     <message>
         <location line="-2"/>
         <source>Export Keyboard Mapping Scheme</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт схемы мапинга клавиатуры</translation>
     </message>
 </context>
 <context>
@@ -6518,7 +6533,7 @@ Reason: %3</source>
     <message>
         <location line="+7"/>
         <source>&amp;Options...</source>
-        <translation>&amp;Параметры...</translation>
+        <translation>&amp;Настройки...</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -6582,32 +6597,32 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/coreplugin/plugindialog.cpp" line="+53"/>
         <source>Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Детали</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Error Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Подробности ошибки</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Закрыть</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Installed Plugins</source>
-        <translation type="unfinished"></translation>
+        <translation>Установленные плагины</translation>
     </message>
     <message>
         <location line="+36"/>
         <source>Plugin Details of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Подробно о  плагине %1</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Plugin Errors of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибки плагина %1</translation>
     </message>
 </context>
 <context>
@@ -6737,7 +6752,7 @@ Reason: %3</source>
     <message>
         <location line="+3"/>
         <source>&lt;h3&gt;OpenPilot GCS %1&lt;/h3&gt;Based on Qt %2 (%3 bit)&lt;br/&gt;&lt;br/&gt;Built on %4 at %5&lt;br /&gt;&lt;br/&gt;%8&lt;br/&gt;Copyright 2008-%6 %7. All rights reserved.&lt;br/&gt;&lt;br/&gt;The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;h3&gt;OpenPilot GCS %1&lt;/h3&gt;Основан на Qt %2 (%3 бит)&lt;br/&gt;&lt;br/&gt;Собран %4 at %5&lt;br /&gt;&lt;br/&gt;%8&lt;br/&gt;Copyright 2008-%6 %7. Все права защищены.&lt;br/&gt;&lt;br/&gt;The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.&lt;br/&gt;</translation>
     </message>
 </context>
 <context>
@@ -6745,7 +6760,7 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/dial/dialgadgetfactory.cpp" line="+37"/>
         <source>Analog Dial Gadget</source>
-        <translation type="unfinished"></translation>
+        <translation>Аналоговый прибор</translation>
     </message>
 </context>
 <context>
@@ -6825,7 +6840,7 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/lineardial/lineardialgadgetfactory.cpp" line="+36"/>
         <source>Bargraph Dial Gadget</source>
-        <translation>Гистограмма</translation>
+        <translation>Индикаторы</translation>
     </message>
 </context>
 <context>
@@ -6841,22 +6856,22 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/modelview/modelviewgadgetoptionspage.cpp" line="+47"/>
         <source>3D model (*.dae *.3ds)</source>
-        <translation type="unfinished"></translation>
+        <translation>3D модель (*.dae *.3ds)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Choose 3D model</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите 3D модель</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Images (*.png *.jpg *.bmp *.xpm)</source>
-        <translation type="unfinished"></translation>
+        <translation>Рисунки (*.png *.jpg *.bmp *.xpm)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Choose background image</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите фоновое изображение</translation>
     </message>
 </context>
 <context>
@@ -7252,37 +7267,37 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/uavobjectbrowser/uavobjecttreemodel.cpp" line="+66"/>
         <source>Property</source>
-        <translation type="unfinished"></translation>
+        <translation>Свойство</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Value</source>
-        <translation type="unfinished"></translation>
+        <translation>Значение</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Unit</source>
-        <translation type="unfinished"></translation>
+        <translation>Единица измерения</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Установки</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Data Objects</source>
-        <translation type="unfinished"></translation>
+        <translation>Объекты</translation>
     </message>
     <message>
         <location line="+41"/>
         <source>Meta Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Метаданные</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Instance</source>
-        <translation type="unfinished"></translation>
+        <translation>Экземпляр</translation>
     </message>
 </context>
 <context>

@@ -801,7 +801,6 @@ void process_spi_request(void)
   }
   
   /* Finished processing the received message, requeue it */
-  memset(&user_rx_v1, 0xAA, sizeof(user_rx_v1));
   lfsm_user_set_rx_v1 (&user_rx_v1);
   lfsm_user_done ();
 }

@@ -52,7 +52,7 @@ uint32_t aux;
 volatile uint32_t downPacketCurrent=0;
 uint32_t downPacketTotal=0;
 uint8_t downType=0;
-
+uint32_t downSizeOfLastPacket=0;
 uint32_t MemLocations[3]=
 {
 		StartOfUserCode, StartOfUserCode-SizeOfHash, StartOfUserCode-SizeOfHash-SizeOfDescription
@@ -67,22 +67,34 @@ uint8_t *FLASH_If_Read (uint32_t SectorAddress, uint32_t DataLength)
   return  (uint8_t*)(SectorAddress);
 }
 void FLASH_Download() {
-	if (DeviceState == downloading) {
+	if ((DeviceState == downloading) && (GetEPTxStatus(ENDP1)==EP_TX_NAK)) {
+		uint8_t packetSize;
 		Buffer[0] = 0x01;
 		Buffer[1] = Download;
 		Buffer[2] = downPacketCurrent >> 24;
 		Buffer[3] = downPacketCurrent >> 16;
 		Buffer[4] = downPacketCurrent >> 8;
 		Buffer[5] = downPacketCurrent;
-		Buffer[6] = *FLASH_If_Read(MemLocations[downType]+downPacketCurrent*4, 0);
-		Buffer[7] = *FLASH_If_Read(MemLocations[downType] + 1+downPacketCurrent*4, 0);
-		Buffer[8] = *FLASH_If_Read(MemLocations[downType] + 2+downPacketCurrent*4, 0);
-		Buffer[9] = *FLASH_If_Read(MemLocations[downType] + 3+downPacketCurrent*4, 0);
+		if(downPacketCurrent==downPacketTotal)
+		{
+			packetSize=downSizeOfLastPacket;
+		}
+		else
+		{
+			packetSize=14;
+		}
+		for(int x=0;x<packetSize;++x)
+		{
+		Buffer[6+x*4] = *FLASH_If_Read(MemLocations[downType]+  downPacketCurrent*4+x*4, 0);
+		Buffer[7+x*4] = *FLASH_If_Read(MemLocations[downType] + 1+downPacketCurrent*4+x*4, 0);
+		Buffer[8+x*4] = *FLASH_If_Read(MemLocations[downType] + 2+downPacketCurrent*4+x*4, 0);
+		Buffer[9+x*4] = *FLASH_If_Read(MemLocations[downType] + 3+downPacketCurrent*4+x*4, 0);
+		}
 		USB_SIL_Write(EP1_IN, (uint8_t*) Buffer, 64);
 		downPacketCurrent=downPacketCurrent+1;
 		if(downPacketCurrent>downPacketTotal)
 		{
-			 STM_EVAL_LEDOn(LED2);
+			// STM_EVAL_LEDOn(LED2);
 			DeviceState=Last_operation_Success;
 			Aditionals=(uint32_t)Download;
 		}
@@ -103,7 +115,6 @@ void EP1_OUT_Callback(void)
 
   /* Read received data (2 bytes) */
   USB_SIL_Read(EP1_OUT, Receive_Buffer);
-
   Command=Receive_Buffer[1];
   EchoReqFlag=(Command>>7);
   EchoAnsFlag=(Command>>6) & 0x01;
@@ -225,6 +236,7 @@ void EP1_OUT_Callback(void)
 			 downPacketCurrent=0;
 			 downPacketTotal=Count;
 			 DeviceState=downloading;
+			 downSizeOfLastPacket=Data1;
 		 }
 		 else
 		 {

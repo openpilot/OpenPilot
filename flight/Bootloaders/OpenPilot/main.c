@@ -32,9 +32,11 @@ typedef void (*pFunction)(void);
 pFunction Jump_To_Application;
 uint32_t JumpAddress;
 
-uint32_t cnt;
-uint32_t pwm_period;
-uint32_t pwm_sweep_steps;
+/// LEDs PWM
+uint32_t period1 = 50; // *100 uS -> 5 mS
+uint32_t sweep_steps1 = 100; // * 5 mS -> 500 mS
+uint32_t period2 = 50; // *100 uS -> 5 mS
+uint32_t sweep_steps2 = 100; // * 5 mS -> 500 mS
 
 /* Extern variables ----------------------------------------------------------*/
 uint8_t DeviceState;
@@ -42,6 +44,7 @@ uint8_t JumpToApp = 0;
 /* Private function prototypes -----------------------------------------------*/
 void Delay(__IO uint32_t nCount);
 void DelayWithDown(__IO uint32_t nCount);
+uint32_t LedPWM(uint32_t pwm_period, uint32_t pwm_sweep_steps, uint32_t count);
 /* Private functions ---------------------------------------------------------*/
 
 /*******************************************************************************
@@ -54,37 +57,76 @@ void DelayWithDown(__IO uint32_t nCount);
 int main(void) {
 
 	Set_System();
-	if (BSL_HOLD_STATE==0) {
+	if (BSL_HOLD_STATE == 0) {
 
 		USB_Interrupts_Config();
 		Set_USBClock();
 		USB_Init();
 		DeviceState = idle;
 		STOPWATCH_Init(100);
-	}
-	else
+	} else
 		JumpToApp = TRUE;
 	STOPWATCH_Reset();
 
 	while (JumpToApp == 0) {
 
-		cnt = STOPWATCH_ValueGet(); // the reference counter (incremented each 100 uS)
-		pwm_period = 50; // *100 uS -> 5 mS
-		pwm_sweep_steps =100; // * 5 mS -> 500 mS
-		uint32_t pwm_duty = ((cnt / pwm_period) % pwm_sweep_steps)
-				/ (pwm_sweep_steps / pwm_period);
-		if ((cnt % (2 * pwm_period * pwm_sweep_steps)) > pwm_period
-				* pwm_sweep_steps)
-			pwm_duty = pwm_period - pwm_duty; // negative direction each 50*100 ticks
-		uint32_t led_on = ((cnt % pwm_period) > pwm_duty) ? 1 : 0;
-		if(led_on==0)
+		//pwm_period = 50; // *100 uS -> 5 mS
+		//pwm_sweep_steps =100; // * 5 mS -> 500 mS
+
+		switch (DeviceState) {
+		case Last_operation_Success:
+		case uploadingStarting:
+		case DFUidle:
+			period1 = 50;
+			sweep_steps1 = 100;
+			STM_EVAL_LEDOff(LED2);
+			period2 = 0;
+			break;
+		case uploading:
+			period1 = 50;
+			sweep_steps1 = 100;
+			period2 = 25;
+			sweep_steps2 = 50;
+			break;
+		case downloading:
+			period1 = 25;
+			sweep_steps1 = 50;
+			STM_EVAL_LEDOff(LED2);
+			period2 = 0;
+			break;
+		case idle:
+			period1 = 0;
 			STM_EVAL_LEDOn(LED1);
-		else
-			STM_EVAL_LEDOff(LED1);
-		if(STOPWATCH_ValueGet()>100*pwm_period*pwm_sweep_steps)
+			period2=0;
+			break;
+		default://error
+			period1 = 50;
+			sweep_steps1 = 100;
+			period2 = 50;
+			sweep_steps2 = 100;
+		}
+
+		if (period1 != 0) {
+			if (LedPWM(period1, sweep_steps1, STOPWATCH_ValueGet()))
+				STM_EVAL_LEDOn(LED1);
+			else
+				STM_EVAL_LEDOff(LED1);
+		} else
+			STM_EVAL_LEDOn(LED1);
+
+		if (period2 != 0) {
+			if (LedPWM(period2, sweep_steps2, STOPWATCH_ValueGet()))
+				STM_EVAL_LEDOn(LED2);
+			else
+				STM_EVAL_LEDOff(LED2);
+		} else
+			STM_EVAL_LEDOff(LED2);
+
+		if (STOPWATCH_ValueGet() > 100 * 50 * 100)
 			STOPWATCH_Reset();
-		if(STOPWATCH_ValueGet()>50000 && DeviceState == idle)
-			JumpToApp=TRUE;
+		if ((STOPWATCH_ValueGet() > 60000) && (DeviceState == idle))
+			JumpToApp = TRUE;
+		FLASH_Download();
 		//DelayWithDown(10);//1000000);
 	}
 	if (((*(__IO uint32_t*) StartOfUserCode) & 0x2FFE0000) == 0x20000000) { /* Jump to user application */
@@ -104,12 +146,27 @@ int main(void) {
 	}
 
 	while (1) {
-		STM_EVAL_LEDToggle(LED1);
-		STM_EVAL_LEDToggle(LED2);
-		Delay(1000000);
+		if (LedPWM(50, 100, STOPWATCH_ValueGet())) {
+			STM_EVAL_LEDOn(LED2);
+			STM_EVAL_LEDOff(LED1);
+		} else {
+			STM_EVAL_LEDOn(LED1);
+			STM_EVAL_LEDOff(LED2);
+		}
+		if (STOPWATCH_ValueGet() > 2*50 * 100)
+			STOPWATCH_Reset();
+		FLASH_Download();
 	}
-}
 
+}
+uint32_t LedPWM(uint32_t pwm_period, uint32_t pwm_sweep_steps, uint32_t count) {
+	uint32_t pwm_duty = ((count / pwm_period) % pwm_sweep_steps)
+			/ (pwm_sweep_steps / pwm_period);
+	if ((count % (2 * pwm_period * pwm_sweep_steps)) > pwm_period
+			* pwm_sweep_steps)
+		pwm_duty = pwm_period - pwm_duty; // negative direction each 50*100 ticks
+	return ((count % pwm_period) > pwm_duty) ? 1 : 0;
+}
 /*******************************************************************************
  * Function Name  : Delay
  * Description    : Inserts a delay time.

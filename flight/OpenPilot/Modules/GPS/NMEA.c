@@ -2,6 +2,7 @@
 #include "pios.h"
 #include "NMEA.h"
 #include "gpsposition.h"
+#include "gpstime.h"
 
 // Debugging
 //#define GPSDEBUG
@@ -28,6 +29,7 @@ static bool nmeaProcessGPGGA (GPSPositionData * GpsData, char * sentence);
 static bool nmeaProcessGPRMC (GPSPositionData * GpsData, char * sentence);
 static bool nmeaProcessGPVTG (GPSPositionData * GpsData, char * sentence);
 static bool nmeaProcessGPGSA (GPSPositionData * GpsData, char * sentence);
+static bool nmeaProcessGPZDA (GPSPositionData * GpsData, char * sentence);
 
 static struct nmea_parser nmea_parsers[] = {
   {
@@ -45,6 +47,10 @@ static struct nmea_parser nmea_parsers[] = {
   {
     .prefix  = "GPRMC",
     .handler = nmeaProcessGPRMC,
+  },
+  {
+    .prefix  = "GPZDA",
+    .handler = nmeaProcessGPZDA,
   },
 };
 
@@ -244,14 +250,20 @@ static bool nmeaProcessGPRMC (GPSPositionData * GpsData, char * sentence)
   char * next = sentence;
   char * tokens;
   char * delimiter = ",*";
+  GPSTimeData gpst;
+  GPSTimeGet(&gpst);
 
 #ifdef NMEA_DEBUG_RMC
   PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"$%s\r\n",sentence);
 #endif
   
   // get UTC time [hhmmss.sss]
-  tokens = strsep(&next, delimiter);
-  
+  tokens = strsep(&next, delimiter);    
+  float hms = NMEA_real_to_float(tokens);     
+  gpst.Second = (int) hms % 100; 
+  gpst.Minute  = (((int) hms - gpst.Second) / 100) % 100;
+  gpst.Hour = (int) hms / 10000;    
+    
   // next field: Navigation receiver warning A = OK, V = warning
   tokens = strsep(&next, delimiter);
 
@@ -293,7 +305,13 @@ static bool nmeaProcessGPRMC (GPSPositionData * GpsData, char * sentence)
   // next field: Date of fix
   // get Date of fix
   tokens = strsep(&next, delimiter);
-
+  // TODO: Should really not use a float here to be safe
+  float date = NMEA_real_to_float(tokens);     
+  gpst.Year = (int) date % 100; 
+  gpst.Month  = (((int) date - gpst.Year) / 100) % 100;
+  gpst.Day = (int) (date / 10000);    
+  gpst.Year += 2000;
+    
   // next field: Magnetic variation
   tokens = strsep(&next, delimiter);
 
@@ -305,7 +323,8 @@ static bool nmeaProcessGPRMC (GPSPositionData * GpsData, char * sentence)
 
   // next field: checksum
   tokens = strsep(&next, delimiter);
-
+    
+  GPSTimeSet(&gpst);
   return true;
 }
 
@@ -354,6 +373,45 @@ static bool nmeaProcessGPVTG (GPSPositionData * GpsData, char * sentence)
   tokens = strsep(&next, delimiter);
 
   return true;
+}
+
+/**
+ * Parse an NMEA GPZDA sentence and update the @ref GPSTime object
+ * \param[in] A pointer to a GPSPosition UAVObject to be updated (unused).
+ * \param[in] An NMEA sentence with a valid checksum
+ */
+static bool nmeaProcessGPZDA (GPSPositionData * GpsData, char * sentence)
+{
+    char * next = sentence;
+    char * tokens;
+    char * delimiter = ",*";
+    
+#ifdef NMEA_DEBUG_VTG
+    PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"$%s\r\n",sentence);
+#endif
+
+    GPSTimeData gpst;
+    GPSTimeGet(&gpst);
+
+    tokens = strsep(&next, delimiter);
+    float hms = NMEA_real_to_float(tokens);
+    
+	gpst.Second = (int) hms % 100;
+	gpst.Minute  = (((int) hms - gpst.Second) / 100) % 100;
+	gpst.Hour = (int) hms / 10000;
+
+    tokens = strsep(&next, delimiter);    
+    gpst.Day = (uint8_t) NMEA_real_to_float(next);
+    
+    tokens = strsep(&next, delimiter);    
+    gpst.Month = (uint8_t) NMEA_real_to_float(next);
+    
+    tokens = strsep(&next, delimiter);    
+    gpst.Year = (uint16_t) NMEA_real_to_float(next);
+    
+    GPSTimeSet(&gpst);
+
+    return true;
 }
 
 /**

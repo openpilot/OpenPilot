@@ -151,12 +151,36 @@ _fields = [ \
 		{
 		}
 	),
+	uavobject.UAVObjectField(
+		'NED',
+		'f',
+		3,
+		[
+			'0',
+			'1',
+			'2',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'Vel',
+		'f',
+		3,
+		[
+			'0',
+			'1',
+			'2',
+		],
+		{
+		}
+	),
 ]
 
 
 class PositionActual(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 1265479538
+    OBJID        = 2253458392
     NAME         = "PositionActual"
     METANAME     = "PositionActualMeta"
     ISSINGLEINST = 1

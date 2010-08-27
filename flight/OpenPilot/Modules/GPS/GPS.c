@@ -35,6 +35,7 @@
 #include "NMEA.h"
 #include "gpsposition.h"
 #include "homelocation.h"
+#include "gpstime.h"
 #include "WorldMagModel.h"
 #include "CoordinateConversions.h"
 
@@ -236,30 +237,35 @@ static bool GPS_copy_sentence_from_cbuffer (char * dest, uint32_t dest_len, cBuf
 
 static void setHomeLocation(GPSPositionData * gpsData) 
 {
-  HomeLocationData home;
-  HomeLocationGet(&home);
-  
-  // Store LLA
-  home.Latitude  = gpsData->Latitude;
-  home.Longitude = gpsData->Longitude;
-  home.Altitude  = gpsData->GeoidSeparation;
-  
-  // Compute home ECEF coordinates and the rotation matrix into NED
-  double LLA[3] = {(double) home.Latitude / 10e6, (double) home.Longitude / 10e6, (double) home.Altitude};
-  double ECEF[3];
-  RneFromLLA(LLA, (float (*)[3]) home.RNE);
-  LLA2ECEF(LLA, ECEF);
-  // TODO: Currently UAVTalk only supports float but these conversions use double
-  // need to find out if they require that precision and if so extend UAVTAlk
-  home.ECEF[0] = (int32_t) (ECEF[0] * 100);
-  home.ECEF[1] = (int32_t) (ECEF[1] * 100);
-  home.ECEF[2] = (int32_t) (ECEF[2] * 100);
-  
-  // Compute magnetic flux direction at home location
-  WMM_GetMagVector(LLA[0], LLA[1], LLA[2], 8, 17, 2010, &home.Be[0]);
-  
-  home.Set = HOMELOCATION_SET_TRUE;
-  HomeLocationSet(&home);
+    HomeLocationData home;
+    HomeLocationGet(&home);
+    GPSTimeData gps;
+    GPSTimeGet(&gps);
+    
+    if(gps.Year >= 2000)
+    {
+        // Store LLA
+        home.Latitude  = gpsData->Latitude;
+        home.Longitude = gpsData->Longitude;
+        home.Altitude  = gpsData->Altitude + gpsData->GeoidSeparation;
+        
+        // Compute home ECEF coordinates and the rotation matrix into NED
+        double LLA[3] = {(double) home.Latitude / 10e6, (double) home.Longitude / 10e6, (double) home.Altitude};
+        double ECEF[3];
+        RneFromLLA(LLA, (float (*)[3]) home.RNE);
+        LLA2ECEF(LLA, ECEF);
+        // TODO: Currently UAVTalk only supports float but these conversions use double
+        // need to find out if they require that precision and if so extend UAVTAlk
+        home.ECEF[0] = (int32_t) (ECEF[0] * 100);
+        home.ECEF[1] = (int32_t) (ECEF[1] * 100);
+        home.ECEF[2] = (int32_t) (ECEF[2] * 100);
+        
+        // Compute magnetic flux direction at home location
+        WMM_GetMagVector(LLA[0], LLA[1], LLA[2], gps.Month, gps.Day, gps.Year, &home.Be[0]);
+        
+        home.Set = HOMELOCATION_SET_TRUE;
+        HomeLocationSet(&home);
+    }
 }
 
 

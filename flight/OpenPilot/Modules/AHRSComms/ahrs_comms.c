@@ -59,6 +59,7 @@
 #include "baroaltitude.h"
 #include "stdbool.h"
 #include "gpsposition.h"
+#include "positionactual.h"
 #include "homelocation.h"
 #include "ahrscalibration.h"
 #include "CoordinateConversions.h"
@@ -393,55 +394,63 @@ static void load_baro_altitude(struct opahrs_msg_v1_req_update * update)
 
 static void load_gps_position(struct opahrs_msg_v1_req_update * update)
 {
-  GPSPositionData data;
-  GPSPositionGet(&data);
-  HomeLocationData home;
-  HomeLocationGet(&home);
-
-  update->gps.updated = TRUE;
-
-  if(home.RNE[0] == 0 && home.RNE[1] && home.RNE[2] == 0 && home.RNE[3] == 0) {
-    update->gps.NED[0] = 0;
-    update->gps.NED[1] = 0;
-    update->gps.NED[2] = 0;
-    update->gps.groundspeed = 0;
-    update->gps.heading = 0;
-    update->gps.quality = 0;
-  } else {
-    update->gps.groundspeed = data.Groundspeed;
-    update->gps.heading = data.Heading;
-    update->gps.quality = 0;
-    double LLA[3] = {(double) data.Latitude / 1e7, (double) data.Longitude / 1e7, (double) data.Altitude};
-    // convert from cm back to meters
-    double ECEF[3] = {(double) (home.ECEF[0] / 100), (double) (home.ECEF[1] / 100), (double) (home.ECEF[2] / 100)};
-    LLA2Base(LLA, ECEF, (float (*)[3]) home.RNE, update->gps.NED);
-  }
-
+    GPSPositionData data;
+    GPSPositionGet(&data);
+    HomeLocationData home;
+    HomeLocationGet(&home);
+    
+    update->gps.updated = TRUE;
+    
+    if(home.Set == HOMELOCATION_SET_FALSE) {
+        PositionActualData pos;
+        PositionActualGet(&pos);
+        
+        update->gps.NED[0] = pos.NED[0];
+        update->gps.NED[1] = pos.NED[1];
+        update->gps.NED[2] = pos.NED[2];
+        update->gps.groundspeed = 0;
+        update->gps.heading = 0;
+        update->gps.quality = 0;
+    } else {
+        update->gps.groundspeed = data.Groundspeed;
+        update->gps.heading = data.Heading;
+        update->gps.quality = 0;
+        double LLA[3] = {(double) data.Latitude / 1e7, (double) data.Longitude / 1e7, (double) (data.GeoidSeparation + data.Altitude)};
+        // convert from cm back to meters
+        double ECEF[3] = {(double) (home.ECEF[0] / 100), (double) (home.ECEF[1] / 100), (double) (home.ECEF[2] / 100)};
+        LLA2Base(LLA, ECEF, (float (*)[3]) home.RNE, update->gps.NED);
+    }
+    
 }
 
 static void process_update(struct opahrs_msg_v1_rsp_update * update)
 {
-  AttitudeActualData   data;
-
-  data.q1 = update->quaternion.q1;
-  data.q2 = update->quaternion.q2;
-  data.q3 = update->quaternion.q3;
-  data.q4 = update->quaternion.q4;
-  
-  float q[4] = {data.q1, data.q2, data.q3, data.q4};
-  float rpy[3];
-  Quaternion2RPY(q,rpy);
-  data.Roll    = rpy[0];
-  data.Pitch   = rpy[1];
-  data.Yaw     = rpy[2];
-  if(data.Yaw < 0) data.Yaw += 360;
+    AttitudeActualData   data;
     
-  AttitudeActualSet(&data);
-  
-  /*
-   * update->NED[]
-   * update->Vel[]
-   */
+    data.q1 = update->quaternion.q1;
+    data.q2 = update->quaternion.q2;
+    data.q3 = update->quaternion.q3;
+    data.q4 = update->quaternion.q4;
+    
+    float q[4] = {data.q1, data.q2, data.q3, data.q4};
+    float rpy[3];
+    Quaternion2RPY(q,rpy);
+    data.Roll    = rpy[0];
+    data.Pitch   = rpy[1];
+    data.Yaw     = rpy[2];
+    if(data.Yaw < 0) data.Yaw += 360;
+    
+    AttitudeActualSet(&data);
+    
+    PositionActualData pos;
+    PositionActualGet(&pos);    
+    pos.NED[0] = update->NED[0];
+    pos.NED[1] = update->NED[1];
+    pos.NED[2] = update->NED[2];
+    pos.Vel[0] = update->Vel[0];
+    pos.Vel[1] = update->Vel[1];
+    pos.Vel[2] = update->Vel[2];
+    PositionActualSet(&pos);
 }
 
 static void update_attitude_raw(struct opahrs_msg_v1_rsp_attituderaw * attituderaw)

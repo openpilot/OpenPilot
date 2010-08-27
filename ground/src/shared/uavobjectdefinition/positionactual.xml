@@ -12,6 +12,8 @@
         <field name="PDOP" units="" type="float" elements="1"/>
         <field name="HDOP" units="" type="float" elements="1"/>
         <field name="VDOP" units="" type="float" elements="1"/>
+        <field name="NED" units="m" type="float" elements="3"/>
+        <field name="Vel" units="m" type="float" elements="3"/>        
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="1000"/>

@@ -80,6 +80,16 @@ PositionActual::PositionActual(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS,
     QStringList VDOPElemNames;
     VDOPElemNames.append("0");
     fields.append( new UAVObjectField(QString("VDOP"), QString(""), UAVObjectField::FLOAT32, VDOPElemNames, QStringList()) );
+    QStringList NEDElemNames;
+    NEDElemNames.append("0");
+    NEDElemNames.append("1");
+    NEDElemNames.append("2");
+    fields.append( new UAVObjectField(QString("NED"), QString("m"), UAVObjectField::FLOAT32, NEDElemNames, QStringList()) );
+    QStringList VelElemNames;
+    VelElemNames.append("0");
+    VelElemNames.append("1");
+    VelElemNames.append("2");
+    fields.append( new UAVObjectField(QString("Vel"), QString("m"), UAVObjectField::FLOAT32, VelElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

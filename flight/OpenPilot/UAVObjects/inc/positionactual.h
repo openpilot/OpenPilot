@@ -41,7 +41,7 @@
 #define POSITIONACTUAL_H
 
 // Object constants
-#define POSITIONACTUAL_OBJID 1265479538U
+#define POSITIONACTUAL_OBJID 2253458392U
 #define POSITIONACTUAL_NAME "PositionActual"
 #define POSITIONACTUAL_METANAME "PositionActualMeta"
 #define POSITIONACTUAL_ISSINGLEINST 1
@@ -82,6 +82,8 @@ typedef struct {
     float PDOP;
     float HDOP;
     float VDOP;
+    float NED[3];
+    float Vel[3];
 
 } __attribute__((packed)) PositionActualData;
 
@@ -99,6 +101,12 @@ typedef enum { POSITIONACTUAL_STATUS_NOGPS=0, POSITIONACTUAL_STATUS_NOFIX=1, POS
 // Field PDOP information
 // Field HDOP information
 // Field VDOP information
+// Field NED information
+/* Number of elements for field NED */
+#define POSITIONACTUAL_NED_NUMELEM 3
+// Field Vel information
+/* Number of elements for field Vel */
+#define POSITIONACTUAL_VEL_NUMELEM 3
 
 
 // Generic interface functions

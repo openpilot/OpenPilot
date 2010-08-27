@@ -54,6 +54,8 @@ public:
         float PDOP;
         float HDOP;
         float VDOP;
+        float NED[3];
+        float Vel[3];
 
     } __attribute__((packed)) DataFields;
 
@@ -71,10 +73,16 @@ public:
     // Field PDOP information
     // Field HDOP information
     // Field VDOP information
+    // Field NED information
+    /* Number of elements for field NED */
+    static const quint32 NED_NUMELEM = 3;
+    // Field Vel information
+    /* Number of elements for field Vel */
+    static const quint32 VEL_NUMELEM = 3;
 
   
     // Constants
-    static const quint32 OBJID = 1265479538U;
+    static const quint32 OBJID = 2253458392U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

@@ -25,6 +25,7 @@
 		65322D2F12283CCD0046CD7C /* NMEA.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = NMEA.c; sourceTree = "<group>"; };
 		65322D3012283CD60046CD7C /* NMEA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NMEA.h; sourceTree = "<group>"; };
 		65322D3B122841F60046CD7C /* gpstime.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = gpstime.xml; sourceTree = "<group>"; };
+		65322D77122897210046CD7C /* MagOrAccelSensorCal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MagOrAccelSensorCal.c; path = ../../AHRS/MagOrAccelSensorCal.c; sourceTree = SOURCE_ROOT; };
 		654330231218E9780063F913 /* insgps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = insgps.c; path = ../../AHRS/insgps.c; sourceTree = SOURCE_ROOT; };
 		6543304F121980300063F913 /* insgps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = insgps.h; sourceTree = "<group>"; };
 		655268BC121FBD2900410C6E /* ahrscalibration.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ahrscalibration.xml; sourceTree = "<group>"; };
@@ -6707,6 +6708,7 @@
 		65B7E6AC120DF1CD000C1123 /* AHRS */ = {
 			isa = PBXGroup;
 			children = (
+				65322D77122897210046CD7C /* MagOrAccelSensorCal.c */,
 				654330231218E9780063F913 /* insgps.c */,
 				65B7E6AD120DF1E2000C1123 /* ahrs_fsm.c */,
 				65B7E6AE120DF1E2000C1123 /* ahrs.c */,

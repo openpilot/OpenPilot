@@ -163,7 +163,7 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
     mag_z->setPos(startX,startY);
     mag_z->setTransform(QTransform::fromScale(1,0),true);
 
-
+    position = 0;
 
     // Fill the dropdown menus:
     UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
@@ -176,7 +176,9 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_ahrs->ahrsSettingsRequest, SIGNAL(clicked()), this, SLOT(ahrsSettingsRequest()));
     connect(m_ahrs->ahrsSettingsSaveRAM, SIGNAL(clicked()), this, SLOT(ahrsSettingsSaveRAM()));
     connect(m_ahrs->ahrsSettingsSaveSD, SIGNAL(clicked()), this, SLOT(ahrsSettingsSaveSD()));
-
+    connect(m_ahrs->ahrsSavePosition, SIGNAL(clicked()), this, SLOT(savePositionData()));
+    connect(m_ahrs->ahrsComputeScaleBias, SIGNAL(clicked()), this, SLOT(computeScaleBias()));
+    connect(m_ahrs->ahrsCalibrationMode, SIGNAL(clicked()), this, SLOT(calibrationMode()));
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(ahrsSettingsRequest()));
 
 
@@ -295,6 +297,175 @@ void ConfigAHRSWidget::saveAHRSCalibration()
 }
 
 /**
+  * Saves the data from the aircraft in one of six positions
+  */
+void ConfigAHRSWidget::savePositionData()
+{
+    UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeRaw")));
+    UAVObjectField *accel_field = obj->getField(QString("accels_filtered"));
+    UAVObjectField *mag_field = obj->getField(QString("magnetometers"));
+
+    accel_data_x[position] = accel_field->getValue(0).toDouble();
+    accel_data_y[position] = accel_field->getValue(1).toDouble();
+    accel_data_z[position] = accel_field->getValue(2).toDouble();
+    mag_data_x[position] = mag_field->getValue(0).toDouble();
+    mag_data_y[position] = mag_field->getValue(1).toDouble();
+    mag_data_z[position] = mag_field->getValue(2).toDouble();
+
+    position = (position + 1) % 6;
+}
+
+//*****************************************************************
+
+int LinearEquationsSolving(int nDim, double* pfMatr, double* pfVect, double* pfSolution)
+{
+  double fMaxElem;
+  double fAcc;
+
+  int i , j, k, m;
+
+  for(k=0; k<(nDim-1); k++) // base row of matrix
+  {
+    // search of line with max element
+    fMaxElem = fabs( pfMatr[k*nDim + k] );
+    m = k;
+    for(i=k+1; i<nDim; i++)
+    {
+      if(fMaxElem < fabs(pfMatr[i*nDim + k]) )
+      {
+        fMaxElem = pfMatr[i*nDim + k];
+        m = i;
+      }
+    }
+
+    // permutation of base line (index k) and max element line(index m)
+    if(m != k)
+    {
+      for(i=k; i<nDim; i++)
+      {
+        fAcc               = pfMatr[k*nDim + i];
+        pfMatr[k*nDim + i] = pfMatr[m*nDim + i];
+        pfMatr[m*nDim + i] = fAcc;
+      }
+      fAcc = pfVect[k];
+      pfVect[k] = pfVect[m];
+      pfVect[m] = fAcc;
+    }
+
+    if( pfMatr[k*nDim + k] == 0.) return 0; // needs improvement !!!
+
+    // triangulation of matrix with coefficients
+    for(j=(k+1); j<nDim; j++) // current row of matrix
+    {
+      fAcc = - pfMatr[j*nDim + k] / pfMatr[k*nDim + k];
+      for(i=k; i<nDim; i++)
+      {
+        pfMatr[j*nDim + i] = pfMatr[j*nDim + i] + fAcc*pfMatr[k*nDim + i];
+      }
+      pfVect[j] = pfVect[j] + fAcc*pfVect[k]; // free member recalculation
+    }
+  }
+
+  for(k=(nDim-1); k>=0; k--)
+  {
+    pfSolution[k] = pfVect[k];
+    for(i=(k+1); i<nDim; i++)
+    {
+      pfSolution[k] -= (pfMatr[k*nDim + i]*pfSolution[i]);
+    }
+    pfSolution[k] = pfSolution[k] / pfMatr[k*nDim + k];
+  }
+
+  return 1;
+}
+
+
+int SixPointInConstFieldCal( double ConstMag, double x[6], double y[6], double z[6], double S[3], double b[3] )
+{
+  int i;
+  double A[5][5];
+  double f[5], c[5];
+  double xp, yp, zp, Sx;
+
+  // Fill in matrix A -
+  // write six difference-in-magnitude equations of the form
+  // Sx^2(x2^2-x1^2) + 2*Sx*bx*(x2-x1) + Sy^2(y2^2-y1^2) + 2*Sy*by*(y2-y1) + Sz^2(z2^2-z1^2) + 2*Sz*bz*(z2-z1) = 0
+  // or in other words
+  // 2*Sx*bx*(x2-x1)/Sx^2  + Sy^2(y2^2-y1^2)/Sx^2  + 2*Sy*by*(y2-y1)/Sx^2  + Sz^2(z2^2-z1^2)/Sx^2  + 2*Sz*bz*(z2-z1)/Sx^2  = (x1^2-x2^2)
+  for (i=0;i<5;i++){
+      A[i][0] = 2.0 * (x[i+1] - x[i]);
+      A[i][1] = y[i+1]*y[i+1] - y[i]*y[i];
+      A[i][2] = 2.0 * (y[i+1] - y[i]);
+      A[i][3] = z[i+1]*z[i+1] - z[i]*z[i];
+      A[i][4] = 2.0 * (z[i+1] - z[i]);
+      f[i]    = x[i]*x[i] - x[i+1]*x[i+1];
+  }
+
+  // solve for c0=bx/Sx, c1=Sy^2/Sx^2; c2=Sy*by/Sx^2, c3=Sz^2/Sx^2, c4=Sz*bz/Sx^2
+  if (  !LinearEquationsSolving( 5, (double *)A, f, c) ) return 0;
+
+  // use one magnitude equation and c's to find Sx - doesn't matter which - all give the same answer
+  xp = x[0]; yp = y[0]; zp = z[0];
+  Sx = sqrt(ConstMag*ConstMag / (xp*xp + 2*c[0]*xp + c[0]*c[0] + c[1]*yp*yp + 2*c[2]*yp + c[2]*c[2]/c[1] + c[3]*zp*zp + 2*c[4]*zp + c[4]*c[4]/c[3]));
+
+  S[0] = Sx;
+  b[0] = Sx*c[0];
+  S[1] = sqrt(c[1]*Sx*Sx);
+  b[1] = c[2]*Sx*Sx/S[1];
+  S[2] = sqrt(c[3]*Sx*Sx);
+  b[2] = c[4]*Sx*Sx/S[2];
+
+  return 1;
+}
+
+void ConfigAHRSWidget::computeScaleBias()
+{
+    UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
+    UAVObjectField *field;
+    double S[3], b[3];
+
+    SixPointInConstFieldCal( 9.81, accel_data_x, accel_data_y, accel_data_z, S, b);
+
+    field = obj->getField(QString("accel_scale"));
+    field->setDouble(S[0],0);
+    field->setDouble(S[1],1);
+    field->setDouble(S[2],2);  // Flip the Z-axis scale to be negative
+    field = obj->getField(QString("accel_bias"));
+    field->setDouble((int) b[0] / S[0],0);
+    field->setDouble((int) b[1] / S[1],1);
+    field->setDouble((int) -b[2] / S[2],2);
+
+    SixPointInConstFieldCal( 1, mag_data_x, mag_data_y, mag_data_z, S, b);
+    field = obj->getField(QString("mag_bias"));
+    field->setDouble(b[0] / S[0], 0);
+    field->setDouble(b[1] / S[1], 1);
+    field->setDouble(b[2] / S[2], 2);
+    obj->updated();
+
+}
+
+void ConfigAHRSWidget::calibrationMode()
+{
+    UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
+
+    // set accels to unity gain
+    UAVObjectField *field = obj->getField(QString("accel_scale"));
+    field->setDouble(1,0);
+    field->setDouble(1,1);
+    field->setDouble(1,2);
+    field = obj->getField(QString("accel_bias"));
+    field->setDouble(0,0);
+    field->setDouble(0,1);
+    field->setDouble(0,2);
+    obj->updated();
+
+    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
+    field = obj->getField(QString("UpdateRaw"));
+    field->setValue("TRUE");
+    obj->updated();
+}
+
+/**
   Draws the sensor variances bargraph
   */
 void ConfigAHRSWidget::drawVariancesGraph()
@@ -341,6 +512,9 @@ void ConfigAHRSWidget::ahrsSettingsRequest()
     m_ahrs->algorithm->setCurrentIndex(m_ahrs->algorithm->findText(field->getValue().toString()));
     drawVariancesGraph();
     m_ahrs->ahrsCalibStart->setEnabled(true);
+    m_ahrs->ahrsSavePosition->setEnabled(true);
+    m_ahrs->ahrsComputeScaleBias->setEnabled(true);
+    m_ahrs->ahrsCalibrationMode->setEnabled(true);
     m_ahrs->calibInstructions->setText(QString("Press \"Start\" above to calibrate."));
 }
 

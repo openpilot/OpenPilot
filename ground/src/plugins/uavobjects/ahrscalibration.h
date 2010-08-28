@@ -50,7 +50,7 @@ public:
         qint16 gyro_bias[3];
         float gyro_scale[3];
         float gyro_var[3];
-        float mag_bias[3];
+        qint16 mag_bias[3];
         float mag_var[3];
 
     } __attribute__((packed)) DataFields;
@@ -102,7 +102,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 3497014596U;
+    static const quint32 OBJID = 2082766848U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

@@ -82,7 +82,7 @@ AHRSCalibration::AHRSCalibration(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTING
     mag_biasElemNames.append("X");
     mag_biasElemNames.append("Y");
     mag_biasElemNames.append("Z");
-    fields.append( new UAVObjectField(QString("mag_bias"), QString("mGau"), UAVObjectField::FLOAT32, mag_biasElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("mag_bias"), QString("mGau"), UAVObjectField::INT16, mag_biasElemNames, QStringList()) );
     QStringList mag_varElemNames;
     mag_varElemNames.append("X");
     mag_varElemNames.append("Y");
@@ -134,9 +134,9 @@ void AHRSCalibration::setDefaultFieldValues()
     data.gyro_bias[0] = -1675;
     data.gyro_bias[1] = -1675;
     data.gyro_bias[2] = -1675;
-    data.gyro_scale[0] = 0.007;
-    data.gyro_scale[1] = 0.007;
-    data.gyro_scale[2] = 0.007;
+    data.gyro_scale[0] = -0.007;
+    data.gyro_scale[1] = -0.007;
+    data.gyro_scale[2] = -0.007;
     data.gyro_var[0] = 0.0001;
     data.gyro_var[1] = 0.0001;
     data.gyro_var[2] = 0.0001;

@@ -338,16 +338,16 @@ int main()
       // format data for INS algo
       gyro[0] = gyro_data.filtered.x;
       gyro[1] = gyro_data.filtered.y;
-      gyro[2] = -gyro_data.filtered.z;
+      gyro[2] = gyro_data.filtered.z;
       accel[0] = accel_data.filtered.x,
       accel[1] = accel_data.filtered.y,
       accel[2] = accel_data.filtered.z,
       
       // Note: The magnetometer driver returns registers X,Y,Z from the chip which are 
       // (left, backward, up).  Remapping to (forward, right, down).
-      mag[0] = -mag_data.raw.axis[1];
-      mag[1] = -mag_data.raw.axis[0];
-      mag[2] = -mag_data.raw.axis[2];
+      mag[0] = -(mag_data.raw.axis[1] - mag_bias[1]);
+      mag[1] = -(mag_data.raw.axis[0] - mag_bias[0]);
+      mag[2] = -(mag_data.raw.axis[2] - mag_bias[2]);
             
       INSPrediction(gyro, accel, 1 / (float) EKF_RATE);
       

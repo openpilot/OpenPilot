@@ -66,6 +66,13 @@ private:
     const static double maxVarValue;
     const static int calibrationDelay;
 
+    double accel_data_x[6];
+    double accel_data_y[6];
+    double accel_data_z[6];
+    double mag_data_x[6];
+    double mag_data_y[6];
+    double mag_data_z[6];
+    int position;
 private slots:
     void launchAHRSCalibration();
     void saveAHRSCalibration();
@@ -74,9 +81,12 @@ private slots:
     void ahrsSettingsRequest();
     void ahrsSettingsSaveRAM();
     void ahrsSettingsSaveSD();
+    void savePositionData();
+    void computeScaleBias();
+    void calibrationMode();
 
 protected:
-   void showEvent(QShowEvent *event);
+    void showEvent(QShowEvent *event);
 
 
 };

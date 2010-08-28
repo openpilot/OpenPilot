@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QFrame" name="frame">
+  <widget class="QFrame" name="Position6">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -158,52 +158,52 @@ Takes about 30 seconds max.</string>
      <string>Calibration #2</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_4">
+   <widget class="QPushButton" name="ahrsSavePosition">
     <property name="enabled">
      <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>270</y>
-      <width>93</width>
+      <x>220</x>
+      <y>290</y>
+      <width>111</width>
       <height>27</height>
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>Save Position</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_5">
+   <widget class="QPushButton" name="ahrsComputeScaleBias">
     <property name="enabled">
      <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
-      <x>230</x>
+      <x>220</x>
       <y>320</y>
-      <width>93</width>
+      <width>111</width>
       <height>27</height>
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>Compute</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_6">
+   <widget class="QPushButton" name="ahrsCalibrationMode">
     <property name="enabled">
      <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>370</y>
-      <width>93</width>
+      <x>220</x>
+      <y>260</y>
+      <width>111</width>
       <height>27</height>
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>Cal Mode</string>
     </property>
    </widget>
    <widget class="QTextBrowser" name="textBrowser">

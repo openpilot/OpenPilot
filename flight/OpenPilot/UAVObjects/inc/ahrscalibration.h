@@ -41,7 +41,7 @@
 #define AHRSCALIBRATION_H
 
 // Object constants
-#define AHRSCALIBRATION_OBJID 3497014596U
+#define AHRSCALIBRATION_OBJID 2082766848U
 #define AHRSCALIBRATION_NAME "AHRSCalibration"
 #define AHRSCALIBRATION_METANAME "AHRSCalibrationMeta"
 #define AHRSCALIBRATION_ISSINGLEINST 1
@@ -78,7 +78,7 @@ typedef struct {
     int16_t gyro_bias[3];
     float gyro_scale[3];
     float gyro_var[3];
-    float mag_bias[3];
+    int16_t mag_bias[3];
     float mag_var[3];
 
 } __attribute__((packed)) AHRSCalibrationData;

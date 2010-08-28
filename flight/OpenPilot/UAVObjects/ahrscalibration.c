@@ -93,9 +93,9 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
     data.gyro_bias[0] = -1675;
     data.gyro_bias[1] = -1675;
     data.gyro_bias[2] = -1675;
-    data.gyro_scale[0] = 0.007;
-    data.gyro_scale[1] = 0.007;
-    data.gyro_scale[2] = 0.007;
+    data.gyro_scale[0] = -0.007;
+    data.gyro_scale[1] = -0.007;
+    data.gyro_scale[2] = -0.007;
     data.gyro_var[0] = 0.0001;
     data.gyro_var[1] = 0.0001;
     data.gyro_var[2] = 0.0001;

@@ -34,6 +34,8 @@ class ImportExportGadgetFactory;
 
 class IMPORTEXPORT_EXPORT ImportExportPlugin : public ExtensionSystem::IPlugin
 {
+    Q_OBJECT
+
 public:
     ImportExportPlugin();
     ~ImportExportPlugin();
@@ -43,6 +45,10 @@ public:
     void shutdown();
 private:
     ImportExportGadgetFactory *mf;
+
+private slots:
+    void importExport();
+
 };
 #endif /* IMPORTEXPORTPLUGIN_H_ */
 /**

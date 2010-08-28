@@ -28,7 +28,7 @@
 #define IMPORTEXPORTGADGETFACTORY_H_
 
 #include <coreplugin/iuavgadgetfactory.h>
-#include "importexport_global.h"
+#include "importexportgadgetconfiguration.h"
 
 namespace Core
 {
@@ -44,10 +44,14 @@ class IMPORTEXPORT_EXPORT ImportExportGadgetFactory : public IUAVGadgetFactory
 public:
     ImportExportGadgetFactory(QObject *parent = 0);
     ~ImportExportGadgetFactory();
+    ImportExportGadgetConfiguration *getLastConfig(){ return lastConfig;}
 
     Core::IUAVGadget *createGadget(QWidget *parent);
     IUAVGadgetConfiguration *createConfiguration(const QByteArray &state);
     IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
+
+private:
+    ImportExportGadgetConfiguration *lastConfig;
 };
 
 #endif // IMPORTEXPORTGADGETFACTORY_H_

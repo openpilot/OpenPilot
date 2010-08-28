@@ -49,8 +49,7 @@ ImportExportGadget::~ImportExportGadget()
  */
 void ImportExportGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 {
-    ImportExportGadgetConfiguration *m = qobject_cast<ImportExportGadgetConfiguration*>(config);
-    m_widget->setDialFile(m->getDialFile());
+    m_widget->loadConfiguration(qobject_cast<ImportExportGadgetConfiguration*>(config));
 }
 /**
  * @}

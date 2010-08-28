@@ -13,7 +13,7 @@
 
 #include <QWidget>
 #include <QString>
-#include "importexport_global.h"
+#include "importexportgadgetconfiguration.h"
 
 namespace Ui
 {
@@ -27,7 +27,10 @@ public:
     ImportExportGadgetWidget(QWidget *parent = 0);
     ~ImportExportGadgetWidget();
 
-    void setDialFile(const QString& filename);
+    void loadConfiguration(const ImportExportGadgetConfiguration* config);
+
+signals:
+    void done();
 
 protected:
     void changeEvent(QEvent *e);

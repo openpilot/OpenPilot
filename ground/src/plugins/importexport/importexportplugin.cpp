@@ -29,10 +29,16 @@
 
 #include "importexportplugin.h"
 #include "importexportgadgetfactory.h"
+#include "importexportdialog.h"
 #include <QDebug>
 #include <QtPlugin>
 #include <QStringList>
 #include <extensionsystem/pluginmanager.h>
+
+#include <coreplugin/coreconstants.h>
+#include <coreplugin/actionmanager/actionmanager.h>
+#include <coreplugin/icore.h>
+#include <QKeySequence>
 
 
 ImportExportPlugin::ImportExportPlugin()
@@ -52,7 +58,29 @@ bool ImportExportPlugin::initialize(const QStringList& args, QString *errMsg)
     mf = new ImportExportGadgetFactory(this);
     addAutoReleasedObject(mf);
 
+    // Add Menu entry
+    Core::ActionManager* am = Core::ICore::instance()->actionManager();
+    Core::ActionContainer* ac = am->actionContainer(Core::Constants::M_FILE);
+
+    Core::Command* cmd = am->registerAction(new QAction(this),
+                                            "ImportExportPlugin.ImportExport",
+                                            QList<int>() <<
+                                            Core::Constants::C_GLOBAL_ID);
+    cmd->setDefaultKeySequence(QKeySequence("Ctrl+I"));
+    cmd->action()->setText("Import/Export...");
+
+    ac->menu()->addSeparator();
+    ac->appendGroup("ImportExport");
+    ac->addAction(cmd, "ImportExport");
+
+    connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(importExport()));
+
     return true;
+}
+
+void ImportExportPlugin::importExport()
+{
+    ImportExportDialog(mf->getLastConfig()).exec();
 }
 
 void ImportExportPlugin::extensionsInitialized()

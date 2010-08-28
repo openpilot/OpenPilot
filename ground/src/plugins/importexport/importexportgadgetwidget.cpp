@@ -62,10 +62,12 @@ void ImportExportGadgetWidget::changeEvent(QEvent *e)
         break;
     }
 }
-
-void ImportExportGadgetWidget::setDialFile(const QString& filename)
+void ImportExportGadgetWidget::loadConfiguration(const ImportExportGadgetConfiguration* config)
 {
-    ui->configFile->setText(filename);
+    if ( !config )
+        return;
+
+    ui->configFile->setText(config->getDialFile());
 }
 
 void ImportExportGadgetWidget::on_exportButton_clicked()
@@ -85,6 +87,7 @@ void ImportExportGadgetWidget::on_exportButton_clicked()
 
     msgBox.setText(tr("The settings have been exported to ") + QFileInfo(file).absoluteFilePath());
     msgBox.exec();
+    emit done();
 
 }
 
@@ -127,6 +130,7 @@ void ImportExportGadgetWidget::on_importButton_clicked()
     msgBox.setText(tr("The settings have been imported from ") + QFileInfo(file).absoluteFilePath()
                    + tr(". Restart the application."));
     msgBox.exec();
+    emit done();
 }
 
 void ImportExportGadgetWidget::importConfiguration(const QString& fileName)
@@ -143,12 +147,12 @@ void ImportExportGadgetWidget::importConfiguration(const QString& fileName)
         Core::ICore::instance()->readMainSettings(&qs);
     }
 
-
     qDebug() << "Import ended";
 }
 
 void ImportExportGadgetWidget::on_helpButton_clicked()
 {
+    qDebug() << "Show Help";
     QDesktopServices::openUrl(QUrl("http://wiki.openpilot.org/Import_Export_plugin"));
 }
 /**

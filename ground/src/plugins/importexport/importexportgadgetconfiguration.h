@@ -47,7 +47,7 @@ public:
     }
 
     //get dial configuration functions
-    QString getDialFile() {
+    QString getDialFile() const{
         return dialFile;
     }
 

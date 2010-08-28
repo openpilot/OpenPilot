@@ -52,7 +52,8 @@ Core::IUAVGadget* ImportExportGadgetFactory::createGadget(QWidget *parent)
 
 IUAVGadgetConfiguration *ImportExportGadgetFactory::createConfiguration(const QByteArray &state)
 {
-    return new ImportExportGadgetConfiguration(QString("ImportExportGadget"), state);
+    lastConfig = new ImportExportGadgetConfiguration(QString("ImportExportGadget"), state);
+    return lastConfig;
 }
 
 IOptionsPage *ImportExportGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)

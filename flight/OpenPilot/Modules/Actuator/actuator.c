@@ -448,9 +448,17 @@ static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutr
 		valueScaled = (int16_t)(value*((float)(neutral-min))) + neutral;
 	}
   
-  if( valueScaled > max ) valueScaled = max;
-  if( valueScaled < min ) valueScaled = min;
-  
+	if (max>min)
+	{
+		if( valueScaled > max ) valueScaled = max;
+		if( valueScaled < min ) valueScaled = min;
+	}
+	else
+	{
+		if( valueScaled < max ) valueScaled = max;
+		if( valueScaled > min ) valueScaled = min;
+	}
+
 	return valueScaled;
 }
 

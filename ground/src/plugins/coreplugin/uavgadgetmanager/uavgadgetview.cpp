@@ -152,6 +152,7 @@ UAVGadgetView::UAVGadgetView(Core::UAVGadgetManager *uavGadgetManager, IUAVGadge
 
 UAVGadgetView::~UAVGadgetView()
 {
+    removeGadget();
 }
 
 bool UAVGadgetView::hasGadget(IUAVGadget *uavGadget) const

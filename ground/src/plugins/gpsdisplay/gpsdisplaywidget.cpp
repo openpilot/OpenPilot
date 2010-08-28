@@ -94,10 +94,10 @@ void GpsDisplayWidget::setSpeedHeading(double speed, double heading)
     temp.append(QString::number(speed,'g',10));
     temp.append(" Heaging: ");
     temp.append(QString::number(heading,'g',10));
-    widget->speed_label->setText(QString::number(speed,'g',10));
-    widget->speed_label->adjustSize();
-    widget->bear_label->setText(QString::number(heading,'g',10));
-    widget->bear_label->adjustSize();
+    widget->speed_value->setText(QString::number(speed,'g',10));
+    widget->speed_value->adjustSize();
+    widget->bear_value->setText(QString::number(heading,'g',10));
+    widget->bear_value->adjustSize();
 
     // widget->textBrowser->append(temp);
 }
@@ -108,10 +108,10 @@ void GpsDisplayWidget::setDateTime(double date, double time)
     temp.append(QString::number(date,'g',10));
     temp.append(" Time: ");
     temp.append(QString::number(time,'g',10));
-    widget->gdate_label->setText(QString::number(date,'g',10));
-    widget->gdate_label->adjustSize();
-    widget->gtime_label->setText(QString::number(time,'g',10));
-    widget->gdate_label->adjustSize();
+    widget->gdate_value->setText(QString::number(date,'g',10));
+    widget->gdate_value->adjustSize();
+    widget->gtime_value->setText(QString::number(time,'g',10));
+    widget->gdate_value->adjustSize();
 
     //widget->textBrowser->append(temp);
 }
@@ -125,8 +125,8 @@ void GpsDisplayWidget::setSVs(int sv)
 {
     QString temp = "Fix: Sats: ";
     temp.append(QString::number(sv));
-    widget->label_2->setText(temp);
-    widget->label_2->adjustSize();
+    widget->status_value->setText(temp);
+    widget->status_value->adjustSize();
 }
 
 void GpsDisplayWidget::setPosition(double lat, double lon, double alt)
@@ -137,12 +137,12 @@ void GpsDisplayWidget::setPosition(double lat, double lon, double alt)
     temp.append(QString::number(lon,'g',10));
     temp.append(" ");
     temp.append(QString::number(alt,'g',10));
-    widget->lat_label->setText(QString::number(lat,'g',10));
-    widget->lat_label->adjustSize();
-    widget->long_label->setText(QString::number(lon,'g',10));
-    widget->long_label->adjustSize();
-    //widget->alt_label->setText(QString::number(alt,'g',10));
-    //widget->alt_label->adjustSize();
+    widget->lat_value->setText(QString::number(lat,'g',10));
+    widget->lat_value->adjustSize();
+    widget->long_value->setText(QString::number(lon,'g',10));
+    widget->long_value->adjustSize();
+    //widget->alt_value->setText(QString::number(alt,'g',10));
+    //widget->alt_value->adjustSize();
 
     //widget->textBrowser->append(temp);
 }

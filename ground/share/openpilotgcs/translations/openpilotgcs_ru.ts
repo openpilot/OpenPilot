@@ -6,67 +6,67 @@
     <message>
         <location filename="../../../src/experimental/tools/DocumentationHelper/mainwindow.ui"/>
         <source>MainWindow</source>
-        <translation type="unfinished"></translation>
+        <translation>Главное окно</translation>
     </message>
     <message>
         <location/>
         <source>Go</source>
-        <translation type="unfinished"></translation>
+        <translation>Вперед</translation>
     </message>
     <message>
         <location/>
         <source>Current File:</source>
-        <translation type="unfinished"></translation>
+        <translation>Текущий файл:</translation>
     </message>
     <message>
         <location/>
         <source>Current Path:</source>
-        <translation type="unfinished"></translation>
+        <translation>Текущий путь:</translation>
     </message>
     <message>
         <location/>
         <source>Choose Path</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбрать путь</translation>
     </message>
     <message>
         <location/>
         <source>Created #IF statements</source>
-        <translation type="unfinished"></translation>
+        <translation>Созданные объяления #IF</translation>
     </message>
     <message>
         <location/>
         <source>Create NameSpace</source>
-        <translation type="unfinished"></translation>
+        <translation>Создать пространство имен</translation>
     </message>
     <message>
         <location/>
         <source>Create Block #if in qDebug Statements</source>
-        <translation type="unfinished"></translation>
+        <translation>Создание блока #IF в qDebug</translation>
     </message>
     <message>
         <location/>
         <source>Write License Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Записать информацию о лицензии</translation>
     </message>
     <message>
         <location/>
         <source>Confirm Before Change</source>
-        <translation type="unfinished"></translation>
+        <translation>Подтверждать перед изменением</translation>
     </message>
     <message>
         <location/>
         <source>Output</source>
-        <translation type="unfinished"></translation>
+        <translation>Вывод</translation>
     </message>
     <message>
         <location/>
         <source>DefGroup</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>namespace</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -776,7 +776,7 @@ Beware of not locking yourself out!</source>
     <message>
         <location filename="../../../src/plugins/coreplugin/dialogs/settingsdialog.ui"/>
         <source>Options</source>
-        <translation>Параметры</translation>
+        <translation>Настройки</translation>
     </message>
     <message>
         <location/>
@@ -789,62 +789,62 @@ Beware of not locking yourself out!</source>
     <message>
         <location filename="../../../src/plugins/coreplugin/dialogs/shortcutsettings.ui"/>
         <source>Keyboard Shortcuts</source>
-        <translation type="unfinished"></translation>
+        <translation>Сочетания клавиш</translation>
     </message>
     <message>
         <location/>
         <source>Filter:</source>
-        <translation type="unfinished"></translation>
+        <translation>Фильтр:</translation>
     </message>
     <message>
         <location/>
         <source>Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Команда</translation>
     </message>
     <message>
         <location/>
         <source>Label</source>
-        <translation type="unfinished"></translation>
+        <translation>Надпись</translation>
     </message>
     <message>
         <location/>
         <source>Shortcut</source>
-        <translation type="unfinished"></translation>
+        <translation>Ярлык</translation>
     </message>
     <message>
         <location/>
         <source>Defaults</source>
-        <translation type="unfinished"></translation>
+        <translation>По умолчанию</translation>
     </message>
     <message>
         <location/>
         <source>Import...</source>
-        <translation type="unfinished"></translation>
+        <translation>Импорт...</translation>
     </message>
     <message>
         <location/>
         <source>Export...</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт...</translation>
     </message>
     <message>
         <location/>
         <source>Key Sequence</source>
-        <translation type="unfinished"></translation>
+        <translation>Сочетание клавиш</translation>
     </message>
     <message>
         <location/>
         <source>Shortcut:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ярлык:</translation>
     </message>
     <message>
         <location/>
         <source>Reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Сброс</translation>
     </message>
     <message>
         <location/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить</translation>
     </message>
 </context>
 <context>
@@ -852,72 +852,72 @@ Beware of not locking yourself out!</source>
     <message>
         <location filename="../../../src/plugins/coreplugin/generalsettings.ui"/>
         <source>General settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Общие настройки</translation>
     </message>
     <message>
         <location/>
         <source>Terminal:</source>
-        <translation type="unfinished"></translation>
+        <translation>Терминал:</translation>
     </message>
     <message>
         <location/>
         <source>External editor:</source>
-        <translation type="unfinished"></translation>
+        <translation>Внешний редактор:</translation>
     </message>
     <message>
         <location/>
         <source>When files are externally modified:</source>
-        <translation type="unfinished"></translation>
+        <translation>Когда файлы изменяются извне:</translation>
     </message>
     <message>
         <location/>
         <source>User interface color:</source>
-        <translation type="unfinished"></translation>
+        <translation>Цвет интерфейса:</translation>
     </message>
     <message>
         <location/>
         <source>Reset to default</source>
-        <translation type="unfinished"></translation>
+        <translation>Сброс в по умолчанию</translation>
     </message>
     <message>
         <location/>
         <source>R</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Always ask</source>
-        <translation type="unfinished"></translation>
+        <translation>Всегда спрашивать</translation>
     </message>
     <message>
         <location/>
         <source>Reload all modified files</source>
-        <translation type="unfinished"></translation>
+        <translation>Обновлять измененные</translation>
     </message>
     <message>
         <location/>
         <source>Ignore modifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Игнорировать изменения</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/coreplugin/generalsettings.cpp" line="+54"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Общие</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Environment</source>
-        <translation type="unfinished"></translation>
+        <translation>Среда</translation>
     </message>
     <message>
         <location line="+73"/>
         <source>Variables</source>
-        <translation type="unfinished"></translation>
+        <translation>Переменные</translation>
     </message>
 </context>
 <context>
@@ -953,38 +953,38 @@ Beware of not locking yourself out!</source>
     <message>
         <location filename="../../../src/plugins/coreplugin/workspacesettings.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/coreplugin/workspacesettings.cpp" line="+60"/>
         <source>Workspaces</source>
-        <translation type="unfinished"></translation>
+        <translation>Экраны</translation>
     </message>
     <message>
         <location/>
         <source>Number of workspaces:</source>
-        <translation type="unfinished"></translation>
+        <translation>Количество экранов:</translation>
     </message>
     <message>
         <location/>
         <source>Change details of workspace:</source>
-        <translation type="unfinished"></translation>
+        <translation>Экран:</translation>
     </message>
     <message>
         <location/>
         <source>Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки экрана</translation>
     </message>
     <message>
         <location/>
         <source>Icon:</source>
-        <translation type="unfinished"></translation>
+        <translation>Пиктограмма:</translation>
     </message>
     <message>
         <location/>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Название:</translation>
     </message>
     <message>
         <location/>
@@ -993,22 +993,26 @@ Beware of not locking yourself out!</source>
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; A restart is needed for changes to number of workspaces to take effect.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Внимание:&lt;/span&gt; Необходим перезапуск, для вступления в силу изменения количества рабочих экранов.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/coreplugin/workspacesettings.cpp" line="+10"/>
         <source>GCS</source>
-        <translation type="unfinished"></translation>
+        <translation>НСУ</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Images (*.png *.jpg *.bmp *.xpm)</source>
-        <translation type="unfinished"></translation>
+        <translation>Изображения (*.png *.jpg *.bmp *.xpm)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Choose icon</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбор пиктограммы</translation>
     </message>
 </context>
 <context>
@@ -1016,97 +1020,97 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/dial/dialgadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>Dial SVG: </source>
-        <translation type="unfinished"></translation>
+        <translation>SVG файл прибора:</translation>
     </message>
     <message>
         <location/>
         <source>Load file...</source>
-        <translation type="unfinished"></translation>
+        <translation>Загрузить файл...</translation>
     </message>
     <message>
         <location/>
         <source>BackgroundID</source>
-        <translation type="unfinished"></translation>
+        <translation>Фон</translation>
     </message>
     <message>
         <location/>
         <source>ForegroundID</source>
-        <translation type="unfinished"></translation>
+        <translation>Передний план</translation>
     </message>
     <message>
         <location/>
         <source>Dial font:</source>
-        <translation type="unfinished"></translation>
+        <translation>Шрифт прибора:</translation>
     </message>
     <message>
         <location/>
         <source>Select...</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбрать...</translation>
     </message>
     <message>
         <location/>
         <source>Indicator 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Индикатор 1</translation>
     </message>
     <message>
         <location/>
         <source>Movement:</source>
-        <translation type="unfinished"></translation>
+        <translation>Движения:</translation>
     </message>
     <message>
         <location/>
         <source>ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>Идентификатор:</translation>
     </message>
     <message>
         <location/>
         <source>Min:</source>
-        <translation type="unfinished"></translation>
+        <translation>Минимум:</translation>
     </message>
     <message>
         <location/>
         <source>Max:</source>
-        <translation type="unfinished"></translation>
+        <translation>Максимум:</translation>
     </message>
     <message>
         <location/>
         <source>Factor:</source>
-        <translation type="unfinished"></translation>
+        <translation>Коэффициент:</translation>
     </message>
     <message>
         <location/>
         <source>DataObject</source>
-        <translation type="unfinished"></translation>
+        <translation>Объект</translation>
     </message>
     <message>
         <location/>
         <source>ObjectField</source>
-        <translation type="unfinished"></translation>
+        <translation>Свойство</translation>
     </message>
     <message>
         <location/>
         <source>Indicator 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Индикатор 2</translation>
     </message>
     <message>
         <location/>
         <source>Indicator 3</source>
-        <translation type="unfinished"></translation>
+        <translation>Индикатор 3</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/dial/dialgadgetoptionspage.cpp" line="+254"/>
         <source>QFileDialog::getOpenFileName()</source>
-        <translation type="unfinished"></translation>
+        <translation>Открытие файла</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>All Files (*);;SVG Files (*.svg)</source>
-        <translation type="unfinished"></translation>
+        <translation>Все файлы (*);;SVG файлы (*.svg)</translation>
     </message>
 </context>
 <context>
@@ -1263,7 +1267,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>FlightGear executable:</source>
-        <translation>исполняемый файл FlightGear:</translation>
+        <translation>Исполняемый файл FlightGear:</translation>
     </message>
     <message>
         <location/>
@@ -1306,7 +1310,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Send update</source>
-        <translation>Отправить обновления</translation>
+        <translation>Передать обновления</translation>
     </message>
     <message>
         <location/>
@@ -1579,12 +1583,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>ObjectName</source>
-        <translation type="unfinished"></translation>
+        <translation>Объект</translation>
     </message>
     <message>
         <location/>
         <source>ObjectField</source>
-        <translation type="unfinished"></translation>
+        <translation>Свойство</translation>
     </message>
     <message>
         <location/>
@@ -1704,12 +1708,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>DataObject</source>
-        <translation type="unfinished"></translation>
+        <translation>Объект</translation>
     </message>
     <message>
         <location/>
         <source>ObjectField</source>
-        <translation type="unfinished"></translation>
+        <translation>Свойство</translation>
     </message>
     <message>
         <location/>
@@ -1794,7 +1798,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+2"/>
         <source>Notify Plugin</source>
-        <translation>Плагин уведомлений</translation>
+        <translation>Оповещения</translation>
     </message>
 </context>
 <context>
@@ -2306,27 +2310,27 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/scope/scopegadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>X-Axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Ось-X</translation>
     </message>
     <message>
         <location/>
         <source>Plot Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Тип графика:</translation>
     </message>
     <message>
         <location/>
         <source>Data Size:</source>
-        <translation type="unfinished"></translation>
+        <translation>Длина оси:</translation>
     </message>
     <message>
         <location/>
         <source> seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>секунд</translation>
     </message>
     <message>
         <location/>
@@ -2336,47 +2340,47 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>ms</source>
-        <translation type="unfinished"></translation>
+        <translation>мс</translation>
     </message>
     <message>
         <location/>
         <source>Plot curves</source>
-        <translation type="unfinished"></translation>
+        <translation>Кривые графика</translation>
     </message>
     <message>
         <location/>
         <source>UAVObject:</source>
-        <translation type="unfinished"></translation>
+        <translation>Объект</translation>
     </message>
     <message>
         <location/>
         <source>UAVField:</source>
-        <translation type="unfinished"></translation>
+        <translation>Свойство</translation>
     </message>
     <message>
         <location/>
         <source>Color:</source>
-        <translation type="unfinished"></translation>
+        <translation>Цвет:</translation>
     </message>
     <message>
         <location/>
         <source>Choose</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбрать</translation>
     </message>
     <message>
         <location/>
         <source>Scale:</source>
-        <translation type="unfinished"></translation>
+        <translation>Масштаб:</translation>
     </message>
     <message>
         <location/>
         <source>&gt;&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>&lt;&lt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2389,7 +2393,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Subsystem SVG:</source>
-        <translation>Подсистема векторной графики:</translation>
+        <translation>Подсистема (SVG):</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/systemhealth/systemhealthgadgetoptionspage.cpp" line="+54"/>
@@ -2407,62 +2411,62 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/uavobjectbrowser/uavobjectbrowser.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>Request update</source>
-        <translation type="unfinished"></translation>
+        <translation>Получить данные</translation>
     </message>
     <message>
         <location/>
         <source>Request</source>
-        <translation type="unfinished"></translation>
+        <translation>Получить</translation>
     </message>
     <message>
         <location/>
         <source>Send update</source>
-        <translation type="unfinished"></translation>
+        <translation>Установить новое значение</translation>
     </message>
     <message>
         <location/>
         <source>Send</source>
-        <translation type="unfinished"></translation>
+        <translation>Установить</translation>
     </message>
     <message>
         <location/>
         <source>Save to SD Card</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить на  SD</translation>
     </message>
     <message>
         <location/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить</translation>
     </message>
     <message>
         <location/>
         <source>Load from SD Card</source>
-        <translation type="unfinished"></translation>
+        <translation>Загрузить с SD карты</translation>
     </message>
     <message>
         <location/>
         <source>Load</source>
-        <translation type="unfinished"></translation>
+        <translation>Загрузить</translation>
     </message>
     <message>
         <location/>
         <source>Erase from SD card</source>
-        <translation type="unfinished"></translation>
+        <translation>Стереть с SD карты</translation>
     </message>
     <message>
         <location/>
         <source>Erase</source>
-        <translation type="unfinished"></translation>
+        <translation>Стереть</translation>
     </message>
     <message>
         <location/>
         <source>Show Meta Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать метаданные</translation>
     </message>
 </context>
 <context>
@@ -2475,12 +2479,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Recently updated color:</source>
-        <translation>Недавно обновленный цвет:</translation>
+        <translation>Цвет недавно обновленного значения:</translation>
     </message>
     <message>
         <location/>
         <source>Manually changed color:</source>
-        <translation>Вручную изменённый цвет:</translation>
+        <translation>Цвет вручную изменённого значения:</translation>
     </message>
     <message>
         <location/>
@@ -2568,7 +2572,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/welcome/welcomemode.cpp" line="+115"/>
         <source>Welcome</source>
-        <translation>Добро пожаловать</translation>
+        <translation>Приветствие</translation>
     </message>
 </context>
 <context>
@@ -6372,7 +6376,7 @@ Reason: %3</source>
     <message>
         <location line="+2"/>
         <source>Options</source>
-        <translation>Параметры</translation>
+        <translation>Настройки</translation>
     </message>
 </context>
 <context>
@@ -6660,72 +6664,72 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/coreplugin/uavgadgetmanager/uavgadgetmanager.cpp" line="+198"/>
         <source>Edit Gadgets Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Режим настройки экрана</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Ctrl+Shift+F10</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Meta+Shift</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Ctrl+Shift</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Split</source>
-        <translation type="unfinished"></translation>
+        <translation>Разделить по вертикали</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>%1+Down</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Split Side by Side</source>
-        <translation type="unfinished"></translation>
+        <translation>Разделить по горизонтали</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>%1+Right</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Close Current View</source>
-        <translation type="unfinished"></translation>
+        <translation>Закрыть активную область</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>%1+C</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Close All Other Views</source>
-        <translation type="unfinished"></translation>
+        <translation>Закрыть все кроме активной</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>%1+A</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Goto Next View</source>
-        <translation type="unfinished"></translation>
+        <translation>Следующая область</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>%1+N</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6760,7 +6764,7 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/dial/dialgadgetfactory.cpp" line="+37"/>
         <source>Analog Dial Gadget</source>
-        <translation>Аналоговый прибор</translation>
+        <translation>Индикатор стрелочный</translation>
     </message>
 </context>
 <context>
@@ -6777,7 +6781,8 @@ Reason: %3</source>
         <location filename="../../../src/plugins/emptygadget/emptygadgetwidget.cpp" line="+41"/>
         <source>Choose a gadget to display in this view.
 </source>
-        <translation>Выберите гаджет, для показа в этой области.
+        <translation>     Выберите инструмент, для показа в этой области.
+
 </translation>
     </message>
     <message>
@@ -6785,14 +6790,14 @@ Reason: %3</source>
         <source>You can also split this view in two.
 
 </source>
-        <translation>Так же вы можете разделить область на две части.
+        <translation>     Так же вы можете разделить область на две части.
 
 </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Maybe you first have to choose Edit Gadgets Mode in the Window menu.</source>
-        <translation>Возможно, сначала нужно выбрать режим изменения гаджета, в меню окна.</translation>
+        <translation>     Возможно, сначала нужно выбрать &quot;Режим настройки экрана&quot;, в меню окна.</translation>
     </message>
 </context>
 <context>
@@ -6816,7 +6821,7 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/hitl/hitlfactory.cpp" line="+35"/>
         <source>HITL Simulation</source>
-        <translation>HITL Симуляция с FlighGear</translation>
+        <translation>HITL Симулятор (FlighGear)</translation>
     </message>
 </context>
 <context>
@@ -6824,7 +6829,7 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/hitlil2/hitlil2factory.cpp" line="+35"/>
         <source>HITL Simulation with IL2</source>
-        <translation>HITL симуляция с ИЛ2</translation>
+        <translation>HITL Симулятор (ИЛ2)</translation>
     </message>
 </context>
 <context>
@@ -6840,7 +6845,7 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/lineardial/lineardialgadgetfactory.cpp" line="+36"/>
         <source>Bargraph Dial Gadget</source>
-        <translation>Индикаторы</translation>
+        <translation>Индикатор цифровой</translation>
     </message>
 </context>
 <context>
@@ -6848,7 +6853,7 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/modelview/modelviewgadgetfactory.cpp" line="+36"/>
         <source>ModelView Gadget</source>
-        <translation>Вид модели</translation>
+        <translation>3D Модель</translation>
     </message>
 </context>
 <context>
@@ -6879,7 +6884,7 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/notify/notifypluginfactory.cpp" line="+36"/>
         <source>Notify Plugin</source>
-        <translation>Плагин уведомлений</translation>
+        <translation>Оповещения</translation>
     </message>
 </context>
 <context>
@@ -7235,7 +7240,7 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/pfd/pfdgadgetfactory.cpp" line="+36"/>
         <source>Primary Flight Display Gadget</source>
-        <translation>Главное окно полета</translation>
+        <translation>Основной дисплей полета</translation>
     </message>
 </context>
 <context>
@@ -7330,27 +7335,27 @@ Reason: %3</source>
     <message>
         <location line="+0"/>
         <source>Never</source>
-        <translation type="unfinished"></translation>
+        <translation>Никогда</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Read/Write</source>
-        <translation type="unfinished"></translation>
+        <translation>Чтение/Запись</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Read Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Только чтение</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Flight Access Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Flight Режим доступа</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GCS Access Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>НСУ Режим доступа</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -7360,12 +7365,12 @@ Reason: %3</source>
     <message>
         <location line="+1"/>
         <source>Flight Telemetry Update Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Flight режим обновления телеметрии</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Flight Telemetry Update Period</source>
-        <translation type="unfinished"></translation>
+        <translation>Flight период обновления телеметрии</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -7375,22 +7380,22 @@ Reason: %3</source>
     <message>
         <location line="+1"/>
         <source>GCS Telemetry Update Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>НСУ режим обновления телеметрии</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>GCS Telemetry Update Period</source>
-        <translation type="unfinished"></translation>
+        <translation>НСУ период обновления телеметрии</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Logging Update Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Режим обновления журнала</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Logging Update Period</source>
-        <translation type="unfinished"></translation>
+        <translation>Период обновления журнала</translation>
     </message>
 </context>
 <context>

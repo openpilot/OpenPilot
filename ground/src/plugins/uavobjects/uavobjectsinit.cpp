@@ -48,6 +48,7 @@
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
 #include "gpsposition.h"
+#include "gpssatellites.h"
 #include "gpstime.h"
 #include "homelocation.h"
 #include "manualcontrolcommand.h"
@@ -87,6 +88,7 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new FlightTelemetryStats() );
     objMngr->registerObject( new GCSTelemetryStats() );
     objMngr->registerObject( new GPSPosition() );
+    objMngr->registerObject( new GPSSatellites() );
     objMngr->registerObject( new GPSTime() );
     objMngr->registerObject( new HomeLocation() );
     objMngr->registerObject( new ManualControlCommand() );

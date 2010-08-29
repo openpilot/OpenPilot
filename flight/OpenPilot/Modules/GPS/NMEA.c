@@ -3,6 +3,7 @@
 #include "NMEA.h"
 #include "gpsposition.h"
 #include "gpstime.h"
+#include "gpssatellites.h"
 
 // Debugging
 //#define GPSDEBUG
@@ -12,6 +13,7 @@
 #define NMEA_DEBUG_VTG	///< define to enable debug of VTG messages
 #define NMEA_DEBUG_RMC	///< define to enable debug of RMC messages
 #define NMEA_DEBUG_GSA	///< define to enable debug of GSA messages
+#define NMEA_DEBUG_GSV	///< define to enable debug of GSV messages
 #define NMEA_DEBUG_ZDA	///< define to enable debug of ZDA messages
 #endif
 
@@ -31,6 +33,7 @@ static bool nmeaProcessGPRMC (GPSPositionData * GpsData, char * sentence);
 static bool nmeaProcessGPVTG (GPSPositionData * GpsData, char * sentence);
 static bool nmeaProcessGPGSA (GPSPositionData * GpsData, char * sentence);
 static bool nmeaProcessGPZDA (GPSPositionData * GpsData, char * sentence);
+static bool nmeaProcessGPGSV (GPSPositionData * GpsData, char * sentence);
 
 static struct nmea_parser nmea_parsers[] = {
   {
@@ -52,6 +55,10 @@ static struct nmea_parser nmea_parsers[] = {
   {
     .prefix  = "GPZDA",
     .handler = nmeaProcessGPZDA,
+  },
+  {
+    .prefix  = "GPGSV",
+    .handler = nmeaProcessGPGSV,
   },
 };
 
@@ -414,6 +421,106 @@ static bool nmeaProcessGPZDA (GPSPositionData * GpsData, char * sentence)
 
     return true;
 }
+
+static GPSSatellitesData gsv_partial;
+/* Bitmaps of which sentences we're looking for to allow us to handle out-of-order GSVs */
+static uint8_t           gsv_expected_mask;
+static uint8_t           gsv_processed_mask;
+/* Error counters */
+static uint16_t          gsv_incomplete_error; 
+static uint16_t          gsv_duplicate_error; 
+
+static bool nmeaProcessGPGSV (GPSPositionData * GpsData, char * sentence)
+{
+  char * next = sentence;
+  char * tokens;
+  char * delimiter = ",";
+
+#ifdef NMEA_DEBUG_GSV
+  PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"$%s\r\n",sentence);
+#endif
+
+  /* Drop the checksum */
+  char * tmp = sentence;
+  char * tmp_delim = "*";
+  next = strsep(&tmp, tmp_delim);
+
+  /* # of sentences in full GSV data set */
+  tokens = strsep(&next, delimiter);
+  uint8_t total_sentences = atoi(tokens);
+  if ((total_sentences < 1) || 
+      (total_sentences > 8)) {
+    return false;
+  }
+
+  /* Sentence number within the current GSV data set */
+  tokens = strsep(&next, delimiter);
+  uint8_t current_sentence = atoi(tokens);
+  if (current_sentence < 1) {
+    return false;
+  }
+
+  /* # of satellites currently in view */
+  tokens = strsep(&next, delimiter);
+  gsv_partial.SatsInView = atoi(tokens);
+
+  /* Find out if this is the first sentence in the GSV set */
+  if (current_sentence == 1) {
+    if (gsv_expected_mask != gsv_processed_mask) {
+      /* We are starting over when we haven't yet finished our previous GSV group */
+      gsv_incomplete_error++;
+    }
+
+    /* First GSV sentence in the sequence, reset our expected_mask */
+    gsv_expected_mask = (1 << total_sentences) - 1;
+  }
+
+  uint8_t current_sentence_id = (1 << (current_sentence - 1));
+  if (gsv_processed_mask & current_sentence_id) {
+    /* Duplicate sentence in this GSV set */
+    gsv_duplicate_error++;
+  } else {
+    /* Note that we've seen this sentence */
+    gsv_processed_mask |= current_sentence_id;
+  }
+
+  /* Make sure this sentence can fit in our GPSSatellites object */
+  if ((current_sentence * 4) <= NELEMENTS(gsv_partial.PRN)) {
+    /* Process 4 blocks of satellite info */
+    for (uint8_t i = 0; next && i < 4; i++) {
+      uint8_t sat_index = ((current_sentence - 1) * 4) + i;
+
+      /* PRN number */
+      tokens = strsep(&next, delimiter);
+      gsv_partial.PRN[sat_index] = atoi(tokens);
+
+      /* Elevation */
+      tokens = strsep(&next, delimiter);
+      gsv_partial.Elevation[sat_index] = NMEA_real_to_float(tokens);
+
+      /* Azimuth */
+      tokens = strsep(&next, delimiter);
+      gsv_partial.Azimuth[sat_index] = NMEA_real_to_float(tokens);
+
+      /* SNR */
+      tokens = strsep(&next, delimiter);
+      gsv_partial.SNR[sat_index] = atoi(tokens);
+    }
+  }
+
+  /* Find out if we're finished processing all GSV sentences in the set */
+  if ((gsv_expected_mask != 0) &&
+      (gsv_processed_mask == gsv_expected_mask)) {
+    /* GSV set has been fully processed.  Update the GPSSatellites object. */
+    GPSSatellitesSet (&gsv_partial);
+    memset ((void *)&gsv_partial, 0, sizeof(gsv_partial));
+    gsv_expected_mask = 0;
+    gsv_processed_mask = 0;
+  }
+
+  return true;
+}
+
 
 /**
  * Parse an NMEA GPGSA sentence and update the given UAVObject

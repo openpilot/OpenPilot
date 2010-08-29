@@ -1,0 +1,14 @@
+<xml>
+    <object name="GPSSatellites" singleinstance="true" settings="false">
+        <description>Contains information about the GPS satellites in view from @ref GPSModule.</description>
+        <field name="SatsInView" units="" type="int8" elements="1"/>
+        <field name="PRN" units="" type="int8" elements="16"/>
+        <field name="Elevation" units="degrees" type="float" elements="16"/>
+        <field name="Azimuth" units="degrees" type="float" elements="16"/>
+        <field name="SNR" units="" type="int8" elements="16"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="10000"/>
+        <logging updatemode="periodic" period="30000"/>
+	</object>
+</xml>

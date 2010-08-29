@@ -46,6 +46,7 @@
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
 #include "gpsposition.h"
+#include "gpssatellites.h"
 #include "gpstime.h"
 #include "homelocation.h"
 #include "manualcontrolcommand.h"
@@ -85,6 +86,7 @@ void UAVObjectsInitializeAll()
     FlightTelemetryStatsInitialize();
     GCSTelemetryStatsInitialize();
     GPSPositionInitialize();
+    GPSSatellitesInitialize();
     GPSTimeInitialize();
     HomeLocationInitialize();
     ManualControlCommandInitialize();

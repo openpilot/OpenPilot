@@ -39,6 +39,7 @@ HEADERS += uavobjects_global.h \
     navigationdesired.h \
     gpsposition.h \
     gpstime.h \
+    gpssatellites.h \
     positionactual.h \
     flightbatterystate.h \
     homelocation.h
@@ -77,6 +78,7 @@ SOURCES += uavobject.cpp \
     navigationdesired.cpp \
     gpsposition.cpp \
     gpstime.cpp \
+    gpssatellites.cpp \
     positionactual.cpp \
     flightbatterystate.cpp \
     homelocation.cpp

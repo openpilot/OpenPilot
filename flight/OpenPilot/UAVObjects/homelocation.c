@@ -80,25 +80,25 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	// Initialize object fields to their default values
 	UAVObjGetInstanceData(obj, instId, &data);
 	memset(&data, 0, sizeof(HomeLocationData));
-    data.Set = 0;
-    data.Latitude = 0;
-    data.Longitude = 0;
-    data.Altitude = 0;
-    data.ECEF[0] = 0;
-    data.ECEF[1] = 0;
-    data.ECEF[2] = 0;
-    data.RNE[0] = 0;
-    data.RNE[1] = 0;
-    data.RNE[2] = 0;
-    data.RNE[3] = 0;
-    data.RNE[4] = 0;
-    data.RNE[5] = 0;
-    data.RNE[6] = 0;
-    data.RNE[7] = 0;
-    data.RNE[8] = 0;
-    data.Be[0] = 0;
-    data.Be[1] = 0;
-    data.Be[2] = 0;
+	data.Set = 0;
+	data.Latitude = 0;
+	data.Longitude = 0;
+	data.Altitude = 0;
+	data.ECEF[0] = 0;
+	data.ECEF[1] = 0;
+	data.ECEF[2] = 0;
+	data.RNE[0] = 0;
+	data.RNE[1] = 0;
+	data.RNE[2] = 0;
+	data.RNE[3] = 0;
+	data.RNE[4] = 0;
+	data.RNE[5] = 0;
+	data.RNE[6] = 0;
+	data.RNE[7] = 0;
+	data.RNE[8] = 0;
+	data.Be[0] = 0;
+	data.Be[1] = 0;
+	data.Be[2] = 0;
 
 	UAVObjSetInstanceData(obj, instId, &data);
 

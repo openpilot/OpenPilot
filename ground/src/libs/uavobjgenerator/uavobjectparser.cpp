@@ -783,19 +783,19 @@ bool UAVObjectParser::generateFlightObject(int objIndex, const QString& template
             {
                 if ( info->fields[n]->type == FIELDTYPE_ENUM )
                 {
-                    initfields.append( QString("    data.%1 = %2;\n")
+                    initfields.append( QString("\tdata.%1 = %2;\n")
                                 .arg( info->fields[n]->name )
                                 .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValue ) ) );
                 }
                 else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
                 {
-                    initfields.append( QString("    data.%1 = %2;\n")
+                    initfields.append( QString("\tdata.%1 = %2;\n")
                                 .arg( info->fields[n]->name )
                                 .arg( info->fields[n]->defaultValue.toFloat() ) );
                 }
                 else
                 {
-                    initfields.append( QString("    data.%1 = %2;\n")
+                    initfields.append( QString("\tdata.%1 = %2;\n")
                                 .arg( info->fields[n]->name )
                                 .arg( info->fields[n]->defaultValue.toInt() ) );
                 }
@@ -807,21 +807,21 @@ bool UAVObjectParser::generateFlightObject(int objIndex, const QString& template
                 {
                     if ( info->fields[n]->type == FIELDTYPE_ENUM )
                     {
-                        initfields.append( QString("    data.%1[%2] = %3;\n")
+                        initfields.append( QString("\tdata.%1[%2] = %3;\n")
                                     .arg( info->fields[n]->name )
                                     .arg( idx )
                                     .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValue ) ) );
                     }
                     else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
                     {
-                        initfields.append( QString("    data.%1[%2] = %3;\n")
+                        initfields.append( QString("\tdata.%1[%2] = %3;\n")
                                     .arg( info->fields[n]->name )
                                     .arg( idx )
                                     .arg( info->fields[n]->defaultValue.toFloat() ) );
                     }
                     else
                     {
-                        initfields.append( QString("    data.%1[%2] = %3;\n")
+                        initfields.append( QString("\tdata.%1[%2] = %3;\n")
                                     .arg( info->fields[n]->name )
                                     .arg( idx )
                                     .arg( info->fields[n]->defaultValue.toInt() ) );

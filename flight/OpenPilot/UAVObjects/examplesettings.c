@@ -80,9 +80,9 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	// Initialize object fields to their default values
 	UAVObjGetInstanceData(obj, instId, &data);
 	memset(&data, 0, sizeof(ExampleSettingsData));
-    data.UpdatePeriod = 10;
-    data.StepSize = 1;
-    data.StepDirection = 0;
+	data.UpdatePeriod = 10;
+	data.StepSize = 1;
+	data.StepDirection = 0;
 
 	UAVObjSetInstanceData(obj, instId, &data);
 

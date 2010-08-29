@@ -80,14 +80,14 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	// Initialize object fields to their default values
 	UAVObjGetInstanceData(obj, instId, &data);
 	memset(&data, 0, sizeof(NavigationSettingsData));
-    data.UpdatePeriod = 100;
-    data.AccelerationMax = 35;
-    data.SpeedMax = 300;
-    data.SpeedSafe = 100;
-    data.SpeedMin = 70;
-    data.SettleTime = 12;
-    data.TurnSpeedFactor = 0.1;
-    data.StabilizationForceFactor = 4;
+	data.UpdatePeriod = 100;
+	data.AccelerationMax = 35;
+	data.SpeedMax = 300;
+	data.SpeedSafe = 100;
+	data.SpeedMin = 70;
+	data.SettleTime = 12;
+	data.TurnSpeedFactor = 0.1;
+	data.StabilizationForceFactor = 4;
 
 	UAVObjSetInstanceData(obj, instId, &data);
 

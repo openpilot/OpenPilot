@@ -26,7 +26,6 @@
  */
 
 #include "gpsdisplaywidget.h"
-#include "gpsdisplaythread.h"
 #include "ui_gpsdisplaywidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjects/uavobjectmanager.h"

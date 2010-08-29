@@ -60,6 +60,7 @@ uint16_t ECEF2LLA(double ECEF[3], double LLA[3])
   double x=ECEF[0], y=ECEF[1], z=ECEF[2];
   double Lat, N, NplusH, delta, esLat;
   uint16_t iter;
+#define MAX_ITER 100
 
 	LLA[1] = RAD2DEG*atan2(y,x);
 	N = a; 
@@ -68,7 +69,7 @@ uint16_t ECEF2LLA(double ECEF[3], double LLA[3])
 	Lat = 1;
 	iter=0;
 	
-	while (((delta > 1.0e-14)||(delta < -1.0e-14)) && (iter < 100))
+	while (((delta > 1.0e-14)||(delta < -1.0e-14)) && (iter < MAX_ITER))
 	{
 		delta = Lat - atan(z / (sqrt(x*x + y*y)*(1-(N*e*e/NplusH))));
 		Lat = Lat-delta;
@@ -81,8 +82,7 @@ uint16_t ECEF2LLA(double ECEF[3], double LLA[3])
 	LLA[0] = RAD2DEG*Lat;
 	LLA[2] = NplusH - N;
 
-    if (iter==500) return (0);
-	else return (1);
+  return (iter < MAX_ITER);
 }
 
 // ****** find ECEF to NED rotation matrix ********

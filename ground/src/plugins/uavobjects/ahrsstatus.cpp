@@ -69,6 +69,9 @@ AhrsStatus::AhrsStatus(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
     SerialNumberElemNames.append("23");
     SerialNumberElemNames.append("24");
     fields.append( new UAVObjectField(QString("SerialNumber"), QString("n/a"), UAVObjectField::UINT8, SerialNumberElemNames, QStringList()) );
+    QStringList CPULoadElemNames;
+    CPULoadElemNames.append("0");
+    fields.append( new UAVObjectField(QString("CPULoad"), QString("count"), UAVObjectField::UINT8, CPULoadElemNames, QStringList()) );
     QStringList CommErrorsElemNames;
     CommErrorsElemNames.append("Algorithm");
     CommErrorsElemNames.append("Update");

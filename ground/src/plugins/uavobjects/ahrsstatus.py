@@ -72,6 +72,16 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
+		'CPULoad',
+		'B',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
 		'CommErrors',
 		'B',
 		5,
@@ -126,7 +136,7 @@ _fields = [ \
 
 class AhrsStatus(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 842145078
+    OBJID        = 3393301276
     NAME         = "AhrsStatus"
     METANAME     = "AhrsStatusMeta"
     ISSINGLEINST = 1

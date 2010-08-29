@@ -45,8 +45,9 @@ AHRSCalibration::AHRSCalibration(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTING
     QStringList measure_varElemNames;
     measure_varElemNames.append("0");
     QStringList measure_varEnumOptions;
-    measure_varEnumOptions.append("FALSE");
-    measure_varEnumOptions.append("TRUE");
+    measure_varEnumOptions.append("SET");
+    measure_varEnumOptions.append("MEASURE");
+    measure_varEnumOptions.append("ECHO");
     fields.append( new UAVObjectField(QString("measure_var"), QString(""), UAVObjectField::ENUM, measure_varElemNames, measure_varEnumOptions) );
     QStringList accel_biasElemNames;
     accel_biasElemNames.append("X");

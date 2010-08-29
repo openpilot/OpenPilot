@@ -58,7 +58,7 @@ public:
     // Field information
     // Field measure_var information
     /* Enumeration options for field measure_var */
-    typedef enum { MEASURE_VAR_FALSE=0, MEASURE_VAR_TRUE=1 } measure_varOptions;
+    typedef enum { MEASURE_VAR_SET=0, MEASURE_VAR_MEASURE=1, MEASURE_VAR_ECHO=2 } measure_varOptions;
     // Field accel_bias information
     /* Array element names for field accel_bias */
     typedef enum { ACCEL_BIAS_X=0, ACCEL_BIAS_Y=1, ACCEL_BIAS_Z=2 } accel_biasElem;

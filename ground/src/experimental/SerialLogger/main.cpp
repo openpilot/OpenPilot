@@ -40,7 +40,7 @@ public:
 
         while(1)
         {
-            dat = serialPort.read(10);
+            dat = serialPort.read(100);
             qDebug() << dat;
             ts << dat;
         }

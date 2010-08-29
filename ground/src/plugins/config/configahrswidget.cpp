@@ -163,7 +163,7 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
     mag_z->setPos(startX,startY);
     mag_z->setTransform(QTransform::fromScale(1,0),true);
 
-    position = 0;
+    position = -1;
 
     // Fill the dropdown menus:
     UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
@@ -177,8 +177,6 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_ahrs->ahrsSettingsSaveRAM, SIGNAL(clicked()), this, SLOT(ahrsSettingsSaveRAM()));
     connect(m_ahrs->ahrsSettingsSaveSD, SIGNAL(clicked()), this, SLOT(ahrsSettingsSaveSD()));
     connect(m_ahrs->ahrsSavePosition, SIGNAL(clicked()), this, SLOT(savePositionData()));
-    connect(m_ahrs->ahrsComputeScaleBias, SIGNAL(clicked()), this, SLOT(computeScaleBias()));
-    connect(m_ahrs->ahrsCalibrationMode, SIGNAL(clicked()), this, SLOT(calibrationMode()));
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(ahrsSettingsRequest()));
 
 
@@ -204,12 +202,12 @@ void ConfigAHRSWidget::showEvent(QShowEvent *event)
   */
 void ConfigAHRSWidget::launchAHRSCalibration()
 {
-    m_ahrs->calibInstructions->setText("Calibration launched...");
+    m_ahrs->calibInstructions->setText("Estimating sensor variance...");
     m_ahrs->ahrsCalibStart->setEnabled(false);
 
     UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
     UAVObjectField *field = obj->getField(QString("measure_var"));
-    field->setValue("TRUE");
+    field->setValue("MEASURE");
     obj->updated();
 
     QTimer::singleShot(calibrationDelay*1000, this, SLOT(calibPhase2()));
@@ -245,42 +243,19 @@ void ConfigAHRSWidget::incrementProgress()
 void ConfigAHRSWidget::calibPhase2()
 {
     UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
+    UAVObjectField *field = obj->getField(QString("measure_var"));
 
-    //  This is a bit weird, but it is because we are expecting an update from the
-    // OP board with the correct calibration values, and those only arrive on the object update
-    // which comes back from the board, and not the first object update signal which is in fast
-    // the object update we did ourselves... Clear ?
-    switch (phaseCounter) {
-    case 0:
-        phaseCounter++;
-        m_ahrs->calibInstructions->setText("Getting results...");
-        connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(calibPhase2()));
-        obj->updated();
-        break;
-    case 1:  // this is where we end up with the update just above
-        phaseCounter++;
-        break;
-    case 2: { // This is the update with the right values (coming from the board)
-            disconnect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(calibPhase2()));
-            // Now update size of all the graphs
-            drawVariancesGraph();
+    //  We need to echo back the results of calibration before changing to set mode
+    m_ahrs->calibInstructions->setText("Getting results...");
+    field->setValue("ECHO");
+    obj->updated();
 
-            // Now wait 15 more seconds before re-enabling the "Save" button
-            QTimer::singleShot(calibrationDelay*1000, this, SLOT(calibPhase2()));
-            m_ahrs->calibInstructions->setText(QString("Saving the results..."));
-            progressBarIndex = 0;
-            phaseCounter++;
-        }
-        break;
+    // Now update size of all the graphs
+    drawVariancesGraph();
 
-    case 3:         // This step saves the configuration.
-        saveAHRSCalibration();
-        m_ahrs->calibInstructions->setText(QString("Calibration saved."));
-        m_ahrs->ahrsCalibStart->setEnabled(true);
-        break;
-
-    }
-
+    saveAHRSCalibration();
+    m_ahrs->calibInstructions->setText(QString("Calibration saved."));
+    m_ahrs->ahrsCalibStart->setEnabled(true);
 }
 
 /**
@@ -290,7 +265,7 @@ void ConfigAHRSWidget::saveAHRSCalibration()
 {
     UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
     UAVObjectField *field = obj->getField(QString("measure_var"));
-    field->setValue("FALSE");
+    field->setValue("SET");
     obj->updated();
     updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
 
@@ -300,7 +275,15 @@ void ConfigAHRSWidget::saveAHRSCalibration()
   * Saves the data from the aircraft in one of six positions
   */
 void ConfigAHRSWidget::savePositionData()
-{
+{    
+    if(position < 0)
+    {
+        calibrationMode();
+        m_ahrs->calibInstructions->setText("Place horizontally and click save position...");
+        position = 0;
+        return;
+    }
+
     UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeRaw")));
     UAVObjectField *accel_field = obj->getField(QString("accels_filtered"));
     UAVObjectField *mag_field = obj->getField(QString("magnetometers"));
@@ -313,6 +296,18 @@ void ConfigAHRSWidget::savePositionData()
     mag_data_z[position] = mag_field->getValue(2).toDouble();
 
     position = (position + 1) % 6;
+    if(position == 1)
+        m_ahrs->calibInstructions->setText("Place with left side down and click save position...");
+    if(position == 2)
+        m_ahrs->calibInstructions->setText("Place upside down and click save position...");
+    if(position == 3)
+        m_ahrs->calibInstructions->setText("Place with right side down and click save position...");
+    if(position == 4)
+        m_ahrs->calibInstructions->setText("Place with nose up and click save position...");
+    if(position == 5)
+        m_ahrs->calibInstructions->setText("Place with nose down and click save position...");
+    if(position == 0)
+        computeScaleBias();
 }
 
 //*****************************************************************
@@ -442,11 +437,16 @@ void ConfigAHRSWidget::computeScaleBias()
     field->setDouble(b[2] / S[2], 2);
     obj->updated();
 
+    position = -1; //set to run again
+    m_ahrs->calibInstructions->setText("Computed accel and mag scale and bias...");
+
 }
 
 void ConfigAHRSWidget::calibrationMode()
 {
     UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
+
+    m_ahrs->calibInstructions->setText("Now place in the horizontal position...");
 
     // set accels to unity gain
     UAVObjectField *field = obj->getField(QString("accel_scale"));
@@ -513,8 +513,6 @@ void ConfigAHRSWidget::ahrsSettingsRequest()
     drawVariancesGraph();
     m_ahrs->ahrsCalibStart->setEnabled(true);
     m_ahrs->ahrsSavePosition->setEnabled(true);
-    m_ahrs->ahrsComputeScaleBias->setEnabled(true);
-    m_ahrs->ahrsCalibrationMode->setEnabled(true);
     m_ahrs->calibInstructions->setText(QString("Press \"Start\" above to calibrate."));
 }
 

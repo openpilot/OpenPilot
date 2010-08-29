@@ -221,7 +221,8 @@ static void ahrscommsTask(void* parameters)
         if(( result = PIOS_OPAHRS_SetGetCalibration(&req,&rsp) ) == OPAHRS_RESULT_OK ) {
           update_calibration(&(rsp.payload.user.v.rsp.calibration));
           AHRSCalibrationIsUpdatedFlag = false;
-          data.CalibrationSet = AHRSSTATUS_CALIBRATIONSET_TRUE;
+          if(rsp.payload.user.v.rsp.calibration.measure_var != AHRS_ECHO)
+            data.CalibrationSet = AHRSSTATUS_CALIBRATIONSET_TRUE;
           AhrsStatusSet(&data);
           
         } else {
@@ -311,8 +312,13 @@ static void load_calibration(struct opahrs_msg_v1_req_calibration * calibration)
 {
   AHRSCalibrationData data;
   AHRSCalibrationGet(&data);
-  
-  calibration->measure_var    = data.measure_var;
+  if(data.measure_var == AHRSCALIBRATION_MEASURE_VAR_SET)
+    calibration->measure_var  = AHRS_SET;
+  else if(data.measure_var == AHRSCALIBRATION_MEASURE_VAR_MEASURE)
+    calibration->measure_var = AHRS_MEASURE;
+  else 
+    calibration->measure_var = AHRS_ECHO;
+
   calibration->accel_bias[0]  = data.accel_bias[0];
   calibration->accel_bias[1]  = data.accel_bias[1];
   calibration->accel_bias[2]  = data.accel_bias[2];
@@ -451,6 +457,11 @@ static void process_update(struct opahrs_msg_v1_rsp_update * update)
     pos.Vel[1] = update->Vel[1];
     pos.Vel[2] = update->Vel[2];
     PositionActualSet(&pos);
+    
+    AhrsStatusData status;
+    AhrsStatusGet(&status);
+    status.CPULoad = update->load;
+    AhrsStatusSet(&status);
 }
 
 static void update_attitude_raw(struct opahrs_msg_v1_rsp_attituderaw * attituderaw)

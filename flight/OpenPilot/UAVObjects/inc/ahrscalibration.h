@@ -86,7 +86,7 @@ typedef struct {
 // Field information
 // Field measure_var information
 /* Enumeration options for field measure_var */
-typedef enum { AHRSCALIBRATION_MEASURE_VAR_FALSE=0, AHRSCALIBRATION_MEASURE_VAR_TRUE=1 } AHRSCalibrationmeasure_varOptions;
+typedef enum { AHRSCALIBRATION_MEASURE_VAR_SET=0, AHRSCALIBRATION_MEASURE_VAR_MEASURE=1, AHRSCALIBRATION_MEASURE_VAR_ECHO=2 } AHRSCalibrationmeasure_varOptions;
 // Field accel_bias information
 /* Array element names for field accel_bias */
 typedef enum { AHRSCALIBRATION_ACCEL_BIAS_X=0, AHRSCALIBRATION_ACCEL_BIAS_Y=1, AHRSCALIBRATION_ACCEL_BIAS_Z=2 } AHRSCalibrationaccel_biasElem;

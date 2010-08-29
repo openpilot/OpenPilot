@@ -62,6 +62,7 @@ void DMA1_Channel1_IRQHandler() __attribute__ ((alias ("AHRS_ADC_DMA_Handler")))
 
 // For debugging the raw sensors
 //#define DUMP_RAW
+//#define DUMP_FRIENDLY
 
 /**
  * @addtogroup AHRS_Definitions 
@@ -85,6 +86,8 @@ void DMA1_Channel1_IRQHandler() __attribute__ ((alias ("AHRS_ADC_DMA_Handler")))
 #define RAD_PER_DEGREE     ( M_PI / 180 )
 #define GYRO_SCALE         ( (VDD / FULL_RANGE) / GYRO_SENSITIVITY * RAD_PER_DEGREE )
 #define GYRO_OFFSET       -1675 /* From data sheet, zero accel output is 1.35 v */
+
+#define MAX_IDLE_COUNT          65e3
 /**
  * @}
  */
@@ -207,6 +210,8 @@ double BaseECEF[3] = {0, 0, 0};
 float Rne[3][3];
 //! Indicates the communications are requesting a calibration
 uint8_t calibration_pending = FALSE;
+//! Counter for tracking the idle level
+static uint32_t idle_counter = 0;
 
 /**
  * @}
@@ -220,8 +225,7 @@ int main()
 {
   float gyro[3], accel[3], mag[3];
   float vel[3] = {0,0,0};
-  uint32_t loop_ctr = 0;
-  
+   
   ahrs_algorithm = INSGPS_Algo;
 
   /* Brings up System using CMSIS functions, enables the LEDs. */
@@ -299,9 +303,7 @@ int main()
   while (1) {
     // Alive signal
     PIOS_LED_Toggle(LED1);
-    
-    loop_ctr ++;
-    
+        
     if(calibration_pending)
     {
       calibrate_sensors();
@@ -312,7 +314,10 @@ int main()
     PIOS_HMC5843_ReadMag(mag_data.raw.axis);
     
     // Delay for valid data
-    while( ahrs_state != AHRS_DATA_READY );
+    idle_counter = 0;
+    while( ahrs_state != AHRS_DATA_READY ) 
+      idle_counter ++;
+
     ahrs_state = AHRS_PROCESSING;
 
     downsample_data();
@@ -387,6 +392,13 @@ int main()
     }
     
     ahrs_state = AHRS_IDLE;
+      
+#ifdef DUMP_FRIENDLY
+      PIOS_COM_SendFormattedString(PIOS_COM_AUX, "a: %d %d %d\r\n", (int16_t)(accel_data.filtered.x * 100), (int16_t)(accel_data.filtered.y * 100), (int16_t)(accel_data.filtered.z * 100)); 
+      PIOS_COM_SendFormattedString(PIOS_COM_AUX, "g: %d %d %d\r\n", (int16_t)(gyro_data.filtered.x * 100), (int16_t)(gyro_data.filtered.y * 100), (int16_t)(gyro_data.filtered.z * 100));
+      PIOS_COM_SendFormattedString(PIOS_COM_AUX, "m: %d %d %d\r\n",  mag_data.raw.axis[0], mag_data.raw.axis[1], mag_data.raw.axis[2]);
+      PIOS_COM_SendFormattedString(PIOS_COM_AUX, "q: %d %d %d %d\r\n", (int16_t)(Nav.q[0] * 100), (int16_t)(Nav.q[1] * 100), (int16_t)(Nav.q[2] * 100), (int16_t)(Nav.q[3] * 100));
+#endif
 
     process_spi_request();
     
@@ -680,9 +692,9 @@ void process_spi_request(void)
       lfsm_user_set_tx_v1 (&user_tx_v1);
       break;
     case OPAHRS_MSG_V1_REQ_CALIBRATION:
-      if(user_rx_v1.payload.user.v.req.calibration.measure_var) {
+      if(user_rx_v1.payload.user.v.req.calibration.measure_var == AHRS_MEASURE) {
         calibration_pending = TRUE;
-      } else {
+      } else if (user_rx_v1.payload.user.v.req.calibration.measure_var == AHRS_SET) {
         accel_var[0] = user_rx_v1.payload.user.v.req.calibration.accel_var[0];
         accel_var[1] = user_rx_v1.payload.user.v.req.calibration.accel_var[1];
         accel_var[2] = user_rx_v1.payload.user.v.req.calibration.accel_var[2];
@@ -700,20 +712,22 @@ void process_spi_request(void)
         INSSetGyroBias(gyro_bias_ins);  //gyro bias corrects in preprocessing
         INSSetGyroVar(gyro_var);
         INSSetMagVar(mag_var);             
-      }      
-      accel_bias[0]  = user_rx_v1.payload.user.v.req.calibration.accel_bias[0];
-      accel_bias[1]  = user_rx_v1.payload.user.v.req.calibration.accel_bias[1];
-      accel_bias[2]  = user_rx_v1.payload.user.v.req.calibration.accel_bias[2];
-      accel_scale[0] = user_rx_v1.payload.user.v.req.calibration.accel_scale[0];
-      accel_scale[1] = user_rx_v1.payload.user.v.req.calibration.accel_scale[1];
-      accel_scale[2] = user_rx_v1.payload.user.v.req.calibration.accel_scale[2];
-      gyro_scale[0]  = user_rx_v1.payload.user.v.req.calibration.gyro_scale[0];
-      gyro_scale[1]  = user_rx_v1.payload.user.v.req.calibration.gyro_scale[1];
-      gyro_scale[2]  = user_rx_v1.payload.user.v.req.calibration.gyro_scale[2];
-      mag_bias[0]    = user_rx_v1.payload.user.v.req.calibration.mag_bias[0];
-      mag_bias[1]    = user_rx_v1.payload.user.v.req.calibration.mag_bias[1];
-      mag_bias[2]    = user_rx_v1.payload.user.v.req.calibration.mag_bias[2];
-      
+      }    
+      if(user_rx_v1.payload.user.v.req.calibration.measure_var != AHRS_ECHO) {
+        /* if echoing don't set anything */
+        accel_bias[0]  = user_rx_v1.payload.user.v.req.calibration.accel_bias[0];
+        accel_bias[1]  = user_rx_v1.payload.user.v.req.calibration.accel_bias[1];
+        accel_bias[2]  = user_rx_v1.payload.user.v.req.calibration.accel_bias[2];
+        accel_scale[0] = user_rx_v1.payload.user.v.req.calibration.accel_scale[0];
+        accel_scale[1] = user_rx_v1.payload.user.v.req.calibration.accel_scale[1];
+        accel_scale[2] = user_rx_v1.payload.user.v.req.calibration.accel_scale[2];
+        gyro_scale[0]  = user_rx_v1.payload.user.v.req.calibration.gyro_scale[0];
+        gyro_scale[1]  = user_rx_v1.payload.user.v.req.calibration.gyro_scale[1];
+        gyro_scale[2]  = user_rx_v1.payload.user.v.req.calibration.gyro_scale[2];
+        mag_bias[0]    = user_rx_v1.payload.user.v.req.calibration.mag_bias[0];
+        mag_bias[1]    = user_rx_v1.payload.user.v.req.calibration.mag_bias[1];
+        mag_bias[2]    = user_rx_v1.payload.user.v.req.calibration.mag_bias[2];
+      }
       // echo back the values used
       opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_CALIBRATION);
       user_tx_v1.payload.user.v.rsp.calibration.accel_var[0] = accel_var[0];
@@ -793,6 +807,9 @@ void process_spi_request(void)
       user_tx_v1.payload.user.v.rsp.update.Vel[1] = Nav.Vel[1];
       user_tx_v1.payload.user.v.rsp.update.Vel[2] = Nav.Vel[2];
 
+      // compute the idle fraction
+      user_tx_v1.payload.user.v.rsp.update.load = (MAX_IDLE_COUNT - idle_counter) * 100 / MAX_IDLE_COUNT;
+          
       dump_spi_message(PIOS_COM_AUX, "U", (uint8_t *)&user_tx_v1, sizeof(user_tx_v1));
       lfsm_user_set_tx_v1 (&user_tx_v1);
       break;

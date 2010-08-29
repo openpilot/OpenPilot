@@ -211,8 +211,10 @@ struct opahrs_msg_v1_req_update {
 struct opahrs_msg_v1_req_attituderaw {
 } __attribute__((__packed__));
 
+enum measure_mode {AHRS_SET, AHRS_MEASURE, AHRS_ECHO};
+
 struct opahrs_msg_v1_req_calibration {
-  uint8_t  measure_var;
+  enum measure_mode  measure_var;
   uint16_t accel_bias[3];
   float    accel_scale[3];
   float    accel_var[3];
@@ -293,6 +295,7 @@ struct opahrs_msg_v1_rsp_update {
   } quaternion;
   float NED[3];
   float Vel[3];
+  uint8_t load;
 } __attribute__((__packed__));
 
 struct opahrs_msg_v1_rsp_calibration {

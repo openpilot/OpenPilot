@@ -26,13 +26,13 @@
  */
 
 #include "scopegadgetoptionspage.h"
-#include "scopegadgetconfiguration.h"
-#include "ui_scopegadgetoptionspage.h"
 
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/uavdataobject.h"
 
+
+#include <QtGui/qpalette.h>
 
 
 ScopeGadgetOptionsPage::ScopeGadgetOptionsPage(ScopeGadgetConfiguration *config, QObject *parent) :
@@ -154,9 +154,9 @@ void ScopeGadgetOptionsPage::setYAxisWidgetFromPlotCurve()
 
 void ScopeGadgetOptionsPage::setButtonColor(const QColor &color)
 {
+    options_page->btnColor->setAutoFillBackground(true);
     options_page->btnColor->setText(color.name());
     options_page->btnColor->setPalette(QPalette(color));
-    options_page->btnColor->setAutoFillBackground(true);
 }
 
 /*!
@@ -228,14 +228,21 @@ void ScopeGadgetOptionsPage::on_btnAddCurve_clicked()
     if(!parseOK)
        scale = 0;
 
-    //TODO: Find an existing plot curve config based on the uavobject and uav field. If it
-    //exists, update it, else add a new one.
 
     QVariant varColor = (int)QColor(options_page->btnColor->text()).rgb();
 
-    addPlotCurveConfig(uavObject,uavField,scale,varColor);
+    //TODO: Find an existing plot curve config based on the uavobject and uav field. If it
+    //exists, update it, else add a new one.
+    if(options_page->lstCurves->currentItem()->text() == uavObject + "." + uavField)
+    {
+        QListWidgetItem *listWidgetItem = options_page->lstCurves->currentItem();
+        setCurvePlotProperties(listWidgetItem,uavObject,uavField,scale,varColor);
+    }else
+    {
+        addPlotCurveConfig(uavObject,uavField,scale,varColor);
 
-    options_page->lstCurves->setCurrentRow(options_page->lstCurves->count() - 1);
+        options_page->lstCurves->setCurrentRow(options_page->lstCurves->count() - 1);
+    }
 }
 
 void ScopeGadgetOptionsPage::addPlotCurveConfig(QString uavObject, QString uavField, int scale, QVariant varColor)
@@ -247,10 +254,19 @@ void ScopeGadgetOptionsPage::addPlotCurveConfig(QString uavObject, QString uavFi
     options_page->lstCurves->addItem(listItemDisplayText);
     QListWidgetItem *listWidgetItem = options_page->lstCurves->item(options_page->lstCurves->count() - 1);
 
+    setCurvePlotProperties(listWidgetItem,uavObject,uavField,scale,varColor);
+
+}
+
+void ScopeGadgetOptionsPage::setCurvePlotProperties(QListWidgetItem *listWidgetItem,QString uavObject, QString uavField, int scale, QVariant varColor)
+{
+    bool parseOK = false;
+
     //Set the properties of the newly added list item
+    QString listItemDisplayText = uavObject + "." + uavField;
     QRgb rgbColor = (QRgb)varColor.toInt(&parseOK);
     QColor color = QColor( rgbColor );
-    listWidgetItem->setText(listItemDisplayText);
+    //listWidgetItem->setText(listItemDisplayText);
     listWidgetItem->setTextColor( color );
 
     //Store some additional data for the plot curve on the list item

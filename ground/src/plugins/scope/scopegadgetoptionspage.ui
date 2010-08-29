@@ -18,8 +18,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>601</width>
-     <height>341</height>
+     <width>611</width>
+     <height>241</height>
     </rect>
    </property>
    <widget class="QWidget" name="horizontalLayoutWidget">
@@ -27,7 +27,7 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>461</width>
+      <width>601</width>
       <height>231</height>
      </rect>
     </property>
@@ -190,22 +190,30 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>80</height>
+           <height>100</height>
           </size>
          </property>
         </spacer>
        </item>
        <item>
         <widget class="QPushButton" name="btnAddCurve">
+         <property name="toolTip">
+          <string>Add a new curve to the scope, or update it if the UAVObject and UAVField is the same.</string>
+         </property>
          <property name="text">
-          <string>&gt;&gt;</string>
+          <string>Add
+Update</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="btnRemoveCurve">
+         <property name="toolTip">
+          <string>Remove the curve from the scope.</string>
+         </property>
          <property name="text">
-          <string>&lt;&lt;</string>
+          <string>Remove
+</string>
          </property>
         </widget>
        </item>
@@ -220,7 +228,7 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>30</height>
+           <height>15</height>
           </size>
          </property>
         </spacer>

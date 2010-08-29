@@ -30,6 +30,9 @@
 
 #include "coreplugin/dialogs/ioptionspage.h"
 
+#include "scopegadgetconfiguration.h"
+#include "ui_scopegadgetoptionspage.h"
+
 #include <QString>
 #include <QStringList>
 #include <QDebug>
@@ -64,6 +67,7 @@ private:
     ScopeGadgetConfiguration *m_config;
 
     void addPlotCurveConfig(QString uavObject, QString uavField, int scale, QVariant varColor);
+    void setCurvePlotProperties(QListWidgetItem *listWidgetItem, QString uavObject, QString uavField, int scale, QVariant varColor);
     void setYAxisWidgetFromPlotCurve();
     void setButtonColor(const QColor &color);
 

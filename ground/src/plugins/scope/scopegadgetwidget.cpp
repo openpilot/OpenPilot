@@ -50,8 +50,8 @@ TestDataGen* ScopeGadgetWidget::testDataGen;
 
 ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent)
 {
-//    if(testDataGen == 0)
-//        testDataGen = new TestDataGen();
+    if(testDataGen == 0)
+        testDataGen = new TestDataGen();
 
     //Setup the timer that replots data
     replotTimer = new QTimer(this);
@@ -161,13 +161,17 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavField, int sc
         setAxisScale(QwtPlot::yLeft, plotData->yMinimum, plotData->yMaximum);
 
     //Create the curve
-    QString curveName = (plotData->uavObject) + "." + (plotData->uavField);
+    QString curveName;
+    if(scaleOrderFactor == 0)
+        curveName = (plotData->uavObject) + "." + (plotData->uavField);
+    else
+        curveName = (plotData->uavObject) + "." + (plotData->uavField) + "(E" + QString::number(scaleOrderFactor) + ")";
+
     QwtPlotCurve* plotCurve = new QwtPlotCurve(curveName);
     plotCurve->setPen(pen);
     plotCurve->setData(*plotData->xData, *plotData->yData);
     plotCurve->attach(this);
     plotData->curve = plotCurve;
-
 
     //Keep the curve details for later
     m_curvesData.insert(curveName, plotData);
@@ -331,7 +335,7 @@ void TestDataGen::genTestData()
     BaroAltitude::DataFields baroAltitudeData;
     baroAltitudeData.Altitude = 500 * sin(1 * testTime) + 200 * cos(4 * testTime) + 800;
     baroAltitudeData.Temperature = 30 * sin(0.5 * testTime);
-    baroAltitudeData.Pressure = 100;
+    baroAltitudeData.Pressure = baroAltitudeData.Altitude * 0.01 + baroAltitudeData.Temperature;
     baroAltitude->setData(baroAltitudeData);
 
 

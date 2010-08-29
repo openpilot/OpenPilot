@@ -54,6 +54,8 @@ public:
 
 private slots:
    void connectButtonClicked();
+   void disconnectButtonClicked();
+   void onDataAvailable();
    void setSVs(int);
    void setPosition(double, double, double);
    void setDateTime(double, double);
@@ -61,6 +63,7 @@ private slots:
    void dumpPacket(char*);
 
 private:
+   void processNewSerialData(QByteArray serialData);
    Ui_GpsDisplayWidget* widget;
    QextSerialPort *port;
    NMEAParser *parser;

@@ -61,9 +61,9 @@ void GpsDisplayGadget::loadConfiguration(IUAVGadgetConfiguration* config)
            if(nport.friendName == m->port())
             {
 #ifdef Q_OS_WIN
-            QextSerialPort *port=new QextSerialPort(nport.portName,portsettings,QextSerialPort::Polling);
+            QextSerialPort *port=new QextSerialPort(nport.portName,portsettings,QextSerialPort::EventDriven);
 #else
-            QextSerialPort *port=new QextSerialPort(nport.physName,portsettings,QextSerialPort::Polling);
+            QextSerialPort *port=new QextSerialPort(nport.physName,portsettings,QextSerialPort::EventDriven);
 #endif
             //Creates new serial port with the user configuration and passes it to the widget
             m_widget->setPort(port);

@@ -73,6 +73,8 @@ GpsDisplayWidget::GpsDisplayWidget(QWidget *parent) : QWidget(parent)
 
     connect(widget->connectButton, SIGNAL(clicked(bool)),
             this,SLOT(connectButtonClicked()));
+    connect(widget->disconnectButton, SIGNAL(clicked(bool)),
+            this,SLOT(disconnectButtonClicked()));
     parser=new NMEAParser();
     connect(parser,SIGNAL(sv(int)),this,SLOT(setSVs(int)));
     connect(parser,SIGNAL(position(double,double,double)),this,SLOT(setPosition(double,double,double)));
@@ -160,9 +162,42 @@ void GpsDisplayWidget::setParser(NMEAParser* parser)
 }
 
 void GpsDisplayWidget::connectButtonClicked() {
-    GpsDisplayThread* gpsThread = new GpsDisplayThread();
     widget->textBrowser->append(QString("Connecting to GPS ...\n"));
-    gpsThread->setPort(port);
-    gpsThread->setParser(parser);
-    gpsThread->start();
+    // TODO: Somehow mark that we're running, and disable connect button while so?
+
+    if (port) {
+        connect(port, SIGNAL(readyRead()), this, SLOT(onDataAvailable()));
+
+        qDebug() <<  "Opening: " <<  port->portName() << ".";
+        bool isOpen =  port->open(QIODevice::ReadWrite);
+        qDebug() <<  "Open: " << isOpen;
+    } else {
+        qDebug() << "Port undefined or invalid.";
+    }
+
+}
+
+void GpsDisplayWidget::disconnectButtonClicked() {
+}
+
+void GpsDisplayWidget::onDataAvailable() {
+    int avail = port->bytesAvailable();
+    if( avail > 0 ) {
+        QByteArray serialData;
+        serialData.resize(avail);
+        int bytesRead = port->read(serialData.data(), serialData.size());
+        if( bytesRead > 0 ) {
+            processNewSerialData(serialData);
+        }
+    }
+}
+
+void GpsDisplayWidget::processNewSerialData(QByteArray serialData) {
+
+    int dataLength = serialData.size();
+    const char* data = serialData.constData();
+
+    for(int pos = 0; pos < dataLength; pos++) {
+        parser->processInputStream(data[pos]);
+    }
 }

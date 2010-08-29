@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>9</y>
+     <y>7</y>
      <width>641</width>
      <height>461</height>
     </rect>
@@ -75,9 +75,9 @@ Tip: lower is better!</string>
      </rect>
     </property>
     <property name="toolTip">
-     <string>Press to start a calibration procedure.
+     <string>Press to start a calibration procedure, takes 30 seconds max.
 
-Takes about 30 seconds max.</string>
+Hint: run this with engines at cruising speed.</string>
     </property>
     <property name="text">
      <string>Start</string>
@@ -100,7 +100,7 @@ Takes about 30 seconds max.</string>
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>180</y>
+      <y>390</y>
       <width>111</width>
       <height>17</height>
      </rect>
@@ -113,7 +113,7 @@ Takes about 30 seconds max.</string>
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>170</y>
+      <y>380</y>
       <width>131</width>
       <height>31</height>
      </rect>
@@ -122,24 +122,11 @@ Takes about 30 seconds max.</string>
      <string>Select the sensor integration algorithm here.</string>
     </property>
    </widget>
-   <widget class="Line" name="line_2">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>220</y>
-      <width>411</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-   </widget>
-   <widget class="QGraphicsView" name="graphicsView_2">
+   <widget class="QGraphicsView" name="sixPointsHelp">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>260</y>
+      <y>190</y>
       <width>191</width>
       <height>151</height>
      </rect>
@@ -149,38 +136,38 @@ Takes about 30 seconds max.</string>
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>240</y>
-      <width>121</width>
+      <y>170</y>
+      <width>151</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>Calibration #2</string>
+     <string>Six Point Calibration</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="ahrsSavePosition">
+   <widget class="QPushButton" name="sixPointsStart">
     <property name="enabled">
      <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
       <x>220</x>
-      <y>250</y>
+      <y>180</y>
       <width>111</width>
       <height>27</height>
      </rect>
     </property>
     <property name="text">
-     <string>Six Point Cal</string>
+     <string>Start</string>
     </property>
    </widget>
-   <widget class="QTextBrowser" name="textBrowser">
+   <widget class="QTextEdit" name="sixPointCalibInstructions">
     <property name="geometry">
      <rect>
-      <x>360</x>
-      <y>250</y>
-      <width>271</width>
-      <height>161</height>
+      <x>220</x>
+      <y>220</y>
+      <width>411</width>
+      <height>121</height>
      </rect>
     </property>
    </widget>
@@ -190,8 +177,8 @@ Takes about 30 seconds max.</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>290</x>
-      <y>180</y>
+      <x>310</x>
+      <y>380</y>
       <width>201</width>
       <height>22</height>
      </rect>
@@ -255,7 +242,7 @@ specific calibration button on top of the screen.</string>
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>410</y>
+      <y>350</y>
       <width>411</width>
       <height>20</height>
      </rect>
@@ -267,14 +254,14 @@ specific calibration button on top of the screen.</string>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>380</x>
+      <x>360</x>
       <y>10</y>
-      <width>151</width>
+      <width>271</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>Sensors calibration</string>
+     <string>Sensor noise calibration</string>
     </property>
    </widget>
    <widget class="QProgressBar" name="calibProgress">
@@ -297,6 +284,22 @@ specific calibration button on top of the screen.</string>
     </property>
     <property name="textVisible">
      <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="sixPointsSave">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>180</y>
+      <width>111</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Save Position</string>
     </property>
    </widget>
   </widget>

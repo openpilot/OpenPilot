@@ -43,6 +43,17 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_ahrs = new Ui_AHRSWidget();
     m_ahrs->setupUi(this);
 
+    // Initialization of the Paper plane widget
+    m_ahrs->sixPointsHelp->setScene(new QGraphicsScene(this));
+
+    paperplane = new QGraphicsSvgItem();
+    paperplane->setSharedRenderer(new QSvgRenderer());
+    paperplane->renderer()->load(QString(":/configgadget/images/paper-plane.svg"));
+    paperplane->setElementId("plane-horizontal");
+    m_ahrs->sixPointsHelp->scene()->addItem(paperplane);
+    m_ahrs->sixPointsHelp->setSceneRect(paperplane->boundingRect());
+
+    // Initialization of the AHRS bargraph graph
 
     m_ahrs->ahrsBargraph->setScene(new QGraphicsScene(this));
 
@@ -176,7 +187,8 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_ahrs->ahrsSettingsRequest, SIGNAL(clicked()), this, SLOT(ahrsSettingsRequest()));
     connect(m_ahrs->ahrsSettingsSaveRAM, SIGNAL(clicked()), this, SLOT(ahrsSettingsSaveRAM()));
     connect(m_ahrs->ahrsSettingsSaveSD, SIGNAL(clicked()), this, SLOT(ahrsSettingsSaveSD()));
-    connect(m_ahrs->ahrsSavePosition, SIGNAL(clicked()), this, SLOT(savePositionData()));
+    connect(m_ahrs->sixPointsStart, SIGNAL(clicked()), this, SLOT(calibrationMode()));
+    connect(m_ahrs->sixPointsSave, SIGNAL(clicked()), this, SLOT(savePositionData()));
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(ahrsSettingsRequest()));
 
 
@@ -195,6 +207,7 @@ void ConfigAHRSWidget::showEvent(QShowEvent *event)
     // widget is shown, otherwise it cannot compute its values and
     // the result is usually a ahrsbargraph that is way too small.
     m_ahrs->ahrsBargraph->fitInView(ahrsbargraph, Qt::KeepAspectRatio);
+    m_ahrs->sixPointsHelp->fitInView(paperplane,Qt::KeepAspectRatio);
 }
 
 /**
@@ -276,13 +289,6 @@ void ConfigAHRSWidget::saveAHRSCalibration()
   */
 void ConfigAHRSWidget::savePositionData()
 {    
-    if(position < 0)
-    {
-        calibrationMode();
-        m_ahrs->calibInstructions->setText("Place horizontally and click save position...");
-        position = 0;
-        return;
-    }
 
     UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeRaw")));
     UAVObjectField *accel_field = obj->getField(QString("accels_filtered"));
@@ -296,18 +302,31 @@ void ConfigAHRSWidget::savePositionData()
     mag_data_z[position] = mag_field->getValue(2).toDouble();
 
     position = (position + 1) % 6;
-    if(position == 1)
-        m_ahrs->calibInstructions->setText("Place with left side down and click save position...");
-    if(position == 2)
-        m_ahrs->calibInstructions->setText("Place upside down and click save position...");
-    if(position == 3)
-        m_ahrs->calibInstructions->setText("Place with right side down and click save position...");
-    if(position == 4)
-        m_ahrs->calibInstructions->setText("Place with nose up and click save position...");
-    if(position == 5)
-        m_ahrs->calibInstructions->setText("Place with nose down and click save position...");
-    if(position == 0)
+    if(position == 1) {
+        m_ahrs->sixPointCalibInstructions->append("Place with left side down and click save position...");
+        displayPlane("plane-left");
+    }
+    if(position == 2) {
+        m_ahrs->sixPointCalibInstructions->append("Place upside down and click save position...");
+        displayPlane("plane-flip");
+    }
+    if(position == 3) {
+        m_ahrs->sixPointCalibInstructions->append("Place with right side down and click save position...");
+        displayPlane("plane-right");
+    }
+    if(position == 4) {
+        m_ahrs->sixPointCalibInstructions->append("Place with nose up and click save position...");
+        displayPlane("plane-up");
+    }
+    if(position == 5) {
+        m_ahrs->sixPointCalibInstructions->append("Place with nose down and click save position...");
+        displayPlane("plane-down");
+    }
+    if(position == 0) {
         computeScaleBias();
+        m_ahrs->sixPointsStart->setEnabled(true);
+        m_ahrs->sixPointsSave->setEnabled(false);
+    }
 }
 
 //*****************************************************************
@@ -438,15 +457,13 @@ void ConfigAHRSWidget::computeScaleBias()
     obj->updated();
 
     position = -1; //set to run again
-    m_ahrs->calibInstructions->setText("Computed accel and mag scale and bias...");
+    m_ahrs->sixPointCalibInstructions->append("Computed accel and mag scale and bias...");
 
 }
 
 void ConfigAHRSWidget::calibrationMode()
 {
     UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
-
-    m_ahrs->calibInstructions->setText("Now place in the horizontal position...");
 
     // set accels to unity gain
     UAVObjectField *field = obj->getField(QString("accel_scale"));
@@ -463,7 +480,27 @@ void ConfigAHRSWidget::calibrationMode()
     field = obj->getField(QString("UpdateRaw"));
     field->setValue("TRUE");
     obj->updated();
+
+    m_ahrs->sixPointCalibInstructions->clear();
+    m_ahrs->sixPointCalibInstructions->append("Place horizontally and click save position...<br>");
+    displayPlane("plane-horizontal");
+    m_ahrs->sixPointsStart->setEnabled(false);
+    m_ahrs->sixPointsSave->setEnabled(true);
+    position = 0;
+
 }
+
+/**
+  Rotate the paper plane
+  */
+void ConfigAHRSWidget::displayPlane(QString elementID)
+{
+    paperplane->setElementId(elementID);
+    m_ahrs->sixPointsHelp->setSceneRect(paperplane->boundingRect());
+    m_ahrs->sixPointsHelp->fitInView(paperplane,Qt::KeepAspectRatio);
+
+}
+
 
 /**
   Draws the sensor variances bargraph
@@ -512,7 +549,7 @@ void ConfigAHRSWidget::ahrsSettingsRequest()
     m_ahrs->algorithm->setCurrentIndex(m_ahrs->algorithm->findText(field->getValue().toString()));
     drawVariancesGraph();
     m_ahrs->ahrsCalibStart->setEnabled(true);
-    m_ahrs->ahrsSavePosition->setEnabled(true);
+    m_ahrs->sixPointsStart->setEnabled(true);
     m_ahrs->calibInstructions->setText(QString("Press \"Start\" above to calibrate."));
 }
 

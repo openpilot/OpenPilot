@@ -48,7 +48,9 @@ public:
 
 private:
     void drawVariancesGraph();
+    void displayPlane(QString elementID);
     Ui_AHRSWidget *m_ahrs;
+    QGraphicsSvgItem *paperplane;
     QGraphicsSvgItem *ahrsbargraph;
     QGraphicsSvgItem *accel_x;
     QGraphicsSvgItem *accel_y;

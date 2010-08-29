@@ -12,6 +12,7 @@
 #define NMEA_DEBUG_VTG	///< define to enable debug of VTG messages
 #define NMEA_DEBUG_RMC	///< define to enable debug of RMC messages
 #define NMEA_DEBUG_GSA	///< define to enable debug of GSA messages
+#define NMEA_DEBUG_ZDA	///< define to enable debug of ZDA messages
 #endif
 
 /* Utility functions */
@@ -386,7 +387,7 @@ static bool nmeaProcessGPZDA (GPSPositionData * GpsData, char * sentence)
     char * tokens;
     char * delimiter = ",*";
     
-#ifdef NMEA_DEBUG_VTG
+#ifdef NMEA_DEBUG_VZDA
     PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART,"$%s\r\n",sentence);
 #endif
 
@@ -396,9 +397,9 @@ static bool nmeaProcessGPZDA (GPSPositionData * GpsData, char * sentence)
     tokens = strsep(&next, delimiter);
     float hms = NMEA_real_to_float(tokens);
     
-	gpst.Second = (int) hms % 100;
-	gpst.Minute  = (((int) hms - gpst.Second) / 100) % 100;
-	gpst.Hour = (int) hms / 10000;
+    gpst.Second = (int) hms % 100;
+    gpst.Minute  = (((int) hms - gpst.Second) / 100) % 100;
+    gpst.Hour = (int) hms / 10000;
 
     tokens = strsep(&next, delimiter);    
     gpst.Day = (uint8_t) NMEA_real_to_float(next);
@@ -448,7 +449,7 @@ static bool nmeaProcessGPGSA (GPSPositionData * GpsData, char * sentence)
     break;
   default:
     /* Unhandled */
-    PIOS_DEBUG_Assert(0);
+    return false;
     break;
   }
 
@@ -491,7 +492,7 @@ static bool nmeaProcessGPGSA (GPSPositionData * GpsData, char * sentence)
  * The fract_units field indicates the units of the fractional part as
  *   1 whole = 10^fract_units fract
  */
-static inline bool NMEA_parse_real (int32_t * whole, uint32_t * fract, uint8_t * fract_units, char * field)
+static bool NMEA_parse_real (int32_t * whole, uint32_t * fract, uint8_t * fract_units, char * field)
 {
   char * s = field;
   char * field_w;
@@ -526,7 +527,7 @@ static inline bool NMEA_parse_real (int32_t * whole, uint32_t * fract, uint8_t *
  * like strtof() does.
  */
 
-float NMEA_real_to_float (char * nmea_real)
+static float NMEA_real_to_float (char * nmea_real)
 {
   int32_t  whole;
   uint32_t fract;
@@ -548,7 +549,7 @@ float NMEA_real_to_float (char * nmea_real)
  *    DD[D]MM.mmmm[mm]
  * into a fixed-point representation in units of (degrees * 1e-7)
  */
-bool NMEA_latlon_to_fixed_point (int32_t * latlon, char * nmea_latlon)
+static bool NMEA_latlon_to_fixed_point (int32_t * latlon, char * nmea_latlon)
 {
   int32_t    num_DDDMM;
   uint32_t   num_m;
@@ -567,6 +568,15 @@ bool NMEA_latlon_to_fixed_point (int32_t * latlon, char * nmea_latlon)
   case 0:
     /* no digits, value is zero so no scaling */
     break;
+  case 1:			/* m       */
+    num_m *= 1e6;		/* m000000 */
+    break;
+  case 2:			/* mm      */
+    num_m *= 1e5;		/* mm00000 */
+    break;
+  case 3:			/* mmm     */
+    num_m *= 1e4;		/* mmm0000 */
+    break;
   case 4:			/* mmmm    */
     num_m *= 1e3;		/* mmmm000 */
     break;
@@ -578,7 +588,7 @@ bool NMEA_latlon_to_fixed_point (int32_t * latlon, char * nmea_latlon)
     break;
   default:
     /* unhandled format */
-    PIOS_DEBUG_Assert(0);
+    num_m = 0;
     break;
   }
 

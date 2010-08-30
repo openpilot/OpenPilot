@@ -50,8 +50,8 @@ TestDataGen* ScopeGadgetWidget::testDataGen;
 
 ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent)
 {
-    if(testDataGen == 0)
-        testDataGen = new TestDataGen();
+   // if(testDataGen == 0)
+   //     testDataGen = new TestDataGen();
 
     //Setup the timer that replots data
     replotTimer = new QTimer(this);
@@ -359,7 +359,7 @@ void TestDataGen::genTestData()
 
     // Update Attitude Raw data
     AttitudeRaw::DataFields attData;
-//    attData.accels[0] = 4 * sin(2 * testTime) + 1 * cos(6 * testTime) + 4;
+//    attData.accels[0] = 4 *  sin(2 * testTime) + 1 * cos(6 * testTime) + 4;
 //    attData.accels[1] = 3 * sin(2.3 * testTime) + 1.5 * cos(3.3 * testTime) + 2;
 //    attData.accels[2] = 4 * sin(5.3 * testTime) + 1.5 * cos(1.3 * testTime) + 1;
     attData.accels[0] = 1;

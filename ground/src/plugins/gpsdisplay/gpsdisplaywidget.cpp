@@ -42,9 +42,6 @@
  */
 GpsDisplayWidget::GpsDisplayWidget(QWidget *parent) : QWidget(parent)
 {
-    setMinimumSize(128,128);
-    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
- 
     widget = new Ui_GpsDisplayWidget();
     widget->setupUi(this);
 
@@ -57,11 +54,9 @@ GpsDisplayWidget::GpsDisplayWidget(QWidget *parent) : QWidget(parent)
     scene->addItem(world);
     scene->setSceneRect(world->boundingRect());
     widget->gpsWorld->setScene(scene);
-    // Somehow fitInView does not work there at all? Makes
-    // the 'world' element tiny tiny tiny. anyone knows why??
-    //widget->gpsWorld->fitInView(world,Qt::KeepAspectRatio);
+
+    // Scale, can't use fitInView since that doesn't work until we're shown.
     qreal factor = widget->gpsWorld->size().height()/world->boundingRect().height();
-    widget->gpsWorld->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
     world->setScale(factor);
 
     //Not elegant, just load the image for now

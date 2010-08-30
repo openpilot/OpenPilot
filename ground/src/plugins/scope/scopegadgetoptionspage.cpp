@@ -172,7 +172,18 @@ void ScopeGadgetOptionsPage::on_cmbUAVObjects_currentIndexChanged(QString val)
 
     QList<UAVObjectField*> fieldList = obj->getFields();
     foreach (UAVObjectField* field, fieldList) {
-        options_page->cmbUAVField->addItem(field->getName());
+        if(field->getType() == UAVObjectField::STRING || field->getType() == UAVObjectField::ENUM )
+            continue;
+
+        if(field->getElementNames().count() > 1)
+        {
+            foreach(QString elemName , field->getElementNames())
+            {
+                options_page->cmbUAVField->addItem(field->getName() + "-" + elemName);
+            }
+        }
+        else
+            options_page->cmbUAVField->addItem(field->getName());
     }
 }
 
@@ -191,7 +202,7 @@ void ScopeGadgetOptionsPage::apply()
     m_config->setDataSize(options_page->spnDataSize->value());
     m_config->setRefreashInterval(options_page->spnRefreshInterval->value());
 
-    QList<PlotCurveConfiguration*> m_PlotCurveConfigs;
+    QList<PlotCurveConfiguration*> plotCurveConfigs;
     for(int iIndex = 0; iIndex < options_page->lstCurves->count();iIndex++) {
         QListWidgetItem* listItem = options_page->lstCurves->item(iIndex);
 
@@ -209,10 +220,10 @@ void ScopeGadgetOptionsPage::apply()
         else
             newPlotCurveConfigs->color = (QRgb)rgb;
 
-        m_PlotCurveConfigs.append(newPlotCurveConfigs);
+        plotCurveConfigs.append(newPlotCurveConfigs);
     }
 
-    m_config->replacePlotCurveConfig(m_PlotCurveConfigs);
+    m_config->replacePlotCurveConfig(plotCurveConfigs);
 }
 
 /*!
@@ -231,7 +242,7 @@ void ScopeGadgetOptionsPage::on_btnAddCurve_clicked()
 
     QVariant varColor = (int)QColor(options_page->btnColor->text()).rgb();
 
-    //TODO: Find an existing plot curve config based on the uavobject and uav field. If it
+    //Find an existing plot curve config based on the uavobject and uav field. If it
     //exists, update it, else add a new one.
     if(options_page->lstCurves->currentItem()->text() == uavObject + "." + uavField)
     {
@@ -247,8 +258,6 @@ void ScopeGadgetOptionsPage::on_btnAddCurve_clicked()
 
 void ScopeGadgetOptionsPage::addPlotCurveConfig(QString uavObject, QString uavField, int scale, QVariant varColor)
 {
-    bool parseOK = false;
-
     //Add a new curve config to the list
     QString listItemDisplayText = uavObject + "." + uavField;
     options_page->lstCurves->addItem(listItemDisplayText);

@@ -31,6 +31,8 @@
 #include "uavobjects/uavobject.h"
 #include "uavobjects/baroaltitude.h"
 #include "uavobjects/positionactual.h"
+#include "uavobjects/attituderaw.h"
+#include "uavobjects/manualcontrolcommand.h"
 
 
 #include "qwt/src/qwt.h"
@@ -67,6 +69,8 @@ public:
 
     QString uavObject;
     QString uavField;
+    QString uavSubField;
+    bool haveSubField;
     int scalePower; //This is the power to which each value must be raised
     double yMinimum;
     double yMaximum;
@@ -80,6 +84,9 @@ public:
     virtual void removeStaleData() = 0;
 
     void updatePlotCurveData();
+
+protected:
+    double valueAsDouble(UAVObject* obj, UAVObjectField* field);
 
 signals:
     void dataChanged();

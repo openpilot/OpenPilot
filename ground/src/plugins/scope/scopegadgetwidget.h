@@ -80,6 +80,8 @@ public:
 private:
     BaroAltitude* baroAltitude;
     PositionActual* gps;
+    AttitudeRaw* attRaw;
+    ManualControlCommand* manCtrlCmd;
 
     QTimer *timer;
     double testTime;
@@ -112,7 +114,7 @@ public:
 
 
     void addCurvePlot(QString uavObject, QString uavField, int scaleOrderFactor = 0, QPen pen = QPen(Qt::black));
-    void removeCurvePlot(QString uavObject, QString uavField);
+    //void removeCurvePlot(QString uavObject, QString uavField);
     void clearCurvePlots();
 
 

@@ -31,9 +31,21 @@
 #include <QDebug>
 
 PlotData::PlotData(QString p_uavObject, QString p_uavField)
-{
+{    
     uavObject = p_uavObject;
-    uavField =  p_uavField;
+
+    if(p_uavField.contains("-"))
+    {
+        QStringList fieldSubfield = p_uavField.split("-", QString::SkipEmptyParts);
+        uavField = fieldSubfield.at(0);
+        uavSubField = fieldSubfield.at(1);
+        haveSubField = true;
+    }
+    else
+    {
+        uavField =  p_uavField;
+        haveSubField = false;
+    }
 
     xData = new QVector<double>();
     yData = new QVector<double>();
@@ -46,6 +58,21 @@ PlotData::PlotData(QString p_uavObject, QString p_uavField)
     m_xWindowSize = 0;
 }
 
+double PlotData::valueAsDouble(UAVObject* obj, UAVObjectField* field)
+{
+    QVariant value;
+
+    if(haveSubField){
+        int indexOfSubField = field->getElementNames().indexOf(QRegExp(uavSubField, Qt::CaseSensitive, QRegExp::FixedString));
+        value = field->getValue(indexOfSubField);
+    }else
+        value = field->getValue();
+
+    // qDebug() << "Data  (" << value.typeName() << ") " <<  value.toString();
+
+    return value.toDouble();
+}
+
 PlotData::~PlotData()
 {
     delete xData;
@@ -56,12 +83,14 @@ PlotData::~PlotData()
 bool SequencialPlotData::append(UAVObject* obj)
 {
     if (uavObject == obj->getName()) {
+
         //Get the field of interest
         UAVObjectField* field =  obj->getField(uavField);
 
         if (field) {
+
             //Shift data forward and put the new value at the front
-            yData->append(field->getDouble() * pow(10, scalePower));
+            yData->append( valueAsDouble(obj, field) * pow(10, scalePower));
             if (yData->size() > m_xWindowSize) {
                 yData->pop_front();
             } else
@@ -81,14 +110,18 @@ bool ChronoPlotData::append(UAVObject* obj)
     if (uavObject == obj->getName()) {
         //Get the field of interest
         UAVObjectField* field =  obj->getField(uavField);
+        //qDebug() << "uavObject: " << uavObject << ", uavField: " << uavField;
 
         if (field) {
             //Put the new value at the front
             QDateTime NOW = QDateTime::currentDateTime();
 
-            double newestValue = NOW.toTime_t() + NOW.time().msec() / 1000.0;
-            xData->append(newestValue);
-            yData->append(field->getDouble() * pow(10, scalePower));
+            double valueX = NOW.toTime_t() + NOW.time().msec() / 1000.0;
+            double valueY = valueAsDouble(obj, field) * pow(10, scalePower);
+            xData->append(valueX);
+            yData->append(valueY);
+
+            //qDebug() << "Data  " << uavObject << "." << field->getName() << " X,Y:" << valueX << "," <<  valueY;
 
             //Remove stale data
             removeStaleData();

@@ -7,7 +7,6 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="744.09448819"
@@ -16,6 +15,8 @@
    version="1.1"
    inkscape:version="0.47 r22583"
    sodipodi:docname="paper-plane.svg">
+  <title
+     id="title2859">Paper planes</title>
   <defs
      id="defs4">
     <inkscape:path-effect
@@ -42,61 +43,6 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
-    <linearGradient
-       id="linearGradient3589">
-      <stop
-         id="stop3591"
-         offset="0"
-         style="stop-color:#dadad1;stop-opacity:1;" />
-      <stop
-         id="stop3593"
-         offset="1"
-         style="stop-color:#ffffff;stop-opacity:1;" />
-    </linearGradient>
-    <linearGradient
-       id="linearGradient4451">
-      <stop
-         id="stop4453"
-         offset="0"
-         style="stop-color:#000000;stop-opacity:0;" />
-      <stop
-         id="stop4455"
-         offset="1"
-         style="stop-color:#000000;stop-opacity:1;" />
-    </linearGradient>
-    <linearGradient
-       id="linearGradient5713">
-      <stop
-         style="stop-color:#000000;stop-opacity:0;"
-         offset="0"
-         id="stop5715" />
-      <stop
-         style="stop-color:#000000;stop-opacity:1;"
-         offset="1"
-         id="stop5717" />
-    </linearGradient>
-    <linearGradient
-       id="linearGradient5754">
-      <stop
-         style="stop-color:#e2e2db;stop-opacity:1;"
-         offset="0"
-         id="stop5756" />
-      <stop
-         style="stop-color:#ffffff;stop-opacity:1;"
-         offset="1"
-         id="stop5758" />
-    </linearGradient>
-    <linearGradient
-       id="linearGradient5877">
-      <stop
-         id="stop5879"
-         offset="0"
-         style="stop-color:#e2e2db;stop-opacity:1;" />
-      <stop
-         id="stop5881"
-         offset="1"
-         style="stop-color:#ffffff;stop-opacity:1;" />
-    </linearGradient>
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
        inkscape:vp_x="0 : 618.71844 : 1"
@@ -113,7 +59,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.60408995"
-     inkscape:cx="455.56381"
+     inkscape:cx="160.9057"
      inkscape:cy="659.88675"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -133,8 +79,31 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title>Paper planes</dc:title>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Edouard Lafargue</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/by-sa/3.0/" />
+        <dc:date>2010.08.29</dc:date>
       </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/by-sa/3.0/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Notice" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#Attribution" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+        <cc:requires
+           rdf:resource="http://creativecommons.org/ns#ShareAlike" />
+      </cc:License>
     </rdf:RDF>
   </metadata>
   <g
@@ -335,93 +304,6 @@
          id="path4087"
          d="m 142.54602,640.35978 c -1.88175,-47.47972 -3.6008,-88.73996 -3.8201,-91.68942 l -0.39873,-5.36266 3.8201,-10.73216 3.8201,-10.73216 0.14953,51.01814 c 0.0822,28.05998 0.0822,74.14969 0,102.42158 l -0.14953,51.40343 -3.42137,-86.32675 z"
          style="opacity:1;fill:#666666;fill-opacity:1" />
-    </g>
-    <g
-       id="g4249"
-       transform="translate(-1399.8845,-1041.4937)">
-      <g
-         style="display:inline"
-         inkscape:label="backdrop"
-         id="layer5"
-         transform="translate(6671.9971,-1494.883)" />
-      <g
-         style="opacity:0.40845068;display:none"
-         inkscape:label="blender_render"
-         id="layer2"
-         transform="translate(6671.9971,-1494.883)">
-        <image
-           xlink:href="file:///home/richard/Dropbox/graphicswork/openpilot.org/persp_path.png"
-           width="720"
-           height="576"
-           id="image2904"
-           x="8.5714464"
-           y="178.64789" />
-      </g>
-      <g
-         style="opacity:0.26126763;display:none"
-         inkscape:label="constr_lines"
-         id="layer3"
-         transform="translate(6671.9971,-1494.883)">
-        <path
-           id="path2937"
-           d="M 435.88082,573.54988 303.55084,697.29356"
-           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-        <path
-           id="path2939"
-           d="m 365.17015,554.35698 94.44926,80.8122"
-           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-        <path
-           id="path2941"
-           d="m 274.25642,623.55243 96.46956,112.12693"
-           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-        <path
-           id="path2943"
-           d="m 358.09908,562.4382 93.94418,86.87312"
-           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-        <path
-           sodipodi:nodetypes="cc"
-           id="path2945"
-           d="m 339.78942,576.47266 91.18422,94.53592"
-           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-        <path
-           id="path2933"
-           d="m 472.85714,488.07647 -205,155"
-           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-        <path
-           id="path2935"
-           d="M 546.07143,520.57647 348.21429,744.1479"
-           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-        <path
-           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
-           d="M 433.86048,597.28846 316.17778,736.68951"
-           id="path3040" />
-        <path
-           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
-           d="M 503.05598,615.97628 369.71588,801.33927"
-           id="path3042" />
-      </g>
-      <g
-         style="display:inline"
-         inkscape:label="shadow"
-         id="layer4"
-         transform="translate(6671.9971,-1494.883)" />
-      <g
-         style="display:inline"
-         id="layer1-7"
-         inkscape:label="Layer 1"
-         transform="translate(6671.9971,-1494.883)">
-        <text
-           xml:space="preserve"
-           style="font-size:29.84373283px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:LondonBetween;-inkscape-font-specification:LondonBetween Bold"
-           x="-6201.9575"
-           y="4050.0679"
-           id="text3640"
-           sodipodi:linespacing="125%"><tspan
-             sodipodi:role="line"
-             id="tspan3642"
-             x="-6201.9575"
-             y="4050.0679" /></text>
-      </g>
     </g>
   </g>
 </svg>

@@ -21,7 +21,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0,0">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
      <property name="leftMargin">
       <number>0</number>
      </property>
@@ -37,8 +37,14 @@
         <string>GPS Status</string>
        </property>
        <layout class="QFormLayout" name="formLayout">
+        <property name="fieldGrowthPolicy">
+         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+        </property>
         <property name="verticalSpacing">
          <number>1</number>
+        </property>
+        <property name="margin">
+         <number>6</number>
         </property>
         <item row="0" column="0">
          <widget class="QLabel" name="status_label">
@@ -156,7 +162,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QGraphicsView" name="gpsWorld">
+      <widget class="QWidget" name="imagesWidget" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -165,119 +171,142 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>171</width>
+         <width>368</width>
          <height>171</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>171</width>
+         <width>368</width>
          <height>171</height>
         </size>
        </property>
-       <property name="acceptDrops">
-        <bool>false</bool>
-       </property>
-       <property name="toolTip">
-        <string extracomment="Shows locations of satellites"/>
-       </property>
-       <property name="verticalScrollBarPolicy">
-        <enum>Qt::ScrollBarAlwaysOff</enum>
-       </property>
-       <property name="horizontalScrollBarPolicy">
-        <enum>Qt::ScrollBarAlwaysOff</enum>
-       </property>
-       <property name="sceneRect">
-        <rectf>
-         <x>0.000000000000000</x>
-         <y>0.000000000000000</y>
-         <width>169.000000000000000</width>
-         <height>169.000000000000000</height>
-        </rectf>
-       </property>
+       <widget class="QGraphicsView" name="gpsWorld">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>171</width>
+          <height>171</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>171</width>
+          <height>171</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>171</width>
+          <height>171</height>
+         </size>
+        </property>
+        <property name="acceptDrops">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string extracomment="Shows locations of satellites"/>
+        </property>
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="sceneRect">
+         <rectf>
+          <x>0.000000000000000</x>
+          <y>0.000000000000000</y>
+          <width>169.000000000000000</width>
+          <height>169.000000000000000</height>
+         </rectf>
+        </property>
+       </widget>
+       <widget class="QGraphicsView" name="flatEarth">
+        <property name="geometry">
+         <rect>
+          <x>177</x>
+          <y>0</y>
+          <width>191</width>
+          <height>95</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>191</width>
+          <height>95</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>191</width>
+          <height>95</height>
+         </size>
+        </property>
+        <property name="acceptDrops">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string extracomment="Location of GCS on the Earth"/>
+        </property>
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="optimizationFlags">
+         <set>QGraphicsView::DontAdjustForAntialiasing</set>
+        </property>
+       </widget>
+       <widget class="QGraphicsView" name="gpsGraph">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="geometry">
+         <rect>
+          <x>177</x>
+          <y>104</y>
+          <width>191</width>
+          <height>67</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>191</width>
+          <height>67</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>191</width>
+          <height>67</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string extracomment="Individual satellite information"/>
+        </property>
+       </widget>
       </widget>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0">
-       <item>
-        <widget class="QGraphicsView" name="flatEarth">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>191</width>
-           <height>95</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>191</width>
-           <height>95</height>
-          </size>
-         </property>
-         <property name="acceptDrops">
-          <bool>false</bool>
-         </property>
-         <property name="toolTip">
-          <string extracomment="Location of GCS on the Earth"/>
-         </property>
-         <property name="verticalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
-         </property>
-         <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
-         </property>
-         <property name="optimizationFlags">
-          <set>QGraphicsView::DontAdjustForAntialiasing</set>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QGraphicsView" name="gpsGraph">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>191</width>
-           <height>67</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>191</width>
-           <height>67</height>
-          </size>
-         </property>
-         <property name="toolTip">
-          <string extracomment="Individual satellite information"/>
-         </property>
-        </widget>
-       </item>
-      </layout>
      </item>
     </layout>
    </item>
@@ -315,10 +344,13 @@
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Ignored</enum>
+          </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>0</width>
-            <height>0</height>
+            <width>13</width>
+            <height>13</height>
            </size>
           </property>
          </spacer>
@@ -358,6 +390,9 @@
         </property>
         <property name="lineWrapMode">
          <enum>QTextEdit::WidgetWidth</enum>
+        </property>
+        <property name="acceptRichText">
+         <bool>false</bool>
         </property>
        </widget>
       </item>

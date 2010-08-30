@@ -133,6 +133,9 @@ static void stabilizationTask(void* parameters)
 		if (( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_VTOL )||( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_HELICP))
 		{
 			yawError = attitudeDesired.Yaw - attitudeActual.Yaw;
+			//this should make it take the quickest path to reach the desired yaw
+			if (yawError>180.0)yawError -= 360;
+			if (yawError<-180.0)yawError += 360;
 			yawDerivative = yawError - yawErrorLast;
 			yawIntegralLimit = YAW_INTEGRAL_LIMIT / stabSettings.YawKi;
 			yawIntegral = bound(yawIntegral+yawError*stabSettings.UpdatePeriod, -yawIntegralLimit, yawIntegralLimit);

@@ -31,7 +31,7 @@
 #ifndef PIOS_WDG
 #define PIOS_WDG
 
-uint8_t PIOS_WDG_Init( uint8_t delayMs );
-void PIOS_WDG_Clear();
+uint16_t PIOS_WDG_Init(uint16_t delayMs);
+void PIOS_WDG_Clear(void);
 
 #endif

@@ -54,19 +54,20 @@
  * @param[in] delayMs The delay period in ms
  * @returns Maximum recommended delay between updates
  */
-uint8_t PIOS_WDG_Init( uint8_t delayMs )
+uint16_t PIOS_WDG_Init(uint16_t delayMs)
 {
-  uint16_t delay;
-  delay = 60 / 16 * delayMs;
-  if( delay > 0xfff )
-    delay = 0xfff;
+  uint32_t delay = (60ul * delayMs) / 16;
+  if (delay > 0xfff) delay = 0xfff;
+
   DBGMCU_Config(DBGMCU_IWDG_STOP, ENABLE);  // make the watchdog stop counting in debug mode
   IWDG_WriteAccessCmd( IWDG_WriteAccess_Enable );
   IWDG_SetPrescaler( IWDG_Prescaler_16 );
   IWDG_SetReload( delay );
   IWDG_ReloadCounter();
-  IWDG_Enable();  
-  return delay / (60 / 16) * .75;
+  IWDG_Enable();
+
+//  return delay / (60 / 16) * .75f;
+  return (((delay * 16) / 60) * .75f);
 }
 
 /**
@@ -74,7 +75,7 @@ uint8_t PIOS_WDG_Init( uint8_t delayMs )
  *
  * This function must be called at the appropriate delay to prevent a reset event occuring
  */
-void PIOS_WDG_Clear()
+void PIOS_WDG_Clear(void)
 {
   IWDG_ReloadCounter();
 }

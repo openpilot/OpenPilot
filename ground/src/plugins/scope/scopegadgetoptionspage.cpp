@@ -244,7 +244,8 @@ void ScopeGadgetOptionsPage::on_btnAddCurve_clicked()
 
     //Find an existing plot curve config based on the uavobject and uav field. If it
     //exists, update it, else add a new one.
-    if(options_page->lstCurves->currentItem()->text() == uavObject + "." + uavField)
+    if(options_page->lstCurves->count() &&
+       options_page->lstCurves->currentItem()->text() == uavObject + "." + uavField)
     {
         QListWidgetItem *listWidgetItem = options_page->lstCurves->currentItem();
         setCurvePlotProperties(listWidgetItem,uavObject,uavField,scale,varColor);

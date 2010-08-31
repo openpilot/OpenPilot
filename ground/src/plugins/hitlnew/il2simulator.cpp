@@ -208,7 +208,7 @@ void IL2Simulator::processUpdate(QString& data)
 	current.Y = old.Y + (current.dY*current.dT);
 
 	// Update AltitudeActual object
-	AltitudeActual::DataFields altActualData;
+        BaroAltitude::DataFields altActualData;
 	altActualData.Altitude = current.Z;
 	altActualData.Temperature = TEMP_GROUND + (current.Z * TEMP_LAPSE_RATE) - 273.0;
 	altActualData.Pressure = PRESSURE(current.Z)/1000.0; // kpa

@@ -21,7 +21,7 @@ SOURCES += hitlplugin.cpp \
     simulator.cpp \
     il2simulator.cpp \
     fgsimulator.cpp
-OTHER_FILES += HITLNEW.pluginspec
+OTHER_FILES += hitlnew.pluginspec
 FORMS += hitloptionspage.ui \
     hitlwidget.ui
 RESOURCES += hitlresources.qrc

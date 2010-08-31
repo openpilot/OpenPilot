@@ -29,7 +29,7 @@
 #define FGSIMULATOR_H_H
 
 #include <QObject>
-#include "Simulator.h"
+#include "simulator.h"
 
 class FGSimulator: public Simulator
 {

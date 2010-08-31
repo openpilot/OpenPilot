@@ -31,7 +31,7 @@
 #include <extensionsystem/iplugin.h>
 #include <qstringlist.h>
 
-#include <Simulator.h>
+#include <simulator.h>
 
 class HITLFactory;
 

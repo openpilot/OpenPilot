@@ -33,7 +33,7 @@
 #include <QFileDialog>
 #include <QtAlgorithms>
 #include <QStringList>
-#include <Simulator.h>
+#include <simulator.h>
 
 
 

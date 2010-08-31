@@ -109,14 +109,14 @@ void Simulator::onStart()
 {
 	QMutexLocker locker(&lock);
 
-	Qt::HANDLE mainThread = QThread::currentThread();
+        QThread* mainThread = QThread::currentThread();
 	qDebug() << "Simulator Thread: "<< mainThread;
 
 	// Get required UAVObjects
 	ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
 	UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
 	actDesired = ActuatorDesired::GetInstance(objManager);
-	altActual = AltitudeActual::GetInstance(objManager);
+        altActual = BaroAltitude::GetInstance(objManager);
 	attActual = AttitudeActual::GetInstance(objManager);
 	posActual = PositionActual::GetInstance(objManager);
 	telStats = GCSTelemetryStats::GetInstance(objManager);

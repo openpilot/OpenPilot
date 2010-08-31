@@ -36,7 +36,8 @@
 #include "uavtalk/telemetrymanager.h"
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/actuatordesired.h"
-#include "uavobjects/altitudeactual.h"
+// #include "uavobjects/altitudeactual.h"
+#include "uavobjects/baroaltitude.h"
 #include "uavobjects/attitudeactual.h"
 #include "uavobjects/positionactual.h"
 #include "uavobjects/gcstelemetrystats.h"
@@ -142,7 +143,7 @@ protected:
 	QUdpSocket* outSocket;
 
 	ActuatorDesired* actDesired;
-	AltitudeActual* altActual;
+        BaroAltitude* altActual;
 	AttitudeActual* attActual;
 	PositionActual* posActual;
 	GCSTelemetryStats* telStats;

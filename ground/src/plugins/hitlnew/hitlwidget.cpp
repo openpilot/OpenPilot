@@ -33,7 +33,7 @@
 #include <QDateTime>
 #include <QThread>
 
-#include <HITLPlugin.h>
+#include <hitlplugin.h>
 #include <simulator.h>
 #include "uavobjects/uavobjectmanager.h"
 #include "coreplugin/icore.h"
@@ -74,7 +74,7 @@ HITLWidget::~HITLWidget()
 
 void HITLWidget::startButtonClicked()
 {
-	Qt::HANDLE mainThread = QThread::currentThread();
+        QThread* mainThread = QThread::currentThread();
 	qDebug() << "Main Thread: "<< mainThread;
 
 	// [1]

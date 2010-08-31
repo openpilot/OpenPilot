@@ -193,7 +193,7 @@ void FGSimulator::processUpdate(QString& data)
 	float pressure = fields[20].toFloat() * INHG2KPA;
 
 	// Update AltitudeActual object
-	AltitudeActual::DataFields altActualData;
+        BaroAltitude::DataFields altActualData;
 	altActualData.Altitude = altitudeAGL;
 	altActualData.Temperature = temperature;
 	altActualData.Pressure = pressure;

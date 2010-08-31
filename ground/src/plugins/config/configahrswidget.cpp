@@ -252,26 +252,38 @@ void ConfigAHRSWidget::incrementProgress()
 
   calibPhase2 is also connected to the AHRSCalibration object update signal.
 
+
   */
 void ConfigAHRSWidget::calibPhase2()
 {
     UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
     UAVObjectField *field = obj->getField(QString("measure_var"));
 
-    //  We need to echo back the results of calibration before changing to set mode
-    m_ahrs->calibInstructions->setText("Getting results...");
-
-    field->setValue("ECHO");
-    obj->updated();
-
-    usleep(100e3); // wait for data to come back
-
-    // Now update size of all the graphs
-    drawVariancesGraph();
-
-    saveAHRSCalibration();
-    m_ahrs->calibInstructions->setText(QString("Calibration saved."));
-    m_ahrs->ahrsCalibStart->setEnabled(true);
+    //  This is a bit weird, but it is because we are expecting an update from the
+      // OP board with the correct calibration values, and those only arrive on the object update
+      // which comes back from the board, and not the first object update signal which is in fast
+      // the object update we did ourselves... Clear ?
+      switch (phaseCounter) {
+      case 0:
+          phaseCounter++;
+          m_ahrs->calibInstructions->setText("Getting results...");
+          connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(calibPhase2()));
+          //  We need to echo back the results of calibration before changing to set mode
+          field->setValue("ECHO");
+          obj->updated();
+          break;
+      case 1:  // this is where we end up with the update just above
+          phaseCounter++;
+          break;
+      case 2:  // This is the update with the right values (coming from the board)
+          disconnect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(calibPhase2()));
+          // Now update size of all the graphs
+          drawVariancesGraph();
+          saveAHRSCalibration();
+          m_ahrs->calibInstructions->setText(QString("Calibration saved."));
+          m_ahrs->ahrsCalibStart->setEnabled(true);
+          break;
+      }
 }
 
 /**

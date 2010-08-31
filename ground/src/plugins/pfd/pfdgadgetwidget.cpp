@@ -51,6 +51,7 @@ PFDGadgetWidget::PFDGadgetWidget(QWidget *parent) : QGraphicsView(parent)
     attitudeObj = NULL;
     headingObj = NULL;
     gcsBatteryObj = NULL;
+    gpsObj = NULL;
     compassBandWidth = 0;
     pfdError = true;
     hqFonts = false;
@@ -108,6 +109,9 @@ void PFDGadgetWidget::connectNeedles() {
     if (gcsBatteryObj != NULL)
     	disconnect(gcsBatteryObj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(updateBattery(UAVObject*)));
 
+    if (gpsObj != NULL)
+        disconnect(gpsObj,SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateGPS(UAVObject*)));
+
     // Safeguard: if artwork did not load properly, don't go further
     if (pfdError)
     	return;
@@ -126,6 +130,15 @@ void PFDGadgetWidget::connectNeedles() {
        connect(headingObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateHeading(UAVObject*)));
    } else {
         qDebug() << "Error: Object is unknown (PositionActual).";
+   }
+
+   if (gcsGPSStats) {
+       gpsObj = dynamic_cast<UAVDataObject*>(objManager->getObject("GPSPosition"));
+       if (gpsObj != NULL) {
+           connect(gpsObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateGPS(UAVObject*)));
+       } else {
+           qDebug() << "Error: Object is unknown (GPSPosition).";
+       }
    }
 
    if (gcsTelemetryArrow || gcsTelemetryStats ) {
@@ -147,6 +160,23 @@ void PFDGadgetWidget::connectNeedles() {
        }
    }
 
+}
+
+
+/*!
+  \brief Updates the GPS stats
+  */
+void PFDGadgetWidget::updateGPS(UAVObject *object1) {
+    UAVObjectField* field = object1->getField(QString("Satellites"));
+    UAVObjectField* field1 = object1->getField(QString("HDOP"));
+    if (field && field1) {
+        QString s = QString("GPS: ") + field->getValue().toString() + "\nHDP: "
+                    + field1->getValue().toString();
+        if (s != satString) {
+            gcsGPSStats->setPlainText(s);
+            satString = s;
+        }
+    }
 }
 
 /*!
@@ -254,20 +284,6 @@ void PFDGadgetWidget::updateHeading(UAVObject *object1) {
     if (field) {
         // The altitude scale represents 30 meters
         altitudeTarget = floor(field->getDouble()*10)/10*altitudeScaleHeight/30;
-    }
-
-    // GPS Stats
-    if (gcsGPSStats) {
-        field = object1->getField(QString("Satellites"));
-        UAVObjectField* field1 = object1->getField(QString("HDOP"));
-        if (field && field1) {
-            QString s = QString("GPS: ") + field->getValue().toString() + "\nHDP: "
-                        + field1->getValue().toString();
-            if (s != satString) {
-                gcsGPSStats->setPlainText(s);
-                satString = s;
-            }
-        }
     }
 
     if (!dialTimer.isActive())

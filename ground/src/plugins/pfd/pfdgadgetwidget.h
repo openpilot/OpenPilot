@@ -56,6 +56,7 @@ public:
 public slots:
    void updateAttitude(UAVObject *object1);
    void updateHeading(UAVObject *object1);
+   void updateGPS(UAVObject *object1);
    void updateAirspeed(UAVObject *object1);
    void updateAltitude(UAVObject *object1);
    void updateBattery(UAVObject *object1);
@@ -126,6 +127,7 @@ private:
    // Name of the fields to read when an update is received:
    UAVDataObject* attitudeObj;
    UAVDataObject* headingObj;
+   UAVDataObject* gpsObj;
    UAVDataObject* gcsTelemetryObj;
    UAVDataObject* gcsBatteryObj;
 

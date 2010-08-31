@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/flightgear/genericprotocol">
-        <file>opfgprotocol.xml</file>
-    </qresource>
-</RCC>

@@ -138,7 +138,7 @@ int32_t PIOS_SYS_SerialNumberGet(char *str)
 	int i;
 
 	/* Stored in the so called "electronic signature" */
-	for(i=0; i<12; ++i) {
+	for(i=0; i<24; ++i) {
 		uint8_t b = MEM8(0x1ffff7e8 + (i/2));
 		if( !(i & 1) )
 		b >>= 4;
@@ -146,7 +146,7 @@ int32_t PIOS_SYS_SerialNumberGet(char *str)
 
 		str[i] = ((b > 9) ? ('A'-10) : '0') + b;
 	}
-	str[i] = 0;
+	str[i] = '\0';
 
 	/* No error */
 	return 0;

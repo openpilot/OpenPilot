@@ -178,7 +178,11 @@ uint8_t PIOS_HID_StringSerial[PIOS_HID_SIZ_STRING_SERIAL] =
   {
     PIOS_HID_SIZ_STRING_SERIAL,           /* bLength */
     USB_STRING_DESCRIPTOR_TYPE,        /* bDescriptorType */
-    'S', 0, 'T', 0, 'M', 0,'3', 0,'2', 0, '1', 0, '\0', 0
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,       
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0       
   };
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/

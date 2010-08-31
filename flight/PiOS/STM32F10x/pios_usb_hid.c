@@ -98,21 +98,10 @@ int32_t PIOS_USB_HID_Init(uint32_t mode)
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USB, ENABLE);
 	
     /* Update the USB serial number from the chip */
-    uint8_t sn[40];
-    PIOS_SYS_SerialNumberGet((char *) sn);
-    /*    uint8_t len = 0;;
-     for(uint8_t i = 0, len = 2; sn[i] != '\0' && len < PIOS_HID_StringSerial[0]; ++i) 
-     {
-     PIOS_HID_StringSerial[len++] = sn[i];
-     PIOS_HID_StringSerial[len++] = 0;
-     }
-     while(len < PIOS_HID_StringSerial[0]) 
-     {
-     PIOS_HID_StringSerial[len++] = 0;
-     } */
-    for(uint8_t i = 0; i < 12; i++) 
-    {
-        PIOS_HID_StringSerial[2+i*2] = sn[i];
+    uint8_t sn[25];
+    PIOS_SYS_SerialNumberGet((char *) sn);    
+    for(uint8_t i = 0; sn[i] != '\0' && (2 * i) < PIOS_HID_StringSerial[0]; i ++) {
+        PIOS_HID_StringSerial[2+2*i] = sn[i];
     }
     
 	USB_Init();

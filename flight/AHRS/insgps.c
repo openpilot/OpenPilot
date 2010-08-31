@@ -74,9 +74,19 @@ void INSGPSInit()   //pretty much just a place holder for now
 	R[0]=R[1]=0.004;       // High freq GPS horizontal position noise variance (m^2)
 	R[2]=0.036;            // High freq GPS vertical position noise variance (m^2)
 	R[3]=R[4]=0.004;       // High freq GPS horizontal velocity noise variance (m/s)^2
-	R[5]=0;                // High freq GPS vertical velocity noise variance (m/s)^2
+	R[5]=100;              // High freq GPS vertical velocity noise variance (m/s)^2
 	R[6]=R[7]=R[8]=0.005;  // magnetometer unit vector noise variance
 	R[9]=1;                // High freq altimeter noise variance (m^2)
+}
+
+void INSSetPosVelVar(float PosVar)
+{
+    R[0] = PosVar;
+    R[1] = PosVar;
+    R[2] = PosVar;
+    R[3] = PosVar;
+    R[4] = PosVar;
+//    R[5] = PosVar;  // Don't change vertical velocity, not measured
 }
 
 void INSSetGyroBias(float gyro_bias[3]) 

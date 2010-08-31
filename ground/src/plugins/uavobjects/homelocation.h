@@ -44,6 +44,7 @@ public:
     // Field structure
     typedef struct {
         quint8 Set;
+        quint8 Indoor;
         qint32 Latitude;
         qint32 Longitude;
         float Altitude;
@@ -57,6 +58,9 @@ public:
     // Field Set information
     /* Enumeration options for field Set */
     typedef enum { SET_FALSE=0, SET_TRUE=1 } SetOptions;
+    // Field Indoor information
+    /* Enumeration options for field Indoor */
+    typedef enum { INDOOR_FALSE=0, INDOOR_TRUE=1 } IndoorOptions;
     // Field Latitude information
     // Field Longitude information
     // Field Altitude information
@@ -72,7 +76,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 3590360786U;
+    static const quint32 OBJID = 316455980U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

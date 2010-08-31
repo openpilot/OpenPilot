@@ -407,20 +407,21 @@ static void load_gps_position(struct opahrs_msg_v1_req_update * update)
     
     update->gps.updated = TRUE;
     
-    if(home.Set == HOMELOCATION_SET_FALSE) {
+    if(home.Set == HOMELOCATION_SET_FALSE || home.Indoor == HOMELOCATION_INDOOR_TRUE) {
         PositionActualData pos;
         PositionActualGet(&pos);
         
-        update->gps.NED[0] = pos.NED[0];
-        update->gps.NED[1] = pos.NED[1];
-        update->gps.NED[2] = pos.NED[2];
+        update->gps.NED[0] = 0;
+        update->gps.NED[1] = 0;
+        update->gps.NED[2] = 0;
         update->gps.groundspeed = 0;
         update->gps.heading = 0;
         update->gps.quality = 0;
     } else {
         update->gps.groundspeed = data.Groundspeed;
         update->gps.heading = data.Heading;
-        update->gps.quality = 0;
+        //Crude measure of quality that decreases with increasing dilution of precision
+        update->gps.quality = 1 / (data.HDOP + data.VDOP + data.PDOP);  
         double LLA[3] = {(double) data.Latitude / 1e7, (double) data.Longitude / 1e7, (double) (data.GeoidSeparation + data.Altitude)};
         // convert from cm back to meters
         double ECEF[3] = {(double) (home.ECEF[0] / 100), (double) (home.ECEF[1] / 100), (double) (home.ECEF[2] / 100)};

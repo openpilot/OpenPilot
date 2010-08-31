@@ -260,8 +260,11 @@ void ConfigAHRSWidget::calibPhase2()
 
     //  We need to echo back the results of calibration before changing to set mode
     m_ahrs->calibInstructions->setText("Getting results...");
+
     field->setValue("ECHO");
     obj->updated();
+
+    usleep(100e3); // wait for data to come back
 
     // Now update size of all the graphs
     drawVariancesGraph();

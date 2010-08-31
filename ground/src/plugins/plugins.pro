@@ -111,12 +111,6 @@ plugin_config.depends = plugin_coreplugin
 plugin_config.depends = plugin_uavobjects
 SUBDIRS += plugin_config
 
-# Export and Import GCS Configuration.
-#plugin_importexport.subdir = importexport
-#plugin_importexport.depends = plugin_coreplugin
-#SUBDIRS += plugin_importexport
-
-
 #GPS Display Gadget
 plugin_gpsdisplay.subdir = gpsdisplay
 plugin_gpsdisplay.depends = plugin_coreplugin
@@ -146,6 +140,11 @@ SUBDIRS += plugin_hitlil2
 plugin_importexport.subdir = importexport
 plugin_importexport.depends = plugin_coreplugin
 SUBDIRS += plugin_importexport
+
+# Export and Import GCS Configuration.
+plugin_logging.subdir = logging
+plugin_logging.depends = plugin_coreplugin
+SUBDIRS += plugin_logging
 
 #GCS Control of UAV Gadget
 plugin_gcscontrol.subdir = gcscontrol

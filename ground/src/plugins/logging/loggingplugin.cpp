@@ -69,23 +69,24 @@ bool LoggingThread::openFile(QString file, LoggingPlugin * parent)
 /**
   * Logs an object update to the file.  Data format is the
   * timestamp as a 32 bit uint counting ms from start of
-  * file writing (flight time will be embedded in stream)
-  * the UAVtalk packed object.
+  * file writing (flight time will be embedded in stream),
+  * then object packet size, then the packed UAVObject.
   */
 void LoggingThread::objectUpdated(UAVObject * obj)
 {
     quint32 timeStamp = myTime.elapsed();
     quint32 objSize = obj->getNumBytes();
-    quint8 * buffer = new quint8[objSize+4];
+    quint8 * buffer = new quint8[objSize+8];
 
     if(buffer == NULL)
         return;
 
-    obj->pack(&buffer[4]);
+    obj->pack(&buffer[8]);
     memcpy(buffer,&timeStamp,4);
+    memcpy(buffer,&objSize,4);
 
     QWriteLocker locker(&lock);
-    qint64 written = logFile.write((char *) buffer,objSize+4);
+    qint64 written = logFile.write((char *) buffer,objSize+8);
 
     delete(buffer);
 
@@ -144,6 +145,9 @@ LoggingPlugin::~LoggingPlugin()
     // Do nothing
 }
 
+/**
+  * Add Logging plugin to File menu
+  */
 bool LoggingPlugin::initialize(const QStringList& args, QString *errMsg)
 {
     Q_UNUSED(args);
@@ -208,11 +212,18 @@ void LoggingPlugin::startLogging(QString file)
     }
 }
 
+/**
+  * Send the stop logging signal to the LoggingThread
+  */
 void LoggingPlugin::stopLogging()
 {
     emit stopLoggingSignal();
 }
 
+/**
+  * Receive the logging stopped signal from the LoggingThread
+  * and change status to not logging
+  */
 void LoggingPlugin::loggingStopped()
 {
     state = IDLE;

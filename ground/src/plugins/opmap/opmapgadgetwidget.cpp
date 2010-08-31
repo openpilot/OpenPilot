@@ -27,7 +27,6 @@
 
 #include "opmapgadgetwidget.h"
 #include "ui_opmap_widget.h"
-
 #include <QtGui/QApplication>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>
@@ -57,7 +56,6 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_plugin_manager = NULL;
     m_objManager = NULL;
-    m_positionActual = NULL;
 
     m_mouse_waypoint = NULL;
 
@@ -68,10 +66,6 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_plugin_manager = ExtensionSystem::PluginManager::instance();
     m_objManager = m_plugin_manager->getObject<UAVObjectManager>();
-    m_positionActual = PositionActual::GetInstance(m_objManager);
-
-    // get current UAV data
-    PositionActual::DataFields data = m_positionActual->getData();
 
     // **************
     // create the widget that holds the user controls and the map
@@ -278,7 +272,8 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_map, SIGNAL(WPInserted(int const&, WayPointItem*)), this, SLOT(WPInserted(int const&, WayPointItem*)));
     connect(m_map, SIGNAL(WPDeleted(int const&)), this, SLOT(WPDeleted(int const&)));
 
-    m_map->SetCurrentPosition(internals::PointLatLng(data.Latitude, data.Longitude));	    // set the default map position
+    QPointF pos = getLatLon();
+    m_map->SetCurrentPosition(internals::PointLatLng(pos.x(), pos.y()));	    // set the default map position
 
     // **************
     // create various context menu (mouse right click menu) actions
@@ -517,12 +512,12 @@ void OPMapGadgetWidget::keyPressEvent(QKeyEvent* event)
 
 void OPMapGadgetWidget::updatePosition()
 {
-    PositionActual::DataFields data = m_positionActual->getData();				// get current UAV data
+    QPointF pos = getLatLon();
 
-    internals::PointLatLng uav_pos = internals::PointLatLng(data.Latitude, data.Longitude);	// current UAV position
-    float uav_heading = data.Heading;								// current UAV heading
-    float uav_altitude_meters = data.Altitude;							// current UAV height
-    float uav_ground_speed_meters_per_second = data.Groundspeed;				// current UAV ground speed
+    internals::PointLatLng uav_pos = internals::PointLatLng(pos.x(), pos.y());	// current UAV position
+    float uav_heading = 0; //data.Heading;								// current UAV heading
+    float uav_altitude_meters = 0; //data.Altitude;							// current UAV height
+    float uav_ground_speed_meters_per_second = 0; //data.Groundspeed;				// current UAV ground speed
 
     // display the UAV lat/lon position
     QString str =   " lat: " + QString::number(uav_pos.Lat(), 'f', 7) +
@@ -1029,6 +1024,27 @@ void OPMapGadgetWidget::createActions()
     // ***********************
 }
 
+QPointF OPMapGadgetWidget::getLatLon()
+{
+    double BaseECEF[3];
+    double NED[3];
+    double LLA[3];
+    UAVObject *obj;
+
+    obj = dynamic_cast<UAVDataObject*>(m_objManager->getObject(QString("HomeLocation")));
+    BaseECEF[0] = obj->getField(QString("ECEF"))->getDouble(0);
+    BaseECEF[1] = obj->getField(QString("ECEF"))->getDouble(1);
+    BaseECEF[2] = obj->getField(QString("ECEF"))->getDouble(2);
+
+    obj = dynamic_cast<UAVDataObject*>(m_objManager->getObject(QString("PositionActual")));
+    NED[0] = obj->getField(QString("NED"))->getDouble(0);
+    NED[1] = obj->getField(QString("NED"))->getDouble(1);
+    NED[2] = obj->getField(QString("NED"))->getDouble(2);
+
+    Utils::CoordinateConversions().GetLLA(BaseECEF, NED, LLA);
+    return QPointF(LLA[0],LLA[1]);
+}
+
 void OPMapGadgetWidget::onReloadAct_triggered()
 {
     if (m_map)
@@ -1135,11 +1151,11 @@ void OPMapGadgetWidget::onGoHomeAct_triggered()
 
 void OPMapGadgetWidget::onGoUAVAct_triggered()
 {
-    PositionActual::DataFields data = m_positionActual->getData();				// get current UAV data
+    QPointF pos = getLatLon();
 
     if (m_map)
     {
-	internals::PointLatLng uav_pos = internals::PointLatLng(data.Latitude, data.Longitude);	// current UAV position
+        internals::PointLatLng uav_pos = internals::PointLatLng(pos.x(), pos.y());	// current UAV position
 	internals::PointLatLng map_pos = m_map->CurrentPosition();				// current MAP position
 	if (map_pos != uav_pos) m_map->SetCurrentPosition(uav_pos);				// center the map onto the UAV
     }
@@ -1147,13 +1163,13 @@ void OPMapGadgetWidget::onGoUAVAct_triggered()
 
 void OPMapGadgetWidget::onSetHomePosAct_triggered()
 {
-    PositionActual::DataFields data = m_positionActual->getData();				// get current UAV data
+    QPointF pos = getLatLon();
 
     if (m_map)
     {
-	internals::PointLatLng uav_pos = internals::PointLatLng(data.Latitude, data.Longitude);	// current UAV position
+        internals::PointLatLng uav_pos = internals::PointLatLng(pos.x(), pos.y());	// current UAV position
 	m_map->Home->SetCoord(uav_pos);								// move the HOME location to match the current UAV location
-	m_map->Home->SetAltitude(data.Altitude);
+        m_map->Home->SetAltitude(0);  // TODO: Update
     }
 }
 

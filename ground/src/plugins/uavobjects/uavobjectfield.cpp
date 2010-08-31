@@ -540,7 +540,7 @@ void UAVObjectField::setValue(const QVariant& value, quint32 index)
 
 double UAVObjectField::getDouble(quint32 index)
 {
-    return getValue().toDouble();
+    return getValue(index).toDouble();
 }
 
 void UAVObjectField::setDouble(double value, quint32 index)

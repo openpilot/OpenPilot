@@ -4,6 +4,7 @@ include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
 include(../../libs/opmapcontrol/opmapcontrol.pri)
 include(../../plugins/uavobjects/uavobjects.pri)
+include(../../libs/utils/utils.pri)
 HEADERS += opmapplugin.h \
     opmapgadgetoptionspage.h \
     opmapgadgetfactory.h \

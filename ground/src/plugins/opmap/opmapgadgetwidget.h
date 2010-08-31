@@ -34,11 +34,13 @@
 #include <QStandardItemModel>
 #include <QList>
 #include <QMutex>
+#include <QPointF>
 
 #include "opmapcontrol/opmapcontrol.h"
 
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/positionactual.h"
+#include "uavobjects/homelocation.h"
 #include "extensionsystem/pluginmanager.h"
 
 #include "opmap_overlay_widget.h"
@@ -46,6 +48,8 @@
 #include "opmap_statusbar_widget.h"
 #include "opmap_waypointeditor_dialog.h"
 #include "opmap_edit_waypoint_dialog.h"
+
+#include "utils/coordinateconversions.h"
 
 namespace Ui
 {
@@ -178,6 +182,8 @@ private slots:
     void onZoomActGroup_triggered(QAction *action);
 
 private:
+    QPointF getLatLon();
+
     double m_heading;	// uav heading
 
     internals::PointLatLng mouse_lat_lon;
@@ -192,7 +198,6 @@ private:
 
     ExtensionSystem::PluginManager *m_plugin_manager;
     UAVObjectManager *m_objManager;
-    PositionActual *m_positionActual;
 
     Ui::OPMap_Widget *m_widget;
 

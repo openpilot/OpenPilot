@@ -98,13 +98,6 @@ plugin_notify.depends = plugin_coreplugin
 plugin_notify.depends = plugin_uavobjects
 SUBDIRS += plugin_notify
 
-#HITL Simulation Gadget
-plugin_hitl.subdir = hitl
-plugin_hitl.depends = plugin_coreplugin
-plugin_hitl.depends += plugin_uavobjects
-plugin_hitl.depends += plugin_uavtalk
-SUBDIRS += plugin_hitl
-
 #Config Gadget
 plugin_config.subdir = config
 plugin_config.depends = plugin_coreplugin
@@ -129,12 +122,13 @@ plugin_ipconnection.subdir = ipconnection
 plugin_ipconnection.depends = plugin_coreplugin
 SUBDIRS += plugin_ipconnection
 
-#HITLIL2 Simulation Gadget
-plugin_hitlil2.subdir = hitlil2
-plugin_hitlil2.depends = plugin_coreplugin
-plugin_hitlil2.depends += plugin_uavobjects
-plugin_hitlil2.depends += plugin_uavtalk
-SUBDIRS += plugin_hitlil2
+
+#HITLNEW Simulation Gadget
+plugin_hitlnew.subdir = hitlnew
+plugin_hitlnew.depends = plugin_coreplugin
+plugin_hitlnew.depends += plugin_uavobjects
+plugin_hitlnew.depends += plugin_uavtalk
+SUBDIRS += plugin_hitlnew
 
 # Export and Import GCS Configuration.
 plugin_importexport.subdir = importexport

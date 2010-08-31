@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PropertyList>
+<generic>
+
+   <input>
+      <line_separator>\n</line_separator>
+      <var_separator>,</var_separator>
+
+      <chunk>
+         <name>aileron</name>
+         <node>/controls/flight/aileron</node>
+         <type>float</type>
+         <format>%f</format>
+       </chunk>
+
+      <chunk>
+         <name>elevator</name>
+         <node>/controls/flight/elevator</node>
+         <type>float</type>
+         <format>%f</format>
+       </chunk>
+
+      <chunk>
+         <name>rudder</name>
+         <node>/controls/flight/rudder</node>
+         <type>float</type>
+         <format>%f</format>
+       </chunk>
+
+      <chunk>
+         <name>throttle</name>
+         <node>/controls/engines/engine/throttle</node>
+         <type>float</type>
+         <format>%f</format>
+       </chunk>
+
+   </input>
+
+   <output>
+      <line_separator>\n</line_separator>
+      <var_separator>,</var_separator>
+
+      <chunk>
+         <name>xRate</name>
+         <node>/fdm/jsbsim/velocities/p-rad_sec</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+      <chunk>
+         <name>yRate</name>
+         <node>/fdm/jsbsim/velocities/q-rad_sec</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+      <chunk>
+         <name>zRate</name>
+         <node>/fdm/jsbsim/velocities/r-rad_sec</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+      <chunk>
+         <name>xAccel</name>
+         <!-- /fdm/jsbsim/accelerations/a-pilot-x-ft_sec2 -->
+         <node>/accelerations/pilot/x-accel-fps_sec</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+      <chunk>
+         <name>yAccel</name>
+         <node>/accelerations/pilot/y-accel-fps_sec</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+      <chunk>
+         <name>zAccel</name>
+         <node>/accelerations/pilot/z-accel-fps_sec</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+      <chunk>
+         <name>Pitch</name>
+         <node>/orientation/pitch-deg</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+      <chunk>
+         <name>PitchRate</name>
+         <node>/orientation/pitch-rate-degps</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+      <chunk>
+         <name>Roll</name>
+         <node>/orientation/roll-deg</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+      <chunk>
+         <name>RollRate</name>
+         <node>/orientation/roll-rate-degps</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+      <chunk>
+         <name>Yaw</name>
+         <node>/orientation/heading-magnetic-deg</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+      <chunk>
+         <name>YawRate</name>
+         <node>/orientation/yaw-rate-degps</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+      <chunk>
+         <name>Latitude</name>
+         <node>/position/latitude-deg</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+      <chunk>
+         <name>Longitude</name>
+         <node>/position/longitude-deg</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+      <chunk>
+         <name>Heading</name>
+         <node>/orientation/heading-deg</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+      <chunk>
+         <name>Altitude</name>
+         <node>/position/altitude-ft</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+      <chunk>
+         <name>AltitudeAGL</name>
+         <node>/position/altitude-agl-ft</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+      <chunk>
+         <name>Groundspeed</name>
+         <node>/velocities/groundspeed-kt</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+      <chunk>
+         <name>Airspeed</name>
+         <node>/velocities/airspeed-kt</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+      <chunk>
+         <name>Temperature</name>
+         <node>/environment/temperature-degc</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+      <chunk>
+         <name>Temperature</name>
+         <node>/environment/temperature-degc</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+      <chunk>
+         <name>Pressure</name>
+         <node>/environment/pressure-inhg</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+   </output>
+
+</generic>
+</PropertyList>

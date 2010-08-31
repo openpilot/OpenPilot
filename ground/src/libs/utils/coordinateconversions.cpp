@@ -28,6 +28,7 @@
  */
 
 #include "coordinateconversions.h"
+#include <stdint.h>
 #include <QDebug>
 
 #define RAD2DEG (180.0/3.14)

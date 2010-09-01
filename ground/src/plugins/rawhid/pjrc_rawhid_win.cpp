@@ -133,14 +133,23 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
                     OPEN_EXISTING,
                     FILE_FLAG_OVERLAPPED,
                     NULL);
-            if( GetLastError() != ERROR_SUCCESS )
+            if( h == INVALID_HANDLE_VALUE )
             {
-                qDebug("Problem openning handle");
-                print_win32_err();
+                // I get ERROR_ACCESS_DENIED with most/all my input devices (mice/trackballs/tablet).
+                // Let's not log it :)
+                if(GetLastError() == ERROR_ACCESS_DENIED) {
+                    free(details);
+                    continue;
+                }
 
+                // qDebug wipes the GetLastError() it seems, so do that after print_win32_err().
+                print_win32_err();
+                qDebug() << "Problem opening handle, path: " << QString().fromWCharArray(details->DevicePath);
+                free(details);
+                continue;
             }
             free(details);
-            if (h == INVALID_HANDLE_VALUE) continue;
+
             attrib.Size = sizeof(HIDD_ATTRIBUTES);
             ret = HidD_GetAttributes(h, &attrib);
             //printf("vid: %4x\n", attrib.VendorID);

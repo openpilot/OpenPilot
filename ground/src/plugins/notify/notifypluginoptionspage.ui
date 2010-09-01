@@ -94,7 +94,7 @@ p, li { white-space: pre-wrap; }
     </rect>
    </property>
    <property name="title">
-    <string>Sound Notifcations</string>
+    <string>Sound Notifications</string>
    </property>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">

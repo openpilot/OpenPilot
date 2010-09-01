@@ -57,6 +57,7 @@ typedef struct struct_GpsData
 
 class NMEAParser: public GPSParser
 {
+    Q_OBJECT
 
 public:
    NMEAParser(QObject *parent = 0);

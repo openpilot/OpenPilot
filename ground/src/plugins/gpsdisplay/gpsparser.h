@@ -37,7 +37,12 @@ class GPSParser: public QObject
 {
     Q_OBJECT
 public:
-    void processInputStream(char c) { Q_UNUSED(c)};
+    ~GPSParser();
+    virtual void processInputStream(char c);
+
+protected:
+    GPSParser(QObject *parent = 0);
+
 signals:
    void sv(int); // Satellites in view
    void position(double,double,double); // Lat, Lon, Alt

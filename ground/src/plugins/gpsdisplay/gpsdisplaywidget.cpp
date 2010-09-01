@@ -133,15 +133,17 @@ void GpsDisplayWidget::setParser(QString connectionMode)
 {
 
     if (connectionMode == "Serial") {
+        qDebug() << "Using Serial parser";
         parser = new NMEAParser();
         widget->connectButton->setEnabled(true);
         widget->disconnectButton->setEnabled(false);
-
     } else if (connectionMode == "Telemetry") {
+        qDebug() << "Using Telemetry parser";
         parser = new TelemetryParser();
         widget->connectButton->setEnabled(false);
         widget->disconnectButton->setEnabled(false);
     } else {
+        qDebug() << "Using Default parser";
         parser = new NMEAParser(); // for the time being...
     }
 
@@ -150,10 +152,8 @@ void GpsDisplayWidget::setParser(QString connectionMode)
     connect(parser,SIGNAL(speedheading(double,double)),this,SLOT(setSpeedHeading(double,double)));
     connect(parser,SIGNAL(datetime(double,double)),this,SLOT(setDateTime(double,double)));
     connect(parser,SIGNAL(packet(char*)), this, SLOT(dumpPacket(char*)));
-    connect(parser, SIGNAL(satellite(int,int,int,int,int)), widget->gpsSky, SLOT(updateSat(int,int,int,int,int)))
-;
+    connect(parser, SIGNAL(satellite(int,int,int,int,int)), widget->gpsSky, SLOT(updateSat(int,int,int,int,int)));
     port = NULL;
-
 }
 
 void GpsDisplayWidget::connectButtonClicked() {
@@ -188,7 +188,6 @@ void GpsDisplayWidget::onDataAvailable() {
 }
 
 void GpsDisplayWidget::processNewSerialData(QByteArray serialData) {
-
     int dataLength = serialData.size();
     const char* data = serialData.constData();
 

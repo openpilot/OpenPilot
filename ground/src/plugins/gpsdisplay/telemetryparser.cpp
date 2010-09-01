@@ -35,10 +35,8 @@
 /**
  * Initialize the parser
  */
-TelemetryParser::TelemetryParser(QObject *parent) : GPSParser()
+TelemetryParser::TelemetryParser(QObject *parent) : GPSParser(parent)
 {
-    Q_UNUSED(parent)
-
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     UAVDataObject *gpsObj = dynamic_cast<UAVDataObject*>(objManager->getObject("GPSPosition"));

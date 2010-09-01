@@ -42,6 +42,24 @@ CoordinateConversions::CoordinateConversions()
 }
 
 /**
+  * Get rotation matrix from ECEF to NED for that LLA
+  * @param[in] LLA Longitude latitude altitude for this location
+  * @param[out] Rne[3][3] Rotation matrix
+  */
+void CoordinateConversions::RneFromLLA(double LLA[3], double Rne[3][3]){
+    float sinLat, sinLon, cosLat, cosLon;
+
+    sinLat=(float)sin(DEG2RAD*LLA[0]);
+    sinLon=(float)sin(DEG2RAD*LLA[1]);
+    cosLat=(float)cos(DEG2RAD*LLA[0]);
+    cosLon=(float)cos(DEG2RAD*LLA[1]);
+
+    Rne[0][0] = -sinLat*cosLon; Rne[0][1] = -sinLat*sinLon; Rne[0][2] = cosLat;
+    Rne[1][0] = -sinLon;        Rne[1][1] = cosLon;         Rne[1][2] = 0;
+    Rne[2][0] = -cosLat*cosLon; Rne[2][1] = -cosLat*sinLon; Rne[2][2] = -sinLat;
+}
+
+/**
   * Convert from LLA coordinates to ECEF coordinates
   * @param[in] LLA[3] latitude longitude alititude coordinates in
   * @param[out] ECEF[3] location in ECEF coordinates
@@ -117,19 +135,15 @@ int CoordinateConversions::GetLLA(double BaseECEFcm[3], double NED[3], double po
     double BaseECEFm[3] = {BaseECEFcm[0] / 100, BaseECEFcm[1] / 100, BaseECEFcm[2] / 100};
     double BaseLLA[3];
     double ECEF[3];
+    double Rne [3][3];
 
     // Get LLA address to compute conversion matrix
     ECEF2LLA(BaseECEFm, BaseLLA);
+    RneFromLLA(BaseLLA, Rne);
 
-    // TODO: Find/derive correct inverse of Rne using LLA
-    double RnePrime [3][3] =
-    {{1,0,0},
-     {0,1,0},
-     {0,0,1}};
-
-    /* P = ECEF + CM * NED */
+    /* P = ECEF + Rne' * NED */
     for(i = 0; i < 3; i++)
-        ECEF[i] = BaseECEFm[i] + RnePrime[i][0]*NED[0] + RnePrime[i][1]*NED[1] + RnePrime[i][2]*NED[2];
+        ECEF[i] = BaseECEFm[i] + Rne[0][i]*NED[0] + Rne[1][i]*NED[1] + Rne[2][i]*NED[2];
 
     ECEF2LLA(ECEF,position);
 

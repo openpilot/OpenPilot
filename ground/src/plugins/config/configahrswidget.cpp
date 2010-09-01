@@ -299,49 +299,94 @@ void ConfigAHRSWidget::saveAHRSCalibration()
 
 }
 
+void ConfigAHRSWidget::attitudeRawUpdated(UAVObject * obj)
+{
+    QMutexLocker lock(&attitudeRawUpdateLock);
+    UAVObjectField *accel_field = obj->getField(QString("accels_filtered"));
+    UAVObjectField *mag_field = obj->getField(QString("magnetometers"));
+    accel_accum_x.append(accel_field->getValue(0).toDouble());
+    accel_accum_y.append(accel_field->getValue(1).toDouble());
+    accel_accum_z.append(accel_field->getValue(2).toDouble());
+    mag_accum_x.append(mag_field->getValue(0).toDouble());
+    mag_accum_y.append(mag_field->getValue(1).toDouble());
+    mag_accum_z.append(mag_field->getValue(2).toDouble());
+    qDebug() << "Size: " << accel_accum_x.size();
+    if(accel_accum_x.size() >= 20) {
+        disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(attitudeRawUpdated(UAVObject*)));
+        m_ahrs->sixPointsSave->setEnabled(true);
+
+        accel_data_x[position] = listMean(accel_accum_x);
+        accel_data_y[position] = listMean(accel_accum_y);
+        accel_data_z[position] = listMean(accel_accum_z);
+        mag_data_x[position] = listMean(mag_accum_x);
+        mag_data_y[position] = listMean(mag_accum_y);
+        mag_data_z[position] = listMean(mag_accum_z);
+
+        qDebug() << accel_data_x[position] << " " << accel_data_y[position] << " " << accel_data_z[position];
+        qDebug() << mag_data_x[position] << " " << mag_data_y[position] << " " << mag_data_z[position];
+
+        position = (position + 1) % 6;
+        if(position == 1) {
+            m_ahrs->sixPointCalibInstructions->append("Place with left side down and click save position...");
+            displayPlane("plane-left");
+        }
+        if(position == 2) {
+            m_ahrs->sixPointCalibInstructions->append("Place upside down and click save position...");
+            displayPlane("plane-flip");
+        }
+        if(position == 3) {
+            m_ahrs->sixPointCalibInstructions->append("Place with right side down and click save position...");
+            displayPlane("plane-right");
+        }
+        if(position == 4) {
+            m_ahrs->sixPointCalibInstructions->append("Place with nose up and click save position...");
+            displayPlane("plane-up");
+        }
+        if(position == 5) {
+            m_ahrs->sixPointCalibInstructions->append("Place with nose down and click save position...");
+            displayPlane("plane-down");
+        }
+        if(position == 0) {
+            computeScaleBias();
+            m_ahrs->sixPointsStart->setEnabled(true);
+            m_ahrs->sixPointsSave->setEnabled(false);
+
+            /* Cleanup original settings */
+            obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
+            obj->getField(QString("UpdateRaw"))->setValue(initialUpdateRaw);
+            obj->getField(QString("UpdateFiltered"))->setValue(initialUpdateFiltered);
+            getObjectManager()->getObject(QString("AttitudeRaw"))->setMetadata(initialMdata);
+        }
+    }
+}
+
+double ConfigAHRSWidget::listMean(QList<double> list)
+{
+    double accum = 0;
+    for(int i = 0; i < list.size(); i++)
+        accum += list[i];
+    return accum / list.size();
+}
+
 /**
   * Saves the data from the aircraft in one of six positions
   */
 void ConfigAHRSWidget::savePositionData()
 {    
+    QMutexLocker lock(&attitudeRawUpdateLock);
+    m_ahrs->sixPointsSave->setEnabled(false);
+
+    accel_accum_x.clear();
+    accel_accum_y.clear();
+    accel_accum_z.clear();
+    mag_accum_x.clear();
+    mag_accum_y.clear();
+    mag_accum_z.clear();
 
     UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeRaw")));
-    UAVObjectField *accel_field = obj->getField(QString("accels_filtered"));
-    UAVObjectField *mag_field = obj->getField(QString("magnetometers"));
+    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(attitudeRawUpdated(UAVObject*)));
 
-    accel_data_x[position] = accel_field->getValue(0).toDouble();
-    accel_data_y[position] = accel_field->getValue(1).toDouble();
-    accel_data_z[position] = accel_field->getValue(2).toDouble();
-    mag_data_x[position] = mag_field->getValue(0).toDouble();
-    mag_data_y[position] = mag_field->getValue(1).toDouble();
-    mag_data_z[position] = mag_field->getValue(2).toDouble();
-
-    position = (position + 1) % 6;
-    if(position == 1) {
-        m_ahrs->sixPointCalibInstructions->append("Place with left side down and click save position...");
-        displayPlane("plane-left");
-    }
-    if(position == 2) {
-        m_ahrs->sixPointCalibInstructions->append("Place upside down and click save position...");
-        displayPlane("plane-flip");
-    }
-    if(position == 3) {
-        m_ahrs->sixPointCalibInstructions->append("Place with right side down and click save position...");
-        displayPlane("plane-right");
-    }
-    if(position == 4) {
-        m_ahrs->sixPointCalibInstructions->append("Place with nose up and click save position...");
-        displayPlane("plane-up");
-    }
-    if(position == 5) {
-        m_ahrs->sixPointCalibInstructions->append("Place with nose down and click save position...");
-        displayPlane("plane-down");
-    }
-    if(position == 0) {
-        computeScaleBias();
-        m_ahrs->sixPointsStart->setEnabled(true);
-        m_ahrs->sixPointsSave->setEnabled(false);
-    }
+    m_ahrs->sixPointCalibInstructions->append("Hold...");
 }
 
 //*****************************************************************
@@ -491,13 +536,26 @@ void ConfigAHRSWidget::calibrationMode()
     field->setDouble(0,2);
     obj->updated();
 
+    /* Make sure we get AttitudeRaw updates, and skip AttitudeActual (for speed) */
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
     field = obj->getField(QString("UpdateRaw"));
+    initialUpdateRaw = field->getValue().toString();
     field->setValue("TRUE");
+    field = obj->getField(QString("UpdateFiltered"));
+    initialUpdateFiltered = field->getValue().toString();
+    field->setValue("FALSE");
     obj->updated();
 
+    /* Need to get as many AttitudeRaw updates as possible */
+    obj = getObjectManager()->getObject(QString("AttitudeRaw"));
+    initialMdata = obj->getMetadata();
+    UAVObject::Metadata mdata = initialMdata;
+    mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
+    obj->setMetadata(mdata);
+
+    /* Show instructions and enable controls */
     m_ahrs->sixPointCalibInstructions->clear();
-    m_ahrs->sixPointCalibInstructions->append("Place horizontally and click save position...<br>");
+    m_ahrs->sixPointCalibInstructions->append("Place horizontally and click save position...");
     displayPlane("plane-horizontal");
     m_ahrs->sixPointsStart->setEnabled(false);
     m_ahrs->sixPointsSave->setEnabled(true);

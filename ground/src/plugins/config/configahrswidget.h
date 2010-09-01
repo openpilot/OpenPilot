@@ -37,6 +37,7 @@
 #include <QtSvg/QGraphicsSvgItem>
 #include <QList>
 #include <QTimer>
+#include <QMutex>
 
 class ConfigAHRSWidget: public ConfigTaskWidget
 {
@@ -61,12 +62,20 @@ private:
     QGraphicsSvgItem *mag_x;
     QGraphicsSvgItem *mag_y;
     QGraphicsSvgItem *mag_z;
+    QMutex attitudeRawUpdateLock;
     double maxBarHeight;
     int phaseCounter;
     int progressBarIndex;
     QTimer progressBarTimer;
     const static double maxVarValue;
     const static int calibrationDelay;
+
+    QList<double> accel_accum_x;
+    QList<double> accel_accum_y;
+    QList<double> accel_accum_z;
+    QList<double> mag_accum_x;
+    QList<double> mag_accum_y;
+    QList<double> mag_accum_z;
 
     double accel_data_x[6];
     double accel_data_y[6];
@@ -75,6 +84,12 @@ private:
     double mag_data_y[6];
     double mag_data_z[6];
     int position;
+
+    UAVObject::Metadata initialMdata;
+    QString initialUpdateRaw;
+    QString initialUpdateFiltered;
+
+    double listMean(QList<double> list);
 private slots:
     void launchAHRSCalibration();
     void saveAHRSCalibration();
@@ -86,7 +101,7 @@ private slots:
     void savePositionData();
     void computeScaleBias();
     void calibrationMode();
-
+    void attitudeRawUpdated(UAVObject * obj);
 protected:
     void showEvent(QShowEvent *event);
 

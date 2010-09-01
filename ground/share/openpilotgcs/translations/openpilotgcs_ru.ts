@@ -74,12 +74,12 @@
     <message>
         <location filename="../../../src/libs/aggregation/examples/text/main.ui"/>
         <source>main</source>
-        <translation type="unfinished"></translation>
+        <translation>основной</translation>
     </message>
     <message>
         <location/>
         <source>Text1:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -89,12 +89,12 @@
     <message>
         <location/>
         <source>Text2:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Text3:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -196,17 +196,17 @@
     <message>
         <location filename="../../../src/libs/opmapcontrol/src/mapwidget/mapripform.ui"/>
         <source>MapRipper</source>
-        <translation type="unfinished"></translation>
+        <translation>Загрузчик карт</translation>
     </message>
     <message>
         <location/>
         <source>Currently ripping from:</source>
-        <translation type="unfinished"></translation>
+        <translation>Грузим из:</translation>
     </message>
     <message>
         <location/>
         <source>Downloading tile</source>
-        <translation type="unfinished"></translation>
+        <translation>Загрузка части</translation>
     </message>
     <message>
         <location/>
@@ -1193,16 +1193,6 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>Lattitude:</source>
-        <translation>Широта:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>TextLabel</source>
-        <translation>---</translation>
-    </message>
-    <message>
-        <location/>
         <source>Longitude:</source>
         <translation>Долгота:</translation>
     </message>
@@ -1256,147 +1246,135 @@ p, li { white-space: pre-wrap; }
         <source>Disconnect</source>
         <translation>Отсоединить</translation>
     </message>
+    <message>
+        <location/>
+        <source>Latitude:</source>
+        <translation>Широта:</translation>
+    </message>
 </context>
 <context>
     <name>HITLOptionsPage</name>
     <message>
-        <location filename="../../../src/plugins/hitl/hitloptionspage.ui"/>
+        <location filename="../../../src/plugins/hitlnew/hitloptionspage.ui"/>
+        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+185"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
     <message>
         <location/>
-        <source>FlightGear executable:</source>
-        <translation>Исполняемый файл FlightGear:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>FlightGear data directory:</source>
-        <translation>Каталог FlightGear:</translation>
-    </message>
-    <message>
-        <location/>
+        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+7"/>
+        <location line="+2"/>
         <source>Manual aircraft control (can be used when hardware is not available)</source>
         <translation>Ручное управление (может быть использовано, когда отсутствует оборудование)</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/hitl/hitloptionspage.cpp" line="+50"/>
-        <source>Choose FlightGear executable</source>
-        <translation>Erf;bnt исполняемый файл FlightGear</translation>
+        <location/>
+        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="-8"/>
+        <source>Choose flight simulator:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+1"/>
+        <source>Latitude in degrees:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+1"/>
+        <source>Longitude in degrees:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+1"/>
+        <source>Path executable:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+1"/>
+        <source>Data directory:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+5"/>
+        <source>Host Address:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+1"/>
+        <source>Output Port:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+1"/>
+        <source>Input Port:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/hitlnew/hitloptionspage.cpp" line="+65"/>
+        <source>Choose flight simulator executable</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Choose FlightGear data directory</source>
-        <translation>Укажите каталог FlightGear</translation>
+        <source>Choose flight simulator data directory</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>HITLWidget</name>
     <message>
-        <location filename="../../../src/plugins/hitl/hitlwidget.ui"/>
+        <location filename="../../../src/plugins/hitlnew/hitlwidget.ui"/>
+        <location filename="../../../src/plugins/hitlnew/ui_hitlwidget.h" line="+331"/>
         <source>Form</source>
         <translation>Форма</translation>
     </message>
     <message>
         <location/>
+        <location filename="../../../src/plugins/hitlnew/ui_hitlwidget.h" line="+2"/>
         <source>Request update</source>
         <translation>Запрос обновления</translation>
     </message>
     <message>
         <location/>
+        <location filename="../../../src/plugins/hitlnew/ui_hitlwidget.h" line="+2"/>
         <source>Start</source>
         <translation>Пуск</translation>
     </message>
     <message>
         <location/>
+        <location filename="../../../src/plugins/hitlnew/ui_hitlwidget.h" line="+2"/>
         <source>Send update</source>
         <translation>Передать обновления</translation>
     </message>
     <message>
         <location/>
+        <location filename="../../../src/plugins/hitlnew/ui_hitlwidget.h" line="+2"/>
         <source>Stop</source>
         <translation>Стоп</translation>
     </message>
     <message>
         <location/>
-        <source>AutoPilot Disconnected</source>
-        <translation>Автопилот отсоединен</translation>
+        <location filename="../../../src/plugins/hitlnew/ui_hitlwidget.h" line="+1"/>
+        <source>AutoPilot disconnected</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>FlighGear Disconnected</source>
-        <translation>FlighGear отсоединен</translation>
-    </message>
-</context>
-<context>
-    <name>HITLIL2OptionsPage</name>
-    <message>
-        <location filename="../../../src/plugins/hitlil2/hitlil2optionspage.ui"/>
-        <source>Form</source>
-        <translation>Форма</translation>
+        <location filename="../../../src/plugins/hitlnew/ui_hitlwidget.h" line="+1"/>
+        <source> Simulator disconnected </source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Manual aircraft control (can be used when hardware is not available)</source>
-        <translation>Ручное управление (может быть использовано, когда отсутствует оборудование)</translation>
-    </message>
-    <message>
-        <location/>
-        <source>IL2 DeviceLink Port</source>
-        <translation>Ил2 DeviceLink Port</translation>
-    </message>
-    <message>
-        <location/>
-        <source>IL2 Host Name/Number</source>
-        <translation>Ил2 Адрес (имя хоста или IP)</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Longitude offset (in degrees)</source>
-        <translation>Долгота смещение (в градусах)</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Latitude offset (in degrees)</source>
-        <translation>Широта смещение (в градусах)</translation>
-    </message>
-</context>
-<context>
-    <name>HITLIL2Widget</name>
-    <message>
-        <location filename="../../../src/plugins/hitlil2/hitlil2widget.ui"/>
-        <source>Form</source>
-        <translation>Форма</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Request update</source>
-        <translation>Запрос обновления</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Start</source>
-        <translation>Пуск</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Send update</source>
-        <translation>Отправить обновления</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Stop</source>
-        <translation>Стоп</translation>
-    </message>
-    <message>
-        <location/>
-        <source>AutoPilot Disconnected</source>
-        <translation>Автопилот отсоединен</translation>
-    </message>
-    <message>
-        <location/>
-        <source>IL2 Disconnected</source>
-        <translation>Ил2 отсоединен</translation>
+        <location filename="../../../src/plugins/hitlnew/ui_hitlwidget.h" line="+1"/>
+        <source>Clear Log</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1422,77 +1400,77 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/importexport/importexportgadgetwidget.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>This is experimental. Use at own risk.</source>
-        <translation type="unfinished"></translation>
+        <translation>Это экспериментальный функционал. Используйте на свой риск.</translation>
     </message>
     <message>
         <location/>
         <source>Please report bugs!</source>
-        <translation type="unfinished"></translation>
+        <translation>Пожалуйста сообщайте об ошибках!</translation>
     </message>
     <message>
         <location/>
         <source>Config File</source>
-        <translation type="unfinished"></translation>
+        <translation>Файл конфигурации</translation>
     </message>
     <message>
         <location/>
         <source>Items</source>
-        <translation type="unfinished"></translation>
+        <translation>Элементы</translation>
     </message>
     <message>
         <location/>
         <source>General (Workspace, Key-Bindings)</source>
-        <translation type="unfinished"></translation>
+        <translation>Основное (Экран, сочетаний клавиш)</translation>
     </message>
     <message>
         <location/>
         <source>All Gadgets</source>
-        <translation type="unfinished"></translation>
+        <translation>Все инструменты</translation>
     </message>
     <message>
         <location/>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт</translation>
     </message>
     <message>
         <location/>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Импорт</translation>
     </message>
     <message>
         <location/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>Справка</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/importexport/importexportgadgetwidget.cpp" line="+79"/>
+        <location filename="../../../src/plugins/importexport/importexportgadgetwidget.cpp" line="+81"/>
         <source>Can&apos;t write file </source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно записать файл</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>The settings have been exported to </source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки были экспортированы в</translation>
     </message>
     <message>
-        <location line="+34"/>
+        <location line="+35"/>
         <source>Can&apos;t read file </source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно прочитать файл</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>The settings have been imported from </source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки были импортированы из</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>. Restart the application.</source>
-        <translation type="unfinished"></translation>
+        <translation>. Перезапустите приложение.</translation>
     </message>
 </context>
 <context>
@@ -1533,52 +1511,52 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/lineardial/lineardialgadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>Dial SVG: </source>
-        <translation type="unfinished"></translation>
+        <translation>SVG файл индикатора:</translation>
     </message>
     <message>
         <location/>
         <source>Load file...</source>
-        <translation type="unfinished"></translation>
+        <translation>Загрузить файл...</translation>
     </message>
     <message>
         <location/>
         <source>Whole range:</source>
-        <translation type="unfinished"></translation>
+        <translation>Весь спектр:</translation>
     </message>
     <message>
         <location/>
         <source>Min:</source>
-        <translation type="unfinished"></translation>
+        <translation>Минимум:</translation>
     </message>
     <message>
         <location/>
         <source>Max:</source>
-        <translation type="unfinished"></translation>
+        <translation>Максимум:</translation>
     </message>
     <message>
         <location/>
         <source>Green:</source>
-        <translation type="unfinished"></translation>
+        <translation>Зеленый:</translation>
     </message>
     <message>
         <location/>
         <source>Yellow:</source>
-        <translation type="unfinished"></translation>
+        <translation>Желтый:</translation>
     </message>
     <message>
         <location/>
         <source>Red:</source>
-        <translation type="unfinished"></translation>
+        <translation>Красный:</translation>
     </message>
     <message>
         <location/>
         <source>Input:</source>
-        <translation type="unfinished"></translation>
+        <translation>Вход:</translation>
     </message>
     <message>
         <location/>
@@ -1593,32 +1571,32 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Dial font:</source>
-        <translation type="unfinished"></translation>
+        <translation>Шрифт индикатора:</translation>
     </message>
     <message>
         <location/>
         <source>Select...</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбрать...</translation>
     </message>
     <message>
         <location/>
         <source>Decimal places:</source>
-        <translation type="unfinished"></translation>
+        <translation>Число десятичных знаков:</translation>
     </message>
     <message>
         <location/>
         <source>Factor:</source>
-        <translation type="unfinished"></translation>
+        <translation>Коэффициент:</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/lineardial/lineardialgadgetoptionspage.cpp" line="+143"/>
         <source>QFileDialog::getOpenFileName()</source>
-        <translation type="unfinished"></translation>
+        <translation>Загрузка SVG файла</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>All Files (*);;SVG Files (*.svg)</source>
-        <translation type="unfinished"></translation>
+        <translation>Все файлы (*);;SVG файлы (*.svg)</translation>
     </message>
 </context>
 <context>
@@ -1673,37 +1651,36 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Select the sound collection&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Sound Notifcations</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Выбор коллекции звуков&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Enable Sounds</source>
-        <translation type="unfinished"></translation>
+        <translation>Разрешить звуки</translation>
     </message>
     <message>
         <location/>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Воспроизведение</translation>
     </message>
     <message>
         <location/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить</translation>
     </message>
     <message>
         <location/>
         <source>Modify</source>
-        <translation type="unfinished"></translation>
+        <translation>Изменить</translation>
     </message>
     <message>
         <location/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location/>
@@ -1718,37 +1695,37 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Sound1:</source>
-        <translation type="unfinished"></translation>
+        <translation>Звук1:</translation>
     </message>
     <message>
         <location/>
         <source>Sound2:</source>
-        <translation type="unfinished"></translation>
+        <translation>Звук2:</translation>
     </message>
     <message>
         <location/>
         <source>Sound3:</source>
-        <translation type="unfinished"></translation>
+        <translation>Звук3:</translation>
     </message>
     <message>
         <location/>
         <source>Value is</source>
-        <translation type="unfinished"></translation>
+        <translation>Значение</translation>
     </message>
     <message>
         <location/>
         <source>Equal to</source>
-        <translation type="unfinished"></translation>
+        <translation>Равно</translation>
     </message>
     <message>
         <location/>
         <source>Greater than</source>
-        <translation type="unfinished"></translation>
+        <translation>Больше чем</translation>
     </message>
     <message>
         <location/>
         <source>Less than</source>
-        <translation type="unfinished"></translation>
+        <translation>Меньше чем</translation>
     </message>
     <message>
         <location/>
@@ -1763,7 +1740,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Never</source>
-        <translation type="unfinished"></translation>
+        <translation>Никогда</translation>
     </message>
     <message>
         <location/>
@@ -1788,7 +1765,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/notify/notifypluginoptionspage.cpp" line="+78"/>
         <source>Choose sound collection directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите каталог с коллекцией звуков</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/notify/notifypluginoptionspage.h" line="+62"/>
@@ -1800,73 +1777,78 @@ p, li { white-space: pre-wrap; }
         <source>Notify Plugin</source>
         <translation>Оповещения</translation>
     </message>
+    <message>
+        <location filename="../../../src/plugins/notify/notifypluginoptionspage.ui"/>
+        <source>Sound Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>opmap_edit_waypoint_dialog</name>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_edit_waypoint_dialog.ui"/>
         <source>OpenPilot GCS Edit Waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактирование точки пути</translation>
     </message>
     <message>
         <location/>
         <source>Number </source>
-        <translation type="unfinished"></translation>
+        <translation>Номер</translation>
     </message>
     <message>
         <location/>
         <source>Latitude </source>
-        <translation type="unfinished"></translation>
+        <translation>Широта</translation>
     </message>
     <message>
         <location/>
         <source>Longitude </source>
-        <translation type="unfinished"></translation>
+        <translation>Долгота</translation>
     </message>
     <message>
         <location/>
         <source>Altitude </source>
-        <translation type="unfinished"></translation>
+        <translation>Высота</translation>
     </message>
     <message>
         <location/>
         <source>meters</source>
-        <translation type="unfinished"></translation>
+        <translation>метров</translation>
     </message>
     <message>
         <location/>
         <source>Description </source>
-        <translation type="unfinished"></translation>
+        <translation>Описание</translation>
     </message>
     <message>
         <location/>
         <source>Locked</source>
-        <translation type="unfinished"></translation>
+        <translation>Блокировать</translation>
     </message>
     <message>
         <location/>
         <source>degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>градусов</translation>
     </message>
     <message>
         <location/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Apply</source>
-        <translation type="unfinished"></translation>
+        <translation>Применить</translation>
     </message>
     <message>
         <location/>
         <source>Revert</source>
-        <translation type="unfinished"></translation>
+        <translation>Вернуть</translation>
     </message>
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Отменить</translation>
     </message>
 </context>
 <context>
@@ -1915,7 +1897,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Waypoints</source>
-        <translation type="unfinished"></translation>
+        <translation>Точки маршрута</translation>
     </message>
     <message>
         <location/>
@@ -1925,27 +1907,27 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Locked</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Блокировать</translation>
     </message>
     <message>
         <location/>
         <source>Latitude</source>
-        <translation type="unfinished"></translation>
+        <translation>Широта</translation>
     </message>
     <message>
         <location/>
         <source>Longitude</source>
-        <translation type="unfinished"></translation>
+        <translation>Долгота</translation>
     </message>
     <message>
         <location/>
         <source>Altitude</source>
-        <translation type="unfinished"></translation>
+        <translation>Высота</translation>
     </message>
     <message>
         <location/>
         <source>Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Время</translation>
     </message>
     <message>
         <location/>
@@ -1960,17 +1942,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/opmap/opmap_waypointeditor_dialog.cpp" line="+146"/>
         <source>Waypoint 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Точка маршрута 1</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Waypoint 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Точка маршрута 2</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Waypoint 3</source>
-        <translation type="unfinished"></translation>
+        <translation>Точка маршрута 3</translation>
     </message>
 </context>
 <context>
@@ -1978,32 +1960,32 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/opmap/opmap_widget.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>Enter place to find</source>
-        <translation type="unfinished"></translation>
+        <translation>Поиск</translation>
     </message>
     <message>
         <location/>
         <source>london</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>new york</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>paris</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Find place</source>
-        <translation type="unfinished"></translation>
+        <translation>Поиск</translation>
     </message>
     <message>
         <location/>
@@ -2018,7 +2000,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source> Waypoints </source>
-        <translation type="unfinished"></translation>
+        <translation>Точки маршрута</translation>
     </message>
     <message>
         <location/>
@@ -2048,17 +2030,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить</translation>
     </message>
     <message>
         <location/>
         <source>Add a waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить точку маршрута</translation>
     </message>
     <message>
         <location/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить</translation>
     </message>
     <message>
         <location/>
@@ -2148,7 +2130,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Go</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Вперед</translation>
     </message>
     <message>
         <location/>
@@ -2199,7 +2181,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/opmap/opmapgadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Форма</translation>
     </message>
     <message>
         <location/>
@@ -2334,11 +2316,6 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>Data Timeout:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>ms</source>
         <translation>мс</translation>
     </message>
@@ -2374,13 +2351,30 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>&gt;&gt;</source>
-        <translation></translation>
+        <source>Update Interval:</source>
+        <translation>Интервал обновления:</translation>
     </message>
     <message>
         <location/>
-        <source>&lt;&lt;</source>
-        <translation></translation>
+        <source>Add a new curve to the scope, or update it if the UAVObject and UAVField is the same.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Add
+Update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Remove the curve from the scope.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Remove
+</source>
+        <translation>Удалить</translation>
     </message>
 </context>
 <context>
@@ -3884,7 +3878,7 @@ Reason: %3</source>
     <message>
         <location line="+345"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Отсутствует</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -3943,7 +3937,7 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/libs/libqxt/src/gui/qxtcountrymodel.cpp" line="+196"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Название</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -6591,7 +6585,7 @@ Reason: %3</source>
 <context>
     <name>Core::ModeManager</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/modemanager.cpp" line="+146"/>
+        <location filename="../../../src/plugins/coreplugin/modemanager.cpp" line="+148"/>
         <source>Switch to %1 mode</source>
         <translation>Переключиться в режим %1</translation>
     </message>
@@ -6819,17 +6813,9 @@ Reason: %3</source>
 <context>
     <name>HITLFactory</name>
     <message>
-        <location filename="../../../src/plugins/hitl/hitlfactory.cpp" line="+35"/>
+        <location filename="../../../src/plugins/hitlnew/hitlfactory.cpp" line="+35"/>
         <source>HITL Simulation</source>
         <translation>HITL Симулятор (FlighGear)</translation>
-    </message>
-</context>
-<context>
-    <name>HITLIL2Factory</name>
-    <message>
-        <location filename="../../../src/plugins/hitlil2/hitlil2factory.cpp" line="+35"/>
-        <source>HITL Simulation with IL2</source>
-        <translation>HITL Симулятор (ИЛ2)</translation>
     </message>
 </context>
 <context>
@@ -6898,19 +6884,19 @@ Reason: %3</source>
 <context>
     <name>OPMapGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/opmap/opmapgadgetwidget.cpp" line="+246"/>
+        <location filename="../../../src/plugins/opmap/opmapgadgetwidget.cpp" line="+240"/>
         <source>Flight path 62</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+156"/>
+        <location line="+157"/>
         <source>Copy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Zoom</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Масштабировать</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -6930,12 +6916,12 @@ Reason: %3</source>
     <message>
         <location line="+8"/>
         <source>Waypoints</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Точки маршрута</translation>
     </message>
     <message>
         <location line="+242"/>
         <source>OpenPilot GCS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OpenPilot НСУ (Наземная Система Управления)</translation>
     </message>
     <message>
         <location line="+204"/>
@@ -7310,27 +7296,27 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/uavobjects/uavmetaobject.cpp" line="+51"/>
         <source>False</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>True</source>
-        <translation type="unfinished"></translation>
+        <translation>Да</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Periodic</source>
-        <translation type="unfinished"></translation>
+        <translation>Периодически</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>On Change</source>
-        <translation type="unfinished"></translation>
+        <translation>При изменении</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Manual</source>
-        <translation type="unfinished"></translation>
+        <translation>Вручную</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -7441,6 +7427,142 @@ Reason: %3</source>
         <location filename="../../../src/plugins/welcome/communitywelcomepage.h" line="+48"/>
         <source>Community</source>
         <translation>Сообщество</translation>
+    </message>
+</context>
+<context>
+    <name>AHRSWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/ahrs.ui"/>
+        <source>Form</source>
+        <translation>Форма</translation>
+    </message>
+    <message>
+        <location/>
+        <source>These are the sensor variance values computed by the AHRS.
+
+Tip: lower is better!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Telemetry link not established.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Press to start a calibration procedure, takes 30 seconds max.
+
+Hint: run this with engines at cruising speed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Start</source>
+        <translation>Пуск</translation>
+    </message>
+    <message>
+        <location/>
+        <source>AHRS Algorithm:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select the sensor integration algorithm here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Six Point Calibration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save Home Location to SD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save settings to the OP board (RAM only).
+
+This does not save the calibration settings, this is done using the
+specific calibration button on top of the screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save to RAM</source>
+        <translation>Записать в RAM</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send settings to OP board, and save to the microSD card.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save to SD</source>
+        <translation>Сохранить на  SD</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Refresh this screen with current values from the board.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Request</source>
+        <translation>Получить</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Sensor noise calibration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FGOptionsPage</name>
+    <message>
+        <location filename="../../../src/plugins/hitlnew/fgoptionspage.ui"/>
+        <location filename="../../../src/plugins/hitlnew/ui_fgoptionspage.h" line="+102"/>
+        <source>Form</source>
+        <translation type="unfinished">Форма</translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/hitlnew/ui_fgoptionspage.h" line="+1"/>
+        <source>FlightGear executable:</source>
+        <translation type="unfinished">Исполняемый файл FlightGear:</translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/hitlnew/ui_fgoptionspage.h" line="+1"/>
+        <source>FlightGear data directory:</source>
+        <translation type="unfinished">Каталог FlightGear:</translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/hitlnew/ui_fgoptionspage.h" line="+2"/>
+        <location line="+2"/>
+        <source>Manual aircraft control (can be used when hardware is not available)</source>
+        <translation type="unfinished">Ручное управление (может быть использовано, когда отсутствует оборудование)</translation>
+    </message>
+</context>
+<context>
+    <name>ImportExportDialog</name>
+    <message>
+        <location filename="../../../src/plugins/importexport/importexportdialog.ui"/>
+        <source>Dialog</source>
+        <translation>Диалог</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/importexport/importexportdialog.cpp" line="+10"/>
+        <source>Import Export Settings</source>
+        <translation>Настройки импорта\экспорта</translation>
     </message>
 </context>
 </TS>

@@ -65,6 +65,7 @@ public:
    void processInputStream(char c);
    char* nmeaGetPacketBuffer(void);
    char nmeaChecksum(char* gps_buffer);
+   void nmeaTerminateAtChecksum(char* gps_buffer);
    uint8_t nmeaProcess(cBuffer* rxBuffer);
    void nmeaProcessGPGGA(char* packet);
    void nmeaProcessGPRMC(char* packet);

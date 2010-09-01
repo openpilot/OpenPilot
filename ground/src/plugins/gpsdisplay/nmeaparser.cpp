@@ -108,6 +108,7 @@ char NMEAParser::nmeaChecksum(char* gps_buffer)
                 {
                         //Parsing received checksum...
                         checksum_received = strtol(&gps_buffer[x+1],NULL,16);
+
                         break;
                 }
                 else
@@ -125,6 +126,18 @@ char NMEAParser::nmeaChecksum(char* gps_buffer)
         {
                 ++numErrors;
                 return 0;
+        }
+}
+
+void NMEAParser::nmeaTerminateAtChecksum(char* gps_buffer)
+{
+        for(int x=0; x<NMEA_BUFFERSIZE; x++)
+        {
+                if(gps_buffer[x]=='*')
+                {
+                        gps_buffer[x] = 0;
+                        break;
+                }
         }
 }
 
@@ -260,6 +273,41 @@ uint8_t NMEAParser::nmeaProcess(cBuffer* rxBuffer)
 void NMEAParser::nmeaProcessGPGSV(char *packet)
 {
 
+    // start parsing just after "GPGSV,"
+    // attempt to reject empty packets right away
+    if(packet[6]==',' && packet[7]==',')
+            return;
+
+    if(!nmeaChecksum(packet))
+    {
+            // checksum not valid
+            return;
+    }
+    nmeaTerminateAtChecksum(packet);
+
+    QString* nmeaString = new QString( packet );
+    QStringList tokenslist = nmeaString->split(",");
+
+
+    const int sentence_total = tokenslist.at(1).toInt(); // Number of sentences for full data
+    const int sentence_index = tokenslist.at(2).toInt(); // sentence x of y
+    const int sat_count = tokenslist.at(3).toInt(); // Number of satellites in view
+
+    int sats = (tokenslist.size() - 4) /4;
+    for(int sat = 0; sat < sats; sat++) {
+        int base = 4+sat*4;
+        const int id = tokenslist.at(base+0).toInt(); // Satellite PRN number
+        const int elv = tokenslist.at(base+1).toInt(); // Elevation, degrees
+        const int azimuth = tokenslist.at(base+2).toInt(); //  Azimuth, degrees
+        const int sig = tokenslist.at(base+3).toInt(); // SNR - higher is better
+
+        // TODO: probably need a better way to create an index, and also I think we need something else then index,
+        // cause what happens if less satelites are found, or the gps juggles the order?
+        const int index = sentence_index * 4 + sat;
+        emit satellite(index, id, elv, azimuth, sig);
+
+    }
+
 }
 
 /**
@@ -278,6 +326,7 @@ void NMEAParser::nmeaProcessGPGGA(char* packet)
                 // checksum not valid
                 return;
         }
+        nmeaTerminateAtChecksum(packet);
 
         QString* nmeaString = new QString( packet );
         QStringList tokenslist = nmeaString->split(",");
@@ -324,6 +373,7 @@ void NMEAParser::nmeaProcessGPRMC(char* packet)
                 // checksum not valid
                 return;
         }
+        nmeaTerminateAtChecksum(packet);
 
         QString* nmeaString = new QString( packet );
         QStringList tokenslist = nmeaString->split(",");
@@ -353,6 +403,7 @@ void NMEAParser::nmeaProcessGPVTG(char* packet)
                 // checksum not valid
                 return;
         }
+        nmeaTerminateAtChecksum(packet);
 
         QString* nmeaString = new QString( packet );
         QStringList tokenslist = nmeaString->split(",");
@@ -374,6 +425,7 @@ void NMEAParser::nmeaProcessGPGSA(char* packet)
                 // checksum not valid
                 return;
         }
+        nmeaTerminateAtChecksum(packet);
 
         QString* nmeaString = new QString( packet );
         QStringList tokenslist = nmeaString->split(",");

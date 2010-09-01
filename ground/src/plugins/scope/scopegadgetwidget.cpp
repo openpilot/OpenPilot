@@ -50,8 +50,8 @@ TestDataGen* ScopeGadgetWidget::testDataGen;
 
 ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent)
 {
-   // if(testDataGen == 0)
-   //     testDataGen = new TestDataGen();
+    //if(testDataGen == 0)
+    //    testDataGen = new TestDataGen();
 
     //Setup the timer that replots data
     replotTimer = new QTimer(this);
@@ -142,14 +142,14 @@ void ScopeGadgetWidget::setupChronoPlot()
     scaleWidget->setMinBorderDist(0, fmh / 2);
 }
 
-void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavField, int scaleOrderFactor, QPen pen)
+void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor, QPen pen)
 {
     PlotData* plotData;
 
     if (m_plotType == SequencialPlot)
-        plotData = new SequencialPlotData(uavObject, uavField);
+        plotData = new SequencialPlotData(uavObject, uavFieldSubField);
     else if (m_plotType == ChronoPlot)
-        plotData = new ChronoPlotData(uavObject, uavField);
+        plotData = new ChronoPlotData(uavObject, uavFieldSubField);
     //else if (m_plotType == UAVObjectPlot)
     //    plotData = new UAVObjectPlotData(uavObject, uavField);
 
@@ -165,11 +165,22 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavField, int sc
     if(plotData->haveSubField)
         curveName = curveName.append("." + plotData->uavSubField);
 
+    //Get the uav object
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject((plotData->uavObject)));
+
+    UAVObjectField* field = obj->getField(plotData->uavField);
+    QString units = field->getUnits();
+
+    if(units == 0)
+        units = QString();
+
     QString curveNameScaled;
     if(scaleOrderFactor == 0)
-        curveNameScaled = curveName;
+        curveNameScaled = curveName + "(" + units + ")";
     else
-        curveNameScaled = curveName + "(E" + QString::number(scaleOrderFactor) + ")";
+        curveNameScaled = curveName + "(x10^" + QString::number(scaleOrderFactor) + " " + units + ")";
 
     QwtPlotCurve* plotCurve = new QwtPlotCurve(curveNameScaled);
     plotCurve->setPen(pen);
@@ -179,11 +190,6 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavField, int sc
 
     //Keep the curve details for later
     m_curvesData.insert(curveNameScaled, plotData);
-
-    //Get the object to monitor
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject((plotData->uavObject)));
 
     //Link to the signal of new data only if this UAVObject has not been to connected yet
     if (!m_connectedUAVObjects.contains(obj->getName())) {

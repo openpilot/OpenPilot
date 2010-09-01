@@ -289,6 +289,8 @@ void NMEAParser::nmeaProcessGPGSV(char *packet)
     QStringList tokenslist = nmeaString->split(",");
 
 
+    // Officially there should be a max of three sentences (12 sats), some gps receivers do more..
+
     const int sentence_total = tokenslist.at(1).toInt(); // Number of sentences for full data
     const int sentence_index = tokenslist.at(2).toInt(); // sentence x of y
     const int sat_count = tokenslist.at(3).toInt(); // Number of satellites in view
@@ -300,14 +302,18 @@ void NMEAParser::nmeaProcessGPGSV(char *packet)
         const int elv = tokenslist.at(base+1).toInt(); // Elevation, degrees
         const int azimuth = tokenslist.at(base+2).toInt(); //  Azimuth, degrees
         const int sig = tokenslist.at(base+3).toInt(); // SNR - higher is better
-
-        // TODO: probably need a better way to create an index, and also I think we need something else then index,
-        // cause what happens if less satelites are found, or the gps juggles the order?
         const int index = sentence_index * 4 + sat;
         emit satellite(index, id, elv, azimuth, sig);
-
     }
 
+    if(sentence_index == sentence_total) {
+        // Last sentence
+        int total_sats = sentence_index * 4 + sats;
+        for(int emptySatIndex = total_sats; emptySatIndex < 16; emptySatIndex++) {
+            // Wipe the rest.
+            emit satellite(emptySatIndex, 0, 0, 0, 0);
+        }
+    }
 }
 
 /**

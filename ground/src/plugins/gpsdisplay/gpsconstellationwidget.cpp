@@ -69,7 +69,7 @@ GpsConstellationWidget::GpsConstellationWidget(QWidget *parent) : QGraphicsView(
         satIcons[i]->setSharedRenderer(renderer);
         satIcons[i]->setElementId("sat-notSeen");
         satIcons[i]->setParentItem(world);
-
+        satIcons[i]->hide();
     }
 
 }
@@ -96,8 +96,10 @@ void GpsConstellationWidget::showEvent(QShowEvent *event)
 
 void GpsConstellationWidget::updateSat(int index, int prn, int elevation, int azimuth, int snr)
 {
-    if (index > 16)
+    if (index >= 16) {
         return; // A bit of error checking never hurts.
+    }
+
     // TODO: add range checking
     satellites[index][0] = prn;
     satellites[index][1] = elevation;

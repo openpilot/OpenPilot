@@ -1045,7 +1045,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Dial font:</source>
-        <translation>Шрифт прибора:</translation>
+        <translation>Шрифт индикатора:</translation>
     </message>
     <message>
         <location/>
@@ -1177,6 +1177,16 @@ p, li { white-space: pre-wrap; }
         <location/>
         <source>Timeout(ms):</source>
         <translation>Тайм-аут(мс):</translation>
+    </message>
+    <message>
+        <location/>
+        <source>IP Connection</source>
+        <translation>IP Соединение</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Serial Connection</source>
+        <translation>Последовательный порт</translation>
     </message>
 </context>
 <context>
@@ -1362,19 +1372,19 @@ p, li { white-space: pre-wrap; }
         <location/>
         <location filename="../../../src/plugins/hitlnew/ui_hitlwidget.h" line="+1"/>
         <source>AutoPilot disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>Автопилот не подключен</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/hitlnew/ui_hitlwidget.h" line="+1"/>
         <source> Simulator disconnected </source>
-        <translation type="unfinished"></translation>
+        <translation>Симулятор не подключен</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/hitlnew/ui_hitlwidget.h" line="+1"/>
         <source>Clear Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Очистить журнал</translation>
     </message>
 </context>
 <context>
@@ -1619,12 +1629,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>VBO allow for performance gains for GPUs that support it (most cards).  This may cause cards with faulty drivers to crash.</source>
-        <translation type="unfinished"></translation>
+        <translation>VBO позволяет повысить производительность, приналичии графического ускорителя.</translation>
     </message>
     <message>
         <location/>
         <source>Enable VBOs:</source>
-        <translation>Разрешить VBOs:</translation>
+        <translation>Разрешить VBO:</translation>
     </message>
 </context>
 <context>
@@ -1665,7 +1675,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Play</source>
-        <translation>Воспроизведение</translation>
+        <translation>Воспроизвести</translation>
     </message>
     <message>
         <location/>
@@ -1730,12 +1740,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Say Order</source>
-        <translation type="unfinished"></translation>
+        <translation>Когда озвучить</translation>
     </message>
     <message>
         <location/>
         <source>Select if the value of the object should be spoken and if so, either before the configured sound or after it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Укажите, если значение свойства должно быть озвучено. И если да, то когда.</translation>
     </message>
     <message>
         <location/>
@@ -1745,22 +1755,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Before first</source>
-        <translation type="unfinished"></translation>
+        <translation>Перед первым</translation>
     </message>
     <message>
         <location/>
         <source>After first</source>
-        <translation type="unfinished"></translation>
+        <translation>После первого</translation>
     </message>
     <message>
         <location/>
         <source>After second</source>
-        <translation type="unfinished"></translation>
+        <translation>После второго</translation>
     </message>
     <message>
         <location/>
         <source>After third</source>
-        <translation type="unfinished"></translation>
+        <translation>После третьего</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/notify/notifypluginoptionspage.cpp" line="+78"/>
@@ -1780,7 +1790,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/notify/notifypluginoptionspage.ui"/>
         <source>Sound Notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Звуковые уведомления</translation>
     </message>
 </context>
 <context>
@@ -1848,7 +1858,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Cancel</source>
-        <translation>Отменить</translation>
+        <translation>Отмена</translation>
     </message>
 </context>
 <context>
@@ -1892,7 +1902,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/opmap/opmap_waypointeditor_dialog.ui"/>
         <source>OpenPilot GCS Waypoint Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Редактор точек маршрута</translation>
     </message>
     <message>
         <location/>
@@ -1902,12 +1912,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Num</source>
-        <translation type="unfinished"></translation>
+        <translation>Номер</translation>
     </message>
     <message>
         <location/>
         <source>Locked</source>
-        <translation type="unfinished">Блокировать</translation>
+        <translation>Блокировать</translation>
     </message>
     <message>
         <location/>
@@ -1932,12 +1942,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Hold Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Время удержания</translation>
     </message>
     <message>
         <location/>
         <source>Height and Timeline</source>
-        <translation type="unfinished"></translation>
+        <translation>Высота и Хронология</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_waypointeditor_dialog.cpp" line="+146"/>
@@ -2181,72 +2191,72 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/opmap/opmapgadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Форма</translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>Default longitude </source>
-        <translation type="unfinished"></translation>
+        <translation>Долгота по умолчанию</translation>
     </message>
     <message>
         <location/>
         <source>Use OpenGL</source>
-        <translation type="unfinished"></translation>
+        <translation>Использовать OpenGL</translation>
     </message>
     <message>
         <location/>
         <source>Default latitude </source>
-        <translation type="unfinished"></translation>
+        <translation>Широта по умолчанию</translation>
     </message>
     <message>
         <location/>
         <source>Default zoom </source>
-        <translation type="unfinished"></translation>
+        <translation>Увеличение по умолчанию</translation>
     </message>
     <message>
         <location/>
         <source>Map type </source>
-        <translation type="unfinished"></translation>
+        <translation>Тип карты</translation>
     </message>
     <message>
         <location/>
         <source>Show Tile Grid Lines</source>
-        <translation type="unfinished"></translation>
+        <translation>Показывать линии сетки</translation>
     </message>
     <message>
         <location/>
         <source>Server and Cache</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер и кэш</translation>
     </message>
     <message>
         <location/>
         <source>Restore default server and cache settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Восстановить сервер и настройки кэш-памяти по умолчанию</translation>
     </message>
     <message>
         <location/>
         <source> Default </source>
-        <translation type="unfinished"></translation>
+        <translation>По умолчанию</translation>
     </message>
     <message>
         <location/>
         <source>Access mode </source>
-        <translation type="unfinished"></translation>
+        <translation>Режим доступа</translation>
     </message>
     <message>
         <location/>
         <source>Cache location </source>
-        <translation type="unfinished"></translation>
+        <translation>Расположение кэша</translation>
     </message>
     <message>
         <location/>
         <source>Use Memory Cache</source>
-        <translation type="unfinished"></translation>
+        <translation>Использовать память под кэш</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/opmap/opmapgadgetoptionspage.cpp" line="+97"/>
         <source>Choose a cache directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Укажите директорию для расположения кэша</translation>
     </message>
 </context>
 <context>
@@ -2327,12 +2337,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>UAVObject:</source>
-        <translation>Объект</translation>
+        <translation>Объект:</translation>
     </message>
     <message>
         <location/>
         <source>UAVField:</source>
-        <translation>Свойство</translation>
+        <translation>Свойство:</translation>
     </message>
     <message>
         <location/>
@@ -2357,18 +2367,19 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Add a new curve to the scope, or update it if the UAVObject and UAVField is the same.</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить новую кривую (или обновить, если объект и свойство те же самые).</translation>
     </message>
     <message>
         <location/>
         <source>Add
 Update</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить
+Обновить</translation>
     </message>
     <message>
         <location/>
         <source>Remove the curve from the scope.</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить кривую графика.</translation>
     </message>
     <message>
         <location/>
@@ -3937,42 +3948,42 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/libs/libqxt/src/gui/qxtcountrymodel.cpp" line="+196"/>
         <source>Name</source>
-        <translation type="unfinished">Название</translation>
+        <translation>Название</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>ISO 3166 Alpha 2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>QLocale</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>ISO 3166 Alpha 3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Currency</source>
-        <translation type="unfinished"></translation>
+        <translation>Валюта</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Currency Code</source>
-        <translation type="unfinished"></translation>
+        <translation>Код валюты</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Currency Symbol</source>
-        <translation type="unfinished"></translation>
+        <translation>Символ валюты</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Continent</source>
-        <translation type="unfinished"></translation>
+        <translation>Континент</translation>
     </message>
 </context>
 <context>
@@ -3980,42 +3991,42 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/libs/libqxt/src/gui/qxtfilterdialog.cpp" line="+115"/>
         <source>Filter options</source>
-        <translation type="unfinished"></translation>
+        <translation>Параметры фильтра</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Match case</source>
-        <translation type="unfinished"></translation>
+        <translation>С учётом регистра</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Filter mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Режим фильтра:</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Fixed String (Default)</source>
-        <translation type="unfinished"></translation>
+        <translation>Строка (по умолчанию)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Wildcard</source>
-        <translation type="unfinished"></translation>
+        <translation>Все</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Regular Expression</source>
-        <translation type="unfinished"></translation>
+        <translation>Регулярное выражение</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Отмена</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Фильтр</translation>
     </message>
 </context>
 <context>
@@ -4028,7 +4039,7 @@ Reason: %3</source>
     <message>
         <location line="+3"/>
         <source>ETA: %r</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6110,62 +6121,62 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/libs/utils/consoleprocess.cpp" line="+48"/>
         <source>Cannot set up communication channel: %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Press &lt;RETURN&gt; to close this window...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Cannot create temporary file: %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Cannot create temporary directory &apos;%1&apos;: %2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Unexpected output from helper program.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Cannot change to working directory &apos;%1&apos;: %2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Cannot execute &apos;%1&apos;: %2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../../src/libs/utils/consoleprocess_unix.cpp" line="+110"/>
         <source>Cannot start the terminal emulator &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+49"/>
         <source>Cannot create socket &apos;%1&apos;: %2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../../src/libs/utils/consoleprocess_win.cpp" line="+124"/>
         <source>The process &apos;%1&apos; could not be started: %2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+70"/>
         <source>Cannot obtain a handle to the inferior: %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+30"/>
         <source>Cannot obtain exit status from inferior: %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6181,22 +6192,22 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/libs/utils/filenamevalidatinglineedit.cpp" line="+94"/>
         <source>The name must not be empty</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя не должно быть пустым</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>The name must not contain any of the characters &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя не должно содержать следующие символы &apos;%1&apos;.</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>The name must not contain &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя не должно содержать &apos;%1&apos;.</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>The name must not match that of a MS Windows device. (%1).</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя не должно совпадать с названием устройства, MS Windows. (%1).</translation>
     </message>
 </context>
 <context>
@@ -6323,12 +6334,12 @@ Reason: %3</source>
     <message>
         <location line="+4"/>
         <source>The unsaved file %1 has been changed outside Qt Creator. Do you want to reload it and discard your changes?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>The file %1 has changed outside Qt Creator. Do you want to reload it?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6857,7 +6868,7 @@ Reason: %3</source>
     <message>
         <location line="+2"/>
         <source>Images (*.png *.jpg *.bmp *.xpm)</source>
-        <translation>Рисунки (*.png *.jpg *.bmp *.xpm)</translation>
+        <translation>Изображения (*.png *.jpg *.bmp *.xpm)</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -7530,26 +7541,26 @@ specific calibration button on top of the screen.</source>
         <location filename="../../../src/plugins/hitlnew/fgoptionspage.ui"/>
         <location filename="../../../src/plugins/hitlnew/ui_fgoptionspage.h" line="+102"/>
         <source>Form</source>
-        <translation type="unfinished">Форма</translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/hitlnew/ui_fgoptionspage.h" line="+1"/>
         <source>FlightGear executable:</source>
-        <translation type="unfinished">Исполняемый файл FlightGear:</translation>
+        <translation>Исполняемый файл FlightGear:</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/hitlnew/ui_fgoptionspage.h" line="+1"/>
         <source>FlightGear data directory:</source>
-        <translation type="unfinished">Каталог FlightGear:</translation>
+        <translation>Каталог FlightGear:</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/hitlnew/ui_fgoptionspage.h" line="+2"/>
         <location line="+2"/>
         <source>Manual aircraft control (can be used when hardware is not available)</source>
-        <translation type="unfinished">Ручное управление (может быть использовано, когда отсутствует оборудование)</translation>
+        <translation>Ручное управление (может быть использовано, когда отсутствует оборудование)</translation>
     </message>
 </context>
 <context>

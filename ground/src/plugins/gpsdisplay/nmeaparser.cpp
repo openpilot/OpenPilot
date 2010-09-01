@@ -63,7 +63,7 @@
 /**
  * Initialize the parser
  */
-NMEAParser::NMEAParser(QObject *parent):QObject(parent)
+NMEAParser::NMEAParser(QObject *parent):GPSParser()
 {
     bufferInit(&gpsRxBuffer, (unsigned char *)gpsRxData, 512);
     gpsRxOverflow=0;

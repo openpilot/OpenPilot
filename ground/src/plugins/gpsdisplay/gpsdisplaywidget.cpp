@@ -34,6 +34,7 @@
 #include <QtGui>
 #include <QDebug>
 #include "nmeaparser.h"
+#include "telemetryparser.h"
 
 
 
@@ -45,20 +46,6 @@ GpsDisplayWidget::GpsDisplayWidget(QWidget *parent) : QWidget(parent)
     widget = new Ui_GpsDisplayWidget();
     widget->setupUi(this);
 
-    QGraphicsScene *scene = new QGraphicsScene(this);
-    QSvgRenderer *renderer = new QSvgRenderer();
-    QGraphicsSvgItem *world = new QGraphicsSvgItem();
-    renderer->load(QString(":/gpsgadget/images/gpsEarth.svg"));
-    world->setSharedRenderer(renderer);
-    world->setElementId("map");
-    scene->addItem(world);
-    scene->setSceneRect(world->boundingRect());
-    widget->gpsWorld->setScene(scene);
-
-    // Scale, can't use fitInView since that doesn't work until we're shown.
-    qreal factor = widget->gpsWorld->size().height()/world->boundingRect().height();
-    world->setScale(factor);
-
     //Not elegant, just load the image for now
     QGraphicsScene *fescene = new QGraphicsScene(this);
     QPixmap earthpix( ":/gpsgadget/images/flatEarth.png" );
@@ -69,14 +56,6 @@ GpsDisplayWidget::GpsDisplayWidget(QWidget *parent) : QWidget(parent)
             this,SLOT(connectButtonClicked()));
     connect(widget->disconnectButton, SIGNAL(clicked(bool)),
             this,SLOT(disconnectButtonClicked()));
-    parser=new NMEAParser();
-    connect(parser,SIGNAL(sv(int)),this,SLOT(setSVs(int)));
-    connect(parser,SIGNAL(position(double,double,double)),this,SLOT(setPosition(double,double,double)));
-    connect(parser,SIGNAL(speedheading(double,double)),this,SLOT(setSpeedHeading(double,double)));
-    connect(parser,SIGNAL(datetime(double,double)),this,SLOT(setDateTime(double,double)));
-    connect(parser,SIGNAL(packet(char*)), this, SLOT(dumpPacket(char*)));
-
-    port = NULL;
 }
 
 GpsDisplayWidget::~GpsDisplayWidget()
@@ -143,16 +122,38 @@ void GpsDisplayWidget::setPosition(double lat, double lon, double alt)
     //widget->textBrowser->append(temp);
 }
 
+
 void GpsDisplayWidget::setPort(QextSerialPort* port)
 {
 
     this->port=port;
 }
 
-void GpsDisplayWidget::setParser(NMEAParser* parser)
+void GpsDisplayWidget::setParser(QString connectionMode)
 {
 
-    this->parser=parser;
+    if (connectionMode == "Serial") {
+        parser = new NMEAParser();
+        widget->connectButton->setEnabled(true);
+        widget->disconnectButton->setEnabled(false);
+
+    } else if (connectionMode == "Telemetry") {
+        parser = new TelemetryParser();
+        widget->connectButton->setEnabled(false);
+        widget->disconnectButton->setEnabled(false);
+    } else {
+        parser = new NMEAParser(); // for the time being...
+    }
+
+    connect(parser,SIGNAL(sv(int)),this,SLOT(setSVs(int)));
+    connect(parser,SIGNAL(position(double,double,double)),this,SLOT(setPosition(double,double,double)));
+    connect(parser,SIGNAL(speedheading(double,double)),this,SLOT(setSpeedHeading(double,double)));
+    connect(parser,SIGNAL(datetime(double,double)),this,SLOT(setDateTime(double,double)));
+    connect(parser,SIGNAL(packet(char*)), this, SLOT(dumpPacket(char*)));
+    connect(parser, SIGNAL(satellite(int,int,int,int,int)), widget->gpsSky, SLOT(updateSat(int,int,int,int,int)))
+;
+    port = NULL;
+
 }
 
 void GpsDisplayWidget::connectButtonClicked() {

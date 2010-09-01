@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       nmeaparser.h
+ * @file       gpsparser.h
  * @author     Sami Korhonen Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
@@ -25,59 +25,27 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef NMEAPARSER_H
-#define NMEAPARSER_H
+#ifndef GPSPARSER_H
+#define GPSPARSER_H
 
 #include <QObject>
 #include <QtCore>
 #include <stdint.h>
-#include "buffer.h"
-#include "gpsparser.h"
 
-// constants/macros/typdefs
-#define NMEA_BUFFERSIZE		128
 
-typedef struct struct_GpsData
+class GPSParser: public QObject
 {
-        double Latitude;
-        double Longitude;
-        double Altitude;
-        double Groundspeed;
-        double Heading;
-        int SV;
-        int Status;
-        double PDOP;
-        double HDOP;
-        double VDOP;
-        double GeoidSeparation;
-        double GPStime;
-        double GPSdate;
-
-}GpsData_t;
-
-class NMEAParser: public GPSParser
-{
-
+    Q_OBJECT
 public:
-   NMEAParser(QObject *parent = 0);
-   ~NMEAParser();
-   void processInputStream(char c);
-   char* nmeaGetPacketBuffer(void);
-   char nmeaChecksum(char* gps_buffer);
-   uint8_t nmeaProcess(cBuffer* rxBuffer);
-   void nmeaProcessGPGGA(char* packet);
-   void nmeaProcessGPRMC(char* packet);
-   void nmeaProcessGPVTG(char* packet);
-   void nmeaProcessGPGSA(char* packet);
-   void nmeaProcessGPGSV(char* packet);
-   GpsData_t GpsData;
-   cBuffer gpsRxBuffer;
-   char gpsRxData[512];
-   char NmeaPacket[NMEA_BUFFERSIZE];
-   uint32_t numUpdates;
-   uint32_t numErrors;
-   int32_t gpsRxOverflow;
+    void processInputStream(char c) { Q_UNUSED(c)};
+signals:
+   void sv(int); // Satellites in view
+   void position(double,double,double); // Lat, Lon, Alt
+   void datetime(double,double); // Date then time
+   void speedheading(double,double);
+   void packet(char*); // Raw NMEA Packet (or just info)
+   void satellite(int,int,int,int,int); // Index, PRN, Elevation, Azimuth, SNR
 
 };
 
-#endif // NMEAPARSER_H
+#endif // GPSPARSER_H

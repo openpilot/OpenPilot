@@ -39,6 +39,9 @@ class GpsDisplayGadgetConfiguration : public IUAVGadgetConfiguration
     public:
         explicit GpsDisplayGadgetConfiguration(QString classId, const QByteArray &state = 0, QObject *parent = 0);
 
+        void setConnectionMode(QString mode) { m_connectionMode = mode; }
+        QString connectionMode() { return m_connectionMode; }
+
         //set port configuration functions
         void setSpeed(BaudRateType speed) {m_defaultSpeed=speed;}
         void setDataBits(DataBitsType databits) {m_defaultDataBits=databits;}
@@ -61,6 +64,7 @@ class GpsDisplayGadgetConfiguration : public IUAVGadgetConfiguration
         IUAVGadgetConfiguration *clone();
 
     private:
+        QString m_connectionMode;
         QString m_defaultPort;
         BaudRateType m_defaultSpeed;
         DataBitsType m_defaultDataBits;

@@ -48,25 +48,34 @@ GpsDisplayGadget::~GpsDisplayGadget()
 void GpsDisplayGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 {
     GpsDisplayGadgetConfiguration *m = qobject_cast< GpsDisplayGadgetConfiguration*>(config);
-    PortSettings portsettings;
-    portsettings.BaudRate=m->speed();
-    portsettings.DataBits=m->dataBits();
-    portsettings.FlowControl=m->flow();
-    portsettings.Parity=m->parity();
-    portsettings.StopBits=m->stopBits();
-    portsettings.Timeout_Millisec=m->timeOut();
 
-    QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
-    foreach( QextPortInfo nport, ports ) {
-           if(nport.friendName == m->port())
+    if (m->connectionMode() == "Serial") {
+        PortSettings portsettings;
+        portsettings.BaudRate=m->speed();
+        portsettings.DataBits=m->dataBits();
+        portsettings.FlowControl=m->flow();
+        portsettings.Parity=m->parity();
+        portsettings.StopBits=m->stopBits();
+        portsettings.Timeout_Millisec=m->timeOut();
+
+        QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
+        foreach( QextPortInfo nport, ports ) {
+            if(nport.friendName == m->port())
             {
 #ifdef Q_OS_WIN
-            QextSerialPort *port=new QextSerialPort(nport.portName,portsettings,QextSerialPort::EventDriven);
+                QextSerialPort *port=new QextSerialPort(nport.portName,portsettings,QextSerialPort::EventDriven);
 #else
-            QextSerialPort *port=new QextSerialPort(nport.physName,portsettings,QextSerialPort::EventDriven);
+                QextSerialPort *port=new QextSerialPort(nport.physName,portsettings,QextSerialPort::EventDriven);
 #endif
-            //Creates new serial port with the user configuration and passes it to the widget
-            m_widget->setPort(port);
+                //Creates new serial port with the user configuration and passes it to the widget
+                m_widget->setParser(QString("Serial"));
+                m_widget->setPort(port);
+            }
         }
-       }
+    } else if (m->connectionMode() == "Telemetry") {
+        m_widget->setParser(QString("Telemetry"));
+
+    } else if (m->connectionMode() == "Network") {
+       // Not implemented for now...
+    }
 }

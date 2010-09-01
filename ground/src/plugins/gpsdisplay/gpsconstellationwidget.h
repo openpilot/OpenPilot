@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       gpsdisplaywidget.h
+ * @file       gpsconstellationwidget.h
  * @author     Edouard Lafargue Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup GPSGadgetPlugin GPS Gadget Plugin
  * @{
- * @brief A gadget that displays GPS status and enables basic configuration 
+ * @brief A widget which displays the GPS constellation
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -25,51 +25,38 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef GPSDISPLAYWIDGET_H_
-#define GPSDISPLAYWIDGET_H_
+#ifndef GPSCONSTELLATIONWIDGET_H_
+#define GPSCONSTELLATIONWIDGET_H_
 
-#include "gpsdisplaygadgetconfiguration.h"
-#include "gpsconstellationwidget.h"
-#include "uavobjects/uavobject.h"
 #include <QGraphicsView>
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
 
-#include <QFile>
-#include <QTimer>
-#include "nmeaparser.h"
 
-class Ui_GpsDisplayWidget;
-
-class GpsDisplayWidget : public QWidget
+class GpsConstellationWidget : public QGraphicsView
 {
     Q_OBJECT
 
 public:
-    GpsDisplayWidget(QWidget *parent = 0);
-   ~GpsDisplayWidget();
+    GpsConstellationWidget(QWidget *parent = 0);
+   ~GpsConstellationWidget();
 
-//   void setMode(QString mode);  // Either UAVTalk or serial port
-   void setPort(QextSerialPort* port);
-   void setParser(QString connectionMode);
+public slots:
+   void updateSat(int index, int prn, int elevation, int azimuth, int snr);
+
 
 private slots:
-   void connectButtonClicked();
-   void disconnectButtonClicked();
-   void onDataAvailable();
-   void setSVs(int);
-   void setPosition(double, double, double);
-   void setDateTime(double, double);
-   void setSpeedHeading(double, double);
-   void dumpPacket(char*);
 
 private:
-   void processNewSerialData(QByteArray serialData);
-   Ui_GpsDisplayWidget* widget;
-   GpsConstellationWidget * gpsConstellation;
-   QextSerialPort *port;
-   GPSParser *parser;
-   bool connected;
+   int satellites[16][4];
+   QGraphicsSvgItem* satIcons[16];
+   QGraphicsSvgItem *world;
+   QGraphicsView *gpsConstellation;
+   QPointF polarToCoord(int elevation, int azimuth);
+
+protected:
+    void showEvent(QShowEvent *event);
+
 
 };
-#endif /* GPSDISPLAYWIDGET_H_ */
+#endif /* GPSCONSTELLATIONWIDGET_H_ */

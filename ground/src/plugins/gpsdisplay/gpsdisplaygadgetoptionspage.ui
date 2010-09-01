@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>486</width>
-    <height>300</height>
+    <width>587</width>
+    <height>359</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -38,13 +38,13 @@
        <string>Mode:</string>
       </property>
      </widget>
-     <widget class="QComboBox" name="comboBox">
+     <widget class="QComboBox" name="connectionMode">
       <property name="geometry">
        <rect>
         <x>50</x>
-        <y>10</y>
-        <width>69</width>
-        <height>22</height>
+        <y>1</y>
+        <width>101</width>
+        <height>31</height>
        </rect>
       </property>
      </widget>
@@ -64,84 +64,84 @@
      <widget class="QWidget" name="formLayoutWidget">
       <property name="geometry">
        <rect>
-        <x>50</x>
-        <y>50</y>
-        <width>421</width>
-        <height>201</height>
+        <x>10</x>
+        <y>73</y>
+        <width>221</width>
+        <height>261</height>
        </rect>
       </property>
       <layout class="QFormLayout" name="formLayout">
        <property name="fieldGrowthPolicy">
         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
        </property>
-       <item row="1" column="0">
+       <item row="0" column="0">
         <widget class="QLabel" name="portLabel">
          <property name="text">
           <string>Port:</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
+       <item row="0" column="1">
         <widget class="QComboBox" name="portComboBox"/>
        </item>
-       <item row="2" column="0">
+       <item row="1" column="0">
         <widget class="QLabel" name="portSpeedLabel">
          <property name="text">
           <string>Port Speed:</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item row="1" column="1">
         <widget class="QComboBox" name="portSpeedComboBox"/>
        </item>
-       <item row="3" column="0">
+       <item row="2" column="0">
         <widget class="QLabel" name="flowControlLabel">
          <property name="text">
           <string>Flow Control:</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="2" column="1">
         <widget class="QComboBox" name="flowControlComboBox"/>
        </item>
-       <item row="4" column="0">
+       <item row="3" column="0">
         <widget class="QLabel" name="dataBitsLabel">
          <property name="text">
           <string>Data Bits:</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="3" column="1">
         <widget class="QComboBox" name="dataBitsComboBox"/>
        </item>
-       <item row="5" column="0">
+       <item row="4" column="0">
         <widget class="QLabel" name="stopBitsLabel">
          <property name="text">
           <string>Stop Bits:</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
+       <item row="4" column="1">
         <widget class="QComboBox" name="stopBitsComboBox"/>
        </item>
-       <item row="6" column="0">
+       <item row="5" column="0">
         <widget class="QLabel" name="parityLabel">
          <property name="text">
           <string>Parity:</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="5" column="1">
         <widget class="QComboBox" name="parityComboBox"/>
        </item>
-       <item row="7" column="0">
+       <item row="6" column="0">
         <widget class="QLabel" name="timeoutLabel">
          <property name="text">
           <string>Timeout(ms):</string>
          </property>
         </widget>
        </item>
-       <item row="7" column="1">
+       <item row="6" column="1">
         <widget class="QSpinBox" name="timeoutSpinBox">
          <property name="maximum">
           <number>100000</number>
@@ -149,6 +149,32 @@
         </widget>
        </item>
       </layout>
+     </widget>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>50</y>
+        <width>111</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>IP Connection</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_2">
+      <property name="geometry">
+       <rect>
+        <x>60</x>
+        <y>50</y>
+        <width>125</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Serial Connection</string>
+      </property>
      </widget>
     </widget>
    </item>

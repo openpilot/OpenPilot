@@ -227,6 +227,13 @@ QWidget *GpsDisplayGadgetOptionsPage::createPage(QWidget *parent)
     // TIMEOUT
     options_page->timeoutSpinBox->setValue(m_config->timeOut());
 
+    QStringList connectionModes;
+    connectionModes << "Serial" << "Network" << "Telemetry";
+    options_page->connectionMode->addItems(connectionModes);
+    int conMode = options_page->connectionMode->findText(m_config->connectionMode());
+    if (conMode != -1)
+       options_page->connectionMode->setCurrentIndex(conMode);
+
 
     return optionsPageWidget;
 }
@@ -249,6 +256,8 @@ void GpsDisplayGadgetOptionsPage::apply()
     m_config->setStopBits((StopBitsType)StopBitsTypeStringALL.indexOf(options_page->stopBitsComboBox->currentText()));
     m_config->setParity((ParityType)ParityTypeStringALL.indexOf(options_page->parityComboBox->currentText()));
     m_config->setTimeOut( options_page->timeoutSpinBox->value());
+    m_config->setConnectionMode(options_page->connectionMode->currentText());
+
 }
 
 void GpsDisplayGadgetOptionsPage::finish()

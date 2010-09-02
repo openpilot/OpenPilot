@@ -164,24 +164,20 @@ static void manualControlTask(void* parameters)
         else
             ManualControlCommandGet(&cmd); /* Under GCS control */
 
-		// Check for connection status (negative throttle values)
-		// The receiver failsafe for the throttle channel should be set to a value below the channel NEUTRAL
-		if ( cmd.Throttle < THROTTLE_FAILSAFE )
+		// Must check both Max and Min in case they reversed
+		if (cmd.Channel[settings.Throttle] < settings.ChannelMax[settings.Throttle]  &&
+			cmd.Channel[settings.Throttle] < settings.ChannelMin[settings.Throttle])
 		{
 			cmd.Connected = MANUALCONTROLCOMMAND_CONNECTED_FALSE;
-			cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO;
+			//cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO; // don't do until AUTO implemented and functioning
 			AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
-            ManualControlCommandSet(&cmd);
+			ManualControlCommandSet(&cmd);
 		}
 		else
 		{
 			cmd.Connected = MANUALCONTROLCOMMAND_CONNECTED_TRUE;
 			AlarmsClear(SYSTEMALARMS_ALARM_MANUALCONTROL);
-			if ( cmd.Throttle < 0 )
-			{
-				cmd.Throttle = 0;
-			}
-            ManualControlCommandSet(&cmd);
+			ManualControlCommandSet(&cmd);
 		}
     
 		// Depending on the mode update the Stabilization or Actuator objects

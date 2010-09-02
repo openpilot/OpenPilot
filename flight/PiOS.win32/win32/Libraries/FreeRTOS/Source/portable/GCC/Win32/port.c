@@ -108,7 +108,7 @@ typedef struct
 
 #define portNO_CRITICAL_NESTING 		( ( unsigned portLONG ) 0 )
 
-//#define DEBUG_OUTPUT
+#define DEBUG_OUTPUT
 //#define ERROR_OUTPUT
 
 #ifdef DEBUG_OUTPUT
@@ -234,7 +234,11 @@ static DWORD WINAPI tick_generator(LPVOID lpParameter)
 		before = (float)clock()/CLOCKS_PER_SEC;
 		debug_printf("tick before, %f\n", before);
 		SetWaitableTimer(hTimer, &liDueTime, 0, NULL, NULL, FALSE);
-		WaitForMultipleObjects(2, hObjList, TRUE, INFINITE);
+		if(WaitForMultipleObjects(2, hObjList, TRUE, 1000) == WAIT_TIMEOUT)
+		{
+			printf("Tick generator: timed out at WaitForMultipleObjects\n");
+			return 0;
+		}
 		after = (float)clock()/CLOCKS_PER_SEC;
 		debug_printf("tick after, %f\n", after);
 		debug_printf("diff: %f\n", after - before);
@@ -245,7 +249,11 @@ static DWORD WINAPI tick_generator(LPVOID lpParameter)
 
 		// wait till interrupt handler acknowledges the interrupt (avoids
 		// overruns).
-		SignalObjectAndWait(hIsrMutex, hTickAck, INFINITE, FALSE);
+		if(SignalObjectAndWait(hIsrMutex, hTickAck, 1000, FALSE) == WAIT_TIMEOUT)
+		{
+			printf("Tick generator: timed out at SignalObjectAndWait\n");
+			return 0;
+		}
 	}
 }
 
@@ -344,7 +352,11 @@ portBASE_TYPE xPortStartScheduler( void )
 
 	for(;;)
 	{
-		WaitForMultipleObjects(2, hObjList, TRUE, INFINITE);
+		if(WaitForMultipleObjects(2, hObjList, TRUE, 1000) == WAIT_TIMEOUT)
+		{
+			printf("vPortStartScheduler: timed out at WaitForMultipleObjects\n");
+			return 0;
+		}
 
 		psSim=(SSIM_T *)*pxCurrentTCB;
 
@@ -385,7 +397,7 @@ portBASE_TYPE xPortStartScheduler( void )
 						SuspendThread(psSim->hThread);
 
 					vTaskIncrementTick();
-					debug_printf("Sending tick ack...\n");
+					//debug_printf("Sending tick ack...\n");
 					SetEvent(hTickAck);
 					break;
 

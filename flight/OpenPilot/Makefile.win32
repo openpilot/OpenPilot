@@ -149,13 +149,16 @@ SRC += $(OPUAVOBJ)/stabilizationsettings.c
 SRC += $(OPUAVOBJ)/ahrsstatus.c
 SRC += $(OPUAVOBJ)/baroaltitude.c
 SRC += $(OPUAVOBJ)/attitudeactual.c
-SRC += $(OPUAVOBJ)/attitudesettings.c
 SRC += $(OPUAVOBJ)/flightsituationactual.c
 SRC += $(OPUAVOBJ)/navigationsettings.c
 SRC += $(OPUAVOBJ)/navigationdesired.c
 SRC += $(OPUAVOBJ)/flightbatterystate.c
 SRC += $(OPUAVOBJ)/attituderaw.c
 SRC += $(OPUAVOBJ)/homelocation.c
+SRC += $(OPUAVOBJ)/ahrscalibration.c
+SRC += $(OPUAVOBJ)/ahrssettings.c
+SRC += $(OPUAVOBJ)/gpstime.c
+SRC += $(OPUAVOBJ)/gpssatellites.c
 endif
 
 ## PIOS Hardware (win32)

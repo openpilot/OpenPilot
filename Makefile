@@ -13,6 +13,7 @@ endif
 ifeq ($(UNAME), Darwin)
   QT_SPEC=macx-g++
 endif
+QT_SPEC=win32-g++
 
 # Set up misc host tools
 RM=rm

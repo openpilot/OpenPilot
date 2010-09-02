@@ -1578,6 +1578,7 @@ void vTaskSwitchContext( void )
 	/* Find the highest priority queue that contains ready tasks. */
 	while( listLIST_IS_EMPTY( &( pxReadyTasksLists[ uxTopReadyPriority ] ) ) )
 	{
+		printf("%i is empty\n", (int) uxTopReadyPriority);
 		--uxTopReadyPriority;
 	}
 

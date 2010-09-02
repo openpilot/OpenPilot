@@ -5,6 +5,8 @@
 #include <../../plugins/rawhid/pjrc_rawhid.h>
 #include <QDebug>
 #include <QFile>
+ #include <QCryptographicHash>
+#include <QList>
 #define BUF_LEN 64
 class OP_DFU
 {
@@ -45,12 +47,22 @@ public:
         Status_Rep,
 
     };
+    struct device
+    {
+            int ID;
+            int SizeOfHash;
+            int SizeOfDesc;
+            quint32 SizeOfCode;
+            bool Readable;
+            bool Writable;
+    };
+
     void JumpToApp();
     void ResetDevice(void);
     void enterDFU(int devNumber);
     void StartUpload(qint32 numberOfBytes, TransferTypes type);
     void UploadData(qint32 numberOfPackets,QByteArray data);
-    void UploadDescription(int devNumber, QString description);
+    void UploadDescription(QString description);
     void UploadFirmware(const QString &sfile);
     int StatusRequest();
     void EndOperation();
@@ -59,7 +71,11 @@ public:
     void CopyWords(char * source, char* destination, int count);
    // QByteArray DownloadData(int devNumber,int numberOfPackets);
     OP_DFU();
+    void findDevices();
 private:
+    int numberOfDevices;
+    int RWFlags;
+    QList<device> devices;
     pjrc_rawhid hidHandle;
     int setStartBit(int command){return command|0x20;}
 };

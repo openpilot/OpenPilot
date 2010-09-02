@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
         filename = QString(argv[1]);
 
     OP_DFU dfu;
+    dfu.enterDFU(0);
 //    dfu.enterDFU(1);
 //    dfu.StartUpload(4,OP_DFU::Descript);
 //    QByteArray array;
@@ -25,10 +26,15 @@ int main(int argc, char *argv[])
 //    array[6]=7;
 //    array[7]=8;
 //    dfu.UploadData(8,array);
-    //dfu.UploadDescription(1,"jose manuel");
-    //QString str=dfu.DownloadDescription(1,12);
+//   dfu.UploadDescription(1,"jose manuel");
+   // QString str=dfu.DownloadDescription(1,12);
    // dfu.JumpToApp();
-  dfu.UploadFirmware(filename.toAscii());
-    //qDebug()<<"Description="<<str;
+    dfu.findDevices();
+
+    dfu.UploadFirmware(filename.toAscii());
+    dfu.UploadDescription("jose manuel");
+   // QString str=dfu.DownloadDescription(1,12);
+    // dfu.JumpToApp();
+  //  qDebug()<<"Description="<<str;
     return a.exec();
 }

@@ -53,7 +53,7 @@ void OP_DFU::StartUpload(qint32 numberOfBytes, TransferTypes type)
     buf[7] = lastPacketCount;//DFU Data1
     buf[8] = 1;//DFU Data2
     buf[9] = 1;//DFU Data3
-
+    qDebug()<<"Number of packets:"<<numberOfPackets<<" Size of last packet:"<<lastPacketCount;
     int result = hidHandle.send(0,buf, BUF_LEN, 5000);
 
     qDebug() << result << " bytes sent";
@@ -104,9 +104,8 @@ void OP_DFU::UploadData(qint32 numberOfBytes, QByteArray data)
       //  qDebug() << "UPLOAD:"<<"Data="<<(int)buf[6]<<(int)buf[7]<<(int)buf[8]<<(int)buf[9]<<";"<<result << " bytes sent";
     }
 }
-void OP_DFU::UploadDescription(int devNumber, QString description)
+void OP_DFU::UploadDescription(QString description)
 {
-    enterDFU(devNumber);
     if(description.length()%2!=0)
     {
 
@@ -117,17 +116,17 @@ void OP_DFU::UploadDescription(int devNumber, QString description)
         padding.fill(' ',pad);
         description.append(padding);
     }
-    StartUpload(description.length()/4,OP_DFU::Descript);
+    StartUpload(description.length(),OP_DFU::Descript);
     QByteArray array=description.toAscii();
-    UploadData(description.length()/4,array);
+    UploadData(description.length(),array);
     EndOperation();
     int ret=StatusRequest();
-    qDebug()<<"Status="<<ret;
+    qDebug()<<"Upload description Status="<<ret;
 }
 QString OP_DFU::DownloadDescription(int devNumber, int numberOfChars)
 {
    // enterDFU(devNumber);
-    QByteArray arr=StartDownload(numberOfChars/4,Descript);
+    QByteArray arr=StartDownload(numberOfChars,Descript);
     QString str(arr);
     return str;
 
@@ -204,10 +203,9 @@ int OP_DFU::StatusRequest()
     buf[8] = 0;
     buf[9] = 0;
 
-    int result = hidHandle.send(0,buf, BUF_LEN, 500);
-    hidHandle.receive(0,buf,BUF_LEN,500);
+    int result = hidHandle.send(0,buf, BUF_LEN, 5000);
     qDebug() << result << " bytes sent";
-    result = hidHandle.receive(0,buf,BUF_LEN,500);
+    result = hidHandle.receive(0,buf,BUF_LEN,5000);
     qDebug() << result << " bytes received";
     if(buf[1]==OP_DFU::Status_Rep)
     {
@@ -216,6 +214,72 @@ int OP_DFU::StatusRequest()
     else
         return -1;
 
+
+}
+void OP_DFU::findDevices()
+{
+    devices.clear();
+    char buf[BUF_LEN];
+    buf[0] =0x02;//reportID
+    buf[1] = OP_DFU::Req_Capabilities;//DFU Command
+    buf[2] = 0;
+    buf[3] = 0;
+    buf[4] = 0;
+    buf[5] = 0;
+    buf[6] = 0;
+    buf[7] = 0;
+    buf[8] = 0;
+    buf[9] = 0;
+    int result = hidHandle.send(0,buf, BUF_LEN, 5000);
+    result = hidHandle.receive(0,buf,BUF_LEN,5000);
+    numberOfDevices=buf[7];
+    RWFlags=buf[8];
+    RWFlags=RWFlags<<8 | buf[9];
+
+
+    if(buf[1]==OP_DFU::Rep_Capabilities)
+    {
+        for(int x=0;x<numberOfDevices;++x)
+        {
+            device dev;
+            dev.Readable=(bool)(RWFlags>>(x*2) & 1);
+            dev.Writable=(bool)(RWFlags>>(x*2+1) & 1);
+            devices.append(dev);
+            buf[0] =0x02;//reportID
+            buf[1] = OP_DFU::Req_Capabilities;//DFU Command
+            buf[2] = 0;
+            buf[3] = 0;
+            buf[4] = 0;
+            buf[5] = 0;
+            buf[6] = x+1;
+            buf[7] = 0;
+            buf[8] = 0;
+            buf[9] = 0;
+            int result = hidHandle.send(0,buf, BUF_LEN, 5000);
+            result = hidHandle.receive(0,buf,BUF_LEN,5000);
+            devices[x].ID=buf[9];
+            devices[x].SizeOfHash=buf[7];
+            qDebug()<<"---------------"<<(int)buf[8];
+            devices[x].SizeOfDesc=buf[8];
+            quint32 aux;
+            aux=(quint8)buf[2];
+            aux=aux<<8 |(quint8)buf[3];
+            aux=aux<<8 |(quint8)buf[4];
+            aux=aux<<8 |(quint8)buf[5];
+            devices[x].SizeOfCode=aux;
+        }
+        qDebug()<<"Found "<<numberOfDevices;
+        for(int x=0;x<numberOfDevices;++x)
+        {
+            qDebug()<<"Device #"<<x+1;
+            qDebug()<<"Device ID="<<devices[x].ID;
+            qDebug()<<"Device Readable="<<devices[x].Readable;
+            qDebug()<<"Device Writable="<<devices[x].Writable;
+            qDebug()<<"Device SizeOfCode="<<devices[x].SizeOfCode;
+            qDebug()<<"Device SizeOfHash="<<devices[x].SizeOfHash;
+            qDebug()<<"Device SizeOfDesc="<<devices[x].SizeOfDesc;
+                }
+    }
 
 }
 void OP_DFU::EndOperation()
@@ -233,12 +297,11 @@ void OP_DFU::EndOperation()
     buf[9] = 0;
 
     int result = hidHandle.send(0,buf, BUF_LEN, 5000);
-    hidHandle.receive(0,buf,BUF_LEN,5000);
+   // hidHandle.receive(0,buf,BUF_LEN,5000);
     qDebug() << result << " bytes sent";
 }
 void OP_DFU::UploadFirmware(const QString &sfile)
 {
-    enterDFU(1);
     QFile file(sfile);
     //QFile file("in.txt");
     if (!file.open(QIODevice::ReadOnly))
@@ -247,6 +310,8 @@ void OP_DFU::UploadFirmware(const QString &sfile)
              return;
                  }
     QByteArray arr=file.readAll();
+    QByteArray hash=QCryptographicHash::hash(arr,QCryptographicHash::Sha1);
+    qDebug()<<"hash size="<<hash.length()<<" -"<<hash;
     qDebug()<<"Bytes Loaded="<<arr.length();
     if(arr.length()%4!=0)
     {
@@ -256,10 +321,22 @@ void OP_DFU::UploadFirmware(const QString &sfile)
     pad=pad-arr.length();
     arr.append(QByteArray(pad,255));
 }
+    qDebug()<<"1";
     StartUpload(arr.length(),FW);
+    qDebug()<<"2";
     UploadData(arr.length(),arr);
+    qDebug()<<"3";
     EndOperation();
+    qDebug()<<"4";
     int ret=StatusRequest();
+    qDebug()<<"5";
+    qDebug()<<"Status="<<ret;
+    StartUpload(hash.length(),Hash);
+    qDebug()<<"6";
+    UploadData(hash.length(),hash);
+    qDebug()<<"7";
+    EndOperation();
+    ret=StatusRequest();
     qDebug()<<"Status="<<ret;
 
 }

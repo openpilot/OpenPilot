@@ -138,7 +138,7 @@ if (EchoReqFlag == 1) {
 }
 switch (Command) {
 case EnterDFU:
-	if ((DeviceState == idle) && (Data0 < numberOfDevices)) {
+	if (((DeviceState == idle) && (Data0 < numberOfDevices)) || (DeviceState == DFUidle)) {
 		DeviceState = DFUidle;
 		currentProgrammingDestination = devicesTable[Data0].programmingType;
 		currentDeviceCanRead = devicesTable[Data0].readWriteFlags & 0x01;
@@ -197,7 +197,7 @@ case Upload:
 				Aditionals = Count;
 			} else if (Count == Next_Packet - 1) {
 				uint8_t numberOfWords = 14;
-				if (Count == SizeOfTransfer)//is this the last packet?
+				if (Count == SizeOfTransfer-1)//is this the last packet?
 				{
 					numberOfWords = SizeOfLastPacket;
 				}
@@ -262,14 +262,14 @@ case Req_Capabilities:
 		Buffer[8] = WRFlags >> 8;
 		Buffer[9] = WRFlags;
 	} else {
-		Buffer[2] = devicesTable[Data0].sizeOfCode >> 24;
-		Buffer[3] = devicesTable[Data0].sizeOfCode >> 16;
-		Buffer[4] = devicesTable[Data0].sizeOfCode >> 8;
-		Buffer[5] = devicesTable[Data0].sizeOfCode;
+		Buffer[2] = devicesTable[Data0-1].sizeOfCode >> 24;
+		Buffer[3] = devicesTable[Data0-1].sizeOfCode >> 16;
+		Buffer[4] = devicesTable[Data0-1].sizeOfCode >> 8;
+		Buffer[5] = devicesTable[Data0-1].sizeOfCode;
 		Buffer[6] = Data0;
-		Buffer[7] = devicesTable[Data0].sizeOfHash;
-		Buffer[8] = devicesTable[Data0].sizeOfDescription;
-		Buffer[8] = devicesTable[Data0].devID;
+		Buffer[7] = devicesTable[Data0-1].sizeOfHash;
+		Buffer[8] = devicesTable[Data0-1].sizeOfDescription;
+		Buffer[9] = devicesTable[Data0-1].devID;
 	}
 	USB_SIL_Write(EP1_IN, (uint8_t*) Buffer, 64);
 	SetEPTxValid(ENDP1);

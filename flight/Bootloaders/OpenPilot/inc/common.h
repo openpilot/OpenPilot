@@ -8,63 +8,71 @@
 #ifndef COMMON_H_
 #define COMMON_H_
 
-
-/**************************************************/
-/* OP_DFU Memory locations                       */
-/**************************************************/
-
-#define StartOfUserCode					0x08006000
-
-/**************************************************/
-/* OP_DFU Mem Sizes			                      */
-/**************************************************/
-
-#define SizeOfHash					60
-#define SizeOfDescription			100
-#define SizoOfCode					100
-
-
+#include "board.h"
 
 /**************************************************/
 /* OP_DFU states                       */
 /**************************************************/
 
-#define DFUidle					0
-#define uploading				1
-#define wrong_packet_received	2
-#define too_many_packets		3
-#define too_few_packets			4
-#define Last_operation_Success	5
-#define downloading				6
-#define idle					7
-#define Last_operation_failed	8
-#define uploadingStarting		9
-
+typedef enum
+{DFUidle,				//0
+uploading,				//1
+wrong_packet_received,	//2
+too_many_packets,		//3
+too_few_packets,		//4
+Last_operation_Success,	//5
+downloading,			//6
+idle,					//7
+Last_operation_failed,	//8
+uploadingStarting,		//9
+outsideDevCapabilities,	//10
+test
+}DFUStates;
 /**************************************************/
 /* OP_DFU commands                       */
 /**************************************************/
-
-#define Reserved						0
-#define Req_Capabilities				1
-#define Rep_Capabilities				2
-#define EnterDFU						3
-#define JumpFW							4
-#define Reset 							5
-#define Abort_Operation					6
-#define Upload							7
-#define Op_END							8
-#define Download_Req					9
-#define Download						10
-#define Status_Request					11
-#define Status_Rep 						12
-
+typedef enum
+{
+Reserved,						//0
+Req_Capabilities,				//1
+Rep_Capabilities,				//2
+EnterDFU,						//3
+JumpFW,							//4
+Reset, 							//5
+Abort_Operation,				//6
+Upload,							//7
+Op_END,							//8
+Download_Req,					//9
+Download,						//10
+Status_Request,					//11
+Status_Rep 					//12
+}DFUCommands;
 /**************************************************/
 /* OP_DFU transfer types                       */
 /**************************************************/
-
-#define FW								0
-#define Hash							1
-#define Descript						2
+typedef enum
+{
+FW,								//0
+Hash,							//1
+Descript						//2
+}DFUTransfer;
+/**************************************************/
+/* OP_DFU programable programable HW types        */
+/**************************************************/
+typedef enum
+{
+Self_flash,   					//0
+Remote_flash_via_spi			//1
+}DFUProgType;
+/**************************************************/
+/* OP_DFU programable sources			          */
+/**************************************************/
+#define USB	0
+#define SPI 1
 
 #define DownloadDelay					100000
+
+#define MAX_DEL_RETRYS					3
+#define MAX_WRI_RETRYS					3
+
 #endif /* COMMON_H_ */

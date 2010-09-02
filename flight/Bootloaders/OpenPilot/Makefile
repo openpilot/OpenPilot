@@ -93,6 +93,8 @@ SRC += $(HIDSYSTEM)/usb_prop.c
 SRC += $(HIDSYSTEM)/usb_pwr.c
 SRC += $(HIDSYSTEM)/stm3210e_eval.c
 SRC += $(HIDSYSTEM)/stopwatch.c
+SRC += $(HIDSYSTEM)/op_dfu.c
+SRC += $(HIDSYSTEM)/flash_dfu.c
 
 ## CMSIS for STM32
 SRC += $(CMSISDIR)/core_cm3.c

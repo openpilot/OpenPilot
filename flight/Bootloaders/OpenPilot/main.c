@@ -14,13 +14,16 @@
  *******************************************************************************/
 
 /* Includes ------------------------------------------------------------------*/
+
 #include "stm32f10x.h"
+
 #include "usb_lib.h"
 #include "hw_config.h"
 #include "stm32_eval.h"
 #include "common.h"
 #include "platform_config.h"
 #include "stopwatch.h"
+#include "op_dfu.h"
 extern void FLASH_Download();
 #define BSL_HOLD_STATE       ((USB_DISCONNECT->IDR & USB_DISCONNECT_PIN) ? 0 : 1)
 
@@ -39,7 +42,7 @@ uint32_t period2 = 50; // *100 uS -> 5 mS
 uint32_t sweep_steps2 = 100; // * 5 mS -> 500 mS
 
 /* Extern variables ----------------------------------------------------------*/
-uint8_t DeviceState;
+DFUStates DeviceState;
 uint8_t JumpToApp = 0;
 /* Private function prototypes -----------------------------------------------*/
 void Delay(__IO uint32_t nCount);
@@ -58,7 +61,7 @@ int main(void) {
 
 	Set_System();
 	if (BSL_HOLD_STATE == 0) {
-
+		OPDfuIni();
 		USB_Interrupts_Config();
 		Set_USBClock();
 		USB_Init();
@@ -124,9 +127,9 @@ int main(void) {
 
 		if (STOPWATCH_ValueGet() > 100 * 50 * 100)
 			STOPWATCH_Reset();
-		if ((STOPWATCH_ValueGet() > 60000) && (DeviceState == idle))
+		if ((STOPWATCH_ValueGet() > 70000) && (DeviceState == idle))
 			JumpToApp = TRUE;
-		FLASH_Download();
+		DataDownload();
 		//DelayWithDown(10);//1000000);
 	}
 	if (((*(__IO uint32_t*) StartOfUserCode) & 0x2FFE0000) == 0x20000000) { /* Jump to user application */
@@ -146,6 +149,9 @@ int main(void) {
 	}
 
 	while (1) {
+	//	STM_EVAL_LEDOff(LED1);
+	//	STM_EVAL_LEDOff(LED2);
+	//	while(1){}
 		if (LedPWM(50, 100, STOPWATCH_ValueGet())) {
 			STM_EVAL_LEDOn(LED2);
 			STM_EVAL_LEDOff(LED1);
@@ -155,7 +161,7 @@ int main(void) {
 		}
 		if (STOPWATCH_ValueGet() > 2*50 * 100)
 			STOPWATCH_Reset();
-		FLASH_Download();
+		DataDownload();
 	}
 
 }
@@ -179,20 +185,7 @@ void Delay(__IO uint32_t nCount) {
 
 	}
 }
-/*******************************************************************************
- * Function Name  : Delay
- * Description    : Inserts a delay time.
- * Input          : nCount: specifies the delay time length.
- * Output         : None
- * Return         : None
- *******************************************************************************/
-void DelayWithDown(__IO uint32_t nCount) {
-	for (; nCount != 0; nCount--) {
-		for (__IO uint32_t delay = DownloadDelay; delay != 0; delay--) {
-		}
-		FLASH_Download();
-	}
-}
+
 #ifdef  USE_FULL_ASSERT
 /*******************************************************************************
  * Function Name  : assert_failed

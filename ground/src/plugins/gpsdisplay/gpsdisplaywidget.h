@@ -28,6 +28,7 @@
 #ifndef GPSDISPLAYWIDGET_H_
 #define GPSDISPLAYWIDGET_H_
 
+#include "ui_gpsdisplaywidget.h"
 #include "gpsdisplaygadgetconfiguration.h"
 #include "gpsconstellationwidget.h"
 #include "uavobjects/uavobject.h"
@@ -35,13 +36,9 @@
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
 
-#include <QFile>
-#include <QTimer>
-#include "nmeaparser.h"
-
 class Ui_GpsDisplayWidget;
 
-class GpsDisplayWidget : public QWidget
+class GpsDisplayWidget : public QWidget, public Ui_GpsDisplayWidget
 {
     Q_OBJECT
 
@@ -49,14 +46,7 @@ public:
     GpsDisplayWidget(QWidget *parent = 0);
    ~GpsDisplayWidget();
 
-//   void setMode(QString mode);  // Either UAVTalk or serial port
-   void setPort(QextSerialPort* port);
-   void setParser(QString connectionMode);
-
 private slots:
-   void connectButtonClicked();
-   void disconnectButtonClicked();
-   void onDataAvailable();
    void setSVs(int);
    void setPosition(double, double, double);
    void setDateTime(double, double);
@@ -64,12 +54,6 @@ private slots:
    void dumpPacket(char*);
 
 private:
-   void processNewSerialData(QByteArray serialData);
-   Ui_GpsDisplayWidget* widget;
    GpsConstellationWidget * gpsConstellation;
-   QextSerialPort *port;
-   GPSParser *parser;
-   bool connected;
-
 };
 #endif /* GPSDISPLAYWIDGET_H_ */

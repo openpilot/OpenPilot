@@ -31,8 +31,11 @@
 
 GpsDisplayGadget::GpsDisplayGadget(QString classId, GpsDisplayWidget *widget, QWidget *parent) :
         IUAVGadget(classId, parent),
-        m_widget(widget)
+        m_widget(widget),
+        connected(FALSE)
 {
+    connect(m_widget->connectButton, SIGNAL(clicked(bool)), this,SLOT(onConnect()));
+    connect(m_widget->disconnectButton, SIGNAL(clicked(bool)), this,SLOT(onDisconnect()));
 }
 
 GpsDisplayGadget::~GpsDisplayGadget()
@@ -47,35 +50,110 @@ GpsDisplayGadget::~GpsDisplayGadget()
  */
 void GpsDisplayGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 {
-    GpsDisplayGadgetConfiguration *m = qobject_cast< GpsDisplayGadgetConfiguration*>(config);
+    // Delete the (old)port, this also closes it.
+    if(port) {
+        delete port;
+    }
 
-    if (m->connectionMode() == "Serial") {
+    // Delete the (old)parser, this also disconnects all signals.
+    if(parser) {
+        delete parser;
+    }
+
+    GpsDisplayGadgetConfiguration *gpsDisplayConfig = qobject_cast< GpsDisplayGadgetConfiguration*>(config);
+
+    if (gpsDisplayConfig->connectionMode() == "Serial") {
         PortSettings portsettings;
-        portsettings.BaudRate=m->speed();
-        portsettings.DataBits=m->dataBits();
-        portsettings.FlowControl=m->flow();
-        portsettings.Parity=m->parity();
-        portsettings.StopBits=m->stopBits();
-        portsettings.Timeout_Millisec=m->timeOut();
+        portsettings.BaudRate=gpsDisplayConfig->speed();
+        portsettings.DataBits=gpsDisplayConfig->dataBits();
+        portsettings.FlowControl=gpsDisplayConfig->flow();
+        portsettings.Parity=gpsDisplayConfig->parity();
+        portsettings.StopBits=gpsDisplayConfig->stopBits();
+        portsettings.Timeout_Millisec=gpsDisplayConfig->timeOut();
 
         QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
         foreach( QextPortInfo nport, ports ) {
-            if(nport.friendName == m->port())
+            if(nport.friendName == gpsDisplayConfig->port())
             {
+                qDebug() << "Using Serial parser";
+                parser = new NMEAParser();
+
 #ifdef Q_OS_WIN
-                QextSerialPort *port=new QextSerialPort(nport.portName,portsettings,QextSerialPort::EventDriven);
+                port=new QextSerialPort(nport.portName,portsettings,QextSerialPort::EventDriven);
 #else
-                QextSerialPort *port=new QextSerialPort(nport.physName,portsettings,QextSerialPort::EventDriven);
+                port=new QextSerialPort(nport.physName,portsettings,QextSerialPort::EventDriven);
 #endif
-                //Creates new serial port with the user configuration and passes it to the widget
-                m_widget->setParser(QString("Serial"));
-                m_widget->setPort(port);
+                m_widget->connectButton->setEnabled(true);
+                m_widget->disconnectButton->setEnabled(false);
+
+                connect(port, SIGNAL(readyRead()), this, SLOT(onDataAvailable()));
             }
         }
-    } else if (m->connectionMode() == "Telemetry") {
-        m_widget->setParser(QString("Telemetry"));
-
-    } else if (m->connectionMode() == "Network") {
+    } else if (gpsDisplayConfig->connectionMode() == "Telemetry") {
+        qDebug() << "Using Telemetry parser";
+        parser = new TelemetryParser();
+        m_widget->connectButton->setEnabled(false);
+        m_widget->disconnectButton->setEnabled(false);
+    } else if (gpsDisplayConfig->connectionMode() == "Network") {
        // Not implemented for now...
+        m_widget->connectButton->setEnabled(false);
+        m_widget->disconnectButton->setEnabled(false);
+    }
+
+    connect(parser, SIGNAL(sv(int)), m_widget,SLOT(setSVs(int)));
+    connect(parser, SIGNAL(position(double,double,double)), m_widget,SLOT(setPosition(double,double,double)));
+    connect(parser, SIGNAL(speedheading(double,double)), m_widget,SLOT(setSpeedHeading(double,double)));
+    connect(parser, SIGNAL(datetime(double,double)), m_widget,SLOT(setDateTime(double,double)));
+    connect(parser, SIGNAL(packet(char*)), m_widget, SLOT(dumpPacket(char*)));
+    connect(parser, SIGNAL(satellite(int,int,int,int,int)), m_widget->gpsSky, SLOT(updateSat(int,int,int,int,int)));
+}
+
+void GpsDisplayGadget::onConnect() {
+    m_widget->textBrowser->append(QString("Connecting to GPS ...\n"));
+    // TODO: Somehow mark that we're running, and disable connect button while so?
+
+    if (port) {
+        qDebug() <<  "Opening: " <<  port->portName() << ".";
+        bool isOpen =  port->open(QIODevice::ReadWrite);
+        qDebug() <<  "Open: " << isOpen;
+        if(isOpen) {
+            m_widget->connectButton->setEnabled(false);
+            m_widget->disconnectButton->setEnabled(true);
+        }
+    } else {
+        qDebug() << "Port undefined or invalid.";
+    }
+
+}
+
+void GpsDisplayGadget::onDisconnect() {
+    if (port) {
+        qDebug() <<  "Closing: " <<  port->portName() << ".";
+        port->close();
+        m_widget->connectButton->setEnabled(true);
+        m_widget->disconnectButton->setEnabled(false);
+    } else {
+        qDebug() << "Port undefined or invalid.";
+    }
+}
+
+void GpsDisplayGadget::onDataAvailable() {
+    int avail = port->bytesAvailable();
+    if( avail > 0 ) {
+        QByteArray serialData;
+        serialData.resize(avail);
+        int bytesRead = port->read(serialData.data(), serialData.size());
+        if( bytesRead > 0 ) {
+            processNewSerialData(serialData);
+        }
+    }
+}
+
+void GpsDisplayGadget::processNewSerialData(QByteArray serialData) {
+    int dataLength = serialData.size();
+    const char* data = serialData.constData();
+
+    for(int pos = 0; pos < dataLength; pos++) {
+        parser->processInputStream(data[pos]);
     }
 }

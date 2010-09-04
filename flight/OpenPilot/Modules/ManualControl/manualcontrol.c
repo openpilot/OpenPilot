@@ -169,6 +169,10 @@ static void manualControlTask(void* parameters)
 			cmd.Channel[settings.Throttle] < settings.ChannelMin[settings.Throttle])
 		{
 			cmd.Connected = MANUALCONTROLCOMMAND_CONNECTED_FALSE;
+			cmd.Throttle = 0; // Shut down engine with no control
+			cmd.Roll = 0;
+			cmd.Yaw = 0;
+			cmd.Pitch = 0;
 			//cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO; // don't do until AUTO implemented and functioning
 			AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
 			ManualControlCommandSet(&cmd);

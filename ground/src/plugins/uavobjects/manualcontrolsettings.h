@@ -51,6 +51,7 @@ public:
         quint8 FlightMode;
         quint8 Accessory1;
         quint8 Accessory2;
+        quint8 Accessory3;
         qint16 ChannelMax[8];
         qint16 ChannelNeutral[8];
         qint16 ChannelMin[8];
@@ -82,6 +83,9 @@ public:
     // Field Accessory2 information
     /* Enumeration options for field Accessory2 */
     typedef enum { ACCESSORY2_CHANNEL0=0, ACCESSORY2_CHANNEL1=1, ACCESSORY2_CHANNEL2=2, ACCESSORY2_CHANNEL3=3, ACCESSORY2_CHANNEL4=4, ACCESSORY2_CHANNEL5=5, ACCESSORY2_CHANNEL6=6, ACCESSORY2_CHANNEL7=7, ACCESSORY2_NONE=8 } Accessory2Options;
+    // Field Accessory3 information
+    /* Enumeration options for field Accessory3 */
+    typedef enum { ACCESSORY3_CHANNEL0=0, ACCESSORY3_CHANNEL1=1, ACCESSORY3_CHANNEL2=2, ACCESSORY3_CHANNEL3=3, ACCESSORY3_CHANNEL4=4, ACCESSORY3_CHANNEL5=5, ACCESSORY3_CHANNEL6=6, ACCESSORY3_CHANNEL7=7, ACCESSORY3_NONE=8 } Accessory3Options;
     // Field ChannelMax information
     /* Number of elements for field ChannelMax */
     static const quint32 CHANNELMAX_NUMELEM = 8;
@@ -94,7 +98,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 2185031164U;
+    static const quint32 OBJID = 1845767664U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

@@ -152,6 +152,12 @@ static void manualControlTask(void* parameters)
 											  settings.ChannelMin[settings.Accessory2], settings.ChannelNeutral[settings.Accessory2] );
 			else 
 				cmd.Accessory2 = 0;
+
+			if(settings.Accessory3 != MANUALCONTROLSETTINGS_ACCESSORY3_NONE)
+				cmd.Accessory3 = scaleChannel( cmd.Channel[settings.Accessory3], settings.ChannelMax[settings.Accessory3],
+											  settings.ChannelMin[settings.Accessory3], settings.ChannelNeutral[settings.Accessory3] );
+			else 
+				cmd.Accessory3 = 0;
 			
             
             // Update flight mode
@@ -223,13 +229,23 @@ static void manualControlTask(void* parameters)
 			AttitudeDesiredSet(&attitude);
 		}
 		
-		if( 1 ) { //TODO: Make what happens here depend on GCS
+		if( cmd.Accessory3 < -.5 ) { //TODO: Make what happens here depend on GCS
 			AttitudeSettingsData attitudeSettings;
 			AttitudeSettingsGet(&attitudeSettings);
-			// Hard coding a maximum bias of 30 for now... maybe mistake
-			attitudeSettings.PitchBias = cmd.Accessory1 * 30;
-			attitudeSettings.RollBias = cmd.Accessory2 * 30;
+			// Hard coding a maximum bias of 15 for now... maybe mistake
+			attitudeSettings.PitchBias = cmd.Accessory1 * 15;
+			attitudeSettings.RollBias = cmd.Accessory2 * 15;
 			AttitudeSettingsSet(&attitudeSettings);
+		} else if (cmd.Accessory3 > .9) { 
+			// REALLY don't want to end up here accidentally.  I've also saved by meta for Stabilization setting to be
+			// flight read only by default
+			StabilizationSettingsData stabSettings;
+			StabilizationSettingsGet(&stabSettings);			
+			if(cmd.Accessory1 > 0)
+				stabSettings.PitchKp = cmd.Accessory1 * 0.05; 
+			if(cmd.Accessory2 > 0)
+				stabSettings.RollKp = cmd.Accessory2 * 0.05; 
+			StabilizationSettingsSet(&stabSettings);
 		}
 	}
 }

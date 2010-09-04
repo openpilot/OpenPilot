@@ -73,6 +73,9 @@ ManualControlCommand::ManualControlCommand(): UAVDataObject(OBJID, ISSINGLEINST,
     QStringList Accessory2ElemNames;
     Accessory2ElemNames.append("0");
     fields.append( new UAVObjectField(QString("Accessory2"), QString("%"), UAVObjectField::FLOAT32, Accessory2ElemNames, QStringList()) );
+    QStringList Accessory3ElemNames;
+    Accessory3ElemNames.append("0");
+    fields.append( new UAVObjectField(QString("Accessory3"), QString("%"), UAVObjectField::FLOAT32, Accessory3ElemNames, QStringList()) );
     QStringList ChannelElemNames;
     ChannelElemNames.append("0");
     ChannelElemNames.append("1");

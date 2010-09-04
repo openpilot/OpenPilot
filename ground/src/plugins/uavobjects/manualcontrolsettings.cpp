@@ -140,6 +140,19 @@ ManualControlSettings::ManualControlSettings(): UAVDataObject(OBJID, ISSINGLEINS
     Accessory2EnumOptions.append("Channel7");
     Accessory2EnumOptions.append("None");
     fields.append( new UAVObjectField(QString("Accessory2"), QString("channel"), UAVObjectField::ENUM, Accessory2ElemNames, Accessory2EnumOptions) );
+    QStringList Accessory3ElemNames;
+    Accessory3ElemNames.append("0");
+    QStringList Accessory3EnumOptions;
+    Accessory3EnumOptions.append("Channel0");
+    Accessory3EnumOptions.append("Channel1");
+    Accessory3EnumOptions.append("Channel2");
+    Accessory3EnumOptions.append("Channel3");
+    Accessory3EnumOptions.append("Channel4");
+    Accessory3EnumOptions.append("Channel5");
+    Accessory3EnumOptions.append("Channel6");
+    Accessory3EnumOptions.append("Channel7");
+    Accessory3EnumOptions.append("None");
+    fields.append( new UAVObjectField(QString("Accessory3"), QString("channel"), UAVObjectField::ENUM, Accessory3ElemNames, Accessory3EnumOptions) );
     QStringList ChannelMaxElemNames;
     ChannelMaxElemNames.append("0");
     ChannelMaxElemNames.append("1");
@@ -211,6 +224,7 @@ void ManualControlSettings::setDefaultFieldValues()
     data.FlightMode = 4;
     data.Accessory1 = 8;
     data.Accessory2 = 8;
+    data.Accessory3 = 8;
     data.ChannelMax[0] = 2000;
     data.ChannelMax[1] = 2000;
     data.ChannelMax[2] = 2000;

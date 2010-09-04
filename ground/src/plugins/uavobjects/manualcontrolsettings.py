@@ -184,6 +184,25 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
+		'Accessory3',
+		'b',
+		1,
+		[
+			'0',
+		],
+		{
+			'0' : 'Channel0',
+			'1' : 'Channel1',
+			'2' : 'Channel2',
+			'3' : 'Channel3',
+			'4' : 'Channel4',
+			'5' : 'Channel5',
+			'6' : 'Channel6',
+			'7' : 'Channel7',
+			'8' : 'None',
+		}
+	),
+	uavobject.UAVObjectField(
 		'ChannelMax',
 		'h',
 		8,
@@ -239,7 +258,7 @@ _fields = [ \
 
 class ManualControlSettings(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 2185031164
+    OBJID        = 1845767664
     NAME         = "ManualControlSettings"
     METANAME     = "ManualControlSettingsMeta"
     ISSINGLEINST = 1

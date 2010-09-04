@@ -380,11 +380,11 @@ int main()
                     vel[0] = 0;
                     vel[1] = 0;
                     vel[2] = 0;
-                    FullCorrection(mag, gps_data.NED, vel, altitude_data.altitude);                            
+                    VelBaroCorrection(vel,altitude_data.altitude);                            
                 } 
             }
-            else
-                MagCorrection(mag); 
+            else if(gps_data.quality != -1)
+                MagCorrection(mag);  // only trust mags if outdoors
             
             attitude_data.quaternion.q1 = Nav.q[0];
             attitude_data.quaternion.q2 = Nav.q[1];

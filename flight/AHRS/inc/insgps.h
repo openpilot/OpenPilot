@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup AHRS 
+ * @{
+ * @addtogroup INSGPS
+ * @{
+ * @brief INSGPS is a joint attitude and position estimation EKF
  *
  * @file       insgps.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -27,6 +32,22 @@
 #ifndef INSGPS_H_
 #define INSGPS_H_
 
+/**
+  * @addtogroup Constants
+  * @{
+  */
+#define POS_SENSORS 0x007
+#define HORIZ_SENSORS 0x018
+#define VERT_SENSORS  0x020
+#define MAG_SENSORS 0x1C0
+#define BARO_SENSOR 0x200
+
+#define FULL_SENSORS 0x3FF
+
+/**
+  * @}
+  */
+
 //  Exposed Function Prototypes
 void INSGPSInit();
 void INSPrediction(float gyro_data[3], float accel_data[3], float dT);
@@ -36,10 +57,11 @@ void INSSetAccelVar(float accel_var[3]);
 void INSSetGyroVar(float gyro_var[3]);
 void INSSetMagNorth(float B[3]);
 void INSSetMagVar(float scaled_mag_var[3]);
+
 void MagCorrection(float mag_data[3]);
 void FullCorrection(float mag_data[3], float Pos[3], float Vel[3], float BaroAlt);
-void GndSpeedAndMagCorrection(float Speed, float Heading, float mag_data[3]);
 void GpsMagCorrection(float mag_data[3], float Pos[3], float Vel[2]);
+void VelBaroCorrection(float Vel[3], float BaroAlt);
 
 //  Nav structure containing current solution
 struct NavStruct {
@@ -48,10 +70,9 @@ struct NavStruct {
     float q[4];             // unit quaternion rotation relative to NED
 } Nav;
 
-// constants
-#define MagSensors 0x1C0
-#define FullSensors 0x3FF
-#define GpsMagSensors 0x1DF
-#define GndSpeedAndMagSensors 0x1D8
+/**
+ * @}
+ * @}
+ */
 
 #endif /* EKF_H_ */

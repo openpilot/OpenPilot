@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup AHRS 
+ * @{
+ * @addtogroup INSGPS
+ * @{
+ * @brief INSGPS is a joint attitude and position estimation EKF
  *
  * @file       insgps.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -35,6 +40,7 @@
 #define NUMU 6   // number of deterministic inputs, U is the input vector
 
 // Private functions
+void INSCorrection(float mag_data[3], float Pos[3], float Vel[3], float BaroAlt, uint16_t SensorsUsed);
 void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW], float Q[NUMW], float dT, float P[NUMX][NUMX]);
 void SerialUpdate(float H[NUMV][NUMX], float R[NUMV], float Z[NUMV], float Y[NUMV],
 				  float P[NUMX][NUMX], float X[NUMX], uint16_t SensorsUsed);
@@ -159,143 +165,58 @@ void INSPrediction(float gyro_data[3], float accel_data[3], float dT)
     Nav.q[3] = X[9];
 }
 
+float zeros[3] = {0,0,0};
+
 void MagCorrection(float mag_data[3])
 {
-    float Z[10], Y[10];
-    float Bmag, qmag;
-
-	// magnetometer data in any units (use unit vector) and in body frame
-	Bmag = sqrt(mag_data[0]*mag_data[0] + mag_data[1]*mag_data[1] + mag_data[2]*mag_data[2]);
-	Z[6] = mag_data[0]/Bmag;
-	Z[7] = mag_data[1]/Bmag;
-	Z[8] = mag_data[2]/Bmag;
-
-    // EKF correction step
-	LinearizeH(X,Be,H);
-	MeasurementEq(X,Be,Y);
-	SerialUpdate(H,R,Z,Y,P,X,MagSensors);
-	qmag=sqrt(X[6]*X[6] + X[7]*X[7] + X[8]*X[8] + X[9]*X[9]);
-	X[6] /= qmag; X[7] /= qmag; X[8] /= qmag; X[9] /= qmag;
-
-    // Update Nav solution structure
-    Nav.Pos[0] = X[0];
-    Nav.Pos[1] = X[1];
-    Nav.Pos[2] = X[2];
-    Nav.Vel[0] = X[3];
-    Nav.Vel[1] = X[4];
-    Nav.Vel[2] = X[5];
-    Nav.q[0] = X[6];
-    Nav.q[1] = X[7];
-    Nav.q[2] = X[8];
-    Nav.q[3] = X[9];
+    INSCorrection(mag_data, zeros, zeros, zeros[0], MAG_SENSORS);
 }
 
 void FullCorrection(float mag_data[3], float Pos[3], float Vel[3], float BaroAlt)
 {
+    INSCorrection(mag_data, Pos, Vel, BaroAlt, FULL_SENSORS);
+}
+
+void GpsMagCorrection(float mag_data[3], float Pos[3], float Vel[3])
+{
+    INSCorrection(mag_data, Pos, Vel, zeros[0], POS_SENSORS | HORIZ_SENSORS | MAG_SENSORS);        
+}
+void VelBaroCorrection(float Vel[3], float BaroAlt)
+{
+    INSCorrection(zeros, zeros, Vel, BaroAlt, HORIZ_SENSORS | VERT_SENSORS | BARO_SENSOR);
+}
+
+void INSCorrection(float mag_data[3], float Pos[3], float Vel[3], float BaroAlt, uint16_t SensorsUsed)
+{
     float Z[10], Y[10];
     float Bmag, qmag;
-
+    
 	// GPS Position in meters and in local NED frame
 	Z[0]=Pos[0];
 	Z[1]=Pos[1];
 	Z[2]=Pos[2];
-
+    
 	// GPS Velocity in meters and in local NED frame
 	Z[3]=Vel[0];
 	Z[4]=Vel[1];
 	Z[5]=Vel[2];
-
+    
 	// magnetometer data in any units (use unit vector) and in body frame
 	Bmag = sqrt(mag_data[0]*mag_data[0] + mag_data[1]*mag_data[1] + mag_data[2]*mag_data[2]);
 	Z[6] = mag_data[0]/Bmag;
 	Z[7] = mag_data[1]/Bmag;
 	Z[8] = mag_data[2]/Bmag;
-
+    
 	// barometric altimeter in meters and in local NED frame
 	Z[9] = BaroAlt;
-
+    
 	// EKF correction step
 	LinearizeH(X,Be,H);
 	MeasurementEq(X,Be,Y);
-	SerialUpdate(H,R,Z,Y,P,X,FullSensors);
-	qmag=sqrt(X[6]*X[6] + X[7]*X[7] + X[8]*X[8] + X[9]*X[9]);
-	X[6] /= qmag; X[7] /= qmag; X[8] /= qmag; X[9] /= qmag;
-
-    // Update Nav solution structure
-    Nav.Pos[0] = X[0];
-    Nav.Pos[1] = X[1];
-    Nav.Pos[2] = X[2];
-    Nav.Vel[0] = X[3];
-    Nav.Vel[1] = X[4];
-    Nav.Vel[2] = X[5];
-    Nav.q[0] = X[6];
-    Nav.q[1] = X[7];
-    Nav.q[2] = X[8];
-    Nav.q[3] = X[9];
-}
-
-void GpsMagCorrection(float mag_data[3], float Pos[3], float Vel[2])
-{
-    float Z[10], Y[10];
-    float Bmag, qmag;
-    
-	// GPS Position in meters and in local NED frame
-	Z[0]=Pos[0];
-	Z[1]=Pos[1];
-	Z[2]=Pos[2];
-    
-	// GPS Velocity in meters and in local NED frame
-	Z[3]=Vel[0];
-	Z[4]=Vel[1];
-    
-	// magnetometer data in any units (use unit vector) and in body frame
-	Bmag = sqrt(mag_data[0]*mag_data[0] + mag_data[1]*mag_data[1] + mag_data[2]*mag_data[2]);
-	Z[6] = mag_data[0]/Bmag;
-	Z[7] = mag_data[1]/Bmag;
-	Z[8] = mag_data[2]/Bmag;
-        
-	// EKF correction step
-	LinearizeH(X,Be,H);
-	MeasurementEq(X,Be,Y);
-	SerialUpdate(H,R,Z,Y,P,X,GpsMagSensors);
+	SerialUpdate(H,R,Z,Y,P,X,SensorsUsed);
 	qmag=sqrt(X[6]*X[6] + X[7]*X[7] + X[8]*X[8] + X[9]*X[9]);
 	X[6] /= qmag; X[7] /= qmag; X[8] /= qmag; X[9] /= qmag;
     
-    // Update Nav solution structure
-    Nav.Pos[0] = X[0];
-    Nav.Pos[1] = X[1];
-    Nav.Pos[2] = X[2];
-    Nav.Vel[0] = X[3];
-    Nav.Vel[1] = X[4];
-    Nav.Vel[2] = X[5];
-    Nav.q[0] = X[6];
-    Nav.q[1] = X[7];
-    Nav.q[2] = X[8];
-    Nav.q[3] = X[9];
-}
-
-void GndSpeedAndMagCorrection(float Speed, float Heading, float mag_data[3])
-{
-    float Z[10], Y[10];
-    float Bmag, qmag;
-
-	// Ground Speed in m/s and Heading in rad
-    Z[3] = Speed*cos((double)Heading);
-    Z[4] = Speed*sin((double)Heading);
-
-    // magnetometer data in any units (use unit vector) and in body frame
-	Bmag = sqrt(mag_data[0]*mag_data[0] + mag_data[1]*mag_data[1] + mag_data[2]*mag_data[2]);
-	Z[6] = mag_data[0]/Bmag;
-	Z[7] = mag_data[1]/Bmag;
-	Z[8] = mag_data[2]/Bmag;
-
-    // EKF correction step
-	LinearizeH(X,Be,H);
-	MeasurementEq(X,Be,Y);
-	SerialUpdate(H,R,Z,Y,P,X,GndSpeedAndMagSensors);
-	qmag=sqrt(X[6]*X[6] + X[7]*X[7] + X[8]*X[8] + X[9]*X[9]);
-	X[6] /= qmag; X[7] /= qmag; X[8] /= qmag; X[9] /= qmag;
-
     // Update Nav solution structure
     Nav.Pos[0] = X[0];
     Nav.Pos[1] = X[1];
@@ -544,3 +465,7 @@ void LinearizeH(float X[NUMX], float Be[3], float H[NUMV][NUMX]){
   H[9][2]=-1;
 }
 
+/**
+ * @}
+ * @}
+ */

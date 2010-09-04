@@ -73,28 +73,28 @@ extern uint8_t JumpToApp;
 void DataDownload() {
 	if ((DeviceState == downloading) && (GetEPTxStatus(ENDP1) == EP_TX_NAK)) {
 		uint8_t packetSize;
+		uint32_t offset;
 		SendBuffer[0] = 0x01;
 		SendBuffer[1] = Download;
 		SendBuffer[2] = downPacketCurrent >> 24;
 		SendBuffer[3] = downPacketCurrent >> 16;
 		SendBuffer[4] = downPacketCurrent >> 8;
 		SendBuffer[5] = downPacketCurrent;
-		if (downPacketCurrent == downPacketTotal) {
+		if (downPacketCurrent == downPacketTotal-1) {
 			packetSize = downSizeOfLastPacket;
-		} else {
+		}
+		else {
 			packetSize = 14;
 		}
-		for (int x = 0; x < packetSize; ++x) {
+		for (uint8_t x = 0; x < packetSize; ++x) {
 			switch (currentProgrammingDestination) {
 			case Self_flash:
-				SendBuffer[6 + x * 4] = *FLASH_If_Read(baseOfAdressType(
-						downType) + downPacketCurrent * 4 + x * 4, 0);
-				SendBuffer[7 + x * 4] = *FLASH_If_Read(baseOfAdressType(
-						downType) + 1 + downPacketCurrent * 4 + x * 4, 0);
-				SendBuffer[8 + x * 4] = *FLASH_If_Read(baseOfAdressType(
-						downType) + 2 + downPacketCurrent * 4 + x * 4, 0);
-				SendBuffer[9 + x * 4] = *FLASH_If_Read(baseOfAdressType(
-						downType) + 3 + downPacketCurrent * 4 + x * 4, 0);
+
+				offset=baseOfAdressType(downType) + (downPacketCurrent * 14 * 4) + (x * 4);
+				SendBuffer[6 + (x * 4)] = *FLASH_If_Read(offset, 0);
+				SendBuffer[7 + (x * 4)] = *FLASH_If_Read(offset+1, 0);
+				SendBuffer[8 + (x * 4)] = *FLASH_If_Read(offset+2, 0);
+				SendBuffer[9 + (x * 4)] = *FLASH_If_Read(offset+3, 0);
 				break;
 			case Remote_flash_via_spi:
 				//TODO result=SPI_FLASH();
@@ -104,7 +104,7 @@ void DataDownload() {
 		}
 	USB_SIL_Write(EP1_IN, (uint8_t*) SendBuffer, 64);
 	downPacketCurrent = downPacketCurrent + 1;
-	if (downPacketCurrent > downPacketTotal) {
+	if (downPacketCurrent > downPacketTotal-1) {
 		// STM_EVAL_LEDOn(LED2);
 		DeviceState = Last_operation_Success;
 		Aditionals = (uint32_t) Download;
@@ -307,13 +307,13 @@ case Download_Req:
 		downType = Data0;
 		downPacketTotal = Count;
 		downSizeOfLastPacket = Data1;
-		if (isBiggerThanAvailable(downType, downPacketTotal - 1 * 14
+		if (isBiggerThanAvailable(downType, (downPacketTotal - 1) * 14
 				+ downSizeOfLastPacket) == 1) {
 			DeviceState = outsideDevCapabilities;
 			Aditionals = (uint32_t) Command;
 
 		} else
-
+			downPacketCurrent=0;
 			DeviceState = downloading;
 	} else {
 		DeviceState = Last_operation_failed;

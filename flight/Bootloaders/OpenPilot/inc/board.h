@@ -24,8 +24,8 @@
 /* OP_DFU Mem Sizes			                      */
 /**************************************************/
 
-#define SizeOfHash					20
-#define SizeOfDescription			100
+#define SizeOfHash					20//0x14
+#define SizeOfDescription			100 //0x64 start=807FFEC
 #define SizeOfCode					499712-SizeOfHash-SizeOfDescription //488K
-
+//524288
 #endif /* BOARD_H_ */

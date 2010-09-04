@@ -118,6 +118,20 @@ void PFDGadgetWidget::connectNeedles() {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
+    airspeedObj = dynamic_cast<UAVDataObject*>(objManager->getObject("PositionActual"));
+    if (attitudeObj != NULL ) {
+        connect(airspeedObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateAirspeed(UAVObject*)));
+    } else {
+         qDebug() << "Error: Object is unknown (PositionActual).";
+    }
+
+    altitudeObj = dynamic_cast<UAVDataObject*>(objManager->getObject("PositionActual"));
+    if (attitudeObj != NULL ) {
+        connect(altitudeObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateAltitude(UAVObject*)));
+    } else {
+         qDebug() << "Error: Object is unknown (PositionActual).";
+    }
+
    attitudeObj = dynamic_cast<UAVDataObject*>(objManager->getObject("AttitudeActual"));
    if (attitudeObj != NULL ) {
        connect(attitudeObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateAttitude(UAVObject*)));
@@ -214,95 +228,83 @@ void PFDGadgetWidget::updateLinkStatus(UAVObject *object1) {
   Resolution is 1 degree roll & 1/7.5 degree pitch.
   */
 void PFDGadgetWidget::updateAttitude(UAVObject *object1) {
-    UAVObjectField* field = object1->getField(QString("Roll"));
-    UAVObjectField* field2 = object1->getField(QString("Pitch"));
-    // Double check that the field exists:
-    if (field && field2) {
+    UAVObjectField * rollField = object1->getField(QString("Roll"));
+    UAVObjectField * yawField = object1->getField(QString("Yaw"));
+    UAVObjectField * pitchField = object1->getField(QString("Pitch"));
+    if(rollField && yawField && pitchField) {
         // These factors assume some things about the PFD SVG, namely:
-        // - Roll value in degrees
+        // - Roll, Pitch and Heading value in degrees
         // - Pitch lines are 300px high for a +20/-20 range, which means
         //   7.5 pixels per pitch degree.
-    	// TODO: loosen this constraint and only require a +/- 20 deg range,
-    	//       and compute the height from the SVG element.
+        // TODO: loosen this constraint and only require a +/- 20 deg range,
+        //       and compute the height from the SVG element.
         // Also: keep the integer value only, to avoid unnecessary redraws
-        rollTarget = -floor(field->getDouble()*10)/10;
+        rollTarget = -floor(pitchField->getDouble()*10)/10;
         if ((rollTarget - rollValue) > 180) {
             rollValue += 360;
         } else if (((rollTarget - rollValue) < -180)) {
             rollValue -= 360;
         }
-        pitchTarget = floor(field2->getDouble()*7.5);
-//        if (!skyDialTimer.isActive())
-//            skyDialTimer.start(); // Rearm the dial Timer which might be stopped.
-    } else {
-        qDebug() << "UpdateAttitude: Wrong field, maybe an issue with object disconnection ?";
-    }
-}
-
-/*!
-  \brief Updates the compass reading and speed dial.
-
-  This also updates speed & altitude according to GPS data.
-
-    Note: the speed dial shows the ground speed at the moment, because
-        there is no airspeed by default. Should become configurable in a future
-        gadget release (TODO)
-  */
-void PFDGadgetWidget::updateHeading(UAVObject *object1) {
-    // Double check that the field exists:
-    QString fieldname = QString("Heading");
-    UAVObjectField* field = object1->getField(fieldname);
-    if (field) {
-        // These factors assume some things about the PFD SVG, namely:
-        // - Heading value in degrees
-        // - "Scale" element is 540 degrees wide
+        pitchTarget = floor(object1->getField(QString("Pitch"))->getDouble()*7.5);
 
         // Corvus Corax: "If you want a smooth transition between two angles, It is usually solved that by substracting
         // one from another, and if the result is >180 or <-180 I substract (respectively add) 360 degrees
         // to it. That way you always get the "shorter difference" to turn in."
         double fac = compassBandWidth/540;
-        headingTarget = field->getDouble()*(-fac);
+        headingTarget = yawField->getDouble();
         if ((headingValue - headingTarget)/fac > 180) {
             headingTarget += 360*fac;
         } else if (((headingValue - headingTarget)/fac < -180)) {
             headingTarget -= 360*fac;
         }
         headingTarget = floor(headingTarget*10)/10; // Avoid stupid redraws
+
+        if (!dialTimer.isActive())
+            dialTimer.start(); // Rearm the dial Timer which might be stopped.
+
+    } else {
+        qDebug() << "Unable to get one of the fields for attitude update";
+    }
+}
+
+/*!
+  \brief Updates the compass reading and speed dial.
+
+  This also updates speed & altitude according to PositionActual data.
+
+    Note: the speed dial shows the ground speed at the moment, because
+        there is no airspeed by default. Should become configurable in a future
+        gadget release (TODO)
+  */
+void PFDGadgetWidget::updateHeading(UAVObject *object) {
+    Q_UNUSED(object);
+}
+
+/*!
+  \brief Called by updates to @PositionActual to compute airspeed from velocity
+  */
+void PFDGadgetWidget::updateAirspeed(UAVObject *object) {
+    UAVObjectField* velField = object->getField("Vel");
+    if (velField) {
+        double val = floor(sqrt(pow(velField->getDouble(0),2) + pow(velField->getDouble(1),2))*10)/10;
+        groundspeedTarget = 3.6*val*speedScaleHeight/30;
+
     } else {
         qDebug() << "UpdateHeading: Wrong field, maybe an issue with object disconnection ?";
     }
-    fieldname = QString("Groundspeed");
-    field = object1->getField(fieldname);
-    if (field) {
-        // The speed scale represents 30km/h (6 * 5)
-        // 3.6 : convert m/s to km/h
-        double val = floor(field->getDouble()*10)/10;
-        groundspeedTarget = 3.6*val*speedScaleHeight/30;
-    }
-    fieldname = QString("Altitude");
-    field = object1->getField(fieldname);
-    if (field) {
+}
+
+/*!
+  \brief Called by the @ref PositionActual updates to show altitude
+  */
+void PFDGadgetWidget::updateAltitude(UAVObject *object) {
+    UAVObjectField* posField = object->getField("NED");
+    if (posField) {
         // The altitude scale represents 30 meters
-        altitudeTarget = floor(field->getDouble()*10)/10*altitudeScaleHeight/30;
+        altitudeTarget = floor(posField->getDouble(3)*10)/10*altitudeScaleHeight/30;
+    } else {
+        qDebug() << "Unable to get field for altitude update.  Obj: " << object->getName();
     }
-
-    if (!dialTimer.isActive())
-        dialTimer.start(); // Rearm the dial Timer which might be stopped.
-}
-
-/*!
-  \brief Called by the UAVObject which got updated
-  */
-void PFDGadgetWidget::updateAirspeed(UAVObject *object3) {
-    Q_UNUSED(object3);
-
-}
-
-/*!
-  \brief Called by the UAVObject which got updated
-  */
-void PFDGadgetWidget::updateAltitude(UAVObject *object3) {
-    Q_UNUSED(object3);
 }
 
 
@@ -903,7 +905,8 @@ void PFDGadgetWidget::moveNeedles()
             headingDiff += 2*threshold;
             headingTarget += 2*threshold;
         }
-        QPointF opd = QPointF(headingDiff,0);
+        qDebug() << headingDiff << " " << headingValue;
+        QPointF opd = QPointF(-headingDiff*2.65,0);
         m_compassband->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), true);
         headingValue += headingDiff;
     }  else {

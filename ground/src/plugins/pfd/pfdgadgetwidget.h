@@ -125,6 +125,8 @@ private:
    qreal altitudeScaleHeight;
 
    // Name of the fields to read when an update is received:
+   UAVDataObject* airspeedObj;
+   UAVDataObject* altitudeObj;
    UAVDataObject* attitudeObj;
    UAVDataObject* headingObj;
    UAVDataObject* gpsObj;

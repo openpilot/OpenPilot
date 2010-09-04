@@ -905,7 +905,6 @@ void PFDGadgetWidget::moveNeedles()
             headingDiff += 2*threshold;
             headingTarget += 2*threshold;
         }
-        qDebug() << headingDiff << " " << headingValue;
         QPointF opd = QPointF(-headingDiff*2.65,0);
         m_compassband->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), true);
         headingValue += headingDiff;

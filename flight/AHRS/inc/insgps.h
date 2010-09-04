@@ -39,6 +39,7 @@ void INSSetMagVar(float scaled_mag_var[3]);
 void MagCorrection(float mag_data[3]);
 void FullCorrection(float mag_data[3], float Pos[3], float Vel[3], float BaroAlt);
 void GndSpeedAndMagCorrection(float Speed, float Heading, float mag_data[3]);
+void GpsMagCorrection(float mag_data[3], float Pos[3], float Vel[2]);
 
 //  Nav structure containing current solution
 struct NavStruct {
@@ -50,6 +51,7 @@ struct NavStruct {
 // constants
 #define MagSensors 0x1C0
 #define FullSensors 0x3FF
+#define GpsMagSensors 0x1DF
 #define GndSpeedAndMagSensors 0x1D8
 
 #endif /* EKF_H_ */

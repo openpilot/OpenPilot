@@ -121,6 +121,8 @@ static void AHRSCalibrationUpdatedCb(UAVObjEvent * ev)
     AHRSCalibrationIsUpdatedFlag = true;
 }
 
+static uint32_t GPSGoodUpdates;
+
 /**
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
@@ -154,6 +156,8 @@ static void ahrscommsTask(void* parameters)
 {
   enum opahrs_result result;
   
+  GPSGoodUpdates = 0;
+    
   // Main task loop
   while (1) {
     struct opahrs_msg_v1 rsp;
@@ -416,18 +420,27 @@ static void load_gps_position(struct opahrs_msg_v1_req_update * update)
         update->gps.NED[2] = 0;
         update->gps.groundspeed = 0;
         update->gps.heading = 0;
-        update->gps.quality = 0;
+        update->gps.quality = -1; // indicates indoor mode, high variance zeros update
     } else {
-        update->gps.groundspeed = data.Groundspeed;
-        update->gps.heading = data.Heading;
-        //Crude measure of quality that decreases with increasing dilution of precision
-        update->gps.quality = 1 / (data.HDOP + data.VDOP + data.PDOP);  
-        double LLA[3] = {(double) data.Latitude / 1e7, (double) data.Longitude / 1e7, (double) (data.GeoidSeparation + data.Altitude)};
-        // convert from cm back to meters
-        double ECEF[3] = {(double) (home.ECEF[0] / 100), (double) (home.ECEF[1] / 100), (double) (home.ECEF[2] / 100)};
-        LLA2Base(LLA, ECEF, (float (*)[3]) home.RNE, update->gps.NED);
-    }
-    
+        // TODO: Parameterize these heuristics into the settings
+        if(data.Satellites >= 7 && data.PDOP < 3.5) {
+            if(GPSGoodUpdates < 30) {
+                GPSGoodUpdates++;
+                update->gps.quality = 0;
+            } else {                            
+                update->gps.groundspeed = data.Groundspeed;
+                update->gps.heading = data.Heading;
+                double LLA[3] = {(double) data.Latitude / 1e7, (double) data.Longitude / 1e7, (double) (data.GeoidSeparation + data.Altitude)};
+                // convert from cm back to meters
+                double ECEF[3] = {(double) (home.ECEF[0] / 100), (double) (home.ECEF[1] / 100), (double) (home.ECEF[2] / 100)};
+                LLA2Base(LLA, ECEF, (float (*)[3]) home.RNE, update->gps.NED);
+                update->gps.quality = 1;
+            }
+        } else {
+            GPSGoodUpdates = 0;
+            update->gps.quality = 0;
+        }
+    }    
 }
 
 static void process_update(struct opahrs_msg_v1_rsp_update * update)

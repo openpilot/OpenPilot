@@ -23,6 +23,8 @@
 		65209A1912208B0600453371 /* gpsposition.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = gpsposition.xml; sourceTree = "<group>"; };
 		6526645A122DF972006F9A3C /* pios_i2c_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_i2c_priv.h; sourceTree = "<group>"; };
 		6526645B122DF972006F9A3C /* pios_wdg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_wdg.h; sourceTree = "<group>"; };
+		65311473122F4C4B00420041 /* stabilization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stabilization.h; sourceTree = "<group>"; };
+		65311474122F4C4B00420041 /* stabilization.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stabilization.c; sourceTree = "<group>"; };
 		65322D2F12283CCD0046CD7C /* NMEA.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = NMEA.c; sourceTree = "<group>"; };
 		65322D3012283CD60046CD7C /* NMEA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NMEA.h; sourceTree = "<group>"; };
 		65322D3B122841F60046CD7C /* gpstime.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = gpstime.xml; sourceTree = "<group>"; };
@@ -2614,8 +2616,6 @@
 		65E8EF4A11EEA61E00BBF654 /* MkSerial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MkSerial.h; path = ../../OpenPilot/Modules/MK/MKSerial/inc/MkSerial.h; sourceTree = SOURCE_ROOT; };
 		65E8EF4B11EEA61E00BBF654 /* MKSerial.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MKSerial.c; path = ../../OpenPilot/Modules/MK/MKSerial/MKSerial.c; sourceTree = SOURCE_ROOT; };
 		65E8EF4E11EEA61E00BBF654 /* OsdEtStd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = OsdEtStd.c; path = ../../OpenPilot/Modules/Osd/OsdEtStd/OsdEtStd.c; sourceTree = SOURCE_ROOT; };
-		65E8EF5111EEA61E00BBF654 /* stabilization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stabilization.h; path = ../../OpenPilot/Modules/Stabilization/inc/stabilization.h; sourceTree = SOURCE_ROOT; };
-		65E8EF5211EEA61E00BBF654 /* stabilization.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stabilization.c; path = ../../OpenPilot/Modules/Stabilization/stabilization.c; sourceTree = SOURCE_ROOT; };
 		65E8EF5511EEA61E00BBF654 /* systemmod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = systemmod.h; path = ../../OpenPilot/Modules/System/inc/systemmod.h; sourceTree = SOURCE_ROOT; };
 		65E8EF5611EEA61E00BBF654 /* systemmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = systemmod.c; path = ../../OpenPilot/Modules/System/systemmod.c; sourceTree = SOURCE_ROOT; };
 		65E8EF5911EEA61E00BBF654 /* telemetry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = telemetry.h; path = ../../OpenPilot/Modules/Telemetry/inc/telemetry.h; sourceTree = SOURCE_ROOT; };
@@ -2886,6 +2886,31 @@
 			isa = PBXGroup;
 			children = (
 				65003B2D1212499100C183DD /* watchdog.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		65311470122F4C4B00420041 /* simple */ = {
+			isa = PBXGroup;
+			children = (
+				65311471122F4C4B00420041 /* Stabilization */,
+			);
+			path = simple;
+			sourceTree = "<group>";
+		};
+		65311471122F4C4B00420041 /* Stabilization */ = {
+			isa = PBXGroup;
+			children = (
+				65311472122F4C4B00420041 /* inc */,
+				65311474122F4C4B00420041 /* stabilization.c */,
+			);
+			path = Stabilization;
+			sourceTree = "<group>";
+		};
+		65311472122F4C4B00420041 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65311473122F4C4B00420041 /* stabilization.h */,
 			);
 			path = inc;
 			sourceTree = "<group>";
@@ -6976,20 +7001,10 @@
 		65E8EF4F11EEA61E00BBF654 /* Stabilization */ = {
 			isa = PBXGroup;
 			children = (
-				65E8EF5011EEA61E00BBF654 /* inc */,
-				65E8EF5211EEA61E00BBF654 /* stabilization.c */,
+				65311470122F4C4B00420041 /* simple */,
 			);
 			name = Stabilization;
 			path = ../../OpenPilot/Modules/Stabilization;
-			sourceTree = SOURCE_ROOT;
-		};
-		65E8EF5011EEA61E00BBF654 /* inc */ = {
-			isa = PBXGroup;
-			children = (
-				65E8EF5111EEA61E00BBF654 /* stabilization.h */,
-			);
-			name = inc;
-			path = ../../OpenPilot/Modules/Stabilization/inc;
 			sourceTree = SOURCE_ROOT;
 		};
 		65E8EF5311EEA61E00BBF654 /* System */ = {

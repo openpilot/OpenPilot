@@ -234,6 +234,46 @@ void FullCorrection(float mag_data[3], float Pos[3], float Vel[3], float BaroAlt
     Nav.q[3] = X[9];
 }
 
+void GpsMagCorrection(float mag_data[3], float Pos[3], float Vel[2])
+{
+    float Z[10], Y[10];
+    float Bmag, qmag;
+    
+	// GPS Position in meters and in local NED frame
+	Z[0]=Pos[0];
+	Z[1]=Pos[1];
+	Z[2]=Pos[2];
+    
+	// GPS Velocity in meters and in local NED frame
+	Z[3]=Vel[0];
+	Z[4]=Vel[1];
+    
+	// magnetometer data in any units (use unit vector) and in body frame
+	Bmag = sqrt(mag_data[0]*mag_data[0] + mag_data[1]*mag_data[1] + mag_data[2]*mag_data[2]);
+	Z[6] = mag_data[0]/Bmag;
+	Z[7] = mag_data[1]/Bmag;
+	Z[8] = mag_data[2]/Bmag;
+        
+	// EKF correction step
+	LinearizeH(X,Be,H);
+	MeasurementEq(X,Be,Y);
+	SerialUpdate(H,R,Z,Y,P,X,GpsMagSensors);
+	qmag=sqrt(X[6]*X[6] + X[7]*X[7] + X[8]*X[8] + X[9]*X[9]);
+	X[6] /= qmag; X[7] /= qmag; X[8] /= qmag; X[9] /= qmag;
+    
+    // Update Nav solution structure
+    Nav.Pos[0] = X[0];
+    Nav.Pos[1] = X[1];
+    Nav.Pos[2] = X[2];
+    Nav.Vel[0] = X[3];
+    Nav.Vel[1] = X[4];
+    Nav.Vel[2] = X[5];
+    Nav.q[0] = X[6];
+    Nav.q[1] = X[7];
+    Nav.q[2] = X[8];
+    Nav.q[3] = X[9];
+}
+
 void GndSpeedAndMagCorrection(float Speed, float Heading, float mag_data[3])
 {
     float Z[10], Y[10];

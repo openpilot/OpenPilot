@@ -50,6 +50,7 @@ signals:
    void speedheading(double,double);
    void packet(char*); // Raw NMEA Packet (or just info)
    void satellite(int,int,int,int,int); // Index, PRN, Elevation, Azimuth, SNR
+   void fixtype(QString); // Type of fix (none, 2D, 3D, etc).
 
 };
 

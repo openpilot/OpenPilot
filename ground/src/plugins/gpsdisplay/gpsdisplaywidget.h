@@ -52,6 +52,7 @@ private slots:
    void setDateTime(double, double);
    void setSpeedHeading(double, double);
    void dumpPacket(char*);
+   void setFixType(QString fixtype);
 
 private:
    GpsConstellationWidget * gpsConstellation;

@@ -75,6 +75,13 @@ void TelemetryParser::updateGPS( UAVObject* object1) {
     double alt = object1->getField(QString("Altitude"))->getDouble();
     emit position(lat,lon,alt);
 
+    double hdg = object1->getField(QString("Heading"))->getDouble();
+    double spd = object1->getField(QString("Groundspeed"))->getDouble();
+    emit speedheading(spd,hdg);
+
+    QString fix = object1->getField(QString("Status"))->getValue().toString();
+    emit fixtype(fix);
+
 }
 
 void TelemetryParser::updateTime( UAVObject* object1) {

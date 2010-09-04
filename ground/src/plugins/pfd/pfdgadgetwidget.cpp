@@ -182,9 +182,9 @@ void PFDGadgetWidget::connectNeedles() {
   */
 void PFDGadgetWidget::updateGPS(UAVObject *object1) {
     UAVObjectField* field = object1->getField(QString("Satellites"));
-    UAVObjectField* field1 = object1->getField(QString("HDOP"));
+    UAVObjectField* field1 = object1->getField(QString("PDOP"));
     if (field && field1) {
-        QString s = QString("GPS: ") + field->getValue().toString() + "\nHDP: "
+        QString s = QString("GPS: ") + field->getValue().toString() + "\nPDP: "
                     + field1->getValue().toString();
         if (s != satString) {
             gcsGPSStats->setPlainText(s);

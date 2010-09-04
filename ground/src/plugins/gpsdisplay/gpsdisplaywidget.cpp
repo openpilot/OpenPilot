@@ -53,30 +53,28 @@ GpsDisplayWidget::~GpsDisplayWidget()
 
 void GpsDisplayWidget::setSpeedHeading(double speed, double heading)
 {
-    QString temp = "Speed: ";
-    temp.append(QString::number(speed,'g',10));
-    temp.append(" Heaging: ");
-    temp.append(QString::number(heading,'g',10));
     speed_value->setText(QString::number(speed,'g',10));
     speed_value->adjustSize();
     bear_value->setText(QString::number(heading,'g',10));
     bear_value->adjustSize();
 
-    // widget->textBrowser->append(temp);
 }
 
 void GpsDisplayWidget::setDateTime(double date, double time)
 {
-    QString temp = "Date: ";
-    temp.append(QString::number(date,'g',10));
-    temp.append(" Time: ");
-    temp.append(QString::number(time,'g',10));
-    gdate_value->setText(QString::number(date,'g',10));
-    gdate_value->adjustSize();
+    QString dstring = QString::number(date,'g',10);
+    dstring.insert(6,".");
+    dstring.insert(4,".");
+    gdate_value->setText(dstring);
+    //gdate_value->adjustSize();
     gtime_value->setText(QString::number(time,'g',10));
     gdate_value->adjustSize();
 
-    //textBrowser->append(temp);
+}
+
+void GpsDisplayWidget::setFixType(QString fixtype)
+{
+  fix_value->setText(fixtype);
 }
 
 void GpsDisplayWidget::dumpPacket(char *packet)

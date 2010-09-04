@@ -30,9 +30,10 @@
 #include "coordinateconversions.h"
 #include <stdint.h>
 #include <QDebug>
+#include <math.h>
 
-#define RAD2DEG (180.0/3.14)
-#define DEG2RAD (3.14/180.0)
+#define RAD2DEG (180.0/M_PI)
+#define DEG2RAD (M_PI/180.0)
 
 namespace Utils {
 

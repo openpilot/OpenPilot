@@ -7,7 +7,11 @@
 #include <QFile>
  #include <QCryptographicHash>
 #include <QList>
+#include <iostream>
+using namespace std;
 #define BUF_LEN 64
+#define DOWNLOAD "-dn"
+#define DEVICE   "-d"
 class OP_DFU
 {
 public:
@@ -27,9 +31,23 @@ public:
         Last_operation_Success,
         downloading,
         idle,
-        Last_operation_failed
+        Last_operation_failed,
+        outsideDevCapabilities,
+        abort
 
     };
+    enum Actions
+    {
+        program,
+        programandverify,
+        download,
+        compareall,
+        comparehash,
+        listdevs,
+        statusreq,
+        downdesc
+    };
+
     enum Commands
     {
         Reserved,
@@ -59,23 +77,26 @@ public:
 
     void JumpToApp();
     void ResetDevice(void);
-    void enterDFU(int devNumber);
-    void StartUpload(qint32 numberOfBytes, TransferTypes type);
-    void UploadData(qint32 numberOfPackets,QByteArray data);
-    void UploadDescription(QString description);
-    void UploadFirmware(const QString &sfile);
-    int StatusRequest();
-    void EndOperation();
-    QString DownloadDescription(int devNumber,int numberOfChars);
-    QByteArray StartDownload(qint32 numberOfPackets, TransferTypes type);
+    bool enterDFU(int devNumber);
+    bool StartUpload(qint32 numberOfBytes, TransferTypes type);
+    bool UploadData(qint32 numberOfPackets,QByteArray data);
+    Status UploadDescription(QString description);
+    Status UploadFirmware(const QString &sfile);
+    Status StatusRequest();
+    bool EndOperation();
+    QString DownloadDescription(int numberOfChars);
+    QByteArray StartDownload(qint32 numberOfBytes, TransferTypes type);
     void CopyWords(char * source, char* destination, int count);
    // QByteArray DownloadData(int devNumber,int numberOfPackets);
-    OP_DFU();
-    void findDevices();
-private:
-    int numberOfDevices;
-    int RWFlags;
+    OP_DFU(bool debug);
+    bool findDevices();
     QList<device> devices;
+    int numberOfDevices;
+    QString StatusToString(OP_DFU::Status);
+private:
+    bool debug;
+    int RWFlags;
+
     pjrc_rawhid hidHandle;
     int setStartBit(int command){return command|0x20;}
 };

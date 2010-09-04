@@ -56,5 +56,6 @@ private slots:
 
 private:
    GpsConstellationWidget * gpsConstellation;
+   QGraphicsSvgItem * marker;
 };
 #endif /* GPSDISPLAYWIDGET_H_ */

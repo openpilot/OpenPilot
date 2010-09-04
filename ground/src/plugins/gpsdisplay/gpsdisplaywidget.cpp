@@ -29,6 +29,7 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjects/uavobjectmanager.h"
 
+
 #include <iostream>
 #include <QtGui>
 #include <QDebug>
@@ -45,6 +46,13 @@ GpsDisplayWidget::GpsDisplayWidget(QWidget *parent) : QWidget(parent)
     QPixmap earthpix( ":/gpsgadget/images/flatEarth.png" );
     fescene->addPixmap( earthpix );
     flatEarth->setScene(fescene);
+    marker = new QGraphicsSvgItem();
+    QSvgRenderer *renderer = new QSvgRenderer();
+    renderer->load(QString(":/gpsgadget/images/marker.svg"));
+    marker->setSharedRenderer(renderer);
+    fescene->addItem(marker);
+    double scale = earthpix.width()/(marker->boundingRect().width()*20);
+    marker->setScale(scale);
 }
 
 GpsDisplayWidget::~GpsDisplayWidget()
@@ -53,9 +61,11 @@ GpsDisplayWidget::~GpsDisplayWidget()
 
 void GpsDisplayWidget::setSpeedHeading(double speed, double heading)
 {
-    speed_value->setText(QString::number(speed,'g',10));
+    QString str;
+    str.sprintf("%.02f m/s",speed);
+    speed_value->setText(str);
     speed_value->adjustSize();
-    bear_value->setText(QString::number(heading,'g',10));
+    bear_value->setText(str.sprintf("%.02f deg",heading));
     bear_value->adjustSize();
 
 }
@@ -66,8 +76,11 @@ void GpsDisplayWidget::setDateTime(double date, double time)
     dstring.insert(6,".");
     dstring.insert(4,".");
     gdate_value->setText(dstring);
-    //gdate_value->adjustSize();
-    gtime_value->setText(QString::number(time,'g',10));
+    gdate_value->adjustSize();
+    dstring = QString::number(time,'g',10);
+    dstring.insert(dstring.length()-2,":");
+    dstring.insert(dstring.length()-5,":");
+    gtime_value->setText(dstring + " GMT");
     gdate_value->adjustSize();
 
 }
@@ -92,18 +105,29 @@ void GpsDisplayWidget::setSVs(int sv)
 
 void GpsDisplayWidget::setPosition(double lat, double lon, double alt)
 {
-    QString temp = "Position: ";
-    temp.append(QString::number(lat,'g',10));
-    temp.append(" ");
-    temp.append(QString::number(lon,'g',10));
-    temp.append(" ");
-    temp.append(QString::number(alt,'g',10));
-    lat_value->setText(QString::number(lat,'g',10));
+    lat *= 1E-7;
+    lon *= 1E-7;
+    double deg = (lat>0) ? floor(lat):ceil(lat);
+    double min = fabs(lat-deg)*60;
+    QString str;
+    str.sprintf("%.0f%c%.3f'", deg,0x00b0, min);
+    lat_value->setText(str);
     lat_value->adjustSize();
-    long_value->setText(QString::number(lon,'g',10));
+    deg = floor(fabs(lon));  // ABS takes an int.
+    min = fabs(lon-deg)*60;
+    str.sprintf("%.0f%c%.3f'", deg,0x00b0, min);
+    if (lon>0)
+        str.append("E");
+    else
+        str.append("W");
+    long_value->setText(str);
     long_value->adjustSize();
-    //alt_value->setText(QString::number(alt,'g',10));
-    //alt_value->adjustSize();
 
-    //textBrowser->append(temp);
+    // Now place the marker:
+    double wscale = flatEarth->sceneRect().width()/360;
+    double hscale = flatEarth->sceneRect().height()/180;
+    QPointF opd = QPointF((lon+180)*wscale-marker->boundingRect().width()*marker->scale()/2,
+                          (90-lat)*hscale-marker->boundingRect().height()*marker->scale()/2);
+    marker->setTransform(QTransform::fromTranslate( opd.x(), opd.y()) , false);
+
 }

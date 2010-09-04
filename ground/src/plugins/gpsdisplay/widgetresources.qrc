@@ -2,5 +2,6 @@
     <qresource prefix="/gpsgadget">
         <file>images/gpsEarth.svg</file>
         <file>images/flatEarth.png</file>
+        <file>images/marker.svg</file>
     </qresource>
 </RCC>

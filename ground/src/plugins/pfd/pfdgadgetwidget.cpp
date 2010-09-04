@@ -247,11 +247,15 @@ void PFDGadgetWidget::updateAttitude(UAVObject *object1) {
         }
         pitchTarget = floor(object1->getField(QString("Pitch"))->getDouble()*7.5);
 
+        // These factors assume some things about the PFD SVG, namely:
+        // - Heading value in degrees
+        // - "Scale" element is 540 degrees wide
+
         // Corvus Corax: "If you want a smooth transition between two angles, It is usually solved that by substracting
         // one from another, and if the result is >180 or <-180 I substract (respectively add) 360 degrees
         // to it. That way you always get the "shorter difference" to turn in."
         double fac = compassBandWidth/540;
-        headingTarget = yawField->getDouble();
+        headingTarget = yawField->getDouble()*(-fac);
         if ((headingValue - headingTarget)/fac > 180) {
             headingTarget += 360*fac;
         } else if (((headingValue - headingTarget)/fac < -180)) {
@@ -905,7 +909,7 @@ void PFDGadgetWidget::moveNeedles()
             headingDiff += 2*threshold;
             headingTarget += 2*threshold;
         }
-        QPointF opd = QPointF(-headingDiff*2.65,0);
+        QPointF opd = QPointF(headingDiff,0);
         m_compassband->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), true);
         headingValue += headingDiff;
     }  else {

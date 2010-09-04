@@ -40,6 +40,7 @@
 #include "manualcontrolcommand.h"
 #include "actuatordesired.h"
 #include "attitudedesired.h"
+#include "attitudesettings.h"
 
 
 // Private constants
@@ -139,6 +140,19 @@ static void manualControlTask(void* parameters)
             // Calculate throttle command in range +1 to -1
             cmd.Throttle = scaleChannel( cmd.Channel[settings.Throttle], settings.ChannelMax[settings.Throttle],
                                         settings.ChannelMin[settings.Throttle], settings.ChannelNeutral[settings.Throttle] );
+			
+			if(settings.Accessory1 != MANUALCONTROLSETTINGS_ACCESSORY1_NONE)
+				cmd.Accessory1 = scaleChannel( cmd.Channel[settings.Accessory1], settings.ChannelMax[settings.Accessory1],
+											  settings.ChannelMin[settings.Accessory1], settings.ChannelNeutral[settings.Accessory1] );
+			else 
+				cmd.Accessory1 = 0;
+			
+			if(settings.Accessory2 != MANUALCONTROLSETTINGS_ACCESSORY2_NONE)
+				cmd.Accessory2 = scaleChannel( cmd.Channel[settings.Accessory2], settings.ChannelMax[settings.Accessory2],
+											  settings.ChannelMin[settings.Accessory2], settings.ChannelNeutral[settings.Accessory2] );
+			else 
+				cmd.Accessory2 = 0;
+			
             
             // Update flight mode
             flightMode = scaleChannel( cmd.Channel[settings.FlightMode], settings.ChannelMax[settings.FlightMode],
@@ -207,6 +221,15 @@ static void manualControlTask(void* parameters)
 			}
 			attitude.Throttle = cmd.Throttle*stabSettings.ThrottleMax;
 			AttitudeDesiredSet(&attitude);
+		}
+		
+		if( 1 ) { //TODO: Make what happens here depend on GCS
+			AttitudeSettingsData attitudeSettings;
+			AttitudeSettingsGet(&attitudeSettings);
+			// Hard coding a maximum bias of 30 for now... maybe mistake
+			attitudeSettings.PitchBias = cmd.Accessory1 * 30;
+			attitudeSettings.RollBias = cmd.Accessory2 * 30;
+			AttitudeSettingsSet(&attitudeSettings);
 		}
 	}
 }

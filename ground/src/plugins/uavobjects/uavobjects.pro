@@ -42,7 +42,8 @@ HEADERS += uavobjects_global.h \
     gpssatellites.h \
     positionactual.h \
     flightbatterystate.h \
-    homelocation.h
+    homelocation.h \
+    attitudesettings.h
 SOURCES += uavobject.cpp \
     uavmetaobject.cpp \
     uavobjectmanager.cpp \
@@ -81,5 +82,6 @@ SOURCES += uavobject.cpp \
     gpssatellites.cpp \
     positionactual.cpp \
     flightbatterystate.cpp \
-    homelocation.cpp
+    homelocation.cpp \
+    attitudesettings.cpp
 OTHER_FILES += UAVObjects.pluginspec

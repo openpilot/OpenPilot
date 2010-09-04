@@ -54,6 +54,7 @@
 #include "attitudeactual.h"
 #include "ahrssettings.h"
 #include "attituderaw.h"
+#include "attitudesettings.h"
 #include "ahrsstatus.h"
 #include "alarms.h"
 #include "baroaltitude.h"
@@ -446,6 +447,8 @@ static void load_gps_position(struct opahrs_msg_v1_req_update * update)
 static void process_update(struct opahrs_msg_v1_rsp_update * update)
 {
     AttitudeActualData   data;
+    AttitudeSettingsData attitudeSettings;
+    AttitudeSettingsGet(&attitudeSettings);
     
     data.q1 = update->quaternion.q1;
     data.q2 = update->quaternion.q2;
@@ -455,8 +458,8 @@ static void process_update(struct opahrs_msg_v1_rsp_update * update)
     float q[4] = {data.q1, data.q2, data.q3, data.q4};
     float rpy[3];
     Quaternion2RPY(q,rpy);
-    data.Roll    = rpy[0];
-    data.Pitch   = rpy[1];
+    data.Roll    = rpy[0] - attitudeSettings.RollBias;
+    data.Pitch   = rpy[1] - attitudeSettings.PitchBias;
     data.Yaw     = rpy[2];
     if(data.Yaw < 0) data.Yaw += 360;
     

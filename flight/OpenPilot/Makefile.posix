@@ -159,6 +159,7 @@ SRC += $(OPUAVOBJ)/ahrscalibration.c
 SRC += $(OPUAVOBJ)/ahrssettings.c
 SRC += $(OPUAVOBJ)/gpstime.c
 SRC += $(OPUAVOBJ)/gpssatellites.c
+SRC += $(OPUAVOBJ)/attitudesettings.c
 endif
 
 ## PIOS Hardware (posix)

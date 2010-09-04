@@ -176,6 +176,7 @@ SRC += $(OPUAVOBJ)/navigationdesired.c
 SRC += $(OPUAVOBJ)/flightbatterystate.c
 SRC += $(OPUAVOBJ)/attituderaw.c
 SRC += $(OPUAVOBJ)/homelocation.c
+SRC += $(OPUAVOBJ)/attitudesettings.c
 endif
 
 ## PIOS Hardware (STM32F10x)

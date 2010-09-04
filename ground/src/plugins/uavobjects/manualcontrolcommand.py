@@ -103,6 +103,26 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
+		'Accessory1',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'Accessory2',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
 		'Channel',
 		'h',
 		8,
@@ -124,7 +144,7 @@ _fields = [ \
 
 class ManualControlCommand(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 990495372
+    OBJID        = 540381354
     NAME         = "ManualControlCommand"
     METANAME     = "ManualControlCommandMeta"
     ISSINGLEINST = 1

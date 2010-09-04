@@ -49,6 +49,8 @@ public:
         quint8 Yaw;
         quint8 Throttle;
         quint8 FlightMode;
+        quint8 Accessory1;
+        quint8 Accessory2;
         qint16 ChannelMax[8];
         qint16 ChannelNeutral[8];
         qint16 ChannelMin[8];
@@ -74,6 +76,12 @@ public:
     // Field FlightMode information
     /* Enumeration options for field FlightMode */
     typedef enum { FLIGHTMODE_CHANNEL0=0, FLIGHTMODE_CHANNEL1=1, FLIGHTMODE_CHANNEL2=2, FLIGHTMODE_CHANNEL3=3, FLIGHTMODE_CHANNEL4=4, FLIGHTMODE_CHANNEL5=5, FLIGHTMODE_CHANNEL6=6, FLIGHTMODE_CHANNEL7=7, FLIGHTMODE_NONE=8 } FlightModeOptions;
+    // Field Accessory1 information
+    /* Enumeration options for field Accessory1 */
+    typedef enum { ACCESSORY1_CHANNEL0=0, ACCESSORY1_CHANNEL1=1, ACCESSORY1_CHANNEL2=2, ACCESSORY1_CHANNEL3=3, ACCESSORY1_CHANNEL4=4, ACCESSORY1_CHANNEL5=5, ACCESSORY1_CHANNEL6=6, ACCESSORY1_CHANNEL7=7, ACCESSORY1_NONE=8 } Accessory1Options;
+    // Field Accessory2 information
+    /* Enumeration options for field Accessory2 */
+    typedef enum { ACCESSORY2_CHANNEL0=0, ACCESSORY2_CHANNEL1=1, ACCESSORY2_CHANNEL2=2, ACCESSORY2_CHANNEL3=3, ACCESSORY2_CHANNEL4=4, ACCESSORY2_CHANNEL5=5, ACCESSORY2_CHANNEL6=6, ACCESSORY2_CHANNEL7=7, ACCESSORY2_NONE=8 } Accessory2Options;
     // Field ChannelMax information
     /* Number of elements for field ChannelMax */
     static const quint32 CHANNELMAX_NUMELEM = 8;
@@ -86,7 +94,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 2933673028U;
+    static const quint32 OBJID = 2185031164U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

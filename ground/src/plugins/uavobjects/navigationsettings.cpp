@@ -47,7 +47,7 @@ NavigationSettings::NavigationSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISS
     fields.append( new UAVObjectField(QString("UpdatePeriod"), QString("ms"), UAVObjectField::UINT16, UpdatePeriodElemNames, QStringList()) );
     QStringList AccelerationMaxElemNames;
     AccelerationMaxElemNames.append("0");
-    fields.append( new UAVObjectField(QString("AccelerationMax"), QString("m/s²"), UAVObjectField::FLOAT32, AccelerationMaxElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("AccelerationMax"), QString("m/s"), UAVObjectField::FLOAT32, AccelerationMaxElemNames, QStringList()) );
     QStringList SpeedMaxElemNames;
     SpeedMaxElemNames.append("0");
     fields.append( new UAVObjectField(QString("SpeedMax"), QString("m/s"), UAVObjectField::FLOAT32, SpeedMaxElemNames, QStringList()) );

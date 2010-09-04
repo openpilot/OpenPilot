@@ -41,7 +41,7 @@
 #define MANUALCONTROLCOMMAND_H
 
 // Object constants
-#define MANUALCONTROLCOMMAND_OBJID 990495372U
+#define MANUALCONTROLCOMMAND_OBJID 540381354U
 #define MANUALCONTROLCOMMAND_NAME "ManualControlCommand"
 #define MANUALCONTROLCOMMAND_METANAME "ManualControlCommandMeta"
 #define MANUALCONTROLCOMMAND_ISSINGLEINST 1
@@ -77,6 +77,8 @@ typedef struct {
     float Yaw;
     float Throttle;
     uint8_t FlightMode;
+    float Accessory1;
+    float Accessory2;
     int16_t Channel[8];
 
 } __attribute__((packed)) ManualControlCommandData;
@@ -92,6 +94,8 @@ typedef enum { MANUALCONTROLCOMMAND_CONNECTED_FALSE=0, MANUALCONTROLCOMMAND_CONN
 // Field FlightMode information
 /* Enumeration options for field FlightMode */
 typedef enum { MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL=0, MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED=1, MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO=2 } ManualControlCommandFlightModeOptions;
+// Field Accessory1 information
+// Field Accessory2 information
 // Field Channel information
 /* Number of elements for field Channel */
 #define MANUALCONTROLCOMMAND_CHANNEL_NUMELEM 8

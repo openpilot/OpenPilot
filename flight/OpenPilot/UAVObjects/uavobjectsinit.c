@@ -37,6 +37,7 @@
 #include "attitudeactual.h"
 #include "attitudedesired.h"
 #include "attituderaw.h"
+#include "attitudesettings.h"
 #include "baroaltitude.h"
 #include "exampleobject1.h"
 #include "exampleobject2.h"
@@ -77,6 +78,7 @@ void UAVObjectsInitializeAll()
     AttitudeActualInitialize();
     AttitudeDesiredInitialize();
     AttitudeRawInitialize();
+    AttitudeSettingsInitialize();
     BaroAltitudeInitialize();
     ExampleObject1Initialize();
     ExampleObject2Initialize();

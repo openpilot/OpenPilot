@@ -49,6 +49,8 @@ public:
         float Yaw;
         float Throttle;
         quint8 FlightMode;
+        float Accessory1;
+        float Accessory2;
         qint16 Channel[8];
 
     } __attribute__((packed)) DataFields;
@@ -64,13 +66,15 @@ public:
     // Field FlightMode information
     /* Enumeration options for field FlightMode */
     typedef enum { FLIGHTMODE_MANUAL=0, FLIGHTMODE_STABILIZED=1, FLIGHTMODE_AUTO=2 } FlightModeOptions;
+    // Field Accessory1 information
+    // Field Accessory2 information
     // Field Channel information
     /* Number of elements for field Channel */
     static const quint32 CHANNEL_NUMELEM = 8;
 
   
     // Constants
-    static const quint32 OBJID = 990495372U;
+    static const quint32 OBJID = 540381354U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

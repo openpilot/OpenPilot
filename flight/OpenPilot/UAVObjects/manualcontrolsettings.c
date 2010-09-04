@@ -86,6 +86,8 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	data.Yaw = 2;
 	data.Throttle = 3;
 	data.FlightMode = 4;
+	data.Accessory1 = 8;
+	data.Accessory2 = 8;
 	data.ChannelMax[0] = 2000;
 	data.ChannelMax[1] = 2000;
 	data.ChannelMax[2] = 2000;

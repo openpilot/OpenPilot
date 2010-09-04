@@ -82,6 +82,10 @@ static void manualControlTask(void* parameters)
 	AttitudeDesiredData attitude;
 	portTickType lastSysTime;
 	float flightMode;
+	
+	uint8_t disconnected_count = 0;	
+	uint8_t connected_count = 0;	
+	enum {CONNECTED, DISCONNECTED} connection_state = DISCONNECTED;
 
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
@@ -184,10 +188,30 @@ static void manualControlTask(void* parameters)
         else
             ManualControlCommandGet(&cmd); /* Under GCS control */
 
+		// Implement hysteresis loop on connection status
 		// Must check both Max and Min in case they reversed
 		if (cmd.Channel[settings.Throttle] < settings.ChannelMax[settings.Throttle]  &&
-			cmd.Channel[settings.Throttle] < settings.ChannelMin[settings.Throttle])
+			cmd.Channel[settings.Throttle] < settings.ChannelMin[settings.Throttle]) 
 		{
+			if (disconnected_count++ > 10)
+			{
+				connection_state = DISCONNECTED;
+				connected_count = 0;
+				disconnected_count = 0;
+			} else
+				disconnected_count++;
+		} else {
+			if (connected_count++ > 10)
+			{
+				connection_state = CONNECTED;
+				connected_count = 0;
+				disconnected_count = 0;
+			}
+			else 
+				connected_count++;
+		}
+		
+		if (connection_state == DISCONNECTED) {
 			cmd.Connected = MANUALCONTROLCOMMAND_CONNECTED_FALSE;
 			cmd.Throttle = 0; // Shut down engine with no control
 			cmd.Roll = 0;

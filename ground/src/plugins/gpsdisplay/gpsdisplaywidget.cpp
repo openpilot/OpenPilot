@@ -72,12 +72,15 @@ void GpsDisplayWidget::setSpeedHeading(double speed, double heading)
 
 void GpsDisplayWidget::setDateTime(double date, double time)
 {
-    QString dstring = QString::number(date,'g',10);
-    dstring.insert(6,".");
-    dstring.insert(4,".");
+//    QString dstring = QString::number(date,'g',10);
+    QString dstring;
+    dstring.sprintf("%06.0f",date);
+    dstring.insert(dstring.length()-2,".");
+    dstring.insert(dstring.length()-5,".");
     gdate_value->setText(dstring);
     gdate_value->adjustSize();
-    dstring = QString::number(time,'g',10);
+    //dstring = QString::number(time,'g',10);
+    dstring.sprintf("%06.0f",time);
     dstring.insert(dstring.length()-2,":");
     dstring.insert(dstring.length()-5,":");
     gtime_value->setText(dstring + " GMT");
@@ -105,8 +108,6 @@ void GpsDisplayWidget::setSVs(int sv)
 
 void GpsDisplayWidget::setPosition(double lat, double lon, double alt)
 {
-    //lat *= 1E-7;
-    //lon *= 1E-7;
     double deg = (lat>0) ? floor(lat):ceil(lat);
     double min = fabs(lat-deg)*60;
     QString str;

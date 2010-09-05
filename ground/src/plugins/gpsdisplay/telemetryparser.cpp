@@ -73,6 +73,8 @@ void TelemetryParser::updateGPS( UAVObject* object1) {
     double lat = object1->getField(QString("Latitude"))->getDouble();
     double lon = object1->getField(QString("Longitude"))->getDouble();
     double alt = object1->getField(QString("Altitude"))->getDouble();
+    lat *= 1E-7;
+    lon *= 1E-7;
     emit position(lat,lon,alt);
 
     double hdg = object1->getField(QString("Heading"))->getDouble();

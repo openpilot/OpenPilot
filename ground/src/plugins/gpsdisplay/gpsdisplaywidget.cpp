@@ -94,7 +94,7 @@ void GpsDisplayWidget::dumpPacket(char *packet)
 
 void GpsDisplayWidget::setSVs(int sv)
 {
-    QString temp = "Fix: Sats: ";
+    QString temp = "Sats: ";
     temp.append(QString::number(sv));
     status_value->setText(temp);
     status_value->adjustSize();
@@ -105,6 +105,7 @@ void GpsDisplayWidget::setDOP(double hdop, double vdop, double pdop)
 
     QString str;
     str.sprintf("%.2f / %.2f / %.2f", hdop, vdop, pdop);
+    dop_value->setText(str);
 
 }
 

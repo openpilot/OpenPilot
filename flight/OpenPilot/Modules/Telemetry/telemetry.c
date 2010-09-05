@@ -317,7 +317,7 @@ static void telemetryRxTask(void* parameters)
 			inputPort = PIOS_COM_TELEM_USB;
 		}
 		else
-#endif /* ALLOW_HID_TELEMETRY */
+#endif /* PIOS_INCLUDE_USB_HID */
 		{
 			inputPort = telemetryPort;
 		}
@@ -351,7 +351,7 @@ static int32_t transmitData(uint8_t* data, int32_t length)
 		outputPort = PIOS_COM_TELEM_USB;
 	}
 	else
-#endif /* ALLOW_HID_TELEMETRY */
+#endif /* PIOS_INCLUDE_USB_HID */
 	{
 		outputPort = telemetryPort;
 	}

@@ -550,7 +550,7 @@ struct pios_com_dev pios_com_devs[] = {
     .id     = PIOS_USART_GPS,
     .driver = &pios_usart_com_driver,
   },
-#ifdef PIOS_INCLUDE_USB_HID
+#if defined(PIOS_INCLUDE_USB_HID)
   {
     .id     = 0,
     .driver = &pios_usb_com_driver,

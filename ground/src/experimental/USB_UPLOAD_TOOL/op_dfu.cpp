@@ -5,8 +5,8 @@
 
 OP_DFU::OP_DFU(bool _debug): debug(_debug)
 {
-QWaitCondition sleep;
-QMutex mutex;
+    QWaitCondition sleep;
+    QMutex mutex;
     int numDevices=0;
     cout<<"Please connect device now\n";
     int count=0;
@@ -28,6 +28,21 @@ QMutex mutex;
     if(debug)
         qDebug() << numDevices << " device(s) opened";
 }
+bool OP_DFU::SaveByteArrayToFile(QString sfile, const QByteArray &array)
+{
+    QFile file(sfile);
+    //QFile file("in.txt");
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        if(debug)
+            qDebug()<<"Cant open file";
+        return false;
+    }
+    file.write(array);
+    file.close();
+    return true;
+}
+
 bool OP_DFU::enterDFU(int devNumber)
 {
     char buf[BUF_LEN];
@@ -104,8 +119,14 @@ bool OP_DFU::UploadData(qint32 numberOfBytes, QByteArray data)
     buf[0] =0x02;//reportID
     buf[1] = OP_DFU::Upload;//DFU Command
     int packetsize;
+    float percentage;
+    int laspercentage;
     for(qint32 packetcount=0;packetcount<numberOfPackets;++packetcount)
     {
+        percentage=(float)(packetcount+1)/numberOfPackets*100;
+        if(laspercentage!=(int)percentage)
+            printProgBar((int)percentage,"UPLOADING");
+        laspercentage=(int)percentage;
         if(packetcount==numberOfPackets)
             packetsize=lastPacketCount;
         else
@@ -133,6 +154,7 @@ bool OP_DFU::UploadData(qint32 numberOfBytes, QByteArray data)
         }
 
         //  qDebug() << "UPLOAD:"<<"Data="<<(int)buf[6]<<(int)buf[7]<<(int)buf[8]<<(int)buf[9]<<";"<<result << " bytes sent";
+
     }
     return true;
 }
@@ -189,10 +211,10 @@ QByteArray OP_DFU::StartDownload(qint32 numberOfBytes, TransferTypes type)
     char buf[BUF_LEN];
     buf[0] =0x02;//reportID
     buf[1] = OP_DFU::Download_Req;//DFU Command
-    buf[2] = (char)numberOfPackets>>24;//DFU Count
-    buf[3] = (char)numberOfPackets>>16;//DFU Count
-    buf[4] = (char)numberOfPackets>>8;//DFU Count
-    buf[5] = (char)numberOfPackets;//DFU Count
+    buf[2] = numberOfPackets>>24;//DFU Count
+    buf[3] = numberOfPackets>>16;//DFU Count
+    buf[4] = numberOfPackets>>8;//DFU Count
+    buf[5] = numberOfPackets;//DFU Count
     buf[6] = (int)type;//DFU Data0
     buf[7] = lastPacketCount;//DFU Data1
     buf[8] = 1;//DFU Data2
@@ -200,13 +222,21 @@ QByteArray OP_DFU::StartDownload(qint32 numberOfBytes, TransferTypes type)
 
     int result = hidHandle.send(0,buf, BUF_LEN, 500);
     if(debug)
-        qDebug() << "StartDownload:"<<result << " bytes sent";
+        qDebug() << "StartDownload:"<<numberOfPackets<<"packets"<<" Last Packet Size="<<lastPacketCount<<" "<<result << " bytes sent";
+    float percentage;
+    int laspercentage;
     for(qint32 x=0;x<numberOfPackets;++x)
     {
-      //  qDebug()<<"Status="<<StatusToString(StatusRequest());
+            percentage=(float)(x+1)/numberOfPackets*100;
+            if(laspercentage!=(int)percentage)
+                printProgBar((int)percentage,"DOWNLOADING");
+            laspercentage=(int)percentage;
+
+
+        //  qDebug()<<"Status="<<StatusToString(StatusRequest());
         result = hidHandle.receive(0,buf,BUF_LEN,5000);
         if(debug)
-            qDebug() << result << " bytes received"<<" Count="<<(int)buf[2]<<";"<<(int)buf[3]<<";"<<(int)buf[4]<<";"<<(int)buf[5]<<" Data="<<(int)buf[6]<<";"<<(int)buf[7]<<";"<<(int)buf[8]<<";"<<(int)buf[9];
+            qDebug() << result << " bytes received"<<" Count="<<x<<"-"<<(int)buf[2]<<";"<<(int)buf[3]<<";"<<(int)buf[4]<<";"<<(int)buf[5]<<" Data="<<(int)buf[6]<<";"<<(int)buf[7]<<";"<<(int)buf[8]<<";"<<(int)buf[9];
         int size;
         if(x==numberOfPackets-1)
             size=lastPacketCount*4;
@@ -375,7 +405,7 @@ bool OP_DFU::EndOperation()
         return true;
     return false;
 }
-OP_DFU::Status OP_DFU::UploadFirmware(const QString &sfile)
+OP_DFU::Status OP_DFU::UploadFirmware(const QString &sfile, const bool &verify)
 {
     cout<<"Starting Firmware Uploading...\n";
     QFile file(sfile);
@@ -422,6 +452,17 @@ OP_DFU::Status OP_DFU::UploadFirmware(const QString &sfile)
     if(ret==OP_DFU::Last_operation_Success)
     {
         cout<<"Firmware Uploading succeeded...going to upload hash\n";
+    }
+    if(verify)
+    {
+        if(arr==StartDownload(arr.length(),OP_DFU::FW))
+            cout<<"Verify:PASSED\n";
+        else
+        {
+            cout<<"Verify:FAILED\n";
+            return OP_DFU::abort;
+        }
+
     }
     else
     {
@@ -496,4 +537,21 @@ QString OP_DFU::StatusToString(OP_DFU::Status status)
         return "abort";
 
     }
+}
+void OP_DFU::printProgBar( int percent,QString const& label){
+    std::string bar;
+
+    for(int i = 0; i < 50; i++){
+        if( i < (percent/2)){
+            bar.replace(i,1,"=");
+        }else if( i == (percent/2)){
+            bar.replace(i,1,">");
+        }else{
+            bar.replace(i,1," ");
+        }
+    }
+
+    std::cout<< "\r"<<label.toLatin1().data()<< "[" << bar << "] ";
+    std::cout.width( 3 );
+    std::cout<< percent << "%     " << std::flush;
 }

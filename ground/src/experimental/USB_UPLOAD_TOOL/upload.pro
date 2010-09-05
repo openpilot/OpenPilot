@@ -8,7 +8,7 @@ QT       += core
 
 QT       -= gui
 
-TARGET = HIDTest
+TARGET = OPUploadTool
 CONFIG   += console
 CONFIG   -= app_bundle
 

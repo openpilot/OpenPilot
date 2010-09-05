@@ -10,8 +10,20 @@
 #include <iostream>
 using namespace std;
 #define BUF_LEN 64
-#define DOWNLOAD "-dn"
-#define DEVICE   "-d"
+
+//Command Line Options
+#define DOWNLOAD            "-dn"    //done
+#define DEVICE              "-d"     //done
+#define DOWNDESCRIPTION     "-dd"    //done
+#define PROGRAMFW           "-p"     //done
+#define PROGRAMDESC         "-w"     //done
+#define VERIFY              "-v"
+#define COMPAREHASH         "-ch"
+#define COMPAREALL          "-ca"
+#define STATUSREQUEST       "-s"    //done
+#define LISTDEVICES         "-ls"   //done
+
+
 class OP_DFU
 {
 public:
@@ -81,11 +93,13 @@ public:
     bool StartUpload(qint32 numberOfBytes, TransferTypes type);
     bool UploadData(qint32 numberOfPackets,QByteArray data);
     Status UploadDescription(QString description);
-    Status UploadFirmware(const QString &sfile);
+    Status UploadFirmware(const QString &sfile, const bool &verify);
     Status StatusRequest();
     bool EndOperation();
+    void printProgBar( int percent,QString const& label);
     QString DownloadDescription(int numberOfChars);
     QByteArray StartDownload(qint32 numberOfBytes, TransferTypes type);
+    bool SaveByteArrayToFile(QString file,QByteArray const &array);
     void CopyWords(char * source, char* destination, int count);
    // QByteArray DownloadData(int devNumber,int numberOfPackets);
     OP_DFU(bool debug);

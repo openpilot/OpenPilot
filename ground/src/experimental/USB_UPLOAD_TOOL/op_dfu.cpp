@@ -227,10 +227,10 @@ QByteArray OP_DFU::StartDownload(qint32 numberOfBytes, TransferTypes type)
     int laspercentage;
     for(qint32 x=0;x<numberOfPackets;++x)
     {
-            percentage=(float)(x+1)/numberOfPackets*100;
-            if(laspercentage!=(int)percentage)
-                printProgBar((int)percentage,"DOWNLOADING");
-            laspercentage=(int)percentage;
+        percentage=(float)(x+1)/numberOfPackets*100;
+        if(laspercentage!=(int)percentage)
+            printProgBar((int)percentage,"DOWNLOADING");
+        laspercentage=(int)percentage;
 
 
         //  qDebug()<<"Status="<<StatusToString(StatusRequest());
@@ -499,6 +499,56 @@ OP_DFU::Status OP_DFU::UploadFirmware(const QString &sfile, const bool &verify)
     }
     return ret;
 }
+OP_DFU::Status OP_DFU::CompareFirmware(const QString &sfile, const CompareType &type)
+{
+    cout<<"Starting Firmware Compare...\n";
+    QFile file(sfile);
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        if(debug)
+            qDebug()<<"Cant open file";
+        return OP_DFU::abort;
+    }
+    QByteArray arr=file.readAll();
+    QByteArray hash=QCryptographicHash::hash(arr,QCryptographicHash::Sha1);
+    if(debug)
+        qDebug()<<"hash size="<<hash.length()<<" -"<<hash;
+    if(debug)
+        qDebug()<<"Bytes Loaded="<<arr.length();
+    if(arr.length()%4!=0)
+    {
+        int pad=arr.length()/4;
+        ++pad;
+        pad=pad*4;
+        pad=pad-arr.length();
+        arr.append(QByteArray(pad,255));
+    }
+    if(type==OP_DFU::hashcompare)
+    {
+        if(hash==StartDownload(hash.length(),OP_DFU::Hash))
+        {
+            cout<<"Compare Successfull Hashes MATCH!\n";
+        }
+        else
+        {
+            cout<<"Compare failed Hashes DONT MATCH!\n";
+        }
+        return StatusRequest();
+    }
+    else
+    {
+        if(arr==StartDownload(arr.length(),OP_DFU::FW))
+        {
+            cout<<"Compare Successfull ALL Bytes MATCH!\n";
+        }
+        else
+        {
+            cout<<"Compare failed Bytes DONT MATCH!\n";
+        }
+        return StatusRequest();
+    }
+}
+
 void OP_DFU::CopyWords(char *source, char *destination, int count)
 {
     for (int x=0;x<count;x=x+4)

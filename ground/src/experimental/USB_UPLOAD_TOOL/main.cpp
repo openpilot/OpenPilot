@@ -4,10 +4,12 @@
 #include "op_dfu.h"
 #include <QStringList>
 
+#define PRIVATE false
+
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    if(argc>1)
+    if(argc>1||!PRIVATE)
     {
         bool verify;
         bool debug=false;
@@ -20,36 +22,50 @@ int main(int argc, char *argv[])
         {
             args<<argv[i];
         }
-
-        if(args.contains("-?"))
+        if(args.contains("-debug"))
+            debug=true;
+        if(args.contains("-?")||(!PRIVATE && argc==1))
         {
-            cout<<"| Commands\n";
-            cout<<"| \n";
-            cout<<"| -ls                  : lists available devices\n";
-            cout<<"| -p <file>            : program hw (requires:-d - optionals:-v,-w)\n";
-            cout<<"| -v                   : verify     (requires:-d)\n";
-            cout<<"| -dn <file>           : download firmware to file (requires:-d)\n";
-            cout<<"| -dd <file>           : download discription (requires:-d)\n";
-            cout<<"| -d <number Of Device : (requires: -p or -dn)\n";
-            cout<<"| -w <description>     : (requires: -p)\n";
-            cout<<"| -ca <file>           : compares byte by byte current firmware with file\n";
-            cout<<"| -ch <file>           : compares hash of current firmware with file\n";
-            cout<<"| -s                   : requests status of device\n";
+            cout<<"_________________________________________________________________________\n";
+            cout<<"| Commands                                                               |\n";
+            cout<<"|                                                                        |\n";
+            cout<<"| -ls                  : lists available devices                         |\n";
+            cout<<"| -p <file>            : program hw (requires:-d - optionals:-v,-w)      |\n";
+            cout<<"| -v                   : verify     (requires:-d)                        |\n";
+            cout<<"| -dn <file>           : download firmware to file (requires:-d)         |\n";
+            //   cout<<"| -dd <file>           : download discription (requires:-d)         |\n";
+            cout<<"| -d <number Of Device : (requires: -p or -dn)                           |\n";
+            cout<<"| -w <description>     : (requires: -p)                                  |\n";
+            cout<<"| -ca <file>           : compares byte by byte current firmware with file|\n";
+            cout<<"| -ch <file>           : compares hash of current firmware with file     |\n";
+            cout<<"| -s                   : requests status of device                       |\n";
+            cout<<"| -r                   : resets the device                               |\n";
+            cout<<"| -j                   : exits bootloader and jumps to user FW           |\n";
+            cout<<"| -debug               : prints debug information                        |\n";
+            cout<<"|                                                                        |\n";
+            cout<<"| examples:                                                              |\n";
+            cout<<"|                                                                        |\n";
+            cout<<"| program and verify device #1                                           |\n";
+            cout<<"| OPUploadTool -p c:/OpenPilot.bin -w \"Openpilot Firmware\" -v -d 1       |\n";
+            cout<<"|                                                                        |\n";
+            cout<<"| Perform a quick compare of FW in file with FW in device #2             |\n";
+            cout<<"| OPUploadTool -ch c:/OpenPilot.bin -d 2                                 |\n";
+            cout<<"|________________________________________________________________________|\n";
             return 0;
 
 
         }
-        else if(args.contains(DOWNDESCRIPTION))
-        {
-            action=OP_DFU::downdesc;
-            if(args.contains(DEVICE))
-            {
-                if(args.indexOf(DEVICE)+1<args.length())
-                {
-                    device=(args[args.indexOf(DEVICE)+1]).toInt();
-                }
-            }
-        }
+        //        else if(args.contains(DOWNDESCRIPTION))
+        //        {
+        //            action=OP_DFU::downdesc;
+        //            if(args.contains(DEVICE))
+        //            {
+        //                if(args.indexOf(DEVICE)+1<args.length())
+        //                {
+        //                    device=(args[args.indexOf(DEVICE)+1]).toInt();
+        //                }
+        //            }
+        //        }
         else if(args.contains(PROGRAMFW))
         {
             if(args.contains(VERIFY))
@@ -66,7 +82,7 @@ int main(int argc, char *argv[])
                 }
 
             }
-            action=OP_DFU::program;
+            action=OP_DFU::actionProgram;
             if(args.contains(DEVICE))
             {
                 if(args.indexOf(DEVICE)+1<args.length())
@@ -84,7 +100,7 @@ int main(int argc, char *argv[])
                 return -1;
             }
             if(args.contains(VERIFY))
-                action=OP_DFU::programandverify;
+                action=OP_DFU::actionProgramAndVerify;
         }
         else if(args.contains(COMPAREHASH) || args.contains(COMPAREALL))
         {
@@ -92,12 +108,12 @@ int main(int argc, char *argv[])
             if(args.contains(COMPAREHASH))
             {
                 index=args.indexOf(COMPAREHASH);
-                action=OP_DFU::comparehash;
+                action=OP_DFU::actionCompareHash;
             }
             else
             {
                 index=args.indexOf(COMPAREALL);
-                action=OP_DFU::compareall;
+                action=OP_DFU::actionCompareAll;
             }
             if(args.contains(DEVICE))
             {
@@ -120,7 +136,7 @@ int main(int argc, char *argv[])
         {
             int index;
             index=args.indexOf(DOWNLOAD);
-            action=OP_DFU::download;
+            action=OP_DFU::actionDownload;
 
             if(args.contains(DEVICE))
             {
@@ -141,32 +157,46 @@ int main(int argc, char *argv[])
         }
         else if(args.contains(STATUSREQUEST))
         {
-            action=OP_DFU::statusreq;
+            action=OP_DFU::actionStatusReq;
         }
+        else if(args.contains(RESET))
+        {
+            action=OP_DFU::actionReset;
+        }
+        else if(args.contains(JUMP))
+        {
+            action=OP_DFU::actionJump;
+        }
+
         else if(args.contains(LISTDEVICES))
         {
-            action=OP_DFU::listdevs;
+            action=OP_DFU::actionListDevs;
         }
-        if((file.isEmpty()|| device==-1)  &&  action!=OP_DFU::downdesc && action!=OP_DFU::statusreq && action!=OP_DFU::listdevs)
+        if((file.isEmpty()|| device==-1)  &&  action!=OP_DFU::actionReset && action!=OP_DFU::actionStatusReq && action!=OP_DFU::actionListDevs&& action!=OP_DFU::actionJump)
         {
             cout<<"wrong parameters";
             return -1;
         }
+        if(debug)
+        {
+            qDebug()<<"Action="<<(int)action;
+            qDebug()<<"File="<<file;
+            qDebug()<<"Device="<<device;
+            qDebug()<<"Action="<<action;
+            qDebug()<<"Desctription"<<description;
+        }
 
-        //    qDebug()<<"Action="<<(int)action;
-        //  qDebug()<<"File="<<file;
-        //  qDebug()<<"Device="<<device;
-        //  qDebug()<<"Action="<<action;
+        ///////////////////////////////////ACTIONS START///////////////////////////////////////////////////
         OP_DFU dfu(debug);
         if(!dfu.enterDFU(0))
         {
             cout<<"Could not enter DFU mode\n";
             return -1;
         }
-        if(action!=OP_DFU::statusreq)
+        if(!(action==OP_DFU::actionStatusReq || action==OP_DFU::actionReset || action== OP_DFU::actionJump))
         {
             dfu.findDevices();
-            if(action==OP_DFU::listdevs)
+            if(action==OP_DFU::actionListDevs)
             {
                 cout<<"Found "<<dfu.numberOfDevices<<"\n";
                 for(int x=0;x<dfu.numberOfDevices;++x)
@@ -184,18 +214,18 @@ int main(int argc, char *argv[])
                 }
                 return 0;
             }
-            else if (action==OP_DFU::program)
+            if(device>dfu.numberOfDevices)
             {
-                if(device>dfu.numberOfDevices)
-                {
-                    cout<<"Error:Invalid Device";
-                    return -1;
-                }
-                if(!dfu.enterDFU(device))
-                {
-                    cout<<"Error:Could not enter DFU mode\n";
-                    return -1;
-                }
+                cout<<"Error:Invalid Device";
+                return -1;
+            }
+            if(!dfu.enterDFU(device))
+            {
+                cout<<"Error:Could not enter DFU mode\n";
+                return -1;
+            }
+            if (action==OP_DFU::actionProgram)
+            {
                 OP_DFU::Status retstatus=dfu.UploadFirmware(file.toAscii(),verify);
                 if(retstatus!=OP_DFU::Last_operation_Success)
                 {
@@ -213,30 +243,42 @@ int main(int argc, char *argv[])
                 }
                 cout<<"Uploading Succeded!\n";
             }
-            else if (action==OP_DFU::download)
+            else if (action==OP_DFU::actionDownload)
             {
-                if(device>dfu.numberOfDevices)
-                {
-                    cout<<"Error:Invalid Device";
-                    return -1;
-                }
-                if(!dfu.enterDFU(device))
-                {
-                    cout<<"Error:Could not enter DFU mode\n";
-                    return -1;
-                }
                 qint32 size=((OP_DFU::device)dfu.devices[device]).SizeOfCode;
                 bool ret=dfu.SaveByteArrayToFile(file.toAscii(),dfu.StartDownload(size,OP_DFU::FW));
                 return ret;
-
             }
-            else if(action==OP_DFU::downdesc)
+            //            else if(action==OP_DFU::downdesc)
+            //            {
+            //                int size=((OP_DFU::device)dfu.devices[device]).SizeOfDesc;
+            //                cout<<"Description:"<<dfu.DownloadDescription(size).toLatin1().data()<<"\n";
+            //            }
+            else if(action==OP_DFU::actionCompareHash)
             {
-                int size=((OP_DFU::device)dfu.devices[device]).SizeOfDesc;
-                cout<<"Description:"<<dfu.DownloadDescription(size).toLatin1().data();
+                dfu.CompareFirmware(file.toAscii(),OP_DFU::hashcompare);
+                return 1;
+            }
+            else if(action==OP_DFU::actionCompareAll)
+            {
+                dfu.CompareFirmware(file.toAscii(),OP_DFU::bytetobytecompare);
+                return 1;
             }
 
         }
+        else if(action==OP_DFU::actionStatusReq)
+        {
+            cout<<"Current device status="<<dfu.StatusToString(dfu.StatusRequest()).toLatin1().data()<<"\n";
+        }
+        else if(action==OP_DFU::actionReset)
+        {
+            dfu.ResetDevice();
+        }
+        else if(action== OP_DFU::actionJump)
+        {
+            dfu.JumpToApp();
+        }
+
         return 0;
     }
 
@@ -261,8 +303,8 @@ int main(int argc, char *argv[])
 
     dfu.UploadFirmware("c:/openpilot.bin",true);
     // dfu.UploadDescription("josemanuel");
-  //  QString str=dfu.DownloadDescription(12);
+    //  QString str=dfu.DownloadDescription(12);
     // dfu.JumpToApp();
-   // qDebug()<<"Description="<<str;
+    // qDebug()<<"Description="<<str;
     return a.exec();
 }

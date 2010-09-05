@@ -14,15 +14,16 @@ using namespace std;
 //Command Line Options
 #define DOWNLOAD            "-dn"    //done
 #define DEVICE              "-d"     //done
-#define DOWNDESCRIPTION     "-dd"    //done
+//#define DOWNDESCRIPTION     "-dd"    //done
 #define PROGRAMFW           "-p"     //done
 #define PROGRAMDESC         "-w"     //done
-#define VERIFY              "-v"
+#define VERIFY              "-v"     //done
 #define COMPAREHASH         "-ch"
 #define COMPAREALL          "-ca"
 #define STATUSREQUEST       "-s"    //done
 #define LISTDEVICES         "-ls"   //done
-
+#define RESET               "-r"
+#define JUMP                "-j"
 
 class OP_DFU
 {
@@ -33,6 +34,12 @@ public:
         Hash,
         Descript
     };
+    enum CompareType
+    {
+        hashcompare,
+        bytetobytecompare
+    };
+
     enum Status
     {
         DFUidle,
@@ -50,14 +57,15 @@ public:
     };
     enum Actions
     {
-        program,
-        programandverify,
-        download,
-        compareall,
-        comparehash,
-        listdevs,
-        statusreq,
-        downdesc
+        actionProgram,
+        actionProgramAndVerify,
+        actionDownload,
+        actionCompareAll,
+        actionCompareHash,
+        actionListDevs,
+        actionStatusReq,
+        actionReset,
+        actionJump
     };
 
     enum Commands
@@ -107,6 +115,7 @@ public:
     QList<device> devices;
     int numberOfDevices;
     QString StatusToString(OP_DFU::Status);
+    OP_DFU::Status CompareFirmware(const QString &sfile, const CompareType &type);
 private:
     bool debug;
     int RWFlags;

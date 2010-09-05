@@ -84,6 +84,12 @@ void TelemetryParser::updateGPS( UAVObject* object1) {
     QString fix = object1->getField(QString("Status"))->getValue().toString();
     emit fixtype(fix);
 
+    double hdop = object1->getField(QString("HDOP"))->getDouble();
+    double vdop = object1->getField(QString("VDOP"))->getDouble();
+    double pdop = object1->getField(QString("PDOP"))->getDouble();
+    emit dop(hdop,vdop,pdop);
+
+
 }
 
 void TelemetryParser::updateTime( UAVObject* object1) {

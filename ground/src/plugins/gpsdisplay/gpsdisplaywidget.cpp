@@ -72,19 +72,13 @@ void GpsDisplayWidget::setSpeedHeading(double speed, double heading)
 
 void GpsDisplayWidget::setDateTime(double date, double time)
 {
-//    QString dstring = QString::number(date,'g',10);
-    QString dstring;
-    dstring.sprintf("%06.0f",date);
-    dstring.insert(dstring.length()-2,".");
-    dstring.insert(dstring.length()-5,".");
-    gdate_value->setText(dstring);
-    gdate_value->adjustSize();
-    //dstring = QString::number(time,'g',10);
-    dstring.sprintf("%06.0f",time);
-    dstring.insert(dstring.length()-2,":");
-    dstring.insert(dstring.length()-5,":");
-    gtime_value->setText(dstring + " GMT");
-    gdate_value->adjustSize();
+    QString dstring1 = QString::number(date,'g',10);
+    dstring1.insert(6,".");
+    dstring1.insert(4,".");
+    QString dstring2 = QString::number(time,'g',10);
+    dstring2.insert(dstring2.length()-2,":");
+    dstring2.insert(dstring2.length()-5,":");
+    time_value->setText(dstring1 + "    " + dstring2 + " GMT");
 
 }
 
@@ -106,27 +100,39 @@ void GpsDisplayWidget::setSVs(int sv)
     status_value->adjustSize();
 }
 
+void GpsDisplayWidget::setDOP(double hdop, double vdop, double pdop)
+{
+
+    QString str;
+    str.sprintf("%.2f / %.2f / %.2f", hdop, vdop, pdop);
+
+}
+
 void GpsDisplayWidget::setPosition(double lat, double lon, double alt)
 {
+    lat *= 1E-7;
+    lon *= 1E-7;
     double deg = (lat>0) ? floor(lat):ceil(lat);
     double min = fabs(lat-deg)*60;
-    QString str;
-    str.sprintf("%.0f%c%.3f'", deg,0x00b0, min);
+    QString str1;
+    str1.sprintf("%.0f%c%.3f' ", deg,0x00b0, min);
     if (lat>0)
-        str.append("N");
+        str1.append("N");
     else
-        str.append("S");
-    lat_value->setText(str);
-    lat_value->adjustSize();
+        str1.append("S");
+    coord_value->setText(str1);
     deg = floor(fabs(lon));  // ABS takes an int.
     min = fabs(lon-deg)*60;
-    str.sprintf("%.0f%c%.3f'", deg,0x00b0, min);
+    QString str2;
+    str2.sprintf("%.0f%c%.3f' ", deg,0x00b0, min);
     if (lon>0)
-        str.append("E");
+        str2.append("E");
     else
-        str.append("W");
-    long_value->setText(str);
-    long_value->adjustSize();
+        str2.append("W");
+    coord_value_2->setText(str2);
+    QString str3;
+    str3.sprintf("%.2f m", alt);
+    coord_value_3->setText(str3);
 
     // Now place the marker:
     double wscale = flatEarth->sceneRect().width()/360;

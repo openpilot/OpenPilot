@@ -107,6 +107,7 @@ void GpsDisplayGadget::loadConfiguration(IUAVGadgetConfiguration* config)
     connect(parser, SIGNAL(packet(char*)), m_widget, SLOT(dumpPacket(char*)));
     connect(parser, SIGNAL(satellite(int,int,int,int,int)), m_widget->gpsSky, SLOT(updateSat(int,int,int,int,int)));
     connect(parser, SIGNAL(fixtype(QString)), m_widget, SLOT(setFixType(QString)));
+    connect(parser, SIGNAL(dop(double,double,double)), m_widget, SLOT(setDOP(double,double,double)));
 }
 
 void GpsDisplayGadget::onConnect() {

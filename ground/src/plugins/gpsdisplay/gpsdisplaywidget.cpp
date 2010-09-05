@@ -113,8 +113,8 @@ void GpsDisplayWidget::setPosition(double lat, double lon, double alt)
 {
     //lat *= 1E-7;
     //lon *= 1E-7;
-    double deg = (lat>0) ? floor(lat):ceil(lat);
-    double min = fabs(lat-deg)*60;
+    double deg = floor(fabs(lat));
+    double min = (fabs(lat)-deg)*60;
     QString str1;
     str1.sprintf("%.0f%c%.3f' ", deg,0x00b0, min);
     if (lat>0)
@@ -122,8 +122,8 @@ void GpsDisplayWidget::setPosition(double lat, double lon, double alt)
     else
         str1.append("S");
     coord_value->setText(str1);
-    deg = floor(fabs(lon));  // ABS takes an int.
-    min = fabs(lon-deg)*60;
+    deg = floor(fabs(lon));
+    min = (fabs(lon)-deg)*60;
     QString str2;
     str2.sprintf("%.0f%c%.3f' ", deg,0x00b0, min);
     if (lon>0)

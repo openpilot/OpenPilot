@@ -16,7 +16,7 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __OP_DFU_H
 #define __OP_DFU_H
-
+#include "common.h"
 /* Includes ------------------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
 typedef struct
@@ -42,7 +42,7 @@ void processComand(uint8_t *Receive_Buffer);
 uint32_t baseOfAdressType(uint8_t type);
 uint8_t isBiggerThanAvailable(uint8_t type, uint32_t size);
 void OPDfuIni(void);
-void DataDownload();
+void DataDownload(DownloadAction);
 #endif /* __OP_DFU_H */
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/

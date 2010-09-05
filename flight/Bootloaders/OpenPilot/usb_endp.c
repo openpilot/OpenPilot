@@ -43,6 +43,10 @@ void EP1_OUT_Callback(void)
   SetEPRxStatus(ENDP1, EP_RX_VALID);
 
 }
+void EP1_IN_Callback(void)
+{
+	DataDownload(keepgoing);
+}
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/
 

@@ -129,7 +129,9 @@ int main(void) {
 			STOPWATCH_Reset();
 		if ((STOPWATCH_ValueGet() > 70000) && (DeviceState == idle))
 			JumpToApp = TRUE;
-		DataDownload();
+
+
+		DataDownload(start);
 		//DelayWithDown(10);//1000000);
 	}
 	if (((*(__IO uint32_t*) StartOfUserCode) & 0x2FFE0000) == 0x20000000) { /* Jump to user application */
@@ -161,7 +163,7 @@ int main(void) {
 		}
 		if (STOPWATCH_ValueGet() > 2*50 * 100)
 			STOPWATCH_Reset();
-		DataDownload();
+		DataDownload(start);
 	}
 
 }

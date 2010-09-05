@@ -20,7 +20,7 @@
 #include "usb_istr.h"
 #include "stm32_eval.h"
 #include "stm32f10x_flash.h"
-#include "common.h"
+
 #include "hw_config.h"
 #include <string.h>
 #include "op_dfu.h"
@@ -70,8 +70,10 @@ extern uint8_t JumpToApp;
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
-void DataDownload() {
-	if ((DeviceState == downloading) && (GetEPTxStatus(ENDP1) == EP_TX_NAK)) {
+void DataDownload(DownloadAction action) {
+	if ((DeviceState == downloading)) {
+		if((action==start) && downPacketCurrent!=0)
+			return;
 		uint8_t packetSize;
 		uint32_t offset;
 		SendBuffer[0] = 0x01;

@@ -452,6 +452,7 @@ void NMEAParser::nmeaProcessGPGSA(char* packet)
         GpsData.PDOP = tokenslist.at(15).toDouble();
         GpsData.HDOP = tokenslist.at(16).toDouble();
         GpsData.VDOP = tokenslist.at(17).toDouble();
+        emit dop(GpsData.HDOP, GpsData.VDOP, GpsData.PDOP);
 
 }
 

@@ -72,14 +72,14 @@ void GpsDisplayWidget::setSpeedHeading(double speed, double heading)
 
 void GpsDisplayWidget::setDateTime(double date, double time)
 {
-    QString dstring1 = QString::number(date,'g',10);
-    dstring1.insert(6,".");
-    dstring1.insert(4,".");
-    QString dstring2 = QString::number(time,'g',10);
+    QString dstring1,dstring2;
+    dstring1.sprintf("%06.0f",date);
+    dstring1.insert(dstring1.length()-2,".");
+    dstring1.insert(dstring1.length()-5,".");
+    dstring2.sprintf("%06.0f",time);
     dstring2.insert(dstring2.length()-2,":");
     dstring2.insert(dstring2.length()-5,":");
     time_value->setText(dstring1 + "    " + dstring2 + " GMT");
-
 }
 
 void GpsDisplayWidget::setFixType(QString fixtype)

@@ -239,13 +239,13 @@ void PFDGadgetWidget::updateAttitude(UAVObject *object1) {
         // TODO: loosen this constraint and only require a +/- 20 deg range,
         //       and compute the height from the SVG element.
         // Also: keep the integer value only, to avoid unnecessary redraws
-        rollTarget = -floor(pitchField->getDouble()*10)/10;
+        rollTarget = -floor(rollField->getDouble()*10)/10;
         if ((rollTarget - rollValue) > 180) {
             rollValue += 360;
         } else if (((rollTarget - rollValue) < -180)) {
             rollValue -= 360;
         }
-        pitchTarget = floor(object1->getField(QString("Pitch"))->getDouble()*7.5);
+        pitchTarget = floor(pitchField->getDouble()*7.5);
 
         // These factors assume some things about the PFD SVG, namely:
         // - Heading value in degrees

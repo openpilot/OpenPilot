@@ -110,8 +110,8 @@ void GpsDisplayWidget::setDOP(double hdop, double vdop, double pdop)
 
 void GpsDisplayWidget::setPosition(double lat, double lon, double alt)
 {
-    lat *= 1E-7;
-    lon *= 1E-7;
+    //lat *= 1E-7;
+    //lon *= 1E-7;
     double deg = (lat>0) ? floor(lat):ceil(lat);
     double min = fabs(lat-deg)*60;
     QString str1;

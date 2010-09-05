@@ -94,6 +94,7 @@ void GpsDisplayGadget::loadConfiguration(IUAVGadgetConfiguration* config)
         parser = new TelemetryParser();
         m_widget->connectButton->setEnabled(false);
         m_widget->disconnectButton->setEnabled(false);
+        m_widget->dataStreamGroupBox->hide();
     } else if (gpsDisplayConfig->connectionMode() == "Network") {
        // Not implemented for now...
         m_widget->connectButton->setEnabled(false);

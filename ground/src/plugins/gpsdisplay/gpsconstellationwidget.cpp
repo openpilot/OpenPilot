@@ -93,6 +93,11 @@ void GpsConstellationWidget::showEvent(QShowEvent *event)
 
 }
 
+void GpsConstellationWidget::resizeEvent(QResizeEvent* event)
+{
+    Q_UNUSED(event);
+    fitInView(world, Qt::KeepAspectRatio);
+}
 
 void GpsConstellationWidget::updateSat(int index, int prn, int elevation, int azimuth, int snr)
 {

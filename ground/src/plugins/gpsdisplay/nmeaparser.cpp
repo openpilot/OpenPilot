@@ -50,7 +50,7 @@
 // Debugging
 
 //#define GPSDEBUG
-#define NMEA_DEBUG_PKT	///< define to enable debug of all NMEA messages
+//#define NMEA_DEBUG_PKT	///< define to enable debug of all NMEA messages
 
 #ifdef GPSDEBUG
         #define NMEA_DEBUG_PKT	///< define to enable debug of all NMEA messages

@@ -94,7 +94,7 @@ void GpsDisplayWidget::dumpPacket(char *packet)
 
 void GpsDisplayWidget::setSVs(int sv)
 {
-    QString temp = "Sats: ";
+    QString temp;
     temp.append(QString::number(sv));
     status_value->setText(temp);
     status_value->adjustSize();

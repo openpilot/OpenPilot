@@ -71,6 +71,10 @@ void GpsDisplayGadget::loadConfiguration(IUAVGadgetConfiguration* config)
         portsettings.StopBits=gpsDisplayConfig->stopBits();
         portsettings.Timeout_Millisec=gpsDisplayConfig->timeOut();
 
+        // In case we find no port, buttons disabled
+        m_widget->connectButton->setEnabled(false);
+        m_widget->disconnectButton->setEnabled(false);
+
         QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
         foreach( QextPortInfo nport, ports ) {
             if(nport.friendName == gpsDisplayConfig->port())
@@ -89,16 +93,18 @@ void GpsDisplayGadget::loadConfiguration(IUAVGadgetConfiguration* config)
                 connect(port, SIGNAL(readyRead()), this, SLOT(onDataAvailable()));
             }
         }
+        m_widget->dataStreamGroupBox->setHidden(false);
     } else if (gpsDisplayConfig->connectionMode() == "Telemetry") {
         qDebug() << "Using Telemetry parser";
         parser = new TelemetryParser();
         m_widget->connectButton->setEnabled(false);
         m_widget->disconnectButton->setEnabled(false);
-        m_widget->dataStreamGroupBox->hide();
+        m_widget->dataStreamGroupBox->setHidden(true);
     } else if (gpsDisplayConfig->connectionMode() == "Network") {
        // Not implemented for now...
         m_widget->connectButton->setEnabled(false);
         m_widget->disconnectButton->setEnabled(false);
+        m_widget->dataStreamGroupBox->setHidden(false);
     }
 
     connect(parser, SIGNAL(sv(int)), m_widget,SLOT(setSVs(int)));

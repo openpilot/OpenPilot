@@ -225,6 +225,7 @@ int main()
 {
     float gyro[3], accel[3], mag[3];
     float vel[3] = {0,0,0};
+	gps_data.quality = -1;
     
     ahrs_algorithm = INSGPS_Algo;
     
@@ -356,35 +357,29 @@ int main()
             
             INSPrediction(gyro, accel, 1 / (float) EKF_RATE);
             
-            if ( gps_data.updated ) 
+            if ( gps_data.updated && gps_data.quality == 1) 
             {
-                if(gps_data.quality == 1) 
-                {
-                    // Compute velocity from Heading and groundspeed
-                    vel[0] = gps_data.groundspeed * cos(gps_data.heading * M_PI / 180);        
-                    vel[1] = gps_data.groundspeed * sin(gps_data.heading * M_PI / 180);
-                    
-                    // Completely unprincipled way to make the position variance
-                    // increase as data quality decreases but keep it bounded
-                    // Variance becomes 40 m^2 and 40 (m/s)^2 when no gps
-                    INSSetPosVelVar(0.004);
-                    FullCorrection(mag, gps_data.NED, vel, altitude_data.altitude);        
-                    gps_data.updated = false;
-                } else if(gps_data.quality == 0) {
-                    // Not indoors but lost lock. 
-                    // TODO: Want to clamp coviance matrix to initial conditions on diagonal
-                    MagCorrection(mag);
-                } else if(gps_data.quality == -1) {
-                    // Indoors, update with zero position and velocity and high covariance
-                    INSSetPosVelVar(10);
-                    vel[0] = 0;
-                    vel[1] = 0;
-                    vel[2] = 0;
-                    VelBaroCorrection(vel,altitude_data.altitude);                            
-                } 
+				// Compute velocity from Heading and groundspeed
+				vel[0] = gps_data.groundspeed * cos(gps_data.heading * M_PI / 180);        
+				vel[1] = gps_data.groundspeed * sin(gps_data.heading * M_PI / 180);
+				
+				// Completely unprincipled way to make the position variance
+				// increase as data quality decreases but keep it bounded
+				// Variance becomes 40 m^2 and 40 (m/s)^2 when no gps
+				INSSetPosVelVar(0.004);
+				FullCorrection(mag, gps_data.NED, vel, altitude_data.altitude);        
+				gps_data.updated = false;
             }
             else if(gps_data.quality != -1)
                 MagCorrection(mag);  // only trust mags if outdoors
+			else {
+				// Indoors, update with zero position and velocity and high covariance
+				INSSetPosVelVar(0.1);
+				vel[0] = 0;
+				vel[1] = 0;
+				vel[2] = 0;
+				VelBaroCorrection(vel,altitude_data.altitude);                            				
+			}
             
             attitude_data.quaternion.q1 = Nav.q[0];
             attitude_data.quaternion.q2 = Nav.q[1];

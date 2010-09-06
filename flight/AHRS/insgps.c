@@ -82,7 +82,7 @@ void INSGPSInit()   //pretty much just a place holder for now
 	R[3]=R[4]=0.004;       // High freq GPS horizontal velocity noise variance (m/s)^2
 	R[5]=100;              // High freq GPS vertical velocity noise variance (m/s)^2
 	R[6]=R[7]=R[8]=0.005;  // magnetometer unit vector noise variance
-	R[9]=1;                // High freq altimeter noise variance (m^2)
+	R[9]=.05;              // High freq altimeter noise variance (m^2)
 }
 
 void INSSetPosVelVar(float PosVar)

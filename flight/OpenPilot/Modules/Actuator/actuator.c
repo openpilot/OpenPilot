@@ -265,12 +265,44 @@ static int32_t mixerFixedWingElevon(const ActuatorSettingsData* settings, const 
 
 /**
  * Mixer for VTOL (quads and octo copters). Converts desired roll,pitch,yaw and throttle to servo outputs.
+ * 
+ * I will probably add settings to change the weighting for each control to each motor.  This will allow more 
+ * flexible support for various motor topologies.  For now hard coding in simple versions and lettings the 
+ * scaling capabilities fix the subtlties.
+ *
+ * Also, because of how the Throttle ranges from 0 to 1, the motors should too!
+ *
  * @return -1 if error, 0 if success
  */
 static int32_t mixerVTOL(const ActuatorSettingsData* settings, const ActuatorDesiredData* desired, ActuatorCommandData* cmd)
 {
-	// TODO: Implement VTOL mixer
-	return -1;
+	// TODO: Implement other than quad
+	if(settings->VTOLMotorN == ACTUATORSETTINGS_VTOLMOTORN_NONE || 
+	   settings->VTOLMotorS == ACTUATORSETTINGS_VTOLMOTORS_NONE || 
+	   settings->VTOLMotorE == ACTUATORSETTINGS_VTOLMOTORE_NONE || 
+	   settings->VTOLMotorW == ACTUATORSETTINGS_VTOLMOTORW_NONE) {
+		return -1;
+	}
+		
+	// TODO: Work out sign of Yaw so we know if NS are CW or CCW
+	cmd->Channel[settings->VTOLMotorN] = scaleChannel(desired->Throttle + desired->Pitch + desired->Yaw, 
+													  settings->ChannelMax[settings->VTOLMotorN],
+													  settings->ChannelMin[settings->VTOLMotorN],
+													  settings->ChannelNeutral[settings->VTOLMotorN]);
+	cmd->Channel[settings->VTOLMotorS] = scaleChannel(desired->Throttle - desired->Pitch + desired->Yaw, 
+													  settings->ChannelMax[settings->VTOLMotorS],
+													  settings->ChannelMin[settings->VTOLMotorS],
+													  settings->ChannelNeutral[settings->VTOLMotorS]);
+	cmd->Channel[settings->VTOLMotorE] = scaleChannel(desired->Throttle - desired->Roll - desired->Yaw, 
+													  settings->ChannelMax[settings->VTOLMotorE],
+													  settings->ChannelMin[settings->VTOLMotorE],
+													  settings->ChannelNeutral[settings->VTOLMotorE]);
+	cmd->Channel[settings->VTOLMotorW] = scaleChannel(desired->Throttle + desired->Roll - desired->Yaw, 
+													  settings->ChannelMax[settings->VTOLMotorW],
+													  settings->ChannelMin[settings->VTOLMotorW],
+													  settings->ChannelNeutral[settings->VTOLMotorW]);
+	
+	return 0;
 }
 
 static int32_t InterpolateCCPMCurve(float *output, float input, const float *curve)

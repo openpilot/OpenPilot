@@ -40,18 +40,6 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_config = new Ui_SettingsWidget();
     m_config->setupUi(this);
 
-    // Fill in the dropdown menus for the channel RC Input assignement.
-    QStringList channelsList;
-    channelsList << "None" << "Roll" << "Pitch" << "Yaw" << "Throttle" << "FlightMode";
-    m_config->ch0Assign->addItems(channelsList);
-    m_config->ch1Assign->addItems(channelsList);
-    m_config->ch2Assign->addItems(channelsList);
-    m_config->ch3Assign->addItems(channelsList);
-    m_config->ch4Assign->addItems(channelsList);
-    m_config->ch5Assign->addItems(channelsList);
-    m_config->ch6Assign->addItems(channelsList);
-    m_config->ch7Assign->addItems(channelsList);
-
     // Now connect the widget to the ManualControlCommand / Channel UAVObject
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -65,6 +53,26 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
     QString fieldName = QString("InputMode");
     UAVObjectField *field = obj->getField(fieldName);
     m_config->receiverType->addItems(field->getOptions());
+    m_config->receiverType->setDisabled(true); // This option does not work for now, it is a compile-time option.
+
+    // Fill in the dropdown menus for the channel RC Input assignement.
+    QStringList channelsList;
+        channelsList << "None";
+    QList<UAVObjectField*> fieldList = obj->getFields();
+    foreach (UAVObjectField* field, fieldList) {
+        if (field->getUnits().contains("channel")) {
+            channelsList.append(field->getName());
+        }
+    }
+
+    m_config->ch0Assign->addItems(channelsList);
+    m_config->ch1Assign->addItems(channelsList);
+    m_config->ch2Assign->addItems(channelsList);
+    m_config->ch3Assign->addItems(channelsList);
+    m_config->ch4Assign->addItems(channelsList);
+    m_config->ch5Assign->addItems(channelsList);
+    m_config->ch6Assign->addItems(channelsList);
+    m_config->ch7Assign->addItems(channelsList);
 
     // And for the channel output assignement options
     m_config->ch0Output->addItem("None");
@@ -77,12 +85,9 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_config->ch7Output->addItem("None");
 
     obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
-    QList<UAVObjectField*> fieldList = obj->getFields();
+    fieldList = obj->getFields();
     foreach (UAVObjectField* field, fieldList) {
-        // NOTE: we assume that all options in ActuatorSettings are a channel assignement
-        // except for the options called "ChannelXXX"
         if (field->getUnits().contains("channel")) {
-//        if (!field->getName().contains("Channel")) {
             m_config->ch0Output->addItem(field->getName());
             m_config->ch1Output->addItem(field->getName());
             m_config->ch2Output->addItem(field->getName());

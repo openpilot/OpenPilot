@@ -97,24 +97,24 @@ public:
 
     void JumpToApp();
     void ResetDevice(void);
-    bool enterDFU(int devNumber);
-    bool StartUpload(qint32 numberOfBytes, TransferTypes type);
-    bool UploadData(qint32 numberOfPackets,QByteArray data);
-    Status UploadDescription(QString description);
+    bool enterDFU(int const &devNumber);
+    bool StartUpload(qint32  const &numberOfBytes, TransferTypes const & type);
+    bool UploadData(qint32 const & numberOfPackets,QByteArray  & data);
+    Status UploadDescription(QString  & description);
     Status UploadFirmware(const QString &sfile, const bool &verify);
     Status StatusRequest();
     bool EndOperation();
-    void printProgBar( int percent,QString const& label);
-    QString DownloadDescription(int numberOfChars);
-    QByteArray StartDownload(qint32 numberOfBytes, TransferTypes type);
-    bool SaveByteArrayToFile(QString file,QByteArray const &array);
+    void printProgBar( int const & percent,QString const& label);
+    QString DownloadDescription(int const & numberOfChars);
+    QByteArray StartDownload(qint32 const & numberOfBytes, TransferTypes const & type);
+    bool SaveByteArrayToFile(QString const & file,QByteArray const &array);
     void CopyWords(char * source, char* destination, int count);
    // QByteArray DownloadData(int devNumber,int numberOfPackets);
     OP_DFU(bool debug);
     bool findDevices();
     QList<device> devices;
     int numberOfDevices;
-    QString StatusToString(OP_DFU::Status);
+    QString StatusToString(OP_DFU::Status  const & status);
     OP_DFU::Status CompareFirmware(const QString &sfile, const CompareType &type);
 private:
     bool debug;

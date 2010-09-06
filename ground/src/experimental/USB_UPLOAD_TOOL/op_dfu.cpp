@@ -28,7 +28,7 @@ OP_DFU::OP_DFU(bool _debug): debug(_debug)
     if(debug)
         qDebug() << numDevices << " device(s) opened";
 }
-bool OP_DFU::SaveByteArrayToFile(QString sfile, const QByteArray &array)
+bool OP_DFU::SaveByteArrayToFile(QString const & sfile, const QByteArray &array)
 {
     QFile file(sfile);
     //QFile file("in.txt");
@@ -43,7 +43,7 @@ bool OP_DFU::SaveByteArrayToFile(QString sfile, const QByteArray &array)
     return true;
 }
 
-bool OP_DFU::enterDFU(int devNumber)
+bool OP_DFU::enterDFU(int const &devNumber)
 {
     char buf[BUF_LEN];
     buf[0] =0x02;//reportID
@@ -64,7 +64,7 @@ bool OP_DFU::enterDFU(int devNumber)
         qDebug() << result << " bytes sent";
     return true;
 }
-bool OP_DFU::StartUpload(qint32 numberOfBytes, TransferTypes type)
+bool OP_DFU::StartUpload(qint32 const & numberOfBytes, TransferTypes const & type)
 {
     int lastPacketCount;
     qint32 numberOfPackets=numberOfBytes/4/14;
@@ -99,7 +99,7 @@ bool OP_DFU::StartUpload(qint32 numberOfBytes, TransferTypes type)
     }
     return false;
 }
-bool OP_DFU::UploadData(qint32 numberOfBytes, QByteArray data)
+bool OP_DFU::UploadData(qint32 const & numberOfBytes, QByteArray  & data)
 {
     int lastPacketCount;
     qint32 numberOfPackets=numberOfBytes/4/14;
@@ -156,9 +156,10 @@ bool OP_DFU::UploadData(qint32 numberOfBytes, QByteArray data)
         //  qDebug() << "UPLOAD:"<<"Data="<<(int)buf[6]<<(int)buf[7]<<(int)buf[8]<<(int)buf[9]<<";"<<result << " bytes sent";
 
     }
+    cout<<"\n";
     return true;
 }
-OP_DFU::Status OP_DFU::UploadDescription(QString description)
+OP_DFU::Status OP_DFU::UploadDescription(QString  & description)
 {
     if(description.length()%4!=0)
     {      
@@ -185,7 +186,7 @@ OP_DFU::Status OP_DFU::UploadDescription(QString description)
         qDebug()<<"Upload description Status="<<ret;
     return ret;
 }
-QString OP_DFU::DownloadDescription(int numberOfChars)
+QString OP_DFU::DownloadDescription(int const & numberOfChars)
 {
     // enterDFU(devNumber);
     QByteArray arr=StartDownload(numberOfChars,Descript);
@@ -193,7 +194,7 @@ QString OP_DFU::DownloadDescription(int numberOfChars)
     return str;
 
 }
-QByteArray OP_DFU::StartDownload(qint32 numberOfBytes, TransferTypes type)
+QByteArray OP_DFU::StartDownload(qint32 const & numberOfBytes, TransferTypes const & type)
 {
     int lastPacketCount;
     qint32 numberOfPackets=numberOfBytes/4/14;
@@ -244,6 +245,7 @@ QByteArray OP_DFU::StartDownload(qint32 numberOfBytes, TransferTypes type)
             size=14*4;
         ret.append(buf+6,size);
     }
+    cout<<"\n";
     StatusRequest();
     return ret;
 }
@@ -451,10 +453,15 @@ OP_DFU::Status OP_DFU::UploadFirmware(const QString &sfile, const bool &verify)
     OP_DFU::Status ret=StatusRequest();
     if(ret==OP_DFU::Last_operation_Success)
     {
-        cout<<"Firmware Uploading succeeded...going to upload hash\n";
+
+    }
+    else
+    {
+        return OP_DFU::abort;
     }
     if(verify)
     {
+        cout<<"Starting code verification\n";
         if(arr==StartDownload(arr.length(),OP_DFU::FW))
             cout<<"Verify:PASSED\n";
         else
@@ -476,6 +483,7 @@ OP_DFU::Status OP_DFU::UploadFirmware(const QString &sfile, const bool &verify)
             qDebug()<<"StartUpload failed";
         return OP_DFU::abort;
     }
+    cout<<"Firmware Uploading succeeded...going to upload hash\n";
     if(!UploadData(hash.length(),hash))
     {
         if(debug)
@@ -559,7 +567,7 @@ void OP_DFU::CopyWords(char *source, char *destination, int count)
         *(destination+x+3)=source[x+0];
     }
 }
-QString OP_DFU::StatusToString(OP_DFU::Status status)
+QString OP_DFU::StatusToString(OP_DFU::Status const & status)
 {
     switch(status)
     {
@@ -585,10 +593,12 @@ QString OP_DFU::StatusToString(OP_DFU::Status status)
         return "outsideDevCapabilities";
     case abort:
         return "abort";
+    default:
+        return "unknown";
 
     }
 }
-void OP_DFU::printProgBar( int percent,QString const& label){
+void OP_DFU::printProgBar( int const & percent,QString const& label){
     std::string bar;
 
     for(int i = 0; i < 50; i++){

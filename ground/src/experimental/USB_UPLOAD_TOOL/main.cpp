@@ -45,11 +45,11 @@ int main(int argc, char *argv[])
             cout<<"|                                                                        |\n";
             cout<<"| examples:                                                              |\n";
             cout<<"|                                                                        |\n";
-            cout<<"| program and verify device #1                                           |\n";
-            cout<<"| OPUploadTool -p c:/OpenPilot.bin -w \"Openpilot Firmware\" -v -d 1       |\n";
+            cout<<"| program and verify device #0                                           |\n";
+            cout<<"| OPUploadTool -p c:/OpenPilot.bin -w \"Openpilot Firmware\" -v -d 0       |\n";
             cout<<"|                                                                        |\n";
-            cout<<"| Perform a quick compare of FW in file with FW in device #2             |\n";
-            cout<<"| OPUploadTool -ch c:/OpenPilot.bin -d 2                                 |\n";
+            cout<<"| Perform a quick compare of FW in file with FW in device #1             |\n";
+            cout<<"| OPUploadTool -ch c:/OpenPilot2.bin -d 2                                |\n";
             cout<<"|________________________________________________________________________|\n";
             return 0;
 
@@ -99,8 +99,7 @@ int main(int argc, char *argv[])
                 cout<<("Device not specified\n");
                 return -1;
             }
-            if(args.contains(VERIFY))
-                action=OP_DFU::actionProgramAndVerify;
+
         }
         else if(args.contains(COMPAREHASH) || args.contains(COMPAREALL))
         {
@@ -214,7 +213,7 @@ int main(int argc, char *argv[])
                 }
                 return 0;
             }
-            if(device>dfu.numberOfDevices)
+            if(device>dfu.numberOfDevices-1)
             {
                 cout<<"Error:Invalid Device";
                 return -1;

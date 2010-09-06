@@ -251,7 +251,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="fix_value">
+           <widget class="QLabel" name="status_value">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -281,7 +281,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="status_value">
+           <widget class="QLabel" name="fix_value">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
               <horstretch>0</horstretch>

@@ -208,7 +208,7 @@ uint8_t NMEAParser::nmeaProcess(cBuffer* rxBuffer)
                                 #ifdef NMEA_DEBUG_PKT
                                     qDebug() << NmeaPacket;
                                 #endif
-                                    emit packet(NmeaPacket);
+                                    emit packet(QString(NmeaPacket));
                                 // found a packet
                                 // done with this processing session
                                 foundpacket = NMEA_UNKNOWN;
@@ -284,8 +284,8 @@ void NMEAParser::nmeaProcessGPGSV(char *packet)
     }
     nmeaTerminateAtChecksum(packet);
 
-    QString* nmeaString = new QString( packet );
-    QStringList tokenslist = nmeaString->split(",");
+    QString nmeaString( packet );
+    QStringList tokenslist = nmeaString.split(",");
 
 
     // Officially there should be a max of three sentences (12 sats), some gps receivers do more..
@@ -333,8 +333,8 @@ void NMEAParser::nmeaProcessGPGGA(char* packet)
         }
         nmeaTerminateAtChecksum(packet);
 
-        QString* nmeaString = new QString( packet );
-        QStringList tokenslist = nmeaString->split(",");
+        QString nmeaString( packet );
+        QStringList tokenslist = nmeaString.split(",");
         GpsData.GPStime = tokenslist.at(1).toDouble();
         GpsData.Latitude = tokenslist.at(2).toDouble();
         int deg = (int)GpsData.Latitude/100;
@@ -380,8 +380,8 @@ void NMEAParser::nmeaProcessGPRMC(char* packet)
         }
         nmeaTerminateAtChecksum(packet);
 
-        QString* nmeaString = new QString( packet );
-        QStringList tokenslist = nmeaString->split(",");
+        QString nmeaString( packet );
+        QStringList tokenslist = nmeaString.split(",");
         GpsData.GPStime = tokenslist.at(1).toDouble();
         GpsData.Groundspeed = tokenslist.at(7).toDouble();
         GpsData.Groundspeed = GpsData.Groundspeed*0.51444;
@@ -410,8 +410,8 @@ void NMEAParser::nmeaProcessGPVTG(char* packet)
         }
         nmeaTerminateAtChecksum(packet);
 
-        QString* nmeaString = new QString( packet );
-        QStringList tokenslist = nmeaString->split(",");
+        QString nmeaString( packet );
+        QStringList tokenslist = nmeaString.split(",");
 }
 
 /**
@@ -432,28 +432,26 @@ void NMEAParser::nmeaProcessGPGSA(char* packet)
         }
         nmeaTerminateAtChecksum(packet);
 
-        QString* nmeaString = new QString( packet );
-        QStringList tokenslist = nmeaString->split(",");
+        QString nmeaString( packet );
+        QStringList tokenslist = nmeaString.split(",");
         // next field: Mode
         // Mode: 1=Fix not available, 2=2D, 3=3D
         int mode = tokenslist.at(2).toInt();
-        /*if (mode == 1)
+        if (mode == 1)
         {
-                GpsData.Status = POSITIONACTUAL_STATUS_NOFIX;
+            emit fixtype(QString("NoFix"));
         }
         else if (mode == 2)
         {
-                GpsData.Status = POSITIONACTUAL_STATUS_FIX2D;
+            emit fixtype(QString("Fix2D"));
         }
         else if (mode == 3)
         {
-                GpsData.Status = POSITIONACTUAL_STATUS_FIX3D;
-        }*/
+            emit fixtype(QString("Fix3D"));
+        }
+
         GpsData.PDOP = tokenslist.at(15).toDouble();
         GpsData.HDOP = tokenslist.at(16).toDouble();
         GpsData.VDOP = tokenslist.at(17).toDouble();
         emit dop(GpsData.HDOP, GpsData.VDOP, GpsData.PDOP);
-
 }
-
-

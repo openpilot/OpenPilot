@@ -32,7 +32,6 @@
 #include <QtCore>
 #include <stdint.h>
 
-
 class GPSParser: public QObject
 {
     Q_OBJECT
@@ -48,9 +47,9 @@ signals:
    void position(double,double,double); // Lat, Lon, Alt
    void datetime(double,double); // Date then time
    void speedheading(double,double);
-   void packet(char*); // Raw NMEA Packet (or just info)
+   void packet(QString); // Raw NMEA Packet (or just info)
    void satellite(int,int,int,int,int); // Index, PRN, Elevation, Azimuth, SNR
-   void fixtype(QString); // Type of fix (none, 2D, 3D, etc).
+   void fixtype(QString); // Type of fix: "NoGPS", "NoFix", "Fix2D", "Fix3D".
    void dop(double, double, double); // HDOP, VDOP, PDOP
 
 };

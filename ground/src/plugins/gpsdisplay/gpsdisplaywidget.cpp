@@ -82,14 +82,24 @@ void GpsDisplayWidget::setDateTime(double date, double time)
     time_value->setText(dstring1 + "    " + dstring2 + " GMT");
 }
 
-void GpsDisplayWidget::setFixType(QString fixtype)
+void GpsDisplayWidget::setFixType(const QString &fixtype)
 {
-  fix_value->setText(fixtype);
+    if(fixtype =="NoGPS") {
+        fix_value->setText("No GPS");
+    } else if (fixtype == "NoFix") {
+        fix_value->setText("Fix not available");
+    } else if (fixtype == "Fix2D") {
+        fix_value->setText("2D");
+    } else if (fixtype =="Fix3D") {
+        fix_value->setText("3D");
+    } else {
+        fix_value->setText("Unknown");
+    }
 }
 
-void GpsDisplayWidget::dumpPacket(char *packet)
+void GpsDisplayWidget::dumpPacket(const QString &packet)
 {
-    textBrowser->append(QString(packet));
+    textBrowser->append(packet);
 }
 
 void GpsDisplayWidget::setSVs(int sv)

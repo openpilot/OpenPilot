@@ -190,7 +190,8 @@ static void manualControlTask(void* parameters)
 
 		// Implement hysteresis loop on connection status
 		// Must check both Max and Min in case they reversed
-		if (cmd.Channel[settings.Throttle] < settings.ChannelMax[settings.Throttle]  &&
+		if (!ManualControlCommandReadOnly(&cmd) &&
+			cmd.Channel[settings.Throttle] < settings.ChannelMax[settings.Throttle]  &&
 			cmd.Channel[settings.Throttle] < settings.ChannelMin[settings.Throttle]) 
 		{
 			if (disconnected_count++ > 10)

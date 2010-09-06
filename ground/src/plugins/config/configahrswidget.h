@@ -100,7 +100,7 @@ private slots:
     void ahrsSettingsSaveSD();
     void savePositionData();
     void computeScaleBias();
-    void calibrationMode();
+    void sixPointCalibrationMode();
     void attitudeRawUpdated(UAVObject * obj);
 protected:
     void showEvent(QShowEvent *event);

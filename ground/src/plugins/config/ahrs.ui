@@ -34,7 +34,7 @@
       <x>10</x>
       <y>10</y>
       <width>341</width>
-      <height>141</height>
+      <height>131</height>
      </rect>
     </property>
     <property name="toolTip">
@@ -100,7 +100,7 @@ Hint: run this with engines at cruising speed.</string>
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>390</y>
+      <y>380</y>
       <width>111</width>
       <height>17</height>
      </rect>
@@ -113,7 +113,7 @@ Hint: run this with engines at cruising speed.</string>
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>380</y>
+      <y>370</y>
       <width>131</width>
       <height>31</height>
      </rect>
@@ -171,14 +171,14 @@ Hint: run this with engines at cruising speed.</string>
      </rect>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox">
+   <widget class="QCheckBox" name="homeLocation">
     <property name="enabled">
      <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
-      <x>310</x>
-      <y>380</y>
+      <x>320</x>
+      <y>370</y>
       <width>201</width>
       <height>22</height>
      </rect>
@@ -254,9 +254,9 @@ specific calibration button on top of the screen.</string>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>360</x>
+      <x>370</x>
       <y>10</y>
-      <width>271</width>
+      <width>251</width>
       <height>17</height>
      </rect>
     </property>
@@ -300,6 +300,19 @@ specific calibration button on top of the screen.</string>
     </property>
     <property name="text">
      <string>Save Position</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="indoorFlight">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>400</y>
+      <width>201</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Indoor flight mode</string>
     </property>
    </widget>
   </widget>

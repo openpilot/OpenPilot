@@ -187,7 +187,7 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_ahrs->ahrsSettingsRequest, SIGNAL(clicked()), this, SLOT(ahrsSettingsRequest()));
     connect(m_ahrs->ahrsSettingsSaveRAM, SIGNAL(clicked()), this, SLOT(ahrsSettingsSaveRAM()));
     connect(m_ahrs->ahrsSettingsSaveSD, SIGNAL(clicked()), this, SLOT(ahrsSettingsSaveSD()));
-    connect(m_ahrs->sixPointsStart, SIGNAL(clicked()), this, SLOT(calibrationMode()));
+    connect(m_ahrs->sixPointsStart, SIGNAL(clicked()), this, SLOT(sixPointCalibrationMode()));
     connect(m_ahrs->sixPointsSave, SIGNAL(clicked()), this, SLOT(savePositionData()));
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(ahrsSettingsRequest()));
 
@@ -350,6 +350,7 @@ void ConfigAHRSWidget::attitudeRawUpdated(UAVObject * obj)
             computeScaleBias();
             m_ahrs->sixPointsStart->setEnabled(true);
             m_ahrs->sixPointsSave->setEnabled(false);
+            saveAHRSCalibration(); // Saves the result to SD.
 
             /* Cleanup original settings */
             obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
@@ -521,7 +522,10 @@ void ConfigAHRSWidget::computeScaleBias()
 
 }
 
-void ConfigAHRSWidget::calibrationMode()
+/**
+  Six point calibration mode
+  */
+void ConfigAHRSWidget::sixPointCalibrationMode()
 {
     UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
 
@@ -619,8 +623,15 @@ void ConfigAHRSWidget::ahrsSettingsRequest()
     UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
     obj->requestUpdate();
     UAVObjectField *field = obj->getField(QString("Algorithm"));
-    m_ahrs->algorithm->setCurrentIndex(m_ahrs->algorithm->findText(field->getValue().toString()));
+    if (field)
+        m_ahrs->algorithm->setCurrentIndex(m_ahrs->algorithm->findText(field->getValue().toString()));
     drawVariancesGraph();
+
+    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("HomeLocation")));
+    field = obj->getField(QString("Indoor"));
+    if (field)
+        m_ahrs->homeLocation->setEnabled(field->getValue().toBool());
+
     m_ahrs->ahrsCalibStart->setEnabled(true);
     m_ahrs->sixPointsStart->setEnabled(true);
     m_ahrs->calibInstructions->setText(QString("Press \"Start\" above to calibrate."));

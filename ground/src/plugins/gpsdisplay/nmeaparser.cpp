@@ -425,31 +425,47 @@ void NMEAParser::nmeaProcessGPGSA(char* packet)
         if(packet[6]==',' && packet[7]==',')
                 return;
 
-        if(!nmeaChecksum(packet))
-        {
-                // checksum not valid
-                return;
+        if(!nmeaChecksum(packet)) {
+            // checksum not valid
+            return;
         }
         nmeaTerminateAtChecksum(packet);
 
         QString nmeaString( packet );
         QStringList tokenslist = nmeaString.split(",");
-        // next field: Mode
+
+        // M=Manual, forced to operate in 2D or 3D
+        // A=Automatic, 3D/2D
+        QString fixmodeValue = tokenslist.at(1);
+        if (fixmodeValue == "A") {
+            emit fixmode(QString("Auto"));
+        } else if (fixmodeValue == "B") {
+            emit fixmode(QString("Manual"));
+        }
+
         // Mode: 1=Fix not available, 2=2D, 3=3D
-        int mode = tokenslist.at(2).toInt();
-        if (mode == 1)
-        {
+        int fixtypeValue = tokenslist.at(2).toInt();
+        if (fixtypeValue == 1) {
             emit fixtype(QString("NoFix"));
-        }
-        else if (mode == 2)
-        {
+        } else if (fixtypeValue == 2) {
             emit fixtype(QString("Fix2D"));
-        }
-        else if (mode == 3)
-        {
+        } else if (fixtypeValue == 3) {
             emit fixtype(QString("Fix3D"));
         }
 
+        // 3-14 = IDs of SVs used in position fix (null for unused fields)
+        QList<int> svList;
+        for(int pos = 0; pos < 12;pos ++) {
+            QString sv = tokenslist.at(3+pos);
+            if(!sv.isEmpty()) {
+                svList.append(sv.toInt());
+            }
+        }
+        emit fixSVs(svList);
+
+        // 15   = PDOP
+        // 16   = HDOP
+        // 17   = VDOP
         GpsData.PDOP = tokenslist.at(15).toDouble();
         GpsData.HDOP = tokenslist.at(16).toDouble();
         GpsData.VDOP = tokenslist.at(17).toDouble();

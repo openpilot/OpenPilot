@@ -49,9 +49,10 @@ signals:
    void speedheading(double,double);
    void packet(QString); // Raw NMEA Packet (or just info)
    void satellite(int,int,int,int,int); // Index, PRN, Elevation, Azimuth, SNR
+   void fixmode(QString); // Mode of fix: "Auto", "Manual".
    void fixtype(QString); // Type of fix: "NoGPS", "NoFix", "Fix2D", "Fix3D".
    void dop(double, double, double); // HDOP, VDOP, PDOP
-
+   void fixSVs(QList<int>); // SV's used for fix.
 };
 
 #endif // GPSPARSER_H

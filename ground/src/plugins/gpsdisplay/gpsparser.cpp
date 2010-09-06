@@ -29,7 +29,7 @@
 
 GPSParser::GPSParser(QObject *parent) : QObject(parent)
 {
-
+    qRegisterMetaType<QList<int> >("QList<int>");
 }
 
 GPSParser::~GPSParser()

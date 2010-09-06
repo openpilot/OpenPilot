@@ -1578,7 +1578,6 @@ void vTaskSwitchContext( void )
 	/* Find the highest priority queue that contains ready tasks. */
 	while( listLIST_IS_EMPTY( &( pxReadyTasksLists[ uxTopReadyPriority ] ) ) )
 	{
-		printf("%i is empty\n", (int) uxTopReadyPriority);
 		--uxTopReadyPriority;
 	}
 
@@ -1828,7 +1827,7 @@ static portTASK_FUNCTION( prvIdleTask, pvParameters )
 		// (depending on kernel settings - around 100 microseconds)
 		// decreases idle thread CPU load from 100 to practically 0
 #ifdef IDLE_SLEEPS
-		Sleep(INFINITE);
+		Sleep(5);
 #endif
 	}
 } /*lint !e715 pvParameters is not accessed but all task functions require the same prototype. */

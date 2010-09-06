@@ -234,7 +234,7 @@ static DWORD WINAPI tick_generator(LPVOID lpParameter)
 		before = (float)clock()/CLOCKS_PER_SEC;
 		debug_printf("tick before, %f\n", before);
 		SetWaitableTimer(hTimer, &liDueTime, 0, NULL, NULL, FALSE);
-		if(WaitForMultipleObjects(2, hObjList, TRUE, 1000) == WAIT_TIMEOUT)
+		if(WaitForMultipleObjects(2, hObjList, TRUE, 2000) == WAIT_TIMEOUT)
 		{
 			printf("Tick generator: timed out at WaitForMultipleObjects\n");
 			return 0;
@@ -249,7 +249,7 @@ static DWORD WINAPI tick_generator(LPVOID lpParameter)
 
 		// wait till interrupt handler acknowledges the interrupt (avoids
 		// overruns).
-		if(SignalObjectAndWait(hIsrMutex, hTickAck, 1000, FALSE) == WAIT_TIMEOUT)
+		if(SignalObjectAndWait(hIsrMutex, hTickAck, 2000, FALSE) == WAIT_TIMEOUT)
 		{
 			printf("Tick generator: timed out at SignalObjectAndWait\n");
 			return 0;
@@ -279,6 +279,7 @@ static void create_system_objects(void)
 		DUPLICATE_SAME_ACCESS);
 
 	SetThreadPriority(hIsrDispatcher, THREAD_PRIORITY_BELOW_NORMAL);
+	SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 
 	hIsrMutex = CreateMutex(NULL, FALSE, NULL);
 	hIsrInvoke = CreateEvent(NULL, FALSE, FALSE, NULL);
@@ -352,7 +353,7 @@ portBASE_TYPE xPortStartScheduler( void )
 
 	for(;;)
 	{
-		if(WaitForMultipleObjects(2, hObjList, TRUE, 1000) == WAIT_TIMEOUT)
+		if(WaitForMultipleObjects(2, hObjList, TRUE, 2000) == WAIT_TIMEOUT)
 		{
 			printf("vPortStartScheduler: timed out at WaitForMultipleObjects\n");
 			return 0;

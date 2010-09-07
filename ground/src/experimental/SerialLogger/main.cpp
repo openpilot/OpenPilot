@@ -18,6 +18,9 @@ public:
     void run()
     {
         QByteArray dat;
+        const char framingRaw[16] = {7,9,3,15,193,130,150,10,7,9,3,15,193,130,150,10};
+        QByteArray framing(framingRaw,16);
+
         PortSettings Settings;
         Settings.BaudRate=BAUD57600;
         Settings.DataBits=DATA_8;
@@ -40,9 +43,17 @@ public:
 
         while(1)
         {
-            dat = serialPort.read(100);
-            qDebug() << dat;
+            dat = serialPort.read(1000);
+            if(dat.contains(framing))
+            {
+                int start = dat.indexOf(framing);
+                int count = *((int *) (dat.data() + start+16));
+                qDebug() << "Found frame start at " << start << " count " << count;
+            }
+            else
+                qDebug() << "No frame start";
             ts << dat;
+            usleep(50000);
         }
     };
 
@@ -54,7 +65,20 @@ protected:
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    pollSerialPort thread("/dev/tty.usbserial-000014FAB","log.dat"); //argv[0]);
+    QString device;
+    QString log;
+
+    if(argc < 2)
+        device = "/dev/tty.usbserial-000014FAB";
+    else
+        device = QString(argv[1]);
+
+    if(argc < 3)
+        log = "log.dat";
+    else
+        log = QString(argv[2]);
+
+    pollSerialPort thread(device, log);
     thread.start();
     return a.exec();
 }

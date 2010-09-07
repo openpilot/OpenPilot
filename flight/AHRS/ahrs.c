@@ -281,7 +281,7 @@ int main()
 #ifdef DUMP_RAW
     while(1) {
         int result;
-        uint8_t sync[4] = {7,7,7,7};
+        uint8_t framing[16] = {7,9,3,15,193,130,150,10,7,9,3,15,193,130,150,10};
         while( ahrs_state != AHRS_DATA_READY );
         ahrs_state = AHRS_PROCESSING;
         
@@ -289,7 +289,7 @@ int main()
         ahrs_state = AHRS_IDLE;;
         
         // Dump raw buffer
-        result = PIOS_COM_SendBuffer(PIOS_COM_AUX, &sync[0], 4); // dump block number
+		result = PIOS_COM_SendBuffer(PIOS_COM_AUX, &framing[0], 16); // framing header
         result += PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &total_conversion_blocks, sizeof(total_conversion_blocks)); // dump block number
         result += PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &valid_data_buffer[0], ADC_OVERSAMPLE * ADC_CONTINUOUS_CHANNELS * sizeof(valid_data_buffer[0]));
         if(result == 0)

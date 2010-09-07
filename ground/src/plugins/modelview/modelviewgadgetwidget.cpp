@@ -113,6 +113,7 @@ void ModelViewGadgetWidget::paintGL()
     m_Light.glExecute();
 
     // Display the collection of GLC_Object
+    m_World.render(0, glc::TransparentRenderFlag);
     m_World.render(0, glc::ShadingFlag);
 
     // Display UI Info (orbit circle)
@@ -170,6 +171,10 @@ void ModelViewGadgetWidget::mousePressEvent(QMouseEvent *e)
                 m_MotionTimer.stop();
                 m_MoverController.setActiveMover(GLC_MoverController::TurnTable, e);
                 updateGL();
+                break;
+        case (Qt::RightButton):
+		printf("Renderer - %s \n", (char*)glGetString(GL_RENDERER));
+		printf("Extensions - %s\n", (char*)glGetString(GL_EXTENSIONS));
                 break;
         default:
                 break;

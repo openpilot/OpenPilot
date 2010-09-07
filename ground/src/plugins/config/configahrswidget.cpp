@@ -188,13 +188,13 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
     // Connect the signals
     connect(m_ahrs->ahrsCalibStart, SIGNAL(clicked()), this, SLOT(launchAHRSCalibration()));
     connect(m_ahrs->ahrsSettingsRequest, SIGNAL(clicked()), this, SLOT(ahrsSettingsRequest()));
+    /*
     connect(m_ahrs->algorithm, SIGNAL(currentIndexChanged(int)), this, SLOT(ahrsSettingsSave()));
     connect(m_ahrs->indoorFlight, SIGNAL(stateChanged(int)), this, SLOT(homeLocationSave()));
     connect(m_ahrs->homeLocation, SIGNAL(clicked()), this, SLOT(homeLocationSaveSD()));
-    /*
+    */
     connect(m_ahrs->ahrsSettingsSaveRAM, SIGNAL(clicked()), this, SLOT(ahrsSettingsSaveRAM()));
     connect(m_ahrs->ahrsSettingsSaveSD, SIGNAL(clicked()), this, SLOT(ahrsSettingsSaveSD()));
-    */
     connect(m_ahrs->sixPointsStart, SIGNAL(clicked()), this, SLOT(sixPointCalibrationMode()));
     connect(m_ahrs->sixPointsSave, SIGNAL(clicked()), this, SLOT(savePositionData()));
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(ahrsSettingsRequest()));
@@ -628,10 +628,6 @@ void ConfigAHRSWidget::drawVariancesGraph()
   */
 void ConfigAHRSWidget::ahrsSettingsRequest()
 {
-    // First of all, disconnect the autosave signals otherwise the GCS will save
-    // the settings as soon as it gets them, which is stupid
-   disconnect(m_ahrs->algorithm, SIGNAL(currentIndexChanged(int)), this, SLOT(ahrsSettingsSave()));
-   disconnect(m_ahrs->indoorFlight, SIGNAL(stateChanged(int)), this, SLOT(homeLocationSave()));
 
     UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
     obj->requestUpdate();
@@ -646,16 +642,11 @@ void ConfigAHRSWidget::ahrsSettingsRequest()
         m_ahrs->indoorFlight->setChecked(field->getValue().toBool());
     field = obj->getField(QString("Set"));
     if (field)
-        m_ahrs->homeLocation->setEnabled(field->getValue().toBool());
+        m_ahrs->homeLocationSet->setEnabled(field->getValue().toBool());
 
     m_ahrs->ahrsCalibStart->setEnabled(true);
     m_ahrs->sixPointsStart->setEnabled(true);
     m_ahrs->calibInstructions->setText(QString("Press \"Start\" above to calibrate."));
-
-    // ... and reconnect
-    connect(m_ahrs->algorithm, SIGNAL(currentIndexChanged(int)), this, SLOT(ahrsSettingsSave()));
-    connect(m_ahrs->indoorFlight, SIGNAL(stateChanged(int)), this, SLOT(homeLocationSave()));
-
 
 }
 
@@ -666,8 +657,9 @@ void ConfigAHRSWidget::ahrsSettingsRequest()
 void ConfigAHRSWidget::enableHomeLocSave(UAVObject * obj)
 {
     UAVObjectField *field = obj->getField(QString("Set"));
-    if (field)
-        m_ahrs->homeLocation->setEnabled(field->getValue().toBool());
+    if (field) {
+        m_ahrs->homeLocationSet->setEnabled(field->getValue().toBool());
+    }
     // While we're at it, ensure the 'indoor' flag is consistent:
     field = obj->getField(QString("Indoor"));
     if (field)
@@ -676,42 +668,40 @@ void ConfigAHRSWidget::enableHomeLocSave(UAVObject * obj)
 
 
 /**
-  Save current settings to SD or RAM (depending on radio button)
+  Save current settings to RAM
   */
-void ConfigAHRSWidget::ahrsSettingsSave()
+void ConfigAHRSWidget::ahrsSettingsSaveRAM()
 {
     UAVDataObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
     UAVObjectField *field = obj->getField(QString("Algorithm"));
     field->setValue(m_ahrs->algorithm->currentText());
     obj->updated();
-    if (m_ahrs->ahrsSettingsSaveSD->isChecked())
-        updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
-}
-
-/**
-  Save Home Location settings to SD or RAM (depending on radio button)
-  */
-void ConfigAHRSWidget::homeLocationSave()
-{
-    UAVDataObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("HomeLocation")));
-    UAVObjectField *field = obj->getField(QString("Indoor"));
+    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("HomeLocation")));
+    field = obj->getField(QString("Indoor"));
     if (m_ahrs->indoorFlight->isChecked())
         field->setValue(QString("TRUE"));
     else
         field->setValue(QString("FALSE"));
+    field = obj->getField(QString("Set"));
+    if (m_ahrs->homeLocationSet->isChecked())
+        field->setValue(QString("TRUE"));
+    else
+        field->setValue(QString("FALSE"));
     obj->updated();
-    if (m_ahrs->ahrsSettingsSaveSD->isChecked())
-        saveObjectToSD(obj);
-//        updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
+
 }
 
 /**
-  Force save Home Location settings to SD
+Save AHRS Settings and home location to SD
   */
-void ConfigAHRSWidget::homeLocationSaveSD()
+void ConfigAHRSWidget::ahrsSettingsSaveSD()
 {
+    ahrsSettingsSaveRAM();
     UAVDataObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("HomeLocation")));
-    updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
+    saveObjectToSD(obj);
+    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
+    saveObjectToSD(obj);
+
 }
 
 

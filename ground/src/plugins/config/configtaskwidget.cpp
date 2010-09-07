@@ -57,7 +57,7 @@ void ConfigTaskWidget::saveNextObject()
         return;
     }
     // Get next object from the queue
-    UAVObject* obj = queue.dequeue();
+    UAVObject* obj = queue.head();
     ObjectPersistence* objper = dynamic_cast<ObjectPersistence*>( getObjectManager()->getObject(ObjectPersistence::NAME) );
     connect(objper, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(transactionCompleted(UAVObject*,bool)));
     if (obj != NULL)
@@ -77,6 +77,7 @@ void ConfigTaskWidget::transactionCompleted(UAVObject* obj, bool success)
     Q_UNUSED(success);
     // Disconnect from sending object
     obj->disconnect(this);
+    queue.dequeue(); // We can now remove the object, it's done.
     saveNextObject();
 }
 

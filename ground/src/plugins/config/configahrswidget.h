@@ -99,9 +99,8 @@ private slots:
     void calibPhase2();
     void incrementProgress();
     void ahrsSettingsRequest();
-    void ahrsSettingsSave();
-    void homeLocationSave();
-    void homeLocationSaveSD(); // forces save to SD
+    void ahrsSettingsSaveRAM();
+    void ahrsSettingsSaveSD();
     void savePositionData();
     void computeScaleBias();
     void sixPointCalibrationMode();

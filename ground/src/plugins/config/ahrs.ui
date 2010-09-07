@@ -182,31 +182,39 @@ Hint: run this with engines at cruising speed.</string>
      <string>Six Point Calibration instructions</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="homeLocation">
+   <widget class="QRadioButton" name="homeLocationSet">
     <property name="enabled">
      <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
-      <x>380</x>
+      <x>480</x>
       <y>361</y>
-      <width>201</width>
+      <width>51</width>
       <height>31</height>
      </rect>
     </property>
     <property name="toolTip">
      <string>Saves the Home Location. This is only enabled
 if the Home Location is set, i.e. if the GPS fix is
-successful.</string>
+successful.
+
+Disabled if there is no GPS fix.</string>
     </property>
     <property name="text">
-     <string>Save Home Location to SD</string>
+     <string>Set</string>
     </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+    <attribute name="buttonGroup">
+     <string>buttonGroup</string>
+    </attribute>
    </widget>
    <widget class="QPushButton" name="ahrsSettingsRequest">
     <property name="geometry">
      <rect>
-      <x>260</x>
+      <x>280</x>
       <y>430</y>
       <width>93</width>
       <height>27</height>
@@ -303,13 +311,13 @@ Only makes sense with the &quot;INSGPS&quot; algorithm.</string>
      <string>Indoor flight mode</string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="ahrsSettingsSaveRAM">
+   <widget class="QPushButton" name="ahrsSettingsSaveRAM">
     <property name="geometry">
      <rect>
       <x>390</x>
       <y>430</y>
       <width>111</width>
-      <height>21</height>
+      <height>27</height>
      </rect>
     </property>
     <property name="toolTip">
@@ -321,17 +329,14 @@ specific calibration button on top of the screen.</string>
     <property name="text">
      <string>Save to RAM</string>
     </property>
-    <attribute name="buttonGroup">
-     <string>buttonGroup</string>
-    </attribute>
    </widget>
-   <widget class="QRadioButton" name="ahrsSettingsSaveSD">
+   <widget class="QPushButton" name="ahrsSettingsSaveSD">
     <property name="geometry">
      <rect>
       <x>520</x>
       <y>430</y>
       <width>101</width>
-      <height>21</height>
+      <height>27</height>
      </rect>
     </property>
     <property name="toolTip">
@@ -341,11 +346,45 @@ specific calibration button on top of the screen.</string>
      <string>Save to SD</string>
     </property>
     <property name="checked">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="homeLocationClear">
+    <property name="enabled">
      <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>360</y>
+      <width>71</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Clears the HomeLocation: only makes sense if you save
+to SD. This will force the AHRS to use the next GPS fix as the
+new home location unless it is in indoor mode.</string>
+    </property>
+    <property name="text">
+     <string>Clear</string>
     </property>
     <attribute name="buttonGroup">
      <string>buttonGroup</string>
     </attribute>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>360</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Home Location:</string>
+    </property>
    </widget>
   </widget>
  </widget>

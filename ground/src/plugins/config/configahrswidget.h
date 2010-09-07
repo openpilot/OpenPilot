@@ -50,6 +50,7 @@ public:
 private:
     void drawVariancesGraph();
     void displayPlane(QString elementID);
+
     Ui_AHRSWidget *m_ahrs;
     QGraphicsSvgItem *paperplane;
     QGraphicsSvgItem *ahrsbargraph;
@@ -90,14 +91,17 @@ private:
     QString initialUpdateFiltered;
 
     double listMean(QList<double> list);
+
 private slots:
+    void enableHomeLocSave(UAVObject *obj);
     void launchAHRSCalibration();
     void saveAHRSCalibration();
     void calibPhase2();
     void incrementProgress();
     void ahrsSettingsRequest();
-    void ahrsSettingsSaveRAM();
-    void ahrsSettingsSaveSD();
+    void ahrsSettingsSave();
+    void homeLocationSave();
+    void homeLocationSaveSD(); // forces save to SD
     void savePositionData();
     void computeScaleBias();
     void sixPointCalibrationMode();

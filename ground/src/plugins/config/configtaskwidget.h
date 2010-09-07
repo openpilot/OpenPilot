@@ -27,10 +27,12 @@
 #ifndef CONFIGTASKWIDGET_H
 #define CONFIGTASKWIDGET_H
 
+
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/uavobject.h"
 #include "uavobjects/objectpersistence.h"
+#include <QQueue>
 #include <QtGui/QWidget>
 #include <QList>
 
@@ -42,8 +44,18 @@ class ConfigTaskWidget: public QWidget
 public:
     ConfigTaskWidget(QWidget *parent = 0);
     ~ConfigTaskWidget();
+    void saveObjectToSD(UAVObject *obj);
     void updateObjectPersistance(ObjectPersistence::OperationOptions op, UAVObject *obj);
     UAVObjectManager* getObjectManager();
+
+public slots:
+    void transactionCompleted(UAVObject* obj, bool success);
+
+private:
+    QQueue<UAVObject*> queue;
+    void saveNextObject();
+
+
 
 };
 

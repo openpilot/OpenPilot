@@ -39,12 +39,50 @@ ConfigTaskWidget::~ConfigTaskWidget()
    // Do nothing
 }
 
+void ConfigTaskWidget::saveObjectToSD(UAVObject *obj)
+{
+    // Add to queue
+    queue.enqueue(obj);
+    // If queue length is one, then start sending (call sendNextObject)
+    // Otherwise, do nothing, it's sending anyway
+    if (queue.length()==1)
+        saveNextObject();
+
+}
+
+void ConfigTaskWidget::saveNextObject()
+{
+    if ( queue.isEmpty() )
+    {
+        return;
+    }
+    // Get next object from the queue
+    UAVObject* obj = queue.dequeue();
+    ObjectPersistence* objper = dynamic_cast<ObjectPersistence*>( getObjectManager()->getObject(ObjectPersistence::NAME) );
+    connect(objper, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(transactionCompleted(UAVObject*,bool)));
+    if (obj != NULL)
+    {
+        ObjectPersistence::DataFields data;
+        data.Operation = ObjectPersistence::OPERATION_SAVE;
+        data.Selection = ObjectPersistence::SELECTION_SINGLEOBJECT;
+        data.ObjectID = obj->getObjID();
+        data.InstanceID = obj->getInstID();
+        objper->setData(data);
+        objper->updated();
+    }
+}
+
+void ConfigTaskWidget::transactionCompleted(UAVObject* obj, bool success)
+{
+    Q_UNUSED(success);
+    // Disconnect from sending object
+    obj->disconnect(this);
+    saveNextObject();
+}
 
 void ConfigTaskWidget::updateObjectPersistance(ObjectPersistence::OperationOptions op, UAVObject *obj)
 {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    ObjectPersistence* objper = dynamic_cast<ObjectPersistence*>( objManager->getObject(ObjectPersistence::NAME) );
+    ObjectPersistence* objper = dynamic_cast<ObjectPersistence*>( getObjectManager()->getObject(ObjectPersistence::NAME) );
     if (obj != NULL)
     {
         ObjectPersistence::DataFields data;

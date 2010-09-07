@@ -701,7 +701,8 @@ void ConfigAHRSWidget::homeLocationSave()
         field->setValue(QString("FALSE"));
     obj->updated();
     if (m_ahrs->ahrsSettingsSaveSD->isChecked())
-        updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
+        saveObjectToSD(obj);
+//        updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
 }
 
 /**

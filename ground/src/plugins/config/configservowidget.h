@@ -54,6 +54,12 @@ private:
         void assignOutputChannel(UAVDataObject *obj, UAVObjectField *field, QString str);
         int mccDataRate;
         UAVObject::Metadata accInitialData;
+        QList<QSlider*> outSliders;
+        QList<QSpinBox*> outMin;
+        QList<QSpinBox*> outMax;
+        QList<QCheckBox*> reversals;
+        QList<QLabel*> outLabels;
+
 
         bool firstUpdate;
 
@@ -67,16 +73,8 @@ private:
         void saveRCOutputObject();
         void runChannelTests(bool state);
         void sendChannelTest(int value);
-
-
-        void setch0OutRange();
-        void setch1OutRange();
-        void setch2OutRange();
-        void setch3OutRange();
-        void setch4OutRange();
-        void setch5OutRange();
-        void setch6OutRange();
-        void setch7OutRange();
+        void setChOutRange();
+        void reverseChannel(bool state);
 
 };
 

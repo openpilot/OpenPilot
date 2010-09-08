@@ -40,6 +40,49 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_config = new Ui_SettingsWidget();
     m_config->setupUi(this);
 
+    // First of all, put all the channel widgets into lists, so that we can
+    // manipulate those:
+    outLabels << m_config->ch0OutValue
+            << m_config->ch1OutValue
+            << m_config->ch2OutValue
+            << m_config->ch3OutValue
+            << m_config->ch4OutValue
+            << m_config->ch5OutValue
+            << m_config->ch6OutValue
+            << m_config->ch7OutValue;
+    outSliders << m_config->ch0OutSlider
+            << m_config->ch1OutSlider
+            << m_config->ch2OutSlider
+            << m_config->ch3OutSlider
+            << m_config->ch4OutSlider
+            << m_config->ch5OutSlider
+            << m_config->ch6OutSlider
+            << m_config->ch7OutSlider;
+    outMin << m_config->ch0OutMin
+            << m_config->ch1OutMin
+            << m_config->ch2OutMin
+            << m_config->ch3OutMin
+            << m_config->ch4OutMin
+            << m_config->ch5OutMin
+            << m_config->ch6OutMin
+            << m_config->ch7OutMin;
+    outMax << m_config->ch0OutMax
+            << m_config->ch1OutMax
+            << m_config->ch2OutMax
+            << m_config->ch3OutMax
+            << m_config->ch4OutMax
+            << m_config->ch5OutMax
+            << m_config->ch6OutMax
+            << m_config->ch7OutMax;
+    reversals << m_config->ch0Rev
+            << m_config->ch1Rev
+            << m_config->ch2Rev
+            << m_config->ch3Rev
+            << m_config->ch4Rev
+            << m_config->ch5Rev
+            << m_config->ch6Rev
+            << m_config->ch7Rev;
+
     // Now connect the widget to the ManualControlCommand / Channel UAVObject
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -99,23 +142,13 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
         }
     }
 
-    connect(m_config->ch0OutMin, SIGNAL(editingFinished()), this, SLOT(setch0OutRange()));
-    connect(m_config->ch1OutMin, SIGNAL(editingFinished()), this, SLOT(setch1OutRange()));
-    connect(m_config->ch2OutMin, SIGNAL(editingFinished()), this, SLOT(setch2OutRange()));
-    connect(m_config->ch3OutMin, SIGNAL(editingFinished()), this, SLOT(setch3OutRange()));
-    connect(m_config->ch4OutMin, SIGNAL(editingFinished()), this, SLOT(setch4OutRange()));
-    connect(m_config->ch5OutMin, SIGNAL(editingFinished()), this, SLOT(setch5OutRange()));
-    connect(m_config->ch6OutMin, SIGNAL(editingFinished()), this, SLOT(setch6OutRange()));
-    connect(m_config->ch7OutMin, SIGNAL(editingFinished()), this, SLOT(setch7OutRange()));
-
-    connect(m_config->ch0OutMax, SIGNAL(editingFinished()), this, SLOT(setch0OutRange()));
-    connect(m_config->ch1OutMax, SIGNAL(editingFinished()), this, SLOT(setch1OutRange()));
-    connect(m_config->ch2OutMax, SIGNAL(editingFinished()), this, SLOT(setch2OutRange()));
-    connect(m_config->ch3OutMax, SIGNAL(editingFinished()), this, SLOT(setch3OutRange()));
-    connect(m_config->ch4OutMax, SIGNAL(editingFinished()), this, SLOT(setch4OutRange()));
-    connect(m_config->ch5OutMax, SIGNAL(editingFinished()), this, SLOT(setch5OutRange()));
-    connect(m_config->ch6OutMax, SIGNAL(editingFinished()), this, SLOT(setch6OutRange()));
-    connect(m_config->ch7OutMax, SIGNAL(editingFinished()), this, SLOT(setch7OutRange()));
+    for (int i = 0; i < 8; i++) {
+        connect(outMin[i], SIGNAL(editingFinished()), this, SLOT(setChOutRange()));
+        connect(outMax[i], SIGNAL(editingFinished()), this, SLOT(setChOutRange()));
+        connect(reversals[i], SIGNAL(toggled(bool)), this, SLOT(reverseChannel(bool)));
+        // Now connect the channel out sliders to our signal to send updates in test mode
+        connect(outSliders[i], SIGNAL(valueChanged(int)), this, SLOT(sendChannelTest(int)));
+    }
 
     connect(m_config->channelOutTest, SIGNAL(toggled(bool)), this, SLOT(runChannelTests(bool)));
 
@@ -129,16 +162,6 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_config->saveRCOutputToSD, SIGNAL(clicked()), this, SLOT(saveRCOutputObject()));
     connect(m_config->saveRCOutputToRAM, SIGNAL(clicked()), this, SLOT(sendRCOutputUpdate()));
     connect(m_config->getRCOutputCurrent, SIGNAL(clicked()), this, SLOT(requestRCOutputUpdate()));
-
-    // Now connect the channel out sliders to our signal to send updates in test mode
-    connect(m_config->ch0OutSlider, SIGNAL(valueChanged(int)), this, SLOT(sendChannelTest(int)));
-    connect(m_config->ch1OutSlider, SIGNAL(valueChanged(int)), this, SLOT(sendChannelTest(int)));
-    connect(m_config->ch2OutSlider, SIGNAL(valueChanged(int)), this, SLOT(sendChannelTest(int)));
-    connect(m_config->ch3OutSlider, SIGNAL(valueChanged(int)), this, SLOT(sendChannelTest(int)));
-    connect(m_config->ch4OutSlider, SIGNAL(valueChanged(int)), this, SLOT(sendChannelTest(int)));
-    connect(m_config->ch5OutSlider, SIGNAL(valueChanged(int)), this, SLOT(sendChannelTest(int)));
-    connect(m_config->ch6OutSlider, SIGNAL(valueChanged(int)), this, SLOT(sendChannelTest(int)));
-    connect(m_config->ch7OutSlider, SIGNAL(valueChanged(int)), this, SLOT(sendChannelTest(int)));
 
 
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestRCInputUpdate()));
@@ -160,6 +183,15 @@ ConfigServoWidget::~ConfigServoWidget()
   */
 void ConfigServoWidget::sendChannelTest(int value)
 {
+    // First of all, update the label:
+    QSlider *ob = (QSlider*)QObject::sender();
+    int index = outSliders.indexOf(ob);
+    if (reversals[index]->isChecked())
+        value = outMin[index]->value()-value+outMax[index]->value();
+    else
+        outLabels[index]->setText(QString::number(value));
+
+    outLabels[index]->setText(QString::number(value));
     if (!m_config->channelOutTest->isChecked())
         return;
 
@@ -168,13 +200,14 @@ void ConfigServoWidget::sendChannelTest(int value)
 
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorCommand")));
 
-    QObject *ob = QObject::sender();
+/*
     QStringList channelsList;
     channelsList << "ch0OutSlider" << "ch1OutSlider" << "ch2OutSlider" << "ch3OutSlider" << "ch4OutSlider"
             << "ch5OutSlider" << "ch6OutSlider" << "ch7OutSlider";
     int idx = channelsList.indexOf(QRegExp(ob->objectName()));
+    */
     UAVObjectField * channel = obj->getField("Channel");
-    channel->setValue(value,idx);
+    channel->setValue(value,index);
     obj->updated();
 
 }
@@ -255,51 +288,30 @@ void ConfigServoWidget::requestRCOutputUpdate()
     m_config->outputRate2->setValue(field->getValue(1).toInt());
 
     // Get Channel ranges:
-    field = obj->getField(QString("ChannelMin"));
-    m_config->ch0OutMin->setValue(field->getValue(0).toInt());
-    m_config->ch0OutSlider->setMinimum(field->getValue(0).toInt());
-    m_config->ch1OutMin->setValue(field->getValue(1).toInt());
-    m_config->ch1OutSlider->setMinimum(field->getValue(1).toInt());
-    m_config->ch2OutMin->setValue(field->getValue(2).toInt());
-    m_config->ch2OutSlider->setMinimum(field->getValue(2).toInt());
-    m_config->ch3OutMin->setValue(field->getValue(3).toInt());
-    m_config->ch3OutSlider->setMinimum(field->getValue(3).toInt());
-    m_config->ch4OutMin->setValue(field->getValue(4).toInt());
-    m_config->ch4OutSlider->setMinimum(field->getValue(4).toInt());
-    m_config->ch5OutMin->setValue(field->getValue(5).toInt());
-    m_config->ch5OutSlider->setMinimum(field->getValue(5).toInt());
-    m_config->ch6OutMin->setValue(field->getValue(6).toInt());
-    m_config->ch6OutSlider->setMinimum(field->getValue(6).toInt());
-    m_config->ch7OutMin->setValue(field->getValue(7).toInt());
-    m_config->ch7OutSlider->setMinimum(field->getValue(7).toInt());
-
-    field = obj->getField(QString("ChannelMax"));
-    m_config->ch0OutMax->setValue(field->getValue(0).toInt());
-    m_config->ch0OutSlider->setMaximum(field->getValue(0).toInt());
-    m_config->ch1OutMax->setValue(field->getValue(1).toInt());
-    m_config->ch1OutSlider->setMaximum(field->getValue(1).toInt());
-    m_config->ch2OutMax->setValue(field->getValue(2).toInt());
-    m_config->ch2OutSlider->setMaximum(field->getValue(2).toInt());
-    m_config->ch3OutMax->setValue(field->getValue(3).toInt());
-    m_config->ch3OutSlider->setMaximum(field->getValue(3).toInt());
-    m_config->ch4OutMax->setValue(field->getValue(4).toInt());
-    m_config->ch4OutSlider->setMaximum(field->getValue(4).toInt());
-    m_config->ch5OutMax->setValue(field->getValue(5).toInt());
-    m_config->ch5OutSlider->setMaximum(field->getValue(5).toInt());
-    m_config->ch6OutMax->setValue(field->getValue(6).toInt());
-    m_config->ch6OutSlider->setMaximum(field->getValue(6).toInt());
-    m_config->ch7OutMax->setValue(field->getValue(7).toInt());
-    m_config->ch7OutSlider->setMaximum(field->getValue(7).toInt());
+    for (int i=0;i<8;i++) {
+        field = obj->getField(QString("ChannelMin"));
+        int minValue = field->getValue(i).toInt();
+        outMin[i]->setValue(minValue);
+        field = obj->getField(QString("ChannelMax"));
+        int maxValue = field->getValue(i).toInt();
+        outMax[i]->setValue(maxValue);
+        if (maxValue>minValue) {
+            outSliders[i]->setMinimum(minValue);
+            outSliders[i]->setMaximum(maxValue);
+            reversals[i]->setChecked(false);
+        } else {
+            outSliders[i]->setMinimum(maxValue);
+            outSliders[i]->setMaximum(minValue);
+            reversals[i]->setChecked(true);
+        }
+    }
 
     field = obj->getField(QString("ChannelNeutral"));
-    m_config->ch0OutSlider->setValue(field->getValue(0).toInt());
-    m_config->ch1OutSlider->setValue(field->getValue(1).toInt());
-    m_config->ch2OutSlider->setValue(field->getValue(2).toInt());
-    m_config->ch3OutSlider->setValue(field->getValue(3).toInt());
-    m_config->ch4OutSlider->setValue(field->getValue(4).toInt());
-    m_config->ch5OutSlider->setValue(field->getValue(5).toInt());
-    m_config->ch6OutSlider->setValue(field->getValue(6).toInt());
-    m_config->ch7OutSlider->setValue(field->getValue(7).toInt());
+    for (int i=0; i<8; i++) {
+        int value = field->getValue(i).toInt();
+        outSliders[i]->setValue(value);
+        outLabels[i]->setText(QString::number(value));
+    }
 
 
 }
@@ -316,34 +328,19 @@ void ConfigServoWidget::sendRCOutputUpdate()
 
     // Now send channel ranges:
     UAVObjectField * field = obj->getField(QString("ChannelMax"));
-    field->setValue(m_config->ch0OutMax->value(),0);
-    field->setValue(m_config->ch1OutMax->value(),1);
-    field->setValue(m_config->ch2OutMax->value(),2);
-    field->setValue(m_config->ch3OutMax->value(),3);
-    field->setValue(m_config->ch4OutMax->value(),4);
-    field->setValue(m_config->ch5OutMax->value(),5);
-    field->setValue(m_config->ch6OutMax->value(),6);
-    field->setValue(m_config->ch7OutMax->value(),7);
+    for (int i = 0; i < 8; i++) {
+        field->setValue(outMax[i]->value(),i);
+    }
 
     field = obj->getField(QString("ChannelMin"));
-    field->setValue(m_config->ch0OutMin->value(),0);
-    field->setValue(m_config->ch1OutMin->value(),1);
-    field->setValue(m_config->ch2OutMin->value(),2);
-    field->setValue(m_config->ch3OutMin->value(),3);
-    field->setValue(m_config->ch4OutMin->value(),4);
-    field->setValue(m_config->ch5OutMin->value(),5);
-    field->setValue(m_config->ch6OutMin->value(),6);
-    field->setValue(m_config->ch7OutMin->value(),7);
+    for (int i = 0; i < 8; i++) {
+        field->setValue(outMin[i]->value(),i);
+    }
 
     field = obj->getField(QString("ChannelNeutral"));
-    field->setValue(m_config->ch0OutSlider->value(),0);
-    field->setValue(m_config->ch1OutSlider->value(),1);
-    field->setValue(m_config->ch2OutSlider->value(),2);
-    field->setValue(m_config->ch3OutSlider->value(),3);
-    field->setValue(m_config->ch4OutSlider->value(),4);
-    field->setValue(m_config->ch5OutSlider->value(),5);
-    field->setValue(m_config->ch6OutSlider->value(),6);
-    field->setValue(m_config->ch7OutSlider->value(),7);
+    for (int i = 0; i < 8; i++) {
+        field->setValue(outSliders[i]->value(),i);
+    }
 
     field = obj->getField(QString("ChannelUpdateFreq"));
     field->setValue(m_config->outputRate1->value(),0);
@@ -420,116 +417,71 @@ void ConfigServoWidget::saveRCOutputObject()
 
 
 /**
-  Sets the minimum/maximem value of the channel 0 to seven output sliders.
+  Sets the minimum/maximum value of the channel 0 to seven output sliders.
   Have to do it here because setMinimum is not a slot.
 
-  One added trik: if the slider is at either its max or its min when the value
+  One added trick: if the slider is at either its max or its min when the value
   is changed, then keep it on the max/min.
   */
-void ConfigServoWidget::setch0OutRange()
+void ConfigServoWidget::setChOutRange()
 {
-    QSlider *slider = m_config->ch0OutSlider;
+    QSpinBox *spinbox = (QSpinBox*)QObject::sender();
+    int index = outMin.indexOf(spinbox); // This is the channel number
+    if (index < 0)
+        index = outMax.indexOf(spinbox); // We can't know if the signal came from min or max
+    QSlider *slider = outSliders[index];
     int oldMini = slider->minimum();
     int oldMaxi = slider->maximum();
-    slider->setRange(m_config->ch0OutMin->value(),
-                                     m_config->ch0OutMax->value());
+    if (outMin[index]->value()<outMax[index]->value()) {
+        slider->setRange(outMin[index]->value(),
+                         outMax[index]->value());
+        reversals[index]->setChecked(false);
+    } else {
+        slider->setRange(outMax[index]->value(),
+                         outMin[index]->value());
+        reversals[index]->setChecked(true);
+    }
     if (slider->value()==oldMini)
         slider->setValue(slider->minimum());
-
     if (slider->value()==oldMaxi)
         slider->setValue(slider->maximum());
 }
-void ConfigServoWidget::setch1OutRange()
-{
-    QSlider *slider = m_config->ch1OutSlider;
-    int oldMini = slider->minimum();
-    int oldMaxi = slider->maximum();
-    slider->setRange(m_config->ch1OutMin->value(),
-                                     m_config->ch1OutMax->value());
-    if (slider->value()==oldMini)
-        slider->setValue(slider->minimum());
 
-    if (slider->value()==oldMaxi)
-        slider->setValue(slider->maximum());
-}
-void ConfigServoWidget::setch2OutRange()
+/**
+  Reverses the channel when the checkbox is clicked
+  */
+void ConfigServoWidget::reverseChannel(bool state)
 {
-    QSlider *slider = m_config->ch2OutSlider;
-    int oldMini = slider->minimum();
-    int oldMaxi = slider->maximum();
-    slider->setRange(m_config->ch2OutMin->value(),
-                                     m_config->ch2OutMax->value());
-    if (slider->value()==oldMini)
-        slider->setValue(slider->minimum());
+    QCheckBox *checkbox = (QCheckBox*)QObject::sender();
+    int index = reversals.indexOf(checkbox); // This is the channel number
 
-    if (slider->value()==oldMaxi)
-        slider->setValue(slider->maximum());
-}
-void ConfigServoWidget::setch3OutRange()
-{
-    QSlider *slider = m_config->ch3OutSlider;
-    int oldMini = slider->minimum();
-    int oldMaxi = slider->maximum();
-    slider->setRange(m_config->ch3OutMin->value(),
-                                     m_config->ch3OutMax->value());
-    if (slider->value()==oldMini)
-        slider->setValue(slider->minimum());
+    // Sanity check: if state became true, make sure the Maxvalue was higher than Minvalue
+    // the situations below can happen!
+    if (state && (outMax[index]->value()<outMin[index]->value()))
+        return;
+    if (!state && (outMax[index]->value()>outMin[index]->value()))
+        return;
 
-    if (slider->value()==oldMaxi)
-        slider->setValue(slider->maximum());
-}
-void ConfigServoWidget::setch4OutRange()
-{
-    QSlider *slider = m_config->ch4OutSlider;
-    int oldMini = slider->minimum();
-    int oldMaxi = slider->maximum();
-    slider->setRange(m_config->ch4OutMin->value(),
-                                     m_config->ch4OutMax->value());
-    if (slider->value()==oldMini)
-        slider->setValue(slider->minimum());
+    // Now, swap the min & max values (only on the spinboxes, the slider
+    // does not change!
+    int temp = outMax[index]->value();
+    outMax[index]->setValue(outMin[index]->value());
+    outMin[index]->setValue(temp);
 
-    if (slider->value()==oldMaxi)
-        slider->setValue(slider->maximum());
-}
-void ConfigServoWidget::setch5OutRange()
-{
-    QSlider *slider = m_config->ch5OutSlider;
-    int oldMini = slider->minimum();
-    int oldMaxi = slider->maximum();
-    slider->setRange(m_config->ch5OutMin->value(),
-                                     m_config->ch5OutMax->value());
-    if (slider->value()==oldMini)
-        slider->setValue(slider->minimum());
+    // Also update the channel value
+    // This is a trick to force the slider to update its value and
+    // emit the right signal itself, because our sendChannelTest(int) method
+    // relies on the object sender's identity.
+    if (outSliders[index]->value()<outSliders[index]->maximum()) {
+        outSliders[index]->setValue(outSliders[index]->value()+1);
+        outSliders[index]->setValue(outSliders[index]->value()-1);
+    } else {
+        outSliders[index]->setValue(outSliders[index]->value()-1);
+        outSliders[index]->setValue(outSliders[index]->value()+1);
+    }
 
-    if (slider->value()==oldMaxi)
-        slider->setValue(slider->maximum());
 }
-void ConfigServoWidget::setch6OutRange()
-{
-    QSlider *slider = m_config->ch6OutSlider;
-    int oldMini = slider->minimum();
-    int oldMaxi = slider->maximum();
-    slider->setRange(m_config->ch6OutMin->value(),
-                                     m_config->ch6OutMax->value());
-    if (slider->value()==oldMini)
-        slider->setValue(slider->minimum());
 
-    if (slider->value()==oldMaxi)
-        slider->setValue(slider->maximum());
-}
-void ConfigServoWidget::setch7OutRange()
-{
-    QSlider *slider = m_config->ch7OutSlider;
-    int oldMini = slider->minimum();
-    int oldMaxi = slider->maximum();
-    slider->setRange(m_config->ch7OutMin->value(),
-                                     m_config->ch7OutMax->value());
-    if (slider->value()==oldMini)
-        slider->setValue(slider->minimum());
-
-    if (slider->value()==oldMaxi)
-        slider->setValue(slider->maximum());
-}
 
 
 

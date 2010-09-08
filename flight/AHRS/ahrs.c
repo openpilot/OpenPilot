@@ -279,12 +279,19 @@ int main()
     }
     
 #ifdef DUMP_RAW
+	int previous_conversion;
     while(1) {
         int result;
-        uint8_t framing[16] = {7,9,3,15,193,130,150,10,7,9,3,15,193,130,150,10};
+        uint8_t framing[16] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
         while( ahrs_state != AHRS_DATA_READY );
         ahrs_state = AHRS_PROCESSING;
-        
+		
+        if(total_conversion_blocks != previous_conversion+1)
+			PIOS_LED_On(LED1); // not keeping up
+		else 
+			PIOS_LED_Off(LED1);		
+		previous_conversion = total_conversion_blocks;
+
         downsample_data();
         ahrs_state = AHRS_IDLE;;
         

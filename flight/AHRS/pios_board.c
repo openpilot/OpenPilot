@@ -157,7 +157,7 @@ void USART3_IRQHandler() __attribute__ ((alias ("PIOS_USART_aux_irq_handler")));
 const struct pios_usart_cfg pios_usart_aux_cfg = {
   .regs = USART3,
   .init = {
-    .USART_BaudRate            = 57600,
+    .USART_BaudRate            = 115200,
     .USART_WordLength          = USART_WordLength_8b,
     .USART_Parity              = USART_Parity_No,
     .USART_StopBits            = USART_StopBits_1,

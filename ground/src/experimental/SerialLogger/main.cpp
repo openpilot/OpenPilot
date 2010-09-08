@@ -18,15 +18,16 @@ public:
     void run()
     {
         QByteArray dat;
-        const char framingRaw[16] = {7,9,3,15,193,130,150,10,7,9,3,15,193,130,150,10};
+        //const char framingRaw[16] = {7,9,3,15,193,130,150,10,7,9,3,15,193,130,150,10};
+        const char framingRaw[16] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
         QByteArray framing(framingRaw,16);
 
         PortSettings Settings;
-        Settings.BaudRate=BAUD57600;
+        Settings.BaudRate=BAUD9600;
         Settings.DataBits=DATA_8;
         Settings.Parity=PAR_NONE;
         Settings.StopBits=STOP_1;
-        Settings.FlowControl=FLOW_HARDWARE;
+        Settings.FlowControl=FLOW_OFF;
         Settings.Timeout_Millisec=500;
 
         QextSerialPort serialPort(device, Settings);
@@ -43,17 +44,19 @@ public:
 
         while(1)
         {
-            dat = serialPort.read(1000);
+            dat = serialPort.read(500);
             if(dat.contains(framing))
             {
                 int start = dat.indexOf(framing);
                 int count = *((int *) (dat.data() + start+16));
                 qDebug() << "Found frame start at " << start << " count " << count;
             }
+            else if (dat.size() == 0)
+                qDebug() << "No data";
             else
                 qDebug() << "No frame start";
             ts << dat;
-            usleep(50000);
+            usleep(100000);
         }
     };
 

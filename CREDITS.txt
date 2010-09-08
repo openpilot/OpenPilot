@@ -23,15 +23,15 @@ D: Minor GCS infrastruture, updating the credit file
 
 N: Pedro Assuncao
 E: pedro (dot) agda (plus) openpilot (at) gmail (dot) com
-D: GCS Settings Gadget work
+D: Initial GCS Settings Gadget work
 
 N: Jose Barros
 E: josembarros (at) hotmail (dot) com
-D: Next-Gen OP Map Lib, GCS Y-Modem Plugin
+D: Next-Gen OP Map Lib, GCS Y-Modem Plugin, OP Bootloader 
 
 N: David "Buzz" Carlson 
 E: chebuzz (plus) openpilot (at) gmail (dot) com
-D: 3D ModelView GCS Plugin
+D: 3D ModelView GCS Plugin, sponsor of HITL merge work and XPlane addition
 
 N: Corvus Corax
 E: corvus (dot) corax (at) cybertrench (dot) com
@@ -39,17 +39,18 @@ D: IL2 HITL GCS Plugin, Posix OpenPilot, Advanced Stabalisation module
 
 N: James Cotton
 E: peabody124 (plus) openpilot (at) gmail (dot) com
-D: HID implementation, GCS Joystick control, Posix OpenPilot work
-D: AHRS firmware implementation
+D: Multiplatform HID implimentation (firmware & GCS), GCS Joystick control 
+D: Posix OpenPilot work and Mac implimentation 
+D: Firmware implimentation of Professor Schinstock's INS/GPS
 
 N: Frederic Goddeeris
 E: fredericgoddeeris (at) hotmail (dot) com
 D: I2C work and FreeRTOS work, MK intergration
-D: EagleTree OSD support   
+D: EagleTree OSD implimentation   
 
 N: Daniel Godin
 E: dgodin (at) dnsct (dot) com
-W: Notify Plugin for the GCS
+W: Sponsor: Notify Plugin for the GCS
 
 N: Bani Greyling
 E: bani (dot) greyling (plus) openpilot (at) gmail (dot) com
@@ -70,9 +71,8 @@ D: Embedded STM32 infrastructure
 
 N: Edouard Lafargue 
 E: edouard (at) lafargue (dot) name
-D: GCS Dial Plugins, GCS PFD Plugin
+D: GCS Dial Plugins, GCS PFD Plugin, GCS Config plugin
 D: Artwork including display dials
-D: GCS GPS Plugin, GCS Config plugin
 
 N: Matt Lipski
 E: mattlipski (plus) openpilot (at) gmail (dot) com
@@ -114,14 +114,18 @@ D: GCS Framework and Plugins for the GCS
 N: Zik Saleeba
 E: zik (at) zikzak (dot) net
 D: Initial schematic based on Zik's Flying Fox schematic     
-D: Picoc creator as used in the flight
+
+N: Professor Dale Schinstock
+E: dales (at) ksu (dot) edu
+D: Lead AHRS Developer
+D: Creator of the OpenPilot INS / EKF
 
 N: Stacey Sheldon
 E: stac (at) solidgoldbomb (dot) org
-D: Core embedded developer
-D: SPI protocol for AHRS, I2C work and various core work  
+D: Core Embedded Developer
+D: SPI protocol for AHRS, I2C rewrite and much core work  
 
-N: Erhard Siegl
+N: Dr. Erhard Siegl
 E: Erhard (dot) Siegl (at) zogazoga (dot) at
 D: Configuration engine for the GCS
 
@@ -136,9 +140,11 @@ D: Hardware debugging and testing, creation of 2-layer Floss-JTAG board
 N: Andrew Thoms
 E: electronics (at) andrewspizza (dot) net
 D: IP Telemtry plugin for the GCS
+D: Helicopter support code and mixing for CCPM
 
 N: Vassilis Varveropoulos
 E: vassilis (at) openpilot (dot) org
 D: Co-founder, Principal embedded software architect. 
-D: Module architecture and UAVTalk Implimentation.
+D: Module architecture and UAVTalk/UAVObjects implimentation.
+
 

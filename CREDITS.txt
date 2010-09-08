@@ -39,7 +39,8 @@ D: IL2 HITL GCS Plugin, Posix OpenPilot, Advanced Stabalisation module
 
 N: James Cotton
 E: peabody124 (plus) openpilot (at) gmail (dot) com
-D: HID implimentation, GCS Joystick control, Posix OpenPilot work
+D: HID implementation, GCS Joystick control, Posix OpenPilot work
+D: AHRS firmware implementation
 
 N: Frederic Goddeeris
 E: fredericgoddeeris (at) hotmail (dot) com
@@ -71,6 +72,7 @@ N: Edouard Lafargue
 E: edouard (at) lafargue (dot) name
 D: GCS Dial Plugins, GCS PFD Plugin
 D: Artwork including display dials
+D: GCS GPS Plugin, GCS Config plugin
 
 N: Matt Lipski
 E: mattlipski (plus) openpilot (at) gmail (dot) com

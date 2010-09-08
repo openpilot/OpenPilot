@@ -413,10 +413,11 @@ int main()
         ahrs_state = AHRS_IDLE;
         
 #ifdef DUMP_FRIENDLY
-        PIOS_COM_SendFormattedString(PIOS_COM_AUX, "a: %d %d %d\r\n", (int16_t)(accel_data.filtered.x * 100), (int16_t)(accel_data.filtered.y * 100), (int16_t)(accel_data.filtered.z * 100)); 
-        PIOS_COM_SendFormattedString(PIOS_COM_AUX, "g: %d %d %d\r\n", (int16_t)(gyro_data.filtered.x * 100), (int16_t)(gyro_data.filtered.y * 100), (int16_t)(gyro_data.filtered.z * 100));
-        PIOS_COM_SendFormattedString(PIOS_COM_AUX, "m: %d %d %d\r\n",  mag_data.raw.axis[0], mag_data.raw.axis[1], mag_data.raw.axis[2]);
-        PIOS_COM_SendFormattedString(PIOS_COM_AUX, "q: %d %d %d %d\r\n", (int16_t)(Nav.q[0] * 100), (int16_t)(Nav.q[1] * 100), (int16_t)(Nav.q[2] * 100), (int16_t)(Nav.q[3] * 100));
+        PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_AUX, "b: %d\r\n", total_conversion_blocks);
+        PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_AUX, "a: %d %d %d\r\n", (int16_t)(accel_data.filtered.x * 1000), (int16_t)(accel_data.filtered.y * 1000), (int16_t)(accel_data.filtered.z * 1000)); 
+        PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_AUX, "g: %d %d %d\r\n", (int16_t)(gyro_data.filtered.x * 1000), (int16_t)(gyro_data.filtered.y * 1000), (int16_t)(gyro_data.filtered.z * 1000));
+        PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_AUX, "m: %d %d %d\r\n",  mag_data.raw.axis[0], mag_data.raw.axis[1], mag_data.raw.axis[2]);
+        PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_AUX, "q: %d %d %d %d\r\n", (int16_t)(Nav.q[0] * 1000), (int16_t)(Nav.q[1] * 1000), (int16_t)(Nav.q[2] * 1000), (int16_t)(Nav.q[3] * 1000));
 #endif
         
         process_spi_request();

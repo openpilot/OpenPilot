@@ -23,7 +23,7 @@ public:
         QByteArray framing(framingRaw,16);
 
         PortSettings Settings;
-        Settings.BaudRate=BAUD9600;
+        Settings.BaudRate=BAUD115200;
         Settings.DataBits=DATA_8;
         Settings.Parity=PAR_NONE;
         Settings.StopBits=STOP_1;

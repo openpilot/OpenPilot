@@ -1,4 +1,4 @@
-function read(device)
+function analyzeRaw(device)
 
 downsample = 12;   % relevant for knowing block size
 Fs = 512;          % need to verify, close

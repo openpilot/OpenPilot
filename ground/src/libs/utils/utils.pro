@@ -37,8 +37,9 @@ SOURCES += reloadpromptutils.cpp \
     fancymainwindow.cpp \
     detailsbutton.cpp \
     detailswidget.cpp \
-    coordinateconversions.cpp
-win32 {
+    coordinateconversions.cpp \
+    pathutils.cpp
+win32 { 
     SOURCES += abstractprocess_win.cpp \
         consoleprocess_win.cpp \
         winutils.cpp
@@ -82,7 +83,8 @@ HEADERS += utils_global.h \
     fancymainwindow.h \
     detailsbutton.h \
     detailswidget.h \
-    coordinateconversions.h
+    coordinateconversions.h \
+    pathutils.h
 FORMS += filewizardpage.ui \
     projectintropage.ui \
     newclasswidget.ui \

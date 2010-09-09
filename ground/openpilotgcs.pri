@@ -81,6 +81,10 @@ macx {
     !isEqual(GCS_SOURCE_TREE, $$GCS_BUILD_TREE):copydata = 1
 }
 
+
+DEFINES += GCS_DATA_PATH=\\\"$$GCS_DATA_PATH\\\"
+
+
 INCLUDEPATH += \
     $$GCS_SOURCE_TREE/src/libs
 

@@ -63,7 +63,7 @@ macx {
     GCS_PLUGIN_PATH  = $$GCS_LIBRARY_PATH
     GCS_LIBEXEC_PATH = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/Resources
     GCS_DATA_PATH    = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/Resources
-    GCS_DATA_BASENAME = $${GCS_APP_TARGET}.app/Contents/Resources
+    GCS_DATA_BASENAME = Resources
     GCS_DOC_PATH     = $$GCS_DATA_PATH/doc
     copydata = 1
 } else {

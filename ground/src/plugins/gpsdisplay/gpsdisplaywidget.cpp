@@ -62,12 +62,8 @@ GpsDisplayWidget::~GpsDisplayWidget()
 void GpsDisplayWidget::setSpeedHeading(double speed, double heading)
 {
     QString str;
-    str.sprintf("%.02f m/s",speed);
-    speed_value->setText(str);
-    speed_value->adjustSize();
+    speed_value->setText(str.sprintf("%.02f m/s",speed));
     bear_value->setText(str.sprintf("%.02f deg",heading));
-    bear_value->adjustSize();
-
 }
 
 void GpsDisplayWidget::setDateTime(double date, double time)

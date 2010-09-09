@@ -26,6 +26,7 @@
  */
 
 #include "pfdgadgetconfiguration.h"
+#include "utils/pathutils.h"
 #include <QtCore/QDataStream>
 
 /**
@@ -43,7 +44,7 @@ PFDGadgetConfiguration::PFDGadgetConfiguration(QString classId, const QByteArray
         stream >> dialFile;
         stream >> useOpenGLFlag;
         stream >> hqFonts;
-        m_defaultDial=dialFile;
+        m_defaultDial=Utils::PathUtils().InsertDataPath(dialFile);
     }
 }
 /**
@@ -66,7 +67,8 @@ QByteArray PFDGadgetConfiguration::saveState() const
 {
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::WriteOnly);
-    stream << m_defaultDial;
+    QString dialFile = Utils::PathUtils().RemoveDataPath(m_defaultDial);
+    stream << dialFile;
     stream << useOpenGLFlag;
     stream << hqFonts;
 

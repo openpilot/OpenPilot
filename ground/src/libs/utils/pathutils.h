@@ -41,6 +41,8 @@ class QTCREATOR_UTILS_EXPORT PathUtils
 public:
     PathUtils();
     QString GetDataPath();
+    QString RemoveDataPath(QString path);
+    QString InsertDataPath(QString path);
 
 };
 

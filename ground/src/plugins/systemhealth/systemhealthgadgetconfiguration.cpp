@@ -26,6 +26,7 @@
  */
 
 #include "systemhealthgadgetconfiguration.h"
+#include "utils/pathutils.h"
 #include <QtCore/QDataStream>
 
 /**
@@ -39,7 +40,9 @@ SystemHealthGadgetConfiguration::SystemHealthGadgetConfiguration(QString classId
     //if a saved configuration exists load it
     if (state.count() > 0) {
         QDataStream stream(state);
-        stream >> systemFile;
+        QString diagram;
+        stream >> diagram;
+        systemFile = Utils::PathUtils().InsertDataPath(diagram);
     }
 }
 /**
@@ -60,7 +63,8 @@ QByteArray SystemHealthGadgetConfiguration::saveState() const
 {
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::WriteOnly);
-    stream << systemFile;
+    QString diagram = Utils::PathUtils().RemoveDataPath(systemFile);
+    stream << diagram;
 
     return bytes;
 }

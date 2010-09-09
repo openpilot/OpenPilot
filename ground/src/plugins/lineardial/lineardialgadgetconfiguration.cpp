@@ -7,7 +7,7 @@
  * @{
  * @addtogroup LinearDialPlugin Linear Dial Plugin
  * @{
- * @brief Impliments a gadget that displays linear gauges 
+ * @brief Implements a gadget that displays linear gauges
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -26,6 +26,7 @@
  */
 
 #include "lineardialgadgetconfiguration.h"
+#include "utils/pathutils.h"
 #include <QtCore/QDataStream>
 
 /**
@@ -51,7 +52,9 @@ LineardialGadgetConfiguration::LineardialGadgetConfiguration(QString classId, co
     //if a saved configuration exists load it
     if (state.count() > 0) {
         QDataStream stream(state);
-        stream >> dialFile;
+        QString dFile;
+        stream >> dFile;
+        dialFile = Utils::PathUtils().InsertDataPath(dFile);
         stream >> sourceDataObject;
         stream >> sourceObjectField;
         stream >> minValue;
@@ -99,7 +102,8 @@ QByteArray LineardialGadgetConfiguration::saveState() const
 {
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::WriteOnly);
-    stream << dialFile;
+    QString dFile = Utils::PathUtils().RemoveDataPath(dialFile);
+    stream << dFile;
     stream << sourceDataObject;
     stream << sourceObjectField;
     stream << minValue;

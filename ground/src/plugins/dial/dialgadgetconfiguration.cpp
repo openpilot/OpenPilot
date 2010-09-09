@@ -27,6 +27,7 @@
  */
 
 #include "dialgadgetconfiguration.h"
+#include "utils/pathutils.h"
 #include <QtCore/QDataStream>
 
 /**
@@ -59,7 +60,7 @@ DialGadgetConfiguration::DialGadgetConfiguration(QString classId, const QByteArr
         QDataStream stream(state);
         QString dialFile;
         stream >> dialFile;
-        m_defaultDial=dialFile;
+        m_defaultDial=Utils::PathUtils().InsertDataPath(dialFile);
         stream >> dialBackgroundID;
         stream >> dialForegroundID;
         stream >> dialNeedleID1;
@@ -130,7 +131,8 @@ QByteArray DialGadgetConfiguration::saveState() const
 {
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::WriteOnly);
-    stream << m_defaultDial;
+    QString dialFile = Utils::PathUtils().RemoveDataPath(m_defaultDial);
+    stream << dialFile;
     stream << dialBackgroundID;
     stream << dialForegroundID;
     stream << dialNeedleID1;

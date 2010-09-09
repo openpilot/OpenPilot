@@ -26,6 +26,7 @@
  */
 
 #include "modelviewgadgetconfiguration.h"
+#include "utils/pathutils.h"
 #include <QtCore/QDataStream>
 
 ModelViewGadgetConfiguration::ModelViewGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
@@ -36,9 +37,13 @@ ModelViewGadgetConfiguration::ModelViewGadgetConfiguration(QString classId, cons
 {
     if (state.count() > 0) {
         QDataStream stream(state);
-        stream >> m_acFilename;
-        stream >> m_bgFilename;
+        QString modelFile;
+        QString bgFile;
+        stream >> modelFile;
+        stream >> bgFile;
 	stream >> m_enableVbo;
+        m_acFilename = Utils::PathUtils().InsertDataPath(modelFile);
+        m_bgFilename = Utils::PathUtils().InsertDataPath(bgFile);
     }
 }
 
@@ -56,8 +61,8 @@ QByteArray ModelViewGadgetConfiguration::saveState() const
 
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::WriteOnly);
-    stream << m_acFilename;
-    stream << m_bgFilename;
+    stream << Utils::PathUtils().RemoveDataPath(m_acFilename);
+    stream << Utils::PathUtils().RemoveDataPath(m_bgFilename);
     stream << m_enableVbo;
     return bytes;
 }

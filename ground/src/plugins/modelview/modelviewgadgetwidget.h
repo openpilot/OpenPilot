@@ -89,6 +89,7 @@ private:
     QString acFilename;
     QString bgFilename;
     bool vboEnable;
+    bool loadError;
 
     AttitudeActual* attActual;
 };

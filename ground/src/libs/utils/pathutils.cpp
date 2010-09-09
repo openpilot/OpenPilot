@@ -43,15 +43,41 @@ namespace Utils {
 QString PathUtils::GetDataPath()
 {
         // Figure out root:  Up one from 'bin'
-        //QDir rootDir = QApplication::applicationDirPath();
-        //rootDir.cdUp();
-        //const QString rootDirPath = rootDir.canonicalPath();
-        //QString pluginPath = rootDirPath;
-        //pluginPath += QLatin1Char('/');
-        QString pluginPath = QLatin1String(GCS_DATA_PATH);
+        QDir rootDir = QApplication::applicationDirPath();
+        rootDir.cdUp();
+        const QString rootDirPath = rootDir.canonicalPath();
+        QString pluginPath = rootDirPath;
+        pluginPath += QLatin1Char('/');
+        pluginPath += QLatin1String(GCS_DATA_BASENAME);
         pluginPath += QLatin1Char('/');
       return pluginPath;
 }
 
+/**
+  Cuts the standard data path from the 'path' argument. If path does not start
+with the standard data path, then do nothing.
+  */
+QString PathUtils::RemoveDataPath(QString path)
+{
+    if (path.startsWith(GetDataPath())) {
+        int i = path.length()- GetDataPath().length();
+        return QString("%%DATAPATH%%") + path.right(i);
+    } else
+        return path;
+}
+
+/**
+  Inserts the data path (only if the path starts with %%DATAPATH%%)
+  */
+QString PathUtils::InsertDataPath(QString path)
+{
+    if (path.startsWith(QString("%%DATAPATH%%")))
+    {
+        QString newPath = GetDataPath();
+        newPath += path.right(path.length()-12);
+        return newPath;
+    }
+    return path;
+}
 
 }

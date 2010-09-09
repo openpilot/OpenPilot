@@ -77,6 +77,8 @@ void ModelViewGadgetWidget::reloadScene()
 //// Private functions ////
 void ModelViewGadgetWidget::initializeGL()
 {
+    if (loadError)
+        return;
     // OpenGL initialization
     m_GlView.initGl();
     if (!vboEnable) 
@@ -97,6 +99,8 @@ void ModelViewGadgetWidget::initializeGL()
 
 void ModelViewGadgetWidget::paintGL()
 {
+    if (loadError)
+        return;
     // Clear screen
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Load identity matrix
@@ -142,15 +146,18 @@ void ModelViewGadgetWidget::CreateScene()
         if(QFile::exists(acFilename))
 	{
 	    QFile aircraft(acFilename);
-
             m_World= GLC_Factory::instance()->createWorldFromFile(aircraft);
-
             m_ModelBoundingBox= m_World.boundingBox();
-	}
+            loadError = false;
+            initializeGL();
+        } else {
+            loadError = true;
+        }
     }
     catch(GLC_Exception e)
     {
 	qDebug("ModelView aircraft texture file loading failed.");
+        loadError = true;
     }
 }
 

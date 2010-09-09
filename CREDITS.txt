@@ -61,7 +61,7 @@ E: peter (at) pyne (dot) se
 D: GCS Core Developer
 D: Multiple GCS plugins, Gadget foundations, UAVObject viewer
 
-N: Samik Korhonen
+N: Sami Korhonen
 E: samik.korhonen (plus) openpilot (at) gmail (dot) com
 D: GPS Module, Spektrum RC Module 
 

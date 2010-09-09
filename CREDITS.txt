@@ -39,8 +39,8 @@ D: IL2 HITL GCS Plugin, Posix OpenPilot, Advanced stabilisation module
 
 N: James Cotton
 E: peabody124 (plus) openpilot (at) gmail (dot) com
-D: Multiplatform HID implimentation (firmware & GCS), GCS Joystick control 
-D: Posix OpenPilot work and Mac implimentation 
+D: Multiplatform HID implementation (firmware & GCS), GCS Joystick control 
+D: Posix OpenPilot work and Mac implementation 
 D: Firmware implementation of Professor Schinstock's INS/GPS
 
 N: Frederic Goddeeris
@@ -71,7 +71,7 @@ D: Embedded STM32 infrastructure
 
 N: Edouard Lafargue 
 E: edouard (at) lafargue (dot) name
-D: GCS Dial Plugins, GCS PFD Plugin, GCS Config plugin
+D: GCS Dial Plugins, GCS PFD Plugin, GCS GPS plugin, GCS Config plugin
 D: Artwork including display dials
 
 N: Matt Lipski

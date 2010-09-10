@@ -26,14 +26,12 @@ VariableSizeLinearLeastSquares2::VariableSizeLinearLeastSquares2(size_t _modelSi
 
 VariableSizeLinearLeastSquares2::VariableSizeLinearLeastSquares2(size_t _modelSize, 
 																																 size_t _dataSetSize)
-  : m_modelSize( _modelSize ), m_dataSetSize(_dataSetSize), m_countValues(0),  
-		m_A(m_dataSetSize, m_modelSize), m_b(m_dataSetSize), 
-		m_x(m_modelSize), m_xCov(m_modelSize, m_modelSize) {
-	//	m_countValues = 0;
-	// m_x.resize(m_modelSize);
-	// m_xCov.resize(m_modelSize, m_modelSize);
+  : m_modelSize( _modelSize ), m_dataSetSize(_dataSetSize), m_countValues(0) {
+	m_A.resize(m_dataSetSize, m_modelSize);
+	m_b.resize(m_dataSetSize);
+	m_x.resize(m_modelSize);
+	m_xCov.resize(m_modelSize, m_modelSize);
 }
-
 
 void VariableSizeLinearLeastSquares2::addMeasure(jblas::vec const& A_row, double b_val)
 {
@@ -91,7 +89,6 @@ void VariableSizeLinearLeastSquares2::solve()
   m_xCov.assign(prod(trans(VT), VT));
 
 }
-
 
 #endif // HAVE_LAPACK
 #endif // HAVE_BOOST_SANDBOX

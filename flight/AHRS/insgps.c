@@ -56,6 +56,7 @@ float F[NUMX][NUMX], G[NUMX][NUMW], H[NUMV][NUMX];  // linearized system matrice
 float Be[3];                                        // local magnetic unit vector in NED frame
 float P[NUMX][NUMX], X[NUMX];                       // covariance matrix and state vector
 float Q[NUMW], R[NUMV];                             // input noise and measurement noise variances
+float K[NUMX][NUMV];                                // feedback gain matrix
 
 
 //  *************  Exposed Functions ****************
@@ -280,7 +281,7 @@ void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW], float Q[NUMW
 
 void SerialUpdate(float H[NUMV][NUMX], float R[NUMV], float Z[NUMV], float Y[NUMV],
 				  float P[NUMX][NUMX], float X[NUMX], uint16_t SensorsUsed){
- float HP[NUMX], K[NUMX], HPHR, Error;
+ float HP[NUMX], HPHR, Error;
  uint8_t i,j,k,m;
 
   for (m=0;m<NUMV;m++){
@@ -294,15 +295,15 @@ void SerialUpdate(float H[NUMV][NUMX], float R[NUMV], float Z[NUMV], float Y[NUM
 			HPHR = R[m];                            // Find  HPHR = H*P*H' + R
 			for (k=0;k<NUMX;k++) HPHR += HP[k]*H[m][k];
 
-			for (k=0;k<NUMX;k++) K[k] = HP[k]/HPHR; // find K = HP/HPHR
+			for (k=0;k<NUMX;k++) K[m][k] = HP[k]/HPHR; // find K = HP/HPHR
 
 			for (i=0;i<NUMX;i++){                   // Find P(m)= P(m-1) + K*HP
-			  for (j=i;j<NUMX;j++) P[i][j]=P[j][i] = P[i][j] - K[i]*HP[j];
+			  for (j=i;j<NUMX;j++) P[i][j]=P[j][i] = P[i][j] - K[m][i]*HP[j];
 			}
 
 			Error = Z[m]-Y[m];
 			for (i=0;i<NUMX;i++)               // Find X(m)= X(m-1) + K*Error
-			  X[i] = X[i] + K[i]*Error;
+			  X[i] = X[i] + K[m][i]*Error;
 
 	  }
   }

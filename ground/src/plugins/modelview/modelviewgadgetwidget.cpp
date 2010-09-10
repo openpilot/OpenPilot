@@ -40,6 +40,7 @@ ModelViewGadgetWidget::ModelViewGadgetWidget(QWidget *parent)
 , m_MotionTimer()
 {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    mvInitGLSuccess = false;
 
     CreateScene();
 
@@ -122,6 +123,8 @@ void ModelViewGadgetWidget::paintGL()
 
     // Display UI Info (orbit circle)
     m_MoverController.drawActiveMoverRep();
+    mvInitGLSuccess = true;
+
 }
 
 void ModelViewGadgetWidget::resizeGL(int width, int height)
@@ -149,7 +152,8 @@ void ModelViewGadgetWidget::CreateScene()
             m_World= GLC_Factory::instance()->createWorldFromFile(aircraft);
             m_ModelBoundingBox= m_World.boundingBox();
             loadError = false;
-            initializeGL();
+            if (!mvInitGLSuccess)
+                initializeGL();
         } else {
             loadError = true;
         }

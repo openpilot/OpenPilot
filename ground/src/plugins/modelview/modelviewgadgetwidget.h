@@ -90,6 +90,7 @@ private:
     QString bgFilename;
     bool vboEnable;
     bool loadError;
+    bool mvInitGLSuccess;
 
     AttitudeActual* attActual;
 };

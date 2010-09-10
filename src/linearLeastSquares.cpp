@@ -22,7 +22,7 @@
 using namespace jafar::jmath;
 
 
-void LinearLeastSquares::setSize(std::size_t sizeModel, std::size_t sizeDataSet)
+void LinearLeastSquares::setSize(std::size_t sizeModel, std::size_t sizeDataSet, bool preserve)
 {
   JFR_PRECOND(sizeDataSet >= sizeModel,
 	      "LinearLeastSquares::setSize: invalid size");
@@ -30,15 +30,15 @@ void LinearLeastSquares::setSize(std::size_t sizeModel, std::size_t sizeDataSet)
   m_sizeModel = sizeModel;
   m_sizeDataSet = sizeDataSet;
 
-  m_A.resize(sizeDataSet, sizeModel);
-  m_b.resize(sizeDataSet);
-  m_x.resize(sizeModel);
-  m_xCov.resize(sizeModel, sizeModel);
+  m_A.resize(sizeDataSet, sizeModel, preserve);
+  m_b.resize(sizeDataSet, preserve);
+  m_x.resize(sizeModel, preserve);
+  m_xCov.resize(sizeModel, sizeModel, preserve);
 }
 
-void LinearLeastSquares::setDataSetSize(std::size_t sizeDataSet)
+void LinearLeastSquares::setDataSetSize(std::size_t sizeDataSet, bool preserve)
 {
-  setSize(sizeModel(), sizeDataSet);
+  setSize(sizeModel(), sizeDataSet, preserve);
 }
 
 void LinearLeastSquares::setData(std::size_t index, jblas::vec const& A_row, double b_val)

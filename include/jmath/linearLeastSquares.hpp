@@ -60,8 +60,10 @@ namespace jafar {
       jblas::vec const& x() const {return m_x;}
       jblas::sym_mat const& xCov() const {return m_xCov;}
 
-      void setSize(std::size_t sizeModel, std::size_t sizeDataSet);
-      void setDataSetSize(std::size_t sizeDataSet);
+			///set size of model and data set and either preserve or not existing data
+      void setSize(std::size_t sizeModel, std::size_t sizeDataSet, bool preserve=false);
+			///set size of data set and either preserve or not existing data
+      void setDataSetSize(std::size_t sizeDataSet, bool preserve=false);
 
       /** Safe function to add a data point. For more efficiency, one
        * can directly modify the matrix A and the vector b.

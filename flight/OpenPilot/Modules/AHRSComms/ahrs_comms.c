@@ -156,6 +156,7 @@ static uint16_t algorithm_errors   = 0;
 static void ahrscommsTask(void* parameters)
 {
   enum opahrs_result result;
+  portTickType lastSysTime;
   
   GPSGoodUpdates = 0;
     
@@ -191,6 +192,7 @@ static void ahrscommsTask(void* parameters)
     AlarmsClear(SYSTEMALARMS_ALARM_AHRSCOMMS);
 
     /* We're in sync with the AHRS, spin here until an error occurs */
+    lastSysTime = xTaskGetTickCount();
     while (1) {
       AHRSSettingsData settings;
 
@@ -308,7 +310,7 @@ static void ahrscommsTask(void* parameters)
       }
 
       /* Wait for the next update interval */
-      vTaskDelay( settings.UpdatePeriod / portTICK_RATE_MS );
+      vTaskDelayUntil(&lastSysTime, settings.UpdatePeriod / portTICK_RATE_MS );
     }
   }
 }

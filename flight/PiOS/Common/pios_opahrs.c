@@ -243,9 +243,7 @@ extern enum opahrs_result PIOS_OPAHRS_SetAlgorithm(struct opahrs_msg_v1 *req)
 	struct opahrs_msg_v1 rsp;
 	enum opahrs_result rc;
 
-	if (!req) {
-		return -1;
-	}
+	if (!req) return OPAHRS_RESULT_FAILED;
 
 	/* Make up an attituderaw request */
 	opahrs_msg_v1_init_user_tx (req, OPAHRS_MSG_V1_REQ_ALGORITHM);
@@ -265,9 +263,7 @@ enum opahrs_result PIOS_OPAHRS_SetMagNorth(struct opahrs_msg_v1 *req)
 	struct opahrs_msg_v1 rsp;
 	enum opahrs_result rc;
 
-	if (!req) {
-		return -1;
-	}
+	if (!req) return OPAHRS_RESULT_FAILED;
 
 	/* Make up an attituderaw request */
 	opahrs_msg_v1_init_user_tx (req, OPAHRS_MSG_V1_REQ_NORTH);
@@ -286,9 +282,7 @@ enum opahrs_result PIOS_OPAHRS_SetGetUpdate(struct opahrs_msg_v1 *req, struct op
 {
 	enum opahrs_result rc;
 
-	if (!req) {
-		return -1;
-	}
+	if (!req) return OPAHRS_RESULT_FAILED;
 
 	/* Make up an attituderaw request */
 	opahrs_msg_v1_init_user_tx (req, OPAHRS_MSG_V1_REQ_UPDATE);
@@ -307,9 +301,7 @@ enum opahrs_result PIOS_OPAHRS_SetGetCalibration(struct opahrs_msg_v1 *req, stru
 {
 	enum opahrs_result rc;
 
-	if (!req) {
-		return -1;
-	}
+	if (!req) return OPAHRS_RESULT_FAILED;
 
 	/* Make up an attituderaw request */
 	opahrs_msg_v1_init_user_tx (req, OPAHRS_MSG_V1_REQ_CALIBRATION);

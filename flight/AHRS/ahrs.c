@@ -323,8 +323,10 @@ int main()
         
         // Delay for valid data
         idle_counter = 0;
-        while( ahrs_state != AHRS_DATA_READY ) 
+        do {
             idle_counter ++;
+            process_spi_request();
+        } while ( ahrs_state != AHRS_DATA_READY );
         
         ahrs_state = AHRS_PROCESSING;
         
@@ -419,9 +421,6 @@ int main()
         PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_AUX, "m: %d %d %d\r\n",  mag_data.raw.axis[0], mag_data.raw.axis[1], mag_data.raw.axis[2]);
         PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_AUX, "q: %d %d %d %d\r\n", (int16_t)(Nav.q[0] * 1000), (int16_t)(Nav.q[1] * 1000), (int16_t)(Nav.q[2] * 1000), (int16_t)(Nav.q[3] * 1000));
 #endif
-        
-        process_spi_request();
-        
     }
     
     return 0;

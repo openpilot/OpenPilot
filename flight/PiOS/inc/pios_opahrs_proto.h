@@ -67,18 +67,18 @@ struct opahrs_msg_link {
 struct opahrs_msg_v0_req_nop {
 } __attribute__((__packed__));
 
-struct opahrs_msg_v0_req_sync {
-  uint32_t cookie;
-} __attribute__((__packed__));
-
-struct opahrs_msg_v0_req_serial {
+struct opahrs_msg_v0_req_versions {
 } __attribute__((__packed__));
 
 struct opahrs_msg_v0_req_reset {
   uint32_t reset_delay_in_ms;
 } __attribute__((__packed__));
 
-struct opahrs_msg_v0_req_switch_proto {
+struct opahrs_msg_v0_req_boot {
+  uint32_t boot_delay_in_ms;
+} __attribute__((__packed__));
+
+struct opahrs_msg_v0_req_serial {
 } __attribute__((__packed__));
 
 struct opahrs_msg_v0_req_fwup_start {
@@ -93,27 +93,15 @@ struct opahrs_msg_v0_req_fwup_verify {
 union opahrs_msg_v0_req {
   /* Mandatory for all bootloader and all application loads */
   struct opahrs_msg_v0_req_nop          nop;
-  struct opahrs_msg_v0_req_sync         sync;
   struct opahrs_msg_v0_req_serial       serial;
   struct opahrs_msg_v0_req_reset        reset;
 
   /* Only implemented by the application */
-  struct opahrs_msg_v0_req_switch_proto switch_proto;
 
   /* Only implemented by bootloaders */
   struct opahrs_msg_v0_req_fwup_start   fwup_start;
   struct opahrs_msg_v0_req_fwup_data    fwup_data;
   struct opahrs_msg_v0_req_fwup_verify  fwup_verify;
-} __attribute__((__packed__));
-
-struct opahrs_msg_v0_rsp_sync {
-  uint8_t  i_am_a_bootloader;
-  uint8_t  hw_version;
-  uint16_t bl_version;
-  uint32_t fw_version;
-
-  uint32_t cookie;
-  uint32_t alternate_proto_version;
 } __attribute__((__packed__));
 
 struct opahrs_msg_v0_rsp_serial {
@@ -125,7 +113,6 @@ struct opahrs_msg_v0_rsp_fwup_status {
 
 union opahrs_msg_v0_rsp {
   /* Mandatory for all bootloader and all application loads */
-  struct opahrs_msg_v0_rsp_sync        sync;
   struct opahrs_msg_v0_rsp_serial      serial;
 
   /* Only implemented by bootloaders */
@@ -134,16 +121,13 @@ union opahrs_msg_v0_rsp {
 
 enum opahrs_msg_v0_tag {
   OPAHRS_MSG_V0_REQ_NOP = 0x00,
-  OPAHRS_MSG_V0_REQ_SYNC,
   OPAHRS_MSG_V0_REQ_RESET,
   OPAHRS_MSG_V0_REQ_SERIAL,
-  OPAHRS_MSG_V0_REQ_SWITCH_PROTO,
 
   OPAHRS_MSG_V0_REQ_FWUP_START,
   OPAHRS_MSG_V0_REQ_FWUP_DATA,
   OPAHRS_MSG_V0_REQ_FWUP_VERIFY,
 
-  OPAHRS_MSG_V0_RSP_SYNC,
   OPAHRS_MSG_V0_RSP_SERIAL,
   OPAHRS_MSG_V0_RSP_FWUP_STATUS,
 };
@@ -171,10 +155,6 @@ struct opahrs_msg_v0 {
  ********/
 
 struct opahrs_msg_v1_req_nop {
-} __attribute__((__packed__));
-
-struct opahrs_msg_v1_req_sync {
-  uint32_t cookie;
 } __attribute__((__packed__));
 
 struct opahrs_msg_v1_req_reset {
@@ -227,7 +207,6 @@ struct opahrs_msg_v1_req_calibration {
 
 union opahrs_msg_v1_req {
   struct opahrs_msg_v1_req_nop          nop;
-  struct opahrs_msg_v1_req_sync         sync;
   struct opahrs_msg_v1_req_reset        reset;
   struct opahrs_msg_v1_req_serial       serial;
   struct opahrs_msg_v1_req_update       update;
@@ -235,15 +214,6 @@ union opahrs_msg_v1_req {
   struct opahrs_msg_v1_req_north        north;
   struct opahrs_msg_v1_req_attituderaw  attituderaw;
   struct opahrs_msg_v1_req_calibration  calibration;
-} __attribute__((__packed__));
-
-struct opahrs_msg_v1_rsp_sync {
-  uint8_t  i_am_a_bootloader;
-  uint8_t  hw_version;
-  uint16_t bl_version;
-  uint32_t fw_version;
-
-  uint32_t cookie;
 } __attribute__((__packed__));
 
 struct opahrs_msg_v1_rsp_serial {
@@ -307,7 +277,6 @@ struct opahrs_msg_v1_rsp_calibration {
 } __attribute__((__packed__));
 
 union opahrs_msg_v1_rsp {
-  struct opahrs_msg_v1_rsp_sync         sync;
   struct opahrs_msg_v1_rsp_serial       serial;
   struct opahrs_msg_v1_rsp_north        north;
   struct opahrs_msg_v1_rsp_algorithm    algorithm;
@@ -318,7 +287,6 @@ union opahrs_msg_v1_rsp {
 
 enum opahrs_msg_v1_tag {
   OPAHRS_MSG_V1_REQ_NOP = 0x02000000,
-  OPAHRS_MSG_V1_REQ_SYNC,
   OPAHRS_MSG_V1_REQ_RESET,
   OPAHRS_MSG_V1_REQ_SERIAL,
   OPAHRS_MSG_V1_REQ_NORTH,
@@ -327,7 +295,6 @@ enum opahrs_msg_v1_tag {
   OPAHRS_MSG_V1_REQ_ATTITUDERAW,
   OPAHRS_MSG_V1_REQ_CALIBRATION,
 
-  OPAHRS_MSG_V1_RSP_SYNC,
   OPAHRS_MSG_V1_RSP_SERIAL,
   OPAHRS_MSG_V1_RSP_NORTH,
   OPAHRS_MSG_V1_RSP_ALGORITHM,

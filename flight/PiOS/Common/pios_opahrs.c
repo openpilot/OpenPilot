@@ -224,29 +224,6 @@ enum opahrs_result PIOS_OPAHRS_resync(void)
 	return rc;
 }
 
-enum opahrs_result PIOS_OPAHRS_Sync(struct opahrs_msg_v1 *rsp)
-{
-	struct opahrs_msg_v1 req;
-	enum opahrs_result rc;
-
-	if (!rsp) {
-		return -1;
-	}
-
-	/* Make up a sync request */
-	opahrs_msg_v1_init_user_tx (&req, OPAHRS_MSG_V1_REQ_SYNC);
-	req.payload.user.v.req.sync.cookie = 0xDEADBEEF;
-
-	/* Send the message until it is received */
-	rc = opahrs_msg_v1_send_req (&req);
-	if (rc != OPAHRS_RESULT_OK) {
-		/* Failed to send the request, bail out */
-		return rc;
-	}
-
-	return opahrs_msg_v1_recv_rsp (OPAHRS_MSG_V1_RSP_SYNC, rsp);
-}
-
 enum opahrs_result PIOS_OPAHRS_GetAttitudeRaw(struct opahrs_msg_v1 *rsp)
 {
 	struct opahrs_msg_v1 req;

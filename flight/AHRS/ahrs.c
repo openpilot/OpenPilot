@@ -678,16 +678,6 @@ void process_spi_request(void)
     //dump_spi_message(PIOS_COM_AUX, "+", (uint8_t *)&user_rx_v1, sizeof(user_rx_v1));
     
     switch (user_rx_v1.payload.user.t) {
-        case OPAHRS_MSG_V1_REQ_SYNC:
-            opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_SYNC);
-            user_tx_v1.payload.user.v.rsp.sync.i_am_a_bootloader = FALSE;
-            user_tx_v1.payload.user.v.rsp.sync.hw_version = 1;
-            user_tx_v1.payload.user.v.rsp.sync.bl_version = 2;
-            user_tx_v1.payload.user.v.rsp.sync.fw_version = 3;
-            user_tx_v1.payload.user.v.rsp.sync.cookie     = user_rx_v1.payload.user.v.req.sync.cookie;
-            dump_spi_message(PIOS_COM_AUX, "S", (uint8_t *)&user_tx_v1, sizeof(user_tx_v1));
-            lfsm_user_set_tx_v1 (&user_tx_v1);
-            break;
         case OPAHRS_MSG_V1_REQ_RESET:
             PIOS_DELAY_WaitmS(user_rx_v1.payload.user.v.req.reset.reset_delay_in_ms);
             PIOS_SYS_Reset();

@@ -39,6 +39,22 @@ enum opahrs_result {
 };
 
 extern void PIOS_OPAHRS_Init(void);
+
+/*
+ * Protocol V0 messages used to talk to bootloaders
+ */
+
+extern enum opahrs_result PIOS_OPAHRS_bl_GetVersions(struct opahrs_msg_v0 * rsp);
+extern enum opahrs_result PIOS_OPAHRS_bl_GetSerial(struct opahrs_msg_v0 * rsp);
+extern enum opahrs_result PIOS_OPAHRS_bl_FwupStart(struct opahrs_msg_v0 * req, struct opahrs_msg_v0 * rsp);
+extern enum opahrs_result PIOS_OPAHRS_bl_FwupData(struct opahrs_msg_v0 * req, struct opahrs_msg_v0 * rsp);
+extern enum opahrs_result PIOS_OPAHRS_bl_FwupVerify(struct opahrs_msg_v0 * rsp);
+extern enum opahrs_result PIOS_OPAHRS_bl_resync(void);
+
+
+/*
+ * Protocol V1 messages used by application
+ */
 extern enum opahrs_result PIOS_OPAHRS_Sync(struct opahrs_msg_v1 *rsp);
 extern enum opahrs_result PIOS_OPAHRS_GetSerial(struct opahrs_msg_v1 *rsp);
 extern enum opahrs_result PIOS_OPAHRS_SetGetUpdate(struct opahrs_msg_v1 *rsp, struct opahrs_msg_v1 *req);

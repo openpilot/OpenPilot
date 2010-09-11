@@ -91,16 +91,11 @@ struct opahrs_msg_v0_req_fwup_verify {
 } __attribute__((__packed__));
 
 union opahrs_msg_v0_req {
-  /* Mandatory for all bootloader and all application loads */
   struct opahrs_msg_v0_req_nop          nop;
   struct opahrs_msg_v0_req_versions     versions;
-  struct opahrs_msg_v0_req_serial       serial;
   struct opahrs_msg_v0_req_reset        reset;
   struct opahrs_msg_v0_req_boot         boot;
-
-  /* Only implemented by the application */
-
-  /* Only implemented by bootloaders */
+  struct opahrs_msg_v0_req_serial       serial;
   struct opahrs_msg_v0_req_fwup_start   fwup_start;
   struct opahrs_msg_v0_req_fwup_data    fwup_data;
   struct opahrs_msg_v0_req_fwup_verify  fwup_verify;
@@ -121,10 +116,7 @@ struct opahrs_msg_v0_rsp_fwup_status {
 
 union opahrs_msg_v0_rsp {
   struct opahrs_msg_v0_rsp_versions    versions;
-  /* Mandatory for all bootloader and all application loads */
   struct opahrs_msg_v0_rsp_serial      serial;
-
-  /* Only implemented by bootloaders */
   struct opahrs_msg_v0_rsp_fwup_status fwup_status;
 } __attribute__((__packed__));
 

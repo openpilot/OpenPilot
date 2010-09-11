@@ -160,26 +160,31 @@ static enum opahrs_result opahrs_msg_v1_recv_rsp (enum opahrs_msg_v1_tag tag, st
 	return OPAHRS_RESULT_TIMEOUT;
 }
 
-enum opahrs_result PIOS_OPAHRS_GetSerial(struct opahrs_msg_v1 *rsp)
+static enum opahrs_result PIOS_OPAHRS_v1_simple_req (enum opahrs_msg_v1_tag req_type, struct opahrs_msg_v1 * rsp, enum opahrs_msg_v1_tag rsp_type)
 {
 	struct opahrs_msg_v1 req;
 	enum opahrs_result rc;
 
-	if (!rsp) {
-		return -1;
-	}
+	/* Make up an empty request */
+	opahrs_msg_v1_init_user_tx (&req, req_type);
 
-	/* Make up a serial number request */
-	opahrs_msg_v1_init_user_tx (&req, OPAHRS_MSG_V1_REQ_SERIAL);
-
-	/* Send the message until it is received */
+	/* Send the message until it is received */ 
 	rc = opahrs_msg_v1_send_req (&req);
-	if (rc != OPAHRS_RESULT_OK) {
-		/* Failed to send the request, bail out */
-		return rc;
+	if ((rc == OPAHRS_RESULT_OK) && rsp) {
+	  /* We need a specific kind of reply, go get it */
+	  return opahrs_msg_v1_recv_rsp (rsp_type, rsp);
 	}
 
-	return opahrs_msg_v1_recv_rsp (OPAHRS_MSG_V1_RSP_SERIAL, rsp);
+	return rc;
+}
+
+enum opahrs_result PIOS_OPAHRS_GetSerial(struct opahrs_msg_v1 *rsp)
+{
+	if (!rsp) return OPAHRS_RESULT_FAILED;
+
+	return (PIOS_OPAHRS_v1_simple_req (OPAHRS_MSG_V1_REQ_SERIAL,
+					   rsp,
+					   OPAHRS_MSG_V1_RSP_SERIAL));
 }
 
 enum opahrs_result PIOS_OPAHRS_resync(void)
@@ -226,24 +231,11 @@ enum opahrs_result PIOS_OPAHRS_resync(void)
 
 enum opahrs_result PIOS_OPAHRS_GetAttitudeRaw(struct opahrs_msg_v1 *rsp)
 {
-	struct opahrs_msg_v1 req;
-	enum opahrs_result rc;
+	if (!rsp) return OPAHRS_RESULT_FAILED;
 
-	if (!rsp) {
-		return -1;
-	}
-
-	/* Make up an attituderaw request */
-	opahrs_msg_v1_init_user_tx (&req, OPAHRS_MSG_V1_REQ_ATTITUDERAW);
-
-	/* Send the message until it is received */
-	rc = opahrs_msg_v1_send_req (&req);
-	if (rc != OPAHRS_RESULT_OK) {
-		/* Failed to send the request, bail out */
-		return rc;
-	}
-
-	return opahrs_msg_v1_recv_rsp (OPAHRS_MSG_V1_RSP_ATTITUDERAW, rsp);
+	return (PIOS_OPAHRS_v1_simple_req (OPAHRS_MSG_V1_REQ_ATTITUDERAW,
+					   rsp,
+					   OPAHRS_MSG_V1_RSP_ATTITUDERAW));
 }
 
 extern enum opahrs_result PIOS_OPAHRS_SetAlgorithm(struct opahrs_msg_v1 *req)

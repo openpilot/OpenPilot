@@ -83,6 +83,8 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
             << m_config->ch6Rev
             << m_config->ch7Rev;
 
+
+
     // Now connect the widget to the ManualControlCommand / Channel UAVObject
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -567,12 +569,14 @@ void ConfigServoWidget::requestRCInputUpdate()
     m_config->ch6Assign->setCurrentIndex(0);
     m_config->ch7Assign->setCurrentIndex(0);
 
+
     // Update all channels assignements
-    assignChannel(obj, field, QString("Roll"));
-    assignChannel(obj, field, QString("Pitch"));
-    assignChannel(obj, field, QString("Yaw"));
-    assignChannel(obj, field, QString("Throttle"));
-    assignChannel(obj, field, QString("FlightMode"));
+    QList<UAVObjectField*> fieldList = obj->getFields();
+    foreach (UAVObjectField* field, fieldList) {
+        if (field->getUnits().contains("channel")) {
+            assignChannel(obj, field, field->getName());
+        }
+    }
 
 }
 

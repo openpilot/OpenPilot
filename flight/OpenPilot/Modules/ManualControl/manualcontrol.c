@@ -250,7 +250,10 @@ static void manualControlTask(void* parameters)
 			{
 				attitude.Yaw = (cmd.Yaw*180.0);
 			}
-			attitude.Throttle = cmd.Throttle*stabSettings.ThrottleMax;
+			if(cmd.Throttle < 0)
+				attitude.Throttle = -1;
+			else
+				attitude.Throttle = cmd.Throttle*stabSettings.ThrottleMax;
 			AttitudeDesiredSet(&attitude);
 		}
 		

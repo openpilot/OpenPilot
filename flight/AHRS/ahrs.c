@@ -325,7 +325,7 @@ int main()
         idle_counter = 0;
         do {
             idle_counter ++;
-            process_spi_request();
+            //process_spi_request();
         } while ( ahrs_state != AHRS_DATA_READY );
         
         ahrs_state = AHRS_PROCESSING;

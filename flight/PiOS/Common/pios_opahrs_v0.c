@@ -6,25 +6,25 @@
  * @brief HAL code to interface to the OpenPilot AHRS module's bootloader
  * @{
  *
- * @file       pios_opahrs_download.c  
+ * @file       pios_opahrs_download.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Hardware commands to communicate with the AHRS bootloader
  * @see        The GNU Public License (GPL) Version 3
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -35,6 +35,27 @@
 
 #include "pios_opahrs_proto.h"
 #include "pios_opahrs.h"
+
+void PIOS_OPAHRS_Init(void)
+{
+	PIOS_SPI_SetClockSpeed(PIOS_OPAHRS_SPI, PIOS_SPI_PRESCALER_8);
+}
+
+static int32_t opahrs_msg_txrx (const uint8_t * tx, uint8_t * rx, uint32_t len)
+{
+	int32_t rc;
+
+	PIOS_SPI_RC_PinSet(PIOS_OPAHRS_SPI, 0);
+#ifdef PIOS_INCLUDE_FREERTOS
+	vTaskDelay(20 / portTICK_RATE_MS);
+#else
+	PIOS_DELAY_WaitmS(20);
+#endif
+	rc = PIOS_SPI_TransferBlock(PIOS_OPAHRS_SPI, tx, rx, len, NULL);
+	PIOS_SPI_RC_PinSet(PIOS_OPAHRS_SPI, 1);
+	return (rc);
+}
+
 
 static enum opahrs_result opahrs_msg_v0_send_req (const struct opahrs_msg_v0 * req)
 {
@@ -137,7 +158,7 @@ static enum opahrs_result opahrs_msg_v0_recv_rsp (enum opahrs_msg_v0_tag tag, st
 	return OPAHRS_RESULT_TIMEOUT;
 }
 
-static enum opahrs_result PIOS_OPAHRS_v0_simple_req (enum opahrs_msg_v0_tag req_type, struct opahrs_msg_v0 * rsp, struct opahrs_msg_v0_tag rsp_type)
+static enum opahrs_result PIOS_OPAHRS_v0_simple_req (enum opahrs_msg_v0_tag req_type, struct opahrs_msg_v0 * rsp, enum opahrs_msg_v0_tag rsp_type)
 {
 	struct opahrs_msg_v0 req;
 	enum opahrs_result rc;
@@ -145,7 +166,7 @@ static enum opahrs_result PIOS_OPAHRS_v0_simple_req (enum opahrs_msg_v0_tag req_
 	/* Make up an empty request */
 	opahrs_msg_v0_init_user_tx (&req, req_type);
 
-	/* Send the message until it is received */ 
+	/* Send the message until it is received */
 	rc = opahrs_msg_v0_send_req (&req);
 	if ((rc == OPAHRS_RESULT_OK) && rsp) {
 	  /* We need a specific kind of reply, go get it */
@@ -176,7 +197,7 @@ enum opahrs_result PIOS_OPAHRS_bl_GetSerial(struct opahrs_msg_v0 * rsp)
 enum opahrs_result PIOS_OPAHRS_bl_FwupStart(struct opahrs_msg_v0 * req, struct opahrs_msg_v0 * rsp)
 {
 	if (!req || !rsp) return OPAHRS_RESULT_FAILED;
-
+	enum opahrs_result rc;
 	/* Make up an attituderaw request */
 	opahrs_msg_v0_init_user_tx (req, OPAHRS_MSG_V0_REQ_FWUP_START);
 
@@ -196,7 +217,7 @@ enum opahrs_result PIOS_OPAHRS_bl_FwupData(struct opahrs_msg_v0 * req, struct op
 
 	/* Make up an attituderaw request */
 	opahrs_msg_v0_init_user_tx (req, OPAHRS_MSG_V0_REQ_FWUP_DATA);
-
+	enum opahrs_result rc;
 	/* Send the message until it is received */
 	rc = opahrs_msg_v0_send_req (req);
 	if (rc != OPAHRS_RESULT_OK) {
@@ -259,4 +280,5 @@ enum opahrs_result PIOS_OPAHRS_bl_resync(void)
 	return rc;
 }
 
+#endif /* PIOS_INCLUDE_OPAHRS */
 

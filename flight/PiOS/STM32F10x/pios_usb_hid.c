@@ -191,8 +191,12 @@ void sendChunk()
         tx_buffer[1] = size; /* valid data length */
         
         /* Wait for any pending transmissions to complete */
-        while(GetEPTxStatus(ENDP1) == EP_TX_VALID) 
-            taskYIELD();         
+        while(GetEPTxStatus(ENDP1) == EP_TX_VALID)
+        {
+			#if defined(PIOS_INCLUDE_FREERTOS)
+				taskYIELD();
+			#endif
+        }
         
         UserToPMABufferCopy((uint8_t*) tx_buffer, GetEPTxAddr(EP1_IN & 0x7F), size+2);
         SetEPTxCount((EP1_IN & 0x7F), PIOS_USB_HID_DATA_LENGTH+2);
@@ -247,7 +251,11 @@ int32_t PIOS_USB_HID_TxBufferPutMore(uint8_t id, const uint8_t *buffer, uint16_t
         return error;
     
     while( bufferBufferedData(&txBuffer) )
-        taskYIELD();
+    {
+		#if defined(PIOS_INCLUDE_FREERTOS)
+			taskYIELD();
+		#endif
+    }
     
     return 0;
 }

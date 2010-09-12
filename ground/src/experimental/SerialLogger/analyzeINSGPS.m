@@ -36,6 +36,7 @@ fclose(fid);
 b = [data.block]; % get block counts
 gaps = find(diff(b) ~= 1);
 if(gaps) % get biggest contiguous chunk
+    gaps = [1 gaps length(b)];
     lengths = diff(gaps);
     [foo idx] = max(lengths);
     idx = gaps(idx):gaps(idx+1);

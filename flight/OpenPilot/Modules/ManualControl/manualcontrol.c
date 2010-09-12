@@ -214,7 +214,7 @@ static void manualControlTask(void* parameters)
 		
 		if (connection_state == DISCONNECTED) {
 			cmd.Connected = MANUALCONTROLCOMMAND_CONNECTED_FALSE;
-			cmd.Throttle = 0; // Shut down engine with no control
+			cmd.Throttle = -1; // Shut down engine with no control
 			cmd.Roll = 0;
 			cmd.Yaw = 0;
 			cmd.Pitch = 0;

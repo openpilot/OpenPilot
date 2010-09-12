@@ -62,15 +62,15 @@ void DMA1_Channel1_IRQHandler() __attribute__ ((alias ("AHRS_ADC_DMA_Handler")))
 
 // For debugging the raw sensors
 //#define DUMP_RAW
-//#define DUMP_FRIENDLY
+#define DUMP_FRIENDLY
 
 /**
  * @addtogroup AHRS_Definitions 
  * @{
  */
 // Currently analog acquistion hard coded at 480 Hz
-#define ADC_OVERSAMPLE          12
-#define EKF_RATE                ((float) 480 / ADC_OVERSAMPLE)
+#define ADC_OVERSAMPLE          40
+#define EKF_RATE                ((float) 4*480 / ADC_OVERSAMPLE)
 #define ADC_CONTINUOUS_CHANNELS PIOS_ADC_NUM_PINS
 #define CORRECTION_COUNT        4
 

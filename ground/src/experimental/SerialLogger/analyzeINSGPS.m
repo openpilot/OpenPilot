@@ -43,6 +43,8 @@ if(gaps) % get biggest contiguous chunk
     data = data(idx);
 end
 
+data(end) = []; % delete in case partial update
+
 q = cat(1,data.q);
 accel = cat(1,data.accel);
 gyro = cat(1,data.gyro);

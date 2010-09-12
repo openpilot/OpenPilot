@@ -44,6 +44,7 @@ HEADERS += uavobjects_global.h \
     flightbatterystate.h \
     homelocation.h \
     vtolsettings.h \
+    vtolstatus.h \
     attitudesettings.h
 SOURCES += uavobject.cpp \
     uavmetaobject.cpp \
@@ -85,5 +86,6 @@ SOURCES += uavobject.cpp \
     flightbatterystate.cpp \
     homelocation.cpp \
     vtolsettings.cpp \
+    vtolstatus.cpp \
     attitudesettings.cpp
 OTHER_FILES += UAVObjects.pluginspec

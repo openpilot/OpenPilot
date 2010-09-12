@@ -178,6 +178,7 @@ SRC += $(OPUAVOBJ)/attituderaw.c
 SRC += $(OPUAVOBJ)/homelocation.c
 SRC += $(OPUAVOBJ)/attitudesettings.c
 SRC += $(OPUAVOBJ)/vtolsettings.c
+SRC += $(OPUAVOBJ)/vtolstatus.c
 endif
 
 ## PIOS Hardware (STM32F10x)

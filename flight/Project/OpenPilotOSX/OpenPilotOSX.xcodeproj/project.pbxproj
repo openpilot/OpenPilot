@@ -2856,6 +2856,12 @@
 		65E8F0EE11EFF25C00BBF654 /* startup_stm32f10x_HD.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = startup_stm32f10x_HD.S; path = ../../PiOS/STM32F10x/startup_stm32f10x_HD.S; sourceTree = SOURCE_ROOT; };
 		65E8F0F111EFF25C00BBF654 /* startup_stm32f10x_MD.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = startup_stm32f10x_MD.S; path = ../../PiOS/STM32F10x/startup_stm32f10x_MD.S; sourceTree = SOURCE_ROOT; };
 		65EF3922123AEED000D1B036 /* vtolsettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = vtolsettings.xml; sourceTree = "<group>"; };
+		65EF392E123AF96500D1B036 /* vtolstatus.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = vtolstatus.xml; sourceTree = "<group>"; };
+		65EF392F123AF97D00D1B036 /* attitudesettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = attitudesettings.c; sourceTree = "<group>"; };
+		65EF3930123AF97D00D1B036 /* gpssatellites.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gpssatellites.c; sourceTree = "<group>"; };
+		65EF3931123AF97D00D1B036 /* gpstime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gpstime.c; sourceTree = "<group>"; };
+		65EF3932123AF97D00D1B036 /* vtolsettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vtolsettings.c; sourceTree = "<group>"; };
+		65EF3933123AF97D00D1B036 /* vtolstatus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = vtolstatus.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -6731,6 +6737,7 @@
 				65B367FD121C2620003EAD18 /* systemstats.xml */,
 				65B367FE121C2620003EAD18 /* telemetrysettings.xml */,
 				65EF3922123AEED000D1B036 /* vtolsettings.xml */,
+				65EF392E123AF96500D1B036 /* vtolstatus.xml */,
 			);
 			path = uavobjectdefinition;
 			sourceTree = "<group>";
@@ -7093,6 +7100,7 @@
 		65E8EF6E11EEA61E00BBF654 /* UAVObjects */ = {
 			isa = PBXGroup;
 			children = (
+				65EF392F123AF97D00D1B036 /* attitudesettings.c */,
 				65C259551224BFAF0081B6ED /* ahrscalibration.c */,
 				65C259561224BFAF0081B6ED /* ahrssettings.c */,
 				65C259571224BFAF0081B6ED /* baroaltitude.c */,
@@ -7115,6 +7123,8 @@
 				65E8EF7D11EEA61E00BBF654 /* flighttelemetrystats.c */,
 				65E8EF7E11EEA61E00BBF654 /* gcstelemetrystats.c */,
 				65C259581224BFAF0081B6ED /* gpsposition.c */,
+				65EF3930123AF97D00D1B036 /* gpssatellites.c */,
+				65EF3931123AF97D00D1B036 /* gpstime.c */,
 				65E8EF8011EEA61E00BBF654 /* inc */,
 				65E8EF9E11EEA61E00BBF654 /* manualcontrolcommand.c */,
 				65E8EF9F11EEA61E00BBF654 /* manualcontrolsettings.c */,
@@ -7129,6 +7139,8 @@
 				65E8EFA811EEA61E00BBF654 /* uavobjectsinit.c */,
 				65E8EFA911EEA61E00BBF654 /* uavobjectsinittemplate.c */,
 				65E8EFAA11EEA61E00BBF654 /* uavobjecttemplate.c */,
+				65EF3932123AF97D00D1B036 /* vtolsettings.c */,
+				65EF3933123AF97D00D1B036 /* vtolstatus.c */,
 			);
 			name = UAVObjects;
 			path = ../../OpenPilot/UAVObjects;

@@ -118,6 +118,7 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	data.CCPMServoZ = 8;
 	data.CCPMThrottle = 8;
 	data.CCPMTailRotor = 8;
+	data.UpdatePeriod = 5;
 	data.ChannelUpdateFreq[0] = 50;
 	data.ChannelUpdateFreq[1] = 50;
 	data.ChannelMax[0] = 2000;

@@ -86,11 +86,12 @@ int32_t ActuatorInitialize()
  */
 static void actuatorTask(void* parameters)
 {
-	UAVObjEvent ev;
+//	UAVObjEvent ev;
 	ActuatorSettingsData settings;
 	SystemSettingsData sysSettings;
 	ActuatorDesiredData desired;
 	ActuatorCommandData cmd;
+	portTickType lastSysTime;
 
 	// Set servo update frequency (done only on start-up)
 	ActuatorSettingsGet(&settings);
@@ -100,14 +101,15 @@ static void actuatorTask(void* parameters)
 	setFailsafe();
 
 	// Main task loop
+	lastSysTime = xTaskGetTickCount();
 	while (1)
 	{
 		// Wait until the ActuatorDesired object is updated, if a timeout then go to failsafe
-		if ( xQueueReceive(queue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE )
+		/*if ( xQueueReceive(queue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE )
 		{
 			setFailsafe();
 			continue;
-		}
+		}*/
 
 		// Read settings
 		ActuatorSettingsGet(&settings);
@@ -178,6 +180,10 @@ static void actuatorTask(void* parameters)
 		{
 			PIOS_Servo_Set( n, cmd.Channel[n] );
 		}
+		
+		// Wait until next update
+		vTaskDelayUntil(&lastSysTime, settings.UpdatePeriod / portTICK_RATE_MS );
+
 	}
 }
 

@@ -51,6 +51,12 @@ IUAVGadgetConfiguration *UAVObjectBrowserFactory::createConfiguration(const QByt
     return new UAVObjectBrowserConfiguration(QString("UAVObjectBrowser"), state);
 }
 
+IUAVGadgetConfiguration *UAVObjectBrowserFactory::createConfiguration(QSettings* qSettings)
+{
+    return new UAVObjectBrowserConfiguration(QString("UAVObjectBrowser"), qSettings);
+}
+
+
 IOptionsPage *UAVObjectBrowserFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
     return new UAVObjectBrowserOptionsPage(qobject_cast<UAVObjectBrowserConfiguration*>(config));

@@ -53,6 +53,11 @@ IUAVGadgetConfiguration *PFDGadgetFactory::createConfiguration(const QByteArray 
     return new PFDGadgetConfiguration(QString("PFDGadget"), state);
 }
 
+IUAVGadgetConfiguration *PFDGadgetFactory::createConfiguration(QSettings* qSettings)
+{
+    return new PFDGadgetConfiguration(QString("PFDGadget"), qSettings);
+}
+
 IOptionsPage *PFDGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
     return new PFDGadgetOptionsPage(qobject_cast<PFDGadgetConfiguration*>(config));

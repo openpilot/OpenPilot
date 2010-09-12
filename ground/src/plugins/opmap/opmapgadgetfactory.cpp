@@ -51,6 +51,11 @@ IUAVGadgetConfiguration * OPMapGadgetFactory::createConfiguration(const QByteArr
     return new OPMapGadgetConfiguration(QString("OPMapGadget"), state);
 }
 
+IUAVGadgetConfiguration *OPMapGadgetFactory::createConfiguration(QSettings* qSettings)
+{
+    return new OPMapGadgetConfiguration(QString("OPMapGadget"), qSettings);
+}
+
 IOptionsPage * OPMapGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
     return new OPMapGadgetOptionsPage(qobject_cast<OPMapGadgetConfiguration*>(config));

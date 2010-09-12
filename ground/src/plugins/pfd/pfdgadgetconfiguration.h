@@ -36,7 +36,8 @@ class PFDGadgetConfiguration : public IUAVGadgetConfiguration
 {
 Q_OBJECT
 public:
-    explicit PFDGadgetConfiguration(QString classId, const QByteArray &state = 0, QObject *parent = 0);
+    explicit PFDGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent = 0);
+    explicit PFDGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
 
     //set dial configuration functions
     void setDialFile(QString dialFile){m_defaultDial=dialFile;}
@@ -47,7 +48,7 @@ public:
     bool useOpenGL() { return useOpenGLFlag; }
     bool getHqFonts() { return hqFonts; }
 
-    QByteArray saveState() const;
+    void saveConfig(QSettings* settings) const;
     IUAVGadgetConfiguration *clone();
 
 private:

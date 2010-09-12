@@ -52,6 +52,11 @@ IUAVGadgetConfiguration *UploaderGadgetFactory::createConfiguration(const QByteA
     return new UploaderGadgetConfiguration(QString("Uploader"), state);
 }
 
+IUAVGadgetConfiguration *UploaderGadgetFactory::createConfiguration(QSettings* qSettings)
+{
+    return new UploaderGadgetConfiguration(QString("Uploader"), qSettings);
+}
+
 IOptionsPage *UploaderGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
     return new UploaderGadgetOptionsPage(qobject_cast<UploaderGadgetConfiguration*>(config));

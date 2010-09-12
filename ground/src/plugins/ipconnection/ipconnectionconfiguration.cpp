@@ -37,9 +37,20 @@ IPconnectionConfiguration::IPconnectionConfiguration(QString classId, const QByt
 {
     settings = Core::ICore::instance()->settings();
 }
+
+IPconnectionConfiguration::IPconnectionConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
+    IUAVGadgetConfiguration(classId, parent),
+    m_HostName("127.0.0.1"),
+    m_Port(1000),
+    m_UseTCP(1)
+{
+    settings = Core::ICore::instance()->settings();
+}
+
 IPconnectionConfiguration::~IPconnectionConfiguration()
 {
 }
+
 IUAVGadgetConfiguration *IPconnectionConfiguration::clone()
 {
     IPconnectionConfiguration *m = new IPconnectionConfiguration(this->classId());
@@ -49,17 +60,15 @@ IUAVGadgetConfiguration *IPconnectionConfiguration::clone()
     return m;
 }
 
-QByteArray IPconnectionConfiguration::saveState() const
-{
-   QByteArray bytes;
-    QDataStream stream(&bytes, QIODevice::WriteOnly);
-    stream << m_Port;
-    stream << m_HostName;
-    stream << m_UseTCP;
-    return bytes;
-
+/**
+ * Saves a configuration.
+ *
+ */
+void IPconnectionConfiguration::saveConfig(QSettings* qSettings) const {
+   qSettings->setValue("port", m_Port);
+   qSettings->setValue("hostName", m_HostName);
+   qSettings->setValue("useTCP", m_UseTCP);
 }
-
 
 void IPconnectionConfiguration::savesettings() const
 {

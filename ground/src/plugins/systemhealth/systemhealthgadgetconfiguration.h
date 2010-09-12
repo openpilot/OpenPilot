@@ -39,7 +39,8 @@ class SystemHealthGadgetConfiguration : public IUAVGadgetConfiguration
 {
 Q_OBJECT
 public:
-    explicit SystemHealthGadgetConfiguration(QString classId, const QByteArray &state = 0, QObject *parent = 0);
+    explicit SystemHealthGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent = 0);
+    explicit SystemHealthGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
 
     //set system health configuration functions
     void setSystemFile(QString filename){systemFile=filename;}
@@ -47,7 +48,7 @@ public:
     //get dial configuration functions
     QString getSystemFile() {return systemFile;}
 
-    QByteArray saveState() const;
+    void saveConfig(QSettings* settings) const;
     IUAVGadgetConfiguration *clone();
 
 private:

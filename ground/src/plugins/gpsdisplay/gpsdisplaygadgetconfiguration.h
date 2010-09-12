@@ -37,7 +37,8 @@ class GpsDisplayGadgetConfiguration : public IUAVGadgetConfiguration
 {
     Q_OBJECT
     public:
-        explicit GpsDisplayGadgetConfiguration(QString classId, const QByteArray &state = 0, QObject *parent = 0);
+        explicit GpsDisplayGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent = 0);
+        explicit GpsDisplayGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
 
         void setConnectionMode(QString mode) { m_connectionMode = mode; }
         QString connectionMode() { return m_connectionMode; }
@@ -60,7 +61,7 @@ class GpsDisplayGadgetConfiguration : public IUAVGadgetConfiguration
         ParityType parity() {return m_defaultParity;}
         long timeOut(){return m_defaultTimeOut;}
 
-        QByteArray saveState() const;
+        void saveConfig(QSettings* settings) const;
         IUAVGadgetConfiguration *clone();
 
     private:

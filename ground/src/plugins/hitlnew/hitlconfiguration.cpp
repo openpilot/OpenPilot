@@ -56,6 +56,33 @@ HITLConfiguration::HITLConfiguration(QString classId, const QByteArray &state, Q
     }
 }
 
+HITLConfiguration::HITLConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
+        IUAVGadgetConfiguration(classId, parent)
+{
+        settings.simulatorId = "";
+        settings.binPath = "";
+        settings.dataPath = "";
+        settings.manual = false;
+        settings.hostAddress = "127.0.0.1";
+        settings.outPort = 0;
+        settings.inPort = 0;
+        settings.latitude = "";
+        settings.longitude = "";
+
+        //if a saved configuration exists load it
+        if(qSettings != 0) {
+                settings.simulatorId = qSettings->value("simulatorId").toString();
+                settings.binPath = qSettings->value("binPath").toString();
+                settings.dataPath = qSettings->value("dataPath").toString();
+                settings.manual = qSettings->value("manual").toBool();
+                settings.hostAddress = qSettings->value("hostAddress").toString();
+                settings.outPort = qSettings->value("outPort").toInt();
+                settings.inPort = qSettings->value("inPort").toInt();
+                settings.latitude = qSettings->value("latitude").toString();
+                settings.longitude = qSettings->value("longitude").toString();
+        }
+}
+
 IUAVGadgetConfiguration *HITLConfiguration::clone()
 {
 	HITLConfiguration *m = new HITLConfiguration(this->classId());
@@ -64,20 +91,19 @@ IUAVGadgetConfiguration *HITLConfiguration::clone()
     return m;
 }
 
-QByteArray HITLConfiguration::saveState() const
-{
-    QByteArray bytes;
-    QDataStream stream(&bytes, QIODevice::WriteOnly);
-
-	stream << settings.simulatorId;
-	stream << settings.binPath;
-	stream << settings.dataPath;
-	stream << settings.manual;
-	stream << settings.hostAddress;
-	stream << settings.outPort;
-	stream << settings.inPort;
-	stream << settings.latitude;
-	stream << settings.longitude;
-    return bytes;
+ /**
+  * Saves a configuration.
+  *
+  */
+void HITLConfiguration::saveConfig(QSettings* qSettings) const {
+    qSettings->setValue("simulatorId", settings.simulatorId);
+    qSettings->setValue("binPath", settings.binPath);
+    qSettings->setValue("dataPath", settings.dataPath);
+    qSettings->setValue("manual", settings.manual);
+    qSettings->setValue("hostAddress", settings.hostAddress);
+    qSettings->setValue("outPort", settings.outPort);
+    qSettings->setValue("inPort", settings.inPort);
+    qSettings->setValue("latitude", settings.latitude);
+    qSettings->setValue("longitude", settings.longitude);
 }
 

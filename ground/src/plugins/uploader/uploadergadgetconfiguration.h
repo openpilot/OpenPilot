@@ -37,7 +37,8 @@ class UploaderGadgetConfiguration : public IUAVGadgetConfiguration
 {
 Q_OBJECT
 public:
-    explicit UploaderGadgetConfiguration(QString classId, const QByteArray &state = 0, QObject *parent = 0);
+    explicit UploaderGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent = 0);
+    explicit UploaderGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
 
     //set port configuration functions
     void setSpeed(BaudRateType speed) {m_defaultSpeed=speed;}
@@ -57,7 +58,7 @@ public:
     QString Port(){return m_defaultPort;}
     long TimeOut(){return m_defaultTimeOut;}
 
-    QByteArray saveState() const;
+    void saveConfig(QSettings* settings) const;
     IUAVGadgetConfiguration *clone();
 
 private:

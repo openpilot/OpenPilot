@@ -48,6 +48,24 @@ UAVObjectBrowserConfiguration::UAVObjectBrowserConfiguration(QString classId, co
     }
 }
 
+UAVObjectBrowserConfiguration::UAVObjectBrowserConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
+    IUAVGadgetConfiguration(classId, parent),
+    m_recentlyUpdatedColor(QColor(255, 230, 230)),
+    m_manuallyChangedColor(QColor(230, 230, 255)),
+    m_recentlyUpdatedTimeout(500)
+{
+    //if a saved configuration exists load it
+    if(qSettings != 0) {
+        QColor recent = qSettings->value("recentlyUpdatedColor").value<QColor>();
+        QColor manual = qSettings->value("manuallyChangedColor").value<QColor>();
+        int timeout = qSettings->value("recentlyUpdatedTimeout").toInt();
+
+        m_recentlyUpdatedColor = recent;
+        m_manuallyChangedColor = manual;
+        m_recentlyUpdatedTimeout = timeout;
+    }
+}
+
 IUAVGadgetConfiguration *UAVObjectBrowserConfiguration::clone()
 {
     UAVObjectBrowserConfiguration *m = new UAVObjectBrowserConfiguration(this->classId());
@@ -57,13 +75,12 @@ IUAVGadgetConfiguration *UAVObjectBrowserConfiguration::clone()
     return m;
 }
 
-QByteArray UAVObjectBrowserConfiguration::saveState() const
-{
-    QByteArray bytes;
-    QDataStream stream(&bytes, QIODevice::WriteOnly);
-    stream << m_recentlyUpdatedColor;
-    stream << m_manuallyChangedColor;
-    stream << m_recentlyUpdatedTimeout;
-    return bytes;
+/**
+ * Saves a configuration.
+ *
+ */
+void UAVObjectBrowserConfiguration::saveConfig(QSettings* qSettings) const {
+    qSettings->setValue("recentlyUpdatedColor", m_recentlyUpdatedColor);
+    qSettings->setValue("manuallyChangedColor", m_manuallyChangedColor);
+    qSettings->setValue("recentlyUpdatedTimeout", m_recentlyUpdatedTimeout);
 }
-

@@ -51,6 +51,11 @@ IUAVGadgetConfiguration *ConfigGadgetFactory::createConfiguration(const QByteArr
     return new ConfigGadgetConfiguration(QString("ConfigGadget"), state);
 }
 
+IUAVGadgetConfiguration *ConfigGadgetFactory::createConfiguration(QSettings* qSettings)
+{
+    return new ConfigGadgetConfiguration(QString("ConfigGadget"), qSettings);
+}
+
 IOptionsPage *ConfigGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
     return new ConfigGadgetOptionsPage(qobject_cast<ConfigGadgetConfiguration*>(config));

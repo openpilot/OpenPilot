@@ -53,6 +53,11 @@ IUAVGadgetConfiguration *SystemHealthGadgetFactory::createConfiguration(const QB
     return new SystemHealthGadgetConfiguration(QString("SystemHealthGadget"), state);
 }
 
+IUAVGadgetConfiguration *SystemHealthGadgetFactory::createConfiguration(QSettings* qSettings)
+{
+    return new SystemHealthGadgetConfiguration(QString("SystemHealthGadget"), qSettings);
+}
+
 IOptionsPage *SystemHealthGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
     return new SystemHealthGadgetOptionsPage(qobject_cast<SystemHealthGadgetConfiguration*>(config));

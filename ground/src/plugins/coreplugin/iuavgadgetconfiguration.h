@@ -30,6 +30,7 @@
 
 #include <coreplugin/core_global.h>
 #include <QObject>
+#include <QSettings>
 
 namespace Core {
 
@@ -46,7 +47,8 @@ public:
     bool locked() const { return m_locked; }
     void setLocked(bool locked) { m_locked = locked; }
 
-    virtual QByteArray saveState() const = 0;
+    virtual void saveConfig(QSettings* settings) const = 0;
+
     virtual IUAVGadgetConfiguration *clone() = 0;
 
 signals:

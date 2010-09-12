@@ -53,6 +53,11 @@ IUAVGadgetConfiguration *ScopeGadgetFactory::createConfiguration(const QByteArra
     return new ScopeGadgetConfiguration(QString("ScopeGadget"), state);
 }
 
+IUAVGadgetConfiguration *ScopeGadgetFactory::createConfiguration(QSettings* qSettings)
+{
+    return new ScopeGadgetConfiguration(QString("ScopeGadget"), qSettings);
+}
+
 IOptionsPage *ScopeGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
     return new ScopeGadgetOptionsPage(qobject_cast<ScopeGadgetConfiguration*>(config));

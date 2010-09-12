@@ -78,6 +78,58 @@ ScopeGadgetConfiguration::ScopeGadgetConfiguration(QString classId, const QByteA
 }
 
 
+ScopeGadgetConfiguration::ScopeGadgetConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
+        IUAVGadgetConfiguration(classId, parent),
+        m_plotType((int)ChronoPlot),
+        m_dataSize(60),
+        m_refreshInterval(1000)
+{
+    uint currentStreamVersion = 0;
+    int plotCurveCount = 0;
+
+
+    //if a saved configuration exists load it
+    if(qSettings != 0) {
+        currentStreamVersion = qSettings->value("configurationStreamVersion").toUInt();
+
+        if(currentStreamVersion != m_configurationStreamVersion)
+            return;
+
+        m_plotType = qSettings->value("plotType").toInt();
+        m_dataSize = qSettings->value("dataSize").toInt();
+        m_refreshInterval = qSettings->value("refreshInterval").toInt();
+        plotCurveCount = qSettings->value("plotCurveCount").toInt();
+
+        for(int plotDatasLoadIndex = 0; plotDatasLoadIndex < plotCurveCount; plotDatasLoadIndex++)
+        {
+            QString uavObject;
+            QString uavField;
+            QRgb color;
+
+            qSettings->beginGroup(QString("plotCurve") + QString().number(plotDatasLoadIndex));
+
+            PlotCurveConfiguration* plotCurveConf = new PlotCurveConfiguration();
+            uavObject = qSettings->value("uavObject").toString();
+            plotCurveConf->uavObject = uavObject;
+            uavField = qSettings->value("uavField").toString();
+            plotCurveConf->uavField = uavField;
+            color = qSettings->value("color").value<QRgb>();
+            plotCurveConf->color = color;
+            plotCurveConf->yScalePower = qSettings->value("yScalePower").toInt();
+            plotCurveConf->yMinimum = qSettings->value("yMinimum").toDouble();
+            plotCurveConf->yMaximum = qSettings->value("yMaximum").toDouble();
+
+            m_PlotCurveConfigs.append(plotCurveConf);
+
+            qSettings->endGroup();
+        }
+
+        //The value is converted to milliseconds, so if it is < 100, it is still seconds
+        if(m_refreshInterval < 100)
+            m_refreshInterval *= 1000;
+    }
+}
+
 void ScopeGadgetConfiguration::clearPlotData()
 {
     PlotCurveConfiguration* poltCurveConfig;
@@ -129,31 +181,31 @@ IUAVGadgetConfiguration *ScopeGadgetConfiguration::clone()
  * Saves a configuration.
  *
  */
-QByteArray ScopeGadgetConfiguration::saveState() const
-{
+void ScopeGadgetConfiguration::saveConfig(QSettings* qSettings) const {
+
     int plotCurveCount = m_PlotCurveConfigs.size();
     int plotDatasLoadIndex = 0;
-    QByteArray bytes;
-    QDataStream stream(&bytes, QIODevice::WriteOnly);
-    stream << m_configurationStreamVersion;
-    stream << m_plotType;
-    stream << m_dataSize;
-    stream << m_refreshInterval;
-    stream << plotCurveCount;
+
+    qSettings->setValue("configurationStreamVersion", m_configurationStreamVersion);
+    qSettings->setValue("plotType", m_plotType);
+    qSettings->setValue("dataSize", m_dataSize);
+    qSettings->setValue("refreshInterval", m_refreshInterval);
+    qSettings->setValue("plotCurveCount", plotCurveCount);
 
     for(plotDatasLoadIndex = 0; plotDatasLoadIndex < plotCurveCount; plotDatasLoadIndex++)
     {
+        qSettings->beginGroup(QString("plotCurve") + QString().number(plotDatasLoadIndex));
+
         PlotCurveConfiguration* plotCurveConf = m_PlotCurveConfigs.at(plotDatasLoadIndex);
+        qSettings->setValue("uavObject",  plotCurveConf->uavObject);
+        qSettings->setValue("uavField",  plotCurveConf->uavField);
+        qSettings->setValue("color",  plotCurveConf->color);
+        qSettings->setValue("yScalePower",  plotCurveConf->yScalePower);
+        qSettings->setValue("yMinimum",  plotCurveConf->yMinimum);
+        qSettings->setValue("yMaximum",  plotCurveConf->yMaximum);
 
-        stream << plotCurveConf->uavObject;
-        stream << plotCurveConf->uavField;
-        stream << plotCurveConf->color;
-        stream << plotCurveConf->yScalePower;
-        stream << plotCurveConf->yMinimum;
-        stream << plotCurveConf->yMaximum;
+        qSettings->endGroup();
     }
-
-    return bytes;
 }
 
 void ScopeGadgetConfiguration::replacePlotCurveConfig(QList<PlotCurveConfiguration*> newPlotCurveConfigs)

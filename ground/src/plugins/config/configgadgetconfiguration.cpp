@@ -34,15 +34,18 @@ ConfigGadgetConfiguration::ConfigGadgetConfiguration(QString classId, const QByt
 
 }
 
+ConfigGadgetConfiguration::ConfigGadgetConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
+    IUAVGadgetConfiguration(classId, parent)
+{
+
+}
+
 IUAVGadgetConfiguration *ConfigGadgetConfiguration::clone()
 {
     ConfigGadgetConfiguration *m = new ConfigGadgetConfiguration(this->classId());
     return m;
 }
 
-QByteArray ConfigGadgetConfiguration::saveState() const
-{
-    QByteArray bytes;
-    QDataStream stream(&bytes, QIODevice::WriteOnly);
-    return bytes;
+void ConfigGadgetConfiguration::saveConfig(QSettings* settings) const {
+
 }

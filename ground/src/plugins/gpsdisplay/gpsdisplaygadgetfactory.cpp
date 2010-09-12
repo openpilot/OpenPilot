@@ -53,6 +53,11 @@ IUAVGadgetConfiguration *GpsDisplayGadgetFactory::createConfiguration(const QByt
     return new GpsDisplayGadgetConfiguration(QString("GpsDisplayGadget"), state);
 }
 
+IUAVGadgetConfiguration *GpsDisplayGadgetFactory::createConfiguration(QSettings* qSettings)
+{
+    return new GpsDisplayGadgetConfiguration(QString("GpsDisplayGadget"), qSettings);
+}
+
 IOptionsPage *GpsDisplayGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
     return new GpsDisplayGadgetOptionsPage(qobject_cast<GpsDisplayGadgetConfiguration*>(config));

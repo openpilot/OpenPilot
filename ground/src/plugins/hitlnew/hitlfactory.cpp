@@ -54,6 +54,11 @@ IUAVGadgetConfiguration *HITLFactory::createConfiguration(const QByteArray &stat
 	return new HITLConfiguration(QString("HITL"), state);
 }
 
+IUAVGadgetConfiguration *HITLFactory::createConfiguration(QSettings* qSettings)
+{
+    return new HITLConfiguration(QString("HITL"), qSettings);
+}
+
 IOptionsPage *HITLFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
     return new HITLOptionsPage(qobject_cast<HITLConfiguration*>(config));

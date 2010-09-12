@@ -52,6 +52,11 @@ IUAVGadgetConfiguration *ModelViewGadgetFactory::createConfiguration(const QByte
     return new ModelViewGadgetConfiguration(QString("ModelViewGadget"), state);
 }
 
+IUAVGadgetConfiguration *ModelViewGadgetFactory::createConfiguration(QSettings* qSettings)
+{
+    return new ModelViewGadgetConfiguration(QString("ModelViewGadget"), qSettings);
+}
+
 IOptionsPage *ModelViewGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
     return new ModelViewGadgetOptionsPage(qobject_cast<ModelViewGadgetConfiguration*>(config));

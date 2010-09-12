@@ -39,7 +39,8 @@ class IMPORTEXPORT_EXPORT ImportExportGadgetConfiguration : public IUAVGadgetCon
 {
     Q_OBJECT
 public:
-    explicit ImportExportGadgetConfiguration(QString classId, const QByteArray &state = 0, QObject *parent = 0);
+    explicit ImportExportGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent = 0);
+    explicit ImportExportGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
 
     //set dial configuration functions
     void setDialFile(QString filename) {
@@ -51,7 +52,7 @@ public:
         return dialFile;
     }
 
-    QByteArray saveState() const;
+    void saveConfig(QSettings* settings) const;
     IUAVGadgetConfiguration *clone();
 
 private:

@@ -85,6 +85,53 @@ GpsDisplayGadgetConfiguration::GpsDisplayGadgetConfiguration(QString classId, co
 }
 
 /**
+ * Loads a saved configuration or defaults if non exist.
+ *
+ */
+GpsDisplayGadgetConfiguration::GpsDisplayGadgetConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
+    IUAVGadgetConfiguration(classId, parent),
+    m_connectionMode("Serial"),
+    m_defaultPort("Unknown"),
+    m_defaultSpeed(BAUD4800),
+    m_defaultDataBits(DATA_8),
+    m_defaultFlow(FLOW_OFF),
+    m_defaultParity(PAR_NONE),
+    m_defaultStopBits(STOP_1),
+    m_defaultTimeOut(5000)
+{
+    //if a saved configuration exists load it
+    if(qSettings != 0) {
+        BaudRateType speed;
+        DataBitsType databits;
+        FlowType flow;
+        ParityType parity;
+        StopBitsType stopbits;
+
+        int ispeed = qSettings->value("defaultSpeed").toInt();
+        int idatabits = qSettings->value("defaultDataBits").toInt();
+        int iflow = qSettings->value("defaultFlow").toInt();
+        int iparity = qSettings->value("defaultParity").toInt();
+        int istopbits = qSettings->value("defaultStopBits").toInt();
+        QString port = qSettings->value("defaultPort").toString();
+        QString conMode = qSettings->value("connectionMode").toString();
+
+        databits = (DataBitsType) idatabits;
+        flow = (FlowType)iflow;
+        parity = (ParityType)iparity;
+        stopbits = (StopBitsType)istopbits;
+        speed = (BaudRateType)ispeed;
+        m_defaultPort = port;
+        m_defaultSpeed = speed;
+        m_defaultDataBits = databits;
+        m_defaultFlow = flow;
+        m_defaultParity = parity;
+        m_defaultStopBits = stopbits;
+        m_connectionMode = conMode;
+    }
+
+}
+
+/**
  * Clones a configuration.
  *
  */
@@ -106,16 +153,13 @@ IUAVGadgetConfiguration *GpsDisplayGadgetConfiguration::clone()
  * Saves a configuration.
  *
  */
-QByteArray GpsDisplayGadgetConfiguration::saveState() const
-{
-    QByteArray bytes;
-    QDataStream stream(&bytes, QIODevice::WriteOnly);
-    stream << (int)m_defaultSpeed;
-    stream << (int)m_defaultDataBits;
-    stream << (int)m_defaultFlow;
-    stream << (int)m_defaultParity;
-    stream << (int)m_defaultStopBits;
-    stream << m_defaultPort;
-    stream << m_connectionMode;
-    return bytes;
+void GpsDisplayGadgetConfiguration::saveConfig(QSettings* settings) const {
+ settings->setValue("defaultSpeed", m_defaultSpeed);
+ settings->setValue("defaultDataBits", m_defaultDataBits);
+ settings->setValue("defaultFlow", m_defaultFlow);
+ settings->setValue("defaultParity", m_defaultParity);
+ settings->setValue("defaultStopBits", m_defaultStopBits);
+ settings->setValue("defaultPort", m_defaultPort);
+ settings->setValue("connectionMode", m_connectionMode);
+
 }

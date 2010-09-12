@@ -54,6 +54,11 @@ IUAVGadgetConfiguration *DialGadgetFactory::createConfiguration(const QByteArray
     return new DialGadgetConfiguration(QString("DialGadget"), state);
 }
 
+IUAVGadgetConfiguration *DialGadgetFactory::createConfiguration(QSettings* qSettings)
+{
+    return new DialGadgetConfiguration(QString("DialGadget"), qSettings);
+}
+
 IOptionsPage *DialGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
     return new DialGadgetOptionsPage(qobject_cast<DialGadgetConfiguration*>(config));

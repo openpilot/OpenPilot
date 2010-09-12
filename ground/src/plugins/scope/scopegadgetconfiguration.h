@@ -49,7 +49,9 @@ class ScopeGadgetConfiguration : public IUAVGadgetConfiguration
 {
     Q_OBJECT
 public:
-    explicit ScopeGadgetConfiguration(QString classId, const QByteArray &state = 0, QObject *parent = 0);
+    explicit ScopeGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent = 0);
+    explicit ScopeGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
+
     ~ScopeGadgetConfiguration();
 
     //configuration setter functions
@@ -66,7 +68,7 @@ public:
     int refreshInterval(){return m_refreshInterval;}
     QList<PlotCurveConfiguration*> plotCurveConfigs(){return m_PlotCurveConfigs;}
 
-    QByteArray saveState() const;
+    void saveConfig(QSettings* settings) const;
     IUAVGadgetConfiguration *clone();
 
 private:

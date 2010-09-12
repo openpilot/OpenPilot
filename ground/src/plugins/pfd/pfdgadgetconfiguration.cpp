@@ -47,6 +47,24 @@ PFDGadgetConfiguration::PFDGadgetConfiguration(QString classId, const QByteArray
         m_defaultDial=Utils::PathUtils().InsertDataPath(dialFile);
     }
 }
+
+/**
+ * Loads a saved configuration or defaults if non exist.
+ *
+ */
+PFDGadgetConfiguration::PFDGadgetConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
+    IUAVGadgetConfiguration(classId, parent),
+    m_defaultDial("Unknown")
+{
+    //if a saved configuration exists load it
+    if(qSettings != 0) {
+        QString dialFile = qSettings->value("dialFile").toString();
+        useOpenGLFlag = qSettings->value("useOpenGLFlag").toBool();
+        hqFonts = qSettings->value("hqFonts").toBool();
+        m_defaultDial=Utils::PathUtils().InsertDataPath(dialFile);
+    }
+}
+
 /**
  * Clones a configuration.
  *
@@ -59,18 +77,14 @@ IUAVGadgetConfiguration *PFDGadgetConfiguration::clone()
     m->hqFonts = hqFonts;
     return m;
 }
+
 /**
  * Saves a configuration.
  *
  */
-QByteArray PFDGadgetConfiguration::saveState() const
-{
-    QByteArray bytes;
-    QDataStream stream(&bytes, QIODevice::WriteOnly);
+void PFDGadgetConfiguration::saveConfig(QSettings* qSettings) const {
     QString dialFile = Utils::PathUtils().RemoveDataPath(m_defaultDial);
-    stream << dialFile;
-    stream << useOpenGLFlag;
-    stream << hqFonts;
-
-    return bytes;
+    qSettings->setValue("dialFile", dialFile);
+    qSettings->setValue("useOpenGLFlag", useOpenGLFlag);
+    qSettings->setValue("hqFonts", hqFonts);
 }

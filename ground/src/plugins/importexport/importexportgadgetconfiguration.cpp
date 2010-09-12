@@ -44,6 +44,21 @@ ImportExportGadgetConfiguration::ImportExportGadgetConfiguration(QString classId
         stream >> dialFile;
     }
 }
+
+/**
+ * Loads a saved configuration or defaults if non exist.
+ *
+ */
+ImportExportGadgetConfiguration::ImportExportGadgetConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
+        IUAVGadgetConfiguration(classId, parent),
+        dialFile("gcs.ini")
+{
+    //if a saved configuration exists load it
+    if(qSettings != 0) {
+        dialFile = qSettings->value("dialFile").toString();
+    }
+}
+
 /**
  * Clones a configuration.
  *
@@ -54,16 +69,13 @@ IUAVGadgetConfiguration *ImportExportGadgetConfiguration::clone()
     m->dialFile = dialFile;
     return m;
 }
+
 /**
  * Saves a configuration.
  *
  */
-QByteArray ImportExportGadgetConfiguration::saveState() const
-{
-    QByteArray bytes;
-    QDataStream stream(&bytes, QIODevice::WriteOnly);
-    stream << dialFile;
-    return bytes;
+void ImportExportGadgetConfiguration::saveConfig(QSettings* qSettings) const {
+   qSettings->setValue("dialFile", dialFile);
 }
 
 /**

@@ -88,6 +88,65 @@ DialGadgetConfiguration::DialGadgetConfiguration(QString classId, const QByteArr
 
     }
 }
+
+
+/**
+ * Loads a saved configuration or defaults if non exist.
+ *
+ */
+DialGadgetConfiguration::DialGadgetConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
+    IUAVGadgetConfiguration(classId, parent),
+    m_defaultDial("Unknown"),
+    dialBackgroundID("background"),
+    dialForegroundID("foreground"),
+    dialNeedleID1("needle"),
+    dialNeedleID2("needle2"),
+    dialNeedleID3("needle3"),
+    needle1MinValue(0),
+    needle1MaxValue(100),
+    needle2MinValue(0),
+    needle2MaxValue(100),
+    needle3MinValue(0),
+    needle3MaxValue(100),
+    needle1Factor(1),
+    needle2Factor(1),
+    needle3Factor(1),
+    needle1Move("Rotate"),
+    needle2Move("Rotate"),
+    needle3Move("Rotate")
+{
+    //if a saved configuration exists load it
+    if(qSettings != 0) {
+        QString dialFile = qSettings->value("dialFile").toString();
+
+        m_defaultDial=Utils::PathUtils().InsertDataPath(dialFile);
+        dialBackgroundID = qSettings->value("dialBackgroundID").toString();
+        dialForegroundID = qSettings->value("dialForegroundID").toString();
+        dialNeedleID1 = qSettings->value("dialNeedleID1").toString();
+        dialNeedleID2 = qSettings->value("dialNeedleID2").toString();
+        dialNeedleID3 = qSettings->value("dialNeedleID3").toString();
+        needle1MinValue = qSettings->value("needle1MinValue").toDouble();
+        needle1MaxValue = qSettings->value("needle1MaxValue").toDouble();
+        needle2MinValue = qSettings->value("needle2MinValue").toDouble();
+        needle2MaxValue = qSettings->value("needle2MaxValue").toDouble();
+        needle3MinValue = qSettings->value("needle3MinValue").toDouble();
+        needle3MaxValue = qSettings->value("needle3MaxValue").toDouble();
+        needle1DataObject = qSettings->value("needle1DataObject").toString();
+        needle1ObjectField = qSettings->value("needle1ObjectField").toString();
+        needle2DataObject = qSettings->value("needle2DataObject").toString();
+        needle2ObjectField = qSettings->value("needle2ObjectField").toString();
+        needle3DataObject = qSettings->value("needle3DataObject").toString();
+        needle3ObjectField = qSettings->value("needle3ObjectField").toString();
+        needle1Factor = qSettings->value("needle1Factor").toDouble();
+        needle2Factor = qSettings->value("needle2Factor").toDouble();
+        needle3Factor = qSettings->value("needle3Factor").toDouble();
+        needle1Move = qSettings->value("needle1Move").toString();
+        needle2Move = qSettings->value("needle2Move").toString();
+        needle3Move = qSettings->value("needle3Move").toString();
+        font = qSettings->value("font").toString();
+    }
+}
+
 /**
  * Clones a configuration.
  *
@@ -123,40 +182,43 @@ IUAVGadgetConfiguration *DialGadgetConfiguration::clone()
 
     return m;
 }
+
 /**
  * Saves a configuration.
  *
  */
-QByteArray DialGadgetConfiguration::saveState() const
-{
-    QByteArray bytes;
-    QDataStream stream(&bytes, QIODevice::WriteOnly);
+void DialGadgetConfiguration::saveConfig(QSettings* settings) const {
     QString dialFile = Utils::PathUtils().RemoveDataPath(m_defaultDial);
-    stream << dialFile;
-    stream << dialBackgroundID;
-    stream << dialForegroundID;
-    stream << dialNeedleID1;
-    stream << dialNeedleID2;
-    stream << dialNeedleID3;
-    stream << needle1MinValue;
-    stream << needle1MaxValue;
-    stream << needle2MinValue;
-    stream << needle2MaxValue;
-    stream << needle3MinValue;
-    stream << needle3MaxValue;
-    stream << needle1DataObject;
-    stream << needle1ObjectField;
-    stream << needle2DataObject;
-    stream << needle2ObjectField;
-    stream << needle3DataObject;
-    stream << needle3ObjectField;
-    stream << needle1Factor;
-    stream << needle2Factor;
-    stream << needle3Factor;
-    stream << needle1Move;
-    stream << needle2Move;
-    stream << needle3Move;
-    stream << font;
+    settings->setValue("dialFile", dialFile);
 
-    return bytes;
+    settings->setValue("dialBackgroundID", dialBackgroundID);
+    settings->setValue("dialForegroundID", dialForegroundID);
+
+    settings->setValue("dialNeedleID1", dialNeedleID1);
+    settings->setValue("dialNeedleID2", dialNeedleID2);
+    settings->setValue("dialNeedleID3", dialNeedleID3);
+
+    settings->setValue("needle1MinValue", needle1MinValue);
+    settings->setValue("needle1MaxValue", needle1MaxValue);
+    settings->setValue("needle2MinValue", needle2MinValue);
+    settings->setValue("needle2MaxValue", needle2MaxValue);
+    settings->setValue("needle3MinValue", needle3MinValue);
+    settings->setValue("needle3MaxValue", needle3MaxValue);
+
+    settings->setValue("needle1DataObject", needle1DataObject);
+    settings->setValue("needle1ObjectField", needle1ObjectField);
+    settings->setValue("needle2DataObject", needle2DataObject);
+    settings->setValue("needle2ObjectField", needle2ObjectField);
+    settings->setValue("needle3DataObject", needle3DataObject);
+    settings->setValue("needle3ObjectField", needle3ObjectField);
+
+    settings->setValue("needle1Factor", needle1Factor);
+    settings->setValue("needle2Factor", needle2Factor);
+    settings->setValue("needle3Factor", needle3Factor);
+
+    settings->setValue("needle1Move", needle1Move);
+    settings->setValue("needle2Move", needle2Move);
+    settings->setValue("needle3Move", needle3Move);
+
+    settings->setValue("font", font);
 }

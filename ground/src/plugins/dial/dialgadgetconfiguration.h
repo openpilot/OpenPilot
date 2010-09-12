@@ -40,7 +40,9 @@ class DialGadgetConfiguration : public IUAVGadgetConfiguration
 {
 Q_OBJECT
 public:
-    explicit DialGadgetConfiguration(QString classId, const QByteArray &state = 0, QObject *parent = 0);
+    explicit DialGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent = 0);
+    explicit DialGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
+
 
     //set dial configuration functions
     void setDialFile(QString dialFile){m_defaultDial=dialFile;}
@@ -97,7 +99,7 @@ public:
     QString getN3Move() { return needle3Move; }
     QString getFont() { return font;}
 
-    QByteArray saveState() const;
+    void saveConfig(QSettings* settings) const;
     IUAVGadgetConfiguration *clone();
 
 private:

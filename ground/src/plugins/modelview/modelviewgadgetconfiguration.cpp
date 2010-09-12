@@ -47,6 +47,22 @@ ModelViewGadgetConfiguration::ModelViewGadgetConfiguration(QString classId, cons
     }
 }
 
+ModelViewGadgetConfiguration::ModelViewGadgetConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
+    IUAVGadgetConfiguration(classId, parent),
+    m_acFilename("../share/models/Easystar/EasyStar.3ds"),
+    m_bgFilename(""),
+    m_enableVbo(false)
+{
+    //if a saved configuration exists load it
+    if(qSettings != 0) {
+        QString modelFile = qSettings->value("acFilename").toString();
+        QString bgFile = qSettings->value("bgFilename").toString();
+        m_enableVbo = qSettings->value("enableVbo").toBool();
+        m_acFilename = Utils::PathUtils().InsertDataPath(modelFile);
+        m_bgFilename = Utils::PathUtils().InsertDataPath(bgFile);
+    }
+}
+
 IUAVGadgetConfiguration *ModelViewGadgetConfiguration::clone()
 {
     ModelViewGadgetConfiguration *mv = new ModelViewGadgetConfiguration(this->classId());
@@ -56,14 +72,12 @@ IUAVGadgetConfiguration *ModelViewGadgetConfiguration::clone()
     return mv;
 }
 
-QByteArray ModelViewGadgetConfiguration::saveState() const
-{
-
-    QByteArray bytes;
-    QDataStream stream(&bytes, QIODevice::WriteOnly);
-    stream << Utils::PathUtils().RemoveDataPath(m_acFilename);
-    stream << Utils::PathUtils().RemoveDataPath(m_bgFilename);
-    stream << m_enableVbo;
-    return bytes;
+/**
+ * Saves a configuration.
+ *
+ */
+void ModelViewGadgetConfiguration::saveConfig(QSettings* qSettings) const {
+   qSettings->setValue("acFilename", Utils::PathUtils().RemoveDataPath(m_acFilename));
+   qSettings->setValue("bgFilename", Utils::PathUtils().RemoveDataPath(m_bgFilename));
+   qSettings->setValue("enableVbo", m_enableVbo);
 }
-

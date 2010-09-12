@@ -31,6 +31,7 @@
 #include "core_global.h"
 
 #include <QtCore/QObject>
+#include <QSettings>
 
 QT_BEGIN_NAMESPACE
 class QStringList;
@@ -54,6 +55,7 @@ public:
 
     virtual IUAVGadget *createGadget(QWidget *parent) = 0;
     virtual IUAVGadgetConfiguration *createConfiguration(const QByteArray &/*state*/) { return 0; }
+    virtual IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings) { return 0; }
     virtual IOptionsPage *createOptionsPage(IUAVGadgetConfiguration */*config*/) { return 0; }
     QString classId() const { return m_classId; }
     QString name() const { return m_name; }

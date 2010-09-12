@@ -56,6 +56,12 @@ IUAVGadgetConfiguration *ImportExportGadgetFactory::createConfiguration(const QB
     return lastConfig;
 }
 
+IUAVGadgetConfiguration *ImportExportGadgetFactory::createConfiguration(QSettings* qSettings)
+{
+    lastConfig = new ImportExportGadgetConfiguration(QString("ImportExportGadget"), qSettings);
+    return lastConfig;
+}
+
 IOptionsPage *ImportExportGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
     return new ImportExportGadgetOptionsPage(qobject_cast<ImportExportGadgetConfiguration*>(config));

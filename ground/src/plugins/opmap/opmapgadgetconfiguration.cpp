@@ -78,6 +78,44 @@ OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId, const QByteA
     }
 }
 
+OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId,  QSettings* qSettings, QObject *parent) :
+    IUAVGadgetConfiguration(classId, parent),
+    m_mapProvider("GoogleHybrid"),
+    m_defaultZoom(2),
+    m_defaultLatitude(0),
+    m_defaultLongitude(0),
+    m_useOpenGL(false),
+    m_showTileGridLines(false),
+    m_accessMode("ServerAndCache"),
+    m_useMemoryCache(true),
+    m_cacheLocation(QDir::currentPath() + QDir::separator() + "mapscache" + QDir::separator())
+{
+
+    //if a saved configuration exists load it
+    if(qSettings != 0) {
+        QString mapProvider  = qSettings->value("mapProvider").toString();
+        int zoom = qSettings->value("defaultZoom").toInt();
+        double latitude= qSettings->value("defaultLatitude").toDouble();
+        double longitude= qSettings->value("defaultLongitude").toDouble();
+        bool useOpenGL= qSettings->value("useOpenGL").toBool();
+        bool showTileGridLines= qSettings->value("showTileGridLines").toBool();
+        QString accessMode= qSettings->value("accessMode").toString();
+        bool useMemoryCache= qSettings->value("useMemoryCache").toBool();
+        QString cacheLocation= qSettings->value("cacheLocation").toString();
+
+        if (!mapProvider.isEmpty()) m_mapProvider = mapProvider;
+        m_defaultZoom = zoom;
+        m_defaultLatitude = latitude;
+        m_defaultLongitude = longitude;
+        m_useOpenGL = useOpenGL;
+        m_showTileGridLines = showTileGridLines;
+
+        if (!accessMode.isEmpty()) m_accessMode = accessMode;
+        m_useMemoryCache = useMemoryCache;
+        if (!cacheLocation.isEmpty()) m_cacheLocation = cacheLocation;
+    }
+}
+
 IUAVGadgetConfiguration * OPMapGadgetConfiguration::clone()
 {
     OPMapGadgetConfiguration *m = new OPMapGadgetConfiguration(this->classId());
@@ -95,20 +133,14 @@ IUAVGadgetConfiguration * OPMapGadgetConfiguration::clone()
     return m;
 }
 
-QByteArray OPMapGadgetConfiguration::saveState() const
-{
-    QByteArray bytes;
-    QDataStream stream(&bytes, QIODevice::WriteOnly);
-
-    stream << m_mapProvider;
-    stream << m_defaultZoom;
-    stream << m_defaultLatitude;
-    stream << m_defaultLongitude;
-    stream << m_useOpenGL;
-    stream << m_showTileGridLines;
-    stream << m_accessMode;
-    stream << m_useMemoryCache;
-    stream << m_cacheLocation;
-
-    return bytes;
+void OPMapGadgetConfiguration::saveConfig(QSettings* qSettings) const {
+   qSettings->setValue("mapProvider", m_mapProvider);
+   qSettings->setValue("defaultZoom", m_defaultZoom);
+   qSettings->setValue("defaultLatitude", m_defaultLatitude);
+   qSettings->setValue("defaultLongitude", m_defaultLongitude);
+   qSettings->setValue("useOpenGL", m_useOpenGL);
+   qSettings->setValue("showTileGridLines", m_showTileGridLines);
+   qSettings->setValue("accessMode", m_accessMode);
+   qSettings->setValue("useMemoryCache", m_useMemoryCache);
+   qSettings->setValue("cacheLocation", m_cacheLocation);
 }

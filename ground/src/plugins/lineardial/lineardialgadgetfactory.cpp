@@ -53,6 +53,11 @@ IUAVGadgetConfiguration *LineardialGadgetFactory::createConfiguration(const QByt
     return new LineardialGadgetConfiguration(QString("LineardialGadget"), state);
 }
 
+IUAVGadgetConfiguration *LineardialGadgetFactory::createConfiguration(QSettings* qSettings)
+{
+    return new LineardialGadgetConfiguration(QString("LineardialGadget"), qSettings);
+}
+
 IOptionsPage *LineardialGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
     return new LineardialGadgetOptionsPage(qobject_cast<LineardialGadgetConfiguration*>(config));

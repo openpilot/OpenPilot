@@ -48,8 +48,10 @@ Q_PROPERTY(bool useMemoryCache READ useMemoryCache WRITE setUseMemoryCache)
 Q_PROPERTY(QString cacheLocation READ cacheLocation WRITE setCacheLocation)
 
 public:
-    explicit OPMapGadgetConfiguration(QString classId, const QByteArray &state = 0, QObject *parent = 0);
-    QByteArray saveState() const;
+    explicit OPMapGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent = 0);
+    explicit OPMapGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
+
+    void saveConfig(QSettings* settings) const;
     IUAVGadgetConfiguration *clone();
 
     QString mapProvider() const { return m_mapProvider; }

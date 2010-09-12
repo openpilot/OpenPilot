@@ -46,7 +46,7 @@ using namespace Core;
 
 UAVGadgetInstanceManager::UAVGadgetInstanceManager(QObject *parent) :
     QObject(parent),
-    m_versionUAVGadgetConfigurations("1.0.0")
+    m_versionUAVGadgetConfigurations("1.1.0")
 {
     m_pm = ExtensionSystem::PluginManager::instance();
     QList<IUAVGadgetFactory*> factories = m_pm->getObjects<IUAVGadgetFactory>();
@@ -80,11 +80,13 @@ void UAVGadgetInstanceManager::readConfigurations(QSettings *qs)
         // If version is not set, assume its a old version before readable config.
         configInfo.setVersion("1.0.0");
     }
+    /*
     if ( configInfo.standardVersionHandlingIsNotOK(m_versionUAVGadgetConfigurations) ){
         // We are in trouble now. User wants us to quit the import.
         qs->endGroup();
         return;
     }
+    */
     readConfigs_1_0_0(qs);
     qs->endGroup();
     createOptionsPages();

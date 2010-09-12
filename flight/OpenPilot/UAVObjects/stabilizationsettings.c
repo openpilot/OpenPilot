@@ -84,6 +84,9 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	data.RollMax = 35;
 	data.PitchMax = 35;
 	data.ThrottleMax = 1;
+	data.RollIntegralLimit = 0.5;
+	data.PitchIntegralLimit = 0.5;
+	data.YawIntegralLimit = 0.5;
 	data.PitchKp = 0.04;
 	data.PitchKi = 4e-06;
 	data.PitchKd = 0.01;

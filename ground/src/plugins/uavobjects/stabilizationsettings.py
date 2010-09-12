@@ -78,6 +78,36 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
+		'RollIntegralLimit',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'PitchIntegralLimit',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'YawIntegralLimit',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
 		'PitchKp',
 		'f',
 		1,
@@ -172,7 +202,7 @@ _fields = [ \
 
 class StabilizationSettings(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 2185681924
+    OBJID        = 3082215042
     NAME         = "StabilizationSettings"
     METANAME     = "StabilizationSettingsMeta"
     ISSINGLEINST = 1

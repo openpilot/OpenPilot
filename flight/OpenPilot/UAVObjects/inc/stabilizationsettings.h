@@ -41,7 +41,7 @@
 #define STABILIZATIONSETTINGS_H
 
 // Object constants
-#define STABILIZATIONSETTINGS_OBJID 2185681924U
+#define STABILIZATIONSETTINGS_OBJID 3082215042U
 #define STABILIZATIONSETTINGS_NAME "StabilizationSettings"
 #define STABILIZATIONSETTINGS_METANAME "StabilizationSettingsMeta"
 #define STABILIZATIONSETTINGS_ISSINGLEINST 1
@@ -75,6 +75,9 @@ typedef struct {
     float RollMax;
     float PitchMax;
     float ThrottleMax;
+    float RollIntegralLimit;
+    float PitchIntegralLimit;
+    float YawIntegralLimit;
     float PitchKp;
     float PitchKi;
     float PitchKd;
@@ -92,6 +95,9 @@ typedef struct {
 // Field RollMax information
 // Field PitchMax information
 // Field ThrottleMax information
+// Field RollIntegralLimit information
+// Field PitchIntegralLimit information
+// Field YawIntegralLimit information
 // Field PitchKp information
 // Field PitchKi information
 // Field PitchKd information

@@ -44,9 +44,6 @@
 // Private constants
 #define STACK_SIZE configMINIMAL_STACK_SIZE
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
-#define PITCH_INTEGRAL_LIMIT 0.5
-#define ROLL_INTEGRAL_LIMIT 0.5
-#define YAW_INTEGRAL_LIMIT 0.5
 
 // Private types
 
@@ -88,9 +85,9 @@ static void stabilizationTask(void* parameters)
 	float pitchDerivative;
 	float rollDerivative;
 	float yawDerivative;
-	float pitchIntegral, pitchIntegralLimit;
-	float rollIntegral, rollIntegralLimit;
-	float yawIntegral, yawIntegralLimit;
+	float pitchIntegral;
+	float rollIntegral;
+	float yawIntegral;
 
 	// Initialize
 	pitchIntegral = 0.0;
@@ -113,18 +110,16 @@ static void stabilizationTask(void* parameters)
 
 		// Pitch stabilization control loop
 		pitchError = bound(attitudeDesired.Pitch, -stabSettings.PitchMax, stabSettings.PitchMax) - attitudeActual.Pitch;
-		pitchDerivative = pitchError - pitchErrorLast;
-		pitchIntegralLimit = PITCH_INTEGRAL_LIMIT / stabSettings.PitchKi;
-		pitchIntegral = bound(pitchIntegral+pitchError*stabSettings.UpdatePeriod, -pitchIntegralLimit, pitchIntegralLimit);
+		pitchDerivative = (pitchError - pitchErrorLast) / stabSettings.UpdatePeriod;
+		pitchIntegral = bound(pitchIntegral+pitchError*stabSettings.UpdatePeriod, -stabSettings.PitchIntegralLimit, stabSettings.PitchIntegralLimit);
 		actuatorDesired.Pitch = stabSettings.PitchKp*pitchError + stabSettings.PitchKi*pitchIntegral + stabSettings.PitchKd*pitchDerivative;
 		actuatorDesired.Pitch = bound(actuatorDesired.Pitch, -1.0, 1.0);
 		pitchErrorLast = pitchError;
 
 		// Roll stabilization control loop
 		rollError = bound(attitudeDesired.Roll, -stabSettings.RollMax, stabSettings.RollMax) - attitudeActual.Roll;
-		rollDerivative = rollError - rollErrorLast;
-		rollIntegralLimit = ROLL_INTEGRAL_LIMIT / stabSettings.RollKi;
-		rollIntegral = bound(rollIntegral+rollError*stabSettings.UpdatePeriod, -rollIntegralLimit, rollIntegralLimit);
+		rollDerivative = (rollError - rollErrorLast) / stabSettings.UpdatePeriod;
+		rollIntegral = bound(rollIntegral+rollError*stabSettings.UpdatePeriod, -stabSettings.RollIntegralLimit, stabSettings.RollIntegralLimit);
 		actuatorDesired.Roll = stabSettings.RollKp*rollError + stabSettings.RollKi*rollIntegral + stabSettings.RollKd*rollDerivative;
 		actuatorDesired.Roll = bound(actuatorDesired.Roll, -1.0, 1.0);
 		rollErrorLast = rollError;
@@ -136,9 +131,8 @@ static void stabilizationTask(void* parameters)
 			//this should make it take the quickest path to reach the desired yaw
 			if (yawError>180.0)yawError -= 360;
 			if (yawError<-180.0)yawError += 360;
-			yawDerivative = yawError - yawErrorLast;
-			yawIntegralLimit = YAW_INTEGRAL_LIMIT / stabSettings.YawKi;
-			yawIntegral = bound(yawIntegral+yawError*stabSettings.UpdatePeriod, -yawIntegralLimit, yawIntegralLimit);
+			yawDerivative = (yawError - yawErrorLast) / stabSettings.UpdatePeriod;
+			yawIntegral = bound(yawIntegral+yawError*stabSettings.UpdatePeriod, -stabSettings.YawIntegralLimit, stabSettings.YawIntegralLimit);
 			actuatorDesired.Yaw = stabSettings.YawKp*yawError + stabSettings.YawKi*yawIntegral + stabSettings.YawKd*yawDerivative;;
 			actuatorDesired.Yaw = bound(actuatorDesired.Yaw, -1.0, 1.0);
 			yawErrorLast = yawError;

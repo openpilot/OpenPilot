@@ -54,6 +54,15 @@ StabilizationSettings::StabilizationSettings(): UAVDataObject(OBJID, ISSINGLEINS
     QStringList ThrottleMaxElemNames;
     ThrottleMaxElemNames.append("0");
     fields.append( new UAVObjectField(QString("ThrottleMax"), QString("%"), UAVObjectField::FLOAT32, ThrottleMaxElemNames, QStringList()) );
+    QStringList RollIntegralLimitElemNames;
+    RollIntegralLimitElemNames.append("0");
+    fields.append( new UAVObjectField(QString("RollIntegralLimit"), QString(""), UAVObjectField::FLOAT32, RollIntegralLimitElemNames, QStringList()) );
+    QStringList PitchIntegralLimitElemNames;
+    PitchIntegralLimitElemNames.append("0");
+    fields.append( new UAVObjectField(QString("PitchIntegralLimit"), QString(""), UAVObjectField::FLOAT32, PitchIntegralLimitElemNames, QStringList()) );
+    QStringList YawIntegralLimitElemNames;
+    YawIntegralLimitElemNames.append("0");
+    fields.append( new UAVObjectField(QString("YawIntegralLimit"), QString(""), UAVObjectField::FLOAT32, YawIntegralLimitElemNames, QStringList()) );
     QStringList PitchKpElemNames;
     PitchKpElemNames.append("0");
     fields.append( new UAVObjectField(QString("PitchKp"), QString(""), UAVObjectField::FLOAT32, PitchKpElemNames, QStringList()) );
@@ -118,6 +127,9 @@ void StabilizationSettings::setDefaultFieldValues()
     data.RollMax = 35;
     data.PitchMax = 35;
     data.ThrottleMax = 1;
+    data.RollIntegralLimit = 0.5;
+    data.PitchIntegralLimit = 0.5;
+    data.YawIntegralLimit = 0.5;
     data.PitchKp = 0.04;
     data.PitchKi = 4e-06;
     data.PitchKd = 0.01;

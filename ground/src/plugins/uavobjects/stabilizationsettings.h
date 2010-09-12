@@ -47,6 +47,9 @@ public:
         float RollMax;
         float PitchMax;
         float ThrottleMax;
+        float RollIntegralLimit;
+        float PitchIntegralLimit;
+        float YawIntegralLimit;
         float PitchKp;
         float PitchKi;
         float PitchKd;
@@ -64,6 +67,9 @@ public:
     // Field RollMax information
     // Field PitchMax information
     // Field ThrottleMax information
+    // Field RollIntegralLimit information
+    // Field PitchIntegralLimit information
+    // Field YawIntegralLimit information
     // Field PitchKp information
     // Field PitchKi information
     // Field PitchKd information
@@ -76,7 +82,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 2185681924U;
+    static const quint32 OBJID = 3082215042U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

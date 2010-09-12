@@ -118,14 +118,27 @@ int32_t PIOS_USB_HID_Init(uint32_t mode)
 */
 int32_t PIOS_USB_HID_ChangeConnectionState(uint32_t Connected)
 {
-	/* In all cases: re-initialise USB HID driver */
-	if(Connected) {
+	// In all cases: re-initialise USB HID driver
+	if (Connected)
+	{
 		transfer_possible = 1;
+
 		//TODO: Check SetEPRxValid(ENDP1);
-	} else {
-		/* Cable disconnected: disable transfers */
-		transfer_possible = 0;
+
+		#if defined(USB_LED_ON)
+			USB_LED_ON;		// turn the USB led on
+		#endif
 	}
+	else
+	{
+		// Cable disconnected: disable transfers
+		transfer_possible = 0;
+
+		#if defined(USB_LED_OFF)
+			USB_LED_OFF;	// turn the USB led off
+		#endif
+	}
+
 	return 0;
 }
 

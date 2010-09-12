@@ -63,6 +63,7 @@ static void setFailsafe();
 
 static float bound(float val, float min, float max);
 
+static uint8_t vtolEnabled = 0;
 /**
  * @brief Module initialization
  * @return 0
@@ -97,6 +98,8 @@ static void actuatorTask(void* parameters)
 	ActuatorSettingsGet(&settings);
 	PIOS_Servo_SetHz(settings.ChannelUpdateFreq[0], settings.ChannelUpdateFreq[1]);
 
+	vtolEnabled = 0; // a flag that must be set by moving throttle up and down again
+	
 	// Go to the neutral (failsafe) values until an ActuatorDesired update is received
 	setFailsafe();
 
@@ -291,10 +294,19 @@ static int32_t mixerVTOL(const ActuatorSettingsData* settings, const ActuatorDes
 	VTOLSettingsGet(&vtolSettings);
 	VTOLStatusGet(&vtolStatus);
 	
+	// Simple logic to require throttle past .5 and then brought back before enabling motors.  
+	// This possibly should be used for other mixers.
+	if ((vtolEnabled == 0) && (desired->Throttle > .5))
+		vtolEnabled = 1;
+	if ((vtolEnabled == 1) && (desired->Throttle <= 0))
+		vtolEnabled = 2;
+	
 	const int vtolMin = -1;
 	int vtolMax = 1;
-	if(desired->Throttle < 0)
+	if(desired->Throttle < 0 || vtolEnabled < 2)
 		vtolMax = -1;
+	else 
+		vtolMax = 1;	
 	
 	if(((settings->VTOLMotorN != ACTUATORSETTINGS_VTOLMOTORN_NONE) +  
 		(settings->VTOLMotorNE != ACTUATORSETTINGS_VTOLMOTORS_NONE) + 

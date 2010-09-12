@@ -45,7 +45,8 @@
 using namespace Core;
 
 UAVGadgetInstanceManager::UAVGadgetInstanceManager(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    m_versionUAVGadgetConfigurations("1.0.0")
 {
     m_pm = ExtensionSystem::PluginManager::instance();
     QList<IUAVGadgetFactory*> factories = m_pm->getObjects<IUAVGadgetFactory>();
@@ -73,6 +74,24 @@ void UAVGadgetInstanceManager::readConfigurations(QSettings *qs)
        emit configurationToBeDeleted(m_configurations.takeLast());
     }
     qs->beginGroup("UAVGadgetConfigurations");
+    UAVConfigInfo configInfo(qs);
+    configInfo.setNameOfConfigurable("UAVGadgetConfigurations");
+    if ( configInfo.version() == UAVConfigVersion() ){
+        // If version is not set, assume its a old version before readable config.
+        configInfo.setVersion("1.0.0");
+    }
+    if ( configInfo.standardVersionHandlingIsNotOK(m_versionUAVGadgetConfigurations) ){
+        // We are in trouble now. User wants us to quit the import.
+        qs->endGroup();
+        return;
+    }
+    readConfigs_1_0_0(qs);
+    qs->endGroup();
+    createOptionsPages();
+}
+
+void UAVGadgetInstanceManager::readConfigs_1_0_0(QSettings *qs)
+{
     foreach (QString classId, m_classIds.keys())
     {
         IUAVGadgetFactory *f = factory(classId);
@@ -115,14 +134,14 @@ void UAVGadgetInstanceManager::readConfigurations(QSettings *qs)
         }
         qs->endGroup();
     }
-    qs->endGroup();
-    createOptionsPages();
 }
 
 void UAVGadgetInstanceManager::writeConfigurations(QSettings *qs)
 {
     qs->beginGroup("UAVGadgetConfigurations");
     qs->remove(""); // Remove existing configurations
+    UAVConfigInfo configInfo(m_versionUAVGadgetConfigurations, "UAVGadgetConfigurations");
+    configInfo.save(qs);
     foreach (IUAVGadgetConfiguration *config, m_configurations)
     {
         qs->beginGroup(config->classId());

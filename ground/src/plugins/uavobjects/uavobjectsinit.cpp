@@ -63,6 +63,7 @@
 #include "systemsettings.h"
 #include "systemstats.h"
 #include "telemetrysettings.h"
+#include "vtolsettings.h"
 
 
 /**
@@ -104,5 +105,6 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new SystemSettings() );
     objMngr->registerObject( new SystemStats() );
     objMngr->registerObject( new TelemetrySettings() );
+    objMngr->registerObject( new VTOLSettings() );
 
 }

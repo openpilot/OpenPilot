@@ -33,6 +33,7 @@
 #include "openpilot.h"
 #include "actuator.h"
 #include "actuatorsettings.h"
+#include "vtolsettings.h"
 #include "systemsettings.h"
 #include "actuatordesired.h"
 #include "actuatorcommand.h"
@@ -276,31 +277,92 @@ static int32_t mixerFixedWingElevon(const ActuatorSettingsData* settings, const 
  */
 static int32_t mixerVTOL(const ActuatorSettingsData* settings, const ActuatorDesiredData* desired, ActuatorCommandData* cmd)
 {
-	// TODO: Implement other than quad
-	if(settings->VTOLMotorN == ACTUATORSETTINGS_VTOLMOTORN_NONE || 
-	   settings->VTOLMotorS == ACTUATORSETTINGS_VTOLMOTORS_NONE || 
-	   settings->VTOLMotorE == ACTUATORSETTINGS_VTOLMOTORE_NONE || 
-	   settings->VTOLMotorW == ACTUATORSETTINGS_VTOLMOTORW_NONE) {
-		return -1;
+	VTOLSettingsData vtolSettings;
+	VTOLSettingsGet(&vtolSettings);
+	
+	if(((settings->VTOLMotorN != ACTUATORSETTINGS_VTOLMOTORN_NONE) +  
+		(settings->VTOLMotorNE != ACTUATORSETTINGS_VTOLMOTORS_NONE) + 
+		(settings->VTOLMotorE != ACTUATORSETTINGS_VTOLMOTORE_NONE) + 
+		(settings->VTOLMotorSE != ACTUATORSETTINGS_VTOLMOTORSE_NONE) + 
+		(settings->VTOLMotorS != ACTUATORSETTINGS_VTOLMOTORS_NONE) + 
+		(settings->VTOLMotorSW != ACTUATORSETTINGS_VTOLMOTORSW_NONE) + 
+		(settings->VTOLMotorW != ACTUATORSETTINGS_VTOLMOTORW_NONE) + 
+		(settings->VTOLMotorNW != ACTUATORSETTINGS_VTOLMOTORNW_NONE))  <= 2) {
+		return -1;  // can't fly with 2 or less engines (i believe)
 	}
-		
-	// TODO: Work out sign of Yaw so we know if NS are CW or CCW
-	cmd->Channel[settings->VTOLMotorN] = scaleChannel(desired->Throttle + desired->Pitch + desired->Yaw, 
-													  settings->ChannelMax[settings->VTOLMotorN],
-													  settings->ChannelMin[settings->VTOLMotorN],
-													  settings->ChannelNeutral[settings->VTOLMotorN]);
-	cmd->Channel[settings->VTOLMotorS] = scaleChannel(desired->Throttle - desired->Pitch + desired->Yaw, 
-													  settings->ChannelMax[settings->VTOLMotorS],
-													  settings->ChannelMin[settings->VTOLMotorS],
-													  settings->ChannelNeutral[settings->VTOLMotorS]);
-	cmd->Channel[settings->VTOLMotorE] = scaleChannel(desired->Throttle - desired->Roll - desired->Yaw, 
-													  settings->ChannelMax[settings->VTOLMotorE],
-													  settings->ChannelMin[settings->VTOLMotorE],
-													  settings->ChannelNeutral[settings->VTOLMotorE]);
-	cmd->Channel[settings->VTOLMotorW] = scaleChannel(desired->Throttle + desired->Roll - desired->Yaw, 
-													  settings->ChannelMax[settings->VTOLMotorW],
-													  settings->ChannelMin[settings->VTOLMotorW],
-													  settings->ChannelNeutral[settings->VTOLMotorW]);
+	
+	if(settings->VTOLMotorN != ACTUATORSETTINGS_VTOLMOTORN_NONE) {
+		cmd->Channel[settings->VTOLMotorN] = scaleChannel(desired->Throttle * vtolSettings.MotorN[VTOLSETTINGS_MOTORN_THROTTLE] + 
+														  desired->Pitch * vtolSettings.MotorN[VTOLSETTINGS_MOTORN_PITCH] +
+														  desired->Roll * vtolSettings.MotorN[VTOLSETTINGS_MOTORN_ROLL] +
+														  desired->Yaw * vtolSettings.MotorN[VTOLSETTINGS_MOTORN_YAW], 
+														  settings->ChannelMax[settings->VTOLMotorN],
+														  settings->ChannelMin[settings->VTOLMotorN],
+														  settings->ChannelNeutral[settings->VTOLMotorN]);
+	}
+	if(settings->VTOLMotorNE != ACTUATORSETTINGS_VTOLMOTORNE_NONE) {
+		cmd->Channel[settings->VTOLMotorNE] = scaleChannel(desired->Throttle * vtolSettings.MotorNE[VTOLSETTINGS_MOTORNE_THROTTLE] + 
+														  desired->Pitch * vtolSettings.MotorNE[VTOLSETTINGS_MOTORNE_PITCH] +
+														   desired->Roll * vtolSettings.MotorNE[VTOLSETTINGS_MOTORNE_ROLL] +
+														  desired->Yaw * vtolSettings.MotorNE[VTOLSETTINGS_MOTORNE_YAW], 
+														  settings->ChannelMax[settings->VTOLMotorNE],
+														  settings->ChannelMin[settings->VTOLMotorNE],
+														  settings->ChannelNeutral[settings->VTOLMotorNE]);
+	}
+	if(settings->VTOLMotorE != ACTUATORSETTINGS_VTOLMOTORE_NONE) {
+		cmd->Channel[settings->VTOLMotorE] = scaleChannel(desired->Throttle * vtolSettings.MotorE[VTOLSETTINGS_MOTORE_THROTTLE] + 
+														  desired->Pitch * vtolSettings.MotorE[VTOLSETTINGS_MOTORE_PITCH] +
+														  desired->Roll * vtolSettings.MotorN[VTOLSETTINGS_MOTORE_ROLL] +
+														  desired->Yaw * vtolSettings.MotorE[VTOLSETTINGS_MOTORE_YAW], 
+														  settings->ChannelMax[settings->VTOLMotorE],
+														  settings->ChannelMin[settings->VTOLMotorE],
+														  settings->ChannelNeutral[settings->VTOLMotorE]);
+	}
+	if(settings->VTOLMotorSE != ACTUATORSETTINGS_VTOLMOTORSE_NONE) {
+		cmd->Channel[settings->VTOLMotorSE] = scaleChannel(desired->Throttle * vtolSettings.MotorSE[VTOLSETTINGS_MOTORSE_THROTTLE] + 
+														  desired->Pitch * vtolSettings.MotorSE[VTOLSETTINGS_MOTORSE_PITCH] +
+														   desired->Roll * vtolSettings.MotorN[VTOLSETTINGS_MOTORSE_ROLL] +
+														  desired->Yaw * vtolSettings.MotorSE[VTOLSETTINGS_MOTORSE_YAW], 
+														  settings->ChannelMax[settings->VTOLMotorSE],
+														  settings->ChannelMin[settings->VTOLMotorSE],
+														  settings->ChannelNeutral[settings->VTOLMotorSE]);
+	}
+	if(settings->VTOLMotorS != ACTUATORSETTINGS_VTOLMOTORS_NONE) {
+		cmd->Channel[settings->VTOLMotorS] = scaleChannel(desired->Throttle * vtolSettings.MotorS[VTOLSETTINGS_MOTORS_THROTTLE] + 
+														  desired->Pitch * vtolSettings.MotorS[VTOLSETTINGS_MOTORS_PITCH] +
+														  desired->Roll * vtolSettings.MotorN[VTOLSETTINGS_MOTORS_ROLL] +
+														  desired->Yaw * vtolSettings.MotorS[VTOLSETTINGS_MOTORS_YAW], 
+														  settings->ChannelMax[settings->VTOLMotorS],
+														  settings->ChannelMin[settings->VTOLMotorS],
+														  settings->ChannelNeutral[settings->VTOLMotorS]);
+	}
+	if(settings->VTOLMotorSW != ACTUATORSETTINGS_VTOLMOTORSW_NONE) {
+		cmd->Channel[settings->VTOLMotorSW] = scaleChannel(desired->Throttle * vtolSettings.MotorSW[VTOLSETTINGS_MOTORSW_THROTTLE] + 
+														  desired->Pitch * vtolSettings.MotorSW[VTOLSETTINGS_MOTORSW_PITCH] +
+														   desired->Roll * vtolSettings.MotorN[VTOLSETTINGS_MOTORSW_ROLL] +
+														  desired->Yaw * vtolSettings.MotorSW[VTOLSETTINGS_MOTORSW_YAW], 
+														  settings->ChannelMax[settings->VTOLMotorSW],
+														  settings->ChannelMin[settings->VTOLMotorSW],
+														  settings->ChannelNeutral[settings->VTOLMotorSW]);
+	}
+	if(settings->VTOLMotorW != ACTUATORSETTINGS_VTOLMOTORW_NONE) {
+		cmd->Channel[settings->VTOLMotorW] = scaleChannel(desired->Throttle * vtolSettings.MotorW[VTOLSETTINGS_MOTORW_THROTTLE] + 
+														  desired->Pitch * vtolSettings.MotorW[VTOLSETTINGS_MOTORW_PITCH] +
+														  desired->Roll * vtolSettings.MotorN[VTOLSETTINGS_MOTORW_ROLL] +
+														  desired->Yaw * vtolSettings.MotorW[VTOLSETTINGS_MOTORW_YAW], 
+														  settings->ChannelMax[settings->VTOLMotorW],
+														  settings->ChannelMin[settings->VTOLMotorW],
+														  settings->ChannelNeutral[settings->VTOLMotorW]);
+	}
+	if(settings->VTOLMotorNW != ACTUATORSETTINGS_VTOLMOTORNW_NONE) {
+		cmd->Channel[settings->VTOLMotorNW] = scaleChannel(desired->Throttle * vtolSettings.MotorNW[VTOLSETTINGS_MOTORNW_THROTTLE] + 
+														  desired->Pitch * vtolSettings.MotorNW[VTOLSETTINGS_MOTORNW_PITCH] +
+														  desired->Roll * vtolSettings.MotorNW[VTOLSETTINGS_MOTORNW_ROLL] +
+														  desired->Yaw * vtolSettings.MotorNW[VTOLSETTINGS_MOTORNW_YAW], 
+														  settings->ChannelMax[settings->VTOLMotorNW],
+														  settings->ChannelMin[settings->VTOLMotorNW],
+														  settings->ChannelNeutral[settings->VTOLMotorNW]);
+	}
 	
 	return 0;
 }

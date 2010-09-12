@@ -61,6 +61,7 @@
 #include "systemsettings.h"
 #include "systemstats.h"
 #include "telemetrysettings.h"
+#include "vtolsettings.h"
 
 
 /**
@@ -102,5 +103,6 @@ void UAVObjectsInitializeAll()
     SystemSettingsInitialize();
     SystemStatsInitialize();
     TelemetrySettingsInitialize();
+    VTOLSettingsInitialize();
 
 }

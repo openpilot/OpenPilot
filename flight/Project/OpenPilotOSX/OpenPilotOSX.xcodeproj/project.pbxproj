@@ -2855,6 +2855,7 @@
 		65E8F0ED11EFF25C00BBF654 /* pios_usb_hid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_usb_hid.c; path = ../../PiOS/STM32F10x/pios_usb_hid.c; sourceTree = SOURCE_ROOT; };
 		65E8F0EE11EFF25C00BBF654 /* startup_stm32f10x_HD.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = startup_stm32f10x_HD.S; path = ../../PiOS/STM32F10x/startup_stm32f10x_HD.S; sourceTree = SOURCE_ROOT; };
 		65E8F0F111EFF25C00BBF654 /* startup_stm32f10x_MD.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = startup_stm32f10x_MD.S; path = ../../PiOS/STM32F10x/startup_stm32f10x_MD.S; sourceTree = SOURCE_ROOT; };
+		65EF3922123AEED000D1B036 /* vtolsettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = vtolsettings.xml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -6729,6 +6730,7 @@
 				65B367FC121C2620003EAD18 /* systemsettings.xml */,
 				65B367FD121C2620003EAD18 /* systemstats.xml */,
 				65B367FE121C2620003EAD18 /* telemetrysettings.xml */,
+				65EF3922123AEED000D1B036 /* vtolsettings.xml */,
 			);
 			path = uavobjectdefinition;
 			sourceTree = "<group>";

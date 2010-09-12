@@ -69,7 +69,7 @@ void DMA1_Channel1_IRQHandler() __attribute__ ((alias ("AHRS_ADC_DMA_Handler")))
  * @{
  */
 // Currently analog acquistion hard coded at 480 Hz
-#define ADC_OVERSAMPLE          40
+#define ADC_OVERSAMPLE          48
 #define EKF_RATE                ((float) 4*480 / ADC_OVERSAMPLE)
 #define ADC_CONTINUOUS_CHANNELS PIOS_ADC_NUM_PINS
 #define CORRECTION_COUNT        4
@@ -388,6 +388,7 @@ int main()
 				vel[1] = 0;
 				vel[2] = 0;
 				VelBaroCorrection(vel,altitude_data.altitude);                            				
+//                MagVelBaroCorrection(mag,vel,altitude_data.altitude);  // only trust mags if outdoors
 			}
             
             attitude_data.quaternion.q1 = Nav.q[0];

@@ -84,7 +84,7 @@ struct pios_i2c_adapter {
 
   bool                                bus_needed_reset;
 
-  enum i2c_adapter_state              curr_state;
+  volatile enum i2c_adapter_state     curr_state;
   const struct pios_i2c_txn         * first_txn;
   const struct pios_i2c_txn         * active_txn;
   const struct pios_i2c_txn         * last_txn;

@@ -160,6 +160,8 @@ SRC += $(OPUAVOBJ)/ahrssettings.c
 SRC += $(OPUAVOBJ)/gpstime.c
 SRC += $(OPUAVOBJ)/gpssatellites.c
 SRC += $(OPUAVOBJ)/attitudesettings.c
+SRC += $(OPUAVOBJ)/vtolsettings.c
+SRC += $(OPUAVOBJ)/vtolstatus.c
 endif
 
 ## PIOS Hardware (posix)

@@ -564,8 +564,8 @@ void lfsm_irq_callback(uint8_t crc_ok, uint8_t crc_val)
   }
 
   /* Recover the head and tail pointers from the message */
-  struct opahrs_msg_link_head * head;
-  struct opahrs_msg_link_tail * tail;
+  struct opahrs_msg_link_head * head = NULL;
+  struct opahrs_msg_link_tail * tail = NULL;
 
   switch (context.user_payload_type) {
   case OPAHRS_MSG_TYPE_USER_V0:

@@ -45,7 +45,7 @@
  * @arg AHRS_DATA_READY - Data ready for downsampling and processing
  * @arg AHRS_PROCESSING - Performing update on the available data
  */
-enum {AHRS_IDLE, AHRS_DATA_READY, AHRS_PROCESSING} ahrs_state;
+volatile enum {AHRS_IDLE, AHRS_DATA_READY, AHRS_PROCESSING} ahrs_state;
 enum algorithms ahrs_algorithm;
 
 /**

@@ -194,7 +194,7 @@ static inline QStringList getPluginPaths()
 #ifdef Q_OS_MAC
 #  define SHARE_PATH "/../Resources"
 #else
-#  define SHARE_PATH "/../share"
+#  define SHARE_PATH "/../share/openpilotgcs"
 #endif
 
 int main(int argc, char **argv)

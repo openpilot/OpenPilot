@@ -53,7 +53,8 @@ JoystickControl::JoystickControl(QWidget *parent) :
 
 
     m_renderer = new QSvgRenderer();
-    Q_ASSERT( m_renderer->load(QString(":/gcscontrol/images/joystick.svg")) );
+    bool test = m_renderer->load(QString(":/gcscontrol/images/joystick.svg"));
+    Q_ASSERT( test );
 
     m_background = new QGraphicsSvgItem();
     m_background->setSharedRenderer(m_renderer);

@@ -701,6 +701,11 @@ p, li { white-space: pre-wrap; }
         <source>0000</source>
         <translation></translation>
     </message>
+    <message>
+        <location/>
+        <source>Rev.</source>
+        <translation>Реверс.</translation>
+    </message>
 </context>
 <context>
     <name>TelemetryWidget</name>
@@ -1188,31 +1193,26 @@ p, li { white-space: pre-wrap; }
         <source>Serial Connection</source>
         <translation>Последовательный порт</translation>
     </message>
+    <message>
+        <location/>
+        <source>Host</source>
+        <translation>Хост</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Port</source>
+        <translation>Порт</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Telemetry</source>
+        <translation>Телеметрия</translation>
+    </message>
 </context>
 <context>
     <name>GpsDisplayWidget</name>
     <message>
         <location filename="../../../src/plugins/gpsdisplay/gpsdisplaywidget.ui"/>
-        <source>Form</source>
-        <translation>Форма</translation>
-    </message>
-    <message>
-        <location/>
-        <source>GPS Status</source>
-        <translation>Статус GPS</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Longitude:</source>
-        <translation>Долгота:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Bearing:</source>
-        <translation>Азимут:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Speed:</source>
         <translation>Скорость:</translation>
     </message>
@@ -1223,23 +1223,8 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>GPS Time:</source>
-        <translation>GPS Время:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>GPS Date:</source>
-        <translation>GPS Дата:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Status:</source>
-        <translation>Статус:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Unknown</source>
-        <translation>не известен</translation>
+        <translation>не известно</translation>
     </message>
     <message>
         <location/>
@@ -1258,8 +1243,28 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>Latitude:</source>
-        <translation>Широта:</translation>
+        <source>Coord:</source>
+        <translation>Координаты:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Heading:</source>
+        <translation>Курс:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>H / V / P DOP:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>0 / 0 / 0</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Sats Used:</source>
+        <translation>Спутников:</translation>
     </message>
 </context>
 <context>
@@ -1281,59 +1286,59 @@ p, li { white-space: pre-wrap; }
         <location/>
         <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="-8"/>
         <source>Choose flight simulator:</source>
-        <translation type="unfinished"></translation>
+        <translation>Симулятор полетов:</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+1"/>
         <source>Latitude in degrees:</source>
-        <translation type="unfinished"></translation>
+        <translation>Широта в градусах:</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+1"/>
         <source>Longitude in degrees:</source>
-        <translation type="unfinished"></translation>
+        <translation>Долгота в градусах:</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+1"/>
         <source>Path executable:</source>
-        <translation type="unfinished"></translation>
+        <translation>Путь к исполняемому файлу:</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+1"/>
         <source>Data directory:</source>
-        <translation type="unfinished"></translation>
+        <translation>Каталог данных:</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+5"/>
         <source>Host Address:</source>
-        <translation type="unfinished"></translation>
+        <translation>Адрес хоста:</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+1"/>
         <source>Output Port:</source>
-        <translation type="unfinished"></translation>
+        <translation>Порт вывода:</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+1"/>
         <source>Input Port:</source>
-        <translation type="unfinished"></translation>
+        <translation>Порт ввода:</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/hitlnew/hitloptionspage.cpp" line="+65"/>
         <source>Choose flight simulator executable</source>
-        <translation type="unfinished"></translation>
+        <translation>Укажите исполняемый файл симулятора</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Choose flight simulator data directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Укажите каталог данных симулятора</translation>
     </message>
 </context>
 <context>
@@ -2000,12 +2005,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source> Places </source>
-        <translation type="unfinished"></translation>
+        <translation>Позиции</translation>
     </message>
     <message>
         <location/>
         <source>New Item</source>
-        <translation type="unfinished"></translation>
+        <translation>Новый элемент</translation>
     </message>
     <message>
         <location/>
@@ -2015,27 +2020,27 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>New waypoints</source>
-        <translation type="unfinished"></translation>
+        <translation>Новые точки маршрута</translation>
     </message>
     <message>
         <location/>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Новый</translation>
     </message>
     <message>
         <location/>
         <source>Open waypoints</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть точки маршрута</translation>
     </message>
     <message>
         <location/>
         <source>Open</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть</translation>
     </message>
     <message>
         <location/>
         <source>Save waypoints</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить точки маршрута</translation>
     </message>
     <message>
         <location/>
@@ -2055,97 +2060,97 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Zoom in</source>
-        <translation type="unfinished"></translation>
+        <translation>Приблизить</translation>
     </message>
     <message>
         <location/>
         <source>Zoom level</source>
-        <translation type="unfinished"></translation>
+        <translation>Уровень приближения</translation>
     </message>
     <message>
         <location/>
         <source>Zoom out</source>
-        <translation type="unfinished"></translation>
+        <translation>Отдалить</translation>
     </message>
     <message>
         <location/>
         <source>Center map over home position</source>
-        <translation type="unfinished"></translation>
+        <translation>Центр карты в домашнюю позицию</translation>
     </message>
     <message>
         <location/>
         <source>Center map over UAV position</source>
-        <translation type="unfinished"></translation>
+        <translation>Центр карты в позицию БПЛА</translation>
     </message>
     <message>
         <location/>
         <source>Map rotation follows UAV heading</source>
-        <translation type="unfinished"></translation>
+        <translation>Вращать карту по направлению полета БПЛА</translation>
     </message>
     <message>
         <location/>
         <source>Show/Hide the UAV trail</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать / скрыть траекторию полета</translation>
     </message>
     <message>
         <location/>
         <source>Clear the UAV trail</source>
-        <translation type="unfinished"></translation>
+        <translation>Стереть траекторию</translation>
     </message>
     <message>
         <location/>
         <source>UAV hold position</source>
-        <translation type="unfinished"></translation>
+        <translation>Удерживать позицию</translation>
     </message>
     <message>
         <location/>
         <source>Hold</source>
-        <translation type="unfinished"></translation>
+        <translation>Удерживать</translation>
     </message>
     <message>
         <location/>
         <source>UAV go home</source>
-        <translation type="unfinished"></translation>
+        <translation>БПЛА в домашнюю позицию</translation>
     </message>
     <message>
         <location/>
         <source>Home</source>
-        <translation type="unfinished"></translation>
+        <translation>Домой</translation>
     </message>
     <message>
         <location/>
         <source>Move UAV to previous waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation>Переместить БПЛА в предыдущую точку маршрута</translation>
     </message>
     <message>
         <location/>
         <source>Previous WP</source>
-        <translation type="unfinished"></translation>
+        <translation>Предыдущая</translation>
     </message>
     <message>
         <location/>
         <source>Move UAV to next waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation>Переместить БПЛА в следующую точку маршрута</translation>
     </message>
     <message>
         <location/>
         <source>Next WP</source>
-        <translation type="unfinished"></translation>
+        <translation>Следующая</translation>
     </message>
     <message>
         <location/>
         <source>UAV go!</source>
-        <translation type="unfinished"></translation>
+        <translation>Полетели!</translation>
     </message>
     <message>
         <location/>
         <source>Go</source>
-        <translation type="unfinished">Вперед</translation>
+        <translation>Лететь</translation>
     </message>
     <message>
         <location/>
         <source>UAV position</source>
-        <translation type="unfinished"></translation>
+        <translation>Положение БПЛА</translation>
     </message>
     <message>
         <location/>
@@ -2155,7 +2160,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Map position</source>
-        <translation type="unfinished"></translation>
+        <translation>Позиция карты</translation>
     </message>
     <message>
         <location/>
@@ -2165,7 +2170,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Mouse position</source>
-        <translation type="unfinished"></translation>
+        <translation>Позиция указателя мыши</translation>
     </message>
     <message>
         <location/>
@@ -6658,7 +6663,7 @@ Reason: %3</source>
 <context>
     <name>Core::UAVGadgetInstanceManager</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/uavgadgetinstancemanager.cpp" line="+111"/>
+        <location filename="../../../src/plugins/coreplugin/uavgadgetinstancemanager.cpp" line="+166"/>
         <location line="+1"/>
         <source>default</source>
         <translation>по умолчанию</translation>
@@ -6902,17 +6907,17 @@ Reason: %3</source>
     <message>
         <location line="+157"/>
         <source>Copy</source>
-        <translation type="unfinished"></translation>
+        <translation>Копировать</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Zoom</source>
-        <translation type="unfinished">Масштабировать</translation>
+        <translation>Масштабировать</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Zoom </source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Масштабировать</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -6927,12 +6932,12 @@ Reason: %3</source>
     <message>
         <location line="+8"/>
         <source>Waypoints</source>
-        <translation type="unfinished">Точки маршрута</translation>
+        <translation>Точки маршрута</translation>
     </message>
     <message>
         <location line="+242"/>
         <source>OpenPilot GCS</source>
-        <translation type="unfinished">OpenPilot НСУ (Наземная Система Управления)</translation>
+        <translation>OpenPilot НСУ (Наземная Система Управления)</translation>
     </message>
     <message>
         <location line="+204"/>
@@ -6952,7 +6957,7 @@ Reason: %3</source>
     <message>
         <location line="+1"/>
         <source>F5</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
@@ -7461,34 +7466,17 @@ Tip: lower is better!</source>
     </message>
     <message>
         <location/>
-        <source>Press to start a calibration procedure, takes 30 seconds max.
-
-Hint: run this with engines at cruising speed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Start</source>
         <translation>Пуск</translation>
     </message>
     <message>
         <location/>
         <source>AHRS Algorithm:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select the sensor integration algorithm here.</source>
-        <translation type="unfinished"></translation>
+        <translation>Алгоритм:</translation>
     </message>
     <message>
         <location/>
         <source>Six Point Calibration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save Home Location to SD</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7534,6 +7522,87 @@ specific calibration button on top of the screen.</source>
         <source>Save Position</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>Press to start a calibration procedure, about 15 seconds.
+
+Hint: run this with engines at cruising speed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select the sensor integration algorithm here.
+&quot;Simple&quot; only uses accelerometer values
+&quot;INSGPS&quot; the full featured algorithm integrating all sensors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Nice paper plane, eh?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Launch a sensor range and bias calibration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Six Point Calibration instructions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Saves the Home Location. This is only enabled
+if the Home Location is set, i.e. if the GPS fix is
+successful.
+
+Disabled if there is no GPS fix.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttonGroup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save settings (only enabled when calibration is running)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Check this box if you are flying indoors and have no GPS fix.
+Only makes sense with the &quot;INSGPS&quot; algorithm.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Indoor flight mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Clears the HomeLocation: only makes sense if you save
+to SD. This will force the AHRS to use the next GPS fix as the
+new home location unless it is in indoor mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Clear</source>
+        <translation>Очистить</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Home Location:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FGOptionsPage</name>
@@ -7574,6 +7643,34 @@ specific calibration button on top of the screen.</source>
         <location filename="../../../src/plugins/importexport/importexportdialog.cpp" line="+10"/>
         <source>Import Export Settings</source>
         <translation>Настройки импорта\экспорта</translation>
+    </message>
+</context>
+<context>
+    <name>Core::UAVConfigInfo</name>
+    <message>
+        <location filename="../../../src/plugins/coreplugin/uavconfiginfo.cpp" line="+77"/>
+        <source>Do you want to continue the import?</source>
+        <translation>Вы хотите продолжить импорт?</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>INFO: </source>
+        <translation>ИНФОРМАЦИЯ: </translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>WARNING: </source>
+        <translation>ПРЕДУПРЕЖДЕНИЕ:</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>ERROR: </source>
+        <translation>ОШИБКА: </translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Unknown compatibility level: </source>
+        <translation>Неизвестный уровень совместимости:</translation>
     </message>
 </context>
 </TS>

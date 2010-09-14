@@ -190,10 +190,12 @@ LINKERSCRIPTPATH = $(PIOSSTM32F10X)
 # (Note: 3 is not always the best optimization level. See avr-libc FAQ.)
 
 ifeq ($(DEBUG),YES)
-OPT = 0
+# Do nothing, default is -O0
 else
-OPT = s
 endif
+
+# Now need -Os always for size reasons
+CFLAGS += -Os
 
 # Output format. (can be ihex or binary or both)
 #  binary to create a load-image in raw-binary format i.e. for SAM-BA, 
@@ -240,7 +242,8 @@ ifeq ($(DEBUG),YES)
 CFLAGS = -g$(DEBUGF)
 endif
 
-CFLAGS += -O$(OPT)
+CFLAGS += -ffast-math
+
 CFLAGS += -mcpu=$(MCU) -mthumb
 CFLAGS += $(CDEFS)
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.

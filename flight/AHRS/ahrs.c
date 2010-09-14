@@ -46,7 +46,7 @@
  * @arg AHRS_PROCESSING - Performing update on the available data
  */
 volatile enum {AHRS_IDLE, AHRS_DATA_READY, AHRS_PROCESSING} ahrs_state;
-enum algorithms ahrs_algorithm;
+volatile enum algorithms ahrs_algorithm;
 
 /**
  * @addtogroup AHRS_ADC_Configuration ADC Configuration
@@ -69,7 +69,7 @@ void DMA1_Channel1_IRQHandler() __attribute__ ((alias ("AHRS_ADC_DMA_Handler")))
  * @{
  */
 // Currently analog acquistion hard coded at 480 Hz
-#define ADC_OVERSAMPLE          48
+#define ADC_OVERSAMPLE          18
 #define EKF_RATE                ((float) 4*480 / ADC_OVERSAMPLE)
 #define ADC_CONTINUOUS_CHANNELS PIOS_ADC_NUM_PINS
 #define CORRECTION_COUNT        4
@@ -155,12 +155,12 @@ struct gps_sensor {
     bool  updated;
 };
 
-static struct mag_sensor        mag_data;
-static struct accel_sensor      accel_data;
-static struct gyro_sensor       gyro_data;
-static struct altitude_sensor   altitude_data;
-static struct gps_sensor        gps_data;
-static struct attitude_solution attitude_data;
+struct mag_sensor        mag_data;
+volatile struct accel_sensor      accel_data;
+volatile struct gyro_sensor       gyro_data;
+volatile struct altitude_sensor   altitude_data;
+struct gps_sensor        gps_data;
+volatile struct attitude_solution attitude_data;
 
 /**
  * @}
@@ -197,9 +197,9 @@ int16_t mag_bias[3] = {0,0,0};
 //! Filter coefficients used in decimation.  Limited order so filter can't run between samples
 int16_t fir_coeffs[ADC_OVERSAMPLE+1];          
 //! Raw buffer that DMA data is dumped into
-int16_t raw_data_buffer[ADC_CONTINUOUS_CHANNELS * ADC_OVERSAMPLE * 2];    // Double buffer that DMA just used
+volatile int16_t raw_data_buffer[ADC_CONTINUOUS_CHANNELS * ADC_OVERSAMPLE * 2];    // Double buffer that DMA just used
 //! Swapped by interrupt handler to achieve double buffering
-int16_t * valid_data_buffer;      
+volatile int16_t * valid_data_buffer;      
 //! Counts how many times the EKF wasn't idle when DMA handler called
 uint32_t ekf_too_slow = 0;
 //! Total number of data blocks converted
@@ -241,13 +241,14 @@ int main()
     /* ADC system */
     AHRS_ADC_Config(EKF_RATE, ADC_OVERSAMPLE);
     
-    /* Magnetic sensor system */
-    PIOS_I2C_Init();
-    PIOS_HMC5843_Init();
     
     /* Setup the Accelerometer FS (Full-Scale) GPIO */
     PIOS_GPIO_Enable(0);
     SET_ACCEL_2G;
+#if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
+    /* Magnetic sensor system */
+    PIOS_I2C_Init();
+    PIOS_HMC5843_Init();
     
     /* Configure the HMC5843 Sensor */
     PIOS_HMC5843_ConfigTypeDef HMC5843_InitStructure;
@@ -260,6 +261,7 @@ int main()
     // Get 3 ID bytes
     strcpy ((char *)mag_data.id, "ZZZ");
     PIOS_HMC5843_ReadID(mag_data.id);
+#endif
     
     /* SPI link to master */
     PIOS_SPI_Init();
@@ -310,7 +312,8 @@ int main()
     /******************* Main EKF loop ****************************/
     while (1) {
         // Alive signal
-        PIOS_LED_Toggle(LED1);
+		if((total_conversion_blocks % 100) == 0)
+			PIOS_LED_Toggle(LED1);
         
         if(calibration_pending)
         {
@@ -318,9 +321,10 @@ int main()
             calibration_pending = FALSE;
         }
         
+#if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
         // Get magnetic readings
         PIOS_HMC5843_ReadMag(mag_data.raw.axis);
-        
+#endif        
         // Delay for valid data
         idle_counter = 0;
         do {
@@ -387,6 +391,7 @@ int main()
 				vel[0] = 0;
 				vel[1] = 0;
 				vel[2] = 0;
+
 				VelBaroCorrection(vel,altitude_data.altitude);                            				
 //                MagVelBaroCorrection(mag,vel,altitude_data.altitude);  // only trust mags if outdoors
 			}
@@ -496,7 +501,7 @@ void downsample_data()
  */
 void calibrate_sensors() {
     int i;
-    int16_t mag_raw[3];
+    int16_t mag_raw[3] = {0,0,0};
     // local biases for noise analysis
     float accel_bias[3], gyro_bias[3], mag_bias[3];
     
@@ -514,7 +519,9 @@ void calibrate_sensors() {
         accel_bias[0] += accel_data.filtered.x;
         accel_bias[1] += accel_data.filtered.y;
         accel_bias[2] += accel_data.filtered.z;
+#if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
         PIOS_HMC5843_ReadMag(mag_raw);
+#endif
         mag_bias[0] += mag_raw[0];
         mag_bias[1] += mag_raw[1];
         mag_bias[2] += mag_raw[2];
@@ -547,7 +554,9 @@ void calibrate_sensors() {
         accel_var[0] += (accel_data.filtered.x - accel_bias[0]) * (accel_data.filtered.x - accel_bias[0]);
         accel_var[1] += (accel_data.filtered.y - accel_bias[1]) * (accel_data.filtered.y - accel_bias[1]);
         accel_var[2] += (accel_data.filtered.z - accel_bias[2]) * (accel_data.filtered.z - accel_bias[2]);
+#if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
         PIOS_HMC5843_ReadMag(mag_raw);
+#endif
         mag_var[0] += (mag_raw[0] - mag_bias[0]) * (mag_raw[0] - mag_bias[0]);
         mag_var[1] += (mag_raw[1] - mag_bias[1]) * (mag_raw[1] - mag_bias[1]);
         mag_var[2] += (mag_raw[2] - mag_bias[2]) * (mag_raw[2] - mag_bias[2]);
@@ -604,7 +613,9 @@ void converge_insgps()
         rpy[1] = -atan2(accel_data.filtered.x, accel_data.filtered.z) * 180 / M_PI;
         rpy[0] = -atan2(accel_data.filtered.y, accel_data.filtered.z) * 180 / M_PI;    
         // Get magnetic readings
+#if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
         PIOS_HMC5843_ReadMag(mag_data.raw.axis);
+#endif
         mag[0] = -mag_data.raw.axis[1];
         mag[1] = -mag_data.raw.axis[0];
         mag[2] = -mag_data.raw.axis[2];

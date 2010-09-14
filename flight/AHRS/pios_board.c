@@ -223,10 +223,12 @@ void PIOS_USART_aux_irq_handler(void)
 extern const struct pios_com_driver pios_usart_com_driver;
 
 struct pios_com_dev pios_com_devs[] = {
+#if defined(PIOS_INCLUDE_USART)	
   {
     .id     = PIOS_USART_AUX,
     .driver = &pios_usart_com_driver,
   },
+#endif
 };
 
 const uint8_t pios_com_num_devices = NELEMENTS(pios_com_devs);

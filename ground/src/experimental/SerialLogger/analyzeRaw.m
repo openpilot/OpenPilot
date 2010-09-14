@@ -3,16 +3,20 @@ function analyzeRaw(device)
 downsample = 12;   % relevant for knowing block size
 Fs = 512;          % need to verify, close
 
-s = serial(device,'Baud',115200);
-set(s,'InputBufferSize',10000);
-fopen(s);
-
-dat = [];
-for i = 1:20
-    i
-    if(i > 5)  % must flush buffer
-        dat = [dat; uint8(fread(s))];
+if ischar(device)
+    s = serial(device,'Baud',115200);
+    set(s,'InputBufferSize',10000);
+    fopen(s);
+    
+    dat = [];
+    for i = 1:20
+        i
+        if(i > 5)  % must flush buffer
+            dat = [dat; uint8(fread(s))];
+        end
     end
+else 
+    dat = uint8(device);
 end
 
 raw_framing = 0:15;
@@ -33,7 +37,7 @@ if(starts) % found raw data, process
     gyro_x = 0.007*(blocks(2,:)-1675);
     gyro_y = 0.007*(blocks(4,:)-1675);
     gyro_z = 0.007*(blocks(6,:)-1675);
-    
+
     time = (1:length(accel_x))/512;
     
     % display accels
@@ -53,7 +57,7 @@ if(starts) % found raw data, process
     title('Accel Y');
     subplot(324);
     pwelch(accel_y-mean(accel_y),[],[],[],Fs);
-    
+
     subplot(325);
     plot(time,accel_z); 
     xlim([0 1])

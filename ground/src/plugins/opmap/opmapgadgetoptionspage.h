@@ -57,7 +57,6 @@ signals:
 public slots:
 
 private slots:
-    void on_pushButtonCacheLocation_clicked();
     void on_pushButtonCacheDefaults_clicked();
 
 private:

@@ -77,25 +77,14 @@ QWidget *OPMapGadgetOptionsPage::createPage(QWidget *parent)
     m_page->accessModeComboBox->setCurrentIndex(index);
 
     m_page->checkBoxUseMemoryCache->setChecked(m_config->useMemoryCache());
-    m_page->lineEditCacheLocation->setText(m_config->cacheLocation());
 
-    connect(m_page->pushButtonCacheLocation, SIGNAL(clicked()), this, SLOT(on_pushButtonCacheLocation_clicked()));
+    m_page->lineEditCacheLocation->setExpectedKind(Utils::PathChooser::Directory);
+    m_page->lineEditCacheLocation->setPromptDialogTitle(tr("Choose Cache Directory"));
+    m_page->lineEditCacheLocation->setPath(m_config->cacheLocation());
+
     connect(m_page->pushButtonCacheDefaults, SIGNAL(clicked()), this, SLOT(on_pushButtonCacheDefaults_clicked()));
 
     return w;
-}
-
-void OPMapGadgetOptionsPage::on_pushButtonCacheLocation_clicked()
-{
-    QString dir = m_page->lineEditCacheLocation->text();
-
-//    QDir dirPath(dir);
-//    dir = dirPath.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
-//    if (!dir.isEmpty()) m_page->lineEditCacheLocation->setText(dir);
-
-    QFileDialog::Options options(QFileDialog::ShowDirsOnly);
-    QString path = QFileDialog::getExistingDirectory(qobject_cast<QWidget*>(this), tr("Choose a cache directory"), dir, options);
-    if (!path.isEmpty()) m_page->lineEditCacheLocation->setText(path);
 }
 
 void OPMapGadgetOptionsPage::on_pushButtonCacheDefaults_clicked()
@@ -106,7 +95,8 @@ void OPMapGadgetOptionsPage::on_pushButtonCacheDefaults_clicked()
 
     m_page->checkBoxUseMemoryCache->setChecked(true);
 
-    m_page->lineEditCacheLocation->setText(QDir::currentPath() + QDir::separator() + "mapscache" + QDir::separator());
+    m_page->lineEditCacheLocation->setPath(QDir::currentPath() + QDir::separator() + "mapscache" + QDir::separator());
+
 }
 
 void OPMapGadgetOptionsPage::apply()
@@ -119,7 +109,7 @@ void OPMapGadgetOptionsPage::apply()
     m_config->setShowTileGridLines(m_page->checkBoxShowTileGridLines->isChecked());
     m_config->setAccessMode(m_page->accessModeComboBox->currentText());
     m_config->setUseMemoryCache(m_page->checkBoxUseMemoryCache->isChecked());
-    m_config->setCacheLocation(m_page->lineEditCacheLocation->text());
+    m_config->setCacheLocation(m_page->lineEditCacheLocation->path());
 }
 
 void OPMapGadgetOptionsPage::finish()

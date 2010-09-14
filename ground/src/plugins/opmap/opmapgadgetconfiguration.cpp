@@ -26,6 +26,8 @@
  */
 
 #include "opmapgadgetconfiguration.h"
+#include "utils/pathutils.h"
+
 #include <QtCore/QDataStream>
 #include <QDir>
 
@@ -74,7 +76,7 @@ OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId, const QByteA
 
 	if (!accessMode.isEmpty()) m_accessMode = accessMode;
 	m_useMemoryCache = useMemoryCache;
-	if (!cacheLocation.isEmpty()) m_cacheLocation = cacheLocation;
+        if (!cacheLocation.isEmpty()) m_cacheLocation = Utils::PathUtils().InsertDataPath(cacheLocation);
     }
 }
 
@@ -112,7 +114,7 @@ OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId,  QSettings* 
 
         if (!accessMode.isEmpty()) m_accessMode = accessMode;
         m_useMemoryCache = useMemoryCache;
-        if (!cacheLocation.isEmpty()) m_cacheLocation = cacheLocation;
+        if (!cacheLocation.isEmpty()) m_cacheLocation = Utils::PathUtils().InsertDataPath(cacheLocation);
     }
 }
 
@@ -142,5 +144,5 @@ void OPMapGadgetConfiguration::saveConfig(QSettings* qSettings) const {
    qSettings->setValue("showTileGridLines", m_showTileGridLines);
    qSettings->setValue("accessMode", m_accessMode);
    qSettings->setValue("useMemoryCache", m_useMemoryCache);
-   qSettings->setValue("cacheLocation", m_cacheLocation);
+   qSettings->setValue("cacheLocation", Utils::PathUtils().RemoveDataPath(m_cacheLocation));
 }

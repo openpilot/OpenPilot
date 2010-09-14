@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>521</width>
-    <height>373</height>
+    <height>384</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -54,19 +54,6 @@
        </property>
        <property name="maximum">
         <double>180.000000000000000</double>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="3">
-      <widget class="QCheckBox" name="checkBoxUseOpenGL">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="layoutDirection">
-        <enum>Qt::RightToLeft</enum>
-       </property>
-       <property name="text">
-        <string>Use OpenGL</string>
        </property>
       </widget>
      </item>
@@ -183,6 +170,19 @@
        </property>
       </spacer>
      </item>
+     <item row="6" column="2">
+      <widget class="QCheckBox" name="checkBoxUseOpenGL">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="layoutDirection">
+        <enum>Qt::RightToLeft</enum>
+       </property>
+       <property name="text">
+        <string>Use OpenGL</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item row="10" column="0">
@@ -223,49 +223,7 @@
     </widget>
    </item>
    <item row="7" column="0">
-    <layout class="QGridLayout" name="gridLayout_5">
-     <item row="5" column="2">
-      <widget class="QPushButton" name="pushButtonCacheDefaults">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="cursor">
-        <cursorShape>OpenHandCursor</cursorShape>
-       </property>
-       <property name="toolTip">
-        <string>Restore default server and cache settings</string>
-       </property>
-       <property name="text">
-        <string> Default </string>
-       </property>
-       <property name="checkable">
-        <bool>false</bool>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-       <property name="flat">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
+    <layout class="QGridLayout" name="gridLayout_5"/>
    </item>
    <item row="4" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -320,35 +278,52 @@
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
       <widget class="QLabel" name="label_5">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
         <string>Cache location </string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEditCacheLocation">
-       <property name="autoFillBackground">
-        <bool>false</bool>
-       </property>
-       <property name="maxLength">
-        <number>512</number>
+      <widget class="Utils::PathChooser" name="lineEditCacheLocation" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButtonCacheLocation">
+      <widget class="QPushButton" name="pushButtonCacheDefaults">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="cursor">
         <cursorShape>OpenHandCursor</cursorShape>
        </property>
-       <property name="text">
-        <string/>
+       <property name="toolTip">
+        <string>Restore default server and cache settings</string>
        </property>
-       <property name="icon">
-        <iconset resource="../coreplugin/core.qrc">
-         <normaloff>:/core/images/dir.png</normaloff>:/core/images/dir.png</iconset>
+       <property name="text">
+        <string> Default </string>
+       </property>
+       <property name="checkable">
+        <bool>false</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
        </property>
        <property name="flat">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -386,8 +361,14 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../coreplugin/core.qrc"/>
- </resources>
+ <customwidgets>
+  <customwidget>
+   <class>Utils::PathChooser</class>
+   <extends>QWidget</extends>
+   <header>utils/pathchooser.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
  <connections/>
 </ui>

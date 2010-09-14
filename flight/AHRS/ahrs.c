@@ -34,46 +34,25 @@
 
 /* OpenPilot Includes */
 #include "ahrs.h"
+#include "ahrs_adc.h"
 #include "pios_opahrs_proto.h"
 #include "ahrs_fsm.h"		/* lfsm_state */
 #include "insgps.h"
 #include "CoordinateConversions.h"
 
-/**
- * State of AHRS EKF
- * @arg AHRS_IDLE - waiting for data to be available for filtering
- * @arg AHRS_DATA_READY - Data ready for downsampling and processing
- * @arg AHRS_PROCESSING - Performing update on the available data
- */
-volatile enum {AHRS_IDLE, AHRS_DATA_READY, AHRS_PROCESSING} ahrs_state;
 volatile enum algorithms ahrs_algorithm;
-
-/**
- * @addtogroup AHRS_ADC_Configuration ADC Configuration
- * @{
- * Functions to configure ADC and handle interrupts
- */
-void AHRS_ADC_Config(int32_t ekf_rate, int32_t adc_oversample);
-void AHRS_ADC_DMA_Handler(void);
-void DMA1_Channel1_IRQHandler() __attribute__ ((alias ("AHRS_ADC_DMA_Handler")));
-/**
- * @}
- */
 
 // For debugging the raw sensors
 //#define DUMP_RAW
-#define DUMP_FRIENDLY
+//#define DUMP_FRIENDLY
 
 /**
  * @addtogroup AHRS_Definitions 
  * @{
  */
 // Currently analog acquistion hard coded at 480 Hz
-#define ADC_OVERSAMPLE          18
-#define EKF_RATE                ((float) 4*480 / ADC_OVERSAMPLE)
-#define ADC_CONTINUOUS_CHANNELS PIOS_ADC_NUM_PINS
-#define CORRECTION_COUNT        4
-
+#define ADC_RATE          (4*480)
+#define EKF_RATE          (ADC_RATE / adc_oversampling)
 #define VDD            3.3    /* supply voltage for ADC */
 #define FULL_RANGE     4096   /* 12 bit ADC */
 #define ACCEL_RANGE    2      /* adjustable by FS input */
@@ -172,6 +151,8 @@ void process_spi_request(void);
 void downsample_data(void);
 void calibrate_sensors(void);
 void converge_insgps();
+void timer_start();
+uint32_t timer_count();
 
 /**
  * @addtogroup AHRS_Global_Data AHRS Global Data
@@ -195,15 +176,7 @@ int16_t gyro_bias[3] = {0,0,0};
 //! Magnetometer bias (direction) from OP or calibrate sensors
 int16_t mag_bias[3] = {0,0,0};
 //! Filter coefficients used in decimation.  Limited order so filter can't run between samples
-int16_t fir_coeffs[ADC_OVERSAMPLE+1];          
-//! Raw buffer that DMA data is dumped into
-volatile int16_t raw_data_buffer[ADC_CONTINUOUS_CHANNELS * ADC_OVERSAMPLE * 2];    // Double buffer that DMA just used
-//! Swapped by interrupt handler to achieve double buffering
-volatile int16_t * valid_data_buffer;      
-//! Counts how many times the EKF wasn't idle when DMA handler called
-uint32_t ekf_too_slow = 0;
-//! Total number of data blocks converted
-uint32_t total_conversion_blocks = 0;
+int16_t fir_coeffs[50];
 //! Home location in ECEF coordinates
 double BaseECEF[3] = {0, 0, 0};
 //! Rotation matrix from LLA to Rne
@@ -212,7 +185,8 @@ float Rne[3][3];
 uint8_t calibration_pending = FALSE;
 //! Counter for tracking the idle level
 static uint32_t idle_counter = 0;
-
+//! The oversampling rate, ekf is 2k / this
+static uint8_t adc_oversampling = 18;
 /**
  * @}
  */
@@ -239,8 +213,7 @@ int main()
     PIOS_COM_Init();
     
     /* ADC system */
-    AHRS_ADC_Config(EKF_RATE, ADC_OVERSAMPLE);
-    
+    AHRS_ADC_Config(adc_oversampling);    
     
     /* Setup the Accelerometer FS (Full-Scale) GPIO */
     PIOS_GPIO_Enable(0);
@@ -268,11 +241,12 @@ int main()
     
     lfsm_init();
     
-    ahrs_state = AHRS_IDLE;;
+    ahrs_state = AHRS_IDLE;
+	
     /* Use simple averaging filter for now */
-    for (int i = 0; i < ADC_OVERSAMPLE; i++)
+    for (int i = 0; i < adc_oversampling; i++)
         fir_coeffs[i] = 1;
-    fir_coeffs[ADC_OVERSAMPLE] = ADC_OVERSAMPLE;
+    fir_coeffs[adc_oversampling] = adc_oversampling;
     
     if(ahrs_algorithm == INSGPS_Algo) {
         // compute a data point and initialize INS
@@ -448,48 +422,44 @@ int main()
  */
 void downsample_data()
 {
-    int16_t temp;
     int32_t accel_raw[3], gyro_raw[3];  
     uint16_t i;
     
     // Get the Y data.  Third byte in.  Convert to m/s
     accel_raw[0] = 0;  
-    for( i = 0; i < ADC_OVERSAMPLE; i++ )      
-    {
-        temp = ( valid_data_buffer[0 + i * ADC_CONTINUOUS_CHANNELS] + accel_bias[1] ) * fir_coeffs[i];
-        accel_raw[0] += temp;
-    }
-    accel_data.filtered.y = (float) accel_raw[0] / (float) fir_coeffs[ADC_OVERSAMPLE] * accel_scale[1];
+    for( i = 0; i < adc_oversampling; i++ )      
+        accel_raw[0] += ( valid_data_buffer[0 + i * PIOS_ADC_NUM_PINS] + accel_bias[1] ) * fir_coeffs[i];
+    accel_data.filtered.y = (float) accel_raw[0] / (float) fir_coeffs[adc_oversampling] * accel_scale[1];
     
     // Get the X data which projects forward/backwards.  Fifth byte in.  Convert to m/s
     accel_raw[1] = 0;  
-    for( i = 0; i < ADC_OVERSAMPLE; i++ )      
-        accel_raw[1] += ( valid_data_buffer[2 + i * ADC_CONTINUOUS_CHANNELS] + accel_bias[0] ) * fir_coeffs[i];
-    accel_data.filtered.x = (float) accel_raw[1] / (float) fir_coeffs[ADC_OVERSAMPLE]  * accel_scale[0];
+    for( i = 0; i < adc_oversampling; i++ )      
+        accel_raw[1] += ( valid_data_buffer[2 + i * PIOS_ADC_NUM_PINS] + accel_bias[0] ) * fir_coeffs[i];
+    accel_data.filtered.x = (float) accel_raw[1] / (float) fir_coeffs[adc_oversampling]  * accel_scale[0];
     
     // Get the Z data.  Third byte in.  Convert to m/s
     accel_raw[2] = 0;  
-    for( i = 0; i < ADC_OVERSAMPLE; i++ )      
-        accel_raw[2] += ( valid_data_buffer[4 + i * ADC_CONTINUOUS_CHANNELS] + accel_bias[2] ) * fir_coeffs[i];
-    accel_data.filtered.z = -(float) accel_raw[2] / (float) fir_coeffs[ADC_OVERSAMPLE]  * accel_scale[2];
+    for( i = 0; i < adc_oversampling; i++ )      
+        accel_raw[2] += ( valid_data_buffer[4 + i * PIOS_ADC_NUM_PINS] + accel_bias[2] ) * fir_coeffs[i];
+    accel_data.filtered.z = -(float) accel_raw[2] / (float) fir_coeffs[adc_oversampling]  * accel_scale[2];
     
     // Get the X gyro data.  Seventh byte in.  Convert to deg/s.
     gyro_raw[0] = 0;
-    for( i = 0; i < ADC_OVERSAMPLE; i++ )
-        gyro_raw[0] += ( valid_data_buffer[1 + i * ADC_CONTINUOUS_CHANNELS] + gyro_bias[0] ) * fir_coeffs[i];
-    gyro_data.filtered.x  = (float) gyro_raw[0] / (float) fir_coeffs[ADC_OVERSAMPLE] * gyro_scale[0];
+    for( i = 0; i < adc_oversampling; i++ )
+        gyro_raw[0] += ( valid_data_buffer[1 + i * PIOS_ADC_NUM_PINS] + gyro_bias[0] ) * fir_coeffs[i];
+    gyro_data.filtered.x  = (float) gyro_raw[0] / (float) fir_coeffs[adc_oversampling] * gyro_scale[0];
     
     // Get the Y gyro data.  Second byte in.  Convert to deg/s.
     gyro_raw[1] = 0;
-    for( i = 0; i < ADC_OVERSAMPLE; i++ )
-        gyro_raw[1] += ( valid_data_buffer[3 + i * ADC_CONTINUOUS_CHANNELS] + gyro_bias[1] ) * fir_coeffs[i];
-    gyro_data.filtered.y = (float) gyro_raw[1] / (float) fir_coeffs[ADC_OVERSAMPLE] * gyro_scale[1];
+    for( i = 0; i < adc_oversampling; i++ )
+        gyro_raw[1] += ( valid_data_buffer[3 + i * PIOS_ADC_NUM_PINS] + gyro_bias[1] ) * fir_coeffs[i];
+    gyro_data.filtered.y = (float) gyro_raw[1] / (float) fir_coeffs[adc_oversampling] * gyro_scale[1];
     
     // Get the Z gyro data.  Fifth byte in.  Convert to deg/s.
     gyro_raw[2] = 0;
-    for( i = 0; i < ADC_OVERSAMPLE; i++ )
-        gyro_raw[2] += ( valid_data_buffer[5 + i * ADC_CONTINUOUS_CHANNELS] + gyro_bias[2] ) * fir_coeffs[i];
-    gyro_data.filtered.z = (float) gyro_raw[2] / (float) fir_coeffs[ADC_OVERSAMPLE] * gyro_scale[2];
+    for( i = 0; i < adc_oversampling; i++ )
+        gyro_raw[2] += ( valid_data_buffer[5 + i * PIOS_ADC_NUM_PINS] + gyro_bias[2] ) * fir_coeffs[i];
+    gyro_data.filtered.z = (float) gyro_raw[2] / (float) fir_coeffs[adc_oversampling] * gyro_scale[2];
 }
 
 /**
@@ -832,7 +802,8 @@ void process_spi_request(void)
             user_tx_v1.payload.user.v.rsp.update.Vel[2] = Nav.Vel[2];
             
             // compute the idle fraction
-            user_tx_v1.payload.user.v.rsp.update.load = (MAX_IDLE_COUNT - idle_counter) * 100 / MAX_IDLE_COUNT;
+            user_tx_v1.payload.user.v.rsp.update.load = ((float) ekf_too_slow / (float) total_conversion_blocks) * 100;
+			//(MAX_IDLE_COUNT - idle_counter) * 100 / MAX_IDLE_COUNT;
             
             dump_spi_message(PIOS_COM_AUX, "U", (uint8_t *)&user_tx_v1, sizeof(user_tx_v1));
             lfsm_user_set_tx_v1 (&user_tx_v1);
@@ -849,167 +820,5 @@ void process_spi_request(void)
  * @}
  */
 
-/* Local Variables */
-static GPIO_TypeDef* ADC_GPIO_PORT[PIOS_ADC_NUM_PINS] = PIOS_ADC_PORTS;
-static const uint32_t ADC_GPIO_PIN[PIOS_ADC_NUM_PINS] = PIOS_ADC_PINS;
-static const uint32_t ADC_CHANNEL[PIOS_ADC_NUM_PINS] = PIOS_ADC_CHANNELS;
-
-static ADC_TypeDef* ADC_MAPPING[PIOS_ADC_NUM_PINS] = PIOS_ADC_MAPPING;
-static const uint32_t ADC_CHANNEL_MAPPING[PIOS_ADC_NUM_PINS] = PIOS_ADC_CHANNEL_MAPPING;
 
 
-/**
- * @brief Initialise the ADC Peripheral
- * @param[in] ekf_rate
- * @param[in] adc_oversample
- * 
- * Currently ignores rates and uses hardcoded values.  Need a little logic to
- * map from sampling rates and such to ADC constants.
- */
-void AHRS_ADC_Config(int32_t ekf_rate, int32_t adc_oversample)
-{
-    
-	int32_t i;
-    
-	/* Setup analog pins */
-	GPIO_InitTypeDef GPIO_InitStructure;
-	GPIO_StructInit(&GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AIN;
-    
-	/* Enable each ADC pin in the array */
-	for(i = 0; i < PIOS_ADC_NUM_PINS; i++) {
-		GPIO_InitStructure.GPIO_Pin = ADC_GPIO_PIN[i];
-		GPIO_Init(ADC_GPIO_PORT[i], &GPIO_InitStructure);
-	}
-    
-	/* Enable ADC clocks */
-	PIOS_ADC_CLOCK_FUNCTION;
-    
-	/* Map channels to conversion slots depending on the channel selection mask */
-	for(i = 0; i < PIOS_ADC_NUM_PINS; i++) {
-		ADC_RegularChannelConfig(ADC_MAPPING[i], ADC_CHANNEL[i], ADC_CHANNEL_MAPPING[i], PIOS_ADC_SAMPLE_TIME);
-	}
-    
-#if (PIOS_ADC_USE_TEMP_SENSOR)
-	ADC_TempSensorVrefintCmd(ENABLE);
-	ADC_RegularChannelConfig(PIOS_ADC_TEMP_SENSOR_ADC, ADC_Channel_14, PIOS_ADC_TEMP_SENSOR_ADC_CHANNEL, PIOS_ADC_SAMPLE_TIME);
-#endif
-    
-    // TODO: update ADC to continuous sampling, configure the sampling rate
-	/* Configure ADCs */
-	ADC_InitTypeDef ADC_InitStructure;
-	ADC_StructInit(&ADC_InitStructure);
-	ADC_InitStructure.ADC_Mode = ADC_Mode_RegSimult;
-	ADC_InitStructure.ADC_ScanConvMode = ENABLE;
-	ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
-	ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None;
-	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
-	ADC_InitStructure.ADC_NbrOfChannel = 4; //((PIOS_ADC_NUM_CHANNELS + 1) >> 1);
-	ADC_Init(ADC1, &ADC_InitStructure);
-    
-#if (PIOS_ADC_USE_ADC2)
-	ADC_Init(ADC2, &ADC_InitStructure);
-    
-	/* Enable ADC2 external trigger conversion (to synch with ADC1) */
-	ADC_ExternalTrigConvCmd(ADC2, ENABLE);
-#endif
-    
-	RCC_ADCCLKConfig(PIOS_ADC_ADCCLK);
-    RCC_PCLK2Config(RCC_HCLK_Div16);
-    
-	/* Enable ADC1->DMA request */
-	ADC_DMACmd(ADC1, ENABLE);
-    
-	/* ADC1 calibration */
-	ADC_Cmd(ADC1, ENABLE);
-	ADC_ResetCalibration(ADC1);
-	while(ADC_GetResetCalibrationStatus(ADC1));
-	ADC_StartCalibration(ADC1);
-	while(ADC_GetCalibrationStatus(ADC1));
-    
-#if (PIOS_ADC_USE_ADC2)
-	/* ADC2 calibration */
-	ADC_Cmd(ADC2, ENABLE);
-	ADC_ResetCalibration(ADC2);
-	while(ADC_GetResetCalibrationStatus(ADC2));
-	ADC_StartCalibration(ADC2);
-	while(ADC_GetCalibrationStatus(ADC2));
-#endif
-    
-	/* Enable DMA1 clock */
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
-    
-	/* Configure DMA1 channel 1 to fetch data from ADC result register */
-	DMA_InitTypeDef DMA_InitStructure;
-	DMA_StructInit(&DMA_InitStructure);
-	DMA_DeInit(DMA1_Channel1);
-	DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&ADC1->DR;
-	DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)&raw_data_buffer[0];
-	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;
-    /* We are double buffering half words from the ADC.  Make buffer appropriately sized */
-	DMA_InitStructure.DMA_BufferSize = (ADC_CONTINUOUS_CHANNELS * ADC_OVERSAMPLE * 2) >> 1; 
-	DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-	DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
-    /* Note: We read ADC1 and ADC2 in parallel making a word read, also hence the half buffer size */
-	DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word;
-	DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Word;
-	DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;
-	DMA_InitStructure.DMA_Priority = DMA_Priority_High;
-	DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;
-	DMA_Init(DMA1_Channel1, &DMA_InitStructure);
-	DMA_Cmd(DMA1_Channel1, ENABLE);
-    
-	/* Trigger interrupt when for half conversions too to indicate double buffer */
-	DMA_ITConfig(DMA1_Channel1, DMA_IT_TC, ENABLE);
-	DMA_ITConfig(DMA1_Channel1, DMA_IT_HT, ENABLE);
-    
-	/* Configure and enable DMA interrupt */
-	NVIC_InitTypeDef NVIC_InitStructure;
-	NVIC_InitStructure.NVIC_IRQChannel = DMA1_Channel1_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_ADC_IRQ_PRIO;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
-    
-	/* Finally start initial conversion */
-	ADC_SoftwareStartConvCmd(ADC1, ENABLE);
-}
-
-/**
- * @brief Interrupt for half and full buffer transfer
- * 
- * This interrupt handler swaps between the two halfs of the double buffer to make
- * sure the ahrs uses the most recent data.  Only swaps data when AHRS is idle, but
- * really this is a pretense of a sanity check since the DMA engine is consantly 
- * running in the background.  Keep an eye on the ekf_too_slow variable to make sure
- * it's keeping up.
- */
-void AHRS_ADC_DMA_Handler(void) 
-{
-    if ( ahrs_state == AHRS_IDLE ) 
-    {
-        // Ideally this would have a mutex, but I think we can avoid it (and don't have RTOS features)
-        
-        if( DMA_GetFlagStatus( DMA1_IT_TC1 ) ) // whole double buffer filled
-            valid_data_buffer = &raw_data_buffer[ 1 * ADC_CONTINUOUS_CHANNELS * ADC_OVERSAMPLE ];
-        else if ( DMA_GetFlagStatus(DMA1_IT_HT1) )
-            valid_data_buffer = &raw_data_buffer[ 0 * ADC_CONTINUOUS_CHANNELS * ADC_OVERSAMPLE ];
-        else {
-            // lets cause a seg fault and catch whatever is going on
-            valid_data_buffer = 0;
-        }
-        
-        ahrs_state = AHRS_DATA_READY;
-    }
-    else {
-        // Track how many times an interrupt occurred before EKF finished processing
-        ekf_too_slow++;
-    }
-    
-    total_conversion_blocks++;
-    
-    // Clear all interrupt from DMA 1 - regardless if buffer swapped
-    DMA_ClearFlag( DMA1_IT_GL1 );
-    
-}

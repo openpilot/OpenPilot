@@ -25,7 +25,7 @@
 
 # Set developer code and compile options
 # Set to YES for debugging
-DEBUG ?= YES
+DEBUG ?= NO
 USE_BOOTLOADER ?= NO
 
 # Set to YES when using Code Sourcery toolchain
@@ -89,6 +89,7 @@ CMSISDIR  = $(STMLIBDIR)/CMSIS/Core/CM3
 ## AHRS:
 SRC = ahrs.c
 SRC += pios_board.c
+SRC += ahrs_adc.c
 SRC += ahrs_fsm.c
 SRC += insgps.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
@@ -190,12 +191,11 @@ LINKERSCRIPTPATH = $(PIOSSTM32F10X)
 # (Note: 3 is not always the best optimization level. See avr-libc FAQ.)
 
 ifeq ($(DEBUG),YES)
-# Do nothing, default is -O0
+CFLAGS += -O0
+CFLAGS += -DGENERAL_COV
 else
-endif
-
-# Now need -Os always for size reasons
 CFLAGS += -Os
+endif
 
 # Output format. (can be ihex or binary or both)
 #  binary to create a load-image in raw-binary format i.e. for SAM-BA, 
@@ -239,7 +239,7 @@ CSTANDARD = -std=gnu99
 # Flags for C and C++ (arm-elf-gcc/arm-elf-g++)
 
 ifeq ($(DEBUG),YES)
-CFLAGS = -g$(DEBUGF)
+CFLAGS += -g$(DEBUGF)
 endif
 
 CFLAGS += -ffast-math

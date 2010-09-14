@@ -39,7 +39,11 @@
 #define NUMV 10  // number of measurements, v is the measurement noise vector
 #define NUMU 6   // number of deterministic inputs, U is the input vector
 
-//#define COVARIANCE_PREDICTION_GENERAL
+#if defined(GENERAL_COV)
+// This might trick people so I have a note here.  There is a slower but bigger version of the 
+// code here but won't fit when debugging disabled (requires -Os)
+#define COVARIANCE_PREDICTION_GENERAL
+#endif
 
 // Private functions
 void INSCorrection(float mag_data[3], float Pos[3], float Vel[3], float BaroAlt, uint16_t SensorsUsed);

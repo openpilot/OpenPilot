@@ -51,7 +51,10 @@ QWidget *ImportExportGadgetOptionsPage::createPage(QWidget *parent)
     options_page->setupUi(optionsPageWidget);
 
     // Restore the contents from the settings:
-    options_page->svgSourceFile->setText(m_config->getDialFile());
+    options_page->svgSourceFile->setExpectedKind(Utils::PathChooser::File);
+    options_page->svgSourceFile->setPromptDialogFilter(tr("INI file (*.ini)"));
+    options_page->svgSourceFile->setPromptDialogTitle(tr("Choose configuration file"));
+    options_page->svgSourceFile->setPath(m_config->getDialFile());
 
     return optionsPageWidget;
 }
@@ -64,7 +67,7 @@ QWidget *ImportExportGadgetOptionsPage::createPage(QWidget *parent)
  */
 void ImportExportGadgetOptionsPage::apply()
 {
-    m_config->setDialFile(options_page->svgSourceFile->text());
+    m_config->setDialFile(options_page->svgSourceFile->path());
 }
 
 

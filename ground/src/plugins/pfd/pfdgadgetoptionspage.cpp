@@ -56,11 +56,13 @@ QWidget *PFDGadgetOptionsPage::createPage(QWidget *parent)
 
 
     // Restore the contents from the settings:
-    options_page->svgSourceFile->setText(m_config->dialFile());
+    options_page->svgSourceFile->setExpectedKind(Utils::PathChooser::File);
+    options_page->svgSourceFile->setPromptDialogFilter(tr("SVG image (*.svg)"));
+    options_page->svgSourceFile->setPromptDialogTitle(tr("Choose SVG image"));
+    options_page->svgSourceFile->setPath(m_config->dialFile());
     options_page->useOpenGL->setChecked(m_config->useOpenGL());
     options_page->hqText->setChecked(m_config->getHqFonts());
 
-    connect(options_page->loadFile, SIGNAL(clicked()), this, SLOT(on_loadFile_clicked()));
     return optionsPageWidget;
 }
 
@@ -72,29 +74,11 @@ QWidget *PFDGadgetOptionsPage::createPage(QWidget *parent)
  */
 void PFDGadgetOptionsPage::apply()
 {
-    m_config->setDialFile(options_page->svgSourceFile->text());
+    m_config->setDialFile(options_page->svgSourceFile->path());
     m_config->setUseOpenGL(options_page->useOpenGL->checkState());
     m_config->setHqFonts(options_page->hqText->checkState());
 }
 
-
-/*
-Opens an open file dialog.
-
-*/
-void PFDGadgetOptionsPage::on_loadFile_clicked()
-{
-    QFileDialog::Options options;
-    QString selectedFilter;
-    QString fileName = QFileDialog::getOpenFileName(qobject_cast<QWidget*>(this),
-                                                    tr("QFileDialog::getOpenFileName()"),
-                                                    options_page->svgSourceFile->text(),
-                                                    tr("All Files (*);;SVG Files (*.svg)"),
-                                                    &selectedFilter,
-                                                    options);
-    if (!fileName.isEmpty()) options_page->svgSourceFile->setText(fileName);
-
-}
 
 
 void PFDGadgetOptionsPage::finish()

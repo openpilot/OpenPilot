@@ -55,7 +55,10 @@ QWidget *LineardialGadgetOptionsPage::createPage(QWidget *parent)
     options_page->setupUi(optionsPageWidget);
 
     // Restore the contents from the settings:
-    options_page->svgSourceFile->setText(m_config->getDialFile());
+    options_page->svgSourceFile->setExpectedKind(Utils::PathChooser::File);
+    options_page->svgSourceFile->setPromptDialogFilter(tr("SVG image (*.svg)"));
+    options_page->svgSourceFile->setPromptDialogTitle(tr("Choose SVG image"));
+    options_page->svgSourceFile->setPath(m_config->getDialFile());
     options_page->minValue->setValue(m_config->getMin());
     options_page->maxValue->setValue(m_config->getMax());
     options_page->greenMin->setValue(m_config->getGreenMin());
@@ -93,7 +96,6 @@ QWidget *LineardialGadgetOptionsPage::createPage(QWidget *parent)
     }
 
     connect(options_page->objectName, SIGNAL(currentIndexChanged(QString)), this, SLOT(on_objectName_currentIndexChanged(QString)));
-    connect(options_page->loadFile, SIGNAL(clicked()), this, SLOT(on_loadFile_clicked()));
     connect(options_page->fontPicker, SIGNAL(clicked()), this, SLOT(on_fontPicker_clicked()));
 
     return optionsPageWidget;
@@ -107,7 +109,7 @@ QWidget *LineardialGadgetOptionsPage::createPage(QWidget *parent)
  */
 void LineardialGadgetOptionsPage::apply()
 {
-    m_config->setDialFile(options_page->svgSourceFile->text());
+    m_config->setDialFile(options_page->svgSourceFile->path());
     m_config->setRange(options_page->minValue->value(),options_page->maxValue->value());
     m_config->setGreenRange(options_page->greenMin->value(),options_page->greenMax->value());
     m_config->setYellowRange(options_page->yellowMin->value(),options_page->yellowMax->value());
@@ -129,25 +131,6 @@ void LineardialGadgetOptionsPage::on_fontPicker_clicked()
     font = QFontDialog::getFont(&ok, font , qobject_cast<QWidget*>(this));
 }
 
-
-/**
-
-Opens an open file dialog.
-
-*/
-void LineardialGadgetOptionsPage::on_loadFile_clicked()
-{
-    QFileDialog::Options options;
-    QString selectedFilter;
-    QString fileName = QFileDialog::getOpenFileName(qobject_cast<QWidget*>(this),
-                                                    tr("QFileDialog::getOpenFileName()"),
-                                                    options_page->svgSourceFile->text(),
-                                                    tr("All Files (*);;SVG Files (*.svg)"),
-                                                    &selectedFilter,
-                                                    options);
-    if (!fileName.isEmpty()) options_page->svgSourceFile->setText(fileName);
-
-}
 
 /*
   Fills in the field1 combo box when value is changed in the

@@ -60,7 +60,6 @@ private:
     PFDGadgetConfiguration *m_config;
 
 private slots:
-    void on_loadFile_clicked();
 };
 
 #endif // PFDGADGETOPTIONSPAGE_H

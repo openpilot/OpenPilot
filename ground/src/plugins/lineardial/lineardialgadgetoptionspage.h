@@ -62,7 +62,6 @@ private:
     QFont font;
 
 private slots:
-    void on_loadFile_clicked();
     void on_fontPicker_clicked();
     void on_objectName_currentIndexChanged(QString val);
 

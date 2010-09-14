@@ -38,36 +38,46 @@ namespace Utils {
     }
 
     /**
-      Returns the base path of the share directory
+      Returns the base path of the share directory.
+
+      Path is in Qt/Unix conventions, separated by "/".
       */
 QString PathUtils::GetDataPath()
 {
-        // Figure out root:  Up one from 'bin'
-        QDir rootDir = QApplication::applicationDirPath();
-        rootDir.cdUp();
-        const QString rootDirPath = rootDir.canonicalPath();
-        QString pluginPath = rootDirPath;
-        pluginPath += QLatin1Char('/');
-        pluginPath += QLatin1String(GCS_DATA_BASENAME);
-        pluginPath += QLatin1Char('/');
-      return pluginPath;
+    // This routine works with "/" as the standard:
+    // Figure out root:  Up one from 'bin'
+    QDir rootDir = QApplication::applicationDirPath();
+    rootDir.cdUp();
+    const QString rootDirPath = rootDir.canonicalPath();
+    QString dataPath = rootDirPath;
+    dataPath += QLatin1Char('/');
+    dataPath += QLatin1String(GCS_DATA_BASENAME);
+    dataPath += QLatin1Char('/');
+   return dataPath;
 }
 
 /**
   Cuts the standard data path from the 'path' argument. If path does not start
 with the standard data path, then do nothing.
+
+   Always returns a path converted to "/".
   */
 QString PathUtils::RemoveDataPath(QString path)
 {
-    if (path.startsWith(GetDataPath())) {
-        int i = path.length()- GetDataPath().length();
-        return QString("%%DATAPATH%%") + path.right(i);
+    // Depending on the platform, we might get either "/" or "\"
+    // so we need to go to the standard ("/")
+    QString goodPath = QDir::fromNativeSeparators(path);
+    if (goodPath.startsWith(GetDataPath())) {
+        int i = goodPath.length()- GetDataPath().length();
+        return QString("%%DATAPATH%%") + goodPath.right(i);
     } else
-        return path;
+        return goodPath;
 }
 
 /**
   Inserts the data path (only if the path starts with %%DATAPATH%%)
+
+  Returns a "/" or "\" separated path depending on platform conventions.
   */
 QString PathUtils::InsertDataPath(QString path)
 {
@@ -75,9 +85,9 @@ QString PathUtils::InsertDataPath(QString path)
     {
         QString newPath = GetDataPath();
         newPath += path.right(path.length()-12);
-        return newPath;
+        return QDir::toNativeSeparators(newPath);
     }
-    return path;
+    return QDir::toNativeSeparators(path);
 }
 
 }

@@ -80,7 +80,11 @@ QWidget *DialGadgetOptionsPage::createPage(QWidget *parent)
     options_page->moveNeedle3->addItem("Vertical");
 
     // Restore the contents from the settings:
-    options_page->svgSourceFile->setText(m_config->dialFile());
+
+    options_page->svgSourceFile->setExpectedKind(Utils::PathChooser::File);
+    options_page->svgSourceFile->setPromptDialogFilter(tr("SVG image (*.svg)"));
+    options_page->svgSourceFile->setPromptDialogTitle(tr("Choose SVG image"));
+    options_page->svgSourceFile->setPath(m_config->dialFile());
     options_page->backgroundID->setText(m_config->dialBackground());
     options_page->foregroundID->setText(m_config->dialForeground());
     options_page->needle1ID->setText(m_config->dialNeedle1());
@@ -143,7 +147,6 @@ QWidget *DialGadgetOptionsPage::createPage(QWidget *parent)
     }
     connect(options_page->uavObject3, SIGNAL(currentIndexChanged(QString)), this, SLOT(on_uavObject3_currentIndexChanged(QString)));
 
-    connect(options_page->loadFile, SIGNAL(clicked()), this, SLOT(on_loadFile_clicked()));
     connect(options_page->fontPicker, SIGNAL(clicked()), this, SLOT(on_fontPicker_clicked()));
 
     return optionsPageWidget;
@@ -157,7 +160,7 @@ QWidget *DialGadgetOptionsPage::createPage(QWidget *parent)
  */
 void DialGadgetOptionsPage::apply()
 {
-    m_config->setDialFile(options_page->svgSourceFile->text());
+    m_config->setDialFile(options_page->svgSourceFile->path());
     m_config->setDialBackgroundID(options_page->backgroundID->text());
     m_config->setDialForegroundID(options_page->foregroundID->text());
     m_config->setDialNeedleID1(options_page->needle1ID->text());
@@ -239,25 +242,6 @@ void DialGadgetOptionsPage::on_uavObject3_currentIndexChanged(QString val) {
     foreach (UAVObjectField* field, fieldList) {
         options_page->objectField3->addItem(field->getName());
     }
-}
-
-
-/*
-Opens an open file dialog.
-
-*/
-void DialGadgetOptionsPage::on_loadFile_clicked()
-{
-    QFileDialog::Options options;
-    QString selectedFilter;
-    QString fileName = QFileDialog::getOpenFileName(qobject_cast<QWidget*>(this),
-                                                    tr("QFileDialog::getOpenFileName()"),
-                                                    options_page->svgSourceFile->text(),
-                                                    tr("All Files (*);;SVG Files (*.svg)"),
-                                                    &selectedFilter,
-                                                    options);
-    if (!fileName.isEmpty()) options_page->svgSourceFile->setText(fileName);
-
 }
 
 

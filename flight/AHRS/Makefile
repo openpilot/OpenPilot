@@ -91,6 +91,7 @@ SRC = ahrs.c
 SRC += pios_board.c
 SRC += ahrs_adc.c
 SRC += ahrs_fsm.c
+SRC += ahrs_timer.c
 SRC += insgps.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
 

@@ -35,6 +35,7 @@
 /* OpenPilot Includes */
 #include "ahrs.h"
 #include "ahrs_adc.h"
+#include "ahrs_timer.h"
 #include "pios_opahrs_proto.h"
 #include "ahrs_fsm.h"		/* lfsm_state */
 #include "insgps.h"
@@ -151,8 +152,12 @@ void process_spi_request(void);
 void downsample_data(void);
 void calibrate_sensors(void);
 void converge_insgps();
-void timer_start();
-uint32_t timer_count();
+
+volatile uint32_t last_counter_idle_start = 0;
+volatile uint32_t last_counter_idle_end = 0;
+volatile uint32_t idle_counts;
+volatile uint32_t running_counts;
+uint32_t counter_val;
 
 /**
  * @addtogroup AHRS_Global_Data AHRS Global Data
@@ -183,10 +188,8 @@ double BaseECEF[3] = {0, 0, 0};
 float Rne[3][3];
 //! Indicates the communications are requesting a calibration
 uint8_t calibration_pending = FALSE;
-//! Counter for tracking the idle level
-static uint32_t idle_counter = 0;
 //! The oversampling rate, ekf is 2k / this
-static uint8_t adc_oversampling = 18;
+static uint8_t adc_oversampling = 15;
 /**
  * @}
  */
@@ -282,9 +285,12 @@ int main()
         }
     }
 #endif
+	
+	timer_start();
     
     /******************* Main EKF loop ****************************/
     while (1) {
+
         // Alive signal
 		if((total_conversion_blocks % 100) == 0)
 			PIOS_LED_Toggle(LED1);
@@ -300,11 +306,16 @@ int main()
         PIOS_HMC5843_ReadMag(mag_data.raw.axis);
 #endif        
         // Delay for valid data
-        idle_counter = 0;
-        do {
-            idle_counter ++;
-            //process_spi_request();
-        } while ( ahrs_state != AHRS_DATA_READY );
+		
+		counter_val = timer_count();
+		running_counts = counter_val - last_counter_idle_end;
+		last_counter_idle_start = counter_val;
+
+        while ( ahrs_state != AHRS_DATA_READY );
+		
+		counter_val = timer_count();
+		idle_counts = counter_val - last_counter_idle_start;
+		last_counter_idle_end = counter_val;
         
         ahrs_state = AHRS_PROCESSING;
         
@@ -802,8 +813,7 @@ void process_spi_request(void)
             user_tx_v1.payload.user.v.rsp.update.Vel[2] = Nav.Vel[2];
             
             // compute the idle fraction
-            user_tx_v1.payload.user.v.rsp.update.load = ((float) ekf_too_slow / (float) total_conversion_blocks) * 100;
-			//(MAX_IDLE_COUNT - idle_counter) * 100 / MAX_IDLE_COUNT;
+            user_tx_v1.payload.user.v.rsp.update.load = ((float) running_counts / (float) (idle_counts+running_counts)) * 100;
             
             dump_spi_message(PIOS_COM_AUX, "U", (uint8_t *)&user_tx_v1, sizeof(user_tx_v1));
             lfsm_user_set_tx_v1 (&user_tx_v1);

@@ -42,6 +42,8 @@ void SysTick_Handler(void);
 
 /* Local Macros */
 #define MEM8(addr)  (*((volatile uint8_t  *)(addr)))
+#define MEM16(addr)  (*((volatile uint16_t  *)(addr)))
+#define MEM32(addr)  (*((volatile uint32_t  *)(addr)))
 
 /**
 * Initialises all system peripherals
@@ -125,6 +127,14 @@ int32_t PIOS_SYS_Reset(void)
 
 	/* We will never reach this point */
 	return -1;
+}
+
+/**
+* Returns the CPU's flash size (in bytes)
+*/
+uint32_t PIOS_SYS_getCPUFlashSize(void)
+{
+	return ((uint32_t)MEM16(0x1FFFF7E0) * 1000);
 }
 
 /**

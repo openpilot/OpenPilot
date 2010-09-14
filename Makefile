@@ -6,6 +6,7 @@ DL_DIR=$(ROOT_DIR)/downloads
 
 # We almost need to consider autoconf/automake instead of this
 # I don't know if windows supports uname :-(
+QT_SPEC=win32-g++
 UNAME := $(shell uname)
 ifeq ($(UNAME), Linux)
   QT_SPEC=linux-g++

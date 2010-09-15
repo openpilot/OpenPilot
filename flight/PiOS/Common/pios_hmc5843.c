@@ -34,18 +34,45 @@
 
 #if defined(PIOS_INCLUDE_HMC5843)
 
-/* Glocal Variables */
+/* Global Variables */
 
 
 /* Local Variables */
+static bool pios_hmc5843_data_ready;
 
 /**
   * @brieft Initialise the HMC5843 sensor
   */
 void PIOS_HMC5843_Init(void)
 {
-	// Nothing to do here
-	// If we were using the DRDY (data ready) interrupt input, we would set it up here
+	GPIO_InitTypeDef GPIO_InitStructure;
+	EXTI_InitTypeDef EXTI_InitStructure;
+	NVIC_InitTypeDef NVIC_InitStructure;
+
+	/* Enable DRDY GPIO clock */
+	RCC_APB2PeriphClockCmd(PIOS_HMC5843_DRDY_CLK | RCC_APB2Periph_AFIO, ENABLE);
+
+	/* Configure EOC pin as input floating */
+	GPIO_InitStructure.GPIO_Pin = PIOS_HMC5843_DRDY_GPIO_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	GPIO_Init(PIOS_HMC5843_DRDY_GPIO_PORT, &GPIO_InitStructure);
+	
+	/* Configure the End Of Conversion (EOC) interrupt */
+	GPIO_EXTILineConfig(PIOS_HMC5843_DRDY_PORT_SOURCE, PIOS_HMC5843_DRDY_PIN_SOURCE);
+	EXTI_InitStructure.EXTI_Line = PIOS_HMC5843_DRDY_EXTI_LINE;
+	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
+	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+	EXTI_Init(&EXTI_InitStructure);
+	
+	/* Enable and set EOC EXTI Interrupt to the lowest priority */
+	NVIC_InitStructure.NVIC_IRQChannel = PIOS_HMC5843_DRDY_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_HMC5843_DRDY_PRIO;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
+
+	pios_hmc5843_data_ready = false;
 }
 
 /**
@@ -133,6 +160,8 @@ void PIOS_HMC5843_ReadMag(int16_t out[3])
 	uint8_t buffer[6];
 	uint8_t crtlB;
 
+	pios_hmc5843_data_ready = false;
+
 	while(!PIOS_HMC5843_Read(PIOS_HMC5843_CONFIG_REG_B, &crtlB, 1));
 	while(!PIOS_HMC5843_Read(PIOS_HMC5843_DATAOUT_XMSB_REG, buffer, 6));
 
@@ -197,6 +226,12 @@ void PIOS_HMC5843_ReadID(uint8_t out[4])
 	out[3] = '\0';
 }
 
+bool PIOS_HMC5843_NewDataAvailable(void)
+{
+	return(pios_hmc5843_data_ready);
+}
+
+
 /**
 * Reads one or more bytes into a buffer
 * \param[in] address HMC5843 register address (depends on size)
@@ -258,6 +293,12 @@ bool PIOS_HMC5843_Write(uint8_t address, uint8_t buffer)
   };
 
   return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
+}
+
+
+void PIOS_HMC5843_IRQHandler(void)
+{
+	pios_hmc5843_data_ready = true;
 }
 
 #endif

@@ -31,7 +31,7 @@
 #ifndef PIOS_HMC5843_H
 #define PIOS_HMC5843_H
 
-/* BMP085 Addresses */
+/* HMC5843 Addresses */
 #define PIOS_HMC5843_I2C_ADDR			0x1E
 #define PIOS_HMC5843_CONFIG_REG_A		(uint8_t)0x00
 #define PIOS_HMC5843_CONFIG_REG_B		(uint8_t)0x01
@@ -101,6 +101,7 @@ typedef struct {
 /* Public Functions */
 extern void PIOS_HMC5843_Init(void);
 extern void PIOS_HMC5843_Config(PIOS_HMC5843_ConfigTypeDef *HMC5843_Config_Struct);
+extern bool PIOS_HMC5843_NewDataAvailable(void);
 extern void PIOS_HMC5843_ReadMag(int16_t out[3]);
 extern void PIOS_HMC5843_ReadID(uint8_t out[4]);
 extern bool PIOS_HMC5843_Read(uint8_t address, uint8_t *buffer, uint8_t len);

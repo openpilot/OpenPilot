@@ -36,16 +36,15 @@
 
 #if defined(PIOS_INCLUDE_EXTI)
 
-
-/* Local Variables */
-static portBASE_TYPE xHigherPriorityTaskWoken;
-
-
 /**
 * Handle external lines 15 to 10 interrupt requests
 */
 void EXTI15_10_IRQHandler(void)
 {
+#if defined(PIOS_INCLUDE_FREERTOS)
+	portBASE_TYPE xHigherPriorityTaskWoken;
+#endif
+
 #if defined(PIOS_INCLUDE_BMP085)
 	if(EXTI_GetITStatus(PIOS_BMP085_EOC_EXTI_LINE) != RESET) {
 		/* Read the ADC Value */
@@ -53,13 +52,29 @@ void EXTI15_10_IRQHandler(void)
 
 		/* Clear the EXTI line pending bit */
 		EXTI_ClearITPendingBit(PIOS_BMP085_EOC_EXTI_LINE);
-
-		/* Yield From ISR if needed */
-		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 	}
+#endif
+
+#if defined(PIOS_INCLUDE_FREERTOS)
+	/* Yield From ISR if needed */
+	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 #endif
 }
 
+
+/**
+* Handle external lines 9 to 5 interrupt requests
+*/
+extern void PIOS_HMC5843_IRQHandler(void);
+void EXTI9_5_IRQHandler(void)
+{
+#if defined(PIOS_INCLUDE_HMC5843)
+	if(EXTI_GetITStatus(PIOS_HMC5843_DRDY_EXTI_LINE) != RESET) {
+		PIOS_HMC5843_IRQHandler();
+		EXTI_ClearITPendingBit(PIOS_HMC5843_DRDY_EXTI_LINE);
+	}
+#endif
+}
 
 /**
 * Handle external line 4 interrupt requests

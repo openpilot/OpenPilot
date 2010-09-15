@@ -40,6 +40,7 @@
 #define PIOS_INCLUDE_COM
 #define PIOS_INCLUDE_HMC5843
 #define PIOS_INCLUDE_GPIO
+#define PIOS_INCLUDE_EXTI
 
 
 #endif /* PIOS_CONFIG_H */

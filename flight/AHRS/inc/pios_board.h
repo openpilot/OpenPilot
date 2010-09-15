@@ -219,4 +219,16 @@ TIM8  |           |           |           |
 #define SET_ACCEL_2G PIOS_GPIO_On(0);
 #define SET_ACCEL_6G PIOS_GPIO_Off(0)
 
+//------------------------
+// PIOS_HMC5843
+//------------------------
+#define PIOS_HMC5843_DRDY_GPIO_PORT		GPIOB
+#define PIOS_HMC5843_DRDY_GPIO_PIN		GPIO_Pin_8
+#define PIOS_HMC5843_DRDY_PORT_SOURCE		GPIO_PortSourceGPIOB
+#define PIOS_HMC5843_DRDY_PIN_SOURCE		GPIO_PinSource8
+#define PIOS_HMC5843_DRDY_CLK			RCC_APB2Periph_GPIOB
+#define PIOS_HMC5843_DRDY_EXTI_LINE		EXTI_Line8
+#define PIOS_HMC5843_DRDY_IRQn			EXTI9_5_IRQn
+#define PIOS_HMC5843_DRDY_PRIO			PIOS_IRQ_PRIO_HIGH
+
 #endif /* PIOS_BOARD_H */

@@ -25,7 +25,7 @@
 
 # Set developer code and compile options
 # Set to YES for debugging
-DEBUG ?= NO
+DEBUG ?= YES
 USE_BOOTLOADER ?= NO
 
 # Set to YES when using Code Sourcery toolchain
@@ -192,12 +192,7 @@ LINKERSCRIPTPATH = $(PIOSSTM32F10X)
 # 0 = turn off optimization. s = optimize for size.
 # (Note: 3 is not always the best optimization level. See avr-libc FAQ.)
 
-ifeq ($(DEBUG),YES)
-CFLAGS += -O0
-CFLAGS += -DGENERAL_COV
-else
 CFLAGS += -Os
-endif
 
 # Output format. (can be ihex or binary or both)
 #  binary to create a load-image in raw-binary format i.e. for SAM-BA, 

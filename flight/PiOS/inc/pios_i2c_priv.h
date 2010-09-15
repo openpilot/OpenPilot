@@ -43,7 +43,7 @@ struct pios_i2c_adapter_cfg {
 };
 
 enum i2c_adapter_state {
-  I2C_STATE_FAULTED = 0, /* Must be zero so undefined transitions land here */
+  I2C_STATE_FSM_FAULT = 0, /* Must be zero so undefined transitions land here */
 
   I2C_STATE_STOPPED,
   I2C_STATE_STOPPING,

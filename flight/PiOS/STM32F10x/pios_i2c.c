@@ -62,7 +62,7 @@ enum i2c_adapter_event {
   I2C_EVENT_NUM_EVENTS	/* Must be last */
 };
 
-static void go_faulted (struct pios_i2c_adapter * i2c_adapter);
+static void go_fsm_fault (struct pios_i2c_adapter * i2c_adapter);
 static void go_stopping (struct pios_i2c_adapter * i2c_adapter);
 static void go_stopped (struct pios_i2c_adapter * i2c_adapter);
 static void go_starting (struct pios_i2c_adapter * i2c_adapter);
@@ -97,8 +97,8 @@ static void i2c_adapter_inject_event(struct pios_i2c_adapter * i2c_adapter, enum
 static void i2c_adapter_fsm_init(struct pios_i2c_adapter * i2c_adapter);
 
 const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM_STATES] = {
-  [I2C_STATE_FAULTED] = {
-    .entry_fn = go_faulted,
+  [I2C_STATE_FSM_FAULT] = {
+    .entry_fn = go_fsm_fault,
   },
 
   [I2C_STATE_STOPPED] = {
@@ -285,7 +285,7 @@ const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM
   },
 };
 
-static void go_faulted (struct pios_i2c_adapter * i2c_adapter)
+static void go_fsm_fault (struct pios_i2c_adapter * i2c_adapter)
 {
   PIOS_DEBUG_Assert(0);
 }

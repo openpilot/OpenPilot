@@ -57,6 +57,7 @@ enum i2c_adapter_event {
   I2C_EVENT_TRANSFER_DONE_LEN_EQ_1,
   I2C_EVENT_TRANSFER_DONE_LEN_EQ_2,
   I2C_EVENT_TRANSFER_DONE_LEN_GT_2,
+  I2C_EVENT_STOPPED,
   I2C_EVENT_AUTO,		/* FIXME: remove this */
 
   I2C_EVENT_NUM_EVENTS	/* Must be last */
@@ -95,6 +96,7 @@ struct i2c_adapter_transition {
 
 static void i2c_adapter_inject_event(struct pios_i2c_adapter * i2c_adapter, enum i2c_adapter_event event);
 static void i2c_adapter_fsm_init(struct pios_i2c_adapter * i2c_adapter);
+static bool i2c_adapter_wait_for_stopped(struct pios_i2c_adapter * i2c_adapter);
 
 const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM_STATES] = {
   [I2C_STATE_FSM_FAULT] = {
@@ -111,7 +113,7 @@ const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM
   [I2C_STATE_STOPPING] = {
     .entry_fn = go_stopping,
     .next_state = {
-      [I2C_EVENT_AUTO]                   = I2C_STATE_STOPPED,
+      [I2C_EVENT_STOPPED]                = I2C_STATE_STOPPED,
     },
   },
 
@@ -292,21 +294,11 @@ static void go_fsm_fault (struct pios_i2c_adapter * i2c_adapter)
 
 static void go_stopping (struct pios_i2c_adapter * i2c_adapter)
 {
-  I2C_ITConfig(i2c_adapter->cfg->regs, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, DISABLE);
-
-  /* Spin waiting for the stop bit to be cleared before continuing */
-#define I2C_CR1_STOP_REQUESTED 0x0200
-  while (i2c_adapter->cfg->regs->CR1 & I2C_CR1_STOP_REQUESTED);
-}
-
-static void go_stopped (struct pios_i2c_adapter * i2c_adapter)
-{
 #ifdef USE_FREERTOS  
   signed portBASE_TYPE pxHigherPriorityTaskWoken = pdFALSE;
 #endif
   
   I2C_ITConfig(i2c_adapter->cfg->regs, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, DISABLE);
-  I2C_AcknowledgeConfig(i2c_adapter->cfg->regs, ENABLE);
 
 #ifdef USE_FREERTOS  
   if (xSemaphoreGiveFromISR(i2c_adapter->sem_ready, &pxHigherPriorityTaskWoken) != pdTRUE) {
@@ -314,6 +306,12 @@ static void go_stopped (struct pios_i2c_adapter * i2c_adapter)
   }
   portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken); /* FIXME: is this the right place for this? */
 #endif /* USE_FREERTOS */
+}
+
+static void go_stopped (struct pios_i2c_adapter * i2c_adapter)
+{
+  I2C_ITConfig(i2c_adapter->cfg->regs, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, DISABLE);
+  I2C_AcknowledgeConfig(i2c_adapter->cfg->regs, ENABLE);
 }
 
 static void go_starting (struct pios_i2c_adapter * i2c_adapter)
@@ -536,9 +534,21 @@ static void i2c_adapter_process_auto(struct pios_i2c_adapter * i2c_adapter)
 static void i2c_adapter_fsm_init(struct pios_i2c_adapter * i2c_adapter)
 {
   i2c_adapter->curr_state = I2C_STATE_STOPPED;
-  //go_stopped(i2c_adapter);
 }
 
+static bool i2c_adapter_wait_for_stopped(struct pios_i2c_adapter * i2c_adapter)
+{
+  /*
+   * Wait for the bus to return to the stopped state.
+   * This was pulled out of the FSM due to occasional
+   * failures at this transition which previously resulted
+   * in spinning on this bit in the ISR forever.
+   */
+#define I2C_CR1_STOP_REQUESTED 0x0200
+  while (i2c_adapter->cfg->regs->CR1 & I2C_CR1_STOP_REQUESTED) continue;
+
+  return true;
+}
 
 #include <pios_i2c_priv.h>
 
@@ -551,6 +561,18 @@ static struct pios_i2c_adapter * find_i2c_adapter_by_id (uint8_t adapter)
 
   /* Get a handle for the device configuration */
   return &(pios_i2c_adapters[adapter]);
+}
+
+/* Return true if the FSM is in a terminal state */
+static bool i2c_adapter_fsm_terminated(struct pios_i2c_adapter * i2c_adapter)
+{
+  switch (i2c_adapter->curr_state) {
+  case I2C_STATE_STOPPING:
+  case I2C_STATE_STOPPED:
+    return (true);
+  default:
+    return (false);
+  }
 }
 
 /**
@@ -696,10 +718,14 @@ bool PIOS_I2C_Transfer(uint8_t i2c, const struct pios_i2c_txn txn_list[], uint32
 #ifdef USE_FREERTOS
   xSemaphoreTake(i2c_adapter->sem_ready, portMAX_DELAY);
   xSemaphoreGive(i2c_adapter->sem_ready);
-#else
-  /* Spin waiting for the transfer to finish */
-  while (i2c_adapter->curr_state != I2C_STATE_STOPPED);
 #endif /* USE_FREERTOS */
+
+  /* Spin waiting for the transfer to finish */
+  while (!i2c_adapter_fsm_terminated(i2c_adapter));
+
+  if (i2c_adapter_wait_for_stopped(i2c_adapter)) {
+    i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_STOPPED);
+  }
 
 #ifdef USE_FREERTOS
   /* Unlock the bus */

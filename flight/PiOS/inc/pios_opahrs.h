@@ -50,8 +50,9 @@ extern enum opahrs_result PIOS_OPAHRS_bl_FwupStart(struct opahrs_msg_v0 * req, s
 extern enum opahrs_result PIOS_OPAHRS_bl_FwupData(struct opahrs_msg_v0 * req, struct opahrs_msg_v0 * rsp);
 extern enum opahrs_result PIOS_OPAHRS_bl_FwupVerify(struct opahrs_msg_v0 * rsp);
 extern enum opahrs_result PIOS_OPAHRS_bl_resync(void);
-
-
+extern enum opahrs_result PIOS_OPAHRS_bl_GetMemMap(struct opahrs_msg_v0 * rsp);
+extern enum opahrs_result PIOS_OPAHRS_bl_reset();
+extern enum opahrs_result PIOS_OPAHRS_bl_boot();
 /*
  * Protocol V1 messages used by application
  */

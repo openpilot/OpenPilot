@@ -85,7 +85,13 @@ struct opahrs_msg_v0_req_fwup_start {
 } __attribute__((__packed__));
 
 struct opahrs_msg_v0_req_fwup_data {
+	uint32_t adress;
+	uint32_t data;
 } __attribute__((__packed__));
+
+struct opahrs_msg_v0_req_mem_map {
+} __attribute__((__packed__));
+
 
 struct opahrs_msg_v0_req_fwup_verify {
 } __attribute__((__packed__));
@@ -96,6 +102,7 @@ union opahrs_msg_v0_req {
   struct opahrs_msg_v0_req_reset        reset;
   struct opahrs_msg_v0_req_boot         boot;
   struct opahrs_msg_v0_req_serial       serial;
+  struct opahrs_msg_v0_req_mem_map		mem_map;
   struct opahrs_msg_v0_req_fwup_start   fwup_start;
   struct opahrs_msg_v0_req_fwup_data    fwup_data;
   struct opahrs_msg_v0_req_fwup_verify  fwup_verify;
@@ -105,19 +112,32 @@ struct opahrs_msg_v0_rsp_versions {
   uint8_t  hw_version;
   uint16_t bl_version;
   uint32_t fw_version;
+  uint8_t	description[100];
 } __attribute__((__packed__));
 
 struct opahrs_msg_v0_rsp_serial {
   uint8_t  serial_bcd[24];
 } __attribute__((__packed__));
 
+enum bootloader_status{idle,started,start_failed,write_error,outside_dev_capabilities,jump_failed};
 struct opahrs_msg_v0_rsp_fwup_status {
+	enum bootloader_status status;
+} __attribute__((__packed__));
+
+enum hw_density {high_density,medium_density};
+struct opahrs_msg_v0_rsp_mem_map {
+	uint32_t start_of_user_code;
+	uint32_t size_of_code_memory;
+	uint8_t	 size_of_description;
+	uint8_t	 rw_flags;
+	enum hw_density density;
 } __attribute__((__packed__));
 
 union opahrs_msg_v0_rsp {
   struct opahrs_msg_v0_rsp_versions    versions;
   struct opahrs_msg_v0_rsp_serial      serial;
   struct opahrs_msg_v0_rsp_fwup_status fwup_status;
+  struct opahrs_msg_v0_rsp_mem_map	   mem_map;
 } __attribute__((__packed__));
 
 enum opahrs_msg_v0_tag {
@@ -127,6 +147,8 @@ enum opahrs_msg_v0_tag {
   OPAHRS_MSG_V0_REQ_BOOT,
   OPAHRS_MSG_V0_REQ_SERIAL,
 
+  OPAHRS_MSG_V0_REQ_MEM_MAP,
+
   OPAHRS_MSG_V0_REQ_FWUP_START,
   OPAHRS_MSG_V0_REQ_FWUP_DATA,
   OPAHRS_MSG_V0_REQ_FWUP_VERIFY,
@@ -134,6 +156,8 @@ enum opahrs_msg_v0_tag {
   OPAHRS_MSG_V0_RSP_VERSIONS,
   OPAHRS_MSG_V0_RSP_SERIAL,
   OPAHRS_MSG_V0_RSP_FWUP_STATUS,
+
+  OPAHRS_MSG_V0_RSP_MEM_MAP,
 };
 
 struct opahrs_msg_v0_payload {

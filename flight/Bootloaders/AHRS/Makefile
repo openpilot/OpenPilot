@@ -68,7 +68,7 @@ TARGET = AHRS_BL
 # Paths
 AHRS_BL = ./
 AHRS_BLINC = $(AHRS_BL)/inc
-PIOS = ../PiOS
+PIOS = ../../PiOS
 PIOSINC = $(PIOS)/inc
 FLIGHTLIB = ../Libraries
 FLIGHTLIBINC = ../Libraries/inc

@@ -102,7 +102,7 @@ typedef struct {
 } PIOS_HMC5843_ConfigTypeDef;
 
 /* Local Variables */
-static bool pios_hmc5843_data_ready;
+volatile bool pios_hmc5843_data_ready;
 
 static void PIOS_HMC5843_Config(PIOS_HMC5843_ConfigTypeDef *HMC5843_Config_Struct);
 static bool PIOS_HMC5843_Read(uint8_t address, uint8_t *buffer, uint8_t len);

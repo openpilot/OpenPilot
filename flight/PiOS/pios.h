@@ -93,6 +93,9 @@
 #include <pios_hmc5843.h>
 #endif
 
+#if defined(PIOS_INCLUDE_BL_HELPER)
+#include <pios_bl_helper.h>
+#endif
 
 #if defined(PIOS_INCLUDE_USB)
 /* USB Libs */

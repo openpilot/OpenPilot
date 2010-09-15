@@ -194,7 +194,6 @@ static uint8_t adc_oversampling = 15;
  * @}
  */
 
-
 /**
  * @brief AHRS Main function
  */
@@ -294,8 +293,10 @@ int main()
         }
         
 #if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
-        // Get magnetic readings
-        PIOS_HMC5843_ReadMag(mag_data.raw.axis);
+	// Get magnetic readings
+	if (PIOS_HMC5843_NewDataAvailable()) {
+		PIOS_HMC5843_ReadMag(mag_data.raw.axis);
+	}
 #endif        
         // Delay for valid data
 		

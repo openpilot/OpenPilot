@@ -320,7 +320,11 @@ void USART2_IRQHandler() __attribute__ ((alias ("PIOS_USART_telem_irq_handler"))
 const struct pios_usart_cfg pios_usart_telem_cfg = {
   .regs  = USART2,
   .init = {
-    .USART_BaudRate            = 57600,
+    #if defined (PIOS_COM_TELEM_BAUDRATE)
+        .USART_BaudRate        = PIOS_COM_TELEM_BAUDRATE,
+    #else
+        .USART_BaudRate        = 57600,
+    #endif
     .USART_WordLength          = USART_WordLength_8b,
     .USART_Parity              = USART_Parity_No,
     .USART_StopBits            = USART_StopBits_1,
@@ -363,7 +367,11 @@ const struct pios_usart_cfg pios_usart_gps_cfg = {
   .regs = USART3,
   .remap = GPIO_PartialRemap_USART3,
   .init = {
-    .USART_BaudRate            = 57600,
+    #if defined (PIOS_COM_GPS_BAUDRATE)
+        .USART_BaudRate        = PIOS_COM_GPS_BAUDRATE,
+    #else
+        .USART_BaudRate        = 57600,
+    #endif
     .USART_WordLength          = USART_WordLength_8b,
     .USART_Parity              = USART_Parity_No,
     .USART_StopBits            = USART_StopBits_1,
@@ -406,7 +414,11 @@ void USART1_IRQHandler() __attribute__ ((alias ("PIOS_USART_aux_irq_handler")));
 const struct pios_usart_cfg pios_usart_aux_cfg = {
   .regs = USART1,
   .init = {
-    .USART_BaudRate            = 57600,
+    #if defined (PIOS_COM_AUX_BAUDRATE)
+        .USART_BaudRate        = PIOS_COM_AUX_BAUDRATE,
+    #else
+        .USART_BaudRate        = 57600,
+    #endif
     .USART_WordLength          = USART_WordLength_8b,
     .USART_Parity              = USART_Parity_No,
     .USART_StopBits            = USART_StopBits_1,
@@ -451,7 +463,11 @@ void USART1_IRQHandler() __attribute__ ((alias ("PIOS_USART_spektrum_irq_handler
 const struct pios_usart_cfg pios_usart_spektrum_cfg = {
   .regs = USART1,
   .init = {
-    .USART_BaudRate            = 115200,
+    #if defined (PIOS_COM_SPEKTRUM_BAUDRATE)
+        .USART_BaudRate        = PIOS_COM_SPEKTRUM_BAUDRATE,
+    #else
+        .USART_BaudRate        = 115200,
+    #endif
     .USART_WordLength          = USART_WordLength_8b,
     .USART_Parity              = USART_Parity_No,
     .USART_StopBits            = USART_StopBits_1,

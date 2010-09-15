@@ -4,10 +4,12 @@
 #include "op_dfu.h"
 #include <QStringList>
 
-#define PRIVATE false
+#define PRIVATE true
 
 int main(int argc, char *argv[])
 {
+//    OP_DFU dfu(false);
+//    dfu.test();
     QCoreApplication a(argc, argv);
     if(argc>1||!PRIVATE)
     {
@@ -37,7 +39,7 @@ int main(int argc, char *argv[])
             cout<<"| -d <number Of Device : (requires: -p or -dn)                           |\n";
             cout<<"| -w <description>     : (requires: -p)                                  |\n";
             cout<<"| -ca <file>           : compares byte by byte current firmware with file|\n";
-            cout<<"| -ch <file>           : compares hash of current firmware with file     |\n";
+            cout<<"| -cc <file>           : compares CRC  of current firmware with file     |\n";
             cout<<"| -s                   : requests status of device                       |\n";
             cout<<"| -r                   : resets the device                               |\n";
             cout<<"| -j                   : exits bootloader and jumps to user FW           |\n";
@@ -55,17 +57,7 @@ int main(int argc, char *argv[])
 
 
         }
-        //        else if(args.contains(DOWNDESCRIPTION))
-        //        {
-        //            action=OP_DFU::downdesc;
-        //            if(args.contains(DEVICE))
-        //            {
-        //                if(args.indexOf(DEVICE)+1<args.length())
-        //                {
-        //                    device=(args[args.indexOf(DEVICE)+1]).toInt();
-        //                }
-        //            }
-        //        }
+
         else if(args.contains(PROGRAMFW))
         {
             if(args.contains(VERIFY))
@@ -205,8 +197,10 @@ int main(int argc, char *argv[])
                     cout<<"Device Readable="<<dfu.devices[x].Readable<<"\n";
                     cout<<"Device Writable="<<dfu.devices[x].Writable<<"\n";
                     cout<<"Device SizeOfCode="<<dfu.devices[x].SizeOfCode<<"\n";
-                    cout<<"Device SizeOfHash="<<dfu.devices[x].SizeOfHash<<"\n";
+                    cout<<"BL Version="<<dfu.devices[x].BL_Version<<"\n";
                     cout<<"Device SizeOfDesc="<<dfu.devices[x].SizeOfDesc<<"\n";
+                    cout<<"FW CRC="<<dfu.devices[x].FW_CRC<<"\n";
+
                     int size=((OP_DFU::device)dfu.devices[x]).SizeOfDesc;
                     cout<<"Description:"<<dfu.DownloadDescription(size).toLatin1().data()<<"\n";
                     cout<<"\n";
@@ -225,10 +219,10 @@ int main(int argc, char *argv[])
             }
             if (action==OP_DFU::actionProgram)
             {
-                OP_DFU::Status retstatus=dfu.UploadFirmware(file.toAscii(),verify);
+                OP_DFU::Status retstatus=dfu.UploadFirmware(file.toAscii(),verify, device);
                 if(retstatus!=OP_DFU::Last_operation_Success)
                 {
-                    cout<<"Upload failed with code:"<<dfu.StatusToString(retstatus).data();
+                    cout<<"Upload failed with code:"<<dfu.StatusToString(retstatus).toLatin1().data();
                     return -1;
                 }
                 if(!description.isEmpty())
@@ -280,27 +274,10 @@ int main(int argc, char *argv[])
 
         return 0;
     }
+    //OP_DFU dfu(false);
+    //dfu.findDevices();
 
-    OP_DFU dfu(true);
-    dfu.enterDFU(0);
-    //    dfu.enterDFU(1);
-    //    dfu.StartUpload(4,OP_DFU::Descript);
-    //    QByteArray array;
-    //    array[0]=11;
-    //    array[1]=2;
-    //    array[2]=3;
-    //    array[3]=4;
-    //    array[4]=5;
-    //    array[5]=6;
-    //    array[6]=7;
-    //    array[7]=8;
-    //    dfu.UploadData(8,array);
-    //   dfu.UploadDescription(1,"jose manuel");
-    // QString str=dfu.DownloadDescription(1,12);
-    // dfu.JumpToApp();
-    //  dfu.findDevices();
-
-    dfu.UploadFirmware("c:/openpilot.bin",true);
+    //dfu.UploadFirmware("c:/openpilot.bin",true,0);
     // dfu.UploadDescription("josemanuel");
     //  QString str=dfu.DownloadDescription(12);
     // dfu.JumpToApp();

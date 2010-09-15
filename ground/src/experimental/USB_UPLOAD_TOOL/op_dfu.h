@@ -18,7 +18,7 @@ using namespace std;
 #define PROGRAMFW           "-p"     //done
 #define PROGRAMDESC         "-w"     //done
 #define VERIFY              "-v"     //done
-#define COMPAREHASH         "-ch"
+#define COMPAREHASH         "-cc"
 #define COMPAREALL          "-ca"
 #define STATUSREQUEST       "-s"    //done
 #define LISTDEVICES         "-ls"   //done
@@ -31,7 +31,6 @@ public:
     enum TransferTypes
     {
         FW,
-        Hash,
         Descript
     };
     enum CompareType
@@ -52,6 +51,8 @@ public:
         idle,
         Last_operation_failed,
         outsideDevCapabilities,
+        CRC_Fail,
+        failed_jump,
         abort
 
     };
@@ -88,7 +89,8 @@ public:
     struct device
     {
             int ID;
-            int SizeOfHash;
+            quint32 FW_CRC;
+            int BL_Version;
             int SizeOfDesc;
             quint32 SizeOfCode;
             bool Readable;
@@ -98,10 +100,10 @@ public:
     void JumpToApp();
     void ResetDevice(void);
     bool enterDFU(int const &devNumber);
-    bool StartUpload(qint32  const &numberOfBytes, TransferTypes const & type);
+    bool StartUpload(qint32  const &numberOfBytes, TransferTypes const & type,quint32 crc);
     bool UploadData(qint32 const & numberOfPackets,QByteArray  & data);
     Status UploadDescription(QString  & description);
-    Status UploadFirmware(const QString &sfile, const bool &verify);
+    Status UploadFirmware(const QString &sfile, const bool &verify,int device);
     Status StatusRequest();
     bool EndOperation();
     void printProgBar( int const & percent,QString const& label);
@@ -116,6 +118,9 @@ public:
     int numberOfDevices;
     QString StatusToString(OP_DFU::Status  const & status);
     OP_DFU::Status CompareFirmware(const QString &sfile, const CompareType &type);
+    quint32 CRC32WideFast(quint32 Crc, quint32 Size, quint32 *Buffer);
+    quint32 CRCFromQBArray(QByteArray array, quint32 Size);
+    void test();
 private:
     bool debug;
     int RWFlags;
@@ -123,5 +128,7 @@ private:
     pjrc_rawhid hidHandle;
     int setStartBit(int command){return command|0x20;}
 };
+
+
 
 #endif // OP_DFU_H

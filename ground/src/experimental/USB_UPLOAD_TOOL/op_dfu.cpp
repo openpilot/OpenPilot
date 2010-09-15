@@ -64,7 +64,7 @@ bool OP_DFU::enterDFU(int const &devNumber)
         qDebug() << result << " bytes sent";
     return true;
 }
-bool OP_DFU::StartUpload(qint32 const & numberOfBytes, TransferTypes const & type)
+bool OP_DFU::StartUpload(qint32 const & numberOfBytes, TransferTypes const & type,quint32 crc)
 {
     int lastPacketCount;
     qint32 numberOfPackets=numberOfBytes/4/14;
@@ -87,8 +87,11 @@ bool OP_DFU::StartUpload(qint32 const & numberOfBytes, TransferTypes const & typ
     buf[5] = numberOfPackets;//DFU Count
     buf[6] = (int)type;//DFU Data0
     buf[7] = lastPacketCount;//DFU Data1
-    buf[8] = 1;//DFU Data2
-    buf[9] = 1;//DFU Data3
+    buf[8] = crc>>24;
+    buf[9] = crc>>16;
+    buf[10] = crc>>8;
+    buf[11] = crc;
+
     qDebug()<<"Number of packets:"<<numberOfPackets<<" Size of last packet:"<<lastPacketCount;
     int result = hidHandle.send(0,buf, BUF_LEN, 5000);
     if(debug)
@@ -101,6 +104,7 @@ bool OP_DFU::StartUpload(qint32 const & numberOfBytes, TransferTypes const & typ
 }
 bool OP_DFU::UploadData(qint32 const & numberOfBytes, QByteArray  & data)
 {
+    qDebug()<<(int)data[0];
     int lastPacketCount;
     qint32 numberOfPackets=numberOfBytes/4/14;
     int pad=(numberOfBytes-numberOfPackets*4*14)/4;
@@ -147,6 +151,7 @@ bool OP_DFU::UploadData(qint32 const & numberOfBytes, QByteArray  & data)
 
         //        }
         // qDebug()<<" Data0="<<(int)data[0]<<" Data0="<<(int)data[1]<<" Data0="<<(int)data[2]<<" Data0="<<(int)data[3]<<" buf6="<<(int)buf[6]<<" buf7="<<(int)buf[7]<<" buf8="<<(int)buf[8]<<" buf9="<<(int)buf[9];
+
         int result = hidHandle.send(0,buf, BUF_LEN, 5000);
         if(result<1)
         {
@@ -170,7 +175,7 @@ OP_DFU::Status OP_DFU::UploadDescription(QString  & description)
         padding.fill(' ',pad);
         description.append(padding);
     }
-    if(!StartUpload(description.length(),OP_DFU::Descript))
+    if(!StartUpload(description.length(),OP_DFU::Descript,0))
         return OP_DFU::abort;
     QByteArray array=description.toAscii();
     if(!UploadData(description.length(),array))
@@ -181,10 +186,11 @@ OP_DFU::Status OP_DFU::UploadDescription(QString  & description)
     {
         return OP_DFU::abort;
     }
-    OP_DFU::Status ret=StatusRequest();
+    int ret=StatusRequest();
+    qDebug()<<"------"<<ret;
     if(debug)
         qDebug()<<"Upload description Status="<<ret;
-    return ret;
+    return (OP_DFU::Status)ret;
 }
 QString OP_DFU::DownloadDescription(int const & numberOfChars)
 {
@@ -194,6 +200,27 @@ QString OP_DFU::DownloadDescription(int const & numberOfChars)
     return str;
 
 }
+void OP_DFU::test()
+{
+    char buf[BUF_LEN];
+    int result;
+    buf[0]=0x02;
+    buf[1]=11;
+    buf[2]=11;
+    buf[63]=333;
+    while(true)
+    {
+        buf[0]=0x02;
+        ++buf[1];
+        ++buf[2];
+        ++buf[63];
+        hidHandle.send(0,buf,BUF_LEN,5000);
+        result = hidHandle.receive(0,buf,BUF_LEN,5000);
+
+        qDebug()<<"Result="<<result;
+        qDebug()<<(int)buf[0]<<":"<<(int)buf[1]<<":"<<(int)buf[2]<<":"<<(int)buf[63];
+    }}
+
 QByteArray OP_DFU::StartDownload(qint32 const & numberOfBytes, TransferTypes const & type)
 {
     int lastPacketCount;
@@ -359,9 +386,18 @@ bool OP_DFU::findDevices()
             int result = hidHandle.send(0,buf, BUF_LEN, 5000);
             result = hidHandle.receive(0,buf,BUF_LEN,5000);
             devices[x].ID=buf[9];
-            devices[x].SizeOfHash=buf[7];
+            devices[x].BL_Version=buf[7];
             devices[x].SizeOfDesc=buf[8];
+
             quint32 aux;
+            aux=(quint8)buf[10];
+            aux=aux<<8 |(quint8)buf[11];
+            aux=aux<<8 |(quint8)buf[12];
+            aux=aux<<8 |(quint8)buf[13];
+
+            devices[x].FW_CRC=aux;
+
+
             aux=(quint8)buf[2];
             aux=aux<<8 |(quint8)buf[3];
             aux=aux<<8 |(quint8)buf[4];
@@ -378,8 +414,9 @@ bool OP_DFU::findDevices()
                 qDebug()<<"Device Readable="<<devices[x].Readable;
                 qDebug()<<"Device Writable="<<devices[x].Writable;
                 qDebug()<<"Device SizeOfCode="<<devices[x].SizeOfCode;
-                qDebug()<<"Device SizeOfHash="<<devices[x].SizeOfHash;
                 qDebug()<<"Device SizeOfDesc="<<devices[x].SizeOfDesc;
+                qDebug()<<"BL Version="<<devices[x].BL_Version;
+                qDebug()<<"FW CRC="<<devices[x].FW_CRC;
             }
         }
     }
@@ -407,7 +444,7 @@ bool OP_DFU::EndOperation()
         return true;
     return false;
 }
-OP_DFU::Status OP_DFU::UploadFirmware(const QString &sfile, const bool &verify)
+OP_DFU::Status OP_DFU::UploadFirmware(const QString &sfile, const bool &verify,int device)
 {
     cout<<"Starting Firmware Uploading...\n";
     QFile file(sfile);
@@ -419,9 +456,7 @@ OP_DFU::Status OP_DFU::UploadFirmware(const QString &sfile, const bool &verify)
         return OP_DFU::abort;
     }
     QByteArray arr=file.readAll();
-    QByteArray hash=QCryptographicHash::hash(arr,QCryptographicHash::Sha1);
-    if(debug)
-        qDebug()<<"hash size="<<hash.length()<<" -"<<hash;
+
     if(debug)
         qDebug()<<"Bytes Loaded="<<arr.length();
     if(arr.length()%4!=0)
@@ -432,11 +467,21 @@ OP_DFU::Status OP_DFU::UploadFirmware(const QString &sfile, const bool &verify)
         pad=pad-arr.length();
         arr.append(QByteArray(pad,255));
     }
-    if(!StartUpload(arr.length(),FW))
+    quint32 crc=CRCFromQBArray(arr,devices[device].SizeOfCode);
+    if(!StartUpload(arr.length(),FW,crc))
     {
         if(debug)
             qDebug()<<"StartUpload failed";
         return OP_DFU::abort;
+    }
+    cout<<"Erasing memory";
+    for(int x=0;x<3;++x)
+    {
+        OP_DFU::Status ret=StatusRequest();
+        if (ret==OP_DFU::uploading)
+               break;
+        else
+             return OP_DFU::abort;
     }
     if(!UploadData(arr.length(),arr))
     {
@@ -469,7 +514,6 @@ OP_DFU::Status OP_DFU::UploadFirmware(const QString &sfile, const bool &verify)
             cout<<"Verify:FAILED\n";
             return OP_DFU::abort;
         }
-
     }
     else
     {
@@ -477,34 +521,7 @@ OP_DFU::Status OP_DFU::UploadFirmware(const QString &sfile, const bool &verify)
     }
     if(debug)
         qDebug()<<"Status="<<ret;
-    if(!StartUpload(hash.length(),Hash))
-    {
-        if(debug)
-            qDebug()<<"StartUpload failed";
-        return OP_DFU::abort;
-    }
-    cout<<"Firmware Uploading succeeded...going to upload hash\n";
-    if(!UploadData(hash.length(),hash))
-    {
-        if(debug)
-            qDebug()<<"Upload failed";
-        return OP_DFU::abort;
-    }
-    if(!EndOperation())
-    {
-        {
-            if(debug)
-                qDebug()<<"Upload failed";
-            return OP_DFU::abort;
-        }
-    }
-    ret=StatusRequest();
-    if(debug)
-        qDebug()<<"Status="<<ret;
-    if(ret==OP_DFU::Last_operation_Success)
-    {
-        cout<<"Hash Uploading succeeded...\n";
-    }
+    cout<<"Firmware Uploading succeeded\n";
     return ret;
 }
 OP_DFU::Status OP_DFU::CompareFirmware(const QString &sfile, const CompareType &type)
@@ -533,15 +550,15 @@ OP_DFU::Status OP_DFU::CompareFirmware(const QString &sfile, const CompareType &
     }
     if(type==OP_DFU::hashcompare)
     {
-        if(hash==StartDownload(hash.length(),OP_DFU::Hash))
-        {
-            cout<<"Compare Successfull Hashes MATCH!\n";
-        }
-        else
-        {
-            cout<<"Compare failed Hashes DONT MATCH!\n";
-        }
-        return StatusRequest();
+        //        if(hash==StartDownload(hash.length(),OP_DFU::Hash))
+        //        {
+        //            cout<<"Compare Successfull Hashes MATCH!\n";
+        //        }
+        //        else
+        //        {
+        //            cout<<"Compare failed Hashes DONT MATCH!\n";
+        //        }
+        //        return StatusRequest();
     }
     else
     {
@@ -591,6 +608,10 @@ QString OP_DFU::StatusToString(OP_DFU::Status const & status)
         return "Last_operation_failed";
     case outsideDevCapabilities:
         return "outsideDevCapabilities";
+    case CRC_Fail:
+        return "CRC check FAILED";
+    case failed_jump:
+        return "Jmp to user FW failed";
     case abort:
         return "abort";
     default:
@@ -614,4 +635,51 @@ void OP_DFU::printProgBar( int const & percent,QString const& label){
     std::cout<< "\r"<<label.toLatin1().data()<< "[" << bar << "] ";
     std::cout.width( 3 );
     std::cout<< percent << "%     " << std::flush;
+}
+quint32 OP_DFU::CRC32WideFast(quint32 Crc, quint32 Size, quint32 *Buffer)
+{
+    //Size = Size >> 2; // /4  Size passed in as a byte count, assumed to be a multiple of 4
+
+    while(Size--)
+    {
+        static const quint32 CrcTable[16] = { // Nibble lookup table for 0x04C11DB7 polynomial
+            0x00000000,0x04C11DB7,0x09823B6E,0x0D4326D9,0x130476DC,0x17C56B6B,0x1A864DB2,0x1E475005,
+            0x2608EDB8,0x22C9F00F,0x2F8AD6D6,0x2B4BCB61,0x350C9B64,0x31CD86D3,0x3C8EA00A,0x384FBDBD };
+
+        Crc = Crc ^ *((quint32 *)Buffer); // Apply all 32-bits
+
+        Buffer += 1;
+
+        // Process 32-bits, 4 at a time, or 8 rounds
+
+        Crc = (Crc << 4) ^ CrcTable[Crc >> 28]; // Assumes 32-bit reg, masking index to 4-bits
+        Crc = (Crc << 4) ^ CrcTable[Crc >> 28]; //  0x04C11DB7 Polynomial used in STM32
+        Crc = (Crc << 4) ^ CrcTable[Crc >> 28];
+        Crc = (Crc << 4) ^ CrcTable[Crc >> 28];
+        Crc = (Crc << 4) ^ CrcTable[Crc >> 28];
+        Crc = (Crc << 4) ^ CrcTable[Crc >> 28];
+        Crc = (Crc << 4) ^ CrcTable[Crc >> 28];
+        Crc = (Crc << 4) ^ CrcTable[Crc >> 28];
+    }
+
+    return(Crc);
+}
+quint32 OP_DFU::CRCFromQBArray(QByteArray array, quint32 Size)
+{
+    int pad=Size-array.length();
+    array.append(QByteArray(pad,255));
+    quint32 t[Size/4];
+    for(int x=0;x<array.length()/4;x++)
+    {
+        quint32 aux=0;
+        aux=(char)array[x*4+3]&0xFF;
+        aux=aux<<8;
+        aux+=(char)array[x*4+2]&0xFF;
+        aux=aux<<8;
+        aux+=(char)array[x*4+1]&0xFF;
+        aux=aux<<8;
+        aux+=(char)array[x*4+0]&0xFF;
+        t[x]=aux;
+    }
+    return CRC32WideFast(0xFFFFFFFF,Size/4,(quint32*)t);
 }

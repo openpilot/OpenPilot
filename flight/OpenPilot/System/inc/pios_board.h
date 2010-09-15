@@ -103,20 +103,25 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 //
 // See also pios_board.c
 //-------------------------
-#define PIOS_USART_RX_BUFFER_SIZE		1024
-#define PIOS_USART_TX_BUFFER_SIZE		256
+#define PIOS_USART_RX_BUFFER_SIZE       1024
+#define PIOS_USART_TX_BUFFER_SIZE       256
 
-#define PIOS_COM_TELEM_RF                       0
-#define PIOS_COM_GPS                            1
-#define PIOS_COM_TELEM_USB                      2
+#define PIOS_COM_TELEM_BAUDRATE         57600
+#define PIOS_COM_GPS_BAUDRATE           57600
+
+#define PIOS_COM_TELEM_RF               0
+#define PIOS_COM_GPS                    1
+#define PIOS_COM_TELEM_USB              2
 
 #ifdef PIOS_ENABLE_AUX_UART
-#define PIOS_COM_AUX                            3
-#define PIOS_COM_DEBUG                          PIOS_COM_AUX
+    #define PIOS_COM_AUX_BAUDRATE       57600
+	#define PIOS_COM_AUX                3
+	#define PIOS_COM_DEBUG              PIOS_COM_AUX
 #endif
 
 #ifdef PIOS_INCLUDE_SPEKTRUM
-#define PIOS_COM_SPEKTRUM                       3
+    #define PIOS_COM_SPEKTRUM_BAUDRATE  115200
+    #define PIOS_COM_SPEKTRUM           3
 #endif
 
 //-------------------------

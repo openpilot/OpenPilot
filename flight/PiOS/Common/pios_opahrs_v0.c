@@ -56,7 +56,6 @@ static int32_t opahrs_msg_txrx (const uint8_t * tx, uint8_t * rx, uint32_t len)
 	return (rc);
 }
 
-
 static enum opahrs_result opahrs_msg_v0_send_req (const struct opahrs_msg_v0 * req)
 {
 	int32_t rc;
@@ -76,10 +75,10 @@ static enum opahrs_result opahrs_msg_v0_send_req (const struct opahrs_msg_v0 * r
 		}
 
 		switch (rsp->head.type) {
-		case OPAHRS_MSG_TYPE_LINK:
+			case OPAHRS_MSG_TYPE_LINK:
 			switch (rsp->payload.link.state) {
-			case OPAHRS_MSG_LINK_STATE_BUSY:
-			case OPAHRS_MSG_LINK_STATE_INACTIVE:
+				case OPAHRS_MSG_LINK_STATE_BUSY:
+				case OPAHRS_MSG_LINK_STATE_INACTIVE:
 				/* Wait for a small delay and retry */
 #ifdef PIOS_INCLUDE_FREERTOS
 				vTaskDelay(20 / portTICK_RATE_MS);
@@ -87,13 +86,13 @@ static enum opahrs_result opahrs_msg_v0_send_req (const struct opahrs_msg_v0 * r
 				PIOS_DELAY_WaitmS(20);
 #endif
 				continue;
-			case OPAHRS_MSG_LINK_STATE_READY:
+				case OPAHRS_MSG_LINK_STATE_READY:
 				/* Peer was ready when we Tx'd so they have now Rx'd our message */
 				return OPAHRS_RESULT_OK;
 			}
 			break;
-		case OPAHRS_MSG_TYPE_USER_V0:
-		case OPAHRS_MSG_TYPE_USER_V1:
+			case OPAHRS_MSG_TYPE_USER_V0:
+			case OPAHRS_MSG_TYPE_USER_V1:
 			/* Wait for a small delay and retry */
 #ifdef PIOS_INCLUDE_FREERTOS
 			vTaskDelay(50 / portTICK_RATE_MS);
@@ -125,9 +124,9 @@ static enum opahrs_result opahrs_msg_v0_recv_rsp (enum opahrs_msg_v0_tag tag, st
 		}
 
 		switch (rsp->head.type) {
-		case OPAHRS_MSG_TYPE_LINK:
+			case OPAHRS_MSG_TYPE_LINK:
 			switch (rsp->payload.link.state) {
-			case OPAHRS_MSG_LINK_STATE_BUSY:
+				case OPAHRS_MSG_LINK_STATE_BUSY:
 				/* Wait for a small delay and retry */
 #ifdef PIOS_INCLUDE_FREERTOS
 				vTaskDelay(20 / portTICK_RATE_MS);
@@ -135,20 +134,20 @@ static enum opahrs_result opahrs_msg_v0_recv_rsp (enum opahrs_msg_v0_tag tag, st
 				PIOS_DELAY_WaitmS(20);
 #endif
 				continue;
-			case OPAHRS_MSG_LINK_STATE_INACTIVE:
-			case OPAHRS_MSG_LINK_STATE_READY:
+				case OPAHRS_MSG_LINK_STATE_INACTIVE:
+				case OPAHRS_MSG_LINK_STATE_READY:
 				/* somehow, we've missed our response */
 				return OPAHRS_RESULT_FAILED;
 			}
 			break;
-		case OPAHRS_MSG_TYPE_USER_V0:
+			case OPAHRS_MSG_TYPE_USER_V0:
 			if (rsp->payload.user.t == tag) {
 				return OPAHRS_RESULT_OK;
 			} else {
 				return OPAHRS_RESULT_FAILED;
 			}
 			break;
-		case OPAHRS_MSG_TYPE_USER_V1:
+			case OPAHRS_MSG_TYPE_USER_V1:
 			/* This isn't the type we expected */
 			return OPAHRS_RESULT_FAILED;
 			break;
@@ -169,8 +168,8 @@ static enum opahrs_result PIOS_OPAHRS_v0_simple_req (enum opahrs_msg_v0_tag req_
 	/* Send the message until it is received */
 	rc = opahrs_msg_v0_send_req (&req);
 	if ((rc == OPAHRS_RESULT_OK) && rsp) {
-	  /* We need a specific kind of reply, go get it */
-	  return opahrs_msg_v0_recv_rsp (rsp_type, rsp);
+		/* We need a specific kind of reply, go get it */
+		return opahrs_msg_v0_recv_rsp (rsp_type, rsp);
 	}
 
 	return rc;
@@ -181,8 +180,17 @@ enum opahrs_result PIOS_OPAHRS_bl_GetVersions(struct opahrs_msg_v0 * rsp)
 	if (!rsp) return OPAHRS_RESULT_FAILED;
 
 	return (PIOS_OPAHRS_v0_simple_req (OPAHRS_MSG_V0_REQ_VERSIONS,
-					   rsp,
-					   OPAHRS_MSG_V0_RSP_VERSIONS));
+					rsp,
+					OPAHRS_MSG_V0_RSP_VERSIONS));
+}
+
+enum opahrs_result PIOS_OPAHRS_bl_GetMemMap(struct opahrs_msg_v0 * rsp)
+{
+	if (!rsp) return OPAHRS_RESULT_FAILED;
+
+	return (PIOS_OPAHRS_v0_simple_req (OPAHRS_MSG_V0_REQ_MEM_MAP,
+					rsp,
+					OPAHRS_MSG_V0_RSP_MEM_MAP));
 }
 
 enum opahrs_result PIOS_OPAHRS_bl_GetSerial(struct opahrs_msg_v0 * rsp)
@@ -190,8 +198,8 @@ enum opahrs_result PIOS_OPAHRS_bl_GetSerial(struct opahrs_msg_v0 * rsp)
 	if (!rsp) return OPAHRS_RESULT_FAILED;
 
 	return (PIOS_OPAHRS_v0_simple_req (OPAHRS_MSG_V0_REQ_SERIAL,
-					   rsp,
-					   OPAHRS_MSG_V0_RSP_SERIAL));
+					rsp,
+					OPAHRS_MSG_V0_RSP_SERIAL));
 }
 
 enum opahrs_result PIOS_OPAHRS_bl_FwupStart(struct opahrs_msg_v0 * req, struct opahrs_msg_v0 * rsp)
@@ -233,10 +241,9 @@ enum opahrs_result PIOS_OPAHRS_bl_FwupVerify(struct opahrs_msg_v0 * rsp)
 	if (!rsp) return OPAHRS_RESULT_FAILED;
 
 	return (PIOS_OPAHRS_v0_simple_req (OPAHRS_MSG_V0_REQ_FWUP_VERIFY,
-					   rsp,
-					   OPAHRS_MSG_V0_RSP_FWUP_STATUS));
+					rsp,
+					OPAHRS_MSG_V0_RSP_FWUP_STATUS));
 }
-
 
 enum opahrs_result PIOS_OPAHRS_bl_resync(void)
 {
@@ -280,5 +287,21 @@ enum opahrs_result PIOS_OPAHRS_bl_resync(void)
 	return rc;
 }
 
+enum opahrs_result PIOS_OPAHRS_bl_reset()
+{
+	struct opahrs_msg_v0 rsp;
+	return (PIOS_OPAHRS_v0_simple_req (OPAHRS_MSG_V0_REQ_RESET,
+					&rsp,
+					OPAHRS_MSG_V0_RSP_FWUP_STATUS));
+}
+
+enum opahrs_result PIOS_OPAHRS_bl_boot()
+{
+	struct opahrs_msg_v0 rsp;
+
+	return (PIOS_OPAHRS_v0_simple_req (OPAHRS_MSG_V0_REQ_BOOT,
+					&rsp,
+					OPAHRS_MSG_V0_RSP_FWUP_STATUS));
+}
 #endif /* PIOS_INCLUDE_OPAHRS */
 

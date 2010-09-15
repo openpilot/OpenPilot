@@ -537,21 +537,18 @@ static void updateSettings()
 {
 	// Set port
 	telemetryPort = PIOS_COM_TELEM_RF;
+
 	// Retrieve settings
 	TelemetrySettingsGet(&settings);
+
 	// Set port speed
-	if (settings.Speed == TELEMETRYSETTINGS_SPEED_9600)
-	{
-		PIOS_COM_ChangeBaud(telemetryPort, 9600);
-	}
-	else if (settings.Speed == TELEMETRYSETTINGS_SPEED_57600)
-	{
-		PIOS_COM_ChangeBaud(telemetryPort, 57600);
-	}
-	else if (settings.Speed == TELEMETRYSETTINGS_SPEED_38400)
-	{
-		PIOS_COM_ChangeBaud(telemetryPort, 38400);
-	}
+	if (settings.Speed == TELEMETRYSETTINGS_SPEED_9600) PIOS_COM_ChangeBaud(telemetryPort, 9600);
+	else
+	if (settings.Speed == TELEMETRYSETTINGS_SPEED_38400) PIOS_COM_ChangeBaud(telemetryPort, 38400);
+	else
+	if (settings.Speed == TELEMETRYSETTINGS_SPEED_57600) PIOS_COM_ChangeBaud(telemetryPort, 57600);
+	else
+	if (settings.Speed == TELEMETRYSETTINGS_SPEED_115200) PIOS_COM_ChangeBaud(telemetryPort, 115200);
 }
 
 /**

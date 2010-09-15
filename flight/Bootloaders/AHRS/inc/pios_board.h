@@ -133,8 +133,9 @@ TIM8  |           |           |           |
 //-------------------------
 #define PIOS_USART_RX_BUFFER_SIZE		256
 #define PIOS_USART_TX_BUFFER_SIZE		256
-#define PIOS_COM_AUX				0
-#define PIOS_COM_DEBUG				PIOS_COM_AUX
+#define PIOS_COM_AUX_BAUDRATE		    115200
+#define PIOS_COM_AUX				    0
+#define PIOS_COM_DEBUG				    PIOS_COM_AUX
 
 //-------------------------
 // ADC

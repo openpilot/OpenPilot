@@ -44,6 +44,7 @@
 #include <pios_i2c_priv.h>
 
 enum i2c_adapter_event {
+  I2C_EVENT_BUS_ERROR,
   I2C_EVENT_START,
   I2C_EVENT_STARTED_MORE_TXN_READ,
   I2C_EVENT_STARTED_MORE_TXN_WRITE,
@@ -64,6 +65,7 @@ enum i2c_adapter_event {
 };
 
 static void go_fsm_fault (struct pios_i2c_adapter * i2c_adapter);
+static void go_bus_error (struct pios_i2c_adapter * i2c_adapter);
 static void go_stopping (struct pios_i2c_adapter * i2c_adapter);
 static void go_stopped (struct pios_i2c_adapter * i2c_adapter);
 static void go_starting (struct pios_i2c_adapter * i2c_adapter);
@@ -98,16 +100,25 @@ static void i2c_adapter_process_auto(struct pios_i2c_adapter * i2c_adapter);
 static void i2c_adapter_inject_event(struct pios_i2c_adapter * i2c_adapter, enum i2c_adapter_event event);
 static void i2c_adapter_fsm_init(struct pios_i2c_adapter * i2c_adapter);
 static bool i2c_adapter_wait_for_stopped(struct pios_i2c_adapter * i2c_adapter);
+static void i2c_adapter_reset_bus(struct pios_i2c_adapter * i2c_adapter);
 
 const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM_STATES] = {
   [I2C_STATE_FSM_FAULT] = {
     .entry_fn = go_fsm_fault,
   },
 
+  [I2C_STATE_BUS_ERROR] = {
+    .entry_fn = go_bus_error,
+    .next_state = {
+      [I2C_EVENT_AUTO]                   = I2C_STATE_STOPPING,
+    },
+  },
+
   [I2C_STATE_STOPPED] = {
     .entry_fn = go_stopped,
     .next_state = {
       [I2C_EVENT_START]                  = I2C_STATE_STARTING,
+      [I2C_EVENT_BUS_ERROR]              = I2C_STATE_BUS_ERROR,
     },
   },
 
@@ -115,6 +126,7 @@ const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM
     .entry_fn = go_stopping,
     .next_state = {
       [I2C_EVENT_STOPPED]                = I2C_STATE_STOPPED,
+      [I2C_EVENT_BUS_ERROR]              = I2C_STATE_BUS_ERROR,
     },
   },
 
@@ -125,6 +137,7 @@ const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM
       [I2C_EVENT_STARTED_MORE_TXN_WRITE] = I2C_STATE_W_MORE_TXN_ADDR,
       [I2C_EVENT_STARTED_LAST_TXN_READ]  = I2C_STATE_R_LAST_TXN_ADDR,
       [I2C_EVENT_STARTED_LAST_TXN_WRITE] = I2C_STATE_W_LAST_TXN_ADDR,
+      [I2C_EVENT_BUS_ERROR]              = I2C_STATE_BUS_ERROR,
     },
   },
 
@@ -138,6 +151,7 @@ const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM
       [I2C_EVENT_ADDR_SENT_LEN_EQ_1]     = I2C_STATE_R_MORE_TXN_PRE_ONE,
       [I2C_EVENT_ADDR_SENT_LEN_EQ_2]     = I2C_STATE_R_MORE_TXN_PRE_FIRST,
       [I2C_EVENT_ADDR_SENT_LEN_GT_2]     = I2C_STATE_R_MORE_TXN_PRE_FIRST,
+      [I2C_EVENT_BUS_ERROR]              = I2C_STATE_BUS_ERROR,
     },
   },
 
@@ -145,6 +159,7 @@ const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM
     .entry_fn = go_r_more_txn_pre_one,
     .next_state = {
       [I2C_EVENT_TRANSFER_DONE_LEN_EQ_1] = I2C_STATE_R_MORE_TXN_POST_LAST,
+      [I2C_EVENT_BUS_ERROR]              = I2C_STATE_BUS_ERROR,
     },
   },
 
@@ -153,6 +168,7 @@ const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM
     .next_state = {
       [I2C_EVENT_TRANSFER_DONE_LEN_EQ_2] = I2C_STATE_R_MORE_TXN_PRE_LAST,
       [I2C_EVENT_TRANSFER_DONE_LEN_GT_2] = I2C_STATE_R_MORE_TXN_PRE_MIDDLE,
+      [I2C_EVENT_BUS_ERROR]              = I2C_STATE_BUS_ERROR,
     },
   },
 
@@ -161,6 +177,7 @@ const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM
     .next_state = {
       [I2C_EVENT_TRANSFER_DONE_LEN_EQ_2] = I2C_STATE_R_MORE_TXN_PRE_LAST,
       [I2C_EVENT_TRANSFER_DONE_LEN_GT_2] = I2C_STATE_R_MORE_TXN_PRE_MIDDLE,
+      [I2C_EVENT_BUS_ERROR]              = I2C_STATE_BUS_ERROR,
     },
   },
 
@@ -168,6 +185,7 @@ const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM
     .entry_fn = go_r_more_txn_pre_last,
     .next_state = {
       [I2C_EVENT_TRANSFER_DONE_LEN_EQ_1] = I2C_STATE_R_MORE_TXN_POST_LAST,
+      [I2C_EVENT_BUS_ERROR]              = I2C_STATE_BUS_ERROR,
     },
   },
 
@@ -188,6 +206,7 @@ const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM
       [I2C_EVENT_ADDR_SENT_LEN_EQ_1]     = I2C_STATE_R_LAST_TXN_PRE_ONE,
       [I2C_EVENT_ADDR_SENT_LEN_EQ_2]     = I2C_STATE_R_LAST_TXN_PRE_FIRST,
       [I2C_EVENT_ADDR_SENT_LEN_GT_2]     = I2C_STATE_R_LAST_TXN_PRE_FIRST,
+      [I2C_EVENT_BUS_ERROR]              = I2C_STATE_BUS_ERROR,
     },
   },
 
@@ -195,6 +214,7 @@ const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM
     .entry_fn = go_r_last_txn_pre_one,
     .next_state = {
       [I2C_EVENT_TRANSFER_DONE_LEN_EQ_1] = I2C_STATE_R_LAST_TXN_POST_LAST,
+      [I2C_EVENT_BUS_ERROR]              = I2C_STATE_BUS_ERROR,
     },
   },
 
@@ -203,6 +223,7 @@ const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM
     .next_state = {
       [I2C_EVENT_TRANSFER_DONE_LEN_EQ_2] = I2C_STATE_R_LAST_TXN_PRE_LAST,
       [I2C_EVENT_TRANSFER_DONE_LEN_GT_2] = I2C_STATE_R_LAST_TXN_PRE_MIDDLE,
+      [I2C_EVENT_BUS_ERROR]              = I2C_STATE_BUS_ERROR,
     },
   },
 
@@ -211,6 +232,7 @@ const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM
     .next_state = {
       [I2C_EVENT_TRANSFER_DONE_LEN_EQ_2] = I2C_STATE_R_LAST_TXN_PRE_LAST,
       [I2C_EVENT_TRANSFER_DONE_LEN_GT_2] = I2C_STATE_R_LAST_TXN_PRE_MIDDLE,
+      [I2C_EVENT_BUS_ERROR]              = I2C_STATE_BUS_ERROR,
     },
   },
 
@@ -218,6 +240,7 @@ const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM
     .entry_fn = go_r_last_txn_pre_last,
     .next_state = {
       [I2C_EVENT_TRANSFER_DONE_LEN_EQ_1] = I2C_STATE_R_LAST_TXN_POST_LAST,
+      [I2C_EVENT_BUS_ERROR]              = I2C_STATE_BUS_ERROR,
     },
   },
 
@@ -239,6 +262,7 @@ const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM
       [I2C_EVENT_ADDR_SENT_LEN_EQ_1]     = I2C_STATE_W_MORE_TXN_LAST,
       [I2C_EVENT_ADDR_SENT_LEN_EQ_2]     = I2C_STATE_W_MORE_TXN_MIDDLE,
       [I2C_EVENT_ADDR_SENT_LEN_GT_2]     = I2C_STATE_W_MORE_TXN_MIDDLE,
+      [I2C_EVENT_BUS_ERROR]              = I2C_STATE_BUS_ERROR,
     },
   },
 
@@ -248,6 +272,7 @@ const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM
       [I2C_EVENT_TRANSFER_DONE_LEN_EQ_1] = I2C_STATE_W_MORE_TXN_LAST,
       [I2C_EVENT_TRANSFER_DONE_LEN_EQ_2] = I2C_STATE_W_MORE_TXN_MIDDLE,
       [I2C_EVENT_TRANSFER_DONE_LEN_GT_2] = I2C_STATE_W_MORE_TXN_MIDDLE,
+      [I2C_EVENT_BUS_ERROR]              = I2C_STATE_BUS_ERROR,
     },
   },
 
@@ -255,6 +280,7 @@ const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM
     .entry_fn = go_w_more_txn_last,
     .next_state = {
       [I2C_EVENT_TRANSFER_DONE_LEN_EQ_0] = I2C_STATE_STARTING,
+      [I2C_EVENT_BUS_ERROR]              = I2C_STATE_BUS_ERROR,
     },
   },
 
@@ -268,6 +294,7 @@ const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM
       [I2C_EVENT_ADDR_SENT_LEN_EQ_1]     = I2C_STATE_W_LAST_TXN_LAST,
       [I2C_EVENT_ADDR_SENT_LEN_EQ_2]     = I2C_STATE_W_LAST_TXN_MIDDLE,
       [I2C_EVENT_ADDR_SENT_LEN_GT_2]     = I2C_STATE_W_LAST_TXN_MIDDLE,
+      [I2C_EVENT_BUS_ERROR]              = I2C_STATE_BUS_ERROR,
     },
   },
 
@@ -277,6 +304,7 @@ const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM
       [I2C_EVENT_TRANSFER_DONE_LEN_EQ_1] = I2C_STATE_W_LAST_TXN_LAST,
       [I2C_EVENT_TRANSFER_DONE_LEN_EQ_2] = I2C_STATE_W_LAST_TXN_MIDDLE,
       [I2C_EVENT_TRANSFER_DONE_LEN_GT_2] = I2C_STATE_W_LAST_TXN_MIDDLE,
+      [I2C_EVENT_BUS_ERROR]              = I2C_STATE_BUS_ERROR,
     },
   },
 
@@ -284,6 +312,7 @@ const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM
     .entry_fn = go_w_last_txn_last,
     .next_state = {
       [I2C_EVENT_TRANSFER_DONE_LEN_EQ_0] = I2C_STATE_STOPPING,
+      [I2C_EVENT_BUS_ERROR]              = I2C_STATE_BUS_ERROR,
     },
   },
 };
@@ -291,6 +320,14 @@ const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM
 static void go_fsm_fault (struct pios_i2c_adapter * i2c_adapter)
 {
   PIOS_DEBUG_Assert(0);
+}
+
+static void go_bus_error (struct pios_i2c_adapter * i2c_adapter)
+{
+  /* Note that this transfer has hit a bus error */
+  i2c_adapter->bus_error = true;
+
+  i2c_adapter_reset_bus (i2c_adapter);
 }
 
 static void go_stopping (struct pios_i2c_adapter * i2c_adapter)
@@ -538,11 +575,14 @@ static void i2c_adapter_process_auto(struct pios_i2c_adapter * i2c_adapter)
 
 static void i2c_adapter_fsm_init(struct pios_i2c_adapter * i2c_adapter)
 {
+  i2c_adapter_reset_bus(i2c_adapter);
   i2c_adapter->curr_state = I2C_STATE_STOPPED;
 }
 
 static bool i2c_adapter_wait_for_stopped(struct pios_i2c_adapter * i2c_adapter)
 {
+  uint32_t guard;
+
   /*
    * Wait for the bus to return to the stopped state.
    * This was pulled out of the FSM due to occasional
@@ -550,10 +590,71 @@ static bool i2c_adapter_wait_for_stopped(struct pios_i2c_adapter * i2c_adapter)
    * in spinning on this bit in the ISR forever.
    */
 #define I2C_CR1_STOP_REQUESTED 0x0200
-  while (i2c_adapter->cfg->regs->CR1 & I2C_CR1_STOP_REQUESTED) continue;
+  for (guard = 1e6;	/* FIXME: should use the configured bus timeout */
+       guard && (i2c_adapter->cfg->regs->CR1 & I2C_CR1_STOP_REQUESTED);
+       guard--) continue;
+  if (!guard) {
+    /* We timed out waiting for the stop condition */
+    return false;
+  }
 
   return true;
 }
+
+static void i2c_adapter_reset_bus(struct pios_i2c_adapter * i2c_adapter)
+{
+  /* Reset the I2C block */
+  I2C_DeInit(i2c_adapter->cfg->regs);
+
+  /* Make sure the bus is free by clocking it until any slaves release the bus. */
+  GPIO_InitTypeDef scl_gpio_init;
+  scl_gpio_init           = i2c_adapter->cfg->scl.init;
+  scl_gpio_init.GPIO_Mode = GPIO_Mode_Out_OD;
+  GPIO_SetBits(i2c_adapter->cfg->scl.gpio, i2c_adapter->cfg->scl.init.GPIO_Pin);
+  GPIO_Init(i2c_adapter->cfg->scl.gpio, &scl_gpio_init);
+
+  GPIO_InitTypeDef sda_gpio_init;
+  sda_gpio_init           = i2c_adapter->cfg->sda.init;
+  sda_gpio_init.GPIO_Mode = GPIO_Mode_Out_OD;
+  GPIO_SetBits(i2c_adapter->cfg->sda.gpio, i2c_adapter->cfg->sda.init.GPIO_Pin);
+  GPIO_Init(i2c_adapter->cfg->sda.gpio, &sda_gpio_init);
+
+  for (uint8_t i = 0; i < 9; i++) {
+    /* Set clock high and wait for any clock stretching to finish. */
+    GPIO_SetBits(i2c_adapter->cfg->scl.gpio, i2c_adapter->cfg->scl.init.GPIO_Pin);
+    while (GPIO_ReadInputDataBit(i2c_adapter->cfg->scl.gpio, i2c_adapter->cfg->scl.init.GPIO_Pin) == Bit_RESET);
+    PIOS_DELAY_WaituS(2);
+    
+    /* Set clock low */
+    GPIO_ResetBits(i2c_adapter->cfg->scl.gpio, i2c_adapter->cfg->scl.init.GPIO_Pin);
+    PIOS_DELAY_WaituS(2);
+  }
+  
+  /* Set data and clock high and wait for any clock stretching to finish. */
+  GPIO_SetBits(i2c_adapter->cfg->sda.gpio, i2c_adapter->cfg->sda.init.GPIO_Pin);
+  GPIO_SetBits(i2c_adapter->cfg->scl.gpio, i2c_adapter->cfg->scl.init.GPIO_Pin);
+  while (GPIO_ReadInputDataBit(i2c_adapter->cfg->scl.gpio, i2c_adapter->cfg->scl.init.GPIO_Pin) == Bit_RESET);
+  /* Wait for data to be high */
+  while (GPIO_ReadInputDataBit(i2c_adapter->cfg->sda.gpio, i2c_adapter->cfg->sda.init.GPIO_Pin) != Bit_SET);
+  
+  /* Bus signals are guaranteed to be high (ie. free) after this point */
+  /* Initialize the GPIO pins to the peripheral function */
+  GPIO_Init(i2c_adapter->cfg->scl.gpio, &(i2c_adapter->cfg->scl.init));
+  GPIO_Init(i2c_adapter->cfg->sda.gpio, &(i2c_adapter->cfg->sda.init));
+
+  /* Reset the I2C block */
+  I2C_DeInit(i2c_adapter->cfg->regs);
+  
+  /* Initialize the I2C block */
+  I2C_Init(i2c_adapter->cfg->regs, &(i2c_adapter->cfg->init));
+
+#define I2C_BUSY 0x20
+  if (i2c_adapter->cfg->regs->SR2 & I2C_BUSY) {
+    /* Reset the I2C block */
+    I2C_SoftwareResetCmd(i2c_adapter->cfg->regs, ENABLE);
+    I2C_SoftwareResetCmd(i2c_adapter->cfg->regs, DISABLE);
+  }
+}    
 
 #include <pios_i2c_priv.h>
 
@@ -603,51 +704,6 @@ int32_t PIOS_I2C_Init(void)
     i2c_adapter->sem_busy = xSemaphoreCreateMutex();
 #endif // USE_FREERTOS
 
-    /* Initialize the state machine */
-    i2c_adapter_fsm_init(i2c_adapter);
-
-    /* Make sure the bus is free by clocking it until any slaves release the bus. */
-    GPIO_InitTypeDef scl_gpio_init;
-    scl_gpio_init           = i2c_adapter->cfg->scl.init;
-    scl_gpio_init.GPIO_Mode = GPIO_Mode_Out_OD;
-    GPIO_SetBits(i2c_adapter->cfg->scl.gpio, i2c_adapter->cfg->scl.init.GPIO_Pin);
-    GPIO_Init(i2c_adapter->cfg->scl.gpio, &scl_gpio_init);
-
-    GPIO_InitTypeDef sda_gpio_init;
-    sda_gpio_init           = i2c_adapter->cfg->sda.init;
-    sda_gpio_init.GPIO_Mode = GPIO_Mode_Out_OD;
-    GPIO_SetBits(i2c_adapter->cfg->sda.gpio, i2c_adapter->cfg->sda.init.GPIO_Pin);
-    GPIO_Init(i2c_adapter->cfg->sda.gpio, &sda_gpio_init);
-
-    i2c_adapter->bus_needed_reset = false;
-    for (uint8_t i = 0; i < 9; i++) {
-      /* Set clock high and wait for any clock stretching to finish. */
-      GPIO_SetBits(i2c_adapter->cfg->scl.gpio, i2c_adapter->cfg->scl.init.GPIO_Pin);
-      while (GPIO_ReadInputDataBit(i2c_adapter->cfg->scl.gpio, i2c_adapter->cfg->scl.init.GPIO_Pin) == Bit_RESET);
-      PIOS_DELAY_WaituS(2);
-
-      if (GPIO_ReadInputDataBit(i2c_adapter->cfg->sda.gpio, i2c_adapter->cfg->sda.init.GPIO_Pin) != Bit_SET) {
-	/* Note that the bus needed reset so we can tell this was useful */
-	i2c_adapter->bus_needed_reset = true;
-      }
-
-      /* Set clock low */
-      GPIO_ResetBits(i2c_adapter->cfg->scl.gpio, i2c_adapter->cfg->scl.init.GPIO_Pin);
-      PIOS_DELAY_WaituS(2);
-    }
-
-    /* Set data and clock high and wait for any clock stretching to finish. */
-    GPIO_SetBits(i2c_adapter->cfg->sda.gpio, i2c_adapter->cfg->sda.init.GPIO_Pin);
-    GPIO_SetBits(i2c_adapter->cfg->scl.gpio, i2c_adapter->cfg->scl.init.GPIO_Pin);
-    while (GPIO_ReadInputDataBit(i2c_adapter->cfg->scl.gpio, i2c_adapter->cfg->scl.init.GPIO_Pin) == Bit_RESET);
-    /* Wait for data to be high */
-    while (GPIO_ReadInputDataBit(i2c_adapter->cfg->sda.gpio, i2c_adapter->cfg->sda.init.GPIO_Pin) != Bit_SET);
-
-    /* Bus signals are guaranteed to be high (ie. free) after this point */
-    /* Initialize the GPIO pins to the peripheral function */
-    GPIO_Init(i2c_adapter->cfg->scl.gpio, &(i2c_adapter->cfg->scl.init));
-    GPIO_Init(i2c_adapter->cfg->sda.gpio, &(i2c_adapter->cfg->sda.init));
-
     /* Enable the associated peripheral clock */
     switch ((uint32_t)i2c_adapter->cfg->regs) {
     case (uint32_t)I2C1:
@@ -660,26 +716,8 @@ int32_t PIOS_I2C_Init(void)
       break;
     }
 
-#if 0 /* FIXME: is this reset necessary? Should it be done in the stopped state? */
-    /* Reset the I2C block */
-    I2C_SoftwareResetCmd(i2c_adapter->cfg->regs, ENABLE);
-    I2C_SoftwareResetCmd(i2c_adapter->cfg->regs, DISABLE);
-#endif
-
-    /* Reset the I2C block */
-    I2C_DeInit(i2c_adapter->cfg->regs);
-
-    /* Initialize the I2C block */
-    I2C_Init(i2c_adapter->cfg->regs, &(i2c_adapter->cfg->init));
-
-#if 1 /* FIXME: is this reset necessary? Should it be done in the stopped state? */
-#define I2C_BUSY 0x20
-    if (i2c_adapter->cfg->regs->SR2 & I2C_BUSY) {
-      /* Reset the I2C block */
-      I2C_SoftwareResetCmd(i2c_adapter->cfg->regs, ENABLE);
-      I2C_SoftwareResetCmd(i2c_adapter->cfg->regs, DISABLE);
-    }
-#endif
+    /* Initialize the state machine */
+    i2c_adapter_fsm_init(i2c_adapter);
 
     /* Configure and enable I2C interrupts */
     NVIC_Init(&(i2c_adapter->cfg->event.init));
@@ -717,6 +755,7 @@ bool PIOS_I2C_Transfer(uint8_t i2c, const struct pios_i2c_txn txn_list[], uint32
   xSemaphoreTake(i2c_adapter->sem_ready, portMAX_DELAY);
 #endif
 
+  i2c_adapter->bus_error = false;
   i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_START);
 
   /* Wait for the transfer to complete */
@@ -730,6 +769,8 @@ bool PIOS_I2C_Transfer(uint8_t i2c, const struct pios_i2c_txn txn_list[], uint32
 
   if (i2c_adapter_wait_for_stopped(i2c_adapter)) {
     i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_STOPPED);
+  } else {
+    i2c_adapter_fsm_init(i2c_adapter);
   }
 
 #ifdef USE_FREERTOS
@@ -737,7 +778,7 @@ bool PIOS_I2C_Transfer(uint8_t i2c, const struct pios_i2c_txn txn_list[], uint32
   xSemaphoreGive(i2c_adapter->sem_busy);
 #endif	/* USE_FREERTOS */
 
-  return TRUE;
+  return (!i2c_adapter->bus_error);
 }
 
 #endif
@@ -853,7 +894,7 @@ void PIOS_I2C_ER_IRQ_Handler(uint8_t i2c)
   PIOS_DEBUG_Assert(i2c_adapter);
 
   /* Fail hard on any errors for now */
-  PIOS_DEBUG_Assert(0);
+  i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_BUS_ERROR);
 }
 
 /**

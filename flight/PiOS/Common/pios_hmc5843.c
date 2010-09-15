@@ -116,13 +116,13 @@ void PIOS_HMC5843_Config(PIOS_HMC5843_ConfigTypeDef *HMC5843_Config_Struct)
 	MODE  |= (uint8_t) (HMC5843_Config_Struct->Mode);
 
 	// CRTL_REGA
-	PIOS_HMC5843_Write(PIOS_HMC5843_CONFIG_REG_A, CRTLA);
+	while(!PIOS_HMC5843_Write(PIOS_HMC5843_CONFIG_REG_A, CRTLA));
 
 	// CRTL_REGB
-	PIOS_HMC5843_Write(PIOS_HMC5843_CONFIG_REG_B, CRTLB);
+	while(!PIOS_HMC5843_Write(PIOS_HMC5843_CONFIG_REG_B, CRTLB));
 
 	// Mode register
-	PIOS_HMC5843_Write(PIOS_HMC5843_MODE_REG, MODE);
+	while(!PIOS_HMC5843_Write(PIOS_HMC5843_MODE_REG, MODE));
 }
 
 /**
@@ -133,8 +133,8 @@ void PIOS_HMC5843_ReadMag(int16_t out[3])
 	uint8_t buffer[6];
 	uint8_t crtlB;
 
-	PIOS_HMC5843_Read(PIOS_HMC5843_CONFIG_REG_B, &crtlB, 1);
-	PIOS_HMC5843_Read(PIOS_HMC5843_DATAOUT_XMSB_REG, buffer, 6);
+	while(!PIOS_HMC5843_Read(PIOS_HMC5843_CONFIG_REG_B, &crtlB, 1));
+	while(!PIOS_HMC5843_Read(PIOS_HMC5843_DATAOUT_XMSB_REG, buffer, 6));
 
 	switch(crtlB & 0xE0) {
 		case 0x00:
@@ -193,7 +193,7 @@ void PIOS_HMC5843_ReadMag(int16_t out[3])
 */
 void PIOS_HMC5843_ReadID(uint8_t out[4])
 {
-	PIOS_HMC5843_Read(PIOS_HMC5843_DATAOUT_IDA_REG, out, 3);
+	while(!PIOS_HMC5843_Read(PIOS_HMC5843_DATAOUT_IDA_REG, out, 3));
 	out[3] = '\0';
 }
 

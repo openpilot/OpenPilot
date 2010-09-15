@@ -45,6 +45,8 @@ struct pios_i2c_adapter_cfg {
 enum i2c_adapter_state {
   I2C_STATE_FSM_FAULT = 0, /* Must be zero so undefined transitions land here */
 
+  I2C_STATE_BUS_ERROR,
+
   I2C_STATE_STOPPED,
   I2C_STATE_STOPPING,
   I2C_STATE_STARTING,
@@ -82,7 +84,7 @@ struct pios_i2c_adapter {
   xSemaphoreHandle                    sem_ready;
 #endif
 
-  bool                                bus_needed_reset;
+  bool                                bus_error;
 
   volatile enum i2c_adapter_state     curr_state;
   const struct pios_i2c_txn         * first_txn;

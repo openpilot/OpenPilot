@@ -80,22 +80,16 @@ static void altitudeTask(void* parameters)
 	{
 		// Update the temperature data
 		PIOS_BMP085_StartADC(TemperatureConv);
-#if 0
 		xSemaphoreTake(PIOS_BMP085_EOC, portMAX_DELAY);
-#else
-		vTaskDelay( 5 / portTICK_RATE_MS );
-#endif
+
 		PIOS_BMP085_ReadADC();
 		// Convert from 1/10ths of degC to degC
 		data.Temperature = PIOS_BMP085_GetTemperature() / 10.0;
 
 		// Update the pressure data
 		PIOS_BMP085_StartADC(PressureConv);
-#if 0
 		xSemaphoreTake(PIOS_BMP085_EOC, portMAX_DELAY);
-#else
-		vTaskDelay( 26 / portTICK_RATE_MS );
-#endif
+
 		PIOS_BMP085_ReadADC();
 		// Convert from Pa to kPa
 		data.Pressure = PIOS_BMP085_GetPressure() / 1000.0;

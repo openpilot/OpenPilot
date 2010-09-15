@@ -617,18 +617,6 @@ void converge_insgps()
  * @brief SPI protocol handling requests for data from OP mainboard
  */
 
-/**
- * @brief What is this meant to do
- * @param[in] port
- * @param[in] prefix
- * @param[in] data
- * @param[in] len
- * @return None
- */
-void dump_spi_message(uint8_t port, const char * prefix, uint8_t * data, uint32_t len)
-{
-}
-
 static struct opahrs_msg_v1   link_tx_v1;
 static struct opahrs_msg_v1   link_rx_v1;
 static struct opahrs_msg_v1   user_rx_v1;
@@ -661,16 +649,8 @@ void process_spi_request(void)
     
     if (!msg_to_process) {
         /* Nothing to do */
-        //PIOS_COM_SendFormattedString(PIOS_COM_AUX, ".");
         return;
     }
-    
-    if (user_rx_v1.tail.magic != OPAHRS_MSG_MAGIC_TAIL) {
-        PIOS_COM_SendFormattedString(PIOS_COM_AUX, "x");
-    }
-    
-    /* We've got a message to process */
-    //dump_spi_message(PIOS_COM_AUX, "+", (uint8_t *)&user_rx_v1, sizeof(user_rx_v1));
     
     switch (user_rx_v1.payload.user.t) {
         case OPAHRS_MSG_V1_REQ_RESET:
@@ -680,20 +660,17 @@ void process_spi_request(void)
         case OPAHRS_MSG_V1_REQ_SERIAL:
             opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_SERIAL);
             PIOS_SYS_SerialNumberGet((char *)&(user_tx_v1.payload.user.v.rsp.serial.serial_bcd));
-            dump_spi_message(PIOS_COM_AUX, "I", (uint8_t *)&user_tx_v1, sizeof(user_tx_v1));
             lfsm_user_set_tx_v1 (&user_tx_v1);
             break;
         case OPAHRS_MSG_V1_REQ_ALGORITHM:
             opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_ALGORITHM);
             ahrs_algorithm = user_rx_v1.payload.user.v.req.algorithm.algorithm;
-            dump_spi_message(PIOS_COM_AUX, "A", (uint8_t *)&user_rx_v1, sizeof(user_rx_v1));
             lfsm_user_set_tx_v1 (&user_tx_v1);
             break;
         case OPAHRS_MSG_V1_REQ_NORTH:
             opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_NORTH);
             INSSetMagNorth(user_rx_v1.payload.user.v.req.north.Be);
             INSGPSInit(); // TODO: Better reinitialization when North is finally established
-            dump_spi_message(PIOS_COM_AUX, "N", (uint8_t *)&user_rx_v1, sizeof(user_rx_v1));
             lfsm_user_set_tx_v1 (&user_tx_v1);
             break;
         case OPAHRS_MSG_V1_REQ_CALIBRATION:
@@ -748,7 +725,6 @@ void process_spi_request(void)
             user_tx_v1.payload.user.v.rsp.calibration.mag_var[1]   = mag_var[1];
             user_tx_v1.payload.user.v.rsp.calibration.mag_var[2]   = mag_var[2];
             
-            dump_spi_message(PIOS_COM_AUX, "C", (uint8_t *)&user_rx_v1, sizeof(user_rx_v1));
             lfsm_user_set_tx_v1 (&user_tx_v1);
             break;      
         case OPAHRS_MSG_V1_REQ_ATTITUDERAW:
@@ -776,7 +752,6 @@ void process_spi_request(void)
             user_tx_v1.payload.user.v.rsp.attituderaw.accels_filtered.y      = accel_data.filtered.y;
             user_tx_v1.payload.user.v.rsp.attituderaw.accels_filtered.z      = accel_data.filtered.z;
             
-            dump_spi_message(PIOS_COM_AUX, "R", (uint8_t *)&user_tx_v1, sizeof(user_tx_v1));
             lfsm_user_set_tx_v1 (&user_tx_v1);
             break;
         case OPAHRS_MSG_V1_REQ_UPDATE:
@@ -815,7 +790,6 @@ void process_spi_request(void)
             // compute the idle fraction
             user_tx_v1.payload.user.v.rsp.update.load = ((float) running_counts / (float) (idle_counts+running_counts)) * 100;
             
-            dump_spi_message(PIOS_COM_AUX, "U", (uint8_t *)&user_tx_v1, sizeof(user_tx_v1));
             lfsm_user_set_tx_v1 (&user_tx_v1);
             break;
         default:

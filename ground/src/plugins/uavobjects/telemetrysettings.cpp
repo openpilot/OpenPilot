@@ -48,6 +48,7 @@ TelemetrySettings::TelemetrySettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSET
     SpeedEnumOptions.append("9600");
     SpeedEnumOptions.append("38400");
     SpeedEnumOptions.append("57600");
+    SpeedEnumOptions.append("115200");
     fields.append( new UAVObjectField(QString("Speed"), QString(""), UAVObjectField::ENUM, SpeedElemNames, SpeedEnumOptions) );
 
     // Initialize object

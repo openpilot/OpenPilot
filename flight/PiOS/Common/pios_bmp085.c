@@ -204,12 +204,14 @@ bool PIOS_BMP085_Read(uint8_t address, uint8_t *buffer, uint8_t len)
 
   const struct pios_i2c_txn txn_list[] = {
     {
+      .info = __func__,
       .addr = BMP085_I2C_ADDR,
       .rw   = PIOS_I2C_TXN_WRITE,
       .len  = sizeof(addr_buffer),
       .buf  = addr_buffer,
     },
     {
+      .info = __func__,
       .addr = BMP085_I2C_ADDR,
       .rw   = PIOS_I2C_TXN_READ,
       .len  = len,
@@ -238,6 +240,7 @@ bool PIOS_BMP085_Write(uint8_t address, uint8_t buffer)
 
   const struct pios_i2c_txn txn_list[] = {
     {
+      .info = __func__,
       .addr = BMP085_I2C_ADDR,
       .rw   = PIOS_I2C_TXN_WRITE,
       .len  = sizeof(data),

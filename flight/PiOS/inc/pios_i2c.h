@@ -40,6 +40,7 @@ enum pios_i2c_txn_direction {
 };
 
 struct pios_i2c_txn {
+  const char                  * info;
   uint16_t                      addr;
   enum pios_i2c_txn_direction   rw;
   uint32_t                      len;

@@ -34,11 +34,79 @@
 
 #if defined(PIOS_INCLUDE_HMC5843)
 
+/* HMC5843 Addresses */
+#define PIOS_HMC5843_I2C_ADDR			0x1E
+#define PIOS_HMC5843_CONFIG_REG_A		(uint8_t)0x00
+#define PIOS_HMC5843_CONFIG_REG_B		(uint8_t)0x01
+#define PIOS_HMC5843_MODE_REG			(uint8_t)0x02
+#define PIOS_HMC5843_DATAOUT_XMSB_REG		0x03
+#define PIOS_HMC5843_DATAOUT_XLSB_REG		0x04
+#define PIOS_HMC5843_DATAOUT_YMSB_REG		0x05
+#define PIOS_HMC5843_DATAOUT_YLSB_REG		0x06
+#define PIOS_HMC5843_DATAOUT_ZMSB_REG		0x07
+#define PIOS_HMC5843_DATAOUT_ZLSB_REG		0x08
+#define PIOS_HMC5843_DATAOUT_STATUS_REG		0x09
+#define PIOS_HMC5843_DATAOUT_IDA_REG		0x0A
+#define PIOS_HMC5843_DATAOUT_IDB_REG		0x0B
+#define PIOS_HMC5843_DATAOUT_IDC_REG		0x0C
+
+/* Output Data Rate */
+#define PIOS_HMC5843_ODR_05			0x00
+#define PIOS_HMC5843_ODR_1			0x04
+#define PIOS_HMC5843_ODR_2			0x08
+#define PIOS_HMC5843_ODR_5			0x0C
+#define PIOS_HMC5843_ODR_10			0x10
+#define PIOS_HMC5843_ODR_20			0x14
+#define PIOS_HMC5843_ODR_50			0x18
+
+/* Measure configuration */
+#define PIOS_HMC5843_MEASCONF_NORMAL		0x00
+#define PIOS_HMC5843_MEASCONF_BIAS_POS		0x01
+#define PIOS_HMC5843_MEASCONF_BIAS_NEG		0x02
+
+/* Gain settings */
+#define PIOS_HMC5843_GAIN_0_7			0x00
+#define PIOS_HMC5843_GAIN_1			0x20
+#define PIOS_HMC5843_GAIN_1_5			0x40
+#define PIOS_HMC5843_GAIN_2			0x60
+#define PIOS_HMC5843_GAIN_3_2			0x80
+#define PIOS_HMC5843_GAIN_3_8			0xA0
+#define PIOS_HMC5843_GAIN_4_5			0xC0
+#define PIOS_HMC5843_GAIN_6_5			0xE0
+
+/* Modes */
+#define PIOS_HMC5843_MODE_CONTINUOUS		0x00
+#define PIOS_HMC5843_MODE_SINGLE		0x01
+#define PIOS_HMC5843_MODE_IDLE			0x02
+#define PIOS_HMC5843_MODE_SLEEP			0x02
+
+/* Sensitivity Conversion Values */
+#define PIOS_HMC5843_Sensitivity_0_7Ga		1602	// LSB/Ga
+#define PIOS_HMC5843_Sensitivity_1Ga		1300	// LSB/Ga
+#define PIOS_HMC5843_Sensitivity_1_5Ga		970	// LSB/Ga
+#define PIOS_HMC5843_Sensitivity_2Ga		780	// LSB/Ga
+#define PIOS_HMC5843_Sensitivity_3_2Ga		530	// LSB/Ga
+#define PIOS_HMC5843_Sensitivity_3_8Ga		460	// LSB/Ga
+#define PIOS_HMC5843_Sensitivity_4_5Ga		390	// LSB/Ga
+#define PIOS_HMC5843_Sensitivity_6_5Ga		280	// LSB/Ga  --> NOT RECOMMENDED
+
 /* Global Variables */
 
 
+/* Local Types */
+typedef struct {
+	uint8_t M_ODR;       /* OUTPUT DATA RATE --> here below the relative define (See datasheet page 11 for more details) */
+	uint8_t Meas_Conf;   /* Measurement Configuration,: Normal, positive bias, or negative bias --> here below the relative define */
+	uint8_t Gain;        /* Gain Configuration, select the full scale --> here below the relative define (See datasheet page 11 for more details) */
+	uint8_t Mode;
+} PIOS_HMC5843_ConfigTypeDef;
+
 /* Local Variables */
 static bool pios_hmc5843_data_ready;
+
+static void PIOS_HMC5843_Config(PIOS_HMC5843_ConfigTypeDef *HMC5843_Config_Struct);
+static bool PIOS_HMC5843_Read(uint8_t address, uint8_t *buffer, uint8_t len);
+static bool PIOS_HMC5843_Write(uint8_t address, uint8_t buffer);
 
 /**
   * @brieft Initialise the HMC5843 sensor
@@ -71,6 +139,14 @@ void PIOS_HMC5843_Init(void)
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
+
+	/* Configure the HMC5843 Sensor */
+	PIOS_HMC5843_ConfigTypeDef HMC5843_InitStructure;
+	HMC5843_InitStructure.M_ODR = PIOS_HMC5843_ODR_10;
+	HMC5843_InitStructure.Meas_Conf = PIOS_HMC5843_MEASCONF_NORMAL;
+	HMC5843_InitStructure.Gain = PIOS_HMC5843_GAIN_2;
+	HMC5843_InitStructure.Mode = PIOS_HMC5843_MODE_CONTINUOUS;
+	PIOS_HMC5843_Config(&HMC5843_InitStructure);
 
 	pios_hmc5843_data_ready = false;
 }
@@ -132,7 +208,7 @@ void PIOS_HMC5843_Init(void)
 *              1  |  0   |  Negative Bias
 *              1  |  1   |  Sleep Mode
 */
-void PIOS_HMC5843_Config(PIOS_HMC5843_ConfigTypeDef *HMC5843_Config_Struct)
+static void PIOS_HMC5843_Config(PIOS_HMC5843_ConfigTypeDef *HMC5843_Config_Struct)
 {
 	uint8_t CRTLA = 0x00;
 	uint8_t CRTLB = 0x00;
@@ -241,7 +317,7 @@ bool PIOS_HMC5843_NewDataAvailable(void)
 * \return -1 if error during I2C transfer
 * \return -4 if invalid length
 */
-bool PIOS_HMC5843_Read(uint8_t address, uint8_t *buffer, uint8_t len)
+static bool PIOS_HMC5843_Read(uint8_t address, uint8_t *buffer, uint8_t len)
 {
   uint8_t addr_buffer[] = {
     address,
@@ -275,7 +351,7 @@ bool PIOS_HMC5843_Read(uint8_t address, uint8_t *buffer, uint8_t len)
 * \return 0 if operation was successful
 * \return -1 if error during I2C transfer
 */
-bool PIOS_HMC5843_Write(uint8_t address, uint8_t buffer)
+static bool PIOS_HMC5843_Write(uint8_t address, uint8_t buffer)
 {
   uint8_t data[] = {
     address,

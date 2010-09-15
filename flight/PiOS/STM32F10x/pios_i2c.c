@@ -94,6 +94,7 @@ struct i2c_adapter_transition {
   enum i2c_adapter_state next_state[I2C_EVENT_NUM_EVENTS];
 };
 
+static void i2c_adapter_process_auto(struct pios_i2c_adapter * i2c_adapter);
 static void i2c_adapter_inject_event(struct pios_i2c_adapter * i2c_adapter, enum i2c_adapter_event event);
 static void i2c_adapter_fsm_init(struct pios_i2c_adapter * i2c_adapter);
 static bool i2c_adapter_wait_for_stopped(struct pios_i2c_adapter * i2c_adapter);
@@ -509,6 +510,10 @@ static void i2c_adapter_inject_event(struct pios_i2c_adapter * i2c_adapter, enum
   if (i2c_adapter_transitions[i2c_adapter->curr_state].entry_fn) {
     i2c_adapter_transitions[i2c_adapter->curr_state].entry_fn(i2c_adapter);
   }
+
+  /* Process any AUTO transitions in the FSM */
+  i2c_adapter_process_auto(i2c_adapter);
+
   PIOS_IRQ_Enable();
 }
 
@@ -835,8 +840,6 @@ void PIOS_I2C_EV_IRQ_Handler(uint8_t i2c)
     PIOS_DEBUG_Assert(0);
     break;
   }
-
-  i2c_adapter_process_auto(i2c_adapter);
 
 skip_event:
   ;

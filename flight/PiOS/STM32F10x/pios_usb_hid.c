@@ -284,7 +284,12 @@ int32_t PIOS_USB_HID_TxBufferPutMore(uint8_t id, const uint8_t *buffer, uint16_t
  */
 int32_t PIOS_USB_HID_RxBufferGet(uint8_t id)
 {
-	return bufferGetFromFront(&rxBuffer);
+	uint8_t read = bufferGetFromFront(&rxBuffer);
+	// If endpoint was stalled and there is now space make it valid
+	if((GetEPRxStatus(ENDP1) == EP_RX_STALL) && (bufferRemainingSpace(&rxBuffer) > 62)) {
+		SetEPRxStatus(ENDP1, EP_RX_VALID);
+	}	
+	return read;
 }
 
 /**
@@ -327,7 +332,13 @@ void PIOS_USB_HID_EP1_OUT_Callback(void)
 #else
 	bufferAddChunkToEnd(&rxBuffer, &rx_buffer[2], rx_buffer[1]);
 #endif
-	SetEPRxStatus(ENDP1, EP_RX_VALID);
+	
+	// Only reactivate endpoint if available space in buffer
+	if(bufferRemainingSpace(&rxBuffer) > 62) {
+		SetEPRxStatus(ENDP1, EP_RX_VALID);
+	} else {
+		SetEPRxStatus(ENDP1, EP_RX_STALL);
+	}
 }
 
 #endif

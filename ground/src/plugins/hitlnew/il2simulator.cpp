@@ -209,14 +209,16 @@ void IL2Simulator::processUpdate(QString& data)
 
 	// Update AltitudeActual object
         BaroAltitude::DataFields altActualData;
-	altActualData.Altitude = current.Z;
+        memset(&altActualData, 0, sizeof(BaroAltitude::DataFields));
+        altActualData.Altitude = current.Z;
 	altActualData.Temperature = TEMP_GROUND + (current.Z * TEMP_LAPSE_RATE) - 273.0;
 	altActualData.Pressure = PRESSURE(current.Z)/1000.0; // kpa
 	altActual->setData(altActualData);
 
 	// Update attActual object
 	AttitudeActual::DataFields attActualData;
-	attActualData.Roll = current.roll;
+        memset(&attActualData, 0, sizeof(AttitudeActual::DataFields));
+        attActualData.Roll = current.roll;
 	attActualData.Pitch = current.pitch;
 	attActualData.Yaw = current.azimuth;
 	attActualData.q1 = 0;
@@ -227,7 +229,8 @@ void IL2Simulator::processUpdate(QString& data)
 
 	// Update gps objects
 	PositionActual::DataFields gpsData;
-	gpsData.Altitude = current.Z;
+        memset(&gpsData, 0, sizeof(PositionActual::DataFields));
+        gpsData.Altitude = current.Z;
 	gpsData.Heading = current.azimuth;
 	gpsData.Groundspeed = current.groundspeed;
 	gpsData.Latitude = settings.latitude.toFloat() + current.Y * DEG2M;

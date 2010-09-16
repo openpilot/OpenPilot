@@ -76,14 +76,19 @@ void LoggingThread::objectUpdated(UAVObject * obj)
 {
     quint32 timeStamp = myTime.elapsed();
     quint32 objSize = obj->getNumBytes();
-    quint8 * buffer = new quint8[objSize+8];
+    quint32 objId = obj->getObjID();
+    quint32 objInst = obj->getInstID();
+
+    quint8 * buffer = new quint8[objSize+16];
 
     if(buffer == NULL)
         return;
 
-    obj->pack(&buffer[8]);
+    obj->pack(&buffer[16]);
     memcpy(buffer,&timeStamp,4);
     memcpy(&buffer[4],&objSize,4);
+    memcpy(&buffer[8],&objId,4);
+    memcpy(&buffer[12],&objInst,4);
 
     QWriteLocker locker(&lock);
     qint64 written = logFile.write((char *) buffer,objSize+8);

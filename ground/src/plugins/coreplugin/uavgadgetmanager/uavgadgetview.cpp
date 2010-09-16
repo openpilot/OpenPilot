@@ -576,23 +576,65 @@ void SplitterOrView::unsplit()
     m_uavGadgetManager->setCurrentGadget(findFirstView()->gadget());
 }
 
-
-QByteArray SplitterOrView::saveState() const
-{
-    QByteArray bytes;
-    QDataStream stream(&bytes, QIODevice::WriteOnly);
-
+void SplitterOrView::saveState(QSettings* qSettings) const {
     if (m_splitter) {
-        stream << QByteArray("splitter")
-                << (qint32)m_splitter->orientation()
-                << m_splitter->saveState()
-                << static_cast<SplitterOrView*>(m_splitter->widget(0))->saveState()
-                << static_cast<SplitterOrView*>(m_splitter->widget(1))->saveState();
+        qSettings->setValue("type", "splitter");
+        qSettings->setValue("splitterOrientation", (qint32)m_splitter->orientation());
+//        qSettings->setValue("splitterSizes", m_splitter->saveState());
+        // Bit clunky, but makes it more readable in the ini file.
+        QList<QVariant> sizesQVariant;
+        QList<int> sizes = m_splitter->sizes();
+        QList<int>::iterator sizesIterator;
+        for (sizesIterator = sizes.begin(); sizesIterator != sizes.end(); sizesIterator++) {
+            sizesQVariant.append(*sizesIterator);
+        }
+        qSettings->setValue("splitterSizes", sizesQVariant);
+        qSettings->beginGroup("side0");
+        static_cast<SplitterOrView*>(m_splitter->widget(0))->saveState(qSettings);
+        qSettings->endGroup();
+        qSettings->beginGroup("side1");
+        static_cast<SplitterOrView*>(m_splitter->widget(1))->saveState(qSettings);
+        qSettings->endGroup();
     } else {
-        if (gadget())
-            stream << QByteArray("uavGadget") << gadget()->classId() << gadget()->saveState();
+        qSettings->setValue("type", "uavGadget");
+        qSettings->setValue("classId", gadget()->classId());
+        if (gadget()) {
+            qSettings->beginGroup("gadget");
+            gadget()->saveState(qSettings);
+            qSettings->endGroup();
+        }
     }
-    return bytes;
+}
+
+void SplitterOrView::restoreState(QSettings* qSettings)
+{
+    QString mode = qSettings->value("type").toString();
+    if (mode == "splitter") {
+        qint32 orientation = qSettings->value("splitterOrientation").toInt();
+        QList<QVariant> sizesQVariant = qSettings->value("splitterSizes").toList();
+        QList<int> sizes;
+        QList<QVariant>::iterator sizesIterator;
+        for (sizesIterator = sizesQVariant.begin(); sizesIterator != sizesQVariant.end(); sizesIterator++) {
+            sizes.append((*sizesIterator).toInt());
+        }
+        split((Qt::Orientation)orientation);
+        m_splitter->setSizes(sizes);
+        qSettings->beginGroup("side0");
+        static_cast<SplitterOrView*>(m_splitter->widget(0))->restoreState(qSettings);
+        qSettings->endGroup();
+        qSettings->beginGroup("side1");
+        static_cast<SplitterOrView*>(m_splitter->widget(1))->restoreState(qSettings);
+        qSettings->endGroup();
+    } else if (mode == "uavGadget") {
+        QString classId = qSettings->value("classId").toString();
+        int index = m_view->indexOfClassId(classId);
+        m_view->listSelectionActivated(index);
+        if(qSettings->childGroups().contains("gadget")) {
+            qSettings->beginGroup("gadget");
+            gadget()->restoreState(qSettings);
+            qSettings->endGroup();
+        }
+    }
 }
 
 void SplitterOrView::restoreState(const QByteArray &state)

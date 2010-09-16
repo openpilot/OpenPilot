@@ -112,13 +112,22 @@ void UAVGadgetDecorator::updateToolbar()
     m_toolbar->setEnabled(m_toolbar->count() > 1);
 }
 
-QByteArray UAVGadgetDecorator::saveState()
+void UAVGadgetDecorator::saveState(QSettings* qSettings)
 {
-    QByteArray bytes;
-    QDataStream stream(&bytes, QIODevice::WriteOnly);
-    if (m_activeConfiguration)
-        stream << m_activeConfiguration->name().toLatin1();
-    return bytes;
+    if (m_activeConfiguration) {
+        qSettings->setValue("activeConfiguration",m_activeConfiguration->name());
+    }
+}
+
+void UAVGadgetDecorator::restoreState(QSettings* qSetting)
+{
+    QString configName = qSetting->value("activeConfiguration").toString();
+    foreach (IUAVGadgetConfiguration *config, *m_configurations) {
+        if (config->name() == configName) {
+            m_activeConfiguration = config;
+            loadConfiguration(config);
+        }
+    }
 }
 
 void UAVGadgetDecorator::restoreState(QByteArray state)

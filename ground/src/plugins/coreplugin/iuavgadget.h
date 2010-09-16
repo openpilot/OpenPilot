@@ -32,6 +32,7 @@
 #include <coreplugin/icontext.h>
 #include <coreplugin/core_global.h>
 #include <QtGui/QComboBox>
+#include <QtCore/QSettings>
 
 QT_BEGIN_NAMESPACE
 class QWidget;
@@ -61,8 +62,9 @@ public:
 
     virtual IUAVGadgetConfiguration *activeConfiguration() { return 0; }
     virtual void loadConfiguration(IUAVGadgetConfiguration*) { }
-    virtual QByteArray saveState() { return QByteArray(); }
+    virtual void saveState(QSettings* qSettings) { }
     virtual void restoreState(QByteArray) { }
+    virtual void restoreState(QSettings* qSettings) { }
 public slots:
     virtual void configurationChanged(IUAVGadgetConfiguration* ) { }
     virtual void configurationAdded(IUAVGadgetConfiguration*) { }

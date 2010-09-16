@@ -96,8 +96,9 @@ public:
 
     IUAVGadget *currentGadget() const;
 
-    QByteArray saveState() const;
+    void saveState(QSettings*) const;
     bool restoreState(const QByteArray &state);
+    bool restoreState(QSettings* qSettings);
 
     void saveSettings(QSettings* qs);
     void readSettings(QSettings* qs);

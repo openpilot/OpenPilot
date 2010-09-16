@@ -44,8 +44,9 @@ public:
     QComboBox *toolBar() { return m_toolbar; }
     IUAVGadgetConfiguration *activeConfiguration() { return m_activeConfiguration; }
     void loadConfiguration(IUAVGadgetConfiguration *config);
-    QByteArray saveState();
+    void saveState(QSettings* qSettings);
     void restoreState(QByteArray state);
+    void restoreState(QSettings* qSettings);
 public slots:
     void configurationChanged(IUAVGadgetConfiguration* config);
     void configurationAdded(IUAVGadgetConfiguration* config);

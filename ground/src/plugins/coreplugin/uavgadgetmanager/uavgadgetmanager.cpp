@@ -422,18 +422,39 @@ void UAVGadgetManager::updateActions()
     m_d->m_gotoOtherSplitAction->setEnabled(shown && hasSplitter);
 }
 
-QByteArray UAVGadgetManager::saveState() const
+void UAVGadgetManager::saveState(QSettings* qSettings) const
 {
-    QByteArray bytes;
-    QDataStream stream(&bytes, QIODevice::WriteOnly);
+    qSettings->setValue("version","UAVGadgetManagerV1");
+    qSettings->setValue("showToolbars",m_showToolbars);
+    qSettings->beginGroup("splitter");
+    m_d->m_splitterOrView->saveState(qSettings);
+    qSettings->endGroup();
+}
 
-    stream << QByteArray("UAVGadgetManagerV1");
+bool UAVGadgetManager::restoreState(QSettings* qSettings)
+{
+    removeAllSplits();
 
-    stream << m_showToolbars;
+    UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
+    IUAVGadget *gadget = m_d->m_splitterOrView->view()->gadget();
+    emptyView(m_d->m_splitterOrView->view());
+    im->removeGadget(gadget);
 
-    stream << m_d->m_splitterOrView->saveState();
+    QString version = qSettings->value("version").toString();
+    if (version != "UAVGadgetManagerV1") {
+        return false;
+    }
 
-    return bytes;
+    m_showToolbars = qSettings->value("showToolbars").toBool();
+
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
+    qSettings->beginGroup("splitter");
+    m_d->m_splitterOrView->restoreState(qSettings);
+    qSettings->endGroup();
+
+    QApplication::restoreOverrideCursor();
+    return true;
 }
 
 bool UAVGadgetManager::restoreState(const QByteArray &state)
@@ -464,35 +485,60 @@ bool UAVGadgetManager::restoreState(const QByteArray &state)
     return true;
 }
 
-
 void UAVGadgetManager::saveSettings(QSettings *qs)
 {
-    QString defaultUAVGadgetManagerKey = QString("UAVGadgetManager/") + m_uavGadgetMode->uniqueModeName() + "/DefaultSettings";
-    QString uavGadgetManagerKey = QString("UAVGadgetManager/") + m_uavGadgetMode->uniqueModeName() + "/Settings";
+    qs->beginGroup("UAVGadgetManager");
+    qs->beginGroup(m_uavGadgetMode->uniqueModeName());
+
+    QString defaultUAVGadgetManagerKey =  "DefaultSettings";
+    QString uavGadgetManagerKey = "Settings";
 
     // The idea is to have a default setting that is only written once
-    if (!qs->contains(defaultUAVGadgetManagerKey))
-        qs->setValue(defaultUAVGadgetManagerKey, saveState().toBase64());
-    else
-        qs->setValue(uavGadgetManagerKey, saveState().toBase64());
+    // TODO: Currently the default thing doesn't seem to be used,
+    // and is slightly randomly set the first time you close the app (after creating the specific mode?)
+    if (!qs->childGroups().contains(defaultUAVGadgetManagerKey)) {
+        qs->beginGroup(defaultUAVGadgetManagerKey);
+        saveState(qs);
+        qs->endGroup();
+    } else {
+        qs->beginGroup(uavGadgetManagerKey);
+        saveState(qs);
+        qs->endGroup();
+    }
+
+    qs->endGroup();
+    qs->endGroup();
 }
 
 void UAVGadgetManager::readSettings(QSettings *qs)
 {
-    QString defaultUAVGadgetManagerKey = QString("UAVGadgetManager/") + m_uavGadgetMode->uniqueModeName() + "/DefaultSettings";
-    QString uavGadgetManagerKey = QString("UAVGadgetManager/") + m_uavGadgetMode->uniqueModeName() + "/Settings";
+    qs->beginGroup("UAVGadgetManager");
+    qs->beginGroup(m_uavGadgetMode->uniqueModeName());
 
-    QString key("");
-    if (qs->contains(uavGadgetManagerKey))
-        key = uavGadgetManagerKey;
-    else if (qs->contains(defaultUAVGadgetManagerKey))
-        key = defaultUAVGadgetManagerKey;
-    else
+    QString defaultUAVGadgetManagerKey = "DefaultSettings";
+    QString uavGadgetManagerKey = "Settings";
+
+    if (qs->childGroups().contains(uavGadgetManagerKey)) {
+        qs->beginGroup(uavGadgetManagerKey);
+        restoreState(qs);
+        qs->endGroup();
+    } else if (qs->childGroups().contains(defaultUAVGadgetManagerKey)) {
+        qs->beginGroup(defaultUAVGadgetManagerKey);
+        restoreState(qs);
+        qs->endGroup();
+    } else if (qs->contains(uavGadgetManagerKey)) {
+        restoreState(QByteArray::fromBase64(qs->value(uavGadgetManagerKey).toByteArray()));
+    } else if (qs->contains(defaultUAVGadgetManagerKey)) {
+        restoreState(QByteArray::fromBase64(qs->value(defaultUAVGadgetManagerKey).toByteArray()));
+    } else {
         return;
-    const QVariant &managerSettings = qs->value(key);
-    restoreState(QByteArray::fromBase64(managerSettings.toByteArray()));
+    }
+
     showToolbars(m_showToolbars);
     updateActions();
+
+    qs->endGroup();
+    qs->endGroup();
 }
 
 void UAVGadgetManager::split(Qt::Orientation orientation)

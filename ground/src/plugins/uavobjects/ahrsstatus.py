@@ -82,6 +82,26 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
+		'IdleTimePerCyle',
+		'B',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'RunningTimePerCyle',
+		'B',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
 		'CommErrors',
 		'B',
 		5,
@@ -136,7 +156,7 @@ _fields = [ \
 
 class AhrsStatus(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 3393301276
+    OBJID        = 1854089084
     NAME         = "AhrsStatus"
     METANAME     = "AhrsStatusMeta"
     ISSINGLEINST = 1

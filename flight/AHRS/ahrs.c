@@ -782,6 +782,8 @@ void process_spi_request(void)
             
             // compute the idle fraction
             user_tx_v1.payload.user.v.rsp.update.load = ((float) running_counts / (float) (idle_counts+running_counts)) * 100;
+			user_tx_v1.payload.user.v.rsp.update.idle_time = idle_counts / (TIMER_RATE / 10000);
+			user_tx_v1.payload.user.v.rsp.update.run_time = running_counts / (TIMER_RATE / 10000);
             
             lfsm_user_set_tx_v1 (&user_tx_v1);
             break;

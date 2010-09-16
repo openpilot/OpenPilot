@@ -72,6 +72,12 @@ AhrsStatus::AhrsStatus(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
     QStringList CPULoadElemNames;
     CPULoadElemNames.append("0");
     fields.append( new UAVObjectField(QString("CPULoad"), QString("count"), UAVObjectField::UINT8, CPULoadElemNames, QStringList()) );
+    QStringList IdleTimePerCyleElemNames;
+    IdleTimePerCyleElemNames.append("0");
+    fields.append( new UAVObjectField(QString("IdleTimePerCyle"), QString("10x ms"), UAVObjectField::UINT8, IdleTimePerCyleElemNames, QStringList()) );
+    QStringList RunningTimePerCyleElemNames;
+    RunningTimePerCyleElemNames.append("0");
+    fields.append( new UAVObjectField(QString("RunningTimePerCyle"), QString("10x ms"), UAVObjectField::UINT8, RunningTimePerCyleElemNames, QStringList()) );
     QStringList CommErrorsElemNames;
     CommErrorsElemNames.append("Algorithm");
     CommErrorsElemNames.append("Update");

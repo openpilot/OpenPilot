@@ -36,6 +36,8 @@
 
 #include <pios.h>
 
+#define TIMER_RATE (8e6 / 128)
+
 void timer_start();
 uint32_t timer_count();
 uint32_t timer_rate();

@@ -33,7 +33,6 @@
 
 #include "ahrs_timer.h"
 
-#define TIMER_RATE (8e6 / 128)
 void timer_start() 
 {
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_BKP | RCC_APB1Periph_PWR,ENABLE);

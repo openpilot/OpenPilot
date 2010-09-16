@@ -41,7 +41,7 @@
 #define AHRSSTATUS_H
 
 // Object constants
-#define AHRSSTATUS_OBJID 3393301276U
+#define AHRSSTATUS_OBJID 1854089084U
 #define AHRSSTATUS_NAME "AhrsStatus"
 #define AHRSSTATUS_METANAME "AhrsStatusMeta"
 #define AHRSSTATUS_ISSINGLEINST 1
@@ -73,6 +73,8 @@
 typedef struct {
     uint8_t SerialNumber[25];
     uint8_t CPULoad;
+    uint8_t IdleTimePerCyle;
+    uint8_t RunningTimePerCyle;
     uint8_t CommErrors[5];
     uint8_t AlgorithmSet;
     uint8_t CalibrationSet;
@@ -85,6 +87,8 @@ typedef struct {
 /* Number of elements for field SerialNumber */
 #define AHRSSTATUS_SERIALNUMBER_NUMELEM 25
 // Field CPULoad information
+// Field IdleTimePerCyle information
+// Field RunningTimePerCyle information
 // Field CommErrors information
 /* Array element names for field CommErrors */
 typedef enum { AHRSSTATUS_COMMERRORS_ALGORITHM=0, AHRSSTATUS_COMMERRORS_UPDATE=1, AHRSSTATUS_COMMERRORS_ATTITUDERAW=2, AHRSSTATUS_COMMERRORS_HOMELOCATION=3, AHRSSTATUS_COMMERRORS_CALIBRATION=4 } AhrsStatusCommErrorsElem;

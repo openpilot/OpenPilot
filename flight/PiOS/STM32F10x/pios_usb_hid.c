@@ -57,8 +57,8 @@ static uint8_t transfer_possible = 0;
 static uint8_t rx_buffer[PIOS_USB_HID_DATA_LENGTH+2] = {0};
 static uint8_t tx_buffer[PIOS_USB_HID_DATA_LENGTH+2] = {0};
 
-#define TX_BUFFER_SIZE 128
-#define RX_BUFFER_SIZE 128
+#define TX_BUFFER_SIZE 512
+#define RX_BUFFER_SIZE 512
 cBuffer rxBuffer;
 cBuffer txBuffer;
 static uint8_t rxBufferSpace[TX_BUFFER_SIZE];

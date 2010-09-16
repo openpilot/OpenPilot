@@ -39,7 +39,7 @@ from collections import namedtuple
 _fields = [ \
 	uavobject.UAVObjectField(
 		'UpdatePeriod',
-		'H',
+		'B',
 		1,
 		[
 			'0',
@@ -49,7 +49,7 @@ _fields = [ \
 	),
 	uavobject.UAVObjectField(
 		'RollMax',
-		'f',
+		'B',
 		1,
 		[
 			'0',
@@ -59,7 +59,7 @@ _fields = [ \
 	),
 	uavobject.UAVObjectField(
 		'PitchMax',
-		'f',
+		'B',
 		1,
 		[
 			'0',
@@ -69,7 +69,7 @@ _fields = [ \
 	),
 	uavobject.UAVObjectField(
 		'YawMax',
-		'f',
+		'B',
 		1,
 		[
 			'0',
@@ -91,6 +91,16 @@ _fields = [ \
 	),
 	uavobject.UAVObjectField(
 		'ThrottleMax',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'ThrottleMin',
 		'f',
 		1,
 		[
@@ -224,7 +234,7 @@ _fields = [ \
 
 class StabilizationSettings(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 1244337598
+    OBJID        = 117768092
     NAME         = "StabilizationSettings"
     METANAME     = "StabilizationSettingsMeta"
     ISSINGLEINST = 1

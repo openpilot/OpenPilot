@@ -38,6 +38,7 @@
 #include "systemsettings.h"
 #include "actuatordesired.h"
 #include "actuatorcommand.h"
+#include "manualcontrolcommand.h"
 
 // Private constants
 #define MAX_QUEUE_SIZE 2
@@ -63,7 +64,6 @@ static void setFailsafe();
 
 static float bound(float val, float min, float max);
 
-static uint8_t vtolEnabled = 0;
 /**
  * @brief Module initialization
  * @return 0
@@ -98,8 +98,6 @@ static void actuatorTask(void* parameters)
 	ActuatorSettingsGet(&settings);
 	PIOS_Servo_SetHz(settings.ChannelUpdateFreq[0], settings.ChannelUpdateFreq[1]);
 
-	vtolEnabled = 0; // a flag that must be set by moving throttle up and down again
-	
 	// Go to the neutral (failsafe) values until an ActuatorDesired update is received
 	setFailsafe();
 
@@ -196,6 +194,7 @@ static void actuatorTask(void* parameters)
  */
 static int32_t mixerFixedWing(const ActuatorSettingsData* settings, const ActuatorDesiredData* desired, ActuatorCommandData* cmd)
 {
+	
 	// Check settings
 	if ( settings->FixedWingPitch1 == ACTUATORSETTINGS_FIXEDWINGPITCH1_NONE ||
 		 settings->FixedWingRoll1 == ACTUATORSETTINGS_FIXEDWINGROLL1_NONE ||
@@ -204,6 +203,9 @@ static int32_t mixerFixedWing(const ActuatorSettingsData* settings, const Actuat
 		return -1;
 	}
 
+	ManualControlCommandData manualControl;
+	ManualControlCommandGet(&manualControl);
+	
 	// Set pitch servo command
 	cmd->Channel[ settings->FixedWingPitch1 ] = scaleChannel(desired->Pitch, settings->ChannelMax[ settings->FixedWingPitch1 ],
 			                                                 settings->ChannelMin[ settings->FixedWingPitch1 ],
@@ -235,9 +237,12 @@ static int32_t mixerFixedWing(const ActuatorSettingsData* settings, const Actuat
 	}
 
 	// Set throttle servo command
-	cmd->Channel[ settings->FixedWingThrottle ] = scaleChannel(desired->Throttle, settings->ChannelMax[ settings->FixedWingThrottle ],
+	if(manualControl.Armed == MANUALCONTROLCOMMAND_ARMED_TRUE)
+		cmd->Channel[ settings->FixedWingThrottle ] = scaleChannel(desired->Throttle, settings->ChannelMax[ settings->FixedWingThrottle ],
 			                                                 settings->ChannelMin[ settings->FixedWingThrottle ],
 			                                                 settings->ChannelNeutral[ settings->FixedWingThrottle ]);
+	else 
+		cmd->Channel[ settings->FixedWingThrottle ] = -1;
 
 	// Done
 	return 0;
@@ -257,21 +262,27 @@ static int32_t mixerFixedWingElevon(const ActuatorSettingsData* settings, const 
 		return -1;
 	}
   
+	ManualControlCommandData manualControl;
+	ManualControlCommandGet(&manualControl);
+	
 	// Set first elevon servo command
 	cmd->Channel[ settings->FixedWingRoll1 ] = scaleChannel(desired->Pitch + desired->Roll, settings->ChannelMax[ settings->FixedWingRoll1 ],
                                                            settings->ChannelMin[ settings->FixedWingRoll1 ],
                                                            settings->ChannelNeutral[ settings->FixedWingRoll1 ]);
 
-  // Set second elevon servo command
-  cmd->Channel[ settings->FixedWingRoll2 ] = scaleChannel(desired->Pitch - desired->Roll, settings->ChannelMax[ settings->FixedWingRoll2 ],
+	// Set second elevon servo command
+	cmd->Channel[ settings->FixedWingRoll2 ] = scaleChannel(desired->Pitch - desired->Roll, settings->ChannelMax[ settings->FixedWingRoll2 ],
                                                              settings->ChannelMin[ settings->FixedWingRoll2 ],
                                                              settings->ChannelNeutral[ settings->FixedWingRoll2 ]);
   
 	// Set throttle servo command
-	cmd->Channel[ settings->FixedWingThrottle ] = scaleChannel(desired->Throttle, settings->ChannelMax[ settings->FixedWingThrottle ],
-                                                             settings->ChannelMin[ settings->FixedWingThrottle ],
-                                                             settings->ChannelNeutral[ settings->FixedWingThrottle ]);
-  
+	if(manualControl.Armed == MANUALCONTROLCOMMAND_ARMED_TRUE)
+		cmd->Channel[ settings->FixedWingThrottle ] = scaleChannel(desired->Throttle, settings->ChannelMax[ settings->FixedWingThrottle ],
+																   settings->ChannelMin[ settings->FixedWingThrottle ],
+																   settings->ChannelNeutral[ settings->FixedWingThrottle ]);
+	else 
+		cmd->Channel[ settings->FixedWingThrottle ] = -1;
+	
 	// Done
 	return 0;
 }
@@ -293,20 +304,18 @@ static int32_t mixerVTOL(const ActuatorSettingsData* settings, const ActuatorDes
 	VTOLStatusData vtolStatus;
 	VTOLSettingsGet(&vtolSettings);
 	VTOLStatusGet(&vtolStatus);
-	
-	// Simple logic to require throttle past .5 and then brought back before enabling motors.  
-	// This possibly should be used for other mixers.
-	if ((vtolEnabled == 0) && (desired->Throttle > .5))
-		vtolEnabled = 1;
-	if ((vtolEnabled == 1) && (desired->Throttle <= 0))
-		vtolEnabled = 2;
+		
+	ManualControlCommandData manualControl;
+	ManualControlCommandGet(&manualControl);
 	
 	const int vtolMin = -1;
-	int vtolMax = 1;
-	if(desired->Throttle < 0 || vtolEnabled < 2)
-		vtolMax = -1;
+	int vtolMax = -1;
+	
+	if((manualControl.Armed == MANUALCONTROLCOMMAND_ARMED_TRUE) &&
+	   (desired->Throttle >= 0))
+		vtolMax = 1;
 	else 
-		vtolMax = 1;	
+		vtolMax = -1;	
 	
 	if(((settings->VTOLMotorN != ACTUATORSETTINGS_VTOLMOTORN_NONE) +  
 		(settings->VTOLMotorNE != ACTUATORSETTINGS_VTOLMOTORS_NONE) + 
@@ -320,51 +329,51 @@ static int32_t mixerVTOL(const ActuatorSettingsData* settings, const ActuatorDes
 	}
 	
 	if(settings->VTOLMotorN != ACTUATORSETTINGS_VTOLMOTORN_NONE) {
-		vtolStatus.MotorN = bound(desired->Throttle * vtolSettings.MotorN[VTOLSETTINGS_MOTORN_THROTTLE] + 
+		vtolStatus.MotorN = desired->Throttle * vtolSettings.MotorN[VTOLSETTINGS_MOTORN_THROTTLE] + 
 								  desired->Pitch * vtolSettings.MotorN[VTOLSETTINGS_MOTORN_PITCH] +
 								  desired->Roll * vtolSettings.MotorN[VTOLSETTINGS_MOTORN_ROLL] +
-								  desired->Yaw * vtolSettings.MotorN[VTOLSETTINGS_MOTORN_YAW],vtolMin,vtolMax);
-		cmd->Channel[settings->VTOLMotorN] = scaleChannel(vtolStatus.MotorN, 
+		desired->Yaw * vtolSettings.MotorN[VTOLSETTINGS_MOTORN_YAW];
+		cmd->Channel[settings->VTOLMotorN] = scaleChannel(bound(vtolStatus.MotorN, vtolMin, vtolMax),
 														  settings->ChannelMax[settings->VTOLMotorN],
 														  settings->ChannelMin[settings->VTOLMotorN],
 														  settings->ChannelNeutral[settings->VTOLMotorN]);
 	}
 	if(settings->VTOLMotorNE != ACTUATORSETTINGS_VTOLMOTORNE_NONE) {
-		vtolStatus.MotorNE = bound(desired->Throttle * vtolSettings.MotorNE[VTOLSETTINGS_MOTORNE_THROTTLE] + 
+		vtolStatus.MotorNE = desired->Throttle * vtolSettings.MotorNE[VTOLSETTINGS_MOTORNE_THROTTLE] + 
 								   desired->Pitch * vtolSettings.MotorNE[VTOLSETTINGS_MOTORNE_PITCH] +
 								   desired->Roll * vtolSettings.MotorNE[VTOLSETTINGS_MOTORNE_ROLL] +
-								   desired->Yaw * vtolSettings.MotorNE[VTOLSETTINGS_MOTORNE_YAW],vtolMin,vtolMax);
-		cmd->Channel[settings->VTOLMotorNE] = scaleChannel(vtolStatus.MotorNE, 
+								   desired->Yaw * vtolSettings.MotorNE[VTOLSETTINGS_MOTORNE_YAW];
+		cmd->Channel[settings->VTOLMotorNE] = scaleChannel(bound(vtolStatus.MotorNE, vtolMin, vtolMax),
 														  settings->ChannelMax[settings->VTOLMotorNE],
 														  settings->ChannelMin[settings->VTOLMotorNE],
 														  settings->ChannelNeutral[settings->VTOLMotorNE]);
 	}
 	if(settings->VTOLMotorE != ACTUATORSETTINGS_VTOLMOTORE_NONE) {
-		vtolStatus.MotorE = bound(desired->Throttle * vtolSettings.MotorE[VTOLSETTINGS_MOTORE_THROTTLE] + 
+		vtolStatus.MotorE = desired->Throttle * vtolSettings.MotorE[VTOLSETTINGS_MOTORE_THROTTLE] + 
 							 desired->Pitch * vtolSettings.MotorE[VTOLSETTINGS_MOTORE_PITCH] +
 							 desired->Roll * vtolSettings.MotorE[VTOLSETTINGS_MOTORE_ROLL] +
-							 desired->Yaw * vtolSettings.MotorE[VTOLSETTINGS_MOTORE_YAW],vtolMin,vtolMax);
-		cmd->Channel[settings->VTOLMotorE] = scaleChannel(vtolStatus.MotorE, 
+							 desired->Yaw * vtolSettings.MotorE[VTOLSETTINGS_MOTORE_YAW];
+		cmd->Channel[settings->VTOLMotorE] = scaleChannel(bound(vtolStatus.MotorE, vtolMin, vtolMax),
 														  settings->ChannelMax[settings->VTOLMotorE],
 														  settings->ChannelMin[settings->VTOLMotorE],
 														  settings->ChannelNeutral[settings->VTOLMotorE]);
 	}
 	if(settings->VTOLMotorSE != ACTUATORSETTINGS_VTOLMOTORSE_NONE) {
-		vtolStatus.MotorSE = bound(desired->Throttle * vtolSettings.MotorSE[VTOLSETTINGS_MOTORSE_THROTTLE] + 
+		vtolStatus.MotorSE = desired->Throttle * vtolSettings.MotorSE[VTOLSETTINGS_MOTORSE_THROTTLE] + 
 								   desired->Pitch * vtolSettings.MotorSE[VTOLSETTINGS_MOTORSE_PITCH] +
 								   desired->Roll * vtolSettings.MotorSE[VTOLSETTINGS_MOTORSE_ROLL] +
-								   desired->Yaw * vtolSettings.MotorSE[VTOLSETTINGS_MOTORSE_YAW],vtolMin,vtolMax);
-		cmd->Channel[settings->VTOLMotorSE] = scaleChannel(vtolStatus.MotorSE, 
+								   desired->Yaw * vtolSettings.MotorSE[VTOLSETTINGS_MOTORSE_YAW];
+		cmd->Channel[settings->VTOLMotorSE] = scaleChannel(bound(vtolStatus.MotorSE, vtolMin, vtolMax),
 														  settings->ChannelMax[settings->VTOLMotorSE],
 														  settings->ChannelMin[settings->VTOLMotorSE],
 														  settings->ChannelNeutral[settings->VTOLMotorSE]);
 	}
 	if(settings->VTOLMotorS != ACTUATORSETTINGS_VTOLMOTORS_NONE) {
-		vtolStatus.MotorS = bound(desired->Throttle * vtolSettings.MotorS[VTOLSETTINGS_MOTORS_THROTTLE] + 
+		vtolStatus.MotorS = desired->Throttle * vtolSettings.MotorS[VTOLSETTINGS_MOTORS_THROTTLE] + 
 								  desired->Pitch * vtolSettings.MotorS[VTOLSETTINGS_MOTORS_PITCH] +
 								  desired->Roll * vtolSettings.MotorS[VTOLSETTINGS_MOTORS_ROLL] +
-								  desired->Yaw * vtolSettings.MotorS[VTOLSETTINGS_MOTORS_YAW],vtolMin,vtolMax);
-		cmd->Channel[settings->VTOLMotorS] = scaleChannel(vtolStatus.MotorS, 
+								  desired->Yaw * vtolSettings.MotorS[VTOLSETTINGS_MOTORS_YAW];
+		cmd->Channel[settings->VTOLMotorS] = scaleChannel(bound(vtolStatus.MotorS, vtolMin, vtolMax),
 														  settings->ChannelMax[settings->VTOLMotorS],
 														  settings->ChannelMin[settings->VTOLMotorS],
 														  settings->ChannelNeutral[settings->VTOLMotorS]);
@@ -380,21 +389,21 @@ static int32_t mixerVTOL(const ActuatorSettingsData* settings, const ActuatorDes
 														  settings->ChannelNeutral[settings->VTOLMotorSW]);
 	}
 	if(settings->VTOLMotorW != ACTUATORSETTINGS_VTOLMOTORW_NONE) {
-		vtolStatus.MotorW = bound(desired->Throttle * vtolSettings.MotorW[VTOLSETTINGS_MOTORW_THROTTLE] + 
+		vtolStatus.MotorW = desired->Throttle * vtolSettings.MotorW[VTOLSETTINGS_MOTORW_THROTTLE] + 
 								  desired->Pitch * vtolSettings.MotorW[VTOLSETTINGS_MOTORW_PITCH] +
 								  desired->Roll * vtolSettings.MotorW[VTOLSETTINGS_MOTORW_ROLL] +
-								  desired->Yaw * vtolSettings.MotorW[VTOLSETTINGS_MOTORW_YAW],vtolMin,vtolMax);
-		cmd->Channel[settings->VTOLMotorW] = scaleChannel(vtolStatus.MotorW, 
+								  desired->Yaw * vtolSettings.MotorW[VTOLSETTINGS_MOTORW_YAW];
+		cmd->Channel[settings->VTOLMotorW] = scaleChannel(bound(vtolStatus.MotorW, vtolMin, vtolMax),
 														  settings->ChannelMax[settings->VTOLMotorW],
 														  settings->ChannelMin[settings->VTOLMotorW],
 														  settings->ChannelNeutral[settings->VTOLMotorW]);
 	}
 	if(settings->VTOLMotorNW != ACTUATORSETTINGS_VTOLMOTORNW_NONE) {
-		vtolStatus.MotorNW = bound(desired->Throttle * vtolSettings.MotorNW[VTOLSETTINGS_MOTORNW_THROTTLE] + 
+		vtolStatus.MotorNW = desired->Throttle * vtolSettings.MotorNW[VTOLSETTINGS_MOTORNW_THROTTLE] + 
 								   desired->Pitch * vtolSettings.MotorNW[VTOLSETTINGS_MOTORNW_PITCH] +
 								   desired->Roll * vtolSettings.MotorNW[VTOLSETTINGS_MOTORNW_ROLL] +
-								   desired->Yaw * vtolSettings.MotorNW[VTOLSETTINGS_MOTORNW_YAW],vtolMin,vtolMax);
-		cmd->Channel[settings->VTOLMotorNW] = scaleChannel(vtolStatus.MotorNW, 
+								   desired->Yaw * vtolSettings.MotorNW[VTOLSETTINGS_MOTORNW_YAW];
+		cmd->Channel[settings->VTOLMotorNW] = scaleChannel(bound(vtolStatus.MotorNW, vtolMin, vtolMax),
 														  settings->ChannelMax[settings->VTOLMotorNW],
 														  settings->ChannelMin[settings->VTOLMotorNW],
 														  settings->ChannelNeutral[settings->VTOLMotorNW]);

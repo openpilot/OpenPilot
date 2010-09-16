@@ -48,6 +48,12 @@ ManualControlCommand::ManualControlCommand(): UAVDataObject(OBJID, ISSINGLEINST,
     ConnectedEnumOptions.append("False");
     ConnectedEnumOptions.append("True");
     fields.append( new UAVObjectField(QString("Connected"), QString(""), UAVObjectField::ENUM, ConnectedElemNames, ConnectedEnumOptions) );
+    QStringList ArmedElemNames;
+    ArmedElemNames.append("0");
+    QStringList ArmedEnumOptions;
+    ArmedEnumOptions.append("False");
+    ArmedEnumOptions.append("True");
+    fields.append( new UAVObjectField(QString("Armed"), QString(""), UAVObjectField::ENUM, ArmedElemNames, ArmedEnumOptions) );
     QStringList RollElemNames;
     RollElemNames.append("0");
     fields.append( new UAVObjectField(QString("Roll"), QString("%"), UAVObjectField::FLOAT32, RollElemNames, QStringList()) );

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>653</width>
-    <height>290</height>
+    <height>295</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -28,6 +28,13 @@
         <widget class="QCheckBox" name="checkBoxGcsControl">
          <property name="text">
           <string>GCS Control</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBoxArmed">
+         <property name="text">
+          <string>Armed</string>
          </property>
         </widget>
        </item>

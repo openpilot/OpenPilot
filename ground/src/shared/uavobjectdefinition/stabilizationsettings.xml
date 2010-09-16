@@ -1,12 +1,13 @@
 <xml>
     <object name="StabilizationSettings" singleinstance="true" settings="true">
         <description>PID settings used by the Stabilization module to combine the @ref AttitudeActual and @ref AttitudeDesired to compute @ref ActuatorDesired</description>
-        <field name="UpdatePeriod" units="ms" type="uint16" elements="1" defaultvalue="10"/>
-        <field name="RollMax" units="degrees" type="float" elements="1" defaultvalue="35"/>
-        <field name="PitchMax" units="degrees" type="float" elements="1" defaultvalue="35"/>
-        <field name="YawMax" units="degrees" type="float" elements="1" defaultvalue="35"/>
+        <field name="UpdatePeriod" units="ms" type="uint8" elements="1" defaultvalue="10"/>
+        <field name="RollMax" units="degrees" type="uint8" elements="1" defaultvalue="35"/>
+        <field name="PitchMax" units="degrees" type="uint8" elements="1" defaultvalue="35"/>
+        <field name="YawMax" units="degrees" type="uint8" elements="1" defaultvalue="35"/>
         <field name="YawMode" units="degrees" type="enum" elements="1" options="rate,heading" defaultvalue="rate"/>
-        <field name="ThrottleMax" units="%" type="float" elements="1" defaultvalue="1.0"/>
+        <field name="ThrottleMax" units="frac" type="float" elements="1" defaultvalue="1.0"/>
+        <field name="ThrottleMin" units="frac" type="float" elements="1" defaultvalue="-1.0"/>
         <field name="RollIntegralLimit" units="" type="float" elements="1" defaultvalue="0.5"/>
         <field name="PitchIntegralLimit" units="" type="float" elements="1" defaultvalue="0.5"/>
         <field name="YawIntegralLimit" units="" type="float" elements="1" defaultvalue="0.5"/>

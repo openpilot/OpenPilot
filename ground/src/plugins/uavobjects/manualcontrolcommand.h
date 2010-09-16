@@ -44,6 +44,7 @@ public:
     // Field structure
     typedef struct {
         quint8 Connected;
+        quint8 Armed;
         float Roll;
         float Pitch;
         float Yaw;
@@ -60,6 +61,9 @@ public:
     // Field Connected information
     /* Enumeration options for field Connected */
     typedef enum { CONNECTED_FALSE=0, CONNECTED_TRUE=1 } ConnectedOptions;
+    // Field Armed information
+    /* Enumeration options for field Armed */
+    typedef enum { ARMED_FALSE=0, ARMED_TRUE=1 } ArmedOptions;
     // Field Roll information
     // Field Pitch information
     // Field Yaw information
@@ -76,7 +80,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 1289277596U;
+    static const quint32 OBJID = 9594768U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

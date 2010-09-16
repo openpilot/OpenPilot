@@ -81,12 +81,18 @@ static void manualControlTask(void* parameters)
 	ActuatorDesiredData actuator;
 	AttitudeDesiredData attitude;
 	portTickType lastSysTime;
+	portTickType armedDisarmStart = 0;
 	float flightMode;
 	
 	uint8_t disconnected_count = 0;	
 	uint8_t connected_count = 0;	
 	enum {CONNECTED, DISCONNECTED} connection_state = DISCONNECTED;
 
+	// Make sure unarmed on power up
+	ManualControlCommandGet(&cmd);
+	cmd.Armed = MANUALCONTROLCOMMAND_ARMED_FALSE;
+	ManualControlCommandSet(&cmd);
+	
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	while (1)
@@ -228,6 +234,22 @@ static void manualControlTask(void* parameters)
 			AlarmsClear(SYSTEMALARMS_ALARM_MANUALCONTROL);
 			ManualControlCommandSet(&cmd);
 		}
+		
+		/* Look for arm or disarm signal */
+		if ((cmd.Throttle <= 0.05) && (cmd.Roll <= -0.95)) {
+			if((armedDisarmStart == 0) || (lastSysTime < armedDisarmStart)) // store when started, deal with rollover
+				armedDisarmStart = lastSysTime;
+			else if ((lastSysTime - armedDisarmStart)  > (1000 * portTICK_RATE_MS))
+				cmd.Armed = MANUALCONTROLCOMMAND_ARMED_TRUE;
+		}else if ((cmd.Throttle <= 0.05) && (cmd.Roll >= 0.95)) {
+			if((armedDisarmStart == 0) || (lastSysTime < armedDisarmStart)) // store when started, deal with rollover
+				armedDisarmStart = lastSysTime;
+			else if ((lastSysTime - armedDisarmStart)  > (1000 * portTICK_RATE_MS))
+				cmd.Armed = MANUALCONTROLCOMMAND_ARMED_FALSE;			
+		} else {
+			armedDisarmStart = 0;
+		}
+		
     
 		// Depending on the mode update the Stabilization or Actuator objects
 		if ( cmd.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL )
@@ -255,11 +277,11 @@ static void manualControlTask(void* parameters)
 				{
 					attitude.Yaw = (cmd.Yaw*180.0);
 				}
-				if(cmd.Throttle < 0)
-					attitude.Throttle = -1;
-				else
-					attitude.Throttle = cmd.Throttle*stabSettings.ThrottleMax;
 			}
+			if(cmd.Throttle < 0)
+				attitude.Throttle = -1;
+			else
+				attitude.Throttle = cmd.Throttle*stabSettings.ThrottleMax;
 			AttitudeDesiredSet(&attitude);
 		}
 		

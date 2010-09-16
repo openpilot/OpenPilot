@@ -43,12 +43,13 @@ class UAVOBJECTS_EXPORT StabilizationSettings: public UAVDataObject
 public:
     // Field structure
     typedef struct {
-        quint16 UpdatePeriod;
-        float RollMax;
-        float PitchMax;
-        float YawMax;
+        quint8 UpdatePeriod;
+        quint8 RollMax;
+        quint8 PitchMax;
+        quint8 YawMax;
         quint8 YawMode;
         float ThrottleMax;
+        float ThrottleMin;
         float RollIntegralLimit;
         float PitchIntegralLimit;
         float YawIntegralLimit;
@@ -73,6 +74,7 @@ public:
     /* Enumeration options for field YawMode */
     typedef enum { YAWMODE_RATE=0, YAWMODE_HEADING=1 } YawModeOptions;
     // Field ThrottleMax information
+    // Field ThrottleMin information
     // Field RollIntegralLimit information
     // Field PitchIntegralLimit information
     // Field YawIntegralLimit information
@@ -88,7 +90,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 1244337598U;
+    static const quint32 OBJID = 117768092U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

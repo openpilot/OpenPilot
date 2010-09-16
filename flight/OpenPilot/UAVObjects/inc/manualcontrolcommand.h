@@ -41,7 +41,7 @@
 #define MANUALCONTROLCOMMAND_H
 
 // Object constants
-#define MANUALCONTROLCOMMAND_OBJID 1289277596U
+#define MANUALCONTROLCOMMAND_OBJID 9594768U
 #define MANUALCONTROLCOMMAND_NAME "ManualControlCommand"
 #define MANUALCONTROLCOMMAND_METANAME "ManualControlCommandMeta"
 #define MANUALCONTROLCOMMAND_ISSINGLEINST 1
@@ -72,6 +72,7 @@
 // Object data
 typedef struct {
     uint8_t Connected;
+    uint8_t Armed;
     float Roll;
     float Pitch;
     float Yaw;
@@ -88,6 +89,9 @@ typedef struct {
 // Field Connected information
 /* Enumeration options for field Connected */
 typedef enum { MANUALCONTROLCOMMAND_CONNECTED_FALSE=0, MANUALCONTROLCOMMAND_CONNECTED_TRUE=1 } ManualControlCommandConnectedOptions;
+// Field Armed information
+/* Enumeration options for field Armed */
+typedef enum { MANUALCONTROLCOMMAND_ARMED_FALSE=0, MANUALCONTROLCOMMAND_ARMED_TRUE=1 } ManualControlCommandArmedOptions;
 // Field Roll information
 // Field Pitch information
 // Field Yaw information

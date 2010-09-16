@@ -45,6 +45,9 @@ private slots:
    void gcsControlToggle(int state);
    void flightModeChanged(int state);
 
+protected slots:
+    void mccChanged(UAVObject*);
+
 private:
        Ui_GCSControl *m_gcscontrol;
        ManualControlCommand* getMCC();

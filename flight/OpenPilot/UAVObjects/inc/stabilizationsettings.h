@@ -41,7 +41,7 @@
 #define STABILIZATIONSETTINGS_H
 
 // Object constants
-#define STABILIZATIONSETTINGS_OBJID 1244337598U
+#define STABILIZATIONSETTINGS_OBJID 117768092U
 #define STABILIZATIONSETTINGS_NAME "StabilizationSettings"
 #define STABILIZATIONSETTINGS_METANAME "StabilizationSettingsMeta"
 #define STABILIZATIONSETTINGS_ISSINGLEINST 1
@@ -71,12 +71,13 @@
 
 // Object data
 typedef struct {
-    uint16_t UpdatePeriod;
-    float RollMax;
-    float PitchMax;
-    float YawMax;
+    uint8_t UpdatePeriod;
+    uint8_t RollMax;
+    uint8_t PitchMax;
+    uint8_t YawMax;
     uint8_t YawMode;
     float ThrottleMax;
+    float ThrottleMin;
     float RollIntegralLimit;
     float PitchIntegralLimit;
     float YawIntegralLimit;
@@ -101,6 +102,7 @@ typedef struct {
 /* Enumeration options for field YawMode */
 typedef enum { STABILIZATIONSETTINGS_YAWMODE_RATE=0, STABILIZATIONSETTINGS_YAWMODE_HEADING=1 } StabilizationSettingsYawModeOptions;
 // Field ThrottleMax information
+// Field ThrottleMin information
 // Field RollIntegralLimit information
 // Field PitchIntegralLimit information
 // Field YawIntegralLimit information

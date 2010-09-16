@@ -52,6 +52,10 @@ GCSControlGadgetWidget::GCSControlGadgetWidget(QWidget *parent) : QLabel(parent)
     // Set up slots and signals
     connect(m_gcscontrol->checkBoxGcsControl, SIGNAL(stateChanged(int)), this, SLOT(gcsControlToggle(int)));
     connect(m_gcscontrol->comboBoxFlightMode, SIGNAL(currentIndexChanged(int)), this, SLOT(flightModeChanged(int)));
+    //connect(m_gcscontrol->checkBoxArmed, SIGNAL(stateChanged(int)), this, SLOT(gcsArmedToggle(int)));
+
+    // Connect object updated event from UAVObject to also update check boxes
+    connect(getMCC(), SIGNAL(objectUpdated(UAVObject*)), this, SLOT(mccChanged(UAVObject*)));
 
 }
 
@@ -69,6 +73,11 @@ ManualControlCommand* GCSControlGadgetWidget::getMCC()
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     ManualControlCommand* obj = dynamic_cast<ManualControlCommand*>( objManager->getObject(QString("ManualControlCommand")) );
     return obj;
+}
+
+void GCSControlGadgetWidget::mccChanged(UAVObject* obj)
+{
+    m_gcscontrol->checkBoxArmed->setChecked(obj->getField("Armed")->getValue().toString() == "True");
 }
 
 /*!

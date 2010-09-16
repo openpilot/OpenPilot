@@ -201,13 +201,15 @@ void FGSimulator::processUpdate(QString& data)
 
 	// Update AltitudeActual object
         BaroAltitude::DataFields altActualData;
-	altActualData.Altitude = altitudeAGL;
+        memset(&altActualData, 0, sizeof(BaroAltitude::DataFields));
+        altActualData.Altitude = altitudeAGL;
 	altActualData.Temperature = temperature;
 	altActualData.Pressure = pressure;
 	altActual->setData(altActualData);
 
 	// Update attActual object
 	AttitudeActual::DataFields attActualData;
+        memset(&attActualData, 0, sizeof(AttitudeActual::DataFields));
 	attActualData.Roll = roll;
 	attActualData.Pitch = pitch;
 	attActualData.Yaw = yaw;
@@ -219,7 +221,8 @@ void FGSimulator::processUpdate(QString& data)
 
 	// Update gps objects
 	PositionActual::DataFields gpsData;
-	gpsData.Altitude = altitude;
+        memset(&gpsData, 0, sizeof(PositionActual::DataFields));
+        gpsData.Altitude = altitude;
 	gpsData.Heading = heading;
 	gpsData.Groundspeed = groundspeed;
 	gpsData.Latitude = latitude;

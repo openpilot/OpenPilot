@@ -306,6 +306,7 @@ struct opahrs_msg_v1_rsp_update {
   uint8_t load;
   uint8_t idle_time;
   uint8_t run_time;
+  uint8_t dropped_updates;
 } __attribute__((__packed__));
 
 struct opahrs_msg_v1_rsp_calibration {

@@ -47,6 +47,7 @@ public:
         quint8 CPULoad;
         quint8 IdleTimePerCyle;
         quint8 RunningTimePerCyle;
+        quint8 DroppedUpdates;
         quint8 CommErrors[5];
         quint8 AlgorithmSet;
         quint8 CalibrationSet;
@@ -61,6 +62,7 @@ public:
     // Field CPULoad information
     // Field IdleTimePerCyle information
     // Field RunningTimePerCyle information
+    // Field DroppedUpdates information
     // Field CommErrors information
     /* Array element names for field CommErrors */
     typedef enum { COMMERRORS_ALGORITHM=0, COMMERRORS_UPDATE=1, COMMERRORS_ATTITUDERAW=2, COMMERRORS_HOMELOCATION=3, COMMERRORS_CALIBRATION=4 } CommErrorsElem;
@@ -78,7 +80,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 1854089084U;
+    static const quint32 OBJID = 1789860144U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

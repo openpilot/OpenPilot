@@ -190,7 +190,7 @@ float Rne[3][3];
 //! Indicates the communications are requesting a calibration
 uint8_t calibration_pending = FALSE;
 //! The oversampling rate, ekf is 2k / this
-static uint8_t adc_oversampling = 15;
+static uint8_t adc_oversampling = 25;
 /**
  * @}
  */
@@ -795,7 +795,7 @@ void process_spi_request(void)
             user_tx_v1.payload.user.v.rsp.update.load = ((float) running_counts / (float) (idle_counts+running_counts)) * 100;
 			user_tx_v1.payload.user.v.rsp.update.idle_time = idle_counts / (TIMER_RATE / 10000);
 			user_tx_v1.payload.user.v.rsp.update.run_time = running_counts / (TIMER_RATE / 10000);
-            
+			user_tx_v1.payload.user.v.rsp.update.dropped_updates = ekf_too_slow;            
             lfsm_user_set_tx_v1 (&user_tx_v1);
             break;
         default:

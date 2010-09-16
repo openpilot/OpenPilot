@@ -482,6 +482,7 @@ static void process_update(struct opahrs_msg_v1_rsp_update * update)
     status.CPULoad = update->load;
 	status.IdleTimePerCyle = update->idle_time;
 	status.RunningTimePerCyle = update->run_time;
+	status.DroppedUpdates = update->dropped_updates;
     AhrsStatusSet(&status);
 }
 

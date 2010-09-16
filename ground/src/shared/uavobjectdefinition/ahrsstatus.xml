@@ -5,6 +5,7 @@
         <field name="CPULoad" units="count" type="uint8" elements="1"/>
         <field name="IdleTimePerCyle" units="10x ms" type="uint8" elements="1"/>
         <field name="RunningTimePerCyle" units="10x ms" type="uint8" elements="1"/>
+        <field name="DroppedUpdates" units="count" type="uint8" elements="1"/>
         <field name="CommErrors" units="count" type="uint8" elementnames="Algorithm,Update,AttitudeRaw,HomeLocation,Calibration"/>
         <field name="AlgorithmSet" units="" type="enum" elements="1" options="FALSE,TRUE"/>
         <field name="CalibrationSet" units="" type="enum" elements="1" options="FALSE,TRUE"/>

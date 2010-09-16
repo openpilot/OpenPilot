@@ -74,6 +74,7 @@ FLIGHTLIB = ../Libraries
 FLIGHTLIBINC = ../Libraries/inc
 PIOSSTM32F10X = $(PIOS)/STM32F10x
 PIOSCOMMON = $(PIOS)/Common
+PIOSBOARDS = $(PIOS)/Boards
 APPLIBDIR = $(PIOSSTM32F10X)/Libraries
 STMLIBDIR = $(APPLIBDIR)
 STMSPDDIR = $(STMLIBDIR)/STM32F10x_StdPeriph_Driver
@@ -165,6 +166,7 @@ EXTRAINCDIRS  += $(PIOSINC)
 EXTRAINCDIRS  += $(FLIGHTLIBINC)
 EXTRAINCDIRS  += $(PIOSSTM32F10X)
 EXTRAINCDIRS  += $(PIOSCOMMON)
+EXTRAINCDIRS  += $(PIOSBOARDS)
 EXTRAINCDIRS  += $(STMSPDINCDIR)
 EXTRAINCDIRS  += $(CMSISDIR)
 EXTRAINCDIRS  += $(AHRS_BLINC)
@@ -211,7 +213,9 @@ DEBUGF = dwarf-2
 CDEFS = -DSTM32F10X_$(MODEL)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)
-
+ifeq ($(USE_BOOTLOADER), YES)
+CDEFS += -DUSE_BOOTLOADER
+endif
 # Place project-specific -D and/or -U options for 
 # Assembler with preprocessor here.
 #ADEFS = -DUSE_IRQ_ASM_WRAPPER
@@ -298,9 +302,9 @@ OOCD_CL=-d0
 # interface and board/target settings (using the OOCD target-library here)
 UNAME := $(shell uname)
 ifeq ($(UNAME), Darwin)
-  OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.ahrs.osx.cfg -f ../Project/OpenOCD/stm32.cfg
+  OOCD_CL+=-f ../../Project/OpenOCD/floss-jtag.ahrs.osx.cfg -f ../../Project/OpenOCD/stm32.cfg
 else
-  OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.ahrs.cfg -f ../Project/OpenOCD/stm32.cfg
+  OOCD_CL+=-f ../../Project/OpenOCD/floss-jtag.ahrs.cfg -f ../../Project/OpenOCD/stm32.cfg
 endif
 # initialize
 OOCD_CL+=-c init

@@ -24,8 +24,8 @@
  */
 
 
-#ifndef PIOS_BOARD_H
-#define PIOS_BOARD_H
+#ifndef STM32103CB_AHRS_H_
+#define STM32103CB_AHRS_H_
 
 
 //------------------------
@@ -69,7 +69,7 @@ TIM8  |           |           |           |
 #define BOOTLOADER_VERSION	0
 #define MEM_SIZE			0x20000 //128K
 #define SIZE_OF_DESCRIPTION	100
-#define START_OF_USER_CODE	(uint32_t)0x08006000
+#define START_OF_USER_CODE	(uint32_t)0x08003400
 #define SIZE_OF_CODE		(uint32_t)(MEM_SIZE-(START_OF_USER_CODE-0x08000000)-SIZE_OF_DESCRIPTION)
 #ifdef STM32F10X_HD
 		#define HW_TYPE			0 //0=high_density 1=medium_density;
@@ -79,6 +79,7 @@ TIM8  |           |           |           |
 #define BOARD_READABLE	TRUE
 #define BOARD_WRITABLA	TRUE
 #define MAX_DEL_RETRYS	3
+
 //------------------------
 // PIOS_LED
 //------------------------
@@ -102,7 +103,7 @@ TIM8  |           |           |           |
 #define PIOS_MASTER_CLOCK			72000000
 #define PIOS_PERIPHERAL_CLOCK			(PIOS_MASTER_CLOCK / 2)
 #if defined(USE_BOOTLOADER)
-#define PIOS_NVIC_VECTTAB_FLASH			((uint32_t)0x08006000)
+#define PIOS_NVIC_VECTTAB_FLASH			(START_OF_USER_CODE)
 #else
 #define PIOS_NVIC_VECTTAB_FLASH			((uint32_t)0x08000000)
 #endif
@@ -133,9 +134,9 @@ TIM8  |           |           |           |
 //-------------------------
 #define PIOS_USART_RX_BUFFER_SIZE		256
 #define PIOS_USART_TX_BUFFER_SIZE		256
-#define PIOS_COM_AUX_BAUDRATE		    115200
-#define PIOS_COM_AUX				    0
-#define PIOS_COM_DEBUG				    PIOS_COM_AUX
+#define PIOS_USART_BAUDRATE				230400
+#define PIOS_COM_AUX				0
+#define PIOS_COM_DEBUG				PIOS_COM_AUX
 
 //-------------------------
 // ADC
@@ -212,7 +213,7 @@ TIM8  |           |           |           |
 #define PIOS_ADC_NUM_ADC_CHANNELS		2
 #define PIOS_ADC_USE_ADC2			1
 #define PIOS_ADC_CLOCK_FUNCTION			RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 | RCC_APB2Periph_ADC2, ENABLE)
-#define PIOS_ADC_ADCCLK				RCC_PCLK2_Div8
+#define PIOS_ADC_ADCCLK				RCC_PCLK2_Div2
 /* RCC_PCLK2_Div2: ADC clock = PCLK2/2 */
 /* RCC_PCLK2_Div4: ADC clock = PCLK2/4 */
 /* RCC_PCLK2_Div6: ADC clock = PCLK2/6 */
@@ -238,4 +239,18 @@ TIM8  |           |           |           |
 #define SET_ACCEL_2G PIOS_GPIO_On(0);
 #define SET_ACCEL_6G PIOS_GPIO_Off(0)
 
-#endif /* PIOS_BOARD_H */
+//------------------------
+// PIOS_HMC5843
+//------------------------
+#define PIOS_HMC5843_DRDY_GPIO_PORT		GPIOB
+#define PIOS_HMC5843_DRDY_GPIO_PIN		GPIO_Pin_8
+#define PIOS_HMC5843_DRDY_PORT_SOURCE		GPIO_PortSourceGPIOB
+#define PIOS_HMC5843_DRDY_PIN_SOURCE		GPIO_PinSource8
+#define PIOS_HMC5843_DRDY_CLK			RCC_APB2Periph_GPIOB
+#define PIOS_HMC5843_DRDY_EXTI_LINE		EXTI_Line8
+#define PIOS_HMC5843_DRDY_IRQn			EXTI9_5_IRQn
+#define PIOS_HMC5843_DRDY_PRIO			PIOS_IRQ_PRIO_HIGH
+
+
+
+#endif /* STM32103CB_AHRS_H_ */

@@ -183,6 +183,11 @@ void MagVelBaroCorrection(float mag_data[3], float Vel[3], float BaroAlt)
     INSCorrection(mag_data, zeros, Vel, BaroAlt, MAG_SENSORS | HORIZ_SENSORS | VERT_SENSORS | BARO_SENSOR);
 }
 
+void GpsBaroCorrection(float Pos[3], float Vel[3], float BaroAlt)
+{
+    INSCorrection(zeros, Pos, Vel, BaroAlt,  HORIZ_SENSORS | VERT_SENSORS | BARO_SENSOR);
+}
+
 void FullCorrection(float mag_data[3], float Pos[3], float Vel[3], float BaroAlt)
 {
     INSCorrection(mag_data, Pos, Vel, BaroAlt, FULL_SENSORS);

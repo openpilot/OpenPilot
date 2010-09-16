@@ -78,6 +78,7 @@ volatile enum algorithms ahrs_algorithm;
  */
 struct mag_sensor {
     uint8_t id[4];
+	uint8_t updated;
     struct {
         int16_t axis[3];
     } raw;
@@ -296,6 +297,7 @@ int main()
 	// Get magnetic readings
 	if (PIOS_HMC5843_NewDataAvailable()) {
 		PIOS_HMC5843_ReadMag(mag_data.raw.axis);
+		mag_data.updated = 1;
 	}
 #endif        
         // Delay for valid data
@@ -358,12 +360,21 @@ int main()
 				// increase as data quality decreases but keep it bounded
 				// Variance becomes 40 m^2 and 40 (m/s)^2 when no gps
 				INSSetPosVelVar(0.004);
-				FullCorrection(mag, gps_data.NED, vel, altitude_data.altitude);        
+				if(gps_data.updated) {
+					//TOOD: add check for altitude updates
+					FullCorrection(mag, gps_data.NED, vel, altitude_data.altitude);        
+					gps_data.updated = 0;
+				} else {
+					GpsBaroCorrection(gps_data.NED,vel,altitude_data.altitude);
+				}
+
 				gps_data.updated = false;
+				mag_data.updated = 0;
             }
-            else if(gps_data.quality != -1)
+            else if(gps_data.quality != -1 && mag_data.updated == 1) {
                 MagCorrection(mag);  // only trust mags if outdoors
-			else {
+				mag_data.updated = 0;
+			} else {
 				// Indoors, update with zero position and velocity and high covariance
 				INSSetPosVelVar(0.1);
 				vel[0] = 0;

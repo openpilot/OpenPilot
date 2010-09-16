@@ -101,10 +101,17 @@ bool FGSimulator::setupProcess()
 	// Setup arguments
 	// Note: The input generic protocol is set to update at a much higher rate than the actual updates are sent by the GCS.
 	// If this is not done then a lag will be introduced by FlightGear, likelly because the receive socket buffer builds up during startup.
-	QString args("--fg-root=\"" + settings.dataPath + "\" --timeofday=dusk --httpd=5400 --enable-hud --in-air --altitude=2000 --vc=100 --generic=socket,out,50,localhost,5500,udp,opfgprotocol");
+        QString args("--fg-root=\"" + settings.dataPath + "\" " +
+                     "--timeofday=dusk " +
+                     "--httpd=5400 " +
+                     "--enable-hud " +
+                     "--in-air " +
+                     "--altitude=2000 " +
+                     "--vc=100 " +
+                     "--generic=socket,out,50,localhost," + QString::number(settings.inPort) + ",udp,opfgprotocol");
 	if(!settings.manual)
 	{
-		args.append(" --generic=socket,in,400,localhost,5501,udp,opfgprotocol");
+            args.append(" --generic=socket,in,400,localhost," + QString::number(settings.outPort) + ",udp,opfgprotocol");
 	}
 
 	// Start FlightGear

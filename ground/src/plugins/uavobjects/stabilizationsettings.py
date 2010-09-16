@@ -68,6 +68,28 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
+		'YawMax',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'YawMode',
+		'b',
+		1,
+		[
+			'0',
+		],
+		{
+			'0' : 'rate',
+			'1' : 'heading',
+		}
+	),
+	uavobject.UAVObjectField(
 		'ThrottleMax',
 		'f',
 		1,
@@ -202,7 +224,7 @@ _fields = [ \
 
 class StabilizationSettings(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 3082215042
+    OBJID        = 1244337598
     NAME         = "StabilizationSettings"
     METANAME     = "StabilizationSettingsMeta"
     ISSINGLEINST = 1

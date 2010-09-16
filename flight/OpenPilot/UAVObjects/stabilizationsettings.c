@@ -83,6 +83,8 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	data.UpdatePeriod = 10;
 	data.RollMax = 35;
 	data.PitchMax = 35;
+	data.YawMax = 35;
+	data.YawMode = 0;
 	data.ThrottleMax = 1;
 	data.RollIntegralLimit = 0.5;
 	data.PitchIntegralLimit = 0.5;

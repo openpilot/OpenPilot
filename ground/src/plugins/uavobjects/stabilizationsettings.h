@@ -46,6 +46,8 @@ public:
         quint16 UpdatePeriod;
         float RollMax;
         float PitchMax;
+        float YawMax;
+        quint8 YawMode;
         float ThrottleMax;
         float RollIntegralLimit;
         float PitchIntegralLimit;
@@ -66,6 +68,10 @@ public:
     // Field UpdatePeriod information
     // Field RollMax information
     // Field PitchMax information
+    // Field YawMax information
+    // Field YawMode information
+    /* Enumeration options for field YawMode */
+    typedef enum { YAWMODE_RATE=0, YAWMODE_HEADING=1 } YawModeOptions;
     // Field ThrottleMax information
     // Field RollIntegralLimit information
     // Field PitchIntegralLimit information
@@ -82,7 +88,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 3082215042U;
+    static const quint32 OBJID = 1244337598U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

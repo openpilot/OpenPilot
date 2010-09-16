@@ -88,6 +88,8 @@ static void stabilizationTask(void* parameters)
 	float pitchIntegral;
 	float rollIntegral;
 	float yawIntegral;
+	float yawPrevious;
+	float yawChange;
 
 	// Initialize
 	pitchIntegral = 0.0;
@@ -127,7 +129,14 @@ static void stabilizationTask(void* parameters)
 		// Yaw stabilization control loop (only enabled on VTOL airframes)
 		if (( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_VTOL )||( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_HELICP))
 		{
-			yawError = attitudeDesired.Yaw - attitudeActual.Yaw;
+			if(stabSettings.YawMode == STABILIZATIONSETTINGS_YAWMODE_RATE) {  // rate stabilization on yaw
+				yawChange = attitudeActual.Yaw - yawPrevious;
+				yawPrevious = attitudeActual.Yaw;
+				yawError = bound(attitudeDesired.Yaw, -stabSettings.YawMax, stabSettings.YawMax) - yawChange;
+			} else { // heading stabilization
+				yawError = attitudeDesired.Yaw - attitudeActual.Yaw;
+			}
+
 			//this should make it take the quickest path to reach the desired yaw
 			if (yawError>180.0)yawError -= 360;
 			if (yawError<-180.0)yawError += 360;

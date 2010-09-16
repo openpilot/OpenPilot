@@ -51,6 +51,15 @@ StabilizationSettings::StabilizationSettings(): UAVDataObject(OBJID, ISSINGLEINS
     QStringList PitchMaxElemNames;
     PitchMaxElemNames.append("0");
     fields.append( new UAVObjectField(QString("PitchMax"), QString("degrees"), UAVObjectField::FLOAT32, PitchMaxElemNames, QStringList()) );
+    QStringList YawMaxElemNames;
+    YawMaxElemNames.append("0");
+    fields.append( new UAVObjectField(QString("YawMax"), QString("degrees"), UAVObjectField::FLOAT32, YawMaxElemNames, QStringList()) );
+    QStringList YawModeElemNames;
+    YawModeElemNames.append("0");
+    QStringList YawModeEnumOptions;
+    YawModeEnumOptions.append("rate");
+    YawModeEnumOptions.append("heading");
+    fields.append( new UAVObjectField(QString("YawMode"), QString("degrees"), UAVObjectField::ENUM, YawModeElemNames, YawModeEnumOptions) );
     QStringList ThrottleMaxElemNames;
     ThrottleMaxElemNames.append("0");
     fields.append( new UAVObjectField(QString("ThrottleMax"), QString("%"), UAVObjectField::FLOAT32, ThrottleMaxElemNames, QStringList()) );
@@ -126,6 +135,8 @@ void StabilizationSettings::setDefaultFieldValues()
     data.UpdatePeriod = 10;
     data.RollMax = 35;
     data.PitchMax = 35;
+    data.YawMax = 35;
+    data.YawMode = 0;
     data.ThrottleMax = 1;
     data.RollIntegralLimit = 0.5;
     data.PitchIntegralLimit = 0.5;

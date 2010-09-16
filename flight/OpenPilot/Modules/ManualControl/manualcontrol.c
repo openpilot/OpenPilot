@@ -242,18 +242,24 @@ static void manualControlTask(void* parameters)
 		{
 			attitude.Roll = cmd.Roll*stabSettings.RollMax;
 			attitude.Pitch = cmd.Pitch*stabSettings.PitchMax;
-			if (cmd.Yaw<0)
-			{
-				attitude.Yaw = 360 + (cmd.Yaw*180.0);
+			if(stabSettings.YawMode == STABILIZATIONSETTINGS_YAWMODE_RATE) { 
+				/* rate stabilization */
+				attitude.Yaw = cmd.Yaw*stabSettings.YawMax;
+			} else { 
+				/* heading stabilization */
+				if (cmd.Yaw<0)
+				{
+					attitude.Yaw = 360 + (cmd.Yaw*180.0);
+				}
+				else
+				{
+					attitude.Yaw = (cmd.Yaw*180.0);
+				}
+				if(cmd.Throttle < 0)
+					attitude.Throttle = -1;
+				else
+					attitude.Throttle = cmd.Throttle*stabSettings.ThrottleMax;
 			}
-			else
-			{
-				attitude.Yaw = (cmd.Yaw*180.0);
-			}
-			if(cmd.Throttle < 0)
-				attitude.Throttle = -1;
-			else
-				attitude.Throttle = cmd.Throttle*stabSettings.ThrottleMax;
 			AttitudeDesiredSet(&attitude);
 		}
 		

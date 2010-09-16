@@ -46,6 +46,19 @@ volatile enum algorithms ahrs_algorithm;
 // For debugging the raw sensors
 //#define DUMP_RAW
 //#define DUMP_FRIENDLY
+//#define DUMP_EKF
+
+
+#ifdef DUMP_EKF
+#define NUMX 13  // number of states, X is the state vector
+#define NUMW 9   // number of plant noise inputs, w is disturbance noise vector
+#define NUMV 10  // number of measurements, v is the measurement noise vector
+#define NUMU 6   // number of deterministic inputs, U is the input vector
+extern float F[NUMX][NUMX], G[NUMX][NUMW], H[NUMV][NUMX];  // linearized system matrices
+extern float P[NUMX][NUMX], X[NUMX];                       // covariance matrix and state vector
+extern float Q[NUMW], R[NUMV];                             // input noise and measurement noise variances
+extern float K[NUMX][NUMV];                                // feedback gain matrix
+#endif
 
 /**
  * @addtogroup AHRS_Definitions 
@@ -415,6 +428,31 @@ int main()
         PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_AUX, "g: %d %d %d\r\n", (int16_t)(gyro_data.filtered.x * 1000), (int16_t)(gyro_data.filtered.y * 1000), (int16_t)(gyro_data.filtered.z * 1000));
         PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_AUX, "m: %d %d %d\r\n",  mag_data.raw.axis[0], mag_data.raw.axis[1], mag_data.raw.axis[2]);
         PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_AUX, "q: %d %d %d %d\r\n", (int16_t)(Nav.q[0] * 1000), (int16_t)(Nav.q[1] * 1000), (int16_t)(Nav.q[2] * 1000), (int16_t)(Nav.q[3] * 1000));
+#endif
+#ifdef DUMP_EKF
+        uint8_t framing[16] = {15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0};
+		extern float F[NUMX][NUMX], G[NUMX][NUMW], H[NUMV][NUMX];  // linearized system matrices
+		extern float P[NUMX][NUMX], X[NUMX];                       // covariance matrix and state vector
+		extern float Q[NUMW], R[NUMV];                             // input noise and measurement noise variances
+		extern float K[NUMX][NUMV];                                // feedback gain matrix
+        
+        // Dump raw buffer
+		int8_t result;
+		result = PIOS_COM_SendBuffer(PIOS_COM_AUX, &framing[0], 16); // framing header
+        result += PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &total_conversion_blocks, sizeof(total_conversion_blocks)); // dump block number
+        result += PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &mag_data, sizeof(mag_data));
+        result += PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &gps_data, sizeof(gps_data));
+        result += PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &accel_data, sizeof(accel_data));
+        result += PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &gyro_data, sizeof(gyro_data));
+        result += PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &Q, sizeof(float)*NUMX*NUMX);
+        result += PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &K, sizeof(float)*NUMX*NUMV);
+        result += PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &X, sizeof(float)*NUMX*NUMX);
+		
+        if(result == 0)
+            PIOS_LED_Off(LED1);
+        else {
+            PIOS_LED_On(LED1);
+        }
 #endif
 		
 		process_spi_request();

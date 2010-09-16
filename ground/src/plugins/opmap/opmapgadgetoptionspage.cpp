@@ -36,7 +36,7 @@
 #include <QtGui/QFileDialog>
 
 #include "opmapcontrol/opmapcontrol.h"
-
+#include "utils/pathutils.h"
 #include "ui_opmapgadgetoptionspage.h"
 
 // *********************************************
@@ -95,7 +95,7 @@ void OPMapGadgetOptionsPage::on_pushButtonCacheDefaults_clicked()
 
     m_page->checkBoxUseMemoryCache->setChecked(true);
 
-    m_page->lineEditCacheLocation->setPath(QDir::currentPath() + QDir::separator() + "mapscache" + QDir::separator());
+    m_page->lineEditCacheLocation->setPath(Utils::PathUtils().GetStoragePath() + "mapscache" + QDir::separator());
 
 }
 

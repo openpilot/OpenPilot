@@ -90,4 +90,50 @@ QString PathUtils::InsertDataPath(QString path)
     return QDir::toNativeSeparators(path);
 }
 
+/**
+  Gets a standard user-writable location for the system
+  */
+QString PathUtils::GetStoragePath()
+{
+    // This routine works with "/" as the standard:
+    // Figure out root:  Up one from 'bin'
+    const QString homeDirPath = QDir::home().canonicalPath();
+    QString storagePath = homeDirPath;
+    storagePath += QLatin1Char('/');
+    storagePath += QLatin1String("OpenPilot");
+    storagePath += QLatin1Char('/');
+   return storagePath;
+}
+
+/**
+  Removes the standard storage path and replace with a tag
+  */
+QString PathUtils::RemoveStoragePath(QString path)
+{
+    // Depending on the platform, we might get either "/" or "\"
+    // so we need to go to the standard ("/")
+    QString goodPath = QDir::fromNativeSeparators(path);
+    if (goodPath.startsWith(GetStoragePath())) {
+        int i = goodPath.length()- GetStoragePath().length();
+        return QString("%%STOREPATH%%") + goodPath.right(i);
+    } else
+        return goodPath;
+
+}
+
+/**
+  Inserts the standard storage path is there is a storage path tag
+  */
+QString PathUtils::InsertStoragePath(QString path)
+{
+    if (path.startsWith(QString("%%STOREPATH%%")))
+    {
+        QString newPath = GetStoragePath();
+        newPath += path.right(path.length()-13);
+        return QDir::toNativeSeparators(newPath);
+    }
+    return QDir::toNativeSeparators(path);
+
+}
+
 }

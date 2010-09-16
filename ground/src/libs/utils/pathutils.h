@@ -44,6 +44,10 @@ public:
     QString RemoveDataPath(QString path);
     QString InsertDataPath(QString path);
 
+    QString GetStoragePath();
+    QString RemoveStoragePath(QString path);
+    QString InsertStoragePath(QString path);
+
 };
 
 }

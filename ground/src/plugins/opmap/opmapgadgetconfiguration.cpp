@@ -41,7 +41,7 @@ OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId, const QByteA
     m_showTileGridLines(false),
     m_accessMode("ServerAndCache"),
     m_useMemoryCache(true),
-    m_cacheLocation(QDir::currentPath() + QDir::separator() + "mapscache" + QDir::separator())
+    m_cacheLocation(Utils::PathUtils().GetStoragePath() + "mapscache" + QDir::separator())
 {
     if (state.count() > 0)
     {
@@ -76,7 +76,7 @@ OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId, const QByteA
 
 	if (!accessMode.isEmpty()) m_accessMode = accessMode;
 	m_useMemoryCache = useMemoryCache;
-        if (!cacheLocation.isEmpty()) m_cacheLocation = Utils::PathUtils().InsertDataPath(cacheLocation);
+        if (!cacheLocation.isEmpty()) m_cacheLocation = Utils::PathUtils().InsertStoragePath(cacheLocation);
     }
 }
 
@@ -90,7 +90,7 @@ OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId,  QSettings* 
     m_showTileGridLines(false),
     m_accessMode("ServerAndCache"),
     m_useMemoryCache(true),
-    m_cacheLocation(QDir::currentPath() + QDir::separator() + "mapscache" + QDir::separator())
+    m_cacheLocation(Utils::PathUtils().GetStoragePath() + "mapscache" + QDir::separator())
 {
 
     //if a saved configuration exists load it
@@ -114,7 +114,7 @@ OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId,  QSettings* 
 
         if (!accessMode.isEmpty()) m_accessMode = accessMode;
         m_useMemoryCache = useMemoryCache;
-        if (!cacheLocation.isEmpty()) m_cacheLocation = Utils::PathUtils().InsertDataPath(cacheLocation);
+        if (!cacheLocation.isEmpty()) m_cacheLocation = Utils::PathUtils().InsertStoragePath(cacheLocation);
     }
 }
 
@@ -144,5 +144,5 @@ void OPMapGadgetConfiguration::saveConfig(QSettings* qSettings) const {
    qSettings->setValue("showTileGridLines", m_showTileGridLines);
    qSettings->setValue("accessMode", m_accessMode);
    qSettings->setValue("useMemoryCache", m_useMemoryCache);
-   qSettings->setValue("cacheLocation", Utils::PathUtils().RemoveDataPath(m_cacheLocation));
+   qSettings->setValue("cacheLocation", Utils::PathUtils().RemoveStoragePath(m_cacheLocation));
 }

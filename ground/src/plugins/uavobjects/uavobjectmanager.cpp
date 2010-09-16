@@ -259,6 +259,7 @@ UAVObject* UAVObjectManager::getObject(const QString* name, quint32 objId, quint
             }
         }
     }
+    Q_ASSERT_X(0,"UAVObjectManager::getObject",(QString("Non existant object ") + *name + QString("requested.  This indicates a bug.  Make sure you also have null checking for non-debug code.")).toAscii());
     // If this point is reached then the requested object could not be found
     return NULL;
 }

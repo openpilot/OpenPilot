@@ -111,7 +111,7 @@ static void stabilizationTask(void* parameters)
 		AttitudeActualGet(&attitudeActual);
 
 		// Pitch stabilization control loop
-		pitchError = bound(attitudeDesired.Pitch, -stabSettings.PitchMax, stabSettings.PitchMax) - attitudeActual.Pitch;
+		pitchError = attitudeDesired.Pitch - attitudeActual.Pitch;
 		pitchDerivative = (pitchError - pitchErrorLast) / stabSettings.UpdatePeriod;
 		pitchIntegral = bound(pitchIntegral+pitchError*stabSettings.UpdatePeriod, -stabSettings.PitchIntegralLimit, stabSettings.PitchIntegralLimit);
 		actuatorDesired.Pitch = stabSettings.PitchKp*pitchError + stabSettings.PitchKi*pitchIntegral + stabSettings.PitchKd*pitchDerivative;
@@ -119,7 +119,7 @@ static void stabilizationTask(void* parameters)
 		pitchErrorLast = pitchError;
 
 		// Roll stabilization control loop
-		rollError = bound(attitudeDesired.Roll, -stabSettings.RollMax, stabSettings.RollMax) - attitudeActual.Roll;
+		rollError = attitudeDesired.Roll - attitudeActual.Roll;
 		rollDerivative = (rollError - rollErrorLast) / stabSettings.UpdatePeriod;
 		rollIntegral = bound(rollIntegral+rollError*stabSettings.UpdatePeriod, -stabSettings.RollIntegralLimit, stabSettings.RollIntegralLimit);
 		actuatorDesired.Roll = stabSettings.RollKp*rollError + stabSettings.RollKi*rollIntegral + stabSettings.RollKd*rollDerivative;

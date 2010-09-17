@@ -130,7 +130,7 @@ static void stabilizationTask(void* parameters)
 		if (( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_VTOL )||( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_HELICP))
 		{
 			if(stabSettings.YawMode == STABILIZATIONSETTINGS_YAWMODE_RATE) {  // rate stabilization on yaw
-				yawChange = attitudeActual.Yaw - yawPrevious;
+				yawChange = (attitudeActual.Yaw - yawPrevious) / stabSettings.UpdatePeriod;
 				yawPrevious = attitudeActual.Yaw;
 				yawError = bound(attitudeDesired.Yaw, -stabSettings.YawMax, stabSettings.YawMax) - yawChange;
 			} else { // heading stabilization

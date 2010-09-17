@@ -17,7 +17,10 @@ HEADERS += configplugin.h \
     configtaskwidget.h \
     configairframewidget.h \
     configtelemetrywidget.h \
-    configahrswidget.h
+    configahrswidget.h \
+    mixercurvewidget.h \
+    mixercurvepoint.h \
+    mixercurveline.h
 SOURCES += configplugin.cpp \
     configgadgetconfiguration.cpp \
     configgadgetwidget.cpp \
@@ -29,7 +32,10 @@ SOURCES += configplugin.cpp \
     configservowidget.cpp \
     configairframewidget.cpp \
     configtelemetrywidget.cpp \
-    configahrswidget.cpp
+    configahrswidget.cpp \
+    mixercurvewidget.cpp \
+    mixercurvepoint.cpp \
+    mixercurveline.cpp
 FORMS += settingswidget.ui \
     airframe.ui \
     telemetry.ui \

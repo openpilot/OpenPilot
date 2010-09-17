@@ -107,8 +107,26 @@
      <string>Aircraft type:</string>
     </property>
    </widget>
+   <widget class="MixerCurveWidget" name="widget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>70</y>
+      <width>131</width>
+      <height>131</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MixerCurveWidget</class>
+   <extends>QWidget</extends>
+   <header>mixercurvewidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

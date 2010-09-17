@@ -6,5 +6,6 @@
         <file>images/ahrs-calib.svg</file>
         <file>images/AHRS-v1.3.png</file>
         <file>images/paper-plane.svg</file>
+        <file>images/curve-bg.svg</file>
     </qresource>
 </RCC>

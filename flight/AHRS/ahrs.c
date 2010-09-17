@@ -361,8 +361,10 @@ int main()
             mag[1] = -(mag_data.raw.axis[0] - mag_bias[0]);
             mag[2] = -(mag_data.raw.axis[2] - mag_bias[2]);
             
-            INSPrediction(gyro, accel, 1 / (float) EKF_RATE);
-            
+            INSStatePrediction(gyro, accel, 1 / (float) EKF_RATE);
+			process_spi_request();
+			INSCovariancePrediction(1 / (float) EKF_RATE);
+			
             if ( gps_data.updated && gps_data.quality == 1) 
             {
 				// Compute velocity from Heading and groundspeed
@@ -418,6 +420,8 @@ int main()
             attitude_data.quaternion.q2 = q[1];
             attitude_data.quaternion.q3 = q[2];
             attitude_data.quaternion.q4 = q[3];
+			process_spi_request();
+
         }
         
         ahrs_state = AHRS_IDLE;
@@ -455,7 +459,6 @@ int main()
         }
 #endif
 		
-		process_spi_request();
     }
     
     return 0;
@@ -644,7 +647,8 @@ void converge_insgps()
         mag[2] = -mag_data.raw.axis[2];
         
         RPY2Quaternion(rpy,Nav.q);
-        INSPrediction( temp_gyro, accel, 1 / (float) EKF_RATE );
+        INSStatePrediction( temp_gyro, accel, 1 / (float) EKF_RATE );
+		INSCovariancePrediction(1 / (float) EKF_RATE);
         FullCorrection(mag,pos,vel,BaroAlt); 
         process_spi_request(); // again we must keep this hear to prevent SPI connection dropping
     } 

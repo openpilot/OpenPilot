@@ -136,7 +136,7 @@ void INSSetMagNorth(float B[3])
   Be[2] = B[2];
 }
 
-void INSPrediction(float gyro_data[3], float accel_data[3], float dT)
+void INSStatePrediction(float gyro_data[3], float accel_data[3], float dT)
 {
 	float U[6];
 	float qmag;
@@ -156,7 +156,7 @@ void INSPrediction(float gyro_data[3], float accel_data[3], float dT)
     RungeKutta(X,U,dT);
     qmag=sqrt(X[6]*X[6] + X[7]*X[7] + X[8]*X[8] + X[9]*X[9]);
     X[6] /= qmag; X[7] /= qmag; X[8] /= qmag; X[9] /= qmag;
-	CovariancePrediction(F,G,Q,dT,P);
+	//CovariancePrediction(F,G,Q,dT,P);
 
     // Update Nav solution structure
     Nav.Pos[0] = X[0];
@@ -169,6 +169,11 @@ void INSPrediction(float gyro_data[3], float accel_data[3], float dT)
     Nav.q[1] = X[7];
     Nav.q[2] = X[8];
     Nav.q[3] = X[9];
+}
+
+void INSCovariancePrediction(float dT)
+{
+	CovariancePrediction(F,G,Q,dT,P);
 }
 
 float zeros[3] = {0,0,0};

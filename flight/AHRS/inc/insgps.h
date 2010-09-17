@@ -50,7 +50,9 @@
 
 //  Exposed Function Prototypes
 void INSGPSInit();
-void INSPrediction(float gyro_data[3], float accel_data[3], float dT);
+void INSStatePrediction(float gyro_data[3], float accel_data[3], float dT);
+void INSCovariancePrediction(float dT); 
+
 void INSSetPosVelVar(float PosVar);
 void INSSetGyroBias(float gyro_bias[3]);
 void INSSetAccelVar(float accel_var[3]);

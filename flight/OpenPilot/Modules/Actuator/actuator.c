@@ -40,6 +40,12 @@
 #include "actuatorcommand.h"
 #include "manualcontrolcommand.h"
 
+//yaw stabilisation for helis...
+#include "stabilizationsettings.h"
+#include "attitudeactual.h"
+//yaw stabilisation for helis...
+
+
 // Private constants
 #define MAX_QUEUE_SIZE 2
 #define STACK_SIZE configMINIMAL_STACK_SIZE
@@ -47,6 +53,18 @@
 #define FAILSAFE_TIMEOUT_MS 100
 
 // Private types
+		//yaw stabilisation for helis...
+		//currently just coppied from simple stabilisation
+		#define YAW_INTEGRAL_LIMIT 0.5
+		AttitudeActualData attitudeActual;
+		StabilizationSettingsData stabSettings;
+		float ccpmYawError, ccpmYawErrorLast;
+		float ccpmYawDerivative;
+		float ccpmYawIntegral, ccpmYawIntegralLimit;
+		float desiredYaw;
+		static float bound(float val, float min, float max);
+		//yaw stabilisation for helis...
+
 
 // Private variables
 static xQueueHandle queue;
@@ -75,6 +93,10 @@ int32_t ActuatorInitialize()
 
 	// Listen for ExampleObject1 updates
 	ActuatorDesiredConnectQueue(queue);
+
+	ccpmYawErrorLast = 0.0;
+
+
 
 	// Start main task
 	xTaskCreate(actuatorTask, (signed char*)"Actuator", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
@@ -563,10 +585,46 @@ static int32_t mixerCCPM( ActuatorSettingsData* settings, const ActuatorDesiredD
 		{
 			configOK=0;
 		}
+		ccpmYawErrorLast = 0.0;
+
 	}
 	else
 	{//TODO need to implement the stabilization PID loop to provide heading hold gyro functionality in manual control mode
+		//currently just coppied from simple stabilisation
 
+		AttitudeActualGet(&attitudeActual);
+		StabilizationSettingsGet(&stabSettings);
+
+		if (desired->Yaw<0)
+		{
+			desiredYaw = 360 + (desired->Yaw*180.0);
+		}
+		else
+		{
+			desiredYaw = (desired->Yaw*180.0);
+		}
+
+		// Yaw stabilization control loop
+			ccpmYawError = desiredYaw - attitudeActual.Yaw;
+			//this should make it take the quickest path to reach the desired yaw
+			if (ccpmYawError>180.0)ccpmYawError -= 360;
+			if (ccpmYawError<-180.0)ccpmYawError += 360;
+			ccpmYawDerivative = ccpmYawError - ccpmYawErrorLast;
+			ccpmYawIntegralLimit = YAW_INTEGRAL_LIMIT / stabSettings.YawKi;
+			ccpmYawIntegral = bound(ccpmYawIntegral+ccpmYawError*stabSettings.UpdatePeriod, -ccpmYawIntegralLimit, ccpmYawIntegralLimit);
+			desiredYaw = stabSettings.YawKp*ccpmYawError + stabSettings.YawKi*ccpmYawIntegral + stabSettings.YawKd*ccpmYawDerivative;;
+			desiredYaw = bound(desiredYaw, -1.0, 1.0);
+			ccpmYawErrorLast = ccpmYawError;
+			if ( settings->CCPMTailRotor != ACTUATORSETTINGS_CCPMTAILROTOR_NONE )
+			{
+				cmd->Channel[ settings->CCPMTailRotor ] = scaleChannel(desiredYaw, settings->ChannelMax[ settings->CCPMTailRotor ],
+																	  settings->ChannelMin[ settings->CCPMTailRotor ],
+																	  settings->ChannelNeutral[ settings->CCPMTailRotor ]);
+			}
+			else
+			{
+				configOK=0;
+			}
 	}
 	if (configOK<2)return -1;
 	return 0;

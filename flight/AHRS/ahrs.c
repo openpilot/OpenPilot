@@ -712,7 +712,6 @@ void process_spi_request(void)
         case OPAHRS_MSG_V1_REQ_NORTH:
             opahrs_msg_v1_init_user_tx (&user_tx_v1, OPAHRS_MSG_V1_RSP_NORTH);
             INSSetMagNorth(user_rx_v1.payload.user.v.req.north.Be);
-            INSGPSInit(); // TODO: Better reinitialization when North is finally established
             lfsm_user_set_tx_v1 (&user_tx_v1);
             break;
         case OPAHRS_MSG_V1_REQ_CALIBRATION:

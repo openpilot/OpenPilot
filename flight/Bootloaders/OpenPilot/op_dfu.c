@@ -262,7 +262,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 							Data += xReceive_Buffer[DATA + 3 + offset];
 							aux = baseOfAdressType(TransferType) + (uint32_t)(
 									Count * 14 * 4 + x * 4);
-							uint8_t result = 0;
+							result = 0;
 							for (int retry = 0; retry < MAX_WRI_RETRYS; ++retry) {
 								if (result == 0) {
 									result = (FLASH_ProgramWord(aux, Data)

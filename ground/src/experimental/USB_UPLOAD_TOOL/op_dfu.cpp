@@ -5,17 +5,14 @@
 
 OP_DFU::OP_DFU(bool _debug): debug(_debug)
 {
-    QWaitCondition sleep;
-    QMutex mutex;
+    send_delay=10;
     int numDevices=0;
     cout<<"Please connect device now\n";
     int count=0;
     while(numDevices==0)
     {
         cout<<".";
-        mutex.lock();
-        sleep.wait(&mutex,500);
-        mutex.unlock();
+        delay::msleep(500);
         numDevices = hidHandle.open(1,0x20a0,0x4117,0,0); //0xff9c,0x0001);
         if(++count==10)
         {
@@ -91,8 +88,8 @@ bool OP_DFU::StartUpload(qint32 const & numberOfBytes, TransferTypes const & typ
     buf[9] = crc>>16;
     buf[10] = crc>>8;
     buf[11] = crc;
-
-    qDebug()<<"Number of packets:"<<numberOfPackets<<" Size of last packet:"<<lastPacketCount;
+    if(debug)
+        qDebug()<<"Number of packets:"<<numberOfPackets<<" Size of last packet:"<<lastPacketCount;
     int result = hidHandle.send(0,buf, BUF_LEN, 5000);
     if(debug)
         qDebug() << result << " bytes sent";
@@ -104,7 +101,6 @@ bool OP_DFU::StartUpload(qint32 const & numberOfBytes, TransferTypes const & typ
 }
 bool OP_DFU::UploadData(qint32 const & numberOfBytes, QByteArray  & data)
 {
-    qDebug()<<(int)data[0];
     int lastPacketCount;
     qint32 numberOfPackets=numberOfBytes/4/14;
     int pad=(numberOfBytes-numberOfPackets*4*14)/4;
@@ -135,6 +131,7 @@ bool OP_DFU::UploadData(qint32 const & numberOfBytes, QByteArray  & data)
             packetsize=lastPacketCount;
         else
             packetsize=14;
+       // qDebug()<<packetcount;
         buf[2] = packetcount>>24;//DFU Count
         buf[3] = packetcount>>16;//DFU Count
         buf[4] = packetcount>>8;//DFU Count
@@ -151,8 +148,9 @@ bool OP_DFU::UploadData(qint32 const & numberOfBytes, QByteArray  & data)
 
         //        }
         // qDebug()<<" Data0="<<(int)data[0]<<" Data0="<<(int)data[1]<<" Data0="<<(int)data[2]<<" Data0="<<(int)data[3]<<" buf6="<<(int)buf[6]<<" buf7="<<(int)buf[7]<<" buf8="<<(int)buf[8]<<" buf9="<<(int)buf[9];
-
+        delay::msleep(send_delay);
         int result = hidHandle.send(0,buf, BUF_LEN, 5000);
+     //   qDebug()<<"sent:"<<result;
         if(result<1)
         {
             return false;
@@ -162,10 +160,13 @@ bool OP_DFU::UploadData(qint32 const & numberOfBytes, QByteArray  & data)
 
     }
     cout<<"\n";
+    // while(true){}
     return true;
 }
 OP_DFU::Status OP_DFU::UploadDescription(QString  & description)
 {
+    if(debug)
+        qDebug()<<"Starting uploading description";
     if(description.length()%4!=0)
     {      
         int pad=description.length()/4;
@@ -446,6 +447,7 @@ bool OP_DFU::EndOperation()
 }
 OP_DFU::Status OP_DFU::UploadFirmware(const QString &sfile, const bool &verify,int device)
 {
+    OP_DFU::Status ret;
     cout<<"Starting Firmware Uploading...\n";
     QFile file(sfile);
     //QFile file("in.txt");
@@ -467,42 +469,63 @@ OP_DFU::Status OP_DFU::UploadFirmware(const QString &sfile, const bool &verify,i
         pad=pad-arr.length();
         arr.append(QByteArray(pad,255));
     }
+    if(devices[device].SizeOfCode<arr.length())
+    {
+        cout<<"ERROR file to big for device\n";
+        return OP_DFU::abort;;
+    }
     quint32 crc=CRCFromQBArray(arr,devices[device].SizeOfCode);
+    cout<<"NEW FIRMWARE CRC="<<crc<<"\n";
     if(!StartUpload(arr.length(),FW,crc))
     {
         if(debug)
+        {
             qDebug()<<"StartUpload failed";
+            OP_DFU::Status ret=StatusRequest();
+            qDebug()<<"StartUpload returned:"<< StatusToString(ret);
+        }
         return OP_DFU::abort;
     }
     cout<<"Erasing memory";
+    delay::msleep(3000);
     for(int x=0;x<3;++x)
     {
         OP_DFU::Status ret=StatusRequest();
+        qDebug()<<"Erase returned:"<<StatusToString(ret);
         if (ret==OP_DFU::uploading)
-               break;
+            break;
         else
-             return OP_DFU::abort;
+            return OP_DFU::abort;
     }
     if(!UploadData(arr.length(),arr))
     {
         if(debug)
-            qDebug()<<"Upload failed";
+        {
+            qDebug()<<"Upload failed (upload data)";
+            OP_DFU::Status ret=StatusRequest();
+            qDebug()<<"StartUpload returned:"<<StatusToString(ret);
+        }
         return OP_DFU::abort;
     }
     if(!EndOperation())
     {
         if(debug)
-            qDebug()<<"Upload failed";
+        {
+            qDebug()<<"Upload failed (end operation)";
+            OP_DFU::Status ret=StatusRequest();
+            qDebug()<<"StartUpload returned:"<<StatusToString(ret);
+        }
         return OP_DFU::abort;
     }
-    OP_DFU::Status ret=StatusRequest();
+    ret=StatusRequest();
+  //  qDebug()<<"---------------------------"<<StatusToString(ret);
     if(ret==OP_DFU::Last_operation_Success)
     {
 
     }
     else
     {
-        return OP_DFU::abort;
+        return ret;
     }
     if(verify)
     {
@@ -614,6 +637,8 @@ QString OP_DFU::StatusToString(OP_DFU::Status const & status)
         return "Jmp to user FW failed";
     case abort:
         return "abort";
+    case uploadingStarting:
+        return "Uploading Starting";
     default:
         return "unknown";
 

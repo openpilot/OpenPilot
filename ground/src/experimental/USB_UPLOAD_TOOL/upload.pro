@@ -15,9 +15,11 @@ CONFIG   -= app_bundle
 TEMPLATE = app
 
 SOURCES += main.cpp \
-    op_dfu.cpp
+    op_dfu.cpp \
+    delay.cpp
 HEADERS += ../../plugins/rawhid/pjrc_rawhid.h \
-    op_dfu.h
+    op_dfu.h \
+    delay.h
 
 win32 {
     SOURCES += ../../plugins/rawhid/pjrc_rawhid_win.cpp

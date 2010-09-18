@@ -184,6 +184,11 @@ int main(int argc, char *argv[])
             cout<<"Could not enter DFU mode\n";
             return -1;
         }
+        if (debug)
+        {
+            OP_DFU::Status ret=dfu.StatusRequest();
+            qDebug()<<dfu.StatusToString(ret);
+        }
         if(!(action==OP_DFU::actionStatusReq || action==OP_DFU::actionReset || action== OP_DFU::actionJump))
         {
             dfu.findDevices();
@@ -202,6 +207,7 @@ int main(int argc, char *argv[])
                     cout<<"FW CRC="<<dfu.devices[x].FW_CRC<<"\n";
 
                     int size=((OP_DFU::device)dfu.devices[x]).SizeOfDesc;
+                    dfu.enterDFU(x);
                     cout<<"Description:"<<dfu.DownloadDescription(size).toLatin1().data()<<"\n";
                     cout<<"\n";
                 }
@@ -274,10 +280,10 @@ int main(int argc, char *argv[])
 
         return 0;
     }
-    //OP_DFU dfu(false);
+    OP_DFU dfu(true);
     //dfu.findDevices();
-
-    //dfu.UploadFirmware("c:/openpilot.bin",true,0);
+    dfu.enterDFU(1);
+    dfu.UploadFirmware("c:/ahrs.bin",true,1);
     // dfu.UploadDescription("josemanuel");
     //  QString str=dfu.DownloadDescription(12);
     // dfu.JumpToApp();

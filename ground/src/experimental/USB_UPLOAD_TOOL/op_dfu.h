@@ -8,6 +8,7 @@
  #include <QCryptographicHash>
 #include <QList>
 #include <iostream>
+#include "delay.h"
 using namespace std;
 #define BUF_LEN 64
 
@@ -41,19 +42,20 @@ public:
 
     enum Status
     {
-        DFUidle,
-        uploading,
-        wrong_packet_received,
-        too_many_packets,
-        too_few_packets,
-        Last_operation_Success,
-        downloading,
-        idle,
-        Last_operation_failed,
-        outsideDevCapabilities,
-        CRC_Fail,
-        failed_jump,
-        abort
+        DFUidle,//0
+        uploading,//1
+        wrong_packet_received,//2
+        too_many_packets,//3
+        too_few_packets,//4
+        Last_operation_Success,//5
+        downloading,//6
+        idle,//7
+        Last_operation_failed,//8
+        uploadingStarting,//9
+        outsideDevCapabilities,//10
+        CRC_Fail,//11
+        failed_jump,//12
+        abort//13
 
     };
     enum Actions
@@ -121,6 +123,7 @@ public:
     quint32 CRC32WideFast(quint32 Crc, quint32 Size, quint32 *Buffer);
     quint32 CRCFromQBArray(QByteArray array, quint32 Size);
     void test();
+    int send_delay;
 private:
     bool debug;
     int RWFlags;

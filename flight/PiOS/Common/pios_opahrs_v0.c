@@ -49,7 +49,7 @@ static int32_t opahrs_msg_txrx (const uint8_t * tx, uint8_t * rx, uint32_t len)
 #ifdef PIOS_INCLUDE_FREERTOS
 	vTaskDelay(20 / portTICK_RATE_MS);
 #else
-	PIOS_DELAY_WaitmS(20);
+	//PIOS_DELAY_WaitmS(20);
 #endif
 	rc = PIOS_SPI_TransferBlock(PIOS_OPAHRS_SPI, tx, rx, len, NULL);
 	PIOS_SPI_RC_PinSet(PIOS_OPAHRS_SPI, 1);
@@ -83,7 +83,7 @@ static enum opahrs_result opahrs_msg_v0_send_req (const struct opahrs_msg_v0 * r
 #ifdef PIOS_INCLUDE_FREERTOS
 				vTaskDelay(20 / portTICK_RATE_MS);
 #else
-				PIOS_DELAY_WaitmS(20);
+				//PIOS_DELAY_WaitmS(1);
 #endif
 				continue;
 				case OPAHRS_MSG_LINK_STATE_READY:
@@ -97,7 +97,7 @@ static enum opahrs_result opahrs_msg_v0_send_req (const struct opahrs_msg_v0 * r
 #ifdef PIOS_INCLUDE_FREERTOS
 			vTaskDelay(50 / portTICK_RATE_MS);
 #else
-			PIOS_DELAY_WaitmS(50);
+			//PIOS_DELAY_WaitmS(1);
 #endif
 			continue;
 		}
@@ -131,7 +131,7 @@ static enum opahrs_result opahrs_msg_v0_recv_rsp (enum opahrs_msg_v0_tag tag, st
 #ifdef PIOS_INCLUDE_FREERTOS
 				vTaskDelay(20 / portTICK_RATE_MS);
 #else
-				PIOS_DELAY_WaitmS(20);
+				PIOS_DELAY_WaitmS(1);
 #endif
 				continue;
 				case OPAHRS_MSG_LINK_STATE_INACTIVE:
@@ -202,21 +202,20 @@ enum opahrs_result PIOS_OPAHRS_bl_GetSerial(struct opahrs_msg_v0 * rsp)
 					OPAHRS_MSG_V0_RSP_SERIAL));
 }
 
-enum opahrs_result PIOS_OPAHRS_bl_FwupStart(struct opahrs_msg_v0 * req, struct opahrs_msg_v0 * rsp)
+enum opahrs_result PIOS_OPAHRS_bl_FwupStart(struct opahrs_msg_v0 * rsp)
 {
-	if (!req || !rsp) return OPAHRS_RESULT_FAILED;
-	enum opahrs_result rc;
-	/* Make up an attituderaw request */
-	opahrs_msg_v0_init_user_tx (req, OPAHRS_MSG_V0_REQ_FWUP_START);
+	if (!rsp) return OPAHRS_RESULT_FAILED;
+	return (PIOS_OPAHRS_v0_simple_req (OPAHRS_MSG_V0_REQ_FWUP_START,
+						rsp,
+						OPAHRS_MSG_V0_RSP_FWUP_STATUS));
+}
 
-	/* Send the message until it is received */
-	rc = opahrs_msg_v0_send_req (req);
-	if (rc != OPAHRS_RESULT_OK) {
-		/* Failed to send the request, bail out */
-		return rc;
-	}
-
-	return opahrs_msg_v0_recv_rsp (OPAHRS_MSG_V0_RSP_FWUP_STATUS, rsp);
+enum opahrs_result PIOS_OPAHRS_bl_FwupStatus(struct opahrs_msg_v0 * rsp)
+{
+	if (!rsp) return OPAHRS_RESULT_FAILED;
+	return (PIOS_OPAHRS_v0_simple_req (OPAHRS_MSG_V0_REQ_FWUP_STATUS,
+						rsp,
+						OPAHRS_MSG_V0_RSP_FWUP_STATUS));
 }
 
 enum opahrs_result PIOS_OPAHRS_bl_FwupData(struct opahrs_msg_v0 * req, struct opahrs_msg_v0 * rsp)
@@ -258,7 +257,7 @@ enum opahrs_result PIOS_OPAHRS_bl_resync(void)
 #ifdef PIOS_INCLUDE_FREERTOS
 	vTaskDelay(20 / portTICK_RATE_MS);
 #else
-	PIOS_DELAY_WaitmS(20);
+	//PIOS_DELAY_WaitmS(1);
 #endif
 
 	for (uint32_t i = 0; i < sizeof(req); i++) {
@@ -277,7 +276,7 @@ enum opahrs_result PIOS_OPAHRS_bl_resync(void)
 #ifdef PIOS_INCLUDE_FREERTOS
 		vTaskDelay(10 / portTICK_RATE_MS);
 #else
-		PIOS_DELAY_WaitmS(10);
+		PIOS_DELAY_WaitmS(1);
 #endif
 	}
 
@@ -287,21 +286,24 @@ enum opahrs_result PIOS_OPAHRS_bl_resync(void)
 	return rc;
 }
 
-enum opahrs_result PIOS_OPAHRS_bl_reset()
+enum opahrs_result PIOS_OPAHRS_bl_reset(uint32_t delay)
 {
-	struct opahrs_msg_v0 rsp;
-	return (PIOS_OPAHRS_v0_simple_req (OPAHRS_MSG_V0_REQ_RESET,
-					&rsp,
-					OPAHRS_MSG_V0_RSP_FWUP_STATUS));
+		struct opahrs_msg_v0 req;
+		/* Make up an attituderaw request */
+		opahrs_msg_v0_init_user_tx (&req, OPAHRS_MSG_V0_REQ_RESET);
+		req.payload.user.v.req.reset.reset_delay_in_ms=delay;
+		/* Send the message until it is received */
+		return opahrs_msg_v0_send_req (&req);
 }
 
-enum opahrs_result PIOS_OPAHRS_bl_boot()
+enum opahrs_result PIOS_OPAHRS_bl_boot(uint32_t delay)
 {
-	struct opahrs_msg_v0 rsp;
-
-	return (PIOS_OPAHRS_v0_simple_req (OPAHRS_MSG_V0_REQ_BOOT,
-					&rsp,
-					OPAHRS_MSG_V0_RSP_FWUP_STATUS));
+	struct opahrs_msg_v0 req;
+	/* Make up an attituderaw request */
+	opahrs_msg_v0_init_user_tx (&req, OPAHRS_MSG_V0_REQ_BOOT);
+	req.payload.user.v.req.boot.boot_delay_in_ms=delay;
+	/* Send the message until it is received */
+	return opahrs_msg_v0_send_req (&req);
 }
 #endif /* PIOS_INCLUDE_OPAHRS */
 

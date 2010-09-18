@@ -84,9 +84,13 @@ struct opahrs_msg_v0_req_serial {
 struct opahrs_msg_v0_req_fwup_start {
 } __attribute__((__packed__));
 
+struct opahrs_msg_v0_req_fwup_status {
+} __attribute__((__packed__));
+
 struct opahrs_msg_v0_req_fwup_data {
 	uint32_t adress;
-	uint32_t data;
+	uint32_t data[14];
+	uint8_t size;
 } __attribute__((__packed__));
 
 struct opahrs_msg_v0_req_mem_map {
@@ -102,6 +106,7 @@ union opahrs_msg_v0_req {
   struct opahrs_msg_v0_req_reset        reset;
   struct opahrs_msg_v0_req_boot         boot;
   struct opahrs_msg_v0_req_serial       serial;
+  struct opahrs_msg_v0_req_fwup_status  status_req;
   struct opahrs_msg_v0_req_mem_map		mem_map;
   struct opahrs_msg_v0_req_fwup_start   fwup_start;
   struct opahrs_msg_v0_req_fwup_data    fwup_data;
@@ -112,7 +117,7 @@ struct opahrs_msg_v0_rsp_versions {
   uint8_t  hw_version;
   uint16_t bl_version;
   uint32_t fw_version;
-  uint8_t	description[100];
+  uint8_t  description[100];
 } __attribute__((__packed__));
 
 struct opahrs_msg_v0_rsp_serial {
@@ -152,6 +157,7 @@ enum opahrs_msg_v0_tag {
   OPAHRS_MSG_V0_REQ_FWUP_START,
   OPAHRS_MSG_V0_REQ_FWUP_DATA,
   OPAHRS_MSG_V0_REQ_FWUP_VERIFY,
+  OPAHRS_MSG_V0_REQ_FWUP_STATUS,
 
   OPAHRS_MSG_V0_RSP_VERSIONS,
   OPAHRS_MSG_V0_RSP_SERIAL,

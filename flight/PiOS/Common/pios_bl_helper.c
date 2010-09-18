@@ -77,10 +77,11 @@ uint32_t crc_memory_calc()
 
 void read_description(uint8_t * array)
 {
+	uint8_t x=0;
 	for(uint32_t i=START_OF_USER_CODE+SIZE_OF_CODE;i<START_OF_USER_CODE+SIZE_OF_CODE+SIZE_OF_DESCRIPTION;++i)
 	{
-		*array=*FLASH_If_Read(i);
-		array++;
+		array[x]=*FLASH_If_Read(i);
+		++x;
 	}
 }
 void CRC_Ini()

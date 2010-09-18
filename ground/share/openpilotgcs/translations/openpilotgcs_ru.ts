@@ -1034,11 +1034,6 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>Load file...</source>
-        <translation>Загрузить файл...</translation>
-    </message>
-    <message>
-        <location/>
         <source>BackgroundID</source>
         <translation>Фон</translation>
     </message>
@@ -1108,14 +1103,14 @@ p, li { white-space: pre-wrap; }
         <translation>Индикатор 3</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/dial/dialgadgetoptionspage.cpp" line="+254"/>
-        <source>QFileDialog::getOpenFileName()</source>
-        <translation>Открытие файла</translation>
+        <location filename="../../../src/plugins/dial/dialgadgetoptionspage.cpp" line="+85"/>
+        <source>SVG image (*.svg)</source>
+        <translation>SVG изображение (*.svg)</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>All Files (*);;SVG Files (*.svg)</source>
-        <translation>Все файлы (*);;SVG файлы (*.svg)</translation>
+        <location line="+1"/>
+        <source>Choose SVG image</source>
+        <translation>Выберите SVG изображение</translation>
     </message>
 </context>
 <context>
@@ -1134,6 +1129,11 @@ p, li { white-space: pre-wrap; }
         <location/>
         <source>Flight Mode:</source>
         <translation>Режим полета:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Armed</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1405,9 +1405,14 @@ p, li { white-space: pre-wrap; }
         <translation>Файл конфигурации по умолчанию</translation>
     </message>
     <message>
-        <location/>
-        <source>Load file...</source>
-        <translation>Загрузить файл...</translation>
+        <location filename="../../../src/plugins/importexport/importexportgadgetoptionspage.cpp" line="+55"/>
+        <source>INI file (*.ini)</source>
+        <translation>Файл настроек (*.ini)</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Choose configuration file</source>
+        <translation>Укажите файл с настройками</translation>
     </message>
 </context>
 <context>
@@ -1535,11 +1540,6 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>Load file...</source>
-        <translation>Загрузить файл...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Whole range:</source>
         <translation>Весь спектр:</translation>
     </message>
@@ -1604,14 +1604,14 @@ p, li { white-space: pre-wrap; }
         <translation>Коэффициент:</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/lineardial/lineardialgadgetoptionspage.cpp" line="+143"/>
-        <source>QFileDialog::getOpenFileName()</source>
-        <translation>Загрузка SVG файла</translation>
+        <location filename="../../../src/plugins/lineardial/lineardialgadgetoptionspage.cpp" line="+59"/>
+        <source>SVG image (*.svg)</source>
+        <translation>SVG изображение (*.svg)</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>All Files (*);;SVG Files (*.svg)</source>
-        <translation>Все файлы (*);;SVG файлы (*.svg)</translation>
+        <location line="+1"/>
+        <source>Choose SVG image</source>
+        <translation>Выберите SVG изображение</translation>
     </message>
 </context>
 <context>
@@ -2259,9 +2259,9 @@ p, li { white-space: pre-wrap; }
         <translation>Использовать память под кэш</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/opmap/opmapgadgetoptionspage.cpp" line="+97"/>
-        <source>Choose a cache directory</source>
-        <translation>Укажите директорию для расположения кэша</translation>
+        <location filename="../../../src/plugins/opmap/opmapgadgetoptionspage.cpp" line="+82"/>
+        <source>Choose Cache Directory</source>
+        <translation>Укажите каталог кэша</translation>
     </message>
 </context>
 <context>
@@ -2278,11 +2278,6 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>Load file...</source>
-        <translation>Загрузить файл...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Use OpenGL for rendering</source>
         <translation>Использовать OpenGL для рендеринга</translation>
     </message>
@@ -2292,14 +2287,14 @@ p, li { white-space: pre-wrap; }
         <translation>Высокое качество текста (OpenGL)</translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/pfd/pfdgadgetoptionspage.cpp" line="+90"/>
-        <source>QFileDialog::getOpenFileName()</source>
-        <translation></translation>
+        <location filename="../../../src/plugins/pfd/pfdgadgetoptionspage.cpp" line="+60"/>
+        <source>SVG image (*.svg)</source>
+        <translation>SVG изображение (*.svg)</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>All Files (*);;SVG Files (*.svg)</source>
-        <translation>Все файлы (*);;SVG файлы (*.svg)</translation>
+        <location line="+1"/>
+        <source>Choose SVG image</source>
+        <translation>Выберите SVG изображение</translation>
     </message>
 </context>
 <context>
@@ -6922,12 +6917,12 @@ Reason: %3</source>
     <message>
         <location line="+9"/>
         <source>HOME</source>
-        <translation type="unfinished"></translation>
+        <translation>Домашняя позиция</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>UAV</source>
-        <translation type="unfinished"></translation>
+        <translation>БПЛА</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -7139,7 +7134,7 @@ Reason: %3</source>
     <message>
         <location line="+1"/>
         <source>Show/Hide the UAV trail</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Показать / скрыть траекторию полета</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -7149,7 +7144,7 @@ Reason: %3</source>
     <message>
         <location line="+1"/>
         <source>Clear the UAV trail</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Стереть траекторию</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -7250,7 +7245,7 @@ Reason: %3</source>
     <message>
         <location filename="../../../src/plugins/scope/scopegadgetfactory.cpp" line="+36"/>
         <source>Scope Gadget</source>
-        <translation>График</translation>
+        <translation>Осциллограф</translation>
     </message>
 </context>
 <context>
@@ -7520,7 +7515,7 @@ specific calibration button on top of the screen.</source>
     <message>
         <location/>
         <source>Save Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить позицию</translation>
     </message>
     <message>
         <location/>
@@ -7601,7 +7596,7 @@ new home location unless it is in indoor mode.</source>
     <message>
         <location/>
         <source>Home Location:</source>
-        <translation type="unfinished"></translation>
+        <translation>Домашняя позиция:</translation>
     </message>
 </context>
 <context>

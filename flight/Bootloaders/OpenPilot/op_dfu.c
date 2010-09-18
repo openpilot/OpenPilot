@@ -62,7 +62,7 @@ uint8_t Data2;
 uint8_t Data3;
 uint8_t offset = 0;
 uint32_t aux;
-uint8_t spi_dev_desc[200]={0};
+uint8_t spi_dev_desc[200] = { 0 };
 //Download vars
 uint32_t downSizeOfLastPacket = 0;
 uint32_t downPacketTotal = 0;
@@ -99,10 +99,14 @@ void DataDownload(DownloadAction action) {
 			switch (currentProgrammingDestination) {
 			case Remote_flash_via_spi:
 				if (downType == Descript) {
-					SendBuffer[6 + (x * 4)] = spi_dev_desc[(uint8_t)partoffset];
-					SendBuffer[7 + (x * 4)] = spi_dev_desc[(uint8_t)partoffset + 1];
-					SendBuffer[8 + (x * 4)] = spi_dev_desc[(uint8_t)partoffset + 2];
-					SendBuffer[9 + (x * 4)] = spi_dev_desc[(uint8_t)partoffset + 3];
+					SendBuffer[6 + (x * 4)]
+							= spi_dev_desc[(uint8_t) partoffset];
+					SendBuffer[7 + (x * 4)] = spi_dev_desc[(uint8_t) partoffset
+							+ 1];
+					SendBuffer[8 + (x * 4)] = spi_dev_desc[(uint8_t) partoffset
+							+ 2];
+					SendBuffer[9 + (x * 4)] = spi_dev_desc[(uint8_t) partoffset
+							+ 3];
 				}
 				break;
 			case Self_flash:
@@ -224,7 +228,6 @@ void processComand(uint8_t *xReceive_Buffer) {
 							}
 							break;
 						default:
-
 							break;
 						}
 					}
@@ -246,51 +249,64 @@ void processComand(uint8_t *xReceive_Buffer) {
 					{
 						numberOfWords = SizeOfLastPacket;
 					}
-					for (uint8_t x = 0; x < numberOfWords; ++x) {
-						offset = 4 * x;
-						Data = xReceive_Buffer[DATA + offset] << 24;
-						Data += xReceive_Buffer[DATA + 1 + offset] << 16;
-						Data += xReceive_Buffer[DATA + 2 + offset] << 8;
-						Data += xReceive_Buffer[DATA + 3 + offset];
-						aux = baseOfAdressType(TransferType) + (uint32_t)(Count
-								* 14 * 4 + x * 4);
-						uint8_t result = 0;
-						struct opahrs_msg_v0 rsp;
-						struct opahrs_msg_v0 req;
-						switch (currentProgrammingDestination) {
-						case Self_flash:
+					struct opahrs_msg_v0 rsp;
+					struct opahrs_msg_v0 req;
+					uint8_t result = 0;
+					switch (currentProgrammingDestination) {
+					case Self_flash:
+						for (uint8_t x = 0; x < numberOfWords; ++x) {
+							offset = 4 * x;
+							Data = xReceive_Buffer[DATA + offset] << 24;
+							Data += xReceive_Buffer[DATA + 1 + offset] << 16;
+							Data += xReceive_Buffer[DATA + 2 + offset] << 8;
+							Data += xReceive_Buffer[DATA + 3 + offset];
+							aux = baseOfAdressType(TransferType) + (uint32_t)(
+									Count * 14 * 4 + x * 4);
+							uint8_t result = 0;
 							for (int retry = 0; retry < MAX_WRI_RETRYS; ++retry) {
 								if (result == 0) {
 									result = (FLASH_ProgramWord(aux, Data)
 											== FLASH_COMPLETE) ? 1 : 0;
 								}
 							}
-							break;
-						case Remote_flash_via_spi:
-							req.payload.user.v.req.fwup_data.adress = aux;
-							req.payload.user.v.req.fwup_data.data = Data;
-							if (PIOS_OPAHRS_bl_FwupData(&req, &rsp)
-									== OPAHRS_RESULT_OK) {
-								if (rsp.payload.user.v.rsp.fwup_status.status
-										== started) {
-									result = TRUE;
-								} else if (rsp.payload.user.v.rsp.fwup_status.status
-										== outside_dev_capabilities) {
-									result = TRUE;
-									DeviceState = outsideDevCapabilities;
-								} else
-									result = FALSE;
-							}
-							break;
-						default:
-							result = 0;
-							break;
 						}
-						if (result != 1) {
-							DeviceState = Last_operation_failed;
-							Aditionals = (uint32_t) Command;
+						break;
+					case Remote_flash_via_spi:
+						for (uint8_t x = 0; x < numberOfWords; ++x) {
+							offset = 4 * x;
+							Data = xReceive_Buffer[DATA + offset] << 24;
+							Data += xReceive_Buffer[DATA + 1 + offset] << 16;
+							Data += xReceive_Buffer[DATA + 2 + offset] << 8;
+							Data += xReceive_Buffer[DATA + 3 + offset];
+							req.payload.user.v.req.fwup_data.data[x] = Data;
 						}
+						aux = (baseOfAdressType(TransferType) + (uint32_t)(
+								Count * 14 * 4));
+						req.payload.user.v.req.fwup_data.adress = aux;
+						req.payload.user.v.req.fwup_data.size = numberOfWords;
+						if (PIOS_OPAHRS_bl_FwupData(&req, &rsp)
+								== OPAHRS_RESULT_OK) {
+							if (rsp.payload.user.v.rsp.fwup_status.status
+									== write_error) {
+								result = FALSE;
+							} else if (rsp.payload.user.v.rsp.fwup_status.status
+									== outside_dev_capabilities) {
+								result = TRUE;
+								DeviceState = outsideDevCapabilities;
+							} else
+								result = TRUE;
+						} else
+							result = FALSE;
+						break;
+					default:
+						result = 0;
+						break;
 					}
+					if (result != 1) {
+						DeviceState = Last_operation_failed;
+						Aditionals = (uint32_t) Command;
+					}
+
 					++Next_Packet;
 				} else {
 
@@ -340,9 +356,20 @@ void processComand(uint8_t *xReceive_Buffer) {
 		PIOS_COM_SendBuffer(PIOS_COM_TELEM_USB, Buffer + 1, 63);//FIX+1
 		break;
 	case JumpFW:
-		FLASH_Lock();
-		PIOS_OPAHRS_bl_boot();
-		JumpToApp = 1;
+		if (numberOfDevices > 1) {
+			struct opahrs_msg_v0 rsp;
+			PIOS_OPAHRS_bl_boot(0);
+			if (PIOS_OPAHRS_bl_FwupStatus(&rsp) == OPAHRS_RESULT_OK) {
+				DeviceState = failed_jump;
+				break;
+			} else {
+				FLASH_Lock();
+				JumpToApp = 1;
+			}
+		} else {
+			FLASH_Lock();
+			JumpToApp = 1;
+		}
 		break;
 	case Reset:
 		//PIOS Reset_Device();
@@ -458,9 +485,9 @@ void OPDfuIni(uint8_t discover) {
 				dev.BL_Version = rsp.payload.user.v.rsp.versions.bl_version;
 				dev.FW_Crc = rsp.payload.user.v.rsp.versions.fw_version;
 				dev.devID = rsp.payload.user.v.rsp.versions.hw_version;
-				for(int x=0;x<200;++x)
-				{
-				spi_dev_desc[x]=(uint8_t)rsp.payload.user.v.rsp.versions.description[x];
+				for (int x = 0; x < 200; ++x) {
+					spi_dev_desc[x]
+							= (uint8_t) rsp.payload.user.v.rsp.versions.description[x];
 
 				}
 				if (PIOS_OPAHRS_bl_GetMemMap(&rsp) == OPAHRS_RESULT_OK) {

@@ -40,12 +40,15 @@
 #define NSS_HOLD_STATE       ((GPIOB->IDR & GPIO_Pin_12) ? 0 : 1)
 enum bootloader_status boot_status;
 /* Private typedef -----------------------------------------------------------*/
-typedef void (*pFunction)(void);
+typedef void
+(*pFunction)(void);
 pFunction Jump_To_Application;
 uint32_t JumpAddress;
 /* Function Prototypes */
-void process_spi_request(void);
-void jump_to_app();
+void
+process_spi_request(void);
+void
+jump_to_app();
 uint8_t jumpFW = FALSE;
 uint32_t Fw_crc;
 /**
@@ -56,23 +59,25 @@ int main() {
 	uint8_t GO_dfu = false;
 	/* Brings up System using CMSIS functions, enables the LEDs. */
 	PIOS_SYS_Init();
-	 /* Enable Prefetch Buffer */
-		    FLASH_PrefetchBufferCmd(FLASH_PrefetchBuffer_Enable);
+	/* Enable Prefetch Buffer */
+	FLASH_PrefetchBufferCmd(FLASH_PrefetchBuffer_Enable);
 
-		    /* Flash 2 wait state */
-		    FLASH_SetLatency(FLASH_Latency_2);
-			RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);
+	/* Flash 2 wait state */
+	FLASH_SetLatency(FLASH_Latency_2);
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);
 	/* Delay system */
 	PIOS_DELAY_Init();
-	for (uint32_t t = 0; t < 20000000; ++t) {
-		if (NSS_HOLD_STATE == 0)
+
+	for (uint32_t t = 0; t < 2; ++t) {
+		if (NSS_HOLD_STATE == 1)
 			GO_dfu = TRUE;
 		else {
 			GO_dfu = FALSE;
 			break;
 		}
+		PIOS_DELAY_WaitmS(1000);
 	}
-	GO_dfu=TRUE;
+	//GO_dfu = TRUE;
 	GO_dfu = GO_dfu;// OR with app boot request
 	if (GO_dfu == FALSE) {
 		jump_to_app();
@@ -126,14 +131,14 @@ void process_spi_request(void) {
 		return;
 	}
 
-
 	switch (user_rx_v0.payload.user.t) {
 
 	case OPAHRS_MSG_V0_REQ_FWUP_VERIFY:
 		opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_FWUP_STATUS);
 		Fw_crc = crc_memory_calc();
 		lfsm_user_set_tx_v0(&user_tx_v0);
-		//boot_status=idle;
+		boot_status = idle;
+		PIOS_LED_Off(LED1);
 		user_tx_v0.payload.user.v.rsp.fwup_status.status = boot_status;
 		break;
 	case OPAHRS_MSG_V0_REQ_RESET:
@@ -141,7 +146,6 @@ void process_spi_request(void) {
 		PIOS_SYS_Reset();
 		break;
 	case OPAHRS_MSG_V0_REQ_VERSIONS:
-		//PIOS_LED_Toggle(LED1);
 		opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_VERSIONS);
 		user_tx_v0.payload.user.v.rsp.versions.bl_version = BOOTLOADER_VERSION;
 		user_tx_v0.payload.user.v.rsp.versions.hw_version = HW_VERSION;
@@ -153,15 +157,14 @@ void process_spi_request(void) {
 	case OPAHRS_MSG_V0_REQ_MEM_MAP:
 		opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_MEM_MAP);
 		user_tx_v0.payload.user.v.rsp.mem_map.density = HW_TYPE;
-		user_tx_v0.payload.user.v.rsp.mem_map.rw_flags = 0;//TODO
+		user_tx_v0.payload.user.v.rsp.mem_map.rw_flags = (BOARD_READABLE
+				| (BOARD_WRITABLA << 1));
 		user_tx_v0.payload.user.v.rsp.mem_map.size_of_code_memory
 				= SIZE_OF_CODE;
 		user_tx_v0.payload.user.v.rsp.mem_map.size_of_description
 				= SIZE_OF_DESCRIPTION;
 		user_tx_v0.payload.user.v.rsp.mem_map.start_of_user_code
 				= START_OF_USER_CODE;
-		//read_description(
-			//	(uint8_t *) &(user_tx_v0.payload.user.v.rsp.versions.description));
 		lfsm_user_set_tx_v0(&user_tx_v0);
 		break;
 	case OPAHRS_MSG_V0_REQ_SERIAL:
@@ -169,28 +172,32 @@ void process_spi_request(void) {
 		PIOS_SYS_SerialNumberGet(
 				(char *) &(user_tx_v0.payload.user.v.rsp.serial.serial_bcd));
 		lfsm_user_set_tx_v0(&user_tx_v0);
-		//PIOS_LED_Toggle(LED1);
 		break;
 	case OPAHRS_MSG_V0_REQ_FWUP_STATUS:
-			opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_FWUP_STATUS);
-			user_tx_v0.payload.user.v.rsp.fwup_status.status=boot_status;
-			lfsm_user_set_tx_v0(&user_tx_v0);
-			PIOS_LED_Toggle(LED1);
-			break;
+		opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_FWUP_STATUS);
+		user_tx_v0.payload.user.v.rsp.fwup_status.status = boot_status;
+		lfsm_user_set_tx_v0(&user_tx_v0);
+		break;
 	case OPAHRS_MSG_V0_REQ_FWUP_DATA:
+		PIOS_LED_On(LED1);
 		opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_FWUP_STATUS);
 		if (!(user_rx_v0.payload.user.v.req.fwup_data.adress
 				< START_OF_USER_CODE)) {
-			if (FLASH_ProgramWord(
-					user_rx_v0.payload.user.v.req.fwup_data.adress,
-					user_rx_v0.payload.user.v.req.fwup_data.data)
-					!= FLASH_COMPLETE) {
-				boot_status = write_error;
+			for (uint8_t x = 0; x
+					< user_rx_v0.payload.user.v.req.fwup_data.size; ++x) {
+				if (FLASH_ProgramWord(
+						(user_rx_v0.payload.user.v.req.fwup_data.adress
+								+ ((uint32_t)(x * 4))),
+						user_rx_v0.payload.user.v.req.fwup_data.data[x])
+						!= FLASH_COMPLETE) {
+					boot_status = write_error;
+					break;
+				}
 			}
-
 		} else {
 			boot_status = outside_dev_capabilities;
 		}
+		PIOS_LED_Off(LED1);
 		user_tx_v0.payload.user.v.rsp.fwup_status.status = boot_status;
 		lfsm_user_set_tx_v0(&user_tx_v0);
 		break;
@@ -208,7 +215,6 @@ void process_spi_request(void) {
 			break;
 		}
 
-
 		break;
 	case OPAHRS_MSG_V0_REQ_BOOT:
 		PIOS_DELAY_WaitmS(user_rx_v0.payload.user.v.req.boot.boot_delay_in_ms);
@@ -225,6 +231,10 @@ void process_spi_request(void) {
 	return;
 }
 void jump_to_app() {
+	while (TRUE) {
+		PIOS_LED_Toggle(LED1);
+		PIOS_DELAY_WaitmS(1000);
+	}
 	if (((*(__IO uint32_t*) START_OF_USER_CODE) & 0x2FFE0000) == 0x20000000) { /* Jump to user application */
 		FLASH_Lock();
 		RCC_APB2PeriphResetCmd(0xffffffff, ENABLE);

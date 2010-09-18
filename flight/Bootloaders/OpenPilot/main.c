@@ -81,7 +81,7 @@ int main() {
 	if (BSL_HOLD_STATE == 0)
 		USB_connected = TRUE;
 
-	GO_dfu = USB_connected || User_DFU_request;
+	GO_dfu = (USB_connected==TRUE) || (User_DFU_request==TRUE);
 	if (GO_dfu == TRUE) {
 		PIOS_Board_Init();
 		PIOS_OPAHRS_Init();

@@ -29,6 +29,7 @@
 
 #include <pios_spi_priv.h>
 
+
 /* OP Interface
  * 
  * NOTE: Leave this declared as const data so that it ends up in the 

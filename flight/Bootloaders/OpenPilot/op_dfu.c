@@ -62,7 +62,7 @@ uint8_t Data2;
 uint8_t Data3;
 uint8_t offset = 0;
 uint32_t aux;
-uint8_t spi_dev_desc[200];
+uint8_t spi_dev_desc[200]={0};
 //Download vars
 uint32_t downSizeOfLastPacket = 0;
 uint32_t downPacketTotal = 0;
@@ -81,6 +81,7 @@ void DataDownload(DownloadAction action) {
 
 		uint8_t packetSize;
 		uint32_t offset;
+		uint32_t partoffset;
 		SendBuffer[0] = 0x01;
 		SendBuffer[1] = Download;
 		SendBuffer[2] = downPacketCurrent >> 24;
@@ -93,23 +94,23 @@ void DataDownload(DownloadAction action) {
 			packetSize = 14;
 		}
 		for (uint8_t x = 0; x < packetSize; ++x) {
-			offset = baseOfAdressType(downType) + (downPacketCurrent * 14 * 4)
-					+ (x * 4);
+			partoffset = (downPacketCurrent * 14 * 4) + (x * 4);
+			offset = baseOfAdressType(downType) + partoffset;
 			switch (currentProgrammingDestination) {
-			case Self_flash:
-				SendBuffer[6 + (x * 4)] = spi_dev_desc[offset];
-				SendBuffer[7 + (x * 4)] = spi_dev_desc[offset + 1];
-				SendBuffer[8 + (x * 4)] = spi_dev_desc[offset + 2];
-				SendBuffer[9 + (x * 4)] = spi_dev_desc[offset + 3];
-				break;
 			case Remote_flash_via_spi:
 				if (downType == Descript) {
-					SendBuffer[6 + (x * 4)] = *FLASH_If_Read(offset);
-					SendBuffer[7 + (x * 4)] = *FLASH_If_Read(offset + 1);
-					SendBuffer[8 + (x * 4)] = *FLASH_If_Read(offset + 2);
-					SendBuffer[9 + (x * 4)] = *FLASH_If_Read(offset + 3);
-					break;
+					SendBuffer[6 + (x * 4)] = spi_dev_desc[(uint8_t)partoffset];
+					SendBuffer[7 + (x * 4)] = spi_dev_desc[(uint8_t)partoffset + 1];
+					SendBuffer[8 + (x * 4)] = spi_dev_desc[(uint8_t)partoffset + 2];
+					SendBuffer[9 + (x * 4)] = spi_dev_desc[(uint8_t)partoffset + 3];
 				}
+				break;
+			case Self_flash:
+				SendBuffer[6 + (x * 4)] = *FLASH_If_Read(offset);
+				SendBuffer[7 + (x * 4)] = *FLASH_If_Read(offset + 1);
+				SendBuffer[8 + (x * 4)] = *FLASH_If_Read(offset + 2);
+				SendBuffer[9 + (x * 4)] = *FLASH_If_Read(offset + 3);
+				break;
 			}
 
 		}
@@ -125,24 +126,25 @@ void DataDownload(DownloadAction action) {
 	}
 }
 
-void processComand(uint8_t *Receive_Buffer) {
+void processComand(uint8_t *xReceive_Buffer) {
 
-	Command = Receive_Buffer[COMMAND];
+	Command = xReceive_Buffer[COMMAND];
 	EchoReqFlag = (Command >> 7);
 	EchoAnsFlag = (Command >> 6) & 0x01;
 	StartFlag = (Command >> 5) & 0x01;
-	Count = Receive_Buffer[COUNT] << 24;
-	Count += Receive_Buffer[COUNT + 1] << 16;
-	Count += Receive_Buffer[COUNT + 2] << 8;
-	Count += Receive_Buffer[COUNT + 3];
-	Data = Receive_Buffer[DATA] << 24;
-	Data += Receive_Buffer[DATA + 1] << 16;
-	Data += Receive_Buffer[DATA + 2] << 8;
-	Data += Receive_Buffer[DATA + 3];
-	Data0 = Receive_Buffer[DATA];
-	Data1 = Receive_Buffer[DATA + 1];
-	Data2 = Receive_Buffer[DATA + 2];
-	Data3 = Receive_Buffer[DATA + 3];
+	Count = xReceive_Buffer[COUNT] << 24;
+	Count += xReceive_Buffer[COUNT + 1] << 16;
+	Count += xReceive_Buffer[COUNT + 2] << 8;
+	Count += xReceive_Buffer[COUNT + 3];
+
+	Data = xReceive_Buffer[DATA] << 24;
+	Data += xReceive_Buffer[DATA + 1] << 16;
+	Data += xReceive_Buffer[DATA + 2] << 8;
+	Data += xReceive_Buffer[DATA + 3];
+	Data0 = xReceive_Buffer[DATA];
+	Data1 = xReceive_Buffer[DATA + 1];
+	Data2 = xReceive_Buffer[DATA + 2];
+	Data3 = xReceive_Buffer[DATA + 3];
 	Command = Command & 0b00011111;
 
 	if (EchoReqFlag == 1) {
@@ -152,7 +154,7 @@ void processComand(uint8_t *Receive_Buffer) {
 	case EnterDFU:
 		if (((DeviceState == BLidle) && (Data0 < numberOfDevices))
 				|| (DeviceState == DFUidle)) {
-			if(Data0>0)
+			if (Data0 > 0)
 				OPDfuIni(TRUE);
 			DeviceState = DFUidle;
 			currentProgrammingDestination = devicesTable[Data0].programmingType;
@@ -166,7 +168,7 @@ void processComand(uint8_t *Receive_Buffer) {
 				result = FLASH_Ini();
 				break;
 			case Remote_flash_via_spi:
-				//TODO result=SPI_FLASH();
+				result = TRUE;
 				break;
 			default:
 				DeviceState = Last_operation_failed;
@@ -176,9 +178,6 @@ void processComand(uint8_t *Receive_Buffer) {
 				DeviceState = Last_operation_failed;
 				Aditionals = (uint32_t) Command;
 			}
-		} else {
-			DeviceState = outsideDevCapabilities;
-			Aditionals = (uint32_t) Command;
 		}
 		break;
 	case Upload:
@@ -189,8 +188,8 @@ void processComand(uint8_t *Receive_Buffer) {
 				Next_Packet = 1;
 				Expected_CRC = Data2 << 24;
 				Expected_CRC += Data3 << 16;
-				Expected_CRC += Receive_Buffer[DATA + 4] << 8;
-				Expected_CRC += Receive_Buffer[DATA + 5];
+				Expected_CRC += xReceive_Buffer[DATA + 4] << 8;
+				Expected_CRC += xReceive_Buffer[DATA + 5];
 				SizeOfLastPacket = Data1;
 
 				if (isBiggerThanAvailable(TransferType, (SizeOfTransfer - 1)
@@ -206,15 +205,23 @@ void processComand(uint8_t *Receive_Buffer) {
 							result = FLASH_Start();
 							break;
 						case Remote_flash_via_spi:
-							if (PIOS_OPAHRS_bl_FwupVerify(&rsp)
-									== OPAHRS_RESULT_OK) {
-								if (rsp.payload.user.v.rsp.fwup_status.status
-										== started) {
-									result = TRUE;
-								} else
-									result = FALSE;
-							} else
-								result = FALSE;
+							PIOS_OPAHRS_bl_FwupStart(&rsp);
+							result = FALSE;
+							for (int i = 0; i < 5; ++i) {
+								PIOS_DELAY_WaitmS(1000);
+								PIOS_OPAHRS_bl_resync();
+								if (PIOS_OPAHRS_bl_FwupStatus(&rsp)
+										== OPAHRS_RESULT_OK) {
+									if (rsp.payload.user.v.rsp.fwup_status.status
+											== started) {
+										result = TRUE;
+										break;
+									} else {
+										result = FALSE;
+										break;
+									}
+								}
+							}
 							break;
 						default:
 
@@ -241,15 +248,15 @@ void processComand(uint8_t *Receive_Buffer) {
 					}
 					for (uint8_t x = 0; x < numberOfWords; ++x) {
 						offset = 4 * x;
-						Data = Receive_Buffer[DATA + offset] << 24;
-						Data += Receive_Buffer[DATA + 1 + offset] << 16;
-						Data += Receive_Buffer[DATA + 2 + offset] << 8;
-						Data += Receive_Buffer[DATA + 3 + offset];
+						Data = xReceive_Buffer[DATA + offset] << 24;
+						Data += xReceive_Buffer[DATA + 1 + offset] << 16;
+						Data += xReceive_Buffer[DATA + 2 + offset] << 8;
+						Data += xReceive_Buffer[DATA + 3 + offset];
 						aux = baseOfAdressType(TransferType) + (uint32_t)(Count
 								* 14 * 4 + x * 4);
 						uint8_t result = 0;
 						struct opahrs_msg_v0 rsp;
-													struct opahrs_msg_v0 req;
+						struct opahrs_msg_v0 req;
 						switch (currentProgrammingDestination) {
 						case Self_flash:
 							for (int retry = 0; retry < MAX_WRI_RETRYS; ++retry) {
@@ -372,9 +379,10 @@ void processComand(uint8_t *Receive_Buffer) {
 				DeviceState = outsideDevCapabilities;
 				Aditionals = (uint32_t) Command;
 
-			} else
+			} else {
 				downPacketCurrent = 0;
-			DeviceState = downloading;
+				DeviceState = downloading;
+			}
 		} else {
 			DeviceState = Last_operation_failed;
 			Aditionals = (uint32_t) Command;
@@ -441,7 +449,7 @@ void OPDfuIni(uint8_t discover) {
 				dev.FW_Crc = 0;
 				break;
 			}
-			PIOS_DELAY_WaitmS(500);
+			PIOS_DELAY_WaitmS(50);
 		}
 		if (found_spi_device == TRUE) {
 			struct opahrs_msg_v0 rsp;
@@ -450,9 +458,11 @@ void OPDfuIni(uint8_t discover) {
 				dev.BL_Version = rsp.payload.user.v.rsp.versions.bl_version;
 				dev.FW_Crc = rsp.payload.user.v.rsp.versions.fw_version;
 				dev.devID = rsp.payload.user.v.rsp.versions.hw_version;
-				memcpy(spi_dev_desc,
-						rsp.payload.user.v.rsp.versions.description,
-						sizeof(rsp.payload.user.v.rsp.versions.description));
+				for(int x=0;x<200;++x)
+				{
+				spi_dev_desc[x]=(uint8_t)rsp.payload.user.v.rsp.versions.description[x];
+
+				}
 				if (PIOS_OPAHRS_bl_GetMemMap(&rsp) == OPAHRS_RESULT_OK) {
 					dev.readWriteFlags
 							= rsp.payload.user.v.rsp.mem_map.rw_flags;
@@ -503,11 +513,15 @@ uint32_t CalcFirmCRC() {
 		return crc_memory_calc();
 		break;
 	case Remote_flash_via_spi:
-		if (PIOS_OPAHRS_bl_FwupVerify(&rsp) == OPAHRS_RESULT_OK) {
+		PIOS_OPAHRS_bl_FwupVerify(&rsp);
+		for (int i = 0; i < 5; ++i) {
+			PIOS_DELAY_WaitmS(1000);
+			PIOS_OPAHRS_bl_resync();
 			if (PIOS_OPAHRS_bl_GetVersions(&rsp) == OPAHRS_RESULT_OK) {
 				return rsp.payload.user.v.rsp.versions.fw_version;
 			}
 		}
+
 		return 0;
 		break;
 	default:

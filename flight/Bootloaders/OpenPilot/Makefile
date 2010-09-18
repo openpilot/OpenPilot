@@ -93,6 +93,7 @@ PIOS = ../../PiOS
 PIOSINC = $(PIOS)/inc
 PIOSSTM32F10X = $(PIOS)/STM32F10x
 PIOSCOMMON = $(PIOS)/Common
+PIOSBOARDS = $(PIOS)/Boards
 APPLIBDIR = $(PIOSSTM32F10X)/Libraries
 STMLIBDIR = $(APPLIBDIR)
 STMSPDDIR = $(STMLIBDIR)/STM32F10x_StdPeriph_Driver
@@ -137,7 +138,7 @@ SRC += $(PIOSSTM32F10X)/pios_spi.c
 SRC += $(PIOSSTM32F10X)/pios_debug.c
 SRC += $(PIOSSTM32F10X)/pios_gpio.c
 #SRC += $(PIOSSTM32F10X)/pios_exti.c
-SRC += $(PIOSSTM32F10X)/pios_wdg.c
+#SRC += $(PIOSSTM32F10X)/pios_wdg.c
 
 
 # PIOS USB related files (seperated to make code maintenance more easy)
@@ -151,7 +152,7 @@ SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
 ## PIOS Hardware (Common)
 #SRC += $(PIOSCOMMON)/pios_sdcard.c
 SRC += $(PIOSCOMMON)/pios_com.c
-SRC += $(PIOSCOMMON)/pios_bmp085.c
+#SRC += $(PIOSCOMMON)/pios_bmp085.c
 SRC += $(PIOSCOMMON)/pios_opahrs_v0.c
 SRC += $(PIOSCOMMON)/pios_bl_helper.c
 
@@ -160,23 +161,21 @@ SRC += $(PIOSCOMMON)/printf-stdarg.c
 
 ## Libraries for flight calculations
 SRC += $(FLIGHTLIB)/buffer.c
-#SRC += $(FLIGHTLIB)/WorldMagModel.c
-#SRC += $(FLIGHTLIB)/CoordinateConversions.c
 
 ## CMSIS for STM32
 SRC += $(CMSISDIR)/core_cm3.c
 SRC += $(CMSISDIR)/system_stm32f10x.c
 
 ## Used parts of the STM-Library
-SRC += $(STMSPDSRCDIR)/stm32f10x_adc.c
+#SRC += $(STMSPDSRCDIR)/stm32f10x_adc.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_bkp.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_crc.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_dac.c
+#SRC += $(STMSPDSRCDIR)/stm32f10x_dac.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_dma.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_exti.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_flash.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_gpio.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_i2c.c
+#SRC += $(STMSPDSRCDIR)/stm32f10x_i2c.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_pwr.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_rcc.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_rtc.c
@@ -194,27 +193,6 @@ SRC += $(STMUSBSRCDIR)/usb_int.c
 SRC += $(STMUSBSRCDIR)/usb_mem.c
 SRC += $(STMUSBSRCDIR)/usb_regs.c
 SRC += $(STMUSBSRCDIR)/usb_sil.c
-
-## RTOS
-#SRC += $(RTOSSRCDIR)/list.c 
-#SRC += $(RTOSSRCDIR)/queue.c  
-#SRC += $(RTOSSRCDIR)/tasks.c
-
-## RTOS Portable 
-#SRC += $(RTOSSRCDIR)/portable/GCC/ARM_CM3/port.c
-#SRC += $(RTOSSRCDIR)/portable/MemMang/heap_2.c
-
-## Dosfs file system
-#SRC += $(DOSFSDIR)/dosfs.c
-#SRC += $(DOSFSDIR)/dfs_sdcard.c
-
-## Mass Storage Device
-#SRC += $(MSDDIR)/msd.c
-#SRC += $(MSDDIR)/msd_bot.c
-#SRC += $(MSDDIR)/msd_desc.c
-#SRC += $(MSDDIR)/msd_memory.c
-#SRC += $(MSDDIR)/msd_scsi.c
-#SRC += $(MSDDIR)/msd_scsi_data.c
 
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
 # use file-extension c for "c-only"-files
@@ -255,6 +233,7 @@ EXTRAINCDIRS  += $(PIOSINC)
 EXTRAINCDIRS  += $(FLIGHTLIBINC)
 EXTRAINCDIRS  += $(PIOSSTM32F10X)
 EXTRAINCDIRS  += $(PIOSCOMMON)
+EXTRAINCDIRS  += $(PIOSBOARDS)
 EXTRAINCDIRS  += $(STMSPDINCDIR)
 EXTRAINCDIRS  += $(STMUSBINCDIR)
 EXTRAINCDIRS  += $(CMSISDIR)
@@ -403,9 +382,9 @@ OOCD_CL=-d0
 # interface and board/target settings (using the OOCD target-library here)
 UNAME := $(shell uname)
 ifeq ($(UNAME), Darwin)
-  OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.openpilot.osx.cfg -f ../Project/OpenOCD/stm32.cfg
+  OOCD_CL+=-f ../../Project/OpenOCD/floss-jtag.openpilot.osx.cfg -f ../../Project/OpenOCD/stm32.cfg
 else
-  OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.openpilot.cfg -f ../Project/OpenOCD/stm32.cfg
+  OOCD_CL+=-f ../../Project/OpenOCD/floss-jtag.openpilot.cfg -f ../../Project/OpenOCD/stm32.cfg
 endif
 # initialize
 OOCD_CL+=-c init

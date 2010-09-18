@@ -60,10 +60,10 @@ uint32_t sweep_steps2 = 100; // * 5 mS -> 500 mS
 /* Extern variables ----------------------------------------------------------*/
 DFUStates DeviceState;
 uint8_t JumpToApp = FALSE;
-uint8_t GO_dfu = false;
-uint8_t USB_connected = false;
-uint8_t User_DFU_request = false;
-uint8_t Receive_Buffer[64];
+uint8_t GO_dfu = FALSE;
+uint8_t USB_connected = FALSE;
+uint8_t User_DFU_request = FALSE;
+static uint8_t mReceive_Buffer[64];
 /* Private function prototypes -----------------------------------------------*/
 uint32_t LedPWM(uint32_t pwm_period, uint32_t pwm_sweep_steps, uint32_t count);
 uint8_t processRX();
@@ -81,7 +81,7 @@ int main() {
 	if (BSL_HOLD_STATE == 0)
 		USB_connected = TRUE;
 
-	GO_dfu = USB_connected | User_DFU_request;
+	GO_dfu = USB_connected || User_DFU_request;
 	if (GO_dfu == TRUE) {
 		PIOS_Board_Init();
 		PIOS_OPAHRS_Init();
@@ -89,14 +89,14 @@ int main() {
 		STOPWATCH_Init(100);
 		USB_connected = TRUE;
 		PIOS_SPI_RC_PinSet(PIOS_OPAHRS_SPI, 0);
-		OPDfuIni(false);
+		//OPDfuIni(false);
 
 	} else
 		JumpToApp = TRUE;
+
 	STOPWATCH_Reset();
 
 	while (TRUE) {
-
 		if (JumpToApp == TRUE)
 			jump_to_app();
 		//pwm_period = 50; // *100 uS -> 5 mS
@@ -193,17 +193,13 @@ uint32_t LedPWM(uint32_t pwm_period, uint32_t pwm_sweep_steps, uint32_t count) {
 }
 
 uint8_t processRX() {
-	uint32_t n = 0;
-
-	n = PIOS_COM_ReceiveBufferUsed(PIOS_COM_TELEM_USB);
-	if (n != 0) {
-		n = (n > 63) ? 63 : n;
-
-		for (int32_t x = 0; x < n; ++x) {
-			Receive_Buffer[x] = PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_USB);
+	while(PIOS_COM_ReceiveBufferUsed(PIOS_COM_TELEM_USB)>=63)
+	{
+		for (int32_t x = 0; x < 63; ++x) {
+			mReceive_Buffer[x] = PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_USB);
 		}
-		processComand(Receive_Buffer);
-		return TRUE;
+		//PIOS_IRQ_Enable();
+		processComand(mReceive_Buffer);
 	}
-	return FALSE;
+	return TRUE;
 }

@@ -30,8 +30,8 @@ typedef enum {
 	Last_operation_failed, //8
 	uploadingStarting, //9
 	outsideDevCapabilities, //10
-	CRC_Fail,
-	failed_jump,
+	CRC_Fail,//11
+	failed_jump,//12
 } DFUStates;
 /**************************************************/
 /* OP_DFU commands                       */

@@ -56,6 +56,12 @@ int main() {
 	uint8_t GO_dfu = false;
 	/* Brings up System using CMSIS functions, enables the LEDs. */
 	PIOS_SYS_Init();
+	 /* Enable Prefetch Buffer */
+		    FLASH_PrefetchBufferCmd(FLASH_PrefetchBuffer_Enable);
+
+		    /* Flash 2 wait state */
+		    FLASH_SetLatency(FLASH_Latency_2);
+			RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);
 	/* Delay system */
 	PIOS_DELAY_Init();
 	for (uint32_t t = 0; t < 20000000; ++t) {
@@ -66,6 +72,7 @@ int main() {
 			break;
 		}
 	}
+	GO_dfu=TRUE;
 	GO_dfu = GO_dfu;// OR with app boot request
 	if (GO_dfu == FALSE) {
 		jump_to_app();
@@ -119,12 +126,14 @@ void process_spi_request(void) {
 		return;
 	}
 
+
 	switch (user_rx_v0.payload.user.t) {
 
 	case OPAHRS_MSG_V0_REQ_FWUP_VERIFY:
 		opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_FWUP_STATUS);
 		Fw_crc = crc_memory_calc();
 		lfsm_user_set_tx_v0(&user_tx_v0);
+		//boot_status=idle;
 		user_tx_v0.payload.user.v.rsp.fwup_status.status = boot_status;
 		break;
 	case OPAHRS_MSG_V0_REQ_RESET:
@@ -132,7 +141,7 @@ void process_spi_request(void) {
 		PIOS_SYS_Reset();
 		break;
 	case OPAHRS_MSG_V0_REQ_VERSIONS:
-		PIOS_LED_Toggle(LED1);
+		//PIOS_LED_Toggle(LED1);
 		opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_VERSIONS);
 		user_tx_v0.payload.user.v.rsp.versions.bl_version = BOOTLOADER_VERSION;
 		user_tx_v0.payload.user.v.rsp.versions.hw_version = HW_VERSION;
@@ -162,8 +171,14 @@ void process_spi_request(void) {
 		lfsm_user_set_tx_v0(&user_tx_v0);
 		//PIOS_LED_Toggle(LED1);
 		break;
+	case OPAHRS_MSG_V0_REQ_FWUP_STATUS:
+			opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_FWUP_STATUS);
+			user_tx_v0.payload.user.v.rsp.fwup_status.status=boot_status;
+			lfsm_user_set_tx_v0(&user_tx_v0);
+			PIOS_LED_Toggle(LED1);
+			break;
 	case OPAHRS_MSG_V0_REQ_FWUP_DATA:
-		opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_REQ_FWUP_DATA);
+		opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_FWUP_STATUS);
 		if (!(user_rx_v0.payload.user.v.req.fwup_data.adress
 				< START_OF_USER_CODE)) {
 			if (FLASH_ProgramWord(
@@ -180,16 +195,20 @@ void process_spi_request(void) {
 		lfsm_user_set_tx_v0(&user_tx_v0);
 		break;
 	case OPAHRS_MSG_V0_REQ_FWUP_START:
+		FLASH_Unlock();
 		opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_FWUP_STATUS);
+		user_tx_v0.payload.user.v.rsp.fwup_status.status = boot_status;
+		lfsm_user_set_tx_v0(&user_tx_v0);
+		PIOS_LED_On(LED1);
 		if (FLASH_Start() == TRUE) {
 			boot_status = started;
+			PIOS_LED_Off(LED1);
 		} else {
 			boot_status = start_failed;
 			break;
 		}
 
-		user_tx_v0.payload.user.v.rsp.fwup_status.status = boot_status;
-		lfsm_user_set_tx_v0(&user_tx_v0);
+
 		break;
 	case OPAHRS_MSG_V0_REQ_BOOT:
 		PIOS_DELAY_WaitmS(user_rx_v0.payload.user.v.req.boot.boot_delay_in_ms);
@@ -203,6 +222,7 @@ void process_spi_request(void) {
 	/* Finished processing the received message, requeue it */
 	lfsm_user_set_rx_v0(&user_rx_v0);
 	lfsm_user_done();
+	return;
 }
 void jump_to_app() {
 	if (((*(__IO uint32_t*) START_OF_USER_CODE) & 0x2FFE0000) == 0x20000000) { /* Jump to user application */

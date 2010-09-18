@@ -93,13 +93,13 @@ int main(int argc, char *argv[])
             }
 
         }
-        else if(args.contains(COMPAREHASH) || args.contains(COMPAREALL))
+        else if(args.contains(COMPARECRC) || args.contains(COMPAREALL))
         {
             int index;
-            if(args.contains(COMPAREHASH))
+            if(args.contains(COMPARECRC))
             {
-                index=args.indexOf(COMPAREHASH);
-                action=OP_DFU::actionCompareHash;
+                index=args.indexOf(COMPARECRC);
+                action=OP_DFU::actionCompareCrc;
             }
             else
             {
@@ -218,6 +218,8 @@ int main(int argc, char *argv[])
                 cout<<"Error:Invalid Device";
                 return -1;
             }
+//            if(dfu.numberOfDevices==1)
+//                dfu.use_delay=false;
             if(!dfu.enterDFU(device))
             {
                 cout<<"Error:Could not enter DFU mode\n";
@@ -225,6 +227,12 @@ int main(int argc, char *argv[])
             }
             if (action==OP_DFU::actionProgram)
             {
+                if(((OP_DFU::device)dfu.devices[device]).Writable==false)
+                {
+                    cout<<"ERROR device not Writable\n";
+                    return false;
+                }
+
                 OP_DFU::Status retstatus=dfu.UploadFirmware(file.toAscii(),verify, device);
                 if(retstatus!=OP_DFU::Last_operation_Success)
                 {
@@ -244,23 +252,28 @@ int main(int argc, char *argv[])
             }
             else if (action==OP_DFU::actionDownload)
             {
+                if(((OP_DFU::device)dfu.devices[device]).Readable==false)
+                {
+                    cout<<"ERROR device not readable\n";
+                    return false;
+                }
                 qint32 size=((OP_DFU::device)dfu.devices[device]).SizeOfCode;
                 bool ret=dfu.SaveByteArrayToFile(file.toAscii(),dfu.StartDownload(size,OP_DFU::FW));
                 return ret;
             }
-            //            else if(action==OP_DFU::downdesc)
-            //            {
-            //                int size=((OP_DFU::device)dfu.devices[device]).SizeOfDesc;
-            //                cout<<"Description:"<<dfu.DownloadDescription(size).toLatin1().data()<<"\n";
-            //            }
-            else if(action==OP_DFU::actionCompareHash)
+            else if(action==OP_DFU::actionCompareCrc)
             {
-                dfu.CompareFirmware(file.toAscii(),OP_DFU::hashcompare);
+                dfu.CompareFirmware(file.toAscii(),OP_DFU::crccompare,device);
                 return 1;
             }
             else if(action==OP_DFU::actionCompareAll)
             {
-                dfu.CompareFirmware(file.toAscii(),OP_DFU::bytetobytecompare);
+                if(((OP_DFU::device)dfu.devices[device]).Readable==false)
+                {
+                    cout<<"ERROR device not readable\n";
+                    return false;
+                }
+                dfu.CompareFirmware(file.toAscii(),OP_DFU::bytetobytecompare,device);
                 return 1;
             }
 

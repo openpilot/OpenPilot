@@ -19,7 +19,7 @@ using namespace std;
 #define PROGRAMFW           "-p"     //done
 #define PROGRAMDESC         "-w"     //done
 #define VERIFY              "-v"     //done
-#define COMPAREHASH         "-cc"
+#define COMPARECRC         "-cc"
 #define COMPAREALL          "-ca"
 #define STATUSREQUEST       "-s"    //done
 #define LISTDEVICES         "-ls"   //done
@@ -36,7 +36,7 @@ public:
     };
     enum CompareType
     {
-        hashcompare,
+        crccompare,
         bytetobytecompare
     };
 
@@ -64,7 +64,7 @@ public:
         actionProgramAndVerify,
         actionDownload,
         actionCompareAll,
-        actionCompareHash,
+        actionCompareCrc,
         actionListDevs,
         actionStatusReq,
         actionReset,
@@ -119,11 +119,12 @@ public:
     QList<device> devices;
     int numberOfDevices;
     QString StatusToString(OP_DFU::Status  const & status);
-    OP_DFU::Status CompareFirmware(const QString &sfile, const CompareType &type);
+    OP_DFU::Status CompareFirmware(const QString &sfile, const CompareType &type,int device);
     quint32 CRC32WideFast(quint32 Crc, quint32 Size, quint32 *Buffer);
     quint32 CRCFromQBArray(QByteArray array, quint32 Size);
     void test();
     int send_delay;
+    bool use_delay;
 private:
     bool debug;
     int RWFlags;

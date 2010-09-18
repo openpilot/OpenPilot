@@ -6,6 +6,7 @@
 OP_DFU::OP_DFU(bool _debug): debug(_debug)
 {
     send_delay=10;
+    use_delay=true;
     int numDevices=0;
     cout<<"Please connect device now\n";
     int count=0;
@@ -148,7 +149,8 @@ bool OP_DFU::UploadData(qint32 const & numberOfBytes, QByteArray  & data)
 
         //        }
         // qDebug()<<" Data0="<<(int)data[0]<<" Data0="<<(int)data[1]<<" Data0="<<(int)data[2]<<" Data0="<<(int)data[3]<<" buf6="<<(int)buf[6]<<" buf7="<<(int)buf[7]<<" buf8="<<(int)buf[8]<<" buf9="<<(int)buf[9];
-        delay::msleep(send_delay);
+        //delay::msleep(send_delay);
+        if(int ret=StatusRequest()!=OP_DFU::uploading) return false;
         int result = hidHandle.send(0,buf, BUF_LEN, 5000);
      //   qDebug()<<"sent:"<<result;
         if(result<1)
@@ -165,8 +167,7 @@ bool OP_DFU::UploadData(qint32 const & numberOfBytes, QByteArray  & data)
 }
 OP_DFU::Status OP_DFU::UploadDescription(QString  & description)
 {
-    if(debug)
-        qDebug()<<"Starting uploading description";
+     cout<<"Starting uploading description\n";
     if(description.length()%4!=0)
     {      
         int pad=description.length()/4;
@@ -188,7 +189,7 @@ OP_DFU::Status OP_DFU::UploadDescription(QString  & description)
         return OP_DFU::abort;
     }
     int ret=StatusRequest();
-    qDebug()<<"------"<<ret;
+
     if(debug)
         qDebug()<<"Upload description Status="<<ret;
     return (OP_DFU::Status)ret;
@@ -486,12 +487,13 @@ OP_DFU::Status OP_DFU::UploadFirmware(const QString &sfile, const bool &verify,i
         }
         return OP_DFU::abort;
     }
-    cout<<"Erasing memory";
-    delay::msleep(3000);
+    cout<<"Erasing memory\n";
+    if(StatusRequest()==OP_DFU::abort) return OP_DFU::abort;
     for(int x=0;x<3;++x)
     {
         OP_DFU::Status ret=StatusRequest();
-        qDebug()<<"Erase returned:"<<StatusToString(ret);
+        if(debug)
+            qDebug()<<"Erase returned:"<<StatusToString(ret);
         if (ret==OP_DFU::uploading)
             break;
         else
@@ -518,7 +520,6 @@ OP_DFU::Status OP_DFU::UploadFirmware(const QString &sfile, const bool &verify,i
         return OP_DFU::abort;
     }
     ret=StatusRequest();
-  //  qDebug()<<"---------------------------"<<StatusToString(ret);
     if(ret==OP_DFU::Last_operation_Success)
     {
 
@@ -547,7 +548,7 @@ OP_DFU::Status OP_DFU::UploadFirmware(const QString &sfile, const bool &verify,i
     cout<<"Firmware Uploading succeeded\n";
     return ret;
 }
-OP_DFU::Status OP_DFU::CompareFirmware(const QString &sfile, const CompareType &type)
+OP_DFU::Status OP_DFU::CompareFirmware(const QString &sfile, const CompareType &type,int device)
 {
     cout<<"Starting Firmware Compare...\n";
     QFile file(sfile);
@@ -558,9 +559,7 @@ OP_DFU::Status OP_DFU::CompareFirmware(const QString &sfile, const CompareType &
         return OP_DFU::abort;
     }
     QByteArray arr=file.readAll();
-    QByteArray hash=QCryptographicHash::hash(arr,QCryptographicHash::Sha1);
-    if(debug)
-        qDebug()<<"hash size="<<hash.length()<<" -"<<hash;
+
     if(debug)
         qDebug()<<"Bytes Loaded="<<arr.length();
     if(arr.length()%4!=0)
@@ -571,18 +570,19 @@ OP_DFU::Status OP_DFU::CompareFirmware(const QString &sfile, const CompareType &
         pad=pad-arr.length();
         arr.append(QByteArray(pad,255));
     }
-    if(type==OP_DFU::hashcompare)
+    if(type==OP_DFU::crccompare)
     {
-        //        if(hash==StartDownload(hash.length(),OP_DFU::Hash))
-        //        {
-        //            cout<<"Compare Successfull Hashes MATCH!\n";
-        //        }
-        //        else
-        //        {
-        //            cout<<"Compare failed Hashes DONT MATCH!\n";
-        //        }
-        //        return StatusRequest();
-    }
+         quint32 crc=CRCFromQBArray(arr,devices[device].SizeOfCode);
+         if(crc==devices[device].FW_CRC)
+         {
+             cout<<"Compare Successfull CRC MATCH!\n";
+         }
+         else
+         {
+             cout<<"Compare failed CRC DONT MATCH!\n";
+         }
+         return StatusRequest();
+     }
     else
     {
         if(arr==StartDownload(arr.length(),OP_DFU::FW))

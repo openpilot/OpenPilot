@@ -493,18 +493,19 @@ void UAVGadgetManager::saveSettings(QSettings *qs)
     QString defaultUAVGadgetManagerKey =  "DefaultSettings";
     QString uavGadgetManagerKey = "Settings";
 
-    // The idea is to have a default setting that is only written once
-    // TODO: Currently the default thing doesn't seem to be used,
-    // and is slightly randomly set the first time you close the app (after creating the specific mode?)
-    if (!qs->childGroups().contains(defaultUAVGadgetManagerKey)) {
-        qs->beginGroup(defaultUAVGadgetManagerKey);
-        saveState(qs);
-        qs->endGroup();
-    } else {
-        qs->beginGroup(uavGadgetManagerKey);
-        saveState(qs);
-        qs->endGroup();
+    // The default group can be done in a better way,
+    // remove them for now. Since we no longer have two
+    // possible groups, we can remove the non default one too.
+    // TODO: Remove this code, and support for reading default group.
+    if (qs->childGroups().contains(defaultUAVGadgetManagerKey)) {
+        qs->remove(defaultUAVGadgetManagerKey);
     }
+    if (qs->childGroups().contains(uavGadgetManagerKey)) {
+        qs->remove(uavGadgetManagerKey);
+    }
+
+    // Do actual saving
+    saveState(qs);
 
     qs->endGroup();
     qs->endGroup();
@@ -519,19 +520,24 @@ void UAVGadgetManager::readSettings(QSettings *qs)
     QString uavGadgetManagerKey = "Settings";
 
     if (qs->childGroups().contains(uavGadgetManagerKey)) {
+        // TODO: Remove.
         qs->beginGroup(uavGadgetManagerKey);
         restoreState(qs);
         qs->endGroup();
     } else if (qs->childGroups().contains(defaultUAVGadgetManagerKey)) {
+        // TODO: Remove.
         qs->beginGroup(defaultUAVGadgetManagerKey);
         restoreState(qs);
         qs->endGroup();
     } else if (qs->contains(uavGadgetManagerKey)) {
+        // TODO: Remove.
         restoreState(QByteArray::fromBase64(qs->value(uavGadgetManagerKey).toByteArray()));
     } else if (qs->contains(defaultUAVGadgetManagerKey)) {
+        // TODO: Remove.
         restoreState(QByteArray::fromBase64(qs->value(defaultUAVGadgetManagerKey).toByteArray()));
     } else {
-        return;
+        // TODO: Make this the only way of loading.
+        restoreState(qs);
     }
 
     showToolbars(m_showToolbars);

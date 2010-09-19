@@ -4,7 +4,7 @@
 #include "op_dfu.h"
 #include <QStringList>
 
-#define PRIVATE true
+#define PRIVATE false
 
 int main(int argc, char *argv[])
 {

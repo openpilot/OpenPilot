@@ -42,6 +42,7 @@ Node::Node(MixerCurveWidget *graphWidget)
     setFlag(ItemSendsGeometryChanges);
     setCacheMode(DeviceCoordinateCache);
     setZValue(-1);
+    vertical = false;
 }
 
 void Node::addEdge(Edge *edge)
@@ -145,9 +146,22 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     painter->drawEllipse(-10, -10, 20, 20);
 }
 
+void Node::verticalMove(bool flag){
+    vertical = flag;
+}
+
 QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 {
+
     switch (change) {
+    case ItemPositionChange: {
+            if (!vertical)
+                    break;
+            // Foce node to move vertically
+            QPointF newPos = value.toPointF();
+            newPos.setX(pos().x());
+            return newPos;
+    }
     case ItemPositionHasChanged:
         foreach (Edge *edge, edgeList)
             edge->adjust();

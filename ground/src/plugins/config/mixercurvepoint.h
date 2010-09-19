@@ -49,6 +49,7 @@ public:
     enum { Type = UserType + 1 };
     int type() const { return Type; }
 
+    void verticalMove(bool flag);
     void calculateForces();
     bool advance();
 
@@ -66,6 +67,7 @@ private:
     QList<Edge *> edgeList;
     QPointF newPos;
     MixerCurveWidget *graph;
+    bool vertical;
 };
 
 #endif  // MIXERCURVEPOINT_H

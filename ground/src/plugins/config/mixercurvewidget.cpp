@@ -83,14 +83,19 @@ MixerCurveWidget::MixerCurveWidget(QWidget *parent) : QGraphicsView(parent)
     scene->addItem(new Edge(node3, node4));
     scene->addItem(new Edge(node4, node5));
 
-    qreal w = plot->boundingRect().width()/5;
+    qreal w = plot->boundingRect().width()/4;
 
-    node1->setPos(w-w/2,50);
-    node2->setPos(2*w-w/2, 50);
-    node3->setPos(3*w-w/2, 50);
-    node4->setPos(4*w-w/2, 50);
-    node5->setPos(5*w-w/2, 50);
+    node1->setPos(0,50);
+    node2->setPos(w, 50);
+    node3->setPos(2*w, 50);
+    node4->setPos(3*w, 50);
+    node5->setPos(4*w, 50);
 
+    node1->verticalMove(true);
+    node2->verticalMove(true);
+    node3->verticalMove(true);
+    node4->verticalMove(true);
+    node5->verticalMove(true);
 
 }
 
@@ -119,5 +124,5 @@ void MixerCurveWidget::resizeEvent(QResizeEvent* event)
 
 void MixerCurveWidget::itemMoved()
 {
-
+ qDebug() << "Moved ball";
 }

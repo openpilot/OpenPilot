@@ -31,6 +31,8 @@
 #include <QGraphicsView>
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
+#include "mixercurvepoint.h"
+#include "mixercurveline.h"
 
 
 class MixerCurveWidget : public QGraphicsView
@@ -40,15 +42,19 @@ class MixerCurveWidget : public QGraphicsView
 public:
     MixerCurveWidget(QWidget *parent = 0);
    ~MixerCurveWidget();
-   void itemMoved();
+   void itemMoved(); // Callback when a point is moved, to be updated
+   void initCurve (QList<double> points);
+   QList<double> getCurve();
 
-public slots:
-
+signals:
+    // Shall create a "curve updated" signal here, maybe ?
+   void curveUpdated(QList<double> );
 
 private slots:
 
 private:
    QGraphicsSvgItem *plot;
+   QList<Node*> nodeList;
 
 protected:
     void showEvent(QShowEvent *event);

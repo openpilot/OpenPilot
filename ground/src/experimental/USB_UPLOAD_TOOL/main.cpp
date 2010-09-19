@@ -179,6 +179,7 @@ int main(int argc, char *argv[])
 
         ///////////////////////////////////ACTIONS START///////////////////////////////////////////////////
         OP_DFU dfu(debug);
+        dfu.AbortOperation();
         if(!dfu.enterDFU(0))
         {
             cout<<"Could not enter DFU mode\n";

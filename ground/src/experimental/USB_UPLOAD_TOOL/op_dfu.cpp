@@ -293,6 +293,21 @@ void OP_DFU::ResetDevice(void)
     buf[9] = 0;
     int result = hidHandle.send(0,buf, BUF_LEN, 500);
 }
+void OP_DFU::AbortOperation(void)
+{
+    char buf[BUF_LEN];
+    buf[0] =0x02;//reportID
+    buf[1] = OP_DFU::Abort_Operation;//DFU Command
+    buf[2] = 0;
+    buf[3] = 0;
+    buf[4] = 0;
+    buf[5] = 0;
+    buf[6] = 0;
+    buf[7] = 0;
+    buf[8] = 0;
+    buf[9] = 0;
+    int result = hidHandle.send(0,buf, BUF_LEN, 500);
+}
 void OP_DFU::JumpToApp()
 {
     char buf[BUF_LEN];
@@ -323,10 +338,10 @@ OP_DFU::Status OP_DFU::StatusRequest()
     buf[8] = 0;
     buf[9] = 0;
 
-    int result = hidHandle.send(0,buf, BUF_LEN, 5000);
+    int result = hidHandle.send(0,buf, BUF_LEN, 10000);
     if(debug)
         qDebug() << result << " bytes sent";
-    result = hidHandle.receive(0,buf,BUF_LEN,5000);
+    result = hidHandle.receive(0,buf,BUF_LEN,10000);
     if(debug)
         qDebug() << result << " bytes received";
     if(buf[1]==OP_DFU::Status_Rep)

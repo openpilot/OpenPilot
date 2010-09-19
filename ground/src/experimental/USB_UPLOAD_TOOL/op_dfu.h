@@ -125,6 +125,7 @@ public:
     void test();
     int send_delay;
     bool use_delay;
+    void AbortOperation(void);
 private:
     bool debug;
     int RWFlags;

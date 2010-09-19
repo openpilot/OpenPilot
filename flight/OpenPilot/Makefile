@@ -605,11 +605,18 @@ gccversion :
 #	@echo $(ALLOBJ)
 
 # Program the device.
+ifeq ($(USE_BOOTLOADER), YES)
+# Program the device with OP Upload Tool".
+program: $(OUTDIR)/$(TARGET).bin
+	@echo ${quote}Programming with OP Upload Tool${quote}
+	../../ground/src/experimental/upload-build-desktop/debug/OPUploadTool.exe -d 0 -p $(OUTDIR)/$(TARGET).bin
+else
 ifeq ($(FLASH_TOOL),OPENOCD)
 # Program the device with Dominic Rath's OPENOCD in "batch-mode", needs cfg and "reset-script".
 program: $(OUTDIR)/$(TARGET).elf
 	@echo ${quote}Programming with OPENOCD${quote}
 	$(OOCD_EXE) $(OOCD_CL)
+endif
 endif
 
 # Create final output file (.hex) from ELF output file.

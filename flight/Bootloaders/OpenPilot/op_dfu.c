@@ -470,13 +470,13 @@ void OPDfuIni(uint8_t discover) {
 	if (discover) {
 		uint8_t found_spi_device = FALSE;
 
-		for (int t = 0; t < 10; ++t) {
+		for (int t = 0; t < 3; ++t) {
 			if (PIOS_OPAHRS_bl_resync() == OPAHRS_RESULT_OK) {
 				found_spi_device = TRUE;
 				dev.FW_Crc = 0;
 				break;
 			}
-			PIOS_DELAY_WaitmS(50);
+			PIOS_DELAY_WaitmS(100);
 		}
 		if (found_spi_device == TRUE) {
 			struct opahrs_msg_v0 rsp;

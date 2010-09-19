@@ -53,11 +53,9 @@ USE_THUMB_MODE = YES
 MCU      = cortex-m3
 CHIP     = STM32F103CBT
 BOARD    = STM32103CB_AHRS
-ifeq ($(USE_BOOTLOADER), YES)
 MODEL    = MD
-else
-MODEL    = MD
-endif
+
+
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
 OUTDIR = Build

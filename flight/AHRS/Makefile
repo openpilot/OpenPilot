@@ -53,12 +53,12 @@ USE_THUMB_MODE = YES
 MCU      = cortex-m3
 CHIP     = STM32F103CBT
 BOARD    = STM32103CB_AHRS
+MODEL    = MD
 ifeq ($(USE_BOOTLOADER), YES)
-MODEL    = MD
+BOOT_MODEL    = $(MODEL)_BL
 else
-MODEL    = MD
+BOOT_MODEL    = $(MODEL)_NB
 endif
-
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
 OUTDIR = Build
 
@@ -216,7 +216,9 @@ DEBUGF = dwarf-2
 CDEFS = -DSTM32F10X_$(MODEL)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)
-
+ifeq ($(USE_BOOTLOADER), YES)
+CDEFS += -DUSE_BOOTLOADER
+endif
 # Place project-specific -D and/or -U options for 
 # Assembler with preprocessor here.
 #ADEFS = -DUSE_IRQ_ASM_WRAPPER
@@ -288,7 +290,7 @@ LDFLAGS += $(MATH_LIB)
 LDFLAGS += -lc -lgcc 
 
 # Set linker-script name depending on selected submodel name
-LDFLAGS +=-T$(LINKERSCRIPTPATH)/link_stm32f10x_$(MODEL).ld
+LDFLAGS +=-T$(LINKERSCRIPTPATH)/link_stm32f10x_$(BOOT_MODEL).ld
 
 # ---------------------------------------------------------------------------
 # Options for OpenOCD flash-programming
@@ -427,11 +429,18 @@ gccversion :
 #	@echo $(ALLOBJ)
 
 # Program the device.
+ifeq ($(USE_BOOTLOADER), YES)
+# Program the device with OP Upload Tool".
+program: $(OUTDIR)/$(TARGET).bin
+	@echo ${quote}Programming with OP Upload Tool${quote}
+	../../ground/src/experimental/upload-build-desktop/debug/OPUploadTool.exe -d 1 -p $(OUTDIR)/$(TARGET).bin
+else
 ifeq ($(FLASH_TOOL),OPENOCD)
 # Program the device with Dominic Rath's OPENOCD in "batch-mode", needs cfg and "reset-script".
 program: $(OUTDIR)/$(TARGET).elf
-	@echo "Programming with OPENOCD"
+	@echo ${quote}Programming with OPENOCD${quote}
 	$(OOCD_EXE) $(OOCD_CL)
+endif
 endif
 
 # Create final output file (.hex) from ELF output file.

@@ -49,7 +49,7 @@ static int32_t opahrs_msg_txrx (const uint8_t * tx, uint8_t * rx, uint32_t len)
 #ifdef PIOS_INCLUDE_FREERTOS
 	vTaskDelay(20 / portTICK_RATE_MS);
 #else
-	//PIOS_DELAY_WaitmS(20);
+	PIOS_DELAY_WaitmS(1);
 #endif
 	rc = PIOS_SPI_TransferBlock(PIOS_OPAHRS_SPI, tx, rx, len, NULL);
 	PIOS_SPI_RC_PinSet(PIOS_OPAHRS_SPI, 1);
@@ -166,6 +166,7 @@ static enum opahrs_result PIOS_OPAHRS_v0_simple_req (enum opahrs_msg_v0_tag req_
 	opahrs_msg_v0_init_user_tx (&req, req_type);
 
 	/* Send the message until it is received */
+
 	rc = opahrs_msg_v0_send_req (&req);
 	if ((rc == OPAHRS_RESULT_OK) && rsp) {
 		/* We need a specific kind of reply, go get it */

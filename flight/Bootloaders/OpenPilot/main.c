@@ -153,7 +153,7 @@ int main() {
 
 		if (STOPWATCH_ValueGet() > 100 * 50 * 100)
 			STOPWATCH_Reset();
-		if ((STOPWATCH_ValueGet() > 70000) && (DeviceState == BLidle))
+		if ((STOPWATCH_ValueGet() > 60000) && (DeviceState == BLidle))
 			JumpToApp = TRUE;
 
 		processRX();

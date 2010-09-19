@@ -68,15 +68,19 @@ int main() {
 	/* Delay system */
 	PIOS_DELAY_Init();
 
-	for (uint32_t t = 0; t < 2; ++t) {
+	for (uint32_t t = 0; t < 10000000; ++t) {
 		if (NSS_HOLD_STATE == 1)
 			GO_dfu = TRUE;
 		else {
 			GO_dfu = FALSE;
 			break;
 		}
-		PIOS_DELAY_WaitmS(1000);
 	}
+	//while(TRUE)
+	//	{
+	//		PIOS_LED_Toggle(LED1);
+	//		PIOS_DELAY_WaitmS(1000);
+	//	}
 	//GO_dfu = TRUE;
 	GO_dfu = GO_dfu;// OR with app boot request
 	if (GO_dfu == FALSE) {
@@ -146,6 +150,7 @@ void process_spi_request(void) {
 		PIOS_SYS_Reset();
 		break;
 	case OPAHRS_MSG_V0_REQ_VERSIONS:
+		//PIOS_LED_On(LED1);
 		opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_VERSIONS);
 		user_tx_v0.payload.user.v.rsp.versions.bl_version = BOOTLOADER_VERSION;
 		user_tx_v0.payload.user.v.rsp.versions.hw_version = HW_VERSION;
@@ -231,10 +236,12 @@ void process_spi_request(void) {
 	return;
 }
 void jump_to_app() {
-	while (TRUE) {
-		PIOS_LED_Toggle(LED1);
-		PIOS_DELAY_WaitmS(1000);
-	}
+	//while(TRUE)
+	//{
+	//	PIOS_LED_Toggle(LED1);
+	//	PIOS_DELAY_WaitmS(1000);
+	//}
+	PIOS_LED_On(LED1);
 	if (((*(__IO uint32_t*) START_OF_USER_CODE) & 0x2FFE0000) == 0x20000000) { /* Jump to user application */
 		FLASH_Lock();
 		RCC_APB2PeriphResetCmd(0xffffffff, ENABLE);

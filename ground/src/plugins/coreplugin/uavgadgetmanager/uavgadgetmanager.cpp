@@ -497,10 +497,13 @@ void UAVGadgetManager::saveSettings(QSettings *qs)
     // remove them for now. Since we no longer have two
     // possible groups, we can remove the non default one too.
     // TODO: Remove this code, and support for reading default group.
-    if (qs->childGroups().contains(defaultUAVGadgetManagerKey)) {
+    if (qs->childKeys().contains(defaultUAVGadgetManagerKey) ||
+        qs->childGroups().contains(defaultUAVGadgetManagerKey)) {
         qs->remove(defaultUAVGadgetManagerKey);
     }
-    if (qs->childGroups().contains(uavGadgetManagerKey)) {
+
+    if (qs->allKeys().contains(uavGadgetManagerKey) ||
+        qs->childGroups().contains(uavGadgetManagerKey)) {
         qs->remove(uavGadgetManagerKey);
     }
 

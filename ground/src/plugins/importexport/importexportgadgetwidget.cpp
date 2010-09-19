@@ -94,10 +94,10 @@ void ImportExportGadgetWidget::on_exportButton_clicked()
 
 void ImportExportGadgetWidget::exportConfiguration(const QString& fileName)
 {
-    bool general = ui->checkBoxGeneral;
-    bool allGadgets = ui->checkBoxAllGadgets;
+    bool general = ui->checkBoxGeneral->isChecked();
+    bool allGadgets = ui->checkBoxAllGadgets->isChecked();
 
-    QSettings qs(fileName, QSettings::defaultFormat());
+    QSettings qs(fileName, QSettings::IniFormat);
 
     if (general) {
         Core::ICore::instance()->saveMainSettings(&qs);
@@ -135,8 +135,8 @@ void ImportExportGadgetWidget::on_importButton_clicked()
 
 void ImportExportGadgetWidget::importConfiguration(const QString& fileName)
 {
-    bool general = ui->checkBoxGeneral;
-    bool allGadgets = ui->checkBoxAllGadgets;
+    bool general = ui->checkBoxGeneral->isChecked();
+    bool allGadgets = ui->checkBoxAllGadgets->isChecked();
 
     QSettings qs(fileName, QSettings::defaultFormat());
 

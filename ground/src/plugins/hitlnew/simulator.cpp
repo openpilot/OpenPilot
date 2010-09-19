@@ -183,8 +183,7 @@ void Simulator::receiveUpdate()
 	}
 
 	// Process data
-	while(inSocket->bytesAvailable() > 0)
-	{
+        while(inSocket->hasPendingDatagrams()) {
 		// Receive datagram
 		QByteArray datagram;
 		datagram.resize(inSocket->pendingDatagramSize());

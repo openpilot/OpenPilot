@@ -142,6 +142,9 @@ protected:
 //    void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *e);
 
+private slots:
+    void onSplitterMoved( int pos, int index );
+
 private:
     void unsplitAll_helper();
     SplitterOrView *findNextView_helper(SplitterOrView *view, bool *found);
@@ -150,6 +153,7 @@ private:
     QStackedLayout *m_layout;
     UAVGadgetView *m_view;
     QSplitter *m_splitter;
+    QList<int> m_sizes;
 };
 
 }

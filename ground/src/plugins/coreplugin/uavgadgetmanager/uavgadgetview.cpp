@@ -498,6 +498,7 @@ void SplitterOrView::split(Qt::Orientation orientation)
     Q_ASSERT(m_view && (m_splitter == 0));
     m_splitter = new MiniSplitter(this);
     m_splitter->setOrientation(orientation);
+    connect(m_splitter, SIGNAL(splitterMoved(int,int)), this, SLOT(onSplitterMoved(int,int)));
     m_layout->addWidget(m_splitter);
     Core::IUAVGadget *e = m_view->gadget();
 
@@ -519,6 +520,11 @@ void SplitterOrView::split(Qt::Orientation orientation)
         delete m_view;
         m_view = 0;
     }
+}
+
+void SplitterOrView::onSplitterMoved( int pos, int index ) {
+    // Update when the splitter is actually moved.
+    m_sizes = m_splitter->sizes();
 }
 
 void SplitterOrView::unsplitAll()
@@ -580,13 +586,9 @@ void SplitterOrView::saveState(QSettings* qSettings) const {
     if (m_splitter) {
         qSettings->setValue("type", "splitter");
         qSettings->setValue("splitterOrientation", (qint32)m_splitter->orientation());
-//        qSettings->setValue("splitterSizes", m_splitter->saveState());
-        // Bit clunky, but makes it more readable in the ini file.
         QList<QVariant> sizesQVariant;
-        QList<int> sizes = m_splitter->sizes();
-        QList<int>::iterator sizesIterator;
-        for (sizesIterator = sizes.begin(); sizesIterator != sizes.end(); sizesIterator++) {
-            sizesQVariant.append(*sizesIterator);
+        foreach (int value, m_sizes) {
+            sizesQVariant.append(value);
         }
         qSettings->setValue("splitterSizes", sizesQVariant);
         qSettings->beginGroup("side0");
@@ -612,13 +614,12 @@ void SplitterOrView::restoreState(QSettings* qSettings)
     if (mode == "splitter") {
         qint32 orientation = qSettings->value("splitterOrientation").toInt();
         QList<QVariant> sizesQVariant = qSettings->value("splitterSizes").toList();
-        QList<int> sizes;
-        QList<QVariant>::iterator sizesIterator;
-        for (sizesIterator = sizesQVariant.begin(); sizesIterator != sizesQVariant.end(); sizesIterator++) {
-            sizes.append((*sizesIterator).toInt());
+        m_sizes.clear();
+        foreach (QVariant value, sizesQVariant) {
+            m_sizes.append(value.toInt());
         }
         split((Qt::Orientation)orientation);
-        m_splitter->setSizes(sizes);
+        m_splitter->setSizes(m_sizes);
         qSettings->beginGroup("side0");
         static_cast<SplitterOrView*>(m_splitter->widget(0))->restoreState(qSettings);
         qSettings->endGroup();
@@ -648,6 +649,18 @@ void SplitterOrView::restoreState(const QByteArray &state)
         stream >> orientation >> splitter >> first >> second;
         split((Qt::Orientation)orientation);
         m_splitter->restoreState(splitter);
+
+        // TODO: Lots of ugly, but this whole method should dissapear ASAP,
+        // It's here only for temporary backwards compatability.
+        m_sizes.clear();
+        QDataStream stream(&splitter, QIODevice::ReadOnly);
+        qint32 marker;
+        qint32 v;
+        stream >> marker;
+        stream >> v;
+        stream >> m_sizes;
+
+
         static_cast<SplitterOrView*>(m_splitter->widget(0))->restoreState(first);
         static_cast<SplitterOrView*>(m_splitter->widget(1))->restoreState(second);
     } else if (mode == "uavGadget") {

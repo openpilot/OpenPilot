@@ -60,7 +60,7 @@ uint8_t FLASH_Start() {
 
 #ifdef STM32F10X_HD
 		pageAdress += 2048;
-#elif STM32F10X_MD
+#elif defined (STM32F10X_MD)
 		pageAdress += 1024;
 #endif
 	}

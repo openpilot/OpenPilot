@@ -46,7 +46,8 @@
 
 /* Local Variables, use pios_usart */
 static uint16_t CaptureValue[12];
-
+static uint8_t prev_byte=0xFF,sync=0,bytecount=0,byte_array[20]={0};
+uint8_t sync_of=0;
 
 /**
 * Initialise the onboard USARTs
@@ -58,6 +59,37 @@ void PIOS_SPEKTRUM_Init(void)
 	{
 		PIOS_SPEKTRUM_Bind();
 	}
+
+
+	/* spektrum "watchdog" timer */
+	NVIC_InitTypeDef NVIC_InitStructure;
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+	/* Enable timer clock */
+	PIOS_SPEKTRUM_SUPV_TIMER_RCC_FUNC;
+
+	/* Configure interrupts */
+	NVIC_InitStructure.NVIC_IRQChannel = PIOS_SPEKTRUM_SUPV_IRQ_CHANNEL;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
+
+	/* Time base configuration */
+	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
+	TIM_TimeBaseStructure.TIM_Period = ((1000000 / PIOS_SPEKTRUM_SUPV_HZ) - 1);
+	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1; /* For 1 uS accuracy */
+	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
+	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+	TIM_TimeBaseInit(PIOS_PPM_SUPV_TIMER, &TIM_TimeBaseStructure);
+
+	/* Enable the Update Interrupt Request */
+	TIM_ITConfig(PIOS_SPEKTRUM_SUPV_TIMER, TIM_IT_Update, ENABLE);
+
+	/* Clear update pending flag */
+	TIM_ClearFlag(TIM6, TIM_FLAG_Update);
+
+	/* Enable counter */
+	TIM_Cmd(PIOS_SPEKTRUM_SUPV_TIMER, ENABLE);
 }
 
 
@@ -141,7 +173,6 @@ uint8_t PIOS_SPEKTRUM_Bind(void)
 */
 int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 {
-	static uint8_t prev_byte=0xFF,sync=0,bytecount=0,byte_array[20]={0};
 	static uint16_t channel=0,sync_word=0;
 	uint8_t channeln=0,frame=0;
 	uint16_t data=0;
@@ -150,8 +181,9 @@ int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 	if(sync==0)
 	{
 		sync_word=(prev_byte<<8)+b;
-		if((sync_word&0xCCFE)==0)
+		if(((sync_word&0x00FE)==0) && (bytecount == 2))
 		{
+			/* sync low byte always 0x01, high byte seems to be random when switching TX on off on, loss counter??? */
 			if(sync_word&0x01)
 			{
 				sync=1;
@@ -173,9 +205,10 @@ int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 	}
 	if(bytecount==16)
 	{
-		//PIOS_COM_SendBufferNonBlocking(PIOS_COM_TELEM_RF,byte_array,16);
+		//PIOS_COM_SendBufferNonBlocking(PIOS_COM_TELEM_RF,byte_array,16); //00 2c 58 84 b0 dc ff
 		bytecount=0;
 		sync=0;
+		sync_of=0;
 	}
 	prev_byte=b;
 	return 0;
@@ -196,7 +229,33 @@ void SPEKTRUM_IRQHandler(void)
 		/* Disable TXE interrupt (TXEIE=0) */
 		USART1->CR1 &= ~(1 << 7);
 	}
+	/* clear "watchdog" timer */
+	TIM_SetCounter(PIOS_SPEKTRUM_SUPV_TIMER,0);
 }
+
+/**
+* This function handles TIM6 global interrupt request.
+*/
+PIOS_SPEKTRUM_SUPV_IRQ_FUNC
+{
+	/* Clear timer interrupt pending bit */
+	TIM_ClearITPendingBit(PIOS_SPEKTRUM_SUPV_TIMER, TIM_IT_Update);
+
+	/* sync between frames, TODO! DX7SE */
+	sync=0;
+	bytecount=0;
+	prev_byte=0xFF;
+	sync_of++;
+	/* watchdog activated */
+	if(sync_of>1)
+	{
+		/* signal lost */
+		sync_of=0;
+		for(int i=0;i<12;i++)
+			CaptureValue[i]=0;
+	}
+}
+
 
 #endif
 

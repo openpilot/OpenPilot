@@ -253,6 +253,15 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define PIOS_PPM_SUPV_IRQ_CHANNEL               TIM6_IRQn
 #define PIOS_PPM_SUPV_IRQ_FUNC                  void TIM6_IRQHandler(void)
 
+//-------------------------
+// SPEKTRUM input
+//-------------------------
+#define PIOS_SPEKTRUM_SUPV_ENABLED                   1
+#define PIOS_SPEKTRUM_SUPV_TIMER                     TIM6
+#define PIOS_SPEKTRUM_SUPV_TIMER_RCC_FUNC            RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE)
+#define PIOS_SPEKTRUM_SUPV_HZ                        50 // 1/22ms
+#define PIOS_SPEKTRUM_SUPV_IRQ_CHANNEL               TIM6_IRQn
+#define PIOS_SPEKTRUM_SUPV_IRQ_FUNC                  void TIM6_IRQHandler(void)
 
 //-------------------------
 // Servo outputs

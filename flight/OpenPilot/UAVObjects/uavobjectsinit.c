@@ -52,6 +52,8 @@
 #include "homelocation.h"
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
+#include "mixersettings.h"
+#include "mixerstatus.h"
 #include "navigationdesired.h"
 #include "navigationsettings.h"
 #include "objectpersistence.h"
@@ -95,6 +97,8 @@ void UAVObjectsInitializeAll()
     HomeLocationInitialize();
     ManualControlCommandInitialize();
     ManualControlSettingsInitialize();
+    MixerSettingsInitialize();
+    MixerStatusInitialize();
     NavigationDesiredInitialize();
     NavigationSettingsInitialize();
     ObjectPersistenceInitialize();

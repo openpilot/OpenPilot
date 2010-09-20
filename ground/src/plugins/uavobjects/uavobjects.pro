@@ -45,7 +45,9 @@ HEADERS += uavobjects_global.h \
     homelocation.h \
     vtolsettings.h \
     vtolstatus.h \
-    attitudesettings.h
+    attitudesettings.h \
+    mixersettings.h \
+    mixerstatus.h
 SOURCES += uavobject.cpp \
     uavmetaobject.cpp \
     uavobjectmanager.cpp \
@@ -87,5 +89,7 @@ SOURCES += uavobject.cpp \
     homelocation.cpp \
     vtolsettings.cpp \
     vtolstatus.cpp \
-    attitudesettings.cpp
+    attitudesettings.cpp \
+    mixersettings.cpp \
+    mixerstatus.cpp
 OTHER_FILES += UAVObjects.pluginspec

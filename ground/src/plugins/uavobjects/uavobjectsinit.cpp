@@ -54,6 +54,8 @@
 #include "homelocation.h"
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
+#include "mixersettings.h"
+#include "mixerstatus.h"
 #include "navigationdesired.h"
 #include "navigationsettings.h"
 #include "objectpersistence.h"
@@ -97,6 +99,8 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new HomeLocation() );
     objMngr->registerObject( new ManualControlCommand() );
     objMngr->registerObject( new ManualControlSettings() );
+    objMngr->registerObject( new MixerSettings() );
+    objMngr->registerObject( new MixerStatus() );
     objMngr->registerObject( new NavigationDesired() );
     objMngr->registerObject( new NavigationSettings() );
     objMngr->registerObject( new ObjectPersistence() );

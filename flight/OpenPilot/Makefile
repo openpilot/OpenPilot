@@ -1,24 +1,24 @@
  #####
  # Project: OpenPilot
- #    
- #  
+ #
+ #
  # Makefile for OpenPilot project build PiOS and the AP.
  #
  # The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
- #    
- # 
- # This program is free software; you can redistribute it and/or modify 
- # it under the terms of the GNU General Public License as published by 
- # the Free Software Foundation; either version 3 of the License, or 
+ #
+ #
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation; either version 3 of the License, or
  # (at your option) any later version.
- # 
- # This program is distributed in the hope that it will be useful, but 
- # WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- # or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ #
+ # This program is distributed in the hope that it will be useful, but
+ # WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ # or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  # for more details.
- # 
- # You should have received a copy of the GNU General Public License along 
- # with this program; if not, write to the Free Software Foundation, Inc., 
+ #
+ # You should have received a copy of the GNU General Public License along
+ # with this program; if not, write to the Free Software Foundation, Inc.,
  # 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  #####
 
@@ -30,7 +30,7 @@ DEBUG ?= YES
 # Set to YES to use the Servo output pins for debugging via scope or logic analyser
 ENABLE_DEBUG_PINS ?= NO
 
-# Set to Yes to enable the AUX UART which is mapped on the S1 (Tx) and S2 (Rx) servo outputs  
+# Set to Yes to enable the AUX UART which is mapped on the S1 (Tx) and S2 (Rx) servo outputs
 ENABLE_AUX_UART ?= NO
 
 #
@@ -38,7 +38,7 @@ USE_BOOTLOADER ?= NO
 
 
 # Set to YES when using Code Sourcery toolchain
-CODE_SOURCERY ?= NO
+CODE_SOURCERY ?= YES
 
 # Toolchain prefix (i.e arm-elf- -> arm-elf-gcc.exe)
 TCHAIN_PREFIX ?= arm-none-eabi-
@@ -52,15 +52,21 @@ endif
 
 FLASH_TOOL = OPENOCD
 
-# YES enables -mthumb option to flags for source-files listed 
+# YES enables -mthumb option to flags for source-files listed
 # in SRC and CPPSRC
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES =  Telemetry GPS ManualControl Actuator Altitude AHRSComms Stabilization/simple/Stabilization Watchdog
+MODULES =  Telemetry GPS ManualControl Altitude AHRSComms Stabilization/simple/Stabilization Watchdog
+#matrix based actuator mixer
+#MODULES += Actuator/matrix/Actuator
+#original actuator with separate mixers for fixed wing, heli and VTOL
+MODULES += Actuator
+
+
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
-#MODULES = Telemetry 
+#MODULES = Telemetry
 #MODULES += Osd/OsdEtStd
 
 
@@ -120,7 +126,7 @@ DOXYGENDIR = ../Doc/Doxygen
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
 
-MODNAMES = $(notdir ${MODULES})   
+MODNAMES = $(notdir ${MODULES})
 
 ifndef TESTAPP
 ## MODULES
@@ -180,6 +186,9 @@ SRC += $(OPUAVOBJ)/homelocation.c
 SRC += $(OPUAVOBJ)/attitudesettings.c
 SRC += $(OPUAVOBJ)/vtolsettings.c
 SRC += $(OPUAVOBJ)/vtolstatus.c
+SRC += $(OPUAVOBJ)/mixersettings.c
+SRC += $(OPUAVOBJ)/mixerstatus.c
+#SRC += $(OPUAVOBJ)/lesstabilizationsettings.c
 endif
 
 ## PIOS Hardware (STM32F10x)
@@ -254,11 +263,11 @@ SRC += $(STMUSBSRCDIR)/usb_regs.c
 SRC += $(STMUSBSRCDIR)/usb_sil.c
 
 ## RTOS
-SRC += $(RTOSSRCDIR)/list.c 
-SRC += $(RTOSSRCDIR)/queue.c  
+SRC += $(RTOSSRCDIR)/list.c
+SRC += $(RTOSSRCDIR)/queue.c
 SRC += $(RTOSSRCDIR)/tasks.c
 
-## RTOS Portable 
+## RTOS Portable
 SRC += $(RTOSSRCDIR)/portable/GCC/ARM_CM3/port.c
 SRC += $(RTOSSRCDIR)/portable/MemMang/heap_2.c
 
@@ -277,16 +286,16 @@ SRC += $(DOSFSDIR)/dfs_sdcard.c
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
 # use file-extension c for "c-only"-files
 ## just for testing, timer.c could be compiled in thumb-mode too
-SRCARM = 
+SRCARM =
 
 # List C++ source files here.
 # use file-extension .cpp for C++-files (not .C)
-CPPSRC = 
+CPPSRC =
 
 # List C++ source files here which must be compiled in ARM-Mode.
 # use file-extension .cpp for C++-files (not .C)
 #CPPSRCARM = $(TARGET).cpp
-CPPSRCARM = 
+CPPSRCARM =
 
 # List Assembler source files here.
 # Make them always end in a capital .S. Files ending in a lowercase .s
@@ -298,7 +307,7 @@ CPPSRCARM =
 ASRC = $(PIOSSTM32F10X)/startup_stm32f10x_$(MODEL)_OP.S
 
 # List Assembler source files here which must be assembled in ARM-Mode..
-ASRCARM = 
+ASRCARM =
 
 # List any extra directories to look for include files here.
 #    Each directory must be seperated by a space.
@@ -330,11 +339,11 @@ EXTRAINCDIRS += ${foreach MOD, ${MODULES}, Modules/${MOD}/inc} ${OPMODULEDIR}/Sy
 # Also add directories where the linker should search for
 # includes from linker-script to the list
 #     Each directory must be seperated by a space.
-EXTRA_LIBDIRS = 
+EXTRA_LIBDIRS =
 
 # Extra Libraries
 #    Each library-name must be seperated by a space.
-#    i.e. to link with libxyz.a, libabc.a and libefsl.a: 
+#    i.e. to link with libxyz.a, libabc.a and libefsl.a:
 #    EXTRA_LIBS = xyz abc efsl
 # for newlib-lpc (file: libnewlibc-lpc.a):
 #    EXTRA_LIBS = newlib-lpc
@@ -343,7 +352,7 @@ EXTRA_LIBS =
 # Path to Linker-Scripts
 LINKERSCRIPTPATH = $(PIOSSTM32F10X)
 
-# Optimization level, can be [0, 1, 2, 3, s]. 
+# Optimization level, can be [0, 1, 2, 3, s].
 # 0 = turn off optimization. s = optimize for size.
 # (Note: 3 is not always the best optimization level. See avr-libc FAQ.)
 
@@ -354,7 +363,7 @@ OPT = s
 endif
 
 # Output format. (can be ihex or binary or both)
-#  binary to create a load-image in raw-binary format i.e. for SAM-BA, 
+#  binary to create a load-image in raw-binary format i.e. for SAM-BA,
 #  ihex to create a load-image in Intel hex format
 #LOADFORMAT = ihex
 #LOADFORMAT = binary
@@ -363,7 +372,7 @@ LOADFORMAT = both
 # Debugging format.
 DEBUGF = dwarf-2
 
-# Place project-specific -D (define) and/or 
+# Place project-specific -D (define) and/or
 # -U options for C here.
 CDEFS = -DSTM32F10X_$(MODEL)
 CDEFS += -DUSE_STDPERIPH_DRIVER
@@ -379,7 +388,7 @@ CDEFS += -DUSE_BOOTLOADER
 endif
 
 
-# Place project-specific -D and/or -U options for 
+# Place project-specific -D and/or -U options for
 # Assembler with preprocessor here.
 #ADEFS = -DUSE_IRQ_ASM_WRAPPER
 ADEFS = -D__ASSEMBLY__
@@ -413,18 +422,20 @@ CFLAGS += -mcpu=$(MCU) -mthumb
 CFLAGS += $(CDEFS)
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
 
-CFLAGS += -mapcs-frame 
+CFLAGS += -mapcs-frame
 CFLAGS += -fomit-frame-pointer
+ifeq ($(CODE_SOURCERY), YES)
 CFLAGS += -fpromote-loop-indices
+endif
 
-CFLAGS += -Wall 
+CFLAGS += -Wall
 CFLAGS += -Werror
 CFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))
 # Compiler flags to generate dependency files:
 CFLAGS += -MD -MP -MF $(OUTDIR)/dep/$(@F).d
 
 # flags only for C
-#CONLYFLAGS += -Wnested-externs 
+#CONLYFLAGS += -Wnested-externs
 CONLYFLAGS += $(CSTANDARD)
 
 # Assembler flags.
@@ -446,7 +457,7 @@ LDFLAGS += $(patsubst %,-L%,$(EXTRA_LIBDIRS))
 LDFLAGS += -lc
 LDFLAGS += $(patsubst %,-l%,$(EXTRA_LIBS))
 LDFLAGS += $(MATH_LIB)
-LDFLAGS += -lc -lgcc 
+LDFLAGS += -lc -lgcc
 
 # Set linker-script name depending on selected submodel name
 LDFLAGS +=-T$(LINKERSCRIPTPATH)/link_stm32f10x_$(BOOT_MODEL).ld
@@ -465,7 +476,7 @@ UNAME := $(shell uname)
 ifeq ($(UNAME), Darwin)
   OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.openpilot.osx.cfg -f ../Project/OpenOCD/stm32.cfg
 else
-  OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.openpilot.cfg -f ../Project/OpenOCD/stm32.cfg
+  OOCD_CL+=-f ../Project/OpenOCD/floss-jtag-revb.cfg -f ../Project/OpenOCD/stm32.cfg
 endif
 # initialize
 OOCD_CL+=-c init
@@ -473,10 +484,10 @@ OOCD_CL+=-c init
 OOCD_CL+=-c targets
 # commands to prepare flash-write
 OOCD_CL+= -c "reset halt"
-# flash erase 
+# flash erase
 OOCD_CL+=-c "stm32x mass_erase 0"
 # flash-write
-OOCD_CL+=-c "flash write_image $(OOCD_LOADFILE)" 
+OOCD_CL+=-c "flash write_image $(OOCD_LOADFILE)"
 # Verify
 OOCD_CL+=-c "verify_image $(OOCD_LOADFILE)"
 # reset target
@@ -506,7 +517,7 @@ MSG_ERRORS_NONE = Errors: none
 MSG_BEGIN = ${quote}-------- begin (mode: $(RUN_MODE)) --------${quote}
 MSG_END = ${quote}--------  end  --------${quote}
 MSG_MODINIT = ${quote}**** Generating ModInit.c${quote}
-MSG_SIZE_BEFORE = ${quote}Size before:${quote} 
+MSG_SIZE_BEFORE = ${quote}Size before:${quote}
 MSG_SIZE_AFTER = ${quote}Size after build:${quote}
 MSG_LOAD_FILE = ${quote}Creating load file:${quote}
 MSG_EXTENDED_LISTING = ${quote}Creating Extended Listing/Disassembly:${quote}
@@ -536,7 +547,7 @@ LSTFILES   = $(addprefix $(OUTDIR)/, $(addsuffix .lst, $(ALLSRCBASE)))
 # Define all depedency-files (used for make clean).
 DEPFILES   = $(addprefix $(OUTDIR)/dep/, $(addsuffix .o.d, $(ALLSRCBASE)))
 
-elf: $(OUTDIR)/$(TARGET).elf 
+elf: $(OUTDIR)/$(TARGET).elf
 lss: $(OUTDIR)/$(TARGET).lss
 sym: $(OUTDIR)/$(TARGET).sym
 hex: $(OUTDIR)/$(TARGET).hex
@@ -548,13 +559,13 @@ all: begin gccversion build sizeafter finished end
 
 ifeq ($(LOADFORMAT),ihex)
 build: elf hex lss sym
-else 
+else
 ifeq ($(LOADFORMAT),binary)
 build: elf bin lss sym
-else 
+else
 ifeq ($(LOADFORMAT),both)
 build: elf hex bin lss sym
-else 
+else
 $(error "$(MSG_FORMATERROR) $(FORMAT)")
 endif
 endif
@@ -565,17 +576,17 @@ result = ${shell echo "test"}
 ifeq (${result}, test)
 	quote = '
 else
-	quote = 
+	quote =
 endif
 
 ${OUTDIR}/InitMods.c: Makefile
 	@echo ${MSG_MODINIT}
-	@echo ${quote}// Autogenerated file${quote} > ${OUTDIR}/InitMods.c 
+	@echo ${quote}// Autogenerated file${quote} > ${OUTDIR}/InitMods.c
 	@echo ${quote}${foreach MOD, ${MODNAMES}, extern unsigned int ${MOD}Initialize(void);}${quote}  >> ${OUTDIR}/InitMods.c
 	@echo ${quote}void InitModules() {${quote} >> ${OUTDIR}/InitMods.c
 	@echo ${quote}${foreach MOD, ${MODNAMES}, ${MOD}Initialize();}${quote}  >> ${OUTDIR}/InitMods.c
 	@echo ${quote}}${quote} >> ${OUTDIR}/InitMods.c
-	
+
 # Eye candy.
 begin:
 ##	@echo
@@ -598,9 +609,9 @@ sizeafter:
 #	@if [ -f  $(OUTDIR)/$(TARGET).elf ]; then echo; echo $(MSG_SIZE_AFTER); $(ELFSIZE); echo; fi
 	@echo $(MSG_SIZE_AFTER)
 	$(ELFSIZE)
-	
+
 # Display compiler version information.
-gccversion : 
+gccversion :
 	@$(CC) --version
 #	@echo $(ALLOBJ)
 
@@ -624,7 +635,7 @@ endif
 ##	@echo
 	@echo $(MSG_LOAD_FILE) $@
 	$(OBJCOPY) -O ihex $< $@
-	
+
 # Create final output file (.bin) from ELF output file.
 %.bin: %.elf
 ##	@echo
@@ -660,18 +671,18 @@ define ASSEMBLE_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 ##	@echo
 	@echo $(MSG_ASSEMBLING) $$<  to  $$@
-	$(CC) -c $(THUMB) $$(ASFLAGS) $$< -o $$@ 
+	$(CC) -c $(THUMB) $$(ASFLAGS) $$< -o $$@
 endef
-$(foreach src, $(ASRC), $(eval $(call ASSEMBLE_TEMPLATE, $(src)))) 
+$(foreach src, $(ASRC), $(eval $(call ASSEMBLE_TEMPLATE, $(src))))
 
 # Assemble: create object files from assembler source files. ARM-only
 define ASSEMBLE_ARM_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 ##	@echo
 	@echo $(MSG_ASSEMBLING_ARM) $$<  to  $$@
-	$(CC) -c $$(ASFLAGS) $$< -o $$@ 
+	$(CC) -c $$(ASFLAGS) $$< -o $$@
 endef
-$(foreach src, $(ASRCARM), $(eval $(call ASSEMBLE_ARM_TEMPLATE, $(src)))) 
+$(foreach src, $(ASRCARM), $(eval $(call ASSEMBLE_ARM_TEMPLATE, $(src))))
 
 
 # Compile: create object files from C source files.
@@ -679,18 +690,18 @@ define COMPILE_C_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 ##	@echo
 	@echo $(MSG_COMPILING) $$<  to  $$@
-	$(CC) -c $(THUMB) $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@ 
+	$(CC) -c $(THUMB) $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
 endef
-$(foreach src, $(SRC), $(eval $(call COMPILE_C_TEMPLATE, $(src)))) 
+$(foreach src, $(SRC), $(eval $(call COMPILE_C_TEMPLATE, $(src))))
 
 # Compile: create object files from C source files. ARM-only
 define COMPILE_C_ARM_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 ##	@echo
 	@echo $(MSG_COMPILING_ARM) $$<  to  $$@
-	$(CC) -c $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@ 
+	$(CC) -c $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
 endef
-$(foreach src, $(SRCARM), $(eval $(call COMPILE_C_ARM_TEMPLATE, $(src)))) 
+$(foreach src, $(SRCARM), $(eval $(call COMPILE_C_ARM_TEMPLATE, $(src))))
 
 
 # Compile: create object files from C++ source files.
@@ -698,18 +709,18 @@ define COMPILE_CPP_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 ##	@echo
 	@echo $(MSG_COMPILINGCPP) $$<  to  $$@
-	$(CC) -c $(THUMB) $$(CFLAGS) $$(CPPFLAGS) $$< -o $$@ 
+	$(CC) -c $(THUMB) $$(CFLAGS) $$(CPPFLAGS) $$< -o $$@
 endef
-$(foreach src, $(CPPSRC), $(eval $(call COMPILE_CPP_TEMPLATE, $(src)))) 
+$(foreach src, $(CPPSRC), $(eval $(call COMPILE_CPP_TEMPLATE, $(src))))
 
 # Compile: create object files from C++ source files. ARM-only
 define COMPILE_CPP_ARM_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 ##	@echo
 	@echo $(MSG_COMPILINGCPP_ARM) $$<  to  $$@
-	$(CC) -c $$(CFLAGS) $$(CPPFLAGS) $$< -o $$@ 
+	$(CC) -c $$(CFLAGS) $$(CPPFLAGS) $$< -o $$@
 endef
-$(foreach src, $(CPPSRCARM), $(eval $(call COMPILE_CPP_ARM_TEMPLATE, $(src)))) 
+$(foreach src, $(CPPSRCARM), $(eval $(call COMPILE_CPP_ARM_TEMPLATE, $(src))))
 
 
 # Compile: create assembler files from C source files. ARM/Thumb
@@ -725,7 +736,7 @@ $(SRCARM:.c=.s) : %.s : %.c
 # Generate Doxygen documents
 docs:
 	doxygen  $(DOXYGENDIR)/doxygen.cfg
-	
+
 # Target: clean project.
 clean: begin clean_list finished end
 

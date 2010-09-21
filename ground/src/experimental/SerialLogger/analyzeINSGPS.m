@@ -9,7 +9,7 @@ fid = fopen(fn);
 i = 1;
 data(i).block = -1;
 tline = fgetl(fid);
-while ischar(tline)
+while ischar(tline) && ~isempty(tline)
     switch(tline(1))
         case 'q'
             c = textscan(tline,'q: %f %f %f %f');

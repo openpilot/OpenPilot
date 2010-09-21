@@ -61,6 +61,11 @@ UAVTalk::UAVTalk(QIODevice* iodev, UAVObjectManager* objMngr)
     connect(io, SIGNAL(readyRead()), this, SLOT(processInputStream()));
 }
 
+UAVTalk::~UAVTalk()
+{
+    disconnect(io, SIGNAL(readyRead()), this, SLOT(processInputStream()));
+}
+
 /**
  * Reset the statistics counters
  */

@@ -50,7 +50,7 @@ public:
     } ComStats;
 
     UAVTalk(QIODevice* iodev, UAVObjectManager* objMngr);
-
+    ~UAVTalk();
     bool sendObject(UAVObject* obj, bool acked, bool allInstances);
     bool sendObjectRequest(UAVObject* obj, bool allInstances);
     void cancelTransaction();

@@ -276,7 +276,7 @@ void LoggingPlugin::stopReplay()
 {
     logFile.stopReplay();
     logFile.close();
-    free(uavTalk);
+    delete(uavTalk);
     uavTalk = 0;
     state = IDLE;
 

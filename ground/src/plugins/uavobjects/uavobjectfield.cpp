@@ -27,6 +27,7 @@
  */
 #include "uavobjectfield.h"
 #include <QtEndian>
+#include <QDebug>
 
 UAVObjectField::UAVObjectField(const QString& name, const QString& units, FieldType type, quint32 numElements, const QStringList& options)
 {
@@ -444,6 +445,11 @@ QVariant UAVObjectField::getValue(quint32 index)
         {
             quint8 tmpenum;
             memcpy(&tmpenum, &data[offset + numBytesPerElement*index], numBytesPerElement);
+//            Q_ASSERT((tmpenum < options.length()) && (tmpenum >= 0)); // catch bad enum settings
+            if(tmpenum >= options.length()) {
+                qDebug() << "Invalid value for" << name;
+                return QVariant( QString("Bad Value") );
+            }
             return QVariant( options[tmpenum] );
             break;
         }

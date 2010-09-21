@@ -157,6 +157,7 @@ UAVGadgetManagerPrivate::UAVGadgetManagerPrivate(ICore *core, QWidget *parent) :
     m_core(core),
     m_coreListener(0)
 {
+    Q_UNUSED(parent);
 }
 
 UAVGadgetManagerPrivate::~UAVGadgetManagerPrivate()

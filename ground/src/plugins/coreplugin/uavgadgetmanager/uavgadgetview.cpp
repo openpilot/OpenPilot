@@ -523,6 +523,8 @@ void SplitterOrView::split(Qt::Orientation orientation)
 }
 
 void SplitterOrView::onSplitterMoved( int pos, int index ) {
+    Q_UNUSED(pos);
+    Q_UNUSED(index);
     // Update when the splitter is actually moved.
     m_sizes = m_splitter->sizes();
 }

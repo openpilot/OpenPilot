@@ -70,15 +70,23 @@ public:
 
 signals:
     void stopLoggingSignal(void);
+    void stopReplaySignal(void);
 
 protected:
-    enum {IDLE, LOGGING} state;
+    enum {IDLE, LOGGING, REPLAY} state;
     LoggingThread * loggingThread;
+
+    // These are used for replay, logging in its own thread
+    UAVTalk * uavTalk;
+    LogFile * logFile;
 
 private slots:
     void toggleLogging();
+    void toggleReplay();
     void startLogging(QString file);
+    void startReplay(QString file);
     void stopLogging();
+    void stopReplay();
     void loggingStopped();
 };
 #endif /* LoggingPLUGIN_H_ */

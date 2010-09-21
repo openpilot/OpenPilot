@@ -118,7 +118,6 @@ void LoggingThread::stopLogging()
     quit();
 }
 
-
 LoggingPlugin::LoggingPlugin() : state(IDLE)
 {
     // Do nothing
@@ -141,6 +140,7 @@ bool LoggingPlugin::initialize(const QStringList& args, QString *errMsg)
     Core::ActionManager* am = Core::ICore::instance()->actionManager();
     Core::ActionContainer* ac = am->actionContainer(Core::Constants::M_FILE);
 
+    // Command to start logging
     Core::Command* cmd = am->registerAction(new QAction(this),
                                             "LoggingPlugin.Logging",
                                             QList<int>() <<
@@ -153,6 +153,19 @@ bool LoggingPlugin::initialize(const QStringList& args, QString *errMsg)
     ac->addAction(cmd, "Logging");
 
     connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(toggleLogging()));
+
+    // Command to replay logging
+    Core::Command* cmd2 = am->registerAction(new QAction(this),
+                                            "LoggingPlugin.Playback",
+                                            QList<int>() <<
+                                            Core::Constants::C_GLOBAL_ID);
+    cmd2->setDefaultKeySequence(QKeySequence("Ctrl+R"));
+    cmd2->action()->setText("Replay...");
+
+    ac->appendGroup("Replay");
+    ac->addAction(cmd2, "Replay");
+
+    connect(cmd2->action(), SIGNAL(triggered(bool)), this, SLOT(toggleReplay()));
 
     return true;
 }
@@ -171,11 +184,32 @@ void LoggingPlugin::toggleLogging()
         connect(fd, SIGNAL(fileSelected(QString)), this, SLOT(startLogging(QString)));
         fd->exec();
     }
-    else
+    else if(state == LOGGING)
     {
         stopLogging();
     }
 }
+
+/**
+  * The action that is triggered by the menu item which opens the
+  * file and begins replay if successful
+  */
+void LoggingPlugin::toggleReplay()
+{
+    if(state == IDLE)
+    {
+        QFileDialog * fd = new QFileDialog();
+        fd->setAcceptMode(QFileDialog::AcceptOpen);
+        fd->setNameFilter("OpenPilot Log (*.opl)");
+        connect(fd, SIGNAL(fileSelected(QString)), this, SLOT(startReplay(QString)));
+        fd->exec();
+    }
+    else if(state == REPLAY)
+    {
+        stopReplay();
+    }
+}
+
 
 /**
   * Starts the logging thread to a certain file
@@ -183,7 +217,7 @@ void LoggingPlugin::toggleLogging()
 void LoggingPlugin::startLogging(QString file)
 {
     qDebug() << "Logging to " << file;
-    LoggingThread *loggingThread = new LoggingThread();
+    loggingThread = new LoggingThread();
     if(loggingThread->openFile(file,this))
     {
         connect(loggingThread,SIGNAL(finished()),this,SLOT(loggingStopped()));
@@ -197,11 +231,50 @@ void LoggingPlugin::startLogging(QString file)
 }
 
 /**
+  * Starts the logging thread replaying a certain file
+  */
+void LoggingPlugin::startReplay(QString file)
+{
+
+    logFile = new LogFile;
+    logFile->setFileName(file);
+    if(logFile->open(QIODevice::ReadOnly)) {
+        qDebug() << "Replaying " << file;
+        state = REPLAY;
+
+        ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+        UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+
+        uavTalk = new UAVTalk(logFile, objManager);
+        logFile->startReplay();
+    } else {
+        QErrorMessage err;
+        err.showMessage("Unable to open file for replay");
+        err.exec();
+    }
+}
+
+/**
   * Send the stop logging signal to the LoggingThread
   */
 void LoggingPlugin::stopLogging()
 {
     emit stopLoggingSignal();
+}
+
+
+/**
+  * Send the stop replay signal to the ReplayThread
+  */
+void LoggingPlugin::stopReplay()
+{
+    logFile->stopReplay();
+    logFile->close();
+    free(uavTalk);
+    free(logFile);
+    uavTalk = 0;
+    logFile = 0;
+    state = IDLE;
 }
 
 /**
@@ -210,8 +283,12 @@ void LoggingPlugin::stopLogging()
   */
 void LoggingPlugin::loggingStopped()
 {
-    state = IDLE;
+    if(state == LOGGING)
+        state = IDLE;
+    free(loggingThread);
+    loggingThread = NULL;
 }
+
 void LoggingPlugin::extensionsInitialized()
 {
     // Do nothing

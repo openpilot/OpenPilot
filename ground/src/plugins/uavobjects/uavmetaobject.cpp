@@ -85,6 +85,7 @@ UAVObject* UAVMetaObject::getParentObject()
  */
 void UAVMetaObject::setMetadata(const Metadata& mdata)
 {
+    Q_UNUSED(mdata);
     return; // can not update metaobject's metadata
 }
 

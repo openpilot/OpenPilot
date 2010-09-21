@@ -133,6 +133,7 @@ void TelemetryMonitor::retrieveNextObject()
  */
 void TelemetryMonitor::transactionCompleted(UAVObject* obj, bool success)
 {
+    Q_UNUSED(success);
     QMutexLocker locker(mutex);
     // Disconnect from sending object
     obj->disconnect(this);
@@ -154,6 +155,7 @@ void TelemetryMonitor::transactionCompleted(UAVObject* obj, bool success)
  */
 void TelemetryMonitor::flightStatsUpdated(UAVObject* obj)
 {
+    Q_UNUSED(obj);
     QMutexLocker locker(mutex);
 
     // Force update if not yet connected

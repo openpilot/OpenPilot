@@ -162,6 +162,8 @@ SRC += $(OPUAVOBJ)/gpssatellites.c
 SRC += $(OPUAVOBJ)/attitudesettings.c
 SRC += $(OPUAVOBJ)/vtolsettings.c
 SRC += $(OPUAVOBJ)/vtolstatus.c
+SRC += $(OPUAVOBJ)/mixersettings.c
+SRC += $(OPUAVOBJ)/mixerstatus.c
 endif
 
 ## PIOS Hardware (posix)

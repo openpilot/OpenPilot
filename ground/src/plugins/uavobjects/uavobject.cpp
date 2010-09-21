@@ -79,6 +79,7 @@ void UAVObject::initializeFields(QList<UAVObjectField*>& fields, quint8* data, q
  */
 void UAVObject::fieldUpdated(UAVObjectField* field)
 {
+    Q_UNUSED(field);
 //    emit objectUpdatedAuto(this); // trigger object updated event
 //    emit objectUpdated(this);
 }
@@ -206,7 +207,7 @@ UAVObjectField* UAVObject::getField(const QString& name)
         }
     }
     // If this point is reached then the field was not found
-    Q_ASSERT_X(0,"UAVObject::getField",QString("Non existant field " + name + "requested.  This indicates a bug.  Make sure you also have null checking for non-debug code.").toAscii());
+    Q_ASSERT_X(0,"UAVObject::getField",QString("Non existant field " + name + " requested.  This indicates a bug.  Make sure you also have null checking for non-debug code.").toAscii());
     return NULL;
 }
 

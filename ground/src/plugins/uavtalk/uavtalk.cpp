@@ -311,6 +311,8 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
  */
 bool UAVTalk::receiveObject(quint8 type, quint32 objId, quint16 instId, quint8* data, qint32 length)
 {
+    Q_UNUSED(length);
+
     UAVObject* obj = NULL;
     bool error = false;
     bool allInstances = (instId == ALL_INSTANCES? true : false);

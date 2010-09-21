@@ -43,6 +43,7 @@
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/icore.h>
 #include <QKeySequence>
+#include <uavobjects/uavobjectmanager.h>
 
 /**
   * Sets the file to use for logging and takes the parent plugin
@@ -52,15 +53,13 @@
   */
 bool LoggingThread::openFile(QString file, LoggingPlugin * parent)
 {
-    // TODO: Write a header at the beginng describing objects so that in future
-    // they can be read back if ID's change
     logFile.setFileName(file);
-    if(logFile.open(QIODevice::WriteOnly) == FALSE)
-    {
-        qDebug() << "Unable to open " << file << " for logging";
-        return false;
-    }
+    logFile.open(QIODevice::WriteOnly);
 
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+
+    uavTalk = new UAVTalk(&logFile, objManager);
     connect(parent,SIGNAL(stopLoggingSignal()),this,SLOT(stopLogging()));
 
     return true;
@@ -74,28 +73,9 @@ bool LoggingThread::openFile(QString file, LoggingPlugin * parent)
   */
 void LoggingThread::objectUpdated(UAVObject * obj)
 {
-    quint32 timeStamp = myTime.elapsed();
-    quint32 objSize = obj->getNumBytes();
-    quint32 objId = obj->getObjID();
-    quint32 objInst = obj->getInstID();
-
-    quint8 * buffer = new quint8[objSize+16];
-
-    if(buffer == NULL)
-        return;
-
-    obj->pack(&buffer[16]);
-    memcpy(buffer,&timeStamp,4);
-    memcpy(&buffer[4],&objSize,4);
-    memcpy(&buffer[8],&objId,4);
-    memcpy(&buffer[12],&objInst,4);
-
     QWriteLocker locker(&lock);
-    qint64 written = logFile.write((char *) buffer,objSize+8);
-
-    delete(buffer);
-
-    //qDebug() << obj->getName() << " logged at " << timeStamp << " size: " << objSize << " written " << written;
+    if(!uavTalk->sendObject(obj,false,false) )
+        qDebug() << "Error logging " << obj->getName();
 };
 
 /**
@@ -123,7 +103,6 @@ void LoggingThread::run()
         }
     }
 
-    myTime.restart();
     exec();
 }
 
@@ -135,7 +114,7 @@ void LoggingThread::stopLogging()
 {
     QWriteLocker locker(&lock);
     logFile.close();
-    qDebug() << "File " << logFile.fileName() << " closed";
+    qDebug() << "File closed";
     quit();
 }
 

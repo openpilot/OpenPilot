@@ -29,8 +29,10 @@
 
 #include <extensionsystem/iplugin.h>
 #include <uavobjects/uavobjectmanager.h>
+#include <uavtalk/uavtalk.h>
+#include <logfile.h>
+
 #include <QThread>
-#include <QTime>
 #include <QReadWriteLock>
 
 class LoggingPlugin;
@@ -49,9 +51,9 @@ public slots:
 
 protected:
     void run();
-    QFile logFile;
-    QTime myTime;
     QReadWriteLock lock;
+    LogFile logFile;
+    UAVTalk * uavTalk;
 };
 
 class LoggingPlugin : public ExtensionSystem::IPlugin

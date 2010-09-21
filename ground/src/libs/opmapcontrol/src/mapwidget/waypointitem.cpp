@@ -66,6 +66,8 @@ namespace mapcontrol
     }
     void WayPointItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
     {
+        Q_UNUSED(option);
+        Q_UNUSED(widget);
         painter->drawPixmap(-picture.width()/2,-picture.height(),picture);
         if(this->isSelected())
             painter->drawRect(QRectF(-picture.width()/2,-picture.height(),picture.width()-1,picture.height()-1));

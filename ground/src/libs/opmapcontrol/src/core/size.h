@@ -44,7 +44,7 @@ namespace core {
         Size operator+(const Size &sz1){return Size(sz1.width+width,sz1.height+height);}
 
         int GetHashCode(){return width^height;}
-        uint qHash(Size const& rect){return width^height;}
+        uint qHash(Size const& /*rect*/){return width^height;}
         QString ToString(){return "With="+QString::number(width)+" ,Height="+QString::number(height);}
         int Width()const {return width;}
         int Height()const {return height;}

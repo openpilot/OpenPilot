@@ -616,31 +616,41 @@ void OPMapGadgetWidget::OnMapZoomChanged()
 
 void OPMapGadgetWidget::OnMapTypeChanged(MapType::Types type)
 {
+    Q_UNUSED(type);
     // to do
 }
 
 void OPMapGadgetWidget::OnEmptyTileError(int zoom, core::Point pos)
 {
+    Q_UNUSED(zoom);
+    Q_UNUSED(pos);
     // to do
 }
 
 void OPMapGadgetWidget::WPNumberChanged(int const &oldnumber, int const &newnumber, WayPointItem *waypoint)
 {
+    Q_UNUSED(oldnumber);
+    Q_UNUSED(newnumber);
+    Q_UNUSED(waypoint);
     // to do
 }
 
 void OPMapGadgetWidget::WPValuesChanged(WayPointItem *waypoint)
 {
+    Q_UNUSED(waypoint);
     // to do
 }
 
 void OPMapGadgetWidget::WPInserted(int const &number, WayPointItem *waypoint)
 {
+    Q_UNUSED(number);
+    Q_UNUSED(waypoint);
     // to do
 }
 
 void OPMapGadgetWidget::WPDeleted(int const &number)
 {
+    Q_UNUSED(number);
     // to do
 }
 

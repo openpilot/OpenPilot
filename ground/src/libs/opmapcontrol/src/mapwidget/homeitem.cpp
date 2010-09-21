@@ -40,16 +40,18 @@ namespace mapcontrol
 
     void HomeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
     {
-       painter->drawPixmap(-pic.width()/2,-pic.height()/2,pic);
-       if(showsafearea)
-       {
-           if(safe)
-               painter->setPen(Qt::green);
-           else
-               painter->setPen(Qt::red);
-           painter->drawEllipse(QPointF(0,0),localsafearea,localsafearea);
-        //   painter->drawRect(QRectF(-localsafearea,-localsafearea,localsafearea*2,localsafearea*2));
-       }
+        Q_UNUSED(option);
+        Q_UNUSED(widget);
+        painter->drawPixmap(-pic.width()/2,-pic.height()/2,pic);
+        if(showsafearea)
+        {
+            if(safe)
+                painter->setPen(Qt::green);
+            else
+                painter->setPen(Qt::red);
+            painter->drawEllipse(QPointF(0,0),localsafearea,localsafearea);
+            //   painter->drawRect(QRectF(-localsafearea,-localsafearea,localsafearea*2,localsafearea*2));
+        }
 
     }
     QRectF HomeItem::boundingRect()const

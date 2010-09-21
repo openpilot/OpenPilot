@@ -616,6 +616,8 @@ double LKS94Projection::GetTileMatrixResolution(int const& zoom)
 }
 double LKS94Projection::GetGroundResolution(int const& zoom, double const& latitude)
 {
+    Q_UNUSED(zoom);
+    Q_UNUSED(latitude);
     return GetTileMatrixResolution(zoom);
 }
 Size LKS94Projection::GetTileMatrixMinXY(int const& zoom)

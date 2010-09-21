@@ -60,6 +60,7 @@ PlotData::PlotData(QString p_uavObject, QString p_uavField)
 
 double PlotData::valueAsDouble(UAVObject* obj, UAVObjectField* field)
 {
+    Q_UNUSED(obj);
     QVariant value;
 
     if(haveSubField){
@@ -166,5 +167,6 @@ void ChronoPlotData::removeStaleDataTimeout()
 
 bool UAVObjectPlotData::append(UAVObject* obj)
 {
+    Q_UNUSED(obj);
     return false;
 }

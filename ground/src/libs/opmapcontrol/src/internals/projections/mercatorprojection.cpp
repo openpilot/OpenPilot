@@ -86,11 +86,13 @@ double MercatorProjection::Flattening() const
 }
 Size MercatorProjection::GetTileMatrixMaxXY(const int &zoom)
 {
+    Q_UNUSED(zoom);
     int xy = (1 << zoom);
     return  Size(xy - 1, xy - 1);
 }
 Size MercatorProjection::GetTileMatrixMinXY(const int &zoom)
 {
+    Q_UNUSED(zoom);
     return Size(0, 0);
 }
 }

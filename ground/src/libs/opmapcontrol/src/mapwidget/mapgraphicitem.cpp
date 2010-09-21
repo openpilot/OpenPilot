@@ -51,7 +51,7 @@ namespace mapcontrol
 
     void MapGraphicItem::resize(const QRectF &rect)
     {
-
+        Q_UNUSED(rect);
         {
             this->prepareGeometryChange();
             maprect=boundingBox(scene()->sceneRect(),rotation);
@@ -143,6 +143,8 @@ namespace mapcontrol
     }
     void MapGraphicItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
     {
+        Q_UNUSED(option);
+        Q_UNUSED(widget);
 
         if(MapRenderTransform!=1)
         {

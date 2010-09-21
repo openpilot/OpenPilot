@@ -45,6 +45,8 @@ ScopeGadgetOptionsPage::ScopeGadgetOptionsPage(ScopeGadgetConfiguration *config,
 //creates options page widget (uses the UI file)
 QWidget* ScopeGadgetOptionsPage::createPage(QWidget *parent)
 {
+    Q_UNUSED(parent);
+
     options_page = new Ui::ScopeGadgetOptionsPage();
     //main widget
     QWidget *optionsPageWidget = new QWidget;
@@ -304,5 +306,6 @@ void ScopeGadgetOptionsPage::finish()
   */
 void ScopeGadgetOptionsPage::on_lstCurves_currentRowChanged(int currentRow)
 {
+    Q_UNUSED(currentRow);
     setYAxisWidgetFromPlotCurve();
 }

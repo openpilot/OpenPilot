@@ -8,21 +8,21 @@
         <field name="ThrottleCurve1" units="percent" type="float" elements="5" elementnames="0,25,50,75,100" defaultvalue="-10"/>
         <field name="ThrottleCurve2" units="percent" type="float" elements="5" elementnames="0,25,50,75,100" defaultvalue="-10"/>
         <field name="Mixer0Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo" defaultvalue="Disabled"/>
-        <field name="Mixer0Matrix" units="" type="float" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
+        <field name="Mixer0Vector" units="" type="float" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
         <field name="Mixer1Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo" defaultvalue="Disabled"/>
-        <field name="Mixer1Matrix" units="" type="float" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
+        <field name="Mixer1Vector" units="" type="float" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
         <field name="Mixer2Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo" defaultvalue="Disabled"/>
-        <field name="Mixer2Matrix" units="" type="float" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
+        <field name="Mixer2Vector" units="" type="float" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
         <field name="Mixer3Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo" defaultvalue="Disabled"/>
-        <field name="Mixer3Matrix" units="" type="float" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
+        <field name="Mixer3Vector" units="" type="float" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
         <field name="Mixer4Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo" defaultvalue="Disabled"/>
-        <field name="Mixer4Matrix" units="" type="float" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
+        <field name="Mixer4Vector" units="" type="float" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
         <field name="Mixer5Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo" defaultvalue="Disabled"/>
-        <field name="Mixer5Matrix" units="" type="float" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
+        <field name="Mixer5Vector" units="" type="float" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
         <field name="Mixer6Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo" defaultvalue="Disabled"/>
-        <field name="Mixer6Matrix" units="" type="float" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
+        <field name="Mixer6Vector" units="" type="float" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
         <field name="Mixer7Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo" defaultvalue="Disabled"/>
-        <field name="Mixer7Matrix" units="" type="float" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
+        <field name="Mixer7Vector" units="" type="float" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

@@ -186,6 +186,9 @@ static int32_t RunMixers(ActuatorCommandData* command, ActuatorSettingsData* set
 	ManualControlCommandData manualControl;
 	ManualControlCommandGet(&manualControl);
 
+	bool armed = manualControl.Armed == MANUALCONTROLCOMMAND_ARMED_TRUE;
+	armed &= desired.Throttle > 0.05; //zero throttle stops the motors
+
 
     float curve1 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve1);
     float curve2 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve2);
@@ -197,10 +200,10 @@ static int32_t RunMixers(ActuatorCommandData* command, ActuatorSettingsData* set
                 settings->ChannelMax[ct],
                 settings->ChannelMin[ct],
                 settings->ChannelNeutral[ct]);
-            if(manualControl.Armed != MANUALCONTROLCOMMAND_ARMED_TRUE &&
+            if(!armed &&
                mixers[ct].type == MIXERSETTINGS_MIXER0TYPE_MOTOR)
             {
-                command->Channel[ct] = -1; //force zero throttle
+                command->Channel[ct] = settings->ChannelMin[ct]; //force zero throttle
             }else
             {
                 command->Channel[ct] = status[ct]; //servos always follow command
@@ -223,11 +226,11 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
     static float filterAccumulator[MAX_MIX_ACTUATORS]={0,0,0,0,0,0,0,0};
     Mixer_t * mixers = (Mixer_t *)&mixerSettings->Mixer0Type; //pointer to array of mixers in UAVObjects
     Mixer_t * mixer = &mixers[index];
-    float result = (mixer->matrix[MIXERSETTINGS_MIXER0MATRIX_THROTTLECURVE1] * curve1) +
-        (mixer->matrix[MIXERSETTINGS_MIXER0MATRIX_THROTTLECURVE2] * curve2) +
-        (mixer->matrix[MIXERSETTINGS_MIXER0MATRIX_ROLL] * desired->Roll) +
-        (mixer->matrix[MIXERSETTINGS_MIXER0MATRIX_PITCH] * desired->Pitch) +
-        (mixer->matrix[MIXERSETTINGS_MIXER0MATRIX_YAW] * desired->Yaw);
+    float result = (mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_THROTTLECURVE1] * curve1) +
+        (mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_THROTTLECURVE2] * curve2) +
+        (mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_ROLL] * desired->Roll) +
+        (mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_PITCH] * desired->Pitch) +
+        (mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_YAW] * desired->Yaw);
     if(mixer->type == MIXERSETTINGS_MIXER0TYPE_MOTOR)
     {
         if(result < 0) //idle throttle

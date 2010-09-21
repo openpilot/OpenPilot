@@ -119,7 +119,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'Mixer0Matrix',
+		'Mixer0Vector',
 		'f',
 		5,
 		[
@@ -146,7 +146,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'Mixer1Matrix',
+		'Mixer1Vector',
 		'f',
 		5,
 		[
@@ -173,7 +173,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'Mixer2Matrix',
+		'Mixer2Vector',
 		'f',
 		5,
 		[
@@ -200,7 +200,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'Mixer3Matrix',
+		'Mixer3Vector',
 		'f',
 		5,
 		[
@@ -227,7 +227,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'Mixer4Matrix',
+		'Mixer4Vector',
 		'f',
 		5,
 		[
@@ -254,7 +254,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'Mixer5Matrix',
+		'Mixer5Vector',
 		'f',
 		5,
 		[
@@ -281,7 +281,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'Mixer6Matrix',
+		'Mixer6Vector',
 		'f',
 		5,
 		[
@@ -308,7 +308,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'Mixer7Matrix',
+		'Mixer7Vector',
 		'f',
 		5,
 		[
@@ -326,7 +326,7 @@ _fields = [ \
 
 class MixerSettings(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 1614220618
+    OBJID        = 3818217990
     NAME         = "MixerSettings"
     METANAME     = "MixerSettingsMeta"
     ISSINGLEINST = 1

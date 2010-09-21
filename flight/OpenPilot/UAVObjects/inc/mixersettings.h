@@ -41,7 +41,7 @@
 #define MIXERSETTINGS_H
 
 // Object constants
-#define MIXERSETTINGS_OBJID 1614220618U
+#define MIXERSETTINGS_OBJID 3818217990U
 #define MIXERSETTINGS_NAME "MixerSettings"
 #define MIXERSETTINGS_METANAME "MixerSettingsMeta"
 #define MIXERSETTINGS_ISSINGLEINST 1
@@ -78,21 +78,21 @@ typedef struct {
     float ThrottleCurve1[5];
     float ThrottleCurve2[5];
     uint8_t Mixer0Type;
-    float Mixer0Matrix[5];
+    float Mixer0Vector[5];
     uint8_t Mixer1Type;
-    float Mixer1Matrix[5];
+    float Mixer1Vector[5];
     uint8_t Mixer2Type;
-    float Mixer2Matrix[5];
+    float Mixer2Vector[5];
     uint8_t Mixer3Type;
-    float Mixer3Matrix[5];
+    float Mixer3Vector[5];
     uint8_t Mixer4Type;
-    float Mixer4Matrix[5];
+    float Mixer4Vector[5];
     uint8_t Mixer5Type;
-    float Mixer5Matrix[5];
+    float Mixer5Vector[5];
     uint8_t Mixer6Type;
-    float Mixer6Matrix[5];
+    float Mixer6Vector[5];
     uint8_t Mixer7Type;
-    float Mixer7Matrix[5];
+    float Mixer7Vector[5];
 
 } __attribute__((packed)) MixerSettingsData;
 
@@ -114,67 +114,67 @@ typedef enum { MIXERSETTINGS_THROTTLECURVE2_0=0, MIXERSETTINGS_THROTTLECURVE2_25
 // Field Mixer0Type information
 /* Enumeration options for field Mixer0Type */
 typedef enum { MIXERSETTINGS_MIXER0TYPE_DISABLED=0, MIXERSETTINGS_MIXER0TYPE_MOTOR=1, MIXERSETTINGS_MIXER0TYPE_SERVO=2 } MixerSettingsMixer0TypeOptions;
-// Field Mixer0Matrix information
-/* Array element names for field Mixer0Matrix */
-typedef enum { MIXERSETTINGS_MIXER0MATRIX_THROTTLECURVE1=0, MIXERSETTINGS_MIXER0MATRIX_THROTTLECURVE2=1, MIXERSETTINGS_MIXER0MATRIX_ROLL=2, MIXERSETTINGS_MIXER0MATRIX_PITCH=3, MIXERSETTINGS_MIXER0MATRIX_YAW=4 } MixerSettingsMixer0MatrixElem;
-/* Number of elements for field Mixer0Matrix */
-#define MIXERSETTINGS_MIXER0MATRIX_NUMELEM 5
+// Field Mixer0Vector information
+/* Array element names for field Mixer0Vector */
+typedef enum { MIXERSETTINGS_MIXER0VECTOR_THROTTLECURVE1=0, MIXERSETTINGS_MIXER0VECTOR_THROTTLECURVE2=1, MIXERSETTINGS_MIXER0VECTOR_ROLL=2, MIXERSETTINGS_MIXER0VECTOR_PITCH=3, MIXERSETTINGS_MIXER0VECTOR_YAW=4 } MixerSettingsMixer0VectorElem;
+/* Number of elements for field Mixer0Vector */
+#define MIXERSETTINGS_MIXER0VECTOR_NUMELEM 5
 // Field Mixer1Type information
 /* Enumeration options for field Mixer1Type */
 typedef enum { MIXERSETTINGS_MIXER1TYPE_DISABLED=0, MIXERSETTINGS_MIXER1TYPE_MOTOR=1, MIXERSETTINGS_MIXER1TYPE_SERVO=2 } MixerSettingsMixer1TypeOptions;
-// Field Mixer1Matrix information
-/* Array element names for field Mixer1Matrix */
-typedef enum { MIXERSETTINGS_MIXER1MATRIX_THROTTLECURVE1=0, MIXERSETTINGS_MIXER1MATRIX_THROTTLECURVE2=1, MIXERSETTINGS_MIXER1MATRIX_ROLL=2, MIXERSETTINGS_MIXER1MATRIX_PITCH=3, MIXERSETTINGS_MIXER1MATRIX_YAW=4 } MixerSettingsMixer1MatrixElem;
-/* Number of elements for field Mixer1Matrix */
-#define MIXERSETTINGS_MIXER1MATRIX_NUMELEM 5
+// Field Mixer1Vector information
+/* Array element names for field Mixer1Vector */
+typedef enum { MIXERSETTINGS_MIXER1VECTOR_THROTTLECURVE1=0, MIXERSETTINGS_MIXER1VECTOR_THROTTLECURVE2=1, MIXERSETTINGS_MIXER1VECTOR_ROLL=2, MIXERSETTINGS_MIXER1VECTOR_PITCH=3, MIXERSETTINGS_MIXER1VECTOR_YAW=4 } MixerSettingsMixer1VectorElem;
+/* Number of elements for field Mixer1Vector */
+#define MIXERSETTINGS_MIXER1VECTOR_NUMELEM 5
 // Field Mixer2Type information
 /* Enumeration options for field Mixer2Type */
 typedef enum { MIXERSETTINGS_MIXER2TYPE_DISABLED=0, MIXERSETTINGS_MIXER2TYPE_MOTOR=1, MIXERSETTINGS_MIXER2TYPE_SERVO=2 } MixerSettingsMixer2TypeOptions;
-// Field Mixer2Matrix information
-/* Array element names for field Mixer2Matrix */
-typedef enum { MIXERSETTINGS_MIXER2MATRIX_THROTTLECURVE1=0, MIXERSETTINGS_MIXER2MATRIX_THROTTLECURVE2=1, MIXERSETTINGS_MIXER2MATRIX_ROLL=2, MIXERSETTINGS_MIXER2MATRIX_PITCH=3, MIXERSETTINGS_MIXER2MATRIX_YAW=4 } MixerSettingsMixer2MatrixElem;
-/* Number of elements for field Mixer2Matrix */
-#define MIXERSETTINGS_MIXER2MATRIX_NUMELEM 5
+// Field Mixer2Vector information
+/* Array element names for field Mixer2Vector */
+typedef enum { MIXERSETTINGS_MIXER2VECTOR_THROTTLECURVE1=0, MIXERSETTINGS_MIXER2VECTOR_THROTTLECURVE2=1, MIXERSETTINGS_MIXER2VECTOR_ROLL=2, MIXERSETTINGS_MIXER2VECTOR_PITCH=3, MIXERSETTINGS_MIXER2VECTOR_YAW=4 } MixerSettingsMixer2VectorElem;
+/* Number of elements for field Mixer2Vector */
+#define MIXERSETTINGS_MIXER2VECTOR_NUMELEM 5
 // Field Mixer3Type information
 /* Enumeration options for field Mixer3Type */
 typedef enum { MIXERSETTINGS_MIXER3TYPE_DISABLED=0, MIXERSETTINGS_MIXER3TYPE_MOTOR=1, MIXERSETTINGS_MIXER3TYPE_SERVO=2 } MixerSettingsMixer3TypeOptions;
-// Field Mixer3Matrix information
-/* Array element names for field Mixer3Matrix */
-typedef enum { MIXERSETTINGS_MIXER3MATRIX_THROTTLECURVE1=0, MIXERSETTINGS_MIXER3MATRIX_THROTTLECURVE2=1, MIXERSETTINGS_MIXER3MATRIX_ROLL=2, MIXERSETTINGS_MIXER3MATRIX_PITCH=3, MIXERSETTINGS_MIXER3MATRIX_YAW=4 } MixerSettingsMixer3MatrixElem;
-/* Number of elements for field Mixer3Matrix */
-#define MIXERSETTINGS_MIXER3MATRIX_NUMELEM 5
+// Field Mixer3Vector information
+/* Array element names for field Mixer3Vector */
+typedef enum { MIXERSETTINGS_MIXER3VECTOR_THROTTLECURVE1=0, MIXERSETTINGS_MIXER3VECTOR_THROTTLECURVE2=1, MIXERSETTINGS_MIXER3VECTOR_ROLL=2, MIXERSETTINGS_MIXER3VECTOR_PITCH=3, MIXERSETTINGS_MIXER3VECTOR_YAW=4 } MixerSettingsMixer3VectorElem;
+/* Number of elements for field Mixer3Vector */
+#define MIXERSETTINGS_MIXER3VECTOR_NUMELEM 5
 // Field Mixer4Type information
 /* Enumeration options for field Mixer4Type */
 typedef enum { MIXERSETTINGS_MIXER4TYPE_DISABLED=0, MIXERSETTINGS_MIXER4TYPE_MOTOR=1, MIXERSETTINGS_MIXER4TYPE_SERVO=2 } MixerSettingsMixer4TypeOptions;
-// Field Mixer4Matrix information
-/* Array element names for field Mixer4Matrix */
-typedef enum { MIXERSETTINGS_MIXER4MATRIX_THROTTLECURVE1=0, MIXERSETTINGS_MIXER4MATRIX_THROTTLECURVE2=1, MIXERSETTINGS_MIXER4MATRIX_ROLL=2, MIXERSETTINGS_MIXER4MATRIX_PITCH=3, MIXERSETTINGS_MIXER4MATRIX_YAW=4 } MixerSettingsMixer4MatrixElem;
-/* Number of elements for field Mixer4Matrix */
-#define MIXERSETTINGS_MIXER4MATRIX_NUMELEM 5
+// Field Mixer4Vector information
+/* Array element names for field Mixer4Vector */
+typedef enum { MIXERSETTINGS_MIXER4VECTOR_THROTTLECURVE1=0, MIXERSETTINGS_MIXER4VECTOR_THROTTLECURVE2=1, MIXERSETTINGS_MIXER4VECTOR_ROLL=2, MIXERSETTINGS_MIXER4VECTOR_PITCH=3, MIXERSETTINGS_MIXER4VECTOR_YAW=4 } MixerSettingsMixer4VectorElem;
+/* Number of elements for field Mixer4Vector */
+#define MIXERSETTINGS_MIXER4VECTOR_NUMELEM 5
 // Field Mixer5Type information
 /* Enumeration options for field Mixer5Type */
 typedef enum { MIXERSETTINGS_MIXER5TYPE_DISABLED=0, MIXERSETTINGS_MIXER5TYPE_MOTOR=1, MIXERSETTINGS_MIXER5TYPE_SERVO=2 } MixerSettingsMixer5TypeOptions;
-// Field Mixer5Matrix information
-/* Array element names for field Mixer5Matrix */
-typedef enum { MIXERSETTINGS_MIXER5MATRIX_THROTTLECURVE1=0, MIXERSETTINGS_MIXER5MATRIX_THROTTLECURVE2=1, MIXERSETTINGS_MIXER5MATRIX_ROLL=2, MIXERSETTINGS_MIXER5MATRIX_PITCH=3, MIXERSETTINGS_MIXER5MATRIX_YAW=4 } MixerSettingsMixer5MatrixElem;
-/* Number of elements for field Mixer5Matrix */
-#define MIXERSETTINGS_MIXER5MATRIX_NUMELEM 5
+// Field Mixer5Vector information
+/* Array element names for field Mixer5Vector */
+typedef enum { MIXERSETTINGS_MIXER5VECTOR_THROTTLECURVE1=0, MIXERSETTINGS_MIXER5VECTOR_THROTTLECURVE2=1, MIXERSETTINGS_MIXER5VECTOR_ROLL=2, MIXERSETTINGS_MIXER5VECTOR_PITCH=3, MIXERSETTINGS_MIXER5VECTOR_YAW=4 } MixerSettingsMixer5VectorElem;
+/* Number of elements for field Mixer5Vector */
+#define MIXERSETTINGS_MIXER5VECTOR_NUMELEM 5
 // Field Mixer6Type information
 /* Enumeration options for field Mixer6Type */
 typedef enum { MIXERSETTINGS_MIXER6TYPE_DISABLED=0, MIXERSETTINGS_MIXER6TYPE_MOTOR=1, MIXERSETTINGS_MIXER6TYPE_SERVO=2 } MixerSettingsMixer6TypeOptions;
-// Field Mixer6Matrix information
-/* Array element names for field Mixer6Matrix */
-typedef enum { MIXERSETTINGS_MIXER6MATRIX_THROTTLECURVE1=0, MIXERSETTINGS_MIXER6MATRIX_THROTTLECURVE2=1, MIXERSETTINGS_MIXER6MATRIX_ROLL=2, MIXERSETTINGS_MIXER6MATRIX_PITCH=3, MIXERSETTINGS_MIXER6MATRIX_YAW=4 } MixerSettingsMixer6MatrixElem;
-/* Number of elements for field Mixer6Matrix */
-#define MIXERSETTINGS_MIXER6MATRIX_NUMELEM 5
+// Field Mixer6Vector information
+/* Array element names for field Mixer6Vector */
+typedef enum { MIXERSETTINGS_MIXER6VECTOR_THROTTLECURVE1=0, MIXERSETTINGS_MIXER6VECTOR_THROTTLECURVE2=1, MIXERSETTINGS_MIXER6VECTOR_ROLL=2, MIXERSETTINGS_MIXER6VECTOR_PITCH=3, MIXERSETTINGS_MIXER6VECTOR_YAW=4 } MixerSettingsMixer6VectorElem;
+/* Number of elements for field Mixer6Vector */
+#define MIXERSETTINGS_MIXER6VECTOR_NUMELEM 5
 // Field Mixer7Type information
 /* Enumeration options for field Mixer7Type */
 typedef enum { MIXERSETTINGS_MIXER7TYPE_DISABLED=0, MIXERSETTINGS_MIXER7TYPE_MOTOR=1, MIXERSETTINGS_MIXER7TYPE_SERVO=2 } MixerSettingsMixer7TypeOptions;
-// Field Mixer7Matrix information
-/* Array element names for field Mixer7Matrix */
-typedef enum { MIXERSETTINGS_MIXER7MATRIX_THROTTLECURVE1=0, MIXERSETTINGS_MIXER7MATRIX_THROTTLECURVE2=1, MIXERSETTINGS_MIXER7MATRIX_ROLL=2, MIXERSETTINGS_MIXER7MATRIX_PITCH=3, MIXERSETTINGS_MIXER7MATRIX_YAW=4 } MixerSettingsMixer7MatrixElem;
-/* Number of elements for field Mixer7Matrix */
-#define MIXERSETTINGS_MIXER7MATRIX_NUMELEM 5
+// Field Mixer7Vector information
+/* Array element names for field Mixer7Vector */
+typedef enum { MIXERSETTINGS_MIXER7VECTOR_THROTTLECURVE1=0, MIXERSETTINGS_MIXER7VECTOR_THROTTLECURVE2=1, MIXERSETTINGS_MIXER7VECTOR_ROLL=2, MIXERSETTINGS_MIXER7VECTOR_PITCH=3, MIXERSETTINGS_MIXER7VECTOR_YAW=4 } MixerSettingsMixer7VectorElem;
+/* Number of elements for field Mixer7Vector */
+#define MIXERSETTINGS_MIXER7VECTOR_NUMELEM 5
 
 
 // Generic interface functions

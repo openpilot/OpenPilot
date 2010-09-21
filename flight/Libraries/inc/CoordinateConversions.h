@@ -31,26 +31,28 @@
 #define COORDINATECONVERSIONS_H_
 
     // ****** convert Lat,Lon,Alt to ECEF  ************
-	void LLA2ECEF(double LLA[3], double ECEF[3]);
+void LLA2ECEF(double LLA[3], double ECEF[3]);
 
     // ****** convert ECEF to Lat,Lon,Alt (ITERATIVE!) *********
-    uint16_t ECEF2LLA(double ECEF[3], double LLA[3]);
+uint16_t ECEF2LLA(double ECEF[3], double LLA[3]);
 
-	void RneFromLLA(double LLA[3], float Rne[3][3]);
-	
+void RneFromLLA(double LLA[3], float Rne[3][3]);
+
 	// ****** find roll, pitch, yaw from quaternion ********
-	void Quaternion2RPY(float q[4], float rpy[3]);
-	
+void Quaternion2RPY(float q[4], float rpy[3]);
+
 	// ****** find quaternion from roll, pitch, yaw ********
-	void RPY2Quaternion(float rpy[3], float q[4]);
-	
+void RPY2Quaternion(float rpy[3], float q[4]);
+
 	//** Find Rbe, that rotates a vector from earth fixed to body frame, from quaternion **
-	void Quaternion2R(float q[4], float Rbe[3][3]);
+void Quaternion2R(float q[4], float Rbe[3][3]);
 
 	// ****** Express LLA in a local NED Base Frame ********
-	void LLA2Base(double LLA[3], double BaseECEF[3], float Rne[3][3], float NED[3]);
-	
-	// ****** Express ECEF in a local NED Base Frame ********
-	void ECEF2Base(double ECEF[3], double BaseECEF[3], float Rne[3][3], float NED[3]);
+void LLA2Base(double LLA[3], double BaseECEF[3], float Rne[3][3],
+	      float NED[3]);
 
-#endif  // COORDINATECONVERSIONS_H_
+	// ****** Express ECEF in a local NED Base Frame ********
+void ECEF2Base(double ECEF[3], double BaseECEF[3], float Rne[3][3],
+	       float NED[3]);
+
+#endif // COORDINATECONVERSIONS_H_

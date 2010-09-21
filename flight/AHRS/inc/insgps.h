@@ -51,7 +51,7 @@
 //  Exposed Function Prototypes
 void INSGPSInit();
 void INSStatePrediction(float gyro_data[3], float accel_data[3], float dT);
-void INSCovariancePrediction(float dT); 
+void INSCovariancePrediction(float dT);
 
 void INSSetPosVelVar(float PosVar);
 void INSSetGyroBias(float gyro_bias[3]);
@@ -62,16 +62,17 @@ void INSSetMagVar(float scaled_mag_var[3]);
 
 void MagCorrection(float mag_data[3]);
 void MagVelBaroCorrection(float mag_data[3], float Vel[3], float BaroAlt);
-void FullCorrection(float mag_data[3], float Pos[3], float Vel[3], float BaroAlt);
+void FullCorrection(float mag_data[3], float Pos[3], float Vel[3],
+		    float BaroAlt);
 void GpsBaroCorrection(float Pos[3], float Vel[3], float BaroAlt);
 void GpsMagCorrection(float mag_data[3], float Pos[3], float Vel[2]);
 void VelBaroCorrection(float Vel[3], float BaroAlt);
 
 //  Nav structure containing current solution
 struct NavStruct {
-    float Pos[3];           // Position in meters and relative to a local NED frame
-    float Vel[3];           // Velocity in meters and in NED
-    float q[4];             // unit quaternion rotation relative to NED
+	float Pos[3];		// Position in meters and relative to a local NED frame
+	float Vel[3];		// Velocity in meters and in NED
+	float q[4];		// unit quaternion rotation relative to NED
 } Nav;
 
 /**

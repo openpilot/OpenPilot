@@ -33,28 +33,29 @@
 
 #include "ahrs_timer.h"
 
-void timer_start() 
+void timer_start()
 {
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_BKP | RCC_APB1Periph_PWR,ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_BKP | RCC_APB1Periph_PWR,
+			       ENABLE);
 	PWR_BackupAccessCmd(ENABLE);
-	
+
 	RCC_RTCCLKConfig(RCC_RTCCLKSource_HSE_Div128);
 	RCC_RTCCLKCmd(ENABLE);
 	RTC_WaitForLastTask();
 	RTC_WaitForSynchro();
-    RTC_WaitForLastTask();	
-	RTC_SetPrescaler(0);  // counting at 8e6 / 128
 	RTC_WaitForLastTask();
-	RTC_SetCounter(0);	
+	RTC_SetPrescaler(0);	// counting at 8e6 / 128
+	RTC_WaitForLastTask();
+	RTC_SetCounter(0);
 	RTC_WaitForLastTask();
 }
 
 uint32_t timer_count()
 {
-	return RTC_GetCounter(); 
+	return RTC_GetCounter();
 }
 
-uint32_t timer_rate() 
+uint32_t timer_rate()
 {
 	return TIMER_RATE;
 }

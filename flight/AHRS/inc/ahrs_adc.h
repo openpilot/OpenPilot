@@ -32,7 +32,7 @@
  */
 
 #ifndef AHRS_ADC
-#define AHRS_ADC 
+#define AHRS_ADC
 
 #include <pios.h>
 
@@ -42,9 +42,9 @@
 uint8_t AHRS_ADC_Config(int32_t adc_oversample);
 void AHRS_ADC_DMA_Handler(void);
 
-typedef enum {AHRS_IDLE, AHRS_DATA_READY, AHRS_PROCESSING} states;
+typedef enum { AHRS_IDLE, AHRS_DATA_READY, AHRS_PROCESSING } states;
 extern volatile states ahrs_state;
-extern volatile int16_t * valid_data_buffer;
+extern volatile int16_t *valid_data_buffer;
 //! Counts how many times the EKF wasn't idle when DMA handler called
 extern volatile int32_t total_conversion_blocks;
 //! Total number of data blocks converted

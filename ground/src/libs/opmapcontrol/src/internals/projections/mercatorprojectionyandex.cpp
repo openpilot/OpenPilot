@@ -106,6 +106,7 @@ Size MercatorProjectionYandex::GetTileMatrixMaxXY(const int &zoom)
 
 Size MercatorProjectionYandex::GetTileMatrixMinXY(const int &zoom)
 {
+    Q_UNUSED(zoom);
     return Size(0, 0);
 }
 }

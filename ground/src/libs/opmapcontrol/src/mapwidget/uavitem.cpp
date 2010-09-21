@@ -56,6 +56,8 @@ namespace mapcontrol
 
     void UAVItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
     {
+        Q_UNUSED(option);
+        Q_UNUSED(widget);
        // painter->rotate(-90);
         painter->drawPixmap(-pic.width()/2,-pic.height()/2,pic);
        //   painter->drawRect(QRectF(-pic.width()/2,-pic.height()/2,pic.width()-1,pic.height()-1));

@@ -36,6 +36,7 @@
 #include <QReadWriteLock>
 
 class LoggingPlugin;
+class LoggingGadgetFactory;
 
 class LoggingThread : public QThread
 {
@@ -68,9 +69,13 @@ public:
     bool initialize(const QStringList & arguments, QString * errorString);
     void shutdown();
 
+    LogFile * getLogfile() { return &logFile; };
+
 signals:
     void stopLoggingSignal(void);
     void stopReplaySignal(void);
+    void stateChanged(QString);
+
 
 protected:
     enum {IDLE, LOGGING, REPLAY} state;
@@ -78,7 +83,7 @@ protected:
 
     // These are used for replay, logging in its own thread
     UAVTalk * uavTalk;
-    LogFile * logFile;
+    LogFile logFile;
 
 private slots:
     void toggleLogging();
@@ -88,6 +93,9 @@ private slots:
     void stopLogging();
     void stopReplay();
     void loggingStopped();
+
+private:
+    LoggingGadgetFactory *mf;
 };
 #endif /* LoggingPLUGIN_H_ */
 /**

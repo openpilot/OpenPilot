@@ -28,6 +28,7 @@
  */
 
 #include "loggingplugin.h"
+#include "logginggadgetfactory.h"
 #include <QDebug>
 #include <QtPlugin>
 #include <QThread>
@@ -167,6 +168,9 @@ bool LoggingPlugin::initialize(const QStringList& args, QString *errMsg)
 
     connect(cmd2->action(), SIGNAL(triggered(bool)), this, SLOT(toggleReplay()));
 
+    mf = new LoggingGadgetFactory(this);
+    addAutoReleasedObject(mf);
+
     return true;
 }
 
@@ -223,6 +227,7 @@ void LoggingPlugin::startLogging(QString file)
         connect(loggingThread,SIGNAL(finished()),this,SLOT(loggingStopped()));
         state = LOGGING;
         loggingThread->start();
+        emit stateChanged("LOGGING");
     } else {
         QErrorMessage err;
         err.showMessage("Unable to open file for logging");
@@ -236,17 +241,18 @@ void LoggingPlugin::startLogging(QString file)
 void LoggingPlugin::startReplay(QString file)
 {
 
-    logFile = new LogFile;
-    logFile->setFileName(file);
-    if(logFile->open(QIODevice::ReadOnly)) {
+    logFile.setFileName(file);
+    if(logFile.open(QIODevice::ReadOnly)) {
         qDebug() << "Replaying " << file;
         state = REPLAY;
 
         ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
         UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
-        uavTalk = new UAVTalk(logFile, objManager);
-        logFile->startReplay();
+        uavTalk = new UAVTalk(&logFile, objManager);
+        logFile.startReplay();
+
+        emit stateChanged("REPLAY");
     } else {
         QErrorMessage err;
         err.showMessage("Unable to open file for replay");
@@ -268,13 +274,13 @@ void LoggingPlugin::stopLogging()
   */
 void LoggingPlugin::stopReplay()
 {
-    logFile->stopReplay();
-    logFile->close();
+    logFile.stopReplay();
+    logFile.close();
     free(uavTalk);
-    free(logFile);
     uavTalk = 0;
-    logFile = 0;
     state = IDLE;
+
+    emit stateChanged("IDLE");
 }
 
 /**
@@ -285,6 +291,9 @@ void LoggingPlugin::loggingStopped()
 {
     if(state == LOGGING)
         state = IDLE;
+
+    emit stateChanged("IDLE");
+
     free(loggingThread);
     loggingThread = NULL;
 }

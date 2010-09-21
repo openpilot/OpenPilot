@@ -63,8 +63,8 @@ void LogFile::timerFired()
 {
     qint64 dataSize;
 
-    // TODO: support time rescaling and seeking
-    while (myTime.elapsed() > lastTimeStamp) {
+    // TODO: going back in time will be a problem
+    while ((myTime.elapsed() - timeOffset) * playbackSpeed > lastTimeStamp) {
         file.read((char *) &dataSize, sizeof(dataSize));
         dataBuffer.append(file.read(dataSize));
         emit readyRead();
@@ -76,9 +76,9 @@ void LogFile::timerFired()
 bool LogFile::startReplay() {
     dataBuffer.clear();
     myTime.restart();
-
+    timeOffset = 0;
+    playbackSpeed = 1;
     file.read((char *) &lastTimeStamp,sizeof(lastTimeStamp));
-
     timer.setInterval(10);
     timer.start();
     return true;
@@ -88,3 +88,16 @@ bool LogFile::stopReplay() {
     timer.stop();
     return true;
 }
+
+void LogFile::pauseReplay()
+{
+    timer.stop();
+    pausedTime = myTime.elapsed();
+}
+
+void LogFile::resumeReplay()
+{
+    timeOffset += myTime.elapsed() - pausedTime;
+    timer.start();
+}
+

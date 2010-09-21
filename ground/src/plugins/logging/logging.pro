@@ -7,23 +7,21 @@ include(../../plugins/uavobjects/uavobjects.pri)
 include(../../plugins/uavtalk/uavtalk.pri)
 include(logging_dependencies.pri)
 HEADERS += loggingplugin.h \
-    logfile.h
-#    logginggadgetwidget.h \
-#    loggingdialog.h \
-#    logginggadget.h \
-#    logginggadgetfactory.h \
+    logfile.h \
+    logginggadgetwidget.h \
+    logginggadget.h \
+    logginggadgetfactory.h
 #    logginggadgetconfiguration.h
 #   logginggadgetoptionspage.h
 
 SOURCES += loggingplugin.cpp \
-    logfile.cpp
-#    logginggadgetwidget.cpp \
-#    loggingdialog.cpp \
-#    logginggadget.cpp \
-#    logginggadgetfactory.cpp \
+    logfile.cpp \
+    logginggadgetwidget.cpp \
+    logginggadget.cpp \
+    logginggadgetfactory.cpp
 #    logginggadgetconfiguration.cpp \
 #    logginggadgetoptionspage.cpp
 OTHER_FILES += LoggingGadget.pluginspec
-#FORMS += logginggadgetoptionspage.ui \
+FORMS += logging.ui
 #    logginggadgetwidget.ui \
 #    loggingdialog.ui

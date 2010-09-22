@@ -599,14 +599,12 @@ void SplitterOrView::saveState(QSettings* qSettings) const {
         qSettings->beginGroup("side1");
         static_cast<SplitterOrView*>(m_splitter->widget(1))->saveState(qSettings);
         qSettings->endGroup();
-    } else {
+    } else if (gadget()) {
         qSettings->setValue("type", "uavGadget");
         qSettings->setValue("classId", gadget()->classId());
-        if (gadget()) {
-            qSettings->beginGroup("gadget");
-            gadget()->saveState(qSettings);
-            qSettings->endGroup();
-        }
+        qSettings->beginGroup("gadget");
+        gadget()->saveState(qSettings);
+        qSettings->endGroup();
     }
 }
 

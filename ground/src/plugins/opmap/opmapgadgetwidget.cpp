@@ -38,6 +38,11 @@
 
 // *************************************************************************************
 
+#define	minimum_zoom   2	// minimum allowed zoom level
+#define	maximum_zoom   19	// maximum allowed zoom level
+
+// *************************************************************************************
+
 // constructor
 OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 {
@@ -76,24 +81,30 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     // **************
     // create the central map widget
 
-    m_map = new mapcontrol::OPMapWidget();
+    m_map = new mapcontrol::OPMapWidget();	// create the map object
 
     m_map->setFrameStyle(QFrame::NoFrame);							    // no border frame
     m_map->setBackgroundBrush(Qt::black);							    // black background
 
-    m_map->configuration->DragButton = Qt::LeftButton;						    // use the left mouse button for map dragging
-    m_map->SetMinZoom(2);
-   // m_map->SetMaxZoom(19);
+    m_map->configuration->DragButton = Qt::LeftButton;		    // use the left mouse button for map dragging
+
+    m_map->SetMinZoom(minimum_zoom);
+//  m_map->SetMaxZoom(maximum_zoom);				    // set the maximum zoom level
+
+    m_widget->horizontalSliderZoom->setMinimum(minimum_zoom);	    //
+    m_widget->horizontalSliderZoom->setMaximum(m_map->MaxZoom());   // set the widget zoom slider maximum value to the map objects maximum zoom value
+
     m_map->SetMouseWheelZoomType(internals::MouseWheelZoomType::MousePositionWithoutCenter);	    // set how the mouse wheel zoom functions
-    m_map->SetFollowMouse(true);								    // we want a contiuous mouse position reading
-    m_map->SetShowHome(true);									    // display the HOME position on the map
-    m_map->SetShowUAV(true);									    // display the UAV position on the map
+    m_map->SetFollowMouse(true);				    // we want a contiuous mouse position reading
 
-//  m_map->UAV->SetTrailTime(1);								    // seconds
-//  m_map->UAV->SetTrailDistance(0.1);								    // kilometers
+    m_map->SetShowHome(true);					    // display the HOME position on the map
+    m_map->SetShowUAV(true);					    // display the UAV position on the map
 
-    m_map->UAV->SetTrailType(UAVTrailType::ByTimeElapsed);
-//  m_map->UAV->SetTrailType(UAVTrailType::ByDistance);
+    m_map->UAV->SetTrailTime(0.5);				    // seconds
+    m_map->UAV->SetTrailDistance(0.01);				    // kilometers
+
+//  m_map->UAV->SetTrailType(UAVTrailType::ByTimeElapsed);
+    m_map->UAV->SetTrailType(UAVTrailType::ByDistance);
 
     // **************
 
@@ -552,18 +563,25 @@ void OPMapGadgetWidget::updateMousePos()
 
 void OPMapGadgetWidget::zoomChanged(double zoom)
 {
+    if (!m_widget)
+	return;
+
+    int min_zoom = m_widget->horizontalSliderZoom->minimum();	// minimum zoom we can accept
+    int max_zoom = m_widget->horizontalSliderZoom->maximum();	// maximum zoom we can accept
+
     int i_zoom = (int)(zoom + 0.5);
-    if (i_zoom < 2 || i_zoom > 19) return;
 
-    if (m_widget)
-    {
-//	m_widget->labelZoom->setText(" " + QString::number(zoom));
-	if (m_widget->horizontalSliderZoom->value() != i_zoom)
-	    m_widget->horizontalSliderZoom->setValue(i_zoom);
-    }
+    if (i_zoom < min_zoom) i_zoom = min_zoom;
+    else
+    if (i_zoom > max_zoom) i_zoom = max_zoom;
 
-    if (i_zoom - 2 < zoomAct.count())
-	zoomAct.at(i_zoom - 2)->setChecked(true);
+//  m_widget->labelZoom->setText(" " + QString::number(zoom));
+    if (m_widget->horizontalSliderZoom->value() != i_zoom)
+	m_widget->horizontalSliderZoom->setValue(i_zoom);	// set the GUI zoom slider position
+
+    int index0_zoom = i_zoom - min_zoom;			// zoom level starting at index level '0'
+    if (index0_zoom < zoomAct.count())
+	zoomAct.at(index0_zoom)->setChecked(true);		// set the right-click context menu zoom level
 }
 
 void OPMapGadgetWidget::OnMapDrag()
@@ -1023,7 +1041,8 @@ void OPMapGadgetWidget::createActions()
     zoomActGroup = new QActionGroup(this);
     connect(zoomActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onZoomActGroup_triggered(QAction *)));
     zoomAct.clear();
-    for (int i = 2; i <= 19; i++)
+    int max_zoom = m_widget->horizontalSliderZoom->maximum();
+    for (int i = minimum_zoom; i <= max_zoom; i++)
     {
 	QAction *zoom_act = new QAction(QString::number(i), zoomActGroup);
 	zoom_act->setCheckable(true);
@@ -1140,10 +1159,17 @@ void OPMapGadgetWidget::onGoZoomOutAct_triggered()
 
 void OPMapGadgetWidget::onZoomActGroup_triggered(QAction *action)
 {
-    if (!action) return;
+    if (!m_widget || !action)
+	return;
+
+    int min_zoom = m_widget->horizontalSliderZoom->minimum();	// minimum zoom we can accept
+    int max_zoom = m_widget->horizontalSliderZoom->maximum();	// maximum zoom we can accept
 
     int zoom = action->data().toInt();
-    if (zoom < 2 || zoom > 19) return;
+
+    if (zoom < min_zoom) zoom = min_zoom;
+    else
+    if (zoom > max_zoom) zoom = max_zoom;
 
     setZoom(zoom);
 }

@@ -91,8 +91,8 @@ private slots:
     void startLogging(QString file);
     void startReplay(QString file);
     void stopLogging();
-    void stopReplay();
     void loggingStopped();
+    void replayStopped();
 
 private:
     LoggingGadgetFactory *mf;

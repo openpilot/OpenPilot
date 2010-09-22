@@ -63,14 +63,37 @@ void LogFile::timerFired()
 {
     qint64 dataSize;
 
-    // TODO: going back in time will be a problem
-    while ((myTime.elapsed() - timeOffset) * playbackSpeed > lastTimeStamp) {
-        file.read((char *) &dataSize, sizeof(dataSize));
-        dataBuffer.append(file.read(dataSize));
-        emit readyRead();
+    if(file.bytesAvailable() > 4)
+    {
+        // TODO: going back in time will be a problem
+        while ((myTime.elapsed() - timeOffset) * playbackSpeed > lastTimeStamp) {
 
-        file.read((char *) &lastTimeStamp,sizeof(lastTimeStamp));
+            if(file.bytesAvailable() < 4) {
+                stopReplay();
+                return;
+            }
+
+            file.read((char *) &dataSize, sizeof(dataSize));
+
+            if(file.bytesAvailable() < dataSize) {
+                stopReplay();
+                return;
+            }
+
+            dataBuffer.append(file.read(dataSize));
+            emit readyRead();
+
+            if(file.bytesAvailable() < 4) {
+                stopReplay();
+                return;
+            }
+
+            file.read((char *) &lastTimeStamp,sizeof(lastTimeStamp));
+        }
+    } else {
+        stopReplay();
     }
+
 }
 
 bool LogFile::startReplay() {
@@ -86,6 +109,7 @@ bool LogFile::startReplay() {
 
 bool LogFile::stopReplay() {
     timer.stop();
+    emit replayFinished();
     return true;
 }
 

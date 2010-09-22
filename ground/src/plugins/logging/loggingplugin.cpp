@@ -171,6 +171,9 @@ bool LoggingPlugin::initialize(const QStringList& args, QString *errMsg)
     mf = new LoggingGadgetFactory(this);
     addAutoReleasedObject(mf);
 
+    // Map signal from end of replay to replay stopped
+    connect(&logFile,SIGNAL(replayFinished()), this, SLOT(replayStopped()));
+
     return true;
 }
 
@@ -210,7 +213,7 @@ void LoggingPlugin::toggleReplay()
     }
     else if(state == REPLAY)
     {
-        stopReplay();
+        logFile.stopReplay();
     }
 }
 
@@ -270,20 +273,6 @@ void LoggingPlugin::stopLogging()
 
 
 /**
-  * Send the stop replay signal to the ReplayThread
-  */
-void LoggingPlugin::stopReplay()
-{
-    logFile.stopReplay();
-    logFile.close();
-    delete(uavTalk);
-    uavTalk = 0;
-    state = IDLE;
-
-    emit stateChanged("IDLE");
-}
-
-/**
   * Receive the logging stopped signal from the LoggingThread
   * and change status to not logging
   */
@@ -297,6 +286,25 @@ void LoggingPlugin::loggingStopped()
     free(loggingThread);
     loggingThread = NULL;
 }
+
+/**
+  * Received the replay stoppedsignal from the LogFile
+  */
+void LoggingPlugin::replayStopped()
+{
+    Q_ASSERT(state == REPLAY);
+
+    if(uavTalk)
+        delete(uavTalk);
+
+    logFile.close();
+
+    uavTalk = 0;
+    state = IDLE;
+
+    emit stateChanged("IDLE");
+}
+
 
 void LoggingPlugin::extensionsInitialized()
 {

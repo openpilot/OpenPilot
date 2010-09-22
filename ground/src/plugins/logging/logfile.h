@@ -35,6 +35,7 @@ protected slots:
 
 signals:
     void readReady();
+    void replayFinished();
 
 protected:
     QByteArray dataBuffer;

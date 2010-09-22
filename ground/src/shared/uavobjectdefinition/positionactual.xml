@@ -8,6 +8,8 @@
         <field name="GeoidSeparation" units="meters" type="float" elements="1"/>
         <field name="Heading" units="degrees" type="float" elements="1"/>
         <field name="Groundspeed" units="m/s" type="float" elements="1"/>
+        <field name="Airspeed" units="m/s" type="float" elements="1"/>
+        <field name="Climbrate" units="m/s" type="float" elements="1"/>
         <field name="Satellites" units="" type="int8" elements="1"/>
         <field name="PDOP" units="" type="float" elements="1"/>
         <field name="HDOP" units="" type="float" elements="1"/>

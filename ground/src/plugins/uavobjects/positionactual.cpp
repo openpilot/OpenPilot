@@ -68,6 +68,12 @@ PositionActual::PositionActual(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS,
     QStringList GroundspeedElemNames;
     GroundspeedElemNames.append("0");
     fields.append( new UAVObjectField(QString("Groundspeed"), QString("m/s"), UAVObjectField::FLOAT32, GroundspeedElemNames, QStringList()) );
+    QStringList AirspeedElemNames;
+    AirspeedElemNames.append("0");
+    fields.append( new UAVObjectField(QString("Airspeed"), QString("m/s"), UAVObjectField::FLOAT32, AirspeedElemNames, QStringList()) );
+    QStringList ClimbrateElemNames;
+    ClimbrateElemNames.append("0");
+    fields.append( new UAVObjectField(QString("Climbrate"), QString("m/s"), UAVObjectField::FLOAT32, ClimbrateElemNames, QStringList()) );
     QStringList SatellitesElemNames;
     SatellitesElemNames.append("0");
     fields.append( new UAVObjectField(QString("Satellites"), QString(""), UAVObjectField::INT8, SatellitesElemNames, QStringList()) );

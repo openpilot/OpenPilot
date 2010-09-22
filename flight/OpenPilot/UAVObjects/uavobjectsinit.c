@@ -49,6 +49,7 @@
 #include "gpsposition.h"
 #include "gpssatellites.h"
 #include "gpstime.h"
+#include "guidancesettings.h"
 #include "homelocation.h"
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
@@ -58,6 +59,7 @@
 #include "navigationsettings.h"
 #include "objectpersistence.h"
 #include "positionactual.h"
+#include "positiondesired.h"
 #include "stabilizationsettings.h"
 #include "systemalarms.h"
 #include "systemsettings.h"
@@ -94,6 +96,7 @@ void UAVObjectsInitializeAll()
     GPSPositionInitialize();
     GPSSatellitesInitialize();
     GPSTimeInitialize();
+    GuidanceSettingsInitialize();
     HomeLocationInitialize();
     ManualControlCommandInitialize();
     ManualControlSettingsInitialize();
@@ -103,6 +106,7 @@ void UAVObjectsInitializeAll()
     NavigationSettingsInitialize();
     ObjectPersistenceInitialize();
     PositionActualInitialize();
+    PositionDesiredInitialize();
     StabilizationSettingsInitialize();
     SystemAlarmsInitialize();
     SystemSettingsInitialize();

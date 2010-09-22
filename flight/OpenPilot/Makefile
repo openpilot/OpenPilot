@@ -188,6 +188,8 @@ SRC += $(OPUAVOBJ)/vtolsettings.c
 SRC += $(OPUAVOBJ)/vtolstatus.c
 SRC += $(OPUAVOBJ)/mixersettings.c
 SRC += $(OPUAVOBJ)/mixerstatus.c
+SRC += $(OPUAVOBJ)/guidancesettings.c
+SRC += $(OPUAVOBJ)/positiondesired.c
 #SRC += $(OPUAVOBJ)/lesstabilizationsettings.c
 endif
 

@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       systemalarms.h
+ * @file       guidancesettings.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
  * @addtogroup GCSPlugins GCS Plugins
@@ -9,7 +9,7 @@
  * @addtogroup UAVObjectsPlugin UAVObjects Plugin
  * @{
  *   
- * @note       Object definition file: systemalarms.xml. 
+ * @note       Object definition file: guidancesettings.xml. 
  *             This is an automatically generated file.
  *             DO NOT modify manually.
  *
@@ -30,49 +30,83 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef SYSTEMALARMS_H
-#define SYSTEMALARMS_H
+#ifndef GUIDANCESETTINGS_H
+#define GUIDANCESETTINGS_H
 
 #include "uavdataobject.h"
 #include "uavobjectmanager.h"
 
-class UAVOBJECTS_EXPORT SystemAlarms: public UAVDataObject
+class UAVOBJECTS_EXPORT GuidanceSettings: public UAVDataObject
 {
     Q_OBJECT
 
 public:
     // Field structure
     typedef struct {
-        quint8 Alarm[11];
+        quint16 UpdatePeriod;
+        float RollMax;
+        float PitchMax;
+        float PitchMin;
+        float PitchRollEpsilon;
+        float ThrottleMax;
+        float ThrottleMin;
+        float SpeedMax;
+        float SpeedMin;
+        float SpeedKp;
+        float SpeedKi;
+        float SpeedKd;
+        float EnergyKp;
+        float EnergyKi;
+        float EnergyKd;
+        float LateralKp;
+        float LateralKi;
+        float LateralKd;
+        float CourseKp;
+        float CourseKi;
+        float CourseKd;
 
     } __attribute__((packed)) DataFields;
 
     // Field information
-    // Field Alarm information
-    /* Enumeration options for field Alarm */
-    typedef enum { ALARM_OK=0, ALARM_WARNING=1, ALARM_ERROR=2, ALARM_CRITICAL=3 } AlarmOptions;
-    /* Array element names for field Alarm */
-    typedef enum { ALARM_OUTOFMEMORY=0, ALARM_STACKOVERFLOW=1, ALARM_CPUOVERLOAD=2, ALARM_EVENTSYSTEM=3, ALARM_SDCARD=4, ALARM_TELEMETRY=5, ALARM_MANUALCONTROL=6, ALARM_ACTUATOR=7, ALARM_STABILIZATION=8, ALARM_GUIDANCE=9, ALARM_AHRSCOMMS=10 } AlarmElem;
-    /* Number of elements for field Alarm */
-    static const quint32 ALARM_NUMELEM = 11;
+    // Field UpdatePeriod information
+    // Field RollMax information
+    // Field PitchMax information
+    // Field PitchMin information
+    // Field PitchRollEpsilon information
+    // Field ThrottleMax information
+    // Field ThrottleMin information
+    // Field SpeedMax information
+    // Field SpeedMin information
+    // Field SpeedKp information
+    // Field SpeedKi information
+    // Field SpeedKd information
+    // Field EnergyKp information
+    // Field EnergyKi information
+    // Field EnergyKd information
+    // Field LateralKp information
+    // Field LateralKi information
+    // Field LateralKd information
+    // Field CourseKp information
+    // Field CourseKi information
+    // Field CourseKd information
 
   
     // Constants
-    static const quint32 OBJID = 2311311584U;
+    static const quint32 OBJID = 2093064904U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
-    static const bool ISSETTINGS = 0;
+    static const bool ISSETTINGS = 1;
     static const quint32 NUMBYTES = sizeof(DataFields);
 
     // Functions
-    SystemAlarms();
+    GuidanceSettings();
 
     DataFields getData();
     void setData(const DataFields& data);
     Metadata getDefaultMetadata();
     UAVDataObject* clone(quint32 instID);
 
-    static SystemAlarms* GetInstance(UAVObjectManager* objMngr, quint32 instID = 0);
+    static GuidanceSettings* GetInstance(UAVObjectManager* objMngr, quint32 instID = 0);
 	
 private:
     DataFields data;
@@ -81,4 +115,4 @@ private:
 
 };
 
-#endif // SYSTEMALARMS_H
+#endif // GUIDANCESETTINGS_H

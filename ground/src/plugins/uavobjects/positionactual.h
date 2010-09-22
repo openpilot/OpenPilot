@@ -50,6 +50,8 @@ public:
         float GeoidSeparation;
         float Heading;
         float Groundspeed;
+        float Airspeed;
+        float Climbrate;
         qint8 Satellites;
         float PDOP;
         float HDOP;
@@ -69,6 +71,8 @@ public:
     // Field GeoidSeparation information
     // Field Heading information
     // Field Groundspeed information
+    // Field Airspeed information
+    // Field Climbrate information
     // Field Satellites information
     // Field PDOP information
     // Field HDOP information
@@ -82,7 +86,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 2253458392U;
+    static const quint32 OBJID = 3881752126U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

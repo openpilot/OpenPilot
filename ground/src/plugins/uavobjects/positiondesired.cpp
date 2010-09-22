@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       systemalarms.cpp
+ * @file       positiondesired.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
  * @addtogroup GCSPlugins GCS Plugins
@@ -9,7 +9,7 @@
  * @addtogroup UAVObjectsPlugin UAVObjects Plugin
  * @{
  *   
- * @note       Object definition file: systemalarms.xml. 
+ * @note       Object definition file: positiondesired.xml. 
  *             This is an automatically generated file.
  *             DO NOT modify manually.
  *
@@ -30,36 +30,29 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include "systemalarms.h"
+#include "positiondesired.h"
 #include "uavobjectfield.h"
 
-const QString SystemAlarms::NAME = QString("SystemAlarms");
+const QString PositionDesired::NAME = QString("PositionDesired");
 
 /**
  * Constructor
  */
-SystemAlarms::SystemAlarms(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
+PositionDesired::PositionDesired(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
 {
     // Create fields
     QList<UAVObjectField*> fields;
-    QStringList AlarmElemNames;
-    AlarmElemNames.append("OutOfMemory");
-    AlarmElemNames.append("StackOverflow");
-    AlarmElemNames.append("CPUOverload");
-    AlarmElemNames.append("EventSystem");
-    AlarmElemNames.append("SDCard");
-    AlarmElemNames.append("Telemetry");
-    AlarmElemNames.append("ManualControl");
-    AlarmElemNames.append("Actuator");
-    AlarmElemNames.append("Stabilization");
-    AlarmElemNames.append("Guidance");
-    AlarmElemNames.append("AHRSComms");
-    QStringList AlarmEnumOptions;
-    AlarmEnumOptions.append("OK");
-    AlarmEnumOptions.append("Warning");
-    AlarmEnumOptions.append("Error");
-    AlarmEnumOptions.append("Critical");
-    fields.append( new UAVObjectField(QString("Alarm"), QString(""), UAVObjectField::ENUM, AlarmElemNames, AlarmEnumOptions) );
+    QStringList NEDElemNames;
+    NEDElemNames.append("0");
+    NEDElemNames.append("1");
+    NEDElemNames.append("2");
+    fields.append( new UAVObjectField(QString("NED"), QString("m"), UAVObjectField::FLOAT32, NEDElemNames, QStringList()) );
+    QStringList HeadingElemNames;
+    HeadingElemNames.append("0");
+    fields.append( new UAVObjectField(QString("Heading"), QString("degrees"), UAVObjectField::FLOAT32, HeadingElemNames, QStringList()) );
+    QStringList GroundspeedElemNames;
+    GroundspeedElemNames.append("0");
+    fields.append( new UAVObjectField(QString("Groundspeed"), QString("m/s"), UAVObjectField::FLOAT32, GroundspeedElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
@@ -70,19 +63,19 @@ SystemAlarms::SystemAlarms(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAM
 /**
  * Get the default metadata for this object
  */
-UAVObject::Metadata SystemAlarms::getDefaultMetadata()
+UAVObject::Metadata PositionDesired::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
     metadata.flightAccess = ACCESS_READWRITE;
     metadata.gcsAccess = ACCESS_READWRITE;
-    metadata.gcsTelemetryAcked = 1;
-    metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
+    metadata.gcsTelemetryAcked = 0;
+    metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_MANUAL;
     metadata.gcsTelemetryUpdatePeriod = 0;
-    metadata.flightTelemetryAcked = 1;
+    metadata.flightTelemetryAcked = 0;
     metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
-    metadata.flightTelemetryUpdatePeriod = 4000;
-    metadata.loggingUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
-    metadata.loggingUpdatePeriod = 1000;
+    metadata.flightTelemetryUpdatePeriod = 1000;
+    metadata.loggingUpdateMode = UAVObject::UPDATEMODE_NEVER;
+    metadata.loggingUpdatePeriod = 0;
     return metadata;
 }
 
@@ -91,7 +84,7 @@ UAVObject::Metadata SystemAlarms::getDefaultMetadata()
  * If a default value is not specified the object fields
  * will be initialized to zero.
  */
-void SystemAlarms::setDefaultFieldValues()
+void PositionDesired::setDefaultFieldValues()
 {
 
 }
@@ -99,7 +92,7 @@ void SystemAlarms::setDefaultFieldValues()
 /**
  * Get the object data fields
  */
-SystemAlarms::DataFields SystemAlarms::getData()
+PositionDesired::DataFields PositionDesired::getData()
 {
     QMutexLocker locker(mutex);
     return data;
@@ -108,7 +101,7 @@ SystemAlarms::DataFields SystemAlarms::getData()
 /**
  * Set the object data fields
  */
-void SystemAlarms::setData(const DataFields& data)
+void PositionDesired::setData(const DataFields& data)
 {
     QMutexLocker locker(mutex);
     // Get metadata
@@ -127,9 +120,9 @@ void SystemAlarms::setData(const DataFields& data)
  * Do not use this function directly to create new instances, the
  * UAVObjectManager should be used instead.
  */
-UAVDataObject* SystemAlarms::clone(quint32 instID)
+UAVDataObject* PositionDesired::clone(quint32 instID)
 {
-    SystemAlarms* obj = new SystemAlarms();
+    PositionDesired* obj = new PositionDesired();
     obj->initialize(instID, this->getMetaObject());
     return obj;
 }
@@ -137,7 +130,7 @@ UAVDataObject* SystemAlarms::clone(quint32 instID)
 /**
  * Static function to retrieve an instance of the object.
  */
-SystemAlarms* SystemAlarms::GetInstance(UAVObjectManager* objMngr, quint32 instID)
+PositionDesired* PositionDesired::GetInstance(UAVObjectManager* objMngr, quint32 instID)
 {
-    return dynamic_cast<SystemAlarms*>(objMngr->getObject(SystemAlarms::OBJID, instID));
+    return dynamic_cast<PositionDesired*>(objMngr->getObject(PositionDesired::OBJID, instID));
 }

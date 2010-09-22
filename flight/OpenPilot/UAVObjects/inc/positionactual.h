@@ -41,7 +41,7 @@
 #define POSITIONACTUAL_H
 
 // Object constants
-#define POSITIONACTUAL_OBJID 2253458392U
+#define POSITIONACTUAL_OBJID 3881752126U
 #define POSITIONACTUAL_NAME "PositionActual"
 #define POSITIONACTUAL_METANAME "PositionActualMeta"
 #define POSITIONACTUAL_ISSINGLEINST 1
@@ -78,6 +78,8 @@ typedef struct {
     float GeoidSeparation;
     float Heading;
     float Groundspeed;
+    float Airspeed;
+    float Climbrate;
     int8_t Satellites;
     float PDOP;
     float HDOP;
@@ -97,6 +99,8 @@ typedef enum { POSITIONACTUAL_STATUS_NOGPS=0, POSITIONACTUAL_STATUS_NOFIX=1, POS
 // Field GeoidSeparation information
 // Field Heading information
 // Field Groundspeed information
+// Field Airspeed information
+// Field Climbrate information
 // Field Satellites information
 // Field PDOP information
 // Field HDOP information

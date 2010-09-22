@@ -51,6 +51,7 @@
 #include "gpsposition.h"
 #include "gpssatellites.h"
 #include "gpstime.h"
+#include "guidancesettings.h"
 #include "homelocation.h"
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
@@ -60,6 +61,7 @@
 #include "navigationsettings.h"
 #include "objectpersistence.h"
 #include "positionactual.h"
+#include "positiondesired.h"
 #include "stabilizationsettings.h"
 #include "systemalarms.h"
 #include "systemsettings.h"
@@ -96,6 +98,7 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new GPSPosition() );
     objMngr->registerObject( new GPSSatellites() );
     objMngr->registerObject( new GPSTime() );
+    objMngr->registerObject( new GuidanceSettings() );
     objMngr->registerObject( new HomeLocation() );
     objMngr->registerObject( new ManualControlCommand() );
     objMngr->registerObject( new ManualControlSettings() );
@@ -105,6 +108,7 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new NavigationSettings() );
     objMngr->registerObject( new ObjectPersistence() );
     objMngr->registerObject( new PositionActual() );
+    objMngr->registerObject( new PositionDesired() );
     objMngr->registerObject( new StabilizationSettings() );
     objMngr->registerObject( new SystemAlarms() );
     objMngr->registerObject( new SystemSettings() );

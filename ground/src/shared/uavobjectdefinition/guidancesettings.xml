@@ -1,0 +1,30 @@
+<xml>
+        <object name="GuidanceSettings" singleinstance="true" settings="true">
+            <description>PID settings used by the Guidance module to combine the @ref PositionActual and @ref PositionDesired to compute @ref AttitudeDesired</description>
+            <field name="UpdatePeriod" units="ms" type="uint16" elements="1" defaultvalue="10"/>
+            <field name="RollMax" units="degrees" type="float" elements="1" defaultvalue="35"/>
+            <field name="PitchMax" units="degrees" type="float" elements="1" defaultvalue="35"/>
+            <field name="PitchMin" units="degrees" type="float" elements="1" defaultvalue="-35"/>
+            <field name="PitchRollEpsilon" units="degrees" type="float" elements="1" defaultvalue="10"/>
+            <field name="ThrottleMax" units="%" type="float" elements="1" defaultvalue="1.0"/>
+            <field name="ThrottleMin" units="%" type="float" elements="1" defaultvalue="0"/>
+            <field name="SpeedMax" units="m/s" type="float" elements="1" defaultvalue="100"/>
+            <field name="SpeedMin" units="m/s" type="float" elements="1" defaultvalue="10"/>
+            <field name="SpeedKp" units="" type="float" elements="1" defaultvalue="0.04"/>
+            <field name="SpeedKi" units="" type="float" elements="1" defaultvalue="0.000004"/>
+            <field name="SpeedKd" units="" type="float" elements="1" defaultvalue="0.01"/>
+            <field name="EnergyKp" units="" type="float" elements="1" defaultvalue="0.04"/>
+            <field name="EnergyKi" units="" type="float" elements="1" defaultvalue="0.000004"/>
+            <field name="EnergyKd" units="" type="float" elements="1" defaultvalue="0.01"/>
+            <field name="LateralKp" units="" type="float" elements="1" defaultvalue="0.04"/>
+            <field name="LateralKi" units="" type="float" elements="1" defaultvalue="0.000004"/>
+            <field name="LateralKd" units="" type="float" elements="1" defaultvalue="0.01"/>
+            <field name="CourseKp" units="" type="float" elements="1" defaultvalue="0.04"/>
+            <field name="CourseKi" units="" type="float" elements="1" defaultvalue="0.000004"/>
+            <field name="CourseKd" units="" type="float" elements="1" defaultvalue="0.01"/>
+            <access gcs="readwrite" flight="readwrite"/>
+            <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+            <telemetryflight acked="true" updatemode="onchange" period="0"/>
+            <logging updatemode="never" period="0"/>
+	</object>
+</xml>

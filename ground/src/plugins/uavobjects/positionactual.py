@@ -112,6 +112,26 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
+		'Airspeed',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'Climbrate',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
 		'Satellites',
 		'b',
 		1,
@@ -180,7 +200,7 @@ _fields = [ \
 
 class PositionActual(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 2253458392
+    OBJID        = 3881752126
     NAME         = "PositionActual"
     METANAME     = "PositionActualMeta"
     ISSINGLEINST = 1

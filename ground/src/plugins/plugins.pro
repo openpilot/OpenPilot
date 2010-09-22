@@ -138,7 +138,9 @@ SUBDIRS += plugin_importexport
 # Export and Import GCS Configuration.
 plugin_logging.subdir = logging
 plugin_logging.depends = plugin_coreplugin
-SUBDIRS += plugin_logging
+plugin_logging.depends += plugin_uavobjects
+plugin_logging.depends += plugin_uavtalk
+#SUBDIRS += plugin_logging
 
 #GCS Control of UAV Gadget
 plugin_gcscontrol.subdir = gcscontrol

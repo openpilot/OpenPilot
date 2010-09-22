@@ -27,26 +27,6 @@
 
 #include "pfdgadgetconfiguration.h"
 #include "utils/pathutils.h"
-#include <QtCore/QDataStream>
-
-/**
- * Loads a saved configuration or defaults if non exist.
- *
- */
-PFDGadgetConfiguration::PFDGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
-    IUAVGadgetConfiguration(classId, parent),
-    m_defaultDial("Unknown")
-{
-    //if a saved configuration exists load it
-    if (state.count() > 0) {
-        QDataStream stream(state);
-        QString dialFile;
-        stream >> dialFile;
-        stream >> useOpenGLFlag;
-        stream >> hqFonts;
-        m_defaultDial=Utils::PathUtils().InsertDataPath(dialFile);
-    }
-}
 
 /**
  * Loads a saved configuration or defaults if non exist.

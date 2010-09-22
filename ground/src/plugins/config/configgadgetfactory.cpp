@@ -46,11 +46,6 @@ Core::IUAVGadget* ConfigGadgetFactory::createGadget(QWidget *parent)
     return new ConfigGadget(QString("ConfigGadget"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *ConfigGadgetFactory::createConfiguration(const QByteArray &state)
-{
-    return new ConfigGadgetConfiguration(QString("ConfigGadget"), state);
-}
-
 IUAVGadgetConfiguration *ConfigGadgetFactory::createConfiguration(QSettings* qSettings)
 {
     return new ConfigGadgetConfiguration(QString("ConfigGadget"), qSettings);

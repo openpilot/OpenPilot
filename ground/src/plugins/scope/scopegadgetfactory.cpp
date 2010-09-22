@@ -48,11 +48,6 @@ Core::IUAVGadget* ScopeGadgetFactory::createGadget(QWidget *parent)
     return new ScopeGadget(QString("ScopeGadget"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *ScopeGadgetFactory::createConfiguration(const QByteArray &state)
-{
-    return new ScopeGadgetConfiguration(QString("ScopeGadget"), state);
-}
-
 IUAVGadgetConfiguration *ScopeGadgetFactory::createConfiguration(QSettings* qSettings)
 {
     return new ScopeGadgetConfiguration(QString("ScopeGadget"), qSettings);

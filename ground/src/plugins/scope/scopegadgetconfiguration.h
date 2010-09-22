@@ -49,7 +49,6 @@ class ScopeGadgetConfiguration : public IUAVGadgetConfiguration
 {
     Q_OBJECT
 public:
-    explicit ScopeGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent = 0);
     explicit ScopeGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
 
     ~ScopeGadgetConfiguration();

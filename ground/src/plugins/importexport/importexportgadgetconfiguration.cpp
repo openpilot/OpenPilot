@@ -28,22 +28,6 @@
  */
 
 #include "importexportgadgetconfiguration.h"
-#include <QtCore/QDataStream>
-
-/**
- * Loads a saved configuration or defaults if non exist.
- *
- */
-ImportExportGadgetConfiguration::ImportExportGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
-        IUAVGadgetConfiguration(classId, parent),
-        dialFile("gcs.ini")
-{
-    //if a saved configuration exists load it
-    if (state.count() > 0) {
-        QDataStream stream(state);
-        stream >> dialFile;
-    }
-}
 
 /**
  * Loads a saved configuration or defaults if non exist.

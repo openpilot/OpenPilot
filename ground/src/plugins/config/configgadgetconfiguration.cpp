@@ -26,14 +26,6 @@
  */
 #include "configgadgetconfiguration.h"
 
-#include <QtCore/QDataStream>
-
-ConfigGadgetConfiguration::ConfigGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
-    IUAVGadgetConfiguration(classId, parent)
-{
-
-}
-
 ConfigGadgetConfiguration::ConfigGadgetConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent)
 {

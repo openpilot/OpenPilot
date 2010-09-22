@@ -26,61 +26,7 @@
  */
 
 #include "uploadergadgetconfiguration.h"
-#include <QtCore/QDataStream>
 #include <qextserialport/src/qextserialport.h>
-
-/**
- * Loads a saved configuration or defaults if non exist.
- *
- */
-UploaderGadgetConfiguration::UploaderGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
-    IUAVGadgetConfiguration(classId, parent),
-    m_defaultPort("Unknown"),
-    m_defaultSpeed(BAUD19200),
-    m_defaultDataBits(DATA_8),
-    m_defaultFlow(FLOW_OFF),
-    m_defaultParity(PAR_NONE),
-    m_defaultStopBits(STOP_1),
-    m_defaultTimeOut(5000)
-
-{
-    //if a saved configuration exists load it
-    if (state.count() > 0) {
-        QDataStream stream(state);
-        BaudRateType speed;
-        DataBitsType databits;
-        FlowType flow;
-        ParityType parity;
-        StopBitsType stopbits;
-        int ispeed;
-        int idatabits;
-        int iflow;
-        int iparity;
-        int istopbits;
-        QString port;
-        stream >> ispeed;
-        stream >> idatabits;
-        stream >>iflow;
-        stream >>iparity;
-        stream >> istopbits;
-        stream >> port;
-
-        databits=(DataBitsType) idatabits;
-        flow=(FlowType)iflow;
-        parity=(ParityType)iparity;
-        stopbits=(StopBitsType)istopbits;
-        speed=(BaudRateType)ispeed;
-        m_defaultPort=port;
-        m_defaultSpeed=speed;
-        m_defaultDataBits=databits;
-        m_defaultFlow=flow;
-        m_defaultParity=parity;
-        m_defaultStopBits=stopbits;
-
-    }
-
-}
-
 
 /**
  * Loads a saved configuration or defaults if non exist.

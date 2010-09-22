@@ -39,7 +39,6 @@ class IMPORTEXPORT_EXPORT ImportExportGadgetConfiguration : public IUAVGadgetCon
 {
     Q_OBJECT
 public:
-    explicit ImportExportGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent = 0);
     explicit ImportExportGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
 
     //set dial configuration functions

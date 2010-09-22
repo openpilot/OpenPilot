@@ -36,7 +36,6 @@ class PFDGadgetConfiguration : public IUAVGadgetConfiguration
 {
 Q_OBJECT
 public:
-    explicit PFDGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent = 0);
     explicit PFDGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
 
     //set dial configuration functions

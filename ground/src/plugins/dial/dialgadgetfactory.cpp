@@ -49,11 +49,6 @@ Core::IUAVGadget* DialGadgetFactory::createGadget(QWidget *parent)
     return new DialGadget(QString("DialGadget"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *DialGadgetFactory::createConfiguration(const QByteArray &state)
-{
-    return new DialGadgetConfiguration(QString("DialGadget"), state);
-}
-
 IUAVGadgetConfiguration *DialGadgetFactory::createConfiguration(QSettings* qSettings)
 {
     return new DialGadgetConfiguration(QString("DialGadget"), qSettings);

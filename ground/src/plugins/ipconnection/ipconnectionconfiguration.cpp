@@ -26,17 +26,7 @@
  */
 
 #include "ipconnectionconfiguration.h"
-#include <QtCore/QDataStream>
 #include <coreplugin/icore.h>
-
-IPconnectionConfiguration::IPconnectionConfiguration(QString classId, const QByteArray &state, QObject *parent) :
-    IUAVGadgetConfiguration(classId, parent),
-    m_HostName("127.0.0.1"),
-    m_Port(1000),
-    m_UseTCP(1)
-{
-    settings = Core::ICore::instance()->settings();
-}
 
 IPconnectionConfiguration::IPconnectionConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),

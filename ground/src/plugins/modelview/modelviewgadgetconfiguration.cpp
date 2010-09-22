@@ -27,25 +27,6 @@
 
 #include "modelviewgadgetconfiguration.h"
 #include "utils/pathutils.h"
-#include <QtCore/QDataStream>
-
-ModelViewGadgetConfiguration::ModelViewGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
-    IUAVGadgetConfiguration(classId, parent),
-    m_acFilename("../share/models/Easystar/EasyStar.3ds"),
-    m_bgFilename(""),
-    m_enableVbo(false)
-{
-    if (state.count() > 0) {
-        QDataStream stream(state);
-        QString modelFile;
-        QString bgFile;
-        stream >> modelFile;
-        stream >> bgFile;
-	stream >> m_enableVbo;
-        m_acFilename = Utils::PathUtils().InsertDataPath(modelFile);
-        m_bgFilename = Utils::PathUtils().InsertDataPath(bgFile);
-    }
-}
 
 ModelViewGadgetConfiguration::ModelViewGadgetConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),

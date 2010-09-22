@@ -50,12 +50,6 @@ Core::IUAVGadget* ImportExportGadgetFactory::createGadget(QWidget *parent)
     return new ImportExportGadget(QString("ImportExportGadget"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *ImportExportGadgetFactory::createConfiguration(const QByteArray &state)
-{
-    lastConfig = new ImportExportGadgetConfiguration(QString("ImportExportGadget"), state);
-    return lastConfig;
-}
-
 IUAVGadgetConfiguration *ImportExportGadgetFactory::createConfiguration(QSettings* qSettings)
 {
     lastConfig = new ImportExportGadgetConfiguration(QString("ImportExportGadget"), qSettings);

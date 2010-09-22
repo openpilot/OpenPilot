@@ -26,57 +26,6 @@
  */
 
 #include "scopegadgetconfiguration.h"
-#include <QtCore/QDataStream>
-
-
-ScopeGadgetConfiguration::ScopeGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
-        IUAVGadgetConfiguration(classId, parent),
-        m_plotType((int)ChronoPlot),
-        m_dataSize(60),
-        m_refreshInterval(1000)
-{
-    uint currentStreamVersion = 0;
-    int plotCurveCount = 0;
-
-    if (state.count() > 0) {
-
-        QDataStream stream(state);
-        stream >> currentStreamVersion;
-
-        if(currentStreamVersion != m_configurationStreamVersion)
-            return;
-
-        stream >> m_plotType;
-        stream >> m_dataSize;
-        stream >> m_refreshInterval;
-        stream >> plotCurveCount;
-
-        while(plotCurveCount-- > 0)
-        {
-            QString uavObject;
-            QString uavField;
-            QRgb color;
-
-            PlotCurveConfiguration* plotCurveConf = new PlotCurveConfiguration();
-            stream >> uavObject;
-            plotCurveConf->uavObject = uavObject;
-            stream >> uavField;
-            plotCurveConf->uavField = uavField;
-            stream >> color;
-            plotCurveConf->color = color;
-            stream >> plotCurveConf->yScalePower;
-            stream >> plotCurveConf->yMinimum;
-            stream >> plotCurveConf->yMaximum;
-
-            m_PlotCurveConfigs.append(plotCurveConf);
-        }
-
-        //The value is converted to milliseconds, so if it is < 100, it is still seconds
-        if(m_refreshInterval < 100)
-            m_refreshInterval *= 1000;
-    }
-}
-
 
 ScopeGadgetConfiguration::ScopeGadgetConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
         IUAVGadgetConfiguration(classId, parent),

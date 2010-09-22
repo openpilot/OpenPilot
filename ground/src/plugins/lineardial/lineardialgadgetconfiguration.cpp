@@ -27,49 +27,6 @@
 
 #include "lineardialgadgetconfiguration.h"
 #include "utils/pathutils.h"
-#include <QtCore/QDataStream>
-
-/**
- * Loads a saved configuration or defaults if non exist.
- *
- */
-LineardialGadgetConfiguration::LineardialGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
-    IUAVGadgetConfiguration(classId, parent),
-    dialFile("Unknown"),
-    sourceDataObject("Unknown"),
-    sourceObjectField("Unknown"),
-    minValue(0),
-    maxValue(100),
-    redMin(0),
-    redMax(33),
-    yellowMin(33),
-    yellowMax(66),
-    greenMin(66),
-    greenMax(100),
-    factor(1.00),
-    decimalPlaces(0)
-{
-    //if a saved configuration exists load it
-    if (state.count() > 0) {
-        QDataStream stream(state);
-        QString dFile;
-        stream >> dFile;
-        dialFile = Utils::PathUtils().InsertDataPath(dFile);
-        stream >> sourceDataObject;
-        stream >> sourceObjectField;
-        stream >> minValue;
-        stream >> maxValue;
-        stream >> redMin;
-        stream >> redMax;
-        stream >> yellowMin;
-        stream >> yellowMax;
-        stream >> greenMin;
-        stream >> greenMax;
-        stream >> font;
-        stream >> decimalPlaces;
-        stream >> factor;
-    }
-}
 
 /**
  * Loads a saved configuration or defaults if non exist.

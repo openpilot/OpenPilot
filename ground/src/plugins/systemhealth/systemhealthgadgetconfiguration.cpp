@@ -27,24 +27,6 @@
 
 #include "systemhealthgadgetconfiguration.h"
 #include "utils/pathutils.h"
-#include <QtCore/QDataStream>
-
-/**
- * Loads a saved configuration or defaults if non exist.
- *
- */
-SystemHealthGadgetConfiguration::SystemHealthGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
-    IUAVGadgetConfiguration(classId, parent),
-    systemFile("Unknown")
-{
-    //if a saved configuration exists load it
-    if (state.count() > 0) {
-        QDataStream stream(state);
-        QString diagram;
-        stream >> diagram;
-        systemFile = Utils::PathUtils().InsertDataPath(diagram);
-    }
-}
 
 /**
  * Loads a saved configuration or defaults if non exist.

@@ -27,58 +27,7 @@
 
 #include "opmapgadgetconfiguration.h"
 #include "utils/pathutils.h"
-
-#include <QtCore/QDataStream>
 #include <QDir>
-
-OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
-    IUAVGadgetConfiguration(classId, parent),
-    m_mapProvider("GoogleHybrid"),
-    m_defaultZoom(2),
-    m_defaultLatitude(0),
-    m_defaultLongitude(0),
-    m_useOpenGL(false),
-    m_showTileGridLines(false),
-    m_accessMode("ServerAndCache"),
-    m_useMemoryCache(true),
-    m_cacheLocation(Utils::PathUtils().GetStoragePath() + "mapscache" + QDir::separator())
-{
-    if (state.count() > 0)
-    {
-        QDataStream stream(state);
-
-	QString mapProvider;
-	int zoom;
-        double latitude;
-        double longitude;
-	bool useOpenGL;
-	bool showTileGridLines;
-	QString accessMode;
-	bool useMemoryCache;
-	QString cacheLocation;
-
-	stream >> mapProvider;
-	stream >> zoom;
-        stream >> latitude;
-        stream >> longitude;
-	stream >> useOpenGL;
-	stream >> showTileGridLines;
-	stream >> accessMode;
-	stream >> useMemoryCache;
-	stream >> cacheLocation;
-
-	if (!mapProvider.isEmpty()) m_mapProvider = mapProvider;
-	m_defaultZoom = zoom;
-        m_defaultLatitude = latitude;
-        m_defaultLongitude = longitude;
-	m_useOpenGL = useOpenGL;
-	m_showTileGridLines = showTileGridLines;
-
-	if (!accessMode.isEmpty()) m_accessMode = accessMode;
-	m_useMemoryCache = useMemoryCache;
-        if (!cacheLocation.isEmpty()) m_cacheLocation = Utils::PathUtils().InsertStoragePath(cacheLocation);
-    }
-}
 
 OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId,  QSettings* qSettings, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),

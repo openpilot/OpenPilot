@@ -44,7 +44,6 @@ class HITLConfiguration : public IUAVGadgetConfiguration
 	Q_PROPERTY(SimulatorSettings settings READ Settings WRITE setSimulatorSettings)
 
 public:
-    explicit HITLConfiguration(QString classId, const QByteArray &state, QObject *parent = 0);
     explicit HITLConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
 
     void saveConfig(QSettings* settings) const;

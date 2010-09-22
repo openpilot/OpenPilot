@@ -26,35 +26,6 @@
  */
 
 #include "hitlconfiguration.h"
-#include <QtCore/QDataStream>
-
-HITLConfiguration::HITLConfiguration(QString classId, const QByteArray &state, QObject *parent) :
-	IUAVGadgetConfiguration(classId, parent)
-{
-	settings.simulatorId = "";
-	settings.binPath = "";
-	settings.dataPath = "";
-	settings.manual = false;
-	settings.hostAddress = "127.0.0.1";
-	settings.outPort = 0;
-	settings.inPort = 0;
-	settings.latitude = "";
-	settings.longitude = "";
-
-    if (state.count() > 0) {
-        QDataStream stream(state);
-
-		stream >> settings.simulatorId;
-		stream >> settings.binPath;
-		stream >> settings.dataPath;
-		stream >> settings.manual;
-		stream >> settings.hostAddress;
-		stream >> settings.outPort;
-		stream >> settings.inPort;
-		stream >> settings.latitude;
-		stream >> settings.longitude;
-    }
-}
 
 HITLConfiguration::HITLConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
         IUAVGadgetConfiguration(classId, parent)

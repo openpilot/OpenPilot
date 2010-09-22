@@ -48,11 +48,6 @@ Core::IUAVGadget* PFDGadgetFactory::createGadget(QWidget *parent)
     return new PFDGadget(QString("PFDGadget"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *PFDGadgetFactory::createConfiguration(const QByteArray &state)
-{
-    return new PFDGadgetConfiguration(QString("PFDGadget"), state);
-}
-
 IUAVGadgetConfiguration *PFDGadgetFactory::createConfiguration(QSettings* qSettings)
 {
     return new PFDGadgetConfiguration(QString("PFDGadget"), qSettings);

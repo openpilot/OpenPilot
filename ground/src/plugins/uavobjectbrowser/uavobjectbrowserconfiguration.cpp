@@ -26,27 +26,6 @@
  */
 
 #include "uavobjectbrowserconfiguration.h"
-#include <QtCore/QDataStream>
-
-UAVObjectBrowserConfiguration::UAVObjectBrowserConfiguration(QString classId, const QByteArray &state, QObject *parent) :
-    IUAVGadgetConfiguration(classId, parent),
-    m_recentlyUpdatedColor(QColor(255, 230, 230)),
-    m_manuallyChangedColor(QColor(230, 230, 255)),
-    m_recentlyUpdatedTimeout(500)
-{
-    if (state.count() > 0) {
-        QDataStream stream(state);
-        QColor recent;
-        QColor manual;
-        int timeout;
-        stream >> recent;
-        stream >> manual;
-        stream >> timeout;
-        m_recentlyUpdatedColor = recent;
-        m_manuallyChangedColor = manual;
-        m_recentlyUpdatedTimeout = timeout;
-    }
-}
 
 UAVObjectBrowserConfiguration::UAVObjectBrowserConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),

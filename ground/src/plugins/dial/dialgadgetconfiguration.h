@@ -40,7 +40,6 @@ class DialGadgetConfiguration : public IUAVGadgetConfiguration
 {
 Q_OBJECT
 public:
-    explicit DialGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent = 0);
     explicit DialGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
 
 

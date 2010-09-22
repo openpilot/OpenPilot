@@ -36,7 +36,6 @@ class ModelViewGadgetConfiguration : public IUAVGadgetConfiguration
 {
 Q_OBJECT
 public:
-    explicit ModelViewGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent = 0);
     explicit ModelViewGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
 
     void saveConfig(QSettings* settings) const;

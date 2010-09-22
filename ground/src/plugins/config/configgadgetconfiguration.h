@@ -36,7 +36,6 @@ class ConfigGadgetConfiguration : public IUAVGadgetConfiguration
     Q_OBJECT
 
 public:
-    explicit ConfigGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent = 0);
     explicit ConfigGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
     void saveConfig(QSettings* settings) const;
     IUAVGadgetConfiguration *clone();

@@ -28,67 +28,6 @@
 
 #include "dialgadgetconfiguration.h"
 #include "utils/pathutils.h"
-#include <QtCore/QDataStream>
-
-/**
- * Loads a saved configuration or defaults if non exist.
- *
- */
-DialGadgetConfiguration::DialGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent) :
-    IUAVGadgetConfiguration(classId, parent),
-    m_defaultDial("Unknown"),
-    dialBackgroundID("background"),
-    dialForegroundID("foreground"),
-    dialNeedleID1("needle"),
-    dialNeedleID2("needle2"),
-    dialNeedleID3("needle3"),
-    needle1MinValue(0),
-    needle1MaxValue(100),
-    needle2MinValue(0),
-    needle2MaxValue(100),
-    needle3MinValue(0),
-    needle3MaxValue(100),
-    needle1Factor(1),
-    needle2Factor(1),
-    needle3Factor(1),
-    needle1Move("Rotate"),
-    needle2Move("Rotate"),
-    needle3Move("Rotate")
-{
-    //if a saved configuration exists load it
-    if (state.count() > 0) {
-        QDataStream stream(state);
-        QString dialFile;
-        stream >> dialFile;
-        m_defaultDial=Utils::PathUtils().InsertDataPath(dialFile);
-        stream >> dialBackgroundID;
-        stream >> dialForegroundID;
-        stream >> dialNeedleID1;
-        stream >> dialNeedleID2;
-        stream >> dialNeedleID3;
-        stream >> needle1MinValue;
-        stream >> needle1MaxValue;
-        stream >> needle2MinValue;
-        stream >> needle2MaxValue;
-        stream >> needle3MinValue;
-        stream >> needle3MaxValue;
-        stream >> needle1DataObject;
-        stream >> needle1ObjectField;
-        stream >> needle2DataObject;
-        stream >> needle2ObjectField;
-        stream >> needle3DataObject;
-        stream >> needle3ObjectField;
-        stream >> needle1Factor;
-        stream >> needle2Factor;
-        stream >> needle3Factor;
-        stream >> needle1Move;
-        stream >> needle2Move;
-        stream >> needle3Move;
-        stream >> font;
-
-    }
-}
-
 
 /**
  * Loads a saved configuration or defaults if non exist.

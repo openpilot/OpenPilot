@@ -48,11 +48,6 @@ Core::IUAVGadget* LineardialGadgetFactory::createGadget(QWidget *parent)
     return new LineardialGadget(QString("LineardialGadget"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *LineardialGadgetFactory::createConfiguration(const QByteArray &state)
-{
-    return new LineardialGadgetConfiguration(QString("LineardialGadget"), state);
-}
-
 IUAVGadgetConfiguration *LineardialGadgetFactory::createConfiguration(QSettings* qSettings)
 {
     return new LineardialGadgetConfiguration(QString("LineardialGadget"), qSettings);

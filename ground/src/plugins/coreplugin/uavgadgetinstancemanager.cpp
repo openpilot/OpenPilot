@@ -99,63 +99,29 @@ void UAVGadgetInstanceManager::readConfigs_1_0_0(QSettings *qs)
         IUAVGadgetFactory *f = factory(classId);
         qs->beginGroup(classId);
 
-        // New style: each config is a group, old style: each config is a value
-        QStringList groups = qs->childGroups();
-        bool oldStyle = groups.size() == 0;
         QStringList configs = QStringList();
-        if(oldStyle) {
-            // Old style configuration
-            configs = qs->childKeys();
 
-            foreach (QString configName, configs) {
-                QByteArray ba = QByteArray::fromBase64(qs->value(configName).toByteArray());
-                QDataStream stream(ba);
-                bool locked;
-                stream >> locked;
-                QByteArray state;
-                stream >> state;
-                IUAVGadgetConfiguration *config = f->createConfiguration(state);
-                if (config){
-                    config->setName(configName);
-                    config->setProvisionalName(configName);
-                    config->setLocked(locked);
-                    int idx = indexForConfig(m_configurations, classId, configName);
-                    if ( idx >= 0 ){
-                        // We should replace the config, but it might be used, so just
-                        // throw it out of the list. The GCS should be reinitialised soon.
-                        m_configurations[idx] = config;
-                    }
-                    else{
-                        m_configurations.append(config);
-                    }
+        configs = qs->childGroups();
+        foreach (QString configName, configs) {
+            qDebug() << "Loading config: " << classId << "," <<  configName;
+            qs->beginGroup(configName);
+            bool locked = qs->value("config.locked").toBool();
+            IUAVGadgetConfiguration *config = f->createConfiguration(qs);
+            if (config){
+                config->setName(configName);
+                config->setProvisionalName(configName);
+                config->setLocked(locked);
+                int idx = indexForConfig(m_configurations, classId, configName);
+                if ( idx >= 0 ){
+                    // We should replace the config, but it might be used, so just
+                    // throw it out of the list. The GCS should be reinitialised soon.
+                    m_configurations[idx] = config;
+                }
+                else{
+                    m_configurations.append(config);
                 }
             }
-        } else {
-            // New style configuration
-            configs = qs->childGroups();
-
-            foreach (QString configName, configs) {
-                qDebug() << "Loading config: " << classId << "," <<  configName;
-                qs->beginGroup(configName);
-                bool locked = qs->value("config.locked").toBool();
-                IUAVGadgetConfiguration *config = f->createConfiguration(qs);
-                if (config){
-                    config->setName(configName);
-                    config->setProvisionalName(configName);
-                    config->setLocked(locked);
-                    int idx = indexForConfig(m_configurations, classId, configName);
-                    if ( idx >= 0 ){
-                        // We should replace the config, but it might be used, so just
-                        // throw it out of the list. The GCS should be reinitialised soon.
-                        m_configurations[idx] = config;
-                    }
-                    else{
-                        m_configurations.append(config);
-                    }
-                }
-
-                qs->endGroup();
-            }
+            qs->endGroup();
         }
 
         if (configs.count() == 0) {

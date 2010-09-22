@@ -42,7 +42,6 @@ Q_PROPERTY(int Port READ Port WRITE setPort)
 Q_PROPERTY(int UseTCP READ UseTCP WRITE setUseTCP)
 
 public:
-    explicit IPconnectionConfiguration(QString classId, const QByteArray &state, QObject *parent = 0);
     explicit IPconnectionConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
 
     virtual ~IPconnectionConfiguration();

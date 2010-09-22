@@ -48,11 +48,6 @@ Core::IUAVGadget* SystemHealthGadgetFactory::createGadget(QWidget *parent)
     return new SystemHealthGadget(QString("SystemHealthGadget"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *SystemHealthGadgetFactory::createConfiguration(const QByteArray &state)
-{
-    return new SystemHealthGadgetConfiguration(QString("SystemHealthGadget"), state);
-}
-
 IUAVGadgetConfiguration *SystemHealthGadgetFactory::createConfiguration(QSettings* qSettings)
 {
     return new SystemHealthGadgetConfiguration(QString("SystemHealthGadget"), qSettings);

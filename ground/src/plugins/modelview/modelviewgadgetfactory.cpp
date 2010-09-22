@@ -47,11 +47,6 @@ Core::IUAVGadget* ModelViewGadgetFactory::createGadget(QWidget *parent)
         return new ModelViewGadget(QString("ModelViewGadget"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *ModelViewGadgetFactory::createConfiguration(const QByteArray &state)
-{
-    return new ModelViewGadgetConfiguration(QString("ModelViewGadget"), state);
-}
-
 IUAVGadgetConfiguration *ModelViewGadgetFactory::createConfiguration(QSettings* qSettings)
 {
     return new ModelViewGadgetConfiguration(QString("ModelViewGadget"), qSettings);

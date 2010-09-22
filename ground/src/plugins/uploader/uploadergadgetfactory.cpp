@@ -47,11 +47,6 @@ Core::IUAVGadget* UploaderGadgetFactory::createGadget(QWidget *parent)
     return new UploaderGadget(QString("Uploader"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *UploaderGadgetFactory::createConfiguration(const QByteArray &state)
-{
-    return new UploaderGadgetConfiguration(QString("Uploader"), state);
-}
-
 IUAVGadgetConfiguration *UploaderGadgetFactory::createConfiguration(QSettings* qSettings)
 {
     return new UploaderGadgetConfiguration(QString("Uploader"), qSettings);

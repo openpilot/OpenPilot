@@ -40,7 +40,6 @@ Q_PROPERTY(QColor m_recentlyUpdatedColor READ recentlyUpdatedColor WRITE setRece
 Q_PROPERTY(QColor m_manuallyChangedColor READ manuallyChangedColor WRITE setManuallyChangedColor)
 Q_PROPERTY(int m_recentlyUpdatedTimeout READ recentlyUpdatedTimeout WRITE setRecentlyUpdatedTimeout)
 public:
-    explicit UAVObjectBrowserConfiguration(QString classId, const QByteArray &state, QObject *parent = 0);
     explicit UAVObjectBrowserConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
 
     void saveConfig(QSettings* settings) const;

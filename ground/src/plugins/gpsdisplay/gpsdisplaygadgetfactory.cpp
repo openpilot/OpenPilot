@@ -48,11 +48,6 @@ Core::IUAVGadget* GpsDisplayGadgetFactory::createGadget(QWidget *parent)
     return new GpsDisplayGadget(QString("GpsDisplayGadget"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *GpsDisplayGadgetFactory::createConfiguration(const QByteArray &state)
-{
-    return new GpsDisplayGadgetConfiguration(QString("GpsDisplayGadget"), state);
-}
-
 IUAVGadgetConfiguration *GpsDisplayGadgetFactory::createConfiguration(QSettings* qSettings)
 {
     return new GpsDisplayGadgetConfiguration(QString("GpsDisplayGadget"), qSettings);

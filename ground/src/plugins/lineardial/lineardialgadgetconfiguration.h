@@ -39,7 +39,6 @@ class LineardialGadgetConfiguration : public IUAVGadgetConfiguration
 {
 Q_OBJECT
 public:
-    explicit LineardialGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent = 0);
     explicit LineardialGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
 
     //set dial configuration functions

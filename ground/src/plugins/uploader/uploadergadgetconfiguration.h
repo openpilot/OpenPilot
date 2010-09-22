@@ -37,7 +37,6 @@ class UploaderGadgetConfiguration : public IUAVGadgetConfiguration
 {
 Q_OBJECT
 public:
-    explicit UploaderGadgetConfiguration(QString classId, const QByteArray &state, QObject *parent = 0);
     explicit UploaderGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
 
     //set port configuration functions

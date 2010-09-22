@@ -47,7 +47,6 @@ public:
     ImportExportGadgetConfiguration *getLastConfig(){ return lastConfig;}
 
     Core::IUAVGadget *createGadget(QWidget *parent);
-    IUAVGadgetConfiguration *createConfiguration(const QByteArray &state);
     IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings);
     IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
 

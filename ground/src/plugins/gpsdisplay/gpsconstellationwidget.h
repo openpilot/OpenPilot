@@ -48,10 +48,14 @@ public slots:
 private slots:
 
 private:
-   int satellites[16][4];
-   QGraphicsSvgItem* satIcons[16];
-   QGraphicsSvgItem *world;
-   QGraphicsView *gpsConstellation;
+   static const int MAX_SATTELITES = 16;
+   int satellites[MAX_SATTELITES][4];
+   QGraphicsScene *scene;
+   QSvgRenderer *renderer;
+   QGraphicsSvgItem* world;
+   QGraphicsSvgItem* satIcons[MAX_SATTELITES];
+   QGraphicsSimpleTextItem* satTexts[MAX_SATTELITES];
+
    QPointF polarToCoord(int elevation, int azimuth);
 
 protected:

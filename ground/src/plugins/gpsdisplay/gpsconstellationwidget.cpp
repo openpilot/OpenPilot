@@ -30,8 +30,6 @@
 #include <QtGui>
 #include <QDebug>
 
-
-
 /*
  * Initialize the widget
  */
@@ -53,30 +51,43 @@ GpsConstellationWidget::GpsConstellationWidget(QWidget *parent) : QGraphicsView(
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    QGraphicsScene *scene = new QGraphicsScene(this);
     QSvgRenderer *renderer = new QSvgRenderer();
-    world = new QGraphicsSvgItem();
     renderer->load(QString(":/gpsgadget/images/gpsEarth.svg"));
+
+    world = new QGraphicsSvgItem();
     world->setSharedRenderer(renderer);
     world->setElementId("map");
+
+    scene = new QGraphicsScene(this);
     scene->addItem(world);
     scene->setSceneRect(world->boundingRect());
     setScene(scene);
 
-    // Now create 16 satellite icons which we will move around on the map:
-    for (int i=0; i<16;i++) {
-        satIcons[i] = new QGraphicsSvgItem();
+    // Now create 'maxSatellites' satellite icons which we will move around on the map:
+    for (int i=0; i < MAX_SATTELITES;i++) {
+        satellites[i][0] = 0;
+        satellites[i][1] = 0;
+        satellites[i][2] = 0;
+        satellites[i][3] = 0;
+
+        satIcons[i] = new QGraphicsSvgItem(world);
         satIcons[i]->setSharedRenderer(renderer);
         satIcons[i]->setElementId("sat-notSeen");
-        satIcons[i]->setParentItem(world);
         satIcons[i]->hide();
-    }
 
+        satTexts[i] = new QGraphicsSimpleTextItem("##",satIcons[i]);
+        satTexts[i]->setBrush(QColor("Black"));
+        satTexts[i]->setFont(QFont("Courier"));
+    }
 }
 
 GpsConstellationWidget::~GpsConstellationWidget()
 {
+    delete scene;
+    scene = 0;
 
+    delete renderer;
+    renderer = 0;
 }
 
 void GpsConstellationWidget::showEvent(QShowEvent *event)
@@ -101,8 +112,9 @@ void GpsConstellationWidget::resizeEvent(QResizeEvent* event)
 
 void GpsConstellationWidget::updateSat(int index, int prn, int elevation, int azimuth, int snr)
 {
-    if (index >= 16) {
-        return; // A bit of error checking never hurts.
+    if (index >= MAX_SATTELITES) {
+        // A bit of error checking never hurts.
+        return;
     }
 
     // TODO: add range checking
@@ -116,12 +128,27 @@ void GpsConstellationWidget::updateSat(int index, int prn, int elevation, int az
         opd += QPointF(-satIcons[index]->boundingRect().center().x(),
                        -satIcons[index]->boundingRect().center().y());
         satIcons[index]->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), false);
-        if (snr)
+        if (snr) {
             satIcons[index]->setElementId("satellite");
-        else
+        } else {
             satIcons[index]->setElementId("sat-notSeen");
+        }
         satIcons[index]->show();
 
+        QRectF iconRect = satIcons[index]->boundingRect();
+        QString prnString = QString().number(prn);
+        if(prnString.length() == 1) {
+            prnString = "0" + prnString;
+        }
+        satTexts[index]->setText(prnString);
+        QRectF textRect = satTexts[index]->boundingRect();
+
+        QTransform matrix;
+        qreal scale = 0.70 * (iconRect.width() / textRect.width());
+        matrix.translate(iconRect.width()/2, iconRect.height()/2);
+        matrix.scale(scale,scale);
+        matrix.translate(-textRect.width()/2,-textRect.height()/2);
+        satTexts[index]->setTransform(matrix,false);
     } else {
         satIcons[index]->hide();
     }

@@ -140,7 +140,7 @@ plugin_logging.subdir = logging
 plugin_logging.depends = plugin_coreplugin
 plugin_logging.depends += plugin_uavobjects
 plugin_logging.depends += plugin_uavtalk
-#SUBDIRS += plugin_logging
+SUBDIRS += plugin_logging
 
 #GCS Control of UAV Gadget
 plugin_gcscontrol.subdir = gcscontrol

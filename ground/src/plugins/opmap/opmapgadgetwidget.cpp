@@ -424,7 +424,7 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
     menu.addAction(zoomInAct);
     menu.addAction(zoomOutAct);
 
-    QMenu zoomSubMenu(tr("&Zoom ") + "(" + QString::number(m_map->Zoom()) + ")", this);
+    QMenu zoomSubMenu(tr("&Zoom ") + "(" + QString::number(m_map->ZoomReal()) + ")", this);
     for (int i = 0; i < zoomAct.count(); i++)
 	zoomSubMenu.addAction(zoomAct.at(i));
     menu.addMenu(&zoomSubMenu);
@@ -819,13 +819,13 @@ void OPMapGadgetWidget::on_treeViewWaypoints_clicked(QModelIndex index)
 void OPMapGadgetWidget::zoomIn()
 {
     if (m_map)
-	m_map->SetZoom(m_map->Zoom() + 1);
+        m_map->SetZoom(m_map->ZoomReal() + 1);
 }
 
 void OPMapGadgetWidget::zoomOut()
 {
     if (m_map)
-	m_map->SetZoom(m_map->Zoom() - 1);
+        m_map->SetZoom(m_map->ZoomReal() - 1);
 }
 
 void OPMapGadgetWidget::setZoom(int value)
@@ -1148,13 +1148,13 @@ void OPMapGadgetWidget::onShowUAVAct_toggled(bool show)
 void OPMapGadgetWidget::onGoZoomInAct_triggered()
 {
     if (m_map)
-	setZoom(m_map->Zoom() + 1);
+        setZoom(m_map->ZoomReal() + 1);
 }
 
 void OPMapGadgetWidget::onGoZoomOutAct_triggered()
 {
     if (m_map)
-	setZoom(m_map->Zoom() - 1);
+        setZoom(m_map->ZoomReal() - 1);
 }
 
 void OPMapGadgetWidget::onZoomActGroup_triggered(QAction *action)

@@ -28,20 +28,15 @@ HEADERS += uavobjects_global.h \
     telemetrysettings.h \
     systemsettings.h \
     stabilizationsettings.h \
-    flightsituationactual.h \
     manualcontrolsettings.h \
     manualcontrolcommand.h \
     attitudedesired.h \
     actuatorsettings.h \
     actuatordesired.h \
     actuatorcommand.h \
-    navigationsettings.h \
-    navigationdesired.h \
     gpsposition.h \
     gpstime.h \
     gpssatellites.h \
-    guidancesettings.h \
-    positiondesired.h \
     positionactual.h \
     flightbatterystate.h \
     homelocation.h \
@@ -74,20 +69,15 @@ SOURCES += uavobject.cpp \
     telemetrysettings.cpp \
     systemsettings.cpp \
     stabilizationsettings.cpp \
-    flightsituationactual.cpp \
     manualcontrolsettings.cpp \
     manualcontrolcommand.cpp \
     attitudedesired.cpp \
     actuatorsettings.cpp \
     actuatordesired.cpp \
     actuatorcommand.cpp \
-    navigationsettings.cpp \
-    navigationdesired.cpp \
     gpsposition.cpp \
     gpstime.cpp \
     gpssatellites.cpp \
-    guidancesettings.cpp \
-    positiondesired.cpp \
     positionactual.cpp \
     flightbatterystate.cpp \
     homelocation.cpp \

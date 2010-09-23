@@ -177,9 +177,6 @@ SRC += $(OPUAVOBJ)/baroaltitude.c
 SRC += $(OPUAVOBJ)/ahrscalibration.c
 SRC += $(OPUAVOBJ)/attitudeactual.c
 SRC += $(OPUAVOBJ)/ahrssettings.c
-SRC += $(OPUAVOBJ)/flightsituationactual.c
-SRC += $(OPUAVOBJ)/navigationsettings.c
-SRC += $(OPUAVOBJ)/navigationdesired.c
 SRC += $(OPUAVOBJ)/flightbatterystate.c
 SRC += $(OPUAVOBJ)/attituderaw.c
 SRC += $(OPUAVOBJ)/homelocation.c
@@ -188,8 +185,6 @@ SRC += $(OPUAVOBJ)/vtolsettings.c
 SRC += $(OPUAVOBJ)/vtolstatus.c
 SRC += $(OPUAVOBJ)/mixersettings.c
 SRC += $(OPUAVOBJ)/mixerstatus.c
-SRC += $(OPUAVOBJ)/guidancesettings.c
-SRC += $(OPUAVOBJ)/positiondesired.c
 #SRC += $(OPUAVOBJ)/lesstabilizationsettings.c
 endif
 

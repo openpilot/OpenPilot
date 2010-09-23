@@ -43,23 +43,18 @@
 #include "exampleobject2.h"
 #include "examplesettings.h"
 #include "flightbatterystate.h"
-#include "flightsituationactual.h"
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
 #include "gpsposition.h"
 #include "gpssatellites.h"
 #include "gpstime.h"
-#include "guidancesettings.h"
 #include "homelocation.h"
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
 #include "mixersettings.h"
 #include "mixerstatus.h"
-#include "navigationdesired.h"
-#include "navigationsettings.h"
 #include "objectpersistence.h"
 #include "positionactual.h"
-#include "positiondesired.h"
 #include "stabilizationsettings.h"
 #include "systemalarms.h"
 #include "systemsettings.h"
@@ -90,23 +85,18 @@ void UAVObjectsInitializeAll()
     ExampleObject2Initialize();
     ExampleSettingsInitialize();
     FlightBatteryStateInitialize();
-    FlightSituationActualInitialize();
     FlightTelemetryStatsInitialize();
     GCSTelemetryStatsInitialize();
     GPSPositionInitialize();
     GPSSatellitesInitialize();
     GPSTimeInitialize();
-    GuidanceSettingsInitialize();
     HomeLocationInitialize();
     ManualControlCommandInitialize();
     ManualControlSettingsInitialize();
     MixerSettingsInitialize();
     MixerStatusInitialize();
-    NavigationDesiredInitialize();
-    NavigationSettingsInitialize();
     ObjectPersistenceInitialize();
     PositionActualInitialize();
-    PositionDesiredInitialize();
     StabilizationSettingsInitialize();
     SystemAlarmsInitialize();
     SystemSettingsInitialize();

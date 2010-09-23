@@ -96,6 +96,13 @@ void GpsDisplayWidget::setFixType(const QString &fixtype)
 void GpsDisplayWidget::dumpPacket(const QString &packet)
 {
     textBrowser->append(packet);
+    if(textBrowser->document()->lineCount() > 200) {
+        QTextCursor tc = textBrowser->textCursor();
+        tc.movePosition(QTextCursor::Start);
+        tc.movePosition(QTextCursor::Down, QTextCursor::KeepAnchor);
+        tc.movePosition(QTextCursor::StartOfLine, QTextCursor::KeepAnchor);
+        tc.removeSelectedText();
+    }
 }
 
 void GpsDisplayWidget::setSVs(int sv)

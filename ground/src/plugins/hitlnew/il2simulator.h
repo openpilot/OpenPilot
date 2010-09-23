@@ -63,7 +63,8 @@ private:
 	float DENSITY(float pressure);
 	float PRESSURE(float alt);
 	float TAS(float ias,float alt);
-	void processUpdate(QString& data);
+
+	void processUpdate(const QByteArray& data);
 
 };
 

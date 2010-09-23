@@ -134,7 +134,7 @@ private slots:
 	Q_INVOKABLE void onDeleteSimulator(void);
 
 	virtual void transmitUpdate() = 0;
-	virtual void processUpdate(QString& data) = 0;
+	virtual void processUpdate(const QByteArray& data) = 0;
 
 protected:
 	QProcess* simProcess;

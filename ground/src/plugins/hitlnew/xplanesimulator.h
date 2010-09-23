@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       flightgearbridge.h
+ * @file       xplanesimulator.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @addtogroup GCSPlugins GCS Plugins
+ * @brief
+ * @see        The GNU Public License (GPL) Version 3
+ * @defgroup   hitlplugin
  * @{
- * @addtogroup HITLPlugin HITL Plugin
- * @{
- * @brief The Hardware In The Loop plugin 
+ *
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -25,46 +25,66 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef FGSIMULATOR_H
-#define FGSIMULATOR_H_H
+#ifndef XPLANESIMULATOR_H
+#define XPLANESIMULATOR_H
 
 #include <QObject>
-#include "simulator.h"
+#include <simulator.h>
 
-class FGSimulator: public Simulator
+class XplaneSimulator: public Simulator
 {
-    Q_OBJECT
-
+	Q_OBJECT
 public:
-	FGSimulator(const SimulatorSettings& params);
-	~FGSimulator();
+	XplaneSimulator(const SimulatorSettings& params);
+	~XplaneSimulator();
 
-	bool setupProcess();
 	void setupUdpPorts(const QString& host, int inPort, int outPort);
 
 private slots:
-    void transmitUpdate();
-	void processReadyRead();
+	void transmitUpdate();
 
 private:
-    static const float FT2M;
-    static const float KT2MPS;
-    static const float INHG2KPA;
+	enum XplaneOutputData
+	{
+		FramRate,
+		Times,
+		SimStats,
+		Speed,
+		Gload,
+		AtmosphereWeather,
+		AtmosphereAircraft,
+		SystemPressures,
+		Joystick1,
+		Joystick2,
+		ArtStab,
+		FlightCon,
+		WingSweep,
+		Trim,
+		Brakes,
+		AngularMoments,
+		AngularAccelerations,
+		AngularVelociies,
+		PitchRollHeading,
+		AoA,
+		LatitudeLongitude,
+		LocVelDistTraveled
+	};
 
 	void processUpdate(const QByteArray& data);
+
 };
 
-class FGSimulatorCreator : public SimulatorCreator
+class XplaneSimulatorCreator : public SimulatorCreator
 {
 public:
-	FGSimulatorCreator(const QString& classId, const QString& description)
+	XplaneSimulatorCreator(const QString& classId, const QString& description)
 	:  SimulatorCreator (classId,description)
 	{}
 
 	Simulator* createSimulator(const SimulatorSettings& params)
 	{
-		return new FGSimulator(params);
+		return new XplaneSimulator(params);
 	}
-
 };
-#endif // FGSIMULATOR_H
+
+#endif // XPLANESIMULATOR_H

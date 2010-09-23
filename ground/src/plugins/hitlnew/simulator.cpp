@@ -191,9 +191,9 @@ void Simulator::receiveUpdate()
 		quint16 senderPort;
 		inSocket->readDatagram(datagram.data(), datagram.size(),
 							   &sender, &senderPort);
-		QString datastr(datagram);
+		//QString datastr(datagram);
 		// Process incomming data
-		processUpdate(datastr);
+		processUpdate(datagram);
 	 }
 }
 

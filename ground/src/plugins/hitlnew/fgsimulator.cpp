@@ -139,7 +139,6 @@ void FGSimulator::transmitUpdate()
 	float elevator = -actData.Pitch;
 	float rudder = actData.Yaw;
 	float throttle = actData.Throttle;
-
 	// Send update to FlightGear
 	QString cmd;
 	cmd = QString("%1,%2,%3,%4\n")
@@ -152,9 +151,10 @@ void FGSimulator::transmitUpdate()
 }
 
 
-void FGSimulator::processUpdate(QString& data)
+void FGSimulator::processUpdate(const QByteArray& inp)
 {
 	// Split
+	QString data(inp);
 	QStringList fields = data.split(",");
 	// Get xRate (deg/s)
 //	float xRate = fields[0].toFloat() * 180.0/M_PI;

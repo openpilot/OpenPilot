@@ -59,6 +59,8 @@
  *
  * unfortunately angular acceleration provided is very limited, too
  */
+
+
 #include "il2simulator.h"
 #include "extensionsystem/pluginmanager.h"
 #include <coreplugin/icore.h>
@@ -150,11 +152,11 @@ float IL2Simulator::TAS(float IAS, float alt) {
 /**
  * process data string from flight simulator
  */
-void IL2Simulator::processUpdate(QString& data)
+void IL2Simulator::processUpdate(const QByteArray& inp)
 {
 	// save old flight data to calculate delta's later
 	old=current;
-
+	QString data(inp);
 	// Split
 	QStringList fields = data.split("/");
 
@@ -208,17 +210,17 @@ void IL2Simulator::processUpdate(QString& data)
 	current.Y = old.Y + (current.dY*current.dT);
 
 	// Update AltitudeActual object
-        BaroAltitude::DataFields altActualData;
-        memset(&altActualData, 0, sizeof(BaroAltitude::DataFields));
-        altActualData.Altitude = current.Z;
+	BaroAltitude::DataFields altActualData;
+	memset(&altActualData, 0, sizeof(BaroAltitude::DataFields));
+	altActualData.Altitude = current.Z;
 	altActualData.Temperature = TEMP_GROUND + (current.Z * TEMP_LAPSE_RATE) - 273.0;
 	altActualData.Pressure = PRESSURE(current.Z)/1000.0; // kpa
 	altActual->setData(altActualData);
 
 	// Update attActual object
 	AttitudeActual::DataFields attActualData;
-        memset(&attActualData, 0, sizeof(AttitudeActual::DataFields));
-        attActualData.Roll = current.roll;
+	memset(&attActualData, 0, sizeof(AttitudeActual::DataFields));
+	attActualData.Roll = current.roll;
 	attActualData.Pitch = current.pitch;
 	attActualData.Yaw = current.azimuth;
 	attActualData.q1 = 0;
@@ -229,8 +231,8 @@ void IL2Simulator::processUpdate(QString& data)
 
 	// Update gps objects
 	PositionActual::DataFields gpsData;
-        memset(&gpsData, 0, sizeof(PositionActual::DataFields));
-        gpsData.Altitude = current.Z;
+	memset(&gpsData, 0, sizeof(PositionActual::DataFields));
+	gpsData.Altitude = current.Z;
 	gpsData.Heading = current.azimuth;
 	gpsData.Groundspeed = current.groundspeed;
 	gpsData.Latitude = settings.latitude.toFloat() + current.Y * DEG2M;

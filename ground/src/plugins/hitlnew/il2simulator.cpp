@@ -246,6 +246,14 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
 	while (gpsData.Longitude>180.0) gpsData.Longitude-=360.0;
 	gpsData.Satellites = 7;
 	gpsData.Status = PositionActual::STATUS_FIX3D;
+	gpsData.NED[0]=current.Y;
+	gpsData.NED[1]=current.X;
+	gpsData.NED[2]=-current.Z;
+	gpsData.Vel[0]=current.dY;
+	gpsData.Vel[1]=current.dX;
+	gpsData.Vel[2]=-current.dZ;
+	gpsData.Airspeed=current.ias;
+	gpsData.Climbrate=current.dZ;
 	posActual->setData(gpsData);
 
 	// issue manual update

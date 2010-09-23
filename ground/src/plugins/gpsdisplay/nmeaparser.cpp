@@ -301,13 +301,13 @@ void NMEAParser::nmeaProcessGPGSV(char *packet)
         const int elv = tokenslist.at(base+1).toInt(); // Elevation, degrees
         const int azimuth = tokenslist.at(base+2).toInt(); //  Azimuth, degrees
         const int sig = tokenslist.at(base+3).toInt(); // SNR - higher is better
-        const int index = sentence_index * 4 + sat;
+        const int index = (sentence_index-1) * 4 + sat;
         emit satellite(index, id, elv, azimuth, sig);
     }
 
     if(sentence_index == sentence_total) {
         // Last sentence
-        int total_sats = sentence_index * 4 + sats;
+        int total_sats = (sentence_index-1) * 4 + sats;
         for(int emptySatIndex = total_sats; emptySatIndex < 16; emptySatIndex++) {
             // Wipe the rest.
             emit satellite(emptySatIndex, 0, 0, 0, 0);

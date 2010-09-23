@@ -5,10 +5,11 @@ include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
 include(gpsdisplay_dependencies.pri)
 include(../../libs/qwt/qwt.pri)
-HEADERS += gpsdisplayplugin.h \
-    gpsconstellationwidget.h \
-    gpsparser.h \
-    telemetryparser.h
+HEADERS += gpsdisplayplugin.h
+HEADERS += gpsconstellationwidget.h
+HEADERS += gpsparser.h
+HEADERS += telemetryparser.h
+HEADERS += gpssnrwidget.h
 HEADERS += buffer.h
 HEADERS += nmeaparser.h
 HEADERS += gpsdisplaygadget.h
@@ -16,10 +17,11 @@ HEADERS += gpsdisplaywidget.h
 HEADERS += gpsdisplaygadgetfactory.h
 HEADERS += gpsdisplaygadgetconfiguration.h
 HEADERS += gpsdisplaygadgetoptionspage.h
-SOURCES += gpsdisplayplugin.cpp \
-    gpsconstellationwidget.cpp \
-    gpsparser.cpp \
-    telemetryparser.cpp
+SOURCES += gpsdisplayplugin.cpp
+SOURCES += gpsconstellationwidget.cpp
+SOURCES += gpsparser.cpp
+SOURCES += telemetryparser.cpp
+SOURCES += gpssnrwidget.cpp
 SOURCES += buffer.cpp
 SOURCES += nmeaparser.cpp
 SOURCES += gpsdisplaygadget.cpp

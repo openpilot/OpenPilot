@@ -2,6 +2,14 @@
 <ui version="4.0">
  <class>GpsDisplayWidget</class>
  <widget class="QWidget" name="GpsDisplayWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>560</width>
+    <height>376</height>
+   </rect>
+  </property>
   <property name="sizePolicy">
    <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
     <horstretch>0</horstretch>
@@ -572,12 +580,18 @@
         </layout>
        </item>
        <item row="1" column="1">
-        <widget class="QGraphicsView" name="graphicsView">
+        <widget class="GpsSnrWidget" name="gpsSnrWidget">
          <property name="maximumSize">
           <size>
            <width>250</width>
            <height>95</height>
           </size>
+         </property>
+         <property name="verticalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
          </property>
         </widget>
        </item>
@@ -666,6 +680,11 @@
    <class>GpsConstellationWidget</class>
    <extends>QGraphicsView</extends>
    <header>gpsconstellationwidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>GpsSnrWidget</class>
+   <extends>QGraphicsView</extends>
+   <header>gpssnrwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

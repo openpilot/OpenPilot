@@ -30,7 +30,7 @@
 
 namespace mapcontrol
 {
-    MapGraphicItem::MapGraphicItem(internals::Core *core, Configuration *configuration):core(core),config(configuration),MapRenderTransform(1), maxZoom(17),minZoom(2),zoomReal(0),isSelected(false),rotation(0)
+    MapGraphicItem::MapGraphicItem(internals::Core *core, Configuration *configuration):core(core),config(configuration),MapRenderTransform(1), maxZoom(17),minZoom(2),zoomReal(0),isSelected(false),rotation(0),zoomDigi(0)
     {
 
         showTileGridLines=false;
@@ -128,6 +128,7 @@ namespace mapcontrol
         if(MapRenderTransform!=1)
         {
             QTransform transform;
+            transform.translate(-((boundingRect().width()*MapRenderTransform)-(boundingRect().width()))/2,-((boundingRect().height()*MapRenderTransform)-(boundingRect().height()))/2);
             transform.scale(MapRenderTransform,MapRenderTransform);
             painter->setWorldTransform(transform);
             {
@@ -149,7 +150,9 @@ namespace mapcontrol
         if(MapRenderTransform!=1)
         {
             QTransform transform;
+            transform.translate(-((boundingRect().width()*MapRenderTransform)-(boundingRect().width()))/2,-((boundingRect().height()*MapRenderTransform)-(boundingRect().height()))/2);
             transform.scale(MapRenderTransform,MapRenderTransform);
+
             painter->setWorldTransform(transform);
             {
                 DrawMap2D(painter);
@@ -276,6 +279,7 @@ namespace mapcontrol
 
     void MapGraphicItem::wheelEvent(QGraphicsSceneWheelEvent *event)
     {
+
         if(!IsMouseOverMarker() && !IsDragging())
         {
             if(core->GetmouseLastZoom().X() != event->pos().x() && core->mouseLastZoom.Y() != event->pos().y())
@@ -311,11 +315,11 @@ namespace mapcontrol
 
             if(event->delta() > 0)
             {
-                SetZoom(Zoom()+1);
+                SetZoom(ZoomTotal()+1);
             }
             else if(event->delta() < 0)
             {
-                SetZoom(Zoom()-1);
+                SetZoom(ZoomTotal()-1);
             }
 
             core->MouseWheelZooming = false;
@@ -323,8 +327,7 @@ namespace mapcontrol
     }
     void MapGraphicItem::DrawMap2D(QPainter *painter)
     {
-
-        if(!lastimage.isNull())
+         if(!lastimage.isNull())
             painter->drawImage(core->GetrenderOffset().X()-lastimagepoint.X(),core->GetrenderOffset().Y()-lastimagepoint.Y(),lastimage);
 
         for(int i = -core->GetsizeOfMapArea().Width(); i <= core->GetsizeOfMapArea().Width(); i++)
@@ -333,21 +336,13 @@ namespace mapcontrol
             {
                 core->SettilePoint (core->GetcenterTileXYLocation());
                 core->SettilePoint(Point(core->GettilePoint().X()+ i,core->GettilePoint().Y()+j));
-
-
-
                 {
                     internals::Tile* t = core->Matrix.TileAt(core->GettilePoint());
-                    //qDebug()<<"OPMapControl::DrawMap2D tile:"<<t->GetPos().ToString()<<" as "<<t->Overlays.count()<<" overlays";
-                    //Tile t = core->Matrix[tileToDraw];
                     if(true)
                     {
-                        //qDebug()<< "opmapcontrol:draw2d TileHasValue:"<<t->GetPos().ToString();
                         core->tileRect.SetX(core->GettilePoint().X()*core->tileRect.Width());
                         core->tileRect.SetY(core->GettilePoint().Y()*core->tileRect.Height());
                         core->tileRect.Offset(core->GetrenderOffset());
-                        //qDebug()<<core->GetrenderOffset().ToString();
-
                         if(core->GetCurrentRegion().IntersectsWith(core->tileRect))
                         {
                             bool found = false;
@@ -364,7 +359,7 @@ namespace mapcontrol
                                             found = true;
                                         {
                                             painter->drawPixmap(core->tileRect.X(),core->tileRect.Y(), core->tileRect.Width(), core->tileRect.Height(),PureImageProxy::FromStream(img));
-
+                                           // qDebug()<<"tile:"<<core->tileRect.X()<<core->tileRect.Y();
                                         }
                                     }
                                 }
@@ -416,6 +411,10 @@ namespace mapcontrol
             }
         }
         // painter->drawRect(core->GetrenderOffset().X()-lastimagepoint.X()-3,core->GetrenderOffset().Y()-lastimagepoint.Y()-3,lastimage.width(),lastimage.height());
+//        painter->setPen(Qt::red);
+//        painter->drawLine(-10,-10,10,10);
+//        painter->drawLine(10,10,-10,-10);
+//        painter->drawRect(boundingRect().adjusted(100,100,-100,-100));
     }
 
 
@@ -424,17 +423,24 @@ namespace mapcontrol
         core::Point ret = core->FromLatLngToLocal(point);
         if(MapRenderTransform!=1)
         {
-            ret.SetX((int) (ret.X() / MapRenderTransform));
-            ret.SetY((int) (ret.Y() / MapRenderTransform));
+            ret.SetX((int) (ret.X() * MapRenderTransform));
+            ret.SetY((int) (ret.Y() * MapRenderTransform));
+            ret.SetX(ret.X()-((boundingRect().width()*MapRenderTransform)-(boundingRect().width()))/2);
+            ret.SetY(ret.Y()-((boundingRect().height()*MapRenderTransform)-(boundingRect().height()))/2);
+
+
         }
         return ret;
     }
     internals::PointLatLng MapGraphicItem::FromLocalToLatLng(int x, int y)
     {
-        if(MapRenderTransform!=-1)
+        if(MapRenderTransform!=1)
         {
-            x = (int) (x * MapRenderTransform);
-            y = (int) (y * MapRenderTransform);
+            x=x+((boundingRect().width()*MapRenderTransform)-(boundingRect().width()))/2;
+            y=y+((boundingRect().height()*MapRenderTransform)-(boundingRect().height()))/2;
+
+            x = (int) (x / MapRenderTransform);
+            y = (int) (y / MapRenderTransform);
         }
         return core->FromLocalToLatLng(x, y);
     }
@@ -443,34 +449,48 @@ namespace mapcontrol
     {
         return zoomReal;
     }
+    double MapGraphicItem::ZoomDigi()
+    {
+        return zoomDigi;
+    }
+    double MapGraphicItem::ZoomTotal()
+    {
+        return zoomDigi+zoomReal;
+    }
+
     void MapGraphicItem::SetZoom(double const& value)
     {
-        if(zoomReal != value)
+        if(ZoomTotal() != value)
         {
             if(value > MaxZoom())
             {
                 zoomReal = MaxZoom();
+                zoomDigi =value-MaxZoom();
             }
             else
                 if(value < MinZoom())
                 {
+                zoomDigi=0;
                 zoomReal = MinZoom();
             }
             else
             {
+                zoomDigi=0;
                 zoomReal = value;
             }
-
-            float remainder = (float)std::fmod((float) value, (float) 1);
-            if(remainder != 0)
+            double integer;
+            double remainder = modf (value , &integer);
+            if(zoomDigi!=0||remainder != 0)
             {
-                float scaleValue = remainder + 1;
+                float scaleValue = zoomDigi+remainder + 1;
                 {
                     MapRenderTransform = scaleValue;
+                  //  qDebug()<<"scale="<<scaleValue<<"zoomdigi:"<<ZoomDigi()<<"integer:"<<integer;
                 }
-
-                SetZoomStep((qint32)(value - remainder));
-
+                if(integer>MaxZoom())
+                    integer=MaxZoom();
+                SetZoomStep((qint32)(integer));
+              //  core->GoToCurrentPositionOnZoom();
                 this->update();
 
             }
@@ -491,24 +511,26 @@ namespace mapcontrol
     }
     void MapGraphicItem::SetZoomStep(int const& value)
     {
-        if(value-core->Zoom()>0 && value<= MaxZoom())
+        double integer;
+        double remainder = modf (value , &integer);
+        if(integer-core->Zoom()>0 && value<= MaxZoom())
             ConstructLastImage(value-core->Zoom());
         else
             lastimage=QImage();
         if(value > MaxZoom())
         {
             core->SetZoom(MaxZoom());
-            emit zoomChanged(MaxZoom());
+            emit zoomChanged(MaxZoom()+ZoomDigi(),Zoom(),ZoomDigi());
         }
         else if(value < MinZoom())
         {
             core->SetZoom(MinZoom());
-            emit zoomChanged(MinZoom());
+            emit zoomChanged(MinZoom()+ZoomDigi(),Zoom(),ZoomDigi());
         }
         else
         {
             core->SetZoom(value);
-            emit zoomChanged(value);
+            emit zoomChanged(value+ZoomDigi(),Zoom(),ZoomDigi());;
         }
 
     }

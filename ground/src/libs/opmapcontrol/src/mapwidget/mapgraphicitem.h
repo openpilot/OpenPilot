@@ -98,6 +98,9 @@ namespace mapcontrol
         void ConstructLastImage(int const& zoomdiff);
         internals::PureProjection* Projection()const{return core->Projection();}
         double Zoom();
+        double ZoomDigi();
+        double ZoomTotal();
+
     protected:
         void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );
         void mousePressEvent ( QGraphicsSceneMouseEvent * event );
@@ -142,6 +145,7 @@ namespace mapcontrol
         internals::PointLatLng selectionStart;
         internals::PointLatLng selectionEnd;
         double zoomReal;
+        double zoomDigi;
         QRectF maprect;
         bool isSelected;
         bool isMouseOverMarker;
@@ -200,7 +204,7 @@ namespace mapcontrol
         *
         * @param zoom
         */
-        void zoomChanged(double zoom);
+        void zoomChanged(double zoomtotal,double zoomreal,double zoomdigi);
     };
 }
 #endif // MAPGRAPHICITEM_H

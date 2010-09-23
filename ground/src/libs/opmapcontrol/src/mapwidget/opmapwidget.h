@@ -151,7 +151,7 @@ namespace mapcontrol
        // Q_PROPERTY(int MaxZoom READ MaxZoom WRITE SetMaxZoom)
         Q_PROPERTY(int MinZoom READ MinZoom WRITE SetMinZoom)
         Q_PROPERTY(bool ShowTileGridLines READ ShowTileGridLines WRITE SetShowTileGridLines)
-        Q_PROPERTY(double Zoom READ Zoom WRITE SetZoom)
+        Q_PROPERTY(double Zoom READ ZoomTotal WRITE SetZoom)
         Q_PROPERTY(qreal Rotate READ Rotate WRITE SetRotate)
         Q_ENUMS(internals::MouseWheelZoomType::Types)
         Q_ENUMS(internals::GeoCoderStatusCode::Types)
@@ -217,7 +217,9 @@ namespace mapcontrol
         internals::PointLatLng CurrentPosition()const{return map->core->CurrentPosition();}
         void SetCurrentPosition(internals::PointLatLng const& value){map->core->SetCurrentPosition(value);}
 
-        double Zoom(){return map->Zoom();}
+        double ZoomReal(){return map->Zoom();}
+        double ZoomDigi(){return map->ZoomDigi();}
+        double ZoomTotal(){return map->ZoomTotal();}
         void SetZoom(double const& value){map->SetZoom(value);}
 
         qreal Rotate(){return map->rotation;}
@@ -361,7 +363,7 @@ namespace mapcontrol
         void mouseMoveEvent ( QMouseEvent * event );
         //    private slots:
     signals:
-        void zoomChanged(double zoom);
+        void zoomChanged(double zoomt,double zoom, double zoomd);
         /**
         * @brief fires when one of the WayPoints numbers changes (not fired if due to a auto-renumbering)
         *

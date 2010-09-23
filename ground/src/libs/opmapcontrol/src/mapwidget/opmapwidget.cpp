@@ -41,7 +41,7 @@ namespace mapcontrol
         mscene.addItem(map);
         this->setScene(&mscene);
         this->adjustSize();
-        connect(map,SIGNAL(zoomChanged(double)),this,SIGNAL(zoomChanged(double)));
+        connect(map,SIGNAL(zoomChanged(double,double,double)),this,SIGNAL(zoomChanged(double,double,double)));
         connect(map->core,SIGNAL(OnCurrentPositionChanged(internals::PointLatLng)),this,SIGNAL(OnCurrentPositionChanged(internals::PointLatLng)));
         connect(map->core,SIGNAL(OnEmptyTileError(int,core::Point)),this,SIGNAL(OnEmptyTileError(int,core::Point)));
         connect(map->core,SIGNAL(OnMapDrag()),this,SIGNAL(OnMapDrag()));
@@ -142,6 +142,7 @@ namespace mapcontrol
     {
         return currentmouseposition;
     }
+
     void OPMapWidget::mouseMoveEvent(QMouseEvent *event)
     {
         QGraphicsView::mouseMoveEvent(event);

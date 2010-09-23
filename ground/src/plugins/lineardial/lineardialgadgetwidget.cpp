@@ -70,7 +70,7 @@ void LineardialGadgetWidget::connectInput(QString object1, QString nfield1) {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
-    qDebug() << "Lineardial Connect needles - " << object1 << "-"<< nfield1;
+    // qDebug() << "Lineardial Connect needles - " << object1 << "-"<< nfield1;
 
     // Check validity of arguments first, reject empty args and unknown fields.
     if (!(object1.isEmpty() || nfield1.isEmpty())) {

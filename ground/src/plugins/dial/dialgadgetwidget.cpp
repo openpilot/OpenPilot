@@ -84,7 +84,7 @@ void DialGadgetWidget::connectNeedles(QString object1, QString nfield1,
     if (!(object1.isEmpty() || nfield1.isEmpty())) {
         obj1 = dynamic_cast<UAVDataObject*>( objManager->getObject(object1) );
         if (obj1 != NULL ) {
-            qDebug() << "Connected Object 1 (" << object1 << ").";
+            // qDebug() << "Connected Object 1 (" << object1 << ").";
             connect(obj1, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateNeedle1(UAVObject*)));
             field1 = nfield1;
         } else {
@@ -96,7 +96,7 @@ void DialGadgetWidget::connectNeedles(QString object1, QString nfield1,
     if (!(object2.isEmpty() || nfield2.isEmpty())) {
         obj2 = dynamic_cast<UAVDataObject*>( objManager->getObject(object2) );
         if (obj2 != NULL ) {
-            qDebug() << "Connected Object 2 (" << object2 << ").";
+            // qDebug() << "Connected Object 2 (" << object2 << ").";
             connect(obj2, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateNeedle2(UAVObject*)));
             field2 = nfield2;
         } else {
@@ -108,7 +108,7 @@ void DialGadgetWidget::connectNeedles(QString object1, QString nfield1,
     if (!(object3.isEmpty() || nfield3.isEmpty())) {
         obj3 = dynamic_cast<UAVDataObject*>( objManager->getObject(object3) );
         if (obj3 != NULL ) {
-            qDebug() << "Connected Object 3 (" << object3 << ").";
+            // qDebug() << "Connected Object 3 (" << object3 << ").";
             connect(obj3, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateNeedle3(UAVObject*)));
             field3 = nfield3;
         } else {

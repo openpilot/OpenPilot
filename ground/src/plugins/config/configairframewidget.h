@@ -48,7 +48,12 @@ public:
 private:
     Ui_AircraftWidget *m_aircraft;
     bool setupFrameFixedWing();
+    bool setupFrameElevon();
     void resetField(UAVObjectField * field);
+    void resetActuators();
+    QStringList mixerTypes;
+    QStringList mixerVectors;
+
 
 
 private slots:

@@ -50,6 +50,14 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
     UAVObjectField *field = obj->getField(fieldName);
     m_aircraft->aircraftType->addItems(field->getOptions());
     */
+
+    mixerTypes << "Mixer0Type" << "Mixer1Type" << "Mixer2Type" << "Mixer3Type"
+            << "Mixer4Type" << "Mixer5Type" << "Mixer6Type" << "Mixer7Type";
+    mixerVectors << "Mixer0Vector" << "Mixer1Vector" << "Mixer2Vector" << "Mixer3Vector"
+            << "Mixer4Vector" << "Mixer5Vector" << "Mixer6Vector" << "Mixer7Vector";
+
+
+
     QStringList airframeTypes;
     airframeTypes << "Fixed Wing" << "Multirotor" << "Helicopter" << "Custom";
     m_aircraft->aircraftType->addItems(airframeTypes);
@@ -236,24 +244,10 @@ void ConfigAirframeWidget::resetField(UAVObjectField * field)
 }
 
 /**
-  Setup Elevator/Aileron/Rudder airframe.
-
-   If both Aileron channels are set to 'None' (EasyStar), do Pitch/Rudder mixing
-
-   Returns False if impossible to create the mixer.
+  Reset actuator values
   */
-bool ConfigAirframeWidget::setupFrameFixedWing()
+void ConfigAirframeWidget::resetActuators()
 {
-    // Check coherence:
-    // - At least Pitch and either Roll or Yaw
-    if (m_aircraft->fwElevator1Channel->currentText() == "None" ||
-        ((m_aircraft->fwAileron1Channel->currentText() == "None") &&
-        (m_aircraft->fwRudderChannel->currentText() == "None"))) {
-        // TODO: explain the problem in the UI
-        m_aircraft->fwStatusLabel->setText("WARNING: check channel assignment");
-        return false;
-    }
-    // Now setup the channels:
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
     Q_ASSERT(obj);
     QList<UAVObjectField*> fieldList = obj->getFields();
@@ -265,6 +259,33 @@ bool ConfigAirframeWidget::setupFrameFixedWing()
             field->setValue(field->getOptions().last());
         }
     }
+}
+
+/**
+  Setup Elevator/Aileron/Rudder airframe.
+
+   If both Aileron channels are set to 'None' (EasyStar), do Pitch/Rudder mixing
+
+   Returns False if impossible to create the mixer.
+  */
+bool ConfigAirframeWidget::setupFrameFixedWing()
+{
+    // Check coherence:
+    // - At least Pitch and either Roll or Yaw
+    if (m_aircraft->fwEngineChannel->currentText() == "None" ||
+        m_aircraft->fwElevator1Channel->currentText() == "None" ||
+        ((m_aircraft->fwAileron1Channel->currentText() == "None") &&
+        (m_aircraft->fwRudderChannel->currentText() == "None"))) {
+        // TODO: explain the problem in the UI
+        m_aircraft->fwStatusLabel->setText("WARNING: check channel assignment");
+        return false;
+    }
+    // Now setup the channels:
+    resetActuators();
+
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
+    Q_ASSERT(obj);
+
     // Elevator
     UAVObjectField *field = obj->getField("FixedWingPitch1");
     Q_ASSERT(field);
@@ -304,12 +325,6 @@ bool ConfigAirframeWidget::setupFrameFixedWing()
     // - Channel dropdowns start with 'None', then 0 to 7
 
     // 1. Assign the servo/motor/none for each channel
-    QStringList mixerTypes;
-    mixerTypes << "Mixer0Type" << "Mixer1Type" << "Mixer2Type" << "Mixer3Type"
-            << "Mixer4Type" << "Mixer5Type" << "Mixer6Type" << "Mixer7Type";
-    QStringList mixerVectors;
-    mixerVectors << "Mixer0Vector" << "Mixer1Vector" << "Mixer2Vector" << "Mixer3Vector"
-            << "Mixer4Vector" << "Mixer5Vector" << "Mixer6Vector" << "Mixer7Vector";
     // Disable all
     foreach(QString mixer, mixerTypes) {
         field = obj->getField(mixer);
@@ -391,14 +406,112 @@ bool ConfigAirframeWidget::setupFrameFixedWing()
 /**
   Setup Elevon
   */
-/*
-void ConfigAirframeWidget::setupFrameElevon()
+bool ConfigAirframeWidget::setupFrameElevon()
 {
     // Check coherence:
-    // - At least Aileron1 and Aileron 2
+    // - At least Aileron1 and Aileron 2, and engine
+    if (m_aircraft->fwEngineChannel->currentText() == "None" ||
+        m_aircraft->fwAileron1Channel->currentText() == "None" ||
+        m_aircraft->fwAileron2Channel->currentText() == "None") {
+        // TODO: explain the problem in the UI
+        m_aircraft->fwStatusLabel->setText("WARNING: check channel assignment");
+        return false;
+    }
 
+    resetActuators();
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
+    Q_ASSERT(obj);
+
+    // Elevons
+    UAVObjectField *field = obj->getField("FixedWingRoll1");
+    Q_ASSERT(field);
+    field->setValue(m_aircraft->fwAileron1Channel->currentText());
+    field = obj->getField("FixedWingRoll2");
+    Q_ASSERT(field);
+    field->setValue(m_aircraft->fwAileron2Channel->currentText());
+    // Rudder (can be None)
+    field = obj->getField("FixedWingYaw");
+    Q_ASSERT(field);
+    field->setValue(m_aircraft->fwRudderChannel->currentText());
+    // Throttle
+    field = obj->getField("FixedWingThrottle");
+    Q_ASSERT(field);
+    field->setValue(m_aircraft->fwEngineChannel->currentText());
+
+    obj->updated();
+
+    // Save the curve:
+    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    Q_ASSERT(obj);
+    field = obj->getField("ThrottleCurve1");
+    QList<double> curve = m_aircraft->fixedWingThrottle->getCurve();
+    for (int i=0;i<curve.length();i++) {
+        field->setValue(curve.at(i),i);
+    }
+
+    // ... and compute the matrix:
+    // In order to make code a bit nicer, we assume:
+    // - Channel dropdowns start with 'None', then 0 to 7
+
+    // 1. Assign the servo/motor/none for each channel
+    // Disable all
+    foreach(QString mixer, mixerTypes) {
+        field = obj->getField(mixer);
+        Q_ASSERT(field);
+        field->setValue("Disabled");
+    }
+    // and set only the relevant channels:
+    // Engine
+    int eng = m_aircraft->fwEngineChannel->currentIndex()-1;
+    field = obj->getField(mixerTypes.at(eng));
+    field->setValue("Motor");
+    field = obj->getField(mixerVectors.at(eng));
+    // First of all reset the vector
+    resetField(field);
+    int ti = field->getElementNames().indexOf("ThrottleCurve1");
+    field->setValue(1, ti);
+
+    // Rudder
+    eng = m_aircraft->fwRudderChannel->currentIndex()-1;
+    // eng will be -1 if rudder is set to "None"
+    if (eng > -1) {
+        field = obj->getField(mixerTypes.at(eng));
+        field->setValue("Servo");
+        field = obj->getField(mixerVectors.at(eng));
+        resetField(field);
+        ti = field->getElementNames().indexOf("Yaw");
+        field->setValue(1, ti);
+    } // Else: we have no rudder, only elevons, we're fine with it.
+
+    eng = m_aircraft->fwAileron1Channel->currentIndex()-1;
+    if (eng > -1) {
+        field = obj->getField(mixerTypes.at(eng));
+        field->setValue("Servo");
+        field = obj->getField(mixerVectors.at(eng));
+        resetField(field);
+        ti = field->getElementNames().indexOf("Pitch");
+        field->setValue(1, ti);
+        ti = field->getElementNames().indexOf("Roll");
+        field->setValue(1,ti);
+    }
+
+    eng = m_aircraft->fwAileron2Channel->currentIndex()-1;
+    if (eng > -1) {
+        field = obj->getField(mixerTypes.at(eng));
+        field->setValue("Servo");
+        field = obj->getField(mixerVectors.at(eng));
+        resetField(field);
+        ti = field->getElementNames().indexOf("Pitch");
+        field->setValue(1, ti);
+        ti = field->getElementNames().indexOf("Roll");
+        field->setValue(-1,ti);
+    }
+
+    obj->updated();
+    m_aircraft->fwStatusLabel->setText("Mixer generated");
+    return true;
 }
-*/
+
 
 /**
   Sends the config to the board (airframe type)
@@ -412,11 +525,12 @@ void ConfigAirframeWidget::sendAircraftUpdate()
         if (m_aircraft->fixedWingType->currentText() == "Elevator aileron rudder" ) {
             airframeType = "FixedWing";
             setupFrameFixedWing();
-
         } else if (m_aircraft->fixedWingType->currentText() == "Elevon") {
             airframeType = "FixedWingElevon";
+            setupFrameElevon();
         } else { // Vtail
             airframeType = "FixedWingVtail";
+            m_aircraft->fwStatusLabel->setText("Mixed Not Implemented");
         }
     } else {
         airframeType = "FixedWing";

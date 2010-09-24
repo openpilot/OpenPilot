@@ -1,6 +1,6 @@
 include(../../../openpilotgcs.pri)
 
-LANGUAGES = de es fr it ru
+LANGUAGES = de es fr it ru cn
 
 # var, prepend, append
 defineReplace(prependAll) {

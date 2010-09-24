@@ -69,7 +69,7 @@
       <item>
        <widget class="QStackedWidget" name="stackedWidget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>3</number>
         </property>
         <widget class="QWidget" name="fixedWing">
          <property name="enabled">
@@ -78,14 +78,7 @@
          <property name="autoFillBackground">
           <bool>false</bool>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1">
-          <item>
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>Fixed Wing</string>
-            </property>
-           </widget>
-          </item>
+         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0">
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_6">
             <item>
@@ -99,12 +92,12 @@
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>Airframe type:</string>
+                 <string>Airplane type:</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QComboBox" name="comboBox"/>
+               <widget class="QComboBox" name="fixedWingType"/>
               </item>
               <item>
                <spacer name="horizontalSpacer_3">
@@ -118,6 +111,136 @@
                  </size>
                 </property>
                </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_7">
+              <property name="text">
+               <string>Channel Assignment</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <item>
+               <layout class="QFormLayout" name="formLayout">
+                <property name="fieldGrowthPolicy">
+                 <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+                </property>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="fwEngineLabel">
+                  <property name="text">
+                   <string>Engine</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QComboBox" name="fwEngineChannel"/>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="fwAileron1Label">
+                  <property name="text">
+                   <string>Aileron 1</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QComboBox" name="fwAileron1Channel"/>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QLabel" name="fwAileron2Label">
+                  <property name="text">
+                   <string>Aileron 2</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0">
+                 <widget class="QLabel" name="fwElevator1Label">
+                  <property name="text">
+                   <string>Elevator 1</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="1">
+                 <widget class="QComboBox" name="fwElevator1Channel"/>
+                </item>
+                <item row="5" column="0">
+                 <widget class="QLabel" name="fwRudderLabel">
+                  <property name="text">
+                   <string>Rudder</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="1">
+                 <widget class="QComboBox" name="fwRudderChannel"/>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QComboBox" name="fwAileron2Channel"/>
+                </item>
+                <item row="4" column="0">
+                 <widget class="QLabel" name="fwElevator2Label">
+                  <property name="text">
+                   <string>Elevator 2</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="1">
+                 <widget class="QComboBox" name="fwElevator2Channel"/>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_4">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <layout class="QVBoxLayout" name="verticalLayout_7">
+                <item>
+                 <widget class="QLabel" name="label_13">
+                  <property name="text">
+                   <string>Throttle Curve</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="MixerCurveWidget" name="fixedWingThrottle" native="true">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>100</width>
+                    <height>100</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>250</width>
+                    <height>250</height>
+                   </size>
+                  </property>
+                  <property name="sizeIncrement">
+                   <size>
+                    <width>10</width>
+                    <height>10</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
              </layout>
             </item>
@@ -148,7 +271,55 @@
            </widget>
           </item>
           <item>
-           <layout class="QFormLayout" name="formLayout_2"/>
+           <layout class="QVBoxLayout" name="verticalLayout_8">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <item>
+               <widget class="QLabel" name="label_15">
+                <property name="text">
+                 <string>Frame type:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="multirotorFrameType"/>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_14">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
@@ -171,6 +342,17 @@
              </widget>
             </item>
            </layout>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="custom">
+         <layout class="QVBoxLayout" name="verticalLayout_9">
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Custom / Advanced setup UI</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -228,6 +410,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MixerCurveWidget</class>
+   <extends>QWidget</extends>
+   <header>mixercurvewidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

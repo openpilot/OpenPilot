@@ -46,12 +46,15 @@ public:
     ~ConfigAirframeWidget();
 
 private:
-        Ui_AircraftWidget *m_aircraft;
+    Ui_AircraftWidget *m_aircraft;
+    bool setupFrameFixedWing();
 
-    private slots:
-        void requestAircraftUpdate();
-        void sendAircraftUpdate();
-        void saveAircraftUpdate();
+
+private slots:
+    void requestAircraftUpdate();
+    void sendAircraftUpdate();
+    void saveAircraftUpdate();
+    void setupAirframeUI(QString type);
 
 };
 

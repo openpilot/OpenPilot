@@ -67,12 +67,6 @@ MixerCurveWidget::MixerCurveWidget(QWidget *parent) : QGraphicsView(parent)
     scene->setSceneRect(plot->boundingRect());
     setScene(scene);
 
-    QList<double> list;
-    list << 0 << 0.3 << 0.6 << -0.4 << -0.8;
-    initCurve(list);
-
-    qDebug() << getCurve();
-
 }
 
 MixerCurveWidget::~MixerCurveWidget()

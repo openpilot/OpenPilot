@@ -50,8 +50,6 @@ public:
     int type() const { return Type; }
 
     void verticalMove(bool flag);
-    void calculateForces();
-    bool advance();
 
     QRectF boundingRect() const;
     QPainterPath shape() const;

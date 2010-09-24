@@ -47,8 +47,14 @@ _fields = [ \
 		{
 			'0' : 'FixedWing',
 			'1' : 'FixedWingElevon',
-			'2' : 'VTOL',
-			'3' : 'HeliCP',
+			'2' : 'FixedWingVtail',
+			'3' : 'VTOL',
+			'4' : 'HeliCP',
+			'5' : 'QuadX',
+			'6' : 'QuadP',
+			'7' : 'Hexa',
+			'8' : 'Octo',
+			'9' : 'Custom',
 		}
 	),
 ]

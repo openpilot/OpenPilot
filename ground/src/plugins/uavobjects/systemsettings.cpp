@@ -47,8 +47,14 @@ SystemSettings::SystemSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS,
     QStringList AirframeTypeEnumOptions;
     AirframeTypeEnumOptions.append("FixedWing");
     AirframeTypeEnumOptions.append("FixedWingElevon");
+    AirframeTypeEnumOptions.append("FixedWingVtail");
     AirframeTypeEnumOptions.append("VTOL");
     AirframeTypeEnumOptions.append("HeliCP");
+    AirframeTypeEnumOptions.append("QuadX");
+    AirframeTypeEnumOptions.append("QuadP");
+    AirframeTypeEnumOptions.append("Hexa");
+    AirframeTypeEnumOptions.append("Octo");
+    AirframeTypeEnumOptions.append("Custom");
     fields.append( new UAVObjectField(QString("AirframeType"), QString(""), UAVObjectField::ENUM, AirframeTypeElemNames, AirframeTypeEnumOptions) );
 
     // Initialize object

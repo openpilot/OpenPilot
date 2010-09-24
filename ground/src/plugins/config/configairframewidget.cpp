@@ -41,25 +41,46 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
     m_aircraft->setupUi(this);
 
     // Now connect the widget to the ManualControlCommand / Channel UAVObject
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+/*
+       ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
-    /*
-    UAVObject *obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("SystemSettings")));
+      UAVObject *obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("SystemSettings")));
     QString fieldName = QString("AirframeType");
     UAVObjectField *field = obj->getField(fieldName);
     m_aircraft->aircraftType->addItems(field->getOptions());
     */
     QStringList airframeTypes;
-    airframeTypes << "Fixed Wing" << "Multirotor" << "Helicopter";
+    airframeTypes << "Fixed Wing" << "Multirotor" << "Helicopter" << "Custom";
     m_aircraft->aircraftType->addItems(airframeTypes);
     m_aircraft->aircraftType->setCurrentIndex(1);
+
+    QStringList fixedWingTypes;
+    fixedWingTypes << "Elevator aileron rudder" << "Elevon" << "Vtail";
+    m_aircraft->fixedWingType->addItems(fixedWingTypes);
+
+    QStringList multiRotorTypes;
+    multiRotorTypes << "Quad +" << "Quad X" << "Hexacopter" << "Octocopter";
+    m_aircraft->multirotorFrameType->addItems(multiRotorTypes);
+
+    QStringList channels;
+    channels << "None" << "Channel0" << "Channel1" << "Channel2" <<
+            "Channel3" << "Channel4" << "Channel5" << "Channel6" << "Channel7";
+    // Now load all the channel assignements for fixed wing
+    m_aircraft->fwElevator1Channel->addItems(channels);
+    m_aircraft->fwElevator2Channel->addItems(channels);
+    m_aircraft->fwEngineChannel->addItems(channels);
+    m_aircraft->fwRudderChannel->addItems(channels);
+    m_aircraft->fwAileron1Channel->addItems(channels);
+    m_aircraft->fwAileron2Channel->addItems(channels);
+
 
 
     requestAircraftUpdate();
     connect(m_aircraft->saveAircraftToSD, SIGNAL(clicked()), this, SLOT(saveAircraftUpdate()));
     connect(m_aircraft->saveAircraftToRAM, SIGNAL(clicked()), this, SLOT(sendAircraftUpdate()));
     connect(m_aircraft->getAircraftCurrent, SIGNAL(clicked()), this, SLOT(requestAircraftUpdate()));
+    connect(m_aircraft->fixedWingType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupAirframeUI(QString)));
 
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestAircraftUpdate()));
 
@@ -87,10 +108,207 @@ void ConfigAirframeWidget::requestAircraftUpdate()
     Q_ASSERT(obj);
     obj->requestUpdate();
     UAVObjectField *field = obj->getField(QString("AirframeType"));
-    m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText(field->getValue().toString()));
+    Q_ASSERT(field);
+//    m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText(field->getValue().toString()));
+    // At this stage, we will need to have some hardcoded settings in this code, this
+    // is not ideal, but here you go.
+    QString frameType = field->getValue().toString();
+    setupAirframeUI(frameType);
+
+    // Load the throttle curve for fixed wing frames:
+    if (frameType.startsWith("FixedWing")) {
+        obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("MixerSettings")));
+        Q_ASSERT(obj);
+        obj->requestUpdate();
+        field = obj->getField(QString("ThrottleCurve1"));
+        Q_ASSERT(field);
+        QList<double> curveValues;
+        // If the 1st element of the curve is <= -10, then the curve
+        // is a straight line (that's how the mixer works on the mainboard):
+        if (field->getValue(0).toInt() <= -10) {
+            for (double i=0; i<field->getNumElements(); i++) {
+                curveValues.append(-1.0 + 2*i/(field->getNumElements()-1));
+            }
+        } else {
+            for (unsigned int i=0; i < field->getNumElements(); i++) {
+                curveValues.append(field->getValue(i).toDouble());
+            }
+        }
+        m_aircraft->fixedWingThrottle->initCurve(curveValues);
+        // Then retrieve how channels are setup
+        obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
+        Q_ASSERT(obj);
+        field = obj->getField(QString("FixedWingThrottle"));
+        Q_ASSERT(field);
+        m_aircraft->fwEngineChannel->setCurrentIndex(m_aircraft->fwEngineChannel->findText(field->getValue().toString()));
+        field = obj->getField(QString("FixedWingRoll1"));
+        Q_ASSERT(field);
+        m_aircraft->fwAileron1Channel->setCurrentIndex(m_aircraft->fwAileron1Channel->findText(field->getValue().toString()));
+        field = obj->getField(QString("FixedWingRoll2"));
+        Q_ASSERT(field);
+        m_aircraft->fwAileron2Channel->setCurrentIndex(m_aircraft->fwAileron2Channel->findText(field->getValue().toString()));
+        field = obj->getField(QString("FixedWingPitch1"));
+        Q_ASSERT(field);
+        m_aircraft->fwElevator1Channel->setCurrentIndex(m_aircraft->fwElevator1Channel->findText(field->getValue().toString()));
+        field = obj->getField(QString("FixedWingPitch2"));
+        Q_ASSERT(field);
+        m_aircraft->fwElevator2Channel->setCurrentIndex(m_aircraft->fwElevator2Channel->findText(field->getValue().toString()));
+        field = obj->getField(QString("FixedWingYaw"));
+        Q_ASSERT(field);
+        m_aircraft->fwRudderChannel->setCurrentIndex(m_aircraft->fwRudderChannel->findText(field->getValue().toString()));
+
+    }
 
 }
 
+/**
+  \brief Sets up the mixer depending on Airframe type. Accepts either system settings or
+  combo box entry from airframe type, as those do not overlap.
+  */
+void ConfigAirframeWidget::setupAirframeUI(QString frameType)
+{
+    if (frameType == "FixedWing" || frameType == "Elevator aileron rudder") {
+        // Setup the UI
+        m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Fixed Wing"));
+        m_aircraft->fixedWingType->setCurrentIndex(m_aircraft->fixedWingType->findText("Elevator aileron rudder"));
+        m_aircraft->fwRudderChannel->setEnabled(true);
+        m_aircraft->fwRudderLabel->setEnabled(true);
+        m_aircraft->fwElevator1Channel->setEnabled(true);
+        m_aircraft->fwElevator1Label->setEnabled(true);
+        m_aircraft->fwElevator2Channel->setEnabled(true);
+        m_aircraft->fwElevator2Label->setEnabled(true);
+
+    } else if (frameType == "FixedWingElevon" || frameType == "Elevon") {
+        m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Fixed Wing"));
+        m_aircraft->fixedWingType->setCurrentIndex(m_aircraft->fixedWingType->findText("Elevon"));
+        m_aircraft->fwElevator1Channel->setEnabled(false);
+        m_aircraft->fwElevator1Label->setEnabled(false);
+        m_aircraft->fwElevator2Channel->setEnabled(false);
+        m_aircraft->fwElevator2Label->setEnabled(false);
+        m_aircraft->fwRudderChannel->setEnabled(true);
+        m_aircraft->fwRudderLabel->setEnabled(true);
+
+            } else if (frameType == "FixedWingVtail" || frameType == "Vtail") {
+        m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Fixed Wing"));
+        m_aircraft->fixedWingType->setCurrentIndex(m_aircraft->fixedWingType->findText("Vtail"));
+        m_aircraft->fwRudderChannel->setEnabled(false);
+        m_aircraft->fwRudderLabel->setEnabled(false);
+        m_aircraft->fwElevator1Channel->setEnabled(true);
+        m_aircraft->fwElevator1Label->setEnabled(true);
+        m_aircraft->fwElevator2Channel->setEnabled(true);
+        m_aircraft->fwElevator2Label->setEnabled(true);
+    }
+
+}
+
+/**
+  Setup Elevator/Aileron/Rudder airframe.
+
+   If both Aileron channels are set to 'None' (EasyStar), do Pitch/Rudder mixing
+
+   Returns False if impossible to create the mixer.
+  */
+bool ConfigAirframeWidget::setupFrameFixedWing()
+{
+    // Check coherence:
+    // - At least Pitch and either Roll or Yaw
+    if (m_aircraft->fwElevator1Channel->currentText() == "None" ||
+        ((m_aircraft->fwAileron1Channel->currentText() == "None") &&
+        (m_aircraft->fwRudderChannel->currentText() == "None"))) {
+        // TODO: explain the problem in the UI
+        return false;
+    }
+    // Now setup the channels:
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
+    Q_ASSERT(obj);
+    QList<UAVObjectField*> fieldList = obj->getFields();
+    foreach (UAVObjectField* field, fieldList) {
+        // NOTE: we assume that all options in ActuatorSettings are a channel assignement
+        // except for the options called "ChannelXXX"
+        if (field->getUnits().contains("channel")) {
+            field->setValue(field->getOptions().last());
+        }
+    }
+    // Elevator
+    UAVObjectField *field = obj->getField("FixedWingPitch1");
+    Q_ASSERT(field);
+    field->setValue(m_aircraft->fwElevator1Channel->currentText());
+    field = obj->getField("FixedWingPitch2");
+    Q_ASSERT(field);
+    field->setValue(m_aircraft->fwElevator2Channel->currentText());
+    // Aileron
+    field = obj->getField("FixedWingRoll1");
+    Q_ASSERT(field);
+    field->setValue(m_aircraft->fwAileron1Channel->currentText());
+    field = obj->getField("FixedWingRoll2");
+    Q_ASSERT(field);
+    field->setValue(m_aircraft->fwAileron2Channel->currentText());
+    // Rudder
+    field = obj->getField("FixedWingYaw");
+    Q_ASSERT(field);
+    field->setValue(m_aircraft->fwRudderChannel->currentText());
+    // Throttle
+    field = obj->getField("FixedWingThrottle");
+    Q_ASSERT(field);
+    field->setValue(m_aircraft->fwEngineChannel->currentText());
+
+    obj->updated();
+
+    // Save the curve:
+    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    Q_ASSERT(obj);
+    field = obj->getField("ThrottleCurve1");
+    QList<double> curve = m_aircraft->fixedWingThrottle->getCurve();
+    for (int i=0;i<curve.length();i++) {
+        field->setValue(curve.at(i),i);
+    }
+
+    // ... and compute the matrix:
+    // In order to make code a bit nicer, we assume:
+    // - Channel dropdowns start with 'None', then 0 to 7
+
+    // 1. Assign the servo/motor/none for each channel
+    QStringList mixerTypes;
+    mixerTypes << "Mixer0Type" << "Mixer1Type" << "Mixer2Type" << "Mixer3Type"
+            << "Mixer4Type" << "Mixer5Type" << "Mixer6Type" << "Mixer7Type";
+    QStringList mixerVectors;
+    mixerVectors << "Mixer0Vector" << "Mixer1Vector" << "Mixer2Vector" << "Mixer3Vector"
+            << "Mixer4Vector" << "Mixer5Vector" << "Mixer6Vector" << "Mixer7Vector";
+    // Disable all
+    foreach(QString mixer, mixerTypes) {
+        field = obj->getField(mixer);
+        Q_ASSERT(field);
+        field->setValue("Disabled");
+    }
+    // and set only the relevant channels:
+    // Engine
+    int eng = m_aircraft->fwEngineChannel->currentIndex()-1;
+    field = obj->getField(mixerTypes.at(eng));
+    field->setValue("Motor");
+    field = obj->getField(mixerVectors.at(eng));
+    // First of all reset the vector
+    for (int i=0;i<field->getNumElements();i++) {
+        field->setValue(0,i);
+    }
+    int ti = field->getElementNames().indexOf("ThrottleCurve1");
+    field->setValue(1, ti);
+
+    obj->updated();
+    return true;
+}
+
+
+/**
+  Setup Elevon
+  */
+/*
+void ConfigAirframeWidget::setupFrameElevon()
+{
+    // Check coherence:
+    // - At least Aileron1 and Aileron 2
+
+}
+*/
 
 /**
   Sends the config to the board (airframe type)
@@ -99,10 +317,25 @@ void ConfigAirframeWidget::sendAircraftUpdate()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    QString airframeType;
+    if (m_aircraft->aircraftType->currentText() == "Fixed Wing") {
+        if (m_aircraft->fixedWingType->currentText() == "Elevator aileron rudder" ) {
+            airframeType = "FixedWing";
+            setupFrameFixedWing();
+
+        } else if (m_aircraft->fixedWingType->currentText() == "Elevon") {
+            airframeType = "FixedWingElevon";
+        } else { // Vtail
+            airframeType = "FixedWingVtail";
+        }
+    } else {
+        airframeType = "FixedWing";
+    }
+
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("SystemSettings")));
     Q_ASSERT(obj);
     UAVObjectField* field = obj->getField(QString("AirframeType"));
-    field->setValue(m_aircraft->aircraftType->currentText());
+    field->setValue(airframeType);
     obj->updated();
 }
 

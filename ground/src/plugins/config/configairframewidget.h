@@ -48,6 +48,7 @@ public:
 private:
     Ui_AircraftWidget *m_aircraft;
     bool setupFrameFixedWing();
+    void resetField(UAVObjectField * field);
 
 
 private slots:
@@ -55,6 +56,8 @@ private slots:
     void sendAircraftUpdate();
     void saveAircraftUpdate();
     void setupAirframeUI(QString type);
+    void toggleAileron2(int index);
+    void toggleElevator2(int index);
 
 };
 

@@ -81,6 +81,8 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
     connect(m_aircraft->saveAircraftToRAM, SIGNAL(clicked()), this, SLOT(sendAircraftUpdate()));
     connect(m_aircraft->getAircraftCurrent, SIGNAL(clicked()), this, SLOT(requestAircraftUpdate()));
     connect(m_aircraft->fixedWingType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupAirframeUI(QString)));
+    connect(m_aircraft->fwAileron1Channel, SIGNAL(currentIndexChanged(int)), this, SLOT(toggleAileron2(int)));
+    connect(m_aircraft->fwElevator1Channel, SIGNAL(currentIndexChanged(int)), this, SLOT(toggleElevator2(int)));
 
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestAircraftUpdate()));
 
@@ -91,6 +93,27 @@ ConfigAirframeWidget::~ConfigAirframeWidget()
    // Do nothing
 }
 
+void ConfigAirframeWidget::toggleAileron2(int index)
+{
+    if (index) {
+        m_aircraft->fwAileron2Channel->setEnabled(true);
+        m_aircraft->fwAileron2Label->setEnabled(true);
+    } else {
+        m_aircraft->fwAileron2Channel->setEnabled(false);
+        m_aircraft->fwAileron2Label->setEnabled(false);
+    }
+}
+
+void ConfigAirframeWidget::toggleElevator2(int index)
+{
+    if (index) {
+        m_aircraft->fwElevator2Channel->setEnabled(true);
+        m_aircraft->fwElevator2Label->setEnabled(true);
+    } else {
+        m_aircraft->fwElevator2Channel->setEnabled(false);
+        m_aircraft->fwElevator2Label->setEnabled(false);
+    }
+}
 
 /**************************
   * Aircraft settings
@@ -175,8 +198,8 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         m_aircraft->fwRudderLabel->setEnabled(true);
         m_aircraft->fwElevator1Channel->setEnabled(true);
         m_aircraft->fwElevator1Label->setEnabled(true);
-        m_aircraft->fwElevator2Channel->setEnabled(true);
-        m_aircraft->fwElevator2Label->setEnabled(true);
+        //m_aircraft->fwElevator2Channel->setEnabled(true);
+        //m_aircraft->fwElevator2Label->setEnabled(true);
 
     } else if (frameType == "FixedWingElevon" || frameType == "Elevon") {
         m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Fixed Wing"));
@@ -195,8 +218,19 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         m_aircraft->fwRudderLabel->setEnabled(false);
         m_aircraft->fwElevator1Channel->setEnabled(true);
         m_aircraft->fwElevator1Label->setEnabled(true);
-        m_aircraft->fwElevator2Channel->setEnabled(true);
-        m_aircraft->fwElevator2Label->setEnabled(true);
+        //m_aircraft->fwElevator2Channel->setEnabled(true);
+        //m_aircraft->fwElevator2Label->setEnabled(true);
+    }
+
+}
+
+/**
+  Reset the contents of a field
+  */
+void ConfigAirframeWidget::resetField(UAVObjectField * field)
+{
+    for (unsigned int i=0;i<field->getNumElements();i++) {
+        field->setValue(0,i);
     }
 
 }
@@ -216,12 +250,14 @@ bool ConfigAirframeWidget::setupFrameFixedWing()
         ((m_aircraft->fwAileron1Channel->currentText() == "None") &&
         (m_aircraft->fwRudderChannel->currentText() == "None"))) {
         // TODO: explain the problem in the UI
+        m_aircraft->fwStatusLabel->setText("WARNING: check channel assignment");
         return false;
     }
     // Now setup the channels:
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
     Q_ASSERT(obj);
     QList<UAVObjectField*> fieldList = obj->getFields();
+    // Reset all assignements first:
     foreach (UAVObjectField* field, fieldList) {
         // NOTE: we assume that all options in ActuatorSettings are a channel assignement
         // except for the options called "ChannelXXX"
@@ -287,13 +323,67 @@ bool ConfigAirframeWidget::setupFrameFixedWing()
     field->setValue("Motor");
     field = obj->getField(mixerVectors.at(eng));
     // First of all reset the vector
-    for (int i=0;i<field->getNumElements();i++) {
-        field->setValue(0,i);
-    }
+    resetField(field);
     int ti = field->getElementNames().indexOf("ThrottleCurve1");
     field->setValue(1, ti);
 
+    // Rudder
+    eng = m_aircraft->fwRudderChannel->currentIndex()-1;
+    // eng will be -1 if rudder is set to "None"
+    if (eng > -1) {
+        field = obj->getField(mixerTypes.at(eng));
+        field->setValue("Servo");
+        field = obj->getField(mixerVectors.at(eng));
+        resetField(field);
+        ti = field->getElementNames().indexOf("Yaw");
+        field->setValue(1, ti);
+    } // Else: we have no rudder, only ailerons, we're fine with it.
+
+    // Ailerons
+    eng = m_aircraft->fwAileron1Channel->currentIndex()-1;
+    if (eng > -1) {
+        field = obj->getField(mixerTypes.at(eng));
+        field->setValue("Servo");
+        field = obj->getField(mixerVectors.at(eng));
+        resetField(field);
+        ti = field->getElementNames().indexOf("Roll");
+        field->setValue(1, ti);
+        // Only set Aileron 2 if Aileron 1 is defined
+        eng = m_aircraft->fwAileron2Channel->currentIndex()-1;
+        if (eng > -1) {
+            field = obj->getField(mixerTypes.at(eng));
+            field->setValue("Servo");
+            field = obj->getField(mixerVectors.at(eng));
+            resetField(field);
+            ti = field->getElementNames().indexOf("Roll");
+            field->setValue(1, ti);
+        }
+    }
+
+    // Elevator
+    eng = m_aircraft->fwElevator1Channel->currentIndex()-1;
+    if (eng > -1) {
+        field = obj->getField(mixerTypes.at(eng));
+        field->setValue("Servo");
+        field = obj->getField(mixerVectors.at(eng));
+        resetField(field);
+        ti = field->getElementNames().indexOf("Pitch");
+        field->setValue(1, ti);
+        // Only set Elevator 2 if Aileron 1 is defined
+        eng = m_aircraft->fwElevator2Channel->currentIndex()-1;
+        if (eng > -1) {
+            field = obj->getField(mixerTypes.at(eng));
+            field->setValue("Servo");
+            field = obj->getField(mixerVectors.at(eng));
+            resetField(field);
+            ti = field->getElementNames().indexOf("Pitch");
+            field->setValue(1, ti);
+        }
+    }
+
     obj->updated();
+    m_aircraft->fwStatusLabel->setText("Mixer generated");
+
     return true;
 }
 

@@ -69,7 +69,7 @@
       <item>
        <widget class="QStackedWidget" name="stackedWidget">
         <property name="currentIndex">
-         <number>3</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="fixedWing">
          <property name="enabled">
@@ -112,6 +112,19 @@
                 </property>
                </spacer>
               </item>
+              <item>
+               <widget class="QLabel" name="fwStatusLabel">
+                <property name="font">
+                 <font>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Mixer OK</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </item>
             <item>
@@ -150,6 +163,9 @@
                 </item>
                 <item row="2" column="0">
                  <widget class="QLabel" name="fwAileron2Label">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="text">
                    <string>Aileron 2</string>
                   </property>
@@ -176,17 +192,28 @@
                  <widget class="QComboBox" name="fwRudderChannel"/>
                 </item>
                 <item row="2" column="1">
-                 <widget class="QComboBox" name="fwAileron2Channel"/>
+                 <widget class="QComboBox" name="fwAileron2Channel">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
                 </item>
                 <item row="4" column="0">
                  <widget class="QLabel" name="fwElevator2Label">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="text">
                    <string>Elevator 2</string>
                   </property>
                  </widget>
                 </item>
                 <item row="4" column="1">
-                 <widget class="QComboBox" name="fwElevator2Channel"/>
+                 <widget class="QComboBox" name="fwElevator2Channel">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>

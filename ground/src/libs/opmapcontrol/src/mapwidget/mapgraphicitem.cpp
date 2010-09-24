@@ -154,6 +154,9 @@ namespace mapcontrol
             transform.scale(MapRenderTransform,MapRenderTransform);
 
             painter->setWorldTransform(transform);
+            painter->setRenderHint(QPainter::SmoothPixmapTransform,true);
+            painter->setRenderHint(QPainter::HighQualityAntialiasing,true);
+
             {
                 DrawMap2D(painter);
             }
@@ -168,9 +171,20 @@ namespace mapcontrol
     {
         if(core->IsDragging())
         {
-            core->mouseCurrent.SetX(event->pos().x());
-            core->mouseCurrent.SetY(event->pos().y());
-
+            if(MapRenderTransform!=1)
+            {
+                qreal dx= (event->pos().x()-core->mouseDown.X())/(MapRenderTransform);
+                qreal dy= (event->pos().y()-core->mouseDown.Y())/(MapRenderTransform);
+                qreal nx=core->mouseDown.X()+dx;
+                qreal ny=core->mouseDown.Y()+dy;
+                core->mouseCurrent.SetX(nx);
+                core->mouseCurrent.SetY(ny);
+            }
+            else
+            {
+                core->mouseCurrent.SetX(event->pos().x());
+                core->mouseCurrent.SetY(event->pos().y());
+            }
             {
                 core->Drag(core->mouseCurrent);
             }
@@ -198,23 +212,23 @@ namespace mapcontrol
 
 
 
-            if(!IsMouseOverMarker())
+        if(!IsMouseOverMarker())
+        {
+            if(event->button() == config->DragButton && CanDragMap()&& !((event->modifiers()==Qt::AltModifier)||(event->modifiers()==Qt::ShiftModifier)))
             {
-                if(event->button() == config->DragButton && CanDragMap()&& !((event->modifiers()==Qt::AltModifier)||(event->modifiers()==Qt::ShiftModifier)))
-                {
-                    core->mouseDown.SetX(event->pos().x());
-                    core->mouseDown.SetY(event->pos().y());
+                core->mouseDown.SetX(event->pos().x());
+                core->mouseDown.SetY(event->pos().y());
 
 
-                    this->setCursor(Qt::SizeAllCursor);
+                this->setCursor(Qt::SizeAllCursor);
 
-                    core->BeginDrag(core->mouseDown);
-                    this->update();
+                core->BeginDrag(core->mouseDown);
+                this->update();
 
-                }
-                else if(!isSelected && ((event->modifiers()==Qt::AltModifier)||(event->modifiers()==Qt::ShiftModifier)))
-                {
-                    isSelected = true;
+            }
+            else if(!isSelected && ((event->modifiers()==Qt::AltModifier)||(event->modifiers()==Qt::ShiftModifier)))
+            {
+                isSelected = true;
                     SetSelectedArea (internals::RectLatLng::Empty);
                     selectionEnd = internals::PointLatLng::Empty;
                     selectionStart = FromLocalToLatLng(event->pos().x(), event->pos().y());

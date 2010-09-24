@@ -505,6 +505,8 @@ void OPDfuIni(uint8_t discover) {
 				}
 			}
 		}
+		else
+			PIOS_SPI_RC_PinSet(PIOS_OPAHRS_SPI, 0);
 	}
 	//TODO check other devices trough spi or whatever
 }

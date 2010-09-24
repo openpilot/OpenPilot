@@ -44,10 +44,17 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
+    /*
     UAVObject *obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("SystemSettings")));
     QString fieldName = QString("AirframeType");
     UAVObjectField *field = obj->getField(fieldName);
     m_aircraft->aircraftType->addItems(field->getOptions());
+    */
+    QStringList airframeTypes;
+    airframeTypes << "Fixed Wing" << "Multirotor" << "Helicopter";
+    m_aircraft->aircraftType->addItems(airframeTypes);
+    m_aircraft->aircraftType->setCurrentIndex(1);
+
 
     requestAircraftUpdate();
     connect(m_aircraft->saveAircraftToSD, SIGNAL(clicked()), this, SLOT(saveAircraftUpdate()));

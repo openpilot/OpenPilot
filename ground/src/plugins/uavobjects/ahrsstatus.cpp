@@ -88,6 +88,12 @@ AhrsStatus::AhrsStatus(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
     CommErrorsElemNames.append("HomeLocation");
     CommErrorsElemNames.append("Calibration");
     fields.append( new UAVObjectField(QString("CommErrors"), QString("count"), UAVObjectField::UINT8, CommErrorsElemNames, QStringList()) );
+    QStringList InitializedElemNames;
+    InitializedElemNames.append("0");
+    QStringList InitializedEnumOptions;
+    InitializedEnumOptions.append("FALSE");
+    InitializedEnumOptions.append("TRUE");
+    fields.append( new UAVObjectField(QString("Initialized"), QString(""), UAVObjectField::ENUM, InitializedElemNames, InitializedEnumOptions) );
     QStringList AlgorithmSetElemNames;
     AlgorithmSetElemNames.append("0");
     QStringList AlgorithmSetEnumOptions;

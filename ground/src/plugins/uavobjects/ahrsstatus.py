@@ -126,6 +126,18 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
+		'Initialized',
+		'b',
+		1,
+		[
+			'0',
+		],
+		{
+			'0' : 'FALSE',
+			'1' : 'TRUE',
+		}
+	),
+	uavobject.UAVObjectField(
 		'AlgorithmSet',
 		'b',
 		1,
@@ -166,7 +178,7 @@ _fields = [ \
 
 class AhrsStatus(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 1789860144
+    OBJID        = 4061809000
     NAME         = "AhrsStatus"
     METANAME     = "AhrsStatusMeta"
     ISSINGLEINST = 1

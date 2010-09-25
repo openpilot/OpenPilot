@@ -316,6 +316,25 @@ enum opahrs_result PIOS_OPAHRS_SetGetCalibration(struct opahrs_msg_v1 *req, stru
 	return opahrs_msg_v1_recv_rsp (OPAHRS_MSG_V1_RSP_CALIBRATION, rsp);
 }
 
+enum opahrs_result PIOS_OPAHRS_SetGetInitialized(struct opahrs_msg_v1 *req, struct opahrs_msg_v1 *rsp)
+{
+	enum opahrs_result rc;
+	
+	if (!req) return OPAHRS_RESULT_FAILED;
+	
+	/* Make up an attituderaw request */
+	opahrs_msg_v1_init_user_tx (req, OPAHRS_MSG_V1_REQ_INITIALIZED);
+	
+	/* Send the message until it is received */
+	rc = opahrs_msg_v1_send_req (req);
+	if (rc != OPAHRS_RESULT_OK) {
+		/* Failed to send the request, bail out */
+		return rc;
+	}
+	
+	return opahrs_msg_v1_recv_rsp (OPAHRS_MSG_V1_RSP_INITIALIZED, rsp);
+}
+
 #endif /* PIOS_INCLUDE_OPAHRS */
 
 /**

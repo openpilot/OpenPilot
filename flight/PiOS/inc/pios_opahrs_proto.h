@@ -107,7 +107,7 @@ union opahrs_msg_v0_req {
   struct opahrs_msg_v0_req_boot         boot;
   struct opahrs_msg_v0_req_serial       serial;
   struct opahrs_msg_v0_req_fwup_status  status_req;
-  struct opahrs_msg_v0_req_mem_map		mem_map;
+  struct opahrs_msg_v0_req_mem_map	mem_map;
   struct opahrs_msg_v0_req_fwup_start   fwup_start;
   struct opahrs_msg_v0_req_fwup_data    fwup_data;
   struct opahrs_msg_v0_req_fwup_verify  fwup_verify;
@@ -201,6 +201,12 @@ struct opahrs_msg_v1_req_reset {
 struct opahrs_msg_v1_req_serial {
 } __attribute__((__packed__));
 
+enum initialized_mode {AHRS_UNINITIALIZED, AHRS_INITIALIZED, AHRS_INIT_QUERY};
+
+struct opahrs_msg_v1_req_initialized {
+  enum initialized_mode initialized;
+} __attribute__((__packed__));
+
 struct opahrs_msg_v1_req_north {
   float Be[3];
 } __attribute__((__packed__));
@@ -247,6 +253,7 @@ union opahrs_msg_v1_req {
   struct opahrs_msg_v1_req_nop          nop;
   struct opahrs_msg_v1_req_versions     versions;
   struct opahrs_msg_v1_req_reset        reset;
+  struct opahrs_msg_v1_req_initialized  initialized;
   struct opahrs_msg_v1_req_serial       serial;
   struct opahrs_msg_v1_req_update       update;
   struct opahrs_msg_v1_req_algorithm    algorithm;
@@ -263,6 +270,10 @@ struct opahrs_msg_v1_rsp_versions {
 
 struct opahrs_msg_v1_rsp_serial {
   uint8_t  serial_bcd[25];
+} __attribute__((__packed__));
+
+struct opahrs_msg_v1_rsp_initialized {
+  enum initialized_mode initialized;
 } __attribute__((__packed__));
 
 struct opahrs_msg_v1_rsp_north {
@@ -325,6 +336,7 @@ struct opahrs_msg_v1_rsp_calibration {
 union opahrs_msg_v1_rsp {
   struct opahrs_msg_v1_rsp_versions     versions;
   struct opahrs_msg_v1_rsp_serial       serial;
+  struct opahrs_msg_v1_rsp_initialized  initialized;	
   struct opahrs_msg_v1_rsp_north        north;
   struct opahrs_msg_v1_rsp_algorithm    algorithm;
   struct opahrs_msg_v1_rsp_attituderaw  attituderaw;
@@ -337,6 +349,7 @@ enum opahrs_msg_v1_tag {
   OPAHRS_MSG_V1_REQ_VERSIONS,
   OPAHRS_MSG_V1_REQ_RESET,
   OPAHRS_MSG_V1_REQ_SERIAL,
+  OPAHRS_MSG_V1_REQ_INITIALIZED,
   OPAHRS_MSG_V1_REQ_NORTH,
   OPAHRS_MSG_V1_REQ_ALGORITHM,
   OPAHRS_MSG_V1_REQ_UPDATE,
@@ -345,6 +358,7 @@ enum opahrs_msg_v1_tag {
 
   OPAHRS_MSG_V1_RSP_VERSIONS,
   OPAHRS_MSG_V1_RSP_SERIAL,
+  OPAHRS_MSG_V1_RSP_INITIALIZED,
   OPAHRS_MSG_V1_RSP_NORTH,
   OPAHRS_MSG_V1_RSP_ALGORITHM,
   OPAHRS_MSG_V1_RSP_UPDATE,

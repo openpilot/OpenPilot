@@ -49,6 +49,7 @@ public:
         quint8 RunningTimePerCyle;
         quint8 DroppedUpdates;
         quint8 CommErrors[5];
+        quint8 Initialized;
         quint8 AlgorithmSet;
         quint8 CalibrationSet;
         quint8 HomeSet;
@@ -68,6 +69,9 @@ public:
     typedef enum { COMMERRORS_ALGORITHM=0, COMMERRORS_UPDATE=1, COMMERRORS_ATTITUDERAW=2, COMMERRORS_HOMELOCATION=3, COMMERRORS_CALIBRATION=4 } CommErrorsElem;
     /* Number of elements for field CommErrors */
     static const quint32 COMMERRORS_NUMELEM = 5;
+    // Field Initialized information
+    /* Enumeration options for field Initialized */
+    typedef enum { INITIALIZED_FALSE=0, INITIALIZED_TRUE=1 } InitializedOptions;
     // Field AlgorithmSet information
     /* Enumeration options for field AlgorithmSet */
     typedef enum { ALGORITHMSET_FALSE=0, ALGORITHMSET_TRUE=1 } AlgorithmSetOptions;
@@ -80,7 +84,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 1789860144U;
+    static const quint32 OBJID = 4061809000U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

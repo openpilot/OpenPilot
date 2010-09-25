@@ -168,17 +168,11 @@ static void ahrscommsTask(void* parameters)
   // Main task loop
   while (1) {
     struct opahrs_msg_v1 rsp;
+    struct opahrs_msg_v1 req;
     AhrsStatusData data;
 
     AlarmsSet(SYSTEMALARMS_ALARM_AHRSCOMMS, SYSTEMALARMS_ALARM_CRITICAL);
 
-    /* Whenever resyncing, assume AHRS doesn't reset and doesn't know home */
-    AhrsStatusGet(&data);
-    data.HomeSet = AHRSSTATUS_HOMESET_FALSE;
-//    data.CalibrationSet = AHRSSTATUS_CALIBRATIONSET_FALSE;
-    data.AlgorithmSet = AHRSSTATUS_ALGORITHMSET_FALSE;
-    AhrsStatusSet(&data);
-    
     /* Spin here until we're in sync */
     while (PIOS_OPAHRS_resync() != OPAHRS_RESULT_OK) {
       vTaskDelay(100 / portTICK_RATE_MS);
@@ -192,17 +186,46 @@ static void ahrscommsTask(void* parameters)
     } else {
       /* Comms error */
       continue;
-    }
+    }	  
 
-    AlarmsClear(SYSTEMALARMS_ALARM_AHRSCOMMS);
+	  
+    /* Whenever resyncing, assume AHRS doesn't reset and doesn't know home */
+    AhrsStatusGet(&data);
+    req.payload.user.v.req.initialized.initialized = AHRS_INIT_QUERY;
+    result = PIOS_OPAHRS_SetGetInitialized(&req,&rsp);
+    if((result != OPAHRS_RESULT_OK) || (rsp.payload.user.v.rsp.initialized.initialized == AHRS_UNINITIALIZED)) {
+        data.Initialized = AHRSSTATUS_INITIALIZED_FALSE;
+        data.HomeSet = AHRSSTATUS_HOMESET_FALSE;
+        data.CalibrationSet = AHRSSTATUS_CALIBRATIONSET_FALSE;
+        data.AlgorithmSet = AHRSSTATUS_ALGORITHMSET_FALSE;
+   } else { 
+        data.Initialized = AHRSSTATUS_INITIALIZED_TRUE;
+	AlarmsClear(SYSTEMALARMS_ALARM_AHRSCOMMS);	      
+   }
+   AhrsStatusSet(&data);
+	  
 
     /* We're in sync with the AHRS, spin here until an error occurs */
     lastSysTime = xTaskGetTickCount();
     while (1) {
       AHRSSettingsData settings;
-
+  
       /* Update settings with latest value */
       AHRSSettingsGet(&settings);
+	    
+      AhrsStatusGet(&data);
+      if((data.HomeSet == AHRSSTATUS_HOMESET_TRUE) && (data.CalibrationSet == AHRSSTATUS_CALIBRATIONSET_TRUE) && (data.AlgorithmSet == AHRSSTATUS_ALGORITHMSET_TRUE)) {
+	      
+         req.payload.user.v.req.initialized.initialized = AHRS_INITIALIZED;	 
+         if((result = PIOS_OPAHRS_SetGetInitialized(&req,&rsp)) == OPAHRS_RESULT_OK) {
+             data.Initialized = AHRSSTATUS_INITIALIZED_TRUE;
+	     AhrsStatusSet(&data);	      
+	     PIOS_OPAHRS_SetGetInitialized(&req,&rsp);
+	     AlarmsClear(SYSTEMALARMS_ALARM_AHRSCOMMS);	      
+	 } else {
+		 break;
+         }
+      }
 
       // Update home coordinate if it hasn't been updated
       AhrsStatusGet(&data);

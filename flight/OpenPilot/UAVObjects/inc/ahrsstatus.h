@@ -41,7 +41,7 @@
 #define AHRSSTATUS_H
 
 // Object constants
-#define AHRSSTATUS_OBJID 1789860144U
+#define AHRSSTATUS_OBJID 4061809000U
 #define AHRSSTATUS_NAME "AhrsStatus"
 #define AHRSSTATUS_METANAME "AhrsStatusMeta"
 #define AHRSSTATUS_ISSINGLEINST 1
@@ -77,6 +77,7 @@ typedef struct {
     uint8_t RunningTimePerCyle;
     uint8_t DroppedUpdates;
     uint8_t CommErrors[5];
+    uint8_t Initialized;
     uint8_t AlgorithmSet;
     uint8_t CalibrationSet;
     uint8_t HomeSet;
@@ -96,6 +97,9 @@ typedef struct {
 typedef enum { AHRSSTATUS_COMMERRORS_ALGORITHM=0, AHRSSTATUS_COMMERRORS_UPDATE=1, AHRSSTATUS_COMMERRORS_ATTITUDERAW=2, AHRSSTATUS_COMMERRORS_HOMELOCATION=3, AHRSSTATUS_COMMERRORS_CALIBRATION=4 } AhrsStatusCommErrorsElem;
 /* Number of elements for field CommErrors */
 #define AHRSSTATUS_COMMERRORS_NUMELEM 5
+// Field Initialized information
+/* Enumeration options for field Initialized */
+typedef enum { AHRSSTATUS_INITIALIZED_FALSE=0, AHRSSTATUS_INITIALIZED_TRUE=1 } AhrsStatusInitializedOptions;
 // Field AlgorithmSet information
 /* Enumeration options for field AlgorithmSet */
 typedef enum { AHRSSTATUS_ALGORITHMSET_FALSE=0, AHRSSTATUS_ALGORITHMSET_TRUE=1 } AhrsStatusAlgorithmSetOptions;

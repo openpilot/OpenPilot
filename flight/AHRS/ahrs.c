@@ -178,6 +178,9 @@ uint8_t calibration_pending = FALSE;
 //! The oversampling rate, ekf is 2k / this
 static uint8_t adc_oversampling = 25;
 
+//! Flag for OP to check if AHRS has been initialized yet
+enum initialized_mode initialized = 0;
+
 /**
  * @}
  */
@@ -913,6 +916,16 @@ void process_spi_request(void)
 		    running_counts / (TIMER_RATE / 10000);
 		user_tx_v1.payload.user.v.rsp.update.dropped_updates =
 		    ekf_too_slow;
+		lfsm_user_set_tx_v1(&user_tx_v1);
+		break;
+	case OPAHRS_MSG_V1_REQ_INITIALIZED:
+		// process incoming data
+		opahrs_msg_v1_init_user_tx(&user_tx_v1,OPAHRS_MSG_V1_RSP_INITIALIZED);
+		user_tx_v1.payload.user.v.rsp.initialized.initialized = initialized;
+		if(user_rx_v1.payload.user.v.req.initialized.initialized == AHRS_INITIALIZED)
+			initialized = AHRS_INITIALIZED;
+		else if(user_rx_v1.payload.user.v.req.initialized.initialized == AHRS_UNINITIALIZED)
+			initialized = AHRS_UNINITIALIZED;			
 		lfsm_user_set_tx_v1(&user_tx_v1);
 		break;
 	default:

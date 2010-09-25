@@ -29,29 +29,11 @@
 #include "splitterorview.h"
 #include "uavgadgetview.h"
 #include "uavgadgetmanager.h"
-#include "uavgadgetinstancemanager.h"
 #include "iuavgadget.h"
-#include "coreimpl.h"
 #include "minisplitter.h"
-#include <coreplugin/coreconstants.h>
-#include <coreplugin/actionmanager/actionmanager.h>
-
-#include <utils/qtcassert.h>
-#include <utils/styledbar.h>
 
 #include <QtCore/QDebug>
 
-#include <QtGui/QApplication>
-#include <QtGui/QComboBox>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QLabel>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
-#include <QtGui/QStyle>
-#include <QtGui/QStyleOption>
-#include <QtGui/QToolButton>
-#include <QtGui/QMenu>
-#include <QtGui/QClipboard>
 
 #ifdef Q_WS_MAC
 #include <qmacstyle_mac.h>
@@ -60,9 +42,8 @@
 using namespace Core;
 using namespace Core::Internal;
 
-SplitterOrView::SplitterOrView(Core::UAVGadgetManager *uavGadgetManager, Core::IUAVGadget *uavGadget, bool isRoot) :
+SplitterOrView::SplitterOrView(Core::UAVGadgetManager *uavGadgetManager, Core::IUAVGadget *uavGadget) :
         m_uavGadgetManager(uavGadgetManager),
-        m_isRoot(isRoot),
         m_splitter(0)
 {
     m_view = new UAVGadgetView(m_uavGadgetManager, uavGadget, this);
@@ -306,28 +287,27 @@ QList<IUAVGadget*> SplitterOrView::gadgets()
 
 void SplitterOrView::split(Qt::Orientation orientation)
 {
-    Q_ASSERT(m_view && (m_splitter == 0));
+    Q_ASSERT(m_view);
+    Q_ASSERT(!m_splitter);
     m_splitter = new MiniSplitter(this);
     m_splitter->setOrientation(orientation);
     connect(m_splitter, SIGNAL(splitterMoved(int,int)), this, SLOT(onSplitterMoved(int,int)));
     m_layout->addWidget(m_splitter);
     Core::IUAVGadget *ourGadget = m_view->gadget();
 
-    SplitterOrView *view = 0;
-    SplitterOrView *otherView = 0;
     if (ourGadget) {
         // Give our gadget to the new left or top SplitterOrView.
         m_view->removeGadget();
-        m_splitter->addWidget((view = new SplitterOrView(m_uavGadgetManager, ourGadget)));
-        m_splitter->addWidget((otherView = new SplitterOrView(m_uavGadgetManager)));
+        m_splitter->addWidget(new SplitterOrView(m_uavGadgetManager, ourGadget));
+        m_splitter->addWidget(new SplitterOrView(m_uavGadgetManager));
     } else {
-        m_splitter->addWidget((otherView = new SplitterOrView(m_uavGadgetManager)));
-        m_splitter->addWidget((view = new SplitterOrView(m_uavGadgetManager)));
+        m_splitter->addWidget(new SplitterOrView(m_uavGadgetManager));
+        m_splitter->addWidget(new SplitterOrView(m_uavGadgetManager));
     }
 
     m_layout->setCurrentWidget(m_splitter);
 
-    if (m_view && !m_isRoot) {
+    if (m_view) {
         m_uavGadgetManager->emptyView(m_view);
         delete m_view;
         m_view = 0;
@@ -341,20 +321,25 @@ void SplitterOrView::onSplitterMoved( int pos, int index ) {
     m_sizes = m_splitter->sizes();
 }
 
-void SplitterOrView::unsplitAll()
+void SplitterOrView::unsplitAll(IUAVGadget *currentGadget)
 {
     Q_ASSERT(m_splitter);
+    Q_ASSERT(!m_view);
     m_splitter->hide();
     m_layout->removeWidget(m_splitter); // workaround Qt bug
     unsplitAll_helper();
     delete m_splitter;
     m_splitter = 0;
+
+    m_view = new UAVGadgetView(m_uavGadgetManager, currentGadget, this);
+    m_layout->addWidget(m_view);
 }
 
 void SplitterOrView::unsplitAll_helper()
 {
-    if (!m_isRoot && m_view)
+    if (m_view) {
         m_uavGadgetManager->emptyView(m_view);
+    }
     if (m_splitter) {
         for (int i = 0; i < m_splitter->count(); ++i) {
             if (SplitterOrView *splitterOrView = qobject_cast<SplitterOrView*>(m_splitter->widget(i))) {

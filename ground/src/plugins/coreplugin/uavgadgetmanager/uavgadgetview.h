@@ -84,8 +84,8 @@ private slots:
 private:
     void updateToolBar();
 
-    UAVGadgetManager *m_uavGadgetManager;
-    IUAVGadget *m_uavGadget;
+    QPointer<UAVGadgetManager> m_uavGadgetManager;
+    QPointer<IUAVGadget> m_uavGadget;
     QWidget *m_toolBar;
     QComboBox *m_defaultToolBar;
     QWidget *m_currentToolBar;

@@ -266,7 +266,7 @@ UAVGadgetManager::UAVGadgetManager(ICore *core, QWidget *parent) :
     connect(m_d->m_gotoOtherSplitAction, SIGNAL(triggered()), this, SLOT(gotoOtherSplit()));
 
     // other setup
-    m_d->m_splitterOrView = new SplitterOrView(this, 0, true);
+    m_d->m_splitterOrView = new SplitterOrView(this, 0);
     // SplitterOrView with 0 as gadget calls our setCurrentGadget, which relies on currentSplitterOrView(),
     // which needs our m_splitterorView to be set, which isn't set yet at that time.
     // So directly set our currentGadget to 0, and do it again.
@@ -604,6 +604,7 @@ void UAVGadgetManager::removeCurrentSplit()
     closeView(viewToClose->view());
 }
 
+// Removes all gadgets and splits in the workspace, except the current/active gadget.
 void UAVGadgetManager::removeAllSplits()
 {
     if (m_d->m_core->modeManager()->currentMode() != m_uavGadgetMode)
@@ -611,14 +612,23 @@ void UAVGadgetManager::removeAllSplits()
 
     if (!m_d->m_splitterOrView->isSplitter())
         return;
-    IUAVGadget *uavGadget = m_d->m_currentGadget;
-    QList<IUAVGadget*> gadgets = m_d->m_splitterOrView->gadgets();
-    gadgets.removeOne(uavGadget);
 
-    m_d->m_currentGadget = 0; // trigger update below
-    m_d->m_splitterOrView->unsplitAll();
-    m_d->m_splitterOrView->view()->setGadget(uavGadget);
-    setCurrentGadget(uavGadget);
+    // Use a QPointer, just in case we accidently delete the gadget we want to keep.
+    QPointer<IUAVGadget> currentGadget = m_d->m_currentGadget;
+
+    Q_ASSERT(currentGadget);
+    QList<IUAVGadget*> gadgets = m_d->m_splitterOrView->gadgets();
+    Q_ASSERT(gadgets.count(currentGadget) == 1);
+    gadgets.removeOne(currentGadget);
+
+    // Remove all splits and their gadgets, then create a new view with the current gadget.
+    m_d->m_splitterOrView->unsplitAll(currentGadget);
+
+    // Zeroing the current gadget means setCurrentGadget will do something when we call it.
+    m_d->m_currentGadget = 0;
+    setCurrentGadget(currentGadget);
+
+    // Remove all other gadgets from the instance manager.
     UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
     foreach (IUAVGadget *g, gadgets) {
         im->removeGadget(g);

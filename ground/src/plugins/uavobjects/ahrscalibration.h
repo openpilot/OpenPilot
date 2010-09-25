@@ -44,13 +44,14 @@ public:
     // Field structure
     typedef struct {
         quint8 measure_var;
-        qint16 accel_bias[3];
+        float accel_bias[3];
         float accel_scale[3];
         float accel_var[3];
-        qint16 gyro_bias[3];
+        float gyro_bias[3];
         float gyro_scale[3];
         float gyro_var[3];
-        qint16 mag_bias[3];
+        float mag_bias[3];
+        float mag_scale[3];
         float mag_var[3];
 
     } __attribute__((packed)) DataFields;
@@ -94,6 +95,11 @@ public:
     typedef enum { MAG_BIAS_X=0, MAG_BIAS_Y=1, MAG_BIAS_Z=2 } mag_biasElem;
     /* Number of elements for field mag_bias */
     static const quint32 MAG_BIAS_NUMELEM = 3;
+    // Field mag_scale information
+    /* Array element names for field mag_scale */
+    typedef enum { MAG_SCALE_X=0, MAG_SCALE_Y=1, MAG_SCALE_Z=2 } mag_scaleElem;
+    /* Number of elements for field mag_scale */
+    static const quint32 MAG_SCALE_NUMELEM = 3;
     // Field mag_var information
     /* Array element names for field mag_var */
     typedef enum { MAG_VAR_X=0, MAG_VAR_Y=1, MAG_VAR_Z=2 } mag_varElem;
@@ -102,7 +108,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 2082766848U;
+    static const quint32 OBJID = 1408636690U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

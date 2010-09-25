@@ -71,6 +71,11 @@ private:
     const static double maxVarValue;
     const static int calibrationDelay;
 
+    bool collectingData;
+
+    QList<double> gyro_accum_x;
+    QList<double> gyro_accum_y;
+    QList<double> gyro_accum_z;
     QList<double> accel_accum_x;
     QList<double> accel_accum_y;
     QList<double> accel_accum_z;

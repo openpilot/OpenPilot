@@ -232,13 +232,14 @@ enum measure_mode {AHRS_SET, AHRS_MEASURE, AHRS_ECHO};
 
 struct opahrs_msg_v1_req_calibration {
   enum measure_mode  measure_var;
-  uint16_t accel_bias[3];
+  float    accel_bias[3];
   float    accel_scale[3];
   float    accel_var[3];
-  uint16_t gyro_bias[3];
+  float    gyro_bias[3];
   float    gyro_scale[3];
   float    gyro_var[3];
-  uint16_t mag_bias[3];
+  float    mag_bias[3];
+  float    mag_scale[3];
   float    mag_var[3];
 } __attribute__((__packed__));
 
@@ -316,9 +317,7 @@ struct opahrs_msg_v1_rsp_update {
 } __attribute__((__packed__));
 
 struct opahrs_msg_v1_rsp_calibration {
-  uint8_t  measure_var;
   float    accel_var[3];
-  uint16_t gyro_bias[3];
   float    gyro_var[3];
   float    mag_var[3];
 } __attribute__((__packed__));

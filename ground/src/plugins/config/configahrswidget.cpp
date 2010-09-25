@@ -36,7 +36,7 @@
 #include <QtGui/QPushButton>
 
 const double ConfigAHRSWidget::maxVarValue = 0.1;
-const int ConfigAHRSWidget::calibrationDelay = 15; // Time to wait for the AHRS to do its calibration
+const int ConfigAHRSWidget::calibrationDelay = 5; // Time to wait for the AHRS to do its calibration
 
 ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
@@ -311,15 +311,28 @@ void ConfigAHRSWidget::attitudeRawUpdated(UAVObject * obj)
 {
     QMutexLocker lock(&attitudeRawUpdateLock);
     UAVObjectField *accel_field = obj->getField(QString("accels_filtered"));
+    UAVObjectField *gyro_field = obj->getField(QString("gyros_filtered"));
     UAVObjectField *mag_field = obj->getField(QString("magnetometers"));
-    accel_accum_x.append(accel_field->getValue(0).toDouble());
-    accel_accum_y.append(accel_field->getValue(1).toDouble());
-    accel_accum_z.append(accel_field->getValue(2).toDouble());
-    mag_accum_x.append(mag_field->getValue(0).toDouble());
-    mag_accum_y.append(mag_field->getValue(1).toDouble());
-    mag_accum_z.append(mag_field->getValue(2).toDouble());
+
+    Q_ASSERT(gyro_field != 0 && accel_field != 0 & mag_field != 0);
+
+    // This is necessary to prevent a race condition on disconnect signal and another update
+    if (collectingData == true) {
+        accel_accum_x.append(accel_field->getValue(0).toDouble());
+        accel_accum_y.append(accel_field->getValue(1).toDouble());
+        accel_accum_z.append(accel_field->getValue(2).toDouble());
+        // Note gyros actually (-y,-x,-z) but since we consistent here no prob
+        mag_accum_x.append(mag_field->getValue(0).toDouble());
+        mag_accum_y.append(mag_field->getValue(1).toDouble());
+        mag_accum_z.append(mag_field->getValue(2).toDouble());
+        gyro_accum_x.append(gyro_field->getValue(0).toDouble());
+        gyro_accum_y.append(gyro_field->getValue(1).toDouble());
+        gyro_accum_z.append(gyro_field->getValue(2).toDouble());
+    }
+
     qDebug() << "Size: " << accel_accum_x.size();
-    if(accel_accum_x.size() >= 20) {
+    if(accel_accum_x.size() >= 20 && collectingData == true) {
+        collectingData = false;
         disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(attitudeRawUpdated(UAVObject*)));
         m_ahrs->sixPointsSave->setEnabled(true);
 
@@ -391,7 +404,11 @@ void ConfigAHRSWidget::savePositionData()
     mag_accum_x.clear();
     mag_accum_y.clear();
     mag_accum_z.clear();
+    gyro_accum_x.clear();
+    gyro_accum_y.clear();
+    gyro_accum_z.clear();
 
+    collectingData = true;
     UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeRaw")));
     connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(attitudeRawUpdated(UAVObject*)));
 
@@ -512,17 +529,27 @@ void ConfigAHRSWidget::computeScaleBias()
     field = obj->getField(QString("accel_scale"));
     field->setDouble(S[0],0);
     field->setDouble(S[1],1);
-    field->setDouble(S[2],2);  // Flip the Z-axis scale to be negative
+    field->setDouble(S[2],2);
     field = obj->getField(QString("accel_bias"));
-    field->setDouble((int) b[0] / S[0],0);
-    field->setDouble((int) b[1] / S[1],1);
-    field->setDouble((int) -b[2] / S[2],2);
+    field->setDouble(b[0],0);
+    field->setDouble(b[1],1);
+    field->setDouble(b[2],2);
 
     SixPointInConstFieldCal( 1, mag_data_x, mag_data_y, mag_data_z, S, b);
+    field = obj->getField(QString("mag_scale"));
+    field->setDouble(S[0],0);
+    field->setDouble(S[1],1);
+    field->setDouble(S[2],2);
     field = obj->getField(QString("mag_bias"));
-    field->setDouble(b[0] / S[0], 0);
-    field->setDouble(b[1] / S[1], 1);
-    field->setDouble(b[2] / S[2], 2);
+    field->setDouble(b[0], 0);
+    field->setDouble(b[1], 1);
+    field->setDouble(b[2], 2);
+
+    field = obj->getField(QString("gyro_bias"));
+    field->setDouble(listMean(gyro_accum_x),0);
+    field->setDouble(listMean(gyro_accum_y),1);
+    field->setDouble(listMean(gyro_accum_z),2);
+
     obj->updated();
 
     position = -1; //set to run again

@@ -1,10 +1,10 @@
 /**
  ******************************************************************************
- * @addtogroup AHRS AHRS Control
+ * @addtogroup AHRS AHRS
  * @brief The AHRS Modules perform
  *
  * @{ 
- * @addtogroup AHRS_TIMER
+ * @addtogroup AHRS_TIMER AHRS Timer
  * @brief Sets up a simple timer that can be polled to estimate idle time
  * @{ 
  *

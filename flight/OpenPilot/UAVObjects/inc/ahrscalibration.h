@@ -41,7 +41,7 @@
 #define AHRSCALIBRATION_H
 
 // Object constants
-#define AHRSCALIBRATION_OBJID 2082766848U
+#define AHRSCALIBRATION_OBJID 1408636690U
 #define AHRSCALIBRATION_NAME "AHRSCalibration"
 #define AHRSCALIBRATION_METANAME "AHRSCalibrationMeta"
 #define AHRSCALIBRATION_ISSINGLEINST 1
@@ -72,13 +72,14 @@
 // Object data
 typedef struct {
     uint8_t measure_var;
-    int16_t accel_bias[3];
+    float accel_bias[3];
     float accel_scale[3];
     float accel_var[3];
-    int16_t gyro_bias[3];
+    float gyro_bias[3];
     float gyro_scale[3];
     float gyro_var[3];
-    int16_t mag_bias[3];
+    float mag_bias[3];
+    float mag_scale[3];
     float mag_var[3];
 
 } __attribute__((packed)) AHRSCalibrationData;
@@ -122,6 +123,11 @@ typedef enum { AHRSCALIBRATION_GYRO_VAR_X=0, AHRSCALIBRATION_GYRO_VAR_Y=1, AHRSC
 typedef enum { AHRSCALIBRATION_MAG_BIAS_X=0, AHRSCALIBRATION_MAG_BIAS_Y=1, AHRSCALIBRATION_MAG_BIAS_Z=2 } AHRSCalibrationmag_biasElem;
 /* Number of elements for field mag_bias */
 #define AHRSCALIBRATION_MAG_BIAS_NUMELEM 3
+// Field mag_scale information
+/* Array element names for field mag_scale */
+typedef enum { AHRSCALIBRATION_MAG_SCALE_X=0, AHRSCALIBRATION_MAG_SCALE_Y=1, AHRSCALIBRATION_MAG_SCALE_Z=2 } AHRSCalibrationmag_scaleElem;
+/* Number of elements for field mag_scale */
+#define AHRSCALIBRATION_MAG_SCALE_NUMELEM 3
 // Field mag_var information
 /* Array element names for field mag_var */
 typedef enum { AHRSCALIBRATION_MAG_VAR_X=0, AHRSCALIBRATION_MAG_VAR_Y=1, AHRSCALIBRATION_MAG_VAR_Z=2 } AHRSCalibrationmag_varElem;

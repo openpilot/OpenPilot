@@ -159,7 +159,12 @@ static void ahrscommsTask(void* parameters)
   portTickType lastSysTime;
   
   GPSGoodUpdates = 0;
-    
+
+  AhrsStatusData data;
+  AhrsStatusGet(&data);
+  data.CalibrationSet = AHRSSTATUS_CALIBRATIONSET_FALSE;
+  AhrsStatusSet(&data);
+	
   // Main task loop
   while (1) {
     struct opahrs_msg_v1 rsp;
@@ -170,8 +175,8 @@ static void ahrscommsTask(void* parameters)
     /* Whenever resyncing, assume AHRS doesn't reset and doesn't know home */
     AhrsStatusGet(&data);
     data.HomeSet = AHRSSTATUS_HOMESET_FALSE;
-    //data.CalibrationSet = AHRSSTATUS_CALIBRATIONSET_FALSE;
-    data.AlgorithmSet = AHRSSTATUS_CALIBRATIONSET_FALSE;
+//    data.CalibrationSet = AHRSSTATUS_CALIBRATIONSET_FALSE;
+    data.AlgorithmSet = AHRSSTATUS_ALGORITHMSET_FALSE;
     AhrsStatusSet(&data);
     
     /* Spin here until we're in sync */
@@ -228,7 +233,7 @@ static void ahrscommsTask(void* parameters)
         if(( result = PIOS_OPAHRS_SetGetCalibration(&req,&rsp) ) == OPAHRS_RESULT_OK ) {
           update_calibration(&(rsp.payload.user.v.rsp.calibration));
           AHRSCalibrationIsUpdatedFlag = false;
-          if(rsp.payload.user.v.rsp.calibration.measure_var != AHRS_ECHO)
+          if(rsp.payload.user.v.req.calibration.measure_var != AHRS_ECHO)
             data.CalibrationSet = AHRSSTATUS_CALIBRATIONSET_TRUE;
           AhrsStatusSet(&data);
           
@@ -347,6 +352,9 @@ static void load_calibration(struct opahrs_msg_v1_req_calibration * calibration)
   calibration->mag_bias[0]    = data.mag_bias[0];
   calibration->mag_bias[1]    = data.mag_bias[1];
   calibration->mag_bias[2]    = data.mag_bias[2];
+  calibration->mag_scale[0]   = data.mag_scale[0];
+  calibration->mag_scale[1]   = data.mag_scale[1];
+  calibration->mag_scale[2]   = data.mag_scale[2];
   calibration->mag_var[0]     = data.mag_var[0];
   calibration->mag_var[1]     = data.mag_var[1];
   calibration->mag_var[2]     = data.mag_var[2];

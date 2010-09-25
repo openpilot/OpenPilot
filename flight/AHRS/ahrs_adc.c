@@ -1,10 +1,10 @@
 /**
  ******************************************************************************
- * @addtogroup AHRS AHRS Control
+ * @addtogroup AHRS AHRS
  * @brief The AHRS Modules perform
  *
  * @{ 
- * @addtogroup AHRS_ADC
+ * @addtogroup AHRS_ADC AHRS ADC
  * @brief Specialized ADC code for double buffered DMA for AHRS
  * @{ 
  *

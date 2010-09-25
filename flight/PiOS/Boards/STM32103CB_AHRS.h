@@ -220,11 +220,16 @@ TIM8  |           |           |           |
 /* RCC_PCLK2_Div8: ADC clock = PCLK2/8 */
 #define PIOS_ADC_SAMPLE_TIME			ADC_SampleTime_239Cycles5
 /* Sample time: */
-/* With an ADCCLK = 14 MHz and a sampling time of 293.5 cycles: */
+/* With an ADCCLK = 14 MHz and a sampling time of 239.5 cycles: */
 /* Tconv = 239.5 + 12.5 = 252 cycles = 18�s */
 /* (1 / (ADCCLK / CYCLES)) = Sample Time (�S) */
 #define PIOS_ADC_IRQ_PRIO			PIOS_IRQ_PRIO_HIGH
 
+// Currently analog acquistion hard coded at 480 Hz
+// PCKL2 = HCLK / 16
+// ADCCLK = PCLK2 / 2
+#define PIOS_ADC_RATE		(72.0e6 / 16 / 2 / 252 / (PIOS_ADC_NUM_PINS / 2))
+#define EKF_RATE		(PIOS_ADC_RATE / adc_oversampling)
 
 //-------------------------
 // GPIO

@@ -52,7 +52,7 @@ _fields = [ \
 	),
 	uavobject.UAVObjectField(
 		'accel_bias',
-		'h',
+		'f',
 		3,
 		[
 			'X',
@@ -88,7 +88,7 @@ _fields = [ \
 	),
 	uavobject.UAVObjectField(
 		'gyro_bias',
-		'h',
+		'f',
 		3,
 		[
 			'X',
@@ -124,7 +124,19 @@ _fields = [ \
 	),
 	uavobject.UAVObjectField(
 		'mag_bias',
-		'h',
+		'f',
+		3,
+		[
+			'X',
+			'Y',
+			'Z',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'mag_scale',
+		'f',
 		3,
 		[
 			'X',
@@ -151,7 +163,7 @@ _fields = [ \
 
 class AHRSCalibration(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 2082766848
+    OBJID        = 1408636690
     NAME         = "AHRSCalibration"
     METANAME     = "AHRSCalibrationMeta"
     ISSINGLEINST = 1

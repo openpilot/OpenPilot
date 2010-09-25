@@ -517,7 +517,14 @@ void UAVGadgetManager::saveSettings(QSettings *qs)
 
 void UAVGadgetManager::readSettings(QSettings *qs)
 {
-    qs->beginGroup("UAVGadgetManager");
+    QString uavGadgetManagerRootKey = "UAVGadgetManager";
+    if(!qs->childGroups().contains(uavGadgetManagerRootKey)) {
+        return;
+    }
+    if(!qs->childGroups().contains(m_uavGadgetMode->uniqueModeName())) {
+        return;
+    }
+    qs->beginGroup(uavGadgetManagerRootKey);
     qs->beginGroup(m_uavGadgetMode->uniqueModeName());
 
     QString defaultUAVGadgetManagerKey = "DefaultSettings";

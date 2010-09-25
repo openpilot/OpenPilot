@@ -83,6 +83,7 @@ public:
     *
     * @param
     */
+    void goHome();
     void setZoom(int zoom);
     void setPosition(QPointF pos);
     void setMapProvider(QString provider);
@@ -168,7 +169,6 @@ private slots:
     void onGoMouseClickAct_triggered();
     void onGoHomeAct_triggered();
     void onGoUAVAct_triggered();
-    void onSetHomePosAct_triggered();
     void onFollowUAVpositionAct_toggled(bool checked);
     void onFollowUAVheadingAct_toggled(bool checked);
     void onShowUAVtrailAct_toggled(bool checked);
@@ -182,8 +182,6 @@ private slots:
     void onZoomActGroup_triggered(QAction *action);
 
 private:
-    QPointF getLatLon();
-
     int min_zoom;
     int max_zoom;
 
@@ -240,7 +238,6 @@ private:
     QAction *goMouseClickAct;
     QAction *goHomeAct;
     QAction *goUAVAct;
-    QAction *setHomePosAct;
     QAction *followUAVpositionAct;
     QAction *followUAVheadingAct;
     QAction *showUAVtrailAct;
@@ -258,7 +255,9 @@ private:
     void loadComboBoxLines(QComboBox *comboBox, QString filename);
     void saveComboBoxLines(QComboBox *comboBox, QString filename);
 
-    void setMapFollowingmode();
+    QPointF getLatLon();
+
+    void setMapFollowingMode();
 };
 
 #endif /* OPMAP_GADGETWIDGET_H_ */

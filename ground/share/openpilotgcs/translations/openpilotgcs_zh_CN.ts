@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="it">
+<TS version="2.0" language="zh_CN">
 <context>
     <name>Application</name>
     <message>
         <location filename="../../../src/app/main.cpp" line="+128"/>
         <source>Failed to load core: %1</source>
-        <translation>Errore nel caricamento del core: %1</translation>
+        <translation>核心载入失败: %1</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Unable to send command line arguments to the already running instance. It appears to be not responding.</source>
-        <translation>Impossibile inviare i parametri della linea di comando all&apos;istanza in esecuzione. Sembra non rispondere.</translation>
+        <translation>无法将命令行参数发送到执行中的进程，看起来进程未响应.</translation>
     </message>
     <message>
         <location line="+135"/>
         <source>Could not find &apos;Core.pluginspec&apos; in %1</source>
-        <translation type="unfinished"></translation>
+        <translation>在%1 找不到 &apos;Core.pluginspec&apos; </translation>
     </message>
     <message>
         <location line="+36"/>
@@ -29,7 +29,7 @@
     <message>
         <location filename="../../../src/plugins/coreplugin/sidebar.cpp" line="+370"/>
         <source>Activate %1</source>
-        <translation>Attiva %1</translation>
+        <translation>激活%1 </translation>
     </message>
 </context>
 <context>
@@ -37,27 +37,27 @@
     <message>
         <location filename="../../../src/plugins/coreplugin/generalsettings.cpp" line="+54"/>
         <source>General</source>
-        <translation>Generale</translation>
+        <translation>概要</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Environment</source>
-        <translation>Ambiente</translation>
+        <translation type="unfinished">环境</translation>
     </message>
     <message>
         <location line="+73"/>
         <source>Variables</source>
-        <translation>Variabili</translation>
+        <translation>变量</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/coreplugin/generalsettings.ui"/>
         <source>General settings</source>
-        <translation>Impostazioni Generali</translation>
+        <translation type="unfinished">基本设定</translation>
     </message>
     <message>
         <location/>
         <source>Reset to default</source>
-        <translation>Ripristina predefinito</translation>
+        <translation>重置为默认</translation>
     </message>
     <message>
         <location/>
@@ -67,12 +67,12 @@
     <message>
         <location/>
         <source>Terminal:</source>
-        <translation>Terminale:</translation>
+        <translation>终端:</translation>
     </message>
     <message>
         <location/>
         <source>External editor:</source>
-        <translation>Editor esterno:</translation>
+        <translation>外部编辑器:</translation>
     </message>
     <message>
         <location/>
@@ -82,22 +82,22 @@
     <message>
         <location/>
         <source>When files are externally modified:</source>
-        <translation type="unfinished"></translation>
+        <translation>当文件被外部修改时:</translation>
     </message>
     <message>
         <location/>
         <source>Always ask</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">总是询问</translation>
     </message>
     <message>
         <location/>
         <source>Reload all modified files</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">载入所有被修改的文件</translation>
     </message>
     <message>
         <location/>
         <source>Ignore modifications</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">忽略修改</translation>
     </message>
     <message>
         <location/>
@@ -108,80 +108,62 @@
 <context>
     <name>Core::Internal::MainWindow</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/mainwindow.cpp" line="+384"/>
-        <source>&amp;File</source>
-        <translation>&amp;File</translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>&amp;Edit</source>
-        <translation>&amp;Modifica</translation>
-    </message>
-    <message>
-        <location line="+11"/>
-        <source>&amp;Tools</source>
-        <translation>&amp;Strumenti</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>&amp;Window</source>
-        <translation>&amp;Finestra</translation>
-    </message>
-    <message>
-        <location line="+11"/>
-        <source>&amp;Help</source>
-        <translation>&amp;Guida</translation>
-    </message>
-    <message>
-        <location line="-281"/>
+        <location filename="../../../src/plugins/coreplugin/mainwindow.cpp" line="+143"/>
         <source>OpenPilot GCS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+343"/>
+        <location line="+241"/>
+        <source>&amp;File</source>
+        <translation>文件(&amp;F)</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>&amp;Edit</source>
+        <translation>编辑(&amp;E)</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>&amp;Tools</source>
+        <translation>工具(&amp;T)</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>&amp;Window</source>
+        <translation>窗体(&amp;W)</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>&amp;Help</source>
+        <translation>帮助(&amp;H)</translation>
+    </message>
+    <message>
+        <location line="+62"/>
         <source>&amp;New File or Project...</source>
-        <translation type="unfinished"></translation>
+        <translation>新建文件或工程(&amp;N)...</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&amp;Open File or Project...</source>
-        <translation type="unfinished"></translation>
+        <translation>打开文件或工程(&amp;O)...</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&amp;Open File With...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">打开为(&amp;O)...</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Recent Files</source>
-        <translation>File Recenti</translation>
+        <translation type="unfinished">最近使用的文件</translation>
     </message>
     <message>
-        <location line="+3"/>
-        <location line="+4"/>
-        <source>&amp;Save</source>
-        <translation>&amp;Salva</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <location line="+6"/>
-        <source>Save &amp;As...</source>
-        <translation>Salva con &amp;Nome...</translation>
-    </message>
-    <message>
-        <location line="-3"/>
-        <location line="+10"/>
-        <source>Ctrl+Shift+S</source>
+        <location line="+122"/>
+        <source>&amp;Help...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-3"/>
-        <source>Save A&amp;ll</source>
-        <translation>Salva T&amp;utti</translation>
-    </message>
-    <message>
-        <location line="+130"/>
+        <location line="+29"/>
         <source>About &amp;OpenPilot GCS</source>
         <translation type="unfinished"></translation>
     </message>
@@ -191,81 +173,99 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+491"/>
-        <source>Settings...</source>
-        <translation type="unfinished">Impostazioni...</translation>
+        <location line="-150"/>
+        <location line="+4"/>
+        <source>&amp;Save</source>
+        <translation>保存(&amp;S)</translation>
     </message>
     <message>
-        <location line="-614"/>
+        <location line="+4"/>
+        <location line="+6"/>
+        <source>Save &amp;As...</source>
+        <translation>另存为(&amp;A)...</translation>
+    </message>
+    <message>
+        <location line="-3"/>
+        <location line="+10"/>
+        <source>Ctrl+Shift+S</source>
+        <translation>Ctrl+Shift+S</translation>
+    </message>
+    <message>
+        <location line="-3"/>
+        <source>Save A&amp;ll</source>
+        <translation>保存所有文件(&amp;l)</translation>
+    </message>
+    <message>
+        <location line="+9"/>
         <source>E&amp;xit</source>
-        <translation>&amp;Esci</translation>
+        <translation>退出(&amp;x)</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Ctrl+Q</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+Q</translation>
     </message>
     <message>
         <location line="+5"/>
         <location line="+4"/>
         <source>&amp;Undo</source>
-        <translation>&amp;Annulla</translation>
+        <translation>撤销(&amp;U)</translation>
     </message>
     <message>
         <location line="+5"/>
         <location line="+4"/>
         <source>&amp;Redo</source>
-        <translation>&amp;Ripeti</translation>
+        <translation>恢复(&amp;R)</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Cu&amp;t</source>
-        <translation>&amp;Taglia</translation>
+        <translation>剪切(&amp;t)</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&amp;Copy</source>
-        <translation>&amp;Copia</translation>
+        <translation>复制(&amp;C)</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&amp;Paste</source>
-        <translation>&amp;Incolla</translation>
+        <translation>粘贴(&amp;P)</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&amp;Select All</source>
-        <translation>&amp;Seleziona tutto</translation>
+        <translation>全选(&amp;S)</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&amp;Options...</source>
-        <translation>&amp;Opzioni...</translation>
+        <translation>选项(&amp;O)...</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Minimize</source>
-        <translation>Minimizza</translation>
+        <translation>最小化</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Zoom</source>
-        <translation>Zoom</translation>
+        <translation>缩放</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Full Screen</source>
-        <translation>Schermo Intero</translation>
+        <translation>全屏</translation>
     </message>
     <message>
-        <location line="+9"/>
-        <source>&amp;Help...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+18"/>
+        <location line="+27"/>
         <source>About &amp;Plugins...</source>
-        <translation>Informazioni sui &amp;Plugin...</translation>
+        <translation>关于插件(&amp;P)...</translation>
+    </message>
+    <message>
+        <location line="+504"/>
+        <source>Settings...</source>
+        <translation>设定...</translation>
     </message>
 </context>
 <context>
@@ -273,7 +273,7 @@
     <message>
         <location filename="../../../src/plugins/coreplugin/messageoutputwindow.cpp" line="+75"/>
         <source>General</source>
-        <translation>Generale</translation>
+        <translation type="unfinished">概要</translation>
     </message>
 </context>
 <context>
@@ -281,32 +281,32 @@
     <message>
         <location filename="../../../src/plugins/coreplugin/plugindialog.cpp" line="+53"/>
         <source>Details</source>
-        <translation>Dettagli</translation>
+        <translation>详情</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Error Details</source>
-        <translation>Dettagli Errore</translation>
+        <translation>错误详情</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Close</source>
-        <translation>Chiudi</translation>
+        <translation>关闭</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Installed Plugins</source>
-        <translation>Plugin Installati</translation>
+        <translation>已安装的插件</translation>
     </message>
     <message>
         <location line="+36"/>
         <source>Plugin Details of %1</source>
-        <translation>Dettagli Plugin di %1</translation>
+        <translation>%1 的插件详情</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Plugin Errors of %1</source>
-        <translation>Errore Plugin di %1</translation>
+        <translation>%1 的插件错误</translation>
     </message>
 </context>
 <context>
@@ -314,28 +314,28 @@
     <message>
         <location filename="../../../src/plugins/coreplugin/dialogs/shortcutsettings.cpp" line="+70"/>
         <source>Keyboard</source>
-        <translation>Tastiera</translation>
+        <translation>键盘</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Environment</source>
-        <translation>Ambiente</translation>
+        <translation type="unfinished">环境</translation>
     </message>
     <message>
         <location line="+157"/>
         <source>Import Keyboard Mapping Scheme</source>
-        <translation>Importa la Mappatura della Tastiera</translation>
+        <translation>导入键盘映射方案</translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+33"/>
         <source>Keyboard Mapping Scheme (*.kms)</source>
-        <translation>Mappatura della Tastiera (*.kms)</translation>
+        <translation>键盘映射方案 (*.kms)</translation>
     </message>
     <message>
         <location line="-2"/>
         <source>Export Keyboard Mapping Scheme</source>
-        <translation>Esporta Mappatura della Tastiera</translation>
+        <translation>导出键盘映射方案</translation>
     </message>
 </context>
 <context>
@@ -343,12 +343,12 @@
     <message>
         <location filename="../../../src/plugins/coreplugin/sidebar.cpp" line="-130"/>
         <source>Split</source>
-        <translation>Dividi</translation>
+        <translation>分栏</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Close</source>
-        <translation>Chiudi</translation>
+        <translation>关闭</translation>
     </message>
 </context>
 <context>
@@ -362,7 +362,7 @@
         <location line="+11"/>
         <source>From revision %1&lt;br/&gt;</source>
         <extracomment>This gets conditionally inserted as argument %8 into the description string.</extracomment>
-        <translation>Dalla revisione %1&lt;br/&gt;</translation>
+        <translation>来自版本 %1&lt;br/&gt;</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -375,7 +375,7 @@
     <message>
         <location filename="../../../src/plugins/coreplugin/modemanager.cpp" line="+148"/>
         <source>Switch to %1 mode</source>
-        <translation>Passa alla modalità %1</translation>
+        <translation type="unfinished">切换至%1模式 </translation>
     </message>
 </context>
 <context>
@@ -383,17 +383,17 @@
     <message>
         <location filename="../../../src/libs/utils/classnamevalidatinglineedit.cpp" line="+83"/>
         <source>The class name must not contain namespace delimiters.</source>
-        <translation>Il nome della classe non deve contenere namespace.</translation>
+        <translation>类名不能包含命名空间分隔符.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Please enter a class name.</source>
-        <translation>Inserisci il nome di una classe.</translation>
+        <translation>请输入类名.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>The class name contains invalid characters.</source>
-        <translation>Il nome della classe contiene caratteri non validi.</translation>
+        <translation>类名含有无效字符.</translation>
     </message>
 </context>
 <context>
@@ -401,62 +401,62 @@
     <message>
         <location filename="../../../src/libs/utils/consoleprocess.cpp" line="+48"/>
         <source>Cannot set up communication channel: %1</source>
-        <translation>Impossibile impostare il canale di comunicazione: %1</translation>
+        <translation>无法与子进程建立通信: %1</translation>
     </message>
     <message>
-        <location line="+12"/>
-        <source>Cannot create temporary file: %1</source>
-        <translation>Impossibile creare il file temporaneo: %1</translation>
-    </message>
-    <message>
-        <location line="-5"/>
+        <location line="+7"/>
         <source>Press &lt;RETURN&gt; to close this window...</source>
-        <translation>Premi &lt;INVIO&gt; per chiudere questa finestra...</translation>
+        <translation>按 &lt;RETURN&gt; 来关闭窗口...</translation>
     </message>
     <message>
-        <location filename="../../../src/libs/utils/consoleprocess_unix.cpp" line="+110"/>
-        <source>Cannot start the terminal emulator &apos;%1&apos;.</source>
-        <translation>Impossibile avviare l&apos;emulatore di terminale &apos;%1&apos;.</translation>
+        <location line="+5"/>
+        <source>Cannot create temporary file: %1</source>
+        <translation>无法创建临时文件: %1</translation>
     </message>
     <message>
-        <location filename="../../../src/libs/utils/consoleprocess.cpp" line="+10"/>
+        <location line="+5"/>
         <source>Cannot create temporary directory &apos;%1&apos;: %2</source>
-        <translation>Impossibile create la cartella temporanea &apos;%1&apos;: %2</translation>
+        <translation>无法创建临时文件夹 &apos;%1&apos;: %2</translation>
     </message>
     <message>
-        <location filename="../../../src/libs/utils/consoleprocess_unix.cpp" line="+49"/>
-        <source>Cannot create socket &apos;%1&apos;: %2</source>
-        <translation>Impossibile creare il socket &apos;%1&apos;: %2</translation>
-    </message>
-    <message>
-        <location filename="../../../src/libs/utils/consoleprocess.cpp" line="+10"/>
+        <location line="+10"/>
         <source>Cannot change to working directory &apos;%1&apos;: %2</source>
-        <translation>Impossibile entrare nella cartella di lavoro &apos;%1&apos;: %2</translation>
+        <translation>无法切换到工作目录 &apos;%1&apos;: %2</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Cannot execute &apos;%1&apos;: %2</source>
-        <translation>Impossibile eseguire &apos;%1&apos;: %2</translation>
+        <translation>无法执行 &apos;%1&apos;: %2</translation>
     </message>
     <message>
         <location line="-10"/>
         <source>Unexpected output from helper program.</source>
-        <translation>Uscita non attesa dal programma helper.</translation>
+        <translation>来自帮助程序的异常输出.</translation>
     </message>
     <message>
         <location filename="../../../src/libs/utils/consoleprocess_win.cpp" line="+124"/>
         <source>The process &apos;%1&apos; could not be started: %2</source>
-        <translation>Impossibile avviare il processo &apos;%1&apos;: %2</translation>
+        <translation>进程 &apos;%1&apos; 无法被启动: %2</translation>
     </message>
     <message>
         <location line="+70"/>
         <source>Cannot obtain a handle to the inferior: %1</source>
-        <translation>Impossibile ottenere un collegamento a: %1</translation>
+        <translation>无法获得inferior的句柄: %1</translation>
     </message>
     <message>
         <location line="+30"/>
         <source>Cannot obtain exit status from inferior: %1</source>
-        <translation>Impossibile ottenere lo stato di uscita da: %1</translation>
+        <translation>无法获得inferior的退出状态: %1</translation>
+    </message>
+    <message>
+        <location filename="../../../src/libs/utils/consoleprocess_unix.cpp" line="+110"/>
+        <source>Cannot start the terminal emulator &apos;%1&apos;.</source>
+        <translation>无法启动终端模拟器&apos;%1&apos;.</translation>
+    </message>
+    <message>
+        <location line="+49"/>
+        <source>Cannot create socket &apos;%1&apos;: %2</source>
+        <translation>无法创建套接字 &apos;%1&apos;: %2</translation>
     </message>
 </context>
 <context>
@@ -464,22 +464,22 @@
     <message>
         <location filename="../../../src/libs/utils/filenamevalidatinglineedit.cpp" line="+94"/>
         <source>The name must not be empty</source>
-        <translation>Il nome non deve essere vuoto</translation>
+        <translation type="unfinished">名称不能为空</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>The name must not contain any of the characters &apos;%1&apos;.</source>
-        <translation>Il nome non deve contenere i caratteri &apos;%1&apos;.</translation>
+        <translation type="unfinished">名称不能包含 &apos;%1&apos; 中的任何一个</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>The name must not contain &apos;%1&apos;.</source>
-        <translation>Il nome non deve contenere &apos;%1&apos;.</translation>
+        <translation type="unfinished">名称不能包含 &apos;%1&apos; </translation>
     </message>
     <message>
         <location line="+10"/>
         <source>The name must not match that of a MS Windows device. (%1).</source>
-        <translation>Il nome non può essere quello di un dispositivo MS Windows (%1).</translation>
+        <translation type="unfinished">名称不能与微软视窗设备名相同. (%1).</translation>
     </message>
 </context>
 <context>
@@ -488,103 +488,100 @@
         <location filename="../../../src/libs/utils/filesearch.cpp" line="+46"/>
         <source>%1: canceled. %n occurrences found in %2 files.</source>
         <translation>
-            <numerusform>%1: annullato. %n ricorrenza trovata in %2 file.</numerusform>
-            <numerusform>%1: annullato. %n ricorrenze trovate in %2 file.</numerusform>
+            <numerusform>%1: 被取消. 在 %2 个文件找到了%n 次。</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+8"/>
         <source>%1: %n occurrences found in %2 files.</source>
         <translation>
-            <numerusform>%1: %n ricorrenza trovata in %2 file.</numerusform>
-            <numerusform>%1: %n ricorrenze trovate in %2 file.</numerusform>
+            <numerusform>%1: 在 %2 个文件找到了%n 次。</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+8"/>
         <source>%1: %n occurrences found in %2 of %3 files.</source>
         <translation>
-            <numerusform>%1: %n ricorrenza trovata in %2 di %3 file.</numerusform>
-            <numerusform>%1: %n ricorrenze trovate in %2 di %3 file.</numerusform>
+            <numerusform>%1: 在 %3个文件中的 %2个找到了%n 次。</numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>Utils::NewClassWidget</name>
     <message>
-        <location filename="../../../src/libs/utils/newclasswidget.ui"/>
-        <source>Class name:</source>
-        <translation>Nome classe:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Base class:</source>
-        <translation>Classe Base:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Header file:</source>
-        <translation>File Header:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Source file:</source>
-        <translation>File Sorgente:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Generate form:</source>
-        <translation>Genera form:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Form file:</source>
-        <translation>File form:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Path:</source>
-        <translation>Percorso:</translation>
-    </message>
-    <message>
         <location filename="../../../src/libs/utils/newclasswidget.cpp" line="+416"/>
         <source>Invalid base class name</source>
-        <translation>Nome della classe base non valido</translation>
+        <translation>无效基类名</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Invalid header file name: &apos;%1&apos;</source>
-        <translation>Nome del file header non valido: &apos;%1&apos;</translation>
+        <translation>无效的头文件名称: &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Invalid source file name: &apos;%1&apos;</source>
-        <translation>Nome del file sorgente non valido: &apos;%1&apos;</translation>
+        <translation>无效的源文件名称: &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Invalid form file name: &apos;%1&apos;</source>
-        <translation>Nome del file form non valido: &apos;%1&apos;</translation>
+        <translation>无效的界面文件名: &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../../../src/libs/utils/newclasswidget.ui"/>
-        <source>Type information:</source>
-        <translation type="unfinished"></translation>
+        <source>Class name:</source>
+        <translation type="unfinished">类名:</translation>
     </message>
     <message>
         <location/>
-        <source>None</source>
-        <translation type="unfinished"></translation>
+        <source>Base class:</source>
+        <translation type="unfinished">基类:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Header file:</source>
+        <translation type="unfinished">头文件:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Source file:</source>
+        <translation type="unfinished">源文件:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Generate form:</source>
+        <translation type="unfinished">创建界面:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Form file:</source>
+        <translation type="unfinished">界面文件:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Path:</source>
+        <translation type="unfinished">路径:</translation>
     </message>
     <message>
         <location/>
         <source>Inherits QObject</source>
-        <translation type="unfinished"></translation>
+        <translation>继承自QObject</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Type information:</source>
+        <translation type="unfinished">类型信息:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>None</source>
+        <translation>无</translation>
     </message>
     <message>
         <location/>
         <source>Inherits QWidget</source>
-        <translation type="unfinished"></translation>
+        <translation>继承自QWidget </translation>
     </message>
 </context>
 <context>
@@ -592,47 +589,47 @@
     <message>
         <location filename="../../../src/libs/utils/pathchooser.cpp" line="+48"/>
         <source>Choose...</source>
-        <translation>Scegli...</translation>
+        <translation>选择...</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Browse...</source>
-        <translation>Sfoglia...</translation>
+        <translation>浏览...</translation>
     </message>
     <message>
         <location line="+126"/>
         <source>Choose a directory</source>
-        <translation>Scegli una cartella</translation>
+        <translation type="unfinished">选择目录</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Choose a file</source>
-        <translation>Scegli un file</translation>
+        <translation type="unfinished">选择文件</translation>
     </message>
     <message>
         <location line="+33"/>
         <source>The path must not be empty.</source>
-        <translation>Il percorso non può essere vuoto.</translation>
+        <translation>路径不能为空.</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>The path &apos;%1&apos; does not exist.</source>
-        <translation>Il percorso &apos;%1&apos; non esiste.</translation>
+        <translation>路径 &apos;%1&apos; 不存在.</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>The path &apos;%1&apos; is not a directory.</source>
-        <translation>Il percorso &apos;%1&apos; non è una cartella.</translation>
+        <translation>路径 &apos;%1&apos; 不是文件夹.</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>The path &apos;%1&apos; is not a file.</source>
-        <translation>Il percorso &apos;%1&apos; non è un file.</translation>
+        <translation>路径 &apos;%1&apos; 不是文件.</translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Path:</source>
-        <translation>Percorso:</translation>
+        <translation>路径:</translation>
     </message>
 </context>
 <context>
@@ -640,60 +637,60 @@
     <message>
         <location filename="../../../src/libs/utils/pathlisteditor.cpp" line="+118"/>
         <source>Insert...</source>
-        <translation>Inserisci...</translation>
+        <translation>插入...</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Add...</source>
-        <translation>Aggiungi...</translation>
+        <translation>添加...</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Delete line</source>
-        <translation>Cancella riga</translation>
+        <translation type="unfinished">删除行</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Clear</source>
-        <translation>Cancella</translation>
+        <translation>清除</translation>
     </message>
     <message>
         <location line="+130"/>
         <source>From &quot;%1&quot;</source>
-        <translation>Da &quot;%1&quot;</translation>
+        <translation>从&quot;%1&quot;</translation>
     </message>
 </context>
 <context>
     <name>Utils::ProjectIntroPage</name>
     <message>
-        <location filename="../../../src/libs/utils/projectintropage.ui"/>
-        <source>Introduction and project location</source>
-        <translation>Introduzione e posizione del progetto</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Name:</source>
-        <translation>Nome:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Create in:</source>
-        <translation>Crea in:</translation>
-    </message>
-    <message>
         <location filename="../../../src/libs/utils/projectintropage.cpp" line="+64"/>
         <source>&lt;Enter_Name&gt;</source>
-        <translation>&lt;Inserisci__Nome&gt;</translation>
+        <translation>&lt;输入名称&gt;</translation>
     </message>
     <message>
         <location line="+97"/>
         <source>The project already exists.</source>
-        <translation>Il progetto è già presente.</translation>
+        <translation>项目已经存在.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>A file with that name already exists.</source>
-        <translation>Un file con lo stesso nome è già presente.</translation>
+        <translation>存在同名文件.</translation>
+    </message>
+    <message>
+        <location filename="../../../src/libs/utils/projectintropage.ui"/>
+        <source>Introduction and project location</source>
+        <translation>项目介绍和位置</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Name:</source>
+        <translation>名称:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Create in:</source>
+        <translation>创建路径:</translation>
     </message>
 </context>
 <context>
@@ -701,7 +698,7 @@
     <message>
         <location filename="../../../src/libs/utils/projectnamevalidatinglineedit.cpp" line="+49"/>
         <source>The name must not contain the &apos;.&apos;-character.</source>
-        <translation>Il nome non può contenere il carattere &apos;.&apos;.</translation>
+        <translation type="unfinished">名称不能包含 &apos;.&apos;</translation>
     </message>
 </context>
 <context>
@@ -709,17 +706,17 @@
     <message>
         <location filename="../../../src/libs/utils/submiteditorwidget.ui"/>
         <source>Subversion Submit</source>
-        <translation>Invio Subversion</translation>
+        <translation>Subversion提交</translation>
     </message>
     <message>
         <location/>
         <source>Des&amp;cription</source>
-        <translation>Des&amp;crizione</translation>
+        <translation>说明(&amp;c)</translation>
     </message>
     <message>
         <location/>
         <source>F&amp;iles</source>
-        <translation>F&amp;ile</translation>
+        <translation>文件(&amp;i)</translation>
     </message>
 </context>
 <context>
@@ -727,17 +724,17 @@
     <message>
         <location filename="../../../src/libs/utils/filewizardpage.ui"/>
         <source>Choose the location</source>
-        <translation>Scegli la posizione</translation>
+        <translation type="unfinished">选择位置</translation>
     </message>
     <message>
         <location/>
         <source>Name:</source>
-        <translation>Nome:</translation>
+        <translation>名称:</translation>
     </message>
     <message>
         <location/>
         <source>Path:</source>
-        <translation>Percorso:</translation>
+        <translation>路径:</translation>
     </message>
 </context>
 <context>
@@ -745,17 +742,17 @@
     <message>
         <location filename="../../../src/libs/utils/reloadpromptutils.cpp" line="+41"/>
         <source>File Changed</source>
-        <translation>File Modificato</translation>
+        <translation>文件已改变</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>The unsaved file %1 has been changed outside Qt Creator. Do you want to reload it and discard your changes?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">未保存的文件 %1 在 Qt Creator以外被改写，你想要重新载入并且丢弃现有的修改吗?</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>The file %1 has changed outside Qt Creator. Do you want to reload it?</source>
-        <translation>Il file %1 è stato modificato fuori da Qt Creator. Vuoi ricaricarlo?</translation>
+        <translation type="unfinished">文件 %1 在 Qt Creator以外被改写，你想重新载入么?</translation>
     </message>
 </context>
 <context>
@@ -763,47 +760,47 @@
     <message>
         <location filename="../../../src/libs/extensionsystem/plugindetailsview.ui"/>
         <source>Name:</source>
-        <translation>Nome:</translation>
+        <translation>名称:</translation>
     </message>
     <message>
         <location/>
         <source>Version:</source>
-        <translation>Versione:</translation>
+        <translation>版本:</translation>
     </message>
     <message>
         <location/>
         <source>Compatibility Version:</source>
-        <translation>Versione di Compatibilità:</translation>
+        <translation>兼容版本:</translation>
     </message>
     <message>
         <location/>
         <source>Url:</source>
-        <translation>Url:</translation>
+        <translation>URL:</translation>
     </message>
     <message>
         <location/>
         <source>Location:</source>
-        <translation>Posizione:</translation>
+        <translation>位置:</translation>
     </message>
     <message>
         <location/>
         <source>Description:</source>
-        <translation>Descrizione:</translation>
+        <translation>说明:</translation>
     </message>
     <message>
         <location/>
         <source>Copyright:</source>
-        <translation>Copyright:</translation>
+        <translation>版权:</translation>
     </message>
     <message>
         <location/>
         <source>License:</source>
-        <translation>Licenza:</translation>
+        <translation>许可:</translation>
     </message>
     <message>
         <location/>
         <source>Dependencies:</source>
-        <translation>Dipendenze:</translation>
+        <translation>依赖关系:</translation>
     </message>
     <message>
         <location/>
@@ -816,12 +813,12 @@
     <message>
         <location filename="../../../src/libs/extensionsystem/pluginerrorview.ui"/>
         <source>State:</source>
-        <translation>Stato:</translation>
+        <translation>状态:</translation>
     </message>
     <message>
         <location/>
         <source>Error Message:</source>
-        <translation>Messaggio d&apos;Errore:</translation>
+        <translation>错误信息:</translation>
     </message>
 </context>
 <context>
@@ -829,17 +826,17 @@
     <message>
         <location filename="../../../src/libs/extensionsystem/pluginspec.cpp" line="+414"/>
         <source>File does not exist: %1</source>
-        <translation>Il file non esiste: %1</translation>
+        <translation>文件不存在: %1</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Could not open file for read: %1</source>
-        <translation>Impossibile aprire il file in lettura: %1</translation>
+        <translation>无法打开用于读取的文件: %1</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Error parsing file %1: %2, at line %3, column %4</source>
-        <translation>Errore leggendo dal file %1: %2, alla riga %3, colonna %4</translation>
+        <translation>分析文件错误 %1: %2, 在行 %3, 列 %4</translation>
     </message>
 </context>
 <context>
@@ -847,22 +844,22 @@
     <message>
         <location filename="../../../src/libs/extensionsystem/pluginview.ui"/>
         <source>State</source>
-        <translation>Stato</translation>
+        <translation type="unfinished">状态</translation>
     </message>
     <message>
         <location/>
         <source>Name</source>
-        <translation>Nome</translation>
+        <translation>名称</translation>
     </message>
     <message>
         <location/>
         <source>Version</source>
-        <translation>Versione</translation>
+        <translation>版本</translation>
     </message>
     <message>
         <location/>
         <source>Location</source>
-        <translation>Posizione</translation>
+        <translation type="unfinished">位置</translation>
     </message>
     <message>
         <location/>
@@ -875,82 +872,82 @@
     <message>
         <location filename="../../../src/libs/extensionsystem/pluginerrorview.cpp" line="+78"/>
         <source>Invalid</source>
-        <translation>Non valido</translation>
+        <translation>无效</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Description file found, but error on read</source>
-        <translation>Il file di descrizione è stato trovato, ma c&apos;è stato un errore in lettura</translation>
+        <translation>找到说明文件，但是读取错误</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Read</source>
-        <translation>Letto</translation>
+        <translation>读入</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Description successfully read</source>
-        <translation>La descrizione è stata letta con successo</translation>
+        <translation>成功读取说明文档</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Resolved</source>
-        <translation>Risolto</translation>
+        <translation>已解決</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Dependencies are successfully resolved</source>
-        <translation>Le dipendenze sono state risolte correttamente</translation>
+        <translation>成功解析依赖关系</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Loaded</source>
-        <translation>Caricato</translation>
+        <translation>已载入</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Library is loaded</source>
-        <translation>La libreria è caricata</translation>
+        <translation>库已载入</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Initialized</source>
-        <translation>Inizializzato</translation>
+        <translation>初始化</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Plugin&apos;s initialization method succeeded</source>
-        <translation>La funzione di inizializzazione del plugin ha avuto successo</translation>
+        <translation>初始化插件成功</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Running</source>
-        <translation>In esecuzione</translation>
+        <translation>执行中</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Plugin successfully loaded and running</source>
-        <translation>Il plugin è stato caricato correttamente ed è in esecuzione</translation>
+        <translation>插件成功载入和运行</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Stopped</source>
-        <translation>Fermato</translation>
+        <translation>停止</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Plugin was shut down</source>
-        <translation>Il plugin è stato fermato</translation>
+        <translation>插件被关闭</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Deleted</source>
-        <translation>Cancellato</translation>
+        <translation>删除</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Plugin ended its life cycle and was deleted</source>
-        <translation>Il plugin ha concluso il suo ciclo di vita ed è stato cancellato</translation>
+        <translation>插件结束了自己的生存期并且已删除</translation>
     </message>
 </context>
 <context>
@@ -959,13 +956,14 @@
         <location filename="../../../src/libs/extensionsystem/pluginmanager.cpp" line="+617"/>
         <source>Circular dependency detected:
 </source>
-        <translation>Rilevata una dipendenza circolare:</translation>
+        <translation>检测到循环依赖:
+</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>%1(%2) depends on
 </source>
-        <translation>%1(%2) dipende da
+        <translation>%1(%2) 依赖于
 </translation>
     </message>
     <message>
@@ -976,15 +974,404 @@
     <message>
         <location line="+8"/>
         <source>Cannot load plugin because dependencies are not resolved</source>
-        <translation>Impossibile caricare il plugin poiché le dipendenze non sono risolte</translation>
+        <translation type="unfinished">由于没有解决依赖所以无法载入插件</translation>
     </message>
     <message>
         <location line="+8"/>
         <location line="+29"/>
         <source>Cannot load plugin because dependency failed to load: %1(%2)
 Reason: %3</source>
-        <translation>Impossibile caricare il plugin perché la dipendenza non è stata caricata: %1(%2)
-Causa: %3</translation>
+        <translation>因为无法载入依赖关系所以无法载入插件: %1(%2)
+原因: %3</translation>
+    </message>
+</context>
+<context>
+    <name>MyMain</name>
+    <message>
+        <location filename="../../../src/libs/aggregation/examples/text/main.cpp" line="+56"/>
+        <location line="+1"/>
+        <location line="+1"/>
+        <source>N/A</source>
+        <translation>N/A</translation>
+    </message>
+</context>
+<context>
+    <name>PluginDialog</name>
+    <message>
+        <location filename="../../../src/libs/extensionsystem/test/manual/pluginview/plugindialog.cpp" line="+54"/>
+        <source>Details</source>
+        <translation>详情</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Error Details</source>
+        <translation>错误详情</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Installed Plugins</source>
+        <translation>已安装的插件</translation>
+    </message>
+    <message>
+        <location line="+33"/>
+        <source>Plugin Details of %1</source>
+        <translation>插件%1 的详细信息</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Plugin Errors of %1</source>
+        <translation>插件 %1 的错误信息</translation>
+    </message>
+</context>
+<context>
+    <name>PluginManager</name>
+    <message>
+        <location filename="../../../src/libs/extensionsystem/optionsparser.cpp" line="+105"/>
+        <location line="+18"/>
+        <source>The plugin &apos;%1&apos; does not exist.</source>
+        <translation>插件 &apos;%1&apos; 不存在。</translation>
+    </message>
+    <message>
+        <location line="+45"/>
+        <source>Unknown option %1</source>
+        <translation>未知选项 %1</translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>The option %1 requires an argument.</source>
+        <translation>选项 %1 需要参数。</translation>
+    </message>
+</context>
+<context>
+    <name>PluginSpec</name>
+    <message>
+        <location filename="../../../src/libs/extensionsystem/pluginspec.cpp" line="+22"/>
+        <source>&apos;%1&apos; misses attribute &apos;%2&apos;</source>
+        <translation>&apos;%1&apos; 缺少属性 &apos;%2&apos; </translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>&apos;%1&apos; has invalid format</source>
+        <translation>&apos;%1&apos; 格式无效</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Invalid element &apos;%1&apos;</source>
+        <translation>&apos;%1&apos; 无效元素</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Unexpected closing element &apos;%1&apos;</source>
+        <translation>未预料到的关闭元素 &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Unexpected token</source>
+        <translation>未预料到的符号</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Expected element &apos;%1&apos; as top level element</source>
+        <translation> &apos;%1&apos; 应为顶层元素</translation>
+    </message>
+    <message>
+        <location line="+234"/>
+        <source>Resolving dependencies failed because state != Read</source>
+        <translation>解决依赖关系失败因为 state != Read</translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Could not resolve dependency &apos;%1(%2)&apos;</source>
+        <translation>无法解决依赖 &apos;%1(%2)&apos;</translation>
+    </message>
+    <message>
+        <location line="+24"/>
+        <source>Loading the library failed because state != Resolved</source>
+        <translation>载入库文件失败因为 state != Resolved</translation>
+    </message>
+    <message>
+        <location line="+35"/>
+        <source>Plugin is not valid (does not derive from IPlugin)</source>
+        <translation>不是有效插件 (未从IPlugin继承)</translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Initializing the plugin failed because state != Loaded</source>
+        <translation>初始化插件失败因为 state != Loaded</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Internal error: have no plugin instance to initialize</source>
+        <translation>内部错误：没有插件实例要初始化</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Plugin initialization failed: %1</source>
+        <translation>插件初始化失败: %1</translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Cannot perform extensionsInitialized because state != Initialized</source>
+        <translation>无法进行扩展初始化因为 state != Initialized</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Internal error: have no plugin instance to perform extensionsInitialized</source>
+        <translation>内部错误:没有可进行扩展初始化的插件实例</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsDialog</name>
+    <message>
+        <location filename="../../../src/plugins/coreplugin/dialogs/settingsdialog.ui"/>
+        <source>Options</source>
+        <translation type="unfinished">选项</translation>
+    </message>
+    <message>
+        <location/>
+        <source>0</source>
+        <translation type="unfinished">0</translation>
+    </message>
+</context>
+<context>
+    <name>ShortcutSettings</name>
+    <message>
+        <location filename="../../../src/plugins/coreplugin/dialogs/shortcutsettings.ui"/>
+        <source>Keyboard Shortcuts</source>
+        <translation type="unfinished">快捷键</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Filter:</source>
+        <translation type="unfinished">过滤器:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Command</source>
+        <translation type="unfinished">命令</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Label</source>
+        <translation type="unfinished">标签</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Shortcut</source>
+        <translation type="unfinished">快捷键</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Defaults</source>
+        <translation type="unfinished">默认</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Import...</source>
+        <translation type="unfinished">导入...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Export...</source>
+        <translation type="unfinished">输出...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Key Sequence</source>
+        <translation type="unfinished">按键顺序</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Shortcut:</source>
+        <translation type="unfinished">快捷键:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reset</source>
+        <translation type="unfinished">重置</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Remove</source>
+        <translation type="unfinished">删除</translation>
+    </message>
+</context>
+<context>
+    <name>mainClass</name>
+    <message>
+        <location filename="../../../src/libs/aggregation/examples/text/main.ui"/>
+        <source>main</source>
+        <translation>主界面</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Text1:</source>
+        <translation>文本1:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>N/A</source>
+        <translation>N/A</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Text2:</source>
+        <translation>文本2:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Text3:</source>
+        <translation>文本3:</translation>
+    </message>
+</context>
+<context>
+    <name>Utils::CheckableMessageBox</name>
+    <message>
+        <location filename="../../../src/libs/utils/checkablemessagebox.ui"/>
+        <source>Dialog</source>
+        <translation>对话框</translation>
+    </message>
+    <message>
+        <location/>
+        <source>TextLabel</source>
+        <translation>TextLabel</translation>
+    </message>
+    <message>
+        <location/>
+        <source>CheckBox</source>
+        <translation>复选框</translation>
+    </message>
+</context>
+<context>
+    <name>Welcome::Internal::CommunityWelcomePageWidget</name>
+    <message>
+        <location filename="../../../src/plugins/welcome/communitywelcomepagewidget.ui"/>
+        <source>Form</source>
+        <translation>界面</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/welcome/communitywelcomepagewidget.cpp" line="+46"/>
+        <source>News From the OpenPilot Project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>OpenPilot Websites</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>http://forums.openpilot.org/blog/rss/4-openpilot-development-blog</source>
+        <extracomment>Add localized feed here only if one exists</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>OpenPilot Home</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>OpenPilot Wiki</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>OpenPilot Store</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>OpenPilot Forums</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>OpenPilot Bug Tracker</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Welcome::WelcomeMode</name>
+    <message>
+        <location filename="../../../src/plugins/welcome/welcomemode.ui"/>
+        <source>#headerFrame {
+    border-image: url(:/welcome/images/center_frame_header.png) 0;
+    border-width: 0;
+}
+</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Feedback</source>
+        <translation>反馈</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/welcome/welcomemode.cpp" line="+115"/>
+        <source>Welcome</source>
+        <translation>欢迎</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/welcome/welcomemode.ui"/>
+        <source>#gradientWidget {
+  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(247, 247, 247, 255), stop:1 rgba(215, 215, 215, 255));
+}</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Help us make OpenPilot even better</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Utils::DetailsButton</name>
+    <message>
+        <location filename="../../../src/libs/utils/detailsbutton.cpp" line="+47"/>
+        <source>Show Details</source>
+        <translation type="unfinished">显示详细信息</translation>
+    </message>
+</context>
+<context>
+    <name>OpenWith::Editors</name>
+    <message>
+        <location filename="../../../src/plugins/coreplugin/coreconstants.h" line="+91"/>
+        <source>Plain Text Editor</source>
+        <translation>普通文本编辑器</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Binary Editor</source>
+        <translation>二进制编辑器</translation>
+    </message>
+</context>
+<context>
+    <name>Core::Internal::SettingsDialog</name>
+    <message>
+        <location filename="../../../src/plugins/coreplugin/dialogs/settingsdialog.cpp" line="+85"/>
+        <source>Preferences</source>
+        <translation>首选项</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Options</source>
+        <translation>选项</translation>
+    </message>
+</context>
+<context>
+    <name>Welcome::Internal::CommunityWelcomePage</name>
+    <message>
+        <location filename="../../../src/plugins/welcome/communitywelcomepage.h" line="+48"/>
+        <source>Community</source>
+        <translation type="unfinished">社区</translation>
+    </message>
+</context>
+<context>
+    <name>StandardTextGroupBox</name>
+    <message>
+        <source></source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1042,7 +1429,7 @@ Causa: %3</translation>
     <message>
         <location/>
         <source>Output</source>
-        <translation type="unfinished">Uscita</translation>
+        <translation type="unfinished">输出</translation>
     </message>
     <message>
         <location/>
@@ -1056,387 +1443,678 @@ Causa: %3</translation>
     </message>
 </context>
 <context>
-    <name>MyMain</name>
+    <name>MapRipForm</name>
     <message>
-        <location filename="../../../src/libs/aggregation/examples/text/main.cpp" line="+56"/>
-        <location line="+1"/>
-        <location line="+1"/>
-        <source>N/A</source>
-        <translation>N/D</translation>
-    </message>
-</context>
-<context>
-    <name>PluginDialog</name>
-    <message>
-        <location filename="../../../src/libs/extensionsystem/test/manual/pluginview/plugindialog.cpp" line="+54"/>
-        <source>Details</source>
-        <translation>Dettagli</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Error Details</source>
-        <translation>Dettagli Errore</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Installed Plugins</source>
-        <translation>Plugin Installati</translation>
-    </message>
-    <message>
-        <location line="+33"/>
-        <source>Plugin Details of %1</source>
-        <translation>Dettagli Plugin di %1</translation>
-    </message>
-    <message>
-        <location line="+20"/>
-        <source>Plugin Errors of %1</source>
-        <translation>Errore Plugin di %1</translation>
-    </message>
-</context>
-<context>
-    <name>PluginManager</name>
-    <message>
-        <location filename="../../../src/libs/extensionsystem/optionsparser.cpp" line="+105"/>
-        <location line="+18"/>
-        <source>The plugin &apos;%1&apos; does not exist.</source>
-        <translation>Il plugin &apos;%1&apos; non esiste.</translation>
-    </message>
-    <message>
-        <location line="+45"/>
-        <source>Unknown option %1</source>
-        <translation>Opzione sconosciuta %1</translation>
-    </message>
-    <message>
-        <location line="+12"/>
-        <source>The option %1 requires an argument.</source>
-        <translation>L&apos;opzione %1 richiede un parametro.</translation>
-    </message>
-</context>
-<context>
-    <name>PluginSpec</name>
-    <message>
-        <location filename="../../../src/libs/extensionsystem/pluginspec.cpp" line="+22"/>
-        <source>&apos;%1&apos; misses attribute &apos;%2&apos;</source>
-        <translation>In &apos;%1&apos; manca l&apos;attributo &apos;%2&apos;</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>&apos;%1&apos; has invalid format</source>
-        <translation>&apos;%1&apos; ha un formato non valido</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Invalid element &apos;%1&apos;</source>
-        <translation>Elemento &apos;%1&apos; non valido</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Unexpected closing element &apos;%1&apos;</source>
-        <translation>Elemento di chiusura &apos;%1&apos; non atteso</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Unexpected token</source>
-        <translation>Elemento non atteso</translation>
-    </message>
-    <message>
-        <location line="+11"/>
-        <source>Expected element &apos;%1&apos; as top level element</source>
-        <translation>Atteso l&apos;elemento &apos;%1&apos; come elemento di primo livello</translation>
-    </message>
-    <message>
-        <location line="+234"/>
-        <source>Resolving dependencies failed because state != Read</source>
-        <translation>La risoluzione delle dipendenze non è riuscita poiché state != Read</translation>
-    </message>
-    <message>
-        <location line="+17"/>
-        <source>Could not resolve dependency &apos;%1(%2)&apos;</source>
-        <translation>Impossibile risolvere la dipendenza &apos;%1(%2)&apos;</translation>
-    </message>
-    <message>
-        <location line="+24"/>
-        <source>Loading the library failed because state != Resolved</source>
-        <translation>Il caricamento della libreria è fallito poiché state != Resolved</translation>
-    </message>
-    <message>
-        <location line="+35"/>
-        <source>Plugin is not valid (does not derive from IPlugin)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+21"/>
-        <source>Initializing the plugin failed because state != Loaded</source>
-        <translation>L&apos;inizializzazione del plugin non è riuscita poiché state != Loaded</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Internal error: have no plugin instance to initialize</source>
-        <translation>Errore interno: non ho un&apos;istanza di plugin da inizializzare</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Plugin initialization failed: %1</source>
-        <translation>L&apos;inizializzazione del plugin è fallita: %1</translation>
-    </message>
-    <message>
-        <location line="+19"/>
-        <source>Cannot perform extensionsInitialized because state != Initialized</source>
-        <translation>Impossibile eseguire extensionsInitialized poiché state != Initialized</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Internal error: have no plugin instance to perform extensionsInitialized</source>
-        <translation>Errore interno: non ho un&apos;istanza di plugin su cui eseguire extensionsInitialized</translation>
-    </message>
-</context>
-<context>
-    <name>SettingsDialog</name>
-    <message>
-        <location filename="../../../src/plugins/coreplugin/dialogs/settingsdialog.ui"/>
-        <source>Options</source>
-        <translation>Opzioni</translation>
-    </message>
-    <message>
-        <location/>
-        <source>0</source>
-        <translation>0</translation>
-    </message>
-</context>
-<context>
-    <name>ShortcutSettings</name>
-    <message>
-        <location filename="../../../src/plugins/coreplugin/dialogs/shortcutsettings.ui"/>
-        <source>Keyboard Shortcuts</source>
-        <translation>Scorciatoie della Tastiera</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Filter:</source>
-        <translation>Filtro:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Command</source>
-        <translation>Comando</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Label</source>
-        <translation>Etichetta</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Shortcut</source>
-        <translation>Scorciatoia</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Defaults</source>
-        <translation>Predefiniti</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Import...</source>
-        <translation>Importa...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Export...</source>
-        <translation>Esporta...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Key Sequence</source>
-        <translation>Sequenza di Tasti</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Shortcut:</source>
-        <translation>Scorciatoia:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Reset</source>
-        <translation>Ripristina</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Remove</source>
-        <translation>Rimuovi</translation>
-    </message>
-</context>
-<context>
-    <name>mainClass</name>
-    <message>
-        <location filename="../../../src/libs/aggregation/examples/text/main.ui"/>
-        <source>main</source>
-        <translation>main</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Text1:</source>
-        <translation>Testo1:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>N/A</source>
-        <translation>N/D</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Text2:</source>
-        <translation>Testo2:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Text3:</source>
-        <translation>Testo3:</translation>
-    </message>
-</context>
-<context>
-    <name>Utils::CheckableMessageBox</name>
-    <message>
-        <location filename="../../../src/libs/utils/checkablemessagebox.ui"/>
-        <source>Dialog</source>
+        <location filename="../../../src/libs/opmapcontrol/src/mapwidget/mapripform.ui"/>
+        <source>MapRipper</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>TextLabel</source>
+        <source>Currently ripping from:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>CheckBox</source>
+        <source>Downloading tile</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Cancel</source>
+        <translation type="unfinished">取消</translation>
     </message>
 </context>
 <context>
-    <name>Welcome::Internal::CommunityWelcomePageWidget</name>
+    <name>AHRSWidget</name>
     <message>
-        <location filename="../../../src/plugins/welcome/communitywelcomepagewidget.ui"/>
+        <location filename="../../../src/plugins/config/ahrs.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/welcome/communitywelcomepagewidget.cpp" line="+46"/>
-        <source>News From the OpenPilot Project</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>OpenPilot Websites</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>http://forums.openpilot.org/blog/rss/4-openpilot-development-blog</source>
-        <extracomment>Add localized feed here only if one exists</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>OpenPilot Home</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>OpenPilot Wiki</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>OpenPilot Store</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>OpenPilot Forums</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>OpenPilot Bug Tracker</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Welcome::WelcomeMode</name>
-    <message>
-        <location filename="../../../src/plugins/welcome/welcomemode.ui"/>
-        <source>#gradientWidget {
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(247, 247, 247, 255), stop:1 rgba(215, 215, 215, 255));
-}</source>
-        <translation type="unfinished">#gradientWidget {
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(247, 247, 247, 255), stop:1 rgba(215, 215, 215, 255));
-}</translation>
+        <translation type="unfinished">界面</translation>
     </message>
     <message>
         <location/>
-        <source>#headerFrame {
-    border-image: url(:/welcome/images/center_frame_header.png) 0;
-    border-width: 0;
-}
-</source>
+        <source>These are the sensor variance values computed by the AHRS.
+
+Tip: lower is better!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Feedback</source>
-        <translation type="unfinished">Commenti</translation>
+        <source>Telemetry link not established.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/welcome/welcomemode.cpp" line="+115"/>
-        <source>Welcome</source>
-        <translation type="unfinished">Benvenuto</translation>
+        <location/>
+        <source>Press to start a calibration procedure, about 15 seconds.
+
+Hint: run this with engines at cruising speed.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/welcome/welcomemode.ui"/>
-        <source>Help us make OpenPilot even better</source>
+        <location/>
+        <source>Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>AHRS Algorithm:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select the sensor integration algorithm here.
+&quot;Simple&quot; only uses accelerometer values
+&quot;INSGPS&quot; the full featured algorithm integrating all sensors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Nice paper plane, eh?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Six Point Calibration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Launch a sensor range and bias calibration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Six Point Calibration instructions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Saves the Home Location. This is only enabled
+if the Home Location is set, i.e. if the GPS fix is
+successful.
+
+Disabled if there is no GPS fix.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttonGroup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Refresh this screen with current values from the board.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Request</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Sensor noise calibration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save settings (only enabled when calibration is running)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Check this box if you are flying indoors and have no GPS fix.
+Only makes sense with the &quot;INSGPS&quot; algorithm.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Indoor flight mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save settings to the OP board (RAM only).
+
+This does not save the calibration settings, this is done using the
+specific calibration button on top of the screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save to RAM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send settings to OP board, and save to the microSD card.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save to SD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Clears the HomeLocation: only makes sense if you save
+to SD. This will force the AHRS to use the next GPS fix as the
+new home location unless it is in indoor mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Clear</source>
+        <translation type="unfinished">清除</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Home Location:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>Utils::DetailsButton</name>
+    <name>AircraftWidget</name>
     <message>
-        <location filename="../../../src/libs/utils/detailsbutton.cpp" line="+47"/>
-        <source>Show Details</source>
+        <location filename="../../../src/plugins/config/airframe.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">界面</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Aircraft type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select aircraft type here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Airplane type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mixer OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel Assignment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Aileron 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Aileron 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Elevator 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rudder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Elevator 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Throttle Curve</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Frame type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Idle Throttle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Cyclic Rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Tricopter Yaw Ch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Feed Forward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Accel Time Constant</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Decel Time Constant</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor 5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor 6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor 7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor 8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>CCPM Heli</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>This is not implemented yet, sorry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Custom / Advanced setup UI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Retrieve settings from OpenPilot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Get Current</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send to OpenPilot but don&apos;t write in SD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save to RAM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Applies and Saves all settings to SD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save to SD</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>OpenWith::Editors</name>
+    <name>SettingsWidget</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/coreconstants.h" line="+91"/>
-        <source>Plain Text Editor</source>
+        <location filename="../../../src/plugins/config/settingswidget.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">界面</translation>
+    </message>
+    <message>
+        <location/>
+        <source>RC Input</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>Binary Editor</source>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;FreeSans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Maximum channel value&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>2000</source>
+        <translation type="unfinished">2000</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;FreeSans&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Current channel value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>1000</source>
+        <translation type="unfinished">1000</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Retrieve settings from OpenPilot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Get Current</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Be sure to set the Neutral position on all sliders before sending!
+Applies and Saves all settings to SD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save to SD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send to OpenPilot but don&apos;t write in SD.
+Be sure to set the Neutral position on all sliders before sending!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save to RAM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;FreeSans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Minimum channel value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Start calibrating the RC Inputs.
+Uncheck/Check to restart calibration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Run Calibration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Indicates whether OpenPilot is getting a signal from the RC receiver.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>RC Receiver Not Connected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select the receiver type here:
+- PWM is the most usual type
+- PPM is connected to input XXX 
+- Spektrum is used with Spektrum &apos;satellite&apos; receivers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>RC Receiver Type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Servo Output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Aircraft type: undefined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel 0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel 5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Select the kind of actuator (servo) connected to this output channel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Minimum PWM value, beware of not overdriving your servo.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Maximum PWM value, beware of not overdriving your servo.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Move the servos using the sliders. Two important things:
+- Take extra care if the output is connected to an motor controller!
+- Will only work if the RC receiver is working (failsafe)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Test outputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel 6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel 7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Update rate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel 0-3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel 4-7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Current value of slider.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>0000</source>
+        <translation type="unfinished">0000</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;FreeSans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Check to invert the channel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rev.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>Core::Internal::SettingsDialog</name>
+    <name>TelemetryWidget</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/dialogs/settingsdialog.cpp" line="+85"/>
-        <source>Preferences</source>
+        <location filename="../../../src/plugins/config/telemetry.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">界面</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Set the serial speed of your telemetry modem here. It is the speed between the OpenPilot board and the modem, and could be different from the radio link speed.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Beware of not locking yourself out! You should only modify this setting when the OpenPilot board is connected through the USB port.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>Options</source>
-        <translation type="unfinished">Opzioni</translation>
+        <location/>
+        <source>Telemetry speed:</source>
+        <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>Welcome::Internal::CommunityWelcomePage</name>
     <message>
-        <location filename="../../../src/plugins/welcome/communitywelcomepage.h" line="+48"/>
-        <source>Community</source>
-        <translation type="unfinished">Comunità</translation>
+        <location/>
+        <source>Select the speed here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send to OpenPilot but don&apos;t write in SD.
+Beware of not locking yourself out!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save to RAM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Retrieve settings from OpenPilot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Get Current</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Applies and Saves all settings to SD.
+Beware of not locking yourself out!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save to SD</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1444,17 +2122,17 @@ Causa: %3</translation>
     <message>
         <location filename="../../../src/plugins/coreplugin/uavgadgetoptionspage.ui"/>
         <source>Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">配置</translation>
     </message>
     <message>
         <location/>
         <source>Clone</source>
-        <translation type="unfinished">Clona</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Delete</source>
-        <translation type="unfinished">Elimina</translation>
+        <translation type="unfinished">删除</translation>
     </message>
     <message>
         <location/>
@@ -1464,7 +2142,7 @@ Causa: %3</translation>
     <message>
         <location/>
         <source>Settings</source>
-        <translation type="unfinished">Impostazioni</translation>
+        <translation type="unfinished">设置</translation>
     </message>
 </context>
 <context>
@@ -1472,7 +2150,7 @@ Causa: %3</translation>
     <message>
         <location filename="../../../src/plugins/coreplugin/workspacesettings.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">界面</translation>
     </message>
     <message>
         <location/>
@@ -1493,7 +2171,7 @@ Causa: %3</translation>
     <message>
         <location/>
         <source>Details</source>
-        <translation type="unfinished">Dettagli</translation>
+        <translation type="unfinished">详情</translation>
     </message>
     <message>
         <location/>
@@ -1503,7 +2181,7 @@ Causa: %3</translation>
     <message>
         <location/>
         <source>Name:</source>
-        <translation type="unfinished">Nome:</translation>
+        <translation type="unfinished">名称:</translation>
     </message>
     <message>
         <location/>
@@ -1531,23 +2209,291 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>DialGadgetOptionsPage</name>
+    <message>
+        <location filename="../../../src/plugins/dial/dialgadgetoptionspage.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">界面</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Dial SVG: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Dial font:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>BackgroundID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>ForegroundID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Indicator 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Movement:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>ID:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Min:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Factor:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>DataObject</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>ObjectField</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Indicator 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Indicator 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/dial/dialgadgetoptionspage.cpp" line="+85"/>
+        <source>SVG image (*.svg)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Choose SVG image</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GCSControl</name>
+    <message>
+        <location filename="../../../src/plugins/gcscontrol/gcscontrol.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">界面</translation>
+    </message>
+    <message>
+        <location/>
+        <source>GCS Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Armed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Flight Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GpsDisplayGadgetOptionsPage</name>
+    <message>
+        <location filename="../../../src/plugins/gpsdisplay/gpsdisplaygadgetoptionspage.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">界面</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Serial Connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Data Bits:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Stop Bits:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Parity:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Timeout(ms):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Port:</source>
+        <translation type="unfinished">端口:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Port Speed:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Flow Control:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>IP Connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Host</source>
+        <translation type="unfinished">主机</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Telemetry</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GpsDisplayWidget</name>
+    <message>
+        <location filename="../../../src/plugins/gpsdisplay/gpsdisplaywidget.ui"/>
+        <source>Coord:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Speed:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Heading:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>H / V / P DOP:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>0 / 0 / 0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Sats Used:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Fix Type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Connect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disconnect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>GPS Data Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FGOptionsPage</name>
+    <message>
+        <location filename="../../../src/plugins/hitlnew/fgoptionspage.ui"/>
+        <location filename="../../../src/plugins/hitlnew/ui_fgoptionspage.h" line="+102"/>
+        <source>Form</source>
+        <translation type="unfinished">界面</translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/hitlnew/ui_fgoptionspage.h" line="+1"/>
+        <source>FlightGear executable:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/hitlnew/ui_fgoptionspage.h" line="+1"/>
+        <source>FlightGear data directory:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/hitlnew/ui_fgoptionspage.h" line="+2"/>
+        <location line="+2"/>
+        <source>Manual aircraft control (can be used when hardware is not available)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>HITLOptionsPage</name>
     <message>
         <location filename="../../../src/plugins/hitlnew/hitloptionspage.ui"/>
         <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+185"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">界面</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+7"/>
-        <location line="+2"/>
-        <source>Manual aircraft control (can be used when hardware is not available)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="-8"/>
+        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+1"/>
         <source>Choose flight simulator:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1577,7 +2523,14 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+5"/>
+        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+2"/>
+        <location line="+2"/>
+        <source>Manual aircraft control (can be used when hardware is not available)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+1"/>
         <source>Host Address:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1610,7 +2563,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/plugins/hitlnew/hitlwidget.ui"/>
         <location filename="../../../src/plugins/hitlnew/ui_hitlwidget.h" line="+331"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">界面</translation>
     </message>
     <message>
         <location/>
@@ -1634,7 +2587,7 @@ p, li { white-space: pre-wrap; }
         <location/>
         <location filename="../../../src/plugins/hitlnew/ui_hitlwidget.h" line="+2"/>
         <source>Stop</source>
-        <translation type="unfinished">Ferma</translation>
+        <translation type="unfinished">停止</translation>
     </message>
     <message>
         <location/>
@@ -1656,11 +2609,158 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>ImportExportDialog</name>
+    <message>
+        <location filename="../../../src/plugins/importexport/importexportdialog.ui"/>
+        <source>Dialog</source>
+        <translation type="unfinished">对话框</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/importexport/importexportdialog.cpp" line="+10"/>
+        <source>Import Export Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ImportExportGadgetOptionsPage</name>
+    <message>
+        <location filename="../../../src/plugins/importexport/importexportgadgetoptionspage.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">界面</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Default Config File </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/importexport/importexportgadgetoptionspage.cpp" line="+55"/>
+        <source>INI file (*.ini)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Choose configuration file</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ImportExportGadgetWidget</name>
+    <message>
+        <location filename="../../../src/plugins/importexport/importexportgadgetwidget.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">界面</translation>
+    </message>
+    <message>
+        <location/>
+        <source>This is experimental. Use at own risk.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Please report bugs!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Config File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Items</source>
+        <translation type="unfinished">项</translation>
+    </message>
+    <message>
+        <location/>
+        <source>General (Workspace, Key-Bindings)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>All Gadgets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Import</source>
+        <translation type="unfinished">导入</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Help</source>
+        <translation type="unfinished">帮助</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/importexport/importexportgadgetwidget.cpp" line="+81"/>
+        <source>Can&apos;t write file </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>The settings have been exported to </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+35"/>
+        <source>Can&apos;t read file </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>The settings have been imported from </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>. Restart the application.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>IPconnectionOptionsPage</name>
+    <message>
+        <location filename="../../../src/plugins/ipconnection/ipconnectionoptionspage.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">界面</translation>
+    </message>
+    <message>
+        <location/>
+        <source>TCP connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>UDP connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Host Name/Number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/ipconnection/ipconnectionoptionspage.h" line="+53"/>
+        <source>settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LineardialGadgetOptionsPage</name>
     <message>
         <location filename="../../../src/plugins/lineardial/lineardialgadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">界面</translation>
     </message>
     <message>
         <location/>
@@ -1744,11 +2844,39 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>Logging</name>
+    <message>
+        <location filename="../../../src/plugins/logging/logging.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">界面</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pause</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Status: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Idle</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ModelViewOptionsPage</name>
     <message>
         <location filename="../../../src/plugins/modelview/modelviewoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">界面</translation>
     </message>
     <message>
         <location/>
@@ -1776,11 +2904,85 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/notify/notifypluginoptionspage.ui"/>
         <source>Form</source>
+        <translation type="unfinished">界面</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Sound Collection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Language</source>
+        <translation type="unfinished">语言</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Select the sound collection&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Sound Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Enable Sounds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Add</source>
+        <translation type="unfinished">添加</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Modify</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Delete</source>
+        <translation type="unfinished">删除</translation>
+    </message>
+    <message>
+        <location/>
+        <source>DataObject</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>ObjectField</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Sound1:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Sound2:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Sound3:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Value is</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1800,7 +3002,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>Sound1:</source>
+        <source>Say Order</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1811,7 +3013,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Never</source>
-        <translation type="unfinished">Mai</translation>
+        <translation type="unfinished">从不</translation>
     </message>
     <message>
         <location/>
@@ -1830,66 +3032,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>Value is</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Say Order</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Sound2:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Sound Collection</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Language</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Select the sound collection&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enable Sounds</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Add</source>
-        <translation type="unfinished">Aggiungi</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Modify</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Delete</source>
-        <translation type="unfinished">Elimina</translation>
-    </message>
-    <message>
-        <location/>
-        <source>DataObject</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>ObjectField</source>
+        <source>After third</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1907,19 +3050,176 @@ p, li { white-space: pre-wrap; }
         <source>Notify Plugin</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>opmap_edit_waypoint_dialog</name>
     <message>
-        <location filename="../../../src/plugins/notify/notifypluginoptionspage.ui"/>
-        <source>Sound Notifications</source>
+        <location filename="../../../src/plugins/opmap/opmap_edit_waypoint_dialog.ui"/>
+        <source>OpenPilot GCS Edit Waypoint</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Sound3:</source>
+        <source>Number </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>After third</source>
+        <source>Latitude </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Longitude </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Altitude </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>meters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Description </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Locked</source>
+        <translation type="unfinished">锁定</translation>
+    </message>
+    <message>
+        <location/>
+        <source>degrees</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Revert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Cancel</source>
+        <translation type="unfinished">取消</translation>
+    </message>
+</context>
+<context>
+    <name>opmap_overlay_widget</name>
+    <message>
+        <location filename="../../../src/plugins/opmap/opmap_overlay_widget.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">界面</translation>
+    </message>
+    <message>
+        <location/>
+        <source>labelStatus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>%v</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>opmap_statusbar_widget</name>
+    <message>
+        <location filename="../../../src/plugins/opmap/opmap_statusbar_widget.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">界面</translation>
+    </message>
+    <message>
+        <location/>
+        <source>labelStatus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>%v</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>opmap_waypointeditor_dialog</name>
+    <message>
+        <location filename="../../../src/plugins/opmap/opmap_waypointeditor_dialog.ui"/>
+        <source>OpenPilot GCS Waypoint Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Waypoints</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Num</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Locked</source>
+        <translation type="unfinished">锁定</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Latitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Longitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Altitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Hold Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Height and Timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/opmap/opmap_waypointeditor_dialog.cpp" line="+146"/>
+        <source>Waypoint 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Waypoint 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Waypoint 3</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1928,52 +3228,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/opmap/opmap_widget.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Find place</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Zoom out</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Zoom in</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Zoom level</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Map position</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>labelMapPos</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Mouse position</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>labelMousePos</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>%v</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">界面</translation>
     </message>
     <message>
         <location/>
@@ -1993,6 +3248,11 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>paris</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Find place</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2018,7 +3278,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">新建</translation>
     </message>
     <message>
         <location/>
@@ -2028,7 +3288,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Open</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">打开</translation>
     </message>
     <message>
         <location/>
@@ -2038,7 +3298,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Save</source>
-        <translation type="unfinished">Salva</translation>
+        <translation type="unfinished">保存</translation>
     </message>
     <message>
         <location/>
@@ -2048,7 +3308,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Add</source>
-        <translation type="unfinished">Aggiungi</translation>
+        <translation type="unfinished">添加</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Zoom in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Zoom level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Zoom out</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -2063,6 +3338,16 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Map rotation follows UAV heading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show/Hide the UAV trail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Clear the UAV trail</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2083,7 +3368,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Home</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">主页</translation>
     </message>
     <message>
         <location/>
@@ -2127,12 +3412,22 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>Show/Hide the UAV trail</source>
+        <source>Map position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Clear the UAV trail</source>
+        <source>labelMapPos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mouse position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>labelMousePos</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2140,32 +3435,30 @@ p, li { white-space: pre-wrap; }
         <source>labelMapZoom</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>%v</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>opmap_zoom_slider_widget</name>
+    <message>
+        <location filename="../../../src/plugins/opmap/opmap_zoom_slider_widget.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">界面</translation>
+    </message>
 </context>
 <context>
     <name>OPMapGadgetOptionsPage</name>
     <message>
         <location filename="../../../src/plugins/opmap/opmapgadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">界面</translation>
     </message>
     <message>
         <location/>
-        <source> Default </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Default longitude </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Use OpenGL</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Default latitude </source>
+        <source>Map type </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2175,7 +3468,12 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>Map type </source>
+        <source>Default latitude </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Default longitude </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2185,12 +3483,12 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>Server and Cache</source>
+        <source>Use OpenGL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Restore default server and cache settings</source>
+        <source>Server and Cache</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2200,12 +3498,22 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
+        <source>Use Memory Cache</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
         <source>Cache location </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Use Memory Cache</source>
+        <source>Restore default server and cache settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source> Default </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2215,10 +3523,48 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>PFDGadgetOptionsPage</name>
+    <message>
+        <location filename="../../../src/plugins/pfd/pfdgadgetoptionspage.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">界面</translation>
+    </message>
+    <message>
+        <location/>
+        <source>PFD SVG: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Use OpenGL for rendering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>High Quality text (OpenGL)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/pfd/pfdgadgetoptionspage.cpp" line="+60"/>
+        <source>SVG image (*.svg)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Choose SVG image</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ScopeGadgetOptionsPage</name>
     <message>
         <location filename="../../../src/plugins/scope/scopegadgetoptionspage.ui"/>
         <source>Form</source>
+        <translation type="unfinished">界面</translation>
+    </message>
+    <message>
+        <location/>
+        <source>X-Axis</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2228,47 +3574,12 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source> seconds</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Data Size:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>UAVObject:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Color:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>UAVField:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Scale:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Plot curves</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>X-Axis</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Choose</source>
+        <source> seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2279,6 +3590,36 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>ms</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Plot curves</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>UAVObject:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>UAVField:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Color:</source>
+        <translation type="unfinished">颜色:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Choose</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Scale:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2309,7 +3650,7 @@ Update</source>
     <message>
         <location filename="../../../src/plugins/systemhealth/systemhealthgadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">界面</translation>
     </message>
     <message>
         <location/>
@@ -2332,7 +3673,7 @@ Update</source>
     <message>
         <location filename="../../../src/plugins/uavobjectbrowser/uavobjectbrowser.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">界面</translation>
     </message>
     <message>
         <location/>
@@ -2362,7 +3703,7 @@ Update</source>
     <message>
         <location/>
         <source>Save</source>
-        <translation type="unfinished">Salva</translation>
+        <translation type="unfinished">保存</translation>
     </message>
     <message>
         <location/>
@@ -2372,7 +3713,7 @@ Update</source>
     <message>
         <location/>
         <source>Load</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">载入</translation>
     </message>
     <message>
         <location/>
@@ -2395,7 +3736,7 @@ Update</source>
     <message>
         <location filename="../../../src/plugins/uavobjectbrowser/uavobjectbrowseroptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">界面</translation>
     </message>
     <message>
         <location/>
@@ -3430,7 +4771,7 @@ Update</source>
     <message>
         <location line="+345"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -3489,7 +4830,7 @@ Update</source>
     <message>
         <location filename="../../../src/libs/libqxt/src/gui/qxtcountrymodel.cpp" line="+196"/>
         <source>Name</source>
-        <translation type="unfinished">Nome</translation>
+        <translation type="unfinished">名称</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3552,22 +4893,22 @@ Update</source>
     <message>
         <location line="+1"/>
         <source>Wildcard</source>
-        <translation type="unfinished">Wildcard</translation>
+        <translation type="unfinished">通配符</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Regular Expression</source>
-        <translation type="unfinished">Espressione Regolare</translation>
+        <translation type="unfinished">正则表达式</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Cancel</source>
-        <translation type="unfinished">Annulla</translation>
+        <translation type="unfinished">取消</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Filter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">过滤器</translation>
     </message>
 </context>
 <context>
@@ -5622,6 +6963,24 @@ Update</source>
     </message>
 </context>
 <context>
+    <name>mapcontrol::TrailItem</name>
+    <message>
+        <location filename="../../../src/libs/opmapcontrol/src/mapwidget/trailitem.cpp" line="+35"/>
+        <source>Position:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Altitude:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ConfigGadgetFactory</name>
     <message>
         <location filename="../../../src/plugins/config/configgadgetfactory.cpp" line="+35"/>
@@ -5643,6 +7002,34 @@ Update</source>
         <location filename="../../../src/plugins/coreplugin/iuavgadgetconfiguration.cpp" line="+36"/>
         <location line="+1"/>
         <source>default</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Core::UAVConfigInfo</name>
+    <message>
+        <location filename="../../../src/plugins/coreplugin/uavconfiginfo.cpp" line="+77"/>
+        <source>Do you want to continue the import?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>INFO: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>WARNING: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>ERROR: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Unknown compatibility level: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5680,7 +7067,7 @@ Update</source>
     <message>
         <location line="+5"/>
         <source>Split</source>
-        <translation type="unfinished">Dividi</translation>
+        <translation type="unfinished">分栏</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5690,7 +7077,7 @@ Update</source>
     <message>
         <location line="+7"/>
         <source>Split Side by Side</source>
-        <translation type="unfinished">Dividi Parte a Parte</translation>
+        <translation type="unfinished">左右分栏</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -5737,6 +7124,14 @@ Update</source>
     </message>
 </context>
 <context>
+    <name>DialGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/dial/dialgadgetfactory.cpp" line="+37"/>
+        <source>Analog Dial Gadget</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>EmptyGadgetFactory</name>
     <message>
         <location filename="../../../src/plugins/emptygadget/emptygadgetfactory.cpp" line="+34"/>
@@ -5766,6 +7161,22 @@ Update</source>
     </message>
 </context>
 <context>
+    <name>GCSControlGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/gcscontrol/gcscontrolgadgetfactory.cpp" line="+34"/>
+        <source>UAV Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GpsDisplayGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/gpsdisplay/gpsdisplaygadgetfactory.cpp" line="+36"/>
+        <source>GPS Display Gadget</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>HITLFactory</name>
     <message>
         <location filename="../../../src/plugins/hitlnew/hitlfactory.cpp" line="+35"/>
@@ -5774,10 +7185,26 @@ Update</source>
     </message>
 </context>
 <context>
+    <name>ImportExportGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/importexport/importexportgadgetfactory.cpp" line="+38"/>
+        <source>Import/Export GCS Config</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LineardialGadgetFactory</name>
     <message>
         <location filename="../../../src/plugins/lineardial/lineardialgadgetfactory.cpp" line="+36"/>
         <source>Bargraph Dial Gadget</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LoggingGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/logging/logginggadgetfactory.cpp" line="+34"/>
+        <source>Logging</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5831,32 +7258,47 @@ Update</source>
 <context>
     <name>OPMapGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/opmap/opmapgadgetwidget.cpp" line="+431"/>
-        <source>&amp;Zoom </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-5"/>
-        <source>Zoom</source>
-        <translation type="unfinished">Zoom</translation>
-    </message>
-    <message>
-        <location line="-171"/>
+        <location filename="../../../src/plugins/opmap/opmapgadgetwidget.cpp" line="+255"/>
         <source>Flight path 62</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+157"/>
         <source>Copy</source>
+        <translation type="unfinished">复制</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Zoom</source>
+        <translation type="unfinished">缩放</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>&amp;Zoom </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+42"/>
+        <location line="+9"/>
+        <source>HOME</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>UAV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
         <source>Waypoints</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+499"/>
+        <location line="+258"/>
+        <source>OpenPilot GCS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+241"/>
         <source>&amp;Close menu</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5873,7 +7315,7 @@ Update</source>
     <message>
         <location line="+1"/>
         <source>F5</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">F5</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -5933,82 +7375,7 @@ Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+18"/>
-        <source>Zoom &amp;In</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Zoom the map in</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Zoom &amp;Out</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Zoom the map out</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Go to where you right clicked the mouse</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Go to &amp;Home location</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Go to &amp;UAV location</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+9"/>
-        <source>Follow UAV position</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Follow UAV heading</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Keep the map rotation to the UAV heading</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+15"/>
-        <source>&amp;Waypoint editor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Open the waypoint editor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-43"/>
-        <source>Center the map onto where you right clicked the mouse</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-568"/>
-        <source>HOME</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>UAV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+534"/>
+        <location line="+1"/>
         <source>Show/Hide the compass</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6033,9 +7400,44 @@ Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+20"/>
-        <source>Ctrl+H</source>
+        <location line="+5"/>
+        <source>Zoom &amp;In</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Zoom the map in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Zoom &amp;Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Zoom the map out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Go to where you right clicked the mouse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Center the map onto where you right clicked the mouse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Go to &amp;Home location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Ctrl+H</source>
+        <translation type="unfinished">Ctrl+H</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -6043,9 +7445,14 @@ Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>Ctrl+U</source>
+        <location line="+3"/>
+        <source>Go to &amp;UAV location</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Ctrl+U</source>
+        <translation type="unfinished">Ctrl+U</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -6063,12 +7470,27 @@ Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+3"/>
+        <source>Follow UAV position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
         <source>Keep the map centered onto the UAV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+5"/>
+        <source>Follow UAV heading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Keep the map rotation to the UAV heading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
         <source>Show UAV trail</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6088,12 +7510,22 @@ Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>Ctrl+W</source>
+        <location line="+3"/>
+        <source>&amp;Waypoint editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+1"/>
+        <source>Ctrl+W</source>
+        <translation type="unfinished">Ctrl+W</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Open the waypoint editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>&amp;Add waypoint</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6115,7 +7547,7 @@ Update</source>
     <message>
         <location line="+1"/>
         <source>Ctrl+E</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ctrl+E</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -6155,16 +7587,19 @@ Update</source>
     <message>
         <location line="+1"/>
         <source>Ctrl+C</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ctrl+C</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Clear waypoints</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>PFDGadgetFactory</name>
     <message>
-        <location line="-366"/>
-        <source>OpenPilot GCS</source>
+        <location filename="../../../src/plugins/pfd/pfdgadgetfactory.cpp" line="+36"/>
+        <source>Primary Flight Display Gadget</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6197,12 +7632,12 @@ Update</source>
     <message>
         <location filename="../../../src/plugins/uavobjectbrowser/uavobjecttreemodel.cpp" line="+66"/>
         <source>Property</source>
-        <translation type="unfinished">Proprietà</translation>
+        <translation type="unfinished">属性</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Value</source>
-        <translation type="unfinished">Valore</translation>
+        <translation type="unfinished">值</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -6212,7 +7647,7 @@ Update</source>
     <message>
         <location line="+3"/>
         <source>Settings</source>
-        <translation type="unfinished">Impostazioni</translation>
+        <translation type="unfinished">设置</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -6255,12 +7690,12 @@ Update</source>
     <message>
         <location line="+0"/>
         <source>Manual</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">手动设置</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Never</source>
-        <translation type="unfinished">Mai</translation>
+        <translation type="unfinished">从不</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -6270,7 +7705,7 @@ Update</source>
     <message>
         <location line="+0"/>
         <source>Read Only</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">只读</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -6357,1438 +7792,6 @@ Update</source>
     <message>
         <location line="+2"/>
         <source>All Files (*);;Text Files (*.bin)</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>DialGadgetOptionsPage</name>
-    <message>
-        <location filename="../../../src/plugins/dial/dialgadgetoptionspage.ui"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Dial SVG: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>BackgroundID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>ForegroundID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Dial font:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Indicator 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Movement:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>ID:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Min:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Max:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Factor:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>DataObject</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>ObjectField</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Indicator 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Indicator 3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/dial/dialgadgetoptionspage.cpp" line="+85"/>
-        <source>SVG image (*.svg)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Choose SVG image</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>GpsDisplayGadgetOptionsPage</name>
-    <message>
-        <location filename="../../../src/plugins/gpsdisplay/gpsdisplaygadgetoptionspage.ui"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Mode:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Port:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Port Speed:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Flow Control:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Serial Connection</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Data Bits:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Stop Bits:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Parity:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Timeout(ms):</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>IP Connection</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Host</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Telemetry</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>GpsDisplayWidget</name>
-    <message>
-        <location filename="../../../src/plugins/gpsdisplay/gpsdisplaywidget.ui"/>
-        <source>Speed:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Connect</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Disconnect</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Coord:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Unknown</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Heading:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>H / V / P DOP:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>0 / 0 / 0</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Sats Used:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Fix Type:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>GPS Data Stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>IPconnectionOptionsPage</name>
-    <message>
-        <location filename="../../../src/plugins/ipconnection/ipconnectionoptionspage.ui"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>TCP connection</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>UDP connection</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Host Name/Number</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/ipconnection/ipconnectionoptionspage.h" line="+53"/>
-        <source>settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>opmap_edit_waypoint_dialog</name>
-    <message>
-        <location filename="../../../src/plugins/opmap/opmap_edit_waypoint_dialog.ui"/>
-        <source>OpenPilot GCS Edit Waypoint</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Number </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Latitude </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Longitude </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Altitude </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>meters</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Description </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Locked</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>degrees</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>OK</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Apply</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Revert</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Cancel</source>
-        <translation type="unfinished">Annulla</translation>
-    </message>
-</context>
-<context>
-    <name>opmap_overlay_widget</name>
-    <message>
-        <location filename="../../../src/plugins/opmap/opmap_overlay_widget.ui"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>labelStatus</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>%v</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>opmap_statusbar_widget</name>
-    <message>
-        <location filename="../../../src/plugins/opmap/opmap_statusbar_widget.ui"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>labelStatus</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>%v</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>opmap_waypointeditor_dialog</name>
-    <message>
-        <location filename="../../../src/plugins/opmap/opmap_waypointeditor_dialog.ui"/>
-        <source>OpenPilot GCS Waypoint Editor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Waypoints</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Num</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Locked</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Latitude</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Longitude</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Altitude</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Hold Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Height and Timeline</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/opmap/opmap_waypointeditor_dialog.cpp" line="+146"/>
-        <source>Waypoint 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Waypoint 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Waypoint 3</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>opmap_zoom_slider_widget</name>
-    <message>
-        <location filename="../../../src/plugins/opmap/opmap_zoom_slider_widget.ui"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>PFDGadgetOptionsPage</name>
-    <message>
-        <location filename="../../../src/plugins/pfd/pfdgadgetoptionspage.ui"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>PFD SVG: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Use OpenGL for rendering</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>High Quality text (OpenGL)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/pfd/pfdgadgetoptionspage.cpp" line="+60"/>
-        <source>SVG image (*.svg)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Choose SVG image</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>mapcontrol::TrailItem</name>
-    <message>
-        <location filename="../../../src/libs/opmapcontrol/src/mapwidget/trailitem.cpp" line="+35"/>
-        <source>Position:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Altitude:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Time:</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>DialGadgetFactory</name>
-    <message>
-        <location filename="../../../src/plugins/dial/dialgadgetfactory.cpp" line="+37"/>
-        <source>Analog Dial Gadget</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>GpsDisplayGadgetFactory</name>
-    <message>
-        <location filename="../../../src/plugins/gpsdisplay/gpsdisplaygadgetfactory.cpp" line="+36"/>
-        <source>GPS Display Gadget</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>PFDGadgetFactory</name>
-    <message>
-        <location filename="../../../src/plugins/pfd/pfdgadgetfactory.cpp" line="+36"/>
-        <source>Primary Flight Display Gadget</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>MapRipForm</name>
-    <message>
-        <location filename="../../../src/libs/opmapcontrol/src/mapwidget/mapripform.ui"/>
-        <source>MapRipper</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Currently ripping from:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Downloading tile</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Cancel</source>
-        <translation type="unfinished">Annulla</translation>
-    </message>
-</context>
-<context>
-    <name>AHRSWidget</name>
-    <message>
-        <location filename="../../../src/plugins/config/ahrs.ui"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>These are the sensor variance values computed by the AHRS.
-
-Tip: lower is better!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Telemetry link not established.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Press to start a calibration procedure, about 15 seconds.
-
-Hint: run this with engines at cruising speed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Start</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>AHRS Algorithm:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select the sensor integration algorithm here.
-&quot;Simple&quot; only uses accelerometer values
-&quot;INSGPS&quot; the full featured algorithm integrating all sensors</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Nice paper plane, eh?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Six Point Calibration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Launch a sensor range and bias calibration.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Six Point Calibration instructions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Saves the Home Location. This is only enabled
-if the Home Location is set, i.e. if the GPS fix is
-successful.
-
-Disabled if there is no GPS fix.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Set</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>buttonGroup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Refresh this screen with current values from the board.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Request</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Sensor noise calibration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save settings (only enabled when calibration is running)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save Position</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Check this box if you are flying indoors and have no GPS fix.
-Only makes sense with the &quot;INSGPS&quot; algorithm.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Indoor flight mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save settings to the OP board (RAM only).
-
-This does not save the calibration settings, this is done using the
-specific calibration button on top of the screen.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save to RAM</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Send settings to OP board, and save to the microSD card.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save to SD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Clears the HomeLocation: only makes sense if you save
-to SD. This will force the AHRS to use the next GPS fix as the
-new home location unless it is in indoor mode.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Clear</source>
-        <translation type="unfinished">Cancella</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Home Location:</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>AircraftWidget</name>
-    <message>
-        <location filename="../../../src/plugins/config/airframe.ui"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Aircraft type:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select aircraft type here</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Airplane type:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Mixer OK</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Channel Assignment</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Engine</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Aileron 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Aileron 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Elevator 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Rudder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Elevator 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Throttle Curve</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Frame type:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Idle Throttle</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Cyclic Rate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Tricopter Yaw Ch</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Feed Forward</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Accel Time Constant</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Decel Time Constant</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motor 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motor 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motor 3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motor 4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motor 5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motor 6</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motor 7</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motor 8</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>CCPM Heli</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>This is not implemented yet, sorry</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Custom / Advanced setup UI</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Retrieve settings from OpenPilot</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Get Current</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Send to OpenPilot but don&apos;t write in SD.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save to RAM</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Applies and Saves all settings to SD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save to SD</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>SettingsWidget</name>
-    <message>
-        <location filename="../../../src/plugins/config/settingswidget.ui"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>RC Input</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;FreeSans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Maximum channel value&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>2000</source>
-        <translation type="unfinished">2000</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;FreeSans&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Current channel value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>1000</source>
-        <translation type="unfinished">1000</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Retrieve settings from OpenPilot</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Get Current</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Be sure to set the Neutral position on all sliders before sending!
-Applies and Saves all settings to SD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save to SD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Send to OpenPilot but don&apos;t write in SD.
-Be sure to set the Neutral position on all sliders before sending!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save to RAM</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;FreeSans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Minimum channel value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Start calibrating the RC Inputs.
-Uncheck/Check to restart calibration.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Run Calibration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Indicates whether OpenPilot is getting a signal from the RC receiver.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>RC Receiver Not Connected</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select the receiver type here:
-- PWM is the most usual type
-- PPM is connected to input XXX 
-- Spektrum is used with Spektrum &apos;satellite&apos; receivers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>RC Receiver Type:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Servo Output</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Aircraft type: undefined</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Channel 0</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Channel 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Channel 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Channel 3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Channel 4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Channel 5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Select the kind of actuator (servo) connected to this output channel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Minimum PWM value, beware of not overdriving your servo.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Maximum PWM value, beware of not overdriving your servo.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Move the servos using the sliders. Two important things:
-- Take extra care if the output is connected to an motor controller!
-- Will only work if the RC receiver is working (failsafe)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Test outputs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Channel 6</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Channel 7</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Update rate:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Channel 0-3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Channel 4-7</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Current value of slider.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>0000</source>
-        <translation type="unfinished">0000</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;FreeSans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Check to invert the channel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Rev.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>TelemetryWidget</name>
-    <message>
-        <location filename="../../../src/plugins/config/telemetry.ui"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Set the serial speed of your telemetry modem here. It is the speed between the OpenPilot board and the modem, and could be different from the radio link speed.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Beware of not locking yourself out! You should only modify this setting when the OpenPilot board is connected through the USB port.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Telemetry speed:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select the speed here.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Send to OpenPilot but don&apos;t write in SD.
-Beware of not locking yourself out!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save to RAM</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Retrieve settings from OpenPilot</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Get Current</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Applies and Saves all settings to SD.
-Beware of not locking yourself out!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save to SD</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>GCSControl</name>
-    <message>
-        <location filename="../../../src/plugins/gcscontrol/gcscontrol.ui"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>GCS Control</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Armed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Flight Mode:</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>FGOptionsPage</name>
-    <message>
-        <location filename="../../../src/plugins/hitlnew/fgoptionspage.ui"/>
-        <location filename="../../../src/plugins/hitlnew/ui_fgoptionspage.h" line="+102"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_fgoptionspage.h" line="+1"/>
-        <source>FlightGear executable:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_fgoptionspage.h" line="+1"/>
-        <source>FlightGear data directory:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_fgoptionspage.h" line="+2"/>
-        <location line="+2"/>
-        <source>Manual aircraft control (can be used when hardware is not available)</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ImportExportDialog</name>
-    <message>
-        <location filename="../../../src/plugins/importexport/importexportdialog.ui"/>
-        <source>Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/importexport/importexportdialog.cpp" line="+10"/>
-        <source>Import Export Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ImportExportGadgetOptionsPage</name>
-    <message>
-        <location filename="../../../src/plugins/importexport/importexportgadgetoptionspage.ui"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Default Config File </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/importexport/importexportgadgetoptionspage.cpp" line="+55"/>
-        <source>INI file (*.ini)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Choose configuration file</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ImportExportGadgetWidget</name>
-    <message>
-        <location filename="../../../src/plugins/importexport/importexportgadgetwidget.ui"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>This is experimental. Use at own risk.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Please report bugs!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Config File</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Items</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>General (Workspace, Key-Bindings)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>All Gadgets</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Export</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Import</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Help</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/importexport/importexportgadgetwidget.cpp" line="+81"/>
-        <source>Can&apos;t write file </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>The settings have been exported to </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+35"/>
-        <source>Can&apos;t read file </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>The settings have been imported from </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>. Restart the application.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Logging</name>
-    <message>
-        <location filename="../../../src/plugins/logging/logging.ui"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Play</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Pause</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Status: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Idle</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Core::UAVConfigInfo</name>
-    <message>
-        <location filename="../../../src/plugins/coreplugin/uavconfiginfo.cpp" line="+77"/>
-        <source>Do you want to continue the import?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+11"/>
-        <source>INFO: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>WARNING: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>ERROR: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+12"/>
-        <source>Unknown compatibility level: </source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>GCSControlGadgetFactory</name>
-    <message>
-        <location filename="../../../src/plugins/gcscontrol/gcscontrolgadgetfactory.cpp" line="+34"/>
-        <source>UAV Control</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ImportExportGadgetFactory</name>
-    <message>
-        <location filename="../../../src/plugins/importexport/importexportgadgetfactory.cpp" line="+38"/>
-        <source>Import/Export GCS Config</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>LoggingGadgetFactory</name>
-    <message>
-        <location filename="../../../src/plugins/logging/logginggadgetfactory.cpp" line="+34"/>
-        <source>Logging</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

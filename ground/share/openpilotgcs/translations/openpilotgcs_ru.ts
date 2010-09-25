@@ -426,6 +426,146 @@
         <source>Aircraft type:</source>
         <translation>Тип БПЛА:</translation>
     </message>
+    <message>
+        <location/>
+        <source>Airplane type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mixer OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel Assignment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Aileron 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Aileron 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Elevator 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rudder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Elevator 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Throttle Curve</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Frame type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Idle Throttle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Cyclic Rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Tricopter Yaw Ch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Feed Forward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Accel Time Constant</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Decel Time Constant</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor 5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor 6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor 7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor 8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>CCPM Heli</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>This is not implemented yet, sorry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Custom / Advanced setup UI</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SettingsWidget</name>
@@ -2180,6 +2320,11 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>%v</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>labelMapZoom</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6658,7 +6803,7 @@ Reason: %3</source>
 <context>
     <name>Core::UAVGadgetInstanceManager</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/uavgadgetinstancemanager.cpp" line="+166"/>
+        <location filename="../../../src/plugins/coreplugin/uavgadgetinstancemanager.cpp" line="+132"/>
         <location line="+1"/>
         <source>default</source>
         <translation>по умолчанию</translation>
@@ -6667,7 +6812,7 @@ Reason: %3</source>
 <context>
     <name>Core::UAVGadgetManager</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/uavgadgetmanager/uavgadgetmanager.cpp" line="+198"/>
+        <location filename="../../../src/plugins/coreplugin/uavgadgetmanager/uavgadgetmanager.cpp" line="+196"/>
         <source>Edit Gadgets Mode</source>
         <translation>Режим настройки экрана</translation>
     </message>
@@ -6895,7 +7040,7 @@ Reason: %3</source>
 <context>
     <name>OPMapGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/opmap/opmapgadgetwidget.cpp" line="+240"/>
+        <location filename="../../../src/plugins/opmap/opmapgadgetwidget.cpp" line="+255"/>
         <source>Flight path 62</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6930,12 +7075,12 @@ Reason: %3</source>
         <translation>Точки маршрута</translation>
     </message>
     <message>
-        <location line="+242"/>
+        <location line="+258"/>
         <source>OpenPilot GCS</source>
         <translation>OpenPilot НСУ (Наземная Система Управления)</translation>
     </message>
     <message>
-        <location line="+204"/>
+        <location line="+241"/>
         <source>&amp;Close menu</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7666,6 +7811,42 @@ new home location unless it is in indoor mode.</source>
         <location line="+12"/>
         <source>Unknown compatibility level: </source>
         <translation>Неизвестный уровень совместимости:</translation>
+    </message>
+</context>
+<context>
+    <name>Logging</name>
+    <message>
+        <location filename="../../../src/plugins/logging/logging.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Форма</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Play</source>
+        <translation type="unfinished">Воспроизвести</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pause</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Status: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Idle</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LoggingGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/logging/logginggadgetfactory.cpp" line="+34"/>
+        <source>Logging</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

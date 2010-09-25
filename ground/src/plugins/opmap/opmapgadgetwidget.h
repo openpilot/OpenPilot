@@ -83,7 +83,7 @@ public:
     *
     * @param
     */
-    void setZoom(int value);
+    void setZoom(int zoom);
     void setPosition(QPointF pos);
     void setMapProvider(QString provider);
     void setUseOpenGL(bool useOpenGL);
@@ -136,7 +136,7 @@ private slots:
     *
     * @param
     */
-    void zoomChanged(double zoom);
+    void zoomChanged(double zoomt,double zoom, double zoomd);
     void OnCurrentPositionChanged(internals::PointLatLng point);
     void OnTileLoadComplete();
     void OnTileLoadStart();
@@ -183,6 +183,9 @@ private slots:
 
 private:
     QPointF getLatLon();
+
+    int min_zoom;
+    int max_zoom;
 
     double m_heading;	// uav heading
 

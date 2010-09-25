@@ -38,8 +38,7 @@
 
 // *************************************************************************************
 
-#define	minimum_zoom   2	// minimum allowed zoom level
-#define	maximum_zoom   19	// maximum allowed zoom level
+#define	max_digital_zoom   3	// maximum allowed digital zoom level
 
 // *************************************************************************************
 
@@ -58,13 +57,14 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_zoom_slider_widget = NULL;
     m_statusbar_widget = NULL;
 
-
     m_plugin_manager = NULL;
     m_objManager = NULL;
 
     m_mouse_waypoint = NULL;
 
     prev_tile_number = 0;
+
+    min_zoom = max_zoom = 0;
 
     // **************
     // fetch required UAVObjects
@@ -88,11 +88,14 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_map->configuration->DragButton = Qt::LeftButton;		    // use the left mouse button for map dragging
 
-    m_map->SetMinZoom(minimum_zoom);
+//  m_map->SetMinZoom(minimum_zoom);
 //  m_map->SetMaxZoom(maximum_zoom);				    // set the maximum zoom level
 
-    m_widget->horizontalSliderZoom->setMinimum(minimum_zoom);	    //
-    m_widget->horizontalSliderZoom->setMaximum(m_map->MaxZoom());   // set the widget zoom slider maximum value to the map objects maximum zoom value
+    m_widget->horizontalSliderZoom->setMinimum(m_map->MinZoom());			//
+    m_widget->horizontalSliderZoom->setMaximum(m_map->MaxZoom() + max_digital_zoom);	//
+
+    min_zoom = m_widget->horizontalSliderZoom->minimum();	// minimum zoom we can accept
+    max_zoom = m_widget->horizontalSliderZoom->maximum();	// maximum zoom we can accept
 
     m_map->SetMouseWheelZoomType(internals::MouseWheelZoomType::MousePositionWithoutCenter);	    // set how the mouse wheel zoom functions
     m_map->SetFollowMouse(true);				    // we want a contiuous mouse position reading
@@ -147,6 +150,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_widget->labelUAVPos->setText("---");
     m_widget->labelMapPos->setText("---");
     m_widget->labelMousePos->setText("---");
+    m_widget->labelMapZoom->setText("---");
 
     m_widget->splitter->setCollapsible(1, false);
 
@@ -269,7 +273,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     // **************
     // map stuff
 
-    connect(m_map, SIGNAL(zoomChanged(double)), this, SLOT(zoomChanged(double)));					// map zoom change signals
+    connect(m_map, SIGNAL(zoomChanged(double, double, double)), this, SLOT(zoomChanged(double, double, double)));					// map zoom change signals
     connect(m_map, SIGNAL(OnCurrentPositionChanged(internals::PointLatLng)), this, SLOT(OnCurrentPositionChanged(internals::PointLatLng)));    // map poisition change signals
     connect(m_map, SIGNAL(OnTileLoadComplete()), this, SLOT(OnTileLoadComplete()));					// tile loading stop signals
     connect(m_map, SIGNAL(OnTileLoadStart()), this, SLOT(OnTileLoadStart()));					// tile loading start signals
@@ -531,11 +535,11 @@ void OPMapGadgetWidget::updatePosition()
     float uav_ground_speed_meters_per_second = 0; //data.Groundspeed;				// current UAV ground speed
 
     // display the UAV lat/lon position
-    QString str =   " lat: " + QString::number(uav_pos.Lat(), 'f', 7) +
-		    "   lon: " + QString::number(uav_pos.Lng(), 'f', 7) +
-		    "   " + QString::number(uav_heading, 'f', 1) + "deg" +
-		    "   " + QString::number(uav_altitude_meters, 'f', 1) + "m" +
-		    "   " + QString::number(uav_ground_speed_meters_per_second, 'f', 1) + "m/s";
+    QString str =   "lat: " + QString::number(uav_pos.Lat(), 'f', 7) +
+		    "  lon: " + QString::number(uav_pos.Lng(), 'f', 7) +
+		    "  " + QString::number(uav_heading, 'f', 1) + "deg" +
+		    "  " + QString::number(uav_altitude_meters, 'f', 1) + "m" +
+		    "  " + QString::number(uav_ground_speed_meters_per_second, 'f', 1) + "m/s";
     if (m_widget) m_widget->labelUAVPos->setText(str);
 
     if (m_map)
@@ -553,7 +557,7 @@ void OPMapGadgetWidget::updateMousePos()
     {	// the mouse has moved
 	mouse_lat_lon = lat_lon;
 
-	QString str = " " + QString::number(mouse_lat_lon.Lat(), 'f', 7) + "   " + QString::number(mouse_lat_lon.Lng(), 'f', 7);
+	QString str = QString::number(mouse_lat_lon.Lat(), 'f', 7) + "  " + QString::number(mouse_lat_lon.Lng(), 'f', 7);
 	if (m_widget) m_widget->labelMousePos->setText(str);
     }
 }
@@ -561,21 +565,20 @@ void OPMapGadgetWidget::updateMousePos()
 // *************************************************************************************
 // map signals
 
-void OPMapGadgetWidget::zoomChanged(double zoom)
+void OPMapGadgetWidget::zoomChanged(double zoomt, double zoom, double zoomd)
 {
-    if (!m_widget)
+    if (!m_widget || !m_map)
 	return;
 
-    int min_zoom = m_widget->horizontalSliderZoom->minimum();	// minimum zoom we can accept
-    int max_zoom = m_widget->horizontalSliderZoom->maximum();	// maximum zoom we can accept
+    QString s = "tot:" + QString::number(zoomt, 'f', 1) + " rea:" + QString::number(zoom, 'f', 1) + " dig:" + QString::number(zoomd, 'f', 1);
+    m_widget->labelMapZoom->setText(s);
 
-    int i_zoom = (int)(zoom + 0.5);
+    int i_zoom = (int)(zoomt + 0.5);
 
     if (i_zoom < min_zoom) i_zoom = min_zoom;
     else
     if (i_zoom > max_zoom) i_zoom = max_zoom;
 
-//  m_widget->labelZoom->setText(" " + QString::number(zoom));
     if (m_widget->horizontalSliderZoom->value() != i_zoom)
 	m_widget->horizontalSliderZoom->setValue(i_zoom);	// set the GUI zoom slider position
 
@@ -592,7 +595,7 @@ void OPMapGadgetWidget::OnCurrentPositionChanged(internals::PointLatLng point)
 {
     if (m_widget)
     {
-	QString coord_str = " " + QString::number(point.Lat(), 'f', 7) + "   " + QString::number(point.Lng(), 'f', 7) + " ";
+	QString coord_str = QString::number(point.Lat(), 'f', 7) + "   " + QString::number(point.Lng(), 'f', 7) + " ";
 	m_widget->labelMapPos->setText(coord_str);
     }
 }
@@ -609,7 +612,7 @@ void OPMapGadgetWidget::OnTilesStillToLoad(int number)
 
 	m_widget->progressBarMap->setValue(m_widget->progressBarMap->maximum() - number);	// update the progress bar
 
-//	m_widget->labelNumTilesToLoad->setText(" " + QString::number(number));
+//	m_widget->labelNumTilesToLoad->setText(QString::number(number));
 
 	prev_tile_number = number;
     }
@@ -818,67 +821,102 @@ void OPMapGadgetWidget::on_treeViewWaypoints_clicked(QModelIndex index)
 
 void OPMapGadgetWidget::zoomIn()
 {
-    if (m_map)
-        m_map->SetZoom(m_map->ZoomReal() + 1);
+    if (!m_widget || !m_map)
+	return;
+
+    int zoom = m_map->ZoomTotal() + 1;
+
+    if (zoom < min_zoom) zoom = min_zoom;
+    else
+    if (zoom > max_zoom) zoom = max_zoom;
+
+    m_map->SetZoom(zoom);
 }
 
 void OPMapGadgetWidget::zoomOut()
 {
-    if (m_map)
-        m_map->SetZoom(m_map->ZoomReal() - 1);
+    if (!m_widget || !m_map)
+	return;
+
+    int zoom = m_map->ZoomTotal() - 1;
+
+    if (zoom < min_zoom) zoom = min_zoom;
+    else
+    if (zoom > max_zoom) zoom = max_zoom;
+
+    m_map->SetZoom(zoom);
 }
 
-void OPMapGadgetWidget::setZoom(int value)
+void OPMapGadgetWidget::setZoom(int zoom)
 {
-    if (m_map)
-    {
-	internals::MouseWheelZoomType::Types zoom_type = m_map->GetMouseWheelZoomType();
-	m_map->SetMouseWheelZoomType(internals::MouseWheelZoomType::ViewCenter);
+    if (!m_widget || !m_map)
+	return;
 
-	m_map->SetZoom(value);
+    if (zoom < min_zoom) zoom = min_zoom;
+    else
+    if (zoom > max_zoom) zoom = max_zoom;
 
-	m_map->SetMouseWheelZoomType(zoom_type);
-    }
+    internals::MouseWheelZoomType::Types zoom_type = m_map->GetMouseWheelZoomType();
+    m_map->SetMouseWheelZoomType(internals::MouseWheelZoomType::ViewCenter);
+
+    m_map->SetZoom(zoom);
+
+    m_map->SetMouseWheelZoomType(zoom_type);
 }
 
 void OPMapGadgetWidget::setPosition(QPointF pos)
 {
-    if (m_map)
-	m_map->SetCurrentPosition(internals::PointLatLng(pos.y(), pos.x()));
+    if (!m_widget || !m_map)
+	return;
+
+    m_map->SetCurrentPosition(internals::PointLatLng(pos.y(), pos.x()));
 }
 
 void OPMapGadgetWidget::setMapProvider(QString provider)
 {
-    if (m_map)
-	m_map->SetMapType(mapcontrol::Helper::MapTypeFromString(provider));
+    if (!m_widget || !m_map)
+	return;
+
+    m_map->SetMapType(mapcontrol::Helper::MapTypeFromString(provider));
 }
 
 void OPMapGadgetWidget::setAccessMode(QString accessMode)
 {
-    if (m_map)
-	m_map->configuration->SetAccessMode(mapcontrol::Helper::AccessModeFromString(accessMode));
+    if (!m_widget || !m_map)
+	return;
+
+    m_map->configuration->SetAccessMode(mapcontrol::Helper::AccessModeFromString(accessMode));
 }
 
 void OPMapGadgetWidget::setUseOpenGL(bool useOpenGL)
 {
-    if (m_map)
-	m_map->SetUseOpenGL(useOpenGL);
+    if (!m_widget || !m_map)
+	return;
+
+    m_map->SetUseOpenGL(useOpenGL);
 }
 
 void OPMapGadgetWidget::setShowTileGridLines(bool showTileGridLines)
 {
-    if (m_map)
-	m_map->SetShowTileGridLines(showTileGridLines);
+    if (!m_widget || !m_map)
+	return;
+
+    m_map->SetShowTileGridLines(showTileGridLines);
 }
 
 void OPMapGadgetWidget::setUseMemoryCache(bool useMemoryCache)
 {
-    if (m_map)
-	m_map->configuration->SetUseMemoryCache(useMemoryCache);
+    if (!m_widget || !m_map)
+	return;
+
+    m_map->configuration->SetUseMemoryCache(useMemoryCache);
 }
 
 void OPMapGadgetWidget::setCacheLocation(QString cacheLocation)
 {
+    if (!m_widget || !m_map)
+	return;
+
     cacheLocation = cacheLocation.simplified();	// remove any surrounding spaces
 
     if (cacheLocation.isEmpty()) return;
@@ -898,8 +936,7 @@ void OPMapGadgetWidget::setCacheLocation(QString cacheLocation)
 
 //    qDebug() << "map cache dir: " << cacheLocation;
 
-    if (m_map)
-	m_map->configuration->SetCacheLocation(cacheLocation);
+    m_map->configuration->SetCacheLocation(cacheLocation);
 }
 
 // *************************************************************************************
@@ -907,6 +944,9 @@ void OPMapGadgetWidget::setCacheLocation(QString cacheLocation)
 
 void OPMapGadgetWidget::createActions()
 {
+    if (!m_widget)
+	return;
+
     // ***********************
     // create menu actions
 
@@ -1041,8 +1081,7 @@ void OPMapGadgetWidget::createActions()
     zoomActGroup = new QActionGroup(this);
     connect(zoomActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onZoomActGroup_triggered(QAction *)));
     zoomAct.clear();
-    int max_zoom = m_widget->horizontalSliderZoom->maximum();
-    for (int i = minimum_zoom; i <= max_zoom; i++)
+    for (int i = min_zoom; i <= max_zoom; i++)
     {
 	QAction *zoom_act = new QAction(QString::number(i), zoomActGroup);
 	zoom_act->setCheckable(true);
@@ -1076,8 +1115,10 @@ QPointF OPMapGadgetWidget::getLatLon()
 
 void OPMapGadgetWidget::onReloadAct_triggered()
 {
-    if (m_map)
-	m_map->ReloadMap();
+    if (!m_widget || !m_map)
+	return;
+
+    m_map->ReloadMap();
 }
 
 void OPMapGadgetWidget::onCopyMouseLatLonToClipAct_triggered()
@@ -1103,6 +1144,9 @@ void OPMapGadgetWidget::onCopyMouseLonToClipAct_triggered()
 
 void OPMapGadgetWidget::onFindPlaceAct_triggered()
 {
+    if (!m_widget || !m_map)
+	return;
+
     m_widget->comboBoxFindPlace->setFocus();	// move focus to the 'find place' text box
 
 /*
@@ -1127,34 +1171,46 @@ void OPMapGadgetWidget::onFindPlaceAct_triggered()
 
 void OPMapGadgetWidget::onShowCompassAct_toggled(bool show)
 {
-    if (m_map)
-	m_map->SetShowCompass(show);
+    if (!m_widget || !m_map)
+	return;
+
+    m_map->SetShowCompass(show);
 }
 
 void OPMapGadgetWidget::onShowHomeAct_toggled(bool show)
 {
-    if (m_map)
-//	m_map->SetShowHome(show);    // this can cause a rather big crash
-	m_map->Home->setVisible(show);
+    if (!m_widget || !m_map)
+	return;
+
+//  m_map->SetShowHome(show);    // this can cause a rather big crash
+    m_map->Home->setVisible(show);
 }
 
 void OPMapGadgetWidget::onShowUAVAct_toggled(bool show)
 {
-    if (m_map)
-//	m_map->SetShowUAV(show);    // this can cause a rather big crash
-	m_map->UAV->setVisible(show);
+    if (!m_widget || !m_map)
+	return;
+
+//  m_map->SetShowUAV(show);    // this can cause a rather big crash
+    m_map->UAV->setVisible(show);
 }
 
 void OPMapGadgetWidget::onGoZoomInAct_triggered()
 {
-    if (m_map)
-        setZoom(m_map->ZoomReal() + 1);
+    if (!m_widget || !m_map)
+	return;
+
+//  setZoom(m_map->ZoomReal() + 1);
+    setZoom(m_map->ZoomTotal() + 1);
 }
 
 void OPMapGadgetWidget::onGoZoomOutAct_triggered()
 {
-    if (m_map)
-        setZoom(m_map->ZoomReal() - 1);
+    if (!m_widget || !m_map)
+	return;
+
+//  setZoom(m_map->ZoomReal() - 1);
+    setZoom(m_map->ZoomTotal() - 1);
 }
 
 void OPMapGadgetWidget::onZoomActGroup_triggered(QAction *action)
@@ -1162,101 +1218,102 @@ void OPMapGadgetWidget::onZoomActGroup_triggered(QAction *action)
     if (!m_widget || !action)
 	return;
 
-    int min_zoom = m_widget->horizontalSliderZoom->minimum();	// minimum zoom we can accept
-    int max_zoom = m_widget->horizontalSliderZoom->maximum();	// maximum zoom we can accept
-
-    int zoom = action->data().toInt();
-
-    if (zoom < min_zoom) zoom = min_zoom;
-    else
-    if (zoom > max_zoom) zoom = max_zoom;
-
-    setZoom(zoom);
+    setZoom(action->data().toInt());
 }
 
 void OPMapGadgetWidget::onGoMouseClickAct_triggered()
 {
-    if (m_map)
-	m_map->SetCurrentPosition(m_map->currentMousePosition());   // center the map onto the mouse position
+    if (!m_widget || !m_map)
+	return;
+
+    m_map->SetCurrentPosition(m_map->currentMousePosition());   // center the map onto the mouse position
 }
 
 void OPMapGadgetWidget::onGoHomeAct_triggered()
 {
+    if (!m_widget || !m_map)
+	return;
+
     followUAVpositionAct->setChecked(false);
 }
 
 void OPMapGadgetWidget::onGoUAVAct_triggered()
 {
+    if (!m_widget || !m_map)
+	return;
+
     QPointF pos = getLatLon();
 
-    if (m_map)
-    {
-        internals::PointLatLng uav_pos = internals::PointLatLng(pos.x(), pos.y());	// current UAV position
-	internals::PointLatLng map_pos = m_map->CurrentPosition();				// current MAP position
-	if (map_pos != uav_pos) m_map->SetCurrentPosition(uav_pos);				// center the map onto the UAV
-    }
+    internals::PointLatLng uav_pos = internals::PointLatLng(pos.x(), pos.y());	// current UAV position
+    internals::PointLatLng map_pos = m_map->CurrentPosition();				// current MAP position
+    if (map_pos != uav_pos) m_map->SetCurrentPosition(uav_pos);				// center the map onto the UAV
 }
 
 void OPMapGadgetWidget::onSetHomePosAct_triggered()
 {
+    if (!m_widget || !m_map)
+	return;
+
     QPointF pos = getLatLon();
 
-    if (m_map)
-    {
-        internals::PointLatLng uav_pos = internals::PointLatLng(pos.x(), pos.y());	// current UAV position
-	m_map->Home->SetCoord(uav_pos);								// move the HOME location to match the current UAV location
-        m_map->Home->SetAltitude(0);  // TODO: Update
-    }
+    internals::PointLatLng uav_pos = internals::PointLatLng(pos.x(), pos.y());	// current UAV position
+    m_map->Home->SetCoord(uav_pos);								// move the HOME location to match the current UAV location
+    m_map->Home->SetAltitude(0);  // TODO: Update
 }
 
 void OPMapGadgetWidget::onFollowUAVpositionAct_toggled(bool checked)
 {
-    if (m_widget)
-    {
-	if (m_widget->toolButtonMapUAV->isChecked() != checked)
-	    m_widget->toolButtonMapUAV->setChecked(checked);
+    if (!m_widget || !m_map)
+	return;
 
-	setMapFollowingmode();
-    }
+    if (m_widget->toolButtonMapUAV->isChecked() != checked)
+	m_widget->toolButtonMapUAV->setChecked(checked);
+
+    setMapFollowingmode();
 }
 
 void OPMapGadgetWidget::onFollowUAVheadingAct_toggled(bool checked)
 {
-    if (m_widget)
-    {
-	if (m_widget->toolButtonMapUAVheading->isChecked() != checked)
-	    m_widget->toolButtonMapUAVheading->setChecked(checked);
+    if (!m_widget || !m_map)
+	return;
 
-	setMapFollowingmode();
-    }
+    if (m_widget->toolButtonMapUAVheading->isChecked() != checked)
+	m_widget->toolButtonMapUAVheading->setChecked(checked);
+
+    setMapFollowingmode();
 }
 
 void OPMapGadgetWidget::onShowUAVtrailAct_toggled(bool checked)
 {
-    if (m_widget)
-    {
-	if (m_widget->toolButtonShowUAVtrail->isChecked() != checked)
-	    m_widget->toolButtonShowUAVtrail->setChecked(checked);
+    if (!m_widget || !m_map)
+	return;
 
-	if (m_map)
-	    m_map->UAV->SetShowTrail(checked);
-    }
+    if (m_widget->toolButtonShowUAVtrail->isChecked() != checked)
+	m_widget->toolButtonShowUAVtrail->setChecked(checked);
+
+    m_map->UAV->SetShowTrail(checked);
 }
 
 void OPMapGadgetWidget::onClearUAVtrailAct_triggered()
 {
-    if (m_map)
-	m_map->UAV->DeleteTrail();
+    if (!m_widget || !m_map)
+	return;
+
+    m_map->UAV->DeleteTrail();
 }
 
 void OPMapGadgetWidget::onOpenWayPointEditorAct_triggered()
 {
+    if (!m_widget || !m_map)
+	return;
+
     waypoint_editor_dialog.show();
 }
 
 void OPMapGadgetWidget::onAddWayPointAct_triggered()
 {
-    if (!m_map) return;
+    if (!m_widget || !m_map)
+	return;
 
     m_waypoint_list_mutex.lock();
 
@@ -1274,6 +1331,9 @@ void OPMapGadgetWidget::onAddWayPointAct_triggered()
 
 void OPMapGadgetWidget::onEditWayPointAct_triggered()
 {
+    if (!m_widget || !m_map)
+	return;
+
     if (!m_mouse_waypoint) return;
 
     waypoint_edit_dialog.editWaypoint(m_mouse_waypoint);
@@ -1283,6 +1343,9 @@ void OPMapGadgetWidget::onEditWayPointAct_triggered()
 
 void OPMapGadgetWidget::onLockWayPointAct_triggered()
 {
+    if (!m_widget || !m_map)
+	return;
+
     if (!m_mouse_waypoint) return;
 
     bool locked = (m_mouse_waypoint->flags() & QGraphicsItem::ItemIsMovable) == 0;
@@ -1293,6 +1356,9 @@ void OPMapGadgetWidget::onLockWayPointAct_triggered()
 
 void OPMapGadgetWidget::onDeleteWayPointAct_triggered()
 {
+    if (!m_widget || !m_map)
+	return;
+
     if (!m_mouse_waypoint) return;
 
     bool locked = (m_mouse_waypoint->flags() & QGraphicsItem::ItemIsMovable) == 0;
@@ -1307,7 +1373,7 @@ void OPMapGadgetWidget::onDeleteWayPointAct_triggered()
 	    if (waypoint.item != m_mouse_waypoint) continue;
 
 	    // delete the waypoint from the map
-	    if (m_map) m_map->WPDelete(waypoint.item);
+	    m_map->WPDelete(waypoint.item);
 
 	    // delete the waypoint from our local waypoint list
 	    m_waypoint_list.removeAt(i);
@@ -1322,8 +1388,11 @@ void OPMapGadgetWidget::onDeleteWayPointAct_triggered()
 
 void OPMapGadgetWidget::onClearWayPointsAct_triggered()
 {
+    if (!m_widget || !m_map)
+	return;
+
     m_waypoint_list_mutex.lock();
-	if (m_map) m_map->WPDeleteAll();
+	m_map->WPDeleteAll();
 	m_waypoint_list.clear();
     m_waypoint_list_mutex.unlock();
 }
@@ -1379,7 +1448,8 @@ void OPMapGadgetWidget::saveComboBoxLines(QComboBox *comboBox, QString filename)
 
 void OPMapGadgetWidget::setMapFollowingmode()
 {
-    if (!m_map) return;
+    if (!m_widget || !m_map)
+	return;
 
     if (!followUAVpositionAct->isChecked())
     {

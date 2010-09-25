@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>548</width>
-    <height>416</height>
+    <height>565</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -826,13 +826,13 @@ border-radius: 3px;
               <number>3</number>
              </property>
              <property name="leftMargin">
-              <number>3</number>
+              <number>1</number>
              </property>
              <property name="topMargin">
               <number>6</number>
              </property>
              <property name="rightMargin">
-              <number>3</number>
+              <number>1</number>
              </property>
              <property name="bottomMargin">
               <number>0</number>
@@ -848,7 +848,7 @@ border-radius: 3px;
                <property name="sizeHint" stdset="0">
                 <size>
                  <width>20</width>
-                 <height>30</height>
+                 <height>10</height>
                 </size>
                </property>
               </spacer>
@@ -870,8 +870,8 @@ border-radius: 3px;
                </property>
                <property name="iconSize">
                 <size>
-                 <width>20</width>
-                 <height>20</height>
+                 <width>28</width>
+                 <height>28</height>
                 </size>
                </property>
                <property name="autoRepeat">
@@ -891,7 +891,7 @@ border-radius: 3px;
              <item>
               <widget class="QSlider" name="horizontalSliderZoom">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -905,7 +905,7 @@ border-radius: 3px;
                <property name="maximumSize">
                 <size>
                  <width>16777215</width>
-                 <height>80</height>
+                 <height>16777215</height>
                 </size>
                </property>
                <property name="cursor">
@@ -924,7 +924,7 @@ border-radius: 3px;
                 <number>2</number>
                </property>
                <property name="maximum">
-                <number>19</number>
+                <number>17</number>
                </property>
                <property name="pageStep">
                 <number>1</number>
@@ -960,8 +960,8 @@ border-radius: 3px;
                </property>
                <property name="iconSize">
                 <size>
-                 <width>20</width>
-                 <height>20</height>
+                 <width>28</width>
+                 <height>28</height>
                 </size>
                </property>
                <property name="autoRepeat">
@@ -1011,8 +1011,8 @@ border-radius: 3px;
                </property>
                <property name="iconSize">
                 <size>
-                 <width>20</width>
-                 <height>20</height>
+                 <width>28</width>
+                 <height>28</height>
                 </size>
                </property>
                <property name="autoRepeat">
@@ -1040,8 +1040,8 @@ border-radius: 3px;
                </property>
                <property name="iconSize">
                 <size>
-                 <width>20</width>
-                 <height>20</height>
+                 <width>28</width>
+                 <height>28</height>
                 </size>
                </property>
                <property name="checkable">
@@ -1072,8 +1072,8 @@ border-radius: 3px;
                </property>
                <property name="iconSize">
                 <size>
-                 <width>20</width>
-                 <height>20</height>
+                 <width>28</width>
+                 <height>28</height>
                 </size>
                </property>
                <property name="checkable">
@@ -1104,8 +1104,8 @@ border-radius: 3px;
                </property>
                <property name="iconSize">
                 <size>
-                 <width>20</width>
-                 <height>20</height>
+                 <width>28</width>
+                 <height>28</height>
                 </size>
                </property>
                <property name="checkable">
@@ -1136,8 +1136,8 @@ border-radius: 3px;
                </property>
                <property name="iconSize">
                 <size>
-                 <width>20</width>
-                 <height>20</height>
+                 <width>28</width>
+                 <height>28</height>
                 </size>
                </property>
                <property name="checkable">
@@ -1156,10 +1156,13 @@ border-radius: 3px;
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
                </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
                <property name="sizeHint" stdset="0">
                 <size>
                  <width>20</width>
-                 <height>40</height>
+                 <height>10</height>
                 </size>
                </property>
               </spacer>
@@ -1677,6 +1680,23 @@ border-radius: 2px;
         </item>
         <item>
          <widget class="Line" name="line">
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelMapZoom">
+          <property name="text">
+           <string>labelMapZoom</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Line" name="line_2">
           <property name="frameShadow">
            <enum>QFrame::Plain</enum>
           </property>

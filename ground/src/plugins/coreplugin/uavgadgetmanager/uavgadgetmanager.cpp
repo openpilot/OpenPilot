@@ -126,11 +126,11 @@ namespace Core {
 struct UAVGadgetManagerPrivate {
     explicit UAVGadgetManagerPrivate(ICore *core, QWidget *parent);
     ~UAVGadgetManagerPrivate();
-    Internal::UAVGadgetView *m_view;
     Internal::SplitterOrView *m_splitterOrView;
     QPointer<IUAVGadget> m_currentGadget;
 
     ICore *m_core;
+    Internal::UAVGadgetClosingCoreListener *m_coreListener;
 
     // actions
     static QAction *m_showToolbarsAction;
@@ -139,8 +139,6 @@ struct UAVGadgetManagerPrivate {
     static QAction *m_removeCurrentSplitAction;
     static QAction *m_removeAllSplitsAction;
     static QAction *m_gotoOtherSplitAction;
-
-    Internal::UAVGadgetClosingCoreListener *m_coreListener;
 };
 }
 
@@ -152,7 +150,6 @@ QAction *UAVGadgetManagerPrivate::m_removeAllSplitsAction = 0;
 QAction *UAVGadgetManagerPrivate::m_gotoOtherSplitAction = 0;
 
 UAVGadgetManagerPrivate::UAVGadgetManagerPrivate(ICore *core, QWidget *parent) :
-    m_view(0),
     m_splitterOrView(0),
     m_core(core),
     m_coreListener(0)
@@ -263,8 +260,7 @@ UAVGadgetManager::UAVGadgetManager(ICore *core, QWidget *parent) :
 
     // other setup
     m_d->m_splitterOrView = new SplitterOrView(this, 0, true);
-    m_d->m_view = m_d->m_splitterOrView->view();
-    setCurrentGadget(m_d->m_view->gadget());
+    setCurrentGadget(m_d->m_splitterOrView->view()->gadget());
 
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setMargin(0);

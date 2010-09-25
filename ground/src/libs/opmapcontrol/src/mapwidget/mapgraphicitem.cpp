@@ -525,11 +525,9 @@ namespace mapcontrol
     }
     void MapGraphicItem::SetZoomStep(int const& value)
     {
-        double integer;
-        double remainder = modf (value , &integer);
-        if(integer-core->Zoom()>0 && value<= MaxZoom())
+        if(value-core->Zoom()>0 && value<= MaxZoom())
             ConstructLastImage(value-core->Zoom());
-        else
+        else if(value!=MaxZoom())
             lastimage=QImage();
         if(value > MaxZoom())
         {

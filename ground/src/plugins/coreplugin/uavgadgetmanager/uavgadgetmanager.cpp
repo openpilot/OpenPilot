@@ -28,6 +28,7 @@
 
 #include "uavgadgetmanager.h"
 #include "uavgadgetview.h"
+#include "splitterorview.h"
 #include "uavgadgetmode.h"
 #include "uavgadgetinstancemanager.h"
 #include "iuavgadgetfactory.h"
@@ -126,11 +127,16 @@ namespace Core {
 struct UAVGadgetManagerPrivate {
     explicit UAVGadgetManagerPrivate(ICore *core, QWidget *parent);
     ~UAVGadgetManagerPrivate();
-    Internal::SplitterOrView *m_splitterOrView;
+
+    // The root splitter or view.
+    QPointer<Internal::SplitterOrView> m_splitterOrView;
+
+    // The gadget which is currently 'active'.
     QPointer<IUAVGadget> m_currentGadget;
 
-    ICore *m_core;
-    Internal::UAVGadgetClosingCoreListener *m_coreListener;
+    QPointer<ICore> m_core;
+
+    QPointer<Internal::UAVGadgetClosingCoreListener> m_coreListener;
 
     // actions
     static QAction *m_showToolbarsAction;
@@ -151,6 +157,7 @@ QAction *UAVGadgetManagerPrivate::m_gotoOtherSplitAction = 0;
 
 UAVGadgetManagerPrivate::UAVGadgetManagerPrivate(ICore *core, QWidget *parent) :
     m_splitterOrView(0),
+    m_currentGadget(0),
     m_core(core),
     m_coreListener(0)
 {
@@ -260,6 +267,10 @@ UAVGadgetManager::UAVGadgetManager(ICore *core, QWidget *parent) :
 
     // other setup
     m_d->m_splitterOrView = new SplitterOrView(this, 0, true);
+    // SplitterOrView with 0 as gadget calls our setCurrentGadget, which relies on currentSplitterOrView(),
+    // which needs our m_splitterorView to be set, which isn't set yet at that time.
+    // So directly set our currentGadget to 0, and do it again.
+    m_d->m_currentGadget = 0;
     setCurrentGadget(m_d->m_splitterOrView->view()->gadget());
 
     QHBoxLayout *layout = new QHBoxLayout(this);

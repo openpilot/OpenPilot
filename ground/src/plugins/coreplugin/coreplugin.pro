@@ -30,6 +30,7 @@ SOURCES += mainwindow.cpp \
     uavgadgetmode.cpp \
     uavgadgetmanager/uavgadgetmanager.cpp \
     uavgadgetmanager/uavgadgetview.cpp \
+    uavgadgetmanager/splitterorview.cpp \
     actionmanager/actionmanager.cpp \
     actionmanager/command.cpp \
     actionmanager/actioncontainer.cpp \
@@ -77,6 +78,7 @@ HEADERS += mainwindow.h \
     iuavgadgetfactory.h \
     uavgadgetmanager/uavgadgetmanager.h \
     uavgadgetmanager/uavgadgetview.h \
+    uavgadgetmanager/splitterorview.h \
     actionmanager/actioncontainer.h \
     actionmanager/actionmanager.h \
     actionmanager/command.h \

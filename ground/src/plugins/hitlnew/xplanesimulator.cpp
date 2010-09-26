@@ -220,14 +220,14 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
 		attActual->setData(attActualData);
 
 		// Update gps objects
-		PositionActual::DataFields gpsData;
-		memset(&gpsData, 0, sizeof(PositionActual::DataFields));
+                GPSPosition::DataFields gpsData;
+                memset(&gpsData, 0, sizeof(GPSPosition::DataFields));
 		gpsData.Altitude = altitude;
 //		gpsData.Heading = pitch[2];
 //		gpsData.Groundspeed = speed[0];
 		gpsData.Latitude = latitude;
 		gpsData.Longitude = longitude;
-		posActual->setData(gpsData);
+                gpsData->setData(gpsData);
 	}
 	// issue manual update
 	//attActual->updated();

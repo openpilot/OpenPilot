@@ -118,7 +118,7 @@ void Simulator::onStart()
 	actDesired = ActuatorDesired::GetInstance(objManager);
         altActual = BaroAltitude::GetInstance(objManager);
 	attActual = AttitudeActual::GetInstance(objManager);
-	posActual = PositionActual::GetInstance(objManager);
+        gpsPos = GPSPosition::GetInstance(objManager);
 	telStats = GCSTelemetryStats::GetInstance(objManager);
 
 	// Listen to autopilot connection events
@@ -202,7 +202,7 @@ void Simulator::setupObjects()
 	setupInputObject(actDesired, 75);
 	setupOutputObject(altActual, 250);
 	setupOutputObject(attActual, 75);
-	setupOutputObject(posActual, 250);
+        setupOutputObject(gpsPos, 250);
 }
 
 void Simulator::setupInputObject(UAVObject* obj, int updatePeriod)

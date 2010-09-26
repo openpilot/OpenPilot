@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       positionactual.cpp
+ * @file       velocitydesired.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
  * @addtogroup GCSPlugins GCS Plugins
@@ -9,7 +9,7 @@
  * @addtogroup UAVObjectsPlugin UAVObjects Plugin
  * @{
  *   
- * @note       Object definition file: positionactual.xml. 
+ * @note       Object definition file: velocitydesired.xml. 
  *             This is an automatically generated file.
  *             DO NOT modify manually.
  *
@@ -30,27 +30,27 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include "positionactual.h"
+#include "velocitydesired.h"
 #include "uavobjectfield.h"
 
-const QString PositionActual::NAME = QString("PositionActual");
+const QString VelocityDesired::NAME = QString("VelocityDesired");
 
 /**
  * Constructor
  */
-PositionActual::PositionActual(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
+VelocityDesired::VelocityDesired(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
 {
     // Create fields
     QList<UAVObjectField*> fields;
     QStringList NorthElemNames;
     NorthElemNames.append("0");
-    fields.append( new UAVObjectField(QString("North"), QString("cm"), UAVObjectField::INT32, NorthElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("North"), QString("cm/s"), UAVObjectField::INT32, NorthElemNames, QStringList()) );
     QStringList EastElemNames;
     EastElemNames.append("0");
-    fields.append( new UAVObjectField(QString("East"), QString("cm"), UAVObjectField::INT32, EastElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("East"), QString("cm/s"), UAVObjectField::INT32, EastElemNames, QStringList()) );
     QStringList DownElemNames;
     DownElemNames.append("0");
-    fields.append( new UAVObjectField(QString("Down"), QString("cm"), UAVObjectField::INT32, DownElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("Down"), QString("cm/s"), UAVObjectField::INT32, DownElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
@@ -61,7 +61,7 @@ PositionActual::PositionActual(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS,
 /**
  * Get the default metadata for this object
  */
-UAVObject::Metadata PositionActual::getDefaultMetadata()
+UAVObject::Metadata VelocityDesired::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
     metadata.flightAccess = ACCESS_READWRITE;
@@ -82,7 +82,7 @@ UAVObject::Metadata PositionActual::getDefaultMetadata()
  * If a default value is not specified the object fields
  * will be initialized to zero.
  */
-void PositionActual::setDefaultFieldValues()
+void VelocityDesired::setDefaultFieldValues()
 {
 
 }
@@ -90,7 +90,7 @@ void PositionActual::setDefaultFieldValues()
 /**
  * Get the object data fields
  */
-PositionActual::DataFields PositionActual::getData()
+VelocityDesired::DataFields VelocityDesired::getData()
 {
     QMutexLocker locker(mutex);
     return data;
@@ -99,7 +99,7 @@ PositionActual::DataFields PositionActual::getData()
 /**
  * Set the object data fields
  */
-void PositionActual::setData(const DataFields& data)
+void VelocityDesired::setData(const DataFields& data)
 {
     QMutexLocker locker(mutex);
     // Get metadata
@@ -118,9 +118,9 @@ void PositionActual::setData(const DataFields& data)
  * Do not use this function directly to create new instances, the
  * UAVObjectManager should be used instead.
  */
-UAVDataObject* PositionActual::clone(quint32 instID)
+UAVDataObject* VelocityDesired::clone(quint32 instID)
 {
-    PositionActual* obj = new PositionActual();
+    VelocityDesired* obj = new VelocityDesired();
     obj->initialize(instID, this->getMetaObject());
     return obj;
 }
@@ -128,7 +128,7 @@ UAVDataObject* PositionActual::clone(quint32 instID)
 /**
  * Static function to retrieve an instance of the object.
  */
-PositionActual* PositionActual::GetInstance(UAVObjectManager* objMngr, quint32 instID)
+VelocityDesired* VelocityDesired::GetInstance(UAVObjectManager* objMngr, quint32 instID)
 {
-    return dynamic_cast<PositionActual*>(objMngr->getObject(PositionActual::OBJID, instID));
+    return dynamic_cast<VelocityDesired*>(objMngr->getObject(VelocityDesired::OBJID, instID));
 }

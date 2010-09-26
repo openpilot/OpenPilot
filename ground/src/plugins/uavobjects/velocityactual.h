@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       positionactual.h
+ * @file       velocityactual.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
  * @addtogroup GCSPlugins GCS Plugins
@@ -9,7 +9,7 @@
  * @addtogroup UAVObjectsPlugin UAVObjects Plugin
  * @{
  *   
- * @note       Object definition file: positionactual.xml. 
+ * @note       Object definition file: velocityactual.xml. 
  *             This is an automatically generated file.
  *             DO NOT modify manually.
  *
@@ -30,13 +30,13 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef POSITIONACTUAL_H
-#define POSITIONACTUAL_H
+#ifndef VELOCITYACTUAL_H
+#define VELOCITYACTUAL_H
 
 #include "uavdataobject.h"
 #include "uavobjectmanager.h"
 
-class UAVOBJECTS_EXPORT PositionActual: public UAVDataObject
+class UAVOBJECTS_EXPORT VelocityActual: public UAVDataObject
 {
     Q_OBJECT
 
@@ -56,21 +56,21 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 3765671478U;
+    static const quint32 OBJID = 1207999624U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;
     static const quint32 NUMBYTES = sizeof(DataFields);
 
     // Functions
-    PositionActual();
+    VelocityActual();
 
     DataFields getData();
     void setData(const DataFields& data);
     Metadata getDefaultMetadata();
     UAVDataObject* clone(quint32 instID);
 
-    static PositionActual* GetInstance(UAVObjectManager* objMngr, quint32 instID = 0);
+    static VelocityActual* GetInstance(UAVObjectManager* objMngr, quint32 instID = 0);
 	
 private:
     DataFields data;
@@ -79,4 +79,4 @@ private:
 
 };
 
-#endif // POSITIONACTUAL_H
+#endif // VELOCITYACTUAL_H

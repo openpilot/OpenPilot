@@ -1,0 +1,23 @@
+<xml>
+    <object name="GuidanceSettings" singleinstance="true" settings="true">
+        <description>Settings for the @ref GuidanceModule</description>
+        <field name="MaxGroundspeed" units="cm/s" type="int32" elements="1" defaultvalue="100"/>
+        <field name="GroundVelocityP" units="" type="float" elements="1" defaultvalue="0.1"/>
+        <field name="MaxVerticalSpeed" units="cm/s" type="int32" elements="1" defaultvalue="100"/>
+        <field name="VertVelocityP" units="" type="float" elements="1" defaultvalue="0.1"/>
+        <field name="VelP" units="" type="float" elements="1" defaultvalue="0.1"/>
+        <field name="VelI" units="" type="float" elements="1" defaultvalue="0.1"/>
+        <field name="VelD" units="" type="float" elements="1" defaultvalue="0.0"/>
+        <field name="DownP" units="" type="float" elements="1" defaultvalue="0.0"/>
+        <field name="DownI" units="" type="float" elements="1" defaultvalue="0.0"/>
+        <field name="DownD" units="" type="float" elements="1" defaultvalue="0.0"/>
+        <field name="MaxVelIntegral" units="deg" type="float" elements="1" defaultvalue="2"/>
+        <field name="MaxThrottleIntegral" units="deg" type="float" elements="1" defaultvalue="1"/>
+        <field name="VelUpdatePeriod" units="" type="int32" elements="1" defaultvalue="100"/>
+        <field name="VelPIDUpdatePeriod" units="" type="int32" elements="1" defaultvalue="20"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <logging updatemode="never" period="0"/>
+    </object>
+</xml>

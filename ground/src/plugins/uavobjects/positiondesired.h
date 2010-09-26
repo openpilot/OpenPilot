@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       positionactual.h
+ * @file       positiondesired.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
  * @addtogroup GCSPlugins GCS Plugins
@@ -9,7 +9,7 @@
  * @addtogroup UAVObjectsPlugin UAVObjects Plugin
  * @{
  *   
- * @note       Object definition file: positionactual.xml. 
+ * @note       Object definition file: positiondesired.xml. 
  *             This is an automatically generated file.
  *             DO NOT modify manually.
  *
@@ -30,13 +30,13 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef POSITIONACTUAL_H
-#define POSITIONACTUAL_H
+#ifndef POSITIONDESIRED_H
+#define POSITIONDESIRED_H
 
 #include "uavdataobject.h"
 #include "uavobjectmanager.h"
 
-class UAVOBJECTS_EXPORT PositionActual: public UAVDataObject
+class UAVOBJECTS_EXPORT PositionDesired: public UAVDataObject
 {
     Q_OBJECT
 
@@ -56,21 +56,21 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 3765671478U;
+    static const quint32 OBJID = 801433018U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;
     static const quint32 NUMBYTES = sizeof(DataFields);
 
     // Functions
-    PositionActual();
+    PositionDesired();
 
     DataFields getData();
     void setData(const DataFields& data);
     Metadata getDefaultMetadata();
     UAVDataObject* clone(quint32 instID);
 
-    static PositionActual* GetInstance(UAVObjectManager* objMngr, quint32 instID = 0);
+    static PositionDesired* GetInstance(UAVObjectManager* objMngr, quint32 instID = 0);
 	
 private:
     DataFields data;
@@ -79,4 +79,4 @@ private:
 
 };
 
-#endif // POSITIONACTUAL_H
+#endif // POSITIONDESIRED_H

@@ -61,6 +61,7 @@
 #include "stdbool.h"
 #include "gpsposition.h"
 #include "positionactual.h"
+#include "velocityactual.h"
 #include "homelocation.h"
 #include "ahrscalibration.h"
 #include "CoordinateConversions.h"
@@ -500,13 +501,17 @@ static void process_update(struct opahrs_msg_v1_rsp_update * update)
     
     PositionActualData pos;
     PositionActualGet(&pos);    
-    pos.NED[0] = update->NED[0];
-    pos.NED[1] = update->NED[1];
-    pos.NED[2] = update->NED[2];
-    pos.Vel[0] = update->Vel[0];
-    pos.Vel[1] = update->Vel[1];
-    pos.Vel[2] = update->Vel[2];
+    pos.North = update->NED[0];
+    pos.East = update->NED[1];
+    pos.Down = update->NED[2];
     PositionActualSet(&pos);
+	
+	VelocityActualData vel;
+	VelocityActualGet(&vel);
+	vel.North = update->Vel[0];
+	vel.East = update->Vel[1];
+	vel.Down = update->Vel[2];
+	VelocityActualSet(&vel);
     
     AhrsStatusData status;
     AhrsStatusGet(&status);

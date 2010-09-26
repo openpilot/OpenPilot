@@ -38,22 +38,8 @@ from collections import namedtuple
 # This is a list of instances of the data fields contained in this object
 _fields = [ \
 	uavobject.UAVObjectField(
-		'Status',
-		'b',
-		1,
-		[
-			'0',
-		],
-		{
-			'0' : 'NoGPS',
-			'1' : 'NoFix',
-			'2' : 'Fix2D',
-			'3' : 'Fix3D',
-		}
-	),
-	uavobject.UAVObjectField(
-		'Latitude',
-		'f',
+		'North',
+		'i',
 		1,
 		[
 			'0',
@@ -62,8 +48,8 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'Longitude',
-		'f',
+		'East',
+		'i',
 		1,
 		[
 			'0',
@@ -72,125 +58,11 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'Altitude',
-		'f',
+		'Down',
+		'i',
 		1,
 		[
 			'0',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
-		'GeoidSeparation',
-		'f',
-		1,
-		[
-			'0',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
-		'Heading',
-		'f',
-		1,
-		[
-			'0',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
-		'Groundspeed',
-		'f',
-		1,
-		[
-			'0',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
-		'Airspeed',
-		'f',
-		1,
-		[
-			'0',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
-		'Climbrate',
-		'f',
-		1,
-		[
-			'0',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
-		'Satellites',
-		'b',
-		1,
-		[
-			'0',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
-		'PDOP',
-		'f',
-		1,
-		[
-			'0',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
-		'HDOP',
-		'f',
-		1,
-		[
-			'0',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
-		'VDOP',
-		'f',
-		1,
-		[
-			'0',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
-		'NED',
-		'f',
-		3,
-		[
-			'0',
-			'1',
-			'2',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
-		'Vel',
-		'f',
-		3,
-		[
-			'0',
-			'1',
-			'2',
 		],
 		{
 		}
@@ -200,7 +72,7 @@ _fields = [ \
 
 class PositionActual(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 3881752126
+    OBJID        = 3765671478
     NAME         = "PositionActual"
     METANAME     = "PositionActualMeta"
     ISSINGLEINST = 1

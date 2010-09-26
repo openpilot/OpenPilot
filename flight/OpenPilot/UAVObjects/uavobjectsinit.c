@@ -48,6 +48,7 @@
 #include "gpsposition.h"
 #include "gpssatellites.h"
 #include "gpstime.h"
+#include "guidancesettings.h"
 #include "homelocation.h"
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
@@ -55,11 +56,14 @@
 #include "mixerstatus.h"
 #include "objectpersistence.h"
 #include "positionactual.h"
+#include "positiondesired.h"
 #include "stabilizationsettings.h"
 #include "systemalarms.h"
 #include "systemsettings.h"
 #include "systemstats.h"
 #include "telemetrysettings.h"
+#include "velocityactual.h"
+#include "velocitydesired.h"
 #include "vtolsettings.h"
 #include "vtolstatus.h"
 
@@ -90,6 +94,7 @@ void UAVObjectsInitializeAll()
     GPSPositionInitialize();
     GPSSatellitesInitialize();
     GPSTimeInitialize();
+    GuidanceSettingsInitialize();
     HomeLocationInitialize();
     ManualControlCommandInitialize();
     ManualControlSettingsInitialize();
@@ -97,11 +102,14 @@ void UAVObjectsInitializeAll()
     MixerStatusInitialize();
     ObjectPersistenceInitialize();
     PositionActualInitialize();
+    PositionDesiredInitialize();
     StabilizationSettingsInitialize();
     SystemAlarmsInitialize();
     SystemSettingsInitialize();
     SystemStatsInitialize();
     TelemetrySettingsInitialize();
+    VelocityActualInitialize();
+    VelocityDesiredInitialize();
     VTOLSettingsInitialize();
     VTOLStatusInitialize();
 

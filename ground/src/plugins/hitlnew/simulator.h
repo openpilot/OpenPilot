@@ -39,7 +39,7 @@
 // #include "uavobjects/altitudeactual.h"
 #include "uavobjects/baroaltitude.h"
 #include "uavobjects/attitudeactual.h"
-#include "uavobjects/positionactual.h"
+#include "uavobjects/gpsposition.h"
 #include "uavobjects/gcstelemetrystats.h"
 
 
@@ -145,7 +145,7 @@ protected:
 	ActuatorDesired* actDesired;
         BaroAltitude* altActual;
 	AttitudeActual* attActual;
-	PositionActual* posActual;
+        GPSPosition* gpsPos;
 	GCSTelemetryStats* telStats;
 
 	SimulatorSettings settings;

@@ -57,12 +57,11 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES =  Telemetry GPS ManualControl Altitude AHRSComms Stabilization/simple/Stabilization Watchdog
+MODULES =  Telemetry GPS ManualControl Altitude AHRSComms Stabilization/simple/Stabilization Guidance Watchdog
 #matrix based actuator mixer
 #MODULES += Actuator/matrix/Actuator
 #original actuator with separate mixers for fixed wing, heli and VTOL
 MODULES += Actuator
-
 
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
@@ -186,6 +185,10 @@ SRC += $(OPUAVOBJ)/vtolstatus.c
 SRC += $(OPUAVOBJ)/mixersettings.c
 SRC += $(OPUAVOBJ)/mixerstatus.c
 #SRC += $(OPUAVOBJ)/lesstabilizationsettings.c
+SRC += $(OPUAVOBJ)/positiondesired.c
+SRC += $(OPUAVOBJ)/velocitydesired.c
+SRC += $(OPUAVOBJ)/velocityactual.c
+SRC += $(OPUAVOBJ)/guidancesettings.c
 endif
 
 ## PIOS Hardware (STM32F10x)

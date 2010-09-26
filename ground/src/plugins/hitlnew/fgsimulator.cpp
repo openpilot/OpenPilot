@@ -220,15 +220,15 @@ void FGSimulator::processUpdate(const QByteArray& inp)
 	attActual->setData(attActualData);
 
 	// Update gps objects
-	PositionActual::DataFields gpsData;
-        memset(&gpsData, 0, sizeof(PositionActual::DataFields));
+        GPSPosition::DataFields gpsData;
+        memset(&gpsData, 0, sizeof(GPSPosition::DataFields));
         gpsData.Altitude = altitude;
 	gpsData.Heading = heading;
 	gpsData.Groundspeed = groundspeed;
 	gpsData.Latitude = latitude;
 	gpsData.Longitude = longitude;
 	gpsData.Satellites = 10;
-	gpsData.Status = PositionActual::STATUS_FIX3D;
-	posActual->setData(gpsData);
+        gpsData.Status = GPSPosition::STATUS_FIX3D;
+        gpsPos->setData(gpsData);
 }
 

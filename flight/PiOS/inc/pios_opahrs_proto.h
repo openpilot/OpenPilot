@@ -319,8 +319,8 @@ struct opahrs_msg_v1_rsp_update {
     float q3;
     float q4;
   } quaternion;
-  float NED[3];
-  float Vel[3];
+  int32_t NED[3];
+  int32_t Vel[3];
   uint8_t load;
   uint8_t idle_time;
   uint8_t run_time;

@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       positionactual.cpp
+ * @file       positiondesired.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
  * @addtogroup GCSPlugins GCS Plugins
@@ -9,7 +9,7 @@
  * @addtogroup UAVObjectsPlugin UAVObjects Plugin
  * @{
  *   
- * @note       Object definition file: positionactual.xml. 
+ * @note       Object definition file: positiondesired.xml. 
  *             This is an automatically generated file.
  *             DO NOT modify manually.
  *
@@ -30,15 +30,15 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include "positionactual.h"
+#include "positiondesired.h"
 #include "uavobjectfield.h"
 
-const QString PositionActual::NAME = QString("PositionActual");
+const QString PositionDesired::NAME = QString("PositionDesired");
 
 /**
  * Constructor
  */
-PositionActual::PositionActual(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
+PositionDesired::PositionDesired(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
 {
     // Create fields
     QList<UAVObjectField*> fields;
@@ -61,7 +61,7 @@ PositionActual::PositionActual(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS,
 /**
  * Get the default metadata for this object
  */
-UAVObject::Metadata PositionActual::getDefaultMetadata()
+UAVObject::Metadata PositionDesired::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
     metadata.flightAccess = ACCESS_READWRITE;
@@ -70,8 +70,8 @@ UAVObject::Metadata PositionActual::getDefaultMetadata()
     metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_MANUAL;
     metadata.gcsTelemetryUpdatePeriod = 0;
     metadata.flightTelemetryAcked = 0;
-    metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
-    metadata.flightTelemetryUpdatePeriod = 1000;
+    metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
+    metadata.flightTelemetryUpdatePeriod = 0;
     metadata.loggingUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
     metadata.loggingUpdatePeriod = 1000;
     return metadata;
@@ -82,7 +82,7 @@ UAVObject::Metadata PositionActual::getDefaultMetadata()
  * If a default value is not specified the object fields
  * will be initialized to zero.
  */
-void PositionActual::setDefaultFieldValues()
+void PositionDesired::setDefaultFieldValues()
 {
 
 }
@@ -90,7 +90,7 @@ void PositionActual::setDefaultFieldValues()
 /**
  * Get the object data fields
  */
-PositionActual::DataFields PositionActual::getData()
+PositionDesired::DataFields PositionDesired::getData()
 {
     QMutexLocker locker(mutex);
     return data;
@@ -99,7 +99,7 @@ PositionActual::DataFields PositionActual::getData()
 /**
  * Set the object data fields
  */
-void PositionActual::setData(const DataFields& data)
+void PositionDesired::setData(const DataFields& data)
 {
     QMutexLocker locker(mutex);
     // Get metadata
@@ -118,9 +118,9 @@ void PositionActual::setData(const DataFields& data)
  * Do not use this function directly to create new instances, the
  * UAVObjectManager should be used instead.
  */
-UAVDataObject* PositionActual::clone(quint32 instID)
+UAVDataObject* PositionDesired::clone(quint32 instID)
 {
-    PositionActual* obj = new PositionActual();
+    PositionDesired* obj = new PositionDesired();
     obj->initialize(instID, this->getMetaObject());
     return obj;
 }
@@ -128,7 +128,7 @@ UAVDataObject* PositionActual::clone(quint32 instID)
 /**
  * Static function to retrieve an instance of the object.
  */
-PositionActual* PositionActual::GetInstance(UAVObjectManager* objMngr, quint32 instID)
+PositionDesired* PositionDesired::GetInstance(UAVObjectManager* objMngr, quint32 instID)
 {
-    return dynamic_cast<PositionActual*>(objMngr->getObject(PositionActual::OBJID, instID));
+    return dynamic_cast<PositionDesired*>(objMngr->getObject(PositionDesired::OBJID, instID));
 }

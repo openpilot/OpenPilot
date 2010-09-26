@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       positionactual.h
+ * @file       guidancesettings.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
  * @addtogroup GCSPlugins GCS Plugins
@@ -9,7 +9,7 @@
  * @addtogroup UAVObjectsPlugin UAVObjects Plugin
  * @{
  *   
- * @note       Object definition file: positionactual.xml. 
+ * @note       Object definition file: guidancesettings.xml. 
  *             This is an automatically generated file.
  *             DO NOT modify manually.
  *
@@ -30,47 +30,69 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef POSITIONACTUAL_H
-#define POSITIONACTUAL_H
+#ifndef GUIDANCESETTINGS_H
+#define GUIDANCESETTINGS_H
 
 #include "uavdataobject.h"
 #include "uavobjectmanager.h"
 
-class UAVOBJECTS_EXPORT PositionActual: public UAVDataObject
+class UAVOBJECTS_EXPORT GuidanceSettings: public UAVDataObject
 {
     Q_OBJECT
 
 public:
     // Field structure
     typedef struct {
-        qint32 North;
-        qint32 East;
-        qint32 Down;
+        qint32 MaxGroundspeed;
+        float GroundVelocityP;
+        qint32 MaxVerticalSpeed;
+        float VertVelocityP;
+        float VelP;
+        float VelI;
+        float VelD;
+        float DownP;
+        float DownI;
+        float DownD;
+        float MaxVelIntegral;
+        float MaxThrottleIntegral;
+        qint32 VelUpdatePeriod;
+        qint32 VelPIDUpdatePeriod;
 
     } __attribute__((packed)) DataFields;
 
     // Field information
-    // Field North information
-    // Field East information
-    // Field Down information
+    // Field MaxGroundspeed information
+    // Field GroundVelocityP information
+    // Field MaxVerticalSpeed information
+    // Field VertVelocityP information
+    // Field VelP information
+    // Field VelI information
+    // Field VelD information
+    // Field DownP information
+    // Field DownI information
+    // Field DownD information
+    // Field MaxVelIntegral information
+    // Field MaxThrottleIntegral information
+    // Field VelUpdatePeriod information
+    // Field VelPIDUpdatePeriod information
 
   
     // Constants
-    static const quint32 OBJID = 3765671478U;
+    static const quint32 OBJID = 2428005802U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
-    static const bool ISSETTINGS = 0;
+    static const bool ISSETTINGS = 1;
     static const quint32 NUMBYTES = sizeof(DataFields);
 
     // Functions
-    PositionActual();
+    GuidanceSettings();
 
     DataFields getData();
     void setData(const DataFields& data);
     Metadata getDefaultMetadata();
     UAVDataObject* clone(quint32 instID);
 
-    static PositionActual* GetInstance(UAVObjectManager* objMngr, quint32 instID = 0);
+    static GuidanceSettings* GetInstance(UAVObjectManager* objMngr, quint32 instID = 0);
 	
 private:
     DataFields data;
@@ -79,4 +101,4 @@ private:
 
 };
 
-#endif // POSITIONACTUAL_H
+#endif // GUIDANCESETTINGS_H

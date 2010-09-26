@@ -230,9 +230,9 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
 	attActual->setData(attActualData);
 
 	// Update gps objects
-	PositionActual::DataFields gpsData;
-	memset(&gpsData, 0, sizeof(PositionActual::DataFields));
-	gpsData.Altitude = current.Z;
+        GPSPosition::DataFields gpsData;
+        memset(&gpsData, 0, sizeof(GPSPosition::DataFields));
+        gpsData.Altitude = current.Z;
 	gpsData.Heading = current.azimuth;
 	gpsData.Groundspeed = current.groundspeed;
 	gpsData.Latitude = settings.latitude.toFloat() + current.Y * DEG2M;
@@ -259,6 +259,6 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
 	// issue manual update
 	attActual->updated();
 	altActual->updated();
-	posActual->updated();
+        gpsPos->updated();
 }
 

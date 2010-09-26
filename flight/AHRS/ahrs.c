@@ -898,15 +898,15 @@ void process_spi_request(void)
 		user_tx_v1.payload.user.v.rsp.update.quaternion.q4 =
 		    attitude_data.quaternion.q4;
 
-		// TODO: separate this from INSGPS
-		user_tx_v1.payload.user.v.rsp.update.NED[0] = Nav.Pos[0];
-		user_tx_v1.payload.user.v.rsp.update.NED[1] = Nav.Pos[1];
-		user_tx_v1.payload.user.v.rsp.update.NED[2] = Nav.Pos[2];
-		user_tx_v1.payload.user.v.rsp.update.Vel[0] = Nav.Vel[0];
-		user_tx_v1.payload.user.v.rsp.update.Vel[1] = Nav.Vel[1];
-		user_tx_v1.payload.user.v.rsp.update.Vel[2] = Nav.Vel[2];
-
-		// compute the idle fraction
+		// convert all to cm/s
+		user_tx_v1.payload.user.v.rsp.update.NED[0] = Nav.Pos[0]*100;
+		user_tx_v1.payload.user.v.rsp.update.NED[1] = Nav.Pos[1]*100;
+		user_tx_v1.payload.user.v.rsp.update.NED[2] = Nav.Pos[2]*100;
+		user_tx_v1.payload.user.v.rsp.update.Vel[0] = Nav.Vel[0]*100;
+		user_tx_v1.payload.user.v.rsp.update.Vel[1] = Nav.Vel[1]*100;
+		user_tx_v1.payload.user.v.rsp.update.Vel[2] = Nav.Vel[2]*100;
+			
+			// compute the idle fraction
 		user_tx_v1.payload.user.v.rsp.update.load =
 		    ((float)running_counts /
 		     (float)(idle_counts + running_counts)) * 100;

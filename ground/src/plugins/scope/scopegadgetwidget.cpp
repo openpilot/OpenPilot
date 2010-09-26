@@ -351,18 +351,6 @@ void TestDataGen::genTestData()
     baroAltitudeData.Pressure = baroAltitudeData.Altitude * 0.01 + baroAltitudeData.Temperature;
     baroAltitude->setData(baroAltitudeData);
 
-
-    // Update gps objects
-    PositionActual::DataFields gpsData;
-    gpsData.Altitude = 0;
-    gpsData.Heading = 0;
-    gpsData.Groundspeed = 0;
-    gpsData.Latitude = 0;
-    gpsData.Longitude = 0;
-    gpsData.Satellites = 10;
-    gps->setData(gpsData);
-
-
     // Update Attitude Raw data
     AttitudeRaw::DataFields attData;
 //    attData.accels[0] = 4 *  sin(2 * testTime) + 1 * cos(6 * testTime) + 4;

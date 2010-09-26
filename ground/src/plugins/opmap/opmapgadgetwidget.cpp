@@ -1466,9 +1466,9 @@ QPointF OPMapGadgetWidget::getLatLon()
     BaseECEF[2] = obj->getField(QString("ECEF"))->getDouble(2);
 
     obj = dynamic_cast<UAVDataObject*>(m_objManager->getObject(QString("PositionActual")));
-    NED[0] = obj->getField(QString("NED"))->getDouble(0);
-    NED[1] = obj->getField(QString("NED"))->getDouble(1);
-    NED[2] = obj->getField(QString("NED"))->getDouble(2);
+    NED[0] = obj->getField(QString("North"))->getDouble() / 100;
+    NED[1] = obj->getField(QString("East"))->getDouble() / 100;
+    NED[2] = obj->getField(QString("Down"))->getDouble() / 100;
 
     Utils::CoordinateConversions().GetLLA(BaseECEF, NED, LLA);
     return QPointF(LLA[0],LLA[1]);

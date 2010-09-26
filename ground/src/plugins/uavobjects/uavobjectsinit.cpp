@@ -50,6 +50,7 @@
 #include "gpsposition.h"
 #include "gpssatellites.h"
 #include "gpstime.h"
+#include "guidancesettings.h"
 #include "homelocation.h"
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
@@ -57,11 +58,14 @@
 #include "mixerstatus.h"
 #include "objectpersistence.h"
 #include "positionactual.h"
+#include "positiondesired.h"
 #include "stabilizationsettings.h"
 #include "systemalarms.h"
 #include "systemsettings.h"
 #include "systemstats.h"
 #include "telemetrysettings.h"
+#include "velocityactual.h"
+#include "velocitydesired.h"
 #include "vtolsettings.h"
 #include "vtolstatus.h"
 
@@ -92,6 +96,7 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new GPSPosition() );
     objMngr->registerObject( new GPSSatellites() );
     objMngr->registerObject( new GPSTime() );
+    objMngr->registerObject( new GuidanceSettings() );
     objMngr->registerObject( new HomeLocation() );
     objMngr->registerObject( new ManualControlCommand() );
     objMngr->registerObject( new ManualControlSettings() );
@@ -99,11 +104,14 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new MixerStatus() );
     objMngr->registerObject( new ObjectPersistence() );
     objMngr->registerObject( new PositionActual() );
+    objMngr->registerObject( new PositionDesired() );
     objMngr->registerObject( new StabilizationSettings() );
     objMngr->registerObject( new SystemAlarms() );
     objMngr->registerObject( new SystemSettings() );
     objMngr->registerObject( new SystemStats() );
     objMngr->registerObject( new TelemetrySettings() );
+    objMngr->registerObject( new VelocityActual() );
+    objMngr->registerObject( new VelocityDesired() );
     objMngr->registerObject( new VTOLSettings() );
     objMngr->registerObject( new VTOLStatus() );
 

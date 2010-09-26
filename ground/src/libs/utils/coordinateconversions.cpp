@@ -133,7 +133,7 @@ int CoordinateConversions::GetLLA(double BaseECEFcm[3], double NED[3], double po
 {
     int i;
     // stored value is in cm, convert to m
-    double BaseECEFm[3] = {BaseECEFcm[0] / 100, BaseECEFcm[1] / 100, BaseECEFcm[2] / 100};
+    double BaseECEFm[3] = {BaseECEFcm[0], BaseECEFcm[1], BaseECEFcm[2]};
     double BaseLLA[3];
     double ECEF[3];
     double Rne [3][3];

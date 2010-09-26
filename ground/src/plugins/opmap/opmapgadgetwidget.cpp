@@ -1461,9 +1461,9 @@ QPointF OPMapGadgetWidget::getLatLon()
     UAVObject *obj;
 
     obj = dynamic_cast<UAVDataObject*>(m_objManager->getObject(QString("HomeLocation")));
-    BaseECEF[0] = obj->getField(QString("ECEF"))->getDouble(0);
-    BaseECEF[1] = obj->getField(QString("ECEF"))->getDouble(1);
-    BaseECEF[2] = obj->getField(QString("ECEF"))->getDouble(2);
+    BaseECEF[0] = obj->getField(QString("ECEF"))->getDouble(0) / 100;
+    BaseECEF[1] = obj->getField(QString("ECEF"))->getDouble(1) / 100;
+    BaseECEF[2] = obj->getField(QString("ECEF"))->getDouble(2) / 100;
 
     obj = dynamic_cast<UAVDataObject*>(m_objManager->getObject(QString("PositionActual")));
     NED[0] = obj->getField(QString("North"))->getDouble() / 100;

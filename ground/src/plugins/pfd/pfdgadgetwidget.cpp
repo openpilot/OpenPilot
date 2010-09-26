@@ -118,7 +118,7 @@ void PFDGadgetWidget::connectNeedles() {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
-    airspeedObj = dynamic_cast<UAVDataObject*>(objManager->getObject("PositionActual"));
+    airspeedObj = dynamic_cast<UAVDataObject*>(objManager->getObject("VelocityActual"));
     if (attitudeObj != NULL ) {
         connect(airspeedObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateAirspeed(UAVObject*)));
     } else {
@@ -288,9 +288,10 @@ void PFDGadgetWidget::updateHeading(UAVObject *object) {
   \brief Called by updates to @PositionActual to compute airspeed from velocity
   */
 void PFDGadgetWidget::updateAirspeed(UAVObject *object) {
-    UAVObjectField* velField = object->getField("Vel");
-    if (velField) {
-        double val = floor(sqrt(pow(velField->getDouble(0),2) + pow(velField->getDouble(1),2))*10)/10;
+    UAVObjectField* northField = object->getField("North");
+    UAVObjectField* eastField = object->getField("East");
+    if (northField && eastField) {
+        double val = floor(sqrt(pow(northField->getDouble(),2) + pow(eastField->getDouble(),2))*10)/10;
         groundspeedTarget = 3.6*val*speedScaleHeight/30;
 
     } else {
@@ -302,10 +303,10 @@ void PFDGadgetWidget::updateAirspeed(UAVObject *object) {
   \brief Called by the @ref PositionActual updates to show altitude
   */
 void PFDGadgetWidget::updateAltitude(UAVObject *object) {
-    UAVObjectField* posField = object->getField("NED");
-    if (posField) {
+    UAVObjectField* downField = object->getField("Down");
+    if (downField) {
         // The altitude scale represents 30 meters
-        altitudeTarget = floor(posField->getDouble(3)*10)/10*altitudeScaleHeight/30;
+        altitudeTarget = -floor(downField->getDouble(3)*10)/10*altitudeScaleHeight/30;
     } else {
         qDebug() << "Unable to get field for altitude update.  Obj: " << object->getName();
     }

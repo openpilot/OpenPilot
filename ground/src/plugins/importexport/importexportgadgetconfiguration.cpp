@@ -29,18 +29,26 @@
 
 #include "importexportgadgetconfiguration.h"
 
+static const QString VERSION = "1.0.1";
+
 /**
  * Loads a saved configuration or defaults if non exist.
  *
  */
-ImportExportGadgetConfiguration::ImportExportGadgetConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
-        IUAVGadgetConfiguration(classId, parent),
-        dialFile("gcs.ini")
+ImportExportGadgetConfiguration::ImportExportGadgetConfiguration(QString classId, QSettings* qSettings, UAVConfigInfo *configInfo, QObject *parent) :
+        IUAVGadgetConfiguration(classId, parent)
 {
-    //if a saved configuration exists load it
-    if(qSettings != 0) {
-        dialFile = qSettings->value("dialFile").toString();
-    }
+    if ( ! qSettings )
+        return;
+
+    if ( configInfo->version() == UAVConfigVersion() )
+        configInfo->setVersion("1.0.0");
+
+    if ( !configInfo->standardVersionHandlingOK(VERSION))
+        return;
+
+    iniFile = qSettings->value("dialFile", "gcs.ini").toString(); // TODO Delete with next minor version.
+    iniFile = qSettings->value("iniFile", iniFile).toString();
 }
 
 /**
@@ -50,7 +58,7 @@ ImportExportGadgetConfiguration::ImportExportGadgetConfiguration(QString classId
 IUAVGadgetConfiguration *ImportExportGadgetConfiguration::clone()
 {
     ImportExportGadgetConfiguration *m = new ImportExportGadgetConfiguration(this->classId());
-    m->dialFile = dialFile;
+    m->iniFile = iniFile;
     return m;
 }
 
@@ -58,8 +66,10 @@ IUAVGadgetConfiguration *ImportExportGadgetConfiguration::clone()
  * Saves a configuration.
  *
  */
-void ImportExportGadgetConfiguration::saveConfig(QSettings* qSettings) const {
-   qSettings->setValue("dialFile", dialFile);
+void ImportExportGadgetConfiguration::saveConfig(QSettings* qSettings, Core::UAVConfigInfo *configInfo) const {
+    configInfo->setVersion(VERSION);
+    qSettings->setValue("dialFile", iniFile);
+    qSettings->setValue("iniFile", iniFile);
 }
 
 /**

@@ -67,7 +67,7 @@ void ImportExportGadgetWidget::loadConfiguration(const ImportExportGadgetConfigu
     if ( !config )
         return;
 
-    ui->configFile->setText(config->getDialFile());
+    ui->configFile->setText(config->getIniFile());
 }
 
 void ImportExportGadgetWidget::on_exportButton_clicked()

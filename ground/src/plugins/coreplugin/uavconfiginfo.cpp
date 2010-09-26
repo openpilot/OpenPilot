@@ -24,6 +24,85 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+/*!
+    \class Core::UAVConfigInfo
+    \mainclass
+
+    \brief The Config Info is a helper-class to handle version changes in GCS
+        configuration files.
+
+    The UAVConfigInfo provides version-information for the configuration-data
+    and callback functions to ask the user how to handle incompatble
+    (old or newer) configurations.
+
+    When the config is created from a \l{QSettings} instance, an UAVConfigInfo
+    object is passed to the factory-method. With the version-data it can decide whether
+    the presented config-data is compatible to the current implementation. It may
+    migrate old data to the current format or abort the import.
+
+    When the config is written to the \l{QSettings} instance, an UAVConfigInfo object
+    is passed to the writer-function. The version of the config-format should
+    be written to the UAVConfigInfo object. This version will be passed to
+    factory-method when creating the config-object from this configuration.
+
+
+    Typically a plugin can handle version-changes like this:
+    \code
+    MyGadgetConfiguration::MyGadgetConfiguration(QString classId, QSettings* qSettings, UAVConfigInfo *configInfo, QObject *parent) :
+        IUAVGadgetConfiguration(classId, parent)
+    {
+        if ( ! qSettings )
+            return;
+
+        if ( configInfo->version() == UAVConfigVersion() )
+            configInfo->setVersion("1.0.0");
+
+        if ( !configInfo->standardVersionHandlingOK(CURRENT_VERSION))
+            return;
+
+        ... read the config ...
+    }
+
+    void MyGadgetConfiguration::saveConfig(QSettings* qSettings, Core::UAVConfigInfo *configInfo) const {
+
+        configInfo->setVersion(CURRENT_VERSION);
+
+        ... write the config ...
+    }
+
+    \endcode
+
+
+    \section1 Version Conventions
+
+    The Version numbers are in the form "major.minor.patch" (e.g. "3.1.4") with the
+    following meaning:
+    \list
+    \o major: Differences in this number indicate completely incompatible formats. The
+        config can't be imported.
+    \o minor: Differences in this number indicate backwards compatible formats. Old
+        configs can be imported or will be automatically migrated by the new program
+        but configs written by this plugin can't be reasonably read by old versions of
+        the plugin.
+    \o patch: Differences in this number indicate backwards and forward compatible formats.
+        Configs written by this plugin can be read by old versions of the plugin. Old configs
+        are extended by defaults by the new plugin.
+    \endlist
+
+    All parts (major, minor, patch) must be numeric values.
+
+    \section1 Utility Functions
+
+    \fn bool UAVConfigInfo::standardVersionHandlingOK(UAVConfigVersion programVersion)
+    \brief Default version handling.
+
+    With this function the plugin can test compatiblility of the current version
+    with the imported version. If there are differences, the user is asked whether
+    he or she wants to import the settings or abort the import.
+
+    Returns true when the import should be done, false otherwise.
+
+*/
 
 #include "uavconfiginfo.h"
 #include <QMessageBox>
@@ -47,27 +126,51 @@ by your version of the plugin. You should upgrade the plugin to import these set
 
 using namespace Core;
 
+UAVConfigInfo::UAVConfigInfo(QObject *parent) :
+        QObject(parent),
+        m_version(VERSION_DEFAULT),
+        m_locked(false),
+        m_nameOfConfigurable("")
+{
+
+}
+
 UAVConfigInfo::UAVConfigInfo(QSettings *qs, QObject *parent) :
     QObject(parent),
     m_version(VERSION_DEFAULT)
 {
-    qs->beginGroup("configInfo");
-    m_version = UAVConfigVersion( qs->value("version", VERSION_DEFAULT ).toString());
-    qs->endGroup();
+    read(qs);
 }
 
 UAVConfigInfo::UAVConfigInfo(UAVConfigVersion version, QString nameOfConfigurable, QObject *parent) :
         QObject(parent),
         m_version(version),
+        m_locked(false),
         m_nameOfConfigurable(nameOfConfigurable)
 {
 
+}
+
+UAVConfigInfo::UAVConfigInfo(IUAVGadgetConfiguration *config, QObject *parent) :
+        QObject(parent)
+{
+    m_locked = config->locked();
+    m_nameOfConfigurable = config->classId() + "-" + config->name();
 }
 
 void UAVConfigInfo::save(QSettings *qs)
 {
     qs->beginGroup("configInfo");
     qs->setValue("version", m_version.toString());
+    qs->setValue("locked", m_locked);
+    qs->endGroup();
+}
+
+void UAVConfigInfo::read(QSettings *qs)
+{
+    qs->beginGroup("configInfo");
+    m_version = UAVConfigVersion( qs->value("version", VERSION_DEFAULT ).toString());
+    m_locked = qs->value("locked", false ).toBool();
     qs->endGroup();
 }
 
@@ -104,6 +207,7 @@ bool UAVConfigInfo::askToAbort(int compat, QString message)
 
     case NotCompatible:
         msgBox.setText("ERROR: " + message + TEXT_NOT_COMPATIBLE);
+        msgBox.setInformativeText(tr(""));
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.exec();
         return true;
@@ -118,7 +222,7 @@ bool UAVConfigInfo::askToAbort(int compat, QString message)
 
 }
 
-void UAVConfigInfo::notifyAbort(QString message)
+void UAVConfigInfo::notify(QString message)
 {
     QMessageBox msgBox;
     msgBox.setText(message);
@@ -139,9 +243,9 @@ int UAVConfigInfo::checkCompatibilityWith(UAVConfigVersion programVersion)
     return FullyCompatible;
 }
 
-bool UAVConfigInfo::standardVersionHandlingIsNotOK(UAVConfigVersion programVersion)
+bool UAVConfigInfo::standardVersionHandlingOK(UAVConfigVersion programVersion)
 {
-    return askToAbort(
+    return !askToAbort(
             checkCompatibilityWith(programVersion),
             "("+m_nameOfConfigurable+")");
 }

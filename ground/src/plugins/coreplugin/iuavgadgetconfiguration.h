@@ -29,10 +29,13 @@
 #define IUAVGADGETCONFIGURATION_H
 
 #include <coreplugin/core_global.h>
+#include <coreplugin/uavconfiginfo.h>
 #include <QObject>
 #include <QSettings>
 
 namespace Core {
+
+class UAVConfigInfo;
 
 class CORE_EXPORT IUAVGadgetConfiguration : public QObject
 {
@@ -47,7 +50,8 @@ public:
     bool locked() const { return m_locked; }
     void setLocked(bool locked) { m_locked = locked; }
 
-    virtual void saveConfig(QSettings* settings) const = 0;
+    virtual void saveConfig(QSettings* /*settings*/) const {};
+    virtual void saveConfig(QSettings* settings, UAVConfigInfo* /*configInfo*/) const { saveConfig(settings); }
 
     virtual IUAVGadgetConfiguration *clone() = 0;
 

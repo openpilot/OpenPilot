@@ -63,7 +63,7 @@
        </widget>
       </item>
       <item>
-       <widget class="Utils::PathChooser" name="svgSourceFile" native="true">
+       <widget class="Utils::PathChooser" name="iniFile" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
           <horstretch>0</horstretch>

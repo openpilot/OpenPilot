@@ -50,9 +50,9 @@ Core::IUAVGadget* ImportExportGadgetFactory::createGadget(QWidget *parent)
     return new ImportExportGadget(QString("ImportExportGadget"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *ImportExportGadgetFactory::createConfiguration(QSettings* qSettings)
+IUAVGadgetConfiguration *ImportExportGadgetFactory::createConfiguration(QSettings* qSettings, UAVConfigInfo *configInfo)
 {
-    lastConfig = new ImportExportGadgetConfiguration(QString("ImportExportGadget"), qSettings);
+    lastConfig = new ImportExportGadgetConfiguration(QString("ImportExportGadget"), qSettings, configInfo);
     return lastConfig;
 }
 

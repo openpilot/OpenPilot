@@ -44,9 +44,10 @@
 
 using namespace Core;
 
+static const UAVConfigVersion m_versionUAVGadgetConfigurations = UAVConfigVersion("1.2.0");
+
 UAVGadgetInstanceManager::UAVGadgetInstanceManager(QObject *parent) :
-    QObject(parent),
-    m_versionUAVGadgetConfigurations("1.1.0")
+    QObject(parent)
 {
     m_pm = ExtensionSystem::PluginManager::instance();
     QList<IUAVGadgetFactory*> factories = m_pm->getObjects<IUAVGadgetFactory>();
@@ -77,23 +78,86 @@ void UAVGadgetInstanceManager::readConfigurations(QSettings *qs)
     UAVConfigInfo configInfo(qs);
     configInfo.setNameOfConfigurable("UAVGadgetConfigurations");
     if ( configInfo.version() == UAVConfigVersion() ){
-        // If version is not set, assume its a old version before readable config.
+        // If version is not set, assume its a old version before readable config (1.0.0).
+        // however compatibility to 1.0.0 is broken.
         configInfo.setVersion("1.0.0");
     }
-    /*
-    if ( configInfo.standardVersionHandlingIsNotOK(m_versionUAVGadgetConfigurations) ){
-        // We are in trouble now. User wants us to quit the import.
-        qs->endGroup();
-        return;
+
+    if ( configInfo.version() == UAVConfigVersion("1.1.0") ){
+        configInfo.notify(tr("Migrating UAVGadgetConfigurations from version 1.1.0 to ")
+                          + m_versionUAVGadgetConfigurations.toString());
+        readConfigs_1_1_0(qs); // this is fully compatible with 1.2.0
     }
-    */
-    readConfigs_1_0_0(qs);
+    else if ( !configInfo.standardVersionHandlingOK(m_versionUAVGadgetConfigurations) ){
+        // We are in trouble now. User wants us to quit the import, but when he saves
+        // the GCS, his old config will be lost.
+        configInfo.notify(
+                tr("You might want to save your old config NOW since it might be replaced by broken one when you exit the GCS!")
+                );
+    }
+    else{
+        readConfigs_1_2_0(qs);
+    }
+
     qs->endGroup();
     createOptionsPages();
 }
 
-void UAVGadgetInstanceManager::readConfigs_1_0_0(QSettings *qs)
+void UAVGadgetInstanceManager::readConfigs_1_2_0(QSettings *qs)
 {
+    UAVConfigInfo configInfo;
+
+    foreach (QString classId, m_classIds.keys())
+    {
+        IUAVGadgetFactory *f = factory(classId);
+        qs->beginGroup(classId);
+
+        QStringList configs = QStringList();
+
+        configs = qs->childGroups();
+        foreach (QString configName, configs) {
+            qDebug() << "Loading config: " << classId << "," <<  configName;
+            qs->beginGroup(configName);
+            configInfo.read(qs);
+            configInfo.setNameOfConfigurable(classId+"-"+configName);
+            qs->beginGroup("data");
+            IUAVGadgetConfiguration *config = f->createConfiguration(qs, &configInfo);
+            if (config){
+                config->setName(configName);
+                config->setProvisionalName(configName);
+                config->setLocked(configInfo.locked());
+                int idx = indexForConfig(m_configurations, classId, configName);
+                if ( idx >= 0 ){
+                    // We should replace the config, but it might be used, so just
+                    // throw it out of the list. The GCS should be reinitialised soon.
+                    m_configurations[idx] = config;
+                }
+                else{
+                    m_configurations.append(config);
+                }
+            }
+            qs->endGroup();
+            qs->endGroup();
+        }
+
+        if (configs.count() == 0) {
+            IUAVGadgetConfiguration *config = f->createConfiguration(0, 0);
+            // it is not mandatory for uavgadgets to have any configurations (settings)
+            // and therefore we have to check for that
+            if (config) {
+                config->setName(tr("default"));
+                config->setProvisionalName(tr("default"));
+                m_configurations.append(config);
+            }
+        }
+        qs->endGroup();
+    }
+}
+
+void UAVGadgetInstanceManager::readConfigs_1_1_0(QSettings *qs)
+{
+    UAVConfigInfo configInfo;
+
     foreach (QString classId, m_classIds.keys())
     {
         IUAVGadgetFactory *f = factory(classId);
@@ -106,7 +170,8 @@ void UAVGadgetInstanceManager::readConfigs_1_0_0(QSettings *qs)
             qDebug() << "Loading config: " << classId << "," <<  configName;
             qs->beginGroup(configName);
             bool locked = qs->value("config.locked").toBool();
-            IUAVGadgetConfiguration *config = f->createConfiguration(qs);
+            configInfo.setNameOfConfigurable(classId+"-"+configName);
+            IUAVGadgetConfiguration *config = f->createConfiguration(qs, &configInfo);
             if (config){
                 config->setName(configName);
                 config->setProvisionalName(configName);
@@ -125,7 +190,7 @@ void UAVGadgetInstanceManager::readConfigs_1_0_0(QSettings *qs)
         }
 
         if (configs.count() == 0) {
-            IUAVGadgetConfiguration *config = f->createConfiguration(0);
+            IUAVGadgetConfiguration *config = f->createConfiguration(0, 0);
             // it is not mandatory for uavgadgets to have any configurations (settings)
             // and therefore we have to check for that
             if (config) {
@@ -140,19 +205,24 @@ void UAVGadgetInstanceManager::readConfigs_1_0_0(QSettings *qs)
 
 void UAVGadgetInstanceManager::writeConfigurations(QSettings *qs)
 {
+    UAVConfigInfo *configInfo;
     qs->beginGroup("UAVGadgetConfigurations");
     qs->remove(""); // Remove existing configurations
-    UAVConfigInfo configInfo(m_versionUAVGadgetConfigurations, "UAVGadgetConfigurations");
-    configInfo.save(qs);
+    configInfo = new UAVConfigInfo(m_versionUAVGadgetConfigurations, "UAVGadgetConfigurations");
+    configInfo->save(qs);
+    delete configInfo;
     foreach (IUAVGadgetConfiguration *config, m_configurations)
     {
+        configInfo = new UAVConfigInfo(config);
         qs->beginGroup(config->classId());
         qs->beginGroup(config->name());
-        // TODO: Someone could accidentially use the same name?
-        qs->setValue("config.locked", config->locked());
-        config->saveConfig(qs);
+        qs->beginGroup("data");
+        config->saveConfig(qs, configInfo);
+        qs->endGroup();
+        configInfo->save(qs);
         qs->endGroup();
         qs->endGroup();
+        delete configInfo;
     }
     qs->endGroup();
 }

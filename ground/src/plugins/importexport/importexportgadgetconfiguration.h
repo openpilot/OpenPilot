@@ -39,23 +39,23 @@ class IMPORTEXPORT_EXPORT ImportExportGadgetConfiguration : public IUAVGadgetCon
 {
     Q_OBJECT
 public:
-    explicit ImportExportGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
+    ImportExportGadgetConfiguration(QString classId, QSettings* qSettings = 0, UAVConfigInfo *configInfo = 0, QObject *parent = 0);
 
     //set dial configuration functions
-    void setDialFile(QString filename) {
-        dialFile = filename;
+    void setIniFile(QString filename) {
+        iniFile = filename;
     }
 
     //get dial configuration functions
-    QString getDialFile() const{
-        return dialFile;
+    QString getIniFile() const{
+        return iniFile;
     }
 
-    void saveConfig(QSettings* settings) const;
+    void saveConfig(QSettings* settings, Core::UAVConfigInfo *configInfo) const;
     IUAVGadgetConfiguration *clone();
 
 private:
-    QString dialFile;
+    QString iniFile;
 };
 
 #endif // IMPORTEXPORTGADGETCONFIGURATION_H

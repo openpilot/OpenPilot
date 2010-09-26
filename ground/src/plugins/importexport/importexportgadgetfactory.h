@@ -47,7 +47,7 @@ public:
     ImportExportGadgetConfiguration *getLastConfig(){ return lastConfig;}
 
     Core::IUAVGadget *createGadget(QWidget *parent);
-    IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings);
+    IUAVGadgetConfiguration *createConfiguration(QSettings *qSettings, UAVConfigInfo *configInfo);
     IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
 
 private:

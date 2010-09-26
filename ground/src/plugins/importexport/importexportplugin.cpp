@@ -69,9 +69,11 @@ bool ImportExportPlugin::initialize(const QStringList& args, QString *errMsg)
     cmd->setDefaultKeySequence(QKeySequence("Ctrl+I"));
     cmd->action()->setText("Import/Export...");
 
-    ac->menu()->addSeparator();
-    ac->appendGroup("ImportExport");
-    ac->addAction(cmd, "ImportExport");
+//    ac->menu()->addSeparator();
+//    ac->appendGroup("ImportExport");
+//    ac->addAction(cmd, "ImportExport");
+    ac->addAction(cmd, Core::Constants::G_FILE_SAVE);
+
 
     connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(importExport()));
 

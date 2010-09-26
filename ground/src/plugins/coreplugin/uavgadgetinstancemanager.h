@@ -97,10 +97,10 @@ private:
     QList<IOptionsPage*> m_provisionalOptionsPages;
     Core::Internal::SettingsDialog *m_settingsDialog;
     ExtensionSystem::PluginManager *m_pm;
-    UAVConfigVersion m_versionUAVGadgetConfigurations;
     int indexForConfig(QList<IUAVGadgetConfiguration*> configurations,
                        QString classId, QString configName);
-    void readConfigs_1_0_0(QSettings *qs);
+    void readConfigs_1_1_0(QSettings *qs);
+    void readConfigs_1_2_0(QSettings *qs);
 };
 
 } // namespace Core

@@ -32,6 +32,8 @@
 		654330231218E9780063F913 /* insgps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = insgps.c; path = ../../AHRS/insgps.c; sourceTree = SOURCE_ROOT; };
 		6543304F121980300063F913 /* insgps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = insgps.h; sourceTree = "<group>"; };
 		655268BC121FBD2900410C6E /* ahrscalibration.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ahrscalibration.xml; sourceTree = "<group>"; };
+		65632CBF124E09D900469B77 /* guidance.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = guidance.c; sourceTree = "<group>"; };
+		65632CC1124E09D900469B77 /* guidance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = guidance.h; sourceTree = "<group>"; };
 		657CEEAD121DB6C8007A1FBE /* homelocation.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = homelocation.xml; sourceTree = "<group>"; };
 		657CEEB7121DBC63007A1FBE /* CoordinateConversions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CoordinateConversions.c; sourceTree = "<group>"; };
 		657CEEB9121DBC63007A1FBE /* CoordinateConversions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoordinateConversions.h; sourceTree = "<group>"; };
@@ -2564,13 +2566,10 @@
 		65B367EE121C2620003EAD18 /* exampleobject2.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = exampleobject2.xml; sourceTree = "<group>"; };
 		65B367EF121C2620003EAD18 /* examplesettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = examplesettings.xml; sourceTree = "<group>"; };
 		65B367F0121C2620003EAD18 /* flightbatterystate.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = flightbatterystate.xml; sourceTree = "<group>"; };
-		65B367F1121C2620003EAD18 /* flightsituationactual.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = flightsituationactual.xml; sourceTree = "<group>"; };
 		65B367F2121C2620003EAD18 /* flighttelemetrystats.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = flighttelemetrystats.xml; sourceTree = "<group>"; };
 		65B367F3121C2620003EAD18 /* gcstelemetrystats.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = gcstelemetrystats.xml; sourceTree = "<group>"; };
 		65B367F4121C2620003EAD18 /* manualcontrolcommand.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = manualcontrolcommand.xml; sourceTree = "<group>"; };
 		65B367F5121C2620003EAD18 /* manualcontrolsettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = manualcontrolsettings.xml; sourceTree = "<group>"; };
-		65B367F6121C2620003EAD18 /* navigationdesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = navigationdesired.xml; sourceTree = "<group>"; };
-		65B367F7121C2620003EAD18 /* navigationsettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = navigationsettings.xml; sourceTree = "<group>"; };
 		65B367F8121C2620003EAD18 /* objectpersistence.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = objectpersistence.xml; sourceTree = "<group>"; };
 		65B367F9121C2620003EAD18 /* positionactual.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = positionactual.xml; sourceTree = "<group>"; };
 		65B367FA121C2620003EAD18 /* stabilizationsettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = stabilizationsettings.xml; sourceTree = "<group>"; };
@@ -2925,6 +2924,23 @@
 			isa = PBXGroup;
 			children = (
 				65311473122F4C4B00420041 /* stabilization.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		65632CBE124E09D900469B77 /* Guidance */ = {
+			isa = PBXGroup;
+			children = (
+				65632CBF124E09D900469B77 /* guidance.c */,
+				65632CC0124E09D900469B77 /* inc */,
+			);
+			path = Guidance;
+			sourceTree = "<group>";
+		};
+		65632CC0124E09D900469B77 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65632CC1124E09D900469B77 /* guidance.h */,
 			);
 			path = inc;
 			sourceTree = "<group>";
@@ -6727,7 +6743,6 @@
 				65B367EE121C2620003EAD18 /* exampleobject2.xml */,
 				65B367EF121C2620003EAD18 /* examplesettings.xml */,
 				65B367F0121C2620003EAD18 /* flightbatterystate.xml */,
-				65B367F1121C2620003EAD18 /* flightsituationactual.xml */,
 				65B367F2121C2620003EAD18 /* flighttelemetrystats.xml */,
 				65B367F3121C2620003EAD18 /* gcstelemetrystats.xml */,
 				65209A1912208B0600453371 /* gpsposition.xml */,
@@ -6735,8 +6750,6 @@
 				657CEEAD121DB6C8007A1FBE /* homelocation.xml */,
 				65B367F4121C2620003EAD18 /* manualcontrolcommand.xml */,
 				65B367F5121C2620003EAD18 /* manualcontrolsettings.xml */,
-				65B367F6121C2620003EAD18 /* navigationdesired.xml */,
-				65B367F7121C2620003EAD18 /* navigationsettings.xml */,
 				65B367F8121C2620003EAD18 /* objectpersistence.xml */,
 				65B367F9121C2620003EAD18 /* positionactual.xml */,
 				65B367FA121C2620003EAD18 /* stabilizationsettings.xml */,
@@ -6806,6 +6819,7 @@
 				65E8EF3011EEA61E00BBF654 /* Battery */,
 				65E8EF3411EEA61E00BBF654 /* Example */,
 				65E8EF3D11EEA61E00BBF654 /* GPS */,
+				65632CBE124E09D900469B77 /* Guidance */,
 				65E8EF4311EEA61E00BBF654 /* ManualControl */,
 				65E8EF4711EEA61E00BBF654 /* MK */,
 				65E8EF4C11EEA61E00BBF654 /* Osd */,

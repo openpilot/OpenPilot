@@ -227,7 +227,7 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
 //		gpsData.Groundspeed = speed[0];
 		gpsData.Latitude = latitude;
 		gpsData.Longitude = longitude;
-                gpsData->setData(gpsData);
+                gpsPos->setData(gpsData);
 	}
 	// issue manual update
 	//attActual->updated();

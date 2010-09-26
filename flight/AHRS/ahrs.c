@@ -362,6 +362,8 @@ int main()
 				mag_data.updated = 0;
 			} else if (gps_data.quality != -1
 				   && mag_data.updated == 1) {
+				float mag_var[3] = {mag_data.calibration.variance[1], mag_data.calibration.variance[0], mag_data.calibration.variance[2]};
+				INSSetMagVar(mag_var);
 				MagCorrection(mag);	// only trust mags if outdoors
 				mag_data.updated = 0;
 			} else {
@@ -371,9 +373,14 @@ int main()
 				vel[1] = 0;
 				vel[2] = 0;
 
-				VelBaroCorrection(vel,
-						  altitude_data.altitude);
-//                MagVelBaroCorrection(mag,vel,altitude_data.altitude);  // only trust mags if outdoors
+				if(mag_data.updated == 1) {
+					float mag_var[3] = {10,10,10};
+					INSSetMagVar(mag_var);
+					MagVelBaroCorrection(mag,vel,altitude_data.altitude);  // only trust mags if outdoors
+					mag_data.updated = 0;
+				} else {
+					VelBaroCorrection(vel, altitude_data.altitude);
+				}
 			}
 
 			attitude_data.quaternion.q1 = Nav.q[0];
@@ -791,7 +798,8 @@ void process_spi_request(void)
 			INSSetGyroBias(zeros);	//gyro bias corrects in preprocessing
 			INSSetAccelVar(accel_data.calibration.variance);
 			INSSetGyroVar(gyro_data.calibration.variance);
-			INSSetMagVar(mag_data.calibration.variance);
+			float mag_var[3] = {mag_data.calibration.variance[1], mag_data.calibration.variance[0], mag_data.calibration.variance[2]};
+			INSSetMagVar(mag_var);
 		}
 
 		// echo back the values used

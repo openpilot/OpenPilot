@@ -30,6 +30,7 @@
 
 #include <QtGui/QLabel>
 #include "uavobjects/positiondesired.h"
+#include "uavobjects/positionactual.h"
 
 class Ui_MagicWaypoint;
 
@@ -42,15 +43,17 @@ public:
     ~MagicWaypointGadgetWidget();
 
 signals:
-    void positionObjectChanged(double north, double east);
+    void positionActualObjectChanged(double north, double east);
+    void positionDesiredObjectChanged(double north, double east);
 
 protected slots:
     void scaleChanged(int scale);
-    void positionDesiredObjectChanged(UAVObject *);
+    void positionObjectChanged(UAVObject *);
     void positionSelected(double north, double east);
 
 private:
     PositionDesired * getPositionDesired();
+    PositionActual * getPositionActual();
     Ui_MagicWaypoint * m_magicwaypoint;
 };
 

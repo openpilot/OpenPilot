@@ -55,15 +55,21 @@ PositionField::PositionField(QWidget *parent) :
     m_background->setSharedRenderer(m_renderer);
     m_background->setElementId(QString("background"));
 
-    m_position = new QGraphicsSvgItem();
-    m_position->setSharedRenderer(m_renderer);
-    m_position->setElementId(QString("joystickEnd"));
-    m_position->setPos(0,0);
+    m_positiondesired = new QGraphicsSvgItem();
+    m_positiondesired->setSharedRenderer(m_renderer);
+    m_positiondesired->setElementId(QString("desiredPosition"));
+    m_positiondesired->setPos(0,0);
+
+    m_positionactual = new QGraphicsSvgItem();
+    m_positionactual->setSharedRenderer(m_renderer);
+    m_positionactual->setElementId(QString("actualPosition"));
+    m_positionactual->setPos(0,0);
 
     QGraphicsScene *l_scene = scene();
     l_scene->clear(); // This also deletes all items contained in the scene.
     l_scene->addItem(m_background);
-    l_scene->addItem(m_position);
+    l_scene->addItem(m_positiondesired);
+    l_scene->addItem(m_positionactual);
     l_scene->setSceneRect(m_background->boundingRect());
 }
 
@@ -75,13 +81,19 @@ PositionField::~PositionField()
 /**
   * @brief Update aircraft position on image (values go from -1 to 1)
   */
-void PositionField::updateIndicator(double north, double east)
+void PositionField::updateDesiredIndicator(double north, double east)
 {
     QRectF sceneSize = scene()->sceneRect();
 
-    m_position->setPos((east+1)/2*sceneSize.width(),(-north+1)/2*sceneSize.height());
+    m_positiondesired->setPos((east+1)/2*sceneSize.width(),(-north+1)/2*sceneSize.height());
 }
 
+void PositionField::updateActualIndicator(double north, double east)
+{
+    QRectF sceneSize = scene()->sceneRect();
+
+    m_positionactual->setPos((east+1)/2*sceneSize.width(),(-north+1)/2*sceneSize.height());
+}
 
 /**
   * @brief Redirect mouse move events to control position

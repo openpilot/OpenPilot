@@ -57,12 +57,14 @@ signals:
     void positionClicked(double north, double east);
 
 public slots:
-    void updateIndicator(double north, double east);
+    void updateDesiredIndicator(double north, double east);
+    void updateActualIndicator(double north, double east);
 
 private:
     QSvgRenderer *m_renderer;
     QGraphicsSvgItem *m_background;
-    QGraphicsSvgItem *m_position;
+    QGraphicsSvgItem *m_positiondesired;
+    QGraphicsSvgItem *m_positionactual;
 };
 
 #endif // POSITIONFIELD_H

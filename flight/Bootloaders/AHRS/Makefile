@@ -244,6 +244,9 @@ CFLAGS = -g$(DEBUGF)
 endif
 
 CFLAGS += -O$(OPT)
+ifeq ($(DEBUG),NO)
+CFLAGS += -fdata-sections -ffunction-sections
+endif
 CFLAGS += -mcpu=$(MCU) -mthumb
 CFLAGS += $(CDEFS)
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
@@ -279,6 +282,9 @@ MATH_LIB = -lm
 #    -Map:      create map file
 #    --cref:    add cross reference to  map file
 LDFLAGS = -nostartfiles -Wl,-Map=$(OUTDIR)/$(TARGET).map,--cref,--gc-sections
+ifeq ($(DEBUG),NO)
+LDFLAGS += -Wl,-static -Wl,-s
+endif
 LDFLAGS += $(patsubst %,-L%,$(EXTRA_LIBDIRS))
 LDFLAGS += -lc
 LDFLAGS += $(patsubst %,-l%,$(EXTRA_LIBS))
@@ -382,13 +388,13 @@ bin: $(OUTDIR)/$(TARGET).bin
 all: begin gccversion build sizeafter finished end
 
 ifeq ($(LOADFORMAT),ihex)
-build: elf hex lss sym
+build: elf hex sym
 else 
 ifeq ($(LOADFORMAT),binary)
-build: elf bin lss sym
+build: elf bin sym
 else 
 ifeq ($(LOADFORMAT),both)
-build: elf hex bin lss sym
+build: elf hex bin sym
 else 
 $(error "$(MSG_FORMATERROR) $(FORMAT)")
 endif

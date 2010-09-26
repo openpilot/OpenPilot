@@ -155,7 +155,6 @@ struct gps_sensor {
 void process_spi_request(void);
 void downsample_data(void);
 void calibrate_sensors(void);
-void converge_insgps();
 void reset_values();
 
 volatile uint32_t last_counter_idle_start = 0;
@@ -234,11 +233,11 @@ int main()
 		fir_coeffs[i] = 1;
 	fir_coeffs[adc_oversampling] = adc_oversampling;
 
-	if (ahrs_algorithm == INSGPS_Algo) {
-		// compute a data point and initialize INS
-		downsample_data();
-		converge_insgps();
-	}
+	INSGPSInit();
+
+	while(initialized != AHRS_INITIALIZED)
+		process_spi_request();
+	
 #ifdef DUMP_RAW
 	int previous_conversion;
 	while (1) {
@@ -642,21 +641,6 @@ void calibrate_sensors()
 	mag_data.calibration.variance[0] = mag_data.calibration.variance[0] / j - pow(mag_data.calibration.bias[0],2);
 	mag_data.calibration.variance[1] = mag_data.calibration.variance[1] / j - pow(mag_data.calibration.bias[1],2);
 	mag_data.calibration.variance[2] = mag_data.calibration.variance[2] / j - pow(mag_data.calibration.bias[2],2);
-}
-
-/**
- * @brief Quickly initialize INS assuming stationary and gravity is down
- *
- * Currently this is done iteratively but I'm sure it can be directly computed
- * when I sit down and work it out
- */
-void converge_insgps()
-{
-	float mag_var[3] = {mag_data.calibration.variance[1], mag_data.calibration.variance[0], mag_data.calibration.variance[2]}; // order swap
-	INSGPSInit();
-	INSSetAccelVar(accel_data.calibration.variance);
-	INSSetGyroVar(gyro_data.calibration.variance);
-	INSSetMagVar(mag_var);
 }
 
 /**

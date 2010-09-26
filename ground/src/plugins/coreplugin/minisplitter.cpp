@@ -46,7 +46,6 @@ public:
         setMask(QRegion(contentsRect()));
         setAttribute(Qt::WA_MouseNoMask, true);
     }
-    void setOrientation(Qt::Orientation orientation);
 protected:
     void resizeEvent(QResizeEvent *event);
     void paintEvent(QPaintEvent *event);
@@ -60,24 +59,26 @@ using namespace Core::Internal;
 
 void MiniSplitterHandle::resizeEvent(QResizeEvent *event)
 {
+    // Warning: We specifically replace the QSplitterHandle::resizeEvent,
+    // since there's no way of doing this while still calling it.
+    // That's because it has pretty much identical code (in 4.7.0) which
+    // undoes what we do here. And they didn't make that code configurable :)
+    // This means that with Qt upgrades it's worthwhile to see if anything changed
+    // in QSplitterHandle::resizeEvent, to see if there's anything important we miss.
+
+    if (orientation() == Qt::Horizontal)
+        setContentsMargins(6, 0, 6, 0);
+    else
+        setContentsMargins(0, 6, 0, 6);
     setMask(QRegion(contentsRect()));
-    QSplitterHandle::resizeEvent(event);
+
+    QWidget::resizeEvent(event);
 }
 
 void MiniSplitterHandle::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
     painter.fillRect(event->rect(), Utils::StyleHelper::borderColor());
-}
-
-
-void MiniSplitterHandle::setOrientation(Qt::Orientation orientation)
-{
-    QSplitterHandle::setOrientation(orientation);
-    if (orientation == Qt::Horizontal)
-        setContentsMargins(6, 0, 6, 0);
-    else
-        setContentsMargins(0, 6, 0, 6);
 }
 
 QSplitterHandle *MiniSplitter::createHandle()

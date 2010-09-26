@@ -617,7 +617,7 @@ ifeq ($(USE_BOOTLOADER), YES)
 # Program the device with OP Upload Tool".
 program: $(OUTDIR)/$(TARGET).bin
 	@echo ${quote}Programming with OP Upload Tool${quote}
-	../../ground/src/experimental/upload-build-desktop/debug/OPUploadTool.exe -d 0 -p $(OUTDIR)/$(TARGET).bin
+	../../ground/src/experimental/upload-build-desktop/debug/OPUploadTool -d 0 -p $(OUTDIR)/$(TARGET).bin
 else
 ifeq ($(FLASH_TOOL),OPENOCD)
 # Program the device with Dominic Rath's OPENOCD in "batch-mode", needs cfg and "reset-script".

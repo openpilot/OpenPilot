@@ -404,9 +404,6 @@ void ConfigAHRSWidget::savePositionData()
     mag_accum_x.clear();
     mag_accum_y.clear();
     mag_accum_z.clear();
-    gyro_accum_x.clear();
-    gyro_accum_y.clear();
-    gyro_accum_z.clear();
 
     collectingData = true;
     UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeRaw")));
@@ -526,10 +523,16 @@ void ConfigAHRSWidget::computeScaleBias()
 
     SixPointInConstFieldCal( 9.81, accel_data_x, accel_data_y, accel_data_z, S, b);
 
+    field = obj->getField(QString("gyro_bias"));
+    field->setDouble(listMean(gyro_accum_x),0);
+    field->setDouble(listMean(gyro_accum_y),1);
+    field->setDouble(listMean(gyro_accum_z),2);
+
     field = obj->getField(QString("accel_scale"));
     field->setDouble(S[0],0);
     field->setDouble(S[1],1);
     field->setDouble(S[2],2);
+
     field = obj->getField(QString("accel_bias"));
     field->setDouble(b[0],0);
     field->setDouble(b[1],1);
@@ -540,15 +543,16 @@ void ConfigAHRSWidget::computeScaleBias()
     field->setDouble(S[0],0);
     field->setDouble(S[1],1);
     field->setDouble(S[2],2);
+
     field = obj->getField(QString("mag_bias"));
     field->setDouble(b[0], 0);
     field->setDouble(b[1], 1);
     field->setDouble(b[2], 2);
 
     field = obj->getField(QString("gyro_bias"));
-    field->setDouble(listMean(gyro_accum_x),0);
-    field->setDouble(listMean(gyro_accum_y),1);
-    field->setDouble(listMean(gyro_accum_z),2);
+    field->setDouble(-listMean(gyro_accum_x),0);
+    field->setDouble(-listMean(gyro_accum_y),1);
+    field->setDouble(-listMean(gyro_accum_z),2);
 
     obj->updated();
 
@@ -569,11 +573,21 @@ void ConfigAHRSWidget::sixPointCalibrationMode()
     field->setDouble(1,0);
     field->setDouble(1,1);
     field->setDouble(1,2);
+
     field = obj->getField(QString("accel_bias"));
     field->setDouble(0,0);
     field->setDouble(0,1);
     field->setDouble(0,2);
+
+    field = obj->getField(QString("gyro_bias"));
+    field->setDouble(0,0);
+    field->setDouble(0,1);
+    field->setDouble(0,2);
     obj->updated();
+
+    gyro_accum_x.clear();
+    gyro_accum_y.clear();
+    gyro_accum_z.clear();
 
     /* Make sure we get AttitudeRaw updates, and skip AttitudeActual (for speed) */
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));

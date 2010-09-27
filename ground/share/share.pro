@@ -7,8 +7,15 @@ DATACOLLECTIONS = dials models pfd sounds diagrams mapicons
 
 equals(copydata, 1) {
     for(dir, DATACOLLECTIONS) {
-        exists($$GCS_SOURCE_TREE/share/openpilotgcs/$$dir) {
-            data_copy.commands += $(COPY_DIR) $$targetPath(\"$$GCS_SOURCE_TREE/share/openpilotgcs/$$dir\") $$targetPath(\"$$GCS_DATA_PATH/\") $$addNewline()
+        macx{
+            exists($$GCS_SOURCE_TREE/share/openpilotgcs/$$dir) {
+                data_copy.commands += $(COPY_DIR) $$targetPath(\"$$GCS_SOURCE_TREE/share/openpilotgcs/$$dir\") $$targetPath(\"$$GCS_DATA_PATH/\") $$addNewline()
+            }
+        }
+        !macx{
+            exists($$GCS_SOURCE_TREE/share/openpilotgcs/$$dir) {
+                data_copy.commands += $(COPY_DIR) $$targetPath(\"$$GCS_SOURCE_TREE/share/openpilotgcs/$$dir\") $$targetPath(\"$$GCS_DATA_PATH/$$dir\") $$addNewline()
+            }
         }
     }
     data_copy.target = FORCE

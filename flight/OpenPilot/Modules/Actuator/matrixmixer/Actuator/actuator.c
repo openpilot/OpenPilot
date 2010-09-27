@@ -62,8 +62,8 @@ static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutr
 static void setFailsafe();
 static float MixerCurve(const float throttle, const float* curve);
 float ProcessMixer(const int index, const float curve1, const float curve2,
-                   MixerSettingsData* mixerSettings, ActuatorDesiredData* desired,
-                   const float period);
+		   MixerSettingsData* mixerSettings, ActuatorDesiredData* desired,
+		   const float period);
 
 
 /**
@@ -74,13 +74,13 @@ int32_t ActuatorInitialize()
 {
 	// Create object queue
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
-
+	
 	// Listen for ExampleObject1 updates
 	ActuatorDesiredConnectQueue(queue);
-
+	
 	// Start main task
 	xTaskCreate(actuatorTask, (signed char*)"Actuator", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
-
+	
 	return 0;
 }
 
@@ -89,39 +89,39 @@ int32_t ActuatorInitialize()
  */
 static void actuatorTask(void* parameters)
 {
-//	UAVObjEvent ev;
+	//	UAVObjEvent ev;
 	portTickType lastSysTime;
-    ActuatorCommandData command;
+	ActuatorCommandData command;
 	ActuatorSettingsData settings;
-
+	
 	// Set servo update frequency (done only on start-up)
 	ActuatorSettingsGet(&settings);
 	PIOS_Servo_SetHz(settings.ChannelUpdateFreq[0], settings.ChannelUpdateFreq[1]);
-
+	
 	// Go to the neutral (failsafe) values until an ActuatorDesired update is received
 	setFailsafe();
-
+	
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	while (1)
 	{
-
+		
 		ActuatorCommandGet(&command);
-        ActuatorSettingsGet(&settings);
-        if ( RunMixers(&command, &settings) == -1 )
-        {
-            AlarmsSet(SYSTEMALARMS_ALARM_ACTUATOR, SYSTEMALARMS_ALARM_CRITICAL);
-        }
-        else
-        {
-            AlarmsClear(SYSTEMALARMS_ALARM_ACTUATOR);
-        }
-
+		ActuatorSettingsGet(&settings);
+		if ( RunMixers(&command, &settings) == -1 )
+		{
+			AlarmsSet(SYSTEMALARMS_ALARM_ACTUATOR, SYSTEMALARMS_ALARM_CRITICAL);
+		}
+		else
+		{
+			AlarmsClear(SYSTEMALARMS_ALARM_ACTUATOR);
+		}
+		
 		// Update output object
 		ActuatorCommandSet(&command);
 		// Update in case read only (eg. during servo configuration)
 		ActuatorCommandGet(&command);
-
+		
 		// Update servo outputs
 		for (int n = 0; n < ACTUATORCOMMAND_CHANNEL_NUMELEM; ++n)
 		{
@@ -129,7 +129,7 @@ static void actuatorTask(void* parameters)
 		}
 		// Wait until next update
 		vTaskDelayUntil(&lastSysTime, settings.UpdatePeriod / portTICK_RATE_MS );
-
+		
 	}
 }
 
@@ -147,8 +147,8 @@ static void actuatorTask(void* parameters)
 
 //this structure is equivalent to the UAVObjects for one mixer.
 typedef struct {
-    uint8_t type;
-    float matrix[5];
+	uint8_t type;
+	float matrix[5];
 } __attribute__((packed)) Mixer_t;
 
 
@@ -156,59 +156,59 @@ typedef struct {
 
 static int32_t RunMixers(ActuatorCommandData* command, ActuatorSettingsData* settings)
 {
-    SystemSettingsData sysSettings;
-    MixerSettingsData mixerSettings;
-    ActuatorDesiredData desired;
-    MixerStatusData mixerStatus;
-
-    SystemSettingsGet(&sysSettings);
-    MixerStatusGet(&mixerStatus);
-    MixerSettingsGet (&mixerSettings);
-    ActuatorDesiredGet(&desired);
-
-    float * status = (float *)&mixerStatus; //access status objects as an array of floats
-
-
+	SystemSettingsData sysSettings;
+	MixerSettingsData mixerSettings;
+	ActuatorDesiredData desired;
+	MixerStatusData mixerStatus;
+	
+	SystemSettingsGet(&sysSettings);
+	MixerStatusGet(&mixerStatus);
+	MixerSettingsGet (&mixerSettings);
+	ActuatorDesiredGet(&desired);
+	
+	float * status = (float *)&mixerStatus; //access status objects as an array of floats
+	
+	
 	int nMixers = 0;
 	Mixer_t * mixers = (Mixer_t *)&mixerSettings.Mixer0Type;
 	for(int ct=0; ct < MAX_MIX_ACTUATORS; ct++)
 	{
-	    if(mixers[ct].type != MIXERSETTINGS_MIXER0TYPE_DISABLED)
-	    {
-            nMixers ++;
-	    }
+		if(mixers[ct].type != MIXERSETTINGS_MIXER0TYPE_DISABLED)
+		{
+			nMixers ++;
+		}
 	}
 	if(nMixers < 2) //Nothing can fly with less than two mixers.
 	{
-	    return(-1);
+		return(-1);
 	}
-
+	
 	ManualControlCommandData manualControl;
 	ManualControlCommandGet(&manualControl);
-
+	
 	bool armed = manualControl.Armed == MANUALCONTROLCOMMAND_ARMED_TRUE;
 	armed &= desired.Throttle > 0.05; //zero throttle stops the motors
-
-
-    float curve1 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve1);
-    float curve2 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve2);
+	
+	
+	float curve1 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve1);
+	float curve2 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve2);
 	for(int ct=0; ct < MAX_MIX_ACTUATORS; ct++)
 	{
-	    if(mixers[ct].type != MIXERSETTINGS_MIXER0TYPE_DISABLED)
-	    {
-            status[ct] = scaleChannel(ProcessMixer(ct, curve1, curve2, &mixerSettings, &desired, settings->UpdatePeriod),
-                settings->ChannelMax[ct],
-                settings->ChannelMin[ct],
-                settings->ChannelNeutral[ct]);
-            if(!armed &&
-               mixers[ct].type == MIXERSETTINGS_MIXER0TYPE_MOTOR)
-            {
-                command->Channel[ct] = settings->ChannelMin[ct]; //force zero throttle
-            }else
-            {
-                command->Channel[ct] = status[ct]; //servos always follow command
-            }
-	    }
+		if(mixers[ct].type != MIXERSETTINGS_MIXER0TYPE_DISABLED)
+		{
+			status[ct] = scaleChannel(ProcessMixer(ct, curve1, curve2, &mixerSettings, &desired, settings->UpdatePeriod),
+						  settings->ChannelMax[ct],
+						  settings->ChannelMin[ct],
+						  settings->ChannelNeutral[ct]);
+			if(!armed &&
+			   mixers[ct].type == MIXERSETTINGS_MIXER0TYPE_MOTOR)
+			{
+				command->Channel[ct] = settings->ChannelMin[ct]; //force zero throttle
+			}else
+			{
+				command->Channel[ct] = status[ct]; //servos always follow command
+			}
+		}
 	}
 	MixerStatusSet(&mixerStatus);
 	return(0);
@@ -216,97 +216,97 @@ static int32_t RunMixers(ActuatorCommandData* command, ActuatorSettingsData* set
 
 /**
  *Process mixing for one actuator
-*/
+ */
 
 float ProcessMixer(const int index, const float curve1, const float curve2,
-                   MixerSettingsData* mixerSettings, ActuatorDesiredData* desired, const float period)
+		   MixerSettingsData* mixerSettings, ActuatorDesiredData* desired, const float period)
 {
-    static float lastResult[MAX_MIX_ACTUATORS]={0,0,0,0,0,0,0,0};
-    static float lastFilteredResult[MAX_MIX_ACTUATORS]={0,0,0,0,0,0,0,0};
-    static float filterAccumulator[MAX_MIX_ACTUATORS]={0,0,0,0,0,0,0,0};
-    Mixer_t * mixers = (Mixer_t *)&mixerSettings->Mixer0Type; //pointer to array of mixers in UAVObjects
-    Mixer_t * mixer = &mixers[index];
-    float result = (mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_THROTTLECURVE1] * curve1) +
-        (mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_THROTTLECURVE2] * curve2) +
-        (mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_ROLL] * desired->Roll) +
-        (mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_PITCH] * desired->Pitch) +
-        (mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_YAW] * desired->Yaw);
-    if(mixer->type == MIXERSETTINGS_MIXER0TYPE_MOTOR)
-    {
-        if(result < 0) //idle throttle
-        {
-            result = 0;
-        }
-
-        //feed forward
-        float accumulator = filterAccumulator[index];
-        accumulator += (result - lastResult[index]) * mixerSettings->FeedForward;
-        lastResult[index] = result;
-        result += accumulator;
-        if(accumulator > 0)
-        {
-            float filter = mixerSettings->AccelTime / period;
-            if(filter <1)
-            {
-                filter = 1;
-            }
-            accumulator -= accumulator / filter;
-        }else
-        {
-            float filter = mixerSettings->DecelTime / period;
-            if(filter <1)
-            {
-                filter = 1;
-            }
-            accumulator -= accumulator / filter;
-        }
-        filterAccumulator[index] = accumulator;
-        result += accumulator;
-
-        //acceleration limit
-        float dt = result - lastFilteredResult[index];
-        float maxDt = mixerSettings->MaxAccel * (period / 1000);
-        if(dt > maxDt) //we are accelerating too hard
-        {
-            result = lastFilteredResult[index] + maxDt;
-        }
-        lastFilteredResult[index] = result;
-    }
-    return(result);
+	static float lastResult[MAX_MIX_ACTUATORS]={0,0,0,0,0,0,0,0};
+	static float lastFilteredResult[MAX_MIX_ACTUATORS]={0,0,0,0,0,0,0,0};
+	static float filterAccumulator[MAX_MIX_ACTUATORS]={0,0,0,0,0,0,0,0};
+	Mixer_t * mixers = (Mixer_t *)&mixerSettings->Mixer0Type; //pointer to array of mixers in UAVObjects
+	Mixer_t * mixer = &mixers[index];
+	float result = (mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_THROTTLECURVE1] * curve1) +
+	(mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_THROTTLECURVE2] * curve2) +
+	(mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_ROLL] * desired->Roll) +
+	(mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_PITCH] * desired->Pitch) +
+	(mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_YAW] * desired->Yaw);
+	if(mixer->type == MIXERSETTINGS_MIXER0TYPE_MOTOR)
+	{
+		if(result < 0) //idle throttle
+		{
+			result = 0;
+		}
+		
+		//feed forward
+		float accumulator = filterAccumulator[index];
+		accumulator += (result - lastResult[index]) * mixerSettings->FeedForward;
+		lastResult[index] = result;
+		result += accumulator;
+		if(accumulator > 0)
+		{
+			float filter = mixerSettings->AccelTime / period;
+			if(filter <1)
+			{
+				filter = 1;
+			}
+			accumulator -= accumulator / filter;
+		}else
+		{
+			float filter = mixerSettings->DecelTime / period;
+			if(filter <1)
+			{
+				filter = 1;
+			}
+			accumulator -= accumulator / filter;
+		}
+		filterAccumulator[index] = accumulator;
+		result += accumulator;
+		
+		//acceleration limit
+		float dt = result - lastFilteredResult[index];
+		float maxDt = mixerSettings->MaxAccel * (period / 1000);
+		if(dt > maxDt) //we are accelerating too hard
+		{
+			result = lastFilteredResult[index] + maxDt;
+		}
+		lastFilteredResult[index] = result;
+	}
+	return(result);
 }
 
 
 /**
  *Interpolate a throttle curve. Throttle input should be in the range 0 to 1.
  *Output is in the range 0 to 1.
-*/
+ */
 
 #define MIXER_CURVE_ENTRIES 5
 
 static float MixerCurve(const float throttle, const float* curve)
 {
-    float scale = throttle * MIXER_CURVE_ENTRIES;
-    int idx1 = scale;
-    scale -= (float)idx1; //remainder
-    if(curve[0] < -1)
-    {
-        return(throttle);
-    }
-    if (idx1 < 0)
-    {
-        idx1 = 0; //clamp to lowest entry in table
-        scale = 0;
-    }
-    int idx2 = idx1 + 1;
-    if(idx2 >= MIXER_CURVE_ENTRIES)
-    {
-        idx2 = MIXER_CURVE_ENTRIES -1; //clamp to highest entry in table
-        if(idx1 >= MIXER_CURVE_ENTRIES)
-        {
-            idx1 = MIXER_CURVE_ENTRIES -1;
-        }
-    }
-    return((curve[idx1] * (1 - scale)) + (curve[idx2] * scale));
+	float scale = throttle * MIXER_CURVE_ENTRIES;
+	int idx1 = scale;
+	scale -= (float)idx1; //remainder
+	if(curve[0] < -1)
+	{
+		return(throttle);
+	}
+	if (idx1 < 0)
+	{
+		idx1 = 0; //clamp to lowest entry in table
+		scale = 0;
+	}
+	int idx2 = idx1 + 1;
+	if(idx2 >= MIXER_CURVE_ENTRIES)
+	{
+		idx2 = MIXER_CURVE_ENTRIES -1; //clamp to highest entry in table
+		if(idx1 >= MIXER_CURVE_ENTRIES)
+		{
+			idx1 = MIXER_CURVE_ENTRIES -1;
+		}
+	}
+	return((curve[idx1] * (1 - scale)) + (curve[idx2] * scale));
 }
 
 
@@ -325,7 +325,7 @@ static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutr
 	{
 		valueScaled = (int16_t)(value*((float)(neutral-min))) + neutral;
 	}
-
+	
 	if (max>min)
 	{
 		if( valueScaled > max ) valueScaled = max;
@@ -336,7 +336,7 @@ static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutr
 		if( valueScaled < max ) valueScaled = max;
 		if( valueScaled > min ) valueScaled = min;
 	}
-
+	
 	return valueScaled;
 }
 
@@ -345,26 +345,26 @@ static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutr
  */
 static void setFailsafe()
 {
-    ActuatorCommandData command;
+	ActuatorCommandData command;
 	ActuatorSettingsData settings;
-
-    ActuatorCommandGet(&command);
+	
+	ActuatorCommandGet(&command);
 	ActuatorSettingsGet(&settings);
 	// Reset ActuatorCommand to neutral values
 	for (int n = 0; n < ACTUATORCOMMAND_CHANNEL_NUMELEM; ++n)
 	{
 		command.Channel[n] = settings.ChannelNeutral[n];
 	}
-
+	
 	// Set alarm
 	AlarmsSet(SYSTEMALARMS_ALARM_ACTUATOR, SYSTEMALARMS_ALARM_CRITICAL);
-
+	
 	// Update servo outputs
 	for (int n = 0; n < ACTUATORCOMMAND_CHANNEL_NUMELEM; ++n)
 	{
 		PIOS_Servo_Set( n, command.Channel[n] );
 	}
-
+	
 	// Update output object
 	ActuatorCommandSet(&command);
 }
@@ -372,5 +372,5 @@ static void setFailsafe()
 
 /**
  * @}
-  * @}
-  */
+ * @}
+ */

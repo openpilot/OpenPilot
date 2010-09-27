@@ -46,7 +46,6 @@ HEADERS += uavobjects_global.h \
     mixerstatus.h \
     velocitydesired.h \
     velocityactual.h \
-    vtolstatus.h \
     guidancesettings.h \
     positiondesired.h \
     attitudesettings.h

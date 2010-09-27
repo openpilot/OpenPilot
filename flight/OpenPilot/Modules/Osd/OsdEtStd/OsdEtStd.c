@@ -31,7 +31,7 @@
 #include "openpilot.h"
 
 #include "flightbatterystate.h"
-#include "positionactual.h"
+#include "gpsposition.h"
 
 //
 // Configuration
@@ -166,7 +166,7 @@ static void FlightBatteryStateUpdatedCb(UAVObjEvent * ev)
 	newBattData = TRUE;
 }
 
-static void PositionActualUpdatedCb(UAVObjEvent * ev)
+static void GPSPositionUpdatedCb(UAVObjEvent * ev)
 {
 	newPosData = TRUE;
 }
@@ -377,7 +377,7 @@ static void Task(void *parameters)
 	PIOS_COM_ChangeBaud(DEBUG_PORT, 57600);
 #endif
 
-	PositionActualConnectCallback(PositionActualUpdatedCb);
+	GPSPositionConnectCallback(GPSPositionUpdatedCb);
 	FlightBatteryStateConnectCallback(FlightBatteryStateUpdatedCb);
 
 	DEBUG_MSG("OSD ET Std\n");
@@ -408,15 +408,15 @@ static void Task(void *parameters)
 		}
 
 		if (newPosData) {
-			PositionActualData positionData;
+			GPSPositionData positionData;
 
-			PositionActualGet(&positionData);
+			GPSPositionGet(&positionData);
 
 			//DEBUG_MSG("%5d Pos: #stat=%d #sats=%d alt=%d\n\r", cnt,
 			//              positionData.Status, positionData.Satellites, (uint32_t)positionData.Altitude);
 
 			// GPS Status
-			if (positionData.Status == POSITIONACTUAL_STATUS_FIX3D)
+			if (positionData.Status == GPSPOSITION_STATUS_FIX3D)
 				msg[OSDMSG_GPS_STAT] = OSDMSG_GPS_STAT_FIX;
 			else
 				msg[OSDMSG_GPS_STAT] = OSDMSG_GPS_STAT_NOFIX;
